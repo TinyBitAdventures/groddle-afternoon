@@ -10,6 +10,7 @@
  */
 
 import { GAME_DAY_MS } from './game-day.js?v=dametime-1';
+import { ITEM_CATALOG } from './inventory.js?v=catalog-unified-2';
 
 export const FOOD_VARIETY_UPGRADE = 'food_variety_bonus';
 export const FOOD_ENERGY_LIMIT_MULTIPLIER = 20;
@@ -53,8 +54,16 @@ export function createFoodState(seed = {}) {
   return normalizeFoodState(seed);
 }
 
+/**
+ * A meal earns the variety bonus only when its GSJS item carries the
+ * `foodbonus` tag. The hand-maintained set covers the original shipped meals;
+ * recipe imports register tags on ITEM_CATALOG (making-items.json).
+ */
 export function isFoodBonusItem(classTsid) {
-  return FOOD_BONUS_ITEMS.has(String(classTsid || ''));
+  const id = String(classTsid || '');
+  if (FOOD_BONUS_ITEMS.has(id)) return true;
+  const tags = ITEM_CATALOG[id]?.tags;
+  return Array.isArray(tags) && tags.includes('foodbonus');
 }
 
 /** GameServerJS game_days_since_ts used Math.round, not floor. */

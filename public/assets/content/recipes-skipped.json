@@ -1,0 +1,591 @@
+{
+  "_meta": {
+    "generator": "build-recipes.mjs",
+    "sourceRecipes": 339,
+    "imported": 281,
+    "skipped": 58,
+    "verbRecipes": 4
+  },
+  "skipped": [
+    {
+      "id": "170",
+      "name": "Juju Shoo-Shoo Powder",
+      "tool": "beaker",
+      "outputs": [
+        "juju_shoo_shoo_powder"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"170\"]"
+    },
+    {
+      "id": "190",
+      "name": "Urth Block",
+      "tool": "blockmaker",
+      "outputs": [
+        "grade_aa_earth_block"
+      ],
+      "reason": "Blockmaker makes Urth Blocks, which only feed house/terrain expansion; no building system exists.",
+      "source": "catalog_recipes.js recipes[\"190\"]"
+    },
+    {
+      "id": "196",
+      "name": "Tinkertool",
+      "tool": "tinkertool",
+      "outputs": [
+        "tinkertool"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"196\"]"
+    },
+    {
+      "id": "197",
+      "name": "Focusing Orb",
+      "tool": "tinkertool",
+      "outputs": [
+        "focusing_orb"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"197\"]"
+    },
+    {
+      "id": "198",
+      "name": "Beaker",
+      "tool": "tinkertool",
+      "outputs": [
+        "beaker"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"198\"]"
+    },
+    {
+      "id": "199",
+      "name": "Test Tube",
+      "tool": "tinkertool",
+      "outputs": [
+        "test_tube"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"199\"]"
+    },
+    {
+      "id": "215",
+      "name": "Butterfly Milker",
+      "tool": "tinkertool",
+      "outputs": [
+        "butterfly_milker"
+      ],
+      "reason": "Butterfly Milker is a placed Remote Herdkeeping machine for home pastures; no pasture/home machine system exists.",
+      "source": "catalog_recipes.js recipes[\"215\"]"
+    },
+    {
+      "id": "216",
+      "name": "Meat Collector",
+      "tool": "tinkertool",
+      "outputs": [
+        "meat_collector"
+      ],
+      "reason": "Meat Collector is a placed Remote Herdkeeping machine for home pastures; no pasture/home machine system exists.",
+      "source": "catalog_recipes.js recipes[\"216\"]"
+    },
+    {
+      "id": "217",
+      "name": "Piggy Feeder",
+      "tool": "tinkertool",
+      "outputs": [
+        "piggy_feeder"
+      ],
+      "reason": "Piggy Feeder is a placed Remote Herdkeeping machine for home pastures; no pasture/home machine system exists.",
+      "source": "catalog_recipes.js recipes[\"217\"]"
+    },
+    {
+      "id": "219",
+      "name": "Grand Ol' Grinder",
+      "tool": "tinkertool",
+      "outputs": [
+        "grand_ol_grinder"
+      ],
+      "reason": "Grand Ol' Grinder is an upgraded Grinder; mining.js only recognizes ore_grinder.",
+      "source": "catalog_recipes.js recipes[\"219\"]"
+    },
+    {
+      "id": "220",
+      "name": "High-Class Hoe",
+      "tool": "tinkertool",
+      "outputs": [
+        "high_class_hoe"
+      ],
+      "reason": "High-Class Hoe is an upgraded Hoe; garden.js only recognizes hoe.",
+      "source": "catalog_recipes.js recipes[\"220\"]"
+    },
+    {
+      "id": "248",
+      "name": "Draught of Wisdom",
+      "tool": "cauldron",
+      "outputs": [
+        "potion_xp"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"248\"]"
+    },
+    {
+      "id": "249",
+      "name": "Rocky Regeneration Solution",
+      "tool": "cauldron",
+      "outputs": [
+        "potion_rocky_regeneration_solution"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"249\"]"
+    },
+    {
+      "id": "251",
+      "name": "Spigot",
+      "tool": "metalmaker",
+      "outputs": [
+        "spigot"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"251\"]"
+    },
+    {
+      "id": "252",
+      "name": "Chair",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_chair"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"252\"]"
+    },
+    {
+      "id": "254",
+      "name": "Still",
+      "tool": "metalmaker",
+      "outputs": [
+        "still"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"254\"]"
+    },
+    {
+      "id": "255",
+      "name": "Storage Display Box",
+      "tool": "construction_tool",
+      "outputs": [
+        "bag_furniture_sdb"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"255\"]"
+    },
+    {
+      "id": "256",
+      "name": "Side Table",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_sidetable"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"256\"]"
+    },
+    {
+      "id": "257",
+      "name": "Armchair",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_armchair"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"257\"]"
+    },
+    {
+      "id": "258",
+      "name": "Bed",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_bed"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"258\"]"
+    },
+    {
+      "id": "259",
+      "name": "Sofa",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_sofa"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"259\"]"
+    },
+    {
+      "id": "260",
+      "name": "Door",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_door"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"260\"]"
+    },
+    {
+      "id": "261",
+      "name": "Wall Segment",
+      "tool": "construction_tool",
+      "outputs": [
+        "wall_segment"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"261\"]"
+    },
+    {
+      "id": "262",
+      "name": "Cabinet",
+      "tool": "construction_tool",
+      "outputs": [
+        "bag_furniture_cabinet"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"262\"]"
+    },
+    {
+      "id": "263",
+      "name": "Bookcase",
+      "tool": "alchemical_tongs",
+      "outputs": [
+        "furniture_bookcase"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"263\"]"
+    },
+    {
+      "id": "264",
+      "name": "Wall Cabinet",
+      "tool": "construction_tool",
+      "outputs": [
+        "bag_furniture_wallcabinet"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"264\"]"
+    },
+    {
+      "id": "265",
+      "name": "Shelf",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_shelf"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"265\"]"
+    },
+    {
+      "id": "266",
+      "name": "Loveseat",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_loveseat"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"266\"]"
+    },
+    {
+      "id": "267",
+      "name": "Table",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_table"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"267\"]"
+    },
+    {
+      "id": "268",
+      "name": "Coffee Table",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_coffeetable"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"268\"]"
+    },
+    {
+      "id": "269",
+      "name": "Desk",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_desk"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"269\"]"
+    },
+    {
+      "id": "270",
+      "name": "Counter",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_counter"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"270\"]"
+    },
+    {
+      "id": "271",
+      "name": "Bench",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_bench"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"271\"]"
+    },
+    {
+      "id": "272",
+      "name": "Room Decoration",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_roomdeco"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"272\"]"
+    },
+    {
+      "id": "273",
+      "name": "Hanging Decoration",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_ceilingdeco"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"273\"]"
+    },
+    {
+      "id": "274",
+      "name": "Wall Decoration",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_walldeco"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"274\"]"
+    },
+    {
+      "id": "275",
+      "name": "Tabletop Decoration",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_tabledeco"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"275\"]"
+    },
+    {
+      "id": "276",
+      "name": "Stool",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_stool"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"276\"]"
+    },
+    {
+      "id": "282",
+      "name": "Machine Stand",
+      "tool": "metalmaker",
+      "outputs": [
+        "machine_stand"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"282\"]"
+    },
+    {
+      "id": "283",
+      "name": "Metalmaker Mechanism",
+      "tool": "metalmaker",
+      "outputs": [
+        "metalmaker_mechanism"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"283\"]"
+    },
+    {
+      "id": "284",
+      "name": "Metalmaker Tooler",
+      "tool": "metalmaker",
+      "outputs": [
+        "metalmaker_tooler"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"284\"]"
+    },
+    {
+      "id": "285",
+      "name": "Blockmaker Chassis",
+      "tool": "metalmaker",
+      "outputs": [
+        "blockmaker_chassis"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"285\"]"
+    },
+    {
+      "id": "286",
+      "name": "Blockmaker Plates",
+      "tool": "metalmaker",
+      "outputs": [
+        "blockmaker_plates"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"286\"]"
+    },
+    {
+      "id": "287",
+      "name": "Cauldron",
+      "tool": "metalmaker",
+      "outputs": [
+        "cauldron"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"287\"]"
+    },
+    {
+      "id": "289",
+      "name": "Table Lamp",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_tablelamp"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"289\"]"
+    },
+    {
+      "id": "290",
+      "name": "Wall Lamp",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_walllamp"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"290\"]"
+    },
+    {
+      "id": "291",
+      "name": "Ceiling Lamp",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_ceilinglamp"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"291\"]"
+    },
+    {
+      "id": "292",
+      "name": "Floor Lamp",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_floorlamp"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"292\"]"
+    },
+    {
+      "id": "296",
+      "name": "Rug",
+      "tool": "loomer",
+      "outputs": [
+        "furniture_rug"
+      ],
+      "reason": "Output is housing furniture; no home interior or furniture placement system exists.",
+      "source": "catalog_recipes.js recipes[\"296\"]"
+    },
+    {
+      "id": "297",
+      "name": "Small Cabinet",
+      "tool": "construction_tool",
+      "outputs": [
+        "bag_furniture_smallcabinet"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"297\"]"
+    },
+    {
+      "id": "299",
+      "name": "Spindle",
+      "tool": "tinkertool",
+      "outputs": [
+        "spindle"
+      ],
+      "reason": "Spindle spins Fiber into Thread via its own verb; no spinning/fiber system exists.",
+      "source": "catalog_recipes.js recipes[\"299\"]"
+    },
+    {
+      "id": "301",
+      "name": "Class Axe",
+      "tool": "tinkertool",
+      "outputs": [
+        "class_axe"
+      ],
+      "reason": "Class Axe is an upgraded Hatchet; woodcutting.js only recognizes hatchet.",
+      "source": "catalog_recipes.js recipes[\"301\"]"
+    },
+    {
+      "id": "302",
+      "name": "Splendid Spindle",
+      "tool": "tinkertool",
+      "outputs": [
+        "splendid_spindle"
+      ],
+      "reason": "Splendid Spindle spins Fiber into Thread via its own verb; no spinning/fiber system exists.",
+      "source": "catalog_recipes.js recipes[\"302\"]"
+    },
+    {
+      "id": "303",
+      "name": "Note Pole",
+      "tool": "construction_tool",
+      "outputs": [
+        "note_pole"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"303\"]"
+    },
+    {
+      "id": "305",
+      "name": "Batterfly Bounty Booster Bar",
+      "tool": "awesome_pot",
+      "outputs": [
+        "batterfly_bar"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"305\"]"
+    },
+    {
+      "id": "307",
+      "name": "Phreaky Philter",
+      "tool": "cauldron",
+      "outputs": [
+        "potion_avatar_mixup"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"307\"]"
+    },
+    {
+      "id": "320",
+      "name": "Alphabet Sauce",
+      "tool": "cauldron",
+      "outputs": [
+        "potion_alphabet_sauce"
+      ],
+      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
+      "source": "catalog_recipes.js recipes[\"320\"]"
+    },
+    {
+      "id": "321",
+      "name": "Fireplace",
+      "tool": "construction_tool",
+      "outputs": [
+        "furniture_fireplace"
+      ],
+      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "source": "catalog_recipes.js recipes[\"321\"]"
+    }
+  ]
+}

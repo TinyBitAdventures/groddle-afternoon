@@ -117,18 +117,67 @@ export function getItemUseInfo(classTsid) {
   const effects = {};
   if (def.energy) effects.energy = def.energy;
   if (def.mood) effects.mood = def.mood;
+  if (def.xp) effects.xp = def.xp;
   return {
     usable: true,
     verb: def.verb,
+    kind: def.kind || (def.verb === 'Drink' ? 'drink' : 'food'),
     effects,
     message: def.message,
+    ...(def.source ? { source: def.source } : {}),
   };
+}
+
+/**
+ * Item uses whose numbers predate the GSJS import and are pinned by the pack
+ * preview tests (ui-systems/world). Source: apple.js base_cost 5 → 5 energy.
+ */
+const PINNED_ITEM_USES = new Set(['apple']);
+
+/**
+ * Register (or refresh) an eat/drink use from GSJS metabolics.
+ * Food: energy = round(base_cost × energy_factor) (include/food.js).
+ * Drink: drink_mood / drink_energy / drink_xp (include/drink.js).
+ * @param {string} classTsid
+ * @param {{ kind?: 'food'|'drink', verb?: string, energy?: number, mood?: number, xp?: number, message?: string, source?: string }} def
+ * @param {{ label?: string }} [opts]
+ * @returns {boolean} whether the catalog entry was written
+ */
+export function registerItemUse(classTsid, def, opts = {}) {
+  if (!classTsid || !def) return false;
+  if (PINNED_ITEM_USES.has(classTsid) && ITEM_USE_CATALOG[classTsid]) return false;
+  const kind = def.kind === 'drink' ? 'drink' : 'food';
+  const verb = def.verb || (kind === 'drink' ? 'Drink' : 'Eat');
+  const label = opts.label || ITEM_CATALOG[classTsid]?.label || classTsid.replace(/_/g, ' ');
+  const existing = ITEM_USE_CATALOG[classTsid];
+  const next = {
+    verb,
+    kind,
+    message:
+      def.message ||
+      existing?.message ||
+      (kind === 'drink' ? `You drink the ${label}.` : `You eat the ${label}.`),
+  };
+  for (const key of ['energy', 'mood', 'xp']) {
+    const n = Math.round(Number(def[key]) || 0);
+    if (n) next[key] = n;
+  }
+  if (def.source) next.source = def.source;
+  if (!next.energy && !next.mood && !next.xp) return false;
+  ITEM_USE_CATALOG[classTsid] = next;
+  return true;
+}
+
+/** Read-only view of a registered use (tests / tooling). */
+export function getItemUseDef(classTsid) {
+  const def = ITEM_USE_CATALOG[classTsid];
+  return def ? { ...def } : null;
 }
 
 /**
  * Register (or refresh icon/label for) a catalog entry.
  * @param {string} classTsid
- * @param {{ label?: string, desc?: string, icon?: string, isTool?: boolean, baseCost?: number, stackMax?: number, sellable?: boolean, donatable?: boolean }} [meta]
+ * @param {{ label?: string, desc?: string, icon?: string, isTool?: boolean, baseCost?: number, stackMax?: number, sellable?: boolean, donatable?: boolean, tags?: string[], namePlural?: string }} [meta]
  */
 export function ensureItem(classTsid, meta = {}) {
   if (!classTsid) return;
@@ -149,6 +198,10 @@ export function ensureItem(classTsid, meta = {}) {
     sellable: meta.sellable ?? existing?.sellable ?? true,
     donatable: meta.donatable ?? existing?.donatable ?? true,
   };
+  const tags = Array.isArray(meta.tags) ? meta.tags : existing?.tags;
+  if (Array.isArray(tags)) ITEM_CATALOG[classTsid].tags = [...tags];
+  const namePlural = meta.namePlural || existing?.namePlural;
+  if (namePlural) ITEM_CATALOG[classTsid].namePlural = namePlural;
 }
 
 /**
@@ -322,19 +375,33 @@ export function useItem(inv, pc, classTsid) {
   }
   const info = getItemUseInfo(classTsid);
   if (!info.usable) return { ok: false, msgs: [info.reason] };
+  // include/drink.js drink_drink: a mood drink is refused at full mood.
+  if (info.kind === 'drink' && (info.effects.mood || 0) > 0 && (pc.mood || 0) >= 100) {
+    const label = ITEM_CATALOG[classTsid]?.label || classTsid;
+    return {
+      ok: false,
+      reason: 'mood_full',
+      msgs: [`You tried to drink ${label}, but you're already in a perfectly good mood, so then you didn't do it.`],
+    };
+  }
   if (!removeItem(inv, classTsid, 1)) {
     return { ok: false, msgs: [`No ${classTsid} in pack.`] };
   }
   const effects = {};
   if (info.effects.energy) {
     const before = pc.energy || 0;
-    pc.energy = Math.min(100, before + info.effects.energy);
-    if (pc.energy > before) effects.energy = pc.energy - before;
+    pc.energy = Math.max(0, Math.min(100, before + info.effects.energy));
+    if (pc.energy !== before) effects.energy = pc.energy - before;
   }
   if (info.effects.mood) {
     const before = pc.mood || 0;
-    pc.mood = Math.min(100, before + info.effects.mood);
-    if (pc.mood > before) effects.mood = pc.mood - before;
+    pc.mood = Math.max(0, Math.min(100, before + info.effects.mood));
+    if (pc.mood !== before) effects.mood = pc.mood - before;
+  }
+  if (info.effects.xp > 0) {
+    pc.imagination = (pc.imagination || 0) + info.effects.xp;
+    pc.xp = (pc.xp || 0) + info.effects.xp;
+    effects.xp = info.effects.xp;
   }
   return { ok: true, msgs: [info.message], effects };
 }

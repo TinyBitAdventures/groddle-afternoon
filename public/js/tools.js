@@ -25,6 +25,20 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   frying_pan: { label: 'Frying Pan', capacity: 100, baseCost: 125, source: 'frying_pan.js' },
   blender: { label: 'Blender', capacity: 100, baseCost: 150, source: 'blender.js' },
   tinkertool: { label: 'Tinkertool', capacity: 200, baseCost: 500, source: 'tinkertool.js' },
+  // Recipe-import making tools (points_capacity / base_cost from each GSJS item).
+  saucepan: { label: 'Saucepan', capacity: 100, baseCost: 200, source: 'saucepan.js' },
+  mike_tyson_grill: { label: 'Famous Pugilist Grill', capacity: 100, baseCost: 175, source: 'mike_tyson_grill.js' },
+  cocktail_shaker: { label: 'Cocktail Shaker', capacity: 100, baseCost: 150, source: 'cocktail_shaker.js' },
+  awesome_pot: { label: 'Awesome Pot', capacity: 100, baseCost: 300, source: 'awesome_pot.js' },
+  cauldron: { label: 'Cauldron', capacity: 200, baseCost: 3500, source: 'cauldron.js' },
+  tincturing_kit: { label: 'Tincturing Kit', capacity: 100, baseCost: 1250, source: 'tincturing_kit.js' },
+  loomer: { label: 'Loomer', capacity: 100, baseCost: 400, source: 'loomer.js' },
+  crystallizer: { label: 'Crystalmalizing Chamber', capacity: 1000, baseCost: 2500, source: 'crystallizer.js' },
+  // Resource-node tools (js/resource-nodes.js): tool_base points_capacity overrides.
+  scraper: { label: 'Scraper', capacity: 50, baseCost: 300, source: 'scraper.js' },
+  super_scraper: { label: 'Super Scraper', capacity: 250, baseCost: 2000, source: 'super_scraper.js' },
+  shovel: { label: 'Shovel', capacity: 100, baseCost: 300, source: 'shovel.js' },
+  ace_of_spades: { label: 'Ace of Spades', capacity: 500, baseCost: 3000, source: 'ace_of_spades.js' },
 });
 
 /** Rank data from catalog_skill_packages.js `tinkering`. */

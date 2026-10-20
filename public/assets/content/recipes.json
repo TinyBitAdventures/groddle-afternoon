@@ -1,4 +1,433 @@
 {
+  "simple_slaw": {
+    "id": "1",
+    "name": "Simple Slaw",
+    "tool": "knife_and_board",
+    "energyCost": 3,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cabbage",
+        "qty": 1
+      },
+      {
+        "classTsid": "corn",
+        "qty": 1
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "simple_slaw",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"1\"]"
+  },
+  "divine_crepes": {
+    "id": "2",
+    "name": "Divine Crepes",
+    "tool": "frying_pan",
+    "energyCost": 25,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "swing_batter",
+        "qty": 1
+      },
+      {
+        "classTsid": "desssert_rub",
+        "qty": 1
+      },
+      {
+        "classTsid": "cloudberry_jam",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "divine_crepes",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "grease_monkey"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"2\"]"
+  },
+  "fried_rice": {
+    "id": "3",
+    "name": "Fried Rice",
+    "tool": "frying_pan",
+    "energyCost": 13,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "proper_rice",
+        "qty": 1
+      },
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "death_to_veg",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fried_rice",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "saute_savant"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"3\"]"
+  },
+  "hearty_omelet": {
+    "id": "4",
+    "name": "Hearty Omelet",
+    "tool": "frying_pan",
+    "energyCost": 13,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "egg_plain",
+        "qty": 2
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "mushroom",
+        "qty": 2
+      },
+      {
+        "classTsid": "hot_n_fizzy_sauce",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hearty_omelet",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "sizzler_supreme"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"4\"]"
+  },
+  "hash": {
+    "id": "5",
+    "name": "Hash",
+    "tool": "frying_pan",
+    "energyCost": 6,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "potato",
+        "qty": 2
+      },
+      {
+        "classTsid": "corn",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hash",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"5\"]"
+  },
+  "spicy_quesadilla": {
+    "id": "6",
+    "name": "Spicy Quesadilla",
+    "tool": "frying_pan",
+    "energyCost": 9,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "mustard",
+        "qty": 1
+      },
+      {
+        "classTsid": "hot_pepper",
+        "qty": 1
+      },
+      {
+        "classTsid": "tortilla",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "spicy_quesadilla",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_2",
+    "skills": [
+      "cheffery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"6\"]"
+  },
+  "juicy_carpaccio": {
+    "id": "7",
+    "name": "Juicy Carpaccio",
+    "tool": "knife_and_board",
+    "energyCost": 8,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 2
+      },
+      {
+        "classTsid": "spinach",
+        "qty": 2
+      },
+      {
+        "classTsid": "kings_of_condiments",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "juicy_carpaccio",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"7\"]"
+  },
+  "hearty_groddle_sammich": {
+    "id": "8",
+    "name": "Hearty Groddle Sammich",
+    "tool": "knife_and_board",
+    "energyCost": 11,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "bun",
+        "qty": 1
+      },
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "hot_n_fizzy_sauce",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hearty_groddle_sammich",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"8\"]"
+  },
+  "choice_crudites": {
+    "id": "9",
+    "name": "Choice Crudites",
+    "tool": "knife_and_board",
+    "energyCost": 5,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "tomato",
+        "qty": 1
+      },
+      {
+        "classTsid": "parsnip",
+        "qty": 1
+      },
+      {
+        "classTsid": "zucchini",
+        "qty": 1
+      },
+      {
+        "classTsid": "mushroom",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "choice_crudites",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "silver_cleaver_award"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"9\"]"
+  },
+  "scrumptious_frittata": {
+    "id": "10",
+    "name": "Scrumptious Frittata",
+    "tool": "frying_pan",
+    "energyCost": 8,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "egg_plain",
+        "qty": 2
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "spinach",
+        "qty": 1
+      },
+      {
+        "classTsid": "kings_of_condiments",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "scrumptious_frittata",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_2",
+    "skills": [
+      "cheffery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"10\"]"
+  },
+  "deluxe_sammich": {
+    "id": "11",
+    "name": "Deluxe Sammich",
+    "tool": "knife_and_board",
+    "energyCost": 9,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "bun",
+        "qty": 1
+      },
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "pickle",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "deluxe_sammich",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "nice_dicer"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"11\"]"
+  },
   "sammich": {
     "id": "12",
     "name": "Sammich",
@@ -26,7 +455,159 @@
     "skills": [
       "ezcooking_1"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"12\"]"
+  },
+  "fruit_salad": {
+    "id": "13",
+    "name": "Fruit Salad",
+    "tool": "knife_and_board",
+    "energyCost": 3,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "apple",
+        "qty": 1
+      },
+      {
+        "classTsid": "bunch_of_grapes",
+        "qty": 1
+      },
+      {
+        "classTsid": "banana",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fruit_salad",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"13\"]"
+  },
+  "cheese_plate": {
+    "id": "14",
+    "name": "Cheese Plate",
+    "tool": "knife_and_board",
+    "energyCost": 5,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cheese",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cheese_plate",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"14\"]"
+  },
+  "common_crudites": {
+    "id": "15",
+    "name": "Common Crudites",
+    "tool": "knife_and_board",
+    "energyCost": 4,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "broccoli",
+        "qty": 1
+      },
+      {
+        "classTsid": "potato",
+        "qty": 1
+      },
+      {
+        "classTsid": "carrot",
+        "qty": 1
+      },
+      {
+        "classTsid": "cucumber",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "common_crudites",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"15\"]"
+  },
+  "big_salad": {
+    "id": "16",
+    "name": "Big Salad",
+    "tool": "knife_and_board",
+    "energyCost": 6,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "tomato",
+        "qty": 1
+      },
+      {
+        "classTsid": "mushroom",
+        "qty": 5
+      },
+      {
+        "classTsid": "oily_dressing",
+        "qty": 1
+      },
+      {
+        "classTsid": "spinach",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "big_salad",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "master_whacker"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"16\"]"
   },
   "fried_eggs": {
     "id": "17",
@@ -55,7 +636,1275 @@
     "skills": [
       "cheffery_1"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"17\"]"
+  },
+  "basic_omelet": {
+    "id": "18",
+    "name": "Basic Omelet",
+    "tool": "frying_pan",
+    "energyCost": 5,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "egg_plain",
+        "qty": 3
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "basic_omelet",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_1",
+    "skills": [
+      "cheffery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"18\"]"
+  },
+  "best_bean_dip": {
+    "id": "19",
+    "name": "Best Bean Dip",
+    "tool": "frying_pan",
+    "energyCost": 6,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "cumin",
+        "qty": 1
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 10
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "best_bean_dip",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"19\"]"
+  },
+  "gammas_pancakes": {
+    "id": "20",
+    "name": "Gamma's Pancakes",
+    "tool": "frying_pan",
+    "energyCost": 6,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "birch_syrup",
+        "qty": 1
+      },
+      {
+        "classTsid": "swing_batter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "gammas_pancakes",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"20\"]"
+  },
+  "grilled_cheese": {
+    "id": "21",
+    "name": "Grilled Cheese",
+    "tool": "mike_tyson_grill",
+    "energyCost": 8,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "bun",
+        "qty": 2
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "grilled_cheese",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_1",
+    "skills": [
+      "grilling_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"21\"]"
+  },
+  "proper_rice": {
+    "id": "22",
+    "name": "Proper Rice",
+    "tool": "awesome_pot",
+    "energyCost": 2,
+    "xpReward": 4,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "rice",
+        "qty": 3
+      },
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "proper_rice",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_1",
+    "skills": [
+      "masterchef_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"22\"]"
+  },
+  "simple_bbq": {
+    "id": "23",
+    "name": "Simple BBQ",
+    "tool": "mike_tyson_grill",
+    "energyCost": 14,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 2
+      },
+      {
+        "classTsid": "sweet_n_sour_sauce",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "simple_bbq",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_1",
+    "skills": [
+      "grilling_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"23\"]"
+  },
+  "waffles": {
+    "id": "24",
+    "name": "Waffles",
+    "tool": "mike_tyson_grill",
+    "energyCost": 19,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "honey",
+        "qty": 1
+      },
+      {
+        "classTsid": "swing_batter",
+        "qty": 1
+      },
+      {
+        "classTsid": "desssert_rub",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "waffles",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_1",
+    "skills": [
+      "grilling_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"24\"]"
+  },
+  "papl_upside_down_pizza": {
+    "id": "25",
+    "name": "Pineapple Upside Down Pizza",
+    "tool": "mike_tyson_grill",
+    "energyCost": 11,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cheese",
+        "qty": 2
+      },
+      {
+        "classTsid": "pineapple",
+        "qty": 1
+      },
+      {
+        "classTsid": "swing_batter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "papl_upside_down_pizza",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"25\"]"
+  },
+  "super_veggie_kebabs": {
+    "id": "26",
+    "name": "Super Veggie Kebabs",
+    "tool": "mike_tyson_grill",
+    "energyCost": 28,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "mushroom",
+        "qty": 2
+      },
+      {
+        "classTsid": "urfu",
+        "qty": 1
+      },
+      {
+        "classTsid": "vegmageddon",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "super_veggie_kebabs",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_2",
+    "skills": [
+      "grilling_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"26\"]"
+  },
+  "cedar_plank_salmon": {
+    "id": "27",
+    "name": "Cedar Plank Salmon",
+    "tool": "mike_tyson_grill",
+    "energyCost": 7,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plank",
+        "qty": 2
+      },
+      {
+        "classTsid": "salmon",
+        "qty": 1
+      },
+      {
+        "classTsid": "lemon",
+        "qty": 2
+      },
+      {
+        "classTsid": "olive_oil",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cedar_plank_salmon",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "brazier_apprentice"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"27\"]"
+  },
+  "obvious_panini": {
+    "id": "28",
+    "name": "Obvious Panini",
+    "tool": "mike_tyson_grill",
+    "energyCost": 14,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "bun",
+        "qty": 1
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "secret_sauce",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "obvious_panini",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_2",
+    "skills": [
+      "grilling_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"28\"]"
+  },
+  "expensive_grilled_cheese": {
+    "id": "29",
+    "name": "Expensive Grilled Cheese",
+    "tool": "mike_tyson_grill",
+    "energyCost": 22,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "bun",
+        "qty": 1
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "creamy_catsup",
+        "qty": 1
+      },
+      {
+        "classTsid": "cheese_very_stinky",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "expensive_grilled_cheese",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "broil_king"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"29\"]"
+  },
+  "tasty_pasta": {
+    "id": "30",
+    "name": "Tasty Pasta",
+    "tool": "awesome_pot",
+    "energyCost": 35,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "wicked_bolognese_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "fried_noodles",
+        "qty": 1
+      },
+      {
+        "classTsid": "green",
+        "qty": 1
+      },
+      {
+        "classTsid": "glitchepoix",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "tasty_pasta",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "1star_cuisinartist"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"30\"]"
+  },
+  "yummy_gruel": {
+    "id": "31",
+    "name": "Yummy Gruel",
+    "tool": "awesome_pot",
+    "energyCost": 26,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "desssert_rub",
+        "qty": 1
+      },
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 3
+      },
+      {
+        "classTsid": "oats",
+        "qty": 6
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "yummy_gruel",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"31\"]"
+  },
+  "ixstyle_braised_meat": {
+    "id": "32",
+    "name": "Ix-style Braised Meat",
+    "tool": "awesome_pot",
+    "energyCost": 26,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 5
+      },
+      {
+        "classTsid": "blue_bubble",
+        "qty": 4
+      },
+      {
+        "classTsid": "naraka_flame_rub",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "ixstyle_braised_meat",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "4star_cuisinartist"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"32\"]"
+  },
+  "fortifying_gruel": {
+    "id": "33",
+    "name": "Fortifying Gruel",
+    "tool": "awesome_pot",
+    "energyCost": 22,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      },
+      {
+        "classTsid": "hot_n_fizzy_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "oats",
+        "qty": 10
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fortifying_gruel",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"33\"]"
+  },
+  "abbasid_ribs": {
+    "id": "34",
+    "name": "Abbasid Ribs",
+    "tool": "mike_tyson_grill",
+    "energyCost": 21,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 2
+      },
+      {
+        "classTsid": "hototot_rub",
+        "qty": 1
+      },
+      {
+        "classTsid": "mild_sauce",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "abbasid_ribs",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "master_carbonifier"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"34\"]"
+  },
+  "meat_gumbo": {
+    "id": "35",
+    "name": "Meat Gumbo",
+    "tool": "awesome_pot",
+    "energyCost": 29,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 2
+      },
+      {
+        "classTsid": "stock_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "glitchepoix",
+        "qty": 1
+      },
+      {
+        "classTsid": "hototot_rub",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "meat_gumbo",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_1",
+    "skills": [
+      "masterchef_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"35\"]"
+  },
+  "lemburger": {
+    "id": "36",
+    "name": "Lemburger",
+    "tool": "mike_tyson_grill",
+    "energyCost": 19,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "bun",
+        "qty": 1
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "creamy_catsup",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "lemburger",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_2",
+    "skills": [
+      "grilling_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"36\"]"
+  },
+  "meat_tetrazzini": {
+    "id": "37",
+    "name": "Meat Tetrazzini",
+    "tool": "awesome_pot",
+    "energyCost": 32,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 2
+      },
+      {
+        "classTsid": "plain_noodles",
+        "qty": 1
+      },
+      {
+        "classTsid": "tangy_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "mushroom",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "meat_tetrazzini",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "3star_cuisinartist"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"37\"]"
+  },
+  "rich_tagine": {
+    "id": "38",
+    "name": "Rich Tagine",
+    "tool": "awesome_pot",
+    "energyCost": 34,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 3
+      },
+      {
+        "classTsid": "trump_rub",
+        "qty": 1
+      },
+      {
+        "classTsid": "glitchepoix",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "rich_tagine",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"38\"]"
+  },
+  "chillybusting_chili": {
+    "id": "39",
+    "name": "Chilly-Busting Chili",
+    "tool": "awesome_pot",
+    "energyCost": 31,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 2
+      },
+      {
+        "classTsid": "death_to_veg",
+        "qty": 1
+      },
+      {
+        "classTsid": "legumes_parisienne",
+        "qty": 2
+      },
+      {
+        "classTsid": "naraka_flame_rub",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "chillybusting_chili",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"39\"]"
+  },
+  "awesome_stew": {
+    "id": "40",
+    "name": "Awesome Stew",
+    "tool": "awesome_pot",
+    "energyCost": 24,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 2
+      },
+      {
+        "classTsid": "saffron",
+        "qty": 1
+      },
+      {
+        "classTsid": "vegmageddon",
+        "qty": 1
+      },
+      {
+        "classTsid": "legumes_parisienne",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "awesome_stew",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "golden_ladle_award"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"40\"]"
+  },
+  "mild_sauce": {
+    "id": "41",
+    "name": "Mild Sauce",
+    "tool": "saucepan",
+    "energyCost": 3,
+    "xpReward": 4,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      },
+      {
+        "classTsid": "milk_butterfly",
+        "qty": 1
+      },
+      {
+        "classTsid": "olive_oil",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "mild_sauce",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_1",
+    "skills": [
+      "saucery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"41\"]"
+  },
+  "cheezy_sauce": {
+    "id": "42",
+    "name": "Cheezy Sauce",
+    "tool": "saucepan",
+    "energyCost": 7,
+    "xpReward": 4,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      },
+      {
+        "classTsid": "roux",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cheezy_sauce",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_1",
+    "skills": [
+      "saucery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"42\"]"
+  },
+  "whortleberry_jelly": {
+    "id": "43",
+    "name": "Whortleberry Jelly",
+    "tool": "saucepan",
+    "energyCost": 6,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "honey",
+        "qty": 1
+      },
+      {
+        "classTsid": "cardamom",
+        "qty": 1
+      },
+      {
+        "classTsid": "whortleberry",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "whortleberry_jelly",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "a1_saucier"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"43\"]"
+  },
+  "wavy_gravy": {
+    "id": "44",
+    "name": "Wavy Gravy",
+    "tool": "saucepan",
+    "energyCost": 9,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "camphor",
+        "qty": 1
+      },
+      {
+        "classTsid": "stock_sauce",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "wavy_gravy",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "super_saucier"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"44\"]"
+  },
+  "creamy_catsup": {
+    "id": "45",
+    "name": "Creamy Catsup",
+    "tool": "saucepan",
+    "energyCost": 9,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "honey",
+        "qty": 1
+      },
+      {
+        "classTsid": "red",
+        "qty": 1
+      },
+      {
+        "classTsid": "kings_of_condiments",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "creamy_catsup",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_2",
+    "skills": [
+      "saucery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"45\"]"
+  },
+  "wicked_bolognese_sauce": {
+    "id": "46",
+    "name": "Wicked Bolognese Sauce",
+    "tool": "saucepan",
+    "energyCost": 8,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "olive_oil",
+        "qty": 1
+      },
+      {
+        "classTsid": "hot_pepper",
+        "qty": 1
+      },
+      {
+        "classTsid": "red",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "wicked_bolognese_sauce",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_2",
+    "skills": [
+      "saucery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"46\"]"
+  },
+  "onion_sauce": {
+    "id": "47",
+    "name": "Onion Sauce",
+    "tool": "saucepan",
+    "energyCost": 7,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "nutmeg",
+        "qty": 1
+      },
+      {
+        "classTsid": "onion",
+        "qty": 2
+      },
+      {
+        "classTsid": "roux",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "onion_sauce",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "spice_examiner"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"47\"]"
+  },
+  "hot_n_fizzy_sauce": {
+    "id": "48",
+    "name": "Hot 'n' Fizzy Sauce",
+    "tool": "saucepan",
+    "energyCost": 5,
+    "xpReward": 5,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hot_pepper",
+        "qty": 1
+      },
+      {
+        "classTsid": "plain_bubble",
+        "qty": 3
+      },
+      {
+        "classTsid": "roux",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hot_n_fizzy_sauce",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "gravy_maven"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"48\"]"
+  },
+  "cloudberry_jam": {
+    "id": "49",
+    "name": "Cloudberry Jam",
+    "tool": "saucepan",
+    "energyCost": 4,
+    "xpReward": 5,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cloudberry",
+        "qty": 11
+      },
+      {
+        "classTsid": "ginger",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cloudberry_jam",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "roux_guru"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"49\"]"
+  },
+  "sweet_n_sour_sauce": {
+    "id": "50",
+    "name": "Sweet 'n' Sour Sauce",
+    "tool": "saucepan",
+    "energyCost": 7,
+    "xpReward": 4,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "honey",
+        "qty": 1
+      },
+      {
+        "classTsid": "lemon",
+        "qty": 1
+      },
+      {
+        "classTsid": "red",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sweet_n_sour_sauce",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_1",
+    "skills": [
+      "saucery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"50\"]"
+  },
+  "secret_sauce": {
+    "id": "51",
+    "name": "Secret Sauce",
+    "tool": "saucepan",
+    "energyCost": 5,
+    "xpReward": 4,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "egg_plain",
+        "qty": 1
+      },
+      {
+        "classTsid": "black_pepper",
+        "qty": 1
+      },
+      {
+        "classTsid": "roux",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "secret_sauce",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "rolling_boiler"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"51\"]"
   },
   "fruity_juice": {
     "id": "52",
@@ -88,6 +1937,10 @@
     "skills": [
       "blending_1"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"52\"]"
   },
   "lemon_juice": {
@@ -113,6 +1966,10 @@
     "skills": [
       "blending_1"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"53\"]"
   },
   "orange_juice": {
@@ -138,7 +1995,255 @@
     "skills": [
       "blending_1"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"54\"]"
+  },
+  "mega_healthy_veggie_juice": {
+    "id": "55",
+    "name": "Mega Healthy Veggie Juice",
+    "tool": "blender",
+    "energyCost": 5,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "carrot",
+        "qty": 1
+      },
+      {
+        "classTsid": "cabbage",
+        "qty": 1
+      },
+      {
+        "classTsid": "parsnip",
+        "qty": 1
+      },
+      {
+        "classTsid": "mangosteen",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "mega_healthy_veggie_juice",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "pulse_frappe_mix_blend"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"55\"]"
+  },
+  "cloud_11_smoothie": {
+    "id": "56",
+    "name": "Cloud 11 Smoothie",
+    "tool": "blender",
+    "energyCost": 7,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cloudberry",
+        "qty": 11
+      },
+      {
+        "classTsid": "banana",
+        "qty": 1
+      },
+      {
+        "classTsid": "honey",
+        "qty": 1
+      },
+      {
+        "classTsid": "milk_butterfly",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cloud_11_smoothie",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"56\"]"
+  },
+  "exotic_juice": {
+    "id": "57",
+    "name": "Exotic Juice",
+    "tool": "blender",
+    "energyCost": 8,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "pineapple",
+        "qty": 1
+      },
+      {
+        "classTsid": "banana",
+        "qty": 1
+      },
+      {
+        "classTsid": "mangosteen",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "exotic_juice",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "high_speed_commingler"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"57\"]"
+  },
+  "tooberry_shake": {
+    "id": "58",
+    "name": "Too-berry Shake",
+    "tool": "blender",
+    "energyCost": 8,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "milk_butterfly",
+        "qty": 1
+      },
+      {
+        "classTsid": "strawberry",
+        "qty": 4
+      },
+      {
+        "classTsid": "whortleberry",
+        "qty": 4
+      },
+      {
+        "classTsid": "birch_syrup",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "tooberry_shake",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_2",
+    "skills": [
+      "blending_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"58\"]"
+  },
+  "savory_smoothie": {
+    "id": "59",
+    "name": "Savory Smoothie",
+    "tool": "blender",
+    "energyCost": 10,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "oily_dressing",
+        "qty": 1
+      },
+      {
+        "classTsid": "hard_bubble",
+        "qty": 3
+      },
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "savory_smoothie",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "blendmaster"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"59\"]"
+  },
+  "earthshaker": {
+    "id": "60",
+    "name": "Earthshaker",
+    "tool": "blender",
+    "energyCost": 17,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "egg_plain",
+        "qty": 6
+      },
+      {
+        "classTsid": "banana",
+        "qty": 1
+      },
+      {
+        "classTsid": "hot_n_fizzy_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "garlic",
+        "qty": 1
+      },
+      {
+        "classTsid": "beer",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "earthshaker",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_2",
+    "skills": [
+      "blending_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"60\"]"
   },
   "bubble_tea": {
     "id": "61",
@@ -175,7 +2280,1088 @@
     "skills": [
       "blending_2"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"61\"]"
+  },
+  "mabbish_coffee": {
+    "id": "62",
+    "name": "Mabbish Coffee",
+    "tool": "cocktail_shaker",
+    "energyCost": 7,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "coffee",
+        "qty": 1
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "milk_butterfly",
+        "qty": 1
+      },
+      {
+        "classTsid": "cinnamon",
+        "qty": 1
+      },
+      {
+        "classTsid": "plain_bubble",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "mabbish_coffee",
+        "qty": 1
+      }
+    ],
+    "skill": "cocktailcrafting_1",
+    "skills": [
+      "cocktailcrafting_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"62\"]"
+  },
+  "spicy_grog": {
+    "id": "63",
+    "name": "Spicy Grog",
+    "tool": "cocktail_shaker",
+    "energyCost": 6,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "licorice",
+        "qty": 1
+      },
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      },
+      {
+        "classTsid": "hot_pepper",
+        "qty": 1
+      },
+      {
+        "classTsid": "mustard",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "spicy_grog",
+        "qty": 1
+      }
+    ],
+    "skill": "cocktailcrafting_1",
+    "skills": [
+      "cocktailcrafting_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"63\"]"
+  },
+  "creamy_martini": {
+    "id": "64",
+    "name": "Creamy Martini",
+    "tool": "cocktail_shaker",
+    "energyCost": 8,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "milk_butterfly",
+        "qty": 2
+      },
+      {
+        "classTsid": "ice",
+        "qty": 1
+      },
+      {
+        "classTsid": "onion",
+        "qty": 1
+      },
+      {
+        "classTsid": "lemon",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "creamy_martini",
+        "qty": 1
+      }
+    ],
+    "skill": "cocktailcrafting_1",
+    "skills": [
+      "cocktailcrafting_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"64\"]"
+  },
+  "slow_gin_fizz": {
+    "id": "65",
+    "name": "Slow Gin Fizz",
+    "tool": "cocktail_shaker",
+    "energyCost": 8,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "fruity_juice",
+        "qty": 1
+      },
+      {
+        "classTsid": "blue_bubble",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "slow_gin_fizz",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "middling_mixologist"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"65\"]"
+  },
+  "carrot_margarita": {
+    "id": "66",
+    "name": "Carrot Margarita",
+    "tool": "cocktail_shaker",
+    "energyCost": 11,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "orange_juice",
+        "qty": 1
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      },
+      {
+        "classTsid": "lemon",
+        "qty": 1
+      },
+      {
+        "classTsid": "ice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "carrot_margarita",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"66\"]"
+  },
+  "cloudberry_daiquiri": {
+    "id": "67",
+    "name": "Cloudberry Daiquiri",
+    "tool": "cocktail_shaker",
+    "energyCost": 17,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "cloud_11_smoothie",
+        "qty": 1
+      },
+      {
+        "classTsid": "ice",
+        "qty": 1
+      },
+      {
+        "classTsid": "nutmeg",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cloudberry_daiquiri",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "mediocre_mixologist"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"67\"]"
+  },
+  "cosmapolitan": {
+    "id": "68",
+    "name": "Cosma-politan",
+    "tool": "cocktail_shaker",
+    "energyCost": 14,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "fruity_juice",
+        "qty": 1
+      },
+      {
+        "classTsid": "ice",
+        "qty": 1
+      },
+      {
+        "classTsid": "lemon_juice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cosmapolitan",
+        "qty": 1
+      }
+    ],
+    "skill": "cocktailcrafting_2",
+    "skills": [
+      "cocktailcrafting_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"68\"]"
+  },
+  "flaming_humbaba": {
+    "id": "69",
+    "name": "Flaming Humbaba",
+    "tool": "cocktail_shaker",
+    "energyCost": 18,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "laughing_gas",
+        "qty": 1
+      },
+      {
+        "classTsid": "hot_n_fizzy_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "fruity_juice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "flaming_humbaba",
+        "qty": 1
+      }
+    ],
+    "skill": "cocktailcrafting_2",
+    "skills": [
+      "cocktailcrafting_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"69\"]"
+  },
+  "gurly_drink": {
+    "id": "70",
+    "name": "Gurly Drink",
+    "tool": "cocktail_shaker",
+    "energyCost": 16,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "fruity_juice",
+        "qty": 1
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "honey",
+        "qty": 1
+      },
+      {
+        "classTsid": "ginger",
+        "qty": 1
+      },
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "gurly_drink",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "superior_mixologist"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"70\"]"
+  },
+  "pungent_sunrise": {
+    "id": "71",
+    "name": "Pungent Sunrise",
+    "tool": "cocktail_shaker",
+    "energyCost": 20,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "fruit_salad",
+        "qty": 1
+      },
+      {
+        "classTsid": "exotic_juice",
+        "qty": 1
+      },
+      {
+        "classTsid": "camphor",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pungent_sunrise",
+        "qty": 1
+      }
+    ],
+    "skill": "cocktailcrafting_2",
+    "skills": [
+      "cocktailcrafting_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"71\"]"
+  },
+  "butterfly_egg": {
+    "id": "72",
+    "name": "Butterfly Egg",
+    "tool": "egg_seasoner",
+    "energyCost": 15,
+    "xpReward": 30,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "blue_bubble",
+        "qty": 8
+      },
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 10
+      },
+      {
+        "classTsid": "honey",
+        "qty": 10
+      },
+      {
+        "classTsid": "egg_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "butterfly_egg",
+        "qty": 1
+      }
+    ],
+    "skill": "animalhusbandry_1",
+    "skills": [
+      "animalhusbandry_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"72\"]"
+  },
+  "chicken_egg": {
+    "id": "73",
+    "name": "Chicken Egg",
+    "tool": "egg_seasoner",
+    "energyCost": 15,
+    "xpReward": 15,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "garlic",
+        "qty": 10
+      },
+      {
+        "classTsid": "white_gas",
+        "qty": 1
+      },
+      {
+        "classTsid": "egg_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "chicken_egg",
+        "qty": 1
+      }
+    ],
+    "skill": "animalhusbandry_1",
+    "skills": [
+      "animalhusbandry_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"73\"]"
+  },
+  "piggy_egg": {
+    "id": "74",
+    "name": "Piggy Egg",
+    "tool": "egg_seasoner",
+    "energyCost": 20,
+    "xpReward": 22,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hard_bubble",
+        "qty": 7
+      },
+      {
+        "classTsid": "potato",
+        "qty": 2
+      },
+      {
+        "classTsid": "apple",
+        "qty": 3
+      },
+      {
+        "classTsid": "egg_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "piggy_egg",
+        "qty": 1
+      }
+    ],
+    "skill": "animalhusbandry_1",
+    "skills": [
+      "animalhusbandry_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"74\"]"
+  },
+  "bean_egg": {
+    "id": "75",
+    "name": "Egg Plant Bean",
+    "tool": "bean_seasoner",
+    "energyCost": 15,
+    "xpReward": 50,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "camphor",
+        "qty": 1
+      },
+      {
+        "classTsid": "heavy_gas",
+        "qty": 1
+      },
+      {
+        "classTsid": "pineapple",
+        "qty": 2
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bean_egg",
+        "qty": 1
+      }
+    ],
+    "skill": "botany_1",
+    "skills": [
+      "botany_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"75\"]"
+  },
+  "bean_bean": {
+    "id": "76",
+    "name": "Bean Tree Bean",
+    "tool": "bean_seasoner",
+    "energyCost": 15,
+    "xpReward": 50,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "nutmeg",
+        "qty": 3
+      },
+      {
+        "classTsid": "lemon",
+        "qty": 3
+      },
+      {
+        "classTsid": "general_vapour",
+        "qty": 3
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bean_bean",
+        "qty": 1
+      }
+    ],
+    "skill": "botany_1",
+    "skills": [
+      "botany_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"76\"]"
+  },
+  "bean_bubble": {
+    "id": "77",
+    "name": "Bubble Tree Bean",
+    "tool": "bean_seasoner",
+    "energyCost": 15,
+    "xpReward": 50,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "turmeric",
+        "qty": 3
+      },
+      {
+        "classTsid": "plum",
+        "qty": 4
+      },
+      {
+        "classTsid": "helium",
+        "qty": 1
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bean_bubble",
+        "qty": 1
+      }
+    ],
+    "skill": "botany_1",
+    "skills": [
+      "botany_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"77\"]"
+  },
+  "bean_fruit": {
+    "id": "78",
+    "name": "Fruit Tree Bean",
+    "tool": "bean_seasoner",
+    "energyCost": 15,
+    "xpReward": 50,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cardamom",
+        "qty": 3
+      },
+      {
+        "classTsid": "laughing_gas",
+        "qty": 2
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bean_fruit",
+        "qty": 1
+      }
+    ],
+    "skill": "botany_1",
+    "skills": [
+      "botany_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"78\"]"
+  },
+  "bean_spice": {
+    "id": "79",
+    "name": "Spice Plant Bean",
+    "tool": "bean_seasoner",
+    "energyCost": 15,
+    "xpReward": 50,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "crying_gas",
+        "qty": 1
+      },
+      {
+        "classTsid": "carrot",
+        "qty": 4
+      },
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 3
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bean_spice",
+        "qty": 1
+      }
+    ],
+    "skill": "botany_1",
+    "skills": [
+      "botany_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"79\"]"
+  },
+  "bean_gas": {
+    "id": "80",
+    "name": "Gas Plant Bean",
+    "tool": "bean_seasoner",
+    "energyCost": 15,
+    "xpReward": 50,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "licorice",
+        "qty": 4
+      },
+      {
+        "classTsid": "beer",
+        "qty": 1
+      },
+      {
+        "classTsid": "hard_bubble",
+        "qty": 2
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bean_gas",
+        "qty": 1
+      }
+    ],
+    "skill": "botany_1",
+    "skills": [
+      "botany_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"80\"]"
+  },
+  "eggy_scramble": {
+    "id": "81",
+    "name": "Eggy Scramble",
+    "tool": "frying_pan",
+    "energyCost": 3,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "egg_plain",
+        "qty": 2
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "eggy_scramble",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_2",
+    "skills": [
+      "cheffery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"81\"]"
+  },
+  "mexicali_eggs": {
+    "id": "82",
+    "name": "Mexicali Eggs",
+    "tool": "frying_pan",
+    "energyCost": 8,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "egg_plain",
+        "qty": 2
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 3
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "tortilla",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "mexicali_eggs",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_2",
+    "skills": [
+      "cheffery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"82\"]"
+  },
+  "corny_fritter": {
+    "id": "83",
+    "name": "Corny Fritter",
+    "tool": "frying_pan",
+    "energyCost": 4,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "corn",
+        "qty": 3
+      },
+      {
+        "classTsid": "egg_plain",
+        "qty": 1
+      },
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "corny_fritter",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_3",
+    "skills": [
+      "cheffery_3"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"83\"]"
+  },
+  "corn_off_the_cob": {
+    "id": "84",
+    "name": "Corn-off-the-Cob",
+    "tool": "frying_pan",
+    "energyCost": 6,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "corn",
+        "qty": 4
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "corn_off_the_cob",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_3",
+    "skills": [
+      "cheffery_3"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"84\"]"
+  },
+  "oaty_cake": {
+    "id": "85",
+    "name": "Oaty Cake",
+    "tool": "awesome_pot",
+    "energyCost": 4,
+    "xpReward": 5,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "oats",
+        "qty": 1
+      },
+      {
+        "classTsid": "birch_syrup",
+        "qty": 1
+      },
+      {
+        "classTsid": "egg_plain",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "oaty_cake",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"85\"]"
+  },
+  "banana_no_names": {
+    "id": "86",
+    "name": "Banana No-Names",
+    "tool": "frying_pan",
+    "energyCost": 4,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "banana",
+        "qty": 1
+      },
+      {
+        "classTsid": "honey",
+        "qty": 1
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "banana_no_names",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_3",
+    "skills": [
+      "cheffery_3"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"86\"]"
+  },
+  "fried_noodles": {
+    "id": "87",
+    "name": "Fried Noodles",
+    "tool": "frying_pan",
+    "energyCost": 4,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_noodles",
+        "qty": 1
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fried_noodles",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "pretty_good_griddler"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"87\"]"
+  },
+  "messy_fry_up": {
+    "id": "88",
+    "name": "Messy Fry-Up",
+    "tool": "frying_pan",
+    "energyCost": 6,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "egg_plain",
+        "qty": 2
+      },
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "potato",
+        "qty": 1
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "messy_fry_up",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_2",
+    "skills": [
+      "cheffery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"88\"]"
   },
   "green_eggs": {
     "id": "89",
@@ -202,7 +3388,560 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [
+      "decent_hash_slinger"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"89\"]"
+  },
+  "applejack": {
+    "id": "90",
+    "name": "Applejack",
+    "tool": "frying_pan",
+    "energyCost": 3,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "apple",
+        "qty": 1
+      },
+      {
+        "classTsid": "oats",
+        "qty": 1
+      },
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "applejack",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_3",
+    "skills": [
+      "cheffery_3"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"90\"]"
+  },
+  "frog_in_a_hole": {
+    "id": "91",
+    "name": "Frog-in-a-Hole",
+    "tool": "mike_tyson_grill",
+    "energyCost": 4,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "egg_plain",
+        "qty": 1
+      },
+      {
+        "classTsid": "bun",
+        "qty": 1
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "frog_in_a_hole",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_2",
+    "skills": [
+      "grilling_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"91\"]"
+  },
+  "bubble_and_squeak": {
+    "id": "92",
+    "name": "Bubble and Squeak",
+    "tool": "frying_pan",
+    "energyCost": 6,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "carrot",
+        "qty": 1
+      },
+      {
+        "classTsid": "hard_bubble",
+        "qty": 1
+      },
+      {
+        "classTsid": "potato",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bubble_and_squeak",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_3",
+    "skills": [
+      "cheffery_3"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"92\"]"
+  },
+  "flummery": {
+    "id": "93",
+    "name": "Flummery",
+    "tool": "awesome_pot",
+    "energyCost": 23,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "oats",
+        "qty": 2
+      },
+      {
+        "classTsid": "milk_butterfly",
+        "qty": 2
+      },
+      {
+        "classTsid": "whortleberry",
+        "qty": 6
+      },
+      {
+        "classTsid": "desssert_rub",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "flummery",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "2star_cuisinartist"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"93\"]"
+  },
+  "tangy_noodles": {
+    "id": "94",
+    "name": "Tangy Noodles",
+    "tool": "awesome_pot",
+    "energyCost": 5,
+    "xpReward": 5,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_noodles",
+        "qty": 1
+      },
+      {
+        "classTsid": "lemon",
+        "qty": 1
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "tangy_noodles",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_1",
+    "skills": [
+      "masterchef_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"94\"]"
+  },
+  "potato_patty": {
+    "id": "95",
+    "name": "Potato Patty",
+    "tool": "knife_and_board",
+    "energyCost": 4,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "potato",
+        "qty": 1
+      },
+      {
+        "classTsid": "onion",
+        "qty": 1
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potato_patty",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"95\"]"
+  },
+  "greasy_frybread": {
+    "id": "96",
+    "name": "Greasy Frybread",
+    "tool": "mike_tyson_grill",
+    "energyCost": 5,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "bun",
+        "qty": 1
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "greasy_frybread",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_2",
+    "skills": [
+      "grilling_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"96\"]"
+  },
+  "cheezy_sammich": {
+    "id": "97",
+    "name": "Cheezy Sammich",
+    "tool": "knife_and_board",
+    "energyCost": 4,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "bun",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cheezy_sammich",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"97\"]"
+  },
+  "berry_bowl": {
+    "id": "98",
+    "name": "Berry Bowl",
+    "tool": "knife_and_board",
+    "energyCost": 5,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "whortleberry",
+        "qty": 4
+      },
+      {
+        "classTsid": "cloudberry",
+        "qty": 3
+      },
+      {
+        "classTsid": "strawberry",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "berry_bowl",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"98\"]"
+  },
+  "lazy_salad": {
+    "id": "99",
+    "name": "Lazy Salad",
+    "tool": "knife_and_board",
+    "energyCost": 4,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "tomato",
+        "qty": 2
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "lazy_salad",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"99\"]"
+  },
+  "snack_pack": {
+    "id": "100",
+    "name": "Snack Pack",
+    "tool": "knife_and_board",
+    "energyCost": 7,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "apple",
+        "qty": 1
+      },
+      {
+        "classTsid": "pickle",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "snack_pack",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "fine_mincer"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"100\"]"
+  },
+  "lotsa_lox": {
+    "id": "101",
+    "name": "Lotsa Lox",
+    "tool": "knife_and_board",
+    "energyCost": 4,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "salmon",
+        "qty": 1
+      },
+      {
+        "classTsid": "onion",
+        "qty": 1
+      },
+      {
+        "classTsid": "lemon",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "lotsa_lox",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"101\"]"
+  },
+  "cold_taco": {
+    "id": "102",
+    "name": "Cold Taco",
+    "tool": "knife_and_board",
+    "energyCost": 7,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "cheese",
+        "qty": 1
+      },
+      {
+        "classTsid": "tortilla",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cold_taco",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "able_chopper"
+    ],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"102\"]"
+  },
+  "spinach_salad": {
+    "id": "103",
+    "name": "Spinach Salad",
+    "tool": "knife_and_board",
+    "energyCost": 2,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "spinach",
+        "qty": 1
+      },
+      {
+        "classTsid": "orange",
+        "qty": 1
+      },
+      {
+        "classTsid": "onion",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "spinach_salad",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"103\"]"
+  },
+  "exotic_fruit_salad": {
+    "id": "104",
+    "name": "Exotic Fruit Salad",
+    "tool": "knife_and_board",
+    "energyCost": 4,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "pineapple",
+        "qty": 1
+      },
+      {
+        "classTsid": "orange",
+        "qty": 1
+      },
+      {
+        "classTsid": "banana",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "exotic_fruit_salad",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"104\"]"
   },
   "blue_bubble": {
     "id": "105",
@@ -225,6 +3964,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"105\"]"
   },
   "tiny_bubble": {
@@ -248,6 +3991,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"106\"]"
   },
   "hard_bubble": {
@@ -271,7 +4018,308 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"107\"]"
+  },
+  "change_plum": {
+    "id": "108",
+    "name": "Plum",
+    "tool": "fruit_changing_machine",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "plum",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"108\"]"
+  },
+  "change_grapes": {
+    "id": "109",
+    "name": "Bunch of Grapes",
+    "tool": "fruit_changing_machine",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bunch_of_grapes",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"109\"]"
+  },
+  "change_orange": {
+    "id": "111",
+    "name": "Orange",
+    "tool": "fruit_changing_machine",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "orange",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"111\"]"
+  },
+  "change_apple": {
+    "id": "112",
+    "name": "Apple",
+    "tool": "fruit_changing_machine",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "apple",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"112\"]"
+  },
+  "change_lemon": {
+    "id": "113",
+    "name": "Lemon",
+    "tool": "fruit_changing_machine",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "lemon",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"113\"]"
+  },
+  "change_pineapple": {
+    "id": "114",
+    "name": "Pineapple",
+    "tool": "fruit_changing_machine",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pineapple",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"114\"]"
+  },
+  "change_banana": {
+    "id": "115",
+    "name": "Banana",
+    "tool": "fruit_changing_machine",
+    "energyCost": 5,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 6
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "banana",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"115\"]"
+  },
+  "pinch_of_salt": {
+    "id": "116",
+    "name": "Pinch of Salt",
+    "tool": "spice_mill",
+    "energyCost": 1,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 100,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"116\"]"
+  },
+  "curry": {
+    "id": "117",
+    "name": "Curry",
+    "tool": "spice_mill",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "curry",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"117\"]"
+  },
+  "hot_pepper": {
+    "id": "118",
+    "name": "Hot Pepper",
+    "tool": "spice_mill",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hot_pepper",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"118\"]"
+  },
+  "garlic": {
+    "id": "119",
+    "name": "Garlic",
+    "tool": "spice_mill",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "garlic",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"119\"]"
   },
   "ginger": {
     "id": "120",
@@ -294,6 +4342,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"120\"]"
   },
   "black_pepper": {
@@ -317,6 +4369,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"121\"]"
   },
   "mustard": {
@@ -340,6 +4396,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"122\"]"
   },
   "cumin": {
@@ -363,7 +4423,227 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"123\"]"
+  },
+  "cinnamon": {
+    "id": "124",
+    "name": "Cinnamon",
+    "tool": "spice_mill",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cinnamon",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"124\"]"
+  },
+  "licorice": {
+    "id": "125",
+    "name": "Licorice",
+    "tool": "spice_mill",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "licorice",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"125\"]"
+  },
+  "nutmeg": {
+    "id": "126",
+    "name": "Nutmeg",
+    "tool": "spice_mill",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "nutmeg",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"126\"]"
+  },
+  "saffron": {
+    "id": "127",
+    "name": "Saffron",
+    "tool": "spice_mill",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "saffron",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"127\"]"
+  },
+  "turmeric": {
+    "id": "128",
+    "name": "Turmeric",
+    "tool": "spice_mill",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "turmeric",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"128\"]"
+  },
+  "cardamom": {
+    "id": "129",
+    "name": "Cardamom",
+    "tool": "spice_mill",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cardamom",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"129\"]"
+  },
+  "camphor": {
+    "id": "130",
+    "name": "Camphor",
+    "tool": "spice_mill",
+    "energyCost": 8,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "camphor",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"130\"]"
+  },
+  "older_spice": {
+    "id": "131",
+    "name": "Old(er) Spice",
+    "tool": "spice_mill",
+    "energyCost": 6,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "older_spice",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"131\"]"
   },
   "heavy_gas": {
     "id": "133",
@@ -386,6 +4666,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"133\"]"
   },
   "helium": {
@@ -409,6 +4693,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"134\"]"
   },
   "laughing_gas": {
@@ -432,6 +4720,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"135\"]"
   },
   "white_gas": {
@@ -455,6 +4747,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"136\"]"
   },
   "crying_gas": {
@@ -478,6 +4774,10 @@
     ],
     "skill": null,
     "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 2,
     "source": "catalog_recipes.js recipes[\"137\"]"
   },
   "flour": {
@@ -503,6 +4803,10 @@
     "skills": [
       "ezcooking_1"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"138\"]"
   },
   "bun": {
@@ -532,32 +4836,1136 @@
     "skills": [
       "cheffery_1"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"139\"]"
   },
-  "plain_metal": {
-    "id": "smelt_metal",
-    "name": "Plain Metal Ingot",
-    "tool": "smelter",
-    "energyCost": 5,
-    "xpReward": 2,
-    "waitMs": 1500,
+  "tortilla": {
+    "id": "140",
+    "name": "Tortilla",
+    "tool": "frying_pan",
+    "energyCost": 3,
+    "xpReward": 3,
+    "waitMs": 2000,
     "inputs": [
       {
-        "classTsid": "metal_rock",
+        "classTsid": "flour",
+        "qty": 1
+      },
+      {
+        "classTsid": "corn",
+        "qty": 1
+      },
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "tortilla",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_1",
+    "skills": [
+      "cheffery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"140\"]"
+  },
+  "plain_noodles": {
+    "id": "141",
+    "name": "Plain Noodles",
+    "tool": "frying_pan",
+    "energyCost": 2,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "flour",
+        "qty": 1
+      },
+      {
+        "classTsid": "rice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "plain_noodles",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_1",
+    "skills": [
+      "cheffery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"141\"]"
+  },
+  "change_whortleberry": {
+    "id": "142",
+    "name": "Whortleberry",
+    "tool": "fruit_changing_machine",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "whortleberry",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"142\"]"
+  },
+  "pickle": {
+    "id": "143",
+    "name": "Pickle",
+    "tool": "awesome_pot",
+    "energyCost": 2,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cucumber",
+        "qty": 1
+      },
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      },
+      {
+        "classTsid": "olive_oil",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pickle",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_1",
+    "skills": [
+      "masterchef_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"143\"]"
+  },
+  "change_cloudberry": {
+    "id": "144",
+    "name": "Cloudberry",
+    "tool": "fruit_changing_machine",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cloudberry",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"144\"]"
+  },
+  "tangy_sauce": {
+    "id": "145",
+    "name": "Tangy Sauce",
+    "tool": "saucepan",
+    "energyCost": 18,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "secret_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "sweet_n_sour_sauce",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "tangy_sauce",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_2",
+    "skills": [
+      "saucery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"145\"]"
+  },
+  "groddlene": {
+    "id": "146",
+    "name": "Groddlene",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 6
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "groddlene",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"146\"]",
+    "discoverable": true
+  },
+  "friendly_acid": {
+    "id": "147",
+    "name": "Friendly Acid",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 10
+      },
+      {
+        "classTsid": "element_blue",
         "qty": 5
       }
     ],
     "outputs": [
       {
-        "classTsid": "plain_metal",
+        "classTsid": "friendly_acid",
         "qty": 1
       }
     ],
-    "skill": "smelting_1",
-    "skills": [
-      "smelting_1"
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"147\"]",
+    "discoverable": true
+  },
+  "abbasidose": {
+    "id": "148",
+    "name": "Abbasidose",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 4
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 6
+      }
     ],
-    "source": "smelter.js smelt \u2014 5 metal_rock \u2192 plain_metal"
+    "outputs": [
+      {
+        "classTsid": "abbasidose",
+        "qty": 1
+      },
+      {
+        "classTsid": "diabolic_acid",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"148\"]",
+    "discoverable": true
+  },
+  "spriggase": {
+    "id": "149",
+    "name": "Spriggase",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 11
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 7
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "spriggase",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"149\"]",
+    "discoverable": true
+  },
+  "potoxin": {
+    "id": "150",
+    "name": "Potoxin",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 7
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 11
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potoxin",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"150\"]",
+    "discoverable": true
+  },
+  "alphose": {
+    "id": "151",
+    "name": "Alphose",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 3
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 5
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "alphose",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"151\"]",
+    "discoverable": true
+  },
+  "rubemycin": {
+    "id": "152",
+    "name": "Rubemycin",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 5
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 3
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "rubemycin",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"152\"]",
+    "discoverable": true
+  },
+  "tiite": {
+    "id": "153",
+    "name": "Tiite",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "tiite",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"153\"]",
+    "discoverable": true
+  },
+  "ixite": {
+    "id": "154",
+    "name": "Ixite",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 3
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "ixite",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"154\"]",
+    "discoverable": true
+  },
+  "humbabol": {
+    "id": "155",
+    "name": "Humbabol",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_blue",
+        "qty": 1
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "humbabol",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"155\"]",
+    "discoverable": true
+  },
+  "cosmox": {
+    "id": "156",
+    "name": "Cosmox",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 12
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 4
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cosmox",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"156\"]",
+    "discoverable": true
+  },
+  "zillene": {
+    "id": "157",
+    "name": "Zillene",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_green",
+        "qty": 5
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 3
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "zillene",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"157\"]",
+    "discoverable": true
+  },
+  "lemene": {
+    "id": "158",
+    "name": "Lemene",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 4
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 3
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "lemene",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"158\"]",
+    "discoverable": true
+  },
+  "grendalinunin": {
+    "id": "159",
+    "name": "Grendalinunin",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 17
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 7
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 4
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "grendalinunin",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"159\"]",
+    "discoverable": true
+  },
+  "mabon": {
+    "id": "160",
+    "name": "Mabon",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_green",
+        "qty": 7
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 7
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "mabon",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"160\"]",
+    "discoverable": true
+  },
+  "diabolic_acid": {
+    "id": "161",
+    "name": "Diabolic Acid",
+    "tool": "test_tube",
+    "energyCost": 0,
+    "xpReward": 0,
+    "waitMs": 50,
+    "inputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 1
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 1
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "diabolic_acid",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 250,
+    "learnt": 0,
+    "source": "catalog_recipes.js recipes[\"161\"]",
+    "discoverable": true
+  },
+  "fertilidust": {
+    "id": "162",
+    "name": "Fertilidust",
+    "tool": "beaker",
+    "energyCost": 20,
+    "xpReward": 10,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "humbabol",
+        "qty": 40
+      },
+      {
+        "classTsid": "potoxin",
+        "qty": 20
+      },
+      {
+        "classTsid": "cosmox",
+        "qty": 10
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fertilidust",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"162\"]"
+  },
+  "extremely_hallowed_shrine_powder": {
+    "id": "163",
+    "name": "Extremely Hallowed Shrine Powder",
+    "tool": "beaker",
+    "energyCost": 60,
+    "xpReward": 50,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "zillene",
+        "qty": 175
+      },
+      {
+        "classTsid": "humbabol",
+        "qty": 160
+      },
+      {
+        "classTsid": "groddlene",
+        "qty": 40
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "extremely_hallowed_shrine_powder",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"163\"]"
+  },
+  "powder_of_mild_fecundity": {
+    "id": "164",
+    "name": "Powder of Mild Fecundity",
+    "tool": "beaker",
+    "energyCost": 20,
+    "xpReward": 10,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "alphose",
+        "qty": 40
+      },
+      {
+        "classTsid": "rubemycin",
+        "qty": 45
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "powder_of_mild_fecundity",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"164\"]"
+  },
+  "fertilidust_lite": {
+    "id": "165",
+    "name": "Fertilidust Lite",
+    "tool": "beaker",
+    "energyCost": 30,
+    "xpReward": 5,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "humbabol",
+        "qty": 15
+      },
+      {
+        "classTsid": "potoxin",
+        "qty": 10
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fertilidust_lite",
+        "qty": 1
+      }
+    ],
+    "skill": "intermediateadmixing_1",
+    "skills": [
+      "intermediateadmixing_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"165\"]"
+  },
+  "powder_of_startling_fecundity": {
+    "id": "166",
+    "name": "Powder of Startling Fecundity",
+    "tool": "beaker",
+    "energyCost": 50,
+    "xpReward": 25,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "grendalinunin",
+        "qty": 60
+      },
+      {
+        "classTsid": "rubemycin",
+        "qty": 75
+      },
+      {
+        "classTsid": "cosmox",
+        "qty": 50
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "powder_of_startling_fecundity",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"166\"]"
+  },
+  "fairly_hallowed_shrine_powder": {
+    "id": "167",
+    "name": "Fairly Hallowed Shrine Powder",
+    "tool": "beaker",
+    "energyCost": 30,
+    "xpReward": 14,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "zillene",
+        "qty": 65
+      },
+      {
+        "classTsid": "humbabol",
+        "qty": 55
+      },
+      {
+        "classTsid": "mabon",
+        "qty": 20
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fairly_hallowed_shrine_powder",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"167\"]"
+  },
+  "no_no_powder": {
+    "id": "168",
+    "name": "No-No Powder",
+    "tool": "beaker",
+    "energyCost": 5,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "lemene",
+        "qty": 4
+      },
+      {
+        "classTsid": "cosmox",
+        "qty": 11
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "no_no_powder",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"168\"]"
+  },
+  "sparkle_powder": {
+    "id": "169",
+    "name": "Sparkle Powder",
+    "tool": "beaker",
+    "energyCost": 15,
+    "xpReward": 10,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "abbasidose",
+        "qty": 30
+      },
+      {
+        "classTsid": "spriggase",
+        "qty": 30
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sparkle_powder",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"169\"]"
+  },
+  "sneezing_powder": {
+    "id": "171",
+    "name": "Sneezing Powder",
+    "tool": "beaker",
+    "energyCost": 5,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "ixite",
+        "qty": 20
+      },
+      {
+        "classTsid": "tiite",
+        "qty": 65
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sneezing_powder",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"171\"]"
+  },
+  "change_strawberry": {
+    "id": "172",
+    "name": "Strawberry",
+    "tool": "fruit_changing_machine",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "strawberry",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"172\"]"
+  },
+  "change_mangosteen": {
+    "id": "173",
+    "name": "Mangosteen",
+    "tool": "fruit_changing_machine",
+    "energyCost": 4,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "mangosteen",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 50,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"173\"]"
   },
   "tin": {
     "id": "174",
@@ -594,6 +6002,10 @@
     "skills": [
       "alchemy_2"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"174\"]"
   },
   "copper": {
@@ -627,6 +6039,10 @@
     "skills": [
       "alchemy_2"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"175\"]"
   },
   "molybdenum": {
@@ -660,7 +6076,2061 @@
     "skills": [
       "alchemy_2"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"176\"]"
+  },
+  "hoe": {
+    "id": "177",
+    "name": "Hoe",
+    "tool": "tinkertool",
+    "energyCost": 15,
+    "xpReward": 10,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "plank",
+        "qty": 1
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hoe",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"177\"]"
+  },
+  "hatchet": {
+    "id": "178",
+    "name": "Hatchet",
+    "tool": "tinkertool",
+    "energyCost": 15,
+    "xpReward": 10,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "plank",
+        "qty": 2
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      },
+      {
+        "classTsid": "barnacle_talc",
+        "qty": 1
+      },
+      {
+        "classTsid": "plain_bubble",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hatchet",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"178\"]"
+  },
+  "knife_and_board": {
+    "id": "179",
+    "name": "Knife & Board",
+    "tool": "tinkertool",
+    "energyCost": 10,
+    "xpReward": 10,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "plank",
+        "qty": 4
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "knife_and_board",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"179\"]"
+  },
+  "watering_can": {
+    "id": "180",
+    "name": "Watering Can",
+    "tool": "tinkertool",
+    "energyCost": 10,
+    "xpReward": 10,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "watering_can",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"180\"]"
+  },
+  "frying_pan": {
+    "id": "181",
+    "name": "Frying Pan",
+    "tool": "tinkertool",
+    "energyCost": 20,
+    "xpReward": 10,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      },
+      {
+        "classTsid": "tin",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "frying_pan",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"181\"]"
+  },
+  "cocktail_shaker": {
+    "id": "182",
+    "name": "Cocktail Shaker",
+    "tool": "tinkertool",
+    "energyCost": 20,
+    "xpReward": 20,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cocktail_shaker",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"182\"]"
+  },
+  "scraper": {
+    "id": "183",
+    "name": "Scraper",
+    "tool": "tinkertool",
+    "energyCost": 20,
+    "xpReward": 25,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 1
+      },
+      {
+        "classTsid": "copper",
+        "qty": 1
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "scraper",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"183\"]"
+  },
+  "saucepan": {
+    "id": "184",
+    "name": "Saucepan",
+    "tool": "tinkertool",
+    "energyCost": 15,
+    "xpReward": 20,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      },
+      {
+        "classTsid": "copper",
+        "qty": 1
+      },
+      {
+        "classTsid": "tin",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "saucepan",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"184\"]"
+  },
+  "awesome_pot": {
+    "id": "187",
+    "name": "Awesome Pot",
+    "tool": "tinkertool",
+    "energyCost": 40,
+    "xpReward": 25,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      },
+      {
+        "classTsid": "copper",
+        "qty": 1
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "awesome_pot",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"187\"]"
+  },
+  "fuel_cell": {
+    "id": "192",
+    "name": "Fuel Cell",
+    "tool": "fuelmaker",
+    "energyCost": 0,
+    "xpReward": 10,
+    "waitMs": 20000,
+    "inputs": [
+      {
+        "classTsid": "jellisac_clump",
+        "qty": 12
+      },
+      {
+        "classTsid": "peat",
+        "qty": 8
+      },
+      {
+        "classTsid": "fuel_cell",
+        "qty": 1
+      },
+      {
+        "classTsid": "white_gas",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fuel_cell",
+        "qty": 1
+      }
+    ],
+    "skill": "fuelmaking_1",
+    "skills": [
+      "fuelmaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"192\"]"
+  },
+  "bean_wood": {
+    "id": "195",
+    "name": "Wood Tree Bean",
+    "tool": "bean_seasoner",
+    "energyCost": 20,
+    "xpReward": 50,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cinnamon",
+        "qty": 5
+      },
+      {
+        "classTsid": "white_gas",
+        "qty": 1
+      },
+      {
+        "classTsid": "mangosteen",
+        "qty": 3
+      },
+      {
+        "classTsid": "bean_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bean_wood",
+        "qty": 1
+      }
+    ],
+    "skill": "botany_1",
+    "skills": [
+      "botany_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"195\"]"
+  },
+  "bubble_tuner": {
+    "id": "200",
+    "name": "Bubble Tuner",
+    "tool": "tinkertool",
+    "energyCost": 20,
+    "xpReward": 15,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "jellisac_clump",
+        "qty": 6
+      },
+      {
+        "classTsid": "barnacle_talc",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bubble_tuner",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"200\"]"
+  },
+  "fruit_changing_machine": {
+    "id": "201",
+    "name": "Fruit Changing Machine",
+    "tool": "tinkertool",
+    "energyCost": 40,
+    "xpReward": 20,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 1
+      },
+      {
+        "classTsid": "copper",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fruit_changing_machine",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"201\"]"
+  },
+  "gassifier": {
+    "id": "202",
+    "name": "Gassifier",
+    "tool": "tinkertool",
+    "energyCost": 20,
+    "xpReward": 15,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "copper",
+        "qty": 1
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "gassifier",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"202\"]"
+  },
+  "spice_mill": {
+    "id": "203",
+    "name": "Spice Mill",
+    "tool": "tinkertool",
+    "energyCost": 20,
+    "xpReward": 15,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "spice_mill",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"203\"]"
+  },
+  "blender": {
+    "id": "204",
+    "name": "Blender",
+    "tool": "tinkertool",
+    "energyCost": 25,
+    "xpReward": 15,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "copper",
+        "qty": 1
+      },
+      {
+        "classTsid": "jellisac_clump",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "blender",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"204\"]"
+  },
+  "shovel": {
+    "id": "205",
+    "name": "Shovel",
+    "tool": "tinkertool",
+    "energyCost": 20,
+    "xpReward": 25,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 3
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 2
+      },
+      {
+        "classTsid": "plank",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "shovel",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"205\"]"
+  },
+  "pick": {
+    "id": "206",
+    "name": "Pick",
+    "tool": "tinkertool",
+    "energyCost": 30,
+    "xpReward": 30,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "copper",
+        "qty": 3
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 5
+      },
+      {
+        "classTsid": "plank",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pick",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"206\"]"
+  },
+  "alchemical_tongs": {
+    "id": "208",
+    "name": "Alchemical Tongs",
+    "tool": "tinkertool",
+    "energyCost": 40,
+    "xpReward": 40,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 2
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "alchemical_tongs",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"208\"]"
+  },
+  "smelter": {
+    "id": "209",
+    "name": "Smelter",
+    "tool": "tinkertool",
+    "energyCost": 50,
+    "xpReward": 50,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 2
+      },
+      {
+        "classTsid": "copper",
+        "qty": 2
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 2
+      },
+      {
+        "classTsid": "barnacle_talc",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "smelter",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"209\"]"
+  },
+  "bean_seasoner": {
+    "id": "210",
+    "name": "Bean Seasoner",
+    "tool": "tinkertool",
+    "energyCost": 20,
+    "xpReward": 15,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 2
+      },
+      {
+        "classTsid": "jellisac_clump",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bean_seasoner",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"210\"]"
+  },
+  "egg_seasoner": {
+    "id": "211",
+    "name": "Egg Seasoner",
+    "tool": "tinkertool",
+    "energyCost": 20,
+    "xpReward": 15,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 2
+      },
+      {
+        "classTsid": "jellisac_clump",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "egg_seasoner",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"211\"]"
+  },
+  "mike_tyson_grill": {
+    "id": "212",
+    "name": "Famous Pugilist Grill",
+    "tool": "tinkertool",
+    "energyCost": 40,
+    "xpReward": 15,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      },
+      {
+        "classTsid": "copper",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "mike_tyson_grill",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"212\"]"
+  },
+  "fancy_pick": {
+    "id": "213",
+    "name": "Fancy Pick",
+    "tool": "tinkertool",
+    "energyCost": 40,
+    "xpReward": 40,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "molybdenum",
+        "qty": 6
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 6
+      },
+      {
+        "classTsid": "plank",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fancy_pick",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"213\"]"
+  },
+  "crystallizer": {
+    "id": "214",
+    "name": "Crystalmalizing Chamber",
+    "tool": "tinkertool",
+    "energyCost": 40,
+    "xpReward": 75,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "molybdenum",
+        "qty": 20
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "crystallizer",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"214\"]"
+  },
+  "ore_grinder": {
+    "id": "218",
+    "name": "Grinder",
+    "tool": "tinkertool",
+    "energyCost": 30,
+    "xpReward": 20,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "molybdenum",
+        "qty": 1
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "ore_grinder",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"218\"]"
+  },
+  "irrigator_9000": {
+    "id": "221",
+    "name": "Irrigator 9000",
+    "tool": "tinkertool",
+    "energyCost": 50,
+    "xpReward": 40,
+    "waitMs": 20000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 7
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "irrigator_9000",
+        "qty": 1
+      }
+    ],
+    "skill": "light_green_thumb_3",
+    "skills": [
+      "light_green_thumb_3",
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"221\"]"
+  },
+  "super_scraper": {
+    "id": "222",
+    "name": "Super Scraper",
+    "tool": "tinkertool",
+    "energyCost": 75,
+    "xpReward": 60,
+    "waitMs": 20000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 7
+      },
+      {
+        "classTsid": "copper",
+        "qty": 7
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "super_scraper",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"222\"]"
+  },
+  "birch_candy": {
+    "id": "223",
+    "name": "Birch Candy",
+    "tool": "saucepan",
+    "energyCost": 2,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "birch_syrup",
+        "qty": 1
+      },
+      {
+        "classTsid": "paper",
+        "qty": 1
+      },
+      {
+        "classTsid": "pepitas",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "birch_candy",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_1",
+    "skills": [
+      "saucery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"223\"]"
+  },
+  "corn_syrup_squares": {
+    "id": "224",
+    "name": "Hi-Sucrose Corn Syrup Square",
+    "tool": "awesome_pot",
+    "energyCost": 4,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "honey",
+        "qty": 1
+      },
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 1
+      },
+      {
+        "classTsid": "corn",
+        "qty": 1
+      },
+      {
+        "classTsid": "pepitas",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "corn_syrup_squares",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_1",
+    "skills": [
+      "masterchef_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"224\"]"
+  },
+  "carobish_treats": {
+    "id": "225",
+    "name": "Raw Bio-Organic Carob-ish Treat",
+    "tool": "knife_and_board",
+    "energyCost": 6,
+    "xpReward": 4,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "guano",
+        "qty": 1
+      },
+      {
+        "classTsid": "jellisac_clump",
+        "qty": 1
+      },
+      {
+        "classTsid": "pepitas",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "carobish_treats",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"225\"]"
+  },
+  "pumpkin_ale": {
+    "id": "226",
+    "name": "Pumpkin Ale",
+    "tool": "cocktail_shaker",
+    "energyCost": 10,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "pumpkin",
+        "qty": 1
+      },
+      {
+        "classTsid": "beer",
+        "qty": 1
+      },
+      {
+        "classTsid": "cinnamon",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pumpkin_ale",
+        "qty": 1
+      }
+    ],
+    "skill": "cocktailcrafting_1",
+    "skills": [
+      "cocktailcrafting_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 5,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"226\"]"
+  },
+  "pumpkin_pie": {
+    "id": "227",
+    "name": "Pumpkin Pie",
+    "tool": "frying_pan",
+    "energyCost": 12,
+    "xpReward": 6,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "flour",
+        "qty": 1
+      },
+      {
+        "classTsid": "honey",
+        "qty": 1
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      },
+      {
+        "classTsid": "nutmeg",
+        "qty": 1
+      },
+      {
+        "classTsid": "pumpkin",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pumpkin_pie",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_3",
+    "skills": [
+      "cheffery_3"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 5,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"227\"]"
+  },
+  "essence_of_gandlevery": {
+    "id": "228",
+    "name": "Essence of Gandlevery",
+    "tool": "tincturing_kit",
+    "energyCost": 11,
+    "xpReward": 15,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "gandlevery",
+        "qty": 3
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "essence_of_gandlevery",
+        "qty": 1
+      }
+    ],
+    "skill": "tincturing_1",
+    "skills": [
+      "tincturing_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"228\"]"
+  },
+  "essence_of_hairball": {
+    "id": "229",
+    "name": "Essence of Hairball",
+    "tool": "tincturing_kit",
+    "energyCost": 17,
+    "xpReward": 23,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "hairball_flower",
+        "qty": 5
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "essence_of_hairball",
+        "qty": 1
+      }
+    ],
+    "skill": "tincturing_1",
+    "skills": [
+      "tincturing_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"229\"]"
+  },
+  "essence_of_purple": {
+    "id": "230",
+    "name": "Essence of Purple",
+    "tool": "tincturing_kit",
+    "energyCost": 18,
+    "xpReward": 25,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "purple_flower",
+        "qty": 23
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 2
+      },
+      {
+        "classTsid": "tangy_sauce",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "essence_of_purple",
+        "qty": 1
+      }
+    ],
+    "skill": "tincturing_1",
+    "skills": [
+      "tincturing_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"230\"]"
+  },
+  "essence_of_rookswort": {
+    "id": "231",
+    "name": "Essence of Rookswort",
+    "tool": "tincturing_kit",
+    "energyCost": 19,
+    "xpReward": 27,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "rookswort",
+        "qty": 5
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "essence_of_rookswort",
+        "qty": 1
+      }
+    ],
+    "skill": "tincturing_1",
+    "skills": [
+      "tincturing_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"231\"]"
+  },
+  "essence_of_rubeweed": {
+    "id": "232",
+    "name": "Essence of Rubeweed",
+    "tool": "tincturing_kit",
+    "energyCost": 15,
+    "xpReward": 21,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "rubeweed",
+        "qty": 5
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "essence_of_rubeweed",
+        "qty": 1
+      }
+    ],
+    "skill": "tincturing_1",
+    "skills": [
+      "tincturing_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"232\"]"
+  },
+  "essence_of_silvertongue": {
+    "id": "233",
+    "name": "Essence of Silvertongue",
+    "tool": "tincturing_kit",
+    "energyCost": 13,
+    "xpReward": 18,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "silvertongue",
+        "qty": 4
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "essence_of_silvertongue",
+        "qty": 1
+      }
+    ],
+    "skill": "tincturing_1",
+    "skills": [
+      "tincturing_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"233\"]"
+  },
+  "essence_of_yellow_crumb": {
+    "id": "234",
+    "name": "Essence of Yellow Crumb",
+    "tool": "tincturing_kit",
+    "energyCost": 20,
+    "xpReward": 30,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "yellow_crumb_flower",
+        "qty": 6
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "essence_of_yellow_crumb",
+        "qty": 1
+      }
+    ],
+    "skill": "tincturing_1",
+    "skills": [
+      "tincturing_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"234\"]"
+  },
+  "krazy_salts": {
+    "id": "235",
+    "name": "Krazy Salts",
+    "tool": "beaker",
+    "energyCost": 11,
+    "xpReward": 11,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "lemene",
+        "qty": 11
+      },
+      {
+        "classTsid": "ixite",
+        "qty": 11
+      },
+      {
+        "classTsid": "tiite",
+        "qty": 11
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "krazy_salts",
+        "qty": 1
+      }
+    ],
+    "skill": "intermediateadmixing_1",
+    "skills": [
+      "intermediateadmixing_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 11,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"235\"]"
+  },
+  "potion_tree_poison_antidote": {
+    "id": "236",
+    "name": "Tree Poison Antidote",
+    "tool": "cauldron",
+    "energyCost": 20,
+    "xpReward": 45,
+    "waitMs": 8000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_gandlevery",
+        "qty": 1
+      },
+      {
+        "classTsid": "spriggase",
+        "qty": 5
+      },
+      {
+        "classTsid": "friendly_acid",
+        "qty": 7
+      },
+      {
+        "classTsid": "guano",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_tree_poison_antidote",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_1",
+    "skills": [
+      "potionmaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"236\"]"
+  },
+  "potion_tree_poison": {
+    "id": "237",
+    "name": "Tree Poison",
+    "tool": "cauldron",
+    "energyCost": 30,
+    "xpReward": 90,
+    "waitMs": 8000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_rookswort",
+        "qty": 1
+      },
+      {
+        "classTsid": "diabolic_acid",
+        "qty": 13
+      },
+      {
+        "classTsid": "krazy_salts",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_tree_poison",
+        "qty": 1
+      }
+    ],
+    "skill": "botany_1",
+    "skills": [
+      "botany_1",
+      "potionmaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"237\"]"
+  },
+  "potion_charades": {
+    "id": "238",
+    "name": "Charades Potion",
+    "tool": "cauldron",
+    "energyCost": 20,
+    "xpReward": 70,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_silvertongue",
+        "qty": 1
+      },
+      {
+        "classTsid": "laughing_gas",
+        "qty": 1
+      },
+      {
+        "classTsid": "crying_gas",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_charades",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_1",
+    "skills": [
+      "potionmaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 5,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"238\"]"
+  },
+  "potion_amorous_philtre": {
+    "id": "239",
+    "name": "Amorous Philtre",
+    "tool": "cauldron",
+    "energyCost": 45,
+    "xpReward": 105,
+    "waitMs": 8000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_purple",
+        "qty": 1
+      },
+      {
+        "classTsid": "laughing_gas",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_amorous_philtre",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_1",
+    "skills": [
+      "potionmaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"239\"]"
+  },
+  "potion_rainbow_juice": {
+    "id": "240",
+    "name": "Rainbow Juice",
+    "tool": "cauldron",
+    "energyCost": 35,
+    "xpReward": 125,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "blue_bubble",
+        "qty": 11
+      },
+      {
+        "classTsid": "green_eggs",
+        "qty": 11
+      },
+      {
+        "classTsid": "strawberry",
+        "qty": 13
+      },
+      {
+        "classTsid": "orange_juice",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_rainbow_juice",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_1",
+    "skills": [
+      "potionmaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 5,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"240\"]"
+  },
+  "potion_elixir_of_avarice": {
+    "id": "241",
+    "name": "Elixir of Avarice",
+    "tool": "cauldron",
+    "energyCost": 60,
+    "xpReward": 200,
+    "waitMs": 8000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_hairball",
+        "qty": 1
+      },
+      {
+        "classTsid": "essence_of_silvertongue",
+        "qty": 1
+      },
+      {
+        "classTsid": "helium",
+        "qty": 3
+      },
+      {
+        "classTsid": "krazy_salts",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_elixir_of_avarice",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [
+      "numismatizer_leprechaun_class"
+    ],
+    "toolWear": 2,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"241\"]"
+  },
+  "potion_chris": {
+    "id": "242",
+    "name": "Door Drink",
+    "tool": "cauldron",
+    "energyCost": 40,
+    "xpReward": 110,
+    "waitMs": 6000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_rubeweed",
+        "qty": 1
+      },
+      {
+        "classTsid": "essence_of_gandlevery",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_chris",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_2",
+    "skills": [
+      "potionmaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 3,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"242\"]"
+  },
+  "potion_rook_balm": {
+    "id": "243",
+    "name": "Rook Balm",
+    "tool": "cauldron",
+    "energyCost": 45,
+    "xpReward": 125,
+    "waitMs": 8000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_rookswort",
+        "qty": 1
+      },
+      {
+        "classTsid": "white_gas",
+        "qty": 3
+      },
+      {
+        "classTsid": "krazy_salts",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_rook_balm",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_2",
+    "skills": [
+      "potionmaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"243\"]"
+  },
+  "potion_keycutter_tonic": {
+    "id": "244",
+    "name": "Keycutter Tonic",
+    "tool": "cauldron",
+    "energyCost": 40,
+    "xpReward": 210,
+    "waitMs": 8000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_rubeweed",
+        "qty": 1
+      },
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 11
+      },
+      {
+        "classTsid": "krazy_salts",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_keycutter_tonic",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_2",
+    "skills": [
+      "potionmaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"244\"]"
+  },
+  "potion_animal_youth": {
+    "id": "245",
+    "name": "Potion of Animal Youth",
+    "tool": "cauldron",
+    "energyCost": 60,
+    "xpReward": 235,
+    "waitMs": 6000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_gandlevery",
+        "qty": 3
+      },
+      {
+        "classTsid": "essence_of_purple",
+        "qty": 1
+      },
+      {
+        "classTsid": "blue_bubble",
+        "qty": 13
+      },
+      {
+        "classTsid": "guano",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_animal_youth",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_2",
+    "skills": [
+      "potionmaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"245\"]"
+  },
+  "potion_ancestral_spirits": {
+    "id": "246",
+    "name": "Ancestral Spirits",
+    "tool": "cauldron",
+    "energyCost": 80,
+    "xpReward": 250,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_hairball",
+        "qty": 2
+      },
+      {
+        "classTsid": "essence_of_silvertongue",
+        "qty": 1
+      },
+      {
+        "classTsid": "essence_of_rubeweed",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_ancestral_spirits",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_2",
+    "skills": [
+      "potionmaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"246\"]"
+  },
+  "potion_trantsformation_fluid": {
+    "id": "247",
+    "name": "Trantsformation Fluid",
+    "tool": "cauldron",
+    "energyCost": 90,
+    "xpReward": 275,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_rookswort",
+        "qty": 2
+      },
+      {
+        "classTsid": "essence_of_yellow_crumb",
+        "qty": 1
+      },
+      {
+        "classTsid": "essence_of_rubeweed",
+        "qty": 1
+      },
+      {
+        "classTsid": "guano",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_trantsformation_fluid",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_2",
+    "skills": [
+      "potionmaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 3,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"247\"]"
+  },
+  "potion_favor": {
+    "id": "250",
+    "name": "Draught of Giant Amicability",
+    "tool": "cauldron",
+    "energyCost": 100,
+    "xpReward": 400,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_silvertongue",
+        "qty": 2
+      },
+      {
+        "classTsid": "essence_of_yellow_crumb",
+        "qty": 2
+      },
+      {
+        "classTsid": "essence_of_rubeweed",
+        "qty": 1
+      },
+      {
+        "classTsid": "krazy_salts",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_favor",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_3",
+    "skills": [
+      "potionmaking_3"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"250\"]"
+  },
+  "board": {
+    "id": "253",
+    "name": "Board",
+    "tool": "woodworker",
+    "energyCost": 0,
+    "xpReward": 1,
+    "waitMs": 2500,
+    "inputs": [
+      {
+        "classTsid": "plank",
+        "qty": 4
+      },
+      {
+        "classTsid": "fuel_cell",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "board",
+        "qty": 1
+      }
+    ],
+    "skill": "woodworking_1",
+    "skills": [
+      "woodworking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"253\"]"
+  },
+  "wood_post": {
+    "id": "277",
+    "name": "Wood Post",
+    "tool": "woodworker",
+    "energyCost": 0,
+    "xpReward": 5,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "board",
+        "qty": 4
+      },
+      {
+        "classTsid": "fuel_cell",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "wood_post",
+        "qty": 1
+      }
+    ],
+    "skill": "woodworking_1",
+    "skills": [
+      "woodworking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"277\"]"
+  },
+  "beam": {
+    "id": "278",
+    "name": "Beam",
+    "tool": "woodworker",
+    "energyCost": 0,
+    "xpReward": 30,
+    "waitMs": 20000,
+    "inputs": [
+      {
+        "classTsid": "wood_post",
+        "qty": 4
+      },
+      {
+        "classTsid": "fuel_cell",
+        "qty": 8
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "beam",
+        "qty": 1
+      }
+    ],
+    "skill": "woodworking_1",
+    "skills": [
+      "woodworking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"278\"]"
   },
   "metal_rod": {
     "id": "279",
@@ -668,7 +8138,7 @@
     "tool": "metalmaker",
     "energyCost": 0,
     "xpReward": 4,
-    "waitMs": 4000,
+    "waitMs": 10000,
     "inputs": [
       {
         "classTsid": "tin",
@@ -693,6 +8163,10 @@
     "skills": [
       "metalwork_1"
     ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 1,
     "source": "catalog_recipes.js recipes[\"279\"]"
   },
   "metal_post": {
@@ -701,7 +8175,7 @@
     "tool": "metalmaker",
     "energyCost": 0,
     "xpReward": 16,
-    "waitMs": 6000,
+    "waitMs": 20000,
     "inputs": [
       {
         "classTsid": "copper",
@@ -726,7 +8200,1958 @@
     "skills": [
       "metalwork_1"
     ],
-    "source": "catalog_recipes.js recipes[\"280\"] metal_post"
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"280\"]"
+  },
+  "girder": {
+    "id": "281",
+    "name": "Girder",
+    "tool": "metalmaker",
+    "energyCost": 0,
+    "xpReward": 60,
+    "waitMs": 30000,
+    "inputs": [
+      {
+        "classTsid": "molybdenum",
+        "qty": 8
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 12
+      },
+      {
+        "classTsid": "fuel_cell",
+        "qty": 12
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "girder",
+        "qty": 1
+      }
+    ],
+    "skill": "metalwork_1",
+    "skills": [
+      "metalwork_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 5,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"281\"]"
+  },
+  "pi": {
+    "id": "288",
+    "name": "Pi",
+    "tool": "frying_pan",
+    "energyCost": 14,
+    "xpReward": 6,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "flour",
+        "qty": 14
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 7
+      },
+      {
+        "classTsid": "older_spice",
+        "qty": 3
+      },
+      {
+        "classTsid": "tiite",
+        "qty": 22
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pi",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 5,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"288\"]"
+  },
+  "string": {
+    "id": "294",
+    "name": "String",
+    "tool": "loomer",
+    "energyCost": 5,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "thread",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "string",
+        "qty": 1
+      }
+    ],
+    "skill": "fiber_arts_2",
+    "skills": [
+      "fiber_arts_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"294\"]"
+  },
+  "general_fabric": {
+    "id": "295",
+    "name": "General Fabric",
+    "tool": "loomer",
+    "energyCost": 32,
+    "xpReward": 10,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "thread",
+        "qty": 21
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 1
+      }
+    ],
+    "skill": "fiber_arts_2",
+    "skills": [
+      "fiber_arts_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"295\"]"
+  },
+  "face_smelter": {
+    "id": "298",
+    "name": "Face Smelter",
+    "tool": "cocktail_shaker",
+    "energyCost": 16,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "parsnip",
+        "qty": 2
+      },
+      {
+        "classTsid": "onion_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "crying_gas",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "face_smelter",
+        "qty": 1
+      }
+    ],
+    "skill": "cocktailcrafting_2",
+    "skills": [
+      "cocktailcrafting_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"298\"]"
+  },
+  "ace_of_spades": {
+    "id": "300",
+    "name": "Ace of Spades",
+    "tool": "tinkertool",
+    "energyCost": 100,
+    "xpReward": 80,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "metal_post",
+        "qty": 4
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 6
+      },
+      {
+        "classTsid": "wood_post",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "ace_of_spades",
+        "qty": 1
+      }
+    ],
+    "skill": "soil_appreciation_5",
+    "skills": [
+      "soil_appreciation_5",
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"300\"]"
+  },
+  "plain_crystal": {
+    "id": "304",
+    "name": "Plain Crystal",
+    "tool": "crystallizer",
+    "energyCost": 134,
+    "xpReward": 0,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "barnacle_talc",
+        "qty": 7
+      },
+      {
+        "classTsid": "firefly_jar",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "plain_crystal",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 25,
+    "taskLimit": 1,
+    "learnt": 2,
+    "source": "catalog_recipes.js recipes[\"304\"]"
+  },
+  "potion_avatar_large": {
+    "id": "306",
+    "name": "Embiggenifying Potion",
+    "tool": "cauldron",
+    "energyCost": 40,
+    "xpReward": 150,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_purple",
+        "qty": 1
+      },
+      {
+        "classTsid": "heavy_gas",
+        "qty": 3
+      },
+      {
+        "classTsid": "laughing_gas",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_avatar_large",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_2",
+    "skills": [
+      "potionmaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 3,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"306\"]"
+  },
+  "potion_garden_water": {
+    "id": "308",
+    "name": "Soak-All Solution",
+    "tool": "cauldron",
+    "energyCost": 60,
+    "xpReward": 300,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_gandlevery",
+        "qty": 3
+      },
+      {
+        "classTsid": "essence_of_silvertongue",
+        "qty": 2
+      },
+      {
+        "classTsid": "blue_bubble",
+        "qty": 11
+      },
+      {
+        "classTsid": "crying_gas",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_garden_water",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_3",
+    "skills": [
+      "potionmaking_3"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 3,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"308\"]"
+  },
+  "potion_garden_plant": {
+    "id": "309",
+    "name": "Seed-Dibber Libation",
+    "tool": "cauldron",
+    "energyCost": 70,
+    "xpReward": 325,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_gandlevery",
+        "qty": 2
+      },
+      {
+        "classTsid": "essence_of_yellow_crumb",
+        "qty": 2
+      },
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 5
+      },
+      {
+        "classTsid": "heavy_gas",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_garden_plant",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_3",
+    "skills": [
+      "potionmaking_3"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 3,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"309\"]"
+  },
+  "potion_garden_harvest": {
+    "id": "310",
+    "name": "Manyharvest Cordial",
+    "tool": "cauldron",
+    "energyCost": 75,
+    "xpReward": 350,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_silvertongue",
+        "qty": 2
+      },
+      {
+        "classTsid": "essence_of_rubeweed",
+        "qty": 2
+      },
+      {
+        "classTsid": "helium",
+        "qty": 5
+      },
+      {
+        "classTsid": "hard_bubble",
+        "qty": 11
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_garden_harvest",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_3",
+    "skills": [
+      "potionmaking_3"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 3,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"310\"]"
+  },
+  "potion_garden_clear": {
+    "id": "311",
+    "name": "Liquid Super-Hoe",
+    "tool": "cauldron",
+    "energyCost": 60,
+    "xpReward": 300,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_hairball",
+        "qty": 1
+      },
+      {
+        "classTsid": "essence_of_rookswort",
+        "qty": 1
+      },
+      {
+        "classTsid": "white_gas",
+        "qty": 5
+      },
+      {
+        "classTsid": "hard_bubble",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_garden_clear",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_3",
+    "skills": [
+      "potionmaking_3"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 3,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"311\"]"
+  },
+  "potion_avatar_small": {
+    "id": "312",
+    "name": "De-Embiggenifying Potion",
+    "tool": "cauldron",
+    "energyCost": 40,
+    "xpReward": 150,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_purple",
+        "qty": 1
+      },
+      {
+        "classTsid": "helium",
+        "qty": 5
+      },
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 11
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_avatar_small",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_2",
+    "skills": [
+      "potionmaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 3,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"312\"]"
+  },
+  "potion_garden_fertilize": {
+    "id": "313",
+    "name": "Dung-Kicker Drops",
+    "tool": "cauldron",
+    "energyCost": 80,
+    "xpReward": 325,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "essence_of_hairball",
+        "qty": 1
+      },
+      {
+        "classTsid": "essence_of_gandlevery",
+        "qty": 1
+      },
+      {
+        "classTsid": "crying_gas",
+        "qty": 5
+      },
+      {
+        "classTsid": "guano",
+        "qty": 50
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potion_garden_fertilize",
+        "qty": 1
+      }
+    ],
+    "skill": "potionmaking_3",
+    "skills": [
+      "potionmaking_3"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 3,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"313\"]"
+  },
+  "sno_cone_blue": {
+    "id": "314",
+    "name": "Blue Sno Cone",
+    "tool": "blender",
+    "energyCost": 6,
+    "xpReward": 10,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "ice",
+        "qty": 2
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 1
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 89
+      },
+      {
+        "classTsid": "paper",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sno_cone_blue",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_1",
+    "skills": [
+      "blending_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"314\"]"
+  },
+  "sno_cone_green": {
+    "id": "315",
+    "name": "Green Sno Cone",
+    "tool": "blender",
+    "energyCost": 12,
+    "xpReward": 13,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "ice",
+        "qty": 2
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 277
+      },
+      {
+        "classTsid": "paper",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sno_cone_green",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_1",
+    "skills": [
+      "blending_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"315\"]"
+  },
+  "sno_cone_orange": {
+    "id": "316",
+    "name": "Orange Sno Cone",
+    "tool": "blender",
+    "energyCost": 23,
+    "xpReward": 18,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "ice",
+        "qty": 3
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_red",
+        "qty": 577
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 409
+      },
+      {
+        "classTsid": "paper",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sno_cone_orange",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_1",
+    "skills": [
+      "blending_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"316\"]"
+  },
+  "sno_cone_red": {
+    "id": "317",
+    "name": "Red Sno Cone",
+    "tool": "blender",
+    "energyCost": 47,
+    "xpReward": 25,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "ice",
+        "qty": 4
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_red",
+        "qty": 997
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 499
+      },
+      {
+        "classTsid": "paper",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sno_cone_red",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_2",
+    "skills": [
+      "blending_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"317\"]"
+  },
+  "sno_cone_purple": {
+    "id": "318",
+    "name": "Purple Sno Cone",
+    "tool": "blender",
+    "energyCost": 85,
+    "xpReward": 33,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "ice",
+        "qty": 5
+      },
+      {
+        "classTsid": "hooch",
+        "qty": 3
+      },
+      {
+        "classTsid": "element_red",
+        "qty": 977
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 977
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 409
+      },
+      {
+        "classTsid": "paper",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sno_cone_purple",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_2",
+    "skills": [
+      "blending_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"318\"]"
+  },
+  "sno_cone_rainbow": {
+    "id": "319",
+    "name": "Rainbo Sno Cone",
+    "tool": "blender",
+    "energyCost": 111,
+    "xpReward": 50,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "sno_cone_blue",
+        "qty": 1
+      },
+      {
+        "classTsid": "sno_cone_green",
+        "qty": 1
+      },
+      {
+        "classTsid": "sno_cone_orange",
+        "qty": 1
+      },
+      {
+        "classTsid": "sno_cone_red",
+        "qty": 1
+      },
+      {
+        "classTsid": "sno_cone_purple",
+        "qty": 1
+      },
+      {
+        "classTsid": "paper",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sno_cone_rainbow",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_2",
+    "skills": [
+      "blending_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"319\"]"
+  },
+  "kings_of_condiments": {
+    "id": "322",
+    "name": "King of Condiments",
+    "tool": "knife_and_board",
+    "energyCost": 2,
+    "xpReward": 4,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 3
+      },
+      {
+        "classTsid": "black_pepper",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "kings_of_condiments",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"322\"]"
+  },
+  "legumes_parisienne": {
+    "id": "323",
+    "name": "Legumes Abbassidienne",
+    "tool": "knife_and_board",
+    "energyCost": 3,
+    "xpReward": 4,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "bean_plain",
+        "qty": 17
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "legumes_parisienne",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"323\"]"
+  },
+  "hototot_rub": {
+    "id": "324",
+    "name": "Hototot Rub",
+    "tool": "knife_and_board",
+    "energyCost": 7,
+    "xpReward": 7,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cumin",
+        "qty": 2
+      },
+      {
+        "classTsid": "saffron",
+        "qty": 1
+      },
+      {
+        "classTsid": "turmeric",
+        "qty": 1
+      },
+      {
+        "classTsid": "curry",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hototot_rub",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"324\"]"
+  },
+  "swing_batter": {
+    "id": "325",
+    "name": "Swing Batter",
+    "tool": "knife_and_board",
+    "energyCost": 4,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "flour",
+        "qty": 1
+      },
+      {
+        "classTsid": "egg_plain",
+        "qty": 1
+      },
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "swing_batter",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"325\"]"
+  },
+  "desssert_rub": {
+    "id": "326",
+    "name": "Desssert Rub",
+    "tool": "knife_and_board",
+    "energyCost": 9,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cinnamon",
+        "qty": 3
+      },
+      {
+        "classTsid": "cardamom",
+        "qty": 1
+      },
+      {
+        "classTsid": "nutmeg",
+        "qty": 1
+      },
+      {
+        "classTsid": "licorice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "desssert_rub",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"326\"]"
+  },
+  "naraka_flame_rub": {
+    "id": "327",
+    "name": "Naraka Flame Rub",
+    "tool": "knife_and_board",
+    "energyCost": 10,
+    "xpReward": 10,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "ginger",
+        "qty": 3
+      },
+      {
+        "classTsid": "hot_pepper",
+        "qty": 8
+      },
+      {
+        "classTsid": "mustard",
+        "qty": 2
+      },
+      {
+        "classTsid": "garlic",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "naraka_flame_rub",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"327\"]"
+  },
+  "trump_rub": {
+    "id": "328",
+    "name": "Trump Rub",
+    "tool": "knife_and_board",
+    "energyCost": 15,
+    "xpReward": 11,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "camphor",
+        "qty": 1
+      },
+      {
+        "classTsid": "older_spice",
+        "qty": 1
+      },
+      {
+        "classTsid": "turmeric",
+        "qty": 1
+      },
+      {
+        "classTsid": "cardamom",
+        "qty": 1
+      },
+      {
+        "classTsid": "nutmeg",
+        "qty": 1
+      },
+      {
+        "classTsid": "saffron",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "trump_rub",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_2",
+    "skills": [
+      "ezcooking_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"328\"]"
+  },
+  "death_to_veg": {
+    "id": "329",
+    "name": "Death to Veg",
+    "tool": "frying_pan",
+    "energyCost": 5,
+    "xpReward": 7,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "tomato",
+        "qty": 2
+      },
+      {
+        "classTsid": "spinach",
+        "qty": 3
+      },
+      {
+        "classTsid": "onion",
+        "qty": 1
+      },
+      {
+        "classTsid": "zucchini",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "death_to_veg",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_1",
+    "skills": [
+      "cheffery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"329\"]"
+  },
+  "glitchepoix": {
+    "id": "330",
+    "name": "Glitchepoix",
+    "tool": "frying_pan",
+    "energyCost": 5,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "onion",
+        "qty": 2
+      },
+      {
+        "classTsid": "carrot",
+        "qty": 2
+      },
+      {
+        "classTsid": "cabbage",
+        "qty": 1
+      },
+      {
+        "classTsid": "zucchini",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "glitchepoix",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_1",
+    "skills": [
+      "cheffery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"330\"]"
+  },
+  "urfu": {
+    "id": "331",
+    "name": "Urfu",
+    "tool": "frying_pan",
+    "energyCost": 7,
+    "xpReward": 10,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "legumes_parisienne",
+        "qty": 1
+      },
+      {
+        "classTsid": "older_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "urfu",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_2",
+    "skills": [
+      "cheffery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"331\"]"
+  },
+  "salmon_jaella": {
+    "id": "332",
+    "name": "Salmon Jaella",
+    "tool": "frying_pan",
+    "energyCost": 22,
+    "xpReward": 16,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "proper_rice",
+        "qty": 1
+      },
+      {
+        "classTsid": "salmon",
+        "qty": 3
+      },
+      {
+        "classTsid": "legumes_parisienne",
+        "qty": 1
+      },
+      {
+        "classTsid": "glitchepoix",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "salmon_jaella",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_3",
+    "skills": [
+      "cheffery_3"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"332\"]"
+  },
+  "kind_breakfurst_burrito": {
+    "id": "333",
+    "name": "Kind BreakfURst Burrito (TM)",
+    "tool": "frying_pan",
+    "energyCost": 28,
+    "xpReward": 17,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "tortilla",
+        "qty": 1
+      },
+      {
+        "classTsid": "legumes_parisienne",
+        "qty": 1
+      },
+      {
+        "classTsid": "green",
+        "qty": 1
+      },
+      {
+        "classTsid": "hototot_rub",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "kind_breakfurst_burrito",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_3",
+    "skills": [
+      "cheffery_3"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"333\"]"
+  },
+  "roux": {
+    "id": "334",
+    "name": "Roux",
+    "tool": "saucepan",
+    "energyCost": 3,
+    "xpReward": 8,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "butterfly_butter",
+        "qty": 1
+      },
+      {
+        "classTsid": "flour",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "roux",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_1",
+    "skills": [
+      "saucery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"334\"]"
+  },
+  "red": {
+    "id": "335",
+    "name": "Red",
+    "tool": "saucepan",
+    "energyCost": 4,
+    "xpReward": 9,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "tomato",
+        "qty": 2
+      },
+      {
+        "classTsid": "onion",
+        "qty": 1
+      },
+      {
+        "classTsid": "milk_butterfly",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "red",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_1",
+    "skills": [
+      "saucery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"335\"]"
+  },
+  "stock_sauce": {
+    "id": "336",
+    "name": "Stock sauce",
+    "tool": "saucepan",
+    "energyCost": 5,
+    "xpReward": 9,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "flour",
+        "qty": 1
+      },
+      {
+        "classTsid": "milk_butterfly",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "stock_sauce",
+        "qty": 1
+      }
+    ],
+    "skill": "saucery_1",
+    "skills": [
+      "saucery_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"336\"]"
+  },
+  "green": {
+    "id": "337",
+    "name": "Green",
+    "tool": "mike_tyson_grill",
+    "energyCost": 6,
+    "xpReward": 14,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "broccoli",
+        "qty": 2
+      },
+      {
+        "classTsid": "cucumber",
+        "qty": 2
+      },
+      {
+        "classTsid": "spinach",
+        "qty": 3
+      },
+      {
+        "classTsid": "cabbage",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "green",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_1",
+    "skills": [
+      "grilling_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"337\"]"
+  },
+  "vegmageddon": {
+    "id": "338",
+    "name": "Vegmageddon",
+    "tool": "mike_tyson_grill",
+    "energyCost": 11,
+    "xpReward": 16,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "corn",
+        "qty": 3
+      },
+      {
+        "classTsid": "parsnip",
+        "qty": 3
+      },
+      {
+        "classTsid": "carrot",
+        "qty": 3
+      },
+      {
+        "classTsid": "broccoli",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "vegmageddon",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_1",
+    "skills": [
+      "grilling_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"338\"]"
+  },
+  "pottine": {
+    "id": "339",
+    "name": "Pottine",
+    "tool": "mike_tyson_grill",
+    "energyCost": 25,
+    "xpReward": 20,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "potato",
+        "qty": 4
+      },
+      {
+        "classTsid": "wavy_gravy",
+        "qty": 1
+      },
+      {
+        "classTsid": "cheese_stinky",
+        "qty": 1
+      },
+      {
+        "classTsid": "olive_oil",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pottine",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_1",
+    "skills": [
+      "grilling_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"339\"]"
+  },
+  "maburger_royale": {
+    "id": "340",
+    "name": "Maburger Royale",
+    "tool": "mike_tyson_grill",
+    "energyCost": 25,
+    "xpReward": 20,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "urfu",
+        "qty": 1
+      },
+      {
+        "classTsid": "bun",
+        "qty": 1
+      },
+      {
+        "classTsid": "cheese_very_stinky",
+        "qty": 1
+      },
+      {
+        "classTsid": "death_to_veg",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "maburger_royale",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_2",
+    "skills": [
+      "grilling_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"340\"]"
+  },
+  "hot_potatoes": {
+    "id": "341",
+    "name": "Hot Potatoes",
+    "tool": "awesome_pot",
+    "energyCost": 8,
+    "xpReward": 19,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "potato",
+        "qty": 6
+      },
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hot_potatoes",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_1",
+    "skills": [
+      "masterchef_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"341\"]"
+  },
+  "potcorn": {
+    "id": "342",
+    "name": "Potcorn",
+    "tool": "awesome_pot",
+    "energyCost": 11,
+    "xpReward": 20,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "corn",
+        "qty": 3
+      },
+      {
+        "classTsid": "olive_oil",
+        "qty": 2
+      },
+      {
+        "classTsid": "potoxin",
+        "qty": 3
+      },
+      {
+        "classTsid": "paper",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potcorn",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_1",
+    "skills": [
+      "masterchef_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"342\"]"
+  },
+  "pad_tii": {
+    "id": "343",
+    "name": "Pad Tii",
+    "tool": "awesome_pot",
+    "energyCost": 33,
+    "xpReward": 30,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_noodles",
+        "qty": 2
+      },
+      {
+        "classTsid": "urfu",
+        "qty": 1
+      },
+      {
+        "classTsid": "egg_plain",
+        "qty": 2
+      },
+      {
+        "classTsid": "naraka_flame_rub",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "pad_tii",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"343\"]"
+  },
+  "swank_zucchini_loaf": {
+    "id": "344",
+    "name": "Swank Zucchini Loaf",
+    "tool": "mike_tyson_grill",
+    "energyCost": 32,
+    "xpReward": 22,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "zucchini",
+        "qty": 4
+      },
+      {
+        "classTsid": "swing_batter",
+        "qty": 1
+      },
+      {
+        "classTsid": "olive_oil",
+        "qty": 2
+      },
+      {
+        "classTsid": "trump_rub",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "swank_zucchini_loaf",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_2",
+    "skills": [
+      "grilling_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"344\"]"
+  },
+  "heston_mash": {
+    "id": "345",
+    "name": "Heston Mash",
+    "tool": "awesome_pot",
+    "energyCost": 43,
+    "xpReward": 32,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hot_potatoes",
+        "qty": 2
+      },
+      {
+        "classTsid": "wavy_gravy",
+        "qty": 1
+      },
+      {
+        "classTsid": "kings_of_condiments",
+        "qty": 1
+      },
+      {
+        "classTsid": "garlic",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "heston_mash",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"345\"]"
+  },
+  "luxury_tortellini": {
+    "id": "346",
+    "name": "Luxury Tortellini",
+    "tool": "awesome_pot",
+    "energyCost": 54,
+    "xpReward": 34,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_noodles",
+        "qty": 2
+      },
+      {
+        "classTsid": "cheese_very_very_stinky",
+        "qty": 2
+      },
+      {
+        "classTsid": "wicked_bolognese_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "green",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "luxury_tortellini",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"346\"]"
+  },
+  "precious_potato_salad": {
+    "id": "347",
+    "name": "Precious Potato Salad",
+    "tool": "awesome_pot",
+    "energyCost": 61,
+    "xpReward": 35,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "hot_potatoes",
+        "qty": 2
+      },
+      {
+        "classTsid": "vegmageddon",
+        "qty": 1
+      },
+      {
+        "classTsid": "trump_rub",
+        "qty": 1
+      },
+      {
+        "classTsid": "stock_sauce",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "precious_potato_salad",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"347\"]"
+  },
+  "hungry_nachos": {
+    "id": "348",
+    "name": "Hungry Nachos",
+    "tool": "mike_tyson_grill",
+    "energyCost": 36,
+    "xpReward": 23,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "tortilla",
+        "qty": 3
+      },
+      {
+        "classTsid": "cheezy_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "legumes_parisienne",
+        "qty": 1
+      },
+      {
+        "classTsid": "death_to_veg",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hungry_nachos",
+        "qty": 1
+      }
+    ],
+    "skill": "grilling_2",
+    "skills": [
+      "grilling_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"348\"]"
+  },
+  "potians_feast": {
+    "id": "349",
+    "name": "Potian's Feast",
+    "tool": "awesome_pot",
+    "energyCost": 75,
+    "xpReward": 44,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "ixstyle_braised_meat",
+        "qty": 1
+      },
+      {
+        "classTsid": "vegmageddon",
+        "qty": 1
+      },
+      {
+        "classTsid": "heston_mash",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "potians_feast",
+        "qty": 1
+      }
+    ],
+    "skill": "masterchef_2",
+    "skills": [
+      "masterchef_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"349\"]"
+  },
+  "onion_rings": {
+    "id": "350",
+    "name": "Onion Rings",
+    "tool": "frying_pan",
+    "energyCost": 6,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "onion",
+        "qty": 1
+      },
+      {
+        "classTsid": "swing_batter",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "onion_rings",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_2",
+    "skills": [
+      "cheffery_2"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 40,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"350\"]"
+  },
+  "plain_metal": {
+    "id": "smelt_metal",
+    "name": "Plain Metal Ingot",
+    "tool": "smelter",
+    "energyCost": 5,
+    "xpReward": 2,
+    "waitMs": 1500,
+    "inputs": [
+      {
+        "classTsid": "metal_rock",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      }
+    ],
+    "skill": "smelting_1",
+    "skills": [
+      "smelting_1"
+    ],
+    "source": "smelter.js smelt — 5 metal_rock → plain_metal"
   },
   "crush_dullite": {
     "id": "crush_dullite",
@@ -826,126 +10251,5 @@
       "refining_1"
     ],
     "source": "ore_grinder.js onCrushComplete sparkly"
-  },
-  "change_plum": {
-    "id": "108",
-    "name": "Plum",
-    "tool": "fruit_changing_machine",
-    "energyCost": 3,
-    "xpReward": 1,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 1 }],
-    "outputs": [{ "classTsid": "plum", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"108\"]"
-  },
-  "change_grapes": {
-    "id": "109",
-    "name": "Bunch of Grapes",
-    "tool": "fruit_changing_machine",
-    "energyCost": 3,
-    "xpReward": 1,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 2 }],
-    "outputs": [{ "classTsid": "bunch_of_grapes", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"109\"]"
-  },
-  "change_orange": {
-    "id": "111",
-    "name": "Orange",
-    "tool": "fruit_changing_machine",
-    "energyCost": 3,
-    "xpReward": 1,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 3 }],
-    "outputs": [{ "classTsid": "orange", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"111\"]"
-  },
-  "change_apple": {
-    "id": "112",
-    "name": "Apple",
-    "tool": "fruit_changing_machine",
-    "energyCost": 3,
-    "xpReward": 1,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 3 }],
-    "outputs": [{ "classTsid": "apple", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"112\"]"
-  },
-  "change_lemon": {
-    "id": "113",
-    "name": "Lemon",
-    "tool": "fruit_changing_machine",
-    "energyCost": 2,
-    "xpReward": 1,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 4 }],
-    "outputs": [{ "classTsid": "lemon", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"113\"]"
-  },
-  "change_pineapple": {
-    "id": "114",
-    "name": "Pineapple",
-    "tool": "fruit_changing_machine",
-    "energyCost": 4,
-    "xpReward": 1,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 5 }],
-    "outputs": [{ "classTsid": "pineapple", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"114\"]"
-  },
-  "change_banana": {
-    "id": "115",
-    "name": "Banana",
-    "tool": "fruit_changing_machine",
-    "energyCost": 5,
-    "xpReward": 2,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 6 }],
-    "outputs": [{ "classTsid": "banana", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"115\"]"
-  },
-  "change_whortleberry": {
-    "id": "142",
-    "name": "Whortleberry",
-    "tool": "fruit_changing_machine",
-    "energyCost": 4,
-    "xpReward": 1,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 2 }],
-    "outputs": [{ "classTsid": "whortleberry", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"142\"]"
-  },
-  "change_cloudberry": {
-    "id": "144",
-    "name": "Cloudberry",
-    "tool": "fruit_changing_machine",
-    "energyCost": 2,
-    "xpReward": 1,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 1 }],
-    "outputs": [{ "classTsid": "cloudberry", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"144\"]"
-  },
-  "change_strawberry": {
-    "id": "172",
-    "name": "Strawberry",
-    "tool": "fruit_changing_machine",
-    "energyCost": 2,
-    "xpReward": 1,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 3 }],
-    "outputs": [{ "classTsid": "strawberry", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"172\"]"
-  },
-  "change_mangosteen": {
-    "id": "173",
-    "name": "Mangosteen",
-    "tool": "fruit_changing_machine",
-    "energyCost": 4,
-    "xpReward": 2,
-    "waitMs": 2000,
-    "inputs": [{ "classTsid": "cherry", "qty": 7 }],
-    "outputs": [{ "classTsid": "mangosteen", "qty": 1 }],
-    "source": "catalog_recipes.js recipes[\"173\"]"
   }
 }

@@ -1,0 +1,6067 @@
+{
+  "_meta": {
+    "generator": "build-recipes.mjs",
+    "source": "glitch-GameServerJS items/*.js, include/food.js, include/drink.js",
+    "foodFormula": "energy = Math.round(base_cost * energy_factor)",
+    "drinkFormula": "mood = drink_mood, energy = drink_energy, xp = drink_xp",
+    "missingSource": []
+  },
+  "items": {
+    "abbasid_ribs": {
+      "label": "Abbasid Ribs",
+      "namePlural": "Abbasid Ribs",
+      "desc": "Succulent Abbasid ribs, made using a time-honored Abbasidian recipe.",
+      "baseCost": 201,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/abbasid_ribs.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 201,
+        "source": "items/abbasid_ribs.js base_cost 201 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "abbasidose": {
+      "label": "Abbasidose",
+      "namePlural": "Abbasidose",
+      "desc": "A compound made out of red, green and blue elements.",
+      "baseCost": 6,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/abbasidose.js"
+    },
+    "ace_of_spades": {
+      "label": "Ace of Spades",
+      "namePlural": "Ace of Spades",
+      "desc": "Finely honed from old metal, the Ace of Spades is made for the heavy digger. Some say it's overkill, but anyone who dreams of spending another perfect day ruling the world of diggery with an iron fist, this is the ideal purchase, lemme tell you.",
+      "baseCost": 3000,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "premiumtool"
+      ],
+      "isTool": true,
+      "source": "items/ace_of_spades.js",
+      "pointsCapacity": 500,
+      "makingType": ""
+    },
+    "alchemical_tongs": {
+      "label": "Alchemical Tongs",
+      "namePlural": "Alchemical Tongs",
+      "desc": "Handy bendy Alchemical Tongs help you to create exciting metals like <a href=\"/items/617/\" glitch=\"item|tin\">Tin</a>, <a href=\"/items/618/\" glitch=\"item|copper\">Copper</a> and <a href=\"/items/619/\" glitch=\"item|molybdenum\">Molybdenum</a> by adding elements to boring old hot smelted metal.",
+      "baseCost": 600,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/alchemical_tongs.js",
+      "pointsCapacity": 100,
+      "makingType": ""
+    },
+    "all_spice": {
+      "label": "Allspice",
+      "namePlural": "Allspices",
+      "desc": "Some basic spice, freshly harvested from a <a href=\"/items/355/\" glitch=\"item|trant_spice\">Spice Plant</a>.",
+      "baseCost": 3,
+      "stackMax": 250,
+      "tags": [
+        "spice",
+        "basic_resource",
+        "trantproduct"
+      ],
+      "isTool": false,
+      "source": "items/all_spice.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/all_spice.js base_cost 3 × energy_factor 0.4 (include/food.js food_eat)"
+      }
+    },
+    "alphose": {
+      "label": "Alphose",
+      "namePlural": "Alphose",
+      "desc": "A compound made out of red, green and blue.",
+      "baseCost": 8,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/alphose.js"
+    },
+    "apple": {
+      "label": "Apple",
+      "namePlural": "Apples",
+      "desc": "A boldly red and brazenly juicy apple.",
+      "baseCost": 5,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/apple.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/apple.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "applejack": {
+      "label": "Applejack",
+      "namePlural": "Applejacks",
+      "desc": "A bowl of apple-y, oat-y, cinnamon-y applejack. Yummy hot or cold.",
+      "baseCost": 25,
+      "stackMax": 40,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/applejack.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 25,
+        "source": "items/applejack.js base_cost 25 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "awesome_pot": {
+      "label": "Awesome Pot",
+      "namePlural": "Awesome Pots",
+      "desc": "An awesome pot is used to make special dishes. Very special.",
+      "baseCost": 300,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "cookingtool",
+        "food_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/awesome_pot.js",
+      "pointsCapacity": 100,
+      "makingType": "cooking"
+    },
+    "awesome_stew": {
+      "label": "Awesome Stew",
+      "namePlural": "Awesome Stews",
+      "desc": "Chunky awesome stew, so thick you can eat it with a spork.",
+      "baseCost": 268,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/awesome_stew.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 268,
+        "source": "items/awesome_stew.js base_cost 268 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "banana": {
+      "label": "Banana",
+      "namePlural": "Bananas",
+      "desc": "A bright yellow, potassium-rich banana.",
+      "baseCost": 10,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/banana.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 10,
+        "source": "items/banana.js base_cost 10 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "banana_no_names": {
+      "label": "Banana No-Names",
+      "namePlural": "Banana No-Names",
+      "desc": "One banana fried to crispy, buttery perfection and drizzled with honey. Mmmm.",
+      "baseCost": 40,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/banana_no_names.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 40,
+        "source": "items/banana_no_names.js base_cost 40 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "barnacle_talc": {
+      "label": "Barnacle Talc",
+      "namePlural": "Barnacle Talc",
+      "desc": "The post-Grinder form of the lovable <a href=\"/items/639/\" glitch=\"item|barnacle\">barnacle</a>, this smooth off-white powder is bound to be good for something. If only you knew what…",
+      "baseCost": 15,
+      "stackMax": 20,
+      "tags": [
+        "barnacle",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/barnacle_talc.js"
+    },
+    "basic_omelet": {
+      "label": "Basic Omelet",
+      "namePlural": "Basic Omelets",
+      "desc": "A fluffy three-egg omelet.",
+      "baseCost": 46,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/basic_omelet.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 46,
+        "source": "items/basic_omelet.js base_cost 46 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "beaker": {
+      "label": "Beaker",
+      "namePlural": "Beakers",
+      "desc": "A state-of-the-art beaker, integral for converting compounds into powders. Now available in exciting Pyrex, specifically designed for today's modern clumsy alchemist.",
+      "baseCost": 400,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/beaker.js",
+      "pointsCapacity": 0,
+      "makingType": ""
+    },
+    "beam": {
+      "label": "Beam",
+      "namePlural": "Beams",
+      "desc": "One sturdy construction beam, similar in heft and girth to a mighty Wood Tree. But then, this Beam was once some Posts; Posts made from Boards, which in turn were once a whole shedload of Planks, each hand-culled from a tender young Wood Tree. Good thing those Wood Trees didn't die in vain, eh?",
+      "baseCost": 800,
+      "stackMax": 8,
+      "tags": [
+        "woodproduct",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/beam.js"
+    },
+    "bean_bean": {
+      "label": "Bean Tree Bean",
+      "namePlural": "Bean Tree Beans",
+      "desc": "A plain, non-magical bean tree bean. It can grow even more beans!",
+      "baseCost": 150,
+      "stackMax": 100,
+      "tags": [
+        "bean",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/bean_bean.js"
+    },
+    "bean_bubble": {
+      "label": "Bubble Tree Bean",
+      "namePlural": "Bubble Tree Beans",
+      "desc": "A fizzy bubble tree bean. It can be planted to grow a bubble tree.",
+      "baseCost": 150,
+      "stackMax": 100,
+      "tags": [
+        "bean",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/bean_bubble.js"
+    },
+    "bean_egg": {
+      "label": "Egg Plant Bean",
+      "namePlural": "Egg Plant Beans",
+      "desc": "A smooth, round egg plant bean. It can grow egg plants. Then the fun really starts!",
+      "baseCost": 150,
+      "stackMax": 100,
+      "tags": [
+        "bean",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/bean_egg.js"
+    },
+    "bean_fruit": {
+      "label": "Fruit Tree Bean",
+      "namePlural": "Fruit Tree Beans",
+      "desc": "An ordinary fruit tree bean. It can be used to grow a fruit tree.",
+      "baseCost": 150,
+      "stackMax": 100,
+      "tags": [
+        "bean",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/bean_fruit.js"
+    },
+    "bean_gas": {
+      "label": "Gas Plant Bean",
+      "namePlural": "Gas Plant Beans",
+      "desc": "A vapourous gas plant bean. It can be used to grow a gas plant.",
+      "baseCost": 150,
+      "stackMax": 100,
+      "tags": [
+        "bean",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/bean_gas.js"
+    },
+    "bean_plain": {
+      "label": "Bean",
+      "namePlural": "Beans",
+      "desc": "A bean. It can be used for cooking, or it can be seasoned to turn it into seeds for different trees and plants.",
+      "baseCost": 1,
+      "stackMax": 250,
+      "tags": [
+        "food",
+        "basic_resource",
+        "trantproduct",
+        "nobag_food"
+      ],
+      "isTool": false,
+      "source": "items/bean_plain.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/bean_plain.js base_cost 1 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "bean_seasoner": {
+      "label": "Bean Seasoner",
+      "namePlural": "Bean Seasoners",
+      "desc": "A Bean Seasoner seasons beans. You probably guessed that already.",
+      "baseCost": 175,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/bean_seasoner.js",
+      "pointsCapacity": 0,
+      "makingType": ""
+    },
+    "bean_spice": {
+      "label": "Spice Plant Bean",
+      "namePlural": "Spice Plant Beans",
+      "desc": "A small spicy bean. It can be used to plant a spice plant.",
+      "baseCost": 150,
+      "stackMax": 100,
+      "tags": [
+        "bean",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/bean_spice.js"
+    },
+    "bean_wood": {
+      "label": "Wood Tree Bean",
+      "namePlural": "Wood Tree Beans",
+      "desc": "A satisfyingly woody wood tree bean. You can use this to grow a wood tree. Guaranteed 100% splinter-free!",
+      "baseCost": 200,
+      "stackMax": 100,
+      "tags": [
+        "bean",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/bean_wood.js"
+    },
+    "beer": {
+      "label": "Beer",
+      "namePlural": "Beers",
+      "desc": "A shiny can of mmm... beer.",
+      "baseCost": 10,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/beer.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/beer.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 3
+      }
+    },
+    "berry_bowl": {
+      "label": "Berry Bowl",
+      "namePlural": "Berry Bowls",
+      "desc": "A very merry bowl of berries.",
+      "baseCost": 46,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/berry_bowl.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 46,
+        "source": "items/berry_bowl.js base_cost 46 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "beryl": {
+      "label": "Chunk of Beryl",
+      "namePlural": "Chunks of Beryl",
+      "desc": "Halfway between sparkly and dull, it's an innocuous chunk of beryl.",
+      "baseCost": 6,
+      "stackMax": 50,
+      "tags": [
+        "rock",
+        "basic_resource"
+      ],
+      "isTool": false,
+      "source": "items/beryl.js"
+    },
+    "best_bean_dip": {
+      "label": "Best Bean Dip",
+      "namePlural": "Best Bean Dips",
+      "desc": "Bowl of beany, dippy bean dip.",
+      "baseCost": 54,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/best_bean_dip.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 54,
+        "source": "items/best_bean_dip.js base_cost 54 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "big_salad": {
+      "label": "Big Salad",
+      "namePlural": "Big Salads",
+      "desc": "It's bigger than small. It's a big salad.",
+      "baseCost": 58,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/big_salad.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 58,
+        "source": "items/big_salad.js base_cost 58 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "birch_candy": {
+      "label": "Birch Candy",
+      "namePlural": "Birch Candies",
+      "desc": "Candy made of boiled birch syrup so concentrated and so sweet that one too many and you may see god. Or at least the tooth fairy. And they'll be crying.",
+      "baseCost": 13,
+      "stackMax": 20,
+      "tags": [
+        "no_rube",
+        "zilloween",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/birch_candy.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 13,
+        "source": "items/birch_candy.js base_cost 13 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "birch_syrup": {
+      "label": "Birch Syrup",
+      "namePlural": "Birch Syrups",
+      "desc": "A bottle of sticky birch syrup.",
+      "baseCost": 4,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/birch_syrup.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 4,
+        "source": "items/birch_syrup.js base_cost 4 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "black_pepper": {
+      "label": "Black Pepper",
+      "namePlural": "Black Peppers",
+      "desc": "A mound of extra-sneezy black pepper.",
+      "baseCost": 4,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/black_pepper.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/black_pepper.js base_cost 4 × energy_factor 0.2 (include/food.js food_eat)"
+      }
+    },
+    "blender": {
+      "label": "Blender",
+      "namePlural": "Blenders",
+      "desc": "A Blender is very good for blending juices, smoothies and other concoctions. This seems a generally sturdy model.",
+      "baseCost": 150,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "cookingtool",
+        "drink_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/blender.js",
+      "pointsCapacity": 100,
+      "makingType": "cooking"
+    },
+    "blue_bubble": {
+      "label": "Blue Bubble",
+      "namePlural": "Blue Bubbles",
+      "desc": "A big blue bubble.",
+      "baseCost": 5,
+      "stackMax": 100,
+      "tags": [
+        "bubble",
+        "gassesbubbles"
+      ],
+      "isTool": false,
+      "source": "items/blue_bubble.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/blue_bubble.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "board": {
+      "label": "Board",
+      "namePlural": "Boards",
+      "desc": "A solid wooden board, reminiscent of some kind of ginormous Plank – unsurprisingly, since that's what it's made of.",
+      "baseCost": 30,
+      "stackMax": 100,
+      "tags": [
+        "woodproduct",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/board.js"
+    },
+    "broccoli": {
+      "label": "Broccoli",
+      "namePlural": "Broccoli",
+      "desc": "One floret of unabashedly healthy broccoli.",
+      "baseCost": 5,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/broccoli.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/broccoli.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "bubble_and_squeak": {
+      "label": "Bubble and Squeak",
+      "namePlural": "Bubble and Squeaks",
+      "desc": "Meaty, carroty, potato-y mush, fried to perfection.",
+      "baseCost": 60,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/bubble_and_squeak.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 60,
+        "source": "items/bubble_and_squeak.js base_cost 60 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "bubble_tea": {
+      "label": "Bubble Tea",
+      "namePlural": "Bubble Teas",
+      "desc": "A super-frothy bubble tea.",
+      "baseCost": 172,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/bubble_tea.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/bubble_tea.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 30,
+        "energy": 10,
+        "xp": 10
+      }
+    },
+    "bubble_tuner": {
+      "label": "Bubble Tuner",
+      "namePlural": "Bubble Tuners",
+      "desc": "A Bubble Tuner somehow converts plain bubbles into not-plain bubbles. How? Nobody knows.",
+      "baseCost": 150,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "transmog_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/bubble_tuner.js",
+      "pointsCapacity": 0,
+      "makingType": "transmogrification"
+    },
+    "bun": {
+      "label": "Bun",
+      "namePlural": "Buns",
+      "desc": "A nice round bun.",
+      "baseCost": 9,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/bun.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 9,
+        "source": "items/bun.js base_cost 9 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "bunch_of_grapes": {
+      "label": "Bunch of Grapes",
+      "namePlural": "Bunches of Grapes",
+      "desc": "A heaping handful of red grapes.",
+      "baseCost": 4,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/bunch_of_grapes.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 4,
+        "source": "items/bunch_of_grapes.js base_cost 4 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "butterfly_butter": {
+      "label": "Butterfly Butter",
+      "namePlural": "Butterfly Butter",
+      "desc": "Butterfly butter might seem like an odd thing, but it is used in many delicious cooking recipes.",
+      "baseCost": 10,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/butterfly_butter.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 10,
+        "source": "items/butterfly_butter.js base_cost 10 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "butterfly_egg": {
+      "label": "Butterfly Egg",
+      "namePlural": "Butterfly Eggs",
+      "desc": "An egg seasoned with the specific mix of lepidopteral herbs and spices to hatch a <a href=\"/items/368/\" glitch=\"item|caterpillar\">Caterpillar</a>.",
+      "baseCost": 400,
+      "stackMax": 10,
+      "tags": [
+        "egg",
+        "herdkeepingsupplies",
+        "animals"
+      ],
+      "isTool": false,
+      "source": "items/butterfly_egg.js"
+    },
+    "cabbage": {
+      "label": "Cabbage",
+      "namePlural": "Cabbages",
+      "desc": "A head of tender, delicately pungent cabbage.",
+      "baseCost": 7,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/cabbage.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 7,
+        "source": "items/cabbage.js base_cost 7 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "camphor": {
+      "label": "Camphor",
+      "namePlural": "Camphor",
+      "desc": "A small pile of bitter camphor.",
+      "baseCost": 20,
+      "stackMax": 200,
+      "tags": [
+        "food",
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/camphor.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/camphor.js base_cost 20 × energy_factor 0.05 (include/food.js food_eat)"
+      }
+    },
+    "cardamom": {
+      "label": "Cardamom",
+      "namePlural": "Cardamom",
+      "desc": "A generous pinch of zesty cardamom. A little goes a long way.",
+      "baseCost": 12,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/cardamom.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/cardamom.js base_cost 12 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "carobish_treats": {
+      "label": "Raw Bio-Organic Carob-ish Treat",
+      "namePlural": "Raw Bio-Organic Carob-ish Treats",
+      "desc": "A chewy, crunchy, apparently ethically-sourced, gritty 'candy-alternative' with a whiff of winter. Leaves a unique chocolatey aftertang you can't quite put your finger on.",
+      "baseCost": 41,
+      "stackMax": 20,
+      "tags": [
+        "no_rube",
+        "zilloween",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/carobish_treats.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 41,
+        "source": "items/carobish_treats.js base_cost 41 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "carrot": {
+      "label": "Carrot",
+      "namePlural": "Carrots",
+      "desc": "A fresh, firm carrot.",
+      "baseCost": 6,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/carrot.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 6,
+        "source": "items/carrot.js base_cost 6 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "carrot_margarita": {
+      "label": "Carrot Margarita",
+      "namePlural": "Carrot Margaritas",
+      "desc": "A thick, warm carrot margarita.",
+      "baseCost": 90,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/carrot_margarita.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/carrot_margarita.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 10,
+        "energy": 8,
+        "xp": 5
+      }
+    },
+    "cauldron": {
+      "label": "Cauldron",
+      "namePlural": "Cauldrons",
+      "desc": "A charmed pot for potioneers of all levels. This thick, heavy, magic-imbued cauldron is perfect for potions, from novice concoctions to expert unctions.",
+      "baseCost": 3500,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/cauldron.js",
+      "pointsCapacity": 200,
+      "makingType": ""
+    },
+    "cedar_plank_salmon": {
+      "label": "Cedar Plank Salmon",
+      "namePlural": "Cedar Plank Salmons",
+      "desc": "A wild salmon cooked on a wild cedar plank.",
+      "baseCost": 70,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/cedar_plank_salmon.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 70,
+        "source": "items/cedar_plank_salmon.js base_cost 70 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cheese": {
+      "label": "Cheese",
+      "namePlural": "Cheeses",
+      "desc": "A nice wedge of holey cheese.",
+      "baseCost": 15,
+      "stackMax": 20,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/cheese.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 15,
+        "source": "items/cheese.js base_cost 15 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cheese_plate": {
+      "label": "Cheese Plate",
+      "namePlural": "Cheese Plates",
+      "desc": "An assortment of fine cheeses.",
+      "baseCost": 58,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/cheese_plate.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 58,
+        "source": "items/cheese_plate.js base_cost 58 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cheese_stinky": {
+      "label": "Stinky Cheese",
+      "namePlural": "Stinky Cheese",
+      "desc": "A lump of cheese that's been left to stand around for a while. It's what the French call 'ripe'. You could age it longer, but glory only knows what the French would call it then.",
+      "baseCost": 21,
+      "stackMax": 10,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/cheese_stinky.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 21,
+        "source": "items/cheese_stinky.js base_cost 21 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cheese_very_stinky": {
+      "label": "Very Stinky Cheese",
+      "namePlural": "Very Stinky Cheese",
+      "desc": "Smelling like a manatee bathed in celery juice and old surgical stockings,  goodness knows what would happen if you aged this connoisseurial cheese any longer. You could give it a go, though…",
+      "baseCost": 27,
+      "stackMax": 10,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/cheese_very_stinky.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 27,
+        "source": "items/cheese_very_stinky.js base_cost 27 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cheese_very_very_stinky": {
+      "label": "Very, Very Stinky Cheese",
+      "namePlural": "Very, Very Stinky Cheese",
+      "desc": "This is the very, very stinkiest cheese you've ever seen, or it would be if you could see through the thick veil of tears it's inducing. You can't make this any stinkier. It wouldn't be fair to everyone else.",
+      "baseCost": 33,
+      "stackMax": 10,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/cheese_very_very_stinky.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 33,
+        "source": "items/cheese_very_very_stinky.js base_cost 33 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cheezy_sammich": {
+      "label": "Cheezy Sammich",
+      "namePlural": "Cheezy Sammiches",
+      "desc": "An easy, pleasey, cheezy sammich.",
+      "baseCost": 37,
+      "stackMax": 40,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/cheezy_sammich.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 37,
+        "source": "items/cheezy_sammich.js base_cost 37 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cheezy_sauce": {
+      "label": "Cheezy Sauce",
+      "namePlural": "Cheezy Sauces",
+      "desc": "A crock full of pleasingly, teasingly cheezy sauce.",
+      "baseCost": 59,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/cheezy_sauce.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 59,
+        "source": "items/cheezy_sauce.js base_cost 59 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cherry": {
+      "label": "Cherry",
+      "namePlural": "Cherries",
+      "desc": "A basic cherry, freshly picked from a <a href=\"/items/291/\" glitch=\"item|trant_fruit\">Fruit Tree</a>.",
+      "baseCost": 1,
+      "stackMax": 250,
+      "tags": [
+        "food",
+        "fruit",
+        "basic_resource",
+        "trantproduct",
+        "nobag_food"
+      ],
+      "isTool": false,
+      "source": "items/cherry.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/cherry.js base_cost 1 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "chicken_egg": {
+      "label": "Chicken Egg",
+      "namePlural": "Chicken Eggs",
+      "desc": "An egg treated with special poultry seasoning to hatch a <a href=\"/items/279/\" glitch=\"item|chick\">Chick</a>.",
+      "baseCost": 200,
+      "stackMax": 10,
+      "tags": [
+        "egg",
+        "herdkeepingsupplies",
+        "animals"
+      ],
+      "isTool": false,
+      "source": "items/chicken_egg.js"
+    },
+    "chillybusting_chili": {
+      "label": "Chilly-Busting Chili",
+      "namePlural": "Chilly-Busting Chilis",
+      "desc": "A tureen of fiery chilly-busting chili.",
+      "baseCost": 349,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/chillybusting_chili.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 349,
+        "source": "items/chillybusting_chili.js base_cost 349 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "choice_crudites": {
+      "label": "Choice Crudites",
+      "namePlural": "Choice Crudites",
+      "desc": "A platter of the very finest crudites.",
+      "baseCost": 42,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/choice_crudites.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 42,
+        "source": "items/choice_crudites.js base_cost 42 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cinnamon": {
+      "label": "Cinnamon",
+      "namePlural": "Cinnamon",
+      "desc": "About a spoonful of versatile cinnamon.",
+      "baseCost": 8,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/cinnamon.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/cinnamon.js base_cost 8 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "cloud_11_smoothie": {
+      "label": "Cloud 11 Smoothie",
+      "namePlural": "Cloud 11 Smoothies",
+      "desc": "A Cloud 11 smoothie. Pretty much the best smoothie ever invented in the history of smoothies.",
+      "baseCost": 69,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/cloud_11_smoothie.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/cloud_11_smoothie.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 5,
+        "xp": 4
+      }
+    },
+    "cloudberry": {
+      "label": "Cloudberry",
+      "namePlural": "Cloudberries",
+      "desc": "A pleasingly tart cloudberry.",
+      "baseCost": 2,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/cloudberry.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 2,
+        "source": "items/cloudberry.js base_cost 2 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cloudberry_daiquiri": {
+      "label": "Cloudberry Daiquiri",
+      "namePlural": "Cloudberry Daiquiris",
+      "desc": "A nourishing cloudberry daiquiri. It goes down smooth.",
+      "baseCost": 142,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/cloudberry_daiquiri.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/cloudberry_daiquiri.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 15,
+        "energy": 10,
+        "xp": 7
+      }
+    },
+    "cloudberry_jam": {
+      "label": "Cloudberry Jam",
+      "namePlural": "Cloudberry Jam",
+      "desc": "A jar of tart cloudberry jam.",
+      "baseCost": 39,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/cloudberry_jam.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 39,
+        "source": "items/cloudberry_jam.js base_cost 39 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cocktail_shaker": {
+      "label": "Cocktail Shaker",
+      "namePlural": "Cocktail Shakers",
+      "desc": "A shiny, chrome-plated cocktail shaker for making special drinks.",
+      "baseCost": 150,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "cookingtool",
+        "drink_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/cocktail_shaker.js",
+      "pointsCapacity": 100,
+      "makingType": "cooking"
+    },
+    "coffee": {
+      "label": "Coffee",
+      "namePlural": "Coffees",
+      "desc": "A steaming mug of strong, life-affirming coffee.",
+      "baseCost": 5,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/coffee.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/coffee.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 2
+      }
+    },
+    "cold_taco": {
+      "label": "Cold Taco",
+      "namePlural": "Cold Tacos",
+      "desc": "A refreshing cold taco.",
+      "baseCost": 69,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/cold_taco.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 69,
+        "source": "items/cold_taco.js base_cost 69 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "common_crudites": {
+      "label": "Common Crudites",
+      "namePlural": "Common Crudites",
+      "desc": "Everyday crudites served in an easy-to-carry cup.",
+      "baseCost": 33,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/common_crudites.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 33,
+        "source": "items/common_crudites.js base_cost 33 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "copper": {
+      "label": "Copper Ingot",
+      "namePlural": "Copper Ingots",
+      "desc": "Pliable yet strong, malleably magnificent, copper is a much-prized material for building. A glitch bearing good, strong copper will always be welcome on a building project.",
+      "baseCost": 70,
+      "stackMax": 20,
+      "tags": [
+        "metal",
+        "advanced_resource",
+        "nobag_advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/copper.js"
+    },
+    "corn": {
+      "label": "Corn",
+      "namePlural": "Corn",
+      "desc": "Many kernels of sweet corn, conveniently located on a sturdy cob.",
+      "baseCost": 6,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/corn.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 6,
+        "source": "items/corn.js base_cost 6 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "corn_off_the_cob": {
+      "label": "Corn-off-the-Cob",
+      "namePlural": "Corn-off-the-Cobs",
+      "desc": "All the goodness of corn-on-the-cob, without the cob.",
+      "baseCost": 55,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/corn_off_the_cob.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 55,
+        "source": "items/corn_off_the_cob.js base_cost 55 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "corn_syrup_squares": {
+      "label": "Hi-Sucrose Corn Syrup Square",
+      "namePlural": "Hi-Sucrose Corn Syrup Squares",
+      "desc": "Densely-packed brick of pure brain-melting sweetness, proving that sometimes the sum of many food items is either something that is only fit for use as building material in a fairy unicorn happy-palace, or a candy.",
+      "baseCost": 31,
+      "stackMax": 20,
+      "tags": [
+        "no_rube",
+        "zilloween",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/corn_syrup_squares.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 31,
+        "source": "items/corn_syrup_squares.js base_cost 31 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "corny_fritter": {
+      "label": "Corny Fritter",
+      "namePlural": "Corny Fritters",
+      "desc": "Some delicately frittered corn.",
+      "baseCost": 39,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/corny_fritter.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 39,
+        "source": "items/corny_fritter.js base_cost 39 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cosmapolitan": {
+      "label": "Cosma-politan",
+      "namePlural": "Cosma-politans",
+      "desc": "An urbane, sophistimicated cosma-politan.",
+      "baseCost": 131,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/cosmapolitan.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/cosmapolitan.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 20,
+        "energy": 5
+      }
+    },
+    "cosmox": {
+      "label": "Cosmox",
+      "namePlural": "Cosmox",
+      "desc": "A compound made out of red, blue and shiny.",
+      "baseCost": 8.2,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/cosmox.js"
+    },
+    "creamy_catsup": {
+      "label": "Creamy Catsup",
+      "namePlural": "Creamy Catsups",
+      "desc": "One gallon of the creamiest catsup in all the land.",
+      "baseCost": 81,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/creamy_catsup.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 81,
+        "source": "items/creamy_catsup.js base_cost 81 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "creamy_martini": {
+      "label": "Creamy Martini",
+      "namePlural": "Creamy Martinis",
+      "desc": "A shaken-and-stirred-and-shaken-again creamy martini.",
+      "baseCost": 60,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/creamy_martini.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/creamy_martini.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 25,
+        "energy": 10,
+        "xp": 5
+      }
+    },
+    "crying_gas": {
+      "label": "Crying Gas",
+      "namePlural": "Crying Gas",
+      "desc": "A flask of crying gas, saltily infused with real tears.",
+      "baseCost": 20,
+      "stackMax": 100,
+      "tags": [
+        "gas",
+        "gassesbubbles"
+      ],
+      "isTool": false,
+      "source": "items/crying_gas.js"
+    },
+    "crystallizer": {
+      "label": "Crystalmalizing Chamber",
+      "namePlural": "Crystalmalizing Chambers",
+      "desc": "With this tool, every armchair alchemist can be the master of their own future. Or at least make some Plain Crystals. Who knew Barnacle Talc and essence of Firefly would combine to make such fine new age bling?",
+      "baseCost": 2500,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "crystalmalization_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/crystallizer.js",
+      "pointsCapacity": 1000,
+      "makingType": "crystalmalization"
+    },
+    "cucumber": {
+      "label": "Cucumber",
+      "namePlural": "Cucumbers",
+      "desc": "An innocuous cucumber.",
+      "baseCost": 4,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/cucumber.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 4,
+        "source": "items/cucumber.js base_cost 4 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "cumin": {
+      "label": "Cumin",
+      "namePlural": "Cumin",
+      "desc": "A heap of pleasantly aromatic cumin.",
+      "baseCost": 8,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/cumin.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/cumin.js base_cost 8 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "curry": {
+      "label": "Curry",
+      "namePlural": "Curries",
+      "desc": "A top-secret blend of curry powder.",
+      "baseCost": 5,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/curry.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/curry.js base_cost 5 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "death_to_veg": {
+      "label": "Death to Veg",
+      "namePlural": "Death to Veg",
+      "desc": "For those who wish a violent end to all harmless vegetables, and desire to feast upon their flesh.",
+      "baseCost": 39,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/death_to_veg.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 39,
+        "source": "items/death_to_veg.js base_cost 39 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "deluxe_sammich": {
+      "label": "Deluxe Sammich",
+      "namePlural": "Deluxe Sammiches",
+      "desc": "A deeply satisfying deluxe sammich.",
+      "baseCost": 86,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/deluxe_sammich.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 86,
+        "source": "items/deluxe_sammich.js base_cost 86 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "desssert_rub": {
+      "label": "Desssert Rub",
+      "namePlural": "Desssert Rub",
+      "desc": "Gritty, sandlike, and strangely sweet, this is both sandy like the desert, and sweet like dessert, and, as such, has the s's of both.",
+      "baseCost": 78,
+      "stackMax": 50,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/desssert_rub.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 8,
+        "source": "items/desssert_rub.js base_cost 78 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "diabolic_acid": {
+      "label": "Diabolic Acid",
+      "namePlural": "Diabolic Acid",
+      "desc": "A compound made out of red, green and blue.",
+      "baseCost": 1.4,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/diabolic_acid.js"
+    },
+    "divine_crepes": {
+      "label": "Divine Crepe",
+      "namePlural": "Divine Crepes",
+      "desc": "Life-changingly scrumptious crepes.",
+      "baseCost": 279,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/divine_crepes.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 279,
+        "source": "items/divine_crepes.js base_cost 279 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "dullite": {
+      "label": "Chunk of Dullite",
+      "namePlural": "Chunks of Dullite",
+      "desc": "A hefty chunk of dullite. What it lacks in sparkliness it makes up for in, um, dullness.",
+      "baseCost": 4,
+      "stackMax": 50,
+      "tags": [
+        "rock",
+        "basic_resource"
+      ],
+      "isTool": false,
+      "source": "items/dullite.js"
+    },
+    "earthshaker": {
+      "label": "Earthshaker",
+      "namePlural": "Earthshakers",
+      "desc": "A seismically upgraded earthshaker.",
+      "baseCost": 152,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/earthshaker.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/earthshaker.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 10,
+        "energy": 30,
+        "xp": 7
+      }
+    },
+    "egg_plain": {
+      "label": "Egg",
+      "namePlural": "Eggs",
+      "desc": "A plain, unseasoned egg, newly harvested from an <a href=\"/items/99/\" glitch=\"item|trant_egg\">Egg Plant</a>. It can be used for all kinds of cooking, or it can be hatched into different animals.",
+      "baseCost": 5,
+      "stackMax": 250,
+      "tags": [
+        "food",
+        "basic_resource",
+        "trantproduct",
+        "nobag_food"
+      ],
+      "isTool": false,
+      "source": "items/egg_plain.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/egg_plain.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "egg_seasoner": {
+      "label": "Egg Seasoner",
+      "namePlural": "Egg Seasoners",
+      "desc": "An Egg Seasoner is an important tool for seasoning and incubating eggs that hatch into all kinds of exciting animals.",
+      "baseCost": 175,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/egg_seasoner.js",
+      "pointsCapacity": 0,
+      "makingType": ""
+    },
+    "eggy_scramble": {
+      "label": "Eggy Scramble",
+      "namePlural": "Eggy Scrambles",
+      "desc": "A messily scrumptious pile of eggs.",
+      "baseCost": 32,
+      "stackMax": 40,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/eggy_scramble.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 32,
+        "source": "items/eggy_scramble.js base_cost 32 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "element_blue": {
+      "label": "Blue Element",
+      "namePlural": "Blue Elements",
+      "desc": "An element is the basic building block of all stuff. This one is blue.",
+      "baseCost": 0.7,
+      "stackMax": 5000,
+      "tags": [
+        "element",
+        "no_rube",
+        "no_auction",
+        "no_vendor",
+        "alchemy"
+      ],
+      "isTool": false,
+      "source": "items/element_blue.js"
+    },
+    "element_green": {
+      "label": "Green Element",
+      "namePlural": "Green Elements",
+      "desc": "An element is the basic building block of all stuff. This one is green.",
+      "baseCost": 0.5,
+      "stackMax": 5000,
+      "tags": [
+        "element",
+        "no_rube",
+        "no_auction",
+        "no_vendor",
+        "alchemy"
+      ],
+      "isTool": false,
+      "source": "items/element_green.js"
+    },
+    "element_red": {
+      "label": "Red Element",
+      "namePlural": "Red Elements",
+      "desc": "An element is the basic building block of all stuff. This one is red.",
+      "baseCost": 0.2,
+      "stackMax": 5000,
+      "tags": [
+        "element",
+        "no_rube",
+        "no_auction",
+        "no_vendor",
+        "alchemy"
+      ],
+      "isTool": false,
+      "source": "items/element_red.js"
+    },
+    "element_shiny": {
+      "label": "Shiny Element",
+      "namePlural": "Shiny Elements",
+      "desc": "An element is the basic building block of all stuff. This one is shiny.",
+      "baseCost": 1,
+      "stackMax": 5000,
+      "tags": [
+        "element",
+        "no_rube",
+        "no_auction",
+        "no_vendor",
+        "alchemy"
+      ],
+      "isTool": false,
+      "source": "items/element_shiny.js"
+    },
+    "essence_of_gandlevery": {
+      "label": "Essence of Gandlevery",
+      "namePlural": "Essences of Gandlevery",
+      "desc": "A potent distillation of Gandlevery, as rich in protein and good for energy as it is foul on the tongue and bad for mood.",
+      "baseCost": 181,
+      "stackMax": 20,
+      "tags": [
+        "tincture",
+        "tinctures_potions",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/essence_of_gandlevery.js"
+    },
+    "essence_of_hairball": {
+      "label": "Essence of Hairball",
+      "namePlural": "Essences of Hairball",
+      "desc": "All the speed-giving power of the Hairball Flower, scraped from the individual hairball ball-hairs, and concentrated into a tincture.",
+      "baseCost": 449,
+      "stackMax": 20,
+      "tags": [
+        "tincture",
+        "tinctures_potions",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/essence_of_hairball.js"
+    },
+    "essence_of_purple": {
+      "label": "Essence of Purple",
+      "namePlural": "Essences of Purple",
+      "desc": "You thought Purple was purple? This is seriously purple. Seriously: The purplest.",
+      "baseCost": 491,
+      "stackMax": 20,
+      "tags": [
+        "tincture",
+        "tinctures_potions",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/essence_of_purple.js"
+    },
+    "essence_of_rookswort": {
+      "label": "Essence of Rookswort",
+      "namePlural": "Essences of Rookswort",
+      "desc": "Distilled Rookswort harnesses the power of the ancients for ultra-absorbent protection during those heavy rook attacks.",
+      "baseCost": 509,
+      "stackMax": 20,
+      "tags": [
+        "tincture",
+        "tinctures_potions",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/essence_of_rookswort.js"
+    },
+    "essence_of_rubeweed": {
+      "label": "Essence of Rubeweed",
+      "namePlural": "Essences of Rubeweed",
+      "desc": "The purest scent of gullible luck, boiled down to the point where Rubes can smell it from many many planks away.",
+      "baseCost": 383,
+      "stackMax": 20,
+      "tags": [
+        "tincture",
+        "tinctures_potions",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/essence_of_rubeweed.js"
+    },
+    "essence_of_silvertongue": {
+      "label": "Essence of Silvertongue",
+      "namePlural": "Essences of Silvertongue",
+      "desc": "The concentrated charm of Silvertongue, giving large returns on upcoming ventures.",
+      "baseCost": 283,
+      "stackMax": 20,
+      "tags": [
+        "tincture",
+        "tinctures_potions",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/essence_of_silvertongue.js"
+    },
+    "essence_of_yellow_crumb": {
+      "label": "Essence of Yellow Crumb",
+      "namePlural": "Essences of Yellow Crumb",
+      "desc": "Purest concentration, concentrated, for those who need a more expansive brain-span.",
+      "baseCost": 541,
+      "stackMax": 20,
+      "tags": [
+        "tincture",
+        "tinctures_potions",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/essence_of_yellow_crumb.js"
+    },
+    "exotic_fruit_salad": {
+      "label": "Exotic Fruit Salad",
+      "namePlural": "Exotic Fruit Salads",
+      "desc": "An enticing array of exotic fruits.",
+      "baseCost": 33,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/exotic_fruit_salad.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 33,
+        "source": "items/exotic_fruit_salad.js base_cost 33 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "exotic_juice": {
+      "label": "Exotic Juice",
+      "namePlural": "Exotic Juices",
+      "desc": "A goblet of mysteriously yummy exotic juice.",
+      "baseCost": 54,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/exotic_juice.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/exotic_juice.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 20,
+        "energy": 10,
+        "xp": 5
+      }
+    },
+    "expensive_grilled_cheese": {
+      "label": "Expensive Grilled Cheese",
+      "namePlural": "Expensive Grilled Cheeses",
+      "desc": "Expensive cheese expensively grilled on expensive bread.",
+      "baseCost": 220,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/expensive_grilled_cheese.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 220,
+        "source": "items/expensive_grilled_cheese.js base_cost 220 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "extremely_hallowed_shrine_powder": {
+      "label": "Extremely Hallowed Shrine Powder",
+      "namePlural": "Extremely Hallowed Shrine Powder",
+      "desc": "A jar of extremely hallowed shrine powder. It lets the giants know that, when it comes to currying favor, you really mean business. ",
+      "baseCost": 2000,
+      "stackMax": 1,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/extremely_hallowed_shrine_powder.js"
+    },
+    "face_smelter": {
+      "label": "Face Smelter",
+      "namePlural": "Face Smelters",
+      "desc": "A powerful brew with a scent acrid enough to perm your nostril hairs.",
+      "baseCost": 141,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/face_smelter.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/face_smelter.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 10,
+        "energy": 30,
+        "xp": 5
+      }
+    },
+    "fairly_hallowed_shrine_powder": {
+      "label": "Fairly Hallowed Shrine Powder",
+      "namePlural": "Fairly Hallowed Shrine Powder",
+      "desc": "Curry a moderate amount of favor with the giants with a jar of fairly hallowed shrine powder. ",
+      "baseCost": 1000,
+      "stackMax": 1,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/fairly_hallowed_shrine_powder.js"
+    },
+    "fancy_pick": {
+      "label": "Fancy Pick",
+      "namePlural": "Fancy Picks",
+      "desc": "A super-deluxe fancy pick for fancy miners. Okay, maybe it doesn't look that fancy on the outside. It's the inside that counts.",
+      "baseCost": 1000,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "mining"
+      ],
+      "isTool": true,
+      "source": "items/fancy_pick.js",
+      "pointsCapacity": 200,
+      "makingType": ""
+    },
+    "fertilidust": {
+      "label": "Fertilidust",
+      "namePlural": "Fertilidust",
+      "desc": "A jar of chokingly musty fertilidust, effective in promoting the health of trees. ",
+      "baseCost": 500,
+      "stackMax": 1,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/fertilidust.js"
+    },
+    "fertilidust_lite": {
+      "label": "Fertilidust Lite",
+      "namePlural": "Fertilidust Lite",
+      "desc": "A jar of somewhat musty fertilidust lite, effective in improving the health of individual trees. ",
+      "baseCost": 200,
+      "stackMax": 1,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/fertilidust_lite.js"
+    },
+    "firefly_jar": {
+      "label": "Firefly Jar",
+      "namePlural": "Firefly Jars",
+      "desc": "This is no ordinary jar. Well, it IS, but once filled with fireflies (seven maximum: objects in space need room to fly) just looking at it gives you a great sense of serenity.",
+      "baseCost": 100,
+      "stackMax": 1,
+      "tags": [
+        "firefly",
+        "advanced_resource",
+        "tool"
+      ],
+      "isTool": false,
+      "source": "items/firefly_jar.js"
+    },
+    "flaming_humbaba": {
+      "label": "Flaming Humbaba",
+      "namePlural": "Flaming Humbabas",
+      "desc": "A 5-alarm flaming Humbaba.",
+      "baseCost": 168,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/flaming_humbaba.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/flaming_humbaba.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 5,
+        "energy": 20,
+        "xp": 2
+      }
+    },
+    "flour": {
+      "label": "Flour",
+      "namePlural": "Flour",
+      "desc": "Some ordinary white, powdery flour.",
+      "baseCost": 7,
+      "stackMax": 80,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/flour.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 7,
+        "source": "items/flour.js base_cost 7 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "flummery": {
+      "label": "Flummery",
+      "namePlural": "Flummerys",
+      "desc": "Few things in this life are as tasty as a masterfully prepared flummery. \"Just like Mom used to make!\" you might say. If you had a mom, that is.",
+      "baseCost": 229,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/flummery.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 229,
+        "source": "items/flummery.js base_cost 229 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "fortifying_gruel": {
+      "label": "Fortifying Gruel",
+      "namePlural": "Fortifying Gruels",
+      "desc": "One bowl of lumpy fortifying gruel.",
+      "baseCost": 271,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/fortifying_gruel.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 271,
+        "source": "items/fortifying_gruel.js base_cost 271 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "fried_egg": {
+      "label": "Fried Egg",
+      "namePlural": "Fried Eggs",
+      "desc": "One sunny-side-up egg.",
+      "baseCost": 11,
+      "stackMax": 40,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/fried_egg.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 11,
+        "source": "items/fried_egg.js base_cost 11 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "fried_noodles": {
+      "label": "Fried Noodles",
+      "namePlural": "Fried Noodles",
+      "desc": "A small slippery hill of fried noodles.",
+      "baseCost": 35,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/fried_noodles.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 35,
+        "source": "items/fried_noodles.js base_cost 35 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "fried_rice": {
+      "label": "Fried Rice",
+      "namePlural": "Fried Rice",
+      "desc": "A bowl of fried rice with lots of nummy bits.",
+      "baseCost": 114,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/fried_rice.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 114,
+        "source": "items/fried_rice.js base_cost 114 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "friendly_acid": {
+      "label": "Friendly Acid",
+      "namePlural": "Friendly Acid",
+      "desc": "A compound made out of red and blue.",
+      "baseCost": 5.5,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/friendly_acid.js"
+    },
+    "frog_in_a_hole": {
+      "label": "Frog-in-a-Hole",
+      "namePlural": "Frogs-in-a-Hole",
+      "desc": "A perfect egg perfectly fried in a perfect hole in a slice of bread.",
+      "baseCost": 44,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/frog_in_a_hole.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 44,
+        "source": "items/frog_in_a_hole.js base_cost 44 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "fruit_changing_machine": {
+      "label": "Fruit Changing Machine",
+      "namePlural": "Fruit Changing Machines",
+      "desc": "A triple-carbine fruit-changing machine. It will transmogrify cherries into other fruit. This can come in surprisingly handy.",
+      "baseCost": 200,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "transmog_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/fruit_changing_machine.js",
+      "pointsCapacity": 0,
+      "makingType": "transmogrification"
+    },
+    "fruit_salad": {
+      "label": "Fruit Salad",
+      "namePlural": "Fruit Salads",
+      "desc": "A nice fruit salad.",
+      "baseCost": 29,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/fruit_salad.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 29,
+        "source": "items/fruit_salad.js base_cost 29 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "fruity_juice": {
+      "label": "Fruity Juice",
+      "namePlural": "Fruity Juices",
+      "desc": "A glass of nigh-ambrosial fruit juice.",
+      "baseCost": 24,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/fruity_juice.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/fruity_juice.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 20
+      }
+    },
+    "frying_pan": {
+      "label": "Frying Pan",
+      "namePlural": "Frying Pans",
+      "desc": "A useful pan for frying things in.",
+      "baseCost": 125,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "cookingtool",
+        "food_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/frying_pan.js",
+      "pointsCapacity": 100,
+      "makingType": "cooking"
+    },
+    "fuel_cell": {
+      "label": "Fuel Cell",
+      "namePlural": "Fuel Cells",
+      "desc": "Hundreds of tiny power-pellets in each capsule provide gigajoules of energy to fuel the machines.",
+      "baseCost": 380,
+      "stackMax": 10,
+      "tags": [
+        "fuel",
+        "machineparts_products",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/fuel_cell.js"
+    },
+    "fuelmaker": {
+      "label": "Fuelmaker",
+      "namePlural": "Fuelmakers",
+      "desc": "Talk about green energy. There's so much green in these fuel cells, and the Fuelmaker is how it gets there.",
+      "baseCost": 0,
+      "stackMax": 1,
+      "tags": [
+        "fuelmaker",
+        "no_rube",
+        "no_trade",
+        "no_shelf",
+        "machineparts_products",
+        "machine_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/fuelmaker.js",
+      "makingType": "machine"
+    },
+    "gammas_pancakes": {
+      "label": "Gamma's Pancake",
+      "namePlural": "Gamma's Pancakes",
+      "desc": "One mouthwatering pancake, just like Gamma used to make.",
+      "baseCost": 57,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/gammas_pancakes.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 57,
+        "source": "items/gammas_pancakes.js base_cost 57 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "gandlevery": {
+      "label": "Gandlevery",
+      "namePlural": "Sprigs of Gandlevery",
+      "desc": "Plant with furry fern-fronds of fleetfooted goodness.",
+      "baseCost": 40,
+      "stackMax": 50,
+      "tags": [
+        "herb",
+        "herbalism_supplies"
+      ],
+      "isTool": false,
+      "source": "items/gandlevery.js"
+    },
+    "garlic": {
+      "label": "Garlic",
+      "namePlural": "Garlic",
+      "desc": "A nice stinky garlic.",
+      "baseCost": 4,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/garlic.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/garlic.js base_cost 4 × energy_factor 0.2 (include/food.js food_eat)"
+      }
+    },
+    "gassifier": {
+      "label": "Gassifier",
+      "namePlural": "Gassifiers",
+      "desc": "An ergonomically correct gassifier. It can turn general vapour into much more exciting gases.",
+      "baseCost": 150,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "transmog_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/gassifier.js",
+      "pointsCapacity": 0,
+      "makingType": "transmogrification"
+    },
+    "general_fabric": {
+      "label": "General Fabric",
+      "namePlural": "General Fabric",
+      "desc": "A coarse fabric necessary in the construction of various basic furniture items. Attractive from a distance, face-to-fabric contact feels uncomfortably like getting up close and personal with the underside of a fox's tail.",
+      "baseCost": 250,
+      "stackMax": 10,
+      "tags": [
+        "fiberarts",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/general_fabric.js"
+    },
+    "general_vapour": {
+      "label": "General Vapour",
+      "namePlural": "General Vapour",
+      "desc": "A flask of all-purpose general vapour, harvested from a <a href=\"/items/354/\" glitch=\"item|trant_gas\">Gas Plant</a>.",
+      "baseCost": 5,
+      "stackMax": 250,
+      "tags": [
+        "gas",
+        "basic_resource",
+        "trantproduct"
+      ],
+      "isTool": false,
+      "source": "items/general_vapour.js"
+    },
+    "ginger": {
+      "label": "Ginger",
+      "namePlural": "Ginger",
+      "desc": "A nubbin of pungent ginger.",
+      "baseCost": 4,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/ginger.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/ginger.js base_cost 4 × energy_factor 0.2 (include/food.js food_eat)"
+      }
+    },
+    "girder": {
+      "label": "Girder",
+      "namePlural": "Girders",
+      "desc": "A solid metal material used for correctly shafting mines and supporting structures. There's some crazy rumour that if you can find a way to boil these down, you can magically create a sparkling bright orange drink out of them. But this has never been proved, and their use in construction is by far the more popular one.",
+      "baseCost": 1500,
+      "stackMax": 4,
+      "tags": [
+        "metalproduct",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/girder.js"
+    },
+    "glitchepoix": {
+      "label": "Glitchepoix",
+      "namePlural": "Glitchepoixes",
+      "desc": "Combination of vegetables known as the holy quadrinity of the Glitchean cuisine.",
+      "baseCost": 45,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/glitchepoix.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 45,
+        "source": "items/glitchepoix.js base_cost 45 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "grain": {
+      "label": "Grain",
+      "namePlural": "Grains",
+      "desc": "Some plain grain.",
+      "baseCost": 1,
+      "stackMax": 250,
+      "tags": [
+        "food",
+        "basic_resource",
+        "animalproduct",
+        "nobag_food"
+      ],
+      "isTool": false,
+      "source": "items/grain.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/grain.js base_cost 1 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "greasy_frybread": {
+      "label": "Greasy Frybread",
+      "namePlural": "Greasy Frybreads",
+      "desc": "A fresh chunk of butter-running-down-your-arms greasy frybread.",
+      "baseCost": 53,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/greasy_frybread.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 53,
+        "source": "items/greasy_frybread.js base_cost 53 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "green": {
+      "label": "Green",
+      "namePlural": "Green",
+      "desc": "So fundamental, so intrinsic to the basic laws of culinary science and a healthy spleen that there was only ever one word needed to describe it: Green. So, so green.",
+      "baseCost": 48,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/green.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 48,
+        "source": "items/green.js base_cost 48 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "green_eggs": {
+      "label": "Green Egg",
+      "namePlural": "Green Eggs",
+      "desc": "One order of fried green eggs, hold the ham.",
+      "baseCost": 12,
+      "stackMax": 40,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/green_eggs.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 12,
+        "source": "items/green_eggs.js base_cost 12 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "grendalinunin": {
+      "label": "Grendalinunin",
+      "namePlural": "Grendalinunin",
+      "desc": "A compound made out of red, green, blue and shiny.",
+      "baseCost": 11.7,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/grendalinunin.js"
+    },
+    "grilled_cheese": {
+      "label": "Grilled Cheese",
+      "namePlural": "Grilled Cheeses",
+      "desc": "A comforting grilled cheese.",
+      "baseCost": 90,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/grilled_cheese.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 90,
+        "source": "items/grilled_cheese.js base_cost 90 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "groddlene": {
+      "label": "Groddlene",
+      "namePlural": "Groddlene",
+      "desc": "A compound made out of red and green.",
+      "baseCost": 2.7,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/groddlene.js"
+    },
+    "guano": {
+      "label": "Guano",
+      "namePlural": "Guano",
+      "desc": "An unobtrusive pellet from the back end of a <a href=\"/items/448/\" glitch=\"item|npc_batterfly\">Batterfly</a>, Guano can be used as a fertilizer to boost the growth of Crops and Herbs, as an ingredient for <b>Potions</b>, or in the street-building trade.",
+      "baseCost": 20,
+      "stackMax": 40,
+      "tags": [
+        "no_rube",
+        "basic_resource"
+      ],
+      "isTool": false,
+      "source": "items/guano.js"
+    },
+    "gurly_drink": {
+      "label": "Gurly Drink",
+      "namePlural": "Gurly Drinks",
+      "desc": "A sweet, innocent gurly drink.",
+      "baseCost": 160,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/gurly_drink.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/gurly_drink.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 30,
+        "energy": 5,
+        "xp": 10
+      }
+    },
+    "hairball_flower": {
+      "label": "Hairball Flower",
+      "namePlural": "Hairball Flowers",
+      "desc": "A hairy perennial. Even the thought of eating it causes feelings of antsy twitchiness.",
+      "baseCost": 66,
+      "stackMax": 50,
+      "tags": [
+        "herb",
+        "herbalism_supplies"
+      ],
+      "isTool": false,
+      "source": "items/hairball_flower.js"
+    },
+    "hard_bubble": {
+      "label": "Hard Bubble",
+      "namePlural": "Hard Bubbles",
+      "desc": "A deceptively hard bubble.",
+      "baseCost": 15,
+      "stackMax": 100,
+      "tags": [
+        "bubble",
+        "gassesbubbles"
+      ],
+      "isTool": false,
+      "source": "items/hard_bubble.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 15,
+        "source": "items/hard_bubble.js base_cost 15 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "hash": {
+      "label": "Hash",
+      "namePlural": "Hashes",
+      "desc": "A serving of oddly satisfying hash.",
+      "baseCost": 57,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/hash.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 57,
+        "source": "items/hash.js base_cost 57 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "hatchet": {
+      "label": "Hatchet",
+      "namePlural": "Hatchets",
+      "desc": "A slightly dull hatchet, useful for both dead tree-clearing and showy beard-shaving.",
+      "baseCost": 100,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/hatchet.js",
+      "pointsCapacity": 100,
+      "makingType": ""
+    },
+    "hearty_groddle_sammich": {
+      "label": "Hearty Groddle Sammich",
+      "namePlural": "Hearty Groddle Sammiches",
+      "desc": "A meaty Groddle sammich with extra hot 'n' fizzy sauce for extra hot 'n' fizzy energy.",
+      "baseCost": 93,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/hearty_groddle_sammich.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 93,
+        "source": "items/hearty_groddle_sammich.js base_cost 93 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "hearty_omelet": {
+      "label": "Hearty Omelet",
+      "namePlural": "Hearty Omelets",
+      "desc": "An unusually nourishing hearty omelet.",
+      "baseCost": 120,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/hearty_omelet.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 120,
+        "source": "items/hearty_omelet.js base_cost 120 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "heavy_gas": {
+      "label": "Heavy Gas",
+      "namePlural": "Heavy Gas",
+      "desc": "A hefty flask of heavy gas. Remember to lift with your legs.",
+      "baseCost": 40,
+      "stackMax": 100,
+      "tags": [
+        "gas",
+        "gassesbubbles"
+      ],
+      "isTool": false,
+      "source": "items/heavy_gas.js"
+    },
+    "helium": {
+      "label": "Helium",
+      "namePlural": "Helium",
+      "desc": "One vial of premium colorless, odorless, tasteless helium. You know, the stuff that makes you sound funny.",
+      "baseCost": 30,
+      "stackMax": 100,
+      "tags": [
+        "gas",
+        "gassesbubbles"
+      ],
+      "isTool": false,
+      "source": "items/helium.js"
+    },
+    "heston_mash": {
+      "label": "Heston Mash",
+      "namePlural": "Heston Mashes",
+      "desc": "This is not just mashed potato, this is the fanciest, zaniest, most delicious mashed potato Ur has ever ingested. And yet, really, it's still just mashed potato.",
+      "baseCost": 576,
+      "stackMax": 10,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/heston_mash.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 576,
+        "source": "items/heston_mash.js base_cost 576 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "hoe": {
+      "label": "Hoe",
+      "namePlural": "Hoes",
+      "desc": "A garden-variety hoe. It can be used to tend weedy patches.",
+      "baseCost": 60,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/hoe.js",
+      "pointsCapacity": 50,
+      "makingType": ""
+    },
+    "honey": {
+      "label": "Honey",
+      "namePlural": "Honey",
+      "desc": "A brimful jar of raw golden honey.",
+      "baseCost": 4,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/honey.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 4,
+        "source": "items/honey.js base_cost 4 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "hooch": {
+      "label": "Hooch",
+      "namePlural": "Hooches",
+      "desc": "One jug of premium high-octane hooch.",
+      "baseCost": 15,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/hooch.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/hooch.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 5
+      }
+    },
+    "hot_n_fizzy_sauce": {
+      "label": "Hot 'n' Fizzy Sauce",
+      "namePlural": "Hot 'n' Fizzy Sauces",
+      "desc": "One jar of potent hot 'n' fizzy sauce. This combustible comestible is packed with energy and all kinds of flaming goodness.",
+      "baseCost": 48,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/hot_n_fizzy_sauce.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 48,
+        "source": "items/hot_n_fizzy_sauce.js base_cost 48 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "hot_pepper": {
+      "label": "Hot Pepper",
+      "namePlural": "Hot Peppers",
+      "desc": "A scoop of potentially combustible hot pepper.",
+      "baseCost": 4,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/hot_pepper.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/hot_pepper.js base_cost 4 × energy_factor 0.2 (include/food.js food_eat)"
+      }
+    },
+    "hot_potatoes": {
+      "label": "Hot Potatoes",
+      "namePlural": "Hot Potatoes",
+      "desc": "If a glitch gives you this 'tato, drop it like it's hot. Because it is.",
+      "baseCost": 66,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/hot_potatoes.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 66,
+        "source": "items/hot_potatoes.js base_cost 66 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "hototot_rub": {
+      "label": "Hototot Rub",
+      "namePlural": "Hototot Rub",
+      "desc": "Oooh. Ow. Hot. Hotot. Hototot.",
+      "baseCost": 77,
+      "stackMax": 50,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/hototot_rub.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 8,
+        "source": "items/hototot_rub.js base_cost 77 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "humbabol": {
+      "label": "Humbabol",
+      "namePlural": "Humbabol",
+      "desc": "A compound made out of blue and shiny.",
+      "baseCost": 5.7,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/humbabol.js"
+    },
+    "hungry_nachos": {
+      "label": "Hungry Nachos",
+      "namePlural": "Hungry Nachos",
+      "desc": "Are you hungry for nachos or are nachos hungry for you? It's nacho decision to make.",
+      "baseCost": 508,
+      "stackMax": 10,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/hungry_nachos.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 508,
+        "source": "items/hungry_nachos.js base_cost 508 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "ice": {
+      "label": "Ice",
+      "namePlural": "Ice",
+      "desc": "A nugget of purest ice, plucked with a scraper from the Nubbins of the north and ripe in readiness for sno cones, cocktail making, and icing the occasional strained glitch-groin. Basically: frozen water in pleasingly cuboid form.",
+      "baseCost": 6,
+      "stackMax": 40,
+      "tags": [
+        "food",
+        "basic_resource",
+        "nobag_food"
+      ],
+      "isTool": false,
+      "source": "items/ice.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 6,
+        "source": "items/ice.js base_cost 6 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "irrigator_9000": {
+      "label": "Irrigator 9000",
+      "namePlural": "Irrigator 9000s",
+      "desc": "Galvanised for your pleasure, the Irrigator 9000 offers unparalleled waterability for the constant gardener. With reinforced spout for a five-times longer life - you get what you pay for.",
+      "baseCost": 750,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "premiumtool"
+      ],
+      "isTool": true,
+      "source": "items/irrigator_9000.js",
+      "pointsCapacity": 500,
+      "makingType": ""
+    },
+    "ixite": {
+      "label": "Ixite",
+      "namePlural": "Ixite",
+      "desc": "A compound made out of red, green, blue and shiny.",
+      "baseCost": 4.3,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/ixite.js"
+    },
+    "ixstyle_braised_meat": {
+      "label": "Ix-Style Braised Meat",
+      "namePlural": "Ix-Style Braised Meats",
+      "desc": "A side of rich, meaty meat, braised a la Ix.",
+      "baseCost": 234,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/ixstyle_braised_meat.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 234,
+        "source": "items/ixstyle_braised_meat.js base_cost 234 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "jellisac_clump": {
+      "label": "Clump of Jellisac",
+      "namePlural": "Clumps of Jellisac",
+      "desc": "It's like your mother always said, just because it's slimy, doesn't mean it's not desirable. Even if she didn't say it, this stuff is certainly gloopy, and eminently usable. Where ooze is needed, jellisacs are your friend.",
+      "baseCost": 9,
+      "stackMax": 100,
+      "tags": [
+        "jellisac",
+        "basic_resource",
+        "firebogproduct"
+      ],
+      "isTool": false,
+      "source": "items/jellisac_clump.js"
+    },
+    "juicy_carpaccio": {
+      "label": "Juicy Carpaccio",
+      "namePlural": "Juicy Carpaccios",
+      "desc": "A tempting platter of juicy carpaccio with all the trimmings.",
+      "baseCost": 71,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/juicy_carpaccio.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 71,
+        "source": "items/juicy_carpaccio.js base_cost 71 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "kind_breakfurst_burrito": {
+      "label": "Kind BreakfURst Burrito (TM)",
+      "namePlural": "Kind BreakfURst Burritos (TM)",
+      "desc": "Warning: Does not contain meat.",
+      "baseCost": 292,
+      "stackMax": 20,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/kind_breakfurst_burrito.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 292,
+        "source": "items/kind_breakfurst_burrito.js base_cost 292 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "kings_of_condiments": {
+      "label": "King of Condiments",
+      "namePlural": "Kings of Condiments",
+      "desc": "Otherwise known as the blandest rub in all of Ur. Meh.",
+      "baseCost": 20,
+      "stackMax": 50,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/kings_of_condiments.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 2,
+        "source": "items/kings_of_condiments.js base_cost 20 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "knife_and_board": {
+      "label": "Knife & Board",
+      "namePlural": "Knives & Boards",
+      "desc": "A good knife and cutting board. They can be used to make simple foods.",
+      "baseCost": 75,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "cookingtool",
+        "food_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/knife_and_board.js",
+      "pointsCapacity": 100,
+      "makingType": "cooking"
+    },
+    "krazy_salts": {
+      "label": "Krazy Salts",
+      "namePlural": "Krazy Salts",
+      "desc": "A vital magical ingredient, Krazy Salts should never be mistaken for normal, run of the spice-mill Pinch of Salt. For one thing, you need to save it for <b>Potions</b>. For the other, this Salt be KRAZY! Seriously: keep it away from sharp objects.",
+      "baseCost": 111,
+      "stackMax": 33,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/krazy_salts.js"
+    },
+    "laughing_gas": {
+      "label": "Laughing Gas",
+      "namePlural": "Laughing Gas",
+      "desc": "One carefully corked container of gigglicious laughing gas.",
+      "baseCost": 20,
+      "stackMax": 100,
+      "tags": [
+        "gas",
+        "gassesbubbles"
+      ],
+      "isTool": false,
+      "source": "items/laughing_gas.js"
+    },
+    "lazy_salad": {
+      "label": "Lazy Salad",
+      "namePlural": "Lazy Salads",
+      "desc": "Sliced tomatoes and cheese. It doesn't get much lazier than a lazy salad.",
+      "baseCost": 38,
+      "stackMax": 40,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/lazy_salad.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 38,
+        "source": "items/lazy_salad.js base_cost 38 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "legumes_parisienne": {
+      "label": "Legumes Abbassidienne",
+      "namePlural": "Legumes Abbassidienne",
+      "desc": "The most sophisticated, chic ways to prepare a bean: simply, classically, with a smile, a touch of flair, and a really big guillotine.",
+      "baseCost": 22,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/legumes_parisienne.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 22,
+        "source": "items/legumes_parisienne.js base_cost 22 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "lemburger": {
+      "label": "Lemburger",
+      "namePlural": "Lemburgers",
+      "desc": "A single-decker Lemburger with all the fixins.",
+      "baseCost": 187,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/lemburger.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 187,
+        "source": "items/lemburger.js base_cost 187 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "lemene": {
+      "label": "Lemene",
+      "namePlural": "Lemene",
+      "desc": "A compound made out of red, green, blue and shiny.",
+      "baseCost": 4.7,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/lemene.js"
+    },
+    "lemon": {
+      "label": "Lemon",
+      "namePlural": "Lemons",
+      "desc": "One half of a nice pair of lemons.",
+      "baseCost": 5,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/lemon.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/lemon.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "lemon_juice": {
+      "label": "Lemon Juice",
+      "namePlural": "Lemon Juices",
+      "desc": "A tall glass of exquisitely sour lemon juice.",
+      "baseCost": 39,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/lemon_juice.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/lemon_juice.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": -5,
+        "energy": 10,
+        "xp": 10
+      }
+    },
+    "licorice": {
+      "label": "Licorice",
+      "namePlural": "Licorice",
+      "desc": "A nub of chewy licorice.",
+      "baseCost": 8,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/licorice.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/licorice.js base_cost 8 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "loomer": {
+      "label": "Loomer",
+      "namePlural": "Loomers",
+      "desc": "The Loomer (TM) is used to Loom thread into String, General Fabric and Rugs through a process of Loomeration so complex, only those with a deep enough understanding of the Fiber Arts II can perform the Loomering.",
+      "baseCost": 400,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "fiberarts_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/loomer.js",
+      "pointsCapacity": 100,
+      "makingType": ""
+    },
+    "lotsa_lox": {
+      "label": "Lotsa Lox",
+      "namePlural": "Lotsa Loxes",
+      "desc": "Goodness! It's a lotta lox!",
+      "baseCost": 34,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/lotsa_lox.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 34,
+        "source": "items/lotsa_lox.js base_cost 34 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "luxury_tortellini": {
+      "label": "Luxury Tortellini",
+      "namePlural": "Luxury Tortellinis",
+      "desc": "It's tortellini, stuffed with extravagance and drizzled with grandeur.",
+      "baseCost": 758,
+      "stackMax": 10,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/luxury_tortellini.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 758,
+        "source": "items/luxury_tortellini.js base_cost 758 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "mabbish_coffee": {
+      "label": "Mabbish Coffee",
+      "namePlural": "Mabbish Coffees",
+      "desc": "A Mabbish coffee has all the goodness of regular coffee, but gooder.",
+      "baseCost": 54,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/mabbish_coffee.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/mabbish_coffee.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 10,
+        "energy": 5
+      }
+    },
+    "mabon": {
+      "label": "Mabon",
+      "namePlural": "Mabon",
+      "desc": "A compound made out of green, blue and shiny.",
+      "baseCost": 15.4,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/mabon.js"
+    },
+    "maburger_royale": {
+      "label": "Maburger Royale",
+      "namePlural": "Maburgers Royale",
+      "desc": "It's not just seasoned beans in a bun smothered in stinky cheese - it's so much more than that. Oh no wait. It's just that.",
+      "baseCost": 350,
+      "stackMax": 20,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/maburger_royale.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 350,
+        "source": "items/maburger_royale.js base_cost 350 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "mangosteen": {
+      "label": "Mangosteen",
+      "namePlural": "Mangosteens",
+      "desc": "A sweet and tangy mangosteen.",
+      "baseCost": 10,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/mangosteen.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 10,
+        "source": "items/mangosteen.js base_cost 10 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "meat": {
+      "label": "Meat",
+      "namePlural": "Meats",
+      "desc": "A simple meat.",
+      "baseCost": 10,
+      "stackMax": 60,
+      "tags": [
+        "food",
+        "basic_resource",
+        "animalproduct",
+        "nobag_food"
+      ],
+      "isTool": false,
+      "source": "items/meat.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 10,
+        "source": "items/meat.js base_cost 10 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "meat_gumbo": {
+      "label": "Meat Gumbo",
+      "namePlural": "Meat Gumbos",
+      "desc": "A bowl of thick, meaty gumbo.",
+      "baseCost": 225,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/meat_gumbo.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 225,
+        "source": "items/meat_gumbo.js base_cost 225 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "meat_tetrazzini": {
+      "label": "Meat Tetrazzini",
+      "namePlural": "Meat Tetrazzinis",
+      "desc": "Some creamy, meaty tetrazzini.",
+      "baseCost": 192,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/meat_tetrazzini.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 192,
+        "source": "items/meat_tetrazzini.js base_cost 192 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "mega_healthy_veggie_juice": {
+      "label": "Mega Healthy Veggie Juice",
+      "namePlural": "Mega Healthy Veggie Juices",
+      "desc": "A bracing tumbler of mega-healthy veggie juice.",
+      "baseCost": 46,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/mega_healthy_veggie_juice.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/mega_healthy_veggie_juice.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 10,
+        "energy": 20,
+        "xp": 5
+      }
+    },
+    "messy_fry_up": {
+      "label": "Messy Fry-Up",
+      "namePlural": "Messy Fry-Ups",
+      "desc": "A sloppy, gloppy messy fry-up.",
+      "baseCost": 60,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/messy_fry_up.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 60,
+        "source": "items/messy_fry_up.js base_cost 60 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "metal_post": {
+      "label": "Metal Bar",
+      "namePlural": "Metal Bars",
+      "desc": "A post made of metal. Good for arduous construction, securing Mineshafts, and doing daring dances on while people tuck herbs into your elasticated pants (probably not all at the same time).",
+      "baseCost": 400,
+      "stackMax": 8,
+      "tags": [
+        "metalproduct",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/metal_post.js"
+    },
+    "metal_rock": {
+      "label": "Chunk of Metal Rock",
+      "namePlural": "Chunks of Metal Rock",
+      "desc": "Chunky and metally, this rock, when smelted, makes <b>Plain Metal</b>. Boring maybe, but it's an excellent base for more ambitious alchemical experimentation.",
+      "baseCost": 3,
+      "stackMax": 50,
+      "tags": [
+        "rock",
+        "basic_resource",
+        "metal"
+      ],
+      "isTool": false,
+      "source": "items/metal_rock.js"
+    },
+    "metal_rod": {
+      "label": "Metal Rod",
+      "namePlural": "Metal Rods",
+      "desc": "Metal Rod, made of tin and plain metal, is not only useful for the yet unimagined construction purposes, but is also a much beloved snack of a Sloth.",
+      "baseCost": 100,
+      "stackMax": 16,
+      "tags": [
+        "metalproduct",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/metal_rod.js"
+    },
+    "metalmaker": {
+      "label": "Metal Machine",
+      "namePlural": "Metal Machines",
+      "desc": "A bangy, squeaky, marvellous red-hot metal machine. For the mutation of Plain Metal, Tin, Copper and Molybdenum into Metal Rods, Bars and Girders. None more metal.",
+      "baseCost": 0,
+      "stackMax": 1,
+      "tags": [
+        "metalmachine",
+        "no_rube",
+        "no_trade",
+        "no_shelf",
+        "machineparts_products",
+        "machine_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/metalmaker.js",
+      "makingType": "machine"
+    },
+    "mexicali_eggs": {
+      "label": "Mexicali Eggs",
+      "namePlural": "Mexicali Eggs",
+      "desc": "A heaping serving of bean-infused eggs.",
+      "baseCost": 78,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/mexicali_eggs.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 78,
+        "source": "items/mexicali_eggs.js base_cost 78 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "mike_tyson_grill": {
+      "label": "Famous Pugilist Grill",
+      "namePlural": "Famous Pugilist Grills",
+      "desc": "For grilling food. Named after the infamous gang of Potian Grillers (all called George) who roamed the countryside in days of yore, indiscriminately punching things into submission then grilling them until they were well done. Whole continents once lived in fear of the Four Georgemen of the Apocgrillypse. You, meanwhile, get to use their tribute novelty cooking item.",
+      "baseCost": 175,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "cookingtool",
+        "food_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/mike_tyson_grill.js",
+      "pointsCapacity": 100,
+      "makingType": "cooking"
+    },
+    "mild_sauce": {
+      "label": "Mild Sauce",
+      "namePlural": "Mild Sauces",
+      "desc": "Bland ho! It's some inoffensive mild sauce.",
+      "baseCost": 26,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/mild_sauce.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 26,
+        "source": "items/mild_sauce.js base_cost 26 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "milk_butterfly": {
+      "label": "Butterfly Milk",
+      "namePlural": "Butterfly Milks",
+      "desc": "A vial of butterfly milk. It has the tingly effervescence of a thousand tiny butterfly farts.",
+      "baseCost": 8,
+      "stackMax": 80,
+      "tags": [
+        "drink",
+        "basic_resource",
+        "animalproduct",
+        "nobag_drink"
+      ],
+      "isTool": false,
+      "source": "items/milk_butterfly.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/milk_butterfly.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 6
+      }
+    },
+    "molybdenum": {
+      "label": "Molybdenum Ingot",
+      "namePlural": "Molybdenum Ingots",
+      "desc": "The glint off a good piece of Molybdenum is like glimpsing into the future. That's why it's used for sophisticated and desirable electronic gadgetry.",
+      "baseCost": 100,
+      "stackMax": 20,
+      "tags": [
+        "metal",
+        "advanced_resource",
+        "nobag_advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/molybdenum.js"
+    },
+    "mushroom": {
+      "label": "Mushroom",
+      "namePlural": "Mushrooms",
+      "desc": "An unusually sporous mushroom.",
+      "baseCost": 3,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/mushroom.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 3,
+        "source": "items/mushroom.js base_cost 3 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "mustard": {
+      "label": "Mustard",
+      "namePlural": "Mustards",
+      "desc": "A dash of tangy mustard.",
+      "baseCost": 4,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/mustard.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/mustard.js base_cost 4 × energy_factor 0.2 (include/food.js food_eat)"
+      }
+    },
+    "naraka_flame_rub": {
+      "label": "Naraka Flame Rub",
+      "namePlural": "Naraka Flame Rub",
+      "desc": "A slightly spicy minute on the lips, a horrifically painful burning in the general area of the hips, some people say. But what do they know? Wussies.",
+      "baseCost": 84,
+      "stackMax": 50,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/naraka_flame_rub.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 8,
+        "source": "items/naraka_flame_rub.js base_cost 84 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "no_no_powder": {
+      "label": "No-No Powder",
+      "namePlural": "Flaps of No-No Powder",
+      "desc": "Some tempting no-no powder. You know you shouldn't, but maybe just this once …",
+      "baseCost": 100,
+      "stackMax": 10,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/no_no_powder.js"
+    },
+    "nutmeg": {
+      "label": "Nutmeg",
+      "namePlural": "Nutmegs",
+      "desc": "A sweet-smelling nutmeg seed.",
+      "baseCost": 12,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/nutmeg.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/nutmeg.js base_cost 12 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "oats": {
+      "label": "Oats",
+      "namePlural": "Oats",
+      "desc": "Regular non-wild oats.",
+      "baseCost": 8,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/oats.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 8,
+        "source": "items/oats.js base_cost 8 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "oaty_cake": {
+      "label": "Oaty Cake",
+      "namePlural": "Oaty Cakes",
+      "desc": "A slightly dry, somewhat crumbly oaty cake.",
+      "baseCost": 32,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/oaty_cake.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 32,
+        "source": "items/oaty_cake.js base_cost 32 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "obvious_panini": {
+      "label": "Obvious Panini",
+      "namePlural": "Obvious Paninis",
+      "desc": "A panini, obviously.",
+      "baseCost": 132,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/obvious_panini.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 132,
+        "source": "items/obvious_panini.js base_cost 132 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "oily_dressing": {
+      "label": "Oily Dressing",
+      "namePlural": "Oily Dressings",
+      "desc": "A bottle of cheap, yet strangely satisfying, oily dressing.",
+      "baseCost": 3,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/oily_dressing.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 3,
+        "source": "items/oily_dressing.js base_cost 3 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "older_spice": {
+      "label": "Old(er) Spice",
+      "namePlural": "Old(er) Spices",
+      "desc": "A handful of colorful older spice.",
+      "baseCost": 20,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/older_spice.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/older_spice.js base_cost 20 × energy_factor 0.05 (include/food.js food_eat)"
+      }
+    },
+    "olive_oil": {
+      "label": "Olive Oil",
+      "namePlural": "Olive Oils",
+      "desc": "A bottle of top-notch olive oil, no virgins required.",
+      "baseCost": 5,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/olive_oil.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/olive_oil.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "onion": {
+      "label": "Onion",
+      "namePlural": "Onions",
+      "desc": "A patented no-tears onion.",
+      "baseCost": 4,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/onion.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 4,
+        "source": "items/onion.js base_cost 4 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "onion_rings": {
+      "label": "Onion Ring",
+      "namePlural": "Onion Rings",
+      "desc": "Battered and fried, these are onions prepared the way Pot intended. Rumored to be popular amongst the elves. Wait, what's an elf?",
+      "baseCost": 51,
+      "stackMax": 40,
+      "tags": [
+        "food",
+        "newfood"
+      ],
+      "isTool": false,
+      "source": "items/onion_rings.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 51,
+        "source": "items/onion_rings.js base_cost 51 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "onion_sauce": {
+      "label": "Onion Sauce",
+      "namePlural": "Onion Sauces",
+      "desc": "A jar of eye-wateringly zesty onion sauce.",
+      "baseCost": 64,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/onion_sauce.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 64,
+        "source": "items/onion_sauce.js base_cost 64 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "orange": {
+      "label": "Orange",
+      "namePlural": "Oranges",
+      "desc": "A very orange orange.",
+      "baseCost": 5,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/orange.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/orange.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "orange_juice": {
+      "label": "Orange Juice",
+      "namePlural": "Orange Juices",
+      "desc": "A surprising glass of orange juice.",
+      "baseCost": 39,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/orange_juice.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/orange_juice.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 20,
+        "energy": 15
+      }
+    },
+    "ore_grinder": {
+      "label": "Grinder",
+      "namePlural": "Grinders",
+      "desc": "A sturdy, no-nonsense grinder. Harness its awesome power to grind rocks (and those rock-like barnacles) into alchemical elements.",
+      "baseCost": 200,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/ore_grinder.js",
+      "pointsCapacity": 100,
+      "makingType": ""
+    },
+    "pad_tii": {
+      "label": "Pad Tii",
+      "namePlural": "Pad Tii",
+      "desc": "Tii has not heard of this dish yet. Chances are it would not approve. Do not tell Tii. Please.",
+      "baseCost": 392,
+      "stackMax": 20,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/pad_tii.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 392,
+        "source": "items/pad_tii.js base_cost 392 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "paper": {
+      "label": "Paper",
+      "namePlural": "Sheets of Paper",
+      "desc": "A blank piece of paper.",
+      "baseCost": 2,
+      "stackMax": 250,
+      "tags": [
+        "paper",
+        "basic_resource"
+      ],
+      "isTool": false,
+      "source": "items/paper.js"
+    },
+    "papl_upside_down_pizza": {
+      "label": "Pineapple Upside-Down Pizza",
+      "namePlural": "Pineapple Upside-Down Pizzas",
+      "desc": "A plate of exotically topsy-turvy pizza.",
+      "baseCost": 111,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/papl_upside_down_pizza.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 111,
+        "source": "items/papl_upside_down_pizza.js base_cost 111 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "parsnip": {
+      "label": "Parsnip",
+      "namePlural": "Parsnips",
+      "desc": "A pungent parsnip.",
+      "baseCost": 6,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/parsnip.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 6,
+        "source": "items/parsnip.js base_cost 6 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "peat": {
+      "label": "Block of Peat",
+      "namePlural": "Blocks of Peat",
+      "desc": "After eons of sitting in the bog -- condensing, compacting and quietly conducting Peaty business -- this dense stinky block should be used to boost building projects.",
+      "baseCost": 12,
+      "stackMax": 24,
+      "tags": [
+        "basic_resource",
+        "firebogproduct"
+      ],
+      "isTool": false,
+      "source": "items/peat.js"
+    },
+    "pepitas": {
+      "label": "Roasted Pepitas",
+      "namePlural": "Roasted Pepitas",
+      "desc": "Crunchy, nutty, seeds pulled from a pumpkin ready roasted (it must be that hot knife you used). May cause a roasted pumpkin to grow in your stomach. No, not really. Will cause you to feel smug about your healthy snacking choices, though.",
+      "baseCost": 5,
+      "stackMax": 50,
+      "tags": [
+        "no_rube",
+        "zilloween",
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/pepitas.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/pepitas.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "pi": {
+      "label": "Pi",
+      "namePlural": "Pi",
+      "desc": "The recipe for Pi was described in ancient times by Alphimedes of Salatu, who also purportedly invented a heat ray for attacking the Rook. (If the heat ray ever existed, it has long since been lost.) It was later improved upon by Ludolph the Cerulean, named for his bright blue skin. Ludolph gave a Pi to several of the giants. Tii immediately stated that Pi was irrational. Pot, on the other hand, declared this to be the best pie he’d ever eaten - transcendental, in fact.",
+      "baseCost": 314,
+      "stackMax": 5,
+      "tags": [
+        "no_rube",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/pi.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 227,
+        "source": "items/pi.js base_cost 314 × energy_factor 0.722 (include/food.js food_eat)"
+      }
+    },
+    "pick": {
+      "label": "Pick",
+      "namePlural": "Picks",
+      "desc": "A relatively sturdy pick, without which mining cannot be done. A plain pick takes care of business, but it's not designed to last.",
+      "baseCost": 500,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "mining"
+      ],
+      "isTool": true,
+      "source": "items/pick.js",
+      "pointsCapacity": 100,
+      "makingType": ""
+    },
+    "pickle": {
+      "label": "Pickle",
+      "namePlural": "Pickles",
+      "desc": "A seriously crunchy pickle.",
+      "baseCost": 21,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/pickle.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 21,
+        "source": "items/pickle.js base_cost 21 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "piggy_egg": {
+      "label": "Piggy Egg",
+      "namePlural": "Piggy Eggs",
+      "desc": "An egg seasoned with special porcine spices to hatch a <a href=\"/items/359/\" glitch=\"item|piglet\">Piglet</a>.",
+      "baseCost": 300,
+      "stackMax": 10,
+      "tags": [
+        "egg",
+        "herdkeepingsupplies",
+        "animals"
+      ],
+      "isTool": false,
+      "source": "items/piggy_egg.js"
+    },
+    "pinch_of_salt": {
+      "label": "Pinch of Salt",
+      "namePlural": "Pinches of Salt",
+      "desc": "A tiny pinch of very salty salt.",
+      "baseCost": 2,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/pinch_of_salt.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/pinch_of_salt.js base_cost 2 × energy_factor 0.5 (include/food.js food_eat)"
+      }
+    },
+    "pineapple": {
+      "label": "Pineapple",
+      "namePlural": "Pineapples",
+      "desc": "An exceptionally prickly pineapple.",
+      "baseCost": 7,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/pineapple.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 7,
+        "source": "items/pineapple.js base_cost 7 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "plain_bubble": {
+      "label": "Plain Bubble",
+      "namePlural": "Plain Bubbles",
+      "desc": "A common, ordinary, plain bubble harvested from  <a href=\"/items/258/\" glitch=\"item|trant_bubble\">Bubble Tree</a>.",
+      "baseCost": 2,
+      "stackMax": 250,
+      "tags": [
+        "bubble",
+        "basic_resource",
+        "trantproduct"
+      ],
+      "isTool": false,
+      "source": "items/plain_bubble.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 2,
+        "source": "items/plain_bubble.js base_cost 2 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "plain_crystal": {
+      "label": "Plain Crystal",
+      "namePlural": "Plain Crystals",
+      "desc": "It shimmers, it glitters, and it's worth a good few currants, but you can't help but think that for a crystal, it's a little bland. Not that you're complaining.",
+      "baseCost": 300,
+      "stackMax": 30,
+      "tags": [
+        "crystal",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/plain_crystal.js"
+    },
+    "plain_metal": {
+      "label": "Plain Metal Ingot",
+      "namePlural": "Plain Metal Ingots",
+      "desc": "Sure, this metal is plain, but with the aid of <a href=\"/items/621/\" glitch=\"item|alchemical_tongs\">Alchemical Tongs</a>, <a href=\"/skills/81/\" glitch=\"skill|alchemy_2\">Alchemy II</a> and a secret blend of elemental ingredients, more exciting metal materials can be made.",
+      "baseCost": 30,
+      "stackMax": 20,
+      "tags": [
+        "metal",
+        "advanced_resource",
+        "metalproduct",
+        "nobag_advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/plain_metal.js"
+    },
+    "plain_noodles": {
+      "label": "Plain Noodles",
+      "namePlural": "Plain Noodles",
+      "desc": "Some good, honest, plain noodles.",
+      "baseCost": 13,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/plain_noodles.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 13,
+        "source": "items/plain_noodles.js base_cost 13 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "plank": {
+      "label": "Plank",
+      "namePlural": "Planks",
+      "desc": "A plain wooden plank with many uses.",
+      "baseCost": 5,
+      "stackMax": 250,
+      "tags": [
+        "basic_resource",
+        "trantproduct",
+        "nobag_trantproduct",
+        "woodproduct"
+      ],
+      "isTool": false,
+      "source": "items/plank.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 2,
+        "source": "items/plank.js base_cost 5 × energy_factor 0.4 (include/food.js food_eat)"
+      }
+    },
+    "plum": {
+      "label": "Plum",
+      "namePlural": "Plums",
+      "desc": "A plummy plum.",
+      "baseCost": 3,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/plum.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 3,
+        "source": "items/plum.js base_cost 3 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "potato": {
+      "label": "Potato",
+      "namePlural": "Potatoes",
+      "desc": "A humble potato.",
+      "baseCost": 7,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/potato.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 7,
+        "source": "items/potato.js base_cost 7 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "potato_patty": {
+      "label": "Potato Patty",
+      "namePlural": "Potato Patties",
+      "desc": "One potato, mashed and fried in a pleasing disc shape.",
+      "baseCost": 33,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/potato_patty.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 33,
+        "source": "items/potato_patty.js base_cost 33 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "potcorn": {
+      "label": "Potcorn",
+      "namePlural": "Potcorns",
+      "desc": "Pot corn is a regular corn made to pop because its kernels have a hard moisture-sealed hull and a dense starchy interior. This allows pressure to build inside the kernel until an explosive \"pop\" results.",
+      "baseCost": 136,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/potcorn.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 136,
+        "source": "items/potcorn.js base_cost 136 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "potians_feast": {
+      "label": "Potian's Feast",
+      "namePlural": "Potians' Feasts",
+      "desc": "The greatest, most magnificent, energy-filled, Pot-approved combination of nourishment. A fitting dish to make or eat for any serious Potian.",
+      "baseCost": 1000,
+      "stackMax": 10,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/potians_feast.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1000,
+        "source": "items/potians_feast.js base_cost 1000 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "potion_amorous_philtre": {
+      "label": "Amorous Philtre",
+      "namePlural": "Amorous Philtres",
+      "desc": "A sensual - and highly infectious - blend of natural ingredients that stimulate the positive mood-memory receptors of the Glitchate Brain. Smells like macaroons.",
+      "baseCost": 750,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm1",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_amorous_philtre.js"
+    },
+    "potion_ancestral_spirits": {
+      "label": "Ancestral Spirits",
+      "namePlural": "Ancestral Spirits",
+      "desc": "Steadies the nerves and steels the soul against the onset of Ancestral Nostalgia.",
+      "baseCost": 1850,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm2",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_ancestral_spirits.js"
+    },
+    "potion_animal_youth": {
+      "label": "Potion of Animal Youth",
+      "namePlural": "Potion of Animal Youth",
+      "desc": "Animals, anxious about aging and longing for childhood, can be soothed by application of this potion: the only effusion with the proven ability to turn back time.",
+      "baseCost": 1500,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm2",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_animal_youth.js"
+    },
+    "potion_avatar_large": {
+      "label": "Embiggenifying Potion",
+      "namePlural": "Embiggenifying Potions",
+      "desc": "\"A noble potion embiggenifies the smallest glitch\" reads the tiny label on this tinier bottle. Embiggenifies, you ask? \"Yes\" say the voices of the ancients, drifting to you through the sour aftersmell of the potion, \"Embiggenifies. It is a perfectly cromulent word.\" For creating an embiggenifying cloud wherever you choose.",
+      "baseCost": 1000,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm2",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_avatar_large.js"
+    },
+    "potion_avatar_small": {
+      "label": "De-Embiggenifying Potion",
+      "namePlural": "De-Embiggenifying Potions",
+      "desc": "When poured on the floor, it releases a very pleasant scent (a strange mixture of cherry tart, custard, pineapple, roast turkey, toffee, and hot buttered toast) and a cloud causing people to feel most curious, like they're shutting up like a telescope or some such.",
+      "baseCost": 1000,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm2",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_avatar_small.js"
+    },
+    "potion_charades": {
+      "label": "Charades Potion",
+      "namePlural": "Charades Potions",
+      "desc": "A classic 'Parlour Potion', this benefits those surrounding the quaffer more than the quaffer themselves - but only if they can guess the word that unlocks the effect.",
+      "baseCost": 400,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm1",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_charades.js"
+    },
+    "potion_chris": {
+      "label": "Door Drink",
+      "namePlural": "Door Drinks",
+      "desc": "The most bewildering of all potions, the dark alchemical secrets brewed into this potent brew can produce (and destroy) mysterious doors to far-off lands. You'll find yourself leaping from place to place, never knowing where the next leap may lead you.",
+      "baseCost": 750,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm2",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_chris.js"
+    },
+    "potion_elixir_of_avarice": {
+      "label": "Elixir of Avarice",
+      "namePlural": "Elixirs of Avarice",
+      "desc": "A natural blend that increases one's appetite for Quoins. Dosage: effective up to one potion per day.",
+      "baseCost": 1250,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm1",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_elixir_of_avarice.js"
+    },
+    "potion_favor": {
+      "label": "Draught of Giant Amicability",
+      "namePlural": "Draughts of Giant Amicability",
+      "desc": "Causes the quaffer to smell like stardust, hot sauce, whiskers on kittens and several other of the Giants' favourite things, thus granting a modicum of favor from the Giant the potion happens to be most amicable with. Shake up to three times a day to shift Giant affinity. Do not exceed one quaff a day.",
+      "baseCost": 3011,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm3",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_favor.js"
+    },
+    "potion_garden_clear": {
+      "label": "Liquid Super-Hoe",
+      "namePlural": "Liquid Super-Hoe",
+      "desc": "A bag full of hoes might be able to clear your whole garden, a bottle of Liquid Super-Hoe has more clearing power than any common old hoe-bag. One drop will clear all the plots that can be cleared from the nearest garden.",
+      "baseCost": 1700,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm3",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_garden_clear.js"
+    },
+    "potion_garden_fertilize": {
+      "label": "Dung-Kicker Drops",
+      "namePlural": "Dung-Kicker Drops",
+      "desc": "One squirt of Dung-Kicker Drops spreads fertilizer over all fertilizable plots in a garden (no extra guano necessary), leaving you free to enjoy more pleasant-scented parts of the gardening experience.",
+      "baseCost": 2200,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm3",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_garden_fertilize.js"
+    },
+    "potion_garden_harvest": {
+      "label": "Manyharvest Cordial",
+      "namePlural": "Manyharvest Cordials",
+      "desc": "Like a delicate tornado, one drop of Manyharvest Cordial will gently gather all ripe crops from the nearest garden (while,  like a twister filled with generosity, giving you all the usual 'super-harvest' bonuses).",
+      "baseCost": 2200,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm3",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_garden_harvest.js"
+    },
+    "potion_garden_plant": {
+      "label": "Seed-Dibber Libation",
+      "namePlural": "Seed-Dibber Libations",
+      "desc": "Just one dose of this patented Seed-Dibber Libation will plant every available plot of the nearest garden with your chosen seed (if you have enough seeds available). Save your fingernails for pretty things, eh?",
+      "baseCost": 2000,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm3",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_garden_plant.js"
+    },
+    "potion_garden_water": {
+      "label": "Soak-All Solution",
+      "namePlural": "Soak-All Solutions",
+      "desc": "A single drop of Soak-All Solution (a tiny bottle filled with matter wetter than wet itself) will water every plot in the nearest garden with only a flick of the wrist.",
+      "baseCost": 1700,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm3",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_garden_water.js"
+    },
+    "potion_keycutter_tonic": {
+      "label": "Keycutter Tonic",
+      "namePlural": "Keycutter Tonics",
+      "desc": "With a sharp metallic taste and acidic fizz, this is a concoction so strong that the fumes given off it when quaffed carve keys into the shape of other keys.",
+      "baseCost": 1250,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm2",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_keycutter_tonic.js"
+    },
+    "potion_rainbow_juice": {
+      "label": "Rainbow Juice",
+      "namePlural": "Rainbow Juices",
+      "desc": "Where is the end of the rainbow? Apparently, in this bottle. Warning: may produce curious disruptive effect on air around it. Thus the term, 'Anti-Gravity Rainbow'.",
+      "baseCost": 750,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm1",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_rainbow_juice.js"
+    },
+    "potion_rook_balm": {
+      "label": "Rook Balm",
+      "namePlural": "Rook Balms",
+      "desc": "Originally marketed under the less classy RUK-B-GONE, this potion, post-rebrand, does precisely the same job - emergency full healing of any rooked critter or tree.",
+      "baseCost": 1000,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm2",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_rook_balm.js"
+    },
+    "potion_trantsformation_fluid": {
+      "label": "Trantsformation Fluid",
+      "namePlural": "Trantsformation Fluids",
+      "desc": "A tree-reassignment liquor, capable of soaking into the roots of any tree or plant and silently, smelllessly, \"almost\" harmlessly rearranging its DNA.",
+      "baseCost": 2500,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm2",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_trantsformation_fluid.js"
+    },
+    "potion_tree_poison": {
+      "label": "Tree Poison",
+      "namePlural": "Tree Poisons",
+      "desc": "Thick glass conceals a dark truth: the death sentence for five trees. But really, since the inevitable broom of death clears the way for new life, isn't it actually just \"a life sentence for five NEW trees\"? \r\nNo, it's mainly just tree poison.",
+      "baseCost": 750,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm1",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_tree_poison.js"
+    },
+    "potion_tree_poison_antidote": {
+      "label": "Tree Poison Antidote",
+      "namePlural": "Tree Poison Antidotes",
+      "desc": "Tree antidote: the only known reprieve for the mostly dead tree (there's a big difference between \"mostly dead\" and \"all dead\"). Contains five sips at the last chance saloon for five lucky trees.",
+      "baseCost": 375,
+      "stackMax": 1,
+      "tags": [
+        "potion",
+        "tinctures_potions",
+        "pm1",
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/potion_tree_poison_antidote.js"
+    },
+    "potoxin": {
+      "label": "Potoxin",
+      "namePlural": "Potoxin",
+      "desc": "A compound made out of red, green and blue.",
+      "baseCost": 9.7,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/potoxin.js"
+    },
+    "pottine": {
+      "label": "Pottine",
+      "namePlural": "Pottine",
+      "desc": "So wrong. But so, so right.",
+      "baseCost": 267,
+      "stackMax": 20,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/pottine.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 267,
+        "source": "items/pottine.js base_cost 267 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "powder_of_mild_fecundity": {
+      "label": "Powder of Mild Fecundity",
+      "namePlural": "Powder of Mild Fecundity",
+      "desc": "The dust in this jar of reasonably fecund powder gets up the noses of piggies, butterflies and chickens (up to a point, there is only so much dust) and causes them to shed small amounts of their edibles everywhere.",
+      "baseCost": 500,
+      "stackMax": 1,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/powder_of_mild_fecundity.js"
+    },
+    "powder_of_startling_fecundity": {
+      "label": "Powder of Startling Fecundity",
+      "namePlural": "Powder of Startling Fecundity",
+      "desc": "This jar of high-potency powder gets under the skin of piggies, chickens and butterflies (up to a limit, one dose can only irritate a certain number of animals) and causes them to fecund their edibles all OVER the place.",
+      "baseCost": 1500,
+      "stackMax": 1,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/powder_of_startling_fecundity.js"
+    },
+    "precious_potato_salad": {
+      "label": "Precious Potato Salad",
+      "namePlural": "Precious Potato Salads",
+      "desc": "Potato salad, traditionally an affordable staple at Glitchen birthdays, is now fit for fancy dinners and lavish banquets with the addition of the particularly precious Trump Rub.",
+      "baseCost": 860,
+      "stackMax": 10,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/precious_potato_salad.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 860,
+        "source": "items/precious_potato_salad.js base_cost 860 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "proper_rice": {
+      "label": "Proper Rice",
+      "namePlural": "Proper Rice",
+      "desc": "A steaming bowl of slightly sticky rice.",
+      "baseCost": 26,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/proper_rice.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 26,
+        "source": "items/proper_rice.js base_cost 26 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "pumpkin": {
+      "label": "Pumpkin",
+      "namePlural": "Pumpkins",
+      "desc": "One plump and thick-skinned pumpkin. Perfect for carving, mulching, munching, and, in times of need, for using as a carriage drawn by tamed gerbils.",
+      "baseCost": 41,
+      "stackMax": 11,
+      "tags": [
+        "no_rube",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/pumpkin.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 41,
+        "source": "items/pumpkin.js base_cost 41 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "pumpkin_ale": {
+      "label": "Pumpkin Ale",
+      "namePlural": "Pumpkin Ales",
+      "desc": "All the refreshment of beer combined with the autumnal savoury heft of pumpkin. Then combined with cinnamon. For no reason anyone can decipher.",
+      "baseCost": 83,
+      "stackMax": 10,
+      "tags": [
+        "zilloween",
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/pumpkin_ale.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/pumpkin_ale.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 50
+      }
+    },
+    "pumpkin_pie": {
+      "label": "Pumpkin Pie",
+      "namePlural": "Pumpkin Pies",
+      "desc": "When people use the phrase 'as nice as pie', they are, in fact, talking about this pie. What goes into it? Fresh pumpkin, crispy pastry, spicy spices, and a big dollop of love. (That's an attitude rather than a hidden ingredient, before you start feeling nauseous).",
+      "baseCost": 111,
+      "stackMax": 5,
+      "tags": [
+        "zilloween",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/pumpkin_pie.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 111,
+        "source": "items/pumpkin_pie.js base_cost 111 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "pungent_sunrise": {
+      "label": "Pungent Sunrise",
+      "namePlural": "Pungent Sunrises",
+      "desc": "A refreshingly pungent sunrise.",
+      "baseCost": 197,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/pungent_sunrise.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/pungent_sunrise.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "energy": 20,
+        "xp": 10
+      }
+    },
+    "purple_flower": {
+      "label": "Purple Flower",
+      "namePlural": "Purple Flowers",
+      "desc": "Very, very purple.",
+      "baseCost": 12,
+      "stackMax": 50,
+      "tags": [
+        "herb",
+        "herbalism_supplies"
+      ],
+      "isTool": false,
+      "source": "items/purple_flower.js"
+    },
+    "red": {
+      "label": "Red",
+      "namePlural": "Red",
+      "desc": "Some things are so basic, so fundamental that they only need one word to describe what they are. This perfect blend of tomato, onion and butterfly milk sums up the essence of red.",
+      "baseCost": 30,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/red.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 30,
+        "source": "items/red.js base_cost 30 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "rice": {
+      "label": "Rice",
+      "namePlural": "Rice",
+      "desc": "A pot of freshly made rice.",
+      "baseCost": 4,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/rice.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 4,
+        "source": "items/rice.js base_cost 4 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "rich_tagine": {
+      "label": "Rich Tagine",
+      "namePlural": "Rich Tagines",
+      "desc": "A steaming pot of zesty, slow-cooked tagine.",
+      "baseCost": 332,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/rich_tagine.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 332,
+        "source": "items/rich_tagine.js base_cost 332 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "rookswort": {
+      "label": "Rookswort",
+      "namePlural": "Sprigs of Rookswort",
+      "desc": "An exotic bud with a pleasantly lasting aftertaste of danger and chaos.",
+      "baseCost": 75,
+      "stackMax": 50,
+      "tags": [
+        "herb",
+        "herbalism_supplies"
+      ],
+      "isTool": false,
+      "source": "items/rookswort.js"
+    },
+    "roux": {
+      "label": "Roux",
+      "namePlural": "Roux",
+      "desc": "Roo!",
+      "baseCost": 22,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/roux.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 22,
+        "source": "items/roux.js base_cost 22 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "rubemycin": {
+      "label": "Rubemycin",
+      "namePlural": "Rubemycin",
+      "desc": "A compound made out of red, green, blue and shiny.",
+      "baseCost": 4.9,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/rubemycin.js"
+    },
+    "rubeweed": {
+      "label": "Rubeweed",
+      "namePlural": "Sprigs of Rubeweed",
+      "desc": "A deceptively dull green shoot filled with lucky sap.",
+      "baseCost": 55,
+      "stackMax": 50,
+      "tags": [
+        "herb",
+        "herbalism_supplies"
+      ],
+      "isTool": false,
+      "source": "items/rubeweed.js"
+    },
+    "saffron": {
+      "label": "Saffron",
+      "namePlural": "Saffron",
+      "desc": "Some tendrils of bitter saffron.",
+      "baseCost": 12,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/saffron.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/saffron.js base_cost 12 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "salmon": {
+      "label": "Pocket Salmon",
+      "namePlural": "Pocket Salmen",
+      "desc": "It's like salmon, but in your pocket! Pocket Salmon! The handy friendly fish-at-your-fingertips that's always ready to go! Why settle for boring old underwater catch-me-if-you-calmon-salmon when you could have the ever-accessible, always-dependable, never-stinky always-yummy Pocket Salmon instead! POCKET SALMON! [TM. Always read the label. Terms and conditions apply]",
+      "baseCost": 15,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/salmon.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 15,
+        "source": "items/salmon.js base_cost 15 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "salmon_jaella": {
+      "label": "Salmon Jaella",
+      "namePlural": "Salmon Jaella",
+      "desc": "An assortment of fresh Salmon from Jal, Rice, Legumes and veggies thrown together into a dish Jal-loving Glitchen identify themselves by.",
+      "baseCost": 241,
+      "stackMax": 20,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/salmon_jaella.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 241,
+        "source": "items/salmon_jaella.js base_cost 241 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "sammich": {
+      "label": "Sammich",
+      "namePlural": "Sammiches",
+      "desc": "A basic bun 'n' meat sammich.",
+      "baseCost": 29,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/sammich.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 29,
+        "source": "items/sammich.js base_cost 29 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "saucepan": {
+      "label": "Saucepan",
+      "namePlural": "Saucepans",
+      "desc": "A saucepan is a must-have item for making sauces.",
+      "baseCost": 200,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "cookingtool",
+        "food_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/saucepan.js",
+      "pointsCapacity": 100,
+      "makingType": "cooking"
+    },
+    "savory_smoothie": {
+      "label": "Savory Smoothie",
+      "namePlural": "Savory Smoothies",
+      "desc": "A savory smoothie. It sticks to your ribs and doesn't let go.",
+      "baseCost": 96,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/savory_smoothie.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/savory_smoothie.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 10
+      }
+    },
+    "scraper": {
+      "label": "Scraper",
+      "namePlural": "Scrapers",
+      "desc": "Wielding  only this hardy flat-edged blade, a song in their heart and a will to succeed, anyone can boast a backpack of Barnacles or a pocket full of Ice. Why that glitch might want a clacking bag and potentially wet pants is not the problem of the scraper. Scraper just scrapes.",
+      "baseCost": 300,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/scraper.js",
+      "pointsCapacity": 50,
+      "makingType": ""
+    },
+    "scrumptious_frittata": {
+      "label": "Scrumptious Frittata",
+      "namePlural": "Scrumptious Frittatas",
+      "desc": "A truly tantalizing scrumptious frittata.",
+      "baseCost": 78,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/scrumptious_frittata.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 78,
+        "source": "items/scrumptious_frittata.js base_cost 78 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "secret_sauce": {
+      "label": "Secret Sauce",
+      "namePlural": "Secret Sauces",
+      "desc": "An enigmatic jar full of mysteriously yummy secret sauce.",
+      "baseCost": 47,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/secret_sauce.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 47,
+        "source": "items/secret_sauce.js base_cost 47 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "shovel": {
+      "label": "Shovel",
+      "namePlural": "Shovels",
+      "desc": "An essential for anyone that calls a spade a shovel, this simple tool masterpiece can be used to harvest Peat, dig for dirt (well, Earth), and occasionally land a juicy piece of Loam.",
+      "baseCost": 300,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/shovel.js",
+      "pointsCapacity": 100,
+      "makingType": ""
+    },
+    "silvertongue": {
+      "label": "Silvertongue",
+      "namePlural": "Sprigs of Silvertongue",
+      "desc": "A blue sparkly bloom of joy.",
+      "baseCost": 50,
+      "stackMax": 50,
+      "tags": [
+        "herb",
+        "herbalism_supplies"
+      ],
+      "isTool": false,
+      "source": "items/silvertongue.js"
+    },
+    "simple_bbq": {
+      "label": "Simple BBQ",
+      "namePlural": "Simple BBQs",
+      "desc": "Some hot meat with tangy sauce.",
+      "baseCost": 116,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/simple_bbq.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 116,
+        "source": "items/simple_bbq.js base_cost 116 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "simple_slaw": {
+      "label": "Simple Slaw",
+      "namePlural": "Simple Slaws",
+      "desc": "The simplest of slaws.",
+      "baseCost": 27,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/simple_slaw.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 27,
+        "source": "items/simple_slaw.js base_cost 27 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "slow_gin_fizz": {
+      "label": "Slow Gin Fizz",
+      "namePlural": "Slow Gin Fizzes",
+      "desc": "A low and lazy slow gin fizz.",
+      "baseCost": 76,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/slow_gin_fizz.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/slow_gin_fizz.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 10,
+        "energy": 10
+      }
+    },
+    "smelter": {
+      "label": "Smelter",
+      "namePlural": "Smelter",
+      "desc": "Extracting purest metal from even the dullest chunk of Metal Rock, this classic Smelter is the second step to creating all manner of exciting secondary metals. (Learning Smelting is step one.)",
+      "baseCost": 700,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/smelter.js",
+      "pointsCapacity": 500,
+      "makingType": ""
+    },
+    "snack_pack": {
+      "label": "Snack Pack",
+      "namePlural": "Snack Packs",
+      "desc": "An apple, some cheese, and a couple of pickles. Not quite a meal, but it'll do until dinner.",
+      "baseCost": 66,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/snack_pack.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 66,
+        "source": "items/snack_pack.js base_cost 66 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "sneezing_powder": {
+      "label": "Sneezing Powder",
+      "namePlural": "Sneezing Powder",
+      "desc": "A potentially troublesome jar of sneezing powder. ",
+      "baseCost": 150,
+      "stackMax": 1,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/sneezing_powder.js"
+    },
+    "sno_cone_blue": {
+      "label": "Blue Sno Cone",
+      "namePlural": "Blue Sno Cones",
+      "desc": "A delicious, refreshing Blue Sno Cone with a tangy hit of iMG. Blended to perfection using ice, hooch, and the very finest elemental additives and preservatives, it tastes exactly what the the concept of blue should taste like. And a little like raspberry, weirdly.",
+      "baseCost": 75,
+      "stackMax": 10,
+      "tags": [
+        "snocone",
+        "no_rube",
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/sno_cone_blue.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 75,
+        "source": "items/sno_cone_blue.js base_cost 75 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "sno_cone_green": {
+      "label": "Green Sno Cone",
+      "namePlural": "Green Sno Cones",
+      "desc": "A bright green blend of ice, hooch and elements make a drink the color of days when spring is born, or nights when the northern lights perform. Packed with a modest hit of iMG, winter cannot fade it. Mainly because it's 40% elemental additives and preservatives.",
+      "baseCost": 150,
+      "stackMax": 10,
+      "tags": [
+        "snocone",
+        "no_rube",
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/sno_cone_green.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 150,
+        "source": "items/sno_cone_green.js base_cost 150 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "sno_cone_orange": {
+      "label": "Orange Sno Cone",
+      "namePlural": "Orange Sno Cones",
+      "desc": "A chillingly refreshing bright Orange Sno Cone, with a medium amount of iMG. A perfect blend of Ice, Hooch, and elemental additives and preservatives, it is the epitome of an orange drink. Not orange the fruit, that is, orange the colour. It's more of a concept.",
+      "baseCost": 300,
+      "stackMax": 10,
+      "tags": [
+        "snocone",
+        "no_rube",
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/sno_cone_orange.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 300,
+        "source": "items/sno_cone_orange.js base_cost 300 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "sno_cone_purple": {
+      "label": "Purple Sno Cone",
+      "namePlural": "Purple Sno Cones",
+      "desc": "A refreshing and delicious purple Sno Cone. A sophisticated blend of Ice, Hooch and elemental additives and preservatives. Now you too can get all the social frisson of Purple but with none of the nutritional or mental expansion benefits (contains considerable iMG, though).",
+      "baseCost": 1100,
+      "stackMax": 10,
+      "tags": [
+        "snocone",
+        "no_rube",
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/sno_cone_purple.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1100,
+        "source": "items/sno_cone_purple.js base_cost 1100 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "sno_cone_rainbow": {
+      "label": "Rainbo Sno Cone",
+      "namePlural": "Rainbo Sno Cones",
+      "desc": "A rainbo in Sno Cone form, eating this blend of all the other Sno Cones makes your tongue tingle, your sinuses snigger and your spine spontaneously decide to go on a tropical vacation to Shimmyville. Warning: Contains gloriously high levels of iMG.",
+      "baseCost": 2200,
+      "stackMax": 10,
+      "tags": [
+        "snocone",
+        "no_rube",
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/sno_cone_rainbow.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 2200,
+        "source": "items/sno_cone_rainbow.js base_cost 2200 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "sno_cone_red": {
+      "label": "Red Sno Cone",
+      "namePlural": "Red Sno Cones",
+      "desc": "A tongue-tingling spine-shiveringly Red Sno Cone. A seamless blend of Ice, Hooch, and a secret blend of elemental additives, preservatives, iMG and raw energy that make you feel slightly, though not to any copyright-infringing extent, like you may have wings.",
+      "baseCost": 600,
+      "stackMax": 10,
+      "tags": [
+        "snocone",
+        "no_rube",
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/sno_cone_red.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 600,
+        "source": "items/sno_cone_red.js base_cost 600 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "sparkle_powder": {
+      "label": "Sparkle Powder",
+      "namePlural": "Sparkle Powder",
+      "desc": "A shimmery jar of sparkle powder. ",
+      "baseCost": 450,
+      "stackMax": 1,
+      "tags": [
+        "alchemy",
+        "powder"
+      ],
+      "isTool": false,
+      "source": "items/sparkle_powder.js"
+    },
+    "sparkly": {
+      "label": "Chunk of Sparkly",
+      "namePlural": "Chunks of Sparkly",
+      "desc": "It's a pleasantly twinkly chunk of sparkly!",
+      "baseCost": 8,
+      "stackMax": 50,
+      "tags": [
+        "rock",
+        "basic_resource"
+      ],
+      "isTool": false,
+      "source": "items/sparkly.js"
+    },
+    "spice_mill": {
+      "label": "Spice Mill",
+      "namePlural": "Spice Mills",
+      "desc": "A basic spice mill for converting basic allspice into other more exciting spices.",
+      "baseCost": 150,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "transmog_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/spice_mill.js",
+      "pointsCapacity": 0,
+      "makingType": "transmogrification"
+    },
+    "spicy_grog": {
+      "label": "Spicy Grog",
+      "namePlural": "Spicy Grogs",
+      "desc": "A tall glass of exceedingly spicy grog.",
+      "baseCost": 51,
+      "stackMax": 24,
+      "tags": [
+        "drink",
+        "alcohol"
+      ],
+      "isTool": false,
+      "source": "items/spicy_grog.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/spicy_grog.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 30,
+        "energy": 5,
+        "xp": 3
+      }
+    },
+    "spicy_quesadilla": {
+      "label": "Spicy Quesadilla",
+      "namePlural": "Spicy Quesadillas",
+      "desc": "An ooey-gooey spicy quesadilla.",
+      "baseCost": 86,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/spicy_quesadilla.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 86,
+        "source": "items/spicy_quesadilla.js base_cost 86 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "spinach": {
+      "label": "Spinach",
+      "namePlural": "Spinach",
+      "desc": "Hearty green spinach. It's strong to the finich.",
+      "baseCost": 3,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/spinach.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 3,
+        "source": "items/spinach.js base_cost 3 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "spinach_salad": {
+      "label": "Spinach Salad",
+      "namePlural": "Spinach Salads",
+      "desc": "A suspiciously nutritious spinach salad.",
+      "baseCost": 18,
+      "stackMax": 40,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/spinach_salad.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 18,
+        "source": "items/spinach_salad.js base_cost 18 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "spriggase": {
+      "label": "Spriggase",
+      "namePlural": "Spriggase",
+      "desc": "A compound made out of red, green and blue.",
+      "baseCost": 9.2,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/spriggase.js"
+    },
+    "stock_sauce": {
+      "label": "Stock Sauce",
+      "namePlural": "Stock Sauce",
+      "desc": "As plain and every day as a woman laughing while eating salad, no one even things about Stock Sauce any more. Perhaps they should.",
+      "baseCost": 34,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/stock_sauce.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 34,
+        "source": "items/stock_sauce.js base_cost 34 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "strawberry": {
+      "label": "Strawberry",
+      "namePlural": "Strawberries",
+      "desc": "A luscious red strawberry.",
+      "baseCost": 4,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/strawberry.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 4,
+        "source": "items/strawberry.js base_cost 4 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "string": {
+      "label": "String",
+      "namePlural": "Strings",
+      "desc": "This is String. In theory, it can be used for constructing fabric, rugs, and other basic furniture items. It is a pretty good theory.",
+      "baseCost": 53,
+      "stackMax": 100,
+      "tags": [
+        "fiberarts",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/string.js"
+    },
+    "super_scraper": {
+      "label": "Super Scraper",
+      "namePlural": "Super Scrapers",
+      "desc": "Replacing the rustic charm of the bestselling original Scraper with super-streamlined barnacle-busting ice-nubbin-bustin' action, the highly desirable Super Scraper offers five times the lasting power for slightly-more-than-five-times the price. What can I say? You pay for convenience (and natty design).",
+      "baseCost": 2000,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "premiumtool"
+      ],
+      "isTool": true,
+      "source": "items/super_scraper.js",
+      "pointsCapacity": 250,
+      "makingType": ""
+    },
+    "super_veggie_kebabs": {
+      "label": "Super Veggie Kebab",
+      "namePlural": "Super Veggie Kebabs",
+      "desc": "Chunks of assorted vegetables on a fun pointy stick!",
+      "baseCost": 256,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/super_veggie_kebabs.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 256,
+        "source": "items/super_veggie_kebabs.js base_cost 256 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "swank_zucchini_loaf": {
+      "label": "Swank Zucchini Loaf",
+      "namePlural": "Swank Zucchini Loaves",
+      "desc": "A good loaf can be made out of anything. A great loaf is made from Zucchini and talks about how rich it is.",
+      "baseCost": 441,
+      "stackMax": 10,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/swank_zucchini_loaf.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 441,
+        "source": "items/swank_zucchini_loaf.js base_cost 441 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "sweet_n_sour_sauce": {
+      "label": "Sweet 'n' Sour Sauce",
+      "namePlural": "Sweet 'n' Sour Sauces",
+      "desc": "Is it sweet? Is it sour? It's both! It's sweet 'n' sour sauce!",
+      "baseCost": 63,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/sweet_n_sour_sauce.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 63,
+        "source": "items/sweet_n_sour_sauce.js base_cost 63 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "swing_batter": {
+      "label": "Swing Batter",
+      "namePlural": "Swing Batter",
+      "desc": "After roughly chopping with a knife, this batter is not mixed, blended or whisked, but swung at the end of the arm. Swing batter, batter batter swing, batter (as they say).",
+      "baseCost": 31,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/swing_batter.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 31,
+        "source": "items/swing_batter.js base_cost 31 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "tangy_noodles": {
+      "label": "Tangy Noodles",
+      "namePlural": "Tangy Noodles",
+      "desc": "A generous serving of zesty, lemony tangy noodles.",
+      "baseCost": 54,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/tangy_noodles.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 54,
+        "source": "items/tangy_noodles.js base_cost 54 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "tangy_sauce": {
+      "label": "Tangy Sauce",
+      "namePlural": "Tangy Sauces",
+      "desc": "A large jar of gloppy tangy sauce.",
+      "baseCost": 154,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/tangy_sauce.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 154,
+        "source": "items/tangy_sauce.js base_cost 154 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "tasty_pasta": {
+      "label": "Tasty Pasta",
+      "namePlural": "Tasty Pastas",
+      "desc": "A bowl of extra-long noodles with rich bolognese sauce.",
+      "baseCost": 338,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/tasty_pasta.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 338,
+        "source": "items/tasty_pasta.js base_cost 338 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "test_tube": {
+      "label": "Test Tube",
+      "namePlural": "Test Tubes",
+      "desc": "If you want to turn elements into compounds, you need a handy-dandy test tube. It's totally tubular.",
+      "baseCost": 100,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/test_tube.js",
+      "pointsCapacity": 0,
+      "makingType": ""
+    },
+    "thread": {
+      "label": "Thread",
+      "namePlural": "Threads",
+      "desc": "Thread, spun from Fox tail <a href=\"/items/1150/\" glitch=\"item|fiber\">fibers</a>, and essential in the <a href=\"/items/1160/\" glitch=\"item|loomer\">Loomeration</a> of <a href=\"/items/1143/\" glitch=\"item|string\">String</a>. Easily lost (but easily picked up again), smells faintly of Fox bottom.",
+      "baseCost": 9,
+      "stackMax": 400,
+      "tags": [
+        "fiberarts",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/thread.js"
+    },
+    "tiite": {
+      "label": "Tiite",
+      "namePlural": "Tiite",
+      "desc": "A compound made out of red and blue.",
+      "baseCost": 1.1,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/tiite.js"
+    },
+    "tin": {
+      "label": "Tin Ingot",
+      "namePlural": "Tin Ingots",
+      "desc": "It's tin.",
+      "baseCost": 50,
+      "stackMax": 20,
+      "tags": [
+        "metal",
+        "advanced_resource",
+        "nobag_advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/tin.js"
+    },
+    "tincturing_kit": {
+      "label": "Tincturing Kit",
+      "namePlural": "Tincturing Kits",
+      "desc": "Anyone who wants to beef up the benefits of herbs or create ingredients for powerful potions would do well to avail themselves of this basic Tincturing Kit and the Tincturing skill. As the name suggests, it is perfect for making tinctures. And no use at all for anything else.",
+      "baseCost": 1250,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "tincturing_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/tincturing_kit.js",
+      "pointsCapacity": 100,
+      "makingType": ""
+    },
+    "tinkertool": {
+      "label": "Tinkertool",
+      "namePlural": "Tinkertools",
+      "desc": "Are you the DIY type who likes to repair your own tools? The nitpicky type who likes to craft their own gear from scratch? Then a Tinkertool is a very handy thing for you to have.",
+      "baseCost": 500,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/tinkertool.js",
+      "pointsCapacity": 200,
+      "makingType": ""
+    },
+    "tiny_bubble": {
+      "label": "Tiny Bubble",
+      "namePlural": "Tiny Bubbles",
+      "desc": "An eeny-weeny, fizzy-wizzy tiny bubble.",
+      "baseCost": 10,
+      "stackMax": 100,
+      "tags": [
+        "bubble",
+        "gassesbubbles"
+      ],
+      "isTool": false,
+      "source": "items/tiny_bubble.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 10,
+        "source": "items/tiny_bubble.js base_cost 10 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "tomato": {
+      "label": "Tomato",
+      "namePlural": "Tomatoes",
+      "desc": "A ripe, heirloom-quality tomato.",
+      "baseCost": 5,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/tomato.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/tomato.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "tooberry_shake": {
+      "label": "Too-Berry Shake",
+      "namePlural": "Too-Berry Shakes",
+      "desc": "A berry tasty too-berry shake.",
+      "baseCost": 76,
+      "stackMax": 24,
+      "tags": [
+        "drink"
+      ],
+      "isTool": false,
+      "source": "items/tooberry_shake.js",
+      "use": {
+        "kind": "drink",
+        "verb": "Drink",
+        "source": "items/tooberry_shake.js classProps drink_mood/drink_energy/drink_xp (include/drink.js drink_effects)",
+        "mood": 5,
+        "energy": 5
+      }
+    },
+    "tortilla": {
+      "label": "Tortilla",
+      "namePlural": "Tortillas",
+      "desc": "A roundish tortilla.",
+      "baseCost": 19,
+      "stackMax": 40,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/tortilla.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 19,
+        "source": "items/tortilla.js base_cost 19 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "trump_rub": {
+      "label": "Trump Rub",
+      "namePlural": "Trump Rub",
+      "desc": "So called because it trumps all the other rubs in expense, flavour, and the ability to be extremely annoying (if you get it in your eye).",
+      "baseCost": 128,
+      "stackMax": 50,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/trump_rub.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 13,
+        "source": "items/trump_rub.js base_cost 128 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "turmeric": {
+      "label": "Turmeric",
+      "namePlural": "Turmerics",
+      "desc": "Some uncommonly orange turmeric.",
+      "baseCost": 12,
+      "stackMax": 200,
+      "tags": [
+        "spice"
+      ],
+      "isTool": false,
+      "source": "items/turmeric.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 1,
+        "source": "items/turmeric.js base_cost 12 × energy_factor 0.1 (include/food.js food_eat)"
+      }
+    },
+    "urfu": {
+      "label": "Urfu",
+      "namePlural": "Urfu",
+      "desc": "A moist beige flaccid matter, imbued with the ability to suck up other flavours.",
+      "baseCost": 73,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/urfu.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 73,
+        "source": "items/urfu.js base_cost 73 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "vegmageddon": {
+      "label": "Vegmageddon",
+      "namePlural": "Vegmageddons",
+      "desc": "No rich urth-born root or brave brassica can survive the searing heat of a Pugilist Grill. It is a slow, vicious end for them. But justified, they say, in the name of 'Healthy Living'.",
+      "baseCost": 90,
+      "stackMax": 40,
+      "tags": [
+        "newfood",
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/vegmageddon.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 90,
+        "source": "items/vegmageddon.js base_cost 90 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "waffles": {
+      "label": "Waffle",
+      "namePlural": "Waffles",
+      "desc": "Fluffy waffles with extra-deep waffle-holes.",
+      "baseCost": 185,
+      "stackMax": 20,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/waffles.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 185,
+        "source": "items/waffles.js base_cost 185 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "watering_can": {
+      "label": "Watering Can",
+      "namePlural": "Watering Cans",
+      "desc": "A stainless-steel 5-gallon watering can. It can be used to water plants, trees, and crops.",
+      "baseCost": 75,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/watering_can.js",
+      "pointsCapacity": 100,
+      "makingType": ""
+    },
+    "wavy_gravy": {
+      "label": "Wavy Gravy",
+      "namePlural": "Wavy Gravies",
+      "desc": "One pint of wavy gravy. It's so good, you'll eat it with a spoon.",
+      "baseCost": 75,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/wavy_gravy.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 75,
+        "source": "items/wavy_gravy.js base_cost 75 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "white_gas": {
+      "label": "White Gas",
+      "namePlural": "White Gas",
+      "desc": "A vial of pristine white gas.",
+      "baseCost": 50,
+      "stackMax": 100,
+      "tags": [
+        "gas",
+        "gassesbubbles"
+      ],
+      "isTool": false,
+      "source": "items/white_gas.js"
+    },
+    "whortleberry": {
+      "label": "Whortleberry",
+      "namePlural": "Whortleberries",
+      "desc": "A single delectable whortleberry.",
+      "baseCost": 5,
+      "stackMax": 100,
+      "tags": [
+        "food",
+        "fruit"
+      ],
+      "isTool": false,
+      "source": "items/whortleberry.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/whortleberry.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "whortleberry_jelly": {
+      "label": "Whortleberry Jelly",
+      "namePlural": "Whortleberry Jellies",
+      "desc": "One jar of homemade whortleberry jelly, made from the pulverized remains of a thousand quivering whortleberries.",
+      "baseCost": 75,
+      "stackMax": 12,
+      "tags": [
+        "food"
+      ],
+      "isTool": false,
+      "source": "items/whortleberry_jelly.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 75,
+        "source": "items/whortleberry_jelly.js base_cost 75 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "wicked_bolognese_sauce": {
+      "label": "Wicked Bolognese Sauce",
+      "namePlural": "Wicked Bolognese Sauces",
+      "desc": "A small jar of wicked bolognese sauce, on spaghetti or on its own for a meaty treat.",
+      "baseCost": 79,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "sauce"
+      ],
+      "isTool": false,
+      "source": "items/wicked_bolognese_sauce.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 79,
+        "source": "items/wicked_bolognese_sauce.js base_cost 79 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "wood_post": {
+      "label": "Wood Post",
+      "namePlural": "Wood Posts",
+      "desc": "If you squint and look hard, you can almost see the joins where the Planks were put together to make Boards, and the Boards tirelessly hewn into a Post. But in its glorious finished form, you can't see the Planks for the Post. Or something.",
+      "baseCost": 150,
+      "stackMax": 40,
+      "tags": [
+        "woodproduct",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/wood_post.js"
+    },
+    "woodworker": {
+      "label": "Woodworker",
+      "namePlural": "Woodworkers",
+      "desc": "How much wood would a Woodworker work if a Woodworker could work wood, you say? Glad you asked. It's four. Four Planks make a Board, four Boards a Post, four posts make a Beam. So how much wood would a Woodworker work if one could work wood? Four.",
+      "baseCost": 0,
+      "stackMax": 1,
+      "tags": [
+        "woodworker",
+        "no_rube",
+        "no_trade",
+        "no_shelf",
+        "machineparts_products",
+        "machine_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/woodworker.js",
+      "makingType": "machine"
+    },
+    "yellow_crumb_flower": {
+      "label": "Yellow Crumb Flower",
+      "namePlural": "Yellow Crumb Flowers",
+      "desc": "Like having a tiny garden full of sunshine. How clever!",
+      "baseCost": 66,
+      "stackMax": 50,
+      "tags": [
+        "herb",
+        "herbalism_supplies"
+      ],
+      "isTool": false,
+      "source": "items/yellow_crumb_flower.js"
+    },
+    "yummy_gruel": {
+      "label": "Yummy Gruel",
+      "namePlural": "Yummy Gruels",
+      "desc": "Somewhat-fizzy-but-still-yummy gruel.",
+      "baseCost": 237,
+      "stackMax": 12,
+      "tags": [
+        "food",
+        "foodbonus"
+      ],
+      "isTool": false,
+      "source": "items/yummy_gruel.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 237,
+        "source": "items/yummy_gruel.js base_cost 237 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
+    "zillene": {
+      "label": "Zillene",
+      "namePlural": "Zillene",
+      "desc": "A compound made out of green, blue and shiny.",
+      "baseCost": 5.6,
+      "stackMax": 500,
+      "tags": [
+        "alchemy",
+        "compound"
+      ],
+      "isTool": false,
+      "source": "items/zillene.js"
+    },
+    "zucchini": {
+      "label": "Zucchini",
+      "namePlural": "Zucchinis",
+      "desc": "A teeny-weeny green zucchini.",
+      "baseCost": 5,
+      "stackMax": 80,
+      "tags": [
+        "crop",
+        "croppery_gardening_supplies"
+      ],
+      "isTool": false,
+      "source": "items/zucchini.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 5,
+        "source": "items/zucchini.js base_cost 5 × energy_factor 1 (include/food.js food_eat)"
+      }
+    }
+  }
+}
