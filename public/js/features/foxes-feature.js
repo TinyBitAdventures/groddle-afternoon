@@ -877,7 +877,7 @@ function setupDemo(engine) {
   if (mode === 'ranger') {
     // An unlicensed Ranger right beside the player, facing them, for the conversation.
     const facing = p.x < engine.worldW - 400 ? 'left' : 'right';
-    const rangerX = p.x + (facing === 'left' ? 170 : -170);
+    const rangerX = p.x + (facing === 'left' ? 110 : -110);
     const rangerY = nearestSurfaceY(engine.platforms, rangerX, p.y) ?? p.y;
     preserve = {
       facing,
@@ -933,9 +933,13 @@ function scheduleAutoplay(engine) {
       let guard = 0;
       const step = () => {
         guard += 1;
-        if (engine.questDialogueOpen() && rangerDialogShowing()) engine.acceptOpenOffer();
-        if (pendingHandoff || engine.questDialogueOpen() || (guard < 6 && lastTalk !== 'enter')) {
-          if (guard < 40) autoplayTimers.push(setTimeout(step, 700));
+        if (engine.questDialogueOpen()) {
+          // QA only: step the Ranger's lines; set aside any other offer that pops up meanwhile.
+          if (rangerDialogShowing()) engine.acceptOpenOffer();
+          else document.getElementById('quest-dialogue-cancel')?.click();
+        }
+        if (pendingHandoff || engine.questDialogueOpen() || lastTalk !== 'enter') {
+          if (guard < 90) autoplayTimers.push(setTimeout(step, 700));
         }
       };
       autoplayTimers.push(setTimeout(step, 600));
