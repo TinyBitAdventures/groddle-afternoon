@@ -5619,8 +5619,32 @@ function stopCompanionFollowForInstance() {
   publishCompanionFollowState();
 }
 
+const COMPANIONS_STORAGE_KEY = 'groddle:companions';
+
+/**
+ * The named stand-in Glitches (Amp, Bumbishfish, Lily Linguistic) are opt-in.
+ * ?companions=1 turns them on and ?companions=0 off (remembered); the
+ * companion, follow, and bear QA routes always show them. Feats, the
+ * Emotional Bear, and mail replies still work by name without world actors.
+ */
+function localCompanionsEnabled() {
+  const params = new URLSearchParams(location.search);
+  const requested = params.get('companions');
+  if (requested === '1' || requested === '0') {
+    try { localStorage.setItem(COMPANIONS_STORAGE_KEY, requested); } catch { /* storage unavailable */ }
+    return requested === '1';
+  }
+  if (params.has('companiondemo') || params.has('followdemo') || params.has('beardemo')) return true;
+  try {
+    return localStorage.getItem(COMPANIONS_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 function spawnLocalCompanions() {
   if (!entityLayer || !player || !currentStreet) return [];
+  if (!localCompanionsEnabled()) return [];
   localCompanions = planLocalCompanionSpawns(player.x, WORLD_W).map((plan, index) => {
     const sprite = makeLocalCompanion(plan);
     sprite.x = plan.x;
@@ -6202,7 +6226,9 @@ const engine = {
         isQuestDialogueOpen() ||
         isScreenFxBlocking() ||
         anyTransientInstance() ||
-        homeIsInstanced()
+        homeIsInstanced() ||
+        // Any open panel (Feat, quests, make, vendor, map, mailbox, ...).
+        document.querySelector('.glitch-modal:not([hidden]), [id$="-panel"]:not([hidden])')
     );
   },
   questDialogueOpen: () => isQuestDialogueOpen(),
