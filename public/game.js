@@ -703,6 +703,20 @@ import {
   planStreetPlacements,
   nearestPlacementGap,
 } from './js/street-ecology.js?v=official-ecology-3';
+import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js';
+import {
+  actionLoopFor,
+  legacySoundKey,
+  soundForAward,
+  soundForConsume,
+  soundForDonation,
+  soundForGardenAction,
+  soundForMakingTool,
+  soundForPanel,
+  soundForGameEvent,
+  soundForQuoin,
+  soundForVerb,
+} from './js/sound-moments.js';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1425,6 +1439,8 @@ const audio = {
   musicGain: null,
   sfxGain: null,
   musicblock: null,
+  /** js/sound-board.js instance (playSound). */
+  board: null,
 };
 
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
@@ -1601,7 +1617,7 @@ function enqueueAward(payload) {
   awardQueue = awardQueue
     .then(async () => {
       const el = document.getElementById('award-screen');
-      playSfx(payload.kind === 'quest' ? 'quest' : 'eat', { volume: 0.7 });
+      playSound(payload.sound || soundForAward(payload.kind), { volume: 0.7 });
       await showAwardScreen(el, payload);
     })
     .catch((e) => console.warn('award screen', e));
@@ -1672,6 +1688,7 @@ async function enterStreetWithTransition(tsid, opts = {}) {
     return enterStreet(tsid, opts);
   }
   let data = null;
+  playSound(opts.teleport ? 'TELEPORT_AWAY' : 'SIGNPOST_TRAVEL', { volume: 0.5 });
   await runStreetTransition(el, {
     fromLabel,
     fromHub,
@@ -1684,7 +1701,7 @@ async function enterStreetWithTransition(tsid, opts = {}) {
       data = await enterStreet(tsid, { ...opts, quiet: true });
     },
   });
-  playSfx('start', { volume: 0.4, rate: 1.05 });
+  playSound('STREET_LOADED', { volume: 0.32 });
   return data;
 }
 
@@ -2361,7 +2378,7 @@ function beginToolRepair(classTsid) {
     }
     toast(result.msg, 3600);
     pushActivity(result.msg);
-    playSfx('pickup', { volume: 0.45, rate: 1.35 });
+    playSound('CRAFT_DONE', { volume: 0.5 });
     emitGameEvent(`tool_repaired:${classTsid}`);
     updateHud();
   }, quote.durationMs);
@@ -2371,7 +2388,7 @@ function beginToolRepair(classTsid) {
     `Repairing ${quote.condition.label} · ${quote.energy} energy · ${quote.durationSeconds}s of tinkering`,
     quote.durationMs + 500
   );
-  playSfx('step', { volume: 0.28, rate: 1.2 });
+  playSound('TINKERTOOL', { volume: 0.6 });
   return true;
 }
 
@@ -3121,7 +3138,7 @@ function usePackItem(classTsid) {
       r.msgs[0] += ` Eating a variety of foods helps you think! +${foodResult.bonus} iMG.`;
     }
   }
-  playSfx('eat', { volume: 0.3, rate: 1.2 });
+  playSound(soundForConsume(classTsid, { drink: ordinaryInfo?.kind ? ordinaryInfo.kind === 'drink' : null }), { volume: 0.6, jitter: 0.05 });
   const buffSuffix = r.effectLabel
     ? r.pending
       ? ` ${r.effectLabel} will begin in ${r.info.delaySeconds}s.`
@@ -3315,17 +3332,6 @@ async function loadAudio() {
   await loadAmbientMusicConfig('assets/content/ambient-music.json?v=eesti-1');
   const files = {
     music: 'assets/audio/groddle.mp3', // legacy default / fallback
-    pet: 'assets/audio/piggy_plop.mp3',
-    pickup: 'assets/audio/discover_new_item.mp3',
-    quest: 'assets/audio/quest_complete.mp3',
-    start: 'assets/audio/game_loaded.mp3',
-    quoin: 'assets/audio/qurazy_quoin.mp3',
-    jump: 'assets/audio/triple_jump.mp3',
-    alert: 'assets/audio/new_quest_alert.mp3',
-    eat: 'assets/audio/level_up_kazoo.mp3',
-    spinningWheel: 'assets/audio/ambient/Spinning-Wheel_1292034939.mp3',
-    // Original client sound key NEWDAY / "NEW_DAY" — fanfare until rooster MP3 recovered
-    newDay: 'assets/audio/new_day_fanfare.mp3',
   };
   // Preload hub ambient tracks (GSJS ambient_library stand-ins)
   for (const url of allAmbientTrackUrls()) {
@@ -3341,6 +3347,15 @@ async function loadAudio() {
   audio.sfxGain.gain.value = 1;
   audio.musicGain.connect(audio.ctx.destination);
   audio.sfxGain.connect(audio.ctx.destination);
+  // Every SFX goes through the sound board: recovered file when one exists,
+  // otherwise a js/synth-sfx.js recipe (assets/content/sound-keys.json).
+  audio.board = createSoundBoard({
+    getContext: () => audio.ctx,
+    getDestination: () => audio.sfxGain,
+    isMuted: () => state.muted,
+    volume: sfxVolumeSetting(),
+  });
+  audio.board.preload(PRELOAD_SOUND_KEYS);
   await Promise.all(
     Object.entries(files).map(async ([key, url]) => {
       try {
@@ -3354,77 +3369,91 @@ async function loadAudio() {
   );
 }
 
-function playSfx(name, { volume = 0.7, rate = 1 } = {}) {
-  if (state.muted || !audio.ctx || !audio.buffers[name]) return;
-  const src = audio.ctx.createBufferSource();
-  const g = audio.ctx.createGain();
-  src.buffer = audio.buffers[name];
-  src.playbackRate.value = rate;
-  g.gain.value = volume;
-  src.connect(g);
-  g.connect(audio.sfxGain);
-  src.start(0);
+/** Small recovered files worth warming at boot (the rest load on first use). */
+const PRELOAD_SOUND_KEYS = [
+  'QUEST_COMPLETE', 'LEVEL_UP', 'TRIPLE_JUMP', 'DISCOVER_USEFUL_NEW_ITEM', 'QUORAZY_QUOIN',
+  'QUEST_ADDED', 'CLIENT_LOADED', 'STREET_LOADED', 'HARVEST', 'PETRIFIED_ROCK', 'PIGGY_PLOP',
+  'HERE_YOU_GO_LIGHTER', 'NEWDAY', 'WATER_SPLASH',
+];
+
+/** SFX bus level: ?sfxvol=0..1, else DEFAULT_SFX_VOLUME. */
+function sfxVolumeSetting() {
+  const param = new URLSearchParams(location.search).get('sfxvol');
+  const value = param === null ? Number.NaN : Number(param);
+  return Number.isFinite(value) ? clamp(value, 0, 1) : DEFAULT_SFX_VOLUME;
 }
 
 /**
- * Procedural sound effects for client sound keys with no recovered file
- * (CROAK, SQUISH_GRAPES have no entry in the archived sound map).
- * @param {'croak'|'squish'} name
+ * Play a sound key from the catalog (CLICK_SUCCESS, PET_PIGGY, PICK, ...):
+ * the recovered file when present, else its synth recipe. Respects mute.
+ * @param {string} key
+ * @param {{ volume?: number, rate?: number, jitter?: number, variant?: number, allowMultiple?: boolean }} [opts]
  */
-function playSynthSfx(name) {
-  if (state.muted || !audio.ctx) return;
-  const ctx = audio.ctx;
-  const t0 = ctx.currentTime;
-  const out = ctx.createGain();
-  out.connect(audio.sfxGain);
-  if (name === 'croak') {
-    // A comic descending "bwoooomp" with a soft low thud underneath.
-    const osc = ctx.createOscillator();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(420, t0);
-    osc.frequency.exponentialRampToValueAtTime(70, t0 + 0.9);
-    const thud = ctx.createOscillator();
-    thud.type = 'sine';
-    thud.frequency.setValueAtTime(90, t0 + 0.75);
-    thud.frequency.exponentialRampToValueAtTime(40, t0 + 1.15);
-    out.gain.setValueAtTime(0.0001, t0);
-    out.gain.exponentialRampToValueAtTime(0.5, t0 + 0.04);
-    out.gain.exponentialRampToValueAtTime(0.2, t0 + 0.8);
-    out.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.25);
-    osc.connect(out);
-    thud.connect(out);
-    osc.start(t0);
-    thud.start(t0 + 0.75);
-    osc.stop(t0 + 1.3);
-    thud.stop(t0 + 1.3);
-    return;
+function playSound(key, opts = {}) {
+  if (state.muted || !audio.board) return null;
+  const handle = audio.board.play(key, opts);
+  if (app?.view && handle) {
+    app.view.dataset.lastSound = handle.kind === 'loading' ? `${handle.key}:loading` : audio.board.stats.last;
   }
-  // Squish: a wet, low-passed noise burst with a quick downward blip.
-  const length = Math.floor(ctx.sampleRate * 0.28);
-  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < length; i += 1) data[i] = (Math.random() * 2 - 1) * (1 - i / length) ** 2;
-  const noise = ctx.createBufferSource();
-  noise.buffer = buffer;
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.setValueAtTime(1800, t0);
-  filter.frequency.exponentialRampToValueAtTime(260, t0 + 0.25);
-  const blip = ctx.createOscillator();
-  blip.type = 'sine';
-  blip.frequency.setValueAtTime(260, t0);
-  blip.frequency.exponentialRampToValueAtTime(90, t0 + 0.18);
-  const blipGain = ctx.createGain();
-  blipGain.gain.setValueAtTime(0.35, t0);
-  blipGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.2);
-  out.gain.setValueAtTime(0.6, t0);
-  noise.connect(filter);
-  filter.connect(out);
-  blip.connect(blipGain);
-  blipGain.connect(out);
-  noise.start(t0);
-  blip.start(t0);
-  blip.stop(t0 + 0.22);
+  return handle;
+}
+
+/** Repeat a key while an action runs; returns { stop() }. */
+function playSoundLoop(key, opts = {}) {
+  if (state.muted || !audio.board) return { stop() {} };
+  return audio.board.loop(key, opts);
+}
+
+/** Legacy SFX ids (pickup, quest, alert, ...) route to their catalog keys. */
+function playSfx(name, { volume = 0.7, rate = 1 } = {}) {
+  return playSound(legacySoundKey(name), { volume, rate, allowMultiple: true });
+}
+
+/** CROAK / SQUISH_GRAPES recipes now live in js/synth-sfx.js. */
+function playSynthSfx(name) {
+  return playSound(name === 'croak' ? 'CROAK' : name === 'squish' ? 'SQUISH_GRAPES' : name, { volume: 1 });
+}
+
+/**
+ * Sounds for feature-owned verbs that play none of their own. Doors publish
+ * their outcome as data-door-last (open/unlocked or a refusal code); the
+ * client played DOOR_OPEN on entry and DOOR_CLOSE 600 ms later
+ * (NetController.as:1838).
+ */
+function playFeatureVerbSound(target, verbId) {
+  if (target?.classId !== 'street_door' || verbId !== 'enter') return;
+  const outcome = app?.view?.dataset.doorLast || '';
+  if (outcome === 'open' || outcome === 'unlocked') {
+    playSound('DOOR_OPEN', { volume: 0.6 });
+    setTimeout(() => playSound('DOOR_CLOSE', { volume: 0.5 }), 900);
+  } else if (outcome) {
+    playSound('CLICK_FAILURE', { volume: 0.45 });
+  }
+}
+
+/** The tool's own class sound repeats while a timed verb or making job runs. */
+let actionSoundLoop = null;
+let craftSoundLoop = null;
+
+function startActionSoundLoop(classId, verbId, durationMs) {
+  stopActionSoundLoop();
+  const spec = actionLoopFor(classId, verbId);
+  if (spec) actionSoundLoop = playSoundLoop(spec.key, { intervalMs: spec.intervalMs, durationMs, volume: 0.5 });
+}
+
+function stopActionSoundLoop() {
+  actionSoundLoop?.stop();
+  actionSoundLoop = null;
+}
+
+function startCraftSoundLoop(toolClassTsid) {
+  stopCraftSoundLoop();
+  craftSoundLoop = playSoundLoop(soundForMakingTool(toolClassTsid), { intervalMs: 720, volume: 0.42 });
+}
+
+function stopCraftSoundLoop() {
+  craftSoundLoop?.stop();
+  craftSoundLoop = null;
 }
 
 function playMusicblockAudio(def) {
@@ -3530,6 +3559,11 @@ function applyMute() {
     audio.musicGain.gain.value = vol;
   }
   audio.sfxGain.gain.value = state.muted ? 0 : 1;
+  if (state.muted) {
+    audio.board?.stopAll();
+    stopActionSoundLoop();
+    stopCraftSoundLoop();
+  }
   const btn = document.getElementById('mute-btn');
   if (btn) btn.textContent = state.muted ? 'Unmute' : 'Mute';
 }
@@ -4527,6 +4561,7 @@ function beginVerbAction(target, verb) {
   };
   clearHoverGlow();
   playVerbStartAnimation(target, verb.id, durationMs);
+  startActionSoundLoop(target.classId, verb.id, durationMs);
   renderCurrentAction();
   return true;
 }
@@ -4536,6 +4571,7 @@ function cancelCurrentAction(opts = {}) {
   stopTrantHarvestAnimation(currentAction.target, 'cancelled');
   if (currentAction.target === rookEggTarget) resetRookEggSmashVisual();
   currentAction = cancelTimedAction(currentAction);
+  stopActionSoundLoop();
   clearActionToolFx('cancelled');
   renderCurrentAction();
   currentAction = null;
@@ -4556,6 +4592,7 @@ function updateCurrentAction(deltaMs) {
   if (currentAction.status !== 'complete') return;
   const completed = currentAction;
   currentAction = null;
+  stopActionSoundLoop();
   stopTrantHarvestAnimation(completed.target, 'complete');
   renderCurrentAction();
   verbAnimationAlreadyStarted = true;
@@ -4581,7 +4618,10 @@ const SPEECH_REACTION_VERBS = new Set([
 
 function executeVerb(target, verbId) {
   if (features.query('runVerbOverride', target, verbId, engine) === true) return;
-  if (features.runVerb(target, verbId, engine)) return;
+  if (features.runVerb(target, verbId, engine)) {
+    playFeatureVerbSound(target, verbId);
+    return;
+  }
   if (target?.classId === 'pc_local') {
     handleLocalCompanionTarget(target, verbId);
     return;
@@ -4838,10 +4878,7 @@ function executeVerb(target, verbId) {
         0xc6a2ff
       );
     }
-    playSfx(verbId === 'pickup' || verbId === 'harvest' || verbId === 'milk' ? 'pickup' : 'pet', {
-      volume: 0.7,
-      rate: 0.95 + Math.random() * 0.2,
-    });
+    playSound(soundForVerb(target.classId, verbId, result), { volume: 0.7, jitter: 0.06 });
     burst(target.sprite.x, target.sprite.y - 30, 0xffe066, 8);
 
     // Refresh trant subtitle after tend/harvest
@@ -4927,7 +4964,7 @@ function executeVerb(target, verbId) {
       interactables = interactables.filter((t) => t !== target);
     }
   } else {
-    playSfx('alert', { volume: 0.25, rate: 0.8 });
+    playSound('CLICK_FAILURE', { volume: 0.45 });
   }
 
   if (!result.remove && target?.sprite && !target.sprite.destroyed) {
@@ -5298,7 +5335,7 @@ function spawnStootMemorial() {
   if (app?.view) {
     app.view.dataset.stootMemorial = 'clean-cc0';
     app.view.dataset.stootDollActive = '1';
-    app.view.dataset.stootDollAudio = 'source-unavailable';
+    app.view.dataset.stootDollAudio = 'recovered-c2';
   }
   return memorial;
 }
@@ -5333,8 +5370,10 @@ function handleStootDollTarget(target, verbId, { context = 'world', animate = tr
     app.view.dataset.stootDollQuote = result.quote;
     app.view.dataset.stootDollSoundKey = result.soundKey || '';
   }
-  // The production audio keys are preserved in stoot-doll.js, but their clean
-  // source files are unavailable. Never substitute compressed video audio.
+  // Clean production voice files (c2.glitch.bz Stewart_Doll_1-14) were
+  // recovered from the Wayback CDX index; quotes 0-28 never had audio.
+  // Never substitute compressed video audio for the missing lines.
+  if (result.soundKey) playSound(result.soundKey, { volume: 0.85 });
 }
 
 function pullPackedStootDoll() {
@@ -6161,12 +6200,19 @@ function register(target) {
 function applyAchievementProgress(state, counter, amount = 1, pcRef = pc) {
   const updates = applyAchievementProgressRaw(state, counter, amount, pcRef);
   features.event(counter, amount, engine);
+  playGameEventSound(counter);
   return updates;
 }
 
 /** Quest-only game events (no badge counter of their own). */
 function emitGameEvent(counter, amount = 1) {
   features.event(counter, amount, engine);
+  playGameEventSound(counter);
+}
+
+function playGameEventSound(counter) {
+  const key = soundForGameEvent(counter);
+  if (key) playSound(key, { volume: 0.55 });
 }
 
 function unregisterTarget(target) {
@@ -6271,7 +6317,10 @@ const engine = {
       title,
       kicker,
       beats: beats?.length ? beats : [{ text: title, response: acceptLabel || 'OK' }],
-      onComplete: onAccept,
+      onComplete: (...args) => {
+        playSound('QUEST_ADDED', { volume: 0.6 });
+        return onAccept?.(...args);
+      },
       onCancel: onDecline,
       cancelable: true,
       primaryLabel: acceptLabel || 'OK',
@@ -6328,6 +6377,10 @@ const engine = {
   updateHud,
   playSfx,
   playSynth: playSynthSfx,
+  /** Play a sound-key catalog entry (file if recovered, else synth recipe). */
+  playSound,
+  /** Repeat a key while something runs; returns { stop() }. */
+  playSoundLoop,
   save: () => savePlayerState(),
   setData(key, value) {
     if (app?.view) app.view.dataset[key] = String(value);
@@ -7123,7 +7176,7 @@ function dropPackItem(classTsid, requested = 1) {
   pushActivity(line);
   floatText(result.stack.x, result.stack.y - 55, `−${result.count} ${label}`, 0xf2c879);
   burst(result.stack.x, result.stack.y - 12, 0xd8c49a, 7);
-  playSfx('pickup', { volume: 0.36, rate: 0.72 });
+  playSound('ITEM_DROP', { volume: 0.6 });
   updateHud();
 }
 
@@ -7144,7 +7197,7 @@ function pickupDroppedWorldItem(target) {
   pushActivity(line);
   floatText(x, y - 55, `+${result.count} ${label}`, 0x7dcea0);
   burst(x, y - 12, 0xffe066, 10);
-  playSfx('pickup', { volume: 0.7, rate: 1.02 });
+  playSound('ITEM_PICKUP', { volume: 0.65, jitter: 0.04 });
   refreshDroppedWorldItems();
   updateHud();
   return true;
@@ -8033,9 +8086,10 @@ function physics(dt) {
         quoins.splice(i, 1);
         const rewardDef = QUOIN_TYPES[result.resolvedTypeId] || q.def;
         const copy = quoinResultCopy(result);
-        playSfx('quoin', {
-          volume: result.typeId === 'qurazy' ? 0.82 : 0.55,
+        playSound(soundForQuoin(result.typeId), {
+          volume: result.typeId === 'qurazy' ? 0.82 : 0.6,
           rate: result.typeId === 'qurazy' ? 1.2 : 1,
+          jitter: result.typeId === 'qurazy' ? 0 : 0.03,
         });
         toast(result.typeId === 'mystery' ? `Mystery quoin: ${copy}` : copy);
         pushActivity(`You collected a ${q.typeId} quoin. ${copy}.`);
@@ -8093,7 +8147,7 @@ function eatApple() {
     toast(r.msgs[0] || 'No apples in pack.');
     return;
   }
-  playSfx('eat', { volume: 0.35, rate: 1.4 });
+  playSound('ITEM_EAT', { volume: 0.6, jitter: 0.05 });
   toast(r.msgs[0] || 'Crunch.');
   floatText(player.x, player.y - 70, '+energy', 0x7dcea0);
   updateHud();
@@ -16234,7 +16288,7 @@ function renderMailboxCompose(recipient = '', replyTo = null) {
     pushActivity(`Mail sent · ${result.postage} currants postage.`);
     emitGameEvent('mail_sent');
     toast('Your letter is on its way.', 2400);
-    playSfx('pickup', { volume: 0.38, rate: 1.22 });
+    playSound('PACKAGE_SENT', { volume: 0.55 });
     updateHud();
     updateHomeChrome();
     savePlayerState();
@@ -18166,6 +18220,7 @@ function runSkillStudyAction(classTsid, action) {
     : startSkillStudy(skillState, classTsid, skillStudyContext(), Date.now());
   if (result.completed?.length) handleSkillCompletions(result.completed);
   if (result.ok && action === 'start' && result.reason === 'started') {
+    playSound('BEGIN_LEARNING_SKILL', { volume: 0.6 });
     toast(`Started studying ${name} · ${formatStudyTime(result.durationSeconds)}`);
     pushActivity(`You started learning ${name}. It will continue while you explore — and while you are away.`);
   } else if (result.ok) {
@@ -18219,6 +18274,7 @@ function handleSkillCompletions(completed, { offline = false } = {}) {
     pushActivity(`${offline ? 'While you were away, you learned' : 'You learned'} ${name}.`);
     enqueueAward({
       kind: 'achievement',
+      sound: 'SKILL_ACHIEVED',
       title: `${name} learned!`,
       body: row.def?.learned || row.def?.description || 'A fresh branch of knowledge has unfurled.',
       subtitle: offline ? 'Your brain kept studying while you were away.' : 'Knowledge: acquired.',
@@ -18538,6 +18594,7 @@ function updateMakeProgressUi(record) {
 
 function finishMakeCraft(record, { close = false, cancelled = false, quiet = false } = {}) {
   if (activeCraftSession === record) activeCraftSession = null;
+  stopCraftSoundLoop();
   setMakeCraftingUi(false);
   const prog = document.getElementById('make-progress');
   if (prog) {
@@ -18551,7 +18608,7 @@ function finishMakeCraft(record, { close = false, cancelled = false, quiet = fal
       updateHud();
       pushActivity(result.activityLine);
       if (!quiet) toast(result.activityLine);
-      playSfx('pickup', { volume: 0.6 });
+      playSound('CRAFT_DONE', { volume: 0.6 });
       if (player) floatText(player.x, player.y - 80, record.recipe.name, 0xffe066);
       if (!close) showMakeResult(result, record.key);
     }
@@ -18583,7 +18640,7 @@ function updateMakeCraft(deltaMs) {
       const transmogFailed = result.reason === 'transmog_failed';
       if (transmogFailed) {
         pushActivity(result.msgs[0]);
-        playSfx('alert', { volume: 0.35, rate: 0.8 });
+        playSound('CRAFTING_RESULT_NOTHING', { volume: 0.5 });
         updateHud();
       }
       if (!record.made || transmogFailed) toast(result.msgs?.[0] || 'Cannot continue making.', transmogFailed ? 3600 : undefined);
@@ -18613,7 +18670,7 @@ function updateMakeCraft(deltaMs) {
     announceAchievementUpdates(achievementUpdates);
     if (achievementCounter) app.view.dataset.achievementCounter = achievementCounter;
     updateHud();
-    playSfx('step', { volume: 0.18, rate: 1.35 });
+    playSound('CRAFT_TICK', { volume: 0.35, jitter: 0.08 });
   }
   updateMakeProgressUi(record);
   if (record.timer.status === 'complete') finishMakeCraft(record);
@@ -18655,7 +18712,7 @@ function runMakeCraft(key, qty) {
   if (title) title.textContent = `Making ${recipe.name}`;
   setMakeCraftingUi(true);
   renderMakeProgressStage(activeCraftSession);
-  playSfx('step', { volume: 0.22, rate: 1.15 });
+  startCraftSoundLoop(recipe.tool);
 }
 
 /**
@@ -19210,7 +19267,7 @@ function performShrineDonation() {
   pushActivity(line);
   floatText(target.sprite.x, target.sprite.y - 150, `+${result.favor} ${giant.name} favor`, 0xffe066);
   burst(target.sprite.x, target.sprite.y - 85, 0xffe066, 20);
-  playSfx('pickup', { volume: 0.62, rate: 0.86 });
+  playSound(soundForDonation(result.favor), { volume: 0.65 });
   announceAchievementUpdates(
     applyAchievementProgress(achieveState, `shrines_donated:${giantId}`, 1, pc)
   );
@@ -19230,7 +19287,7 @@ function claimActiveShrineEmblem() {
   closeShrinePanel();
   playShrineDonation(target);
   refreshShrineTarget(target);
-  playSfx('quest', { volume: 0.7, rate: 1.04 });
+  playSound('DONATION_RECIEVE_EMBLEM', { volume: 0.7 });
   pushActivity(`The Shrine grants you an Emblem of ${result.giant.name}.`);
   applyAchievementProgress(achieveState, `emblems_acquired:${giantId}`, 1, pc);
   enqueueAward({
@@ -19355,7 +19412,7 @@ function renderVendorList() {
         : vendorSell(pc, inv, activeVendor.offers, vendorSelected, vendorQty);
       toast(r.msgs[0]);
       pushActivity(r.msgs[0]);
-      if (r.ok) playSfx(isBuy ? 'pickup' : 'quoin', { volume: 0.4 });
+      playSound(r.ok ? (isBuy ? 'PURCHASE_ITEM' : 'VENDOR_SELL') : 'CLICK_FAILURE', { volume: 0.55 });
       if (r.ok) {
         emitGameEvent(`vendor_${isBuy ? 'bought' : 'sold'}:${vendorSelected}`, r.qty || vendorQty);
       }
@@ -20155,6 +20212,7 @@ function runGardenPlotAction(key, action) {
   }
   if (!r.ok) {
     toast(r.msgs?.[0] || 'Cannot do that.');
+    playSound('CLICK_FAILURE', { volume: 0.45 });
     return;
   }
   if (action === 'harvest' && r.cropId) {
@@ -20170,7 +20228,7 @@ function runGardenPlotAction(key, action) {
     pushActivity(r.msgs?.[0]);
   }
   toast(r.msgs?.[0] || 'Done.');
-  playSfx('pickup', { volume: 0.45, rate: 1.1 });
+  playSound(soundForGardenAction(action), { volume: 0.6, jitter: 0.05 });
   if (player) floatText(player.x, player.y - 70, r.reason || '✓', 0x7dcea0);
   for (const t of gardens) {
     if (t.state?.garden === activeGarden) refreshGardenVisual(t);
@@ -21632,8 +21690,7 @@ async function main() {
       try { await audio.ctx.resume(); } catch (_) { /* */ }
     }
     startMusic();
-    playSfx('start', { volume: 0.5 });
-    playSfx('alert', { volume: 0.4 });
+    playSound('CLIENT_LOADED', { volume: 0.5 });
     // Apply saved look after textures are ready
     applyPlayerAppearance();
     toast(`${currentStreet?.label || 'Hechey Track'} loaded. Press L for look · G for map.`);
@@ -21749,7 +21806,26 @@ async function main() {
       try { await audio.ctx.resume(); } catch (_) { /* audio remains opt-in */ }
     }
     applyMute();
+    playSound('UI_TOGGLE', { volume: 0.5 });
   });
+  // Panel open/close and dialog button clicks (client CLICK_SUCCESS/FAILURE).
+  watchPanelSounds(document, playSound, soundForPanel);
+  watchButtonClicks(document, playSound);
+  // QA: ?sound=1 starts unmuted (browsers still resume audio on the first gesture).
+  if (new URLSearchParams(location.search).get('sound') === '1') {
+    state.muted = false;
+    applyMute();
+    window.groddleSound = { play: playSound, stats: () => audio.board?.stats, resolve: (k) => audio.board?.resolve(k) };
+  }
+  if (new URLSearchParams(location.search).has('soundtest')) {
+    import('./js/sound-test.js').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
+      state.muted = false;
+      if (audio.ctx?.state === 'suspended') {
+        try { await audio.ctx.resume(); } catch (_) { /* opt-in */ }
+      }
+      applyMute();
+    } }));
+  }
   document.querySelector('.top-actions')?.addEventListener('click', () => {
     if (currentAction) cancelCurrentAction({ quiet: true });
     closePackPopover();

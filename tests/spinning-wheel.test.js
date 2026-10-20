@@ -179,7 +179,9 @@ test.describe('shrine source and client integration', () => {
     const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
     assert.match(game, /function useGameshowTicket\(/);
     assert.match(game, /function updateSpinningWheel\(/);
-    assert.match(game, /Spinning-Wheel_1292034939\.mp3/);
+    const soundKeys = fs.readFileSync(path.join(root, 'public/js/sound-keys.js'), 'utf8');
+    assert.match(soundKeys, /"SPINNING_WHEEL": "assets\/audio\/ambient\/Spinning-Wheel_1292034939\.mp3"/);
+    assert.match(game, /playSfx\('spinningWheel'/);
     assert.match(game, /data(?:set)?\.spinningWheelRewardApplied/);
     assert.match(game, /stootdemo/);
     assert.match(content, /classId === 'npc_spinning_wheel'/);
