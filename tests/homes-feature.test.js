@@ -74,6 +74,13 @@ describe('homes feature helpers', () => {
     assert.equal(canPlantBean('bean_egg', 'patch', 56), false);
   });
 
+  it('offers Place in house for pack furniture only', () => {
+    const verbs = homesFeature.packVerbs('furniture_chair', {});
+    assert.equal(verbs[0].id, 'place_furniture');
+    assert.equal(verbs[0].enabled, false);
+    assert.deepEqual(homesFeature.packVerbs('apple', {}), []);
+  });
+
   it('round-trips its save slice', () => {
     homesFeature.restore({ decor: { wall: 'red_brick', wallSegments: 9 }, cult: { yardLeft: 2 } });
     const slice = JSON.parse(JSON.stringify(homesFeature.save()));

@@ -480,7 +480,7 @@ const STREET_STYLES = {
     sky: [0xf0d98a, 0x9a5a3a],
     field: 0x6a4a34,
     fieldDark: 0x523726,
-    soil: 'front_ground_2',
+    soil: null,
     soilColor: 0x4c3022,
     house: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, signX: 0.06 },
     layers: [
@@ -513,7 +513,7 @@ const STREET_STYLES = {
     sky: [0x8fd6cf, 0xd8eedd],
     field: 0x5e8f8a,
     fieldDark: 0x4b7672,
-    soil: 'front_ground_2',
+    soil: null,
     soilColor: 0x40525a,
     house: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
     layers: [
@@ -615,7 +615,14 @@ function streetBackground(engine, styleId) {
   soilFill.beginFill(style.soilColor || 0x5c3b25).drawRect(-50, GROUND_Y + 30, width + 100, 240).endFill();
   root.addChild(soilFill);
   const soilW = 1038 * 0.6;
-  for (let x = -40; x < width + soilW; x += soilW - 2) {
+  if (!style.soil) {
+    soilFill.beginFill(0x000000, 0.22).drawRect(-50, GROUND_Y + 30, width + 100, 6).endFill();
+    for (let x = 30; x < width; x += 140) {
+      const r = 6 + hash01(`pebble:${x}`) * 10;
+      soilFill.beginFill(0x000000, 0.14).drawEllipse(x + hash01(`p2:${x}`) * 60, GROUND_Y + 70 + hash01(`p3:${x}`) * 50, r * 1.6, r).endFill();
+    }
+  }
+  for (let x = -40; style.soil && x < width + soilW; x += soilW - 2) {
     const soil = PIXI.Sprite.from(`${DECO}${style.soil}.png`);
     soil.anchor.set(0, 0);
     soil.width = soilW;
@@ -1323,8 +1330,8 @@ function setMode(engine, next) {
   publish(engine);
 }
 
-function beginPlacing(engine, classTsid) {
-  placing = { kind: 'furniture', classTsid };
+function beginPlacing(engine, classTsid, from = null) {
+  placing = { kind: 'furniture', classTsid, from };
   selected = null;
   makeGhost(engine);
   renderFurniture(engine);
@@ -1442,7 +1449,7 @@ function placeAtPointer(engine, at) {
       result = moveFurniture(decor, placing.moveId, at);
       selected = { kind: 'furniture', id: placing.moveId };
     } else {
-      result = placeFurniture(decor, engine.inv, placing.classTsid, at);
+      result = placeFurniture(decor, engine.inv, placing.classTsid, at, { from: placing.from || undefined });
       if (result.ok) {
         selected = { kind: 'furniture', id: result.item.id };
         engine.pushActivity(`You placed a ${furnitureDef(placing.classTsid).label}.`);
@@ -1785,6 +1792,12 @@ function runCultivateAutoplay(engine) {
 // The scene contract for game.js renderHomeScene
 // ---------------------------------------------------------------------------
 
+/** QA: ?homex= arrival point (interior x, or street x relative to the house). */
+function homeX(engine) {
+  const raw = engine.param('homex');
+  return raw != null && raw !== '' && Number.isFinite(Number(raw)) ? Number(raw) : null;
+}
+
 function homeScene(room, engine) {
   const ctx = engine.homeContext?.() || {};
   const style = ctx.style || 'meadow';
@@ -1801,7 +1814,7 @@ function homeScene(room, engine) {
       background,
       spawnFor(opts = {}) {
         if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) return Math.max(80, Math.min(width - 80, opts.spawnX));
-        if (opts.arrive !== 'door' && Number.isFinite(Number(engine.param('homex')))) return Number(engine.param('homex'));
+        if (opts.arrive !== 'door' && homeX(engine) != null) return homeX(engine);
         if (opts.arrive !== 'door' && engine.param('homedemo') === 'decorate') return Math.round(width * 0.48);
         return interiorDoorX() - 80;
       },
@@ -1831,7 +1844,7 @@ function homeScene(room, engine) {
         return Math.max(60, Math.min(layout.width - 60, opts.spawnX + (opts.shift || 0)));
       }
       if (opts.arrive === 'door') return background.houseDoorX + 70;
-      if (Number.isFinite(Number(engine.param('homex')))) return layout.houseX + Number(engine.param('homex'));
+      if (homeX(engine) != null) return layout.houseX + homeX(engine);
       if (engine.param('homedemo') === 'cultivate') return layout.houseX - 260;
       return layout.lotLeft + 130;
     },
@@ -1902,6 +1915,27 @@ export const homesFeature = {
       selected = null;
       renderBar(engine);
     }
+  },
+
+  /** Pack furniture: place it straight from the pack while inside the house. */
+  packVerbs(classTsid, engine) {
+    if (!FURNITURE_CATALOG[classTsid]) return [];
+    const inside = scene?.room === 'interior';
+    return [{
+      id: 'place_furniture',
+      label: 'Place in house',
+      enabled: inside,
+      reason: inside ? '' : 'Go inside your house to place furniture.',
+      tooltip: 'Choose a spot in your house for it',
+      primary: true,
+    }];
+  },
+
+  runPackVerb(classTsid, verbId, engine) {
+    if (verbId !== 'place_furniture' || !FURNITURE_CATALOG[classTsid] || scene?.room !== 'interior') return false;
+    if (mode !== 'decorate') setMode(engine, 'decorate');
+    beginPlacing(engine, classTsid, 'pack');
+    return true;
   },
 
   onTick(dtMs, now, engine) {
