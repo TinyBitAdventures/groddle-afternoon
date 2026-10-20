@@ -234,6 +234,28 @@ export function platformYAt(p, x, margin = 4) {
 }
 
 /**
+ * Ground for a walking NPC: the nearest platform at or below its feet, allowing
+ * only a gentle `maxRise` step up, so steep slopes and branches overhead are
+ * never climbed. Falls back to the lowest platform at x, or null when none.
+ * @param {{ x1:number,y1:number,x2:number,y2:number }[]} platforms  screen-space
+ * @param {number} x
+ * @param {number} feetY
+ * @param {number} [maxRise=6]
+ * @returns {{ y:number, platform:object }|null}
+ */
+export function groundBeneath(platforms, x, feetY, maxRise = 6) {
+  let below = null;
+  let lowest = null;
+  for (const p of platforms || []) {
+    const y = platformYAt(p, x, 0);
+    if (y == null) continue;
+    if (y >= feetY - maxRise && (!below || y < below.y)) below = { y, platform: p };
+    if (!lowest || y > lowest.y) lowest = { y, platform: p };
+  }
+  return below || lowest;
+}
+
+/**
  * Resolve ground under a feet position (screen coords).
  * Returns the highest platform top the player is standing on / falling onto.
  * @param {{ x1:number,y1:number,x2:number,y2:number }[]} platforms  screen-space

@@ -499,6 +499,7 @@ import {
 } from './js/street-loader.js';
 import {
   resolveGround as resolveStreetGround,
+  groundBeneath,
   streetWidth,
   assertStreetGeometry,
   worldToScreen,
@@ -5615,7 +5616,10 @@ function spawnLocalCompanions() {
   localCompanions = planLocalCompanionSpawns(player.x, WORLD_W).map((plan, index) => {
     const sprite = makeLocalCompanion(plan);
     sprite.x = plan.x;
-    sprite.y = resolveGround(plan.x, player.y);
+    // Spawn at the player's level: the ground beneath the player's feet at x.
+    const spawnGround = groundBeneath(streetPlatforms, plan.x, player.y - 60, 0);
+    sprite.y = spawnGround?.y ?? resolveGround(plan.x, player.y);
+    const homePlatform = spawnGround?.platform || null;
     const actor = {
       name: plan.name,
       label: plan.name,
@@ -5627,6 +5631,9 @@ function spawnLocalCompanions() {
         followee: companionFollowState.followee || '',
       },
       homeX: plan.x,
+      // Idle wandering stays on the spawn platform, like a Glitch chatting nearby.
+      homeMinX: homePlatform ? Math.min(homePlatform.x1, homePlatform.x2) + 24 : 42,
+      homeMaxX: homePlatform ? Math.max(homePlatform.x1, homePlatform.x2) - 24 : WORLD_W - 42,
       wanderRange: plan.wanderRange,
       wanderDirection: index % 2 ? -1 : 1,
       wanderTargetX: plan.x,
@@ -5696,8 +5703,8 @@ function updateLocalCompanions(dt) {
         actor.wanderDirection *= -1;
         actor.wanderTargetX = clamp(
           actor.homeX + actor.wanderDirection * actor.wanderRange,
-          42,
-          Math.max(42, WORLD_W - 42)
+          Math.max(42, actor.homeMinX ?? 42),
+          Math.max(42, Math.min(WORLD_W - 42, actor.homeMaxX ?? WORLD_W - 42))
         );
         actor.nextWanderAt = now + 3600 + actor.wanderRange * 18;
       }
@@ -5710,7 +5717,9 @@ function updateLocalCompanions(dt) {
       now < actor.socialUntil ? 2.25 : 0.72
     );
     sprite.x = motion.x;
-    const ground = resolveGround(sprite.x, sprite.y);
+    // Companions use their own ground rule, not the player's vertical velocity:
+    // gentle rises only, otherwise drop to the platform beneath.
+    const ground = groundBeneath(streetPlatforms, sprite.x, sprite.y)?.y ?? GROUND_Y;
     sprite.y += (ground - sprite.y) * Math.min(1, 0.32 * dt);
     if (Math.abs(motion.vx) > 0.05) {
       body.facing = facingFromVelocity(motion.vx, body.facing || 'right');
