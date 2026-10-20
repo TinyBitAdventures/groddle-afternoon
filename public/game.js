@@ -6144,6 +6144,35 @@ const engine = {
   get worldW() {
     return WORLD_W;
   },
+  get population() {
+    return currentStreetPopulation;
+  },
+  get toolState() {
+    return toolState;
+  },
+  get learnedSkills() {
+    return skillState.learned || [];
+  },
+  get unlockedAchievements() {
+    return achieveState.unlocked || [];
+  },
+  get platforms() {
+    return streetPlatforms;
+  },
+  /** Planner points for a group a feature requested via placementGroups(). */
+  placement(key) {
+    return currentStreetPlacement?.groups?.[key] || [];
+  },
+  /** Persistent per-street object owned by one feature (saved with the world). */
+  streetSlot(featureId, tsid = currentStreetTsid) {
+    const street = streetWorldState(tsid);
+    street.features ||= {};
+    street.features[featureId] ||= {};
+    return street.features[featureId];
+  },
+  floatText: (x, y, text, color) => floatText(x, y, text, color),
+  /** updateHud re-renders both pack rows. */
+  refreshPack: () => updateHud(),
   register,
   unregister: unregisterTarget,
   toast,
@@ -16512,6 +16541,7 @@ async function enterStreet(tsid, opts = {}) {
       { key: 'apples', count: currentStreetPopulation.apples, clearance: 30 },
       { key: 'musicblocks', count: currentStreetPopulation.musicblocks, clearance: 45 },
       { key: 'quoins', count: currentStreetPopulation.quoins, clearance: 28 },
+      ...features.collect('placementGroups', currentStreetPopulation, data, engine),
     ],
     { worldW: WORLD_W, seed: data.tsid, reserved }
   );

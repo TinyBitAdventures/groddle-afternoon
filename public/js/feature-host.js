@@ -19,6 +19,8 @@
  *   travelGate(tsid, engine)              // -> { ok:false, msg } blocks map travel
  *   enterGate(tsid, engine)               // -> { tsid, spawnX, spawnY } redirects an enter
  *   labelFor(tsid)                        // -> { street, hub, hubId } public street name
+ *   placementGroups(population, street)   // -> [{ key, count, clearance }] extra planner groups;
+ *                                         //    read the points with engine.placement(key)
  *   allowZeroEnergyMovement(engine)       // -> true lets the avatar walk at 0 energy
  *   reloadLocation(saved, engine)         // -> { tsid, x, y } overrides the saved start
  *   metabolicGate(stat, direction, engine)// -> { ok:false, msg } blocks a gain/loss
@@ -108,6 +110,16 @@ export function createFeatureHost(features = []) {
     },
     enterGate(tsid, engine) {
       return first('enterGate', tsid, engine);
+    },
+    /** Concatenated array answers from every feature implementing `hook`. */
+    collect(hook, ...args) {
+      const out = [];
+      for (const feature of list) {
+        if (typeof feature[hook] !== 'function') continue;
+        const rows = feature[hook](...args);
+        if (Array.isArray(rows)) out.push(...rows);
+      }
+      return out;
     },
     /** First non-null answer from any feature implementing `hook`. */
     query(hook, ...args) {

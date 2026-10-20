@@ -251,6 +251,7 @@ function normalizeStreetSnapshot(seed = {}) {
     rocks,
     collectedApples: cleanIndexArray(seed?.collectedApples),
     collectedQuoins: cleanIndexArray(seed?.collectedQuoins),
+    features: normalizeFeatureSlices(seed?.features),
   };
 }
 
