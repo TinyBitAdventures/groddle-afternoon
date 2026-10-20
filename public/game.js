@@ -6328,6 +6328,7 @@ const engine = {
   travelGate: (tsid) => features.travelGate(tsid, engine),
   /** Every feature's metabolic gate, e.g. the dead gain no energy. */
   metabolicGate: (stat, direction) => features.metabolicGate(stat, direction, engine),
+  openMap: (hubId) => openMap(hubId),
   closeMap: () => closeMap(),
   /** QA routes: learn a skill outright (prerequisites skipped). */
   grantSkill: (classTsid) => grantSkill(skillState, classTsid, true),
