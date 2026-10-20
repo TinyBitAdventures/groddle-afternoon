@@ -1880,6 +1880,11 @@ export const rookAttackFeature = {
   },
 
   /** Rooked targets and shrines under attack offer only the rook verbs. */
+  /** No Magic Rock offers over a Rook attack on this street. */
+  holdQuestOffers(engine) {
+    return here(engine) ? true : null;
+  },
+
   verbOverride(target, engine) {
     if (!target || target.featureId === ROOK_FEATURE_ID) return null;
     if (isRookableClass(target.classId)) {

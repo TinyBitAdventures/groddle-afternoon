@@ -6330,6 +6330,8 @@ const engine = {
   /** A verb in progress or the verb menu open (both interrupt meditation). */
   acting: () => Boolean(currentAction || menuTarget),
   questDialogueOpen: () => isQuestDialogueOpen(),
+  /** True while a feature holds the Magic Rock quiet (rook attack, Naraka, meditation). */
+  questOffersHeld: () => features.query('holdQuestOffers', engine) === true,
   /** A quest offer: the recovered beats, then accept / decline. */
   offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline }) {
     openScriptedQuestDialogue({

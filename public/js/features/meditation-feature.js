@@ -465,6 +465,11 @@ export const meditationFeature = {
     publish(engine, true);
   },
 
+  /** A quest offer would break the meditation; wait until it ends. */
+  holdQuestOffers() {
+    return session ? true : null;
+  },
+
   /** Teleporting or walking off the street interrupts, like any other action. */
   onStreetClear(engine) {
     if (session) end(engine || engineRef, 'street');

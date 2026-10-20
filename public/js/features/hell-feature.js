@@ -300,6 +300,11 @@ export const hellFeature = {
     return gate.allowed ? null : { ok: false, msg: gate.text };
   },
 
+  /** The Magic Rock leaves the dead alone. */
+  holdQuestOffers() {
+    return state.isDead ? true : null;
+  },
+
   /** The dead walk Naraka with zero energy. */
   allowZeroEnergyMovement() {
     return state.isDead ? true : null;

@@ -40,4 +40,25 @@ test.describe('integration playtest regressions', () => {
     assert.match(css, /\.glitch-modal-card \{[^}]*max-height: min\(78vh, 640px, calc\(100% - 12px\)\)/);
     assert.match(css, /\.home-card,\n\.mail-card \{[^}]*width: min\(920px, 100%\)/);
   });
+
+  test('the Magic Rock waits out rook attacks, Naraka and meditation', async () => {
+    const { createFeatureHost } = await import('../public/js/feature-host.js');
+    const { rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js');
+    const { hellFeature } = await import('../public/js/features/hell-feature.js');
+    const { createRookAttack } = await import('../public/js/rook-attack.js');
+    const host = createFeatureHost([rookAttackFeature, hellFeature]);
+    rookAttackFeature.restore({ active: createRookAttack({ tsid: 'L1', now: Date.now() }) });
+    assert.equal(host.query('holdQuestOffers', { streetTsid: 'L1' }), true);
+    assert.equal(host.query('holdQuestOffers', { streetTsid: 'L2' }), null);
+    rookAttackFeature.restore(undefined);
+    hellFeature.restore({ isDead: true });
+    assert.equal(host.query('holdQuestOffers', { streetTsid: 'L1' }), true);
+    hellFeature.restore(undefined);
+    assert.equal(host.query('holdQuestOffers', { streetTsid: 'L1' }), null);
+    const offers = fs.readFileSync(path.join(root, 'public/js/features/quest-offers-feature.js'), 'utf8');
+    assert.match(offers, /engine\.busy\(\) \|\| engine\.questOffersHeld\?\.\(\)/);
+    assert.match(game, /questOffersHeld: \(\) => features\.query\('holdQuestOffers', engine\) === true/);
+    const meditation = fs.readFileSync(path.join(root, 'public/js/features/meditation-feature.js'), 'utf8');
+    assert.match(meditation, /holdQuestOffers\(\) \{\n    return session \? true : null;/);
+  });
 });

@@ -79,7 +79,7 @@ function finish(rows, engine) {
 }
 
 function presentOffer(engine, now = Date.now()) {
-  if (offerOpen || engine.busy()) return false;
+  if (offerOpen || engine.busy() || engine.questOffersHeld?.()) return false;
   const qs = engine.questState;
   const card = nextQuestOffer(qs, engine.pc, questContext(engine, now));
   if (!card || card.waiting) {
