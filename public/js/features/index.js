@@ -11,6 +11,7 @@ import { questOffersFeature } from './quest-offers-feature.js?v=offers-1';
 import { racesFeature } from './races-feature.js?v=races-1';
 import { patchesFeature } from './patches-feature.js?v=patches-1';
 import { foxesFeature } from './foxes-feature.js?v=foxes-1';
+import { heliKittiesFeature } from './heli-kitties-feature.js?v=kitties-1';
 
 export { questFlagsFeature };
 
@@ -22,4 +23,5 @@ export const FEATURES = [
   racesFeature,
   patchesFeature,
   foxesFeature,
+  heliKittiesFeature,
 ];
