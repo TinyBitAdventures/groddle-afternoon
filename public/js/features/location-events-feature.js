@@ -177,7 +177,10 @@ function applyEffects(engine, effects, now) {
         break;
       case 'sound': {
         if (fx.stop) break;
-        const url = soundUrl(fx.name);
+        // The sound-key catalog plays recovered files or synth stand-ins;
+        // fall back to a recorded url when the catalog does not know the key.
+        const played = typeof engine.playSound === 'function' ? engine.playSound(fx.name, { volume: 0.6 }) : null;
+        const url = played ? null : soundUrl(fx.name);
         if (url) engine.playCue(url, { volume: 0.5 });
         break;
       }
