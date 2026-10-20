@@ -6338,6 +6338,10 @@ const engine = {
   get platforms() {
     return streetPlatforms;
   },
+  /** Street deco sprites by XML deco id (street-render decoViews), for location events. */
+  get decoViews() {
+    return bgLayer?.decoViews || null;
+  },
   /** Every registered interactable on the current street (read only). */
   get interactables() {
     return interactables;
@@ -7663,12 +7667,66 @@ function performPlayerJump(result, baseVelocity, now) {
   updateHud();
 }
 
+/*
+ * Per-street physics (js/features/location-events-feature.js): the host's
+ * optional extras with neutral defaults, and the few movement rules they
+ * change. Source: AvatarPhysicsHandler.as (vy capped at vy_max, x2 upward;
+ * friction_air drag; jetpack pushes on every airborne jump press, half force
+ * while rising; multiplier_3_jump scales the triple-jump boost).
+ */
+/** normal vy_max (670 px/s) in the remake's px/frame, against its -9.6 = 570 px/s jump. */
+const STREET_PHYSICS_TERMINAL_VY = (9.6 * 670) / 570;
+
+function streetPhysicsExtras(extra) {
+  return {
+    vyMax: Number.isFinite(extra.vyMax) && extra.vyMax > 0 ? extra.vyMax : null,
+    accel: extra.accel ?? 1,
+    airAccel: extra.airAccel ?? 1,
+    friction: extra.friction ?? 1,
+    airDrag: extra.airDrag > 0 ? extra.airDrag : 0,
+    jetpack: extra.jetpack === true,
+    tripleJump: extra.tripleJump ?? 1,
+  };
+}
+
+/** Coasting decay per frame: ground friction scales the 0.78 rule; drag rules the air. */
+function streetPhysicsCoastDecay(buff) {
+  if (!player?.onGround && buff.airDrag > 0) return Math.max(0, 1 - buff.airDrag / 60);
+  if (player?.onGround && buff.friction !== 1) return 0.78 ** Math.max(0.05, buff.friction);
+  return 0.78;
+}
+
+/** An airborne jump press on a jetpack street (swimming): a stroke, half force while rising. */
+function streetPhysicsJetpackStroke(buff, jumpVelocity, now) {
+  if (!buff.jetpack || player.onGround || !hasQueuedJump(jumpState, now)) return false;
+  clearJumpQueue(jumpState);
+  player.vy = player.vy < 0 ? jumpVelocity / 2 : jumpVelocity;
+  pc.energy = clamp(pc.energy - 0.4, 0, 100);
+  return true;
+}
+
+/** Street multiplier_3_jump on a resolved triple jump (0 disables it upstream). */
+function streetPhysicsTripleJump(buff, result) {
+  if (result?.triple && buff.tripleJump !== 1) result.multiplier = 1 + (result.multiplier - 1) * buff.tripleJump;
+  return result;
+}
+
+/** Air drag and the vy_max cap, only on streets/events that set them. */
+function streetPhysicsFreeFall(buff, dt) {
+  if (buff.airDrag > 0 && !player.onGround) player.vy *= Math.max(0, 1 - (buff.airDrag * dt) / 60);
+  if (buff.vyMax) {
+    const cap = STREET_PHYSICS_TERMINAL_VY * buff.vyMax;
+    player.vy = clamp(player.vy, -(buff.gravity < 0 ? cap : cap * 2), cap);
+  }
+}
+
 /** Buff physics with feature multipliers (e.g. Pooped) folded in. */
 function combinedPhysics() {
   const base = buffPhysics(buffState, Date.now());
   const extra = features.physics(engine);
   return {
     ...base,
+    ...streetPhysicsExtras(extra),
     speed: base.speed * extra.speed,
     jump: base.jump * extra.jump,
     gravity: (base.gravity ?? 1) * extra.gravity,
@@ -7774,7 +7832,7 @@ function handleInput() {
     }
   }
 
-  const accel = 0.58;
+  const accel = 0.58 * (player.onGround ? movementBuff.accel : movementBuff.airAccel);
   const max = 4.4 * movementBuff.speed;
   const jumpVelocity = -9.6 * movementBuff.jump;
   if (left) {
@@ -7787,7 +7845,7 @@ function handleInput() {
       ? companionFollowVelocity(player.x, followee.sprite.x, player.vx, { maxSpeed: max })
       : player.vx * 0.78;
   } else {
-    player.vx *= 0.78;
+    player.vx *= streetPhysicsCoastDecay(movementBuff);
     if (Math.abs(player.vx) < 0.05) player.vx = 0;
   }
   applyPlayerFacing();
@@ -7799,12 +7857,14 @@ function handleInput() {
   const jumpResult = resolveQueuedJump(jumpState, {
     now,
     grounded: player.onGround,
-    upgrades: pc.imaginationUpgrades,
+    upgrades: movementBuff.tripleJump > 0 ? pc.imaginationUpgrades : [],
     velocityX: player.vx,
     maxVelocityX: max,
   });
   if (jumpResult.ok) {
-    performPlayerJump(jumpResult, jumpVelocity, now);
+    performPlayerJump(streetPhysicsTripleJump(movementBuff, jumpResult), jumpVelocity, now);
+  } else {
+    streetPhysicsJetpackStroke(movementBuff, jumpVelocity, now);
   }
   // Walk cycle whenever moving horizontally (don't require onGround —
   // slope/platform frames often flicker onGround and were freezing anim at frame 0)
@@ -7838,6 +7898,7 @@ function physics(dt) {
   } else {
     const movementBuff = combinedPhysics();
     player.vy += 0.42 * movementBuff.gravity * dt;
+    streetPhysicsFreeFall(movementBuff, dt);
     const prevX = player.x;
     player.x += player.vx * dt;
     player.y += player.vy * dt;

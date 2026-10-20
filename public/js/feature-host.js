@@ -25,7 +25,10 @@
  *   allowZeroEnergyMovement(engine)       // -> true lets the avatar walk at 0 energy
  *   reloadLocation(saved, engine)         // -> { tsid, x, y } overrides the saved start
  *   metabolicGate(stat, direction, engine)// -> { ok:false, msg } blocks a gain/loss
- *   physics(engine)                       // -> { speed, jump, gravity } multipliers
+ *   physics(engine)                       // -> { speed, jump, gravity } multipliers, plus optional
+ *                                         //    vyMax (terminal-speed multiplier, min wins), accel,
+ *                                         //    airAccel, friction, tripleJump (multiply), airDrag
+ *                                         //    (per second, max wins), jetpack (any true)
  *   packVerbs(classTsid, engine)          // -> [{ id, label, enabled, reason, tooltip, primary }]
  *                                         //    extra buttons on that item's pack popover
  *   runPackVerb(classTsid, verbId, engine)// -> true when handled
@@ -143,17 +146,19 @@ export function createFeatureHost(features = []) {
       return { ok: true };
     },
     physics(engine) {
-      let speed = 1;
-      let jump = 1;
-      let gravity = 1;
+      const out = { speed: 1, jump: 1, gravity: 1 };
+      // Street-physics extras (location-events) appear only when a feature sets them.
       for (const feature of list) {
         if (typeof feature.physics !== 'function') continue;
         const p = feature.physics(engine) || {};
-        if (Number.isFinite(p.speed)) speed *= p.speed;
-        if (Number.isFinite(p.jump)) jump *= p.jump;
-        if (Number.isFinite(p.gravity)) gravity *= p.gravity;
+        for (const key of ['speed', 'jump', 'gravity', 'accel', 'airAccel', 'friction', 'tripleJump']) {
+          if (Number.isFinite(p[key])) out[key] = (out[key] ?? 1) * p[key];
+        }
+        if (Number.isFinite(p.vyMax) && p.vyMax > 0) out.vyMax = out.vyMax == null ? p.vyMax : Math.min(out.vyMax, p.vyMax);
+        if (Number.isFinite(p.airDrag) && p.airDrag > 0) out.airDrag = Math.max(out.airDrag || 0, p.airDrag);
+        if (p.jetpack === true) out.jetpack = true;
       }
-      return { speed, jump, gravity };
+      return out;
     },
     /** Pack popover verbs every feature offers for one item class. */
     packVerbs(classTsid, engine) {
