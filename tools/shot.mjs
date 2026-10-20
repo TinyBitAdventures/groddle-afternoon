@@ -14,6 +14,9 @@ page.on('console', (m) => {
   if (/GL Driver Message|AudioContext was not allowed/.test(m.text())) return;
   if (['error', 'warning'].includes(m.type())) logs.push(`${m.type()}: ${m.text()}`);
 });
+page.on('response', (r) => {
+  if (r.status() >= 400) logs.push(`http ${r.status()}: ${r.url().replace(/^https:\/\/groddle\.localhost\//, '')}`);
+});
 page.on('pageerror', (e) => logs.push(`pageerror: ${e.message} @ ${String(e.stack || '').split('\n').slice(1, 4).join(' | ')}`));
 // INIT='js' runs before page scripts (e.g. feature switches for perf checks).
 if (process.env.INIT) await page.addInitScript(process.env.INIT);

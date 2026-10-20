@@ -723,7 +723,7 @@ async function goVisit(engine, opts = {}) {
   const scene = {
     tsid: neighbourSceneTsid(neighbour.id),
     label: homeStreetLabel(neighbour),
-    hubName: 'Home Street',
+    hubName: 'Neighbourhood',
     width: NEIGHBOUR_SCENE.width,
     height: NEIGHBOUR_SCENE.height,
     background: buildNeighbourBackground(engine.PIXI, neighbour),
@@ -745,7 +745,7 @@ async function goVisit(engine, opts = {}) {
       fromLabel: engine.street?.label || '',
       fromHub: engine.street?.hubName || '',
       toLabel: homeStreetLabel(neighbour),
-      toHub: 'Home Street',
+      toHub: 'Neighbourhood',
       topColor: top,
       bottomColor: bottom,
       onMid: setup,
