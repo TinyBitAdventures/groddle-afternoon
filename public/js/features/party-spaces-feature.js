@@ -20,8 +20,10 @@
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&partydemo=<theme>
  * (moon|mazzala|rainbow|pitchen|nylon|val_holla|aquarius|glitchmas) enters
  * the space directly; add &partyautoplay=1 for the full loop from the pack
- * (activate, portal, pick up, ATM extend, guest, booster, signpost home) or
- * =hold to stop inside after the activities. &partytaster=1 uses the taster
+ * (activate, portal, pick up, ATM extend, guest, booster, Leave party) or
+ * =hold to stop inside after the activities, =instructions to stop on the
+ * first-use instructions, =portal to stop beside the open teleporter, =atm
+ * to stop on the Party ATM's offer. &partytaster=1 uses the taster
  * pack; &partyexpire=<seconds> shortens the clock after entry.
  * Canvas data: partyStatus, partyTemplate, partyRemaining, partyInside,
  * partyReturn, partyStacks, partyAtm, partyGuests, partyPhysics, partyBoost,
@@ -182,6 +184,7 @@ const STYLE = `
 .party-hud button { border: 0; border-radius: 999px; padding: 4px 10px; font: inherit; font-size: .78rem; cursor: pointer;
   color: #fff; background: #7a4bd6; }
 .party-modal-options { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.party-modal-scroll { max-height: min(210px, 34vh); overflow-y: auto; margin: 0 0 6px; padding-right: 4px; }
 .party-modal-list { text-align: left; font-size: .86rem; line-height: 1.35; margin: 0 0 8px; padding-left: 1.1em; }
 .party-modal-list li { margin: 0 0 6px; }
 .party-modal-small { text-align: left; font-size: .72rem; line-height: 1.3; color: #6b5a3a; margin: 0 0 10px; }
@@ -234,10 +237,10 @@ function ensureModal() {
   const node = el('div', { id: 'party-modal', class: 'quest-dialogue glitch-modal', hidden: true, role: 'dialog', 'aria-modal': 'true' }, `
     <div class="quest-dialogue-shade"></div>
     <div class="quest-dialogue-card" style="background:linear-gradient(160deg,#fffdf4,#f3ead2);box-shadow:0 22px 70px rgba(0,0,0,.42),inset 0 0 0 1px #d9c48f">
-      <img data-party-modal-art alt="" style="height:76px;margin:-4px auto 2px;display:block" />
+      <img data-party-modal-art alt="" style="height:56px;margin:-4px auto 2px;display:block" />
       <p class="mr-kicker" data-party-modal-kicker></p>
       <div data-party-modal-body></div>
-      <p data-party-modal-copy class="quest-dialogue-copy"></p>
+      <p data-party-modal-copy class="quest-dialogue-copy" style="min-height:0;margin-bottom:.7rem"></p>
       <div data-party-modal-buttons class="party-modal-options"></div>
     </div>`);
   host.appendChild(node);
@@ -322,8 +325,8 @@ function activationBlock(engine, classTsid) {
 }
 
 function instructionsBody() {
-  return `<ol class="party-modal-list">${PARTY_TEXT.instructions.map((line) => `<li>${line.replace(/^\d+\.\s*/, '')}</li>`).join('')}</ol>
-    <p class="party-modal-small">SMALL PRINT:<br>${PARTY_TEXT.smallPrint.join('<br>')}</p>`;
+  return `<div class="party-modal-scroll"><ol class="party-modal-list">${PARTY_TEXT.instructions.map((line) => `<li>${line.replace(/^\d+\.\s*/, '')}</li>`).join('')}</ol>
+    <p class="party-modal-small">SMALL PRINT:<br>${PARTY_TEXT.smallPrint.join('<br>')}</p></div>`;
 }
 
 function activatePack(engine, classTsid, { skipInstructions = false } = {}) {
@@ -593,8 +596,12 @@ function setupSpace(street, engine) {
   const points = [...engine.placement('partySpots')]
     .sort((a, b) => Math.hypot(a.x - arrive.x, a.y - arrive.y) - Math.hypot(b.x - arrive.x, b.y - arrive.y));
   const take = () => points.shift() || { x: arrive.x + (Math.random() - 0.5) * 300, y: arrive.y };
-  spawnAtm(engine, take());
-  const guestPoints = [take(), take(), take()];
+  // The ATM and the dancing friends greet you on the arrival floor (the
+  // source marker_teleport spots are lost); the planner places the rest.
+  const dir = arrive.x < (s.bounds.r - s.bounds.l) / 2 ? 1 : -1;
+  const near = (dx) => groundNear(engine, arrive.x + dir * dx, arrive.y);
+  spawnAtm(engine, near(210) || take());
+  const guestPoints = [near(340) || take(), near(420) || take(), near(500) || take()];
   if (s.event) {
     const far = points.length > 3 ? points.splice(Math.floor(points.length / 3), 1)[0] : take();
     spawnBooster(engine, far);
@@ -611,6 +618,22 @@ function setupSpace(street, engine) {
     p.warned = false;
   }
   void PIXI;
+}
+
+/** A walkable floor point at x within reach of y (screen space), or null. */
+function groundNear(engine, x, y) {
+  let best = null;
+  for (const p of engine.platforms || []) {
+    if (Number(p.pc_perm) === 0 || p.hidden) continue;
+    const lo = Math.min(p.x1, p.x2) + 20;
+    const hi = Math.max(p.x1, p.x2) - 20;
+    if (x < lo || x > hi) continue;
+    const t = p.x2 === p.x1 ? 0 : (x - p.x1) / (p.x2 - p.x1);
+    const py = p.y1 + t * (p.y2 - p.y1);
+    if (py < y - 90 || py > y + 120) continue;
+    if (!best || Math.abs(py - y) < Math.abs(best.y - y)) best = { x, y: py };
+  }
+  return best;
 }
 
 function spawnAtm(engine, point) {
@@ -995,6 +1018,11 @@ function stepDemo(engine, now) {
   switch (demo.stage) {
     case 'activate':
       activatePack(engine, demo.classTsid);
+      if (demo.mode === 'instructions') {
+        demo.at = 0;
+        demo.stage = 'instructions-hold';
+        return undefined;
+      }
       return set('instructions', 900);
     case 'instructions':
       modal?.el.querySelector('[data-party-choice="go"]')?.click();
@@ -1002,6 +1030,11 @@ function stepDemo(engine, now) {
     case 'portal': {
       const tp = party()?.teleporter;
       if (!tp || teleporterPhase(tp, now) !== 'portal') return set('portal', 400);
+      if (demo.mode === 'portal') {
+        demo.at = 0;
+        demo.stage = 'portal-hold';
+        return undefined;
+      }
       engine.player.x = tp.x;
       engine.player.y = tp.y;
       return set('entering', 1500);
@@ -1020,6 +1053,11 @@ function stepDemo(engine, now) {
     case 'atm':
       engine.player.x = atm.sprite.x + 40;
       openAtm(engine);
+      if (demo.mode === 'atm') {
+        demo.at = 0;
+        demo.stage = 'atm-hold';
+        return undefined;
+      }
       return set('extend', 1200);
     case 'extend': {
       const first = partyExtendOptions(party())[0];
