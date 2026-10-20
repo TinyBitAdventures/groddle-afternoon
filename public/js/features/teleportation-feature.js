@@ -49,6 +49,7 @@ import {
   reconcileScripts,
   rollTeleportDay,
   scriptLabel,
+  scriptTitle,
   setTarget,
   teleportEnergyCost,
   teleportRank,
@@ -575,6 +576,29 @@ export const teleportationFeature = {
       return true;
     }
     return false;
+  },
+
+  /**
+   * Hand the player an imbued script to `destination` ({ tsid, x, y, label,
+   * hubName }), e.g. street project rewards (players/inc_jobs.js
+   * jobs_familiar_job_complete_do). Imbued scripts need no skill or energy.
+   */
+  grantScript(engine, destination) {
+    if (!destination?.tsid) return null;
+    const s = normalizeTeleportState(state);
+    const script = {
+      id: `tps${s.nextScriptId}`,
+      destination,
+      imbued: true,
+      title: scriptTitle(destination),
+      createdAt: Date.now(),
+    };
+    s.nextScriptId += 1;
+    s.scripts.push(script);
+    state = normalizeTeleportState(s);
+    addItem(engine.inv, SCRIPT_CLASS, 1);
+    publish(engine);
+    return script;
   },
 
   /** QA / tests. */

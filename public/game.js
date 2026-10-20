@@ -6388,6 +6388,8 @@ const engine = {
   },
   /** The persistent per-street world slot (gardens, trees, rocks). */
   streetWorld: (tsid) => streetWorldState(tsid),
+  /** TSIDs of every street this save has entered (the persistent world keys). */
+  visitedStreets: () => Object.keys(persistentWorldState.streets || {}),
   /** A garden bed through the street garden path ({ x, y, gardenType, cols, rows, label, garden, detached }). */
   spawnGarden: (opts) => spawnGarden(opts),
   /** One mineable rock that keeps its state in the street's rock slot `index`. */
