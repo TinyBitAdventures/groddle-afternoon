@@ -15,6 +15,8 @@ page.on('console', (m) => {
   if (['error', 'warning'].includes(m.type())) logs.push(`${m.type()}: ${m.text()}`);
 });
 page.on('pageerror', (e) => logs.push(`pageerror: ${e.message}`));
+// INIT='js' runs before page scripts (e.g. feature switches for perf checks).
+if (process.env.INIT) await page.addInitScript(process.env.INIT);
 await page.goto(url, { waitUntil: 'load' });
 await page.waitForTimeout(Number(waitArg));
 for (const a of JSON.parse(actionsArg)) {

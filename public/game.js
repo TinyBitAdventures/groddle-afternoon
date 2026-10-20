@@ -513,7 +513,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=greedy-story-2';
+} from './js/street-render.js?v=parallax-1';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -21396,6 +21396,7 @@ async function main() {
     updateIlmenskieAutoplay();
     updateSpinningWheel();
     features.tick((1000 / 60) * dt, Date.now(), engine);
+    bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H);
 
     buffTickAccum += dt;
     if (buffTickAccum >= 24) {

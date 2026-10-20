@@ -321,6 +321,189 @@ export async function loadDecoManifest() {
   return decoManifest;
 }
 
+// —— Glitch layer colour treatment (client ColorMatrix.as, default path) ——
+const LUM_R = 0.212671;
+const LUM_G = 0.71516;
+const LUM_B = 0.072169;
+const IDENTITY = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+const DELTA_INDEX = [
+  0, 0.01, 0.02, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.11,
+  0.12, 0.14, 0.15, 0.16, 0.17, 0.18, 0.2, 0.21, 0.22, 0.24,
+  0.25, 0.27, 0.28, 0.3, 0.32, 0.34, 0.36, 0.38, 0.4, 0.42,
+  0.44, 0.46, 0.48, 0.5, 0.53, 0.56, 0.59, 0.62, 0.65, 0.68,
+  0.71, 0.74, 0.77, 0.8, 0.83, 0.86, 0.89, 0.92, 0.95, 0.98,
+  1.0, 1.06, 1.12, 1.18, 1.24, 1.3, 1.36, 1.42, 1.48, 1.54,
+  1.6, 1.66, 1.72, 1.78, 1.84, 1.9, 1.96, 2.0, 2.12, 2.25,
+  2.37, 2.5, 2.62, 2.75, 2.87, 3.0, 3.2, 3.4, 3.6, 3.8,
+  4.0, 4.3, 4.7, 4.9, 5.0, 5.5, 6.0, 6.5, 6.8, 7.0,
+  7.3, 7.5, 7.8, 8.0, 8.4, 8.7, 9.0, 9.4, 9.6, 9.8,
+  10.0,
+];
+
+function clampValue(min, max, value) {
+  return Math.max(min, Math.min(max, value));
+}
+
+/** Flash-style 4x5 matrix multiply: other applied after current. */
+function multiplyMatrix(current, other) {
+  const out = new Array(20);
+  let i = 0;
+  for (let y = 0; y < 4; y += 1) {
+    for (let x = 0; x < 5; x += 1) {
+      out[i + x] =
+        other[i] * current[x] +
+        other[i + 1] * current[x + 5] +
+        other[i + 2] * current[x + 10] +
+        other[i + 3] * current[x + 15] +
+        (x === 4 ? other[i + 4] : 0);
+    }
+    i += 5;
+  }
+  return out;
+}
+
+/**
+ * The client's layer matrix: contrast, brightness, saturation, then tint, with
+ * offsets in Flash's 0-255 units. Faithfully keeps the tint's shifted blue row
+ * (an AS3 comma expression in ColorMatrix.tint), which shaped the original look.
+ * @param {{ brightness?: number, contrast?: number, saturation?: number, tintColor?: number, tintAmount?: number }} f
+ * @returns {number[]|null}
+ */
+export function glitchLayerMatrix(f = {}) {
+  const brightness = Number(f.brightness) || 0;
+  const contrast = Number(f.contrast) || 0;
+  const saturation = Number(f.saturation) || 0;
+  const tintAmount = Number(f.tintAmount) || 0;
+  const tintColor = Number(f.tintColor) || 0;
+  if (!brightness && !contrast && !saturation && !tintAmount) return null;
+  let m = IDENTITY.slice();
+  if (contrast) {
+    const c = clampValue(-100, 100, contrast);
+    let x;
+    if (c < 0) {
+      x = 127 + (c / 100) * 127;
+    } else {
+      const frac = c % 1;
+      const whole = Math.floor(c);
+      x = frac === 0
+        ? DELTA_INDEX[whole]
+        : DELTA_INDEX[whole] * (1 - frac) + DELTA_INDEX[whole + 1] * frac;
+      x = x * 127 + 127;
+    }
+    const op = IDENTITY.slice();
+    op[0] = op[6] = op[12] = x / 127;
+    op[4] = op[9] = op[14] = 0.5 * (127 - x);
+    m = multiplyMatrix(m, op);
+  }
+  if (brightness) {
+    const b = clampValue(-100, 100, brightness);
+    const op = IDENTITY.slice();
+    op[4] = op[9] = op[14] = b;
+    m = multiplyMatrix(m, op);
+  }
+  if (saturation) {
+    const sv = clampValue(-100, 100, saturation);
+    const x = 1 + (sv > 0 ? (3 * sv) / 100 : sv / 100);
+    const op = IDENTITY.slice();
+    op[0] = LUM_R * (1 - x) + x; op[1] = LUM_G * (1 - x); op[2] = LUM_B * (1 - x);
+    op[5] = LUM_R * (1 - x); op[6] = LUM_G * (1 - x) + x; op[7] = LUM_B * (1 - x);
+    op[10] = LUM_R * (1 - x); op[11] = LUM_G * (1 - x); op[12] = LUM_B * (1 - x) + x;
+    m = multiplyMatrix(m, op);
+  }
+  if (tintAmount) {
+    const a = clampValue(0, 100, tintAmount) / 100;
+    const r = ((tintColor >> 16) & 0xff) / 255;
+    const g = ((tintColor >> 8) & 0xff) / 255;
+    const b = (tintColor & 0xff) / 255;
+    const inv = 1 - a;
+    const op = IDENTITY.slice();
+    op[0] = inv + a * r * LUM_R; op[1] = a * r * LUM_G; op[2] = a * r * LUM_B;
+    op[5] = a * g * LUM_R; op[6] = inv + a * g * LUM_G; op[7] = a * g * LUM_B;
+    // Source: `methodArray[10] = amount*b*lumR,amount*b*lumG;` then [11], [12]=0.
+    op[10] = a * b * LUM_R; op[11] = inv + a * b * LUM_B; op[12] = 0;
+    m = multiplyMatrix(m, op);
+  }
+  // Pixi's ColorMatrixFilter takes offsets in normalized 0-1 units.
+  m[4] /= 255; m[9] /= 255; m[14] /= 255; m[19] /= 255;
+  return m;
+}
+
+function colourFilter(PIXI, filters) {
+  const matrix = filters ? glitchLayerMatrix(filters) : null;
+  if (!matrix) return null;
+  const cm = new PIXI.ColorMatrixFilter();
+  cm.matrix = matrix;
+  return cm;
+}
+
+/** Resolution of the one-time bitmap a blurred layer is baked into. */
+const BLURRED_LAYER_RESOLUTION = 0.5;
+
+/**
+ * Blurred layers are static, so bake colour + blur into one half-resolution
+ * bitmap once every deco texture has loaded, instead of re-blurring a
+ * street-wide layer every frame. Flash's BlurFilter(blur, blur, LOW) is one
+ * box pass; a light two-pass Pixi blur at half strength matches it.
+ */
+function bakeBlurredLayer(PIXI, lc, blur, colour) {
+  const bases = new Set();
+  for (const child of lc.children) {
+    const base = child.texture?.baseTexture;
+    if (base && !base.valid) bases.add(base);
+  }
+  const bake = () => {
+    if (lc.destroyed) return;
+    lc.filters = [...(colour ? [colour] : []), new PIXI.BlurFilter(blur * 0.5, 2)];
+    lc.cacheAsBitmapResolution = BLURRED_LAYER_RESOLUTION;
+    lc.cacheAsBitmap = true;
+  };
+  if (!bases.size) {
+    bake();
+    return;
+  }
+  let pending = bases.size;
+  const done = () => {
+    pending -= 1;
+    if (pending === 0) bake();
+  };
+  for (const base of bases) {
+    base.once('loaded', done);
+    base.once('error', done);
+  }
+}
+
+/** Vertical sky gradient texture from the location's top/bottom colours. */
+function gradientTexture(PIXI, top, bottom) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 256);
+  grad.addColorStop(0, `#${top}`);
+  grad.addColorStop(1, `#${bottom}`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 2, 256);
+  return PIXI.Texture.from(canvas);
+}
+
+/**
+ * Parallax offset for a non-middleground layer (client LocationRenderer
+ * recomputeParallax): the layer slides from its left/top edge to its
+ * right/bottom edge as the camera crosses the street.
+ */
+export function parallaxLayerOffset(layer, camX, camY, vpW, vpH, streetW, streetH) {
+  const maxX = streetW - vpW;
+  const maxY = streetH - vpH;
+  const rectX = clampValue(0, Math.max(0, maxX), camX);
+  const rectY = clampValue(0, Math.max(0, maxY), camY);
+  const percX = maxX > 0 ? rectX / maxX : 1;
+  const percY = maxY > 0 ? rectY / maxY : 1;
+  return {
+    x: camX + Math.floor(percX * (vpW - layer.w)),
+    y: camY + Math.floor(percY * (vpH - layer.h)),
+  };
+}
+
 function makePlaceholder(PIXI, deco, pos) {
   const g = new PIXI.Graphics();
   const w = deco.w || 48;
@@ -360,6 +543,15 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const cameraBottomPadding = Math.max(0, Number(opts.cameraBottomPadding) || 0);
   const H = Math.ceil(Math.max(sourceH, deepestPlatformY + cameraBottomPadding));
 
+  // The location's own sky gradient, fixed to the viewport (positioned by
+  // updateParallax). Streets without one keep the painted fallback below.
+  let skyView = null;
+  if (street.gradient?.top && street.gradient?.bottom) {
+    skyView = new PIXI.Sprite(gradientTexture(PIXI, street.gradient.top, street.gradient.bottom));
+    skyView.zIndex = -1100;
+    root.addChild(skyView);
+  }
+
   // Sky / depth backdrop (not solid ground strip alone)
   const sky = new PIXI.Graphics();
   const themeTop = 0x8eb8d8;
@@ -373,7 +565,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
   sky.drawRect(0, sourceH * 0.7, W, Math.max(sourceH * 0.35, H - sourceH * 0.7));
   sky.endFill();
   sky.zIndex = -1000;
-  root.addChild(sky);
+  if (!skyView) root.addChild(sky);
 
   // Soft horizon clouds
   const clouds = new PIXI.Graphics();
@@ -386,7 +578,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
     clouds.endFill();
   }
   clouds.zIndex = -900;
-  root.addChild(clouds);
+  if (!skyView) root.addChild(clouds);
 
   const layerContainers = [];
   const decoViews = new Map();
@@ -399,6 +591,12 @@ export function buildStreetView(street, PIXI, opts = {}) {
     lc.sortableChildren = true;
     lc.zIndex = (layer.z ?? li) * 10;
     lc.label = layer.id;
+    // Every layer except the middleground is its own parallax canvas whose
+    // decos use layer-local coordinates (needs the imported w/h).
+    const parallax = layer.id !== 'middleground' && layer.w > 0 && layer.h > 0;
+    lc.parallaxLayer = parallax ? { w: layer.w, h: layer.h } : null;
+    const colour = colourFilter(PIXI, layer.filters);
+    if (colour) lc.filters = [colour];
 
     for (const deco of layer.decos || []) {
       // Archived `middleground` decos use location/world coordinates, while
@@ -406,7 +604,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
       // the layer's already-normalized 0..width / 0..height canvas space.
       // Applying worldToScreen twice pushed entire underground race layers
       // one street-width down/right, leaving only collision debug lines.
-      const pos = /^T_/.test(String(layer.id || ''))
+      const pos = parallax || /^T_/.test(String(layer.id || ''))
         ? { x: deco.x, y: deco.y }
         : worldToScreen(street, deco.x, deco.y);
       if (!available.has(deco.sprite)) {
@@ -439,11 +637,28 @@ export function buildStreetView(street, PIXI, opts = {}) {
       lc.addChild(spr);
       drawn += 1;
     }
+    const blur = Number(layer.filters?.blur) || 0;
+    if (blur > 0) bakeBlurredLayer(PIXI, lc, blur, colour);
     root.addChild(lc);
     layerContainers.push(lc);
   }
   root.decoDrawn = drawn;
   root.decoViews = decoViews;
+  root.parallaxLayers = layerContainers.filter((lc) => lc.parallaxLayer);
+  /** Call once per frame with the camera's top-left in screen space. */
+  root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => {
+    for (const lc of root.parallaxLayers) {
+      const at = parallaxLayerOffset(lc.parallaxLayer, camX, camY, vpW, vpH, W, sourceH);
+      lc.x = at.x;
+      lc.y = at.y;
+    }
+    if (skyView) {
+      skyView.x = camX;
+      skyView.y = camY;
+      skyView.width = vpW;
+      skyView.height = skyH;
+    }
+  };
 
   // Collision geometry is normally invisible, as it was in the original
   // client. Keep an explicit opt-in overlay for geometry troubleshooting.
