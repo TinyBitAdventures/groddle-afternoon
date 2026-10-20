@@ -12995,5 +12995,311 @@
     "GUVUETG9K6G2HAO": {
       "trant_gas_dead": 1
     }
+  },
+  "wildlifeStreetCount": 84,
+  "wildlife": {
+    "GA5215DAMMR2G95": {
+      "npc_kitty_chicken": 3
+    },
+    "GA53D0DJQMB2B4S": {
+      "npc_kitty_chicken": 3
+    },
+    "GA53N05IG9S2BLR": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GA556IE55JS245H": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GA578O7KNJS2BNI": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GA582EG1QLS20BF": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GA5945LJ7JS2GFK": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GA5AS7POI5T24IG": {
+      "fox_stop_marker": 4,
+      "npc_fox_ranger": 1
+    },
+    "GA5CUF0978T2L64": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GA5ELMKFP7T2Q4H": {
+      "fox_stop_marker": 4,
+      "npc_fox_ranger": 1
+    },
+    "GA5G8MQD45T2UMH": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GA5I10NJDL52TKD": {
+      "npc_kitty_chicken": 3
+    },
+    "GA5KC1SHA8T2AL7": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GA5LBN35B8T288J": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GA5NV05NFJS2NIF": {
+      "npc_fox_ranger": 1,
+      "fox_stop_marker": 7
+    },
+    "GA5OO9PJC8T26KE": {
+      "fox_stop_marker": 4,
+      "npc_fox_ranger": 1
+    },
+    "GA5PU7I1A5T2GKQ": {
+      "npc_kitty_chicken": 3
+    },
+    "GA5QAHLTB9S2C0F": {
+      "npc_fox_ranger": 1,
+      "fox_stop_marker": 5
+    },
+    "GA5R11F6C9S2HA9": {
+      "npc_fox_ranger": 1,
+      "fox_stop_marker": 5
+    },
+    "GA5RJRSOHJS2C95": {
+      "npc_fox_ranger": 1,
+      "fox_stop_marker": 5
+    },
+    "GA5RV551E8T2K2F": {
+      "npc_fox_ranger": 1,
+      "fox_stop_marker": 5
+    },
+    "GA5U9449F8T2DPR": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GA5UDRLCE9S20ER": {
+      "fox_stop_marker": 4,
+      "npc_fox_ranger": 1
+    },
+    "GA5VEL0SJJS2KVU": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GA5VJDNKS5T2EFM": {
+      "fox_stop_marker": 4,
+      "npc_fox_ranger": 1
+    },
+    "GA912LITC492EU2": {
+      "npc_kitty_chicken": 3
+    },
+    "GA934IQQT8A26SV": {
+      "npc_kitty_chicken": 3
+    },
+    "GA983PEN5DT21G9": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GA9EAH3R8DT2R18": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GA9MJQRNCDT23BP": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GA9QR9R40DT2A1D": {
+      "fox_stop_marker": 4,
+      "npc_fox_ranger": 1
+    },
+    "GCR10199TPJ1DA3": {
+      "npc_kitty_chicken": 3
+    },
+    "GCR12D911T12E57": {
+      "npc_kitty_chicken": 3
+    },
+    "GCR144H8APK1OJS": {
+      "npc_kitty_chicken": 3
+    },
+    "GCR168ITRSL1498": {
+      "npc_kitty_chicken": 3
+    },
+    "GCR1IDDEB2M17RC": {
+      "npc_kitty_chicken": 3
+    },
+    "GDOFQEEIHDT2QNS": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GDOKTFQ22DT2OEL": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GDORJMMHCDT2J08": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GDOTEUFUIVQ2F0S": {
+      "npc_kitty_chicken": 3
+    },
+    "GHF48S34D1J2F31": {
+      "npc_kitty_chicken": 3
+    },
+    "GHF6E6PK0UC34J5": {
+      "npc_kitty_chicken": 3
+    },
+    "GHV21H2S5DT2VF8": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GHV23IAU9LA2E7A": {
+      "npc_kitty_chicken": 3
+    },
+    "GHV2CGP55U22T4Q": {
+      "npc_kitty_chicken": 3
+    },
+    "GHV73IC58DT2RO7": {
+      "npc_fox_ranger": 1,
+      "fox_stop_marker": 7
+    },
+    "GHV894HP4MA3ME7": {
+      "npc_kitty_chicken": 3
+    },
+    "GHVAP821MDT2L85": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GHVB16RSG652GJ4": {
+      "npc_kitty_chicken": 3
+    },
+    "GHVBSCOFMDT2VE0": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GHVC7554ADT2VA1": {
+      "npc_fox_ranger": 1,
+      "fox_stop_marker": 4
+    },
+    "GHVCJB2OMDT2VD8": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GHVK0T750DT2D3K": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GHVMCDF3LA32K2R": {
+      "npc_kitty_chicken": 1
+    },
+    "GHVSP6MKGDT2VUK": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GIF14VBBV872N2I": {
+      "npc_kitty_chicken": 3
+    },
+    "GIFCLLMITT727LH": {
+      "npc_kitty_chicken": 3
+    },
+    "GIFDVRTI27I2578": {
+      "npc_kitty_chicken": 3
+    },
+    "GIFNEU3LGUG2BMK": {
+      "npc_kitty_chicken": 3
+    },
+    "GIFNH08K9OU1SAB": {
+      "npc_kitty_chicken": 3
+    },
+    "GIFVST7DH4E2CCO": {
+      "npc_kitty_chicken": 3
+    },
+    "GLI2HVHUM4F16B0": {
+      "npc_kitty_chicken": 1
+    },
+    "GLI32HBOUTD1GQV": {
+      "npc_kitty_chicken": 1
+    },
+    "GNV4R9D5ADT2NP1": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GNVEC8L1DDT2F20": {
+      "fox_stop_marker": 7,
+      "npc_fox_ranger": 1
+    },
+    "GNVQLF5B0JH2KP7": {
+      "npc_kitty_chicken": 3
+    },
+    "GNVVEB4M8DT2JUB": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GTJ11BUJ57K1VUV": {
+      "npc_kitty_chicken": 3
+    },
+    "GTJ11HQLJUV1R15": {
+      "npc_kitty_chicken": 3
+    },
+    "GUV2SS9BHDT2I85": {
+      "npc_fox_ranger": 1,
+      "fox_stop_marker": 6
+    },
+    "GUV3HOATQOS2HNO": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GUV8KDPNIKR2U39": {
+      "npc_kitty_chicken": 3
+    },
+    "GUV8KVC0JDT2N8E": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GUVDU3H5COS2S4O": {
+      "npc_fox_ranger": 1,
+      "fox_stop_marker": 5
+    },
+    "GUVE5KV0TOS2N87": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GUVEAT1BCOS25QL": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GUVHBDR6DOS2UED": {
+      "fox_stop_marker": 6,
+      "npc_fox_ranger": 1
+    },
+    "GUVIP8FLKOS2USV": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GUVL8CLKD5F2TNB": {
+      "npc_kitty_chicken": 3
+    },
+    "GUVO1ABIQQS2QIF": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GUVPAQS5B9S2E00": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    },
+    "GUVPMRNUQQS2GF3": {
+      "fox_stop_marker": 7,
+      "npc_fox_ranger": 1
+    },
+    "GUVQ7T6QICK2S0Q": {
+      "npc_kitty_chicken": 3
+    },
+    "GUVV8SDGGDT2QOH": {
+      "fox_stop_marker": 5,
+      "npc_fox_ranger": 1
+    }
   }
 }

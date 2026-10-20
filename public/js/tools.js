@@ -39,6 +39,8 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   super_scraper: { label: 'Super Scraper', capacity: 250, baseCost: 2000, source: 'super_scraper.js' },
   shovel: { label: 'Shovel', capacity: 100, baseCost: 300, source: 'shovel.js' },
   ace_of_spades: { label: 'Ace of Spades', capacity: 500, baseCost: 3000, source: 'ace_of_spades.js' },
+  // Fox Brushing (js/foxes.js): fox_brush overrides points_capacity to 100.
+  fox_brush: { label: 'Fox Brush', capacity: 100, baseCost: 200, source: 'fox_brush.js' },
   // Teleportation Scripts (js/teleportation.js): one wear per script written.
   quill: { label: 'Quill', capacity: 100, baseCost: 400, source: 'quill.js' },
 });

@@ -6417,6 +6417,29 @@ const engine = {
     if (scene.returnTo?.tsid) savePlayerLocation(scene.returnTo);
     updateHud();
   },
+  /** A cream speech bubble that follows a registered target. */
+  say(target, text, durationMs = 4000) {
+    return showSpeechBubble(target, { text, durationMs });
+  },
+  /**
+   * Open the shared vendor panel on a feature's store profile
+   * ({ key, id, label, desc, color, badge, offers }); the street's own
+   * vendor comes back on the next call with no profile (or a new street).
+   */
+  openShop(profile = null) {
+    if (profile) {
+      if (!engine._shopReturn) engine._shopReturn = { vendor: activeVendor, tsid: currentStreetTsid };
+      activeVendor = profile;
+      openVendor();
+      return;
+    }
+    const back = engine._shopReturn;
+    engine._shopReturn = null;
+    if (back && back.tsid === currentStreetTsid && activeVendor !== back.vendor) activeVendor = back.vendor;
+  },
+  /** Whether the shared vendor panel is open. */
+  shopOpen: () => isVendorOpen(),
+  _shopReturn: null,
   /** Feature-driven travel: home rooms, ordinary streets, gate bypass. */
   async enter(tsid, opts = {}) {
     if (tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID) {

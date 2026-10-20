@@ -78,6 +78,27 @@ function soilFromLabels(labels) {
 }
 
 /**
+ * Fox Brushing Preserves and Heli Kitties (js/foxes.js, js/heli-kitties.js).
+ * Written to a separate top-level `wildlife` map, like `soil`, so kitty-only
+ * streets keep their playable fallback population. 51 Fox Rangers, 278 Fox
+ * Stop Markers, and 93 Heli Kitties in the archived snapshot.
+ */
+const WILDLIFE_LABEL_TO_CLASS = Object.freeze({
+  'Fox Ranger': 'npc_fox_ranger',
+  'Fox Stop Marker': 'fox_stop_marker',
+  'Heli Kitty': 'npc_kitty_chicken',
+});
+
+function wildlifeFromLabels(labels) {
+  const counts = {};
+  for (const label of labels) {
+    const classTsid = WILDLIFE_LABEL_TO_CLASS[label];
+    if (classTsid) counts[classTsid] = (counts[classTsid] || 0) + 1;
+  }
+  return counts;
+}
+
+/**
  * Curated source-empty streets. Their archived XML holds only scenery-style
  * objects, and the remake deliberately keeps them uncluttered (for example the
  * private Stoot memorial), so the row is emitted with `empty: true` even when
@@ -142,6 +163,7 @@ function ecologyFromLabels(labels) {
 const index = JSON.parse(await readFile(streetIndexPath, 'utf8'));
 const streets = {};
 const soil = {};
+const wildlife = {};
 for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const candidates = locationAliases(tsid).map((alias) => join(locationRoot, `${alias}.xml`));
   const sourcePath = await firstReadable(candidates);
@@ -154,6 +176,8 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const labels = itemLabels(await readFile(sourcePath, 'utf8'));
   const soilCounts = soilFromLabels(labels);
   if (Object.keys(soilCounts).length) soil[tsid] = soilCounts;
+  const wildlifeCounts = wildlifeFromLabels(labels);
+  if (Object.keys(wildlifeCounts).length) wildlife[tsid] = wildlifeCounts;
   const ecology = ecologyFromLabels(labels);
   if (!Object.keys(ecology.counts).length && !ecology.giantId && !ecology.spawners) continue;
   streets[tsid] = {
@@ -172,6 +196,8 @@ const catalog = {
   streets,
   soilStreetCount: Object.keys(soil).length,
   soil,
+  wildlifeStreetCount: Object.keys(wildlife).length,
+  wildlife,
 };
 
 await writeFile(outputPath, `${JSON.stringify(catalog, null, 2)}\n`);

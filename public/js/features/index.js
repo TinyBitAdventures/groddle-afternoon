@@ -10,6 +10,7 @@ import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nod
 import { questOffersFeature } from './quest-offers-feature.js?v=offers-1';
 import { racesFeature } from './races-feature.js?v=races-1';
 import { patchesFeature } from './patches-feature.js?v=patches-1';
+import { foxesFeature } from './foxes-feature.js?v=foxes-1';
 
 export { questFlagsFeature };
 
@@ -20,4 +21,5 @@ export const FEATURES = [
   questOffersFeature,
   racesFeature,
   patchesFeature,
+  foxesFeature,
 ];
