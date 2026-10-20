@@ -123,3 +123,11 @@ describe('profile-aware vendor UI wiring', () => {
     assert.match(css, /data-vendor="toys"/);
   });
 });
+
+describe('official street stores (map_stores)', () => {
+  it('uses the street’s production store when the map data names one', () => {
+    assert.equal(selectVendorProfile('GA9TIJ7S4JA2CNF', '', { store: 'produce' }).key, 'produce');
+    assert.equal(selectVendorProfile('anything', '', { store: 'alchemical' }).key, 'alchemical');
+    assert.equal(selectVendorProfile('GLI2V0UN7RD1T2J', '', { store: 'produce' }).key, 'groceries');
+  });
+});

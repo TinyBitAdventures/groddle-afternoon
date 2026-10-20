@@ -16536,7 +16536,10 @@ async function enterStreet(tsid, opts = {}) {
   activeVendor = selectVendorProfile(
     currentStreetTsid,
     new URLSearchParams(location.search).get('vendor') || '',
-    { rocks: currentStreetPopulation.rockClasses.length }
+    {
+      rocks: currentStreetPopulation.rockClasses.length,
+      store: STREET_INDEX.streets?.[currentStreetTsid]?.store,
+    }
   );
   const reserved = (data.signposts || []).map((signpost, index) => {
     const point = worldToScreen(data, signpost.x, signpost.y);

@@ -89,16 +89,19 @@ export function ensureVendorItems() {
 
 /**
  * Pick a stable shop for a street, with a query-friendly profile override.
- * Hechey Track stays the familiar groceries stop; rocky streets favour the
- * mining, hardware, and tool vendors.
+ * Hechey Track stays the familiar groceries stop seen in the footage; other
+ * streets use their official store from map_stores, and streets without one
+ * get a stable pick (rocky streets favour mining, hardware, and tools).
  * @param {string} [streetTsid]
  * @param {string} [override]
- * @param {{ rocks?: number }} [context]
+ * @param {{ rocks?: number, store?: string }} [context]
  */
 export function selectVendorProfile(streetTsid = '', override = '', context = {}) {
   const requested = String(override || '').trim().toLowerCase();
   if (VENDOR_PROFILES[requested]) return VENDOR_PROFILES[requested];
   if (streetTsid === 'GLI2V0UN7RD1T2J') return VENDOR_PROFILES.groceries;
+  // The street's own store from production map data (map_stores).
+  if (VENDOR_PROFILES[context.store]) return VENDOR_PROFILES[context.store];
   let hash = 0;
   for (const char of String(streetTsid)) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
   if ((context.rocks || 0) >= 3) {
