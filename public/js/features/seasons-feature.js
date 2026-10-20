@@ -628,7 +628,9 @@ function spawnAll(engine) {
     }
     if (isOn('egg_hunt')) {
       const yearKey = seasonYearKey('egg_hunt', nowForCalendar(engine));
-      const cls = eggForStreet(engine.streetTsid, yearKey);
+      // &seasonegg=1..5 hides that egg here for QA.
+      const forced = Number(engine.param?.('seasonegg')) || 0;
+      const cls = forced >= 1 && forced <= 5 ? EGG_CLASSES[forced - 1] : eggForStreet(engine.streetTsid, yearKey);
       if (cls && !eggFound(state, yearKey, engine.streetTsid)) {
         const pt = (engine.placement(EGG_GROUP) || [])[0] || fallbackPoints(engine, 1)[0];
         if (pt) spawnEgg(engine, cls, pt);
@@ -1148,6 +1150,13 @@ function demoSetup(engine) {
     need('egg_plain', 2);
   }
   if (isOn('pi_day')) need('pi', 1);
+  if (isOn('egg_hunt') && engine.param?.('seasonautoplay') === 'trophy') {
+    // Four of the five eggs already found, so the street's egg completes the set.
+    for (const cls of EGG_CLASSES.slice(0, 4)) {
+      need(cls, 1);
+      engine.achievement?.(`in_inventory:${cls}`, 1);
+    }
+  }
   engine.refreshPack?.();
   if (engine.param?.('seasonautoplay')) autoplayAt = Date.now() + 1800;
   publish(engine);
