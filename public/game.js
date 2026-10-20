@@ -1482,6 +1482,8 @@ function toast(msg, ms = 3000) {
 let awardQueue = Promise.resolve();
 /** @type {Record<string, string>} classTsid → local badge PNG path */
 let badgeIconMap = {};
+/** @type {Record<string, { path: string, generated: true, subject?: string }>} reimagined art for rows the archive lost */
+let badgeGeneratedMap = {};
 /** @type {Record<string, { url?: string, local?: string, w?: number, h?: number }>} */
 let loadingImageMap = {};
 /** @type {Record<string, { top_color?: string, btm_color?: string, hubName?: string }>} */
@@ -1489,11 +1491,13 @@ let hubColorCache = {};
 
 async function loadTransitionAssets() {
   try {
-    const [bRes, lRes] = await Promise.all([
-      fetch('assets/content/badge-icons.json?v=catalog-art-2'),
+    const [bRes, lRes, gRes] = await Promise.all([
+      fetch('assets/content/badge-icons.json?v=catalog-art-3'),
       fetch('assets/content/loading-images.json'),
+      fetch('assets/content/badge-icons-generated.json?v=catalog-art-3'),
     ]);
     if (bRes.ok) badgeIconMap = await bRes.json();
+    if (gRes.ok) badgeGeneratedMap = await gRes.json();
     if (lRes.ok) loadingImageMap = await lRes.json();
   } catch (e) {
     console.warn('transition assets', e);
@@ -1562,9 +1566,17 @@ async function resolveHubColors(hubId) {
   }
 }
 
-function badgeIconFor(classTsid) {
+/** Official archived art first, then the reimagined generator output. */
+function badgeArtFor(classTsid) {
   if (!classTsid) return null;
-  return badgeIconMap[classTsid] || null;
+  if (badgeIconMap[classTsid]) return { url: badgeIconMap[classTsid], generated: false };
+  const made = badgeGeneratedMap[classTsid];
+  if (made?.path) return { url: made.path, generated: true };
+  return null;
+}
+
+function badgeIconFor(classTsid) {
+  return badgeArtFor(classTsid)?.url || null;
 }
 
 /** Honest neutral art for catalog rows whose official PNG is not archived. */
@@ -18013,12 +18025,16 @@ function renderAchievePanel() {
     const tsid = row.def.classTsid || row.classTsid || '';
     card.dataset.badgeTsid = row.redacted ? 'secret' : tsid;
     card.dataset.badgeStatus = row.status;
-    const iconUrl = row.redacted ? '' : badgeIconFor(tsid);
-    if (iconUrl) {
+    const art = row.redacted ? null : badgeArtFor(tsid);
+    if (art) {
       const icon = document.createElement('img');
       icon.className = 'badge-art';
-      icon.dataset.source = 'official-archive';
-      icon.src = iconUrl;
+      icon.dataset.source = art.generated ? 'reimagined' : 'official-archive';
+      icon.loading = 'lazy';
+      icon.decoding = 'async';
+      icon.width = 48;
+      icon.height = 48;
+      icon.src = art.url;
       icon.alt = '';
       icon.onerror = () => icon.replaceWith(achievementBadgeFallback(row.def));
       card.appendChild(icon);
@@ -18044,6 +18060,13 @@ function renderAchievePanel() {
       label.className = 'badge-category';
       label.textContent = achievementCategoryLabel(row.def.category);
       body.appendChild(label);
+    }
+    if (art?.generated) {
+      const note = document.createElement('div');
+      note.className = 'badge-reimagined';
+      note.textContent = 'Reimagined badge art';
+      note.title = 'The original badge image was not archived, so this one was redrawn in its style.';
+      body.appendChild(note);
     }
     for (const c of row.redacted ? [] : row.conditions || []) {
       const r = document.createElement('div');

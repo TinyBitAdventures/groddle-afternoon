@@ -195,10 +195,10 @@ describe('video badge client integration', () => {
     assert.match(game, /rewards\.favor\?\.points/);
     assert.match(game, /achievementdemo/);
     assert.match(game, /achievementUnlocked/);
-    assert.match(game, /badge-icons\.json\?v=catalog-art-2/);
+    assert.match(game, /badge-icons\.json\?v=catalog-art-3/);
     assert.match(game, /screen-fx\.js\?v=quest-pages-2/);
     assert.match(html, /game\.js\?v=official-ecology-1/);
-    assert.match(html, /badges=catalog-art-2/);
+    assert.match(html, /badges=catalog-art-3/);
     assert.match(game, /muted:\s*true/);
   });
 });

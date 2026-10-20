@@ -1,0 +1,42 @@
+{
+ "_note": "Design overrides for reimagined badges. Rows with archived official art never use these.",
+ "categoryIcons": {
+  "trees": "bean_plain",
+  "gardens": "seed_carrot",
+  "cultivation": "hoe",
+  "harvesting": "cherry",
+  "animals": "npc_cubimal_piggy",
+  "social": "lips",
+  "cooking": "awesome_pot",
+  "alchemy": "beaker",
+  "industrial": "pick",
+  "projects": "construction_tool",
+  "furniture": "furniture_armchair",
+  "exploring": "teleportation_script",
+  "player": "focusing_orb",
+  "giants": "emblem_friendly",
+  "feats": "faded_heart",
+  "trophies": "gem_diamond",
+  "seasonal": "pumpkin",
+  "games": "dice"
+ },
+ "badges": {
+  "highest_of_the_hi_skippers": {
+   "subject": "glyph:sneaker with the Hi-Sign series emblem (all-time evasion record)",
+   "glyph": "sneaker",
+   "disc": "red",
+   "rim": "gold",
+   "number": "",
+   "emblem": "emblem_friendly",
+   "topStar": true
+  },
+  "impossible_achievement": {
+   "subject": "glyph:padlock (cannot be earned)",
+   "glyph": "padlock",
+   "disc": "slate",
+   "rim": "white",
+   "deco": "laurel",
+   "number": "0"
+  }
+ }
+}

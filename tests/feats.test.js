@@ -125,7 +125,7 @@ describe('Feat client integration', () => {
     const css = readFileSync(join(publicRoot, 'style.css'), 'utf8');
     assert.match(game, /submitIncantation\(featState, text, participant/);
     assert.match(game, /'feats:contributed'/);
-    assert.match(game, /badge-icons\.json\?v=catalog-art-2/);
+    assert.match(game, /badge-icons\.json\?v=catalog-art-3/);
     assert.match(game, /finishAssistedFeatChain/);
     assert.match(game, /updateLocalChatDockPosition/);
     assert.match(html, /id="feat-panel"/);

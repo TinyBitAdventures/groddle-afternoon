@@ -3924,6 +3924,12 @@ body.buff-purple-pulse::after {
   border-color: #c9a227;
   box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.25);
 }
+.badge-reimagined {
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  font-style: italic;
+  color: #9a917f;
+}
 .badge-condition {
   overflow-wrap: anywhere;
 }
