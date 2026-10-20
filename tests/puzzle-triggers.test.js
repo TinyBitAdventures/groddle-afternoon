@@ -251,3 +251,50 @@ describe('gut tubes', () => {
     }
   });
 });
+
+describe('lost puzzle levels (scenes)', async () => {
+  const scenes = await import('../public/js/puzzle-scenes.js');
+  const { CONSTELLATION, BEAM_ME_DOWN } = scenes;
+
+  test('Constellation: stars connect only in order, and the first star closes the piggy', () => {
+    const run = scenes.createConstellationRun();
+    const s = CONSTELLATION.stars;
+    assert.equal(scenes.clickConstellation(run, CONSTELLATION, s[3].x, s[3].y).result, 'miss');
+    assert.equal(scenes.clickConstellation(run, CONSTELLATION, 5, 5).result, 'empty');
+    for (const [i, star] of s.entries()) {
+      assert.equal(scenes.clickConstellation(run, CONSTELLATION, star.x + 8, star.y - 8).result, 'connect', `star ${i}`);
+    }
+    assert.equal(scenes.nextStarIndex(run, CONSTELLATION), 0);
+    assert.equal(scenes.clickConstellation(run, CONSTELLATION, s[0].x, s[0].y).result, 'close');
+    assert.equal(run.complete, true);
+    assert.equal(run.misses, 1);
+  });
+
+  test('Constellation: field stars never crowd the piggy and stay in the sky', () => {
+    const field = scenes.fieldStars();
+    assert.equal(field.length, CONSTELLATION.fieldCount);
+    for (const f of field) {
+      for (const s of CONSTELLATION.stars) assert.ok(Math.hypot(f.x - s.x, f.y - s.y) >= 28);
+      assert.ok(f.y < CONSTELLATION.floorY - 60);
+    }
+  });
+
+  test('Beam Me Down: every quoin hangs inside its saucer beam, and beams slow the fall', () => {
+    const quoins = scenes.beamQuoins();
+    assert.equal(quoins.length, BEAM_ME_DOWN.saucers.length * 3);
+    for (const q of quoins) assert.ok(scenes.beamAt(BEAM_ME_DOWN, q.x, q.y), `${q.id} inside a beam`);
+    assert.equal(scenes.beamAt(BEAM_ME_DOWN, 20, 600), null);
+    assert.ok(scenes.beamPhysics(true).gravity < scenes.beamPhysics(false).gravity);
+    const last = BEAM_ME_DOWN.saucers.at(-1);
+    assert.ok(last.y + 30 + BEAM_ME_DOWN.beamLength < BEAM_ME_DOWN.floorY);
+  });
+
+  test('scene tsids never look like street tsids; saves drop unknown scenes', () => {
+    assert.equal(scenes.isPuzzleSceneTsid(scenes.sceneTsid('beam_me_down')), true);
+    assert.equal(scenes.sceneIdFromTsid(scenes.sceneTsid('constellation')), 'constellation');
+    assert.deepEqual(scenes.normalizeSceneSave({ done: { constellation: 2, nope: 1 }, returnTo: { tsid: 'GX', x: 3 } }), {
+      done: { constellation: 2 },
+      returnTo: { tsid: 'GX', x: 3, y: 0 },
+    });
+  });
+});
