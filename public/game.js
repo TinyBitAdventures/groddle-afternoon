@@ -6305,6 +6305,10 @@ const engine = {
   get questState() {
     return questState;
   },
+  /** Giant favor, earned emblems and daily shrine caps (js/shrines.js state). */
+  get shrineState() {
+    return shrineState;
+  },
   activeBuffIds() {
     return Object.keys(buffState.active || {});
   },

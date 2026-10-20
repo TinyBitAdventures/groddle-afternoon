@@ -54,6 +54,8 @@ function questContext(engine, now = Date.now()) {
     hub: street.hubId || '',
     street: street.label || '',
     streetTsid: engine.streetTsid,
+    // create_giant_icon's offer trigger (items/include/shrines.js: 4+ emblems of one Giant).
+    emblemsMax: Math.max(0, ...Object.values(engine.shrineState?.emblems || {}).map((n) => Number(n) || 0)),
     now,
     pc: engine.pc,
     addItem,
