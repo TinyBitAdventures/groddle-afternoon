@@ -1,0 +1,1252 @@
+{
+ "_about": "Reconstructed triggers for puzzle streets whose Collision-triggered Event Boxes, quoins, switches and keys were never archived (rules: public/js/puzzle-triggers.js, feature: public/js/features/puzzles-feature.js). Screen space like street.boxes: bottom-centre x, y, then w, h. Each trigger's `why` records how its position was derived (street geometry, the decos/platforms its events toggle, and the reference video). Quoin counts are the street's source Coin (quoin) objrefs; their types follow the video where it shows them.",
+ "streets": {
+  "GHVOD0F3T403694": {
+   "name": "Griinolyza",
+   "blurb": "Four hidden bridges with a gap that runs back and forth. Time your jumps.",
+   "strict": true,
+   "start": {
+    "x": 140,
+    "y": 388
+   },
+   "fallY": 492,
+   "checkpoints": [
+    {
+     "x": 1500,
+     "y": 388
+    },
+    {
+     "x": 3040,
+     "y": 388
+    },
+    {
+     "x": 4600,
+     "y": 314
+    },
+    {
+     "x": 6420,
+     "y": 310
+    }
+   ],
+   "exit": {
+    "door": true
+   },
+   "reward": {
+    "xp": 250,
+    "energy": 100,
+    "favor": [
+     {
+      "giant": "ti",
+      "points": 50
+     }
+    ],
+    "source": "quests/puzzle_level_color_blockage.js (Color Unblocking), the shipped quest built from these colour levels"
+   },
+   "completion": "Every board crossed. A little colour suits you.",
+   "triggers": [
+    {
+     "id": "bridge1",
+     "x": 505,
+     "y": 397,
+     "w": 100,
+     "h": 60,
+     "once": true,
+     "onEnter": [
+      "check_challenge1",
+      "default_challenge1",
+      "seq1_gap1"
+     ],
+     "why": "Ledge end before bridge 1 (plat 3529 ends x=556; the bridge's five boards 3557-3561 start x=675). check_challenge1 must set its flag before default_challenge1 (flag_not_exit) shows the boards and seq1_gap1 starts the 850 ms gap that runs B1-B5-B1. Video VxAyiFj2gVU 0:07: the bridge appears as the avatar reaches the ledge."
+    },
+    {
+     "id": "bridge2",
+     "x": 1505,
+     "y": 396,
+     "w": 100,
+     "h": 60,
+     "once": true,
+     "onEnter": [
+      "check_challenge2",
+      "default_challenge2",
+      "seq2_gap1"
+     ],
+     "why": "Ledge end before bridge 2 (plat 3588 ends x=1558; boards 3564... start x=1692). check_challenge2 clears challenge1 (stopping its chain) and hides bridge 1 behind the player."
+    },
+    {
+     "id": "secret_alcove",
+     "x": 2924,
+     "y": 131,
+     "w": 130,
+     "h": 110,
+     "onEnter": [
+      "show_coin"
+     ],
+     "onExit": [
+      "hide_coin"
+     ],
+     "why": "show_coin/hide_coin fade ug_wall_heights_1338418528030 (layer T_1335489691386, same size as the middleground, x=2918 y=131, 157x91): the cover over the alcove at the top of the ladder (x=2925, y 8-270) between walls 7088 (x=2854) and 7089 (x=2994)."
+    },
+    {
+     "id": "bridge3",
+     "x": 3055,
+     "y": 397,
+     "w": 100,
+     "h": 60,
+     "once": true,
+     "onEnter": [
+      "check_challenge3",
+      "default_challenge3",
+      "seq3_gap1",
+      "seq3_plat1_on"
+     ],
+     "why": "Ledge end before bridge 3 (plat 3616 ends x=3109; boards start x=3247). seq3_plat1_on starts the two high boards (3941/318 and 4082/265) blinking 2.8 s on, 1.2 s off: the route to the bonus quoins above the bridge."
+    },
+    {
+     "id": "bridge4",
+     "x": 4615,
+     "y": 318,
+     "w": 100,
+     "h": 60,
+     "once": true,
+     "onEnter": [
+      "check_challenge4",
+      "default_challenge4",
+      "seq4_gap1",
+      "seq4_plat1_on"
+     ],
+     "why": "Upper ledge end before bridge 4 (plats 9988-9992 end x=4666 at y\u2248318; the two six-board halves sit at y=319). seq4_plat1_on blinks the middle board 1105 (x=5507) and the two high boards 2 s on, 0.8 s off: the only way across the hole between the halves (video VxAyiFj2gVU 0:45-0:55)."
+    }
+   ],
+   "quoins": [
+    {
+     "x": 895,
+     "y": 340,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 1400,
+     "y": 350,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 1960,
+     "y": 345,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 2300,
+     "y": 345,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 2924,
+     "y": 95,
+     "type": "xp",
+     "amount": 81
+    },
+    {
+     "x": 3560,
+     "y": 345,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 3941,
+     "y": 280,
+     "type": "mood",
+     "amount": 10
+    },
+    {
+     "x": 4082,
+     "y": 228,
+     "type": "xp",
+     "amount": 20
+    },
+    {
+     "x": 4965,
+     "y": 200,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 5507,
+     "y": 280,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 6040,
+     "y": 200,
+     "type": "mood",
+     "amount": 10
+    },
+    {
+     "x": 5800,
+     "y": 270,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 6640,
+     "y": 270,
+     "type": "xp",
+     "amount": 3
+    }
+   ]
+  },
+  "GHVDKQ2O6S23LVJ": {
+   "name": "Amberlyza",
+   "blurb": "Sinking islands over the water, see-saw rocks and falling pillars on the way to the door.",
+   "strict": true,
+   "start": {
+    "x": 120,
+    "y": 414
+   },
+   "exit": {
+    "door": true
+   },
+   "reward": {
+    "xp": 250,
+    "energy": 100,
+    "favor": [
+     {
+      "giant": "ti",
+      "points": 50
+     }
+    ],
+    "source": "quests/puzzle_level_color_blockage.js (Color Unblocking), the shipped quest built from these colour levels"
+   },
+   "completion": "Islands crossed, rocks tipped, pillars ridden. Very amber of you.",
+   "events": {
+    "unhide_secret1_a": [
+     {
+      "type": "flag_has_exit",
+      "flag": "secret1_a"
+     },
+     {
+      "type": "flag_set",
+      "flag": "secret1_a"
+     },
+     {
+      "type": "deco_show",
+      "deco": "bling_charms_4_1340664170610",
+      "fade": 800
+     },
+     {
+      "type": "play_sound",
+      "name": "HIT_TRIGGER_SUMMER",
+      "loops": 1,
+      "all": false
+     },
+     {
+      "type": "deco_hide",
+      "deco": "pulseDot_1341884449719",
+      "fade": 0
+     }
+    ],
+    "unhide_secret1_b": [
+     {
+      "type": "flag_not_exit",
+      "flag": "secret1_a"
+     },
+     {
+      "type": "flag_has_exit",
+      "flag": "secret1_b"
+     },
+     {
+      "type": "flag_set",
+      "flag": "secret1_b"
+     },
+     {
+      "type": "deco_show",
+      "deco": "bling_charms_4_1340407775205",
+      "fade": 800
+     },
+     {
+      "type": "play_sound",
+      "name": "HIT_TRIGGER_SUMMER",
+      "loops": 1,
+      "all": false
+     }
+    ],
+    "unhide_secret1_c": [
+     {
+      "type": "flag_not_exit",
+      "flag": "secret1_b"
+     },
+     {
+      "type": "flag_has_exit",
+      "flag": "secret1_c"
+     },
+     {
+      "type": "flag_set",
+      "flag": "secret1_c"
+     },
+     {
+      "type": "plat",
+      "plat": "plat_1340664170623",
+      "pc_perm": -1
+     },
+     {
+      "type": "deco_show",
+      "deco": "bling_charms_4_1340407775201",
+      "fade": 800
+     },
+     {
+      "type": "play_sound",
+      "name": "HIT_TRIGGER_SUMMER",
+      "loops": 1,
+      "all": false
+     }
+    ]
+   },
+   "eventsWhy": "The source unhide_secret1_a/b/c scripts can never run: each clears its own flag and then exits unless that flag is set (flag_clear then flag_not_exit), and nothing sets secret1_*. Repaired to the evident intent: the pulse dot lights the low rope's charm, standing on each rope stone lights the next, and the third reveals the top stone (plat 0623, pc_perm 0 in the source).",
+   "triggers": [
+    {
+     "id": "secret_dot",
+     "x": 1334,
+     "y": 404,
+     "w": 36,
+     "h": 40,
+     "onEnter": [
+      "unhide_secret1_a"
+     ],
+     "why": "pulseDot_1341884449719 (layer T_1341884449718, x=1334 y=402), the glowing dot unhide_secret1_a hides: it sits on the low cap (plat 8231, y\u2248421) beside bling_charms_3."
+    },
+    {
+     "id": "secret_rope_a",
+     "x": 1047,
+     "y": 264,
+     "w": 34,
+     "h": 40,
+     "onEnter": [
+      "unhide_secret1_b"
+     ],
+     "why": "Rope stone a: plat 0624 (x 1033-1061, y 262) under bling_charms_4_1340664170610 (x=1047), the charm unhide_secret1_a lights."
+    },
+    {
+     "id": "secret_rope_b",
+     "x": 858,
+     "y": 202,
+     "w": 34,
+     "h": 40,
+     "onEnter": [
+      "unhide_secret1_c"
+     ],
+     "why": "Rope stone b: plat 0622 (x 843-873, y 200) under bling_charms_4_1340407775205 (x=859); lights the top rope and reveals plat 0623 (x 657-681, y 160)."
+    },
+    {
+     "id": "sink1",
+     "x": 2426,
+     "y": 330,
+     "w": 120,
+     "h": 44,
+     "onEnter": [
+      "sink1_a"
+     ],
+     "why": "sink1_a switches plat 9182 (x 2366-2486, y 330, the island's top) off and the next one 20 px lower on: the box is the island's own top. Six 500 ms steps lower it 120 px to the water (y\u2248450); 700 ms later it pops back. Video YvRCmwdipuo 0:40-0:55."
+    },
+    {
+     "id": "sink2",
+     "x": 2665,
+     "y": 368,
+     "w": 90,
+     "h": 44,
+     "onEnter": [
+      "sink2_a"
+     ],
+     "why": "Island top plat 7220 (x 2621-2710, y 367), the platform sink2_a switches off."
+    },
+    {
+     "id": "sink3",
+     "x": 2920,
+     "y": 366,
+     "w": 115,
+     "h": 44,
+     "onEnter": [
+      "sink3_a"
+     ],
+     "why": "Island top plat 7229 (x 2863-2978, y 364)."
+    },
+    {
+     "id": "sink4",
+     "x": 3145,
+     "y": 320,
+     "w": 90,
+     "h": 44,
+     "onEnter": [
+      "sink4_a"
+     ],
+     "why": "Island top plat 1956 (x 3101-3190, y 319)."
+    },
+    {
+     "id": "sink6",
+     "x": 3393,
+     "y": 345,
+     "w": 120,
+     "h": 44,
+     "onEnter": [
+      "sink6_a_delay"
+     ],
+     "why": "Island top plat 7424 (x 3334-3453, y 344); sink6_a_delay waits 900 ms before the first step."
+    },
+    {
+     "id": "sink7",
+     "x": 3673,
+     "y": 344,
+     "w": 120,
+     "h": 44,
+     "onEnter": [
+      "sink7_a_delay"
+     ],
+     "why": "Island top plat 7425 (x 3614-3733, y 343); 900 ms grace like sink6."
+    },
+    {
+     "id": "sink5",
+     "x": 3910,
+     "y": 339,
+     "w": 57,
+     "h": 44,
+     "onEnter": [
+      "sink5_a"
+     ],
+     "why": "Island top plat 0473 (x 3881-3938, y 338), the last before the right ladder."
+    },
+    {
+     "id": "water",
+     "x": 3120,
+     "y": 662,
+     "w": 1770,
+     "h": 200,
+     "onEnter": [
+      "swim"
+     ],
+     "onExit": [
+      "walk"
+     ],
+     "why": "The pool between walls 9170 (x=2237) and the right ladder (x\u22484040): floor y\u2248655, surface just under the sunk islands (y\u2248450-460). swim is the street's own jetpack physics (gravity x0.3, jump x0.4, speed x0.6); walk resets it."
+    },
+    {
+     "id": "tilt1_left",
+     "x": 4650,
+     "y": 410,
+     "w": 58,
+     "h": 50,
+     "onEnter": [
+      "tilt1_left_trigger"
+     ],
+     "why": "See-saw 1 left arm: plat 680 (x 4621-4678) / 673 (x 4632-4678). Stepping on an arm tips it down (tilt1_left_action swaps 673/674 for 680/681)."
+    },
+    {
+     "id": "tilt1_right",
+     "x": 4746,
+     "y": 410,
+     "w": 72,
+     "h": 50,
+     "onEnter": [
+      "tilt1_right_trigger"
+     ],
+     "why": "See-saw 1 right arm: plats 674 (x 4712-4783) / 681 (x 4712-4770)."
+    },
+    {
+     "id": "tilt2_left",
+     "x": 4966,
+     "y": 348,
+     "w": 72,
+     "h": 50,
+     "onEnter": [
+      "tilt2_left_trigger"
+     ],
+     "why": "See-saw 2 left arm: plats 569 (x 4930-5001) / 565 (x 4942-5001)."
+    },
+    {
+     "id": "tilt2_right",
+     "x": 5062,
+     "y": 348,
+     "w": 58,
+     "h": 50,
+     "onEnter": [
+      "tilt2_right_trigger"
+     ],
+     "why": "See-saw 2 right arm: plats 567 (x 5034-5091) / 568 (x 5034-5081)."
+    },
+    {
+     "id": "tilt3_left",
+     "x": 5182,
+     "y": 262,
+     "w": 42,
+     "h": 70,
+     "onEnter": [
+      "tilt3_left_trigger"
+     ],
+     "why": "Arch rock 3 left foot: plat 574 (x 5162-5203, y 257-238). Only one foot is solid at a time; the box is tall so a jump onto the other foot catches it."
+    },
+    {
+     "id": "tilt3_right",
+     "x": 5258,
+     "y": 262,
+     "w": 42,
+     "h": 70,
+     "onEnter": [
+      "tilt3_right_trigger"
+     ],
+     "why": "Arch rock 3 right foot: plat 576 (x 5238-5279)."
+    },
+    {
+     "id": "tilt4_left",
+     "x": 5465,
+     "y": 290,
+     "w": 56,
+     "h": 70,
+     "onEnter": [
+      "tilt4_left_trigger"
+     ],
+     "why": "Arch rock 4 left: plats 615/616 (x 5437-5493, y 286-263)."
+    },
+    {
+     "id": "tilt4_right",
+     "x": 5524,
+     "y": 290,
+     "w": 62,
+     "h": 70,
+     "onEnter": [
+      "tilt4_right_trigger"
+     ],
+     "why": "Arch rock 4 right: plats 617/618 (x 5493-5554, y 263-285)."
+    },
+    {
+     "id": "fall1",
+     "x": 5698,
+     "y": 243,
+     "w": 57,
+     "h": 40,
+     "onEnter": [
+      "fall1_a"
+     ],
+     "why": "Pillar 1 cap: plat 6611 (x 5670-5727, y 241), the one fall1_a switches off. The cap then drops 20 px every 400 ms (12 steps, to y\u2248481) and returns 4 s later."
+    },
+    {
+     "id": "fall3",
+     "x": 5894,
+     "y": 208,
+     "w": 50,
+     "h": 40,
+     "onEnter": [
+      "fall3_a"
+     ],
+     "why": "Pillar 2 cap: plat 6612 (x 5869-5919, y 205); fall3_a runs 14 steps."
+    },
+    {
+     "id": "fall2",
+     "x": 6085,
+     "y": 246,
+     "w": 66,
+     "h": 40,
+     "onEnter": [
+      "fall2_a"
+     ],
+     "why": "Pillar 3 cap: plat 6613 (x 6052-6118, y 244). Not bound: bounce1-3, whose replacement plats 1340661292646-648 are missing from the geometry (they would drop the avatar through the cap)."
+    }
+   ],
+   "quoins": [
+    {
+     "x": 720,
+     "y": 335,
+     "type": "xp",
+     "amount": 4
+    },
+    {
+     "x": 1047,
+     "y": 225,
+     "type": "xp",
+     "amount": 4
+    },
+    {
+     "x": 858,
+     "y": 162,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 669,
+     "y": 120,
+     "type": "xp",
+     "amount": 47
+    },
+    {
+     "x": 1590,
+     "y": 215,
+     "type": "xp",
+     "amount": 4
+    },
+    {
+     "x": 2665,
+     "y": 325,
+     "type": "xp",
+     "amount": 4
+    },
+    {
+     "x": 3145,
+     "y": 278,
+     "type": "energy",
+     "amount": 8
+    },
+    {
+     "x": 3673,
+     "y": 300,
+     "type": "xp",
+     "amount": 4
+    },
+    {
+     "x": 4746,
+     "y": 350,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 5220,
+     "y": 200,
+     "type": "xp",
+     "amount": 4
+    },
+    {
+     "x": 5894,
+     "y": 165,
+     "type": "xp",
+     "amount": 8
+    },
+    {
+     "x": 6400,
+     "y": 225,
+     "type": "xp",
+     "amount": 4
+    }
+   ]
+  },
+  "GHVP7QOKT403F5Q": {
+   "name": "Purplysa",
+   "blurb": "Glowing pads flip gravity: float to the ceiling, drop back down, and keep clear of the crystals.",
+   "strict": true,
+   "ceilings": true,
+   "start": {
+    "x": 150,
+    "y": 421
+   },
+   "checkpoints": [
+    {
+     "x": 2150,
+     "y": 523
+    },
+    {
+     "x": 3800,
+     "y": 182
+    },
+    {
+     "x": 4300,
+     "y": 185
+    }
+   ],
+   "respawnEvents": [
+    "part1_gravity_normal"
+   ],
+   "exit": {
+    "door": true
+   },
+   "reward": {
+    "xp": 250,
+    "energy": 100,
+    "favor": [
+     {
+      "giant": "ti",
+      "points": 50
+     }
+    ],
+    "source": "quests/puzzle_level_color_blockage.js (Color Unblocking), the shipped quest built from these colour levels"
+   },
+   "completion": "Up, down and through the crystals. Gravity is just a suggestion.",
+   "triggers": [
+    {
+     "id": "pad_floor_7450",
+     "x": 738,
+     "y": 531,
+     "w": 56,
+     "h": 34,
+     "onEnter": [
+      "part1_gravity_off"
+     ],
+     "why": "Floor pad hover_platform_1340320557450 (middleground, screen x=738); its sprite bottom sits ~30 px under the floor (y=527), so the box is the floor above it. Part 1 pad set (show1_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+    },
+    {
+     "id": "pad_floor_7451",
+     "x": 1298,
+     "y": 532,
+     "w": 56,
+     "h": 34,
+     "onEnter": [
+      "part1_gravity_off"
+     ],
+     "why": "Floor pad hover_platform_1340320557451 (middleground, screen x=1298); its sprite bottom sits ~30 px under the floor (y=528), so the box is the floor above it. Part 1 pad set (show1_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+    },
+    {
+     "id": "pad_floor_7461",
+     "x": 2257,
+     "y": 530,
+     "w": 56,
+     "h": 34,
+     "onEnter": [
+      "part2_gravity_off"
+     ],
+     "why": "Floor pad hover_platform_1340320557461 (middleground, screen x=2257); its sprite bottom sits ~30 px under the floor (y=526), so the box is the floor above it. Part 2 pad set (show2_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+    },
+    {
+     "id": "pad_floor_7462",
+     "x": 2733,
+     "y": 528,
+     "w": 56,
+     "h": 34,
+     "onEnter": [
+      "part2_gravity_off"
+     ],
+     "why": "Floor pad hover_platform_1340320557462 (middleground, screen x=2733); its sprite bottom sits ~30 px under the floor (y=524), so the box is the floor above it. Part 2 pad set (show2_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+    },
+    {
+     "id": "pad_floor_7464",
+     "x": 3376,
+     "y": 488,
+     "w": 56,
+     "h": 34,
+     "onEnter": [
+      "part2_gravity_off"
+     ],
+     "why": "Floor pad hover_platform_1340320557464 (middleground, screen x=3376); its sprite bottom sits ~30 px under the floor (y=484), so the box is the floor above it. Part 2 pad set (show2_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+    },
+    {
+     "id": "pad_floor_7463",
+     "x": 3530,
+     "y": 578,
+     "w": 56,
+     "h": 34,
+     "onEnter": [
+      "part2_gravity_off"
+     ],
+     "why": "Floor pad hover_platform_1340320557463 (middleground, screen x=3530); its sprite bottom sits ~30 px under the floor (y=574), so the box is the floor above it. Part 2 pad set (show2_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+    },
+    {
+     "id": "pad_floor_7466",
+     "x": 4405,
+     "y": 560,
+     "w": 56,
+     "h": 34,
+     "onEnter": [
+      "part3_gravity_off"
+     ],
+     "why": "Floor pad hover_platform_1340320557466 (middleground, screen x=4405); its sprite bottom sits ~30 px under the floor (y=556), so the box is the floor above it. Part 3 pad set (show3_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+    },
+    {
+     "id": "pad_floor_7465",
+     "x": 4687,
+     "y": 460,
+     "w": 56,
+     "h": 34,
+     "onEnter": [
+      "part3_gravity_off"
+     ],
+     "why": "Floor pad hover_platform_1340320557465 (middleground, screen x=4687); its sprite bottom sits ~30 px under the floor (y=456), so the box is the floor above it. Part 3 pad set (show3_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+    },
+    {
+     "id": "pad_floor_7467",
+     "x": 4968,
+     "y": 560,
+     "w": 56,
+     "h": 34,
+     "onEnter": [
+      "part3_gravity_off"
+     ],
+     "why": "Floor pad hover_platform_1340320557467 (middleground, screen x=4968); its sprite bottom sits ~30 px under the floor (y=556), so the box is the floor above it. Part 3 pad set (show3_* events): touching it turns gravity to x-0.1, the float up in video 2j0v9FgQPig 0:05-0:20."
+    },
+    {
+     "id": "pad_ceiling_7483",
+     "x": 391,
+     "y": 149,
+     "w": 64,
+     "h": 118,
+     "body": true,
+     "onEnter": [
+      "part1_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557483 (rotated 180, hangs from y=49 to 137): a head touch turns gravity back on (part1_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "pad_ceiling_7456",
+     "x": 1021,
+     "y": 152,
+     "w": 64,
+     "h": 118,
+     "body": true,
+     "onEnter": [
+      "part1_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557456 (rotated 180, hangs from y=52 to 140): a head touch turns gravity back on (part1_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "pad_ceiling_7459",
+     "x": 1181,
+     "y": 149,
+     "w": 64,
+     "h": 118,
+     "body": true,
+     "onEnter": [
+      "part1_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557459 (rotated 180, hangs from y=49 to 137): a head touch turns gravity back on (part1_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "pad_ceiling_7471",
+     "x": 1548,
+     "y": 289,
+     "w": 82,
+     "h": 143,
+     "body": true,
+     "onEnter": [
+      "part1_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557471 (rotated 180, hangs from y=164 to 277): a head touch turns gravity back on (part1_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "pad_ceiling_7472",
+     "x": 2958,
+     "y": 111,
+     "w": 64,
+     "h": 118,
+     "body": true,
+     "onEnter": [
+      "part2_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557472 (rotated 180, hangs from y=11 to 99): a head touch turns gravity back on (part2_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "pad_ceiling_7474",
+     "x": 3390,
+     "y": 120,
+     "w": 64,
+     "h": 118,
+     "body": true,
+     "onEnter": [
+      "part2_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557474 (rotated 180, hangs from y=20 to 108): a head touch turns gravity back on (part2_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "pad_ceiling_7476",
+     "x": 3679,
+     "y": 129,
+     "w": 82,
+     "h": 143,
+     "body": true,
+     "onEnter": [
+      "part2_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557476 (rotated 180, hangs from y=4 to 117): a head touch turns gravity back on (part2_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "pad_ceiling_7480",
+     "x": 4173,
+     "y": 297,
+     "w": 64,
+     "h": 118,
+     "body": true,
+     "onEnter": [
+      "part3_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557480 (rotated 180, hangs from y=197 to 285): a head touch turns gravity back on (part3_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "pad_ceiling_7478",
+     "x": 4435,
+     "y": 116,
+     "w": 64,
+     "h": 118,
+     "body": true,
+     "onEnter": [
+      "part3_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557478 (rotated 180, hangs from y=16 to 104): a head touch turns gravity back on (part3_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "pad_ceiling_7481",
+     "x": 5245,
+     "y": 111,
+     "w": 64,
+     "h": 118,
+     "body": true,
+     "onEnter": [
+      "part3_gravity_on"
+     ],
+     "why": "Ceiling pad hover_platform_1340320557481 (rotated 180, hangs from y=11 to 99): a head touch turns gravity back on (part3_gravity_on, then partN_gravity_normal resets)."
+    },
+    {
+     "id": "icicles_1",
+     "x": 1965,
+     "y": 524,
+     "w": 44,
+     "h": 61,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_2",
+     "x": 2114,
+     "y": 127,
+     "w": 79,
+     "h": 68,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_3",
+     "x": 2126,
+     "y": 325,
+     "w": 86,
+     "h": 54,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_4",
+     "x": 2266,
+     "y": 240,
+     "w": 78,
+     "h": 55,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_5",
+     "x": 2575,
+     "y": 430,
+     "w": 142,
+     "h": 76,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_6",
+     "x": 2732,
+     "y": 274,
+     "w": 48,
+     "h": 55,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_7",
+     "x": 2888,
+     "y": 428,
+     "w": 155,
+     "h": 74,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_8",
+     "x": 3377,
+     "y": 338,
+     "w": 144,
+     "h": 80,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_9",
+     "x": 4826,
+     "y": 445,
+     "w": 72,
+     "h": 67,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_10",
+     "x": 4840,
+     "y": 277,
+     "w": 86,
+     "h": 54,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_11",
+     "x": 4836,
+     "y": 112,
+     "w": 72,
+     "h": 55,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_12",
+     "x": 4970,
+     "y": 349,
+     "w": 76,
+     "h": 54,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_13",
+     "x": 4973,
+     "y": 209,
+     "w": 66,
+     "h": 54,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_14",
+     "x": 5110,
+     "y": 356,
+     "w": 71,
+     "h": 57,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_15",
+     "x": 5110,
+     "y": 202,
+     "w": 69,
+     "h": 52,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_16",
+     "x": 5251,
+     "y": 412,
+     "w": 76,
+     "h": 58,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "icicles_17",
+     "x": 5251,
+     "y": 257,
+     "w": 72,
+     "h": 56,
+     "body": true,
+     "respawn": true,
+     "onEnter": [],
+     "why": "Crystal spike cluster (cave_icicle_1/2 decos, rotated bounds shrunk 15%). The street has 17 Collision-triggered Teleporters and exactly 17 spike clusters: touching one sends the avatar back to the last safe spot."
+    },
+    {
+     "id": "sections12_back",
+     "x": 2030,
+     "y": 600,
+     "w": 24,
+     "h": 600,
+     "onEnter": [
+      "show1_hide2"
+     ],
+     "why": "Section 1/2 boundary under rock column 1885-2080: the part 1 pads (show1) light when walking back left; flags show2 keep it idempotent."
+    },
+    {
+     "id": "sections12_on",
+     "x": 2100,
+     "y": 600,
+     "w": 24,
+     "h": 600,
+     "onEnter": [
+      "show2_hide1"
+     ],
+     "why": "Section 1/2 boundary, right side: lights the part 2 pads (show2_hide1)."
+    },
+    {
+     "id": "sections23_back",
+     "x": 3850,
+     "y": 600,
+     "w": 24,
+     "h": 600,
+     "onEnter": [
+      "show2_hide3"
+     ],
+     "why": "Section 2/3 boundary on the high ledge (plats 7392-7397, y\u2248183), between the last part 2 pad (x 3679) and the first part 3 pad (x 4173)."
+    },
+    {
+     "id": "sections23_on",
+     "x": 3920,
+     "y": 600,
+     "w": 24,
+     "h": 600,
+     "onEnter": [
+      "show3_hide2"
+     ],
+     "why": "Section 2/3 boundary, right side: lights the part 3 pads."
+    },
+    {
+     "id": "secret_ladder",
+     "x": 1824,
+     "y": 230,
+     "w": 150,
+     "h": 170,
+     "onEnter": [
+      "secret_in"
+     ],
+     "onExit": [
+      "secret_out"
+     ],
+     "why": "ug_wall_heights_1337036905111 (layer T_1335489691386, x=1824 y=230, 172x186) covers the ladder nook at x\u22481790; secret_in fades it while the avatar is inside."
+    },
+    {
+     "id": "hidden_nook",
+     "x": 435,
+     "y": 252,
+     "w": 140,
+     "h": 180,
+     "onEnter": [
+      "hidden_in"
+     ],
+     "onExit": [
+      "hidden_out"
+     ],
+     "why": "ug_wall_heights_1337187375152 (x=435 y=63, rotated 180, 163x191: covers y 63-254) hides the nook above the start ledge."
+    },
+    {
+     "id": "bonus_room",
+     "x": 5392,
+     "y": 176,
+     "w": 200,
+     "h": 125,
+     "onEnter": [
+      "bonus_in"
+     ],
+     "onExit": [
+      "bonus_out"
+     ],
+     "why": "ug_wall_heights_1337202603208 (x=5392 y=176, 226x129) covers the bonus shelf above the exit."
+    },
+    {
+     "id": "finish",
+     "x": 5340,
+     "y": 553,
+     "w": 70,
+     "h": 90,
+     "onEnter": [
+      "finish_hide3"
+     ],
+     "why": "Floor before the exit door (x 5418): finish_hide3 turns the last pads off and resets physics."
+    }
+   ],
+   "quoins": [
+    {
+     "x": 738,
+     "y": 300,
+     "type": "xp",
+     "amount": 10
+    },
+    {
+     "x": 1100,
+     "y": 140,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 1824,
+     "y": 150,
+     "type": "xp",
+     "amount": 81
+    },
+    {
+     "x": 1600,
+     "y": 320,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 2257,
+     "y": 330,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 2733,
+     "y": 180,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 3376,
+     "y": 200,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 3679,
+     "y": 150,
+     "type": "xp",
+     "amount": 17
+    },
+    {
+     "x": 4405,
+     "y": 420,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 4687,
+     "y": 330,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 4968,
+     "y": 440,
+     "type": "mood",
+     "amount": 10
+    },
+    {
+     "x": 5392,
+     "y": 130,
+     "type": "xp",
+     "amount": 81
+    }
+   ]
+  }
+ }
+}

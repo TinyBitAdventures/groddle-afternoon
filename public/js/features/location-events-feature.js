@@ -42,6 +42,7 @@ import {
   eventPhysicsAdjustments,
   inEventBox,
   physicsMultipliers,
+  eventPlatformIds,
   recoverableToggles,
   runLocationEvent,
   streetOwner,
@@ -63,6 +64,9 @@ let teleporting = false;
 // Simulation clock (sum of onTick dtMs): event physics and timers follow the
 // movement integration, so slow frames (or headless QA) keep source timings.
 let clock = 0;
+// Other features (puzzle triggers) that rebuild a street's lost triggers:
+// { strict(street, engine) -> true } turns the walkable fallback off there.
+const streetHooks = [];
 
 function inactive(engine) {
   return !current || engine.transientInstance() || engine.homeContext?.().inHome;
@@ -162,14 +166,14 @@ function applyEffects(engine, effects, now) {
         setDeco(engine, fx.id, fx.visible, fx.fade, now);
         break;
       case 'plat':
-        if (Number(fx.pc_perm) === 0 && !current?.guard?.platOn.has(fx.id) && demo.stage !== 'run') {
+        if (Number(fx.pc_perm) === 0 && !current?.strict && !current?.guard?.platOn.has(fx.id) && demo.stage !== 'run') {
           effectCounts.kept_walkable = (effectCounts.kept_walkable || 0) + 1;
           break;
         }
         setPlatform(engine, fx.id, fx.pc_perm);
         break;
       case 'wall':
-        if (!(fx.pc_perm != null && Number(fx.pc_perm) === 0) && !current?.guard?.wallOpen.has(fx.id) && demo.stage !== 'run') {
+        if (!(fx.pc_perm != null && Number(fx.pc_perm) === 0) && !current?.strict && !current?.guard?.wallOpen.has(fx.id) && demo.stage !== 'run') {
           effectCounts.kept_walkable = (effectCounts.kept_walkable || 0) + 1;
           break;
         }
@@ -406,6 +410,48 @@ function demoStep(engine, now) {
 }
 
 /* ------------------------------------------------------------------ */
+/* API for trigger features                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The small surface a trigger feature (features/puzzles-feature.js) uses to
+ * drive this street's recovered scripts: register a strict hook, fire events
+ * as the lost Collision-triggered Event Boxes, switches and keys did, and read
+ * the runtime's flags and simulation clock.
+ */
+export const locationEventsApi = {
+  /** hook: { strict(street, engine) -> true when the street's triggers are rebuilt }. */
+  register(hook) {
+    if (hook && !streetHooks.includes(hook)) streetHooks.push(hook);
+  },
+  /** The street whose scripts are running (null on owned/instanced streets). */
+  active: () => current?.tsid || null,
+  strict: () => current?.strict === true,
+  has: (name) => Boolean(current?.events?.[name]),
+  /** Run one event with the player as target_pc (as a collision box did). */
+  fire(engine, name, target = true) {
+    if (!current || inactive(engine)) return false;
+    return fire(engine, name, target, clock);
+  },
+  flag: (name) => Boolean(current?.runtime.flags.has(name)),
+  /** Simulation clock (ms): the one event timers and physics use. */
+  clock: () => clock,
+  /**
+   * Re-enter the current street's scripts (a hook's data arrived after the
+   * street did): put back platforms the first run switched off, then run the
+   * arrival chain again with the hooks consulted afresh.
+   */
+  restart(engine) {
+    if (!current?.street) return false;
+    const street = current.street;
+    for (const plat of stash.values()) engine.platforms?.push(plat);
+    stash = new Map();
+    locationEventsFeature.onStreetEnter(street, engine);
+    return true;
+  },
+};
+
+/* ------------------------------------------------------------------ */
 /* Feature                                                             */
 /* ------------------------------------------------------------------ */
 
@@ -446,8 +492,12 @@ export const locationEventsFeature = {
       // line as solid. Ones only lost collision boxes enable stay solid, so
       // those streets remain walkable.
       current.guard = recoverableToggles(current.events);
+      // A street whose triggers another feature rebuilt runs its scripts as
+      // written: every platform an event toggles starts in its source state.
+      current.strict = streetHooks.some((hook) => hook.strict?.(street, engine) === true);
+      const toggled = current.strict ? eventPlatformIds(current.events) : current.guard.platOn;
       for (const plat of street.platforms || []) {
-        if (current.guard.platOn.has(plat.id) && Number(plat.pc_perm) === 0) setPlatform(engine, plat.id, 0);
+        if (toggled.has(plat.id) && Number(plat.pc_perm) === 0) setPlatform(engine, plat.id, 0);
       }
       for (const { name, target } of arrivalEvents(current.events)) fire(engine, name, target, clock);
     }

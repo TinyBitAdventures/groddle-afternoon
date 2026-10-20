@@ -20,6 +20,7 @@ import { rookAttackFeature } from './rook-attack-feature.js?v=rooks-1';
 import { streetFurnitureFeature } from './street-furniture-feature.js?v=furniture-1';
 import { doorsFeature } from './doors-feature.js?v=doors-1';
 import { locationEventsFeature } from './location-events-feature.js?v=location-events-1';
+import { puzzlesFeature } from './puzzles-feature.js?v=puzzles-1';
 import { streetJobsFeature } from './street-jobs-feature.js?v=jobs-1';
 import { imaginationFeature } from './imagination-feature.js?v=imagination-1';
 import { supplyFeature } from './supply-feature.js?v=supply-1';
@@ -45,6 +46,7 @@ export const FEATURES = [
   streetFurnitureFeature,
   doorsFeature,
   locationEventsFeature,
+  puzzlesFeature,
   streetJobsFeature,
   imaginationFeature,
   supplyFeature,

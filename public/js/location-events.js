@@ -407,6 +407,15 @@ export function recoverableToggles(events) {
   return { platOn, wallOpen };
 }
 
+/** Platform ids any event toggles (strict streets start them in source state). */
+export function eventPlatformIds(events) {
+  const ids = new Set();
+  for (const actions of Object.values(events || {})) {
+    for (const act of actions) if (act.type === 'plat' && act.plat) ids.add(act.plat);
+  }
+  return ids;
+}
+
 /** Deco ids an event set shows or hides. */
 export function eventDecoIds(events) {
   const ids = new Set();
