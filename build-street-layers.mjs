@@ -2,7 +2,8 @@
  * Add the parallax and colour data the first street import dropped:
  * each layer's canvas size (w, h), its `filtersNEW` colour treatment
  * (brightness, contrast, saturation, tintColor, tintAmount, blur), and the
- * location's sky `gradient` (top, bottom). Source: tinyspeck/glitch-locations
+ * location's sky `gradient` (top, bottom), plus each deco's `h_flip` and
+ * `hidden` flags. Source: tinyspeck/glitch-locations
  * (CC0). Edits assets/streets/*.json in place; safe to re-run.
  *
  * Run from spike root:
@@ -99,7 +100,26 @@ function parseFilters(body) {
 }
 
 const files = (await readdir(streetsDir)).filter((f) => /^[GL][A-Z0-9]+\.json$/.test(f));
+/** XML deco flags keyed by sprite/x/y, in document order per key. */
+function decoFlags(layerBody) {
+  const decos = childObjects(layerBody).find((c) => c.id === 'decos');
+  const byKey = new Map();
+  for (const deco of decos ? childObjects(decos.body) : []) {
+    const scalars = directScalars(deco.body);
+    const key = `${scalars.sprite_class}|${scalars.x}|${scalars.y}`;
+    const flags = {
+      flip: /<bool id="h_flip">true<\/bool>/.test(deco.body),
+      hidden: /<bool id="hidden">true<\/bool>/.test(deco.body),
+    };
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key).push(flags);
+  }
+  return byKey;
+}
+
 let updated = 0;
+let flipped = 0;
+let hiddenDecos = 0;
 let filtered = 0;
 let gradients = 0;
 for (const file of files) {
@@ -143,9 +163,31 @@ for (const file of files) {
       } else {
         delete layer.filters;
       }
+      const flags = layer.id === 'middleground'
+        ? decoFlags(body.replace(/<object id="(platform_lines|walls|ladders|signposts|boxes|targets|doors)">[\s\S]*?\n\t{4}<\/object>/g, ''))
+        : decoFlags(body);
+      for (const deco of layer.decos || []) {
+        const queue = flags.get(`${deco.sprite}|${deco.x}|${deco.y}`);
+        const flag = queue?.shift();
+        if (flag?.flip) {
+          deco.flip = true;
+          flipped += 1;
+        } else {
+          delete deco.flip;
+        }
+        if (flag?.hidden) {
+          deco.hidden = true;
+          hiddenDecos += 1;
+        } else {
+          delete deco.hidden;
+        }
+      }
     }
   }
   await writeFile(path, `${JSON.stringify(street)}\n`);
   updated += 1;
 }
-console.log(`Updated ${updated} streets: ${gradients} gradients, ${filtered} filtered layers.`);
+console.log(
+  `Updated ${updated} streets: ${gradients} gradients, ${filtered} filtered layers, ` +
+    `${flipped} flipped decos, ${hiddenDecos} hidden decos.`
+);

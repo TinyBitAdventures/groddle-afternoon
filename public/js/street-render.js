@@ -436,26 +436,54 @@ function colourFilter(PIXI, filters) {
   return cm;
 }
 
-/** Resolution of the one-time bitmap a blurred layer is baked into. */
+/** Resolution of the one-time texture a blurred layer is baked into. */
 const BLURRED_LAYER_RESOLUTION = 0.5;
 
 /**
  * Blurred layers are static, so bake colour + blur into one half-resolution
- * bitmap once every deco texture has loaded, instead of re-blurring a
- * street-wide layer every frame. Flash's BlurFilter(blur, blur, LOW) is one
- * box pass; a light two-pass Pixi blur at half strength matches it.
+ * texture once every deco texture has loaded, instead of re-blurring a
+ * street-wide layer every frame. The texture covers the layer's full local
+ * bounds: Pixi's cacheAsBitmap clips filters to the screen, which baked only
+ * the part visible at load time and let its cut edges slide with parallax.
+ * Flash's BlurFilter(blur, blur, LOW) is one box pass; a light two-pass Pixi
+ * blur at half strength matches it.
  */
-function bakeBlurredLayer(PIXI, lc, blur, colour) {
+function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
   const bases = new Set();
   for (const child of lc.children) {
     const base = child.texture?.baseTexture;
     if (base && !base.valid) bases.add(base);
   }
   const bake = () => {
-    if (lc.destroyed) return;
-    lc.filters = [...(colour ? [colour] : []), new PIXI.BlurFilter(blur * 0.5, 2)];
-    lc.cacheAsBitmapResolution = BLURRED_LAYER_RESOLUTION;
-    lc.cacheAsBitmap = true;
+    if (lc.destroyed || !lc.children.length) return;
+    const pad = Math.ceil(blur * 2);
+    const bounds = lc.getLocalBounds();
+    const region = new PIXI.Rectangle(
+      Math.floor(bounds.x - pad),
+      Math.floor(bounds.y - pad),
+      Math.ceil(bounds.width + pad * 2),
+      Math.ceil(bounds.height + pad * 2)
+    );
+    const holder = new PIXI.Container();
+    holder.filters = [...(colour ? [colour] : []), new PIXI.BlurFilter(blur * 0.5, 2)];
+    const moved = lc.removeChildren();
+    for (const child of moved) {
+      child.x -= region.x;
+      child.y -= region.y;
+      holder.addChild(child);
+    }
+    holder.sortableChildren = true;
+    const texture = renderer.generateTexture(holder, {
+      region: new PIXI.Rectangle(0, 0, region.width, region.height),
+      resolution: BLURRED_LAYER_RESOLUTION,
+    });
+    holder.destroy({ children: true });
+    const baked = new PIXI.Sprite(texture);
+    baked.x = region.x;
+    baked.y = region.y;
+    lc.filters = null;
+    lc.addChild(baked);
+    lc.bakedLayer = baked;
   };
   if (!bases.size) {
     bake();
@@ -524,7 +552,8 @@ function makePlaceholder(PIXI, deco, pos) {
  *   decoBase?: string,
  *   available?: Set<string>,
  *   debugPlatforms?: boolean,
- *   cameraBottomPadding?: number
+ *   cameraBottomPadding?: number,
+ *   renderer?: import('pixi.js').Renderer
  * }} [opts]
  */
 export function buildStreetView(street, PIXI, opts = {}) {
@@ -619,14 +648,15 @@ export function buildStreetView(street, PIXI, opts = {}) {
       const tex = PIXI.Texture.from(url);
       const spr = new PIXI.Sprite(tex);
       spr.anchor.set(0.5, 1);
-      if (deco.w > 0) spr.width = deco.w;
-      if (deco.h > 0) spr.height = deco.h;
-      if (!tex.valid) {
-        tex.baseTexture.once('loaded', () => {
-          if (deco.w > 0) spr.width = deco.w;
-          if (deco.h > 0) spr.height = deco.h;
-        });
-      }
+      // h_flip mirrors the deco about its registration point.
+      const sizeDeco = () => {
+        if (deco.w > 0) spr.width = deco.w;
+        if (deco.h > 0) spr.height = deco.h;
+        if (deco.flip) spr.scale.x = -Math.abs(spr.scale.x);
+      };
+      sizeDeco();
+      if (!tex.valid) tex.baseTexture.once('loaded', sizeDeco);
+      if (deco.hidden) spr.visible = false;
       spr.x = pos.x;
       spr.y = pos.y;
       spr.zIndex = deco.z || 0;
@@ -638,7 +668,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
       drawn += 1;
     }
     const blur = Number(layer.filters?.blur) || 0;
-    if (blur > 0) bakeBlurredLayer(PIXI, lc, blur, colour);
+    if (blur > 0 && opts.renderer) bakeBlurredLayer(PIXI, opts.renderer, lc, blur, colour);
     root.addChild(lc);
     layerContainers.push(lc);
   }

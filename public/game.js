@@ -513,7 +513,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=parallax-1';
+} from './js/street-render.js?v=parallax-3';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -16491,6 +16491,7 @@ async function enterStreet(tsid, opts = {}) {
   const available = await loadDecoManifest();
   await loadSignpostTextures(PIXI);
   bgLayer = buildStreetView(data, PIXI, {
+    renderer: app.renderer,
     available,
     cameraBottomPadding: cameraBottomSlack(LOCATION_VIEW_H),
   });
