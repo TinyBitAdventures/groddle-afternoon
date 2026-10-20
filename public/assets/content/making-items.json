@@ -174,6 +174,62 @@
         "source": "items/awesome_stew.js base_cost 268 × energy_factor 1 (include/food.js food_eat)"
       }
     },
+    "bag_furniture_cabinet": {
+      "label": "Cabinet",
+      "namePlural": "Cabinets",
+      "desc": "The kind of unassuming cabinet that looks so plain and basic you suspect it may contain a portal to a secret world, rather than shelves. It contains shelves.",
+      "baseCost": 2200,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture",
+        "furniture_interactable"
+      ],
+      "isTool": false,
+      "source": "items/bag_furniture_cabinet.js"
+    },
+    "bag_furniture_sdb": {
+      "label": "Storage Display Box",
+      "namePlural": "Storage Display Boxes",
+      "desc": "For the pragmatic showoff in everyone, a box with hidden depths. Not only can you display your prized possessions, but you can tuck a virtually infinite amount of the exact same prized possession behind it, for safekeeping.",
+      "baseCost": 500,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture",
+        "furniture_interactable"
+      ],
+      "isTool": false,
+      "source": "items/bag_furniture_sdb.js"
+    },
+    "bag_furniture_smallcabinet": {
+      "label": "Small Cabinet",
+      "namePlural": "Small Cabinets",
+      "desc": "Rumour has it this cabinet, perceived as 'small' from the outside, is actually cavernous inside, and potentially capable of time travel. The rumours are false.",
+      "baseCost": 1500,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture",
+        "furniture_interactable"
+      ],
+      "isTool": false,
+      "source": "items/bag_furniture_smallcabinet.js"
+    },
+    "bag_furniture_wallcabinet": {
+      "label": "Wall Cabinet",
+      "namePlural": "Wall Cabinets",
+      "desc": "The good thing about this cabinet is that it's at eye-level. The bad thing about it is that it's eye-level and mildly unattractive. Still, you don't need to compliment the cabinetry while you're stashing your stockpile, as they say.",
+      "baseCost": 1350,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture",
+        "furniture_interactable"
+      ],
+      "isTool": false,
+      "source": "items/bag_furniture_wallcabinet.js"
+    },
     "banana": {
       "label": "Banana",
       "namePlural": "Bananas",
@@ -663,6 +719,18 @@
       "source": "items/bubble_tuner.js",
       "pointsCapacity": 0,
       "makingType": "transmogrification"
+    },
+    "bulb": {
+      "label": "Bulb",
+      "namePlural": "Bulbs",
+      "desc": "The glowy bit of a lamp. Without this, a lamp is just a stick with a silly hat on.",
+      "baseCost": 50,
+      "stackMax": 10,
+      "tags": [
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/bulb.js"
     },
     "bun": {
       "label": "Bun",
@@ -1253,6 +1321,20 @@
         "energy": 33,
         "source": "items/common_crudites.js base_cost 33 × energy_factor 1 (include/food.js food_eat)"
       }
+    },
+    "construction_tool": {
+      "label": "Construction Tool",
+      "namePlural": "Construction Tools",
+      "desc": "One handy pocketsized gadget for all your furniture construction needs. Comes complete with four pokey whojamaflilps, one specializing in tweaking the wotsit, one in cranking the doodah, and the other two in levering the begiantus out of any sticky-outty bits. A true professional's tool.",
+      "baseCost": 500,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/construction_tool.js",
+      "pointsCapacity": 100,
+      "makingType": ""
     },
     "copper": {
       "label": "Copper Ingot",
@@ -1989,6 +2071,19 @@
       "isTool": false,
       "source": "items/fertilidust_lite.js"
     },
+    "fiber": {
+      "label": "Fiber",
+      "namePlural": "Fibers",
+      "desc": "A patch of downy hair brushed from the tail of a fox, perfect for spinning into thread or stuffing into furniture for padding.  Also might be perfect for gluing to your face as a moustache, but due to its origin (the underside of a fox tail), no one does.",
+      "baseCost": 1,
+      "stackMax": 999,
+      "tags": [
+        "fiberarts",
+        "basic_resource"
+      ],
+      "isTool": false,
+      "source": "items/fiber.js"
+    },
     "firefly_jar": {
       "label": "Firefly Jar",
       "namePlural": "Firefly Jars",
@@ -2268,6 +2363,307 @@
       "isTool": true,
       "source": "items/fuelmaker.js",
       "makingType": "machine"
+    },
+    "furniture_armchair": {
+      "label": "Armchair",
+      "namePlural": "Armchairs",
+      "desc": "A basic armchair. Like a normal chair, but armed. Armed and dangerous. If by \"dangerous\" you mean \"quite uncomfortable.\"",
+      "baseCost": 1000,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_armchair.js"
+    },
+    "furniture_bed": {
+      "label": "Bed",
+      "namePlural": "Beds",
+      "desc": "Where the magic happens (low-grade magic. Better magic available with upgraded beds. Also: magic not included).",
+      "baseCost": 1700,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_bed.js"
+    },
+    "furniture_bench": {
+      "label": "Bench",
+      "namePlural": "Benches",
+      "desc": "Too thin to be a coffee table, too low to be a shelf, too long-winded to be a stool, this is a bench. For benching people.",
+      "baseCost": 950,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_bench.js"
+    },
+    "furniture_ceilingdeco": {
+      "label": "Hanging Decoration",
+      "namePlural": "Hanging Decorations",
+      "desc": "As a piece of modern art, this cutting edge contemporary faux-rustic hanging piece has been called both \"a searing socio-religious commentary\" and \"a ceilingular carbuncle\". Which is it? You decide.",
+      "baseCost": 625,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_ceilingdeco.js"
+    },
+    "furniture_ceilinglamp": {
+      "label": "Ceiling Lamp",
+      "namePlural": "Ceiling Lamps",
+      "desc": "A small fixture, radiating with an unexplainable dim glow, like the tiny weak sun around which the universe of your house revolves.",
+      "baseCost": 675,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_ceilinglamp.js"
+    },
+    "furniture_chair": {
+      "label": "Chair",
+      "namePlural": "Chairs",
+      "desc": "The perfect chair for those who like the idea of sitting briefly and with utmost caution. Upgrading recommended for those who like highfalutin' ideas like \"comfort\" and \"aesthetics\".",
+      "baseCost": 450,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_chair.js"
+    },
+    "furniture_coffeetable": {
+      "label": "Coffee Table",
+      "namePlural": "Coffee Tables",
+      "desc": "A starter table for those who enjoy the concept of resting their brew on an almost flat surface. For those who dream of an *actually* flat one, upgrades are available.",
+      "baseCost": 1100,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_coffeetable.js"
+    },
+    "furniture_counter": {
+      "label": "Counter",
+      "namePlural": "Counters",
+      "desc": "Why own a counter? Because it is an admirably flat surface, useful for dividing large spaces. (This is known as 'The Counter Argument'. A Counter-Counter Argument exists, but it only confuses everything).",
+      "baseCost": 925,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_counter.js"
+    },
+    "furniture_desk": {
+      "label": "Desk",
+      "namePlural": "Desks",
+      "desc": "For those who aspire to life in the bureaucratic hall, even a basic starter desk can induce the feelings of power previously known only to the administrators of Ur.",
+      "baseCost": 1050,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_desk.js"
+    },
+    "furniture_fireplace": {
+      "label": "Fireplace",
+      "namePlural": "Fireplaces",
+      "desc": "It's a place with fire. Or sometimes without the fire.",
+      "baseCost": 2000,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_fireplace.js"
+    },
+    "furniture_floorlamp": {
+      "label": "Floor Lamp",
+      "namePlural": "Floor Lamps",
+      "desc": "A basic low-level provider of atmospheric downlighting. Upgrade for downlighting with wider appeal and higher aesthetic appeal.",
+      "baseCost": 800,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_floorlamp.js"
+    },
+    "furniture_loveseat": {
+      "label": "Loveseat",
+      "namePlural": "Loveseats",
+      "desc": "A loveseat for those who love seats in a moderate way. For those who really LOVE seats, upgrades to even more loveable seats are available.",
+      "baseCost": 1250,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_loveseat.js"
+    },
+    "furniture_roomdeco": {
+      "label": "Room Decoration",
+      "namePlural": "Room Decorations",
+      "desc": "To those with a layman's knowledge of art, this may look like a couple of pieces of wood roughly snailed together. But to those with their mind tuned to higher things (and the possibility of upgradiness) the true inner beauty of the piece reveals itself.",
+      "baseCost": 700,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_roomdeco.js"
+    },
+    "furniture_rug": {
+      "label": "Rug",
+      "namePlural": "Rugs",
+      "desc": "Most rugs are said to pull the room together because they're aesthetically pleasing. This hardwearing floorcovering literally pulls the room together, because it has its own centre of gravity. Not really. It's just a rug.",
+      "baseCost": 875,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_rug.js"
+    },
+    "furniture_shelf": {
+      "label": "Shelf",
+      "namePlural": "Shelves",
+      "desc": "The perfect shelf is longer, stronger and more attractive: this is not that shelf. It's like that shelf. It's shelf-ish. But there's nothing wrong with being a little shelfish.",
+      "baseCost": 750,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_shelf.js"
+    },
+    "furniture_sidetable": {
+      "label": "Side Table",
+      "namePlural": "Side Tables",
+      "desc": "A side table. For the side. The side of what, no one knows. But that's where it belongs. Not in the centre, and certainly not in the corner. Nobody puts a table in the corner.",
+      "baseCost": 300,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_sidetable.js"
+    },
+    "furniture_sofa": {
+      "label": "Sofa",
+      "namePlural": "Sofas",
+      "desc": "The phrase \"sofa: so good\" is not about this sofa, which is not, essentially, a good sofa. But with a little upgrading, it could be.",
+      "baseCost": 1500,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_sofa.js"
+    },
+    "furniture_stool": {
+      "label": "Stool",
+      "namePlural": "Stools",
+      "desc": "A deceptively simple construction offering the ability to see through walls. Small segments of wall, at any rate.",
+      "baseCost": 150,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_stool.js"
+    },
+    "furniture_table": {
+      "label": "Table",
+      "namePlural": "Tables",
+      "desc": "It has four legs, like a pig. It isn't a pig. It's a plain old basic table. Do not nibble it.",
+      "baseCost": 1200,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_table.js"
+    },
+    "furniture_tabledeco": {
+      "label": "Tabletop Decoration",
+      "namePlural": "Tabletop Decorations",
+      "desc": "A simple wooden table decoration? Perhaps. But squint a little, and you can see the potential that lies within it. Squint a *little* more, and it kind of looks like a chicken with a hat on. But squint any more than that and you'll get wrinkles. Stop squinting.",
+      "baseCost": 225,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture",
+        "furniture_placed_normally"
+      ],
+      "isTool": false,
+      "source": "items/furniture_tabledeco.js"
+    },
+    "furniture_tablelamp": {
+      "label": "Table Lamp",
+      "namePlural": "Table Lamps",
+      "desc": "A basic table light, for the lighting of tables. The perfect accessory for those who long to see tables better.",
+      "baseCost": 550,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture",
+        "furniture_placed_normally"
+      ],
+      "isTool": false,
+      "source": "items/furniture_tablelamp.js"
+    },
+    "furniture_walldeco": {
+      "label": "Wall Decoration",
+      "namePlural": "Wall Decorations",
+      "desc": "Some would look at this and see an empty frame. Those with more of a creative eye can see the potential that lies within it. Art is in the eye of the beholder: for a wall decoration, doubly so.",
+      "baseCost": 350,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_walldeco.js"
+    },
+    "furniture_walllamp": {
+      "label": "Wall Lamp",
+      "namePlural": "Wall Lamps",
+      "desc": "For those who require a detailed, well-lit view of a small area of the wall, of anyone standing directly below the lamp, and of the lamp itself. A desirable feature.",
+      "baseCost": 600,
+      "stackMax": 1,
+      "tags": [
+        "no_rube",
+        "furniture"
+      ],
+      "isTool": false,
+      "source": "items/furniture_walllamp.js"
     },
     "gammas_pancakes": {
       "label": "Gamma's Pancake",
@@ -5144,6 +5540,18 @@
         "source": "items/snack_pack.js base_cost 66 × energy_factor 1 (include/food.js food_eat)"
       }
     },
+    "snail": {
+      "label": "Snail",
+      "namePlural": "Snails",
+      "desc": "Part-screw, part-nail (and managing to combine the less useful parts of both), snails are the product of a Sloth getting private time with metal rods.",
+      "baseCost": 10,
+      "stackMax": 100,
+      "tags": [
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/snail.js"
+    },
     "sneezing_powder": {
       "label": "Sneezing Powder",
       "namePlural": "Sneezing Powder",
@@ -5865,6 +6273,18 @@
         "energy": 185,
         "source": "items/waffles.js base_cost 185 × energy_factor 1 (include/food.js food_eat)"
       }
+    },
+    "wall_segment": {
+      "label": "Wall Segment",
+      "namePlural": "Wall Segments",
+      "desc": "On its own, it would just fall over. But among a house and other Wall Segments, it becomes the building block of home expansions. Useful for widening and adding floors to houses.",
+      "baseCost": 2500,
+      "stackMax": 10,
+      "tags": [
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/wall_segment.js"
     },
     "watering_can": {
       "label": "Watering Can",

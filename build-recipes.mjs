@@ -61,11 +61,10 @@ export const INCLUDED_TOOLS = [
   'loomer',
   'crystallizer',
   'tinkertool',
+  'construction_tool',
 ];
 
 const SKIPPED_TOOLS = {
-  construction_tool:
-    'Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.',
   blockmaker:
     'Blockmaker makes Urth Blocks, which only feed house/terrain expansion; no building system exists.',
 };
@@ -102,6 +101,11 @@ const UNPLAYABLE_TOOL_REASONS = {
   spindle: 'Spindle spins Fiber into Thread via its own verb; no spinning/fiber system exists.',
   splendid_spindle: 'Splendid Spindle spins Fiber into Thread via its own verb; no spinning/fiber system exists.',
 };
+
+/** Furniture classes with recovered art (build-homes.mjs FURNITURE_CLASSES). */
+const PLACEABLE_FURNITURE = new Set(
+  [...readFileSync(join(root, 'public/js/homes-catalog.js'), 'utf8').matchAll(/^  "((?:bag_)?furniture_[a-z_]+)": \{/gm)].map((m) => m[1])
+);
 
 /** Existing remake keys (kept so saves, tests, QA links and game.js stay stable). */
 const LEGACY_KEYS = {
@@ -335,9 +339,15 @@ function skipReason(id, r) {
     return 'learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).';
   }
   const outIds = r.outputs.map((o) => o[0]);
-  if (outIds.some((o) => /^(furniture_|bag_furniture_)/.test(o))) {
-    return 'Output is housing furniture; no home interior or furniture placement system exists.';
+  // Furniture the house can place (homes-catalog.js) and the Wall Segment that
+  // widens it are playable; doors between floors and Note Poles are not.
+  const unplaceable = outIds.find((o) => /^(furniture_|bag_furniture_)/.test(o) && !PLACEABLE_FURNITURE.has(o));
+  if (unplaceable) {
+    return unplaceable === 'furniture_door'
+      ? 'Doors connect extra floors; the remake house has one floor.'
+      : `Output ${unplaceable} has no recovered art for the house.`;
   }
+  if (outIds.includes('note_pole')) return 'Note Poles hold public notes; there is no note system.';
   if (r.tool === 'tinkertool') {
     const bad = outIds.find((o) => !PLAYABLE_TOOL_OUTPUTS.has(o));
     if (bad) return UNPLAYABLE_TOOL_REASONS[bad] || `Output tool ${bad} has no gameplay loop in the remake.`;

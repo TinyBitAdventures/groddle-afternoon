@@ -2,8 +2,8 @@
   "_meta": {
     "generator": "build-recipes.mjs",
     "sourceRecipes": 339,
-    "imported": 281,
-    "skipped": 58,
+    "imported": 309,
+    "skipped": 30,
     "verbRecipes": 4
   },
   "skipped": [
@@ -148,16 +148,6 @@
       "source": "catalog_recipes.js recipes[\"251\"]"
     },
     {
-      "id": "252",
-      "name": "Chair",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_chair"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"252\"]"
-    },
-    {
       "id": "254",
       "name": "Still",
       "tool": "metalmaker",
@@ -168,84 +158,14 @@
       "source": "catalog_recipes.js recipes[\"254\"]"
     },
     {
-      "id": "255",
-      "name": "Storage Display Box",
-      "tool": "construction_tool",
-      "outputs": [
-        "bag_furniture_sdb"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"255\"]"
-    },
-    {
-      "id": "256",
-      "name": "Side Table",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_sidetable"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"256\"]"
-    },
-    {
-      "id": "257",
-      "name": "Armchair",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_armchair"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"257\"]"
-    },
-    {
-      "id": "258",
-      "name": "Bed",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_bed"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"258\"]"
-    },
-    {
-      "id": "259",
-      "name": "Sofa",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_sofa"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"259\"]"
-    },
-    {
       "id": "260",
       "name": "Door",
       "tool": "construction_tool",
       "outputs": [
         "furniture_door"
       ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "reason": "Doors connect extra floors; the remake house has one floor.",
       "source": "catalog_recipes.js recipes[\"260\"]"
-    },
-    {
-      "id": "261",
-      "name": "Wall Segment",
-      "tool": "construction_tool",
-      "outputs": [
-        "wall_segment"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"261\"]"
-    },
-    {
-      "id": "262",
-      "name": "Cabinet",
-      "tool": "construction_tool",
-      "outputs": [
-        "bag_furniture_cabinet"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"262\"]"
     },
     {
       "id": "263",
@@ -256,136 +176,6 @@
       ],
       "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
       "source": "catalog_recipes.js recipes[\"263\"]"
-    },
-    {
-      "id": "264",
-      "name": "Wall Cabinet",
-      "tool": "construction_tool",
-      "outputs": [
-        "bag_furniture_wallcabinet"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"264\"]"
-    },
-    {
-      "id": "265",
-      "name": "Shelf",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_shelf"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"265\"]"
-    },
-    {
-      "id": "266",
-      "name": "Loveseat",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_loveseat"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"266\"]"
-    },
-    {
-      "id": "267",
-      "name": "Table",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_table"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"267\"]"
-    },
-    {
-      "id": "268",
-      "name": "Coffee Table",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_coffeetable"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"268\"]"
-    },
-    {
-      "id": "269",
-      "name": "Desk",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_desk"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"269\"]"
-    },
-    {
-      "id": "270",
-      "name": "Counter",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_counter"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"270\"]"
-    },
-    {
-      "id": "271",
-      "name": "Bench",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_bench"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"271\"]"
-    },
-    {
-      "id": "272",
-      "name": "Room Decoration",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_roomdeco"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"272\"]"
-    },
-    {
-      "id": "273",
-      "name": "Hanging Decoration",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_ceilingdeco"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"273\"]"
-    },
-    {
-      "id": "274",
-      "name": "Wall Decoration",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_walldeco"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"274\"]"
-    },
-    {
-      "id": "275",
-      "name": "Tabletop Decoration",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_tabledeco"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"275\"]"
-    },
-    {
-      "id": "276",
-      "name": "Stool",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_stool"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"276\"]"
     },
     {
       "id": "282",
@@ -448,66 +238,6 @@
       "source": "catalog_recipes.js recipes[\"287\"]"
     },
     {
-      "id": "289",
-      "name": "Table Lamp",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_tablelamp"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"289\"]"
-    },
-    {
-      "id": "290",
-      "name": "Wall Lamp",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_walllamp"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"290\"]"
-    },
-    {
-      "id": "291",
-      "name": "Ceiling Lamp",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_ceilinglamp"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"291\"]"
-    },
-    {
-      "id": "292",
-      "name": "Floor Lamp",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_floorlamp"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"292\"]"
-    },
-    {
-      "id": "296",
-      "name": "Rug",
-      "tool": "loomer",
-      "outputs": [
-        "furniture_rug"
-      ],
-      "reason": "Output is housing furniture; no home interior or furniture placement system exists.",
-      "source": "catalog_recipes.js recipes[\"296\"]"
-    },
-    {
-      "id": "297",
-      "name": "Small Cabinet",
-      "tool": "construction_tool",
-      "outputs": [
-        "bag_furniture_smallcabinet"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"297\"]"
-    },
-    {
       "id": "299",
       "name": "Spindle",
       "tool": "tinkertool",
@@ -544,7 +274,7 @@
       "outputs": [
         "note_pole"
       ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
+      "reason": "Note Poles hold public notes; there is no note system.",
       "source": "catalog_recipes.js recipes[\"303\"]"
     },
     {
@@ -576,16 +306,6 @@
       ],
       "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
       "source": "catalog_recipes.js recipes[\"320\"]"
-    },
-    {
-      "id": "321",
-      "name": "Fireplace",
-      "tool": "construction_tool",
-      "outputs": [
-        "furniture_fireplace"
-      ],
-      "reason": "Construction Tool recipes build housing furniture, walls, lamps and doors; the remake has no home interior or furniture placement system.",
-      "source": "catalog_recipes.js recipes[\"321\"]"
     }
   ]
 }

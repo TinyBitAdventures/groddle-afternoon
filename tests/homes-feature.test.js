@@ -100,3 +100,30 @@ describe('homes feature helpers', () => {
     assert.match(game, /'decorate', 'cultivate'\]\.includes\(homeDemo\)/);
   });
 });
+
+describe('furniture making and buying', () => {
+  const recipes = JSON.parse(readFileSync(join(root, 'assets/content/recipes.json'), 'utf8'));
+  const skipped = JSON.parse(readFileSync(join(root, 'assets/content/recipes-skipped.json'), 'utf8'));
+  const stores = readFileSync(join(root, 'js/store-catalog.js'), 'utf8');
+
+  it('imports the Construction Tool and Loomer furniture recipes with source costs', () => {
+    assert.equal(recipes.furniture_chair.tool, 'construction_tool');
+    assert.deepEqual(recipes.furniture_chair.inputs, [
+      { classTsid: 'wood_post', qty: 1 },
+      { classTsid: 'board', qty: 4 },
+      { classTsid: 'snail', qty: 4 },
+    ]);
+    assert.equal(recipes.furniture_chair.energyCost, 75);
+    assert.equal(recipes.furniture_chair.skill, 'furnituremaking_1');
+    assert.equal(recipes.wall_segment.id, '261');
+    assert.equal(recipes.furniture_rug.tool, 'loomer');
+    assert.equal(recipes.furniture_fireplace.id, '321');
+    const stillSkipped = skipped.skipped.filter((r) => r.tool === 'construction_tool').map((r) => r.id);
+    assert.deepEqual(stillSkipped, ['260', '303']);
+  });
+
+  it('stocks the Construction Tool and Bulb where catalog_stores.js sells them', () => {
+    assert.match(stores, /"classTsid": "construction_tool",\s+"label": "Construction Tool",\s+"cost": 560/);
+    assert.match(stores, /"classTsid": "bulb",\s+"label": "Bulb",\s+"cost": 56/);
+  });
+});

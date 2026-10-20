@@ -33,6 +33,7 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   cauldron: { label: 'Cauldron', capacity: 200, baseCost: 3500, source: 'cauldron.js' },
   tincturing_kit: { label: 'Tincturing Kit', capacity: 100, baseCost: 1250, source: 'tincturing_kit.js' },
   loomer: { label: 'Loomer', capacity: 100, baseCost: 400, source: 'loomer.js' },
+  construction_tool: { label: 'Construction Tool', capacity: 100, baseCost: 500, source: 'construction_tool.js' },
   crystallizer: { label: 'Crystalmalizing Chamber', capacity: 1000, baseCost: 2500, source: 'crystallizer.js' },
   // Resource-node tools (js/resource-nodes.js): tool_base points_capacity overrides.
   scraper: { label: 'Scraper', capacity: 50, baseCost: 300, source: 'scraper.js' },

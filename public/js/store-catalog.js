@@ -198,6 +198,16 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "loomer",
         "label": "Loomer",
         "cost": 448
+      },
+      {
+        "classTsid": "construction_tool",
+        "label": "Construction Tool",
+        "cost": 560
+      },
+      {
+        "classTsid": "bulb",
+        "label": "Bulb",
+        "cost": 56
       }
     ]
   },
@@ -700,6 +710,16 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "loomer",
         "label": "Loomer",
         "cost": 420
+      },
+      {
+        "classTsid": "construction_tool",
+        "label": "Construction Tool",
+        "cost": 525
+      },
+      {
+        "classTsid": "bulb",
+        "label": "Bulb",
+        "cost": 53
       }
     ]
   },

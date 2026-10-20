@@ -8033,6 +8033,43 @@
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"250\"]"
   },
+  "furniture_chair": {
+    "id": "252",
+    "name": "Chair",
+    "tool": "construction_tool",
+    "energyCost": 75,
+    "xpReward": 18,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "wood_post",
+        "qty": 1
+      },
+      {
+        "classTsid": "board",
+        "qty": 4
+      },
+      {
+        "classTsid": "snail",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_chair",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"252\"]"
+  },
   "board": {
     "id": "253",
     "name": "Board",
@@ -8065,6 +8102,775 @@
     "taskLimit": 40,
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"253\"]"
+  },
+  "bag_furniture_sdb": {
+    "id": "255",
+    "name": "Storage Display Box",
+    "tool": "construction_tool",
+    "energyCost": 40,
+    "xpReward": 10,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "metal_rod",
+        "qty": 2
+      },
+      {
+        "classTsid": "board",
+        "qty": 4
+      },
+      {
+        "classTsid": "snail",
+        "qty": 8
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bag_furniture_sdb",
+        "qty": 1
+      }
+    ],
+    "skill": "engineering_1",
+    "skills": [
+      "engineering_1",
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"255\"]"
+  },
+  "furniture_sidetable": {
+    "id": "256",
+    "name": "Side Table",
+    "tool": "construction_tool",
+    "energyCost": 40,
+    "xpReward": 12,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "board",
+        "qty": 4
+      },
+      {
+        "classTsid": "snail",
+        "qty": 10
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_sidetable",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"256\"]"
+  },
+  "furniture_armchair": {
+    "id": "257",
+    "name": "Armchair",
+    "tool": "construction_tool",
+    "energyCost": 150,
+    "xpReward": 40,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 1
+      },
+      {
+        "classTsid": "wood_post",
+        "qty": 1
+      },
+      {
+        "classTsid": "fiber",
+        "qty": 70
+      },
+      {
+        "classTsid": "board",
+        "qty": 4
+      },
+      {
+        "classTsid": "snail",
+        "qty": 12
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_armchair",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"257\"]"
+  },
+  "furniture_bed": {
+    "id": "258",
+    "name": "Bed",
+    "tool": "construction_tool",
+    "energyCost": 180,
+    "xpReward": 64,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 1
+      },
+      {
+        "classTsid": "fiber",
+        "qty": 240
+      },
+      {
+        "classTsid": "wood_post",
+        "qty": 3
+      },
+      {
+        "classTsid": "board",
+        "qty": 8
+      },
+      {
+        "classTsid": "snail",
+        "qty": 8
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_bed",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"258\"]"
+  },
+  "furniture_sofa": {
+    "id": "259",
+    "name": "Sofa",
+    "tool": "construction_tool",
+    "energyCost": 180,
+    "xpReward": 60,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 2
+      },
+      {
+        "classTsid": "fiber",
+        "qty": 160
+      },
+      {
+        "classTsid": "wood_post",
+        "qty": 2
+      },
+      {
+        "classTsid": "snail",
+        "qty": 8
+      },
+      {
+        "classTsid": "plank",
+        "qty": 8
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_sofa",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"259\"]"
+  },
+  "wall_segment": {
+    "id": "261",
+    "name": "Wall Segment",
+    "tool": "construction_tool",
+    "energyCost": 150,
+    "xpReward": 100,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "beam",
+        "qty": 1
+      },
+      {
+        "classTsid": "wood_post",
+        "qty": 4
+      },
+      {
+        "classTsid": "board",
+        "qty": 12
+      },
+      {
+        "classTsid": "barnacle_talc",
+        "qty": 15
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "wall_segment",
+        "qty": 1
+      }
+    ],
+    "skill": "engineering_1",
+    "skills": [
+      "engineering_1",
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 5,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"261\"]"
+  },
+  "bag_furniture_cabinet": {
+    "id": "262",
+    "name": "Cabinet",
+    "tool": "construction_tool",
+    "energyCost": 200,
+    "xpReward": 80,
+    "waitMs": 5000,
+    "inputs": [
+      {
+        "classTsid": "metal_post",
+        "qty": 2
+      },
+      {
+        "classTsid": "wood_post",
+        "qty": 2
+      },
+      {
+        "classTsid": "board",
+        "qty": 12
+      },
+      {
+        "classTsid": "snail",
+        "qty": 20
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bag_furniture_cabinet",
+        "qty": 1
+      }
+    ],
+    "skill": "engineering_1",
+    "skills": [
+      "engineering_1",
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 5,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"262\"]"
+  },
+  "bag_furniture_wallcabinet": {
+    "id": "264",
+    "name": "Wall Cabinet",
+    "tool": "construction_tool",
+    "energyCost": 180,
+    "xpReward": 44,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "metal_post",
+        "qty": 1
+      },
+      {
+        "classTsid": "metal_rod",
+        "qty": 2
+      },
+      {
+        "classTsid": "board",
+        "qty": 10
+      },
+      {
+        "classTsid": "snail",
+        "qty": 12
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bag_furniture_wallcabinet",
+        "qty": 1
+      }
+    ],
+    "skill": "engineering_1",
+    "skills": [
+      "engineering_1",
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"264\"]"
+  },
+  "furniture_shelf": {
+    "id": "265",
+    "name": "Shelf",
+    "tool": "construction_tool",
+    "energyCost": 150,
+    "xpReward": 30,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "metal_rod",
+        "qty": 2
+      },
+      {
+        "classTsid": "board",
+        "qty": 6
+      },
+      {
+        "classTsid": "snail",
+        "qty": 12
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_shelf",
+        "qty": 1
+      }
+    ],
+    "skill": "engineering_1",
+    "skills": [
+      "engineering_1",
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"265\"]"
+  },
+  "furniture_loveseat": {
+    "id": "266",
+    "name": "Loveseat",
+    "tool": "construction_tool",
+    "energyCost": 180,
+    "xpReward": 50,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 1
+      },
+      {
+        "classTsid": "fiber",
+        "qty": 80
+      },
+      {
+        "classTsid": "wood_post",
+        "qty": 2
+      },
+      {
+        "classTsid": "board",
+        "qty": 6
+      },
+      {
+        "classTsid": "snail",
+        "qty": 8
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_loveseat",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"266\"]"
+  },
+  "furniture_table": {
+    "id": "267",
+    "name": "Table",
+    "tool": "construction_tool",
+    "energyCost": 180,
+    "xpReward": 48,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "wood_post",
+        "qty": 4
+      },
+      {
+        "classTsid": "board",
+        "qty": 6
+      },
+      {
+        "classTsid": "snail",
+        "qty": 8
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_table",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"267\"]"
+  },
+  "furniture_coffeetable": {
+    "id": "268",
+    "name": "Coffee Table",
+    "tool": "construction_tool",
+    "energyCost": 160,
+    "xpReward": 44,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "wood_post",
+        "qty": 2
+      },
+      {
+        "classTsid": "board",
+        "qty": 12
+      },
+      {
+        "classTsid": "snail",
+        "qty": 12
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_coffeetable",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"268\"]"
+  },
+  "furniture_desk": {
+    "id": "269",
+    "name": "Desk",
+    "tool": "construction_tool",
+    "energyCost": 150,
+    "xpReward": 42,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "metal_post",
+        "qty": 1
+      },
+      {
+        "classTsid": "board",
+        "qty": 8
+      },
+      {
+        "classTsid": "snail",
+        "qty": 12
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_desk",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"269\"]"
+  },
+  "furniture_counter": {
+    "id": "270",
+    "name": "Counter",
+    "tool": "construction_tool",
+    "energyCost": 125,
+    "xpReward": 37,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "board",
+        "qty": 18
+      },
+      {
+        "classTsid": "snail",
+        "qty": 12
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_counter",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"270\"]"
+  },
+  "furniture_bench": {
+    "id": "271",
+    "name": "Bench",
+    "tool": "construction_tool",
+    "energyCost": 150,
+    "xpReward": 38,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "wood_post",
+        "qty": 1
+      },
+      {
+        "classTsid": "board",
+        "qty": 12
+      },
+      {
+        "classTsid": "snail",
+        "qty": 16
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_bench",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"271\"]"
+  },
+  "furniture_roomdeco": {
+    "id": "272",
+    "name": "Room Decoration",
+    "tool": "construction_tool",
+    "energyCost": 125,
+    "xpReward": 28,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "board",
+        "qty": 12
+      },
+      {
+        "classTsid": "snail",
+        "qty": 12
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_roomdeco",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"272\"]"
+  },
+  "furniture_ceilingdeco": {
+    "id": "273",
+    "name": "Hanging Decoration",
+    "tool": "construction_tool",
+    "energyCost": 100,
+    "xpReward": 25,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "metal_rod",
+        "qty": 2
+      },
+      {
+        "classTsid": "board",
+        "qty": 6
+      },
+      {
+        "classTsid": "string",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_ceilingdeco",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"273\"]"
+  },
+  "furniture_walldeco": {
+    "id": "274",
+    "name": "Wall Decoration",
+    "tool": "construction_tool",
+    "energyCost": 60,
+    "xpReward": 14,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "board",
+        "qty": 4
+      },
+      {
+        "classTsid": "string",
+        "qty": 1
+      },
+      {
+        "classTsid": "snail",
+        "qty": 6
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_walldeco",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"274\"]"
+  },
+  "furniture_tabledeco": {
+    "id": "275",
+    "name": "Tabletop Decoration",
+    "tool": "construction_tool",
+    "energyCost": 30,
+    "xpReward": 9,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "board",
+        "qty": 4
+      },
+      {
+        "classTsid": "snail",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_tabledeco",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"275\"]"
+  },
+  "furniture_stool": {
+    "id": "276",
+    "name": "Stool",
+    "tool": "construction_tool",
+    "energyCost": 20,
+    "xpReward": 6,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "board",
+        "qty": 3
+      },
+      {
+        "classTsid": "snail",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_stool",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"276\"]"
   },
   "wood_post": {
     "id": "277",
@@ -8282,6 +9088,166 @@
     "learnt": 2,
     "source": "catalog_recipes.js recipes[\"288\"]"
   },
+  "furniture_tablelamp": {
+    "id": "289",
+    "name": "Table Lamp",
+    "tool": "construction_tool",
+    "energyCost": 75,
+    "xpReward": 22,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 1
+      },
+      {
+        "classTsid": "metal_rod",
+        "qty": 1
+      },
+      {
+        "classTsid": "bulb",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_tablelamp",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"289\"]"
+  },
+  "furniture_walllamp": {
+    "id": "290",
+    "name": "Wall Lamp",
+    "tool": "construction_tool",
+    "energyCost": 75,
+    "xpReward": 24,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 1
+      },
+      {
+        "classTsid": "metal_rod",
+        "qty": 1
+      },
+      {
+        "classTsid": "bulb",
+        "qty": 1
+      },
+      {
+        "classTsid": "snail",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_walllamp",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_1",
+    "skills": [
+      "furnituremaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"290\"]"
+  },
+  "furniture_ceilinglamp": {
+    "id": "291",
+    "name": "Ceiling Lamp",
+    "tool": "construction_tool",
+    "energyCost": 100,
+    "xpReward": 27,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 1
+      },
+      {
+        "classTsid": "metal_rod",
+        "qty": 1
+      },
+      {
+        "classTsid": "bulb",
+        "qty": 1
+      },
+      {
+        "classTsid": "snail",
+        "qty": 8
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_ceilinglamp",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"291\"]"
+  },
+  "furniture_floorlamp": {
+    "id": "292",
+    "name": "Floor Lamp",
+    "tool": "construction_tool",
+    "energyCost": 150,
+    "xpReward": 32,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 1
+      },
+      {
+        "classTsid": "metal_rod",
+        "qty": 2
+      },
+      {
+        "classTsid": "bulb",
+        "qty": 1
+      },
+      {
+        "classTsid": "snail",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_floorlamp",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 20,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"292\"]"
+  },
   "string": {
     "id": "294",
     "name": "String",
@@ -8339,6 +9305,81 @@
     "taskLimit": 10,
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"295\"]"
+  },
+  "furniture_rug": {
+    "id": "296",
+    "name": "Rug",
+    "tool": "loomer",
+    "energyCost": 125,
+    "xpReward": 35,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "general_fabric",
+        "qty": 2
+      },
+      {
+        "classTsid": "string",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_rug",
+        "qty": 1
+      }
+    ],
+    "skill": "fiber_arts_2",
+    "skills": [
+      "fiber_arts_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"296\"]"
+  },
+  "bag_furniture_smallcabinet": {
+    "id": "297",
+    "name": "Small Cabinet",
+    "tool": "construction_tool",
+    "energyCost": 175,
+    "xpReward": 54,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "metal_post",
+        "qty": 1
+      },
+      {
+        "classTsid": "wood_post",
+        "qty": 2
+      },
+      {
+        "classTsid": "board",
+        "qty": 10
+      },
+      {
+        "classTsid": "snail",
+        "qty": 12
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bag_furniture_smallcabinet",
+        "qty": 1
+      }
+    ],
+    "skill": "engineering_1",
+    "skills": [
+      "engineering_1",
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"297\"]"
   },
   "face_smelter": {
     "id": "298",
@@ -8998,6 +10039,47 @@
     "taskLimit": 10,
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"319\"]"
+  },
+  "furniture_fireplace": {
+    "id": "321",
+    "name": "Fireplace",
+    "tool": "construction_tool",
+    "energyCost": 200,
+    "xpReward": 75,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "board",
+        "qty": 16
+      },
+      {
+        "classTsid": "firefly_jar",
+        "qty": 7
+      },
+      {
+        "classTsid": "dullite",
+        "qty": 120
+      },
+      {
+        "classTsid": "barnacle_talc",
+        "qty": 16
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "furniture_fireplace",
+        "qty": 1
+      }
+    ],
+    "skill": "furnituremaking_2",
+    "skills": [
+      "furnituremaking_2"
+    ],
+    "achievements": [],
+    "toolWear": 2,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"321\"]"
   },
   "kings_of_condiments": {
     "id": "322",

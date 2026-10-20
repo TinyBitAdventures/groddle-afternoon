@@ -218,6 +218,14 @@ export const TOOL_CATALOG = {
     icon: itemIcon('loomer'),
     isTool: true,
   },
+  construction_tool: {
+    classTsid: 'construction_tool',
+    label: 'Construction Tool',
+    desc: 'Builds chairs, tables, lamps, cabinets, rugs and Wall Segments for your house.',
+    icon: itemIcon('construction_tool'),
+    isTool: true,
+    action: 'build',
+  },
   pick: {
     classTsid: 'pick',
     label: 'Pick',
