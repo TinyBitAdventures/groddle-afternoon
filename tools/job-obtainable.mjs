@@ -1,15 +1,25 @@
 /**
  * Which item classes a solo player can actually get in the remake today, for
- * classifying street projects (build-street-jobs.mjs, tests/street-jobs.test.js).
+ * classifying street projects (build-street-jobs.mjs, tests/street-jobs.test.js)
+ * and the supply report (tools/supply-report.mjs).
  *
- * Sources, in order:
- *  - every ordinary street-spirit store (vendor.js VENDOR_PROFILES)
- *  - harvest systems: living trants, garden crops, mine rock chunks, ore
- *    grinder elements, smelted Plain Metal, Wood Tree planks, Animal Kinship
- *    yields, soil and resource-node drop tables, fox fiber
- *  - then a fixpoint over recipes.json: a recipe adds its outputs once its
- *    tool and every input are obtainable
+ * Sources:
+ *  - every ordinary street-spirit store (vendor.js VENDOR_PROFILES), the
+ *    Fox Ranger (foxes.js FOX_RANGER_STORE) and the Bureaucratic Hall clerks
+ *    (bureaucracy.js: Your Papers, General Building Permit)
+ *  - the starting kit's tools (making STARTER_TOOL_IDS, garden, mining and
+ *    resource-node starter tools, the Hatchet); starter consumables are not
+ *    counted because they run out
+ *  - harvest systems: living trants, mine rock chunks, smelted Plain Metal,
+ *    Wood Tree planks, Animal Kinship yields, soil and resource-node drop
+ *    tables, fox fiber
+ *  - then a fixpoint over every conversion: recipes.json (a recipe needs its
+ *    tool held and every input; machine recipes burn fuel from the machine's
+ *    tank, js/machines.js), garden seeds into crops, pack transforms
+ *    (js/item-transforms.js: butter, cheese, herb seeds), machine assembly
+ *    from a Machine Stand and parts, the Still's Hooch, and Paper into Notes
  *
+ * A tool counts as held only when one of those sources gives it.
  * Node only (reads recipes.json from disk).
  */
 
@@ -31,6 +41,42 @@ function walkClassTsids(value, out) {
   }
 }
 
+/** Every conversion as { inputs: [ids], tool, outputs: [ids], source }. */
+export async function supplyConversions() {
+  const making = await import(js('making.js'));
+  await making.loadRecipeCatalogFromFile(join(root, 'assets/content/recipes.json'));
+  const garden = await import(js('garden.js'));
+  const transforms = await import(js('item-transforms.js'));
+  const machines = await import(js('machines.js'));
+
+  const rows = [];
+  for (const [key, recipe] of Object.entries(making.RECIPE_CATALOG)) {
+    rows.push({
+      inputs: (recipe.inputs || []).map((i) => i.classTsid),
+      tool: recipe.tool || null,
+      outputs: (recipe.outputs || []).map((o) => o.classTsid),
+      source: `recipe:${key}`,
+    });
+  }
+  for (const seed of Object.values(garden.SEED_CATALOG)) {
+    rows.push({ inputs: [seed.seedId], tool: null, outputs: [seed.cropId], source: `garden:${seed.seedId}` });
+  }
+  for (const edge of transforms.transformEdges()) {
+    rows.push({ inputs: [edge.from], tool: null, outputs: [edge.to], source: `transform:${edge.verb}` });
+  }
+  for (const [from, verbs] of Object.entries(transforms.ITEM_TRANSFORMS)) {
+    for (const t of verbs) if (t.becomes) rows.push({ inputs: [from], tool: null, outputs: [t.becomes], source: `transform:${t.id}` });
+  }
+  for (const [machine, def] of Object.entries(machines.MACHINE_ASSEMBLIES)) {
+    rows.push({ inputs: [machines.MACHINE_STAND, ...def.parts], tool: null, outputs: [machine], source: 'assembly' });
+  }
+  for (const id of Object.keys(machines.STILL.distillables)) {
+    rows.push({ inputs: [id], tool: machines.STILL.classTsid, outputs: ['hooch'], source: 'still' });
+  }
+  rows.push({ inputs: ['paper'], tool: null, outputs: ['note'], source: 'paper:write' });
+  return rows;
+}
+
 export async function obtainableItems() {
   const vendor = await import(js('vendor.js'));
   const making = await import(js('making.js'));
@@ -41,28 +87,41 @@ export async function obtainableItems() {
   const resources = await import(js('resource-nodes.js'));
   const patches = await import(js('patches.js'));
   const tools = await import(js('tools.js'));
+  const foxes = await import(js('foxes.js'));
+  const bureaucracy = await import(js('bureaucracy.js'));
 
   const have = new Set();
   const sources = {};
   const add = (id, source) => {
-    if (!id || have.has(id)) return;
+    if (!id || have.has(id)) return false;
     have.add(id);
     sources[id] = source;
+    return true;
   };
 
   for (const profile of Object.values(vendor.VENDOR_PROFILES)) {
     for (const offer of profile.offers || []) add(offer.classTsid, `vendor:${profile.key}`);
   }
+  for (const item of foxes.FOX_RANGER_STORE.items) add(item.classTsid, 'vendor:fox_ranger');
+  // Bureaucratic Hall clerks (supply feature), after the Legalize It card.
+  for (const id of Object.keys(bureaucracy.BUREAUCRACY_ITEMS)) add(id, 'vendor:bureaucracy');
+
+  const starterTools = [
+    ...making.STARTER_TOOL_IDS,
+    ...Object.keys(garden.starterGardenTools()),
+    ...Object.keys(resources.starterResourceTools()),
+    ...Object.keys(mining.starterMiningTools()).filter((id) => id !== 'fuel_cell'),
+    'hatchet',
+  ];
+  for (const id of starterTools) add(id, 'starter');
+
   for (const meta of Object.values(trants.TRANT_META)) add(meta.fruitClass, 'trant');
-  for (const seed of Object.values(garden.SEED_CATALOG)) {
-    if (have.has(seed.seedId)) add(seed.cropId, 'garden');
-  }
   for (const rock of Object.values(mining.ROCK_CATALOG)) add(rock.chunkId, 'mining');
   for (const rows of Object.values(mining.CRUSH_YIELDS)) for (const row of rows) add(row.classTsid, 'ore_grinder');
   add('plain_metal', 'smelter');
   add('plank', 'wood_tree');
   for (const id of ['meat', 'grain', 'milk_butterfly']) add(id, 'animal_kinship');
-  add('fiber', 'fox_brushing');
+  add(foxes.FIBER_ID, 'fox_brushing');
   const drops = new Set();
   walkClassTsids(resources.RESOURCE_DROP_TABLES, drops);
   walkClassTsids(resources.RESOURCE_ITEM_DEFS, drops);
@@ -72,29 +131,26 @@ export async function obtainableItems() {
   for (const id of Object.keys(resources.RESOURCE_ITEM_DEFS || {})) add(id, 'harvest');
   for (const id of Object.keys(patches.SOIL_ITEM_DEFS || {})) add(id, 'harvest');
 
-  const toolOk = (tool) => !tool || have.has(tool) || tool in making.TOOL_CATALOG;
+  const conversions = await supplyConversions();
   let grew = true;
   while (grew) {
     grew = false;
-    for (const recipe of Object.values(making.RECIPE_CATALOG)) {
-      if (!toolOk(recipe.tool)) continue;
-      if (!(recipe.inputs || []).every((input) => have.has(input.classTsid))) continue;
-      for (const output of recipe.outputs || []) {
-        if (!have.has(output.classTsid)) {
-          add(output.classTsid, `recipe:${recipe.tool || 'hand'}`);
-          grew = true;
-        }
+    for (const row of conversions) {
+      if (row.tool && !have.has(row.tool)) continue;
+      if (!row.inputs.every((id) => have.has(id))) continue;
+      for (const out of row.outputs) {
+        if (add(out, row.source.startsWith('recipe:') ? `recipe:${row.tool || 'hand'}` : row.source)) grew = true;
       }
     }
   }
 
-  // Tools a player can hold: the making catalog, condition-tracked tools, and
-  // anything a store sells.
+  // Tools a player can hold: anything above that is a tool.
   const toolIds = new Set([
     ...Object.keys(making.TOOL_CATALOG),
     ...Object.keys(tools.TOOL_CONDITION_CATALOG),
     'focusing_orb',
+    'still',
   ]);
-  const heldTools = new Set([...toolIds].filter((id) => have.has(id) || id in making.TOOL_CATALOG));
+  const heldTools = new Set([...toolIds].filter((id) => have.has(id)));
   return { items: have, sources, tools: heldTools };
 }
