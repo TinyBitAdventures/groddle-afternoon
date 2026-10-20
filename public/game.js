@@ -6234,6 +6234,7 @@ const engine = {
         isScreenFxBlocking() ||
         anyTransientInstance() ||
         engine.inScene() ||
+        engine.instanceHold ||
         homeIsInstanced() ||
         // Any open panel (Feat, quests, make, vendor, map, mailbox, ...).
         document.querySelector('.glitch-modal:not([hidden]), [id$="-panel"]:not([hidden])')
@@ -6316,7 +6317,7 @@ const engine = {
     });
   },
   stopFollowing: () => stopCompanionFollowForInstance(),
-  transientInstance: () => anyTransientInstance() || engine.inScene(),
+  transientInstance: () => anyTransientInstance() || engine.inScene() || Boolean(engine.instanceHold),
   homeContext() {
     return {
       inHome: homeIsInstanced(),
@@ -6391,6 +6392,8 @@ const engine = {
     world.x = -Math.round(camTarget);
     world.y = -Math.round(camY);
   },
+  /** A feature's transient instance on a real street (e.g. Game of Crowns), or null. */
+  instanceHold: null,
   /** TSID of the feature scene last entered with enterScene (or null). */
   sceneTsid: null,
   inScene() {

@@ -67,6 +67,8 @@ import {
 } from '../race-render.js?v=races-1';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { runStreetTransition } from '../screen-fx.js';
+import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
+import { startCrowns } from './crowns-feature.js?v=crowns-1';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
 const RIVAL_SCALE = 1.35 * 0.4;
@@ -111,6 +113,15 @@ function ensureRaceItems() {
       namePlural: `${race.ticketLabel}s`,
     });
   }
+  ensureItem(CROWNS_TICKET, {
+    label: 'Game of Crowns Ticket',
+    desc: 'Challenge another player to Game of Crowns.',
+    icon: `${RACE_ICON_DIR}${CROWNS_TICKET}.png`,
+    baseCost: 20,
+    stackMax: RACE_TICKET_STACK,
+    tags: ['no_trade'],
+    namePlural: 'Game of Crowns Tickets',
+  });
   ensureItem(RACE_GENERIC_TICKET, {
     label: 'Race Ticket',
     desc: 'Challenge another player to a race.',
@@ -123,23 +134,24 @@ function ensureRaceItems() {
 }
 
 function isRaceTicket(classTsid) {
-  return classTsid === RACE_GENERIC_TICKET || Boolean(raceForTicket(classTsid));
+  return classTsid === RACE_GENERIC_TICKET || classTsid === CROWNS_TICKET || Boolean(raceForTicket(classTsid));
 }
 
 function ticketRaceId(classTsid) {
+  if (classTsid === CROWNS_TICKET) return 'it_game';
   return classTsid === RACE_GENERIC_TICKET ? null : raceForTicket(classTsid)?.id || null;
 }
 
 function playable(raceId) {
-  return RACE_COURSE_IDS.includes(raceId);
+  return raceId === 'it_game' || RACE_COURSE_IDS.includes(raceId);
 }
 
 function raceTitle(raceId) {
-  return RACES[raceId]?.title || '';
+  return raceId === 'it_game' ? CROWNS_TITLE : RACES[raceId]?.title || '';
 }
 
 function raceDesc(raceId) {
-  return RACES[raceId]?.desc || '';
+  return raceId === 'it_game' ? 'Hold the crown for 60 seconds to win.' : RACES[raceId]?.desc || '';
 }
 
 /* ------------------------------------------------------------------ */
@@ -364,11 +376,13 @@ function activateTicket(classTsid, engine, opts = {}) {
   record.pendingTicket = classTsid;
   engine.updateHud();
   engine.save();
+  const crowns = raceId === 'it_game';
   const rival = pickRival(raceId, Date.now() / 1000);
-  const names = rival.name;
-  engine.pushActivity(`You activated a ${ITEM_LABEL(classTsid)}. ${rival.name} accepted your challenge!`);
+  // inc_games.js pretty_list(opponent_names, ' and ').
+  const names = crowns ? 'Lily Linguistic' : rival.name;
+  engine.pushActivity(`You activated a ${ITEM_LABEL(classTsid)}. ${crowns ? 'Three challengers' : rival.name} accepted your challenge!`);
   buildChrome(engine);
-  hud.banner.textContent = startDelayMessage(raceTitle(raceId), 'you', names);
+  hud.banner.textContent = startDelayMessage(raceTitle(raceId), crowns ? 'you, Amp, Bumbishfish' : 'you', names);
   hud.banner.hidden = false;
   engine.playSfx('alert', { volume: 0.45, rate: 1.05 });
   starting = true;
@@ -376,7 +390,9 @@ function activateTicket(classTsid, engine, opts = {}) {
   clearTimeout(startTimer);
   startTimer = setTimeout(() => {
     hud.banner.hidden = true;
-    startRace(raceId, engine, { rival, ticket: classTsid }).finally(() => {
+    const go = crowns ? startCrowns(engine, { ticket: classTsid }) : startRace(raceId, engine, { rival, ticket: classTsid });
+    record.pendingTicket = crowns ? null : record.pendingTicket;
+    Promise.resolve(go).finally(() => {
       starting = false;
     });
   }, delay);
@@ -385,6 +401,7 @@ function activateTicket(classTsid, engine, opts = {}) {
 }
 
 function ITEM_LABEL(classTsid) {
+  if (classTsid === CROWNS_TICKET) return 'Game of Crowns Ticket';
   return raceForTicket(classTsid)?.ticketLabel || 'Race Ticket';
 }
 

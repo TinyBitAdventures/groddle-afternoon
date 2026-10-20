@@ -11,6 +11,7 @@ import { questOffersFeature } from './quest-offers-feature.js?v=offers-1';
 import { meditationFeature } from './meditation-feature.js?v=meditation-1';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-1';
 import { racesFeature } from './races-feature.js?v=races-1';
+import { crownsFeature } from './crowns-feature.js?v=crowns-1';
 import { patchesFeature } from './patches-feature.js?v=patches-1';
 import { foxesFeature } from './foxes-feature.js?v=foxes-1';
 import { heliKittiesFeature } from './heli-kitties-feature.js?v=kitties-1';
@@ -26,6 +27,7 @@ export const FEATURES = [
   meditationFeature,
   teleportationFeature,
   racesFeature,
+  crownsFeature,
   patchesFeature,
   foxesFeature,
   heliKittiesFeature,
