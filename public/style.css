@@ -1438,6 +1438,18 @@ button.play-context-head:focus-visible {
     text-overflow: ellipsis;
   }
   .activity-feed { top: 36px; }
+  /* Side panels end above the pack; their cards scroll inside that space. */
+  .side-panel {
+    bottom: var(--pack-live-height, 112px);
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+  }
+  .side-panel.side-panel > .side-card {
+    max-height: 100%;
+    min-height: 0;
+    pointer-events: auto;
+  }
 }
 
 /* Bottom pack — dual row like original (items over tools) */

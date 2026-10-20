@@ -117,4 +117,10 @@ test.describe('integration playtest regressions', () => {
     // butterfly-care-1 was cached by browsers before pickerMaxCount existed.
     assert.ok(!versions.has('butterfly-care-1'));
   });
+
+  test('phone side panels end above the pack and scroll inside', () => {
+    const phone = /@media \(max-width: 760px\) \{([\s\S]*?)\n\}/.exec(css)[1];
+    assert.match(phone, /\.side-panel \{[^}]*bottom: var\(--pack-live-height, 112px\)[^}]*pointer-events: none/);
+    assert.match(phone, /\.side-panel\.side-panel > \.side-card \{[^}]*max-height: 100%[^}]*pointer-events: auto/);
+  });
 });
