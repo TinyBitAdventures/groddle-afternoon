@@ -21886,7 +21886,9 @@ async function main() {
       // immediately. Avoid placing a transient verb modal under the same
       // pointer gesture that summoned it.
       if (best.classId === 'npc_mailbox') {
-        openMailboxPanel();
+        // Through the verb path, so street mailboxes (street-furniture) open
+        // without a deed and the home mailbox still opens the home mail.
+        executeVerb(best, 'view_inbox');
         return;
       }
       openVerbMenu(best);
