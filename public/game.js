@@ -373,8 +373,8 @@ import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=butterfly-care-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=butterfly-care-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=husbandry-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=husbandry-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -636,7 +636,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=butterfly-care-1';
+} from './js/animals.js?v=husbandry-1';
 import {
   ensureWoodTreeState,
   resetWoodTreeDay,

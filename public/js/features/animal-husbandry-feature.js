@@ -36,7 +36,7 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
-import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=butterfly-care-1';
+import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=husbandry-1';
 import {
   BABY_ANIMALS,
   BATTERFLY,

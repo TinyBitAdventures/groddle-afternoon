@@ -100,4 +100,21 @@ test.describe('integration playtest regressions', () => {
     assert.match(phone, /\.street-nameplate \{[^}]*white-space: nowrap;[^}]*text-overflow: ellipsis/);
     assert.match(phone, /\.activity-feed \{ top: 36px; \}/);
   });
+
+  test('every browser import of animals.js uses one cache-bust version', () => {
+    const files = [
+      'public/game.js',
+      'public/content.js',
+      ...fs.readdirSync(path.join(root, 'public/js/features')).map((f) => `public/js/features/${f}`),
+      ...fs.readdirSync(path.join(root, 'public/js')).filter((f) => f.endsWith('.js')).map((f) => `public/js/${f}`),
+    ];
+    const versions = new Set();
+    for (const file of files) {
+      const text = fs.readFileSync(path.join(root, file), 'utf8');
+      for (const m of text.matchAll(/animals\.js\?v=([\w-]+)/g)) versions.add(m[1]);
+    }
+    assert.equal(versions.size, 1, [...versions].join(', '));
+    // butterfly-care-1 was cached by browsers before pickerMaxCount existed.
+    assert.ok(!versions.has('butterfly-care-1'));
+  });
 });
