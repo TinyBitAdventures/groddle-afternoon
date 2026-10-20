@@ -156,6 +156,34 @@ function clearRun(engine) {
   run = null;
 }
 
+const ART_BASE = 'assets/sprites/puzzles/';
+
+/** Recovered CC0 item art the lost objects wore (e.g. Shim Shiri's light beams). */
+function spawnArt(engine, def) {
+  const { PIXI } = engine;
+  for (const a of def.art || []) {
+    const spr = PIXI.Sprite.from(`${ART_BASE}${a.sprite}.png`);
+    spr.anchor.set(0.5, 1);
+    spr.x = a.x;
+    spr.y = a.y;
+    // Size once the texture is real (a 1x1 placeholder would inflate the scale).
+    const size = () => {
+      spr.width = a.w;
+      spr.height = a.h;
+    };
+    if (spr.texture.valid) size();
+    else spr.texture.baseTexture.once('loaded', size);
+    if (a.tint != null) spr.tint = Number(a.tint);
+    spr.alpha = a.alpha ?? 0.6;
+    spr.zIndex = a.z ?? 5;
+    if (a.blend === 'add') spr.blendMode = PIXI.BLEND_MODES.ADD;
+    spr.puzzleArt = a;
+    engine.entityLayer.addChild(spr);
+    run.sprites.push(spr);
+    run.artViews.push({ spr, a, phase: (a.x % 53) / 9 });
+  }
+}
+
 function startRun(engine, street, def) {
   run = {
     tsid: key(street.tsid),
@@ -172,13 +200,18 @@ function startRun(engine, street, def) {
     complete: false,
     startedAt: locationEventsApi.clock(),
     repeatAt: new Map(),
+    artViews: [],
+    pull: null,
     toasted: new Set(),
     prevY: null,
+    pinned: false,
+    arrivalChecked: false,
     ceilings: def.ceilings
       ? new Set((street.platforms || []).filter((pl) => pl.pc_perm == null || Number(pl.pc_perm) === 1).map((pl) => pl.id))
       : null,
   };
   spawnQuoins(engine, def);
+  spawnArt(engine, def);
 }
 
 function place(engine, x, y) {
@@ -239,17 +272,102 @@ function clampCeiling(engine, p, height) {
   }
 }
 
+function ceilingYAt(pl, x) {
+  const x0 = Math.min(pl.x1, pl.x2);
+  const x1 = Math.max(pl.x1, pl.x2);
+  if (x < x0 || x > x1) return null;
+  return x1 > x0 ? pl.y1 + ((pl.y2 - pl.y1) * (x - pl.x1)) / (pl.x2 - pl.x1) : pl.y1;
+}
+
+/**
+ * Reversed gravity (the gut tubes' gravity -1, Purplysa's x-0.1 pads): as in
+ * the client (AvatarAnimationState, AvatarPhysicsHandler) the avatar stays
+ * upright in its airborne pose and its head stops on source ceilings
+ * (pc_perm 1/null). While it presses a ceiling the head follows that ceiling
+ * up and down its slope as the avatar moves, so it slides along the roof of a
+ * tube instead of tunnelling through where the line dips.
+ * @returns {boolean} true while gravity is reversed here
+ */
+function stepInverted(engine, p, height) {
+  const inverted = Boolean(run.ceilings) && locationEventsApi.gravity() < 0;
+  if (!inverted) {
+    run.pinned = false;
+    return false;
+  }
+  const head = p.y - height;
+  const prevHead = run.prevY == null ? null : run.prevY - height;
+  let best = null;
+  for (const pl of engine.platforms || []) {
+    if (!run.ceilings.has(pl.id)) continue;
+    const y = ceilingYAt(pl, p.x);
+    if (y == null) continue;
+    if (run.pinned && y >= head - 12 && y <= head + 28) {
+      if (best == null || Math.abs(y - head) < Math.abs(best - head)) best = y;
+    } else if (p.vy < 0 && prevHead != null && prevHead >= y - 2 && head < y) {
+      if (best == null || y > best) best = y;
+    }
+  }
+  if (best != null && p.vy <= 0.5) {
+    p.y = best + height;
+    p.vy = 0;
+    run.pinned = true;
+  } else {
+    run.pinned = false;
+  }
+  return true;
+}
+
+/**
+ * Gut tubes: Space flips which way is down. The lost boxes that flipped
+ * gravity at each bend of the serpentine and spiral tubes cannot be placed
+ * from the archive, so the traveller works the street's own invert/reset
+ * scripts instead (def.gravityToggle names them).
+ */
+let flipKeysBound = false;
+function bindGravityFlip(engine) {
+  if (flipKeysBound || typeof window === 'undefined') return;
+  flipKeysBound = true;
+  window.addEventListener('keydown', (e) => {
+    const flip = run?.def?.gravityToggle;
+    if (!flip || e.code !== 'Space' || e.repeat) return;
+    const tag = String(e.target?.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || engine.busy() || engine.transientInstance()) return;
+    const now = performance.now();
+    if (now - (run.flippedAt || -1e9) < 300) return;
+    run.flippedAt = now;
+    const inverted = locationEventsApi.gravity() < 0;
+    fireAll(engine, [inverted ? flip.normal : flip.invert], 'flip');
+    run.flips = (run.flips || 0) + 1;
+    engine.playSound('JUMP', { volume: 0.4, rate: inverted ? 0.8 : 1.3 });
+  });
+}
+
 function stepRun(engine) {
   const p = engine.player;
   if (!p || !run) return;
   run.bestX = Math.max(run.bestX, p.x);
   const height = avatarHeight(p);
-  clampCeiling(engine, p, height);
+  if (!stepInverted(engine, p, height)) clampCeiling(engine, p, height);
+  if (!run.arrivalChecked) {
+    run.arrivalChecked = true;
+    // Where the avatar arrived decides which way the street runs (the gut
+    // tubes' player_enter checked pc.y): fire that region's events once.
+    for (const rule of run.def.arrival || []) {
+      if (p.x >= rule.x0 && p.x <= rule.x1 && p.y >= rule.y0 && p.y <= rule.y1) {
+        fireAll(engine, rule.events || [], 'arrival');
+        if (rule.toast) engine.toast(rule.toast);
+        break;
+      }
+    }
+  }
   const now = locationEventsApi.clock();
   for (const edge of stepTriggers(run.def.triggers, run.inside, run.spent, p.x, p.y, height)) {
     fireAll(engine, edge.events, edge.trigger.id);
     if (!run) return;
     if (edge.edge === 'enter') run.repeatAt.set(edge.trigger.id, now + (edge.trigger.repeatMs || 0));
+    // moveAvatar stand-in: ease the avatar to the trigger's centre (a light
+    // beam lifting it straight up its column).
+    if (edge.edge === 'enter' && edge.trigger.pullMs) run.pull = { x: edge.trigger.x, until: now + edge.trigger.pullMs };
     if (edge.edge === 'enter' && edge.trigger.toast && !run.toasted.has(edge.trigger.id)) {
       run.toasted.add(edge.trigger.id);
       engine.toast(edge.trigger.toast);
@@ -266,6 +384,17 @@ function stepRun(engine) {
     if (!t.repeatMs || !run.inside.has(t.id) || now < (run.repeatAt.get(t.id) || 0)) continue;
     run.repeatAt.set(t.id, now + t.repeatMs);
     fireAll(engine, t.onEnter, t.id);
+  }
+  if (run.pull) {
+    if (now > run.pull.until) run.pull = null;
+    else {
+      p.x += (run.pull.x - p.x) * 0.15;
+      p.vx *= 0.5;
+    }
+  }
+  for (const view of run.artViews) {
+    view.phase += 0.05;
+    if (view.spr && !view.spr.destroyed) view.spr.alpha = (view.a.alpha ?? 0.6) * (0.85 + Math.sin(view.phase) * 0.15);
   }
   takeQuoins(engine);
   if (run.def.fallY != null && p.y > run.def.fallY) respawn(engine, 'Whoops! Back to the ledge.');
@@ -356,7 +485,7 @@ function travelTo(engine, tsid) {
 
 function buildMapCard(engine) {
   if (!data || typeof document === 'undefined') return null;
-  const rows = Object.entries(data).filter(([, def]) => def.mapCard !== false);
+  const rows = Object.entries(data).filter(([, def]) => def.exit && def.mapCard !== false);
   if (!rows.length) return null;
   const card = document.createElement('section');
   card.className = 'map-feature-card puzzle-map-card';
@@ -396,6 +525,8 @@ function publish(engine, now) {
   engine.setData('puzzleLast', run?.last || '');
   engine.setData('puzzleQuoins', run ? `${run.taken.size}/${run.def.quoins.length}` : '');
   engine.setData('puzzleRespawns', run?.respawns || 0);
+  engine.setData('puzzleGravity', run ? Number(locationEventsApi.gravity().toFixed(2)) : '');
+  engine.setData('puzzleFlips', run?.flips || 0);
 }
 
 function demoStep(engine, now) {
@@ -493,14 +624,17 @@ export const puzzlesFeature = {
   id: PUZZLES_FEATURE_ID,
 
   init(engine) {
+    bindGravityFlip(engine);
     if (engine.param('puzzledemo')) engine.setData('puzzleDemo', 'idle');
     load();
   },
 
   ecologyOverride(street) {
     const def = defFor(street?.tsid);
-    // Puzzle streets are hand-built courses: no wandering piggies or vendors.
-    return def ? { label: def.name, sourceTsid: key(street.tsid), counts: {}, empty: true } : null;
+    // Puzzle levels and gut tubes are hand-built courses: no wandering piggies
+    // or vendors. Hub streets with rebuilt triggers (Shim Shiri) keep theirs.
+    if (!def || def.emptyEcology === false || !(def.exit || def.emptyEcology)) return null;
+    return { label: def.name, sourceTsid: key(street.tsid), counts: {}, empty: true };
   },
 
   prepareStreet(street) {

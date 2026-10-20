@@ -105,6 +105,8 @@ describe('puzzle trigger data', () => {
         assert.ok(t.x >= 0 && t.x <= W && t.y >= 0 && t.y <= H + 80, `${t.id} out of bounds`);
         assert.ok(String(t.why || '').length > 20, `${t.id} needs a derivation note`);
       }
+      for (const rule of def.arrival || []) for (const name of rule.events || []) assert.ok(events[name], `arrival: missing event ${name}`);
+      for (const name of Object.values(def.gravityToggle || {})) assert.ok(events[name], `gravityToggle: missing event ${name}`);
       for (const q of def.quoins) assert.ok(q.x >= 0 && q.x <= W && q.y >= 0 && q.y <= H, `quoin out of bounds ${q.x},${q.y}`);
       if (def.start) assert.ok(def.start.x >= 0 && def.start.x <= W);
       const ids = new Set(def.triggers.map((t) => t.id));
@@ -218,5 +220,34 @@ describe('location-events trigger API', () => {
     assert.ok(!engine.platforms.some((p) => p.id === 'plat_a'), 'strict: plat_a really switches off');
     assert.equal(locationEventsApi.has('open'), true);
     assert.equal(locationEventsApi.active(), 'GTESTPUZZLE0001');
+  });
+});
+
+describe('gut tubes', () => {
+  test('every tube teleports its traveller out of the far end with the source destination', () => {
+    const tubes = Object.entries(data).filter(([, def]) => def.gravityToggle);
+    assert.equal(tubes.length, 5);
+    for (const [tsid, def] of tubes) {
+      const rt = createEventRuntime();
+      runLocationEvent(rt, def.events, 'gut_from_bottom', { now: 0, target: true });
+      assert.equal(rt.physics.gravity.value, -1, `${def.name}: arriving from Shim Shiri inverts gravity`);
+      const fx = runLocationEvent(rt, def.events, 'gut_top', { now: 0, target: true });
+      const tp = fx.find((e) => e.type === 'teleport');
+      assert.ok(tp?.street && tp.arrive, `${def.name}: top teleport resolves`);
+      assert.deepEqual(rt.physics, {}, `${def.name}: gravity resets on the way out`);
+      const again = runLocationEvent(rt, def.events, 'gut_top', { now: 0, target: true });
+      assert.ok(!again.some((e) => e.type === 'teleport'), `${def.name}: only a bottom starter rides out the top`);
+      assert.ok(street(tsid));
+    }
+  });
+
+  test('Shim Shiri light beams lift into each tube', () => {
+    const def = data.GA9BT2I0ILD340S;
+    const s = street('GA9BT2I0ILD340S');
+    assert.equal(def.triggers.length, 6);
+    for (const t of def.triggers) {
+      const fx = runLocationEvent(createEventRuntime(), s.events, t.onEnter[0], { now: 0, target: true });
+      assert.ok(fx.some((e) => e.type === 'physics' && e.param === 'gravity' && e.value === -1), `${t.id} lifts`);
+    }
   });
 });

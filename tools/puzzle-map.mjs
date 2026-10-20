@@ -13,9 +13,11 @@ const nums = rest.filter((a) => !a.startsWith('--')).map(Number);
 const root = new URL('../public/', import.meta.url);
 const street = JSON.parse(readFileSync(new URL(`assets/streets/${tsid}.json`, root), 'utf8'));
 let triggers = [];
+let quoins = [];
 try {
   const all = JSON.parse(readFileSync(new URL('assets/content/puzzle-triggers.json', root), 'utf8'));
   triggers = all.streets?.[tsid]?.triggers || [];
+  quoins = all.streets?.[tsid]?.quoins || [];
 } catch {}
 const W = street.bounds.r - street.bounds.l;
 const H = street.bounds.b - street.bounds.t;
@@ -38,7 +40,7 @@ const blank = new URL('../shots/.puzzle-map-blank.html', import.meta.url);
 writeFileSync(blank, '<!doctype html><html><body></body></html>');
 await page.goto(blank.href);
 const decoBase = new URL('assets/decos/groddle/', root).href;
-await page.evaluate(async ({ street, triggers, x0, x1, y0, y1, scale, toggled, decoIds, decoBase }) => {
+await page.evaluate(async ({ street, triggers, quoins, x0, x1, y0, y1, scale, toggled, decoIds, decoBase }) => {
   document.body.innerHTML = '';
   const c = document.createElement('canvas');
   c.width = Math.round((x1 - x0) * scale);
@@ -93,7 +95,8 @@ await page.evaluate(async ({ street, triggers, x0, x1, y0, y1, scale, toggled, d
   }
   for (const p of street.platforms) {
     const on = Number(p.pc_perm) !== 0;
-    g.strokeStyle = on ? '#0a0' : '#e00';
+    // green: hard on top (-1), blue: hard from below (1, a ceiling), red: off (0).
+    g.strokeStyle = !on ? '#e00' : p.pc_perm == null || Number(p.pc_perm) === 1 ? '#06f' : '#0a0';
     g.lineWidth = toggled.includes(p.id) ? 3 : 1.5;
     g.beginPath();
     g.moveTo(p.x1 - l, p.y1 - t);
@@ -132,6 +135,12 @@ await page.evaluate(async ({ street, triggers, x0, x1, y0, y1, scale, toggled, d
     g.fillStyle = '#860';
     g.fillText(tr.id, tr.x - tr.w / 2, tr.y + 12);
   }
+  for (const q of quoins) {
+    g.fillStyle = '#c0f';
+    g.beginPath();
+    g.arc(q.x, q.y, 14, 0, Math.PI * 2);
+    g.fill();
+  }
   g.setTransform(1, 0, 0, 1, 0, 0);
   g.font = '12px monospace';
   g.fillStyle = '#000';
@@ -143,7 +152,7 @@ await page.evaluate(async ({ street, triggers, x0, x1, y0, y1, scale, toggled, d
     g.fillText(String(gy), 2, (gy - y0) * scale - 2);
     g.fillRect(0, (gy - y0) * scale, 6, 1);
   }
-}, { street, triggers, x0, x1, y0, y1, scale, toggled: [...toggled], decoIds: [...decoIds], decoBase });
+}, { street, triggers, quoins, x0, x1, y0, y1, scale, toggled: [...toggled], decoIds: [...decoIds], decoBase });
 const canvas = await page.$('canvas');
 await canvas.screenshot({ path: out });
 await browser.close();

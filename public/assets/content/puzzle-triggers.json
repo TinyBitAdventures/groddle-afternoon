@@ -3125,6 +3125,1039 @@
      "amount": 10
     }
    ]
+  },
+  "GA9TCL1H7LD37DC": {
+   "name": "Bilicious Blues",
+   "emptyEcology": true,
+   "events": {
+    "gut_from_bottom": [
+     {
+      "type": "flag_set",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_from_top": [
+     {
+      "type": "flag_set",
+      "flag": "from_top"
+     }
+    ],
+    "gut_top": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LIFR1RLV0G43647",
+       "x": 437,
+       "y": -120,
+       "street": "GIFR1RLV0G43647",
+       "arrive": {
+        "x": 1687,
+        "y": 2283
+       }
+      }
+     }
+    ],
+    "gut_bottom": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_top"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_top"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LA9BT2I0ILD340S",
+       "x": -1097,
+       "y": -1000,
+       "street": "GA9BT2I0ILD340S",
+       "arrive": {
+        "x": 1903,
+        "y": 0
+       }
+      }
+     }
+    ],
+    "gut_invert": [
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_normal": [
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     }
+    ]
+   },
+   "eventsWhy": "The source scripts are code the remake cannot run (player_enter picks a direction from pc.y and sets pc.startedAT; should_tp_top/bottom teleport only for the matching start; invert_phys is addCTPCPhysics({gravity:-1})). Repaired as flags: the arrival region fires gut_from_bottom (gravity x-1) or gut_from_top, and each end teleports only the traveller who started at the other end, with the source destinations.",
+   "arrival": [
+    {
+     "x0": 0,
+     "x1": 1000,
+     "y0": 4000,
+     "y1": 6300,
+     "events": [
+      "gut_from_bottom"
+     ],
+     "why": "player_enter: pc.y > 0 (world) = the lower two thirds; the Shim Shiri blue beam lands at (500, 5900), its signpost at (520, 5860).",
+     "toast": "Inside the gut, press Space to flip which way is down."
+    },
+    {
+     "x0": 0,
+     "x1": 1000,
+     "y0": -300,
+     "y1": 4000,
+     "events": [
+      "gut_from_top"
+     ]
+    }
+   ],
+   "triggers": [
+    {
+     "id": "tube_top",
+     "x": 500,
+     "y": 560,
+     "w": 1000,
+     "h": 560,
+     "onEnter": [
+      "gut_top"
+     ],
+     "why": "The tube's cap above its last wall lines (plats 2575/2581 end at y\u2248470), under the Cinnabar Chibe signpost (500, 35): should_tp_top -> Cinnabar Chibe (437, -120)."
+    },
+    {
+     "id": "tube_bottom",
+     "x": 500,
+     "y": 6000,
+     "w": 1000,
+     "h": 90,
+     "onEnter": [
+      "gut_bottom"
+     ],
+     "why": "The tube's floor (plat 5102, y 5994): should_tp_bottom -> Shim Shiri (-1097, -1000), dropping in above its blue beam."
+    }
+   ],
+   "quoins": [
+    {
+     "x": 500,
+     "y": 4500,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 480,
+     "y": 3000,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 520,
+     "y": 1500,
+     "type": "xp",
+     "amount": 3
+    }
+   ],
+   "ceilings": true,
+   "gravityToggle": {
+    "invert": "gut_invert",
+    "normal": "gut_normal"
+   }
+  },
+  "GA9U27HN7LD3FVE": {
+   "name": "Greyving Grays",
+   "emptyEcology": true,
+   "events": {
+    "gut_from_bottom": [
+     {
+      "type": "flag_set",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_from_top": [
+     {
+      "type": "flag_set",
+      "flag": "from_top"
+     }
+    ],
+    "gut_top": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LIF153KDV872SE5",
+       "x": -297,
+       "y": -147,
+       "street": "GIF153KDV872SE5",
+       "arrive": {
+        "x": 2703,
+        "y": 856
+       }
+      }
+     }
+    ],
+    "gut_bottom": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_top"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_top"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LA9BT2I0ILD340S",
+       "x": -239,
+       "y": -1000,
+       "street": "GA9BT2I0ILD340S",
+       "arrive": {
+        "x": 2761,
+        "y": 0
+       }
+      }
+     }
+    ],
+    "gut_invert": [
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_normal": [
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     }
+    ]
+   },
+   "eventsWhy": "The source scripts are code the remake cannot run (player_enter picks a direction from pc.y and sets pc.startedAT; should_tp_top/bottom teleport only for the matching start; invert_phys is addCTPCPhysics({gravity:-1})). Repaired as flags: the arrival region fires gut_from_bottom (gravity x-1) or gut_from_top, and each end teleports only the traveller who started at the other end, with the source destinations.",
+   "arrival": [
+    {
+     "x0": 0,
+     "x1": 3000,
+     "y0": 3450,
+     "y1": 4200,
+     "events": [
+      "gut_from_bottom"
+     ],
+     "why": "player_enter: pc.y > -550 (the bottom 550 px). The grey beam lands at the foot of the narrow left shaft (320, 3900); the Shim Shiri signpost at the foot of the winding gut (2680, 3933).",
+     "toast": "Inside the gut, press Space to flip which way is down."
+    },
+    {
+     "x0": 0,
+     "x1": 3000,
+     "y0": -300,
+     "y1": 3450,
+     "events": [
+      "gut_from_top"
+     ]
+    }
+   ],
+   "triggers": [
+    {
+     "id": "tube_top",
+     "x": 330,
+     "y": 560,
+     "w": 560,
+     "h": 520,
+     "onEnter": [
+      "gut_top"
+     ],
+     "why": "The top-left chamber where the winding gut and the shaft-and-pear both end, under the Buna Belt signpost (19, 458) and the hanging drop: should_tp_top -> Buna Belt (-297, -147)."
+    },
+    {
+     "id": "tube_bottom",
+     "x": 2760,
+     "y": 4000,
+     "w": 260,
+     "h": 120,
+     "onEnter": [
+      "gut_bottom"
+     ],
+     "why": "Foot of the winding gut by the Shim Shiri signpost (2810, 4093). Its source should_tp_bottom was commented out; kept for travellers who came down from the top."
+    }
+   ],
+   "quoins": [
+    {
+     "x": 320,
+     "y": 2800,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 300,
+     "y": 1300,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 1600,
+     "y": 2700,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 1300,
+     "y": 1100,
+     "type": "xp",
+     "amount": 3
+    }
+   ],
+   "ceilings": true,
+   "gravityToggle": {
+    "invert": "gut_invert",
+    "normal": "gut_normal"
+   }
+  },
+  "GA931BPTNLD3E35": {
+   "name": "Glutton Greens",
+   "emptyEcology": true,
+   "events": {
+    "gut_from_bottom": [
+     {
+      "type": "flag_set",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_from_top": [
+     {
+      "type": "flag_set",
+      "flag": "from_top"
+     }
+    ],
+    "gut_top": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LA5AAB0VNKR2VRN",
+       "x": 575,
+       "y": -226,
+       "street": "GA5AAB0VNKR2VRN",
+       "arrive": {
+        "x": 3575,
+        "y": 777
+       }
+      }
+     }
+    ],
+    "gut_bottom": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_top"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_top"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LA9BT2I0ILD340S",
+       "x": 447,
+       "y": -1000,
+       "street": "GA9BT2I0ILD340S",
+       "arrive": {
+        "x": 3447,
+        "y": 0
+       }
+      }
+     }
+    ],
+    "gut_invert": [
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_normal": [
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     }
+    ]
+   },
+   "eventsWhy": "The source scripts are code the remake cannot run (player_enter picks a direction from pc.y and sets pc.startedAT; should_tp_top/bottom teleport only for the matching start; invert_phys is addCTPCPhysics({gravity:-1})). Repaired as flags: the arrival region fires gut_from_bottom (gravity x-1) or gut_from_top, and each end teleports only the traveller who started at the other end, with the source destinations.",
+   "arrival": [
+    {
+     "x0": 2300,
+     "x1": 3000,
+     "y0": 2300,
+     "y1": 3300,
+     "events": [
+      "gut_from_bottom"
+     ],
+     "why": "The wide right shaft's foot: the green beam lands at (2711, 2900), the Shim Shiri signpost at (2760, 2910); invert_phys there is the street's own gravity:-1 step.",
+     "toast": "Inside the gut, press Space to flip which way is down."
+    },
+    {
+     "x0": 0,
+     "x1": 3000,
+     "y0": -300,
+     "y1": 2300,
+     "events": [
+      "gut_from_top"
+     ]
+    }
+   ],
+   "triggers": [
+    {
+     "id": "tube_top",
+     "x": 260,
+     "y": 600,
+     "w": 520,
+     "h": 560,
+     "onEnter": [
+      "gut_top"
+     ],
+     "why": "Top-left end of the zigzag gut by the hanging drop and the Teobocci Shasha signpost (-14, 396): should_tp_top -> Teobocci Shasha (575, -226)."
+    },
+    {
+     "id": "tube_bottom",
+     "x": 1880,
+     "y": 2995,
+     "w": 160,
+     "h": 160,
+     "onEnter": [
+      "gut_bottom"
+     ],
+     "why": "Foot of the narrow shaft (x\u22481850) the zigzag drains into: should_tp_bottom -> Shim Shiri (447, -1000)."
+    }
+   ],
+   "quoins": [
+    {
+     "x": 2700,
+     "y": 1900,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 1500,
+     "y": 1150,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 900,
+     "y": 700,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 1800,
+     "y": 200,
+     "type": "xp",
+     "amount": 3
+    }
+   ],
+   "ceilings": true,
+   "gravityToggle": {
+    "invert": "gut_invert",
+    "normal": "gut_normal"
+   }
+  },
+  "GA9BT2I0ILD340S": {
+   "name": "Shim Shiri",
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "beam_blue",
+     "x": 1903,
+     "y": 884,
+     "w": 110,
+     "h": 260,
+     "pullMs": 2000,
+     "onEnter": [
+      "beam_blue"
+     ],
+     "why": "Light Beam (blue): one of the six archived Light Beam objrefs (no x/y). Its beam_blue script centres the avatar on x=1903 (moveAvatar target -1097 world) before tp_blue lifts it into Bilicious Blues, so the beam stands there on the floor (y 880)."
+    },
+    {
+     "id": "beam_yellow",
+     "x": 958,
+     "y": 878,
+     "w": 110,
+     "h": 260,
+     "pullMs": 2000,
+     "onEnter": [
+      "beam_yellow"
+     ],
+     "why": "Light Beam (yellow): one of the six archived Light Beam objrefs (no x/y). Its beam_yellow script centres the avatar on x=958 (moveAvatar target -2042 world) before tp_yellow lifts it into Yellow Yawning, so the beam stands there on the floor (y 874)."
+    },
+    {
+     "id": "beam_grey",
+     "x": 2761,
+     "y": 895,
+     "w": 110,
+     "h": 260,
+     "pullMs": 2000,
+     "onEnter": [
+      "beam_grey"
+     ],
+     "why": "Light Beam (grey): one of the six archived Light Beam objrefs (no x/y). Its beam_grey script centres the avatar on x=2761 (moveAvatar target -239 world) before tp_grey lifts it into Greyving Grays, so the beam stands there on the floor (y 891)."
+    },
+    {
+     "id": "beam_green",
+     "x": 3447,
+     "y": 881,
+     "w": 110,
+     "h": 260,
+     "pullMs": 2000,
+     "onEnter": [
+      "beam_green"
+     ],
+     "why": "Light Beam (green): one of the six archived Light Beam objrefs (no x/y). Its beam_green script centres the avatar on x=3447 (moveAvatar target 447 world) before tp_green lifts it into Glutton Greens, so the beam stands there on the floor (y 877)."
+    },
+    {
+     "id": "beam_orange",
+     "x": 4359,
+     "y": 884,
+     "w": 110,
+     "h": 260,
+     "pullMs": 2000,
+     "onEnter": [
+      "beam_orange"
+     ],
+     "why": "Light Beam (orange): one of the six archived Light Beam objrefs (no x/y). Its beam_orange script centres the avatar on x=4359 (moveAvatar target 1359 world) before tp_orange lifts it into Organish Chute, so the beam stands there on the floor (y 880)."
+    },
+    {
+     "id": "beam_brown",
+     "x": 5273,
+     "y": 893,
+     "w": 110,
+     "h": 260,
+     "pullMs": 2000,
+     "onEnter": [
+      "beam_brown"
+     ],
+     "why": "Light Beam (brown): one of the six archived Light Beam objrefs (no x/y). Its beam_brown script centres the avatar on x=5273 (moveAvatar target 2273 world) before tp_brown lifts it into Duodenal Browns, so the beam stands there on the floor (y 889)."
+    }
+   ],
+   "art": [
+    {
+     "sprite": "light_beam",
+     "x": 1903,
+     "y": 886,
+     "w": 176,
+     "h": 840,
+     "tint": 5219327,
+     "alpha": 0.55,
+     "blend": "add",
+     "z": 2
+    },
+    {
+     "sprite": "light_beam",
+     "x": 958,
+     "y": 880,
+     "w": 176,
+     "h": 834,
+     "tint": 16767050,
+     "alpha": 0.55,
+     "blend": "add",
+     "z": 2
+    },
+    {
+     "sprite": "light_beam",
+     "x": 2761,
+     "y": 897,
+     "w": 176,
+     "h": 851,
+     "tint": 13224406,
+     "alpha": 0.55,
+     "blend": "add",
+     "z": 2
+    },
+    {
+     "sprite": "light_beam",
+     "x": 3447,
+     "y": 883,
+     "w": 176,
+     "h": 837,
+     "tint": 7330922,
+     "alpha": 0.55,
+     "blend": "add",
+     "z": 2
+    },
+    {
+     "sprite": "light_beam",
+     "x": 4359,
+     "y": 886,
+     "w": 176,
+     "h": 840,
+     "tint": 16751164,
+     "alpha": 0.55,
+     "blend": "add",
+     "z": 2
+    },
+    {
+     "sprite": "light_beam",
+     "x": 5273,
+     "y": 895,
+     "w": 176,
+     "h": 849,
+     "tint": 12617807,
+     "alpha": 0.55,
+     "blend": "add",
+     "z": 2
+    }
+   ],
+   "quoins": [],
+   "artWhy": "items/light_beam.js art (OGA glitch-assets light_beam__x1_1, 161x382, white) tinted per beam colour and stretched from the floor to the ceiling like the client's 176x415 asset box."
+  },
+  "GA9UCEFP7LD3523": {
+   "name": "Organish Chute",
+   "ceilings": true,
+   "emptyEcology": true,
+   "gravityToggle": {
+    "invert": "gut_invert",
+    "normal": "gut_normal"
+   },
+   "events": {
+    "gut_from_bottom": [
+     {
+      "type": "flag_set",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_from_top": [
+     {
+      "type": "flag_set",
+      "flag": "from_top"
+     }
+    ],
+    "gut_top": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LA5GNCQ4T3137M7",
+       "x": 60,
+       "y": -85,
+       "street": "GA5GNCQ4T3137M7",
+       "arrive": {
+        "x": 1060,
+        "y": 2318
+       }
+      }
+     }
+    ],
+    "gut_bottom": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_top"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_top"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LA9BT2I0ILD340S",
+       "x": 1359,
+       "y": -1000,
+       "street": "GA9BT2I0ILD340S",
+       "arrive": {
+        "x": 4359,
+        "y": 0
+       }
+      }
+     }
+    ],
+    "gut_invert": [
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_normal": [
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     }
+    ]
+   },
+   "eventsWhy": "The source scripts are code the remake cannot run (player_enter picks a direction from pc.y and sets pc.startedAT; should_tp_top/bottom teleport only for the matching start; invert_phys is addCTPCPhysics({gravity:-1})). Repaired as flags: the arrival region fires gut_from_bottom (gravity x-1) or gut_from_top, and each end teleports only the traveller who started at the other end, with the source destinations. The serpentine/spiral's 14 lost boxes flipped gravity at its bends (invert_phys*/reset_phys*, check_a/check_b); their places are not recoverable, so Space works those same flips (gut_invert = gravity x-1, gut_normal = reset) and the traveller steers the bends.",
+   "arrival": [
+    {
+     "x0": 3700,
+     "x1": 4000,
+     "y0": 2300,
+     "y1": 3100,
+     "events": [
+      "gut_from_bottom"
+     ],
+     "toast": "Inside the gut, press Space to flip which way is down.",
+     "why": "Foot of the wide right shaft: the orange beam lands at (3843, 2850), the Shim Shiri signpost at (3850, 2997). check_a's own test was pc.x > 1730 world (screen 3730) and pc.y > -350."
+    },
+    {
+     "x0": 0,
+     "x1": 4000,
+     "y0": -300,
+     "y1": 2300,
+     "events": [
+      "gut_from_top"
+     ]
+    }
+   ],
+   "triggers": [
+    {
+     "id": "tube_top",
+     "x": 480,
+     "y": 430,
+     "w": 560,
+     "h": 400,
+     "onEnter": [
+      "gut_top"
+     ],
+     "why": "Top-left end of the serpentine under the hanging drop, by the Indulcet Fames signpost (471, 44): should_tp_top -> Indulcet Fames (60, -85)."
+    },
+    {
+     "id": "tube_bottom",
+     "x": 3510,
+     "y": 2998,
+     "w": 180,
+     "h": 160,
+     "onEnter": [
+      "gut_bottom"
+     ],
+     "why": "Foot of the narrow shaft (x\u22483420-3600) the inner loop drains into: should_tp_bottom -> Shim Shiri (1359, -1000)."
+    }
+   ],
+   "quoins": [
+    {
+     "x": 3880,
+     "y": 1400,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 3100,
+     "y": 300,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 2460,
+     "y": 1500,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 1300,
+     "y": 2700,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 800,
+     "y": 1200,
+     "type": "mood",
+     "amount": 10
+    }
+   ]
+  },
+  "GA9TKSRJ7LD3SGK": {
+   "name": "Duodenal Browns",
+   "ceilings": true,
+   "emptyEcology": true,
+   "gravityToggle": {
+    "invert": "gut_invert",
+    "normal": "gut_normal"
+   },
+   "events": {
+    "gut_from_bottom": [
+     {
+      "type": "flag_set",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_from_top": [
+     {
+      "type": "flag_set",
+      "flag": "from_top"
+     }
+    ],
+    "gut_top": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_bottom"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LA9T7IFRDIA2N0K",
+       "x": 354,
+       "y": -205,
+       "street": "GA9T7IFRDIA2N0K",
+       "arrive": {
+        "x": 3354,
+        "y": 799
+       }
+      }
+     }
+    ],
+    "gut_bottom": [
+     {
+      "type": "flag_not_exit",
+      "flag": "from_top"
+     },
+     {
+      "type": "flag_clear",
+      "flag": "from_top"
+     },
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     },
+     {
+      "type": "code_player",
+      "all": false,
+      "code": {
+       "type": "teleport",
+       "tsid": "LA9BT2I0ILD340S",
+       "x": 2273,
+       "y": -1000,
+       "street": "GA9BT2I0ILD340S",
+       "arrive": {
+        "x": 5273,
+        "y": 0
+       }
+      }
+     }
+    ],
+    "gut_invert": [
+     {
+      "type": "physics",
+      "param": "gravity",
+      "value": -1,
+      "duration": 0,
+      "all": false
+     }
+    ],
+    "gut_normal": [
+     {
+      "type": "physics_reset",
+      "param": "all",
+      "all": false
+     }
+    ]
+   },
+   "eventsWhy": "The source scripts are code the remake cannot run (player_enter picks a direction from pc.y and sets pc.startedAT; should_tp_top/bottom teleport only for the matching start; invert_phys is addCTPCPhysics({gravity:-1})). Repaired as flags: the arrival region fires gut_from_bottom (gravity x-1) or gut_from_top, and each end teleports only the traveller who started at the other end, with the source destinations. The serpentine/spiral's 14 lost boxes flipped gravity at its bends (invert_phys*/reset_phys*, check_a/check_b); their places are not recoverable, so Space works those same flips (gut_invert = gravity x-1, gut_normal = reset) and the traveller steers the bends.",
+   "arrival": [
+    {
+     "x0": 1200,
+     "x1": 2400,
+     "y0": 1150,
+     "y1": 2400,
+     "events": [
+      "gut_from_bottom"
+     ],
+     "toast": "Inside the gut, press Space to flip which way is down.",
+     "why": "The heart of the square spiral, where the brown beam (1920, 2080) and the Shim Shiri signpost (2031, 2247) both land; its source start_bottom check was pc.y > -2670 world on the way in."
+    },
+    {
+     "x0": 0,
+     "x1": 3000,
+     "y0": -300,
+     "y1": 1150,
+     "events": [
+      "gut_from_top"
+     ]
+    }
+   ],
+   "triggers": [
+    {
+     "id": "tube_top",
+     "x": 220,
+     "y": 700,
+     "w": 440,
+     "h": 560,
+     "onEnter": [
+      "gut_top"
+     ],
+     "why": "The spiral's outer mouth at the top left by the Tambra Tiss signpost (-97, 405): should_tp_top -> Tambra Tiss (354, -205)."
+    }
+   ],
+   "quoins": [
+    {
+     "x": 1700,
+     "y": 1200,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 2300,
+     "y": 1600,
+     "type": "energy",
+     "amount": 4
+    },
+    {
+     "x": 900,
+     "y": 2500,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 2700,
+     "y": 700,
+     "type": "xp",
+     "amount": 3
+    }
+   ]
   }
  }
 }

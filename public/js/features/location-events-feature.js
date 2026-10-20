@@ -434,6 +434,11 @@ export const locationEventsApi = {
     return fire(engine, name, target, clock);
   },
   flag: (name) => Boolean(current?.runtime.flags.has(name)),
+  /** Effective gravity against normal (negative while a script inverts it). */
+  gravity() {
+    const setting = effectiveSetting(clock);
+    return setting ? setting.gravity / NORMAL_PHYSICS.gravity : 1;
+  },
   /** Simulation clock (ms): the one event timers and physics use. */
   clock: () => clock,
   /**
