@@ -9,7 +9,9 @@
  * and starter quests keep their own progress path (managedOnly routing).
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=now offers the first
- * pending quest immediately; &questofferautoplay=accept accepts it.
+ * pending quest immediately; &questofferautoplay=accept accepts it. Other QA
+ * routes (any *demo or *autoplay param) get no offers; ?questoffer=off
+ * silences them anywhere.
  */
 
 import {
@@ -33,6 +35,8 @@ const SYNC_MS = 1_000;
 let nextOfferCheckAt = 0;
 let nextSyncAt = 0;
 let offerOpen = false;
+/** Offers are suppressed on QA routes and with ?questoffer=off. */
+let quiet = false;
 /** Pack counts at the last sync, for `in_inventory:<item>` gain events. */
 let lastPack = null;
 // Musicblocks and Cubimals already emit in_inventory through their badges.
@@ -120,6 +124,12 @@ export const questOffersFeature = {
 
   init(engine) {
     ensureQuestOfferState(engine.questState);
+    // QA routes (any *demo / *autoplay / streetdemo param) stay uninterrupted
+    // unless they ask for offers; ?questoffer=off silences them anywhere.
+    const params = [...new URLSearchParams(globalThis.location?.search || '').keys()];
+    const qaRoute = params.some((key) => /demo$|autoplay$/.test(key) && !key.startsWith('questoffer'));
+    const mode = engine.param('questoffer');
+    quiet = mode === 'off' || (qaRoute && mode !== 'now');
     nextOfferCheckAt = Date.now() + (engine.param('questoffer') === 'now' ? 1_500 : 12_000);
   },
 
@@ -162,7 +172,7 @@ export const questOffersFeature = {
       if (sync.advanced?.length) engine.updateHud();
       finish(sync.completable, engine);
     }
-    if (now >= nextOfferCheckAt) {
+    if (!quiet && now >= nextOfferCheckAt) {
       nextOfferCheckAt = now + OFFER_CHECK_MS;
       presentOffer(engine, now);
     }
