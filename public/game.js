@@ -6365,6 +6365,13 @@ const engine = {
   get textures() {
     return textures;
   },
+  /** Snap the camera onto the avatar (after a feature teleport or respawn). */
+  snapCamera() {
+    camTarget = cameraTargetForPlayer(player?.x || 0);
+    camY = cameraTargetY(player?.y || GROUND_Y, activeCameraWorldHeight(), LOCATION_VIEW_H);
+    world.x = -Math.round(camTarget);
+    world.y = -Math.round(camY);
+  },
   /** TSID of the feature scene last entered with enterScene (or null). */
   sceneTsid: null,
   inScene() {
@@ -6410,10 +6417,7 @@ const engine = {
       player.vy = 0;
       player.onGround = true;
     }
-    camTarget = cameraTargetForPlayer(player?.x || 0);
-    camY = cameraTargetY(player?.y || GROUND_Y, activeCameraWorldHeight(), LOCATION_VIEW_H);
-    world.x = -Math.round(camTarget);
-    world.y = -Math.round(camY);
+    engine.snapCamera();
     const name = document.getElementById('street-name');
     if (name) {
       name.textContent = scene.hubName ? `${currentStreet.label} · ${scene.hubName}` : currentStreet.label;

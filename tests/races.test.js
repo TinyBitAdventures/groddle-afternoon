@@ -249,7 +249,7 @@ describe('course reachability', () => {
 
       it('puts every route stop, checkpoint and the finish on solid ground', () => {
         const solid = course.platforms.filter((p) => !p.hazard);
-        for (const node of course.route) {
+        for (const node of [...course.route, ...(course.rivalRoute || [])]) {
           if (node.mode === 'climb') {
             assert.ok(course.walls.some((w) => Math.abs(w.x - node.x) < 2), `climb wall at ${node.x}`);
             continue;
@@ -263,10 +263,10 @@ describe('course reachability', () => {
       });
 
       it('only asks for jumps the avatar can make', () => {
-        for (let i = 1; i < course.route.length; i += 1) {
-          const node = course.route[i];
+        for (const route of [course.route, course.rivalRoute].filter(Boolean)) for (let i = 1; i < route.length; i += 1) {
+          const node = route[i];
           if (node.mode !== 'jump') continue;
-          const from = course.route[i - 1];
+          const from = route[i - 1];
           const dx = node.x - from.x;
           const rise = from.y - node.y;
           assert.ok(
@@ -277,10 +277,15 @@ describe('course reachability', () => {
       });
 
       it('paces the rival for a 30-120 s race', () => {
-        const ms = routeDurationMs(course.route, { pace: course.rivalPace, gravity: course.gravity });
+        const ms = routeDurationMs(course.rivalRoute || course.route, { pace: course.rivalPace, gravity: course.gravity });
         assert.ok(ms > 30_000 && ms < 120_000, `${id} rival ${Math.round(ms)} ms`);
         const best = routeDurationMs(course.route, { pace: 1, gravity: course.gravity });
-        assert.ok(best < ms * 0.9, 'a clean run beats the rival');
+        assert.ok(best < ms * 0.88, 'a clean run beats the rival');
+        if (course.rivalRoute) {
+          assert.equal(course.rivalRoute.length, course.route.length);
+          const end = course.rivalRoute[course.rivalRoute.length - 1];
+          assert.deepEqual([end.x, end.y], [course.finish.x, course.finish.y], 'twin routes meet at the posts');
+        }
       });
     });
   }

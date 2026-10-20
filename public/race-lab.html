@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Race course lab — Groddle</title>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+  <style>
+    body { margin: 0; padding: 16px; font-family: "Trebuchet MS", system-ui, sans-serif; background: #1a1a22; color: #f0ebe3; }
+    h1 { margin: 0 0 4px; font-size: 1.3rem; color: #95a3d6; }
+    p { margin: 0 0 10px; color: #b9b4ab; font-size: .85rem; max-width: 70rem; }
+    nav a { color: #95a3d6; margin-right: 10px; font-size: .9rem; }
+    #stage canvas { display: block; max-width: 100%; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1 id="title">Race course lab</h1>
+  <p id="meta"></p>
+  <nav id="nav"></nav>
+  <div id="stage"></div>
+  <script type="module">
+    import { raceCourse, RACE_COURSE_IDS } from './js/race-courses.js';
+    import { renderRaceCourse, drawFinishPosts, drawCheckpointFlag } from './js/race-render.js';
+    import { RACES, routeDurationMs, formatRaceTime } from './js/races.js';
+
+    // ?race=<id> overview, or &x=&y=&zoom=1 for a 960x540 window at full size.
+    const params = new URLSearchParams(location.search);
+    const id = params.get('race') || 'space_race';
+    const nav = document.getElementById('nav');
+    nav.innerHTML = RACE_COURSE_IDS.map((r) => `<a href="?race=${r}">${RACES[r].title}</a>`).join('');
+    const course = raceCourse(id);
+    const zoom = Number(params.get('zoom')) || 0;
+    const W = zoom ? 960 : 1600;
+    const H = zoom ? 540 : 900;
+    const scale = zoom || Math.min(W / course.width, H / course.height);
+    const app = new PIXI.Application({ width: W, height: H, backgroundColor: 0x222222, antialias: true });
+    document.getElementById('stage').appendChild(app.view);
+    const world = new PIXI.Container();
+    world.scale.set(scale);
+    const camX = zoom ? Number(params.get('x')) || 0 : 0;
+    const camY = zoom ? Number(params.get('y')) || 0 : 0;
+    world.x = -camX * scale;
+    world.y = -camY * scale;
+    app.stage.addChild(world);
+    const bg = renderRaceCourse(PIXI, course);
+    bg.updateParallax?.(camX, camY);
+    world.addChild(bg);
+    for (const cp of course.checkpoints) world.addChild(drawCheckpointFlag(PIXI, cp));
+    world.addChild(drawFinishPosts(PIXI, course.finish));
+    const lines = new PIXI.Graphics();
+    const route = (nodes, color) => {
+      lines.lineStyle(zoom ? 2 : 6, color, 0.9);
+      nodes.forEach((n, i) => (i ? lines.lineTo(n.x, n.y - 4) : lines.moveTo(n.x, n.y - 4)));
+      lines.lineStyle(0);
+      for (const n of nodes) if (n.mode === 'jump') lines.beginFill(color).drawCircle(n.x, n.y - 4, zoom ? 3 : 9).endFill();
+    };
+    if (params.get('route') !== '0') {
+      route(course.route, 0xffd55b);
+      if (course.rivalRoute) route(course.rivalRoute, 0xc9a6ff);
+    }
+    const spawn = new PIXI.Graphics();
+    spawn.beginFill(0xffd55b).drawRect(course.spawn.player.x - 14, course.spawn.player.y - 90, 28, 90).endFill();
+    spawn.beginFill(0xc9a6ff).drawRect(course.spawn.rival.x - 14, course.spawn.rival.y - 90, 28, 90).endFill();
+    world.addChild(lines, spawn);
+    const rival = routeDurationMs(course.rivalRoute || course.route, { pace: course.rivalPace, gravity: course.gravity });
+    const best = routeDurationMs(course.route, { pace: 1, gravity: course.gravity });
+    document.getElementById('title').textContent = `${RACES[id].title} · ${course.width}×${course.height}`;
+    document.getElementById('meta').textContent =
+      `${course.source} Gravity ${course.gravity} · ${course.platforms.length} ledges · ${course.walls.length} climbs · ${course.checkpoints.length} checkpoints · rival ${formatRaceTime(rival)} · clean run ${formatRaceTime(best)}. Yellow: your route; lilac: the rival's.`;
+    document.body.dataset.ready = '1';
+  </script>
+</body>
+</html>

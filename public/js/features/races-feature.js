@@ -93,6 +93,7 @@ let demoHandled = false;
 let starting = false;
 let lastSafe = null;
 let engineRef = null;
+let pinX = 0;
 
 /* ------------------------------------------------------------------ */
 /* Items                                                              */
@@ -131,6 +132,14 @@ function ticketRaceId(classTsid) {
 
 function playable(raceId) {
   return RACE_COURSE_IDS.includes(raceId);
+}
+
+function raceTitle(raceId) {
+  return RACES[raceId]?.title || '';
+}
+
+function raceDesc(raceId) {
+  return RACES[raceId]?.desc || '';
 }
 
 /* ------------------------------------------------------------------ */
@@ -287,7 +296,7 @@ function renderStore(engine) {
     const why = !on ? 'Not in this remake yet' : full ? 'Your pack holds 5' : poor ? 'Not enough currants' : '';
     return `<li class="${on ? '' : 'is-off'}">
       <img src="${RACE_ICON_DIR}${row.classTsid}.png" alt="" />
-      <span><b>${escapeHtml(row.label)}</b><small>${on ? escapeHtml(RACES[raceId].desc) : 'Not in this remake yet.'}${owned ? ` · ${owned} in pack` : ''}</small></span>
+      <span><b>${escapeHtml(row.label)}</b><small>${on ? escapeHtml(raceDesc(raceId)) : 'Not in this remake yet.'}${owned ? ` · ${owned} in pack` : ''}</small></span>
       <span class="race-store-actions">
         ${owned ? `<button type="button" data-race-activate="${row.classTsid}">Activate</button>` : ''}
         <button type="button" data-race-buy="${row.classTsid}" ${why ? `disabled title="${escapeHtml(why)}"` : ''}>Buy · ${row.cost}</button>
@@ -317,7 +326,7 @@ function buyTicket(classTsid, engine) {
   engine.pc.currants -= RACE_TICKET_PRICE;
   addItem(engine.inv, classTsid, 1);
   engine.playSfx('pickup', { volume: 0.6, rate: 1.1 });
-  engine.pushActivity(`You bought a ${RACES[raceId].ticketLabel} for ${RACE_TICKET_PRICE} currants.`);
+  engine.pushActivity(`You bought a ${ITEM_LABEL(classTsid)} for ${RACE_TICKET_PRICE} currants.`);
   engine.updateHud();
   engine.save();
   renderStore(engine);
@@ -356,10 +365,10 @@ function activateTicket(classTsid, engine, opts = {}) {
   engine.updateHud();
   engine.save();
   const rival = pickRival(raceId, Date.now() / 1000);
-  const race = RACES[raceId];
+  const names = rival.name;
   engine.pushActivity(`You activated a ${ITEM_LABEL(classTsid)}. ${rival.name} accepted your challenge!`);
   buildChrome(engine);
-  hud.banner.textContent = startDelayMessage(race.title, 'you', rival.name);
+  hud.banner.textContent = startDelayMessage(raceTitle(raceId), 'you', names);
   hud.banner.hidden = false;
   engine.playSfx('alert', { volume: 0.45, rate: 1.05 });
   starting = true;
@@ -399,9 +408,9 @@ async function startRace(raceId, engine, opts = {}) {
   const params = new URLSearchParams(location.search);
   const rivalSeconds = Number(params.get('racerivalseconds'));
   rivalOpts = { pace: course.rivalPace, gravity: course.gravity };
-  rivalTimeline = routeTimeline(course.route, rivalOpts);
+  rivalTimeline = routeTimeline(rivalRoute(), rivalOpts);
   routeLens = routeLengths(course.route);
-  const natural = routeDurationMs(course.route, rivalOpts);
+  const natural = routeDurationMs(rivalRoute(), rivalOpts);
   run = createRaceRun(raceId, {
     now: Date.now(),
     rival: opts.rival,
@@ -411,7 +420,7 @@ async function startRace(raceId, engine, opts = {}) {
     ticket: opts.ticket || null,
   });
   if (rivalSeconds > 0) rivalOpts = { ...rivalOpts, pace: course.rivalPace * (natural / (rivalSeconds * 1000)) };
-  rivalTimeline = routeTimeline(course.route, rivalOpts);
+  rivalTimeline = routeTimeline(rivalRoute(), rivalOpts);
   resultApplied = false;
   progressHint = 0;
   lastSafe = null;
@@ -493,6 +502,7 @@ function spawnRaceEntities(engine) {
     engine.entityLayer.addChild(rivalLabel);
   }
   placeRival(course.spawn.rival.x, course.spawn.rival.y, 'idle', 1);
+  pinX = course.spawn.player.x;
   const preview = new URLSearchParams(location.search).get('racepreview');
   if (preview && engine.player) {
     const cp = preview === 'finish'
@@ -502,8 +512,15 @@ function spawnRaceEntities(engine) {
       const p = platformUnder(course.platforms, cp.x, cp.y, 4);
       engine.player.x = cp.x;
       engine.player.y = p ? p.y : cp.y;
+      pinX = cp.x;
+      engine.snapCamera?.();
     }
   }
+}
+
+/** Twin-path climbs give the rival its own mirrored route. */
+function rivalRoute() {
+  return course?.rivalRoute || course?.route || [];
 }
 
 function placeRival(x, y, mode, facing) {
@@ -565,6 +582,7 @@ function respawn(engine, why) {
   player.vy = 0;
   player.onGround = true;
   respawnUntil = Date.now() + 700;
+  engine.snapCamera?.();
   engine.floatText(to.x, to.y - 90, why, 0xfff4d6);
   engine.playSfx('alert', { volume: 0.35, rate: 0.8 });
   progressHint = Math.max(0, progressHint - 6);
@@ -593,7 +611,7 @@ function raceTick(engine, now) {
     }
     if (event.type === 'lost') {
       run.rivalProgress = 1;
-      const end = course.route[course.route.length - 1];
+      const end = rivalRoute()[rivalRoute().length - 1];
       placeRival(end.x, end.y, 'idle', 1);
       showResult(engine);
     }
@@ -603,12 +621,12 @@ function raceTick(engine, now) {
   }
   const player = engine.player;
   if (run.status === 'staging' || run.status === 'countdown') {
-    player.x = course.spawn.player.x;
+    player.x = pinX;
     player.vx = 0;
   }
   if (run.status !== 'running') return;
 
-  const pose = routePoseAt(course.route, now - run.startAt, rivalOpts, rivalTimeline);
+  const pose = routePoseAt(rivalRoute(), now - run.startAt, rivalOpts, rivalTimeline);
   placeRival(pose.x, pose.y, pose.mode, pose.facing);
   run.rivalProgress = pose.progress;
 
@@ -799,7 +817,9 @@ function handleDemo(engine) {
   if (RACE_IDS.includes(demo) && playable(demo)) {
     demoHandled = true;
     setTimeout(() => startRace(demo, engine, { useTransition: false }), 300);
-  } else if (demo === 'dispenser') {
+  } else if (demo !== 'dispenser') {
+    demoHandled = true;
+  } else {
     demoHandled = true;
     if ((engine.pc.currants || 0) < 200) engine.pc.currants = 500;
     openStore(engine);
@@ -915,7 +935,7 @@ export const racesFeature = {
     if (!isRaceTicket(classTsid)) return [];
     const raceId = ticketRaceId(classTsid);
     const block = activationBlock(engine);
-    const name = raceId ? RACES[raceId].title : 'a random race';
+    const name = raceId ? raceTitle(raceId) : 'a random race';
     return [{
       id: 'activate',
       label: 'Activate',
