@@ -4,3 +4,5 @@ achievements.json — from achievements/*.js (badges)
 skills.json — from inc_data_skills.js
 buffs.json — from items/catalog_buffs.js
 Re-run: node scripts/extract-gsjs-content.mjs
+
+quests.json is now built by spike/build-quests.mjs (adds offer triggers, solo classification, recipe ids, timers). Run it after extract-gsjs-content.mjs.

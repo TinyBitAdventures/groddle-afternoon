@@ -4,8 +4,8 @@
   "counts": {
     "quests": {
       "input": 446,
-      "output": 441,
-      "skips": 5
+      "output": 445,
+      "skips": 1
     },
     "achievements": {
       "input": 665,
@@ -32,24 +32,8 @@
   "skips": {
     "quests": [
       {
-        "file": "build_a_tower.js",
-        "reason": "Unexpected token '}'"
-      },
-      {
-        "file": "get_first_tool.js",
-        "reason": "Unexpected token ','"
-      },
-      {
-        "file": "le_miserable.js",
-        "reason": "Unexpected token '}'"
-      },
-      {
         "file": "missing.js",
         "reason": "no_title"
-      },
-      {
-        "file": "orld_ugs_esara.js",
-        "reason": "Unexpected token ','"
       }
     ],
     "achievements": [
@@ -62,5 +46,6 @@
         "reason": "no_name"
       }
     ]
-  }
+  },
+  "questsBuiltBy": "spike/build-quests.mjs"
 }
