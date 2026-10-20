@@ -94,4 +94,10 @@ test.describe('integration playtest regressions', () => {
   test('clicking a street mailbox goes through its feature, not the home deed gate', () => {
     assert.match(game, /if \(best\.classId === 'npc_mailbox'\) \{[\s\S]{0,200}?executeVerb\(best, 'view_inbox'\);/);
   });
+
+  test('the street nameplate stays on one line above the feed on phones', () => {
+    const phone = /@media \(max-width: 760px\) \{([\s\S]*?)\n\}/.exec(css)[1];
+    assert.match(phone, /\.street-nameplate \{[^}]*white-space: nowrap;[^}]*text-overflow: ellipsis/);
+    assert.match(phone, /\.activity-feed \{ top: 36px; \}/);
+  });
 });

@@ -1427,6 +1427,17 @@ button.play-context-head:focus-visible {
 @media (max-width: 760px) {
   .play-context { display: none; }
   .activity-feed { width: min(300px, 72%); }
+  /* One line on phones, so it never wraps under the activity feed. */
+  .street-nameplate {
+    top: 6px;
+    max-width: calc(100% - 24px);
+    padding: 0.18rem 0.6rem;
+    font-size: 0.74rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .activity-feed { top: 36px; }
 }
 
 /* Bottom pack — dual row like original (items over tools) */
