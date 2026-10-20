@@ -6566,6 +6566,8 @@ const engine = {
   visitedStreets: () => Object.keys(persistentWorldState.streets || {}),
   /** A garden bed through the street garden path ({ x, y, gardenType, cols, rows, label, garden, detached }). */
   spawnGarden: (opts) => spawnGarden(opts),
+  /** Redraw a garden bed's plots after a feature changed them (Master Gardener potions). */
+  refreshGarden: (target) => refreshGardenVisual(target),
   /** One mineable rock that keeps its state in the street's rock slot `index`. */
   spawnMineRock: (classTsid, x, y, index) => spawnMineRock(classTsid, x, y, index),
   streetExists(tsid) {

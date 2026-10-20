@@ -108,8 +108,8 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
     note: 'Unlocks the Bean Seasoner, which turns plain beans into seeds for other trees. Poisoning and curing trees are not here yet.',
   },
   'Master Gardener': {
-    status: 'later',
-    note: 'Needs the Watering Whiz and Tendy Gonzales upgrade cards (Upgrades shop) to learn; the Master Garden and its garden potions are not here yet.',
+    status: 'live',
+    note: 'Needs the Watering Whiz and Tendy Gonzales upgrade cards (Upgrades shop) to learn. Pour the five garden potions (Soak-All, Seed-Dibber, Manyharvest, Liquid Super-Hoe, Dung-Kicker; made in the Cauldron) to water, plant, harvest, clear or fertilize a whole garden bed at once.',
   },
   Nudgery: {
     status: 'live',

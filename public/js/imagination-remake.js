@@ -87,7 +87,7 @@ const RULES = [
   [/^herbalism_time_[12]$/, 'live', 'Herbs grow 10 / 20% faster.'],
   [/^croppery_super_harvest_[12]$/, 'live', 'Crop super harvests x3 / x4 at 6%.'],
   [/^herbalism_super_harvest_[12]$/, 'live', 'Herb super harvests x3 at 20 / 30%.'],
-  [/^croppery_herbalism_(watering|clearing)_time$/, 'partial', 'Required for Master Gardener; the Master Garden itself is not built yet.'],
+  [/^croppery_herbalism_(watering|clearing)_time$/, 'live', 'Required for Master Gardener, whose garden potions now water, plant, clear, fertilize and harvest a whole bed; the source only shortens the potion pass (one sound instead of two).'],
   [/^croppery_growing_drop_[12]$/, 'live', 'Planting, watering and clearing crops roll the larger croppery drop table (5 / 7%).'],
   [/^herbalism_shucking_[12]$/, 'later', 'Herb seed extraction is not in the remake.'],
   [/^hoeing_more_img_more_wear$/, 'live', 'Aggressive hoeing: tending patches gives more iMG for more Hoe wear.'],
