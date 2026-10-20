@@ -8217,15 +8217,12 @@ function physics(dt) {
 }
 
 function eatApple() {
-  const r = useItem(inv, pc, 'apple');
-  if (!r.ok) {
-    toast(r.msgs[0] || 'No apples in pack.');
+  if (countItem(inv, 'apple') < 1) {
+    toast('No apples in pack.');
     return;
   }
-  playSound('ITEM_EAT', { volume: 0.6, jitter: 0.05 });
-  toast(r.msgs[0] || 'Crunch.');
-  floatText(player.x, player.y - 70, '+energy', 0x7dcea0);
-  updateHud();
+  // Same path as the pack's Eat: Naraka's gate, fullness, food memory, quests.
+  usePackItem('apple');
 }
 
 function announceQuestCompletions(updates = []) {
