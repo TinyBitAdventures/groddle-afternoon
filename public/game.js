@@ -6233,6 +6233,7 @@ const engine = {
         isQuestDialogueOpen() ||
         isScreenFxBlocking() ||
         anyTransientInstance() ||
+        engine.inScene() ||
         homeIsInstanced() ||
         // Any open panel (Feat, quests, make, vendor, map, mailbox, ...).
         document.querySelector('.glitch-modal:not([hidden]), [id$="-panel"]:not([hidden])')
@@ -6313,7 +6314,7 @@ const engine = {
     });
   },
   stopFollowing: () => stopCompanionFollowForInstance(),
-  transientInstance: anyTransientInstance,
+  transientInstance: () => anyTransientInstance() || engine.inScene(),
   homeContext() {
     return { inHome: homeIsInstanced(), room: homeState.room || 'street' };
   },
@@ -6354,6 +6355,67 @@ const engine = {
       gain.gain.setTargetAtTime(0.0001, t, 0.35);
       try { src.stop(t + 1.4); } catch { /* ended */ }
     };
+  },
+  /** Loaded texture sheets (e.g. avatarStyledWalk for stand-in racers). */
+  get textures() {
+    return textures;
+  },
+  /** TSID of the feature scene last entered with enterScene (or null). */
+  sceneTsid: null,
+  inScene() {
+    return Boolean(engine.sceneTsid && currentStreetTsid === engine.sceneTsid);
+  },
+  /**
+   * A feature-built transient scene (races): swaps the street for the
+   * feature's own Pixi background (optional worldH / updateParallax) and its
+   * collision lines and climb walls, with no street load. `returnTo` is
+   * written as the resumable location; leave with engine.enter(tsid, …).
+   * scene = { tsid, label, hubName, width, height, background, platforms,
+   *           walls, spawn: { x, y }, returnTo: { tsid, x, y } }
+   */
+  enterScene(scene) {
+    clearWorldEntities();
+    if (bgLayer && world) {
+      world.removeChild(bgLayer);
+      bgLayer.destroy({ children: true });
+    }
+    bgLayer = scene.background;
+    bgLayer.worldH ||= scene.height;
+    world.addChildAt(bgLayer, 0);
+    WORLD_W = scene.width;
+    GROUND_Y = scene.height - 80;
+    streetPlatforms = scene.platforms || [];
+    streetWalls = scene.walls || [];
+    climb = { active: false, wall: null };
+    currentStreetTsid = scene.tsid;
+    engine.sceneTsid = scene.tsid;
+    currentStreet = {
+      tsid: scene.tsid,
+      label: scene.label || scene.tsid,
+      hubId: 'scene',
+      hubName: scene.hubName || '',
+      bounds: { l: 0, r: scene.width, t: 0, b: scene.height },
+      platforms: streetPlatforms,
+      signposts: [],
+    };
+    if (player && scene.spawn) {
+      player.x = scene.spawn.x;
+      player.y = scene.spawn.y;
+      player.vx = 0;
+      player.vy = 0;
+      player.onGround = true;
+    }
+    camTarget = cameraTargetForPlayer(player?.x || 0);
+    camY = cameraTargetY(player?.y || GROUND_Y, activeCameraWorldHeight(), LOCATION_VIEW_H);
+    world.x = -Math.round(camTarget);
+    world.y = -Math.round(camY);
+    const name = document.getElementById('street-name');
+    if (name) {
+      name.textContent = scene.hubName ? `${currentStreet.label} · ${scene.hubName}` : currentStreet.label;
+      name.dataset.tsid = scene.tsid;
+    }
+    if (scene.returnTo?.tsid) savePlayerLocation(scene.returnTo);
+    updateHud();
   },
   /** Feature-driven travel: home rooms, ordinary streets, gate bypass. */
   async enter(tsid, opts = {}) {
