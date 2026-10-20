@@ -1,0 +1,392 @@
+{
+  "hubId": "56",
+  "hubName": "Groddle Forest",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_groddle_forest_43684.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_groddle_forest_59153.png",
+  "color": "#5f721d",
+  "btm_color": "#6b7954",
+  "top_color": "#99ad78",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LLI2V30ECRD1GAU",
+      "name": "Adanac",
+      "x1": 178,
+      "y1": 224,
+      "x2": 320,
+      "y2": 231
+    },
+    {
+      "tsid": "LCR10157DMK1L0G",
+      "name": "Addingfoot Trip",
+      "x1": 240,
+      "y1": 334,
+      "x2": 339,
+      "y2": 289
+    },
+    {
+      "tsid": "LCR1UERKPIN1G7N",
+      "name": "Addysshot Croft",
+      "x1": 207,
+      "y1": 225,
+      "x2": 307,
+      "y2": 303
+    },
+    {
+      "tsid": "LCRHITPKONL1T7J",
+      "name": "Balcam Stacks",
+      "x1": 49,
+      "y1": 176,
+      "x2": 76,
+      "y2": 269
+    },
+    {
+      "tsid": "LCR13O9VQEM1M3P",
+      "name": "Berecroy Woods",
+      "x1": 611,
+      "y1": 167,
+      "x2": 685,
+      "y2": 153
+    },
+    {
+      "tsid": "LCR143M18PK1774",
+      "name": "Blackberry Glebe",
+      "x1": 443,
+      "y1": 349,
+      "x2": 593,
+      "y2": 330
+    },
+    {
+      "tsid": "LLIE7307LTG11T2",
+      "name": "Blue Mountain Bore",
+      "x1": 39,
+      "y1": 290,
+      "x2": 171,
+      "y2": 225
+    },
+    {
+      "tsid": "LLIF6R3R9GE1GQB",
+      "name": "Burnabee",
+      "x1": 370,
+      "y1": 63,
+      "x2": 399,
+      "y2": 167
+    },
+    {
+      "tsid": "LCR1356LOEM1NUI",
+      "name": "Camsteeple Strat",
+      "x1": 51,
+      "y1": 178,
+      "x2": 172,
+      "y2": 223
+    },
+    {
+      "tsid": "LLI2HHRC84F1TJ6",
+      "name": "Cranbury Coppice",
+      "x1": 258,
+      "y1": 146,
+      "x2": 316,
+      "y2": 225
+    },
+    {
+      "tsid": "LLIF37ASJFE1AVQ",
+      "name": "Doon Way",
+      "x1": 478,
+      "y1": 113,
+      "x2": 611,
+      "y2": 165
+    },
+    {
+      "tsid": "LCR13KDF9MK1QJK",
+      "name": "Evanfell Craine",
+      "x1": 344,
+      "y1": 290,
+      "x2": 467,
+      "y2": 308
+    },
+    {
+      "tsid": "LCR103UREMK11MT",
+      "name": "Fairgower Lane",
+      "x1": 207,
+      "y1": 225,
+      "x2": 241,
+      "y2": 336
+    },
+    {
+      "tsid": "LCRTTKP69DO1MG0",
+      "name": "Fern End",
+      "x1": 627,
+      "y1": 88,
+      "x2": 686,
+      "y2": 151
+    },
+    {
+      "tsid": "LCR13M5UQEM15TA",
+      "name": "Ferncaster End",
+      "x1": 363,
+      "y1": 363,
+      "x2": 434,
+      "y2": 411
+    },
+    {
+      "tsid": "LCR101SU5VL1P09",
+      "name": "Follybottom Stritt",
+      "x1": 239,
+      "y1": 333,
+      "x2": 299,
+      "y2": 407
+    },
+    {
+      "tsid": "LLI1BQA9PUH16A0",
+      "name": "Grand Mile",
+      "x1": 337,
+      "y1": 291,
+      "x2": 424,
+      "y2": 220
+    },
+    {
+      "tsid": "LCR195Q63RK143M",
+      "name": "Grimssea Bottom",
+      "x1": 146,
+      "y1": 346,
+      "x2": 241,
+      "y2": 334
+    },
+    {
+      "tsid": "LLI3272LOTD1B1F",
+      "name": "Groddle Forest Junction",
+      "x1": 318,
+      "y1": 232,
+      "x2": 502,
+      "y2": 91
+    },
+    {
+      "tsid": "LCR13NMUQEM1A2R",
+      "name": "Hackfast Quicks",
+      "x1": 593,
+      "y1": 330,
+      "x2": 677,
+      "y2": 276
+    },
+    {
+      "tsid": "LLIF3AQTOFE19OR",
+      "name": "Hayden Seek Alley",
+      "x1": 551,
+      "y1": 258,
+      "x2": 612,
+      "y2": 166
+    },
+    {
+      "tsid": "LLI2V0UN7RD1T2J",
+      "name": "Hechey Track",
+      "x1": 399,
+      "y1": 168,
+      "x2": 474,
+      "y2": 323
+    },
+    {
+      "tsid": "LCR13JCI5MK1EF4",
+      "name": "Hellenturret Pass",
+      "x1": 569,
+      "y1": 230,
+      "x2": 675,
+      "y2": 275
+    },
+    {
+      "tsid": "LCR101UN0NJ1QPQ",
+      "name": "Middle Arbor",
+      "x1": 453,
+      "y1": 129,
+      "x2": 585,
+      "y2": 200
+    },
+    {
+      "tsid": "LLI23FELDHD1O3C",
+      "name": "Middle Valley Clearing",
+      "x1": 317,
+      "y1": 225,
+      "x2": 363,
+      "y2": 362
+    },
+    {
+      "tsid": "LCR15ST40FM1M1I",
+      "name": "Mossystep",
+      "x1": 148,
+      "y1": 57,
+      "x2": 177,
+      "y2": 119
+    },
+    {
+      "tsid": "LLI23D3LDHD1FQA",
+      "name": "Northwest Passage",
+      "x1": 224,
+      "y1": 148,
+      "x2": 401,
+      "y2": 167
+    },
+    {
+      "tsid": "LCR7KJGL6LL1SSO",
+      "name": "Ozacosta Avenue",
+      "x1": 514,
+      "y1": 284,
+      "x2": 596,
+      "y2": 331
+    },
+    {
+      "tsid": "LLI2HVHUM4F16B0",
+      "name": "Pasha's Place",
+      "x1": 398,
+      "y1": 166,
+      "x2": 552,
+      "y2": 260
+    },
+    {
+      "tsid": "LCR13CE52PK1L81",
+      "name": "Sapslow Tweeds",
+      "x1": 371,
+      "y1": 64,
+      "x2": 475,
+      "y2": 112
+    },
+    {
+      "tsid": "LLICFILAMTI11QV",
+      "name": "Scribe's Weald",
+      "x1": 465,
+      "y1": 293,
+      "x2": 533,
+      "y2": 248
+    },
+    {
+      "tsid": "LCR11SBEGQL13D9",
+      "name": "Shillrigg Tiers",
+      "x1": 50,
+      "y1": 176,
+      "x2": 96,
+      "y2": 85
+    },
+    {
+      "tsid": "LCR1IDDEB2M17RC",
+      "name": "Strucote Stacks",
+      "x1": 95,
+      "y1": 86,
+      "x2": 226,
+      "y2": 148
+    },
+    {
+      "tsid": "LLI4HC7IO2E1U31",
+      "name": "Switchback",
+      "x1": 170,
+      "y1": 226,
+      "x2": 227,
+      "y2": 147
+    },
+    {
+      "tsid": "LCR10NQRPKJ16H6",
+      "name": "Sylvan Grove",
+      "x1": 506,
+      "y1": 123,
+      "x2": 628,
+      "y2": 88
+    },
+    {
+      "tsid": "LLI2VDR4JRD1AEG",
+      "name": "The Great Hole to Ix",
+      "x1": 261,
+      "y1": 435,
+      "x2": 364,
+      "y2": 362
+    },
+    {
+      "tsid": "LCR14HPKPBK1U25",
+      "name": "The Landing",
+      "x1": 291,
+      "y1": 117,
+      "x2": 304,
+      "y2": 39
+    },
+    {
+      "tsid": "LLI23Q4NDHD11EK",
+      "name": "Thicket",
+      "x1": 445,
+      "y1": 349,
+      "x2": 553,
+      "y2": 257
+    },
+    {
+      "tsid": "LLI23TBNDHD19F2",
+      "name": "Tii Street",
+      "x1": 363,
+      "y1": 365,
+      "x2": 442,
+      "y2": 348
+    },
+    {
+      "tsid": "LLI23UJNDHD1A4V",
+      "name": "Upper Valley Heights",
+      "x1": 257,
+      "y1": 148,
+      "x2": 368,
+      "y2": 63
+    },
+    {
+      "tsid": "LCR10S7GVKJ1ABI",
+      "name": "Verdant Green",
+      "x1": 445,
+      "y1": 351,
+      "x2": 495,
+      "y2": 407
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LM4115NJ46G8M",
+      "hub_id": "27",
+      "hubName": "Ix",
+      "label": "To: Ix",
+      "x": 250,
+      "y": 440,
+      "arrow": 225
+    },
+    {
+      "tsid": "LIF101NCNU112O2",
+      "hub_id": "51",
+      "hubName": "Uralia",
+      "label": "To: Uralia",
+      "x": 506,
+      "y": 76,
+      "arrow": 45
+    },
+    {
+      "tsid": "LLID3PL336E1RN1",
+      "hub_id": "58",
+      "hubName": "Groddle Meadow",
+      "label": "To: Groddle Meadow",
+      "x": 31,
+      "y": 295,
+      "arrow": 270
+    },
+    {
+      "tsid": "LCR1OU9H34K19OE",
+      "hub_id": "64",
+      "hubName": "Groddle Heights",
+      "label": "To: Groddle Heights",
+      "x": 305,
+      "y": 27,
+      "arrow": 5
+    },
+    {
+      "tsid": "LTJ103U2KJK1BLG",
+      "hub_id": "63",
+      "hubName": "Shimla Mirch",
+      "label": "To: Shimla Mirch",
+      "x": 446,
+      "y": 419,
+      "arrow": 190
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_groddleforest.jpg"
+}

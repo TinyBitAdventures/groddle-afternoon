@@ -1,0 +1,6 @@
+Mined static content from Tiny Speck glitch-GameServerJS (CC0).
+quests.json — from quests/*.js
+achievements.json — from achievements/*.js (badges)
+skills.json — from inc_data_skills.js
+buffs.json — from items/catalog_buffs.js
+Re-run: node scripts/extract-gsjs-content.mjs

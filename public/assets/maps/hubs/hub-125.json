@@ -1,0 +1,92 @@
+{
+  "hubId": "125",
+  "hubName": "Underground Puzzles",
+  "bg": "http://c1.glitch.bz/img/maps/map_fake_island_45490.jpg",
+  "fg": "",
+  "color": "#ff0000",
+  "btm_color": "#606669",
+  "top_color": "#8a9297",
+  "mote_id": "10",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LHVDKQ2O6S23LVJ",
+      "name": "Amberlyza",
+      "x1": 40,
+      "y1": 440,
+      "x2": 240,
+      "y2": 440
+    },
+    {
+      "tsid": "LHVP8TCLT40336S",
+      "name": "Blooian",
+      "x1": 40,
+      "y1": 360,
+      "x2": 240,
+      "y2": 360
+    },
+    {
+      "tsid": "LHVQMS17V813FN7",
+      "name": "Fernucopia",
+      "x1": 40,
+      "y1": 400,
+      "x2": 240,
+      "y2": 400
+    },
+    {
+      "tsid": "LHVOD0F3T403694",
+      "name": "Griinolyza",
+      "x1": 40,
+      "y1": 200,
+      "x2": 240,
+      "y2": 200
+    },
+    {
+      "tsid": "LHVCKEPHO403BN5",
+      "name": "Orangian",
+      "x1": 40,
+      "y1": 120,
+      "x2": 240,
+      "y2": 120
+    },
+    {
+      "tsid": "LHVP6H0KT403N8A",
+      "name": "Piryan",
+      "x1": 40,
+      "y1": 280,
+      "x2": 240,
+      "y2": 280
+    },
+    {
+      "tsid": "LHVP7QOKT403F5Q",
+      "name": "Purplysa",
+      "x1": 40,
+      "y1": 320,
+      "x2": 240,
+      "y2": 320
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LA9117Q58K624RI",
+      "hub_id": "81",
+      "hubName": "Ryan",
+      "label": "To: Ryan",
+      "x": 700,
+      "y": 100,
+      "arrow": 0
+    },
+    {
+      "tsid": "LTJ8GSQV1IV1FBE",
+      "hub_id": "72",
+      "hubName": "Chakra Phool",
+      "label": "To: Chakra Phool",
+      "x": 700,
+      "y": 200,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": ""
+}

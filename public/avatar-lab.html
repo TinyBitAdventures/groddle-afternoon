@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Avatar vector lab — Groddle</title>
+  <style>
+    :root {
+      --bg: #1a1a22;
+      --panel: #252530;
+      --text: #f0ebe3;
+      --muted: #9a958c;
+      --accent: #95a3d6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Trebuchet MS", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding: 1.5rem;
+    }
+    a { color: var(--accent); }
+    h1 { font-size: 1.6rem; margin: 0 0 0.25rem; color: var(--accent); }
+    h2 { margin-top: 1.75rem; font-size: 1.1rem; color: var(--accent); }
+    .sub { color: var(--muted); margin-bottom: 1.25rem; max-width: 54rem; }
+    .note {
+      background: var(--panel);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      max-width: 54rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+    }
+    .note code { background: #0003; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.9em; }
+    .ok { color: #7dcea0; }
+    .hero {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .stage {
+      background: #7ec8e3;
+      border-radius: 12px;
+      border: 1px solid #333;
+      padding: 1rem 1.5rem;
+      min-width: 200px;
+      text-align: center;
+    }
+    .stage img, .stage object {
+      max-height: 280px;
+      image-rendering: auto;
+    }
+    .strip {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+    .strip img {
+      height: 96px;
+      background: #111;
+      border-radius: 6px;
+      border: 1px solid #333;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.85rem;
+    }
+    figure {
+      margin: 0;
+      background: #111;
+      border-radius: 10px;
+      padding: 0.65rem;
+      text-align: center;
+      border: 1px solid #333;
+    }
+    figure img {
+      max-width: 100%;
+      height: 120px;
+      object-fit: contain;
+    }
+    figcaption {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+      word-break: break-word;
+    }
+    button {
+      background: var(--accent);
+      color: #111;
+      border: 0;
+      border-radius: 8px;
+      padding: 0.45rem 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Avatar vector lab</h1>
+  <p class="sub">
+    Original <code>glitch-avatars</code> SWF → JPEXS → SVG/PNG.
+    Back to <a href="/">the game</a> (player now uses this walk cycle).
+  </p>
+
+  <div class="note">
+    <span class="ok">Working:</span>
+    Base body from <code>Avatar.swf</code> <code>avatarContainer</code> (chid 409) —
+    full <strong>walk1x</strong> (frames 1–24) and <strong>idle0</strong> as real vector timelines.
+    Placement matrices for every wardrobe slot extracted from SWF XML.<br /><br />
+    <span class="ok">In game:</span> skinned walk sheet
+    <code>assets/sprites/avatar_walk_vector.png</code> (24×196×258).<br /><br />
+    <strong>Still open:</strong> wardrobe pieces drop into named containers
+    (<code>sideShirtContainer_mc</code>, …) at runtime in Flash — we have the slot transforms
+    but have not yet injected clothes into the composed avatar SVG. Pattern-fill bitmaps in
+    the raw SVG export are empty; we replace them with solid skin for browser vectors.
+  </div>
+
+  <div class="hero">
+    <div class="stage">
+      <div style="font-size:0.8rem;color:#134;margin-bottom:0.5rem">walk1x (vector export → PNG)</div>
+      <img id="walk-anim" src="assets/avatar-vector/walk_01.svg" alt="walk frame" height="260" />
+      <div>
+        <button type="button" id="btn-play">Play walk</button>
+        <button type="button" id="btn-idle">Idle</button>
+      </div>
+    </div>
+    <div class="stage">
+      <div style="font-size:0.8rem;color:#134;margin-bottom:0.5rem">idle0 SVG (skin-filled)</div>
+      <img src="assets/avatar-vector/idle.svg" alt="idle vector" height="260" />
+    </div>
+    <div class="stage" style="background:#111;color:var(--muted)">
+      <div style="font-size:0.8rem;margin-bottom:0.5rem">game sheet (skinned)</div>
+      <img src="assets/sprites/avatar_idle_vector.png" alt="idle skinned" height="200" style="image-rendering:pixelated" />
+    </div>
+  </div>
+
+  <h2>Walk frames (SVG)</h2>
+  <div class="strip" id="walk-strip"></div>
+
+  <h2>Wardrobe / vanity pieces (still greyscale parts)</h2>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const walkImg = document.getElementById('walk-anim');
+    let frame = 1;
+    let timer = null;
+    function show(n) {
+      frame = n;
+      const name = n >= 800 ? 'idle.svg' : `walk_${String(n).padStart(2, '0')}.svg`;
+      walkImg.src = 'assets/avatar-vector/' + name;
+    }
+    document.getElementById('btn-play').onclick = () => {
+      if (timer) clearInterval(timer);
+      frame = 1;
+      timer = setInterval(() => {
+        show(frame);
+        frame = frame >= 24 ? 1 : frame + 1;
+      }, 50);
+    };
+    document.getElementById('btn-idle').onclick = () => {
+      if (timer) clearInterval(timer);
+      timer = null;
+      show(801);
+      walkImg.src = 'assets/avatar-vector/idle.svg';
+    };
+    // auto-play
+    document.getElementById('btn-play').click();
+
+    const strip = document.getElementById('walk-strip');
+    for (let i = 1; i <= 24; i++) {
+      const img = document.createElement('img');
+      img.src = `assets/avatar-vector/walk_${String(i).padStart(2, '0')}.svg`;
+      img.alt = 'f' + i;
+      img.title = 'frame ' + i;
+      strip.appendChild(img);
+    }
+
+    const pieces = [
+      'Candy_Cane_Sweater__shirtTorso.png',
+      'Boardwalk_Empire_Overcoat__coatClose.png',
+      'Lederhosen__pantsTop.png',
+      'Buzzcut__sideHair.png',
+      'eyes_01__sideEyeClose.png',
+      'bunny_slippers__shoeClose.png',
+      'Men_DressShoes__shoeClose.png',
+    ];
+    const grid = document.getElementById('grid');
+    for (const name of pieces) {
+      const fig = document.createElement('figure');
+      const img = document.createElement('img');
+      img.src = 'avatar-lab/' + name;
+      img.alt = name;
+      const cap = document.createElement('figcaption');
+      cap.textContent = name.replace(/\.png$/, '').replace(/__/g, ' · ');
+      fig.append(img, cap);
+      grid.append(fig);
+    }
+  </script>
+</body>
+</html>

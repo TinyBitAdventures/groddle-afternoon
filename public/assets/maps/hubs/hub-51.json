@@ -1,0 +1,87 @@
+{
+  "hubId": "51",
+  "hubName": "Uralia",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_uralia_59002.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_uralia_59153.png",
+  "color": "#591f73",
+  "btm_color": "7c7e88",
+  "top_color": "9597a9",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIF12PMQ5121D68",
+      "name": "Cebarkul",
+      "x1": 357,
+      "y1": 223,
+      "x2": 464,
+      "y2": 142
+    },
+    {
+      "tsid": "LIF2IUQJQ571TFL",
+      "name": "Eastern Approach",
+      "x1": 383,
+      "y1": 233,
+      "x2": 460,
+      "y2": 344
+    },
+    {
+      "tsid": "LIF102FDNU11314",
+      "name": "Ilmenskie",
+      "x1": 357,
+      "y1": 223,
+      "x2": 506,
+      "y2": 283
+    },
+    {
+      "tsid": "LIF101NCNU112O2",
+      "name": "Oktyabrya",
+      "x1": 172,
+      "y1": 209,
+      "x2": 358,
+      "y2": 224
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LLI3272LOTD1B1F",
+      "hub_id": "56",
+      "hubName": "Groddle Forest",
+      "label": "To: Groddle Forest",
+      "x": 167,
+      "y": 208,
+      "arrow": 285
+    },
+    {
+      "tsid": "LHH101L162117H2",
+      "hub_id": "50",
+      "hubName": "Ilmenskie Caverns",
+      "label": "To: Ilmenskie Caverns",
+      "x": 508,
+      "y": 280,
+      "arrow": 120
+    },
+    {
+      "tsid": "LM4109NI2R640",
+      "hub_id": "27",
+      "hubName": "Ix",
+      "label": "To: Ix",
+      "x": 474,
+      "y": 131,
+      "arrow": 45
+    },
+    {
+      "tsid": "LLI1D5DO1671QPA",
+      "hub_id": "50",
+      "hubName": "Ilmenskie Caverns",
+      "label": "To: Ilmenskie Caverns",
+      "x": 458,
+      "y": 342,
+      "arrow": 135
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_uralia.jpg"
+}

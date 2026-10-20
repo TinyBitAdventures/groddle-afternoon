@@ -1,0 +1,206 @@
+{
+  "hubId": "107",
+  "hubName": "Callopee",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_callopee_66209.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_callopee_66209.png",
+  "color": "#a75200",
+  "btm_color": "#7c8b7e",
+  "top_color": "#94ab9c",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LDOEMNGFQCD2KI2",
+      "name": "Bayadd Yadding",
+      "x1": 274,
+      "y1": 429,
+      "x2": 355,
+      "y2": 342
+    },
+    {
+      "tsid": "LDOVUDD84DD2U4U",
+      "name": "Boorgal Broods",
+      "x1": 490,
+      "y1": 129,
+      "x2": 560,
+      "y2": 30
+    },
+    {
+      "tsid": "LDO8SVSPPCD22ED",
+      "name": "Fosolia Flaps",
+      "x1": 359,
+      "y1": 342,
+      "x2": 498,
+      "y2": 323
+    },
+    {
+      "tsid": "LNVCJKCAHCD2660",
+      "name": "Gomen Grap",
+      "x1": 500,
+      "y1": 323,
+      "x2": 630,
+      "y2": 343
+    },
+    {
+      "tsid": "LDOE4V402DD2S3O",
+      "name": "Hari Haring",
+      "x1": 178,
+      "y1": 205,
+      "x2": 221,
+      "y2": 96
+    },
+    {
+      "tsid": "LDOOD6S77DD228S",
+      "name": "Keywot Whot",
+      "x1": 229,
+      "y1": 306,
+      "x2": 355,
+      "y2": 339
+    },
+    {
+      "tsid": "LDONE5453DD2DHS",
+      "name": "Kinche Klap",
+      "x1": 357,
+      "y1": 115,
+      "x2": 489,
+      "y2": 129
+    },
+    {
+      "tsid": "LDOACFHG1DD26A5",
+      "name": "Kohanger Hang",
+      "x1": 37,
+      "y1": 189,
+      "x2": 173,
+      "y2": 203
+    },
+    {
+      "tsid": "LDO5CC4R1FD2SQG",
+      "name": "Limmu Later",
+      "x1": 284,
+      "y1": 30,
+      "x2": 352,
+      "y2": 115
+    },
+    {
+      "tsid": "LNV9O6NVFCD2SFS",
+      "name": "Luump Yasa",
+      "x1": 632,
+      "y1": 345,
+      "x2": 727,
+      "y2": 388
+    },
+    {
+      "tsid": "LDOFAE74UCD29PD",
+      "name": "Mayspeek Moar",
+      "x1": 495,
+      "y1": 134,
+      "x2": 586,
+      "y2": 225
+    },
+    {
+      "tsid": "LDO1OPGDSCD29NF",
+      "name": "Nawiwa Wend",
+      "x1": 357,
+      "y1": 340,
+      "x2": 418,
+      "y2": 225
+    },
+    {
+      "tsid": "LDOU5PQU0FD21PF",
+      "name": "Neva Neva",
+      "x1": 271,
+      "y1": 243,
+      "x2": 395,
+      "y2": 268
+    },
+    {
+      "tsid": "LDOISPPQICD27RQ",
+      "name": "Onoma Peas",
+      "x1": 501,
+      "y1": 324,
+      "x2": 576,
+      "y2": 433
+    },
+    {
+      "tsid": "LDOM6B78RCD26TA",
+      "name": "Oyas Yeh",
+      "x1": 224,
+      "y1": 93,
+      "x2": 353,
+      "y2": 113
+    },
+    {
+      "tsid": "LDOTQ8JCOCD20TU",
+      "name": "Paodoo Lets",
+      "x1": 589,
+      "y1": 225,
+      "x2": 704,
+      "y2": 152
+    },
+    {
+      "tsid": "LDOQRJELVCD285H",
+      "name": "PokiPok Press",
+      "x1": 422,
+      "y1": 222,
+      "x2": 585,
+      "y2": 228
+    },
+    {
+      "tsid": "LDOOF07GRCD2MAP",
+      "name": "Tepen Heel",
+      "x1": 178,
+      "y1": 208,
+      "x2": 230,
+      "y2": 307
+    },
+    {
+      "tsid": "LDO8HM0S8DD240C",
+      "name": "Vekke Vets",
+      "x1": 354,
+      "y1": 115,
+      "x2": 419,
+      "y2": 222
+    },
+    {
+      "tsid": "LDOVRMU9SCD2ASN",
+      "name": "Yebeg Yobs",
+      "x1": 589,
+      "y1": 230,
+      "x2": 629,
+      "y2": 339
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LHF8B3B0S4D2L5U",
+      "hub_id": "106",
+      "hubName": "Pollokoo",
+      "label": "To: Pollokoo",
+      "x": 265,
+      "y": 434,
+      "arrow": 180
+    },
+    {
+      "tsid": "LA9FDN44SG92SDQ",
+      "hub_id": "98",
+      "hubName": "Besara",
+      "label": "To: Besara",
+      "x": 36,
+      "y": 184,
+      "arrow": 270
+    },
+    {
+      "tsid": "LA5GBQ27BUG2FF9",
+      "hub_id": "110",
+      "hubName": "Massadoe",
+      "label": "To: Massadoe",
+      "x": 289,
+      "y": 30,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_callopee.jpg"
+}

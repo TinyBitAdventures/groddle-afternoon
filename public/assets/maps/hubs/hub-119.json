@@ -1,0 +1,196 @@
+{
+  "hubId": "119",
+  "hubName": "Folivoria",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-19/folivoria_bg_1334879259.jpg",
+  "fg": "http://c2.glitch.bz/client_maps/2012-04-19/folivoria_fg_1334879259.png",
+  "color": "a75200",
+  "btm_color": "817f88",
+  "top_color": "9e98a7",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LDOUIB18JVQ2O16",
+      "name": "Berunj Mari",
+      "x1": 394,
+      "y1": 192,
+      "x2": 580,
+      "y2": 149
+    },
+    {
+      "tsid": "LDO97PV01MQ236V",
+      "name": "Billore Crys",
+      "x1": 305,
+      "y1": 41,
+      "x2": 427,
+      "y2": 103
+    },
+    {
+      "tsid": "LDOF2V2INVQ2M9D",
+      "name": "Chiti Tiga",
+      "x1": 580,
+      "y1": 150,
+      "x2": 696,
+      "y2": 25
+    },
+    {
+      "tsid": "LDO20OO2ETQ2EAG",
+      "name": "Gomed Essoni",
+      "x1": 212,
+      "y1": 299,
+      "x2": 330,
+      "y2": 421
+    },
+    {
+      "tsid": "LDOAVTFUNTQ2EVU",
+      "name": "Gondata Moo",
+      "x1": 291,
+      "y1": 203,
+      "x2": 434,
+      "y2": 265
+    },
+    {
+      "tsid": "LDORIA62TLQ2HOH",
+      "name": "Haqiq Cedony",
+      "x1": 188,
+      "y1": 210,
+      "x2": 394,
+      "y2": 191
+    },
+    {
+      "tsid": "LDOT3LP63TQ204B",
+      "name": "Heera Amond",
+      "x1": 64,
+      "y1": 306,
+      "x2": 213,
+      "y2": 299
+    },
+    {
+      "tsid": "LDOGKA16T4R2NP1",
+      "name": "Katela Ameth",
+      "x1": 52,
+      "y1": 117,
+      "x2": 87,
+      "y2": 250
+    },
+    {
+      "tsid": "LDOU6HOAO2R21Q1",
+      "name": "Lapix Lora",
+      "x1": 77,
+      "y1": 405,
+      "x2": 195,
+      "y2": 368
+    },
+    {
+      "tsid": "LDOIGN9B60R2LI4",
+      "name": "Lolime Kakaneeli",
+      "x1": 195,
+      "y1": 368,
+      "x2": 235,
+      "y2": 211
+    },
+    {
+      "tsid": "LDO4KOD692R2GQB",
+      "name": "Manak Ruba",
+      "x1": 393,
+      "y1": 190,
+      "x2": 445,
+      "y2": 52
+    },
+    {
+      "tsid": "LDOKUS4M0TQ263H",
+      "name": "Moonga Coral",
+      "x1": 292,
+      "y1": 201,
+      "x2": 304,
+      "y2": 42
+    },
+    {
+      "tsid": "LDOGVQ4M32R2COS",
+      "name": "Moti Peral",
+      "x1": 435,
+      "y1": 264,
+      "x2": 462,
+      "y2": 402
+    },
+    {
+      "tsid": "LDOVCSE5H2R2L24",
+      "name": "Neelam Saff",
+      "x1": 135,
+      "y1": 32,
+      "x2": 184,
+      "y2": 210
+    },
+    {
+      "tsid": "LDO3JFLC5TQ2NOR",
+      "name": "Panna Meral",
+      "x1": 158,
+      "y1": 108,
+      "x2": 303,
+      "y2": 43
+    },
+    {
+      "tsid": "LDOTEUFUIVQ2F0S",
+      "name": "Pitonia Lood",
+      "x1": 433,
+      "y1": 265,
+      "x2": 611,
+      "y2": 294
+    },
+    {
+      "tsid": "LDOIJ31100R2CQG",
+      "name": "Pokhraj Topa",
+      "x1": 613,
+      "y1": 293,
+      "x2": 716,
+      "y2": 239
+    },
+    {
+      "tsid": "LDO5D2B1Q2R2M9S",
+      "name": "Sunela Citrine",
+      "x1": 90,
+      "y1": 250,
+      "x2": 184,
+      "y2": 211
+    },
+    {
+      "tsid": "LDO8NGHIFTQ21CQ",
+      "name": "Sunsitara Stona",
+      "x1": 634,
+      "y1": 93,
+      "x2": 714,
+      "y2": 237
+    },
+    {
+      "tsid": "LDOPA4JQBTQ2AA9",
+      "name": "Tamar Garna",
+      "x1": 284,
+      "y1": 371,
+      "x2": 449,
+      "y2": 341
+    },
+    {
+      "tsid": "LDOJ3MELL2R23Q6",
+      "name": "Turmali Tourma",
+      "x1": 461,
+      "y1": 401,
+      "x2": 612,
+      "y2": 387
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LHFU61GVLKI2ATQ",
+      "hub_id": "113",
+      "hubName": "Tahli",
+      "label": "To: Tahli",
+      "x": 630,
+      "y": 388,
+      "arrow": 135
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_folivoria.jpg"
+}

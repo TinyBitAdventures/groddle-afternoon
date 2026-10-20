@@ -1,0 +1,206 @@
+{
+  "hubId": "64",
+  "hubName": "Groddle Heights",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_groddle_heights_43684.jpg",
+  "fg": "",
+  "color": "#6a5522",
+  "btm_color": "#756262",
+  "top_color": "#a88d8d",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LCR3MQK9NPJ191K",
+      "name": "Alpine Vista",
+      "x1": 266,
+      "y1": 363,
+      "x2": 399,
+      "y2": 173
+    },
+    {
+      "tsid": "LCR168ITRSL1498",
+      "name": "Beesfast Heave",
+      "x1": 220,
+      "y1": 309,
+      "x2": 312,
+      "y2": 297
+    },
+    {
+      "tsid": "LCR10199TPJ1DA3",
+      "name": "Bishop's Arch",
+      "x1": 400,
+      "y1": 173,
+      "x2": 552,
+      "y2": 103
+    },
+    {
+      "tsid": "LCR1OU9H34K19OE",
+      "name": "Clamber Crag",
+      "x1": 397,
+      "y1": 357,
+      "x2": 492,
+      "y2": 409
+    },
+    {
+      "tsid": "LCR10K63BQL14PE",
+      "name": "Clarbeare Voya",
+      "x1": 497,
+      "y1": 288,
+      "x2": 586,
+      "y2": 361
+    },
+    {
+      "tsid": "LCR16BA1SSL1P7K",
+      "name": "Coldham Shift",
+      "x1": 182,
+      "y1": 255,
+      "x2": 263,
+      "y2": 197
+    },
+    {
+      "tsid": "LCR101NQ4BU1SKS",
+      "name": "Community Gardens",
+      "x1": 106,
+      "y1": 346,
+      "x2": 219,
+      "y2": 309
+    },
+    {
+      "tsid": "LCR169AURSL1G9O",
+      "name": "Darnefree Air",
+      "x1": 526,
+      "y1": 206,
+      "x2": 596,
+      "y2": 264
+    },
+    {
+      "tsid": "LLI3ABTPR2J1SH9",
+      "name": "Highland Fling",
+      "x1": 369,
+      "y1": 232,
+      "x2": 520,
+      "y2": 207
+    },
+    {
+      "tsid": "LCR13L1JQEM1OSG",
+      "name": "Jacob's Climb",
+      "x1": 342,
+      "y1": 409,
+      "x2": 437,
+      "y2": 433
+    },
+    {
+      "tsid": "LCR12SD8J4K1PCV",
+      "name": "Larceny Ladder",
+      "x1": 175,
+      "y1": 406,
+      "x2": 266,
+      "y2": 366
+    },
+    {
+      "tsid": "LCR1460502K1790",
+      "name": "Ledge Narrows",
+      "x1": 397,
+      "y1": 354,
+      "x2": 497,
+      "y2": 288
+    },
+    {
+      "tsid": "LCR167RSRSL1VPP",
+      "name": "Lethensome Lift",
+      "x1": 266,
+      "y1": 197,
+      "x2": 399,
+      "y2": 173
+    },
+    {
+      "tsid": "LCRHJHOFQNL1PHP",
+      "name": "Newcot Close",
+      "x1": 267,
+      "y1": 365,
+      "x2": 345,
+      "y2": 407
+    },
+    {
+      "tsid": "LCR16VUKOQL18DU",
+      "name": "Pinhigh Prose",
+      "x1": 586,
+      "y1": 362,
+      "x2": 680,
+      "y2": 367
+    },
+    {
+      "tsid": "LCR16AUURSL1KTM",
+      "name": "Smallend High",
+      "x1": 527,
+      "y1": 205,
+      "x2": 600,
+      "y2": 175
+    },
+    {
+      "tsid": "LCR103T98QJ1SC9",
+      "name": "Tallish Crest",
+      "x1": 364,
+      "y1": 230,
+      "x2": 496,
+      "y2": 288
+    },
+    {
+      "tsid": "LCR12NU45AM12BB",
+      "name": "Thornfad Layers",
+      "x1": 342,
+      "y1": 407,
+      "x2": 396,
+      "y2": 354
+    },
+    {
+      "tsid": "LCR131F8U1K1PF9",
+      "name": "Uplands Verge",
+      "x1": 319,
+      "y1": 300,
+      "x2": 395,
+      "y2": 357
+    },
+    {
+      "tsid": "LCR10H9E3QJ1E2P",
+      "name": "Yeoman's Bluff",
+      "x1": 327,
+      "y1": 85,
+      "x2": 399,
+      "y2": 173
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LCR105E77812AEF",
+      "hub_id": "76",
+      "hubName": "Alakol",
+      "label": "To: Alakol",
+      "x": 319,
+      "y": 68,
+      "arrow": 0
+    },
+    {
+      "tsid": "LCR14HPKPBK1U25",
+      "hub_id": "56",
+      "hubName": "Groddle Forest",
+      "label": "To: Groddle Forest",
+      "x": 503,
+      "y": 422,
+      "arrow": 165
+    },
+    {
+      "tsid": "LCR14K7RQBK119B",
+      "hub_id": "58",
+      "hubName": "Groddle Meadow",
+      "label": "To: Groddle Meadow",
+      "x": 165,
+      "y": 420,
+      "arrow": 195
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_groddleheights.jpg"
+}

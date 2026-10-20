@@ -1,0 +1,399 @@
+{
+  "hubId": "58",
+  "hubName": "Groddle Meadow",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_groddle_meadow_43684.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_groddle_meadow_59153.png",
+  "color": "#1d3a80",
+  "btm_color": "#6a6d7f",
+  "top_color": "#989cb6",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LLI32N0F1UD114O",
+      "name": "Archimedes Acres",
+      "x1": 427,
+      "y1": 382,
+      "x2": 551,
+      "y2": 293
+    },
+    {
+      "tsid": "LCR10U5VHMK112O",
+      "name": "Bailestorth Shin",
+      "x1": 291,
+      "y1": 212,
+      "x2": 357,
+      "y2": 300
+    },
+    {
+      "tsid": "LCR10K0NLRK1GKE",
+      "name": "Balliure Heath",
+      "x1": 486,
+      "y1": 210,
+      "x2": 641,
+      "y2": 213
+    },
+    {
+      "tsid": "LCR117DK18O11FF",
+      "name": "Bonebottle Sands",
+      "x1": 571,
+      "y1": 386,
+      "x2": 651,
+      "y2": 327
+    },
+    {
+      "tsid": "LCRHSGTEION115H",
+      "name": "Bonelington Hole",
+      "x1": 650,
+      "y1": 251,
+      "x2": 710,
+      "y2": 159
+    },
+    {
+      "tsid": "LCR11DNA3EL10TD",
+      "name": "Briarset Croft",
+      "x1": 230,
+      "y1": 78,
+      "x2": 373,
+      "y2": 124
+    },
+    {
+      "tsid": "LCR13VM1REM1GHI",
+      "name": "Brinlow Vale",
+      "x1": 390,
+      "y1": 339,
+      "x2": 517,
+      "y2": 281
+    },
+    {
+      "tsid": "LCR199KIJRK1I2B",
+      "name": "Broxhurst Green",
+      "x1": 345,
+      "y1": 66,
+      "x2": 462,
+      "y2": 87
+    },
+    {
+      "tsid": "LCR144H8APK1OJS",
+      "name": "Buckward Vale",
+      "x1": 220,
+      "y1": 310,
+      "x2": 318,
+      "y2": 401
+    },
+    {
+      "tsid": "LCR17BAC6OL11L8",
+      "name": "Coldthorp Lam",
+      "x1": 616,
+      "y1": 93,
+      "x2": 708,
+      "y2": 158
+    },
+    {
+      "tsid": "LCR14062REM1QIR",
+      "name": "Eglesgown Wanks",
+      "x1": 288,
+      "y1": 213,
+      "x2": 374,
+      "y2": 124
+    },
+    {
+      "tsid": "LLI33CQJ3UD1G5J",
+      "name": "Elysian Slope",
+      "x1": 410,
+      "y1": 167,
+      "x2": 485,
+      "y2": 57
+    },
+    {
+      "tsid": "LLI32KHF0UD1AOK",
+      "name": "Estevan Hummock",
+      "x1": 448,
+      "y1": 236,
+      "x2": 551,
+      "y2": 292
+    },
+    {
+      "tsid": "LLI32J0SVTD114U",
+      "name": "Estevan Meadows",
+      "x1": 356,
+      "y1": 298,
+      "x2": 435,
+      "y2": 399
+    },
+    {
+      "tsid": "LCR10M2FUJK177P",
+      "name": "Fanfoot Flare",
+      "x1": 461,
+      "y1": 87,
+      "x2": 559,
+      "y2": 122
+    },
+    {
+      "tsid": "LCR14K7RQBK119B",
+      "name": "Footlands Heath",
+      "x1": 484,
+      "y1": 58,
+      "x2": 578,
+      "y2": 25
+    },
+    {
+      "tsid": "LCR113VN08O1116",
+      "name": "Greenvern Mend",
+      "x1": 489,
+      "y1": 345,
+      "x2": 567,
+      "y2": 384
+    },
+    {
+      "tsid": "LLI32G3NUTD100I",
+      "name": "Gregarious Grange",
+      "x1": 373,
+      "y1": 123,
+      "x2": 449,
+      "y2": 238
+    },
+    {
+      "tsid": "LA5134UPLRU29OH",
+      "name": "Gregarious Towers",
+      "x1": 40,
+      "y1": 160,
+      "x2": 240,
+      "y2": 160
+    },
+    {
+      "tsid": "LDONEDVHC4030KF",
+      "name": "Gregarious Towers Basement",
+      "x1": 40,
+      "y1": 200,
+      "x2": 240,
+      "y2": 200
+    },
+    {
+      "tsid": "LCR202JSVIN1STL",
+      "name": "Kipacre Greens",
+      "x1": 141,
+      "y1": 222,
+      "x2": 206,
+      "y2": 156
+    },
+    {
+      "tsid": "LCR111KI08O1HLB",
+      "name": "Langden Abbey",
+      "x1": 231,
+      "y1": 78,
+      "x2": 329,
+      "y2": 27
+    },
+    {
+      "tsid": "LCR10B6U5NJ1VMA",
+      "name": "Leftmost Graze",
+      "x1": 318,
+      "y1": 402,
+      "x2": 425,
+      "y2": 381
+    },
+    {
+      "tsid": "LLIFIG7BP8G1MU9",
+      "name": "Louise Pasture",
+      "x1": 153,
+      "y1": 317,
+      "x2": 358,
+      "y2": 299
+    },
+    {
+      "tsid": "LLIERMJ93DE1H25",
+      "name": "Marrakesh Meadow",
+      "x1": 288,
+      "y1": 213,
+      "x2": 451,
+      "y2": 238
+    },
+    {
+      "tsid": "LLI32HBOUTD1GQV",
+      "name": "Marylpole Mount",
+      "x1": 550,
+      "y1": 293,
+      "x2": 639,
+      "y2": 214
+    },
+    {
+      "tsid": "LCR101Q98A12EHH",
+      "name": "Meadow Community Machine Room",
+      "x1": 40,
+      "y1": 120,
+      "x2": 240,
+      "y2": 120
+    },
+    {
+      "tsid": "LLID3PL336E1RN1",
+      "name": "Meadow's Edge",
+      "x1": 551,
+      "y1": 292,
+      "x2": 671,
+      "y2": 329
+    },
+    {
+      "tsid": "LCR11JA67NJ15N3",
+      "name": "Nightshade Woods",
+      "x1": 141,
+      "y1": 221,
+      "x2": 205,
+      "y2": 311
+    },
+    {
+      "tsid": "LCR10K3BPJK1U6F",
+      "name": "Otterlane",
+      "x1": 224,
+      "y1": 308,
+      "x2": 290,
+      "y2": 213
+    },
+    {
+      "tsid": "LCRO4M7LH5L1QOO",
+      "name": "Prestnash Thrash",
+      "x1": 143,
+      "y1": 220,
+      "x2": 289,
+      "y2": 213
+    },
+    {
+      "tsid": "LCR11EIB3EL15ID",
+      "name": "Ramsley Sway",
+      "x1": 464,
+      "y1": 86,
+      "x2": 495,
+      "y2": 212
+    },
+    {
+      "tsid": "LLI32IDPUTD1F2R",
+      "name": "Ritzrock Rise",
+      "x1": 357,
+      "y1": 300,
+      "x2": 560,
+      "y2": 165
+    },
+    {
+      "tsid": "LCR169OSLQL13JR",
+      "name": "Rookthills Lay",
+      "x1": 486,
+      "y1": 58,
+      "x2": 614,
+      "y2": 92
+    },
+    {
+      "tsid": "LCR11CD34KK1AN1",
+      "name": "Rushlane Steading",
+      "x1": 402,
+      "y1": 6,
+      "x2": 486,
+      "y2": 58
+    },
+    {
+      "tsid": "LCR1UJAMSIN1D0G",
+      "name": "Sculdent Shill",
+      "x1": 319,
+      "y1": 402,
+      "x2": 392,
+      "y2": 339
+    },
+    {
+      "tsid": "LCR1985LIRK12N4",
+      "name": "Tillymurry Hurry",
+      "x1": 330,
+      "y1": 31,
+      "x2": 373,
+      "y2": 124
+    },
+    {
+      "tsid": "LCR1664750O1D23",
+      "name": "Twickenrill Grotto",
+      "x1": 642,
+      "y1": 214,
+      "x2": 651,
+      "y2": 318
+    },
+    {
+      "tsid": "LLIFINFQT8G13OU",
+      "name": "Undermine Hollows",
+      "x1": 560,
+      "y1": 165,
+      "x2": 614,
+      "y2": 91
+    },
+    {
+      "tsid": "LLI334UG2UD1IKQ",
+      "name": "Waylon Way",
+      "x1": 558,
+      "y1": 165,
+      "x2": 642,
+      "y2": 214
+    },
+    {
+      "tsid": "LCRVT5V0BDO1HLF",
+      "name": "Welldale",
+      "x1": 204,
+      "y1": 157,
+      "x2": 231,
+      "y2": 78
+    },
+    {
+      "tsid": "LCR13R31REM1A4S",
+      "name": "Wickdoon Mood",
+      "x1": 198,
+      "y1": 396,
+      "x2": 320,
+      "y2": 401
+    },
+    {
+      "tsid": "LCR7C1EG6LL1197",
+      "name": "Wilhem Borough",
+      "x1": 344,
+      "y1": 65,
+      "x2": 403,
+      "y2": 4
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LLI4HJ9GRLI1C4E",
+      "hub_id": "63",
+      "hubName": "Shimla Mirch",
+      "label": "To: Shimla Mirch",
+      "x": 446,
+      "y": 414,
+      "arrow": 165
+    },
+    {
+      "tsid": "LLIE7307LTG11T2",
+      "hub_id": "56",
+      "hubName": "Groddle Forest",
+      "label": "To: Groddle Forest",
+      "x": 692,
+      "y": 325,
+      "arrow": 80
+    },
+    {
+      "tsid": "LM413RQ6LRG9N",
+      "hub_id": "27",
+      "hubName": "Ix",
+      "label": "To: Ix",
+      "x": 136,
+      "y": 319,
+      "arrow": 270
+    },
+    {
+      "tsid": "LCR12SD8J4K1PCV",
+      "hub_id": "64",
+      "hubName": "Groddle Heights",
+      "label": "To: Groddle Heights",
+      "x": 581,
+      "y": 21,
+      "arrow": 45
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_groddlemeadow.jpg"
+}

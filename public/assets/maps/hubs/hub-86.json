@@ -1,0 +1,383 @@
+{
+  "hubId": "86",
+  "hubName": "Baqala",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_baqala_56779.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_baqala_52144.png",
+  "color": "#959b00",
+  "btm_color": "#82897f",
+  "top_color": "#9eaa9c",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA517OTP8K42NN9",
+      "name": "Contour Rd E",
+      "x1": 178,
+      "y1": 93,
+      "x2": 282,
+      "y2": 49
+    },
+    {
+      "tsid": "LA5C39VNDK420LG",
+      "name": "Contour Rd NE",
+      "x1": 276,
+      "y1": 51,
+      "x2": 376,
+      "y2": 30
+    },
+    {
+      "tsid": "LA5T6PDF7K42SNM",
+      "name": "Contour Rd NW",
+      "x1": 10,
+      "y1": 201,
+      "x2": 85,
+      "y2": 127
+    },
+    {
+      "tsid": "LA5PV4JH5K42CIV",
+      "name": "Contour Rd W",
+      "x1": 86,
+      "y1": 125,
+      "x2": 182,
+      "y2": 96
+    },
+    {
+      "tsid": "LA5P9MNTJK42IJS",
+      "name": "Dust Path 1A",
+      "x1": 90,
+      "y1": 378,
+      "x2": 175,
+      "y2": 317
+    },
+    {
+      "tsid": "LA515H6TSC424T9",
+      "name": "Dust Path 1B",
+      "x1": 175,
+      "y1": 315,
+      "x2": 285,
+      "y2": 280
+    },
+    {
+      "tsid": "LA51DET7GF42FKO",
+      "name": "Dust Path 1C",
+      "x1": 283,
+      "y1": 281,
+      "x2": 359,
+      "y2": 200
+    },
+    {
+      "tsid": "LA515KVOUC42I7T",
+      "name": "Dust Path 1D",
+      "x1": 365,
+      "y1": 199,
+      "x2": 484,
+      "y2": 145
+    },
+    {
+      "tsid": "LA55S7P5RJ42VTG",
+      "name": "Dust Path 1E",
+      "x1": 471,
+      "y1": 150,
+      "x2": 588,
+      "y2": 84
+    },
+    {
+      "tsid": "LA5J7IB1HK42N3D",
+      "name": "Dust Path 1F",
+      "x1": 589,
+      "y1": 83,
+      "x2": 700,
+      "y2": 71
+    },
+    {
+      "tsid": "LA5BVMNOTH42T8L",
+      "name": "Empty Via 1",
+      "x1": 196,
+      "y1": 12,
+      "x2": 276,
+      "y2": 53
+    },
+    {
+      "tsid": "LA51CP6NAF42G0N",
+      "name": "Empty Via 2",
+      "x1": 273,
+      "y1": 49,
+      "x2": 357,
+      "y2": 96
+    },
+    {
+      "tsid": "LA52G8H9PJ420LQ",
+      "name": "Empty Via 3",
+      "x1": 356,
+      "y1": 98,
+      "x2": 473,
+      "y2": 150
+    },
+    {
+      "tsid": "LA5146P2JC42B1Q",
+      "name": "Empty Via 4",
+      "x1": 471,
+      "y1": 150,
+      "x2": 567,
+      "y2": 209
+    },
+    {
+      "tsid": "LA5101HF7F429V5",
+      "name": "Empty Via 5",
+      "x1": 569,
+      "y1": 212,
+      "x2": 672,
+      "y2": 242
+    },
+    {
+      "tsid": "LA510IHD1F426DS",
+      "name": "Empty Via 6",
+      "x1": 675,
+      "y1": 243,
+      "x2": 746,
+      "y2": 325
+    },
+    {
+      "tsid": "LA5ASS2OEH42TSV",
+      "name": "Mart's Way 1",
+      "x1": 67,
+      "y1": 242,
+      "x2": 180,
+      "y2": 200
+    },
+    {
+      "tsid": "LA57JSVQRH423HV",
+      "name": "Mart's Way 2",
+      "x1": 180,
+      "y1": 199,
+      "x2": 260,
+      "y2": 146
+    },
+    {
+      "tsid": "LA57LTPQBK42SLV",
+      "name": "Mart's Way 3",
+      "x1": 259,
+      "y1": 145,
+      "x2": 361,
+      "y2": 96
+    },
+    {
+      "tsid": "LA5KUKA22I42CI9",
+      "name": "Mart's Way 4",
+      "x1": 353,
+      "y1": 99,
+      "x2": 463,
+      "y2": 55
+    },
+    {
+      "tsid": "LA514TDJOC42JUA",
+      "name": "Parsin's Trail E",
+      "x1": 576,
+      "y1": 311,
+      "x2": 674,
+      "y2": 244
+    },
+    {
+      "tsid": "LA515E0PQC4214G",
+      "name": "Parsin's Trail SE",
+      "x1": 677,
+      "y1": 243,
+      "x2": 754,
+      "y2": 165
+    },
+    {
+      "tsid": "LA51450HIC42Q4I",
+      "name": "Parsin's Trail SW",
+      "x1": 380,
+      "y1": 427,
+      "x2": 485,
+      "y2": 396
+    },
+    {
+      "tsid": "LA514988KC42014",
+      "name": "Parsin's Trail W",
+      "x1": 486,
+      "y1": 394,
+      "x2": 572,
+      "y2": 316
+    },
+    {
+      "tsid": "LA5N5E10CM42HJ4",
+      "name": "Plains Rte A",
+      "x1": 288,
+      "y1": 397,
+      "x2": 383,
+      "y2": 324
+    },
+    {
+      "tsid": "LA51488SJC424V7",
+      "name": "Plains Rte B",
+      "x1": 383,
+      "y1": 327,
+      "x2": 452,
+      "y2": 273
+    },
+    {
+      "tsid": "LA5157TDPC42IGK",
+      "name": "Plains Rte C",
+      "x1": 456,
+      "y1": 272,
+      "x2": 568,
+      "y2": 209
+    },
+    {
+      "tsid": "LA5CTEP5UH42CQC",
+      "name": "Plains Rte D",
+      "x1": 567,
+      "y1": 210,
+      "x2": 652,
+      "y2": 129
+    },
+    {
+      "tsid": "LA5371G9AH421NO",
+      "name": "Range Rd 1",
+      "x1": 86,
+      "y1": 40,
+      "x2": 182,
+      "y2": 95
+    },
+    {
+      "tsid": "LA59DJ1KSH42F4L",
+      "name": "Range Rd 2",
+      "x1": 182,
+      "y1": 96,
+      "x2": 262,
+      "y2": 146
+    },
+    {
+      "tsid": "LA5M6H0P2I42BQJ",
+      "name": "Range Rd 3",
+      "x1": 253,
+      "y1": 142,
+      "x2": 359,
+      "y2": 200
+    },
+    {
+      "tsid": "LA514BBVLC423BJ",
+      "name": "Range Rd 4",
+      "x1": 358,
+      "y1": 200,
+      "x2": 461,
+      "y2": 271
+    },
+    {
+      "tsid": "LA5N7KV0CM42DKT",
+      "name": "Range Rd 5",
+      "x1": 460,
+      "y1": 270,
+      "x2": 573,
+      "y2": 312
+    },
+    {
+      "tsid": "LA514DNTMC42534",
+      "name": "Range Rd 6",
+      "x1": 575,
+      "y1": 315,
+      "x2": 637,
+      "y2": 398
+    },
+    {
+      "tsid": "LA514GCJNC42I6G",
+      "name": "Range Rd 7",
+      "x1": 639,
+      "y1": 401,
+      "x2": 743,
+      "y2": 437
+    },
+    {
+      "tsid": "LA512CSG4H42RKG",
+      "name": "Stake Claim Rd A",
+      "x1": 8,
+      "y1": 47,
+      "x2": 88,
+      "y2": 129
+    },
+    {
+      "tsid": "LA5DNE9DVJ429P8",
+      "name": "Stake Claim Rd B",
+      "x1": 85,
+      "y1": 122,
+      "x2": 179,
+      "y2": 202
+    },
+    {
+      "tsid": "LA5THPDOLK42GRD",
+      "name": "Stake Claim Rd C",
+      "x1": 182,
+      "y1": 202,
+      "x2": 282,
+      "y2": 281
+    },
+    {
+      "tsid": "LA5147JHJC424OI",
+      "name": "Stake Claim Rd D",
+      "x1": 281,
+      "y1": 281,
+      "x2": 387,
+      "y2": 326
+    },
+    {
+      "tsid": "LA536V4QPH429H8",
+      "name": "Stake Claim Rd E",
+      "x1": 383,
+      "y1": 324,
+      "x2": 486,
+      "y2": 394
+    },
+    {
+      "tsid": "LA515GCSSC42QGF",
+      "name": "Stake Claim Rd F",
+      "x1": 487,
+      "y1": 395,
+      "x2": 599,
+      "y2": 453
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LHV5B9093K42J9S",
+      "hub_id": "85",
+      "hubName": "Kajuu",
+      "label": "To: Kajuu",
+      "x": 361,
+      "y": 431,
+      "arrow": 180
+    },
+    {
+      "tsid": "LA513MGQ0J52Q8S",
+      "hub_id": "91",
+      "hubName": "Zhambu",
+      "label": "To: Zhambu",
+      "x": 47,
+      "y": 247,
+      "arrow": 270
+    },
+    {
+      "tsid": "LIFNTO2RPG52AH8",
+      "hub_id": "90",
+      "hubName": "Choru",
+      "label": "To: Choru",
+      "x": 396,
+      "y": 26,
+      "arrow": 20
+    },
+    {
+      "tsid": "LIF14OKTU8722CQ",
+      "hub_id": "92",
+      "hubName": "Tamila",
+      "label": "To: Tamila",
+      "x": 707,
+      "y": 71,
+      "arrow": 70
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_baqala.jpg"
+}

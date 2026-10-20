@@ -1,0 +1,206 @@
+{
+  "hubId": "133",
+  "hubName": "Kloro",
+  "bg": "http://c2.glitch.bz/client_maps/2012-08-07/kloro_bg_1344390972.jpg",
+  "fg": "",
+  "color": "804a16",
+  "btm_color": "7e8487",
+  "top_color": "98a2a7",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIFD7QU2DF432MC",
+      "name": "Armillo Flaria",
+      "x1": 241,
+      "y1": 417,
+      "x2": 336,
+      "y2": 302
+    },
+    {
+      "tsid": "LIFJUKUDO743LES",
+      "name": "Arvensis Harris",
+      "x1": 436,
+      "y1": 329,
+      "x2": 579,
+      "y2": 392
+    },
+    {
+      "tsid": "LIFJKLT8VF43JTF",
+      "name": "Calvatia Bovista",
+      "x1": 326,
+      "y1": 106,
+      "x2": 440,
+      "y2": 243
+    },
+    {
+      "tsid": "LIFR1RLV0G43647",
+      "name": "Cinnabar Chibe",
+      "x1": 508,
+      "y1": 361,
+      "x2": 673,
+      "y2": 274
+    },
+    {
+      "tsid": "LIF3T0ACGI43H7O",
+      "name": "Edodes Peziza",
+      "x1": 397,
+      "y1": 60,
+      "x2": 522,
+      "y2": 149
+    },
+    {
+      "tsid": "LIFBLG555G434J3",
+      "name": "Ganos Lucidum",
+      "x1": 485,
+      "y1": 219,
+      "x2": 672,
+      "y2": 271
+    },
+    {
+      "tsid": "LIFNGN0F5I438EQ",
+      "name": "Gomphus Comatus",
+      "x1": 247,
+      "y1": 150,
+      "x2": 394,
+      "y2": 61
+    },
+    {
+      "tsid": "LIFJPVPCO743LKE",
+      "name": "Kanun Phothen",
+      "x1": 239,
+      "y1": 419,
+      "x2": 429,
+      "y2": 416
+    },
+    {
+      "tsid": "LIFP24DTLI43SM4",
+      "name": "Laccaria Quadrata",
+      "x1": 130,
+      "y1": 78,
+      "x2": 242,
+      "y2": 148
+    },
+    {
+      "tsid": "LIFJISNAO743CK0",
+      "name": "Madhur Hathur",
+      "x1": 177,
+      "y1": 288,
+      "x2": 236,
+      "y2": 418
+    },
+    {
+      "tsid": "LIF77JBCJF43LC2",
+      "name": "Mellai Nivelare",
+      "x1": 176,
+      "y1": 284,
+      "x2": 246,
+      "y2": 152
+    },
+    {
+      "tsid": "LIF6RTBE48435HF",
+      "name": "Morchella Lepiota",
+      "x1": 206,
+      "y1": 238,
+      "x2": 334,
+      "y2": 303
+    },
+    {
+      "tsid": "LIFJLIMKKI438SK",
+      "name": "Mussirio Flero",
+      "x1": 50,
+      "y1": 221,
+      "x2": 174,
+      "y2": 285
+    },
+    {
+      "tsid": "LIFBHR9M3L43FET",
+      "name": "Mydus Tangere",
+      "x1": 428,
+      "y1": 415,
+      "x2": 438,
+      "y2": 249
+    },
+    {
+      "tsid": "LIFG0VETDF43E95",
+      "name": "Pholiota Squarros",
+      "x1": 51,
+      "y1": 219,
+      "x2": 166,
+      "y2": 102
+    },
+    {
+      "tsid": "LIFRS9CDPF43UKR",
+      "name": "Porcini Bolete",
+      "x1": 339,
+      "y1": 301,
+      "x2": 484,
+      "y2": 220
+    },
+    {
+      "tsid": "LIFJ48A6O743F2G",
+      "name": "Pourto Ello",
+      "x1": 88,
+      "y1": 388,
+      "x2": 201,
+      "y2": 339
+    },
+    {
+      "tsid": "LIF2K0TOOK434L9",
+      "name": "Ravenelii Mucida",
+      "x1": 635,
+      "y1": 143,
+      "x2": 673,
+      "y2": 273
+    },
+    {
+      "tsid": "LIF6BOGS0I43INV",
+      "name": "Tsuga Ramaria",
+      "x1": 484,
+      "y1": 218,
+      "x2": 561,
+      "y2": 91
+    },
+    {
+      "tsid": "LIF455U7PK43M1N",
+      "name": "Ustilago Elata",
+      "x1": 530,
+      "y1": 150,
+      "x2": 711,
+      "y2": 136
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LTJ12SJ2RUV1N6R",
+      "hub_id": "72",
+      "hubName": "Chakra Phool",
+      "label": "To: Chakra Phool",
+      "x": 78,
+      "y": 397,
+      "arrow": 135
+    },
+    {
+      "tsid": "LIF9O9SDPJ3318J",
+      "hub_id": "131",
+      "hubName": "Haoma",
+      "label": "To: Haoma",
+      "x": 575,
+      "y": 67,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIFHNVD4SG33SKK",
+      "hub_id": "131",
+      "hubName": "Haoma",
+      "label": "To: Haoma",
+      "x": 108,
+      "y": 64,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_kloro.jpg"
+}

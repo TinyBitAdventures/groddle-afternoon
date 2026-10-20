@@ -1,0 +1,17 @@
+{
+  "hubId": "87",
+  "hubName": "Kajuu POLs",
+  "bg": "http://c1.glitch.bz/img/maps/map_fake_island_45490.jpg",
+  "fg": "",
+  "color": "#ff0000",
+  "btm_color": "#606669",
+  "top_color": "#8a9297",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [],
+  "hubs": [],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_kajuu.jpg"
+}

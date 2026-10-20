@@ -1,0 +1,206 @@
+{
+  "hubId": "131",
+  "hubName": "Haoma",
+  "bg": "http://c2.glitch.bz/client_maps/2012-08-07/haoma_bg_1344390920.jpg",
+  "fg": "",
+  "color": "00a79d",
+  "btm_color": "88857f",
+  "top_color": "a7a498",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIFL5KM3KE333GJ",
+      "name": "Agarrec Bowetic",
+      "x1": 129,
+      "y1": 165,
+      "x2": 263,
+      "y2": 93
+    },
+    {
+      "tsid": "LIF9JS2DPJ3327C",
+      "name": "Aurivella Odora",
+      "x1": 512,
+      "y1": 395,
+      "x2": 636,
+      "y2": 300
+    },
+    {
+      "tsid": "LIF72A3F7J33VAI",
+      "name": "Bhuva Lamella ",
+      "x1": 267,
+      "y1": 251,
+      "x2": 379,
+      "y2": 360
+    },
+    {
+      "tsid": "LIFTQPDA7H335UQ",
+      "name": "Chattra Dileera",
+      "x1": 109,
+      "y1": 284,
+      "x2": 247,
+      "y2": 395
+    },
+    {
+      "tsid": "LIFDQ6HSHJ33QQB",
+      "name": "Clavatus Stippe",
+      "x1": 375,
+      "y1": 229,
+      "x2": 461,
+      "y2": 81
+    },
+    {
+      "tsid": "LIF5TTUG9H33TNH",
+      "name": "Crispaa Esculenta",
+      "x1": 185,
+      "y1": 340,
+      "x2": 310,
+      "y2": 200
+    },
+    {
+      "tsid": "LIF54MLFFJ33G7G",
+      "name": "Delika Nudha",
+      "x1": 310,
+      "y1": 199,
+      "x2": 467,
+      "y2": 281
+    },
+    {
+      "tsid": "LIF33FDK0K3371H",
+      "name": "Flammulina Gigantea",
+      "x1": 506,
+      "y1": 219,
+      "x2": 686,
+      "y2": 329
+    },
+    {
+      "tsid": "LIFJ8NC9JE33O53",
+      "name": "Helvell Morell",
+      "x1": 252,
+      "y1": 46,
+      "x2": 309,
+      "y2": 197
+    },
+    {
+      "tsid": "LIFU2T6EMJ33NI6",
+      "name": "Kazaka Boviss",
+      "x1": 442,
+      "y1": 120,
+      "x2": 617,
+      "y2": 130
+    },
+    {
+      "tsid": "LIFL56303J33S8H",
+      "name": "Mycinna Muscarea",
+      "x1": 250,
+      "y1": 395,
+      "x2": 429,
+      "y2": 355
+    },
+    {
+      "tsid": "LIFM36BDKE33VO3",
+      "name": "Nanita Peckita",
+      "x1": 71,
+      "y1": 54,
+      "x2": 149,
+      "y2": 214
+    },
+    {
+      "tsid": "LIFSC0G9FG33LCT",
+      "name": "Pielus Pleurotus",
+      "x1": 54,
+      "y1": 196,
+      "x2": 262,
+      "y2": 252
+    },
+    {
+      "tsid": "LIF94J49PJ332NQ",
+      "name": "Ramosum Pranum",
+      "x1": 433,
+      "y1": 355,
+      "x2": 506,
+      "y2": 218
+    },
+    {
+      "tsid": "LIFGKHHCIE33LTF",
+      "name": "Russula Involutii",
+      "x1": 246,
+      "y1": 43,
+      "x2": 442,
+      "y2": 116
+    },
+    {
+      "tsid": "LIFTFC6OCE33DO7",
+      "name": "Scarletto Fuungoo",
+      "x1": 72,
+      "y1": 50,
+      "x2": 242,
+      "y2": 43
+    },
+    {
+      "tsid": "LIFHNVD4SG33SKK",
+      "name": "Tre Oofull",
+      "x1": 51,
+      "y1": 355,
+      "x2": 151,
+      "y2": 222
+    },
+    {
+      "tsid": "LIF9O9SDPJ3318J",
+      "name": "Tremella Frondosa",
+      "x1": 433,
+      "y1": 357,
+      "x2": 547,
+      "y2": 417
+    },
+    {
+      "tsid": "LIFKRLE5NL334A8",
+      "name": "Volvacea Grifolla",
+      "x1": 625,
+      "y1": 130,
+      "x2": 639,
+      "y2": 296
+    },
+    {
+      "tsid": "LIF7CEAQOJ339P2",
+      "name": "Zelleri Sulbabi",
+      "x1": 506,
+      "y1": 217,
+      "x2": 673,
+      "y2": 88
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LIFP24DTLI43SM4",
+      "hub_id": "133",
+      "hubName": "Kloro",
+      "label": "To: Kloro",
+      "x": 44,
+      "y": 373,
+      "arrow": 180
+    },
+    {
+      "tsid": "LIF6BOGS0I43INV",
+      "hub_id": "133",
+      "hubName": "Kloro",
+      "label": "To: Kloro",
+      "x": 558,
+      "y": 422,
+      "arrow": 180
+    },
+    {
+      "tsid": "LIFEL8CPH08259V",
+      "hub_id": "93",
+      "hubName": "Salatu",
+      "label": "To: Salatu",
+      "x": 703,
+      "y": 343,
+      "arrow": 90
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_haoma.jpg"
+}

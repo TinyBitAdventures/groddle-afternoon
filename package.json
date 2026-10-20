@@ -1,0 +1,8 @@
+{
+  "name": "groddle-afternoon",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/world.test.js"
+  }
+}

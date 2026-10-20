@@ -1,0 +1,279 @@
+{
+  "hubId": "85",
+  "hubName": "Kajuu",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-24/kajuu_bg_1335307170.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_kajuu_59153.png",
+  "color": "#a05200",
+  "btm_color": "#606d64",
+  "top_color": "#83978c",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LHV4AC2C3C42172",
+      "name": "Akki Blocks",
+      "x1": 463,
+      "y1": 429,
+      "x2": 584,
+      "y2": 413
+    },
+    {
+      "tsid": "LHV17CFO5V327AJ",
+      "name": "Appam Almost",
+      "x1": 314,
+      "y1": 293,
+      "x2": 463,
+      "y2": 264
+    },
+    {
+      "tsid": "LHV51JE5JC42VP2",
+      "name": "Arisi Amble",
+      "x1": 409,
+      "y1": 272,
+      "x2": 415,
+      "y2": 368
+    },
+    {
+      "tsid": "LHV15KA8NE42GSP",
+      "name": "Fesenjan Freeq",
+      "x1": 596,
+      "y1": 320,
+      "x2": 705,
+      "y2": 407
+    },
+    {
+      "tsid": "LHV15C8IEQ322UG",
+      "name": "Firabiz Flaunts",
+      "x1": 526,
+      "y1": 244,
+      "x2": 609,
+      "y2": 334
+    },
+    {
+      "tsid": "LHVHP2BJI652O9S",
+      "name": "Jolkan Jank",
+      "x1": 365,
+      "y1": 188,
+      "x2": 460,
+      "y2": 264
+    },
+    {
+      "tsid": "LHV15B8HEQ32SN0",
+      "name": "Kanji Sink",
+      "x1": 418,
+      "y1": 371,
+      "x2": 462,
+      "y2": 429
+    },
+    {
+      "tsid": "LHV1FQN29442T03",
+      "name": "Koozh Sidestep",
+      "x1": 279,
+      "y1": 383,
+      "x2": 370,
+      "y2": 448
+    },
+    {
+      "tsid": "LHV2JBHA9152QAS",
+      "name": "Laroo Ledge",
+      "x1": 563,
+      "y1": 228,
+      "x2": 691,
+      "y2": 145
+    },
+    {
+      "tsid": "LHV4U1QMFC42NBP",
+      "name": "Manggal Haste",
+      "x1": 300,
+      "y1": 343,
+      "x2": 415,
+      "y2": 367
+    },
+    {
+      "tsid": "LHV1OOC40U42TKA",
+      "name": "Moraba Plains",
+      "x1": 427,
+      "y1": 72,
+      "x2": 571,
+      "y2": 129
+    },
+    {
+      "tsid": "LHV17T973F42GEP",
+      "name": "Pahsmeq Diggs",
+      "x1": 561,
+      "y1": 229,
+      "x2": 571,
+      "y2": 122
+    },
+    {
+      "tsid": "LHVE9CULH652BV2",
+      "name": "Pitika Parse",
+      "x1": 222,
+      "y1": 123,
+      "x2": 365,
+      "y2": 188
+    },
+    {
+      "tsid": "LHV5B9093K42J9S",
+      "name": "Piyaz Prone",
+      "x1": 255,
+      "y1": 33,
+      "x2": 381,
+      "y2": 112
+    },
+    {
+      "tsid": "LHV1EUUNP142EDF",
+      "name": "Ponghal Pleats",
+      "x1": 97,
+      "y1": 176,
+      "x2": 310,
+      "y2": 291
+    },
+    {
+      "tsid": "LHV15EUNEQ32FCI",
+      "name": "Puttu Petty",
+      "x1": 143,
+      "y1": 450,
+      "x2": 280,
+      "y2": 382
+    },
+    {
+      "tsid": "LHV3ISF18352QIP",
+      "name": "Rappam Rolls",
+      "x1": 140,
+      "y1": 297,
+      "x2": 201,
+      "y2": 235
+    },
+    {
+      "tsid": "LHV9BF0AUJ42CLQ",
+      "name": "Robenaa Range",
+      "x1": 382,
+      "y1": 111,
+      "x2": 471,
+      "y2": 31
+    },
+    {
+      "tsid": "LHV43I0BI352TG6",
+      "name": "Sadam Savanna",
+      "x1": 204,
+      "y1": 228,
+      "x2": 222,
+      "y2": 121
+    },
+    {
+      "tsid": "LHV15D5LEQ325BE",
+      "name": "Sambara Stack",
+      "x1": 138,
+      "y1": 302,
+      "x2": 230,
+      "y2": 407
+    },
+    {
+      "tsid": "LHV1PHOQH442RKT",
+      "name": "Sappatu Slinks",
+      "x1": 584,
+      "y1": 425,
+      "x2": 594,
+      "y2": 320
+    },
+    {
+      "tsid": "LHV1BIOIL142P25",
+      "name": "Seva Opens",
+      "x1": 44,
+      "y1": 253,
+      "x2": 135,
+      "y2": 299
+    },
+    {
+      "tsid": "LHV1FUFU9442AKR",
+      "name": "Sohan Sheer",
+      "x1": 465,
+      "y1": 263,
+      "x2": 562,
+      "y2": 228
+    },
+    {
+      "tsid": "LHV12H937T32BDS",
+      "name": "Thorai Theme",
+      "x1": 280,
+      "y1": 383,
+      "x2": 315,
+      "y2": 295
+    },
+    {
+      "tsid": "LHVB16RSG652GJ4",
+      "name": "Tonga Trips",
+      "x1": 365,
+      "y1": 187,
+      "x2": 382,
+      "y2": 110
+    },
+    {
+      "tsid": "LHV144684H42FI4",
+      "name": "Trabriz Tale",
+      "x1": 572,
+      "y1": 121,
+      "x2": 633,
+      "y2": 32
+    },
+    {
+      "tsid": "LHV14CBAO352I1I",
+      "name": "Uppma Uplands",
+      "x1": 222,
+      "y1": 121,
+      "x2": 324,
+      "y2": 75
+    },
+    {
+      "tsid": "LHV140E5N352BGF",
+      "name": "Vada Widens",
+      "x1": 144,
+      "y1": 20,
+      "x2": 221,
+      "y2": 123
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LA517MT2M262D0F",
+      "hub_id": "89",
+      "hubName": "Andra",
+      "label": "To: Andra",
+      "x": 27,
+      "y": 244,
+      "arrow": 270
+    },
+    {
+      "tsid": "LCRPA1RV1N12J4H",
+      "hub_id": "76",
+      "hubName": "Alakol",
+      "label": "To: Alakol",
+      "x": 715,
+      "y": 412,
+      "arrow": 130
+    },
+    {
+      "tsid": "LA51450HIC42Q4I",
+      "hub_id": "86",
+      "hubName": "Baqala",
+      "label": "To: Baqala",
+      "x": 239,
+      "y": 24,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIFNRF3P0E02J90",
+      "hub_id": "75",
+      "hubName": "Bortola",
+      "label": "To: Bortola",
+      "x": 707,
+      "y": 134,
+      "arrow": 55
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_kajuu.jpg"
+}

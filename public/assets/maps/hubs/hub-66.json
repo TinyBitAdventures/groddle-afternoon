@@ -1,0 +1,232 @@
+{
+  "hubId": "66",
+  "hubName": "The Seams",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_seamstreet_56971.jpg",
+  "fg": "",
+  "color": "#009995",
+  "btm_color": "#7d8987",
+  "top_color": "#96a7aa",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LDOC74759ST2IG1",
+      "name": "Autumn Lodge",
+      "x1": 299,
+      "y1": 414,
+      "x2": 499,
+      "y2": 414
+    },
+    {
+      "tsid": "LHVECS766MC3LHP",
+      "name": "Distant End",
+      "x1": 40,
+      "y1": 40,
+      "x2": 240,
+      "y2": 40
+    },
+    {
+      "tsid": "LDOB5HTH1ID2MTL",
+      "name": "Kristel Kaos",
+      "x1": 508,
+      "y1": 111,
+      "x2": 708,
+      "y2": 111
+    },
+    {
+      "tsid": "LDO6NJEE1AE3MKL",
+      "name": "Namaste",
+      "x1": 40,
+      "y1": 120,
+      "x2": 240,
+      "y2": 120
+    },
+    {
+      "tsid": "LDOHDJ84BST2UI2",
+      "name": "Oppidan Avenue",
+      "x1": 32,
+      "y1": 236,
+      "x2": 206,
+      "y2": 235
+    },
+    {
+      "tsid": "LTJ1KL16N2O13T2",
+      "name": "Palindrone",
+      "x1": 435,
+      "y1": 43,
+      "x2": 635,
+      "y2": 43
+    },
+    {
+      "tsid": "LHVDIELDQQ7228K",
+      "name": "Plexus",
+      "x1": 284,
+      "y1": 283,
+      "x2": 484,
+      "y2": 283
+    },
+    {
+      "tsid": "LTJ1KOM8N2O1EFS",
+      "name": "Snool",
+      "x1": 32,
+      "y1": 376,
+      "x2": 181,
+      "y2": 368
+    },
+    {
+      "tsid": "LDOSHD9J6NT2HUJ",
+      "name": "Umbra",
+      "x1": 40,
+      "y1": 120,
+      "x2": 240,
+      "y2": 120
+    },
+    {
+      "tsid": "LDOU1UON87E3K2T",
+      "name": "uutiif",
+      "x1": 40,
+      "y1": 80,
+      "x2": 240,
+      "y2": 80
+    },
+    {
+      "tsid": "LM11E7ODKHO1QJE",
+      "name": "Wintry Place",
+      "x1": 290,
+      "y1": 207,
+      "x2": 490,
+      "y2": 207
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LCR17BAC6OL11L8",
+      "hub_id": "58",
+      "hubName": "Groddle Meadow",
+      "label": "To: Groddle Meadow",
+      "x": 40,
+      "y": 365,
+      "arrow": 230
+    },
+    {
+      "tsid": "LCRHJHOFQNL1PHP",
+      "hub_id": "64",
+      "hubName": "Groddle Heights",
+      "label": "To: Groddle Heights",
+      "x": 492,
+      "y": 205,
+      "arrow": 45
+    },
+    {
+      "tsid": "LLI23D3LDHD1FQA",
+      "hub_id": "56",
+      "hubName": "Groddle Forest",
+      "label": "To: Groddle Forest",
+      "x": 281,
+      "y": 205,
+      "arrow": 135
+    },
+    {
+      "tsid": "LA5DVVGJQQ5237U",
+      "hub_id": "89",
+      "hubName": "Andra",
+      "label": "To: Andra",
+      "x": 298,
+      "y": 280,
+      "arrow": 300
+    },
+    {
+      "tsid": "LHV15B8HEQ32SN0",
+      "hub_id": "85",
+      "hubName": "Kajuu",
+      "label": "To: Kajuu",
+      "x": 493,
+      "y": 288,
+      "arrow": 340
+    },
+    {
+      "tsid": "LHFKT1LK83D2BAF",
+      "hub_id": "106",
+      "hubName": "Pollokoo",
+      "label": "To: Pollokoo",
+      "x": 685,
+      "y": 109,
+      "arrow": 0
+    },
+    {
+      "tsid": "LDO5CC4R1FD2SQG",
+      "hub_id": "107",
+      "hubName": "Callopee",
+      "label": "To: Callopee",
+      "x": 519,
+      "y": 111,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA55B5RDL7T2F00",
+      "hub_id": "123",
+      "hubName": "Fenneq",
+      "label": "To: Fenneq",
+      "x": 518,
+      "y": 413,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIF16CPE89723EI",
+      "hub_id": "92",
+      "hubName": "Tamila",
+      "label": "To: Tamila",
+      "x": 278,
+      "y": 415,
+      "arrow": 0
+    },
+    {
+      "tsid": "LUVQCRVPBKR2T5H",
+      "hub_id": "120",
+      "hubName": "Cauda",
+      "label": "To: Cauda",
+      "x": 700,
+      "y": 100,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA53SMVHGD13MA5",
+      "hub_id": "128",
+      "hubName": "Balzare",
+      "label": "To: Balzare",
+      "x": 700,
+      "y": 200,
+      "arrow": 0
+    },
+    {
+      "tsid": "LDO2NCNJUR038S7",
+      "hub_id": "126",
+      "hubName": "Roobrik",
+      "label": "To: Roobrik",
+      "x": 700,
+      "y": 300,
+      "arrow": 0
+    },
+    {
+      "tsid": "LHV7LLAAIDB35G2",
+      "hub_id": "137",
+      "hubName": "Nottis",
+      "label": "To: Nottis",
+      "x": 700,
+      "y": 400,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA912TJ0KF328Q3",
+      "hub_id": "78",
+      "hubName": "Ilmenskie Deeps",
+      "label": "To: Ilmenskie Deeps",
+      "x": 250,
+      "y": 20,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": ""
+}

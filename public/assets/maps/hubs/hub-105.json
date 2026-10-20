@@ -1,0 +1,271 @@
+{
+  "hubId": "105",
+  "hubName": "Lida",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_lida_73050.jpg",
+  "fg": "",
+  "color": "#00a73d",
+  "btm_color": "#897e81",
+  "top_color": "#a89798",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIF28P8KH4E2U7M",
+      "name": "Adeno Sierra",
+      "x1": 596,
+      "y1": 329,
+      "x2": 713,
+      "y2": 310
+    },
+    {
+      "tsid": "LIFGECSJLGE25UP",
+      "name": "Amika Forca",
+      "x1": 337,
+      "y1": 111,
+      "x2": 416,
+      "y2": 192
+    },
+    {
+      "tsid": "LIFG1L8GLGE2HIA",
+      "name": "Becca Guille",
+      "x1": 507,
+      "y1": 262,
+      "x2": 591,
+      "y2": 327
+    },
+    {
+      "tsid": "LIF1DI4GH4E2JB7",
+      "name": "Chamuss Knurl",
+      "x1": 525,
+      "y1": 171,
+      "x2": 638,
+      "y2": 148
+    },
+    {
+      "tsid": "LIFQRA323ME2GCO",
+      "name": "Cynque Dent",
+      "x1": 325,
+      "y1": 258,
+      "x2": 415,
+      "y2": 318
+    },
+    {
+      "tsid": "LIFDTKVOMQE2SPB",
+      "name": "Glarus Thora",
+      "x1": 621,
+      "y1": 237,
+      "x2": 730,
+      "y2": 230
+    },
+    {
+      "tsid": "LIFEMMLM17E2540",
+      "name": "Glenti Bulgee",
+      "x1": 168,
+      "y1": 229,
+      "x2": 246,
+      "y2": 169
+    },
+    {
+      "tsid": "LIF1NMGHH4E2OA1",
+      "name": "Hillet Fillet",
+      "x1": 417,
+      "y1": 318,
+      "x2": 506,
+      "y2": 261
+    },
+    {
+      "tsid": "LIF2T8VNH4E2DRK",
+      "name": "Hoari Furgg",
+      "x1": 462,
+      "y1": 94,
+      "x2": 564,
+      "y2": 92
+    },
+    {
+      "tsid": "LIFBSQJTGME2KRH",
+      "name": "Knaphre Crag",
+      "x1": 175,
+      "y1": 430,
+      "x2": 238,
+      "y2": 340
+    },
+    {
+      "tsid": "LIFHEL95TME269I",
+      "name": "Neurph Turf",
+      "x1": 418,
+      "y1": 323,
+      "x2": 459,
+      "y2": 419
+    },
+    {
+      "tsid": "LIF2KRHMH4E24QU",
+      "name": "Parinosa Apix",
+      "x1": 339,
+      "y1": 110,
+      "x2": 454,
+      "y2": 94
+    },
+    {
+      "tsid": "LIF3IFLRH4E2D6G",
+      "name": "Pasque Ridge",
+      "x1": 62,
+      "y1": 349,
+      "x2": 141,
+      "y2": 314
+    },
+    {
+      "tsid": "LIFJJRJ23PE224C",
+      "name": "Phrood Kulm",
+      "x1": 523,
+      "y1": 174,
+      "x2": 613,
+      "y2": 235
+    },
+    {
+      "tsid": "LIF3I4MK96E26KF",
+      "name": "Pradera Passo",
+      "x1": 41,
+      "y1": 92,
+      "x2": 157,
+      "y2": 100
+    },
+    {
+      "tsid": "LIF2I10MEOE2CRA",
+      "name": "Puckell Peck",
+      "x1": 646,
+      "y1": 145,
+      "x2": 736,
+      "y2": 109
+    },
+    {
+      "tsid": "LIF85V4ON6E2UVV",
+      "name": "Ramfeon Cima",
+      "x1": 157,
+      "y1": 101,
+      "x2": 247,
+      "y2": 167
+    },
+    {
+      "tsid": "LIFI1K1IRJE2VTS",
+      "name": "Rocher Joch",
+      "x1": 567,
+      "y1": 91,
+      "x2": 641,
+      "y2": 145
+    },
+    {
+      "tsid": "LIF35OFPH4E21T2",
+      "name": "Sorrel Snag",
+      "x1": 365,
+      "y1": 25,
+      "x2": 458,
+      "y2": 93
+    },
+    {
+      "tsid": "LIFD854FO6E2UO7",
+      "name": "Spitze Summit",
+      "x1": 251,
+      "y1": 167,
+      "x2": 335,
+      "y2": 110
+    },
+    {
+      "tsid": "LIF3NBOHV8E20DR",
+      "name": "Tistel Stock",
+      "x1": 420,
+      "y1": 193,
+      "x2": 520,
+      "y2": 173
+    },
+    {
+      "tsid": "LIFVST7DH4E2CCO",
+      "name": "Twaye Monte",
+      "x1": 327,
+      "y1": 255,
+      "x2": 413,
+      "y2": 195
+    },
+    {
+      "tsid": "LIFHGPDRLLE275R",
+      "name": "Vanil Noir",
+      "x1": 241,
+      "y1": 337,
+      "x2": 324,
+      "y2": 260
+    },
+    {
+      "tsid": "LIFGR46M8RE2RC7",
+      "name": "Veldt Balm",
+      "x1": 596,
+      "y1": 333,
+      "x2": 659,
+      "y2": 425
+    },
+    {
+      "tsid": "LIF57HKSG9E2FSO",
+      "name": "Waagel Scad",
+      "x1": 138,
+      "y1": 315,
+      "x2": 165,
+      "y2": 230
+    },
+    {
+      "tsid": "LIF1LG3FA9E23A6",
+      "name": "Wieser Wedge",
+      "x1": 140,
+      "y1": 317,
+      "x2": 241,
+      "y2": 337
+    },
+    {
+      "tsid": "LIF209RIH4E2JCP",
+      "name": "Wolbane Barrel",
+      "x1": 508,
+      "y1": 259,
+      "x2": 617,
+      "y2": 237
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LNV81HAK2TH20GG",
+      "hub_id": "88",
+      "hubName": "Karnata",
+      "label": "To: Karnata",
+      "x": 716,
+      "y": 308,
+      "arrow": 90
+    },
+    {
+      "tsid": "LA9S90EJ0G8241N",
+      "hub_id": "97",
+      "hubName": "Muufo",
+      "label": "To: Muufo",
+      "x": 363,
+      "y": 25,
+      "arrow": 15
+    },
+    {
+      "tsid": "LIFIDIQ4NGC2U1Q",
+      "hub_id": "102",
+      "hubName": "Ormonos",
+      "label": "To: Ormonos",
+      "x": 45,
+      "y": 357,
+      "arrow": 250
+    },
+    {
+      "tsid": "LHV12AQNBB32CJ2",
+      "hub_id": "75",
+      "hubName": "Bortola",
+      "label": "To: Bortola",
+      "x": 38,
+      "y": 91,
+      "arrow": 260
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_lida.jpg"
+}

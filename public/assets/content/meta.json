@@ -1,0 +1,66 @@
+{
+  "source": "glitch-GameServerJS (CC0)",
+  "generatedAt": "2026-07-20T20:29:38.435Z",
+  "counts": {
+    "quests": {
+      "input": 446,
+      "output": 441,
+      "skips": 5
+    },
+    "achievements": {
+      "input": 665,
+      "output": 663,
+      "skips": 2
+    },
+    "skills": {
+      "input": 106,
+      "output": 105,
+      "skips": 0
+    },
+    "buffs": {
+      "input": 112,
+      "output": 112,
+      "skips": 0
+    }
+  },
+  "samples": {
+    "quest": "animalkinship_pet_piggies",
+    "achievement": "able_chopper",
+    "skill": "alchemy_1",
+    "buff": "gift_of_gab"
+  },
+  "skips": {
+    "quests": [
+      {
+        "file": "build_a_tower.js",
+        "reason": "Unexpected token '}'"
+      },
+      {
+        "file": "get_first_tool.js",
+        "reason": "Unexpected token ','"
+      },
+      {
+        "file": "le_miserable.js",
+        "reason": "Unexpected token '}'"
+      },
+      {
+        "file": "missing.js",
+        "reason": "no_title"
+      },
+      {
+        "file": "orld_ugs_esara.js",
+        "reason": "Unexpected token ','"
+      }
+    ],
+    "achievements": [
+      {
+        "file": "catalog.js",
+        "reason": "no_name"
+      },
+      {
+        "file": "inc_data_counters.js",
+        "reason": "no_name"
+      }
+    ]
+  }
+}

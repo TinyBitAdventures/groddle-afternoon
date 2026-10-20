@@ -1,0 +1,81 @@
+{
+  "hubId": "108",
+  "hubName": "Party Locations",
+  "bg": "http://c1.glitch.bz/img/maps/map_fake_island_45490.jpg",
+  "fg": "",
+  "color": "#ff0000",
+  "btm_color": "#606669",
+  "top_color": "#8a9297",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LUVU11R1HP9341R",
+      "name": "Aquarius",
+      "x1": 40,
+      "y1": 440,
+      "x2": 240,
+      "y2": 440
+    },
+    {
+      "tsid": "LDOGBH4BG1E2BM0",
+      "name": "Double Rainbow",
+      "x1": 40,
+      "y1": 120,
+      "x2": 240,
+      "y2": 120
+    },
+    {
+      "tsid": "LDOE67MFL6E2FBR",
+      "name": "Mazza'la Gala",
+      "x1": 40,
+      "y1": 240,
+      "x2": 240,
+      "y2": 240
+    },
+    {
+      "tsid": "LDOK0A8OG1E2C7O",
+      "name": "Nylon Phool",
+      "x1": 40,
+      "y1": 200,
+      "x2": 240,
+      "y2": 200
+    },
+    {
+      "tsid": "LDOGNQICG1E2PNI",
+      "name": "Pitchen Lilliputt",
+      "x1": 40,
+      "y1": 160,
+      "x2": 240,
+      "y2": 160
+    },
+    {
+      "tsid": "LDOBUP8IR8E2IPH",
+      "name": "Toxic Moon",
+      "x1": 40,
+      "y1": 280,
+      "x2": 240,
+      "y2": 280
+    },
+    {
+      "tsid": "LUVNGTHAGP93U34",
+      "name": "Val Holla",
+      "x1": 40,
+      "y1": 400,
+      "x2": 240,
+      "y2": 400
+    },
+    {
+      "tsid": "LDOOS17UPNJ2HT7",
+      "name": "Winter Wingding",
+      "x1": 40,
+      "y1": 320,
+      "x2": 240,
+      "y2": 320
+    }
+  ],
+  "hubs": [],
+  "bgLocal": "",
+  "fgLocal": ""
+}

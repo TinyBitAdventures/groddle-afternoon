@@ -1,0 +1,311 @@
+{
+  "hubId": "71",
+  "hubName": "Jethimadh",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_jethimadh_59002.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_jethimadh_59153.png",
+  "color": "#726758",
+  "btm_color": "#778385",
+  "top_color": "#8da2a7",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIF17GAI3VV1C1F",
+      "name": "Boan Stravenue",
+      "x1": 395,
+      "y1": 283,
+      "x2": 435,
+      "y2": 370
+    },
+    {
+      "tsid": "LIF102S56SV16TJ",
+      "name": "Iso Roine",
+      "x1": 336,
+      "y1": 368,
+      "x2": 344,
+      "y2": 446
+    },
+    {
+      "tsid": "LA97L62229522GS",
+      "name": "Jethimadh Herb Gardens",
+      "x1": 196,
+      "y1": 373,
+      "x2": 338,
+      "y2": 372
+    },
+    {
+      "tsid": "LIFGR4QG5IV1QPI",
+      "name": "Kala Close",
+      "x1": 544,
+      "y1": 201,
+      "x2": 623,
+      "y2": 246
+    },
+    {
+      "tsid": "LIF12UPTEUV14ON",
+      "name": "Kalix Follows",
+      "x1": 401,
+      "y1": 442,
+      "x2": 433,
+      "y2": 370
+    },
+    {
+      "tsid": "LIF15S7VPRV1DIP",
+      "name": "Kiehiman Course",
+      "x1": 336,
+      "y1": 369,
+      "x2": 354,
+      "y2": 289
+    },
+    {
+      "tsid": "LIF1AUQNSDU1UFL",
+      "name": "Konemaen Jaunt",
+      "x1": 446,
+      "y1": 304,
+      "x2": 485,
+      "y2": 229
+    },
+    {
+      "tsid": "LIF1GTHPO9V14NG",
+      "name": "Konka Brink",
+      "x1": 544,
+      "y1": 204,
+      "x2": 594,
+      "y2": 139
+    },
+    {
+      "tsid": "LIF10RP1DBU11NU",
+      "name": "Koulato Cluster",
+      "x1": 561,
+      "y1": 338,
+      "x2": 610,
+      "y2": 404
+    },
+    {
+      "tsid": "LIF1077T5TU16I9",
+      "name": "Kyron Kreep",
+      "x1": 472,
+      "y1": 335,
+      "x2": 564,
+      "y2": 339
+    },
+    {
+      "tsid": "LIF1SGGD7EU12T5",
+      "name": "Lentua Lane",
+      "x1": 420,
+      "y1": 189,
+      "x2": 482,
+      "y2": 147
+    },
+    {
+      "tsid": "LIF11LLL5KV1CUG",
+      "name": "Lonkari Line",
+      "x1": 230,
+      "y1": 271,
+      "x2": 243,
+      "y2": 336
+    },
+    {
+      "tsid": "LIF12EQUGVU1RPI",
+      "name": "Luiro Run",
+      "x1": 233,
+      "y1": 147,
+      "x2": 257,
+      "y2": 219
+    },
+    {
+      "tsid": "LIFMOLVTLHV1RAR",
+      "name": "Naata Garth",
+      "x1": 486,
+      "y1": 228,
+      "x2": 560,
+      "y2": 286
+    },
+    {
+      "tsid": "LIFN3FI0TNU10PS",
+      "name": "Naatamo Way",
+      "x1": 483,
+      "y1": 147,
+      "x2": 541,
+      "y2": 92
+    },
+    {
+      "tsid": "LIF10HE4JTU1S7P",
+      "name": "Onto Parada",
+      "x1": 422,
+      "y1": 276,
+      "x2": 473,
+      "y2": 333
+    },
+    {
+      "tsid": "LIF10O20NQU1B2P",
+      "name": "Oulanka End",
+      "x1": 326,
+      "y1": 134,
+      "x2": 369,
+      "y2": 215
+    },
+    {
+      "tsid": "LIFN5CQH1OU1P61",
+      "name": "Paats Yield",
+      "x1": 176,
+      "y1": 233,
+      "x2": 258,
+      "y2": 215
+    },
+    {
+      "tsid": "LIFNIC9JFOU1B2S",
+      "name": "Raudan Rasp",
+      "x1": 230,
+      "y1": 273,
+      "x2": 257,
+      "y2": 214
+    },
+    {
+      "tsid": "LIF113PVOQU1UE5",
+      "name": "Simo Steer",
+      "x1": 486,
+      "y1": 229,
+      "x2": 547,
+      "y2": 199
+    },
+    {
+      "tsid": "LIF1609JRKV151E",
+      "name": "Svarta Swale",
+      "x1": 271,
+      "y1": 313,
+      "x2": 343,
+      "y2": 336
+    },
+    {
+      "tsid": "LIF12VEKFAV1D67",
+      "name": "Sysma Link",
+      "x1": 33,
+      "y1": 153,
+      "x2": 89,
+      "y2": 216
+    },
+    {
+      "tsid": "LIF126GSMBU1V2Q",
+      "name": "Tadaa Track",
+      "x1": 420,
+      "y1": 189,
+      "x2": 486,
+      "y2": 230
+    },
+    {
+      "tsid": "LIF13FGQHKV1E72",
+      "name": "Tallus Gardens",
+      "x1": 169,
+      "y1": 313,
+      "x2": 234,
+      "y2": 269
+    },
+    {
+      "tsid": "LIFMVP96ONU12CO",
+      "name": "Tammer Path",
+      "x1": 484,
+      "y1": 38,
+      "x2": 541,
+      "y2": 92
+    },
+    {
+      "tsid": "LIF25C8OJSV19UJ",
+      "name": "Tana Trample",
+      "x1": 435,
+      "y1": 368,
+      "x2": 500,
+      "y2": 430
+    },
+    {
+      "tsid": "LIF1F3IM11020RB",
+      "name": "Tower St East",
+      "x1": 421,
+      "y1": 188,
+      "x2": 425,
+      "y2": 276
+    },
+    {
+      "tsid": "LIF163TJHQU191C",
+      "name": "Tower St North",
+      "x1": 337,
+      "y1": 222,
+      "x2": 420,
+      "y2": 189
+    },
+    {
+      "tsid": "LIF15OTSM102353",
+      "name": "Tower St South",
+      "x1": 355,
+      "y1": 290,
+      "x2": 423,
+      "y2": 276
+    },
+    {
+      "tsid": "LIF5UU8FO3029OK",
+      "name": "Tower St West",
+      "x1": 331,
+      "y1": 223,
+      "x2": 356,
+      "y2": 295
+    },
+    {
+      "tsid": "LIFNH08K9OU1SAB",
+      "name": "Tuntsa Coze",
+      "x1": 256,
+      "y1": 216,
+      "x2": 337,
+      "y2": 225
+    },
+    {
+      "tsid": "LIFMGTCIQGU13TS",
+      "name": "Uskela Passage",
+      "x1": 90,
+      "y1": 217,
+      "x2": 176,
+      "y2": 232
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LTJ102LVLDQ1NGH",
+      "hub_id": "63",
+      "hubName": "Shimla Mirch",
+      "label": "To: Shimla Mirch",
+      "x": 476,
+      "y": 26,
+      "arrow": 325
+    },
+    {
+      "tsid": "LIF1QBNPP7123J0",
+      "hub_id": "77",
+      "hubName": "Jethimadh Tower: Base",
+      "label": "To: Jethimadh Tower: Base",
+      "x": 405,
+      "y": 150,
+      "arrow": 186
+    },
+    {
+      "tsid": "LTJ13VTR2RU14QO",
+      "hub_id": "72",
+      "hubName": "Chakra Phool",
+      "label": "To: Chakra Phool",
+      "x": 32,
+      "y": 151,
+      "arrow": 270
+    },
+    {
+      "tsid": "LA5KKVRDKAT2EA2",
+      "hub_id": "121",
+      "hubName": "Sura",
+      "label": "To: Sura",
+      "x": 629,
+      "y": 248,
+      "arrow": 86
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_jethimadh.jpg"
+}

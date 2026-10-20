@@ -1,0 +1,62 @@
+{
+  "knife_and_board": {
+    "classTsid": "knife_and_board",
+    "label": "Knife & Board",
+    "isTool": true
+  },
+  "frying_pan": {
+    "classTsid": "frying_pan",
+    "label": "Frying Pan",
+    "isTool": true
+  },
+  "blender": {
+    "classTsid": "blender",
+    "label": "Blender",
+    "isTool": true
+  },
+  "gassifier": {
+    "classTsid": "gassifier",
+    "label": "Gassifier",
+    "isTool": true
+  },
+  "bubble_tuner": {
+    "classTsid": "bubble_tuner",
+    "label": "Bubble Tuner",
+    "isTool": true
+  },
+  "spice_mill": {
+    "classTsid": "spice_mill",
+    "label": "Spice Mill",
+    "isTool": true
+  },
+  "pick": {
+    "classTsid": "pick",
+    "label": "Pick",
+    "isTool": true
+  },
+  "fancy_pick": {
+    "classTsid": "fancy_pick",
+    "label": "Fancy Pick",
+    "isTool": true
+  },
+  "smelter": {
+    "classTsid": "smelter",
+    "label": "Smelter",
+    "isTool": true
+  },
+  "ore_grinder": {
+    "classTsid": "ore_grinder",
+    "label": "Grinder",
+    "isTool": true
+  },
+  "metalmaker": {
+    "classTsid": "metalmaker",
+    "label": "Metal Machine",
+    "isTool": true
+  },
+  "alchemical_tongs": {
+    "classTsid": "alchemical_tongs",
+    "label": "Alchemical Tongs",
+    "isTool": true
+  }
+}

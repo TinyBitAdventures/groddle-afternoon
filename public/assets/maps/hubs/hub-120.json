@@ -1,0 +1,190 @@
+{
+  "hubId": "120",
+  "hubName": "Cauda",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-24/cauda_bg_1335303214.jpg",
+  "fg": "http://c2.glitch.bz/client_maps/2012-04-24/cauda_fg_1335303214.png",
+  "color": "52a700",
+  "btm_color": "88857f",
+  "top_color": "a7a598",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LUV3BOQ5GKR2V7N",
+      "name": "Anaka Azimuth",
+      "x1": 526,
+      "y1": 190,
+      "x2": 576,
+      "y2": 81
+    },
+    {
+      "tsid": "LUVPMRNUQQS2GF3",
+      "name": "Apadrav Habitat",
+      "x1": 658,
+      "y1": 244,
+      "x2": 712,
+      "y2": 342
+    },
+    {
+      "tsid": "LUVPO8VCBKR2NF8",
+      "name": "Baavai Buraq",
+      "x1": 224,
+      "y1": 192,
+      "x2": 256,
+      "y2": 297
+    },
+    {
+      "tsid": "LUVO1ABIQQS2QIF",
+      "name": "Byssus Park",
+      "x1": 588,
+      "y1": 214,
+      "x2": 702,
+      "y2": 158
+    },
+    {
+      "tsid": "LUVDU3H5COS2S4O",
+      "name": "Fasena Preserve",
+      "x1": 43,
+      "y1": 213,
+      "x2": 193,
+      "y2": 173
+    },
+    {
+      "tsid": "LUV3HOATQOS2HNO",
+      "name": "Gambir Preserve",
+      "x1": 433,
+      "y1": 332,
+      "x2": 570,
+      "y2": 311
+    },
+    {
+      "tsid": "LUVHBDR6DOS2UED",
+      "name": "Kampung Preserve",
+      "x1": 238,
+      "y1": 21,
+      "x2": 321,
+      "y2": 90
+    },
+    {
+      "tsid": "LUVEAT1BCOS25QL",
+      "name": "Kapru Habitat",
+      "x1": 282,
+      "y1": 135,
+      "x2": 419,
+      "y2": 139
+    },
+    {
+      "tsid": "LUVED7UI07S2FLJ",
+      "name": "Kattil Natron",
+      "x1": 226,
+      "y1": 192,
+      "x2": 322,
+      "y2": 89
+    },
+    {
+      "tsid": "LUVQCRVPBKR2T5H",
+      "name": "Khanda Jarra",
+      "x1": 257,
+      "y1": 299,
+      "x2": 380,
+      "y2": 274
+    },
+    {
+      "tsid": "LUVIP8FLKOS2USV",
+      "name": "Kutu Preserve",
+      "x1": 323,
+      "y1": 198,
+      "x2": 448,
+      "y2": 234
+    },
+    {
+      "tsid": "LUVO82HBAKR2A9G",
+      "name": "Nagam Truth",
+      "x1": 88,
+      "y1": 96,
+      "x2": 221,
+      "y2": 192
+    },
+    {
+      "tsid": "LUVNIF7Q9KR2382",
+      "name": "Pandhal Pegs",
+      "x1": 114,
+      "y1": 382,
+      "x2": 253,
+      "y2": 300
+    },
+    {
+      "tsid": "LUVCIGHLKKR2J0V",
+      "name": "Pannaa Marrim",
+      "x1": 532,
+      "y1": 193,
+      "x2": 662,
+      "y2": 247
+    },
+    {
+      "tsid": "LUVPAQS5B9S2E00",
+      "name": "Phersu Preserve",
+      "x1": 217,
+      "y1": 329,
+      "x2": 284,
+      "y2": 412
+    },
+    {
+      "tsid": "LUVE5KV0TOS2N87",
+      "name": "Pikul Park",
+      "x1": 426,
+      "y1": 95,
+      "x2": 536,
+      "y2": 165
+    },
+    {
+      "tsid": "LUV8KDPNIKR2U39",
+      "name": "Suruta Serendipity",
+      "x1": 380,
+      "y1": 274,
+      "x2": 524,
+      "y2": 193
+    },
+    {
+      "tsid": "LUVNH88P9KR2B8L",
+      "name": "Tachai Tanbur",
+      "x1": 382,
+      "y1": 275,
+      "x2": 490,
+      "y2": 398
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LA54EE8QNMR2G7C",
+      "hub_id": "121",
+      "hubName": "Sura",
+      "label": "To: Sura",
+      "x": 500,
+      "y": 411,
+      "arrow": 110
+    },
+    {
+      "tsid": "LTJ12O0H7AO1IBS",
+      "hub_id": "63",
+      "hubName": "Shimla Mirch",
+      "label": "To: Shimla Mirch",
+      "x": 108,
+      "y": 390,
+      "arrow": 270
+    },
+    {
+      "tsid": "LA5H2SQS45T2EIU",
+      "hub_id": "123",
+      "hubName": "Fenneq",
+      "label": "To: Fenneq",
+      "x": 584,
+      "y": 64,
+      "arrow": 50
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_cauda.jpg"
+}

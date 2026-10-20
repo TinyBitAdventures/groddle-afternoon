@@ -1,0 +1,197 @@
+{
+  "hubId": "136",
+  "hubName": "Jal",
+  "bg": "http://c2.glitch.bz/client_maps/2012-10-15/jal_bg_1350335497.jpg",
+  "fg": "",
+  "color": "005182",
+  "btm_color": "7b898c",
+  "top_color": "91a4ae",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LUVG9L7NOLA3CEB",
+      "name": "Adityas Plain",
+      "x1": 51,
+      "y1": 69,
+      "x2": 90,
+      "y2": 184
+    },
+    {
+      "tsid": "LUV1RBFLU8A3LR9",
+      "name": "Agni Abyss",
+      "x1": 471,
+      "y1": 343,
+      "x2": 583,
+      "y2": 202
+    },
+    {
+      "tsid": "LUV1JGGKU8A3NHG",
+      "name": "Aryaman Canyon",
+      "x1": 346,
+      "y1": 168,
+      "x2": 481,
+      "y2": 64
+    },
+    {
+      "tsid": "LUV10AGQOOA3MOE",
+      "name": "Asura Spire",
+      "x1": 633,
+      "y1": 86,
+      "x2": 691,
+      "y2": 323
+    },
+    {
+      "tsid": "LUVTKP64DEA3D31",
+      "name": "Avsins Cut",
+      "x1": 237,
+      "y1": 192,
+      "x2": 272,
+      "y2": 29
+    },
+    {
+      "tsid": "LUVNHLCRGEA3VAS",
+      "name": "Bhaga Arch",
+      "x1": 235,
+      "y1": 194,
+      "x2": 372,
+      "y2": 321
+    },
+    {
+      "tsid": "LUVCHLO06EA3VBC",
+      "name": "Brhaspati Bay",
+      "x1": 276,
+      "y1": 30,
+      "x2": 481,
+      "y2": 63
+    },
+    {
+      "tsid": "LUV270LMU8A3UCB",
+      "name": "Daksina Tom",
+      "x1": 482,
+      "y1": 65,
+      "x2": 584,
+      "y2": 200
+    },
+    {
+      "tsid": "LUV2ERENU8A30JC",
+      "name": "Dasas Terrace",
+      "x1": 154,
+      "y1": 379,
+      "x2": 183,
+      "y2": 192
+    },
+    {
+      "tsid": "LUV2SSTOU8A30RS",
+      "name": "Indri Slope",
+      "x1": 526,
+      "y1": 121,
+      "x2": 677,
+      "y2": 70
+    },
+    {
+      "tsid": "LUV2M85OU8A39GS",
+      "name": "Kanva Ria",
+      "x1": 91,
+      "y1": 183,
+      "x2": 270,
+      "y2": 29
+    },
+    {
+      "tsid": "LUV2UE4DCMA3RLS",
+      "name": "Marut Seamount",
+      "x1": 88,
+      "y1": 347,
+      "x2": 255,
+      "y2": 425
+    },
+    {
+      "tsid": "LUVLLA752MA3R76",
+      "name": "Mitra Shelf",
+      "x1": 94,
+      "y1": 184,
+      "x2": 237,
+      "y2": 194
+    },
+    {
+      "tsid": "LUVITGLVQOA3H34",
+      "name": "Pusan Fathom",
+      "x1": 374,
+      "y1": 320,
+      "x2": 570,
+      "y2": 378
+    },
+    {
+      "tsid": "LUVM9R39TBA362T",
+      "name": "Sakra Praise",
+      "x1": 255,
+      "y1": 424,
+      "x2": 373,
+      "y2": 321
+    },
+    {
+      "tsid": "LUVST31K7MA369P",
+      "name": "Savitar Cusps",
+      "x1": 532,
+      "y1": 272,
+      "x2": 693,
+      "y2": 323
+    },
+    {
+      "tsid": "LUV5I1CTIEA3DT0",
+      "name": "Statkratu Plat",
+      "x1": 155,
+      "y1": 379,
+      "x2": 317,
+      "y2": 267
+    },
+    {
+      "tsid": "LUVVSU5NCBA3KOS",
+      "name": "Varuna Trough",
+      "x1": 404,
+      "y1": 202,
+      "x2": 467,
+      "y2": 348
+    },
+    {
+      "tsid": "LUVMF06N99A3U2B",
+      "name": "Vayu Trench",
+      "x1": 405,
+      "y1": 200,
+      "x2": 581,
+      "y2": 201
+    },
+    {
+      "tsid": "LUV1BKIJU8A3VL1",
+      "name": "Visvedevas Divergence",
+      "x1": 257,
+      "y1": 121,
+      "x2": 404,
+      "y2": 200
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LUV174V0QUB3JT4",
+      "hub_id": "114",
+      "hubName": "Firozi",
+      "label": "To: Firozi",
+      "x": 696,
+      "y": 62,
+      "arrow": 90
+    },
+    {
+      "tsid": "LUVVV3FU2FC38SK",
+      "hub_id": "140",
+      "hubName": "Samudra",
+      "label": "To: Samudra",
+      "x": 46,
+      "y": 53,
+      "arrow": 345
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_jal.jpg"
+}

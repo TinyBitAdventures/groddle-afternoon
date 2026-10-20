@@ -1,0 +1,190 @@
+/** Official location populations and collision-aware street placement. */
+
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  setStreetEcologyCatalog,
+  ecologyForStreet,
+  populationForStreet,
+  buildPlatformCandidates,
+  planStreetPlacements,
+  nearestPlacementGap,
+  STREET_ECOLOGY_URL,
+} from '../public/js/street-ecology.js';
+import {
+  platformsScreen,
+  platformYAt,
+  streetWidth,
+  worldToScreen,
+} from '../public/js/street-model.js';
+import { giantForStreet } from '../public/js/shrines.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const publicRoot = join(__dirname, '../public');
+const ecologyPath = join(publicRoot, 'assets/content/street-ecology.json');
+const hecheyPath = join(publicRoot, 'assets/streets/GLI2V0UN7RD1T2J.json');
+const catalog = JSON.parse(readFileSync(ecologyPath, 'utf8'));
+const hechey = JSON.parse(readFileSync(hecheyPath, 'utf8'));
+setStreetEcologyCatalog(catalog);
+
+describe('Tiny Speck street ecology catalog', () => {
+  it('ships a generated, source-attributed population for more than a thousand streets', () => {
+    assert.ok(existsSync(ecologyPath));
+    assert.match(catalog.source, /tinyspeck\/glitch-locations/i);
+    assert.match(catalog.sourceSnapshot, /2012-12/i);
+    assert.ok(catalog.streetCount >= 1000, String(catalog.streetCount));
+    assert.equal(catalog.streetCount, Object.keys(catalog.streets).length);
+    assert.equal(STREET_ECOLOGY_URL, 'assets/content/street-ecology.json?v=official-ecology-2');
+  });
+
+  it('recovers Hechey Track exact static animals, trants, vendor, shrine, and spawner', () => {
+    const row = ecologyForStreet('GLI2V0UN7RD1T2J');
+    assert.equal(row.sourceTsid, 'LLI2V0UN7RD1T2J');
+    assert.equal(row.counts.npc_piggy, 6);
+    assert.equal(row.counts.trant_fruit, 5);
+    assert.equal(row.counts.trant_bubble, 2);
+    assert.equal(row.counts.street_spirit, 1);
+    assert.equal(row.giantId, 'mab');
+    assert.equal(row.spawners, 1);
+  });
+
+  it('recovers Groddle Forest Junction as a different source-derived ecology', () => {
+    const row = ecologyForStreet('GLI3272LOTD1B1F');
+    assert.equal(row.sourceTsid, 'LLI3272LOTD1B1F');
+    assert.equal(row.counts.trant_spice, 2);
+    assert.equal(row.counts.trant_bean, 3);
+    assert.equal(row.counts.trant_bubble, 1);
+    assert.equal(row.counts.trant_gas, 1);
+    assert.equal(row.counts.trant_fruit, 1);
+    assert.equal(row.giantId, 'friendly');
+    assert.equal(row.counts.npc_piggy || 0, 0);
+  });
+
+  it('keeps the source-empty Stoot memorial private and uncluttered', () => {
+    const row = ecologyForStreet('GIFPV9EMLT72DP4');
+    const population = populationForStreet('GIFPV9EMLT72DP4', row);
+    assert.equal(row.sourceTsid, 'LIFPV9EMLT72DP4');
+    assert.equal(row.empty, true);
+    assert.equal(population.sourceEmpty, true);
+    assert.equal(population.companions, false);
+    assert.deepEqual(population.treeClasses, []);
+    assert.deepEqual(population.rockClasses, []);
+    assert.equal(population.piggies, 0);
+    assert.equal(population.chickens, 0);
+    assert.equal(population.butterflies, 0);
+    assert.equal(population.gardens, 0);
+    assert.equal(population.vendor, false);
+    assert.equal(population.shrine, false);
+    assert.equal(population.apples, 0);
+    assert.equal(population.musicblocks, 0);
+    assert.equal(population.quoins, 0);
+  });
+
+  it('resolves G/L aliases and honors an official shrine Giant over hub heuristics', () => {
+    assert.equal(ecologyForStreet('LLI2V0UN7RD1T2J')?.giantId, 'mab');
+    assert.equal(
+      giantForStreet({ hubName: 'Groddle Forest', officialGiantId: 'mab' }).id,
+      'mab'
+    );
+  });
+
+  it('keeps the official starter ecology while adding only focused onboarding access', () => {
+    const row = ecologyForStreet(hechey.tsid);
+    const population = populationForStreet(hechey.tsid, row, { starter: true });
+    assert.equal(population.source, 'tinyspeck-locations-xml');
+    assert.equal(population.piggies, 6);
+    assert.equal(population.treeClasses.filter((id) => id === 'trant_fruit').length, 5);
+    assert.equal(population.treeClasses.filter((id) => id === 'trant_bubble').length, 2);
+    assert.ok(population.treeClasses.includes('wood_tree'));
+    assert.ok(population.chickens >= 2);
+    assert.ok(population.butterflies >= 2);
+    assert.equal(population.giantId, 'mab');
+  });
+});
+
+describe('one-pass platform placement', () => {
+  const platforms = platformsScreen(hechey);
+  const population = populationForStreet(
+    hechey.tsid,
+    ecologyForStreet(hechey.tsid),
+    { starter: true }
+  );
+  const requests = [
+    { key: 'player', count: 1, clearance: 190 },
+    { key: 'trees', count: population.treeClasses.length, clearance: 135 },
+    { key: 'gardens', count: population.gardens, clearance: 165 },
+    { key: 'vendor', count: 1, clearance: 120 },
+    { key: 'shrine', count: 1, clearance: 135 },
+    { key: 'rocks', count: population.rockClasses.length, clearance: 74 },
+    { key: 'piggies', count: population.piggies, clearance: 92 },
+    { key: 'chickens', count: population.chickens, clearance: 86 },
+    { key: 'butterflies', count: population.butterflies, clearance: 62 },
+    { key: 'flyingButterflies', count: population.flyingButterflies, clearance: 58 },
+    { key: 'apples', count: 4, clearance: 30 },
+    { key: 'musicblocks', count: 1, clearance: 45 },
+    { key: 'quoins', count: 8, clearance: 28 },
+  ];
+  const options = {
+    worldW: streetWidth(hechey),
+    seed: hechey.tsid,
+    reserved: hechey.signposts.map((signpost, index) => ({
+      ...worldToScreen(hechey, signpost.x, signpost.y),
+      key: `signpost:${index}`,
+      clearance: 100,
+    })),
+  };
+
+  it('builds many distinct candidates directly on recovered platform segments', () => {
+    const candidates = buildPlatformCandidates(platforms, options);
+    assert.ok(candidates.length >= 60, String(candidates.length));
+    assert.equal(new Set(candidates.map((point) => point.id)).size, candidates.length);
+    for (const point of candidates) {
+      const onPlatform = platforms.some((platform) => {
+        const y = platformYAt(platform, point.x, 0.01);
+        return y != null && Math.abs(y - point.y) < 0.01;
+      });
+      assert.ok(onPlatform, `candidate ${point.id} is not on a platform`);
+    }
+  });
+
+  it('is deterministic, fills every requested group, and keeps arrival clear', () => {
+    const first = planStreetPlacements(platforms, requests, options);
+    const second = planStreetPlacements(platforms, requests, options);
+    assert.deepEqual(first, second);
+    for (const request of requests) {
+      assert.equal(first.groups[request.key].length, request.count, request.key);
+    }
+    const allIds = Object.values(first.groups).flat().map((point) => point.id);
+    assert.equal(new Set(allIds).size, allIds.length);
+    const majorGap = nearestPlacementGap(first, 'player', [
+      'trees',
+      'gardens',
+      'vendor',
+      'shrine',
+      'rocks',
+      'piggies',
+      'chickens',
+      'butterflies',
+    ]);
+    assert.ok(majorGap >= 180, `major arrival gap ${majorGap}`);
+  });
+});
+
+describe('runtime wiring', () => {
+  it('loads source ecology before entering and exposes deterministic QA evidence', () => {
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const generator = readFileSync(join(__dirname, '../build-street-ecology.mjs'), 'utf8');
+    assert.match(game, /loadStreetEcologyCatalog/);
+    assert.match(game, /populationForStreet/);
+    assert.match(game, /planStreetPlacements/);
+    assert.match(game, /dataset\.ecologyPopulation/);
+    assert.match(game, /dataset\.ecologyPlayerClearance/);
+    assert.match(game, /officialGiantId/);
+    assert.match(html, /game\.js\?v=official-ecology-1/);
+    assert.match(generator, /locations-xml\.zip item references/);
+  });
+});

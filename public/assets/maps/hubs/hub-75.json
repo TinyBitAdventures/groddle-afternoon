@@ -1,0 +1,401 @@
+{
+  "hubId": "75",
+  "hubName": "Bortola",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-24/bortola_bg_1335307201.jpg",
+  "fg": "http://c2.glitch.bz/client_maps/2012-04-24/bortola_fg_1335307201.png",
+  "color": "#3b7700",
+  "btm_color": "#767265",
+  "top_color": "#b1ab96",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LHVAKM1MR032IGJ",
+      "name": "Akas Apparata",
+      "x1": 496,
+      "y1": 117,
+      "x2": 602,
+      "y2": 117
+    },
+    {
+      "tsid": "LHV2CGP55U22T4Q",
+      "name": "Borem Summon",
+      "x1": 391,
+      "y1": 117,
+      "x2": 497,
+      "y2": 116
+    },
+    {
+      "tsid": "LA9S5T1LA0D27NG",
+      "name": "Bortola Start",
+      "x1": 171,
+      "y1": 240,
+      "x2": 265,
+      "y2": 212
+    },
+    {
+      "tsid": "LA9TEC6GB0D2B2M",
+      "name": "Bortola Start",
+      "x1": 117,
+      "y1": 327,
+      "x2": 200,
+      "y2": 298
+    },
+    {
+      "tsid": "LA9U0VLRB0D2JES",
+      "name": "Bortola Start",
+      "x1": 328,
+      "y1": 449,
+      "x2": 398,
+      "y2": 394
+    },
+    {
+      "tsid": "LA9U90TVB0D2EAH",
+      "name": "Bortola Start",
+      "x1": 508,
+      "y1": 315,
+      "x2": 543,
+      "y2": 236
+    },
+    {
+      "tsid": "LHV1H1EHOF32UJM",
+      "name": "Evi Effect",
+      "x1": 495,
+      "y1": 115,
+      "x2": 513,
+      "y2": 50
+    },
+    {
+      "tsid": "LA983PEN5DT21G9",
+      "name": "Gavad Park",
+      "x1": 318,
+      "y1": 21,
+      "x2": 366,
+      "y2": 107
+    },
+    {
+      "tsid": "LHV36AG0LO2208L",
+      "name": "Hauki Seeks",
+      "x1": 264,
+      "y1": 212,
+      "x2": 285,
+      "y2": 75
+    },
+    {
+      "tsid": "LA9H1V6OGRU2FSB",
+      "name": "Hauki Seeks Manor",
+      "x1": 40,
+      "y1": 80,
+      "x2": 240,
+      "y2": 80
+    },
+    {
+      "tsid": "LA9EBPF8M2031HB",
+      "name": "Hauki Seeks Manor Basement",
+      "x1": 40,
+      "y1": 120,
+      "x2": 240,
+      "y2": 120
+    },
+    {
+      "tsid": "LHVB9CAE6032G6S",
+      "name": "Ilmoilan Sequence",
+      "x1": 384,
+      "y1": 221,
+      "x2": 391,
+      "y2": 117
+    },
+    {
+      "tsid": "LIFNRF3P0E02J90",
+      "name": "Jonku Impressions",
+      "x1": 141,
+      "y1": 191,
+      "x2": 262,
+      "y2": 211
+    },
+    {
+      "tsid": "LHV1HT5F4D32GNM",
+      "name": "Kaavin Kit",
+      "x1": 669,
+      "y1": 217,
+      "x2": 749,
+      "y2": 163
+    },
+    {
+      "tsid": "LIF13QL5IG02UAI",
+      "name": "Kalla Chase",
+      "x1": 403,
+      "y1": 393,
+      "x2": 549,
+      "y2": 375
+    },
+    {
+      "tsid": "LIF8I91P8J02A85",
+      "name": "Kyy Queries",
+      "x1": 285,
+      "y1": 357,
+      "x2": 403,
+      "y2": 394
+    },
+    {
+      "tsid": "LHV1VI5GPD32VAN",
+      "name": "Lampaan Avert",
+      "x1": 606,
+      "y1": 121,
+      "x2": 703,
+      "y2": 47
+    },
+    {
+      "tsid": "LHV5TFKNF0320GQ",
+      "name": "Lorme Rush",
+      "x1": 385,
+      "y1": 225,
+      "x2": 455,
+      "y2": 289
+    },
+    {
+      "tsid": "LHVT7SA9QT221J2",
+      "name": "Malaren Urge",
+      "x1": 287,
+      "y1": 76,
+      "x2": 389,
+      "y2": 117
+    },
+    {
+      "tsid": "LHV1L41MCD32O4A",
+      "name": "Mallos Means",
+      "x1": 415,
+      "y1": 253,
+      "x2": 513,
+      "y2": 171
+    },
+    {
+      "tsid": "LHVLCNLR783251B",
+      "name": "Mien Evoke",
+      "x1": 335,
+      "y1": 304,
+      "x2": 382,
+      "y2": 222
+    },
+    {
+      "tsid": "LIF19BFUG922N84",
+      "name": "Onkamo Ward",
+      "x1": 171,
+      "y1": 423,
+      "x2": 284,
+      "y2": 359
+    },
+    {
+      "tsid": "LHVMHDIBNA32QPF",
+      "name": "Ora Soon",
+      "x1": 497,
+      "y1": 116,
+      "x2": 544,
+      "y2": 232
+    },
+    {
+      "tsid": "LHVL2NDFT732BK3",
+      "name": "Piene Question",
+      "x1": 603,
+      "y1": 118,
+      "x2": 670,
+      "y2": 217
+    },
+    {
+      "tsid": "LHVQM0MUB032B5S",
+      "name": "Pikku Precedent",
+      "x1": 546,
+      "y1": 233,
+      "x2": 627,
+      "y2": 310
+    },
+    {
+      "tsid": "LIF10P7CR622E3R",
+      "name": "Poro Nella",
+      "x1": 109,
+      "y1": 260,
+      "x2": 203,
+      "y2": 296
+    },
+    {
+      "tsid": "LIF38KRD8S12HAR",
+      "name": "Raudan Sparkle",
+      "x1": 548,
+      "y1": 374,
+      "x2": 640,
+      "y2": 433
+    },
+    {
+      "tsid": "LA9QR9R40DT2A1D",
+      "name": "Rijul Habitat",
+      "x1": 115,
+      "y1": 103,
+      "x2": 196,
+      "y2": 45
+    },
+    {
+      "tsid": "LHVD0VVK8U2262J",
+      "name": "Rikki Regard",
+      "x1": 261,
+      "y1": 210,
+      "x2": 382,
+      "y2": 223
+    },
+    {
+      "tsid": "LA9EAH3R8DT2R18",
+      "name": "Rutase Preserve",
+      "x1": 444,
+      "y1": 328,
+      "x2": 547,
+      "y2": 342
+    },
+    {
+      "tsid": "LHVVLBM1VL22A6Q",
+      "name": "Savi Sense",
+      "x1": 205,
+      "y1": 297,
+      "x2": 263,
+      "y2": 211
+    },
+    {
+      "tsid": "LHVH2BF13132CUF",
+      "name": "Simpele Slip",
+      "x1": 591,
+      "y1": 275,
+      "x2": 669,
+      "y2": 217
+    },
+    {
+      "tsid": "LA9MJQRNCDT23BP",
+      "name": "Tilnat Park",
+      "x1": 662,
+      "y1": 325,
+      "x2": 734,
+      "y2": 258
+    },
+    {
+      "tsid": "LHV8NMVAGE228A2",
+      "name": "Toisi Trappings",
+      "x1": 203,
+      "y1": 297,
+      "x2": 285,
+      "y2": 356
+    },
+    {
+      "tsid": "LHV12AQNBB32CJ2",
+      "name": "Uko Grips",
+      "x1": 626,
+      "y1": 311,
+      "x2": 719,
+      "y2": 350
+    },
+    {
+      "tsid": "LIF1687ILK12R66",
+      "name": "Ukon Cognate",
+      "x1": 548,
+      "y1": 374,
+      "x2": 626,
+      "y2": 310
+    },
+    {
+      "tsid": "LIFUNGIBHQ1243A",
+      "name": "Unnu Slight",
+      "x1": 439,
+      "y1": 30,
+      "x2": 505,
+      "y2": 75
+    },
+    {
+      "tsid": "LHV27JP91G321HQ",
+      "name": "Vaala Vina",
+      "x1": 197,
+      "y1": 45,
+      "x2": 286,
+      "y2": 76
+    },
+    {
+      "tsid": "LHVMCDF3LA32K2R",
+      "name": "Venet Root",
+      "x1": 335,
+      "y1": 304,
+      "x2": 404,
+      "y2": 394
+    },
+    {
+      "tsid": "LHVLJEBAJ832SJA",
+      "name": "Viini Vital",
+      "x1": 455,
+      "y1": 290,
+      "x2": 543,
+      "y2": 232
+    },
+    {
+      "tsid": "LIFU7EN0HN12ETM",
+      "name": "Vuos Bosca",
+      "x1": 434,
+      "y1": 389,
+      "x2": 454,
+      "y2": 288
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LHV2JBHA9152QAS",
+      "hub_id": "85",
+      "hubName": "Kajuu",
+      "label": "To: Kajuu",
+      "x": 124,
+      "y": 189,
+      "arrow": 280
+    },
+    {
+      "tsid": "LA5JI29VIMB2SDT",
+      "hub_id": "102",
+      "hubName": "Ormonos",
+      "label": "To: Ormonos",
+      "x": 644,
+      "y": 434,
+      "arrow": 180
+    },
+    {
+      "tsid": "LCR10UJQ1922K16",
+      "hub_id": "76",
+      "hubName": "Alakol",
+      "label": "To: Alakol",
+      "x": 157,
+      "y": 431,
+      "arrow": 225
+    },
+    {
+      "tsid": "LIF3I4MK96E26KF",
+      "hub_id": "105",
+      "hubName": "Lida",
+      "label": "To: Lida",
+      "x": 727,
+      "y": 351,
+      "arrow": 90
+    },
+    {
+      "tsid": "LA9NT2E8FF8243N",
+      "hub_id": "97",
+      "hubName": "Muufo",
+      "label": "To: Muufo",
+      "x": 717,
+      "y": 36,
+      "arrow": 45
+    },
+    {
+      "tsid": "LIF160988972VND",
+      "hub_id": "92",
+      "hubName": "Tamila",
+      "label": "To: Tamila",
+      "x": 517,
+      "y": 29,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_bortola.jpg"
+}

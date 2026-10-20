@@ -1,0 +1,343 @@
+{
+  "hubId": "93",
+  "hubName": "Salatu",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_salatu_57042.jpg",
+  "fg": "http://c2.glitch.bz/client_maps/2012-04-24/salatu_fg_1335307182.png",
+  "color": "#008f6a",
+  "btm_color": "#8a7e81",
+  "top_color": "#aa9796",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIFQMHF4MT72V9Q",
+      "name": "Agala Axis",
+      "x1": 130,
+      "y1": 285,
+      "x2": 241,
+      "y2": 332
+    },
+    {
+      "tsid": "LIFF72DU3O727EA",
+      "name": "Balkao Blvd",
+      "x1": 331,
+      "y1": 137,
+      "x2": 488,
+      "y2": 105
+    },
+    {
+      "tsid": "LIF28GT9KE72QQG",
+      "name": "Bebingka Bridge",
+      "x1": 436,
+      "y1": 116,
+      "x2": 547,
+      "y2": 171
+    },
+    {
+      "tsid": "LIF18TO5NB72AMR",
+      "name": "Chamuc Chance",
+      "x1": 151,
+      "y1": 379,
+      "x2": 262,
+      "y2": 407
+    },
+    {
+      "tsid": "LIFJP2UC80820D3",
+      "name": "Davana Drive",
+      "x1": 173,
+      "y1": 128,
+      "x2": 330,
+      "y2": 136
+    },
+    {
+      "tsid": "LIF14KB3T872MAH",
+      "name": "Dhab Habit",
+      "x1": 587,
+      "y1": 286,
+      "x2": 681,
+      "y2": 199
+    },
+    {
+      "tsid": "LIFHR02K9S62Q72",
+      "name": "Dodol Dwells",
+      "x1": 485,
+      "y1": 272,
+      "x2": 583,
+      "y2": 289
+    },
+    {
+      "tsid": "LUVV8SDGGDT2QOH",
+      "name": "Jansin Park",
+      "x1": 667,
+      "y1": 213,
+      "x2": 739,
+      "y2": 285
+    },
+    {
+      "tsid": "LIF1AQ6CK972734",
+      "name": "Kalp Clips",
+      "x1": 244,
+      "y1": 334,
+      "x2": 348,
+      "y2": 257
+    },
+    {
+      "tsid": "LIF19MQDQB725HT",
+      "name": "Khat Massives",
+      "x1": 564,
+      "y1": 403,
+      "x2": 688,
+      "y2": 358
+    },
+    {
+      "tsid": "LIFIECSPJ082A49",
+      "name": "Khoul Bheens",
+      "x1": 51,
+      "y1": 312,
+      "x2": 151,
+      "y2": 379
+    },
+    {
+      "tsid": "LIF16SBFB972GLK",
+      "name": "Konkan Carom",
+      "x1": 546,
+      "y1": 171,
+      "x2": 623,
+      "y2": 249
+    },
+    {
+      "tsid": "LIFCLLMITT727LH",
+      "name": "Lunu Lane",
+      "x1": 163,
+      "y1": 235,
+      "x2": 291,
+      "y2": 295
+    },
+    {
+      "tsid": "LIFNU7T73U722U5",
+      "name": "Malaba Summit",
+      "x1": 484,
+      "y1": 104,
+      "x2": 602,
+      "y2": 40
+    },
+    {
+      "tsid": "LIFE9GRB8S62L1H",
+      "name": "Mangane Gaps",
+      "x1": 98,
+      "y1": 345,
+      "x2": 161,
+      "y2": 234
+    },
+    {
+      "tsid": "LIF4CVKKD082IRH",
+      "name": "Olani Ohm",
+      "x1": 44,
+      "y1": 175,
+      "x2": 170,
+      "y2": 127
+    },
+    {
+      "tsid": "LIF16U5HC972SNC",
+      "name": "Paatol Press",
+      "x1": 408,
+      "y1": 366,
+      "x2": 482,
+      "y2": 271
+    },
+    {
+      "tsid": "LIFDB8NGF282H0Q",
+      "name": "Parvana Pungence",
+      "x1": 82,
+      "y1": 69,
+      "x2": 169,
+      "y2": 126
+    },
+    {
+      "tsid": "LIF9UI391Q62CIC",
+      "name": "Puran Pills",
+      "x1": 36,
+      "y1": 240,
+      "x2": 159,
+      "y2": 235
+    },
+    {
+      "tsid": "LIFID13EDG725C2",
+      "name": "Revdyo Rake",
+      "x1": 238,
+      "y1": 133,
+      "x2": 346,
+      "y2": 189
+    },
+    {
+      "tsid": "LHF1FNLTD0D28PT",
+      "name": "Salatu Start",
+      "x1": 191,
+      "y1": 343,
+      "x2": 261,
+      "y2": 406
+    },
+    {
+      "tsid": "LHF2R7NJE0D2JOC",
+      "name": "Salatu Start",
+      "x1": 68,
+      "y1": 267,
+      "x2": 131,
+      "y2": 286
+    },
+    {
+      "tsid": "LHF358MNE0D27A3",
+      "name": "Salatu Start",
+      "x1": 192,
+      "y1": 289,
+      "x2": 294,
+      "y2": 297
+    },
+    {
+      "tsid": "LHF3UJS8F0D2CCC",
+      "name": "Salatu Start",
+      "x1": 511,
+      "y1": 247,
+      "x2": 625,
+      "y2": 251
+    },
+    {
+      "tsid": "LIFKPQEDFG722M5",
+      "name": "Sanna Salts",
+      "x1": 349,
+      "y1": 257,
+      "x2": 482,
+      "y2": 272
+    },
+    {
+      "tsid": "LIFJ9M178082JAO",
+      "name": "Seeyam Far",
+      "x1": 108,
+      "y1": 152,
+      "x2": 161,
+      "y2": 236
+    },
+    {
+      "tsid": "LIF103GH4C72BHJ",
+      "name": "Shak Shales",
+      "x1": 349,
+      "y1": 188,
+      "x2": 488,
+      "y2": 210
+    },
+    {
+      "tsid": "LIFR3G1FFE72K0S",
+      "name": "Solachi Slims",
+      "x1": 260,
+      "y1": 407,
+      "x2": 413,
+      "y2": 365
+    },
+    {
+      "tsid": "LIFI9G70SV72H3C",
+      "name": "Thiruvan Thrive",
+      "x1": 201,
+      "y1": 252,
+      "x2": 342,
+      "y2": 189
+    },
+    {
+      "tsid": "LIF1CI1RSB72BCA",
+      "name": "Tondak Tracks",
+      "x1": 408,
+      "y1": 367,
+      "x2": 559,
+      "y2": 404
+    },
+    {
+      "tsid": "LIFEL8CPH08259V",
+      "name": "Vattuu Vains",
+      "x1": 54,
+      "y1": 417,
+      "x2": 151,
+      "y2": 380
+    },
+    {
+      "tsid": "LIFFBC4MNO72556",
+      "name": "Via Velaya",
+      "x1": 417,
+      "y1": 261,
+      "x2": 539,
+      "y2": 167
+    },
+    {
+      "tsid": "LIF2AUKEAT72DU9",
+      "name": "Wali Hoppers",
+      "x1": 243,
+      "y1": 332,
+      "x2": 331,
+      "y2": 385
+    },
+    {
+      "tsid": "LIFFIRQ00P729BS",
+      "name": "Watta Wayward",
+      "x1": 484,
+      "y1": 105,
+      "x2": 623,
+      "y2": 141
+    },
+    {
+      "tsid": "LIF14N6MU872GGI",
+      "name": "Xacut Cross",
+      "x1": 581,
+      "y1": 286,
+      "x2": 627,
+      "y2": 376
+    },
+    {
+      "tsid": "LIFFHFT5UO72FC2",
+      "name": "Yariam Jam",
+      "x1": 271,
+      "y1": 56,
+      "x2": 377,
+      "y2": 124
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LHVDGF0JMQ7299V",
+      "hub_id": "76",
+      "hubName": "Alakol",
+      "label": "To: Alakol",
+      "x": 689,
+      "y": 357,
+      "arrow": 100
+    },
+    {
+      "tsid": "LA51BNNOEK629KG",
+      "hub_id": "89",
+      "hubName": "Andra",
+      "label": "To: Andra",
+      "x": 260,
+      "y": 46,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIF33FDK0K3371H",
+      "hub_id": "131",
+      "hubName": "Haoma",
+      "label": "To: Haoma",
+      "x": 41,
+      "y": 423,
+      "arrow": 260
+    },
+    {
+      "tsid": "LUVSCDSTRAF2EOF",
+      "hub_id": "109",
+      "hubName": "Rasana",
+      "label": "To: Rasana",
+      "x": 54,
+      "y": 311,
+      "arrow": 270
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_salatu.jpg"
+}

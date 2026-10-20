@@ -1,0 +1,254 @@
+{
+  "hubId": "114",
+  "hubName": "Firozi",
+  "bg": "http://c2.glitch.bz/client_maps/2012-09-12/firozi_bg_1347491743.jpg",
+  "fg": "",
+  "color": "954f18",
+  "btm_color": "7c867c",
+  "top_color": "98a89a",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LUVBP2STKQJ24PT",
+      "name": "Abhiman Himan",
+      "x1": 139,
+      "y1": 86,
+      "x2": 240,
+      "y2": 219
+    },
+    {
+      "tsid": "LUVQD7K50HL25GG",
+      "name": "Afra Maf",
+      "x1": 335,
+      "y1": 167,
+      "x2": 374,
+      "y2": 262
+    },
+    {
+      "tsid": "LUV174V0QUB3JT4",
+      "name": "Ambu Jal",
+      "x1": 59,
+      "y1": 336,
+      "x2": 88,
+      "y2": 429
+    },
+    {
+      "tsid": "LUVN6H8QIJL250Q",
+      "name": "Angla Mangle",
+      "x1": 581,
+      "y1": 191,
+      "x2": 698,
+      "y2": 137
+    },
+    {
+      "tsid": "LUVS3QBDOBL2HMO",
+      "name": "Anista Mista",
+      "x1": 445,
+      "y1": 295,
+      "x2": 488,
+      "y2": 152
+    },
+    {
+      "tsid": "LUVIOOG33CL26FM",
+      "name": "Basma Asma",
+      "x1": 300,
+      "y1": 330,
+      "x2": 372,
+      "y2": 259
+    },
+    {
+      "tsid": "LUV483AL8JL28J2",
+      "name": "Batata Tata",
+      "x1": 329,
+      "y1": 394,
+      "x2": 438,
+      "y2": 301
+    },
+    {
+      "tsid": "LUVBQFC4NJL2093",
+      "name": "Dolla Holla",
+      "x1": 576,
+      "y1": 288,
+      "x2": 686,
+      "y2": 346
+    },
+    {
+      "tsid": "LUVIEBL289L21A2",
+      "name": "Kura Kura",
+      "x1": 439,
+      "y1": 133,
+      "x2": 555,
+      "y2": 45
+    },
+    {
+      "tsid": "LUV8H510J7K2DQS",
+      "name": "Lavaku Lore",
+      "x1": 255,
+      "y1": 104,
+      "x2": 285,
+      "y2": 202
+    },
+    {
+      "tsid": "LUV681KDSQL2PST",
+      "name": "Leffe Weff",
+      "x1": 250,
+      "y1": 445,
+      "x2": 300,
+      "y2": 333
+    },
+    {
+      "tsid": "LUVCFATLK1L21R1",
+      "name": "Matara Ara",
+      "x1": 377,
+      "y1": 118,
+      "x2": 535,
+      "y2": 164
+    },
+    {
+      "tsid": "LUVIAI9LFBL2TRO",
+      "name": "Matsia Tia",
+      "x1": 374,
+      "y1": 260,
+      "x2": 502,
+      "y2": 339
+    },
+    {
+      "tsid": "LUVTLIP0SIJ2DQG",
+      "name": "Mrandeya Minds",
+      "x1": 79,
+      "y1": 77,
+      "x2": 254,
+      "y2": 104
+    },
+    {
+      "tsid": "LUV1RMOG91L2F6G",
+      "name": "Musta Hafsum",
+      "x1": 337,
+      "y1": 168,
+      "x2": 426,
+      "y2": 60
+    },
+    {
+      "tsid": "LUVGS4ELCPK2EJI",
+      "name": "Narasiha Seeha",
+      "x1": 162,
+      "y1": 258,
+      "x2": 282,
+      "y2": 370
+    },
+    {
+      "tsid": "LUVQ7T6QICK2S0Q",
+      "name": "Prashura Sure",
+      "x1": 251,
+      "y1": 104,
+      "x2": 427,
+      "y2": 59
+    },
+    {
+      "tsid": "LUVO4MCSNPK2P6J",
+      "name": "Ramavata Vata",
+      "x1": 235,
+      "y1": 318,
+      "x2": 285,
+      "y2": 204
+    },
+    {
+      "tsid": "LUVGL5C7BJL2V4U",
+      "name": "Rumina Ruma",
+      "x1": 504,
+      "y1": 340,
+      "x2": 580,
+      "y2": 444
+    },
+    {
+      "tsid": "LUV528DLLJL23MB",
+      "name": "Tumera Hilda",
+      "x1": 505,
+      "y1": 85,
+      "x2": 621,
+      "y2": 166
+    },
+    {
+      "tsid": "LUVLN7FNEJJ2NOQ",
+      "name": "Valmiki Vall",
+      "x1": 158,
+      "y1": 251,
+      "x2": 199,
+      "y2": 163
+    },
+    {
+      "tsid": "LUVC8S7H3AK2JPD",
+      "name": "Vamanda Van",
+      "x1": 157,
+      "y1": 256,
+      "x2": 281,
+      "y2": 203
+    },
+    {
+      "tsid": "LUV4RLT53QK2GUF",
+      "name": "Varana Na",
+      "x1": 117,
+      "y1": 401,
+      "x2": 231,
+      "y2": 324
+    },
+    {
+      "tsid": "LUVP2B2ITBL2DIF",
+      "name": "Vartula Lura",
+      "x1": 536,
+      "y1": 165,
+      "x2": 641,
+      "y2": 235
+    },
+    {
+      "tsid": "LUVNNQQ9AOJ253J",
+      "name": "Venkate Kate",
+      "x1": 70,
+      "y1": 378,
+      "x2": 155,
+      "y2": 254
+    },
+    {
+      "tsid": "LUVP6OB76JL27S1",
+      "name": "Vina Dosh",
+      "x1": 504,
+      "y1": 337,
+      "x2": 641,
+      "y2": 236
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LUVUKCOSE793PHI",
+      "hub_id": "76",
+      "hubName": "Alakol",
+      "label": "To: Alakol",
+      "x": 62,
+      "y": 70,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIF308SGODC2TRS",
+      "hub_id": "102",
+      "hubName": "Ormonos",
+      "label": "To: Ormonos",
+      "x": 560,
+      "y": 41,
+      "arrow": 25
+    },
+    {
+      "tsid": "LUV2SSTOU8A30RS",
+      "hub_id": "136",
+      "hubName": "Jal",
+      "label": "To: Jal",
+      "x": 54,
+      "y": 319,
+      "arrow": 270
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_firozi.jpg"
+}

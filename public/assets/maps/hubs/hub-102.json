@@ -1,0 +1,279 @@
+{
+  "hubId": "102",
+  "hubName": "Ormonos",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_ormonos_72522.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_ormonos_72522.png",
+  "color": "#00937f",
+  "btm_color": "#847e87",
+  "top_color": "#a699a7",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA5OSVV5LRB23BT",
+      "name": "Anor Sapro",
+      "x1": 560,
+      "y1": 241,
+      "x2": 635,
+      "y2": 315
+    },
+    {
+      "tsid": "LA5JAMFQIMB227E",
+      "name": "Appin Shol",
+      "x1": 380,
+      "y1": 172,
+      "x2": 447,
+      "y2": 98
+    },
+    {
+      "tsid": "LA5ATR2SUMB2FKP",
+      "name": "Arago Thaum",
+      "x1": 118,
+      "y1": 232,
+      "x2": 187,
+      "y2": 159
+    },
+    {
+      "tsid": "LA5JDUKSIMB207U",
+      "name": "Arkose Gabbro",
+      "x1": 450,
+      "y1": 96,
+      "x2": 559,
+      "y2": 91
+    },
+    {
+      "tsid": "LIFIDIQ4NGC2U1Q",
+      "name": "Basalt Syen",
+      "x1": 636,
+      "y1": 161,
+      "x2": 726,
+      "y2": 127
+    },
+    {
+      "tsid": "LIF26JLSR8C261S",
+      "name": "Batre Yrarg",
+      "x1": 101,
+      "y1": 421,
+      "x2": 151,
+      "y2": 329
+    },
+    {
+      "tsid": "LA5J5DGOIMB24LP",
+      "name": "Bukovs Gossan",
+      "x1": 301,
+      "y1": 415,
+      "x2": 383,
+      "y2": 345
+    },
+    {
+      "tsid": "LA5FIJ2LMPB2FVN",
+      "name": "Cancrin Psam",
+      "x1": 112,
+      "y1": 90,
+      "x2": 190,
+      "y2": 155
+    },
+    {
+      "tsid": "LDOS7IQJDEC2KHP",
+      "name": "Charnoc Slag",
+      "x1": 640,
+      "y1": 315,
+      "x2": 721,
+      "y2": 258
+    },
+    {
+      "tsid": "LA5GILERBSB25H2",
+      "name": "Diami Quarry",
+      "x1": 381,
+      "y1": 173,
+      "x2": 443,
+      "y2": 260
+    },
+    {
+      "tsid": "LA5P7O926NB2CFB",
+      "name": "Djur Rhomb",
+      "x1": 116,
+      "y1": 235,
+      "x2": 218,
+      "y2": 264
+    },
+    {
+      "tsid": "LA5VOHQCROB2NSG",
+      "name": "Elios Durr",
+      "x1": 220,
+      "y1": 266,
+      "x2": 327,
+      "y2": 259
+    },
+    {
+      "tsid": "LIF26IOMR8C2GBF",
+      "name": "Eosphr Meso",
+      "x1": 386,
+      "y1": 345,
+      "x2": 493,
+      "y2": 371
+    },
+    {
+      "tsid": "LA5JI29VIMB2SDT",
+      "name": "Essec Zyte",
+      "x1": 562,
+      "y1": 88,
+      "x2": 638,
+      "y2": 28
+    },
+    {
+      "tsid": "LA5OUBP2SPB2MK2",
+      "name": "Fluore Vaes",
+      "x1": 388,
+      "y1": 342,
+      "x2": 445,
+      "y2": 263
+    },
+    {
+      "tsid": "LA5GRQJINPB2HS1",
+      "name": "Gueis Pumice",
+      "x1": 560,
+      "y1": 237,
+      "x2": 635,
+      "y2": 164
+    },
+    {
+      "tsid": "LDOEDH6P6GC2R2T",
+      "name": "Juom Guson",
+      "x1": 30,
+      "y1": 28,
+      "x2": 107,
+      "y2": 86
+    },
+    {
+      "tsid": "LA5DGUEJ3PB2UE3",
+      "name": "Kratoch Emer",
+      "x1": 329,
+      "y1": 257,
+      "x2": 378,
+      "y2": 174
+    },
+    {
+      "tsid": "LA5IUQRKIMB2SGF",
+      "name": "Larvik Skarn",
+      "x1": 281,
+      "y1": 130,
+      "x2": 375,
+      "y2": 169
+    },
+    {
+      "tsid": "LA5JGH5UIMB28BP",
+      "name": "Levyn Gahne",
+      "x1": 44,
+      "y1": 348,
+      "x2": 147,
+      "y2": 329
+    },
+    {
+      "tsid": "LIF5JTDA5EC2A02",
+      "name": "Marl Pegma",
+      "x1": 637,
+      "y1": 317,
+      "x2": 719,
+      "y2": 395
+    },
+    {
+      "tsid": "LA53D0DJQMB2B4S",
+      "name": "Meion Nsut",
+      "x1": 190,
+      "y1": 156,
+      "x2": 281,
+      "y2": 129
+    },
+    {
+      "tsid": "LA5H2M7G7UB24FO",
+      "name": "Mica Nephe",
+      "x1": 561,
+      "y1": 95,
+      "x2": 629,
+      "y2": 161
+    },
+    {
+      "tsid": "LA57DQKFHPB2EIS",
+      "name": "Rhyol Dolo",
+      "x1": 150,
+      "y1": 329,
+      "x2": 221,
+      "y2": 267
+    },
+    {
+      "tsid": "LIF308SGODC2TRS",
+      "name": "Rutyle Scheel",
+      "x1": 497,
+      "y1": 372,
+      "x2": 599,
+      "y2": 421
+    },
+    {
+      "tsid": "LIFDS8H7KBC2B2U",
+      "name": "Seugal Elba",
+      "x1": 112,
+      "y1": 86,
+      "x2": 198,
+      "y2": 34
+    },
+    {
+      "tsid": "LA5J0NEMIMB2OQ0",
+      "name": "Tachyl Grit",
+      "x1": 330,
+      "y1": 261,
+      "x2": 383,
+      "y2": 341
+    },
+    {
+      "tsid": "LIF1TOD6F8C21NS",
+      "name": "Tephr Scoria",
+      "x1": 445,
+      "y1": 260,
+      "x2": 554,
+      "y2": 239
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LLI1C5DJ2Q12O21",
+      "hub_id": "76",
+      "hubName": "Alakol",
+      "label": "To: Alakol",
+      "x": 37,
+      "y": 348,
+      "arrow": 270
+    },
+    {
+      "tsid": "LIF38KRD8S12HAR",
+      "hub_id": "75",
+      "hubName": "Bortola",
+      "label": "To: Bortola",
+      "x": 641,
+      "y": 27,
+      "arrow": 0
+    },
+    {
+      "tsid": "LUVIEBL289L21A2",
+      "hub_id": "114",
+      "hubName": "Firozi",
+      "label": "To: Firozi",
+      "x": 606,
+      "y": 426,
+      "arrow": 200
+    },
+    {
+      "tsid": "LIF3IFLRH4E2D6G",
+      "hub_id": "105",
+      "hubName": "Lida",
+      "label": "To: Lida",
+      "x": 732,
+      "y": 125,
+      "arrow": 70
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_ormonos.jpg"
+}

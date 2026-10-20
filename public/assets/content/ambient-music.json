@@ -1,0 +1,251 @@
+{
+  "source": "glitch-GameServerJS/main.js ambient_library + ambient_hub_map; public-domain music from glitchthegame.com/downloads (Wayback 2013-12-14)",
+  "note": "Original client picked a random track from ambient_library[set] when entering a hub. Streets could override via geometry.music_file (announce_music). Full c2.glitch.bz/sounds ambient libraries (Forest_Theme_*, CAVERN_*, Highlands_*, etc.) were never archived at exact CDN URLs — we use the complete public /downloads/ music catalog as stand-ins keyed to hub themes.",
+  "recovered": {
+    "downloadsCatalog": 46,
+    "cdnAmbientLibraries": 0,
+    "localAmbientTracks": 34
+  },
+  "defaultTheme": "default",
+  "themes": {
+    "default": {
+      "label": "Forest / Groddle",
+      "gsjsKeys": ["FOREST_AMBIENT1", "FOREST_AMBIENT2", "FOREST_AMBIENT3", "FOREST_AMBIENT4"],
+      "tracks": [
+        "assets/audio/ambient/groddle.mp3",
+        "assets/audio/ambient/Groddle-Forest-Theme_1291876879.mp3",
+        "assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3",
+        "assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3",
+        "assets/audio/ambient/enchanted_woods_1344997332.mp3"
+      ]
+    },
+    "caverns": {
+      "label": "Ilmenskie Caverns",
+      "gsjsKeys": ["AMBIENT_CAVERNS1", "AMBIENT_CAVERNS2", "AMBIENT_CAVERNS3", "AMBIENT_CAVERNS4"],
+      "tracks": [
+        "assets/audio/ambient/Ilmenskie-Caverns-Work-Song_1291877437.mp3",
+        "assets/audio/ambient/Tubamaphone_1292397289.mp3",
+        "assets/audio/ambient/metalmaker_1344997841.mp3"
+      ]
+    },
+    "cave": {
+      "label": "Caves",
+      "gsjsKeys": ["CAVE_MUSIC1", "CAVE_MUSIC2", "CAVE_MUSIC3", "CAVE_MUSIC4", "CAVE_MUSIC5"],
+      "tracks": [
+        "assets/audio/ambient/Ilmenskie-Caverns-Work-Song_1291877437.mp3",
+        "assets/audio/ambient/Tubamaphone_1292397289.mp3",
+        "assets/audio/ambient/moon_music_1344997839.mp3"
+      ]
+    },
+    "firebog": {
+      "label": "Firebog",
+      "gsjsKeys": ["AMBIENT_FIREBOGS1", "AMBIENT_FIREBOGS2", "AMBIENT_FIREBOGS3"],
+      "tracks": [
+        "assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3",
+        "assets/audio/ambient/Spooky_Groddle_1291879214.mp3",
+        "assets/audio/ambient/rooks_woods_1344997275.mp3"
+      ]
+    },
+    "uralia": {
+      "label": "Uralia",
+      "gsjsKeys": ["AMBIENT_URALIA1", "AMBIENT_URALIA2", "AMBIENT_URALIA3", "AMBIENT_URALIA4"],
+      "tracks": [
+        "assets/audio/ambient/Spinning-Wheel_1292034939.mp3",
+        "assets/audio/ambient/Rainbow-Run_1291879159.mp3",
+        "assets/audio/ambient/eesti_life_catalogue_1344997859.mp3",
+        "assets/audio/ambient/moon_music_1344997839.mp3"
+      ]
+    },
+    "savanna": {
+      "label": "Savanna",
+      "gsjsKeys": ["AMBIENT_SAVANNA1", "AMBIENT_SAVANNA2"],
+      "tracks": [
+        "assets/audio/ambient/Rainbow-Run_1291879159.mp3",
+        "assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3",
+        "assets/audio/ambient/eesti_life_catalogue_1344997859.mp3",
+        "assets/audio/ambient/marching_band_1344997302.mp3"
+      ]
+    },
+    "highlands": {
+      "label": "Highlands",
+      "gsjsKeys": ["AMBIENT_HIGHLANDS1", "AMBIENT_HIGHLANDS2"],
+      "tracks": [
+        "assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3",
+        "assets/audio/ambient/Meditation_1291879502.mp3",
+        "assets/audio/ambient/meditation1_1344997850.mp3",
+        "assets/audio/ambient/meditation2_1344997844.mp3",
+        "assets/audio/ambient/meditation3_1344997842.mp3",
+        "assets/audio/ambient/meditation4_1344997846.mp3"
+      ]
+    },
+    "bortola_muufo": {
+      "label": "Slow forest (Bortola/Muufo)",
+      "gsjsKeys": ["AMBIENT_FOREST_SLOW1", "AMBIENT_FOREST_SLOW2"],
+      "tracks": [
+        "assets/audio/ambient/Groddle-Forest-Theme_1291876879.mp3",
+        "assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3",
+        "assets/audio/ambient/enchanted_woods_1344997332.mp3",
+        "assets/audio/ambient/waiting_muzak_1344997267.mp3"
+      ]
+    },
+    "nottis": {
+      "label": "Winter (Nottis/Drifa)",
+      "gsjsKeys": ["WINTER_HUB1", "WINTER_HUB2", "WINTER_HUB3"],
+      "tracks": [
+        "assets/audio/ambient/winterland_1344997854.mp3",
+        "assets/audio/ambient/winter_holiday_1344997255.mp3",
+        "assets/audio/ambient/moon_music_1344997839.mp3"
+      ]
+    },
+    "andra_kajuu": {
+      "label": "Kajuu / Andra",
+      "gsjsKeys": ["ANDRA_KAJUU_1", "ANDRA_KAJUU_2"],
+      "tracks": [
+        "assets/audio/ambient/Spinning-Wheel_1292034939.mp3",
+        "assets/audio/ambient/Rainbow-Run_1291879159.mp3",
+        "assets/audio/ambient/The_Rube_Song_1290596637.mp3"
+      ]
+    },
+    "ix": {
+      "label": "Ix",
+      "gsjsKeys": ["AMBIENT_IX_1", "AMBIENT_IX_2"],
+      "tracks": [
+        "assets/audio/ambient/elevator_music_1344997334.mp3",
+        "assets/audio/ambient/subway_music_1344997270.mp3",
+        "assets/audio/ambient/Tubamaphone_1292397289.mp3",
+        "assets/audio/ambient/waiting_muzak_1344997267.mp3"
+      ]
+    },
+    "hell": {
+      "label": "Hell",
+      "gsjsKeys": ["HELL"],
+      "tracks": [
+        "assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3",
+        "assets/audio/ambient/rooks_woods_1344997275.mp3",
+        "assets/audio/ambient/Spooky_Groddle_1291879214.mp3"
+      ]
+    },
+    "subway": {
+      "label": "Subway",
+      "gsjsKeys": ["TRAVELLING_TRAIN", "SUBWAY_STATION_HUM"],
+      "tracks": [
+        "assets/audio/ambient/subway_music_1344997270.mp3",
+        "assets/audio/ambient/elevator_music_1344997334.mp3",
+        "assets/audio/ambient/waiting_muzak_1344997267.mp3"
+      ]
+    },
+    "rook": {
+      "label": "Rook woods",
+      "gsjsKeys": ["ROOK_ATTACK", "ROOK_FLOCK"],
+      "tracks": [
+        "assets/audio/ambient/rooks_woods_1344997275.mp3",
+        "assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3"
+      ]
+    },
+    "meditation": {
+      "label": "Meditation / focus",
+      "gsjsKeys": ["FOCUSED_MEDITATION_ENERGY", "TRANSCENDENTAL_MEDITATION_01"],
+      "tracks": [
+        "assets/audio/ambient/Meditation_1291879502.mp3",
+        "assets/audio/ambient/meditation1_1344997850.mp3",
+        "assets/audio/ambient/meditation2_1344997844.mp3",
+        "assets/audio/ambient/meditation3_1344997842.mp3",
+        "assets/audio/ambient/meditation4_1344997846.mp3"
+      ]
+    },
+    "eesti": {
+      "label": "Eesti Life Catalogue",
+      "gsjsKeys": ["EESTI_LIFE_CATALOGUE"],
+      "tracks": [
+        "assets/audio/ambient/eesti_life_catalogue_1344997859.mp3"
+      ]
+    },
+    "musicblocks": {
+      "label": "Musicblocks (collectible snippets)",
+      "gsjsKeys": ["MUSICBLOCK_D_GREEN_01", "MUSICBLOCK_D_RED_01"],
+      "tracks": [
+        "assets/audio/ambient/Musicblock-DG-2_1291896713.mp3",
+        "assets/audio/ambient/Musicblock-DG-3_1291896740.mp3",
+        "assets/audio/ambient/Musicblock-DR-1_1291896467.mp3",
+        "assets/audio/ambient/Musicblock-DR-5_1291896506.mp3",
+        "assets/audio/ambient/Musicblock-XS-2_1292035400.mp3",
+        "assets/audio/ambient/Musicblock-XS-3_1291896779.mp3"
+      ]
+    }
+  },
+  "hubMap": {
+    "49": "eesti",
+    "50": "caverns",
+    "78": "caverns",
+    "18": "caverns",
+    "51": "uralia",
+    "40": "hell",
+    "63": "firebog",
+    "71": "firebog",
+    "72": "firebog",
+    "77": "firebog",
+    "99": "firebog",
+    "86": "savanna",
+    "95": "savanna",
+    "90": "savanna",
+    "91": "savanna",
+    "76": "highlands",
+    "93": "highlands",
+    "109": "highlands",
+    "114": "highlands",
+    "107": "cave",
+    "106": "cave",
+    "110": "cave",
+    "85": "andra_kajuu",
+    "89": "andra_kajuu",
+    "113": "andra_kajuu",
+    "119": "andra_kajuu",
+    "102": "andra_kajuu",
+    "105": "andra_kajuu",
+    "27": "ix",
+    "133": "default",
+    "131": "default",
+    "126": "default",
+    "128": "default",
+    "136": "default",
+    "140": "default",
+    "137": "nottis",
+    "141": "nottis",
+    "75": "bortola_muufo",
+    "97": "bortola_muufo",
+    "112": "bortola_muufo",
+    "116": "bortola_muufo",
+    "88": "bortola_muufo",
+    "56": "default",
+    "58": "default",
+    "52": "default"
+  },
+  "hubNameHints": {
+    "Eesti": "eesti",
+    "Groddle": "default",
+    "Ilmenskie": "caverns",
+    "Firebog": "firebog",
+    "Shimla": "firebog",
+    "Jethimadh": "firebog",
+    "Chakra": "firebog",
+    "Uralia": "uralia",
+    "Salatu": "highlands",
+    "Alakol": "highlands",
+    "Rasana": "highlands",
+    "Firozi": "highlands",
+    "Baqala": "savanna",
+    "Xalanga": "savanna",
+    "Choru": "savanna",
+    "Zhambu": "savanna",
+    "Tamila": "savanna",
+    "Bortola": "bortola_muufo",
+    "Muufo": "bortola_muufo",
+    "Nottis": "nottis",
+    "Drifa": "nottis",
+    "Andra": "andra_kajuu",
+    "Kajuu": "andra_kajuu",
+    "Ormonos": "andra_kajuu",
+    "Ix": "ix",
+    "Rook": "rook"
+  }
+}

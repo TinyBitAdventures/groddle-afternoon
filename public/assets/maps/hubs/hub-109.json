@@ -1,0 +1,351 @@
+{
+  "hubId": "109",
+  "hubName": "Rasana",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-24/rasana_bg_1335307178.jpg",
+  "fg": "http://c2.glitch.bz/client_maps/2012-04-24/rasana_fg_1335307178.png",
+  "color": "#00a77b",
+  "btm_color": "#837e87",
+  "top_color": "#a199a7",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LUVTKR868NF27QG",
+      "name": "Aavani Avenue",
+      "x1": 408,
+      "y1": 44,
+      "x2": 607,
+      "y2": 82
+    },
+    {
+      "tsid": "LUVMBSKJQ5F289H",
+      "name": "Agraha Yana",
+      "x1": 176,
+      "y1": 326,
+      "x2": 286,
+      "y2": 246
+    },
+    {
+      "tsid": "LUVIIL1P65F22NC",
+      "name": "Aippasi Massy",
+      "x1": 539,
+      "y1": 335,
+      "x2": 655,
+      "y2": 355
+    },
+    {
+      "tsid": "LUVNUGNGN5F2BOT",
+      "name": "Asvina Vet",
+      "x1": 454,
+      "y1": 242,
+      "x2": 554,
+      "y2": 322
+    },
+    {
+      "tsid": "LUVL2G4TQ7F2L1T",
+      "name": "Barthigai Broke",
+      "x1": 128,
+      "y1": 315,
+      "x2": 247,
+      "y2": 357
+    },
+    {
+      "tsid": "LUVCMP7BM7F2JET",
+      "name": "Bhadra Pada",
+      "x1": 496,
+      "y1": 356,
+      "x2": 606,
+      "y2": 296
+    },
+    {
+      "tsid": "LUV5DRKRFNF2BNO",
+      "name": "Chingam Chai",
+      "x1": 476,
+      "y1": 149,
+      "x2": 575,
+      "y2": 124
+    },
+    {
+      "tsid": "LUVEAFOJ4LF23HV",
+      "name": "Dhanu Dhani",
+      "x1": 441,
+      "y1": 339,
+      "x2": 489,
+      "y2": 271
+    },
+    {
+      "tsid": "LUVLL5M2V9G24MD",
+      "name": "Durva Dell",
+      "x1": 229,
+      "y1": 154,
+      "x2": 286,
+      "y2": 245
+    },
+    {
+      "tsid": "LUVINN2QDSF265I",
+      "name": "Edavam Vam",
+      "x1": 222,
+      "y1": 75,
+      "x2": 351,
+      "y2": 136
+    },
+    {
+      "tsid": "LUVUETG9K6G2HAO",
+      "name": "Ghara Gulley",
+      "x1": 338,
+      "y1": 325,
+      "x2": 438,
+      "y2": 339
+    },
+    {
+      "tsid": "LUVPOEQCV9G2JEL",
+      "name": "Hariali Alley",
+      "x1": 444,
+      "y1": 238,
+      "x2": 556,
+      "y2": 198
+    },
+    {
+      "tsid": "LUVKM04MB9G2I53",
+      "name": "Jazi Kaya",
+      "x1": 573,
+      "y1": 124,
+      "x2": 673,
+      "y2": 150
+    },
+    {
+      "tsid": "LUVT92Q1PNF23GR",
+      "name": "Kanni Climb",
+      "x1": 495,
+      "y1": 359,
+      "x2": 605,
+      "y2": 429
+    },
+    {
+      "tsid": "LUVSMJ94HKF2V3J",
+      "name": "Karka Dakam",
+      "x1": 77,
+      "y1": 388,
+      "x2": 285,
+      "y2": 423
+    },
+    {
+      "tsid": "LUVL8CLKD5F2TNB",
+      "name": "Kartika Crams",
+      "x1": 128,
+      "y1": 314,
+      "x2": 151,
+      "y2": 207
+    },
+    {
+      "tsid": "LUV8KVC0JDT2N8E",
+      "name": "Kermu Park",
+      "x1": 578,
+      "y1": 232,
+      "x2": 705,
+      "y2": 246
+    },
+    {
+      "tsid": "LUV3TN6CIDF2DL5",
+      "name": "Koumbahm Bahm",
+      "x1": 319,
+      "y1": 133,
+      "x2": 504,
+      "y2": 153
+    },
+    {
+      "tsid": "LUV2SS9BHDT2I85",
+      "name": "Luma Preserve",
+      "x1": 177,
+      "y1": 255,
+      "x2": 268,
+      "y2": 211
+    },
+    {
+      "tsid": "LUV22FOR7AF2TIE",
+      "name": "Magha Shank",
+      "x1": 30,
+      "y1": 310,
+      "x2": 132,
+      "y2": 316
+    },
+    {
+      "tsid": "LUVGTE14OSF23D5",
+      "name": "Makaram Maker",
+      "x1": 66,
+      "y1": 121,
+      "x2": 223,
+      "y2": 75
+    },
+    {
+      "tsid": "LUV7MEQ2P5F2LOG",
+      "name": "Margazhi Gazzi",
+      "x1": 577,
+      "y1": 125,
+      "x2": 646,
+      "y2": 49
+    },
+    {
+      "tsid": "LUV81B4FPCF2QOL",
+      "name": "Masi Step",
+      "x1": 228,
+      "y1": 155,
+      "x2": 320,
+      "y2": 133
+    },
+    {
+      "tsid": "LUV1D5ROINF2MDO",
+      "name": "Medam Mads",
+      "x1": 504,
+      "y1": 152,
+      "x2": 565,
+      "y2": 205
+    },
+    {
+      "tsid": "LUVLGC15RKF2L68",
+      "name": "Meenam Seer",
+      "x1": 439,
+      "y1": 339,
+      "x2": 461,
+      "y2": 428
+    },
+    {
+      "tsid": "LUVQ4HDKLSF274K",
+      "name": "Midtunam Tunam",
+      "x1": 80,
+      "y1": 40,
+      "x2": 221,
+      "y2": 74
+    },
+    {
+      "tsid": "LUVTEIMAL2F2UMM",
+      "name": "Mincedoathe Formation",
+      "x1": 288,
+      "y1": 245,
+      "x2": 450,
+      "y2": 238
+    },
+    {
+      "tsid": "LUVSCDSTRAF2EOF",
+      "name": "Palguna Muna",
+      "x1": 611,
+      "y1": 295,
+      "x2": 706,
+      "y2": 296
+    },
+    {
+      "tsid": "LUVEJ2PKGAF2771",
+      "name": "Panguni Ploy",
+      "x1": 467,
+      "y1": 430,
+      "x2": 657,
+      "y2": 427
+    },
+    {
+      "tsid": "LUVQMVII88F2O29",
+      "name": "Rausa Repent",
+      "x1": 45,
+      "y1": 159,
+      "x2": 149,
+      "y2": 207
+    },
+    {
+      "tsid": "LUVFGT16B7G240H",
+      "name": "Tallama Trends",
+      "x1": 564,
+      "y1": 206,
+      "x2": 607,
+      "y2": 293
+    },
+    {
+      "tsid": "LUVTV2TR28F23GO",
+      "name": "Thithi Thrust",
+      "x1": 286,
+      "y1": 423,
+      "x2": 338,
+      "y2": 322
+    },
+    {
+      "tsid": "LUVK3V3GUKF2K88",
+      "name": "Thulam Twist",
+      "x1": 285,
+      "y1": 250,
+      "x2": 337,
+      "y2": 322
+    },
+    {
+      "tsid": "LUVCIHEQCAF28NR",
+      "name": "Vaikasi Rise",
+      "x1": 124,
+      "y1": 393,
+      "x2": 245,
+      "y2": 357
+    },
+    {
+      "tsid": "LUVTHO9HPSF2GJA",
+      "name": "Vaisakha Sack",
+      "x1": 466,
+      "y1": 57,
+      "x2": 593,
+      "y2": 13
+    },
+    {
+      "tsid": "LUVUVJBM5DF2UR6",
+      "name": "Vrish Chi",
+      "x1": 155,
+      "y1": 206,
+      "x2": 224,
+      "y2": 156
+    },
+    {
+      "tsid": "LUV1V6AR27G26QO",
+      "name": "Yugadi Yearns",
+      "x1": 277,
+      "y1": 101,
+      "x2": 405,
+      "y2": 43
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LA5EPQG0FN62PCS",
+      "hub_id": "89",
+      "hubName": "Andra",
+      "label": "To: Andra",
+      "x": 651,
+      "y": 37,
+      "arrow": 15
+    },
+    {
+      "tsid": "LIFIECSPJ082A49",
+      "hub_id": "93",
+      "hubName": "Salatu",
+      "label": "To: Salatu",
+      "x": 718,
+      "y": 296,
+      "arrow": 90
+    },
+    {
+      "tsid": "LDO38FFPUR035D6",
+      "hub_id": "126",
+      "hubName": "Roobrik",
+      "label": "To: Roobrik",
+      "x": 70,
+      "y": 388,
+      "arrow": 270
+    },
+    {
+      "tsid": "LHFPD9KBT5J2D8M",
+      "hub_id": "113",
+      "hubName": "Tahli",
+      "label": "To: Tahli",
+      "x": 73,
+      "y": 36,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_rasana.jpg"
+}

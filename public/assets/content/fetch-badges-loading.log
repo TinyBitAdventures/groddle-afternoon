@@ -1,0 +1,31 @@
+loading_images mapped=2798 unique_fetch=1364
+loading progress 100/1364 ok=2 fail=98 1.6s
+loading progress 200/1364 ok=3 fail=197 2.5s
+loading progress 300/1364 ok=3 fail=297 3.2s
+loading progress 400/1364 ok=3 fail=397 4.3s
+loading progress 500/1364 ok=3 fail=497 5.3s
+loading progress 600/1364 ok=3 fail=597 6.3s
+loading progress 700/1364 ok=3 fail=697 7.1s
+loading progress 800/1364 ok=3 fail=797 8.1s
+loading progress 900/1364 ok=3 fail=897 9.1s
+loading progress 1000/1364 ok=3 fail=997 9.9s
+loading progress 1100/1364 ok=3 fail=1097 11.0s
+loading progress 1200/1364 ok=3 fail=1197 11.9s
+loading progress 1300/1364 ok=3 fail=1297 13.0s
+loading progress 1364/1364 ok=3 fail=1361 13.6s
+badges to fetch=662
+badge progress 50/662 ok=0 fail=50 14.1s
+badge progress 100/662 ok=0 fail=100 14.6s
+badge progress 150/662 ok=0 fail=150 14.8s
+badge progress 200/662 ok=0 fail=200 15.3s
+badge progress 250/662 ok=0 fail=250 15.6s
+badge progress 300/662 ok=0 fail=300 15.9s
+badge progress 350/662 ok=0 fail=350 16.4s
+badge progress 400/662 ok=0 fail=400 16.8s
+badge progress 450/662 ok=0 fail=450 17.3s
+badge progress 500/662 ok=0 fail=500 17.7s
+badge progress 550/662 ok=0 fail=550 18.2s
+badge progress 600/662 ok=0 fail=600 18.5s
+badge progress 650/662 ok=0 fail=650 18.9s
+badge progress 662/662 ok=0 fail=662 19.8s
+DONE loading ok=3 fail=1361 badges ok=0 fail=662 badge_map=0 loading_files=3

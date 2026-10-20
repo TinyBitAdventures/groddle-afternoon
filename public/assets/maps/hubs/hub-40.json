@@ -1,0 +1,73 @@
+{
+  "hubId": "40",
+  "hubName": "Naraka",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_purgatory_69074.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_purgatory_69074.png",
+  "color": "#7b0000",
+  "btm_color": "#2e2325",
+  "top_color": "#4c3c3d",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA5REO5I9OE2KLS",
+      "name": "Dhuma Maya",
+      "x1": 189,
+      "y1": 142,
+      "x2": 531,
+      "y2": 89
+    },
+    {
+      "tsid": "LA5PPFP86NF2FOS",
+      "name": "Hell One",
+      "x1": 256,
+      "y1": 277,
+      "x2": 423,
+      "y2": 361
+    },
+    {
+      "tsid": "LA524M0OMOE2OGT",
+      "name": "Mada Tamaha",
+      "x1": 365,
+      "y1": 290,
+      "x2": 472,
+      "y2": 157
+    },
+    {
+      "tsid": "LA5PV4T79OE2AOA",
+      "name": "Mahatam Audarika",
+      "x1": 423,
+      "y1": 361,
+      "x2": 532,
+      "y2": 89
+    },
+    {
+      "tsid": "LA5RPAFK9OE28GN",
+      "name": "Panka Surazu",
+      "x1": 290,
+      "y1": 160,
+      "x2": 347,
+      "y2": 244
+    },
+    {
+      "tsid": "LA5Q57C99OE2GNU",
+      "name": "Ratna Vitteha",
+      "x1": 189,
+      "y1": 144,
+      "x2": 365,
+      "y2": 290
+    },
+    {
+      "tsid": "LA5S44RM9OE2416",
+      "name": "Valuka Himsa",
+      "x1": 287,
+      "y1": 156,
+      "x2": 474,
+      "y2": 155
+    }
+  ],
+  "hubs": [],
+  "bgLocal": "",
+  "fgLocal": ""
+}

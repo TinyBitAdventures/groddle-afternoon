@@ -1,0 +1,36 @@
+{
+  "hubId": "96",
+  "hubName": "Jethimadh Tower: Mid",
+  "bg": "http://c1.glitch.bz/img/maps/map_fake_island_45490.jpg",
+  "fg": "",
+  "color": "#ff0000",
+  "btm_color": "#606669",
+  "top_color": "#8a9297",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIFPV9EMLT72DP4",
+      "name": "unnnn",
+      "x1": 40,
+      "y1": 40,
+      "x2": 240,
+      "y2": 40
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LIF5UU8FO3029OK",
+      "hub_id": "71",
+      "hubName": "Jethimadh",
+      "label": "To: Jethimadh",
+      "x": 700,
+      "y": 100,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_jethimadh.jpg"
+}

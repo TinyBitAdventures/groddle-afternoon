@@ -1,0 +1,142 @@
+{
+  "hubId": "50",
+  "hubName": "Ilmenskie Caverns",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_ilmenskie_caverns_43684.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_ilmenskie_caverns_43684.png",
+  "color": "#633279",
+  "btm_color": "#464949",
+  "top_color": "#646869",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LLI14TT8T921J21",
+      "name": "Karpal Tunnel",
+      "x1": 160,
+      "y1": 371,
+      "x2": 325,
+      "y2": 210
+    },
+    {
+      "tsid": "LHH112FHF411BUI",
+      "name": "Level 1 East",
+      "x1": 415,
+      "y1": 124,
+      "x2": 491,
+      "y2": 176
+    },
+    {
+      "tsid": "LHH110KCF411NK6",
+      "name": "Level 1 West",
+      "x1": 243,
+      "y1": 191,
+      "x2": 330,
+      "y2": 125
+    },
+    {
+      "tsid": "LLI101QQRA211SM",
+      "name": "Level 2 East",
+      "x1": 491,
+      "y1": 176,
+      "x2": 547,
+      "y2": 211
+    },
+    {
+      "tsid": "LHH1011JSO11ORS",
+      "name": "Level 2 West",
+      "x1": 151,
+      "y1": 253,
+      "x2": 241,
+      "y2": 193
+    },
+    {
+      "tsid": "LLI1D3B2U5715LL",
+      "name": "Level 3 East",
+      "x1": 546,
+      "y1": 210,
+      "x2": 626,
+      "y2": 241
+    },
+    {
+      "tsid": "LLI107JLRU11EM2",
+      "name": "Level 3 West",
+      "x1": 55,
+      "y1": 255,
+      "x2": 148,
+      "y2": 254
+    },
+    {
+      "tsid": "LLI1D2QFT571VQT",
+      "name": "Level 4 East",
+      "x1": 617,
+      "y1": 237,
+      "x2": 727,
+      "y2": 239
+    },
+    {
+      "tsid": "LHH12E1QP611OPA",
+      "name": "The Drop",
+      "x1": 55,
+      "y1": 257,
+      "x2": 55,
+      "y2": 373
+    },
+    {
+      "tsid": "LHH101L162117H2",
+      "name": "The Entrance",
+      "x1": 330,
+      "y1": 124,
+      "x2": 415,
+      "y2": 124
+    },
+    {
+      "tsid": "LLI1D5DO1671QPA",
+      "name": "The Other Drop",
+      "x1": 724,
+      "y1": 60,
+      "x2": 725,
+      "y2": 239
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LIF102FDNU11314",
+      "hub_id": "51",
+      "hubName": "Uralia",
+      "label": "To: Uralia",
+      "x": 309,
+      "y": 108,
+      "arrow": 270
+    },
+    {
+      "tsid": "LM112V6OCA126K1",
+      "hub_id": "78",
+      "hubName": "Ilmenskie Deeps",
+      "label": "To: Ilmenskie Deeps",
+      "x": 55,
+      "y": 399,
+      "arrow": 180
+    },
+    {
+      "tsid": "LIF2IUQJQ571TFL",
+      "hub_id": "51",
+      "hubName": "Uralia",
+      "label": "To: Uralia",
+      "x": 723,
+      "y": 41,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA91JU4QQ712DJN",
+      "hub_id": "78",
+      "hubName": "Ilmenskie Deeps",
+      "label": "To: Ilmenskie Deeps",
+      "x": 724,
+      "y": 264,
+      "arrow": 180
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": ""
+}

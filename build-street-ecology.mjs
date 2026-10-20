@@ -1,0 +1,120 @@
+/**
+ * Build a compact, playable ecology catalog from Tiny Speck's archived
+ * locations-xml item references. The G-prefixed files contain geometry while
+ * their L-prefixed aliases retain the late-game item population snapshot.
+ *
+ * Run from spike root:
+ *   node build-street-ecology.mjs
+ */
+
+import { readFile, writeFile, access } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = dirname(fileURLToPath(import.meta.url));
+const streetIndexPath = join(root, 'public/assets/streets/index.json');
+const outputPath = join(root, 'public/assets/content/street-ecology.json');
+const locationRoot =
+  process.env.GRODDLE_LOCATION_XML ||
+  '/Users/austin/Documents/glitch-audit/streets/mnt/stos/location_data';
+
+const LABEL_TO_CLASS = Object.freeze({
+  Piggy: 'npc_piggy',
+  Chicken: 'npc_chicken',
+  Butterfly: 'npc_butterfly',
+  'Fruit Tree': 'trant_fruit',
+  'Egg Plant': 'trant_egg',
+  'Bean Tree': 'trant_bean',
+  'Bubble Tree': 'trant_bubble',
+  'Spice Plant': 'trant_spice',
+  'Gas Plant': 'trant_gas',
+  'Wood Tree': 'wood_tree',
+  'Metal Rock': 'rock_metal_1',
+  'Dullite Rock': 'rock_dullite_1',
+  'Beryl Rock': 'rock_beryl_1',
+  'Sparkly Rock': 'rock_sparkly_1',
+  Garden: 'garden',
+  'Street Spirit': 'street_spirit',
+});
+
+const GIANT_ALIASES = Object.freeze({
+  alph: 'alph',
+  cosma: 'cosma',
+  friendly: 'friendly',
+  grendaline: 'grendaline',
+  humbaba: 'humbaba',
+  lem: 'lem',
+  mab: 'mab',
+  pot: 'pot',
+  spriggan: 'spriggan',
+  ti: 'ti',
+  tii: 'ti',
+  zille: 'zille',
+});
+
+async function firstReadable(paths) {
+  for (const path of paths) {
+    try {
+      await access(path);
+      return path;
+    } catch {
+      // Try the next canonical/alias snapshot.
+    }
+  }
+  return null;
+}
+
+function locationAliases(tsid) {
+  const out = [];
+  if (tsid.startsWith('G')) out.push(`L${tsid.slice(1)}`);
+  if (tsid.startsWith('L')) out.push(`G${tsid.slice(1)}`);
+  out.push(tsid);
+  return [...new Set(out)];
+}
+
+function itemLabels(xml) {
+  const block = xml.match(/<objrefs id="items">([\s\S]*?)<\/objrefs>/)?.[1] || '';
+  return [...block.matchAll(/<objref\b[^>]*\blabel="([^"]+)"/g)].map((match) => match[1]);
+}
+
+function ecologyFromLabels(labels) {
+  const counts = {};
+  let giantId = null;
+  let spawners = 0;
+  for (const label of labels) {
+    const classTsid = LABEL_TO_CLASS[label];
+    if (classTsid) counts[classTsid] = (counts[classTsid] || 0) + 1;
+    if (label.toLowerCase() === 'spawner') spawners += 1;
+    const shrine = label.match(/(?:Ix )?Shrine (?:for|to) ([A-Za-z]+)/i);
+    if (shrine) giantId = GIANT_ALIASES[shrine[1].toLowerCase()] || giantId;
+  }
+  return { counts, giantId, spawners };
+}
+
+const index = JSON.parse(await readFile(streetIndexPath, 'utf8'));
+const streets = {};
+for (const [tsid, meta] of Object.entries(index.streets || {})) {
+  const candidates = locationAliases(tsid).map((alias) => join(locationRoot, `${alias}.xml`));
+  const sourcePath = await firstReadable(candidates);
+  if (!sourcePath) continue;
+  const sourceTsid = sourcePath.slice(sourcePath.lastIndexOf('/') + 1, -4);
+  const ecology = ecologyFromLabels(itemLabels(await readFile(sourcePath, 'utf8')));
+  if (!Object.keys(ecology.counts).length && !ecology.giantId && !ecology.spawners) continue;
+  streets[tsid] = {
+    label: meta.label || tsid,
+    sourceTsid,
+    counts: ecology.counts,
+    ...(ecology.giantId ? { giantId: ecology.giantId } : {}),
+    ...(ecology.spawners ? { spawners: ecology.spawners } : {}),
+  };
+}
+
+const catalog = {
+  source: 'tinyspeck/glitch-locations locations-xml.zip item references (CC0)',
+  sourceSnapshot: '2012-12 late-game L-prefixed location objects',
+  streetCount: Object.keys(streets).length,
+  streets,
+};
+
+await writeFile(outputPath, `${JSON.stringify(catalog, null, 2)}\n`);
+console.log(`Wrote ${catalog.streetCount} official street ecologies to ${outputPath}`);

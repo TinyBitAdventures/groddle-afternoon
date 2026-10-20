@@ -1,0 +1,357 @@
+{
+  "hubId": "95",
+  "hubName": "Xalanga",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_xalanga_56779.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_xalanga_56739.png",
+  "color": "#8f5200",
+  "btm_color": "#96aaa9",
+  "top_color": "#7d8985",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIFF8NE0BO72CNQ",
+      "name": "Ardent Ave 1",
+      "x1": 269,
+      "y1": 30,
+      "x2": 375,
+      "y2": 67
+    },
+    {
+      "tsid": "LIFF81JT9O72F60",
+      "name": "Ardent Ave 2",
+      "x1": 376,
+      "y1": 69,
+      "x2": 473,
+      "y2": 121
+    },
+    {
+      "tsid": "LIFF7Q3H9O7222R",
+      "name": "Ardent Ave 3",
+      "x1": 476,
+      "y1": 123,
+      "x2": 564,
+      "y2": 176
+    },
+    {
+      "tsid": "LIFF8P93BO72VKV",
+      "name": "Ardent Ave 4",
+      "x1": 566,
+      "y1": 178,
+      "x2": 668,
+      "y2": 223
+    },
+    {
+      "tsid": "LIFF91EEBO723DF",
+      "name": "Deadpan Dike 1",
+      "x1": 245,
+      "y1": 412,
+      "x2": 361,
+      "y2": 375
+    },
+    {
+      "tsid": "LIFF96TLBO72CS3",
+      "name": "Deadpan Dike 2",
+      "x1": 365,
+      "y1": 371,
+      "x2": 464,
+      "y2": 320
+    },
+    {
+      "tsid": "LIFF7O3E9O72HNI",
+      "name": "Deadpan Dike 3",
+      "x1": 469,
+      "y1": 318,
+      "x2": 559,
+      "y2": 274
+    },
+    {
+      "tsid": "LIFF8H8NAO729GM",
+      "name": "Deadpan Dike 4",
+      "x1": 561,
+      "y1": 272,
+      "x2": 668,
+      "y2": 225
+    },
+    {
+      "tsid": "LIFF8TQ8BO72L8G",
+      "name": "Distant Drag A",
+      "x1": 56,
+      "y1": 308,
+      "x2": 158,
+      "y2": 270
+    },
+    {
+      "tsid": "LIFF7PKF9O72UKC",
+      "name": "Distant Drag B",
+      "x1": 163,
+      "y1": 268,
+      "x2": 263,
+      "y2": 216
+    },
+    {
+      "tsid": "LIFF8GBMAO72KNI",
+      "name": "Distant Drag C",
+      "x1": 270,
+      "y1": 211,
+      "x2": 369,
+      "y2": 167
+    },
+    {
+      "tsid": "LIFF84K2AO72945",
+      "name": "Distant Drag D",
+      "x1": 371,
+      "y1": 163,
+      "x2": 474,
+      "y2": 123
+    },
+    {
+      "tsid": "LIFF808S9O724UJ",
+      "name": "Distant Drag E",
+      "x1": 476,
+      "y1": 122,
+      "x2": 581,
+      "y2": 81
+    },
+    {
+      "tsid": "LIFF7T7N9O72TP2",
+      "name": "Distant Drag F",
+      "x1": 583,
+      "y1": 80,
+      "x2": 696,
+      "y2": 74
+    },
+    {
+      "tsid": "LIFF8LVSAO72S3C",
+      "name": "Fervor Tack A",
+      "x1": 54,
+      "y1": 60,
+      "x2": 168,
+      "y2": 69
+    },
+    {
+      "tsid": "LIFF92MGBO72DPK",
+      "name": "Fervor Tack B",
+      "x1": 172,
+      "y1": 70,
+      "x2": 271,
+      "y2": 109
+    },
+    {
+      "tsid": "LIFF7RSJ9O725F1",
+      "name": "Fervor Tack C",
+      "x1": 271,
+      "y1": 111,
+      "x2": 371,
+      "y2": 167
+    },
+    {
+      "tsid": "LIFF8B1GAO72GIC",
+      "name": "Fervor Tack D",
+      "x1": 373,
+      "y1": 169,
+      "x2": 463,
+      "y2": 217
+    },
+    {
+      "tsid": "LIFF8VNBBO72B2C",
+      "name": "Fervor Tack E",
+      "x1": 463,
+      "y1": 218,
+      "x2": 557,
+      "y2": 271
+    },
+    {
+      "tsid": "LIFF8EOJAO72U8U",
+      "name": "Fervor Tack F",
+      "x1": 560,
+      "y1": 275,
+      "x2": 677,
+      "y2": 316
+    },
+    {
+      "tsid": "LIFF829V9O7221M",
+      "name": "Hazy Gate 1",
+      "x1": 82,
+      "y1": 410,
+      "x2": 163,
+      "y2": 357
+    },
+    {
+      "tsid": "LIFF8R57BO72VDS",
+      "name": "Hazy Gate 2",
+      "x1": 165,
+      "y1": 356,
+      "x2": 267,
+      "y2": 320
+    },
+    {
+      "tsid": "LIFF8A7EAO72NPH",
+      "name": "Hazy Gate 3",
+      "x1": 271,
+      "y1": 318,
+      "x2": 358,
+      "y2": 268
+    },
+    {
+      "tsid": "LIFF892CAO72FUN",
+      "name": "Hazy Gate 4",
+      "x1": 363,
+      "y1": 266,
+      "x2": 459,
+      "y2": 219
+    },
+    {
+      "tsid": "LIFF88AAAO72MQ9",
+      "name": "Hazy Gate 5",
+      "x1": 466,
+      "y1": 217,
+      "x2": 561,
+      "y2": 177
+    },
+    {
+      "tsid": "LIFF949JBO728GK",
+      "name": "Hazy Gate 6",
+      "x1": 565,
+      "y1": 175,
+      "x2": 672,
+      "y2": 135
+    },
+    {
+      "tsid": "LIFF85Q3AO72TIV",
+      "name": "Languid Line S",
+      "x1": 273,
+      "y1": 321,
+      "x2": 365,
+      "y2": 373
+    },
+    {
+      "tsid": "LIFF8ITNAO72C6N",
+      "name": "Languid Line SE",
+      "x1": 369,
+      "y1": 375,
+      "x2": 486,
+      "y2": 417
+    },
+    {
+      "tsid": "LIFF8JAQAO72U81",
+      "name": "Languid Line SW",
+      "x1": 164,
+      "y1": 268,
+      "x2": 265,
+      "y2": 316
+    },
+    {
+      "tsid": "LIFF86N5AO72UVT",
+      "name": "Languid Line W",
+      "x1": 66,
+      "y1": 212,
+      "x2": 162,
+      "y2": 268
+    },
+    {
+      "tsid": "LIFF8OI1BO72KC1",
+      "name": "Ramble Way 1",
+      "x1": 56,
+      "y1": 129,
+      "x2": 163,
+      "y2": 155
+    },
+    {
+      "tsid": "LIFF87R8AO72P6D",
+      "name": "Ramble Way 2",
+      "x1": 170,
+      "y1": 159,
+      "x2": 267,
+      "y2": 213
+    },
+    {
+      "tsid": "LIFF8C3IAO7210R",
+      "name": "Ramble Way 3",
+      "x1": 267,
+      "y1": 215,
+      "x2": 363,
+      "y2": 264
+    },
+    {
+      "tsid": "LIFF7UIP9O724RP",
+      "name": "Ramble Way 4",
+      "x1": 366,
+      "y1": 267,
+      "x2": 465,
+      "y2": 319
+    },
+    {
+      "tsid": "LIFF8K9RAO72LP5",
+      "name": "Ramble Way 5",
+      "x1": 464,
+      "y1": 322,
+      "x2": 578,
+      "y2": 359
+    },
+    {
+      "tsid": "LIFF8FOKAO722CT",
+      "name": "Ramble Way 6",
+      "x1": 580,
+      "y1": 360,
+      "x2": 661,
+      "y2": 419
+    },
+    {
+      "tsid": "LIFF7V2R9O72MUP",
+      "name": "Zealous Rd N",
+      "x1": 275,
+      "y1": 109,
+      "x2": 374,
+      "y2": 69
+    },
+    {
+      "tsid": "LIFF95RKBO72R2Q",
+      "name": "Zealous Rd NE",
+      "x1": 376,
+      "y1": 68,
+      "x2": 491,
+      "y2": 32
+    },
+    {
+      "tsid": "LIFF8D0JAO72UM0",
+      "name": "Zealous Rd NW",
+      "x1": 171,
+      "y1": 156,
+      "x2": 271,
+      "y2": 112
+    },
+    {
+      "tsid": "LIFF83D0AO72SUG",
+      "name": "Zealous Rd W",
+      "x1": 67,
+      "y1": 210,
+      "x2": 170,
+      "y2": 156
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LA513A7M0J521F2",
+      "hub_id": "91",
+      "hubName": "Zhambu",
+      "label": "To: Zhambu",
+      "x": 226,
+      "y": 420,
+      "arrow": 180
+    },
+    {
+      "tsid": "LIFNNL3OJG52OKJ",
+      "hub_id": "90",
+      "hubName": "Choru",
+      "label": "To: Choru",
+      "x": 692,
+      "y": 129,
+      "arrow": 90
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_xalanga.jpg"
+}

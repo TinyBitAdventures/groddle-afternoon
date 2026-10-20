@@ -1,0 +1,366 @@
+{
+  "hubId": "91",
+  "hubName": "Zhambu",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_zhambu_56779.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_zhambu_53974.png",
+  "color": "#d88a00",
+  "btm_color": "#94aca2",
+  "top_color": "#7d8b82",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA5132LA0J526JJ",
+      "name": "Boor Bane A",
+      "x1": 48,
+      "y1": 339,
+      "x2": 107,
+      "y2": 270
+    },
+    {
+      "tsid": "LA5131390J52DJR",
+      "name": "Boor Bane B",
+      "x1": 108,
+      "y1": 268,
+      "x2": 180,
+      "y2": 204
+    },
+    {
+      "tsid": "LA512V480J52NMN",
+      "name": "Boor Bane C",
+      "x1": 176,
+      "y1": 205,
+      "x2": 265,
+      "y2": 148
+    },
+    {
+      "tsid": "LA5139FL0J52SP5",
+      "name": "Boor Bane D",
+      "x1": 267,
+      "y1": 145,
+      "x2": 360,
+      "y2": 112
+    },
+    {
+      "tsid": "LA513CDN0J52ND9",
+      "name": "Boor Bane E",
+      "x1": 363,
+      "y1": 111,
+      "x2": 473,
+      "y2": 79
+    },
+    {
+      "tsid": "LA513S9U0J52SKD",
+      "name": "Boor Bane F",
+      "x1": 476,
+      "y1": 79,
+      "x2": 573,
+      "y2": 31
+    },
+    {
+      "tsid": "LA5138OK0J526HB",
+      "name": "Chuff Chase 1",
+      "x1": 95,
+      "y1": 139,
+      "x2": 176,
+      "y2": 204
+    },
+    {
+      "tsid": "LA5145S31J52BA2",
+      "name": "Chuff Chase 2",
+      "x1": 179,
+      "y1": 208,
+      "x2": 278,
+      "y2": 257
+    },
+    {
+      "tsid": "LA5144431J524TC",
+      "name": "Chuff Chase 3",
+      "x1": 282,
+      "y1": 258,
+      "x2": 376,
+      "y2": 305
+    },
+    {
+      "tsid": "LA5147561J525G7",
+      "name": "Chuff Chase 4",
+      "x1": 379,
+      "y1": 307,
+      "x2": 462,
+      "y2": 372
+    },
+    {
+      "tsid": "LA5137QE0J52UB8",
+      "name": "Cornfed Crt A",
+      "x1": 43,
+      "y1": 208,
+      "x2": 109,
+      "y2": 271
+    },
+    {
+      "tsid": "LA5148N71J5237C",
+      "name": "Cornfed Crt B",
+      "x1": 109,
+      "y1": 270,
+      "x2": 194,
+      "y2": 318
+    },
+    {
+      "tsid": "LA5130090J525IQ",
+      "name": "Cornfed Crt C",
+      "x1": 197,
+      "y1": 320,
+      "x2": 284,
+      "y2": 362
+    },
+    {
+      "tsid": "LA513PFS0J52F45",
+      "name": "Cornfed Crt D",
+      "x1": 284,
+      "y1": 363,
+      "x2": 383,
+      "y2": 403
+    },
+    {
+      "tsid": "LA513A7M0J521F2",
+      "name": "Loutish Ln A",
+      "x1": 270,
+      "y1": 65,
+      "x2": 360,
+      "y2": 110
+    },
+    {
+      "tsid": "LA512T760J52JMS",
+      "name": "Loutish Ln B",
+      "x1": 363,
+      "y1": 113,
+      "x2": 467,
+      "y2": 166
+    },
+    {
+      "tsid": "LA513BTM0J524D4",
+      "name": "Loutish Ln C",
+      "x1": 468,
+      "y1": 169,
+      "x2": 560,
+      "y2": 216
+    },
+    {
+      "tsid": "LA513KEP0J52N21",
+      "name": "Loutish Ln D",
+      "x1": 563,
+      "y1": 217,
+      "x2": 630,
+      "y2": 296
+    },
+    {
+      "tsid": "LA513RIT0J52F6P",
+      "name": "Rube's Way 1",
+      "x1": 71,
+      "y1": 71,
+      "x2": 169,
+      "y2": 94
+    },
+    {
+      "tsid": "LA5143921J52F9U",
+      "name": "Rube's Way 2",
+      "x1": 171,
+      "y1": 96,
+      "x2": 262,
+      "y2": 148
+    },
+    {
+      "tsid": "LA513JAO0J5220P",
+      "name": "Rube's Way 3",
+      "x1": 264,
+      "y1": 149,
+      "x2": 372,
+      "y2": 205
+    },
+    {
+      "tsid": "LA513NJQ0J523F2",
+      "name": "Rube's Way 4",
+      "x1": 375,
+      "y1": 207,
+      "x2": 476,
+      "y2": 271
+    },
+    {
+      "tsid": "LA5134PC0J52VC3",
+      "name": "Rube's Way 5",
+      "x1": 477,
+      "y1": 274,
+      "x2": 552,
+      "y2": 347
+    },
+    {
+      "tsid": "LA5135VC0J52RGQ",
+      "name": "Rube's Way 6",
+      "x1": 551,
+      "y1": 346,
+      "x2": 657,
+      "y2": 399
+    },
+    {
+      "tsid": "LA513MGQ0J52Q8S",
+      "name": "Rustic Rd E",
+      "x1": 650,
+      "y1": 176,
+      "x2": 704,
+      "y2": 249
+    },
+    {
+      "tsid": "LA513TDU0J524CU",
+      "name": "Rustic Rd N",
+      "x1": 473,
+      "y1": 80,
+      "x2": 567,
+      "y2": 122
+    },
+    {
+      "tsid": "LA5142521J52DH8",
+      "name": "Rustic Rd NE",
+      "x1": 565,
+      "y1": 120,
+      "x2": 648,
+      "y2": 176
+    },
+    {
+      "tsid": "LA513LMP0J52V1C",
+      "name": "Rustic Rd NW",
+      "x1": 378,
+      "y1": 45,
+      "x2": 472,
+      "y2": 79
+    },
+    {
+      "tsid": "LA512UR70J52M1G",
+      "name": "Swain Way 1",
+      "x1": 204,
+      "y1": 421,
+      "x2": 282,
+      "y2": 364
+    },
+    {
+      "tsid": "LA513QET0J523AD",
+      "name": "Swain Way 2",
+      "x1": 289,
+      "y1": 362,
+      "x2": 375,
+      "y2": 308
+    },
+    {
+      "tsid": "LA5136CE0J52562",
+      "name": "Swain Way 3",
+      "x1": 375,
+      "y1": 304,
+      "x2": 471,
+      "y2": 272
+    },
+    {
+      "tsid": "LA514HDC2J52TOU",
+      "name": "Swain Way 4",
+      "x1": 477,
+      "y1": 270,
+      "x2": 557,
+      "y2": 218
+    },
+    {
+      "tsid": "LA513I7O0J52MO0",
+      "name": "Swain Way 5",
+      "x1": 562,
+      "y1": 215,
+      "x2": 651,
+      "y2": 177
+    },
+    {
+      "tsid": "LA514JHG3J52E88",
+      "name": "Swain Way 6",
+      "x1": 652,
+      "y1": 173,
+      "x2": 717,
+      "y2": 109
+    },
+    {
+      "tsid": "LA5146Q41J528U9",
+      "name": "Yokel Yarn 1",
+      "x1": 108,
+      "y1": 384,
+      "x2": 193,
+      "y2": 323
+    },
+    {
+      "tsid": "LA5133PB0J522JA",
+      "name": "Yokel Yarn 2",
+      "x1": 198,
+      "y1": 317,
+      "x2": 282,
+      "y2": 259
+    },
+    {
+      "tsid": "LA5140E01J52TLO",
+      "name": "Yokel Yarn 3",
+      "x1": 283,
+      "y1": 257,
+      "x2": 372,
+      "y2": 208
+    },
+    {
+      "tsid": "LA512SK50J52F8M",
+      "name": "Yokel Yarn 4",
+      "x1": 375,
+      "y1": 205,
+      "x2": 468,
+      "y2": 168
+    },
+    {
+      "tsid": "LA514K0J3J52ID0",
+      "name": "Yokel Yarn 5",
+      "x1": 469,
+      "y1": 166,
+      "x2": 566,
+      "y2": 122
+    },
+    {
+      "tsid": "LA513OVR0J52BMT",
+      "name": "Yokel Yarn 6",
+      "x1": 565,
+      "y1": 119,
+      "x2": 659,
+      "y2": 69
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LIFF91EEBO723DF",
+      "hub_id": "95",
+      "hubName": "Xalanga",
+      "label": "To: Xalanga",
+      "x": 253,
+      "y": 55,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA5ASS2OEH42TSV",
+      "hub_id": "86",
+      "hubName": "Baqala",
+      "label": "To: Baqala",
+      "x": 712,
+      "y": 258,
+      "arrow": 90
+    },
+    {
+      "tsid": "LA517JJML262LT0",
+      "hub_id": "89",
+      "hubName": "Andra",
+      "label": "To: Andra",
+      "x": 399,
+      "y": 416,
+      "arrow": 180
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_zhambu.jpg"
+}

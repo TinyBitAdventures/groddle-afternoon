@@ -1,0 +1,26 @@
+{
+  "hubId": "69",
+  "hubName": "Bureaucratic Hall",
+  "bg": "http://c1.glitch.bz/img/maps/map_fake_island_45490.jpg",
+  "fg": "",
+  "color": "#ff0000",
+  "btm_color": "#606669",
+  "top_color": "#8a9297",
+  "mote_id": "10",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [],
+  "hubs": [
+    {
+      "tsid": "LLI32G3NUTD100I",
+      "hub_id": "58",
+      "hubName": "Groddle Meadow",
+      "label": "To: Groddle Meadow",
+      "x": 700,
+      "y": 100,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": ""
+}

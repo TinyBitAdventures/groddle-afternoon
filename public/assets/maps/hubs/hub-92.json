@@ -1,0 +1,312 @@
+{
+  "hubId": "92",
+  "hubName": "Tamila",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-24/tamila_bg_1335307197.jpg",
+  "fg": "http://c2.glitch.bz/client_maps/2012-04-24/tamila_fg_1335307197.png",
+  "color": "#718f00",
+  "btm_color": "#7d8988",
+  "top_color": "#96a6aa",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIF7SHGS3E72T8L",
+      "name": "Afar Whence",
+      "x1": 342,
+      "y1": 318,
+      "x2": 404,
+      "y2": 388
+    },
+    {
+      "tsid": "LIF14ULAV8720HD",
+      "name": "Ambo Aims",
+      "x1": 339,
+      "y1": 314,
+      "x2": 395,
+      "y2": 241
+    },
+    {
+      "tsid": "LIF14PFVU872CSG",
+      "name": "Awagni Walk",
+      "x1": 209,
+      "y1": 47,
+      "x2": 299,
+      "y2": 75
+    },
+    {
+      "tsid": "LIFF11B2RE72HMI",
+      "name": "Bulaa Clacks",
+      "x1": 491,
+      "y1": 223,
+      "x2": 605,
+      "y2": 221
+    },
+    {
+      "tsid": "LIF153KDV872SE5",
+      "name": "Buna Belt",
+      "x1": 242,
+      "y1": 337,
+      "x2": 271,
+      "y2": 247
+    },
+    {
+      "tsid": "LIFVTRAAJE72GHD",
+      "name": "Chari Chalks",
+      "x1": 405,
+      "y1": 389,
+      "x2": 517,
+      "y2": 349
+    },
+    {
+      "tsid": "LIF1FHVC1C72HEJ",
+      "name": "Ensete Sets",
+      "x1": 271,
+      "y1": 242,
+      "x2": 325,
+      "y2": 158
+    },
+    {
+      "tsid": "LIFN23NRGG72NRR",
+      "name": "Firfire Frees",
+      "x1": 388,
+      "y1": 41,
+      "x2": 416,
+      "y2": 109
+    },
+    {
+      "tsid": "LIF14RQ7V872TPR",
+      "name": "Gedeo Grails",
+      "x1": 66,
+      "y1": 379,
+      "x2": 144,
+      "y2": 310
+    },
+    {
+      "tsid": "LIF14TS9V872U9I",
+      "name": "Geeze Bets",
+      "x1": 302,
+      "y1": 78,
+      "x2": 327,
+      "y2": 158
+    },
+    {
+      "tsid": "LIF16GDJ89724E3",
+      "name": "Goorsh Gam",
+      "x1": 396,
+      "y1": 240,
+      "x2": 478,
+      "y2": 289
+    },
+    {
+      "tsid": "LIF14S69V872E2N",
+      "name": "Gurag Green",
+      "x1": 236,
+      "y1": 157,
+      "x2": 270,
+      "y2": 240
+    },
+    {
+      "tsid": "LIF14OKTU8722CQ",
+      "name": "Injeba Wedge",
+      "x1": 52,
+      "y1": 152,
+      "x2": 139,
+      "y2": 126
+    },
+    {
+      "tsid": "LDORJMMHCDT2J08",
+      "name": "Jansib Preserve",
+      "x1": 551,
+      "y1": 381,
+      "x2": 682,
+      "y2": 367
+    },
+    {
+      "tsid": "LIFIEGBN9E72ILT",
+      "name": "Jeban Journey",
+      "x1": 180,
+      "y1": 414,
+      "x2": 241,
+      "y2": 341
+    },
+    {
+      "tsid": "LIF152TCV8720Q6",
+      "name": "Kebra Glories",
+      "x1": 512,
+      "y1": 129,
+      "x2": 627,
+      "y2": 56
+    },
+    {
+      "tsid": "LIF1502CV8729RP",
+      "name": "Kifti Crown",
+      "x1": 273,
+      "y1": 246,
+      "x2": 340,
+      "y2": 317
+    },
+    {
+      "tsid": "LIF1662B8972C00",
+      "name": "Maale Bads",
+      "x1": 604,
+      "y1": 221,
+      "x2": 635,
+      "y2": 301
+    },
+    {
+      "tsid": "LDOFQEEIHDT2QNS",
+      "name": "Manoq Preserve",
+      "x1": 370,
+      "y1": 279,
+      "x2": 471,
+      "y2": 338
+    },
+    {
+      "tsid": "LIF16PJS9972LC8",
+      "name": "Meade Weeds",
+      "x1": 143,
+      "y1": 310,
+      "x2": 241,
+      "y2": 340
+    },
+    {
+      "tsid": "LIF14QE5V872L2E",
+      "name": "Mesekel Maybes",
+      "x1": 143,
+      "y1": 126,
+      "x2": 235,
+      "y2": 156
+    },
+    {
+      "tsid": "LIF16TPLB972GKV",
+      "name": "Meskel Move",
+      "x1": 329,
+      "y1": 159,
+      "x2": 398,
+      "y2": 239
+    },
+    {
+      "tsid": "LIF160988972VND",
+      "name": "Mesob Medium",
+      "x1": 519,
+      "y1": 354,
+      "x2": 599,
+      "y2": 423
+    },
+    {
+      "tsid": "LIF14VBBV872N2I",
+      "name": "Prutki Pardons",
+      "x1": 497,
+      "y1": 218,
+      "x2": 514,
+      "y2": 131
+    },
+    {
+      "tsid": "LIF18V95I972R96",
+      "name": "Qabena Quaint",
+      "x1": 164,
+      "y1": 253,
+      "x2": 269,
+      "y2": 245
+    },
+    {
+      "tsid": "LDOKTFQ22DT2OEL",
+      "name": "Samga Preserve",
+      "x1": 617,
+      "y1": 251,
+      "x2": 740,
+      "y2": 283
+    },
+    {
+      "tsid": "LIF16CPE89723EI",
+      "name": "Sheba Shales",
+      "x1": 607,
+      "y1": 220,
+      "x2": 691,
+      "y2": 177
+    },
+    {
+      "tsid": "LIF1AJ58K972JHJ",
+      "name": "Sini Shake",
+      "x1": 326,
+      "y1": 158,
+      "x2": 416,
+      "y2": 112
+    },
+    {
+      "tsid": "LIF154IEV872JTD",
+      "name": "Tejj Trades",
+      "x1": 399,
+      "y1": 237,
+      "x2": 492,
+      "y2": 222
+    },
+    {
+      "tsid": "LIF16IHL8972EAC",
+      "name": "Tella Hella",
+      "x1": 477,
+      "y1": 287,
+      "x2": 518,
+      "y2": 353
+    },
+    {
+      "tsid": "LIFU9C04IE72O8K",
+      "name": "Xhola Mades",
+      "x1": 419,
+      "y1": 111,
+      "x2": 513,
+      "y2": 128
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LA5J7IB1HK42N3D",
+      "hub_id": "86",
+      "hubName": "Baqala",
+      "label": "To: Baqala",
+      "x": 38,
+      "y": 152,
+      "arrow": 250
+    },
+    {
+      "tsid": "LHFET4I773D2OUU",
+      "hub_id": "106",
+      "hubName": "Pollokoo",
+      "label": "To: Pollokoo",
+      "x": 626,
+      "y": 49,
+      "arrow": 60
+    },
+    {
+      "tsid": "LHV1H1EHOF32UJM",
+      "hub_id": "75",
+      "hubName": "Bortola",
+      "label": "To: Bortola",
+      "x": 614,
+      "y": 433,
+      "arrow": 180
+    },
+    {
+      "tsid": "LA9KLA8H1D82JM3",
+      "hub_id": "97",
+      "hubName": "Muufo",
+      "label": "To: Muufo",
+      "x": 707,
+      "y": 167,
+      "arrow": 70
+    },
+    {
+      "tsid": "LA91195E8492R4B",
+      "hub_id": "98",
+      "hubName": "Besara",
+      "label": "To: Besara",
+      "x": 383,
+      "y": 27,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_tamila.jpg"
+}

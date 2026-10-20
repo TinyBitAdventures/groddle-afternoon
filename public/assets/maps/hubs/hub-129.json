@@ -1,0 +1,65 @@
+{
+  "hubId": "129",
+  "hubName": "Gentle Island",
+  "bg": "http://c2.glitch.bz/client_maps/2012-07-26/gentle_island_bg_1343348721.jpg",
+  "fg": "",
+  "color": "5289a8",
+  "btm_color": "6f8c8e",
+  "top_color": "94b1b3",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA94AEO5H3D35LP",
+      "name": "Diversionary Path",
+      "x1": 249,
+      "y1": 188,
+      "x2": 279,
+      "y2": 291
+    },
+    {
+      "tsid": "LA94GCF7H3D30IM",
+      "name": "Doonboggle Trail",
+      "x1": 321,
+      "y1": 212,
+      "x2": 429,
+      "y2": 159
+    },
+    {
+      "tsid": "LA93VBH3H3D38HF",
+      "name": "Gentle Island Exit",
+      "x1": 488,
+      "y1": 297,
+      "x2": 623,
+      "y2": 348
+    },
+    {
+      "tsid": "LA94O989H3D3RN7",
+      "name": "High Jumper's Gully",
+      "x1": 257,
+      "y1": 189,
+      "x2": 383,
+      "y2": 230
+    },
+    {
+      "tsid": "LA94UK1BH3D3FJL",
+      "name": "Progress Way",
+      "x1": 384,
+      "y1": 232,
+      "x2": 489,
+      "y2": 298
+    },
+    {
+      "tsid": "LA952QGCH3D31E2",
+      "name": "Surveyor's Stroll",
+      "x1": 129,
+      "y1": 104,
+      "x2": 253,
+      "y2": 186
+    }
+  ],
+  "hubs": [],
+  "bgLocal": "",
+  "fgLocal": ""
+}

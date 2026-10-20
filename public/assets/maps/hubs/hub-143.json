@@ -1,0 +1,156 @@
+{
+  "hubId": "143",
+  "hubName": "Vortex of Random",
+  "bg": "http://c2.glitch.bz/client_maps/2012-11-26/vortex_of_random_bg_1353920017.jpg",
+  "fg": "",
+  "color": "#009995",
+  "btm_color": "#7d8987",
+  "top_color": "#96a7aa",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA9R4OR505F3PSL",
+      "name": "Abbasid Jail",
+      "x1": 275,
+      "y1": 447,
+      "x2": 486,
+      "y2": 448
+    },
+    {
+      "tsid": "LA9R6BM705F3L3N",
+      "name": "Abbasid River",
+      "x1": 77,
+      "y1": 410,
+      "x2": 276,
+      "y2": 446
+    },
+    {
+      "tsid": "LA9R3FG405F3B9P",
+      "name": "Abbasid Walkway",
+      "x1": 488,
+      "y1": 448,
+      "x2": 690,
+      "y2": 413
+    },
+    {
+      "tsid": "LA9RMUNU05F3EI8",
+      "name": "Ain't That Dry",
+      "x1": 567,
+      "y1": 349,
+      "x2": 690,
+      "y2": 410
+    },
+    {
+      "tsid": "LA9QTSIOV4F31QH",
+      "name": "Bliss",
+      "x1": 59,
+      "y1": 69,
+      "x2": 279,
+      "y2": 25
+    },
+    {
+      "tsid": "LA9Q9EQ5V4F33RE",
+      "name": "Downside Up",
+      "x1": 315,
+      "y1": 86,
+      "x2": 369,
+      "y2": 245
+    },
+    {
+      "tsid": "LA9R9KCC05F3VOU",
+      "name": "Firebog Deeps",
+      "x1": 395,
+      "y1": 247,
+      "x2": 439,
+      "y2": 380
+    },
+    {
+      "tsid": "LA9S09UB15F34AE",
+      "name": "Giant Kitchen",
+      "x1": 74,
+      "y1": 409,
+      "x2": 186,
+      "y2": 351
+    },
+    {
+      "tsid": "LA9S04AB15F3H53",
+      "name": "Giant Living Room",
+      "x1": 188,
+      "y1": 351,
+      "x2": 329,
+      "y2": 375
+    },
+    {
+      "tsid": "LA9QQQ8LV4F3TJ2",
+      "name": "May Soup",
+      "x1": 138,
+      "y1": 53,
+      "x2": 316,
+      "y2": 84
+    },
+    {
+      "tsid": "LA9RKS1O05F33Q1",
+      "name": "Mental Space",
+      "x1": 394,
+      "y1": 244,
+      "x2": 455,
+      "y2": 80
+    },
+    {
+      "tsid": "LA96OS42D6F3M9P",
+      "name": "Piano Party",
+      "x1": 281,
+      "y1": 25,
+      "x2": 452,
+      "y2": 23
+    },
+    {
+      "tsid": "LA9QMIMHV4F3RHN",
+      "name": "Rook Cemetery",
+      "x1": 331,
+      "y1": 375,
+      "x2": 368,
+      "y2": 246
+    },
+    {
+      "tsid": "LA9RM4IT05F3B4M",
+      "name": "Savanna Sunset",
+      "x1": 441,
+      "y1": 382,
+      "x2": 566,
+      "y2": 350
+    },
+    {
+      "tsid": "LA9RFQBJ05F33D7",
+      "name": "Shivering Isles",
+      "x1": 454,
+      "y1": 23,
+      "x2": 658,
+      "y2": 49
+    },
+    {
+      "tsid": "LA9QNMSIV4F3143",
+      "name": "Volcano Villa",
+      "x1": 456,
+      "y1": 79,
+      "x2": 659,
+      "y2": 52
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LUVH137RPTC3IJ6",
+      "hub_id": "140",
+      "hubName": "Samudra",
+      "label": "To: Samudra",
+      "x": 70,
+      "y": 70,
+      "arrow": 340
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_vortex.jpg"
+}

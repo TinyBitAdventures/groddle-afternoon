@@ -1,0 +1,128 @@
+{
+  "hubId": "142",
+  "hubName": "Moshi Moshi Oshilatis",
+  "bg": "http://c2.glitch.bz/client_maps/2012-11-09/moshi_moshi_oshilatis_bg_1352509438.jpg",
+  "fg": "",
+  "color": "44a700",
+  "btm_color": "5f595e",
+  "top_color": "756b71",
+  "mote_id": "10",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA9TCL1H7LD37DC",
+      "name": "Bilicious Blues",
+      "x1": 230,
+      "y1": 165,
+      "x2": 267,
+      "y2": 317
+    },
+    {
+      "tsid": "LA9TKSRJ7LD3SGK",
+      "name": "Duodenal Browns",
+      "x1": 582,
+      "y1": 316,
+      "x2": 662,
+      "y2": 185
+    },
+    {
+      "tsid": "LA931BPTNLD3E35",
+      "name": "Glutton Greens",
+      "x1": 411,
+      "y1": 315,
+      "x2": 422,
+      "y2": 162
+    },
+    {
+      "tsid": "LA9U27HN7LD3FVE",
+      "name": "Greyving Grays",
+      "x1": 328,
+      "y1": 151,
+      "x2": 344,
+      "y2": 314
+    },
+    {
+      "tsid": "LA9UCEFP7LD3523",
+      "name": "Organish Chute",
+      "x1": 495,
+      "y1": 317,
+      "x2": 531,
+      "y2": 167
+    },
+    {
+      "tsid": "LA9BT2I0ILD340S",
+      "name": "Shim Shiri",
+      "x1": 91,
+      "y1": 319,
+      "x2": 646,
+      "y2": 318
+    },
+    {
+      "tsid": "LA9UIKNQ7LD3SN0",
+      "name": "Yellow Yawning",
+      "x1": 110,
+      "y1": 182,
+      "x2": 175,
+      "y2": 319
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LIFR1RLV0G43647",
+      "hub_id": "133",
+      "hubName": "Kloro",
+      "label": "To: Kloro",
+      "x": 224,
+      "y": 145,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA9T7IFRDIA2N0K",
+      "hub_id": "99",
+      "hubName": "Kalavana",
+      "label": "To: Kalavana",
+      "x": 672,
+      "y": 168,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIF153KDV872SE5",
+      "hub_id": "92",
+      "hubName": "Tamila",
+      "label": "To: Tamila",
+      "x": 327,
+      "y": 135,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA5GNCQ4T3137M7",
+      "hub_id": "128",
+      "hubName": "Balzare",
+      "label": "To: Balzare",
+      "x": 537,
+      "y": 148,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIFF8A7EAO72NPH",
+      "hub_id": "95",
+      "hubName": "Xalanga",
+      "label": "To: Xalanga",
+      "x": 104,
+      "y": 169,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA5AAB0VNKR2VRN",
+      "hub_id": "121",
+      "hubName": "Sura",
+      "label": "To: Sura",
+      "x": 425,
+      "y": 136,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": ""
+}

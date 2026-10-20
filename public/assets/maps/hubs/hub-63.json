@@ -1,0 +1,328 @@
+{
+  "hubId": "63",
+  "hubName": "Shimla Mirch",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_shimla_mirch_59153.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_shimla_mirch_59153.png",
+  "color": "#545454",
+  "btm_color": "7c7d88",
+  "top_color": "9596a9",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LTJ105NEFDQ1H97",
+      "name": "Basabasa",
+      "x1": 439,
+      "y1": 228,
+      "x2": 528,
+      "y2": 307
+    },
+    {
+      "tsid": "LTJLTCN21IQ1URB",
+      "name": "Blottnass",
+      "x1": 527,
+      "y1": 306,
+      "x2": 579,
+      "y2": 212
+    },
+    {
+      "tsid": "LTJ1024R2DQ1B5S",
+      "name": "Clam Calumny",
+      "x1": 186,
+      "y1": 391,
+      "x2": 298,
+      "y2": 404
+    },
+    {
+      "tsid": "LTJ12E6VSFQ1V4E",
+      "name": "Fjarcke",
+      "x1": 579,
+      "y1": 212,
+      "x2": 652,
+      "y2": 172
+    },
+    {
+      "tsid": "LTJ103U2KJK1BLG",
+      "name": "Froughtful Fen",
+      "x1": 273,
+      "y1": 136,
+      "x2": 463,
+      "y2": 44
+    },
+    {
+      "tsid": "LTJ102GGGJK1VDO",
+      "name": "Harbinger Heath",
+      "x1": 55,
+      "y1": 332,
+      "x2": 235,
+      "y2": 213
+    },
+    {
+      "tsid": "LTJ1013E97K17P1",
+      "name": "Heckes",
+      "x1": 361,
+      "y1": 275,
+      "x2": 507,
+      "y2": 187
+    },
+    {
+      "tsid": "LTJ11BUJ57K1VUV",
+      "name": "Humus Hollow",
+      "x1": 361,
+      "y1": 274,
+      "x2": 406,
+      "y2": 352
+    },
+    {
+      "tsid": "LTJ112E9DIO1BPE",
+      "name": "Leeteg",
+      "x1": 30,
+      "y1": 253,
+      "x2": 143,
+      "y2": 208
+    },
+    {
+      "tsid": "LTJ17MOFE6P1NJ3",
+      "name": "Likom\u00e4rk\u00e4",
+      "x1": 30,
+      "y1": 254,
+      "x2": 81,
+      "y2": 314
+    },
+    {
+      "tsid": "LLI4HJ9GRLI1C4E",
+      "name": "Lowland Slough",
+      "x1": 265,
+      "y1": 36,
+      "x2": 281,
+      "y2": 192
+    },
+    {
+      "tsid": "LTJ13ELOLPQ1DP3",
+      "name": "Marga Mooch",
+      "x1": 143,
+      "y1": 209,
+      "x2": 175,
+      "y2": 109
+    },
+    {
+      "tsid": "LLI599R12JI1216",
+      "name": "Maybe Marsh",
+      "x1": 161,
+      "y1": 263,
+      "x2": 182,
+      "y2": 386
+    },
+    {
+      "tsid": "LLI57FTH2HI17PN",
+      "name": "Metch Morass",
+      "x1": 301,
+      "y1": 405,
+      "x2": 361,
+      "y2": 275
+    },
+    {
+      "tsid": "LTJ102C4FFQ1Q6O",
+      "name": "Mokkar Mill",
+      "x1": 406,
+      "y1": 353,
+      "x2": 501,
+      "y2": 419
+    },
+    {
+      "tsid": "LTJ11TPQUMO197U",
+      "name": "Mucid Memes",
+      "x1": 29,
+      "y1": 157,
+      "x2": 118,
+      "y2": 120
+    },
+    {
+      "tsid": "LTJ102LVLDQ1NGH",
+      "name": "Mullat",
+      "x1": 501,
+      "y1": 417,
+      "x2": 528,
+      "y2": 307
+    },
+    {
+      "tsid": "LTJ108JAODQ11KH",
+      "name": "Nagu Keel",
+      "x1": 256,
+      "y1": 292,
+      "x2": 327,
+      "y2": 344
+    },
+    {
+      "tsid": "LTJ101PRVCQ1RN0",
+      "name": "Niiske Kook",
+      "x1": 393,
+      "y1": 77,
+      "x2": 490,
+      "y2": 113
+    },
+    {
+      "tsid": "LTJ10B0UHQQ172V",
+      "name": "Nilpsama",
+      "x1": 175,
+      "y1": 324,
+      "x2": 255,
+      "y2": 291
+    },
+    {
+      "tsid": "LTJ3PGOAMIQ1QDS",
+      "name": "Ortolana",
+      "x1": 175,
+      "y1": 110,
+      "x2": 268,
+      "y2": 75
+    },
+    {
+      "tsid": "LTJ101I3KSO1JQS",
+      "name": "Palsa Mosch",
+      "x1": 312,
+      "y1": 47,
+      "x2": 388,
+      "y2": 77
+    },
+    {
+      "tsid": "LLICF642CTI16R1",
+      "name": "Peatland Moors",
+      "x1": 366,
+      "y1": 163,
+      "x2": 510,
+      "y2": 187
+    },
+    {
+      "tsid": "LM11HIDASHO1THR",
+      "name": "Pungent Ponds",
+      "x1": 299,
+      "y1": 404,
+      "x2": 406,
+      "y2": 353
+    },
+    {
+      "tsid": "LTJ101FB0SO17JK",
+      "name": "Quinmchary",
+      "x1": 379,
+      "y1": 305,
+      "x2": 527,
+      "y2": 308
+    },
+    {
+      "tsid": "LLI57G8I2HI1CSO",
+      "name": "Seldom Squish",
+      "x1": 506,
+      "y1": 187,
+      "x2": 577,
+      "y2": 212
+    },
+    {
+      "tsid": "LA99U5PI39524GN",
+      "name": "Shimla Mirch Herb Gardens",
+      "x1": 127,
+      "y1": 440,
+      "x2": 300,
+      "y2": 406
+    },
+    {
+      "tsid": "LTJ11KEKAKO196V",
+      "name": "Soggy Bottoms",
+      "x1": 29,
+      "y1": 157,
+      "x2": 30,
+      "y2": 253
+    },
+    {
+      "tsid": "LLI57DI72HI153U",
+      "name": "Somewhat Sump",
+      "x1": 235,
+      "y1": 214,
+      "x2": 367,
+      "y2": 163
+    },
+    {
+      "tsid": "LLI57EKC2HI1EH8",
+      "name": "Squatter's Quag",
+      "x1": 89,
+      "y1": 311,
+      "x2": 182,
+      "y2": 390
+    },
+    {
+      "tsid": "LTJ9IM9AFAO1C44",
+      "name": "Tlemcen",
+      "x1": 279,
+      "y1": 198,
+      "x2": 365,
+      "y2": 275
+    },
+    {
+      "tsid": "LTJ12O0H7AO1IBS",
+      "name": "Viscid Pud",
+      "x1": 509,
+      "y1": 187,
+      "x2": 570,
+      "y2": 118
+    },
+    {
+      "tsid": "LTJ103NK29K1TNJ",
+      "name": "Wettish Walk",
+      "x1": 118,
+      "y1": 121,
+      "x2": 160,
+      "y2": 259
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LLI32J0SVTD114U",
+      "hub_id": "58",
+      "hubName": "Groddle Meadow",
+      "label": "To: Groddle Meadow",
+      "x": 268,
+      "y": 32,
+      "arrow": 345
+    },
+    {
+      "tsid": "LTJ10KOCHTU1N89",
+      "hub_id": "72",
+      "hubName": "Chakra Phool",
+      "label": "To: Chakra Phool",
+      "x": 61,
+      "y": 331,
+      "arrow": 255
+    },
+    {
+      "tsid": "LCR13M5UQEM15TA",
+      "hub_id": "56",
+      "hubName": "Groddle Forest",
+      "label": "To: Groddle Forest",
+      "x": 482,
+      "y": 37,
+      "arrow": 30
+    },
+    {
+      "tsid": "LUVNIF7Q9KR2382",
+      "hub_id": "120",
+      "hubName": "Cauda",
+      "label": "To: Cauda",
+      "x": 582,
+      "y": 102,
+      "arrow": 85
+    },
+    {
+      "tsid": "LIFMVP96ONU12CO",
+      "hub_id": "71",
+      "hubName": "Jethimadh",
+      "label": "To: Jethimadh",
+      "x": 504,
+      "y": 425,
+      "arrow": 160
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_shimlamirch.jpg"
+}

@@ -1,0 +1,285 @@
+{
+  "hubId": "28",
+  "hubName": "Old Groddle Forest",
+  "bg": "http://c1.glitch.bz/img/maps/map_fake_island_45490.jpg",
+  "fg": "",
+  "color": "#ff0000",
+  "btm_color": "#606669",
+  "top_color": "#8a9297",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LM410AP19K1O3",
+      "name": "Adanac",
+      "x1": 394,
+      "y1": 76,
+      "x2": 461,
+      "y2": 165
+    },
+    {
+      "tsid": "LM4108P19EK7Q",
+      "name": "Burnabee",
+      "x1": 114,
+      "y1": 258,
+      "x2": 209,
+      "y2": 199
+    },
+    {
+      "tsid": "LLI14JA80B71JPF",
+      "name": "Chad Gallows",
+      "x1": 78,
+      "y1": 336,
+      "x2": 109,
+      "y2": 259
+    },
+    {
+      "tsid": "LLI11SO07871QPM",
+      "name": "Chadwick Mews",
+      "x1": 274,
+      "y1": 142,
+      "x2": 397,
+      "y2": 80
+    },
+    {
+      "tsid": "LLI12K8HL87171B",
+      "name": "Curlingwood",
+      "x1": 373,
+      "y1": 254,
+      "x2": 554,
+      "y2": 209
+    },
+    {
+      "tsid": "LM411HOPTGN58",
+      "name": "Doon Way",
+      "x1": 100,
+      "y1": 89,
+      "x2": 190,
+      "y2": 65
+    },
+    {
+      "tsid": "LM4103P17E3G0",
+      "name": "East Hechey Clearing",
+      "x1": 554,
+      "y1": 209,
+      "x2": 628,
+      "y2": 280
+    },
+    {
+      "tsid": "LLI2V8CKHRD1JKQ",
+      "name": "G010.J",
+      "x1": 68,
+      "y1": 41,
+      "x2": 268,
+      "y2": 41
+    },
+    {
+      "tsid": "LLI14321RA71QC7",
+      "name": "Georgian Narrows",
+      "x1": 480,
+      "y1": 290,
+      "x2": 517,
+      "y2": 362
+    },
+    {
+      "tsid": "LLI1018LOKA18M6",
+      "name": "Groddle Forest Junction",
+      "x1": 326,
+      "y1": 209,
+      "x2": 514,
+      "y2": 142
+    },
+    {
+      "tsid": "LLI11VQR8871IPQ",
+      "name": "Hayden Seek Alley",
+      "x1": 287,
+      "y1": 363,
+      "x2": 370,
+      "y2": 256
+    },
+    {
+      "tsid": "LM4104P19669M",
+      "name": "Hechey Track",
+      "x1": 519,
+      "y1": 363,
+      "x2": 623,
+      "y2": 286
+    },
+    {
+      "tsid": "LLI12LNGM871KU0",
+      "name": "Herring Bone Hatch",
+      "x1": 216,
+      "y1": 319,
+      "x2": 324,
+      "y2": 210
+    },
+    {
+      "tsid": "LLI11B92BD71UJA",
+      "name": "Lapulapu Caverns",
+      "x1": 146,
+      "y1": 122,
+      "x2": 273,
+      "y2": 145
+    },
+    {
+      "tsid": "LM4107P19BGU4",
+      "name": "Lem Hill",
+      "x1": 106,
+      "y1": 256,
+      "x2": 212,
+      "y2": 322
+    },
+    {
+      "tsid": "LM410DL52LK2K",
+      "name": "Lower Valley Hollow",
+      "x1": 286,
+      "y1": 362,
+      "x2": 419,
+      "y2": 389
+    },
+    {
+      "tsid": "LLI14LBT3B71VLS",
+      "name": "Maharlika Heights",
+      "x1": 115,
+      "y1": 174,
+      "x2": 204,
+      "y2": 191
+    },
+    {
+      "tsid": "LLI145VJTA71TU6",
+      "name": "Maharlika Meadows",
+      "x1": 115,
+      "y1": 172,
+      "x2": 187,
+      "y2": 66
+    },
+    {
+      "tsid": "LLI104NPBDC1DC2",
+      "name": "Market St",
+      "x1": 478,
+      "y1": 285,
+      "x2": 629,
+      "y2": 281
+    },
+    {
+      "tsid": "LLI144CHSA71ALA",
+      "name": "Meandering Meadow",
+      "x1": 378,
+      "y1": 257,
+      "x2": 474,
+      "y2": 285
+    },
+    {
+      "tsid": "LM410BP19K6GH",
+      "name": "Middle Valley Meadow",
+      "x1": 293,
+      "y1": 44,
+      "x2": 396,
+      "y2": 76
+    },
+    {
+      "tsid": "LM410DP19KDPO",
+      "name": "Northwest Passage",
+      "x1": 48,
+      "y1": 165,
+      "x2": 106,
+      "y2": 254
+    },
+    {
+      "tsid": "LLI14KAI2B71CB8",
+      "name": "Pants Place",
+      "x1": 429,
+      "y1": 117,
+      "x2": 506,
+      "y2": 62
+    },
+    {
+      "tsid": "LM410FP19KQO9",
+      "name": "Switchback",
+      "x1": 46,
+      "y1": 159,
+      "x2": 96,
+      "y2": 89
+    },
+    {
+      "tsid": "LM410EP19KL55",
+      "name": "The Great Hole to Ix",
+      "x1": 494,
+      "y1": 151,
+      "x2": 558,
+      "y2": 61
+    },
+    {
+      "tsid": "LM4105P196DJ5",
+      "name": "The Short Track",
+      "x1": 420,
+      "y1": 389,
+      "x2": 519,
+      "y2": 363
+    },
+    {
+      "tsid": "LM4109P19ER8H",
+      "name": "Thicket",
+      "x1": 214,
+      "y1": 196,
+      "x2": 329,
+      "y2": 205
+    },
+    {
+      "tsid": "LM4106P196QP2",
+      "name": "Ti Street",
+      "x1": 212,
+      "y1": 322,
+      "x2": 287,
+      "y2": 363
+    },
+    {
+      "tsid": "LM410CL52JQA0",
+      "name": "Upper Valley Heights",
+      "x1": 189,
+      "y1": 65,
+      "x2": 293,
+      "y2": 44
+    },
+    {
+      "tsid": "LM411BNOGTUG2",
+      "name": "West Hechey Clearing",
+      "x1": 395,
+      "y1": 181,
+      "x2": 556,
+      "y2": 210
+    },
+    {
+      "tsid": "LLI11TJJ7871GF3",
+      "name": "Whipping Cross Crossing",
+      "x1": 328,
+      "y1": 205,
+      "x2": 395,
+      "y2": 79
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LLI23D3LDHD1FQA",
+      "hub_id": "56",
+      "hubName": "Groddle Forest",
+      "label": "To: Groddle Forest",
+      "x": 728,
+      "y": 101,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIF101NCNU112O2",
+      "hub_id": "51",
+      "hubName": "Uralia",
+      "label": "To: Uralia",
+      "x": 600,
+      "y": 124,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_groddleforest.jpg"
+}

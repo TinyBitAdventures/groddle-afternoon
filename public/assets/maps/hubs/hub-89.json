@@ -1,0 +1,280 @@
+{
+  "hubId": "89",
+  "hubName": "Andra",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-24/andra_bg_1335307175.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_andra_59153.png",
+  "color": "#de5d25",
+  "btm_color": "#8a7c85",
+  "top_color": "#ac949e",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA51A5VM3K62P49",
+      "name": "Annam Angst",
+      "x1": 321,
+      "y1": 327,
+      "x2": 417,
+      "y2": 421
+    },
+    {
+      "tsid": "LA51701PF262LC8",
+      "name": "Arisa Annex",
+      "x1": 192,
+      "y1": 332,
+      "x2": 319,
+      "y2": 324
+    },
+    {
+      "tsid": "LA513ALBNM623UJ",
+      "name": "Bangala Bristles",
+      "x1": 42,
+      "y1": 193,
+      "x2": 161,
+      "y2": 221
+    },
+    {
+      "tsid": "LA51CAQQ55629QM",
+      "name": "Bongul Beat",
+      "x1": 470,
+      "y1": 128,
+      "x2": 562,
+      "y2": 100
+    },
+    {
+      "tsid": "LA5VDIGU3G525F9",
+      "name": "Boonbi Books",
+      "x1": 318,
+      "y1": 322,
+      "x2": 360,
+      "y2": 218
+    },
+    {
+      "tsid": "LA5I10NJDL52TKD",
+      "name": "Chego Chase",
+      "x1": 469,
+      "y1": 131,
+      "x2": 503,
+      "y2": 239
+    },
+    {
+      "tsid": "LA57FADCBN62PR0",
+      "name": "Chettia Churns",
+      "x1": 82,
+      "y1": 93,
+      "x2": 106,
+      "y2": 207
+    },
+    {
+      "tsid": "LA5DVVGJQQ5237U",
+      "name": "Firdaus Finds",
+      "x1": 161,
+      "y1": 219,
+      "x2": 196,
+      "y2": 330
+    },
+    {
+      "tsid": "LA512IH5226256P",
+      "name": "Gaare Grims",
+      "x1": 61,
+      "y1": 288,
+      "x2": 191,
+      "y2": 332
+    },
+    {
+      "tsid": "LA5TBM8BIL5219R",
+      "name": "Gavvalu Gasp",
+      "x1": 589,
+      "y1": 219,
+      "x2": 629,
+      "y2": 310
+    },
+    {
+      "tsid": "LA51IOM1PC62SPF",
+      "name": "Ianara Straight",
+      "x1": 563,
+      "y1": 100,
+      "x2": 648,
+      "y2": 48
+    },
+    {
+      "tsid": "LA517MT2M262D0F",
+      "name": "Jantik Jog",
+      "x1": 508,
+      "y1": 241,
+      "x2": 671,
+      "y2": 191
+    },
+    {
+      "tsid": "LA55645B8O528MI",
+      "name": "Jonna Jinx",
+      "x1": 519,
+      "y1": 341,
+      "x2": 640,
+      "y2": 427
+    },
+    {
+      "tsid": "LA517L6UL262RHT",
+      "name": "Kobbaya Shii",
+      "x1": 164,
+      "y1": 52,
+      "x2": 307,
+      "y2": 115
+    },
+    {
+      "tsid": "LA51CGIGKK62NV8",
+      "name": "Kongu Hop",
+      "x1": 219,
+      "y1": 174,
+      "x2": 360,
+      "y2": 219
+    },
+    {
+      "tsid": "LA5QBAL9SL52I02",
+      "name": "Lavu Lane",
+      "x1": 360,
+      "y1": 220,
+      "x2": 483,
+      "y2": 183
+    },
+    {
+      "tsid": "LA519RU9M462NJ1",
+      "name": "Manggai Mile",
+      "x1": 320,
+      "y1": 325,
+      "x2": 513,
+      "y2": 340
+    },
+    {
+      "tsid": "LA58KK7B9O522PC",
+      "name": "Mira Mesh",
+      "x1": 410,
+      "y1": 329,
+      "x2": 505,
+      "y2": 241
+    },
+    {
+      "tsid": "LA51BNNOEK629KG",
+      "name": "Modati Modes",
+      "x1": 265,
+      "y1": 421,
+      "x2": 368,
+      "y2": 373
+    },
+    {
+      "tsid": "LA51B2OQAK623EF",
+      "name": "Murrukku Meander",
+      "x1": 423,
+      "y1": 417,
+      "x2": 522,
+      "y2": 338
+    },
+    {
+      "tsid": "LA5EPQG0FN62PCS",
+      "name": "Naera Needs",
+      "x1": 80,
+      "y1": 408,
+      "x2": 192,
+      "y2": 334
+    },
+    {
+      "tsid": "LA51BMHT2562Q3D",
+      "name": "Pachi Preach",
+      "x1": 516,
+      "y1": 339,
+      "x2": 692,
+      "y2": 297
+    },
+    {
+      "tsid": "LA517JJML262LT0",
+      "name": "Pakodi Prim",
+      "x1": 362,
+      "y1": 37,
+      "x2": 471,
+      "y2": 129
+    },
+    {
+      "tsid": "LA517KBQL262H3U",
+      "name": "Poorna Plea",
+      "x1": 301,
+      "y1": 116,
+      "x2": 415,
+      "y2": 83
+    },
+    {
+      "tsid": "LA51IVI7PC62L64",
+      "name": "Raagi Road",
+      "x1": 559,
+      "y1": 103,
+      "x2": 671,
+      "y2": 136
+    },
+    {
+      "tsid": "LA51DOIHSK626VM",
+      "name": "Sakinalu Shreds",
+      "x1": 162,
+      "y1": 219,
+      "x2": 302,
+      "y2": 114
+    },
+    {
+      "tsid": "LA5FUB7R0N627KI",
+      "name": "Telanga Tops",
+      "x1": 261,
+      "y1": 327,
+      "x2": 280,
+      "y2": 194
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LA513PFS0J52F45",
+      "hub_id": "91",
+      "hubName": "Zhambu",
+      "label": "To: Zhambu",
+      "x": 362,
+      "y": 33,
+      "arrow": 0
+    },
+    {
+      "tsid": "LHV1BIOIL142P25",
+      "hub_id": "85",
+      "hubName": "Kajuu",
+      "label": "To: Kajuu",
+      "x": 691,
+      "y": 186,
+      "arrow": 90
+    },
+    {
+      "tsid": "LIFFHFT5UO72FC2",
+      "hub_id": "93",
+      "hubName": "Salatu",
+      "label": "To: Salatu",
+      "x": 251,
+      "y": 426,
+      "arrow": 180
+    },
+    {
+      "tsid": "LHFSLPE6A3J2CFJ",
+      "hub_id": "113",
+      "hubName": "Tahli",
+      "label": "To: Tahli",
+      "x": 29,
+      "y": 188,
+      "arrow": 270
+    },
+    {
+      "tsid": "LUV7MEQ2P5F2LOG",
+      "hub_id": "109",
+      "hubName": "Rasana",
+      "label": "To: Rasana",
+      "x": 66,
+      "y": 415,
+      "arrow": 205
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_andra.jpg"
+}

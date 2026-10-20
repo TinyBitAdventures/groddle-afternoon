@@ -1,0 +1,5 @@
+Street geometry from tinyspeck/glitch-locations locations-xml.zip (CC0).
+Imported 1422 convertible streets from 2846 XML files.
+Skipped 1424 (see import-skips.json).
+Deco PNGs from local CoU/CC0 deco corpus where available; missing listed in missing-decos.json.
+Default street: GLI2V0UN7RD1T2J

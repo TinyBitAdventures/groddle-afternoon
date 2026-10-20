@@ -1,0 +1,278 @@
+{
+  "hubId": "100",
+  "hubName": "Vantalu",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_vantalu_73816.jpg",
+  "fg": "",
+  "color": "#2da89e",
+  "btm_color": "#87837e",
+  "top_color": "#a7a399",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LIFP35VRDTC2JVA",
+      "name": "Akalet Moves",
+      "x1": 243,
+      "y1": 280,
+      "x2": 417,
+      "y2": 331
+    },
+    {
+      "tsid": "LIF48OQC9DH2014",
+      "name": "Akkawwi Wails",
+      "x1": 601,
+      "y1": 362,
+      "x2": 669,
+      "y2": 212
+    },
+    {
+      "tsid": "LIF6APMFJUG2AK5",
+      "name": "Balleet Berm",
+      "x1": 547,
+      "y1": 86,
+      "x2": 668,
+      "y2": 50
+    },
+    {
+      "tsid": "LIFME5D0K0H2EGC",
+      "name": "Banya Banya ",
+      "x1": 553,
+      "y1": 87,
+      "x2": 613,
+      "y2": 195
+    },
+    {
+      "tsid": "LIFV6DIGKVC21D0",
+      "name": "BereBere Scald",
+      "x1": 332,
+      "y1": 302,
+      "x2": 464,
+      "y2": 260
+    },
+    {
+      "tsid": "LIF992JCSAH29T1",
+      "name": "Canjeero Crams ",
+      "x1": 416,
+      "y1": 329,
+      "x2": 505,
+      "y2": 406
+    },
+    {
+      "tsid": "LIFU3VBO31H28F0",
+      "name": "Gabouta Bouts",
+      "x1": 311,
+      "y1": 419,
+      "x2": 418,
+      "y2": 332
+    },
+    {
+      "tsid": "LIFVV1VA9RG2ISF",
+      "name": "Gehsho Nuff",
+      "x1": 124,
+      "y1": 293,
+      "x2": 258,
+      "y2": 312
+    },
+    {
+      "tsid": "LIFD8KDI3BH2UAF",
+      "name": "Gersal Gemony",
+      "x1": 87,
+      "y1": 81,
+      "x2": 251,
+      "y2": 146
+    },
+    {
+      "tsid": "LIFC768I7UG2F88",
+      "name": "Guraibe Gran",
+      "x1": 368,
+      "y1": 31,
+      "x2": 401,
+      "y2": 155
+    },
+    {
+      "tsid": "LIF9N8QU1PG2CN8",
+      "name": "Hareesh Sook",
+      "x1": 177,
+      "y1": 114,
+      "x2": 258,
+      "y2": 51
+    },
+    {
+      "tsid": "LIFQS2GE6BH21V9",
+      "name": "Injeer Asour",
+      "x1": 475,
+      "y1": 260,
+      "x2": 630,
+      "y2": 199
+    },
+    {
+      "tsid": "LIFSLDITPAH2CHG",
+      "name": "Jameeda Meds",
+      "x1": 562,
+      "y1": 174,
+      "x2": 723,
+      "y2": 229
+    },
+    {
+      "tsid": "LIFFGUFIABH2D6F",
+      "name": "Jiireesh Risen",
+      "x1": 575,
+      "y1": 344,
+      "x2": 687,
+      "y2": 426
+    },
+    {
+      "tsid": "LIFF6BQE33H26JC",
+      "name": "Lebben Laps",
+      "x1": 252,
+      "y1": 283,
+      "x2": 311,
+      "y2": 421
+    },
+    {
+      "tsid": "LIFE0QTCG3H2QU2",
+      "name": "Machaboos Mess",
+      "x1": 108,
+      "y1": 252,
+      "x2": 159,
+      "y2": 398
+    },
+    {
+      "tsid": "LIF3VMSMT0H2NKE",
+      "name": "Masquff Greets",
+      "x1": 254,
+      "y1": 145,
+      "x2": 424,
+      "y2": 157
+    },
+    {
+      "tsid": "LIFCNFNEJRG2ON4",
+      "name": "Mmumawwa Wala",
+      "x1": 421,
+      "y1": 329,
+      "x2": 578,
+      "y2": 345
+    },
+    {
+      "tsid": "LIFJBNJ589E2BNK",
+      "name": "Mutta Maart",
+      "x1": 378,
+      "y1": 57,
+      "x2": 548,
+      "y2": 86
+    },
+    {
+      "tsid": "LIFLPK2J9UG2AV1",
+      "name": "Muuja Jah",
+      "x1": 327,
+      "y1": 226,
+      "x2": 424,
+      "y2": 158
+    },
+    {
+      "tsid": "LIFNEU3LGUG2BMK",
+      "name": "Nalla Duva",
+      "x1": 401,
+      "y1": 178,
+      "x2": 469,
+      "y2": 258
+    },
+    {
+      "tsid": "LIFJ5ECMA3H2OIV",
+      "name": "Qaado Barrus",
+      "x1": 425,
+      "y1": 157,
+      "x2": 560,
+      "y2": 174
+    },
+    {
+      "tsid": "LIFTPARUOOG2TEB",
+      "name": "Quozee Quanta",
+      "x1": 257,
+      "y1": 50,
+      "x2": 378,
+      "y2": 56
+    },
+    {
+      "tsid": "LIFK0P9Q6JC2MEF",
+      "name": "Spagh Federa",
+      "x1": 128,
+      "y1": 217,
+      "x2": 251,
+      "y2": 285
+    },
+    {
+      "tsid": "LIFBD8FM0UG2QCR",
+      "name": "Steeha Sham",
+      "x1": 129,
+      "y1": 219,
+      "x2": 249,
+      "y2": 145
+    },
+    {
+      "tsid": "LIFJVV332JC2M0S",
+      "name": "Taboon Tribute",
+      "x1": 204,
+      "y1": 252,
+      "x2": 328,
+      "y2": 225
+    },
+    {
+      "tsid": "LIFUKF4FNRG2JT0",
+      "name": "Tigrinni Grins",
+      "x1": 473,
+      "y1": 261,
+      "x2": 576,
+      "y2": 346
+    },
+    {
+      "tsid": "LIFK06CR2JC2K51",
+      "name": "Zalaib Labra",
+      "x1": 473,
+      "y1": 159,
+      "x2": 550,
+      "y2": 87
+    },
+    {
+      "tsid": "LIFTGHSRLDH2LDE",
+      "name": "Zayffuun Zona ",
+      "x1": 50,
+      "y1": 325,
+      "x2": 125,
+      "y2": 221
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LHVQ48MA5GB39HE",
+      "hub_id": "137",
+      "hubName": "Nottis",
+      "label": "To: Nottis",
+      "x": 675,
+      "y": 44,
+      "arrow": 0
+    },
+    {
+      "tsid": "LHV245SVALA2ST5",
+      "hub_id": "101",
+      "hubName": "Aranna",
+      "label": "To: Aranna",
+      "x": 719,
+      "y": 224,
+      "arrow": 90
+    },
+    {
+      "tsid": "LIFLRSGG7952SBS",
+      "hub_id": "90",
+      "hubName": "Choru",
+      "label": "To: Choru",
+      "x": 517,
+      "y": 413,
+      "arrow": 180
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_vantalu.jpg"
+}

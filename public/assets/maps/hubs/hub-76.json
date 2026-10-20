@@ -1,0 +1,401 @@
+{
+  "hubId": "76",
+  "hubName": "Alakol",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-24/alakol_bg_1335307186.jpg",
+  "fg": "http://c2.glitch.bz/client_maps/2012-04-24/alakol_fg_1335307185.png",
+  "color": "#2d8a4a",
+  "btm_color": "#706769",
+  "top_color": "#a99c9e",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LNVKFBM3PVC2GDD",
+      "name": "Alakol Start",
+      "x1": 83,
+      "y1": 137,
+      "x2": 198,
+      "y2": 167
+    },
+    {
+      "tsid": "LNVRJVDNB0D2GJ9",
+      "name": "Alakol Start",
+      "x1": 275,
+      "y1": 198,
+      "x2": 349,
+      "y2": 269
+    },
+    {
+      "tsid": "LNV57FNCD0D2059",
+      "name": "Alakol Start",
+      "x1": 367,
+      "y1": 265,
+      "x2": 451,
+      "y2": 253
+    },
+    {
+      "tsid": "LNV6FEDKD0D2J3O",
+      "name": "Alakol Start",
+      "x1": 164,
+      "y1": 252,
+      "x2": 234,
+      "y2": 194
+    },
+    {
+      "tsid": "LLI17VIKLJ02BSV",
+      "name": "Anrasan Glance",
+      "x1": 521,
+      "y1": 327,
+      "x2": 630,
+      "y2": 304
+    },
+    {
+      "tsid": "LCRTAJK5UN124GG",
+      "name": "Bolesan Ambitions",
+      "x1": 601,
+      "y1": 69,
+      "x2": 625,
+      "y2": 163
+    },
+    {
+      "tsid": "LCRMCBQCRN12OFL",
+      "name": "Brunnan Bafflings",
+      "x1": 398,
+      "y1": 103,
+      "x2": 410,
+      "y2": 196
+    },
+    {
+      "tsid": "LHVTUCELRV02V9I",
+      "name": "Dofsan Vex",
+      "x1": 196,
+      "y1": 335,
+      "x2": 232,
+      "y2": 193
+    },
+    {
+      "tsid": "LCR12D911T12E57",
+      "name": "Dyran Notion",
+      "x1": 88,
+      "y1": 191,
+      "x2": 198,
+      "y2": 168
+    },
+    {
+      "tsid": "LHVQU18N3O021A5",
+      "name": "Ekorran Roughs",
+      "x1": 412,
+      "y1": 357,
+      "x2": 523,
+      "y2": 328
+    },
+    {
+      "tsid": "LCR4R7OEDS123M7",
+      "name": "Feman Falters",
+      "x1": 295,
+      "y1": 103,
+      "x2": 426,
+      "y2": 100
+    },
+    {
+      "tsid": "LHV1F2U5M212P9C",
+      "name": "Flogan Shames",
+      "x1": 285,
+      "y1": 333,
+      "x2": 421,
+      "y2": 359
+    },
+    {
+      "tsid": "LCR146VPNK12CTU",
+      "name": "Fyran Descant",
+      "x1": 413,
+      "y1": 191,
+      "x2": 496,
+      "y2": 161
+    },
+    {
+      "tsid": "LHV1HLGUT212JNT",
+      "name": "Getan Tenets",
+      "x1": 452,
+      "y1": 252,
+      "x2": 518,
+      "y2": 329
+    },
+    {
+      "tsid": "LNVVEB4M8DT2JUB",
+      "name": "Gimja Preserve",
+      "x1": 272,
+      "y1": 139,
+      "x2": 348,
+      "y2": 216
+    },
+    {
+      "tsid": "LCR1H8R9J62257C",
+      "name": "Hammar Steadies",
+      "x1": 86,
+      "y1": 194,
+      "x2": 126,
+      "y2": 283
+    },
+    {
+      "tsid": "LCRCDPP5AN12EK8",
+      "name": "Harkan Idiom",
+      "x1": 518,
+      "y1": 71,
+      "x2": 601,
+      "y2": 67
+    },
+    {
+      "tsid": "LCR3M699PP12F4A",
+      "name": "Idan Frisk",
+      "x1": 421,
+      "y1": 100,
+      "x2": 515,
+      "y2": 71
+    },
+    {
+      "tsid": "LCR137T2HK123RR",
+      "name": "Isalan Interval",
+      "x1": 232,
+      "y1": 198,
+      "x2": 295,
+      "y2": 103
+    },
+    {
+      "tsid": "LCR1303AT622I0Q",
+      "name": "Jadraan Fix",
+      "x1": 177,
+      "y1": 53,
+      "x2": 293,
+      "y2": 105
+    },
+    {
+      "tsid": "LNVEC8L1DDT2F20",
+      "name": "Kobah Habitat",
+      "x1": 498,
+      "y1": 208,
+      "x2": 594,
+      "y2": 269
+    },
+    {
+      "tsid": "LCRPA1RV1N12J4H",
+      "name": "Kolan Presence",
+      "x1": 423,
+      "y1": 29,
+      "x2": 518,
+      "y2": 71
+    },
+    {
+      "tsid": "LHV1IHMG1312A0S",
+      "name": "Lustan Cautions",
+      "x1": 417,
+      "y1": 356,
+      "x2": 450,
+      "y2": 252
+    },
+    {
+      "tsid": "LCRL3F8I3L12O0J",
+      "name": "Marlan Bias",
+      "x1": 174,
+      "y1": 51,
+      "x2": 197,
+      "y2": 166
+    },
+    {
+      "tsid": "LCR10UJQ1922K16",
+      "name": "Motala Dun",
+      "x1": 601,
+      "y1": 66,
+      "x2": 686,
+      "y2": 24
+    },
+    {
+      "tsid": "LCR8F1FLBI12F2H",
+      "name": "Navran Dissent",
+      "x1": 125,
+      "y1": 284,
+      "x2": 196,
+      "y2": 171
+    },
+    {
+      "tsid": "LCRR4REARA12CM5",
+      "name": "Ojan Repine",
+      "x1": 348,
+      "y1": 271,
+      "x2": 410,
+      "y2": 195
+    },
+    {
+      "tsid": "LNV4R9D5ADT2NP1",
+      "name": "Onbo Park",
+      "x1": 31,
+      "y1": 19,
+      "x2": 142,
+      "y2": 58
+    },
+    {
+      "tsid": "LLI1C5DJ2Q12O21",
+      "name": "Pinnan Glimpse",
+      "x1": 624,
+      "y1": 168,
+      "x2": 698,
+      "y2": 196
+    },
+    {
+      "tsid": "LHV1AMP8TL02B40",
+      "name": "Rekan Flux",
+      "x1": 349,
+      "y1": 270,
+      "x2": 430,
+      "y2": 303
+    },
+    {
+      "tsid": "LCR105E77812AEF",
+      "name": "Semsan Simile",
+      "x1": 632,
+      "y1": 303,
+      "x2": 679,
+      "y2": 394
+    },
+    {
+      "tsid": "LHV1IM9C23124HD",
+      "name": "Simean Dims",
+      "x1": 233,
+      "y1": 198,
+      "x2": 286,
+      "y2": 334
+    },
+    {
+      "tsid": "LHVDGF0JMQ7299V",
+      "name": "Smy Mod",
+      "x1": 39,
+      "y1": 137,
+      "x2": 87,
+      "y2": 193
+    },
+    {
+      "tsid": "LCRGEU0PUP12CLS",
+      "name": "Stopan Winnow",
+      "x1": 68,
+      "y1": 81,
+      "x2": 177,
+      "y2": 52
+    },
+    {
+      "tsid": "LHV1CIQLVL02C6H",
+      "name": "Stora Rede",
+      "x1": 451,
+      "y1": 252,
+      "x2": 513,
+      "y2": 190
+    },
+    {
+      "tsid": "LHV1E645M21278O",
+      "name": "Taftan Raves",
+      "x1": 206,
+      "y1": 340,
+      "x2": 287,
+      "y2": 333
+    },
+    {
+      "tsid": "LCR241CP4Q129I1",
+      "name": "Torpan Cleft",
+      "x1": 426,
+      "y1": 103,
+      "x2": 513,
+      "y2": 186
+    },
+    {
+      "tsid": "LUVUKCOSE793PHI",
+      "name": "Via Firozi",
+      "x1": 450,
+      "y1": 347,
+      "x2": 560,
+      "y2": 409
+    },
+    {
+      "tsid": "LCR13974F4220EH",
+      "name": "Vindel Frowns",
+      "x1": 128,
+      "y1": 285,
+      "x2": 202,
+      "y2": 341
+    },
+    {
+      "tsid": "LLI17P0T8J029N7",
+      "name": "Vragan Boost",
+      "x1": 266,
+      "y1": 273,
+      "x2": 352,
+      "y2": 268
+    },
+    {
+      "tsid": "LCR29V8S4Q12IF4",
+      "name": "Yan Jaggery",
+      "x1": 514,
+      "y1": 188,
+      "x2": 621,
+      "y2": 166
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LCR10H9E3QJ1E2P",
+      "hub_id": "64",
+      "hubName": "Groddle Heights",
+      "label": "To: Groddle Heights",
+      "x": 682,
+      "y": 401,
+      "arrow": 160
+    },
+    {
+      "tsid": "LHV15KA8NE42GSP",
+      "hub_id": "85",
+      "hubName": "Kajuu",
+      "label": "To: Kajuu",
+      "x": 409,
+      "y": 20,
+      "arrow": 320
+    },
+    {
+      "tsid": "LA5JGH5UIMB28BP",
+      "hub_id": "102",
+      "hubName": "Ormonos",
+      "label": "To: Ormonos",
+      "x": 718,
+      "y": 200,
+      "arrow": 90
+    },
+    {
+      "tsid": "LIF19BFUG922N84",
+      "hub_id": "75",
+      "hubName": "Bortola",
+      "label": "To: Bortola",
+      "x": 701,
+      "y": 20,
+      "arrow": 45
+    },
+    {
+      "tsid": "LIF19MQDQB725HT",
+      "hub_id": "93",
+      "hubName": "Salatu",
+      "label": "To: Salatu",
+      "x": 26,
+      "y": 123,
+      "arrow": 300
+    },
+    {
+      "tsid": "LUVTLIP0SIJ2DQG",
+      "hub_id": "114",
+      "hubName": "Firozi",
+      "label": "To: Firozi",
+      "x": 565,
+      "y": 420,
+      "arrow": 110
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_alakol.jpg"
+}

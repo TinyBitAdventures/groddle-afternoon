@@ -1,0 +1,189 @@
+{
+  "hubId": "123",
+  "hubName": "Fenneq",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-24/fenneq_bg_1335291122.jpg",
+  "fg": "http://c2.glitch.bz/client_maps/2012-04-24/fenneq_fg_1335291122.png",
+  "color": "b55513",
+  "btm_color": "7f8588",
+  "top_color": "989fa7",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA5G8MQD45T2UMH",
+      "name": "Banyan Park",
+      "x1": 113,
+      "y1": 220,
+      "x2": 241,
+      "y2": 221
+    },
+    {
+      "tsid": "LA5OO9PJC8T26KE",
+      "name": "Bossam Preserve",
+      "x1": 583,
+      "y1": 244,
+      "x2": 674,
+      "y2": 339
+    },
+    {
+      "tsid": "LA5H2SQS45T2EIU",
+      "name": "Budae Bada",
+      "x1": 124,
+      "y1": 367,
+      "x2": 269,
+      "y2": 281
+    },
+    {
+      "tsid": "LA55B5RDL7T2F00",
+      "name": "Chettar Lings",
+      "x1": 357,
+      "y1": 401,
+      "x2": 487,
+      "y2": 242
+    },
+    {
+      "tsid": "LA5PU7I1A5T2GKQ",
+      "name": "Deodak Nabak",
+      "x1": 272,
+      "y1": 282,
+      "x2": 426,
+      "y2": 320
+    },
+    {
+      "tsid": "LA5O4SAUO5T2GEB",
+      "name": "Dingal Lin",
+      "x1": 229,
+      "y1": 185,
+      "x2": 361,
+      "y2": 89
+    },
+    {
+      "tsid": "LA5CUF0978T2L64",
+      "name": "Enjan Park",
+      "x1": 73,
+      "y1": 40,
+      "x2": 164,
+      "y2": 142
+    },
+    {
+      "tsid": "LA5HQ0QUL5T2KGP",
+      "name": "Gemyan Guome",
+      "x1": 454,
+      "y1": 292,
+      "x2": 582,
+      "y2": 385
+    },
+    {
+      "tsid": "LA5KC1SHA8T2AL7",
+      "name": "Gopchan Habitat",
+      "x1": 473,
+      "y1": 81,
+      "x2": 576,
+      "y2": 180
+    },
+    {
+      "tsid": "LA5U9449F8T2DPR",
+      "name": "Hobak Habitat",
+      "x1": 43,
+      "y1": 266,
+      "x2": 176,
+      "y2": 337
+    },
+    {
+      "tsid": "LA5809MJM7T2N18",
+      "name": "Jappa Chae",
+      "x1": 58,
+      "y1": 140,
+      "x2": 206,
+      "y2": 145
+    },
+    {
+      "tsid": "LA5BTSQAJ5T2KNL",
+      "name": "Jigoree Galbee",
+      "x1": 209,
+      "y1": 147,
+      "x2": 270,
+      "y2": 278
+    },
+    {
+      "tsid": "LA5VJDNKS5T2EFM",
+      "name": "Leonta Park",
+      "x1": 268,
+      "y1": 354,
+      "x2": 385,
+      "y2": 346
+    },
+    {
+      "tsid": "LA5UIVQD18T21M0",
+      "name": "Maiwiwi Don",
+      "x1": 555,
+      "y1": 240,
+      "x2": 602,
+      "y2": 112
+    },
+    {
+      "tsid": "LA5RV551E8T2K2F",
+      "name": "Namul Habitat",
+      "x1": 434,
+      "y1": 419,
+      "x2": 535,
+      "y2": 358
+    },
+    {
+      "tsid": "LA5AS7POI5T24IG",
+      "name": "Qermiz Habitat",
+      "x1": 319,
+      "y1": 289,
+      "x2": 409,
+      "y2": 217
+    },
+    {
+      "tsid": "LA5LBN35B8T288J",
+      "name": "Sinseollo Park",
+      "x1": 631,
+      "y1": 234,
+      "x2": 718,
+      "y2": 146
+    },
+    {
+      "tsid": "LA5ELMKFP7T2Q4H",
+      "name": "Teok Habitat",
+      "x1": 302,
+      "y1": 133,
+      "x2": 426,
+      "y2": 139
+    },
+    {
+      "tsid": "LA5HHSJRL5T24RB",
+      "name": "Yeopsul Mumal",
+      "x1": 486,
+      "y1": 243,
+      "x2": 676,
+      "y2": 238
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LUV3BOQ5GKR2V7N",
+      "hub_id": "120",
+      "hubName": "Cauda",
+      "label": "To: Cauda",
+      "x": 112,
+      "y": 374,
+      "arrow": 230
+    },
+    {
+      "tsid": "LA54O13ELKR29I9",
+      "hub_id": "121",
+      "hubName": "Sura",
+      "label": "To: Sura",
+      "x": 346,
+      "y": 415,
+      "arrow": 180
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_fenneq.jpg"
+}

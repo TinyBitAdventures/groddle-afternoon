@@ -1,0 +1,172 @@
+{
+  "hubId": "78",
+  "hubName": "Ilmenskie Deeps",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_ilmenskie_deep_48415.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_ilmenskie_deep_46962.png",
+  "color": "#492e5e",
+  "btm_color": "#4a4846",
+  "top_color": "#676563",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA9154LI9R22R7A",
+      "name": "Ajaya Bliss",
+      "x1": 217,
+      "y1": 318,
+      "x2": 316,
+      "y2": 318
+    },
+    {
+      "tsid": "LA9ENT2CRE22NFB",
+      "name": "Amant Kudos",
+      "x1": 139,
+      "y1": 248,
+      "x2": 140,
+      "y2": 331
+    },
+    {
+      "tsid": "LA91JU4QQ712DJN",
+      "name": "Arjun Plunge",
+      "x1": 558,
+      "y1": 57,
+      "x2": 561,
+      "y2": 216
+    },
+    {
+      "tsid": "LA9114MS8B32FB2",
+      "name": "Churni Sanctum",
+      "x1": 275,
+      "y1": 413,
+      "x2": 464,
+      "y2": 420
+    },
+    {
+      "tsid": "LM112V6OCA126K1",
+      "name": "Devi Drape",
+      "x1": 265,
+      "y1": 57,
+      "x2": 266,
+      "y2": 141
+    },
+    {
+      "tsid": "LA918AIN63127HB",
+      "name": "Dobak Fathom",
+      "x1": 420,
+      "y1": 216,
+      "x2": 653,
+      "y2": 221
+    },
+    {
+      "tsid": "LM1TS65LBN12EIV",
+      "name": "Gori Blear",
+      "x1": 44,
+      "y1": 144,
+      "x2": 265,
+      "y2": 142
+    },
+    {
+      "tsid": "LA911QQIDI32J6R",
+      "name": "Janagi Elations",
+      "x1": 632,
+      "y1": 304,
+      "x2": 636,
+      "y2": 434
+    },
+    {
+      "tsid": "LM113FUK5422FVO",
+      "name": "Kosi Aracana",
+      "x1": 146,
+      "y1": 300,
+      "x2": 361,
+      "y2": 187
+    },
+    {
+      "tsid": "LA9QR2STO832N8E",
+      "name": "Malika Whim",
+      "x1": 141,
+      "y1": 329,
+      "x2": 272,
+      "y2": 414
+    },
+    {
+      "tsid": "LA912TJ0KF328Q3",
+      "name": "Megna Burrow",
+      "x1": 535,
+      "y1": 301,
+      "x2": 716,
+      "y2": 304
+    },
+    {
+      "tsid": "LA9DNT3I2U22RS7",
+      "name": "Nandak Intention",
+      "x1": 462,
+      "y1": 343,
+      "x2": 654,
+      "y2": 224
+    },
+    {
+      "tsid": "LA910DULG012JIE",
+      "name": "Punar Grotta",
+      "x1": 42,
+      "y1": 246,
+      "x2": 139,
+      "y2": 247
+    },
+    {
+      "tsid": "LA9QKFSST732VNK",
+      "name": "Punpun Snug",
+      "x1": 461,
+      "y1": 343,
+      "x2": 464,
+      "y2": 421
+    },
+    {
+      "tsid": "LM169I1E0C226G1",
+      "name": "Sarda Rapt",
+      "x1": 40,
+      "y1": 142,
+      "x2": 42,
+      "y2": 247
+    },
+    {
+      "tsid": "LA9B6PJ3NM22M0D",
+      "name": "Subarna Spells",
+      "x1": 262,
+      "y1": 241,
+      "x2": 395,
+      "y2": 412
+    },
+    {
+      "tsid": "LM113VSD6922MRJ",
+      "name": "Tharon Spelunk",
+      "x1": 267,
+      "y1": 141,
+      "x2": 419,
+      "y2": 215
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LLI1D5DO1671QPA",
+      "hub_id": "50",
+      "hubName": "Ilmenskie Caverns",
+      "label": "To: Ilmenskie Caverns",
+      "x": 560,
+      "y": 42,
+      "arrow": 0
+    },
+    {
+      "tsid": "LHH12E1QP611OPA",
+      "hub_id": "50",
+      "hubName": "Ilmenskie Caverns",
+      "label": "To: Ilmenskie Caverns",
+      "x": 266,
+      "y": 42,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": ""
+}

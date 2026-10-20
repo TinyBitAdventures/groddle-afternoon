@@ -1,0 +1,25 @@
+Hub map geometry + art preservation
+===================================
+
+Geometry (complete offline)
+  Source: Tiny Speck GSJS CC0 — inc_data_maps_prod.js
+  assets/maps/index.json           — 94 hubs catalog
+  assets/maps/hubs/hub-<id>.json   — streets + GO exits (760×460)
+  61 hubs have street segments (1,396 total street lines)
+  33 hubs are empty/POL/templates (0 streets)
+
+  hub-56-groddle-forest.json is a legacy copy of hubs/hub-56.json
+
+Art preserved offline
+  assets/maps/art/thumbs/sm_*.jpg  — 48 hub thumbs (150×91) from world_map.fla
+  assets/maps/art/world/*.jpg      — continent world-map bitmaps from same FLA
+  thumbLocal on ~57 hub JSON files when a matching thumb exists
+
+CDN hub paintings (full 760×460 bg/fg) — URLs preserved, files NOT on Wayback
+  assets/maps/art-urls.txt         — 89 original c1/c2.glitch.bz URLs
+  Each hub JSON keeps bg / fg CDN strings; bgLocal/fgLocal fill when recovered
+  Re-try: ~/Documents/glitch-audit/scripts/recover-map-art.py
+
+In-game
+  Map (G) opens player hub; dropdown browses all hubs with geometry
+  GO buttons switch hub map view (explore); yellow paths = playable streets only

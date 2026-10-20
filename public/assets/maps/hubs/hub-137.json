@@ -1,0 +1,197 @@
+{
+  "hubId": "137",
+  "hubName": "Nottis",
+  "bg": "http://c2.glitch.bz/client_maps/2012-10-30/nottis_bg_1351664108.jpg",
+  "fg": "",
+  "color": "0097a7",
+  "btm_color": "769091",
+  "top_color": "89afb6",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LHVCUKA1I0B3UE8",
+      "name": "Awn Terio",
+      "x1": 68,
+      "y1": 406,
+      "x2": 185,
+      "y2": 335
+    },
+    {
+      "tsid": "LHVN4R7V7OA3MFN",
+      "name": "Brilyn Chelyn",
+      "x1": 614,
+      "y1": 354,
+      "x2": 724,
+      "y2": 287
+    },
+    {
+      "tsid": "LHV7LLAAIDB35G2",
+      "name": "Dokk Rokk",
+      "x1": 590,
+      "y1": 39,
+      "x2": 657,
+      "y2": 168
+    },
+    {
+      "tsid": "LHV1U1OJ7DB3RGF",
+      "name": "Frysta Virki",
+      "x1": 42,
+      "y1": 33,
+      "x2": 139,
+      "y2": 121
+    },
+    {
+      "tsid": "LHVQ48MA5GB39HE",
+      "name": "Glatour Stooir",
+      "x1": 612,
+      "y1": 357,
+      "x2": 710,
+      "y2": 429
+    },
+    {
+      "tsid": "LHV7VE7O4MA35H6",
+      "name": "Hellinum Dum",
+      "x1": 396,
+      "y1": 203,
+      "x2": 521,
+      "y2": 141
+    },
+    {
+      "tsid": "LHVDH0710RA3812",
+      "name": "Joklin Seddin",
+      "x1": 238,
+      "y1": 220,
+      "x2": 321,
+      "y2": 84
+    },
+    {
+      "tsid": "LHV8H4NQ4MA316V",
+      "name": "Klikka Kawer",
+      "x1": 70,
+      "y1": 234,
+      "x2": 140,
+      "y2": 124
+    },
+    {
+      "tsid": "LHVRJLV2UOA3EMR",
+      "name": "Lacier Landare",
+      "x1": 656,
+      "y1": 169,
+      "x2": 725,
+      "y2": 284
+    },
+    {
+      "tsid": "LHV88RQU60B3Q0G",
+      "name": "Lotha Harte",
+      "x1": 325,
+      "y1": 83,
+      "x2": 460,
+      "y2": 38
+    },
+    {
+      "tsid": "LHV7RGKN4MA33RT",
+      "name": "Myndun Snun",
+      "x1": 241,
+      "y1": 226,
+      "x2": 393,
+      "y2": 203
+    },
+    {
+      "tsid": "LHVNJNP4MAB3JI5",
+      "name": "Pallur Runnar",
+      "x1": 324,
+      "y1": 344,
+      "x2": 462,
+      "y2": 319
+    },
+    {
+      "tsid": "LHVO8GQFVAB33C9",
+      "name": "Sickle Nappo",
+      "x1": 520,
+      "y1": 142,
+      "x2": 654,
+      "y2": 172
+    },
+    {
+      "tsid": "LHV8KV9R4MA3JLS",
+      "name": "Slappao Kalt",
+      "x1": 144,
+      "y1": 121,
+      "x2": 320,
+      "y2": 85
+    },
+    {
+      "tsid": "LHV7EKEL4MA3L56",
+      "name": "Snullin Ballin",
+      "x1": 470,
+      "y1": 318,
+      "x2": 610,
+      "y2": 355
+    },
+    {
+      "tsid": "LHV894HP4MA3ME7",
+      "name": "Stafli Joli",
+      "x1": 425,
+      "y1": 427,
+      "x2": 517,
+      "y2": 331
+    },
+    {
+      "tsid": "LHVPOOR1LTA3NJ2",
+      "name": "Stenina Jora",
+      "x1": 397,
+      "y1": 206,
+      "x2": 465,
+      "y2": 316
+    },
+    {
+      "tsid": "LHVFCFD8FRA37T6",
+      "name": "Stornur Sezzez",
+      "x1": 238,
+      "y1": 225,
+      "x2": 320,
+      "y2": 343
+    },
+    {
+      "tsid": "LHVQ1AS19UA3O3T",
+      "name": "Toppa Tre",
+      "x1": 189,
+      "y1": 333,
+      "x2": 316,
+      "y2": 345
+    },
+    {
+      "tsid": "LHV8E39Q4MA3CMV",
+      "name": "Tunglio Bru",
+      "x1": 69,
+      "y1": 237,
+      "x2": 186,
+      "y2": 330
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LHF7DU3N0UC3DRA",
+      "hub_id": "141",
+      "hubName": "Drifa",
+      "label": "To: Drifa",
+      "x": 48,
+      "y": 37,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIF6APMFJUG2AK5",
+      "hub_id": "100",
+      "hubName": "Vantalu",
+      "label": "To: Vantalu",
+      "x": 702,
+      "y": 424,
+      "arrow": 180
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_nottis.jpg"
+}

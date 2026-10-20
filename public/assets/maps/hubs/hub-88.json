@@ -1,0 +1,270 @@
+{
+  "hubId": "88",
+  "hubName": "Karnata",
+  "bg": "http://c1.glitch.bz/img/maps/map_bg_karnata_75282.jpg",
+  "fg": "http://c1.glitch.bz/img/maps/map_fg_karnata_74575.png",
+  "color": "#479500",
+  "btm_color": "#887f87",
+  "top_color": "#a89aa4",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LNV8MSAUQVH2TFL",
+      "name": "Anu Afzelii",
+      "x1": 413,
+      "y1": 438,
+      "x2": 502,
+      "y2": 359
+    },
+    {
+      "tsid": "LNV81HAK2TH20GG",
+      "name": "Anulis Trisc",
+      "x1": 59,
+      "y1": 418,
+      "x2": 158,
+      "y2": 363
+    },
+    {
+      "tsid": "LNV5HIJMOGH28CJ",
+      "name": "Arom Runce",
+      "x1": 143,
+      "y1": 74,
+      "x2": 200,
+      "y2": 172
+    },
+    {
+      "tsid": "LNVQLF5B0JH2KP7",
+      "name": "Balin Bastion",
+      "x1": 202,
+      "y1": 174,
+      "x2": 315,
+      "y2": 239
+    },
+    {
+      "tsid": "LNVNNC9SFTH241J",
+      "name": "Cotton Cross",
+      "x1": 252,
+      "y1": 305,
+      "x2": 379,
+      "y2": 350
+    },
+    {
+      "tsid": "LNV8377MPSH2PCU",
+      "name": "Cryptocrin",
+      "x1": 433,
+      "y1": 205,
+      "x2": 554,
+      "y2": 250
+    },
+    {
+      "tsid": "LNVN7S3VBVH24N3",
+      "name": "Dore Valore",
+      "x1": 381,
+      "y1": 349,
+      "x2": 509,
+      "y2": 356
+    },
+    {
+      "tsid": "LNVAMBDDQSH2OFD",
+      "name": "Echin Gross",
+      "x1": 511,
+      "y1": 358,
+      "x2": 606,
+      "y2": 430
+    },
+    {
+      "tsid": "LNVH5V5D5TH2SJP",
+      "name": "Gibba Gant",
+      "x1": 625,
+      "y1": 181,
+      "x2": 644,
+      "y2": 313
+    },
+    {
+      "tsid": "LNVQ2LE50JH29HU",
+      "name": "Hidro Bluu",
+      "x1": 268,
+      "y1": 59,
+      "x2": 373,
+      "y2": 108
+    },
+    {
+      "tsid": "LNVIK9H78JH2UKU",
+      "name": "Iable Var",
+      "x1": 376,
+      "y1": 109,
+      "x2": 431,
+      "y2": 201
+    },
+    {
+      "tsid": "LNV1QGBR9TH256G",
+      "name": "Jullis Junc",
+      "x1": 421,
+      "y1": 33,
+      "x2": 510,
+      "y2": 109
+    },
+    {
+      "tsid": "LNV37JHLS1I2BF2",
+      "name": "Loksa Laarb",
+      "x1": 314,
+      "y1": 240,
+      "x2": 382,
+      "y2": 349
+    },
+    {
+      "tsid": "LNV5RCDE1GH2PCQ",
+      "name": "Lulu Lim",
+      "x1": 143,
+      "y1": 70,
+      "x2": 267,
+      "y2": 60
+    },
+    {
+      "tsid": "LNV9QIRBELH2BS0",
+      "name": "Maka Murh",
+      "x1": 317,
+      "y1": 239,
+      "x2": 431,
+      "y2": 202
+    },
+    {
+      "tsid": "LNVLGNPAHLH2SRJ",
+      "name": "Maladii Trik",
+      "x1": 372,
+      "y1": 105,
+      "x2": 516,
+      "y2": 113
+    },
+    {
+      "tsid": "LNV19KE3NSH2JG3",
+      "name": "Mino Kree",
+      "x1": 510,
+      "y1": 356,
+      "x2": 640,
+      "y2": 319
+    },
+    {
+      "tsid": "LNV4VAJQKLH20N1",
+      "name": "Nana Null",
+      "x1": 164,
+      "y1": 365,
+      "x2": 257,
+      "y2": 428
+    },
+    {
+      "tsid": "LNVUI1969TH2JE4",
+      "name": "Natan Noks",
+      "x1": 166,
+      "y1": 360,
+      "x2": 248,
+      "y2": 304
+    },
+    {
+      "tsid": "LNVCD62GKTH2FSM",
+      "name": "Radin Ralis",
+      "x1": 556,
+      "y1": 251,
+      "x2": 637,
+      "y2": 314
+    },
+    {
+      "tsid": "LNVEA19502I2S8M",
+      "name": "Rudna Barthii",
+      "x1": 46,
+      "y1": 33,
+      "x2": 139,
+      "y2": 70
+    },
+    {
+      "tsid": "LNVEALS492I20KD",
+      "name": "Sankrit Sul",
+      "x1": 44,
+      "y1": 207,
+      "x2": 116,
+      "y2": 259
+    },
+    {
+      "tsid": "LNV5MEDQOSH2DGS",
+      "name": "Sintin Sess",
+      "x1": 520,
+      "y1": 114,
+      "x2": 624,
+      "y2": 177
+    },
+    {
+      "tsid": "LNV8DCHH72I2222",
+      "name": "Sri Holik",
+      "x1": 624,
+      "y1": 180,
+      "x2": 714,
+      "y2": 96
+    },
+    {
+      "tsid": "LNVT1M8U00I2GAD",
+      "name": "Sultri Sim",
+      "x1": 645,
+      "y1": 318,
+      "x2": 735,
+      "y2": 383
+    },
+    {
+      "tsid": "LNV67JM1JTH271R",
+      "name": "Ubas Gracilis",
+      "x1": 515,
+      "y1": 112,
+      "x2": 622,
+      "y2": 40
+    },
+    {
+      "tsid": "LNVSNG1S00I2FLE",
+      "name": "Velata Lang",
+      "x1": 116,
+      "y1": 258,
+      "x2": 160,
+      "y2": 362
+    },
+    {
+      "tsid": "LNVB0R0UVKH2OKJ",
+      "name": "Willo Let",
+      "x1": 118,
+      "y1": 257,
+      "x2": 196,
+      "y2": 173
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LIF28P8KH4E2U7M",
+      "hub_id": "105",
+      "hubName": "Lida",
+      "label": "To: Lida",
+      "x": 39,
+      "y": 421,
+      "arrow": 270
+    },
+    {
+      "tsid": "LIF7T3QJAFI2BKP",
+      "hub_id": "112",
+      "hubName": "Brillah",
+      "label": "To: Brillah",
+      "x": 419,
+      "y": 30,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA9KLB7I1D822OL",
+      "hub_id": "97",
+      "hubName": "Muufo",
+      "label": "To: Muufo",
+      "x": 37,
+      "y": 26,
+      "arrow": 300
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_karnata.jpg"
+}

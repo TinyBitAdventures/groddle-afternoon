@@ -1,0 +1,951 @@
+{
+  "sammich": {
+    "id": "12",
+    "name": "Sammich",
+    "tool": "knife_and_board",
+    "energyCost": 3,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "bun",
+        "qty": 1
+      },
+      {
+        "classTsid": "meat",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "sammich",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "source": "catalog_recipes.js recipes[\"12\"]"
+  },
+  "fried_eggs": {
+    "id": "17",
+    "name": "Fried Eggs",
+    "tool": "frying_pan",
+    "energyCost": 1,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      },
+      {
+        "classTsid": "egg_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fried_egg",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_1",
+    "skills": [
+      "cheffery_1"
+    ],
+    "source": "catalog_recipes.js recipes[\"17\"]"
+  },
+  "fruity_juice": {
+    "id": "52",
+    "name": "Fruity Juice",
+    "tool": "blender",
+    "energyCost": 3,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "cherry",
+        "qty": 4
+      },
+      {
+        "classTsid": "plum",
+        "qty": 2
+      },
+      {
+        "classTsid": "orange",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "fruity_juice",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_1",
+    "skills": [
+      "blending_1"
+    ],
+    "source": "catalog_recipes.js recipes[\"52\"]"
+  },
+  "lemon_juice": {
+    "id": "53",
+    "name": "Lemon Juice",
+    "tool": "blender",
+    "energyCost": 4,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "lemon",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "lemon_juice",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_1",
+    "skills": [
+      "blending_1"
+    ],
+    "source": "catalog_recipes.js recipes[\"53\"]"
+  },
+  "orange_juice": {
+    "id": "54",
+    "name": "Orange Juice",
+    "tool": "blender",
+    "energyCost": 4,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "orange",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "orange_juice",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_1",
+    "skills": [
+      "blending_1"
+    ],
+    "source": "catalog_recipes.js recipes[\"54\"]"
+  },
+  "bubble_tea": {
+    "id": "61",
+    "name": "Bubble Tea",
+    "tool": "blender",
+    "energyCost": 18,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "blue_bubble",
+        "qty": 5
+      },
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 4
+      },
+      {
+        "classTsid": "hard_bubble",
+        "qty": 2
+      },
+      {
+        "classTsid": "plain_bubble",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bubble_tea",
+        "qty": 1
+      }
+    ],
+    "skill": "blending_2",
+    "skills": [
+      "blending_2"
+    ],
+    "source": "catalog_recipes.js recipes[\"61\"]"
+  },
+  "green_eggs": {
+    "id": "89",
+    "name": "Green Eggs",
+    "tool": "frying_pan",
+    "energyCost": 1,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "spinach",
+        "qty": 1
+      },
+      {
+        "classTsid": "egg_plain",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "green_eggs",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"89\"]"
+  },
+  "blue_bubble": {
+    "id": "105",
+    "name": "Blue Bubble",
+    "tool": "bubble_tuner",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_bubble",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "blue_bubble",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"105\"]"
+  },
+  "tiny_bubble": {
+    "id": "106",
+    "name": "Tiny Bubble",
+    "tool": "bubble_tuner",
+    "energyCost": 5,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_bubble",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "tiny_bubble",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"106\"]"
+  },
+  "hard_bubble": {
+    "id": "107",
+    "name": "Hard Bubble",
+    "tool": "bubble_tuner",
+    "energyCost": 6,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_bubble",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "hard_bubble",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"107\"]"
+  },
+  "ginger": {
+    "id": "120",
+    "name": "Ginger",
+    "tool": "spice_mill",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "ginger",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"120\"]"
+  },
+  "black_pepper": {
+    "id": "121",
+    "name": "Black Pepper",
+    "tool": "spice_mill",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "black_pepper",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"121\"]"
+  },
+  "mustard": {
+    "id": "122",
+    "name": "Mustard",
+    "tool": "spice_mill",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "mustard",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"122\"]"
+  },
+  "cumin": {
+    "id": "123",
+    "name": "Cumin",
+    "tool": "spice_mill",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "all_spice",
+        "qty": 2
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "cumin",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"123\"]"
+  },
+  "heavy_gas": {
+    "id": "133",
+    "name": "Heavy Gas",
+    "tool": "gassifier",
+    "energyCost": 15,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "general_vapour",
+        "qty": 6
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "heavy_gas",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"133\"]"
+  },
+  "helium": {
+    "id": "134",
+    "name": "Helium",
+    "tool": "gassifier",
+    "energyCost": 9,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "general_vapour",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "helium",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"134\"]"
+  },
+  "laughing_gas": {
+    "id": "135",
+    "name": "Laughing Gas",
+    "tool": "gassifier",
+    "energyCost": 6,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "general_vapour",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "laughing_gas",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"135\"]"
+  },
+  "white_gas": {
+    "id": "136",
+    "name": "White Gas",
+    "tool": "gassifier",
+    "energyCost": 15,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "general_vapour",
+        "qty": 8
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "white_gas",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"136\"]"
+  },
+  "crying_gas": {
+    "id": "137",
+    "name": "Crying Gas",
+    "tool": "gassifier",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "general_vapour",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "crying_gas",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "source": "catalog_recipes.js recipes[\"137\"]"
+  },
+  "flour": {
+    "id": "138",
+    "name": "Flour",
+    "tool": "knife_and_board",
+    "energyCost": 1,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "grain",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "flour",
+        "qty": 1
+      }
+    ],
+    "skill": "ezcooking_1",
+    "skills": [
+      "ezcooking_1"
+    ],
+    "source": "catalog_recipes.js recipes[\"138\"]"
+  },
+  "bun": {
+    "id": "139",
+    "name": "Bun",
+    "tool": "frying_pan",
+    "energyCost": 2,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "flour",
+        "qty": 1
+      },
+      {
+        "classTsid": "pinch_of_salt",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "bun",
+        "qty": 1
+      }
+    ],
+    "skill": "cheffery_1",
+    "skills": [
+      "cheffery_1"
+    ],
+    "source": "catalog_recipes.js recipes[\"139\"]"
+  },
+  "plain_metal": {
+    "id": "smelt_metal",
+    "name": "Plain Metal Ingot",
+    "tool": "smelter",
+    "energyCost": 5,
+    "xpReward": 2,
+    "waitMs": 1500,
+    "inputs": [
+      {
+        "classTsid": "metal_rock",
+        "qty": 5
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      }
+    ],
+    "skill": "smelting_1",
+    "skills": [
+      "smelting_1"
+    ],
+    "source": "smelter.js smelt \u2014 5 metal_rock \u2192 plain_metal"
+  },
+  "tin": {
+    "id": "174",
+    "name": "Tin",
+    "tool": "alchemical_tongs",
+    "energyCost": 2,
+    "xpReward": 3,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      },
+      {
+        "classTsid": "element_red",
+        "qty": 8
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 8
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 8
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "tin",
+        "qty": 1
+      }
+    ],
+    "skill": "alchemy_2",
+    "skills": [
+      "alchemy_2"
+    ],
+    "source": "catalog_recipes.js recipes[\"174\"]"
+  },
+  "copper": {
+    "id": "175",
+    "name": "Copper",
+    "tool": "alchemical_tongs",
+    "energyCost": 2,
+    "xpReward": 4,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      },
+      {
+        "classTsid": "element_red",
+        "qty": 60
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 30
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "copper",
+        "qty": 1
+      }
+    ],
+    "skill": "alchemy_2",
+    "skills": [
+      "alchemy_2"
+    ],
+    "source": "catalog_recipes.js recipes[\"175\"]"
+  },
+  "molybdenum": {
+    "id": "176",
+    "name": "Molybdenum",
+    "tool": "alchemical_tongs",
+    "energyCost": 2,
+    "xpReward": 5,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 5
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 50
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "molybdenum",
+        "qty": 1
+      }
+    ],
+    "skill": "alchemy_2",
+    "skills": [
+      "alchemy_2"
+    ],
+    "source": "catalog_recipes.js recipes[\"176\"]"
+  },
+  "metal_rod": {
+    "id": "279",
+    "name": "Metal Rod",
+    "tool": "metalmaker",
+    "energyCost": 0,
+    "xpReward": 4,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 1
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      },
+      {
+        "classTsid": "fuel_cell",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "metal_rod",
+        "qty": 1
+      }
+    ],
+    "skill": "metalwork_1",
+    "skills": [
+      "metalwork_1"
+    ],
+    "source": "catalog_recipes.js recipes[\"279\"]"
+  },
+  "metal_post": {
+    "id": "280",
+    "name": "Metal Bar",
+    "tool": "metalmaker",
+    "energyCost": 0,
+    "xpReward": 16,
+    "waitMs": 6000,
+    "inputs": [
+      {
+        "classTsid": "copper",
+        "qty": 2
+      },
+      {
+        "classTsid": "tin",
+        "qty": 3
+      },
+      {
+        "classTsid": "fuel_cell",
+        "qty": 6
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "metal_post",
+        "qty": 1
+      }
+    ],
+    "skill": "metalwork_1",
+    "skills": [
+      "metalwork_1"
+    ],
+    "source": "catalog_recipes.js recipes[\"280\"] metal_post"
+  },
+  "crush_dullite": {
+    "id": "crush_dullite",
+    "name": "Crush Dullite",
+    "tool": "ore_grinder",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 1200,
+    "inputs": [
+      {
+        "classTsid": "dullite",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 5
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 8
+      }
+    ],
+    "skill": "refining_1",
+    "skills": [
+      "refining_1"
+    ],
+    "source": "ore_grinder.js onCrushComplete dullite"
+  },
+  "crush_beryl": {
+    "id": "crush_beryl",
+    "name": "Crush Beryl",
+    "tool": "ore_grinder",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 1200,
+    "inputs": [
+      {
+        "classTsid": "beryl",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 20
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 2
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 4
+      }
+    ],
+    "skill": "refining_1",
+    "skills": [
+      "refining_1"
+    ],
+    "source": "ore_grinder.js onCrushComplete beryl"
+  },
+  "crush_sparkly": {
+    "id": "crush_sparkly",
+    "name": "Crush Sparkly",
+    "tool": "ore_grinder",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 1200,
+    "inputs": [
+      {
+        "classTsid": "sparkly",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "element_red",
+        "qty": 5
+      },
+      {
+        "classTsid": "element_green",
+        "qty": 1
+      },
+      {
+        "classTsid": "element_blue",
+        "qty": 4
+      },
+      {
+        "classTsid": "element_shiny",
+        "qty": 6
+      }
+    ],
+    "skill": "refining_1",
+    "skills": [
+      "refining_1"
+    ],
+    "source": "ore_grinder.js onCrushComplete sparkly"
+  },
+  "change_plum": {
+    "id": "108",
+    "name": "Plum",
+    "tool": "fruit_changing_machine",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 1 }],
+    "outputs": [{ "classTsid": "plum", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"108\"]"
+  },
+  "change_grapes": {
+    "id": "109",
+    "name": "Bunch of Grapes",
+    "tool": "fruit_changing_machine",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 2 }],
+    "outputs": [{ "classTsid": "bunch_of_grapes", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"109\"]"
+  },
+  "change_orange": {
+    "id": "111",
+    "name": "Orange",
+    "tool": "fruit_changing_machine",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 3 }],
+    "outputs": [{ "classTsid": "orange", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"111\"]"
+  },
+  "change_apple": {
+    "id": "112",
+    "name": "Apple",
+    "tool": "fruit_changing_machine",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 3 }],
+    "outputs": [{ "classTsid": "apple", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"112\"]"
+  },
+  "change_lemon": {
+    "id": "113",
+    "name": "Lemon",
+    "tool": "fruit_changing_machine",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 4 }],
+    "outputs": [{ "classTsid": "lemon", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"113\"]"
+  },
+  "change_pineapple": {
+    "id": "114",
+    "name": "Pineapple",
+    "tool": "fruit_changing_machine",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 5 }],
+    "outputs": [{ "classTsid": "pineapple", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"114\"]"
+  },
+  "change_banana": {
+    "id": "115",
+    "name": "Banana",
+    "tool": "fruit_changing_machine",
+    "energyCost": 5,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 6 }],
+    "outputs": [{ "classTsid": "banana", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"115\"]"
+  },
+  "change_whortleberry": {
+    "id": "142",
+    "name": "Whortleberry",
+    "tool": "fruit_changing_machine",
+    "energyCost": 4,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 2 }],
+    "outputs": [{ "classTsid": "whortleberry", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"142\"]"
+  },
+  "change_cloudberry": {
+    "id": "144",
+    "name": "Cloudberry",
+    "tool": "fruit_changing_machine",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 1 }],
+    "outputs": [{ "classTsid": "cloudberry", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"144\"]"
+  },
+  "change_strawberry": {
+    "id": "172",
+    "name": "Strawberry",
+    "tool": "fruit_changing_machine",
+    "energyCost": 2,
+    "xpReward": 1,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 3 }],
+    "outputs": [{ "classTsid": "strawberry", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"172\"]"
+  },
+  "change_mangosteen": {
+    "id": "173",
+    "name": "Mangosteen",
+    "tool": "fruit_changing_machine",
+    "energyCost": 4,
+    "xpReward": 2,
+    "waitMs": 2000,
+    "inputs": [{ "classTsid": "cherry", "qty": 7 }],
+    "outputs": [{ "classTsid": "mangosteen", "qty": 1 }],
+    "source": "catalog_recipes.js recipes[\"173\"]"
+  }
+}

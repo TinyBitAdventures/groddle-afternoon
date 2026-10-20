@@ -1,0 +1,80 @@
+{
+  "hubId": "81",
+  "hubName": "Ryan",
+  "bg": "http://c1.glitch.bz/img/maps/map_fake_island_45490.jpg",
+  "fg": "",
+  "color": "#ff0000",
+  "btm_color": "#606669",
+  "top_color": "#8a9297",
+  "mote_id": "14",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [],
+  "hubs": [
+    {
+      "tsid": "LA5RPAFK9OE28GN",
+      "hub_id": "40",
+      "hubName": "Naraka",
+      "label": "To: Naraka",
+      "x": 700,
+      "y": 100,
+      "arrow": 0
+    },
+    {
+      "tsid": "LUV5M48HCRL28EA",
+      "hub_id": "84",
+      "hubName": "Ian",
+      "label": "To: Ian",
+      "x": 700,
+      "y": 200,
+      "arrow": 0
+    },
+    {
+      "tsid": "LHV1H1EHOF32UJM",
+      "hub_id": "75",
+      "hubName": "Bortola",
+      "label": "To: Bortola",
+      "x": 700,
+      "y": 300,
+      "arrow": 0
+    },
+    {
+      "tsid": "LHV4DK1R7JS2P08",
+      "hub_id": "117",
+      "hubName": "Homes",
+      "label": "To: Homes",
+      "x": 700,
+      "y": 100,
+      "arrow": 0
+    },
+    {
+      "tsid": "LA9TCL1H7LD37DC",
+      "hub_id": "142",
+      "hubName": "Moshi Moshi Oshilatis",
+      "label": "To: Moshi Moshi Oshilatis",
+      "x": 700,
+      "y": 200,
+      "arrow": 0
+    },
+    {
+      "tsid": "LIFSTR1LIJC3J52",
+      "hub_id": "118",
+      "hubName": "Keita",
+      "label": "To: Keita",
+      "x": 700,
+      "y": 300,
+      "arrow": 0
+    },
+    {
+      "tsid": "LDOTQ7BJGUC3CNP",
+      "hub_id": "118",
+      "hubName": "Keita",
+      "label": "To: Keita",
+      "x": 700,
+      "y": 400,
+      "arrow": 0
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": ""
+}

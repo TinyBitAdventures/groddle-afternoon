@@ -1,0 +1,206 @@
+{
+  "hubId": "121",
+  "hubName": "Sura",
+  "bg": "http://c2.glitch.bz/client_maps/2012-04-19/sura_bg_1334879408.jpg",
+  "fg": "http://c2.glitch.bz/client_maps/2012-04-19/sura_fg_1334879408.png",
+  "color": "1d8a00",
+  "btm_color": "877f7e",
+  "top_color": "a79a98",
+  "mote_id": "9",
+  "mapW": 760,
+  "mapH": 460,
+  "streets": [
+    {
+      "tsid": "LA556IE55JS245H",
+      "name": "Bokkeum Habitat",
+      "x1": 132,
+      "y1": 350,
+      "x2": 207,
+      "y2": 423
+    },
+    {
+      "tsid": "LA5NV05NFJS2NIF",
+      "name": "Calta Habitat",
+      "x1": 317,
+      "y1": 194,
+      "x2": 368,
+      "y2": 88
+    },
+    {
+      "tsid": "LA54EE8QNMR2G7C",
+      "name": "Chueo Vegae",
+      "x1": 68,
+      "y1": 380,
+      "x2": 191,
+      "y2": 314
+    },
+    {
+      "tsid": "LA5VFMEIT8S2PPV",
+      "name": "Dorajii Nakji",
+      "x1": 561,
+      "y1": 136,
+      "x2": 690,
+      "y2": 81
+    },
+    {
+      "tsid": "LA5UDRLCE9S20ER",
+      "name": "Dorji Park",
+      "x1": 385,
+      "y1": 333,
+      "x2": 476,
+      "y2": 244
+    },
+    {
+      "tsid": "LA5QAHLTB9S2C0F",
+      "name": "Gaji Preserve",
+      "x1": 79,
+      "y1": 272,
+      "x2": 201,
+      "y2": 274
+    },
+    {
+      "tsid": "LA54VETILKR26N1",
+      "name": "Gimbap Bop",
+      "x1": 367,
+      "y1": 188,
+      "x2": 491,
+      "y2": 251
+    },
+    {
+      "tsid": "LA578O7KNJS2BNI",
+      "name": "Goptan Habitat",
+      "x1": 513,
+      "y1": 217,
+      "x2": 687,
+      "y2": 203
+    },
+    {
+      "tsid": "LA5R11F6C9S2HA9",
+      "name": "Gosari Habitat",
+      "x1": 210,
+      "y1": 90,
+      "x2": 266,
+      "y2": 202
+    },
+    {
+      "tsid": "LA53N05IG9S2BLR",
+      "name": "Gyerean Park",
+      "x1": 210,
+      "y1": 259,
+      "x2": 330,
+      "y2": 293
+    },
+    {
+      "tsid": "LA54O13ELKR29I9",
+      "name": "Jarjai Binq",
+      "x1": 75,
+      "y1": 107,
+      "x2": 220,
+      "y2": 208
+    },
+    {
+      "tsid": "LA5FBH56QKR29RK",
+      "name": "Mandu Passo",
+      "x1": 492,
+      "y1": 253,
+      "x2": 561,
+      "y2": 135
+    },
+    {
+      "tsid": "LA5VEL0SJJS2KVU",
+      "name": "Medbim Preserve",
+      "x1": 448,
+      "y1": 375,
+      "x2": 571,
+      "y2": 332
+    },
+    {
+      "tsid": "LA5945LJ7JS2GFK",
+      "name": "Mogari Preserve",
+      "x1": 406,
+      "y1": 98,
+      "x2": 545,
+      "y2": 160
+    },
+    {
+      "tsid": "LA5GVGHRQKR2V5U",
+      "name": "Ojangi Chimi",
+      "x1": 491,
+      "y1": 252,
+      "x2": 623,
+      "y2": 372
+    },
+    {
+      "tsid": "LA5215DAMMR2G95",
+      "name": "Ramyeon Kon",
+      "x1": 190,
+      "y1": 310,
+      "x2": 222,
+      "y2": 208
+    },
+    {
+      "tsid": "LA582EG1QLS20BF",
+      "name": "Samdol Habitat",
+      "x1": 535,
+      "y1": 35,
+      "x2": 645,
+      "y2": 99
+    },
+    {
+      "tsid": "LA5KKVRDKAT2EA2",
+      "name": "Shinso Ello",
+      "x1": 193,
+      "y1": 316,
+      "x2": 313,
+      "y2": 405
+    },
+    {
+      "tsid": "LA5AAB0VNKR2VRN",
+      "name": "Teobocci Shasha",
+      "x1": 226,
+      "y1": 207,
+      "x2": 363,
+      "y2": 187
+    },
+    {
+      "tsid": "LA5RJRSOHJS2C95",
+      "name": "Traloma Habitat",
+      "x1": 124,
+      "y1": 140,
+      "x2": 208,
+      "y2": 47
+    }
+  ],
+  "hubs": [
+    {
+      "tsid": "LA55B5RDL7T2F00",
+      "hub_id": "123",
+      "hubName": "Fenneq",
+      "label": "To: Fenneq",
+      "x": 64,
+      "y": 108,
+      "arrow": 0
+    },
+    {
+      "tsid": "LUVNH88P9KR2B8L",
+      "hub_id": "120",
+      "hubName": "Cauda",
+      "label": "To: Cauda",
+      "x": 59,
+      "y": 381,
+      "arrow": 290
+    },
+    {
+      "tsid": "LIFGR4QG5IV1QPI",
+      "hub_id": "71",
+      "hubName": "Jethimadh",
+      "label": "To: Jethimadh",
+      "x": 317,
+      "y": 408,
+      "arrow": 200
+    }
+  ],
+  "bgLocal": "",
+  "fgLocal": "",
+  "thumbLocal": "assets/maps/art/thumbs/sm_sura.jpg"
+}
