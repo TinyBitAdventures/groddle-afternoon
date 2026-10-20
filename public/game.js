@@ -1492,7 +1492,8 @@ function toast(msg, ms = 3000) {
   const el = document.getElementById('toast');
   el.hidden = false;
   el.textContent = msg;
-  state.toastTimer = ms;
+  // Wall-clock deadline: frame-counted timers linger on slow or throttled frames.
+  state.toastTimer = performance.now() + ms;
 }
 
 /** @type {Promise<void>} */
@@ -8210,9 +8211,9 @@ function physics(dt) {
       (LOCATION_VIEW_H - (player.y - camY)).toFixed(2);
   }
 
-  if (state.toastTimer > 0) {
-    state.toastTimer -= (1000 / 60) * dt;
-    if (state.toastTimer <= 0) document.getElementById('toast').hidden = true;
+  if (state.toastTimer > 0 && performance.now() >= state.toastTimer) {
+    state.toastTimer = 0;
+    document.getElementById('toast').hidden = true;
   }
 }
 

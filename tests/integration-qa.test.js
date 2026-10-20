@@ -22,4 +22,10 @@ test.describe('integration playtest regressions', () => {
     assert.match(body, /usePackItem\('apple'\)/);
     assert.doesNotMatch(body, /useItem\(inv/);
   });
+
+  test('toasts expire on the wall clock, not counted frames', () => {
+    assert.match(fnBody('toast'), /state\.toastTimer = performance\.now\(\) \+ ms/);
+    assert.match(game, /state\.toastTimer > 0 && performance\.now\(\) >= state\.toastTimer/);
+    assert.doesNotMatch(game, /state\.toastTimer -= /);
+  });
 });
