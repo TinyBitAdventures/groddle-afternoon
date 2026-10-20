@@ -114,7 +114,7 @@
       "seq4_gap1",
       "seq4_plat1_on"
      ],
-     "why": "Upper ledge end before bridge 4 (plats 9988-9992 end x=4666 at y\u2248318; the two six-board halves sit at y=319). seq4_plat1_on blinks the middle board 1105 (x=5507) and the two high boards 2 s on, 0.8 s off: the only way across the hole between the halves (video VxAyiFj2gVU 0:45-0:55)."
+     "why": "Upper ledge end before bridge 4 (plats 9988-9992 end x=4666 at y≈318; the two six-board halves sit at y=319). seq4_plat1_on blinks the middle board 1105 (x=5507) and the two high boards 2 s on, 0.8 s off: the only way across the hole between the halves (video VxAyiFj2gVU 0:45-0:55)."
     }
    ],
    "quoins": [
@@ -315,7 +315,7 @@
      "onEnter": [
       "unhide_secret1_a"
      ],
-     "why": "pulseDot_1341884449719 (layer T_1341884449718, x=1334 y=402), the glowing dot unhide_secret1_a hides: it sits on the low cap (plat 8231, y\u2248421) beside bling_charms_3."
+     "why": "pulseDot_1341884449719 (layer T_1341884449718, x=1334 y=402), the glowing dot unhide_secret1_a hides: it sits on the low cap (plat 8231, y≈421) beside bling_charms_3."
     },
     {
      "id": "secret_rope_a",
@@ -348,7 +348,7 @@
      "onEnter": [
       "sink1_a"
      ],
-     "why": "sink1_a switches plat 9182 (x 2366-2486, y 330, the island's top) off and the next one 20 px lower on: the box is the island's own top. Six 500 ms steps lower it 120 px to the water (y\u2248450); 700 ms later it pops back. Video YvRCmwdipuo 0:40-0:55."
+     "why": "sink1_a switches plat 9182 (x 2366-2486, y 330, the island's top) off and the next one 20 px lower on: the box is the island's own top. Six 500 ms steps lower it 120 px to the water (y≈450); 700 ms later it pops back. Video YvRCmwdipuo 0:40-0:55."
     },
     {
      "id": "sink2",
@@ -428,7 +428,7 @@
      "onExit": [
       "walk"
      ],
-     "why": "The pool between walls 9170 (x=2237) and the right ladder (x\u22484040): floor y\u2248655, surface just under the sunk islands (y\u2248450-460). swim is the street's own jetpack physics (gravity x0.3, jump x0.4, speed x0.6); walk resets it."
+     "why": "The pool between walls 9170 (x=2237) and the right ladder (x≈4040): floor y≈655, surface just under the sunk islands (y≈450-460). swim is the street's own jetpack physics (gravity x0.3, jump x0.4, speed x0.6); walk resets it."
     },
     {
      "id": "tilt1_left",
@@ -527,7 +527,7 @@
      "onEnter": [
       "fall1_a"
      ],
-     "why": "Pillar 1 cap: plat 6611 (x 5670-5727, y 241), the one fall1_a switches off. The cap then drops 20 px every 400 ms (12 steps, to y\u2248481) and returns 4 s later."
+     "why": "Pillar 1 cap: plat 6611 (x 5670-5727, y 241), the one fall1_a switches off. The cap then drops 20 px every 400 ms (12 steps, to y≈481) and returns 4 s later."
     },
     {
      "id": "fall3",
@@ -1106,7 +1106,7 @@
      "onEnter": [
       "show2_hide3"
      ],
-     "why": "Section 2/3 boundary on the high ledge (plats 7392-7397, y\u2248183), between the last part 2 pad (x 3679) and the first part 3 pad (x 4173)."
+     "why": "Section 2/3 boundary on the high ledge (plats 7392-7397, y≈183), between the last part 2 pad (x 3679) and the first part 3 pad (x 4173)."
     },
     {
      "id": "sections23_on",
@@ -1131,7 +1131,7 @@
      "onExit": [
       "secret_out"
      ],
-     "why": "ug_wall_heights_1337036905111 (layer T_1335489691386, x=1824 y=230, 172x186) covers the ladder nook at x\u22481790; secret_in fades it while the avatar is inside."
+     "why": "ug_wall_heights_1337036905111 (layer T_1335489691386, x=1824 y=230, 172x186) covers the ladder nook at x≈1790; secret_in fades it while the avatar is inside."
     },
     {
      "id": "hidden_nook",
@@ -1284,7 +1284,7 @@
      "onExit": [
       "depn_swch_1_up"
      ],
-     "why": "Depression switch 1: the 45 px button plat (x 879-924, y 694) between its 24 px walls, the top of the pillar deco that drops 24-26 px when pressed. Standing on it presses it (button plat off, walls open); stepping off releases it. It also opens gate wall 556 (x\u22481055) for good."
+     "why": "Depression switch 1: the 45 px button plat (x 879-924, y 694) between its 24 px walls, the top of the pillar deco that drops 24-26 px when pressed. Standing on it presses it (button plat off, walls open); stepping off releases it. It also opens gate wall 556 (x≈1055) for good."
     },
     {
      "id": "switch2",
@@ -1734,7 +1734,7 @@
      "onEnter": [
       "hide_spacebarbar_sign"
      ],
-     "why": "Exit ledge (y\u2248150, door at x 4908): fades the fly hint sign (groddle_sign_blank_1339202979221)."
+     "why": "Exit ledge (y≈150, door at x 4908): fades the fly hint sign (groddle_sign_blank_1339202979221)."
     }
    ],
    "quoins": [
@@ -2346,7 +2346,7 @@
      "onEnter": [
       "key1"
      ],
-     "why": "Piano key 1: where its light_spot (0943, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 718, y 1765). Keys sit ~90 px apart along the slanted keyboard; key1 lights the spot and plays LITTLE_STAR_19."
+     "why": "Piano key 1: where its light_spot (0943, rotated 39° like the keyboard) meets the keyboard platform (x 718, y 1765). Keys sit ~90 px apart along the slanted keyboard; key1 lights the spot and plays LITTLE_STAR_19."
     },
     {
      "id": "key2",
@@ -2357,7 +2357,7 @@
      "onEnter": [
       "key2"
      ],
-     "why": "Piano key 2: where its light_spot (0935, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 807, y 1770). Keys sit ~90 px apart along the slanted keyboard; key2 lights the spot and plays LITTLE_STAR_18."
+     "why": "Piano key 2: where its light_spot (0935, rotated 39° like the keyboard) meets the keyboard platform (x 807, y 1770). Keys sit ~90 px apart along the slanted keyboard; key2 lights the spot and plays LITTLE_STAR_18."
     },
     {
      "id": "key3",
@@ -2368,7 +2368,7 @@
      "onEnter": [
       "key3"
      ],
-     "why": "Piano key 3: where its light_spot (0936, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 896, y 1776). Keys sit ~90 px apart along the slanted keyboard; key3 lights the spot and plays LITTLE_STAR_17."
+     "why": "Piano key 3: where its light_spot (0936, rotated 39° like the keyboard) meets the keyboard platform (x 896, y 1776). Keys sit ~90 px apart along the slanted keyboard; key3 lights the spot and plays LITTLE_STAR_17."
     },
     {
      "id": "key4",
@@ -2379,7 +2379,7 @@
      "onEnter": [
       "key4"
      ],
-     "why": "Piano key 4: where its light_spot (8651, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 988, y 1781). Keys sit ~90 px apart along the slanted keyboard; key4 lights the spot and plays LITTLE_STAR_16."
+     "why": "Piano key 4: where its light_spot (8651, rotated 39° like the keyboard) meets the keyboard platform (x 988, y 1781). Keys sit ~90 px apart along the slanted keyboard; key4 lights the spot and plays LITTLE_STAR_16."
     },
     {
      "id": "key5",
@@ -2390,7 +2390,7 @@
      "onEnter": [
       "key5"
      ],
-     "why": "Piano key 5: where its light_spot (8652, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1078, y 1787). Keys sit ~90 px apart along the slanted keyboard; key5 lights the spot and plays LITTLE_STAR_15."
+     "why": "Piano key 5: where its light_spot (8652, rotated 39° like the keyboard) meets the keyboard platform (x 1078, y 1787). Keys sit ~90 px apart along the slanted keyboard; key5 lights the spot and plays LITTLE_STAR_15."
     },
     {
      "id": "key6",
@@ -2401,7 +2401,7 @@
      "onEnter": [
       "key6"
      ],
-     "why": "Piano key 6: where its light_spot (8650, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1167, y 1792). Keys sit ~90 px apart along the slanted keyboard; key6 lights the spot and plays LITTLE_STAR_14."
+     "why": "Piano key 6: where its light_spot (8650, rotated 39° like the keyboard) meets the keyboard platform (x 1167, y 1792). Keys sit ~90 px apart along the slanted keyboard; key6 lights the spot and plays LITTLE_STAR_14."
     },
     {
      "id": "key7",
@@ -2412,7 +2412,7 @@
      "onEnter": [
       "key7"
      ],
-     "why": "Piano key 7: where its light_spot (8654, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1257, y 1798). Keys sit ~90 px apart along the slanted keyboard; key7 lights the spot and plays LITTLE_STAR_13."
+     "why": "Piano key 7: where its light_spot (8654, rotated 39° like the keyboard) meets the keyboard platform (x 1257, y 1798). Keys sit ~90 px apart along the slanted keyboard; key7 lights the spot and plays LITTLE_STAR_13."
     },
     {
      "id": "key8",
@@ -2423,7 +2423,7 @@
      "onEnter": [
       "key8"
      ],
-     "why": "Piano key 8: where its light_spot (8655, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1347, y 1803). Keys sit ~90 px apart along the slanted keyboard; key8 lights the spot and plays LITTLE_STAR_12."
+     "why": "Piano key 8: where its light_spot (8655, rotated 39° like the keyboard) meets the keyboard platform (x 1347, y 1803). Keys sit ~90 px apart along the slanted keyboard; key8 lights the spot and plays LITTLE_STAR_12."
     },
     {
      "id": "key9",
@@ -2434,7 +2434,7 @@
      "onEnter": [
       "key9"
      ],
-     "why": "Piano key 9: where its light_spot (8653, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1438, y 1809). Keys sit ~90 px apart along the slanted keyboard; key9 lights the spot and plays LITTLE_STAR_11."
+     "why": "Piano key 9: where its light_spot (8653, rotated 39° like the keyboard) meets the keyboard platform (x 1438, y 1809). Keys sit ~90 px apart along the slanted keyboard; key9 lights the spot and plays LITTLE_STAR_11."
     },
     {
      "id": "key10",
@@ -2445,7 +2445,7 @@
      "onEnter": [
       "key10"
      ],
-     "why": "Piano key 10: where its light_spot (8657, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1526, y 1814). Keys sit ~90 px apart along the slanted keyboard; key10 lights the spot and plays LITTLE_STAR_10."
+     "why": "Piano key 10: where its light_spot (8657, rotated 39° like the keyboard) meets the keyboard platform (x 1526, y 1814). Keys sit ~90 px apart along the slanted keyboard; key10 lights the spot and plays LITTLE_STAR_10."
     },
     {
      "id": "key11",
@@ -2456,7 +2456,7 @@
      "onEnter": [
       "key11"
      ],
-     "why": "Piano key 11: where its light_spot (8658, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1614, y 1819). Keys sit ~90 px apart along the slanted keyboard; key11 lights the spot and plays LITTLE_STAR_9."
+     "why": "Piano key 11: where its light_spot (8658, rotated 39° like the keyboard) meets the keyboard platform (x 1614, y 1819). Keys sit ~90 px apart along the slanted keyboard; key11 lights the spot and plays LITTLE_STAR_9."
     },
     {
      "id": "key12",
@@ -2467,7 +2467,7 @@
      "onEnter": [
       "key12"
      ],
-     "why": "Piano key 12: where its light_spot (8656, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1706, y 1825). Keys sit ~90 px apart along the slanted keyboard; key12 lights the spot and plays LITTLE_STAR_8."
+     "why": "Piano key 12: where its light_spot (8656, rotated 39° like the keyboard) meets the keyboard platform (x 1706, y 1825). Keys sit ~90 px apart along the slanted keyboard; key12 lights the spot and plays LITTLE_STAR_8."
     },
     {
      "id": "key13",
@@ -2478,7 +2478,7 @@
      "onEnter": [
       "key13"
      ],
-     "why": "Piano key 13: where its light_spot (8663, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1792, y 1830). Keys sit ~90 px apart along the slanted keyboard; key13 lights the spot and plays LITTLE_STAR_7."
+     "why": "Piano key 13: where its light_spot (8663, rotated 39° like the keyboard) meets the keyboard platform (x 1792, y 1830). Keys sit ~90 px apart along the slanted keyboard; key13 lights the spot and plays LITTLE_STAR_7."
     },
     {
      "id": "key14",
@@ -2489,7 +2489,7 @@
      "onEnter": [
       "key14"
      ],
-     "why": "Piano key 14: where its light_spot (8664, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1885, y 1836). Keys sit ~90 px apart along the slanted keyboard; key14 lights the spot and plays LITTLE_STAR_6."
+     "why": "Piano key 14: where its light_spot (8664, rotated 39° like the keyboard) meets the keyboard platform (x 1885, y 1836). Keys sit ~90 px apart along the slanted keyboard; key14 lights the spot and plays LITTLE_STAR_6."
     },
     {
      "id": "key15",
@@ -2500,7 +2500,7 @@
      "onEnter": [
       "key15"
      ],
-     "why": "Piano key 15: where its light_spot (8662, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1973, y 1841). Keys sit ~90 px apart along the slanted keyboard; key15 lights the spot and plays LITTLE_STAR_5."
+     "why": "Piano key 15: where its light_spot (8662, rotated 39° like the keyboard) meets the keyboard platform (x 1973, y 1841). Keys sit ~90 px apart along the slanted keyboard; key15 lights the spot and plays LITTLE_STAR_5."
     },
     {
      "id": "key16",
@@ -2511,7 +2511,7 @@
      "onEnter": [
       "key16"
      ],
-     "why": "Piano key 16: where its light_spot (8660, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 2064, y 1847). Keys sit ~90 px apart along the slanted keyboard; key16 lights the spot and plays LITTLE_STAR_4."
+     "why": "Piano key 16: where its light_spot (8660, rotated 39° like the keyboard) meets the keyboard platform (x 2064, y 1847). Keys sit ~90 px apart along the slanted keyboard; key16 lights the spot and plays LITTLE_STAR_4."
     },
     {
      "id": "key17",
@@ -2522,7 +2522,7 @@
      "onEnter": [
       "key17"
      ],
-     "why": "Piano key 17: where its light_spot (8661, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 2153, y 1852). Keys sit ~90 px apart along the slanted keyboard; key17 lights the spot and plays LITTLE_STAR_3."
+     "why": "Piano key 17: where its light_spot (8661, rotated 39° like the keyboard) meets the keyboard platform (x 2153, y 1852). Keys sit ~90 px apart along the slanted keyboard; key17 lights the spot and plays LITTLE_STAR_3."
     },
     {
      "id": "key18",
@@ -2533,7 +2533,7 @@
      "onEnter": [
       "key18"
      ],
-     "why": "Piano key 18: where its light_spot (8659, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 2245, y 1857). Keys sit ~90 px apart along the slanted keyboard; key18 lights the spot and plays LITTLE_STAR_2."
+     "why": "Piano key 18: where its light_spot (8659, rotated 39° like the keyboard) meets the keyboard platform (x 2245, y 1857). Keys sit ~90 px apart along the slanted keyboard; key18 lights the spot and plays LITTLE_STAR_2."
     },
     {
      "id": "key19",
@@ -2544,7 +2544,7 @@
      "onEnter": [
       "key19"
      ],
-     "why": "Piano key 19: where its light_spot (8665, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 2338, y 1863). Keys sit ~90 px apart along the slanted keyboard; key19 lights the spot and plays LITTLE_STAR_1."
+     "why": "Piano key 19: where its light_spot (8665, rotated 39° like the keyboard) meets the keyboard platform (x 2338, y 1863). Keys sit ~90 px apart along the slanted keyboard; key19 lights the spot and plays LITTLE_STAR_1."
     },
     {
      "id": "star1",
@@ -3259,7 +3259,7 @@
      "onEnter": [
       "gut_top"
      ],
-     "why": "The tube's cap above its last wall lines (plats 2575/2581 end at y\u2248470), under the Cinnabar Chibe signpost (500, 35): should_tp_top -> Cinnabar Chibe (437, -120)."
+     "why": "The tube's cap above its last wall lines (plats 2575/2581 end at y≈470), under the Cinnabar Chibe signpost (500, 35): should_tp_top -> Cinnabar Chibe (437, -120)."
     },
     {
      "id": "tube_bottom",
@@ -3622,7 +3622,7 @@
      "onEnter": [
       "gut_bottom"
      ],
-     "why": "Foot of the narrow shaft (x\u22481850) the zigzag drains into: should_tp_bottom -> Shim Shiri (447, -1000)."
+     "why": "Foot of the narrow shaft (x≈1850) the zigzag drains into: should_tp_bottom -> Shim Shiri (447, -1000)."
     }
    ],
    "quoins": [
@@ -3955,7 +3955,7 @@
      "onEnter": [
       "gut_bottom"
      ],
-     "why": "Foot of the narrow shaft (x\u22483420-3600) the inner loop drains into: should_tp_bottom -> Shim Shiri (1359, -1000)."
+     "why": "Foot of the narrow shaft (x≈3420-3600) the inner loop drains into: should_tp_bottom -> Shim Shiri (1359, -1000)."
     }
    ],
    "quoins": [
@@ -4158,6 +4158,648 @@
      "amount": 3
     }
    ]
+  },
+  "GUV270LMU8A3UCB": {
+   "name": "Daksina Tom",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 637,
+     "y": 310,
+     "w": 167,
+     "h": 218,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "vent"
+     ],
+     "why": "WindCurl current (layer T_1343156868615, scaled x1.00, anchor 602,213, 182x83 rotated 58°): its rotated bounds, firing vent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent2",
+     "x": 633,
+     "y": 681,
+     "w": 90,
+     "h": 202,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "vent"
+     ],
+     "why": "WindCurl current (layer T_1343156868615, scaled x1.00, anchor 674,570, 182x83 rotated -90°): its rotated bounds, firing vent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent3",
+     "x": 2609,
+     "y": 532,
+     "w": 90,
+     "h": 202,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "vent"
+     ],
+     "why": "WindCurl current (layer T_1343156868615, scaled x1.00, anchor 2650,421, 182x83 rotated -90°): its rotated bounds, firing vent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUV2LJJO5UC30B2": {
+   "name": "Matsya",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 1221,
+     "y": 2203,
+     "w": 497,
+     "h": 678,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1350949910837, scaled x1.00, anchor 1133,1905, 643x203 rotated 60°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent2",
+     "x": 1137,
+     "y": 1005,
+     "w": 235,
+     "h": 446,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1350949910837, scaled x1.00, anchor 1091,755, 418x98 rotated 110°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUV8TSS9Q5D308S": {
+   "name": "Atata",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 1405,
+     "y": 1516,
+     "w": 166,
+     "h": 351,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindFog current (layer T_1350927810566, scaled x1.09, anchor 1483,1328, 300x150 rotated -92°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUVGG7RFV2D3L0U": {
+   "name": "Balarama",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 856,
+     "y": 1751,
+     "w": 371,
+     "h": 605,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351273234226, scaled x0.98, anchor 793,1468, 593x138 rotated 65°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent2",
+     "x": 1505,
+     "y": 1117,
+     "w": 371,
+     "h": 605,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351273234226, scaled x0.98, anchor 1442,834, 593x138 rotated 65°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent3",
+     "x": 199,
+     "y": 883,
+     "w": 138,
+     "h": 601,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351273234226, scaled x0.98, anchor 268,572, 593x138 rotated -90°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUVITGLVQOA3H34": {
+   "name": "Pusan Fathom",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 814,
+     "y": 1831,
+     "w": 90,
+     "h": 320,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer middleground, anchor 849,1661, 300x70 rotated -90°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUVM9R39TBA362T": {
+   "name": "Sakra Praise",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 1032,
+     "y": 2027,
+     "w": 258,
+     "h": 398,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 1084,1842, 364x115 rotated -65°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent2",
+     "x": 1410,
+     "y": 2204,
+     "w": 263,
+     "h": 398,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 1358,2020, 364x115 rotated 64°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent3",
+     "x": 1088,
+     "y": 1188,
+     "w": 98,
+     "h": 438,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 1137,959, 418x98 rotated -90°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUVMF06N99A3U2B": {
+   "name": "Vayu Trench",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 1113,
+     "y": 2083,
+     "w": 282,
+     "h": 393,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 1063,1905, 364x115 rotated 60°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent2",
+     "x": 1850,
+     "y": 1798,
+     "w": 115,
+     "h": 384,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 1907,1596, 364x115 rotated 270°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent3",
+     "x": 1021,
+     "y": 1426,
+     "w": 98,
+     "h": 438,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 1070,1197, 418x98 rotated -90°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUVUMTSQ2FC34ES": {
+   "name": "Pakoti",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 1800,
+     "y": 1683,
+     "w": 115,
+     "h": 384,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351038941202, scaled x1.00, anchor 1857,1481, 364x115 rotated 270°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent2",
+     "x": 510,
+     "y": 569,
+     "w": 155,
+     "h": 448,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351038941202, scaled x1.00, anchor 461,328, 418x98 rotated -262°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent3",
+     "x": 1010,
+     "y": 1613,
+     "w": 98,
+     "h": 438,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351038941202, scaled x1.00, anchor 1059,1384, 418x98 rotated -90°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent4",
+     "x": 861,
+     "y": 763,
+     "w": 98,
+     "h": 438,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351038941202, scaled x1.00, anchor 910,534, 418x98 rotated -90°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent5",
+     "x": 1236,
+     "y": 582,
+     "w": 148,
+     "h": 447,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351038941202, scaled x1.00, anchor 1285,343, 418x98 rotated -97°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent6",
+     "x": 1261,
+     "y": 1257,
+     "w": 148,
+     "h": 447,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351038941202, scaled x1.00, anchor 1310,1018, 418x98 rotated -97°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent7",
+     "x": 1635,
+     "y": 825,
+     "w": 98,
+     "h": 438,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351038941177, scaled x1.00, anchor 1684,596, 418x98 rotated -90°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent8",
+     "x": 1101,
+     "y": 2079,
+     "w": 282,
+     "h": 393,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351038941177, scaled x1.00, anchor 1051,1901, 364x115 rotated 60°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent9",
+     "x": 526,
+     "y": 1370,
+     "w": 260,
+     "h": 442,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1351038941177, scaled x1.00, anchor 481,1159, 418x98 rotated -294°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUVV0NRR2FC3D3D": {
+   "name": "Niyuta",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 1789,
+     "y": 2075,
+     "w": 233,
+     "h": 401,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1350949910837, scaled x1.00, anchor 1843,1884, 364x115 rotated 290°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent2",
+     "x": 1137,
+     "y": 1005,
+     "w": 235,
+     "h": 446,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1350949910837, scaled x1.00, anchor 1091,755, 418x98 rotated 110°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent3",
+     "x": 304,
+     "y": 1713,
+     "w": 282,
+     "h": 393,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1350949910837, scaled x1.00, anchor 254,1535, 364x115 rotated 60°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent4",
+     "x": 1076,
+     "y": 1934,
+     "w": 282,
+     "h": 393,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1350949910837, scaled x1.00, anchor 1026,1756, 364x115 rotated 60°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUVVASOS2FC3J3Q": {
+   "name": "Vivara",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 1626,
+     "y": 2056,
+     "w": 195,
+     "h": 287,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindFog current (layer T_1350927810539, scaled x1.00, anchor 1721,1901, 264x190 rotated -91°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
+  },
+  "GUVVSU5NCBA3KOS": {
+   "name": "Varuna Trough",
+   "vents": true,
+   "sourcePhysics": false,
+   "emptyEcology": false,
+   "triggers": [
+    {
+     "id": "vent1",
+     "x": 2379,
+     "y": 1334,
+     "w": 233,
+     "h": 401,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 2433,1104, 364x115 rotated -110°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent2",
+     "x": 2402,
+     "y": 2193,
+     "w": 205,
+     "h": 401,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 2458,1997, 364x115 rotated -75°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent3",
+     "x": 427,
+     "y": 2027,
+     "w": 282,
+     "h": 393,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 377,1849, 364x115 rotated 60°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent4",
+     "x": 1008,
+     "y": 1546,
+     "w": 98,
+     "h": 438,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 1057,1317, 418x98 rotated -90°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent5",
+     "x": 1026,
+     "y": 1901,
+     "w": 282,
+     "h": 393,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 976,1723, 364x115 rotated 60°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent6",
+     "x": 1797,
+     "y": 1607,
+     "w": 115,
+     "h": 384,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 1854,1405, 364x115 rotated 270°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent7",
+     "x": 373,
+     "y": 1164,
+     "w": 121,
+     "h": 386,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 316,962, 364x115 rotated 89°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    },
+    {
+     "id": "vent8",
+     "x": 1801,
+     "y": 1894,
+     "w": 115,
+     "h": 384,
+     "body": true,
+     "repeatMs": 450,
+     "bubbles": true,
+     "onEnter": [
+      "upvent"
+     ],
+     "why": "WindCurl current (layer T_1347647117037, scaled x1.00, anchor 1858,1692, 364x115 rotated 270°): its rotated bounds, firing upvent again every 450 ms while the avatar swims inside."
+    }
+   ],
+   "quoins": [],
+   "ventsWhy": "Generated by tools/build-puzzle-vents.mjs from the street's WindCurl/WindFog decos."
   }
  }
 }

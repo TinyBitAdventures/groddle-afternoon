@@ -184,6 +184,50 @@ function spawnArt(engine, def) {
   }
 }
 
+/**
+ * Vent currents: the WindCurl swirl the source drew has a blank first frame,
+ * so a vent shows as a column of crisp rising bubbles inside its box.
+ */
+function spawnBubbles(engine, def) {
+  const { PIXI } = engine;
+  for (const t of def.triggers) {
+    if (!t.bubbles) continue;
+    const layer = new PIXI.Container();
+    layer.zIndex = 30;
+    const bubbles = [];
+    const count = Math.max(10, Math.min(22, Math.round((t.w * t.h) / 5000)));
+    for (let i = 0; i < count; i += 1) {
+      const g = new PIXI.Graphics();
+      const r = 3 + ((i * 7) % 6);
+      g.lineStyle(2, 0xffffff, 0.9);
+      g.beginFill(0xdff6ff, 0.18);
+      g.drawCircle(0, 0, r);
+      g.endFill();
+      g.lineStyle(0);
+      g.beginFill(0xffffff, 0.8);
+      g.drawCircle(-r * 0.35, -r * 0.35, Math.max(1, r * 0.25));
+      g.endFill();
+      layer.addChild(g);
+      bubbles.push({ g, u: ((i * 37) % 100) / 100, v: (i * 0.61803) % 1, speed: 0.004 + ((i * 13) % 7) * 0.0012 });
+    }
+    engine.entityLayer.addChild(layer);
+    run.sprites.push(layer);
+    run.bubbleViews.push({ t, bubbles });
+  }
+}
+
+function stepBubbles() {
+  for (const view of run.bubbleViews) {
+    const { t } = view;
+    for (const b of view.bubbles) {
+      b.v = (b.v + b.speed) % 1;
+      b.g.x = t.x - t.w / 2 + t.w * (0.15 + 0.7 * b.u) + Math.sin((b.v + b.u) * 12) * 6;
+      b.g.y = t.y - t.h * b.v;
+      b.g.alpha = Math.min(1, b.v * 6, (1 - b.v) * 6);
+    }
+  }
+}
+
 function startRun(engine, street, def) {
   run = {
     tsid: key(street.tsid),
@@ -201,6 +245,7 @@ function startRun(engine, street, def) {
     startedAt: locationEventsApi.clock(),
     repeatAt: new Map(),
     artViews: [],
+    bubbleViews: [],
     pull: null,
     toasted: new Set(),
     prevY: null,
@@ -212,6 +257,7 @@ function startRun(engine, street, def) {
   };
   spawnQuoins(engine, def);
   spawnArt(engine, def);
+  spawnBubbles(engine, def);
 }
 
 function place(engine, x, y) {
@@ -396,6 +442,7 @@ function stepRun(engine) {
     view.phase += 0.05;
     if (view.spr && !view.spr.destroyed) view.spr.alpha = (view.a.alpha ?? 0.6) * (0.85 + Math.sin(view.phase) * 0.15);
   }
+  stepBubbles();
   takeQuoins(engine);
   if (run.def.fallY != null && p.y > run.def.fallY) respawn(engine, 'Whoops! Back to the ledge.');
   const exit = run.def.exit;
