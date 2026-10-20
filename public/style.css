@@ -3323,7 +3323,9 @@ body.buff-purple-pulse::after {
   box-shadow: 0 14px 40px rgba(0,0,0,0.28);
   padding: 0.85rem 1rem 0.75rem;
   width: min(560px, 94vw);
-  max-height: min(78vh, 640px);
+  /* Never taller than the modal area, or centring clips the header and its
+     close button off the top on short (phone) game roots. */
+  max-height: min(78vh, 640px, calc(100% - 12px));
   overflow: auto;
 }
 .glitch-modal-head {
@@ -3333,6 +3335,7 @@ body.buff-purple-pulse::after {
   flex-wrap: wrap;
   margin-bottom: 0.55rem;
 }
+.glitch-modal-head > .verb-menu-x { margin-left: auto; }
 .glitch-modal-head h2 {
   margin: 0;
   font-size: 1.25rem;
@@ -5856,7 +5859,8 @@ header.top-bar + .sub { display: none; }
 
 .home-card,
 .mail-card {
-  width: min(920px, 96vw);
+  /* 100% = the panel's padded box; 96vw overflowed the game root on phones. */
+  width: min(920px, 100%);
   max-height: 100%;
   overflow: hidden;
   border: 4px solid #f8f0dc;

@@ -36,4 +36,8 @@ test.describe('integration playtest regressions', () => {
     assert.doesNotMatch(wide, /\.top-actions \{ flex-wrap: nowrap; \}/);
   });
 
+  test('phone-sized modals keep their header and close button inside the game root', () => {
+    assert.match(css, /\.glitch-modal-card \{[^}]*max-height: min\(78vh, 640px, calc\(100% - 12px\)\)/);
+    assert.match(css, /\.home-card,\n\.mail-card \{[^}]*width: min\(920px, 100%\)/);
+  });
 });
