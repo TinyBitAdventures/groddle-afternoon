@@ -407,6 +407,7 @@ import {
   archiveMail,
   createMailboxState,
   deleteMail,
+  deliverMail,
   listMailboxMessages,
   mailCost,
   readMail,
@@ -6309,6 +6310,18 @@ const engine = {
     if (!unlocked.ok) return false;
     announceAchievementUpdates([{ classTsid, unlocked: true, rewards: unlocked.rewards, def: unlocked.def }]);
     return true;
+  },
+  /** Open the shared mail panel from a street mailbox (no deed needed, like npc_mailbox.js). */
+  openMailbox: () => openMailboxPanel({ anywhere: true }),
+  mailboxOpen: () => isMailboxOpen(),
+  mailUnread: () => unreadMailCount(mailboxState, Date.now()),
+  /** Whether the player owns a home street (Visiting Stone opt-in, visitor letters). */
+  homeOwned: () => homeState.owned === true,
+  /** Deliver one letter ({ sender, text, deliveryAt, attachment, currants }) to the player's mail. */
+  deliverMail(message) {
+    const row = deliverMail(mailboxState, { sentAt: Date.now(), ...message });
+    updateHomeChrome();
+    return row;
   },
   questFlag(flag) {
     questFlagsFeature.set(flag);
@@ -16293,13 +16306,13 @@ function renderMailboxPanel() {
   updateHomeChrome();
 }
 
-function openMailboxPanel() {
-  if (!homeState.owned) {
+function openMailboxPanel({ anywhere = false } = {}) {
+  if (!homeState.owned && !anywhere) {
     openHomePanel();
     toast('A mailbox comes with your home deed.');
     return;
   }
-  seedMailbox(mailboxState, Date.now());
+  if (homeState.owned) seedMailbox(mailboxState, Date.now());
   closeHomePanel();
   closeMap();
   closePackPopover();
