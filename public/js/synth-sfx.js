@@ -126,6 +126,36 @@ function rand(opts, salt = 0) {
 }
 
 /**
+ * Piano Party (GA96OS42D6F3M9P) notes, whose files never survived: its 19
+ * keys and 34 small stars play LITTLE_STAR_1..19, its 12 constellation stars
+ * BIG_STAR_1..12. Key 1 (leftmost) plays LITTLE_STAR_19, so the numbers run
+ * high to low: a C major scale from G6 (1) down to C4 (19). The big stars,
+ * hit in their scripted order, play the opening of "Twinkle Twinkle Little
+ * Star" (the sounds' namesake); MOON_APPEARS resolves it when the moon smiles.
+ */
+const C_MAJOR = [0, 2, 4, 5, 7, 9, 11];
+const scaleSemitones = (i) => 12 * Math.floor(i / 7) + C_MAJOR[i % 7];
+const C4 = 261.63;
+const TWINKLE = [0, 0, 7, 7, 9, 9, 7, 5, 5, 4, 4, 2];
+const PIANO_RECIPES = {};
+const PIANO_KEY_RECIPES = {};
+for (let n = 1; n <= 19; n += 1) {
+  const f = C4 * 2 ** (scaleSemitones(19 - n) / 12);
+  PIANO_RECIPES[`littleStar${n}`] = (c, o, t, p) => {
+    tone(c, o, t, { type: 'triangle', f: f * p.r, peak: 0.09, attack: 0.004, decay: 0.7 });
+    return bell(c, o, t, { f: f * p.r, peak: 0.05, decay: 0.9, bright: 0.35 });
+  };
+  PIANO_KEY_RECIPES[`LITTLE_STAR_${n}`] = `littleStar${n}`;
+}
+TWINKLE.forEach((semitones, i) => {
+  PIANO_RECIPES[`bigStar${i + 1}`] = (c, o, t, p) =>
+    bell(c, o, t, { f: 523.25 * 2 ** (semitones / 12) * p.r, peak: 0.12, decay: 1.1, bright: 0.7 });
+  PIANO_KEY_RECIPES[`BIG_STAR_${i + 1}`] = `bigStar${i + 1}`;
+});
+PIANO_RECIPES.moonAppears = (c, o, t, p) => arp(c, o, t, [0, 4, 7, 12, 16, 19, 24], { base: C4 * p.r, step: 0.11, peak: 0.08, decay: 1.4 });
+PIANO_KEY_RECIPES.MOON_APPEARS = 'moonAppears';
+
+/**
  * Recipes. Each: (ctx, out, t, opts) → seconds. `out` is a per-play gain at
  * the requested volume; `opts.rate` scales pitch where it reads naturally.
  */
@@ -564,10 +594,12 @@ export const SYNTH_RECIPES = Object.freeze({
     return 2;
   },
   soft: (c, o, t, p) => tone(c, o, t, { type: 'triangle', f: 660 * p.r, f2: 880 * p.r, peak: 0.08, decay: 0.12 }),
+  ...PIANO_RECIPES,
 });
 
 /** Explicit key → recipe choices. Pattern rules below cover the rest. */
 const KEY_RECIPES = {
+  ...PIANO_KEY_RECIPES,
   CLICK_SUCCESS: 'click',
   CLICK_FAILURE: 'clickFail',
   UI_TOGGLE: 'toggle',

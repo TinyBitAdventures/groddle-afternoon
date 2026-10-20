@@ -2317,6 +2317,814 @@
      "amount": 20
     }
    ]
+  },
+  "GA96OS42D6F3M9P": {
+   "name": "Piano Party",
+   "blurb": "Float over a giant keyboard: every key and star plays a note. Ring the twelve big stars in order to wake the moon.",
+   "strict": true,
+   "start": {
+    "x": 790,
+    "y": 872
+   },
+   "exit": {
+    "flag": "moon_done",
+    "stay": true
+   },
+   "reward": {
+    "xp": 100,
+    "mood": 25,
+    "source": "No source quest: a clean, small first-finish reward for completing the moon ring (the script's own goal, moon_show)."
+   },
+   "completion": "Twinkle, twinkle! The ring is complete and the moon is smiling.",
+   "triggers": [
+    {
+     "id": "key1",
+     "x": 718,
+     "y": 1769,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key1"
+     ],
+     "why": "Piano key 1: where its light_spot (0943, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 718, y 1765). Keys sit ~90 px apart along the slanted keyboard; key1 lights the spot and plays LITTLE_STAR_19."
+    },
+    {
+     "id": "key2",
+     "x": 807,
+     "y": 1774,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key2"
+     ],
+     "why": "Piano key 2: where its light_spot (0935, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 807, y 1770). Keys sit ~90 px apart along the slanted keyboard; key2 lights the spot and plays LITTLE_STAR_18."
+    },
+    {
+     "id": "key3",
+     "x": 896,
+     "y": 1780,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key3"
+     ],
+     "why": "Piano key 3: where its light_spot (0936, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 896, y 1776). Keys sit ~90 px apart along the slanted keyboard; key3 lights the spot and plays LITTLE_STAR_17."
+    },
+    {
+     "id": "key4",
+     "x": 988,
+     "y": 1785,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key4"
+     ],
+     "why": "Piano key 4: where its light_spot (8651, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 988, y 1781). Keys sit ~90 px apart along the slanted keyboard; key4 lights the spot and plays LITTLE_STAR_16."
+    },
+    {
+     "id": "key5",
+     "x": 1078,
+     "y": 1791,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key5"
+     ],
+     "why": "Piano key 5: where its light_spot (8652, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1078, y 1787). Keys sit ~90 px apart along the slanted keyboard; key5 lights the spot and plays LITTLE_STAR_15."
+    },
+    {
+     "id": "key6",
+     "x": 1167,
+     "y": 1796,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key6"
+     ],
+     "why": "Piano key 6: where its light_spot (8650, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1167, y 1792). Keys sit ~90 px apart along the slanted keyboard; key6 lights the spot and plays LITTLE_STAR_14."
+    },
+    {
+     "id": "key7",
+     "x": 1257,
+     "y": 1802,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key7"
+     ],
+     "why": "Piano key 7: where its light_spot (8654, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1257, y 1798). Keys sit ~90 px apart along the slanted keyboard; key7 lights the spot and plays LITTLE_STAR_13."
+    },
+    {
+     "id": "key8",
+     "x": 1347,
+     "y": 1807,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key8"
+     ],
+     "why": "Piano key 8: where its light_spot (8655, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1347, y 1803). Keys sit ~90 px apart along the slanted keyboard; key8 lights the spot and plays LITTLE_STAR_12."
+    },
+    {
+     "id": "key9",
+     "x": 1438,
+     "y": 1813,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key9"
+     ],
+     "why": "Piano key 9: where its light_spot (8653, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1438, y 1809). Keys sit ~90 px apart along the slanted keyboard; key9 lights the spot and plays LITTLE_STAR_11."
+    },
+    {
+     "id": "key10",
+     "x": 1526,
+     "y": 1818,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key10"
+     ],
+     "why": "Piano key 10: where its light_spot (8657, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1526, y 1814). Keys sit ~90 px apart along the slanted keyboard; key10 lights the spot and plays LITTLE_STAR_10."
+    },
+    {
+     "id": "key11",
+     "x": 1614,
+     "y": 1823,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key11"
+     ],
+     "why": "Piano key 11: where its light_spot (8658, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1614, y 1819). Keys sit ~90 px apart along the slanted keyboard; key11 lights the spot and plays LITTLE_STAR_9."
+    },
+    {
+     "id": "key12",
+     "x": 1706,
+     "y": 1829,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key12"
+     ],
+     "why": "Piano key 12: where its light_spot (8656, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1706, y 1825). Keys sit ~90 px apart along the slanted keyboard; key12 lights the spot and plays LITTLE_STAR_8."
+    },
+    {
+     "id": "key13",
+     "x": 1792,
+     "y": 1834,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key13"
+     ],
+     "why": "Piano key 13: where its light_spot (8663, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1792, y 1830). Keys sit ~90 px apart along the slanted keyboard; key13 lights the spot and plays LITTLE_STAR_7."
+    },
+    {
+     "id": "key14",
+     "x": 1885,
+     "y": 1840,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key14"
+     ],
+     "why": "Piano key 14: where its light_spot (8664, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1885, y 1836). Keys sit ~90 px apart along the slanted keyboard; key14 lights the spot and plays LITTLE_STAR_6."
+    },
+    {
+     "id": "key15",
+     "x": 1973,
+     "y": 1845,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key15"
+     ],
+     "why": "Piano key 15: where its light_spot (8662, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 1973, y 1841). Keys sit ~90 px apart along the slanted keyboard; key15 lights the spot and plays LITTLE_STAR_5."
+    },
+    {
+     "id": "key16",
+     "x": 2064,
+     "y": 1851,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key16"
+     ],
+     "why": "Piano key 16: where its light_spot (8660, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 2064, y 1847). Keys sit ~90 px apart along the slanted keyboard; key16 lights the spot and plays LITTLE_STAR_4."
+    },
+    {
+     "id": "key17",
+     "x": 2153,
+     "y": 1856,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key17"
+     ],
+     "why": "Piano key 17: where its light_spot (8661, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 2153, y 1852). Keys sit ~90 px apart along the slanted keyboard; key17 lights the spot and plays LITTLE_STAR_3."
+    },
+    {
+     "id": "key18",
+     "x": 2245,
+     "y": 1861,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key18"
+     ],
+     "why": "Piano key 18: where its light_spot (8659, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 2245, y 1857). Keys sit ~90 px apart along the slanted keyboard; key18 lights the spot and plays LITTLE_STAR_2."
+    },
+    {
+     "id": "key19",
+     "x": 2338,
+     "y": 1867,
+     "w": 86,
+     "h": 50,
+     "onEnter": [
+      "key19"
+     ],
+     "why": "Piano key 19: where its light_spot (8665, rotated 39\u00b0 like the keyboard) meets the keyboard platform (x 2338, y 1863). Keys sit ~90 px apart along the slanted keyboard; key19 lights the spot and plays LITTLE_STAR_1."
+    },
+    {
+     "id": "star1",
+     "x": 202,
+     "y": 200,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star1_on"
+     ],
+     "why": "Small star 1: the 112x96 star its glow (light_shafts_blue_bottom, shown by star1_on) sits on, x 202 bottom y 208; flying through it chimes LITTLE_STAR_1."
+    },
+    {
+     "id": "star2",
+     "x": 319,
+     "y": 475,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star2_on"
+     ],
+     "why": "Small star 2: the 112x96 star its glow (light_shafts_blue_bottom, shown by star2_on) sits on, x 319 bottom y 483; flying through it chimes LITTLE_STAR_2."
+    },
+    {
+     "id": "star3",
+     "x": 217,
+     "y": 713,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star3_on"
+     ],
+     "why": "Small star 3: the 112x96 star its glow (light_shafts_blue_bottom, shown by star3_on) sits on, x 217 bottom y 721; flying through it chimes LITTLE_STAR_3."
+    },
+    {
+     "id": "star4",
+     "x": 92,
+     "y": 955,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star4_on"
+     ],
+     "why": "Small star 4: the 112x96 star its glow (light_shafts_blue_bottom, shown by star4_on) sits on, x 92 bottom y 963; flying through it chimes LITTLE_STAR_4."
+    },
+    {
+     "id": "star5",
+     "x": 251,
+     "y": 1286,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star5_on"
+     ],
+     "why": "Small star 5: the 112x96 star its glow (light_shafts_blue_bottom, shown by star5_on) sits on, x 251 bottom y 1294; flying through it chimes LITTLE_STAR_5."
+    },
+    {
+     "id": "star6",
+     "x": 478,
+     "y": 1462,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star6_on"
+     ],
+     "why": "Small star 6: the 112x96 star its glow (light_shafts_blue_bottom, shown by star6_on) sits on, x 478 bottom y 1470; flying through it chimes LITTLE_STAR_6."
+    },
+    {
+     "id": "star7",
+     "x": 578,
+     "y": 1281,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star7_on"
+     ],
+     "why": "Small star 7: the 112x96 star its glow (light_shafts_blue_bottom, shown by star7_on) sits on, x 578 bottom y 1289; flying through it chimes LITTLE_STAR_7."
+    },
+    {
+     "id": "star8",
+     "x": 643,
+     "y": 293,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star8_on"
+     ],
+     "why": "Small star 8: the 112x96 star its glow (light_shafts_blue_bottom, shown by star8_on) sits on, x 643 bottom y 301; flying through it chimes LITTLE_STAR_8."
+    },
+    {
+     "id": "star9",
+     "x": 779,
+     "y": 127,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star9_on"
+     ],
+     "why": "Small star 9: the 112x96 star its glow (light_shafts_blue_bottom, shown by star9_on) sits on, x 779 bottom y 135; flying through it chimes LITTLE_STAR_9."
+    },
+    {
+     "id": "star10",
+     "x": 777,
+     "y": 616,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star10_on"
+     ],
+     "why": "Small star 10: the 112x96 star its glow (light_shafts_blue_bottom, shown by star10_on) sits on, x 777 bottom y 624; flying through it chimes LITTLE_STAR_10."
+    },
+    {
+     "id": "star11",
+     "x": 876,
+     "y": 1109,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star11_on"
+     ],
+     "why": "Small star 11: the 112x96 star its glow (light_shafts_blue_bottom, shown by star11_on) sits on, x 876 bottom y 1117; flying through it chimes LITTLE_STAR_11."
+    },
+    {
+     "id": "star12",
+     "x": 993,
+     "y": 1431,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star12_on"
+     ],
+     "why": "Small star 12: the 112x96 star its glow (light_shafts_blue_bottom, shown by star12_on) sits on, x 993 bottom y 1439; flying through it chimes LITTLE_STAR_12."
+    },
+    {
+     "id": "star13",
+     "x": 1157,
+     "y": 1215,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star13_on"
+     ],
+     "why": "Small star 13: the 112x96 star its glow (light_shafts_blue_bottom, shown by star13_on) sits on, x 1157 bottom y 1223; flying through it chimes LITTLE_STAR_13."
+    },
+    {
+     "id": "star14",
+     "x": 1168,
+     "y": 590,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star14_on"
+     ],
+     "why": "Small star 14: the 112x96 star its glow (light_shafts_blue_bottom, shown by star14_on) sits on, x 1168 bottom y 598; flying through it chimes LITTLE_STAR_14."
+    },
+    {
+     "id": "star15",
+     "x": 1222,
+     "y": 128,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star15_on"
+     ],
+     "why": "Small star 15: the 112x96 star its glow (light_shafts_blue_bottom, shown by star15_on) sits on, x 1222 bottom y 136; flying through it chimes LITTLE_STAR_15."
+    },
+    {
+     "id": "star16",
+     "x": 1400,
+     "y": 292,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star16_on"
+     ],
+     "why": "Small star 16: the 112x96 star its glow (light_shafts_blue_bottom, shown by star16_on) sits on, x 1400 bottom y 300; flying through it chimes LITTLE_STAR_16."
+    },
+    {
+     "id": "star17",
+     "x": 1445,
+     "y": 1350,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star17_on"
+     ],
+     "why": "Small star 17: the 112x96 star its glow (light_shafts_blue_bottom, shown by star17_on) sits on, x 1445 bottom y 1358; flying through it chimes LITTLE_STAR_17."
+    },
+    {
+     "id": "star18",
+     "x": 1672,
+     "y": 441,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star18_on"
+     ],
+     "why": "Small star 18: the 112x96 star its glow (light_shafts_blue_bottom, shown by star18_on) sits on, x 1672 bottom y 449; flying through it chimes LITTLE_STAR_18."
+    },
+    {
+     "id": "star19",
+     "x": 1875,
+     "y": 131,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star19_on"
+     ],
+     "why": "Small star 19: the 112x96 star its glow (light_shafts_blue_bottom, shown by star19_on) sits on, x 1875 bottom y 139; flying through it chimes LITTLE_STAR_19."
+    },
+    {
+     "id": "star20",
+     "x": 1891,
+     "y": 318,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star20_on"
+     ],
+     "why": "Small star 20: the 112x96 star its glow (light_shafts_blue_bottom, shown by star20_on) sits on, x 1891 bottom y 326; flying through it chimes LITTLE_STAR_1."
+    },
+    {
+     "id": "star21",
+     "x": 1806,
+     "y": 1384,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star21_on"
+     ],
+     "why": "Small star 21: the 112x96 star its glow (light_shafts_blue_bottom, shown by star21_on) sits on, x 1806 bottom y 1392; flying through it chimes LITTLE_STAR_2."
+    },
+    {
+     "id": "star22",
+     "x": 2015,
+     "y": 655,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star22_on"
+     ],
+     "why": "Small star 22: the 112x96 star its glow (light_shafts_blue_bottom, shown by star22_on) sits on, x 2015 bottom y 663; flying through it chimes LITTLE_STAR_3."
+    },
+    {
+     "id": "star23",
+     "x": 2183,
+     "y": 504,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star23_on"
+     ],
+     "why": "Small star 23: the 112x96 star its glow (light_shafts_blue_bottom, shown by star23_on) sits on, x 2183 bottom y 512; flying through it chimes LITTLE_STAR_4."
+    },
+    {
+     "id": "star24",
+     "x": 2163,
+     "y": 1156,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star24_on"
+     ],
+     "why": "Small star 24: the 112x96 star its glow (light_shafts_blue_bottom, shown by star24_on) sits on, x 2163 bottom y 1164; flying through it chimes LITTLE_STAR_5."
+    },
+    {
+     "id": "star25",
+     "x": 2416,
+     "y": 1499,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star25_on"
+     ],
+     "why": "Small star 25: the 112x96 star its glow (light_shafts_blue_bottom, shown by star25_on) sits on, x 2416 bottom y 1507; flying through it chimes LITTLE_STAR_6."
+    },
+    {
+     "id": "star26",
+     "x": 2551,
+     "y": 1254,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star26_on"
+     ],
+     "why": "Small star 26: the 112x96 star its glow (light_shafts_blue_bottom, shown by star26_on) sits on, x 2551 bottom y 1262; flying through it chimes LITTLE_STAR_7."
+    },
+    {
+     "id": "star27",
+     "x": 2438,
+     "y": 635,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star27_on"
+     ],
+     "why": "Small star 27: the 112x96 star its glow (light_shafts_blue_bottom, shown by star27_on) sits on, x 2438 bottom y 643; flying through it chimes LITTLE_STAR_8."
+    },
+    {
+     "id": "star28",
+     "x": 2890,
+     "y": 237,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star28_on"
+     ],
+     "why": "Small star 28: the 112x96 star its glow (light_shafts_blue_bottom, shown by star28_on) sits on, x 2890 bottom y 245; flying through it chimes LITTLE_STAR_9."
+    },
+    {
+     "id": "star29",
+     "x": 2592,
+     "y": 133,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star29_on"
+     ],
+     "why": "Small star 29: the 112x96 star its glow (light_shafts_blue_bottom, shown by star29_on) sits on, x 2592 bottom y 141; flying through it chimes LITTLE_STAR_10."
+    },
+    {
+     "id": "star30",
+     "x": 2882,
+     "y": 543,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star30_on"
+     ],
+     "why": "Small star 30: the 112x96 star its glow (light_shafts_blue_bottom, shown by star30_on) sits on, x 2882 bottom y 551; flying through it chimes LITTLE_STAR_11."
+    },
+    {
+     "id": "star31",
+     "x": 2497,
+     "y": 308,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star31_on"
+     ],
+     "why": "Small star 31: the 112x96 star its glow (light_shafts_blue_bottom, shown by star31_on) sits on, x 2497 bottom y 316; flying through it chimes LITTLE_STAR_12."
+    },
+    {
+     "id": "star32",
+     "x": 2800,
+     "y": 799,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star32_on"
+     ],
+     "why": "Small star 32: the 112x96 star its glow (light_shafts_blue_bottom, shown by star32_on) sits on, x 2800 bottom y 807; flying through it chimes LITTLE_STAR_13."
+    },
+    {
+     "id": "star33",
+     "x": 2947,
+     "y": 1006,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star33_on"
+     ],
+     "why": "Small star 33: the 112x96 star its glow (light_shafts_blue_bottom, shown by star33_on) sits on, x 2947 bottom y 1014; flying through it chimes LITTLE_STAR_14."
+    },
+    {
+     "id": "star34",
+     "x": 2833,
+     "y": 1298,
+     "w": 84,
+     "h": 80,
+     "body": true,
+     "onEnter": [
+      "star34_on"
+     ],
+     "why": "Small star 34: the 112x96 star its glow (light_shafts_blue_bottom, shown by star34_on) sits on, x 2833 bottom y 1306; flying through it chimes LITTLE_STAR_15."
+    },
+    {
+     "id": "bigstar1",
+     "x": 1516,
+     "y": 607,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar1_on",
+      "moon_check1"
+     ],
+     "why": "Big star 1 of the ring around the moon (174x149 glow at x 1516, bottom y 617). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check1: hit in order 1-12 they draw the ring's lines (moon_check1 needs 1..0) and the moon smiles."
+    },
+    {
+     "id": "bigstar2",
+     "x": 1924,
+     "y": 473,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar2_on",
+      "moon_check2"
+     ],
+     "why": "Big star 2 of the ring around the moon (174x149 glow at x 1924, bottom y 483). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check2: hit in order 1-12 they draw the ring's lines (moon_check2 needs 1..1) and the moon smiles."
+    },
+    {
+     "id": "bigstar3",
+     "x": 2305,
+     "y": 328,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar3_on",
+      "moon_check3"
+     ],
+     "why": "Big star 3 of the ring around the moon (174x149 glow at x 2305, bottom y 338). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check3: hit in order 1-12 they draw the ring's lines (moon_check3 needs 1..2) and the moon smiles."
+    },
+    {
+     "id": "bigstar4",
+     "x": 2659,
+     "y": 542,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar4_on",
+      "moon_check4"
+     ],
+     "why": "Big star 4 of the ring around the moon (174x149 glow at x 2659, bottom y 552). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check4: hit in order 1-12 they draw the ring's lines (moon_check4 needs 1..3) and the moon smiles."
+    },
+    {
+     "id": "bigstar5",
+     "x": 2730,
+     "y": 929,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar5_on",
+      "moon_check5"
+     ],
+     "why": "Big star 5 of the ring around the moon (174x149 glow at x 2730, bottom y 939). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check5: hit in order 1-12 they draw the ring's lines (moon_check5 needs 1..4) and the moon smiles."
+    },
+    {
+     "id": "bigstar6",
+     "x": 2515,
+     "y": 1165,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar6_on",
+      "moon_check6"
+     ],
+     "why": "Big star 6 of the ring around the moon (174x149 glow at x 2515, bottom y 1175). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check6: hit in order 1-12 they draw the ring's lines (moon_check6 needs 1..5) and the moon smiles."
+    },
+    {
+     "id": "bigstar7",
+     "x": 2096,
+     "y": 1461,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar7_on",
+      "moon_check7"
+     ],
+     "why": "Big star 7 of the ring around the moon (174x149 glow at x 2096, bottom y 1471). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check7: hit in order 1-12 they draw the ring's lines (moon_check7 needs 1..6) and the moon smiles."
+    },
+    {
+     "id": "bigstar8",
+     "x": 1483,
+     "y": 1517,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar8_on",
+      "moon_check8"
+     ],
+     "why": "Big star 8 of the ring around the moon (174x149 glow at x 1483, bottom y 1527). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check8: hit in order 1-12 they draw the ring's lines (moon_check8 needs 1..7) and the moon smiles."
+    },
+    {
+     "id": "bigstar9",
+     "x": 841,
+     "y": 1284,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar9_on",
+      "moon_check9"
+     ],
+     "why": "Big star 9 of the ring around the moon (174x149 glow at x 841, bottom y 1294). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check9: hit in order 1-12 they draw the ring's lines (moon_check9 needs 1..8) and the moon smiles."
+    },
+    {
+     "id": "bigstar10",
+     "x": 374,
+     "y": 891,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar10_on",
+      "moon_check10"
+     ],
+     "why": "Big star 10 of the ring around the moon (174x149 glow at x 374, bottom y 901). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check10: hit in order 1-12 they draw the ring's lines (moon_check10 needs 1..9) and the moon smiles."
+    },
+    {
+     "id": "bigstar11",
+     "x": 532,
+     "y": 465,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar11_on",
+      "moon_check11"
+     ],
+     "why": "Big star 11 of the ring around the moon (174x149 glow at x 532, bottom y 475). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check11: hit in order 1-12 they draw the ring's lines (moon_check11 needs 1..10) and the moon smiles."
+    },
+    {
+     "id": "bigstar12",
+     "x": 1021,
+     "y": 330,
+     "w": 130,
+     "h": 120,
+     "body": true,
+     "onEnter": [
+      "bigstar12_on",
+      "moon_check12"
+     ],
+     "why": "Big star 12 of the ring around the moon (174x149 glow at x 1021, bottom y 340). Exactly 65 Collision-triggered Event Boxes = 19 keys + 34 stars + 12 big stars, so each big star's box also carries moon_check12: hit in order 1-12 they draw the ring's lines (moon_check12 needs 1..11) and the moon smiles."
+    }
+   ],
+   "quoins": [
+    {
+     "x": 1520,
+     "y": 960,
+     "type": "xp",
+     "amount": 3
+    },
+    {
+     "x": 2338,
+     "y": 1820,
+     "type": "mood",
+     "amount": 10
+    }
+   ]
   }
  }
 }

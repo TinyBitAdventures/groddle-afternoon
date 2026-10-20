@@ -21,7 +21,8 @@
  * street and stands at its start; &puzzleautoplay=1 walks the triggers in
  * order by placing the avatar on each (1.2 s apart), collects every quoin,
  * then uses the exit; &puzzleautoplay=<triggerId> stops on that trigger;
- * &puzzlex=&puzzley= start elsewhere. Canvas data: puzzleStreet,
+ * &puzzlex=&puzzley= start elsewhere; &puzzleend=x,y moves the avatar there
+ * after the last step (framing a result). Canvas data: puzzleStreet,
  * puzzleStrict, puzzleTriggers, puzzleFired, puzzleLast, puzzleQuoins,
  * puzzleRespawns, puzzleComplete, puzzleReward, puzzleDemo.
  */
@@ -269,7 +270,9 @@ function stepRun(engine) {
   takeQuoins(engine);
   if (run.def.fallY != null && p.y > run.def.fallY) respawn(engine, 'Whoops! Back to the ledge.');
   const exit = run.def.exit;
-  if (exit && !exit.door && !run.complete && Math.abs(p.x - exit.x) <= (exit.w || 60) / 2 && p.y <= exit.y + 4 && p.y >= exit.y - (exit.h || 80)) {
+  // A finish the street's own script declares (Piano Party's moon_done).
+  if (exit?.flag && !run.complete && locationEventsApi.flag(exit.flag)) complete(engine);
+  if (exit && !exit.door && !exit.flag && !run.complete && Math.abs(p.x - exit.x) <= (exit.w || 60) / 2 && p.y <= exit.y + 4 && p.y >= exit.y - (exit.h || 80)) {
     complete(engine);
   }
   for (const view of run.quoinViews.values()) {
@@ -316,6 +319,7 @@ function complete(engine) {
   });
   engine.updateHud();
   engine.save();
+  if (run.def.exit?.stay) return;
   const back = save.returnTo;
   save.returnTo = null;
   if (back && key(back.tsid) !== tsid && engine.travelGate(back.tsid)?.ok !== false) {
@@ -447,6 +451,9 @@ function demoStep(engine, now) {
   if (engine.busy() && !run.complete) return;
   const step = demo.queue.shift();
   if (!step) {
+    // &puzzleend=x,y frames a result (e.g. the moon) once the steps are done.
+    const end = String(engine.param('puzzleend') || '').split(',').map(Number);
+    if (end.length === 2 && end.every(Number.isFinite)) place(engine, end[0], end[1]);
     engine.setData('puzzleDemo', run.complete ? 'complete' : `held:${run.last}`);
     demo.stage = 'done';
     return;
@@ -465,8 +472,15 @@ function demoStep(engine, now) {
     place(engine, step.q.x, step.q.y + 20);
     engine.setData('puzzleDemo', `quoin:${step.q.id}`);
   } else if (step.kind === 'exit') {
-    complete(engine);
-    engine.setData('puzzleDemo', 'exit');
+    if (def.exit?.flag) {
+      // The street's own script finishes it (Piano Party's moon): wait for it.
+      step.tries = (step.tries || 0) + 1;
+      if (!run.complete && step.tries < 40) demo.queue.unshift(step);
+      engine.setData('puzzleDemo', run.complete ? 'exit' : `waiting:${def.exit.flag}`);
+    } else {
+      complete(engine);
+      engine.setData('puzzleDemo', 'exit');
+    }
   }
   demo.at = now + (step.kind === 'trigger' ? 1200 : 300);
 }
