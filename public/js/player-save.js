@@ -2,7 +2,7 @@
 import { normalizeShrineState } from './shrines.js?v=shrines-1';
 import { normalizeQuoinState } from './quoins.js?v=quoins-1';
 import { normalizeToolConditionState } from './tools.js?v=tools-2';
-import { normalizeSkillState } from './skills.js?v=study-1';
+import { normalizeSkillState } from './skills.js';
 import { normalizeFoodState } from './food.js?v=food-memory-2';
 import { createGhostQuestState } from './ghost-quest.js?v=phantom-1';
 import { normalizeParadiseState } from './paradise-flight.js?v=paradise-flight-2';

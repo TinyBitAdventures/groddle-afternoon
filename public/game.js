@@ -326,9 +326,10 @@ import {
   studySecondsForSkill,
   formatStudyTime,
   grantSkill,
+  grantSkillWithPrereqs,
   canLearnSkill,
   listLearnedSkills,
-} from './js/skills.js?v=study-1';
+} from './js/skills.js';
 import { skillTitle, spendEmblemForSkill } from './js/skill-tree.js';
 import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js';
 import {
@@ -20200,15 +20201,17 @@ async function main() {
   assignQuest(questState, 'animalkinship_pet_piggies', { ignorePrereq: true });
   assignQuest(questState, 'animalkinship_milk_butterflies', { ignorePrereq: true });
   // Free starter skill with no skill prereqs if present
-  grantSkill(skillState, 'animalkinship_1', true);
+  // Starter skills arrive with their whole prerequisite chain (Alchemy II
+  // brings Alchemy I, Element Handling, and so on), never as orphans.
+  grantSkillWithPrereqs(skillState, 'animalkinship_1');
   // Cooking / blending so GSJS recipes with skill tags are craftable in the demo
-  grantSkill(skillState, 'ezcooking_1', true);
-  grantSkill(skillState, 'cheffery_1', true);
-  grantSkill(skillState, 'blending_1', true);
-  grantSkill(skillState, 'blending_2', true);
+  grantSkillWithPrereqs(skillState, 'ezcooking_1');
+  grantSkillWithPrereqs(skillState, 'cheffery_1');
+  grantSkillWithPrereqs(skillState, 'blending_1');
+  grantSkillWithPrereqs(skillState, 'blending_2');
   // Mining / smelting / refining / alchemy II / metalworking chain
   for (const sk of STARTER_MINING_SKILLS) {
-    grantSkill(skillState, sk, true);
+    grantSkillWithPrereqs(skillState, sk);
   }
 
   // Full locations-xml street catalog (index.json), then last saved street (or default)

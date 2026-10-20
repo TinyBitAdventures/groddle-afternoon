@@ -258,6 +258,24 @@ export function grantSkill(state, classTsid, skipPrereq = false) {
   return { ok: true, reason: 'granted', def };
 }
 
+/**
+ * Grant a skill and, first, every prerequisite skill it chains through, so a
+ * starter grant never shows Alchemy II learned while Alchemy I is not.
+ * @returns {string[]} skills newly granted, prerequisites first
+ */
+export function grantSkillWithPrereqs(state, classTsid, seen = new Set()) {
+  if (seen.has(classTsid)) return [];
+  seen.add(classTsid);
+  const def = getSkillCatalog()[classTsid];
+  if (!def) return [];
+  const granted = [];
+  for (const skillId of def.reqSkills || []) {
+    granted.push(...grantSkillWithPrereqs(state, skillId, seen));
+  }
+  if (grantSkill(state, classTsid, true).ok) granted.push(classTsid);
+  return granted;
+}
+
 export function listLearnedSkills(state) {
   const catalog = getSkillCatalog();
   return state.learned.map((id) => catalog[id]).filter(Boolean);
