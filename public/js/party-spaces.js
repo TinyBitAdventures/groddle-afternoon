@@ -104,6 +104,7 @@ function goods(list) {
 export const PARTY_SPACES = Object.freeze({
   moon: Object.freeze({
     id: 'moon',
+    bounds: Object.freeze({ l: -2000, t: -1550, r: 2000 }),
     exit: Object.freeze({ x: -1858, y: -177 }),
     ambience: 'sparkles',
     label: 'Toxic Moon',
@@ -124,6 +125,7 @@ export const PARTY_SPACES = Object.freeze({
   }),
   mazzala: Object.freeze({
     id: 'mazzala',
+    bounds: Object.freeze({ l: -2500, t: -1500, r: 2500 }),
     exit: Object.freeze({ x: -2304, y: -145 }),
     ambience: 'confetti',
     label: "Mazza'la Gala",
@@ -147,6 +149,7 @@ export const PARTY_SPACES = Object.freeze({
   }),
   rainbow: Object.freeze({
     id: 'rainbow',
+    bounds: Object.freeze({ l: -3000, t: -1000, r: 3000 }),
     exit: Object.freeze({ x: -2627, y: -399 }),
     ambience: 'confetti',
     label: 'Double Rainbow',
@@ -167,6 +170,7 @@ export const PARTY_SPACES = Object.freeze({
   }),
   pitchen: Object.freeze({
     id: 'pitchen',
+    bounds: Object.freeze({ l: -2000, t: -1500, r: 2000 }),
     exit: Object.freeze({ x: -510, y: -1056 }),
     ambience: 'confetti',
     label: 'Pitchen Lilliputt',
@@ -188,6 +192,7 @@ export const PARTY_SPACES = Object.freeze({
   }),
   nylon: Object.freeze({
     id: 'nylon',
+    bounds: Object.freeze({ l: -2000, t: -1500, r: 2000 }),
     exit: Object.freeze({ x: -880, y: -388 }),
     ambience: 'bubbles',
     label: 'Nylon Phool',
@@ -210,6 +215,7 @@ export const PARTY_SPACES = Object.freeze({
   }),
   val_holla: Object.freeze({
     id: 'val_holla',
+    bounds: Object.freeze({ l: -3000, t: -1000, r: 3000 }),
     exit: Object.freeze({ x: -760, y: -274 }),
     ambience: 'sparkles',
     label: 'Val Holla',
@@ -228,6 +234,7 @@ export const PARTY_SPACES = Object.freeze({
   }),
   aquarius: Object.freeze({
     id: 'aquarius',
+    bounds: Object.freeze({ l: -1500, t: -2000, r: 1500 }),
     exit: Object.freeze({ x: -1326, y: -191 }),
     ambience: 'bubbles',
     label: 'Aquarius',
@@ -246,6 +253,7 @@ export const PARTY_SPACES = Object.freeze({
   }),
   glitchmas: Object.freeze({
     id: 'glitchmas',
+    bounds: Object.freeze({ l: -2500, t: -1200, r: 2500 }),
     exit: Object.freeze({ x: 2270, y: -205 }),
     ambience: 'snow',
     label: 'Winter Wingding',
@@ -387,7 +395,7 @@ export function partyExitSignpost(template, returnTo) {
 }
 
 /** Where the teleporter lands you: beside the exit signpost (screen space). */
-export function partyArrival(template, bounds) {
+export function partyArrival(template, bounds = PARTY_SPACES[template]?.bounds) {
   const space = PARTY_SPACES[template];
   if (!space || !bounds) return null;
   const x = space.exit.x - bounds.l;

@@ -205,8 +205,11 @@ function refuse(engine, target, code, msg) {
 function enterDoor(engine, target) {
   const door = target?.door;
   if (!door || pending) return true;
-  if (engine.transientInstance() || engine.homeContext?.().inHome) return refuse(engine, target, 'instance', NO_EXIT);
   const dest = doorDestination(door, { current: engine.streetTsid });
+  // Same-street doors only move the avatar, so they keep working inside a
+  // feature instance (Mazza'la Gala's five rooms in a party space).
+  const sameStreet = dest?.street && dest.street === engine.streetTsid;
+  if ((engine.transientInstance() && !sameStreet) || engine.homeContext?.().inHome) return refuse(engine, target, 'instance', NO_EXIT);
   const check = checkDoorEntry(door, {
     level: Number(engine.pc?.level) || 1,
     hasKey: hasKeyIn(engine),

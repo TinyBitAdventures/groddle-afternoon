@@ -64,9 +64,14 @@ for (const [rawId, meta] of Object.entries(KEEP)) {
     if (entry.total_quantity !== undefined) continue;
     const info = await itemMeta(entry.class_tsid);
     if (!info || info.hidden) continue;
-    // Bags, machine parts, party packs, and pasture machines have no remake
-    // system yet; none of them has a recovered icon, so stock only what the
-    // pack can actually show.
+    // Machine parts and pasture machines have no remake system yet and no
+    // recovered icon, so stock only what the pack can actually show.
+    // Icons that arrived with drop tables still have no system behind them:
+    // bags (no bag slots) and the snapshot Camera (no photos).
+    if (/^bag_/.test(entry.class_tsid) || entry.class_tsid === 'camera') {
+      skipped.push(`${store.name}: ${entry.class_tsid}`);
+      continue;
+    }
     if (!existsSync(join(root, 'public/assets/sprites/icons', `${entry.class_tsid}.png`))) {
       skipped.push(`${store.name}: ${entry.class_tsid}`);
       continue;

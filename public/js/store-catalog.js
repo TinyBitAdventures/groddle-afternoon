@@ -1503,9 +1503,79 @@ export const STORE_CATALOG = Object.freeze([
         "cost": 2200
       },
       {
+        "classTsid": "party_pack_pitchen_lilliputt",
+        "label": "Pitchen Lilliputt Party Pack",
+        "cost": 1100
+      },
+      {
+        "classTsid": "party_pack_toxic_moon",
+        "label": "Toxic Moon Party Pack",
+        "cost": 1100
+      },
+      {
+        "classTsid": "party_pack_nylon_phool",
+        "label": "Nylon Phool Party Pack",
+        "cost": 1100
+      },
+      {
+        "classTsid": "party_pack_double_rainbow",
+        "label": "Double Rainbow Party Pack",
+        "cost": 1100
+      },
+      {
+        "classTsid": "party_pack_mazzala_gala",
+        "label": "Mazza'la Gala Party Pack",
+        "cost": 1100
+      },
+      {
+        "classTsid": "party_pack_taster_double_rainbow",
+        "label": "Double Rainbow Party Pack Taster",
+        "cost": 220
+      },
+      {
+        "classTsid": "party_pack_taster_mazzala_gala",
+        "label": "Mazza'la Gala Party Pack Taster",
+        "cost": 220
+      },
+      {
+        "classTsid": "party_pack_taster_nylon_phool",
+        "label": "Nylon Phool Party Pack Taster",
+        "cost": 220
+      },
+      {
+        "classTsid": "party_pack_taster_pitchen_lilliputt",
+        "label": "Pitchen Lilliputt Party Pack Taster",
+        "cost": 220
+      },
+      {
+        "classTsid": "party_pack_taster_toxic_moon",
+        "label": "Toxic Moon Party Pack Taster",
+        "cost": 220
+      },
+      {
         "classTsid": "cubimal_package_2",
         "label": "Cubimal Series 2 Box",
         "cost": 5500
+      },
+      {
+        "classTsid": "party_pack_taster_val_holla",
+        "label": "Val Holla Party Pack Taster",
+        "cost": 220
+      },
+      {
+        "classTsid": "party_pack_val_holla",
+        "label": "Val Holla Party Pack",
+        "cost": 1100
+      },
+      {
+        "classTsid": "party_pack_aquarius",
+        "label": "Aquarius Party Pack",
+        "cost": 1100
+      },
+      {
+        "classTsid": "party_pack_taster_aquarius",
+        "label": "Aquarius Party Pack Taster",
+        "cost": 220
       }
     ]
   }

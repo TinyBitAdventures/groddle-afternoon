@@ -77,6 +77,8 @@ describe('party spaces (config_prod.js party_spaces)', () => {
       assert.equal(partySpaceForStreet(space.templateTsid), space);
       const sign = data.signposts[0];
       assert.deepEqual([sign.x, sign.y], [space.exit.x, space.exit.y], `${space.id} exit is signpost_1`);
+      assert.deepEqual({ l: data.bounds.l, t: data.bounds.t, r: data.bounds.r }, { ...space.bounds }, `${space.id} bounds`);
+      assert.deepEqual(partyArrival(space.id), partyArrival(space.id, data.bounds));
     }
   });
 
@@ -233,5 +235,56 @@ describe('party lifecycle (groups/party.js, party_atm.js)', () => {
     assert.equal(normalizePartyRecord({ party }, 3_600_000).party, null);
     const fromParty = normalizePartyRecord({ party: { ...party, returnTo: { tsid: 'GDOK0A8OG1E2C7O', x: 0, y: 0 } } }, 1000);
     assert.equal(fromParty.party.returnTo, null);
+  });
+});
+
+describe('party spaces feature wiring', async () => {
+  const { partySpacesFeature } = await import('../public/js/features/party-spaces-feature.js');
+  const { FEATURES } = await import('../public/js/features/index.js');
+
+  it('is registered with the feature host', () => {
+    assert.ok(FEATURES.some((f) => f.id === partySpacesFeature.id));
+  });
+
+  it('keeps party streets private and freezes travel inside except the exit signpost', () => {
+    const outside = { streetTsid: 'GA5101HF7F429V5' };
+    assert.equal(partySpacesFeature.travelGate('GDOBUP8IR8E2IPH', outside).ok, false);
+    assert.equal(partySpacesFeature.travelGate('GA510IHD1F426DS', outside), null);
+    const now = Date.now();
+    const party = startParty(null, 'party_pack_toxic_moon', { now }).party;
+    party.inside = true;
+    party.returnTo = { tsid: 'GA5101HF7F429V5', label: 'Hechey Track', x: 10, y: 20 };
+    partySpacesFeature.restore({ party });
+    const inside = { streetTsid: 'GDOBUP8IR8E2IPH' };
+    assert.equal(partySpacesFeature.travelGate('GA510IHD1F426DS', inside, {}).ok, false);
+    assert.equal(partySpacesFeature.travelGate('GA5101HF7F429V5', inside, { via: 'signpost' }), null);
+    assert.equal(partySpacesFeature.travelGate('GDOBUP8IR8E2IPH', inside, {}), null, 'same-street doors');
+    const data = street('GDOBUP8IR8E2IPH');
+    partySpacesFeature.prepareStreet(data);
+    assert.equal(data.signposts[0].connects[0].tsid, 'GA5101HF7F429V5');
+    assert.equal(data.musicFile, 'TOXIC_MOON');
+    const rainbow = street('GDOGBH4BG1E2BM0');
+    partySpacesFeature.prepareStreet(rainbow);
+    assert.equal(rainbow.musicFile, 'PARTY_LIVELY');
+    assert.deepEqual(rainbow.signposts, []);
+    // A reload inside the live party stays; any other party street goes home.
+    assert.equal(partySpacesFeature.reloadLocation({ tsid: 'GDOBUP8IR8E2IPH', x: 1, y: 1 }), null);
+    assert.deepEqual(partySpacesFeature.reloadLocation({ tsid: 'GDOGBH4BG1E2BM0', x: 1, y: 1 }), { tsid: 'GA5101HF7F429V5', x: 10, y: 20 });
+    partySpacesFeature.restore({});
+  });
+
+  it('offers Activate on every pack', () => {
+    const engine = {
+      streetTsid: 'GA5101HF7F429V5',
+      transientInstance: () => false,
+      homeContext: () => ({ inHome: false }),
+      streetExists: () => true,
+      travelGate: () => null,
+    };
+    const [verb] = partySpacesFeature.packVerbs('party_pack_taster_aquarius', engine);
+    assert.equal(verb.id, 'activate');
+    assert.equal(verb.enabled, true);
+    assert.equal(verb.tooltip, PARTY_TEXT.activateTooltip);
+    assert.deepEqual(partySpacesFeature.packVerbs('apple', engine), []);
   });
 });
