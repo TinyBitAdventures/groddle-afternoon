@@ -345,7 +345,7 @@ describe('new kitchen tools end to end', () => {
     assert.equal(blocked.ok, false);
     assert.equal(blocked.reason, 'skill');
     assert.match(blocked.msgs[0], /engineering_1/);
-    const made = craftRecipe(inv, pc, key, { learned: ['tinkering_5', 'engineering_1'] });
+    const made = craftRecipe(inv, pc, key, { learned: ['tinkering_1', 'tinkering_5', 'engineering_1'] });
     assert.equal(made.ok, true);
     assert.equal(countItem(inv, 'mike_tyson_grill'), 1);
     assert.equal(ITEM_CATALOG.mike_tyson_grill.isTool, true);
@@ -385,11 +385,13 @@ describe('making gates', () => {
     const key = Object.keys(RECIPE_CATALOG).find((k) => RECIPE_CATALOG[k].id === '2');
     const recipe = RECIPE_CATALOG[key];
     const inv = createInventory({ frying_pan: 1, swing_batter: 1, desssert_rub: 1, cloudberry_jam: 1 });
-    assert.equal(canCraft(inv, recipe, { learned: [] }).ok, true);
-    const gated = canCraft(inv, recipe, { learned: [], achievements: [] });
+    // The Frying Pan itself needs Cheffery I (making_required_skill).
+    const learned = ['cheffery_1'];
+    assert.equal(canCraft(inv, recipe, { learned }).ok, true);
+    const gated = canCraft(inv, recipe, { learned, achievements: [] });
     assert.equal(gated.reason, 'achievement');
     assert.equal(gated.achievement, 'grease_monkey');
-    assert.equal(canCraft(inv, recipe, { learned: [], achievements: ['grease_monkey'] }).ok, true);
+    assert.equal(canCraft(inv, recipe, { learned, achievements: ['grease_monkey'] }).ok, true);
   });
 
   it('search and producer lookups cover the larger catalog', () => {

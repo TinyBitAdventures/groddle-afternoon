@@ -18,6 +18,7 @@ import {
   registerItemUse,
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
+import { highestSkillLevel, skillPackageDetails } from './skill-packages.js';
 
 /**
  * @typedef {{
@@ -249,6 +250,121 @@ export const TOOL_CATALOG = {
     action: 'repair',
   },
 };
+
+/**
+ * Each making tool's `required_skill` and `making_type` class props
+ * (items/<tool>.js), driving players/inc_making.js:
+ * - making_required_skill: transmogrification tools need no skill; every
+ *   other tool needs its required skill before any recipe can be made.
+ * - computeEnergyAndTimeCost: cooking tools at level 2+ of their skill take
+ *   half the time and Math.round(energy * 0.5); level 3 uses * 0.67.
+ *   Unskilled transmogrification takes twice as long and
+ *   Math.round(energy * 1.25).
+ * - making_make_known async completion: unskilled transmogrification fails
+ *   20% of the time for a flat 2 energy and 2 mood, after tool wear.
+ */
+export const MAKING_TOOL_SKILLS = Object.freeze({
+  knife_and_board: Object.freeze({ requiredSkill: 'ezcooking_1', makingType: 'cooking' }),
+  frying_pan: Object.freeze({ requiredSkill: 'cheffery_1', makingType: 'cooking' }),
+  mike_tyson_grill: Object.freeze({ requiredSkill: 'grilling_1', makingType: 'cooking' }),
+  awesome_pot: Object.freeze({ requiredSkill: 'masterchef_1', makingType: 'cooking' }),
+  saucepan: Object.freeze({ requiredSkill: 'saucery_1', makingType: 'cooking' }),
+  blender: Object.freeze({ requiredSkill: 'blending_1', makingType: 'cooking' }),
+  cocktail_shaker: Object.freeze({ requiredSkill: 'cocktailcrafting_1', makingType: 'cooking' }),
+  egg_seasoner: Object.freeze({ requiredSkill: 'animalhusbandry_1', makingType: '' }),
+  bean_seasoner: Object.freeze({ requiredSkill: 'botany_1', makingType: '' }),
+  bubble_tuner: Object.freeze({ requiredSkill: 'bubbletuning_1', makingType: 'transmogrification' }),
+  fruit_changing_machine: Object.freeze({ requiredSkill: 'fruitchanging_1', makingType: 'transmogrification' }),
+  spice_mill: Object.freeze({ requiredSkill: 'spicemilling_1', makingType: 'transmogrification' }),
+  gassifier: Object.freeze({ requiredSkill: 'gasmogrification_1', makingType: 'transmogrification' }),
+  test_tube: Object.freeze({ requiredSkill: 'alchemy_1', makingType: '' }),
+  beaker: Object.freeze({ requiredSkill: 'intermediateadmixing_1', makingType: '' }),
+  alchemical_tongs: Object.freeze({ requiredSkill: 'alchemy_2', makingType: '' }),
+  tinkertool: Object.freeze({ requiredSkill: 'tinkering_1', makingType: '' }),
+  fuelmaker: Object.freeze({ requiredSkill: 'fuelmaking_1', makingType: 'machine' }),
+  tincturing_kit: Object.freeze({ requiredSkill: 'tincturing_1', makingType: '' }),
+  cauldron: Object.freeze({ requiredSkill: 'potionmaking_1', makingType: '' }),
+  woodworker: Object.freeze({ requiredSkill: 'woodworking_1', makingType: 'machine' }),
+  metalmaker: Object.freeze({ requiredSkill: 'metalwork_1', makingType: 'machine' }),
+  blockmaker: Object.freeze({ requiredSkill: 'blockmaking_1', makingType: 'machine' }),
+  loomer: Object.freeze({ requiredSkill: 'fiber_arts_2', makingType: '' }),
+  spindle: Object.freeze({ requiredSkill: 'fiber_arts_1', makingType: '' }),
+  crystallizer: Object.freeze({ requiredSkill: 'crystalography_1', makingType: 'crystalmalization' }),
+  smelter: Object.freeze({ requiredSkill: 'smelting_1', makingType: '' }),
+  ore_grinder: Object.freeze({ requiredSkill: 'refining_1', makingType: '' }),
+  grand_ol_grinder: Object.freeze({ requiredSkill: 'refining_1', makingType: '' }),
+  construction_tool: Object.freeze({ requiredSkill: 'furnituremaking_1', makingType: '' }),
+});
+
+export const TRANSMOG_FAIL_CHANCE = 0.2;
+export const TRANSMOG_FAIL_ENERGY = 2;
+export const TRANSMOG_FAIL_MOOD = 2;
+export const TRANSMOG_FAIL_LINE = "Well, that didn't work. I suggest you get some more skillz!";
+
+/** making_required_skill: the skill a tool needs, or null (transmogrifiers). */
+export function makingRequiredSkill(toolId) {
+  const rule = MAKING_TOOL_SKILLS[toolId];
+  if (!rule || rule.makingType === 'transmogrification') return null;
+  return rule.requiredSkill || null;
+}
+
+/**
+ * Skill-adjusted per-unit energy and wait for a recipe, plus the unskilled
+ * transmogrification failure chance. Without a learned list the catalog
+ * values are returned unchanged.
+ * @param {Recipe|null} recipe
+ * @param {string[]} [learned]
+ */
+export function makingSkillAdjustments(recipe, learned) {
+  const baseEnergy = Number(recipe?.energyCost) || 0;
+  const baseWait = Number(recipe?.waitMs) || 0;
+  const rule = MAKING_TOOL_SKILLS[recipe?.tool] || null;
+  const out = {
+    energyCost: baseEnergy,
+    waitMs: baseWait,
+    waitMultiplier: 1,
+    failChance: 0,
+    skillLevel: 0,
+    requiredSkill: rule?.requiredSkill || null,
+    makingType: rule?.makingType || '',
+    note: '',
+  };
+  if (!rule || !Array.isArray(learned)) return out;
+  if (rule.makingType === 'cooking') {
+    const level = highestSkillLevel(learned, rule.requiredSkill);
+    out.skillLevel = level;
+    if (level >= 2) out.waitMultiplier = 0.5;
+    if (level >= 3) out.energyCost = Math.round(baseEnergy * 0.67);
+    else if (level >= 2) out.energyCost = Math.round(baseEnergy * 0.5);
+    if (level >= 2) out.note = `Level ${level} cooking: half the time, less energy.`;
+  } else if (rule.makingType === 'transmogrification') {
+    if (!learned.includes(rule.requiredSkill)) {
+      out.waitMultiplier = 2;
+      out.energyCost = Math.round(baseEnergy * 1.25);
+      out.failChance = TRANSMOG_FAIL_CHANCE;
+      out.note = 'Unskilled: twice as slow, +25% energy, 20% chance to fail.';
+    } else {
+      out.skillLevel = 1;
+    }
+  } else if (recipe?.tool === 'ore_grinder' || recipe?.tool === 'grand_ol_grinder') {
+    // The Grinder runs the `refining` package: Refining II takes half the
+    // time (4 s to 2 s) and 3 energy per chunk instead of 4.
+    const refining = skillPackageDetails('refining', learned);
+    if (refining) {
+      out.skillLevel = refining.rank;
+      out.energyCost = refining.energy_cost;
+      out.waitMultiplier = refining.duration / 4000;
+      if (refining.rank >= 2) out.note = 'Refining II: twice as fast, 3 energy per chunk.';
+    }
+  }
+  out.waitMs = Math.round(baseWait * out.waitMultiplier);
+  return out;
+}
+
+/** Per-unit energy a recipe really costs this player. */
+export function recipeEnergyCost(recipe, learned) {
+  return makingSkillAdjustments(recipe, learned).energyCost;
+}
 
 /** Fallback if recipes.json not loaded (classic knife/pan chain). */
 const EMBEDDED_RECIPES = {
@@ -562,6 +678,12 @@ export function canCraft(inv, recipe, opts = {}) {
       return { ok: false, reason: 'skill', skill: missingSkill };
     }
   }
+  // The tool itself needs its required_skill (except transmogrifiers):
+  // making_can_use refuses a Frying Pan without Cheffery, and so on.
+  const toolSkill = makingRequiredSkill(recipe.tool);
+  if (toolSkill && Array.isArray(opts.learned) && opts.requireSkill !== false && !opts.learned.includes(toolSkill)) {
+    return { ok: false, reason: 'skill', skill: toolSkill };
+  }
   // Achievement-gated recipes (learnt 2) apply only when the caller passes
   // the unlocked achievement ids.
   if (
@@ -644,12 +766,35 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     return { ok: false, reason: check.reason, msgs: ['Cannot craft.'] };
   }
 
-  const cost = recipe.energyCost || 0;
+  const adjust = makingSkillAdjustments(recipe, opts.learned);
+  const cost = adjust.energyCost;
   if ((pc.energy || 0) < cost) {
     return {
       ok: false,
       reason: 'energy',
       msgs: [`Need ${cost} energy (you have ${Math.floor(pc.energy || 0)}).`],
+    };
+  }
+
+  // Unskilled transmogrification: the tool is used, then 20% of the time
+  // nothing is made and the player loses a flat 2 energy and 2 mood.
+  if (adjust.failChance && !opts.maxLuck && (opts.rng || Math.random)() < adjust.failChance) {
+    const failWear = recipe.tool && opts.toolState
+      ? useToolCondition(opts.toolState, recipe.tool, opts.toolWear || recipe.toolWear || 1)
+      : null;
+    const energyLost = Math.min(TRANSMOG_FAIL_ENERGY, Math.max(0, pc.energy || 0));
+    const moodLost = Math.min(TRANSMOG_FAIL_MOOD, Math.max(0, pc.mood || 0));
+    pc.energy = (pc.energy || 0) - energyLost;
+    if (pc.mood != null) pc.mood = (pc.mood || 0) - moodLost;
+    return {
+      ok: false,
+      reason: 'transmog_failed',
+      recipe,
+      recipeKey,
+      toolUse: failWear,
+      energyLost,
+      moodLost,
+      msgs: [`${TRANSMOG_FAIL_LINE} (−${energyLost} energy, −${moodLost} mood)`],
     };
   }
 
@@ -743,14 +888,17 @@ const TOOL_CRAFT_DURATION_MS = {
  * with a tool-specific fallback for embedded and future recipes.
  * @param {Recipe|string|null} recipeOrTool
  */
-export function craftDurationFor(recipeOrTool) {
+export function craftDurationFor(recipeOrTool, learned) {
   const recipe = typeof recipeOrTool === 'object' ? recipeOrTool : null;
   const tool = typeof recipeOrTool === 'string' ? recipeOrTool : recipe?.tool;
+  // Cooking level 2+, unskilled transmogrification, and Refining II scale
+  // the visible cycle the same way the source scales wait_ms.
+  const multiplier = recipe ? makingSkillAdjustments(recipe, learned).waitMultiplier : 1;
   const sourceWait = Number(recipe?.waitMs);
   if (Number.isFinite(sourceWait) && sourceWait > 0) {
-    return Math.max(700, Math.min(6000, sourceWait));
+    return Math.max(350, Math.min(12000, Math.round(Math.max(700, Math.min(6000, sourceWait)) * multiplier)));
   }
-  return TOOL_CRAFT_DURATION_MS[tool] || 1800;
+  return Math.round((TOOL_CRAFT_DURATION_MS[tool] || 1800) * multiplier);
 }
 
 /**
@@ -841,7 +989,7 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
   const count = Math.max(0, Math.floor(Number(made) || 0));
   if (!recipe || count < 1) return null;
 
-  const energy = -(recipe.energyCost || 0) * count;
+  const energy = -recipeEnergyCost(recipe, opts.learned) * count;
   const xp = (recipe.xpReward || 0) * count;
   const used = (recipe.inputs || []).map((input) => ({
     classTsid: input.classTsid,
@@ -855,7 +1003,7 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
     label: ITEM_CATALOG[output.classTsid]?.label || output.classTsid,
   }));
   const canMakeMore = canCraft(inv, recipe, opts).ok
-    && (pc.energy || 0) >= (recipe.energyCost || 0);
+    && (pc.energy || 0) >= recipeEnergyCost(recipe, opts.learned);
   const activityLine = formatCraftResultLine({
     made: count,
     recipeName: recipe.name,
@@ -943,7 +1091,7 @@ export function craftRecipeBatch(inv, pc, recipeKey, qty = 1, opts = {}) {
       break;
     }
     made += 1;
-    const eCost = recipe.energyCost || 0;
+    const eCost = recipeEnergyCost(recipe, opts.learned);
     const xpGain = recipe.xpReward || 0;
     progress.push({
       i,
@@ -994,7 +1142,7 @@ export function canCraftAgain(inv, pc, recipeKey, opts = {}) {
   if (!recipe) return false;
   const check = canCraft(inv, recipe, opts);
   if (!check.ok) return false;
-  return (pc.energy || 0) >= (recipe.energyCost || 0);
+  return (pc.energy || 0) >= recipeEnergyCost(recipe, opts.learned);
 }
 
 /**
