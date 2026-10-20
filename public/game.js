@@ -15370,8 +15370,8 @@ function confirmParadiseTicketActivation(courseId) {
         return;
       }
       if (!removeItem(inv, course.ticketId, 1)) return;
+      // Spending iMG never lowers lifetime XP (or the level it earned).
       pc.imagination = Math.max(0, pc.imagination - activated.cost);
-      pc.xp = Math.max(0, pc.xp - activated.cost);
       savePlayerState();
       updateHud();
       await startParadiseFlight(courseId);
