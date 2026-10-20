@@ -276,3 +276,50 @@ describe('rooked things and cures', () => {
     }
   });
 });
+
+describe('rook attack feature', async () => {
+  const { ROOK_SHEETS, rookAttackFeature } = await import('../public/js/features/rook-attack-feature.js');
+  const { createFeatureHost } = await import('../public/js/feature-host.js');
+
+  /** Pixel size from a PNG IHDR or a WebP VP8/VP8L/VP8X header. */
+  function imageSize(file) {
+    const b = fs.readFileSync(file);
+    if (b.toString('ascii', 1, 4) === 'PNG') return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+    const chunk = b.toString('ascii', 12, 16);
+    if (chunk === 'VP8X') return { w: 1 + b.readUIntLE(24, 3), h: 1 + b.readUIntLE(27, 3) };
+    if (chunk === 'VP8L') {
+      const bits = b.readUInt32LE(21);
+      return { w: (bits & 0x3fff) + 1, h: ((bits >> 14) & 0x3fff) + 1 };
+    }
+    return { w: b.readUInt16LE(26) & 0x3fff, h: b.readUInt16LE(28) & 0x3fff };
+  }
+
+  it('slices every sheet on exact cells inside its image', () => {
+    for (const [id, def] of Object.entries(ROOK_SHEETS)) {
+      const { w, h } = imageSize(path.join(root, def.path));
+      assert.equal(w % def.fw, 0, `${id} width ${w} / ${def.fw}`);
+      assert.equal(h % def.fh, 0, `${id} height ${h} / ${def.fh}`);
+      assert.equal(w / def.fw, def.cols, `${id} cols`);
+      assert.ok(Math.ceil(def.frames / def.cols) * def.fh <= h, `${id} rows`);
+    }
+  });
+
+  it('answers the verb-override hooks only for rook verbs and targets', () => {
+    const host = createFeatureHost([rookAttackFeature]);
+    const engine = { streetSlot: () => ({}), streetTsid: 'L1' };
+    assert.equal(host.query('verbOverride', { classId: 'rock_metal_1' }, engine), null);
+    assert.equal(host.query('verbOverride', { classId: 'npc_piggy' }, engine), null);
+    assert.equal(host.query('runVerbOverride', { classId: 'npc_piggy' }, 'pet', engine), null);
+    assert.equal(host.query('verbOverride', { classId: 'npc_shrine_mab' }, engine), null);
+  });
+
+  it('saves and restores its slice', () => {
+    rookAttackFeature.restore({ nextAttackAt: 123, balmPoints: 3, stats: { defeats: 1 } });
+    const slice = rookAttackFeature.save();
+    assert.equal(slice.nextAttackAt, 123);
+    assert.equal(slice.balmPoints, 3);
+    assert.equal(slice.stats.defeats, 1);
+    rookAttackFeature.restore(undefined);
+    assert.equal(rookAttackFeature.save().active, null);
+  });
+});

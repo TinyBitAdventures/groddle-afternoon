@@ -605,7 +605,12 @@ export function rookResponse(classId, pool, rng = Math.random, label = 'Ur') {
   const lines = ROOK_RESPONSES[classId]?.[pool];
   if (!lines?.length) return '';
   const line = lines[Math.min(lines.length - 1, Math.floor(rng() * lines.length))];
-  return line.replace(/\{pc_label\}/g, label);
+  return line
+    .replace(/\{pc_label\}/g, label)
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&');
 }
 
 /**

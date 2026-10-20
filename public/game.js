@@ -4151,7 +4151,8 @@ function showMusicblockFx(def) {
 function openVerbMenu(target) {
   if (currentAction) return;
   menuTarget = target;
-  const verbs = features.verbsFor(target, engine) ?? getVerbsFor(target, {
+  // A feature may take over any target's menu (rooked trees/animals, shrines under attack).
+  const verbs = features.query('verbOverride', target, engine) ?? features.verbsFor(target, engine) ?? getVerbsFor(target, {
     pc,
     inv,
     tools: toolState,
@@ -4565,6 +4566,7 @@ const SPEECH_REACTION_VERBS = new Set([
 ]);
 
 function executeVerb(target, verbId) {
+  if (features.query('runVerbOverride', target, verbId, engine) === true) return;
   if (features.runVerb(target, verbId, engine)) return;
   if (target?.classId === 'pc_local') {
     handleLocalCompanionTarget(target, verbId);
@@ -6272,6 +6274,24 @@ const engine = {
   },
   get platforms() {
     return streetPlatforms;
+  },
+  /** Every registered interactable on the current street (read only). */
+  get interactables() {
+    return interactables;
+  },
+  /** Camera origin and location viewport, in world pixels. */
+  get camera() {
+    return { x: -(world?.x || 0), y: -(world?.y || 0), w: VIEW_W, h: LOCATION_VIEW_H };
+  },
+  /** The Pixi stage, for screen-space layers above the world. */
+  get stage() {
+    return app?.stage || null;
+  },
+  /** Offset the camera for this frame only (screen shake). */
+  nudgeCamera(dx = 0, dy = 0) {
+    if (!world) return;
+    world.x += dx;
+    world.y += dy;
   },
   /** Planner points for a group a feature requested via placementGroups(). */
   placement(key) {
