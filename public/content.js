@@ -18,6 +18,7 @@ import {
 import {
   listPlantableSeeds,
   waterAllPlots,
+  gardenActionProfile,
   plantPlot,
   waterPlot,
   harvestPlot,
@@ -30,6 +31,7 @@ import {
 import {
   ROCK_CATALOG,
   MINING_COSTS,
+  miningProfile,
   mineRock,
   tickMineRock,
   findWorkingPick,
@@ -788,10 +790,12 @@ export function getVerbsFor(target, ctx) {
     const gType = garden?.gardenType || 'default';
     const seeds = listPlantableSeeds(inv, gType);
     const st = plot?.state || 'clean';
+    const gardenLearned = ctx.skills?.learned || ctx.learned || [];
+    const gardenCost = (action) => gardenActionProfile(gType, action, gardenLearned).energy;
     if (st === 'clean') {
       add('plant', 'plant', {
         sort: 10,
-        energy: 2,
+        energy: gardenCost('plant'),
         enabled: seeds.length > 0,
         reason: seeds.length ? '' : gType === 'herb' ? 'Need herb seeds' : 'Need crop seeds',
         tooltip: seeds.length
@@ -802,23 +806,26 @@ export function getVerbsFor(target, ctx) {
     if ((st === 'seeds' || st === 'shoots') && !plot?.wet) {
       add('water', 'water', {
         sort: 10,
-        energy: 2,
+        energy: gardenCost('water'),
         enabled: hasWateringCan(inv),
         reason: hasWateringCan(inv) ? '' : 'Need a Watering Can',
         tooltip: 'Water so this plot can grow',
       });
     }
     if (st === 'crop') {
+      const harvestProfile = gardenActionProfile(gType, 'harvest', gardenLearned);
       add('harvest', 'harvest', {
         sort: 10,
-        energy: 3,
-        tooltip: 'Pick the crop',
+        energy: harvestProfile.energy,
+        tooltip: harvestProfile.halfHarvest
+          ? `Pick the crop (half yield without ${gType === 'herb' ? 'Herbalism' : 'Croppery'})`
+          : 'Pick the crop',
       });
     }
     if (st === 'dirty') {
       add('clear', 'clear', {
         sort: 10,
-        energy: 2,
+        energy: gardenCost('clear'),
         enabled: hasHoe(inv),
         reason: hasHoe(inv) ? '' : 'Need a Hoe',
         tooltip: 'Hoe the dirt so you can plant again',
@@ -844,9 +851,11 @@ export function getVerbsFor(target, ctx) {
       learned.includes('mining_3') ||
       learned.includes('mining_4');
     const depleted = !!(rock.depleted || rock.chunksRemaining <= 0);
+    const swing = (hasSkill && miningProfile(learned, pick || 'pick')) || miningProfile(undefined, pick || 'pick');
     add('mine', 'mine', {
       sort: 10,
-      energy: MINING_COSTS.energy,
+      energy: swing?.energy ?? MINING_COSTS.energy,
+      durationMs: swing?.durationMs,
       enabled: !depleted && !!pick && hasSkill,
       reason: depleted
         ? rockStatusLabel(rock) || 'Depleted'
@@ -1339,7 +1348,14 @@ export function runVerb(target, verbId, ctx) {
     const preferSeed =
       ctx.seedId ||
       listPlantableSeeds(inv, garden.gardenType || 'default')[0]?.seedId;
-    const opts = { inv, now: Date.now(), seedId: preferSeed, toolState: ctx.tools };
+    const opts = {
+      inv,
+      now: Date.now(),
+      seedId: preferSeed,
+      toolState: ctx.tools,
+      learned: ctx.skills?.learned || ctx.learned || [],
+      upgrades: ctx.imaginationUpgrades || pc.imaginationUpgrades || [],
+    };
     let r = null;
     if (verbId === 'plant') r = plantPlot(garden, key, inv, pc, preferSeed, opts);
     else if (verbId === 'water') r = waterPlot(garden, key, pc, opts);
@@ -1384,7 +1400,12 @@ export function runVerb(target, verbId, ctx) {
     if (!garden.plots) {
       return { ok: false, msgs: ['This garden has no plots.'], effects };
     }
-    const r = waterAllPlots(garden, pc, { inv, toolState: ctx.tools });
+    const r = waterAllPlots(garden, pc, {
+      inv,
+      toolState: ctx.tools,
+      learned: ctx.skills?.learned || ctx.learned || [],
+      upgrades: ctx.imaginationUpgrades || pc.imaginationUpgrades || [],
+    });
     if (!r.ok) return { ok: false, msgs: r.msgs || ['Could not water.'], effects };
     effects.energy += r.effects?.energy || 0;
     effects._activityBase = `You water the garden (${r.watered} plots)`;

@@ -19,6 +19,7 @@ import {
   itemIcon,
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
+import { skillPackageDetails } from './skill-packages.js';
 
 /**
  * @typedef {{
@@ -172,6 +173,53 @@ export const PICK_TOOLS = {
   },
 };
 
+/** Demo-scaled verb time for the source 20-second Mining I swing. */
+export const MINING_DEMO_DURATION_MS = 1800;
+
+/**
+ * Exact `mining` / `mining_fancypick` package row for the player's highest
+ * Mining rank (1–4): swing time, energy, xp, and pick wear. Without a learned
+ * list the Mining I row applies (legacy callers that skip the skill gate).
+ * @param {string[]|undefined} learned
+ * @param {'pick'|'fancy_pick'|string} [pick]
+ */
+export function miningProfile(learned, pick = 'pick') {
+  const packageId = pick === 'fancy_pick' ? 'mining_fancypick' : 'mining';
+  const details = Array.isArray(learned)
+    ? skillPackageDetails(packageId, learned)
+    : skillPackageDetails(packageId, ['mining_1']);
+  if (!details) return null;
+  return {
+    package: packageId,
+    skill: details.skill,
+    rank: details.rank,
+    sourceDurationMs: details.duration,
+    durationMs: Math.round(MINING_DEMO_DURATION_MS * (details.duration / 20000)),
+    energy: details.energy_cost,
+    xp: details.xp_bonus || 0,
+    toolWear: details.tool_wear,
+  };
+}
+
+/**
+ * Exact `refining` package row (Refining I or II) for the Grinder.
+ * @param {string[]|undefined} learned
+ */
+export function refiningProfile(learned) {
+  const details = Array.isArray(learned)
+    ? skillPackageDetails('refining', learned)
+    : skillPackageDetails('refining', ['refining_1']);
+  if (!details) return null;
+  return {
+    skill: details.skill,
+    rank: details.rank,
+    sourceDurationMs: details.duration,
+    energy: details.energy_cost,
+    xp: details.xp_bonus || 0,
+    toolWear: details.tool_wear,
+  };
+}
+
 /**
  * @param {number} min
  * @param {number} max
@@ -246,7 +294,12 @@ export function mineRock(rock, inv, pc, opts = {}) {
   if (!rock || rock.depleted || rock.chunksRemaining <= 0) {
     return { ok: false, reason: 'depleted', msgs: ['This rock is mined out. Wait for it to respawn.'] };
   }
-  const pick = findWorkingPick(inv, opts.toolState, MINING_COSTS.toolWear);
+  const skilled = Array.isArray(opts.learned) ? opts.learned : undefined;
+  const wearCheck = Math.min(
+    miningProfile(skilled, 'fancy_pick')?.toolWear ?? MINING_COSTS.toolWear,
+    miningProfile(skilled, 'pick')?.toolWear ?? MINING_COSTS.toolWear,
+  );
+  const pick = findWorkingPick(inv, opts.toolState, wearCheck);
   if (!pick) {
     const ownsPick = countItem(inv, 'fancy_pick') >= 1 || countItem(inv, 'pick') >= 1;
     return {
@@ -256,8 +309,7 @@ export function mineRock(rock, inv, pc, opts = {}) {
     };
   }
   if (opts.requireSkill !== false) {
-    const learned = opts.learned || [];
-    if (!learned.includes(MINING_COSTS.skill) && !learned.includes('mining_2') && !learned.includes('mining_3')) {
+    if (!miningProfile(opts.learned || [], pick)) {
       return {
         ok: false,
         reason: 'skill',
@@ -265,11 +317,21 @@ export function mineRock(rock, inv, pc, opts = {}) {
       };
     }
   }
-  if ((pc.energy || 0) < MINING_COSTS.energy) {
+  // Mining II–IV: faster swings, less energy, less wear, more xp.
+  const profile = miningProfile(opts.requireSkill === false ? skilled : opts.learned || [], pick)
+    || miningProfile(undefined, pick);
+  if (opts.toolState && !canUseTool(opts.toolState, pick, profile.toolWear).ok) {
+    return {
+      ok: false,
+      reason: 'broken_tool',
+      msgs: ['Your pick does not have enough uses left.'],
+    };
+  }
+  if ((pc.energy || 0) < profile.energy) {
     return {
       ok: false,
       reason: 'energy',
-      msgs: [`Needs ${MINING_COSTS.energy} energy (you have ${Math.floor(pc.energy || 0)}).`],
+      msgs: [`Needs ${profile.energy} energy (you have ${Math.floor(pc.energy || 0)}).`],
     };
   }
 
@@ -277,14 +339,14 @@ export function mineRock(rock, inv, pc, opts = {}) {
   const toGet = randInt(def?.minChunks ?? 3, def?.maxChunks ?? 9, rng);
   const got = Math.min(toGet, rock.chunksRemaining);
 
-  pc.energy = (pc.energy || 0) - MINING_COSTS.energy;
-  if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + MINING_COSTS.xp;
-  if (pc.xp != null) pc.xp = (pc.xp || 0) + MINING_COSTS.xp;
+  pc.energy = (pc.energy || 0) - profile.energy;
+  if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + profile.xp;
+  if (pc.xp != null) pc.xp = (pc.xp || 0) + profile.xp;
 
   addItem(inv, rock.chunkId, got);
   rock.chunksRemaining -= got;
   const toolUse = opts.toolState
-    ? useToolCondition(opts.toolState, pick, MINING_COSTS.toolWear)
+    ? useToolCondition(opts.toolState, pick, profile.toolWear)
     : null;
 
   const chunkLabel = def?.chunkLabel || rock.chunkId;
@@ -306,14 +368,15 @@ export function mineRock(rock, inv, pc, opts = {}) {
     reason: 'mined',
     msgs,
     effects: {
-      energy: -MINING_COSTS.energy,
-      xp: MINING_COSTS.xp,
-      img: MINING_COSTS.xp,
+      energy: -profile.energy,
+      xp: profile.xp,
+      img: profile.xp,
       activityLine: msgs[0],
     },
     got,
     chunkId: rock.chunkId,
     pick,
+    profile,
     toolUse,
     cleared,
     rock,
@@ -433,14 +496,18 @@ export function crushOre(inv, pc, oreId, opts = {}) {
       return { ok: false, reason: 'skill', msgs: ['You need Refining to use a Grinder.'] };
     }
   }
-  const toolWear = REFINE_COSTS.toolWear * qty;
+  // Refining II halves the grind time and lowers energy (4→3) and wear (2→1).
+  const refining = (opts.requireSkill !== false || Array.isArray(opts.learned))
+    ? refiningProfile(opts.learned || []) || refiningProfile(undefined)
+    : refiningProfile(undefined);
+  const toolWear = refining.toolWear * qty;
   if (opts.requireTool !== false && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, REFINE_COSTS.tool, toolWear);
     if (!toolCheck.ok) {
       return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck };
     }
   }
-  const energy = REFINE_COSTS.energy * qty;
+  const energy = refining.energy * qty;
   if ((pc.energy || 0) < energy) {
     return {
       ok: false,
@@ -452,7 +519,7 @@ export function crushOre(inv, pc, oreId, opts = {}) {
     return { ok: false, reason: 'pack', msgs: ['Not enough ore.'] };
   }
   pc.energy = (pc.energy || 0) - energy;
-  const xp = REFINE_COSTS.xp * qty;
+  const xp = refining.xp * qty;
   if (pc.imagination != null) pc.imagination += xp;
   if (pc.xp != null) pc.xp += xp;
 
@@ -474,6 +541,7 @@ export function crushOre(inv, pc, oreId, opts = {}) {
     effects: { energy: -energy, xp, img: xp, activityLine: msgs[0] },
     got,
     toolUse,
+    refining,
   };
 }
 

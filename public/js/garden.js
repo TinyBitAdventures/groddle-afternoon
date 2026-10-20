@@ -10,6 +10,7 @@
 
 import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
+import { skillPackageDetails } from './skill-packages.js';
 
 /** @typedef {'clean'|'seeds'|'shoots'|'crop'|'dirty'} PlotState */
 
@@ -242,13 +243,119 @@ export const GARDEN_TOOLS = {
   },
 };
 
-/** Energy costs (croppery / herbalism skill packages, simplified). */
+/**
+ * Legacy flat costs, used only when a caller passes no learned-skill list
+ * (older tests and helpers). Game paths pass `learned` and get the exact
+ * Croppery / Herbalism skill packages below.
+ */
 export const GARDEN_COSTS = {
   water: 2,
   plant: 2,
   harvest: 3,
   clear: 2,
 };
+
+/** include/garden.js: which skill package each garden type runs. */
+export const GARDEN_SKILL_PACKAGES = Object.freeze({
+  default: Object.freeze({
+    skill: 'croppery_1',
+    plant: 'croppery_plant',
+    water: 'croppery_water',
+    harvest: 'croppery_harvest',
+    clear: 'croppery_clear',
+  }),
+  herb: Object.freeze({
+    skill: 'herbalism_1',
+    plant: 'herbalism_plant',
+    water: 'herbalism_water',
+    harvest: 'herbalism_harvest',
+    clear: 'herbalism_clear',
+  }),
+});
+
+/** garden_new.js `*_harvest_na_failed` talkbacks (75% no-skill success roll). */
+export const GARDEN_HARVEST_FAILED_LINES = Object.freeze({
+  default: Object.freeze([
+    "No. I like these. You can't have them.",
+    'Say please.',
+    "You mis-picked. You picked nothin'. Try harder, picky-picker.",
+  ]),
+  herb: Object.freeze([
+    'Nooooo. My precious! Cannot take my precious herbs. Mineses.',
+    'Hoe no. Hoe no no no.',
+    'The roots run deep on this one.',
+  ]),
+});
+
+/** include/garden.js water failure: package energy plus a flat 3 mood. */
+export const GARDEN_WATER_FAIL_MOOD = 3;
+export const GARDEN_WATER_FAILED_LINE = 'Oops. Somehow you failed at watering that. Try again?';
+
+/**
+ * Costs and rewards for one garden action. With a `learned` array this is the
+ * exact source package row (no_skill or Croppery/Herbalism 1–3): energy,
+ * mood, xp, tool wear, success rate, super-harvest multiplier/chance, and the
+ * source rule that harvesting without Croppery I / Herbalism I yields half
+ * (rounded). Without `learned` it returns the legacy flat profile.
+ * @param {'default'|'herb'|string} gardenType
+ * @param {'plant'|'water'|'harvest'|'clear'} action
+ * @param {string[]} [learned]
+ * @param {string[]} [upgrades]
+ */
+export function gardenActionProfile(gardenType, action, learned, upgrades = []) {
+  const type = gardenType === 'herb' ? 'herb' : 'default';
+  if (!Array.isArray(learned)) {
+    return {
+      legacy: true,
+      gardenType: type,
+      action,
+      skill: null,
+      rank: null,
+      energy: GARDEN_COSTS[action] || 0,
+      mood: action === 'harvest' ? 2 : action === 'water' ? 1 : 0,
+      xp: action === 'harvest' ? 2 : 0,
+      toolWear: 1,
+      successRate: 100,
+      bonusMultiplier: 0,
+      bonusChance: 0,
+      halfHarvest: false,
+    };
+  }
+  const packages = GARDEN_SKILL_PACKAGES[type];
+  const details = skillPackageDetails(packages[action], learned, upgrades) || {};
+  return {
+    legacy: false,
+    gardenType: type,
+    action,
+    package: packages[action],
+    skill: details.skill === 'no_skill' ? null : details.skill || null,
+    rank: Number.isFinite(details.rank) ? Math.max(0, details.rank) : 0,
+    energy: Number(details.energy_cost) || 0,
+    mood: Number(details.mood_bonus) || 0,
+    xp: Number(details.xp_bonus) || 0,
+    toolWear: Number(details.tool_wear) || 1,
+    successRate: details.success_rate ?? 100,
+    bonusMultiplier: Number(details.bonus_multiplier) || 0,
+    bonusChance: Number(details.bonus_chance) || 0,
+    halfHarvest: action === 'harvest' && !learned.includes(packages.skill),
+  };
+}
+
+function rollSucceeds(profile, opts) {
+  if (opts.maxLuck) return true;
+  const rate = Number(profile.successRate);
+  if (!Number.isFinite(rate) || rate >= 100) return true;
+  return (opts.rng || Math.random)() < rate / 100;
+}
+
+function applyGardenRewards(pc, profile) {
+  if (profile.legacy) return;
+  if (profile.mood && pc.mood != null) pc.mood = Math.min(pc.moodMax || 100, (pc.mood || 0) + profile.mood);
+  if (profile.xp) {
+    if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + profile.xp;
+    if (pc.xp != null) pc.xp = (pc.xp || 0) + profile.xp;
+  }
+}
 
 /**
  * Register seed + crop/herb items + garden tools on ITEM_CATALOG.
@@ -555,13 +662,15 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
       ],
     };
   }
-  const cost = GARDEN_COSTS.plant;
+  const profile = gardenActionProfile(gType, 'plant', opts.learned, opts.upgrades);
+  const cost = profile.energy;
   const er = spendEnergy(pc, cost);
   if (!er.ok) return er;
   if (!removeItem(inv, seed.seedId, 1)) {
     pc.energy = (pc.energy || 0) + cost;
     return { ok: false, reason: 'seed', msgs: ['Not enough seeds.'] };
   }
+  applyGardenRewards(pc, profile);
   const now = opts.now ?? Date.now();
   plot.state = 'seeds';
   plot.seed = seed.seedId;
@@ -574,8 +683,11 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
     plotKey: key,
     seedId: seed.seedId,
     cropId: seed.cropId,
+    profile,
     msgs: [`You planted ${seed.label} in plot ${key}.`],
-    effects: { energy: -cost },
+    effects: profile.legacy
+      ? { energy: -cost }
+      : { energy: -cost, mood: profile.mood, xp: profile.xp },
   };
 }
 
@@ -611,28 +723,46 @@ export function waterPlot(garden, key, pc, opts = {}) {
         ? 'irrigator_9000'
         : null
     : null;
+  const profile = gardenActionProfile(garden.gardenType, 'water', opts.learned, opts.upgrades);
   if (requireTool && toolId && opts.toolState) {
-    const toolCheck = canUseTool(opts.toolState, toolId, 1);
+    const toolCheck = canUseTool(opts.toolState, toolId, profile.toolWear);
     if (!toolCheck.ok) {
       return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck };
     }
   }
-  const cost = GARDEN_COSTS.water;
+  const cost = profile.energy;
   const er = spendEnergy(pc, cost);
   if (!er.ok) return er;
+  if (!rollSucceeds(profile, opts)) {
+    // Source: a failed water still costs the package energy plus 3 mood.
+    const moodLost = Math.min(GARDEN_WATER_FAIL_MOOD, Math.max(0, pc.mood || 0));
+    if (pc.mood != null) pc.mood = (pc.mood || 0) - moodLost;
+    return {
+      ok: false,
+      reason: 'failed',
+      plotKey: key,
+      profile,
+      msgs: [`${GARDEN_WATER_FAILED_LINE} (−${cost} energy, −${moodLost} mood)`],
+      effects: { energy: -cost, mood: -moodLost },
+    };
+  }
+  applyGardenRewards(pc, profile);
   const now = opts.now ?? Date.now();
   plot.wet = true;
   // Restart stage timer when re-wetting (GSJS restarts grow on water)
   plot.stageStartedAt = now;
   const toolUse = requireTool && toolId && opts.toolState
-    ? useToolCondition(opts.toolState, toolId, 1)
+    ? useToolCondition(opts.toolState, toolId, profile.toolWear)
     : null;
   return {
     ok: true,
     reason: 'watered',
     plotKey: key,
+    profile,
     msgs: ['You watered a plot.', ...(toolUse?.broke ? [toolUse.msg] : [])],
-    effects: { energy: -cost, mood: 1 },
+    effects: profile.legacy
+      ? { energy: -cost, mood: 1 }
+      : { energy: -cost, mood: profile.mood, xp: profile.xp },
     toolUse,
   };
 }
@@ -651,14 +781,42 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   if (!seed) {
     return { ok: false, reason: 'seed', msgs: ['Unknown crop.'] };
   }
-  const cost = GARDEN_COSTS.harvest;
-  const er = spendEnergy(pc, cost);
-  if (!er.ok) return er;
-  const n = seed.produces;
-  addItem(inv, seed.cropId, n);
-  if (pc.mood != null) pc.mood = Math.min(100, (pc.mood || 0) + 2);
-  if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + 2;
-  if (pc.xp != null) pc.xp = (pc.xp || 0) + 2;
+  const profile = gardenActionProfile(garden.gardenType, 'harvest', opts.learned, opts.upgrades);
+  const cost = profile.energy;
+  if ((pc.energy || 0) < cost) {
+    return { ok: false, reason: 'energy', msgs: [`Need ${cost} energy (have ${Math.floor(pc.energy || 0)}).`] };
+  }
+  const rng = opts.rng || Math.random;
+  if (!rollSucceeds(profile, opts)) {
+    // Source: a failed pick costs nothing and leaves the crop in the ground.
+    const lines = GARDEN_HARVEST_FAILED_LINES[profile.gardenType];
+    return {
+      ok: false,
+      reason: 'failed',
+      plotKey: key,
+      profile,
+      msgs: [lines[Math.floor(rng() * lines.length) % lines.length]],
+    };
+  }
+  pc.energy = Math.max(0, (pc.energy || 0) - cost);
+  // Players without Croppery I / Herbalism I receive half (rounded).
+  const n = profile.halfHarvest ? Math.round(seed.produces / 2) : seed.produces;
+  let bonus = 0;
+  if (
+    profile.bonusMultiplier &&
+    profile.bonusChance &&
+    (opts.maxLuck || rng() < profile.bonusChance)
+  ) {
+    bonus = n * (profile.bonusMultiplier - 1);
+  }
+  addItem(inv, seed.cropId, n + bonus);
+  if (profile.legacy) {
+    if (pc.mood != null) pc.mood = Math.min(100, (pc.mood || 0) + 2);
+    if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + 2;
+    if (pc.xp != null) pc.xp = (pc.xp || 0) + 2;
+  } else {
+    applyGardenRewards(pc, profile);
+  }
   const now = opts.now ?? Date.now();
   plot.state = 'dirty';
   plot.seed = null;
@@ -669,13 +827,20 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
     reason: 'harvested',
     plotKey: key,
     cropId: seed.cropId,
-    count: n,
-    msgs: [`You harvested ${n}× ${seed.cropLabel}.`],
+    count: n + bonus,
+    baseCount: n,
+    bonusCount: bonus,
+    superHarvest: bonus > 0,
+    profile,
+    msgs: [
+      `You harvested ${n}× ${seed.cropLabel}.`,
+      ...(bonus ? [`Super Harvest! +${bonus}× ${seed.cropLabel}.`] : []),
+    ],
     effects: {
       energy: -cost,
-      mood: 2,
-      xp: 2,
-      items: { [seed.cropId]: n },
+      mood: profile.legacy ? 2 : profile.mood,
+      xp: profile.legacy ? 2 : profile.xp,
+      items: { [seed.cropId]: n + bonus },
     },
   };
 }
@@ -709,29 +874,34 @@ export function clearPlot(garden, key, pc, opts = {}) {
         ? 'hoe_highclass'
         : null
     : null;
+  const profile = gardenActionProfile(garden.gardenType, 'clear', opts.learned, opts.upgrades);
   if (requireTool && toolId && opts.toolState) {
-    const toolCheck = canUseTool(opts.toolState, toolId, 1);
+    const toolCheck = canUseTool(opts.toolState, toolId, profile.toolWear);
     if (!toolCheck.ok) {
       return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck };
     }
   }
-  const cost = GARDEN_COSTS.clear;
+  const cost = profile.energy;
   const er = spendEnergy(pc, cost);
   if (!er.ok) return er;
+  applyGardenRewards(pc, profile);
   const now = opts.now ?? Date.now();
   plot.state = 'clean';
   plot.seed = null;
   plot.wet = false;
   plot.stageStartedAt = now;
   const toolUse = requireTool && toolId && opts.toolState
-    ? useToolCondition(opts.toolState, toolId, 1)
+    ? useToolCondition(opts.toolState, toolId, profile.toolWear)
     : null;
   return {
     ok: true,
     reason: 'cleared',
     plotKey: key,
+    profile,
     msgs: ['You cleared a plot. Ready to plant.', ...(toolUse?.broke ? [toolUse.msg] : [])],
-    effects: { energy: -cost },
+    effects: profile.legacy
+      ? { energy: -cost }
+      : { energy: -cost, mood: profile.mood, xp: profile.xp },
     toolUse,
   };
 }
@@ -789,12 +959,18 @@ export function waterAllPlots(garden, pc, opts = {}) {
     };
   }
   let n = 0;
+  let spent = 0;
+  let failed = 0;
   const msgs = [];
   for (const key of Object.keys(garden.plots || {})) {
     const r = waterPlot(garden, key, pc, opts);
     if (r.ok) {
       n += 1;
+      spent += -(r.effects?.energy || 0);
       if (r.msgs?.[0]) msgs.push(r.msgs[0]);
+    } else if (r.reason === 'failed') {
+      failed += 1;
+      spent += -(r.effects?.energy || 0);
     } else if (r.reason === 'energy') {
       return {
         ok: n > 0,
@@ -811,12 +987,19 @@ export function waterAllPlots(garden, pc, opts = {}) {
       };
     }
   }
+  if (!n && failed) {
+    return { ok: false, watered: 0, failed, reason: 'failed', msgs: [GARDEN_WATER_FAILED_LINE] };
+  }
   if (!n) return { ok: false, watered: 0, reason: 'none', msgs: ['No dry plots need water.'] };
   return {
     ok: true,
     watered: n,
-    msgs: [`You watered ${n} plot(s).`],
-    effects: { energy: -GARDEN_COSTS.water * n },
+    failed,
+    msgs: [
+      `You watered ${n} plot(s).`,
+      ...(failed ? [`${failed} plot(s) stayed dry. ${GARDEN_WATER_FAILED_LINE}`] : []),
+    ],
+    effects: { energy: -spent },
   };
 }
 

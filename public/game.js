@@ -20084,7 +20084,14 @@ function renderGardenPanel() {
 
 function runGardenPlotAction(key, action) {
   if (!activeGarden) return;
-  const opts = { seedId: gardenSeedPick, now: Date.now(), inv, toolState };
+  const opts = {
+    seedId: gardenSeedPick,
+    now: Date.now(),
+    inv,
+    toolState,
+    learned: skillState.learned,
+    upgrades: pc.imaginationUpgrades || [],
+  };
   let r;
   if (action === 'plant') r = plantPlot(activeGarden, key, inv, pc, gardenSeedPick, opts);
   else if (action === 'water') r = waterPlot(activeGarden, key, pc, opts);
