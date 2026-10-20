@@ -423,7 +423,8 @@ import {
 import {
   listRecipes,
   listRecipesForTool,
-  listTools,
+  listMakingTools,
+  searchRecipes,
   craftRecipe,
   craftRecipeBatch,
   formatCraftProgress,
@@ -1165,6 +1166,7 @@ let vendorSellReceipt = null;
 let vendorReceiptTimer = 0;
 /** @type {string} make panel tool filter (`all` or tool class_tsid) */
 let makeToolFilter = 'all';
+let makeSearchQuery = '';
 /** @type {string|null} recipe key for make detail */
 let makeSelected = null;
 const ACHIEVEMENT_PAGE_SIZE = 40;
@@ -2239,7 +2241,7 @@ function getPackUseInfo(classTsid) {
     };
   }
   const info = getItemUseInfo(classTsid);
-  if (!info.usable || !info.effects?.energy) return info;
+  if (!info.usable || !info.effects?.energy || info.kind === 'drink') return info;
   const quote = quoteFoodVarietyBonus(
     foodState,
     classTsid,
@@ -3046,7 +3048,10 @@ function usePackItem(classTsid) {
   }
   const buffInfo = getBuffItemInfo(classTsid);
   const ordinaryInfo = buffInfo?.def ? null : getItemUseInfo(classTsid);
-  const isFood = Boolean(ordinaryInfo?.usable && ordinaryInfo.effects?.energy);
+  // Drinks never count toward fullness or food history in the source.
+  const isFood = Boolean(
+    ordinaryInfo?.usable && ordinaryInfo.effects?.energy && ordinaryInfo.kind !== 'drink'
+  );
   if (isFood) {
     const gate = canEatFood(foodState, pc, 100);
     if (!gate.ok) {
@@ -16238,10 +16243,6 @@ async function enterStreet(tsid, opts = {}) {
   }
   currentStreet = data;
   currentStreetTsid = data.tsid;
-  activeVendor = selectVendorProfile(
-    currentStreetTsid,
-    new URLSearchParams(location.search).get('vendor') || ''
-  );
   WORLD_W = streetWidth(data);
   clearWorldEntities();
 
@@ -16274,6 +16275,11 @@ async function enterStreet(tsid, opts = {}) {
   if (currentStreetPopulation.giantId) {
     data.officialGiantId = currentStreetPopulation.giantId;
   }
+  activeVendor = selectVendorProfile(
+    currentStreetTsid,
+    new URLSearchParams(location.search).get('vendor') || '',
+    { rocks: currentStreetPopulation.rockClasses.length }
+  );
   const reserved = (data.signposts || []).map((signpost, index) => {
     const point = worldToScreen(data, signpost.x, signpost.y);
     return { ...point, key: `signpost:${index}`, clearance: 100 };
@@ -17845,6 +17851,7 @@ function isBuffsOpen() {
 function craftOpts() {
   return {
     learned: skillState.learned || [],
+    achievements: achieveState.unlocked || [],
     requireSkill: true,
     requireTool: true,
     toolState,
@@ -18144,21 +18151,29 @@ function renderMakePanel() {
 
   // Prefer a real tool filter (original: open tool → recipes for that tool)
   if (makeToolFilter === 'all') {
-    const firstOwned = listTools().find((t) => hasTool(inv, t.classTsid));
+    const firstOwned = listMakingTools().find((t) => hasTool(inv, t.classTsid));
     if (firstOwned) makeToolFilter = firstOwned.classTsid;
   }
 
   if (toolsEl) {
     toolsEl.innerHTML = '';
-    for (const t of listTools()) {
+    // Owned tools first: the original opened recipes from a tool in the pack,
+    // so the 28-tool catalog leads with what the player can actually use.
+    const makingTools = listMakingTools();
+    const ownedTools = makingTools.filter((t) => hasTool(inv, t.classTsid));
+    const otherTools = makingTools.filter((t) => !hasTool(inv, t.classTsid));
+    for (const t of [...ownedTools, ...otherTools]) {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'make-tool-chip' + (makeToolFilter === t.classTsid ? ' active' : '');
       const owned = hasTool(inv, t.classTsid);
+      btn.className = 'make-tool-chip'
+        + (makeToolFilter === t.classTsid && !makeSearchQuery.trim() ? ' active' : '')
+        + (owned ? '' : ' unowned');
       btn.textContent = owned ? t.label : `${t.label}`;
       btn.title = owned ? t.label : `You need a ${t.label}`;
       btn.addEventListener('click', () => {
         makeToolFilter = t.classTsid;
+        makeSearchQuery = '';
         makeSelected = null;
         makeQty = 1;
         renderMakePanel();
@@ -18174,15 +18189,24 @@ function renderMakePanel() {
   }
 
   const toolLabel = TOOL_CATALOG[makeToolFilter]?.label || makeToolFilter || 'tools';
-  const toolAction = TOOL_CATALOG[makeToolFilter]?.action || 'make';
+  // The Tinkertool repairs from the pack, but its recipe list is for making.
+  const toolAction = makeToolFilter === 'tinkertool'
+    ? 'make'
+    : TOOL_CATALOG[makeToolFilter]?.action || 'make';
   if (titleEl) {
     titleEl.textContent = makeSelected
       ? `Make ${RECIPE_CATALOG[makeSelected]?.name || ''}`
-      : `You want to ${toolAction} with a ${toolLabel}?`;
+      : makeSearchQuery.trim()
+        ? `Recipes for “${makeSearchQuery.trim()}”`
+        : `You want to ${toolAction} with a ${toolLabel}?`;
   }
 
-  const recipes =
-    makeToolFilter === 'all' ? listRecipes() : listRecipesForTool(makeToolFilter);
+  const searchEl = document.getElementById('make-search');
+  if (searchEl && searchEl.value !== makeSearchQuery) searchEl.value = makeSearchQuery;
+  // A search looks across every tool: "where do I make this?"
+  const recipes = searchRecipes(makeSearchQuery, {
+    tool: makeSearchQuery.trim() ? 'all' : makeToolFilter,
+  });
   const opts = craftOpts();
   recipes.sort((a, b) => {
     const ca = canCraft(inv, a, opts).ok && pc.energy >= (a.energyCost || 0) ? 0 : 1;
@@ -18360,6 +18384,10 @@ function openVendor() {
     desc.hidden = false;
   }
   panel.dataset.vendor = activeVendor.key;
+  panel.style.setProperty(
+    '--vendor-accent',
+    `#${Number(activeVendor.color || 0xd87439).toString(16).padStart(6, '0')}`
+  );
   vendorTab = 'buy';
   vendorSelected = null;
   vendorQty = 1;
@@ -20820,6 +20848,11 @@ async function main() {
     else openMakePanel();
   });
   document.getElementById('make-close')?.addEventListener('click', closeMakePanel);
+  document.getElementById('make-search')?.addEventListener('input', (event) => {
+    makeSearchQuery = event.target.value || '';
+    makeSelected = null;
+    renderMakePanel();
+  });
   document.getElementById('vendor-btn')?.addEventListener('click', () => {
     if (!state.started) return;
     if (isVendorOpen()) closeVendor();

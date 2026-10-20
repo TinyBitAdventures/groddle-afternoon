@@ -19,15 +19,34 @@ const here = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(here, '../public');
 
 describe('official street vendor profiles', () => {
-  it('ships the four store types seen in the gameplay footage', () => {
-    assert.deepEqual(
-      Object.values(VENDOR_PROFILES).map((vendor) => vendor.label),
-      ['Groceries Vendor', 'Gardening Goods Vendor', 'Produce Vendor', 'Toy Vendor']
-    );
+  it('ships every ordinary street-spirit store from catalog_stores.js', () => {
+    const labels = Object.values(VENDOR_PROFILES).map((vendor) => vendor.label);
+    assert.equal(labels.length, 15);
+    for (const label of [
+      'Groceries Vendor', 'Gardening Goods Vendor', 'Produce Vendor', 'Toy Vendor',
+      'Kitchen Tools Vendor', 'Alchemical Goods Vendor', 'Mining Vendor', "Helga's Liquor Store",
+    ]) {
+      assert.ok(labels.includes(label), label);
+    }
     assert.equal(VENDOR_PROFILES.groceries.offers.length, 12);
-    assert.equal(VENDOR_PROFILES.gardening.offers.length, 14);
+    assert.equal(VENDOR_PROFILES.gardening.offers.length, 18);
     assert.equal(VENDOR_PROFILES.produce.offers.length, 15);
-    assert.equal(VENDOR_PROFILES.toys.offers.length, 7);
+    assert.equal(VENDOR_PROFILES.toys.offers.length, 9);
+    for (const vendor of Object.values(VENDOR_PROFILES)) {
+      assert.match(vendor.id, /^street_spirit_/, vendor.label);
+      for (const offer of vendor.offers) {
+        assert.equal(existsSync(join(publicDir, `assets/sprites/icons/${offer.classTsid}.png`)), true, offer.classTsid);
+      }
+    }
+  });
+
+  it('stocks the source kitchen tools at their catalog prices', () => {
+    const kitchen = VENDOR_PROFILES.kitchen.offers;
+    const cost = (id) => kitchen.find((offer) => offer.classTsid === id)?.buyPrice;
+    assert.equal(cost('knife_and_board'), 83);
+    assert.equal(cost('saucepan'), 220);
+    assert.equal(cost('mike_tyson_grill'), 193);
+    assert.equal(cost('awesome_pot'), 330);
   });
 
   it('uses canonical GSJS catalog prices and the 0.66 buy-back rate', () => {
@@ -50,7 +69,9 @@ describe('official street vendor profiles', () => {
     assert.equal(selectVendorProfile('repeatable-street').key, selectVendorProfile('repeatable-street').key);
     const seen = new Set();
     for (let i = 0; i < 100; i++) seen.add(selectVendorProfile(`street-${i}`).key);
-    assert.deepEqual([...seen].sort(), ['gardening', 'groceries', 'produce', 'toys']);
+    assert.ok(seen.size >= 10, `only ${seen.size} vendor types across 100 streets`);
+    const rocky = selectVendorProfile('rocky-street', '', { rocks: 4 }).key;
+    assert.ok(['mining', 'hardware', 'tools'].includes(rocky), rocky);
   });
 
   it('restricts purchases to the active shop stock', () => {

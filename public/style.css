@@ -6087,3 +6087,30 @@ header.top-bar + .sub { display: none; }
     grid-column: 1 / -1;
   }
 }
+
+/* Making: owned tools lead; recipe search spans every tool */
+.make-tool-chip.unowned {
+  opacity: 0.55;
+  font-weight: 600;
+}
+.make-tool-chip.unowned.active {
+  opacity: 1;
+}
+.make-search-row {
+  margin: 0.45rem 0 0;
+}
+.make-search {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d0cdc6;
+  border-radius: 8px;
+  padding: 0.4rem 0.65rem;
+  font: inherit;
+  font-size: 0.85rem;
+  background: #fffdf8;
+  color: #2a2a2a;
+}
+.make-search:focus {
+  outline: 2px solid #8fbf5a;
+  outline-offset: 1px;
+}

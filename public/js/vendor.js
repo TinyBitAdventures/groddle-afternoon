@@ -14,136 +14,74 @@ import {
 import { gardenVendorOffers } from './garden.js?v=vendor-crops-1';
 import { miningVendorOffers } from './mining.js';
 
+import { STORE_CATALOG } from './store-catalog.js?v=stores-1';
+
 /** @typedef {{ classTsid: string, label: string, buyPrice: number, sellPrice: number, stock?: number }} VendorOffer */
 
 const BUYBACK_MULTIPLIER = 0.66;
 
-/** Build one catalog_stores.js offer using the original vendor buy-back rate. */
-function officialOffer(classTsid, label, buyPrice) {
+/** Build one catalog_stores.js offer using the store's buy-back rate. */
+function officialOffer(classTsid, label, buyPrice, buyMultiplier = BUYBACK_MULTIPLIER) {
   return {
     classTsid,
     label,
     buyPrice,
-    sellPrice: Math.max(1, Math.floor(buyPrice * BUYBACK_MULTIPLIER)),
+    sellPrice: Math.max(1, Math.floor(buyPrice * buyMultiplier)),
   };
 }
 
-const groceriesOffers = [
-  officialOffer('coffee', 'Coffee', 6),
-  officialOffer('honey', 'Honey', 5),
-  officialOffer('mushroom', 'Mushroom', 3),
-  officialOffer('mustard', 'Mustard', 5),
-  officialOffer('oats', 'Oats', 9),
-  officialOffer('oily_dressing', 'Oily Dressing', 3),
-  officialOffer('olive_oil', 'Olive Oil', 6),
-  officialOffer('sesame_oil', 'Sesame Oil', 5),
-  officialOffer('birch_syrup', 'Birch Syrup', 5),
-  officialOffer('beer', 'Beer', 11),
-  officialOffer('garlic', 'Garlic', 5),
-  officialOffer('bun', 'Bun', 10),
-];
+/** Shop-window copy for each street spirit (the source stores have names only). */
+const VENDOR_DESCRIPTIONS = {
+  groceries: 'Coffee, oils, syrups, and pantry staples from the official Groceries catalog.',
+  gardening: 'Seeds, watering cans, and hoes for a serious patch of dirt.',
+  produce: 'Fresh vegetables and peculiar produce tools from the official catalog.',
+  toys: 'Dice, bears, fortunes, moons, lips, Cubimal boxes, and other entirely necessary toys.',
+  hardware: 'Picks, scrapers, shovels, and sturdy tools for people who hit things for a living.',
+  sno_cone: 'Sno cones in every colour a tongue can turn.',
+  kitchen: 'Knives, pans, pots, shakers, and grills for an ambitious kitchen.',
+  alchemical: 'Tinctures, tubes, beakers, and cauldrons for the scientifically curious.',
+  animal: 'Lotions, seasoners, and looms for friends of piggies, chickens, and butterflies.',
+  tools: 'A little of everything a working Glitch could need.',
+  gardening_tools: 'Hoes, cans, seeds, and herb gear for gardeners who mean it.',
+  emporium: 'Uncle Friendly’s grab bag of necessities and delightful oddities.',
+  liquor: 'Helga pours the strong stuff. Drink responsibly, or at least interestingly.',
+  meals: 'Hot meals ready to eat, for Glitches too busy to cook.',
+  mining: 'Picks, smelters, grinders, and tongs for the subterranean set.',
+};
 
-const gardeningOffers = [
-  officialOffer('hoe', 'Hoe', 65),
-  officialOffer('watering_can', 'Watering Can', 81),
-  officialOffer('seed_broccoli', 'Broccoli Seed', 26),
-  officialOffer('seed_cabbage', 'Cabbage Seed', 28),
-  officialOffer('seed_carrot', 'Carrot Seed', 30),
-  officialOffer('seed_corn', 'Corn Seed', 27),
-  officialOffer('seed_cucumber', 'Cucumber Seed', 27),
-  officialOffer('seed_onion', 'Onion Seed', 16),
-  officialOffer('seed_potato', 'Potato Seed', 43),
-  officialOffer('seed_rice', 'Rice Seed', 21),
-  officialOffer('seed_spinach', 'Spinach Seed', 13),
-  officialOffer('seed_tomato', 'Tomato Seed', 22),
-  officialOffer('seed_zucchini', 'Zucchini Seed', 37),
-  officialOffer('seed_parsnip', 'Parsnip Seed', 26),
-];
+/** Every ordinary street-spirit store from catalog_stores.js (see build-stores.mjs). */
+export const VENDOR_PROFILES = Object.freeze(
+  Object.fromEntries(
+    STORE_CATALOG.map((store) => [
+      store.key,
+      {
+        key: store.key,
+        id: store.id,
+        storeId: store.storeId,
+        label: store.label,
+        badge: store.badge,
+        color: store.color,
+        desc: VENDOR_DESCRIPTIONS[store.key] || `Official stock from the ${store.label}.`,
+        offers: store.offers.map((offer) =>
+          officialOffer(offer.classTsid, offer.label, offer.cost, store.buyMultiplier)
+        ),
+      },
+    ])
+  )
+);
 
-const produceOffers = [
-  officialOffer('garlic', 'Garlic', 4),
-  officialOffer('broccoli', 'Broccoli', 6),
-  officialOffer('carrot', 'Carrot', 7),
-  officialOffer('cabbage', 'Cabbage', 8),
-  officialOffer('corn', 'Corn', 7),
-  officialOffer('cucumber', 'Cucumber', 4),
-  officialOffer('onion', 'Onion', 4),
-  officialOffer('parsnip', 'Parsnip', 7),
-  officialOffer('potato', 'Potato', 8),
-  officialOffer('rice', 'Rice', 4),
-  officialOffer('spinach', 'Spinach', 3),
-  officialOffer('tomato', 'Tomato', 6),
-  officialOffer('zucchini', 'Zucchini', 6),
-  officialOffer('bubble_tuner', 'Bubble Tuner', 167),
-  officialOffer('gassifier', 'Gassifier', 167),
-];
-
-const toyOffers = [
-  officialOffer('dice', 'Dice', 550),
-  officialOffer('dice_12sided', '12-Sided Dice', 1210),
-  officialOffer('fortune_cookie', 'Fortune Cookie', 220),
-  officialOffer('emotional_bear', 'Emotional Bear', 330),
-  officialOffer('lips', 'Lips', 11),
-  officialOffer('moon', 'Moon', 109),
-  officialOffer('npc_garden_gnome', 'Garden Gnome', 2200),
-];
-
-/** Street-spirit shop types shown in the original gameplay footage. */
-export const VENDOR_PROFILES = Object.freeze({
-  groceries: {
-    key: 'groceries',
-    id: 'street_spirit_groceries',
-    label: 'Groceries Vendor',
-    badge: 'G',
-    color: 0xd87439,
-    desc: 'Coffee, oils, syrups, and pantry staples from the official Groceries catalog.',
-    offers: groceriesOffers,
-  },
-  gardening: {
-    key: 'gardening',
-    id: 'street_spirit_gardening',
-    label: 'Gardening Goods Vendor',
-    badge: 'GG',
-    color: 0x6f9e3b,
-    desc: 'Seeds, watering cans, and hoes for a serious patch of dirt.',
-    offers: gardeningOffers,
-  },
-  produce: {
-    key: 'produce',
-    id: 'street_spirit_produce',
-    label: 'Produce Vendor',
-    badge: 'P',
-    color: 0xc74f47,
-    desc: 'Fresh vegetables and peculiar produce tools from the official catalog.',
-    offers: produceOffers,
-  },
-  toys: {
-    key: 'toys',
-    id: 'street_spirit_toys',
-    label: 'Toy Vendor',
-    badge: 'T',
-    color: 0x7653a6,
-    desc: 'Dice, bears, fortunes, moons, lips, and other entirely necessary toys.',
-    offers: toyOffers,
-  },
-});
-
-const VENDOR_SEQUENCE = [
-  VENDOR_PROFILES.groceries,
-  VENDOR_PROFILES.gardening,
-  VENDOR_PROFILES.produce,
-  VENDOR_PROFILES.toys,
-];
+const VENDOR_SEQUENCE = Object.values(VENDOR_PROFILES);
+const MINING_VENDOR_KEYS = ['mining', 'hardware', 'tools'];
 
 /** Register official stock in the shared pack catalog. */
 export function ensureVendorItems() {
-  const tools = new Set(['hoe', 'watering_can', 'bubble_tuner', 'gassifier']);
   for (const vendor of VENDOR_SEQUENCE) {
     for (const offer of vendor.offers) {
+      // Keep richer metadata already registered by making, mining, or gardens.
+      if (ITEM_CATALOG[offer.classTsid]) continue;
       ensureItem(offer.classTsid, {
         label: offer.label,
         desc: `${offer.label}, stocked by the ${vendor.label}. (GSJS catalog_stores.js)`,
-        isTool: tools.has(offer.classTsid),
       });
     }
   }
@@ -151,14 +89,21 @@ export function ensureVendorItems() {
 
 /**
  * Pick a stable shop for a street, with a query-friendly profile override.
- * Hechey Track stays the familiar groceries stop.
+ * Hechey Track stays the familiar groceries stop; rocky streets favour the
+ * mining, hardware, and tool vendors.
+ * @param {string} [streetTsid]
+ * @param {string} [override]
+ * @param {{ rocks?: number }} [context]
  */
-export function selectVendorProfile(streetTsid = '', override = '') {
+export function selectVendorProfile(streetTsid = '', override = '', context = {}) {
   const requested = String(override || '').trim().toLowerCase();
   if (VENDOR_PROFILES[requested]) return VENDOR_PROFILES[requested];
   if (streetTsid === 'GLI2V0UN7RD1T2J') return VENDOR_PROFILES.groceries;
   let hash = 0;
   for (const char of String(streetTsid)) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  if ((context.rocks || 0) >= 3) {
+    return VENDOR_PROFILES[MINING_VENDOR_KEYS[hash % MINING_VENDOR_KEYS.length]];
+  }
   return VENDOR_SEQUENCE[hash % VENDOR_SEQUENCE.length];
 }
 
