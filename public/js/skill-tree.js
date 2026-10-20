@@ -194,12 +194,12 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
     note: 'Lets you use a Beaker to mix compounds into powders.',
   },
   Crystallography: {
-    status: 'partial',
-    note: 'Unlocks the Crystallizer. Its Barnacle Talc and Firefly Jar ingredients are hard to come by here.',
+    status: 'live',
+    note: 'Unlocks the Crystalmalizing Chamber: Barnacle Talc (grind Barnacles in a Grinder) and Firefly Jars become Plain Crystals.',
   },
   Distilling: {
-    status: 'later',
-    note: 'The Still and its Hooch are not here yet. Learning it still opens Tincturing.',
+    status: 'live',
+    note: 'Lets you run a Still: Distill Grain, Corn or Potatoes into its hopper and Collect the Hooch it makes, one every 140 seconds. Also opens Tincturing.',
   },
   Tincturing: {
     status: 'live',
@@ -229,31 +229,31 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
   },
   Engineering: {
     status: 'live',
-    note: 'With Tinkering IV or V, unlocks most of the Tinkertool tool recipes.',
+    note: 'Lets you assemble a Woodworker, Metalmaker, Fuelmaker or Blockmaker from a Machine Stand and its three parts. With Tinkering IV or V, unlocks most of the Tinkertool tool recipes.',
   },
   Metalworking: {
     status: 'live',
     note: 'Lets you run the Metalmaker for Metal Rods, Posts and Girders.',
   },
   Woodworking: {
-    status: 'partial',
-    note: 'Unlocks the Woodworker recipes (Boards, Posts, Beams), but a Woodworker machine cannot be assembled here yet.',
+    status: 'live',
+    note: 'Lets you run a Woodworker (assembled with Engineering) for Boards, Posts and Beams; each burns fuel from its tank.',
   },
   Blockmaking: {
-    status: 'later',
-    note: 'The Blockmaker machine is not here yet.',
+    status: 'live',
+    note: 'Lets you run a Blockmaker (assembled with Engineering) to press Earth and Loam into Urth Blocks. The retired Brick and Grade A/AAA Earth Block recipes are not in the source.',
   },
   Fuelmaking: {
-    status: 'partial',
-    note: 'Unlocks the Fuelmaker recipe, but a Fuelmaker machine cannot be assembled here yet.',
+    status: 'live',
+    note: 'Lets you run a Fuelmaker (assembled with Engineering): Jellisac, Peat and White Gas become Fuel Cells that refuel every machine.',
   },
   Furnituremaking: {
     status: 'later',
     note: 'The Construction Tool and furniture building are not here yet.',
   },
   'Fiber Arts': {
-    status: 'partial',
-    note: 'Fiber Arts I is for the Spindle, which is not here yet. Fiber Arts II unlocks the Loomer recipes.',
+    status: 'live',
+    note: 'Fiber Arts I lets you spin seven Fibers into a Thread on a Spindle. Fiber Arts II unlocks the Loomer recipes.',
   },
 
   // Intellectual
@@ -294,10 +294,10 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
     note: 'Frees the camera to look around the whole street. There is no free camera here yet.',
   },
   'Bureaucratic Arts': {
-    status: 'partial',
-    note: 'Bureaucratic Hall clerks sell documents only to those who know Bureaucratic Arts. Only the Card-Carrying Qualification route is here; Your Papers and permits are not yet.',
+    status: 'live',
+    note: 'The Bureaucrat outside the Bureaucratic Halls on Gregarious Grange, Baeli Bray and Chego Chase sells Your Papers (Complete them for the You Have Papers badge) to those who know Bureaucratic Arts.',
     ranks: {
-      bureaucraticarts_2: { status: 'later', note: 'Needs the You Have Papers badge, and Your Papers cannot be bought here yet.' },
+      bureaucraticarts_2: { status: 'live', note: 'Needs the You Have Papers badge; lets the Bureaucrat sell you General Building Permits for street projects.' },
       bureaucraticarts_3: { status: 'later', note: 'Needs the Impossible Achievement badge, which is impossible by design.' },
     },
   },

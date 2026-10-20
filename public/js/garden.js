@@ -225,6 +225,38 @@ export const SEED_CATALOG = {
     grow2H: 3.5,
     gardenType: 'herb',
   }),
+  // Dust Trap drop-table herbs (item-transforms.js shucks them back into seeds).
+  herb_seed_gandlevery: seedDef({
+    seedId: 'herb_seed_gandlevery',
+    label: 'Gandlevery Seed',
+    cropId: 'gandlevery',
+    cropLabel: 'Gandlevery',
+    produces: 1,
+    grow1H: 0.75,
+    grow2H: 0.75,
+    gardenType: 'herb',
+  }),
+  herb_seed_yellow_crumb_flower: seedDef({
+    seedId: 'herb_seed_yellow_crumb_flower',
+    label: 'Yellow Crumb Flower Seed',
+    cropId: 'yellow_crumb_flower',
+    cropLabel: 'Yellow Crumb Flower',
+    produces: 3,
+    grow1H: 4.5,
+    grow2H: 4.5,
+    gardenType: 'herb',
+  }),
+  // Gardening Goods / Gardening Tools vendors (catalog_stores.js stores 6, 12).
+  seed_pumpkin: seedDef({
+    seedId: 'seed_pumpkin',
+    label: 'Pumpkin Seed',
+    cropId: 'pumpkin',
+    cropLabel: 'Pumpkin',
+    produces: 1,
+    grow1H: 3,
+    grow2H: 3,
+    gardenType: 'default',
+  }),
 };
 
 /** Tools used by original garden_action (watering_can / hoe). */

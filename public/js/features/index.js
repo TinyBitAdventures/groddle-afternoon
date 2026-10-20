@@ -21,6 +21,7 @@ import { streetFurnitureFeature } from './street-furniture-feature.js?v=furnitur
 import { doorsFeature } from './doors-feature.js?v=doors-1';
 import { locationEventsFeature } from './location-events-feature.js?v=location-events-1';
 import { streetJobsFeature } from './street-jobs-feature.js?v=jobs-1';
+import { supplyFeature } from './supply-feature.js?v=supply-1';
 
 export { questFlagsFeature };
 
@@ -42,4 +43,5 @@ export const FEATURES = [
   doorsFeature,
   locationEventsFeature,
   streetJobsFeature,
+  supplyFeature,
 ];
