@@ -62,12 +62,20 @@ export const INCLUDED_TOOLS = [
   'crystallizer',
   'tinkertool',
   'construction_tool',
+  'blockmaker',
+  'spindle',
+  'splendid_spindle',
 ];
 
-const SKIPPED_TOOLS = {
-  blockmaker:
-    'Blockmaker makes Urth Blocks, which only feed house/terrain expansion; no building system exists.',
-};
+/** Tools whose recipes are all left out (none since the Blockmaker arrived). */
+const SKIPPED_TOOLS = {};
+
+/**
+ * making_type "machine" tools: players/inc_making.js burns a recipe's
+ * fuel_cell input from the machine's fuel tank (tool_uses = fuel qty) instead
+ * of taking Fuel Cells from the pack. js/machines.js owns the tank.
+ */
+export const MACHINE_TOOLS = new Set(['woodworker', 'fuelmaker', 'metalmaker', 'blockmaker']);
 
 /**
  * Tinkertool recipes that make tools with a working gameplay loop in the
@@ -98,8 +106,6 @@ const UNPLAYABLE_TOOL_REASONS = {
   grand_ol_grinder: "Grand Ol' Grinder is an upgraded Grinder; mining.js only recognizes ore_grinder.",
   high_class_hoe: 'High-Class Hoe is an upgraded Hoe; garden.js only recognizes hoe.',
   class_axe: 'Class Axe is an upgraded Hatchet; woodcutting.js only recognizes hatchet.',
-  spindle: 'Spindle spins Fiber into Thread via its own verb; no spinning/fiber system exists.',
-  splendid_spindle: 'Splendid Spindle spins Fiber into Thread via its own verb; no spinning/fiber system exists.',
 };
 
 /** Furniture classes with recovered art (build-homes.mjs FURNITURE_CLASSES). */
@@ -217,6 +223,50 @@ const VERB_RECIPES = {
     skill: 'refining_1',
     skills: ['refining_1'],
     source: 'ore_grinder.js onCrushComplete sparkly',
+  },
+  crush_barnacle: {
+    id: 'crush_barnacle',
+    name: 'Grind Barnacles',
+    tool: 'ore_grinder',
+    energyCost: 3,
+    xpReward: 1,
+    waitMs: 4000,
+    inputs: [{ classTsid: 'barnacle', qty: 1 }],
+    outputs: [{ classTsid: 'barnacle_talc', qty: 1 }],
+    skill: null,
+    skills: [],
+    toolWear: 2,
+    // ore_grinder.js: barnacles need no Refining ("grinding ore requires ...").
+    toolSkillFree: true,
+    source: 'ore_grinder.js onCrushComplete barnacle + catalog_skill_packages.js barnacle_refining no_skill',
+  },
+  spin_thread: {
+    id: 'spin_thread',
+    name: 'Thread',
+    tool: 'spindle',
+    energyCost: 1,
+    xpReward: 0,
+    waitMs: 2000,
+    inputs: [{ classTsid: 'fiber', qty: 7 }],
+    outputs: [{ classTsid: 'thread', qty: 1 }],
+    skill: 'fiber_arts_1',
+    skills: ['fiber_arts_1'],
+    toolWear: 1,
+    source: 'spindle.js spin (7 Fiber per Thread) + catalog_skill_packages.js spinning fiber_arts_1',
+  },
+  spin_thread_splendid: {
+    id: 'spin_thread_splendid',
+    name: 'Thread',
+    tool: 'splendid_spindle',
+    energyCost: 1,
+    xpReward: 0,
+    waitMs: 2000,
+    inputs: [{ classTsid: 'fiber', qty: 7 }],
+    outputs: [{ classTsid: 'thread', qty: 1 }],
+    skill: 'fiber_arts_1',
+    skills: ['fiber_arts_1'],
+    toolWear: 1,
+    source: 'splendid_spindle.js spin (7 Fiber per Thread) + catalog_skill_packages.js spinning fiber_arts_1',
   },
 };
 
@@ -404,6 +454,14 @@ export function buildCatalog(gsjs = GSJS) {
       source: `catalog_recipes.js recipes["${id}"]`,
     };
     if (r.learnt === 0) entry.discoverable = true;
+    if (MACHINE_TOOLS.has(r.tool)) {
+      const fuel = entry.inputs.filter((i) => i.classTsid === 'fuel_cell').reduce((n, i) => n + i.qty, 0);
+      if (fuel) {
+        entry.fuel = fuel;
+        entry.toolWear = fuel;
+        entry.inputs = entry.inputs.filter((i) => i.classTsid !== 'fuel_cell');
+      }
+    }
     out[key] = entry;
   }
 

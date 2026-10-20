@@ -2,7 +2,8 @@
  * Add the parallax and colour data the first street import dropped:
  * each layer's canvas size (w, h), its `filtersNEW` colour treatment
  * (brightness, contrast, saturation, tintColor, tintAmount, blur), and the
- * location's sky `gradient` (top, bottom), plus each deco's `h_flip` and
+ * location's sky `gradient` (top, bottom), its `music_file` override, plus each
+ * deco's `h_flip` and
  * `hidden` flags. Source: tinyspeck/glitch-locations
  * (CC0). Edits assets/streets/*.json in place; safe to re-run.
  *
@@ -136,6 +137,11 @@ for (const file of files) {
   }
   if (!xmlPath) continue;
   const xml = await readFile(xmlPath, 'utf8');
+
+  // The location's music override (announce_music on entry), e.g. HELL.
+  const music = xml.match(/<str id="music_file">([^<]+)<\/str>/)?.[1]?.trim();
+  if (music) street.musicFile = music;
+  else delete street.musicFile;
 
   const gradientAt = xml.indexOf('<object id="gradient">');
   if (gradientAt >= 0) {

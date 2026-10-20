@@ -44,6 +44,15 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   fox_brush: { label: 'Fox Brush', capacity: 100, baseCost: 200, source: 'fox_brush.js' },
   // Teleportation Scripts (js/teleportation.js): one wear per script written.
   quill: { label: 'Quill', capacity: 100, baseCost: 400, source: 'quill.js' },
+  // Spinning (spindle.js / splendid_spindle.js points_capacity).
+  spindle: { label: 'Spindle', capacity: 100, baseCost: 200, source: 'spindle.js' },
+  splendid_spindle: { label: 'Splendid Spindle', capacity: 500, baseCost: 2000, source: 'splendid_spindle.js' },
+  // Machines (js/machines.js): the condition is the fuel tank, machine_base
+  // max_fuel 200. Fuel Cells refill it; a Tinkertool cannot.
+  metalmaker: { label: 'Metalmaker', capacity: 200, baseCost: 0, repairable: false, fuel: true, source: 'metalmaker.js machine_base max_fuel' },
+  woodworker: { label: 'Woodworker', capacity: 200, baseCost: 0, repairable: false, fuel: true, source: 'woodworker.js machine_base max_fuel' },
+  fuelmaker: { label: 'Fuelmaker', capacity: 200, baseCost: 0, repairable: false, fuel: true, source: 'fuelmaker.js machine_base max_fuel' },
+  blockmaker: { label: 'Blockmaker', capacity: 200, baseCost: 0, repairable: false, fuel: true, source: 'blockmaker.js machine_base max_fuel' },
 });
 
 /** Rank data from catalog_skill_packages.js `tinkering`. */
@@ -143,7 +152,9 @@ export function canUseTool(state, classTsid, wear = 1) {
       reason: 'broken_tool',
       condition,
       wear: cost,
-      msg: `This ${condition.label} has become broken, and must be repaired.`,
+      msg: TOOL_CONDITION_CATALOG[classTsid]?.fuel
+        ? "That machine doesn't have enough fuel left."
+        : `This ${condition.label} has become broken, and must be repaired.`,
     };
   }
   return { ok: true, condition, wear: cost };
@@ -168,7 +179,11 @@ export function useToolCondition(state, classTsid, wear = 1) {
     remaining: row.remaining,
     capacity: check.condition.capacity,
     broke,
-    msg: broke ? `Ooops! You done broke your ${check.condition.label}.` : '',
+    msg: broke
+      ? TOOL_CONDITION_CATALOG[classTsid]?.fuel
+        ? `Your ${check.condition.label} is out of fuel. Refuel it with Fuel Cells.`
+        : `Ooops! You done broke your ${check.condition.label}.`
+      : '',
   };
 }
 

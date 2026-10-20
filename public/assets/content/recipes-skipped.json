@@ -2,9 +2,9 @@
   "_meta": {
     "generator": "build-recipes.mjs",
     "sourceRecipes": 339,
-    "imported": 309,
-    "skipped": 30,
-    "verbRecipes": 4
+    "imported": 312,
+    "skipped": 27,
+    "verbRecipes": 7
   },
   "skipped": [
     {
@@ -16,16 +16,6 @@
       ],
       "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
       "source": "catalog_recipes.js recipes[\"170\"]"
-    },
-    {
-      "id": "190",
-      "name": "Urth Block",
-      "tool": "blockmaker",
-      "outputs": [
-        "grade_aa_earth_block"
-      ],
-      "reason": "Blockmaker makes Urth Blocks, which only feed house/terrain expansion; no building system exists.",
-      "source": "catalog_recipes.js recipes[\"190\"]"
     },
     {
       "id": "196",
@@ -238,16 +228,6 @@
       "source": "catalog_recipes.js recipes[\"287\"]"
     },
     {
-      "id": "299",
-      "name": "Spindle",
-      "tool": "tinkertool",
-      "outputs": [
-        "spindle"
-      ],
-      "reason": "Spindle spins Fiber into Thread via its own verb; no spinning/fiber system exists.",
-      "source": "catalog_recipes.js recipes[\"299\"]"
-    },
-    {
       "id": "301",
       "name": "Class Axe",
       "tool": "tinkertool",
@@ -256,16 +236,6 @@
       ],
       "reason": "Class Axe is an upgraded Hatchet; woodcutting.js only recognizes hatchet.",
       "source": "catalog_recipes.js recipes[\"301\"]"
-    },
-    {
-      "id": "302",
-      "name": "Splendid Spindle",
-      "tool": "tinkertool",
-      "outputs": [
-        "splendid_spindle"
-      ],
-      "reason": "Splendid Spindle spins Fiber into Thread via its own verb; no spinning/fiber system exists.",
-      "source": "catalog_recipes.js recipes[\"302\"]"
     },
     {
       "id": "303",

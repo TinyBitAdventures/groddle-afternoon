@@ -268,6 +268,20 @@
         "source": "items/banana_no_names.js base_cost 40 × energy_factor 1 (include/food.js food_eat)"
       }
     },
+    "barnacle": {
+      "label": "Mortar Barnacle",
+      "namePlural": "Mortar Barnacles",
+      "desc": "If clinging to things is a skill, this little fella was a champion. Once prised from a cluster (or \"Blister\") of pals, Barnacles can be introduced to the Grinder to find a new purpose.",
+      "baseCost": 8,
+      "stackMax": 20,
+      "tags": [
+        "barnacle",
+        "basic_resource",
+        "firebogproduct"
+      ],
+      "isTool": false,
+      "source": "items/barnacle.js"
+    },
     "barnacle_talc": {
       "label": "Barnacle Talc",
       "namePlural": "Barnacle Talc",
@@ -614,6 +628,24 @@
       "source": "items/blender.js",
       "pointsCapacity": 100,
       "makingType": "cooking"
+    },
+    "blockmaker": {
+      "label": "Blockmaker",
+      "namePlural": "Blockmakers",
+      "desc": "Even simple building blocks have to come from somewhere... and this is where. Learn to harness the power of this machine and Urth Blocks of superiour blockiness shall be yours.",
+      "baseCost": 0,
+      "stackMax": 1,
+      "tags": [
+        "blockmaker",
+        "no_rube",
+        "no_trade",
+        "no_shelf",
+        "machineparts_products",
+        "machine_task_limit_upgrade"
+      ],
+      "isTool": true,
+      "source": "items/blockmaker.js",
+      "makingType": "machine"
     },
     "blue_bubble": {
       "label": "Blue Bubble",
@@ -1687,6 +1719,19 @@
       ],
       "isTool": false,
       "source": "items/dullite.js"
+    },
+    "earth": {
+      "label": "Lump of Earth",
+      "namePlural": "Lumps of Earth",
+      "desc": "Many have tried to sum up the wonder of Earth, with superlatives like \"Earthy\", \"Lumpy\" and \"Eart... oh, that's been said? Brown, then.\" But it's just a lump of earth. For building with.",
+      "baseCost": 3,
+      "stackMax": 50,
+      "tags": [
+        "basic_resource",
+        "earth"
+      ],
+      "isTool": false,
+      "source": "items/earth.js"
     },
     "earthshaker": {
       "label": "Earthshaker",
@@ -2808,6 +2853,20 @@
         "source": "items/glitchepoix.js base_cost 45 × energy_factor 1 (include/food.js food_eat)"
       }
     },
+    "grade_aa_earth_block": {
+      "label": "Urth Block",
+      "namePlural": "Urth Blocks",
+      "desc": "Marginally muddy earth of Ur, less-than-lofty loam and heavy gas from somewhat suspect origin comprise these useful building blocks.",
+      "baseCost": 150,
+      "stackMax": 10,
+      "tags": [
+        "earth",
+        "block",
+        "advanced_resource"
+      ],
+      "isTool": false,
+      "source": "items/grade_aa_earth_block.js"
+    },
     "grain": {
       "label": "Grain",
       "namePlural": "Grains",
@@ -3585,6 +3644,19 @@
         "energy": 1,
         "source": "items/licorice.js base_cost 8 × energy_factor 0.1 (include/food.js food_eat)"
       }
+    },
+    "loam": {
+      "label": "Lump of Loam",
+      "namePlural": "Lumps of Loam",
+      "desc": "Ah, loam sweet loam. Moist and fertile, and leagues above plain old earth, this rich, meaty chunk of ground will do any building project proud.",
+      "baseCost": 10,
+      "stackMax": 24,
+      "tags": [
+        "basic_resource",
+        "earth"
+      ],
+      "isTool": false,
+      "source": "items/loam.js"
     },
     "loomer": {
       "label": "Loomer",
@@ -5803,6 +5875,35 @@
         "energy": 18,
         "source": "items/spinach_salad.js base_cost 18 × energy_factor 1 (include/food.js food_eat)"
       }
+    },
+    "spindle": {
+      "label": "Spindle",
+      "namePlural": "Spindles",
+      "desc": "In the mists of time, storytellers spoke of  a magical spindle that could be used to spin starlight into downy threads to weave into a cloak of invisibility. But it's not this spindle. This is just a spindle. It's used to turn fibers into thread. But that other one sounds amazing, right?",
+      "baseCost": 200,
+      "stackMax": 1,
+      "tags": [
+        "tool"
+      ],
+      "isTool": true,
+      "source": "items/spindle.js",
+      "pointsCapacity": 100,
+      "makingType": ""
+    },
+    "splendid_spindle": {
+      "label": "Splendid Spindle",
+      "namePlural": "Splendid Spindle",
+      "desc": "The ancients whispered of the spindle of Cosma that could spin the very fibres of air into cloths of heaven, enwrought with golden and silver light; blue and dim and dark cloths of night and light and the half-light. This is not that spindle. But it is really quite a good spindle, and it lasts longer than the other kind of spindle.",
+      "baseCost": 2000,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "premiumtool"
+      ],
+      "isTool": true,
+      "source": "items/splendid_spindle.js",
+      "pointsCapacity": 500,
+      "makingType": ""
     },
     "spriggase": {
       "label": "Spriggase",

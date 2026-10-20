@@ -6391,6 +6391,44 @@
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"187\"]"
   },
+  "grade_aa_earth_block": {
+    "id": "190",
+    "name": "Urth Block",
+    "tool": "blockmaker",
+    "energyCost": 0,
+    "xpReward": 5,
+    "waitMs": 15000,
+    "inputs": [
+      {
+        "classTsid": "earth",
+        "qty": 5
+      },
+      {
+        "classTsid": "loam",
+        "qty": 2
+      },
+      {
+        "classTsid": "heavy_gas",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "grade_aa_earth_block",
+        "qty": 1
+      }
+    ],
+    "skill": "blockmaking_1",
+    "skills": [
+      "blockmaking_1"
+    ],
+    "achievements": [],
+    "toolWear": 5,
+    "taskLimit": 10,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"190\"]",
+    "fuel": 5
+  },
   "fuel_cell": {
     "id": "192",
     "name": "Fuel Cell",
@@ -6406,10 +6444,6 @@
       {
         "classTsid": "peat",
         "qty": 8
-      },
-      {
-        "classTsid": "fuel_cell",
-        "qty": 1
       },
       {
         "classTsid": "white_gas",
@@ -6430,7 +6464,8 @@
     "toolWear": 1,
     "taskLimit": 10,
     "learnt": 1,
-    "source": "catalog_recipes.js recipes[\"192\"]"
+    "source": "catalog_recipes.js recipes[\"192\"]",
+    "fuel": 1
   },
   "bean_wood": {
     "id": "195",
@@ -8081,10 +8116,6 @@
       {
         "classTsid": "plank",
         "qty": 4
-      },
-      {
-        "classTsid": "fuel_cell",
-        "qty": 1
       }
     ],
     "outputs": [
@@ -8101,7 +8132,8 @@
     "toolWear": 1,
     "taskLimit": 40,
     "learnt": 1,
-    "source": "catalog_recipes.js recipes[\"253\"]"
+    "source": "catalog_recipes.js recipes[\"253\"]",
+    "fuel": 1
   },
   "bag_furniture_sdb": {
     "id": "255",
@@ -8883,10 +8915,6 @@
       {
         "classTsid": "board",
         "qty": 4
-      },
-      {
-        "classTsid": "fuel_cell",
-        "qty": 2
       }
     ],
     "outputs": [
@@ -8900,10 +8928,11 @@
       "woodworking_1"
     ],
     "achievements": [],
-    "toolWear": 1,
+    "toolWear": 2,
     "taskLimit": 20,
     "learnt": 1,
-    "source": "catalog_recipes.js recipes[\"277\"]"
+    "source": "catalog_recipes.js recipes[\"277\"]",
+    "fuel": 2
   },
   "beam": {
     "id": "278",
@@ -8916,10 +8945,6 @@
       {
         "classTsid": "wood_post",
         "qty": 4
-      },
-      {
-        "classTsid": "fuel_cell",
-        "qty": 8
       }
     ],
     "outputs": [
@@ -8933,10 +8958,11 @@
       "woodworking_1"
     ],
     "achievements": [],
-    "toolWear": 1,
+    "toolWear": 8,
     "taskLimit": 10,
     "learnt": 1,
-    "source": "catalog_recipes.js recipes[\"278\"]"
+    "source": "catalog_recipes.js recipes[\"278\"]",
+    "fuel": 8
   },
   "metal_rod": {
     "id": "279",
@@ -8952,10 +8978,6 @@
       },
       {
         "classTsid": "plain_metal",
-        "qty": 1
-      },
-      {
-        "classTsid": "fuel_cell",
         "qty": 1
       }
     ],
@@ -8973,7 +8995,8 @@
     "toolWear": 1,
     "taskLimit": 20,
     "learnt": 1,
-    "source": "catalog_recipes.js recipes[\"279\"]"
+    "source": "catalog_recipes.js recipes[\"279\"]",
+    "fuel": 1
   },
   "metal_post": {
     "id": "280",
@@ -8990,10 +9013,6 @@
       {
         "classTsid": "tin",
         "qty": 3
-      },
-      {
-        "classTsid": "fuel_cell",
-        "qty": 6
       }
     ],
     "outputs": [
@@ -9007,10 +9026,11 @@
       "metalwork_1"
     ],
     "achievements": [],
-    "toolWear": 1,
+    "toolWear": 6,
     "taskLimit": 10,
     "learnt": 1,
-    "source": "catalog_recipes.js recipes[\"280\"]"
+    "source": "catalog_recipes.js recipes[\"280\"]",
+    "fuel": 6
   },
   "girder": {
     "id": "281",
@@ -9027,10 +9047,6 @@
       {
         "classTsid": "plain_metal",
         "qty": 12
-      },
-      {
-        "classTsid": "fuel_cell",
-        "qty": 12
       }
     ],
     "outputs": [
@@ -9044,10 +9060,11 @@
       "metalwork_1"
     ],
     "achievements": [],
-    "toolWear": 1,
+    "toolWear": 12,
     "taskLimit": 5,
     "learnt": 1,
-    "source": "catalog_recipes.js recipes[\"281\"]"
+    "source": "catalog_recipes.js recipes[\"281\"]",
+    "fuel": 12
   },
   "pi": {
     "id": "288",
@@ -9422,6 +9439,35 @@
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"298\"]"
   },
+  "spindle": {
+    "id": "299",
+    "name": "Spindle",
+    "tool": "tinkertool",
+    "energyCost": 15,
+    "xpReward": 20,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "wood_post",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "spindle",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_4",
+    "skills": [
+      "tinkering_4"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"299\"]"
+  },
   "ace_of_spades": {
     "id": "300",
     "name": "Ace of Spades",
@@ -9459,6 +9505,44 @@
     "taskLimit": 1,
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"300\"]"
+  },
+  "splendid_spindle": {
+    "id": "302",
+    "name": "Splendid Spindle",
+    "tool": "tinkertool",
+    "energyCost": 75,
+    "xpReward": 60,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "metal_post",
+        "qty": 3
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 2
+      },
+      {
+        "classTsid": "tin",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "splendid_spindle",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "fiber_arts_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"302\"]"
   },
   "plain_crystal": {
     "id": "304",
@@ -11333,5 +11417,82 @@
       "refining_1"
     ],
     "source": "ore_grinder.js onCrushComplete sparkly"
+  },
+  "crush_barnacle": {
+    "id": "crush_barnacle",
+    "name": "Grind Barnacles",
+    "tool": "ore_grinder",
+    "energyCost": 3,
+    "xpReward": 1,
+    "waitMs": 4000,
+    "inputs": [
+      {
+        "classTsid": "barnacle",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "barnacle_talc",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "toolWear": 2,
+    "toolSkillFree": true,
+    "source": "ore_grinder.js onCrushComplete barnacle + catalog_skill_packages.js barnacle_refining no_skill"
+  },
+  "spin_thread": {
+    "id": "spin_thread",
+    "name": "Thread",
+    "tool": "spindle",
+    "energyCost": 1,
+    "xpReward": 0,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "fiber",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "thread",
+        "qty": 1
+      }
+    ],
+    "skill": "fiber_arts_1",
+    "skills": [
+      "fiber_arts_1"
+    ],
+    "toolWear": 1,
+    "source": "spindle.js spin (7 Fiber per Thread) + catalog_skill_packages.js spinning fiber_arts_1"
+  },
+  "spin_thread_splendid": {
+    "id": "spin_thread_splendid",
+    "name": "Thread",
+    "tool": "splendid_spindle",
+    "energyCost": 1,
+    "xpReward": 0,
+    "waitMs": 2000,
+    "inputs": [
+      {
+        "classTsid": "fiber",
+        "qty": 7
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "thread",
+        "qty": 1
+      }
+    ],
+    "skill": "fiber_arts_1",
+    "skills": [
+      "fiber_arts_1"
+    ],
+    "toolWear": 1,
+    "source": "splendid_spindle.js spin (7 Fiber per Thread) + catalog_skill_packages.js spinning fiber_arts_1"
   }
 }

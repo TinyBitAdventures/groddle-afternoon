@@ -29,7 +29,7 @@ describe('official street vendor profiles', () => {
       assert.ok(labels.includes(label), label);
     }
     assert.equal(VENDOR_PROFILES.groceries.offers.length, 12);
-    assert.equal(VENDOR_PROFILES.gardening.offers.length, 18);
+    assert.equal(VENDOR_PROFILES.gardening.offers.length, 19); // Pumpkin Seed joined with its recovered icon
     assert.equal(VENDOR_PROFILES.produce.offers.length, 15);
     assert.equal(VENDOR_PROFILES.toys.offers.length, 9);
     for (const vendor of Object.values(VENDOR_PROFILES)) {

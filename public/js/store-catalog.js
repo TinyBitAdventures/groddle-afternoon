@@ -185,6 +185,36 @@ export const STORE_CATALOG = Object.freeze([
         "cost": 2800
       },
       {
+        "classTsid": "machine_stand",
+        "label": "Machine Stand",
+        "cost": 560
+      },
+      {
+        "classTsid": "blockmaker_chassis",
+        "label": "Blockmaker Chassis",
+        "cost": 1680
+      },
+      {
+        "classTsid": "blockmaker_plates",
+        "label": "Blockmaker Plates",
+        "cost": 1400
+      },
+      {
+        "classTsid": "blockmaker_engine",
+        "label": "Machine Engine",
+        "cost": 2800
+      },
+      {
+        "classTsid": "fuelmaker_case",
+        "label": "Fuelmaker Case",
+        "cost": 1680
+      },
+      {
+        "classTsid": "fuelmaker_core",
+        "label": "Fuelmaker Core",
+        "cost": 1400
+      },
+      {
         "classTsid": "cauldron",
         "label": "Cauldron",
         "cost": 3920
@@ -193,6 +223,36 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "tincturing_kit",
         "label": "Tincturing Kit",
         "cost": 1400
+      },
+      {
+        "classTsid": "still",
+        "label": "Still",
+        "cost": 2240
+      },
+      {
+        "classTsid": "metalmaker_mechanism",
+        "label": "Metal Machine Mechanism",
+        "cost": 1512
+      },
+      {
+        "classTsid": "metalmaker_tooler",
+        "label": "Metal Machine Tooler",
+        "cost": 1960
+      },
+      {
+        "classTsid": "woodworker_fuser",
+        "label": "Woodworker Fuser",
+        "cost": 1960
+      },
+      {
+        "classTsid": "woodworker_chassis",
+        "label": "Woodworker Chassis",
+        "cost": 1400
+      },
+      {
+        "classTsid": "spindle",
+        "label": "Spindle",
+        "cost": 224
       },
       {
         "classTsid": "loomer",
@@ -265,6 +325,11 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "watering_can",
         "label": "Watering Can",
         "cost": 81
+      },
+      {
+        "classTsid": "seed_pumpkin",
+        "label": "Pumpkin Seed",
+        "cost": 18
       },
       {
         "classTsid": "seed_broccoli",
@@ -485,6 +550,11 @@ export const STORE_CATALOG = Object.freeze([
     "buyMultiplier": 0.66,
     "offers": [
       {
+        "classTsid": "still",
+        "label": "Still",
+        "cost": 2140
+      },
+      {
         "classTsid": "tincturing_kit",
         "label": "Tincturing Kit",
         "cost": 1338
@@ -556,6 +626,11 @@ export const STORE_CATALOG = Object.freeze([
     "buyMultiplier": 0.66,
     "offers": [
       {
+        "classTsid": "spindle",
+        "label": "Spindle",
+        "cost": 218
+      },
+      {
         "classTsid": "loomer",
         "label": "Loomer",
         "cost": 436
@@ -564,6 +639,11 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "butterfly_lotion",
         "label": "Butterfly Lotion",
         "cost": 11
+      },
+      {
+        "classTsid": "pig_bait",
+        "label": "Pig Bait",
+        "cost": 27
       },
       {
         "classTsid": "quill",
@@ -586,6 +666,11 @@ export const STORE_CATALOG = Object.freeze([
     "label": "Tool Vendor",
     "buyMultiplier": 0.75,
     "offers": [
+      {
+        "classTsid": "pig_bait",
+        "label": "Pig Bait",
+        "cost": 26
+      },
       {
         "classTsid": "butterfly_lotion",
         "label": "Butterfly Lotion",
@@ -697,6 +782,36 @@ export const STORE_CATALOG = Object.freeze([
         "cost": 420
       },
       {
+        "classTsid": "machine_stand",
+        "label": "Machine Stand",
+        "cost": 525
+      },
+      {
+        "classTsid": "blockmaker_chassis",
+        "label": "Blockmaker Chassis",
+        "cost": 1575
+      },
+      {
+        "classTsid": "blockmaker_engine",
+        "label": "Machine Engine",
+        "cost": 2625
+      },
+      {
+        "classTsid": "blockmaker_plates",
+        "label": "Blockmaker Plates",
+        "cost": 1313
+      },
+      {
+        "classTsid": "fuelmaker_case",
+        "label": "Fuelmaker Case",
+        "cost": 1575
+      },
+      {
+        "classTsid": "fuelmaker_core",
+        "label": "Fuelmaker Core",
+        "cost": 1313
+      },
+      {
         "classTsid": "cauldron",
         "label": "Cauldron",
         "cost": 3675
@@ -705,6 +820,36 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "tincturing_kit",
         "label": "Tincturing Kit",
         "cost": 1313
+      },
+      {
+        "classTsid": "still",
+        "label": "Still",
+        "cost": 2100
+      },
+      {
+        "classTsid": "metalmaker_mechanism",
+        "label": "Metal Machine Mechanism",
+        "cost": 1418
+      },
+      {
+        "classTsid": "metalmaker_tooler",
+        "label": "Metal Machine Tooler",
+        "cost": 1838
+      },
+      {
+        "classTsid": "woodworker_fuser",
+        "label": "Woodworker Fuser",
+        "cost": 1838
+      },
+      {
+        "classTsid": "woodworker_chassis",
+        "label": "Woodworker Chassis",
+        "cost": 1313
+      },
+      {
+        "classTsid": "spindle",
+        "label": "Spindle",
+        "cost": 210
       },
       {
         "classTsid": "loomer",
@@ -771,6 +916,11 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "spice_mill",
         "label": "Spice Mill",
         "cost": 158
+      },
+      {
+        "classTsid": "seed_pumpkin",
+        "label": "Pumpkin Seed",
+        "cost": 18
       },
       {
         "classTsid": "seed_broccoli",
@@ -1039,6 +1189,11 @@ export const STORE_CATALOG = Object.freeze([
     "label": "Helga's Liquor Store",
     "buyMultiplier": 0.66,
     "offers": [
+      {
+        "classTsid": "still",
+        "label": "Still",
+        "cost": 2200
+      },
       {
         "classTsid": "beer",
         "label": "Beer",
