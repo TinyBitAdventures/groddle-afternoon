@@ -18278,12 +18278,16 @@ function renderSkillsPanel() {
       achievementName: (id) => getAchievementCatalog()[id]?.name || id.replace(/_/g, ' '),
       giantName: (id) => GIANTS[id]?.name || id,
       emblemCount: (giant) => countItem(inv, `emblem_${giant}`),
+      // Unlearning (features/unlearning-feature.js): progress + per-skill check.
+      unlearning: features.query('skillUnlearning', engine),
     },
     actions: {
       start: (id) => runSkillStudyAction(id, 'start'),
       resume: (id) => runSkillStudyAction(id, 'resume'),
       pause: (id) => runSkillStudyAction(id, 'pause'),
       spendEmblem: (id) => spendEmblemForSkillUnlock(id),
+      unlearn: (id) => features.query('runSkillUnlearn', id, 'start', engine),
+      cancelUnlearn: (id) => features.query('runSkillUnlearn', id, 'cancel', engine),
     },
   });
 }
@@ -18292,6 +18296,13 @@ function renderSkillsPanel() {
 function runSkillStudyAction(classTsid, action) {
   const def = getSkillCatalog()[classTsid];
   const name = skillTitle(def) || classTsid;
+  // skills_train refuses while a skill is being unlearned.
+  const gate = action === 'pause' ? null : features.query('skillStudyGate', classTsid, engine);
+  if (gate && gate.ok === false) {
+    toast(gate.msg);
+    renderSkillsPanel();
+    return;
+  }
   const result = action === 'pause'
     ? pauseSkillStudy(skillState, classTsid, Date.now())
     : startSkillStudy(skillState, classTsid, skillStudyContext(), Date.now());

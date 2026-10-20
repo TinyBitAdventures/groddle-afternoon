@@ -308,8 +308,49 @@ function skillRow(entry, ctx, actions, rerender) {
   body.appendChild(el('div', 'skill-meta', meta.join(' · ')));
   const btn = actionButton(entry, ctx, actions);
   if (btn) body.appendChild(btn);
+  const unlearn = unlearnButton(entry, ctx, actions, rerender);
+  if (unlearn) body.appendChild(unlearn);
   row.appendChild(body);
   return row;
+}
+
+/**
+ * Unlearn (players/inc_skills.js skills_unlearn) for a learned or queued
+ * skill, when the Unlearning Ability card is owned. Two clicks: the first
+ * spells out the time and that nothing is refunded.
+ */
+function unlearnButton(entry, ctx, actions, rerender) {
+  const check = ctx.unlearning?.check?.(entry.classTsid);
+  if (!check?.visible || typeof actions.unlearn !== 'function') return null;
+  const btn = el('button', 'content-action-btn skill-unlearn-btn');
+  btn.type = 'button';
+  btn.dataset.unlearn = entry.classTsid;
+  if (!check.ok) {
+    btn.textContent = 'Unlearn';
+    btn.disabled = true;
+    btn.title = check.msg || '';
+    return btn;
+  }
+  const time = formatStudyTime(check.seconds);
+  if (ui.confirmUnlearn === entry.classTsid) {
+    btn.textContent = `Really unlearn? ${time}, no refund`;
+    btn.classList.add('is-confirm');
+    btn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      ui.confirmUnlearn = null;
+      actions.unlearn(entry.classTsid);
+      rerender();
+    });
+  } else {
+    btn.textContent = `Unlearn · ${time}`;
+    btn.title = check.quest ? 'Its skill quest in your log will be removed too.' : 'Forget this skill to free up your brain.';
+    btn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      ui.confirmUnlearn = entry.classTsid;
+      rerender();
+    });
+  }
+  return btn;
 }
 
 /**
@@ -349,6 +390,28 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
 
   // Active and paused studies stay pinned above the tree.
   study.innerHTML = '';
+  const unlearning = ctx.unlearning?.active;
+  if (unlearning) {
+    const card = el('div', 'skill-study-card unlearning');
+    card.dataset.unlearning = unlearning.classTsid;
+    const title = el('div', 'skill-study-title');
+    title.appendChild(el('b', '', unlearning.name || unlearning.classTsid));
+    title.appendChild(el('span', '', 'Unlearning'));
+    card.appendChild(title);
+    card.appendChild(el('div', 'skill-study-time', `${formatStudyTime(unlearning.remainingSeconds)} remaining · ${Math.round(unlearning.progress * 100)}%`));
+    const bar = el('div', 'q-bar skill-study-bar');
+    const fill = el('i');
+    fill.style.width = `${Math.round(unlearning.progress * 100)}%`;
+    bar.appendChild(fill);
+    card.appendChild(bar);
+    if (typeof actions.cancelUnlearn === 'function') {
+      const stop = el('button', 'content-action-btn', 'Stop unlearning');
+      stop.type = 'button';
+      stop.addEventListener('click', () => actions.cancelUnlearn(unlearning.classTsid));
+      card.appendChild(stop);
+    }
+    study.appendChild(card);
+  }
   for (const row of listStudyQueue(state, now)) {
     const def = getSkillCatalog()[row.classTsid];
     if (!def) continue;

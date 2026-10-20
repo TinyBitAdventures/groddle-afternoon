@@ -121,7 +121,8 @@ const RULES = [
   [/^ancestral_lands_time_[12]$/, 'later', 'The Ancestral Lands are not in the remake.'],
   [/^rube_better_items$/, 'live', 'The Rube treats you as 10 levels higher when choosing what to offer: no more cheap items.'],
   [/^rube_chance_to_meet$/, 'live', 'The Rube visits on 1% of street entries (from 0.5%).'],
-  [/^unlearning_/, 'later', 'Unlearning skills is not in the remake.'],
+  [/^unlearning_ability$/, 'live', 'Unlearn a skill from the Skills panel in the time it took to learn.'],
+  [/^unlearning_time_[12]$/, 'live', 'Unlearning takes 25 / 50% less time.'],
 
   // Interface conveniences.
   [/^trade_channel$/, 'multiplayer', 'The trade chat channel needs other players.'],

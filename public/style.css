@@ -3011,6 +3011,11 @@ button.play-context-head:focus-visible {
 .skill-study-title span { color: #286479; font-weight: 700; font-size: 0.72rem; }
 .skill-study-card.paused .skill-study-title span { color: #8a6420; }
 .skill-study-card .skill-study-time { font-size: 0.74rem; color: #4c5b60; }
+.skill-study-card.unlearning { border-color: #c9908a; background: #fff1ef; }
+.skill-study-card.unlearning .skill-study-title span { color: #9a3d33; }
+.skill-study-card.unlearning .skill-study-bar i { background: #c96a5e; }
+.skill-unlearn-btn { margin-top: 0.35rem; color: #8a3a31; border-color: #e0b3ad; background: #fff7f5; }
+.skill-unlearn-btn.is-confirm { color: #fff; background: #b8564a; border-color: #9a3d33; }
 .skill-tree-toolbar {
   position: sticky;
   top: 1.55rem;
