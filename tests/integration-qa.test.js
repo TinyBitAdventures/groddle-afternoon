@@ -61,4 +61,9 @@ test.describe('integration playtest regressions', () => {
     const meditation = fs.readFileSync(path.join(root, 'public/js/features/meditation-feature.js'), 'utf8');
     assert.match(meditation, /holdQuestOffers\(\) \{\n    return session \? true : null;/);
   });
+
+  test('the map and centred modals end above the live pack', () => {
+    assert.match(css, /\.map-panel \{[^}]*bottom: var\(--pack-live-height, 112px\)/);
+    assert.match(css, /\.glitch-modal \{[^}]*bottom: var\(--pack-live-height, 105px\)/);
+  });
 });

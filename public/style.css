@@ -104,6 +104,8 @@ header h1 {
 .map-panel {
   position: absolute;
   inset: 0;
+  /* Stop above the pack (z 45) so the map's lower edge is never under it. */
+  bottom: var(--pack-live-height, 112px);
   z-index: 40;
   display: flex;
   align-items: center;
@@ -3311,7 +3313,7 @@ body.buff-purple-pulse::after {
   position: absolute;
   inset: 0;
   /* The original-style pack remains live below modal workflows. */
-  bottom: 105px;
+  bottom: var(--pack-live-height, 105px);
   z-index: 40;
   display: flex;
   align-items: center;
