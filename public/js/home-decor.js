@@ -434,6 +434,31 @@ export function renderOrder(state) {
   });
 }
 
+/**
+ * First visit: lay the furniture_populate starter kit out as a cosy room, so a
+ * new house is lived in from the start. Everything stays movable. The blank
+ * Room / Tabletop / Wall Decoration frames (their art came from credit
+ * upgrades) wait in storage for the player to place.
+ */
+export function arrangeStarterRoom(state) {
+  const plan = [
+    ['bag_furniture_smallcabinet', 200],
+    ['furniture_floorlamp', 330],
+    ['furniture_table', 600],
+    ['furniture_chair', 452, null, { facingRight: true }],
+    ['furniture_ceilinglamp', 600],
+    ['furniture_shelf', 200, 486],
+    ['furniture_shelf', 860, 470],
+    ['bag_furniture_sdb', 1010, 560],
+    ['bag_furniture_sdb', 1100, 560],
+  ];
+  for (const [classTsid, x, y, extra] of plan) {
+    if (!state.storage[classTsid]) continue;
+    placeFurniture(state, {}, classTsid, { x, y: y ?? INTERIOR.floorY }, extra || {});
+  }
+  return state;
+}
+
 /** Seed a furnished, lived-in room (QA demo and the decorate tutorial). */
 export function furnishDemoRoom(state) {
   const add = (classTsid, x, y = null, extra = {}) => {
@@ -443,17 +468,17 @@ export function furnishDemoRoom(state) {
   };
   add('furniture_rug', 520);
   add('furniture_bookcase', 170);
-  const table = add('furniture_table', 520);
+  add('furniture_table', 520);
   add('furniture_chair', 372, null, { facingRight: true });
   add('furniture_chair', 668, null, { facingRight: false });
   add('furniture_tablelamp', 470);
-  if (table) add('furniture_tabledeco', 575);
   add('furniture_floorlamp', 790);
   add('furniture_sofa', 960);
   add('furniture_shelf', 960, 470);
-  add('furniture_painting', 520, 470);
-  add('bag_furniture_sdb', 1200, 500);
+  add('furniture_painting', 340, 486);
+  add('furniture_largewindow', 690, 486);
+  add('bag_furniture_sdb', 1170, 520);
   add('furniture_ceilinglamp', 520);
-  add('furniture_walllamp', 790, 480);
+  add('furniture_walllamp', 1090, 476);
   return state;
 }

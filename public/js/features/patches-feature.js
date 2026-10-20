@@ -702,7 +702,8 @@ export const patchesFeature = {
     generation += 1;
     const myGeneration = generation;
     const slot = engine.streetSlot(PATCHES_FEATURE_ID);
-    const counts = soilCountsForStreet(street?.tsid || engine.streetTsid);
+    // Home streets pass their cultivated Patches (js/features/homes-feature.js).
+    const counts = street?.soilCounts || soilCountsForStreet(street?.tsid || engine.streetTsid);
     const now = Date.now();
     let planned = soilSpawnPlan(counts, (key) => engine.placement(key));
     planned = setupDemo(engine, slot, planned);

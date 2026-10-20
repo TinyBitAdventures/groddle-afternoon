@@ -327,8 +327,10 @@ export function cultivateDemoYard(state, now = Date.now()) {
     ['proto_metal_rock', 760],
     ['proto_peat', 1010],
     ['proto_herb_garden_small', 1250],
-    ['proto_barnacle_pod', 1480],
+    ['proto_barnacle_pod', 1560],
   ];
+  // The demo yard is two segments longer on the right, so nothing crowds the house.
+  state.yardRight = Math.max(state.yardRight, 2);
   const rich = { level: 60, imagination: 1e9 };
   for (const [protoClass, rx] of plan) {
     const at = nearestFreeRx(state, protoClass, rx);

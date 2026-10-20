@@ -348,6 +348,8 @@ export function plantingHub(hubId) {
 export function canPlantBean(beanClass, patchKind, hubId) {
   const bean = SEASONED_BEANS[beanClass];
   if (!bean) return false;
+  // patch.js canPlant: "everything is ok in new POLs" (home streets).
+  if (hubId === 'home') return true;
   if (patchKind === 'patch_dark') return bean.trantClass === 'trant_egg';
   if (bean.trantClass === 'trant_egg') return false;
   const hub = plantingHub(hubId);

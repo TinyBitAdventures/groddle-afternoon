@@ -6318,8 +6318,27 @@ const engine = {
   stopFollowing: () => stopCompanionFollowForInstance(),
   transientInstance: () => anyTransientInstance() || engine.inScene(),
   homeContext() {
-    return { inHome: homeIsInstanced(), room: homeState.room || 'street' };
+    return {
+      inHome: homeIsInstanced(),
+      room: homeState.room || 'street',
+      owned: homeState.owned === true,
+      style: homeState.style || 'meadow',
+      returnLabel: homeState.returnLocation?.label || '',
+      unread: unreadMailCount(mailboxState, Date.now()),
+    };
   },
+  /** Rebuild the current home room in place (decorate / cultivate changes). */
+  async refreshHomeScene(opts = {}) {
+    if (!homeIsInstanced()) return false;
+    await renderHomeScene(homeState.room, { spawnX: player?.x, arrive: 'exact', ...opts });
+    return true;
+  },
+  /** The persistent per-street world slot (gardens, trees, rocks). */
+  streetWorld: (tsid) => streetWorldState(tsid),
+  /** A garden bed through the street garden path ({ x, y, gardenType, cols, rows, label, garden, detached }). */
+  spawnGarden: (opts) => spawnGarden(opts),
+  /** One mineable rock that keeps its state in the street's rock slot `index`. */
+  spawnMineRock: (classTsid, x, y, index) => spawnMineRock(classTsid, x, y, index),
   streetExists(tsid) {
     if (tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID) return homeState.owned === true;
     return Boolean(resolveIndexTsid(tsid));
@@ -16436,9 +16455,11 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
     world.removeChild(bgLayer);
     bgLayer.destroy({ children: true });
   }
-  WORLD_W = 1500;
+  // The homes feature (js/features/homes-feature.js) builds the scene.
+  const homeScene = features.query('homeScene', room, engine);
+  WORLD_W = homeScene?.width || 1500;
   GROUND_Y = 620;
-  bgLayer = drawHomeBackground(homeState.style, room);
+  bgLayer = homeScene?.background || drawHomeBackground(homeState.style, room);
   world.addChildAt(bgLayer, 0);
   streetPlatforms = bgLayer.platformsScreen;
   streetWalls = [];
@@ -16453,9 +16474,17 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
     platforms: streetPlatforms,
     signposts: [],
   };
-  spawnHomeSceneTargets(room);
+  if (homeScene) {
+    const targets = homeScene.spawnTargets() || {};
+    homeMailboxTarget = targets.mailbox || null;
+    homeDoorTarget = targets.door || null;
+    homeReturnTarget = targets.gate || null;
+  } else {
+    spawnHomeSceneTargets(room);
+  }
   if (player) {
-    player.x = Number.isFinite(opts.spawnX) ? opts.spawnX : room === 'interior' ? 1030 : 250;
+    const sceneX = homeScene?.spawnFor?.(opts);
+    player.x = Number.isFinite(sceneX) ? sceneX : Number.isFinite(opts.spawnX) ? opts.spawnX : room === 'interior' ? 1030 : 250;
     player.y = GROUND_Y;
     player.vx = 0;
     player.vy = 0;
@@ -16465,6 +16494,7 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
   camY = cameraTargetY(player?.y || GROUND_Y, activeCameraWorldHeight(), LOCATION_VIEW_H);
   world.x = -Math.round(camTarget);
   world.y = -Math.round(camY);
+  homeScene?.enter?.();
   const name = document.getElementById('street-name');
   if (name) {
     name.textContent = `${currentStreet.label} · ${HOME_STYLES[homeState.style]?.label || 'Meadow'} Home`;
@@ -16548,7 +16578,7 @@ async function switchHomeRoom(room) {
     fromHub: 'Home',
     toLabel: result.label,
     toHub: 'Home',
-    load: () => renderHomeScene(room, { spawnX: room === 'interior' ? 1030 : 910 }),
+    load: () => renderHomeScene(room, { arrive: 'door', spawnX: room === 'interior' ? 1030 : 910 }),
   });
   savePlayerState();
   return true;
@@ -19503,8 +19533,10 @@ function spawnGarden(opts = {}) {
   const cols = opts.cols || (gardenType === 'herb' ? 3 : 4);
   const rows = opts.rows || 2;
   const streetState = streetWorldState();
-  const garden = streetState.gardens[gardenType] || createGarden({ cols, rows, gardenType });
-  streetState.gardens[gardenType] = garden;
+  // Detached gardens (home cultivations) keep their plots with their owner.
+  const garden = opts.garden || (opts.detached ? null : streetState.gardens[gardenType]) ||
+    createGarden({ cols, rows, gardenType });
+  if (!opts.detached) streetState.gardens[gardenType] = garden;
   // Growth continues while the player is away or the browser is closed.
   tickGarden(garden, Date.now());
   const pts = samplePlatformPoints(3);
@@ -20221,7 +20253,7 @@ async function main() {
   const homeDemo = String(bootParams.get('homedemo') || '').toLowerCase();
   if (homeDemo) {
     pc.currants = Math.max(pc.currants, HOME_PURCHASE_COST + 250);
-    if (['owned', 'mail', 'home', 'interior'].includes(homeDemo) && !homeState.owned) {
+    if (['owned', 'mail', 'home', 'interior', 'decorate', 'cultivate'].includes(homeDemo) && !homeState.owned) {
       purchaseHome(homeState, pc, bootParams.get('homestyle') || 'meadow', Date.now() - 60_000);
     }
     if (homeState.owned) seedMailbox(mailboxState, Date.now());
@@ -20546,7 +20578,7 @@ async function main() {
   }
   try {
     await enterStreet(startTsid, startOpts);
-    if (resumeHomeAtBoot || ['home', 'interior'].includes(homeDemo)) {
+    if (resumeHomeAtBoot || ['home', 'interior', 'decorate', 'cultivate'].includes(homeDemo)) {
       if (!homeState.returnLocation) {
         homeState.returnLocation = {
           tsid: currentStreetTsid,
@@ -20557,7 +20589,9 @@ async function main() {
         };
       }
       homeState.inHome = true;
-      homeState.room = homeDemo === 'interior' ? 'interior' : homeState.room || 'street';
+      homeState.room = ['interior', 'decorate'].includes(homeDemo)
+        ? 'interior'
+        : homeDemo === 'cultivate' ? 'street' : homeState.room || 'street';
       await renderHomeScene(homeState.room, { spawnX: homeState.room === 'interior' ? 1030 : 250 });
     }
     if (streetDemoTsid && app?.view) app.view.dataset.streetDemo = streetDemoTsid;
