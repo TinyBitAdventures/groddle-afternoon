@@ -119,7 +119,8 @@ const RULES = [
   [/^icon_bestow_chance_[1-3]$/, 'live', 'Placed Icons bestow Giant Love 5.5 / 6 / 6.5% of the time (from 5%).'],
   [/^transcendental_/, 'multiplayer', 'Transcendental Radiation needs other players.'],
   [/^ancestral_lands_time_[12]$/, 'later', 'The Ancestral Lands are not in the remake.'],
-  [/^rube_/, 'later', 'The Rube does not visit the remake.'],
+  [/^rube_better_items$/, 'live', 'The Rube treats you as 10 levels higher when choosing what to offer: no more cheap items.'],
+  [/^rube_chance_to_meet$/, 'live', 'The Rube visits on 1% of street entries (from 0.5%).'],
   [/^unlearning_/, 'later', 'Unlearning skills is not in the remake.'],
 
   // Interface conveniences.

@@ -24,6 +24,7 @@ import { streetJobsFeature } from './street-jobs-feature.js?v=jobs-1';
 import { imaginationFeature } from './imagination-feature.js?v=imagination-1';
 import { supplyFeature } from './supply-feature.js?v=supply-1';
 import { giantIconsFeature } from './giant-icons-feature.js?v=icons-1';
+import { rubeFeature } from './rube-feature.js?v=rube-1';
 
 export { questFlagsFeature };
 
@@ -48,4 +49,5 @@ export const FEATURES = [
   imaginationFeature,
   supplyFeature,
   giantIconsFeature,
+  rubeFeature,
 ];
