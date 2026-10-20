@@ -23,6 +23,9 @@
  *   bounds: { l:number, r:number, t:number, b:number },
  *   platforms: Platform[],
  *   walls?: Wall[],
+ *   ladders?: { id?:string, x:number, y:number, w?:number, h:number }[],
+ *   barriers?: { id?:string, x:number, y:number, h:number, pc_perm:number|null }[],
+ *   doors?: object[],
  *   layers: { id:string, name?:string, z?:number, decos: object[] }[],
  *   signposts: object[],
  *   stats?: object,
@@ -100,6 +103,15 @@ export function climbWallsWorld(street) {
   for (const w of street.walls || []) {
     if (!w || !Number.isFinite(w.h) || w.h === 0) continue;
     out.push({ ...w, source: w.source || 'xml' });
+  }
+  // Source ladders (build-street-navigation.mjs): x centre, y bottom, h up
+  // (PhysicsQuadtree.insertLadder). Skip any a feature already restored.
+  for (const l of street.ladders || []) {
+    if (!l || !Number.isFinite(l.h) || l.h <= 0) continue;
+    const top = l.y - l.h;
+    const covered = out.some((w) => Math.abs(w.x - l.x) < 40 && !(l.y < w.y || top > w.y + w.h));
+    if (covered) continue;
+    out.push({ id: l.id, x: l.x, y: top, h: l.h, w: l.w || 50, pc_perm: null, item_perm: null, source: 'ladder' });
   }
   // Synthesize from trunk_ladder stacks (cluster by x)
   /** @type {{ x:number, y:number, w:number, h:number, sprite:string }[]} */
@@ -217,6 +229,72 @@ export function findClimbWallNear(walls, px, py, xTol = 36) {
   return { wall: best, x: best.x, yTop: best.yTop, yBot: best.yBot };
 }
 
+/** @type {WeakMap<object, object[]>} */
+const barrierCache = new WeakMap();
+
+/**
+ * The source <walls> (build-street-navigation.mjs `barriers`) as screen-space
+ * vertical colliders: { x, yTop, yBot, fromLeft, fromRight } where fromLeft
+ * means solid to an avatar walking right into it (Wall.as pc_solid_from_left:
+ * pc_perm null or -1), fromRight the reverse (null or 1). pc_perm 0 is open.
+ * @param {StreetData} street
+ */
+export function barriersScreen(street) {
+  if (!street || typeof street !== 'object') return [];
+  if (barrierCache.has(street)) return barrierCache.get(street);
+  const out = [];
+  for (const w of street.barriers || []) {
+    if (!w || !Number.isFinite(w.h) || w.h === 0 || w.pc_perm === 0) continue;
+    const top = worldToScreen(street, w.x, w.y);
+    const bot = worldToScreen(street, w.x, w.y + w.h);
+    out.push({
+      id: w.id,
+      x: top.x,
+      yTop: Math.min(top.y, bot.y),
+      yBot: Math.max(top.y, bot.y),
+      fromLeft: w.pc_perm !== 1,
+      fromRight: w.pc_perm !== -1,
+    });
+  }
+  barrierCache.set(street, out);
+  return out;
+}
+
+/**
+ * Horizontal move from prevX to nextX for an avatar whose body spans
+ * feetY - bodyH .. feetY, stopped at the first solid barrier it would cross.
+ * @param {ReturnType<typeof barriersScreen>} barriers
+ * @returns {number} the allowed x
+ */
+export function blockBarrierCrossing(barriers, prevX, nextX, feetY, bodyH = 80) {
+  if (!barriers?.length || prevX === nextX) return nextX;
+  const headY = feetY - bodyH;
+  let allowed = nextX;
+  for (const w of barriers) {
+    // Overlap of more than a few pixels: a wall ending at the floor line or
+    // just above the head does not block.
+    if (Math.min(feetY - 4, w.yBot) - Math.max(headY, w.yTop) <= 0) continue;
+    if (nextX > prevX && w.fromLeft && prevX <= w.x && allowed > w.x) allowed = w.x - 1;
+    else if (nextX < prevX && w.fromRight && prevX >= w.x && allowed < w.x) allowed = w.x + 1;
+  }
+  return allowed;
+}
+
+/**
+ * Signposts as the client shows them (SignpostView.render): hidden connects
+ * are dropped, and a post with no visible connect is not shown at all.
+ * @param {object[]} signposts
+ */
+export function navigableSignposts(signposts) {
+  const out = [];
+  for (const sign of signposts || []) {
+    const connects = (sign?.connects || []).filter((c) => c && !c.hidden);
+    if (!connects.length) continue;
+    out.push(connects.length === (sign.connects || []).length ? sign : { ...sign, connects });
+  }
+  return out;
+}
+
 /**
  * Platform y at world/screen x via linear interpolation, or null if off segment.
  * @param {{ x1:number,y1:number,x2:number,y2:number }} p  screen-space
@@ -324,7 +402,9 @@ export function pickConnection(signpost, availableTsids) {
   for (const c of connects) {
     for (const a of aliases(c.tsid)) {
       if (avail.has(a)) {
-        return { tsid: a, label: c.label || a, hub_id: c.hub_id };
+        const out = { tsid: a, label: c.label || a, hub_id: c.hub_id };
+        if (c.arrive) out.arrive = c.arrive;
+        return out;
       }
     }
   }

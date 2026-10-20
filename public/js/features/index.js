@@ -18,6 +18,7 @@ import { heliKittiesFeature } from './heli-kitties-feature.js?v=kitties-1';
 import { homesFeature } from './homes-feature.js?v=homes-1';
 import { rookAttackFeature } from './rook-attack-feature.js?v=rooks-1';
 import { streetFurnitureFeature } from './street-furniture-feature.js?v=furniture-1';
+import { doorsFeature } from './doors-feature.js?v=doors-1';
 
 export { questFlagsFeature };
 
@@ -36,4 +37,5 @@ export const FEATURES = [
   homesFeature,
   rookAttackFeature,
   streetFurnitureFeature,
+  doorsFeature,
 ];

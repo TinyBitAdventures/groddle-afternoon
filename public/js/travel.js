@@ -44,11 +44,14 @@ export function pickConnection(signpost, availableTsids) {
   for (const c of connects) {
     const resolved = resolveLoadedTsid(c.tsid, availableTsids);
     if (resolved) {
-      return {
+      const out = {
         tsid: resolved,
         label: c.label || resolved,
         hub_id: c.hub_id,
       };
+      // Source arrival point in the target street (build-street-navigation.mjs).
+      if (c.arrive) out.arrive = c.arrive;
+      return out;
     }
   }
   return null;
@@ -149,6 +152,7 @@ export function planSignpostTravel(street, playerScreenX, availableTsids, radius
     fromTsid: street.tsid,
     toTsid: conn.tsid,
     label: conn.label,
+    arrive: conn.arrive || null,
     signpost: nearest,
   };
 }

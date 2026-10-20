@@ -310,7 +310,7 @@ export function signpostBoardAt(signViews, worldX, worldY) {
 export async function loadDecoManifest() {
   if (decoManifest) return decoManifest;
   try {
-    const res = await fetch('assets/decos/manifest.json?v=greedy-story-2');
+    const res = await fetch('assets/decos/manifest.json?v=doors-1');
     if (res.ok) {
       const list = await res.json();
       decoManifest = new Set(list);

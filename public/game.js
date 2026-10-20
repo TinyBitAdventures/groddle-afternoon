@@ -510,6 +510,8 @@ import {
   worldToScreen,
   wallsScreen,
   findClimbWallNear,
+  barriersScreen,
+  blockBarrierCrossing,
 } from './js/street-model.js';
 import {
   buildStreetView,
@@ -7769,9 +7771,16 @@ function physics(dt) {
   } else {
     const movementBuff = combinedPhysics();
     player.vy += 0.42 * movementBuff.gravity * dt;
+    const prevX = player.x;
     player.x += player.vx * dt;
     player.y += player.vy * dt;
     player.x = clamp(player.x, 24, WORLD_W - 24);
+    // Source <walls>: vertical colliders with directional pc_perm.
+    const walledX = blockBarrierCrossing(barriersScreen(currentStreet), prevX, player.x, player.y);
+    if (walledX !== player.x) {
+      player.x = walledX;
+      player.vx = 0;
+    }
     // Snap onto climb wall if flying into one
     const hit = findClimbWallNear(streetWalls, player.x, player.y, 22);
     if (hit && !player.onGround && Math.abs(player.vx) > 0.5) {
@@ -17092,7 +17101,11 @@ async function travelTo(toTsid, meta = {}) {
   closeBuffsPanel();
   closeMakePanel();
   closeVendor();
-  await enterStreetWithTransition(plan.toTsid);
+  // Signposts land on the connect's source arrival point (build-street-navigation.mjs).
+  const arrive = meta.arrive && Number.isFinite(meta.arrive.x) && Number.isFinite(meta.arrive.y)
+    ? { spawnX: meta.arrive.x, spawnY: meta.arrive.y }
+    : {};
+  await enterStreetWithTransition(plan.toTsid, arrive);
   if (player) floatText(player.x, player.y - 80, '✦ ' + (meta.label || plan.label), 0xc9a0ff);
   pushActivity(`Arrived: ${plan.label || meta.label || plan.toTsid}`);
   return plan;
@@ -17145,7 +17158,7 @@ function doTeleport() {
     }
     return;
   }
-  travelTo(plan.toTsid, { label: plan.label });
+  travelTo(plan.toTsid, { label: plan.label, arrive: plan.arrive });
 }
 
 function renderIlmenskieMapCallout(panel) {
@@ -21563,7 +21576,7 @@ async function main() {
         availableStreetTsids()
       );
       if (conn) {
-        travelTo(conn.tsid, { label: conn.label });
+        travelTo(conn.tsid, { label: conn.label, arrive: conn.arrive });
         return;
       }
       openMap();
