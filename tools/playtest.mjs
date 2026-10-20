@@ -2,7 +2,7 @@
 //
 // Usage: node tools/playtest.mjs <scenario...> [--width=1280] [--height=860]
 //          [--swiftshader] [--headed] [--out=shots/playtest] [--fresh]
-// Scenarios: newplayer, travel, long, resize, perf, all.
+// Scenarios: newplayer, travel, naraka, rook, long, resize, perf, all.
 //
 // Plays like a real player: no demo/QA params beyond autostart/fresh/resetgame,
 // keyboard walking, E menus, HUD buttons, signposts, the Map. It drives one
@@ -20,7 +20,7 @@ const flags = Object.fromEntries(argv.filter((a) => a.startsWith('--')).map((a) 
   return [k, v ?? true];
 }));
 let scenarios = argv.filter((a) => !a.startsWith('--'));
-if (!scenarios.length || scenarios.includes('all')) scenarios = ['newplayer', 'travel', 'long', 'resize', 'perf'];
+if (!scenarios.length || scenarios.includes('all')) scenarios = ['newplayer', 'travel', 'naraka', 'rook', 'long', 'resize', 'perf'];
 const OUT = flags.out || 'shots/playtest';
 const BASE = 'https://groddle.localhost/';
 const NOISE = /GL Driver Message|AudioContext was not allowed|WebGL: INVALID|GPU stall|swiftshader/i;
@@ -328,7 +328,14 @@ class Session {
     const { metrics } = await this.cdp.send('Performance.getMetrics');
     const m = Object.fromEntries(metrics.map((x) => [x.name, x.value]));
     const lt = await this.page.evaluate(() => ({ n: window.__pt?.longTasks.length || 0, ms: Math.round(window.__pt?.longTaskMs || 0), max: Math.max(0, ...(window.__pt?.longTasks || [0])) }));
-    return { heapMB: +(m.JSHeapUsedSize / 1048576).toFixed(1), nodes: m.Nodes, listeners: m.JSEventListeners, longTasks: lt };
+    const tex = await this.page.evaluate(() => {
+      const u = window.PIXI?.utils;
+      if (!u) return null;
+      const bases = Object.values(u.BaseTextureCache || {});
+      const px = bases.reduce((n, b) => n + (b.valid ? (b.realWidth || 0) * (b.realHeight || 0) : 0), 0);
+      return { textures: Object.keys(u.TextureCache || {}).length, bases: bases.length, mpx: +(px / 1e6).toFixed(1) };
+    });
+    return { heapMB: +(m.JSHeapUsedSize / 1048576).toFixed(1), nodes: m.Nodes, listeners: m.JSEventListeners, longTasks: lt, tex };
   }
 
   /** Assert there is no horizontal page scroll. */
@@ -360,6 +367,7 @@ const PANELS = [
   { name: 'Home', btn: '#home-btn', panel: '#home-panel', close: '#home-close' },
   { name: 'Vendor', btn: '#vendor-btn', panel: '#vendor-panel', close: '#vendor-close' },
   { name: 'Look', btn: '#avatar-btn', panel: '#avatar-panel', close: '#avatar-close' },
+  { name: 'Upgrades', btn: '#img-btn', panel: '#imagination-panel', close: '#imagination-panel [aria-label^="Close"], #imagination-panel .verb-menu-x' },
 ];
 
 async function exercisePanels(t, label = '') {
@@ -382,7 +390,7 @@ async function exercisePanels(t, label = '') {
       const el = document.querySelector(sel);
       if (!el) return { exists: false };
       const r = el.getBoundingClientRect();
-      const card = el.querySelector('.side-card, .glitch-modal-card, .home-card, .mail-card, .map-card, .avatar-card') || el;
+      const card = el.querySelector('.side-card, .glitch-modal-card, .home-card, .mail-card, .map-card, .avatar-card, .img-card-shell') || el;
       const cr = card.getBoundingClientRect();
       return {
         exists: true,
@@ -403,7 +411,7 @@ async function exercisePanels(t, label = '') {
       if (state.text < 20) t.issue('ui', `${p.name}: panel looks empty (${state.text} chars)`);
       if (state.card.r > state.vw + 2 || state.card.l < -2) t.issue('layout', `${p.name}: panel card overflows horizontally ${JSON.stringify(state.card)} vw=${state.vw}${label}`);
       await t.shot(`panel-${p.name.toLowerCase()}${label.replace(/\W+/g, '-')}`);
-      const close = t.page.locator(p.close);
+      const close = t.page.locator(p.close).first();
       if (await close.isVisible().catch(() => false)) await close.click().catch(() => {});
       else await t.page.keyboard.press('Escape');
       await t.wait(500);
@@ -525,6 +533,8 @@ const SCENARIOS = {
 
     // Eat something from the pack (F eats an apple).
     t.step = 'eat';
+    await t.declineOffer();
+    await t.clearAwards();
     const e0 = (await t.snap()).player.energy;
     await t.page.keyboard.press('f');
     await t.wait(800);
@@ -601,6 +611,26 @@ const SCENARIOS = {
     await t.page.click('#make-close').catch(() => t.page.keyboard.press('Escape'));
     await t.wait(400);
 
+    // Skill study: pick the first Ready skill and start it.
+    t.step = 'skill study';
+    await t.declineOffer();
+    await t.page.click('#skills-btn').catch(() => {});
+    await t.wait(800);
+    const ready = t.page.locator('#skills-panel button', { hasText: /Ready to study/ }).first();
+    if (await ready.count()) {
+      const name = (await ready.textContent()).replace(/Ready to study.*/, '').trim();
+      await ready.click();
+      await t.wait(500);
+      const start = t.page.locator('#skills-panel button', { hasText: /^Start studying/ }).first();
+      if (await start.count()) {
+        await start.click();
+        await t.wait(800);
+        t.note(`studying ${name}: chrome "${(await t.page.textContent('#skills-btn')).trim()}"`);
+      } else t.issue('play', `no Start studying button for ${name}`);
+    } else t.note('no Ready skill');
+    await t.page.keyboard.press('Escape');
+    await t.wait(300);
+
     // Persistence: reload without reset and compare.
     t.step = 'reload';
     const packBefore = await t.pack();
@@ -613,6 +643,8 @@ const SCENARIOS = {
     const pd = t.diffPack(packBefore, packAfter);
     if (pd.length) t.issue('persist', `pack changed on reload: ${pd.join(', ')}`);
     if (packBefore.quests !== packAfter.quests) t.issue('persist', `quest tracker changed on reload: "${packBefore.quests}" -> "${packAfter.quests}"`);
+    const skillAfter = (await t.page.textContent('#skills-btn')).trim();
+    if (!/Study/.test(skillAfter)) t.issue('persist', `skill study lost on reload (chrome "${skillAfter}")`);
     t.note(`hud before: ${packBefore.hud}`);
     t.note(`hud after:  ${packAfter.hud}`);
     t.note(`reload: street ${sBefore?.street?.tsid} -> ${sAfter?.street?.tsid}, x ${Math.round(sBefore?.player.x)} -> ${Math.round(sAfter?.player.x)}, energy ${sBefore?.player.energy} -> ${sAfter?.player.energy}`);
@@ -661,8 +693,35 @@ const SCENARIOS = {
       return { hubs: sel ? [...sel.options].map((o) => o.textContent) : [], streets: document.querySelectorAll('#map-canvas [data-tsid], #map-canvas .map-street').length };
     });
     t.note(`map hubs=${mapInfo.hubs.length} street nodes=${mapInfo.streets}`);
-    await t.page.keyboard.press('g');
-    await t.wait(400);
+    for (const hubName of [/Ix/, /Shimla Mirch|Alakol/, /Groddle Meadow/]) {
+      const from = (await t.snap()).street;
+      if (!(await t.page.evaluate(() => !document.getElementById('map-panel').hidden))) {
+        await t.page.keyboard.press('g');
+        await t.wait(1000);
+      }
+      const value = await t.page.evaluate((src) => {
+        const sel = document.getElementById('map-hub-select');
+        const opt = [...sel.options].find((o) => new RegExp(src).test(o.textContent));
+        if (!opt) return null;
+        sel.value = opt.value;
+        sel.dispatchEvent(new Event('change'));
+        return opt.textContent;
+      }, hubName.source);
+      await t.wait(1200);
+      const node = t.page.locator('#map-canvas .map-street.travelable').first();
+      if (!value || !(await node.count())) {
+        t.note(`map: no travelable street in ${hubName}`);
+        continue;
+      }
+      const label = await node.getAttribute('data-label');
+      await node.dispatchEvent('click');
+      const moved = await t.waitFor((tsid) => window.groddleQA.snapshot().street?.tsid !== tsid, 20000, from.tsid);
+      await t.wait(2500);
+      const s = await t.snap();
+      t.note(`map ${value}: ${from.label} -> ${s.street.label} (clicked ${label}) onGround=${s.player.onGround}`);
+      if (!moved) t.issue('travel', `map click on ${label} did not travel`);
+      await t.shot(`map-${(s.street.label || '').replace(/\W+/g, '-')}`);
+    }
 
     const streetVisit = async (tsid, label, extra = '') => {
       t.step = `visit ${label}`;
@@ -701,7 +760,7 @@ const SCENARIOS = {
       t.note(`walked right from ${Math.round(x0)} to ${Math.round(s.player.x)}`);
     }
     // Underwater Jal street (jetpack physics).
-    const jal = await streetVisit('GHVECS766MC3LHP', 'Distant End (Jal)');
+    const jal = await streetVisit('GUV10AGQOOA3MOE', 'Jal underwater');
     if (jal) {
       t.step = 'swim';
       const y0 = (await t.snap()).player.y;
@@ -715,31 +774,157 @@ const SCENARIOS = {
       await t.wait(2500);
       await t.shot('jal-swim');
     }
-    // Naraka: drain energy to croak.
+  },
+
+  async naraka(t) {
+    // A tired player (save patched to 3 energy) spends the rest and croaks.
+    await t.goto('?autostart=1&resetgame=1&fresh=1&questoffer=off', 3000);
     t.step = 'croak';
-    await t.goto('?autostart=1&questoffer=off', 5000);
-    const drained = await t.page.evaluate(() => {
-      // There is no player-facing drain other than spending energy; walk the
-      // real path below instead if this hook ever disappears.
-      return !!window.groddleQA;
+    await t.goto('?autostart=1&questoffer=off', 3000);
+    await t.page.evaluate(() => {
+      const key = 'groddle_player_state_v1';
+      const save = JSON.parse(localStorage.getItem(key));
+      const find = (o) => (o && typeof o === 'object' ? (o.player && 'energy' in o.player ? o.player : Object.values(o).map(find).find(Boolean)) : null);
+      sessionStorage.setItem('__ptEnergy', '3');
+      return !!find(save);
     });
-    t.note(`drain via repeated actions (hook=${drained})`);
-    let croaked = false;
-    for (let i = 0; i < 60 && !croaked; i++) {
-      const d = await t.data();
-      if (d.hellDead === '1') { croaked = true; break; }
-      const s = await t.snap();
-      if (s.player.energy <= 0) {
-        await t.wait(3000);
-        croaked = (await t.data()).hellDead === '1';
-        break;
-      }
-      const r = await useTarget(t, /^(npc_piggy|npc_chicken|npc_butterfly|trant_)/, /^(pet|squeeze|massage)/i, { wait: 6000 });
-      if (!r?.pick) await t.wait(500);
+    await t.context.addInitScript(() => {
+      let want = null;
+      try { want = sessionStorage.getItem('__ptEnergy'); } catch (_) { return; }
+      if (!want) return;
+      sessionStorage.removeItem('__ptEnergy');
+      const key = 'groddle_player_state_v1';
+      const save = JSON.parse(localStorage.getItem(key));
+      const visit = (o) => {
+        if (!o || typeof o !== 'object') return false;
+        if (o.player && typeof o.player.energy === 'number') { o.player.energy = Number(want); return true; }
+        return Object.values(o).some(visit);
+      };
+      visit(save);
+      localStorage.setItem(key, JSON.stringify(save));
+    });
+    await t.goto('?autostart=1&questoffer=off', 4000);
+    let s = await t.snap();
+    t.note(`tired player energy=${s?.player.energy} on ${s?.street?.label}`);
+    // Walking costs energy (0.6 every 40 frames); keep walking until it runs out.
+    for (let i = 0; i < 40 && (await t.data()).hellDead !== '1'; i++) {
+      await t.declineOffer();
+      const key = i % 2 ? 'a' : 'd';
+      await t.page.keyboard.down(key);
+      await t.wait(1500);
+      await t.page.keyboard.up(key);
     }
-    const s = await t.snap();
-    t.note(`after drain: energy=${s.player.energy} hellDead=${(await t.data()).hellDead} street=${s.street.label}`);
-    await t.shot('croak');
+    await t.wait(4000);
+    const dead = await t.data();
+    s = await t.snap();
+    t.note(`hellDead=${dead.hellDead} street=${s?.street?.label} energy=${s?.player.energy}`);
+    await t.shot('croaked');
+    if (dead.hellDead !== '1') {
+      t.issue('play', `no croak at energy ${s?.player.energy}`);
+      return;
+    }
+    // Try to leave: map and signposts should refuse.
+    t.step = 'naraka gates';
+    await t.page.keyboard.press('g');
+    await t.wait(800);
+    t.note(`map in Naraka: ${JSON.stringify(await t.overlays())}`);
+    await t.page.keyboard.press('Escape');
+    await t.page.keyboard.press('f');
+    await t.wait(500);
+    const s2 = await t.snap();
+    t.note(`F in Naraka: energy ${s?.player.energy} -> ${s2?.player.energy}, toast ${JSON.stringify((await t.overlays()).toast || '')}`);
+    if (s2.player.energy > (s?.player.energy || 0) + 1) t.issue('play', 'eating restored energy in Naraka');
+    // Squish grapes until resurrection.
+    t.step = 'squish';
+    for (let i = 0; i < 30; i++) {
+      const d = await t.data();
+      if (d.hellDead !== '1') break;
+      const r = await useTarget(t, /grapes/, /squish/i, { wait: 6000 });
+      if (!r) {
+        // Hell One may need the Hell Hole first; walk around.
+        await t.page.keyboard.down('d');
+        await t.wait(1500);
+        await t.page.keyboard.up('d');
+      }
+      await t.clearAwards();
+    }
+    const left = await t.waitFor(() => !/^Hell/.test(window.groddleQA.snapshot().street?.label || ''), 20000);
+    if (!left) t.issue('play', 'resurrected but still in Naraka 20 s later');
+    const after = await t.data();
+    s = await t.snap();
+    t.note(`after squishing: hellDead=${after.hellDead} grapes=${after.hellGrapes} street=${s?.street?.label} energy=${s?.player.energy}`);
+    await t.shot('resurrected');
+    if (after.hellDead === '1') t.issue('play', 'could not resurrect by squishing grapes');
+    await t.goto('?autostart=1&questoffer=off', 4000);
+    const re = await t.data();
+    t.note(`reload after resurrection: hellDead=${re.hellDead} deaths=${re.hellDeaths} street=${(await t.snap())?.street?.label}`);
+  },
+
+  async rook(t) {
+    // Natural attack, brought forward: the save's next-attack time is moved to now.
+    await t.goto('?autostart=1&resetgame=1&fresh=1', 3000);
+    await t.declineOffer();
+    await t.context.addInitScript(() => {
+      let flag = null;
+      try { flag = sessionStorage.getItem('__ptRook'); } catch (_) { return; }
+      if (!flag) return;
+      sessionStorage.removeItem('__ptRook');
+      const key = 'groddle_player_state_v1';
+      const save = JSON.parse(localStorage.getItem(key));
+      const visit = (o) => {
+        if (!o || typeof o !== 'object') return false;
+        if (o['rook-attack'] && typeof o['rook-attack'] === 'object') { o['rook-attack'].nextAttackAt = Date.now() + 15000; return true; }
+        return Object.values(o).some(visit);
+      };
+      if (!visit(save)) console.warn('playtest: no rook-attack slice in save');
+      localStorage.setItem(key, JSON.stringify(save));
+    });
+    await t.page.evaluate(() => sessionStorage.setItem('__ptRook', '1'));
+    await t.goto('?autostart=1', 2000);
+    // Open a verb menu right as the herald is due: the attack must wait for it.
+    t.step = 'rook vs menu';
+    const timeline = [];
+    let last = '';
+    const end = Date.now() + 150000;
+    let menuHeld = false;
+    while (Date.now() < end) {
+      const d = await t.data();
+      const ov = await t.overlays();
+      if (d.rookPhase !== last) {
+        timeline.push(`${Math.round((150000 - (end - Date.now())) / 1000)}s ${last || '-'} -> ${d.rookPhase} overlays=${Object.keys(ov).join(',')}`);
+        last = d.rookPhase;
+        await t.shot(`rook-${d.rookPhase}`);
+      }
+      const blocking = Object.keys(ov).filter((k) => k !== 'toast');
+      if (blocking.length > 1) t.issue('overlap', `${blocking.join(' + ')} during rook ${d.rookPhase}`);
+      if (ov['quest-dialogue'] && d.rookPhase && d.rookPhase !== 'none') t.issue('overlap', `quest dialogue during rook ${d.rookPhase}`);
+      if (!menuHeld && Number(d.rookNextAttack) <= 4) {
+        menuHeld = true;
+        const pig = await t.find(/^npc_piggy$/);
+        const menu = pig ? await t.approach(pig) : null;
+        t.note(`menu open at herald time: ${menu?.title || 'none'}`);
+        await t.wait(6000);
+        const d2 = await t.data();
+        t.note(`after 6 s with menu open: rookPhase=${d2.rookPhase}`);
+        await t.closeMenus();
+      }
+      if (ov['quest-dialogue']) await t.declineOffer();
+      await t.clearAwards();
+      // Fight: use the rook verbs on whatever offers them.
+      if (/attack|angry|build_up|stunned/.test(d.rookPhase || '')) {
+        const s = await t.snap();
+        const shrine = s.interactables.find((i) => /shrine/.test(i.classId));
+        if (shrine && Math.random() < 0.3) await useTarget(t, /shrine/, /prime|strike|stun|orb/i, { wait: 12000 });
+      }
+      if (/dead|cleared|none/.test(d.rookPhase || '') && last && timeline.length > 2) break;
+      await t.wait(1500);
+    }
+    for (const line of timeline) t.note(line);
+    const d = await t.data();
+    t.note(`rook end: phase=${d.rookPhase} health=${d.rookHealth} stats=${d.rookStats} rooked=${d.rookRooked}`);
+    await t.goto('?autostart=1', 4000);
+    const r = await t.data();
+    t.note(`reload: phase=${r.rookPhase} rooked=${r.rookRooked} next=${r.rookNextAttack}`);
   },
 
   async long(t) {
@@ -824,7 +1009,7 @@ const SCENARIOS = {
       await t.wait(2500);
       const m = await t.metrics();
       const s2 = await t.snap();
-      route.push(`${s2.street.label} heap=${m.heapMB}MB nodes=${m.nodes} lt=${m.longTasks.n}/${m.longTasks.ms}ms`);
+      route.push(`${s2.street.label} heap=${m.heapMB}MB nodes=${m.nodes} lt=${m.longTasks.n}/${m.longTasks.ms}ms tex=${m.tex?.bases}/${m.tex?.mpx}Mpx`);
       log(`  ${route[route.length - 1]}`);
     }
     await t.cdp.send('HeapProfiler.collectGarbage').catch(() => {});
@@ -834,6 +1019,7 @@ const SCENARIOS = {
     for (const r of route) t.note(r);
     if (m1.heapMB > m0.heapMB * 2 + 50) t.issue('perf', `heap grew ${m0.heapMB} -> ${m1.heapMB} MB over ${route.length} streets`);
     if (m1.nodes > m0.nodes * 2 + 2000) t.issue('perf', `DOM nodes grew ${m0.nodes} -> ${m1.nodes}`);
+    if (m0.tex && m1.tex && m1.tex.mpx > m0.tex.mpx * 3 + 50) t.issue('perf', `texture pixels grew ${m0.tex.mpx} -> ${m1.tex.mpx} Mpx (${m0.tex.bases} -> ${m1.tex.bases} base textures)`);
   },
 };
 
