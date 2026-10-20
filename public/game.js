@@ -329,6 +329,8 @@ import {
   canLearnSkill,
   listLearnedSkills,
 } from './js/skills.js?v=study-1';
+import { skillTitle, spendEmblemForSkill } from './js/skill-tree.js';
+import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js';
 import {
   createBuffState,
   removeBuff,
@@ -18062,108 +18064,70 @@ function isAchieveOpen() {
 
 function renderSkillsPanel() {
   const box = document.getElementById('skills-body');
-  const meta = document.getElementById('skills-meta');
   if (!box) return;
-  box.innerHTML = '';
-  const all = listSkills();
-  const now = Date.now();
-  const queue = listStudyQueue(skillState, now);
-  if (meta) {
-    const paused = queue.filter((row) => row.isPaused).length;
-    meta.textContent = `${skillState.learned.length} learned · ${all.length} in tree` +
-      (queue.length ? ` · ${queue.length - paused} studying · ${paused} paused` : ' · ready to study');
+  renderSkillTreePanel({
+    box,
+    meta: document.getElementById('skills-meta'),
+    state: skillState,
+    ctx: {
+      ...skillStudyContext(),
+      questName: (id) => getQuestCatalog()[id]?.title || id.replace(/_/g, ' '),
+      achievementName: (id) => getAchievementCatalog()[id]?.name || id.replace(/_/g, ' '),
+      giantName: (id) => GIANTS[id]?.name || id,
+      emblemCount: (giant) => countItem(inv, `emblem_${giant}`),
+    },
+    actions: {
+      start: (id) => runSkillStudyAction(id, 'start'),
+      resume: (id) => runSkillStudyAction(id, 'resume'),
+      pause: (id) => runSkillStudyAction(id, 'pause'),
+      spendEmblem: (id) => spendEmblemForSkillUnlock(id),
+    },
+  });
+}
+
+/** Start, resume, or pause one study from the Skills panel. */
+function runSkillStudyAction(classTsid, action) {
+  const def = getSkillCatalog()[classTsid];
+  const name = skillTitle(def) || classTsid;
+  const result = action === 'pause'
+    ? pauseSkillStudy(skillState, classTsid, Date.now())
+    : startSkillStudy(skillState, classTsid, skillStudyContext(), Date.now());
+  if (result.completed?.length) handleSkillCompletions(result.completed);
+  if (result.ok && action === 'start' && result.reason === 'started') {
+    toast(`Started studying ${name} · ${formatStudyTime(result.durationSeconds)}`);
+    pushActivity(`You started learning ${name}. It will continue while you explore — and while you are away.`);
+  } else if (result.ok) {
+    const verb = action === 'pause' ? 'Paused' : 'Resumed';
+    toast(`${verb} ${name}.`);
+    pushActivity(`${verb} learning ${name}.`);
+  } else {
+    toast(`Cannot study ${name} yet.`);
   }
-  // Official queue: one active study plus any paused progress.
-  for (const row of queue) {
-    const def = getSkillCatalog()[row.classTsid];
-    if (!def) continue;
-    const card = document.createElement('div');
-    card.className = `q-card skill-study-card ${row.isPaused ? 'paused' : 'studying'}`;
-    const title = document.createElement('div');
-    title.className = 'q-title';
-    title.textContent = `${def.name}${def.level ? ' L' + def.level : ''} · ${row.isPaused ? 'Paused' : row.isAccelerated ? 'Accelerated!' : 'Studying'}`;
-    card.appendChild(title);
-    const timing = document.createElement('div');
-    timing.className = 'q-req skill-study-time';
-    timing.textContent = `${formatStudyTime(row.remainingSeconds)} remaining · ${Math.round(row.progress * 100)}%`;
-    card.appendChild(timing);
-    const bar = document.createElement('div');
-    bar.className = 'q-bar skill-study-bar';
-    const fill = document.createElement('i');
-    fill.style.width = `${Math.round(row.progress * 100)}%`;
-    bar.appendChild(fill);
-    card.appendChild(bar);
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'content-action-btn';
-    btn.textContent = row.isPaused ? 'Resume study' : 'Pause study';
-    btn.addEventListener('click', () => {
-      const result = row.isPaused
-        ? startSkillStudy(skillState, row.classTsid, skillStudyContext(), Date.now())
-        : pauseSkillStudy(skillState, row.classTsid, Date.now());
-      if (result.completed?.length) handleSkillCompletions(result.completed);
-      if (result.ok) {
-        toast(row.isPaused ? `Resumed ${def.name}.` : `Paused ${def.name}.`);
-        pushActivity(`${row.isPaused ? 'Resumed' : 'Paused'} learning ${def.name}.`);
-      }
-      updateHud();
-      renderSkillsPanel();
-    });
-    card.appendChild(btn);
-    box.appendChild(card);
+  updateHud();
+  renderSkillsPanel();
+}
+
+/** emblem_base spend: trade one pack emblem for its skill-unlock badge. */
+function spendEmblemForSkillUnlock(classTsid) {
+  const result = spendEmblemForSkill(inv, achieveState.unlocked, classTsid);
+  if (!result.ok) {
+    toast(result.reason === 'no_emblem' ? 'You need that Giant\'s emblem first.' : 'That emblem is already spent.');
+    renderSkillsPanel();
+    return;
   }
-  // Learned first
-  for (const def of listLearnedSkills(skillState)) {
-    const card = document.createElement('div');
-    card.className = 'q-card done';
-    card.innerHTML = `<div class="q-title">${def.name} ${def.level ? 'L' + def.level : ''} ✓</div>
-      <div class="q-req">${def.description || ''}</div>`;
-    box.appendChild(card);
+  const badge = unlockAchievement(achieveState, result.achievement, pc);
+  if (badge.ok) {
+    announceAchievementUpdates([
+      { classTsid: result.achievement, unlocked: true, rewards: badge.rewards, def: badge.def },
+    ]);
   }
-  // Learnable sample (first 40 not learned)
-  let shown = 0;
-  for (const def of all) {
-    if (skillState.learned.includes(def.classTsid)) continue;
-    if (skillState.queue?.[def.classTsid]) continue;
-    if (shown >= 40) break;
-    shown++;
-    const check = canLearnSkill(skillState, def.classTsid, skillStudyContext());
-    const card = document.createElement('div');
-    card.className = 'q-card';
-    const title = document.createElement('div');
-    title.className = 'q-title';
-    title.textContent = `${def.name}${def.level ? ' L' + def.level : ''} · ${formatStudyTime(studySecondsForSkill(def))}`;
-    card.appendChild(title);
-    const desc = document.createElement('div');
-    desc.className = 'q-req';
-    desc.textContent = def.description || '';
-    card.appendChild(desc);
-    if (def.reqSkills?.length) {
-      const pre = document.createElement('div');
-      pre.className = 'q-req';
-      pre.textContent = 'Requires skills: ' + def.reqSkills.join(', ');
-      card.appendChild(pre);
-    }
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'content-action-btn';
-    btn.textContent = check.ok ? 'Start studying' : `Locked (${check.reason})`;
-    btn.disabled = !check.ok;
-    btn.addEventListener('click', () => {
-      const r = startSkillStudy(skillState, def.classTsid, skillStudyContext(), Date.now());
-      if (r.completed?.length) handleSkillCompletions(r.completed);
-      if (r.ok) {
-        toast(`Started studying ${def.name} · ${formatStudyTime(r.durationSeconds)}`);
-        pushActivity(`You started learning ${def.name}. It will continue while you explore — and while you are away.`);
-      } else {
-        toast(`Cannot study: ${r.reason}`);
-      }
-      updateHud();
-      renderSkillsPanel();
-    });
-    card.appendChild(btn);
-    box.appendChild(card);
-  }
+  const name = skillTitle(getSkillCatalog()[classTsid]) || classTsid;
+  pushActivity(`You spent an Emblem of ${GIANTS[result.giant]?.name || result.giant}. You are now able to learn ${name}.`);
+  toast(`You are now able to learn ${name}.`, 3600);
+  playSfx('quest', { volume: 0.55, rate: 1.08 });
+  updateHud();
+  renderSkillsPanel();
+  savePlayerState();
 }
 
 function skillStudyContext() {
@@ -18217,8 +18181,9 @@ function openSkillsPanel() {
   closeVendor();
   const panel = document.getElementById('skills-panel');
   if (panel) {
-    renderSkillsPanel();
+    // Show first so a focused skill can scroll into view.
     panel.hidden = false;
+    renderSkillsPanel();
   }
 }
 
@@ -20366,6 +20331,16 @@ async function main() {
     if (Number.isFinite(remaining) && remaining > 0) {
       skillState.queue[demoSkill].endsAt = Date.now() + Math.max(1, remaining) * 1000;
     }
+    focusSkillInPanel(demoSkill);
+  }
+  // Skill tree QA: `?skilltree=<skill>` opens the Skills panel expanded on
+  // that skill; `&emblemdemo=<giant>` adds one emblem for the spend action.
+  if (bootParams.has('skilltree')) {
+    const treeSkill = bootParams.get('skilltree');
+    if (getSkillCatalog()[treeSkill]) focusSkillInPanel(treeSkill);
+    const emblemGiant = bootParams.get('emblemdemo');
+    if (emblemGiant && GIANTS[emblemGiant]) inv[`emblem_${emblemGiant}`] = Math.max(1, inv[`emblem_${emblemGiant}`] || 0);
+    setTimeout(() => openSkillsPanel(), 1200);
   }
   // Deterministic food-memory QA. `day` is two game days ago because the
   // official server used Math.round(days) and required a result greater than 1.

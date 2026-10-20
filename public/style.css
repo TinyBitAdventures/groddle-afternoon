@@ -2974,7 +2974,220 @@ button.play-context-head:focus-visible {
     width: auto;
   }
 }
-.side-panel.skills-panel { left: auto; right: 10px; top: 44px; }
+.side-panel.skills-panel { left: auto; right: 10px; top: 44px; max-width: min(440px, 94%); }
+/* Full skill tree (js/skills-panel.js) */
+.skills-panel .side-card {
+  width: min(420px, calc(100vw - 42px));
+  max-height: min(500px, calc(100vh - 180px));
+}
+.skills-panel .side-head {
+  position: sticky;
+  top: -0.75rem;
+  z-index: 5;
+  margin: -0.75rem -0.15rem 0;
+  padding: 0.75rem 0.15rem 0.3rem;
+  background: #fffdf7;
+}
+.skills-panel .panel-meta { margin: 0.1rem 0 0; font-size: 0.72rem; color: #6f695f; }
+.skills-panel .quest-log-body { margin-top: 0.35rem; }
+.skill-tree-study:empty { display: none; }
+.skill-tree-study { display: grid; gap: 0.35rem; margin-bottom: 0.45rem; }
+.skill-study-card {
+  border: 1px solid #83b8c9;
+  background: #edfafd;
+  border-radius: 9px;
+  padding: 0.45rem 0.55rem;
+}
+.skill-study-card.paused { border-color: #d6b986; background: #fff8e9; }
+.skill-study-title { display: flex; justify-content: space-between; gap: 0.5rem; font-size: 0.84rem; }
+.skill-study-title span { color: #286479; font-weight: 700; font-size: 0.72rem; }
+.skill-study-card.paused .skill-study-title span { color: #8a6420; }
+.skill-study-card .skill-study-time { font-size: 0.74rem; color: #4c5b60; }
+.skill-tree-toolbar {
+  position: sticky;
+  top: 1.55rem;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem;
+  margin: 0 -0.15rem 0.35rem;
+  padding: 0.35rem 0.15rem 0.45rem;
+  background: #fffdf7;
+  box-shadow: 0 6px 6px -6px rgba(90, 80, 60, 0.25);
+}
+.skill-row { scroll-margin-top: 7.4rem; }
+.skill-tree-search,
+.skill-tree-category {
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid #c9c1b1;
+  border-radius: 8px;
+  padding: 0.38rem 0.5rem;
+  background: #fff;
+  color: #2b2a33;
+  font: inherit;
+  font-size: 0.8rem;
+}
+.skill-tree-category { max-width: 9.5rem; }
+.skill-tree-search:focus,
+.skill-tree-category:focus {
+  border-color: #79aa58;
+  outline: 2px solid rgba(106, 170, 58, 0.2);
+}
+.skill-tree-filters { grid-column: 1 / -1; display: flex; gap: 0.25rem; }
+.skill-tree-chip {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #cec7b8;
+  border-radius: 999px;
+  padding: 0.26rem 0.2rem;
+  background: #f4f0e7;
+  color: #5d584f;
+  font: 700 0.66rem/1.15 "Trebuchet MS", sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.skill-tree-chip b { font-weight: 700; opacity: 0.7; margin-left: 0.1rem; }
+.skill-tree-chip:hover,
+.skill-tree-chip:focus-visible { border-color: #8fbf6a; outline: none; }
+.skill-tree-chip.is-active { border-color: #6fa84a; background: #dff0cf; color: #365a28; }
+.skill-tree-empty { padding: 1rem 0.3rem; text-align: center; color: #7b756b; font-size: 0.82rem; }
+.skill-cat + .skill-cat { margin-top: 0.6rem; }
+.skill-cat-title {
+  margin: 0 0 0.3rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a7f6b;
+}
+.skill-family {
+  border: 1px solid #e3dccd;
+  border-radius: 10px;
+  background: #fbf8f1;
+  padding: 0.3rem 0.35rem 0.35rem;
+  margin-bottom: 0.35rem;
+}
+.skill-family-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.05rem 0.2rem 0.2rem;
+}
+.skill-family-name { font-weight: 700; color: #3d5a32; font-size: 0.86rem; }
+.skill-pips { display: inline-flex; gap: 3px; }
+.skill-pip {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid #c9c1b1;
+  background: #fff;
+  box-sizing: border-box;
+}
+.skill-pip.is-learned { border-color: #5f9a3c; background: #79b552; }
+.skill-pip.is-studying { border-color: #3f8ea6; background: linear-gradient(90deg, #58a6bd 50%, #fff 50%); }
+.skill-pip.is-paused { border-color: #c2953f; background: linear-gradient(90deg, #e2b866 50%, #fff 50%); }
+.skill-pip.is-available { border-color: #79aa58; }
+.skill-pip.is-locked { border-color: #d8d2c6; background: #eeeae2; }
+.skill-row {
+  border-radius: 7px;
+  background: #fff;
+  border: 1px solid #ece6da;
+}
+.skill-row + .skill-row { margin-top: 0.22rem; }
+.skill-row.is-learned { background: #f1f8ea; border-color: #cfe5bc; }
+.skill-row.is-studying { background: #edfafd; border-color: #b6dbe6; }
+.skill-row.is-paused { background: #fff8e9; border-color: #ead4a6; }
+.skill-row.is-available { border-color: #b9d99f; }
+.skill-row.is-locked .skill-row-name { color: #6f6a62; }
+.skill-row-head {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 0.36rem 0.45rem;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.skill-row-head:focus-visible { outline: 2px solid rgba(106, 170, 58, 0.45); border-radius: 7px; }
+.skill-row-label { display: grid; min-width: 0; }
+.skill-row-name { font-size: 0.82rem; font-weight: 700; }
+.skill-row-why { font-size: 0.68rem; color: #8a7f6b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.skill-row-why.is-locked { color: #9a6a45; }
+.skill-row-why.is-multiplayer { color: #7a64a3; }
+.skill-family.is-single { padding: 0; border: 0; background: none; }
+.skill-row-time {
+  font-size: 0.7rem;
+  color: #7b756b;
+  font-variant-numeric: tabular-nums;
+  min-width: 2.6rem;
+  text-align: right;
+}
+.skill-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.1rem 0.42rem;
+  white-space: nowrap;
+  background: #eeeae2;
+  color: #6f6a62;
+}
+.skill-badge.is-learned { background: #d7ecc5; color: #335a1f; }
+.skill-badge.is-studying { background: #cdeaf2; color: #1f5a6c; }
+.skill-badge.is-paused { background: #f5e2b8; color: #7a5716; }
+.skill-badge.is-available { background: #e6f3d9; color: #3c6a24; box-shadow: inset 0 0 0 1px #9cc87c; }
+.skill-row .skill-study-bar { margin: 0 0.45rem 0.4rem; }
+.skill-row-body { padding: 0 0.5rem 0.5rem; font-size: 0.78rem; line-height: 1.4; }
+.skill-desc { margin: 0 0 0.4rem; color: #3f3c37; }
+.skill-remake {
+  display: grid;
+  gap: 0.12rem;
+  border-left: 3px solid #9cc87c;
+  background: #f3f9ec;
+  border-radius: 0 6px 6px 0;
+  padding: 0.3rem 0.45rem;
+  margin-bottom: 0.4rem;
+}
+.skill-remake.is-partial { border-left-color: #e0b55c; background: #fff7e6; }
+.skill-remake.is-later { border-left-color: #b9b2a5; background: #f4f1eb; }
+.skill-remake.is-multiplayer { border-left-color: #9f8bc4; background: #f5f1fb; }
+.skill-remake-label { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #5d584f; }
+.skill-sub { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8a7f6b; }
+.skill-prereqs { list-style: none; margin: 0.15rem 0 0.4rem; padding: 0; display: grid; gap: 0.12rem; }
+.skill-prereqs li { display: flex; gap: 0.35rem; align-items: baseline; }
+.skill-prereqs li.is-met { color: #4d6e3a; }
+.skill-prereqs li.is-missing { color: #8a4b2f; }
+.skill-prereq-mark { width: 0.8rem; text-align: center; font-weight: 700; }
+.skill-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.skill-path { margin-bottom: 0.3rem; }
+.skill-links { color: #8a7f6b; }
+.skill-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: #3f7a2a;
+  text-decoration: underline;
+  text-decoration-color: rgba(63, 122, 42, 0.35);
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.skill-link:hover { color: #2c5a1c; }
+.skill-meta { color: #8a8379; font-size: 0.7rem; margin-bottom: 0.15rem; }
+.skill-action { width: 100%; margin-top: 0.4rem; padding: 0.38rem 0.55rem; }
+.skill-action.btn-glitch-primary { color: #fff; }
+.skill-emblem-btn { border-color: #b79ad6; background: #f1e9fb; color: #5a3d7a; }
+.make-skill-note { font-size: 0.76rem; color: #3f6f8a; margin: 0.15rem 0 0.35rem; }
+@media (max-width: 480px) {
+  .side-panel.skills-panel { right: 6px; left: 6px; max-width: none; }
+  .skills-panel .side-card { width: auto; max-height: calc(100vh - 120px); }
+  .skill-tree-category { max-width: 7.5rem; }
+}
 .chrome-btn.is-studying {
   border-color: #83b8c9;
   background: #e4f5f8;
