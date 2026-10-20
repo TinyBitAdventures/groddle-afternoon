@@ -17,7 +17,7 @@
  *   onEvent(counter, amount, engine)      // every badge counter the game emits
  *   verbsFor(target, engine)              // -> verb list | null for targets it owns
  *   runVerb(target, verbId, engine)       // -> true when handled
- *   travelGate(tsid, engine)              // -> { ok:false, msg } blocks map travel
+ *   travelGate(tsid, engine, meta)        // -> { ok:false, msg } blocks travel (meta.via: 'signpost' | undefined)
  *   enterGate(tsid, engine)               // -> { tsid, spawnX, spawnY } redirects an enter
  *   labelFor(tsid)                        // -> { street, hub, hubId } public street name
  *   placementGroups(population, street)   // -> [{ key, count, clearance }] extra planner groups;
@@ -112,10 +112,10 @@ export function createFeatureHost(features = []) {
       if (!feature || typeof feature.runVerb !== 'function') return false;
       return feature.runVerb(target, verbId, engine) === true;
     },
-    travelGate(tsid, engine) {
+    travelGate(tsid, engine, meta = {}) {
       for (const feature of list) {
         if (typeof feature.travelGate !== 'function') continue;
-        const gate = feature.travelGate(tsid, engine);
+        const gate = feature.travelGate(tsid, engine, meta);
         if (gate && gate.ok === false) return gate;
       }
       return { ok: true };

@@ -1121,8 +1121,9 @@ export const streetJobsFeature = {
     }
   },
 
-  travelGate(tsid, engine) {
-    if (!catalog) return null;
+  /** Closed roads block their signposts only; the Map still goes anywhere. */
+  travelGate(tsid, engine, meta = {}) {
+    if (!catalog || meta?.via !== 'signpost') return null;
     const closed = roadClosure(state, catalog, tsid, signpostTsids(engine.street), opts());
     if (!closed) return null;
     const from = closed.job.connecting.find((t) => t === engine.streetTsid) || closed.job.connecting[0];

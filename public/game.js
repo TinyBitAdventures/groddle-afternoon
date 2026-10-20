@@ -6477,7 +6477,7 @@ const engine = {
     return Boolean(resolveIndexTsid(tsid));
   },
   /** Every feature's travel gate (Hell: dead / Naraka / Pooped) for a destination. */
-  travelGate: (tsid) => features.travelGate(tsid, engine),
+  travelGate: (tsid, meta) => features.travelGate(tsid, engine, meta),
   /** Every feature's metabolic gate, e.g. the dead gain no energy. */
   metabolicGate: (stat, direction) => features.metabolicGate(stat, direction, engine),
   openMap: (hubId) => openMap(hubId),
@@ -17200,7 +17200,7 @@ async function enterStreet(tsid, opts = {}) {
  * @param {{ label?: string }} [meta]
  */
 async function travelTo(toTsid, meta = {}) {
-  const featureGate = features.travelGate(toTsid, engine);
+  const featureGate = features.travelGate(toTsid, engine, { via: meta.via });
   if (!featureGate.ok) {
     toast(featureGate.msg || 'You cannot travel there right now.');
     return { ok: false, reason: 'feature_gate' };
@@ -17305,7 +17305,7 @@ function doTeleport() {
     }
     return;
   }
-  travelTo(plan.toTsid, { label: plan.label, arrive: plan.arrive });
+  travelTo(plan.toTsid, { label: plan.label, arrive: plan.arrive, via: 'signpost' });
 }
 
 function renderIlmenskieMapCallout(panel) {
@@ -21748,7 +21748,7 @@ async function main() {
         availableStreetTsids()
       );
       if (conn) {
-        travelTo(conn.tsid, { label: conn.label, arrive: conn.arrive });
+        travelTo(conn.tsid, { label: conn.label, arrive: conn.arrive, via: 'signpost' });
         return;
       }
       openMap();

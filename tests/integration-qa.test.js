@@ -77,4 +77,17 @@ test.describe('integration playtest regressions', () => {
     assert.ok(r.ok, JSON.stringify(r));
     assert.match(r.msgs[0], /for 1 currant\.$/);
   });
+
+  test('closed roads refuse signposts but not the Map', async () => {
+    const { createFeatureHost } = await import('../public/js/feature-host.js');
+    const seen = [];
+    const host = createFeatureHost([{ id: 'probe', travelGate: (tsid, engine, meta) => { seen.push(meta); return meta.via === 'signpost' ? { ok: false } : null; } }]);
+    assert.equal(host.travelGate('L1', {}, { via: 'signpost' }).ok, false);
+    assert.equal(host.travelGate('L1', {}).ok, true);
+    assert.deepEqual(seen, [{ via: 'signpost' }, {}]);
+    const jobs = fs.readFileSync(path.join(root, 'public/js/features/street-jobs-feature.js'), 'utf8');
+    assert.match(jobs, /travelGate\(tsid, engine, meta = \{\}\) \{\n    if \(!catalog \|\| meta\?\.via !== 'signpost'\) return null;/);
+    assert.match(game, /features\.travelGate\(toTsid, engine, \{ via: meta\.via \}\)/);
+    assert.equal((game.match(/via: 'signpost' \}\)/g) || []).length, 2, 'T and signpost-board clicks both say signpost');
+  });
 });
