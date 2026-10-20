@@ -7,6 +7,7 @@
  */
 
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
+import { woodHarvestOverrides } from './imagination-effects.js';
 
 export const WOOD_TREE_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 
@@ -91,20 +92,24 @@ export function quoteWoodTreeHarvest(state, inv = {}, pc = {}, toolState = {}) {
       msg: "You can't just pluck planks from a tree. You need a Hatchet.",
     };
   }
-  const tool = canUseTool(toolState, 'hatchet', WOOD_TREE_HARVEST.hatchetWear);
+  // Woodier Harvest (gardening_harvest_wood): 12 energy and 3 Hatchet wear.
+  const woodier = woodHarvestOverrides(pc?.imaginationUpgrades);
+  const energyCost = woodier?.energyCost ?? WOOD_TREE_HARVEST.energyCost;
+  const hatchetWear = woodier?.toolWear ?? WOOD_TREE_HARVEST.hatchetWear;
+  const tool = canUseTool(toolState, 'hatchet', hatchetWear);
   if (!tool.ok) return { ...tool, reason: 'broken_hatchet', msg: tool.msg };
-  if ((pc?.energy || 0) < WOOD_TREE_HARVEST.energyCost) {
+  if ((pc?.energy || 0) < energyCost) {
     return {
       ok: false,
       reason: 'energy',
-      msg: `You need ${WOOD_TREE_HARVEST.energyCost} energy to harvest this tree.`,
+      msg: `You need ${energyCost} energy to harvest this tree.`,
     };
   }
   return {
     ok: true,
     durationMs: WOOD_TREE_HARVEST.durationMs,
-    energyCost: WOOD_TREE_HARVEST.energyCost,
-    hatchetWear: WOOD_TREE_HARVEST.hatchetWear,
+    energyCost,
+    hatchetWear,
     plankYield: plankYieldForMaturity(s.maturity),
     maturity: s.maturity,
     condition: tool.condition,

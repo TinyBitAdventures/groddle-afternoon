@@ -17,6 +17,7 @@ import {
   setToolRemaining,
   useToolCondition,
 } from './tools.js?v=tools-2';
+import { SKILL_PACKAGES, skillPackageDetails } from './skill-packages.js';
 
 export const ANIMAL_KINSHIP_RANK_IDS = Object.freeze(
   Array.from({ length: 7 }, (_, index) => `animalkinship_${index + 1}`)
@@ -127,12 +128,35 @@ export function highestAnimalKinshipRank(learned = []) {
   return rank;
 }
 
-export function resolveAnimalKinshipPackage(classId, verbId, learned = []) {
+/** Source skill package behind each action, for the imagination overlays. */
+const AK_SOURCE_PACKAGES = Object.freeze({
+  'npc_piggy:pet': 'ak_piggy_pet',
+  'npc_piggy:nibble': 'ak_piggy_nibble',
+  'npc_chicken:squeeze': 'ak_chicken_squeeze',
+  'npc_butterfly:massage': 'ak_butterfly_massage',
+  'npc_butterfly:milk': 'ak_butterfly_milk',
+});
+
+export function resolveAnimalKinshipPackage(classId, verbId, learned = [], upgrades = []) {
   const key = `${classId}:${verbId}`;
   const table = ANIMAL_KINSHIP_PACKAGES[key];
   if (!table) return null;
   const rank = highestAnimalKinshipRank(learned);
-  return table[rank] || table[0];
+  const row = table[rank] || table[0];
+  // Super Animal Harvest I-III and Grain Attraction overlay the package's
+  // bonus fields (getSkillPackageDetails img_upgrades).
+  const pkgId = AK_SOURCE_PACKAGES[key];
+  const owned = new Set(Array.isArray(upgrades) ? upgrades : []);
+  const img = pkgId ? SKILL_PACKAGES[pkgId]?.img_upgrades || {} : {};
+  if (!Object.keys(img).some((id) => owned.has(id))) return row;
+  const details = skillPackageDetails(pkgId, learned, [...owned]);
+  if (!details) return row;
+  return {
+    ...row,
+    bonusMultiplier: Number(details.bonus_multiplier) || row.bonusMultiplier,
+    bonusChance: Number(details.bonus_chance) || row.bonusChance,
+    bonusAmount: Number(details.bonus_amount) || row.bonusAmount,
+  };
 }
 
 /** Normalize new daily counters while preserving the older boolean save shape. */
@@ -171,7 +195,12 @@ export function quoteAnimalKinship(state, classId, verbId, ctx = {}) {
   const key = `${classId}:${verbId}`;
   const actionState = ACTION_STATE[key];
   const rank = highestAnimalKinshipRank(ctx.learned || []);
-  const selected = resolveAnimalKinshipPackage(classId, verbId, ctx.learned || []);
+  const selected = resolveAnimalKinshipPackage(
+    classId,
+    verbId,
+    ctx.learned || [],
+    ctx.upgrades || ctx.imaginationUpgrades || ctx.pc?.imaginationUpgrades || []
+  );
   if (!actionState || !selected) {
     return quoteFailure('unsupported', 'That animal does not understand this interaction.', null, rank);
   }

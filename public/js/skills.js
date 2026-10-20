@@ -25,6 +25,20 @@ function cleanLearned(value) {
   return [...new Set((Array.isArray(value) ? value : []).map(cleanKey).filter(Boolean))];
 }
 
+/**
+ * Seconds per study second (skills_points_to_seconds): brain capacity and the
+ * learntime_* category upgrades scale how long points take. 1 = unmodified.
+ */
+function cleanTimeFactor(value) {
+  const n = finite(value, 1);
+  return n > 0 && n < 1000 ? n : 1;
+}
+
+function resolveTimeFactor(ctx, def) {
+  const raw = typeof ctx?.timeFactor === 'function' ? ctx.timeFactor(def) : ctx?.timeFactor;
+  return cleanTimeFactor(raw);
+}
+
 export function normalizeSkillState(seed = {}) {
   const learned = cleanLearned(seed?.learned);
   const known = new Set(learned);
@@ -51,6 +65,7 @@ export function normalizeSkillState(seed = {}) {
       pausedAt: isPaused ? Math.max(0, Math.floor(finite(rawRow.pausedAt, 0))) : 0,
       isPaused,
       acceleratedUntil: isPaused ? 0 : Math.max(0, Math.floor(finite(rawRow.acceleratedUntil, 0))),
+      timeFactor: cleanTimeFactor(rawRow.timeFactor),
     };
   }
   return { learned, queue };
@@ -120,9 +135,10 @@ export function canLearnSkill(state, classTsid, ctx = {}) {
 export function getStudyStatus(state, classTsid, now = Date.now()) {
   const row = state.queue?.[classTsid];
   if (!row) return null;
-  const totalSeconds = Math.max(1, Math.round(row.totalPoints / SKILL_POINTS_PER_SECOND));
+  const factor = cleanTimeFactor(row.timeFactor);
+  const totalSeconds = Math.max(1, Math.round((row.totalPoints / SKILL_POINTS_PER_SECOND) * factor));
   const remainingSeconds = row.isPaused
-    ? Math.max(1, Math.ceil(row.pointsRemaining / SKILL_POINTS_PER_SECOND))
+    ? Math.max(1, Math.ceil((row.pointsRemaining / SKILL_POINTS_PER_SECOND) * factor))
     : Math.max(0, Math.ceil((row.endsAt - now) / 1000));
   return {
     ...row,
@@ -151,7 +167,10 @@ export function pauseSkillStudy(state, classTsid, now = Date.now()) {
   if (row.isPaused) return { ok: false, reason: 'already_paused' };
   const remainingSeconds = Math.max(0, (row.endsAt - now) / 1000);
   if (remainingSeconds <= 0) return tickSkillStudy(state, now);
-  row.pointsRemaining = Math.max(1, Math.ceil(remainingSeconds * SKILL_POINTS_PER_SECOND));
+  row.pointsRemaining = Math.max(
+    1,
+    Math.ceil((remainingSeconds * SKILL_POINTS_PER_SECOND) / cleanTimeFactor(row.timeFactor))
+  );
   row.endsAt = 0;
   row.pausedAt = now;
   row.isPaused = true;
@@ -174,7 +193,8 @@ export function startSkillStudy(state, classTsid, ctx = {}, now = Date.now()) {
   const existing = state.queue?.[classTsid];
   const totalPoints = Math.max(1, Math.floor(check.def.pointCost || SKILL_POINTS_PER_SECOND));
   const pointsRemaining = existing?.pointsRemaining || totalPoints;
-  const durationSeconds = Math.max(1, Math.round(pointsRemaining / SKILL_POINTS_PER_SECOND));
+  const timeFactor = resolveTimeFactor(ctx, check.def);
+  const durationSeconds = Math.max(1, Math.round((pointsRemaining / SKILL_POINTS_PER_SECOND) * timeFactor));
   state.queue[classTsid] = {
     classTsid,
     totalPoints: existing?.totalPoints || totalPoints,
@@ -184,13 +204,15 @@ export function startSkillStudy(state, classTsid, ctx = {}, now = Date.now()) {
     pausedAt: 0,
     isPaused: false,
     acceleratedUntil: existing?.acceleratedUntil > now ? existing.acceleratedUntil : 0,
+    timeFactor,
   };
   return {
     ok: true,
     reason: existing ? 'resumed' : 'started',
     def: check.def,
     durationSeconds,
-    totalSeconds: studySecondsForSkill(check.def),
+    timeFactor,
+    totalSeconds: Math.max(1, Math.round(studySecondsForSkill(check.def) * timeFactor)),
     pausedIds,
     completed: due.completed,
   };

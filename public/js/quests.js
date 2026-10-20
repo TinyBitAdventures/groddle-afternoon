@@ -11,6 +11,7 @@
  */
 
 import { getQuestCatalog } from './content-catalogs.js';
+import { questRewardModifier } from './imagination-effects.js';
 
 /**
  * @typedef {{
@@ -198,7 +199,8 @@ export function completeQuest(state, classTsid, pc = null) {
   if (!state.completed.includes(classTsid)) state.completed.push(classTsid);
 
   const rewards = { ...(def.rewards || {}) };
-  applyRewards(pc, rewards);
+  // Fit for a King I-V: +2% to +10% on top of any reward buff (inc_quests.js:844).
+  applyRewards(pc, rewards, { bonus: questRewardModifier(pc?.imaginationUpgrades) });
   return { ok: true, reason: 'completed', rewards, def };
 }
 
@@ -206,9 +208,12 @@ export function completeQuest(state, classTsid, pc = null) {
  * @param {object|null} pc
  * @param {object} rewards
  */
-export function applyRewards(pc, rewards) {
+export function applyRewards(pc, rewards, opts = {}) {
   if (!pc || !rewards) return pc;
-  const multiplier = Math.max(1, Number(pc.rewardMultiplier) || 1);
+  const buffMultiplier = Math.max(1, Number(pc.rewardMultiplier) || 1);
+  // Imagination reward upgrades add to the buff multiplier (Overachiever,
+  // Fit for a King): multiplier = buff + modifier.
+  const multiplier = buffMultiplier + Math.max(0, Number(opts.bonus) || 0);
   const scaled = (value) => Math.max(0, Math.round((Number(value) || 0) * multiplier));
   const energy = scaled(rewards.energy);
   const mood = scaled(rewards.mood);
@@ -219,7 +224,7 @@ export function applyRewards(pc, rewards) {
     points: scaled(entry.points),
   }));
   const favorPoints = favorRewards.reduce((sum, entry) => sum + entry.points, 0);
-  if (energy) pc.energy = Math.min(100, (pc.energy || 0) + energy);
+  if (energy) pc.energy = Math.min(Math.max(100, Number(pc.energyMax) || 100), (pc.energy || 0) + energy);
   if (mood) pc.mood = Math.min(100, (pc.mood || 0) + mood);
   if (xp) {
     pc.imagination = (pc.imagination || 0) + xp;
@@ -233,7 +238,7 @@ export function applyRewards(pc, rewards) {
       favor[entry.giant] = Math.max(0, Number(favor[entry.giant]) || 0) + entry.points;
     }
   }
-  if (multiplier > 1 && (energy || mood || xp || currants || favorPoints)) {
+  if (buffMultiplier > 1 && (energy || mood || xp || currants || favorPoints)) {
     pc.rewardBuffConsumed = true;
   }
   return pc;
@@ -314,8 +319,11 @@ export function questRewardSummary(rewards = {}, opts = {}) {
  * @param {{ inv?: object, addItem?: Function, learnRecipe?: Function }} [ctx]
  */
 export function applyQuestRewards(pc, rewards = {}, ctx = {}) {
-  const summary = questRewardSummary(rewards, { multiplier: pc?.rewardMultiplier });
-  if (pc) applyRewards(pc, rewards);
+  const bonus = questRewardModifier(pc?.imaginationUpgrades);
+  const summary = questRewardSummary(rewards, {
+    multiplier: Math.max(1, Number(pc?.rewardMultiplier) || 1) + bonus,
+  });
+  if (pc) applyRewards(pc, rewards, { bonus });
   if (ctx.inv) {
     for (const item of summary.items) {
       if (typeof ctx.addItem === 'function') ctx.addItem(ctx.inv, item.classTsid, item.count);

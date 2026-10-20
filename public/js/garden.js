@@ -11,6 +11,7 @@
 import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { skillPackageDetails } from './skill-packages.js';
+import { gardenGrowModifier } from './imagination-effects.js';
 
 /** @typedef {'clean'|'seeds'|'shoots'|'crop'|'dirty'} PlotState */
 
@@ -707,6 +708,12 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
   plot.state = 'seeds';
   plot.seed = seed.seedId;
   plot.stageStartedAt = now;
+  // Growth Spurt / Speedy Herbs cards: crop or herb plots grow 10/20% faster
+  // (include/garden.js plot grow_modifier, set at planting).
+  plot.growModifier = 1 - gardenGrowModifier(
+    seed.gardenType === 'herb' ? 'herb' : 'default',
+    opts.upgrades || pc?.imaginationUpgrades || []
+  );
   // Fresh plant starts dry — water to grow (matches original wet check)
   plot.wet = false;
   return {

@@ -5,6 +5,8 @@
  * Tools whose GSJS points_capacity is 0 remain intentionally wear-free.
  */
 
+import { repairGivesMood } from './imagination-effects.js';
+
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {
     label: 'Butterfly Lotion',
@@ -257,10 +259,19 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
   target.repairs = (target.repairs || 0) + 1;
   state.totalRepairs = (state.totalRepairs || 0) + 1;
   const tinkertoolUse = useToolCondition(state, 'tinkertool', quote.tinkertoolWear);
+  // Tink Happy Thoughts (tinkertool.js:419): each repair tick adds mood equal
+  // to that tick's Tinkertool wear, so the whole repair adds the full wear.
+  let moodGained = 0;
+  if (repairGivesMood(opts.upgrades || pc?.imaginationUpgrades) && pc) {
+    const before = Number(pc.mood) || 0;
+    pc.mood = Math.min(Math.max(100, Number(pc.moodMax) || 100), before + quote.tinkertoolWear);
+    moodGained = pc.mood - before;
+  }
   return {
     ok: true,
     quote,
     tinkertoolUse,
+    moodGained,
     msg: `You fixed the ${quote.condition.label} up just perfect. You spent ${quote.energy} energy.`,
   };
 }

@@ -105,7 +105,7 @@ describe('profile-aware vendor UI wiring', () => {
   it('uses active stock throughout and opens buy details instead of sell details', () => {
     const game = readFileSync(join(publicDir, 'game.js'), 'utf8');
     assert.match(game, /activeVendor = selectVendorProfile/);
-    assert.match(game, /listBuyOffers\(activeVendor\.offers\)/);
+    assert.match(game, /listBuyOffers\(activeVendor\.offers[,)]/);
     assert.match(game, /vendorBuy\(pc, inv, activeVendor\.offers/);
     assert.match(game, /tile\.addEventListener\('click', \(\) => \{\s*vendorSelected = row\.classTsid;\s*vendorQty = 1;/);
     assert.doesNotMatch(game, /listBuyOffers\([^)]*\)[\s\S]{0,800}stageVendorSell\(row\.classTsid\)/);

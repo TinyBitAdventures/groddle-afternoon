@@ -4,6 +4,7 @@
 
 import { getAchievementCatalog } from './content-catalogs.js';
 import { applyRewards } from './quests.js';
+import { achievementRewardModifier, scaleRewards } from './imagination-effects.js';
 
 export function createAchievementState() {
   return {
@@ -298,8 +299,10 @@ export function unlockAchievement(state, classTsid, pc = null) {
   if (state.unlocked.includes(classTsid)) return { ok: false, reason: 'already', rewards: null };
   state.unlocked.push(classTsid);
   delete state.progress[classTsid];
-  const rewards = { ...(def.rewards || {}) };
-  applyRewards(pc, rewards);
+  // Overachiever I-V: +2% to +10% on every badge reward (inc_achievements.js:331).
+  const bonus = achievementRewardModifier(pc?.imaginationUpgrades);
+  applyRewards(pc, { ...(def.rewards || {}) }, { bonus });
+  const rewards = scaleRewards({ ...(def.rewards || {}) }, bonus);
   return { ok: true, reason: 'unlocked', rewards, def };
 }
 

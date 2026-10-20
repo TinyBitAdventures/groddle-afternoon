@@ -851,7 +851,9 @@ export function getVerbsFor(target, ctx) {
       learned.includes('mining_3') ||
       learned.includes('mining_4');
     const depleted = !!(rock.depleted || rock.chunksRemaining <= 0);
-    const swing = (hasSkill && miningProfile(learned, pick || 'pick')) || miningProfile(undefined, pick || 'pick');
+    const mineUpgrades = ctx.imaginationUpgrades || pc.imaginationUpgrades || [];
+    const swing = (hasSkill && miningProfile(learned, pick || 'pick', mineUpgrades))
+      || miningProfile(undefined, pick || 'pick', mineUpgrades);
     add('mine', 'mine', {
       sort: 10,
       energy: swing?.energy ?? MINING_COSTS.energy,

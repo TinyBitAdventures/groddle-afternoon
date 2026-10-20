@@ -629,6 +629,7 @@ import {
   listBuyOffers,
   listSellOffers,
   createVendorSellQuote,
+  vendorBuyUnitPrice,
 } from './js/vendor.js?v=stores-1';
 import {
   createAnimalState,
@@ -1705,6 +1706,11 @@ async function enterStreetWithTransition(tsid, opts = {}) {
   return data;
 }
 
+/** Energy tank size: 100 plus the Energy Tank upgrade cards (imagination feature). */
+function energyCap() {
+  return Math.max(100, Number(pc.energyMax) || 100);
+}
+
 function setBar(id, value) {
   const el = document.getElementById(id);
   if (el) el.style.width = `${clamp(value, 0, 100)}%`;
@@ -2290,7 +2296,7 @@ function getPackUseInfo(classTsid) {
     pc.imaginationUpgrades || [],
     Date.now()
   );
-  const gate = canEatFood(foodState, pc, 100);
+  const gate = canEatFood(foodState, pc, energyCap());
   return {
     ...info,
     food: {
@@ -3038,7 +3044,7 @@ function updateHud() {
     quoinEl.title = `${quoinState.totalCollected} quoins collected total`;
     quoinEl.classList.toggle('at-limit', quoinState.collectedToday >= quoinState.dailyLimit);
   }
-  setBar('bar-energy', pc.energy);
+  setBar('bar-energy', (pc.energy / energyCap()) * 100);
   setBar('bar-mood', pc.mood);
 
   // Dual-row pack: items (top) + tools (bottom), currants already set above
@@ -3107,7 +3113,7 @@ function usePackItem(classTsid) {
       toast(deadGate.msg);
       return;
     }
-    const gate = canEatFood(foodState, pc, 100);
+    const gate = canEatFood(foodState, pc, energyCap());
     if (!gate.ok) {
       toast(gate.reason);
       renderPackPopover(classTsid);
@@ -3127,7 +3133,7 @@ function usePackItem(classTsid) {
     foodResult = recordFoodEat(foodState, classTsid, {
       baseEnergy: ordinaryInfo.effects.energy,
       appliedEnergy: r.effects.energy,
-      energyMax: 100,
+      energyMax: energyCap(),
       upgrades: pc.imaginationUpgrades || [],
       now: Date.now(),
     });
@@ -6284,6 +6290,14 @@ const engine = {
   get learnedSkills() {
     return skillState.learned || [];
   },
+  /** Skill study queue (classTsid → row), read for brain-capacity learning time. */
+  get skillQueue() {
+    return skillState.queue || {};
+  },
+  /** Live quoin economy state (multiplier, daily limit) for imagination upgrades. */
+  get quoinState() {
+    return quoinState;
+  },
   get unlockedAchievements() {
     return achieveState.unlocked || [];
   },
@@ -7537,7 +7551,7 @@ async function maybeNewDay(opts = {}) {
   if (!opts.force && !shouldFireNewDay()) return false;
   newDayBusy = true;
   const el = document.getElementById('new-day-screen');
-  const refill = applyNewDayRefill(pc, { energyMax: 100, moodMax: 100 });
+  const refill = applyNewDayRefill(pc, { energyMax: energyCap(), moodMax: 100 });
   setLastNewDayTs(Date.now());
   // Living things: reset daily care/harvest limits and regrow tree produce.
   const trantN = resetAllTrantsForNewDay();
@@ -7653,7 +7667,7 @@ function performPlayerJump(result, baseVelocity, now) {
   player.vy = baseVelocity * result.multiplier;
   player.onGround = false;
   noteGrounded(jumpState, false, now);
-  pc.energy = clamp(pc.energy - 1.2, 0, 100);
+  pc.energy = clamp(pc.energy - 1.2, 0, energyCap());
   if (result.triple) {
     playSfx('jump', { volume: 0.58, rate: 1 });
     const boost = result.multiplier.toFixed(2).replace(/0$/, '');
@@ -7701,7 +7715,7 @@ function streetPhysicsJetpackStroke(buff, jumpVelocity, now) {
   if (!buff.jetpack || player.onGround || !hasQueuedJump(jumpState, now)) return false;
   clearJumpQueue(jumpState);
   player.vy = player.vy < 0 ? jumpVelocity / 2 : jumpVelocity;
-  pc.energy = clamp(pc.energy - 0.4, 0, 100);
+  pc.energy = clamp(pc.energy - 0.4, 0, energyCap());
   return true;
 }
 
@@ -7795,7 +7809,7 @@ function handleInput() {
         stopClimb({ jumpOff: true, side });
         noteGrounded(jumpState, false, now);
         if (jumpRequested) {
-          pc.energy = clamp(pc.energy - 1.2, 0, 100);
+          pc.energy = clamp(pc.energy - 1.2, 0, energyCap());
           updateHud();
         }
         return;
@@ -7893,7 +7907,7 @@ function physics(dt) {
     player.pivot.y = Math.sin(player.walkPhase) * 1.5;
     // Small energy drain while actively climbing
     if (Math.abs(player.vy) > 0.1) {
-      pc.energy = clamp(pc.energy - 0.012 * dt, 0, 100);
+      pc.energy = clamp(pc.energy - 0.012 * dt, 0, energyCap());
     }
   } else {
     const movementBuff = combinedPhysics();
@@ -7942,10 +7956,10 @@ function physics(dt) {
     state.energyTick = 0;
     if (Math.abs(player.vx) > 0.5) {
       if (features.metabolicGate('energy', 'loss', engine).ok) {
-        pc.energy = clamp(pc.energy - 0.6, 0, 100);
+        pc.energy = clamp(pc.energy - 0.6, 0, energyCap());
       }
     } else if (features.metabolicGate('energy', 'gain', engine).ok) {
-      pc.energy = clamp(pc.energy + 0.5, 0, 100);
+      pc.energy = clamp(pc.energy + 0.5, 0, energyCap());
     }
     updateHud();
   }
@@ -18324,6 +18338,8 @@ function skillStudyContext() {
     completedQuests: questState.completed,
     unlockedAchievements: achieveState.unlocked,
     upgrades: pc.imaginationUpgrades || [],
+    // Brain capacity and category learning-speed cards (imagination feature).
+    timeFactor: (def) => features.query('skillTimeFactor', def, engine) ?? 1,
   };
 }
 
@@ -18557,6 +18573,7 @@ function craftOpts() {
     requireSkill: true,
     requireTool: true,
     toolState,
+    upgrades: pc.imaginationUpgrades || [],
   };
 }
 
@@ -18759,7 +18776,7 @@ function runMakeCraft(key, qty) {
     recipeName: recipe.name,
     tool: recipe.tool,
     qty: n,
-    durationMs: craftDurationFor(recipe, opts.learned),
+    durationMs: craftDurationFor(recipe, opts.learned, opts.upgrades),
   });
   activeCraftSession = { timer, key, recipe, qty: n, made: 0, opts };
   document.getElementById('make-list')?.setAttribute('hidden', '');
@@ -19362,7 +19379,7 @@ function claimActiveShrineEmblem() {
 
 /** Stage a pack item in the Sell detail without mutating inventory. */
 function stageVendorSell(classTsid) {
-  const quote = createVendorSellQuote(inv, activeVendor.offers, classTsid, 1);
+  const quote = createVendorSellQuote(inv, activeVendor.offers, classTsid, 1, pc.imaginationUpgrades);
   if (!quote.ok) {
     toast(quote.msgs?.[0] || 'That item cannot be sold here.');
     return quote;
@@ -19414,7 +19431,7 @@ function renderVendorList() {
     detail.hidden = false;
     const isBuy = vendorTab === 'buy';
     const offer = activeVendor.offers.find((o) => o.classTsid === vendorSelected);
-    const quote = isBuy ? null : createVendorSellQuote(inv, activeVendor.offers, vendorSelected, vendorQty);
+    const quote = isBuy ? null : createVendorSellQuote(inv, activeVendor.offers, vendorSelected, vendorQty, pc.imaginationUpgrades);
     if (!isBuy && !quote?.ok) {
       vendorSelected = null;
       renderVendorList();
@@ -19423,7 +19440,7 @@ function renderVendorList() {
     const label = isBuy
       ? offer?.label || ITEM_CATALOG[vendorSelected]?.label || vendorSelected
       : quote.label;
-    const unit = isBuy ? offer?.buyPrice ?? 0 : quote.unitPrice;
+    const unit = isBuy ? vendorBuyUnitPrice(offer, pc.imaginationUpgrades) : quote.unitPrice;
     const have = isBuy ? countItem(inv, vendorSelected) : quote.have;
     const maxQ = isBuy
       ? unit > 0
@@ -19503,7 +19520,7 @@ function renderVendorList() {
   list.innerHTML = '';
 
   if (vendorTab === 'buy') {
-    for (const row of listBuyOffers(activeVendor.offers)) {
+    for (const row of listBuyOffers(activeVendor.offers, pc.imaginationUpgrades)) {
       const tile = document.createElement('button');
       tile.type = 'button';
       tile.className = 'vendor-tile';
@@ -19521,7 +19538,7 @@ function renderVendorList() {
       list.appendChild(tile);
     }
   } else {
-    const rows = listSellOffers(inv, activeVendor.offers);
+    const rows = listSellOffers(inv, activeVendor.offers, pc.imaginationUpgrades);
     if (!rows.length) {
       list.innerHTML =
         '<div class="make-empty">Drag an item from your pack.<br/><small>(Or earn goods, then sell them here.)</small></div>';
@@ -20469,16 +20486,10 @@ async function main() {
   }
   // This slice ships with a Tinkertool, so existing saves also receive the entry repair skill.
   grantSkill(skillState, 'tinkering_1', true);
-  // Expose the original food-variety loop in the focused demo, including on older saves.
+  // Food variety and Triple Jump are imagination upgrade cards bought in the
+  // Upgrades shop (features/imagination-feature.js). Saves from before the
+  // shop keep the copies the old demo grant gave them.
   pc.imaginationUpgrades ||= [];
-  if (!pc.imaginationUpgrades.includes(FOOD_VARIETY_UPGRADE)) {
-    pc.imaginationUpgrades.push(FOOD_VARIETY_UPGRADE);
-  }
-  // There is no imagination-upgrade shop in this focused remake yet, so grant
-  // the official entry Triple Jump to fresh and existing demo saves.
-  if (!TRIPLE_JUMP_UPGRADES.some((profile) => pc.imaginationUpgrades.includes(profile.id))) {
-    pc.imaginationUpgrades.push(TRIPLE_JUMP_UPGRADES[0].id);
-  }
   const jumpDemoValue = String(bootParams.get('jumpdemo') || '').toLowerCase();
   const jumpDemoProfile = jumpDemoValue
     ? TRIPLE_JUMP_UPGRADES[
@@ -20542,6 +20553,8 @@ async function main() {
       ? bootParams.get('fooddemo')
       : 'sammich';
     inv[demoFood] = Math.max(1, inv[demoFood] || 0);
+    // The variety bonus needs the Appreciation of Food Variety upgrade card.
+    if (!pc.imaginationUpgrades.includes(FOOD_VARIETY_UPGRADE)) pc.imaginationUpgrades.push(FOOD_VARIETY_UPGRADE);
     pc.energy = Math.min(pc.energy, 50);
     foodState.foodToday = 0;
     const age = String(bootParams.get('foodlast') || 'first').toLowerCase();

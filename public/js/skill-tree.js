@@ -110,7 +110,7 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
   },
   'Master Gardener': {
     status: 'later',
-    note: 'Needs two imagination upgrades (watering and clearing time) that cannot be bought here yet, and its garden potions are not here.',
+    note: 'Needs the Watering Whiz and Tendy Gonzales upgrade cards (Upgrades shop) to learn; the Master Garden and its garden potions are not here yet.',
   },
   Nudgery: {
     status: 'live',

@@ -11,6 +11,9 @@ import { getBuffCatalog } from './content-catalogs.js';
 
 const SECOND = 1000;
 
+/** Energy tank size: 100 plus Energy Tank upgrade cards (pc.energyMax). */
+const energyCap = (pc) => Math.max(100, Number(pc?.energyMax) || 100);
+
 /** Pack items which legitimately create buffs in the original game. */
 export const BUFF_ITEM_CATALOG = Object.freeze({
   spinach: {
@@ -145,10 +148,10 @@ function applyStartEffects(classTsid, pc) {
   const beforeEnergy = Number(pc.energy) || 0;
   const beforeMood = Number(pc.mood) || 0;
   if (classTsid === 'rookswort') {
-    pc.energy = clamp(beforeEnergy + 3, 0, 100);
+    pc.energy = clamp(beforeEnergy + 3, 0, energyCap(pc));
     pc.mood = clamp(beforeMood - 2, 0, 100);
   } else if (classTsid === 'silvertongue') {
-    pc.energy = clamp(beforeEnergy - 5, 0, 100);
+    pc.energy = clamp(beforeEnergy - 5, 0, energyCap(pc));
     pc.mood = clamp(beforeMood + 5, 0, 100);
   }
   if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
@@ -225,7 +228,7 @@ function applyTickEffect(row, pc) {
   if (!pc) return effects;
   if (row.classTsid === 'hairball_flower') {
     const before = Number(pc.energy) || 0;
-    pc.energy = clamp(before - 5, 0, 100);
+    pc.energy = clamp(before - 5, 0, energyCap(pc));
     if (pc.energy !== before) effects.energy = pc.energy - before;
   } else if (row.classTsid === 'purple_flower') {
     pc.imagination = (Number(pc.imagination) || 0) + 1;
@@ -234,7 +237,7 @@ function applyTickEffect(row, pc) {
     effects.xp = 1;
   } else if (row.classTsid === 'well_fed_energy') {
     const before = Number(pc.energy) || 0;
-    pc.energy = clamp(before + (Number(row.args?.energy) || 5), 0, 100);
+    pc.energy = clamp(before + (Number(row.args?.energy) || 5), 0, energyCap(pc));
     if (pc.energy !== before) effects.energy = pc.energy - before;
   }
   return effects;

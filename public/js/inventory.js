@@ -390,7 +390,7 @@ export function useItem(inv, pc, classTsid) {
   const effects = {};
   if (info.effects.energy) {
     const before = pc.energy || 0;
-    pc.energy = Math.max(0, Math.min(100, before + info.effects.energy));
+    pc.energy = Math.max(0, Math.min(Math.max(100, Number(pc.energyMax) || 100), before + info.effects.energy));
     if (pc.energy !== before) effects.energy = pc.energy - before;
   }
   if (info.effects.mood) {

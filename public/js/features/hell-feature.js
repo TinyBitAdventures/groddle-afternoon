@@ -431,4 +431,19 @@ export const hellFeature = {
   inHell(tsid) {
     return isInHell(tsid);
   },
+  /**
+   * Resurrect right away (the Get Out of Hell Free Card,
+   * upgrade_card_instant_resurrection.js): pc.resurrect() then, with
+   * `full`, +999999 energy and mood, i.e. both tanks full.
+   */
+  resurrectNow(engine, { full = false } = {}) {
+    if (!state.isDead) return false;
+    if (!doResurrect(engine)) return false;
+    if (full) {
+      engine.pc.energy = Math.max(1, Number(engine.pc.energyMax) || 100);
+      engine.pc.mood = Math.max(1, Number(engine.pc.moodMax) || 100);
+      engine.updateHud();
+    }
+    return true;
+  },
 };

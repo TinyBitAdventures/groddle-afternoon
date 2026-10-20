@@ -988,6 +988,8 @@ function verbContext(engine, entity, verbId) {
   return {
     verbId,
     skills: engine.learnedSkills,
+    // Imagination upgrades (scraping/scooping speed, ice and peat yield, dirt and peat daily limits).
+    upgrades: engine.pc?.imaginationUpgrades || [],
     achievements: engine.unlockedAchievements,
     toolState: engine.toolState,
     now: Date.now(),

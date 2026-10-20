@@ -101,7 +101,7 @@ export function reconcilePlayerProgression(pc, opts = {}) {
     currants += currantRewardForLevel(level);
   }
 
-  const energyTop = Math.max(0, Number(opts.energyTop) || 100);
+  const energyTop = Math.max(0, Number(opts.energyTop) || Number(pc.energyMax) || 100);
   const moodTop = Math.max(0, Number(opts.moodTop) || 100);
   const beforeEnergy = Number(pc.energy) || 0;
   const beforeMood = Number(pc.mood) || 0;

@@ -17,9 +17,11 @@ import {
   countItem,
   ensureItem,
   itemIcon,
+  ITEM_CATALOG,
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { skillPackageDetails } from './skill-packages.js';
+import { GEM_ITEMS, miningExpertBonus, rollGemSmall, smeltingOverrides } from './imagination-effects.js';
 
 /**
  * @typedef {{
@@ -183,11 +185,12 @@ export const MINING_DEMO_DURATION_MS = 1800;
  * @param {string[]|undefined} learned
  * @param {'pick'|'fancy_pick'|string} [pick]
  */
-export function miningProfile(learned, pick = 'pick') {
+export function miningProfile(learned, pick = 'pick', upgrades = []) {
   const packageId = pick === 'fancy_pick' ? 'mining_fancypick' : 'mining';
+  // Imagination overlays: Manic Mining (duration) and Truly Outrageous (gem drop).
   const details = Array.isArray(learned)
-    ? skillPackageDetails(packageId, learned)
-    : skillPackageDetails(packageId, ['mining_1']);
+    ? skillPackageDetails(packageId, learned, upgrades)
+    : skillPackageDetails(packageId, ['mining_1'], upgrades);
   if (!details) return null;
   return {
     package: packageId,
@@ -198,17 +201,21 @@ export function miningProfile(learned, pick = 'pick') {
     energy: details.energy_cost,
     xp: details.xp_bonus || 0,
     toolWear: details.tool_wear,
+    dropClassId: details.drop_class_id || null,
+    dropChance: Number(details.drop_chance) || 0,
   };
 }
 
 /**
  * Exact `refining` package row (Refining I or II) for the Grinder.
+ * Refined Speed I/II (refining_time_1/2) shorten it through the overlay.
  * @param {string[]|undefined} learned
+ * @param {string[]} [upgrades]
  */
-export function refiningProfile(learned) {
+export function refiningProfile(learned, upgrades = []) {
   const details = Array.isArray(learned)
-    ? skillPackageDetails('refining', learned)
-    : skillPackageDetails('refining', ['refining_1']);
+    ? skillPackageDetails('refining', learned, upgrades)
+    : skillPackageDetails('refining', ['refining_1'], upgrades);
   if (!details) return null;
   return {
     skill: details.skill,
@@ -295,6 +302,7 @@ export function mineRock(rock, inv, pc, opts = {}) {
     return { ok: false, reason: 'depleted', msgs: ['This rock is mined out. Wait for it to respawn.'] };
   }
   const skilled = Array.isArray(opts.learned) ? opts.learned : undefined;
+  const upgrades = Array.isArray(opts.upgrades) ? opts.upgrades : pc?.imaginationUpgrades || [];
   const wearCheck = Math.min(
     miningProfile(skilled, 'fancy_pick')?.toolWear ?? MINING_COSTS.toolWear,
     miningProfile(skilled, 'pick')?.toolWear ?? MINING_COSTS.toolWear,
@@ -318,8 +326,8 @@ export function mineRock(rock, inv, pc, opts = {}) {
     }
   }
   // Mining II–IV: faster swings, less energy, less wear, more xp.
-  const profile = miningProfile(opts.requireSkill === false ? skilled : opts.learned || [], pick)
-    || miningProfile(undefined, pick);
+  const profile = miningProfile(opts.requireSkill === false ? skilled : opts.learned || [], pick, upgrades)
+    || miningProfile(undefined, pick, upgrades);
   if (opts.toolState && !canUseTool(opts.toolState, pick, profile.toolWear).ok) {
     return {
       ok: false,
@@ -336,7 +344,9 @@ export function mineRock(rock, inv, pc, opts = {}) {
   }
 
   const rng = opts.rng || Math.random;
-  const toGet = randInt(def?.minChunks ?? 3, def?.maxChunks ?? 9, rng);
+  let toGet = randInt(def?.minChunks ?? 3, def?.maxChunks ?? 9, rng);
+  // include/mining.js: Beryl/Dullite/Metal Rock/Sparkly Expert, +round(15%).
+  toGet += miningExpertBonus(rock.classTsid || def?.classTsid, upgrades, toGet);
   const got = Math.min(toGet, rock.chunksRemaining);
 
   pc.energy = (pc.energy || 0) - profile.energy;
@@ -351,6 +361,14 @@ export function mineRock(rock, inv, pc, opts = {}) {
 
   const chunkLabel = def?.chunkLabel || rock.chunkId;
   msgs.push(`You mine ${got} ${got === 1 ? chunkLabel : chunkLabel + (chunkLabel.endsWith('s') ? '' : 's')}.`);
+  // Truly Outrageous I-IV: the package's gem_small drop (catalog_drop_tables.js).
+  let gem = null;
+  if (profile.dropClassId === 'gem_small' && profile.dropChance > 0 && rng() * 100 < profile.dropChance) {
+    gem = rollGemSmall(rng);
+    if (!ITEM_CATALOG[gem]) ensureItem(gem, GEM_ITEMS[gem]);
+    addItem(inv, gem, 1);
+    msgs.push(`You also found a ${GEM_ITEMS[gem]?.label || gem}!`);
+  }
   if (toolUse?.broke) msgs.push(toolUse.msg);
 
   let cleared = false;
@@ -374,6 +392,7 @@ export function mineRock(rock, inv, pc, opts = {}) {
       activityLine: msgs[0],
     },
     got,
+    gem,
     chunkId: rock.chunkId,
     pick,
     profile,
@@ -429,14 +448,16 @@ export function smeltMetalRocks(inv, pc, opts = {}) {
     }
   }
   const ingots = chunks / per;
-  const toolWear = SMELT_COSTS.toolWear * ingots;
+  // smelter.js: The Green Smelt (energy 5 → 3) and Strong Smelter (wear 3 → 2).
+  const smeltUpgrades = smeltingOverrides(Array.isArray(opts.upgrades) ? opts.upgrades : pc?.imaginationUpgrades || []);
+  const toolWear = (smeltUpgrades.toolWear ?? SMELT_COSTS.toolWear) * ingots;
   if (opts.requireTool !== false && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, SMELT_COSTS.tool, toolWear);
     if (!toolCheck.ok) {
       return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck };
     }
   }
-  const energy = SMELT_COSTS.energyPerIngot * ingots;
+  const energy = (smeltUpgrades.energyCost ?? SMELT_COSTS.energyPerIngot) * ingots;
   if ((pc.energy || 0) < energy) {
     return {
       ok: false,

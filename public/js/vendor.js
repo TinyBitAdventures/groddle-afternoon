@@ -3,6 +3,7 @@
  * Prices adapted from Glitch economy feel (GSJS street_spirit patterns).
  */
 
+import { adjustedVendorPayout, adjustedVendorPrice } from './imagination-effects.js';
 import {
   addItem,
   removeItem,
@@ -155,6 +156,26 @@ export function findOffer(offers, classTsid) {
  * @param {string} classTsid
  * @param {number} [qty=1]
  */
+/**
+ * Unit price a vendor charges this player: Beginner Haggler … Harry the
+ * Haggler take 2/5/7/10% off (inc_stores.js storeAdjust).
+ * @param {VendorOffer|null|undefined} offer
+ * @param {string[]} [upgrades]
+ */
+export function vendorBuyUnitPrice(offer, upgrades = []) {
+  return adjustedVendorPrice(Number(offer?.buyPrice) || 0, upgrades);
+}
+
+/**
+ * Unit price a vendor pays this player: Fast Talker … Ultimate Closer add
+ * 2/5/7/10% (inc_stores.js storeAdjustBuyPrice).
+ * @param {VendorOffer|null|undefined} offer
+ * @param {string[]} [upgrades]
+ */
+export function vendorSellUnitPrice(offer, upgrades = []) {
+  return adjustedVendorPayout(offer?.sellPrice ?? 1, upgrades);
+}
+
 export function vendorBuy(pc, inv, offers, classTsid, qty = 1) {
   const offer = findOffer(offers, classTsid);
   if (!offer) return { ok: false, reason: 'not_sold', msgs: ['They do not sell that.'] };
@@ -162,7 +183,7 @@ export function vendorBuy(pc, inv, offers, classTsid, qty = 1) {
   if (!Number.isFinite(amount) || amount < 1) {
     return { ok: false, reason: 'bad_qty', msgs: ['Buy at least one.'] };
   }
-  const cost = offer.buyPrice * amount;
+  const cost = vendorBuyUnitPrice(offer, pc?.imaginationUpgrades) * amount;
   if ((pc.currants || 0) < cost) {
     return {
       ok: false,
@@ -210,7 +231,7 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1) {
   if (countItem(inv, classTsid) < amount) {
     return { ok: false, reason: 'empty', msgs: ['You do not have enough to sell.'] };
   }
-  const unit = offer?.sellPrice ?? 1;
+  const unit = vendorSellUnitPrice(offer, pc?.imaginationUpgrades);
   const gain = unit * amount;
   if (!removeItem(inv, classTsid, amount)) {
     return { ok: false, reason: 'empty', msgs: ['You do not have enough to sell.'] };
@@ -233,11 +254,11 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1) {
  * List buy rows for UI.
  * @param {VendorOffer[]} offers
  */
-export function listBuyOffers(offers) {
+export function listBuyOffers(offers, upgrades = []) {
   return offers.map((o) => ({
     classTsid: o.classTsid,
     label: o.label,
-    price: o.buyPrice,
+    price: vendorBuyUnitPrice(o, upgrades),
     mode: 'buy',
   }));
 }
@@ -247,13 +268,13 @@ export function listBuyOffers(offers) {
  * @param {import('./inventory.js').Inventory} inv
  * @param {VendorOffer[]} offers
  */
-export function listSellOffers(inv, offers) {
+export function listSellOffers(inv, offers, upgrades = []) {
   return listPackItemSlots(inv).filter((slot) => slot.sellable !== false).map((slot) => {
     const offer = findOffer(offers, slot.classTsid);
     return {
       classTsid: slot.classTsid,
       label: offer?.label || slot.label,
-      price: offer?.sellPrice ?? 1,
+      price: vendorSellUnitPrice(offer, upgrades),
       have: slot.count,
       mode: 'sell',
       vendorStocked: Boolean(offer),
@@ -269,13 +290,13 @@ export function listSellOffers(inv, offers) {
  * @param {string} classTsid
  * @param {number} [qty=1]
  */
-export function createVendorSellQuote(inv, offers, classTsid, qty = 1) {
+export function createVendorSellQuote(inv, offers, classTsid, qty = 1, upgrades = []) {
   const slot = listPackItemSlots(inv).find((row) => row.classTsid === classTsid);
   if (!slot || slot.count < 1 || slot.sellable === false) {
     return { ok: false, reason: 'not_sellable', classTsid, msgs: ['That item is not sellable from your pack.'] };
   }
   const offer = findOffer(offers, classTsid);
-  const unitPrice = offer?.sellPrice ?? 1;
+  const unitPrice = vendorSellUnitPrice(offer, upgrades);
   const amount = Math.max(1, Math.min(slot.count, Math.floor(Number(qty) || 1)));
   return {
     ok: true,

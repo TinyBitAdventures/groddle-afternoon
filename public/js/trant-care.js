@@ -10,6 +10,7 @@
 
 import { canUseTool, useToolCondition } from './tools.js';
 import { fruitCapacityAt } from './trants.js?v=trant-harvest-2';
+import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
 
 const freezeRanks = (ranks) => Object.freeze(
   Object.fromEntries(Object.entries(ranks).map(([id, row]) => [id, Object.freeze(row)]))
@@ -116,8 +117,13 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
   const rng = ctx.rng || Math.random;
   const pc = ctx.pc;
   pc.energy = Math.max(0, (Number(pc.energy) || 0) - profile.energyCost);
-  const toolUse = kind === 'water'
-    ? useToolCondition(ctx.tools, 'watering_can', profile.toolWear)
+  // Heavy Flow (lightgreenthumb_tool_wear): the Watering Can wears at half rate.
+  const upgrades = ctx.upgrades || ctx.imaginationUpgrades || pc?.imaginationUpgrades || [];
+  const wear = kind === 'water'
+    ? scaledToolWear(ctx.tools, 'watering_can', profile.toolWear, toolWearMultiplier('watering_can', upgrades))
+    : 0;
+  const toolUse = kind === 'water' && wear > 0
+    ? useToolCondition(ctx.tools, 'watering_can', wear)
     : null;
   const success = rng() * 100 < profile.successRate;
   if (!success) {

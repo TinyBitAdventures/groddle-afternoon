@@ -17,6 +17,7 @@ export const PLAYER_SAVE_VERSION = 7;
 
 const PLAYER_DEFAULTS = Object.freeze({
   energy: 80,
+  energyMax: 100,
   mood: 70,
   imagination: 5000,
   currants: 200,
@@ -80,7 +81,13 @@ export function normalizePlayerSnapshot(seed = {}, fallback = PLAYER_DEFAULTS) {
   const source = seed && typeof seed === 'object' ? seed : {};
   const base = { ...PLAYER_DEFAULTS, ...(fallback || {}) };
   return {
-    energy: clamp(finite(source.energy, base.energy), 0, 100),
+    // Energy Tank upgrade cards raise the tank above the 100 default.
+    energyMax: clamp(Math.floor(finite(source.energyMax, base.energyMax ?? 100)), 100, 1_000_000),
+    energy: clamp(
+      finite(source.energy, base.energy),
+      0,
+      clamp(Math.floor(finite(source.energyMax, base.energyMax ?? 100)), 100, 1_000_000)
+    ),
     mood: clamp(finite(source.mood, base.mood), 0, 100),
     imagination: Math.max(0, Math.floor(finite(source.imagination, base.imagination))),
     currants: Math.max(0, Math.floor(finite(source.currants, base.currants))),
