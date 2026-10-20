@@ -21891,6 +21891,30 @@ async function main() {
     applyMute();
     window.groddleSound = { play: playSound, stats: () => audio.board?.stats, resolve: (k) => audio.board?.resolve(k) };
   }
+  // Read-only snapshot for tools/playtest.mjs: where things are, nothing more.
+  window.groddleQA = {
+    snapshot() {
+      const rect = app.view.getBoundingClientRect();
+      const sx = rect.width / VIEW_W;
+      const sy = rect.height / VIEW_H;
+      const toPage = (wx, wy) => ({ x: rect.left + (wx + world.x) * sx, y: rect.top + (wy + world.y) * sy });
+      return {
+        street: currentStreet ? { tsid: currentStreet.tsid, label: currentStreet.label, hub: currentStreet.hub || '' } : null,
+        player: { x: player.x, y: player.y, onGround: !!player.onGround, energy: pc.energy, mood: pc.mood },
+        busy: engine.busy(),
+        acting: !!currentAction,
+        menu: menuTarget ? (menuTarget.label || menuTarget.classId) : '',
+        interactables: interactables
+          .filter((it) => it?.sprite && !it.sprite.destroyed)
+          .map((it) => ({ classId: it.classId, label: it.label || '', featureId: it.featureId || '', x: it.sprite.x, y: it.sprite.y, page: toPage(it.sprite.x, it.sprite.y - 20) })),
+        signposts: (currentStreet?.signposts || []).map((s) => {
+          const pos = worldToScreen(currentStreet, s.x, s.y);
+          const conn = pickConnection(s, availableStreetTsids());
+          return { x: pos.x, y: pos.y, to: conn ? conn.label : '', tsid: conn ? conn.tsid : '' };
+        }),
+      };
+    },
+  };
   if (new URLSearchParams(location.search).has('soundtest')) {
     import('./js/sound-test.js').then((m) => m.openSoundTest({ document, playSound, board: () => audio.board, unmute: async () => {
       state.muted = false;
