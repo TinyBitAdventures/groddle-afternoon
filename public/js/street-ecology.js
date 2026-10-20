@@ -237,10 +237,12 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     gardens,
     vendor,
     shrine,
-    apples: 4,
-    musicblocks: 1,
-    quoins: 8,
-    companions: true,
+    // Feature-built rows (private instances such as party spaces) may pin
+    // these; archived street rows never carry them.
+    apples: Number.isFinite(entry?.apples) ? whole(entry.apples, 0, 8) : 4,
+    musicblocks: Number.isFinite(entry?.musicblocks) ? whole(entry.musicblocks, 0, 2) : 1,
+    quoins: Number.isFinite(entry?.quoins) ? whole(entry.quoins, 0, 40) : 8,
+    companions: entry?.companions !== false,
     resourceCounts: resourceCountsFrom(counts),
     resourceNodeClasses: expandResourceClasses(counts),
   };
