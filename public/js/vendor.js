@@ -10,7 +10,7 @@ import {
   listPackItemSlots,
   ITEM_CATALOG,
   ensureItem,
-} from './inventory.js?v=catalog-unified-2';
+} from './inventory.js?v=catalog-unified-3';
 import { gardenVendorOffers } from './garden.js?v=vendor-crops-1';
 import { miningVendorOffers } from './mining.js';
 

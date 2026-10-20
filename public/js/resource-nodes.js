@@ -73,8 +73,8 @@ import {
   countItem,
   ensureItem,
   ITEM_CATALOG,
-} from './inventory.js?v=catalog-unified-2';
-import { canUseTool, useToolCondition } from './tools.js?v=resource-nodes-1';
+} from './inventory.js?v=catalog-unified-3';
+import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { getGameDayKey } from './game-day.js?v=dametime-1';
 
 export const RESOURCE_NODES_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';

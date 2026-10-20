@@ -6,7 +6,7 @@
  * - items/include/shrines.js
  */
 
-import { addItem, ensureItem } from './inventory.js?v=catalog-unified-2';
+import { addItem, ensureItem } from './inventory.js?v=catalog-unified-3';
 
 export const GAMESHOW_TICKET_ID = 'gameshow_ticket';
 export const SPINNING_WHEEL_APPEAR_MS = 1_200;

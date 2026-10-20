@@ -18,7 +18,7 @@ import {
   listPackRows,
   isToolItem,
   getItemUseInfo,
-} from '../public/js/inventory.js?v=catalog-unified-2';
+} from '../public/js/inventory.js?v=catalog-unified-3';
 import { starterToolsInventory, ensureMakingItems } from '../public/js/making.js';
 import {
   createQuestState,
@@ -169,7 +169,7 @@ describe('pack / inventory', () => {
       '../public/js/world-items.js',
     ].map((path) => readFileSync(join(__dirnameUi, path), 'utf8'));
     for (const source of files) {
-      assert.match(source, /inventory\.js\?v=catalog-unified-2/);
+      assert.match(source, /inventory\.js\?v=catalog-unified-3/);
       assert.doesNotMatch(source, /inventory\.js\?v=(?:pack-actions-1|butterfly-care-1)/);
     }
     const game = files[0];

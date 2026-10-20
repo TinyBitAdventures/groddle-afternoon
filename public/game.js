@@ -3,6 +3,9 @@
  * PixiJS 7 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=social-follow-1';
+import { createFeatureHost } from './js/feature-host.js?v=features-1';
+import { hellFeature } from './js/features/hell-feature.js?v=hell-1';
+import { questFlagsFeature } from './js/features/quest-flags-feature.js?v=flags-1';
 import {
   actionDurationFor,
   createTimedAction,
@@ -363,7 +366,7 @@ import {
   ensureItem,
   addItem,
   removeItem,
-} from './js/inventory.js?v=catalog-unified-2';
+} from './js/inventory.js?v=catalog-unified-3';
 import {
   packPagerState,
   packPageTarget,
@@ -383,7 +386,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=homes-mail-2';
+} from './js/player-save.js?v=features-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_PURCHASE_COST,
@@ -419,7 +422,7 @@ import {
   quoteToolRepair,
   repairToolCondition,
   setToolRemaining,
-} from './js/tools.js?v=butterfly-care-1';
+} from './js/tools.js?v=tools-2';
 import {
   listRecipes,
   listRecipesForTool,
@@ -442,7 +445,7 @@ import {
   starterToolsInventory,
   starterCraftIngredients,
   hasTool,
-} from './js/making.js?v=catalog-unified-2';
+} from './js/making.js?v=recipes-full-1';
 import {
   createGarden,
   tickGarden,
@@ -534,7 +537,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=food-memory-1';
+} from './js/food.js?v=food-memory-2';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -618,7 +621,7 @@ import {
   listBuyOffers,
   listSellOffers,
   createVendorSellQuote,
-} from './js/vendor.js?v=catalog-unified-2';
+} from './js/vendor.js?v=stores-1';
 import {
   createAnimalState,
   resetAnimalDay,
@@ -691,7 +694,7 @@ import {
   populationForStreet,
   planStreetPlacements,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=official-ecology-2';
+} from './js/street-ecology.js?v=official-ecology-3';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1636,11 +1639,12 @@ async function enterStreetWithTransition(tsid, opts = {}) {
     STREET_INDEX.streets?.[String(tsid).replace(/^L/, 'G')] ||
     {};
   const winterLabel = winterLocationLabel(tsid);
-  const toLabel = winterLabel?.street || LAST_FEAT_STREET_LABELS[tsid] ||
+  const featureLabel = features.query('labelFor', tsid, engine);
+  const toLabel = featureLabel?.street || winterLabel?.street || LAST_FEAT_STREET_LABELS[tsid] ||
     (tsid === AXIS_DENYDE_STREET_ID ? 'Axis Denyde' : meta.label || tsid);
-  const toHub = winterLabel?.hub ||
+  const toHub = featureLabel?.hub || winterLabel?.hub ||
     (tsid === AXIS_DENYDE_STREET_ID ? 'Pollokoo' : meta.hubName || '');
-  const hubId = meta.hubId || currentStreet?.hubId;
+  const hubId = featureLabel?.hubId || meta.hubId || currentStreet?.hubId;
   const colors = await resolveHubColors(hubId);
   const loadingImg = resolveLoadingImg(tsid);
 
@@ -3053,6 +3057,11 @@ function usePackItem(classTsid) {
     ordinaryInfo?.usable && ordinaryInfo.effects?.energy && ordinaryInfo.kind !== 'drink'
   );
   if (isFood) {
+    const deadGate = features.metabolicGate('energy', 'gain', engine);
+    if (!deadGate.ok) {
+      toast(deadGate.msg);
+      return;
+    }
     const gate = canEatFood(foodState, pc, 100);
     if (!gate.ok) {
       toast(gate.reason);
@@ -3326,6 +3335,67 @@ function playSfx(name, { volume = 0.7, rate = 1 } = {}) {
   src.connect(g);
   g.connect(audio.sfxGain);
   src.start(0);
+}
+
+/**
+ * Procedural sound effects for client sound keys with no recovered file
+ * (CROAK, SQUISH_GRAPES have no entry in the archived sound map).
+ * @param {'croak'|'squish'} name
+ */
+function playSynthSfx(name) {
+  if (state.muted || !audio.ctx) return;
+  const ctx = audio.ctx;
+  const t0 = ctx.currentTime;
+  const out = ctx.createGain();
+  out.connect(audio.sfxGain);
+  if (name === 'croak') {
+    // A comic descending "bwoooomp" with a soft low thud underneath.
+    const osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(420, t0);
+    osc.frequency.exponentialRampToValueAtTime(70, t0 + 0.9);
+    const thud = ctx.createOscillator();
+    thud.type = 'sine';
+    thud.frequency.setValueAtTime(90, t0 + 0.75);
+    thud.frequency.exponentialRampToValueAtTime(40, t0 + 1.15);
+    out.gain.setValueAtTime(0.0001, t0);
+    out.gain.exponentialRampToValueAtTime(0.5, t0 + 0.04);
+    out.gain.exponentialRampToValueAtTime(0.2, t0 + 0.8);
+    out.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.25);
+    osc.connect(out);
+    thud.connect(out);
+    osc.start(t0);
+    thud.start(t0 + 0.75);
+    osc.stop(t0 + 1.3);
+    thud.stop(t0 + 1.3);
+    return;
+  }
+  // Squish: a wet, low-passed noise burst with a quick downward blip.
+  const length = Math.floor(ctx.sampleRate * 0.28);
+  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < length; i += 1) data[i] = (Math.random() * 2 - 1) * (1 - i / length) ** 2;
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1800, t0);
+  filter.frequency.exponentialRampToValueAtTime(260, t0 + 0.25);
+  const blip = ctx.createOscillator();
+  blip.type = 'sine';
+  blip.frequency.setValueAtTime(260, t0);
+  blip.frequency.exponentialRampToValueAtTime(90, t0 + 0.18);
+  const blipGain = ctx.createGain();
+  blipGain.gain.setValueAtTime(0.35, t0);
+  blipGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.2);
+  out.gain.setValueAtTime(0.6, t0);
+  noise.connect(filter);
+  filter.connect(out);
+  blip.connect(blipGain);
+  blipGain.connect(out);
+  noise.start(t0);
+  blip.start(t0);
+  blip.stop(t0 + 0.22);
 }
 
 function playMusicblockAudio(def) {
@@ -4066,7 +4136,7 @@ function showMusicblockFx(def) {
 function openVerbMenu(target) {
   if (currentAction) return;
   menuTarget = target;
-  const verbs = getVerbsFor(target, {
+  const verbs = features.verbsFor(target, engine) ?? getVerbsFor(target, {
     pc,
     inv,
     tools: toolState,
@@ -4480,6 +4550,7 @@ const SPEECH_REACTION_VERBS = new Set([
 ]);
 
 function executeVerb(target, verbId) {
+  if (features.runVerb(target, verbId, engine)) return;
   if (target?.classId === 'pc_local') {
     handleLocalCompanionTarget(target, verbId);
     return;
@@ -6013,6 +6084,117 @@ function register(target) {
   return target;
 }
 
+function unregisterTarget(target) {
+  if (!target) return;
+  if (hoverTarget === target) clearHoverGlow();
+  interactables = interactables.filter((entry) => entry !== target);
+  if (target.sprite?.parent) target.sprite.parent.removeChild(target.sprite);
+  if (target.sprite && !target.sprite.destroyed) target.sprite.destroy({ children: true });
+}
+
+// —— Feature modules (js/feature-host.js) ——
+// Each feature lives in one file and reaches the world only through `engine`.
+const features = createFeatureHost([questFlagsFeature, hellFeature]);
+
+function anyTransientInstance() {
+  return [
+    deEmbiggenifyIsInstanced,
+    fourLetterIsInstanced,
+    greedyStreetIsInstanced,
+    hogHaulIsInstanced,
+    legalizeIsInstanced,
+    paradiseIsInstanced,
+    rookMuseumIsInstanced,
+    rookWoodsIsInstanced,
+    summersDayIsInstanced,
+    winterWalkIsInstanced,
+  ].some((isInstanced) => isInstanced());
+}
+
+/** The engine API features use instead of reaching into game.js state. */
+const engine = {
+  PIXI,
+  get started() {
+    return state.started === true;
+  },
+  get entityLayer() {
+    return entityLayer;
+  },
+  get fxLayer() {
+    return fxLayer;
+  },
+  get player() {
+    return player;
+  },
+  get pc() {
+    return pc;
+  },
+  get inv() {
+    return inv;
+  },
+  get street() {
+    return currentStreet;
+  },
+  get streetTsid() {
+    return currentStreetTsid;
+  },
+  get groundY() {
+    return GROUND_Y;
+  },
+  get worldW() {
+    return WORLD_W;
+  },
+  register,
+  unregister: unregisterTarget,
+  toast,
+  pushActivity,
+  updateHud,
+  playSfx,
+  playSynth: playSynthSfx,
+  save: () => savePlayerState(),
+  setData(key, value) {
+    if (app?.view) app.view.dataset[key] = String(value);
+  },
+  param(name) {
+    return new URLSearchParams(location.search).get(name);
+  },
+  achievement(counter, amount = 1) {
+    announceAchievementUpdates(applyAchievementProgress(achieveState, counter, amount, pc));
+  },
+  questFlag(flag) {
+    questFlagsFeature.set(flag);
+  },
+  prompt({ title = '', kicker = '', text = '' } = {}) {
+    openScriptedQuestDialogue({
+      title,
+      kicker,
+      beats: [{ text, response: 'OK' }],
+      cancelable: true,
+    });
+  },
+  stopFollowing: () => stopCompanionFollowForInstance(),
+  transientInstance: anyTransientInstance,
+  homeContext() {
+    return { inHome: homeIsInstanced(), room: homeState.room || 'street' };
+  },
+  streetExists(tsid) {
+    if (tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID) return homeState.owned === true;
+    return Boolean(resolveIndexTsid(tsid));
+  },
+  /** Feature-driven travel: home rooms, ordinary streets, gate bypass. */
+  async enter(tsid, opts = {}) {
+    if (tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID) {
+      homeState.inHome = true;
+      homeState.room = tsid === HOME_INTERIOR_TSID ? 'interior' : 'street';
+      await renderHomeScene(homeState.room, { spawnX: opts.spawnX });
+      return;
+    }
+    if (homeIsInstanced()) homeState.inHome = false;
+    const resolved = resolveIndexTsid(tsid) || tsid;
+    await enterStreetWithTransition(resolved, opts);
+  },
+};
+
 function streetWorldState(tsid = currentStreetTsid) {
   const key = String(tsid || currentStreetTsid);
   if (!persistentWorldState.streets[key]) {
@@ -6794,6 +6976,7 @@ function persistentSystems() {
     emotionalBear: emotionalBearState,
     home: homeState,
     mailbox: mailboxState,
+    features: features.save(),
   };
 }
 
@@ -6962,6 +7145,7 @@ async function maybeNewDay(opts = {}) {
   const quoinReset = resetQuoinDay(quoinState, pc.imaginationUpgrades);
   resetFoodDay(foodState);
   resetStreetCollectiblesForNewDay();
+  features.newDay(Date.now(), engine);
   updateHud();
   pushActivity(
     `A new day — energy refilled (+${Math.round(refill.energyGained)}) · mood restored` +
@@ -7082,6 +7266,13 @@ function performPlayerJump(result, baseVelocity, now) {
   updateHud();
 }
 
+/** Buff physics with feature multipliers (e.g. Pooped) folded in. */
+function combinedPhysics() {
+  const base = buffPhysics(buffState, Date.now());
+  const extra = features.physics(engine);
+  return { ...base, speed: base.speed * extra.speed, jump: base.jump * extra.jump };
+}
+
 function handleInput() {
   if (gameplayInputBlocked()) {
     player.vx = 0;
@@ -7100,7 +7291,7 @@ function handleInput() {
     handleSummersDayBuoyancyInput();
     return;
   }
-  if (pc.energy <= 0) {
+  if (pc.energy <= 0 && features.query('allowZeroEnergyMovement', engine) !== true) {
     player.vx *= 0.85;
     if (climb.active) stopClimb();
     clearJumpQueue(jumpState);
@@ -7113,7 +7304,7 @@ function handleInput() {
   const down = keys.has('ArrowDown') || keys.has('s') || keys.has('S');
   const jumpRequested = hasQueuedJump(jumpState, now);
   const climbHit = findClimbWallNear(streetWalls, player.x, player.y, 40);
-  const movementBuff = buffPhysics(buffState, Date.now());
+  const movementBuff = combinedPhysics();
 
   // —— Climbing (original walls + trunk_ladder zones) ——
   if (climb.active) {
@@ -7279,8 +7470,13 @@ function physics(dt) {
   state.energyTick += dt;
   if (state.energyTick > 40 && !paradiseIsInstanced()) {
     state.energyTick = 0;
-    if (Math.abs(player.vx) > 0.5) pc.energy = clamp(pc.energy - 0.6, 0, 100);
-    else pc.energy = clamp(pc.energy + 0.5, 0, 100);
+    if (Math.abs(player.vx) > 0.5) {
+      if (features.metabolicGate('energy', 'loss', engine).ok) {
+        pc.energy = clamp(pc.energy - 0.6, 0, 100);
+      }
+    } else if (features.metabolicGate('energy', 'gain', engine).ok) {
+      pc.energy = clamp(pc.energy + 0.5, 0, 100);
+    }
     updateHud();
   }
 
@@ -16135,6 +16331,7 @@ function clearWorldEntities() {
     if (spr === player) continue;
     entityLayer.removeChild(spr);
   }
+  features.streetClear(engine);
   interactables = [];
   piggies = [];
   chickens = [];
@@ -16224,6 +16421,17 @@ function clearWorldEntities() {
  * @param {{ spawnX?: number, spawnY?: number, quiet?: boolean }} [opts]
  */
 async function enterStreet(tsid, opts = {}) {
+  if (!opts.bypassFeatureGates) {
+    const redirect = features.enterGate(tsid, engine);
+    if (redirect?.tsid && redirect.tsid !== tsid) {
+      return enterStreet(resolveIndexTsid(redirect.tsid) || redirect.tsid, {
+        ...opts,
+        spawnX: redirect.spawnX,
+        spawnY: redirect.spawnY,
+        bypassFeatureGates: true,
+      });
+    }
+  }
   if (featState.nextStep !== 1) {
     resetIncantationChain(featState);
     assistedFeatChain = null;
@@ -16241,6 +16449,7 @@ async function enterStreet(tsid, opts = {}) {
     // screen preserves the original Alphermia Prime attribution.
     data.hubName = 'Alphermia Prime';
   }
+  features.prepareStreet(data, engine);
   currentStreet = data;
   currentStreetTsid = data.tsid;
   WORLD_W = streetWidth(data);
@@ -16268,7 +16477,7 @@ async function enterStreet(tsid, opts = {}) {
   // Tiny Speck's late-game location objects retain each street's real item
   // population. Allocate all of it in one pass so independent systems never
   // reuse the same handful of platform points or bury the arrival spot.
-  const ecologyEntry = ecologyForStreet(data.tsid);
+  const ecologyEntry = features.ecologyOverride(data, engine) || ecologyForStreet(data.tsid);
   currentStreetPopulation = populationForStreet(data.tsid, ecologyEntry, {
     starter: data.tsid === STREET_INDEX.default,
   });
@@ -16411,6 +16620,7 @@ async function enterStreet(tsid, opts = {}) {
   }
   spawnPhantomQuestEncounter();
   spawnIlmenskieJones();
+  features.streetEnter(data, engine, opts);
   if (app?.view) {
     const pop = currentStreetPopulation;
     app.view.dataset.ecologySource = pop.source;
@@ -16471,6 +16681,11 @@ async function enterStreet(tsid, opts = {}) {
  * @param {{ label?: string }} [meta]
  */
 async function travelTo(toTsid, meta = {}) {
+  const featureGate = features.travelGate(toTsid, engine);
+  if (!featureGate.ok) {
+    toast(featureGate.msg || 'You cannot travel there right now.');
+    return { ok: false, reason: 'feature_gate' };
+  }
   if (homeIsInstanced()) {
     toast('Use the World Gate to return from home.');
     return { ok: false, reason: 'home_instance' };
@@ -19587,6 +19802,7 @@ async function main() {
   await loadSheets();
   await loadTrantTables();
   await loadAudio();
+  features.init(engine);
 
   world = new PIXI.Container();
   entityLayer = new PIXI.Container();
@@ -19680,10 +19896,13 @@ async function main() {
   droppedItemState = loadDroppedItems();
   const savedPlayerState = loadPlayerState();
   if (savedPlayerState) {
+    const savedFeatureSlices = {};
     restorePlayerSave(savedPlayerState, inv, pc, {
       ...persistentSystems(),
+      features: savedFeatureSlices,
       world: persistentWorldState,
     });
+    features.restore(savedFeatureSlices, engine);
     restoreAnimalStateCache();
     rehydrateSavedBuffs();
     const mainQuests = ['animalkinship_pet_piggies', 'animalkinship_milk_butterflies'];
@@ -19820,7 +20039,10 @@ async function main() {
       : Math.max(1, Math.floor(TOOL_CONDITION_CATALOG[toolDemo].capacity * 0.12));
     setToolRemaining(toolState, toolDemo, requested);
   }
-  const savedLoc = bootParams.has('fresh') ? null : resolveSavedLocation(loadPlayerLocation());
+  const featureStart = features.query('reloadLocation', loadPlayerLocation(), engine);
+  const savedLoc = featureStart
+    ? resolveSavedLocation(featureStart)
+    : bootParams.has('fresh') ? null : resolveSavedLocation(loadPlayerLocation());
   const stootDemoTsid = bootParams.has('stootdemo')
     ? resolveIndexTsid(STOOT_MEMORIAL_STREET_ID)
     : null;
@@ -21143,6 +21365,7 @@ async function main() {
     updateParadiseFlight(dt);
     updateIlmenskieAutoplay();
     updateSpinningWheel();
+    features.tick((1000 / 60) * dt, Date.now(), engine);
 
     buffTickAccum += dt;
     if (buffTickAccum >= 24) {

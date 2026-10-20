@@ -19,7 +19,7 @@ import {
   createInventory,
   ensureItem,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=catalog-unified-2';
+} from '../public/js/inventory.js?v=catalog-unified-3';
 import {
   createDroppedItemState,
   dropInventoryStack,
@@ -120,7 +120,7 @@ test.describe('pull-string interaction', () => {
     assert.match(game, /stootdollpickupautoplay/);
     assert.match(game, /dataset\.droppedStootDolls/);
     assert.match(game, /useInfo\.singleAction \? 'Item' : 'Consumable'/);
-    assert.match(game, /inventory\.js\?v=catalog-unified-2/);
+    assert.match(game, /inventory\.js\?v=catalog-unified-3/);
     assert.doesNotMatch(game, /inventory\.js\?v=catalog-unified-1/);
     assert.match(content, /classId === 'stoot_barfield_pullstring_doll'/);
     assert.match(content, /add\('pull_string', 'pull string'/);

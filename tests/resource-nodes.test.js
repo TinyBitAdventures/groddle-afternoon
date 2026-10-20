@@ -31,7 +31,7 @@ import {
   resourceItemIds,
   sheetFrameRect,
 } from '../public/js/resource-nodes.js';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-2';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-3';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,

@@ -12,7 +12,7 @@
  * contract, two-minute timer, Crusher cycle, tool gates, and four-hit Egg smash.
  */
 
-import { canUseTool } from './tools.js?v=butterfly-care-1';
+import { canUseTool } from './tools.js?v=tools-2';
 
 export const ROOK_QUEST_ID = 'rook_egg_smash';
 export const ROOK_WOODS_STREET_ID = 'LLI1AD8LUCH109E';

@@ -6,7 +6,7 @@
  * was last heard. The recovered public-domain MP3s below are shipped locally.
  */
 
-import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-2';
+import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-3';
 import { GAME_DAY_MS } from './game-day.js';
 
 export const MUSICBLOCK_MONTH_MS = Math.round(30.5 * 24 * 60 * 60 * 1000);

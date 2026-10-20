@@ -17,8 +17,8 @@ import {
   countItem,
   ensureItem,
   itemIcon,
-} from './inventory.js?v=catalog-unified-2';
-import { canUseTool, useToolCondition } from './tools.js?v=tool-condition-1';
+} from './inventory.js?v=catalog-unified-3';
+import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 
 /**
  * @typedef {{

@@ -25,7 +25,7 @@ import {
   countItem,
   createInventory,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=catalog-unified-2';
+} from '../public/js/inventory.js?v=catalog-unified-3';
 import {
   applyAchievementProgress,
   createAchievementState,

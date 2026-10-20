@@ -6,7 +6,7 @@
  * limit, maturity production curve, energy cost, and Hatchet wear.
  */
 
-import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-1';
+import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 
 export const WOOD_TREE_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 

@@ -1,15 +1,16 @@
 /** Persistent player systems + per-street world snapshot. */
 import { normalizeShrineState } from './shrines.js?v=shrines-1';
 import { normalizeQuoinState } from './quoins.js?v=quoins-1';
-import { normalizeToolConditionState } from './tools.js?v=butterfly-care-1';
+import { normalizeToolConditionState } from './tools.js?v=tools-2';
 import { normalizeSkillState } from './skills.js?v=study-1';
-import { normalizeFoodState } from './food.js?v=food-memory-1';
+import { normalizeFoodState } from './food.js?v=food-memory-2';
 import { createGhostQuestState } from './ghost-quest.js?v=phantom-1';
 import { normalizeParadiseState } from './paradise-flight.js?v=paradise-flight-2';
 import { normalizeFeatSnapshot } from './feats.js?v=incantations-2';
 import { normalizeEmotionalBearState } from './emotional-bear.js?v=emotional-bear-1';
 import { normalizeHomeState } from './homes.js?v=homes-mail-1';
 import { normalizeMailboxState } from './mailbox.js?v=homes-mail-1';
+import { normalizeFeatureSlices } from './feature-host.js?v=features-1';
 
 export const PLAYER_SAVE_VERSION = 7;
 
@@ -193,6 +194,7 @@ export function normalizeSystemsSnapshot(seed = {}) {
     emotionalBear: normalizeEmotionalBearState(seed?.emotionalBear),
     home: normalizeHomeState(seed?.home),
     mailbox: normalizeMailboxState(seed?.mailbox),
+    features: normalizeFeatureSlices(seed?.features),
   };
 }
 
@@ -345,6 +347,7 @@ export function restorePlayerSave(snapshot, inventory, player, targets = {}) {
   replace(targets.emotionalBear, normalized.systems.emotionalBear);
   replace(targets.home, normalized.systems.home);
   replace(targets.mailbox, normalized.systems.mailbox);
+  replace(targets.features, normalized.systems.features);
   replace(targets.world, normalized.world);
   return true;
 }

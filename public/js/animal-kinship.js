@@ -16,7 +16,7 @@ import {
   canUseTool,
   setToolRemaining,
   useToolCondition,
-} from './tools.js?v=butterfly-care-1';
+} from './tools.js?v=tools-2';
 
 export const ANIMAL_KINSHIP_RANK_IDS = Object.freeze(
   Array.from({ length: 7 }, (_, index) => `animalkinship_${index + 1}`)
