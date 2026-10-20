@@ -2,7 +2,7 @@
 //
 // Usage: node tools/playtest.mjs <scenario...> [--width=1280] [--height=860]
 //          [--swiftshader] [--headed] [--out=shots/playtest] [--fresh]
-// Scenarios: newplayer, travel, naraka, rook, long, resize, perf, all.
+// Scenarios: newplayer, travel, naraka, rook, fuzz, long, resize, perf, all.
 //
 // Plays like a real player: no demo/QA params beyond autostart/fresh/resetgame,
 // keyboard walking, E menus, HUD buttons, signposts, the Map. It drives one
@@ -20,7 +20,7 @@ const flags = Object.fromEntries(argv.filter((a) => a.startsWith('--')).map((a) 
   return [k, v ?? true];
 }));
 let scenarios = argv.filter((a) => !a.startsWith('--'));
-if (!scenarios.length || scenarios.includes('all')) scenarios = ['newplayer', 'travel', 'naraka', 'rook', 'long', 'resize', 'perf'];
+if (!scenarios.length || scenarios.includes('all')) scenarios = ['newplayer', 'travel', 'naraka', 'rook', 'fuzz', 'long', 'resize', 'perf'];
 const OUT = flags.out || 'shots/playtest';
 const BASE = 'https://groddle.localhost/';
 const NOISE = /GL Driver Message|AudioContext was not allowed|WebGL: INVALID|GPU stall|swiftshader/i;
@@ -925,6 +925,73 @@ const SCENARIOS = {
     await t.goto('?autostart=1', 4000);
     const r = await t.data();
     t.note(`reload: phase=${r.rookPhase} rooked=${r.rookRooked} next=${r.rookNextAttack}`);
+  },
+
+  async fuzz(t) {
+    // Every distinct interactable class on a run of streets: open its menu and
+    // use the first enabled verb. Catches errors where features meet.
+    await t.goto('?autostart=1&resetgame=1&fresh=1&questoffer=off', 3000);
+    const streets = Number(flags.streets || 6);
+    const tried = new Set();
+    for (let n = 0; n < streets; n++) {
+      const s = await t.snap();
+      t.step = `fuzz ${s.street.label}`;
+      const classes = [...new Set(s.interactables.map((i) => i.classId))].filter((c) => !tried.has(c));
+      for (const cls of classes.slice(0, 10)) {
+        tried.add(cls);
+        // A real player eats before croaking (the naraka scenario covers croaks).
+        if ((await t.snap()).player.energy < 30) {
+          await t.page.keyboard.press('f');
+          await t.wait(400);
+        }
+        const target = await t.find(new RegExp(`^${cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`));
+        if (!target) continue;
+        const menu = await t.approach(target);
+        if (!menu) {
+          const ov = await t.overlays();
+          if (Object.keys(ov).filter((k) => k !== 'toast').length) {
+            t.note(`${cls}: opened ${Object.keys(ov).join(',')} directly`);
+            await t.page.keyboard.press('Escape');
+            await t.wait(300);
+            await t.page.keyboard.press('Escape');
+          } else t.note(`${cls}: no menu`);
+          continue;
+        }
+        const usable = menu.verbs.filter((v) => !v.disabled && !/^(drop|set free|pick up|sell|give|apply|hire|destroy|unlearn)/i.test(v.text));
+        const tired = (await t.snap()).player.energy < 30;
+        const verb = (tired && usable.find((v) => /^(talk|inspect|look|read|examine|browse|view)/i.test(v.text))) || (tired ? null : usable[0]);
+        if (!verb) {
+          t.note(`${cls}: all verbs disabled [${menu.verbs.map((v) => v.text.split(' ').slice(0, 2).join(' ')).join(', ')}]`);
+          await t.closeMenus();
+          continue;
+        }
+        const word = verb.text.split(' ')[0];
+        await t.chooseVerb(new RegExp(`^${word}`));
+        await t.waitAction(15000);
+        await t.wait(600);
+        const ov = await t.overlays();
+        const line = await t.page.evaluate(() => document.querySelector('#activity-history > *')?.textContent.trim() || '');
+        t.note(`${cls} ${word}: ${line.slice(0, 90)} ${Object.keys(ov).filter((k) => k !== 'toast').join(',')}`);
+        await t.clearAwards();
+        for (let i = 0; i < 3; i++) {
+          const open = Object.keys(await t.overlays()).filter((k) => k !== 'toast');
+          if (!open.length) break;
+          await t.declineOffer();
+          await t.page.keyboard.press('Escape');
+          await t.wait(400);
+        }
+        const left = Object.keys(await t.overlays()).filter((k) => k !== 'toast');
+        if (left.length) t.issue('ui', `${cls} ${word}: ${left.join(',')} would not close with Esc`);
+      }
+      // Next street through the right-most signpost.
+      const posts = s.signposts.filter((p) => p.to);
+      if (!posts.length) break;
+      const post = posts[(n * 7) % posts.length];
+      await t.walkTo(post.x, { tol: 40, maxMs: 40000 });
+      await t.page.keyboard.press('t');
+      await t.waitFor((tsid) => window.groddleQA.snapshot().street?.tsid !== tsid, 20000, s.street.tsid);
+      await t.wait(2500);
+    }
   },
 
   async long(t) {
