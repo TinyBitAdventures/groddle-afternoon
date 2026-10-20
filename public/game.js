@@ -4,10 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=social-follow-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-1';
-import { hellFeature } from './js/features/hell-feature.js?v=hell-1';
-import { resourceNodesFeature } from './js/features/resource-nodes-feature.js?v=resource-nodes-1';
-import { questFlagsFeature } from './js/features/quest-flags-feature.js?v=flags-1';
-import { questOffersFeature } from './js/features/quest-offers-feature.js?v=offers-1';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-1';
 import {
   actionDurationFor,
   createTimedAction,
@@ -6129,7 +6126,7 @@ function unregisterTarget(target) {
 
 // —— Feature modules (js/feature-host.js) ——
 // Each feature lives in one file and reaches the world only through `engine`.
-const features = createFeatureHost([questFlagsFeature, hellFeature, resourceNodesFeature, questOffersFeature]);
+const features = createFeatureHost(FEATURES);
 
 function anyTransientInstance() {
   return [
