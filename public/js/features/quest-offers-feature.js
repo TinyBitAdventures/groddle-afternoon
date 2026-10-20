@@ -1,0 +1,170 @@
+/**
+ * The Magic Rock's quest offers (js/quest-offers.js) as a feature module.
+ *
+ * Offers arrive one at a time like the original familiar: checked shortly
+ * after a street loads and every 30 seconds, never while a dialogue, award,
+ * timed action, or private instance is in progress. Accepted quests advance
+ * from every badge counter the game emits (onEvent) and from the pack (item
+ * and currant requirements), and turn in automatically when complete. Story
+ * and starter quests keep their own progress path (managedOnly routing).
+ *
+ * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=now offers the first
+ * pending quest immediately; &questofferautoplay=accept accepts it.
+ */
+
+import {
+  acceptOffer,
+  declineOffer,
+  ensureQuestOfferState,
+  markOffered,
+  nextQuestOffer,
+  questAwardPayload,
+  routeQuestEvent,
+  syncItemRequirements,
+  tickQuestTimers,
+  turnInQuest,
+} from '../quest-offers.js';
+import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-3';
+
+const OFFER_CHECK_MS = 30_000;
+const STREET_ENTER_DELAY_MS = 4_000;
+const SYNC_MS = 1_000;
+
+let nextOfferCheckAt = 0;
+let nextSyncAt = 0;
+let offerOpen = false;
+/** Pack counts at the last sync, for `in_inventory:<item>` gain events. */
+let lastPack = null;
+// Musicblocks and Cubimals already emit in_inventory through their badges.
+const PACK_GAIN_SKIP = /^(musicblock_|npc_cubimal_)/;
+
+function questContext(engine, now = Date.now()) {
+  const street = engine.street || {};
+  return {
+    level: engine.pc.level,
+    xp: engine.pc.xp,
+    skills: engine.learnedSkills,
+    achievements: engine.unlockedAchievements,
+    inv: engine.inv,
+    buffs: engine.activeBuffIds(),
+    hub: street.hubId || '',
+    street: street.label || '',
+    streetTsid: engine.streetTsid,
+    now,
+    pc: engine.pc,
+    addItem,
+    removeItem,
+    countItem,
+    managedOnly: true,
+  };
+}
+
+function finish(rows, engine) {
+  for (const row of rows || []) {
+    const done = turnInQuest(engine.questState, row.classTsid, engine.pc, questContext(engine));
+    if (!done.ok) continue;
+    engine.playSfx('quest', { volume: 0.6 });
+    engine.award(questAwardPayload(row.def, done.rewards || {}));
+    engine.pushActivity(`Quest complete: ${row.def.title}`);
+    engine.refreshPack();
+    engine.save();
+    nextOfferCheckAt = Math.min(nextOfferCheckAt, Date.now() + STREET_ENTER_DELAY_MS);
+  }
+}
+
+function presentOffer(engine, now = Date.now()) {
+  if (offerOpen || engine.busy()) return false;
+  const qs = engine.questState;
+  const card = nextQuestOffer(qs, engine.pc, questContext(engine, now));
+  if (!card || card.waiting) {
+    if (card?.waiting) nextOfferCheckAt = now + Math.max(1_000, card.waiting);
+    return false;
+  }
+  markOffered(qs, card.classTsid, now);
+  offerOpen = true;
+  engine.setData('questOffer', card.classTsid);
+  engine.playSfx('alert', { volume: 0.5 });
+  const accept = () => {
+    offerOpen = false;
+    const result = acceptOffer(qs, card.classTsid, questContext(engine));
+    engine.setData('questOfferResult', result.ok ? 'accepted' : result.reason || 'failed');
+    if (result.ok) {
+      engine.pushActivity(`New quest: ${card.def.title}`);
+      engine.refreshPack();
+      if (result.completable) finish([{ classTsid: card.classTsid, def: card.def }], engine);
+    }
+    engine.save();
+  };
+  const decline = () => {
+    offerOpen = false;
+    declineOffer(qs, card.classTsid, Date.now());
+    engine.setData('questOfferResult', 'declined');
+    engine.pushActivity(`You can accept “${card.def.title}” from your quest log later.`);
+    engine.save();
+  };
+  engine.offerQuestDialogue({
+    title: card.def.title,
+    kicker: 'Magic Rock',
+    beats: card.beats,
+    acceptLabel: card.acceptLabel,
+    declineLabel: card.declineLabel,
+    onAccept: accept,
+    onDecline: decline,
+  });
+  if (engine.param('questofferautoplay') === 'accept') setTimeout(() => engine.acceptOpenOffer(), 400);
+  return true;
+}
+
+export const questOffersFeature = {
+  id: 'quest-offers',
+
+  init(engine) {
+    ensureQuestOfferState(engine.questState);
+    nextOfferCheckAt = Date.now() + (engine.param('questoffer') === 'now' ? 1_500 : 12_000);
+  },
+
+  onStreetEnter(street, engine) {
+    nextOfferCheckAt = Math.min(
+      nextOfferCheckAt || Infinity,
+      Date.now() + (engine.param('questoffer') === 'now' ? 1_500 : STREET_ENTER_DELAY_MS)
+    );
+  },
+
+  onEvent(counter, amount, engine) {
+    const result = routeQuestEvent(engine.questState, counter, amount, questContext(engine));
+    if (result.advanced.length) engine.updateHud();
+    finish(result.completable, engine);
+  },
+
+  onTick(dtMs, now, engine) {
+    if (!engine.started) return;
+    if (offerOpen && !engine.questDialogueOpen()) {
+      // Closed with Escape: treat it as "Not right now".
+      offerOpen = false;
+      const pending = Object.keys(ensureQuestOfferState(engine.questState).offered);
+      for (const id of pending) declineOffer(engine.questState, id, now);
+      engine.save();
+    }
+    if (now >= nextSyncAt) {
+      nextSyncAt = now + SYNC_MS;
+      const qs = engine.questState;
+      const failed = tickQuestTimers(qs, now);
+      for (const id of failed) engine.pushActivity('A timed quest ran out of time. You can restart it from the quest log.');
+      const pack = { ...engine.inv };
+      if (lastPack) {
+        for (const [id, count] of Object.entries(pack)) {
+          const gained = (Number(count) || 0) - (Number(lastPack[id]) || 0);
+          if (gained > 0 && !PACK_GAIN_SKIP.test(id)) this.onEvent(`in_inventory:${id}`, gained, engine);
+        }
+      }
+      lastPack = pack;
+      const sync = syncItemRequirements(qs, engine.inv, questContext(engine, now));
+      if (sync.advanced?.length) engine.updateHud();
+      finish(sync.completable, engine);
+    }
+    if (now >= nextOfferCheckAt) {
+      nextOfferCheckAt = now + OFFER_CHECK_MS;
+      presentOffer(engine, now);
+    }
+  },
+};

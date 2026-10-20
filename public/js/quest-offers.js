@@ -120,6 +120,7 @@ export function normalizeQuestOfferState(seed = {}) {
     declined: cleanTimeMap(src.declined),
     failed: cleanTimeMap(src.failed),
     repeats: cleanTimeMap(src.repeats),
+    managed: cleanTimeMap(src.managed),
     queue,
     lastOfferAt: Math.max(0, finiteInt(src.lastOfferAt, 0)),
     timers,
@@ -551,6 +552,9 @@ export function acceptOffer(questState, classTsid, ctx = {}) {
   delete offers.declined[classTsid];
   delete offers.failed[classTsid];
   delete offers.distinct[classTsid];
+  // Quests this engine handed out; legacy story/starter quests keep their own
+  // progress path and are skipped by managedOnly routing.
+  offers.managed[classTsid] = now;
   offers.queue = offers.queue.filter((id) => id !== classTsid);
   const given = [];
   for (const item of def.giveItems || []) {
@@ -740,7 +744,21 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'making_tool:{a}' },
   { event: 'shrines_donated:{a}' },
   { event: 'emblems_acquired:{a}' },
-  { event: 'in_inventory:{a}', note: 'musicblocks and cubimals only' },
+  { event: 'in_inventory:{a}', note: 'every pack gain (quest-offers feature diff)' },
+  // game.js emitGameEvent (2026-10-19)
+  { event: '{a}:{b}', note: 'every successful world verb and pack use' },
+  { event: 'rocks_depleted:{a}' },
+  { event: 'making_recipe:{a}' },
+  { event: 'making_tool_output:{a}:{b}' },
+  { event: 'vendor_bought:{a}' },
+  { event: 'vendor_sold:{a}' },
+  { event: 'skill_learned:{a}' },
+  { event: 'tool_repaired:{a}' },
+  { event: 'garden_harvest:{a}' },
+  { event: 'herb_harvest:{a}' },
+  { event: 'mail_sent' },
+  { event: 'street_first_visit:{a}' },
+  { event: 'street_entered:{a}' },
   { event: 'cubimals_freed:{a}' },
   { event: 'musicblocks_played:{a}' },
   { event: 'feats:contributed' },
@@ -938,6 +956,7 @@ function routableQuests(questState, ctx) {
   const catalog = getQuestCatalog();
   return Object.keys(questState.active || {})
     .filter((id) => !offers.failed[id] && (!ctx.only || ctx.only === id))
+    .filter((id) => !ctx.managedOnly || offers.managed[id])
     .map((id) => ({ id, quest: questState.active[id], def: catalog[id] }))
     .filter((row) => row.def);
 }

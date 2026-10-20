@@ -14,6 +14,7 @@
  *   onStreetClear(engine),                // drop references before entities are destroyed
  *   onTick(dtMs, now, engine),            // every frame
  *   onNewDay(now, engine),
+ *   onEvent(counter, amount, engine)      // every badge counter the game emits
  *   verbsFor(target, engine)              // -> verb list | null for targets it owns
  *   runVerb(target, verbId, engine)       // -> true when handled
  *   travelGate(tsid, engine)              // -> { ok:false, msg } blocks map travel
@@ -88,6 +89,10 @@ export function createFeatureHost(features = []) {
     },
     newDay(now, engine) {
       each('onNewDay', now, engine);
+    },
+    /** A game event counter (`group:label`, the badge counters) and amount. */
+    event(counter, amount, engine) {
+      each('onEvent', counter, amount, engine);
     },
     /** Verb list for a feature-owned target, or null when no feature owns it. */
     verbsFor(target, engine) {

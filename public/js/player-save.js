@@ -11,6 +11,7 @@ import { normalizeEmotionalBearState } from './emotional-bear.js?v=emotional-bea
 import { normalizeHomeState } from './homes.js?v=homes-mail-1';
 import { normalizeMailboxState } from './mailbox.js?v=homes-mail-1';
 import { normalizeFeatureSlices } from './feature-host.js?v=features-1';
+import { normalizeQuestOfferState } from './quest-offers.js';
 
 export const PLAYER_SAVE_VERSION = 7;
 
@@ -117,7 +118,12 @@ export function normalizeQuestSnapshot(seed = {}) {
   if (seed?.story?.greedyStreetSpirit) {
     story.greedyStreetSpirit = cleanScalarRecord(seed.story.greedyStreetSpirit);
   }
-  return { active, completed: cleanStringArray(seed?.completed), story };
+  return {
+    active,
+    completed: cleanStringArray(seed?.completed),
+    story,
+    offers: normalizeQuestOfferState(seed?.offers),
+  };
 }
 
 export function normalizeAchievementSnapshot(seed = {}) {

@@ -5,7 +5,9 @@
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=social-follow-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-1';
 import { hellFeature } from './js/features/hell-feature.js?v=hell-1';
+import { resourceNodesFeature } from './js/features/resource-nodes-feature.js?v=resource-nodes-1';
 import { questFlagsFeature } from './js/features/quest-flags-feature.js?v=flags-1';
+import { questOffersFeature } from './js/features/quest-offers-feature.js?v=offers-1';
 import {
   actionDurationFor,
   createTimedAction,
@@ -22,7 +24,7 @@ import {
   listQuestTracker,
   parseQuestConversation,
   cleanQuestMarkup,
-} from './js/quests.js?v=phantom-1';
+} from './js/quests.js';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -296,7 +298,7 @@ import {
 } from './js/paradise-flight.js?v=paradise-flight-7';
 import {
   createAchievementState,
-  applyAchievementProgress,
+  applyAchievementProgress as applyAchievementProgressRaw,
   worldVerbAchievementCounters,
   makingToolAchievementCounter,
   achievementConditionLabel,
@@ -2343,6 +2345,7 @@ function beginToolRepair(classTsid) {
     toast(result.msg, 3600);
     pushActivity(result.msg);
     playSfx('pickup', { volume: 0.45, rate: 1.35 });
+    emitGameEvent(`tool_repaired:${classTsid}`);
     updateHud();
   }, quote.durationMs);
   activeToolRepair = { classTsid, timer, finishesAt };
@@ -3077,6 +3080,7 @@ function usePackItem(classTsid) {
     toast(r.msgs[0] || 'Cannot use that.');
     return;
   }
+  emitGameEvent(`${classTsid}:${String(ordinaryInfo?.verb || 'use').toLowerCase()}`);
   let foodResult = null;
   if (isFood && r.effects?.energy > 0) {
     foodResult = recordFoodEat(foodState, classTsid, {
@@ -4870,6 +4874,13 @@ function executeVerb(target, verbId) {
         .map((event) => `${event.counter}=${event.amount}`)
         .join(',');
     }
+    // Every world verb is also a `<class>:<verb>` quest event, unless a badge
+    // counter of the same name already carried it.
+    const verbEvent = `${target.classId}:${verbId}`;
+    if (!achievementEvents.some((event) => event.counter === verbEvent)) emitGameEvent(verbEvent);
+    if (ROCK_CATALOG[target.classId] && verbId === 'mine' && target.state?.rock?.depleted) {
+      emitGameEvent(`rocks_depleted:${target.classId}`);
+    }
 
     // anim hooks
     if (!verbAnimationAlreadyStarted) playVerbStartAnimation(target, result.anim);
@@ -6093,6 +6104,21 @@ function register(target) {
   return target;
 }
 
+/**
+ * Badge progress plus the feature event stream: every counter the game emits
+ * also reaches features (quest offers advance from these).
+ */
+function applyAchievementProgress(state, counter, amount = 1, pcRef = pc) {
+  const updates = applyAchievementProgressRaw(state, counter, amount, pcRef);
+  features.event(counter, amount, engine);
+  return updates;
+}
+
+/** Quest-only game events (no badge counter of their own). */
+function emitGameEvent(counter, amount = 1) {
+  features.event(counter, amount, engine);
+}
+
 function unregisterTarget(target) {
   if (!target) return;
   if (hoverTarget === target) clearHoverGlow();
@@ -6103,7 +6129,7 @@ function unregisterTarget(target) {
 
 // —— Feature modules (js/feature-host.js) ——
 // Each feature lives in one file and reaches the world only through `engine`.
-const features = createFeatureHost([questFlagsFeature, hellFeature]);
+const features = createFeatureHost([questFlagsFeature, hellFeature, resourceNodesFeature, questOffersFeature]);
 
 function anyTransientInstance() {
   return [
@@ -6165,6 +6191,45 @@ const engine = {
   get unlockedAchievements() {
     return achieveState.unlocked || [];
   },
+  get questState() {
+    return questState;
+  },
+  activeBuffIds() {
+    return Object.keys(buffState.active || {});
+  },
+  award: (payload) => enqueueAward(payload),
+  busy() {
+    return Boolean(
+      currentAction ||
+        menuTarget ||
+        isQuestDialogueOpen() ||
+        isScreenFxBlocking() ||
+        anyTransientInstance() ||
+        homeIsInstanced()
+    );
+  },
+  questDialogueOpen: () => isQuestDialogueOpen(),
+  /** A quest offer: the recovered beats, then accept / decline. */
+  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline }) {
+    openScriptedQuestDialogue({
+      title,
+      kicker,
+      beats: beats?.length ? beats : [{ text: title, response: acceptLabel || 'OK' }],
+      onComplete: onAccept,
+      onCancel: onDecline,
+      cancelable: true,
+      primaryLabel: acceptLabel || 'OK',
+      cancelLabel: declineLabel || 'Not right now',
+    });
+  },
+  /** QA autoplay: step through the open offer's beats and accept it. */
+  acceptOpenOffer() {
+    let guard = 20;
+    while (isQuestDialogueOpen() && guard > 0) {
+      advanceQuestDialogue();
+      guard -= 1;
+    }
+  },
   get platforms() {
     return streetPlatforms;
   },
@@ -6198,6 +6263,13 @@ const engine = {
   },
   achievement(counter, amount = 1) {
     announceAchievementUpdates(applyAchievementProgress(achieveState, counter, amount, pc));
+  },
+  /** Grant a condition-less badge outright (rewards from the catalog). */
+  grantAchievement(classTsid) {
+    const unlocked = unlockAchievement(achieveState, classTsid, pc);
+    if (!unlocked.ok) return false;
+    announceAchievementUpdates([{ classTsid, unlocked: true, rewards: unlocked.rewards, def: unlocked.def }]);
+    return true;
   },
   questFlag(flag) {
     questFlagsFeature.set(flag);
@@ -15914,6 +15986,7 @@ function renderMailboxCompose(recipient = '', replyTo = null) {
     mailboxSelectedId = result.id;
     mailboxComposeReplyTo = null;
     pushActivity(`Mail sent · ${result.postage} currants postage.`);
+    emitGameEvent('mail_sent');
     toast('Your letter is on its way.', 2400);
     playSfx('pickup', { volume: 0.38, rate: 1.22 });
     updateHud();
@@ -16460,6 +16533,7 @@ function clearWorldEntities() {
  * @param {{ spawnX?: number, spawnY?: number, quiet?: boolean }} [opts]
  */
 async function enterStreet(tsid, opts = {}) {
+  const firstVisit = !persistentWorldState.streets?.[tsid];
   if (!opts.bypassFeatureGates) {
     const redirect = features.enterGate(tsid, engine);
     if (redirect?.tsid && redirect.tsid !== tsid) {
@@ -16674,6 +16748,8 @@ async function enterStreet(tsid, opts = {}) {
   spawnPhantomQuestEncounter();
   spawnIlmenskieJones();
   features.streetEnter(data, engine, opts);
+  if (firstVisit) emitGameEvent(`street_first_visit:${data.tsid}`);
+  emitGameEvent(`street_entered:${String(data.label || '').toLowerCase().replace(/[^a-z0-9]+/g, '_')}`);
   if (app?.view) {
     const pop = currentStreetPopulation;
     app.view.dataset.ecologySource = pop.source;
@@ -17899,6 +17975,7 @@ function skillStudyContext() {
 function handleSkillCompletions(completed, { offline = false } = {}) {
   for (const row of completed || []) {
     const name = row.def?.name || row.classTsid;
+    emitGameEvent(`skill_learned:${row.classTsid}`);
     toast(`You learned ${name}!`, 4200);
     pushActivity(`${offline ? 'While you were away, you learned' : 'You learned'} ${name}.`);
     enqueueAward({
@@ -18272,6 +18349,10 @@ function updateMakeCraft(deltaMs) {
       playSfx('alert', { volume: 0.35, rate: 0.72 });
     }
     record.made += 1;
+    emitGameEvent(`making_recipe:${record.key}`);
+    for (const output of record.recipe.outputs || []) {
+      emitGameEvent(`making_tool_output:${record.recipe.tool}:${output.classTsid}`, output.qty || 1);
+    }
     const achievementCounter = makingToolAchievementCounter(record.recipe.tool);
     const achievementUpdates = achievementCounter
       ? applyAchievementProgress(achieveState, achievementCounter, 1, pc)
@@ -19021,6 +19102,9 @@ function renderVendorList() {
       toast(r.msgs[0]);
       pushActivity(r.msgs[0]);
       if (r.ok) playSfx(isBuy ? 'pickup' : 'quoin', { volume: 0.4 });
+      if (r.ok) {
+        emitGameEvent(`vendor_${isBuy ? 'bought' : 'sold'}:${vendorSelected}`, r.qty || vendorQty);
+      }
       if (r.ok && !isBuy) {
         vendorSellReceipt = { label, qty: r.qty, gain: r.gain };
         vendorSelected = null;
@@ -19809,6 +19893,10 @@ function runGardenPlotAction(key, action) {
   if (!r.ok) {
     toast(r.msgs?.[0] || 'Cannot do that.');
     return;
+  }
+  if (action === 'harvest' && r.cropId) {
+    const kind = activeGarden.gardenType === 'herb' ? 'herb_harvest' : 'garden_harvest';
+    emitGameEvent(`${kind}:${r.cropId}`, r.count || 1);
   }
   if (r.effects) {
     pushActivity({
