@@ -8,6 +8,7 @@ import { questFlagsFeature } from './quest-flags-feature.js?v=flags-1';
 import { hellFeature } from './hell-feature.js?v=hell-1';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-1';
 import { questOffersFeature } from './quest-offers-feature.js?v=offers-1';
+import { meditationFeature } from './meditation-feature.js?v=meditation-1';
 import { racesFeature } from './races-feature.js?v=races-1';
 import { patchesFeature } from './patches-feature.js?v=patches-1';
 import { foxesFeature } from './foxes-feature.js?v=foxes-1';
@@ -20,6 +21,7 @@ export const FEATURES = [
   hellFeature,
   resourceNodesFeature,
   questOffersFeature,
+  meditationFeature,
   racesFeature,
   patchesFeature,
   foxesFeature,

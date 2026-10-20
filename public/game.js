@@ -6239,6 +6239,8 @@ const engine = {
         document.querySelector('.glitch-modal:not([hidden]), [id$="-panel"]:not([hidden])')
     );
   },
+  /** A verb in progress or the verb menu open (both interrupt meditation). */
+  acting: () => Boolean(currentAction || menuTarget),
   questDialogueOpen: () => isQuestDialogueOpen(),
   /** A quest offer: the recovered beats, then accept / decline. */
   offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline }) {
@@ -6324,6 +6326,8 @@ const engine = {
   },
   /** Every feature's travel gate (Hell: dead / Naraka / Pooped) for a destination. */
   travelGate: (tsid) => features.travelGate(tsid, engine),
+  /** Every feature's metabolic gate, e.g. the dead gain no energy. */
+  metabolicGate: (stat, direction) => features.metabolicGate(stat, direction, engine),
   closeMap: () => closeMap(),
   /** QA routes: learn a skill outright (prerequisites skipped). */
   grantSkill: (classTsid) => grantSkill(skillState, classTsid, true),
