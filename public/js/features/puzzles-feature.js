@@ -171,6 +171,7 @@ function startRun(engine, street, def) {
     complete: false,
     startedAt: locationEventsApi.clock(),
     repeatAt: new Map(),
+    toasted: new Set(),
     prevY: null,
     ceilings: def.ceilings
       ? new Set((street.platforms || []).filter((pl) => pl.pc_perm == null || Number(pl.pc_perm) === 1).map((pl) => pl.id))
@@ -248,6 +249,10 @@ function stepRun(engine) {
     fireAll(engine, edge.events, edge.trigger.id);
     if (!run) return;
     if (edge.edge === 'enter') run.repeatAt.set(edge.trigger.id, now + (edge.trigger.repeatMs || 0));
+    if (edge.edge === 'enter' && edge.trigger.toast && !run.toasted.has(edge.trigger.id)) {
+      run.toasted.add(edge.trigger.id);
+      engine.toast(edge.trigger.toast);
+    }
     if (edge.edge === 'enter' && edge.trigger.respawn) {
       respawn(engine, edge.trigger.respawnText || 'Ouch! Back to the last safe spot.');
       run.inside.delete(edge.trigger.id);

@@ -4,7 +4,8 @@
 // with their real art, collision platforms (green solid, red pc_perm 0, labels
 // for ids the street's events toggle), walls (orange), ladders (cyan), doors,
 // labels for event decos, and the reconstructed puzzle triggers (yellow boxes).
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+mkdirSync(new URL('../shots/', import.meta.url), { recursive: true });
 import { chromium } from 'playwright';
 
 const [tsid, out = 'shots/map.png', ...rest] = process.argv.slice(2);
@@ -32,8 +33,12 @@ for (const acts of Object.values(street.events || {})) {
 
 const browser = await chromium.launch({ args: ['--ignore-certificate-errors'] });
 const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 800, height: 600 } });
-await page.goto('https://groddle.localhost/', { waitUntil: 'domcontentloaded' });
-await page.evaluate(async ({ street, triggers, x0, x1, y0, y1, scale, toggled, decoIds }) => {
+// A file:// page loads the deco PNGs straight from public/ (no server needed).
+const blank = new URL('../shots/.puzzle-map-blank.html', import.meta.url);
+writeFileSync(blank, '<!doctype html><html><body></body></html>');
+await page.goto(blank.href);
+const decoBase = new URL('assets/decos/groddle/', root).href;
+await page.evaluate(async ({ street, triggers, x0, x1, y0, y1, scale, toggled, decoIds, decoBase }) => {
   document.body.innerHTML = '';
   const c = document.createElement('canvas');
   c.width = Math.round((x1 - x0) * scale);
@@ -62,7 +67,7 @@ await page.evaluate(async ({ street, triggers, x0, x1, y0, y1, scale, toggled, d
     const im = new Image();
     im.onload = () => { imgs.set(s, im); res(); };
     im.onerror = res;
-    im.src = `assets/decos/groddle/${s}.png`;
+    im.src = `${decoBase}${s}.png`;
   })));
   for (const d of decos) {
     const im = imgs.get(d.sprite);
@@ -138,7 +143,7 @@ await page.evaluate(async ({ street, triggers, x0, x1, y0, y1, scale, toggled, d
     g.fillText(String(gy), 2, (gy - y0) * scale - 2);
     g.fillRect(0, (gy - y0) * scale, 6, 1);
   }
-}, { street, triggers, x0, x1, y0, y1, scale, toggled: [...toggled], decoIds: [...decoIds] });
+}, { street, triggers, x0, x1, y0, y1, scale, toggled: [...toggled], decoIds: [...decoIds], decoBase });
 const canvas = await page.$('canvas');
 await canvas.screenshot({ path: out });
 await browser.close();
