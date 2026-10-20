@@ -13301,5 +13301,1324 @@
       "fox_stop_marker": 5,
       "npc_fox_ranger": 1
     }
+  },
+  "furnitureStreetCount": 418,
+  "furniture": {
+    "GA510IHD1F426DS": {
+      "visiting_stone": 1
+    },
+    "GA512CSG4H42RKG": {
+      "visiting_stone": 1
+    },
+    "GA512IH5226256P": {
+      "visiting_stone": 1
+    },
+    "GA512UR70J52M1G": {
+      "visiting_stone": 1
+    },
+    "GA5132LA0J526JJ": {
+      "visiting_stone": 1
+    },
+    "GA5134UPLRU29OH": {
+      "note": 1,
+      "bag_notice_board": 1
+    },
+    "GA5135VC0J52RGQ": {
+      "visiting_stone": 1
+    },
+    "GA5137QE0J52UB8": {
+      "visiting_stone": 1
+    },
+    "GA5138OK0J526HB": {
+      "visiting_stone": 1
+    },
+    "GA513ALBNM623UJ": {
+      "npc_mailbox": 1
+    },
+    "GA513KEP0J52N21": {
+      "visiting_stone": 1
+    },
+    "GA513LMP0J52V1C": {
+      "visiting_stone": 1
+    },
+    "GA513OVR0J52BMT": {
+      "visiting_stone": 1
+    },
+    "GA513RIT0J52F6P": {
+      "visiting_stone": 1
+    },
+    "GA513S9U0J52SKD": {
+      "visiting_stone": 1
+    },
+    "GA5146Q41J528U9": {
+      "visiting_stone": 1
+    },
+    "GA5147561J525G7": {
+      "visiting_stone": 1
+    },
+    "GA514GCJNC42I6G": {
+      "visiting_stone": 1
+    },
+    "GA514JHG3J52E88": {
+      "visiting_stone": 1
+    },
+    "GA515E0PQC4214G": {
+      "visiting_stone": 1
+    },
+    "GA515GCSSC42QGF": {
+      "visiting_stone": 1
+    },
+    "GA51701PF262LC8": {
+      "npc_mailbox": 1
+    },
+    "GA517JJML262LT0": {
+      "npc_mailbox": 1
+    },
+    "GA517KBQL262H3U": {
+      "npc_mailbox": 1
+    },
+    "GA517L6UL262RHT": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA517MT2M262D0F": {
+      "npc_mailbox": 1
+    },
+    "GA51BMHT2562Q3D": {
+      "npc_mailbox": 1
+    },
+    "GA51CGIGKK62NV8": {
+      "npc_mailbox": 1
+    },
+    "GA51DOIHSK626VM": {
+      "npc_mailbox": 1
+    },
+    "GA51IOM1PC62SPF": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA51IVI7PC62L64": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA5371G9AH421NO": {
+      "visiting_stone": 1
+    },
+    "GA55645B8O528MI": {
+      "visiting_stone": 1
+    },
+    "GA57FADCBN62PR0": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA57S02C1BH2TP4": {
+      "visiting_stone": 1
+    },
+    "GA5BVMNOTH42T8L": {
+      "visiting_stone": 1
+    },
+    "GA5C1CH8TDH277B": {
+      "visiting_stone": 1
+    },
+    "GA5CTEP5UH42CQC": {
+      "visiting_stone": 1
+    },
+    "GA5D59PVEL13KNQ": {
+      "visiting_stone": 1
+    },
+    "GA5G15O4BUG2CVB": {
+      "visiting_stone": 1
+    },
+    "GA5I9D23ODH22M8": {
+      "visiting_stone": 1
+    },
+    "GA5J5DGOIMB24LP": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA5JAMFQIMB227E": {
+      "npc_mailbox": 1
+    },
+    "GA5JN50RNAH27R9": {
+      "npc_mailbox": 1
+    },
+    "GA5KUKA22I42CI9": {
+      "visiting_stone": 1
+    },
+    "GA5N5E10CM42HJ4": {
+      "visiting_stone": 1
+    },
+    "GA5P9MNTJK42IJS": {
+      "visiting_stone": 1
+    },
+    "GA5QBAL9SL52I02": {
+      "npc_mailbox": 1
+    },
+    "GA5T6PDF7K42SNM": {
+      "visiting_stone": 1
+    },
+    "GA5T7SLLO3H2ERO": {
+      "visiting_stone": 1
+    },
+    "GA9111M11LA2VAT": {
+      "visiting_stone": 1
+    },
+    "GA91120N5LA249C": {
+      "visiting_stone": 1
+    },
+    "GA9117J18492SRS": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GA911QQIDI32J6R": {
+      "visiting_stone": 1
+    },
+    "GA912PJ5D492UIL": {
+      "npc_mailbox": 1
+    },
+    "GA912UEGE492F2G": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GA9143HLH4929K7": {
+      "npc_mailbox": 1
+    },
+    "GA91PK4T4292B0V": {
+      "npc_mailbox": 1
+    },
+    "GA91SD0IEQA24L5": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GA92VDUR8D82E3F": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GA934IQQT8A26SV": {
+      "npc_mailbox": 1
+    },
+    "GA948QFPNDO2I94": {
+      "npc_mailbox": 1
+    },
+    "GA94KO5CFQA2V4Q": {
+      "npc_mailbox": 1
+    },
+    "GA957DNLVGN2F0S": {
+      "visiting_stone": 1
+    },
+    "GA960EK0JI82065": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA97VMVOOG92JGT": {
+      "npc_mailbox": 1
+    },
+    "GA98V53GRQA2VTO": {
+      "npc_mailbox": 1
+    },
+    "GA99CL11LSA2M35": {
+      "npc_mailbox": 1
+    },
+    "GA99NEQK1F92ICE": {
+      "npc_mailbox": 1
+    },
+    "GA9A9CGB9F824PK": {
+      "npc_mailbox": 1
+    },
+    "GA9AD3L90KN2KA3": {
+      "npc_mailbox": 1
+    },
+    "GA9CO2B02OA2BG0": {
+      "visiting_stone": 1
+    },
+    "GA9DEDE2N9N2MCS": {
+      "npc_mailbox": 1
+    },
+    "GA9DNG6KMHP2AKF": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA9DURMSIAA2S1T": {
+      "visiting_stone": 1
+    },
+    "GA9EJ02SANM2BT7": {
+      "npc_mailbox": 1
+    },
+    "GA9FD1O7S492CCD": {
+      "npc_mailbox": 1
+    },
+    "GA9FV0T3I1N2USG": {
+      "npc_mailbox": 1
+    },
+    "GA9GLRKMQF82961": {
+      "npc_mailbox": 1
+    },
+    "GA9GT0J87H92MPR": {
+      "visiting_stone": 1
+    },
+    "GA9H1V6OGRU2FSB": {
+      "bag_notice_board": 1,
+      "note": 2
+    },
+    "GA9HJCHM18A21B4": {
+      "npc_mailbox": 1
+    },
+    "GA9IHQQSCF820VN": {
+      "npc_mailbox": 1
+    },
+    "GA9IUTR8JJN28MF": {
+      "visiting_stone": 1
+    },
+    "GA9JJL6KCE924IK": {
+      "visiting_stone": 1
+    },
+    "GA9KL58B1D82CDV": {
+      "npc_mailbox": 1
+    },
+    "GA9KL68C1D825IA": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA9KL77D1D829Q3": {
+      "npc_mailbox": 1
+    },
+    "GA9L02KJ2D829LS": {
+      "npc_mailbox": 1
+    },
+    "GA9L777SRI82T5F": {
+      "visiting_stone": 1
+    },
+    "GA9LU1276F92KDP": {
+      "npc_mailbox": 1
+    },
+    "GA9MU59GB792T80": {
+      "bag_notice_board": 1
+    },
+    "GA9N5MTRTF828OT": {
+      "npc_mailbox": 1
+    },
+    "GA9NRNJSB792OG4": {
+      "npc_mailbox": 1
+    },
+    "GA9P334396A2GHP": {
+      "visiting_stone": 1
+    },
+    "GA9Q4AL8DI82H2M": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GA9QOQAL96A2L2K": {
+      "visiting_stone": 1
+    },
+    "GA9RPI1P1QA2IMQ": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA9TDS1HSIA2RCO": {
+      "npc_mailbox": 1
+    },
+    "GA9TEL683JA2JU0": {
+      "visiting_stone": 1
+    },
+    "GA9TIJ7S4JA2CNF": {
+      "visiting_stone": 1
+    },
+    "GA9U04T3OAA2R2L": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GA9V2T5DH8A23JD": {
+      "visiting_stone": 1
+    },
+    "GCR10199TPJ1DA3": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GCR101NQ4BU1SKS": {
+      "npc_mailbox": 1
+    },
+    "GCR101Q98A12EHH": {
+      "note": 1,
+      "bag_notice_board": 1
+    },
+    "GCR101SU5VL1P09": {
+      "npc_mailbox": 1
+    },
+    "GCR101UN0NJ1QPQ": {
+      "npc_mailbox": 1
+    },
+    "GCR103T98QJ1SC9": {
+      "npc_mailbox": 1
+    },
+    "GCR103UREMK11MT": {
+      "npc_mailbox": 1
+    },
+    "GCR10K3BPJK1U6F": {
+      "npc_mailbox": 1
+    },
+    "GCR10M2FUJK177P": {
+      "visiting_stone": 1
+    },
+    "GCR10S7GVKJ1ABI": {
+      "visiting_stone": 1
+    },
+    "GCR10U5VHMK112O": {
+      "npc_mailbox": 1
+    },
+    "GCR12D911T12E57": {
+      "npc_mailbox": 1
+    },
+    "GCR1303AT622I0Q": {
+      "npc_mailbox": 1
+    },
+    "GCR137T2HK123RR": {
+      "npc_mailbox": 1
+    },
+    "GCR13974F4220EH": {
+      "npc_mailbox": 1
+    },
+    "GCR13JCI5MK1EF4": {
+      "npc_mailbox": 1
+    },
+    "GCR13L1JQEM1OSG": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GCR13R31REM1A4S": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GCR143M18PK1774": {
+      "npc_mailbox": 1
+    },
+    "GCR144H8APK1OJS": {
+      "npc_mailbox": 1
+    },
+    "GCR15ST40FM1M1I": {
+      "visiting_stone": 1
+    },
+    "GCR167RSRSL1VPP": {
+      "npc_mailbox": 1
+    },
+    "GCR168ITRSL1498": {
+      "npc_mailbox": 1
+    },
+    "GCR169AURSL1G9O": {
+      "visiting_stone": 1
+    },
+    "GCR16AUURSL1KTM": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GCR16BA1SSL1P7K": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GCR16VUKOQL18DU": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GCR17BAC6OL11L8": {
+      "npc_mailbox": 1
+    },
+    "GCR195Q63RK143M": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GCR199KIJRK1I2B": {
+      "npc_mailbox": 1
+    },
+    "GCR1IDDEB2M17RC": {
+      "npc_mailbox": 1
+    },
+    "GCR4R7OEDS123M7": {
+      "npc_mailbox": 1
+    },
+    "GCR8F1FLBI12F2H": {
+      "npc_mailbox": 1
+    },
+    "GCRGEU0PUP12CLS": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GCRL3F8I3L12O0J": {
+      "npc_mailbox": 1
+    },
+    "GCRO4M7LH5L1QOO": {
+      "npc_mailbox": 1
+    },
+    "GCRR4REARA12CM5": {
+      "npc_mailbox": 1
+    },
+    "GCRTAJK5UN124GG": {
+      "npc_mailbox": 1
+    },
+    "GCRVT5V0BDO1HLF": {
+      "npc_mailbox": 1
+    },
+    "GDO20OO2ETQ2EAG": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GDO2NCNJUR038S7": {
+      "visiting_stone": 1
+    },
+    "GDO3CO0RUR0307B": {
+      "visiting_stone": 1
+    },
+    "GDO6NJEE1AE3MKL": {
+      "note": 1
+    },
+    "GDOEDH6P6GC2R2T": {
+      "visiting_stone": 1
+    },
+    "GDOF2V2INVQ2M9D": {
+      "visiting_stone": 1
+    },
+    "GDOGKA16T4R2NP1": {
+      "visiting_stone": 1
+    },
+    "GDOISPPQICD27RQ": {
+      "visiting_stone": 1
+    },
+    "GDOKUS4M0TQ263H": {
+      "npc_mailbox": 1
+    },
+    "GDOOSA8V29J24I3": {
+      "note": 3
+    },
+    "GDOS7IQJDEC2KHP": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GDOT3LP63TQ204B": {
+      "visiting_stone": 1
+    },
+    "GDOTQ8JCOCD20TU": {
+      "visiting_stone": 1
+    },
+    "GDOU1UON87E3K2T": {
+      "note": 59
+    },
+    "GDOU6HOAO2R21Q1": {
+      "visiting_stone": 1
+    },
+    "GDOVCSE5H2R2L24": {
+      "npc_mailbox": 1
+    },
+    "GDOVUDD84DD2U4U": {
+      "visiting_stone": 1
+    },
+    "GHF583RFVLD3IUE": {
+      "visiting_stone": 1
+    },
+    "GHF6MVO2G6J2F1F": {
+      "npc_mailbox": 1
+    },
+    "GHF6UMCMHOD387H": {
+      "visiting_stone": 1
+    },
+    "GHF893IMS2D2AKU": {
+      "visiting_stone": 1
+    },
+    "GHFATC8M4RD3E61": {
+      "visiting_stone": 1
+    },
+    "GHFC6RU2F3J26ME": {
+      "npc_mailbox": 1
+    },
+    "GHFD81QMKMI2SSL": {
+      "visiting_stone": 1
+    },
+    "GHFH7LJRA8D3QAR": {
+      "visiting_stone": 1
+    },
+    "GHFJGR1KH3J29IT": {
+      "npc_mailbox": 1
+    },
+    "GHFJR7H9R8J2SHM": {
+      "visiting_stone": 1
+    },
+    "GHFKT1LK83D2BAF": {
+      "visiting_stone": 1
+    },
+    "GHFL23QTC2D21SF": {
+      "visiting_stone": 1
+    },
+    "GHFL8M1IIPI2L46": {
+      "npc_mailbox": 1
+    },
+    "GHFM9ORBM1J2BS4": {
+      "npc_mailbox": 1
+    },
+    "GHFN5KCGS5D3IFC": {
+      "visiting_stone": 1
+    },
+    "GHFNIVJNP4D2IM6": {
+      "visiting_stone": 1
+    },
+    "GHFP8P54GMI2UCH": {
+      "npc_mailbox": 1
+    },
+    "GHFRAQFOGMI2QAI": {
+      "npc_mailbox": 1
+    },
+    "GHFRISNV5NI2580": {
+      "npc_mailbox": 1
+    },
+    "GHFS76JAU5J2P90": {
+      "visiting_stone": 1
+    },
+    "GHFTBK54M4D2JQA": {
+      "visiting_stone": 1
+    },
+    "GHV140E5N352BGF": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GHV144684H42FI4": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GHV14CBAO352I1I": {
+      "npc_mailbox": 1
+    },
+    "GHV15B8HEQ32SN0": {
+      "npc_mailbox": 1
+    },
+    "GHV15EUNEQ32FCI": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GHV15KA8NE42GSP": {
+      "npc_mailbox": 1
+    },
+    "GHV1AMP8TL02B40": {
+      "npc_mailbox": 1
+    },
+    "GHV1CIQLVL02C6H": {
+      "npc_mailbox": 1
+    },
+    "GHV1E645M21278O": {
+      "npc_mailbox": 1
+    },
+    "GHV1EUUNP142EDF": {
+      "npc_mailbox": 1
+    },
+    "GHV1F2U5M212P9C": {
+      "npc_mailbox": 1
+    },
+    "GHV1FQN29442T03": {
+      "visiting_stone": 1
+    },
+    "GHV1FUFU9442AKR": {
+      "npc_mailbox": 1
+    },
+    "GHV1HKHRSKA2CR9": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GHV1HT5F4D32GNM": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GHV1IHMG1312A0S": {
+      "npc_mailbox": 1
+    },
+    "GHV1KT9J0LA2IIA": {
+      "npc_mailbox": 1
+    },
+    "GHV1L41MCD32O4A": {
+      "npc_mailbox": 1
+    },
+    "GHV1OOC40U42TKA": {
+      "npc_mailbox": 1
+    },
+    "GHV23IAU9LA2E7A": {
+      "npc_mailbox": 1
+    },
+    "GHV245SVALA2ST5": {
+      "npc_mailbox": 1
+    },
+    "GHV253Q5BLA2TTI": {
+      "visiting_stone": 1
+    },
+    "GHV2547JP9B2AG0": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GHV2CGP55U22T4Q": {
+      "npc_mailbox": 1
+    },
+    "GHV2SQS7ENA25BL": {
+      "visiting_stone": 1
+    },
+    "GHV36AG0LO2208L": {
+      "npc_mailbox": 1
+    },
+    "GHV3ISF18352QIP": {
+      "npc_mailbox": 1
+    },
+    "GHV4U509S9B2MRV": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GHV5B9093K42J9S": {
+      "npc_mailbox": 1
+    },
+    "GHV5TFKNF0320GQ": {
+      "npc_mailbox": 1
+    },
+    "GHV7LLAAIDB35G2": {
+      "visiting_stone": 1
+    },
+    "GHV88RQU60B3Q0G": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GHV894HP4MA3ME7": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GHV8E39Q4MA3CMV": {
+      "npc_mailbox": 1
+    },
+    "GHV8NMVAGE228A2": {
+      "npc_mailbox": 1
+    },
+    "GHV9BF0AUJ42CLQ": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GHVAKM1MR032IGJ": {
+      "npc_mailbox": 1
+    },
+    "GHVB16RSG652GJ4": {
+      "npc_mailbox": 1
+    },
+    "GHVCUKA1I0B3UE8": {
+      "visiting_stone": 1
+    },
+    "GHVD0VVK8U2262J": {
+      "npc_mailbox": 1
+    },
+    "GHVEI9NVJ203LRO": {
+      "note": 3
+    },
+    "GHVH2BF13132CUF": {
+      "npc_mailbox": 1
+    },
+    "GHVHMCSV0QA2JET": {
+      "npc_mailbox": 1
+    },
+    "GHVHP2BJI652O9S": {
+      "npc_mailbox": 1
+    },
+    "GHVLCNLR783251B": {
+      "npc_mailbox": 1
+    },
+    "GHVM1R8OA7B2IRT": {
+      "npc_mailbox": 1
+    },
+    "GHVMCDF3LA32K2R": {
+      "npc_mailbox": 1
+    },
+    "GHVMF8SSJ7B2DV2": {
+      "npc_mailbox": 1
+    },
+    "GHVMK86NP7B26E6": {
+      "visiting_stone": 1
+    },
+    "GHVRJLV2UOA3EMR": {
+      "npc_mailbox": 1
+    },
+    "GHVT0JVHRIA2IE9": {
+      "npc_mailbox": 1
+    },
+    "GHVTUCELRV02V9I": {
+      "npc_mailbox": 1
+    },
+    "GHVUFJ6HGRU2V0E": {
+      "bag_notice_board": 1,
+      "note": 1
+    },
+    "GHVUR3UKGRU2SD2": {
+      "bag_notice_board": 1
+    },
+    "GHVVLBM1VL22A6Q": {
+      "npc_mailbox": 1
+    },
+    "GIF101NCNU112O2": {
+      "npc_mailbox": 1
+    },
+    "GIF102S56SV16TJ": {
+      "visiting_stone": 1
+    },
+    "GIF103GH4C72BHJ": {
+      "npc_mailbox": 1
+    },
+    "GIF10HE4JTU1S7P": {
+      "npc_mailbox": 1
+    },
+    "GIF10P7CR622E3R": {
+      "npc_mailbox": 1
+    },
+    "GIF10RP1DBU11NU": {
+      "visiting_stone": 1
+    },
+    "GIF11LLL5KV1CUG": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GIF126GSMBU1V2Q": {
+      "npc_mailbox": 1
+    },
+    "GIF12EQUGVU1RPI": {
+      "visiting_stone": 1
+    },
+    "GIF12UPTEUV14ON": {
+      "visiting_stone": 1
+    },
+    "GIF13FGQHKV1E72": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GIF14KB3T872MAH": {
+      "npc_mailbox": 1
+    },
+    "GIF14OKTU8722CQ": {
+      "npc_mailbox": 1
+    },
+    "GIF14PFVU872CSG": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GIF14RQ7V872TPR": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GIF14VBBV872N2I": {
+      "npc_mailbox": 1
+    },
+    "GIF1502CV8729RP": {
+      "npc_mailbox": 1
+    },
+    "GIF152TCV8720Q6": {
+      "npc_mailbox": 1
+    },
+    "GIF15S7VPRV1DIP": {
+      "npc_mailbox": 1
+    },
+    "GIF1609JRKV151E": {
+      "visiting_stone": 1
+    },
+    "GIF1662B8972C00": {
+      "npc_mailbox": 1
+    },
+    "GIF1687ILK12R66": {
+      "npc_mailbox": 1
+    },
+    "GIF16GDJ89724E3": {
+      "npc_mailbox": 1
+    },
+    "GIF16SBFB972GLK": {
+      "npc_mailbox": 1
+    },
+    "GIF17GAI3VV1C1F": {
+      "npc_mailbox": 1
+    },
+    "GIF18TO5NB72AMR": {
+      "npc_mailbox": 1
+    },
+    "GIF18V95I972R96": {
+      "visiting_stone": 1
+    },
+    "GIF1AJ58K972JHJ": {
+      "npc_mailbox": 1
+    },
+    "GIF1AQ6CK972734": {
+      "npc_mailbox": 1
+    },
+    "GIF1AUQNSDU1UFL": {
+      "npc_mailbox": 1
+    },
+    "GIF1CI1RSB72BCA": {
+      "npc_mailbox": 1
+    },
+    "GIF1GTHPO9V14NG": {
+      "visiting_stone": 1
+    },
+    "GIF25C8OJSV19UJ": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GIF26JLSR8C261S": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GIF28P8KH4E2U7M": {
+      "npc_mailbox": 1
+    },
+    "GIF2I10MEOE2CRA": {
+      "visiting_stone": 1
+    },
+    "GIF38KRD8S12HAR": {
+      "npc_mailbox": 1
+    },
+    "GIF47THTV6I2D29": {
+      "npc_mailbox": 1
+    },
+    "GIF57HKSG9E2FSO": {
+      "npc_mailbox": 1
+    },
+    "GIF5JTDA5EC2A02": {
+      "visiting_stone": 1
+    },
+    "GIF7SHGS3E72T8L": {
+      "npc_mailbox": 1
+    },
+    "GIF85V4ON6E2UVV": {
+      "npc_mailbox": 1
+    },
+    "GIF8I91P8J02A85": {
+      "npc_mailbox": 1
+    },
+    "GIF8TG1FV4I2M3B": {
+      "npc_mailbox": 1
+    },
+    "GIF992JCSAH29T1": {
+      "npc_mailbox": 1
+    },
+    "GIF9UI391Q62CIC": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GIFBSQJTGME2KRH": {
+      "visiting_stone": 1
+    },
+    "GIFCLLMITT727LH": {
+      "npc_mailbox": 1
+    },
+    "GIFD6TMU2952RMJ": {
+      "visiting_stone": 1
+    },
+    "GIFD8KDI3BH2UAF": {
+      "npc_mailbox": 1
+    },
+    "GIFDAMF03952OEO": {
+      "visiting_stone": 1
+    },
+    "GIFDB8NGF282H0Q": {
+      "visiting_stone": 1
+    },
+    "GIFDS8H7KBC2B2U": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GIFDTKVOMQE2SPB": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GIFE0QTCG3H2QU2": {
+      "visiting_stone": 1
+    },
+    "GIFE9GRB8S62L1H": {
+      "npc_mailbox": 1
+    },
+    "GIFEL8CPH08259V": {
+      "npc_mailbox": 1
+    },
+    "GIFF72DU3O727EA": {
+      "npc_mailbox": 1
+    },
+    "GIFF7T7N9O72TP2": {
+      "visiting_stone": 1
+    },
+    "GIFF829V9O7221M": {
+      "visiting_stone": 1
+    },
+    "GIFF8EOJAO72U8U": {
+      "visiting_stone": 1
+    },
+    "GIFF8FOKAO722CT": {
+      "visiting_stone": 1
+    },
+    "GIFF8ITNAO72C6N": {
+      "visiting_stone": 1
+    },
+    "GIFF8LVSAO72S3C": {
+      "visiting_stone": 1
+    },
+    "GIFF8NE0BO72CNQ": {
+      "visiting_stone": 1
+    },
+    "GIFF8OI1BO72KC1": {
+      "visiting_stone": 1
+    },
+    "GIFF8TQ8BO72L8G": {
+      "visiting_stone": 1
+    },
+    "GIFF95RKBO72R2Q": {
+      "visiting_stone": 1
+    },
+    "GIFFBC4MNO72556": {
+      "npc_mailbox": 1
+    },
+    "GIFFGUFIABH2D6F": {
+      "visiting_stone": 1
+    },
+    "GIFFIRQ00P729BS": {
+      "visiting_stone": 1
+    },
+    "GIFGR4QG5IV1QPI": {
+      "npc_mailbox": 1
+    },
+    "GIFHB52DMHI2FQ6": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GIFHEL95TME269I": {
+      "visiting_stone": 1
+    },
+    "GIFHR02K9S62Q72": {
+      "npc_mailbox": 1
+    },
+    "GIFI1K1IRJE2VTS": {
+      "npc_mailbox": 1
+    },
+    "GIFI4FP9GRU2CC8": {
+      "bag_notice_board": 1
+    },
+    "GIFIDIQ4NGC2U1Q": {
+      "npc_mailbox": 1
+    },
+    "GIFIECSPJ082A49": {
+      "npc_mailbox": 1
+    },
+    "GIFIEGBN9E72ILT": {
+      "visiting_stone": 1
+    },
+    "GIFIGIANP4I22P2": {
+      "npc_mailbox": 1
+    },
+    "GIFIGKANP4I2H84": {
+      "visiting_stone": 1
+    },
+    "GIFJ5ECMA3H2OIV": {
+      "npc_mailbox": 1
+    },
+    "GIFK0P9Q6JC2MEF": {
+      "npc_mailbox": 1
+    },
+    "GIFLFDAA79522M2": {
+      "visiting_stone": 1
+    },
+    "GIFMLT2S7952HAQ": {
+      "visiting_stone": 1
+    },
+    "GIFMOLVTLHV1RAR": {
+      "visiting_stone": 1
+    },
+    "GIFMR8JU7952PH5": {
+      "visiting_stone": 1
+    },
+    "GIFNH08K9OU1SAB": {
+      "npc_mailbox": 1
+    },
+    "GIFNL5554G52MHJ": {
+      "visiting_stone": 1
+    },
+    "GIFNL8294G52U4M": {
+      "visiting_stone": 1
+    },
+    "GIFNMSQ5GG528AK": {
+      "visiting_stone": 1
+    },
+    "GIFNNDV7JG52198": {
+      "visiting_stone": 1
+    },
+    "GIFNNGNAJG52LIH": {
+      "visiting_stone": 1
+    },
+    "GIFNNHRBJG52QS0": {
+      "visiting_stone": 1
+    },
+    "GIFNTBMONG520FD": {
+      "visiting_stone": 1
+    },
+    "GIFNU7T73U722U5": {
+      "visiting_stone": 1
+    },
+    "GIFO6K4DEFI22MQ": {
+      "npc_mailbox": 1
+    },
+    "GIFQMHF4MT72V9Q": {
+      "npc_mailbox": 1
+    },
+    "GIFQRA323ME2GCO": {
+      "npc_mailbox": 1
+    },
+    "GIFQS2GE6BH21V9": {
+      "npc_mailbox": 1
+    },
+    "GIFSJB0MAHI2EN9": {
+      "visiting_stone": 1
+    },
+    "GIFTO2T9TEI2LFB": {
+      "npc_mailbox": 1
+    },
+    "GIFU7EN0HN12ETM": {
+      "npc_mailbox": 1
+    },
+    "GIFUNGIBHQ1243A": {
+      "npc_mailbox": 1
+    },
+    "GIFV6DIGKVC21D0": {
+      "npc_mailbox": 1
+    },
+    "GIFVCIJ6BHI2DR4": {
+      "visiting_stone": 1
+    },
+    "GLI17P0T8J029N7": {
+      "npc_mailbox": 1
+    },
+    "GLI17VIKLJ02BSV": {
+      "npc_mailbox": 1
+    },
+    "GLI1BQA9PUH16A0": {
+      "npc_mailbox": 1
+    },
+    "GLI23TBNDHD19F2": {
+      "npc_mailbox": 1
+    },
+    "GLI2HVHUM4F16B0": {
+      "npc_mailbox": 1
+    },
+    "GLI32G3NUTD100I": {
+      "note": 1,
+      "npc_mailbox": 1
+    },
+    "GLI32HBOUTD1GQV": {
+      "npc_mailbox": 1
+    },
+    "GLI32J0SVTD114U": {
+      "npc_mailbox": 1
+    },
+    "GLI4HJ9GRLI1C4E": {
+      "npc_mailbox": 1
+    },
+    "GLI599R12JI1216": {
+      "npc_mailbox": 1
+    },
+    "GLICF642CTI16R1": {
+      "npc_mailbox": 1
+    },
+    "GLID3PL336E1RN1": {
+      "npc_mailbox": 1
+    },
+    "GLIERMJ93DE1H25": {
+      "npc_mailbox": 1
+    },
+    "GLIF37ASJFE1AVQ": {
+      "npc_mailbox": 1
+    },
+    "GLIF6R3R9GE1GQB": {
+      "npc_mailbox": 1
+    },
+    "GLIFIG7BP8G1MU9": {
+      "npc_mailbox": 1
+    },
+    "GM11HIDASHO1THR": {
+      "npc_mailbox": 1
+    },
+    "GM4109NI2R640": {
+      "npc_mailbox": 1
+    },
+    "GM413SQ6LRN58": {
+      "visiting_stone": 1
+    },
+    "GNV4VAJQKLH20N1": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GNV67JM1JTH271R": {
+      "visiting_stone": 1
+    },
+    "GNV8DCHH72I2222": {
+      "visiting_stone": 1
+    },
+    "GNV8MSAUQVH2TFL": {
+      "visiting_stone": 1
+    },
+    "GNV9O6NVFCD2SFS": {
+      "visiting_stone": 1
+    },
+    "GNVAMBDDQSH2OFD": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GNVCD62GKTH2FSM": {
+      "npc_mailbox": 1
+    },
+    "GNVEA19502I2S8M": {
+      "npc_mailbox": 1
+    },
+    "GNVEALS492I20KD": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GNVLGNPAHLH2SRJ": {
+      "npc_mailbox": 1
+    },
+    "GNVT1M8U00I2GAD": {
+      "visiting_stone": 1
+    },
+    "GTJ101I3KSO1JQS": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GTJ101PRVCQ1RN0": {
+      "visiting_stone": 1
+    },
+    "GTJ102GGGJK1VDO": {
+      "npc_mailbox": 1
+    },
+    "GTJ103U2KJK1BLG": {
+      "npc_mailbox": 1
+    },
+    "GTJ105NEFDQ1H97": {
+      "npc_mailbox": 1
+    },
+    "GTJ112E9DIO1BPE": {
+      "npc_mailbox": 1
+    },
+    "GTJ11HQLJUV1R15": {
+      "npc_mailbox": 1
+    },
+    "GTJ11TPQUMO197U": {
+      "npc_mailbox": 1
+    },
+    "GTJ12E6VSFQ1V4E": {
+      "visiting_stone": 1
+    },
+    "GTJ12G0H5KV10GH": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GTJ13ELOLPQ1DP3": {
+      "npc_mailbox": 1
+    },
+    "GTJ13T0J2VV1A4N": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GTJ1539P8102B2F": {
+      "visiting_stone": 1
+    },
+    "GTJ154SP8102KIG": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GTJ168OVQRV1TQA": {
+      "npc_mailbox": 1
+    },
+    "GTJ16T2SURV19NT": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GTJ1PV6RLCV1L08": {
+      "npc_mailbox": 1
+    },
+    "GTJ34OO4UHV1NLQ": {
+      "npc_mailbox": 1
+    },
+    "GTJ7GRG1VCV1VJD": {
+      "npc_mailbox": 1
+    },
+    "GTJOCVQUMHV1K83": {
+      "npc_mailbox": 1
+    },
+    "GUV22FOR7AF2TIE": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GUV483AL8JL28J2": {
+      "visiting_stone": 1
+    },
+    "GUV4RLT53QK2GUF": {
+      "visiting_stone": 1
+    },
+    "GUV681KDSQL2PST": {
+      "visiting_stone": 1
+    },
+    "GUVBQFC4NJL2093": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GUVCMP7BM7F2JET": {
+      "npc_mailbox": 1
+    },
+    "GUVFGT16B7G240H": {
+      "npc_mailbox": 1
+    },
+    "GUVGL5C7BJL2V4U": {
+      "visiting_stone": 1
+    },
+    "GUVGTE14OSF23D5": {
+      "visiting_stone": 1
+    },
+    "GUVIIL1P65F22NC": {
+      "npc_mailbox": 1,
+      "visiting_stone": 1
+    },
+    "GUVKM04MB9G2I53": {
+      "visiting_stone": 1
+    },
+    "GUVL8CLKD5F2TNB": {
+      "npc_mailbox": 1
+    },
+    "GUVLN7FNEJJ2NOQ": {
+      "npc_mailbox": 1
+    },
+    "GUVN6H8QIJL250Q": {
+      "visiting_stone": 1
+    },
+    "GUVNUGNGN5F2BOT": {
+      "npc_mailbox": 1
+    },
+    "GUVO4MCSNPK2P6J": {
+      "npc_mailbox": 1
+    },
+    "GUVO82HBAKR2A9G": {
+      "visiting_stone": 1
+    },
+    "GUVQ4HDKLSF274K": {
+      "npc_mailbox": 1
+    },
+    "GUVQMVII88F2O29": {
+      "visiting_stone": 1,
+      "npc_mailbox": 1
+    },
+    "GUVS3QBDOBL2HMO": {
+      "npc_mailbox": 1
+    },
+    "GUVSCDSTRAF2EOF": {
+      "npc_mailbox": 1
+    },
+    "GUVT92Q1PNF23GR": {
+      "npc_mailbox": 1
+    },
+    "GUVTEIMAL2F2UMM": {
+      "npc_mailbox": 1
+    },
+    "GUVTHO9HPSF2GJA": {
+      "visiting_stone": 1
+    },
+    "GUVTKR868NF27QG": {
+      "npc_mailbox": 1
+    },
+    "GUVTLIP0SIJ2DQG": {
+      "npc_mailbox": 1
+    }
   }
 }

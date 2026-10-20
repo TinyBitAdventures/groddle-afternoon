@@ -99,6 +99,32 @@ function wildlifeFromLabels(labels) {
 }
 
 /**
+ * Street furniture (js/street-furniture.js): street Mailboxes, Visiting
+ * Stones, placed Notes and Notice Boards. Written to a separate top-level
+ * `furniture` map, like `soil`, so furniture-only streets keep their playable
+ * fallback population. 265 Mailboxes, 199 Visiting Stones, 135 Notes (63 on
+ * the curated-empty Stoot memorial, which stays empty) and 7 Notice Boards in
+ * the archived snapshot. Clickable Broadcasters are invisible event triggers
+ * whose per-instance `event` props are absent from the dump, so they are not
+ * mapped.
+ */
+const FURNITURE_LABEL_TO_CLASS = Object.freeze({
+  Mailbox: 'npc_mailbox',
+  'Visiting Stone': 'visiting_stone',
+  Note: 'note',
+  'Notice Board': 'bag_notice_board',
+});
+
+function furnitureFromLabels(labels) {
+  const counts = {};
+  for (const label of labels) {
+    const classTsid = FURNITURE_LABEL_TO_CLASS[label];
+    if (classTsid) counts[classTsid] = (counts[classTsid] || 0) + 1;
+  }
+  return counts;
+}
+
+/**
  * Curated source-empty streets. Their archived XML holds only scenery-style
  * objects, and the remake deliberately keeps them uncluttered (for example the
  * private Stoot memorial), so the row is emitted with `empty: true` even when
@@ -164,6 +190,7 @@ const index = JSON.parse(await readFile(streetIndexPath, 'utf8'));
 const streets = {};
 const soil = {};
 const wildlife = {};
+const furniture = {};
 for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const candidates = locationAliases(tsid).map((alias) => join(locationRoot, `${alias}.xml`));
   const sourcePath = await firstReadable(candidates);
@@ -178,6 +205,8 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
   if (Object.keys(soilCounts).length) soil[tsid] = soilCounts;
   const wildlifeCounts = wildlifeFromLabels(labels);
   if (Object.keys(wildlifeCounts).length) wildlife[tsid] = wildlifeCounts;
+  const furnitureCounts = furnitureFromLabels(labels);
+  if (Object.keys(furnitureCounts).length) furniture[tsid] = furnitureCounts;
   const ecology = ecologyFromLabels(labels);
   if (!Object.keys(ecology.counts).length && !ecology.giantId && !ecology.spawners) continue;
   streets[tsid] = {
@@ -198,6 +227,8 @@ const catalog = {
   soil,
   wildlifeStreetCount: Object.keys(wildlife).length,
   wildlife,
+  furnitureStreetCount: Object.keys(furniture).length,
+  furniture,
 };
 
 await writeFile(outputPath, `${JSON.stringify(catalog, null, 2)}\n`);
