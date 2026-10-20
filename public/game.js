@@ -17350,7 +17350,14 @@ async function travelTo(toTsid, meta = {}) {
   const arrive = meta.arrive && Number.isFinite(meta.arrive.x) && Number.isFinite(meta.arrive.y)
     ? { spawnX: meta.arrive.x, spawnY: meta.arrive.y }
     : {};
-  await enterStreetWithTransition(plan.toTsid, arrive);
+  try {
+    await enterStreetWithTransition(plan.toTsid, arrive);
+  } catch (err) {
+    // A failed street fetch leaves you where you were; say so instead of nothing.
+    console.warn('travel', err);
+    toast(`Could not reach ${plan.label || meta.label || 'that street'}. Try again in a moment.`, 4000);
+    return { ok: false, reason: 'load_failed' };
+  }
   if (player) floatText(player.x, player.y - 80, '✦ ' + (meta.label || plan.label), 0xc9a0ff);
   pushActivity(`Arrived: ${plan.label || meta.label || plan.toTsid}`);
   return plan;

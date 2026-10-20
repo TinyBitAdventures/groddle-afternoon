@@ -123,4 +123,11 @@ test.describe('integration playtest regressions', () => {
     assert.match(phone, /\.side-panel \{[^}]*bottom: var\(--pack-live-height, 112px\)[^}]*pointer-events: none/);
     assert.match(phone, /\.side-panel\.side-panel > \.side-card \{[^}]*max-height: 100%[^}]*pointer-events: auto/);
   });
+
+  test('a street that fails to load keeps you put and says so', () => {
+    const body = fnBody('travelTo');
+    assert.match(body, /try \{\n    await enterStreetWithTransition\(plan\.toTsid, arrive\);\n  \} catch \(err\) \{/);
+    assert.match(body, /Could not reach \$\{plan\.label/);
+    assert.match(body, /reason: 'load_failed'/);
+  });
 });
