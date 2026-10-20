@@ -33,6 +33,7 @@
 
 import { ITEM_CATALOG } from '../inventory.js?v=catalog-unified-3';
 import { platformYAt } from '../street-model.js';
+import { rollResourceNodeDrop } from './drops-feature.js?v=drops-1';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,
   FIREFLY_WHISTLE_ACHIEVEMENT,
@@ -1056,6 +1057,8 @@ function applyResult(engine, entity, result) {
   }
   if (result.costs?.xp) engine.floatText(anchorX, anchorY - lift, `+${result.costs.xp} iMG`, 0xd7b8ff);
   for (const counter of result.achievementCounters || []) engine.achievement(counter.counter, counter.amount);
+  // Skill-package rare drops (scraping, jellisac, peat, paper tree): features/drops-feature.js.
+  rollResourceNodeDrop(engine, result);
   engine.playSound(sfxFor(result), { volume: 0.6, jitter: 0.05 });
 
   if (entity.classTsid === 'npc_firefly') {
