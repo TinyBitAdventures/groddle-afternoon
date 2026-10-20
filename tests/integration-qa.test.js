@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'public/style.css'), 'utf8');
 
 function fnBody(name) {
   const start = game.search(new RegExp(`\\n(async )?function ${name}\\(`));
@@ -28,4 +29,11 @@ test.describe('integration playtest regressions', () => {
     assert.match(game, /state\.toastTimer > 0 && performance\.now\(\) >= state\.toastTimer/);
     assert.doesNotMatch(game, /state\.toastTimer -= /);
   });
+
+  test('chrome buttons wrap instead of running off wide screens', () => {
+    const wide = /@media \(min-width: 1101px\) \{([\s\S]*?)\n\}/.exec(css)[1];
+    assert.match(wide, /\.top-actions \{[^}]*flex-wrap: wrap/);
+    assert.doesNotMatch(wide, /\.top-actions \{ flex-wrap: nowrap; \}/);
+  });
+
 });

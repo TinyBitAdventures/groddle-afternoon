@@ -1029,8 +1029,16 @@ footer a { color: inherit; }
 
 @media (min-width: 1101px) {
   .top-bar,
-  .metabolics-cluster,
-  .top-actions { flex-wrap: nowrap; }
+  .metabolics-cluster { flex-wrap: nowrap; }
+  /* Buttons wrap to a second row instead of running off the right edge
+     (Look and Mute disappeared once Upgrades joined the bar). */
+  .top-actions {
+    flex: 0 1 auto;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 0.2rem;
+  }
 }
 
 #game-root {
