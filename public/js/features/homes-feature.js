@@ -265,6 +265,20 @@ function drawRoomShell(PIXI, container, width) {
   const floorLook = lookFor('floor', decor.floor);
   const bottom = floorY + 220;
 
+  // The house's outer timber wall beyond both end caps: the camera keeps the
+  // avatar clear of the right-hand rail, which can reveal a little past the
+  // room's end, so that edge reads as the house rather than open sky.
+  const outside = new PIXI.Graphics();
+  const OUTSIDE_W = 640;
+  for (const [x0, x1] of [[-OUTSIDE_W, 0], [width, width + OUTSIDE_W]]) {
+    outside.beginFill(0x3a2a1f).drawRect(x0, ceilingTop - 200, x1 - x0, bottom - ceilingTop + 400).endFill();
+    for (let x = x0; x < x1; x += 46) {
+      outside.beginFill(0x2c1f17).drawRect(x, ceilingTop - 200, 4, bottom - ceilingTop + 400).endFill();
+      outside.beginFill(0x4a3627, 0.6).drawRect(x + 4, ceilingTop - 200, 3, bottom - ceilingTop + 400).endFill();
+    }
+  }
+  container.addChild(outside);
+
   // Ceiling band
   const ceil = new PIXI.TilingSprite(tileTexture(PIXI, 'ceiling', decor.ceiling), width, wallTop - ceilingTop + 120);
   ceil.y = ceilingTop - 120;
