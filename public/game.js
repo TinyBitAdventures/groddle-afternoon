@@ -513,7 +513,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=parallax-3';
+} from './js/street-render.js?v=parallax-4';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -16361,6 +16361,7 @@ function clearWorldEntities() {
     entityLayer.removeChild(spr);
   }
   features.streetClear(engine);
+  if (entityLayer) entityLayer.filters = null;
   interactables = [];
   piggies = [];
   chickens = [];
@@ -16497,6 +16498,15 @@ async function enterStreet(tsid, opts = {}) {
   });
   streetPlatforms = bgLayer.platformsScreen;
   streetWalls = wallsScreen(data);
+  if (entityLayer) {
+    if (bgLayer.middlegroundMatrix) {
+      const middlegroundColour = new PIXI.ColorMatrixFilter();
+      middlegroundColour.matrix = bgLayer.middlegroundMatrix;
+      entityLayer.filters = [middlegroundColour];
+    } else {
+      entityLayer.filters = null;
+    }
+  }
   climb = { active: false, wall: null };
   Object.assign(jumpState, createJumpState(movementNow()));
   // Ground reference = median of lower platforms

@@ -675,6 +675,10 @@ export function buildStreetView(street, PIXI, opts = {}) {
   root.decoDrawn = drawn;
   root.decoViews = decoViews;
   root.parallaxLayers = layerContainers.filter((lc) => lc.parallaxLayer);
+  // The client filters the whole middleground plane, so avatars and items on
+  // it share the decos' treatment (Hell One's greyscale Glitches).
+  const middleground = (street.layers || []).find((layer) => layer.id === 'middleground');
+  root.middlegroundMatrix = glitchLayerMatrix(middleground?.filters || {});
   /** Call once per frame with the camera's top-left in screen space. */
   root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => {
     for (const lc of root.parallaxLayers) {
