@@ -265,7 +265,9 @@ export function applyAchievementProgress(state, counterName, amount = 1, pc = nu
       const exactCounter = group
         ? `${c.group}:${c.name}` === counterName
         : c.name === counterName;
-      const groupedTotal = group && c.type === 'group_sum' && c.group === group;
+      // Three-part counters such as `VERB:tend:patch` belong to group `VERB:tend`.
+      const groupedTotal = group && c.type === 'group_sum'
+        && (c.group === group || counterName.startsWith(`${c.group}:`));
       return exactCounter || groupedTotal;
     });
     if (!matches.length) continue;

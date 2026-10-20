@@ -51,6 +51,33 @@ const LABEL_TO_CLASS = Object.freeze({
 });
 
 /**
+ * Soil objects (js/patches.js): Patches, Dark Patches, the one archived
+ * Seedling, and dead trants that clear back into a Patch. They are written to
+ * a separate top-level `soil` map instead of `counts`, so a street whose only
+ * archived objects are patches keeps its playable fallback population.
+ */
+const SOIL_LABEL_TO_CLASS = Object.freeze({
+  Patch: 'patch',
+  'Dark Patch': 'patch_dark',
+  Seedling: 'patch_seedling',
+  'Dead Bean Tree': 'trant_bean_dead',
+  'Dead Bubble Tree': 'trant_bubble_dead',
+  'Dead Egg Plant': 'trant_egg_dead',
+  'Dead Fruit Tree': 'trant_fruit_dead',
+  'Dead Gas Plant': 'trant_gas_dead',
+  'Dead Spice Plant': 'trant_spice_dead',
+});
+
+function soilFromLabels(labels) {
+  const counts = {};
+  for (const label of labels) {
+    const classTsid = SOIL_LABEL_TO_CLASS[label];
+    if (classTsid) counts[classTsid] = (counts[classTsid] || 0) + 1;
+  }
+  return counts;
+}
+
+/**
  * Curated source-empty streets. Their archived XML holds only scenery-style
  * objects, and the remake deliberately keeps them uncluttered (for example the
  * private Stoot memorial), so the row is emitted with `empty: true` even when
@@ -114,6 +141,7 @@ function ecologyFromLabels(labels) {
 
 const index = JSON.parse(await readFile(streetIndexPath, 'utf8'));
 const streets = {};
+const soil = {};
 for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const candidates = locationAliases(tsid).map((alias) => join(locationRoot, `${alias}.xml`));
   const sourcePath = await firstReadable(candidates);
@@ -123,7 +151,10 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
     streets[tsid] = { label: meta.label || tsid, sourceTsid, counts: {}, empty: true };
     continue;
   }
-  const ecology = ecologyFromLabels(itemLabels(await readFile(sourcePath, 'utf8')));
+  const labels = itemLabels(await readFile(sourcePath, 'utf8'));
+  const soilCounts = soilFromLabels(labels);
+  if (Object.keys(soilCounts).length) soil[tsid] = soilCounts;
+  const ecology = ecologyFromLabels(labels);
   if (!Object.keys(ecology.counts).length && !ecology.giantId && !ecology.spawners) continue;
   streets[tsid] = {
     label: meta.label || tsid,
@@ -139,6 +170,8 @@ const catalog = {
   sourceSnapshot: '2012-12 late-game L-prefixed location objects',
   streetCount: Object.keys(streets).length,
   streets,
+  soilStreetCount: Object.keys(soil).length,
+  soil,
 };
 
 await writeFile(outputPath, `${JSON.stringify(catalog, null, 2)}\n`);
