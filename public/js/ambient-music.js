@@ -90,8 +90,10 @@ export function tracksForTheme(themeId) {
   const cfg = config;
   if (!cfg?.themes) return [];
   if (themeId && themeId.startsWith('street:')) {
-    // Future: map music_file keys to local paths
-    return tracksForTheme(cfg.defaultTheme || 'default');
+    // geometry.music_file keys map to a theme of recovered stand-ins
+    // (streetMusic); unknown keys keep the default library.
+    const mapped = cfg.streetMusic?.[themeId.slice(7)];
+    return tracksForTheme(mapped && cfg.themes[mapped] ? mapped : cfg.defaultTheme || 'default');
   }
   const theme = cfg.themes[themeId] || cfg.themes[cfg.defaultTheme] || cfg.themes.default;
   return Array.isArray(theme?.tracks) ? theme.tracks.filter(Boolean) : [];

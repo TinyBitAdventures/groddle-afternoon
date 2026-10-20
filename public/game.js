@@ -3340,7 +3340,7 @@ let ambientThemeId = 'default';
 let ambientTrackUrl = null;
 
 async function loadAudio() {
-  await loadAmbientMusicConfig('assets/content/ambient-music.json?v=eesti-1');
+  await loadAmbientMusicConfig('assets/content/ambient-music.json?v=streetmusic-1');
   const files = {
     music: 'assets/audio/groddle.mp3', // legacy default / fallback
   };

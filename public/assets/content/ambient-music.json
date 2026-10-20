@@ -156,9 +156,7 @@
     "eesti": {
       "label": "Eesti Life Catalogue",
       "gsjsKeys": ["EESTI_LIFE_CATALOGUE"],
-      "tracks": [
-        "assets/audio/ambient/eesti_life_catalogue_1344997859.mp3"
-      ]
+      "tracks": ["assets/audio/ambient/eesti_life_catalogue_1344997859.mp3"]
     },
     "musicblocks": {
       "label": "Musicblocks (collectible snippets)",
@@ -171,7 +169,72 @@
         "assets/audio/ambient/Musicblock-XS-2_1292035400.mp3",
         "assets/audio/ambient/Musicblock-XS-3_1291896779.mp3"
       ]
+    },
+    "party_moon": {
+      "label": "Party: Toxic Moon",
+      "gsjsKeys": ["TOXIC_MOON"],
+      "note": "Source Also_Sprach_Zarathustra_Loop_3.2_fades.mp3 is unrecovered; Moon Music (public downloads) stands in.",
+      "tracks": ["assets/audio/ambient/moon_music_1344997839.mp3"]
+    },
+    "party_highlands": {
+      "label": "Party: Val Holla",
+      "gsjsKeys": ["AMBIENT_HIGHLANDS6"],
+      "note": "Highlands_6.3.mp3 is unrecovered; a public Highlands-theme stand-in.",
+      "tracks": ["assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3"]
+    },
+    "party_abysmal": {
+      "label": "Party: Aquarius",
+      "gsjsKeys": ["ABYSMAL_THRILLS"],
+      "note": "_Abysmal_Thrill_1.1_2.mp3 is unrecovered; Elevator Music (public downloads) stands in.",
+      "tracks": ["assets/audio/ambient/elevator_music_1344997334.mp3"]
+    },
+    "party_holiday": {
+      "label": "Party: Winter Wingding",
+      "gsjsKeys": ["GLITCHMAS_PARTY_LOCATION"],
+      "note": "Holiday_Party_Space_Loop_2.1.mp3 is unrecovered; Winter Holiday (public downloads) stands in.",
+      "tracks": ["assets/audio/ambient/winter_holiday_1344997255.mp3"]
+    },
+    "party_lively": {
+      "label": "Party: lively stand-in",
+      "gsjsKeys": [],
+      "note": "Party spaces with no geometry.music_file fell back to hub 108's unmapped (forest) ambient; the remake plays a lively public track instead.",
+      "tracks": [
+        "assets/audio/ambient/marching_band_1344997302.mp3",
+        "assets/audio/ambient/Rainbow-Run_1291879159.mp3",
+        "assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3"
+      ]
+    },
+    "enchanted": {
+      "label": "Enchanted Wood",
+      "gsjsKeys": ["ENCHANTED_WOOD", "ENCHANTED_WOOD_III"],
+      "tracks": ["assets/audio/ambient/enchanted_woods_1344997332.mp3"]
+    },
+    "piano": {
+      "label": "Piano Theme",
+      "gsjsKeys": ["PIANO_THEME1"],
+      "tracks": ["assets/audio/sfx/PIANO_THEME1.mp3"]
+    },
+    "snappy": {
+      "label": "Groddle Snappy Loop",
+      "gsjsKeys": ["SNAPPY_LOOP"],
+      "tracks": ["assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3"]
     }
+  },
+  "streetMusic": {
+    "TOXIC_MOON": "party_moon",
+    "AMBIENT_HIGHLANDS6": "party_highlands",
+    "ABYSMAL_THRILLS": "party_abysmal",
+    "GLITCHMAS_PARTY_LOCATION": "party_holiday",
+    "PARTY_LIVELY": "party_lively",
+    "HELL": "hell",
+    "DE_EMBIGGENIFY": "eesti",
+    "ENCHANTED_WOOD": "enchanted",
+    "ENCHANTED_WOOD_III": "enchanted",
+    "PIANO_THEME1": "piano",
+    "AMBIENT_SAVANNA1": "savanna",
+    "SNAPPY_LOOP": "snappy",
+    "HOME_STREET_URALIA": "uralia",
+    "HOME_STREET_FIREBOGS": "firebog"
   },
   "hubMap": {
     "49": "eesti",

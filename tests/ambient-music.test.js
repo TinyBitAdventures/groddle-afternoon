@@ -88,6 +88,23 @@ describe('GSJS hub → ambient theme', () => {
   });
 });
 
+describe('street music_file keys', () => {
+  it('maps geometry music_file keys through streetMusic to recovered themes', () => {
+    const cfg = JSON.parse(readFileSync(cfgPath, 'utf8'));
+    for (const [key, theme] of Object.entries(cfg.streetMusic || {})) {
+      assert.ok(cfg.themes[theme], `${key} -> ${theme} has no theme`);
+      assert.deepEqual(tracksForTheme(`street:${key}`), tracksForTheme(theme));
+      for (const url of cfg.themes[theme].tracks) assert.ok(existsSync(join(__dirname, '../public', url)), url);
+    }
+    assert.equal(resolveAmbientTheme({ musicFile: 'TOXIC_MOON' }), 'street:TOXIC_MOON');
+    assert.match(tracksForTheme('street:TOXIC_MOON')[0], /moon_music/);
+  });
+
+  it('unknown music_file keys keep the default library', () => {
+    assert.deepEqual(tracksForTheme('street:NO_SUCH_KEY'), tracksForTheme('default'));
+  });
+});
+
 describe('game wiring', () => {
   it('game.js switches ambient on street enter', () => {
     const game = readFileSync(join(__dirname, '../public/game.js'), 'utf8');
