@@ -1026,11 +1026,13 @@ function notePublishResult(result) {
 }
 
 function sfxFor(result) {
-  if (result.jarFull) return 'quest';
-  if (result.classTsid === 'paper_tree' && result.verbId === 'pet') return 'pet';
-  if (result.classTsid === 'dust_trap') return 'alert';
-  if (result.classTsid === 'npc_sloth' && result.verbId === 'knock') return 'pet';
-  return 'pickup';
+  if (result.jarFull) return 'COMPLETE_QUEST_REQUIREMENT';
+  if (result.classTsid === 'paper_tree') return result.verbId === 'pet' ? 'PET_TRANT' : result.verbId === 'water' ? 'WATERING_CAN' : 'PAPER_TREE';
+  if (result.classTsid === 'dust_trap') return 'DUST_TRAP_SMACK_DOWN';
+  if (result.classTsid === 'npc_sloth') return result.verbId === 'knock' ? 'SLOTH_KNOCKER' : 'SLOTH_EAT';
+  if (result.classTsid === 'npc_salmon') return 'SALMON_CATCH';
+  if (result.classTsid === 'npc_firefly') return 'BUTTERFLY_SING';
+  return { scrape: 'SCRAPER', scoop: 'SCOOPED_JELLISAC', dig: 'SHOVEL', harvest: 'HOE' }[result.verbId] || 'ITEM_PICKUP';
 }
 
 function applyResult(engine, entity, result) {
@@ -1052,7 +1054,7 @@ function applyResult(engine, entity, result) {
   }
   if (result.costs?.xp) engine.floatText(anchorX, anchorY - lift, `+${result.costs.xp} iMG`, 0xd7b8ff);
   for (const counter of result.achievementCounters || []) engine.achievement(counter.counter, counter.amount);
-  engine.playSfx(sfxFor(result));
+  engine.playSound(sfxFor(result), { volume: 0.6, jitter: 0.05 });
 
   if (entity.classTsid === 'npc_firefly') {
     jar = normalizeFireflyJarState(result.jar || jar);

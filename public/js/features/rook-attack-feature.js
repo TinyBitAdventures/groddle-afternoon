@@ -1008,7 +1008,7 @@ function onAttackStart(engine) {
   showOverlay(engine, ROOK_TEXT.attack);
   setFeed('A Rook descends on the street. Use your Focusing Orb to start a stun attack.', 9000);
   engine.pushActivity('ROOK ATTACK! A Rook descends on the street.');
-  engine.playSfx('alert', { volume: 0.5, rate: 0.7 });
+  engine.playSound('ROOK_CAW', { volume: 0.55 });
   startMusic(engine);
   if (fore) fore.leaving = now();
   lastAction = 'attack_start';
@@ -1026,7 +1026,7 @@ function onWingBeat(engine, a) {
   const hit = rookStreet(engine);
   engine.pushActivity({ base: `The Rook attacks! ${hit.length} ${hit.length === 1 ? 'thing was' : 'things were'} rooked.`, effects: { energy: -energy, mood: -mood } });
   setFeed(`The Rook swooped! ${hit.length} rooked. ${a.phase === 'departed' ? '' : 'Stun it before it strikes again.'}`);
-  engine.playSfx('jump', { volume: 0.4, rate: 0.5 });
+  engine.playSound('ROOK_CAW', { volume: 0.5, rate: 0.8, allowMultiple: true });
   lastAction = `wing_beat:${hit.length}`;
 }
 
@@ -1040,7 +1040,7 @@ function onDefeat(engine, a) {
   grant(engine, { xp });
   engine.pushActivity({ base: a.damageDealt > 0 ? ROOK_TEXT.defeatHelp(xp) : ROOK_TEXT.defeatWitness(xp), effects: { xp } });
   spawnRainbow(engine, engine.player.x, engine.player.y - 150, 'YOU DID IT!', 1.15);
-  engine.playSfx('quest', { volume: 0.7 });
+  engine.playSound('RAINBOW_YOUDIDIT', { volume: 0.7 });
   if (armored()) engine.achievement('essence_of_rookswort:defeated_rook', 1);
   save.stats.defeats += 1;
   endPrime(engine, false);
@@ -1070,7 +1070,7 @@ function handleEvents(engine, a, events) {
     if (ev.type === 'herald_warning') {
       showOverlay(engine, { ...ROOK_TEXT.herald, color: ROOK_COLORS.herald, inS: 0.35, holdS: 1.3, outS: 0.35, alpha: 0.72 });
       spawnSilhouettes(engine, 3 + ev.n);
-      engine.playSfx('alert', { volume: 0.35, rate: 0.6 });
+      engine.playSound('ROOK_CAW', { volume: 0.35, rate: 1.15 });
       if (ev.n === 1) engine.pushActivity('A Forehorseman gallops through, ringing his bells. Something is coming.');
     } else if (ev.type === 'attack_start') {
       onAttackStart(engine);
@@ -1166,7 +1166,7 @@ function startStun(engine, source = 'verb') {
     shrine,
   };
   lastAction = `orb_start:${order.length}`;
-  engine.playSfx('pickup', { volume: 0.35, rate: 0.75 });
+  engine.playSound('FOCUSING_ORB', { volume: 0.5 });
   return true;
 }
 
@@ -1300,9 +1300,9 @@ function releaseOrb(engine) {
   if (r.stunned) {
     showOverlay(engine, ROOK_TEXT.stunned);
     setFeed(ROOK_TEXT.stunnedNote, 9000);
-    engine.playSfx('quest', { volume: 0.45, rate: 1.2 });
+    engine.playSound('MEDITATION_SUCCESS', { volume: 0.5 });
   }
-  engine.playSfx('jump', { volume: 0.5, rate: 1.4 });
+  engine.playSound('EFFECT_MILD', { volume: 0.5 });
   lastAction = `stun:${r.damage}:${a.stun}`;
   engine.save();
 }
@@ -1327,7 +1327,7 @@ function prime(engine, target) {
   engine.pushActivity({ base: `You primed the ${target.label}.`, effects: { energy: -cost } });
   setFeed('The shrine is primed. Strike the Rook with an offering!');
   lastAction = 'primed';
-  engine.playSfx('pickup', { volume: 0.4, rate: 1.3 });
+  engine.playSound('DONATE_TO_SHRINE', { volume: 0.5 });
 }
 
 function endPrime(engine, announce = true) {
@@ -1551,7 +1551,7 @@ function revive(engine, target, { balm = false } = {}) {
     if (favor && typeof favor === 'object') for (const g of Object.keys(favor)) favor[g] = (favor[g] || 0) + r.favor;
     removeRookedVisual(engine, key);
     spawnRainbow(engine, target.sprite.x, target.sprite.y - 120, 'revived', 0.8);
-    engine.playSfx('quest', { volume: 0.45, rate: 1.35 });
+    engine.playSound('RAINBOW_FULLYREVIVED', { volume: 0.5 });
     save.stats.fullRevives += 1;
     engine.pushActivity({ base: `You revived a ${label}! +${r.favor} favor with every Giant`, effects: { xp: r.xp, energy: -energy, mood: -mood } });
     lastAction = `revived:${key}`;

@@ -166,7 +166,7 @@ function scare(engine, entity, force = false) {
   if (kitty.state === 'sleep' || kitty.state === 'sleepStart' || kitty.flying) return false;
   kickKitty(kitty);
   engine.say(entity.target, KITTY_MOTION.mewBubble, KITTY_MOTION.mewBubbleMs);
-  engine.playSfx('alert', { volume: 0.25, rate: 1.6 });
+  engine.playSound('FLYING_KITTY_MEW', { volume: 0.5 });
   lastAction = 'scared';
   publish(engine, true);
   return true;
@@ -180,7 +180,7 @@ function pet(engine, entity) {
   }
   setClip(entity, '3sleepStart');
   engine.say(entity.target, result.bubble, KITTY_PET.bubbleMs);
-  engine.playSfx('pet', { volume: 0.55, rate: 1.25 });
+  engine.playSound('FLYING_KITTY_PURR', { volume: 0.6 });
   engine.pushActivity({
     base: `You petted ${entity.kitty.name ? entity.kitty.name : 'a Heli Kitty'}`,
     effects: { energy: result.energy, mood: result.mood, xp: result.xp },

@@ -254,7 +254,7 @@ function readyUp(engine) {
   hud.ready.hidden = true;
   hud.countdown.hidden = false;
   hud.countdown.textContent = 'READY?';
-  engine.playSfx('start', { volume: 0.55, rate: 0.9 });
+  engine.playSound('COUNT_DOWN', { volume: 0.55 });
 }
 
 function posOf(id, engine) {
@@ -357,7 +357,7 @@ function handleEvents(events, engine) {
       setTimeout(() => {
         if (game?.status === 'running') hud.countdown.hidden = true;
       }, 650);
-      engine.playSfx('start', { volume: 0.7, rate: 1.16 });
+      engine.playSound('READY', { volume: 0.65 });
       record.pendingTicket = null;
       engine.save();
       tip(engine, game.itId === 'you' ? CROWNS_TEXT.youreItAbove : `${game.players[game.itId].name} has the crown! Tag them to steal it.`);
@@ -372,10 +372,10 @@ function passCrown(from, to, engine) {
   const p = game.players;
   if (to === 'you') {
     tip(engine, p.you.below ? CROWNS_TEXT.youreIt(crownRemainingSeconds(game, 'you')) : CROWNS_TEXT.youreItAbove);
-    engine.playSfx('quest', { volume: 0.55, rate: 1.2 });
+    engine.playSound('YOU_TAKE_CROWN', { volume: 0.55 });
   } else if (from === 'you') {
     tip(engine, p.you.below ? CROWNS_TEXT.notIt : CROWNS_TEXT.notItAbove);
-    engine.playSfx('alert', { volume: 0.45, rate: 0.85 });
+    engine.playSound('YOU_LOSE_CROWN', { volume: 0.45 });
   } else {
     tip(engine, `${p[to].name} stole the crown from ${p[from].name}!`);
   }
@@ -452,7 +452,7 @@ function tick(dtMs, now, engine) {
       if (out.ok) {
         if (id === 'you') {
           engine.floatText(lock.x, lock.y - 90, out.text, 0xb8f08a);
-          engine.playSfx('quoin', { volume: 0.5, rate: 1.1 });
+          engine.playSound('QUOIN_GOT', { volume: 0.55 });
         }
         break;
       }
@@ -484,7 +484,7 @@ function finish(engine) {
     record.wins += 1;
     engine.achievement('it_game:won', 1);
     engine.pushActivity(`You won the Game of Crowns! +${res.reward.xp} iMG · +${res.reward.currants} currants.`);
-    engine.playSfx('quest', { volume: 0.75 });
+    engine.playSound('YOU_WIN', { volume: 0.7 });
   } else {
     record.losses += 1;
     engine.achievement('it_game:lost', 1);

@@ -448,7 +448,7 @@ function finishPhase(engine, jobId) {
   engine.award({ kind: 'quest', title, body: '', subtitle: bits.join(' · '), iconUrl: BOARD_ART, steps, primaryLabel: 'OK' });
   lastResult = `${jobId}:phase${out.index + 1}${out.finalPhase ? ':done' : ''}`;
   engine.pushActivity({ base: `Project phase complete: ${job.title}`, effects: { xp: out.rewards.xp + out.performance.xp } });
-  engine.playSfx('quest', { volume: 0.6 });
+  engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
   engine.updateHud();
   engine.save();
   renderPanel(engine);
@@ -859,7 +859,7 @@ function doGive(engine, jobId, classId, n) {
   const res = contributeItems(state, catalog, jobId, classId, n, engine.inv);
   if (!res.ok) return engine.toast(res.msg), false;
   engine.pushActivity(`You contributed ${res.amount} ${itemLabel(classId, res.amount)}.`);
-  engine.playSfx('pickup', { volume: 0.4, rate: 0.85 });
+  engine.playSound('ITEM_GIVE', { volume: 0.55 });
   engine.updateHud();
   afterContribution(engine, { ...res, jobId });
   engine.save();

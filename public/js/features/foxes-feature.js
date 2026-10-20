@@ -334,7 +334,7 @@ function landBait(engine, bait) {
   if (!bait.sprite || bait.sprite.destroyed) return;
   bait.sprite.y = bait.y + 2;
   setClip(engine, bait.sprite, FOX_SHEETS.bait[`stink${bait.variant}`], { loop: true, fps: 30 });
-  engine.playSfx('pickup', { volume: 0.35, rate: 0.7 });
+  engine.playSound('FOX_BAIT_LAND', { volume: 0.5 });
 }
 
 function removeBait(bait) {
@@ -514,7 +514,7 @@ function tickFoxes(engine, dtMs, now) {
         const bait = baits.find((b) => b.id === ev.baitId);
         if (bait) removeBait(bait);
         world.baits = baits.map((b) => ({ id: b.id, x: b.x }));
-        engine.playSfx('pet', { volume: 0.3, rate: 1.3 });
+        engine.playSound('FOX_EAT', { volume: 0.45 });
       } else if (ev.type === 'leave') {
         engine.pushActivity(ev.reason);
       } else if (ev.type === 'despawn') {
@@ -569,7 +569,7 @@ function performBrush(engine, entity, { ignoreReach = false } = {}) {
   slice.totalBrushes += 1;
   entity.flashUntil = nowMs + 420;
   brushFx(engine, entity.fox.x, entity.fox.y, 'hit');
-  engine.playSfx('pickup', { volume: 0.55, rate: 1.15 });
+  engine.playSound('FOX_BRUSH_HIT', { volume: 0.55 });
   engine.pushActivity({
     base: 'You brushed a Fox',
     effects: { energy: result.energy, xp: result.xp, items: { Fiber: result.fibers } },
@@ -672,7 +672,7 @@ function choose(engine, value) {
       return;
     }
     pc.currants = (pc.currants || 0) - FOX_LICENSE.cost;
-    engine.playSfx('quest', { volume: 0.6 });
+    engine.playSound('BUY_FOX_BRUSHING_PERMIT', { volume: 0.6 });
     engine.pushActivity({ base: 'You bought a Fox-Brushing Permit', effects: {} });
     engine.grantAchievement(FOX_LICENSE_ACHIEVEMENT);
     engine.updateHud();
@@ -843,7 +843,7 @@ function ignite(engine) {
   if (!pendingSpawnAt) pendingSpawnAt = now + FOX_TIMING.spawnDelayMs;
   pendingDrops.push({ at: now + FOX_TIMING.baitDropDelayMs, x: p.x, y: p.y });
   igniteFx(engine);
-  engine.playSfx('alert', { volume: 0.4, rate: 0.8 });
+  engine.playSound('FOX_BAIT', { volume: 0.5 });
   engine.pushActivity({ base: 'You ignited a Fox Bait', effects: { items: { 'Fox Bait': -1 } } });
   engine.refreshPack();
   engine.save();

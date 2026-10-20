@@ -337,7 +337,7 @@ function buyTicket(classTsid, engine) {
   }
   engine.pc.currants -= RACE_TICKET_PRICE;
   addItem(engine.inv, classTsid, 1);
-  engine.playSfx('pickup', { volume: 0.6, rate: 1.1 });
+  engine.playSound('PURCHASE_ITEM', { volume: 0.55 });
   engine.pushActivity(`You bought a ${ITEM_LABEL(classTsid)} for ${RACE_TICKET_PRICE} currants.`);
   engine.updateHud();
   engine.save();
@@ -384,7 +384,7 @@ function activateTicket(classTsid, engine, opts = {}) {
   buildChrome(engine);
   hud.banner.textContent = startDelayMessage(raceTitle(raceId), crowns ? 'you, Amp, Bumbishfish' : 'you', names);
   hud.banner.hidden = false;
-  engine.playSfx('alert', { volume: 0.45, rate: 1.05 });
+  engine.playSound('GAME_STARTING_SOON', { volume: 0.5 });
   starting = true;
   const delay = opts.delayMs ?? RACE_START_DELAY_MS;
   clearTimeout(startTimer);
@@ -575,7 +575,7 @@ function readyUp(engine) {
   hud.countdown.hidden = false;
   hud.countdown.classList.remove('is-go');
   hud.countdown.textContent = 'READY?';
-  engine.playSfx('start', { volume: 0.55, rate: 0.9 });
+  engine.playSound('COUNT_DOWN', { volume: 0.55 });
   publish(engine);
 }
 
@@ -601,7 +601,7 @@ function respawn(engine, why) {
   respawnUntil = Date.now() + 700;
   engine.snapCamera?.();
   engine.floatText(to.x, to.y - 90, why, 0xfff4d6);
-  engine.playSfx('alert', { volume: 0.35, rate: 0.8 });
+  engine.playSound('CLICK_FAILURE', { volume: 0.4 });
   progressHint = Math.max(0, progressHint - 6);
 }
 
@@ -621,7 +621,7 @@ function raceTick(engine, now) {
       setTimeout(() => {
         if (run?.status === 'running') hud.countdown.hidden = true;
       }, 650);
-      engine.playSfx('start', { volume: 0.7, rate: 1.16 });
+      engine.playSound('READY', { volume: 0.65 });
       record.pendingTicket = null;
       autoplayStartAt = now;
       engine.save();
@@ -666,7 +666,7 @@ function raceTick(engine, now) {
     if (Math.abs(player.x - cp.x) < 64 && Math.abs(player.y - cp.y) < 90 && passRaceCheckpoint(run, index)) {
       checkpointSprites[index]?.setPassed?.(true);
       engine.floatText(cp.x, cp.y - 100, 'Checkpoint!', 0xb8f08a);
-      engine.playSfx('quoin', { volume: 0.45, rate: 1.2 });
+      engine.playSound('QUOIN_GOT', { volume: 0.5 });
     }
   });
 
@@ -701,7 +701,7 @@ function showResult(engine) {
     engine.questFlag(RACE_FLAGS.win);
     engine.achievement(RACE_ACHIEVEMENTS.won, 1);
     engine.pushActivity(`You won ${race.title}! +${reward.currants} currants · +${reward.xp} iMG.`);
-    engine.playSfx('quest', { volume: 0.7, rate: 1 });
+    engine.playSound('YOU_WIN', { volume: 0.7 });
     const rainbow = drawWinnerRainbow(engine.PIXI);
     rainbow.x = engine.player.x;
     rainbow.y = engine.player.y - 30;

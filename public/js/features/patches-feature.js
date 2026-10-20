@@ -527,7 +527,7 @@ function performVerb(engine, entity, verbId) {
   if (!result.ok) {
     if (result.response) talk(engine, entity, result.response, plotLabel(entity.plot));
     engine.toast(result.msg, 2400);
-    if (result.sound) engine.playSfx?.('alert');
+    if (result.sound) engine.playSound?.(result.sound, { volume: 0.45 });
     publish(engine);
     return result;
   }
@@ -548,7 +548,7 @@ function performVerb(engine, entity, verbId) {
   if (result.costs?.xp) engine.floatText(engine.player.x - 20, engine.player.y - 90, `+${result.costs.xp} iMG`, 0xb388ff);
   for (const row of result.counters || []) engine.achievement(row.counter, row.amount);
   if (result.verbId === 'tend' || result.verbId === 'dig') soilPuff(engine, x, y);
-  engine.playSfx?.(result.verbId === 'pet' ? 'pet' : 'pickup');
+  engine.playSound?.({ pet: 'PET_TRANT', water: 'WATERING_CAN', dig: 'SHOVEL', tend: 'HOE', plant: 'GARDEN_PLANT' }[result.verbId] || 'ITEM_PICKUP', { volume: 0.6, jitter: 0.05 });
   engine.refreshPack();
   const rebuild = before !== entity.plot.stage || result.verbId === 'pet';
   const myGeneration = generation;

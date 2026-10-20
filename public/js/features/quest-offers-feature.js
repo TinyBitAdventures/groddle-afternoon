@@ -67,7 +67,7 @@ function finish(rows, engine) {
   for (const row of rows || []) {
     const done = turnInQuest(engine.questState, row.classTsid, engine.pc, questContext(engine));
     if (!done.ok) continue;
-    engine.playSfx('quest', { volume: 0.6 });
+    engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
     engine.award(questAwardPayload(row.def, done.rewards || {}));
     engine.pushActivity(`Quest complete: ${row.def.title}`);
     engine.refreshPack();
@@ -87,7 +87,7 @@ function presentOffer(engine, now = Date.now()) {
   markOffered(qs, card.classTsid, now);
   offerOpen = true;
   engine.setData('questOffer', card.classTsid);
-  engine.playSfx('alert', { volume: 0.5 });
+  engine.playSound('QUEST_OFFER', { volume: 0.55 });
   const accept = () => {
     offerOpen = false;
     const result = acceptOffer(qs, card.classTsid, questContext(engine));

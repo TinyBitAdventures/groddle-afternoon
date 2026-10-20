@@ -1383,7 +1383,7 @@ function openStore(engine) {
 function applySwatch(engine, kind, key) {
   const result = setHomeTexture(decor, kind, key);
   if (!result.ok) return result;
-  engine.playSfx?.('pickup', { volume: 0.3, rate: 1.3 });
+  engine.playSound?.('UI_TOGGLE', { volume: 0.45 });
   engine.pushActivity(`You changed your ${kind === 'wall' ? 'wallpaper' : kind} to ${result.name}.`);
   scene?.background?.redraw?.();
   renderBar(engine);
@@ -1471,7 +1471,7 @@ function placeAtPointer(engine, at) {
       }
     }
     if (!result.ok && result.msg) engine.toast(result.msg);
-    engine.playSfx?.('pickup', { volume: 0.35, rate: 0.9 });
+    engine.playSound?.(result.ok ? 'ITEM_DROP' : 'CLICK_FAILURE', { volume: 0.45 });
     placing = null;
     destroyGhost();
     renderFurniture(engine);

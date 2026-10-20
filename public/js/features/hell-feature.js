@@ -80,7 +80,7 @@ function applyEffects(effects, engine) {
   for (const effect of effects || []) {
     switch (effect.type) {
       case 'sound':
-        engine.playSynth(effect.key === 'SQUISH_GRAPES' ? 'squish' : 'croak');
+        engine.playSound(effect.key === 'SQUISH_GRAPES' ? 'SQUISH_GRAPES' : 'CROAK', { volume: 1 });
         break;
       case 'activity':
         engine.pushActivity(effect.text);

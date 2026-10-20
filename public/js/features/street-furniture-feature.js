@@ -328,7 +328,7 @@ function writeOnPaper(engine) {
       nextNoteId += 1;
       engine.pushActivity(`You turned a piece of Paper into a note: ${noteTitle(out.note)}`);
       if (wear?.msg) engine.pushActivity(wear.msg);
-      engine.playSfx('pickup', { volume: 0.4, rate: 1.2 });
+      engine.playSound('CRAFT_DONE', { volume: 0.5 });
       lastAction = `paper:${noteTitle(out.note)}`;
       engine.updateHud();
       engine.save();
@@ -482,7 +482,7 @@ function runNoteVerb(engine, entity, verbId) {
     addCarried(engine, row);
     engine.unregister(entity.target);
     notes = notes.filter((n) => n !== entity);
-    engine.playSfx('pickup', { volume: 0.45, rate: 1.15 });
+    engine.playSound('ITEM_PICKUP', { volume: 0.55 });
     engine.pushActivity(`You picked up a note: ${noteTitle(row)}`);
     lastAction = `note:pickup:${noteTitle(row)}`;
     engine.save();
@@ -1029,7 +1029,7 @@ function runNeighbourVerb(engine, target, verbId) {
     engine.pushActivity({ base, effects: out.effects });
     const art = t.chore.sprite;
     engine.floatText(art.x, art.y - 90, `+${out.effects.mood} mood`, 0xffe5a8);
-    engine.playSfx(neighbour.chore === 'gift' ? 'pickup' : 'pet', { volume: 0.45, rate: 1.1 });
+    engine.playSound(neighbour.chore === 'gift' ? 'ITEM_GIVE' : 'NEIGHBOUR_WAVE', { volume: 0.5 });
     if (out.letter) {
       engine.deliverMail?.(out.letter);
       lettersSent += 1;
