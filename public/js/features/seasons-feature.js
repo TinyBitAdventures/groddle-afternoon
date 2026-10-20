@@ -937,8 +937,7 @@ function tickCracker(engine, now) {
   const paid = payDrop(engine, result, { source: 'glitchmas_cracker' });
   state.crackersOpened += 1;
   engine.achievement?.(CRACKER.counter, 1);
-  const prize = paid.lines?.[0] ? ` ${paid.lines[0].replace(/!$/, '')} from the Glitchmas Cracker. Merry Glitchmas!` : '';
-  say(engine, `POP! The ${name} helped pull your Glitchmas Cracker. ${note.classTsid === 'glitchmas_cracker_joke' ? 'It handed you the joke.' : 'It handed you the fun fact.'}${prize}`);
+  say(engine, `POP! The ${name} helped pull your Glitchmas Cracker and handed you the ${note.classTsid === 'glitchmas_cracker_joke' ? 'joke' : 'fun fact'}.${paid.lines?.length ? ' Merry Glitchmas!' : ''}`);
   engine.save?.();
 }
 
@@ -1229,6 +1228,7 @@ function autoplay(engine, now) {
       break;
     case 'yay':
       completeHolidayQuest(engine);
+      setTimeout(() => engine.acceptOpenOffer?.(), 500);
       break;
     case 'unwrap':
       run('glitchmas_present', 'unwrap');
