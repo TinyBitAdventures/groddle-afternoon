@@ -556,6 +556,11 @@ export const STORE_CATALOG = Object.freeze([
         "cost": 11
       },
       {
+        "classTsid": "quill",
+        "label": "Quill",
+        "cost": 436
+      },
+      {
         "classTsid": "egg_seasoner",
         "label": "Egg Seasoner",
         "cost": 191
@@ -675,6 +680,11 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "scraper",
         "label": "Scraper",
         "cost": 315
+      },
+      {
+        "classTsid": "quill",
+        "label": "Quill",
+        "cost": 420
       },
       {
         "classTsid": "cauldron",

@@ -39,6 +39,8 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   super_scraper: { label: 'Super Scraper', capacity: 250, baseCost: 2000, source: 'super_scraper.js' },
   shovel: { label: 'Shovel', capacity: 100, baseCost: 300, source: 'shovel.js' },
   ace_of_spades: { label: 'Ace of Spades', capacity: 500, baseCost: 3000, source: 'ace_of_spades.js' },
+  // Teleportation Scripts (js/teleportation.js): one wear per script written.
+  quill: { label: 'Quill', capacity: 100, baseCost: 400, source: 'quill.js' },
 });
 
 /** Rank data from catalog_skill_packages.js `tinkering`. */
