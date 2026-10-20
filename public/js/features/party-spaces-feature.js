@@ -593,13 +593,21 @@ function setupSpace(street, engine) {
   simMs = 0;
   boostUntil = 0;
   const arrive = partyArrival(p.template);
+  // Keep provisions off the doorways (Mazza'la Gala's rooms) so a click on a
+  // stack never opens the door instead.
+  const doors = street.doors || [];
+  const clearOfDoors = (pt) => !doors.some((d) => Math.abs(d.x - pt.x) < 110 && Math.abs(d.y - pt.y) < 160);
   const points = [...engine.placement('partySpots')]
+    .filter(clearOfDoors)
     .sort((a, b) => Math.hypot(a.x - arrive.x, a.y - arrive.y) - Math.hypot(b.x - arrive.x, b.y - arrive.y));
   const take = () => points.shift() || { x: arrive.x + (Math.random() - 0.5) * 300, y: arrive.y };
   // The ATM and the dancing friends greet you on the arrival floor (the
   // source marker_teleport spots are lost); the planner places the rest.
   const dir = arrive.x < (s.bounds.r - s.bounds.l) / 2 ? 1 : -1;
-  const near = (dx) => groundNear(engine, arrive.x + dir * dx, arrive.y);
+  const near = (dx) => {
+    const pt = groundNear(engine, arrive.x + dir * dx, arrive.y);
+    return pt && clearOfDoors(pt) ? pt : null;
+  };
   spawnAtm(engine, near(210) || take());
   const guestPoints = [near(340) || take(), near(420) || take(), near(500) || take()];
   if (s.event) {
@@ -768,7 +776,8 @@ function tickGuests(engine, dtMs, now) {
     g.sprite.scale.set(GUEST_SCALE * flip, GUEST_SCALE);
     g.name.x = g.sprite.x;
     g.name.y = g.sprite.y - g.sprite.height - 4;
-    if (now >= g.nextLine && !engine.busy()) {
+    // engine.busy() is always true inside the instance hold.
+    if (now >= g.nextLine && !engine.acting() && !engine.questDialogueOpen() && !modal?.open) {
       g.nextLine = now + 14000 + Math.random() * 9000;
       g.line += 3;
       engine.say(g.target, partyGuestLine(g.line), 3200);
@@ -1080,6 +1089,7 @@ function stepDemo(engine, now) {
       leaveParty(engine);
       return set('returned', 1500);
     case 'returned':
+    case 'returning':
       demo.stage = onPartyStreet(engine) ? 'returning' : 'done';
       demo.at = demo.stage === 'done' ? 0 : now + 500;
       publish(engine, true);
@@ -1142,7 +1152,8 @@ export const partySpacesFeature = {
     if (!s) return [];
     const p = party();
     const groups = p && p.template === s.id ? partyStackGroups(s.id).length : 0;
-    return [{ key: 'partySpots', count: groups + 1 + PARTY_GUESTS.length + (s.event ? 1 : 0), clearance: 46 }];
+    // Extra spots so the ones in doorways can be dropped.
+    return [{ key: 'partySpots', count: groups + 1 + PARTY_GUESTS.length + (s.event ? 1 : 0) + (street.doors?.length || 0) * 2, clearance: 46 }];
   },
 
   onStreetEnter(street, engine) {
