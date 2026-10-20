@@ -19,7 +19,6 @@ import {
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { highestSkillLevel, skillPackageDetails } from './skill-packages.js';
-import { rollMakingBonusImagination, scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
 
 /**
  * @typedef {{
@@ -338,7 +337,7 @@ export function makingRequiredSkill(toolId) {
  * @param {Recipe|null} recipe
  * @param {string[]} [learned]
  */
-export function makingSkillAdjustments(recipe, learned, upgrades = []) {
+export function makingSkillAdjustments(recipe, learned) {
   const baseEnergy = Number(recipe?.energyCost) || 0;
   const baseWait = Number(recipe?.waitMs) || 0;
   const rule = MAKING_TOOL_SKILLS[recipe?.tool] || null;
@@ -372,8 +371,7 @@ export function makingSkillAdjustments(recipe, learned, upgrades = []) {
   } else if (recipe?.tool === 'ore_grinder' || recipe?.tool === 'grand_ol_grinder') {
     // The Grinder runs the `refining` package: Refining II takes half the
     // time (4 s to 2 s) and 3 energy per chunk instead of 4.
-    // Refined Speed I/II (refining_time_1/2) shorten the package duration 20/40%.
-    const refining = skillPackageDetails('refining', learned, upgrades);
+    const refining = skillPackageDetails('refining', learned);
     if (refining) {
       out.skillLevel = refining.rank;
       out.energyCost = refining.energy_cost;
@@ -791,11 +789,8 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     return { ok: false, reason: check.reason, msgs: ['Cannot craft.'] };
   }
 
-  const upgrades = Array.isArray(opts.upgrades) ? opts.upgrades : pc?.imaginationUpgrades || [];
-  const adjust = makingSkillAdjustments(recipe, opts.learned, upgrades);
+  const adjust = makingSkillAdjustments(recipe, opts.learned);
   const cost = adjust.energyCost;
-  // getHitPointModifier: the *_tool_wear cards halve that cooking tool's wear.
-  const wearFor = (wear) => scaledToolWear(opts.toolState, recipe.tool, wear, toolWearMultiplier(recipe.tool, upgrades));
   if ((pc.energy || 0) < cost) {
     return {
       ok: false,
@@ -807,8 +802,9 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   // Unskilled transmogrification: the tool is used, then 20% of the time
   // nothing is made and the player loses a flat 2 energy and 2 mood.
   if (adjust.failChance && !opts.maxLuck && (opts.rng || Math.random)() < adjust.failChance) {
-    const failPoints = recipe.tool && opts.toolState ? wearFor(opts.toolWear || recipe.toolWear || 1) : 0;
-    const failWear = failPoints > 0 ? useToolCondition(opts.toolState, recipe.tool, failPoints) : null;
+    const failWear = recipe.tool && opts.toolState
+      ? useToolCondition(opts.toolState, recipe.tool, opts.toolWear || recipe.toolWear || 1)
+      : null;
     const energyLost = Math.min(TRANSMOG_FAIL_ENERGY, Math.max(0, pc.energy || 0));
     const moodLost = Math.min(TRANSMOG_FAIL_MOOD, Math.max(0, pc.mood || 0));
     pc.energy = (pc.energy || 0) - energyLost;
@@ -846,20 +842,10 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   for (const out of recipe.outputs || []) {
     addItem(inv, out.classTsid, out.qty);
   }
-  // rollCraftingBonusImagination: the tool's *_imagination card can pay a
-  // share of the output's base cost as bonus iMG.
-  const outputValue = (recipe.outputs || []).reduce(
-    (sum, out) => sum + (Number(ITEM_CATALOG[out.classTsid]?.baseCost) || 0) * (Number(out.qty) || 0),
-    0
-  );
-  const bonusImagination = rollMakingBonusImagination(recipe.tool, upgrades, outputValue, opts.rng || Math.random, Boolean(opts.maxLuck));
-  if (bonusImagination) {
-    pc.imagination = (pc.imagination || 0) + bonusImagination;
-    pc.xp = (pc.xp || 0) + bonusImagination;
-  }
 
-  const wearPoints = recipe.tool && opts.toolState ? wearFor(opts.toolWear || recipe.toolWear || 1) : 0;
-  const toolUse = wearPoints > 0 ? useToolCondition(opts.toolState, recipe.tool, wearPoints) : null;
+  const toolUse = recipe.tool && opts.toolState
+    ? useToolCondition(opts.toolState, recipe.tool, opts.toolWear || recipe.toolWear || 1)
+    : null;
 
   const toolLabel = TOOL_CATALOG[recipe.tool]?.label || recipe.tool || 'hands';
   const outLabels = (recipe.outputs || [])
@@ -872,11 +858,9 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     recipeKey,
     msgs: [
       `You made ${recipe.name} with ${toolLabel} (${outLabels}). −${cost} energy, +${recipe.xpReward || 0} iMG.`,
-      ...(bonusImagination ? [`Bonus imagination! +${bonusImagination} iMG.`] : []),
       ...(toolUse?.broke ? [toolUse.msg] : []),
     ],
     toolUse,
-    bonusImagination,
     // for tests / rollback inspection
     _before: { energy: beforeE, imagination: beforeImg, xp: beforeXp },
   };
@@ -930,12 +914,12 @@ const TOOL_CRAFT_DURATION_MS = {
  * with a tool-specific fallback for embedded and future recipes.
  * @param {Recipe|string|null} recipeOrTool
  */
-export function craftDurationFor(recipeOrTool, learned, upgrades = []) {
+export function craftDurationFor(recipeOrTool, learned) {
   const recipe = typeof recipeOrTool === 'object' ? recipeOrTool : null;
   const tool = typeof recipeOrTool === 'string' ? recipeOrTool : recipe?.tool;
   // Cooking level 2+, unskilled transmogrification, and Refining II scale
   // the visible cycle the same way the source scales wait_ms.
-  const multiplier = recipe ? makingSkillAdjustments(recipe, learned, upgrades).waitMultiplier : 1;
+  const multiplier = recipe ? makingSkillAdjustments(recipe, learned).waitMultiplier : 1;
   const sourceWait = Number(recipe?.waitMs);
   if (Number.isFinite(sourceWait) && sourceWait > 0) {
     return Math.max(350, Math.min(12000, Math.round(Math.max(700, Math.min(6000, sourceWait)) * multiplier)));
