@@ -1,0 +1,7112 @@
+{
+ "generatedBy": "build-sound-keys.mjs",
+ "soundsXml": "http://c2.glitch.bz/sounds/2012-12/sounds_1354665929.xml (not archived)",
+ "counts": {
+  "keys": 582,
+  "original": 550,
+  "music": 205,
+  "remake": 32,
+  "recoveredWayback": 38,
+  "downloadsBestFit": 17,
+  "withFile": 55,
+  "aliases": 3
+ },
+ "keys": {
+  "ABANDONDED_APARTMENTS2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-06/1339105558-Abandoned_Apartments_Upper_Floors_1.2_more_creak_less_suck.mp3"
+  },
+  "ABANDONED_APARTMENTS1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-06/1339105456-Abandonded_Apartments_Basement_and_Lobby_1.2.mp3"
+  },
+  "ABYSMAL_THRILLS": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1344044864-_Abysmal_Thrill_1.1_2.mp3"
+  },
+  "ACE_OF_SPADES": {
+   "category": "tool",
+   "moment": "items/ace_of_spades.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/ace_of_spades.js (tool class sound while working)"
+   ]
+  },
+  "ACHIEVEMENT_UNLOCKED": {
+   "category": "reward",
+   "moment": "Badge earned overlay",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:players/inc_achievements.js:436 (achievements_grant)"
+   ]
+  },
+  "ACTIVATE_GAME_TELEPORTER": {
+   "category": "travel",
+   "moment": "items/game_teleporter.js:195 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/game_teleporter.js:195 (initInstanceProps)"
+   ]
+  },
+  "ACTIVE": {
+   "category": "event",
+   "moment": "items/blockmaker.js:1449 (onPlayerEnter)",
+   "uses": 6,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker.js:1449 (onPlayerEnter)",
+    "gsjs:items/fuelmaker.js:1444 (onPlayerEnter)",
+    "gsjs:items/metalmaker.js:1550 (onPlayerEnter)",
+    "gsjs:items/woodworker.js:1428 (onPlayerEnter)",
+    "gsjs:players/inc_making.js:442 (making_make_known)",
+    "gsjs:players/inc_making.js:641 (tryToMake)"
+   ]
+  },
+  "ALCHEMICAL_TONGS": {
+   "category": "tool",
+   "moment": "items/alchemical_tongs.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/alchemical_tongs.js (tool class sound while working)"
+   ]
+  },
+  "AMBIENT_CAVERNS1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312401366-CAVERN_1.2.mp3"
+  },
+  "AMBIENT_CAVERNS2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312401399-CAVERN_2.2.mp3"
+  },
+  "AMBIENT_CAVERNS3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312401700-CAVERN_3.2.mp3"
+  },
+  "AMBIENT_CAVERNS4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312401763-CAVERN_4.2.mp3"
+  },
+  "AMBIENT_DEMO": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-05/1306254804-Forest_Demo_2.1.mp3"
+  },
+  "AMBIENT_FIREBOGS1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317316896-Firebogs_3.1.5_remix.mp3"
+  },
+  "AMBIENT_FIREBOGS2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317316931-Firebogs_3.2.5_remix.mp3"
+  },
+  "AMBIENT_FIREBOGS3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317316963-Firebogs_4.1.9_remix.mp3"
+  },
+  "AMBIENT_FIREBOGS4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317317088-Firebogs_4.2.3_remix.mp3"
+  },
+  "AMBIENT_FIREBOGS5": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317317138-Firebogs_4.4.2_remix.mp3"
+  },
+  "AMBIENT_FIREBOGS6": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317317174-Firebogs_4.5.4_remix.mp3"
+  },
+  "AMBIENT_FIREBOGS7": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317317206-Firebogs_4.6.2_remix.mp3"
+  },
+  "AMBIENT_FOREST_SLOW1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352222409-Forest_70_1.1.mp3"
+  },
+  "AMBIENT_FOREST_SLOW2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352222410-Forest_70_2.1.mp3"
+  },
+  "AMBIENT_FOREST_SLOW3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352222410-Forest_70_3.1.mp3"
+  },
+  "AMBIENT_FOREST_SLOW4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352222410-Forest_70_4.1.mp3"
+  },
+  "AMBIENT_HIGHLANDS1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326153361-Highlands_1.5.mp3"
+  },
+  "AMBIENT_HIGHLANDS2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326153874-Highlands_2.4.mp3"
+  },
+  "AMBIENT_HIGHLANDS3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326153964-Highlands_3.4.mp3"
+  },
+  "AMBIENT_HIGHLANDS4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326154058-Highlands_4.4.mp3"
+  },
+  "AMBIENT_HIGHLANDS5": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326154149-Highlands_5.4.mp3"
+  },
+  "AMBIENT_HIGHLANDS6": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326154229-Highlands_6.3.mp3"
+  },
+  "AMBIENT_HIGHLANDS7": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326154292-Highlands_7.3.mp3"
+  },
+  "AMBIENT_IX_1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470531-IX_1.3.mp3"
+  },
+  "AMBIENT_IX_10": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470865-IX_10.3.mp3"
+  },
+  "AMBIENT_IX_11": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470889-IX_11.2.mp3"
+  },
+  "AMBIENT_IX_12": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470945-IX_12.2.mp3"
+  },
+  "AMBIENT_IX_13": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471043-IX_13.2.mp3"
+  },
+  "AMBIENT_IX_14": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470988-IX_14.4.mp3"
+  },
+  "AMBIENT_IX_15": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471062-IX_15.2.mp3"
+  },
+  "AMBIENT_IX_16": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471090-IX_16.2.mp3"
+  },
+  "AMBIENT_IX_17": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471109-IX_17.4.mp3"
+  },
+  "AMBIENT_IX_18": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330471135-IX_18.4.mp3"
+  },
+  "AMBIENT_IX_2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470589-IX_2.3.mp3"
+  },
+  "AMBIENT_IX_3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470613-IX_3.4.mp3"
+  },
+  "AMBIENT_IX_4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470673-IX_4.4.mp3"
+  },
+  "AMBIENT_IX_5": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470693-IX_5.3.mp3"
+  },
+  "AMBIENT_IX_6": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470738-IX_6.4.mp3"
+  },
+  "AMBIENT_IX_7": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470791-IX_7.3.mp3"
+  },
+  "AMBIENT_IX_8": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470820-IX_8.4.mp3"
+  },
+  "AMBIENT_IX_9": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1330470843-IX_9.3.mp3"
+  },
+  "AMBIENT_KLORO_HAOMA1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1344450420-Mushroom_Hubs_1.3.mp3"
+  },
+  "AMBIENT_LOOP": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-06/1275501421-Ambient_Loop_2.mp3"
+  },
+  "AMBIENT_SAVANNA1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959624-SAVANNA_1.4plus4.mp3"
+  },
+  "AMBIENT_SAVANNA2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959799-SAVANNA_2.3plus4.mp3"
+  },
+  "AMBIENT_SAVANNA3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959876-SAVANNA_3.3plus4.mp3"
+  },
+  "AMBIENT_SAVANNA4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329960102-SAVANNA_4.6plus4.mp3"
+  },
+  "AMBIENT_SAVANNA5": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959932-SAVANNA_5.5plus4.mp3"
+  },
+  "AMBIENT_SAVANNA6": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1329959970-SAVANNA_6.4plus4.mp3"
+  },
+  "AMBIENT_URALIA1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312405966-URALIA_1.4.mp3"
+  },
+  "AMBIENT_URALIA2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312406074-URALIA_2.4.mp3"
+  },
+  "AMBIENT_URALIA3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312406109-URALIA_3.3.mp3"
+  },
+  "AMBIENT_URALIA4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312406220-URALIA_4.3.mp3"
+  },
+  "AMBIENT_URWOK1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345512097-00._Urwok_1.4.mp3"
+  },
+  "AMBIENT_URWOK2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056719-Urwok_2.3.mp3"
+  },
+  "AMBIENT_URWOK3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345512097-00._Urwok_3.4.mp3"
+  },
+  "AMBIENT_URWOK4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056720-Urwok_4.3.mp3"
+  },
+  "AMBIENT_URWOK5": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345512098-00._Urwok_5.4.mp3"
+  },
+  "AMBIENT_URWOK6": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056721-Urwok_6.3.mp3"
+  },
+  "AMBIENT_URWOK7": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056722-Urwok_7.3.mp3"
+  },
+  "AMBIENT_URWOK8": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1345056723-Urwok_8.4.mp3"
+  },
+  "AMBIENT_WATERFALL": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-09/1346892406-Waterfall_Background_1.1.mp3",
+   "file": "assets/audio/sfx/AMBIENT_WATERFALL.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "AMBIENT_WATERFALL_LEVEL3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-09/1347325991-Waterfall_Background_No_Gurgle_1.1.mp3",
+   "file": "assets/audio/sfx/AMBIENT_WATERFALL_LEVEL3.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "ANDRA_KAJUU_1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235352-Kajuu_1.5.mp3"
+  },
+  "ANDRA_KAJUU_10": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235598-Kajuu_11.3.mp3"
+  },
+  "ANDRA_KAJUU_11": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235598-Kajuu_11.3.mp3"
+  },
+  "ANDRA_KAJUU_12": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235641-Kajuu_12.3.mp3"
+  },
+  "ANDRA_KAJUU_13": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235699-Kajuu_13.3.mp3"
+  },
+  "ANDRA_KAJUU_14": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235790-Kajuu_14.4.mp3"
+  },
+  "ANDRA_KAJUU_15": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335288511-Kajuu_15.3.mp3"
+  },
+  "ANDRA_KAJUU_2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235373-Kajuu_2.5.mp3"
+  },
+  "ANDRA_KAJUU_3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235392-Kajuu_3.7.mp3"
+  },
+  "ANDRA_KAJUU_4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235417-Kajuu_4.5.mp3"
+  },
+  "ANDRA_KAJUU_5": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235451-Kajuu_5.9.mp3"
+  },
+  "ANDRA_KAJUU_6": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235469-Kajuu_6.5.mp3"
+  },
+  "ANDRA_KAJUU_7": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235484-Kajuu_7.5.mp3"
+  },
+  "ANDRA_KAJUU_8": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235499-Kajuu_8.8.mp3"
+  },
+  "ANDRA_KAJUU_9": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335235515-Kajuu_9.3.mp3"
+  },
+  "ANIMAL_STICK": {
+   "category": "event",
+   "moment": "items/magic_butterfly_stick.js:250 (parent_verb_magic_animal_stick_place)",
+   "uses": 6,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/magic_butterfly_stick.js:250 (parent_verb_magic_animal_stick_place)",
+    "gsjs:items/magic_butterfly_stick.js:273 (parent_verb_magic_animal_stick_place)",
+    "gsjs:items/magic_chicken_stick.js:239 (parent_verb_magic_animal_stick_place)",
+    "gsjs:items/magic_chicken_stick.js:262 (parent_verb_magic_animal_stick_place)",
+    "gsjs:items/magic_pig_stick.js:238 (parent_verb_magic_animal_stick_place)",
+    "gsjs:items/magic_pig_stick.js:261 (parent_verb_magic_animal_stick_place)"
+   ]
+  },
+  "ASSLANDIA": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352420340-Asslandia_1.1.mp3"
+  },
+  "AUTUMN_DAY": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-10/1350096123-Autumn_Day_2.5.mp3",
+   "file": "assets/audio/sfx/AUTUMN_DAY.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "AWESOME_POT": {
+   "category": "tool",
+   "moment": "items/awesome_pot.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/awesome_pot.js (tool class sound while working)"
+   ]
+  },
+  "BADGE_FANFARE": {
+   "category": "remake",
+   "moment": "Badge overlay (synth stand-in for ACHIEVEMENT_UNLOCKED)",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Badge overlay (synth stand-in for ACHIEVEMENT_UNLOCKED))"
+   ]
+  },
+  "BARNACLE_IS_RELEASED": {
+   "category": "animal",
+   "moment": "items/mortar_barnacle.js:296 (onScrapingComplete)",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/mortar_barnacle.js:296 (onScrapingComplete)",
+    "gsjs:items/test_item3.js:296 (onScrapingComplete)"
+   ]
+  },
+  "BEAKER": {
+   "category": "tool",
+   "moment": "items/beaker.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/beaker.js (tool class sound while working)"
+   ]
+  },
+  "BEAN_SEASONER": {
+   "category": "tool",
+   "moment": "items/bean_seasoner.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/bean_seasoner.js (tool class sound while working)"
+   ]
+  },
+  "BEEN_TREE": {
+   "category": "nature",
+   "moment": "items/include/trants.js:327 (onHarvestingComplete)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/trants.js:327 (onHarvestingComplete)"
+   ]
+  },
+  "BEGIN_LEARNING_SKILL": {
+   "category": "ui",
+   "moment": "Start learning a skill",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/port/SkillInfoUI.as:355 (learnIt)"
+   ]
+  },
+  "BIG_STAR_1": {
+   "category": "event",
+   "moment": "items/toy_star_2.js:27 (onPlayerCollision)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/toy_star_2.js:27 (onPlayerCollision)"
+   ]
+  },
+  "BIG_STAR_3": {
+   "category": "event",
+   "moment": "items/toy_star_1.js:27 (onPlayerCollision)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/toy_star_1.js:27 (onPlayerCollision)"
+   ]
+  },
+  "BIGENNIFY": {
+   "category": "event",
+   "moment": "items/avatar_embiggenifier.js:100 (onPlayerCollision)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/avatar_embiggenifier.js:100 (onPlayerCollision)"
+   ]
+  },
+  "BLENDER": {
+   "category": "tool",
+   "moment": "items/blender.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/blender.js (tool class sound while working)"
+   ]
+  },
+  "BLUE__WHITE": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1335837087-Blue_Quest_Ambient_Loop_1.1.mp3"
+  },
+  "BUBBLE_TREE": {
+   "category": "nature",
+   "moment": "items/include/trants.js:330 (onHarvestingComplete)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/trants.js:330 (onHarvestingComplete)"
+   ]
+  },
+  "BUBBLE_TUNER": {
+   "category": "tool",
+   "moment": "items/bubble_tuner.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/bubble_tuner.js (tool class sound while working)"
+   ]
+  },
+  "BUREAUCRATIC_HALL_MUZAK": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326989321-Waiting_Muzak_2.1.mp3"
+  },
+  "BURP": {
+   "category": "event",
+   "moment": "Overeating burp",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:locations/location.js:298 (onPlayerEnter)"
+   ]
+  },
+  "BUTLER_DOLL_FALL": {
+   "category": "event",
+   "moment": "items/bag_butler.js:5214 (playSound)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/bag_butler.js:5214 (playSound)"
+   ]
+  },
+  "BUTLER_DOLL_IDLE_2": {
+   "category": "event",
+   "moment": "items/bag_butler.js:5211 (playSound)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/bag_butler.js:5211 (playSound)"
+   ]
+  },
+  "BUTTERFLY_LOTION": {
+   "category": "tool",
+   "moment": "items/butterfly_lotion.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/butterfly_lotion.js (tool class sound while working)"
+   ]
+  },
+  "BUTTERFLY_NET": {
+   "category": "tool",
+   "moment": "items/butterfly_net.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/butterfly_net.js (tool class sound while working)"
+   ]
+  },
+  "BUTTERFLY_SING": {
+   "category": "animal",
+   "moment": "Sing to / milk a Butterfly",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_batterfly.js:1021 (parent_verb_npc_butterfly_sing_to)",
+    "gsjs:items/npc_butterfly.js:680 (is_potion)"
+   ]
+  },
+  "BUY_FOX_BRUSHING_PERMIT": {
+   "category": "animal",
+   "moment": "items/npc_fox_ranger.js:309 (onConversation)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_fox_ranger.js:309 (onConversation)"
+   ]
+  },
+  "BW_A1": {
+   "category": "recovered",
+   "moment": "Recovered c2 bell note (2012-08 waterfall puzzle bells, Blue & White set)",
+   "uses": 1,
+   "via": [
+    "wayback"
+   ],
+   "sources": [
+    "wayback:http://c2.glitch.bz/sounds/2012-08/1346434794-BW_A1.mp3 (filename)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1346434794-BW_A1.mp3",
+   "file": "assets/audio/sfx/BW_A1.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
+  },
+  "BW_C2": {
+   "category": "recovered",
+   "moment": "Recovered c2 bell note (2012-08 waterfall puzzle bells, Blue & White set)",
+   "uses": 1,
+   "via": [
+    "wayback"
+   ],
+   "sources": [
+    "wayback:http://c2.glitch.bz/sounds/2012-08/1346434795-BW_C2.mp3 (filename)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1346434795-BW_C2.mp3",
+   "file": "assets/audio/sfx/BW_C2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
+  },
+  "BW_D2": {
+   "category": "recovered",
+   "moment": "Recovered c2 bell note (2012-08 waterfall puzzle bells, Blue & White set)",
+   "uses": 1,
+   "via": [
+    "wayback"
+   ],
+   "sources": [
+    "wayback:http://c2.glitch.bz/sounds/2012-08/1346434795-BW_D2.mp3 (filename)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1346434795-BW_D2.mp3",
+   "file": "assets/audio/sfx/BW_D2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
+  },
+  "BW_E2": {
+   "category": "recovered",
+   "moment": "Recovered c2 bell note (2012-08 waterfall puzzle bells, Blue & White set)",
+   "uses": 1,
+   "via": [
+    "wayback"
+   ],
+   "sources": [
+    "wayback:http://c2.glitch.bz/sounds/2012-08/1346434795-BW_E2.mp3 (filename)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1346434795-BW_E2.mp3",
+   "file": "assets/audio/sfx/BW_E2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
+  },
+  "BW_G2": {
+   "category": "recovered",
+   "moment": "Recovered c2 bell note (2012-08 waterfall puzzle bells, Blue & White set)",
+   "uses": 1,
+   "via": [
+    "wayback"
+   ],
+   "sources": [
+    "wayback:http://c2.glitch.bz/sounds/2012-08/1346434796-BW_G2.mp3 (filename)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1346434796-BW_G2.mp3",
+   "file": "assets/audio/sfx/BW_G2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
+  },
+  "CAMERA_SHUTTER": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/gameoverlay/CameraMan.as:500 (snap)",
+   "uses": 2,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/gameoverlay/CameraMan.as:500 (snap)",
+    "client:com/tinyspeck/engine/view/gameoverlay/SnapTravelView.as:254 (showSnap)"
+   ]
+  },
+  "CAMERA_WIND": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/gameoverlay/CameraMan.as:438 (startUserMode)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/gameoverlay/CameraMan.as:438 (startUserMode)"
+   ]
+  },
+  "CANCEL_DISPATCHER": {
+   "category": "event",
+   "moment": "items/npc_mail_dispatcher.js:266 (mailStop)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_mail_dispatcher.js:266 (mailStop)"
+   ]
+  },
+  "CARD_DEAL1": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)"
+   ]
+  },
+  "CARD_DEAL2": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)"
+   ]
+  },
+  "CARD_DEAL3": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)"
+   ]
+  },
+  "CARD_DEAL4": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)"
+   ]
+  },
+  "CARD_DEAL5": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)"
+   ]
+  },
+  "CARD_DEAL6": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)"
+   ]
+  },
+  "CARD_DEAL7": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:199 (deal cards)"
+   ]
+  },
+  "CAULDRON": {
+   "category": "tool",
+   "moment": "items/cauldron.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/cauldron.js (tool class sound while working)"
+   ],
+   "file": "assets/audio/cauldron.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Cauldron (tool class sound)"
+  },
+  "CAVE_MUSIC1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328219938-Caves_1.1.mp3"
+  },
+  "CAVE_MUSIC2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328220013-Caves_2.1.mp3"
+  },
+  "CAVE_MUSIC3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328220148-Caves_3.1.mp3"
+  },
+  "CAVE_MUSIC4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328220183-Caves_4.1.mp3"
+  },
+  "CAVE_MUSIC5": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-02/1328220309-Caves_5.1.mp3"
+  },
+  "CHAIN_PULL": {
+   "category": "event",
+   "moment": "items/newxp_chain.js:56 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/newxp_chain.js:56 (initInstanceProps)"
+   ]
+  },
+  "CHASSIS1": {
+   "category": "making",
+   "moment": "items/blockmaker.js:733 (onApplyPart)",
+   "uses": 8,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker.js:733 (onApplyPart)",
+    "gsjs:items/blockmaker.js:819 (onDisassemblePart)",
+    "gsjs:items/fuelmaker.js:733 (onApplyPart)",
+    "gsjs:items/fuelmaker.js:737 (onApplyPart)",
+    "gsjs:items/metalmaker.js:808 (onApplyPart)",
+    "gsjs:items/metalmaker.js:812 (onApplyPart)"
+   ]
+  },
+  "CHASSIS2": {
+   "category": "making",
+   "moment": "items/blockmaker.js:764 (onApplyPartStep)",
+   "uses": 7,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker.js:764 (onApplyPartStep)",
+    "gsjs:items/fuelmaker.js:764 (onApplyPartStep)",
+    "gsjs:items/fuelmaker.js:780 (onApplyPartStep)",
+    "gsjs:items/metalmaker.js:839 (onApplyPartStep)",
+    "gsjs:items/metalmaker.js:855 (onApplyPartStep)",
+    "gsjs:items/woodworker.js:764 (onApplyPartStep)"
+   ]
+  },
+  "CHICKEN_SQUEEZED": {
+   "category": "animal",
+   "moment": "Squeeze a Chicken",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_chicken.js:1558 (onSqueezeComplete)",
+    "gsjs:items/npc_kitty_chicken.js:1718 (onSqueezeComplete)",
+    "gsjs:items/npc_test.js:1600 (onSqueezeComplete)"
+   ]
+  },
+  "CHOOSE_LEVEL": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/port/LocationSelectorDialog.as:638 (onButtonChosen)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/port/LocationSelectorDialog.as:638 (onButtonChosen)"
+   ]
+  },
+  "CHOOSE_ROD": {
+   "category": "event",
+   "moment": "items/npc_sloth.js:258 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_sloth.js:258 (initInstanceProps)"
+   ]
+  },
+  "CHOP_HIT": {
+   "category": "remake",
+   "moment": "One hatchet strike on a Wood Tree",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (One hatchet strike on a Wood Tree)"
+   ]
+  },
+  "CLASS_AXE": {
+   "category": "tool",
+   "moment": "items/class_axe.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/class_axe.js (tool class sound while working)"
+   ]
+  },
+  "CLASSIC_AXE": {
+   "category": "tool",
+   "moment": "items/classic_axe.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/classic_axe.js (tool class sound while working)"
+   ]
+  },
+  "CLICK_FAILURE": {
+   "category": "ui",
+   "moment": "A disabled button, or a verb that cannot run (garden, trants)",
+   "uses": 179,
+   "via": [
+    "announce_sound",
+    "client"
+   ],
+   "sources": [
+    "gsjs:items/gandlevery.js:377 (onExtractSeedsComplete)",
+    "gsjs:items/gandlevery.js:385 (onExtractSeedsComplete)",
+    "gsjs:items/hairball_flower.js:378 (onExtractSeedsComplete)",
+    "gsjs:items/hairball_flower.js:386 (onExtractSeedsComplete)",
+    "gsjs:items/include/garden.js:137 (is_watering_can)",
+    "gsjs:items/include/garden.js:221 (is_watering_can)"
+   ]
+  },
+  "CLICK_SUCCESS": {
+   "category": "ui",
+   "moment": "Any enabled button in a dialog (client UI)",
+   "uses": 164,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/debug/AdminDialogRookPanel.as:384 (inputEnterKeyHandler)",
+    "client:com/tinyspeck/engine/admin/HandOfGod.as:188 (onEnterKey)",
+    "client:com/tinyspeck/engine/admin/HandOfGod.as:213 (onEscapeKey)",
+    "client:com/tinyspeck/engine/admin/HandOfGod.as:230 (editProps)",
+    "client:com/tinyspeck/engine/admin/HandOfGod.as:237 (destroySelection)",
+    "client:com/tinyspeck/engine/control/HandOfDecorator.as:2094 (onEscapeKey)"
+   ]
+  },
+  "CLIENT_LOADED": {
+   "category": "travel",
+   "moment": "Game loaded",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:main.js:1012 (doLoginEnd)"
+   ],
+   "file": "assets/audio/game_loaded.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Game Loaded"
+  },
+  "CLOSE_HUB_MAP": {
+   "category": "ui",
+   "moment": "Map closes",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/gameoverlay/maps/HubMapDialog.as:545 (end)"
+   ]
+  },
+  "CLOUD_DROP_2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-06/1340390601-Rainbow_Run_A_Capella_8s_2.3.mp3",
+   "file": "assets/audio/sfx/CLOUD_DROP_2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "CLOUD_DROP_2_INTRO": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-06/1340390619-Rainbow_Run_A_Cappella_Intro_1.1.mp3",
+   "file": "assets/audio/sfx/CLOUD_DROP_2_INTRO.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "CLOUD1": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImgMenuSkills.as:40 (buildBase)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuSkills.as:40 (buildBase)"
+   ]
+  },
+  "CLOUD2": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImgMenuQuests.as:37 (buildBase)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuQuests.as:37 (buildBase)"
+   ]
+  },
+  "CLOUD3": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImgMenuUpgrade.as:26 (buildBase)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuUpgrade.as:26 (buildBase)"
+   ]
+  },
+  "CLOUD4": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImgMenuKeys.as:27 (buildBase)",
+   "uses": 2,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuKeys.as:27 (buildBase)",
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuYourLooks.as:30 (buildBase)"
+   ]
+  },
+  "CLOUD5": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImgMenuTeleport.as:31 (buildBase)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuTeleport.as:31 (buildBase)"
+   ]
+  },
+  "CLOUD6": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImgMenuHome.as:30 (buildBase)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuHome.as:30 (buildBase)"
+   ]
+  },
+  "CLOUD7": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImgMenuBackToWorld.as:28 (buildBase)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuBackToWorld.as:28 (buildBase)"
+   ]
+  },
+  "CLOUDHOPOLIS": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-06/1340243203-Rainbow_Run_A_Capella_60s_1.1.mp3"
+  },
+  "COCKTAIL_SHAKER": {
+   "category": "tool",
+   "moment": "items/cocktail_shaker.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/cocktail_shaker.js (tool class sound while working)"
+   ]
+  },
+  "COLLECT": {
+   "category": "making",
+   "moment": "items/blockmaker.js:605",
+   "uses": 4,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker.js:605",
+    "gsjs:items/fuelmaker.js:605",
+    "gsjs:items/metalmaker.js:665",
+    "gsjs:items/woodworker.js:605"
+   ]
+  },
+  "COMEDIAN": {
+   "category": "event",
+   "moment": "items/catalog_buffs.js:466",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/catalog_buffs.js:466"
+   ]
+  },
+  "COMPLETE_QUEST_REQUIREMENT": {
+   "category": "ui",
+   "moment": "One quest requirement is met",
+   "uses": 3,
+   "via": [
+    "announce_sound",
+    "client"
+   ],
+   "sources": [
+    "gsjs:locations/location.js:4532 (doIncantationsFeat)",
+    "gsjs:locations/location.js:4544 (doIncantationsFeat)",
+    "client:com/tinyspeck/engine/view/ui/quest/QuestQueue.as:161 (handleNextThingInQueue)"
+   ]
+  },
+  "CONCH": {
+   "category": "music",
+   "moment": "items/conch.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/conch.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-09/1347572925-Waterfall_For_Conch_1.1.mp3",
+   "file": "assets/audio/sfx/CONCH.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "CONFIRM_DELIVERY": {
+   "category": "event",
+   "moment": "items/npc_mail_dispatcher.js:334 (sendParcel)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_mail_dispatcher.js:334 (sendParcel)"
+   ]
+  },
+  "CONSTRUCTION_TOOL": {
+   "category": "tool",
+   "moment": "items/construction_tool.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/construction_tool.js (tool class sound while working)"
+   ]
+  },
+  "COUNT_DOWN": {
+   "category": "event",
+   "moment": "Race / Game of Crowns countdown",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:groups/shared_instance_manager.js:685 (startCountdown)"
+   ]
+  },
+  "CRAFT_DONE": {
+   "category": "remake",
+   "moment": "A making job finishes",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (A making job finishes)"
+   ]
+  },
+  "CRAFT_TICK": {
+   "category": "remake",
+   "moment": "Making progress tick",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Making progress tick)"
+   ]
+  },
+  "CRAFTING_RESULT_NOTHING": {
+   "category": "making",
+   "moment": "players/inc_making.js:795 (finishMakingKnown)",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_making.js:795 (finishMakingKnown)",
+    "gsjs:players/inc_making.js:1192 (finishMakingUnknown)",
+    "gsjs:players/inc_making.js:1233 (finishMakingUnknown)"
+   ]
+  },
+  "CRAFTYBOT_COLLAPSE": {
+   "category": "making",
+   "moment": "items/npc_crafty_bot.js:1028 (collapse)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_crafty_bot.js:1028 (collapse)"
+   ]
+  },
+  "CRAFTYBOT_CRAFT_END": {
+   "category": "making",
+   "moment": "items/npc_crafty_bot.js:2979 (setState)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_crafty_bot.js:2979 (setState)"
+   ]
+  },
+  "CRAFTYBOT_CRAFT_START": {
+   "category": "making",
+   "moment": "items/npc_crafty_bot.js:3018 (setState)",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:items/npc_crafty_bot.js:3018 (setState)"
+   ]
+  },
+  "CRAFTYBOT_EXPAND": {
+   "category": "making",
+   "moment": "items/npc_crafty_bot.js:1876 (expand)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_crafty_bot.js:1876 (expand)"
+   ]
+  },
+  "CRAFTYBOT_IDLE_1": {
+   "category": "making",
+   "moment": "items/npc_crafty_bot.js:3024 (setState)",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:items/npc_crafty_bot.js:3024 (setState)"
+   ]
+  },
+  "CRAFTYBOT_KICK": {
+   "category": "making",
+   "moment": "items/npc_crafty_bot.js:244 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_crafty_bot.js:244 (initInstanceProps)"
+   ]
+  },
+  "CRAFTYBOT_PEEK": {
+   "category": "making",
+   "moment": "items/npc_crafty_bot.js:2534 (onPlayerCollision)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_crafty_bot.js:2534 (onPlayerCollision)"
+   ]
+  },
+  "CRAFTYBOT_WALK": {
+   "category": "making",
+   "moment": "items/npc_crafty_bot.js:3013 (setState)",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:items/npc_crafty_bot.js:3013 (setState)"
+   ]
+  },
+  "CROAK": {
+   "category": "event",
+   "moment": "Your Glitch croaks (energy hits zero)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:1254 (croak)"
+   ]
+  },
+  "CROWN_CHANGES_HANDS": {
+   "category": "event",
+   "moment": "Game of Crowns: crown changes hands",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:groups/global_game.js:220 (setIt)"
+   ]
+  },
+  "CRUSHER_COLLISION": {
+   "category": "event",
+   "moment": "items/crusher.js:172 (onPlayerCollision)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/crusher.js:172 (onPlayerCollision)"
+   ]
+  },
+  "CRUSHER_IMPACT": {
+   "category": "event",
+   "moment": "items/crusher.js:64 (endDrop)",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:items/crusher.js:64 (endDrop)"
+   ]
+  },
+  "CRYSTALLIZER": {
+   "category": "tool",
+   "moment": "items/crystallizer.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/crystallizer.js (tool class sound while working)"
+   ]
+  },
+  "CUBIMAL_RACE": {
+   "category": "event",
+   "moment": "items/npc_combat_cubimal.js:779 (onBattleStart)",
+   "uses": 90,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_combat_cubimal.js:779 (onBattleStart)",
+    "gsjs:items/npc_combat_cubimal.js:1078 (onRaceStart)",
+    "gsjs:items/npc_combat_cubimal.js:1453 (parent_onBattleStart)",
+    "gsjs:items/npc_cubimal_batterfly.js:729 (onBattleStart)",
+    "gsjs:items/npc_cubimal_batterfly.js:959 (onRaceStart)",
+    "gsjs:items/npc_cubimal_bureaucrat.js:729 (onBattleStart)"
+   ]
+  },
+  "CUBIMAL_WIND_DOWN": {
+   "category": "event",
+   "moment": "items/npc_combat_cubimal.js:743 (onBattleLoop)",
+   "uses": 90,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_combat_cubimal.js:743 (onBattleLoop)",
+    "gsjs:items/npc_combat_cubimal.js:1054 (onRaceEnd)",
+    "gsjs:items/npc_combat_cubimal.js:1404 (parent_onBattleLoop)",
+    "gsjs:items/npc_cubimal_batterfly.js:680 (onBattleLoop)",
+    "gsjs:items/npc_cubimal_batterfly.js:935 (onRaceEnd)",
+    "gsjs:items/npc_cubimal_bureaucrat.js:680 (onBattleLoop)"
+   ]
+  },
+  "CUBIMAL_WIND_UP": {
+   "category": "event",
+   "moment": "items/npc_combat_cubimal.js:148 (initInstanceProps)",
+   "uses": 180,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_combat_cubimal.js:148 (initInstanceProps)",
+    "gsjs:items/npc_combat_cubimal.js:269 (initInstanceProps)",
+    "gsjs:items/npc_combat_cubimal.js:316 (initInstanceProps)",
+    "gsjs:items/npc_combat_cubimal.js:510",
+    "gsjs:items/npc_combat_cubimal.js:547 (parent_verb_npc_cubimal_base_battle)",
+    "gsjs:items/npc_combat_cubimal.js:586 (parent_verb_npc_cubimal_base_paper_battle)"
+   ]
+  },
+  "DANCER_POSE_FROG": {
+   "category": "animal",
+   "moment": "items/npc_yoga_frog.js:314 (doYoga)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_yoga_frog.js:314 (doYoga)"
+   ]
+  },
+  "DE_EMBIGGENIFY": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316485534-De-Embiggenfify_1.2.mp3"
+  },
+  "DEIMAGINATOR_TAKES_BOX": {
+   "category": "event",
+   "moment": "items/npc_deimaginator.js:243 (caughtPlayer)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_deimaginator.js:243 (caughtPlayer)"
+   ]
+  },
+  "DINOSAUR_INTESTINES": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352397228-Dinosaur_Ambience_1.1.mp3"
+  },
+  "DISCOVER_USEFUL_NEW_ITEM": {
+   "category": "event",
+   "moment": "First time an item class enters the pack",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_items.js:626 (items_added)"
+   ],
+   "file": "assets/audio/discover_new_item.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Discover New Item"
+  },
+  "DONATE_TO_SHRINE": {
+   "category": "reward",
+   "moment": "Donate to a Giant shrine",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/shrines.js:373 (doDonate)"
+   ]
+  },
+  "DONATION_1ST_TIER": {
+   "category": "reward",
+   "moment": "items/include/shrines.js:640 (doDonate)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/shrines.js:640 (doDonate)"
+   ]
+  },
+  "DONATION_2ND_TIER": {
+   "category": "reward",
+   "moment": "items/include/shrines.js:643 (doDonate)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/shrines.js:643 (doDonate)"
+   ]
+  },
+  "DONATION_3RD_TIER": {
+   "category": "reward",
+   "moment": "items/include/shrines.js:646 (doDonate)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/shrines.js:646 (doDonate)"
+   ]
+  },
+  "DONATION_4TH_TIER": {
+   "category": "reward",
+   "moment": "items/include/shrines.js:634 (doDonate)",
+   "uses": 5,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/shrines.js:634 (doDonate)",
+    "gsjs:items/include/shrines.js:637 (doDonate)",
+    "gsjs:items/include/shrines.js:649 (doDonate)",
+    "gsjs:items/potion_draught_of_giant_amicability.js:599 (onQuaff)",
+    "gsjs:items/potion_favor.js:599 (onQuaff)"
+   ]
+  },
+  "DONATION_RECIEVE_EMBLEM": {
+   "category": "reward",
+   "moment": "Shrine favor fills: emblem",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/shrines.js:131 (give_emblem)"
+   ]
+  },
+  "DOOR_CLOSE": {
+   "category": "ui",
+   "moment": "Door closes behind you, 600 ms after entering (client)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/gameoverlay/LoadingLocationView.as:411 (done)"
+   ]
+  },
+  "DOOR_CREAK": {
+   "category": "remake",
+   "moment": "Doors and house entrances",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Doors and house entrances)"
+   ]
+  },
+  "DOOR_OPEN": {
+   "category": "ui",
+   "moment": "Walk through a door (client)",
+   "uses": 2,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/control/engine/NetController.as:428 (actuallyStartLocationMove)",
+    "client:com/tinyspeck/engine/control/engine/NetController.as:1428 (removeTsidsFromHash)"
+   ]
+  },
+  "DUST_TRAP_SMACK_DOWN": {
+   "category": "event",
+   "moment": "items/dust_trap.js:155 (doPlayerResponse)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/dust_trap.js:155 (doPlayerResponse)"
+   ]
+  },
+  "DUST_TRAP_UP": {
+   "category": "event",
+   "moment": "items/dust_trap.js:241 (reset)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/dust_trap.js:241 (reset)"
+   ]
+  },
+  "DUSTY_STICK": {
+   "category": "tool",
+   "moment": "items/dusty_stick.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/dusty_stick.js (tool class sound while working)"
+   ]
+  },
+  "EFFECT_EXTREME": {
+   "category": "event",
+   "moment": "items/extremely_hallowed_shrine_powder.js:285 (isShrine)",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/extremely_hallowed_shrine_powder.js:285 (isShrine)",
+    "gsjs:items/fertilidust.js:346 (onUse)",
+    "gsjs:items/powder_of_startling_fecundity.js:372 (onUse)"
+   ]
+  },
+  "EFFECT_MILD": {
+   "category": "event",
+   "moment": "items/fairly_hallowed_shrine_powder.js:285 (isShrine)",
+   "uses": 4,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/fairly_hallowed_shrine_powder.js:285 (isShrine)",
+    "gsjs:items/fertilidust_lite.js:278 (isTrant)",
+    "gsjs:items/juju_shoo_shoo_powder.js:305 (onUse)",
+    "gsjs:items/powder_of_mild_fecundity.js:369 (onUse)"
+   ]
+  },
+  "EGG_SEASONER": {
+   "category": "tool",
+   "moment": "items/egg_seasoner.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/egg_seasoner.js (tool class sound while working)"
+   ]
+  },
+  "EGG_TREE": {
+   "category": "nature",
+   "moment": "items/include/trants.js:333 (onHarvestingComplete)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/trants.js:333 (onHarvestingComplete)"
+   ]
+  },
+  "ELEVATOR_MUSIC": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1294276855-Elevator_Music_2.mp3"
+  },
+  "ELEVATOR_OPENS": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/port/LocationSelectorDialog.as:301 (showElevator)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/port/LocationSelectorDialog.as:301 (showElevator)"
+   ]
+  },
+  "EMO_BEAR_HUG": {
+   "category": "event",
+   "moment": "items/emotional_bear.js:112",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/emotional_bear.js:112"
+   ]
+  },
+  "EMOTIONAL_BEAR_HIGH_5": {
+   "category": "event",
+   "moment": "items/emotional_bear.js:185",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/emotional_bear.js:185"
+   ]
+  },
+  "ENCHANTED_WOOD": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1334190845-Enchanted_Woods_1.1.mp3"
+  },
+  "ENCHANTED_WOOD_II": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1334190773-Enchanted_Woods_2.3.mp3"
+  },
+  "ENCHANTED_WOOD_III": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-04/1334190701-Enchanted_Woods_3.5.mp3"
+  },
+  "ENGINE1": {
+   "category": "making",
+   "moment": "items/blockmaker.js:737 (onApplyPart)",
+   "uses": 5,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker.js:737 (onApplyPart)",
+    "gsjs:items/blockmaker.js:824 (onDisassemblePart)",
+    "gsjs:items/fuelmaker.js:741 (onApplyPart)",
+    "gsjs:items/metalmaker.js:816 (onApplyPart)",
+    "gsjs:items/woodworker.js:741 (onApplyPart)"
+   ]
+  },
+  "ENGINE2": {
+   "category": "making",
+   "moment": "items/blockmaker.js:780 (onApplyPartStep)",
+   "uses": 4,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker.js:780 (onApplyPartStep)",
+    "gsjs:items/fuelmaker.js:796 (onApplyPartStep)",
+    "gsjs:items/metalmaker.js:871 (onApplyPartStep)",
+    "gsjs:items/woodworker.js:796 (onApplyPartStep)"
+   ]
+  },
+  "EXTREMELY_HALLOWED_SHRINE_POWDER": {
+   "category": "powder",
+   "moment": "items/extremely_hallowed_shrine_powder.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/extremely_hallowed_shrine_powder.js (use_sound)"
+   ]
+  },
+  "FAILED_AT_CHARADES": {
+   "category": "event",
+   "moment": "items/catalog_buffs.js:418",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/catalog_buffs.js:418",
+    "gsjs:main.js:1773 (doLocalChat)"
+   ]
+  },
+  "FAIRLY_HALLOWED_SHRINE_POWDER": {
+   "category": "powder",
+   "moment": "items/fairly_hallowed_shrine_powder.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/fairly_hallowed_shrine_powder.js (use_sound)"
+   ]
+  },
+  "FANCY_PICK": {
+   "category": "tool",
+   "moment": "Mining with a Fancy Pick (looped)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/fancy_pick.js (tool class sound while working)"
+   ]
+  },
+  "FEED_PIGGY": {
+   "category": "animal",
+   "moment": "Feed a Piggy",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_kitty.js:381 (initInstanceProps)",
+    "gsjs:items/npc_piggy.js:742 (is_potion)"
+   ]
+  },
+  "FERTILIDUST": {
+   "category": "powder",
+   "moment": "items/fertilidust.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/fertilidust.js (use_sound)"
+   ]
+  },
+  "FERTILIDUST_LITE": {
+   "category": "powder",
+   "moment": "items/fertilidust_lite.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/fertilidust_lite.js (use_sound)"
+   ]
+  },
+  "FIREFLY_WHISTLE_1": {
+   "category": "music",
+   "moment": "items/firefly_jar.js:204 (whistle)",
+   "uses": 2,
+   "via": [
+    "family",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/firefly_jar.js:204 (whistle)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1296255471-Firefly_Whistle_1.3.mp3",
+   "file": "assets/audio/sfx/FIREFLY_WHISTLE_1.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "FIREFLY_WHISTLE_2": {
+   "category": "music",
+   "moment": "items/firefly_jar.js:204 (whistle)",
+   "uses": 2,
+   "via": [
+    "family",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/firefly_jar.js:204 (whistle)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1296255489-Firefly_Whistle_2.2.mp3",
+   "file": "assets/audio/sfx/FIREFLY_WHISTLE_2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "FIREFLY_WHISTLE_3": {
+   "category": "music",
+   "moment": "items/firefly_jar.js:204 (whistle)",
+   "uses": 2,
+   "via": [
+    "family",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/firefly_jar.js:204 (whistle)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1296255520-Firefly_Whistle_3.3.mp3",
+   "file": "assets/audio/sfx/FIREFLY_WHISTLE_3.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "FIRST_STREET_LOADING": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/TSMainView.as:1495 (makeVisibleFirstTime)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/TSMainView.as:1495 (makeVisibleFirstTime)"
+   ]
+  },
+  "FLIP_BACK": {
+   "category": "ui",
+   "moment": "Imagination card flips back",
+   "uses": 2,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:352 (reset)",
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:540 (flip)"
+   ]
+  },
+  "FLIP_OVER": {
+   "category": "ui",
+   "moment": "Imagination card flips over",
+   "uses": 2,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:540 (flip)",
+    "client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:540 (flip)"
+   ]
+  },
+  "FLITTERBUG_COLLISION": {
+   "category": "downloads",
+   "moment": "downloads.html (Flitterbug Collision)",
+   "uses": 1,
+   "via": [
+    "downloads"
+   ],
+   "sources": [
+    "downloads.html (Flitterbug Collision)"
+   ],
+   "file": "assets/audio/flitterbug_collision.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Flitterbug Collision"
+  },
+  "FLYING_KITTY_MEW": {
+   "category": "animal",
+   "moment": "items/npc_kitty_chicken.js:1220 (onPlayerCollision)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_kitty_chicken.js:1220 (onPlayerCollision)"
+   ]
+  },
+  "FLYING_KITTY_PURR": {
+   "category": "animal",
+   "moment": "items/npc_kitty_chicken.js:244 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_kitty_chicken.js:244 (initInstanceProps)"
+   ]
+  },
+  "FOCUSED_MEDITATION_ENERGY": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297359267-meditation_korg.mp3"
+  },
+  "FOCUSED_MEDITATION_MOOD": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297359604-meditation_wurly.mp3"
+  },
+  "FOCUSING_ORB": {
+   "category": "tool",
+   "moment": "items/focusing_orb.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/focusing_orb.js (tool class sound while working)"
+   ]
+  },
+  "FOOTSTEP": {
+   "category": "remake",
+   "moment": "Soft step (slides, crafting ticks)",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Soft step (slides, crafting ticks))"
+   ]
+  },
+  "FOREST_AMBIENT1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-06/1309454496-Forest_Theme_1.1.mp3"
+  },
+  "FOREST_AMBIENT2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-06/1309454585-Forest_Theme_2.1.mp3"
+  },
+  "FOREST_AMBIENT3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-06/1309454619-Forest_Theme_3.3.mp3"
+  },
+  "FOREST_AMBIENT4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-06/1309454863-Forest_Theme_4.6.mp3"
+  },
+  "FOX_BAIT": {
+   "category": "animal",
+   "moment": "items/fox_bait.js:139 (is_bait)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/fox_bait.js:139 (is_bait)"
+   ]
+  },
+  "FOX_BAIT_LAND": {
+   "category": "animal",
+   "moment": "items/fox_bait.js:203 (land)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/fox_bait.js:203 (land)"
+   ]
+  },
+  "FOX_BRUSH": {
+   "category": "tool",
+   "moment": "items/fox_brush.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/fox_brush.js (tool class sound while working)"
+   ]
+  },
+  "FOX_BRUSH_HIT": {
+   "category": "animal",
+   "moment": "items/npc_fox.js:232 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_fox.js:232 (initInstanceProps)"
+   ]
+  },
+  "FOX_BRUSH_MISS": {
+   "category": "animal",
+   "moment": "items/npc_fox.js:216 (initInstanceProps)",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_fox.js:216 (initInstanceProps)",
+    "gsjs:items/npc_fox.js:228 (initInstanceProps)",
+    "gsjs:items/npc_fox.js:337 (endBrushing)"
+   ]
+  },
+  "FOX_EAT": {
+   "category": "animal",
+   "moment": "items/furniture_rug.js:85 (initInstanceProps)",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/furniture_rug.js:85 (initInstanceProps)",
+    "gsjs:items/npc_fox.js:507 (onPathing)"
+   ]
+  },
+  "FOX_YIP": {
+   "category": "remake",
+   "moment": "Fox bark",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Fox bark)"
+   ]
+  },
+  "FRUIT_CHANGING_MACHINE": {
+   "category": "tool",
+   "moment": "items/fruit_changing_machine.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/fruit_changing_machine.js (tool class sound while working)"
+   ]
+  },
+  "FRUIT_TREE": {
+   "category": "nature",
+   "moment": "items/include/trants.js:336 (onHarvestingComplete)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/trants.js:336 (onHarvestingComplete)"
+   ]
+  },
+  "FRYING_PAN": {
+   "category": "tool",
+   "moment": "items/frying_pan.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/frying_pan.js (tool class sound while working)"
+   ]
+  },
+  "FUELMAKER_CASE1": {
+   "category": "making",
+   "moment": "items/fuelmaker.js:819 (onDisassemblePart)",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/fuelmaker.js:819 (onDisassemblePart)",
+    "gsjs:items/metalmaker.js:894 (onDisassemblePart)",
+    "gsjs:items/woodworker.js:819 (onDisassemblePart)"
+   ]
+  },
+  "FUELMAKER_CORE1": {
+   "category": "making",
+   "moment": "items/fuelmaker.js:824 (onDisassemblePart)",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/fuelmaker.js:824 (onDisassemblePart)",
+    "gsjs:items/metalmaker.js:899 (onDisassemblePart)",
+    "gsjs:items/woodworker.js:824 (onDisassemblePart)"
+   ]
+  },
+  "FUELMAKER_ENGINE1": {
+   "category": "making",
+   "moment": "items/fuelmaker.js:830 (onDisassemblePart)",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/fuelmaker.js:830 (onDisassemblePart)",
+    "gsjs:items/metalmaker.js:905 (onDisassemblePart)",
+    "gsjs:items/woodworker.js:830 (onDisassemblePart)"
+   ]
+  },
+  "FUELMAKER_LOAD_OPEN": {
+   "category": "making",
+   "moment": "items/still.js:370 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/still.js:370 (initInstanceProps)"
+   ]
+  },
+  "FUTURE_SWING_20": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-05/1274905279-Future_Swing_20_sec.mp3"
+  },
+  "FUTURE_SWING_30": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-05/1274905292-Future_Swing_30_sec.mp3"
+  },
+  "GAME_STARTING_SOON": {
+   "category": "event",
+   "moment": "groups/shared_instance_manager.js:313 (dismissOverlaysAndStart)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:groups/shared_instance_manager.js:313 (dismissOverlaysAndStart)"
+   ]
+  },
+  "GARDEN_CLEAR": {
+   "category": "remake",
+   "moment": "Clear a garden plot",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Clear a garden plot)"
+   ]
+  },
+  "GARDEN_PLANT": {
+   "category": "remake",
+   "moment": "Plant seeds in a garden plot",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Plant seeds in a garden plot)"
+   ]
+  },
+  "GAS_TREE": {
+   "category": "nature",
+   "moment": "items/include/trants.js:339 (onHarvestingComplete)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/trants.js:339 (onHarvestingComplete)"
+   ]
+  },
+  "GASSIFIER": {
+   "category": "tool",
+   "moment": "items/gassifier.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/gassifier.js (tool class sound while working)"
+   ]
+  },
+  "GLITCHMAS_CRACKER": {
+   "category": "event",
+   "moment": "items/glitchmas_cracker.js:340 (onOverlayClicked)",
+   "uses": 2,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:items/glitchmas_cracker.js:340 (onOverlayClicked)",
+    "gsjs:items/glitchmas_cracker.js:345 (onOverlayClicked)"
+   ]
+  },
+  "GLITCHMAS_PARTY_LOCATION": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-12/1324484819-Holiday_Party_Space_Loop_2.1.mp3"
+  },
+  "GOC_MUSIC_1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326904591-Game_of_Crowns_1.2.mp3"
+  },
+  "GOC_MUSIC_2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326904652-Game_of_Crowns_2.2.mp3"
+  },
+  "GOC_MUSIC_3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326904729-Game_of_Crowns_3.2.mp3"
+  },
+  "GONG_GIANTS": {
+   "category": "reward",
+   "moment": "admin.js:137 (broadcastGodMessage)",
+   "uses": 3,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:admin.js:137 (broadcastGodMessage)",
+    "gsjs:items/include/shrines.js:1254 (open_giant_screen)",
+    "gsjs:main.js:1819 (is_shrine)"
+   ]
+  },
+  "GOODNIGHT_GRODDLE": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-06/1307035523-Goodnight_Groddle_Master.mp3"
+  },
+  "GRAND_OL_GRINDER": {
+   "category": "tool",
+   "moment": "items/grand_ol_grinder.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/grand_ol_grinder.js (tool class sound while working)"
+   ]
+  },
+  "GREETING_NEEDED": {
+   "category": "event",
+   "moment": "locations/location.js:3961 (summonGreeters)",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:locations/location.js:3961 (summonGreeters)"
+   ]
+  },
+  "GRODDLE_AMBIENT": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-05/1305665080-Groddle_Ambient_Test_1.6.mp3"
+  },
+  "HAND_PULL_DOWN": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:200 (onHandAniComplete)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:200 (onHandAniComplete)"
+   ]
+  },
+  "HAND_SWIPE": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:179 (redealHand)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as:179 (redealHand)"
+   ]
+  },
+  "HAPPY_CHICKEN": {
+   "category": "animal",
+   "moment": "Chicken is happy after care",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_chicken.js:195 (initInstanceProps)",
+    "gsjs:items/npc_kitty_chicken.js:753 (parent_verb_npc_chicken_butter_up)",
+    "gsjs:items/npc_test.js:269 (initInstanceProps)"
+   ]
+  },
+  "HARVEST": {
+   "category": "nature",
+   "moment": "Harvest a trant or Wood Tree",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/trants.js:345 (onHarvestingComplete)",
+    "gsjs:items/wood_tree.js:770 (endHarvest)",
+    "gsjs:items/wood_tree_enchanted.js:801 (endHarvest)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-03/1333032669-Harvest_2.1.mp3",
+   "file": "assets/audio/sfx/HARVEST.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "HAS_MAIL": {
+   "category": "event",
+   "moment": "Mailbox has new mail",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/bag_butler.js:5960 (setPCState)",
+    "gsjs:items/npc_mailbox.js:337 (setPCState)"
+   ]
+  },
+  "HATCHET": {
+   "category": "tool",
+   "moment": "Chopping a Wood Tree with a Hatchet (looped)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/hatchet.js (tool class sound while working)"
+   ]
+  },
+  "HEARTBEAT": {
+   "category": "event",
+   "moment": "quests/phantom_glitch.js:438 (onEnterLocation)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:quests/phantom_glitch.js:438 (onEnterLocation)"
+   ]
+  },
+  "HELL": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-05/1274906921-Bongbong.mp3"
+  },
+  "HERE_YOU_GO_LIGHTER": {
+   "category": "recovered",
+   "moment": "Recovered c2 file with no surviving key; a \"here you go\" hand-over, so ITEM_GIVE and ITEM_GIVEN_TO_YOU borrow it",
+   "uses": 1,
+   "via": [
+    "wayback"
+   ],
+   "sources": [
+    "wayback:http://c2.glitch.bz/sounds/2010-05/here_you_go_lighter.mp3 (filename)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-05/here_you_go_lighter.mp3",
+   "file": "assets/audio/sfx/HERE_YOU_GO_LIGHTER.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
+  },
+  "HI_FLOWERS": {
+   "category": "ui",
+   "moment": "Hi signs thrown between players",
+   "uses": 2,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/control/engine/AnnouncementController.as:783 (doEmoteHi)",
+    "client:com/tinyspeck/engine/control/engine/AnnouncementController.as:791 (doEmoteHi)"
+   ]
+  },
+  "HI_FLOWERS_2X": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/control/engine/AnnouncementController.as:689 (doEmoteHiBonus)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/control/engine/AnnouncementController.as:689 (doEmoteHiBonus)"
+   ]
+  },
+  "HI_FLOWERS_HIT": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/control/engine/MissileController.as:99 (doMissilehit)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/control/engine/MissileController.as:99 (doMissilehit)"
+   ]
+  },
+  "HIGH_CLASS_HOE": {
+   "category": "tool",
+   "moment": "items/high_class_hoe.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/high_class_hoe.js (tool class sound while working)"
+   ]
+  },
+  "HOE": {
+   "category": "tool",
+   "moment": "Hoe a garden plot",
+   "uses": 5,
+   "via": [
+    "announce_sound",
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/include/garden.js:285 (is_hoe)",
+    "gsjs:items/include/garden.js:288 (is_hoe)",
+    "gsjs:items/include/master_garden.js:285 (potionTendGarden)",
+    "gsjs:items/include/master_garden.js:288 (potionTendGarden)",
+    "gsjs:items/hoe.js (tool class sound while working)"
+   ]
+  },
+  "HOME_STREET_FIREBOGS": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1344474398-Firebogs_Home_Street_Final_1.1.mp3"
+  },
+  "HOME_STREET_GRODDLE_WHISTLE": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1344474851-Snappy_w_and_wo_whistle_Loop.mp3"
+  },
+  "HOME_STREET_URALIA": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-07/1341949924-Musical_Party_Space_Uralia_1.3_plus_3db.mp3"
+  },
+  "HORRIBLE_SOUND": {
+   "category": "event",
+   "moment": "items/focusing_orb.js:842 (endFocusedMeditation)",
+   "uses": 6,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/focusing_orb.js:842 (endFocusedMeditation)",
+    "gsjs:items/focusing_orb.js:971 (endStandingMeditation)",
+    "gsjs:items/focusing_orb.js:1132 (endTranscendentalMeditation)",
+    "gsjs:items/focusing_orb.js:1292 (endTranscendentalRadiationNew)",
+    "gsjs:items/include/shrines.js:301 (evalDonate)",
+    "gsjs:items/sneezing_powder.js:256 (is_antidote)"
+   ]
+  },
+  "ICE_CREAM_TRUCK": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316476676-Ice_Cream_Truck_for_Wintry_Place_1.3.mp3"
+  },
+  "ICE_CUBE": {
+   "category": "event",
+   "moment": "items/ice_knob.js:320 (onScrapingComplete)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/ice_knob.js:320 (onScrapingComplete)"
+   ]
+  },
+  "ICON_GIANT_LOVE": {
+   "category": "reward",
+   "moment": "items/include/icon.js:586 (showBonus)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/icon.js:586 (showBonus)"
+   ]
+  },
+  "IDLE_FROG": {
+   "category": "animal",
+   "moment": "items/npc_yoga_frog.js:450 (followPC)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_yoga_frog.js:450 (followPC)"
+   ]
+  },
+  "IMAGINATION_CLOSE": {
+   "category": "ui",
+   "moment": "Imagination menu closes",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/gameoverlay/ImgMenuView.as:290 (hide)"
+   ]
+  },
+  "IMAGINATION_OPEN": {
+   "category": "ui",
+   "moment": "Imagination menu opens (remake: skills panel)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/gameoverlay/ImgMenuView.as:236 (show)"
+   ]
+  },
+  "IMAGINATION_PURCHASE": {
+   "category": "downloads",
+   "moment": "downloads.html (Imagination Upgrade)",
+   "uses": 1,
+   "via": [
+    "downloads"
+   ],
+   "sources": [
+    "downloads.html (Imagination Upgrade)"
+   ],
+   "file": "assets/audio/imagination_upgrade.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Imagination Upgrade"
+  },
+  "INCOMING_CHAT": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/port/RightSideManager.as:260 (chatUpdate)",
+   "uses": 2,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/port/RightSideManager.as:260 (chatUpdate)",
+    "client:com/tinyspeck/engine/port/RightSideView.as:542 (chatUpdate)"
+   ]
+  },
+  "INCOMING_CHAT_NEW": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/port/RightSideView.as:527 (chatUpdate)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/port/RightSideView.as:527 (chatUpdate)"
+   ]
+  },
+  "INTERACT_DISPATCHER": {
+   "category": "event",
+   "moment": "items/npc_mail_dispatcher.js:308 (sendMail)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_mail_dispatcher.js:308 (sendMail)"
+   ]
+  },
+  "INTERACT_MAILBOX": {
+   "category": "event",
+   "moment": "Open the mailbox",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/bag_butler.js:5901 (checkMail)",
+    "gsjs:items/npc_mailbox.js:221 (checkMail)"
+   ]
+  },
+  "IRRIGATOR_9000": {
+   "category": "tool",
+   "moment": "items/irrigator_9000.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/irrigator_9000.js (tool class sound while working)"
+   ]
+  },
+  "ITEM_DRINK": {
+   "category": "item",
+   "moment": "Drink a drink item",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/drink.js:121 (drink_drink)"
+   ]
+  },
+  "ITEM_DROP": {
+   "category": "item",
+   "moment": "Drop an item on the street",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/takeable.js:211 (takeable_drop)"
+   ]
+  },
+  "ITEM_EAT": {
+   "category": "item",
+   "moment": "Eat a food item",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/food.js:189 (food_eat)"
+   ]
+  },
+  "ITEM_GIVE": {
+   "category": "item",
+   "moment": "Give an item to another player",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/takeable.js:279 (takeable_give)"
+   ],
+   "alias": "HERE_YOU_GO_LIGHTER"
+  },
+  "ITEM_GIVEN_TO_YOU": {
+   "category": "item",
+   "moment": "Someone gives you an item",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/takeable.js:281 (takeable_give)"
+   ],
+   "alias": "HERE_YOU_GO_LIGHTER"
+  },
+  "ITEM_PICKUP": {
+   "category": "item",
+   "moment": "Pick up an item from the street",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/takeable.js:100 (takeable_pickup)"
+   ]
+  },
+  "JAL1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-10/1350945525-Jal_1.8.mp3"
+  },
+  "JAL2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-10/1350945525-Jal_2.4.mp3"
+  },
+  "JUJU_BANDIT_SHRINK": {
+   "category": "event",
+   "moment": "items/npc_juju_bandit.js:225 (escape)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_juju_bandit.js:225 (escape)"
+   ]
+  },
+  "JUJU_BANDIT_SPAWN": {
+   "category": "event",
+   "moment": "items/npc_juju_bandit.js:205 (appear)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_juju_bandit.js:205 (appear)"
+   ]
+  },
+  "JUJU_SHOO_SHOO_POWDER": {
+   "category": "powder",
+   "moment": "items/juju_shoo_shoo_powder.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/juju_shoo_shoo_powder.js (use_sound)"
+   ]
+  },
+  "JUMP": {
+   "category": "remake",
+   "moment": "Ordinary jump",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Ordinary jump)"
+   ]
+  },
+  "KISS_RECV": {
+   "category": "event",
+   "moment": "items/emotional_bear.js:285",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/emotional_bear.js:285",
+    "gsjs:items/lips.js:150"
+   ]
+  },
+  "KISS_SEND": {
+   "category": "event",
+   "moment": "items/emotional_bear.js:287",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/emotional_bear.js:287",
+    "gsjs:items/lips.js:152"
+   ]
+  },
+  "KITTY_MEW": {
+   "category": "remake",
+   "moment": "Heli kitty mew",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Heli kitty mew)"
+   ]
+  },
+  "KNIFE_AND_BOARD": {
+   "category": "tool",
+   "moment": "items/pumpkin.js:392 (onCarveStep1Complete)",
+   "uses": 2,
+   "via": [
+    "announce_sound",
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/pumpkin.js:392 (onCarveStep1Complete)",
+    "gsjs:items/knife_and_board.js (tool class sound while working)"
+   ]
+  },
+  "LEVEL_UP": {
+   "category": "reward",
+   "moment": "Level up overlay",
+   "uses": 2,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:players/inc_newxp.js:67 (newxpComplete)",
+    "gsjs:players/inc_stats.js:409 (stats_add_xp)"
+   ],
+   "file": "assets/audio/level_up_kazoo.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Level Up Kazoo"
+  },
+  "LONELINESS_FIREWORKS": {
+   "category": "event",
+   "moment": "items/include/loneliness.js:366 (lonelinessEndPartyOverlay)",
+   "uses": 6,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/loneliness.js:366 (lonelinessEndPartyOverlay)",
+    "gsjs:items/include/loneliness.js:380 (lonelinessEndPartyOverlay)",
+    "gsjs:items/include/loneliness.js:394 (lonelinessEndPartyOverlay)",
+    "gsjs:items/include/loneliness.js:407 (lonelinessEndPartyOverlay)",
+    "gsjs:items/include/loneliness.js:421 (lonelinessEndPartyOverlay)",
+    "gsjs:items/include/loneliness.js:435 (lonelinessEndPartyOverlay)"
+   ]
+  },
+  "LOOMER": {
+   "category": "tool",
+   "moment": "items/loomer.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/loomer.js (tool class sound while working)"
+   ]
+  },
+  "MAILBOX_ALL_DONE": {
+   "category": "event",
+   "moment": "Mailbox emptied",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/bag_butler.js:6441 (parent_mailStop)",
+    "gsjs:items/npc_mailbox.js:249 (mailStop)"
+   ]
+  },
+  "MAKING_WAITING_COOKING": {
+   "category": "making",
+   "moment": "players/inc_making.js:677 (tryToMake)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_making.js:677 (tryToMake)"
+   ]
+  },
+  "MEDITATION_SUCCESS": {
+   "category": "event",
+   "moment": "items/focusing_orb.js:843 (endFocusedMeditation)",
+   "uses": 4,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/focusing_orb.js:843 (endFocusedMeditation)",
+    "gsjs:items/focusing_orb.js:972 (endStandingMeditation)",
+    "gsjs:items/focusing_orb.js:1133 (endTranscendentalMeditation)",
+    "gsjs:items/focusing_orb.js:1293 (endTranscendentalRadiationNew)"
+   ]
+  },
+  "MEDITATIVE_ARTS_01": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1294257766-Round_Two_in_Seven_2.mp3"
+  },
+  "MEDITATIVE_ARTS_02": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297227011-meditation_ac15.mp3"
+  },
+  "METALMAKER": {
+   "category": "music",
+   "moment": "items/blockmaker.js:1442 (onPlayerEnter)",
+   "uses": 6,
+   "via": [
+    "announce_sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker.js:1442 (onPlayerEnter)",
+    "gsjs:items/fuelmaker.js:1437 (onPlayerEnter)",
+    "gsjs:items/metalmaker.js:101 (initInstanceProps)",
+    "gsjs:items/metalmaker.js:1543 (onPlayerEnter)",
+    "gsjs:items/woodworker.js:1421 (onPlayerEnter)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-03/1332181597-Metalmaker_1.3.mp3",
+   "file": "assets/audio/ambient/metalmaker_1344997841.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "metalmaker (music_map METALMAKER)"
+  },
+  "MIKE_TYSON_GRILL": {
+   "category": "tool",
+   "moment": "items/mike_tyson_grill.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/mike_tyson_grill.js (tool class sound while working)"
+   ]
+  },
+  "MINE_HIT": {
+   "category": "remake",
+   "moment": "One pick strike on a rock",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (One pick strike on a rock)"
+   ]
+  },
+  "MOONWALK": {
+   "category": "music",
+   "moment": "items/catalog_buffs.js:1418",
+   "uses": 2,
+   "via": [
+    "announce_sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/catalog_buffs.js:1418",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316194089-Moonwalk_1.1.mp3",
+   "file": "assets/audio/sfx/MOONWALK.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "MOVE_FROG": {
+   "category": "animal",
+   "moment": "items/npc_yoga_frog.js:417 (followPC)",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_yoga_frog.js:417 (followPC)",
+    "gsjs:items/npc_yoga_frog.js:487 (leave)"
+   ]
+  },
+  "MUSICAL_PARTY_SPACE_URALIA": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-07/1341949924-Musical_Party_Space_Uralia_1.3_plus_3db.mp3"
+  },
+  "MUSICBLOCK_B_BROWN_01": {
+   "category": "music",
+   "moment": "items/musicblock_b_brown_01.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_b_brown_01.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492303-B_brown_1.mp3"
+  },
+  "MUSICBLOCK_B_BROWN_02": {
+   "category": "music",
+   "moment": "items/musicblock_b_brown_02.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_b_brown_02.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492313-B_brown_2_short.mp3"
+  },
+  "MUSICBLOCK_B_BROWN_03": {
+   "category": "music",
+   "moment": "items/musicblock_b_brown_03.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_b_brown_03.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492331-B_brown_3.mp3"
+  },
+  "MUSICBLOCK_B_BROWN_04": {
+   "category": "music",
+   "moment": "items/musicblock_b_brown_04.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_b_brown_04.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492342-B_brown_4_short.mp3"
+  },
+  "MUSICBLOCK_B_BROWN_05": {
+   "category": "music",
+   "moment": "items/musicblock_b_brown_05.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_b_brown_05.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492353-B_brown_5.mp3"
+  },
+  "MUSICBLOCK_D_BLUE_01": {
+   "category": "music",
+   "moment": "items/musicblock_d_blue_01.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_blue_01.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492439-Chill_Dude_corrected.mp3"
+  },
+  "MUSICBLOCK_D_BLUE_02": {
+   "category": "music",
+   "moment": "items/musicblock_d_blue_02.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_blue_02.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492569-Spanish_Fly.mp3"
+  },
+  "MUSICBLOCK_D_BLUE_03": {
+   "category": "music",
+   "moment": "items/musicblock_d_blue_03.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_blue_03.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492590-Swampy.mp3"
+  },
+  "MUSICBLOCK_D_BLUE_04": {
+   "category": "music",
+   "moment": "items/musicblock_d_blue_04.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_blue_04.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492613-Tin_Whistle.mp3"
+  },
+  "MUSICBLOCK_D_BLUE_05": {
+   "category": "music",
+   "moment": "items/musicblock_d_blue_05.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_blue_05.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492465-Euro_Pop.mp3"
+  },
+  "MUSICBLOCK_D_GREEN_01": {
+   "category": "music",
+   "moment": "items/musicblock_d_green_01.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_green_01.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492475-Front_Porch.mp3"
+  },
+  "MUSICBLOCK_D_GREEN_02": {
+   "category": "music",
+   "moment": "items/musicblock_d_green_02.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_green_02.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492623-Travelin_Banjer.mp3"
+  },
+  "MUSICBLOCK_D_GREEN_03": {
+   "category": "music",
+   "moment": "items/musicblock_d_green_03.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_green_03.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492540-Kiss_Me_Quickly_corrected.mp3"
+  },
+  "MUSICBLOCK_D_GREEN_04": {
+   "category": "music",
+   "moment": "items/musicblock_d_green_04.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_green_04.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492602-Think_About_It.mp3"
+  },
+  "MUSICBLOCK_D_GREEN_05": {
+   "category": "music",
+   "moment": "items/musicblock_d_green_05.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_green_05.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492486-How_the_West_Was_Won.mp3"
+  },
+  "MUSICBLOCK_D_RED_01": {
+   "category": "music",
+   "moment": "items/musicblock_d_red_01.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_red_01.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492451-Ciao.mp3"
+  },
+  "MUSICBLOCK_D_RED_02": {
+   "category": "music",
+   "moment": "items/musicblock_d_red_02.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_red_02.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492428-Bubblicious_corrected.mp3"
+  },
+  "MUSICBLOCK_D_RED_03": {
+   "category": "music",
+   "moment": "items/musicblock_d_red_03.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_red_03.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492292-Astor.mp3"
+  },
+  "MUSICBLOCK_D_RED_04": {
+   "category": "music",
+   "moment": "items/musicblock_d_red_04.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_red_04.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492279-8_Bit_Groddle.mp3"
+  },
+  "MUSICBLOCK_D_RED_05": {
+   "category": "music",
+   "moment": "items/musicblock_d_red_05.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_d_red_05.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317493230-Round_1.mp3"
+  },
+  "MUSICBLOCK_GOODNIGHT_GRODDLE": {
+   "category": "music",
+   "moment": "items/musicblock_goodnight_groddle.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_goodnight_groddle.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-06/1307035523-Goodnight_Groddle_Master.mp3"
+  },
+  "MUSICBLOCK_SB_SECRET_01": {
+   "category": "music",
+   "moment": "items/musicblock_sb_secret_01.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_sb_secret_01.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-09/1285727979-MUSICBLOCK_SB_SECRET_01.mp3"
+  },
+  "MUSICBLOCK_TRUMPETS": {
+   "category": "music",
+   "moment": "items/musicblock_trumpets.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_trumpets.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316056846-trumpets.mp3"
+  },
+  "MUSICBLOCK_X_SHINY_01": {
+   "category": "music",
+   "moment": "items/musicblock_x_shiny_01.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_x_shiny_01.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492636-X_shiny_1_short_SOUINNG_100A.mp3"
+  },
+  "MUSICBLOCK_X_SHINY_02": {
+   "category": "music",
+   "moment": "items/musicblock_x_shiny_02.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_x_shiny_02.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492647-X_shiny_2_short_Mellovoices_100A.mp3"
+  },
+  "MUSICBLOCK_X_SHINY_03": {
+   "category": "music",
+   "moment": "items/musicblock_x_shiny_03.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_x_shiny_03.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492660-X_shiny_3_Short_fluttyGroove_100A.mp3"
+  },
+  "MUSICBLOCK_X_SHINY_04": {
+   "category": "music",
+   "moment": "items/musicblock_x_shiny_04.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_x_shiny_04.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492671-X_shiny_4_short_wouaaaou_100A.mp3"
+  },
+  "MUSICBLOCK_X_SHINY_05": {
+   "category": "music",
+   "moment": "items/musicblock_x_shiny_05.js (play)",
+   "uses": 2,
+   "via": [
+    "class sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/musicblock_x_shiny_05.js (play)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492681-X_shiny_5_Short_ZUTTO_100A.mp3"
+  },
+  "NEIGHBOUR_WAVE": {
+   "category": "remake",
+   "moment": "Neighbour chore greeting",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Neighbour chore greeting)"
+   ]
+  },
+  "NEW_XP_BEFORE_CHAIN_PULL": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-07/1341954908-newxp_messed_up_theme_2.2_even_louder.mp3"
+  },
+  "NEW_XP_INTRO": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1352504882-Cloud_Theme_1.4_fixed.mp3"
+  },
+  "NEW_XP_TRAINING1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-07/1341512455-Ix_for_newxp_w_comp_1.3.mp3"
+  },
+  "NEWDAY": {
+   "category": "event",
+   "moment": "A new game day begins",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:players/player.js:911 (doNewDay)"
+   ],
+   "file": "assets/audio/new_day_fanfare.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "stand-in fanfare until the rooster is recovered"
+  },
+  "NIBBLE_PIGGY": {
+   "category": "animal",
+   "moment": "Nibble a Piggy",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_kitty.js:507",
+    "gsjs:items/npc_piggy.js:886"
+   ]
+  },
+  "NO_MUSIC": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/"
+  },
+  "NO_NO_POWDER": {
+   "category": "powder",
+   "moment": "items/no_no_powder.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/no_no_powder.js (use_sound)"
+   ]
+  },
+  "OPEN_HUB_MAP": {
+   "category": "ui",
+   "moment": "Map opens",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/gameoverlay/maps/HubMapDialog.as:958 (start)"
+   ]
+  },
+  "OPENING_SCREEN": {
+   "category": "ui",
+   "moment": "com/tinyspeck/bootstrap/control/BootStrapController.as:826 (loadSounds)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/bootstrap/control/BootStrapController.as:826 (loadSounds)"
+   ]
+  },
+  "OPENING_SCREEN_MUSIC": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 3,
+   "via": [
+    "client",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)",
+    "client:com/tinyspeck/bootstrap/LateralLoader.as:189 (onMusicClick)",
+    "client:com/tinyspeck/bootstrap/control/BootStrapController.as:833 (loadSounds)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-03/1331738603-Opening_Screen_Music_1.1.mp3"
+  },
+  "ORE_GRINDER": {
+   "category": "tool",
+   "moment": "items/ore_grinder.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/ore_grinder.js (tool class sound while working)"
+   ]
+  },
+  "PACK_FULL": {
+   "category": "item",
+   "moment": "Pickup refused: pack is full",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/takeable.js:77 (takeable_pickup)",
+    "gsjs:items/include/takeable.js:91 (takeable_pickup)"
+   ]
+  },
+  "PACKAGE_SENT": {
+   "category": "event",
+   "moment": "Send a mail package",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_mail_dispatcher.js:242 (doParcel)"
+   ]
+  },
+  "PAPER_TREE": {
+   "category": "nature",
+   "moment": "items/paper_tree.js:497 (givePaper)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/paper_tree.js:497 (givePaper)"
+   ]
+  },
+  "PARALAXING_STREETS": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-05/1335917252-Paralaxing_Level_1.3.mp3"
+  },
+  "PAY_50_CURRANTS": {
+   "category": "item",
+   "moment": "locations/inc_transit.js:71 (transit_pay_fare)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:locations/inc_transit.js:71 (transit_pay_fare)"
+   ]
+  },
+  "PAY_FIFTY_CURRANTS": {
+   "category": "item",
+   "moment": "items/game_teleporter.js:227 (onConversation)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/game_teleporter.js:227 (onConversation)"
+   ]
+  },
+  "PET_PIGGY": {
+   "category": "animal",
+   "moment": "Pet a Piggy",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_kitty.js:433",
+    "gsjs:items/npc_piggy.js:956"
+   ],
+   "alias": "PIGGY_PLOP"
+  },
+  "PET_TRANT": {
+   "category": "nature",
+   "moment": "Pet a trant (any tree)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/trants.js:88 (onPettingComplete)"
+   ]
+  },
+  "PETRIFIED_ROCK": {
+   "category": "nature",
+   "moment": "Mine a petrified rock (remake: a rock mining action finishes)",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/petrified_rock_large.js:173",
+    "gsjs:items/petrified_rock_medium.js:173",
+    "gsjs:items/petrified_rock_small.js:173"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-10/1350083646-Petrified_Rock_1.1.mp3",
+   "file": "assets/audio/sfx/PETRIFIED_ROCK.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "PIANO_THEME1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-07/1341549958-Dreamy_Theme_Loop_1.1.mp3",
+   "file": "assets/audio/sfx/PIANO_THEME1.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "PICK": {
+   "category": "tool",
+   "moment": "Mining with a Pick (looped while the action runs)",
+   "uses": 2,
+   "via": [
+    "announce_sound",
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/pumpkin.js:224",
+    "gsjs:items/pick.js (tool class sound while working)"
+   ]
+  },
+  "PIGGY_PLOP": {
+   "category": "downloads",
+   "moment": "downloads.html (Piggy Plop)",
+   "uses": 1,
+   "via": [
+    "downloads"
+   ],
+   "sources": [
+    "downloads.html (Piggy Plop)"
+   ],
+   "file": "assets/audio/piggy_plop.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Piggy Plop"
+  },
+  "PIGGY_SCOFFS": {
+   "category": "animal",
+   "moment": "Piggy refuses food",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_kitty.js:517",
+    "gsjs:items/npc_piggy.js:896"
+   ]
+  },
+  "PLATES1": {
+   "category": "making",
+   "moment": "items/blockmaker.js:741 (onApplyPart)",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker.js:741 (onApplyPart)",
+    "gsjs:items/blockmaker.js:830 (onDisassemblePart)"
+   ]
+  },
+  "PLATES2": {
+   "category": "making",
+   "moment": "items/blockmaker.js:796 (onApplyPartStep)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker.js:796 (onApplyPartStep)"
+   ]
+  },
+  "PLEASE_LET_ME_GO_BACK_TO_GRODDLE": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1317071270-Please_Take_Me_Back_to_Groddle_EQd_2.mp3"
+  },
+  "POL_GATE_KNOCKED": {
+   "category": "event",
+   "moment": "players/inc_houses.js:134 (houses_auth_request)",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_houses.js:134 (houses_auth_request)",
+    "gsjs:players/inc_houses.js:135 (houses_auth_request)"
+   ]
+  },
+  "POTION_ALPHABET_SAUCE": {
+   "category": "tool",
+   "moment": "items/potion_alphabet_sauce.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_alphabet_sauce.js (tool class sound while working)"
+   ]
+  },
+  "POTION_AMOROUS_PHILTRE": {
+   "category": "tool",
+   "moment": "items/potion_amorous_philtre.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_amorous_philtre.js (tool class sound while working)"
+   ]
+  },
+  "POTION_ANCESTRAL_SPIRITS": {
+   "category": "tool",
+   "moment": "items/potion_ancestral_spirits.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_ancestral_spirits.js (tool class sound while working)"
+   ]
+  },
+  "POTION_ANIMAL_YOUTH": {
+   "category": "tool",
+   "moment": "items/potion_animal_youth.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_animal_youth.js (tool class sound while working)"
+   ]
+  },
+  "POTION_AVATAR_LARGE": {
+   "category": "tool",
+   "moment": "items/potion_avatar_large.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_avatar_large.js (tool class sound while working)"
+   ]
+  },
+  "POTION_AVATAR_MIXUP": {
+   "category": "tool",
+   "moment": "items/potion_avatar_mixup.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_avatar_mixup.js (tool class sound while working)"
+   ]
+  },
+  "POTION_AVATAR_SMALL": {
+   "category": "tool",
+   "moment": "items/potion_avatar_small.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_avatar_small.js (tool class sound while working)"
+   ]
+  },
+  "POTION_CHARADES": {
+   "category": "tool",
+   "moment": "items/potion_charades.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_charades.js (tool class sound while working)"
+   ]
+  },
+  "POTION_CHRIS": {
+   "category": "tool",
+   "moment": "items/potion_chris.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_chris.js (tool class sound while working)"
+   ]
+  },
+  "POTION_DRAUGHT_OF_GIANT_AMICABILITY": {
+   "category": "tool",
+   "moment": "items/potion_draught_of_giant_amicability.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_draught_of_giant_amicability.js (tool class sound while working)"
+   ]
+  },
+  "POTION_ELIXIR_OF_AVARICE": {
+   "category": "tool",
+   "moment": "items/potion_elixir_of_avarice.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_elixir_of_avarice.js (tool class sound while working)"
+   ]
+  },
+  "POTION_FAVOR": {
+   "category": "tool",
+   "moment": "items/potion_favor.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_favor.js (tool class sound while working)"
+   ]
+  },
+  "POTION_GARDEN_CLEAR": {
+   "category": "tool",
+   "moment": "items/potion_garden_clear.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_garden_clear.js (tool class sound while working)"
+   ]
+  },
+  "POTION_GARDEN_FERTILIZE": {
+   "category": "tool",
+   "moment": "items/potion_garden_fertilize.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_garden_fertilize.js (tool class sound while working)"
+   ]
+  },
+  "POTION_GARDEN_HARVEST": {
+   "category": "tool",
+   "moment": "items/potion_garden_harvest.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_garden_harvest.js (tool class sound while working)"
+   ]
+  },
+  "POTION_GARDEN_PLANT": {
+   "category": "tool",
+   "moment": "items/potion_garden_plant.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_garden_plant.js (tool class sound while working)"
+   ]
+  },
+  "POTION_GARDEN_WATER": {
+   "category": "tool",
+   "moment": "items/potion_garden_water.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_garden_water.js (tool class sound while working)"
+   ]
+  },
+  "POTION_GENERIC": {
+   "category": "event",
+   "moment": "items/potion_alphabet_sauce.js:399 (is_tinkertool)",
+   "uses": 50,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/potion_alphabet_sauce.js:399 (is_tinkertool)",
+    "gsjs:items/potion_alphabet_sauce.js:496 (parent_verb_potion_base_pour)",
+    "gsjs:items/potion_amorous_philtre.js:413 (is_tinkertool)",
+    "gsjs:items/potion_amorous_philtre.js:504 (is_tinkertool)",
+    "gsjs:items/potion_ancestral_spirits.js:413 (is_tinkertool)",
+    "gsjs:items/potion_ancestral_spirits.js:504 (is_tinkertool)"
+   ]
+  },
+  "POTION_KEYCUTTER_TONIC": {
+   "category": "tool",
+   "moment": "items/potion_keycutter_tonic.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_keycutter_tonic.js (tool class sound while working)"
+   ]
+  },
+  "POTION_RAINBOW_JUICE": {
+   "category": "tool",
+   "moment": "items/potion_rainbow_juice.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_rainbow_juice.js (tool class sound while working)"
+   ]
+  },
+  "POTION_ROCKY_REGENERATION_SOLUTION": {
+   "category": "tool",
+   "moment": "items/potion_rocky_regeneration_solution.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_rocky_regeneration_solution.js (tool class sound while working)"
+   ]
+  },
+  "POTION_ROOK_BALM": {
+   "category": "tool",
+   "moment": "items/potion_rook_balm.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_rook_balm.js (tool class sound while working)"
+   ]
+  },
+  "POTION_TRANTSFORMATION_FLUID": {
+   "category": "tool",
+   "moment": "items/potion_trantsformation_fluid.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_trantsformation_fluid.js (tool class sound while working)"
+   ]
+  },
+  "POTION_TREE_POISON": {
+   "category": "tool",
+   "moment": "items/potion_tree_poison.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_tree_poison.js (tool class sound while working)"
+   ]
+  },
+  "POTION_TREE_POISON_ANTIDOTE": {
+   "category": "tool",
+   "moment": "items/potion_tree_poison_antidote.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_tree_poison_antidote.js (tool class sound while working)"
+   ]
+  },
+  "POTION_XP": {
+   "category": "tool",
+   "moment": "items/potion_xp.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/potion_xp.js (tool class sound while working)"
+   ]
+  },
+  "POWDER_OF_MILD_FECUNDITY": {
+   "category": "powder",
+   "moment": "items/powder_of_mild_fecundity.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/powder_of_mild_fecundity.js (use_sound)"
+   ]
+  },
+  "POWDER_OF_STARTLING_FECUNDITY": {
+   "category": "powder",
+   "moment": "items/powder_of_startling_fecundity.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/powder_of_startling_fecundity.js (use_sound)"
+   ]
+  },
+  "Prisencolinensinainciusol": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/port/RightSideManager.as:203 (chatUpdate)",
+   "uses": 2,
+   "via": [
+    "client",
+    "embedded"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/port/RightSideManager.as:203 (chatUpdate)",
+    "client:TSEngineAssets/src/Assets.as:8 (embedded easter egg)"
+   ]
+  },
+  "PROTO_PUFF": {
+   "category": "event",
+   "moment": "items/item.js:506 (deleteWithPoof)",
+   "uses": 47,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/item.js:506 (deleteWithPoof)",
+    "gsjs:items/npc_combat_cubimal.js:653 (checkWin)",
+    "gsjs:items/npc_combat_cubimal.js:1309 (parent_checkWin)",
+    "gsjs:items/npc_cubimal_batterfly.js:564 (checkWin)",
+    "gsjs:items/npc_cubimal_bureaucrat.js:564 (checkWin)",
+    "gsjs:items/npc_cubimal_butler.js:564 (checkWin)"
+   ]
+  },
+  "PURCHASE_ITEM": {
+   "category": "item",
+   "moment": "Buy from a vendor or furniture store",
+   "uses": 35,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/bag_furniture_cabinet.js:690 (sellItem)",
+    "gsjs:items/bag_furniture_sdb.js:1241 (sellItem)",
+    "gsjs:items/bag_furniture_sdb.js:1494 (parent_sellItem)",
+    "gsjs:items/bag_furniture_smallcabinet.js:700 (sellItem)",
+    "gsjs:items/bag_furniture_wallcabinet.js:690 (sellItem)",
+    "gsjs:items/furniture_armchair.js:601 (sellItem)"
+   ]
+  },
+  "PURPLE_LOCATION": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-11/1321639889-ZeGroupTheme.mp3"
+  },
+  "PUZZLES1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-05/1337808321-Xavier_Whistle_-5db.mp3"
+  },
+  "QUEST_ACCEPT": {
+   "category": "remake",
+   "moment": "Accept a quest",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Accept a quest)"
+   ]
+  },
+  "QUEST_ADDED": {
+   "category": "ui",
+   "moment": "A new quest lands in the quest log",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/view/ui/chrome/ImaginationButton.as:125 (updateCount)"
+   ],
+   "file": "assets/audio/new_quest_alert.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "New Quest Alert"
+  },
+  "QUEST_COMPLETE": {
+   "category": "reward",
+   "moment": "Quest complete overlay",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_quests.js:883 (quests_familiar_turnin_do)"
+   ],
+   "file": "assets/audio/quest_complete.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "exact name"
+  },
+  "QUEST_DIALOGUE_BOX": {
+   "category": "ui",
+   "moment": "Quest log opens",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/port/QuestsDialog.as:184 (tweenOpenClose)"
+   ]
+  },
+  "QUEST_DIALOGUE_BOX_CLOSE": {
+   "category": "ui",
+   "moment": "Quest log closes",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/port/QuestsDialog.as:184 (tweenOpenClose)"
+   ]
+  },
+  "QUEST_OFFER": {
+   "category": "remake",
+   "moment": "Magic Rock offers a quest",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Magic Rock offers a quest)"
+   ]
+  },
+  "QUILL": {
+   "category": "tool",
+   "moment": "items/quill.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/quill.js (tool class sound while working)"
+   ]
+  },
+  "QUOIN_CURRANTS": {
+   "category": "remake",
+   "moment": "Currant quoin",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Currant quoin)"
+   ]
+  },
+  "QUOIN_ENERGY": {
+   "category": "remake",
+   "moment": "Energy quoin",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Energy quoin)"
+   ]
+  },
+  "QUOIN_FAVOR": {
+   "category": "remake",
+   "moment": "Favor quoin",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Favor quoin)"
+   ]
+  },
+  "QUOIN_GOT": {
+   "category": "quoin",
+   "moment": "Touch a quoin (all types)",
+   "uses": 3,
+   "via": [
+    "announce_sound",
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:items/crown_game_lock.js:49 (onPlayerCollision)",
+    "gsjs:items/moving_quoin.js:306 (onPlayerCollision)",
+    "gsjs:items/quoin.js:267 (onPlayerCollision)"
+   ]
+  },
+  "QUOIN_MOOD": {
+   "category": "remake",
+   "moment": "Mood quoin",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Mood quoin)"
+   ]
+  },
+  "QUOIN_MYSTERY": {
+   "category": "remake",
+   "moment": "Mystery quoin",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Mystery quoin)"
+   ]
+  },
+  "QUOIN_SHARD_2": {
+   "category": "quoin",
+   "moment": "items/quoin.js:94 (onPlayerCollision (shared quoin))",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
+   ]
+  },
+  "QUOIN_SHARD_3": {
+   "category": "quoin",
+   "moment": "items/quoin.js:94 (onPlayerCollision (shared quoin))",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
+   ]
+  },
+  "QUOIN_SHARD_4": {
+   "category": "quoin",
+   "moment": "items/quoin.js:94 (onPlayerCollision (shared quoin))",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
+   ]
+  },
+  "QUOIN_SHARD_5": {
+   "category": "quoin",
+   "moment": "items/quoin.js:94 (onPlayerCollision (shared quoin))",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
+   ]
+  },
+  "QUOIN_SHARD_6": {
+   "category": "quoin",
+   "moment": "items/quoin.js:94 (onPlayerCollision (shared quoin))",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
+   ]
+  },
+  "QUOIN_SHARD_7": {
+   "category": "quoin",
+   "moment": "items/quoin.js:94 (onPlayerCollision (shared quoin))",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
+   ]
+  },
+  "QUOIN_SHARD_8": {
+   "category": "quoin",
+   "moment": "items/quoin.js:94 (onPlayerCollision (shared quoin))",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
+   ]
+  },
+  "QUOIN_SHARD_9": {
+   "category": "quoin",
+   "moment": "items/quoin.js:94 (onPlayerCollision (shared quoin))",
+   "uses": 1,
+   "via": [
+    "family"
+   ],
+   "sources": [
+    "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
+   ]
+  },
+  "QUOIN_TIME": {
+   "category": "remake",
+   "moment": "Time quoin",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Time quoin)"
+   ]
+  },
+  "QUOIN_XP": {
+   "category": "remake",
+   "moment": "iMG quoin",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (iMG quoin)"
+   ]
+  },
+  "QUORAZY_QUOIN": {
+   "category": "quoin",
+   "moment": "Touch a Qurazy quoin",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/moving_quoin.js:299 (onPlayerCollision)",
+    "gsjs:items/quoin.js:260 (onPlayerCollision)"
+   ],
+   "file": "assets/audio/qurazy_quoin.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Quarazy Quoin"
+  },
+  "RAIN": {
+   "category": "remake",
+   "moment": "Rain and weather patter",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Rain and weather patter)"
+   ]
+  },
+  "RAINBOW_100COINSTODAY": {
+   "category": "reward",
+   "moment": "players/player.js:3039 (show_rainbow)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:3039 (show_rainbow)"
+   ]
+  },
+  "RAINBOW_FULLYREVIVED": {
+   "category": "reward",
+   "moment": "items/include/rook.js:224 (doReviveComplete)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/rook.js:224 (doReviveComplete)"
+   ]
+  },
+  "RAINBOW_GOODJOB": {
+   "category": "reward",
+   "moment": "players/player.js:3042 (show_rainbow)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:3042 (show_rainbow)"
+   ]
+  },
+  "RAINBOW_MAXRELAX": {
+   "category": "reward",
+   "moment": "players/player.js:3045 (show_rainbow)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:3045 (show_rainbow)"
+   ]
+  },
+  "RAINBOW_RANDOMKINDNESS": {
+   "category": "reward",
+   "moment": "players/player.js:3048 (show_rainbow)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:3048 (show_rainbow)"
+   ]
+  },
+  "RAINBOW_SECRETSPOT": {
+   "category": "reward",
+   "moment": "players/player.js:3063 (show_rainbow)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:3063 (show_rainbow)"
+   ]
+  },
+  "RAINBOW_SPINDOCTOR": {
+   "category": "reward",
+   "moment": "players/player.js:3051 (show_rainbow)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:3051 (show_rainbow)"
+   ]
+  },
+  "RAINBOW_SUPERHARVEST": {
+   "category": "nature",
+   "moment": "players/player.js:3054 (show_rainbow)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:3054 (show_rainbow)"
+   ]
+  },
+  "RAINBOW_WINNER": {
+   "category": "reward",
+   "moment": "players/player.js:3057 (show_rainbow)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:3057 (show_rainbow)"
+   ]
+  },
+  "RAINBOW_YOUDIDIT": {
+   "category": "reward",
+   "moment": "main.js:1791 (doLocalChat)",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:main.js:1791 (doLocalChat)",
+    "gsjs:players/player.js:3060 (show_rainbow)"
+   ]
+  },
+  "RANDOM_KINDNESS": {
+   "category": "tool",
+   "moment": "items/random_kindness.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/random_kindness.js (tool class sound while working)"
+   ]
+  },
+  "READY": {
+   "category": "event",
+   "moment": "Race ready",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_making.js:830 (finishMakingKnown)"
+   ]
+  },
+  "RECEIVE_MEAT_FROM_PIGGY": {
+   "category": "animal",
+   "moment": "Meat drops from a nibbled Piggy",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_kitty.js:926 (onNibbleComplete)",
+    "gsjs:items/npc_piggy.js:1662 (onNibbleComplete)"
+   ]
+  },
+  "REVEAL_1": {
+   "category": "event",
+   "moment": "locations/location.js:4556 (doIncantationsFeat)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:locations/location.js:4556 (doIncantationsFeat)"
+   ]
+  },
+  "ROCKS_DISAPPEAR": {
+   "category": "recovered",
+   "moment": "Recovered c2 file with no surviving key; rocks vanish in the 2012-09 waterfall puzzle",
+   "uses": 1,
+   "via": [
+    "wayback"
+   ],
+   "sources": [
+    "wayback:http://c2.glitch.bz/sounds/2012-09/1347481186-Rocks_Disappear_2.2.mp3 (filename)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-09/1347481186-Rocks_Disappear_2.2.mp3",
+   "file": "assets/audio/sfx/ROCKS_DISAPPEAR.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
+  },
+  "ROOK_ATTACK": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-10/1287601674-Master_Rook_attack.mp3"
+  },
+  "ROOK_CAW": {
+   "category": "remake",
+   "moment": "Rook caw during attacks",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Rook caw during attacks)"
+   ]
+  },
+  "ROOK_FLOCK": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-10/1287601688-Master_Rook_flight.mp3"
+  },
+  "ROOK_HALL_VO_1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844259-Rook_Hall_mixdown_VO_01.mp3"
+  },
+  "ROOK_HALL_VO_2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844269-Rook_Hall_mixdown_VO_02.mp3"
+  },
+  "ROOK_HALL_VO_3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844277-Rook_Hall_mixdown_VO_03.mp3"
+  },
+  "ROOK_HALL_VO_4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844295-Rook_Hall_mixdown_VO_04.mp3"
+  },
+  "ROOK_HALL_VO_5": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1313204175-Rook_Hall_mixdown_VO_05_reedit.mp3"
+  },
+  "ROOK_HALL_VO_6": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-08/1312844328-Rook_Hall_mixdown_VO_06.mp3"
+  },
+  "RUBE_APPEARS": {
+   "category": "music",
+   "moment": "items/npc_rube.js:651 (setTarget)",
+   "uses": 2,
+   "via": [
+    "announce_sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/npc_rube.js:651 (setTarget)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492698-X_yappi_youpi.mp3"
+  },
+  "SALMON_CATCH": {
+   "category": "animal",
+   "moment": "items/npc_salmon.js:219 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_salmon.js:219 (initInstanceProps)"
+   ]
+  },
+  "SALMON_RELEASE": {
+   "category": "animal",
+   "moment": "items/salmon.js:91",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/salmon.js:91"
+   ]
+  },
+  "SAUCEPAN": {
+   "category": "tool",
+   "moment": "items/saucepan.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/saucepan.js (tool class sound while working)"
+   ]
+  },
+  "SAVE_AND_CHECKOUT": {
+   "category": "event",
+   "moment": "items/npc_crafty_bot.js:218 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_crafty_bot.js:218 (initInstanceProps)"
+   ]
+  },
+  "SCOOPED_JELLISAC": {
+   "category": "animal",
+   "moment": "items/jellisac.js:219 (onScoopingComplete)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/jellisac.js:219 (onScoopingComplete)"
+   ]
+  },
+  "SCRAPER": {
+   "category": "tool",
+   "moment": "items/scraper.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/scraper.js (tool class sound while working)"
+   ]
+  },
+  "SHOVEL": {
+   "category": "tool",
+   "moment": "items/shovel.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/shovel.js (tool class sound while working)"
+   ]
+  },
+  "SHRINE_EMBLEM": {
+   "category": "remake",
+   "moment": "Claim a Giant emblem",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Claim a Giant emblem)"
+   ]
+  },
+  "SIGNPOST_TRAVEL": {
+   "category": "remake",
+   "moment": "Walk through a signpost or map travel",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Walk through a signpost or map travel)"
+   ]
+  },
+  "SKILL_ACHIEVED": {
+   "category": "reward",
+   "moment": "A skill finishes learning",
+   "uses": 2,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:players/inc_skills.js:1435 (skills_give)",
+    "gsjs:players/inc_skills.js:1545 (skills_remove_notify)"
+   ]
+  },
+  "SLOTH_ARRIVES": {
+   "category": "animal",
+   "moment": "A sloth arrives on the street",
+   "uses": 2,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:items/npc_sloth.js:698 (setState)",
+    "gsjs:items/npc_sloth.js:755 (setState)"
+   ],
+   "file": "assets/audio/sloth_arrives.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "exact name"
+  },
+  "SLOTH_EAT": {
+   "category": "animal",
+   "moment": "items/npc_sloth.js:724 (setState)",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:items/npc_sloth.js:724 (setState)"
+   ]
+  },
+  "SLOTH_KNOCKER": {
+   "category": "animal",
+   "moment": "items/sloth_knocker.js:54",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/sloth_knocker.js:54"
+   ]
+  },
+  "SLOTH_PEAK_AND_SPIT": {
+   "category": "animal",
+   "moment": "items/npc_sloth.js:743 (setState)",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:items/npc_sloth.js:743 (setState)"
+   ]
+  },
+  "SLOTH_SPIT": {
+   "category": "animal",
+   "moment": "items/npc_sloth.js:376 (createSnail)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_sloth.js:376 (createSnail)"
+   ]
+  },
+  "SMALLIFY": {
+   "category": "event",
+   "moment": "items/avatar_smallifier.js:100 (onPlayerCollision)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/avatar_smallifier.js:100 (onPlayerCollision)"
+   ]
+  },
+  "SMELTER": {
+   "category": "tool",
+   "moment": "items/smelter.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/smelter.js (tool class sound while working)"
+   ]
+  },
+  "SMUGGLER_GIVES_OR_TAKES_BOX": {
+   "category": "event",
+   "moment": "items/npc_smuggler.js:378 (giveStartQuest)",
+   "uses": 5,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_smuggler.js:378 (giveStartQuest)",
+    "gsjs:items/npc_smuggler.js:831 (conversation_run_receive_first_time)",
+    "gsjs:items/npc_smuggler.js:1120 (conversation_run_receive_repeat1)",
+    "gsjs:items/npc_smuggler.js:1231 (conversation_run_receive_repeat2)",
+    "gsjs:items/npc_smuggler.js:1342 (conversation_run_receive_repeat3)"
+   ]
+  },
+  "SMUGGLING_NPC_ARRIVES": {
+   "category": "event",
+   "moment": "items/npc_deimaginator.js:177 (appear)",
+   "uses": 4,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_deimaginator.js:177 (appear)",
+    "gsjs:items/npc_deimaginator.js:458 (targetJumpComplete)",
+    "gsjs:items/npc_smuggler.js:287 (giveAppearForPlayer)",
+    "gsjs:items/npc_smuggler.js:467 (receiveAppearForPlayer)"
+   ]
+  },
+  "SMUGGLING_NPC_LEAVES": {
+   "category": "event",
+   "moment": "items/npc_deimaginator.js:275 (goAway)",
+   "uses": 6,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_deimaginator.js:275 (goAway)",
+    "gsjs:items/npc_deimaginator.js:421 (targetJump)",
+    "gsjs:items/npc_deimaginator.js:449 (targetJumpComplete)",
+    "gsjs:items/npc_smuggler.js:324 (giveDoDisappear)",
+    "gsjs:items/npc_smuggler.js:388 (giveTimeOut)",
+    "gsjs:items/npc_smuggler.js:499 (receiveDoDisappear)"
+   ]
+  },
+  "SNAPPY_LOOP": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316564696-Snappy_w_and_wo_whistle_Loop.mp3"
+  },
+  "SNEEZING_AHCHOO": {
+   "category": "event",
+   "moment": "items/catalog_buffs.js:2462",
+   "uses": 3,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/catalog_buffs.js:2462",
+    "gsjs:items/sneezing_powder.js:281 (onUse)",
+    "gsjs:players/player.js:2633 (sneeze)"
+   ]
+  },
+  "SNEEZING_POWDER": {
+   "category": "powder",
+   "moment": "items/sneezing_powder.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/sneezing_powder.js (use_sound)"
+   ]
+  },
+  "SPARKLE_POWDER": {
+   "category": "powder",
+   "moment": "items/sparkle_powder.js (use_sound)",
+   "uses": 1,
+   "via": [
+    "use_sound"
+   ],
+   "sources": [
+    "gsjs:items/sparkle_powder.js (use_sound)"
+   ]
+  },
+  "SPECIAL_ITEM_THAT_ONLY_BETA_TESTERS_GET": {
+   "category": "event",
+   "moment": "items/special_item_that_only_beta_testers_get.js:300 (bounce)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/special_item_that_only_beta_testers_get.js:300 (bounce)"
+   ]
+  },
+  "SPICE_MILL": {
+   "category": "tool",
+   "moment": "items/spice_mill.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/spice_mill.js (tool class sound while working)"
+   ]
+  },
+  "SPICE_TREE": {
+   "category": "nature",
+   "moment": "items/include/trants.js:342 (onHarvestingComplete)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/include/trants.js:342 (onHarvestingComplete)"
+   ]
+  },
+  "SPIGOT": {
+   "category": "tool",
+   "moment": "items/spigot.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/spigot.js (tool class sound while working)"
+   ]
+  },
+  "SPINACHJUMP": {
+   "category": "event",
+   "moment": "items/npc_combat_cubimal.js:1120 (setFree)",
+   "uses": 44,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_combat_cubimal.js:1120 (setFree)",
+    "gsjs:items/npc_cubimal_batterfly.js:1048 (setFree)",
+    "gsjs:items/npc_cubimal_bureaucrat.js:1048 (setFree)",
+    "gsjs:items/npc_cubimal_butler.js:1048 (setFree)",
+    "gsjs:items/npc_cubimal_butterfly.js:1048 (setFree)",
+    "gsjs:items/npc_cubimal_cactus.js:1048 (setFree)"
+   ]
+  },
+  "SPINDLE": {
+   "category": "tool",
+   "moment": "items/spindle.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/spindle.js (tool class sound while working)"
+   ]
+  },
+  "SPINNING_WHEEL": {
+   "category": "event",
+   "moment": "Gameshow Ticket wheel spins",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_spinning_wheel.js:197 (initInstanceProps)"
+   ],
+   "file": "assets/audio/ambient/Spinning-Wheel_1292034939.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Spinning Wheel"
+  },
+  "SPIRAL_STARS": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-06/1340729256-Cloud_Theme_1.1.mp3"
+  },
+  "SPLANK": {
+   "category": "event",
+   "moment": "items/plank.js:84",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/plank.js:84"
+   ]
+  },
+  "SPLENDID_SPINDLE": {
+   "category": "tool",
+   "moment": "items/splendid_spindle.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/splendid_spindle.js (tool class sound while working)"
+   ]
+  },
+  "SQUISH_GRAPES": {
+   "category": "event",
+   "moment": "Squish grapes in Hell",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/bunch_of_grapes_hell.js:65",
+    "gsjs:items/include/shrines.js:869 (showSplatterOverlayFinish)"
+   ]
+  },
+  "STAND1": {
+   "category": "making",
+   "moment": "items/blockmaker_chassis.js:363",
+   "uses": 22,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/blockmaker_chassis.js:363",
+    "gsjs:items/blockmaker_chassis.js:553 (onDisassembleStand)",
+    "gsjs:items/blockmaker_engine.js:363",
+    "gsjs:items/blockmaker_engine.js:557 (onDisassembleStand)",
+    "gsjs:items/blockmaker_plates.js:363",
+    "gsjs:items/blockmaker_plates.js:553 (onDisassembleStand)"
+   ]
+  },
+  "STEWARTDOLL1": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll line 1 (quotes 29-42 map to STEWARTDOLL1-14)",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539578-Stewart_Doll_1.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL1.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL10": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 10",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539580-Stewart_Doll_10.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL10.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL11": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 11",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539698-Stewart_Doll_11.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL11.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL12": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 12",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539698-Stewart_Doll_12.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL12.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL13": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 13",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539698-Stewart_Doll_13.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL13.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL14": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 14",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539699-Stewart_Doll_14.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL14.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL2": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 2",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539578-Stewart_Doll_2.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL2.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL3": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 3",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539578-Stewart_Doll_3.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL3.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL4": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 4",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539579-Stewart_Doll_4.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL4.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL5": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 5",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539579-Stewart_Doll_5.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL5.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL6": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 6",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539579-Stewart_Doll_6.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL6.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL7": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 7",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539579-Stewart_Doll_7.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL7.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL8": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 8",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539580-Stewart_Doll_8.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL8.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STEWARTDOLL9": {
+   "category": "voice",
+   "moment": "Stoot pull-string doll voice line 9",
+   "uses": 1,
+   "via": [
+    "return key"
+   ],
+   "sources": [
+    "gsjs:items/stoot_barfield_pullstring_doll.js:217 (getSound)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1353539580-Stewart_Doll_9.mp3",
+   "file": "assets/audio/sfx/STEWARTDOLL9.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "gsjs-filename"
+  },
+  "STILL_COLLECT": {
+   "category": "making",
+   "moment": "items/still.js:166 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/still.js:166 (initInstanceProps)"
+   ]
+  },
+  "STILL_READY": {
+   "category": "making",
+   "moment": "items/still.js:413 (finishWorking)",
+   "uses": 2,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/still.js:413 (finishWorking)",
+    "gsjs:items/still.js:416 (finishWorking)"
+   ]
+  },
+  "STREET_LOADED": {
+   "category": "ui",
+   "moment": "A street finishes loading",
+   "uses": 3,
+   "via": [
+    "announce_sound",
+    "client"
+   ],
+   "sources": [
+    "gsjs:main.js:1017 (doLoginEnd)",
+    "gsjs:main.js:1466 (doEndMove)",
+    "client:com/tinyspeck/engine/view/gameoverlay/LoadingLocationView.as:408 (done)"
+   ],
+   "file": "assets/audio/game_loaded_2.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Game Loaded (second take)"
+  },
+  "SUBWAY_BUTTON": {
+   "category": "travel",
+   "moment": "items/subway_gate.js:54 (initInstanceProps)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/subway_gate.js:54 (initInstanceProps)"
+   ]
+  },
+  "SUBWAY_CAR_HUM": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1296155223-hum_caboose_4.mp3"
+  },
+  "SUBWAY_STATION_HUM": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1296155245-hum_station_4.mp3"
+  },
+  "SUPER_SCRAPER": {
+   "category": "tool",
+   "moment": "items/super_scraper.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/super_scraper.js (tool class sound while working)"
+   ]
+  },
+  "TALK_FROG": {
+   "category": "animal",
+   "moment": "items/npc_yoga_frog.js:221 (dialog_onMsg)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_yoga_frog.js:221 (dialog_onMsg)"
+   ]
+  },
+  "TELEPORT_ARRIVE": {
+   "category": "remake",
+   "moment": "Arrive after a teleport",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Arrive after a teleport)"
+   ]
+  },
+  "TELEPORT_AWAY": {
+   "category": "travel",
+   "moment": "Teleport away (Teleportation skill)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:677 (teleportToLocation)"
+   ]
+  },
+  "TELEPORT_AWAY_HUB": {
+   "category": "travel",
+   "moment": "Teleport to a hub",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/player.js:675 (teleportToLocation)"
+   ]
+  },
+  "TELEPORTER_VISIBLE_APPEAR": {
+   "category": "travel",
+   "moment": "players/inc_party.js:513 (party_create_teleporter)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_party.js:513 (party_create_teleporter)"
+   ]
+  },
+  "TELEPORTER_VISIBLE_DISAPPEARS": {
+   "category": "travel",
+   "moment": "items/teleporter.js:73 (onPlayerCollision)",
+   "uses": 4,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/teleporter.js:73 (onPlayerCollision)",
+    "gsjs:items/teleporter_custom.js:98 (parent_onPlayerCollision)",
+    "gsjs:items/teleporter_ground.js:97 (onPlayerCollision)",
+    "gsjs:items/teleporter_visible.js:93 (onPlayerCollision)"
+   ]
+  },
+  "TELEPORTER_VISIBLE_PORTAL": {
+   "category": "travel",
+   "moment": "players/inc_party.js:514 (party_create_teleporter)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_party.js:514 (party_create_teleporter)"
+   ]
+  },
+  "TEST": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-06/1339778284-Glowing_Orb_Summer_2.2.mp3"
+  },
+  "TEST_TUBE": {
+   "category": "tool",
+   "moment": "items/test_tube.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/test_tube.js (tool class sound while working)"
+   ]
+  },
+  "TICKET_TO_PARADISE1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-06/1340218671-Rainbow_Run_A_Capella_v.2.1.mp3"
+  },
+  "TINCTURING_KIT": {
+   "category": "tool",
+   "moment": "items/tincturing_kit.js (tool class sound while working)",
+   "uses": 1,
+   "via": [
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/tincturing_kit.js (tool class sound while working)"
+   ],
+   "file": "assets/audio/tincture.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Tincture (tool class sound)"
+  },
+  "TINKERTOOL": {
+   "category": "tool",
+   "moment": "Repair a tool with the Tinkertool",
+   "uses": 2,
+   "via": [
+    "announce_sound",
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/tinkertool.js:464 (startRepair)",
+    "gsjs:items/tinkertool.js (tool class sound while working)"
+   ]
+  },
+  "TOGGLE_VIEWPORT_SCALE_ONE_CLICK": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/control/TSFrontController.as:3245 (setViewportScale)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/control/TSFrontController.as:3245 (setViewportScale)"
+   ]
+  },
+  "TOGGLE_VIEWPORT_SCALE_THREE_CLICKS": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/control/TSFrontController.as:3246 (setViewportScale)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/control/TSFrontController.as:3246 (setViewportScale)"
+   ]
+  },
+  "TOOL_BREAKS": {
+   "category": "making",
+   "moment": "A tool wears out",
+   "uses": 74,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/ace_of_spades.js:389 (doBreak)",
+    "gsjs:items/alchemical_tongs.js:329 (doBreak)",
+    "gsjs:items/awesome_pot.js:336 (doBreak)",
+    "gsjs:items/beaker.js:342 (doBreak)",
+    "gsjs:items/bean_seasoner.js:338 (doBreak)",
+    "gsjs:items/blender.js:335 (doBreak)"
+   ]
+  },
+  "TOXIC_MOON": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-11/1322689572-Also_Sprach_Zarathustra_Loop_3.2_fades.mp3",
+   "file": "assets/audio/sfx/TOXIC_MOON.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "TRADE_COMPLETED": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/port/TradeDialog.as:621 (complete)",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/port/TradeDialog.as:621 (complete)"
+   ]
+  },
+  "TRAIN_ARRIVES": {
+   "category": "music",
+   "moment": "locations/inc_transit.js:342 (transit_brakes)",
+   "uses": 3,
+   "via": [
+    "announce_sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:locations/inc_transit.js:342 (transit_brakes)",
+    "gsjs:locations/inc_transit.js:367 (transit_arrive)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1295655628-train_arrives2.mp3"
+  },
+  "TRAIN_DEPARTS": {
+   "category": "music",
+   "moment": "locations/inc_transit.js:423 (transit_doors_close)",
+   "uses": 2,
+   "via": [
+    "announce_sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:locations/inc_transit.js:423 (transit_doors_close)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1295655636-train_departs2.mp3"
+  },
+  "TRANSCENDENTAL_MEDITATION_01": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297359285-meditation_berg.mp3"
+  },
+  "TRANSCENDENTAL_MEDITATION_02": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297359584-meditation_limbs_2.mp3"
+  },
+  "TRAVELLING_TRAIN": {
+   "category": "music",
+   "moment": "locations/inc_transit.js:287 (transit_depart)",
+   "uses": 2,
+   "via": [
+    "announce_sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:locations/inc_transit.js:287 (transit_depart)",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-01/1295895572-subway_loop3.mp3"
+  },
+  "TREE_POSE_FROG": {
+   "category": "animal",
+   "moment": "items/npc_yoga_frog.js:317 (doYoga)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_yoga_frog.js:317 (doYoga)"
+   ]
+  },
+  "TRIPLE_JUMP": {
+   "category": "ui",
+   "moment": "Third jump of a Triple Jump chain",
+   "uses": 1,
+   "via": [
+    "client"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/physics/avatar/AvatarPhysicsHandler.as:270 (handleAvatarControls)"
+   ],
+   "file": "assets/audio/triple_jump.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "exact name"
+  },
+  "TROPHY_RECEIVED": {
+   "category": "reward",
+   "moment": "players/inc_achievements.js:430 (achievements_grant)",
+   "uses": 1,
+   "via": [
+    "sound field"
+   ],
+   "sources": [
+    "gsjs:players/inc_achievements.js:430 (achievements_grant)"
+   ]
+  },
+  "trumpet": {
+   "category": "ui",
+   "moment": "com/tinyspeck/engine/control/TSFrontController.as:2784 (initiateShutDownSequence)",
+   "uses": 3,
+   "via": [
+    "client",
+    "embedded"
+   ],
+   "sources": [
+    "client:com/tinyspeck/engine/control/TSFrontController.as:2784 (initiateShutDownSequence)",
+    "client:com/tinyspeck/engine/control/TSFrontController.as:2792 (initiateShutDownSequence)",
+    "client:TSEngineAssets/src/Assets.as:10 (embedded)"
+   ]
+  },
+  "TUBAMAPHONE_DARK": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-05/1275198424-tubamaphone_dark.mp3"
+  },
+  "TUBAMAPHONE_LIGHT": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-05/1275198115-tubamaphone_light.mp3"
+  },
+  "UI_PANEL_CLOSE": {
+   "category": "remake",
+   "moment": "Any side panel or dialog closes",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Any side panel or dialog closes)"
+   ]
+  },
+  "UI_PANEL_OPEN": {
+   "category": "remake",
+   "moment": "Any side panel or dialog opens",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Any side panel or dialog opens)"
+   ]
+  },
+  "UI_TOGGLE": {
+   "category": "remake",
+   "moment": "Mute and other small toggles",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Mute and other small toggles)"
+   ]
+  },
+  "UNDERGROUND_PUZZLES": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-05/1338428582-Abandoned_Building_Puzzles_1.4.mp3"
+  },
+  "VENDOR_SELL": {
+   "category": "remake",
+   "moment": "Sell an item to a vendor",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Sell an item to a vendor)"
+   ]
+  },
+  "VERB_MENU_OPEN": {
+   "category": "remake",
+   "moment": "Verb menu pops up over a target",
+   "uses": 1,
+   "via": [
+    "remake"
+   ],
+   "sources": [
+    "remake (Verb menu pops up over a target)"
+   ]
+  },
+  "WAITING_FOR_FROG": {
+   "category": "animal",
+   "moment": "items/npc_mail_dispatcher.js:220 (doParcel)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_mail_dispatcher.js:220 (doParcel)"
+   ]
+  },
+  "WAITING_MUZAK": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326989321-Waiting_Muzak_2.1.mp3"
+  },
+  "WARRIOR_POSE_FROG": {
+   "category": "animal",
+   "moment": "items/npc_yoga_frog.js:311 (doYoga)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/npc_yoga_frog.js:311 (doYoga)"
+   ]
+  },
+  "WATER_SPLASH": {
+   "category": "recovered",
+   "moment": "Recovered c2 file with no surviving key; a water splash (2012-06, the Paradise / Summer's Day era)",
+   "uses": 1,
+   "via": [
+    "wayback"
+   ],
+   "sources": [
+    "wayback:http://c2.glitch.bz/sounds/2012-06/1339778251-Water_Splash_1.1.mp3 (filename)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-06/1339778251-Water_Splash_1.1.mp3",
+   "file": "assets/audio/sfx/WATER_SPLASH.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
+  },
+  "WATERFALL_MELODY": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1346270583-Bells_Waterfall_1.3_low_less_echo.mp3"
+  },
+  "WATERFALL_MELODY_LONG": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-08/1346436550-Waterfall_Bells_Melody_Placeholder_2.1.mp3"
+  },
+  "WATERFALL_SUCCESS": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-09/1347572925-Waterfall_3.3_more_throaght.mp3",
+   "file": "assets/audio/sfx/WATERFALL_SUCCESS.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "music_map"
+  },
+  "WATERFALL_SYMBOL_GLOW": {
+   "category": "recovered",
+   "moment": "Recovered c2 file with no surviving key; a waterfall puzzle symbol lights up",
+   "uses": 1,
+   "via": [
+    "wayback"
+   ],
+   "sources": [
+    "wayback:http://c2.glitch.bz/sounds/2012-09/1347576005-Waterfall_Symbol_Glow_1.1.mp3 (filename)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-09/1347576005-Waterfall_Symbol_Glow_1.1.mp3",
+   "file": "assets/audio/sfx/WATERFALL_SYMBOL_GLOW.mp3",
+   "origin": "wayback-c2",
+   "keyFrom": "filename"
+  },
+  "WATERING_CAN": {
+   "category": "tool",
+   "moment": "Water a trant or garden plot",
+   "uses": 5,
+   "via": [
+    "announce_sound",
+    "tool class"
+   ],
+   "sources": [
+    "gsjs:items/include/garden.js:182 (is_watering_can)",
+    "gsjs:items/include/garden.js:185 (is_watering_can)",
+    "gsjs:items/include/master_garden.js:196 (potionTendGarden)",
+    "gsjs:items/include/master_garden.js:199 (potionTendGarden)",
+    "gsjs:items/watering_can.js (tool class sound while working)"
+   ]
+  },
+  "WHISTLE_SONG": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-09/1316564696-Snappy_w_and_wo_whistle_Loop.mp3"
+  },
+  "WHISTLE_SWALLOWED": {
+   "category": "music",
+   "moment": "items/firefly_whistle.js:63",
+   "uses": 2,
+   "via": [
+    "announce_sound",
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:items/firefly_whistle.js:63",
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-02/1296756369-Firefly_Whistle_Swallow_1.1.mp3"
+  },
+  "WILHELM_SCREAM": {
+   "category": "event",
+   "moment": "items/special_item_that_only_beta_testers_get.js:447 (scream)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:items/special_item_that_only_beta_testers_get.js:447 (scream)"
+   ]
+  },
+  "WINTER_HUB1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903483-Winter_1.9.mp3"
+  },
+  "WINTER_HUB2": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903484-Winter_2.2.mp3"
+  },
+  "WINTER_HUB3": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903484-Winter_3.2.mp3"
+  },
+  "WINTER_HUB4": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903485-Winter_4.2.mp3"
+  },
+  "WINTER_HUB5": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2012-11/1351903485-Winter_5.2.mp3"
+  },
+  "WINTER_WALK_QUEST": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2011-12/1324484819-Holiday_Party_Space_Loop_2.1.mp3"
+  },
+  "XAVIER_CARNIVOROUS_PLANTS": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-05/1274727254-CarnivorousPlantsDigestion.mp3"
+  },
+  "YOU_LOSE": {
+   "category": "event",
+   "moment": "Lose a race or game",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_games.js:697 (games_end_it_game)"
+   ]
+  },
+  "YOU_LOSE_CROWN": {
+   "category": "event",
+   "moment": "Game of Crowns: you lose the crown",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_games.js:526 (games_is_not_it)"
+   ]
+  },
+  "YOU_TAKE_CROWN": {
+   "category": "event",
+   "moment": "Game of Crowns: you take the crown",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_games.js:447 (games_is_it)"
+   ]
+  },
+  "YOU_WIN": {
+   "category": "ui",
+   "moment": "Win a race or game",
+   "uses": 2,
+   "via": [
+    "announce_sound",
+    "client"
+   ],
+   "sources": [
+    "gsjs:players/inc_games.js:688 (games_end_it_game)",
+    "client:com/tinyspeck/engine/view/ui/imagination/ImaginationPurchaseUpgradeUI.as:226 (show)"
+   ]
+  },
+  "ZUTTO1": {
+   "category": "music",
+   "moment": "inc_data_sounds.js (music_map)",
+   "uses": 1,
+   "via": [
+    "music_map"
+   ],
+   "sources": [
+    "gsjs:inc_data_sounds.js (music_map)"
+   ],
+   "url": "http://c2.glitch.bz/sounds/2010-05/1275198462-zutto_master1.mp3"
+  }
+ }
+}
