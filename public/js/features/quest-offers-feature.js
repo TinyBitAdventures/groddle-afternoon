@@ -62,6 +62,8 @@ function questContext(engine, now = Date.now()) {
     removeItem,
     countItem,
     managedOnly: true,
+    // `custom_code` prerequisites (GSJS canOffer) answered by the feature that owns them.
+    customPrereq: (id, prereq) => engine.questCustomPrereq?.(id, prereq) === true,
   };
 }
 

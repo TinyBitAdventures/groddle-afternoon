@@ -41,6 +41,7 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { QUEST_ROOMS, OFFER_OVERRIDES, isBuiltRoom } from './public/js/quest-rooms/catalog.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const GS = join(ROOT, '../glitch-GameServerJS');
@@ -398,10 +399,24 @@ for (const def of Object.values(catalog)) {
   }
   def.offerTriggers = list;
   if (PREREQ_PROXY[id]) def.prereqProxy = PREREQ_PROXY[id];
+  // Rebuilt instance rooms (public/js/quest-rooms/catalog.js): solo once built,
+  // with offer sources the remake cannot reproduce swapped for familiar ones.
+  const room = QUEST_ROOMS[id];
+  const builtRoom = room && isBuiltRoom(room);
+  if (builtRoom) {
+    def.instanceRoom = room;
+    const o = OFFER_OVERRIDES[id];
+    if (o?.offerTriggers) def.offerTriggers = list = o.offerTriggers.map((t) => ({ ...t, override: true }));
+    if (o?.prereqQuests) def.prereqQuests = [...o.prereqQuests];
+    if (o?.prerequisites) def.prerequisites = [...def.prerequisites.filter((p) => p.condition !== 'custom_code'), ...o.prerequisites];
+    if (o?.why) def.offerNote = o.why;
+    for (const req of def.requirements) if (req.type === 'flag' || req.type === 'counter') req.route = 'quest-instances';
+  }
 
   let reason = null;
   if (def.isJob) reason = 'job';
   else if (CUSTOM.has(id)) reason = null;
+  else if (builtRoom) reason = null;
   else if (EXCLUDE[id]) reason = EXCLUDE[id];
   else if (def.isMultiplayer) reason = 'multiplayer';
   else if (!list.length) reason = 'no_offer_source';

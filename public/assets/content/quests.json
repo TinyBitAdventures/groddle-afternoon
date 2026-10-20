@@ -1676,7 +1676,8 @@
     "recipeId": "190",
     "recipeName": "Urth Block",
     "tool": "blockmaker",
-    "outputClass": "grade_aa_earth_block"
+    "outputClass": "grade_aa_earth_block",
+    "recipeKey": "grade_aa_earth_block"
    }
   ],
   "rewards": {
@@ -29902,14 +29903,16 @@
     "type": "counter",
     "name": "quoins_collected",
     "num": 30,
-    "desc": "Coins Qollected"
+    "desc": "Coins Qollected",
+    "route": "quest-instances"
    },
    {
     "id": "r89",
     "type": "flag",
     "name": "left_rainbow_run",
     "num": 1,
-    "desc": "Leave Rainbow Run"
+    "desc": "Leave Rainbow Run",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -29939,8 +29942,8 @@
     "level": 5
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "rainbow_run",
+  "solo": true
  },
  "omg_bacon": {
   "classTsid": "omg_bacon",

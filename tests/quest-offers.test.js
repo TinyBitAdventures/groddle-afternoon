@@ -24,6 +24,7 @@ import {
   questRewardSummary,
   listQuestLog,
 } from '../public/js/quests.js';
+import { builtInstanceQuests } from '../public/js/quest-rooms/catalog.js';
 import {
   OFFER_INTERVAL_MS,
   COUNTER_ROUTES,
@@ -99,16 +100,20 @@ describe('rebuilt quest catalog', () => {
 describe('classifyQuests', () => {
   it('splits 445 quests into solo, custom story, and excluded with reasons', () => {
     const c = classifyQuests();
-    assert.equal(c.solo.length, 129);
+    // Rebuilt quest rooms (public/js/quest-rooms/catalog.js) move from
+    // instance_unbuilt to solo as each room lands.
+    const built = builtInstanceQuests().length;
+    assert.equal(c.solo.length, 129 + built);
     assert.equal(c.custom.length, 17);
-    assert.equal(c.excluded.length, 299);
+    assert.equal(c.excluded.length, 299 - built);
     assert.equal(c.byReason.job.length, 200);
     assert.equal(c.byReason.multiplayer.length, 11);
-    assert.equal(c.byReason.instance_unbuilt.length, 32);
+    assert.equal((c.byReason.instance_unbuilt || []).length, 32 - built);
+    for (const id of builtInstanceQuests()) assert.ok(c.solo.some((row) => row.classTsid === id), id);
     assert.ok(c.byReason.needs_other_players.includes('kindly_randomness'));
     assert.ok(c.byReason.removed_feature.includes('say_cheese'));
     assert.ok(c.custom.some((row) => row.classTsid === 'phantom_glitch'));
-    assert.equal(questOfferIndex().length, 129);
+    assert.equal(questOfferIndex().length, 129 + built);
   });
 
   it('marks NPC-only quests whose giver the remake lacks as unreachable', () => {

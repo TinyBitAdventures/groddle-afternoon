@@ -851,6 +851,8 @@ export function isEventEmitted(event) {
  */
 export function requirementRoute(req) {
   if (!req) return null;
+  // Flags and counters set by a rebuilt quest room (features/quest-instances-feature.js).
+  if (req.route === 'quest-instances') return { system: 'quest-instances', event: req.name, emitted: true };
   if (req.type === 'item' || req.type === 'currants') {
     return { system: 'inventory', event: 'syncItemRequirements', emitted: true, sync: true };
   }

@@ -30,6 +30,7 @@ import { unlearningFeature } from './unlearning-feature.js?v=unlearn-1';
 import { dropsFeature } from './drops-feature.js?v=drops-1';
 import { masterGardenFeature } from './master-garden-feature.js?v=mastergarden-1';
 import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=husbandry-1';
+import { questInstancesFeature } from './quest-instances-feature.js?v=qi-1';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-1';
 import { seasonsFeature } from './seasons-feature.js?v=seasons-1';
 
@@ -62,6 +63,7 @@ export const FEATURES = [
   dropsFeature,
   masterGardenFeature,
   animalHusbandryFeature,
+  questInstancesFeature,
   partySpacesFeature,
   seasonsFeature,
 ];
