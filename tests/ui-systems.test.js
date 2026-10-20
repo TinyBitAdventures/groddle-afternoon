@@ -152,7 +152,8 @@ describe('pack / inventory', () => {
     assert.match(game, /data-pack-sell/);
     assert.match(game, /event\.shiftKey/);
     assert.match(css, /\.pack-bar\s*\{[\s\S]*?z-index:\s*45/);
-    assert.match(css, /\.glitch-modal\s*\{[\s\S]*?bottom:\s*105px/);
+    // Modal workflows stop above the live pack so it stays usable underneath.
+    assert.match(css, /\.glitch-modal\s*\{[^}]*bottom:\s*var\(--pack-live-height, 105px\)/);
     assert.match(css, /\.vendor-shelf\[hidden\][\s\S]*?display:\s*none\s*!important/);
     assert.match(css, /\.qty-row \.btn-glitch-primary\s*\{[\s\S]*?width:\s*auto[\s\S]*?background:\s*#4a90c8/);
   });
