@@ -124,6 +124,13 @@ export const OFFER_OVERRIDES = Object.freeze({
   },
 });
 
+/**
+ * Items the rooms hand out or ask for, registered in the pack catalog at boot
+ * (inventory.js ensureItem) so they read correctly after a reload. Icons live
+ * at assets/sprites/icons/<class>.png (recovered OGA iconic art).
+ */
+export const ROOM_ITEMS = Object.freeze({});
+
 /** Pack items that offer a room's reminisce quests (npc triggers on an item class). */
 export const REMINISCE_ITEMS = Object.freeze({
   play_cube: 'play_cube',

@@ -59,7 +59,7 @@ import {
   solveQuestInstance,
   stepQuestInstance,
 } from '../quest-instance.js?v=qi-1';
-import { QUEST_ROOMS, REMINISCE_ITEMS, isBuiltRoom, roomModulePath } from '../quest-rooms/catalog.js?v=qi-1';
+import { QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, roomModulePath } from '../quest-rooms/catalog.js?v=qi-1';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import {
   acceptOffer,
@@ -1038,6 +1038,7 @@ export const questInstancesFeature = {
     engineRef = engine;
     // quest-offers-feature asks the engine for custom_code prerequisites.
     engine.questCustomPrereq = (id, prereq) => customPrereq(id, prereq, engine);
+    for (const [classTsid, meta] of Object.entries(ROOM_ITEMS)) ensureItem(classTsid, meta);
     const want = String(engine.param('questdemo') || '');
     if (QUEST_ROOMS[want]) {
       demo = { quest: want, mode: engine.param('questautoplay') || '', stage: 'idle' };
