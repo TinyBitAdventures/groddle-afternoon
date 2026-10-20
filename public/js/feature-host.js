@@ -25,7 +25,11 @@
  *   allowZeroEnergyMovement(engine)       // -> true lets the avatar walk at 0 energy
  *   reloadLocation(saved, engine)         // -> { tsid, x, y } overrides the saved start
  *   metabolicGate(stat, direction, engine)// -> { ok:false, msg } blocks a gain/loss
- *   physics(engine)                       // -> { speed, jump } multipliers
+ *   physics(engine)                       // -> { speed, jump, gravity } multipliers
+ *   packVerbs(classTsid, engine)          // -> [{ id, label, enabled, reason, tooltip, primary }]
+ *                                         //    extra buttons on that item's pack popover
+ *   runPackVerb(classTsid, verbId, engine)// -> true when handled
+ *   mapCards(engine)                      // -> [HTMLElement] cards shown above the Map canvas
  *   save()                                // -> JSON-safe slice
  *   restore(slice, engine)                // slice may be undefined on a fresh game
  * }
@@ -141,13 +145,35 @@ export function createFeatureHost(features = []) {
     physics(engine) {
       let speed = 1;
       let jump = 1;
+      let gravity = 1;
       for (const feature of list) {
         if (typeof feature.physics !== 'function') continue;
         const p = feature.physics(engine) || {};
         if (Number.isFinite(p.speed)) speed *= p.speed;
         if (Number.isFinite(p.jump)) jump *= p.jump;
+        if (Number.isFinite(p.gravity)) gravity *= p.gravity;
       }
-      return { speed, jump };
+      return { speed, jump, gravity };
+    },
+    /** Pack popover verbs every feature offers for one item class. */
+    packVerbs(classTsid, engine) {
+      const out = [];
+      for (const feature of list) {
+        if (typeof feature.packVerbs !== 'function') continue;
+        for (const verb of feature.packVerbs(classTsid, engine) || []) {
+          if (verb && typeof verb.id === 'string') out.push({ ...verb, featureId: feature.id });
+        }
+      }
+      return out;
+    },
+    /** Route a pack verb to the feature that offered it (or the first that handles it). */
+    runPackVerb(classTsid, verbId, engine, featureId = '') {
+      const owners = featureId && byId.has(featureId) ? [byId.get(featureId)] : list;
+      for (const feature of owners) {
+        if (typeof feature.runPackVerb !== 'function') continue;
+        if (feature.runPackVerb(classTsid, verbId, engine) === true) return true;
+      }
+      return false;
     },
     /** { [featureId]: slice } for the player save. */
     save() {

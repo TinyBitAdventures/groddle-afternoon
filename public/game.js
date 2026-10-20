@@ -2540,6 +2540,7 @@ function renderPackPopover(classTsid, anchor = null) {
       ${bearUpgradeMarkup}
       ${bearAccessoryMarkup}
       ${toolCondition?.tracked && toolCondition.needsRepair && toolCondition.repairable ? `<button type="button" class="pack-pop-repair" data-pack-repair ${canRepair ? '' : 'disabled'} title="${canRepair ? 'Repair with your Tinkertool' : 'Needs Tinkering, energy, and a working Tinkertool'}">Repair · ${repairQuote?.ok ? `${repairQuote.energy} energy` : 'unavailable'}</button>` : ''}
+      ${features.packVerbs(classTsid, engine).map((verb) => `<button type="button" class="pack-bear-action pack-feature-verb${verb.primary ? ' pack-pop-primary' : ''}" data-feature-pack-verb="${escapeHtml(verb.id)}" data-feature-id="${escapeHtml(verb.featureId)}" ${verb.enabled === false ? 'disabled' : ''} title="${escapeHtml(verb.enabled === false ? verb.reason || '' : verb.tooltip || '')}">${escapeHtml(verb.label)}</button>`).join('')}
       ${recipeTarget ? `<button type="button" data-pack-make>${escapeHtml(makeLabel)}</button>` : ''}
       <button type="button" data-pack-drop>Drop</button>
       ${canSellHere ? `<button type="button" class="pack-pop-sell" data-pack-sell>Sell for ◎ ${offer?.sellPrice ?? 1}</button>` : ''}
@@ -2554,6 +2555,12 @@ function renderPackPopover(classTsid, anchor = null) {
   positionPackPopover(pop, sourceAnchor);
 
   pop.querySelector('[data-pack-close]')?.addEventListener('click', closePackPopover);
+  pop.querySelectorAll('[data-feature-pack-verb]').forEach((button) => {
+    button.addEventListener('click', () => {
+      closePackPopover();
+      features.runPackVerb(classTsid, button.dataset.featurePackVerb, engine, button.dataset.featureId);
+    });
+  });
   pop.querySelector('[data-pack-use]')?.addEventListener('click', () => {
     closePackPopover();
     usePackItem(classTsid);
@@ -6314,6 +6321,40 @@ const engine = {
     if (tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID) return homeState.owned === true;
     return Boolean(resolveIndexTsid(tsid));
   },
+  /** Every feature's travel gate (Hell: dead / Naraka / Pooped) for a destination. */
+  travelGate: (tsid) => features.travelGate(tsid, engine),
+  closeMap: () => closeMap(),
+  /** QA routes: learn a skill outright (prerequisites skipped). */
+  grantSkill: (classTsid) => grantSkill(skillState, classTsid, true),
+  /** A music cue over the ducked street BGM (the Musicblock duck); resolves to stop(). */
+  async playCue(url, { volume = 0.6 } = {}) {
+    const key = `cue:${url}`;
+    if (!audio.ctx) return () => {};
+    try {
+      audio.buffers[key] ||= await audio.ctx.decodeAudioData(await (await fetch(url)).arrayBuffer());
+    } catch {
+      return () => {};
+    }
+    if (audio.musicblock) try { audio.musicblock.stop(); } catch { /* ended */ }
+    const src = audio.ctx.createBufferSource();
+    const gain = audio.ctx.createGain();
+    src.buffer = audio.buffers[key];
+    gain.gain.value = volume;
+    src.connect(gain);
+    gain.connect(audio.sfxGain);
+    audio.musicblock = src;
+    src.onended = () => {
+      if (audio.musicblock === src) audio.musicblock = null;
+      applyMute();
+    };
+    src.start(0);
+    applyMute();
+    return () => {
+      const t = audio.ctx.currentTime;
+      gain.gain.setTargetAtTime(0.0001, t, 0.35);
+      try { src.stop(t + 1.4); } catch { /* ended */ }
+    };
+  },
   /** Feature-driven travel: home rooms, ordinary streets, gate bypass. */
   async enter(tsid, opts = {}) {
     if (tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID) {
@@ -7403,7 +7444,12 @@ function performPlayerJump(result, baseVelocity, now) {
 function combinedPhysics() {
   const base = buffPhysics(buffState, Date.now());
   const extra = features.physics(engine);
-  return { ...base, speed: base.speed * extra.speed, jump: base.jump * extra.jump };
+  return {
+    ...base,
+    speed: base.speed * extra.speed,
+    jump: base.jump * extra.jump,
+    gravity: (base.gravity ?? 1) * extra.gravity,
+  };
 }
 
 function handleInput() {
@@ -7567,7 +7613,7 @@ function physics(dt) {
       pc.energy = clamp(pc.energy - 0.012 * dt, 0, 100);
     }
   } else {
-    const movementBuff = buffPhysics(buffState, Date.now());
+    const movementBuff = combinedPhysics();
     player.vy += 0.42 * movementBuff.gravity * dt;
     player.x += player.vx * dt;
     player.y += player.vy * dt;
@@ -17139,6 +17185,11 @@ async function openMap(hubId) {
 
   renderIlmenskieMapCallout(panel);
   renderHomeMapCallout(panel);
+  panel.querySelectorAll('.map-feature-card').forEach((el) => el.remove());
+  for (const el of features.collect('mapCards', engine)) {
+    el.classList.add('map-feature-card');
+    panel.querySelector('.map-card')?.insertBefore(el, panel.querySelector('.map-canvas'));
+  }
   panel.hidden = false;
 }
 
