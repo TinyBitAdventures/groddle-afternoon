@@ -833,6 +833,20 @@
       "isTool": false,
       "source": "items/butterfly_egg.js"
     },
+    "butterfly_milker": {
+      "label": "Butterfly Milker",
+      "namePlural": "Butterfly Milkers",
+      "desc": "A mechanized butterfly milker. It will gently milk your butterflies in your absence. Good for busy farmers or those with chapped hands.",
+      "baseCost": 400,
+      "stackMax": 1,
+      "tags": [
+        "herdkeeping",
+        "herdkeepingsupplies",
+        "animals"
+      ],
+      "isTool": false,
+      "source": "items/butterfly_milker.js"
+    },
     "cabbage": {
       "label": "Cabbage",
       "namePlural": "Cabbages",
@@ -3805,6 +3819,20 @@
         "source": "items/meat.js base_cost 10 × energy_factor 1 (include/food.js food_eat)"
       }
     },
+    "meat_collector": {
+      "label": "Meat Collector",
+      "namePlural": "Meat Collectors",
+      "desc": "A farm-grade meat collector. It works around the clock to collect meat from your piggies when you can't.",
+      "baseCost": 500,
+      "stackMax": 1,
+      "tags": [
+        "herdkeeping",
+        "herdkeepingsupplies",
+        "animals"
+      ],
+      "isTool": false,
+      "source": "items/meat_collector.js"
+    },
     "meat_gumbo": {
       "label": "Meat Gumbo",
       "namePlural": "Meat Gumbos",
@@ -4505,6 +4533,20 @@
       ],
       "isTool": false,
       "source": "items/piggy_egg.js"
+    },
+    "piggy_feeder": {
+      "label": "Piggy Feeder",
+      "namePlural": "Piggy Feeders",
+      "desc": "A piggy feeder is a must-have device for lazy farmers. It will feed your pigs while you are away.",
+      "baseCost": 200,
+      "stackMax": 1,
+      "tags": [
+        "herdkeeping",
+        "herdkeepingsupplies",
+        "animals"
+      ],
+      "isTool": false,
+      "source": "items/piggy_feeder.js"
     },
     "pinch_of_salt": {
       "label": "Pinch of Salt",

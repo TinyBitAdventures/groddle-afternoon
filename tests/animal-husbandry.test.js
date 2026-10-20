@@ -368,7 +368,7 @@ describe('Animal husbandry wiring', () => {
     assert.deepEqual(slot.guano, []);
   });
 
-  it('registers the feature, the picker count step, and the event emits', () => {
+  it('registers the feature, the picker count step, the event emits, and the unskipped machine recipes', () => {
     const index = readFileSync(join(publicDir, 'js/features/index.js'), 'utf8');
     assert.match(index, /animalHusbandryFeature/);
     const html = readFileSync(join(publicDir, 'index.html'), 'utf8');
@@ -377,6 +377,16 @@ describe('Animal husbandry wiring', () => {
     assert.match(game, /animal_max_reward:\$\{target\.classId\}/);
     assert.match(game, /skill_package_drop:\$\{target\.classId\}/);
     assert.match(game, /openPicker: \(target, verb\) => openFeedPicker\(target, verb\)/);
+    const recipes = JSON.parse(readFileSync(join(publicDir, 'assets/content/recipes.json'), 'utf8'));
+    const outputs = Object.values(recipes.recipes || recipes).flatMap((r) => (r.outputs || []).map((o) => o.classTsid));
+    for (const id of ['meat_collector', 'butterfly_milker', 'piggy_feeder']) assert.ok(outputs.includes(id), id);
   });
 
+  it('makes Guano, Piggy Plop, Caterpillars and Hog-tied Piggies obtainable for street projects', async () => {
+    const { obtainableItems } = await import('../tools/job-obtainable.mjs');
+    const { items } = await obtainableItems();
+    for (const id of ['guano', 'plop', 'caterpillar', 'chick', 'piglet', 'hogtied_piggy', 'meat_collector']) {
+      assert.ok(items.has(id), id);
+    }
+  });
 });

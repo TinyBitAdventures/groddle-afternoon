@@ -236,8 +236,10 @@ describe('obtainability (tools/job-obtainable.mjs)', () => {
     }
     for (const id of ['woodworker', 'fuelmaker', 'blockmaker', 'metalmaker', 'still', 'spindle']) assert.ok(tools.has(id), `${id} held`);
     assert.equal(sources.woodworker, 'assembly');
-    // Retired or animal-only in the source: still missing, on purpose.
-    for (const id of ['brick', 'grade_a_earth_block', 'grade_aaa_earth_block', 'guano', 'caterpillar']) assert.ok(!items.has(id), id);
+    // Retired in the source: still missing, on purpose.
+    for (const id of ['brick', 'grade_a_earth_block', 'grade_aaa_earth_block']) assert.ok(!items.has(id), id);
+    // Animal husbandry (2026-10-20): Batterfly Guano, Piggy Plop, incubated Caterpillars.
+    for (const id of ['guano', 'plop', 'caterpillar', 'hogtied_piggy']) assert.ok(items.has(id), id);
   });
 
   it('the report counts recipes and quests', async () => {

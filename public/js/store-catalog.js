@@ -636,6 +636,21 @@ export const STORE_CATALOG = Object.freeze([
         "cost": 436
       },
       {
+        "classTsid": "magic_pig_stick",
+        "label": "Pig Stick",
+        "cost": 436
+      },
+      {
+        "classTsid": "magic_butterfly_stick",
+        "label": "Butterfly Stick",
+        "cost": 436
+      },
+      {
+        "classTsid": "magic_chicken_stick",
+        "label": "Chicken Stick",
+        "cost": 436
+      },
+      {
         "classTsid": "butterfly_lotion",
         "label": "Butterfly Lotion",
         "cost": 11
@@ -654,6 +669,21 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "egg_seasoner",
         "label": "Egg Seasoner",
         "cost": 191
+      },
+      {
+        "classTsid": "butterfly_milker",
+        "label": "Butterfly Milker",
+        "cost": 436
+      },
+      {
+        "classTsid": "piggy_feeder",
+        "label": "Piggy Feeder",
+        "cost": 218
+      },
+      {
+        "classTsid": "meat_collector",
+        "label": "Meat Collector",
+        "cost": 545
       }
     ]
   },
@@ -675,6 +705,21 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "butterfly_lotion",
         "label": "Butterfly Lotion",
         "cost": 11
+      },
+      {
+        "classTsid": "meat_collector",
+        "label": "Meat Collector",
+        "cost": 525
+      },
+      {
+        "classTsid": "piggy_feeder",
+        "label": "Piggy Feeder",
+        "cost": 210
+      },
+      {
+        "classTsid": "butterfly_milker",
+        "label": "Butterfly Milker",
+        "cost": 420
       },
       {
         "classTsid": "egg_seasoner",

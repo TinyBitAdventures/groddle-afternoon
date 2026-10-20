@@ -2,8 +2,8 @@
   "_meta": {
     "generator": "build-recipes.mjs",
     "sourceRecipes": 339,
-    "imported": 312,
-    "skipped": 27,
+    "imported": 315,
+    "skipped": 24,
     "verbRecipes": 7
   },
   "skipped": [
@@ -56,36 +56,6 @@
       ],
       "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
       "source": "catalog_recipes.js recipes[\"199\"]"
-    },
-    {
-      "id": "215",
-      "name": "Butterfly Milker",
-      "tool": "tinkertool",
-      "outputs": [
-        "butterfly_milker"
-      ],
-      "reason": "Butterfly Milker is a placed Remote Herdkeeping machine for home pastures; no pasture/home machine system exists.",
-      "source": "catalog_recipes.js recipes[\"215\"]"
-    },
-    {
-      "id": "216",
-      "name": "Meat Collector",
-      "tool": "tinkertool",
-      "outputs": [
-        "meat_collector"
-      ],
-      "reason": "Meat Collector is a placed Remote Herdkeeping machine for home pastures; no pasture/home machine system exists.",
-      "source": "catalog_recipes.js recipes[\"216\"]"
-    },
-    {
-      "id": "217",
-      "name": "Piggy Feeder",
-      "tool": "tinkertool",
-      "outputs": [
-        "piggy_feeder"
-      ],
-      "reason": "Piggy Feeder is a placed Remote Herdkeeping machine for home pastures; no pasture/home machine system exists.",
-      "source": "catalog_recipes.js recipes[\"217\"]"
     },
     {
       "id": "219",

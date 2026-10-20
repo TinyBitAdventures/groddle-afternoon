@@ -6996,6 +6996,108 @@
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"214\"]"
   },
+  "butterfly_milker": {
+    "id": "215",
+    "name": "Butterfly Milker",
+    "tool": "tinkertool",
+    "energyCost": 30,
+    "xpReward": 30,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 4
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "butterfly_milker",
+        "qty": 1
+      }
+    ],
+    "skill": "remoteherdkeeping_1",
+    "skills": [
+      "remoteherdkeeping_1",
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"215\"]"
+  },
+  "meat_collector": {
+    "id": "216",
+    "name": "Meat Collector",
+    "tool": "tinkertool",
+    "energyCost": 30,
+    "xpReward": 30,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 5
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 4
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "meat_collector",
+        "qty": 1
+      }
+    ],
+    "skill": "remoteherdkeeping_1",
+    "skills": [
+      "remoteherdkeeping_1",
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"216\"]"
+  },
+  "piggy_feeder": {
+    "id": "217",
+    "name": "Piggy Feeder",
+    "tool": "tinkertool",
+    "energyCost": 30,
+    "xpReward": 20,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "tin",
+        "qty": 2
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "piggy_feeder",
+        "qty": 1
+      }
+    ],
+    "skill": "remoteherdkeeping_1",
+    "skills": [
+      "remoteherdkeeping_1",
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"217\"]"
+  },
   "ore_grinder": {
     "id": "218",
     "name": "Grinder",

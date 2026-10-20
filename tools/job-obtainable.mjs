@@ -11,12 +11,14 @@
  *    resource-node starter tools, the Hatchet); starter consumables are not
  *    counted because they run out
  *  - harvest systems: living trants, mine rock chunks, smelted Plain Metal,
- *    Wood Tree planks, Animal Kinship yields, soil and resource-node drop
+ *    Wood Tree planks, Animal Kinship yields and drop tables, Batterfly
+ *    Guano, soil and resource-node drop
  *    tables, fox fiber
  *  - then a fixpoint over every conversion: recipes.json (a recipe needs its
  *    tool held and every input; machine recipes burn fuel from the machine's
  *    tank, js/machines.js), garden seeds into crops, pack transforms
- *    (js/item-transforms.js: butter, cheese, herb seeds), machine assembly
+ *    (js/item-transforms.js: butter, cheese, herb seeds), Piggy Plop from
+ *    crops, egg incubation, Herdkeeping capture, machine assembly
  *    from a Machine Stand and parts, the Still's Hooch, and Paper into Notes
  *
  * A tool counts as held only when one of those sources gives it.
@@ -74,6 +76,17 @@ export async function supplyConversions() {
     rows.push({ inputs: [id], tool: machines.STILL.classTsid, outputs: ['hooch'], source: 'still' });
   }
   rows.push({ inputs: ['paper'], tool: null, outputs: ['note'], source: 'paper:write' });
+  // Animal husbandry (js/animal-husbandry.js): a Piggy fed 3+ crops plops,
+  // a Chicken incubates seasoned eggs, Herdkeeping turns Pig Bait into a
+  // Hog-tied Piggy.
+  const husbandry = await import(js('animal-husbandry.js'));
+  for (const crop of Object.keys(husbandry.PIGGY_CROP_SEEDS)) {
+    rows.push({ inputs: [crop], tool: null, outputs: ['plop'], source: 'piggy_plop' });
+  }
+  for (const [egg, baby] of Object.entries(husbandry.INCUBATION.hatches)) {
+    rows.push({ inputs: [egg], tool: null, outputs: [baby], source: 'incubation' });
+  }
+  rows.push({ inputs: [husbandry.HERDKEEPING.bait], tool: null, outputs: ['hogtied_piggy'], source: 'herdkeeping' });
   return rows;
 }
 
@@ -121,6 +134,11 @@ export async function obtainableItems() {
   add('plain_metal', 'smelter');
   add('plank', 'wood_tree');
   for (const id of ['meat', 'grain', 'milk_butterfly']) add(id, 'animal_kinship');
+  // Batterflies on cave streets release Guano when fed any food (and hourly);
+  // Animal Kinship V+ drop tables (squeeze: seasoned eggs, Musicblocks; nibble: bacon).
+  const husbandry = await import(js('animal-husbandry.js'));
+  add('guano', 'batterfly');
+  for (const id of husbandry.akDropItems()) add(id, 'animal_kinship_drop');
   add(foxes.FIBER_ID, 'fox_brushing');
   const drops = new Set();
   walkClassTsids(resources.RESOURCE_DROP_TABLES, drops);

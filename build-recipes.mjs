@@ -97,12 +97,14 @@ const PLAYABLE_TOOL_OUTPUTS = new Set([
   'super_scraper',
   'shovel',
   'ace_of_spades',
+  // Remote Herdkeeping machines: placed in the back yard by
+  // features/animal-husbandry-feature.js (js/animal-husbandry.js REMOTE_MACHINES).
+  'butterfly_milker',
+  'meat_collector',
+  'piggy_feeder',
 ]);
 
 const UNPLAYABLE_TOOL_REASONS = {
-  butterfly_milker: 'Butterfly Milker is a placed Remote Herdkeeping machine for home pastures; no pasture/home machine system exists.',
-  meat_collector: 'Meat Collector is a placed Remote Herdkeeping machine for home pastures; no pasture/home machine system exists.',
-  piggy_feeder: 'Piggy Feeder is a placed Remote Herdkeeping machine for home pastures; no pasture/home machine system exists.',
   grand_ol_grinder: "Grand Ol' Grinder is an upgraded Grinder; mining.js only recognizes ore_grinder.",
   high_class_hoe: 'High-Class Hoe is an upgraded Hoe; garden.js only recognizes hoe.',
   class_axe: 'Class Axe is an upgraded Hatchet; woodcutting.js only recognizes hatchet.',
