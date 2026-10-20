@@ -29,6 +29,7 @@ import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unifie
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import { emblemCostFor } from '../shrines.js';
+import { landingY } from '../walk-surface.js';
 import {
   EMBLEM_VERBS,
   GIANT_ICON_DATA,
@@ -189,7 +190,9 @@ function runIconVerb(giant, verbId, engine, ref = { giant }) {
   }
   if (verbId === 'place') {
     const p = engine.player;
-    const res = placeIcon(state, engine.inv, giant, engine.streetTsid, (p?.x || 0) + 70 * (p?.scale?.x < 0 ? -1 : 1), p?.y || engine.groundY);
+    const x = (p?.x || 0) + 70 * (p?.scale?.x < 0 ? -1 : 1);
+    const y = landingY(engine.platforms, x, (p?.y || engine.groundY) - 40) ?? p?.y ?? engine.groundY;
+    const res = placeIcon(state, engine.inv, giant, engine.streetTsid, x, y);
     if (!res.ok) return say(engine, res.msg, false), true;
     spawnIcon(engine, res.row);
     engine.playSound?.('ITEM_DROP', { volume: 0.5 });
