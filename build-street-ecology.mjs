@@ -35,7 +35,28 @@ const LABEL_TO_CLASS = Object.freeze({
   'Sparkly Rock': 'rock_sparkly_1',
   Garden: 'garden',
   'Street Spirit': 'street_spirit',
+  // Harvestable world resource nodes (js/resource-nodes.js). Labels are the
+  // exact objref labels in the archived location XML; Peat Bog covers the
+  // peat_1/peat_2/peat_3 visual variants, which share one label.
+  Firefly: 'npc_firefly',
+  Salmon: 'npc_salmon',
+  'Mortar Barnacle': 'mortar_barnacle',
+  'Ice Nubbin': 'ice_knob',
+  'Jellisac Growth': 'jellisac',
+  'Dirt Pile': 'dirt_pile',
+  'Peat Bog': 'peat_1',
+  'Paper Tree': 'paper_tree',
+  Sloth: 'npc_sloth',
+  'Dust Trap': 'dust_trap',
 });
+
+/**
+ * Curated source-empty streets. Their archived XML holds only scenery-style
+ * objects, and the remake deliberately keeps them uncluttered (for example the
+ * private Stoot memorial), so the row is emitted with `empty: true` even when
+ * no mapped labels are present.
+ */
+const CURATED_EMPTY_STREETS = Object.freeze(new Set(['GIFPV9EMLT72DP4']));
 
 const GIANT_ALIASES = Object.freeze({
   alph: 'alph',
@@ -98,6 +119,10 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const sourcePath = await firstReadable(candidates);
   if (!sourcePath) continue;
   const sourceTsid = sourcePath.slice(sourcePath.lastIndexOf('/') + 1, -4);
+  if (CURATED_EMPTY_STREETS.has(tsid)) {
+    streets[tsid] = { label: meta.label || tsid, sourceTsid, counts: {}, empty: true };
+    continue;
+  }
   const ecology = ecologyFromLabels(itemLabels(await readFile(sourcePath, 'utf8')));
   if (!Object.keys(ecology.counts).length && !ecology.giantId && !ecology.spawners) continue;
   streets[tsid] = {

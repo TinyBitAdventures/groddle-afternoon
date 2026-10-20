@@ -1,8 +1,25 @@
 {
   "source": "tinyspeck/glitch-locations locations-xml.zip item references (CC0)",
   "sourceSnapshot": "2012-12 late-game L-prefixed location objects",
-  "streetCount": 1084,
+  "streetCount": 1256,
   "streets": {
+    "GA5101HF7F429V5": {
+      "label": "Empty Via 5",
+      "sourceTsid": "LA5101HF7F429V5",
+      "counts": {
+        "dust_trap": 3,
+        "dirt_pile": 1
+      }
+    },
+    "GA510IHD1F426DS": {
+      "label": "Empty Via 6",
+      "sourceTsid": "LA510IHD1F426DS",
+      "counts": {
+        "dirt_pile": 1,
+        "paper_tree": 1,
+        "dust_trap": 2
+      }
+    },
     "GA510OD56BH2CBJ": {
       "label": "r_horiz_3",
       "sourceTsid": "LA510OD56BH2CBJ",
@@ -15,32 +32,443 @@
       },
       "giantId": "humbaba"
     },
+    "GA512CSG4H42RKG": {
+      "label": "Stake Claim Rd A",
+      "sourceTsid": "LA512CSG4H42RKG",
+      "counts": {
+        "dust_trap": 3,
+        "dirt_pile": 1
+      }
+    },
     "GA512IH5226256P": {
       "label": "Gaare Grims",
       "sourceTsid": "LA512IH5226256P",
       "counts": {
         "trant_bean": 2,
+        "dirt_pile": 2,
+        "npc_sloth": 1,
         "street_spirit": 1
       },
       "giantId": "friendly",
       "spawners": 1
+    },
+    "GA512SK50J52F8M": {
+      "label": "Yokel Yarn 4",
+      "sourceTsid": "LA512SK50J52F8M",
+      "counts": {
+        "dust_trap": 1,
+        "paper_tree": 1
+      }
+    },
+    "GA512T760J52JMS": {
+      "label": "Loutish Ln B",
+      "sourceTsid": "LA512T760J52JMS",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA512UR70J52M1G": {
+      "label": "Swain Way 1",
+      "sourceTsid": "LA512UR70J52M1G",
+      "counts": {
+        "dust_trap": 1,
+        "paper_tree": 1
+      }
+    },
+    "GA512V480J52NMN": {
+      "label": "Boor Bane C",
+      "sourceTsid": "LA512V480J52NMN",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA5130090J525IQ": {
+      "label": "Cornfed Crt C",
+      "sourceTsid": "LA5130090J525IQ",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA5131390J52DJR": {
+      "label": "Boor Bane B",
+      "sourceTsid": "LA5131390J52DJR",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA5132LA0J526JJ": {
+      "label": "Boor Bane A",
+      "sourceTsid": "LA5132LA0J526JJ",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA5133PB0J522JA": {
+      "label": "Yokel Yarn 2",
+      "sourceTsid": "LA5133PB0J522JA",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA5134PC0J52VC3": {
+      "label": "Rube's Way 5",
+      "sourceTsid": "LA5134PC0J52VC3",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA5135VC0J52RGQ": {
+      "label": "Rube's Way 6",
+      "sourceTsid": "LA5135VC0J52RGQ",
+      "counts": {
+        "dust_trap": 2,
+        "paper_tree": 1
+      }
+    },
+    "GA5136CE0J52562": {
+      "label": "Swain Way 3",
+      "sourceTsid": "LA5136CE0J52562",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA5137QE0J52UB8": {
+      "label": "Cornfed Crt A",
+      "sourceTsid": "LA5137QE0J52UB8",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GA5138OK0J526HB": {
+      "label": "Chuff Chase 1",
+      "sourceTsid": "LA5138OK0J526HB",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA5139FL0J52SP5": {
+      "label": "Boor Bane D",
+      "sourceTsid": "LA5139FL0J52SP5",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA513A7M0J521F2": {
+      "label": "Loutish Ln A",
+      "sourceTsid": "LA513A7M0J521F2",
+      "counts": {
+        "dust_trap": 3
+      }
     },
     "GA513ALBNM623UJ": {
       "label": "Bangala Bristles",
       "sourceTsid": "LA513ALBNM623UJ",
       "counts": {
         "trant_bean": 1,
+        "dirt_pile": 1,
         "street_spirit": 1
       },
       "giantId": "lem",
       "spawners": 1
+    },
+    "GA513BTM0J524D4": {
+      "label": "Loutish Ln C",
+      "sourceTsid": "LA513BTM0J524D4",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA513CDN0J52ND9": {
+      "label": "Boor Bane E",
+      "sourceTsid": "LA513CDN0J52ND9",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA513I7O0J52MO0": {
+      "label": "Swain Way 5",
+      "sourceTsid": "LA513I7O0J52MO0",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA513JAO0J5220P": {
+      "label": "Rube's Way 3",
+      "sourceTsid": "LA513JAO0J5220P",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GA513KEP0J52N21": {
+      "label": "Loutish Ln D",
+      "sourceTsid": "LA513KEP0J52N21",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA513LMP0J52V1C": {
+      "label": "Rustic Rd NW",
+      "sourceTsid": "LA513LMP0J52V1C",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA513MGQ0J52Q8S": {
+      "label": "Rustic Rd E",
+      "sourceTsid": "LA513MGQ0J52Q8S",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GA513NJQ0J523F2": {
+      "label": "Rube's Way 4",
+      "sourceTsid": "LA513NJQ0J523F2",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA513OVR0J52BMT": {
+      "label": "Yokel Yarn 6",
+      "sourceTsid": "LA513OVR0J52BMT",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA513PFS0J52F45": {
+      "label": "Cornfed Crt D",
+      "sourceTsid": "LA513PFS0J52F45",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA513QET0J523AD": {
+      "label": "Swain Way 2",
+      "sourceTsid": "LA513QET0J523AD",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA513RIT0J52F6P": {
+      "label": "Rube's Way 1",
+      "sourceTsid": "LA513RIT0J52F6P",
+      "counts": {
+        "dust_trap": 3,
+        "paper_tree": 1
+      }
+    },
+    "GA513S9U0J52SKD": {
+      "label": "Boor Bane F",
+      "sourceTsid": "LA513S9U0J52SKD",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GA513TDU0J524CU": {
+      "label": "Rustic Rd N",
+      "sourceTsid": "LA513TDU0J524CU",
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 1
+      }
+    },
+    "GA5140E01J52TLO": {
+      "label": "Yokel Yarn 3",
+      "sourceTsid": "LA5140E01J52TLO",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA5142521J52DH8": {
+      "label": "Rustic Rd NE",
+      "sourceTsid": "LA5142521J52DH8",
+      "counts": {
+        "dust_trap": 1,
+        "dirt_pile": 1
+      }
+    },
+    "GA5143921J52F9U": {
+      "label": "Rube's Way 2",
+      "sourceTsid": "LA5143921J52F9U",
+      "counts": {
+        "dust_trap": 2,
+        "dirt_pile": 1
+      }
+    },
+    "GA5144431J524TC": {
+      "label": "Chuff Chase 3",
+      "sourceTsid": "LA5144431J524TC",
+      "counts": {
+        "dust_trap": 1,
+        "dirt_pile": 1
+      }
+    },
+    "GA51450HIC42Q4I": {
+      "label": "Parsin's Trail SW",
+      "sourceTsid": "LA51450HIC42Q4I",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA5145S31J52BA2": {
+      "label": "Chuff Chase 2",
+      "sourceTsid": "LA5145S31J52BA2",
+      "counts": {
+        "dust_trap": 1,
+        "dirt_pile": 1
+      }
+    },
+    "GA5146P2JC42B1Q": {
+      "label": "Empty Via 4",
+      "sourceTsid": "LA5146P2JC42B1Q",
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 1
+      }
+    },
+    "GA5146Q41J528U9": {
+      "label": "Yokel Yarn 1",
+      "sourceTsid": "LA5146Q41J528U9",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 3
+      }
+    },
+    "GA5147561J525G7": {
+      "label": "Chuff Chase 4",
+      "sourceTsid": "LA5147561J525G7",
+      "counts": {
+        "dust_trap": 2,
+        "dirt_pile": 1
+      }
+    },
+    "GA5147JHJC424OI": {
+      "label": "Stake Claim Rd D",
+      "sourceTsid": "LA5147JHJC424OI",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA51488SJC424V7": {
+      "label": "Plains Rte B",
+      "sourceTsid": "LA51488SJC424V7",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA5148N71J5237C": {
+      "label": "Cornfed Crt B",
+      "sourceTsid": "LA5148N71J5237C",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 1,
+        "paper_tree": 1
+      }
+    },
+    "GA514988KC42014": {
+      "label": "Parsin's Trail W",
+      "sourceTsid": "LA514988KC42014",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA514BBVLC423BJ": {
+      "label": "Range Rd 4",
+      "sourceTsid": "LA514BBVLC423BJ",
+      "counts": {
+        "dust_trap": 1
+      }
+    },
+    "GA514DNTMC42534": {
+      "label": "Range Rd 6",
+      "sourceTsid": "LA514DNTMC42534",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA514GCJNC42I6G": {
+      "label": "Range Rd 7",
+      "sourceTsid": "LA514GCJNC42I6G",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GA514HDC2J52TOU": {
+      "label": "Swain Way 4",
+      "sourceTsid": "LA514HDC2J52TOU",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 1
+      }
+    },
+    "GA514JHG3J52E88": {
+      "label": "Swain Way 6",
+      "sourceTsid": "LA514JHG3J52E88",
+      "counts": {
+        "paper_tree": 1,
+        "dirt_pile": 1,
+        "dust_trap": 2
+      }
+    },
+    "GA514K0J3J52ID0": {
+      "label": "Yokel Yarn 5",
+      "sourceTsid": "LA514K0J3J52ID0",
+      "counts": {
+        "dust_trap": 2,
+        "dirt_pile": 1
+      }
+    },
+    "GA514TDJOC42JUA": {
+      "label": "Parsin's Trail E",
+      "sourceTsid": "LA514TDJOC42JUA",
+      "counts": {
+        "dust_trap": 1
+      }
+    },
+    "GA5157TDPC42IGK": {
+      "label": "Plains Rte C",
+      "sourceTsid": "LA5157TDPC42IGK",
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 1
+      }
+    },
+    "GA515E0PQC4214G": {
+      "label": "Parsin's Trail SE",
+      "sourceTsid": "LA515E0PQC4214G",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA515GCSSC42QGF": {
+      "label": "Stake Claim Rd F",
+      "sourceTsid": "LA515GCSSC42QGF",
+      "counts": {
+        "dust_trap": 3,
+        "dirt_pile": 1
+      }
+    },
+    "GA515H6TSC424T9": {
+      "label": "Dust Path 1B",
+      "sourceTsid": "LA515H6TSC424T9",
+      "counts": {
+        "dust_trap": 2,
+        "paper_tree": 1
+      }
+    },
+    "GA515KVOUC42I7T": {
+      "label": "Dust Path 1D",
+      "sourceTsid": "LA515KVOUC42I7T",
+      "counts": {
+        "dust_trap": 3
+      }
     },
     "GA51701PF262LC8": {
       "label": "Arisa Annex",
       "sourceTsid": "LA51701PF262LC8",
       "counts": {
         "street_spirit": 1,
-        "trant_bean": 1
+        "trant_bean": 1,
+        "npc_sloth": 2
       },
       "giantId": "zille",
       "spawners": 1
@@ -49,6 +477,7 @@
       "label": "Pakodi Prim",
       "sourceTsid": "LA517JJML262LT0",
       "counts": {
+        "dirt_pile": 2,
         "street_spirit": 1
       },
       "giantId": "cosma"
@@ -59,6 +488,7 @@
       "counts": {
         "trant_fruit": 1,
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_bubble": 1
       },
       "giantId": "mab",
@@ -70,7 +500,8 @@
       "counts": {
         "trant_bean": 1,
         "street_spirit": 1,
-        "wood_tree": 1
+        "wood_tree": 1,
+        "dirt_pile": 1
       },
       "giantId": "friendly",
       "spawners": 1
@@ -80,15 +511,25 @@
       "sourceTsid": "LA517MT2M262D0F",
       "counts": {
         "trant_bean": 1,
+        "dirt_pile": 1,
         "street_spirit": 1
       },
       "giantId": "humbaba"
+    },
+    "GA517OTP8K42NN9": {
+      "label": "Contour Rd E",
+      "sourceTsid": "LA517OTP8K42NN9",
+      "counts": {
+        "dust_trap": 2
+      }
     },
     "GA519RU9M462NJ1": {
       "label": "Manggai Mile",
       "sourceTsid": "LA519RU9M462NJ1",
       "counts": {
-        "street_spirit": 1
+        "street_spirit": 1,
+        "npc_sloth": 2,
+        "dirt_pile": 1
       },
       "giantId": "cosma",
       "spawners": 1
@@ -97,6 +538,7 @@
       "label": "Annam Angst",
       "sourceTsid": "LA51A5VM3K62P49",
       "counts": {
+        "dirt_pile": 2,
         "trant_bean": 1,
         "street_spirit": 1
       },
@@ -118,7 +560,8 @@
       "sourceTsid": "LA51B2OQAK623EF",
       "counts": {
         "trant_egg": 1,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 1
       },
       "giantId": "ti"
     },
@@ -126,8 +569,10 @@
       "label": "Pachi Preach",
       "sourceTsid": "LA51BMHT2562Q3D",
       "counts": {
+        "npc_sloth": 2,
         "trant_fruit": 3,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 2
       },
       "giantId": "zille",
       "spawners": 1
@@ -136,6 +581,7 @@
       "label": "Modati Modes",
       "sourceTsid": "LA51BNNOEK629KG",
       "counts": {
+        "dirt_pile": 1,
         "trant_bean": 2,
         "street_spirit": 1
       },
@@ -147,7 +593,8 @@
       "sourceTsid": "LA51CAQQ55629QM",
       "counts": {
         "street_spirit": 1,
-        "trant_fruit": 1
+        "trant_fruit": 1,
+        "dirt_pile": 1
       },
       "giantId": "humbaba"
     },
@@ -156,9 +603,27 @@
       "sourceTsid": "LA51CGIGKK62NV8",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_bean": 1
       },
       "giantId": "alph"
+    },
+    "GA51CP6NAF42G0N": {
+      "label": "Empty Via 2",
+      "sourceTsid": "LA51CP6NAF42G0N",
+      "counts": {
+        "paper_tree": 1,
+        "dirt_pile": 1,
+        "dust_trap": 1
+      }
+    },
+    "GA51DET7GF42FKO": {
+      "label": "Dust Path 1C",
+      "sourceTsid": "LA51DET7GF42FKO",
+      "counts": {
+        "dust_trap": 3,
+        "dirt_pile": 1
+      }
     },
     "GA51DOIHSK626VM": {
       "label": "Sakinalu Shreds",
@@ -176,6 +641,7 @@
       "sourceTsid": "LA51IOM1PC62SPF",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_bean": 1
       },
       "giantId": "zille"
@@ -184,6 +650,7 @@
       "label": "Raagi Road",
       "sourceTsid": "LA51IVI7PC62L64",
       "counts": {
+        "dirt_pile": 2,
         "trant_fruit": 1,
         "street_spirit": 1
       },
@@ -216,6 +683,13 @@
       "counts": {},
       "spawners": 14
     },
+    "GA52G8H9PJ420LQ": {
+      "label": "Empty Via 3",
+      "sourceTsid": "LA52G8H9PJ420LQ",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
     "GA52JSKF6BH2BPA": {
       "label": "Zaytuun Xalwo",
       "sourceTsid": "LA52JSKF6BH2BPA",
@@ -239,6 +713,22 @@
         "street_spirit": 1
       },
       "giantId": "mab"
+    },
+    "GA536V4QPH429H8": {
+      "label": "Stake Claim Rd E",
+      "sourceTsid": "LA536V4QPH429H8",
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 1
+      }
+    },
+    "GA5371G9AH421NO": {
+      "label": "Range Rd 1",
+      "sourceTsid": "LA5371G9AH421NO",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 3
+      }
     },
     "GA53D0DJQMB2B4S": {
       "label": "Heights_T_01",
@@ -291,7 +781,9 @@
       "label": "Jonna Jinx",
       "sourceTsid": "LA55645B8O528MI",
       "counts": {
+        "npc_sloth": 2,
         "trant_fruit": 2,
+        "dirt_pile": 2,
         "street_spirit": 1
       },
       "giantId": "lem",
@@ -311,6 +803,14 @@
         "street_spirit": 1
       },
       "giantId": "pot"
+    },
+    "GA55S7P5RJ42VTG": {
+      "label": "Dust Path 1E",
+      "sourceTsid": "LA55S7P5RJ42VTG",
+      "counts": {
+        "dust_trap": 3,
+        "dirt_pile": 1
+      }
     },
     "GA578O7KNJS2BNI": {
       "label": "Fox_Preserve_10",
@@ -336,9 +836,25 @@
       "sourceTsid": "LA57FADCBN62PR0",
       "counts": {
         "trant_bean": 1,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 1
       },
       "giantId": "humbaba"
+    },
+    "GA57JSVQRH423HV": {
+      "label": "Mart's Way 2",
+      "sourceTsid": "LA57JSVQRH423HV",
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 1
+      }
+    },
+    "GA57LTPQBK42SLV": {
+      "label": "Mart's Way 3",
+      "sourceTsid": "LA57LTPQBK42SLV",
+      "counts": {
+        "dust_trap": 3
+      }
     },
     "GA57S02C1BH2TP4": {
       "label": "r_horiz_2",
@@ -372,6 +888,7 @@
       "label": "Mira Mesh",
       "sourceTsid": "LA58KK7B9O522PC",
       "counts": {
+        "dirt_pile": 1,
         "trant_bean": 1,
         "street_spirit": 1
       },
@@ -395,6 +912,13 @@
       "counts": {},
       "spawners": 1
     },
+    "GA59DJ1KSH42F4L": {
+      "label": "Range Rd 2",
+      "sourceTsid": "LA59DJ1KSH42F4L",
+      "counts": {
+        "dust_trap": 1
+      }
+    },
     "GA5AAB0VNKR2VRN": {
       "label": "Forest-Transit_02",
       "sourceTsid": "LA5AAB0VNKR2VRN",
@@ -414,7 +938,10 @@
     "GA5ASS2OEH42TSV": {
       "label": "Mart's Way 1",
       "sourceTsid": "LA5ASS2OEH42TSV",
-      "counts": {},
+      "counts": {
+        "dust_trap": 3,
+        "dirt_pile": 1
+      },
       "spawners": 1
     },
     "GA5ATR2SUMB2FKP": {
@@ -440,6 +967,13 @@
       },
       "giantId": "friendly"
     },
+    "GA5BVMNOTH42T8L": {
+      "label": "Empty Via 1",
+      "sourceTsid": "LA5BVMNOTH42T8L",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
     "GA5C1CH8TDH277B": {
       "label": "Polenta Qado",
       "sourceTsid": "LA5C1CH8TDH277B",
@@ -451,6 +985,20 @@
         "rock_metal_1": 1
       },
       "giantId": "cosma"
+    },
+    "GA5C39VNDK420LG": {
+      "label": "Contour Rd NE",
+      "sourceTsid": "LA5C39VNDK420LG",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA5CTEP5UH42CQC": {
+      "label": "Plains Rte D",
+      "sourceTsid": "LA5CTEP5UH42CQC",
+      "counts": {
+        "dust_trap": 2
+      }
     },
     "GA5CUF0978T2L64": {
       "label": "heights_preserve_06_R",
@@ -471,10 +1019,18 @@
       "giantId": "friendly",
       "spawners": 1
     },
+    "GA5DNE9DVJ429P8": {
+      "label": "Stake Claim Rd B",
+      "sourceTsid": "LA5DNE9DVJ429P8",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
     "GA5DVVGJQQ5237U": {
       "label": "Firdaus Finds",
       "sourceTsid": "LA5DVVGJQQ5237U",
       "counts": {
+        "dirt_pile": 1,
         "street_spirit": 1,
         "trant_egg": 1
       },
@@ -491,6 +1047,7 @@
       "sourceTsid": "LA5EPQG0FN62PCS",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 2,
         "trant_fruit": 1
       },
       "giantId": "mab",
@@ -534,6 +1091,7 @@
       "label": "Telanga Tops",
       "sourceTsid": "LA5FUB7R0N627KI",
       "counts": {
+        "dirt_pile": 1,
         "wood_tree": 1,
         "street_spirit": 1
       },
@@ -695,6 +1253,7 @@
       "label": "Chego Chase",
       "sourceTsid": "LA5I10NJDL52TKD",
       "counts": {
+        "dirt_pile": 2,
         "trant_fruit": 1,
         "street_spirit": 1
       },
@@ -757,6 +1316,13 @@
         "rock_metal_1": 1
       },
       "giantId": "humbaba"
+    },
+    "GA5J7IB1HK42N3D": {
+      "label": "Dust Path 1F",
+      "sourceTsid": "LA5J7IB1HK42N3D",
+      "counts": {
+        "dust_trap": 4
+      }
     },
     "GA5JAMFQIMB227E": {
       "label": "Heights_M_04",
@@ -835,11 +1401,39 @@
       },
       "giantId": "spriggan"
     },
+    "GA5KUKA22I42CI9": {
+      "label": "Mart's Way 4",
+      "sourceTsid": "LA5KUKA22I42CI9",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
     "GA5LBN35B8T288J": {
       "label": "heights_preserve_08_L",
       "sourceTsid": "LA5LBN35B8T288J",
       "counts": {},
       "spawners": 1
+    },
+    "GA5M6H0P2I42BQJ": {
+      "label": "Range Rd 3",
+      "sourceTsid": "LA5M6H0P2I42BQJ",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA5N5E10CM42HJ4": {
+      "label": "Plains Rte A",
+      "sourceTsid": "LA5N5E10CM42HJ4",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GA5N7KV0CM42DKT": {
+      "label": "Range Rd 5",
+      "sourceTsid": "LA5N7KV0CM42DKT",
+      "counts": {
+        "dust_trap": 3
+      }
     },
     "GA5NACEOCUG283E": {
       "label": "r_square_01",
@@ -912,6 +1506,13 @@
       },
       "giantId": "alph"
     },
+    "GA5P9MNTJK42IJS": {
+      "label": "Dust Path 1A",
+      "sourceTsid": "LA5P9MNTJK42IJS",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
     "GA5PPFP86NF2FOS": {
       "label": "Hell One Clone",
       "sourceTsid": "LA5PPFP86NF2FOS",
@@ -928,6 +1529,13 @@
       },
       "giantId": "lem",
       "spawners": 1
+    },
+    "GA5PV4JH5K42CIV": {
+      "label": "Contour Rd W",
+      "sourceTsid": "LA5PV4JH5K42CIV",
+      "counts": {
+        "dust_trap": 3
+      }
     },
     "GA5PV4T79OE2AOA": {
       "label": "Lisa Hell Street",
@@ -951,6 +1559,7 @@
       "label": "Lavu Lane",
       "sourceTsid": "LA5QBAL9SL52I02",
       "counts": {
+        "dirt_pile": 1,
         "trant_fruit": 1,
         "street_spirit": 1
       },
@@ -1005,6 +1614,14 @@
       "counts": {},
       "spawners": 4
     },
+    "GA5T6PDF7K42SNM": {
+      "label": "Contour Rd NW",
+      "sourceTsid": "LA5T6PDF7K42SNM",
+      "counts": {
+        "dust_trap": 3,
+        "paper_tree": 1
+      }
+    },
     "GA5T7SLLO3H2ERO": {
       "label": "Alecha Kolo",
       "sourceTsid": "LA5T7SLLO3H2ERO",
@@ -1021,10 +1638,19 @@
       "label": "Gavvalu Gasp",
       "sourceTsid": "LA5TBM8BIL5219R",
       "counts": {
+        "dirt_pile": 2,
         "street_spirit": 1,
         "trant_bean": 1
       },
       "giantId": "grendaline"
+    },
+    "GA5THPDOLK42GRD": {
+      "label": "Stake Claim Rd C",
+      "sourceTsid": "LA5THPDOLK42GRD",
+      "counts": {
+        "dust_trap": 3,
+        "dirt_pile": 1
+      }
     },
     "GA5U9449F8T2DPR": {
       "label": "heights_preserve_11_R",
@@ -1053,6 +1679,7 @@
       "sourceTsid": "LA5VDIGU3G525F9",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_fruit": 1
       },
       "giantId": "pot"
@@ -1142,7 +1769,8 @@
       "counts": {
         "trant_gas": 1,
         "trant_spice": 3,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "peat_1": 2
       },
       "giantId": "cosma"
     },
@@ -1151,6 +1779,7 @@
       "sourceTsid": "LA91120N5LA249C",
       "counts": {
         "trant_gas": 4,
+        "peat_1": 1,
         "street_spirit": 1
       },
       "giantId": "zille"
@@ -1170,7 +1799,10 @@
       "label": "underground_01",
       "sourceTsid": "LA91161VALA21D4",
       "counts": {
-        "street_spirit": 1
+        "npc_firefly": 19,
+        "street_spirit": 1,
+        "mortar_barnacle": 4,
+        "jellisac": 2
       },
       "giantId": "grendaline",
       "spawners": 1
@@ -1209,6 +1841,9 @@
       "label": "underground_02",
       "sourceTsid": "LA911I05ILA2CQ5",
       "counts": {
+        "npc_firefly": 15,
+        "jellisac": 9,
+        "mortar_barnacle": 8,
         "street_spirit": 1
       },
       "giantId": "ti",
@@ -1219,6 +1854,9 @@
       "sourceTsid": "LA911J5DKLA20MS",
       "counts": {
         "trant_egg": 2,
+        "jellisac": 10,
+        "peat_1": 1,
+        "npc_firefly": 16,
         "street_spirit": 1
       },
       "giantId": "cosma",
@@ -1362,6 +2000,8 @@
       "label": "Goli Grabs",
       "sourceTsid": "LA91SD0IEQA24L5",
       "counts": {
+        "mortar_barnacle": 2,
+        "peat_1": 1,
         "trant_gas": 2,
         "street_spirit": 1
       },
@@ -1383,8 +2023,11 @@
       "label": "FB_01",
       "sourceTsid": "LA931JPPT8A2LPU",
       "counts": {
+        "npc_firefly": 19,
+        "peat_1": 2,
         "trant_gas": 1,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "mortar_barnacle": 4
       },
       "giantId": "ti",
       "spawners": 1
@@ -1393,6 +2036,7 @@
       "label": "FB_02",
       "sourceTsid": "LA934IQQT8A26SV",
       "counts": {
+        "peat_1": 2,
         "trant_spice": 3,
         "street_spirit": 1
       },
@@ -1453,7 +2097,9 @@
       "label": "Seela Latta",
       "sourceTsid": "LA94KO5CFQA2V4Q",
       "counts": {
-        "street_spirit": 1
+        "street_spirit": 1,
+        "peat_1": 1,
+        "mortar_barnacle": 5
       },
       "giantId": "mab"
     },
@@ -1482,6 +2128,7 @@
       "sourceTsid": "LA957DNLVGN2F0S",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 1,
         "rock_beryl_1": 2,
         "trant_bubble": 2,
         "rock_metal_1": 1,
@@ -1593,7 +2240,9 @@
       "counts": {
         "trant_gas": 1,
         "trant_spice": 1,
-        "street_spirit": 1
+        "mortar_barnacle": 5,
+        "street_spirit": 1,
+        "peat_1": 1
       },
       "giantId": "spriggan"
     },
@@ -1614,6 +2263,7 @@
       "counts": {
         "trant_spice": 2,
         "trant_gas": 1,
+        "mortar_barnacle": 3,
         "street_spirit": 1
       },
       "giantId": "humbaba"
@@ -1651,6 +2301,8 @@
       "label": "firebog_01",
       "sourceTsid": "LA99VU1246A2VND",
       "counts": {
+        "mortar_barnacle": 6,
+        "peat_1": 2,
         "trant_gas": 1,
         "trant_spice": 2,
         "street_spirit": 1
@@ -1690,6 +2342,7 @@
         "rock_metal_1": 1,
         "street_spirit": 1,
         "trant_fruit": 1,
+        "dirt_pile": 1,
         "rock_dullite_1": 1
       },
       "giantId": "humbaba"
@@ -1731,6 +2384,10 @@
       "label": "underground_03",
       "sourceTsid": "LA9CO2B02OA2BG0",
       "counts": {
+        "mortar_barnacle": 6,
+        "npc_firefly": 31,
+        "peat_1": 1,
+        "jellisac": 2,
         "street_spirit": 1
       },
       "giantId": "spriggan",
@@ -1776,6 +2433,8 @@
       "label": "FB_03",
       "sourceTsid": "LA9DURMSIAA2S1T",
       "counts": {
+        "mortar_barnacle": 7,
+        "peat_1": 2,
         "street_spirit": 1
       },
       "giantId": "pot"
@@ -1877,6 +2536,7 @@
       "sourceTsid": "LA9GA91EN6N2OHB",
       "counts": {
         "rock_dullite_1": 2,
+        "dirt_pile": 1,
         "rock_beryl_1": 1,
         "street_spirit": 1
       },
@@ -1907,6 +2567,7 @@
       "sourceTsid": "LA9H82Q59BO2EEE",
       "counts": {
         "rock_beryl_1": 1,
+        "dirt_pile": 1,
         "street_spirit": 1,
         "trant_bean": 1,
         "trant_fruit": 1,
@@ -1920,6 +2581,7 @@
       "sourceTsid": "LA9HJCHM18A21B4",
       "counts": {
         "street_spirit": 1,
+        "peat_1": 1,
         "trant_gas": 1,
         "trant_spice": 1
       },
@@ -1930,6 +2592,7 @@
       "sourceTsid": "LA9HU5KR4MN235O",
       "counts": {
         "rock_metal_1": 1,
+        "dirt_pile": 1,
         "rock_sparkly_1": 1,
         "rock_dullite_1": 1,
         "rock_beryl_1": 1,
@@ -1966,6 +2629,8 @@
       "label": "firebog_trans_02",
       "sourceTsid": "LA9I8CS028A2O5F",
       "counts": {
+        "mortar_barnacle": 7,
+        "peat_1": 1,
         "street_spirit": 1
       },
       "giantId": "zille"
@@ -2002,6 +2667,7 @@
         "rock_dullite_1": 2,
         "street_spirit": 1,
         "rock_metal_1": 1,
+        "dirt_pile": 1,
         "trant_bubble": 1
       },
       "giantId": "pot"
@@ -2013,6 +2679,7 @@
         "street_spirit": 1,
         "rock_beryl_1": 2,
         "rock_dullite_1": 1,
+        "dirt_pile": 1,
         "rock_metal_1": 1,
         "trant_bubble": 2
       },
@@ -2186,7 +2853,8 @@
       "sourceTsid": "LA9M05J386A296V",
       "counts": {
         "trant_fruit": 1,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "peat_1": 1
       },
       "giantId": "pot"
     },
@@ -2233,7 +2901,9 @@
       "label": "firebog_plateau01",
       "sourceTsid": "LA9P334396A2GHP",
       "counts": {
+        "mortar_barnacle": 5,
         "trant_bubble": 1,
+        "peat_1": 1,
         "trant_bean": 1,
         "street_spirit": 1,
         "trant_gas": 1
@@ -2245,7 +2915,8 @@
       "sourceTsid": "LA9PIEHVQ8A2H4S",
       "counts": {
         "street_spirit": 1,
-        "trant_spice": 2
+        "trant_spice": 2,
+        "peat_1": 2
       },
       "giantId": "pot"
     },
@@ -2287,6 +2958,8 @@
       "label": "firebog_trans_01",
       "sourceTsid": "LA9QOQAL96A2L2K",
       "counts": {
+        "peat_1": 2,
+        "mortar_barnacle": 7,
         "trant_gas": 2,
         "street_spirit": 1
       },
@@ -2312,7 +2985,9 @@
     "GA9QTSIOV4F31QH": {
       "label": "Bliss",
       "sourceTsid": "LA9QTSIOV4F31QH",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GA9R3FG405F3B9P": {
@@ -2327,10 +3002,33 @@
       "counts": {},
       "spawners": 1
     },
+    "GA9R9KCC05F3VOU": {
+      "label": "Firebog Deeps",
+      "sourceTsid": "LA9R9KCC05F3VOU",
+      "counts": {
+        "jellisac": 5,
+        "peat_1": 1
+      }
+    },
+    "GA9RM4IT05F3B4M": {
+      "label": "Savanna Sunset",
+      "sourceTsid": "LA9RM4IT05F3B4M",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GA9RMUNU05F3EI8": {
+      "label": "Ain't That Dry",
+      "sourceTsid": "LA9RMUNU05F3EI8",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
     "GA9RPI1P1QA2IMQ": {
       "label": "Nia Sra",
       "sourceTsid": "LA9RPI1P1QA2IMQ",
       "counts": {
+        "peat_1": 2,
         "trant_gas": 2,
         "street_spirit": 1
       },
@@ -2369,7 +3067,9 @@
       "label": "firebog_03",
       "sourceTsid": "LA9T7IFRDIA2N0K",
       "counts": {
-        "street_spirit": 1
+        "mortar_barnacle": 8,
+        "street_spirit": 1,
+        "peat_1": 1
       },
       "giantId": "friendly"
     },
@@ -2378,6 +3078,7 @@
       "sourceTsid": "LA9TDS1HSIA2RCO",
       "counts": {
         "street_spirit": 1,
+        "peat_1": 1,
         "trant_spice": 2
       },
       "giantId": "alph"
@@ -2387,6 +3088,7 @@
       "sourceTsid": "LA9TDT2BUIA2GMA",
       "counts": {
         "trant_gas": 2,
+        "peat_1": 1,
         "trant_spice": 1,
         "street_spirit": 1
       },
@@ -2396,8 +3098,10 @@
       "label": "FB_04",
       "sourceTsid": "LA9TEL683JA2JU0",
       "counts": {
+        "mortar_barnacle": 5,
         "street_spirit": 1,
-        "trant_gas": 2
+        "trant_gas": 2,
+        "peat_1": 2
       },
       "giantId": "grendaline"
     },
@@ -2405,6 +3109,8 @@
       "label": "firebog_05",
       "sourceTsid": "LA9TIJ7S4JA2CNF",
       "counts": {
+        "mortar_barnacle": 5,
+        "peat_1": 1,
         "street_spirit": 1,
         "trant_gas": 2
       },
@@ -2414,6 +3120,8 @@
       "label": "firebog_trans_04",
       "sourceTsid": "LA9U04T3OAA2R2L",
       "counts": {
+        "mortar_barnacle": 3,
+        "peat_1": 1,
         "trant_gas": 1,
         "street_spirit": 1
       },
@@ -2437,7 +3145,8 @@
       "counts": {
         "trant_spice": 1,
         "street_spirit": 1,
-        "trant_gas": 1
+        "trant_gas": 1,
+        "peat_1": 1
       },
       "giantId": "mab"
     },
@@ -2575,6 +3284,7 @@
       "label": "Otterlane ",
       "sourceTsid": "LCR10K3BPJK1U6F",
       "counts": {
+        "dirt_pile": 1,
         "trant_fruit": 3,
         "street_spirit": 1,
         "trant_bean": 1,
@@ -2586,6 +3296,7 @@
       "label": "Clarbeare Voya",
       "sourceTsid": "LCR10K63BQL14PE",
       "counts": {
+        "dirt_pile": 1,
         "street_spirit": 1,
         "trant_egg": 3,
         "trant_bean": 2,
@@ -2734,6 +3445,7 @@
       "sourceTsid": "LCR11SBEGQL13D9",
       "counts": {
         "trant_egg": 6,
+        "dirt_pile": 1,
         "street_spirit": 1,
         "trant_bean": 2
       },
@@ -2756,6 +3468,7 @@
       "counts": {
         "street_spirit": 1,
         "trant_egg": 2,
+        "dirt_pile": 1,
         "rock_metal_1": 4,
         "trant_fruit": 1,
         "rock_beryl_1": 1
@@ -2796,7 +3509,8 @@
         "street_spirit": 1,
         "wood_tree": 1,
         "rock_dullite_1": 1,
-        "trant_bubble": 2
+        "trant_bubble": 2,
+        "dirt_pile": 1
       },
       "spawners": 1
     },
@@ -2807,6 +3521,7 @@
         "npc_piggy": 1,
         "trant_egg": 3,
         "trant_bean": 2,
+        "dirt_pile": 1,
         "street_spirit": 1,
         "trant_bubble": 1
       },
@@ -2818,6 +3533,7 @@
       "sourceTsid": "LCR137T2HK123RR",
       "counts": {
         "trant_bean": 2,
+        "dirt_pile": 1,
         "trant_fruit": 1,
         "street_spirit": 1
       },
@@ -3055,6 +3771,7 @@
         "trant_bubble": 3,
         "trant_fruit": 3,
         "rock_metal_1": 3,
+        "dirt_pile": 1,
         "street_spirit": 1
       },
       "giantId": "humbaba"
@@ -3130,6 +3847,7 @@
         "trant_bubble": 2,
         "street_spirit": 1,
         "trant_egg": 4,
+        "dirt_pile": 1,
         "trant_bean": 1
       },
       "giantId": "ti",
@@ -3377,7 +4095,8 @@
         "street_spirit": 1,
         "trant_fruit": 1,
         "trant_egg": 4,
-        "rock_beryl_1": 1
+        "rock_beryl_1": 1,
+        "dirt_pile": 1
       },
       "giantId": "alph",
       "spawners": 1
@@ -3387,6 +4106,7 @@
       "sourceTsid": "LCRHSGTEION115H",
       "counts": {
         "trant_egg": 2,
+        "dirt_pile": 1,
         "street_spirit": 1
       },
       "giantId": "cosma"
@@ -3396,6 +4116,7 @@
       "sourceTsid": "LCRL3F8I3L12O0J",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_gas": 2
       },
       "giantId": "friendly",
@@ -3499,6 +4220,8 @@
       "label": "Plateau 07",
       "sourceTsid": "LDO20OO2ETQ2EAG",
       "counts": {
+        "dirt_pile": 2,
+        "npc_sloth": 4,
         "trant_bean": 1,
         "street_spirit": 1
       },
@@ -3508,7 +4231,9 @@
       "label": "Plateau 05",
       "sourceTsid": "LDO3JFLC5TQ2NOR",
       "counts": {
+        "dirt_pile": 2,
         "trant_bean": 2,
+        "npc_sloth": 3,
         "street_spirit": 1,
         "npc_piggy": 1
       },
@@ -3519,6 +4244,7 @@
       "label": "Plateau 11",
       "sourceTsid": "LDO4KOD692R2GQB",
       "counts": {
+        "npc_sloth": 3,
         "street_spirit": 1,
         "trant_fruit": 1
       },
@@ -3537,6 +4263,7 @@
       "label": "Climb 03",
       "sourceTsid": "LDO5D2B1Q2R2M9S",
       "counts": {
+        "dirt_pile": 1,
         "street_spirit": 1
       },
       "giantId": "lem"
@@ -3557,6 +4284,7 @@
       "label": "Savanna 01",
       "sourceTsid": "LDO8NGHIFTQ21CQ",
       "counts": {
+        "dirt_pile": 2,
         "trant_bean": 2,
         "street_spirit": 1
       },
@@ -3579,8 +4307,10 @@
       "sourceTsid": "LDO97PV01MQ236V",
       "counts": {
         "trant_fruit": 1,
+        "npc_sloth": 3,
         "street_spirit": 1,
-        "trant_bean": 1
+        "trant_bean": 1,
+        "dirt_pile": 1
       },
       "giantId": "ti"
     },
@@ -3601,6 +4331,8 @@
       "sourceTsid": "LDOAVTFUNTQ2EVU",
       "counts": {
         "street_spirit": 1,
+        "npc_sloth": 3,
+        "dirt_pile": 2,
         "trant_fruit": 1
       },
       "giantId": "mab"
@@ -3651,6 +4383,7 @@
         "trant_bubble": 2,
         "street_spirit": 1,
         "trant_spice": 1,
+        "dirt_pile": 1,
         "rock_metal_1": 1
       },
       "giantId": "grendaline",
@@ -3672,6 +4405,7 @@
       "label": "Savannah 02",
       "sourceTsid": "LDOF2V2INVQ2M9D",
       "counts": {
+        "dirt_pile": 2,
         "street_spirit": 1,
         "trant_fruit": 2
       },
@@ -3716,6 +4450,7 @@
       "label": "Alakol-style Plateau 01",
       "sourceTsid": "LDOGKA16T4R2NP1",
       "counts": {
+        "dirt_pile": 2,
         "trant_fruit": 2,
         "street_spirit": 1
       },
@@ -3735,7 +4470,9 @@
       "label": "Plateau 10",
       "sourceTsid": "LDOGVQ4M32R2COS",
       "counts": {
+        "npc_sloth": 3,
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_bean": 1,
         "trant_fruit": 1
       },
@@ -3753,7 +4490,9 @@
       "sourceTsid": "LDOIGN9B60R2LI4",
       "counts": {
         "street_spirit": 1,
-        "trant_fruit": 2
+        "npc_sloth": 3,
+        "trant_fruit": 2,
+        "dirt_pile": 2
       },
       "giantId": "spriggan"
     },
@@ -3761,6 +4500,7 @@
       "label": "Savannah 03",
       "sourceTsid": "LDOIJ31100R2CQG",
       "counts": {
+        "dirt_pile": 2,
         "trant_fruit": 1,
         "trant_bubble": 1,
         "street_spirit": 1
@@ -3783,6 +4523,8 @@
       "label": "Plateau 13",
       "sourceTsid": "LDOJ3MELL2R23Q6",
       "counts": {
+        "dirt_pile": 3,
+        "npc_sloth": 3,
         "street_spirit": 1,
         "trant_fruit": 1
       },
@@ -3792,6 +4534,7 @@
       "label": "Nylon Phool",
       "sourceTsid": "LDOK0A8OG1E2C7O",
       "counts": {
+        "npc_salmon": 1,
         "rock_sparkly_1": 2
       },
       "spawners": 21
@@ -3806,7 +4549,9 @@
       "label": "Plateau 03",
       "sourceTsid": "LDOKUS4M0TQ263H",
       "counts": {
+        "npc_sloth": 3,
         "npc_piggy": 1,
+        "dirt_pile": 2,
         "trant_fruit": 1,
         "rock_metal_1": 1,
         "rock_beryl_1": 1,
@@ -3886,6 +4631,8 @@
       "label": "Plateau 06",
       "sourceTsid": "LDOPA4JQBTQ2AA9",
       "counts": {
+        "npc_sloth": 4,
+        "dirt_pile": 2,
         "street_spirit": 1,
         "trant_fruit": 1
       },
@@ -3907,7 +4654,9 @@
       "label": "Plateau 01",
       "sourceTsid": "LDORIA62TLQ2HOH",
       "counts": {
+        "npc_sloth": 3,
         "rock_beryl_1": 1,
+        "dirt_pile": 2,
         "trant_fruit": 1,
         "rock_metal_1": 1,
         "street_spirit": 1
@@ -3938,6 +4687,8 @@
       "label": "Plateau 04",
       "sourceTsid": "LDOT3LP63TQ204B",
       "counts": {
+        "npc_sloth": 4,
+        "dirt_pile": 3,
         "street_spirit": 1,
         "trant_bean": 1
       },
@@ -3947,6 +4698,7 @@
       "label": "Climb 02",
       "sourceTsid": "LDOTEUFUIVQ2F0S",
       "counts": {
+        "npc_sloth": 1,
         "trant_fruit": 1,
         "street_spirit": 1
       },
@@ -3975,8 +4727,10 @@
       "label": "Plateau 14",
       "sourceTsid": "LDOU6HOAO2R21Q1",
       "counts": {
+        "npc_sloth": 3,
         "trant_bean": 2,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 3
       },
       "giantId": "humbaba",
       "spawners": 1
@@ -3985,6 +4739,7 @@
       "label": "Climb 01 fixed",
       "sourceTsid": "LDOUIB18JVQ2O16",
       "counts": {
+        "dirt_pile": 1,
         "street_spirit": 1
       },
       "giantId": "grendaline"
@@ -3993,6 +4748,8 @@
       "label": "Plateau 12",
       "sourceTsid": "LDOVCSE5H2R2L24",
       "counts": {
+        "dirt_pile": 2,
+        "npc_sloth": 2,
         "trant_fruit": 1,
         "street_spirit": 1
       },
@@ -4037,6 +4794,7 @@
       "label": "day_03",
       "sourceTsid": "LHF468KKJGD3IMD",
       "counts": {
+        "ice_knob": 9,
         "trant_bubble": 1,
         "trant_spice": 1,
         "street_spirit": 1
@@ -4047,8 +4805,10 @@
       "label": "Kaavi Kannot",
       "sourceTsid": "LHF48S34D1J2F31",
       "counts": {
+        "npc_sloth": 1,
         "rock_metal_1": 1,
         "street_spirit": 1,
+        "dirt_pile": 2,
         "trant_fruit": 1
       },
       "giantId": "ti"
@@ -4059,6 +4819,7 @@
       "counts": {
         "street_spirit": 1,
         "trant_bean": 1,
+        "dirt_pile": 1,
         "trant_fruit": 1
       },
       "giantId": "spriggan"
@@ -4068,6 +4829,7 @@
       "sourceTsid": "LHF583RFVLD3IUE",
       "counts": {
         "trant_bubble": 2,
+        "ice_knob": 7,
         "street_spirit": 1
       },
       "giantId": "friendly"
@@ -4086,6 +4848,7 @@
       "sourceTsid": "LHF6MVO2G6J2F1F",
       "counts": {
         "street_spirit": 1,
+        "npc_sloth": 1,
         "trant_bean": 1,
         "rock_beryl_1": 1
       },
@@ -4104,6 +4867,7 @@
       "label": "cave_long_01",
       "sourceTsid": "LHF70EIUS0D3RDM",
       "counts": {
+        "ice_knob": 10,
         "street_spirit": 1
       },
       "giantId": "mab"
@@ -4112,6 +4876,7 @@
       "label": "night_02",
       "sourceTsid": "LHF7DU3N0UC3DRA",
       "counts": {
+        "ice_knob": 13,
         "trant_bubble": 2,
         "street_spirit": 1
       },
@@ -4145,6 +4910,7 @@
       "label": "day_01",
       "sourceTsid": "LHF8LE0Q0UC3QEF",
       "counts": {
+        "ice_knob": 13,
         "wood_tree": 1,
         "trant_bean": 1,
         "street_spirit": 1
@@ -4169,6 +4935,7 @@
       "label": "cave_01",
       "sourceTsid": "LHFA15VS0UC3ITS",
       "counts": {
+        "ice_knob": 20,
         "street_spirit": 1
       },
       "giantId": "alph"
@@ -4177,6 +4944,7 @@
       "label": "cave_long_02",
       "sourceTsid": "LHFATC8M4RD3E61",
       "counts": {
+        "ice_knob": 9,
         "street_spirit": 1
       },
       "giantId": "pot"
@@ -4187,6 +4955,7 @@
       "counts": {
         "trant_fruit": 1,
         "rock_dullite_1": 2,
+        "npc_sloth": 2,
         "rock_metal_1": 1,
         "street_spirit": 1
       },
@@ -4220,7 +4989,8 @@
       "sourceTsid": "LHFD81QMKMI2SSL",
       "counts": {
         "trant_bean": 1,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 1
       },
       "giantId": "grendaline"
     },
@@ -4228,7 +4998,8 @@
       "label": "bridge upper test clone",
       "sourceTsid": "LHFEKBJFP0J2J9Q",
       "counts": {
-        "street_spirit": 1
+        "street_spirit": 1,
+        "npc_sloth": 1
       },
       "giantId": "humbaba"
     },
@@ -4261,6 +5032,7 @@
         "rock_beryl_1": 1,
         "trant_fruit": 2,
         "rock_dullite_1": 2,
+        "npc_sloth": 3,
         "street_spirit": 1
       },
       "giantId": "lem"
@@ -4291,8 +5063,10 @@
       "label": "Maaku Mills",
       "sourceTsid": "LHFG6KGMV3J2OU9",
       "counts": {
+        "npc_sloth": 2,
         "rock_dullite_1": 1,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 1
       },
       "giantId": "grendaline"
     },
@@ -4301,6 +5075,7 @@
       "sourceTsid": "LHFGU9HJ81J2GGT",
       "counts": {
         "trant_fruit": 2,
+        "dirt_pile": 2,
         "street_spirit": 1
       },
       "giantId": "mab"
@@ -4309,6 +5084,7 @@
       "label": "night_04",
       "sourceTsid": "LHFH7LJRA8D3QAR",
       "counts": {
+        "ice_knob": 9,
         "trant_bubble": 3,
         "street_spirit": 1
       },
@@ -4319,6 +5095,7 @@
       "sourceTsid": "LHFHNQ3RFUC3JMI",
       "counts": {
         "trant_bubble": 3,
+        "ice_knob": 10,
         "street_spirit": 1,
         "trant_spice": 1
       },
@@ -4340,6 +5117,7 @@
       "label": "Pasanu Pains",
       "sourceTsid": "LHFHTR4FSMI2MA2",
       "counts": {
+        "dirt_pile": 2,
         "trant_egg": 2,
         "street_spirit": 1
       },
@@ -4350,6 +5128,7 @@
       "sourceTsid": "LHFHUF5304J2F70",
       "counts": {
         "trant_egg": 3,
+        "dirt_pile": 1,
         "street_spirit": 1
       },
       "giantId": "cosma"
@@ -4358,6 +5137,7 @@
       "label": "night_06",
       "sourceTsid": "LHFIEG6R1JD30UH",
       "counts": {
+        "ice_knob": 11,
         "street_spirit": 1,
         "trant_bubble": 1
       },
@@ -4377,6 +5157,8 @@
       "label": "Doora Dooms",
       "sourceTsid": "LHFJGR1KH3J29IT",
       "counts": {
+        "npc_sloth": 1,
+        "dirt_pile": 2,
         "street_spirit": 1,
         "trant_fruit": 1,
         "trant_bean": 1
@@ -4388,6 +5170,8 @@
       "sourceTsid": "LHFJR7H9R8J2SHM",
       "counts": {
         "rock_metal_1": 1,
+        "npc_sloth": 3,
+        "dirt_pile": 1,
         "rock_beryl_1": 1,
         "street_spirit": 1,
         "wood_tree": 1
@@ -4399,6 +5183,7 @@
       "label": "day_02",
       "sourceTsid": "LHFK965MT8D3G9E",
       "counts": {
+        "ice_knob": 8,
         "trant_bubble": 3,
         "street_spirit": 1
       },
@@ -4432,6 +5217,7 @@
       "label": "Nila Nila",
       "sourceTsid": "LHFL2SL1R0J2655",
       "counts": {
+        "dirt_pile": 2,
         "trant_fruit": 2,
         "street_spirit": 1,
         "trant_bean": 2
@@ -4465,6 +5251,7 @@
       "sourceTsid": "LHFM9ORBM1J2BS4",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 2,
         "trant_fruit": 1
       },
       "giantId": "humbaba"
@@ -4473,6 +5260,7 @@
       "label": "night_01",
       "sourceTsid": "LHFN5KCGS5D3IFC",
       "counts": {
+        "ice_knob": 13,
         "street_spirit": 1,
         "trant_bubble": 3
       },
@@ -4514,6 +5302,7 @@
       "counts": {
         "rock_metal_1": 1,
         "trant_fruit": 1,
+        "npc_sloth": 2,
         "street_spirit": 1,
         "rock_beryl_1": 1
       },
@@ -4524,6 +5313,7 @@
       "label": "night_07",
       "sourceTsid": "LHFODV4KNLD3L8L",
       "counts": {
+        "ice_knob": 12,
         "trant_gas": 1,
         "street_spirit": 1
       },
@@ -4533,6 +5323,7 @@
       "label": "day_05",
       "sourceTsid": "LHFOE9L06OD3JR6",
       "counts": {
+        "ice_knob": 11,
         "trant_bubble": 2,
         "street_spirit": 1
       },
@@ -4542,9 +5333,11 @@
       "label": "Saafed Leek",
       "sourceTsid": "LHFP8P54GMI2UCH",
       "counts": {
+        "dirt_pile": 2,
         "wood_tree": 1,
         "trant_bean": 1,
         "rock_beryl_1": 1,
+        "npc_sloth": 1,
         "street_spirit": 1
       },
       "giantId": "pot",
@@ -4555,6 +5348,7 @@
       "sourceTsid": "LHFPD9KBT5J2D8M",
       "counts": {
         "trant_bean": 1,
+        "npc_sloth": 1,
         "rock_beryl_1": 1,
         "trant_fruit": 1,
         "street_spirit": 1
@@ -4566,6 +5360,7 @@
       "label": "Kaiya Kit",
       "sourceTsid": "LHFR1N2PUMI2C7A",
       "counts": {
+        "dirt_pile": 2,
         "street_spirit": 1,
         "trant_egg": 1
       },
@@ -4609,7 +5404,8 @@
       "counts": {
         "street_spirit": 1,
         "trant_egg": 3,
-        "trant_spice": 1
+        "trant_spice": 1,
+        "dirt_pile": 3
       },
       "giantId": "pot"
     },
@@ -4625,6 +5421,7 @@
       "sourceTsid": "LHFS76JAU5J2P90",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 2,
         "rock_beryl_1": 1,
         "rock_metal_1": 1,
         "trant_egg": 1,
@@ -4636,6 +5433,7 @@
       "label": "night_05",
       "sourceTsid": "LHFS89VFIID3EB6",
       "counts": {
+        "ice_knob": 11,
         "trant_bean": 1,
         "street_spirit": 1,
         "trant_bubble": 2
@@ -4700,6 +5498,8 @@
       "sourceTsid": "LHFU61GVLKI2ATQ",
       "counts": {
         "trant_fruit": 1,
+        "npc_sloth": 3,
+        "dirt_pile": 2,
         "street_spirit": 1,
         "trant_bean": 1
       },
@@ -4761,6 +5561,7 @@
       "counts": {
         "rock_dullite_1": 4,
         "rock_sparkly_1": 3,
+        "paper_tree": 1,
         "rock_beryl_1": 3,
         "rock_metal_1": 1
       }
@@ -4784,7 +5585,8 @@
       "sourceTsid": "LHV12H937T32BDS",
       "counts": {
         "street_spirit": 1,
-        "trant_bean": 2
+        "trant_bean": 2,
+        "dirt_pile": 3
       },
       "giantId": "spriggan"
     },
@@ -4792,6 +5594,7 @@
       "label": "Vada Widens",
       "sourceTsid": "LHV140E5N352BGF",
       "counts": {
+        "dirt_pile": 4,
         "trant_fruit": 2,
         "street_spirit": 1
       },
@@ -4801,6 +5604,7 @@
       "label": "Trabriz Tale",
       "sourceTsid": "LHV144684H42FI4",
       "counts": {
+        "dirt_pile": 2,
         "trant_fruit": 2,
         "street_spirit": 1
       },
@@ -4810,6 +5614,7 @@
       "label": "Uppma Uplands",
       "sourceTsid": "LHV14CBAO352I1I",
       "counts": {
+        "dirt_pile": 4,
         "trant_bubble": 1,
         "street_spirit": 1
       },
@@ -4819,7 +5624,8 @@
       "label": "Kanji Sink",
       "sourceTsid": "LHV15B8HEQ32SN0",
       "counts": {
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 2
       },
       "giantId": "pot",
       "spawners": 1
@@ -4829,6 +5635,7 @@
       "sourceTsid": "LHV15C8IEQ322UG",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 4,
         "trant_egg": 1
       },
       "giantId": "alph"
@@ -4837,6 +5644,7 @@
       "label": "Sambara Stack",
       "sourceTsid": "LHV15D5LEQ325BE",
       "counts": {
+        "dirt_pile": 4,
         "trant_egg": 1,
         "street_spirit": 1
       },
@@ -4847,6 +5655,8 @@
       "sourceTsid": "LHV15EUNEQ32FCI",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 3,
+        "npc_sloth": 2,
         "trant_bean": 1,
         "trant_fruit": 2
       },
@@ -4856,6 +5666,7 @@
       "label": "Fesenjan Freeq",
       "sourceTsid": "LHV15KA8NE42GSP",
       "counts": {
+        "dirt_pile": 3,
         "trant_fruit": 1,
         "street_spirit": 1
       },
@@ -4865,8 +5676,10 @@
       "label": "Appam Almost",
       "sourceTsid": "LHV17CFO5V327AJ",
       "counts": {
+        "npc_sloth": 2,
         "trant_fruit": 3,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 2
       },
       "giantId": "lem"
     },
@@ -4874,6 +5687,7 @@
       "label": "Pahsmeq Diggs",
       "sourceTsid": "LHV17T973F42GEP",
       "counts": {
+        "dirt_pile": 6,
         "trant_egg": 2,
         "street_spirit": 1
       },
@@ -4896,6 +5710,7 @@
       "counts": {
         "trant_bean": 2,
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_fruit": 1
       },
       "giantId": "grendaline",
@@ -4930,6 +5745,7 @@
       "sourceTsid": "LHV1EUUNP142EDF",
       "counts": {
         "trant_fruit": 1,
+        "dirt_pile": 4,
         "street_spirit": 1,
         "trant_bean": 1
       },
@@ -4951,7 +5767,9 @@
       "sourceTsid": "LHV1FQN29442T03",
       "counts": {
         "trant_gas": 2,
+        "npc_sloth": 2,
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_fruit": 2,
         "trant_bubble": 1
       },
@@ -4962,8 +5780,10 @@
       "label": "Sohan Sheer",
       "sourceTsid": "LHV1FUFU9442AKR",
       "counts": {
+        "dirt_pile": 5,
         "trant_spice": 1,
         "trant_fruit": 1,
+        "npc_sloth": 1,
         "trant_bubble": 1,
         "street_spirit": 1
       },
@@ -4973,6 +5793,7 @@
       "label": "Evi Effect",
       "sourceTsid": "LHV1H1EHOF32UJM",
       "counts": {
+        "dirt_pile": 1,
         "trant_fruit": 2,
         "rock_metal_1": 1,
         "rock_dullite_1": 1,
@@ -5085,6 +5906,7 @@
       "counts": {
         "trant_gas": 1,
         "trant_fruit": 1,
+        "dirt_pile": 1,
         "trant_bean": 1,
         "street_spirit": 1
       },
@@ -5094,6 +5916,7 @@
       "label": "Sappatu Slinks",
       "sourceTsid": "LHV1PHOQH442RKT",
       "counts": {
+        "dirt_pile": 3,
         "street_spirit": 1,
         "trant_egg": 1
       },
@@ -5103,6 +5926,7 @@
       "label": "nottis_night_08",
       "sourceTsid": "LHV1U1OJ7DB3RGF",
       "counts": {
+        "ice_knob": 16,
         "street_spirit": 1,
         "trant_spice": 1
       },
@@ -5211,8 +6035,10 @@
       "label": "Laroo Ledge",
       "sourceTsid": "LHV2JBHA9152QAS",
       "counts": {
+        "dirt_pile": 2,
         "street_spirit": 1,
         "trant_bean": 1,
+        "npc_sloth": 2,
         "trant_spice": 1,
         "trant_gas": 1
       },
@@ -5256,6 +6082,7 @@
       "sourceTsid": "LHV3ISF18352QIP",
       "counts": {
         "trant_bean": 2,
+        "dirt_pile": 2,
         "street_spirit": 1,
         "trant_fruit": 1,
         "trant_bubble": 1
@@ -5266,6 +6093,7 @@
       "label": "Sadam Savanna",
       "sourceTsid": "LHV43I0BI352TG6",
       "counts": {
+        "dirt_pile": 2,
         "trant_fruit": 2,
         "street_spirit": 1,
         "trant_bean": 2
@@ -5276,6 +6104,7 @@
       "label": "Akki Blocks",
       "sourceTsid": "LHV4AC2C3C42172",
       "counts": {
+        "dirt_pile": 3,
         "street_spirit": 1,
         "trant_egg": 2
       },
@@ -5286,6 +6115,7 @@
       "sourceTsid": "LHV4U1QMFC42NBP",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 2,
         "trant_egg": 1
       },
       "giantId": "zille"
@@ -5303,6 +6133,7 @@
       "label": "Arisi Amble",
       "sourceTsid": "LHV51JE5JC42VP2",
       "counts": {
+        "dirt_pile": 3,
         "trant_egg": 2,
         "street_spirit": 1
       },
@@ -5314,7 +6145,8 @@
       "counts": {
         "street_spirit": 1,
         "trant_gas": 1,
-        "trant_spice": 1
+        "trant_spice": 1,
+        "dirt_pile": 1
       },
       "giantId": "grendaline"
     },
@@ -5340,6 +6172,7 @@
       "label": "nottis_01",
       "sourceTsid": "LHV7EKEL4MA3L56",
       "counts": {
+        "ice_knob": 10,
         "street_spirit": 1,
         "trant_bubble": 2
       },
@@ -5350,6 +6183,7 @@
       "label": "nottis_cavern_07",
       "sourceTsid": "LHV7LLAAIDB35G2",
       "counts": {
+        "ice_knob": 11,
         "street_spirit": 1,
         "rock_dullite_1": 1,
         "rock_sparkly_1": 1,
@@ -5361,6 +6195,7 @@
       "label": "nottis_cavern_01",
       "sourceTsid": "LHV7RGKN4MA33RT",
       "counts": {
+        "ice_knob": 3,
         "street_spirit": 1,
         "rock_beryl_1": 1
       },
@@ -5370,6 +6205,7 @@
       "label": "nottis_cavern_02",
       "sourceTsid": "LHV7VE7O4MA35H6",
       "counts": {
+        "ice_knob": 11,
         "street_spirit": 1,
         "rock_beryl_1": 1
       },
@@ -5380,6 +6216,7 @@
       "sourceTsid": "LHV88RQU60B3Q0G",
       "counts": {
         "wood_tree": 1,
+        "ice_knob": 8,
         "street_spirit": 1,
         "trant_bubble": 1,
         "rock_sparkly_1": 1
@@ -5413,6 +6250,7 @@
       "label": "nottis_night_02",
       "sourceTsid": "LHV8H4NQ4MA316V",
       "counts": {
+        "ice_knob": 10,
         "street_spirit": 1,
         "trant_bubble": 1
       },
@@ -5422,6 +6260,7 @@
       "label": "nottis_night_03",
       "sourceTsid": "LHV8KV9R4MA3JLS",
       "counts": {
+        "ice_knob": 8,
         "trant_fruit": 1,
         "street_spirit": 1,
         "trant_bubble": 1
@@ -5445,7 +6284,8 @@
       "sourceTsid": "LHV9BF0AUJ42CLQ",
       "counts": {
         "street_spirit": 1,
-        "trant_gas": 1
+        "trant_gas": 1,
+        "dirt_pile": 2
       },
       "giantId": "ti"
     },
@@ -5543,6 +6383,7 @@
       "label": "nottis_night_04",
       "sourceTsid": "LHVDH0710RA3812",
       "counts": {
+        "ice_knob": 7,
         "trant_bubble": 2,
         "street_spirit": 1
       },
@@ -5555,6 +6396,7 @@
       "counts": {
         "trant_bean": 1,
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_fruit": 1
       },
       "giantId": "zille"
@@ -5570,6 +6412,7 @@
       "label": "nottis_cavern_03",
       "sourceTsid": "LHVFCFD8FRA37T6",
       "counts": {
+        "ice_knob": 7,
         "rock_sparkly_1": 1,
         "street_spirit": 1,
         "rock_beryl_1": 1
@@ -5624,7 +6467,8 @@
       "sourceTsid": "LHVHP2BJI652O9S",
       "counts": {
         "street_spirit": 1,
-        "trant_gas": 1
+        "trant_gas": 1,
+        "dirt_pile": 1
       },
       "giantId": "pot"
     },
@@ -5758,6 +6602,7 @@
       "label": "nottis_03",
       "sourceTsid": "LHVN4R7V7OA3MFN",
       "counts": {
+        "ice_knob": 10,
         "trant_bubble": 2,
         "street_spirit": 1
       },
@@ -5768,6 +6613,7 @@
       "label": "nottis_cavern_07",
       "sourceTsid": "LHVNJNP4MAB3JI5",
       "counts": {
+        "ice_knob": 10,
         "street_spirit": 1
       },
       "giantId": "spriggan"
@@ -5777,6 +6623,7 @@
       "sourceTsid": "LHVO8GQFVAB33C9",
       "counts": {
         "street_spirit": 1,
+        "ice_knob": 5,
         "rock_beryl_1": 1
       },
       "giantId": "lem"
@@ -5794,6 +6641,7 @@
       "label": "nottis_cavern_05",
       "sourceTsid": "LHVPOOR1LTA3NJ2",
       "counts": {
+        "ice_knob": 8,
         "street_spirit": 1,
         "rock_beryl_1": 1,
         "rock_sparkly_1": 1
@@ -5804,6 +6652,7 @@
       "label": "nottis_night_05",
       "sourceTsid": "LHVQ1AS19UA3O3T",
       "counts": {
+        "ice_knob": 10,
         "trant_bubble": 2,
         "trant_spice": 1,
         "street_spirit": 1
@@ -5816,7 +6665,8 @@
       "sourceTsid": "LHVQ48MA5GB39HE",
       "counts": {
         "street_spirit": 1,
-        "trant_bubble": 2
+        "trant_bubble": 2,
+        "ice_knob": 1
       },
       "giantId": "friendly",
       "spawners": 1
@@ -5839,6 +6689,7 @@
         "rock_metal_1": 5,
         "rock_dullite_1": 2,
         "rock_beryl_1": 3,
+        "dirt_pile": 1,
         "trant_fruit": 1,
         "street_spirit": 1
       },
@@ -5848,6 +6699,7 @@
       "label": "nottis_04",
       "sourceTsid": "LHVRJLV2UOA3EMR",
       "counts": {
+        "ice_knob": 9,
         "street_spirit": 1,
         "trant_bubble": 2
       },
@@ -5905,6 +6757,7 @@
       "label": "Malaren Urge",
       "sourceTsid": "LHVT7SA9QT221J2",
       "counts": {
+        "dirt_pile": 1,
         "trant_bubble": 1,
         "street_spirit": 1,
         "trant_fruit": 2
@@ -5919,6 +6772,7 @@
         "trant_fruit": 2,
         "street_spirit": 1,
         "wood_tree": 1,
+        "dirt_pile": 1,
         "trant_bubble": 1
       },
       "giantId": "ti",
@@ -5969,6 +6823,8 @@
       "sourceTsid": "LIF102S56SV16TJ",
       "counts": {
         "trant_gas": 3,
+        "peat_1": 1,
+        "mortar_barnacle": 3,
         "street_spirit": 1
       },
       "giantId": "humbaba"
@@ -5987,6 +6843,8 @@
       "label": "Kyron Kreep",
       "sourceTsid": "LIF1077T5TU16I9",
       "counts": {
+        "mortar_barnacle": 4,
+        "peat_1": 3,
         "street_spirit": 1
       },
       "giantId": "friendly"
@@ -5995,6 +6853,7 @@
       "label": "Onto Parada",
       "sourceTsid": "LIF10HE4JTU1S7P",
       "counts": {
+        "mortar_barnacle": 5,
         "trant_spice": 1,
         "street_spirit": 1
       },
@@ -6004,6 +6863,8 @@
       "label": "Oulanka End",
       "sourceTsid": "LIF10O20NQU1B2P",
       "counts": {
+        "mortar_barnacle": 5,
+        "npc_firefly": 37,
         "street_spirit": 1
       },
       "spawners": 2
@@ -6023,6 +6884,8 @@
       "label": "Koulato Cluster",
       "sourceTsid": "LIF10RP1DBU11NU",
       "counts": {
+        "mortar_barnacle": 8,
+        "peat_1": 1,
         "street_spirit": 1
       },
       "giantId": "cosma"
@@ -6031,7 +6894,9 @@
       "label": "Simo Steer",
       "sourceTsid": "LIF113PVOQU1UE5",
       "counts": {
+        "mortar_barnacle": 5,
         "street_spirit": 1,
+        "peat_1": 2,
         "trant_spice": 1
       },
       "giantId": "mab",
@@ -6041,8 +6906,10 @@
       "label": "Lonkari Line",
       "sourceTsid": "LIF11LLL5KV1CUG",
       "counts": {
+        "mortar_barnacle": 8,
         "trant_gas": 1,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "peat_1": 2
       },
       "giantId": "pot"
     },
@@ -6050,7 +6917,8 @@
       "label": "Tadaa Track",
       "sourceTsid": "LIF126GSMBU1V2Q",
       "counts": {
-        "street_spirit": 1
+        "street_spirit": 1,
+        "mortar_barnacle": 10
       },
       "giantId": "humbaba",
       "spawners": 1
@@ -6059,7 +6927,9 @@
       "label": "Luiro Run",
       "sourceTsid": "LIF12EQUGVU1RPI",
       "counts": {
+        "mortar_barnacle": 9,
         "street_spirit": 1,
+        "peat_1": 4,
         "trant_gas": 1
       },
       "giantId": "ti"
@@ -6076,6 +6946,8 @@
       "label": "Kalix Follows",
       "sourceTsid": "LIF12UPTEUV14ON",
       "counts": {
+        "mortar_barnacle": 4,
+        "peat_1": 1,
         "trant_spice": 2,
         "street_spirit": 1
       },
@@ -6085,7 +6957,9 @@
       "label": "Sysma Link",
       "sourceTsid": "LIF12VEKFAV1D67",
       "counts": {
-        "street_spirit": 1
+        "peat_1": 1,
+        "street_spirit": 1,
+        "mortar_barnacle": 3
       },
       "giantId": "cosma"
     },
@@ -6093,6 +6967,8 @@
       "label": "Tallus Gardens",
       "sourceTsid": "LIF13FGQHKV1E72",
       "counts": {
+        "peat_1": 2,
+        "mortar_barnacle": 7,
         "trant_gas": 1,
         "street_spirit": 1
       },
@@ -6126,7 +7002,8 @@
       "sourceTsid": "LIF14N6MU872GGI",
       "counts": {
         "trant_egg": 3,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 1
       },
       "giantId": "ti"
     },
@@ -6270,6 +7147,7 @@
       "label": "Kiehiman Course",
       "sourceTsid": "LIF15S7VPRV1DIP",
       "counts": {
+        "mortar_barnacle": 13,
         "street_spirit": 1
       },
       "giantId": "zille",
@@ -6291,6 +7169,8 @@
       "counts": {
         "trant_gas": 1,
         "street_spirit": 1,
+        "peat_1": 2,
+        "mortar_barnacle": 2,
         "trant_spice": 1
       },
       "giantId": "mab",
@@ -6393,6 +7273,7 @@
       "label": "Paatol Press ",
       "sourceTsid": "LIF16U5HC972SNC",
       "counts": {
+        "dirt_pile": 1,
         "trant_egg": 1,
         "rock_metal_1": 1,
         "street_spirit": 1,
@@ -6404,6 +7285,7 @@
       "label": "Boan Stravenue",
       "sourceTsid": "LIF17GAI3VV1C1F",
       "counts": {
+        "mortar_barnacle": 6,
         "street_spirit": 1,
         "trant_spice": 1
       },
@@ -6478,7 +7360,8 @@
       "sourceTsid": "LIF1AUQNSDU1UFL",
       "counts": {
         "trant_gas": 2,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "mortar_barnacle": 10
       },
       "giantId": "lem",
       "spawners": 1
@@ -6531,6 +7414,9 @@
       "label": "Konka Brink",
       "sourceTsid": "LIF1GTHPO9V14NG",
       "counts": {
+        "npc_firefly": 33,
+        "mortar_barnacle": 10,
+        "peat_1": 1,
         "street_spirit": 1
       },
       "giantId": "zille",
@@ -6584,7 +7470,9 @@
       "sourceTsid": "LIF1SGGD7EU12T5",
       "counts": {
         "street_spirit": 1,
-        "trant_gas": 2
+        "trant_gas": 2,
+        "mortar_barnacle": 3,
+        "peat_1": 2
       },
       "giantId": "grendaline"
     },
@@ -6615,7 +7503,9 @@
       "label": "Tana Trample",
       "sourceTsid": "LIF25C8OJSV19UJ",
       "counts": {
+        "mortar_barnacle": 7,
         "trant_gas": 2,
+        "peat_1": 1,
         "street_spirit": 1
       },
       "giantId": "alph"
@@ -6638,7 +7528,8 @@
       "counts": {
         "rock_metal_1": 2,
         "street_spirit": 1,
-        "trant_fruit": 1
+        "trant_fruit": 1,
+        "dirt_pile": 1
       },
       "giantId": "zille"
     },
@@ -6678,7 +7569,8 @@
         "rock_beryl_1": 2,
         "rock_dullite_1": 1,
         "street_spirit": 1,
-        "trant_egg": 1
+        "trant_egg": 1,
+        "dirt_pile": 1
       },
       "giantId": "ti"
     },
@@ -6709,6 +7601,7 @@
       "label": "Eastern Approach",
       "sourceTsid": "LIF2IUQJQ571TFL",
       "counts": {
+        "paper_tree": 1,
         "rock_dullite_1": 1
       }
     },
@@ -6750,6 +7643,7 @@
       "counts": {
         "trant_bubble": 3,
         "rock_dullite_1": 2,
+        "dirt_pile": 1,
         "rock_beryl_1": 1,
         "rock_metal_1": 2,
         "street_spirit": 1
@@ -6781,6 +7675,7 @@
       "sourceTsid": "LIF38KRD8S12HAR",
       "counts": {
         "rock_metal_1": 2,
+        "dirt_pile": 1,
         "rock_dullite_1": 2,
         "rock_beryl_1": 1,
         "trant_bubble": 1,
@@ -6913,6 +7808,8 @@
       "label": "Kymi Abyss",
       "sourceTsid": "LIF4SAD3FGU1NJ4",
       "counts": {
+        "npc_firefly": 35,
+        "jellisac": 4,
         "street_spirit": 1
       },
       "giantId": "grendaline",
@@ -6938,7 +7835,8 @@
         "rock_beryl_1": 1,
         "trant_fruit": 1,
         "rock_metal_1": 2,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 1
       },
       "giantId": "friendly"
     },
@@ -7016,6 +7914,7 @@
         "rock_dullite_1": 2,
         "rock_beryl_1": 1,
         "wood_tree": 1,
+        "dirt_pile": 1,
         "trant_fruit": 1
       },
       "giantId": "alph"
@@ -7043,6 +7942,8 @@
       "label": "Kiiminki Stretch",
       "sourceTsid": "LIF8TUJ3HGU1G3J",
       "counts": {
+        "jellisac": 5,
+        "npc_firefly": 7,
         "street_spirit": 1
       },
       "giantId": "humbaba"
@@ -7106,6 +8007,9 @@
       "label": "Inari Deeps",
       "sourceTsid": "LIFAGDB0IGU1BCK",
       "counts": {
+        "npc_firefly": 18,
+        "jellisac": 6,
+        "peat_1": 4,
         "trant_egg": 1,
         "street_spirit": 1
       },
@@ -7188,6 +8092,13 @@
       },
       "giantId": "mab"
     },
+    "GIFD6TMU2952RMJ": {
+      "label": "Rook's Way 1",
+      "sourceTsid": "LIFD6TMU2952RMJ",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
     "GIFD854FO6E2UO7": {
       "label": "Spitze Summit",
       "sourceTsid": "LIFD854FO6E2UO7",
@@ -7209,6 +8120,13 @@
       },
       "giantId": "grendaline"
     },
+    "GIFDAMF03952OEO": {
+      "label": "Bumpkin Tr E",
+      "sourceTsid": "LIFDAMF03952OEO",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
     "GIFDB8NGF282H0Q": {
       "label": "zAH 13",
       "sourceTsid": "LIFDB8NGF282H0Q",
@@ -7226,7 +8144,11 @@
       "label": "Ratin Jot Jog",
       "sourceTsid": "LIFDIDJT0GU1CR8",
       "counts": {
+        "npc_firefly": 24,
+        "jellisac": 6,
+        "mortar_barnacle": 4,
         "street_spirit": 1,
+        "peat_1": 2,
         "trant_egg": 1
       },
       "giantId": "alph",
@@ -7276,6 +8198,7 @@
         "street_spirit": 1,
         "trant_bubble": 1,
         "trant_bean": 1,
+        "dirt_pile": 1,
         "trant_fruit": 1
       },
       "giantId": "lem"
@@ -7353,12 +8276,311 @@
       },
       "giantId": "pot"
     },
+    "GIFF7O3E9O72HNI": {
+      "label": "Deadpan Dike 3",
+      "sourceTsid": "LIFF7O3E9O72HNI",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 1,
+        "paper_tree": 1
+      }
+    },
+    "GIFF7PKF9O72UKC": {
+      "label": "Distant Drag B",
+      "sourceTsid": "LIFF7PKF9O72UKC",
+      "counts": {
+        "dust_trap": 1,
+        "paper_tree": 1
+      }
+    },
+    "GIFF7Q3H9O7222R": {
+      "label": "Ardent Ave 3",
+      "sourceTsid": "LIFF7Q3H9O7222R",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFF7RSJ9O725F1": {
+      "label": "Fervor Tack C",
+      "sourceTsid": "LIFF7RSJ9O725F1",
+      "counts": {
+        "dust_trap": 1,
+        "dirt_pile": 1
+      }
+    },
+    "GIFF7T7N9O72TP2": {
+      "label": "Distant Drag F",
+      "sourceTsid": "LIFF7T7N9O72TP2",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFF7UIP9O724RP": {
+      "label": "Ramble Way 4",
+      "sourceTsid": "LIFF7UIP9O724RP",
+      "counts": {
+        "dust_trap": 1,
+        "paper_tree": 1
+      }
+    },
+    "GIFF7V2R9O72MUP": {
+      "label": "Zealous Rd N",
+      "sourceTsid": "LIFF7V2R9O72MUP",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 2
+      }
+    },
+    "GIFF808S9O724UJ": {
+      "label": "Distant Drag E",
+      "sourceTsid": "LIFF808S9O724UJ",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF81JT9O72F60": {
+      "label": "Ardent Ave 2",
+      "sourceTsid": "LIFF81JT9O72F60",
+      "counts": {
+        "dust_trap": 3,
+        "dirt_pile": 1
+      }
+    },
+    "GIFF829V9O7221M": {
+      "label": "Hazy Gate 1",
+      "sourceTsid": "LIFF829V9O7221M",
+      "counts": {
+        "dust_trap": 2,
+        "dirt_pile": 1
+      }
+    },
+    "GIFF83D0AO72SUG": {
+      "label": "Zealous Rd W",
+      "sourceTsid": "LIFF83D0AO72SUG",
+      "counts": {
+        "dust_trap": 2,
+        "dirt_pile": 1
+      }
+    },
+    "GIFF84K2AO72945": {
+      "label": "Distant Drag D",
+      "sourceTsid": "LIFF84K2AO72945",
+      "counts": {
+        "paper_tree": 1,
+        "dirt_pile": 1,
+        "dust_trap": 1
+      }
+    },
+    "GIFF85Q3AO72TIV": {
+      "label": "Languid Line S",
+      "sourceTsid": "LIFF85Q3AO72TIV",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 1
+      }
+    },
+    "GIFF86N5AO72UVT": {
+      "label": "Languid Line W",
+      "sourceTsid": "LIFF86N5AO72UVT",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 1,
+        "paper_tree": 1
+      }
+    },
+    "GIFF87R8AO72P6D": {
+      "label": "Ramble Way 2",
+      "sourceTsid": "LIFF87R8AO72P6D",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF88AAAO72MQ9": {
+      "label": "Hazy Gate 5",
+      "sourceTsid": "LIFF88AAAO72MQ9",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFF892CAO72FUN": {
+      "label": "Hazy Gate 4",
+      "sourceTsid": "LIFF892CAO72FUN",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GIFF8A7EAO72NPH": {
+      "label": "Hazy Gate 3",
+      "sourceTsid": "LIFF8A7EAO72NPH",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF8B1GAO72GIC": {
+      "label": "Fervor Tack D",
+      "sourceTsid": "LIFF8B1GAO72GIC",
+      "counts": {
+        "dust_trap": 2,
+        "paper_tree": 1
+      }
+    },
+    "GIFF8C3IAO7210R": {
+      "label": "Ramble Way 3",
+      "sourceTsid": "LIFF8C3IAO7210R",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFF8D0JAO72UM0": {
+      "label": "Zealous Rd NW",
+      "sourceTsid": "LIFF8D0JAO72UM0",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF8EOJAO72U8U": {
+      "label": "Fervor Tack F",
+      "sourceTsid": "LIFF8EOJAO72U8U",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFF8FOKAO722CT": {
+      "label": "Ramble Way 6",
+      "sourceTsid": "LIFF8FOKAO722CT",
+      "counts": {
+        "dust_trap": 2,
+        "paper_tree": 1
+      }
+    },
+    "GIFF8GBMAO72KNI": {
+      "label": "Distant Drag C",
+      "sourceTsid": "LIFF8GBMAO72KNI",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF8H8NAO729GM": {
+      "label": "Deadpan Dike 4",
+      "sourceTsid": "LIFF8H8NAO729GM",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF8ITNAO72C6N": {
+      "label": "Languid Line SE",
+      "sourceTsid": "LIFF8ITNAO72C6N",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GIFF8JAQAO72U81": {
+      "label": "Languid Line SW",
+      "sourceTsid": "LIFF8JAQAO72U81",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF8K9RAO72LP5": {
+      "label": "Ramble Way 5",
+      "sourceTsid": "LIFF8K9RAO72LP5",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF8LVSAO72S3C": {
+      "label": "Fervor Tack A",
+      "sourceTsid": "LIFF8LVSAO72S3C",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF8NE0BO72CNQ": {
+      "label": "Ardent Ave 1",
+      "sourceTsid": "LIFF8NE0BO72CNQ",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GIFF8OI1BO72KC1": {
+      "label": "Ramble Way 1",
+      "sourceTsid": "LIFF8OI1BO72KC1",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF8P93BO72VKV": {
+      "label": "Ardent Ave 4",
+      "sourceTsid": "LIFF8P93BO72VKV",
+      "counts": {
+        "dust_trap": 1,
+        "dirt_pile": 1
+      }
+    },
+    "GIFF8R57BO72VDS": {
+      "label": "Hazy Gate 2",
+      "sourceTsid": "LIFF8R57BO72VDS",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF8TQ8BO72L8G": {
+      "label": "Distant Drag A",
+      "sourceTsid": "LIFF8TQ8BO72L8G",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFF8VNBBO72B2C": {
+      "label": "Fervor Tack E",
+      "sourceTsid": "LIFF8VNBBO72B2C",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF91EEBO723DF": {
+      "label": "Deadpan Dike 1",
+      "sourceTsid": "LIFF91EEBO723DF",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GIFF92MGBO72DPK": {
+      "label": "Fervor Tack B",
+      "sourceTsid": "LIFF92MGBO72DPK",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF949JBO728GK": {
+      "label": "Hazy Gate 6",
+      "sourceTsid": "LIFF949JBO728GK",
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 2
+      }
+    },
+    "GIFF95RKBO72R2Q": {
+      "label": "Zealous Rd NE",
+      "sourceTsid": "LIFF95RKBO72R2Q",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFF96TLBO72CS3": {
+      "label": "Deadpan Dike 2",
+      "sourceTsid": "LIFF96TLBO72CS3",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
     "GIFFBC4MNO72556": {
       "label": "Via Velaya ",
       "sourceTsid": "LIFFBC4MNO72556",
       "counts": {
         "rock_sparkly_1": 1,
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_egg": 2,
         "rock_beryl_1": 1
       },
@@ -7369,6 +8591,7 @@
       "sourceTsid": "LIFFGUFIABH2D6F",
       "counts": {
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_bubble": 1
       },
       "giantId": "lem"
@@ -7449,6 +8672,8 @@
       "label": "Kala Close",
       "sourceTsid": "LIFGR4QG5IV1QPI",
       "counts": {
+        "peat_1": 2,
+        "mortar_barnacle": 6,
         "street_spirit": 1
       },
       "giantId": "grendaline"
@@ -7734,11 +8959,55 @@
       "sourceTsid": "LIFKPQEDFG722M5",
       "counts": {
         "rock_metal_1": 1,
+        "dirt_pile": 1,
         "rock_beryl_1": 1,
         "street_spirit": 1,
         "trant_egg": 1
       },
       "giantId": "lem"
+    },
+    "GIFL52J67952Q3L": {
+      "label": "Rook's Way 3",
+      "sourceTsid": "LIFL52J67952Q3L",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFLAJU87952TDU": {
+      "label": "Rook's Way 2",
+      "sourceTsid": "LIFLAJU87952TDU",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFLFDAA79522M2": {
+      "label": "Rook's Way 5",
+      "sourceTsid": "LIFLFDAA79522M2",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFLKU9C7952Q8N": {
+      "label": "Hayseed Rd 4",
+      "sourceTsid": "LIFLKU9C7952Q8N",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFLN0JD7952TH6": {
+      "label": "Putter Track D",
+      "sourceTsid": "LIFLN0JD7952TH6",
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 1
+      }
+    },
+    "GIFLPDTE7952BT3": {
+      "label": "Bumpkin Tr C",
+      "sourceTsid": "LIFLPDTE7952BT3",
+      "counts": {
+        "dust_trap": 3
+      }
     },
     "GIFLPK2J9UG2AV1": {
       "label": "Muuja Jah",
@@ -7748,6 +9017,15 @@
         "street_spirit": 1
       },
       "giantId": "friendly"
+    },
+    "GIFLRSGG7952SBS": {
+      "label": "Redhorn Rd E",
+      "sourceTsid": "LIFLRSGG7952SBS",
+      "counts": {
+        "dust_trap": 2,
+        "dirt_pile": 1,
+        "paper_tree": 1
+      }
     },
     "GIFM4LUEREI2A6E": {
       "label": "Meadow to Plateau 023",
@@ -7775,10 +9053,20 @@
       "label": "Uskela Passage",
       "sourceTsid": "LIFMGTCIQGU13TS",
       "counts": {
+        "mortar_barnacle": 5,
         "trant_spice": 3,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "peat_1": 1
       },
       "giantId": "grendaline"
+    },
+    "GIFMJ2KQ7952UFB": {
+      "label": "Rook's Way 4",
+      "sourceTsid": "LIFMJ2KQ7952UFB",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 1
+      }
     },
     "GIFMJN4D6II2D79": {
       "label": "Irron Lavi",
@@ -7792,14 +9080,46 @@
       },
       "giantId": "spriggan"
     },
+    "GIFMLT2S7952HAQ": {
+      "label": "Bumpkin Tr A",
+      "sourceTsid": "LIFMLT2S7952HAQ",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GIFMNSVS7952M4T": {
+      "label": "Tumble Rd 5",
+      "sourceTsid": "LIFMNSVS7952M4T",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 2
+      }
+    },
     "GIFMOLVTLHV1RAR": {
       "label": "Naata Garth",
       "sourceTsid": "LIFMOLVTLHV1RAR",
       "counts": {
+        "mortar_barnacle": 5,
         "trant_spice": 1,
+        "peat_1": 1,
         "street_spirit": 1
       },
       "giantId": "ti"
+    },
+    "GIFMR8JU7952PH5": {
+      "label": "Putter Track E",
+      "sourceTsid": "LIFMR8JU7952PH5",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFMTLQV79528FE": {
+      "label": "Bumpkin Tr D",
+      "sourceTsid": "LIFMTLQV79528FE",
+      "counts": {
+        "dust_trap": 1,
+        "paper_tree": 1
+      }
     },
     "GIFMVP96ONU12CO": {
       "label": "Tammer Path",
@@ -7824,6 +9144,8 @@
       "label": "Naatamo Way",
       "sourceTsid": "LIFN3FI0TNU10PS",
       "counts": {
+        "mortar_barnacle": 8,
+        "peat_1": 4,
         "street_spirit": 1,
         "trant_gas": 1,
         "trant_spice": 1
@@ -7834,6 +9156,7 @@
       "label": "Paats Yield",
       "sourceTsid": "LIFN5CQH1OU1P61",
       "counts": {
+        "mortar_barnacle": 4,
         "trant_spice": 1,
         "trant_gas": 1,
         "street_spirit": 1
@@ -7855,6 +9178,10 @@
       "label": "Loimi Linger",
       "sourceTsid": "LIFNG7GD8OU17BO",
       "counts": {
+        "npc_firefly": 24,
+        "peat_1": 2,
+        "mortar_barnacle": 1,
+        "jellisac": 7,
         "trant_egg": 3,
         "street_spirit": 1
       },
@@ -7865,6 +9192,9 @@
       "label": "Livo Farce",
       "sourceTsid": "LIFNG8EK8OU1A8D",
       "counts": {
+        "npc_firefly": 13,
+        "peat_1": 2,
+        "jellisac": 10,
         "street_spirit": 1
       },
       "giantId": "cosma",
@@ -7874,6 +9204,7 @@
       "label": "Tuntsa Coze",
       "sourceTsid": "LIFNH08K9OU1SAB",
       "counts": {
+        "mortar_barnacle": 2,
         "trant_spice": 1,
         "trant_gas": 1,
         "street_spirit": 1
@@ -7884,11 +9215,155 @@
       "label": "Raudan Rasp",
       "sourceTsid": "LIFNIC9JFOU1B2S",
       "counts": {
+        "mortar_barnacle": 3,
+        "peat_1": 3,
         "trant_gas": 2,
         "street_spirit": 1
       },
       "giantId": "alph",
       "spawners": 1
+    },
+    "GIFNKR2C2G522MG": {
+      "label": "Putter Track C",
+      "sourceTsid": "LIFNKR2C2G522MG",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFNL5554G52MHJ": {
+      "label": "Naif Lane W",
+      "sourceTsid": "LIFNL5554G52MHJ",
+      "counts": {
+        "dust_trap": 4
+      }
+    },
+    "GIFNL7F74G52BUD": {
+      "label": "Tumble Rd 2",
+      "sourceTsid": "LIFNL7F74G52BUD",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFNL8294G52U4M": {
+      "label": "Putter Track A",
+      "sourceTsid": "LIFNL8294G52U4M",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFNMSQ5GG528AK": {
+      "label": "Redhorn Rd W",
+      "sourceTsid": "LIFNMSQ5GG528AK",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFNMTBAGG52OON": {
+      "label": "Redhorn Rd NW",
+      "sourceTsid": "LIFNMTBAGG52OON",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFNN016HG5246T": {
+      "label": "Chester Way 1B",
+      "sourceTsid": "LIFNN016HG5246T",
+      "counts": {
+        "dust_trap": 3,
+        "dirt_pile": 1
+      }
+    },
+    "GIFNNAK4JG5273T": {
+      "label": "Naif Lane S",
+      "sourceTsid": "LIFNNAK4JG5273T",
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 1
+      }
+    },
+    "GIFNNB46JG527E6": {
+      "label": "Redhorn Rd N",
+      "sourceTsid": "LIFNNB46JG527E6",
+      "counts": {
+        "dust_trap": 1,
+        "paper_tree": 1
+      }
+    },
+    "GIFNNC57JG52PDR": {
+      "label": "Tumble Rd 4",
+      "sourceTsid": "LIFNNC57JG52PDR",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFNNDV7JG52198": {
+      "label": "Hayseed Rd 5",
+      "sourceTsid": "LIFNNDV7JG52198",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFNNEA8JG52VL8": {
+      "label": "Bumpkin Tr B",
+      "sourceTsid": "LIFNNEA8JG52VL8",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 2
+      }
+    },
+    "GIFNNFA9JG5222H": {
+      "label": "Chester Way 1D",
+      "sourceTsid": "LIFNNFA9JG5222H",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 2
+      }
+    },
+    "GIFNNGNAJG52LIH": {
+      "label": "Hayseed Rd 1",
+      "sourceTsid": "LIFNNGNAJG52LIH",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 1
+      }
+    },
+    "GIFNNHRBJG52QS0": {
+      "label": "Chester Way 1E",
+      "sourceTsid": "LIFNNHRBJG52QS0",
+      "counts": {
+        "dust_trap": 2,
+        "dirt_pile": 1,
+        "paper_tree": 1
+      }
+    },
+    "GIFNNI8JJG52EA8": {
+      "label": "Hayseed Rd 2",
+      "sourceTsid": "LIFNNI8JJG52EA8",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFNNL3OJG52OKJ": {
+      "label": "Chester Way 1A",
+      "sourceTsid": "LIFNNL3OJG52OKJ",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFNNMMQJG52764": {
+      "label": "Naif Lane SW",
+      "sourceTsid": "LIFNNMMQJG52764",
+      "counts": {
+        "dirt_pile": 1,
+        "dust_trap": 1
+      }
+    },
+    "GIFNOHGBMG523LQ": {
+      "label": "Chester Way 1C",
+      "sourceTsid": "LIFNOHGBMG523LQ",
+      "counts": {
+        "dust_trap": 3
+      }
     },
     "GIFNRF3P0E02J90": {
       "label": "Jonku Impressions",
@@ -7899,11 +9374,50 @@
       },
       "giantId": "humbaba"
     },
+    "GIFNTBMONG520FD": {
+      "label": "Naif Lane E",
+      "sourceTsid": "LIFNTBMONG520FD",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFNTFRSNG52DMO": {
+      "label": "Putter Track B",
+      "sourceTsid": "LIFNTFRSNG52DMO",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
+    "GIFNTLPJPG52ONQ": {
+      "label": "Naif Lane SE",
+      "sourceTsid": "LIFNTLPJPG52ONQ",
+      "counts": {
+        "dust_trap": 2
+      }
+    },
     "GIFNTM0NPG52JB5": {
       "label": "Hayseed Rd 3",
       "sourceTsid": "LIFNTM0NPG52JB5",
-      "counts": {},
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 1
+      },
       "spawners": 1
+    },
+    "GIFNTN8PPG52DTG": {
+      "label": "Tumble Rd 3",
+      "sourceTsid": "LIFNTN8PPG52DTG",
+      "counts": {
+        "dust_trap": 3
+      }
+    },
+    "GIFNTO2RPG52AH8": {
+      "label": "Tumble Rd 1",
+      "sourceTsid": "LIFNTO2RPG52AH8",
+      "counts": {
+        "paper_tree": 1,
+        "dust_trap": 1
+      }
     },
     "GIFNU7T73U722U5": {
       "label": "zA10",
@@ -7927,6 +9441,13 @@
       },
       "giantId": "zille",
       "spawners": 1
+    },
+    "GIFOEFNL89529MS": {
+      "label": "Redhorn Rd NE",
+      "sourceTsid": "LIFOEFNL89529MS",
+      "counts": {
+        "dust_trap": 3
+      }
     },
     "GIFOU5Q1E543GP3": {
       "label": "And so it begins...",
@@ -8351,6 +9872,7 @@
         "trant_bean": 2,
         "trant_bubble": 1,
         "npc_piggy": 3,
+        "dirt_pile": 1,
         "rock_sparkly_1": 1,
         "street_spirit": 1
       },
@@ -8594,6 +10116,7 @@
       "counts": {
         "trant_fruit": 2,
         "rock_metal_1": 5,
+        "paper_tree": 1,
         "street_spirit": 1
       },
       "spawners": 1
@@ -8605,7 +10128,8 @@
         "trant_egg": 5,
         "rock_beryl_1": 1,
         "rock_metal_1": 3,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "dirt_pile": 1
       },
       "giantId": "cosma"
     },
@@ -8613,7 +10137,10 @@
       "label": "Lowland Slough",
       "sourceTsid": "LLI4HJ9GRLI1C4E",
       "counts": {
-        "street_spirit": 1
+        "mortar_barnacle": 5,
+        "street_spirit": 1,
+        "paper_tree": 1,
+        "peat_1": 1
       },
       "giantId": "mab"
     },
@@ -8621,7 +10148,9 @@
       "label": "Somewhat Sump",
       "sourceTsid": "LLI57DI72HI153U",
       "counts": {
-        "street_spirit": 1
+        "mortar_barnacle": 11,
+        "street_spirit": 1,
+        "peat_1": 1
       },
       "giantId": "grendaline"
     },
@@ -8629,6 +10158,8 @@
       "label": "Squatter's Quag",
       "sourceTsid": "LLI57EKC2HI1EH8",
       "counts": {
+        "mortar_barnacle": 4,
+        "peat_1": 3,
         "street_spirit": 1
       },
       "giantId": "alph"
@@ -8637,6 +10168,9 @@
       "label": "Metch Morass",
       "sourceTsid": "LLI57FTH2HI17PN",
       "counts": {
+        "npc_firefly": 38,
+        "jellisac": 7,
+        "peat_1": 1,
         "street_spirit": 1
       },
       "giantId": "ti",
@@ -8646,7 +10180,11 @@
       "label": "Seldom Squish",
       "sourceTsid": "LLI57G8I2HI1CSO",
       "counts": {
-        "street_spirit": 1
+        "npc_firefly": 36,
+        "jellisac": 9,
+        "street_spirit": 1,
+        "mortar_barnacle": 3,
+        "peat_1": 1
       },
       "giantId": "cosma",
       "spawners": 3
@@ -8655,6 +10193,8 @@
       "label": "Maybe Marsh ",
       "sourceTsid": "LLI599R12JI1216",
       "counts": {
+        "mortar_barnacle": 4,
+        "peat_1": 2,
         "street_spirit": 1
       },
       "giantId": "alph"
@@ -8663,10 +10203,20 @@
       "label": "Peatland Moors",
       "sourceTsid": "LLICF642CTI16R1",
       "counts": {
-        "street_spirit": 1
+        "peat_1": 3,
+        "mortar_barnacle": 5,
+        "street_spirit": 1,
+        "npc_firefly": 15
       },
       "giantId": "lem",
       "spawners": 1
+    },
+    "GLICFILAMTI11QV": {
+      "label": "Scribe's Weald",
+      "sourceTsid": "LLICFILAMTI11QV",
+      "counts": {
+        "paper_tree": 1
+      }
     },
     "GLID3PL336E1RN1": {
       "label": "Meadow's Edge",
@@ -8674,6 +10224,7 @@
       "counts": {
         "trant_fruit": 2,
         "npc_piggy": 1,
+        "dirt_pile": 1,
         "trant_spice": 1,
         "trant_bean": 2,
         "trant_bubble": 2,
@@ -8689,6 +10240,7 @@
         "trant_egg": 3,
         "street_spirit": 1,
         "npc_piggy": 1,
+        "dirt_pile": 1,
         "rock_metal_1": 1
       },
       "giantId": "ti",
@@ -8800,7 +10352,9 @@
       "label": "Pungent Ponds",
       "sourceTsid": "LM11HIDASHO1THR",
       "counts": {
-        "street_spirit": 1
+        "mortar_barnacle": 3,
+        "street_spirit": 1,
+        "peat_1": 1
       },
       "giantId": "grendaline"
     },
@@ -8874,7 +10428,8 @@
       "label": "East Spice",
       "sourceTsid": "LM413SQ6LRN58",
       "counts": {
-        "trant_spice": 5
+        "trant_spice": 5,
+        "paper_tree": 1
       },
       "spawners": 4
     },
@@ -8944,6 +10499,7 @@
       "counts": {
         "trant_fruit": 1,
         "street_spirit": 1,
+        "dirt_pile": 1,
         "trant_egg": 1
       },
       "giantId": "cosma",
@@ -9160,6 +10716,7 @@
       "counts": {
         "trant_fruit": 1,
         "trant_bubble": 1,
+        "dirt_pile": 1,
         "street_spirit": 1
       },
       "giantId": "alph"
@@ -9387,6 +10944,9 @@
       "label": "Heckes",
       "sourceTsid": "LTJ1013E97K17P1",
       "counts": {
+        "npc_firefly": 36,
+        "jellisac": 8,
+        "mortar_barnacle": 2,
         "street_spirit": 1
       },
       "giantId": "mab",
@@ -9396,6 +10956,8 @@
       "label": "Quinmchary",
       "sourceTsid": "LTJ101FB0SO17JK",
       "counts": {
+        "npc_firefly": 8,
+        "jellisac": 11,
         "street_spirit": 1
       },
       "giantId": "humbaba",
@@ -9405,6 +10967,8 @@
       "label": "Palsa Mosch",
       "sourceTsid": "LTJ101I3KSO1JQS",
       "counts": {
+        "mortar_barnacle": 9,
+        "peat_1": 4,
         "street_spirit": 1
       },
       "giantId": "lem"
@@ -9413,7 +10977,9 @@
       "label": "Niiske Kook",
       "sourceTsid": "LTJ101PRVCQ1RN0",
       "counts": {
-        "street_spirit": 1
+        "mortar_barnacle": 6,
+        "street_spirit": 1,
+        "peat_1": 1
       },
       "giantId": "grendaline"
     },
@@ -9421,7 +10987,10 @@
       "label": "Clam Calumny ",
       "sourceTsid": "LTJ1024R2DQ1B5S",
       "counts": {
-        "street_spirit": 1
+        "npc_firefly": 31,
+        "jellisac": 6,
+        "street_spirit": 1,
+        "peat_1": 1
       },
       "giantId": "humbaba",
       "spawners": 2
@@ -9430,6 +10999,8 @@
       "label": "Mokkar Mill",
       "sourceTsid": "LTJ102C4FFQ1Q6O",
       "counts": {
+        "npc_firefly": 12,
+        "jellisac": 7,
         "street_spirit": 1
       },
       "giantId": "friendly",
@@ -9439,7 +11010,9 @@
       "label": "Harbinger Heath",
       "sourceTsid": "LTJ102GGGJK1VDO",
       "counts": {
-        "street_spirit": 1
+        "mortar_barnacle": 11,
+        "street_spirit": 1,
+        "peat_1": 3
       },
       "giantId": "friendly"
     },
@@ -9447,6 +11020,8 @@
       "label": "Mullat",
       "sourceTsid": "LTJ102LVLDQ1NGH",
       "counts": {
+        "jellisac": 6,
+        "npc_firefly": 8,
         "street_spirit": 1
       },
       "giantId": "lem",
@@ -9456,6 +11031,8 @@
       "label": "Wettish Walk",
       "sourceTsid": "LTJ103NK29K1TNJ",
       "counts": {
+        "mortar_barnacle": 7,
+        "peat_1": 2,
         "street_spirit": 1
       },
       "giantId": "cosma"
@@ -9464,7 +11041,9 @@
       "label": "Froughtful Fen",
       "sourceTsid": "LTJ103U2KJK1BLG",
       "counts": {
-        "street_spirit": 1
+        "mortar_barnacle": 11,
+        "street_spirit": 1,
+        "peat_1": 1
       },
       "giantId": "pot"
     },
@@ -9472,8 +11051,11 @@
       "label": "Pielis Pass",
       "sourceTsid": "LTJ1057EEQU17G1",
       "counts": {
+        "npc_firefly": 27,
         "trant_egg": 2,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "peat_1": 2,
+        "jellisac": 4
       },
       "giantId": "lem",
       "spawners": 3
@@ -9482,6 +11064,8 @@
       "label": "Basabasa",
       "sourceTsid": "LTJ105NEFDQ1H97",
       "counts": {
+        "npc_firefly": 22,
+        "jellisac": 6,
         "street_spirit": 1
       },
       "giantId": "ti",
@@ -9491,6 +11075,8 @@
       "label": "Nagu Keel",
       "sourceTsid": "LTJ108JAODQ11KH",
       "counts": {
+        "npc_firefly": 37,
+        "jellisac": 5,
         "street_spirit": 1
       },
       "giantId": "spriggan",
@@ -9500,6 +11086,8 @@
       "label": "Nilpsama",
       "sourceTsid": "LTJ10B0UHQQ172V",
       "counts": {
+        "npc_firefly": 38,
+        "jellisac": 3,
         "street_spirit": 1
       },
       "giantId": "cosma",
@@ -9509,7 +11097,9 @@
       "label": "Tennio Spur",
       "sourceTsid": "LTJ10HO3FAV1HDD",
       "counts": {
-        "street_spirit": 1
+        "npc_firefly": 37,
+        "street_spirit": 1,
+        "jellisac": 4
       },
       "giantId": "mab",
       "spawners": 3
@@ -9525,6 +11115,8 @@
       "sourceTsid": "LTJ10KOCHTU1N89",
       "counts": {
         "street_spirit": 1,
+        "mortar_barnacle": 3,
+        "peat_1": 2,
         "trant_gas": 1
       },
       "giantId": "pot"
@@ -9545,7 +11137,9 @@
       "label": "Leeteg",
       "sourceTsid": "LTJ112E9DIO1BPE",
       "counts": {
-        "street_spirit": 1
+        "street_spirit": 1,
+        "mortar_barnacle": 10,
+        "peat_1": 2
       },
       "giantId": "grendaline"
     },
@@ -9553,7 +11147,10 @@
       "label": "Humus Hollow",
       "sourceTsid": "LTJ11BUJ57K1VUV",
       "counts": {
-        "street_spirit": 1
+        "npc_firefly": 36,
+        "jellisac": 8,
+        "street_spirit": 1,
+        "mortar_barnacle": 1
       },
       "giantId": "pot",
       "spawners": 3
@@ -9562,6 +11159,9 @@
       "label": "Amerran Huddles",
       "sourceTsid": "LTJ11HQLJUV1R15",
       "counts": {
+        "peat_1": 3,
+        "mortar_barnacle": 9,
+        "jellisac": 8,
         "trant_egg": 1,
         "street_spirit": 1
       },
@@ -9572,6 +11172,8 @@
       "label": "Soggy Bottoms",
       "sourceTsid": "LTJ11KEKAKO196V",
       "counts": {
+        "mortar_barnacle": 4,
+        "peat_1": 3,
         "street_spirit": 1
       },
       "giantId": "ti"
@@ -9580,7 +11182,9 @@
       "label": "Mucid Memes",
       "sourceTsid": "LTJ11TPQUMO197U",
       "counts": {
-        "street_spirit": 1
+        "street_spirit": 1,
+        "mortar_barnacle": 4,
+        "peat_1": 1
       },
       "giantId": "humbaba"
     },
@@ -9588,6 +11192,8 @@
       "label": "Fjarcke",
       "sourceTsid": "LTJ12E6VSFQ1V4E",
       "counts": {
+        "jellisac": 16,
+        "npc_firefly": 16,
         "street_spirit": 1
       },
       "giantId": "zille",
@@ -9597,6 +11203,9 @@
       "label": "Toma Traverse",
       "sourceTsid": "LTJ12G0H5KV10GH",
       "counts": {
+        "mortar_barnacle": 2,
+        "jellisac": 3,
+        "peat_1": 4,
         "trant_spice": 3,
         "street_spirit": 1
       },
@@ -9606,7 +11215,9 @@
       "label": "Viscid Pud",
       "sourceTsid": "LTJ12O0H7AO1IBS",
       "counts": {
-        "street_spirit": 1
+        "peat_1": 3,
+        "street_spirit": 1,
+        "mortar_barnacle": 4
       },
       "giantId": "spriggan"
     },
@@ -9614,7 +11225,11 @@
       "label": "Vasko Shift",
       "sourceTsid": "LTJ12PGU9KV1MGI",
       "counts": {
+        "npc_firefly": 12,
+        "mortar_barnacle": 3,
         "trant_egg": 2,
+        "peat_1": 3,
+        "jellisac": 4,
         "street_spirit": 1
       },
       "giantId": "grendaline",
@@ -9624,6 +11239,9 @@
       "label": "Belan Bends",
       "sourceTsid": "LTJ12SJ2RUV1N6R",
       "counts": {
+        "mortar_barnacle": 4,
+        "jellisac": 3,
+        "peat_1": 5,
         "trant_spice": 2,
         "street_spirit": 1
       },
@@ -9633,7 +11251,10 @@
       "label": "Vuoksi Vale",
       "sourceTsid": "LTJ135JKNQU113D",
       "counts": {
+        "npc_firefly": 49,
+        "jellisac": 6,
         "trant_egg": 2,
+        "peat_1": 3,
         "street_spirit": 1
       },
       "giantId": "cosma",
@@ -9643,7 +11264,9 @@
       "label": "Marga Mooch",
       "sourceTsid": "LTJ13ELOLPQ1DP3",
       "counts": {
-        "street_spirit": 1
+        "street_spirit": 1,
+        "mortar_barnacle": 4,
+        "peat_1": 2
       },
       "giantId": "lem"
     },
@@ -9652,7 +11275,10 @@
       "sourceTsid": "LTJ13T0J2VV1A4N",
       "counts": {
         "street_spirit": 1,
-        "trant_spice": 3
+        "trant_spice": 3,
+        "peat_1": 3,
+        "mortar_barnacle": 2,
+        "jellisac": 1
       },
       "giantId": "alph"
     },
@@ -9660,6 +11286,10 @@
       "label": "Kitkaa Carom",
       "sourceTsid": "LTJ13TRDHKV1970",
       "counts": {
+        "jellisac": 5,
+        "peat_1": 3,
+        "npc_firefly": 15,
+        "mortar_barnacle": 3,
         "trant_egg": 2,
         "street_spirit": 1
       },
@@ -9670,8 +11300,12 @@
       "label": "Lutto Lisp",
       "sourceTsid": "LTJ13VTR2RU14QO",
       "counts": {
+        "npc_firefly": 24,
+        "jellisac": 6,
+        "mortar_barnacle": 4,
         "trant_egg": 1,
-        "street_spirit": 1
+        "street_spirit": 1,
+        "peat_1": 2
       },
       "giantId": "friendly",
       "spawners": 2
@@ -9680,6 +11314,8 @@
       "label": "Dalsan Detach",
       "sourceTsid": "LTJ1539P8102B2F",
       "counts": {
+        "mortar_barnacle": 7,
+        "peat_1": 4,
         "trant_spice": 1,
         "street_spirit": 1
       },
@@ -9689,6 +11325,7 @@
       "label": "Bakean Stutter",
       "sourceTsid": "LTJ154SP8102KIG",
       "counts": {
+        "peat_1": 2,
         "street_spirit": 1,
         "trant_spice": 1
       },
@@ -9698,7 +11335,10 @@
       "label": "Ounaas Means",
       "sourceTsid": "LTJ168OVQRV1TQA",
       "counts": {
+        "peat_1": 3,
+        "mortar_barnacle": 5,
         "trant_spice": 2,
+        "jellisac": 6,
         "street_spirit": 1
       },
       "giantId": "humbaba"
@@ -9707,6 +11347,9 @@
       "label": "Saani Shim",
       "sourceTsid": "LTJ16T2SURV19NT",
       "counts": {
+        "peat_1": 2,
+        "mortar_barnacle": 4,
+        "jellisac": 8,
         "trant_spice": 1,
         "street_spirit": 1,
         "trant_gas": 1
@@ -9717,7 +11360,9 @@
       "label": "Likomärkä",
       "sourceTsid": "LTJ17MOFE6P1NJ3",
       "counts": {
-        "street_spirit": 1
+        "mortar_barnacle": 2,
+        "street_spirit": 1,
+        "peat_1": 2
       },
       "giantId": "pot"
     },
@@ -9725,6 +11370,8 @@
       "label": "Siuruan Untold",
       "sourceTsid": "LTJ18J9ASDU1UPS",
       "counts": {
+        "npc_firefly": 24,
+        "jellisac": 4,
         "street_spirit": 1
       },
       "giantId": "friendly",
@@ -9734,8 +11381,11 @@
       "label": "Jamsan Jag",
       "sourceTsid": "LTJ1F3AER9V139B",
       "counts": {
+        "npc_firefly": 24,
         "trant_egg": 2,
-        "street_spirit": 1
+        "peat_1": 2,
+        "street_spirit": 1,
+        "jellisac": 2
       },
       "giantId": "zille",
       "spawners": 2
@@ -9744,7 +11394,11 @@
       "label": "Paijanne Feign",
       "sourceTsid": "LTJ1FR102AV17DP",
       "counts": {
+        "jellisac": 4,
+        "mortar_barnacle": 4,
+        "npc_firefly": 24,
         "trant_egg": 2,
+        "peat_1": 3,
         "street_spirit": 1
       },
       "giantId": "friendly",
@@ -9754,7 +11408,10 @@
       "label": "Perhoni Flim",
       "sourceTsid": "LTJ1PV6RLCV1L08",
       "counts": {
+        "peat_1": 1,
         "street_spirit": 1,
+        "mortar_barnacle": 4,
+        "jellisac": 5,
         "trant_egg": 2
       },
       "giantId": "lem"
@@ -9763,8 +11420,12 @@
       "label": "Lagan Lark",
       "sourceTsid": "LTJ2S0EVDSV1HQ0",
       "counts": {
+        "jellisac": 7,
+        "npc_firefly": 24,
         "street_spirit": 1,
-        "trant_egg": 2
+        "peat_1": 2,
+        "trant_egg": 2,
+        "mortar_barnacle": 5
       },
       "giantId": "cosma",
       "spawners": 2
@@ -9773,7 +11434,9 @@
       "label": "Ivalo Trims",
       "sourceTsid": "LTJ34OO4UHV1NLQ",
       "counts": {
+        "mortar_barnacle": 4,
         "street_spirit": 1,
+        "peat_1": 3,
         "trant_spice": 1
       },
       "giantId": "mab"
@@ -9782,6 +11445,9 @@
       "label": "Ortolana",
       "sourceTsid": "LTJ3PGOAMIQ1QDS",
       "counts": {
+        "jellisac": 3,
+        "mortar_barnacle": 5,
+        "peat_1": 2,
         "street_spirit": 1
       },
       "giantId": "lem"
@@ -9790,6 +11456,10 @@
       "label": "Iljoki Ease",
       "sourceTsid": "LTJ7GRG1VCV1VJD",
       "counts": {
+        "mortar_barnacle": 5,
+        "npc_firefly": 12,
+        "peat_1": 1,
+        "jellisac": 5,
         "street_spirit": 1,
         "trant_egg": 2
       },
@@ -9800,7 +11470,11 @@
       "label": "Jutuan Central",
       "sourceTsid": "LTJ8GSQV1IV1FBE",
       "counts": {
-        "street_spirit": 1
+        "npc_firefly": 12,
+        "jellisac": 4,
+        "street_spirit": 1,
+        "mortar_barnacle": 3,
+        "peat_1": 1
       },
       "giantId": "pot",
       "spawners": 1
@@ -9809,7 +11483,10 @@
       "label": "Tlemcen",
       "sourceTsid": "LTJ9IM9AFAO1C44",
       "counts": {
-        "street_spirit": 1
+        "npc_firefly": 26,
+        "street_spirit": 1,
+        "mortar_barnacle": 11,
+        "peat_1": 3
       },
       "giantId": "friendly",
       "spawners": 1
@@ -9818,6 +11495,8 @@
       "label": "Blottnass",
       "sourceTsid": "LTJLTCN21IQ1URB",
       "counts": {
+        "npc_firefly": 4,
+        "jellisac": 11,
         "street_spirit": 1
       },
       "giantId": "spriggan",
@@ -9828,6 +11507,8 @@
       "sourceTsid": "LTJOCVQUMHV1K83",
       "counts": {
         "street_spirit": 1,
+        "peat_1": 3,
+        "mortar_barnacle": 4,
         "trant_gas": 2
       },
       "giantId": "friendly"
@@ -9835,13 +11516,17 @@
     "GUV10AGQOOA3MOE": {
       "label": "Jal 19",
       "sourceTsid": "LUV10AGQOOA3MOE",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUV13UHOH3D3V3S": {
       "label": "samudra 16",
       "sourceTsid": "LUV13UHOH3D3V3S",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUV174V0QUB3JT4": {
@@ -9859,7 +11544,9 @@
     "GUV1BKIJU8A3VL1": {
       "label": "tall 02",
       "sourceTsid": "LUV1BKIJU8A3VL1",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 19
+      },
       "spawners": 1
     },
     "GUV1D5ROINF2MDO": {
@@ -9876,13 +11563,17 @@
     "GUV1JGGKU8A3NHG": {
       "label": "tall 03",
       "sourceTsid": "LUV1JGGKU8A3NHG",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 16
+      },
       "spawners": 1
     },
     "GUV1RBFLU8A3LR9": {
       "label": "tall 05",
       "sourceTsid": "LUV1RBFLU8A3LR9",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUV1RMOG91L2F6G": {
@@ -9920,22 +11611,42 @@
       },
       "giantId": "friendly"
     },
+    "GUV270LMU8A3UCB": {
+      "label": "long 06",
+      "sourceTsid": "LUV270LMU8A3UCB",
+      "counts": {
+        "npc_salmon": 14
+      }
+    },
     "GUV2ERENU8A30JC": {
       "label": "tall 07",
       "sourceTsid": "LUV2ERENU8A30JC",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
+    },
+    "GUV2LJJO5UC30B2": {
+      "label": "samudra 11",
+      "sourceTsid": "LUV2LJJO5UC30B2",
+      "counts": {
+        "npc_salmon": 16
+      }
     },
     "GUV2M7GCJ8D3878": {
       "label": "samudra 20",
       "sourceTsid": "LUV2M7GCJ8D3878",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 39
+      },
       "spawners": 1
     },
     "GUV2M85OU8A39GS": {
       "label": "tall 08",
       "sourceTsid": "LUV2M85OU8A39GS",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 26
+      },
       "spawners": 1
     },
     "GUV2SS9BHDT2I85": {
@@ -9947,13 +11658,17 @@
     "GUV2SSTOU8A30RS": {
       "label": "long 09",
       "sourceTsid": "LUV2SSTOU8A30RS",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 35
+      },
       "spawners": 1
     },
     "GUV2UE4DCMA3RLS": {
       "label": "jal 18",
       "sourceTsid": "LUV2UE4DCMA3RLS",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 23
+      },
       "spawners": 1
     },
     "GUV3BOQ5GKR2V7N": {
@@ -10036,7 +11751,9 @@
     "GUV5I1CTIEA3DT0": {
       "label": "jal 14",
       "sourceTsid": "LUV5I1CTIEA3DT0",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 22
+      },
       "spawners": 1
     },
     "GUV681KDSQL2PST": {
@@ -10106,25 +11823,33 @@
     "GUV8TSS9Q5D308S": {
       "label": "samudra 17",
       "sourceTsid": "LUV8TSS9Q5D308S",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUV9CALK9MC3MGA": {
       "label": "samudra 09",
       "sourceTsid": "LUV9CALK9MC3MGA",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 21
+      },
       "spawners": 1
     },
     "GUVA5LSLC0D3VCR": {
       "label": "samudra 12",
       "sourceTsid": "LUVA5LSLC0D3VCR",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUVAPJARHHC3H1I": {
       "label": "samudra 07",
       "sourceTsid": "LUVAPJARHHC3H1I",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 36
+      },
       "spawners": 1
     },
     "GUVBP2STKQJ24PT": {
@@ -10179,7 +11904,9 @@
     "GUVCHLO06EA3VBC": {
       "label": "jal 11",
       "sourceTsid": "LUVCHLO06EA3VBC",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 18
+      },
       "spawners": 1
     },
     "GUVCIGHLKKR2J0V": {
@@ -10205,7 +11932,9 @@
     "GUVCLS8RV5D3VGT": {
       "label": "samudra 18",
       "sourceTsid": "LUVCLS8RV5D3VGT",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 54
+      },
       "spawners": 1
     },
     "GUVCMP7BM7F2JET": {
@@ -10233,6 +11962,13 @@
       "sourceTsid": "LUVDU3H5COS2S4O",
       "counts": {},
       "spawners": 1
+    },
+    "GUVE3K14D3D314I": {
+      "label": "samudra 15",
+      "sourceTsid": "LUVE3K14D3D314I",
+      "counts": {
+        "npc_salmon": 22
+      }
     },
     "GUVE5KV0TOS2N87": {
       "label": "Fox_Preserve_09",
@@ -10271,7 +12007,9 @@
     "GUVEDNPVFJC3UIQ": {
       "label": "samudra 08",
       "sourceTsid": "LUVEDNPVFJC3UIQ",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 34
+      },
       "spawners": 1
     },
     "GUVEJ2PKGAF2771": {
@@ -10299,8 +12037,17 @@
     "GUVG9L7NOLA3CEB": {
       "label": "jal 15",
       "sourceTsid": "LUVG9L7NOLA3CEB",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
+    },
+    "GUVGG7RFV2D3L0U": {
+      "label": "samudra 14",
+      "sourceTsid": "LUVGG7RFV2D3L0U",
+      "counts": {
+        "npc_salmon": 38
+      }
     },
     "GUVGL5C7BJL2V4U": {
       "label": "Plateau 08",
@@ -10339,7 +12086,9 @@
     "GUVH137RPTC3IJ6": {
       "label": "samudra 10",
       "sourceTsid": "LUVH137RPTC3IJ6",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 22
+      },
       "spawners": 1
     },
     "GUVHBDR6DOS2UED": {
@@ -10409,6 +12158,13 @@
       "counts": {},
       "spawners": 1
     },
+    "GUVITGLVQOA3H34": {
+      "label": "jal 20",
+      "sourceTsid": "LUVITGLVQOA3H34",
+      "counts": {
+        "npc_salmon": 12
+      }
+    },
     "GUVK3V3GUKF2K88": {
       "label": "Thulam Twist",
       "sourceTsid": "LUVK3V3GUKF2K88",
@@ -10421,7 +12177,9 @@
     "GUVKHENRO0D3MJ8": {
       "label": "samudra 13",
       "sourceTsid": "LUVKHENRO0D3MJ8",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUVKM04MB9G2I53": {
@@ -10484,7 +12242,9 @@
     "GUVLLA752MA3R76": {
       "label": "jal 16",
       "sourceTsid": "LUVLLA752MA3R76",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUVLN7FNEJJ2NOQ": {
@@ -10496,6 +12256,13 @@
         "trant_fruit": 1
       },
       "giantId": "humbaba"
+    },
+    "GUVM9R39TBA362T": {
+      "label": "jal 10",
+      "sourceTsid": "LUVM9R39TBA362T",
+      "counts": {
+        "npc_salmon": 5
+      }
     },
     "GUVMBSKJQ5F289H": {
       "label": "Concept - plateau water view",
@@ -10532,7 +12299,9 @@
     "GUVNHLCRGEA3VAS": {
       "label": "jal 13",
       "sourceTsid": "LUVNHLCRGEA3VAS",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 29
+      },
       "spawners": 1
     },
     "GUVNIF7Q9KR2382": {
@@ -10720,7 +12489,9 @@
     "GUVSBGGQCHC386B": {
       "label": "samudra 06",
       "sourceTsid": "LUVSBGGQCHC386B",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUVSCDSTRAF2EOF": {
@@ -10750,7 +12521,9 @@
     "GUVST31K7MA369P": {
       "label": "jal 17",
       "sourceTsid": "LUVST31K7MA369P",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 31
+      },
       "spawners": 1
     },
     "GUVT92Q1PNF23GR": {
@@ -10788,7 +12561,9 @@
     "GUVTKP64DEA3D31": {
       "label": "jal 12",
       "sourceTsid": "LUVTKP64DEA3D31",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUVTKR868NF27QG": {
@@ -10847,6 +12622,13 @@
       },
       "giantId": "zille"
     },
+    "GUVUMTSQ2FC34ES": {
+      "label": "samudra 01",
+      "sourceTsid": "LUVUMTSQ2FC34ES",
+      "counts": {
+        "npc_salmon": 15
+      }
+    },
     "GUVUVJBM5DF2UR6": {
       "label": "Vrishchikam Sum",
       "sourceTsid": "LUVUVJBM5DF2UR6",
@@ -10855,6 +12637,13 @@
         "trant_bean": 2
       },
       "giantId": "cosma"
+    },
+    "GUVV0NRR2FC3D3D": {
+      "label": "samudra 02",
+      "sourceTsid": "LUVV0NRR2FC3D3D",
+      "counts": {
+        "npc_salmon": 38
+      }
     },
     "GUVV8SDGGDT2QOH": {
       "label": "Fox_Preserve_01_L",
@@ -10865,25 +12654,40 @@
     "GUVVASOS2FC3J3Q": {
       "label": "samudra 03",
       "sourceTsid": "LUVVASOS2FC3J3Q",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
     },
     "GUVVL8J088D3QVT": {
       "label": "samudra 19",
       "sourceTsid": "LUVVL8J088D3QVT",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 21
+      },
       "spawners": 1
     },
     "GUVVMMKT2FC3V5B": {
       "label": "samudra 04",
       "sourceTsid": "LUVVMMKT2FC3V5B",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 17
+      },
       "spawners": 1
+    },
+    "GUVVSU5NCBA3KOS": {
+      "label": "jal 04",
+      "sourceTsid": "LUVVSU5NCBA3KOS",
+      "counts": {
+        "npc_salmon": 20
+      }
     },
     "GUVVV3FU2FC38SK": {
       "label": "samudra 05",
       "sourceTsid": "LUVVV3FU2FC38SK",
-      "counts": {},
+      "counts": {
+        "npc_salmon": 25
+      },
       "spawners": 1
     }
   }

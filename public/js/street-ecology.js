@@ -3,7 +3,7 @@
  * placement on recovered locations-xml platforms.
  */
 
-export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-2';
+export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-3';
 
 /** @type {{source?:string, sourceSnapshot?:string, streetCount?:number, streets:Record<string, any>}} */
 let catalog = { streets: {} };
@@ -24,6 +24,55 @@ const ROCK_CLASSES = Object.freeze([
   'rock_beryl_1',
   'rock_sparkly_1',
 ]);
+
+/**
+ * Harvestable world resource nodes (see js/resource-nodes.js), in source
+ * frequency order, with per-street render caps. `resourceCounts` on a
+ * population stays exact; `resourceNodeClasses` is the capped spawn list.
+ */
+export const RESOURCE_NODE_CLASSES = Object.freeze([
+  'npc_firefly',
+  'npc_salmon',
+  'mortar_barnacle',
+  'dust_trap',
+  'ice_knob',
+  'jellisac',
+  'dirt_pile',
+  'peat_1',
+  'npc_sloth',
+  'paper_tree',
+]);
+
+export const RESOURCE_NODE_CAPS = Object.freeze({
+  npc_firefly: 12,
+  npc_salmon: 8,
+  mortar_barnacle: 6,
+  dust_trap: 4,
+  ice_knob: 6,
+  jellisac: 6,
+  dirt_pile: 3,
+  peat_1: 3,
+  npc_sloth: 2,
+  paper_tree: 1,
+});
+
+function resourceCountsFrom(counts) {
+  const out = {};
+  for (const classTsid of RESOURCE_NODE_CLASSES) {
+    const n = whole(counts?.[classTsid]);
+    if (n > 0) out[classTsid] = n;
+  }
+  return out;
+}
+
+function expandResourceClasses(counts) {
+  const out = [];
+  for (const classTsid of RESOURCE_NODE_CLASSES) {
+    const n = Math.min(whole(counts?.[classTsid]), RESOURCE_NODE_CAPS[classTsid] || 4);
+    for (let i = 0; i < n; i += 1) out.push(classTsid);
+  }
+  return out;
+}
 
 function whole(value, fallback = 0, max = 999) {
   const n = Number(value);
@@ -111,6 +160,8 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
       musicblocks: 0,
       quoins: 0,
       companions: false,
+      resourceCounts: {},
+      resourceNodeClasses: [],
     };
   }
   const counts = entry?.counts || {};
@@ -190,6 +241,8 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     musicblocks: 1,
     quoins: 8,
     companions: true,
+    resourceCounts: resourceCountsFrom(counts),
+    resourceNodeClasses: expandResourceClasses(counts),
   };
 }
 
