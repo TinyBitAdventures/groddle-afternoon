@@ -2,8 +2,8 @@
  "generatedBy": "build-sound-keys.mjs",
  "soundsXml": "http://c2.glitch.bz/sounds/2012-12/sounds_1354665929.xml (not archived)",
  "counts": {
-  "keys": 582,
-  "original": 550,
+  "keys": 636,
+  "original": 604,
   "music": 205,
   "remake": 32,
   "recoveredWayback": 38,
@@ -68,6 +68,19 @@
    ],
    "sources": [
     "gsjs:players/inc_achievements.js:436 (achievements_grant)"
+   ]
+  },
+  "ACTIVATE_1": {
+   "category": "event",
+   "moment": "street:GIFM4BD43383DKV (Le Miserable puzzle_1_verify)",
+   "uses": 3,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GIFM4BD43383DKV (Le Miserable puzzle_1_verify)",
+    "street:GIFM4BD43383DKV (Le Miserable puzzle_2_verify)",
+    "street:GIFM4BD43383DKV (Le Miserable puzzle_3_verify)"
    ]
   },
   "ACTIVATE_GAME_TELEPORTER": {
@@ -1174,23 +1187,153 @@
   "BIG_STAR_1": {
    "category": "event",
    "moment": "items/toy_star_2.js:27 (onPlayerCollision)",
-   "uses": 1,
+   "uses": 3,
    "via": [
-    "announce_sound"
+    "announce_sound",
+    "street event"
    ],
    "sources": [
-    "gsjs:items/toy_star_2.js:27 (onPlayerCollision)"
+    "gsjs:items/toy_star_2.js:27 (onPlayerCollision)",
+    "street:GA96OS42D6F3M9P (Piano Party bigstar1_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_53)"
+   ]
+  },
+  "BIG_STAR_10": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar10_on)",
+   "uses": 2,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar10_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_17)"
+   ]
+  },
+  "BIG_STAR_11": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar11_on)",
+   "uses": 2,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar11_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_13)"
+   ]
+  },
+  "BIG_STAR_12": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar12_on)",
+   "uses": 2,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar12_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_09)"
+   ]
+  },
+  "BIG_STAR_2": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar2_on)",
+   "uses": 2,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar2_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_49)"
    ]
   },
   "BIG_STAR_3": {
    "category": "event",
    "moment": "items/toy_star_1.js:27 (onPlayerCollision)",
-   "uses": 1,
+   "uses": 3,
    "via": [
-    "announce_sound"
+    "announce_sound",
+    "street event"
    ],
    "sources": [
-    "gsjs:items/toy_star_1.js:27 (onPlayerCollision)"
+    "gsjs:items/toy_star_1.js:27 (onPlayerCollision)",
+    "street:GA96OS42D6F3M9P (Piano Party bigstar3_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_45)"
+   ]
+  },
+  "BIG_STAR_4": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar4_on)",
+   "uses": 3,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar4_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_05)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_41)"
+   ]
+  },
+  "BIG_STAR_5": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar5_on)",
+   "uses": 3,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar5_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_01)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_37)"
+   ]
+  },
+  "BIG_STAR_6": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar6_on)",
+   "uses": 2,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar6_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_33)"
+   ]
+  },
+  "BIG_STAR_7": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar7_on)",
+   "uses": 2,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar7_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_29)"
+   ]
+  },
+  "BIG_STAR_8": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar8_on)",
+   "uses": 2,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar8_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_25)"
+   ]
+  },
+  "BIG_STAR_9": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party bigstar9_on)",
+   "uses": 4,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party bigstar9_on)",
+    "street:GHFCS002GN63BRB (Starlit Night moon)",
+    "street:GHFCVOD2GN631RJ (Starlit Night moon)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_21)"
    ]
   },
   "BIGENNIFY": {
@@ -1326,6 +1469,17 @@
    "sources": [
     "gsjs:items/npc_batterfly.js:1021 (parent_verb_npc_butterfly_sing_to)",
     "gsjs:items/npc_butterfly.js:680 (is_potion)"
+   ]
+  },
+  "BUTTON_2": {
+   "category": "event",
+   "moment": "street:GIFM4BD43383DKV (Le Miserable button_press)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GIFM4BD43383DKV (Le Miserable button_press)"
    ]
   },
   "BUY_FOX_BRUSHING_PERMIT": {
@@ -1916,12 +2070,14 @@
   "COMEDIAN": {
    "category": "event",
    "moment": "items/catalog_buffs.js:466",
-   "uses": 1,
+   "uses": 2,
    "via": [
-    "announce_sound"
+    "announce_sound",
+    "street event"
    ],
    "sources": [
-    "gsjs:items/catalog_buffs.js:466"
+    "gsjs:items/catalog_buffs.js:466",
+    "street:GHFQOLEIHN63P27 (Radial Heights star_appear)"
    ]
   },
   "COMPLETE_QUEST_REQUIREMENT": {
@@ -2736,14 +2892,18 @@
    ]
   },
   "FLITTERBUG_COLLISION": {
-   "category": "downloads",
-   "moment": "downloads.html (Flitterbug Collision)",
-   "uses": 1,
+   "category": "event",
+   "moment": "street:GHFQOLEIHN63P27 (Radial Heights hide_cover_01)",
+   "uses": 5,
    "via": [
-    "downloads"
+    "street event"
    ],
    "sources": [
-    "downloads.html (Flitterbug Collision)"
+    "street:GHFQOLEIHN63P27 (Radial Heights hide_cover_01)",
+    "street:GNVV9IM8PL4301V (A Summer's Day flutter_wings)",
+    "street:GNVV9IM8PL4301V (A Summer's Day owl2_off)",
+    "street:GNVV9IM8PL4301V (A Summer's Day owl3_off)",
+    "street:GNVV9IM8PL4301V (A Summer's Day owl4_off)"
    ],
    "file": "assets/audio/flitterbug_collision.mp3",
    "origin": "downloads-best-fit",
@@ -3131,6 +3291,22 @@
    ],
    "url": "http://c2.glitch.bz/sounds/2011-12/1324484819-Holiday_Party_Space_Loop_2.1.mp3"
   },
+  "GLOWING_ORB_COLLIDE": {
+   "category": "event",
+   "moment": "street:GNVV9IM8PL4301V (A Summer's Day ball_1)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GNVV9IM8PL4301V (A Summer's Day ball_1)",
+    "street:GNVV9IM8PL4301V (A Summer's Day ball_3)",
+    "street:GNVV9IM8PL4301V (A Summer's Day ball_2)",
+    "street:GNVV9IM8PL4301V (A Summer's Day ball_4)",
+    "street:GNVV9IM8PL4301V (A Summer's Day dot_1)",
+    "street:GNVV9IM8PL4301V (A Summer's Day dot_2)"
+   ]
+  },
   "GOC_MUSIC_1": {
    "category": "music",
    "moment": "inc_data_sounds.js (music_map)",
@@ -3382,6 +3558,22 @@
    ],
    "sources": [
     "gsjs:items/high_class_hoe.js (tool class sound while working)"
+   ]
+  },
+  "HIT_TRIGGER_SUMMER": {
+   "category": "event",
+   "moment": "street:GHVDKQ2O6S23LVJ (Amberlyza unhide_secret1_c)",
+   "uses": 6,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHVDKQ2O6S23LVJ (Amberlyza unhide_secret1_c)",
+    "street:GHVDKQ2O6S23LVJ (Amberlyza unhide_secret1_b)",
+    "street:GHVDKQ2O6S23LVJ (Amberlyza unhide_secret1_a)",
+    "street:GNVV9IM8PL4301V (A Summer's Day button_down)",
+    "street:GNVV9IM8PL4301V (A Summer's Day water_plat_1)",
+    "street:GNVV9IM8PL4301V (A Summer's Day button2_down)"
    ]
   },
   "HOE": {
@@ -3789,6 +3981,310 @@
    "origin": "downloads-best-fit",
    "fit": "Level Up Kazoo"
   },
+  "LITTLE_STAR_1": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key19)",
+   "uses": 6,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key19)",
+    "street:GA96OS42D6F3M9P (Piano Party star1_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star20_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_1)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_1)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_34)"
+   ]
+  },
+  "LITTLE_STAR_10": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key10)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key10)",
+    "street:GA96OS42D6F3M9P (Piano Party star10_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star29_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_11)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_11)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_26)"
+   ]
+  },
+  "LITTLE_STAR_11": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key9)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key9)",
+    "street:GA96OS42D6F3M9P (Piano Party star11_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star30_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_13)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_13)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_04)"
+   ]
+  },
+  "LITTLE_STAR_12": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key8)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key8)",
+    "street:GA96OS42D6F3M9P (Piano Party star12_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star31_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_12)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_12)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_03)"
+   ]
+  },
+  "LITTLE_STAR_13": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key7)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key7)",
+    "street:GA96OS42D6F3M9P (Piano Party star13_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star32_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_14)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_14)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_02)"
+   ]
+  },
+  "LITTLE_STAR_14": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key6)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key6)",
+    "street:GA96OS42D6F3M9P (Piano Party star14_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star33_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_15)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_15)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_24)"
+   ]
+  },
+  "LITTLE_STAR_15": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key5)",
+   "uses": 6,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key5)",
+    "street:GA96OS42D6F3M9P (Piano Party star15_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star34_on)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_44)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_48)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_52)"
+   ]
+  },
+  "LITTLE_STAR_16": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key4)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key4)",
+    "street:GA96OS42D6F3M9P (Piano Party star16_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_17)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_17)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_18)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_47)"
+   ]
+  },
+  "LITTLE_STAR_17": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key3)",
+   "uses": 6,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key3)",
+    "street:GA96OS42D6F3M9P (Piano Party star17_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_18)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_18)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_19)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_23)"
+   ]
+  },
+  "LITTLE_STAR_18": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key2)",
+   "uses": 6,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key2)",
+    "street:GA96OS42D6F3M9P (Piano Party star18_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_19)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_19)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_22)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_46)"
+   ]
+  },
+  "LITTLE_STAR_19": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key1)",
+   "uses": 6,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key1)",
+    "street:GA96OS42D6F3M9P (Piano Party star19_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_21)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_21)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_20)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_50)"
+   ]
+  },
+  "LITTLE_STAR_2": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key18)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key18)",
+    "street:GA96OS42D6F3M9P (Piano Party star2_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star21_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_2)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_2)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_10)"
+   ]
+  },
+  "LITTLE_STAR_3": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key17)",
+   "uses": 9,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key17)",
+    "street:GA96OS42D6F3M9P (Piano Party star3_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star22_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_3)",
+    "street:GHFCS002GN63BRB (Starlit Night star_23)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_3)"
+   ]
+  },
+  "LITTLE_STAR_4": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key16)",
+   "uses": 9,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key16)",
+    "street:GA96OS42D6F3M9P (Piano Party star4_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star23_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_4)",
+    "street:GHFCS002GN63BRB (Starlit Night star_24)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_4)"
+   ]
+  },
+  "LITTLE_STAR_5": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key15)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key15)",
+    "street:GA96OS42D6F3M9P (Piano Party star5_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star24_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_5)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_5)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_07)"
+   ]
+  },
+  "LITTLE_STAR_6": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key14)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key14)",
+    "street:GA96OS42D6F3M9P (Piano Party star6_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star25_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_6)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_6)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_12)"
+   ]
+  },
+  "LITTLE_STAR_7": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key13)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key13)",
+    "street:GA96OS42D6F3M9P (Piano Party star7_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star26_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_7)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_7)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_06)"
+   ]
+  },
+  "LITTLE_STAR_8": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key12)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key12)",
+    "street:GA96OS42D6F3M9P (Piano Party star8_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star27_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_8)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_8)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_28)"
+   ]
+  },
+  "LITTLE_STAR_9": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party key11)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party key11)",
+    "street:GA96OS42D6F3M9P (Piano Party star9_on)",
+    "street:GA96OS42D6F3M9P (Piano Party star28_on)",
+    "street:GHFCS002GN63BRB (Starlit Night star_9)",
+    "street:GHFCVOD2GN631RJ (Starlit Night star_9)",
+    "street:GHFQOLEIHN63P27 (Radial Heights show_star_14)"
+   ]
+  },
   "LONELINESS_FIREWORKS": {
    "category": "event",
    "moment": "items/include/loneliness.js:366 (lonelinessEndPartyOverlay)",
@@ -3837,6 +4333,72 @@
    ],
    "sources": [
     "gsjs:players/inc_making.js:677 (tryToMake)"
+   ]
+  },
+  "MB_B1": {
+   "category": "event",
+   "moment": "street:GA512IH5226256P (Gaare Grims s1)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA512IH5226256P (Gaare Grims s1)"
+   ]
+  },
+  "MB_B2": {
+   "category": "event",
+   "moment": "street:GA512IH5226256P (Gaare Grims s5)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA512IH5226256P (Gaare Grims s5)"
+   ]
+  },
+  "MB_C2": {
+   "category": "event",
+   "moment": "street:GA512IH5226256P (Gaare Grims s2)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA512IH5226256P (Gaare Grims s2)"
+   ]
+  },
+  "MB_E2": {
+   "category": "event",
+   "moment": "street:GA512IH5226256P (Gaare Grims s3)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA512IH5226256P (Gaare Grims s3)"
+   ]
+  },
+  "MB_F2": {
+   "category": "event",
+   "moment": "street:GHVECS766MC3LHP (Distant End spawnq)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHVECS766MC3LHP (Distant End spawnq)"
+   ]
+  },
+  "MB_G2": {
+   "category": "event",
+   "moment": "street:GA512IH5226256P (Gaare Grims s4)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA512IH5226256P (Gaare Grims s4)"
    ]
   },
   "MEDITATION_SUCCESS": {
@@ -3918,6 +4480,22 @@
    ],
    "sources": [
     "remake (One pick strike on a rock)"
+   ]
+  },
+  "MOON_APPEARS": {
+   "category": "event",
+   "moment": "street:GA96OS42D6F3M9P (Piano Party moon_show)",
+   "uses": 6,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GA96OS42D6F3M9P (Piano Party moon_show)",
+    "street:GHFCS002GN63BRB (Starlit Night exit_message)",
+    "street:GHFCS002GN63BRB (Starlit Night exit_message2)",
+    "street:GHFCVOD2GN631RJ (Starlit Night exit_message)",
+    "street:GHFCVOD2GN631RJ (Starlit Night exit_message2)",
+    "street:GHFQOLEIHN63P27 (Radial Heights moon_appear)"
    ]
   },
   "MOONWALK": {
@@ -4413,6 +4991,22 @@
    "file": "assets/audio/new_day_fanfare.mp3",
    "origin": "downloads-best-fit",
    "fit": "stand-in fanfare until the rooster is recovered"
+  },
+  "NEWXP_YOU": {
+   "category": "event",
+   "moment": "street:GNVD57N9ERF3TNH (The Greedy Street Spirit act1_button1_down)",
+   "uses": 21,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GNVD57N9ERF3TNH (The Greedy Street Spirit act1_button1_down)",
+    "street:GNVD57N9ERF3TNH (The Greedy Street Spirit act1_button2_down)",
+    "street:GNVD57N9ERF3TNH (The Greedy Street Spirit act1_button3_down)",
+    "street:GNVD57N9ERF3TNH (The Greedy Street Spirit act2_button1_down)",
+    "street:GNVD57N9ERF3TNH (The Greedy Street Spirit act2_button2_down)",
+    "street:GNVD57N9ERF3TNH (The Greedy Street Spirit act2_button3_down)"
+   ]
   },
   "NIBBLE_PIGGY": {
    "category": "animal",
@@ -5522,6 +6116,18 @@
     "gsjs:items/npc_piggy.js:1662 (onNibbleComplete)"
    ]
   },
+  "RESET_TRIGGER_SUMMER": {
+   "category": "event",
+   "moment": "street:GNVV9IM8PL4301V (A Summer's Day button_up)",
+   "uses": 2,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GNVV9IM8PL4301V (A Summer's Day button_up)",
+    "street:GNVV9IM8PL4301V (A Summer's Day button2_up)"
+   ]
+  },
   "REVEAL_1": {
    "category": "event",
    "moment": "locations/location.js:4556 (doIncantationsFeat)",
@@ -6396,6 +7002,38 @@
     "gsjs:items/super_scraper.js (tool class sound while working)"
    ]
   },
+  "SWITCH_PRESS_BLOOIAN": {
+   "category": "event",
+   "moment": "street:GHVP8TCLT40336S (Blooian depn_swch_1)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHVP8TCLT40336S (Blooian depn_swch_1)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_2_down)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_3_down)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_4_down)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_5_down)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_6_down)"
+   ]
+  },
+  "SWITCH_RESET_BLOOIAN": {
+   "category": "event",
+   "moment": "street:GHVP8TCLT40336S (Blooian depn_swch_1_up)",
+   "uses": 7,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHVP8TCLT40336S (Blooian depn_swch_1_up)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_2_up)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_3_up)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_4_up)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_5_up)",
+    "street:GHVP8TCLT40336S (Blooian depn_swch_6_up)"
+   ]
+  },
   "TALK_FROG": {
    "category": "animal",
    "moment": "items/npc_yoga_frog.js:221 (dialog_onMsg)",
@@ -6441,14 +7079,16 @@
    ]
   },
   "TELEPORTER_VISIBLE_APPEAR": {
-   "category": "travel",
+   "category": "event",
    "moment": "players/inc_party.js:513 (party_create_teleporter)",
-   "uses": 1,
+   "uses": 2,
    "via": [
-    "announce_sound"
+    "announce_sound",
+    "street event"
    ],
    "sources": [
-    "gsjs:players/inc_party.js:513 (party_create_teleporter)"
+    "gsjs:players/inc_party.js:513 (party_create_teleporter)",
+    "street:GIFM4BD43383DKV (Le Miserable win_condition)"
    ]
   },
   "TELEPORTER_VISIBLE_DISAPPEARS": {
@@ -6466,14 +7106,16 @@
    ]
   },
   "TELEPORTER_VISIBLE_PORTAL": {
-   "category": "travel",
+   "category": "event",
    "moment": "players/inc_party.js:514 (party_create_teleporter)",
-   "uses": 1,
+   "uses": 2,
    "via": [
-    "announce_sound"
+    "announce_sound",
+    "street event"
    ],
    "sources": [
-    "gsjs:players/inc_party.js:514 (party_create_teleporter)"
+    "gsjs:players/inc_party.js:514 (party_create_teleporter)",
+    "street:GIFM4BD43383DKV (Le Miserable win_condition)"
    ]
   },
   "TEST": {
@@ -6487,6 +7129,22 @@
     "gsjs:inc_data_sounds.js (music_map)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-06/1339778284-Glowing_Orb_Summer_2.2.mp3"
+  },
+  "TEST_SOUND": {
+   "category": "event",
+   "moment": "street:GIFM4BD43383DKV (Le Miserable p1_sounds_a1)",
+   "uses": 15,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GIFM4BD43383DKV (Le Miserable p1_sounds_a1)",
+    "street:GIFM4BD43383DKV (Le Miserable p1_sounds_a2)",
+    "street:GIFM4BD43383DKV (Le Miserable p1_sounds_a3)",
+    "street:GIFM4BD43383DKV (Le Miserable p2_sounds_a1)",
+    "street:GIFM4BD43383DKV (Le Miserable p2_sounds_a2)",
+    "street:GIFM4BD43383DKV (Le Miserable p2_sounds_a3)"
+   ]
   },
   "TEST_TUBE": {
    "category": "tool",
@@ -6845,14 +7503,15 @@
    ]
   },
   "WATER_SPLASH": {
-   "category": "recovered",
+   "category": "event",
    "moment": "Recovered c2 file with no surviving key; a water splash (2012-06, the Paradise / Summer's Day era)",
-   "uses": 1,
+   "uses": 2,
    "via": [
-    "wayback"
+    "street event"
    ],
    "sources": [
-    "wayback:http://c2.glitch.bz/sounds/2012-06/1339778251-Water_Splash_1.1.mp3 (filename)"
+    "street:GNVV9IM8PL4301V (A Summer's Day set_phys)",
+    "street:GUV174V0QUB3JT4 (Ambu Jal sound_splash)"
    ],
    "url": "http://c2.glitch.bz/sounds/2012-06/1339778251-Water_Splash_1.1.mp3",
    "file": "assets/audio/sfx/WATER_SPLASH.mp3",
@@ -7038,6 +7697,106 @@
    ],
    "url": "http://c2.glitch.bz/sounds/2011-12/1324484819-Holiday_Party_Space_Loop_2.1.mp3"
   },
+  "WM_A1": {
+   "category": "event",
+   "moment": "street:GHFIEG6R1JD30UH (Ding a Lingers note_2)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHFIEG6R1JD30UH (Ding a Lingers note_2)"
+   ]
+  },
+  "WM_A2": {
+   "category": "event",
+   "moment": "street:GHFIEG6R1JD30UH (Ding a Lingers note_6)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHFIEG6R1JD30UH (Ding a Lingers note_6)"
+   ]
+  },
+  "WM_B2": {
+   "category": "event",
+   "moment": "street:GHFIEG6R1JD30UH (Ding a Lingers note_7)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHFIEG6R1JD30UH (Ding a Lingers note_7)"
+   ]
+  },
+  "WM_C2": {
+   "category": "event",
+   "moment": "street:GHFIEG6R1JD30UH (Ding a Lingers note_3)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHFIEG6R1JD30UH (Ding a Lingers note_3)"
+   ]
+  },
+  "WM_D1": {
+   "category": "event",
+   "moment": "street:GHV88RQU60B3Q0G (Lotha Harte first_note)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHV88RQU60B3Q0G (Lotha Harte first_note)"
+   ]
+  },
+  "WM_D2": {
+   "category": "event",
+   "moment": "street:GHV88RQU60B3Q0G (Lotha Harte second_note)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHV88RQU60B3Q0G (Lotha Harte second_note)"
+   ]
+  },
+  "WM_E2": {
+   "category": "event",
+   "moment": "street:GHFIEG6R1JD30UH (Ding a Lingers note_4)",
+   "uses": 2,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHFIEG6R1JD30UH (Ding a Lingers note_4)",
+    "street:GHV88RQU60B3Q0G (Lotha Harte third_note)"
+   ]
+  },
+  "WM_G1": {
+   "category": "event",
+   "moment": "street:GHFIEG6R1JD30UH (Ding a Lingers note_1)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHFIEG6R1JD30UH (Ding a Lingers note_1)"
+   ]
+  },
+  "WM_G2": {
+   "category": "event",
+   "moment": "street:GHFIEG6R1JD30UH (Ding a Lingers note_5)",
+   "uses": 1,
+   "via": [
+    "street event"
+   ],
+   "sources": [
+    "street:GHFIEG6R1JD30UH (Ding a Lingers note_5)"
+   ]
+  },
   "XAVIER_CARNIVOROUS_PLANTS": {
    "category": "music",
    "moment": "inc_data_sounds.js (music_map)",
@@ -7075,12 +7834,16 @@
   "YOU_TAKE_CROWN": {
    "category": "event",
    "moment": "Game of Crowns: you take the crown",
-   "uses": 1,
+   "uses": 4,
    "via": [
-    "announce_sound"
+    "announce_sound",
+    "street event"
    ],
    "sources": [
-    "gsjs:players/inc_games.js:447 (games_is_it)"
+    "gsjs:players/inc_games.js:447 (games_is_it)",
+    "street:GIFM4BD43383DKV (Le Miserable p1_sounds_b)",
+    "street:GIFM4BD43383DKV (Le Miserable p2_sounds_b)",
+    "street:GIFM4BD43383DKV (Le Miserable p3_sounds_b)"
    ]
   },
   "YOU_WIN": {

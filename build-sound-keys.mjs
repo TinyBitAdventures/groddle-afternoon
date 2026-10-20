@@ -6,6 +6,7 @@
  *                               class-named tool/musicblock sounds, music_map
  *   glitch-client/**.as         SoundMaster.playSound('KEY'), sound_id = 'KEY',
  *                               tween onStartParams:['KEY']
+ *   public/assets/streets/G*.json  street event play_sound names
  *
  * Writes:
  *   public/assets/content/sound-keys.json   every key: category, in-game moment,
@@ -315,6 +316,22 @@ for (let n = 1; n <= 7; n += 1) note(`CARD_DEAL${n}`, { category: 'ui', where: '
 note('FLIP_OVER', { category: 'ui', where: 'client:com/tinyspeck/engine/view/ui/imagination/ImgCardUI.as:540', context: 'flip', via: 'client' });
 note('Prisencolinensinainciusol', { category: 'ui', where: 'client:TSEngineAssets/src/Assets.as:8', context: 'embedded easter egg', via: 'embedded' });
 note('trumpet', { category: 'ui', where: 'client:TSEngineAssets/src/Assets.as:10', context: 'embedded', via: 'embedded' });
+
+// —— Street event scripts (L*.xml `events` play_sound, in assets/streets) ——
+// Puzzle streets name their own sounds (Piano Party's LITTLE_STAR_1-19 and
+// BIG_STAR_1-12, MOON_APPEARS, Blooian's SWITCH_PRESS/RESET_BLOOIAN, ...).
+{
+  const streetsDir = join(PUBLIC, 'assets/streets');
+  for (const file of existsSync(streetsDir) ? readdirSync(streetsDir).filter((f) => /^G[A-Z0-9]+\.json$/.test(f)).sort() : []) {
+    const street = JSON.parse(readFileSync(join(streetsDir, file), 'utf8'));
+    for (const [name, actions] of Object.entries(street.events || {})) {
+      for (const act of actions) {
+        if (act.type !== 'play_sound' || !act.name) continue;
+        note(act.name, { category: 'event', where: `street:${street.tsid}`, context: `${street.label || ''} ${name}`.trim(), via: 'street event' });
+      }
+    }
+  }
+}
 
 // —— Remake-only keys (moments the remake has that never had their own key) ——
 const REMAKE = {
