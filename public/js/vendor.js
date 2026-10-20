@@ -199,7 +199,7 @@ export function vendorBuy(pc, inv, offers, classTsid, qty = 1) {
     classTsid,
     qty: amount,
     cost,
-    msgs: [`Bought ${amount}× ${offer.label} for ${cost} currants.`],
+    msgs: [`Bought ${amount}× ${offer.label} for ${cost} ${cost === 1 ? 'currant' : 'currants'}.`],
     packCount: countItem(inv, classTsid),
     currants: pc.currants,
   };
@@ -244,7 +244,7 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1) {
     classTsid,
     qty: amount,
     gain,
-    msgs: [`Sold ${amount}× ${label} for ${gain} currants.`],
+    msgs: [`Sold ${amount}× ${label} for ${gain} ${gain === 1 ? 'currant' : 'currants'}.`],
     packCount: countItem(inv, classTsid),
     currants: pc.currants,
   };

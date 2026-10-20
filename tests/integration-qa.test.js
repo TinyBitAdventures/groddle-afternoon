@@ -66,4 +66,15 @@ test.describe('integration playtest regressions', () => {
     assert.match(css, /\.map-panel \{[^}]*bottom: var\(--pack-live-height, 112px\)/);
     assert.match(css, /\.glitch-modal \{[^}]*bottom: var\(--pack-live-height, 105px\)/);
   });
+
+  test('vendor receipts say "1 currant"', async () => {
+    const { vendorSell } = await import('../public/js/vendor.js');
+    const { createInventory } = await import('../public/js/inventory.js?v=catalog-unified-3');
+    const inv = createInventory();
+    inv.apple = 1;
+    const pc = { currants: 0 };
+    const r = vendorSell(pc, inv, [{ classTsid: 'apple', label: 'Apple', price: 2 }], 'apple', 1);
+    assert.ok(r.ok, JSON.stringify(r));
+    assert.match(r.msgs[0], /for 1 currant\.$/);
+  });
 });
