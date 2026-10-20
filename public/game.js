@@ -334,6 +334,8 @@ import { skillTitle, spendEmblemForSkill } from './js/skill-tree.js';
 import { renderSkillTreePanel, focusSkillInPanel } from './js/skills-panel.js';
 import {
   createBuffState,
+  applyBuff,
+  extendBuff,
   removeBuff,
   listActiveBuffs,
   listPendingBuffs,
@@ -3104,6 +3106,12 @@ function usePackItem(classTsid) {
   }
   if (classTsid === LEGALIZE_CARD_ID) {
     activateLegalizeCard();
+    return;
+  }
+  // A feature may refuse an eat/use (seasonal candy's daily toothache limit).
+  const useGate = features.query('packUseGate', classTsid, engine);
+  if (useGate && useGate.ok === false) {
+    toast(useGate.msg || 'Not right now.');
     return;
   }
   const buffInfo = getBuffItemInfo(classTsid);
@@ -6405,6 +6413,23 @@ const engine = {
   },
   activeBuffIds() {
     return Object.keys(buffState.active || {});
+  },
+  /** Whether a buff is running (catalog id). */
+  hasBuff: (classTsid) => hasBuff(buffState, classTsid, Date.now()),
+  /**
+   * Apply a catalog buff from a feature (seasonal treats); with `extendMs`
+   * an already-running buff is lengthened instead (buffs_extend_time).
+   */
+  applyBuff(classTsid, { extendMs = 0 } = {}) {
+    const now = Date.now();
+    if (extendMs > 0 && hasBuff(buffState, classTsid, now)) {
+      const res = extendBuff(buffState, classTsid, extendMs, now);
+      updateHud();
+      return res;
+    }
+    const res = applyBuff(buffState, classTsid, pc, now);
+    if (res.ok) handleBuffEvents([{ type: 'activated', classTsid, buff: res.buff, effects: res.effects || {} }]);
+    return res;
   },
   award: (payload) => enqueueAward(payload),
   busy() {
@@ -17103,6 +17128,8 @@ async function enterStreet(tsid, opts = {}) {
       store: STREET_INDEX.streets?.[currentStreetTsid]?.store,
     }
   );
+  // Seasonal stock (Glitchmas Crackers and Cards) comes and goes with the calendar.
+  activeVendor = features.query('vendorProfile', activeVendor, engine) || activeVendor;
   const reserved = (data.signposts || []).map((signpost, index) => {
     const point = worldToScreen(data, signpost.x, signpost.y);
     return { ...point, key: `signpost:${index}`, clearance: 100 };

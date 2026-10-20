@@ -239,8 +239,46 @@ function applyTickEffect(row, pc) {
     const before = Number(pc.energy) || 0;
     pc.energy = clamp(before + (Number(row.args?.energy) || 5), 0, energyCap(pc));
     if (pc.energy !== before) effects.energy = pc.energy - before;
+  } else if (HOLIDAY_TICKS[row.classTsid]) {
+    // catalog_buffs.js on_tick for the seasonal treats (js/seasons.js).
+    const tick = HOLIDAY_TICKS[row.classTsid];
+    const beforeEnergy = Number(pc.energy) || 0;
+    const beforeMood = Number(pc.mood) || 0;
+    if (tick.energy) pc.energy = clamp(beforeEnergy + tick.energy, 0, energyCap(pc));
+    if (tick.mood) pc.mood = clamp(beforeMood + tick.mood, 0, 100);
+    if (tick.xp) {
+      pc.imagination = (Number(pc.imagination) || 0) + tick.xp;
+      pc.xp = (Number(pc.xp) || 0) + tick.xp;
+      effects.xp = tick.xp;
+    }
+    if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
+    if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
   }
   return effects;
+}
+
+/**
+ * Seasonal buffs' on_tick (catalog_buffs.js): Sugar Rush +7 mood, Smug
+ * Healthy Glow +11 energy, Chocolate High +30 mood/+20 energy/+5 iMG, Full of
+ * Pie +20/+20, Sugar Crash -20 mood/-10 energy.
+ */
+const HOLIDAY_TICKS = Object.freeze({
+  sugar_rush: { mood: 7 },
+  smug_healthy_glow: { energy: 11 },
+  chocolate_high: { mood: 30, energy: 20, xp: 5 },
+  full_of_pie: { mood: 20, energy: 20 },
+  sugar_crash: { mood: -20, energy: -10 },
+});
+
+/** Chocolate High's on_remove applies Sugar Crash. */
+const ON_EXPIRE = Object.freeze({ chocolate_high: 'sugar_crash' });
+
+/** Lengthen an active buff (buffs_extend_time), e.g. Sugar Rush per extra candy. */
+export function extendBuff(state, classTsid, ms, now = Date.now()) {
+  const row = activeRows(state)[classTsid];
+  if (!row || row.expiresAt == null) return { ok: false, reason: 'not_active' };
+  row.expiresAt = Math.max(row.expiresAt, now) + Math.max(0, Number(ms) || 0);
+  return { ok: true, buff: row };
 }
 
 /** Advance delayed starts, exact catalog ticks, and expiration. */
@@ -277,6 +315,11 @@ export function tickBuffs(state, pc, now = Date.now()) {
     if (row.expiresAt != null && row.expiresAt <= now) {
       delete state.active[classTsid];
       events.push({ type: 'expired', classTsid, buff: row, effects: {} });
+      const follow = ON_EXPIRE[classTsid];
+      if (follow) {
+        const applied = applyBuff(state, follow, pc, now);
+        if (applied.ok) events.push({ type: 'activated', classTsid: follow, buff: applied.buff, effects: applied.effects || {} });
+      }
     }
   }
   syncPcBuffFlags(state, pc, now);
@@ -287,6 +330,12 @@ export function tickBuffs(state, pc, now = Date.now()) {
 export function buffPhysics(state, now = Date.now()) {
   const result = { speed: 1, jump: 1, gravity: 1 };
   if (hasBuff(state, 'hairball_flower', now)) result.speed *= 1.1;
+  // Sugar Rush vx_max 1.05; Full of Pie vx_max 0.6, vy_jump 0.7.
+  if (hasBuff(state, 'sugar_rush', now)) result.speed *= 1.05;
+  if (hasBuff(state, 'full_of_pie', now)) {
+    result.speed *= 0.6;
+    result.jump *= 0.7;
+  }
   if (hasBuff(state, 'high_jumper', now)) {
     result.speed *= 1.7;
     result.jump *= 1.5;

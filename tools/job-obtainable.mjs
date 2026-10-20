@@ -19,7 +19,10 @@
  *    tank, js/machines.js), garden seeds into crops, pack transforms
  *    (js/item-transforms.js: butter, cheese, herb seeds), Piggy Plop from
  *    crops, egg incubation, Herdkeeping capture, machine assembly
- *    from a Machine Stand and parts, the Still's Hooch, and Paper into Notes
+ *    from a Machine Stand and parts, the Still's Hooch, Paper into Notes, and
+ *    the holiday paths in js/seasons.js (Zilloween pumpkin carving makes
+ *    Pepitas; Jack-O-Lantern treats, Glitchmas stock and Egg Hunt eggs only
+ *    run while their event is on)
  *
  * A tool counts as held only when one of those sources gives it.
  * Node only (reads recipes.json from disk).
@@ -87,6 +90,9 @@ export async function supplyConversions() {
     rows.push({ inputs: [egg], tool: null, outputs: [baby], source: 'incubation' });
   }
   rows.push({ inputs: [husbandry.HERDKEEPING.bait], tool: null, outputs: ['hogtied_piggy'], source: 'herdkeeping' });
+  // Seasonal (js/seasons.js): Zilloween pumpkin carving (Pepitas), smashing, lighting; Glitchmas unwraps.
+  const seasons = await import(js('seasons.js'));
+  rows.push(...seasons.seasonalConversions());
   return rows;
 }
 
@@ -118,6 +124,9 @@ export async function obtainableItems() {
   for (const item of foxes.FOX_RANGER_STORE.items) add(item.classTsid, 'vendor:fox_ranger');
   // Bureaucratic Hall clerks (supply feature), after the Legalize It card.
   for (const id of Object.keys(bureaucracy.BUREAUCRACY_ITEMS)) add(id, 'vendor:bureaucracy');
+  // Holiday-only sources (js/seasons.js): Jack-O-Lantern treats, Glitchmas stock and quest, Egg Hunt eggs.
+  const seasons = await import(js('seasons.js'));
+  for (const [id, source] of seasons.seasonalSources()) add(id, source);
 
   const starterTools = [
     ...making.STARTER_TOOL_IDS,

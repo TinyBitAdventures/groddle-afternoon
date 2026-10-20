@@ -31,6 +31,7 @@ import { dropsFeature } from './drops-feature.js?v=drops-1';
 import { masterGardenFeature } from './master-garden-feature.js?v=mastergarden-1';
 import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=husbandry-1';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-1';
+import { seasonsFeature } from './seasons-feature.js?v=seasons-1';
 
 export { questFlagsFeature };
 
@@ -62,4 +63,5 @@ export const FEATURES = [
   masterGardenFeature,
   animalHusbandryFeature,
   partySpacesFeature,
+  seasonsFeature,
 ];

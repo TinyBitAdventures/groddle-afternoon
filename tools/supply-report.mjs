@@ -37,6 +37,7 @@ export const FEATURE_NEEDS = Object.freeze({
   'hog-haul': ['pig_bait'],
   'rook-woods': ['pick'],
   machines: ['machine_stand', 'fuel_cell'],
+  seasons: ['pumpkin', 'knife_and_board', 'firefly_jar', 'glitchmas_cracker', 'egg_plain'],
 });
 
 export async function supplyReport() {

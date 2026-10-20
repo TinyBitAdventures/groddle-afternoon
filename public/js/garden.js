@@ -605,6 +605,26 @@ export function tickGarden(garden, now = Date.now()) {
 }
 
 /**
+ * Seasonal seeds (seed_base getDescExtras: "This item is seasonal. It can
+ * only be grown during the appropriate holidays."): Pumpkin Seeds plant only
+ * during Zilloween. js/features/seasons-feature.js installs the season test;
+ * until it does every seed is in season.
+ */
+export const SEASONAL_SEEDS = Object.freeze({ seed_pumpkin: 'zilloween' });
+let seasonalSeedCheck = () => true;
+
+/** @param {(seedId: string, season: string) => boolean} fn */
+export function setSeasonalSeedCheck(fn) {
+  seasonalSeedCheck = typeof fn === 'function' ? fn : () => true;
+}
+
+/** Whether a seed may be planted today. */
+export function seedInSeason(seedId) {
+  const season = SEASONAL_SEEDS[seedId];
+  return !season || seasonalSeedCheck(seedId, season) !== false;
+}
+
+/**
  * Seeds in pack that match this garden type (crop vs herb).
  * @param {import('./inventory.js').Inventory} inv
  * @param {'default'|'herb'|string} [gardenType='default']
@@ -614,7 +634,7 @@ export function listPlantableSeeds(inv, gardenType = 'default') {
   ensureGardenItems();
   const want = gardenType === 'herb' ? 'herb' : 'default';
   return Object.values(SEED_CATALOG).filter(
-    (s) => s.gardenType === want && countItem(inv, s.seedId) > 0
+    (s) => s.gardenType === want && countItem(inv, s.seedId) > 0 && seedInSeason(s.seedId)
   );
 }
 
@@ -630,7 +650,8 @@ export function pickSeedToPlant(inv, preferSeedId, gardenType = 'default') {
     preferSeedId &&
     SEED_CATALOG[preferSeedId] &&
     SEED_CATALOG[preferSeedId].gardenType === want &&
-    countItem(inv, preferSeedId) > 0
+    countItem(inv, preferSeedId) > 0 &&
+    seedInSeason(preferSeedId)
   ) {
     return SEED_CATALOG[preferSeedId];
   }
@@ -673,6 +694,13 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
   }
   const gType = garden.gardenType || 'default';
   const seed = pickSeedToPlant(inv, seedId, gType);
+  if (!seed && Object.keys(SEASONAL_SEEDS).some((id) => countItem(inv, id) > 0 && !seedInSeason(id))) {
+    return {
+      ok: false,
+      reason: 'season',
+      msgs: ['Pumpkin Seeds are seasonal. They can only be grown during Zilloween.'],
+    };
+  }
   if (!seed) {
     return {
       ok: false,
