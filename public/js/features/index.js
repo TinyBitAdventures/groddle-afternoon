@@ -28,6 +28,7 @@ import { giantIconsFeature } from './giant-icons-feature.js?v=icons-1';
 import { rubeFeature } from './rube-feature.js?v=rube-1';
 import { unlearningFeature } from './unlearning-feature.js?v=unlearn-1';
 import { dropsFeature } from './drops-feature.js?v=drops-1';
+import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=husbandry-1';
 
 export { questFlagsFeature };
 
@@ -56,4 +57,5 @@ export const FEATURES = [
   rubeFeature,
   unlearningFeature,
   dropsFeature,
+  animalHusbandryFeature,
 ];

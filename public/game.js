@@ -374,6 +374,7 @@ import {
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
 import { listAnimalFeedOptions } from './js/animals.js?v=butterfly-care-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=butterfly-care-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -1086,6 +1087,9 @@ let menuTarget = null;
 /** Target-item chooser state for the original Feed → "Feed what?" flow. */
 let feedPickerTarget = null;
 let feedPickerOptions = [];
+/** Target-item verb the picker serves (feed, incubate, deposit) and the stack awaiting a count. */
+let feedPickerVerb = 'feed';
+let feedPickerQtyFood = null;
 /** Keep keyboard interaction on the just-used entity through short overlap ambiguity. */
 let recentInteractionTarget = null;
 let recentInteractionUntil = 0;
@@ -4213,6 +4217,8 @@ function openVerbMenu(target) {
     tools: toolState,
     skills: skillState,
     learned: skillState.learned,
+    imaginationUpgrades: pc.imaginationUpgrades || [],
+    streetTsid: currentStreetTsid,
   });
   const menu = document.getElementById('verb-menu');
   const list = document.getElementById('verb-menu-list');
@@ -4244,7 +4250,7 @@ function openVerbMenu(target) {
       if (!firstEnabled) firstEnabled = btn;
       btn.addEventListener('click', () => {
         closeVerbMenu();
-        if (v.id === 'feed') openFeedPicker(target);
+        if (v.id === 'feed' || v.picker) openFeedPicker(target, v);
         else beginVerbAction(target, v);
       });
     }
@@ -4284,16 +4290,89 @@ function markFeedPickerChoice(button) {
 function closeFeedPicker(result = 'cancelled') {
   const panel = document.getElementById('feed-picker');
   if (panel) panel.hidden = true;
+  showFeedPickerQty(null);
   feedPickerTarget = null;
   feedPickerOptions = [];
   if (app?.view && result) app.view.dataset.feedPickerResult = result;
+}
+
+/** Eligible stacks for the picker's verb (Feed keeps the original animal list). */
+function feedPickerChoices(target, verbId = feedPickerVerb) {
+  return verbId === 'feed'
+    ? listAnimalFeedOptions(target.classId, inv)
+    : pickerOptionsFor(target.classId, verbId, inv);
+}
+
+const FEED_PICKER_TITLES = { feed: 'Feed what?', incubate: 'Incubate what?', deposit: 'Deposit what?' };
+const FEED_PICKER_VERB_LABELS = { feed: 'Feed', incubate: 'Incubate', deposit: 'Deposit' };
+
+/** requires_target_item_count: the second step asks how many of the chosen stack. */
+function showFeedPickerQty(food) {
+  const grid = document.getElementById('feed-picker-grid');
+  const qty = document.getElementById('feed-picker-qty');
+  feedPickerQtyFood = food || null;
+  if (grid) grid.hidden = Boolean(food);
+  const hint = document.getElementById('feed-picker-hint');
+  if (hint) {
+    hint.textContent = food
+      ? 'Enter confirms · arrow keys change how many · Esc cancels'
+      : 'Enter selects · arrow keys move · Esc cancels';
+  }
+  if (!qty) return;
+  qty.hidden = !food;
+  if (!food) return;
+  const max = Math.max(1, pickerMaxCount(feedPickerTarget?.classId, food.classTsid, inv));
+  const input = document.getElementById('feed-picker-qty-input');
+  const icon = document.getElementById('feed-picker-qty-icon');
+  const label = document.getElementById('feed-picker-qty-label');
+  if (icon) icon.src = ITEM_ICONS[food.classTsid] || `assets/sprites/icons/${food.classTsid}.png`;
+  if (label) label.textContent = `${food.label} · ${food.have} in your pack`;
+  if (input) {
+    input.max = String(max);
+    input.value = '1';
+  }
+  setFeedPickerQty(1);
+  requestAnimationFrame(() => document.getElementById('feed-picker-qty-go')?.focus({ preventScroll: true }));
+}
+
+function setFeedPickerQty(value) {
+  const food = feedPickerQtyFood;
+  if (!food) return 1;
+  const max = Math.max(1, pickerMaxCount(feedPickerTarget?.classId, food.classTsid, inv));
+  const n = clamp(Math.floor(Number(value) || 1), 1, max);
+  const input = document.getElementById('feed-picker-qty-input');
+  const go = document.getElementById('feed-picker-qty-go');
+  if (input) input.value = String(n);
+  if (go) go.textContent = `${FEED_PICKER_VERB_LABELS[feedPickerVerb] || 'Feed'} ${n}`;
+  if (app?.view) app.view.dataset.feedPickerCount = String(n);
+  return n;
+}
+
+function confirmFeedPickerQty() {
+  const food = feedPickerQtyFood;
+  if (!food) return false;
+  const n = setFeedPickerQty(document.getElementById('feed-picker-qty-input')?.value);
+  return commitFeedPick(food.classTsid, n);
 }
 
 function chooseFeedPickerItem(classTsid) {
   const target = feedPickerTarget;
   const food = feedPickerOptions.find((option) => option.classTsid === classTsid);
   if (!target || !food || currentAction) return false;
-  const stillAvailable = listAnimalFeedOptions(target.classId, inv)
+  if (pickerTakesCount(target.classId, feedPickerVerb) && pickerMaxCount(target.classId, classTsid, inv) > 1) {
+    if (app?.view) app.view.dataset.feedPickerSelection = classTsid;
+    showFeedPickerQty(food);
+    return true;
+  }
+  return commitFeedPick(classTsid, 1);
+}
+
+function commitFeedPick(classTsid, count = 1) {
+  const target = feedPickerTarget;
+  const verbId = feedPickerVerb;
+  const food = feedPickerOptions.find((option) => option.classTsid === classTsid);
+  if (!target || !food || currentAction) return false;
+  const stillAvailable = feedPickerChoices(target, verbId)
     .some((option) => option.classTsid === classTsid);
   if (!stillAvailable) {
     closeFeedPicker('missing');
@@ -4302,27 +4381,36 @@ function chooseFeedPickerItem(classTsid) {
   }
   if (app?.view) app.view.dataset.feedPickerSelection = classTsid;
   closeFeedPicker('selected');
+  const counted = pickerTakesCount(target.classId, verbId);
   return beginVerbAction(target, {
-    id: `feed:${classTsid}`,
-    label: `feed ${food.label}`,
+    id: counted ? `${verbId}:${classTsid}:${count}` : `${verbId}:${classTsid}`,
+    label: `${verbId} ${counted && count > 1 ? `${count} ` : ''}${food.label}`,
+    ...(target.featureId ? { durationMs: 0 } : {}),
   });
 }
 
-function openFeedPicker(target) {
+function openFeedPicker(target, verb = null) {
   if (!target || currentAction) return false;
   const panel = document.getElementById('feed-picker');
   const grid = document.getElementById('feed-picker-grid');
   const sub = document.getElementById('feed-picker-sub');
   if (!panel || !grid || !sub) return false;
-  const options = listAnimalFeedOptions(target.classId, inv);
+  const verbId = verb?.picker || verb?.id || 'feed';
+  const options = verbId === 'feed'
+    ? listAnimalFeedOptions(target.classId, inv)
+    : pickerOptionsFor(target.classId, verbId, inv);
   if (!options.length) {
-    toast(`You don't have anything this ${target.label || 'animal'} wants to eat.`, 2800);
+    toast(verb?.emptyMsg || `You don't have anything this ${target.label || 'animal'} wants to eat.`, 2800);
     return false;
   }
 
   closePackPopover();
   feedPickerTarget = target;
   feedPickerOptions = options;
+  feedPickerVerb = verbId;
+  showFeedPickerQty(null);
+  const title = document.getElementById('feed-picker-title');
+  if (title) title.textContent = FEED_PICKER_TITLES[verbId] || 'Feed what?';
   sub.textContent = `Choose something from your pack for ${target.label || 'this animal'}.`;
   grid.innerHTML = '';
   for (const food of options) {
@@ -4333,7 +4421,7 @@ function openFeedPicker(target) {
     button.setAttribute('role', 'option');
     button.setAttribute('aria-selected', 'false');
     button.setAttribute('aria-label', `${food.label}, ${food.have} in pack`);
-    button.title = `Feed one ${food.label} · ${food.have} in your pack`;
+    button.title = `${FEED_PICKER_VERB_LABELS[verbId] || 'Feed'} ${food.label} · ${food.have} in your pack`;
 
     const image = document.createElement('img');
     image.src = ITEM_ICONS[food.classTsid] || `assets/sprites/icons/${food.classTsid}.png`;
@@ -4354,6 +4442,8 @@ function openFeedPicker(target) {
 
   panel.hidden = false;
   if (app?.view) {
+    app.view.dataset.feedPickerVerb = verbId;
+    app.view.dataset.feedPickerCount = '';
     app.view.dataset.feedPickerTarget = target.classId;
     app.view.dataset.feedPickerOptions = options.map((option) => option.classTsid).join(',');
     app.view.dataset.feedPickerSelection = '';
@@ -4818,6 +4908,10 @@ function executeVerb(target, verbId) {
         app.view.dataset.butterflyLotionTubes = String(inv.butterfly_lotion || 0);
       }
     }
+    // Quest counters piggy_nibble_max_reward / butterfly_milk_max_reward /
+    // chicken_squeeze_max_reward and chicken_music_block (quest-offers routes).
+    if (result.ok && care.superHarvest) emitGameEvent(`animal_max_reward:${target.classId}`);
+    if (result.ok && result.skillPackageDrop?.musicblock) emitGameEvent(`skill_package_drop:${target.classId}`);
     if (result.ok && care.superHarvest && care.itemClassTsid) {
       const bonus = Math.max(
         1,
@@ -6397,6 +6491,8 @@ const engine = {
   refreshPack: () => updateHud(),
   register,
   unregister: unregisterTarget,
+  /** The target-item chooser (Feed what? / how many) for a feature target or pack pseudo-target. */
+  openPicker: (target, verb) => openFeedPicker(target, verb),
   toast,
   pushActivity,
   updateHud,
@@ -21328,6 +21424,16 @@ async function main() {
     if (e.target.id === 'verb-menu') closeVerbMenu();
   });
   document.getElementById('feed-picker-close').addEventListener('click', () => closeFeedPicker());
+  document.getElementById('feed-picker-qty-minus')?.addEventListener('click', () => {
+    setFeedPickerQty((Number(document.getElementById('feed-picker-qty-input')?.value) || 1) - 1);
+  });
+  document.getElementById('feed-picker-qty-plus')?.addEventListener('click', () => {
+    setFeedPickerQty((Number(document.getElementById('feed-picker-qty-input')?.value) || 1) + 1);
+  });
+  document.getElementById('feed-picker-qty-max')?.addEventListener('click', () => setFeedPickerQty(Infinity));
+  document.getElementById('feed-picker-qty-input')?.addEventListener('change', (e) => setFeedPickerQty(e.target.value));
+  document.getElementById('feed-picker-qty-back')?.addEventListener('click', () => showFeedPickerQty(null));
+  document.getElementById('feed-picker-qty-go')?.addEventListener('click', () => confirmFeedPickerQty());
   document.getElementById('feed-picker').addEventListener('click', (e) => {
     if (e.target.id === 'feed-picker') closeFeedPicker();
   });
@@ -21423,6 +21529,20 @@ async function main() {
     if (currentAction) {
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'].includes(e.key)) {
         cancelCurrentAction();
+      }
+      return;
+    }
+    if (isFeedPickerOpen() && feedPickerQtyFood) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (document.activeElement?.id === 'feed-picker-qty-back') showFeedPickerQty(null);
+        else confirmFeedPickerQty();
+        return;
+      }
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        const step = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : -1;
+        setFeedPickerQty((Number(document.getElementById('feed-picker-qty-input')?.value) || 1) + step);
       }
       return;
     }

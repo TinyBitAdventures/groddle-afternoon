@@ -8,6 +8,15 @@ import {
   ensureAnimalKinshipState,
   resetAnimalKinshipDay,
 } from './animal-kinship.js?v=butterfly-care-1';
+import {
+  BABY_ANIMALS,
+  babyFoodOptions,
+  feedPiggyStack,
+  incubationEggOptions,
+  isFoodItem,
+  itemLabel,
+  itemStackMax,
+} from './animal-husbandry.js';
 
 export const ANIMAL_CLASS_IDS = Object.freeze([
   'npc_piggy',
@@ -71,10 +80,14 @@ export function createAnimalState(classId, seed = {}) {
   return ensureAnimalState(classId, { ...seed });
 }
 
+/** Classes whose Feed (or Deposit) eats any `is_food` item (npc_animal, npc_batterfly, piggy_feeder). */
+const ANY_FOOD_CLASSES = new Set(['npc_piggy', 'npc_batterfly', 'piggy_feeder']);
+
 /** Pack foods this animal will accept, in a stable player-friendly order. */
 export function listAnimalFeedOptions(classId, inv = {}) {
+  if (BABY_ANIMALS[classId]) return babyFoodOptions(classId, inv);
   const catalog = FEED_CATALOG[classId] || {};
-  return Object.entries(catalog)
+  const known = Object.entries(catalog)
     .filter(([classTsid]) => (inv[classTsid] || 0) > 0)
     .map(([classTsid, meta]) => ({
       classTsid,
@@ -82,21 +95,59 @@ export function listAnimalFeedOptions(classId, inv = {}) {
       nutrition: meta.nutrition,
       have: inv[classTsid] || 0,
     }));
+  if (!ANY_FOOD_CLASSES.has(classId)) return known;
+  // The source feeds any food (include/food.js is_food): the familiar list
+  // first, then every other food in the pack alphabetically.
+  const extra = Object.keys(inv || {})
+    .filter((classTsid) => !catalog[classTsid] && (inv[classTsid] || 0) > 0 && isFoodItem(classTsid))
+    .sort()
+    .map((classTsid) => ({ classTsid, label: itemLabel(classTsid), nutrition: 0, have: inv[classTsid] || 0 }));
+  return [...known, ...extra];
 }
 
-/** Consume one selected food and update the animal's daily care state. */
-export function feedAnimal(classId, state, inv, classTsid) {
+/** Does this target-item verb also ask how many (requires_target_item_count)? */
+export function pickerTakesCount(classId, verbId = 'feed') {
+  if (verbId === 'deposit') return classId === 'piggy_feeder';
+  return verbId === 'feed' && (classId === 'npc_piggy' || classId === 'npc_batterfly');
+}
+
+/** Most you can give at once: one stack (npc_animal feed) and what you hold. */
+export function pickerMaxCount(classId, classTsid, inv = {}) {
+  const have = Math.max(0, inv?.[classTsid] || 0);
+  return classId === 'npc_piggy' ? Math.min(have, itemStackMax(classTsid)) : have;
+}
+
+/** Choices for a target-item verb: Feed, Request incubation, Deposit. */
+export function pickerOptionsFor(classId, verbId, inv = {}) {
+  if (verbId === 'incubate') return incubationEggOptions(inv);
+  if (verbId === 'deposit') return listAnimalFeedOptions('piggy_feeder', inv);
+  return listAnimalFeedOptions(classId, inv);
+}
+
+/** Consume the selected food (one, or up to a stack for a Piggy) and update care state. */
+export function feedAnimal(classId, state, inv, classTsid, count = 1) {
   const catalog = FEED_CATALOG[classId] || {};
-  const food = catalog[classTsid];
+  const food = catalog[classTsid] || (classId === 'npc_piggy' && isFoodItem(classTsid)
+    ? { label: itemLabel(classTsid), nutrition: 0 }
+    : null);
   if (!food) return { ok: false, reason: 'not_food', msg: "That animal doesn't want to eat that." };
   if ((inv?.[classTsid] || 0) < 1) return { ok: false, reason: 'missing', msg: `You have no ${food.label}.` };
   const s = ensureAnimalState(classId, state || {});
+  if (classId === 'npc_piggy') {
+    const n = Math.max(1, Math.min(Math.floor(Number(count) || 1), pickerMaxCount(classId, classTsid, inv)));
+    inv[classTsid] -= n;
+    const fed = feedPiggyStack(s, classTsid, n);
+    s.fed = true;
+    s.feedCount = (s.feedCount || 0) + 1;
+    s.lastFed = classTsid;
+    return { ok: true, classTsid, label: food.label, nutrition: food.nutrition, count: fed.count, xp: fed.xp, plops: fed.plops, msg: fed.msg };
+  }
   inv[classTsid] -= 1;
   s.fed = true;
   s.hunger = 0;
   s.feedCount = (s.feedCount || 0) + 1;
   s.lastFed = classTsid;
-  return { ok: true, classTsid, label: food.label, nutrition: food.nutrition };
+  return { ok: true, classTsid, label: food.label, nutrition: food.nutrition, count: 1 };
 }
 
 /** Reset per-game-day limits while retaining lifetime counters. */

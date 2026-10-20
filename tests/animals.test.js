@@ -20,7 +20,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 describe('Animal Kinship daily care', () => {
   it('builds pack-backed feed choices and consumes exactly the selected food', () => {
     const state = createAnimalState('npc_piggy');
-    const inv = { apple: 2, cherry: 0, grain: 3, meat: 4 };
+    const inv = { apple: 2, cherry: 0, grain: 3, plank: 4 };
     assert.deepEqual(
       listAnimalFeedOptions('npc_piggy', inv).map((row) => row.classTsid),
       ['apple', 'grain']
@@ -28,7 +28,7 @@ describe('Animal Kinship daily care', () => {
     const fed = feedAnimal('npc_piggy', state, inv, 'apple');
     assert.equal(fed.ok, true);
     assert.equal(inv.apple, 1);
-    assert.equal(inv.meat, 4);
+    assert.equal(inv.plank, 4);
     assert.equal(state.fed, true);
     assert.equal(state.hunger, 0);
     assert.match(animalStatusLabel('npc_piggy', state), /fed/i);
@@ -75,7 +75,8 @@ describe('Animal Kinship daily care', () => {
     const result = runVerb(target, 'feed:apple', { pc, inv });
     assert.equal(result.ok, true);
     assert.deepEqual(result.effects.items, { apple: -1 });
-    assert.equal(result.effects.mood, 1);
+    // npc_animal feed: no mood; +2 XP because an Apple (base cost 5) fed a hungry piggy.
+    assert.equal(result.effects.mood, 0);
     assert.equal(result.effects.img, 2);
     assert.match(result.effects.activityLine, /-1 Apple/);
     assert.equal(inv.apple, 0);

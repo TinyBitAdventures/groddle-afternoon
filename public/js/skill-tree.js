@@ -49,26 +49,25 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
     ranks: {
       animalkinship_3: { note: 'Faster, surer animal care, and lets you feed Metal Rods to the Sloth for snails.' },
       animalkinship_5: {
-        status: 'partial',
-        note: 'Better animal care, and you can name Heli Kitties. Naming piggies, chickens and butterflies is not here yet.',
+        note: 'Better animal care, Chicken squeezes and Piggy nibbles start dropping treats (Musicblocks, seasoned eggs, bacon), and you can name Piggies, Chickens, Butterflies, Batterflies and Heli Kitties.',
       },
     },
   },
   'Animal Husbandry': {
-    status: 'partial',
-    note: 'Unlocks the Egg Seasoner recipes. Incubating eggs into new animals is not here yet.',
+    status: 'live',
+    note: 'Unlocks the Egg Seasoner recipes and Request incubation on Chickens: wait a minute beside her and a seasoned egg hatches a Chick, Piglet or Caterpillar to raise into a new animal.',
   },
   'Fox Brushing': {
     status: 'live',
     note: 'Brushing foxes yields 10 to 12 more Fiber per brush, for more iMG and half the Fox Brush wear.',
   },
   Herdkeeping: {
-    status: 'later',
-    note: 'Capturing piggies, chickens and butterflies with Magic Sticks is not here yet. Learning it still opens Remote Herdkeeping.',
+    status: 'live',
+    note: 'Capture Piggies with Pig Bait into a Hog-tied Piggy (release it anywhere, ideally your back yard, before it escapes), and place Pig, Chicken and Butterfly Sticks in your yard to keep animals close.',
   },
   'Remote Herdkeeping': {
-    status: 'later',
-    note: 'Meat Collectors, Butterfly Milkers and Piggy Feeders are not here yet.',
+    status: 'live',
+    note: 'Meat Collectors, Butterfly Milkers and Piggy Feeders work in your back yard while you are away, on the original 24-minute collection rounds.',
   },
 
   // Growing

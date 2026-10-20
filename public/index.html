@@ -407,7 +407,24 @@
           </div>
           <p id="feed-picker-sub" class="verb-menu-sub">Choose something from your pack.</p>
           <div id="feed-picker-grid" class="feed-picker-grid" role="listbox" aria-label="Eligible food"></div>
-          <p class="verb-menu-hint">Enter selects · arrow keys move · Esc cancels</p>
+          <!-- requires_target_item_count: how many of the chosen stack (Piggy, Batterfly, Piggy Feeder) -->
+          <div id="feed-picker-qty" class="feed-picker-qty" hidden>
+            <img id="feed-picker-qty-icon" class="feed-picker-qty-icon" alt="" />
+            <div class="feed-picker-qty-body">
+              <div id="feed-picker-qty-label" class="feed-picker-qty-label"></div>
+              <div class="feed-picker-qty-row">
+                <button type="button" id="feed-picker-qty-minus" class="feed-picker-qty-step" aria-label="One fewer">−</button>
+                <input id="feed-picker-qty-input" class="feed-picker-qty-input" type="number" min="1" value="1" inputmode="numeric" aria-label="How many" />
+                <button type="button" id="feed-picker-qty-plus" class="feed-picker-qty-step" aria-label="One more">+</button>
+                <button type="button" id="feed-picker-qty-max" class="feed-picker-qty-max">Max</button>
+              </div>
+            </div>
+            <div class="feed-picker-qty-actions">
+              <button type="button" id="feed-picker-qty-back" class="feed-picker-qty-back">Back</button>
+              <button type="button" id="feed-picker-qty-go" class="feed-picker-qty-go">Feed 1</button>
+            </div>
+          </div>
+          <p id="feed-picker-hint" class="verb-menu-hint">Enter selects · arrow keys move · Esc cancels</p>
         </div>
       </div>
 

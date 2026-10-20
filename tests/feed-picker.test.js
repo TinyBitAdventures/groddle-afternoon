@@ -28,7 +28,7 @@ describe('original-style target-item feed picker', () => {
   it('keeps Feed visible but disabled when the pack has no eligible food', () => {
     const piggy = { classId: 'npc_piggy', state: createAnimalState('npc_piggy') };
     const chicken = { classId: 'npc_chicken', state: createAnimalState('npc_chicken') };
-    const pigFeed = getVerbsFor(piggy, { pc: player(), inv: { meat: 3 } }).find((verb) => verb.id === 'feed');
+    const pigFeed = getVerbsFor(piggy, { pc: player(), inv: { plank: 3 } }).find((verb) => verb.id === 'feed');
     const chickenFeed = getVerbsFor(chicken, { pc: player(), inv: { apple: 2 } }).find((verb) => verb.id === 'feed');
     assert.equal(pigFeed.enabled, false);
     assert.match(pigFeed.reason, /don't have anything/i);
@@ -61,14 +61,14 @@ describe('original-style target-item feed picker', () => {
 
   it('wires mouse, keyboard, exact item ids, timing, and deterministic QA state', () => {
     const game = readFileSync(join(publicDir, 'game.js'), 'utf8');
-    assert.match(game, /function openFeedPicker\(target\)/);
+    assert.match(game, /function openFeedPicker\(target, verb = null\)/);
     assert.match(game, /listAnimalFeedOptions\(target\.classId, inv\)/);
-    assert.match(game, /id: `feed:\$\{classTsid\}`/);
+    assert.match(game, /id: counted \? `\$\{verbId\}:\$\{classTsid\}:\$\{count\}` : `\$\{verbId\}:\$\{classTsid\}`/);
     assert.match(game, /ArrowLeft'[\s\S]*ArrowRight'[\s\S]*ArrowUp'[\s\S]*ArrowDown'/);
     assert.match(game, /e\.key === 'Enter' \|\| e\.key === ' '/);
     assert.match(game, /chooseFeedPickerItem\(selected\.dataset\.food\)/);
     assert.match(game, /dataset\.feedPickerOptions/);
     assert.match(game, /dataset\.feedPickerResult = result\.ok \? 'success' : 'failed'/);
-    assert.match(game, /if \(v\.id === 'feed'\) openFeedPicker\(target\)/);
+    assert.match(game, /if \(v\.id === 'feed' \|\| v\.picker\) openFeedPicker\(target, v\)/);
   });
 });

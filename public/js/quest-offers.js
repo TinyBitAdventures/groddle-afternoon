@@ -768,6 +768,18 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'players_mooned' },
   { event: 'quoins_collected' },
   { event: 'favor_points', note: 'flat amount; switch to favor_earned:<giant>' },
+  // animal husbandry (game.js executeVerb + features/animal-husbandry-feature.js, 2026-10-20)
+  { event: 'animal_max_reward:{a}', a: ['npc_piggy', 'npc_butterfly', 'npc_chicken'] },
+  { event: 'skill_package_drop:{a}', a: ['npc_chicken'], note: 'Animal Kinship V+ squeeze drop of a Musicblock' },
+  { event: 'animals_named:{a}', a: ['npc_piggy', 'npc_chicken', 'npc_butterfly', 'npc_batterfly'] },
+  { event: 'npc_piggy:hogtie', note: 'Herdkeeping capture off your own land' },
+  { event: 'plop:inspect' },
+  { event: 'guano:pickup' },
+  { event: 'npc_batterfly:feed' },
+  { event: 'eggs_incubated:{a}', a: ['piggy_egg', 'butterfly_egg', 'chicken_egg'] },
+  { event: 'animals_grown:{a}', a: ['chick', 'piglet', 'caterpillar'] },
+  { event: 'meat_collector:full' },
+  { event: 'butterfly_milker:full' },
 ]);
 
 const templateCache = new Map();

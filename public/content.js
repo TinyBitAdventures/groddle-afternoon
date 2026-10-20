@@ -61,6 +61,26 @@ import {
   woodTreeStatusLabel,
 } from './js/woodcutting.js?v=woodcutting-1';
 import { findWorkingRookTool } from './js/rook-woods.js?v=rook-woods-1';
+import {
+  HERDKEEPING,
+  INCUBATION,
+  applyKinshipDrop,
+  captureVerbState,
+  incubateVerbState,
+  namingVerbs,
+  queuePlops,
+  startIncubation,
+} from './js/animal-husbandry.js';
+
+/** Naming / capture context for an animal target (the back yard counts as yours). */
+function husbandryCtx(ctx) {
+  return {
+    learned: ctx.skills?.learned || ctx.learned || [],
+    playerId: 'player',
+    nowS: Math.floor(Date.now() / 1000),
+    ownYard: ctx.streetTsid === 'RH_HOME_EXT',
+  };
+}
 
 /** OGA iconic pack — assets/sprites/icons/<class_tsid>.png */
 export const ITEM_ICONS = {
@@ -156,6 +176,7 @@ export function getVerbsFor(target, ctx) {
       reason,
       energy,
       durationMs: Number.isFinite(opts.durationMs) ? opts.durationMs : undefined,
+      ...(opts.picker ? { picker: opts.picker } : {}),
     });
   };
 
@@ -514,6 +535,22 @@ export function getVerbsFor(target, ctx) {
         ? `Choose from ${feedOptions.length} eligible pack item${feedOptions.length === 1 ? '' : 's'}`
         : 'Feed it fruit, crops, grain, or something you made',
     });
+    const hk = husbandryCtx(ctx);
+    const capture = captureVerbState({
+      inv,
+      learned: hk.learned,
+      energy: pc?.energy || 0,
+      streetTsid: ctx.streetTsid || '',
+      ownYard: hk.ownYard,
+    });
+    add('capture', 'capture', {
+      sort: 55,
+      energy: HERDKEEPING.energy,
+      tooltip: HERDKEEPING.tooltip,
+      enabled: capture.enabled,
+      reason: capture.reason,
+    });
+    for (const verb of namingVerbs(classId, s, hk)) add(verb.id, verb.label, verb);
     add('talk_to', 'talk to', {
       sort: 90,
       tooltip: 'I have something to tell you!',
@@ -584,6 +621,18 @@ export function getVerbsFor(target, ctx) {
       enabled: !s.buttered,
       reason: s.buttered ? 'This Chicken has received enough compliments today.' : '',
     });
+    const hk = husbandryCtx(ctx);
+    const incubate = incubateVerbState(s, hk.learned);
+    if (incubate) {
+      add('incubate', 'request incubation', {
+        sort: 56,
+        tooltip: INCUBATION.tooltip,
+        enabled: incubate.enabled,
+        reason: incubate.reason,
+        picker: 'incubate',
+      });
+    }
+    for (const verb of namingVerbs(classId, s, hk)) add(verb.id, verb.label, verb);
     add('talk_to', 'talk to', { sort: 90, tooltip: 'I have something to tell you!' });
   }
 
@@ -623,6 +672,7 @@ export function getVerbsFor(target, ctx) {
       energy: 1,
       tooltip: 'Your song might scare them or charm them',
     });
+    for (const verb of namingVerbs(classId, s, husbandryCtx(ctx))) add(verb.id, verb.label, verb);
     add('talk_to', 'talk to', { sort: 40, tooltip: 'I have something to tell you!' });
   }
 
@@ -946,10 +996,46 @@ export function runVerb(target, verbId, ctx) {
     inv[id] = (inv[id] || 0) + n;
     effects.items[id] = (effects.items[id] || 0) + n;
   };
-  const [verbBase, verbTarget] = String(verbId || '').split(':');
+  const [verbBase, verbTarget, verbCount] = String(verbId || '').split(':');
+
+  // --- Piggy feeding (npc_animal feed: up to one stack, crops queue Piggy Plops) ---
+  if (classId === 'npc_piggy' && verbBase === 'feed') {
+    const fed = feedAnimal(classId, s, inv, verbTarget, Number(verbCount) || 1);
+    if (!fed.ok) return { ok: false, msgs: [fed.msg], effects };
+    effects.items[fed.classTsid] = -fed.count;
+    if (fed.xp) {
+      pc.imagination = (pc.imagination || 0) + fed.xp;
+      pc.xp = (pc.xp || 0) + fed.xp;
+      effects.img = fed.xp;
+      effects.xp = fed.xp;
+    }
+    if (fed.plops.length) queuePlops(target, fed.plops);
+    effects._activityBase = fed.msg;
+    msgs.push(fed.msg);
+    finalizeMsgs(msgs, effects);
+    return { ok: true, msgs, effects, anim: 'feed', animalChanged: true, fedCount: fed.count, plops: fed.plops };
+  }
+
+  // --- Chicken: Request incubation (Animal Husbandry) ---
+  if (classId === 'npc_chicken' && verbBase === 'incubate') {
+    const started = startIncubation(s, inv, verbTarget, Date.now(), ctx.rng || Math.random);
+    if (!started.ok) {
+      return { ok: false, msgs: [started.msg], effects, speech: started.bubble ? { speaker: 'Chicken', text: started.bubble } : null };
+    }
+    effects.items[started.egg] = -1;
+    msgs.push(started.msg);
+    return {
+      ok: true,
+      msgs,
+      effects,
+      animalChanged: true,
+      incubation: started,
+      speech: { speaker: target.label || 'Chicken', text: started.bubble, durationMs: 6000 },
+    };
+  }
 
   // --- animal feeding (GSJS target-item verb, flattened into pack-backed choices) ---
-  if ((classId === 'npc_piggy' || classId === 'npc_chicken') && verbBase === 'feed') {
+  if (classId === 'npc_chicken' && verbBase === 'feed') {
     const fed = feedAnimal(classId, s, inv, verbTarget);
     if (!fed.ok) return { ok: false, msgs: [fed.msg], effects };
     effects.items[fed.classTsid] = -1;
@@ -1001,6 +1087,10 @@ export function runVerb(target, verbId, ctx) {
   }
   if (classId === 'npc_piggy' && verbId === 'nibble') {
     const care = performKinship('nibble');
+    const drop = care.ok ? applyKinshipDrop(care.profile, { pc, inv, rng: ctx.rng || Math.random }) : null;
+    for (const [itemId, amount] of Object.entries(drop?.items || {})) {
+      effects.items[itemId] = (effects.items[itemId] || 0) + amount;
+    }
     effects._activityBase = care.ok ? 'You nibble a Piggy.' : 'You try to nibble a Piggy.';
     msgs.push(care.ok
       ? `${care.superHarvest ? 'Super Harvest! ' : ''}The Piggy looks philosophical about it.`
@@ -1014,6 +1104,7 @@ export function runVerb(target, verbId, ctx) {
       animalChanged: care.ok,
       animalKinshipAttempted: care.attempted,
       animalKinship: care,
+      skillPackageDrop: drop,
     };
   }
   if (classId === 'npc_piggy' && verbId === 'talk_to') {
@@ -1023,6 +1114,10 @@ export function runVerb(target, verbId, ctx) {
   // --- chicken ---
   if (classId === 'npc_chicken' && verbId === 'squeeze') {
     const care = performKinship('squeeze');
+    const drop = care.ok ? applyKinshipDrop(care.profile, { pc, inv, rng: ctx.rng || Math.random }) : null;
+    for (const [itemId, amount] of Object.entries(drop?.items || {})) {
+      effects.items[itemId] = (effects.items[itemId] || 0) + amount;
+    }
     effects._activityBase = care.ok ? 'You squeeze a Chicken.' : 'You try to squeeze a Chicken.';
     msgs.push(care.ok ? `${care.superHarvest ? 'Super Harvest! ' : ''}Buk!` : care.msg);
     finalizeMsgs(msgs, effects);
@@ -1034,6 +1129,7 @@ export function runVerb(target, verbId, ctx) {
       animalChanged: care.ok,
       animalKinshipAttempted: care.attempted,
       animalKinship: care,
+      skillPackageDrop: drop,
     };
   }
   if (classId === 'npc_chicken' && verbId === 'butter_up') {

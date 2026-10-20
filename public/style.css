@@ -681,6 +681,103 @@ footer a { color: inherit; }
   line-height: 1.25;
 }
 
+/* Second step of the picker: how many of the chosen stack. */
+.feed-picker-qty {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.55rem 0.75rem;
+  align-items: center;
+  padding: 0.4rem 0.85rem 0.85rem;
+}
+
+.feed-picker-qty[hidden],
+.feed-picker-grid[hidden] { display: none; }
+
+.feed-picker-qty-icon {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  padding: 0.3rem;
+  border: 1px solid #77a94b;
+  border-radius: 10px;
+  background: #eef5df;
+}
+
+.feed-picker-qty-label {
+  color: #274b79;
+  font-size: 0.82rem;
+  font-weight: 750;
+  margin-bottom: 0.35rem;
+}
+
+.feed-picker-qty-row {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.feed-picker-qty-step,
+.feed-picker-qty-max,
+.feed-picker-qty-back,
+.feed-picker-qty-go {
+  border: 1px solid #dfd3bd;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fffefb, #f6efe3);
+  color: #274b79;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 750;
+}
+
+.feed-picker-qty-step {
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.feed-picker-qty-max { padding: 0.3rem 0.6rem; font-size: 0.78rem; }
+
+.feed-picker-qty-input {
+  width: 3.6rem;
+  height: 2rem;
+  border: 1px solid #dfd3bd;
+  border-radius: 8px;
+  background: #fff;
+  color: #274b79;
+  font: inherit;
+  font-weight: 800;
+  text-align: center;
+}
+
+.feed-picker-qty-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.feed-picker-qty-back { padding: 0.35rem 0.8rem; }
+
+.feed-picker-qty-go {
+  padding: 0.35rem 0.95rem;
+  border-color: #77a94b;
+  background: #e8f0dc;
+}
+
+.feed-picker-qty-step:hover,
+.feed-picker-qty-max:hover,
+.feed-picker-qty-back:hover,
+.feed-picker-qty-go:hover,
+.feed-picker-qty-step:focus-visible,
+.feed-picker-qty-max:focus-visible,
+.feed-picker-qty-back:focus-visible,
+.feed-picker-qty-go:focus-visible {
+  outline: none;
+  border-color: #77a94b;
+  box-shadow: 0 0 0 2px rgba(113, 164, 63, 0.2);
+}
+
 @media (max-width: 480px) {
   .feed-picker-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
