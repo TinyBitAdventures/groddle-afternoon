@@ -181,7 +181,7 @@ describe('Cubimal achievements and clean art', () => {
   it('ships one crisp transparent PNG for every official figure', () => {
     const iconDir = join(publicRoot, 'assets/sprites/icons');
     const files = readdirSync(iconDir)
-      .filter((file) => /^npc_cubimal_.+\.png$/.test(file))
+      .filter((file) => /^npc_cubimal_[^@]+\.png$/.test(file))
       .sort();
     assert.equal(files.length, 43);
     for (const rows of Object.values(CUBIMAL_SERIES)) {

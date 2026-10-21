@@ -731,6 +731,7 @@ import {
   soundForVerb,
 } from './js/sound-moments.js';
 import { moodMax } from './js/metabolics.js';
+import { installHiresIcons } from './js/icon-hires.js';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -20752,6 +20753,8 @@ async function main() {
   // streets), so avatars, animals and decos were drawn at half density on
   // Retina. A falsy resolution makes FilterSystem use the renderer's.
   PIXI.Filter.defaultResolution = null;
+  // 3x pack icons in Pixi sprites and <img>s, at their original sizes.
+  installHiresIcons(PIXI);
   app = new PIXI.Application({
     width: VIEW_W,
     height: VIEW_H,
