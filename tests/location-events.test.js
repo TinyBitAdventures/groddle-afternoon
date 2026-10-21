@@ -91,12 +91,13 @@ describe('street physics', () => {
 });
 
 describe('location events', () => {
-  test('actions run in editor string order (6 < 61 < 611 < 7)', () => {
-    assert.deepEqual(orderedActionKeys(['5', '1', '7', '61', '6', '611', '4']), ['1', '4', '5', '6', '61', '611', '7']);
+  test('actions run in document order, as GSJS for-in walked them', () => {
+    // Document order (GSJS for-in), not key names: p1_red_1_on gates before it lights.
+    assert.deepEqual(orderedActionKeys(['a3', 'a2', 'a1', 'a4']), ['a3', 'a2', 'a1', 'a4']);
     const xml = `<object id="events"><object id="hit"><object id="actions">
-      <object id="2"><str id="type">flag_set</str><str id="flag">b</str></object>
+      <object id="2"><str id="type">physics</str><str id="param">gravity</str><str id="value">-7.5</str><int id="duration">400</int></object>
       <object id="11"><str id="type">deco_hide</str><str id="deco_id">d1</str><int id="fade">500</int></object>
-      <object id="1"><str id="type">physics</str><str id="param">gravity</str><str id="value">-7.5</str><int id="duration">400</int></object>
+      <object id="1"><str id="type">flag_set</str><str id="flag">b</str></object>
     </object></object></object>`;
     const events = parseLocationEvents(xml);
     assert.deepEqual(events.hit.map((a) => a.type), ['physics', 'deco_hide', 'flag_set']);

@@ -245,13 +245,15 @@ export function physicsMultipliers(setting) {
 /* ------------------------------------------------------------------ */
 
 /**
- * Action keys run in string order. The location editor inserts a step after
- * key K by appending digits (6 → 61 → 611, 20 → 2011111), which only sorts
- * between K and its neighbour as a string; `a1`/`a2` keys come from the
- * admin reorder tool.
+ * Action keys run in document order. GSJS events_broadcast walks
+ * `for (var i in ev.actions)` (insertion order), and the archived XML was
+ * written from that same object. Key names do not carry the order: 201 of
+ * 1,108 multi-step events list keys out of string order, e.g. Le Misérable's
+ * p1_red_1_on runs a3 (win gate), a2 (previous-colour gate), a1 (light), a4,
+ * and LHFRK14DDU53RQQ's a1 ... a13 would put a10 before a2 if sorted.
  */
 export function orderedActionKeys(keys) {
-  return [...keys].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return [...keys];
 }
 
 const num = (v, fallback = 0) => (Number.isFinite(Number(v)) ? Number(v) : fallback);
