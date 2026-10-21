@@ -233,7 +233,7 @@ export function shouldFireNewDay(now = Date.now(), dayMs = GAME_DAY_MS) {
 
 export function applyNewDayRefill(pc, caps = {}) {
   const eMax = caps.energyMax ?? Math.max(100, Number(pc.energyMax) || 100);
-  const mMax = caps.moodMax ?? 100;
+  const mMax = caps.moodMax ?? eMax;
   const energyBefore = pc.energy;
   const moodBefore = pc.mood;
   pc.energy = eMax;

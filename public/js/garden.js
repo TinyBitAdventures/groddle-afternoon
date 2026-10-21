@@ -670,7 +670,7 @@ export function seedFitsGarden(seed, gardenType) {
 }
 
 function spendEnergy(pc, cost) {
-  if ((pc.energy || 0) < cost) {
+  if ((pc.energy || 0) <= cost) {
     return { ok: false, reason: 'energy', msgs: [`Need ${cost} energy (have ${Math.floor(pc.energy || 0)}).`] };
   }
   pc.energy = Math.max(0, (pc.energy || 0) - cost);
@@ -851,7 +851,7 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   }
   const profile = gardenActionProfile(garden.gardenType, 'harvest', opts.learned, opts.upgrades);
   const cost = profile.energy;
-  if ((pc.energy || 0) < cost) {
+  if ((pc.energy || 0) <= cost) {
     return { ok: false, reason: 'energy', msgs: [`Need ${cost} energy (have ${Math.floor(pc.energy || 0)}).`] };
   }
   const rng = opts.rng || Math.random;

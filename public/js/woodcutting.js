@@ -98,7 +98,7 @@ export function quoteWoodTreeHarvest(state, inv = {}, pc = {}, toolState = {}) {
   const hatchetWear = woodier?.toolWear ?? WOOD_TREE_HARVEST.hatchetWear;
   const tool = canUseTool(toolState, 'hatchet', hatchetWear);
   if (!tool.ok) return { ...tool, reason: 'broken_hatchet', msg: tool.msg };
-  if ((pc?.energy || 0) < energyCost) {
+  if ((pc?.energy || 0) <= energyCost) {
     return {
       ok: false,
       reason: 'energy',

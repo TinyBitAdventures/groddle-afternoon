@@ -7909,7 +7909,9 @@ async function maybeNewDay(opts = {}) {
   if (!opts.force && !shouldFireNewDay()) return false;
   newDayBusy = true;
   const el = document.getElementById('new-day-screen');
-  const refill = applyNewDayRefill(pc, { energyMax: energyCap(), moodMax: 100 });
+  const refill = applyNewDayRefill(pc, { energyMax: energyCap(), moodMax: moodMax(pc) });
+  // doNewDay drops the mining gem-drop overrides.
+  pc.miningDropScale = {};
   setLastNewDayTs(Date.now());
   // Living things: reset daily care/harvest limits and regrow tree produce.
   const trantN = resetAllTrantsForNewDay();
@@ -7935,7 +7937,7 @@ async function maybeNewDay(opts = {}) {
     if (statsEl) {
       statsEl.textContent =
         refill.energyGained > 0 || refill.moodGained > 0
-          ? `Energy ${Math.round(refill.energyBefore)} → 100 · Mood restored`
+          ? `Energy ${Math.round(refill.energyBefore)} → ${energyCap()} · Mood restored`
           : 'You were already full. Still — a new day!';
     }
     // Decorative button only — cannot skip

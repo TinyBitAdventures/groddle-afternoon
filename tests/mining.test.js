@@ -41,6 +41,7 @@ import {
   TOOL_CATALOG,
 } from '../public/js/making.js';
 import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-2';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPIKE = join(__dirname, '../public');
@@ -134,6 +135,35 @@ describe('mine rock loop', () => {
     assert.equal(rock.depleted, false);
   });
 
+  it('gives the whole roll even past the chunks remaining (include/mining.js)', () => {
+    const rock = createMineRock('rock_metal_1', { chunksRemaining: 2 });
+    const inv = createInventory({ pick: 1 });
+    const pc = { energy: 100, imagination: 0, xp: 0 };
+    const r = mineRock(rock, inv, pc, { learned: ['mining_1'], rng: () => 0 });
+    assert.equal(r.got, 3);
+    assert.equal(countItem(inv, 'metal_rock'), 3);
+    assert.ok(rock.depleted);
+  });
+
+  it('refuses a swing when energy only equals the cost', () => {
+    const rock = createMineRock('rock_metal_1');
+    const inv = createInventory({ pick: 1 });
+    const pc = { energy: MINING_COSTS.energy };
+    assert.equal(mineRock(rock, inv, pc, { learned: ['mining_1'] }).reason, 'energy');
+  });
+
+  it('each gem scales that pick\'s drop chance by 0.8', () => {
+    const rock = createMineRock('rock_metal_1');
+    const inv = createInventory({ pick: 1 });
+    const pc = { energy: 100, imagination: 0, xp: 0, imaginationUpgrades: ['mining_drop_1'] };
+    const r = mineRock(rock, inv, pc, { learned: ['mining_1'], rng: () => 0 });
+    assert.ok(r.gem);
+    assert.equal(pc.miningDropScale.pick, 0.8);
+    // 4% * 0.8 = 3.2%: a 3.5% roll now misses.
+    const again = mineRock(rock, inv, pc, { learned: ['mining_1'], rng: () => 0.035 });
+    assert.equal(again.gem, null);
+  });
+
   it('scene index scales with chunks remaining', () => {
     const rock = createMineRock('rock_metal_1', { chunksRemaining: 50 });
     assert.equal(rockSceneIndex(rock), 5);
@@ -182,6 +212,20 @@ describe('smelt + crush', () => {
     assert.equal(s.ok, true);
     assert.equal(countItem(inv, 'element_shiny'), 6);
     assert.ok(CRUSH_YIELDS.sparkly.length === 4);
+  });
+
+  it('grinder wear is round(count / 3) uses, at least one (ore_grinder.js)', () => {
+    const wearFor = (qty) => {
+      const inv = createInventory({ dullite: qty, ore_grinder: 1 });
+      const tools = createToolConditionState();
+      const before = getToolCondition(tools, 'ore_grinder').remaining;
+      const r = crushOre(inv, { energy: 1000 }, 'dullite', { qty, learned: ['refining_1'], toolState: tools });
+      assert.equal(r.ok, true);
+      return before - getToolCondition(tools, 'ore_grinder').remaining;
+    };
+    assert.equal(wearFor(1), 2);
+    assert.equal(wearFor(9), 6);
+    assert.equal(wearFor(10), 6);
   });
 });
 

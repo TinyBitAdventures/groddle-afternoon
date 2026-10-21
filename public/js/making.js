@@ -813,7 +813,8 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   const cost = adjust.energyCost;
   // getHitPointModifier: the *_tool_wear cards halve that cooking tool's wear.
   const wearFor = (wear) => scaledToolWear(opts.toolState, recipe.tool, wear, toolWearMultiplier(recipe.tool, upgrades));
-  if ((pc.energy || 0) < cost) {
+  // inc_making.js refuses when energy_cost >= energy.
+  if ((pc.energy || 0) <= cost) {
     return {
       ok: false,
       reason: 'energy',

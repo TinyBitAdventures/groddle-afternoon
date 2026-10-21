@@ -335,7 +335,8 @@ export function mineRock(rock, inv, pc, opts = {}) {
       msgs: ['Your pick does not have enough uses left.'],
     };
   }
-  if ((pc.energy || 0) < profile.energy) {
+  // startSkillPackage refuses at energy <= cost.
+  if ((pc.energy || 0) <= profile.energy) {
     return {
       ok: false,
       reason: 'energy',
@@ -347,7 +348,8 @@ export function mineRock(rock, inv, pc, opts = {}) {
   let toGet = randInt(def?.minChunks ?? 3, def?.maxChunks ?? 9, rng);
   // include/mining.js: Beryl/Dullite/Metal Rock/Sparkly Expert, +round(15%).
   toGet += miningExpertBonus(rock.classTsid || def?.classTsid, upgrades, toGet);
-  const got = Math.min(toGet, rock.chunksRemaining);
+  // include/mining.js gives the whole to_get, even past chunks_remaining.
+  const got = toGet;
 
   pc.energy = (pc.energy || 0) - profile.energy;
   if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + profile.xp;
@@ -362,8 +364,12 @@ export function mineRock(rock, inv, pc, opts = {}) {
   const chunkLabel = def?.chunkLabel || rock.chunkId;
   msgs.push(`You mine ${got} ${got === 1 ? chunkLabel : chunkLabel + (chunkLabel.endsWith('s') ? '' : 's')}.`);
   // Truly Outrageous I-IV: the package's gem_small drop (catalog_drop_tables.js).
+  // Each gem scales that pick's drop chance by 0.8 until the new day
+  // (addSkillPackageOverride in include/mining.js, cleared in doNewDay).
   let gem = null;
-  if (profile.dropClassId === 'gem_small' && profile.dropChance > 0 && rng() * 100 < profile.dropChance) {
+  const dropScale = Number(pc.miningDropScale?.[pick] ?? 1);
+  if (profile.dropClassId === 'gem_small' && profile.dropChance > 0 && rng() * 100 < profile.dropChance * dropScale) {
+    pc.miningDropScale = { ...(pc.miningDropScale || {}), [pick]: dropScale * 0.8 };
     gem = rollGemSmall(rng);
     if (!ITEM_CATALOG[gem]) ensureItem(gem, GEM_ITEMS[gem]);
     addItem(inv, gem, 1);
@@ -458,7 +464,7 @@ export function smeltMetalRocks(inv, pc, opts = {}) {
     }
   }
   const energy = (smeltUpgrades.energyCost ?? SMELT_COSTS.energyPerIngot) * ingots;
-  if ((pc.energy || 0) < energy) {
+  if ((pc.energy || 0) <= energy) {
     return {
       ok: false,
       reason: 'energy',
@@ -521,7 +527,9 @@ export function crushOre(inv, pc, oreId, opts = {}) {
   const refining = (opts.requireSkill !== false || Array.isArray(opts.learned))
     ? refiningProfile(opts.learned || []) || refiningProfile(undefined)
     : refiningProfile(undefined);
-  const toolWear = refining.toolWear * qty;
+  // ore_grinder.js getToolWearMultiplier: round(count / 3), and
+  // runSkillPackage treats a 0 multiplier as 1.
+  const toolWear = refining.toolWear * (Math.round(qty / 3) || 1);
   if (opts.requireTool !== false && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, REFINE_COSTS.tool, toolWear);
     if (!toolCheck.ok) {
@@ -529,7 +537,7 @@ export function crushOre(inv, pc, oreId, opts = {}) {
     }
   }
   const energy = refining.energy * qty;
-  if ((pc.energy || 0) < energy) {
+  if ((pc.energy || 0) <= energy) {
     return {
       ok: false,
       reason: 'energy',

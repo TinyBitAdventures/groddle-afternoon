@@ -99,6 +99,8 @@ export function normalizePlayerSnapshot(seed = {}, fallback = PLAYER_DEFAULTS) {
         ? source.imaginationUpgrades
         : base.imaginationUpgrades || []
     ),
+    miningDropScale: Object.fromEntries(Object.entries(cleanScalarRecord(source.miningDropScale))
+      .filter(([, v]) => typeof v === 'number').map(([k, v]) => [k, clamp(v, 0, 1)])),
   };
 }
 

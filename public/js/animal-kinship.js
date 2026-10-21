@@ -252,7 +252,7 @@ export function quoteAnimalKinship(state, classId, verbId, ctx = {}) {
     );
   }
   const energy = Math.max(0, Number(ctx.pc?.energy) || 0);
-  if (energy < selected.energyCost) {
+  if (energy <= selected.energyCost) {
     return quoteFailure(
       'energy',
       `Needs ${selected.energyCost} energy (you have ${Math.floor(energy)}).`,
