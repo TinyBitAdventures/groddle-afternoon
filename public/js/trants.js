@@ -219,17 +219,26 @@ export function resolveArborologyPackage(skillStateOrList) {
 }
 
 /**
- * Look up capacity for maturity/health (0–10 tables; index as-is, clamp).
+ * Table cell for maturity/health 1-10: include/trants.js reads
+ * map[maturity - 1][health - 1] (updateFruitCap, onFruitCycle); 0 has no cell.
+ */
+function trantCell(t, maturity, health) {
+  const m = Math.min(10, Math.floor(Number(maturity) || 0));
+  const h = Math.min(10, Math.floor(Number(health) || 0));
+  if (m < 1 || h < 1) return 0;
+  return t[m - 1]?.[h - 1] ?? 0;
+}
+
+/**
+ * Fruit capacity for maturity/health (updateFruitCap).
  * @param {string} classTsid
- * @param {number} maturity 0–10
- * @param {number} health 0–10
+ * @param {number} maturity 1–10
+ * @param {number} health 1–10
  */
 export function fruitCapacityAt(classTsid, maturity, health) {
   const t = tables?.[classTsid]?.fruitCapMap;
   if (!t) return 0;
-  const m = clamp(Math.floor(maturity), 0, 9);
-  const h = clamp(Math.floor(health), 0, 9);
-  return t[m]?.[h] ?? 0;
+  return trantCell(t, maturity, health);
 }
 
 /**
@@ -238,9 +247,7 @@ export function fruitCapacityAt(classTsid, maturity, health) {
 export function fruitProductionAt(classTsid, maturity, health) {
   const t = tables?.[classTsid]?.fruitProdMap;
   if (!t) return 0;
-  const m = clamp(Math.floor(maturity), 0, 9);
-  const h = clamp(Math.floor(health), 0, 9);
-  return t[m]?.[h] ?? 0;
+  return trantCell(t, maturity, health);
 }
 
 function clamp(v, a, b) {
@@ -368,14 +375,15 @@ export function harvestTrant(state, player = {}, opts = {}) {
 }
 
 /**
- * Pet/water tend: small health bump; optional free fruit at LGT III (rare — skipped here).
+ * Pet/water tend: health +1 once both have landed this period (performTending);
+ * optional free fruit at LGT III (rare — skipped here).
  * @param {ReturnType<typeof createTrantState>} state
  * @param {'pet'|'water'} kind
  */
 export function tendTrant(state, kind) {
   if (kind === 'pet') state.petted = true;
   if (kind === 'water') state.watered = true;
-  state.health = clamp((state.health || 5) + 1, 1, 10);
+  if (state.petted && state.watered) state.health = clamp((state.health || 5) + 1, 1, 10);
   // Refresh capacity if maturity/health changed
   state.fruitCapacity = fruitCapacityAt(state.classTsid, state.maturity, state.health);
   if (state.fruitCount > state.fruitCapacity) state.fruitCount = state.fruitCapacity;

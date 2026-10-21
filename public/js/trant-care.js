@@ -96,7 +96,8 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
     }
   }
   const energy = Math.max(0, Number(ctx.pc?.energy) || 0);
-  if (energy < profile.energyCost) {
+  // inc_skill_packages.js startSkillPackage refuses at energy <= cost.
+  if (energy <= profile.energyCost) {
     return {
       ok: false,
       reason: 'energy',
@@ -108,8 +109,11 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
 }
 
 /**
- * Commit one tending attempt. Energy and Watering Can wear are spent on a failed
- * no-skill attempt, matching the original skill-package attempt semantics.
+ * Commit one tending attempt. The success roll comes first, as in
+ * finishSkillPackage: a failure spends no energy and no Watering Can wear; a
+ * failed living-trant pet loses its mood bonus (include/trants.js onPetComplete).
+ * Health rises once a period, when the tree has been both petted and watered
+ * (include/trants.js performTending).
  */
 export function performTrantCare(state, classId, kind, ctx = {}) {
   const quote = quoteTrantCare(state, classId, kind, ctx);
@@ -117,6 +121,23 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
   const { profile, flag } = quote;
   const rng = ctx.rng || Math.random;
   const pc = ctx.pc;
+  const success = rng() * 100 < profile.successRate;
+  if (!success) {
+    const moodBefore = Number(pc.mood) || 0;
+    if (kind === 'pet' && classId !== 'wood_tree' && profile.moodBonus) {
+      pc.mood = Math.max(0, moodBefore - profile.moodBonus);
+    }
+    return {
+      ok: false,
+      attempted: true,
+      success: false,
+      reason: 'failed',
+      msg: 'Oops. You failed! You probably need a bit more skill to stop that from happening.',
+      profile,
+      toolUse: null,
+      effects: { energy: 0, mood: (Number(pc.mood) || 0) - moodBefore, xp: 0 },
+    };
+  }
   pc.energy = Math.max(0, (Number(pc.energy) || 0) - profile.energyCost);
   // Heavy Flow (lightgreenthumb_tool_wear): the Watering Can wears at half rate.
   const upgrades = ctx.upgrades || ctx.imaginationUpgrades || pc?.imaginationUpgrades || [];
@@ -126,22 +147,11 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
   const toolUse = kind === 'water' && wear > 0
     ? useToolCondition(ctx.tools, 'watering_can', wear)
     : null;
-  const success = rng() * 100 < profile.successRate;
-  if (!success) {
-    return {
-      ok: false,
-      attempted: true,
-      success: false,
-      reason: 'failed',
-      msg: 'Oops. You failed! A little more Light Green Thumb would help.',
-      profile,
-      toolUse,
-      effects: { energy: -profile.energyCost, mood: 0, xp: 0 },
-    };
-  }
   state[flag] = true;
-  state.health = Math.max(1, Math.min(10, (Number(state.health) || 5) + 1));
   if (classId !== 'wood_tree') {
+    if (state.petted && state.watered) {
+      state.health = Math.max(1, Math.min(10, (Number(state.health) || 5) + 1));
+    }
     state.fruitCapacity = fruitCapacityAt(classId, state.maturity, state.health);
     state.fruitCount = Math.min(state.fruitCapacity, Math.max(0, Number(state.fruitCount) || 0));
   }

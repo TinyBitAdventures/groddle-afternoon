@@ -43,6 +43,14 @@ describe('trant harvest (GSJS-extracted)', () => {
       'trant_gas',
     ]) {
       assert.ok(fruitCapacityAt(id, 7, 8) > 0, id);
+      // include/trants.js updateFruitCap: fruitCapMap[maturity - 1][health - 1].
+      const tables = JSON.parse(readFileSync(join(root, 'assets/content/trants.json'), 'utf8'));
+      const map = (tables[id] || tables.trants?.[id])?.fruitCapMap;
+      if (map) {
+        assert.equal(fruitCapacityAt(id, 7, 8), map[6][7], id);
+        assert.equal(fruitCapacityAt(id, 10, 10), map[9][9], id);
+        assert.equal(fruitCapacityAt(id, 0, 5), 0, id);
+      }
     }
   });
 
@@ -174,14 +182,14 @@ describe('trant harvest (GSJS-extracted)', () => {
     assert.equal(s.fruitCount, mid);
   });
 
-  it('tendTrant marks pet/water and bumps health', () => {
+  it('tendTrant marks pet/water and bumps health once both land', () => {
     const s = createTrantState('trant_egg', { maturity: 7, health: 5 });
     tendTrant(s, 'pet');
     assert.equal(s.petted, true);
-    assert.equal(s.health, 6);
+    assert.equal(s.health, 5);
     tendTrant(s, 'water');
     assert.equal(s.watered, true);
-    assert.equal(s.health, 7);
+    assert.equal(s.health, 6);
   });
 
   it('content verbs: harvest uses Arborology + invents eggs/cherries', () => {

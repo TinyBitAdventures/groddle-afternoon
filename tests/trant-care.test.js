@@ -100,7 +100,8 @@ test.describe('official Light Green Thumb care packages', () => {
     });
     assert.equal(result.ok, true);
     assert.equal(state.watered, true);
-    assert.equal(state.health, 8);
+    // Not petted yet this period, so health holds (performTending).
+    assert.equal(state.health, 7);
     assert.equal(ctx.pc.energy, 98);
     assert.equal(ctx.pc.mood, 52);
     assert.equal(ctx.pc.imagination, 2);
@@ -109,7 +110,29 @@ test.describe('official Light Green Thumb care packages', () => {
     assert.match(trantStatusLabel(state), /watered/);
   });
 
-  test('a no-skill failure spends the attempt but leaves the daily gate open', () => {
+  test('health rises once the tree is both petted and watered', () => {
+    const state = createTrantState('trant_fruit', { health: 7 });
+    const ctx = context({ skills: { learned: ['light_green_thumb_2'] } });
+    const run = (kind) => performTrantCare(state, 'trant_fruit', kind, {
+      ...ctx, learned: ctx.skills.learned, rng: () => 0.99,
+    });
+    assert.equal(run('pet').ok, true);
+    assert.equal(state.health, 7);
+    assert.equal(run('water').ok, true);
+    assert.equal(state.health, 8);
+  });
+
+  test('a failed pet loses the mood bonus and spends nothing else', () => {
+    const state = createTrantState('trant_fruit', { health: 6 });
+    const ctx = context();
+    const result = performTrantCare(state, 'trant_fruit', 'pet', { ...ctx, learned: [], rng: () => 0.95 });
+    assert.equal(result.reason, 'failed');
+    assert.equal(ctx.pc.energy, 100);
+    assert.equal(ctx.pc.mood, 50 - result.profile.moodBonus);
+    assert.equal(state.petted, false);
+  });
+
+  test('a no-skill failure spends nothing and leaves the daily gate open', () => {
     const state = createTrantState('trant_egg', { health: 6 });
     const ctx = context();
     const result = performTrantCare(state, 'trant_egg', 'water', {
@@ -122,8 +145,8 @@ test.describe('official Light Green Thumb care packages', () => {
     assert.equal(result.attempted, true);
     assert.equal(state.watered, false);
     assert.equal(state.health, 6);
-    assert.equal(ctx.pc.energy, 95);
-    assert.equal(getToolCondition(ctx.tools, 'watering_can').remaining, 98);
+    assert.equal(ctx.pc.energy, 100);
+    assert.equal(getToolCondition(ctx.tools, 'watering_can').remaining, 100);
   });
 
   test('daily repeat and low-energy gates are atomic', () => {
