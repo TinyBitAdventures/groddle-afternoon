@@ -236,6 +236,8 @@ async function finish(ctx) {
   const won = ctx.data.got >= COINS_NEEDED;
   if (won) {
     ctx.solve();
+    // inc_quests.js rainbow run: show_rainbow + playEmotionAnimation('happy').
+    ctx.engine.playEmotion?.('happy');
     ctx.sound('ACHIEVEMENT_UNLOCKED', { volume: 0.5 });
     await ctx.wait(1200);
   }

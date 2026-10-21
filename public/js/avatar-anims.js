@@ -20,6 +20,9 @@ export const SHEET_FRAMES = Object.freeze({
   base: Object.freeze([...range(103, 114), 489, 490, 801]),
   jump: Object.freeze(range(192, 224)),
   climb: Object.freeze(range(1145, 1163)),
+  angry: Object.freeze([...range(625, 637), ...range(688, 694)]),
+  happy: Object.freeze([...range(405, 418), ...range(472, 478)]),
+  surprise: Object.freeze([...range(225, 237), ...range(287, 294)]),
 });
 
 /**
@@ -34,6 +37,9 @@ export const GLITCH_AVATAR = Object.freeze({
     base: { file: 'base.png', cells: 15, fw: 102, fh: 135, feetY: 133, midX: 44 },
     jump: { file: 'jump.png', cells: 33, fw: 108, fh: 138, feetY: 135, midX: 60 },
     climb: { file: 'climb.png', cells: 19, fw: 92, fh: 128, feetY: 123, midX: 57 },
+    angry: { file: 'angry.png', cells: 20, fw: 92, fh: 133, feetY: 130, midX: 51 },
+    happy: { file: 'happy.png', cells: 21, fw: 78, fh: 134, feetY: 131, midX: 40 },
+    surprise: { file: 'surprise.png', cells: 21, fw: 78, fh: 136, feetY: 133, midX: 40 },
   }),
   // Glitch renders avatars at the world's own scale.
   scale: 1,
@@ -52,7 +58,17 @@ export const ANIMS = Object.freeze({
   jumpOver_fall: range(204, 214),
   jumpOver_land: range(215, 224),
   climb: range(1145, 1163),
+  hit1: [489],
+  hit2: [490],
+  // Emotions (TSFrontController.playEmotionAnimation): ~3 s each, replacing the stand.
+  angry: [625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 636, 635, 636, 637, 636, 635, 636, 637, 636, 635, 636, 637, 636, 635, 636, 637, 636, 635, 636, 637, 636, 635, 636, 637, 636, 635, 636, 637, 636, 635, 688, 689, 690, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 691, 692, 693, 694, 625],
+  happy: [405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 417, 416, 415, 416, 417, 418, 417, 416, 415, 416, 417, 418, 417, 416, 415, 416, 417, 418, 417, 416, 415, 416, 417, 418, 417, 416, 415, 416, 417, 418, 417, 416, 415, 416, 417, 418, 417, 416, 415, 416, 417, 418, 417, 416, 415, 416, 417, 418, 472, 473, 474, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 475, 476, 477, 478, 405],
+  surprise: [225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 236, 235, 236, 237, 236, 235, 236, 237, 236, 235, 236, 237, 236, 235, 236, 237, 236, 235, 236, 237, 236, 235, 236, 237, 236, 235, 236, 237, 287, 288, 289, 290, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 292, 293, 294, 225],
 });
+
+/** Emotions a player can show (player.js emotion_types); each lasts 3000 ms (setEmotionTimeout). */
+export const EMOTIONS = Object.freeze(['happy', 'surprise', 'angry']);
+export const EMOTION_MS = 3000;
 
 /** Frames the fall settles into after its run (212, 213, 214, 213 ... 4 ticks each). */
 export const FALL_LOOP = Object.freeze([
@@ -85,7 +101,12 @@ export function frameRef(fn) {
 export function avatarAnimState(s, last = 'stand') {
   if (s.onLadder) return s.climbing ? 'climb' : 'climbPause';
   if (!s.airborne) {
-    if (!s.moving) return 'stand';
+    if (!s.moving) {
+      // AvatarView.getStandInForStand: a hit, then an emotion, replace the stand.
+      if (s.hit === 'hit1' || s.hit === 'hit2') return s.hit;
+      if (EMOTIONS.includes(s.emotion)) return s.emotion;
+      return 'stand';
+    }
     return Math.abs(s.vx || 0) < 150 && (s.vxMax ?? 335) < 150 ? 'walk1x' : 'walk2x';
   }
   const vy = Number(s.vy) || 0;
@@ -108,6 +129,7 @@ export function animForState(state) {
     case 'lift': return { anim: 'jumpOver_lift', loop: false };
     case 'fall': return { anim: 'jumpOver_fall', loop: false, then: FALL_LOOP };
     case 'land': return { anim: 'jumpOver_land', loop: false };
+    case 'hit1': case 'hit2': case 'happy': case 'surprise': case 'angry': return { anim: state, loop: false };
     default: return { anim: 'idle0', loop: false };
   }
 }

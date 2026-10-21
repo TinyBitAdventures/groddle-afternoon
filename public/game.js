@@ -595,7 +595,7 @@ import {
   planSignpostTravel,
 } from './js/travel.js';
 import { AVATAR_SHEETS, facingScaleX, facingFromVelocity } from './js/avatar.js';
-import { ANIMS, ANIM_FPS, FALL_LOOP, GLITCH_AVATAR, animForState, avatarAnimState, frameRef } from './js/avatar-anims.js';
+import { ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, animForState, avatarAnimState, frameRef } from './js/avatar-anims.js';
 import { landingY } from './js/walk-surface.js';
 import {
   createDefaultAppearance,
@@ -1013,6 +1013,9 @@ const SHEETS = {
   glitchAvatarBase: glitchSheetDef('base'),
   glitchAvatarJump: glitchSheetDef('jump'),
   glitchAvatarClimb: glitchSheetDef('climb'),
+  glitchAvatarAngry: glitchSheetDef('angry'),
+  glitchAvatarHappy: glitchSheetDef('happy'),
+  glitchAvatarSurprise: glitchSheetDef('surprise'),
   avatarStyledAlt: { url: 'assets/sprites/avatar_styled_alt.png', whole: true },
 };
 
@@ -5993,7 +5996,14 @@ const appearanceTexCache = new Map();
  * each frame anchored on its sheet's feet line (GLITCH_AVATAR).
  */
 function glitchAnimPack(key, app) {
-  const loaded = { base: textures.glitchAvatarBase, jump: textures.glitchAvatarJump, climb: textures.glitchAvatarClimb };
+  const loaded = {
+    base: textures.glitchAvatarBase,
+    jump: textures.glitchAvatarJump,
+    climb: textures.glitchAvatarClimb,
+    angry: textures.glitchAvatarAngry,
+    happy: textures.glitchAvatarHappy,
+    surprise: textures.glitchAvatarSurprise,
+  };
   if (!loaded.base?.frames?.length) return null;
   // The sheets in their own colours, or recoloured once per look (classifyGlitchPixel regions).
   const native = key === appearanceCacheKey(createDefaultAppearance());
@@ -6343,9 +6353,12 @@ function glitchAnimState(requested) {
   // onGround flickers on slopes; a few frames off the floor make it a jump or fall.
   const airborne = !player.onGround && (player.airFrames || 0) > 3;
   const floorY = airborne ? landingY(streetPlatforms, player.x, player.y) : null;
+  const now = Date.now();
   return avatarAnimState({
     airborne,
     moving: requested === 'walk',
+    hit: player.hit && now < (player.hitUntil || 0) ? player.hit : null,
+    emotion: player.emotion && now < (player.emotionUntil || 0) ? player.emotion : null,
     vx: player.vx * 60,
     vy: player.vy * 60,
     distFromFloor: floorY == null ? null : floorY - player.y,
@@ -6359,6 +6372,7 @@ function applyGlitchState(st) {
   }
   const { anim, loop, then } = animForState(st);
   player.glitchState = st;
+  if (app?.view) app.view.dataset.playerAnim = st;
   player.animState = st === 'climb' || st === 'climbPause' ? 'climb' : st.startsWith('walk') ? 'walk' : st === 'stand' ? 'idle' : 'air';
   player.textures = player.anims[anim];
   player.animationSpeed = ANIM_FPS / 60;
@@ -6857,6 +6871,30 @@ const engine = {
     }
     if (scene.returnTo?.tsid) savePlayerLocation(scene.returnTo);
     updateHud();
+  },
+  /**
+   * player.js playEmotionAnimation: happy, surprise or angry replaces the
+   * standing pose for 3 s (the Glitch sheets; portrait styles ignore it).
+   */
+  playEmotion(emotion, delayMs = 0) {
+    if (!EMOTIONS.includes(emotion)) return false;
+    const go = () => {
+      if (!player) return;
+      player.emotion = emotion;
+      player.emotionUntil = Date.now() + EMOTION_MS;
+    };
+    if (delayMs > 0) setTimeout(go, delayMs);
+    else go();
+    return true;
+  },
+  /** playHitAnimation('hit1'|'hit2') until stopHit (or durationMs). */
+  playHit(hit = 'hit1', durationMs = 1500) {
+    if (!player) return;
+    player.hit = hit === 'hit2' ? 'hit2' : 'hit1';
+    player.hitUntil = Date.now() + durationMs;
+  },
+  stopHit() {
+    if (player) player.hitUntil = 0;
   },
   /** A cream speech bubble that follows a registered target. */
   say(target, text, durationMs = 4000) {
@@ -13444,6 +13482,9 @@ function beginRookCrusherHit(entry, now) {
     toY: rookWoodsState.spawn.y,
   };
   burst(player.x, player.y - 48, 0xa79d7b, 26);
+  // crusher.js: the hit pose through the knockback, then angry on arrival.
+  engine.playHit('hit1', rookHitFx.durationMs);
+  engine.playEmotion('angry', rookHitFx.durationMs);
   playSfx('pickup', { volume: 0.62, rate: 0.45 });
   toast('Ow. Crushers suck!', 2200);
   pushActivity(
@@ -22240,6 +22281,13 @@ async function main() {
     window.groddleSound = { play: playSound, stats: () => audio.board?.stats, resolve: (k) => audio.board?.resolve(k) };
   }
   // Read-only snapshot for tools/playtest.mjs: where things are, nothing more.
+  // QA: ?emotiondemo=happy|angry|surprise|hit1|hit2 replays it on the Glitch sheets every 4 s.
+  const emotionDemo = new URLSearchParams(location.search).get('emotiondemo');
+  if (emotionDemo) {
+    const play = () => (/^hit[12]$/.test(emotionDemo) ? engine.playHit(emotionDemo, 1500) : engine.playEmotion(emotionDemo));
+    setTimeout(play, 1500);
+    setInterval(play, 4000);
+  }
   window.groddleQA = {
     snapshot() {
       const rect = app.view.getBoundingClientRect();

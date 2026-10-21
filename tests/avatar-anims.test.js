@@ -59,3 +59,20 @@ describe('avatar animation state (calcAnimationStateFromAPO)', () => {
     assert.equal(avatarAnimState({ airborne: true, vy: 600, distFromFloor: null }, 'lift'), 'fall');
   });
 });
+
+describe('emotions and hits replace the stand', () => {
+  it('plays a hit, then an emotion, only while standing', () => {
+    assert.equal(avatarAnimState({ moving: false, emotion: 'happy' }), 'happy');
+    assert.equal(avatarAnimState({ moving: false, hit: 'hit1', emotion: 'angry' }), 'hit1');
+    assert.equal(avatarAnimState({ moving: true, vx: 264, emotion: 'happy' }), 'walk2x');
+    assert.equal(avatarAnimState({ moving: false, emotion: 'bored' }), 'stand');
+  });
+
+  it('maps the three emotion sheets (AvatarAnimationDefinitions angry/happy/surprise)', () => {
+    for (const em of ['angry', 'happy', 'surprise']) {
+      assert.ok(ANIMS[em].length > 90, em);
+      for (const fn of ANIMS[em]) assert.ok(frameRef(fn), `${em} ${fn}`);
+      assert.equal(SHEET_FRAMES[em].length, GLITCH_AVATAR.sheets[em].cells, em);
+    }
+  });
+});

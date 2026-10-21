@@ -697,6 +697,8 @@ function showResult(engine) {
     pc.xp = (pc.xp || 0) + reward.xp;
   }
   const race = RACES[run.raceId];
+  // inc_race.js: the winner plays happy and the loser angry, 2 s on.
+  if (run.status === 'won' || run.status === 'lost') engine.playEmotion?.(run.status === 'won' ? 'happy' : 'angry', 2000);
   if (run.status === 'won') {
     engine.questFlag(RACE_FLAGS.win);
     engine.achievement(RACE_ACHIEVEMENTS.won, 1);
