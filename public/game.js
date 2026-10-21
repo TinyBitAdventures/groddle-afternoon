@@ -524,7 +524,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=parallax-4';
+} from './js/street-render.js?v=parallax-5';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -565,6 +565,7 @@ import {
   cameraBottomSlack,
   cameraWorldHeightForGround,
 } from './js/movement.js?v=movement-5';
+import { renderResolution, RESOLUTION_STEP } from './js/render-density.js';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -1006,6 +1007,17 @@ const keys = new Set();
 let app, world, bgLayer, entityLayer, fxLayer, player, prompt, camTarget, camY, portalSprites;
 let hoveredSignBoard = null;
 let cameraRightInset = 0;
+
+/** Keep the backing store at the canvas's displayed density (js/render-density.js). */
+function syncRenderResolution() {
+  if (!app?.renderer || !app.view) return;
+  const cssWidth = app.view.getBoundingClientRect().width;
+  const next = renderResolution(cssWidth, VIEW_W, window.devicePixelRatio || 1);
+  if (Math.abs(next - app.renderer.resolution) < RESOLUTION_STEP / 2) return;
+  app.renderer.resolution = next;
+  app.renderer.resize(VIEW_W, VIEW_H);
+  app.view.dataset.renderResolution = String(next);
+}
 
 /**
  * Translate the HTML quest/activity rail into Pixi view coordinates. The
@@ -20467,24 +20479,33 @@ async function main() {
   syncCameraSafeArea();
   window.addEventListener('resize', () => {
     syncCameraSafeArea();
+    syncRenderResolution();
     refreshPackPagers();
     if (player && Number.isFinite(WORLD_W)) {
       camTarget = cameraTargetForPlayer(player.x, player.vx || 0);
       if (world) world.x = -Math.round(camTarget * 2) / 2;
     }
   });
+  // Pixi 7 renders every filter at resolution 1 by default. The street colour
+  // matrix sits on the middleground and on entityLayer (1,169 of 1,422
+  // streets), so avatars, animals and decos were drawn at half density on
+  // Retina. A falsy resolution makes FilterSystem use the renderer's.
+  PIXI.Filter.defaultResolution = null;
   app = new PIXI.Application({
     width: VIEW_W,
     height: VIEW_H,
     backgroundColor: 0x8ec8e8,
     antialias: false,
-    resolution: Math.min(window.devicePixelRatio || 1, 2),
+    resolution: renderResolution(VIEW_W, VIEW_W, window.devicePixelRatio || 1),
     autoDensity: true,
   });
   app.view.setAttribute('role', 'application');
   app.view.setAttribute('aria-label', 'Groddle game world');
   app.view.tabIndex = 0;
   root.insertBefore(app.view, document.getElementById('overlay'));
+  syncRenderResolution();
+  // Panels and the HUD can resize the canvas without a window resize.
+  if (typeof ResizeObserver === 'function') new ResizeObserver(() => syncRenderResolution()).observe(app.view);
 
   await loadSheets();
   await loadTrantTables();

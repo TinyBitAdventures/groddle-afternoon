@@ -500,6 +500,74 @@ function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
   }
 }
 
+/** Most GPU memory one street may spend on recoloured deco textures. */
+export const RECOLOUR_BUDGET_BYTES = 192 * 1024 * 1024;
+
+/**
+ * Static deco layers take the client's colour matrix once per texture instead
+ * of a full-screen filter pass per layer every frame (14-20 passes on the
+ * busiest streets, at the screen's full density). The matrix is affine, so
+ * recolouring each deco before compositing gives the same pixels as filtering
+ * the composited layer wherever it is opaque, at the texture's own resolution.
+ * Layers holding anything but sprites, or past the street's memory budget,
+ * keep the live filter.
+ * @param {{ textures: Map<string, any>, bytes: number }} cache per street
+ */
+function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
+  const sprites = lc.children;
+  if (!sprites.length || sprites.some((child) => !(child instanceof PIXI.Sprite))) return;
+  const key = colour.matrix.join(',');
+  const bake = () => {
+    if (lc.destroyed) return;
+    let bytes = 0;
+    const fresh = new Set();
+    for (const spr of sprites) {
+      const base = spr.texture.baseTexture;
+      if (!spr.texture.valid || cache.textures.has(`${key}|${base.uid}`) || fresh.has(base)) continue;
+      fresh.add(base);
+      bytes += base.realWidth * base.realHeight * 4;
+    }
+    if (cache.bytes + bytes > RECOLOUR_BUDGET_BYTES) return;
+    cache.bytes += bytes;
+    const holder = new PIXI.Sprite();
+    holder.filters = [colour];
+    for (const spr of sprites) {
+      if (!spr.texture.valid) continue;
+      const base = spr.texture.baseTexture;
+      const id = `${key}|${base.uid}`;
+      let texture = cache.textures.get(id);
+      if (!texture) {
+        holder.texture = new PIXI.Texture(base);
+        texture = renderer.generateTexture(holder, {
+          region: new PIXI.Rectangle(0, 0, base.width, base.height),
+          resolution: base.resolution,
+        });
+        holder.texture.destroy();
+        cache.textures.set(id, texture);
+      }
+      spr.texture = texture;
+    }
+    holder.filters = null;
+    holder.destroy();
+    lc.filters = null;
+    lc.recoloured = true;
+  };
+  const pending = new Set(sprites.map((spr) => spr.texture.baseTexture).filter((base) => !base.valid));
+  if (!pending.size) {
+    bake();
+    return;
+  }
+  let left = pending.size;
+  const done = () => {
+    left -= 1;
+    if (left === 0) bake();
+  };
+  for (const base of pending) {
+    base.once('loaded', done);
+    base.once('error', done);
+  }
+}
+
 /** Vertical sky gradient texture from the location's top/bottom colours. */
 function gradientTexture(PIXI, top, bottom) {
   const canvas = document.createElement('canvas');
@@ -561,6 +629,13 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const available = opts.available || decoManifest || new Set();
   const root = new PIXI.Container();
   root.sortableChildren = true;
+  const recolourCache = { textures: new Map(), bytes: 0 };
+  root.recolourCache = recolourCache;
+  // Decos are destroyed with the view but not their textures; free the copies.
+  root.once('destroyed', () => {
+    for (const texture of recolourCache.textures.values()) texture.destroy(true);
+    recolourCache.textures.clear();
+  });
 
   const W = streetWidth(street);
   const sourceH = streetHeight(street);
@@ -669,6 +744,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
     }
     const blur = Number(layer.filters?.blur) || 0;
     if (blur > 0 && opts.renderer) bakeBlurredLayer(PIXI, opts.renderer, lc, blur, colour);
+    else if (colour && opts.renderer) bakeLayerColour(PIXI, opts.renderer, lc, colour, recolourCache);
     root.addChild(lc);
     layerContainers.push(lc);
   }
