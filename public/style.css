@@ -1081,6 +1081,57 @@ footer a { color: inherit; }
 .quoin-stat.at-limit small { color: #fff; }
 .currant-coin { color: #d4a017; margin-right: 0.15rem; }
 .top-actions { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+.top-actions { align-items: center; }
+.more-menu { position: relative; display: flex; }
+.more-chevron {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 0.1rem 0 0.35rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
+.more-btn[aria-expanded="true"] .more-chevron { transform: translateY(1px) rotate(225deg); }
+/* Unread mail sits on Home, inside the menu; show it on the Menu button too. */
+.more-menu:has(.mail-unread-badge:not([hidden])) .more-btn::after {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 0.3rem;
+  border-radius: 50%;
+  background: #d9534f;
+  vertical-align: middle;
+}
+.more-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 148px;
+  padding: 0.35rem;
+  background: #fbfdff;
+  border: 1px solid #a8bcc9;
+  border-radius: 10px;
+  box-shadow: 0 8px 22px rgba(30, 50, 60, 0.18);
+}
+.more-list[hidden] { display: none; }
+.more-list .chrome-btn {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  border-color: transparent;
+}
+.more-list .chrome-btn:hover,
+.more-list .chrome-btn:focus-visible { border-color: #a8bcc9; }
+.mute-btn { display: inline-flex; align-items: center; justify-content: center; padding-inline: 0.4rem; }
+.mute-btn svg { display: block; }
+.mute-btn[aria-pressed="true"] .mute-waves,
+.mute-btn[aria-pressed="false"] .mute-x { display: none; }
 .chrome-btn {
   border: 1px solid #a8bcc9;
   background: #fff;
@@ -1230,6 +1281,7 @@ footer a { color: inherit; }
 .activity-feed .act .act-gain { color: #2e7d32; font-weight: 700; }
 .activity-feed .act .act-neutral { color: #5a5248; }
 @keyframes actIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.activity-feed .act.is-leaving { opacity: 0; transition: opacity 0.4s ease; }
 
 /* Committed world verb, positioned above the avatar by game.js. */
 .action-progress {

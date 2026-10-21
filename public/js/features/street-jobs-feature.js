@@ -21,6 +21,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon } from '../inven
 import { canUseTool, useToolCondition } from '../tools.js?v=tools-2';
 import { ecologyForStreet } from '../street-ecology.js?v=official-ecology-3';
 import { worldToScreen } from '../street-model.js';
+import { signArmWidth } from '../street-render.js?v=parallax-5';
 import { getSkillCatalog } from '../content-catalogs.js';
 import { GIANTS } from '../shrines.js?v=stoot-doll-2';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-1';
@@ -260,14 +261,14 @@ function drawBarricades(engine) {
       if (!closed.includes(c)) return;
       const left = Boolean(i % 2);
       const label = c.label || c.tsid || 'Somewhere';
-      const armW = Math.max(100, Math.min(220, 18 + label.length * 9));
+      const armW = signArmWidth(PIXI, label);
       const art = PIXI.Sprite.from(BARRICADE_ART);
       art.anchor.set(0.5, 0.5);
       art.scale.set(0.085);
       art.alpha = 0.95;
       art.rotation = ((left ? 5.5 : -5.5) * Math.PI) / 180;
-      // Nailed over the arm's tip so the street name stays readable.
-      art.x = (left ? -1 : 1) * (2 + armW - 4) * SIGN_SCALE;
+      // Nailed just past the arm's tip so the street name stays readable.
+      art.x = (left ? -1 : 1) * (2 + armW + 18) * SIGN_SCALE;
       art.y = (-SIGN_POST_H + i * 28 + 32) * SIGN_SCALE;
       wrap.addChild(art);
     });
@@ -281,9 +282,17 @@ function drawBarricades(engine) {
     });
     tag.anchor.set(0.5, 0);
     tag.y = (-SIGN_POST_H + Math.min(shown.length, 4) * 28 + 40) * SIGN_SCALE;
-    wrap.addChild(tag);
-    engine.entityLayer.addChild(wrap);
-    barricades.push(wrap);
+    // The planks say it from afar; the words only show close up, in front
+    // of the avatar so its head never hides them.
+    const tagWrap = new PIXI.Container();
+    tagWrap.x = pos.x;
+    tagWrap.y = pos.y;
+    tagWrap.zIndex = 8001;
+    tagWrap.visible = false;
+    tagWrap.addChild(tag);
+    wrap.barricadeTag = tagWrap;
+    engine.entityLayer.addChild(wrap, tagWrap);
+    barricades.push(wrap, tagWrap);
   }
 }
 
@@ -1113,6 +1122,10 @@ export const streetJobsFeature = {
 
   onTick(dtMs, now, engine) {
     if (!catalog) return;
+    const px = engine.player?.x;
+    for (const b of barricades) {
+      if (b.barricadeTag && !b.destroyed) b.barricadeTag.visible = Number.isFinite(px) && Math.abs(px - b.x) < 160;
+    }
     tickWork(engine, now);
     tickReload(engine);
     autoplayStep(engine, now);

@@ -1033,6 +1033,30 @@ let app, world, bgLayer, entityLayer, fxLayer, player, prompt, camTarget, camY, 
 let hoveredSignBoard = null;
 let cameraRightInset = 0;
 
+/** The top bar's Menu: the less-used panels, closed by a pick, Esc or a click away. */
+function installMoreMenu() {
+  const btn = document.getElementById('more-btn');
+  const list = document.getElementById('more-list');
+  if (!btn || !list) return;
+  const setOpen = (open) => {
+    list.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+  };
+  btn.addEventListener('click', () => setOpen(list.hidden));
+  list.addEventListener('click', (e) => {
+    if (e.target.closest('button')) setOpen(false);
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (!list.hidden && !e.target.closest('.more-menu')) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !list.hidden) {
+      setOpen(false);
+      btn.focus();
+    }
+  });
+}
+
 /** Keep the backing store at the canvas's displayed density (js/render-density.js). */
 function syncRenderResolution() {
   if (!app?.renderer || !app.view) return;
@@ -1770,6 +1794,9 @@ function setBar(id, value) {
  * Push an activity line. Accepts plain text or { base, effects } for signed gain/loss HTML.
  * @param {string|{ base?: string, text?: string, html?: string, effects?: object }} msg
  */
+const ACTIVITY_POPUPS = 2;
+const ACTIVITY_POPUP_MS = 4000;
+
 function pushActivity(msg) {
   if (!msg) return;
   if (typeof msg === 'string') msg = wholeStatAmounts(msg);
@@ -1804,9 +1831,12 @@ function pushActivity(msg) {
   el.className = 'act';
   el.innerHTML = html || escapeHtml(plain);
   feed.prepend(el);
-  // Keep a short stack of whole bubbles. A fixed-height box plus eight
-  // variable-height messages left the oldest card visibly sliced in half.
-  while (feed.children.length > 4) feed.removeChild(feed.lastChild);
+  // The newest one or two lines float briefly; Local activity keeps the rest.
+  while (feed.children.length > ACTIVITY_POPUPS) feed.removeChild(feed.lastChild);
+  setTimeout(() => {
+    el.classList.add('is-leaving');
+    setTimeout(() => el.remove(), 400);
+  }, ACTIVITY_POPUP_MS);
 }
 
 function renderActivityHistory() {
@@ -3638,7 +3668,12 @@ function applyMute() {
     stopCraftSoundLoop();
   }
   const btn = document.getElementById('mute-btn');
-  if (btn) btn.textContent = state.muted ? 'Unmute' : 'Mute';
+  if (btn) {
+    const label = state.muted ? 'Unmute audio' : 'Mute audio';
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
+    btn.setAttribute('aria-pressed', String(state.muted));
+  }
 }
 
 // —— Textures ——
@@ -3765,6 +3800,47 @@ function trantDisplayScale(tex, opts = {}) {
   const maxScale = opts.maxScale ?? 1;
   const baseH = Math.max(1, tex?.height || targetH);
   return Math.min(maxScale, targetH / baseH);
+}
+
+/**
+ * The interaction hint: a small chip with a keycap and what it acts on,
+ * anchored by its bottom centre above the target.
+ */
+function makePromptChip() {
+  const chip = new PIXI.Container();
+  const bg = new PIXI.Graphics();
+  const cap = new PIXI.Graphics();
+  const keyText = new PIXI.Text('', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 11, fontWeight: '700', fill: 0x2b2418 });
+  const labelText = new PIXI.Text('', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 12, fontWeight: '700', fill: 0xfffaf0 });
+  chip.addChild(bg, cap, keyText, labelText);
+  chip.promptKey = '';
+  chip.promptLabel = '';
+  chip.setPrompt = (key, label) => {
+    if (chip.promptKey === key && chip.promptLabel === label) return;
+    chip.promptKey = key;
+    chip.promptLabel = label;
+    keyText.text = key;
+    labelText.text = label;
+    const padX = 6;
+    const h = 22;
+    const capW = key ? Math.ceil(keyText.width + 10) : 0;
+    const gap = key && label ? 6 : 0;
+    const w = Math.ceil(padX * 2 + capW + gap + (label ? labelText.width : 0));
+    bg.clear();
+    bg.beginFill(0x1f2a22, 0.74);
+    bg.drawRoundedRect(0, 0, w, h, 8);
+    bg.endFill();
+    cap.clear();
+    if (key) {
+      cap.beginFill(0xfff8e6, 0.96);
+      cap.drawRoundedRect(padX, 3, capW, h - 6, 4);
+      cap.endFill();
+    }
+    keyText.position.set(padX + 5, Math.round((h - keyText.height) / 2));
+    labelText.position.set(padX + capW + gap, Math.round((h - labelText.height) / 2));
+    chip.pivot.set(Math.round(w / 2), h);
+  };
+  return chip;
 }
 
 // —— Hover / pick targeting (crowded entities) ——
@@ -18769,11 +18845,14 @@ function handleSkillCompletions(completed, { offline = false } = {}) {
 function updateSkillChrome(now = Date.now()) {
   const button = document.getElementById('skills-btn');
   if (!button) return;
+  // Skills lives in the Menu; the study countdown stays on the bar as its own chip.
+  const chip = document.getElementById('study-chip');
   const active = getActiveStudy(skillState, now);
   if (!active) {
     button.textContent = 'Skills';
     button.title = 'Skills (K)';
     button.classList.remove('is-studying');
+    if (chip) chip.hidden = true;
     return;
   }
   const def = getSkillCatalog()[active.classTsid];
@@ -18781,6 +18860,11 @@ function updateSkillChrome(now = Date.now()) {
   button.textContent = `Study · ${remaining}`;
   button.title = `${def?.name || active.classTsid}: ${remaining} remaining`;
   button.classList.add('is-studying');
+  if (chip) {
+    chip.textContent = button.textContent;
+    chip.title = button.title;
+    chip.hidden = false;
+  }
 }
 
 function openSkillsPanel() {
@@ -20789,17 +20873,7 @@ async function main() {
   playerSpeechTarget = { name: 'Ur', label: 'Ur', classId: 'pc_player', sprite: player };
   entityLayer.addChild(player);
 
-  prompt = new PIXI.Text('', {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 14,
-    fill: 0xffffff,
-    fontWeight: '700',
-    dropShadow: true,
-    dropShadowColor: 0x000000,
-    dropShadowBlur: 2,
-    dropShadowDistance: 1,
-  });
-  prompt.anchor.set(0.5, 1);
+  prompt = makePromptChip();
   prompt.visible = false;
   fxLayer.addChild(prompt);
 
@@ -22058,6 +22132,7 @@ async function main() {
     if (input) input.value = '';
     if (result.ok) finishAssistedFeatChain(result);
   });
+  document.getElementById('study-chip')?.addEventListener('click', () => document.getElementById('skills-btn')?.click());
   document.getElementById('skills-btn')?.addEventListener('click', () => {
     if (!state.started) return;
     if (isSkillsOpen()) closeSkillsPanel();
@@ -22389,6 +22464,7 @@ async function main() {
       applyMute();
     } }));
   }
+  installMoreMenu();
   document.querySelector('.top-actions')?.addEventListener('click', () => {
     if (currentAction) cancelCurrentAction({ quiet: true });
     closePackPopover();
@@ -22496,30 +22572,28 @@ async function main() {
         ? findClimbWallNear(streetWalls, player.x, player.y, 42)
         : null;
       if (climb.active) {
-        prompt.text = '↑/↓ climb · ←/→ step off · Space jump';
+        prompt.setPrompt('↑↓', 'climb · ←→ step off · Space jump');
         prompt.x = player.x;
         prompt.y = player.y - 80;
         prompt.visible = true;
       } else if (nearClimb && (!near || Math.abs(player.x - nearClimb.x) < 50)) {
-        prompt.text = '↑ climb · Enter interact';
+        prompt.setPrompt('↑', 'climb');
         prompt.x = nearClimb.x;
         prompt.y = Math.min(player.y, nearClimb.yBot) - 70;
         prompt.visible = true;
       } else if (near) {
-        const label = near.label || near.classId;
-        prompt.text =
-          hoverTarget === near
-            ? `${label} — Enter / click`
-            : 'Enter / click — interact';
+        prompt.setPrompt('Enter', near.label || near.classId || 'interact');
         prompt.x = near.sprite.x;
         const box = spriteWorldHitBox(near.sprite, 0);
         prompt.y = (box ? box.top : near.sprite.y - 74) - 12;
         prompt.visible = true;
       } else if (nearSign) {
         const conn = pickConnection(nearSign.signpost, availableStreetTsids());
-        prompt.text = conn ? `T / click — ${conn.label}` : 'G — map (no loaded link)';
+        if (conn) prompt.setPrompt('T', conn.label);
+        else prompt.setPrompt('G', 'map (no loaded link)');
+        // Above the post, clear of the arms (SignpostView post 246px at 0.8).
         prompt.x = nearSign.screen.x;
-        prompt.y = nearSign.screen.y - 100;
+        prompt.y = nearSign.screen.y - 246 * 0.8 - 10;
         prompt.visible = true;
       } else {
         prompt.visible = false;

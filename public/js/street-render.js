@@ -28,6 +28,27 @@ const SIGN_FONT_SIZE = 14;
 const SIGN_TEXT_RESOLUTION = 3;
 const SIGN_ARM_PAD_X = 8;
 const SIGN_GLOW_COLOUR = 0x53e5ff;
+const SIGN_LABEL_STYLE = Object.freeze({
+  fontFamily: 'Trebuchet MS, Georgia, serif',
+  fontSize: SIGN_FONT_SIZE,
+  fontWeight: '700',
+  // The glow's strength 3 is approximated by a soft stroke under a blur.
+  stroke: 'rgba(255,255,255,0.45)',
+  strokeThickness: 3,
+  lineJoin: 'round',
+  dropShadow: true,
+  dropShadowColor: 0xffffff,
+  dropShadowBlur: 2,
+  dropShadowDistance: 0,
+  dropShadowAlpha: 0.6,
+  padding: 3,
+});
+
+/** makeSign: an arm fits its label plus 8px either side (holder units). */
+export function signArmWidth(PIXI, labelText) {
+  const metrics = PIXI.TextMetrics.measureText(String(labelText), new PIXI.TextStyle(SIGN_LABEL_STYLE));
+  return Math.ceil(metrics.width + 2 * SIGN_ARM_PAD_X);
+}
 
 /** @type {Set<string>|null} */
 let decoManifest = null;
@@ -144,26 +165,10 @@ function buildSignpostSprite(PIXI, signpost, pos) {
     // SignpostView.createSignTextField: 14px text drawn at 2.8x then scaled
     // down, with a soft white glow (StaticFilters.white1pxSignpost_GlowA).
     const baseFill = isLoaded ? 0x2a1a08 : 0x4a3a28;
-    const label = new PIXI.Text(labelText, {
-      fontFamily: 'Trebuchet MS, Georgia, serif',
-      fontSize: SIGN_FONT_SIZE,
-      fill: baseFill,
-      fontWeight: '700',
-      // The glow's strength 3 is approximated by a soft stroke under a blur.
-      stroke: 'rgba(255,255,255,0.45)',
-      strokeThickness: 3,
-      lineJoin: 'round',
-      dropShadow: true,
-      dropShadowColor: 0xffffff,
-      dropShadowBlur: 2,
-      dropShadowDistance: 0,
-      dropShadowAlpha: 0.6,
-      padding: 3,
-    });
+    const label = new PIXI.Text(labelText, { ...SIGN_LABEL_STYLE, fill: baseFill });
     label.resolution = SIGN_TEXT_RESOLUTION;
     label.anchor.set(0.5, 0.5);
-    // makeSign: the arm fits the text plus 8px either side.
-    const fitW = Math.ceil(label.width + 2 * SIGN_ARM_PAD_X);
+    const fitW = signArmWidth(PIXI, labelText);
 
     let armW = fitW;
     let armSprite = null;

@@ -275,6 +275,6 @@ test.describe('smooth directional camera and client wiring', () => {
     assert.match(game, /resolveIndexTsid\(bootParams\.get\('streetdemo'\)\)/);
     assert.match(game, /jumpdemo/);
     assert.match(game, /TRIPLE JUMP ×/);
-    assert.match(html, /id="mute-btn"[^>]*>Unmute</);
+    assert.match(html, /id="mute-btn"[^>]*aria-label="Unmute audio"/);
   });
 });

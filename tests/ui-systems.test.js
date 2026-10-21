@@ -182,7 +182,7 @@ describe('pack / inventory', () => {
     const html = readFileSync(join(__dirnameUi, '../public/index.html'), 'utf8');
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
     assert.match(game, /muted:\s*true/);
-    assert.match(html, /id="mute-btn"[^>]*title="Unmute audio"[^>]*>Unmute</);
+    assert.match(html, /id="mute-btn"[^>]*title="Unmute audio"[^>]*aria-label="Unmute audio"[^>]*aria-pressed="true"/);
     assert.match(html, /id="start-btn"[^>]*>Start exploring</);
     assert.doesNotMatch(html, /Start \(enables sound\)/);
   });

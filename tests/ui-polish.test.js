@@ -38,10 +38,12 @@ test.describe('responsive chrome polish', () => {
     assert.match(game, /Groddle could not finish loading/);
   });
 
-  test('renders only complete activity bubbles and enlarges large-screen chrome', () => {
+  test('floats only the newest activity briefly and enlarges large-screen chrome', () => {
     const css = fs.readFileSync(path.join(publicRoot, 'style.css'), 'utf8');
     const game = fs.readFileSync(path.join(publicRoot, 'game.js'), 'utf8');
-    assert.match(game, /feed\.children\.length > 4/);
+    assert.match(game, /feed\.children\.length > ACTIVITY_POPUPS/);
+    assert.match(game, /const ACTIVITY_POPUPS = 2;/);
+    assert.match(game, /classList\.add\('is-leaving'\)/);
     assert.doesNotMatch(
       css.match(/\.activity-feed\s*\{[\s\S]*?\}/)?.[0] || '',
       /max-height/

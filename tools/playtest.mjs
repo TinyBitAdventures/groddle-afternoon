@@ -356,6 +356,19 @@ class Session {
 
 // ---------------------------------------------------------------- helpers
 
+/** Open the top bar's Menu first when a button lives inside it. */
+async function revealChrome(t, sel) {
+  const hiddenInMenu = await t.page.evaluate((s) => {
+    const el = document.querySelector(s);
+    const list = el?.closest('#more-list');
+    return Boolean(list && list.hidden);
+  }, sel).catch(() => false);
+  if (hiddenInMenu) {
+    await t.page.click('#more-btn').catch(() => {});
+    await t.wait(150);
+  }
+}
+
 const PANELS = [
   { name: 'Quests', btn: '#quest-btn', panel: '#quest-panel', close: '#quest-close' },
   { name: 'Badges', btn: '#achieve-btn', panel: '#achieve-panel', close: '#achieve-close' },
@@ -374,6 +387,7 @@ async function exercisePanels(t, label = '') {
   for (const p of PANELS) {
     t.step = `panel ${p.name}${label}`;
     await t.declineOffer();
+    await revealChrome(t, p.btn);
     const btn = t.page.locator(p.btn);
     if (!(await btn.count())) {
       t.issue('ui', `${p.name}: button ${p.btn} missing`);
@@ -422,12 +436,12 @@ async function exercisePanels(t, label = '') {
       if (still) t.issue('ui', `${p.name}: panel did not close`);
     }
   }
-  // Mute toggles its own label.
+  // Mute toggles its own (icon button) label.
   t.step = `mute${label}`;
-  const before = await t.page.textContent('#mute-btn').catch(() => '');
+  const before = await t.page.getAttribute('#mute-btn', 'aria-label').catch(() => '');
   await t.page.click('#mute-btn', { timeout: 2000 }).catch((e) => t.issue('ui', `Mute click failed: ${e.message.split('\n')[0]}`));
   await t.wait(300);
-  const after = await t.page.textContent('#mute-btn').catch(() => '');
+  const after = await t.page.getAttribute('#mute-btn', 'aria-label').catch(() => '');
   if (before === after) t.issue('ui', `Mute label did not change (${before})`);
   await t.page.click('#mute-btn', { timeout: 2000 }).catch(() => {});
 }
@@ -614,6 +628,7 @@ const SCENARIOS = {
     // Skill study: pick the first Ready skill and start it.
     t.step = 'skill study';
     await t.declineOffer();
+    await revealChrome(t, '#skills-btn');
     await t.page.click('#skills-btn').catch(() => {});
     await t.wait(800);
     const ready = t.page.locator('#skills-panel button', { hasText: /Ready to study/ }).first();
@@ -1030,7 +1045,8 @@ const SCENARIOS = {
         await t.page.keyboard.up(i % 2 ? 'd' : 'a');
       }
       if (i % 20 === 0) {
-        await t.page.click('#skills-btn').catch(() => {});
+        await revealChrome(t, '#skills-btn');
+    await t.page.click('#skills-btn').catch(() => {});
         await t.wait(800);
         await t.shot(`skills-${i}`);
         await t.page.keyboard.press('Escape');
