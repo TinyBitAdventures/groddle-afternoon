@@ -298,6 +298,22 @@ describe('beans to trees', () => {
   });
 });
 
+describe('wood tree harvest', () => {
+  it('a surviving harvest zeroes the care counts (wood_tree.js endHarvest)', () => {
+    const plot = createPlot('patch');
+    plot.stage = 'seedling';
+    plot.seedling = { trantClass: 'wood_tree', petted: 3, minAt: 0, maxAt: 1e12, thirdPetAt: 0, growLevel: 0 };
+    const tree = growTree(plot, 0);
+    tree.state.maturity = 3;
+    tree.state.petted = true;
+    noteWoodTreeCare(tree);
+    assert.equal(tree.woodPetted, 1);
+    tree.state.totalHarvests = (tree.state.totalHarvests || 0) + 1;
+    noteWoodTreeCare(tree);
+    assert.equal(tree.woodPetted, 0);
+  });
+});
+
 describe('dead trees', () => {
   it('clearing a Dead Egg Plant gives 25 Planks and leaves a Dark Patch', () => {
     const plot = createPlot('trant_egg_dead');

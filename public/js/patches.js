@@ -504,6 +504,7 @@ export function normalizePlot(saved) {
         woodWatered: whole(t.woodWatered, 0),
         seenPetted: t.seenPetted === true,
         seenWatered: t.seenWatered === true,
+        seenHarvests: whole(t.seenHarvests, whole(state?.totalHarvests, 0)),
         clearedAt: time(t.clearedAt),
         resetAt: time(t.resetAt, time(t.grownAt)),
       };
@@ -544,6 +545,7 @@ export function growTree(plot, now = Date.now()) {
     woodWatered: 0,
     seenPetted: false,
     seenWatered: false,
+    seenHarvests: 0,
     clearedAt: 0,
     resetAt: now,
   };
@@ -590,6 +592,7 @@ function growLivingTree(tree, now, rng) {
 /**
  * wood_tree.js care growth: each new petting/watering counts; once both are
  * done and both counts reach maturityMap[m-1], the tree gains one maturity.
+ * A harvest the tree survives zeroes both counts.
  */
 export function noteWoodTreeCare(tree) {
   if (!tree || tree.classId !== 'wood_tree') return false;
@@ -605,6 +608,16 @@ export function noteWoodTreeCare(tree) {
   }
   tree.seenPetted = state.petted;
   tree.seenWatered = state.watered;
+  // endHarvest zeroes both counts when the tree survives the harvest.
+  const harvests = Math.max(0, Math.floor(Number(state.totalHarvests) || 0));
+  if (harvests !== (tree.seenHarvests ?? harvests)) {
+    if (state.maturity > 0 && (tree.woodPetted || tree.woodWatered)) {
+      tree.woodPetted = 0;
+      tree.woodWatered = 0;
+      changed = true;
+    }
+  }
+  tree.seenHarvests = harvests;
   if (changed && state.petted && state.watered && state.maturity >= 1 && state.maturity < 6) {
     const need = WOOD_TREE_MATURITY_MAP[state.maturity - 1];
     if (tree.woodPetted >= need && tree.woodWatered >= need) {
