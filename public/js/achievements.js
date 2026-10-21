@@ -301,8 +301,11 @@ export function unlockAchievement(state, classTsid, pc = null) {
   delete state.progress[classTsid];
   // Overachiever I-V: +2% to +10% on every badge reward (inc_achievements.js:331).
   const bonus = achievementRewardModifier(pc?.imaginationUpgrades);
-  applyRewards(pc, { ...(def.rewards || {}) }, { bonus });
-  const rewards = scaleRewards({ ...(def.rewards || {}) }, bonus);
+  // Every generated onComplete: /completist/i badges pay x level/4 past level 4.
+  const level = Number(pc?.level) || 0;
+  const factor = /completist/i.test(String(def.name || def.title || '')) && level > 4 ? level / 4 : 1;
+  applyRewards(pc, { ...(def.rewards || {}) }, { bonus, factor });
+  const rewards = scaleRewards({ ...(def.rewards || {}) }, bonus, factor);
   return { ok: true, reason: 'unlocked', rewards, def };
 }
 

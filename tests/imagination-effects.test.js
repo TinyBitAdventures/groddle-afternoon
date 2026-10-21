@@ -68,8 +68,9 @@ describe('reward upgrades', () => {
     assert.equal(pc.rewardBuffConsumed, undefined);
     const buffed = { xp: 0, imagination: 0, rewardMultiplier: 1.2 };
     applyRewards(buffed, { xp: 100 }, { bonus: 0.04 });
-    assert.equal(buffed.xp, 124);
-    assert.deepEqual(scaleRewards({ xp: 75, favor: { giant: 'pot', points: 10 } }, 0.1), { xp: 83, favor: { giant: 'pot', points: 11 } });
+    // round_to_5 (common.js): 124 -> 125, 82.5 -> 85, 11 -> 10.
+    assert.equal(buffed.xp, 125);
+    assert.deepEqual(scaleRewards({ xp: 75, favor: { giant: 'pot', points: 10 } }, 0.1), { xp: 85, favor: { giant: 'pot', points: 10 } });
   });
 });
 

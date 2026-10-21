@@ -402,9 +402,9 @@ describe('quest rewards', () => {
     const pc = freshPc({ rewardMultiplier: 1.2 });
     applyRewards(pc, getQuestCatalog().alchemy_make_compounds.rewards);
     assert.equal(pc.imagination, 240);
-    assert.equal(pc.giantFavor.ti, 24);
+    assert.equal(pc.giantFavor.ti, 25); // round_to_5(24)
     assert.equal(pc.rewardBuffConsumed, true);
-    assert.equal(questRewardSummary({ xp: 100, favor: { giant: 'lem', points: 10 } }, { multiplier: 1.2 }).subtitle, '+120 iMG · +12 Lem favor');
+    assert.equal(questRewardSummary({ xp: 100, favor: { giant: 'lem', points: 10 } }, { multiplier: 1.2 }).subtitle, '+120 iMG · +10 Lem favor');
   });
 });
 

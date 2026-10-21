@@ -205,16 +205,27 @@ export function completeQuest(state, classTsid, pc = null) {
 }
 
 /**
+ * common.js round_to_5: every quest and badge reward is rounded to the
+ * nearest 5 (a remainder of 2.5 rounds up), even at multiplier 1.
+ */
+export function roundTo5(value) {
+  const v = Number(value) || 0;
+  return v % 5 >= 2.5 ? Math.trunc(v / 5) * 5 + 5 : Math.trunc(v / 5) * 5;
+}
+
+/**
  * @param {object|null} pc
  * @param {object} rewards
+ * @param {{ bonus?: number, factor?: number }} [opts] factor multiplies after the bonus (Completist level/4)
  */
 export function applyRewards(pc, rewards, opts = {}) {
   if (!pc || !rewards) return pc;
   const buffMultiplier = Math.max(1, Number(pc.rewardMultiplier) || 1);
   // Imagination reward upgrades add to the buff multiplier (Overachiever,
   // Fit for a King): multiplier = buff + modifier.
-  const multiplier = buffMultiplier + Math.max(0, Number(opts.bonus) || 0);
-  const scaled = (value) => Math.max(0, Math.round((Number(value) || 0) * multiplier));
+  const factor = Number(opts.factor) > 0 ? Number(opts.factor) : 1;
+  const multiplier = (buffMultiplier + Math.max(0, Number(opts.bonus) || 0)) * factor;
+  const scaled = (value) => Math.max(0, roundTo5((Number(value) || 0) * multiplier));
   const energy = scaled(rewards.energy);
   const mood = scaled(rewards.mood);
   const xp = scaled(rewards.xp);
@@ -274,7 +285,7 @@ const giantLabel = (giant) => {
  */
 export function questRewardSummary(rewards = {}, opts = {}) {
   const multiplier = Math.max(1, Number(opts.multiplier) || 1);
-  const scaled = (value) => Math.max(0, Math.round((Number(value) || 0) * multiplier));
+  const scaled = (value) => Math.max(0, roundTo5((Number(value) || 0) * multiplier));
   const summary = {
     xp: scaled(rewards?.xp),
     currants: scaled(rewards?.currants),

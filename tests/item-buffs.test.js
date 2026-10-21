@@ -127,7 +127,7 @@ describe('official item buff mappings', () => {
     assert.equal(silverPc.rewardMultiplier, 1.05);
     applyRewards(silverPc, { xp: 100, currants: 20 });
     assert.equal(silverPc.imagination, 105);
-    assert.equal(silverPc.currants, 21);
+    assert.equal(silverPc.currants, 20); // round_to_5(21)
     assert.equal(silverPc.rewardBuffConsumed, true);
     const spent = consumeRewardBuff(silverState, silverPc, 1);
     assert.equal(spent.classTsid, 'silvertongue');

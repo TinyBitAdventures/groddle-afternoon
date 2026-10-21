@@ -31,18 +31,20 @@ export function questRewardModifier(owned) {
  * favor in either shape ({ giant, points } or a map of them). Items and
  * recipes are untouched.
  */
-export function scaleRewards(rewards, modifier) {
-  if (!rewards || !modifier) return rewards;
-  const k = 1 + modifier;
+export function scaleRewards(rewards, modifier, factor = 1) {
+  if (!rewards) return rewards;
+  // round_to_5, as paid (quests.js roundTo5), even with no modifier.
+  const k = (1 + (Number(modifier) || 0)) * (Number(factor) > 0 ? Number(factor) : 1);
+  const round5 = (v) => (v % 5 >= 2.5 ? Math.trunc(v / 5) * 5 + 5 : Math.trunc(v / 5) * 5);
   const out = { ...rewards };
   for (const key of ['xp', 'currants', 'mood', 'energy']) {
-    if (typeof out[key] === 'number' && Number.isFinite(out[key])) out[key] = Math.round(out[key] * k);
+    if (typeof out[key] === 'number' && Number.isFinite(out[key])) out[key] = round5(out[key] * k);
   }
   const favor = out.favor;
   if (favor && typeof favor === 'object') {
     const scaleEntry = (entry) =>
       entry && typeof entry === 'object' && typeof entry.points === 'number'
-        ? { ...entry, points: Math.round(entry.points * k) }
+        ? { ...entry, points: round5(entry.points * k) }
         : entry;
     if (typeof favor.points === 'number') out.favor = scaleEntry(favor);
     else out.favor = Object.fromEntries(Object.entries(favor).map(([id, entry]) => [id, scaleEntry(entry)]));
