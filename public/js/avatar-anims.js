@@ -159,3 +159,9 @@ export function crowdScaleX(scale, facing, facesRight) {
   return (left === Boolean(facesRight)) ? -scale : scale;
 }
 
+/** A stable crowd index for a name, so one Glitch keeps one face everywhere. */
+export function crowdIndexFor(name) {
+  let h = 0;
+  for (const ch of String(name || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return h % GLITCH_CROWD.length;
+}

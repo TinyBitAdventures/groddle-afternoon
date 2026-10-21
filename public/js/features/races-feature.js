@@ -19,7 +19,7 @@
  *     &raceautoplay=buy                    buy + activate a Space Race ticket
  */
 
-import { crowdScaleX } from '../avatar-anims.js';
+import { crowdIndexFor, crowdScaleX } from '../avatar-anims.js';
 import {
   RACES,
   RACE_ACHIEVEMENTS,
@@ -496,7 +496,7 @@ function spawnRaceEntities(engine) {
   finishSprite.zIndex = 9;
   engine.entityLayer.addChild(finishSprite);
   // Another Glitch's real walk cycle; the tinted portrait strip is the fallback.
-  const crowd = engine.glitchCrowd?.(hashText(run.rivalName || run.raceId));
+  const crowd = engine.glitchCrowd?.(crowdIndexFor(run.rivalName || run.raceId));
   const frames = crowd?.frames || engine.textures?.avatarStyledWalk?.frames || [];
   if (frames.length) {
     rivalSprite = new PIXI.AnimatedSprite(frames);
@@ -690,13 +690,6 @@ function raceTick(engine, now) {
   if (Math.abs(player.x - f.x) < 52 && player.y <= f.y + 8 && player.y >= f.y - 150) {
     if (finishRace(run, now)) showResult(engine);
   }
-}
-
-/** Stable small hash so a rival keeps the same Glitch. */
-function hashText(text) {
-  let h = 0;
-  for (const ch of String(text || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return h;
 }
 
 function showResult(engine) {

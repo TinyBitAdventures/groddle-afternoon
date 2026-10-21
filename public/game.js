@@ -595,7 +595,7 @@ import {
   planSignpostTravel,
 } from './js/travel.js';
 import { AVATAR_SHEETS, facingScaleX, facingFromVelocity } from './js/avatar.js';
-import { ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, GLITCH_CROWD, animForState, avatarAnimState, crowdScaleX, frameRef } from './js/avatar-anims.js';
+import { ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, GLITCH_CROWD, animForState, avatarAnimState, crowdIndexFor, crowdScaleX, frameRef } from './js/avatar-anims.js';
 import { landingY } from './js/walk-surface.js';
 import {
   createDefaultAppearance,
@@ -5668,21 +5668,29 @@ function makePlayer() {
   return body;
 }
 
+function companionScaleX(body) {
+  return crowdScaleX(Math.abs(body.baseScale), body.facing === 'left' ? -1 : 1, body.facesRight);
+}
+
 function makeLocalCompanion(profile) {
   const appearance =
     APPEARANCE_PRESETS[profile.preset]?.appearance ||
     APPEARANCE_PRESETS.classic.appearance;
-  const pack = getAppearanceTextures(appearance);
+  // Another real Glitch, the same one the name has in races and parties.
+  const crowd = engine.glitchCrowd(crowdIndexFor(profile.name));
+  const pack = crowd ? { walkFrames: crowd.frames, idleFrame: crowd.idle } : getAppearanceTextures(appearance);
   const root = new PIXI.Container();
   const body = new PIXI.AnimatedSprite(pack.walkFrames);
   body.texturesIdle = [pack.idleFrame];
   body.texturesWalk = pack.walkFrames;
   body.anchor.set(0.5, 1);
-  body.baseScale = SCALE * 0.39;
+  body.updateAnchor = Boolean(crowd);
+  body.facesRight = Boolean(crowd);
+  body.baseScale = crowd ? crowd.scale : SCALE * 0.39;
   body.facing = profile.gatherOffset < 0 ? 'right' : 'left';
-  body.scale.set(facingScaleX(body.baseScale, body.facing), body.baseScale);
+  body.scale.set(companionScaleX(body), body.baseScale);
   body.textures = body.texturesIdle;
-  body.animationSpeed = 0.16;
+  body.animationSpeed = crowd ? crowd.animationSpeed : 0.16;
   body.loop = true;
   body.autoUpdate = false;
   body.gotoAndStop(0);
@@ -5700,7 +5708,7 @@ function makeLocalCompanion(profile) {
     dropShadowDistance: 0,
   });
   name.anchor.set(0.5, 1);
-  name.y = -104;
+  name.y = crowd ? -Math.round((crowd.frames[0]?.frame?.height || 130) + 6) : -104;
   const plate = new PIXI.Graphics();
   plate.beginFill(0xfffdf5, 0.82);
   plate.lineStyle(1, profile.color, 0.64);
@@ -5965,13 +5973,13 @@ function updateLocalCompanions(dt) {
     sprite.y += (ground - sprite.y) * Math.min(1, 0.32 * dt);
     if (Math.abs(motion.vx) > 0.05) {
       body.facing = facingFromVelocity(motion.vx, body.facing || 'right');
-      body.scale.x = facingScaleX(body.baseScale, body.facing);
+      body.scale.x = companionScaleX(body);
       body.scale.y = body.baseScale;
       setLocalCompanionAnim(actor, 'walk');
     } else {
       if (now < actor.socialUntil && player) {
         body.facing = sprite.x < player.x ? 'right' : 'left';
-        body.scale.x = facingScaleX(body.baseScale, body.facing);
+        body.scale.x = companionScaleX(body);
       }
       setLocalCompanionAnim(actor, 'idle');
     }
