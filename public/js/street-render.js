@@ -586,14 +586,18 @@ function gradientTexture(PIXI, top, bottom) {
  * Parallax offset for a non-middleground layer (client LocationRenderer
  * recomputeParallax): the layer slides from its left/top edge to its
  * right/bottom edge as the camera crosses the street.
+ *
+ * The client's camera never left the street, so it could clamp. The remake's
+ * camera runs past the declared bottom to frame low platforms above the pack
+ * (cameraWorldHeightForGround), so the slide continues on the same line: a
+ * clamp froze same-size layers such as Hechey Track's `middleplus` dirt while
+ * the ground kept moving, opening gaps of sky under the grass.
  */
 export function parallaxLayerOffset(layer, camX, camY, vpW, vpH, streetW, streetH) {
   const maxX = streetW - vpW;
   const maxY = streetH - vpH;
-  const rectX = clampValue(0, Math.max(0, maxX), camX);
-  const rectY = clampValue(0, Math.max(0, maxY), camY);
-  const percX = maxX > 0 ? rectX / maxX : 1;
-  const percY = maxY > 0 ? rectY / maxY : 1;
+  const percX = maxX > 0 ? camX / maxX : 1;
+  const percY = maxY > 0 ? camY / maxY : 1;
   return {
     x: camX + Math.floor(percX * (vpW - layer.w)),
     y: camY + Math.floor(percY * (vpH - layer.h)),

@@ -64,6 +64,16 @@ describe('parallax layer offset (LocationRenderer.recomputeParallax)', () => {
     assert.deepEqual(parallaxLayerOffset(layer, 0, 0, 960, 408, 3000, 1000), { x: 0, y: 0 });
   });
 
+  it('keeps a street-sized layer on the ground when the camera runs past the bottom', () => {
+    // Hechey Track's middleplus dirt (6000 x 1000, like the middleground) with the
+    // camera 10 px below the declared street (camera world height 1102).
+    const dirt = { w: 6000, h: 1000 };
+    for (const camY of [0, 300, 592, 602, 694]) {
+      const at = parallaxLayerOffset(dirt, 2000, camY, 960, 408, 6000, 1000);
+      assert.equal(at.y, 0, `camY ${camY}`);
+    }
+  });
+
   it('reaches the layer’s right/bottom edge at the street end', () => {
     const at = parallaxLayerOffset(layer, 2040, 592, 960, 408, 3000, 1000);
     assert.equal(at.x - 2040, 960 - 2000);
