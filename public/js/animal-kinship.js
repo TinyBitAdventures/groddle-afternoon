@@ -18,6 +18,7 @@ import {
   useToolCondition,
 } from './tools.js?v=tools-2';
 import { SKILL_PACKAGES, skillPackageDetails } from './skill-packages.js';
+import { moodMax } from './metabolics.js';
 
 export const ANIMAL_KINSHIP_RANK_IDS = Object.freeze(
   Array.from({ length: 7 }, (_, index) => `animalkinship_${index + 1}`)
@@ -269,7 +270,7 @@ function awardMetabolics(pc, selected, moodBonus = selected.moodBonus) {
   effects.energy = -selected.energyCost;
   if (moodBonus) {
     const before = Number(pc.mood) || 0;
-    pc.mood = Math.min(100, before + moodBonus);
+    pc.mood = Math.min(moodMax(pc), before + moodBonus);
     effects.mood = pc.mood - before;
   }
   if (selected.xpBonus) {

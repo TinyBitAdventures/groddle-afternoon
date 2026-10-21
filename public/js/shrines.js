@@ -19,6 +19,7 @@ import {
   GAMESHOW_TICKET_ID,
   gameshowTicketChance,
 } from './spinning-wheel.js?v=spinning-wheel-1';
+import { moodMax } from './metabolics.js';
 
 export const EMBLEM_FAVOR_COST = 1000;
 export const EMBLEM_FAVOR_INCREMENT = 100;
@@ -307,7 +308,7 @@ export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, op
   xp = Math.min(xp, quote.dailyXpRoom);
 
   const moodBefore = Number(pc.mood) || 0;
-  pc.mood = Math.min(100, moodBefore + mood);
+  pc.mood = Math.min(moodMax(pc), moodBefore + mood);
   const actualMood = pc.mood - moodBefore;
   pc.xp = (Number(pc.xp) || 0) + xp;
   pc.imagination = (Number(pc.imagination) || 0) + xp;

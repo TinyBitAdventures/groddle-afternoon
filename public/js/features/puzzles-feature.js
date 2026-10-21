@@ -40,6 +40,7 @@ import {
   rewardBits,
   stepTriggers,
 } from '../puzzle-triggers.js';
+import { moodMax } from '../metabolics.js';
 
 export const PUZZLES_FEATURE_ID = 'puzzles';
 const DATA_MS = 250;
@@ -466,7 +467,7 @@ function payout(engine, r) {
   }
   if (r.currants) pc.currants = (pc.currants || 0) + r.currants;
   if (r.energy) pc.energy = Math.min(100, (pc.energy || 0) + r.energy);
-  if (r.mood) pc.mood = Math.min(100, (pc.mood || 0) + r.mood);
+  if (r.mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + r.mood);
   const ledger = pc.giantFavor;
   for (const f of r.favor || []) if (ledger) ledger[f.giant] = Math.max(0, Number(ledger[f.giant]) || 0) + f.points;
 }

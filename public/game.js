@@ -726,6 +726,7 @@ import {
   soundForQuoin,
   soundForVerb,
 } from './js/sound-moments.js';
+import { moodMax } from './js/metabolics.js';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -3082,7 +3083,7 @@ function updateHud() {
     quoinEl.classList.toggle('at-limit', quoinState.collectedToday >= quoinState.dailyLimit);
   }
   setBar('bar-energy', (pc.energy / energyCap()) * 100);
-  setBar('bar-mood', pc.mood);
+  setBar('bar-mood', (pc.mood / moodMax(pc)) * 100);
 
   // Dual-row pack: items (top) + tools (bottom), currants already set above
   syncEmotionalBearCatalog();
@@ -8491,6 +8492,7 @@ function physics(dt) {
         const result = collectQuoin(quoinState, q.typeId, pc, {
           giantId,
           favor: shrineState.favor,
+          favorCap: (id) => emblemCostFor(shrineState, id),
           accelerateStudy: (seconds) => accelerateActiveStudy(skillState, seconds, Date.now()),
         });
         if (!result.ok) {

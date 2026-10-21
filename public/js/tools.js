@@ -6,6 +6,7 @@
  */
 
 import { repairGivesMood } from './imagination-effects.js';
+import { moodMax } from './metabolics.js';
 
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {
@@ -264,7 +265,7 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
   let moodGained = 0;
   if (repairGivesMood(opts.upgrades || pc?.imaginationUpgrades) && pc) {
     const before = Number(pc.mood) || 0;
-    pc.mood = Math.min(Math.max(100, Number(pc.moodMax) || 100), before + quote.tinkertoolWear);
+    pc.mood = Math.min(moodMax(pc), before + quote.tinkertoolWear);
     moodGained = pc.mood - before;
   }
   return {

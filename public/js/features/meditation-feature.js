@@ -48,6 +48,7 @@ import {
   startLevitation,
   startMeditation,
 } from '../meditation.js';
+import { moodMax } from '../metabolics.js';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 const TANK = 100;
@@ -357,6 +358,7 @@ function end(engine, reason = 'timer', at = Date.now()) {
     streetTsid: engine.streetTsid,
     energy: pc.energy,
     mood: pc.mood,
+    moodMax: moodMax(pc),
     rng: rng(engine),
   });
   let { energy, mood } = out;
@@ -365,7 +367,7 @@ function end(engine, reason = 'timer', at = Date.now()) {
   // Energy the gate refused does not count toward the daily top.
   state = { ...out.state, energyToday: Math.max(0, out.state.energyToday - (out.energy - energy)) };
   pc.energy = Math.min(TANK, (pc.energy || 0) + energy);
-  pc.mood = Math.min(100, (pc.mood || 0) + mood);
+  pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
   if (out.img) {
     pc.imagination = (pc.imagination || 0) + out.img;
     pc.xp = (pc.xp || 0) + out.img;

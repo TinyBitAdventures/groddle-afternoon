@@ -82,6 +82,7 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js';
+import { moodMax } from '../metabolics.js';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -1494,7 +1495,7 @@ export const animalHusbandryFeature = {
       if (baby.extraVerb && verbId === baby.extraVerb.id) {
         const v = baby.extraVerb;
         if (v.energy) engine.pc.energy = Math.max(0, (engine.pc.energy || 0) + v.energy);
-        engine.pc.mood = Math.max(0, Math.min(Number(engine.pc.maxMood) || 100, (engine.pc.mood || 0) + v.mood));
+        engine.pc.mood = Math.max(0, Math.min(moodMax(engine.pc), (engine.pc.mood || 0) + v.mood));
         engine.pushActivity({ base: v.msg, effects: { energy: v.energy, mood: v.mood } });
         emit(engine, `${classTsid}:${v.id}`);
         engine.updateHud();

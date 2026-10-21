@@ -12,6 +12,7 @@
 
 import { getQuestCatalog } from './content-catalogs.js';
 import { questRewardModifier } from './imagination-effects.js';
+import { moodMax } from './metabolics.js';
 
 /**
  * @typedef {{
@@ -236,7 +237,7 @@ export function applyRewards(pc, rewards, opts = {}) {
   }));
   const favorPoints = favorRewards.reduce((sum, entry) => sum + entry.points, 0);
   if (energy) pc.energy = Math.min(Math.max(100, Number(pc.energyMax) || 100), (pc.energy || 0) + energy);
-  if (mood) pc.mood = Math.min(100, (pc.mood || 0) + mood);
+  if (mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
   if (xp) {
     pc.imagination = (pc.imagination || 0) + xp;
     pc.xp = (pc.xp || 0) + xp;

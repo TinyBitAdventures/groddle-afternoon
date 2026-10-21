@@ -36,6 +36,7 @@
 
 import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-3';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
+import { moodMax } from './metabolics.js';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -766,7 +767,7 @@ export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', no
     inv.hogtied_piggy = (inv.hogtied_piggy || 0) + 1;
     effects.items.hogtied_piggy = 1;
     const before = pc.mood || 0;
-    pc.mood = Math.min(Number(pc.maxMood) || 100, before + HERDKEEPING.successMood);
+    pc.mood = Math.min(moodMax(pc), before + HERDKEEPING.successMood);
     effects.mood = pc.mood - before;
     if (!ownYard) {
       pc.xp = (pc.xp || 0) + HERDKEEPING.successXp;

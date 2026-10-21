@@ -11,6 +11,7 @@
 import { canUseTool, useToolCondition } from './tools.js';
 import { fruitCapacityAt } from './trants.js?v=trant-harvest-2';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
+import { moodMax } from './metabolics.js';
 
 const freezeRanks = (ranks) => Object.freeze(
   Object.fromEntries(Object.entries(ranks).map(([id, row]) => [id, Object.freeze(row)]))
@@ -145,7 +146,7 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
     state.fruitCount = Math.min(state.fruitCapacity, Math.max(0, Number(state.fruitCount) || 0));
   }
   const moodBefore = Number(pc.mood) || 0;
-  pc.mood = Math.min(100, moodBefore + profile.moodBonus);
+  pc.mood = Math.min(moodMax(pc), moodBefore + profile.moodBonus);
   const mood = pc.mood - moodBefore;
   pc.imagination = (Number(pc.imagination) || 0) + profile.xpBonus;
   pc.xp = (Number(pc.xp) || 0) + profile.xpBonus;

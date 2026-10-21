@@ -12,6 +12,7 @@ import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventor
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { skillPackageDetails } from './skill-packages.js';
 import { gardenGrowModifier } from './imagination-effects.js';
+import { moodMax } from './metabolics.js';
 
 /** @typedef {'clean'|'seeds'|'shoots'|'crop'|'dirty'} PlotState */
 
@@ -383,7 +384,7 @@ function rollSucceeds(profile, opts) {
 
 function applyGardenRewards(pc, profile) {
   if (profile.legacy) return;
-  if (profile.mood && pc.mood != null) pc.mood = Math.min(pc.moodMax || 100, (pc.mood || 0) + profile.mood);
+  if (profile.mood && pc.mood != null) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + profile.mood);
   if (profile.xp) {
     if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + profile.xp;
     if (pc.xp != null) pc.xp = (pc.xp || 0) + profile.xp;
@@ -878,7 +879,7 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   }
   addItem(inv, seed.cropId, n + bonus);
   if (profile.legacy) {
-    if (pc.mood != null) pc.mood = Math.min(100, (pc.mood || 0) + 2);
+    if (pc.mood != null) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + 2);
     if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + 2;
     if (pc.xp != null) pc.xp = (pc.xp || 0) + 2;
   } else {

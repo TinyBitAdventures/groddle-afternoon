@@ -88,7 +88,7 @@ export function normalizePlayerSnapshot(seed = {}, fallback = PLAYER_DEFAULTS) {
       0,
       clamp(Math.floor(finite(source.energyMax, base.energyMax ?? 100)), 100, 1_000_000)
     ),
-    mood: clamp(finite(source.mood, base.mood), 0, 100),
+    mood: clamp(finite(source.mood, base.mood), 0, clamp(Math.floor(finite(source.energyMax, base.energyMax ?? 100)), 100, 1_000_000)),
     imagination: Math.max(0, Math.floor(finite(source.imagination, base.imagination))),
     currants: Math.max(0, Math.floor(finite(source.currants, base.currants))),
     xp: Math.max(0, Math.floor(finite(source.xp, base.xp))),

@@ -8,6 +8,7 @@
  */
 
 import { getBuffCatalog } from './content-catalogs.js';
+import { moodMax } from './metabolics.js';
 
 const SECOND = 1000;
 
@@ -149,10 +150,10 @@ function applyStartEffects(classTsid, pc) {
   const beforeMood = Number(pc.mood) || 0;
   if (classTsid === 'rookswort') {
     pc.energy = clamp(beforeEnergy + 3, 0, energyCap(pc));
-    pc.mood = clamp(beforeMood - 2, 0, 100);
+    pc.mood = clamp(beforeMood - 2, 0, moodMax(pc));
   } else if (classTsid === 'silvertongue') {
     pc.energy = clamp(beforeEnergy - 5, 0, energyCap(pc));
-    pc.mood = clamp(beforeMood + 5, 0, 100);
+    pc.mood = clamp(beforeMood + 5, 0, moodMax(pc));
   }
   if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
   if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
@@ -245,7 +246,7 @@ function applyTickEffect(row, pc) {
     const beforeEnergy = Number(pc.energy) || 0;
     const beforeMood = Number(pc.mood) || 0;
     if (tick.energy) pc.energy = clamp(beforeEnergy + tick.energy, 0, energyCap(pc));
-    if (tick.mood) pc.mood = clamp(beforeMood + tick.mood, 0, 100);
+    if (tick.mood) pc.mood = clamp(beforeMood + tick.mood, 0, moodMax(pc));
     if (tick.xp) {
       pc.imagination = (Number(pc.imagination) || 0) + tick.xp;
       pc.xp = (Number(pc.xp) || 0) + tick.xp;

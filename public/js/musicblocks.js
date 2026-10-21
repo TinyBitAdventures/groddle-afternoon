@@ -8,6 +8,7 @@
 
 import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-3';
 import { GAME_DAY_MS } from './game-day.js';
+import { moodMax } from './metabolics.js';
 
 export const MUSICBLOCK_MONTH_MS = Math.round(30.5 * 24 * 60 * 60 * 1000);
 export const MUSICBLOCK_REPLAY_MS = 4 * 60 * 60 * 1000;
@@ -184,7 +185,7 @@ export function playMusicblock(state, pc, classTsid, now = Date.now()) {
 
   pc.energy = Math.max(0, (pc.energy || 0) - 2);
   const oldMood = pc.mood || 0;
-  pc.mood = Math.min(100, oldMood + 2);
+  pc.mood = Math.min(moodMax(pc), oldMood + 2);
   if (xp) {
     pc.xp = (pc.xp || 0) + xp;
     pc.imagination = (pc.imagination || 0) + xp;

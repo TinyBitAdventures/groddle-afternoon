@@ -57,6 +57,7 @@ import {
   plainText,
   isJobBuilt,
 } from '../street-jobs.js?v=jobs-1';
+import { energyMax, moodMax } from '../metabolics.js';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';
@@ -320,8 +321,9 @@ function clearFlora() {
 /* Rewards                                                              */
 /* ------------------------------------------------------------------ */
 
-function clamp100(v) {
-  return Math.max(0, Math.min(100, Math.round(v)));
+/** 0 up to the player's metabolic maximum (the energy tank, also mood's). */
+function clampMetabolic(v, max) {
+  return Math.max(0, Math.min(max, Math.round(v)));
 }
 
 function payout(engine, { xp = 0, currants = 0, mood = 0, energy = 0, favor = [] } = {}) {
@@ -331,8 +333,8 @@ function payout(engine, { xp = 0, currants = 0, mood = 0, energy = 0, favor = []
     pc.imagination = (pc.imagination || 0) + xp;
   }
   if (currants) pc.currants = (pc.currants || 0) + currants;
-  if (mood) pc.mood = clamp100((pc.mood || 0) + mood);
-  if (energy) pc.energy = clamp100((pc.energy || 0) + energy);
+  if (mood) pc.mood = clampMetabolic((pc.mood || 0) + mood, moodMax(pc));
+  if (energy) pc.energy = clampMetabolic((pc.energy || 0) + energy, energyMax(pc));
   const ledger = pc.giantFavor;
   for (const f of favor) {
     if (!f?.points || !ledger) continue;

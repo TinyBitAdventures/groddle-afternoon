@@ -1,5 +1,7 @@
 /** Official Glitch quoin types and their persistent daily economy. */
 
+import { energyMax, moodMax } from './metabolics.js';
+
 export const DEFAULT_DAILY_QUOIN_LIMIT = 100;
 export const QUOIN_SHEET = Object.freeze({
   url: 'assets/sprites/quoin__x1_1_x1_2_x1_3_x1_4_x1_5_x1_6_x1_7_x1_8_png_1354829599.png',
@@ -29,7 +31,6 @@ export const QURAZY_REWARDS = Object.freeze([
   815, 835, 855, 875, 895, 915,
 ]);
 
-const COMMON_MYSTERY_TYPES = Object.freeze(['xp', 'mood', 'energy', 'currants']);
 const STREET_SEQUENCE = Object.freeze(['xp', 'energy', 'mood', 'currants', 'mystery', 'favor', 'xp', 'time']);
 
 function finite(value, fallback = 0) {
@@ -116,11 +117,6 @@ export function resetQuoinDay(state, upgrades = []) {
   return { hitLimit, limitStreak: state.limitStreak, dailyLimit: state.dailyLimit };
 }
 
-function resolveMysteryType(rng = Math.random) {
-  const roll = clamp(finite(rng(), 0), 0, 0.999999);
-  return COMMON_MYSTERY_TYPES[Math.floor(roll * COMMON_MYSTERY_TYPES.length)];
-}
-
 /**
  * Apply one quoin. Qurazy quoins bypass the daily limit, matching GSJS.
  * Time quoins accelerate an active skill study through opts.accelerateStudy,
@@ -134,7 +130,8 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     return { ok: false, reason: 'daily_limit', dailyCount: state.collectedToday, dailyLimit: state.dailyLimit };
   }
 
-  const resolvedType = originalType === 'mystery' ? resolveMysteryType(opts.rng) : originalType;
+  // items/quoin.js has no mystery branch: a mystery quoin only counts toward the daily limit.
+  const resolvedType = originalType;
   const def = QUOIN_TYPES[resolvedType];
   const multiplier = originalType === 'qurazy' ? 1 : state.multiplier;
   const baseAmount = originalType === 'qurazy'
@@ -148,15 +145,21 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     pc.imagination = Math.max(0, Math.floor(finite(pc.imagination, 0))) + amount;
     pc.xp = Math.max(0, Math.floor(finite(pc.xp, 0))) + amount;
   } else if (resolvedType === 'energy' || resolvedType === 'mood') {
-    const before = clamp(finite(pc[resolvedType], 0), 0, 100);
-    pc[resolvedType] = clamp(before + amount, 0, 100);
+    // metabolics_add_energy / _mood cap at the tank, never lowering a tank above 100.
+    const top = resolvedType === 'mood' ? moodMax(pc) : energyMax(pc);
+    const before = clamp(finite(pc[resolvedType], 0), 0, top);
+    pc[resolvedType] = clamp(before + amount, 0, top);
     actual = pc[resolvedType] - before;
   } else if (resolvedType === 'currants') {
     pc.currants = Math.max(0, Math.floor(finite(pc.currants, 0))) + amount;
   } else if (resolvedType === 'favor') {
     const giantId = String(opts.giantId || 'all').toLowerCase();
     const favor = opts.favor && typeof opts.favor === 'object' ? opts.favor : {};
-    favor[giantId] = Math.max(0, Math.floor(finite(favor[giantId], 0))) + amount;
+    // stats_add_favor_points caps each Giant at its emblem target (stats_get_max_favor).
+    const cap = typeof opts.favorCap === 'function' ? Number(opts.favorCap(giantId)) : Infinity;
+    const before = Math.max(0, Math.floor(finite(favor[giantId], 0)));
+    favor[giantId] = Math.min(Number.isFinite(cap) ? Math.max(before, cap) : Infinity, before + amount);
+    actual = favor[giantId] - before;
   } else if (resolvedType === 'time') {
     acceleration = typeof opts.accelerateStudy === 'function'
       ? opts.accelerateStudy(amount)

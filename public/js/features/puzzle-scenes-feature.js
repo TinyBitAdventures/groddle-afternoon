@@ -38,6 +38,7 @@ import {
   normalizeSceneSave,
   sceneTsid,
 } from '../puzzle-scenes.js';
+import { moodMax } from '../metabolics.js';
 
 export const PUZZLE_SCENES_FEATURE_ID = 'puzzle-scenes';
 const TICKET = 'paradise_ticket_beam_me_down';
@@ -347,7 +348,7 @@ function payout(engine, r) {
     pc.xp = (pc.xp || 0) + r.xp;
     pc.imagination = (pc.imagination || 0) + r.xp;
   }
-  if (r.mood) pc.mood = Math.min(100, (pc.mood || 0) + r.mood);
+  if (r.mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + r.mood);
 }
 
 function finish(engine) {

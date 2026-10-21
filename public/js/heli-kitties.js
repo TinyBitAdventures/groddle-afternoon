@@ -10,6 +10,7 @@
  * Those hidden verbs are listed in KITTY_SOURCE_HIDDEN_VERBS and never shown.
  */
 
+import { moodMax } from './metabolics.js';
 export const KITTY_ID = 'npc_kitty_chicken';
 export const KITTY_LABEL = 'Heli Kitty';
 export const KITTY_PLURAL = 'Heli Kitties';
@@ -166,7 +167,7 @@ export function petKitty(kitty, pc) {
   const energy = Math.min(KITTY_PET.energy, Math.max(0, pc.energy || 0));
   pc.energy = Math.max(0, (pc.energy || 0) - energy);
   const before = pc.mood || 0;
-  pc.mood = Math.min(100, before + KITTY_PET.mood);
+  pc.mood = Math.min(moodMax(pc), before + KITTY_PET.mood);
   const mood = pc.mood - before;
   pc.xp = (pc.xp || 0) + KITTY_PET.xp;
   if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + KITTY_PET.xp;

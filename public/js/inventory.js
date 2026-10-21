@@ -6,6 +6,7 @@
 /** @typedef {Record<string, number>} Inventory */
 
 /** Canonical icon path for a class_tsid (OGA iconic extract). */
+import { moodMax } from './metabolics.js';
 export function itemIcon(classTsid) {
   if (!classTsid) return 'assets/sprites/icons/apple.png';
   return `assets/sprites/icons/${classTsid}.png`;
@@ -395,7 +396,7 @@ export function useItem(inv, pc, classTsid) {
   }
   if (info.effects.mood) {
     const before = pc.mood || 0;
-    pc.mood = Math.max(0, Math.min(100, before + info.effects.mood));
+    pc.mood = Math.max(0, Math.min(moodMax(pc), before + info.effects.mood));
     if (pc.mood !== before) effects.mood = pc.mood - before;
   }
   if (info.effects.xp > 0) {
