@@ -72,7 +72,9 @@ describe('official Tiny Speck level progression', () => {
     const pc = { xp: 2180, level: 1, energy: 5, mood: 6, currants: 0 };
     const result = reconcilePlayerProgression(pc);
     assert.deepEqual(result.levelsGained, [2, 3, 4]);
-    assert.equal(result.currants, 540);
+    // stats_add_xp pays the level reached once (prev_level = info.level - 1).
+    assert.equal(result.currants, 270);
+    assert.equal(result.favor, 15);
     assert.equal(pc.level, 4);
     assert.equal(formatLevelProgress(levelInfoForXp(6080)), '2,285 / 2,290 XP');
   });

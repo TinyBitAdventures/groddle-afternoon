@@ -65,9 +65,20 @@ export function currantRewardForLevel(level) {
 }
 
 /**
+ * Level-up favor for every Giant (inc_stats.js:391, "From Excel"):
+ * round(log10(x)^2 * sqrt(x) / 20) with x the XP interval of the level reached.
+ */
+export function favorRewardForLevel(level) {
+  const x = xpIntervalForLevel(level);
+  if (!(x > 0)) return 0;
+  return Math.round(Math.pow(Math.log10(x), 2) * (Math.sqrt(x) / 20));
+}
+
+/**
  * Bring `pc.level` in line with lifetime XP and apply level-up rewards once.
- * Mirrors the original refill + currant reward while omitting the unused favor
- * currency from this focused remake.
+ * Mirrors stats_add_xp's level check: the refill, then currants and favor for
+ * the level reached only (a multi-level jump pays the final level once).
+ * The caller pays `favor` to each Giant (it lives in the shrine state).
  *
  * @param {object} pc
  * @param {{ energyTop?: number, moodTop?: number }} [opts]
@@ -95,14 +106,13 @@ export function reconcilePlayerProgression(pc, opts = {}) {
   }
 
   const levelsGained = [];
-  let currants = 0;
-  for (let level = fromLevel + 1; level <= toLevel; level += 1) {
-    levelsGained.push(level);
-    currants += currantRewardForLevel(level);
-  }
+  for (let level = fromLevel + 1; level <= toLevel; level += 1) levelsGained.push(level);
+  const currants = currantRewardForLevel(toLevel);
+  const favor = favorRewardForLevel(toLevel);
 
   const energyTop = Math.max(0, Number(opts.energyTop) || Number(pc.energyMax) || 100);
-  const moodTop = Math.max(0, Number(opts.moodTop) || 100);
+  // Mood's maximum is the same tank (metabolics_recalc_limits).
+  const moodTop = Math.max(0, Number(opts.moodTop) || Number(pc.energyMax) || 100);
   const beforeEnergy = Number(pc.energy) || 0;
   const beforeMood = Number(pc.mood) || 0;
   pc.energy = energyTop;
@@ -115,6 +125,7 @@ export function reconcilePlayerProgression(pc, opts = {}) {
     toLevel,
     levelsGained,
     currants,
+    favor,
     energyAdded: energyTop - beforeEnergy,
     moodAdded: moodTop - beforeMood,
     info,

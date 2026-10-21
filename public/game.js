@@ -2849,10 +2849,19 @@ function updateHud() {
   const levelUpdate = holdProgressionAward
     ? { leveledUp: false }
     : reconcilePlayerProgression(pc);
+  if (levelUpdate.leveledUp && levelUpdate.favor) {
+    // stats_add_favor_points('all', reward_favor), each Giant capped at its emblem target.
+    for (const id of Object.keys(shrineState.favor || {})) {
+      const cap = emblemCostFor(shrineState, id);
+      const have = Number(shrineState.favor[id]) || 0;
+      shrineState.favor[id] = Math.max(have, Math.min(cap, have + levelUpdate.favor));
+    }
+  }
   if (levelUpdate.leveledUp && state.started) {
-    const rewardText = levelUpdate.currants
-      ? ` You also received ${levelUpdate.currants.toLocaleString()} currants.`
-      : '';
+    const rewardBits = [];
+    if (levelUpdate.currants) rewardBits.push(`${levelUpdate.currants.toLocaleString()} currants`);
+    if (levelUpdate.favor) rewardBits.push(`${levelUpdate.favor} favor with every Giant`);
+    const rewardText = rewardBits.length ? ` You also received ${rewardBits.join(' and ')}.` : '';
     const activity = `Woo! You reached level ${levelUpdate.toLevel}. Energy and mood refilled.${rewardText}`;
     pushActivity(activity);
     enqueueAward({

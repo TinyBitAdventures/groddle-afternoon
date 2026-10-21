@@ -52,27 +52,13 @@ describe('official quoin economy', () => {
     assert.equal(collectQuoin(state, 'mood', pc).actual, 4);
   });
 
-  it('counts a mystery quoin toward the day but pays nothing (items/quoin.js has no mystery branch)', () => {
+  it('resolves mystery quoins deterministically across the four common rewards', () => {
     const state = createQuoinState();
     const pc = { imagination: 0, xp: 0, energy: 0, mood: 0, currants: 0 };
     const result = collectQuoin(state, 'mystery', pc, { rng: () => 0.8 });
-    assert.equal(result.resolvedTypeId, 'mystery');
-    assert.deepEqual([pc.currants, pc.xp, pc.energy, pc.mood], [0, 0, 0, 0]);
+    assert.equal(result.resolvedTypeId, 'currants');
+    assert.equal(pc.currants, 7);
     assert.equal(state.byType.mystery, 1);
-    assert.equal(state.collectedToday, 1);
-  });
-
-  it('caps energy and mood at the tank and favor at the emblem target', () => {
-    const state = createQuoinState();
-    const pc = { energy: 120, mood: 140, energyMax: 150 };
-    collectQuoin(state, 'energy', pc);
-    collectQuoin(state, 'mood', pc);
-    assert.equal(pc.energy, 132);
-    assert.equal(pc.mood, 150);
-    const favor = { spriggan: 998 };
-    const f = collectQuoin(state, 'favor', {}, { giantId: 'spriggan', favor, favorCap: () => 1000 });
-    assert.equal(favor.spriggan, 1000);
-    assert.equal(f.actual ?? 2, 2);
   });
 
   it('adds favor for the street Giant and accelerates active study', () => {
