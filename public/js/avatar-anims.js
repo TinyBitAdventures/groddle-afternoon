@@ -34,7 +34,8 @@ export const GLITCH_AVATAR = Object.freeze({
   id: '62d8dab1',
   dir: 'assets/sprites/avatar/glitch-62d8/',
   sheets: Object.freeze({
-    base: { file: 'base.png', cells: 15, fw: 102, fh: 135, feetY: 133, midX: 44 },
+    // midX over the walk frames (the leaning hit frames widen the full box).
+    base: { file: 'base.png', cells: 15, fw: 102, fh: 135, feetY: 133, midX: 52 },
     jump: { file: 'jump.png', cells: 33, fw: 108, fh: 138, feetY: 135, midX: 60 },
     climb: { file: 'climb.png', cells: 19, fw: 92, fh: 128, feetY: 123, midX: 57 },
     angry: { file: 'angry.png', cells: 20, fw: 92, fh: 133, feetY: 130, midX: 51 },
@@ -133,3 +134,28 @@ export function animForState(state) {
     default: return { anim: 'idle0', loop: false };
   }
 }
+
+/**
+ * Other Glitches (race and Game of Crowns rivals, party guests, the Hog Haul
+ * rival): six more players' base sheets from the same CDX recovery
+ * (c2.glitch.bz/avatars/2012-12-NN/<id>..._base.png), 15 cells each, walk
+ * frames 0-11 and idle cell 14. feetY / midX measured over the walk frames.
+ */
+export const GLITCH_CROWD = Object.freeze([
+  { id: '2af0a374', fw: 130, fh: 144, feetY: 143, midX: 71 },
+  { id: '6c41f6ba', fw: 94, fh: 126, feetY: 124, midX: 55 },
+  { id: '730692de', fw: 90, fh: 124, feetY: 123, midX: 56 },
+  { id: '8ac9d32b', fw: 104, fh: 129, feetY: 126, midX: 58 },
+  { id: 'b338c47c', fw: 108, fh: 131, feetY: 129, midX: 56 },
+  { id: '01f12f85', fw: 102, fh: 135, feetY: 133, midX: 52 },
+].map((c) => Object.freeze({ ...c, file: `assets/sprites/avatar/crowd/${c.id}.png`, cells: 15 })));
+
+/**
+ * scale.x for a Glitch-sheet sprite (drawn facing right) or a portrait one
+ * (drawn facing left) moving in `facing` (negative = left).
+ */
+export function crowdScaleX(scale, facing, facesRight) {
+  const left = facing < 0;
+  return (left === Boolean(facesRight)) ? -scale : scale;
+}
+

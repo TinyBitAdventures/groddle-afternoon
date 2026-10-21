@@ -19,6 +19,7 @@
  *     &raceautoplay=buy                    buy + activate a Space Race ticket
  */
 
+import { crowdScaleX } from '../avatar-anims.js';
 import {
   RACES,
   RACE_ACHIEVEMENTS,
@@ -494,13 +495,18 @@ function spawnRaceEntities(engine) {
   finishSprite = drawFinishPosts(PIXI, course.finish);
   finishSprite.zIndex = 9;
   engine.entityLayer.addChild(finishSprite);
-  const frames = engine.textures?.avatarStyledWalk?.frames || [];
+  // Another Glitch's real walk cycle; the tinted portrait strip is the fallback.
+  const crowd = engine.glitchCrowd?.(hashText(run.rivalName || run.raceId));
+  const frames = crowd?.frames || engine.textures?.avatarStyledWalk?.frames || [];
   if (frames.length) {
     rivalSprite = new PIXI.AnimatedSprite(frames);
     rivalSprite.anchor.set(0.5, 1);
-    rivalSprite.animationSpeed = 0.18;
-    rivalSprite.scale.set(RIVAL_SCALE);
-    rivalSprite.tint = run.rivalTint;
+    rivalSprite.updateAnchor = Boolean(crowd);
+    rivalSprite.animationSpeed = crowd ? crowd.animationSpeed : 0.18;
+    rivalSprite.crowdScale = crowd ? crowd.scale : RIVAL_SCALE;
+    rivalSprite.facesRight = Boolean(crowd);
+    rivalSprite.scale.set(rivalSprite.crowdScale);
+    if (!crowd) rivalSprite.tint = run.rivalTint;
     rivalSprite.x = course.spawn.rival.x;
     rivalSprite.y = course.spawn.rival.y;
     rivalSprite.zIndex = 46;
@@ -544,9 +550,11 @@ function placeRival(x, y, mode, facing) {
   if (!rivalSprite || rivalSprite.destroyed) return;
   rivalSprite.x = x;
   rivalSprite.y = y;
-  rivalSprite.scale.set(facing < 0 ? RIVAL_SCALE : -RIVAL_SCALE, RIVAL_SCALE);
+  const scale = rivalSprite.crowdScale || RIVAL_SCALE;
+  rivalSprite.scale.set(crowdScaleX(scale, facing, rivalSprite.facesRight), scale);
   if (mode === 'walk' || mode === 'climb') {
-    rivalSprite.animationSpeed = mode === 'climb' ? 0.1 : 0.2;
+    const speed = rivalSprite.facesRight ? 0.5 : 0.2;
+    rivalSprite.animationSpeed = mode === 'climb' ? speed / 2 : speed;
     if (!rivalSprite.playing) rivalSprite.play();
   } else if (rivalSprite.playing) {
     rivalSprite.gotoAndStop(mode === 'jump' ? 3 : 0);
@@ -682,6 +690,13 @@ function raceTick(engine, now) {
   if (Math.abs(player.x - f.x) < 52 && player.y <= f.y + 8 && player.y >= f.y - 150) {
     if (finishRace(run, now)) showResult(engine);
   }
+}
+
+/** Stable small hash so a rival keeps the same Glitch. */
+function hashText(text) {
+  let h = 0;
+  for (const ch of String(text || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return h;
 }
 
 function showResult(engine) {

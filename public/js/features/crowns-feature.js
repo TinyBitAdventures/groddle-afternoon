@@ -19,6 +19,7 @@
  *     &crownstart=<seconds>                  pre-fill your crown clock
  */
 
+import { crowdScaleX } from '../avatar-anims.js';
 import {
   CROWNS_ID,
   CROWNS_LADDERS,
@@ -200,17 +201,22 @@ function setupArena(street, engine) {
   lastTip = '';
   autoPath = null;
   actors = {};
-  const frames = engine.textures?.avatarStyledWalk?.frames || [];
   rivals().forEach((r, i) => {
     const start = START_POINTS[i + 1];
     let sprite = null;
     let label = null;
+    // Each rival is another real Glitch; the tinted portrait strip is the fallback.
+    const crowd = engine.glitchCrowd?.(i + 1);
+    const frames = crowd?.frames || engine.textures?.avatarStyledWalk?.frames || [];
     if (frames.length) {
       sprite = new PIXI.AnimatedSprite(frames);
       sprite.anchor.set(0.5, 1);
-      sprite.animationSpeed = 0.2;
-      sprite.scale.set(RIVAL_SCALE);
-      sprite.tint = r.tint;
+      sprite.updateAnchor = Boolean(crowd);
+      sprite.animationSpeed = crowd ? crowd.animationSpeed : 0.2;
+      sprite.crowdScale = crowd ? crowd.scale : RIVAL_SCALE;
+      sprite.facesRight = Boolean(crowd);
+      sprite.scale.set(sprite.crowdScale);
+      if (!crowd) sprite.tint = r.tint;
       sprite.zIndex = 46;
       sprite.eventMode = 'none';
       engine.entityLayer.addChild(sprite);
@@ -267,7 +273,8 @@ function placeActor(a) {
   if (!a.sprite || a.sprite.destroyed) return;
   a.sprite.x = a.x;
   a.sprite.y = a.y;
-  a.sprite.scale.set(a.facing < 0 ? RIVAL_SCALE : -RIVAL_SCALE, RIVAL_SCALE);
+  const scale = a.sprite.crowdScale || RIVAL_SCALE;
+  a.sprite.scale.set(crowdScaleX(scale, a.facing, a.sprite.facesRight), scale);
   if (a.mode === 'walk' || a.mode === 'climb') {
     if (!a.sprite.playing) a.sprite.play();
   } else if (a.sprite.playing) a.sprite.gotoAndStop(a.mode === 'jump' || a.mode === 'drop' ? 3 : 0);

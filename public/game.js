@@ -595,7 +595,7 @@ import {
   planSignpostTravel,
 } from './js/travel.js';
 import { AVATAR_SHEETS, facingScaleX, facingFromVelocity } from './js/avatar.js';
-import { ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, animForState, avatarAnimState, frameRef } from './js/avatar-anims.js';
+import { ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, GLITCH_CROWD, animForState, avatarAnimState, crowdScaleX, frameRef } from './js/avatar-anims.js';
 import { landingY } from './js/walk-surface.js';
 import {
   createDefaultAppearance,
@@ -1016,6 +1016,8 @@ const SHEETS = {
   glitchAvatarAngry: glitchSheetDef('angry'),
   glitchAvatarHappy: glitchSheetDef('happy'),
   glitchAvatarSurprise: glitchSheetDef('surprise'),
+  // Other Glitches' walk sheets (rivals, party guests).
+  ...Object.fromEntries(GLITCH_CROWD.map((c, i) => [`glitchCrowd${i}`, { url: c.file, fw: c.fw, fh: c.fh, cols: c.cells, rows: 1 }])),
   avatarStyledAlt: { url: 'assets/sprites/avatar_styled_alt.png', whole: true },
 };
 
@@ -6805,6 +6807,21 @@ const engine = {
       try { src.stop(t + 1.4); } catch { /* ended */ }
     };
   },
+  /**
+   * Another Glitch's real walk cycle (GLITCH_CROWD, by index) for rivals and
+   * guests: 12 walk frames anchored on their feet (set updateAnchor), facing
+   * right, at world scale and 30 fps. Null until the sheets load.
+   */
+  glitchCrowd(index = 0) {
+    const n = GLITCH_CROWD.length;
+    const i = ((Math.floor(Number(index) || 0) % n) + n) % n;
+    const c = GLITCH_CROWD[i];
+    const sheet = textures[`glitchCrowd${i}`];
+    if (!sheet?.frames?.length) return null;
+    for (const tex of sheet.frames) tex.defaultAnchor.set(c.midX / c.fw, c.feetY / c.fh);
+    return { id: c.id, frames: sheet.frames.slice(0, 12), idle: sheet.frames[14], scale: 1, facesRight: true, animationSpeed: ANIM_FPS / 60 };
+  },
+  crowdScaleX,
   /** Loaded texture sheets (e.g. avatarStyledWalk for stand-in racers). */
   get textures() {
     return textures;
@@ -9054,14 +9071,18 @@ function spawnHogHaulPen(point) {
 }
 
 function spawnHogHaulRival(point) {
-  const frames = textures.avatarStyledWalk?.frames || [];
+  const crowd = engine.glitchCrowd(3);
+  const frames = crowd?.frames || textures.avatarStyledWalk?.frames || [];
   if (!frames.length) return null;
   const rival = new PIXI.AnimatedSprite(frames);
   rival.anchor.set(0.5, 1);
-  rival.animationSpeed = 0.18;
+  rival.updateAnchor = Boolean(crowd);
+  rival.animationSpeed = crowd ? crowd.animationSpeed : 0.18;
   rival.loop = true;
-  rival.scale.set(SCALE * 0.4);
-  rival.tint = 0xd8b5ff;
+  rival.crowdScale = crowd ? crowd.scale : SCALE * 0.4;
+  rival.facesRight = Boolean(crowd);
+  rival.scale.set(rival.crowdScale);
+  if (!crowd) rival.tint = 0xd8b5ff;
   rival.alpha = 0.88;
   rival.x = point.x + 82;
   rival.y = point.y;
@@ -9109,8 +9130,8 @@ function updateHogHaulRival(dt) {
   const step = Math.min(distance, 2.15 * dt);
   rival.x += (dx / distance) * step;
   rival.y += (dy / distance) * step;
-  const scale = SCALE * 0.4;
-  rival.scale.set(dx < 0 ? scale : -scale, scale);
+  const scale = rival.crowdScale || SCALE * 0.4;
+  rival.scale.set(crowdScaleX(scale, dx, rival.facesRight), scale);
   if (!rival.playing) rival.play();
 }
 

@@ -740,13 +740,17 @@ function pickUp(engine, row) {
 
 function spawnGuest(engine, guest, point, index) {
   const { PIXI } = engine;
-  const frames = engine.textures?.avatarStyledWalk?.frames || [];
+  // Each guest is another real Glitch; the tinted portrait strip is the fallback.
+  const crowd = engine.glitchCrowd?.(index + 3);
+  const frames = crowd?.frames || engine.textures?.avatarStyledWalk?.frames || [];
   if (!frames.length || !point) return;
   const sprite = new PIXI.AnimatedSprite(frames);
   sprite.anchor.set(0.5, 1);
-  sprite.animationSpeed = 0.16 + index * 0.02;
-  sprite.scale.set(GUEST_SCALE);
-  sprite.tint = guest.tint;
+  sprite.updateAnchor = Boolean(crowd);
+  sprite.animationSpeed = crowd ? crowd.animationSpeed * (0.8 + index * 0.1) : 0.16 + index * 0.02;
+  sprite.crowdScale = crowd ? crowd.scale : GUEST_SCALE;
+  sprite.scale.set(sprite.crowdScale);
+  if (!crowd) sprite.tint = guest.tint;
   sprite.x = point.x;
   sprite.y = point.y + 2;
   sprite.zIndex = 30;
@@ -776,7 +780,8 @@ function tickGuests(engine, dtMs, now) {
     const hop = Math.max(0, Math.sin(beat)) * (Math.floor(g.t / 2.4) % 3 === 0 ? 14 : 5);
     g.sprite.y = g.baseY - hop;
     const flip = Math.floor(g.t / 0.9) % 2 === 0 ? 1 : -1;
-    g.sprite.scale.set(GUEST_SCALE * flip, GUEST_SCALE);
+    const scale = g.sprite.crowdScale || GUEST_SCALE;
+    g.sprite.scale.set(scale * flip, scale);
     g.name.x = g.sprite.x;
     g.name.y = g.sprite.y - g.sprite.height - 4;
     // engine.busy() is always true inside the instance hold.
