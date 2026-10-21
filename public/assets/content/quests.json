@@ -28278,9 +28278,7 @@
   "completion": "Oh, little Glitch. What are you doing down here? <split butt_txt=\"Not really sure …\" />",
   "requirements": [],
   "rewards": {},
-  "prereqQuests": [
-   "firefly_whistle"
-  ],
+  "prereqQuests": [],
   "isJob": false,
   "autoComplete": false,
   "isRepeatable": false,
@@ -28293,7 +28291,7 @@
   "prerequisites": [
    {
     "condition": "custom_code",
-    "value": "custom",
+    "value": "hour_after:le_miserable",
     "not": 0
    }
   ],
@@ -28308,28 +28306,14 @@
   "hasCanOffer": true,
   "offerTriggers": [
    {
-    "type": "npc",
-    "npc": "street_spirit"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_firebog"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_groddle"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_ix"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_zutto"
+    "type": "level",
+    "level": 10,
+    "override": true
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "le_miserable",
+  "offerNote": "firefly_whistle newxp prereq replaced by level 10; canOffer: an hour after a fail",
+  "solo": true
  },
  "le_miserable_part_2": {
   "classTsid": "le_miserable_part_2",
@@ -28344,7 +28328,8 @@
     "name": "turn_on_machine",
     "num": 1,
     "classId": "teleporter_button",
-    "desc": "Turn on the Machine"
+    "desc": "Turn on the Machine",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -28381,8 +28366,8 @@
     "npc": "npc_maintenance_bot"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "le_miserable",
+  "solo": true
  },
  "le_miserable_reminisce": {
   "classTsid": "le_miserable_reminisce",
@@ -28397,14 +28382,16 @@
     "name": "turn_on_machine",
     "num": 1,
     "classId": "teleporter_button",
-    "desc": "Turn on the Machine"
+    "desc": "Turn on the Machine",
+    "route": "quest-instances"
    },
    {
     "id": "r546",
     "type": "flag",
     "name": "instance_exit_via_door",
     "num": 1,
-    "desc": "Find the Exit"
+    "desc": "Find the Exit",
+    "route": "quest-instances"
    }
   ],
   "rewards": {},
@@ -28420,7 +28407,13 @@
   "familiarTurnin": true,
   "silentComplete": false,
   "showAlert": false,
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "hour_after:le_miserable_part_2",
+    "not": 0
+   }
+  ],
   "endNpcs": [],
   "locations": [
    "le_miserable"
@@ -28434,8 +28427,9 @@
     "npc": "play_cube"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "le_miserable",
+  "offerNote": "canOffer: an hour after part 2 and after the last repeat",
+  "solo": true
  },
  "learn_first_skill": {
   "classTsid": "learn_first_skill",

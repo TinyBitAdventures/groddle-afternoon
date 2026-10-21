@@ -168,6 +168,11 @@ function buildView(engine, door, available) {
     addExtra(engine, view, plate);
   }
 
+  // A held instance's exit door belongs to the instance (a quest room registers its own Exit).
+  if (door.instance_exit && engine.instanceHold) {
+    views.push(view);
+    return view;
+  }
   view.target = engine.register({
     classId: 'street_door',
     featureId: DOORS_FEATURE_ID,

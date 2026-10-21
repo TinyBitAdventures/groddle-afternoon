@@ -57,6 +57,7 @@ export const BUILT_ROOMS = Object.freeze([
   'vision_quest',
   'kids_room',
   'rube_yard',
+  'le_miserable',
 ]);
 
 /**

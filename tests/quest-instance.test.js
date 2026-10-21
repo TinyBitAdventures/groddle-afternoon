@@ -268,3 +268,69 @@ describe('The Wrizzards and The Rube (rube_yard)', () => {
     assert.ok(existsSync(join(root, 'public/assets/sprites/icons/play_cube.png')));
   });
 });
+
+describe('Le Misérable (le_miserable)', () => {
+  const streetFile = join(root, 'public/assets/streets/GIFM4BD43383DKV.json');
+  // Colour layers by their tint (yellow, orange, purple, teal): steps along the pad cycle.
+  const STEP_BY_TINT = { 16777024: 1, 16750144: 2, 10436052: 3, 3394764: 4 };
+
+  async function setup() {
+    const mod = await import('../public/js/quest-rooms/le-miserable.js');
+    const ev = await import('../public/js/location-events.js');
+    const { readFileSync } = await import('node:fs');
+    const street = JSON.parse(readFileSync(streetFile, 'utf8'));
+    const rt = ev.createEventRuntime();
+    const effects = [];
+    const fire = (name) => effects.push(...ev.runLocationEvent(rt, street.events, name, { now: 0, target: true }));
+    fire('instance_created');
+    return { mod, street, rt, fire, effects };
+  }
+
+  /** Each panel's answer: the fixed square deco under each column, on a tinted colour layer. */
+  function answers(street, mod) {
+    const toggled = new Set(Object.values(street.events).flat().map((a) => a.deco).filter(Boolean));
+    const squares = [];
+    for (const layer of street.layers) {
+      const step = STEP_BY_TINT[layer.filters?.tintColor];
+      if (!step || layer.filters?.tintAmount !== 100) continue;
+      for (const d of layer.decos || []) {
+        if (d.sprite === 'bg_white_patch' && d.w === 30 && !toggled.has(d.id)) squares.push({ x: d.x + street.bounds.l, step });
+      }
+    }
+    return mod.PANELS.map((panel) => panel.slots.map((x) => squares.find((s) => Math.abs(s.x - x) < 3)?.step));
+  }
+
+  it('keeps the source 5-minute run, rebuilt pads under every column and the crawl walls', async () => {
+    const { mod, street } = await setup();
+    assert.equal(mod.room.durationMs, 300_000);
+    assert.equal(mod.room.streetEvents, true);
+    const pads = street.layers.flatMap((l) => l.decos || []).filter((d) => d.sprite === 'circle_cutout_04_arbito1');
+    for (const panel of mod.PANELS) for (const x of panel.slots) assert.ok(pads.some((p) => Math.abs(p.x - x) < 3 && p.y === -407), `pad at ${x}`);
+    assert.deepEqual(mod.padEvents(2, 3), ['p2_black_3_on', 'p2_purple_3_on', 'p2_blue_3_on', 'p2_red_3_on', 'p2_yellow_3_on']);
+    for (const id of mod.CRAWL_WALLS) {
+      const wall = street.barriers.find((w) => w.id === id);
+      assert.ok(wall, id);
+      assert.ok(-109 - (wall.y + wall.h) >= 60, `${id} leaves a crawl gap`);
+    }
+  });
+
+  it('solves each panel with the squares shown under it, and only then turns on the machine', async () => {
+    const { mod, street, rt, fire, effects } = await setup();
+    const want = answers(street, mod);
+    assert.deepEqual(want, [[3, 2, 1], [4, 3, 2, 3, 4], [1, 2, 3, 4, 3, 2, 1]]);
+    const step = (n, k, times) => { for (let i = 0; i < times; i++) for (const e of mod.padEvents(n, k)) fire(e); };
+    // Panel 2 one step short on column 2 stays unlit. (Column 3 would not do:
+    // puzzle_2_verify tests the misspelled flag p2_red_, so it takes yellow too.)
+    want[1].forEach((s, i) => step(2, i + 1, i === 1 ? s - 1 : s));
+    assert.equal(rt.flags.has('p2_win_check'), false);
+    // Reset, then the answer.
+    for (const e of mod.resetEvents(2)) fire(e);
+    want[1].forEach((s, i) => step(2, i + 1, s));
+    assert.equal(rt.flags.has('p2_win_check'), true);
+    want[2].forEach((s, i) => step(3, i + 1, s));
+    assert.equal(effects.some((fx) => fx.type === 'quest_flag'), false, 'not before panel 1');
+    want[0].forEach((s, i) => step(1, i + 1, s));
+    assert.ok(['p1_win_check', 'p2_win_check', 'p3_win_check'].every((f) => rt.flags.has(f)));
+    assert.ok(effects.some((fx) => fx.type === 'quest_flag' && fx.flag === 'turn_on_machine'));
+  });
+});

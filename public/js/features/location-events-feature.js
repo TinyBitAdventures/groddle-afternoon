@@ -69,7 +69,12 @@ let clock = 0;
 const streetHooks = [];
 
 function inactive(engine) {
-  return !current || engine.transientInstance() || engine.homeContext?.().inHome;
+  return !current || (engine.transientInstance() && !current.instanced) || engine.homeContext?.().inHome;
+}
+
+/** A hook may run a held street's own scripts inside a transient instance (quest rooms on archived streets). */
+function instanceAllowed(street, engine) {
+  return streetHooks.some((hook) => hook.instance?.(street, engine) === true);
 }
 
 function effectiveSetting(now) {
@@ -420,7 +425,10 @@ function demoStep(engine, now) {
  * the runtime's flags and simulation clock.
  */
 export const locationEventsApi = {
-  /** hook: { strict(street, engine) -> true when the street's triggers are rebuilt }. */
+  /**
+   * hook: { strict(street, engine) -> true when the street's triggers are rebuilt,
+   *         instance(street, engine) -> true to run its scripts while a transient instance holds it }.
+   */
   register(hook) {
     if (hook && !streetHooks.includes(hook)) streetHooks.push(hook);
   },
@@ -476,7 +484,8 @@ export const locationEventsFeature = {
     effectCounts = {};
     unsupported = 0;
     lastData = 0;
-    if (!street || streetOwner(street.tsid) || engine.transientInstance() || engine.homeContext?.().inHome) {
+    const instanced = Boolean(street && engine.transientInstance() && instanceAllowed(street, engine));
+    if (!street || streetOwner(street.tsid) || (engine.transientInstance() && !instanced) || engine.homeContext?.().inHome) {
       publish(engine, clock, null);
       return;
     }
@@ -491,6 +500,7 @@ export const locationEventsFeature = {
         boxes: street.eventBoxes || [],
         runtime: createEventRuntime(),
         inside: new Set(),
+        instanced,
       };
       // Platforms the arrival chain switches on start in their source state
       // (pc_perm 0, not solid); the remake's collision otherwise treats every

@@ -61,6 +61,7 @@ import {
 } from '../quest-instance.js?v=qi-1';
 import { QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, roomModulePath } from '../quest-rooms/catalog.js?v=qi-1';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
+import { locationEventsApi } from './location-events-feature.js?v=location-events-1';
 import {
   acceptOffer,
   ensureQuestOfferState,
@@ -474,6 +475,21 @@ function makeContext(engine) {
     now: () => Date.now(),
     /** Requirement progress for the running quest (flag or counter). */
     progress: (name, amount = 1) => (run ? progress(engine, run.questId, name, amount) : false),
+    /** Another quest the room hands out or finishes in place (Le Misérable II inside Le Misérable). */
+    quest: (questId) => ({
+      active: () => Boolean(activeQuest(engine, questId)),
+      progress: (name, amount = 1) => progress(engine, questId, name, amount),
+      complete: () => requirementsMet(engine, questId),
+      turnIn: (opts) => turnIn(engine, questId, opts),
+      fail: () => failQuest(engine, questId),
+    }),
+    offerQuest: (questId, opts) => offerInRoom(engine, questId, opts),
+    /** The held street's own location events (rooms with streetEvents: true). */
+    events: {
+      fire: (name) => locationEventsApi.fire(engine, name),
+      flag: (name) => locationEventsApi.flag(name),
+      has: (name) => locationEventsApi.has(name),
+    },
     hasProgress: (name) => Number(activeQuest(engine, run?.questId)?.progress?.[name]) > 0,
     flag: (name) => (run ? setRunFlag(run, name) : false),
     hasFlag: (name) => runFlag(run, name),
@@ -1048,6 +1064,10 @@ export const questInstancesFeature = {
 
   init(engine) {
     engineRef = engine;
+    // Rooms on archived streets may run the street's own event scripts (streetEvents: true).
+    locationEventsApi.register({
+      instance: (street) => Boolean(run && room?.streetEvents && ctx?.data?._awaitStreet?.tsid === street?.tsid),
+    });
     // quest-offers-feature asks the engine for custom_code prerequisites.
     engine.questCustomPrereq = (id, prereq) => customPrereq(id, prereq, engine);
     for (const [classTsid, meta] of Object.entries(ROOM_ITEMS)) ensureItem(classTsid, meta);

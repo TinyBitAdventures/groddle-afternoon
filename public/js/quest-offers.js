@@ -146,6 +146,8 @@ export const REMAKE_QUEST_NPCS = Object.freeze([
   'street_spirit_toys', 'npc_piggy', 'emotional_bear',
   // Pack items whose Reminisce verb offers a quest room's repeat (quest-rooms/catalog.js REMINISCE_ITEMS).
   'play_cube', 'conch',
+  // Offers Le Misérable II inside its room (quest-rooms/le-miserable.js).
+  'npc_maintenance_bot',
 ]);
 const GSJS_STREET_SPIRITS = new Set([
   'street_spirit', 'street_spirit_groddle', 'street_spirit_firebog', 'street_spirit_zutto', 'street_spirit_ix',
