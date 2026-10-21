@@ -149,7 +149,9 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     const top = resolvedType === 'mood' ? moodMax(pc) : energyMax(pc);
     const before = clamp(finite(pc[resolvedType], 0), 0, top);
     pc[resolvedType] = clamp(before + amount, 0, top);
-    actual = pc[resolvedType] - before;
+    // GSJS stats are whole numbers; ours drift by fractions, so report the
+    // change in the whole numbers the HUD shows.
+    actual = Math.floor(pc[resolvedType]) - Math.floor(before);
   } else if (resolvedType === 'currants') {
     pc.currants = Math.max(0, Math.floor(finite(pc.currants, 0))) + amount;
   } else if (resolvedType === 'favor') {

@@ -52,6 +52,14 @@ describe('official quoin economy', () => {
     assert.equal(collectQuoin(state, 'mood', pc).actual, 4);
   });
 
+  it('reports a whole-number gain when energy holds a fraction', () => {
+    const state = createQuoinState();
+    const pc = { energy: 97.7, mood: 50.4 };
+    assert.equal(collectQuoin(state, 'energy', pc).actual, 3, 'the HUD goes 97 to 100');
+    assert.equal(pc.energy, 100);
+    assert.equal(collectQuoin(state, 'mood', pc).actual, 10);
+  });
+
   it('counts a mystery quoin toward the day but pays nothing (items/quoin.js has no mystery branch)', () => {
     const state = createQuoinState();
     const pc = { imagination: 0, xp: 0, energy: 0, mood: 0, currants: 0 };

@@ -732,6 +732,7 @@ import {
 } from './js/sound-moments.js';
 import { moodMax } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js';
+import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1539,7 +1540,7 @@ function updateDametimeChrome(now = dametimeDisplayNow()) {
 function toast(msg, ms = 3000) {
   const el = document.getElementById('toast');
   el.hidden = false;
-  el.textContent = msg;
+  el.textContent = wholeStatAmounts(msg);
   // Wall-clock deadline: frame-counted timers linger on slow or throttled frames.
   state.toastTimer = performance.now() + ms;
 }
@@ -1771,6 +1772,8 @@ function setBar(id, value) {
  */
 function pushActivity(msg) {
   if (!msg) return;
+  if (typeof msg === 'string') msg = wholeStatAmounts(msg);
+  else if (msg && typeof msg === 'object' && msg.effects) msg = { ...msg, effects: wholeEffects(msg.effects) };
   let plain = '';
   let html = '';
   if (typeof msg === 'string') {
@@ -4118,7 +4121,7 @@ function updateSpeechBubbles(dt) {
 }
 
 function floatText(x, y, text, color = 0xfff4d6) {
-  const t = new PIXI.Text(text, {
+  const t = new PIXI.Text(wholeStatAmounts(text), {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 15,
     fill: color,
@@ -8543,7 +8546,8 @@ function physics(dt) {
           jitter: result.typeId === 'qurazy' ? 0 : 0.03,
         });
         toast(result.typeId === 'mystery' ? `Mystery quoin: ${copy}` : copy);
-        pushActivity(`You collected a ${q.typeId} quoin. ${copy}.`);
+        const kind = q.typeId === 'xp' ? 'iMG' : q.typeId;
+        pushActivity(`You collected ${/^[aeiou]/i.test(kind) ? 'an' : 'a'} ${kind} quoin. ${copy}.`);
         if (result.acceleration?.completed?.length) {
           handleSkillCompletions(result.acceleration.completed);
         }
