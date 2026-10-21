@@ -119,7 +119,8 @@ describe('official Giant shrine donation economy', () => {
     assert.equal(state.favor.spriggan, 12);
     assert.equal(state.favor.fake, undefined);
     assert.equal(state.emblems.spriggan, 0);
-    assert.equal(state.dailyXp, DAILY_DONATION_XP_LIMIT);
+    // The cap is level-based (donationXpLimit), applied when donating.
+    assert.equal(state.dailyXp, 999999);
     const rows = listShrineDonationOptions(state, 'spriggan', { grain: 4, sammich: 1, pick: 1 });
     assert.deepEqual(rows.map((row) => row.classTsid), ['sammich', 'grain']);
     resetShrineDay(state);
@@ -148,6 +149,32 @@ describe('shrine official art and client wiring', () => {
     assert.match(game, /donateToShrine/);
     assert.match(game, /shrines: shrineState/);
     assert.match(html, /id="shrine-panel"/);
+  });
+
+  it('follows the source donation rules: level cap, capped bonus, favor accounting, emblem iMG', async () => {
+    const { donationXpLimit, EMBLEM_XP } = await import('../public/js/shrines.js');
+    const { XP_FOR_LEVEL } = await import('../public/js/progression.js');
+    // stats_donation_xp_limit: 250 to level 5, 500 to 10, then a share of the level's interval.
+    assert.equal(donationXpLimit(0), 250);
+    assert.equal(donationXpLimit(XP_FOR_LEVEL[6]), 500); // level 8
+    const l20 = XP_FOR_LEVEL[18]; // reaching level 20
+    assert.equal(donationXpLimit(l20), Math.round((XP_FOR_LEVEL[19] - XP_FOR_LEVEL[18]) * (0.2 - 9 * 0.005)));
+    // A lucky bonus counts toward the cap (bonus added before apiInc).
+    const capped = createShrineState({ dailyXp: 250 });
+    const huge = donateToShrine(capped, 'spriggan', { sammich: 1 }, { mood: 0, xp: 0, imagination: 0 }, 'sammich', 1, { rng: () => 0.005 });
+    assert.equal(huge.bonus, 'huge');
+    assert.equal(huge.xp, 0);
+    // Daily favor takes its own room; total favor caps after (evalDonate).
+    const near = createShrineState({ favor: { spriggan: 990 } });
+    const res = donateToShrine(near, 'spriggan', { musicblock_d_green_02: 1 }, { mood: 0, xp: 0, imagination: 0 }, 'musicblock_d_green_02', 1, { rng: () => 0.5 });
+    assert.equal(res.favor, 10);
+    assert.equal(near.dailyFavor.spriggan, 40);
+    // Emblems after the first pay 50 iMG.
+    const st = createShrineState({ favor: { spriggan: 2200 } });
+    const pc = { xp: 0, imagination: 0 };
+    assert.equal(claimShrineEmblem(st, 'spriggan', {}, pc).xp, 0);
+    assert.equal(claimShrineEmblem(st, 'spriggan', {}, pc).xp, EMBLEM_XP);
+    assert.equal(pc.imagination, 50);
   });
 });
 

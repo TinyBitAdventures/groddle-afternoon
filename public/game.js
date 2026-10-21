@@ -19620,7 +19620,7 @@ function renderShrinePanel() {
     }).join('');
   }
 
-  const options = listShrineDonationOptions(shrineState, giantId, inv);
+  const options = listShrineDonationOptions(shrineState, giantId, inv, { xp: pc.xp });
   if (!options.some((row) => row.classTsid === shrineSelected)) {
     shrineSelected = options[0]?.classTsid || null;
     shrineQty = 1;
@@ -19660,7 +19660,7 @@ function renderShrinePanel() {
   }
   const have = Math.max(1, inv[shrineSelected] || 1);
   shrineQty = clamp(Math.floor(shrineQty || 1), 1, have);
-  const quote = quoteShrineDonation(shrineState, giantId, inv, shrineSelected, shrineQty);
+  const quote = quoteShrineDonation(shrineState, giantId, inv, shrineSelected, shrineQty, { xp: pc.xp });
   if (!quote.ok) {
     shrineSelected = null;
     renderShrinePanel();
@@ -19739,7 +19739,7 @@ function performShrineDonation() {
 function claimActiveShrineEmblem() {
   const target = activeShrineTarget;
   const giantId = target?.state?.giantId;
-  const result = claimShrineEmblem(shrineState, giantId, inv);
+  const result = claimShrineEmblem(shrineState, giantId, inv, pc);
   if (!result.ok) {
     toast('More favor is needed before an emblem can be claimed.');
     renderShrinePanel();
@@ -19749,7 +19749,7 @@ function claimActiveShrineEmblem() {
   playShrineDonation(target);
   refreshShrineTarget(target);
   playSound('DONATION_RECIEVE_EMBLEM', { volume: 0.7 });
-  pushActivity(`The Shrine grants you an Emblem of ${result.giant.name}.`);
+  pushActivity(`The Shrine grants you an Emblem of ${result.giant.name}.${result.xp ? ` +${result.xp} iMG.` : ''}`);
   applyAchievementProgress(achieveState, `emblems_acquired:${giantId}`, 1, pc);
   enqueueAward({
     kind: 'badge',

@@ -7,6 +7,7 @@
  * target lets the player claim an emblem; each later emblem costs 100 more.
  */
 
+import { levelInfoForXp } from './progression.js?v=progression-1';
 import {
   ITEM_CATALOG,
   addItem,
@@ -21,7 +22,24 @@ import {
 
 export const EMBLEM_FAVOR_COST = 1000;
 export const EMBLEM_FAVOR_INCREMENT = 100;
-export const DAILY_DONATION_XP_LIMIT = 1000;
+/** The level-5 daily donation iMG cap; donationXpLimit(xp) gives the real one. */
+export const DAILY_DONATION_XP_LIMIT = 250;
+
+/**
+ * stats_donation_xp_limit (inc_stats.js:1280): 250 to level 5, 500 to level
+ * 10, then a share of the level's XP interval (20% at 11 easing to 10% at 31
+ * and up), with level 60's value hard-coded.
+ */
+export function donationXpLimit(xp) {
+  const info = levelInfoForXp(xp);
+  let base;
+  if (info.level <= 5) base = 250;
+  else if (info.level <= 10) base = 500;
+  else if (info.level <= 30) base = info.needed * (0.2 - (info.level - 11) * 0.005);
+  else if (info.level === 60) base = 170894.8;
+  else base = info.needed * 0.1;
+  return Math.round(Math.max(0, base));
+}
 
 export const GIANTS = Object.freeze({
   alph: Object.freeze({
@@ -72,7 +90,12 @@ export const GIANTS = Object.freeze({
 
 const GIANT_IDS = Object.freeze(Object.keys(GIANTS));
 
-/** GSJS item `base_cost` values for the goods currently obtainable in the remake. */
+/**
+ * GSJS item `var base_cost` for the goods obtainable early, used only until
+ * the recipe import registers every item's baseCost on ITEM_CATALOG
+ * (making-items.json, the same source values). Several were wrong before
+ * (bubble_tea 18 vs 172, fuel_cell 10 vs 380, metal_post 95 vs 400).
+ */
 export const SHRINE_ITEM_BASE_COSTS = Object.freeze({
   apple: 5,
   milk_butterfly: 8,
@@ -98,34 +121,34 @@ export const SHRINE_ITEM_BASE_COSTS = Object.freeze({
   corn: 6,
   potato: 7,
   tomato: 5,
-  broccoli: 6,
-  cabbage: 8,
+  broccoli: 5,
+  cabbage: 7,
   cucumber: 4,
   onion: 4,
-  parsnip: 7,
+  parsnip: 6,
   rice: 4,
-  zucchini: 6,
-  orange_juice: 15,
-  lemon_juice: 15,
-  fruity_juice: 15,
-  bubble_tea: 18,
-  fried_egg: 12,
+  zucchini: 5,
+  orange_juice: 39,
+  lemon_juice: 39,
+  fruity_juice: 24,
+  bubble_tea: 172,
+  fried_egg: 11,
   green_eggs: 12,
-  metal_rock: 5,
-  dullite: 5,
-  beryl: 5,
-  sparkly: 5,
-  plain_metal: 25,
-  tin: 35,
-  copper: 45,
-  molybdenum: 55,
-  metal_rod: 75,
-  metal_post: 95,
-  fuel_cell: 10,
+  metal_rock: 3,
+  dullite: 4,
+  beryl: 6,
+  sparkly: 8,
+  plain_metal: 30,
+  tin: 50,
+  copper: 70,
+  molybdenum: 100,
+  metal_rod: 100,
+  metal_post: 400,
+  fuel_cell: 380,
   musicblock_d_green_02: 400,
-  musicblock_d_green_03: 400,
+  musicblock_d_green_03: 500,
   musicblock_d_red_01: 400,
-  musicblock_d_red_05: 400,
+  musicblock_d_red_05: 700,
 });
 
 const GIANT_TIPS = Object.freeze([
@@ -151,7 +174,7 @@ export function normalizeShrineState(seed = {}) {
     favor: cleanCountMap(seed?.favor),
     emblems: cleanCountMap(seed?.emblems, 9999),
     dailyFavor: cleanCountMap(seed?.dailyFavor),
-    dailyXp: whole(seed?.dailyXp, 0, DAILY_DONATION_XP_LIMIT),
+    dailyXp: whole(seed?.dailyXp),
     donations: whole(seed?.donations),
     donationsByGiant: cleanCountMap(seed?.donationsByGiant),
     giantTipIndex: whole(seed?.giantTipIndex, 0, GIANT_TIPS.length - 1),
@@ -174,7 +197,7 @@ export function emblemCostFor(state, giantId) {
 
 export function donationValueFor(classTsid) {
   const catalogValue = whole(ITEM_CATALOG[classTsid]?.baseCost, 0);
-  return SHRINE_ITEM_BASE_COSTS[classTsid] || catalogValue || 1;
+  return catalogValue || SHRINE_ITEM_BASE_COSTS[classTsid] || 1;
 }
 
 function stableHash(value) {
@@ -198,7 +221,8 @@ export function giantForStreet(street = {}) {
   return GIANTS[GIANT_IDS[stableHash(key) % GIANT_IDS.length]];
 }
 
-export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1) {
+/** @param {{ xp?: number }} [opts] the player's lifetime XP sets the daily iMG cap */
+export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, opts = {}) {
   const giant = GIANTS[giantId];
   if (!giant) return { ok: false, reason: 'unknown_giant' };
   if (
@@ -219,7 +243,10 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1) {
   const emblemCost = emblemCostFor(state, giantId);
   const favorRoom = Math.max(0, emblemCost - whole(state?.favor?.[giantId]));
   const dailyFavorRoom = Math.max(0, emblemCost - whole(state?.dailyFavor?.[giantId]));
-  const dailyXpRoom = Math.max(0, DAILY_DONATION_XP_LIMIT - whole(state?.dailyXp));
+  const xpLimit = Number.isFinite(Number(opts.xp)) ? donationXpLimit(opts.xp) : DAILY_DONATION_XP_LIMIT;
+  const dailyXpRoom = Math.max(0, xpLimit - whole(state?.dailyXp));
+  // evalDonate: daily favor takes up to its own room; total favor caps after.
+  const dailyFavor = Math.min(rawFavor, dailyFavorRoom);
   return {
     ok: true,
     giant,
@@ -230,7 +257,10 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1) {
     baseCost,
     xp: Math.min(rawXp, dailyXpRoom),
     mood: rawMood,
-    favor: Math.min(rawFavor, favorRoom, dailyFavorRoom),
+    favor: Math.min(dailyFavor, favorRoom),
+    dailyFavor,
+    dailyXpRoom,
+    xpLimit,
     rawXp,
     rawMood,
     rawFavor,
@@ -241,7 +271,7 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1) {
   };
 }
 
-export function listShrineDonationOptions(state, giantId, inv = {}) {
+export function listShrineDonationOptions(state, giantId, inv = {}, opts = {}) {
   return Object.keys(inv)
     .filter((classTsid) =>
       whole(inv[classTsid]) > 0 &&
@@ -249,17 +279,18 @@ export function listShrineDonationOptions(state, giantId, inv = {}) {
       !classTsid.startsWith('emblem_') &&
       ITEM_CATALOG[classTsid]?.donatable !== false
     )
-    .map((classTsid) => quoteShrineDonation(state, giantId, inv, classTsid, 1))
+    .map((classTsid) => quoteShrineDonation(state, giantId, inv, classTsid, 1, opts))
     .filter((row) => row.ok)
     .sort((a, b) => b.baseCost - a.baseCost || a.label.localeCompare(b.label));
 }
 
 export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, opts = {}) {
-  const quote = quoteShrineDonation(state, giantId, inv, classTsid, count);
+  const quote = quoteShrineDonation(state, giantId, inv, classTsid, count, { xp: pc?.xp });
   if (!quote.ok) return quote;
   if (!removeItem(inv, classTsid, quote.qty)) return { ok: false, reason: 'missing' };
 
-  let xp = quote.xp;
+  // The lucky bonus is added before the daily cap (items/include/shrines.js:460-478).
+  let xp = quote.rawXp;
   let mood = quote.mood;
   let bonus = null;
   const roll = typeof opts.rng === 'function' ? opts.rng() : Math.random();
@@ -273,14 +304,16 @@ export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, op
     mood += Math.round(quote.baseCost * 0.2);
   }
 
+  xp = Math.min(xp, quote.dailyXpRoom);
+
   const moodBefore = Number(pc.mood) || 0;
   pc.mood = Math.min(100, moodBefore + mood);
   const actualMood = pc.mood - moodBefore;
   pc.xp = (Number(pc.xp) || 0) + xp;
   pc.imagination = (Number(pc.imagination) || 0) + xp;
   state.favor[giantId] = whole(state.favor[giantId]) + quote.favor;
-  state.dailyFavor[giantId] = whole(state.dailyFavor[giantId]) + quote.favor;
-  state.dailyXp = Math.min(DAILY_DONATION_XP_LIMIT, whole(state.dailyXp) + quote.xp);
+  state.dailyFavor[giantId] = whole(state.dailyFavor[giantId]) + quote.dailyFavor;
+  state.dailyXp = Math.min(quote.xpLimit, whole(state.dailyXp) + xp);
   state.donations = whole(state.donations) + 1;
   state.donationsByGiant[giantId] = whole(state.donationsByGiant[giantId]) + 1;
   const tip = GIANT_TIPS[state.giantTipIndex % GIANT_TIPS.length];
@@ -319,7 +352,10 @@ export function canClaimEmblem(state, giantId) {
   return whole(state?.favor?.[giantId]) >= emblemCostFor(state, giantId);
 }
 
-export function claimShrineEmblem(state, giantId, inv = {}) {
+/** Every emblem after a Giant's first also pays 50 iMG (items/include/shrines.js:111). */
+export const EMBLEM_XP = 50;
+
+export function claimShrineEmblem(state, giantId, inv = {}, pc = null) {
   const giant = GIANTS[giantId];
   if (!giant) return { ok: false, reason: 'unknown_giant' };
   const cost = emblemCostFor(state, giantId);
@@ -327,12 +363,18 @@ export function claimShrineEmblem(state, giantId, inv = {}) {
     return { ok: false, reason: 'favor', have: whole(state?.favor?.[giantId]), cost };
   }
   state.favor[giantId] = whole(state.favor[giantId]) - cost;
+  const first = whole(state.emblems[giantId]) === 0;
   state.emblems[giantId] = whole(state.emblems[giantId]) + 1;
+  const xp = first ? 0 : EMBLEM_XP;
+  if (xp && pc) {
+    pc.xp = (Number(pc.xp) || 0) + xp;
+    pc.imagination = (Number(pc.imagination) || 0) + xp;
+  }
   const classTsid = `emblem_${giantId}`;
   ensureItem(classTsid, {
     label: `Emblem of ${giant.name}`,
     desc: `A mark of devotion to ${giant.name}.`,
   });
   inv[classTsid] = whole(inv[classTsid]) + 1;
-  return { ok: true, giant, classTsid, cost, count: state.emblems[giantId] };
+  return { ok: true, giant, classTsid, cost, count: state.emblems[giantId], xp: pc ? xp : 0 };
 }
