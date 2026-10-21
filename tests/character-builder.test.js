@@ -9,6 +9,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   createDefaultAppearance,
+  createClassicAppearance,
   normalizeAppearance,
   classifyAvatarPixel,
   recolorImageData,
@@ -30,13 +31,24 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 describe('appearance model', () => {
   it('default + normalize clamps and fills slots', () => {
     const d = createDefaultAppearance();
-    assert.equal(d.bodyStyle, 'classic');
-    assert.ok(d.hair.g > d.hair.r);
+    assert.equal(d.bodyStyle, 'glitch');
+    const classic = createClassicAppearance();
+    assert.equal(classic.bodyStyle, 'classic');
+    assert.ok(classic.hair.g > classic.hair.r);
     const n = normalizeAppearance({ hair: { r: 300, g: -5, b: 10 } });
     assert.equal(n.hair.r, 255);
     assert.equal(n.hair.g, 0);
     assert.equal(n.hair.b, 10);
     assert.ok(n.pants);
+  });
+
+  it('moves an untouched old default to the Glitch sheets, keeps a customised look', () => {
+    const store = new Map();
+    const storage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) };
+    saveAppearance(createClassicAppearance(), { storage });
+    assert.equal(loadAppearance({ storage }).bodyStyle, 'glitch');
+    saveAppearance({ ...createClassicAppearance(), hair: { r: 200, g: 50, b: 50 } }, { storage });
+    assert.equal(loadAppearance({ storage }).bodyStyle, 'classic');
   });
 
   it('json round-trip and storage mock', () => {

@@ -595,8 +595,12 @@ import {
   planSignpostTravel,
 } from './js/travel.js';
 import { AVATAR_SHEETS, facingScaleX, facingFromVelocity } from './js/avatar.js';
+import { ANIMS, ANIM_FPS, FALL_LOOP, GLITCH_AVATAR, animForState, avatarAnimState, frameRef } from './js/avatar-anims.js';
+import { landingY } from './js/walk-surface.js';
 import {
   createDefaultAppearance,
+  createClassicAppearance,
+  classifyGlitchPixel,
   loadAppearance,
   saveAppearance,
   normalizeAppearance,
@@ -799,6 +803,11 @@ const ENTITY_SCALE = {
   trant: SCALE * 0.28,
 };
 
+function glitchSheetDef(name) {
+  const sheet = GLITCH_AVATAR.sheets[name];
+  return { url: `${GLITCH_AVATAR.dir}${sheet.file}`, fw: sheet.fw, fh: sheet.fh, cols: sheet.cells, rows: 1 };
+}
+
 const SHEETS = {
   piggyWalk: {
     url: 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png',
@@ -1000,6 +1009,10 @@ const SHEETS = {
     rows: AVATAR_SHEETS.walk.rows,
   },
   avatarStyledIdle: { url: AVATAR_SHEETS.idle.url, whole: true },
+  // Real Glitch avatar sheets (js/avatar-anims.js): walk, climb, jump.
+  glitchAvatarBase: glitchSheetDef('base'),
+  glitchAvatarJump: glitchSheetDef('jump'),
+  glitchAvatarClimb: glitchSheetDef('climb'),
   avatarStyledAlt: { url: 'assets/sprites/avatar_styled_alt.png', whole: true },
 };
 
@@ -5626,8 +5639,11 @@ function makePlayer() {
   body.loop = true;
   body.gotoAndStop(0);
   body.anchor.set(0.5, 1);
+  // Glitch sheets: each frame carries its sheet's feet anchor; drawn at world scale.
+  body.anims = pack.anims || null;
+  body.updateAnchor = Boolean(pack.anims);
   // Portrait ~172×248; keep a bit under entity scale so pigs/chickens read correctly.
-  body.baseScale = SCALE * 0.42;
+  body.baseScale = pack.anims ? GLITCH_AVATAR.scale : SCALE * 0.42;
   // Pixi AnimatedSprite advances by animationSpeed * delta each tick
   body.autoUpdate = true;
   // Art faces left; start facing right via flip so first movement looks correct
@@ -5972,14 +5988,60 @@ const appearanceTexCache = new Map();
  * Build (or fetch cached) idle + walk textures for an appearance via canvas recolor.
  * @param {import('./js/character-builder.js').Appearance} appearance
  */
+/**
+ * The Glitch sheets as an animation pack: every source animation as textures,
+ * each frame anchored on its sheet's feet line (GLITCH_AVATAR).
+ */
+function glitchAnimPack(key, app) {
+  const loaded = { base: textures.glitchAvatarBase, jump: textures.glitchAvatarJump, climb: textures.glitchAvatarClimb };
+  if (!loaded.base?.frames?.length) return null;
+  // The sheets in their own colours, or recoloured once per look (classifyGlitchPixel regions).
+  const native = key === appearanceCacheKey(createDefaultAppearance());
+  const sheets = {};
+  for (const [name, sheet] of Object.entries(loaded)) {
+    const img = sheet?.frames?.[0]?.baseTexture?.resource?.source;
+    if (native || !img) {
+      sheets[name] = sheet;
+      continue;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const g = canvas.getContext('2d');
+    g.drawImage(img, 0, 0);
+    const data = g.getImageData(0, 0, canvas.width, canvas.height);
+    recolorImageData(data.data, canvas.width, canvas.height, app, classifyGlitchPixel);
+    g.putImageData(data, 0, 0);
+    sheets[name] = { frames: sliceSheet(PIXI.BaseTexture.from(canvas), sheet.def) };
+  }
+  for (const [name, sheet] of Object.entries(sheets)) {
+    const def = GLITCH_AVATAR.sheets[name];
+    for (const tex of sheet?.frames || []) tex.defaultAnchor.set(def.midX / def.fw, def.feetY / def.fh);
+  }
+  const toTextures = (list) => list.map((fn) => {
+    const ref = frameRef(fn);
+    return (ref && sheets[ref.sheet]?.frames?.[ref.index]) || sheets.base.frames[14];
+  });
+  const anims = Object.fromEntries(Object.entries(ANIMS).map(([name, list]) => [name, toTextures(list)]));
+  anims.fallLoop = toTextures(FALL_LOOP);
+  return { key, idleFrame: anims.idle0[0], walkFrames: anims.walk2x, anims };
+}
+
 function getAppearanceTextures(appearance) {
   const app = normalizeAppearance(appearance);
   const key = appearanceCacheKey(app);
   if (appearanceTexCache.has(key)) return appearanceTexCache.get(key);
+  if (app.bodyStyle === 'glitch') {
+    const pack = glitchAnimPack(key, app);
+    if (pack) {
+      appearanceTexCache.set(key, pack);
+      return pack;
+    }
+  }
 
   const sheets = resolveBodySheets(app);
   const isDefaultClassic =
-    key === appearanceCacheKey(createDefaultAppearance()) && app.bodyStyle === 'classic';
+    key === appearanceCacheKey(createClassicAppearance()) && app.bodyStyle === 'classic';
 
   // Default classic look uses preloaded sheets (no recolor cost)
   if (isDefaultClassic && textures.avatarStyledWalk?.frames?.length) {
@@ -6095,6 +6157,16 @@ function applyPlayerAppearance() {
   player.texturesIdle = [pack.idleFrame];
   player.texturesWalk = pack.walkFrames;
   player.appearanceKey = pack.key;
+  // Switching between the Glitch sheets and the portrait styles keeps any
+  // street or room scaling (ratio of the current to the style's own scale).
+  const styleScale = (anims) => (anims ? GLITCH_AVATAR.scale : SCALE * 0.42);
+  if (Boolean(pack.anims) !== Boolean(player.anims)) {
+    player.baseScale = (player.baseScale / styleScale(player.anims)) * styleScale(pack.anims);
+  }
+  player.anims = pack.anims || null;
+  player.updateAnchor = Boolean(pack.anims);
+  if (!pack.anims) player.anchor.set(0.5, 1);
+  player.glitchState = null;
   if (was === 'walk' || was === 'climb') {
     player.textures = player.texturesWalk;
     player.play();
@@ -6209,6 +6281,32 @@ function paintAvatarPreview() {
   const sheets = resolveBodySheets(playerAppearance);
   const img = new Image();
   img.crossOrigin = 'anonymous';
+  if (sheets.sheets) {
+    // The Glitch sheets: their idle frame (base cell 14), recoloured.
+    const base = GLITCH_AVATAR.sheets.base;
+    img.onload = () => {
+      canvas.width = 172;
+      canvas.height = 248;
+      ctx.clearRect(0, 0, 172, 248);
+      // Recolour the cell at its own size (the regions read its height), then scale.
+      const cell = document.createElement('canvas');
+      cell.width = base.fw;
+      cell.height = base.fh;
+      const cg = cell.getContext('2d');
+      cg.drawImage(img, base.fw * 14, 0, base.fw, base.fh, 0, 0, base.fw, base.fh);
+      if (appearanceCacheKey(playerAppearance) !== appearanceCacheKey(createDefaultAppearance())) {
+        const id = cg.getImageData(0, 0, base.fw, base.fh);
+        recolorImageData(id.data, base.fw, base.fh, playerAppearance, classifyGlitchPixel);
+        cg.putImageData(id, 0, 0);
+      }
+      const scale = Math.min(172 / base.fw, 248 / base.fh);
+      const dw = base.fw * scale;
+      const dh = base.fh * scale;
+      ctx.drawImage(cell, (172 - dw) / 2, (248 - dh) / 2, dw, dh);
+    };
+    img.src = `${GLITCH_AVATAR.dir}${base.file}`;
+    return;
+  }
   img.onload = () => {
     canvas.width = 172;
     canvas.height = 248;
@@ -6239,8 +6337,52 @@ function commitAvatarAppearance() {
   closeAvatarPanel();
 }
 
+/** The Glitch sheet state for a requested walk/idle/climb (AvatarAnimationState). */
+function glitchAnimState(requested) {
+  if (requested === 'climb') return 'climb';
+  // onGround flickers on slopes; a few frames off the floor make it a jump or fall.
+  const airborne = !player.onGround && (player.airFrames || 0) > 3;
+  const floorY = airborne ? landingY(streetPlatforms, player.x, player.y) : null;
+  return avatarAnimState({
+    airborne,
+    moving: requested === 'walk',
+    vx: player.vx * 60,
+    vy: player.vy * 60,
+    distFromFloor: floorY == null ? null : floorY - player.y,
+  }, player.glitchState || 'stand');
+}
+
+function applyGlitchState(st) {
+  if (player.glitchState === st) {
+    if ((st === 'walk1x' || st === 'walk2x' || st === 'climb') && player.playing === false) player.play();
+    return;
+  }
+  const { anim, loop, then } = animForState(st);
+  player.glitchState = st;
+  player.animState = st === 'climb' || st === 'climbPause' ? 'climb' : st.startsWith('walk') ? 'walk' : st === 'stand' ? 'idle' : 'air';
+  player.textures = player.anims[anim];
+  player.animationSpeed = ANIM_FPS / 60;
+  player.loop = loop;
+  player.autoUpdate = true;
+  player.onComplete = then
+    ? () => {
+        if (player.glitchState !== st) return;
+        player.textures = player.anims.fallLoop;
+        player.loop = true;
+        player.gotoAndPlay(0);
+      }
+    : null;
+  if (st === 'stand') player.gotoAndStop(0);
+  else player.gotoAndPlay(0);
+  applyPlayerFacing();
+}
+
 function setPlayerAnim(state) {
   if (!player) return;
+  if (player.anims) {
+    applyGlitchState(glitchAnimState(state));
+    return;
+  }
   if (player.animState === state) {
     // Keep walk cycling if something stopped the AnimatedSprite
     if (state === 'walk' && player.playing === false) player.play();
@@ -6304,7 +6446,8 @@ function stopClimb({ jumpOff = false, side = 0 } = {}) {
 function applyPlayerFacing() {
   if (!player) return;
   player.facing = facingFromVelocity(player.vx, player.facing || 'right');
-  const sx = facingScaleX(player.baseScale, player.facing);
+  const flip = player.anims && GLITCH_AVATAR.facesRight ? -1 : 1;
+  const sx = flip * facingScaleX(player.baseScale, player.facing);
   player.scale.set(sx, Math.abs(player.baseScale));
 }
 
@@ -8088,7 +8231,9 @@ function physics(dt) {
       }
     }
     // Foot-plant bob only if not using full walk sheet animation
-    if (player.animState !== 'walk' && player.animState !== 'climb' && player.onGround && Math.abs(player.vx) > 0.4) {
+    if (player.anims) {
+      player.pivot.y = 0;
+    } else if (player.animState !== 'walk' && player.animState !== 'climb' && player.onGround && Math.abs(player.vx) > 0.4) {
       player.walkPhase += dt * 0.45;
       player.pivot.y = Math.sin(player.walkPhase) * 2;
     } else if (player.animState !== 'walk' && player.animState !== 'climb') {
@@ -8099,6 +8244,7 @@ function physics(dt) {
   }
 
   noteGrounded(jumpState, player.onGround === true && !climb.active, movementNow());
+  player.airFrames = player.onGround || climb.active ? 0 : (player.airFrames || 0) + dt;
   publishJumpState();
 
   state.energyTick += dt;

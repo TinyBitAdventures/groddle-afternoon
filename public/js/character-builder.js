@@ -24,6 +24,13 @@
 export const STORAGE_KEY = 'groddle.avatar.appearance.v1';
 
 export const BODY_STYLES = {
+  // Real Glitch animation sheets (base walk, climb, jump) recovered from the
+  // Wayback CDX; js/avatar-anims.js maps their frames.
+  glitch: {
+    id: 'glitch',
+    label: 'Glitch',
+    sheets: true,
+  },
   classic: {
     id: 'classic',
     label: 'Classic Glitch',
@@ -100,10 +107,11 @@ export const COLOR_SWATCHES = {
 };
 
 /**
- * Default classic look (matches current avatar_styled_idle).
+ * The old default classic look (matches avatar_styled_idle). Saves still on it
+ * move to the Glitch sheets (loadAppearance).
  * @returns {Appearance}
  */
-export function createDefaultAppearance() {
+export function createClassicAppearance() {
   return {
     bodyStyle: 'classic',
     hair: { r: 72, g: 140, b: 72 },
@@ -116,12 +124,35 @@ export function createDefaultAppearance() {
   };
 }
 
+/**
+ * Default look: the Glitch sheets in their own colours (62d8dab1: lavender
+ * hair, grey skin, lime top, purple trousers, green shoes).
+ * @returns {Appearance}
+ */
+export function createDefaultAppearance() {
+  return {
+    bodyStyle: 'glitch',
+    hair: { r: 205, g: 205, b: 232 },
+    skin: { r: 190, g: 190, b: 196 },
+    shirt: { r: 214, g: 240, b: 40 },
+    shirtDark: { r: 150, g: 170, b: 30 },
+    pants: { r: 100, g: 40, b: 110 },
+    shoes: { r: 120, g: 210, b: 40 },
+    sole: { r: 170, g: 60, b: 200 },
+  };
+}
+
 /** Named full looks for one-click presets. */
 export const APPEARANCE_PRESETS = {
+  glitch: {
+    id: 'glitch',
+    label: 'Glitch',
+    appearance: createDefaultAppearance(),
+  },
   classic: {
     id: 'classic',
     label: 'Classic',
-    appearance: createDefaultAppearance(),
+    appearance: createClassicAppearance(),
   },
   blueberry: {
     id: 'blueberry',
@@ -224,7 +255,7 @@ export function normalizeAppearance(partial = {}) {
       b: clampByte(c.b),
     };
   }
-  out.bodyStyle = partial.bodyStyle === 'alt' ? 'alt' : 'classic';
+  out.bodyStyle = BODY_STYLES[partial.bodyStyle] ? partial.bodyStyle : d.bodyStyle;
   return out;
 }
 
@@ -272,7 +303,10 @@ export function loadAppearance(opts = {}) {
   if (!storage) return createDefaultAppearance();
   const raw = storage.getItem(STORAGE_KEY);
   if (!raw) return createDefaultAppearance();
-  return appearanceFromJson(raw);
+  const saved = appearanceFromJson(raw);
+  // An untouched old default moves to the Glitch sheets.
+  if (appearanceCacheKey(saved) === appearanceCacheKey(createClassicAppearance())) return createDefaultAppearance();
+  return saved;
 }
 
 /**
@@ -341,6 +375,36 @@ export function classifyAvatarPixel(r, g, b, a, yNorm = 0.5) {
 }
 
 /**
+ * Regions of the Glitch sheet avatar (62d8dab1, js/avatar-anims.js): lavender
+ * hair, grey skin, lime top, purple trousers and soles, green shoes. The
+ * yellow eyes and the dark headband are left as drawn. yNorm is the height in
+ * the sheet row (each sheet is one row of frames).
+ * @returns {null|'hair'|'skin'|'shirt'|'shirtDark'|'pants'|'shoes'|'sole'}
+ */
+export function classifyGlitchPixel(r, g, b, a, yNorm = 0.5) {
+  if (a < 30) return null;
+  const maxc = Math.max(r, g, b);
+  const minc = Math.min(r, g, b);
+  const sat = maxc - minc;
+  // Lime top (and its darker folds); yellow eyes sit high and are less green.
+  if (g > 120 && r > 0.6 * g && b < 0.55 * g && g >= r - 10) {
+    if (yNorm < 0.42 && r > g - 15) return null;
+    // Lime-green near the bottom is the shoes (the climb's tucked feet).
+    if (yNorm > 0.82) return 'shoes';
+    return g > 170 ? 'shirt' : 'shirtDark';
+  }
+  // Green shoes.
+  if (g > r + 25 && g > b + 25 && yNorm > 0.6) return 'shoes';
+  // Purple trousers; the same purple on the soles at the very bottom.
+  if (r > g + 25 && b > g + 25) return yNorm > 0.9 ? 'sole' : 'pants';
+  // Lavender hair: light with a blue cast, high on the figure.
+  if (yNorm < 0.55 && maxc > 150 && b > r + 6 && b >= g && sat < 80) return 'hair';
+  // Grey skin: neutral mid-to-light greys (the headband is darker, kept).
+  if (sat < 22 && maxc > 120 && maxc < 235) return 'skin';
+  return null;
+}
+
+/**
  * Blend source luminance with target hue for natural shading.
  * @param {number} sr
  * @param {number} sg
@@ -366,7 +430,7 @@ export function applyTargetColor(sr, sg, sb, target) {
  * @param {Appearance} appearance
  * @returns {number} pixels changed
  */
-export function recolorImageData(data, width, height, appearance) {
+export function recolorImageData(data, width, height, appearance, classify = classifyAvatarPixel) {
   const app = normalizeAppearance(appearance);
   let changed = 0;
   const n = width * height;
@@ -377,7 +441,7 @@ export function recolorImageData(data, width, height, appearance) {
     const b = data[o + 2];
     const a = data[o + 3];
     const yNorm = Math.floor(i / width) / Math.max(1, height - 1);
-    const region = classifyAvatarPixel(r, g, b, a, yNorm);
+    const region = classify(r, g, b, a, yNorm);
     if (!region) continue;
     const target = app[region] || app.skin;
     const c = applyTargetColor(r, g, b, target);
