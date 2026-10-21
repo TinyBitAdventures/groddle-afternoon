@@ -229,7 +229,7 @@ export function findClimbWallNear(walls, px, py, xTol = 36) {
   return { wall: best, x: best.x, yTop: best.yTop, yBot: best.yBot };
 }
 
-/** @type {WeakMap<object, object[]>} */
+/** @type {WeakMap<object, { sig: string, list: object[] }>} */
 const barrierCache = new WeakMap();
 
 /**
@@ -241,7 +241,10 @@ const barrierCache = new WeakMap();
  */
 export function barriersScreen(street) {
   if (!street || typeof street !== 'object') return [];
-  if (barrierCache.has(street)) return barrierCache.get(street);
+  // Location events and quest rooms open and close walls (pc_perm) at runtime.
+  const sig = (street.barriers || []).map((w) => w?.pc_perm).join(',');
+  const cached = barrierCache.get(street);
+  if (cached && cached.sig === sig) return cached.list;
   const out = [];
   for (const w of street.barriers || []) {
     if (!w || !Number.isFinite(w.h) || w.h === 0 || w.pc_perm === 0) continue;
@@ -256,7 +259,7 @@ export function barriersScreen(street) {
       fromRight: w.pc_perm !== -1,
     });
   }
-  barrierCache.set(street, out);
+  barrierCache.set(street, { sig, list: out });
   return out;
 }
 
