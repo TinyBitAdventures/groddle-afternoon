@@ -32,6 +32,9 @@ body {
     radial-gradient(circle at 50% 38%, rgba(241, 251, 225, 0.96), rgba(198, 226, 175, 0.98) 48%, #b6d49d 100%);
 }
 .boot-loader[hidden] { display: none; }
+/* Nothing else shows through while loading; visibility keeps the layout for sizing. */
+body.is-booting #wrap > :not(#boot-loader),
+body.is-booting #wrap ~ * { visibility: hidden; }
 .boot-loader-card {
   display: flex;
   align-items: center;
