@@ -733,6 +733,7 @@ import {
 import { moodMax } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
+import { createPromptSettler, promptId } from './js/prompt-settle.js';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -3841,6 +3842,22 @@ function makePromptChip() {
     chip.pivot.set(Math.round(w / 2), h);
   };
   return chip;
+}
+
+const settlePromptChange = createPromptSettler(180);
+
+/** Show this frame's hint once it has settled (js/prompt-settle.js). */
+function settlePrompt(want, now) {
+  const shownId = prompt.visible ? promptId({ key: prompt.promptKey, label: prompt.promptLabel }) : '';
+  if (!settlePromptChange(want, shownId, now)) return;
+  if (!want) {
+    prompt.visible = false;
+    return;
+  }
+  prompt.setPrompt(want.key, want.label);
+  prompt.x = want.x;
+  prompt.y = want.y;
+  prompt.visible = true;
 }
 
 // —— Hover / pick targeting (crowded entities) ——
@@ -22571,33 +22588,27 @@ async function main() {
       const nearClimb = !climb.active
         ? findClimbWallNear(streetWalls, player.x, player.y, 42)
         : null;
+      let want = null;
       if (climb.active) {
-        prompt.setPrompt('↑↓', 'climb · ←→ step off · Space jump');
-        prompt.x = player.x;
-        prompt.y = player.y - 80;
-        prompt.visible = true;
+        want = { key: '↑↓', label: 'climb · Space jump', x: player.x, y: player.y - 80 };
       } else if (nearClimb && (!near || Math.abs(player.x - nearClimb.x) < 50)) {
-        prompt.setPrompt('↑', 'climb');
-        prompt.x = nearClimb.x;
-        prompt.y = Math.min(player.y, nearClimb.yBot) - 70;
-        prompt.visible = true;
+        want = { key: '↑', label: 'climb', x: nearClimb.x, y: Math.min(player.y, nearClimb.yBot) - 70 };
       } else if (near) {
-        prompt.setPrompt('Enter', near.label || near.classId || 'interact');
-        prompt.x = near.sprite.x;
         const box = spriteWorldHitBox(near.sprite, 0);
-        prompt.y = (box ? box.top : near.sprite.y - 74) - 12;
-        prompt.visible = true;
+        want = {
+          key: 'Enter',
+          label: near.label || near.classId || 'interact',
+          x: near.sprite.x,
+          y: (box ? box.top : near.sprite.y - 74) - 12,
+        };
       } else if (nearSign) {
         const conn = pickConnection(nearSign.signpost, availableStreetTsids());
-        if (conn) prompt.setPrompt('T', conn.label);
-        else prompt.setPrompt('G', 'map (no loaded link)');
         // Above the post, clear of the arms (SignpostView post 246px at 0.8).
-        prompt.x = nearSign.screen.x;
-        prompt.y = nearSign.screen.y - 246 * 0.8 - 10;
-        prompt.visible = true;
-      } else {
-        prompt.visible = false;
+        want = conn
+          ? { key: 'T', label: conn.label, x: nearSign.screen.x, y: nearSign.screen.y - 246 * 0.8 - 10 }
+          : { key: 'G', label: 'map (no loaded link)', x: nearSign.screen.x, y: nearSign.screen.y - 246 * 0.8 - 10 };
       }
+      settlePrompt(want, performance.now());
       if (prompt.visible) {
         prompt.x = clampWorldOverlayX(prompt.x, prompt.width, 12);
         app.view.dataset.promptScreenX = (prompt.x - camTarget).toFixed(2);
