@@ -791,6 +791,8 @@ const LOCATION_VIEW_H = VIEW_H - PACK_VIEW_RESERVE;
 let WORLD_W = 2400;
 let GROUND_Y = 420;
 const SCALE = 1.35;
+/** Quoins keep their source size, like the avatar (GLITCH_AVATAR.scale). */
+const QUOIN_SCALE = 1;
 /**
  * Per-entity display scales relative to global SCALE.
  * Official Glitch sheets are low-res x1 rasters (no x2 / no vector bodies for animals).
@@ -823,10 +825,8 @@ const SHEETS = {
     url: 'assets/sprites/npc_piggy__x1_nibble_png_1354829441.png',
     fw: 88, fh: 62, cols: 10, rows: 6,
   },
-  appleIcon: {
-    url: 'assets/sprites/apple__x1_iconic_png_1354829396.png',
-    fw: 38, fh: 43, cols: 1, rows: 1,
-  },
+  // The pack icon, which has a 3x render (js/icon-hires.js).
+  appleIcon: { url: 'assets/sprites/icons/apple.png', whole: true },
   chickenWalk: {
     url: 'assets/sprites/npc_chicken__x1_walk_png_1354830385.png',
     fw: 148, fh: 110, cols: 6, rows: 4,
@@ -7605,8 +7605,10 @@ function spawnWorldQuoin(spot, typeId = 'xp', opts = {}) {
   q.anchor.set(0.5, 0.5);
   q.animationSpeed = typeId === 'qurazy' ? 0.42 : 0.28;
   q.loop = true;
-  q.play();
-  q.baseScale = SCALE * (typeId === 'qurazy' ? 1.08 : 0.95);
+  // AbstractItemstackView: each quoin starts on a random one of its 24 frames.
+  q.gotoAndPlay(Math.floor(Math.random() * q.totalFrames));
+  // quoin.as draws its 40x50 tiles at the world's own scale.
+  q.baseScale = QUOIN_SCALE;
   q.scale.set(q.baseScale);
   q.x = spot.x;
   q.baseY = opts.useExactY ? spot.y : spot.y - 58 - (phaseIndex % 3) * 34;
@@ -7624,11 +7626,6 @@ function spawnWorldQuoin(spot, typeId = 'xp', opts = {}) {
     ? opts.summersDayRewardIndex
     : null;
   q.zIndex = 25;
-  const glow = new PIXI.Graphics();
-  glow.beginFill(def.color, typeId === 'qurazy' ? 0.32 : 0.18);
-  glow.drawCircle(0, 0, typeId === 'qurazy' ? 27 : 22);
-  glow.endFill();
-  q.addChildAt(glow, 0);
   entityLayer.addChild(q);
   return q;
 }
@@ -8406,9 +8403,8 @@ function physics(dt) {
 
   for (const q of quoins) {
     q.phase += 0.05 * dt;
-    q.y = q.baseY + Math.sin(q.phase) * 8;
-    const pulse = 1 + Math.sin(q.phase * 1.6) * 0.08;
-    q.scale.set(q.baseScale * pulse);
+    // Whole pixels and a fixed scale keep the 40x50 bitmap from resampling.
+    q.y = Math.round(q.baseY + Math.sin(q.phase) * 8);
   }
 
   for (const b of butterflies) {
