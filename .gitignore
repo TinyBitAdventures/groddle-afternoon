@@ -5,3 +5,4 @@ shots/
 # Research workspaces, not game files (SWF probes, reference video frames)
 character-probe/
 _ref-frames/
+/shot.png

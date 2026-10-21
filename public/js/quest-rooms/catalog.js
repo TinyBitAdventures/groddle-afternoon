@@ -52,6 +52,11 @@ export const QUEST_ROOMS = Object.freeze({
 /** Rooms that exist and pass QA. A quest is solo-offerable once its room is here. */
 export const BUILT_ROOMS = Object.freeze([
   'rainbow_run',
+  'top_of_tree',
+  'color_unblocking',
+  'vision_quest',
+  'kids_room',
+  'rube_yard',
 ]);
 
 /**
@@ -129,7 +134,18 @@ export const OFFER_OVERRIDES = Object.freeze({
  * (inventory.js ensureItem) so they read correctly after a reload. Icons live
  * at assets/sprites/icons/<class>.png (recovered OGA iconic art).
  */
-export const ROOM_ITEMS = Object.freeze({});
+export const ROOM_ITEMS = Object.freeze({
+  // items/play_cube.js: Color Unblocking's first-run reward; tags no_rube, no_trade, no_auction, toys.
+  play_cube: {
+    label: 'Play Cube',
+    desc: "Play Cubes are famous the world over. Re-live some of your favorite quest memories with one simple click. Don't waste another minute, play with your cube now!",
+    stackMax: 1,
+    baseCost: 0,
+    sellable: false,
+    donatable: false,
+    tags: ['no_rube', 'no_trade', 'no_auction', 'toys'],
+  },
+});
 
 /** Pack items that offer a room's reminisce quests (npc triggers on an item class). */
 export const REMINISCE_ITEMS = Object.freeze({

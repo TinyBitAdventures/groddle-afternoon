@@ -4311,7 +4311,8 @@
     "name": "identify_object",
     "num": 1,
     "classId": "npc_myopic_frog",
-    "desc": "Press 'C' to enter Camera Mode and to identify an object from long way away"
+    "desc": "Press 'C' to enter Camera Mode and to identify an object from long way away",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -4348,8 +4349,8 @@
     "skill": "eyeballery_1"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "vision_quest",
+  "solo": true
  },
  "ezcooking_1": {
   "classTsid": "ezcooking_1",
@@ -6853,7 +6854,8 @@
     "type": "flag",
     "name": "top_of_tree",
     "num": 1,
-    "desc": "Get to the top of the tree"
+    "desc": "Get to the top of the tree",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -6889,8 +6891,8 @@
     "quest": "de_embiggenify_part2"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "top_of_tree",
+  "solo": true
  },
  "hogtie_piggy": {
   "classTsid": "hogtie_piggy",
@@ -28535,7 +28537,8 @@
     "name": "correct_letter_item",
     "num": 1,
     "classId": "npc_letterblock",
-    "desc": "Give Mr. Block an appropriately named item."
+    "desc": "Give Mr. Block an appropriately named item.",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -28570,8 +28573,8 @@
     "inferred": true
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "kids_room",
+  "solo": true
  },
  "letter_block_2": {
   "classTsid": "letter_block_2",
@@ -28640,7 +28643,8 @@
     "name": "spell_words",
     "num": 1,
     "classId": "quest_req_icon_letterblock",
-    "desc": "Spell as many words as possible in three minutes"
+    "desc": "Spell as many words as possible in three minutes",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -28674,8 +28678,8 @@
     "level": 11
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "kids_room",
+  "solo": true
  },
  "lightgreenthumb_1": {
   "classTsid": "lightgreenthumb_1",
@@ -30773,7 +30777,8 @@
     "type": "flag",
     "name": "instance_exit_via_door",
     "num": 1,
-    "desc": "Find the Exit"
+    "desc": "Find the Exit",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -30820,8 +30825,8 @@
     "xp": 4940
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "color_unblocking",
+  "solo": true
  },
  "puzzle_level_color_blockage_rem": {
   "classTsid": "puzzle_level_color_blockage_rem",
@@ -30835,7 +30840,8 @@
     "type": "flag",
     "name": "instance_exit_via_door",
     "num": 1,
-    "desc": "Find the Exit"
+    "desc": "Find the Exit",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -30878,8 +30884,8 @@
     "npc": "play_cube"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "color_unblocking",
+  "solo": true
  },
  "puzzle_level_light_perspective": {
   "classTsid": "puzzle_level_light_perspective",
@@ -31703,7 +31709,8 @@
     "name": "wrizzards_found",
     "num": 10,
     "classId": "npc_rube",
-    "desc": "Wrizzards Found"
+    "desc": "Wrizzards Found",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -31721,7 +31728,13 @@
   "familiarTurnin": true,
   "silentComplete": false,
   "showAlert": false,
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "rube_traded",
+    "not": 0
+   }
+  ],
   "endNpcs": [],
   "locations": [
    "the_wrizzards_and_the_rube"
@@ -31731,12 +31744,13 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "event",
-    "event": "rube_visited_home"
+    "type": "prerequisites",
+    "override": true
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "rube_yard",
+  "offerNote": "rube_visited_home event; offered once you have traded with The Rube",
+  "solo": true
  },
  "saucery_make_level1_recipes": {
   "classTsid": "saucery_make_level1_recipes",

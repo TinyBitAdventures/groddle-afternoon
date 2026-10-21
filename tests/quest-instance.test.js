@@ -181,3 +181,90 @@ describe('Rainbow Run (numismatic_hustle)', () => {
     }
   });
 });
+
+describe('The High Jumper (top_of_tree)', () => {
+  it('keeps the source two-minute clock and branches only Spinach can reach', async () => {
+    const mod = await import('../public/js/quest-rooms/top-of-tree.js');
+    assert.equal(mod.CLIMB_MS, 120_000);
+    assert.deepEqual(mod.NAG.map((n) => n.atMs), [30_000, 45_000]);
+    const rows = [mod.GROUND, ...mod.treeBranches().map((b) => b.y), mod.CROWN_Y];
+    // An ordinary jump peaks near 110 px; Spinach's measured in-room apex is 289 px.
+    for (let i = 1; i < rows.length; i++) {
+      const rise = rows[i - 1] - rows[i];
+      assert.ok(rise > 110 && rise < 289, `step ${i} rises ${rise}`);
+    }
+    // Branches alternate sides of the trunk so each hop crosses it.
+    const sides = mod.treeBranches().map((b) => b.side).join('');
+    assert.equal(sides, 'RLRLRLRL');
+    const spinach = mod.spinachSpots().reduce((n, s) => n + s.count, 0);
+    assert.ok(spinach >= 3, `${spinach} spinach`);
+  });
+});
+
+describe('Color Unblocking (color_unblocking)', () => {
+  it('opens a path with the four solution switches and keeps the orange bridge', async () => {
+    const mod = await import('../public/js/quest-rooms/color-unblocking.js');
+    const layout = mod.colorLayout();
+    const on = mod.colorsAfter(layout.solution);
+    for (const color of ['red', 'blue', 'green', 'purple']) assert.ok(!on.has(color), `${color} cleared`);
+    assert.ok(on.has('orange'), 'the bridge stays');
+    // Nothing standing on the floor path is left after the solution.
+    const left = mod.solidColumns(layout, on).filter((c) => c.color !== 'orange');
+    assert.deepEqual(left, []);
+    // Green steps climb to the blue switch's ledge one rise at a time.
+    const { CELL, JUMP_RISE } = mod.COLOR_ROOM_FACTS;
+    assert.ok(CELL <= JUMP_RISE);
+    assert.equal(layout.ledge.y, layout.switches.find((s) => s.id === 'blue').y);
+  });
+});
+
+describe('Vision Quest (vision_quest)', () => {
+  it('uses the archived Institute street and the six source objects', async () => {
+    const mod = await import('../public/js/quest-rooms/vision-quest.js');
+    assert.equal(mod.STREET, 'GNV1T7PCUM53T25');
+    assert.deepEqual(Object.keys(mod.OBJECTS).sort(), ['lemburger', 'npc_crab', 'npc_piggy', 'pumpkin', 'rock_sparkly_1', 'trant_fruit']);
+    assert.equal(mod.WRONG_THINGS.length, 7);
+    assert.ok(existsSync(join(root, 'public/assets/streets', `${mod.STREET}.json`)));
+  });
+});
+
+describe("Mr. Block's playroom (kids_room)", () => {
+  it('has the 24 source words, the doneSpelling tiers and letter gifts', async () => {
+    const mod = await import('../public/js/quest-rooms/kids-room.js');
+    assert.equal(mod.WORD_UP_WORDS.length, 24);
+    assert.equal(mod.SPELL_MS, 180_000);
+    assert.deepEqual([2, 3, 9, 10, 19, 20].map((n) => mod.spellingTier(n).id),
+      ['fail', 'done_spelling_1', 'done_spelling_1', 'done_spelling_3', 'done_spelling_3', 'done_spelling_5']);
+    const spelled = [];
+    assert.equal(mod.recordWord(spelled, ['T', 'E', 'A']), 'TEA');
+    assert.equal(mod.recordWord(spelled, ['T', 'E', 'A']), null);
+    assert.equal(mod.nextLetter('T'), 'A');
+    const gifts = mod.giftable({ meat: 2, pick: 1, apple: 1 }, 'M', { meat: { label: 'Meat' }, apple: { label: 'Apple' } });
+    assert.deepEqual(gifts.map((g) => g.id), ['meat']);
+  });
+});
+
+describe('The Wrizzards and The Rube (rube_yard)', () => {
+  it('hides ten Wrizzards where the camera and room card leave them visible', async () => {
+    const mod = await import('../public/js/quest-rooms/rube-yard.js');
+    assert.equal(mod.WRIZZARDS_NEEDED, 10);
+    assert.equal(mod.HIDING_SPOTS.length, 10);
+    assert.equal(new Set(mod.HIDING_SPOTS.map((s) => s.id)).size, 10);
+    // The camera shows ~300 px above the floor and the room card covers its top
+    // ~140, so each Wrizzard's clickable middle (38 px above rest) stays within
+    // 160 px (the fence one sat at 180, on the card's edge, in a real-click run).
+    const FLOOR = 620;
+    for (const s of mod.HIDING_SPOTS) {
+      const middle = s.wy + s.peek - 38;
+      assert.ok(FLOOR - middle <= 160, `${s.id} middle is ${FLOOR - middle} px up`);
+    }
+  });
+
+  it('registers the Play Cube for the pack catalog', async () => {
+    const { ROOM_ITEMS } = await import('../public/js/quest-rooms/catalog.js');
+    assert.equal(ROOM_ITEMS.play_cube.label, 'Play Cube');
+    assert.equal(ROOM_ITEMS.play_cube.stackMax, 1);
+    assert.equal(ROOM_ITEMS.play_cube.sellable, false);
+    assert.ok(existsSync(join(root, 'public/assets/sprites/icons/play_cube.png')));
+  });
+});
