@@ -89,8 +89,9 @@ export function platformsScreen(street) {
 }
 
 /**
- * Build climb walls from original geo + trunk_ladder_* deco stacks.
- * Many climbable trees (e.g. Hechey Track) ship empty walls[] but ladder decos.
+ * Build climb walls from the street's source walls and ladders. trunk_ladder
+ * decos are art only: the client climbs <ladder> elements (LadderView), and
+ * every climbable trunk has one.
  *
  * Wall world coords (Glitch): top y (more negative), height h extends downward
  * so bottom = y + h. See Wall.as getClosestToXY.
@@ -112,76 +113,6 @@ export function climbWallsWorld(street) {
     const covered = out.some((w) => Math.abs(w.x - l.x) < 40 && !(l.y < w.y || top > w.y + w.h));
     if (covered) continue;
     out.push({ id: l.id, x: l.x, y: top, h: l.h, w: l.w || 50, pc_perm: null, item_perm: null, source: 'ladder' });
-  }
-  // Synthesize from trunk_ladder stacks (cluster by x)
-  /** @type {{ x:number, y:number, w:number, h:number, sprite:string }[]} */
-  const ladders = [];
-  for (const L of street.layers || []) {
-    for (const d of L.decos || []) {
-      const sp = String(d.sprite || '');
-      if (!sp.startsWith('trunk_ladder')) continue;
-      ladders.push({
-        x: Number(d.x) || 0,
-        y: Number(d.y) || 0,
-        w: Number(d.w) || 40,
-        h: Number(d.h) || 50,
-        sprite: sp,
-      });
-    }
-  }
-  if (ladders.length) {
-    const used = new Set();
-    const sorted = [...ladders].sort((a, b) => a.x - b.x);
-    for (let i = 0; i < sorted.length; i++) {
-      if (used.has(i)) continue;
-      const cluster = [sorted[i]];
-      used.add(i);
-      for (let j = i + 1; j < sorted.length; j++) {
-        if (used.has(j)) continue;
-        const cx = cluster.reduce((s, c) => s + c.x, 0) / cluster.length;
-        if (Math.abs(sorted[j].x - cx) <= 48) {
-          cluster.push(sorted[j]);
-          used.add(j);
-        }
-      }
-      // Deco y is registration at bottom of sprite → top = y - h
-      const tops = cluster.map((c) => c.y - c.h);
-      const bots = cluster.map((c) => c.y);
-      let top = Math.min(...tops);
-      let bot = Math.max(...bots);
-      const x = Math.round(cluster.reduce((s, c) => s + c.x, 0) / cluster.length);
-      // Extend climb zone down to the nearest platform under the trunk so you
-      // can grab from the path/mound (ladder rungs often start above ground).
-      let groundY = null;
-      for (const p of street.platforms || []) {
-        const minX = Math.min(p.x1, p.x2) - 60;
-        const maxX = Math.max(p.x1, p.x2) + 60;
-        if (x < minX || x > maxX) continue;
-        const midY = (p.y1 + p.y2) / 2;
-        // platforms at or below ladder bottom (less negative = lower)
-        if (midY >= bot - 20 && midY <= bot + 200) {
-          if (groundY == null || midY > groundY) groundY = midY;
-        }
-      }
-      if (groundY != null && groundY > bot) bot = groundY + 8;
-      const h = bot - top;
-      if (h < 40) continue;
-      // Skip if an XML wall already covers this x range closely
-      const overlapsXml = out.some(
-        (w) => Math.abs(w.x - x) < 40 && !(bot < w.y || top > w.y + w.h)
-      );
-      if (overlapsXml) continue;
-      out.push({
-        id: `ladder_climb_${x}_${Math.round(top)}`,
-        x,
-        y: top,
-        h,
-        w: 0,
-        pc_perm: null,
-        item_perm: null,
-        source: 'trunk_ladder',
-      });
-    }
   }
   return out;
 }

@@ -557,6 +557,7 @@ import {
   clearJumpQueue,
   hasQueuedJump,
   noteGrounded,
+  noteJumped,
   resolveQueuedJump,
   dampingAlpha,
   cameraTargetX,
@@ -1145,7 +1146,7 @@ let streetWalls = [];
 let currentStreetPopulation = null;
 let currentStreetPlacement = null;
 let currentStreetTsid = STREET_INDEX.default;
-/** Climb state: original Glitch walls + trunk_ladder-synthesized zones */
+/** Climb state: original Glitch walls and ladders */
 let climb = { active: false, wall: null };
 let homeMailboxTarget = null;
 let homeDoorTarget = null;
@@ -6464,15 +6465,17 @@ function startClimb(wallHit) {
   setPlayerAnim('climb');
 }
 
-function stopClimb({ jumpOff = false, side = 0 } = {}) {
+function stopClimb({ jumpOff = false, side = 0, jumpVelocity = -9.6, maxSpeed = 4.4 } = {}) {
   if (!climb.active && !player?.climbing) return;
   climb.active = false;
   climb.wall = null;
   if (player) {
     player.climbing = false;
     if (jumpOff) {
-      player.vy = -7.2;
-      player.vx = side * 3.2;
+      // vy_jump / 10 and vx_off_ladder (300 of vx_max 335) sideways; a full jump straight up.
+      player.vy = side ? jumpVelocity / 10 : jumpVelocity;
+      player.vx = side * maxSpeed * (300 / 335);
+      if (side) player.facing = side < 0 ? 'left' : 'right';
       player.onGround = false;
     }
     setPlayerAnim(Math.abs(player.vx) > 0.35 ? 'walk' : 'idle');
@@ -8142,7 +8145,7 @@ function handleInput() {
   const climbHit = findClimbWallNear(streetWalls, player.x, player.y, 40);
   const movementBuff = combinedPhysics();
 
-  // —— Climbing (original walls + trunk_ladder zones) ——
+  // —— Climbing (original walls and ladders) ——
   if (climb.active) {
     const wall = climb.wall;
     if (!wall) {
@@ -8151,7 +8154,8 @@ function handleInput() {
     }
     player.x = wall.x;
     player.vx = 0;
-    const climbSpeed = 2.35 * movementBuff.speed;
+    // AvatarPhysicsHandler: a ladder climbs at vx_max, the walk speed.
+    const climbSpeed = 4.4 * movementBuff.speed;
     if (up && !down) {
       player.vy = -climbSpeed;
       setPlayerAnim('climb');
@@ -8163,19 +8167,20 @@ function handleInput() {
       // Pause pose at current climb frame
       if (player.playing) player.stop();
     }
-    // Jump off left/right (Glitch wall-jump lite)
+    // Getting off (AvatarPhysicsHandler triggerGetOffLadder): left/right
+    // win over Space and hop off sideways at vx_off_ladder with a tenth of a
+    // jump; Space alone jumps straight up and uses the air jump.
     if (jumpRequested || (left && !right) || (right && !left)) {
-      const side = left && !right ? -1 : right && !left ? 1 : player.facing === 'left' ? -1 : 1;
-      if (jumpRequested || left || right) {
-        clearJumpQueue(jumpState);
-        stopClimb({ jumpOff: true, side });
-        noteGrounded(jumpState, false, now);
-        if (jumpRequested) {
-          pc.energy = clamp(pc.energy - 1.2, 0, energyCap());
-          updateHud();
-        }
-        return;
+      const side = left && !right ? -1 : right && !left ? 1 : 0;
+      clearJumpQueue(jumpState);
+      noteGrounded(jumpState, false, now);
+      stopClimb({ jumpOff: true, side, jumpVelocity: -9.6 * movementBuff.jump, maxSpeed: 4.4 * movementBuff.speed });
+      if (!side) {
+        noteJumped(jumpState);
+        pc.energy = clamp(pc.energy - 1.2, 0, energyCap());
+        updateHud();
       }
+      return;
     }
     // Drop off bottom of wall onto ground
     if (player.y >= wall.yBot - 2 && down) {
@@ -8199,24 +8204,17 @@ function handleInput() {
     return;
   }
 
-  // Down at a ladder's top climbs down it (Le Misérable's ladder has no other way back).
-  if (climbHit && down && !up && player.onGround && player.y <= climbHit.yTop + 30 && Math.abs(player.x - climbHit.x) < 28) {
+  // Up or Down over a ladder gets on it (AvatarController onUpKey/onDownKey);
+  // there is no grabbing by flying or falling into one. Down at the very
+  // bottom would only stand you on its last rung, so it walks on instead.
+  const atBase = climbHit && player.onGround && player.y >= climbHit.yBot - 4;
+  if (climbHit && (up !== down) && Math.abs(player.x - climbHit.x) < 28 && !(down && atBase)) {
     startClimb(climbHit);
     return;
   }
-  // Grab onto climbable surface when near + holding up (or jump into it).
-  // Not by falling off its bottom: a ladder whose base floats above the floor
-  // (Le Misérable's, 13 px) re-grabbed you and the next step jumped you off it.
-  const belowBase = climbHit && player.y >= climbHit.yBot - 4;
-  if (climbHit && (up || (!player.onGround && !belowBase && Math.abs(player.x - climbHit.x) < 28))) {
-    // Only auto-grab when airborne near wall, or pressing up at base
-    if (up || player.vy !== 0 || !player.onGround) {
-      startClimb(climbHit);
-      return;
-    }
-  }
 
-  const accel = 0.58 * (player.onGround ? movementBuff.accel : movementBuff.airAccel);
+  // vx_accel_add_in_air 0.22 against _floor 0.3.
+  const accel = 0.58 * (player.onGround ? movementBuff.accel : movementBuff.airAccel * (0.22 / 0.3));
   const max = 4.4 * movementBuff.speed;
   const jumpVelocity = -9.6 * movementBuff.jump;
   if (left) {
@@ -8228,6 +8226,10 @@ function handleInput() {
     player.vx = followee?.sprite && !followee.sprite.destroyed
       ? companionFollowVelocity(player.x, followee.sprite.x, player.vx, { maxSpeed: max })
       : player.vx * 0.78;
+  } else if (!player.onGround && !(movementBuff.airDrag > 0)) {
+    // Airborne with no key: floor friction does not apply, so the jump keeps
+    // its momentum until it drops under friction_thresh (80 of vx_max 335).
+    if (Math.abs(player.vx) < max * (80 / 335)) player.vx = 0;
   } else {
     player.vx *= streetPhysicsCoastDecay(movementBuff);
     if (Math.abs(player.vx) < 0.05) player.vx = 0;
@@ -8293,11 +8295,7 @@ function physics(dt) {
       player.x = walledX;
       player.vx = 0;
     }
-    // Snap onto climb wall if flying into one
-    const hit = findClimbWallNear(streetWalls, player.x, player.y, 22);
-    if (hit && !player.onGround && Math.abs(player.vx) > 0.5) {
-      startClimb(hit);
-    } else {
+    {
       const ground = resolveGround(player.x, player.y);
       if (player.y >= ground && player.vy >= 0) {
         player.y = ground;
@@ -22354,7 +22352,7 @@ async function main() {
       const toPage = (wx, wy) => ({ x: rect.left + (wx + world.x) * sx, y: rect.top + (wy + world.y) * sy });
       return {
         street: currentStreet ? { tsid: currentStreet.tsid, label: currentStreet.label, hub: currentStreet.hub || '' } : null,
-        player: { x: player.x, y: player.y, onGround: !!player.onGround, energy: pc.energy, mood: pc.mood },
+        player: { x: player.x, y: player.y, vx: player.vx, vy: player.vy, onGround: !!player.onGround, climbing: !!climb.active, energy: pc.energy, mood: pc.mood },
         busy: engine.busy(),
         acting: !!currentAction,
         menu: menuTarget ? (menuTarget.label || menuTarget.classId) : '',
@@ -22485,7 +22483,7 @@ async function main() {
         ? findClimbWallNear(streetWalls, player.x, player.y, 42)
         : null;
       if (climb.active) {
-        prompt.text = '↑/↓ climb · Space hop off';
+        prompt.text = '↑/↓ climb · ←/→ step off · Space jump';
         prompt.x = player.x;
         prompt.y = player.y - 80;
         prompt.visible = true;

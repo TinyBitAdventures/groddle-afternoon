@@ -12,6 +12,7 @@ import {
   createJumpState,
   queueJump,
   noteGrounded,
+  noteJumped,
   resolveQueuedJump,
   rawTripleJumpMultiplier,
   scaledTripleJumpMultiplier,
@@ -110,6 +111,7 @@ test.describe('official chained Triple Jump', () => {
   test('buffers an early press through landing and allows a short coyote jump', () => {
     const buffered = createJumpState();
     noteGrounded(buffered, false, 1_000);
+    noteJumped(buffered);
     queueJump(buffered, 1_100);
     assert.equal(resolveQueuedJump(buffered, { now: 1_100, grounded: false }).reason, 'airborne_buffered');
     land(buffered, 1_180);
@@ -122,8 +124,20 @@ test.describe('official chained Triple Jump', () => {
 
     const tooLate = createJumpState(3_000);
     noteGrounded(tooLate, false, 3_010);
+    noteJumped(tooLate);
     queueJump(tooLate, 3_120);
     assert.equal(resolveQueuedJump(tooLate, { now: 3_120, grounded: false }).reason, 'airborne_buffered');
+  });
+
+  test('one air jump after walking off a ledge, none after a jump (hasJumpedSinceFloor)', () => {
+    const ledge = createJumpState(4_000);
+    noteGrounded(ledge, false, 4_010);
+    queueJump(ledge, 4_600);
+    assert.equal(resolveQueuedJump(ledge, { now: 4_600, grounded: false }).reason, 'air_jump');
+    queueJump(ledge, 4_800);
+    assert.equal(resolveQueuedJump(ledge, { now: 4_800, grounded: false }).reason, 'airborne_buffered');
+    land(ledge, 5_000);
+    assert.equal(ledge.jumpedSinceFloor, false);
   });
 });
 

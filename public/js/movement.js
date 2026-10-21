@@ -46,7 +46,15 @@ export function createJumpState(now = 0) {
     chainDeadline: 0,
     jumps: 0,
     tripleJumps: 0,
+    // AvatarPhysicsHandler hasJumpedSinceFloor: one jump is allowed in the
+    // air after leaving the floor without jumping (walking off a ledge).
+    jumpedSinceFloor: false,
   };
+}
+
+/** A jump that used up the airborne allowance (e.g. Space off a ladder). */
+export function noteJumped(state) {
+  if (state && typeof state === 'object') state.jumpedSinceFloor = true;
 }
 
 /** Queue one edge-triggered jump. Held-key repeats should not call this. */
@@ -77,6 +85,7 @@ export function noteGrounded(state, grounded, now) {
   const next = grounded === true;
   if (next) {
     state.lastGroundedAt = at;
+    state.jumpedSinceFloor = false;
     if (!state.grounded) {
       state.landedAt = at;
       state.chainDeadline = state.chainCount > 0 ? at + TRIPLE_JUMP_WINDOW_MS : 0;
@@ -109,8 +118,9 @@ export function scaledTripleJumpMultiplier(rawMultiplier, upgradeMultiplier) {
 }
 
 /**
- * Consume a buffered request when a floor or coyote jump is possible.
- * The official boost is a third quick jump from the floor, not an air jump.
+ * Consume a buffered request when a floor, coyote or first-air jump is
+ * possible. The official boost is a third quick jump from the floor, not an
+ * air jump.
  */
 export function resolveQueuedJump(state, {
   now = 0,
@@ -128,7 +138,8 @@ export function resolveQueuedJump(state, {
   noteGrounded(state, grounded, at);
   const floorJump = state.grounded === true;
   const coyoteJump = !floorJump && at - finite(state.lastGroundedAt) <= Math.max(0, finite(coyoteMs));
-  if (!floorJump && !coyoteJump) return { ok: false, reason: 'airborne_buffered' };
+  const airJump = !floorJump && !coyoteJump && state.jumpedSinceFloor === false;
+  if (!floorJump && !coyoteJump && !airJump) return { ok: false, reason: 'airborne_buffered' };
 
   state.queuedAt = null;
   const profile = tripleJumpProfile(upgrades);
@@ -164,9 +175,10 @@ export function resolveQueuedJump(state, {
   state.jumps = Math.max(0, Math.floor(finite(state.jumps))) + 1;
   state.grounded = false;
   state.lastGroundedAt = at;
+  state.jumpedSinceFloor = true;
   return {
     ok: true,
-    reason: triple ? 'triple_jump' : coyoteJump ? 'coyote_jump' : 'jump',
+    reason: triple ? 'triple_jump' : coyoteJump ? 'coyote_jump' : airJump ? 'air_jump' : 'jump',
     jumpNumber,
     triple,
     multiplier,
