@@ -7979,8 +7979,16 @@ function handleInput() {
     return;
   }
 
-  // Grab onto climbable surface when near + holding up (or jump into it)
-  if (climbHit && (up || (!player.onGround && Math.abs(player.x - climbHit.x) < 28))) {
+  // Down at a ladder's top climbs down it (Le Misérable's ladder has no other way back).
+  if (climbHit && down && !up && player.onGround && player.y <= climbHit.yTop + 30 && Math.abs(player.x - climbHit.x) < 28) {
+    startClimb(climbHit);
+    return;
+  }
+  // Grab onto climbable surface when near + holding up (or jump into it).
+  // Not by falling off its bottom: a ladder whose base floats above the floor
+  // (Le Misérable's, 13 px) re-grabbed you and the next step jumped you off it.
+  const belowBase = climbHit && player.y >= climbHit.yBot - 4;
+  if (climbHit && (up || (!player.onGround && !belowBase && Math.abs(player.x - climbHit.x) < 28))) {
     // Only auto-grab when airborne near wall, or pressing up at base
     if (up || player.vy !== 0 || !player.onGround) {
       startClimb(climbHit);
