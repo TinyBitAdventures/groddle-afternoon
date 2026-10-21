@@ -386,6 +386,9 @@ function openTeleporter(engine) {
   const p = party();
   if (!p || !engine.player) return;
   p.teleporter = createPartyTeleporter({ tsid: engine.streetTsid, x: engine.player.x, y: engine.player.y, now: Date.now() });
+  // Stand it on the floor even when the avatar is mid-jump.
+  const floor = groundNear(engine, p.teleporter.x, engine.player.y);
+  if (floor) p.teleporter.y = Math.round(floor.y);
   engine.playSound('TELEPORTER_VISIBLE_APPEAR', { volume: 0.6 });
   setTimeout(() => {
     if (party()?.teleporter) engine.playSound('TELEPORTER_VISIBLE_PORTAL', { volume: 0.6 });
