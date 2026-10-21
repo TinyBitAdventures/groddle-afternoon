@@ -19,7 +19,7 @@ import {
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { highestSkillLevel, skillPackageDetails } from './skill-packages.js';
-import { rollMakingBonusImagination, scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
+import { rollMakingBonusImagination, scaledToolWear, smeltingOverrides, toolWearMultiplier } from './imagination-effects.js';
 
 /**
  * @typedef {{
@@ -324,6 +324,34 @@ export const TRANSMOG_FAIL_ENERGY = 2;
 export const TRANSMOG_FAIL_MOOD = 2;
 export const TRANSMOG_FAIL_LINE = "Well, that didn't work. I suggest you get some more skillz!";
 
+/** computeEnergyAndTimeCost: machines add 2200 ms once per batch for their animations. */
+export const MACHINE_EXTRA_WAIT_MS = 2200;
+
+/**
+ * making_get_transmogrification_time: seconds for the nth unit of a batch
+ * (2 s each for the first five, then 1, 0.5, 0.2 and 0.1 s).
+ */
+export function transmogUnitSeconds(n) {
+  if (n <= 5) return 2;
+  if (n <= 10) return 1;
+  if (n <= 20) return 0.5;
+  if (n <= 50) return 0.2;
+  return 0.1;
+}
+
+/**
+ * Tool-wear units a batch of `count` costs: ore_grinder.js
+ * getToolWearMultiplier is round(count / 3) for rock (runSkillPackage turns
+ * 0 into 1) and count for barnacles; every other tool wears per unit.
+ */
+export function batchWearUnits(recipe, count) {
+  const n = Math.max(0, Math.floor(Number(count) || 0));
+  if (!n) return 0;
+  const grinder = recipe?.tool === 'ore_grinder' || recipe?.tool === 'grand_ol_grinder';
+  const barnacle = (recipe?.inputs || []).some((inp) => inp.classTsid === 'barnacle');
+  return grinder && !barnacle ? Math.round(n / 3) || 1 : n;
+}
+
 /** making_required_skill: the skill a tool needs, or null (transmogrifiers). */
 export function makingRequiredSkill(toolId) {
   const rule = MAKING_TOOL_SKILLS[toolId];
@@ -346,6 +374,7 @@ export function makingSkillAdjustments(recipe, learned, upgrades = []) {
     energyCost: baseEnergy,
     waitMs: baseWait,
     waitMultiplier: 1,
+    toolWear: null,
     failChance: 0,
     skillLevel: 0,
     requiredSkill: rule?.requiredSkill || null,
@@ -373,12 +402,23 @@ export function makingSkillAdjustments(recipe, learned, upgrades = []) {
     // The Grinder runs the `refining` package: Refining II takes half the
     // time (4 s to 2 s) and 3 energy per chunk instead of 4.
     // Refined Speed I/II (refining_time_1/2) shorten the package duration 20/40%.
-    const refining = skillPackageDetails('refining', learned, upgrades);
+    const barnacle = (recipe.inputs || []).some((inp) => inp.classTsid === 'barnacle');
+    const refining = skillPackageDetails(barnacle ? 'barnacle_refining' : 'refining', barnacle ? ['no_skill'] : learned, upgrades);
     if (refining) {
-      out.skillLevel = refining.rank;
+      out.skillLevel = barnacle ? 0 : refining.rank;
       out.energyCost = refining.energy_cost;
-      out.waitMultiplier = refining.duration / 4000;
-      if (refining.rank >= 2) out.note = 'Refining II: twice as fast, 3 energy per chunk.';
+      out.toolWear = refining.tool_wear;
+      if (!barnacle) out.waitMultiplier = refining.duration / 4000;
+      if (!barnacle && refining.rank >= 2) out.note = 'Refining II: twice as fast, 3 energy per chunk.';
+    }
+  } else if (recipe?.tool === 'smelter') {
+    // smelter.js runs the `smelting` package: 5 energy and 3 wear per ingot,
+    // The Green Smelt 3 energy, Strong Smelter 2 wear.
+    const smelting = skillPackageDetails('smelting', learned, upgrades);
+    const cards = smeltingOverrides(upgrades);
+    if (smelting) {
+      out.energyCost = cards.energyCost ?? smelting.energy_cost;
+      out.toolWear = cards.toolWear ?? smelting.tool_wear;
     }
   }
   out.waitMs = Math.round(baseWait * out.waitMultiplier);
@@ -386,8 +426,8 @@ export function makingSkillAdjustments(recipe, learned, upgrades = []) {
 }
 
 /** Per-unit energy a recipe really costs this player. */
-export function recipeEnergyCost(recipe, learned) {
-  return makingSkillAdjustments(recipe, learned).energyCost;
+export function recipeEnergyCost(recipe, learned, upgrades = []) {
+  return makingSkillAdjustments(recipe, learned, upgrades).energyCost;
 }
 
 /** Fallback if recipes.json not loaded (classic knife/pan chain). */
@@ -822,10 +862,16 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     };
   }
 
-  // Unskilled transmogrification: the tool is used, then 20% of the time
-  // nothing is made and the player loses a flat 2 energy and 2 mood.
-  if (adjust.failChance && !opts.maxLuck && (opts.rng || Math.random)() < adjust.failChance) {
-    const failPoints = recipe.tool && opts.toolState ? wearFor(opts.toolWear || recipe.toolWear || 1) : 0;
+  // A session commits a batch one unit at a time: unitIndex is this unit
+  // (1-based) and batchQty the whole batch, for batch-level rules.
+  const unitIndex = Math.max(1, Math.floor(Number(opts.unitIndex) || 1));
+  const batchQty = Math.max(unitIndex, Math.floor(Number(opts.batchQty) || 1));
+  const baseWear = opts.toolWear || adjust.toolWear || recipe.toolWear || 1;
+  // Unskilled transmogrification: once per batch the tool takes the whole
+  // batch's wear, then 20% of the time nothing is made and the player loses
+  // a flat 2 energy and 2 mood (finishMakingKnown).
+  if (adjust.failChance && unitIndex === 1 && !opts.maxLuck && (opts.rng || Math.random)() < adjust.failChance) {
+    const failPoints = recipe.tool && opts.toolState ? wearFor(baseWear * batchWearUnits(recipe, batchQty)) : 0;
     const failWear = failPoints > 0 ? useToolCondition(opts.toolState, recipe.tool, failPoints) : null;
     const energyLost = Math.min(TRANSMOG_FAIL_ENERGY, Math.max(0, pc.energy || 0));
     const moodLost = Math.min(TRANSMOG_FAIL_MOOD, Math.max(0, pc.mood || 0));
@@ -876,7 +922,8 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     pc.xp = (pc.xp || 0) + bonusImagination;
   }
 
-  const wearPoints = recipe.tool && opts.toolState ? wearFor(opts.toolWear || recipe.toolWear || 1) : 0;
+  const unitWear = batchWearUnits(recipe, unitIndex) - batchWearUnits(recipe, unitIndex - 1);
+  const wearPoints = recipe.tool && opts.toolState && unitWear > 0 ? wearFor(baseWear * unitWear) : 0;
   const toolUse = wearPoints > 0 ? useToolCondition(opts.toolState, recipe.tool, wearPoints) : null;
 
   const toolLabel = TOOL_CATALOG[recipe.tool]?.label || recipe.tool || 'hands';
@@ -965,7 +1012,7 @@ export function craftDurationFor(recipeOrTool, learned, upgrades = []) {
  * Pure timer state for an animated, per-unit making session.
  * Inventory mutation deliberately happens outside this helper when unitsReady > 0.
  */
-export function createCraftSession({ recipeKey, recipeName = '', tool = '', qty = 1, durationMs } = {}) {
+export function createCraftSession({ recipeKey, recipeName = '', tool = '', qty = 1, durationMs, durations } = {}) {
   const total = Math.max(1, Math.floor(Number(qty) || 1));
   const duration = Math.max(1, Number(durationMs) || craftDurationFor(tool));
   return {
@@ -974,12 +1021,36 @@ export function createCraftSession({ recipeKey, recipeName = '', tool = '', qty 
     tool,
     qty: total,
     durationMs: duration,
+    // Optional per-unit durations (transmogrification's sliding scale).
+    durations: Array.isArray(durations) ? durations.map((d) => Math.max(1, Number(d) || duration)) : null,
     completed: 0,
     unitElapsedMs: 0,
     unitProgress: 0,
     totalProgress: 0,
     status: 'running',
   };
+}
+
+function unitDuration(session) {
+  return session.durations?.[session.completed] ?? session.durationMs;
+}
+
+/**
+ * Per-unit visible durations for a batch, or null when every unit takes
+ * craftDurationFor: transmogrifiers follow making_get_transmogrification_time
+ * (doubled unskilled) and machines add MACHINE_EXTRA_WAIT_MS to the first unit.
+ */
+export function craftUnitDurations(recipe, qty, learned, upgrades = []) {
+  const n = Math.max(1, Math.floor(Number(qty) || 1));
+  const adjust = makingSkillAdjustments(recipe, learned, upgrades);
+  if (adjust.makingType === 'transmogrification') {
+    return Array.from({ length: n }, (_, i) => Math.round(transmogUnitSeconds(i + 1) * 1000 * adjust.waitMultiplier));
+  }
+  if (adjust.makingType === 'machine') {
+    const each = craftDurationFor(recipe, learned, upgrades);
+    return Array.from({ length: n }, (_, i) => each + (i === 0 ? MACHINE_EXTRA_WAIT_MS : 0));
+  }
+  return null;
 }
 
 /** Advance a making timer without touching inventory or player stats. */
@@ -990,7 +1061,7 @@ export function advanceCraftSession(session, deltaMs) {
 
   let remaining = Math.max(0, Number(deltaMs) || 0);
   while (remaining > 0 && next.status === 'running') {
-    const needed = Math.max(0, next.durationMs - next.unitElapsedMs);
+    const needed = Math.max(0, unitDuration(next) - next.unitElapsedMs);
     if (remaining < needed) {
       next.unitElapsedMs += remaining;
       remaining = 0;
@@ -1005,7 +1076,7 @@ export function advanceCraftSession(session, deltaMs) {
 
   next.unitProgress = next.status === 'complete'
     ? 1
-    : Math.max(0, Math.min(1, next.unitElapsedMs / next.durationMs));
+    : Math.max(0, Math.min(1, next.unitElapsedMs / unitDuration(next)));
   next.totalProgress = Math.max(
     0,
     Math.min(1, (next.completed + (next.status === 'running' ? next.unitProgress : 0)) / next.qty)
@@ -1145,13 +1216,13 @@ export function craftRecipeBatch(inv, pc, recipeKey, qty = 1, opts = {}) {
   let lastFail = null;
 
   for (let i = 1; i <= n; i++) {
-    const r = craftRecipe(inv, pc, recipeKey, opts);
+    const r = craftRecipe(inv, pc, recipeKey, { ...opts, unitIndex: i, batchQty: n });
     if (!r.ok) {
       lastFail = r;
       break;
     }
     made += 1;
-    const eCost = recipeEnergyCost(recipe, opts.learned);
+    const eCost = recipeEnergyCost(recipe, opts.learned, opts.upgrades || pc?.imaginationUpgrades || []);
     const xpGain = recipe.xpReward || 0;
     progress.push({
       i,

@@ -438,6 +438,7 @@ import {
   craftRecipeBatch,
   formatCraftProgress,
   craftDurationFor,
+  craftUnitDurations,
   recipeEnergyCost,
   makingSkillAdjustments,
   createCraftSession,
@@ -19108,7 +19109,7 @@ function updateMakeCraft(deltaMs) {
   const advanced = advanceCraftSession(record.timer, deltaMs);
   record.timer = advanced.session;
   for (let i = 0; i < advanced.unitsReady; i++) {
-    const result = craftRecipe(inv, pc, record.key, record.opts);
+    const result = craftRecipe(inv, pc, record.key, { ...record.opts, unitIndex: record.made + 1, batchQty: record.qty });
     if (!result.ok) {
       record.timer = cancelCraftSession(record.timer);
       // Unskilled transmogrification can fail (inc_making 20% rule).
@@ -19161,19 +19162,27 @@ function runMakeCraft(key, qty) {
   }
   const opts = craftOpts();
   const check = canCraft(inv, recipe, opts);
-  if (!check.ok || pc.energy < recipeEnergyCost(recipe, opts.learned)) {
+  const n = Math.max(1, Math.floor(qty || 1));
+  // inc_making.js refuses the whole batch when its energy >= the player's.
+  const batchEnergy = makingSkillAdjustments(recipe, opts.learned, opts.upgrades).energyCost * n;
+  if (check.ok && batchEnergy && pc.energy <= batchEnergy) {
+    toast("You don't have enough energy.");
+    renderMakePanel();
+    return;
+  }
+  if (!check.ok) {
     toast(check.reason === 'ingredients' ? 'You need more ingredients.' : check.msg || 'Cannot make that right now.');
     renderMakePanel();
     return;
   }
 
-  const n = Math.max(1, Math.floor(qty || 1));
   const timer = createCraftSession({
     recipeKey: key,
     recipeName: recipe.name,
     tool: recipe.tool,
     qty: n,
     durationMs: craftDurationFor(recipe, opts.learned, opts.upgrades),
+    durations: craftUnitDurations(recipe, n, opts.learned, opts.upgrades),
   });
   activeCraftSession = { timer, key, recipe, qty: n, made: 0, opts };
   document.getElementById('make-list')?.setAttribute('hidden', '');
@@ -19343,15 +19352,15 @@ function renderMakePanel() {
   });
   const opts = craftOpts();
   recipes.sort((a, b) => {
-    const ca = canCraft(inv, a, opts).ok && pc.energy >= recipeEnergyCost(a, opts.learned) ? 0 : 1;
-    const cb = canCraft(inv, b, opts).ok && pc.energy >= recipeEnergyCost(b, opts.learned) ? 0 : 1;
+    const ca = canCraft(inv, a, opts).ok && pc.energy > recipeEnergyCost(a, opts.learned, pc.imaginationUpgrades) ? 0 : 1;
+    const cb = canCraft(inv, b, opts).ok && pc.energy > recipeEnergyCost(b, opts.learned, pc.imaginationUpgrades) ? 0 : 1;
     if (ca !== cb) return ca - cb;
     return a.name.localeCompare(b.name);
   });
 
   if (meta) {
     meta.textContent = makeSelected
-      ? `Uses ${recipeEnergyCost(RECIPE_CATALOG[makeSelected], skillState.learned)} energy · energy now ${Math.floor(pc.energy)}`
+      ? `Uses ${recipeEnergyCost(RECIPE_CATALOG[makeSelected], skillState.learned, pc.imaginationUpgrades)} energy · energy now ${Math.floor(pc.energy)}`
       : makeToolFilter === 'fruit_changing_machine'
         ? `${recipes.length} fruits · ${countItem(inv, 'cherry')} cherries ready · energy ${Math.floor(pc.energy)}`
         : `${recipes.length} recipes · energy ${Math.floor(pc.energy)}`;
@@ -19376,8 +19385,9 @@ function renderMakePanel() {
         for (const inp of recipe.inputs || []) {
           m = Math.min(m, Math.floor(countItem(inv, inp.classTsid) / inp.qty));
         }
-        const energyEach = recipeEnergyCost(recipe, skillState.learned);
-        if (energyEach > 0) m = Math.min(m, Math.floor(pc.energy / energyEach));
+        const energyEach = recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades);
+        // The batch needs energy strictly above its cost (inc_making.js).
+        if (energyEach > 0) m = Math.min(m, Math.ceil(pc.energy / energyEach) - 1);
         return Math.max(0, m);
       })();
       makeQty = Math.max(1, Math.min(makeQty, Math.max(1, maxMake || 1)));
@@ -19393,7 +19403,7 @@ function renderMakePanel() {
         <div class="make-detail-icon"><img src="${itemIconUrl(outId)}" alt=""/></div>
         <div class="make-detail-body">
           <h3>${recipe.name}</h3>
-          <p>You can make up to ${maxMake}. Uses ${recipeEnergyCost(recipe, skillState.learned)} energy each.</p>
+          <p>You can make up to ${maxMake}. Uses ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy each.</p>
           ${makingSkillAdjustments(recipe, skillState.learned).note ? `<p class="make-skill-note">${makingSkillAdjustments(recipe, skillState.learned).note}</p>` : ''}
           ${inputsHtml}
           <div class="qty-row">
@@ -19440,7 +19450,7 @@ function renderMakePanel() {
       recipe.key ||
       Object.keys(RECIPE_CATALOG).find((k) => RECIPE_CATALOG[k].id === recipe.id);
     const check = canCraft(inv, recipe, opts);
-    const energyOk = pc.energy >= recipeEnergyCost(recipe, skillState.learned);
+    const energyOk = pc.energy > recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades);
     const canMake = check.ok && energyOk;
     const outId = recipe.outputs?.[0]?.classTsid;
     const tile = document.createElement('button');
@@ -19458,7 +19468,7 @@ function renderMakePanel() {
       <span class="tile-req">${inputs}</span>`;
     tile.setAttribute(
       'aria-label',
-      `${recipe.name}. ${inputs}. ${recipeEnergyCost(recipe, skillState.learned)} energy.${canMake ? '' : ' Not enough resources.'}`
+      `${recipe.name}. ${inputs}. ${recipeEnergyCost(recipe, skillState.learned, pc.imaginationUpgrades)} energy.${canMake ? '' : ' Not enough resources.'}`
     );
     tile.addEventListener('click', () => {
       makeSelected = key;

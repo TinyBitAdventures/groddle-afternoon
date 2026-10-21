@@ -41,6 +41,9 @@ import {
   recipeEnergyCost,
   RECIPE_CATALOG,
   MAKING_TOOL_SKILLS,
+  craftRecipeBatch,
+  craftUnitDurations,
+  MACHINE_EXTRA_WAIT_MS,
 } from '../public/js/making.js';
 import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-3';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-2';
@@ -259,6 +262,48 @@ describe('making skill rules (players/inc_making.js)', () => {
     const made = craftRecipe(inv, pc, 'change_pineapple', { learned: [], rng: () => 0.5 });
     assert.equal(made.ok, true);
     assert.equal(pc.energy, 93);
+  });
+
+  it('transmogrification rolls once per batch', () => {
+    const inv = createInventory({ fruit_changing_machine: 1, cherry: 15 });
+    const tools = createToolConditionState();
+    const pc = fresh();
+    // Every roll after the first would fail; only the first counts.
+    let calls = 0;
+    const rng = () => (calls++ === 0 ? 0.5 : 0.1);
+    const batch = craftRecipeBatch(inv, pc, 'change_pineapple', 3, { learned: [], rng, toolState: tools });
+    assert.equal(batch.made, 3);
+    const failInv = createInventory({ fruit_changing_machine: 1, cherry: 15 });
+    const failPc = fresh();
+    const failed = craftRecipeBatch(failInv, failPc, 'change_pineapple', 3, { learned: [], rng: () => 0.1 });
+    assert.equal(failed.made, 0);
+    assert.equal(failPc.energy, 98);
+    assert.equal(failPc.mood, 48);
+    assert.equal(countItem(failInv, 'cherry'), 15);
+  });
+
+  it('transmog time follows the sliding scale; machines add 2200 ms once', () => {
+    const fruit = RECIPE_CATALOG.change_plum;
+    const skilled = craftUnitDurations(fruit, 12, ['fruitchanging_1']);
+    assert.deepEqual(skilled, [2000, 2000, 2000, 2000, 2000, 1000, 1000, 1000, 1000, 1000, 500, 500]);
+    assert.equal(craftUnitDurations(fruit, 1, [])[0], 4000);
+    const board = RECIPE_CATALOG.board;
+    const each = craftDurationFor(board, ['woodworking_1']);
+    assert.deepEqual(craftUnitDurations(board, 2, ['woodworking_1']), [each + MACHINE_EXTRA_WAIT_MS, each]);
+    assert.equal(craftUnitDurations(RECIPE_CATALOG.basic_omelet, 2, ['cheffery_1']), null);
+  });
+
+  it('the Make panel Smelter and Grinder wear like their packages', () => {
+    const tools = createToolConditionState();
+    const inv = createInventory({ smelter: 1, metal_rock: 10, ore_grinder: 1, dullite: 9 });
+    const pc = fresh({ energy: 500 });
+    const smelt = getToolCondition(tools, 'smelter').remaining;
+    assert.equal(craftRecipeBatch(inv, pc, 'plain_metal', 2, { learned: ['smelting_1'], toolState: tools }).made, 2);
+    assert.equal(smelt - getToolCondition(tools, 'smelter').remaining, 6);
+    const grind = getToolCondition(tools, 'ore_grinder').remaining;
+    assert.equal(craftRecipeBatch(inv, pc, 'crush_dullite', 9, { learned: ['refining_1'], toolState: tools }).made, 9);
+    assert.equal(grind - getToolCondition(tools, 'ore_grinder').remaining, 6); // 2 * round(9 / 3)
+    assert.equal(makingSkillAdjustments(RECIPE_CATALOG.plain_metal, ['smelting_1'], ['smelting_energy']).energyCost, 3);
   });
 
   it('the Grinder runs the Refining package', () => {
