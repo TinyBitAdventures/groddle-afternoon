@@ -51,10 +51,21 @@ describe('layer colour matrix (client ColorMatrix.as)', () => {
     assert.ok(Math.abs(m[2] - 0.072169) < 1e-9);
   });
 
-  it('keeps the source tint’s shifted blue row', () => {
+  it('tints with quasimondo colorize, the production default (alt_color_matrix)', () => {
     const m = glitchLayerMatrix({ tintAmount: 100, tintColor: 0x0000ff });
-    assert.equal(m[12], 0);
-    assert.ok(Math.abs(m[11] - 0.072169) < 1e-9);
+    assert.ok(Math.abs(m[10] - 0.212671) < 1e-9);
+    assert.ok(Math.abs(m[11] - 0.71516) < 1e-9);
+    assert.ok(Math.abs(m[12] - 0.072169) < 1e-9);
+    // Le Misérable's purple panel light stays purple on white (j9xJLETQzi4).
+    const p = glitchLayerMatrix({ tintAmount: 100, tintColor: 0x9f3dd4 });
+    const white = (row) => p[row] + p[row + 1] + p[row + 2] + p[row + 4];
+    assert.ok(white(10) > white(0) && white(0) > white(5), `rgb ${[0, 5, 10].map(white).map((v) => v.toFixed(2))}`);
+  });
+
+  it('applies contrast as a linear stretch about 128 after the tint', () => {
+    const m = glitchLayerMatrix({ contrast: 50 });
+    assert.equal(m[0], 1.5);
+    assert.ok(Math.abs(m[4] - (128 * -0.5) / 255) < 1e-9);
   });
 });
 
