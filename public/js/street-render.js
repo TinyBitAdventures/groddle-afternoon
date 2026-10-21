@@ -23,6 +23,12 @@ const SIGNPOST = {
   scale: 0.8,
 };
 
+/** SignpostView: CSS signpost fontSize 14, rendered at 2.8x, arm_padd_x 8. */
+const SIGN_FONT_SIZE = 14;
+const SIGN_TEXT_RESOLUTION = 3;
+const SIGN_ARM_PAD_X = 8;
+const SIGN_GLOW_COLOUR = 0x53e5ff;
+
 /** @type {Set<string>|null} */
 let decoManifest = null;
 /** @type {Record<string, import('pixi.js').Texture>|null} */
@@ -127,39 +133,6 @@ function buildSignpostSprite(PIXI, signpost, pos) {
     armHolder.name = 'sign-arm-holder';
 
     const labelText = conn.label || conn.tsid || 'Somewhere';
-    let armW = 120;
-    let armSprite = null;
-    if (tex.arm && !tex.arm.baseTexture?.destroyed) {
-      const arm = new PIXI.Sprite(tex.arm);
-      arm.anchor.set(0, 0.5);
-      // stretch arm to fit text roughly
-      const approx = Math.max(100, Math.min(220, 18 + labelText.length * 9));
-      arm.width = approx;
-      arm.height = Math.max(22, (tex.arm.height || 30) * (approx / (tex.arm.width || 260)));
-      if (leftSide) {
-        arm.scale.x *= -1;
-        arm.x = 0;
-      }
-      armW = Math.abs(arm.width);
-      arm.name = 'sign-arm';
-      armSprite = arm;
-      holder.addChild(armHolder);
-      armHolder.addChild(arm);
-    } else {
-      const arm = new PIXI.Graphics();
-      arm.beginFill(0xd4b896);
-      arm.lineStyle(1, 0x8a6a40, 0.8);
-      const armLen = Math.max(100, Math.min(200, 20 + labelText.length * 8));
-      arm.drawRoundedRect(leftSide ? -armLen : 0, -12, armLen, 24, 3);
-      arm.endFill();
-      armW = armLen;
-      arm.name = 'sign-arm';
-      armSprite = arm;
-      holder.addChild(armHolder);
-      armHolder.addChild(arm);
-    }
-    if (armSprite) g.signHoverParts.arms.push(armSprite);
-
     const isLoaded = (() => {
       try {
         return !!pickConnection({ connects: [conn] }, available);
@@ -168,22 +141,72 @@ function buildSignpostSprite(PIXI, signpost, pos) {
       }
     })();
 
+    // SignpostView.createSignTextField: 14px text drawn at 2.8x then scaled
+    // down, with a soft white glow (StaticFilters.white1pxSignpost_GlowA).
     const baseFill = isLoaded ? 0x2a1a08 : 0x4a3a28;
     const label = new PIXI.Text(labelText, {
       fontFamily: 'Trebuchet MS, Georgia, serif',
-      fontSize: 13,
+      fontSize: SIGN_FONT_SIZE,
       fill: baseFill,
       fontWeight: '700',
+      // The glow's strength 3 is approximated by a soft stroke under a blur.
+      stroke: 'rgba(255,255,255,0.45)',
+      strokeThickness: 3,
+      lineJoin: 'round',
       dropShadow: true,
-      dropShadowColor: 0xfff8e8,
-      dropShadowBlur: 0,
-      dropShadowDistance: 1,
-      dropShadowAlpha: 0.85,
+      dropShadowColor: 0xffffff,
+      dropShadowBlur: 2,
+      dropShadowDistance: 0,
+      dropShadowAlpha: 0.6,
+      padding: 3,
     });
+    label.resolution = SIGN_TEXT_RESOLUTION;
     label.anchor.set(0.5, 0.5);
-    // Center on arm
-    if (leftSide) label.x = -armW * 0.5;
-    else label.x = armW * 0.5;
+    // makeSign: the arm fits the text plus 8px either side.
+    const fitW = Math.ceil(label.width + 2 * SIGN_ARM_PAD_X);
+
+    let armW = fitW;
+    let armSprite = null;
+    let glow = null;
+    holder.addChild(armHolder);
+    if (tex.arm && !tex.arm.baseTexture?.destroyed) {
+      const armH = Math.max(22, tex.arm.height || 30);
+      const makeArm = () => {
+        const arm = new PIXI.Sprite(tex.arm);
+        arm.anchor.set(0, 0.5);
+        arm.width = fitW;
+        arm.height = armH;
+        if (leftSide) arm.scale.x *= -1;
+        return arm;
+      };
+      // Hover is a cyan glow round the whole sign (StaticFilters.tsSprite_GlowA,
+      // blur 15). A tint would only darken the brown arm, so this is a blurred
+      // solid shape behind it.
+      glow = new PIXI.Graphics();
+      glow.beginFill(SIGN_GLOW_COLOUR, 1);
+      glow.drawRoundedRect(leftSide ? -fitW : 0, -armH / 2, fitW, armH, 4);
+      glow.endFill();
+      glow.filters = [new PIXI.BlurFilter(7, 3)];
+      glow.visible = false;
+      glow.name = 'sign-glow';
+      armHolder.addChild(glow);
+      const arm = makeArm();
+      arm.name = 'sign-arm';
+      armSprite = arm;
+      armHolder.addChild(arm);
+    } else {
+      const arm = new PIXI.Graphics();
+      arm.beginFill(0xd4b896);
+      arm.lineStyle(1, 0x8a6a40, 0.8);
+      arm.drawRoundedRect(leftSide ? -fitW : 0, -12, fitW, 24, 3);
+      arm.endFill();
+      arm.name = 'sign-arm';
+      armSprite = arm;
+      armHolder.addChild(arm);
+    }
+    if (armSprite) g.signHoverParts.arms.push(armSprite);
+
+    label.x = leftSide ? -armW * 0.5 : armW * 0.5;
     label.y = -1;
     label.name = 'sign-label';
     label._baseFill = baseFill;
@@ -194,6 +217,7 @@ function buildSignpostSprite(PIXI, signpost, pos) {
       index: visibleI,
       connection: conn,
       arm: armSprite,
+      glow,
       label,
       baseFill,
       x: armHolder.x,
@@ -229,7 +253,7 @@ function buildSignpostSprite(PIXI, signpost, pos) {
 }
 
 /**
- * Brighten only sign arms + destination text (not post/shadow).
+ * Glow the hovered destination board (SignpostView: tsSprite_GlowA on the sign).
  * @param {PIXI.Container} g  signpost container from buildSignpostSprite
  * @param {boolean} on
  * @param {number|null} [boardIndex] individual arm index; null affects every arm
@@ -239,29 +263,10 @@ export function setSignpostHover(g, on, boardIndex = null) {
   const boards = g.signBoards || [];
   for (const board of boards) {
     const active = Boolean(on && (boardIndex == null || board.index === boardIndex));
+    if (board.glow && !board.glow.destroyed) board.glow.visible = active;
+    // Graphics fallback arms have no glow copy, so they warm up instead.
     const arm = board.arm;
-    if (!arm || arm.destroyed) continue;
-    if (arm.tint !== undefined) arm.tint = active ? 0xfff0c8 : 0xffffff;
-    // Graphics arms: slight alpha bump
-    if (arm.geometry) arm.alpha = 1;
-    const label = board.label;
-    if (!label || label.destroyed || !label.style) continue;
-    const base = board.baseFill ?? label._baseFill ?? 0x2a1a08;
-    if (active) {
-      // Brighter cream lettering
-      label.style.fill = 0xfff8e0;
-      label.style.dropShadow = true;
-      label.style.dropShadowColor = 0x5a4010;
-      label.style.dropShadowBlur = 2;
-      label.style.dropShadowDistance = 1;
-      label.style.dropShadowAlpha = 0.55;
-    } else {
-      label.style.fill = base;
-      label.style.dropShadowColor = 0xfff8e8;
-      label.style.dropShadowBlur = 0;
-      label.style.dropShadowDistance = 1;
-      label.style.dropShadowAlpha = 0.85;
-    }
+    if (!board.glow && arm && !arm.destroyed && arm.tint !== undefined) arm.tint = active ? 0xfff0c8 : 0xffffff;
   }
 }
 

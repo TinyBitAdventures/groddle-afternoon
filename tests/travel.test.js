@@ -141,6 +141,7 @@ describe('signpost travel plan', () => {
         index: 0,
         connection: { tsid: 'A', label: 'Left Road' },
         arm: { tint: 0xffffff },
+        glow: { visible: false },
         label: { style: {}, destroyed: false },
         baseFill: 0x221100,
         x: 0,
@@ -152,6 +153,7 @@ describe('signpost travel plan', () => {
         index: 1,
         connection: { tsid: 'B', label: 'Right Road' },
         arm: { tint: 0xffffff },
+        glow: { visible: false },
         label: { style: {}, destroyed: false },
         baseFill: 0x332200,
         x: 0,
@@ -187,9 +189,10 @@ describe('signpost travel plan', () => {
     assert.equal(signpostBoardAt([view], 500, 400), null, 'the bare post is inert');
 
     setSignpostHover(view, true, hit.index);
-    assert.equal(boards[0].arm.tint, 0xffffff);
-    assert.equal(boards[0].label.style.fill, boards[0].baseFill);
-    assert.equal(boards[1].arm.tint, 0xfff0c8);
-    assert.equal(boards[1].label.style.fill, 0xfff8e0);
+    assert.equal(boards[0].glow.visible, false);
+    assert.equal(boards[1].glow.visible, true);
+    assert.equal(boards[1].label.style.fill, undefined, 'the lettering keeps its colour');
+    setSignpostHover(view, false);
+    assert.equal(boards[1].glow.visible, false);
   });
 });
