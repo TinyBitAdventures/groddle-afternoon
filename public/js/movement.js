@@ -222,7 +222,8 @@ export function cameraOverlayCenterX(
 }
 
 /**
- * Center the avatar and look ahead in whichever direction it is moving.
+ * Center the avatar (CameraMan has no look-ahead: cam_vx_x_adj is 0 unless a
+ * debug command sets it; velocityX and maxVelocityX are kept for callers).
  * `rightInset` reserves the part of the location viewport occupied by the
  * persistent quest/activity rail, matching the original client's loc_vp_w.
  */
@@ -237,13 +238,22 @@ export function cameraTargetX(
   const view = Math.max(1, finite(viewWidth, 1));
   const locationView = cameraLocationViewWidth(view, rightInset);
   const world = Math.max(locationView, finite(worldWidth, locationView));
-  const speed = clamp(finite(velocityX) / Math.max(0.0001, Math.abs(finite(maxVelocityX, 4.4))), -1, 1);
-  const lookAhead = speed * locationView * 0.12;
   return clamp(
-    finite(playerX) - locationView * 0.5 + lookAhead,
+    finite(playerX) - locationView * 0.5,
     0,
     Math.max(0, world - locationView)
   );
+}
+
+/**
+ * Where the avatar sits in the location viewport for a street's y_cam_offset
+ * (CameraMan: pc.y - y_cam_offset, scaled from max_vp_h 600). The default 150
+ * gives 0.75; streets set their own in their G*.xml physics. The remake's
+ * 408 px viewport is shorter than the client's, so the negative offsets
+ * (-96, -179) stop at 0.4, which keeps the whole avatar under the top chrome.
+ */
+export function yCamOffsetAnchor(yCamOffset = 150) {
+  return clamp(0.5 + finite(yCamOffset, 150) / 600, 0.4, 0.95);
 }
 
 /**

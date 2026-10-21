@@ -564,6 +564,7 @@ import {
   cameraLocationViewWidth,
   cameraOverlayCenterX,
   cameraTargetY,
+  yCamOffsetAnchor,
   cameraBottomSlack,
   cameraWorldHeightForGround,
 } from './js/movement.js?v=movement-5';
@@ -1083,6 +1084,12 @@ function deepestWalkableGroundY() {
     ),
     Number(GROUND_Y) || 0
   );
+}
+
+/** The street's own y_cam_offset (G*.xml physics; default 150) as a viewport anchor. */
+function streetCameraAnchor() {
+  const offset = Number(currentStreet?.physics?.setting?.y_cam_offset);
+  return yCamOffsetAnchor(Number.isFinite(offset) ? offset : 150);
 }
 
 function activeCameraWorldHeight(anchorRatio = 0.75) {
@@ -8568,8 +8575,9 @@ function physics(dt) {
   camTarget += (target - camTarget) * dampingAlpha(0.08, dt);
   world.x = -Math.round(camTarget * 2) / 2;
   // Vertical follow for tall original streets
-  const streetH = activeCameraWorldHeight();
-  const targetY = cameraTargetY(player.y, streetH, LOCATION_VIEW_H);
+  const anchor = streetCameraAnchor();
+  const streetH = activeCameraWorldHeight(anchor);
+  const targetY = cameraTargetY(player.y, streetH, LOCATION_VIEW_H, anchor);
   if (camY === undefined || Number.isNaN(camY)) camY = targetY;
   camY += (targetY - camY) * dampingAlpha(0.12, dt);
   world.y = -Math.round(camY * 2) / 2;

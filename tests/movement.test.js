@@ -22,6 +22,7 @@ import {
   cameraOverlayCenterX,
   cameraTargetX,
   cameraTargetY,
+  yCamOffsetAnchor,
   cameraBottomSlack,
   cameraWorldHeightForGround,
 } from '../public/js/movement.js';
@@ -142,13 +143,17 @@ test.describe('official chained Triple Jump', () => {
 });
 
 test.describe('smooth directional camera and client wiring', () => {
-  test('looks ahead in the movement direction and clamps at street edges', () => {
+  test('centers the avatar with no look-ahead and clamps at street edges', () => {
     const still = cameraTargetX(1_000, 0, 3_000, 1_000);
     const right = cameraTargetX(1_000, 4.4, 3_000, 1_000);
     const left = cameraTargetX(1_000, -4.4, 3_000, 1_000);
     assert.equal(still, 500);
-    assert.equal(right, 620);
-    assert.equal(left, 380);
+    assert.equal(right, 500);
+    assert.equal(left, 500);
+    assert.equal(yCamOffsetAnchor(150), 0.75);
+    assert.equal(yCamOffsetAnchor(114), 0.69);
+    assert.equal(yCamOffsetAnchor(54), 0.59);
+    assert.equal(yCamOffsetAnchor(-179), 0.4);
     assert.equal(cameraTargetX(20, -4.4, 3_000, 1_000), 0);
     assert.equal(cameraTargetX(2_980, 4.4, 3_000, 1_000), 2_000);
   });
