@@ -31,6 +31,7 @@ import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { quoinDailyLimitFor } from '../quoins.js';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import {
+  CARD_ART_LAYERS,
   HAND_SIZE,
   IMAGINATION_UPGRADES,
   buildDeck,
@@ -244,7 +245,7 @@ function afterRedeal(engine, message) {
 
 const PANEL_CSS = `
 #imagination-panel{background:rgba(12,10,30,.45)}
-.img-card-shell{position:relative;width:min(760px,96vw);max-height:min(86vh,700px);overflow:auto;border-radius:14px;
+.img-card-shell{position:relative;width:min(760px,96vw);max-height:min(86vh,700px,calc(100% - 16px));overflow:auto;border-radius:14px;
   background:#15122b url(${UI}imagination_space.png) center/341px 187px repeat;box-shadow:0 18px 50px rgba(0,0,0,.45);
   color:#f3efff;padding:14px 18px 16px;border:1px solid rgba(190,170,255,.25)}
 .img-card-shell::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
@@ -374,7 +375,9 @@ function buildCard(card, slot, ctx, { dealing = false } = {}) {
   if (!text.keepable || card.cost) front.append(el('div', { class: 'img-cost' }, formatCost(card.cost)));
   const back = el('div', { class: 'img-face img-back' });
   back.append(layer('bg_back'));
-  if (text.config.suit) back.append(layer(`suit_${text.config.suit}_back`));
+  // Keepable cards have no suit back in the client art (build-imagination.mjs).
+  const suitBack = `suit_${text.config.suit}_back`;
+  if (text.config.suit && CARD_ART_LAYERS.includes(suitBack)) back.append(layer(suitBack));
   const bt = el('div', { class: 'img-back-text' });
   bt.append(el('h3', {}, text.name), el('p', {}, text.desc));
   const status = remakeStatus(card.class_tsid);
