@@ -260,6 +260,7 @@ const DIALOG_STYLE = `
  color:#3b3a33;border:2px solid rgba(255,255,255,.85);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(238,244,250,.95));
  box-shadow:0 10px 30px rgba(31,48,66,.28),inset 0 0 0 1px rgba(160,180,200,.35);backdrop-filter:blur(7px);pointer-events:none;font-family:inherit}
 .qi-hud[hidden]{display:none}
+.qi-hud.is-covered{visibility:hidden}
 .qi-hud-heading{display:grid;grid-template-columns:38px 1fr auto auto;align-items:center;gap:9px}
 .qi-hud-heading img{width:34px;height:34px;object-fit:contain}
 .qi-hud-heading strong,.qi-hud-heading span{display:block}
@@ -583,6 +584,13 @@ function makeContext(engine) {
     card: (opts) => showCard(engine, opts),
     /** Big countdown beats, e.g. ['3', '2', '1', 'GO!']. */
     countdown: (beats, ms) => showCountdown(engine, beats, ms),
+    /** QA: press the open award screen's OK/next button (true when pressed). */
+    advanceAward() {
+      const next = typeof document !== 'undefined' ? document.querySelector('#award-screen [data-award-next]:not([hidden])') : null;
+      if (!next || next.closest('[hidden]')) return false;
+      next.click();
+      return true;
+    },
     cardOpen: () => Boolean(cardEl && !cardEl.hidden),
     clickCard: () => {
       if (!cardEl || cardEl.hidden) return false;
@@ -813,7 +821,11 @@ function renderHud(engine, force = false) {
     return;
   }
   hud.bar.hidden = false;
-  hud.bar.className = `qi-hud${room.theme ? ` theme-${room.theme}` : ''}`;
+  // The bar sits in the game root's stacking context, above the dialogue host:
+  // step aside while a conversation or award is up.
+  const covered = (dialog && !dialog.modal.hidden)
+    || (typeof document !== 'undefined' && Boolean(document.querySelector('#award-screen.is-visible:not([hidden])')));
+  hud.bar.className = `qi-hud${room.theme ? ` theme-${room.theme}` : ''}${covered ? ' is-covered' : ''}`;
   if (force || hud.icon.dataset.src !== room.icon) {
     hud.icon.dataset.src = room.icon || '';
     if (room.icon) hud.icon.src = room.icon;
@@ -1081,6 +1093,21 @@ export const questInstancesFeature = {
   travelGate(tsid, engine, meta = {}) {
     if (!run || meta?.bypass) return null;
     return { ok: false, msg: room?.travelText || "You can't travel from here. Use Leave to go back." };
+  },
+
+  /** Street-based rooms keep only what the room spawns (no fallback animals). */
+  ecologyOverride(street) {
+    const wait = ctx?.data?._awaitStreet;
+    if (!run || !wait || !street || street.tsid !== wait.tsid) return null;
+    return { label: room?.title || street.label, sourceTsid: street.tsid, counts: {}, empty: true };
+  },
+
+  prepareStreet(street) {
+    const wait = ctx?.data?._awaitStreet;
+    if (!run || !wait || !street || street.tsid !== wait.tsid) return;
+    const label = room?.stageLabel?.(wait.stage, ctx) || room?.title;
+    if (label) street.label = label;
+    street.hubName = room?.hubName || street.hubName || '';
   },
 
   physics(engine) {
