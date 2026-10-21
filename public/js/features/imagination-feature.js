@@ -780,7 +780,9 @@ export const imaginationFeature = {
   /** skills_points_to_seconds factor for one skill (brain capacity + category cards). */
   skillTimeFactor(def, engine) {
     const learned = engine?.learnedSkills || [];
-    const queued = Object.keys(engine?.skillQueue || {}).filter((id) => id !== def?.classTsid).length;
+    // skills_learn computes the duration before queuing a new skill, but a
+    // resumed one is already in the queue and counts (inc_skills.js:815-821).
+    const queued = Object.keys(engine?.skillQueue || {}).length;
     return skillTimeFactor({
       count: learned.length + queued,
       brainCapacity: state.brainCapacity,
