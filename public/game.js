@@ -18924,7 +18924,7 @@ function runMakeCraft(key, qty) {
   const opts = craftOpts();
   const check = canCraft(inv, recipe, opts);
   if (!check.ok || pc.energy < recipeEnergyCost(recipe, opts.learned)) {
-    toast(check.reason === 'ingredients' ? 'You need more ingredients.' : 'Cannot make that right now.');
+    toast(check.reason === 'ingredients' ? 'You need more ingredients.' : check.msg || 'Cannot make that right now.');
     renderMakePanel();
     return;
   }

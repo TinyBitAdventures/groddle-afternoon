@@ -31,6 +31,7 @@ import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATAL
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=dametime-1';
 import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=catalog-unified-2';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js';
+import { setSeasonalRecipeCheck } from '../making.js?v=recipes-full-1';
 import { getToolCondition } from '../tools.js';
 import { landingY, nearestSurfaceY } from '../walk-surface.js';
 import { isBatterflyHabitat } from '../animal-husbandry.js';
@@ -1311,6 +1312,7 @@ export const seasonsFeature = {
     const gate = (seedId, seasonId) => isOn(seasonId);
     setGardenSeasonGate(gate);
     setMasterGardenSeasonGate(gate);
+    setSeasonalRecipeCheck((seasonId) => isOn(seasonId));
     if (typeof document !== 'undefined') document.addEventListener('submit', onChatSubmit, true);
     refreshSeason(engine, true);
     publish(engine);

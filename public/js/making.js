@@ -670,8 +670,25 @@ export function hasTool(inv, toolId) {
  * @param {Recipe} recipe
  * @param {{ learned?: string[], requireSkill?: boolean, requireTool?: boolean }} [opts]
  */
+/**
+ * Holiday-only recipes: Pi (288) cooks only on Pi Day (inc_making.js
+ * `recipe_id == 288 && isPiDay()`). js/features/seasons-feature.js installs
+ * the season test; until it does every recipe is in season.
+ */
+export const SEASONAL_RECIPES = Object.freeze({ 288: 'pi_day' });
+let seasonalRecipeCheck = () => true;
+
+/** @param {(season: string) => boolean} fn */
+export function setSeasonalRecipeCheck(fn) {
+  seasonalRecipeCheck = typeof fn === 'function' ? fn : () => true;
+}
+
 export function canCraft(inv, recipe, opts = {}) {
   if (!recipe) return { ok: false, reason: 'unknown' };
+  const season = SEASONAL_RECIPES[String(recipe.id ?? '')];
+  if (season && seasonalRecipeCheck(season) === false) {
+    return { ok: false, reason: 'season', season, msg: 'You can only make this item on Pi Day, observed on March 14.' };
+  }
 
   const requireTool = opts.requireTool !== false;
   if (requireTool && recipe.tool && !hasTool(inv, recipe.tool)) {
