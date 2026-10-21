@@ -34,6 +34,8 @@ import {
   hasHoe,
   gardenVendorOffers,
   suggestedPlotAction,
+  GARDEN_WATER_MS,
+  gardenActionProfile,
 } from '../public/js/garden.js';
 import {
   createInventory,
@@ -161,6 +163,57 @@ describe('plot lifecycle clean → plant → water → grow → harvest → clea
     const cleared = clearPlot(garden, key, pc, { now: t2 + 10 });
     assert.equal(cleared.ok, true);
     assert.equal(getPlot(garden, key).state, 'clean');
+  });
+
+  it('crop yields are the source produces_count, halved once without Croppery', () => {
+    assert.equal(SEED_CATALOG.seed_spinach.produces, 12);
+    assert.equal(SEED_CATALOG.seed_zucchini.produces, 23);
+    assert.equal(SEED_CATALOG.seed_potato.produces, 18);
+    const garden = createGarden({ cols: 1, rows: 1, now: 0 });
+    const plot = getPlot(garden, '1-1');
+    Object.assign(plot, { state: 'crop', seed: 'seed_zucchini' });
+    const inv = createInventory({});
+    const r = harvestPlot(garden, '1-1', inv, { energy: 100, mood: 0, imagination: 0, xp: 0 }, { learned: [], rng: () => 0 });
+    assert.equal(r.baseCount, 12); // round(23 / 2)
+  });
+
+  it('wetness lasts 12 hours, pauses growth when dry, and carries over', () => {
+    const garden = createGarden({ cols: 1, rows: 1, now: 0 });
+    const key = '1-1';
+    const inv = createInventory({ seed_potato: 2 });
+    const pc = { energy: 1000, mood: 0, imagination: 0, xp: 0 };
+    plantPlot(garden, key, inv, pc, 'seed_potato', { now: 0 });
+    const plot = getPlot(garden, key);
+    const H = GARDEN_WATER_MS / 12;
+    plot.growModifier = (H * 20) / SEED_CATALOG.seed_potato.grow1Ms; // a 20-hour stage
+    waterPlot(garden, key, pc, { now: 0, requireTool: false });
+    tickGarden(garden, GARDEN_WATER_MS + 5000);
+    assert.equal(plot.wet, false);
+    assert.equal(plot.state, 'seeds');
+    assert.equal(plot.growthMs, GARDEN_WATER_MS);
+    assert.equal(plotGrowProgress(plot, GARDEN_WATER_MS * 3), 0.6);
+    // Re-watering resumes from the banked 12 hours.
+    waterPlot(garden, key, pc, { now: GARDEN_WATER_MS * 3, requireTool: false });
+    assert.deepEqual(tickGarden(garden, GARDEN_WATER_MS * 3 + H * 7), []);
+    assert.deepEqual(tickGarden(garden, GARDEN_WATER_MS * 3 + H * 8), [key]);
+    assert.equal(plot.state, 'shoots');
+    assert.equal(plot.wet, true);
+    // Picking and hoeing keep the plot wet, so a new seed grows at once.
+    Object.assign(plot, { state: 'crop' });
+    const later = GARDEN_WATER_MS * 3 + H * 9;
+    assert.equal(harvestPlot(garden, key, inv, pc, { now: later, rng: () => 0 }).ok, true);
+    assert.equal(clearPlot(garden, key, pc, { now: later, requireTool: false }).ok, true);
+    assert.equal(plantPlot(garden, key, inv, pc, 'seed_potato', { now: later }).ok, true);
+    assert.equal(plot.wet, true);
+    assert.equal(plot.state, 'seeds');
+  });
+
+  it('Aggressive Hoeing sets clear xp and multiplies Hoe wear by Croppery rank', () => {
+    const base = gardenActionProfile('default', 'clear', ['croppery_2'], []);
+    const card = gardenActionProfile('default', 'clear', ['croppery_1', 'croppery_2'], ['hoeing_more_img_more_wear']);
+    assert.equal(card.xp, 6);
+    assert.equal(card.toolWear, base.toolWear * 4);
+    assert.equal(gardenActionProfile('herb', 'clear', [], ['hoeing_more_img_more_wear']).xp, 3);
   });
 
   it('tendPlot uses suggested action', () => {

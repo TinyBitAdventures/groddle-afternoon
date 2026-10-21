@@ -315,7 +315,8 @@ describe('persistent pack and core player state', () => {
     assert.equal(garden.cols, 12);
     assert.equal(garden.rows, 1);
     assert.deepEqual(garden.plots['1-1'], {
-      state: 'clean', seed: 'seedspinach', wet: false, stageStartedAt: 0, growModifier: 0.05,
+      state: 'clean', seed: 'seedspinach', wet: false, wetAt: null, stageStartedAt: 0, growthMs: 0,
+      growModifier: 0.05, fertilized: false,
     });
     const world = normalizeWorldSnapshot({
       streets: { 'bad street!': { collectedApples: [2, 2, -1, 1000], collectedQuoins: [3] } },

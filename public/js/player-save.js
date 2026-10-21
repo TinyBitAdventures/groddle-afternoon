@@ -220,8 +220,13 @@ function normalizePlotSnapshot(seed = {}) {
     state,
     seed: cleanKey(seed?.seed) || null,
     wet: seed?.wet === true,
+    wetAt: seed?.wet === true && seed?.wetAt != null && Number.isFinite(Number(seed.wetAt))
+      ? Math.max(0, Math.floor(Number(seed.wetAt)))
+      : null,
     stageStartedAt: Math.max(0, Math.floor(finite(seed?.stageStartedAt, 0))),
+    growthMs: Math.max(0, Math.floor(finite(seed?.growthMs, 0))),
     growModifier: clamp(finite(seed?.growModifier, 1), 0.05, 100),
+    fertilized: seed?.fertilized === true,
   };
 }
 

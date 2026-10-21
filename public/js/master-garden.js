@@ -31,7 +31,7 @@
  * growModifier }. Growth uses SEED_CATALOG grow1Ms / grow2Ms.
  */
 
-import { SEED_CATALOG } from './garden.js';
+import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js';
 import { gardenGrowModifier } from './imagination-effects.js';
 import { skillPackageDetails } from './skill-packages.js';
 import { moodMax } from './metabolics.js';
@@ -215,17 +215,16 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
   for (const [, plot] of plotsOf(garden)) {
     if (action === 'water') {
       if (!pay()) break;
-      if (!plot.wet && (plot.state === 'seeds' || plot.state === 'shoots')) plot.stageStartedAt = now;
-      plot.wet = true;
+      wetPlot(plot, now);
       count += 1;
     } else if (action === 'hoe') {
       if (plot.state !== 'dirty') continue;
       if (!pay()) break;
       plot.state = 'clean';
       plot.seed = null;
-      plot.wet = false;
       plot.fertilized = false;
       plot.stageStartedAt = now;
+      plot.growthMs = 0;
       count += 1;
     } else if (action === 'plant') {
       if (!(Number(inv?.[ctx.seedId]) > 0)) break;
@@ -240,6 +239,7 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
       plot.fertilized = false;
       plot.growModifier = 1 - gardenGrowModifier(type, ctx.upgrades || []);
       plot.stageStartedAt = now;
+      plot.growthMs = 0;
       count += 1;
     } else if (action === 'pick') {
       if (plot.state !== 'crop' || !plot.seed) continue;
@@ -254,9 +254,9 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
       row.bonus += bonus;
       plot.state = 'dirty';
       plot.seed = null;
-      plot.wet = false;
       plot.fertilized = false;
       plot.stageStartedAt = now;
+      plot.growthMs = 0;
       count += 1;
     } else if (action === 'fertilize') {
       if (!plot.seed || plot.fertilized || plot.state === 'crop') continue;
@@ -267,11 +267,12 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
         // stateChanged(grow1): straight to shoots.
         plot.state = 'shoots';
         plot.stageStartedAt = now;
+        plot.growthMs = 0;
       } else if (plot.state === 'shoots') {
         const need = seed.grow2Ms * (plot.growModifier || 1);
-        const elapsed = Math.max(0, now - (plot.stageStartedAt ?? now));
-        const left = Math.max(0, need - elapsed);
+        const left = Math.max(0, need - stageElapsedMs(plot, now));
         plot.stageStartedAt = now - (need - 0.1 * left);
+        plot.growthMs = 0;
         plot.fertilized = true;
       }
       count += 1;

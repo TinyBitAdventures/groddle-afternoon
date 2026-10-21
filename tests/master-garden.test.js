@@ -65,7 +65,7 @@ describe('whole-garden actions', () => {
     assert.equal(pick.count, 5);
     assert.equal(inv.spinach, 5 * SEED_CATALOG.seed_spinach.produces, 'no half harvest for Master Gardener');
     assert.equal(pick.drop, null);
-    assert.match(pick.msg, /^You picked 30 Spinachs\./);
+    assert.match(pick.msg, /^You picked 60 Spinachs\./);
   });
 
   it('fertilized shoots finish in a tenth of their remaining time', () => {

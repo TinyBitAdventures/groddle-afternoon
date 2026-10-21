@@ -2,10 +2,12 @@
  * Crop gardens — simplified from GSJS items/include/garden.js + seed_*.js.
  *
  * Plot states (original): clean → seeds → shoots → crop → dirty → (clear) clean
- * Growth only advances while wet. Watering sets wet; growth stages use grow1/grow2.
+ * Growth only advances while wet. Watering keeps a plot wet for 12 hours
+ * (timings.water); a plot that dries pauses its growth until watered again.
+ * Wetness carries over through picking, hoeing and replanting.
  *
- * Timings are demo-scaled seconds (original used hours × garden_grow_multiplier).
- * Produce counts come from GSJS seed classProps (capped for pack balance).
+ * Grow timings are demo-scaled seconds (original used hours × garden_grow_multiplier).
+ * Produce counts are the GSJS seed classProps produces_count.
  */
 
 import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-3';
@@ -35,6 +37,42 @@ import { moodMax } from './metabolics.js';
  * Scale: hours × 8s so spinach is quick, potato still a wait.
  * @param {number} hours
  */
+/** include/garden.js timings.water: hours a watering lasts (not grow-scaled). */
+export const GARDEN_WATER_MS = 12 * 60 * 60 * 1000;
+
+/** Growth so far in the plot's current stage, paused while dry. */
+export function stageElapsedMs(plot, now = Date.now()) {
+  const banked = Math.max(0, Number(plot?.growthMs) || 0);
+  if (!plot?.wet) return banked;
+  // stageStartedAt may be 0 in tests — do not treat as missing
+  const started = typeof plot.stageStartedAt === 'number' ? plot.stageStartedAt : now;
+  return banked + Math.max(0, now - started);
+}
+
+/** Water a plot: restart a paused stage clock and the 12-hour dry timer. */
+export function wetPlot(plot, now = Date.now()) {
+  if (!plot.wet) plot.stageStartedAt = now;
+  plot.wet = true;
+  plot.wetAt = now;
+}
+
+/** stateChanged('dry'): bank the stage's growth and stop the clock. */
+function dryPlot(plot, at) {
+  if (plot.state === 'seeds' || plot.state === 'shoots') {
+    const started = typeof plot.stageStartedAt === 'number' ? plot.stageStartedAt : at;
+    plot.growthMs = Math.max(0, Number(plot.growthMs) || 0) + Math.max(0, at - started);
+  }
+  plot.stageStartedAt = at;
+  plot.wet = false;
+  plot.wetAt = null;
+}
+
+/** Enter a new stage (or plant/clear): its clock starts now. */
+function startStage(plot, now) {
+  plot.stageStartedAt = now;
+  plot.growthMs = 0;
+}
+
 function growHoursToMs(hours) {
   return Math.max(4000, Math.round(Number(hours) * 8000));
 }
@@ -61,7 +99,7 @@ export const SEED_CATALOG = {
     label: 'Spinach Seed',
     cropId: 'spinach',
     cropLabel: 'Spinach',
-    produces: 6,
+    produces: 12,
     grow1H: 0.5,
     grow2H: 0.25,
     gardenType: 'default',
@@ -71,7 +109,7 @@ export const SEED_CATALOG = {
     label: 'Onion Seed',
     cropId: 'onion',
     cropLabel: 'Onion',
-    produces: 6,
+    produces: 12,
     grow1H: 1,
     grow2H: 0.5,
     gardenType: 'default',
@@ -81,7 +119,7 @@ export const SEED_CATALOG = {
     label: 'Tomato Seed',
     cropId: 'tomato',
     cropLabel: 'Tomato',
-    produces: 7,
+    produces: 14,
     grow1H: 2.5,
     grow2H: 2.5,
     gardenType: 'default',
@@ -91,7 +129,7 @@ export const SEED_CATALOG = {
     label: 'Carrot Seed',
     cropId: 'carrot',
     cropLabel: 'Carrot',
-    produces: 7,
+    produces: 14,
     grow1H: 3.5,
     grow2H: 3.5,
     gardenType: 'default',
@@ -101,7 +139,7 @@ export const SEED_CATALOG = {
     label: 'Corn Seed',
     cropId: 'corn',
     cropLabel: 'Corn',
-    produces: 6,
+    produces: 12,
     grow1H: 3,
     grow2H: 3,
     gardenType: 'default',
@@ -111,7 +149,7 @@ export const SEED_CATALOG = {
     label: 'Potato Seed',
     cropId: 'potato',
     cropLabel: 'Potato',
-    produces: 9,
+    produces: 18,
     grow1H: 6,
     grow2H: 5.5,
     gardenType: 'default',
@@ -121,7 +159,7 @@ export const SEED_CATALOG = {
     label: 'Rice Seed',
     cropId: 'rice',
     cropLabel: 'Rice',
-    produces: 9,
+    produces: 12,
     grow1H: 0.75,
     grow2H: 0.5,
     gardenType: 'default',
@@ -131,7 +169,7 @@ export const SEED_CATALOG = {
     label: 'Cucumber Seed',
     cropId: 'cucumber',
     cropLabel: 'Cucumber',
-    produces: 9,
+    produces: 17,
     grow1H: 1.5,
     grow2H: 1.5,
     gardenType: 'default',
@@ -141,7 +179,7 @@ export const SEED_CATALOG = {
     label: 'Parsnip Seed',
     cropId: 'parsnip',
     cropLabel: 'Parsnip',
-    produces: 9,
+    produces: 12,
     grow1H: 2.5,
     grow2H: 2.5,
     gardenType: 'default',
@@ -151,7 +189,7 @@ export const SEED_CATALOG = {
     label: 'Broccoli Seed',
     cropId: 'broccoli',
     cropLabel: 'Broccoli',
-    produces: 9,
+    produces: 16,
     grow1H: 3.5,
     grow2H: 3.5,
     gardenType: 'default',
@@ -161,7 +199,7 @@ export const SEED_CATALOG = {
     label: 'Zucchini Seed',
     cropId: 'zucchini',
     cropLabel: 'Zucchini',
-    produces: 9,
+    produces: 23,
     grow1H: 4,
     grow2H: 4,
     gardenType: 'default',
@@ -171,7 +209,7 @@ export const SEED_CATALOG = {
     label: 'Cabbage Seed',
     cropId: 'cabbage',
     cropLabel: 'Cabbage',
-    produces: 9,
+    produces: 14,
     grow1H: 4.5,
     grow2H: 4.5,
     gardenType: 'default',
@@ -325,6 +363,14 @@ export const GARDEN_HARVEST_FAILED_LINES = Object.freeze({
 export const GARDEN_WATER_FAIL_MOOD = 3;
 export const GARDEN_WATER_FAILED_LINE = 'Oops. Somehow you failed at watering that. Try again?';
 
+export const GARDEN_HOEING_UPGRADE = 'hoeing_more_img_more_wear';
+export const GARDEN_HOEING_TABLE = Object.freeze([
+  Object.freeze({ skill: 'croppery_3', xp: 8, wear: 5 }),
+  Object.freeze({ skill: 'croppery_2', xp: 6, wear: 4 }),
+  Object.freeze({ skill: 'croppery_1', xp: 4, wear: 3 }),
+  Object.freeze({ skill: null, xp: 3, wear: 1.5 }),
+]);
+
 /**
  * Costs and rewards for one garden action. With a `learned` array this is the
  * exact source package row (no_skill or Croppery/Herbalism 1–3): energy,
@@ -357,6 +403,15 @@ export function gardenActionProfile(gardenType, action, learned, upgrades = []) 
   }
   const packages = GARDEN_SKILL_PACKAGES[type];
   const details = skillPackageDetails(packages[action], learned, upgrades) || {};
+  let xp = Number(details.xp_bonus) || 0;
+  let toolWear = Number(details.tool_wear) || 1;
+  // include/garden.js clear: Aggressive Hoeing overrides xp_bonus and
+  // multiplies Hoe wear by the player's Croppery rank (herb gardens too).
+  if (action === 'clear' && Array.isArray(upgrades) && upgrades.includes(GARDEN_HOEING_UPGRADE)) {
+    const row = GARDEN_HOEING_TABLE.find((r) => r.skill === null || learned.includes(r.skill));
+    xp = row.xp;
+    toolWear *= row.wear;
+  }
   return {
     legacy: false,
     gardenType: type,
@@ -366,8 +421,8 @@ export function gardenActionProfile(gardenType, action, learned, upgrades = []) 
     rank: Number.isFinite(details.rank) ? Math.max(0, details.rank) : 0,
     energy: Number(details.energy_cost) || 0,
     mood: Number(details.mood_bonus) || 0,
-    xp: Number(details.xp_bonus) || 0,
-    toolWear: Number(details.tool_wear) || 1,
+    xp,
+    toolWear,
     successRate: details.success_rate ?? 100,
     bonusMultiplier: Number(details.bonus_multiplier) || 0,
     bonusChance: Number(details.bonus_chance) || 0,
@@ -530,7 +585,9 @@ export function createEmptyPlot(now = Date.now()) {
     state: 'clean',
     seed: null,
     wet: false,
+    wetAt: null,
     stageStartedAt: now,
+    growthMs: 0,
     growModifier: 1,
   };
 }
@@ -581,25 +638,24 @@ export function tickGarden(garden, now = Date.now()) {
   const changed = [];
   for (const [key, plot] of Object.entries(garden.plots)) {
     if (!plot.wet) continue;
-    if (plot.state !== 'seeds' && plot.state !== 'shoots') continue;
+    if (typeof plot.wetAt !== 'number') plot.wetAt = now;
+    const dryAt = plot.wetAt + GARDEN_WATER_MS;
+    const at = Math.min(now, dryAt);
     const seed = SEED_CATALOG[plot.seed];
-    if (!seed) continue;
-    const need =
-      plot.state === 'seeds'
-        ? seed.grow1Ms * (plot.growModifier || 1)
-        : seed.grow2Ms * (plot.growModifier || 1);
-    const started =
-      typeof plot.stageStartedAt === 'number' ? plot.stageStartedAt : now;
-    const elapsed = now - started;
-    if (elapsed < need) continue;
-    if (plot.state === 'seeds') {
-      plot.state = 'shoots';
-      plot.stageStartedAt = now;
-      changed.push(key);
-    } else if (plot.state === 'shoots') {
-      plot.state = 'crop';
-      plot.stageStartedAt = now;
-      changed.push(key);
+    if (seed && (plot.state === 'seeds' || plot.state === 'shoots')) {
+      const need =
+        plot.state === 'seeds'
+          ? seed.grow1Ms * (plot.growModifier || 1)
+          : seed.grow2Ms * (plot.growModifier || 1);
+      if (stageElapsedMs(plot, at) >= need) {
+        plot.state = plot.state === 'seeds' ? 'shoots' : 'crop';
+        startStage(plot, at);
+        changed.push(key);
+      }
+    }
+    if (now >= dryAt) {
+      dryPlot(plot, dryAt);
+      if (!changed.includes(key)) changed.push(key);
     }
   }
   return changed;
@@ -736,15 +792,14 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
   const now = opts.now ?? Date.now();
   plot.state = 'seeds';
   plot.seed = seed.seedId;
-  plot.stageStartedAt = now;
+  startStage(plot, now);
   // Growth Spurt / Speedy Herbs cards: crop or herb plots grow 10/20% faster
   // (include/garden.js plot grow_modifier, set at planting).
   plot.growModifier = 1 - gardenGrowModifier(
     seed.gardenType === 'herb' ? 'herb' : 'default',
     opts.upgrades || pc?.imaginationUpgrades || []
   );
-  // Fresh plant starts dry — water to grow (matches original wet check)
-  plot.wet = false;
+  // A plot still wet from before starts growing at once (include/garden.js plant).
   return {
     ok: true,
     reason: 'planted',
@@ -816,9 +871,7 @@ export function waterPlot(garden, key, pc, opts = {}) {
   }
   applyGardenRewards(pc, profile);
   const now = opts.now ?? Date.now();
-  plot.wet = true;
-  // Restart stage timer when re-wetting (GSJS restarts grow on water)
-  plot.stageStartedAt = now;
+  wetPlot(plot, now);
   const toolUse = requireTool && toolId && opts.toolState
     ? useToolCondition(opts.toolState, toolId, profile.toolWear)
     : null;
@@ -888,8 +941,7 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   const now = opts.now ?? Date.now();
   plot.state = 'dirty';
   plot.seed = null;
-  plot.wet = false;
-  plot.stageStartedAt = now;
+  startStage(plot, now);
   return {
     ok: true,
     reason: 'harvested',
@@ -956,8 +1008,7 @@ export function clearPlot(garden, key, pc, opts = {}) {
   const now = opts.now ?? Date.now();
   plot.state = 'clean';
   plot.seed = null;
-  plot.wet = false;
-  plot.stageStartedAt = now;
+  startStage(plot, now);
   const toolUse = requireTool && toolId && opts.toolState
     ? useToolCondition(opts.toolState, toolId, profile.toolWear)
     : null;
@@ -1100,7 +1151,6 @@ export function plotStatusLabel(plot) {
  */
 export function plotGrowProgress(plot, now = Date.now()) {
   if (!plot || (plot.state !== 'seeds' && plot.state !== 'shoots')) return 0;
-  if (!plot.wet) return 0;
   const seed = SEED_CATALOG[plot.seed];
   if (!seed) return 0;
   const need =
@@ -1108,10 +1158,7 @@ export function plotGrowProgress(plot, now = Date.now()) {
       ? seed.grow1Ms * (plot.growModifier || 1)
       : seed.grow2Ms * (plot.growModifier || 1);
   if (need <= 0) return 1;
-  // stageStartedAt may be 0 in tests — do not treat as missing
-  const started =
-    typeof plot.stageStartedAt === 'number' ? plot.stageStartedAt : now;
-  return Math.min(1, Math.max(0, (now - started) / need));
+  return Math.min(1, Math.max(0, stageElapsedMs(plot, now) / need));
 }
 
 /**
