@@ -637,6 +637,7 @@ import {
   listBuyOffers,
   listSellOffers,
   createVendorSellQuote,
+  vendorSellUnitPrice,
   vendorBuyUnitPrice,
 } from './js/vendor.js?v=stores-1';
 import {
@@ -2573,8 +2574,8 @@ function renderPackPopover(classTsid, anchor = null) {
   const collectionNote = musicblockCollection
     ? `Recovered tunes ${musicblockCollection.owned}/${musicblockCollection.total} · ${musicblockDef.collection} series ${musicblockSeries.filter((row) => row.owned).length}/${musicblockSeries.length}`
     : '';
-  const offer = activeVendor.offers.find((row) => row.classTsid === classTsid);
-  const canSellHere = isVendorOpen() && !slot.isTool && slot.sellable !== false;
+  const sellPrice = vendorSellUnitPrice(classTsid, { ...vendorSellOpts(), upgrades: pc.imaginationUpgrades });
+  const canSellHere = isVendorOpen() && !slot.isTool && slot.sellable !== false && sellPrice > 0;
   const makeLabel = slot.isTool
     ? classTsid === 'fruit_changing_machine'
       ? 'Convert fruit'
@@ -2624,7 +2625,7 @@ function renderPackPopover(classTsid, anchor = null) {
       ${features.packVerbs(classTsid, engine).map((verb) => `<button type="button" class="pack-bear-action pack-feature-verb${verb.primary ? ' pack-pop-primary' : ''}" data-feature-pack-verb="${escapeHtml(verb.id)}" data-feature-id="${escapeHtml(verb.featureId)}" ${verb.enabled === false ? 'disabled' : ''} title="${escapeHtml(verb.enabled === false ? verb.reason || '' : verb.tooltip || '')}">${escapeHtml(verb.label)}</button>`).join('')}
       ${recipeTarget ? `<button type="button" data-pack-make>${escapeHtml(makeLabel)}</button>` : ''}
       <button type="button" data-pack-drop>Drop</button>
-      ${canSellHere ? `<button type="button" class="pack-pop-sell" data-pack-sell>Sell for ◎ ${offer?.sellPrice ?? 1}</button>` : ''}
+      ${canSellHere ? `<button type="button" class="pack-pop-sell" data-pack-sell>Sell for ◎ ${sellPrice}</button>` : ''}
     </div>
     ${dropPrompt}`;
 
@@ -19773,9 +19774,14 @@ function claimActiveShrineEmblem() {
   updateHud();
 }
 
+/** The open store's buy-back multiplier, for sell prices. */
+function vendorSellOpts() {
+  return { buyMultiplier: activeVendor?.buyMultiplier };
+}
+
 /** Stage a pack item in the Sell detail without mutating inventory. */
 function stageVendorSell(classTsid) {
-  const quote = createVendorSellQuote(inv, activeVendor.offers, classTsid, 1, pc.imaginationUpgrades);
+  const quote = createVendorSellQuote(inv, activeVendor.offers, classTsid, 1, pc.imaginationUpgrades, vendorSellOpts());
   if (!quote.ok) {
     toast(quote.msgs?.[0] || 'That item cannot be sold here.');
     return quote;
@@ -19827,7 +19833,7 @@ function renderVendorList() {
     detail.hidden = false;
     const isBuy = vendorTab === 'buy';
     const offer = activeVendor.offers.find((o) => o.classTsid === vendorSelected);
-    const quote = isBuy ? null : createVendorSellQuote(inv, activeVendor.offers, vendorSelected, vendorQty, pc.imaginationUpgrades);
+    const quote = isBuy ? null : createVendorSellQuote(inv, activeVendor.offers, vendorSelected, vendorQty, pc.imaginationUpgrades, vendorSellOpts());
     if (!isBuy && !quote?.ok) {
       vendorSelected = null;
       renderVendorList();
@@ -19883,7 +19889,7 @@ function renderVendorList() {
     detail.querySelector('[data-v-go]')?.addEventListener('click', () => {
       const r = isBuy
         ? vendorBuy(pc, inv, activeVendor.offers, vendorSelected, vendorQty)
-        : vendorSell(pc, inv, activeVendor.offers, vendorSelected, vendorQty);
+        : vendorSell(pc, inv, activeVendor.offers, vendorSelected, vendorQty, vendorSellOpts());
       toast(r.msgs[0]);
       pushActivity(r.msgs[0]);
       playSound(r.ok ? (isBuy ? 'PURCHASE_ITEM' : 'VENDOR_SELL') : 'CLICK_FAILURE', { volume: 0.55 });
@@ -19934,7 +19940,7 @@ function renderVendorList() {
       list.appendChild(tile);
     }
   } else {
-    const rows = listSellOffers(inv, activeVendor.offers, pc.imaginationUpgrades);
+    const rows = listSellOffers(inv, activeVendor.offers, pc.imaginationUpgrades, vendorSellOpts());
     if (!rows.length) {
       list.innerHTML =
         '<div class="make-empty">Drag an item from your pack.<br/><small>(Or earn goods, then sell them here.)</small></div>';

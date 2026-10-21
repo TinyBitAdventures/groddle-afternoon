@@ -15,7 +15,7 @@ import {
 import { gardenVendorOffers } from './garden.js?v=vendor-crops-1';
 import { miningVendorOffers } from './mining.js';
 
-import { STORE_CATALOG } from './store-catalog.js?v=stores-1';
+import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=stores-2';
 
 /** @typedef {{ classTsid: string, label: string, buyPrice: number, sellPrice: number, stock?: number }} VendorOffer */
 
@@ -63,6 +63,7 @@ export const VENDOR_PROFILES = Object.freeze(
         badge: store.badge,
         color: store.color,
         desc: VENDOR_DESCRIPTIONS[store.key] || `Official stock from the ${store.label}.`,
+        buyMultiplier: store.buyMultiplier,
         offers: store.offers.map((offer) =>
           officialOffer(offer.classTsid, offer.label, offer.cost, store.buyMultiplier)
         ),
@@ -166,14 +167,31 @@ export function vendorBuyUnitPrice(offer, upgrades = []) {
   return adjustedVendorPrice(Number(offer?.buyPrice) || 0, upgrades);
 }
 
+/** An item's base_cost (items/*.js), else the remake catalog's. */
+export function itemBaseCost(classTsid) {
+  return Number(ITEM_BASE_COSTS[classTsid] ?? ITEM_CATALOG[classTsid]?.baseCost) || 0;
+}
+
 /**
- * Unit price a vendor pays this player: Fast Talker … Ultimate Closer add
- * 2/5/7/10% (inc_stores.js storeAdjustBuyPrice).
- * @param {VendorOffer|null|undefined} offer
- * @param {string[]} [upgrades]
+ * What a store pays for `qty` of an item (inc_stores.js storeSell):
+ * round(base_cost * buy_multiplier) per unit, then Fast Talker … Ultimate
+ * Closer add 2/5/7/10% rounded once on the total. A unit worth 0 (including
+ * every item at a 0-multiplier store, and no_vendor items) can't be sold.
+ * @param {string} classTsid
+ * @param {number} [qty]
+ * @param {{ buyMultiplier?: number, upgrades?: string[] }} [opts]
  */
-export function vendorSellUnitPrice(offer, upgrades = []) {
-  return adjustedVendorPayout(offer?.sellPrice ?? 1, upgrades);
+export function vendorSellValue(classTsid, qty = 1, opts = {}) {
+  if (ITEM_CATALOG[classTsid]?.sellable === false || NO_VENDOR_ITEMS.has(classTsid)) return { unit: 0, total: 0 };
+  const multiplier = Number(opts.buyMultiplier ?? BUYBACK_MULTIPLIER);
+  const unit = Math.round(itemBaseCost(classTsid) * multiplier);
+  if (unit <= 0) return { unit: 0, total: 0 };
+  return { unit, total: adjustedVendorPayout(unit * qty, opts.upgrades || []) };
+}
+
+/** Per-unit payout including the Fast Talker cards (shown in the sell list). */
+export function vendorSellUnitPrice(classTsid, opts = {}) {
+  return vendorSellValue(classTsid, 1, opts).total;
 }
 
 export function vendorBuy(pc, inv, offers, classTsid, qty = 1) {
@@ -213,17 +231,11 @@ export function vendorBuy(pc, inv, offers, classTsid, qty = 1) {
  * @param {string} classTsid
  * @param {number} [qty=1]
  */
-export function vendorSell(pc, inv, offers, classTsid, qty = 1) {
-  if (ITEM_CATALOG[classTsid]?.sellable === false) {
-    return { ok: false, reason: 'not_sellable', msgs: ['They will not buy that.'] };
+export function vendorSell(pc, inv, offers, classTsid, qty = 1, opts = {}) {
+  if (ITEM_CATALOG[classTsid]?.sellable === false || NO_VENDOR_ITEMS.has(classTsid)) {
+    return { ok: false, reason: 'not_sellable', msgs: ["You can't sell that kind of thing."] };
   }
   const offer = findOffer(offers, classTsid);
-  if (!offer) {
-    // Still allow sell of known catalog items at floor price
-    if (!ITEM_CATALOG[classTsid]) {
-      return { ok: false, reason: 'not_bought', msgs: ['They will not buy that.'] };
-    }
-  }
   const amount = Math.floor(Number(qty));
   if (!Number.isFinite(amount) || amount < 1) {
     return { ok: false, reason: 'bad_qty', msgs: ['Sell at least one.'] };
@@ -231,8 +243,10 @@ export function vendorSell(pc, inv, offers, classTsid, qty = 1) {
   if (countItem(inv, classTsid) < amount) {
     return { ok: false, reason: 'empty', msgs: ['You do not have enough to sell.'] };
   }
-  const unit = vendorSellUnitPrice(offer, pc?.imaginationUpgrades);
-  const gain = unit * amount;
+  const { total: gain } = vendorSellValue(classTsid, amount, { ...opts, upgrades: pc?.imaginationUpgrades });
+  if (gain <= 0) {
+    return { ok: false, reason: 'no_value', msgs: ["You can't sell that item."] };
+  }
   if (!removeItem(inv, classTsid, amount)) {
     return { ok: false, reason: 'empty', msgs: ['You do not have enough to sell.'] };
   }
@@ -268,18 +282,18 @@ export function listBuyOffers(offers, upgrades = []) {
  * @param {import('./inventory.js').Inventory} inv
  * @param {VendorOffer[]} offers
  */
-export function listSellOffers(inv, offers, upgrades = []) {
+export function listSellOffers(inv, offers, upgrades = [], opts = {}) {
   return listPackItemSlots(inv).filter((slot) => slot.sellable !== false).map((slot) => {
     const offer = findOffer(offers, slot.classTsid);
     return {
       classTsid: slot.classTsid,
       label: offer?.label || slot.label,
-      price: vendorSellUnitPrice(offer, upgrades),
+      price: vendorSellUnitPrice(slot.classTsid, { ...opts, upgrades }),
       have: slot.count,
       mode: 'sell',
       vendorStocked: Boolean(offer),
     };
-  });
+  }).filter((row) => row.price > 0);
 }
 
 /**
@@ -290,14 +304,18 @@ export function listSellOffers(inv, offers, upgrades = []) {
  * @param {string} classTsid
  * @param {number} [qty=1]
  */
-export function createVendorSellQuote(inv, offers, classTsid, qty = 1, upgrades = []) {
+export function createVendorSellQuote(inv, offers, classTsid, qty = 1, upgrades = [], opts = {}) {
   const slot = listPackItemSlots(inv).find((row) => row.classTsid === classTsid);
   if (!slot || slot.count < 1 || slot.sellable === false) {
     return { ok: false, reason: 'not_sellable', classTsid, msgs: ['That item is not sellable from your pack.'] };
   }
   const offer = findOffer(offers, classTsid);
-  const unitPrice = vendorSellUnitPrice(offer, upgrades);
   const amount = Math.max(1, Math.min(slot.count, Math.floor(Number(qty) || 1)));
+  const value = vendorSellValue(classTsid, amount, { ...opts, upgrades });
+  if (value.unit <= 0) {
+    return { ok: false, reason: 'no_value', classTsid, msgs: ["You can't sell that kind of thing."] };
+  }
+  const unitPrice = vendorSellUnitPrice(classTsid, { ...opts, upgrades });
   return {
     ok: true,
     reason: 'quoted',
@@ -307,7 +325,7 @@ export function createVendorSellQuote(inv, offers, classTsid, qty = 1, upgrades 
     maxQty: slot.count,
     qty: amount,
     unitPrice,
-    total: unitPrice * amount,
+    total: value.total,
     vendorStocked: Boolean(offer),
   };
 }

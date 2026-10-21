@@ -83,7 +83,9 @@ describe('vendor upgrades', () => {
     const pc = { currants: 1000, imaginationUpgrades: ['vendors_lower_sell_price_4', 'vendors_higher_buy_price_1'] };
     const inv = createInventory({ apple: 0 });
     assert.equal(vendorBuy(pc, inv, offers, 'apple', 2).cost, 72);
-    assert.equal(vendorSell(pc, inv, offers, 'apple', 1).gain, 20);
+    // inc_stores.js: round(5 * 0.66) = 3 an Apple, x10 = 30, +2% rounded once on the total.
+    inv.apple = 10;
+    assert.equal(vendorSell(pc, inv, offers, 'apple', 10).gain, 31);
   });
 });
 

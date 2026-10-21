@@ -13,6 +13,8 @@ import {
   VENDOR_PROFILES,
   selectVendorProfile,
   vendorBuy,
+  vendorSell,
+  vendorSellValue,
 } from '../public/js/vendor.js?v=vendor-profiles-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -129,5 +131,24 @@ describe('official street stores (map_stores)', () => {
     assert.equal(selectVendorProfile('GA9TIJ7S4JA2CNF', '', { store: 'produce' }).key, 'produce');
     assert.equal(selectVendorProfile('anything', '', { store: 'alchemical' }).key, 'alchemical');
     assert.equal(selectVendorProfile('GLI2V0UN7RD1T2J', '', { store: 'produce' }).key, 'groceries');
+  });
+});
+
+describe('store sell prices (inc_stores.js storeSell)', () => {
+  it('pays round(base_cost * buy_multiplier) per unit at each store', () => {
+    assert.equal(VENDOR_PROFILES.tools.buyMultiplier, 0.75);
+    assert.equal(vendorSellValue('meat', 3, { buyMultiplier: VENDOR_PROFILES.groceries.buyMultiplier }).total, 21);
+    assert.equal(vendorSellValue('meat', 3, { buyMultiplier: VENDOR_PROFILES.tools.buyMultiplier }).total, 24);
+  });
+
+  it('the Sno Cone vendor and no_vendor items refuse to buy', () => {
+    const inv = createInventory({ meat: 2, element_red: 5 });
+    const pc = { currants: 0 };
+    const sno = vendorSell(pc, inv, VENDOR_PROFILES.sno_cone.offers, 'meat', 1, { buyMultiplier: VENDOR_PROFILES.sno_cone.buyMultiplier });
+    assert.equal(sno.ok, false);
+    assert.equal(sno.reason, 'no_value');
+    assert.equal(vendorSell(pc, inv, [], 'element_red', 1).reason, 'not_sellable');
+    assert.equal(pc.currants, 0);
+    assert.equal(countItem(inv, 'meat'), 2);
   });
 });

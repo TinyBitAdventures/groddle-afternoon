@@ -269,19 +269,19 @@ describe('vendor buy/sell', () => {
     assert.ok(sells.some((s) => s.classTsid === 'apple'));
   });
 
-  it('quotes any non-tool pack item at a safe floor price', () => {
+  it('quotes any non-tool pack item from its own base cost', () => {
     ensureMakingItems();
     const inv = createInventory({ butterfly_lotion: 0, orange_juice: 3, knife_and_board: 1 });
     const sells = listSellOffers(inv, DEFAULT_VENDOR.offers);
     const juice = sells.find((row) => row.classTsid === 'orange_juice');
     assert.ok(juice, 'crafted goods outside vendor stock should still be sellable');
-    assert.equal(juice.price, 1);
+    assert.equal(juice.price, 26); // round(39 * 0.66)
     assert.equal(sells.some((row) => row.classTsid === 'knife_and_board'), false, 'tools stay out of drag-sell');
 
     const quote = createVendorSellQuote(inv, DEFAULT_VENDOR.offers, 'orange_juice', 99);
     assert.equal(quote.ok, true);
     assert.equal(quote.qty, 3, 'quote clamps to current stack');
-    assert.equal(quote.total, 3);
+    assert.equal(quote.total, 78);
     assert.equal(quote.vendorStocked, false);
   });
 

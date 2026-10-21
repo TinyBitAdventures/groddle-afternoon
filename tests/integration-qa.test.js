@@ -71,9 +71,10 @@ test.describe('integration playtest regressions', () => {
     const { vendorSell } = await import('../public/js/vendor.js');
     const { createInventory } = await import('../public/js/inventory.js?v=catalog-unified-3');
     const inv = createInventory();
-    inv.apple = 1;
+    inv.grain = 1;
     const pc = { currants: 0 };
-    const r = vendorSell(pc, inv, [{ classTsid: 'apple', label: 'Apple', price: 2 }], 'apple', 1);
+    // Grain base_cost 1: round(1 * 0.66) = 1 currant.
+    const r = vendorSell(pc, inv, [], 'grain', 1);
     assert.ok(r.ok, JSON.stringify(r));
     assert.match(r.msgs[0], /for 1 currant\.$/);
   });

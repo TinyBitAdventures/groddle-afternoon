@@ -628,12 +628,13 @@ export function foxRangerStoreProfile() {
     badge: 'F',
     color: 0x8a7a4a,
     desc: 'Regulation Fox Brushes and Fox Bait, and absolutely no cheese. (catalog_stores.js store 22)',
+    // buy_multiplier 0: the Ranger buys nothing back (inc_stores.js storeSell).
+    buyMultiplier: FOX_RANGER_STORE.buyMultiplier,
     offers: FOX_RANGER_STORE.items.map((row) => ({
       classTsid: row.classTsid,
       label: FOX_ITEM_DEFS[row.classTsid].label,
       buyPrice: row.cost,
-      // buy_multiplier 0 follows the shared vendor convention of a one-currant floor.
-      sellPrice: Math.max(1, Math.floor(row.cost * FOX_RANGER_STORE.buyMultiplier)),
+      sellPrice: 0,
     })),
   };
 }
