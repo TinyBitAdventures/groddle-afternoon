@@ -17348,6 +17348,8 @@ async function enterStreet(tsid, opts = {}) {
     renderer: app.renderer,
     available,
     cameraBottomPadding: cameraBottomSlack(LOCATION_VIEW_H),
+    // The canvas runs on under the overlaid pack.
+    skirtBelow: VIEW_H - LOCATION_VIEW_H,
   });
   streetPlatforms = bgLayer.platformsScreen;
   streetWalls = wallsScreen(data);

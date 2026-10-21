@@ -173,7 +173,7 @@ test.describe('smooth directional camera and client wiring', () => {
     const locationViewHeight = 540 - 132;
     assert.equal(locationViewHeight, 408);
     assert.equal(cameraTargetY(20, 1_000, locationViewHeight), 0);
-    assert.equal(cameraBottomSlack(locationViewHeight), 102);
+    assert.equal(cameraBottomSlack(locationViewHeight), 40);
 
     const lowestPlatformY = 1_034;
     const cameraWorldHeight = cameraWorldHeightForGround(
@@ -187,8 +187,9 @@ test.describe('smooth directional camera and client wiring', () => {
       locationViewHeight
     );
     const playerScreenY = lowestPlatformY - cameraY;
-    assert.equal(playerScreenY, 306);
-    assert.equal(locationViewHeight - playerScreenY, 102);
+    // Bounded like CameraMan: the feet drop towards the pack, never closer than 40.
+    assert.equal(playerScreenY, 368);
+    assert.equal(locationViewHeight - playerScreenY, 40);
     assert.ok(playerScreenY < locationViewHeight, 'feet stay above the pack');
   });
 
@@ -200,11 +201,10 @@ test.describe('smooth directional camera and client wiring', () => {
       homeGroundY,
       locationViewHeight
     );
-    assert.equal(cameraWorldHeight, 722);
+    assert.equal(cameraWorldHeight, 660);
     const cameraY = cameraTargetY(homeGroundY, cameraWorldHeight, locationViewHeight);
-    assert.equal(cameraY, 314);
-    assert.equal(homeGroundY - cameraY, 306);
-    assert.equal(locationViewHeight - (homeGroundY - cameraY), 102);
+    assert.equal(cameraY, 252);
+    assert.equal(locationViewHeight - (homeGroundY - cameraY), 40);
   });
 
   test('keeps the lowest platform above the pack in every imported street', () => {

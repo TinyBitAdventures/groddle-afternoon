@@ -269,21 +269,25 @@ export function cameraTargetY(playerY, worldHeight, locationViewHeight, anchorRa
   return clamp(finite(playerY) - view * anchor, 0, Math.max(0, world - view));
 }
 
+/** Least ground the camera keeps between the avatar's feet and the pack. */
+export const MIN_GROUND_CLEARANCE = 40;
+
 /**
- * Extra world space required below the lowest walkable point so the camera can
- * still hold the avatar at its normal anchor. Imported streets commonly end
- * exactly on their lowest platform (and a few round 30px past it), leaving no
- * room for the camera to pan above the overlaid pack.
+ * Extra world space the camera may show below the lowest walkable point.
+ * CameraMan bounds the camera to the location, so the avatar drops towards
+ * the bottom near a street's lower edge; the remake's pack overlays the
+ * canvas, so streets whose ground sits closer than MIN_GROUND_CLEARANCE to
+ * that edge (or below it) get just enough room to keep the feet in view.
  */
 export function cameraBottomSlack(locationViewHeight, anchorRatio = 0.75) {
   const view = Math.max(1, finite(locationViewHeight, 1));
   const anchor = clamp(finite(anchorRatio, 0.75), 0, 1);
-  return view * (1 - anchor);
+  return Math.min(MIN_GROUND_CLEARANCE, view * (1 - anchor));
 }
 
 /**
- * Return a camera-only world height that can frame the deepest walkable ground
- * at the normal avatar anchor. Authored scenes and imported streets may report
+ * Return a camera-only world height that keeps the deepest walkable ground
+ * MIN_GROUND_CLEARANCE above the pack. Authored scenes and imported streets may report
  * a visual height that ends above, exactly on, or far below their collision
  * ground; camera framing must not inherit that inconsistency.
  */

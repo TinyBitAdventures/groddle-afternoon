@@ -593,6 +593,108 @@ function makePlaceholder(PIXI, deco, pos) {
   return g;
 }
 
+/** A 1 x 32 ramp of one colour from clear to opaque. */
+function fadeTexture(PIXI, colour) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d');
+  const hex = `#${colour.toString(16).padStart(6, '0')}`;
+  const grad = ctx.createLinearGradient(0, 0, 0, 32);
+  grad.addColorStop(0, `${hex}00`);
+  grad.addColorStop(1, `${hex}ff`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1, 32);
+  return PIXI.Texture.from(canvas);
+}
+
+/**
+ * Fill the strip under a street's bottom edge (street art ends at bounds.b;
+ * the camera can show up to MIN_GROUND_CLEARANCE below it, and the canvas
+ * runs on under the overlaid pack). The middleground's last row is stretched
+ * down and fades into a fill of its average colour, so the ground carries on
+ * instead of showing the sky gradient's bottom colour.
+ */
+function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallback) {
+  const depth = Math.ceil(depthPx);
+  if (!lc || depth <= 0 || W <= 0) return;
+  const ROWS = 3;
+  const CHUNK = 4096;
+  const build = () => {
+    if (lc.destroyed || root.destroyed) return;
+    const strip = new PIXI.Container();
+    strip.zIndex = lc.zIndex - 1;
+    const fill = new PIXI.Graphics();
+    strip.addChild(fill);
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    let n = 0;
+    for (let x0 = 0; x0 < W; x0 += CHUNK) {
+      const w = Math.min(CHUNK, Math.ceil(W - x0));
+      const rt = PIXI.RenderTexture.create({ width: w, height: ROWS });
+      renderer.render(lc, { renderTexture: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -x0, -(sourceH - ROWS)), clear: true });
+      try {
+        const px = renderer.extract.pixels(rt);
+        for (let i = 0; i < px.length; i += 16) {
+          const a = px[i + 3];
+          if (a < 200) continue;
+          r += px[i] * 255 / a;
+          g += px[i + 1] * 255 / a;
+          b += px[i + 2] * 255 / a;
+          n += 1;
+        }
+      } catch { /* extract can fail on a lost context: the stretch still draws */ }
+      const spr = new PIXI.Sprite(new PIXI.Texture(rt.baseTexture, new PIXI.Rectangle(0, ROWS - 1, w, 1)));
+      spr.x = x0;
+      spr.y = sourceH - 1;
+      spr.width = w;
+      spr.height = depth + 1;
+      strip.addChild(spr);
+    }
+    const colour = n
+      ? (Math.round(r / n) << 16) | (Math.round(g / n) << 8) | Math.round(b / n)
+      : fallback;
+    fill.beginFill(colour);
+    fill.drawRect(0, sourceH - 1, W, depth + 1);
+    fill.endFill();
+    const fade = new PIXI.Sprite(fadeTexture(PIXI, colour));
+    fade.x = 0;
+    fade.y = sourceH - 1;
+    fade.width = W;
+    fade.height = Math.min(depth + 1, 36);
+    strip.addChild(fade);
+    const solid = new PIXI.Graphics();
+    solid.beginFill(colour);
+    solid.drawRect(0, sourceH + 35, W, Math.max(0, depth - 35));
+    solid.endFill();
+    strip.addChild(solid);
+    root.addChild(strip);
+    root.groundSkirt = { depth, colour };
+  };
+  const sprites = [];
+  lc.children.forEach(function walk(child) {
+    if (child instanceof PIXI.Sprite) sprites.push(child);
+    (child.children || []).forEach(walk);
+  });
+  const pending = [...new Set(sprites.map((spr) => spr.texture.baseTexture).filter((base) => !base.valid))];
+  // Let a pending colour bake swap textures first.
+  const later = () => setTimeout(build, 0);
+  if (!pending.length) {
+    later();
+    return;
+  }
+  let left = pending.length;
+  const done = () => {
+    left -= 1;
+    if (left === 0) later();
+  };
+  for (const base of pending) {
+    base.once('loaded', done);
+    base.once('error', done);
+  }
+}
+
 /**
  * @param {import('./street-model.js').StreetData} street
  * @param {typeof PIXI} PIXI
@@ -727,6 +829,12 @@ export function buildStreetView(street, PIXI, opts = {}) {
     else if (colour && opts.renderer) bakeLayerColour(PIXI, opts.renderer, lc, colour, recolourCache);
     root.addChild(lc);
     layerContainers.push(lc);
+  }
+  const skirtDepth = H - sourceH + Math.max(0, Number(opts.skirtBelow) || 0);
+  if (skirtDepth > 0 && opts.renderer) {
+    const ground = layerContainers.find((lc) => lc.label === 'middleground');
+    const fallback = parseInt(String(street.gradient?.bottom || '6b8f3c').replace(/^#/, ''), 16) || 0x6b8f3c;
+    buildGroundSkirt(PIXI, opts.renderer, root, ground, W, sourceH, skirtDepth, fallback);
   }
   root.decoDrawn = drawn;
   root.decoViews = decoViews;
