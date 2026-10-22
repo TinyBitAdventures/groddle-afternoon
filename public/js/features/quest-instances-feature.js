@@ -29,7 +29,8 @@
  *     autoplay(ctx, mode) -> Promise,
  *     world: { onStreetEnter(wctx, street), onTick(wctx, dt, now),
  *              verbs(wctx, target), runVerb(wctx, target, verb),
- *              packVerbs(wctx, cls), runPackVerb(wctx, cls, verb) } }
+ *              packVerbs(wctx, cls), runPackVerb(wctx, cls, verb),
+ *              verbOverride(wctx, target), runVerbOverride(wctx, target, verb) } }
  *   `world` hooks run on ordinary streets while one of the room's quests is
  *   active (Carry That Weight's dig sites).
  *
@@ -1208,6 +1209,24 @@ export const questInstancesFeature = {
     const def = loaded.get(target.qiRoom);
     if (def?.world?.runVerb) return def.world.runVerb(worldContext(engine), target, verbId) === true;
     return false;
+  },
+
+  /** World rooms may take over another feature's target (a subway door while a quest needs it). */
+  verbOverride(target, engine) {
+    if (run || entering) return null;
+    for (const def of activeWorldRooms(engine)) {
+      const verbs = def.world.verbOverride?.(worldContext(engine), target);
+      if (verbs) return verbs;
+    }
+    return null;
+  },
+
+  runVerbOverride(target, verbId, engine) {
+    if (run || entering) return null;
+    for (const def of activeWorldRooms(engine)) {
+      if (def.world.runVerbOverride?.(worldContext(engine), target, verbId) === true) return true;
+    }
+    return null;
   },
 
   packVerbs(classTsid, engine) {

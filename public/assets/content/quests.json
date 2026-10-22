@@ -4892,7 +4892,8 @@
     "name": "talk_to_bureaucrat",
     "num": 1,
     "classId": "npc_bureaucrat",
-    "desc": "Speak to the Shady Bureaucrat"
+    "desc": "Speak to the Shady Bureaucrat",
+    "route": "quest-instances"
    },
    {
     "id": "r352",
@@ -4900,7 +4901,8 @@
     "name": "made_fuel_cell",
     "num": 1,
     "classId": "fuelmaker",
-    "desc": "Make a Fuel Cell"
+    "desc": "Make a Fuel Cell",
+    "route": "quest-instances"
    },
    {
     "id": "r353",
@@ -4908,7 +4910,8 @@
     "name": "refuel_bot",
     "num": 1,
     "classId": "fuel_cell",
-    "desc": "Refuel a Subway Maintenance Bot"
+    "desc": "Refuel a Subway Maintenance Bot",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -4946,8 +4949,8 @@
     "skill": "fuelmaking_1"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "back_alley",
+  "solo": true
  },
  "gardening_harvest_all_trees_in_time_period": {
   "classTsid": "gardening_harvest_all_trees_in_time_period",
@@ -33373,7 +33376,8 @@
     "name": "leave",
     "num": 1,
     "classId": "cup_of_water",
-    "desc": "Ride It Out"
+    "desc": "Ride It Out",
+    "route": "quest-instances"
    },
    {
     "id": "r523",
@@ -33381,7 +33385,8 @@
     "name": "convo_end",
     "num": 1,
     "classId": "cup_of_water",
-    "desc": "Peek Behind the Veil"
+    "desc": "Peek Behind the Veil",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -33412,13 +33417,14 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "event",
-    "event": "item_use",
-    "item": "cup_of_water"
+    "type": "quest",
+    "quest": "card_carrying_qualification",
+    "override": true
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "being_watched",
+  "offerNote": "item_use cup_of_water trigger; offered after Legalize It",
+  "solo": true
  },
  "star_sprint": {
   "classTsid": "star_sprint",

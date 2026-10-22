@@ -69,6 +69,8 @@ export const BUILT_ROOMS = Object.freeze([
   'picto_pattern',
   'radiant_glare',
   'an_autumn_day',
+  'being_watched',
+  'back_alley',
 ]);
 
 /**
