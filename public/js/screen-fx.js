@@ -44,12 +44,32 @@ export function nextFrame() {
  * Empty/malformed arrays deliberately fall back to the ordinary timed award.
  * @param {{ steps?: Array<{text?: string, response?: string}>, primaryLabel?: string }} payload
  */
+/**
+ * Award text comes from GSJS copy, which carries the client's HTML: item links
+ * (<a href="event:item|npc_piggy">Piggies</a>), <b>, <br>, <split> and entities.
+ * The card shows plain text, so keep the words and drop the markup.
+ */
+export function awardText(value) {
+  return String(value ?? '')
+    .replace(/<split[^>]*>/gi, '\n\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 export function normalizeAwardPages(payload = {}) {
   if (!Array.isArray(payload.steps)) return [];
   const pages = payload.steps
     .map((step) => ({
-      text: String(step?.text || '').trim(),
-      response: String(step?.response || '').trim(),
+      text: awardText(step?.text),
+      response: awardText(step?.response),
     }))
     .filter((step) => step.text || step.response);
   return pages.map((page, index) => ({
@@ -240,14 +260,15 @@ export async function showAwardScreen(el, payload) {
     generic: 'Well done!',
   };
   if (kicker) kicker.textContent = kickers[kind] || kickers.generic;
-  if (title) title.textContent = payload.title || '';
+  const bodyText = awardText(payload.body);
+  if (title) title.textContent = awardText(payload.title);
   if (body) {
-    body.textContent = payload.body || '';
-    body.hidden = !payload.body;
+    body.textContent = bodyText;
+    body.hidden = !bodyText;
   }
   if (sub) {
     // Crossfades are non-skippable — no "click to dismiss" cue
-    sub.textContent = payload.subtitle || '';
+    sub.textContent = awardText(payload.subtitle);
     sub.classList.remove('has-reward-tokens');
     sub.hidden = !payload.subtitle || Boolean(paged);
   }

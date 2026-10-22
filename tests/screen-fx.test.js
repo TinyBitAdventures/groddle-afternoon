@@ -161,3 +161,16 @@ describe('badge + loading asset maps (local pack)', () => {
     assert.match(game, /onDismiss: \(\) => returnFromDeEmbiggenify\(\)/);
   });
 });
+
+describe('award card text', () => {
+  it('drops GSJS item links and tags but keeps the words', async () => {
+    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js');
+    assert.equal(
+      awardText('Give 6 <a href="event:item|npc_piggy">Piggies</a> the pleasuring of a lifetime. By petting them, of course.'),
+      'Give 6 Piggies the pleasuring of a lifetime. By petting them, of course.',
+    );
+    assert.equal(awardText('<b>Bold</b> &amp; brave<br>next &quot;line&quot;'), 'Bold & brave\nnext "line"');
+    assert.equal(awardText(undefined), '');
+    assert.equal(normalizeAwardPages({ steps: [{ text: 'A <a href="event:item|apple">Apple</a>' }] })[0].text, 'A Apple');
+  });
+});

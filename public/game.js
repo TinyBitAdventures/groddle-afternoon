@@ -603,7 +603,7 @@ import {
   NEW_DAY_HOLD_MS,
   runStreetTransition,
   showAwardScreen,
-} from './js/screen-fx.js?v=quest-pages-2';
+} from './js/screen-fx.js?v=award-text-1';
 import {
   planTravel,
   listMapDestinations,

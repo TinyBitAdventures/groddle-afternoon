@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 232,
+  "commits": 233,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "One shared header on the home page, the restoration report and the compare page"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1510,11 +1515,6 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Your Glitch idles, dozes off when you're away, and walks with feet on the ground"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "The favicon is now an iMG quoin"
    }
   ]
  },
