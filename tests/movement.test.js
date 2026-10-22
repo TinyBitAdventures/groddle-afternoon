@@ -252,7 +252,8 @@ test.describe('smooth directional camera and client wiring', () => {
   test('uses edge-triggered requests, blocks panels, exposes QA, and keeps mute opt-in', () => {
     const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
     const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
-    assert.match(game, /!e\.repeat && \[' ', 'ArrowUp', 'w', 'W'\]\.includes\(e\.key\)/);
+    // Space always; W/Up jump off the ground only (on a ladder they climb).
+    assert.match(game, /!e\.repeat && \(e\.key === ' ' \|\| \(!climb\.active && \['ArrowUp', 'w', 'W'\]\.includes\(e\.key\)\)\)/);
     assert.match(game, /queueJump\(jumpState, movementNow\(\)\)/);
     assert.match(game, /resolveQueuedJump\(jumpState/);
     assert.match(game, /gameplayInputBlocked\(\)/);
