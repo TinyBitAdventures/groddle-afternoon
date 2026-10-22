@@ -50,10 +50,14 @@ describe('climbing input (game.js)', () => {
 
   it('does not re-grab a ladder with a still-held Up/Down right after leaving it', () => {
     // Hopping off sideways or jumping while Up/Down is held must not flip back onto the ladder next frame.
-    assert.match(game, /climb\.regrabLock = up \|\| down;/);
+    assert.match(game, /climb\.wall = null;\s*\/\/[^\n]*\n[^\n]*\n\s*climb\.regrabLock = true;/);
     assert.match(game, /if \(!up && !down\) climb\.regrabLock = false;/);
     assert.match(game, /climbHit && !climb\.regrabLock && \(up !== down\)/);
     assert.match(game, /climbHit && up && !climb\.regrabLock\)/);
+  });
+
+  it('treats Up/W as climb, not jump, while on a ladder (only Space jumps off)', () => {
+    assert.match(game, /e\.key === ' ' \|\| \(!climb\.active && \['ArrowUp', 'w', 'W'\]\.includes\(e\.key\)\)/);
   });
 
   it('runs the climb cycle only while moving on the ladder (CLIMB_PAUSE holds the frame)', () => {

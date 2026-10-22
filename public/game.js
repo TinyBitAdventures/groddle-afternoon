@@ -7237,6 +7237,9 @@ function stopClimb({ jumpOff = false, side = 0, jumpVelocity = -9.6, maxSpeed = 
   if (!climb.active && !player?.climbing) return;
   climb.active = false;
   climb.wall = null;
+  // Every way off (bottom, top ledge, sideways, jump) waits for Up/Down to be
+  // released before a ladder can be grabbed again; handleInput clears it.
+  climb.regrabLock = true;
   if (player) {
     player.climbing = false;
     if (jumpOff) {
@@ -9006,7 +9009,6 @@ function handleInput() {
     // jump; Space alone jumps straight up and uses the air jump.
     if (jumpRequested || (left && !right) || (right && !left)) {
       const side = left && !right ? -1 : right && !left ? 1 : 0;
-      climb.regrabLock = up || down;
       clearJumpQueue(jumpState);
       noteGrounded(jumpState, false, now);
       stopClimb({ jumpOff: true, side, jumpVelocity: -9.6 * movementBuff.jump, maxSpeed: 4.4 * movementBuff.speed });
@@ -22874,8 +22876,9 @@ async function main() {
       return;
     }
     // Original AvatarController triggers on the key edge, not while Space is
-    // held. W/Up keep the remake's accessible jump-or-climb controls.
-    if (!e.repeat && [' ', 'ArrowUp', 'w', 'W'].includes(e.key)) {
+    // held. W/Up keep the remake's accessible jump-or-climb controls, except on
+    // a ladder, where Up only climbs (onUpKey returns when apo.onLadder).
+    if (!e.repeat && (e.key === ' ' || (!climb.active && ['ArrowUp', 'w', 'W'].includes(e.key)))) {
       queueJump(jumpState, movementNow());
     }
     // Enter / Return or E — open verb menu on nearest interactable
