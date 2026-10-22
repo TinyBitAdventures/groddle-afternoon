@@ -104,7 +104,7 @@ describe('classifyQuests', () => {
     // instance_unbuilt to solo as each room lands.
     const built = builtInstanceQuests().length;
     // Overworld features that brought once-excluded quests back (not rooms).
-    const featureQuests = ['smuggling_basic'].length;
+    const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station'].length;
     assert.equal(c.solo.length, 129 + built + featureQuests);
     assert.equal(c.custom.length, 17);
     assert.equal(c.excluded.length, 299 - built - featureQuests);

@@ -157,6 +157,8 @@ export const REMAKE_QUEST_NPCS = Object.freeze([
   'npc_smuggler',
   // The imprisoned Smuggler in quest-rooms/penalty.js (part 1's end NPC, offers II and III).
   'npc_rare_item_vendor',
+  // The Magic Rock on your home street offers Build a Tower (features/home-tower-feature.js).
+  'magic_rock',
 ]);
 const GSJS_STREET_SPIRITS = new Set([
   'street_spirit', 'street_spirit_groddle', 'street_spirit_firebog', 'street_spirit_zutto', 'street_spirit_ix',
@@ -759,6 +761,9 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'emblems_acquired:{a}' },
   { event: 'in_inventory:{a}', note: 'every pack gain (quest-offers feature diff)' },
   { event: 'contraband_delivered', note: 'features/smuggling-feature.js sets it when the contact takes the box' },
+  { event: 'cultivate_tower', note: 'features/home-tower-feature.js on cultivating the Tower' },
+  { event: 'build_tower', note: 'features/home-tower-feature.js when the Tower project finishes' },
+  { event: 'meditation_station_days', note: 'js/meditation-station.js, one per counted game day' },
   // game.js emitGameEvent (2026-10-19)
   { event: '{a}:{b}', note: 'every successful world verb and pack use' },
   { event: 'rocks_depleted:{a}' },

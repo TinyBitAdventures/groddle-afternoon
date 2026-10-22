@@ -30,7 +30,14 @@
  */
 
 import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-3';
-import { getGameDayKey } from '../game-day.js?v=dametime-1';
+import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../game-day.js?v=dametime-1';
+import {
+  STATION_COUNTER,
+  STATION_QUEST,
+  normalizeStationState,
+  recordStationSession,
+  stationMessage,
+} from '../meditation-station.js?v=station-1';
 import {
   LEVITATION_PACKAGE,
   MEDITATION_TEXT,
@@ -58,6 +65,8 @@ const ORB_HELD_SIZE = 52;
 const JUMP_KEYS = new Set([' ', 'w', 'W']);
 
 let state = normalizeMeditationState();
+/** Meditation Station practice (js/meditation-station.js), saved beside the meditation state. */
+let station = normalizeStationState();
 let session = null; // transient: { kind, focus, startedAt, durationMs, x, ticks, stopMusic }
 let fx = null; // Pixi container + parts while meditating
 let levFx = null;
@@ -382,10 +391,32 @@ function end(engine, reason = 'timer', at = Date.now()) {
   if (out.maxRelax && player) showMaxRelax(engine);
   if (out.reachedZen) engine.toast(MEDITATION_TEXT.zenReached, 3600);
   for (const event of out.events) engine.achievement(event.counter, event.amount);
+  stationAfterSession(engine, out.seconds);
   engine.setData('meditationLast', `${reason}:${out.seconds}s:e${energy}:m${mood}:i${out.img}:${out.full ? 'full' : 'part'}`);
   engine.updateHud();
   engine.save();
   publish(engine, true);
+}
+
+/** Meditation Station: one counted game day per 60 s on the same street (quest active only). */
+function stationAfterSession(engine, seconds) {
+  const quest = engine.questState?.active?.[STATION_QUEST];
+  if (!quest) {
+    station = normalizeStationState();
+    return;
+  }
+  const res = recordStationSession(station, {
+    tsid: engine.streetTsid,
+    label: engine.street?.label || engine.streetTsid,
+    seconds,
+    day: Math.floor(getGameDayStartMs(Date.now()) / GAME_DAY_MS),
+  });
+  station = res.state;
+  if (res.reset && quest.progress) quest.progress[STATION_COUNTER] = 0;
+  if (res.counted) engine.achievement(STATION_COUNTER, 1);
+  const msg = stationMessage(res);
+  if (msg) engine.pushActivity(msg);
+  engine.setData('meditationStation', `${station.tsid}:${station.days}:${station.todaySeconds}`);
 }
 
 function levitate(engine) {
@@ -455,11 +486,12 @@ export const meditationFeature = {
   },
 
   save() {
-    return state;
+    return { ...state, station };
   },
 
   restore(slice) {
     state = normalizeMeditationState(slice || {});
+    station = normalizeStationState(slice?.station);
   },
 
   onStreetEnter(street, engine) {

@@ -2271,8 +2271,7 @@
     "npc": "magic_rock"
    }
   ],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "solo": true
  },
  "butler_zombies": {
   "classTsid": "butler_zombies",
@@ -29340,10 +29339,10 @@
    {
     "id": "r470",
     "type": "counter",
-    "name": "meditation_time",
-    "num": 60,
+    "name": "meditation_station_days",
+    "num": 11,
     "classId": "focusing_orb",
-    "desc": "Meditate for 60 seconds"
+    "desc": "Meditate on the same street on 11 game days"
    }
   ],
   "rewards": {
@@ -29373,9 +29372,17 @@
   "instanced": false,
   "needsStart": false,
   "hasCanOffer": false,
-  "offerTriggers": [],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "offerTriggers": [
+   {
+    "type": "inferred",
+    "inferred": true,
+    "quests": [
+     "meditativearts_get_max_relax"
+    ],
+    "why": "Meditative Arts series; no giver survives (familiar turn-in)"
+   }
+  ],
+  "solo": true
  },
  "mental_block": {
   "classTsid": "mental_block",

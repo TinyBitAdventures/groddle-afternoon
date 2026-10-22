@@ -163,7 +163,16 @@ for (const [q, list] of Object.entries(SPECIAL_TRIGGERS)) for (const t of list) 
 
 // Hand-assigned gates for quests whose giver is lost from the dump. Each is a
 // judgment call from the quest text; `inferred: true` marks them in the data.
+// Requirements the remake implements as the quest text describes, where the
+// source only checked a looser counter. Each row says why.
+const REQUIREMENT_OVERRIDES = {
+  // Source: any 60 s meditation counted; the text asks for the same street on 11 game days, gaps of 6 at most
+  // (js/meditation-station.js).
+  meditativearts_meditation_station: [{ id: 'r470', type: 'counter', name: 'meditation_station_days', num: 11, classId: 'focusing_orb', desc: 'Meditate on the same street on 11 game days' }],
+};
+
 const INFERRED_GATES = {
+  meditativearts_meditation_station: { quests: ['meditativearts_get_max_relax'], why: 'Meditative Arts series; no giver survives (familiar turn-in)' },
   master_milker: { quests: ['animalkinship_milk_butterflies'], why: 'milking quest after the Animal Kinship milking quest' },
   rannacramble: { quests: ['master_milker'], region: 'Aranna', why: '"Take a hike through Aranna"' },
   doody_inspector: { quests: ['animalkinship_pet_piggies'], why: 'piggy plops follow piggy care' },
@@ -252,8 +261,6 @@ const EXCLUDE = {
   radiant_glare: 'instance_unbuilt', radiant_glare_rem: 'instance_unbuilt', rube_spy: 'instance_unbuilt',
   stale_but_necessary: 'instance_unbuilt', where_the_blue_grew: 'instance_unbuilt', numismatic_hustle: 'instance_unbuilt',
   // features or givers the remake does not have
-  build_a_tower: 'feature_unbuilt',
-  meditativearts_meditation_station: 'feature_unbuilt',
 };
 
 /* ------------------------------------------------------------------ */
@@ -374,6 +381,7 @@ for (const file of files) {
     continue;
   }
   catalog[classTsid] = extractQuest(classTsid, ctx, buffs);
+  if (REQUIREMENT_OVERRIDES[classTsid]) catalog[classTsid].requirements = REQUIREMENT_OVERRIDES[classTsid].map((r) => ({ ...r }));
 }
 
 // chain triggers from completion code

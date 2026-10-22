@@ -67,6 +67,7 @@ import {
   textureConfig,
 } from '../home-decor.js?v=home-decor-1';
 import {
+  nearestFreeRx,
   FIREFLY_HIVE,
   addWear,
   createCultivationState,
@@ -84,7 +85,10 @@ import {
   placementCheck,
   quoteYardExpansion,
   removeCultivation,
+  towerItem,
 } from '../home-cultivation.js?v=home-cultivation-1';
+import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-1';
+import { towerApi } from './home-tower-feature.js?v=home-tower-1';
 import { lookFor, paintTile, shade } from '../home-looks.js?v=home-looks-1';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-1';
 import { patchesFeature } from './patches-feature.js?v=patches-1';
@@ -218,7 +222,11 @@ export function ensureFurnitureItems() {
 // Module state
 // ---------------------------------------------------------------------------
 
-let decor = createHomeDecorState();
+let houseDecor = createHomeDecorState();
+/** One decor slice per Tower floor; furniture storage is shared with the house (one furniture bag). */
+let towerDecor = [];
+/** The decor being shown and edited: the house, or the Tower floor you stand on. */
+let decor = houseDecor;
 let cult = createCultivationState();
 let mode = null; // 'decorate' | 'cultivate' | null
 let tab = 'furniture';
@@ -246,6 +254,74 @@ function publish(engine) {
   engine.setData('homeSelected', selected ? `${selected.kind}:${selected.id}` : '');
   engine.setData('homePlacing', placing ? placing.classTsid || placing.protoClass || '' : '');
 }
+
+// ---------------------------------------------------------------------------
+// Tower floors (js/home-tower.js, features/home-tower-feature.js)
+// ---------------------------------------------------------------------------
+
+/** A Tower floor's decor: config_base.js towers start textures, the 6 wall segments of tower.js. */
+function towerFloorDecor(index) {
+  while (towerDecor.length <= index) {
+    towerDecor.push(createHomeDecorState({
+      wall: TOWER_CONFIG.START_TEXTURE_WALL,
+      floor: TOWER_CONFIG.START_TEXTURE_FLOOR,
+      ceiling: TOWER_CONFIG.START_TEXTURE_CEILING,
+      wallSegments: TOWER_GEO.wallSegments,
+      starterKit: true,
+    }));
+  }
+  const slice = towerDecor[index];
+  slice.storage = houseDecor.storage;
+  slice.wallSegments = TOWER_GEO.wallSegments;
+  return slice;
+}
+
+/** The unfinished floor while a new one is going up (not decoratable, never saved). */
+function constructionDecor() {
+  return createHomeDecorState({ wall: 'grey_unfinished', floor: 'starter_crappy', ceiling: 'starter_crappy_ceiling', wallSegments: TOWER_GEO.wallSegments, starterKit: true });
+}
+
+function inTower() {
+  return scene?.tower != null;
+}
+
+/** Bridge the Tower feature uses onto the cultivation state (it never imports this file). */
+const towerBridge = {
+  towerItem: () => towerItem(cult),
+  towerWorldX() {
+    const item = towerItem(cult);
+    return item ? cultivationWorldX(item) : null;
+  },
+  markBuilt() {
+    const item = towerItem(cult);
+    if (item) item.endClass = TOWER_CHASSIS;
+  },
+  /** QA: put a Tower in the yard (proto or built) at the first free spot right of the house. */
+  seedTower(built = false) {
+    if (towerItem(cult)) return towerItem(cult);
+    cult.yardRight = Math.max(cult.yardRight, 2);
+    const rich = { level: 60, imagination: 1e9 };
+    const rx = nearestFreeRx(cult, TOWER_PROTO, 640);
+    const res = rx == null ? null : cultivate(cult, rich, TOWER_PROTO, rx, { now: Date.now() });
+    if (res?.ok && built) res.item.endClass = TOWER_CHASSIS;
+    return res?.item || null;
+  },
+  /** QA autoplay: cultivate the Tower with the player's own level and imagination. */
+  cultivateTower(engine) {
+    const rx = nearestFreeRx(cult, TOWER_PROTO, 640);
+    if (rx == null) return { ok: false, reason: 'no_room' };
+    beginCultivate(engine, TOWER_PROTO, { confirmed: true });
+    return placeAtPointer(engine, { x: homeStreetLayout(cult).houseX + rx, y: GROUND_Y });
+  },
+  removeTower(engine) {
+    const item = towerItem(cult);
+    if (!item) return false;
+    return towerApi.requestRemove(engine, item, () => {
+      uncultivate(engine, item.id);
+      engine.refreshHomeScene?.();
+    });
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Scene: the house interior
@@ -960,6 +1036,15 @@ function spawnCultivations(engine) {
   if (Object.keys(soilCounts).length) {
     patchesFeature.onStreetEnter({ tsid: HOME_STREET_TSID, soilCounts }, shimEngine(engine, engine.population, soilPoints));
   }
+  // The Tower (proto or built) and the Magic Rock that asks for one.
+  const tower = towerItem(cult);
+  const layout = homeStreetLayout(cult);
+  towerApi.spawnStreet(engine, {
+    item: tower,
+    x: tower ? cultivationWorldX(tower) : null,
+    groundY: GROUND_Y,
+    rockX: layout.houseX + 200,
+  });
   // Lifespan rings while cultivating.
   if (mode === 'cultivate') drawCultivationMarkers(engine);
 }
@@ -977,9 +1062,13 @@ function drawCultivationMarkers(engine) {
     const pad = new PIXI.Graphics();
     pad.beginFill(sel ? 0xffd76a : 0xffffff, sel ? 0.28 : 0.14).drawRoundedRect(x - half, GROUND_Y - 4, half * 2, 14, 7).endFill();
     pad.lineStyle(2, sel ? 0xffd76a : 0xffffff, sel ? 0.95 : 0.4).drawRoundedRect(x - half, GROUND_Y - 4, half * 2, 14, 7);
+    pad.lineStyle(0);
+    if (cultivationDef(item.protoClass)?.kind === 'tower') {
+      g.addChild(pad);
+      continue;
+    }
     // Lifespan bar (buildConfig lifespan.percentage_left)
     const left = lifespanLeft(item);
-    pad.lineStyle(0);
     pad.beginFill(0x2b2a33, 0.55).drawRoundedRect(x - 30, GROUND_Y + 16, 60, 6, 3).endFill();
     pad.beginFill(left > 0.3 ? 0x7cc35a : 0xe0a84a).drawRoundedRect(x - 30, GROUND_Y + 16, 60 * left, 6, 3).endFill();
     g.addChild(pad);
@@ -1115,8 +1204,8 @@ function renderModes(engine) {
   if (!ensureUi(engine)) return;
   const ctx = engine.homeContext?.() || {};
   const atHome = Boolean(ctx.inHome && scene);
-  ui.modes.hidden = !atHome || Boolean(mode);
-  if (!atHome) return;
+  ui.modes.hidden = !atHome || Boolean(mode) || Boolean(scene.construction);
+  if (!atHome || scene.construction) return;
   ui.modes.replaceChildren(
     scene.room === 'interior'
       ? el('button', { type: 'button', id: 'homes-decorate-btn', text: 'Decorate', onclick: () => setMode(engine, 'decorate') })
@@ -1130,7 +1219,7 @@ function renderBar(engine) {
   bar.hidden = !mode;
   renderModes(engine);
   if (!mode) return;
-  const title = mode === 'decorate' ? 'Decorate your house' : 'Cultivate your yard';
+  const title = mode === 'decorate' ? (inTower() ? `Decorate ${towerApi.floorTitle()}` : 'Decorate your house') : 'Cultivate your yard';
   const sub = mode === 'decorate'
     ? `${decor.placed.length} placed`
     : `◉ ${Math.floor(engine.pc.imagination || 0).toLocaleString()} iMG`;
@@ -1141,7 +1230,7 @@ function renderBar(engine) {
   ]);
   const body = el('div', { class: 'hb-body' });
   if (mode === 'decorate') {
-    const tabs = [['furniture', 'Furniture'], ['wall', 'Walls'], ['floor', 'Floors'], ['ceiling', 'Ceilings'], ['house', 'House']];
+    const tabs = [['furniture', 'Furniture'], ['wall', 'Walls'], ['floor', 'Floors'], ['ceiling', 'Ceilings'], ['house', inTower() ? 'Tower' : 'House']];
     const nav = el('nav', {}, tabs.map(([id, label]) => el('button', {
       type: 'button',
       class: tab === id ? 'on' : '',
@@ -1229,6 +1318,10 @@ function renderDecorateBody(engine, body) {
     ]));
     return;
   }
+  if (tab === 'house' && inTower()) {
+    renderTowerTab(engine, body);
+    return;
+  }
   if (tab === 'house') {
     const quote = quoteInteriorExpansion(decor, engine.inv);
     body.append(el('p', { class: 'hb-note', text: `Your house is ${decor.wallSegments} wall segments wide (the most is 20). Each extra segment takes one Wall Segment, made with a Construction Tool.` }));
@@ -1270,18 +1363,48 @@ function renderDecorateBody(engine, body) {
   flush();
 }
 
+/** The Decorate bar's Tower tab: floors and Build a New Floor (tower_get_expand_costs / tower_start_expand). */
+function renderTowerTab(engine, body) {
+  const state = towerApi.state();
+  const costs = towerApi.expandCosts();
+  body.append(el('p', { class: 'hb-note', text: `${towerApi.label()} has ${state.floors} of ${TOWER_CONFIG.MAX_FLOORS} floors. Each new floor is a project at the Workbench on the floor under construction.` }));
+  if (costs.count && !costs.locked) {
+    const items = Object.entries(costs.items).map(([cls, n]) => `${n} ${ITEM_CATALOG[cls]?.label || cls.replace(/_/g, ' ')}`);
+    const workRows = Object.entries(costs.work).map(([cls, n]) => `${n} units with a ${ITEM_CATALOG[cls]?.label || cls.replace(/_/g, ' ')}`);
+    body.append(el('h4', { text: 'The next floor will cost' }));
+    body.append(el('p', { class: 'hb-note', text: [...items, ...workRows].join(' · ') }));
+  }
+  body.append(el('div', { class: 'hb-row' }, [
+    el('button', {
+      type: 'button',
+      class: 'primary',
+      'data-tower-expand': '1',
+      disabled: !costs.count || costs.locked,
+      text: costs.locked ? 'A floor is under construction' : costs.count ? 'Build a New Floor' : 'As tall as it gets',
+      onclick: () => {
+        const res = towerApi.beginExpansion(engine);
+        renderBar(engine);
+        if (res.ok) engine.toast('Take the elevator up to the Workbench.', 2600);
+      },
+    }),
+  ]));
+}
+
 function renderCultivateBody(engine, body) {
   if (selected?.kind === 'cultivation') {
     const item = cult.items.find((row) => row.id === selected.id);
     if (item) {
       const def = cultivationDef(item.protoClass);
       const nudge = engine.learnedSkills.includes('nudgery_1');
+      const isTower = def.kind === 'tower';
       body.append(el('div', { class: 'hb-sel' }, [
-        el('strong', { text: def.label }),
-        el('p', { text: `Lifespan ${Math.round(lifespanLeft(item) * 100)}% (wears out after ${def.maxWear} uses).` }),
+        el('strong', { text: isTower ? towerApi.label() : def.label }),
+        el('p', { text: isTower
+          ? (item.endClass === TOWER_CHASSIS ? 'Built. Step inside to decorate its floors.' : 'A Tower project. Click it in the yard to see what it needs.')
+          : `Lifespan ${Math.round(lifespanLeft(item) * 100)}% (wears out after ${def.maxWear} uses).` }),
         el('div', { class: 'hb-actions' }, [
           el('button', { type: 'button', 'data-home-action': 'nudge', disabled: !nudge, title: nudge ? 'Move it along the yard' : 'Needs the Nudgery skill', text: 'Nudge', onclick: () => beginNudge(engine, item.id) }),
-          el('button', { type: 'button', 'data-home-action': 'remove', text: 'Remove', onclick: () => removeSelected(engine) }),
+          el('button', { type: 'button', 'data-home-action': 'remove', text: 'Remove', disabled: item.endClass === TOWER_CHASSIS, title: item.endClass === TOWER_CHASSIS ? 'A finished Tower stays.' : '', onclick: () => removeSelected(engine) }),
         ]),
       ]));
     }
@@ -1312,6 +1435,7 @@ function renderCultivateBody(engine, body) {
 
 function cultivationIcon(protoClass) {
   const def = cultivationDef(protoClass);
+  if (def.kind === 'tower') return 'assets/sprites/home-tower/proto_3.webp';
   if (def.art) return `assets/sprites/cultivation/${def.art}.png`;
   if (def.kind === 'garden') return `assets/sprites/icons/${def.gardenType === 'herb' ? 'herb_seed_rubeweed' : 'seed_carrot'}.png`;
   if (def.kind === 'rock') return `assets/sprites/icons/${{ proto_metal_rock: 'metal_rock', proto_dullite_rock: 'dullite', proto_beryl_rock: 'beryl', proto_sparkly_rock: 'sparkly' }[protoClass]}.png`;
@@ -1360,7 +1484,20 @@ function beginMove(engine, id) {
   renderBar(engine);
 }
 
-function beginCultivate(engine, protoClass) {
+function beginCultivate(engine, protoClass, opts = {}) {
+  const def = cultivationDef(protoClass);
+  if (def?.warning && !opts.confirmed) {
+    // cultivation_get_available placement_warning before the Tower plans are bought.
+    engine.offerQuestDialogue({
+      title: def.label,
+      kicker: 'Cultivate',
+      beats: [{ text: def.warning, response: 'Yes' }],
+      acceptLabel: 'Yes',
+      declineLabel: 'Nevermind',
+      onAccept: () => beginCultivate(engine, protoClass, { confirmed: true }),
+    });
+    return;
+  }
   placing = { kind: 'cultivation', protoClass };
   selected = null;
   makeGhost(engine);
@@ -1450,6 +1587,7 @@ function growYard(engine, side) {
 
 function removeSelected(engine) {
   if (selected?.kind !== 'cultivation') return null;
+  if (towerItem(cult)?.id === selected.id) return towerBridge.removeTower(engine);
   const result = uncultivate(engine, selected.id);
   engine.refreshHomeScene?.();
   return result;
@@ -1487,6 +1625,7 @@ function placeAtPointer(engine, at) {
     result = cultivate(cult, engine.pc, placing.protoClass, rx);
     if (result.ok) {
       engine.pushActivity(`You imagined a ${result.label} into your yard for ${result.cost.toLocaleString()} iMG.`);
+      if (cultivationDef(result.item.protoClass)?.kind === 'tower') towerApi.onCultivated(engine, result.item);
       engine.floatText?.(at.x, GROUND_Y - 120, `-${result.cost} iMG`, 0xb38cff);
       selected = { kind: 'cultivation', id: result.item.id };
     }
@@ -1812,9 +1951,69 @@ function homeX(engine) {
   return raw != null && raw !== '' && Number.isFinite(Number(raw)) ? Number(raw) : null;
 }
 
+function towerFloorScene(engine, floor) {
+  const construction = towerApi.isConstructionFloor(floor);
+  decor = construction ? constructionDecor() : towerFloorDecor(floor);
+  const background = interiorBackground(engine);
+  const width = interiorWidth(decor);
+  const via = towerApi.takeFloorArrival();
+  return {
+    width,
+    background,
+    spawnFor(opts = {}) {
+      if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) return Math.max(80, Math.min(width - 80, opts.spawnX));
+      if (homeX(engine) != null) return homeX(engine);
+      // tower_get_teleport_point (w - 150) from outside; the elevator connect (x 200) between floors.
+      if (via === 'door' || (!via && floor === 0)) return interiorDoorX() - 80;
+      return TOWER_GEO.elevatorX + 70;
+    },
+    spawnTargets() {
+      scene = { room: 'interior', tower: floor, construction, background, furnitureLayer: null, ghost: null, markers: null };
+      towerApi.spawnFloor(engine, { width, groundY: GROUND_Y, doorX: interiorDoorX() });
+      return {};
+    },
+    enter() {
+      const { PIXI } = engine;
+      const layer = new PIXI.Container();
+      layer.sortableChildren = true;
+      layer.zIndex = FURNITURE_Z;
+      engine.entityLayer.addChild(layer);
+      scene.furnitureLayer = layer;
+      if (construction) {
+        if (mode === 'decorate') mode = null;
+        drawScaffold(engine, width);
+      }
+      renderFurniture(engine);
+      afterEnter(engine);
+    },
+  };
+}
+
+/** The floor under construction: bare timber framing over the unfinished walls. */
+function drawScaffold(engine, width) {
+  const { PIXI } = engine;
+  const g = new PIXI.Graphics();
+  g.zIndex = 2;
+  const top = INTERIOR.wallTop - 10;
+  for (let x = 330; x < width - 120; x += 210) {
+    g.beginFill(0x7a5634).drawRect(x, top, 16, GROUND_Y - top).endFill();
+    g.beginFill(0x5c3f25).drawRect(x + 12, top, 4, GROUND_Y - top).endFill();
+  }
+  g.beginFill(0x8d6444).drawRect(300, top + 70, width - 400, 12).endFill();
+  g.lineStyle(10, 0x7a5634, 1);
+  for (let x = 330; x + 210 < width - 120; x += 420) g.moveTo(x + 16, GROUND_Y - 6).lineTo(x + 210, top + 82);
+  g.lineStyle(0);
+  for (let i = 0; i < 4; i += 1) g.beginFill(0x9c9c94).drawRoundedRect(width - 380 + i * 34, GROUND_Y - 22 - (i % 2) * 18, 30, 18, 3).endFill();
+  engine.entityLayer.addChild(g);
+}
+
 function homeScene(room, engine) {
   const ctx = engine.homeContext?.() || {};
   const style = ctx.style || 'meadow';
+  const floor = room === 'interior' ? towerApi.currentFloor() : null;
+  if (floor != null) return towerFloorScene(engine, floor);
+  decor = houseDecor;
+  if (room !== 'interior') towerApi.clearFloor();
   if (room === 'interior') {
     if (!decor.starterKit) {
       grantStarterKit(decor);
@@ -1857,6 +2056,8 @@ function homeScene(room, engine) {
       if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) {
         return Math.max(60, Math.min(layout.width - 60, opts.spawnX + (opts.shift || 0)));
       }
+      const fromTower = towerApi.takeArrivalX();
+      if (Number.isFinite(fromTower)) return Math.max(60, Math.min(layout.width - 60, fromTower));
       if (opts.arrive === 'door') return background.houseDoorX + 70;
       if (homeX(engine) != null) return layout.houseX + homeX(engine);
       if (engine.param('homedemo') === 'cultivate') return layout.houseX - 260;
@@ -1895,16 +2096,22 @@ export const homesFeature = {
 
   init(engine) {
     ensureFurnitureItems();
+    towerApi.connect(towerBridge);
     publish(engine);
   },
 
   save() {
-    return { decor, cult };
+    // Tower floors share the house's furniture storage; it is saved once, with the house.
+    return { decor: houseDecor, cult, towerDecor: towerDecor.map(({ storage, ...rest }) => rest) };
   },
 
   restore(slice) {
-    decor = normalizeHomeDecorState(slice?.decor || {});
+    houseDecor = normalizeHomeDecorState(slice?.decor || {});
+    decor = houseDecor;
     cult = normalizeCultivationState(slice?.cult || {});
+    towerDecor = (Array.isArray(slice?.towerDecor) ? slice.towerDecor : [])
+      .slice(0, TOWER_CONFIG.MAX_FLOORS)
+      .map((row) => normalizeHomeDecorState({ ...row, wallSegments: TOWER_GEO.wallSegments, starterKit: true }));
   },
 
   /** renderHomeScene: the scene for 'interior' or 'street'. */
@@ -1934,7 +2141,7 @@ export const homesFeature = {
   /** Pack furniture: place it straight from the pack while inside the house. */
   packVerbs(classTsid, engine) {
     if (!FURNITURE_CATALOG[classTsid]) return [];
-    const inside = scene?.room === 'interior';
+    const inside = scene?.room === 'interior' && !scene.construction;
     return [{
       id: 'place_furniture',
       label: 'Place in house',
@@ -1946,7 +2153,7 @@ export const homesFeature = {
   },
 
   runPackVerb(classTsid, verbId, engine) {
-    if (verbId !== 'place_furniture' || !FURNITURE_CATALOG[classTsid] || scene?.room !== 'interior') return false;
+    if (verbId !== 'place_furniture' || !FURNITURE_CATALOG[classTsid] || scene?.room !== 'interior' || scene.construction) return false;
     if (mode !== 'decorate') setMode(engine, 'decorate');
     beginPlacing(engine, classTsid, 'pack');
     return true;
@@ -1963,6 +2170,6 @@ export const homesFeature = {
 
   /** QA / tests. */
   _state() {
-    return { decor, cult, mode, placing, selected };
+    return { decor, houseDecor, towerDecor, cult, mode, placing, selected, scene };
   },
 };

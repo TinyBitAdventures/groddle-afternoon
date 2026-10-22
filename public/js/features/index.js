@@ -72,3 +72,4 @@ export const FEATURES = [
   cameraModeFeature,
 ];
 import { smugglingFeature } from './smuggling-feature.js?v=smuggling-1'; FEATURES.push(smugglingFeature);
+import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-1'; FEATURES.push(homeTowerFeature);

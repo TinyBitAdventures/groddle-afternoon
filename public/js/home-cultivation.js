@@ -24,6 +24,14 @@
  */
 
 import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=homes-catalog-1';
+import {
+  TOWER_CHASSIS,
+  TOWER_IMG_COST,
+  TOWER_MIN_LEVEL,
+  TOWER_PLACEMENT_WARNING,
+  TOWER_PROTO,
+  TOWER_WIDTH,
+} from './home-tower.js?v=home-tower-1';
 
 export const YARD_SEGMENT_W = 150;
 /** The house, porch, mailbox and World Gate stand on a fixed lot between the yards. */
@@ -35,12 +43,38 @@ const BASE = 0.15;
 const ADDITIONAL = 0.5;
 const MAX_ITEMS = 60;
 
+/**
+ * The Tower (inc_cultivation.js proto_furniture_tower_chassis, level 18). It
+ * stays a cultivation while its project runs (endClass = the proto) and keeps
+ * its spot once built (endClass = furniture_tower_chassis); js/home-tower.js
+ * holds the project and the building. build-homes.mjs leaves it out of the
+ * generated catalog, so it joins the list here.
+ */
+export const TOWER_CULTIVATION = Object.freeze({
+  protoClass: TOWER_PROTO,
+  label: 'Tower',
+  baseCost: TOWER_IMG_COST,
+  minLevel: TOWER_MIN_LEVEL,
+  width: TOWER_WIDTH,
+  endItems: Object.freeze([TOWER_PROTO, TOWER_CHASSIS]),
+  maxWear: 0,
+  kind: 'tower',
+  warning: TOWER_PLACEMENT_WARNING,
+  source: 'items/proto_furniture_tower_chassis.js',
+});
+const ALL_CLASSES = Object.freeze({ ...CULTIVATION_CLASSES, [TOWER_PROTO]: TOWER_CULTIVATION });
+
 export function cultivationDef(protoClass) {
-  return CULTIVATION_CLASSES[protoClass] || null;
+  return ALL_CLASSES[protoClass] || null;
 }
 
 export function listCultivationClasses() {
-  return Object.values(CULTIVATION_CLASSES).sort((a, b) => a.minLevel - b.minLevel || a.baseCost - b.baseCost);
+  return Object.values(ALL_CLASSES).sort((a, b) => a.minLevel - b.minLevel || a.baseCost - b.baseCost);
+}
+
+/** The home street's Tower cultivation (proto or built), if any. */
+export function towerItem(state) {
+  return (state?.items || []).find((row) => row.protoClass === TOWER_PROTO) || null;
 }
 
 function finite(value, fallback = 0) {
@@ -121,7 +155,8 @@ export function worldXFor(state, item) {
 }
 
 export function countCultivations(state, protoClass = null) {
-  return (state?.items || []).filter((row) => !protoClass || row.protoClass === protoClass).length;
+  // cultivation_count_all_items: a built Tower is furniture, not a proto, so it stops counting.
+  return (state?.items || []).filter((row) => (protoClass ? row.protoClass === protoClass : row.endClass !== TOWER_CHASSIS)).length;
 }
 
 /**
@@ -131,6 +166,8 @@ export function countCultivations(state, protoClass = null) {
 export function cultivationCost(state, protoClass) {
   const def = cultivationDef(protoClass);
   if (!def) return 0;
+  // cultivation_get_img_cost: the Tower is always its base_cost.
+  if (def.kind === 'tower') return def.baseCost;
   const all = countCultivations(state);
   const existing = countCultivations(state, protoClass);
   let cost = 1;
@@ -141,7 +178,8 @@ export function cultivationCost(state, protoClass) {
 
 /** cultivation_get_available + level/imagination gates for the Cultivate menu. */
 export function cultivationChoices(state, pc = {}) {
-  return listCultivationClasses().map((def) => {
+  // cultivation_get_available: no Tower choice once one is cultivated or built.
+  return listCultivationClasses().filter((def) => def.kind !== 'tower' || !towerItem(state)).map((def) => {
     const cost = cultivationCost(state, def.protoClass);
     const level = Math.floor(finite(pc.level, 1));
     const img = Math.floor(finite(pc.imagination, 0));
@@ -158,6 +196,7 @@ export function cultivationChoices(state, pc = {}) {
       width: def.width,
       canPlace: !reason,
       reason,
+      warning: def.warning || '',
     };
   });
 }
@@ -211,6 +250,7 @@ export function cultivate(state, pc, protoClass, rx, opts = {}) {
   const def = cultivationDef(protoClass);
   if (!def) return { ok: false, reason: 'invalid', msg: 'Invalid choice.' };
   const choice = cultivationChoices(state, pc).find((row) => row.protoClass === protoClass);
+  if (!choice) return { ok: false, reason: 'full', msg: "You can't place any more of those." };
   if (Math.floor(finite(pc.level, 1)) < def.minLevel) {
     return { ok: false, reason: 'level', msg: `You're not high enough level. Need ${def.minLevel}` };
   }
@@ -218,10 +258,14 @@ export function cultivate(state, pc, protoClass, rx, opts = {}) {
     return { ok: false, reason: 'img', msg: "You don't have enough imagination." };
   }
   if (countCultivations(state) >= MAX_ITEMS) return { ok: false, reason: 'full', msg: "You can't place any more of those." };
+  if (def.kind === 'tower' && towerItem(state)) return { ok: false, reason: 'full', msg: "You can't place any more of those." };
   const fit = placementCheck(state, protoClass, rx);
   if (!fit.ok) return fit;
   const rng = typeof opts.rng === 'function' ? opts.rng : Math.random;
-  const endClass = def.endItems[Math.min(def.endItems.length - 1, Math.floor(rng() * def.endItems.length))];
+  // cultivation_purchase: the Tower places its proto; everything else picks an end item.
+  const endClass = def.kind === 'tower'
+    ? TOWER_PROTO
+    : def.endItems[Math.min(def.endItems.length - 1, Math.floor(rng() * def.endItems.length))];
   pc.imagination = Math.floor(finite(pc.imagination, 0)) - choice.cost;
   const item = {
     id: state.nextId++,
@@ -238,6 +282,8 @@ export function cultivate(state, pc, protoClass, rx, opts = {}) {
 export function removeCultivation(state, id) {
   const item = state.items.find((row) => row.id === Number(id));
   if (!item) return { ok: false, reason: 'missing' };
+  // A finished Tower is a building (furniture_tower_chassis has no remove verb).
+  if (item.endClass === TOWER_CHASSIS) return { ok: false, reason: 'built', msg: 'Your Tower is built; it stays.' };
   state.items = state.items.filter((row) => row !== item);
   delete state.gardens[item.id];
   return { ok: true, item, label: cultivationDef(item.protoClass).label };
