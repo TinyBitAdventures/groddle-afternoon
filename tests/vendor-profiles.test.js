@@ -99,7 +99,7 @@ describe('official street vendor profiles', () => {
     for (const id of ['coffee', 'broccoli', 'seed_broccoli', 'dice', 'lips', 'moon', 'npc_garden_gnome']) {
       assert.equal(existsSync(join(publicDir, `assets/sprites/icons/${id}.png`)), true, id);
     }
-    assert.equal(existsSync(join(publicDir, 'assets/decos/groddle/vendor.png')), true);
+    assert.equal(existsSync(join(publicDir, 'assets/decos/groddle/vendor.webp')), true);
   });
 });
 

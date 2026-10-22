@@ -148,7 +148,7 @@ describe('deco coverage inventory', () => {
     for (const name of ['dirt_platform_short', 'tree_coniferous_fg_1']) {
       if (manifest.includes(name)) {
         assert.ok(
-          existsSync(join(ROOT, `public/assets/decos/groddle/${name}.png`))
+          existsSync(join(ROOT, `public/assets/decos/groddle/${name}.webp`))
         );
       }
     }

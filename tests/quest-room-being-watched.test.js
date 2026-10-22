@@ -60,7 +60,7 @@ describe('Being Watched (stale_but_necessary) source', () => {
   it('ships its icon and the recovered art it draws', () => {
     assert.ok(existsSync(join(root, 'public', room.icon)), room.icon);
     for (const deco of ['cloud_fluffy_1', 'cloud_fluffy_2', 'block_cloud01', 'bureaucratic_hall_tv_1']) {
-      assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${deco}.png`)), deco);
+      assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${deco}.webp`)), deco);
     }
     const art = readFileSync(join(root, 'public/js/quest-rooms/being-watched.js'), 'utf8');
     for (const m of art.matchAll(/`\$\{LEGALIZE\}([^`]+)`/g)) {

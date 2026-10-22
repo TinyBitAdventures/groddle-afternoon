@@ -123,7 +123,7 @@ test('Starlit Night restores its source star field and plain-to-smile moon revea
     'star_asset_02.png',
   ]) {
     assert.equal(
-      fs.existsSync(path.join(publicDir, 'assets', 'decos', 'groddle', asset)),
+      fs.existsSync(path.join(publicDir, 'assets', 'decos', 'groddle', asset.replace(/\.png$/, '.webp'))),
       true,
       `${asset} must exist as clean recovered art`
     );
@@ -151,7 +151,7 @@ test("Slip 'N Slide uses the clean recovered K03 landmarks from the recording", 
   ];
   for (const sprite of sprites) {
     assert.equal(
-      fs.existsSync(path.join(publicDir, 'assets', 'decos', 'groddle', `${sprite}.png`)),
+      fs.existsSync(path.join(publicDir, 'assets', 'decos', 'groddle', `${sprite}.webp`)),
       true,
       `${sprite} must exist as clean recovered art`
     );

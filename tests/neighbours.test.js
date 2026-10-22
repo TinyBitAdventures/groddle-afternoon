@@ -32,6 +32,8 @@ import { SCENE_DECO_SIZES, SCENE_STYLES, neighbourPlatforms, propPlan } from '..
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const DECO = join(root, 'assets/decos/groddle');
+// Logical deco sizes are the source PNGs' (tools/deco-pipeline keeps each WebP at that size).
+const DECO_SRC = join(root, '..', 'assets-src/decos/groddle');
 
 function pngSize(path) {
   const buf = readFileSync(path);
@@ -61,11 +63,11 @@ describe('the neighbours', () => {
 
   it('draw every house and deco at its true recovered size', () => {
     for (const n of NEIGHBOURS) {
-      assert.deepEqual(pngSize(join(DECO, `${n.house.path}.png`)), [n.house.w, n.house.h], n.house.path);
-      for (const prop of n.props) assert.ok(existsSync(join(DECO, `${prop}.png`)), prop);
+      assert.deepEqual(pngSize(join(DECO_SRC, `${n.house.path}.png`)), [n.house.w, n.house.h], n.house.path);
+      for (const prop of n.props) assert.ok(existsSync(join(DECO, `${prop}.webp`)), prop);
     }
     for (const [name, size] of Object.entries(SCENE_DECO_SIZES)) {
-      assert.deepEqual(pngSize(join(DECO, `${name}.png`)), size, name);
+      assert.deepEqual(pngSize(join(DECO_SRC, `${name}.png`)), size, name);
     }
     for (const style of Object.values(SCENE_STYLES)) {
       for (const layer of style.layers) for (const item of layer.items) assert.ok(SCENE_DECO_SIZES[item.s], item.s);

@@ -185,7 +185,7 @@ describe('Juju Hideout room', () => {
     }
     for (const cls of Object.keys(mod.ITEMS)) assert.ok(existsSync(join(ROOT, 'assets', 'sprites', 'icons', `${cls}.png`)), cls);
     for (const d of ['juju_grandma_tent_01a_al1', 'juju_grandma_campfire_01a_al1', 'juju_grandma_papers_01a_al1']) {
-      assert.ok(existsSync(join(ROOT, 'assets', 'decos', 'groddle', `${d}.png`)), d);
+      assert.ok(existsSync(join(ROOT, 'assets', 'decos', 'groddle', `${d}.webp`)), d);
     }
   });
 

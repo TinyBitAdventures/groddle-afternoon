@@ -40,16 +40,17 @@ function uniqueSpritesNeeded() {
   return { need, instances };
 }
 
+/** Deco stems shipped as 2x WebP (tools/deco-pipeline; the @1.5x files are their 3x copies). */
 function pngStemsOnDisk() {
   const stems = new Set();
   for (const name of readdirSync(decoDir)) {
-    if (!name.endsWith('.png')) continue;
+    if (!name.endsWith('.webp') || name.endsWith('@1.5x.webp')) continue;
     const full = join(decoDir, name);
     const st = statSync(full);
-    if (st.size < 50) continue;
+    if (st.size < 30) continue;
     const buf = readFileSync(full);
-    if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) {
-      stems.add(name.replace(/\.png$/, ''));
+    if (buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
+      stems.add(name.replace(/\.webp$/, ''));
     }
   }
   return stems;

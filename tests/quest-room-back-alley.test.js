@@ -106,7 +106,7 @@ describe("We're Off to See the Lizard (fuelmaking_refuel_robot) source", () => {
     for (const f of ['bot_move.png', 'bot_attract.png']) assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/back_alley', f)), f);
     for (const f of ['bot_talk.png']) assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/le_miserable', f)), f);
     for (const d of ['subway_platform_1', 'forest_hole_back', 'ground_forest_terrain_plat_01', 'tree_background_01', 'tree_background_02', 'tree_background_03', 'tree_front_01', 'tree_front_02']) {
-      assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${d}.png`)), d);
+      assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${d}.webp`)), d);
     }
   });
 });

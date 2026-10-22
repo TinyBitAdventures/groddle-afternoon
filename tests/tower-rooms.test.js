@@ -96,7 +96,7 @@ describe('rebuilt tower rooms: street data', () => {
           assert.ok(manifest.has(d.sprite), d.sprite);
         }
       }
-      for (const door of s.doors) assert.ok(existsSync(join(spike, 'public/assets/decos/groddle', `${door.sprite}.png`)), door.sprite);
+      for (const door of s.doors) assert.ok(existsSync(join(spike, 'public/assets/decos/groddle', `${door.sprite}.webp`)), door.sprite);
     }
   });
 

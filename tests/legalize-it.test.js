@@ -153,7 +153,7 @@ test('client integration ships recovered clean quest art and a playable route', 
     'bureaucratic_hall_counter_1.png',
     'bureaucratic_hall_tv_1.png',
   ]) {
-    assert.equal(fs.existsSync(path.join(root, 'public/assets/decos/groddle', file)), true);
+    assert.equal(fs.existsSync(path.join(root, 'public/assets/decos/groddle', file.replace(/\.png$/, '.webp'))), true);
   }
   assert.match(game, /startLegalizeIt/);
   assert.match(game, /handleLegalizeTarget/);

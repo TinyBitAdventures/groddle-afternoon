@@ -154,7 +154,7 @@ describe('The Greedy Street Spirit source-authored story', () => {
     for (const stem of stems) {
       assert.ok(manifest.includes(stem), `${stem} is in the runtime manifest`);
       assert.ok(
-        existsSync(join(PUBLIC, 'assets/decos/groddle', `${stem}.png`)),
+        existsSync(join(PUBLIC, 'assets/decos/groddle', `${stem}.webp`)),
         `${stem} clean PNG exists`
       );
     }

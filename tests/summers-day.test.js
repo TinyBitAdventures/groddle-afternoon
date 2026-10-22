@@ -173,7 +173,7 @@ test('client integration uses recovered clean decos, HUD, buoyancy, and determin
     'vine_rope.png',
   ]) {
     assert.equal(
-      fs.existsSync(path.join(root, 'public/assets/decos/groddle', file)),
+      fs.existsSync(path.join(root, 'public/assets/decos/groddle', file.replace(/\.png$/, '.webp'))),
       true,
       file
     );

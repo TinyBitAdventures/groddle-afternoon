@@ -12,6 +12,7 @@ import {
 } from './street-model.js';
 import { availableStreetTsids } from './street-loader.js';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
+import { decoUrl } from './deco-hires.js';
 
 const DECO_BASE = 'assets/decos/groddle/';
 const PLACEHOLDER = 0x5a7a4a;
@@ -477,8 +478,18 @@ function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
   }
 }
 
-/** Most GPU memory one street may spend on recoloured deco textures. */
+/**
+ * Most memory one street may spend on recoloured deco textures, counted at the decos' logical
+ * size (4 bytes per 2x-art pixel): a 3x deco (js/deco-hires.js) costs 2.25 times this on the GPU,
+ * but takes no more of the budget, so Retina screens keep every layer baked instead of falling
+ * back to a live filter.
+ */
 export const RECOLOUR_BUDGET_BYTES = 192 * 1024 * 1024;
+
+/** Budget bytes for a deco texture: its logical size, whatever resolution its file has. */
+export function recolourBudgetBytes(base) {
+  return Math.ceil(base.width) * Math.ceil(base.height) * 4;
+}
 
 /** A recoloured texture nobody has been near for this long is freed. */
 export const RECOLOUR_EVICT_MS = 12000;
@@ -536,7 +547,7 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
       const base = spr.texture.source;
       if (!isLoaded(spr.texture) || cache.textures.has(`${key}|${base.uid}`) || fresh.has(base)) continue;
       fresh.add(base);
-      bytes += base.pixelWidth * base.pixelHeight * 4;
+      bytes += recolourBudgetBytes(base);
     }
     if (cache.bytes + bytes > RECOLOUR_BUDGET_BYTES) return;
     cache.bytes += bytes;
@@ -548,7 +559,7 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
       const id = `${key}|${base.uid}`;
       let entry = cache.entries.get(id);
       if (!entry) {
-        entry = { id, base, colour, texture: bakeRecolour(PIXI, renderer, base, colour), users: new Set(), seen: now, bytes: base.pixelWidth * base.pixelHeight * 4 };
+        entry = { id, base, colour, texture: bakeRecolour(PIXI, renderer, base, colour), users: new Set(), seen: now, bytes: recolourBudgetBytes(base) };
         cache.entries.set(id, entry);
         cache.textures.set(id, entry.texture);
       }
@@ -880,6 +891,10 @@ export function buildStreetView(street, PIXI, opts = {}) {
   clouds.zIndex = -900;
   if (!skyView) root.addChild(clouds);
 
+  // Layers behind the middleground are distant parallax art, darkened or washed out by their
+  // colour matrix: they load the 2x deco files even where js/deco-hires.js would pick 3x.
+  const middleZ = (street.layers || []).findIndex((layer) => layer.id === 'middleground');
+  const middleLayerZ = middleZ < 0 ? null : (street.layers[middleZ].z ?? middleZ);
   const layerContainers = [];
   const decoViews = new Map();
   const missingSprites = new Set();
@@ -900,6 +915,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
     if (parallax) lc.isRenderGroup = true;
     const colour = colourFilter(PIXI, layer.filters);
     if (colour) lc.filters = [colour];
+    const far = middleLayerZ !== null && (layer.z ?? li) < middleLayerZ;
 
     for (const deco of layer.decos || []) {
       // Archived `middleground` decos use location/world coordinates, while
@@ -919,7 +935,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
         continue;
       }
       const url = `${decoBase}${deco.sprite}.png`;
-      const tex = textureFromUrl(url);
+      const farUrl = far ? decoUrl(url) : null;
+      const tex = farUrl ? textureFromUrl(farUrl, { raw: true }) : textureFromUrl(url);
       const spr = new PIXI.Sprite(tex);
       spr.anchor.set(0.5, 1);
       // h_flip mirrors the deco about its registration point.

@@ -538,7 +538,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=parallax-6';
+} from './js/street-render.js?v=parallax-7';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -753,6 +753,7 @@ import {
 } from './js/sound-moments.js';
 import { moodMax } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js';
+import { installHiresDecos } from './js/deco-hires.js';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
 import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js';
@@ -21621,6 +21622,8 @@ async function main() {
   installHiresIcons(textureUrls);
   // 3x animal sheets from the vector SWFs (js/sprite-hires.js), same frame rects.
   installHiresSprites(textureUrls);
+  // Street decos load as WebP, 3x on Retina (js/deco-hires.js), same logical sizes.
+  installHiresDecos(textureUrls, { renderer: () => app?.renderer });
   app = new PIXI.Application();
   await app.init({
     width: VIEW_W,

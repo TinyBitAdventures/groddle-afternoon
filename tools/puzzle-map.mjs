@@ -35,7 +35,7 @@ for (const acts of Object.values(street.events || {})) {
 
 const browser = await chromium.launch({ args: ['--ignore-certificate-errors'] });
 const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 800, height: 600 } });
-// A file:// page loads the deco PNGs straight from public/ (no server needed).
+// A file:// page loads the deco WebPs (2x) straight from public/ (no server needed).
 const blank = new URL('../shots/.puzzle-map-blank.html', import.meta.url);
 writeFileSync(blank, '<!doctype html><html><body></body></html>');
 await page.goto(blank.href);
@@ -69,7 +69,7 @@ await page.evaluate(async ({ street, triggers, quoins, x0, x1, y0, y1, scale, to
     const im = new Image();
     im.onload = () => { imgs.set(s, im); res(); };
     im.onerror = res;
-    im.src = `${decoBase}${s}.png`;
+    im.src = `${decoBase}${s}.webp`;
   })));
   for (const d of decos) {
     const im = imgs.get(d.sprite);

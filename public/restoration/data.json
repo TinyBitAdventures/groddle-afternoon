@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 246,
+  "commits": 247,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Gentle Island's map reveal, upgrade quoins and side streets"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1510,14 +1515,9 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "Pixi 7.4.2 ships with the game instead of loading from a CDN"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Restoration scorecard for the coverage loop"
    }
   ]
  },
- "tests": 156,
+ "tests": 157,
  "generatedAt": "2026-10-22"
 }

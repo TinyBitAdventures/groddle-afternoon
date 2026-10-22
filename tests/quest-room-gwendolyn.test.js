@@ -200,7 +200,7 @@ describe("Gwendolyn's Task (gwendolyn): source", () => {
     for (const f of ['gwendolyn_icon.png', 'swoonerfly_fall.png', 'swoonerfly_rest.png']) {
       assert.ok(existsSync(pub(`assets/sprites/quest-rooms/gwendolyn/${f}`)), f);
     }
-    for (const d of ['cacti_3', 'trailerhome_1', 'land_l3_mesa_1']) assert.ok(existsSync(pub(`assets/decos/groddle/${d}.png`)), d);
+    for (const d of ['cacti_3', 'trailerhome_1', 'land_l3_mesa_1']) assert.ok(existsSync(pub(`assets/decos/groddle/${d}.webp`)), d);
     assert.ok(existsSync(pub('assets/sprites/icons/gurly_drink.png')));
     assert.ok(existsSync(pub('assets/sprites/icons/random_kindness.png')));
   });

@@ -175,7 +175,7 @@ test('Rooks’ Woods uses a deterministic clean-asset forest with readable depth
   )));
 
   for (const deco of ROOK_FOREST_DECOS) {
-    const asset = path.join(root, 'public/assets/decos/groddle', deco.asset);
+    const asset = path.join(root, 'public/assets/decos/groddle', deco.asset.replace(/\.png$/, '.webp'));
     assert.equal(fs.existsSync(asset), true, `missing clean Rooks’ Woods deco: ${deco.asset}`);
   }
 

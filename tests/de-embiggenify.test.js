@@ -130,7 +130,7 @@ test('client integration uses clean recovered room and item art', () => {
     'k04_cake_01.png',
     'k04_plant_03.png',
   ]) {
-    assert.equal(fs.existsSync(path.join(decoRoot, file)), true);
+    assert.equal(fs.existsSync(path.join(decoRoot, file.replace(/\.png$/, '.webp'))), true);
   }
   assert.equal(fs.existsSync(path.join(root, 'public', EESTI_MUSIC_FILE)), true);
   const ambient = JSON.parse(

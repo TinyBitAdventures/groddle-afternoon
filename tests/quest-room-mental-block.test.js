@@ -74,7 +74,7 @@ describe('Mental Block source', () => {
     for (const f of ['wall_button_lockOut.png', 'wall_button_lockIn.png', 'Teleporter_Base.png', 'Teleporter_Beam.png']) {
       assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/mental_block', f)), f);
     }
-    assert.ok(existsSync(join(root, 'public/assets/decos/groddle/door_asset_gray.png')));
+    assert.ok(existsSync(join(root, 'public/assets/decos/groddle/door_asset_gray.webp')));
     assert.ok(existsSync(join(root, 'public', room.icon)));
   });
 });

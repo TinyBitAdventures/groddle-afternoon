@@ -40,7 +40,8 @@ sys.path.insert(0, os.path.join(SPIKE, 'tools', 'icon-hires'))
 import swfinfo  # noqa: E402
 
 PUBLIC = os.path.join(SPIKE, 'public')
-DECOS = os.path.join(PUBLIC, 'assets', 'decos', 'groddle')
+# The PNGs the game shipped until G31; they are tools/deco-pipeline's sources now (not shipped).
+DECOS = os.path.join(SPIKE, 'assets-src', 'decos', 'groddle')
 STREETS = os.path.join(PUBLIC, 'assets', 'streets')
 LOCATIONS = os.path.expanduser('~/Documents/glitch-audit/research/audio-hunt/raw/glitch-locations/source')
 JAVA = '/opt/homebrew/opt/openjdk@21/bin/java'

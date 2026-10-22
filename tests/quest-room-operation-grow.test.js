@@ -82,8 +82,8 @@ describe('Operation: Grow geometry', () => {
   it('ships its art', () => {
     for (const f of [
       'assets/sprites/soil/patch-dark-dirty.png', 'assets/sprites/soil/patch-seedling.png',
-      'assets/decos/groddle/bling_branchflowerbrush_blue_1.png', 'assets/decos/groddle/mushroom_aqua_1.png',
-      'assets/decos/groddle/firebog_sign_blank_plank.png', 'assets/decos/groddle/underground_bogwillow.png',
+      'assets/decos/groddle/bling_branchflowerbrush_blue_1.webp', 'assets/decos/groddle/mushroom_aqua_1.webp',
+      'assets/decos/groddle/firebog_sign_blank_plank.webp', 'assets/decos/groddle/underground_bogwillow.webp',
       mod.room.icon,
     ]) assert.ok(existsSync(join(root, 'public', f)), f);
   });

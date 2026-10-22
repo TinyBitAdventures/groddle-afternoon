@@ -69,7 +69,7 @@ describe('Smuggle the Smuggler source', () => {
     }
     const src = readFileSync(join(root, 'public/js/quest-rooms/penalty.js'), 'utf8');
     for (const m of src.matchAll(/kit\.deco\(PIXI, '([a-z0-9_]+)'/g)) {
-      assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${m[1]}.png`)), m[1]);
+      assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${m[1]}.webp`)), m[1]);
     }
     for (const f of ['patch-dark-dirty.png', 'patch-dark-dug.png']) assert.ok(existsSync(join(root, 'public/assets/sprites/soil', f)));
   });

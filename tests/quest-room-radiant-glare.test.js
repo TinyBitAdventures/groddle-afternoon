@@ -198,6 +198,6 @@ describe('Radiant Glare (radiant_glare)', () => {
     const lines = walkable(layout, litByTier({}));
     for (const id of ['rg_floor_lamps', 'rg_console', 'rg_totem_slab', 'rg_ledge', 'rg_rainbow_200']) assert.ok(lines.some((l) => l.id === id), id);
     assert.ok(!lines.some((l) => l.id.startsWith('rg_lamps_')), 'no disc while dark');
-    assert.ok(existsSync(join(root, 'public/assets/decos/groddle/sign_exit_starter_01a.png')));
+    assert.ok(existsSync(join(root, 'public/assets/decos/groddle/sign_exit_starter_01a.webp')));
   });
 });

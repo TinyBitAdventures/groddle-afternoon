@@ -121,7 +121,7 @@ describe('An Autumn Day (an_autumn_day): source', () => {
     for (const f of ['crow.png', 'bird_red.png', 'bird_icon.png']) assert.ok(existsSync(pub(`assets/sprites/quest-rooms/an_autumn_day/${f}`)), f);
     assert.ok(existsSync(pub('assets/audio/sfx/AUTUMN_DAY.mp3')));
     for (const d of ['heights_tree_bare_1', 'heights_tree_bare_3', 'tree_bare_tall_1', 'background_ghost_transparent']) {
-      assert.ok(existsSync(pub(`assets/decos/groddle/${d}.png`)), d);
+      assert.ok(existsSync(pub(`assets/decos/groddle/${d}.webp`)), d);
     }
     assert.equal(CAPTION, 'Almost forgot this feeling of …');
   });

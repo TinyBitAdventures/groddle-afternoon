@@ -202,7 +202,7 @@ describe('Join the Club (clubhouse)', () => {
     assert.ok(decos.length > 20);
     for (const d of new Set(decos)) {
       if (d === 'fireplace') continue;
-      assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${d}.png`)), `deco ${d}`);
+      assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${d}.webp`)), `deco ${d}`);
     }
   });
 });

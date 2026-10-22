@@ -12,7 +12,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const decoDir = join(root, 'public/assets/decos/groddle');
+// The audited PNGs are the pipeline's sources since G31 (assets-src, not shipped); see tools/deco-pipeline.
+const decoDir = join(root, 'assets-src/decos/groddle');
 const report = JSON.parse(readFileSync(join(root, 'tools/deco-audit/report.json'), 'utf8'));
 const verdicts = JSON.parse(readFileSync(join(root, 'tools/deco-audit/verdicts.json'), 'utf8'));
 const { flag } = verdicts.rule;

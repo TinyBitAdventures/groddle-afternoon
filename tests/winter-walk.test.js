@@ -84,11 +84,11 @@ test('client ships clean recovered exit art, three-phase routing, snow, and auto
   const css = fs.readFileSync(path.join(publicDir, 'style.css'), 'utf8');
   assert.equal(fs.existsSync(path.join(publicDir, 'assets', 'sprites', 'icons', 'ice.png')), true);
   assert.equal(
-    fs.existsSync(path.join(publicDir, 'assets', 'decos', 'groddle', 'sign_exit_starter_01a.png')),
+    fs.existsSync(path.join(publicDir, 'assets', 'decos', 'groddle', 'sign_exit_starter_01a.webp')),
     true
   );
   assert.equal(
-    fs.existsSync(path.join(publicDir, 'assets', 'decos', 'groddle', 'ladder_interior_4steps.png')),
+    fs.existsSync(path.join(publicDir, 'assets', 'decos', 'groddle', 'ladder_interior_4steps.webp')),
     true
   );
   assert.match(game, /spawnWinterSnow/);
