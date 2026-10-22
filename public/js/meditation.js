@@ -12,14 +12,19 @@
  * - players/player.js: any action other than the meditation verbs interrupts
  *   (moving cancels); get_meditation_bonus() daily limit = 1 x max energy.
  * - players/inc_stats.js stats_add_meditation_today: reaching the daily top
- *   applies the `zen` buff until the next game day (no more meditation energy).
+ *   applied the `zen` buff until the next game day (no more meditation energy).
  * - items/catalog_buffs.js: meditation_cooldown, levitation_by_meditation
  *   (5 s, jetpack, gravity 0.85; on removal a 20 s meditation_cooldown), zen.
  *
- * Source gap: the exported GSJS never calls stats_add_meditation_today (the
- * engine side that fed it is missing), so the remake counts the energy each
- * meditation actually adds against the documented daily top.
+ * The daily top is gone in the final game: @glitchlog 2012-10-31, "Daily
+ * limits on energy gained through meditation have been permanently removed
+ * form the game", and the Dec 2012 GSJS never calls
+ * stats_add_meditation_today, so zen is never applied. The remake still
+ * counts energyToday (stats) but never caps it (MEDITATION_DAILY_LIMIT).
  */
+
+/** No daily cap on meditation energy (see above); dailyEnergyLimit is the pre-2012-10-31 top. */
+export const MEDITATION_DAILY_LIMIT = false;
 
 export const ORB_CLASS = 'focusing_orb';
 
@@ -258,6 +263,7 @@ export function rollMeditationDay(state, dayKey) {
 }
 
 export function hasZen(state, dayKey, tank = DEFAULT_TANK) {
+  if (!MEDITATION_DAILY_LIMIT) return false;
   const s = normalizeMeditationState(state);
   if (dayKey && s.dayKey !== dayKey) return false;
   return s.energyToday >= dailyEnergyLimit(tank);
@@ -431,9 +437,9 @@ export function finishMeditation(state, session, ctx = {}) {
     if (zen) energy = 0;
   }
 
-  // metabolics_add_* clamp to the tank; meditation energy also respects the daily top.
+  // metabolics_add_* clamp to the tank (the daily top was removed 2012-10-31).
   const energyRoom = Math.max(0, tank - (ctx.energy ?? 0));
-  const dailyRoom = Math.max(0, dailyEnergyLimit(tank) - s.energyToday);
+  const dailyRoom = MEDITATION_DAILY_LIMIT ? Math.max(0, dailyEnergyLimit(tank) - s.energyToday) : Infinity;
   const energyGained = Math.min(Math.round(energy), energyRoom, Math.floor(dailyRoom));
   const moodGained = Math.min(Math.round(mood), Math.max(0, (ctx.moodMax || 100) - (ctx.mood ?? 0)));
   const imgGained = Math.round(img);

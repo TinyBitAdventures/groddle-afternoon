@@ -18,6 +18,7 @@ import {
   ORB_TOOL_SHEET,
   createMeditationState,
   dailyEnergyLimit,
+  MEDITATION_DAILY_LIMIT,
   endLevitation,
   finishMeditation,
   focusedCooldownSeconds,
@@ -183,26 +184,29 @@ describe('focused meditation and zen', () => {
     assert.ok(out.events.some((e) => e.counter === 'meditation_gain_24'));
   });
 
-  it('counts meditation energy toward the daily top, then zen blocks focus energy', () => {
+  // @glitchlog 2012-10-31: "Daily limits on energy gained through meditation
+  // have been permanently removed"; the final GSJS never applies zen.
+  it('has no daily top: energy past the old limit still pays and never reaches zen', () => {
+    assert.equal(MEDITATION_DAILY_LIMIT, false);
     const learned = ['meditativearts_3', 'focused_meditation_1'];
     const start = startMeditation({}, 'focus_energy', { learned, rng: fixed(0.9999), now: 0 });
     const out = finishMeditation({ dayKey: 'd', energyToday: 80 }, start.session, {
       learned, now: 25000, energy: 0, dayKey: 'd',
     });
-    assert.equal(out.energy, 20);
-    assert.equal(out.reachedZen, true);
-    assert.equal(hasZen(out.state, 'd'), true);
+    assert.equal(out.energy, 41);
+    assert.equal(out.reachedZen, false);
+    assert.equal(out.state.energyToday, 121);
+    assert.equal(hasZen(out.state, 'd'), false);
     const verbs = listOrbVerbs(out.state, { learned, energy: 50, now: 60000, dayKey: 'd' });
-    assert.equal(verbs.find((v) => v.id === 'focus_energy').reason, MEDITATION_TEXT.zen);
-    assert.equal(hasZen(out.state, 'next-day'), false);
+    assert.equal(verbs.find((v) => v.id === 'focus_energy').reason, '');
   });
 
-  it('zen still lets standing meditation restore mood', () => {
+  it('standing meditation past the old top restores energy and mood', () => {
     const start = startMeditation({}, 'meditate', { learned: MA1, rng: fixed(0.9999), now: 0 });
     const out = finishMeditation({ dayKey: 'd', energyToday: 100 }, start.session, {
-      learned: MA1, now: 16000, dayKey: 'd',
+      learned: MA1, now: 16000, dayKey: 'd', energy: 0,
     });
-    assert.equal(out.energy, 0);
+    assert.equal(out.energy, 12);
     assert.equal(out.mood, 12);
   });
 
