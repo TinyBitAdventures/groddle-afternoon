@@ -72,7 +72,7 @@ function objectSprite(ctx, cls) {
   const { PIXI, kit } = ctx;
   const { x, y } = objectSpot(cls);
   if (cls === 'npc_piggy') {
-    const sheet = kit.animated(PIXI, 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png', 8, 2, { count: 16, speed: 0.12 });
+    const sheet = kit.animated(PIXI, 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png', 8, 3, { count: 24, speed: 0.12 });
     sheet.x = x;
     sheet.y = y + 2;
     sheet.scale.set(0.9);
