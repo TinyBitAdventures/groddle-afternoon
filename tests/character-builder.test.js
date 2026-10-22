@@ -9,6 +9,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   createDefaultAppearance,
+  createGlitchSheetsAppearance,
   createClassicAppearance,
   normalizeAppearance,
   classifyAvatarPixel,
@@ -31,7 +32,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 describe('appearance model', () => {
   it('default + normalize clamps and fills slots', () => {
     const d = createDefaultAppearance();
-    assert.equal(d.bodyStyle, 'glitch');
+    assert.equal(d.bodyStyle, 'vector');
+    assert.equal(createGlitchSheetsAppearance().bodyStyle, 'glitch');
     const classic = createClassicAppearance();
     assert.equal(classic.bodyStyle, 'classic');
     assert.ok(classic.hair.g > classic.hair.r);
@@ -42,13 +44,26 @@ describe('appearance model', () => {
     assert.ok(n.pants);
   });
 
-  it('moves an untouched old default to the Glitch sheets, keeps a customised look', () => {
+  it('moves an untouched old default to the vector Glitch, keeps a customised look', () => {
     const store = new Map();
     const storage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) };
-    saveAppearance(createClassicAppearance(), { storage });
-    assert.equal(loadAppearance({ storage }).bodyStyle, 'glitch');
-    saveAppearance({ ...createClassicAppearance(), hair: { r: 200, g: 50, b: 50 } }, { storage });
+    // v1 saves had no `v`.
+    const v1 = (a) => { const { v, vector, ...rest } = normalizeAppearance(a); return JSON.stringify(rest); };
+    store.set(STORAGE_KEY, v1(createClassicAppearance()));
+    assert.equal(loadAppearance({ storage }).bodyStyle, 'vector');
+    store.set(STORAGE_KEY, v1(createGlitchSheetsAppearance()));
+    assert.equal(loadAppearance({ storage }).bodyStyle, 'vector');
+    store.set(STORAGE_KEY, v1({ ...createClassicAppearance(), hair: { r: 200, g: 50, b: 50 } }));
     assert.equal(loadAppearance({ storage }).bodyStyle, 'classic');
+    // A recoloured recovered-sheets look keeps its colours on the vector outfit.
+    store.set(STORAGE_KEY, v1({ ...createGlitchSheetsAppearance(), shirt: { r: 200, g: 20, b: 30 }, skin: { r: 120, g: 90, b: 60 } }));
+    const moved = loadAppearance({ storage });
+    assert.equal(moved.bodyStyle, 'vector');
+    assert.equal(moved.vector.tint.shirt, 'c8141e');
+    assert.equal(moved.vector.skinTint, '785a3c');
+    // v2 saves load as they are, including a chosen recovered-sheets look.
+    saveAppearance(createGlitchSheetsAppearance(), { storage });
+    assert.equal(loadAppearance({ storage }).bodyStyle, 'glitch');
   });
 
   it('json round-trip and storage mock', () => {
@@ -153,6 +168,8 @@ describe('UI wiring', () => {
     assert.ok(game.includes('character-builder'));
     assert.ok(game.includes('applyPlayerAppearance'));
     assert.ok(game.includes('recolorImageData'));
+    assert.ok(game.includes('renderVectorControls'));
+    assert.ok(game.includes('bakeLook'));
     const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
     assert.ok(css.includes('avatar-swatch'));
   });

@@ -185,9 +185,11 @@
    "group": "world",
    "name": "Your Glitch",
    "status": "source",
-   "blurb": "A real player’s recovered animation sheets: walk, climb, jump, happy, angry, surprised, with a colour builder.",
+   "blurb": "Tiny Speck’s own vector avatar, rebuilt part by part: walk, climb, jump, happy, angry, surprised, with real hair, eyes, mouths, hats and clothes in their original colourways, sharp on Retina.",
    "spot": "player",
    "evidence": [
+    "public/js/avatar-rig.js",
+    "public/js/avatar-compositor.js",
     "public/js/avatar-anims.js",
     "public/js/character-builder.js"
    ],
@@ -1391,9 +1393,14 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 194,
+  "commits": 195,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "Sharp bureaucrats, shrines, Mr. Block, Gwendolyn, Fox Ranger and more on Retina"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1508,14 +1515,9 @@
     "date": "2026-10-21",
     "kind": "new",
     "text": "Join the Club: the treehouse clubhouse and Pintura Prosa"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Camera Mode: press C to look around the street, all of it with Eyeballery"
    }
   ]
  },
- "tests": 138,
+ "tests": 139,
  "generatedAt": "2026-10-22"
 }

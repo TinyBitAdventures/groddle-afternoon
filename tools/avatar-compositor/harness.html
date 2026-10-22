@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Avatar compositor harness</title></head>
+<body>
+<script type="module">
+  // Offline driver for tools/avatar-compositor/build.mjs (render, score).
+  import { prepareLook, sheetLayout, paintSheet, sheetDef, paintPreview, SHEET_ORDER } from '/js/avatar-compositor.js';
+  import { resolveLook } from '/js/avatar-looks.js';
+
+  /** { sheet: { def, 1: dataUrl, 3: dataUrl } } */
+  window.renderLook = async (look, scales = [1, 3], only = null) => {
+    const prep = await prepareLook(look, '/assets/avatar/');
+    const out = {};
+    for (const name of SHEET_ORDER) {
+      if (only && !only.includes(name)) continue;
+      const layout = sheetLayout(prep, name);
+      out[name] = { def: sheetDef(layout, `${name}.png`) };
+      for (const s of scales) out[name][s] = paintSheet(prep, layout, s).toDataURL('image/png');
+    }
+    return out;
+  };
+
+  /** One frame preview as a data URL. */
+  window.renderPreview = async (look, frame = 801, w = 240, h = 320) => {
+    const prep = await prepareLook(look, '/assets/avatar/');
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    paintPreview(prep, c, frame);
+    return c.toDataURL('image/png');
+  };
+
+  window.resolveLook = async (fields) => resolveLook(fields, await (await fetch('/assets/avatar/catalog.json')).json());
+
+  /** Time a full 3x bake of a look (ms). */
+  window.timeBake = async (look, scale = 3) => {
+    const prep = await prepareLook(look, '/assets/avatar/');
+    const t = performance.now();
+    for (const name of SHEET_ORDER) paintSheet(prep, sheetLayout(prep, name), scale);
+    return performance.now() - t;
+  };
+  window.harnessReady = true;
+</script>
+</body>
+</html>

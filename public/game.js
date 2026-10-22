@@ -611,8 +611,12 @@ import {
 import { AVATAR_SHEETS, facingScaleX, facingFromVelocity } from './js/avatar.js';
 import { ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, GLITCH_CROWD, animForState, avatarAnimState, crowdIndexFor, crowdScaleX, frameRef } from './js/avatar-anims.js';
 import { landingY } from './js/walk-surface.js';
+import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js';
+import { bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js';
+import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js';
 import {
   createDefaultAppearance,
+  createGlitchSheetsAppearance,
   createClassicAppearance,
   classifyGlitchPixel,
   loadAppearance,
@@ -826,9 +830,11 @@ const ENTITY_SCALE = {
   trant: SCALE * 0.28,
 };
 
-function glitchSheetDef(name) {
-  const sheet = GLITCH_AVATAR.sheets[name];
-  return { url: `${GLITCH_AVATAR.dir}${sheet.file}`, fw: sheet.fw, fh: sheet.fh, cols: sheet.cells, rows: 1 };
+function glitchSheetDef(name, av = GLITCH_AVATAR) {
+  const sheet = av.sheets[name];
+  // The recovered sheets are one row; the vector sheets wrap into cols x rows.
+  const cols = sheet.cols ?? sheet.cells;
+  return { url: `${av.dir}${sheet.file}`, fw: sheet.fw, fh: sheet.fh, cols, rows: sheet.rows ?? Math.ceil(sheet.cells / cols), frameCount: sheet.cells };
 }
 
 const SHEETS = {
@@ -1037,6 +1043,13 @@ const SHEETS = {
   glitchAvatarAngry: glitchSheetDef('angry'),
   glitchAvatarHappy: glitchSheetDef('happy'),
   glitchAvatarSurprise: glitchSheetDef('surprise'),
+  // The vector Glitch's default look (js/avatar-vector-sheets.js, 3x on first draw).
+  vectorAvatarBase: glitchSheetDef('base', VECTOR_AVATAR),
+  vectorAvatarJump: glitchSheetDef('jump', VECTOR_AVATAR),
+  vectorAvatarClimb: glitchSheetDef('climb', VECTOR_AVATAR),
+  vectorAvatarAngry: glitchSheetDef('angry', VECTOR_AVATAR),
+  vectorAvatarHappy: glitchSheetDef('happy', VECTOR_AVATAR),
+  vectorAvatarSurprise: glitchSheetDef('surprise', VECTOR_AVATAR),
   // Other Glitches' walk sheets (rivals, party guests).
   ...Object.fromEntries(GLITCH_CROWD.map((c, i) => [`glitchCrowd${i}`, { url: c.file, fw: c.fw, fh: c.fh, cols: c.cells, rows: 1 }])),
   avatarStyledAlt: { url: 'assets/sprites/avatar_styled_alt.png', whole: true },
@@ -6161,7 +6174,7 @@ function glitchAnimPack(key, app) {
   };
   if (!loaded.base?.frames?.length) return null;
   // The sheets in their own colours, or recoloured once per look (classifyGlitchPixel regions).
-  const native = key === appearanceCacheKey(createDefaultAppearance());
+  const native = key === appearanceCacheKey(createGlitchSheetsAppearance());
   const sheets = {};
   for (const [name, sheet] of Object.entries(loaded)) {
     const img = sheet?.frames?.[0]?.baseTexture?.resource?.source;
@@ -6179,8 +6192,17 @@ function glitchAnimPack(key, app) {
     g.putImageData(data, 0, 0);
     sheets[name] = { frames: sliceSheet(PIXI.BaseTexture.from(canvas), sheet.def) };
   }
+  return animPackFromSheets(key, sheets, GLITCH_AVATAR);
+}
+
+/**
+ * Sheets laid out like GLITCH_AVATAR (one per animation group, cells in
+ * SHEET_FRAMES order) as an animation pack, each frame anchored on its
+ * sheet's feet.
+ */
+function animPackFromSheets(key, sheets, av) {
   for (const [name, sheet] of Object.entries(sheets)) {
-    const def = GLITCH_AVATAR.sheets[name];
+    const def = av.sheets[name];
     for (const tex of sheet?.frames || []) tex.defaultAnchor.set(def.midX / def.fw, def.feetY / def.fh);
   }
   const toTextures = (list) => list.map((fn) => {
@@ -6192,11 +6214,107 @@ function glitchAnimPack(key, app) {
   return { key, idleFrame: anims.idle0[0], walkFrames: anims.walk2x, anims };
 }
 
+// —— Vector Glitch looks (js/avatar-compositor.js) ——
+/** assets/avatar/catalog.json once loaded (character builder, look resolving). */
+let avatarCatalog = null;
+/** Baked custom looks: lookKey -> { pack?, promise, bases }. Two at most. */
+const vectorBakes = new Map();
+
+/** Device pixels per art pixel decide the bake: 3x like js/sprite-hires.js, else 1x. */
+function vectorBakeScale() {
+  const dpr = window.devicePixelRatio || 1;
+  return dpr * Math.max(1, (window.innerWidth || VIEW_W) / VIEW_W) >= 1.5 ? 3 : 1;
+}
+
+function vectorDefaultPack(key) {
+  const sheets = {
+    base: textures.vectorAvatarBase,
+    jump: textures.vectorAvatarJump,
+    climb: textures.vectorAvatarClimb,
+    angry: textures.vectorAvatarAngry,
+    happy: textures.vectorAvatarHappy,
+    surprise: textures.vectorAvatarSurprise,
+  };
+  if (!sheets.base?.frames?.length) return null;
+  return animPackFromSheets(key, sheets, VECTOR_AVATAR);
+}
+
+let vectorDefaultKey = null;
+/** lookKey of the catalog default (the prerendered sheets). */
+function defaultVectorLookKey() {
+  if (!vectorDefaultKey && avatarCatalog) vectorDefaultKey = lookKey(resolveLook({}, avatarCatalog));
+  return vectorDefaultKey;
+}
+
+/**
+ * A vector look's pack: the prerendered sheets for the default outfit, a
+ * baked pack for any other, or (while it bakes) the default with a pending
+ * key so the finished bake swaps in.
+ */
+function vectorAnimPack(key, app) {
+  if (!avatarCatalog) {
+    const fallback = vectorDefaultPack(`${key}#pending`);
+    if (fallback) fallback.pending = true;
+    return fallback;
+  }
+  const look = resolveLook(app.vector, avatarCatalog);
+  const lk = lookKey(look);
+  if (lk === defaultVectorLookKey()) return vectorDefaultPack(key);
+  let bake = vectorBakes.get(lk);
+  if (bake?.pack) return { ...bake.pack, key };
+  if (!bake) {
+    bake = { promise: null, pack: null, bases: [] };
+    vectorBakes.set(lk, bake);
+    const scale = vectorBakeScale();
+    bake.promise = prepareLook(look)
+      .then((prep) => bakeLook(prep, scale))
+      .then(({ sheets }) => {
+        const loaded = {};
+        const defs = {};
+        for (const [name, sh] of Object.entries(sheets)) {
+          const base = PIXI.BaseTexture.from(sh.canvas, { resolution: scale, scaleMode: PIXI.SCALE_MODES.LINEAR });
+          bake.bases.push(base);
+          defs[name] = sh.def;
+          loaded[name] = { frames: sliceSheet(base, { fw: sh.def.fw, fh: sh.def.fh, cols: sh.def.cols, rows: sh.def.rows }, sh.def.cells) };
+        }
+        bake.pack = animPackFromSheets(lk, loaded, { sheets: defs });
+        trimVectorBakes(lk);
+        // The player may have moved on to another look while this baked.
+        if (appearanceCacheKey(playerAppearance) === key || (player && player.appearanceKey === `${key}#pending`)) applyPlayerAppearance();
+      })
+      .catch((err) => {
+        vectorBakes.delete(lk);
+        console.warn('avatar bake failed', err);
+      });
+  }
+  const pending = vectorDefaultPack(`${key}#pending`);
+  if (pending) pending.pending = true;
+  return pending;
+}
+
+/** Keep the newest bake and the player's current one; free the rest. */
+function trimVectorBakes(keep) {
+  for (const [lk, bake] of vectorBakes) {
+    if (vectorBakes.size <= 2) break;
+    if (lk === keep || !bake.pack || player?.anims === bake.pack.anims) continue;
+    for (const [k, p] of appearanceTexCache) if (p.anims === bake.pack.anims) appearanceTexCache.delete(k);
+    for (const base of bake.bases) base.destroy();
+    vectorBakes.delete(lk);
+  }
+}
+
 function getAppearanceTextures(appearance) {
   const app = normalizeAppearance(appearance);
   const key = appearanceCacheKey(app);
   if (appearanceTexCache.has(key)) return appearanceTexCache.get(key);
-  if (app.bodyStyle === 'glitch') {
+  if (app.bodyStyle === 'vector') {
+    const pack = vectorAnimPack(key, app);
+    if (pack) {
+      if (!pack.pending) appearanceTexCache.set(key, pack);
+      return pack;
+    }
+  }
+  if (app.bodyStyle === 'glitch' || app.bodyStyle === 'vector') {
     const pack = glitchAnimPack(key, app);
     if (pack) {
       appearanceTexCache.set(key, pack);
@@ -6392,6 +6510,24 @@ function openAvatarPanel() {
 function closeAvatarPanel() {
   const panel = document.getElementById('avatar-panel');
   if (panel) panel.hidden = true;
+  stopAvatarPreviewLoop();
+}
+
+/** Builder tabs: colour slots for the older looks, parts for the vector Glitch. */
+const CLASSIC_BUILDER_TABS = [['hair', 'Hair'], ['skin', 'Skin'], ['shirt', 'Shirt'], ['pants', 'Pants'], ['shoes', 'Shoes']];
+const VECTOR_BUILDER_TABS = [['hair', 'Hair'], ['face', 'Face'], ['skin', 'Skin'], ['top', 'Top'], ['bottom', 'Bottom'], ['shoes', 'Shoes'], ['hat', 'Hat']];
+/** Which article types each vector tab edits, with section titles. */
+const VECTOR_TAB_TYPES = {
+  hair: [['hair', 'Hair style']],
+  face: [['eyes', 'Eyes'], ['mouth', 'Mouth'], ['nose', 'Nose'], ['ears', 'Ears']],
+  top: [['shirt', 'Top'], ['dress', 'Dress']],
+  bottom: [['pants', 'Trousers'], ['skirt', 'Skirt']],
+  shoes: [['shoes', 'Shoes']],
+  hat: [['hat', 'Hat']],
+};
+
+function isVectorLook(app = playerAppearance) {
+  return app.bodyStyle === 'vector';
 }
 
 function renderAvatarBuilder() {
@@ -6406,7 +6542,7 @@ function renderAvatarBuilder() {
       btn.dataset.preset = p.id;
       btn.addEventListener('click', () => {
         playerAppearance = normalizeAppearance(p.appearance);
-        renderAvatarSwatches();
+        renderAvatarBuilder();
         paintAvatarPreview();
         presetsEl.querySelectorAll('.avatar-preset-chip').forEach((c) => {
           c.classList.toggle('active', c.dataset.preset === p.id);
@@ -6415,16 +6551,44 @@ function renderAvatarBuilder() {
       presetsEl.appendChild(btn);
     }
   }
-
+  const tabsEl = document.getElementById('avatar-tabs');
+  const tabs = isVectorLook() ? VECTOR_BUILDER_TABS : CLASSIC_BUILDER_TABS;
+  if (!tabs.some(([slot]) => slot === avatarBuilderSlot)) avatarBuilderSlot = tabs[0][0];
+  if (tabsEl && tabsEl.dataset.set !== (isVectorLook() ? 'vector' : 'classic')) {
+    tabsEl.dataset.set = isVectorLook() ? 'vector' : 'classic';
+    tabsEl.innerHTML = '';
+    for (const [slot, label] of tabs) {
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'avatar-tab';
+      tab.dataset.slot = slot;
+      tab.setAttribute('role', 'tab');
+      tab.textContent = label;
+      tabsEl.appendChild(tab);
+    }
+  }
   document.querySelectorAll('.avatar-tab').forEach((tab) => {
-    tab.classList.toggle('active', tab.dataset.slot === avatarBuilderSlot);
+    const active = tab.dataset.slot === avatarBuilderSlot;
+    tab.classList.toggle('active', active);
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
   });
+  const meta = document.querySelector('#avatar-panel .panel-meta');
+  if (meta) {
+    meta.textContent = isVectorLook()
+      ? 'Pick hair, face, clothes and colours from the original Glitch wardrobe. Saved on this device.'
+      : 'Pick colors for hair, skin, shirt, pants, and shoes. Saved on this device.';
+  }
   renderAvatarSwatches();
 }
 
 function renderAvatarSwatches() {
   const box = document.getElementById('avatar-swatches');
   if (!box) return;
+  if (isVectorLook()) {
+    renderVectorControls(box);
+    return;
+  }
+  box.dataset.mode = 'colors';
   const slot = avatarBuilderSlot;
   const list = COLOR_SWATCHES[slot] || COLOR_SWATCHES.hair;
   const current = playerAppearance[slot] || playerAppearance.hair;
@@ -6462,9 +6626,176 @@ function renderAvatarSwatches() {
   }
 }
 
+/** Update the vector look's saved fields and refresh the builder. */
+function setVectorFields(mutate) {
+  const v = JSON.parse(JSON.stringify(playerAppearance.vector || {}));
+  mutate(v);
+  playerAppearance = normalizeAppearance({ ...playerAppearance, bodyStyle: 'vector', vector: v });
+  document.querySelectorAll('.avatar-preset-chip').forEach((c) => c.classList.remove('active'));
+  renderAvatarSwatches();
+  paintAvatarPreview();
+}
+
+/** The article name a vector look shows for a type (saved, else the catalog default). */
+function vectorPartName(type) {
+  const look = avatarCatalog ? resolveLook(playerAppearance.vector, avatarCatalog) : null;
+  return look?.outfit?.[type]?.name || 'none';
+}
+
+function sectionTitle(text) {
+  const h = document.createElement('div');
+  h.className = 'avatar-section-title';
+  h.textContent = text;
+  return h;
+}
+
+function renderVectorControls(box) {
+  box.dataset.mode = 'parts';
+  box.innerHTML = '';
+  if (!avatarCatalog) {
+    box.appendChild(sectionTitle('Loading the wardrobe…'));
+    loadAvatarCatalog().then((c) => { avatarCatalog = c; renderAvatarSwatches(); paintAvatarPreview(); }).catch(() => {});
+    return;
+  }
+  const tab = avatarBuilderSlot;
+  if (tab === 'skin' || tab === 'hair') {
+    if (tab === 'hair') renderStyleChips(box, 'hair', 'Hair style');
+    const slot = tab;
+    box.appendChild(sectionTitle(tab === 'skin' ? 'Skin colour' : 'Hair colour'));
+    const row = document.createElement('div');
+    row.className = 'avatar-palette';
+    const key = tab === 'skin' ? 'skinColor' : 'hairColor';
+    const currentId = playerAppearance.vector?.[key] ?? (playerAppearance.vector?.[`${slot}Tint`] ? null : avatarCatalog.defaultLook?.[key]);
+    for (const p of avatarCatalog.palettes[slot] || []) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'avatar-swatch avatar-swatch-small';
+      btn.style.background = `#${p.color}`;
+      btn.title = `#${p.color}`;
+      btn.setAttribute('aria-label', `${tab} colour ${p.color}`);
+      if (p.id === currentId) btn.classList.add('active');
+      btn.addEventListener('click', () => setVectorFields((v) => { v[key] = p.id; delete v[`${slot}Tint`]; }));
+      row.appendChild(btn);
+    }
+    box.appendChild(row);
+    return;
+  }
+  for (const [type, title] of VECTOR_TAB_TYPES[tab] || []) renderStyleChips(box, type, title);
+}
+
+/** Style chips for one article type, then the chosen article's colourways. */
+function renderStyleChips(box, type, title) {
+  const items = avatarCatalog.types[type] || [];
+  if (!items.length) return;
+  box.appendChild(sectionTitle(title));
+  const row = document.createElement('div');
+  row.className = 'avatar-style-row';
+  const current = vectorPartName(type);
+  const optional = ['hat', 'dress', 'skirt', 'nose', 'ears'].includes(type);
+  const options = optional ? [{ name: 'none', label: 'None' }, ...items] : items;
+  for (const item of options) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'avatar-style-chip';
+    btn.textContent = item.label;
+    btn.dataset.type = type;
+    btn.dataset.name = item.name;
+    if (item.name === current) btn.classList.add('active');
+    btn.addEventListener('click', () => setVectorFields((v) => {
+      v.outfit = v.outfit || {};
+      v.outfit[type] = item.name;
+      if (v.variant) delete v.variant[type];
+      if (v.tint) delete v.tint[type];
+      // A dress replaces top and trousers; a skirt replaces trousers (AvatarSwf: skirt excludes dress).
+      if (type === 'dress' && item.name !== 'none') { v.outfit.skirt = 'none'; v.outfit.pants = 'none'; v.outfit.shirt = 'none'; }
+      if (type === 'skirt' && item.name !== 'none') { v.outfit.pants = 'none'; v.outfit.dress = 'none'; }
+      if ((type === 'shirt' || type === 'pants') && item.name !== 'none') v.outfit.dress = 'none';
+      if (type === 'pants' && item.name !== 'none') v.outfit.skirt = 'none';
+    }));
+    row.appendChild(btn);
+  }
+  box.appendChild(row);
+  const item = catalogItem(avatarCatalog, type, current);
+  if (type === 'hat' && item && vectorPartName('hair') !== 'none' && !avatarCatalog.hatHair?.[item.name]?.includes(vectorPartName('hair'))) {
+    const note = document.createElement('p');
+    note.className = 'avatar-note';
+    note.textContent = 'This hat hides your hair.';
+    box.appendChild(note);
+  }
+  if (!item?.variants || item.variants.length < 2) return;
+  const swatches = document.createElement('div');
+  swatches.className = 'avatar-palette';
+  const chosen = playerAppearance.vector?.variant?.[type] ?? (item.name === (avatarCatalog.defaultLook?.outfit?.[type]) ? avatarCatalog.defaultLook?.variant?.[type] ?? 0 : 0);
+  const tinted = playerAppearance.vector?.tint?.[type] ?? (playerAppearance.vector?.variant?.[type] === undefined && item.name === avatarCatalog.defaultLook?.outfit?.[type] ? avatarCatalog.defaultLook?.tint?.[type] : null);
+  item.variants.forEach((variant, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'avatar-swatch avatar-swatch-small';
+    btn.style.background = `#${variantSwatch(variant.colors)}`;
+    btn.setAttribute('aria-label', `${item.label} colourway ${i + 1}`);
+    if (i === chosen && !tinted) btn.classList.add('active');
+    btn.addEventListener('click', () => setVectorFields((v) => {
+      v.variant = v.variant || {};
+      v.variant[type] = i;
+      if (v.tint) delete v.tint[type];
+    }));
+    swatches.appendChild(btn);
+  });
+  box.appendChild(swatches);
+}
+
+// —— Builder preview ——
+let avatarPreviewRun = 0;
+let avatarPreviewTimer = 0;
+
+function stopAvatarPreviewLoop() {
+  avatarPreviewRun += 1;
+  if (avatarPreviewTimer) clearInterval(avatarPreviewTimer);
+  avatarPreviewTimer = 0;
+}
+
+/** The vector preview: the look walking in place, sharp at the device's pixel ratio. */
+async function paintVectorAvatarPreview(canvas) {
+  stopAvatarPreviewLoop();
+  const run = avatarPreviewRun;
+  const dpr = Math.min(3, window.devicePixelRatio || 1);
+  // style.css sizes the preview box; fill it at device pixels.
+  const cssW = canvas.clientWidth || 140;
+  const cssH = canvas.clientHeight || 200;
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  if (!avatarCatalog) avatarCatalog = await loadAvatarCatalog().catch(() => null);
+  if (!avatarCatalog || run !== avatarPreviewRun) return;
+  let prep;
+  try {
+    prep = await prepareLook(resolveLook(playerAppearance.vector, avatarCatalog));
+  } catch (err) {
+    console.warn('avatar preview failed', err);
+    return;
+  }
+  if (run !== avatarPreviewRun) return;
+  const frames = ANIMS.walk2x;
+  let i = 0;
+  const step = () => {
+    if (run !== avatarPreviewRun) return;
+    paintVectorPreview(prep, canvas, avatarPreviewWalking ? frames[i % frames.length] : 801, { pad: 8 * dpr, boundsFrame: 801 });
+    canvas.dataset.previewFrame = String(avatarPreviewWalking ? frames[i % frames.length] : 801);
+    i += 1;
+  };
+  step();
+  avatarPreviewTimer = setInterval(step, 1000 / 15);
+}
+/** The preview walks unless reduced motion is asked for. */
+const avatarPreviewWalking = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
 function paintAvatarPreview() {
   const canvas = document.getElementById('avatar-preview');
   if (!canvas) return;
+  if (isVectorLook()) {
+    paintVectorAvatarPreview(canvas);
+    return;
+  }
+  stopAvatarPreviewLoop();
   const ctx = canvas.getContext('2d');
   const sheets = resolveBodySheets(playerAppearance);
   const img = new Image();
@@ -6482,7 +6813,7 @@ function paintAvatarPreview() {
       cell.height = base.fh;
       const cg = cell.getContext('2d');
       cg.drawImage(img, base.fw * 14, 0, base.fw, base.fh, 0, 0, base.fw, base.fh);
-      if (appearanceCacheKey(playerAppearance) !== appearanceCacheKey(createDefaultAppearance())) {
+      if (appearanceCacheKey(playerAppearance) !== appearanceCacheKey(createGlitchSheetsAppearance())) {
         const id = cg.getImageData(0, 0, base.fw, base.fh);
         recolorImageData(id.data, base.fw, base.fh, playerAppearance, classifyGlitchPixel);
         cg.putImageData(id, 0, 0);
@@ -21072,6 +21403,8 @@ async function main() {
   if (typeof ResizeObserver === 'function') new ResizeObserver(() => syncRenderResolution()).observe(app.view);
 
   await loadSheets();
+  // The vector avatar's catalog (looks, colourways); the default look's sheets are already loaded.
+  avatarCatalog = await loadAvatarCatalog().catch(() => null);
   await loadTrantTables();
   await loadAudio();
   features.init(engine);
@@ -22619,7 +22952,10 @@ async function main() {
     if (e.target?.id === 'avatar-panel') closeAvatarPanel();
   });
   document.getElementById('avatar-random')?.addEventListener('click', () => {
-    playerAppearance = randomAppearance();
+    // A vector look draws from the wardrobe; the older looks pick random colours.
+    playerAppearance = isVectorLook() && avatarCatalog
+      ? normalizeAppearance({ ...playerAppearance, vector: randomVectorFields(avatarCatalog) })
+      : randomAppearance();
     renderAvatarBuilder();
     paintAvatarPreview();
   });
@@ -22629,11 +22965,12 @@ async function main() {
     paintAvatarPreview();
   });
   document.getElementById('avatar-apply')?.addEventListener('click', commitAvatarAppearance);
-  document.querySelectorAll('.avatar-tab').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      avatarBuilderSlot = tab.dataset.slot || 'hair';
-      renderAvatarBuilder();
-    });
+  // Tabs are rebuilt per look style, so listen on their row.
+  document.getElementById('avatar-tabs')?.addEventListener('click', (e) => {
+    const tab = e.target?.closest?.('.avatar-tab');
+    if (!tab) return;
+    avatarBuilderSlot = tab.dataset.slot || 'hair';
+    renderAvatarBuilder();
   });
   document.getElementById('mute-btn')?.addEventListener('click', async () => {
     state.muted = !state.muted;

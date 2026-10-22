@@ -8,6 +8,12 @@
 export const HIRES_SPRITES = new Map([
   ["assets/sprites/animals/npc_batterfly_chew.webp", "assets/sprites/animals/npc_batterfly_chew@3x.webp"],
   ["assets/sprites/animals/npc_batterfly_profile.webp", "assets/sprites/animals/npc_batterfly_profile@3x.webp"],
+  ["assets/sprites/avatar/vector/angry.webp", "assets/sprites/avatar/vector/angry@3x.webp"],
+  ["assets/sprites/avatar/vector/base.webp", "assets/sprites/avatar/vector/base@3x.webp"],
+  ["assets/sprites/avatar/vector/climb.webp", "assets/sprites/avatar/vector/climb@3x.webp"],
+  ["assets/sprites/avatar/vector/happy.webp", "assets/sprites/avatar/vector/happy@3x.webp"],
+  ["assets/sprites/avatar/vector/jump.webp", "assets/sprites/avatar/vector/jump@3x.webp"],
+  ["assets/sprites/avatar/vector/surprise.webp", "assets/sprites/avatar/vector/surprise@3x.webp"],
   ["assets/sprites/foxes/bait-bait1.png", "assets/sprites/foxes/bait-bait1@3x.webp"],
   ["assets/sprites/foxes/bait-bait2.png", "assets/sprites/foxes/bait-bait2@3x.webp"],
   ["assets/sprites/foxes/bait-bait3.png", "assets/sprites/foxes/bait-bait3@3x.webp"],
@@ -145,6 +151,12 @@ export const HIRES_SPRITES = new Map([
  * installHiresFirstDraw swaps them in place on first upload.
  */
 export const FIRST_DRAW_SPRITES = new Set([
+  "assets/sprites/avatar/vector/angry.webp",
+  "assets/sprites/avatar/vector/base.webp",
+  "assets/sprites/avatar/vector/climb.webp",
+  "assets/sprites/avatar/vector/happy.webp",
+  "assets/sprites/avatar/vector/jump.webp",
+  "assets/sprites/avatar/vector/surprise.webp",
   "assets/sprites/foxes/bait-bait1.png",
   "assets/sprites/foxes/bait-bait2.png",
   "assets/sprites/foxes/bait-bait3.png",

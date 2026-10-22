@@ -1,0 +1,1011 @@
+{
+ "reference": "62d8dab1",
+ "sheets": {
+  "base": {
+   "pass": true,
+   "mean": 0.9738,
+   "min": 0.9697,
+   "offset": [
+    -14,
+    -4
+   ],
+   "expected": [
+    -13,
+    -6
+   ],
+   "drift": [],
+   "unmatched": [],
+   "frames": [
+    {
+     "swf": 103,
+     "score": 0.9733,
+     "own": null,
+     "bestMatch": 103,
+     "matched": true
+    },
+    {
+     "swf": 104,
+     "score": 0.9703,
+     "own": null,
+     "bestMatch": 104,
+     "matched": true
+    },
+    {
+     "swf": 105,
+     "score": 0.9729,
+     "own": null,
+     "bestMatch": 105,
+     "matched": true
+    },
+    {
+     "swf": 106,
+     "score": 0.9728,
+     "own": null,
+     "bestMatch": 106,
+     "matched": true
+    },
+    {
+     "swf": 107,
+     "score": 0.9782,
+     "own": null,
+     "bestMatch": 107,
+     "matched": true
+    },
+    {
+     "swf": 108,
+     "score": 0.9777,
+     "own": null,
+     "bestMatch": 108,
+     "matched": true
+    },
+    {
+     "swf": 109,
+     "score": 0.9697,
+     "own": null,
+     "bestMatch": 109,
+     "matched": true
+    },
+    {
+     "swf": 110,
+     "score": 0.974,
+     "own": null,
+     "bestMatch": 110,
+     "matched": true
+    },
+    {
+     "swf": 111,
+     "score": 0.9772,
+     "own": null,
+     "bestMatch": 111,
+     "matched": true
+    },
+    {
+     "swf": 112,
+     "score": 0.9759,
+     "own": null,
+     "bestMatch": 112,
+     "matched": true
+    },
+    {
+     "swf": 113,
+     "score": 0.9733,
+     "own": null,
+     "bestMatch": 113,
+     "matched": true
+    },
+    {
+     "swf": 114,
+     "score": 0.9715,
+     "own": null,
+     "bestMatch": 114,
+     "matched": true
+    },
+    {
+     "swf": 489,
+     "score": 0.9722,
+     "own": null,
+     "bestMatch": 489,
+     "matched": true
+    },
+    {
+     "swf": 490,
+     "score": 0.9708,
+     "own": null,
+     "bestMatch": 490,
+     "matched": true
+    },
+    {
+     "swf": 801,
+     "score": 0.9775,
+     "own": null,
+     "bestMatch": 801,
+     "matched": true
+    }
+   ]
+  },
+  "jump": {
+   "pass": true,
+   "mean": 0.9756,
+   "min": 0.9702,
+   "offset": [
+    0,
+    -7
+   ],
+   "expected": [
+    6,
+    -10
+   ],
+   "drift": [],
+   "unmatched": [],
+   "frames": [
+    {
+     "swf": 192,
+     "score": 0.9759,
+     "own": null,
+     "bestMatch": 192,
+     "matched": true
+    },
+    {
+     "swf": 193,
+     "score": 0.9705,
+     "own": null,
+     "bestMatch": 193,
+     "matched": true
+    },
+    {
+     "swf": 194,
+     "score": 0.9736,
+     "own": null,
+     "bestMatch": 194,
+     "matched": true
+    },
+    {
+     "swf": 195,
+     "score": 0.974,
+     "own": null,
+     "bestMatch": 195,
+     "matched": true
+    },
+    {
+     "swf": 196,
+     "score": 0.9753,
+     "own": null,
+     "bestMatch": 196,
+     "matched": true
+    },
+    {
+     "swf": 197,
+     "score": 0.9785,
+     "own": null,
+     "bestMatch": 197,
+     "matched": true
+    },
+    {
+     "swf": 198,
+     "score": 0.9788,
+     "own": null,
+     "bestMatch": 198,
+     "matched": true
+    },
+    {
+     "swf": 199,
+     "score": 0.9772,
+     "own": null,
+     "bestMatch": 199,
+     "matched": true
+    },
+    {
+     "swf": 200,
+     "score": 0.9785,
+     "own": null,
+     "bestMatch": 200,
+     "matched": true
+    },
+    {
+     "swf": 201,
+     "score": 0.9787,
+     "own": null,
+     "bestMatch": 201,
+     "matched": true
+    },
+    {
+     "swf": 202,
+     "score": 0.978,
+     "own": null,
+     "bestMatch": 202,
+     "matched": true
+    },
+    {
+     "swf": 203,
+     "score": 0.9732,
+     "own": null,
+     "bestMatch": 202,
+     "matched": true
+    },
+    {
+     "swf": 204,
+     "score": 0.9737,
+     "own": null,
+     "bestMatch": 203,
+     "matched": true
+    },
+    {
+     "swf": 205,
+     "score": 0.9763,
+     "own": null,
+     "bestMatch": 202,
+     "matched": true
+    },
+    {
+     "swf": 206,
+     "score": 0.9702,
+     "own": null,
+     "bestMatch": 206,
+     "matched": true
+    },
+    {
+     "swf": 207,
+     "score": 0.9753,
+     "own": null,
+     "bestMatch": 207,
+     "matched": true
+    },
+    {
+     "swf": 208,
+     "score": 0.9739,
+     "own": null,
+     "bestMatch": 208,
+     "matched": true
+    },
+    {
+     "swf": 209,
+     "score": 0.9767,
+     "own": null,
+     "bestMatch": 209,
+     "matched": true
+    },
+    {
+     "swf": 210,
+     "score": 0.9758,
+     "own": null,
+     "bestMatch": 210,
+     "matched": true
+    },
+    {
+     "swf": 211,
+     "score": 0.9758,
+     "own": null,
+     "bestMatch": 211,
+     "matched": true
+    },
+    {
+     "swf": 212,
+     "score": 0.9767,
+     "own": null,
+     "bestMatch": 212,
+     "matched": true
+    },
+    {
+     "swf": 213,
+     "score": 0.9751,
+     "own": null,
+     "bestMatch": 213,
+     "matched": true
+    },
+    {
+     "swf": 214,
+     "score": 0.9719,
+     "own": null,
+     "bestMatch": 214,
+     "matched": true
+    },
+    {
+     "swf": 215,
+     "score": 0.9747,
+     "own": null,
+     "bestMatch": 215,
+     "matched": true
+    },
+    {
+     "swf": 216,
+     "score": 0.9722,
+     "own": null,
+     "bestMatch": 216,
+     "matched": true
+    },
+    {
+     "swf": 217,
+     "score": 0.9763,
+     "own": null,
+     "bestMatch": 217,
+     "matched": true
+    },
+    {
+     "swf": 218,
+     "score": 0.9749,
+     "own": null,
+     "bestMatch": 218,
+     "matched": true
+    },
+    {
+     "swf": 219,
+     "score": 0.975,
+     "own": null,
+     "bestMatch": 219,
+     "matched": true
+    },
+    {
+     "swf": 220,
+     "score": 0.9779,
+     "own": null,
+     "bestMatch": 220,
+     "matched": true
+    },
+    {
+     "swf": 221,
+     "score": 0.9784,
+     "own": null,
+     "bestMatch": 221,
+     "matched": true
+    },
+    {
+     "swf": 222,
+     "score": 0.9768,
+     "own": null,
+     "bestMatch": 224,
+     "matched": true
+    },
+    {
+     "swf": 223,
+     "score": 0.9768,
+     "own": null,
+     "bestMatch": 224,
+     "matched": true
+    },
+    {
+     "swf": 224,
+     "score": 0.9784,
+     "own": null,
+     "bestMatch": 224,
+     "matched": true
+    }
+   ]
+  },
+  "climb": {
+   "pass": true,
+   "mean": 0.9702,
+   "min": 0.9649,
+   "offset": [
+    20,
+    -4
+   ],
+   "expected": [
+    31,
+    -9
+   ],
+   "drift": [],
+   "unmatched": [],
+   "frames": [
+    {
+     "swf": 1145,
+     "score": 0.9686,
+     "own": null,
+     "bestMatch": 1163,
+     "matched": true
+    },
+    {
+     "swf": 1146,
+     "score": 0.9694,
+     "own": null,
+     "bestMatch": 1146,
+     "matched": true
+    },
+    {
+     "swf": 1147,
+     "score": 0.9735,
+     "own": null,
+     "bestMatch": 1147,
+     "matched": true
+    },
+    {
+     "swf": 1148,
+     "score": 0.9729,
+     "own": null,
+     "bestMatch": 1148,
+     "matched": true
+    },
+    {
+     "swf": 1149,
+     "score": 0.9712,
+     "own": null,
+     "bestMatch": 1149,
+     "matched": true
+    },
+    {
+     "swf": 1150,
+     "score": 0.9704,
+     "own": null,
+     "bestMatch": 1150,
+     "matched": true
+    },
+    {
+     "swf": 1151,
+     "score": 0.9732,
+     "own": null,
+     "bestMatch": 1151,
+     "matched": true
+    },
+    {
+     "swf": 1152,
+     "score": 0.9649,
+     "own": null,
+     "bestMatch": 1152,
+     "matched": true
+    },
+    {
+     "swf": 1153,
+     "score": 0.9694,
+     "own": null,
+     "bestMatch": 1154,
+     "matched": true
+    },
+    {
+     "swf": 1154,
+     "score": 0.9694,
+     "own": null,
+     "bestMatch": 1154,
+     "matched": true
+    },
+    {
+     "swf": 1155,
+     "score": 0.9649,
+     "own": null,
+     "bestMatch": 1155,
+     "matched": true
+    },
+    {
+     "swf": 1156,
+     "score": 0.971,
+     "own": null,
+     "bestMatch": 1156,
+     "matched": true
+    },
+    {
+     "swf": 1157,
+     "score": 0.9723,
+     "own": null,
+     "bestMatch": 1157,
+     "matched": true
+    },
+    {
+     "swf": 1158,
+     "score": 0.9703,
+     "own": null,
+     "bestMatch": 1158,
+     "matched": true
+    },
+    {
+     "swf": 1159,
+     "score": 0.975,
+     "own": null,
+     "bestMatch": 1159,
+     "matched": true
+    },
+    {
+     "swf": 1160,
+     "score": 0.9704,
+     "own": null,
+     "bestMatch": 1160,
+     "matched": true
+    },
+    {
+     "swf": 1161,
+     "score": 0.9669,
+     "own": null,
+     "bestMatch": 1161,
+     "matched": true
+    },
+    {
+     "swf": 1162,
+     "score": 0.9688,
+     "own": null,
+     "bestMatch": 1163,
+     "matched": true
+    },
+    {
+     "swf": 1163,
+     "score": 0.9708,
+     "own": null,
+     "bestMatch": 1163,
+     "matched": true
+    }
+   ]
+  },
+  "angry": {
+   "pass": true,
+   "mean": 0.9751,
+   "min": 0.9713,
+   "offset": [
+    9,
+    -6
+   ],
+   "expected": [
+    14,
+    -9
+   ],
+   "drift": [],
+   "unmatched": [],
+   "frames": [
+    {
+     "swf": 625,
+     "score": 0.9774,
+     "own": null,
+     "bestMatch": 625,
+     "matched": true
+    },
+    {
+     "swf": 626,
+     "score": 0.9725,
+     "own": null,
+     "bestMatch": 626,
+     "matched": true
+    },
+    {
+     "swf": 627,
+     "score": 0.9753,
+     "own": null,
+     "bestMatch": 627,
+     "matched": true
+    },
+    {
+     "swf": 628,
+     "score": 0.9773,
+     "own": null,
+     "bestMatch": 628,
+     "matched": true
+    },
+    {
+     "swf": 629,
+     "score": 0.9772,
+     "own": null,
+     "bestMatch": 629,
+     "matched": true
+    },
+    {
+     "swf": 630,
+     "score": 0.9763,
+     "own": null,
+     "bestMatch": 630,
+     "matched": true
+    },
+    {
+     "swf": 631,
+     "score": 0.9728,
+     "own": null,
+     "bestMatch": 630,
+     "matched": true
+    },
+    {
+     "swf": 632,
+     "score": 0.9724,
+     "own": null,
+     "bestMatch": 632,
+     "matched": true
+    },
+    {
+     "swf": 633,
+     "score": 0.9771,
+     "own": null,
+     "bestMatch": 633,
+     "matched": true
+    },
+    {
+     "swf": 634,
+     "score": 0.9713,
+     "own": null,
+     "bestMatch": 637,
+     "matched": true
+    },
+    {
+     "swf": 635,
+     "score": 0.975,
+     "own": null,
+     "bestMatch": 635,
+     "matched": true
+    },
+    {
+     "swf": 636,
+     "score": 0.975,
+     "own": null,
+     "bestMatch": 635,
+     "matched": true
+    },
+    {
+     "swf": 637,
+     "score": 0.975,
+     "own": null,
+     "bestMatch": 635,
+     "matched": true
+    },
+    {
+     "swf": 688,
+     "score": 0.9743,
+     "own": null,
+     "bestMatch": 688,
+     "matched": true
+    },
+    {
+     "swf": 689,
+     "score": 0.9762,
+     "own": null,
+     "bestMatch": 689,
+     "matched": true
+    },
+    {
+     "swf": 690,
+     "score": 0.9756,
+     "own": null,
+     "bestMatch": 690,
+     "matched": true
+    },
+    {
+     "swf": 691,
+     "score": 0.9743,
+     "own": null,
+     "bestMatch": 691,
+     "matched": true
+    },
+    {
+     "swf": 692,
+     "score": 0.9761,
+     "own": null,
+     "bestMatch": 692,
+     "matched": true
+    },
+    {
+     "swf": 693,
+     "score": 0.9738,
+     "own": null,
+     "bestMatch": 693,
+     "matched": true
+    },
+    {
+     "swf": 694,
+     "score": 0.9762,
+     "own": null,
+     "bestMatch": 694,
+     "matched": true
+    }
+   ]
+  },
+  "happy": {
+   "pass": true,
+   "mean": 0.9758,
+   "min": 0.9702,
+   "offset": [
+    0,
+    -5
+   ],
+   "expected": [
+    1,
+    -8
+   ],
+   "drift": [],
+   "unmatched": [],
+   "frames": [
+    {
+     "swf": 405,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 415,
+     "matched": true
+    },
+    {
+     "swf": 406,
+     "score": 0.9748,
+     "own": null,
+     "bestMatch": 406,
+     "matched": true
+    },
+    {
+     "swf": 407,
+     "score": 0.9775,
+     "own": null,
+     "bestMatch": 407,
+     "matched": true
+    },
+    {
+     "swf": 408,
+     "score": 0.9775,
+     "own": null,
+     "bestMatch": 408,
+     "matched": true
+    },
+    {
+     "swf": 409,
+     "score": 0.9759,
+     "own": null,
+     "bestMatch": 409,
+     "matched": true
+    },
+    {
+     "swf": 410,
+     "score": 0.9778,
+     "own": null,
+     "bestMatch": 410,
+     "matched": true
+    },
+    {
+     "swf": 411,
+     "score": 0.974,
+     "own": null,
+     "bestMatch": 412,
+     "matched": true
+    },
+    {
+     "swf": 412,
+     "score": 0.9702,
+     "own": null,
+     "bestMatch": 412,
+     "matched": true
+    },
+    {
+     "swf": 413,
+     "score": 0.9742,
+     "own": null,
+     "bestMatch": 413,
+     "matched": true
+    },
+    {
+     "swf": 414,
+     "score": 0.9768,
+     "own": null,
+     "bestMatch": 414,
+     "matched": true
+    },
+    {
+     "swf": 415,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 415,
+     "matched": true
+    },
+    {
+     "swf": 416,
+     "score": 0.976,
+     "own": null,
+     "bestMatch": 416,
+     "matched": true
+    },
+    {
+     "swf": 417,
+     "score": 0.9775,
+     "own": null,
+     "bestMatch": 417,
+     "matched": true
+    },
+    {
+     "swf": 418,
+     "score": 0.9732,
+     "own": null,
+     "bestMatch": 417,
+     "matched": true
+    },
+    {
+     "swf": 472,
+     "score": 0.9733,
+     "own": null,
+     "bestMatch": 417,
+     "matched": true
+    },
+    {
+     "swf": 473,
+     "score": 0.9756,
+     "own": null,
+     "bestMatch": 473,
+     "matched": true
+    },
+    {
+     "swf": 474,
+     "score": 0.9724,
+     "own": null,
+     "bestMatch": 415,
+     "matched": true
+    },
+    {
+     "swf": 475,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 415,
+     "matched": true
+    },
+    {
+     "swf": 476,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 415,
+     "matched": true
+    },
+    {
+     "swf": 477,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 415,
+     "matched": true
+    },
+    {
+     "swf": 478,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 415,
+     "matched": true
+    }
+   ]
+  },
+  "surprise": {
+   "pass": true,
+   "mean": 0.9767,
+   "min": 0.9743,
+   "offset": [
+    0,
+    -5
+   ],
+   "expected": [
+    1,
+    -8
+   ],
+   "drift": [],
+   "unmatched": [],
+   "frames": [
+    {
+     "swf": 225,
+     "score": 0.9775,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 226,
+     "score": 0.9746,
+     "own": null,
+     "bestMatch": 226,
+     "matched": true
+    },
+    {
+     "swf": 227,
+     "score": 0.9769,
+     "own": null,
+     "bestMatch": 227,
+     "matched": true
+    },
+    {
+     "swf": 228,
+     "score": 0.9748,
+     "own": null,
+     "bestMatch": 228,
+     "matched": true
+    },
+    {
+     "swf": 229,
+     "score": 0.9763,
+     "own": null,
+     "bestMatch": 229,
+     "matched": true
+    },
+    {
+     "swf": 230,
+     "score": 0.9752,
+     "own": null,
+     "bestMatch": 231,
+     "matched": true
+    },
+    {
+     "swf": 231,
+     "score": 0.9743,
+     "own": null,
+     "bestMatch": 231,
+     "matched": true
+    },
+    {
+     "swf": 232,
+     "score": 0.9755,
+     "own": null,
+     "bestMatch": 232,
+     "matched": true
+    },
+    {
+     "swf": 233,
+     "score": 0.9769,
+     "own": null,
+     "bestMatch": 233,
+     "matched": true
+    },
+    {
+     "swf": 234,
+     "score": 0.9766,
+     "own": null,
+     "bestMatch": 234,
+     "matched": true
+    },
+    {
+     "swf": 235,
+     "score": 0.9775,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 236,
+     "score": 0.9774,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 237,
+     "score": 0.9774,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 287,
+     "score": 0.9775,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 288,
+     "score": 0.9775,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 289,
+     "score": 0.9775,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 290,
+     "score": 0.9774,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 291,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 292,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 293,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    },
+    {
+     "swf": 294,
+     "score": 0.9776,
+     "own": null,
+     "bestMatch": 235,
+     "matched": true
+    }
+   ]
+  }
+ },
+ "pass": true
+}

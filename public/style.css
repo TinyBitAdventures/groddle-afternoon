@@ -2183,6 +2183,54 @@ button.play-context-head:focus-visible {
   text-shadow: 0 0 3px #000, 0 1px 1px #000;
   pointer-events: none;
 }
+.avatar-swatches[data-mode="parts"] {
+  display: block;
+  max-height: min(340px, 52vh);
+  overflow-y: auto;
+}
+.avatar-section-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5b5648;
+  margin: 0.15rem 0 0.3rem;
+}
+.avatar-section-title:not(:first-child) { margin-top: 0.6rem; }
+.avatar-style-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.avatar-style-chip {
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid #c5bdaa;
+  background: #fffdf7;
+  color: #2b2a33;
+  cursor: pointer;
+}
+.avatar-style-chip:hover,
+.avatar-style-chip.active {
+  border-color: #5a9e3e;
+  background: #eef8e8;
+  color: #2e5a20;
+}
+.avatar-palette {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22px, 1fr));
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+}
+.avatar-swatch-small { border-radius: 6px; border-width: 1px; }
+.avatar-note {
+  font-size: 0.66rem;
+  margin: 0.3rem 0 0;
+  opacity: 0.75;
+}
 .avatar-actions {
   display: flex;
   flex-wrap: wrap;

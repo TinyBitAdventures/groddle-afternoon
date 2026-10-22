@@ -1,16 +1,20 @@
 /**
  * Character builder — appearance model + pure recolor of styled Glitch avatars.
  *
- * v1 recolors the clothed portrait / walk strip (CC0 Wayback + derived walk)
- * by region (hair, skin, shirt, pants, shoes). Full Flash wardrobe puppet is
- * deferred; avatar-lab pieces document that path.
+ * The default look ('vector') is Tiny Speck's avatar rebuilt from its vector
+ * parts (js/avatar-rig.js, js/avatar-looks.js): real hair, eyes, mouth, nose,
+ * ears and wardrobe articles in their GSJS colourways. The older looks remain
+ * as presets: the recovered 62d8 sheets ('glitch', recoloured by region) and
+ * the classic/alt portraits.
  */
+import { normalizeVectorFields, vectorFieldsFromColors } from './avatar-looks.js';
 
 /** @typedef {{ r: number, g: number, b: number }} Rgb */
 
 /**
  * @typedef {{
- *   bodyStyle: 'classic'|'alt',
+ *   bodyStyle: 'vector'|'glitch'|'classic'|'alt',
+ *   vector?: object,
  *   hair: Rgb,
  *   skin: Rgb,
  *   shirt: Rgb,
@@ -22,13 +26,23 @@
  */
 
 export const STORAGE_KEY = 'groddle.avatar.appearance.v1';
+/** Saved appearance format; 1 had no `v` (colour-only looks). */
+export const APPEARANCE_VERSION = 2;
 
 export const BODY_STYLES = {
+  // Tiny Speck's vector avatar: rig + articles composited per look
+  // (js/avatar-compositor.js), default look prerendered.
+  vector: {
+    id: 'vector',
+    label: 'Glitch',
+    sheets: true,
+    vector: true,
+  },
   // Real Glitch animation sheets (base walk, climb, jump) recovered from the
   // Wayback CDX; js/avatar-anims.js maps their frames.
   glitch: {
     id: 'glitch',
-    label: 'Glitch',
+    label: 'Recovered',
     sheets: true,
   },
   classic: {
@@ -125,11 +139,11 @@ export function createClassicAppearance() {
 }
 
 /**
- * Default look: the Glitch sheets in their own colours (62d8dab1: lavender
- * hair, grey skin, lime top, purple trousers, green shoes).
+ * The recovered Glitch sheets in their own colours (62d8dab1: lavender hair,
+ * grey skin, lime top, purple trousers, green shoes).
  * @returns {Appearance}
  */
-export function createDefaultAppearance() {
+export function createGlitchSheetsAppearance() {
   return {
     bodyStyle: 'glitch',
     hair: { r: 205, g: 205, b: 232 },
@@ -142,12 +156,60 @@ export function createDefaultAppearance() {
   };
 }
 
+/**
+ * Default look: the vector Glitch in the catalog's default outfit (styled on
+ * 62d8dab1, so the colour fields match the recovered sheets for the classic
+ * swatches).
+ * @returns {Appearance}
+ */
+export function createDefaultAppearance() {
+  return { ...createGlitchSheetsAppearance(), bodyStyle: 'vector', vector: normalizeVectorFields({}) };
+}
+
+/** A vector preset: catalog default plus these fields. */
+function vectorPreset(fields) {
+  return { ...createDefaultAppearance(), vector: normalizeVectorFields(fields) };
+}
+
 /** Named full looks for one-click presets. */
 export const APPEARANCE_PRESETS = {
-  glitch: {
-    id: 'glitch',
+  vector: {
+    id: 'vector',
     label: 'Glitch',
     appearance: createDefaultAppearance(),
+  },
+  sunday: {
+    id: 'sunday',
+    label: 'Sunday best',
+    appearance: vectorPreset({
+      outfit: { hair: 'hair_09', hat: 'bowler_hat', eyes: 'eyes_20101109B', mouth: 'mouth_01', nose: 'nose_0006', ears: 'ears_0002', shirt: 'Shirt_and_Tie', pants: 'plain_trousers', shoes: 'Men_DressShoes' },
+      variant: { pants: 13 },
+      skinColor: 4,
+      hairColor: 6,
+    }),
+  },
+  cowpoke: {
+    id: 'cowpoke',
+    label: 'Cowpoke',
+    appearance: vectorPreset({
+      outfit: { hair: 'Curly_pixie_hair', hat: 'cap', eyes: 'eyes_03', mouth: 'mouth_09', nose: 'nose_20101109A', ears: 'ears_0009', shirt: 'plaid_shirt', pants: 'regular_jeans', shoes: 'cowboy_boots' },
+      skinColor: 33,
+      hairColor: 79,
+    }),
+  },
+  party: {
+    id: 'party',
+    label: 'Party',
+    appearance: vectorPreset({
+      outfit: { hair: 'mohawk', hat: 'party_hat', eyes: 'eyes_girly_1', mouth: 'mouth_tongue', nose: 'nose_clown', ears: 'ears_0003', shirt: 'hawaiian_shirt', pants: 'cargo_shorts', shoes: 'havaianas' },
+      skinColor: 31,
+      hairColor: 111,
+    }),
+  },
+  glitch: {
+    id: 'glitch',
+    label: 'Recovered',
+    appearance: createGlitchSheetsAppearance(),
   },
   classic: {
     id: 'classic',
@@ -256,6 +318,8 @@ export function normalizeAppearance(partial = {}) {
     };
   }
   out.bodyStyle = BODY_STYLES[partial.bodyStyle] ? partial.bodyStyle : d.bodyStyle;
+  out.vector = normalizeVectorFields(partial.vector || {});
+  out.v = APPEARANCE_VERSION;
   return out;
 }
 
@@ -303,9 +367,25 @@ export function loadAppearance(opts = {}) {
   if (!storage) return createDefaultAppearance();
   const raw = storage.getItem(STORAGE_KEY);
   if (!raw) return createDefaultAppearance();
-  const saved = appearanceFromJson(raw);
-  // An untouched old default moves to the Glitch sheets.
-  if (appearanceCacheKey(saved) === appearanceCacheKey(createClassicAppearance())) return createDefaultAppearance();
+  let parsed = null;
+  try { parsed = JSON.parse(raw); } catch { return createDefaultAppearance(); }
+  return migrateAppearance(parsed);
+}
+
+/**
+ * Saved looks from before the vector avatar (no `v`): an untouched default
+ * (classic portrait or recovered sheets) becomes the vector default; a
+ * recoloured recovered-sheets look keeps its colours on the vector default
+ * outfit (skin, hair, top, trousers, shoes tints); classic and alt looks stay.
+ * @param {object} parsed
+ * @returns {Appearance}
+ */
+export function migrateAppearance(parsed) {
+  const saved = normalizeAppearance(parsed || {});
+  if (parsed && Number(parsed.v) >= APPEARANCE_VERSION) return saved;
+  const key = appearanceCacheKey(saved);
+  if (key === appearanceCacheKey(createClassicAppearance()) || key === appearanceCacheKey(createGlitchSheetsAppearance())) return createDefaultAppearance();
+  if (saved.bodyStyle === 'glitch') return { ...saved, bodyStyle: 'vector', vector: vectorFieldsFromColors(saved) };
   return saved;
 }
 
@@ -491,6 +571,7 @@ export function appearanceCacheKey(appearance) {
     const c = a[k];
     parts.push(`${c.r},${c.g},${c.b}`);
   }
+  if (a.bodyStyle === 'vector') parts.push(JSON.stringify(a.vector));
   return parts.join('|');
 }
 

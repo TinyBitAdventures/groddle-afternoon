@@ -1,0 +1,156 @@
+{
+  "articles": {
+    "eyes": [
+      "eyes_01",
+      "eyes_02",
+      "eyes_03",
+      "eyes_05",
+      "eyes_12",
+      "eyes_20101109A",
+      "eyes_20101109B",
+      "eyes_20101109C",
+      "eyes_20101109D",
+      "eyes_20101109E",
+      "eyes_20101109F",
+      "eyes_girly_1",
+      "eyes_big_eyebrows",
+      "eyes_asia",
+      "eyes_alien",
+      "eyes_cross"
+    ],
+    "mouth": [
+      "mouth_01",
+      "mouth_02",
+      "mouth_08",
+      "mouth_09",
+      "mouth_10",
+      "mouth_12",
+      "mouth_20101109A",
+      "mouth_20101109B",
+      "mouth_20101109C",
+      "mouth_20101109E",
+      "mouth_20101109F",
+      "mouth_tongue"
+    ],
+    "nose": [
+      "nose_0001",
+      "nose_0006",
+      "nose_0009",
+      "nose_0010",
+      "nose_0017",
+      "nose_100815",
+      "nose_20101109A",
+      "nose_20101109B",
+      "nose_20101109C",
+      "nose_20101109D",
+      "nose_20101109E",
+      "nose_B0012",
+      "nose_bandage",
+      "nose_bone",
+      "nose_clown",
+      "nose_curl",
+      "nose_jughead",
+      "nose_manly_1",
+      "nose_oblong_1",
+      "nose_pierced_stud",
+      "nose_ring",
+      "nose_skinny_1",
+      "nose_triangle",
+      "nose_wood"
+    ],
+    "ears": [
+      "ears_0001",
+      "ears_0002",
+      "ears_0003",
+      "ears_0005",
+      "ears_0009",
+      "ears_alien",
+      "ears_buddha",
+      "ears_fish"
+    ],
+    "hair": [
+      "eightiesBandana",
+      "Buzzcut",
+      "mohawk",
+      "Curly_pixie_hair",
+      "loopy_bun",
+      "the_ronette_hair",
+      "wavy_tieback_ponytail",
+      "hair_07",
+      "hair_09",
+      "hair_12",
+      "electro_longbangs"
+    ],
+    "hat": [
+      "cap",
+      "beanies_guy_hat",
+      "bowler_hat",
+      "party_hat",
+      "chef_hat",
+      "flat_cap",
+      "striped_tuque",
+      "viking"
+    ],
+    "shirt": [
+      "classic_undershirt",
+      "plain_tee_light",
+      "hawaiian_shirt",
+      "plaid_shirt",
+      "turtle_neck",
+      "xmas_sweater",
+      "Candy_Cane_Sweater",
+      "cheerleader_tank",
+      "flowy_shirt",
+      "Shirt_and_Tie"
+    ],
+    "pants": [
+      "plain_trousers",
+      "regular_jeans",
+      "cargo_shorts",
+      "Lederhosen",
+      "polkadot_pants",
+      "leggings_pants",
+      "drawstring_sweats",
+      "checker_pants"
+    ],
+    "skirt": [
+      "short_skirt",
+      "skirt_with_bow"
+    ],
+    "dress": [
+      "Nevermore_Dress",
+      "paper_dress"
+    ],
+    "shoes": [
+      "converse",
+      "cowboy_boots",
+      "bunny_slippers",
+      "Men_DressShoes",
+      "rain_boots",
+      "havaianas",
+      "swoosh_sneakers",
+      "clogs"
+    ]
+  },
+  "defaultLook": {
+    "outfit": {
+      "eyes": "eyes_20101109E",
+      "mouth": "mouth_08",
+      "nose": "nose_20101109D",
+      "ears": "ears_0001",
+      "hair": "eightiesBandana",
+      "shirt": "classic_undershirt",
+      "pants": "plain_trousers",
+      "shoes": "converse"
+    },
+    "variant": {
+      "pants": 0,
+      "shoes": 0
+    },
+    "tint": {
+      "shirt": "d6f028"
+    },
+    "skinColor": 63,
+    "hairColor": 73
+  }
+}

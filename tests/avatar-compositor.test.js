@@ -1,0 +1,243 @@
+/**
+ * Vector Glitch avatar: rig data, colour maths, slot rules, looks and the
+ * prerendered default sheets (tools/avatar-compositor, js/avatar-rig.js,
+ * js/avatar-looks.js, js/avatar-compositor.js).
+ * Run: node --test tests/avatar-compositor.test.js
+ */
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  ARTICLE_CONTAINERS, SKIN_NODES, applyCM, colorMatrixFor, drawListBounds, expandRig, frameDrawList,
+  hardLightMatrix, isBoot, lookMatrices, slotAssignments,
+} from '../public/js/avatar-rig.js';
+import {
+  articleColors, lookKey, normalizeVectorFields, randomVectorFields, resolveLook, vectorFieldsFromColors,
+} from '../public/js/avatar-looks.js';
+import { SHEET_FRAMES } from '../public/js/avatar-anims.js';
+import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js';
+import { compactD } from '../tools/avatar-compositor/shapes.mjs';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const pub = join(root, 'public');
+const A = join(pub, 'assets/avatar');
+const json = (f) => JSON.parse(readFileSync(f, 'utf8'));
+const rig = expandRig(json(join(A, 'base.json')));
+const catalog = json(join(A, 'catalog.json'));
+const RIG_FRAMES = [...new Set(Object.values(SHEET_FRAMES).flat())].sort((a, b) => a - b);
+
+function articlesFor(look) {
+  const m = new Map();
+  for (const [type, a] of Object.entries(look.outfit)) m.set(a.name, json(join(A, 'articles', type, `${a.name}.json`)));
+  return m;
+}
+function lookCtx(look) {
+  const articles = articlesFor(look);
+  return {
+    look: { assign: slotAssignments(look.outfit, { hatAllowsHair: (h, r) => Boolean(catalog.hatHair[h.name]?.includes(r.name)) }), articles, matrices: lookMatrices(look), face: look.face },
+    shapeOf: (src, id) => (src === 'base' ? rig.shapes[id] : articles.get(src)?.shapes[id]),
+  };
+}
+const flat = (items) => items.flatMap((it) => (it.clip ? flat(it.items) : [it]));
+
+/** Absolute points of a path (M/L/Q or relative m/l/q), for round trips. */
+function points(d) {
+  const t = d.match(/[MLQmlq]|-?\d*\.?\d+/g);
+  const out = [];
+  let cmd = 'M';
+  let x = 0;
+  let y = 0;
+  for (let i = 0; i < t.length;) {
+    if (/[A-Za-z]/.test(t[i])) { cmd = t[i++]; continue; }
+    const n = cmd.toLowerCase() === 'q' ? 4 : 2;
+    const v = t.slice(i, i + n).map(Number);
+    i += n;
+    const rel = cmd === cmd.toLowerCase();
+    for (let k = 0; k < n; k += 2) out.push([Math.round(((rel ? x : 0) + v[k]) * 20), Math.round(((rel ? y : 0) + v[k + 1]) * 20)]);
+    x = (rel ? x : 0) + v[n - 2];
+    y = (rel ? y : 0) + v[n - 1];
+    if (cmd === 'm') cmd = 'l';
+    if (cmd === 'M') cmd = 'L';
+  }
+  return out;
+}
+
+describe('colour maths (ColorMatrix.as, AvatarSwf)', () => {
+  it('a 0% tint is identity and a full tint colours by luminance', () => {
+    const id = colorMatrixFor({ tintColor: 'ff0000', tintAmount: '0', brightness: '0', saturation: '0', contrast: '0', alpha: '100' });
+    assert.deepEqual(applyCM(id, [10, 120, 230, 1]).map(Math.round), [10, 120, 230, 1]);
+    const red = colorMatrixFor({ tintColor: 'ff0000', tintAmount: '100', brightness: '0', saturation: '0', contrast: '0', alpha: '100' });
+    const white = applyCM(red, [255, 255, 255, 1]);
+    assert.ok(Math.abs(white[0] - 255) < 0.5 && white[1] < 0.5 && white[2] < 0.5);
+    // Brightness adds to every channel; alpha 50 halves alpha.
+    const b = colorMatrixFor({ tintColor: '000000', tintAmount: '0', brightness: '20', saturation: '0', contrast: '0', alpha: '50' });
+    assert.deepEqual(applyCM(b, [100, 100, 100, 1]).map((v) => Math.round(v * 100) / 100), [120, 120, 120, 0.5]);
+  });
+
+  it('skin is a hard-light flat tint (old Avatar.swf colouring)', () => {
+    const grey = hardLightMatrix('808080');
+    const c = applyCM(grey, [100, 150, 200, 1]);
+    assert.ok(c.every((v, i) => i === 3 || Math.abs(v - [100, 150, 200][i]) < 1.5));
+    const light = applyCM(hardLightMatrix('ffffff'), [40, 40, 40, 1]);
+    assert.equal(Math.round(light[0]), 255);
+    const dark = applyCM(hardLightMatrix('000000'), [200, 200, 200, 1]);
+    assert.equal(Math.round(dark[0]), 0);
+  });
+});
+
+describe('slot rules (AvatarSwf.initializeHead)', () => {
+  const art = (name) => ({ name });
+  it('a hat hides hair unless the hat allows it; boots use boot containers', () => {
+    const a = slotAssignments({ hat: art('party_hat'), hair: art('mohawk'), shoes: art('cowboy_boots') });
+    assert.ok(a.map.has('sideHatContainer_mc'));
+    assert.ok(!a.map.has('sideHairContainer_mc'));
+    assert.ok(a.map.has('sideBootFootCloseContainer_mc') && !a.map.has('sideShoeCloseContainer_mc'));
+    assert.equal(isBoot('ballet_shoes'), false);
+    const b = slotAssignments({ hat: art('cap'), hair: art('Buzzcut') }, { hatAllowsHair: () => true });
+    assert.ok(b.map.has('sideHairContainer_mc') && b.hatAndHair);
+  });
+  it('a skirt excludes a dress, and most coats hide shirt sleeves', () => {
+    const a = slotAssignments({ skirt: art('short_skirt'), dress: art('paper_dress'), coat: art('anything'), shirt: art('plaid_shirt') });
+    assert.ok(a.map.has('sideSkirtContainer_mc') && !a.map.has('sideDressContainer_mc'));
+    assert.ok(a.hidden.has('sideShirtSleeveUpperCloseContainer_mc'));
+    assert.equal(slotAssignments({ coat: art('Fisherman_vest') }).hidden.size, 0);
+  });
+});
+
+describe('rig data (Avatar.swf avatarContainer)', () => {
+  it('holds every swf frame the sheets use, with slots the client fills', () => {
+    assert.deepEqual(rig.frames, RIG_FRAMES);
+    assert.equal(rig.table.length, RIG_FRAMES.length);
+    for (const s of rig.slots) assert.ok(ARTICLE_CONTAINERS.includes(s), s);
+    assert.ok(rig.nodes.every((n) => SKIN_NODES.includes(n.name)), 'body parts are skin parts');
+    for (const n of rig.nodes) for (const op of n.ops) assert.ok(rig.shapes[op.s], `${n.name} shape ${op.s}`);
+    // The eye/mouth mask copies the skull at skull.x/y: the skull node must be unrotated in its container.
+    assert.ok(rig.nodes.some((n) => n.name === 'sideSkull_mc'));
+  });
+
+  it('compact paths keep every point on the twip grid', () => {
+    const abs = 'M-4.95 1.2 L-5.0 0.05 Q-6.15 -0.4 -6.95 -0.9 L-6.8 0.25 -4.9 1.35 M-0.8 2.45 Q-0.45 2.15 -0.2 1.1 L12 4';
+    assert.deepEqual(points(compactD(abs)), points(abs));
+    assert.ok(compactD(abs).length < abs.length);
+  });
+});
+
+describe('catalog and looks', () => {
+  it('every catalog article has parts, shapes and real GSJS colourways', () => {
+    let n = 0;
+    for (const [type, items] of Object.entries(catalog.types)) {
+      for (const item of items) {
+        const data = json(join(A, 'articles', type, `${item.name}.json`));
+        assert.ok(Object.keys(data.parts).length, `${type}/${item.name} parts`);
+        for (const part of Object.values(data.parts)) {
+          if (part.frames !== 0) assert.equal(part.frames.length, RIG_FRAMES.length);
+          for (const v of part.variants) for (const op of flat(v.map((o) => (o.clip ? { clip: o.clip, items: o.ops } : o)))) assert.ok(data.shapes[op.s], `${item.name} shape ${op.s}`);
+        }
+        if (['shirt', 'pants', 'shoes', 'hat', 'skirt', 'dress'].includes(type)) assert.ok(item.variants?.length >= 1, `${item.name} colourways`);
+        n += 1;
+      }
+    }
+    assert.ok(n >= 60, `${n} articles`);
+    assert.ok(catalog.palettes.skin.length >= 50 && catalog.palettes.hair.length >= 50);
+  });
+
+  it('resolves the default look and saved fields, dropping unknown parts', () => {
+    const def = resolveLook({}, catalog);
+    assert.equal(def.outfit.hair.name, 'eightiesBandana');
+    assert.equal(def.outfit.shirt.colors.color_1.tintColor, 'd6f028');
+    assert.equal(def.colors.skin.tint, catalog.palettes.skin.find((p) => p.id === catalog.defaultLook.skinColor).color);
+    const custom = resolveLook({ outfit: { hair: 'mohawk', hat: 'none', shirt: 'not_a_shirt' }, variant: { pants: 2 } }, catalog);
+    assert.equal(custom.outfit.hair.name, 'mohawk');
+    assert.equal(custom.outfit.shirt.name, 'classic_undershirt');
+    assert.equal(custom.outfit.pants.colors.color_1.tintColor, articleColors(catalog.types.pants.find((p) => p.name === 'plain_trousers'), 2).color_1.tintColor);
+    assert.notEqual(lookKey(def), lookKey(custom));
+    assert.deepEqual(normalizeVectorFields({ outfit: { hair: 'nope' } }, catalog).outfit, {});
+    assert.equal(vectorFieldsFromColors({ shirt: { r: 255, g: 0, b: 16 } }).tint.shirt, 'ff0010');
+  });
+
+  it('random looks only use catalog parts, and hats only with hair they allow', () => {
+    let seed = 7;
+    const rng = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    for (let i = 0; i < 40; i++) {
+      const f = randomVectorFields(catalog, rng);
+      for (const [type, name] of Object.entries(f.outfit)) if (name !== 'none') assert.ok(catalog.types[type].some((x) => x.name === name), `${type} ${name}`);
+      if (f.outfit.hat && f.outfit.hat !== 'none') assert.ok(catalog.hatHair[f.outfit.hat].includes(f.outfit.hair));
+    }
+  });
+});
+
+describe('draw lists', () => {
+  it('every frame of the default look draws the body, clothes and a masked face', () => {
+    const look = resolveLook({}, catalog);
+    const { look: L, shapeOf } = lookCtx(look);
+    for (let i = 0; i < RIG_FRAMES.length; i++) {
+      const items = frameDrawList(rig, L, i);
+      const srcs = new Set(flat(items).map((it) => it.src));
+      assert.ok(srcs.has('base') && srcs.has('eightiesBandana') && srcs.has('plain_trousers'), `frame ${RIG_FRAMES[i]}`);
+      assert.ok(drawListBounds(items, shapeOf), `frame ${RIG_FRAMES[i]} bounds`);
+      for (const it of flat(items)) assert.ok(it.m.every(Number.isFinite), `frame ${RIG_FRAMES[i]} matrix`);
+    }
+    // Side frames mask the eyes with the skull; the face animates with the emotion.
+    const stand = frameDrawList(rig, L, RIG_FRAMES.indexOf(801));
+    assert.ok(stand.some((it) => it.clip && it.items.some((x) => x.src === 'eyes_20101109E')));
+    const mouth = (fn) => JSON.stringify(flat(frameDrawList(rig, L, RIG_FRAMES.indexOf(fn))).filter((x) => x.src === 'mouth_08').map((x) => [x.s, x.m.map((v) => v.toFixed(2))]));
+    assert.notEqual(mouth(801), mouth(410));
+    // Climbing shows the back: no face parts.
+    assert.ok(!flat(frameDrawList(rig, L, RIG_FRAMES.indexOf(1150))).some((x) => x.src === 'eyes_20101109E'));
+  });
+
+  it('colours reach skin, hair and article colour groups', () => {
+    const look = resolveLook({ outfit: { hair: 'Buzzcut' }, hairColor: catalog.palettes.hair[3].id }, catalog);
+    const { look: L } = lookCtx(look);
+    const items = flat(frameDrawList(rig, L, RIG_FRAMES.indexOf(801)));
+    assert.ok(items.some((it) => it.src === 'base' && it.cm), 'skin coloured');
+    assert.ok(items.some((it) => it.src === 'Buzzcut' && it.cm), 'hair coloured');
+    assert.ok(items.some((it) => it.src === 'classic_undershirt' && it.cm), 'shirt coloured');
+  });
+});
+
+describe('prerendered default sheets', () => {
+  const size = (file) => {
+    const b = readFileSync(file);
+    if (b.readUInt32BE(0) === 0x89504e47) return [b.readUInt32BE(16), b.readUInt32BE(20)];
+    const bits = b.readUInt32LE(21);
+    return [(bits & 0x3fff) + 1, ((bits >> 14) & 0x3fff) + 1];
+  };
+  it('hold SHEET_FRAMES in the GLITCH_AVATAR layout, with exact 3x files listed for first draw', () => {
+    for (const [name, frames] of Object.entries(SHEET_FRAMES)) {
+      const d = VECTOR_AVATAR.sheets[name];
+      assert.equal(d.cells, frames.length, name);
+      assert.equal(d.cols * d.rows >= d.cells && d.cols * (d.rows - 1) < d.cells, true, name);
+      const one = `${VECTOR_AVATAR.dir}${d.file}`;
+      const three = VECTOR_AVATAR_HIRES[one];
+      assert.deepEqual(size(join(pub, one)), [d.cols * d.fw, d.rows * d.fh], name);
+      assert.deepEqual(size(join(pub, three)), [d.cols * d.fw * 3, d.rows * d.fh * 3], name);
+      assert.ok(d.cols * d.fw * 3 <= 4096, `${name} width`);
+      assert.equal(HIRES_SPRITES.get(one), three);
+      assert.ok(FIRST_DRAW_SPRITES.has(one));
+      assert.ok(d.feetY > 0 && d.feetY <= d.fh && d.midX > 0 && d.midX < d.fw, name);
+    }
+  });
+
+  it('match the recovered 62d8 sheets pose for pose', () => {
+    const score = json(join(root, 'tools/avatar-compositor/score.json'));
+    assert.equal(score.pass, true);
+    for (const [name, s] of Object.entries(score.sheets)) {
+      assert.ok(s.mean >= 0.9, `${name} ${s.mean}`);
+      assert.equal(s.unmatched.length, 0, name);
+      assert.equal(s.drift.length, 0, name);
+      assert.equal(s.frames.length, SHEET_FRAMES[name].length);
+    }
+  });
+});
+
+describe('game wiring', () => {
+  it('game.js loads the default sheets, bakes custom looks and keeps the older styles', () => {
+    const game = readFileSync(join(pub, 'game.js'), 'utf8');
+    for (const s of ['vectorAvatarBase', 'animPackFromSheets', 'bakeLook', 'vectorBakeScale', 'renderVectorControls', 'loadAvatarCatalog', 'glitchAnimPack']) assert.ok(game.includes(s), s);
+    assert.ok(existsSync(join(pub, 'js/avatar-compositor.js')));
+  });
+});
