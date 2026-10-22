@@ -76,6 +76,7 @@ export const BUILT_ROOMS = Object.freeze([
   'tile_puzzle',
   'operation_grow',
   'gwendolyn',
+  'mental_block',
 ]);
 
 /**
@@ -146,9 +147,12 @@ export const OFFER_OVERRIDES = Object.freeze({
     prerequisites: [{ condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 }],
     why: 'canOffer: walk_speed_3 and jump_2',
   },
-  mental_block_2: {
-    prerequisites: [{ condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 }],
-    why: 'canOffer: walk_speed_3 and jump_2',
+  mental_block_rem: {
+    prerequisites: [
+      { condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 },
+      { condition: 'custom_code', value: 'hour_after:mental_block', not: 0 },
+    ],
+    why: 'canOffer: walk_speed_3 and jump_2; an hour after part 1 and after the last repeat or fail',
   },
   puzzle_level_light_perspective: {
     prerequisites: [{ condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 }],

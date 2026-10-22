@@ -29378,14 +29378,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "Solved Puzzle"
+    "desc": "Solved Puzzle",
+    "route": "quest-instances"
    },
    {
     "id": "r530",
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "Complete the Journey"
+    "desc": "Complete the Journey",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -29411,7 +29413,13 @@
   "familiarTurnin": true,
   "silentComplete": false,
   "showAlert": false,
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "upgrades:walk_speed_3,jump_2",
+    "not": 0
+   }
+  ],
   "endNpcs": [],
   "locations": [
    "mental_block"
@@ -29425,8 +29433,9 @@
     "xp": 16110
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "mental_block",
+  "offerNote": "canOffer: walk_speed_3 and jump_2",
+  "solo": true
  },
  "mental_block_2": {
   "classTsid": "mental_block_2",
@@ -29440,14 +29449,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "Solved Puzzle"
+    "desc": "Solved Puzzle",
+    "route": "quest-instances"
    },
    {
     "id": "r555",
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "Complete the Journey"
+    "desc": "Complete the Journey",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -29489,8 +29500,8 @@
     "xp": 39898
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "mental_block",
+  "solo": true
  },
  "mental_block_rem": {
   "classTsid": "mental_block_rem",
@@ -29504,14 +29515,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "Solved Puzzle"
+    "desc": "Solved Puzzle",
+    "route": "quest-instances"
    },
    {
     "id": "r543",
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "Complete the Journey"
+    "desc": "Complete the Journey",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -29539,6 +29552,16 @@
     "condition": "completed_quest",
     "value": "mental_block",
     "not": 0
+   },
+   {
+    "condition": "custom_code",
+    "value": "upgrades:walk_speed_3,jump_2",
+    "not": 0
+   },
+   {
+    "condition": "custom_code",
+    "value": "hour_after:mental_block",
+    "not": 0
    }
   ],
   "endNpcs": [],
@@ -29554,8 +29577,9 @@
     "npc": "play_cube"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "mental_block",
+  "offerNote": "canOffer: walk_speed_3 and jump_2; an hour after part 1 and after the last repeat or fail",
+  "solo": true
  },
  "mini_me_mini_you": {
   "classTsid": "mini_me_mini_you",
