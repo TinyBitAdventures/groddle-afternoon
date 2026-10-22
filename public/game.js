@@ -6310,7 +6310,30 @@ function recolorTextureFromImage(source, appearance, opts = {}) {
 /** Apply current playerAppearance to the live player sprite. */
 function applyPlayerAppearance() {
   if (!player) return;
-  const pack = getAppearanceTextures(playerAppearance);
+  player.climbBorrow = null;
+  swapPlayerPack(getAppearanceTextures(playerAppearance));
+}
+
+/**
+ * The Classic and Alt looks have only idle and walk sheets. On a ladder they
+ * borrow the Glitch look's real climb frames in the same colours (a climber
+ * faces away, so the swap reads naturally) and switch back on stepping off.
+ */
+function syncClimbBorrow(state) {
+  const climbing = state === 'climb';
+  if (climbing === Boolean(player.climbBorrow)) return;
+  if (climbing) {
+    if (getAppearanceTextures(playerAppearance).anims) return;
+    const pack = getAppearanceTextures({ ...playerAppearance, bodyStyle: 'glitch' });
+    if (!pack.anims) return;
+    player.climbBorrow = true;
+    swapPlayerPack(pack);
+  } else {
+    applyPlayerAppearance();
+  }
+}
+
+function swapPlayerPack(pack) {
   if (player.appearanceKey === pack.key) return;
   const was = player.animState || 'idle';
   player.texturesIdle = [pack.idleFrame];
@@ -6542,6 +6565,7 @@ function applyGlitchState(st) {
 
 function setPlayerAnim(state) {
   if (!player) return;
+  syncClimbBorrow(state);
   if (player.anims) {
     applyGlitchState(glitchAnimState(state));
     return;
