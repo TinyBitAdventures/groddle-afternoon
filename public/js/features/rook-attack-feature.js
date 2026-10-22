@@ -48,7 +48,7 @@
 import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-3';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
-import { donationValueFor } from '../shrines.js?v=stoot-doll-2';
+import { donationValueFor } from '../shrines.js?v=shrine-walkby-1';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
 import {
   FOREHORSEMAN_LINES,

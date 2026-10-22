@@ -414,7 +414,7 @@
    "group": "economy",
    "name": "Giants and shrines",
    "status": "source",
-   "blurb": "Donate at the eleven Giants’ shrines for favor and emblems.",
+   "blurb": "Donate at the eleven Giants’ shrines for favor; a waiting emblem is handed over as you walk past.",
    "spot": "shrine",
    "evidence": [
     "public/js/shrines.js"
@@ -1393,7 +1393,7 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 224,
+  "commits": 225,
   "since": "2026-10-19",
   "recent": [
    {

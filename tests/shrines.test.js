@@ -11,6 +11,7 @@ import {
   donateToShrine,
   emblemCostFor,
   giantForStreet,
+  inEmblemHitbox,
   listShrineDonationOptions,
   normalizeShrineState,
   quoteShrineDonation,
@@ -178,3 +179,24 @@ describe('shrine official art and client wiring', () => {
   });
 });
 
+
+describe('emblem hitbox (2012-09-22: a waiting emblem is given as you walk past)', () => {
+  it('matches npc_shrine_base apiAddHitBox("emblem", 400, 400) around the shrine', () => {
+    const shrine = { x: 1000, y: 500 };
+    assert.equal(inEmblemHitbox(shrine, 1000, 500), true);
+    assert.equal(inEmblemHitbox(shrine, 1200, 500), true);
+    assert.equal(inEmblemHitbox(shrine, 801, 500), true);
+    assert.equal(inEmblemHitbox(shrine, 1201, 500), false);
+    assert.equal(inEmblemHitbox(shrine, 1000, 100), true);
+    assert.equal(inEmblemHitbox(shrine, 1000, 99), false);
+    assert.equal(inEmblemHitbox(shrine, 1000, 540), false);
+    assert.equal(inEmblemHitbox(null, 1000, 500), false);
+  });
+
+  it('game.js grants on entering the hitbox through the same claim path as the panel', () => {
+    const src = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    assert.match(src, /function updateShrineWalkBy\(\)/);
+    assert.match(src, /entered && !isScreenFxBlocking\(\) && canClaimEmblem\(shrineState, target\.state\?\.giantId\)/);
+    assert.match(src, /physics\(dt\);\n\s+tickAvatarAfk\(\);\n\s+updateShrineWalkBy\(\);/);
+  });
+});

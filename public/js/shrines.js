@@ -349,6 +349,18 @@ export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, op
   };
 }
 
+/**
+ * npc_shrine_base onLoad: apiAddHitBox("emblem", 400, 400). Since the 2012-09-22 update a waiting
+ * emblem is handed over as you walk into it (onPlayerCollision, hitbox "emblem"). Centred on the
+ * shrine and rising from its feet; `x`/`y` are the player's feet.
+ */
+export const EMBLEM_HITBOX = Object.freeze({ w: 400, h: 400 });
+
+export function inEmblemHitbox(shrine, x, y) {
+  if (!shrine) return false;
+  return Math.abs(x - shrine.x) <= EMBLEM_HITBOX.w / 2 && y <= shrine.y + 12 && y >= shrine.y - EMBLEM_HITBOX.h;
+}
+
 export function canClaimEmblem(state, giantId) {
   return whole(state?.favor?.[giantId]) >= emblemCostFor(state, giantId);
 }

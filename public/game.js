@@ -681,8 +681,9 @@ import {
   canClaimEmblem,
   claimShrineEmblem,
   emblemCostFor,
+  inEmblemHitbox,
   resetShrineDay,
-} from './js/shrines.js?v=stoot-doll-2';
+} from './js/shrines.js?v=shrine-walkby-1';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -20482,15 +20483,31 @@ function performShrineDonation() {
 }
 
 function claimActiveShrineEmblem() {
-  const target = activeShrineTarget;
-  const giantId = target?.state?.giantId;
-  const result = claimShrineEmblem(shrineState, giantId, inv, pc);
-  if (!result.ok) {
+  if (!grantShrineEmblem(activeShrineTarget)) {
     toast('More favor is needed before an emblem can be claimed.');
     renderShrinePanel();
-    return;
   }
-  closeShrinePanel();
+}
+
+let shrineEmblemInside = false;
+
+/** A waiting emblem is given as you walk past the shrine (2012-09-22; npc_shrine_base onPlayerCollision). */
+function updateShrineWalkBy() {
+  const target = interactables.find((t) => t.classId?.startsWith('npc_shrine_') && t.sprite && !t.sprite.destroyed);
+  const inside = !!target && !climb.active && inEmblemHitbox(target.sprite, player.x, player.y);
+  const entered = inside && !shrineEmblemInside;
+  shrineEmblemInside = inside;
+  if (entered && !isScreenFxBlocking() && canClaimEmblem(shrineState, target.state?.giantId)) {
+    grantShrineEmblem(target);
+  }
+}
+
+function grantShrineEmblem(target) {
+  const giantId = target?.state?.giantId;
+  const result = claimShrineEmblem(shrineState, giantId, inv, pc);
+  if (!result.ok) return false;
+  if (isShrineOpen()) closeShrinePanel();
+  app.canvas.dataset.shrineEmblems = String(result.count);
   playShrineDonation(target);
   refreshShrineTarget(target);
   playSound('DONATION_RECIEVE_EMBLEM', { volume: 0.7 });
@@ -20503,6 +20520,7 @@ function claimActiveShrineEmblem() {
     iconUrl: `assets/sprites/icons/${result.classTsid}.png`,
   });
   updateHud();
+  return true;
 }
 
 /** The open store's buy-back multiplier, for sell prices. */
@@ -22126,6 +22144,14 @@ async function main() {
       player.vy = 0;
       player.onGround = true;
       hoverTarget = shrine;
+      if (bootParams.get('shrinedemo') === 'emblem') {
+        // Walk-by QA: favor at the emblem target, 320px left of the shrine; walk right to receive it.
+        const giantId = shrine.state.giantId;
+        shrineState.favor[giantId] = emblemCostFor(shrineState, giantId);
+        refreshShrineTarget(shrine);
+        player.x = clamp(shrine.sprite.x - 320, 40, Math.max(80, WORLD_W - 40));
+        hoverTarget = null;
+      }
     }
   }
 
@@ -23186,6 +23212,7 @@ async function main() {
     handleInput();
     physics(dt);
     tickAvatarAfk();
+    updateShrineWalkBy();
     updateHogHaul((1000 / 60) * dt);
     updateFourLetterQuest();
     updateLegalizeIt();

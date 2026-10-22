@@ -134,7 +134,7 @@ export const CHECKLIST = Object.freeze([
     blurb: 'All eight quoin types, daily limits, multipliers and Qurazy quoins.',
     evidence: ['public/js/quoins.js'] },
   { id: 'shrines', group: 'economy', name: 'Giants and shrines', status: 'source', spot: 'shrine',
-    blurb: 'Donate at the eleven Giants’ shrines for favor and emblems.',
+    blurb: 'Donate at the eleven Giants’ shrines for favor; a waiting emblem is handed over as you walk past.',
     evidence: ['public/js/shrines.js'] },
   { id: 'vendors', group: 'economy', name: 'Street spirit vendors', status: 'source', spot: 'vendor',
     blurb: 'The original stores, stock and prices, buying and selling.',
