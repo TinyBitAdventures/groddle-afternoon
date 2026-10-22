@@ -73,6 +73,8 @@ export const BUILT_ROOMS = Object.freeze([
   'back_alley',
   'clubhouse',
   'light_perspective',
+  'tile_puzzle',
+  'operation_grow',
 ]);
 
 /**
@@ -157,6 +159,18 @@ export const OFFER_OVERRIDES = Object.freeze({
       { condition: 'custom_code', value: 'hour_after:puzzle_level_light_perspective', not: 0 },
     ],
     why: 'canOffer: walk_speed_3 and jump_2; an hour after part 1, after the last repeat and after a fail',
+  },
+  btc_room_3_reminisce: {
+    prerequisites: [{ condition: 'custom_code', value: 'hour_after:btc_room_3', not: 0 }],
+    why: 'canOffer: an hour after part 1 and after the last repeat or fail',
+  },
+  // Offered by the familiar when any of four Firebog completist badges is
+  // earned; its has_achievement shimla_mirch_completist gate is never checked
+  // by quests_offer, so it would wrongly limit the offer to Shimla Mirch.
+  where_the_blue_grew: {
+    prerequisites: [],
+    replacePrerequisites: true,
+    why: 'quests_offer ignores prerequisites: any of the four Firebog completist badges offers it',
   },
   radiant_glare: {
     prerequisites: [{ condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 }],

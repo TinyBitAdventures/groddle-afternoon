@@ -2036,7 +2036,8 @@
     "type": "flag",
     "name": "instance_exit_via_door",
     "num": 1,
-    "desc": "Reach the Exit"
+    "desc": "Reach the Exit",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -2075,8 +2076,8 @@
     "xp": 22296
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "tile_puzzle",
+  "solo": true
  },
  "btc_room_3_reminisce": {
   "classTsid": "btc_room_3_reminisce",
@@ -2090,7 +2091,8 @@
     "type": "flag",
     "name": "instance_exit_via_door",
     "num": 1,
-    "desc": "Reach the Exit"
+    "desc": "Reach the Exit",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -2115,7 +2117,13 @@
   "familiarTurnin": true,
   "silentComplete": false,
   "showAlert": false,
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "hour_after:btc_room_3",
+    "not": 0
+   }
+  ],
   "endNpcs": [],
   "locations": [
    "tile_puzzle"
@@ -2129,8 +2137,9 @@
     "npc": "play_cube"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "tile_puzzle",
+  "offerNote": "canOffer: an hour after part 1 and after the last repeat or fail",
+  "solo": true
  },
  "bubbletuning_transform_bubbles": {
   "classTsid": "bubbletuning_transform_bubbles",
@@ -35528,14 +35537,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "Solved Puzzle"
+    "desc": "Solved Puzzle",
+    "route": "quest-instances"
    },
    {
     "id": "r529",
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "Complete the Journey"
+    "desc": "Complete the Journey",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -35558,13 +35569,7 @@
   "familiarTurnin": true,
   "silentComplete": false,
   "showAlert": false,
-  "prerequisites": [
-   {
-    "condition": "has_achievement",
-    "value": "shimla_mirch_completist",
-    "not": 0
-   }
-  ],
+  "prerequisites": [],
   "endNpcs": [],
   "locations": [
    "operation_grow"
@@ -35590,8 +35595,9 @@
     "achievement": "kalavana_completist"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "operation_grow",
+  "offerNote": "quests_offer ignores prerequisites: any of the four Firebog completist badges offers it",
+  "solo": true
  },
  "wierd_n_wild": {
   "classTsid": "wierd_n_wild",

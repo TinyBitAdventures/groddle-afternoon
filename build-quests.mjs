@@ -408,7 +408,12 @@ for (const def of Object.values(catalog)) {
     const o = OFFER_OVERRIDES[id];
     if (o?.offerTriggers) def.offerTriggers = list = o.offerTriggers.map((t) => ({ ...t, override: true }));
     if (o?.prereqQuests) def.prereqQuests = [...o.prereqQuests];
-    if (o?.prerequisites) def.prerequisites = [...def.prerequisites.filter((p) => p.condition !== 'custom_code'), ...o.prerequisites];
+    // Overrides replace custom_code gates; replacePrerequisites drops every
+    // source gate (quests_offer never checks prerequisites for trigger offers).
+    if (o?.prerequisites) {
+      const kept = o.replacePrerequisites ? [] : def.prerequisites.filter((p) => p.condition !== 'custom_code');
+      def.prerequisites = [...kept, ...o.prerequisites];
+    }
     if (o?.why) def.offerNote = o.why;
     for (const req of def.requirements) if (req.type === 'flag' || req.type === 'counter') req.route = 'quest-instances';
   }
