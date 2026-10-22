@@ -622,6 +622,7 @@ import {
   loadAmbientMusicConfig,
   resolveAmbientTheme,
   pickAmbientTrack,
+  SILENT_THEME,
   themeLabel,
   allAmbientTrackUrls,
 } from './js/ambient-music.js';
@@ -3607,6 +3608,12 @@ function startMusic() {
 function setAmbientForStreet(street, opts = {}) {
   if (!audio.ctx) return;
   const theme = resolveAmbientTheme(street || {});
+  if (theme === SILENT_THEME) {
+    // Keep the current track loaded but faded out; the next street fades in.
+    ambientThemeId = theme;
+    applyMute();
+    return;
+  }
   const url =
     pickAmbientTrack(theme, { hubId: street?.hubId, random: false }) ||
     'assets/audio/groddle.mp3';
@@ -3662,7 +3669,7 @@ function setAmbientForStreet(street, opts = {}) {
 
 function applyMute() {
   if (!audio.musicGain) return;
-  const vol = state.muted ? 0 : audio.musicblock ? 0.055 : 0.26;
+  const vol = state.muted || ambientThemeId === SILENT_THEME ? 0 : audio.musicblock ? 0.055 : 0.26;
   try {
     audio.musicGain.gain.setTargetAtTime(vol, audio.ctx.currentTime, 0.05);
   } catch {

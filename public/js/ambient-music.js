@@ -52,6 +52,9 @@ export async function loadAmbientMusicConfig(
   }
 }
 
+/** Theme id for streets whose music_file is NO_MUSIC. */
+export const SILENT_THEME = 'silence';
+
 /**
  * Resolve ambient theme id for a hub.
  * @param {{ hubId?: string|number, hubName?: string, musicFile?: string|null }} street
@@ -62,9 +65,13 @@ export function resolveAmbientTheme(street = {}) {
   const fallback = cfg?.defaultTheme || 'default';
   if (!cfg) return fallback;
 
-  // Per-street override key if we ever import geometry.music_file
-  if (street.musicFile && String(street.musicFile).trim()) {
-    return `street:${street.musicFile}`;
+  // geometry.music_file: NO_MUSIC keeps the street quiet (Piano Party plays
+  // its own notes); a key with recovered stand-ins uses them; any other key's
+  // library is lost, so the street keeps its hub's music.
+  const musicKey = String(street.musicFile || '').trim();
+  if (musicKey === 'NO_MUSIC') return SILENT_THEME;
+  if (musicKey && cfg.streetMusic?.[musicKey] && cfg.themes?.[cfg.streetMusic[musicKey]]) {
+    return `street:${musicKey}`;
   }
 
   const hid = street.hubId != null ? String(street.hubId) : '';

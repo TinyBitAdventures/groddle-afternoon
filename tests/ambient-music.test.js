@@ -14,6 +14,7 @@ import {
   pickAmbientTrack,
   themeLabel,
   allAmbientTrackUrls,
+  SILENT_THEME,
 } from '../public/js/ambient-music.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -102,6 +103,18 @@ describe('street music_file keys', () => {
 
   it('unknown music_file keys keep the default library', () => {
     assert.deepEqual(tracksForTheme('street:NO_SUCH_KEY'), tracksForTheme('default'));
+  });
+
+  it('a street whose music library is lost keeps its hub music', () => {
+    // XAVIER_CARNIVOROUS_PLANTS (36 streets) was never recovered.
+    assert.equal(resolveAmbientTheme({ musicFile: 'XAVIER_CARNIVOROUS_PLANTS', hubId: '50' }), resolveAmbientTheme({ hubId: '50' }));
+    assert.equal(resolveAmbientTheme({ musicFile: 'XAVIER_CARNIVOROUS_PLANTS', hubId: '50' }), 'caverns');
+  });
+
+  it('NO_MUSIC streets are silent', () => {
+    assert.equal(resolveAmbientTheme({ musicFile: 'NO_MUSIC', hubId: '56' }), SILENT_THEME);
+    const piano = JSON.parse(readFileSync(join(__dirname, '../public/assets/streets/GA96OS42D6F3M9P.json'), 'utf8'));
+    assert.equal(resolveAmbientTheme(piano), SILENT_THEME);
   });
 });
 
