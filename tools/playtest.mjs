@@ -2,6 +2,7 @@
 //
 // Usage: node tools/playtest.mjs <scenario...> [--width=1280] [--height=860]
 //          [--swiftshader] [--headed] [--out=shots/playtest] [--fresh]
+//          [--base=http://127.0.0.1:8831/] (default https://groddle.localhost/)
 // Scenarios: newplayer, travel, naraka, rook, fuzz, long, resize, perf, all.
 //
 // Plays like a real player: no demo/QA params beyond autostart/fresh/resetgame,
@@ -22,7 +23,7 @@ const flags = Object.fromEntries(argv.filter((a) => a.startsWith('--')).map((a) 
 let scenarios = argv.filter((a) => !a.startsWith('--'));
 if (!scenarios.length || scenarios.includes('all')) scenarios = ['newplayer', 'travel', 'naraka', 'rook', 'fuzz', 'long', 'resize', 'perf'];
 const OUT = flags.out || 'shots/playtest';
-const BASE = 'https://groddle.localhost/';
+const BASE = String(flags.base || 'https://groddle.localhost/').replace(/\/?$/, '/');
 const NOISE = /GL Driver Message|AudioContext was not allowed|WebGL: INVALID|GPU stall|swiftshader/i;
 
 function log(...a) {

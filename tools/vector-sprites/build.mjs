@@ -20,7 +20,7 @@
  *  - "budget": { "maxSide": px, "maxMB": decoded MB } rejects a sheet whose 3x
  *    file would be larger, before any rendering.
  *  - "firstDraw": true (manifest or job) keeps the sheet out of the eager
- *    Texture.from route: it swaps to 3x when the renderer first draws it.
+ *    URL route: it swaps to 3x when the renderer first draws it.
  *  - job "character": sheets sharing one are all-or-nothing (a character
  *    that is sharp in one state and soft in the next looks broken), so one
  *    rejected sheet holds back the others. Defaults to the job name.

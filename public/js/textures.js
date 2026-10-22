@@ -70,6 +70,8 @@ function placeholderCanvas() {
     if (placeholder) {
       placeholder.width = 1;
       placeholder.height = 1;
+      // WebGPU's copyExternalImageToTexture refuses a canvas with no context.
+      placeholder.getContext('2d');
     }
   }
   return placeholder;

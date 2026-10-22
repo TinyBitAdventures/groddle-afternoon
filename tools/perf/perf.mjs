@@ -5,6 +5,7 @@
 //   node tools/perf/perf.mjs --base=http://127.0.0.1:8831/ --label=v7
 //     [--routes=hechey,marrakesh,room,rook,builder] [--dpr=1,2]
 //     [--out=tools/perf/results] [--shots=shots/perf] [--capped] [--headed]
+//     [--extra=renderer=webgpu --webgpu] (append query params; enable WebGPU)
 //
 // Headless Chromium on the Metal GPU (ANGLE). Frame pacing is uncapped
 // (--disable-gpu-vsync --disable-frame-rate-limit) unless --capped, so the
@@ -342,7 +343,7 @@ async function runRoute(browser, name, dpr) {
     if (r.status() >= 400) issues.push(`http ${r.status()}: ${r.url().replace(BASE, '')}`);
   });
   const t0 = Date.now();
-  await page.goto(`${BASE}${route.query}`, { waitUntil: 'load', timeout: 60000 });
+  await page.goto(`${BASE}${route.query}${flags.extra ? `&${flags.extra}` : ''}`, { waitUntil: 'load', timeout: 60000 });
   const booted = await page.waitForFunction(() => window.__perf?.bootMs !== null, null, { timeout: 60000, polling: 100 }).then(() => true, () => false);
   const bootMs = await page.evaluate(() => Math.round(window.__perf.bootMs ?? -1));
   await page.waitForTimeout(route.settle);

@@ -499,7 +499,7 @@ ${Object.values(defs).map((d) => `  ${JSON.stringify(`${dir}/${d.file}`)}: ${JSO
 
 /**
  * List the default sheets in tools/vector-sprites/results.json and
- * regenerate public/js/sprite-hires.js, so the game's Texture.from route
+ * regenerate public/js/sprite-hires.js, so the game's URL texture route
  * swaps them to 3x on first draw like the other vector sheets.
  */
 async function registerHires(defs, report) {
