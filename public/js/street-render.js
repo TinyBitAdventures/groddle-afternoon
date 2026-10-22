@@ -774,10 +774,12 @@ export const CULL_MARGIN = 256;
 
 /** A deco's axis-aligned box in its layer's coordinates (sprites only). */
 export function decoBox(spr) {
-  const tex = spr.texture;
-  if (!tex) return null;
-  const w = tex.orig.width;
-  const h = tex.orig.height;
+  // Skip anything without a measurable texture (a texture-less child or a
+  // non-Texture `texture` field): one throw here blanked the whole street.
+  const orig = spr.texture?.orig;
+  if (!orig) return null;
+  const w = orig.width;
+  const h = orig.height;
   const sx = spr.scale.x;
   const sy = spr.scale.y;
   const ax = spr.anchor?.x ?? 0;

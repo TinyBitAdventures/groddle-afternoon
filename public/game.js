@@ -537,7 +537,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=parallax-5';
+} from './js/street-render.js?v=parallax-6';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,

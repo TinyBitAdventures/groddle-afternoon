@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 240,
+  "commits": 241,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "163 street decos show Tiny Speck's real art again"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1510,14 +1515,9 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Drop the made-up XS Musicblock icons"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Every recovered Musicblock tune to collect, and Esquibeth's own melody"
    }
   ]
  },
- "tests": 151,
+ "tests": 152,
  "generatedAt": "2026-10-22"
 }
