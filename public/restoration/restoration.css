@@ -228,7 +228,7 @@ h3 { font-size: 22px; margin: 0 0 10px; }
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
   padding: 20px; min-height: 200px;
   box-shadow: 0 12px 30px -20px rgba(48, 70, 44, 0.45);
-  position: sticky; top: 16px;
+  position: sticky; top: calc(var(--site-nav-h, 0px) + 16px);
 }
 .spot-card-empty { color: var(--muted); margin: 0; }
 .detail + .detail { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--border); }

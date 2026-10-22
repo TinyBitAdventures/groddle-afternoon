@@ -139,7 +139,7 @@ describe('compare page', () => {
   });
 
   it('hosts no other project\'s images', () => {
-    for (const m of html.matchAll(/<img[^>]+src="([^"]+)"/g)) assert.ok(m[1].startsWith('../assets/'), m[1]);
+    for (const m of html.matchAll(/<img[^>]+src="([^"]+)"/g)) assert.ok(m[1].startsWith('../assets/') || m[1].startsWith('../favicon.svg'), m[1]);
     assert.ok(!/<img[^>]+src="https?:/.test(html));
   });
 

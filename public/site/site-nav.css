@@ -1,0 +1,44 @@
+/* Groddle Field Notes · the shared site header on the home page, the
+   restoration report and the compare page. Uses each page's own tokens
+   (--bg, --fg, --muted, --border, --accent), so it follows the page's
+   light or dark theme. The markup is identical on every page apart from
+   the path prefix and aria-current (tests/site-nav.test.js). */
+
+:root { --site-nav-h: 60px; }
+html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
+
+.site-nav {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.site-nav-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: var(--site-nav-h); }
+.site-nav .wordmark {
+  display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0;
+  color: var(--fg); text-decoration: none; white-space: nowrap;
+  font-family: var(--font-display); font-weight: 600; font-size: 20px; letter-spacing: -0.01em;
+}
+.site-nav-links { display: flex; align-items: center; gap: 18px; }
+.site-nav-links a:not(.site-nav-play) {
+  color: var(--muted); text-decoration: none; font-weight: 700; font-size: 15px;
+  padding: 4px 0; border-bottom: 2px solid transparent;
+}
+.site-nav-links a:not(.site-nav-play):hover { color: var(--fg); }
+.site-nav-links a[aria-current="page"] { color: var(--fg); border-bottom-color: var(--accent); }
+.site-nav-play {
+  display: inline-flex; align-items: center; min-height: 36px; padding: 0 16px; border-radius: 999px;
+  background: var(--accent); color: #1f1407; font-weight: 800; font-size: 15px; text-decoration: none;
+  transition: filter .15s ease;
+}
+.site-nav-play:hover { filter: brightness(1.08); }
+.site-nav a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+/* Phones: the mark alone, the two reports and Play. */
+@media (max-width: 640px) {
+  .site-nav .wordmark span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .site-nav-links { gap: 14px; }
+  .site-nav-links .site-nav-dev { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) { .site-nav-play { transition: none; } }
