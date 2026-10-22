@@ -72,6 +72,7 @@ import {
   startIncubation,
 } from './js/animal-husbandry.js';
 import { moodMax } from './js/metabolics.js';
+import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-3';
 
 /** Naming / capture context for an animal target (the back yard counts as yours). */
 function husbandryCtx(ctx) {
@@ -967,7 +968,7 @@ function finalizeMsgs(msgs, effects) {
       xp: effects.img || effects.xp,
       items: effects.items,
     },
-    (id) => ITEM_LABELS[id] || id
+    (id) => ITEM_LABELS[id] || ITEM_CATALOG[id]?.label || id
   );
   // Put activity line first for feed/toast
   if (line && (!msgs.length || msgs[0] !== line)) {

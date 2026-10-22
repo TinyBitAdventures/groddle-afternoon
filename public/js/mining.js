@@ -362,7 +362,9 @@ export function mineRock(rock, inv, pc, opts = {}) {
     : null;
 
   const chunkLabel = def?.chunkLabel || rock.chunkId;
-  msgs.push(`You mine ${got} ${got === 1 ? chunkLabel : chunkLabel + (chunkLabel.endsWith('s') ? '' : 's')}.`);
+  // "Chunk of Metal Rock" → "Chunks of Metal Rock"; Dullite, Beryl and Sparkly read as mass nouns.
+  const chunkPlural = chunkLabel.startsWith('Chunk of ') ? `Chunks of ${chunkLabel.slice(9)}` : chunkLabel;
+  msgs.push(`You mine ${got} ${got === 1 ? chunkLabel : chunkPlural}.`);
   // Truly Outrageous I-IV: the package's gem_small drop (catalog_drop_tables.js).
   // Each gem scales that pick's drop chance by 0.8 until the new day
   // (addSkillPackageOverride in include/mining.js, cleared in doNewDay).

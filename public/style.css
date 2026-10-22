@@ -4667,8 +4667,11 @@ header.top-bar + .sub { display: none; }
 .toast {
   position: absolute;
   left: 50%;
-  bottom: 72px;
+  /* Above the pack and the local chat input row, not over the item slots. */
+  bottom: calc(var(--pack-live-height, 112px) + 52px);
   transform: translateX(-50%);
+  /* Appears in place: the pop keyframes would override the centring transform and slide it in. */
+  animation: none;
   z-index: 50;
   background: rgba(30,28,24,0.9);
   color: #fffdf7;
