@@ -319,3 +319,27 @@ describe('game wiring', () => {
     assert.match(src, /'mine'/);
   });
 });
+
+describe('pick swing', () => {
+  const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
+  // WebP VP8L header: 14-bit width-1 and height-1 after the 0x2f signature.
+  const webpSize = (rel) => {
+    const b = readFileSync(join(pub, rel));
+    const bits = b.readUInt32LE(21);
+    return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+  };
+
+  it('ships the source tool_animation scene for both picks at 3x (11 x 3 cells of 115 x 63)', () => {
+    for (const file of ['pick-tool@3x.webp', 'fancy-pick-tool@3x.webp']) {
+      assert.deepEqual(webpSize(`assets/sprites/tools/${file}`), { width: 115 * 11 * 3, height: 63 * 3 * 3 });
+    }
+  });
+
+  it('swings the working pick while the mine verb runs', () => {
+    const game = readFileSync(join(pub, 'game.js'), 'utf8');
+    assert.match(game, /ROCK_CATALOG\[target\.classId\] && baseVerb === 'mine'\) playPickAnimation/);
+    assert.match(game, /findWorkingPick\(inv, toolState\)/);
+    assert.match(game, /pick-tool@3x\.webp/);
+    assert.match(game, /fancy-pick-tool@3x\.webp/);
+  });
+});

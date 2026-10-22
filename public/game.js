@@ -500,6 +500,7 @@ import {
   ensureMiningItems,
   starterMiningTools,
   STARTER_MINING_SKILLS,
+  findWorkingPick,
 } from './js/mining.js?v=rock-cells-1';
 import {
   createActivityLog,
@@ -4747,6 +4748,7 @@ function playVerbStartAnimation(target, verbId, durationMs = 0) {
   if (baseVerb === 'water' || baseVerb === 'water_all') {
     playWateringCanAnimation(target, durationMs);
   }
+  if (ROCK_CATALOG[target.classId] && baseVerb === 'mine') playPickAnimation(target, durationMs);
 }
 
 function playButterflyCareAnimation(target, verbId, durationMs = 0) {
@@ -4817,6 +4819,59 @@ function playWateringCanAnimation(target, durationMs = 0) {
     if (tool.parent) tool.parent.removeChild(tool);
     if (!tool.destroyed) tool.destroy();
     if (app?.view) app.view.dataset.wateringCanAnimation = 'complete';
+  };
+  tool.play();
+  return tool;
+}
+
+/** pick.swf / fancy_pick.swf tool_animation scene (root frames 1-33) at 3x, loaded on the first swing. */
+const PICK_TOOL_SHEETS = Object.freeze({
+  pick: 'assets/sprites/tools/pick-tool@3x.webp',
+  fancy_pick: 'assets/sprites/tools/fancy-pick-tool@3x.webp',
+});
+const PICK_TOOL_DEF = Object.freeze({ fw: 115, fh: 63, cols: 11, rows: 3 });
+const PICK_SWING_FRAMES = 33;
+const pickToolFrames = new Map();
+
+/** The pick swings beside the avatar for the whole timed mine verb (the source overlay loops). */
+async function playPickAnimation(target, durationMs = 0) {
+  const pick = findWorkingPick(inv, toolState) || 'pick';
+  if (!pickToolFrames.has(pick)) {
+    const tex = await loadTexture(PICK_TOOL_SHEETS[pick]).catch(() => null);
+    if (!tex) return null;
+    pickToolFrames.set(pick, sliceSheet(tex.baseTexture, PICK_TOOL_DEF, PICK_SWING_FRAMES));
+  }
+  // The verb may have finished or been cancelled while the sheet loaded.
+  if (!fxLayer || !player || !target?.sprite || currentAction?.target !== target) return null;
+  clearActionToolFx('replaced');
+  const swing = pickToolFrames.get(pick);
+  const seconds = Math.max(1.1, (Number(durationMs) || 2000) / 1000);
+  // Whole swings at the SWF's 30 fps, stretched slightly to end with the verb.
+  const swings = Math.max(1, Math.round(seconds / (PICK_SWING_FRAMES / 30)));
+  const frames = Array.from({ length: swings }, () => swing).flat();
+  const tool = new PIXI.AnimatedSprite(frames);
+  const targetIsLeft = target.sprite.x < player.x;
+  tool.anchor.set(0.5);
+  // The source drew it on the rock (itemstack_overlay); between avatar and rock keeps it off the face.
+  tool.x = player.x + (targetIsLeft ? -50 : 50);
+  tool.y = player.y - 46;
+  tool.scale.set(targetIsLeft ? -1 : 1, 1);
+  tool.animationSpeed = frames.length / (60 * seconds);
+  tool.loop = false;
+  tool.zIndex = 100000;
+  tool.eventMode = 'none';
+  tool._toolAnimationDataset = 'pickAnimation';
+  actionToolFx = tool;
+  fxLayer.addChild(tool);
+  if (app?.view) {
+    app.view.dataset.pickAnimation = 'playing';
+    app.view.dataset.pickAnimationTool = pick;
+  }
+  tool.onComplete = () => {
+    if (actionToolFx === tool) actionToolFx = null;
+    if (tool.parent) tool.parent.removeChild(tool);
+    if (!tool.destroyed) tool.destroy();
+    if (app?.view) app.view.dataset.pickAnimation = 'complete';
   };
   tool.play();
   return tool;
