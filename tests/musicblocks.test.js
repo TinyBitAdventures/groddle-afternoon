@@ -249,8 +249,8 @@ describe('Musicblock street collection', () => {
     assert.equal(countItem(inv, 'musicblock_sb_secret_01'), 0);
     assert.equal(listMusicblockCollection(inv).owned, 26);
     assert.equal(planMusicblockDrop(state, inv, 'one-more-street'), null);
-    assert.equal(musicblockCollectionNote(inv, 'musicblock_d_blue_03'), 'Recovered tunes 26/27 · DB series 5/5');
-    assert.equal(musicblockCollectionNote(inv, 'musicblock_goodnight_groddle'), 'Recovered tunes 26/27');
+    assert.equal(musicblockCollectionNote(inv, 'musicblock_d_blue_03'), 'DB series 5/5');
+    assert.equal(musicblockCollectionNote(inv, 'musicblock_goodnight_groddle'), '');
   });
 
   it('pays SB-1 its own first hearing (1000 XP)', () => {

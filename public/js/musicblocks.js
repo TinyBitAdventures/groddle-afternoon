@@ -178,14 +178,12 @@ export function musicblockSeriesProgress(inv, collection) {
   return { collection, owned, total: rows.length, complete: owned === rows.length };
 }
 
-/** The pack popover line: whole collection, plus the block's series when it has one. */
+/** The pack popover line: the block's series progress, when it belongs to one. */
 export function musicblockCollectionNote(inv, classTsid) {
   const def = getMusicblock(classTsid);
   if (!def) return '';
-  const all = listMusicblockCollection(inv);
   const series = musicblockSeriesProgress(inv, def.collection);
-  const head = `Recovered tunes ${all.owned}/${all.total}`;
-  return series ? `${head} · ${series.collection} series ${series.owned}/${series.total}` : head;
+  return series ? `${series.collection} series ${series.owned}/${series.total}` : '';
 }
 
 /**

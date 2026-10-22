@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=social-follow-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=musicblocks-note-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-1';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-3';
 import {
@@ -649,7 +649,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=musicblocks-all-1';
+} from './js/musicblocks.js?v=musicblocks-note-2';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,

@@ -127,3 +127,13 @@ describe('game wiring', () => {
     assert.ok(game.includes('ambient-music'));
   });
 });
+
+describe('street playlists', () => {
+  it('play no Musicblock tunes (Goodnight Groddle is the Musicblock lullaby, not street music)', () => {
+    const cfg = JSON.parse(readFileSync(new URL('../public/assets/content/ambient-music.json', import.meta.url), 'utf8'));
+    for (const [id, theme] of Object.entries(cfg.themes)) {
+      if (id === 'musicblocks') continue;
+      for (const track of theme.tracks || []) assert.doesNotMatch(track, /GOODNIGHT_GRODDLE|MUSICBLOCK/i, `${id}: ${track}`);
+    }
+  });
+});
