@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 239,
+  "commits": 240,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "Sharp 3x quoins, hand-traced from the 1x sheet"
+   },
    {
     "date": "2026-10-22",
     "kind": "fix",
@@ -1510,14 +1515,9 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Every recovered Musicblock tune to collect, and Esquibeth's own melody"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Climbing: no flicker at the top or bottom, and Up never jumps off a ladder"
    }
   ]
  },
- "tests": 150,
+ "tests": 151,
  "generatedAt": "2026-10-22"
 }

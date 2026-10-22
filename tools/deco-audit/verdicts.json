@@ -1,0 +1,2286 @@
+{
+ "rule": {
+  "flag": {
+   "missing_or_extra": 0.08,
+   "colour": 0.12
+  },
+  "about": "report.json rows at or past these scores are flagged; each needs a verdict here"
+ },
+ "source": "tinyspeck/glitch-locations glitch-location-swfs bundles (CC0), FFDec 2x frame 1, resized to the shipped PNG size",
+ "fixed": {
+  "arbito_ladder_tile_center_02_stone": {
+   "swf": "bundle:arbito1.swf#arbito_ladder_tile_center_02_stone",
+   "size": [
+    146,
+    100
+   ],
+   "sha256": "b4c22c58023cf8306a1871eb90e4a75b795f473c7f652b7e6837eaa02ff0087f",
+   "cause": "flat colour: a colour-transformed texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GHVCKEPHO403BN5 Orangian",
+   "placed": 7
+  },
+  "archway_x": {
+   "swf": "bundle:abbasid1.swf#archway_x",
+   "size": [
+    1022,
+    1338
+   ],
+   "sha256": "a51ae7c65789c9d393938988ef0b094bfc50f115f09a3abc323ef7d4a6ecf5c3",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA9R3FG405F3B9P Abbasid Walkway",
+   "placed": 7
+  },
+  "arrow_ground2": {
+   "swf": "bundle:quest02.swf#arrow_ground2",
+   "size": [
+    242,
+    58
+   ],
+   "sha256": "d7375832d75f2f2633c64b495eeac6ff7d3e1179954af34f8dec7a9cc0dbd615",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GNVD57N9ERF3TNH The Greedy Street Spirit",
+   "placed": 15
+  },
+  "background_wallpaper_test": {
+   "swf": "bundle:firebog.swf#background_wallpaper_test",
+   "size": [
+    1905,
+    809
+   ],
+   "sha256": "eb54cbe77e31cc70fce152610ace5eb29cfc2da35a11c89fe3ad48a2b64d167e",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA9111M11LA2VAT Ghora Chani",
+   "placed": 94
+  },
+  "bling_mushroom_bunch_tree_1": {
+   "swf": "bundle:groddle1.swf#bling_mushroom_bunch_tree_1",
+   "size": [
+    106,
+    160
+   ],
+   "sha256": "60cd742a99dc721c6f21a37544358fe7d438c63bffbc0480432ec6ca7d8214f8",
+   "cause": "missing or misplaced layers",
+   "renderer": "ffdec raster",
+   "street": "GCR111KI08O1HLB Langden Abbey",
+   "placed": 20
+  },
+  "block_grass01": {
+   "swf": "bundle:keita1.swf#block_grass01",
+   "size": [
+    384,
+    136
+   ],
+   "sha256": "a1f0c2ba76f05dae224a113b7e5c9b89b6a5ae0ae6fe462de866d839e7e30138",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9BT2I0ILD340S Shim Shiri",
+   "placed": 8
+  },
+  "block_grass02": {
+   "swf": "bundle:keita1.swf#block_grass02",
+   "size": [
+    384,
+    136
+   ],
+   "sha256": "9031add02b224b9284a8440355d81125e9279299e113d6d67dd4ee9bf7e5fe8b",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9BT2I0ILD340S Shim Shiri",
+   "placed": 7
+  },
+  "block_grass03": {
+   "swf": "bundle:keita1.swf#block_grass03",
+   "size": [
+    386,
+    152
+   ],
+   "sha256": "c6494f9e0728d9e47b0db17a620e087c0916937b0356e0ba39d86de458a1efc2",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9BT2I0ILD340S Shim Shiri",
+   "placed": 11
+  },
+  "blur_landscape_piece_01": {
+   "swf": "bundle:limbo1.swf#blur_landscape_piece_01",
+   "size": [
+    4350,
+    2188
+   ],
+   "sha256": "502ff945b01210bfe801931c5efd4cce8f78cb00038b494e27865896392c7337",
+   "cause": "missing or misplaced layers (SWF uses filters (blur))",
+   "renderer": "ffdec raster",
+   "street": "GA9QTSIOV4F31QH Bliss",
+   "placed": 410
+  },
+  "blur_purple_flower_2_maytang": {
+   "swf": "bundle:maytang.swf#blur_purple_flower_2_maytang",
+   "size": [
+    250,
+    340
+   ],
+   "sha256": "e0f2f0dca2dcef6c7ab329aa2b9a3b7808bf8e568d5fe33b64928ff61f9169bf",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9QQQ8LV4F3TJ2 May Soup",
+   "placed": 1
+  },
+  "blur_willow_01": {
+   "swf": "bundle:limbo1.swf#blur_willow_01",
+   "size": [
+    70,
+    180
+   ],
+   "sha256": "0aaef04ebc78ec7f52d832d787d9707179657d118aa2388f7533c7085ff6a714",
+   "cause": "missing or misplaced layers (SWF uses filters (blur))",
+   "renderer": "ffdec raster",
+   "street": "GA5REO5I9OE2KLS Dhuma Maya",
+   "placed": 1
+  },
+  "blur_willow_02": {
+   "swf": "bundle:limbo1.swf#blur_willow_02",
+   "size": [
+    74,
+    180
+   ],
+   "sha256": "baf791089cbb1d4ff8b5656046540d8cf31d859072e88726d97df3809d1a7429",
+   "cause": "missing or misplaced layers (SWF uses filters (blur))",
+   "renderer": "ffdec raster",
+   "street": "GA9RFQBJ05F33D7 Shivering Isles",
+   "placed": 13
+  },
+  "bottletree_body2": {
+   "swf": "bundle:firebog.swf#bottletree_body2",
+   "size": [
+    1116,
+    1314
+   ],
+   "sha256": "7672f15685bba816669ddc3d16cfda7b60f70aa970af392da7f3d0d1b43e7012",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9111M11LA2VAT Ghora Chani",
+   "placed": 105
+  },
+  "bottletree_burb_wndw_2": {
+   "swf": "bundle:firebog.swf#bottletree_burb_wndw_2",
+   "size": [
+    1198,
+    1286
+   ],
+   "sha256": "1a51e482660f8488677b7a03b0b53768fdd3922fb13a26f3264b351a73652d9c",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA911I05ILA2CQ5 Dusa Tanad",
+   "placed": 59
+  },
+  "boulder_1": {
+   "swf": "bundle:limbo1.swf#boulder_1",
+   "size": [
+    472,
+    660
+   ],
+   "sha256": "076cb3d593334216170fb2221c6a77588ff719058021df4854c1ad6cd26650bf",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GNVV9IM8PL4301V A Summer's Day",
+   "placed": 49
+  },
+  "building_blue_base": {
+   "swf": "bundle:abbasid1.swf#building_blue_base",
+   "size": [
+    1682,
+    970
+   ],
+   "sha256": "d4a27e70f383a8fa9a8ee521ad62b3b249f41a66314b1bbfa2566cb486d4c8de",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA9R3FG405F3B9P Abbasid Walkway",
+   "placed": 7
+  },
+  "building_blue_middle": {
+   "swf": "bundle:abbasid1.swf#building_blue_middle",
+   "size": [
+    1682,
+    694
+   ],
+   "sha256": "58e9dc69934a57ffb58a281c2ac42e2ec654137ba153cd3149040a12a9b3734a",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA9R3FG405F3B9P Abbasid Walkway",
+   "placed": 10
+  },
+  "cave_big_platform_1": {
+   "swf": "bundle:zutto1.swf#cave_big_platform_1",
+   "size": [
+    768,
+    544
+   ],
+   "sha256": "4675c051adb3b039ea0d108ab10217d69b981bc8bbbb6ff384d0c0b15ffe101c",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GDOK0A8OG1E2C7O Nylon Phool",
+   "placed": 22
+  },
+  "cave_big_platform_2": {
+   "swf": "bundle:zutto1.swf#cave_big_platform_2",
+   "size": [
+    218,
+    342
+   ],
+   "sha256": "2659765e9cb0133d115ee3e025822dc65bc2ed18beb2be7ae844013706c16a7f",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA918AIN63127HB Dobak Fathom",
+   "placed": 53
+  },
+  "cave_crystal_1": {
+   "swf": "bundle:zutto1.swf#cave_crystal_1",
+   "size": [
+    130,
+    74
+   ],
+   "sha256": "ed8503b5384bb57b83fbe82172bd18e011c3c48740a9e7388556993278300cb0",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA910DULG012JIE Punar Grotta",
+   "placed": 42
+  },
+  "cave_crystal_2": {
+   "swf": "bundle:zutto1.swf#cave_crystal_2",
+   "size": [
+    130,
+    74
+   ],
+   "sha256": "e1d0f35951da7703043f4ea10bfca617381f67d63d746e525c6e841e37d0f2fd",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA910DULG012JIE Punar Grotta",
+   "placed": 166
+  },
+  "cave_crystal_3": {
+   "swf": "bundle:zutto1.swf#cave_crystal_3",
+   "size": [
+    130,
+    74
+   ],
+   "sha256": "4f236279012e2eff2147d4d2cabaa6e1e0300d3e34e6e04d2af80ca1bb1b6234",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA910DULG012JIE Punar Grotta",
+   "placed": 55
+  },
+  "cave_crystal_5": {
+   "swf": "bundle:zutto1.swf#cave_crystal_5",
+   "size": [
+    202,
+    246
+   ],
+   "sha256": "9599587e56ac936318d2545a56a1ca4b3c53b5d6a048b245ed692597e652ffda",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA91JU4QQ712DJN Arjun Plunge",
+   "placed": 13
+  },
+  "cave_crystal_6": {
+   "swf": "bundle:zutto1.swf#cave_crystal_6",
+   "size": [
+    122,
+    108
+   ],
+   "sha256": "318b5eb9af2f686c676ac69c31bb7f25d670c5f12afeda78c76a973c6597359d",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA9114MS8B32FB2 Churni Sanctum",
+   "placed": 54
+  },
+  "cave_crystal_7": {
+   "swf": "bundle:zutto1.swf#cave_crystal_7",
+   "size": [
+    250,
+    268
+   ],
+   "sha256": "8a90195d2cc5bdf8fa2f64adb517370d27e7af3672f4b747fa42a7e71fb0746e",
+   "cause": "missing or misplaced layers (SWF uses masks, colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA9114MS8B32FB2 Churni Sanctum",
+   "placed": 133
+  },
+  "cave_crystal_8": {
+   "swf": "bundle:zutto1.swf#cave_crystal_8",
+   "size": [
+    130,
+    74
+   ],
+   "sha256": "297520c98a80d4ec967038c4c7d0180a79f933c0689fa78c078a34a469c9c8a3",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA911QQIDI32J6R Janagi Elations",
+   "placed": 82
+  },
+  "cave_gr_texture_8": {
+   "swf": "bundle:zutto1.swf#cave_gr_texture_8",
+   "size": [
+    836,
+    168
+   ],
+   "sha256": "afadf75713dd08a9da1551d3f6a97641e0de2f0d1a03a6ea4c9ab2b0acfe3c6b",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA91JU4QQ712DJN Arjun Plunge",
+   "placed": 3
+  },
+  "cave_platform_1": {
+   "swf": "bundle:zutto1.swf#cave_platform_1",
+   "size": [
+    482,
+    812
+   ],
+   "sha256": "a0c39c7deed52a728e5d2484a07b3d99f1d41289e79315aaa350bb819a550978",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA918AIN63127HB Dobak Fathom",
+   "placed": 82
+  },
+  "cave_platform_2": {
+   "swf": "bundle:zutto1.swf#cave_platform_2",
+   "size": [
+    768,
+    226
+   ],
+   "sha256": "3f3f6ffba02838c5be574457d20cfe09bfe65c92e8ded1314a2f8c4f004ef931",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA918AIN63127HB Dobak Fathom",
+   "placed": 51
+  },
+  "cave_platform_3": {
+   "swf": "bundle:zutto1.swf#cave_platform_3",
+   "size": [
+    394,
+    234
+   ],
+   "sha256": "2cf40237044fe953858f1829328e72b4006544900f7c093b1fe207e1c9ee64d2",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA918AIN63127HB Dobak Fathom",
+   "placed": 26
+  },
+  "cave_platform_4": {
+   "swf": "bundle:zutto1.swf#cave_platform_4",
+   "size": [
+    742,
+    812
+   ],
+   "sha256": "6774b0405824a2cb664b20187af59220eb61f3c2e0d3ee3a44b43a5740941bf7",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA918AIN63127HB Dobak Fathom",
+   "placed": 16
+  },
+  "cave_platform_5": {
+   "swf": "bundle:zutto1.swf#cave_platform_5",
+   "size": [
+    482,
+    790
+   ],
+   "sha256": "35ffff1c6f23dc52e547da3e7375e92765e7f4b9706a0d29ad60728c4978ed72",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA910DULG012JIE Punar Grotta",
+   "placed": 16
+  },
+  "cave_platform_6": {
+   "swf": "bundle:zutto1.swf#cave_platform_6",
+   "size": [
+    482,
+    790
+   ],
+   "sha256": "acf22f607322d92f225aa62c82b036a11e271b697c0ab083edf7813c3d7ce25a",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA918AIN63127HB Dobak Fathom",
+   "placed": 52
+  },
+  "cave_stalactite_1": {
+   "swf": "bundle:zutto1.swf#cave_stalactite_1",
+   "size": [
+    318,
+    716
+   ],
+   "sha256": "ef3d1446d2197a92116cd8c0ba9fbb10b5af4dcec4cd420e54f987220f64818d",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply, screen), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA91JU4QQ712DJN Arjun Plunge",
+   "placed": 44
+  },
+  "cave_stalactite_2": {
+   "swf": "bundle:zutto1.swf#cave_stalactite_2",
+   "size": [
+    236,
+    482
+   ],
+   "sha256": "ece2748051ce93070a918e7f4f4ab3d04ad0b526fe10437741f5f0f6c44bef6d",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA9154LI9R22R7A Ajaya Bliss",
+   "placed": 12
+  },
+  "cave_stalactite_3": {
+   "swf": "bundle:zutto1.swf#cave_stalactite_3",
+   "size": [
+    214,
+    442
+   ],
+   "sha256": "5fcfcb2dd1f1b53639c69532411e00ba8819516a088885a04dbc75241ccc2b97",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply, screen), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA918AIN63127HB Dobak Fathom",
+   "placed": 45
+  },
+  "cave_stalactite_4": {
+   "swf": "bundle:zutto1.swf#cave_stalactite_4",
+   "size": [
+    178,
+    366
+   ],
+   "sha256": "033159234af9e7019dba9fe718fbe814adbf930eaa61582812a96ac8c02cb69c",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply, screen), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA9154LI9R22R7A Ajaya Bliss",
+   "placed": 32
+  },
+  "cave_stalactite_5": {
+   "swf": "bundle:zutto1.swf#cave_stalactite_5",
+   "size": [
+    218,
+    448
+   ],
+   "sha256": "de830fd589ddb27981067c96b8b4d659f650b843bb43aaf1399853a790a2f575",
+   "cause": "missing or misplaced layers (SWF uses blend modes (screen), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA91JU4QQ712DJN Arjun Plunge",
+   "placed": 84
+  },
+  "cl2_cactus_Back_02": {
+   "swf": "bundle:leavens1.swf#cl2_cactus_Back_02",
+   "size": [
+    56,
+    170
+   ],
+   "sha256": "ff71cbab778c99f4aa77f4cbef2569be6d564b4c26c86c67e89e5628c072af7a",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 3
+  },
+  "climbingtree_02_piece_shadow": {
+   "swf": "bundle:corey3.swf#climbingtree_02_piece_shadow",
+   "size": [
+    258,
+    58
+   ],
+   "sha256": "c98010ec9d2f02bbb1a720614041b396c0eebe74afe66c940b772a5e2f780449",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GIF101PQNFD27KG The Next Step",
+   "placed": 19
+  },
+  "column2": {
+   "swf": "bundle:firebog.swf#column2",
+   "size": [
+    196,
+    906
+   ],
+   "sha256": "534ce309ea9eedd6f43eecdc105f52c2a6e58eee4a0fc1ee014c670222c9106d",
+   "cause": "flat colour: a masked texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA99VU1246A2VND Vilong Hari",
+   "placed": 7
+  },
+  "decor_plants1": {
+   "swf": "bundle:firebog.swf#decor_plants1",
+   "size": [
+    320,
+    326
+   ],
+   "sha256": "49ab3bfd234b08502e0dc48cd40a9d0effe7854a94c0a96057db88ddf313e4be",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA99VU1246A2VND Vilong Hari",
+   "placed": 10
+  },
+  "decor_plants2": {
+   "swf": "bundle:firebog.swf#decor_plants2",
+   "size": [
+    178,
+    238
+   ],
+   "sha256": "dcdbb79cf750fdc7851b207f69ca6cd7a5ca677e20b454879babf054b2ed9267",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA98V53GRQA2VTO Tonki Toe",
+   "placed": 6
+  },
+  "decor_plants4": {
+   "swf": "bundle:firebog.swf#decor_plants4",
+   "size": [
+    400,
+    286
+   ],
+   "sha256": "6f6a11725efae8d0c69540c6d3327ffd2d17be4438e625143b1ed13e61d9317e",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA94KO5CFQA2V4Q Seela Latta",
+   "placed": 6
+  },
+  "decor_plants5": {
+   "swf": "bundle:firebog.swf#decor_plants5",
+   "size": [
+    240,
+    338
+   ],
+   "sha256": "6e2ab74b51fa02ea00ae01875540af953be33ff0c24a5fe6a77f799d82b6cac2",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA94KO5CFQA2V4Q Seela Latta",
+   "placed": 3
+  },
+  "decor_plants6": {
+   "swf": "bundle:firebog.swf#decor_plants6",
+   "size": [
+    456,
+    330
+   ],
+   "sha256": "a265a851f1adf8d165987220baff37358bf79376ca1a52d2e1014fadd494b3b1",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA99CL11LSA2M35 Fitadara Fry",
+   "placed": 6
+  },
+  "door_asset_house_medium_01": {
+   "swf": "bundle:pol_ext_meadow.swf#door_asset_house_medium_01",
+   "size": [
+    764,
+    586
+   ],
+   "sha256": "a256f755435cfbe05b5b369e07e17a81fc3908a287634d6297d3391bb794ebe1",
+   "cause": "flat colour: a masked texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "code-placed only",
+   "placed": 0
+  },
+  "fence_wood1": {
+   "swf": "bundle:newxp.swf#fence_wood1",
+   "size": [
+    262,
+    360
+   ],
+   "sha256": "6d3b2e28f48fd1f62a34a75318a670160e51a68834a204ad6ca3b7ef75d6d85b",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GIF101PQNFD27KG The Next Step",
+   "placed": 4
+  },
+  "firebog_ladder_tile_cap_0_vine": {
+   "swf": "bundle:firebog.swf#firebog_ladder_tile_cap_0_vine",
+   "size": [
+    36,
+    100
+   ],
+   "sha256": "8f496c7d04eec12845a4de2980c9589bb6de4c95245b3d0c6e5e608e05796a79",
+   "cause": "missing or misplaced layers",
+   "renderer": "ffdec raster",
+   "street": "GA94KO5CFQA2V4Q Seela Latta",
+   "placed": 10
+  },
+  "firebog_ladder_tile_cap_1_vine": {
+   "swf": "bundle:firebog.swf#firebog_ladder_tile_cap_1_vine",
+   "size": [
+    36,
+    100
+   ],
+   "sha256": "c81fdd190eeb9811b453f49e9f569fe89396952c8b0c74428e381ff54dc97528",
+   "cause": "missing or misplaced layers",
+   "renderer": "ffdec raster",
+   "street": "GA94KO5CFQA2V4Q Seela Latta",
+   "placed": 54
+  },
+  "fireflies": {
+   "swf": "bundle:firebog.swf#fireflies",
+   "size": [
+    604,
+    194
+   ],
+   "sha256": "b790d7896dbad25b0cf5c257419cec32f14459f4d96eaed9626d39a5820d89a7",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GNVV9IM8PL4301V A Summer's Day",
+   "placed": 7
+  },
+  "front_ground_2": {
+   "swf": "bundle:firebog.swf#front_ground_2",
+   "size": [
+    620,
+    272
+   ],
+   "sha256": "0cb15e674c625f8fa431896928589dab6634c6caf035d9ae240135fb86b3cbb0",
+   "cause": "flat colour: a masked texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA9111M11LA2VAT Ghora Chani",
+   "placed": 1638
+  },
+  "front_ground_3": {
+   "swf": "bundle:firebog.swf#front_ground_3",
+   "size": [
+    768,
+    420
+   ],
+   "sha256": "e7d6f0776fc92f724b667ade82fbc79dd2d3b72622b1b6d9f75d0073044de331",
+   "cause": "flat colour: a masked texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA9111M11LA2VAT Ghora Chani",
+   "placed": 486
+  },
+  "front_ground_set_3": {
+   "swf": "bundle:firebog.swf#front_ground_set_3",
+   "size": [
+    618,
+    382
+   ],
+   "sha256": "0daf06102a6a7089997e435cc7aaf17231ccf2b9c893dca1963a468c7a86902f",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA94KO5CFQA2V4Q Seela Latta",
+   "placed": 35
+  },
+  "fungus_oyster_noshadow_01b_et1": {
+   "swf": "bundle:enchant_tree.swf#fungus_oyster_noshadow_01b_et1",
+   "size": [
+    346,
+    144
+   ],
+   "sha256": "75e241ff9ff649ed5b907602243a02b0bbf2ed87228d6dc02ad5d579837a0577",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA57CE3KTN13I7Q Verbum Destruit",
+   "placed": 2
+  },
+  "fungus_oyster_noshadow_01c_et1": {
+   "swf": "bundle:enchant_tree.swf#fungus_oyster_noshadow_01c_et1",
+   "size": [
+    364,
+    150
+   ],
+   "sha256": "e68d699098ab7dabb5ac1e53d63ea86ea6ca3f006fcd6a8deb3513d11cea152f",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA57CE3KTN13I7Q Verbum Destruit",
+   "placed": 5
+  },
+  "fungus_oyster_noshadow_01d_et1": {
+   "swf": "bundle:enchant_tree.swf#fungus_oyster_noshadow_01d_et1",
+   "size": [
+    260,
+    144
+   ],
+   "sha256": "34285bf64d5a253bc95b444eddad2f445709b1e75e0f30fae352fc10b1fa8da6",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA57CE3KTN13I7Q Verbum Destruit",
+   "placed": 4
+  },
+  "grass_texture_6": {
+   "swf": "bundle:zutto1.swf#grass_texture_6",
+   "size": [
+    156,
+    38
+   ],
+   "sha256": "197d5ba2b6df215bc2dd883be9bde245e7d6771f9bacc1d5b924ee02ee97aee1",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GUV174V0QUB3JT4 Ambu Jal",
+   "placed": 46
+  },
+  "grass_texture_7": {
+   "swf": "bundle:zutto1.swf#grass_texture_7",
+   "size": [
+    156,
+    38
+   ],
+   "sha256": "5c0c3e102b88f5c1f07e0542c8b591f9097bbc167a82c305949b593f929d8fc6",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA93VBH3H3D38HF Gentle Island Exit",
+   "placed": 44
+  },
+  "groddle_flower_9": {
+   "swf": "bundle:newxp.swf#groddle_flower_9",
+   "size": [
+    176,
+    104
+   ],
+   "sha256": "59fa1d86cabca3dc5513c00df37a5011390b08f9d4067f18fd972475b2e8ffa7",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA614AEMKBD2UCC And so it begins...",
+   "placed": 36
+  },
+  "ground_curb_1": {
+   "swf": "bundle:abbasid1.swf#ground_curb_1",
+   "size": [
+    408,
+    174
+   ],
+   "sha256": "90b63703f87c72bc08e14652966c78c168f9cf30d938fb10574f826619b5f082",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA9R3FG405F3B9P Abbasid Walkway",
+   "placed": 15
+  },
+  "ground_cutaway_fish1": {
+   "swf": "bundle:firebog.swf#ground_cutaway_fish1",
+   "size": [
+    110,
+    60
+   ],
+   "sha256": "3d7464b7c51f0499442b377e424131f5dadc158139621790f9db159775f8f1d8",
+   "cause": "blank PNG: the art is all gradient fills, which the coU-decos export dropped",
+   "renderer": "ffdec raster",
+   "street": "GA91120N5LA249C Senna Karup",
+   "placed": 19
+  },
+  "ground_cutaway_fish2": {
+   "swf": "bundle:firebog.swf#ground_cutaway_fish2",
+   "size": [
+    112,
+    48
+   ],
+   "sha256": "ffaac65d54c208296aeb06ae9d9962f4e4f2f96c01b227a1f668f32f26e94e74",
+   "cause": "blank PNG: the art is all gradient fills, which the coU-decos export dropped",
+   "renderer": "ffdec raster",
+   "street": "GA91120N5LA249C Senna Karup",
+   "placed": 45
+  },
+  "ground_cutaway_fish3": {
+   "swf": "bundle:firebog.swf#ground_cutaway_fish3",
+   "size": [
+    168,
+    94
+   ],
+   "sha256": "6a14a4a3e76197d0af7b3def13f2bd1d978e0afbb7ee6107ef669c928c7d5367",
+   "cause": "blank PNG: the art is all gradient fills, which the coU-decos export dropped",
+   "renderer": "ffdec raster",
+   "street": "GTJ12SJ2RUV1N6R Belan Bends",
+   "placed": 13
+  },
+  "ground_cutaway_fossil1": {
+   "swf": "bundle:firebog.swf#ground_cutaway_fossil1",
+   "size": [
+    160,
+    108
+   ],
+   "sha256": "eb90139420718b670532e4579dc4beaf6b3098d8b7a9235a3a261b1688fc9fd1",
+   "cause": "blank PNG: the art is all gradient fills, which the coU-decos export dropped",
+   "renderer": "ffdec raster",
+   "street": "GA911I05ILA2CQ5 Dusa Tanad",
+   "placed": 70
+  },
+  "ground_cutaway_fossil2": {
+   "swf": "bundle:firebog.swf#ground_cutaway_fossil2",
+   "size": [
+    106,
+    74
+   ],
+   "sha256": "a354c5c6c16eaee4536aa2fda0869e5c0f0086ae64ba37eff58ba32c1291cb9d",
+   "cause": "blank PNG: the art is all gradient fills, which the coU-decos export dropped",
+   "renderer": "ffdec raster",
+   "street": "GA911I05ILA2CQ5 Dusa Tanad",
+   "placed": 64
+  },
+  "ground_cutaway_fossil3": {
+   "swf": "bundle:firebog.swf#ground_cutaway_fossil3",
+   "size": [
+    108,
+    72
+   ],
+   "sha256": "a633d463aea73447a0a5f2aed2fa627ec6148abcdb1b2b389ea21db8d7adfbb5",
+   "cause": "blank PNG: the art is all gradient fills, which the coU-decos export dropped",
+   "renderer": "ffdec raster",
+   "street": "GA91120N5LA249C Senna Karup",
+   "placed": 96
+  },
+  "ground_hole_foreground_ix": {
+   "swf": "bundle:leavens1.swf#ground_hole_foreground_ix",
+   "size": [
+    490,
+    156
+   ],
+   "sha256": "c112c76a5915be9ff29cdc04de08e91331151ae85c355f5921bd12629702d013",
+   "cause": "missing or misplaced layers (SWF uses masks)",
+   "renderer": "ffdec raster",
+   "street": "GA5PPFP86NF2FOS Hell One",
+   "placed": 1
+  },
+  "ground_rail_1": {
+   "swf": "bundle:abbasid1.swf#ground_rail_1",
+   "size": [
+    2074,
+    262
+   ],
+   "sha256": "c07a8e77484c7c5d3bb6cda128e2b230a2443decbb309650d2053a617b6e103f",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA9R3FG405F3B9P Abbasid Walkway",
+   "placed": 31
+  },
+  "ground_rootpipe2": {
+   "swf": "bundle:firebog.swf#ground_rootpipe2",
+   "size": [
+    186,
+    172
+   ],
+   "sha256": "5a9f9ffdbf80ef0f7aa1f9f9857b7636a1eb162e321885f7eafbe5230487e105",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA91161VALA21D4 Botchi Etta",
+   "placed": 118
+  },
+  "hearth_fire": {
+   "swf": "bundle:firebog.swf#hearth_fire",
+   "size": [
+    350,
+    324
+   ],
+   "sha256": "aecb376f8af786de9a0cd6d6037029b76d4f6e3f9a3564f01c27957b1d8c15a4",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9HJCHM18A21B4 Badvi Bist",
+   "placed": 6
+  },
+  "hill_6": {
+   "swf": "bundle:zutto1.swf#hill_6",
+   "size": [
+    1096,
+    410
+   ],
+   "sha256": "77150bda0bb721999dcb3617b149287cb8abbe3970db29a210206de9c84fc7a3",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GDO6NJEE1AE3MKL Namaste",
+   "placed": 8
+  },
+  "hillock_1": {
+   "swf": "bundle:zutto1.swf#hillock_1",
+   "size": [
+    332,
+    134
+   ],
+   "sha256": "1df135b7975d317f59341968cb5a877882e8a0e2837deaf1677a1c5ca8f71653",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GDOB5HTH1ID2MTL Kristel Kaos",
+   "placed": 5
+  },
+  "jethimadh_ext_wall_modular_center_left": {
+   "swf": "bundle:firebog.swf#jethimadh_ext_wall_modular_center_left",
+   "size": [
+    2904,
+    1478
+   ],
+   "sha256": "4407ea41a331dc68f90ca15debc9bbe323220eb93f1e5acd3373f12ff5322ebe",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GDOE67MFL6E2FBR Mazza'la Gala",
+   "placed": 6
+  },
+  "jethimadh_tower_pillarface": {
+   "swf": "bundle:tower_ext_jethimadh.swf#jethimadh_tower_pillarface",
+   "size": [
+    266,
+    660
+   ],
+   "sha256": "33a7a5506eac4a13acdfd6406ab266504f700a6963cef3b84f989725f211abfa",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GIF163TJHQU191C Tower St North",
+   "placed": 2
+  },
+  "k01_clothesline_01": {
+   "swf": "bundle:kukubee.swf#k01_clothesline_01",
+   "size": [
+    1570,
+    418
+   ],
+   "sha256": "7a6dba8abc890c86c59f200444cabeed1e5d01ec4b878dc1a271a5b6c4ec2a94",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GDOOS17UPNJ2HT7 Winter Wingding",
+   "placed": 1
+  },
+  "k03_icebridge_01": {
+   "swf": "bundle:kukubee.swf#k03_icebridge_01",
+   "size": [
+    1372,
+    440
+   ],
+   "sha256": "e477aab5cf96fe640180f558377abfef8393a7c40cd02194390774033f883290",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GDOOS17UPNJ2HT7 Winter Wingding",
+   "placed": 2
+  },
+  "k03_logcabin_01": {
+   "swf": "bundle:kukubee.swf#k03_logcabin_01",
+   "size": [
+    922,
+    832
+   ],
+   "sha256": "f1b50d7eacd677e7dada7e31cdc7833b94529cfea30d66dd942b292335fd9dbf",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GDOOS17UPNJ2HT7 Winter Wingding",
+   "placed": 1
+  },
+  "k03_pinchertree_01": {
+   "swf": "bundle:kukubee.swf#k03_pinchertree_01",
+   "size": [
+    1216,
+    1538
+   ],
+   "sha256": "4384fdf3f4cc22acb631aa894c7f334c5241f5877fe9cc5614c9c2f0a4acb675",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GM11E7ODKHO1QJE Wintry Place",
+   "placed": 1
+  },
+  "k03_pinchertree_02_branch2": {
+   "swf": "bundle:kukubee.swf#k03_pinchertree_02_branch2",
+   "size": [
+    796,
+    1020
+   ],
+   "sha256": "a8a6279469694de64f262438e1e676f0d2619deec31824cbe3caa4474420e69f",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GM11E7ODKHO1QJE Wintry Place",
+   "placed": 1
+  },
+  "k04_rug_01_zebra": {
+   "swf": "bundle:kukubee2.swf#k04_rug_01_zebra",
+   "size": [
+    3274,
+    670
+   ],
+   "sha256": "ff0c5e7f351f599da452cfcd1c4dcfac6a56f0cf6672f7bff13beedbe8537f6a",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9S04AB15F3H53 Giant Living Room",
+   "placed": 1
+  },
+  "ladder_int_hole_cover": {
+   "swf": "bundle:firebog.swf#ladder_int_hole_cover",
+   "size": [
+    288,
+    140
+   ],
+   "sha256": "cbd0a79af3c334f0750baf33daa8a3a181edd4cc0688bc7f74efc2efc196197e",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GCR18H2DTFS17FB SM Apartment 01",
+   "placed": 4
+  },
+  "ladder_tile_cap_0_interior": {
+   "swf": "bundle:firebog.swf#ladder_tile_cap_0_interior",
+   "size": [
+    194,
+    100
+   ],
+   "sha256": "e40dabfc2a671f12c11cb9a6e5ec0cd5e5b1b7d7fbced9ba5148636c7c9cd0bf",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GTJ108JAODQ11KH Nagu Keel",
+   "placed": 1
+  },
+  "ladder_tile_cap_0_stone": {
+   "swf": "bundle:zutto1.swf#ladder_tile_cap_0_stone",
+   "size": [
+    140,
+    100
+   ],
+   "sha256": "afc2c69abaf9e4acc5b0af88fc8e0e0e136ab05881787afa583f9a42ec329584",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9114MS8B32FB2 Churni Sanctum",
+   "placed": 41
+  },
+  "ladder_tile_cap_0_tree": {
+   "swf": "bundle:groddle1.swf#ladder_tile_cap_0_tree",
+   "size": [
+    220,
+    100
+   ],
+   "sha256": "4d0a50f7ddaf1ab28bfd8047c16aabaef2e191b20fc0552a68ab1b6b97e51eee",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA93EC9GHI824JT Zaruu Zilch",
+   "placed": 12
+  },
+  "ladder_tile_cap_1_interior": {
+   "swf": "bundle:firebog.swf#ladder_tile_cap_1_interior",
+   "size": [
+    194,
+    100
+   ],
+   "sha256": "97d98d6784c33bf406b95336715dd448d2ae2e2df6f9fa660b2f37f71a24dd4c",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA91120N5LA249C Senna Karup",
+   "placed": 18
+  },
+  "ladder_tile_cap_1_stone": {
+   "swf": "bundle:zutto1.swf#ladder_tile_cap_1_stone",
+   "size": [
+    150,
+    100
+   ],
+   "sha256": "c3ff3a1c929f59550b116134fc309427feb316258cf74c1a366a094bd5474309",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA910DULG012JIE Punar Grotta",
+   "placed": 37
+  },
+  "ladder_tile_cap_1_tree": {
+   "swf": "bundle:groddle1.swf#ladder_tile_cap_1_tree",
+   "size": [
+    220,
+    100
+   ],
+   "sha256": "b38441faf814f2e38ac2dabccb07bcea0f88235ab2b922ab288a725b84590a80",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA93EC9GHI824JT Zaruu Zilch",
+   "placed": 8
+  },
+  "ladder_tile_center_01_blue": {
+   "swf": "bundle:freeny1.swf#ladder_tile_center_01_blue",
+   "size": [
+    100,
+    100
+   ],
+   "sha256": "72adce359abb096506dce33e85852854ed8497932deef3acd9f48a9fac032f04",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GTJ1KL16N2O13T2 Palindrone",
+   "placed": 10
+  },
+  "ladder_tile_center_01_interior": {
+   "swf": "bundle:firebog.swf#ladder_tile_center_01_interior",
+   "size": [
+    194,
+    100
+   ],
+   "sha256": "e48ab4e0abed3abc9d353f65b16375a6ff88ba338595f97ae1e7934d3c3e7a62",
+   "cause": "missing or misplaced layers (SWF uses blend modes (multiply), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA9QOQAL96A2L2K Coci Muttah",
+   "placed": 7
+  },
+  "ladder_tile_center_01_stake_left": {
+   "swf": "bundle:kukubee.swf#ladder_tile_center_01_stake_left",
+   "size": [
+    180,
+    100
+   ],
+   "sha256": "0c137cafacb0402b77e35dcf9e90b5dd9e1dcdb0f2103b4cf2d53657e9bff2d8",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GDOOS17UPNJ2HT7 Winter Wingding",
+   "placed": 11
+  },
+  "ladder_tile_center_01_tree": {
+   "swf": "bundle:groddle1.swf#ladder_tile_center_01_tree",
+   "size": [
+    220,
+    100
+   ],
+   "sha256": "be5d281242808ff4c8c75653d7075580791fde0aaf81c4390262d2a18ca88089",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9KL9UE1D82RFO Odena Odes",
+   "placed": 9
+  },
+  "ladder_tile_center_02_tree": {
+   "swf": "bundle:groddle1.swf#ladder_tile_center_02_tree",
+   "size": [
+    220,
+    100
+   ],
+   "sha256": "1da640b7f5a54454a28b630c6f2df7a957fd7d241dca6a001bc3d3a4620ab436",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9KL9UE1D82RFO Odena Odes",
+   "placed": 5
+  },
+  "legs_moss_back_1": {
+   "swf": "bundle:firebog.swf#legs_moss_back_1",
+   "size": [
+    598,
+    808
+   ],
+   "sha256": "65edba59caf6fe3ac00985a6ea4fa1d94e3fb81a61ba4d3d8c767e419f91f5f7",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA91120N5LA249C Senna Karup",
+   "placed": 138
+  },
+  "light_shafts_blue": {
+   "swf": "bundle:groddle1.swf#light_shafts_blue",
+   "size": [
+    1524,
+    1446
+   ],
+   "sha256": "70b95581d7c00ed7e36907be9eae9015c019a5e6860576cd89b4ee9c64a0ebb6",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GHVP6H0KT403N8A Piryan",
+   "placed": 690
+  },
+  "monster_flower_close_maytang": {
+   "swf": "bundle:maytang.swf#monster_flower_close_maytang",
+   "size": [
+    690,
+    404
+   ],
+   "sha256": "82298fb81f29048feeeafa1e481277e03e2388d0e6a8974da0ff55e5d81b8dea",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9QQQ8LV4F3TJ2 May Soup",
+   "placed": 1
+  },
+  "newxp_stonetext_lower_c": {
+   "swf": "bundle:newxp_stone_text.swf#newxp_stonetext_lower_c",
+   "size": [
+    88,
+    92
+   ],
+   "sha256": "14aa8e882f4c02e32b27f7052c5a799d7d919ae934be93afad2f59f7fafa78c6",
+   "cause": "missing or misplaced layers (SWF uses filters (colormatrix))",
+   "renderer": "ffdec raster",
+   "street": "GA93VBH3H3D38HF Gentle Island Exit",
+   "placed": 2
+  },
+  "newxp_stonetext_lower_f": {
+   "swf": "bundle:newxp_stone_text.swf#newxp_stonetext_lower_f",
+   "size": [
+    90,
+    180
+   ],
+   "sha256": "701f31373271756d3274447821203adbe6bc6b390076bbf0d5b5f234895fe468",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA93VBH3H3D38HF Gentle Island Exit",
+   "placed": 1
+  },
+  "newxp_stonetext_lower_o": {
+   "swf": "bundle:newxp_stone_text.swf#newxp_stonetext_lower_o",
+   "size": [
+    108,
+    70
+   ],
+   "sha256": "1beb0e3b5ff0522f446482ac77eb777a7d50d54aa089774c4de29f82a141480d",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA93VBH3H3D38HF Gentle Island Exit",
+   "placed": 9
+  },
+  "newxp_stonetext_lower_p": {
+   "swf": "bundle:newxp_stone_text.swf#newxp_stonetext_lower_p",
+   "size": [
+    86,
+    144
+   ],
+   "sha256": "b9e1ed46236d998a664387ba0924b1a41b78095ae7b4453d3bbe50d96d640402",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA93VBH3H3D38HF Gentle Island Exit",
+   "placed": 1
+  },
+  "newxp_stonetext_lower_r": {
+   "swf": "bundle:newxp_stone_text.swf#newxp_stonetext_lower_r",
+   "size": [
+    80,
+    94
+   ],
+   "sha256": "996666beea7bd8d74dffe7fd2a69b2d3ee8e69885e70dcdd7bf5900d43e5b256",
+   "cause": "missing or misplaced layers (SWF uses filters (colormatrix))",
+   "renderer": "ffdec raster",
+   "street": "GA93VBH3H3D38HF Gentle Island Exit",
+   "placed": 1
+  },
+  "newxp_stonetext_punct_apostrophe": {
+   "swf": "bundle:newxp_stone_text.swf#newxp_stonetext_punct_apostrophe",
+   "size": [
+    36,
+    46
+   ],
+   "sha256": "583cebfb6a8a88e80734d19fa8ec2304db8a090733e4a9dd82511e7625ebe3db",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA93VBH3H3D38HF Gentle Island Exit",
+   "placed": 1
+  },
+  "newxp_stonetext_punct_period": {
+   "swf": "bundle:newxp_stone_text.swf#newxp_stonetext_punct_period",
+   "size": [
+    54,
+    22
+   ],
+   "sha256": "a5a2f271f0cc78055864c6e25c92c5f20a7caa8f71c0721f0d707f447b887319",
+   "cause": "missing or misplaced layers (SWF uses filters (colormatrix))",
+   "renderer": "ffdec raster",
+   "street": "GA93VBH3H3D38HF Gentle Island Exit",
+   "placed": 1
+  },
+  "penaltybox_roof": {
+   "swf": "bundle:groddle1.swf#penaltybox_roof",
+   "size": [
+    2396,
+    572
+   ],
+   "sha256": "c53a1fca5bb497c507c4a8292c37b4a1a3e15b3df6fb773b84de01a9ea1ee6ec",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA51B2OQAK623EF Murrukku Meander",
+   "placed": 1685
+  },
+  "plat_tile_center_02_feltgrass": {
+   "swf": "bundle:meomi2.swf#plat_tile_center_02_feltgrass",
+   "size": [
+    100,
+    492
+   ],
+   "sha256": "b31a56469a9cbff6e3415da45a3a3bd3e1eb8e93228adc18592ec90820240c22",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GDOHDJ84BST2UI2 Oppidan Avenue",
+   "placed": 1
+  },
+  "plat_tile_center_02_snow": {
+   "swf": "bundle:kukubee.swf#plat_tile_center_02_snow",
+   "size": [
+    200,
+    400
+   ],
+   "sha256": "036d20e4a1525d01917409f2bd33df734d55bf9ed3a998de0b4cf87a0b4be1f7",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GM11E7ODKHO1QJE Wintry Place",
+   "placed": 17
+  },
+  "plat_tile_center_03_snow": {
+   "swf": "bundle:kukubee.swf#plat_tile_center_03_snow",
+   "size": [
+    200,
+    400
+   ],
+   "sha256": "28297b0cee79571d95292619bb2cc1faf5594471993407ce0381960e28fca8bb",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GM11E7ODKHO1QJE Wintry Place",
+   "placed": 1
+  },
+  "plat_tile_center_04_snow": {
+   "swf": "bundle:kukubee.swf#plat_tile_center_04_snow",
+   "size": [
+    200,
+    400
+   ],
+   "sha256": "2d4775dbecbb3326b58cd1073545237bc4e2be24e310ca167104d813cba533ff",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GM11E7ODKHO1QJE Wintry Place",
+   "placed": 21
+  },
+  "platform_bottletree_3_panel": {
+   "swf": "bundle:firebog.swf#platform_bottletree_3_panel",
+   "size": [
+    248,
+    132
+   ],
+   "sha256": "0a1b4429833bfce1299e70614d15d4e4150b7ce4fff56b695e9492460b33c0d5",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA91120N5LA249C Senna Karup",
+   "placed": 15
+  },
+  "platform_bottletree_4_panel": {
+   "swf": "bundle:firebog.swf#platform_bottletree_4_panel",
+   "size": [
+    298,
+    186
+   ],
+   "sha256": "967a86d9776bfc1f83b77a871eb7eb4f0bad35aae4efbd6dc9fd324ce7ce4d2b",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA911J5DKLA20MS Gooliv Naven",
+   "placed": 57
+  },
+  "platform_bottletree_steep_3_panel": {
+   "swf": "bundle:firebog.swf#platform_bottletree_steep_3_panel",
+   "size": [
+    192,
+    142
+   ],
+   "sha256": "ed4fcd7e7c77d7ca356ab89843ebd3572b8e8835c357990151ab0f0f99c1d992",
+   "cause": "flat colour: a blend-mode texture or shading layer was dropped",
+   "renderer": "ffdec raster",
+   "street": "GA91120N5LA249C Senna Karup",
+   "placed": 220
+  },
+  "platform_branch_boards_10_g1": {
+   "swf": "bundle:groddle1.swf#platform_branch_boards_10_g1",
+   "size": [
+    730,
+    218
+   ],
+   "sha256": "67f7e35e9abab2fef1bf291329559b76e639cc3f522b9f16012552d5767bde32",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA53SMVHGD13MA5 Justitia Coelum",
+   "placed": 312
+  },
+  "platform_branch_boards_11_g1": {
+   "swf": "bundle:groddle1.swf#platform_branch_boards_11_g1",
+   "size": [
+    300,
+    112
+   ],
+   "sha256": "62a6b8aa942b005339477165eb2d1b627d85b7d629a757e5936fd1d069e69561",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA53SMVHGD13MA5 Justitia Coelum",
+   "placed": 194
+  },
+  "platform_wood_1": {
+   "swf": "bundle:abbasid1.swf#platform_wood_1",
+   "size": [
+    1212,
+    696
+   ],
+   "sha256": "9b55171b6b85f80053a7a21daeb5e13a96e1df57d7f50d6c969b00bf8d42cbf0",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9R3FG405F3B9P Abbasid Walkway",
+   "placed": 6
+  },
+  "pod1": {
+   "swf": "bundle:firebog.swf#pod1",
+   "size": [
+    164,
+    136
+   ],
+   "sha256": "33f764e55128bdc02fc16e8a6c2588f842534142b3ab051a9bed6e43aad5316a",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GDOE67MFL6E2FBR Mazza'la Gala",
+   "placed": 5
+  },
+  "pod_egg2": {
+   "swf": "bundle:firebog.swf#pod_egg2",
+   "size": [
+    268,
+    162
+   ],
+   "sha256": "3615ee1ea1da6fb91ed7bfe628e216e1162cbdae9042ea3ca1e1dd053972390c",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GLICF642CTI16R1 Peatland Moors",
+   "placed": 13
+  },
+  "pod_opened": {
+   "swf": "bundle:firebog.swf#pod_opened",
+   "size": [
+    218,
+    92
+   ],
+   "sha256": "3b58dcf7b8252d3a5a1e88359826a16850f4279fe1d450c68e74af8f337560fe",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GLI57EKC2HI1EH8 Squatter's Quag",
+   "placed": 10
+  },
+  "puzzletube_off_elbow_starter": {
+   "swf": "bundle:starter.swf#puzzletube_off_elbow_starter",
+   "size": [
+    24,
+    22
+   ],
+   "sha256": "2a62028a5775843841865604a9b55a0197530be9e8bd2c2679398238cc11d553",
+   "cause": "missing or misplaced layers",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 6
+  },
+  "puzzletube_off_tube_starter": {
+   "swf": "bundle:starter.swf#puzzletube_off_tube_starter",
+   "size": [
+    272,
+    6
+   ],
+   "sha256": "8334a7c501af506b1be140663602515923ba72534aafc7a44f41f166b5826013",
+   "cause": "missing or misplaced layers",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 9
+  },
+  "puzzletube_on_elbow_starter": {
+   "swf": "bundle:starter.swf#puzzletube_on_elbow_starter",
+   "size": [
+    126,
+    118
+   ],
+   "sha256": "1aa6f64670b9f7e60bcf62cd2eb1ad3605d8123206554de10a80b0a6daaaee39",
+   "cause": "missing or misplaced layers (SWF uses filters (blur))",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 9
+  },
+  "ra_drum_3": {
+   "swf": "bundle:freeny1.swf#ra_drum_3",
+   "size": [
+    696,
+    658
+   ],
+   "sha256": "db46c44dd28f9a06d2a22e72ca4f21ab1c9628ae75f6f6a8a2a9ace855d4f05c",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GTJ1KL16N2O13T2 Palindrone",
+   "placed": 13
+  },
+  "rug_blue": {
+   "swf": "bundle:firebog.swf#rug_blue",
+   "size": [
+    524,
+    114
+   ],
+   "sha256": "66f7e6210f8611c80155d0fd8bc915d6d2e27bd40e7258a02e889d3f39c335ae",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GCR18H2DTFS17FB SM Apartment 01",
+   "placed": 6
+  },
+  "rug_green": {
+   "swf": "bundle:firebog.swf#rug_green",
+   "size": [
+    524,
+    114
+   ],
+   "sha256": "21e27971fc8be6861e4e756ae380f904594f0968a698598bb4f10a22369396a3",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GCR18H2DTFS17FB SM Apartment 01",
+   "placed": 4
+  },
+  "rug_pink": {
+   "swf": "bundle:firebog.swf#rug_pink",
+   "size": [
+    524,
+    114
+   ],
+   "sha256": "f9b2ed98a659c2470bb69b4f233ec76db8b2f98ece239f8573e73dfe65b87693",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GIF33FDK0K3371H Flammulina Gigantea",
+   "placed": 236
+  },
+  "rug_red": {
+   "swf": "bundle:firebog.swf#rug_red",
+   "size": [
+    524,
+    114
+   ],
+   "sha256": "7280204d151909e793aadb811e8a04cea8cefd8be805e025e6355cc87925fa4e",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GDOE67MFL6E2FBR Mazza'la Gala",
+   "placed": 237
+  },
+  "security_orb": {
+   "swf": "bundle:starter.swf#security_orb",
+   "size": [
+    208,
+    278
+   ],
+   "sha256": "89e2c9cc636d5e840880a17851b2bd048dfc7a79633134dcded982d69d82154f",
+   "cause": "missing or misplaced layers",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 2
+  },
+  "shadow_diagonal_lemiserable_01a_starter": {
+   "swf": "bundle:starter.swf#shadow_diagonal_lemiserable_01a_starter",
+   "size": [
+    244,
+    566
+   ],
+   "sha256": "9660f42061965b2124891587fd1fd394901922ea14058b3e2ca1a3f43af6ba30",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 1
+  },
+  "sign_apartment_groddle": {
+   "swf": "bundle:groddle1.swf#sign_apartment_groddle",
+   "size": [
+    558,
+    288
+   ],
+   "sha256": "61c6cf5e627fc9ac047f4ebdce5cd4d1226a2cf026db45a9f0b3563c45063bd7",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9A9CGB9F824PK Hakusan Heaps",
+   "placed": 12
+  },
+  "sign_blue": {
+   "swf": "bundle:quest06.swf#sign_blue",
+   "size": [
+    438,
+    266
+   ],
+   "sha256": "33fa861e978b429cc3345097aa28049b4ad350b49e29dd6910d488f7568d0c3c",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9BT2I0ILD340S Shim Shiri",
+   "placed": 1
+  },
+  "sign_brown": {
+   "swf": "bundle:quest06.swf#sign_brown",
+   "size": [
+    358,
+    282
+   ],
+   "sha256": "ec2a1454e93e2c8641e3885072decb1865f87325231e9cf97a1416f61a9e7fba",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9BT2I0ILD340S Shim Shiri",
+   "placed": 1
+  },
+  "sign_exit_starter_01a": {
+   "swf": "bundle:starter.swf#sign_exit_starter_01a",
+   "size": [
+    134,
+    78
+   ],
+   "sha256": "62e2bb213ffed75bfbcf6f28dfa598d2cf3c83f728bc497c046d4e416ed8df5a",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 1
+  },
+  "sign_green": {
+   "swf": "bundle:quest06.swf#sign_green",
+   "size": [
+    438,
+    262
+   ],
+   "sha256": "eb256f4b5a567b7fbe3c0b950ab94c4d1c5ae7e2a50bd7882b2e61d9dc6a73be",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9BT2I0ILD340S Shim Shiri",
+   "placed": 1
+  },
+  "sign_grey": {
+   "swf": "bundle:quest06.swf#sign_grey",
+   "size": [
+    362,
+    310
+   ],
+   "sha256": "bc9a8fef74f8d34dad6b4e5c23d35de4f71abfb54f1e38f959666e86cb591760",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9BT2I0ILD340S Shim Shiri",
+   "placed": 1
+  },
+  "sign_noexit_starter_01a": {
+   "swf": "bundle:starter.swf#sign_noexit_starter_01a",
+   "size": [
+    148,
+    78
+   ],
+   "sha256": "7d6306c7af6525560548158f61eef3c736bae055021d9e756599c0dcf4633eaa",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 1
+  },
+  "sign_orange": {
+   "swf": "bundle:quest06.swf#sign_orange",
+   "size": [
+    426,
+    318
+   ],
+   "sha256": "81ffe5729a53819f434f7adf861e10bc4b7c75be605cc2ea7363282304621351",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9BT2I0ILD340S Shim Shiri",
+   "placed": 1
+  },
+  "sign_yellow": {
+   "swf": "bundle:quest06.swf#sign_yellow",
+   "size": [
+    394,
+    328
+   ],
+   "sha256": "97932a9e031af9ceeefdcbf42096c9cdf57c0801c23bafbc749d34a352045457",
+   "cause": "missing or misplaced layers (SWF uses filters (dropshadow), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA9BT2I0ILD340S Shim Shiri",
+   "placed": 1
+  },
+  "signpost_asset_elevator": {
+   "swf": "bundle:bldg_int_apt.swf#signpost_asset_elevator",
+   "size": [
+    784,
+    844
+   ],
+   "sha256": "9509a260875b6ed2017d9964c56cf157210b5fc0e2293e00c44782d9a9bb14ad",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9H1V6OGRU2FSB Hauki Seeks Manor",
+   "placed": 2
+  },
+  "skyCrack_01_masked": {
+   "swf": "bundle:leavens1.swf#skyCrack_01_masked",
+   "size": [
+    2090,
+    1278
+   ],
+   "sha256": "f66c28a6fee5e727913cf3c13a27389f5aeaddc88b218e7bd07b466b045fa56e",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply))",
+   "renderer": "ffdec raster",
+   "street": "GM4115NJ46G8M Groddle Ladder",
+   "placed": 1
+  },
+  "soil_debris2": {
+   "swf": "bundle:firebog.swf#soil_debris2",
+   "size": [
+    130,
+    42
+   ],
+   "sha256": "0fc5d50be64f6c67f5540cc68c63fd1958addf41fb29ffc766e3c439f74e4e61",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA95U14319524O9 Chakra Phool Herb Gardens",
+   "placed": 67
+  },
+  "soil_debris3": {
+   "swf": "bundle:firebog.swf#soil_debris3",
+   "size": [
+    114,
+    42
+   ],
+   "sha256": "452479442d6b0e75076e99412400d9df66eb54830ef6f5164e72c00847e60671",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA95U14319524O9 Chakra Phool Herb Gardens",
+   "placed": 60
+  },
+  "soil_debris4": {
+   "swf": "bundle:firebog.swf#soil_debris4",
+   "size": [
+    158,
+    38
+   ],
+   "sha256": "220814a315973195213f7fe119c7b7f9068187892c5a19ded705534bfc2f28eb",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA9111M11LA2VAT Ghora Chani",
+   "placed": 65
+  },
+  "soil_debris5": {
+   "swf": "bundle:firebog.swf#soil_debris5",
+   "size": [
+    232,
+    40
+   ],
+   "sha256": "a2d6f0a36d4111170bec4a0c16bab34f07b7d205c42430496ff891c277a6ecb1",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA95U14319524O9 Chakra Phool Herb Gardens",
+   "placed": 42
+  },
+  "soil_debris6": {
+   "swf": "bundle:firebog.swf#soil_debris6",
+   "size": [
+    230,
+    28
+   ],
+   "sha256": "26be47534bb65e00fb8c0caae37e44177e8d0439ba875c2cb32204055412e54b",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA9DURMSIAA2S1T Nandu Pitha",
+   "placed": 26
+  },
+  "soil_debris7": {
+   "swf": "bundle:firebog.swf#soil_debris7",
+   "size": [
+    174,
+    28
+   ],
+   "sha256": "57cc3535650f948c511427da081d32b0f3a075650b9456fc0e99b1ff145e12a1",
+   "cause": "missing or misplaced layers (SWF uses colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA9111M11LA2VAT Ghora Chani",
+   "placed": 28
+  },
+  "stars_field_1a_g1": {
+   "swf": "bundle:groddle1.swf#stars_field_1a_g1",
+   "size": [
+    1100,
+    800
+   ],
+   "sha256": "2f225dc9359eaa055bbdb0bd590f38310aa5273cc8f31123b8d839799647b775",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA524M0OMOE2OGT Mada Tamaha",
+   "placed": 98
+  },
+  "tadpole_howl": {
+   "swf": "bundle:firebog.swf#tadpole_howl",
+   "size": [
+    286,
+    234
+   ],
+   "sha256": "4c4b9cb2752e4906222311cc23fa247849587c5da61ba97e790998b5428276d8",
+   "cause": "missing or misplaced layers (SWF uses blend modes (multiply), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GDOE67MFL6E2FBR Mazza'la Gala",
+   "placed": 1
+  },
+  "texture_grass_4": {
+   "swf": "bundle:arbito1.swf#texture_grass_4",
+   "size": [
+    480,
+    66
+   ],
+   "sha256": "f40b06ea56156dd29dcbf1c53dd3c1db83c939f11a9dd179b67addd52f09f000",
+   "cause": "missing or misplaced layers",
+   "renderer": "ffdec raster",
+   "street": "GTJ1KOM8N2O1EFS Snool",
+   "placed": 3
+  },
+  "tree_14": {
+   "swf": "bundle:zutto1.swf#tree_14",
+   "size": [
+    460,
+    422
+   ],
+   "sha256": "685933ae15125765224aa6c59a4a89279ee615e8883291e0c15e7a8a169080e8",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GDOB5HTH1ID2MTL Kristel Kaos",
+   "placed": 20
+  },
+  "tree_bare_bunch_1": {
+   "swf": "bundle:groddle1.swf#tree_bare_bunch_1",
+   "size": [
+    1398,
+    1318
+   ],
+   "sha256": "9f651baf827de7010305d4c1fccc32863fff0ec405011edde58fc963106f543b",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA53D0DJQMB2B4S Meion Nsut",
+   "placed": 190
+  },
+  "tree_coniferous1": {
+   "swf": "bundle:newxp.swf#tree_coniferous1",
+   "size": [
+    530,
+    1294
+   ],
+   "sha256": "f88c3dba867e171355976c16a7aba53eab8e83a5665bd496d5836c5974d92b31",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA614AEMKBD2UCC And so it begins...",
+   "placed": 111
+  },
+  "tree_coniferous2": {
+   "swf": "bundle:newxp.swf#tree_coniferous2",
+   "size": [
+    740,
+    1322
+   ],
+   "sha256": "2698e0dfc9e8e121ee15cfc84fe98e62f9fdbc90b9605ddf0f2af546272187a4",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA614AEMKBD2UCC And so it begins...",
+   "placed": 273
+  },
+  "tree_coniferous_11_maytang": {
+   "swf": "bundle:maytang.swf#tree_coniferous_11_maytang",
+   "size": [
+    234,
+    326
+   ],
+   "sha256": "53ca1d2fdf65ee38ad9098c665d4384f33cbbca480af8810876cd0cbd72e1c92",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA9QQQ8LV4F3TJ2 May Soup",
+   "placed": 1
+  },
+  "tree_cracklight_01a_et1": {
+   "swf": "bundle:enchant_tree.swf#tree_cracklight_01a_et1",
+   "size": [
+    260,
+    262
+   ],
+   "sha256": "e82b969b0040a58bba1eed2ea6bd1cfcc052727a9e487807f155f1da5c07c556",
+   "cause": "missing or misplaced layers (SWF uses filters (blur, glow))",
+   "renderer": "ffdec raster",
+   "street": "GDOC74759ST2IG1 Autumn Lodge",
+   "placed": 1
+  },
+  "tree_int_ladder_1": {
+   "swf": "bundle:zutto1.swf#tree_int_ladder_1",
+   "size": [
+    266,
+    184
+   ],
+   "sha256": "519018d5f9ad7e7524857b57cb24281eec8d2c8274d828dc1c12c72257c0b271",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GHVDKQ2O6S23LVJ Amberlyza",
+   "placed": 5
+  },
+  "tree_int_ladder_6": {
+   "swf": "bundle:zutto1.swf#tree_int_ladder_6",
+   "size": [
+    266,
+    184
+   ],
+   "sha256": "3fcb5937ed7ec34b9fb88344d6b2c26fcd33847898727ca9c7bacfc0a09ac5ae",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GHVDKQ2O6S23LVJ Amberlyza",
+   "placed": 5
+  },
+  "tree_plane_foliage_02a_g1": {
+   "swf": "bundle:groddle1.swf#tree_plane_foliage_02a_g1",
+   "size": [
+    520,
+    324
+   ],
+   "sha256": "3cde86605650ca4c75e31312957f3b8341752871d6c69412eb5a14b2c518d537",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GA57CE3KTN13I7Q Verbum Destruit",
+   "placed": 210
+  },
+  "underground_stalagtite": {
+   "swf": "bundle:firebog.swf#underground_stalagtite",
+   "size": [
+    616,
+    382
+   ],
+   "sha256": "84791ad54fb282c884ef1fbe90e82444608e6a32312810a1ca42c2671da130dc",
+   "cause": "different art under the same name (another set or an older version), not the class the street bundle draws",
+   "renderer": "ffdec raster",
+   "street": "GA91SD0IEQA24L5 Goli Grabs",
+   "placed": 86
+  },
+  "wall_seam_separated_01a_starter": {
+   "swf": "bundle:starter.swf#wall_seam_separated_01a_starter",
+   "size": [
+    360,
+    746
+   ],
+   "sha256": "1b60571777a7460bf24162048ec5ca08f69c3ddda1f09a8beb7d682cd8968021",
+   "cause": "missing or misplaced layers (SWF uses masks, filters (blur), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 1
+  },
+  "wall_shelf1": {
+   "swf": "bundle:firebog.swf#wall_shelf1",
+   "size": [
+    452,
+    60
+   ],
+   "sha256": "58d5834d74e918a6edd7509017f8ba23497794cb02846b4e4563ccae5777c9d9",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GCR18H2DTFS17FB SM Apartment 01",
+   "placed": 18
+  },
+  "wall_shelf2": {
+   "swf": "bundle:firebog.swf#wall_shelf2",
+   "size": [
+    452,
+    60
+   ],
+   "sha256": "b7422188da70d369f7a3621bfb41afbf0be20a9814d3227e8b1e820fb5f31d21",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GDOE67MFL6E2FBR Mazza'la Gala",
+   "placed": 13
+  },
+  "wall_smalldoor_base_01a_starter": {
+   "swf": "bundle:starter.swf#wall_smalldoor_base_01a_starter",
+   "size": [
+    274,
+    732
+   ],
+   "sha256": "e1a91e4932e7ec182c280bb32066dd436b747c03ab3da804e15b65fd20f898d9",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 2
+  },
+  "wall_smalldoor_cover_01a_starter": {
+   "swf": "bundle:starter.swf#wall_smalldoor_cover_01a_starter",
+   "size": [
+    320,
+    876
+   ],
+   "sha256": "a3f61c4e70455562f8cd0ce50fab37d635560b49c95b7610b8ad026ae5260858",
+   "cause": "art offset inside the frame: the coU export centred the art bounds; the client draws the SWF stage",
+   "renderer": "ffdec raster",
+   "street": "GIFM4BD43383DKV Le Miserable",
+   "placed": 2
+  },
+  "zutto_ladder_tile_center_03_stone": {
+   "swf": "bundle:zutto1.swf#zutto_ladder_tile_center_03_stone",
+   "size": [
+    142,
+    110
+   ],
+   "sha256": "82d01d5682b32e0d21afed01d5bad165c3a6c6cd6b0bddd355b00aa2664ced53",
+   "cause": "missing or misplaced layers (SWF uses masks, blend modes (multiply, screen), colour transforms)",
+   "renderer": "ffdec raster",
+   "street": "GA910DULG012JIE Punar Grotta",
+   "placed": 124
+  }
+ },
+ "kept": {
+  "Glints_3": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "Glints_5": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "cave_crystal_4": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cave_large_rock_1": {
+   "verdict": "ambiguous",
+   "reason": "same rock; the PNG frame differs from the SWF stage and street placements match neither aspect; race-courses.js draws it at natural size, so the framing is left as is"
+  },
+  "cave_large_rock_2": {
+   "verdict": "ambiguous",
+   "reason": "same rock; the PNG frame differs from the SWF stage and street placements match neither aspect; race-courses.js draws it at natural size, so the framing is left as is"
+  },
+  "cave_stalactite_6": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_cactus_01": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_cactus_Back_03": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_01": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_02": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_03": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_04": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_05": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_06": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_wayBack_01": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_wayBack_02": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_wayBack_03": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_wayBack_04": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_wayBack_05": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "cl2_mountains_wayBack_06": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_background_02": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_background_03": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_background_05": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_background_08": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_background_09": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_background_10": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_background_11": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_background_12": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_mid_01": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_mid_03": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "craggyMountain_mid_04": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "door_asset_jethimadh_tower_interior_lock02": {
+   "verdict": "ambiguous",
+   "reason": "the PNG is only the lock; frame 1 of the 50-frame SWF also draws the door. No street places it and no code references it, so it is left as is"
+  },
+  "door_asset_jethimadh_tower_interior_lock_fix2": {
+   "verdict": "ambiguous",
+   "reason": "the PNG is only the lock; frame 1 of the 50-frame SWF also draws the door. No street places it and no code references it, so it is left as is"
+  },
+  "flitterbug_limbo1": {
+   "verdict": "fine",
+   "reason": "animated deco (48/1 frames): frame 1 differs from the frame the PNG shows; nothing missing"
+  },
+  "floating_steam01": {
+   "verdict": "fine",
+   "reason": "animated deco (1/261 frames): frame 1 differs from the frame the PNG shows; nothing missing"
+  },
+  "floating_steam02": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "groddle_arrow_2": {
+   "verdict": "fine",
+   "reason": "animated deco (29/1 frames): frame 1 differs from the frame the PNG shows; nothing missing"
+  },
+  "ground_cutaway_egg1": {
+   "verdict": "ambiguous",
+   "reason": "egg shading differs only in a radial gradient's centre (light in the PNG, dark in FFDec raster, white in FFDec SVG); shape and placement agree"
+  },
+  "ground_cutaway_egg2": {
+   "verdict": "ambiguous",
+   "reason": "egg shading differs only in a radial gradient's centre (light in the PNG, dark in FFDec raster, white in FFDec SVG); shape and placement agree"
+  },
+  "ground_spots7": {
+   "verdict": "fine",
+   "reason": "small grey ground spots; the raster differs by a few pixels of position, FFDec's SVG turns them red (ignores the colour transform). Nothing missing"
+  },
+  "ground_spots8": {
+   "verdict": "fine",
+   "reason": "small grey ground spots; the raster differs by a few pixels of position, FFDec's SVG turns them red (ignores the colour transform). Nothing missing"
+  },
+  "groundstars_row_6a_newxpblack": {
+   "verdict": "fine",
+   "reason": "a row of tiny star specks; differences are single pixels"
+  },
+  "hover_platform": {
+   "verdict": "fine",
+   "reason": "animated deco (48/1 frames): frame 1 differs from the frame the PNG shows; nothing missing"
+  },
+  "juju_grandma_campfire_01a_al1": {
+   "verdict": "fine",
+   "reason": "animated deco (22/22 frames): frame 1 differs from the frame the PNG shows; nothing missing"
+  },
+  "k02_cloud01": {
+   "verdict": "fine",
+   "reason": "PNG is right: FFDec's rasteriser draws this kukubee paper cloud's bitmap-filled mask as a rectangle; FFDec's SVG export (Chromium) matches the PNG"
+  },
+  "k02_moon": {
+   "verdict": "fine",
+   "reason": "PNG is right: FFDec's rasteriser draws the kukubee paper moon's bitmap-filled mask as a rectangle; FFDec's SVG export (Chromium) matches the PNG"
+  },
+  "k03_cloud_01": {
+   "verdict": "fine",
+   "reason": "PNG is right: FFDec's rasteriser draws this kukubee paper cloud's bitmap-filled mask as a rectangle; FFDec's SVG export (Chromium) matches the PNG"
+  },
+  "k03_foreground_cloud_01": {
+   "verdict": "fine",
+   "reason": "PNG is right: FFDec's rasteriser leaves the paper texture as a rectangle above the cloud; FFDec's SVG export (Chromium) matches the PNG"
+  },
+  "k03_gingerbreadhouse_01": {
+   "verdict": "fine",
+   "reason": "PNG is right: FFDec's rasteriser draws the roof's paper texture as an unmasked white rectangle; FFDec's SVG export (Chromium) matches the PNG"
+  },
+  "lens_flare": {
+   "verdict": "fine",
+   "reason": "near-transparent flare disc; PNG and render are both a faint circle"
+  },
+  "lens_flare_ring": {
+   "verdict": "fine",
+   "reason": "a faint hairline ring; PNG and FFDec render show the same ring (offset by 2 px), nothing missing"
+  },
+  "light_discs": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "light_discs_02": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "light_discs_03": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "light_discs_05": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "magic_mushroom_light_colorgroup_small_01": {
+   "verdict": "fine",
+   "reason": "soft light blobs; at 2x the PNG matches FFDec's raster (score 0.05), the zoom-1 flag was blur noise"
+  },
+  "miniparty_piggy": {
+   "verdict": "fine",
+   "reason": "animated deco (600/300 frames): frame 1 differs from the frame the PNG shows; nothing missing"
+  },
+  "newxp_gentleislandexit_arrow": {
+   "verdict": "fine",
+   "reason": "animated deco (1/110 frames): frame 1 differs from the frame the PNG shows; nothing missing"
+  },
+  "portal_wintry": {
+   "verdict": "ambiguous",
+   "reason": "animated portal (115-frame sprite): frame 1 is a pale rectangle, the PNG an oval glow from another frame; left as is"
+  },
+  "pulseDot": {
+   "verdict": "fine",
+   "reason": "animated pulse (30 frames): frame 1 is a filled disc, the PNG a later ring frame; A Summer's Day uses the ring"
+  },
+  "steam_burst_03": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "steam_smallerburst_01": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "steam_smallerburst_02": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "steam_smallerburst_03": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  },
+  "steam_stream_02": {
+   "verdict": "fine",
+   "reason": "animated deco (57/57 frames): frame 1 differs from the frame the PNG shows; nothing missing"
+  },
+  "tree_front_04": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "underground_bogwillow": {
+   "verdict": "ambiguous",
+   "reason": "berry glows use overlay and multiply blends over transparent pixels; the PNG, FFDec raster and FFDec SVG all differ (green glow vs dark halos). Without a Flash renderer the PNG stays"
+  },
+  "vine_02": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "vine_05": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "vine_06": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "vine_07": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "vine_08": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "vine_09": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "vine_10": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "vine_11": {
+   "verdict": "ambiguous",
+   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
+  },
+  "waterTest": {
+   "verdict": "fine",
+   "reason": "animated deco (200/200 frames): frame 1 differs from the frame the PNG shows; nothing missing"
+  },
+  "waterTestStatic": {
+   "verdict": "fine",
+   "reason": "faint water lines; at 2x the PNG matches FFDec's raster (score 0.06)"
+  },
+  "water_ripple": {
+   "verdict": "ambiguous",
+   "reason": "PNG, FFDec raster and FFDec SVG disagree on the ripple's colour transform; thin strip, left as is"
+  },
+  "water_ripple_double_1": {
+   "verdict": "fine",
+   "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
+  }
+ }
+}
