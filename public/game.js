@@ -19145,6 +19145,7 @@ function craftOpts() {
   return {
     learned: skillState.learned || [],
     achievements: achieveState.unlocked || [],
+    completedQuests: questState.completed || [],
     requireSkill: true,
     requireTool: true,
     toolState,
@@ -19539,6 +19540,7 @@ function renderMakePanel() {
   // A search looks across every tool: "where do I make this?"
   const recipes = searchRecipes(makeSearchQuery, {
     tool: makeSearchQuery.trim() ? 'all' : makeToolFilter,
+    completedQuests: questState.completed || [],
   });
   const opts = craftOpts();
   recipes.sort((a, b) => {

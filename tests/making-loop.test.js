@@ -457,3 +457,20 @@ describe('UI wiring', () => {
     assert.match(game, /entityLayer\.addChildAt\(outline/);
   });
 });
+
+describe('quest-taught recipes (learnt 3)', () => {
+  it('Batterfly Bounty teaches the Batterfly Bounty Booster Bar', async () => {
+    const { RECIPE_CATALOG, canCraft, searchRecipes, recipeKnown, loadRecipeCatalog } = await import('../public/js/making.js');
+    if (typeof loadRecipeCatalog === 'function') await loadRecipeCatalog?.();
+    const bar = Object.values(RECIPE_CATALOG).find((r) => r.id === '305');
+    assert.ok(bar, 'recipe 305 imported');
+    assert.equal(bar.taughtBy, 'batterfly_bounty');
+    assert.equal(recipeKnown(bar, []), false);
+    assert.equal(recipeKnown(bar, ['batterfly_bounty']), true);
+    const inv = { awesome_pot: 1, grain: 20, oats: 5, hot_pepper: 7, cumin: 5, plum: 5, hot_n_fizzy_sauce: 1, olive_oil: 1 };
+    assert.equal(canCraft(inv, bar, { completedQuests: [] }).reason, 'quest');
+    assert.notEqual(canCraft(inv, bar, { completedQuests: ['batterfly_bounty'] }).reason, 'quest');
+    assert.ok(!searchRecipes('batterfly', { tool: 'all', completedQuests: [] }).some((r) => r.id === '305'));
+    assert.ok(searchRecipes('batterfly', { tool: 'all', completedQuests: ['batterfly_bounty'] }).some((r) => r.id === '305'));
+  });
+});

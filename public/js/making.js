@@ -665,7 +665,8 @@ export function listMakingTools() {
  */
 export function searchRecipes(query, opts = {}) {
   const q = String(query || '').trim().toLowerCase();
-  const pool = opts.tool && opts.tool !== 'all' ? listRecipesForTool(opts.tool) : listRecipes();
+  const pool = (opts.tool && opts.tool !== 'all' ? listRecipesForTool(opts.tool) : listRecipes())
+    .filter((r) => recipeKnown(r, opts.completedQuests));
   if (!q) return pool;
   return pool.filter((r) => {
     if (String(r.name || '').toLowerCase().includes(q)) return true;
@@ -679,6 +680,11 @@ export function searchRecipes(query, opts = {}) {
 /** Recipes that produce a class_tsid (pack popover "how do I make this?"). */
 export function listRecipesProducing(classTsid) {
   return listRecipes().filter((r) => (r.outputs || []).some((o) => o.classTsid === classTsid));
+}
+
+/** A quest-taught recipe stays out of the catalog until its quest is done. */
+export function recipeKnown(recipe, completedQuests = null) {
+  return !recipe?.taughtBy || !Array.isArray(completedQuests) || completedQuests.includes(recipe.taughtBy);
 }
 
 export function listRecipes() {
@@ -766,6 +772,11 @@ export function canCraft(inv, recipe, opts = {}) {
   if (toolSkill && Array.isArray(opts.learned) && opts.requireSkill !== false && !opts.learned.includes(toolSkill)) {
     return { ok: false, reason: 'skill', skill: toolSkill };
   }
+  // Quest-taught recipes (learnt 3, making_try_learn_recipe from a quest's
+  // onComplete) apply only when the caller passes the completed quest ids.
+  if (recipe.taughtBy && Array.isArray(opts.completedQuests) && !opts.completedQuests.includes(recipe.taughtBy)) {
+    return { ok: false, reason: 'quest', quest: recipe.taughtBy };
+  }
   // Achievement-gated recipes (learnt 2) apply only when the caller passes
   // the unlocked achievement ids.
   if (
@@ -828,6 +839,13 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
         ok: false,
         reason: 'broken_tool',
         msgs: [check.msg || `Your ${check.need} needs repairing.`],
+      };
+    }
+    if (check.reason === 'quest') {
+      return {
+        ok: false,
+        reason: 'quest',
+        msgs: ["You haven't learned this recipe yet."],
       };
     }
     if (check.reason === 'achievement') {

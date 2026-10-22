@@ -384,10 +384,16 @@ export function itemUse(row) {
   return null;
 }
 
+// learnt 3 recipes stay out of the client catalog (main.js) but a quest can
+// still teach one with making_try_learn_recipe: id -> teaching quest.
+const QUEST_TAUGHT = {
+  305: 'batterfly_bounty', // quests/batterfly_bounty.js onComplete; Batterfly Bounty Booster makes it
+};
+
 function skipReason(id, r) {
   if (SKIPPED_TOOLS[r.tool]) return SKIPPED_TOOLS[r.tool];
   if (!INCLUDED_TOOLS.includes(r.tool)) return `Tool ${r.tool} is not a player-ownable making tool in the remake.`;
-  if (r.learnt === 3) {
+  if (r.learnt === 3 && !QUEST_TAUGHT[id]) {
     return 'learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).';
   }
   const outIds = r.outputs.map((o) => o[0]);
@@ -456,6 +462,7 @@ export function buildCatalog(gsjs = GSJS) {
       source: `catalog_recipes.js recipes["${id}"]`,
     };
     if (r.learnt === 0) entry.discoverable = true;
+    if (QUEST_TAUGHT[id]) entry.taughtBy = QUEST_TAUGHT[id];
     if (MACHINE_TOOLS.has(r.tool)) {
       const fuel = entry.inputs.filter((i) => i.classTsid === 'fuel_cell').reduce((n, i) => n + i.qty, 0);
       if (fuel) {

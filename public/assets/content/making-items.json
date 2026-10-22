@@ -314,6 +314,24 @@
         "source": "items/basic_omelet.js base_cost 46 × energy_factor 1 (include/food.js food_eat)"
       }
     },
+    "batterfly_bar": {
+      "label": "Batterfly Bounty Booster Bar",
+      "namePlural": "Batterfly Bounty Booster Bars",
+      "desc": "An extremely potent concoction which is rumored to produce a prodigious amount of <a href=\"/items/445/\" glitch=\"item|guano\">guano</a> from a <a href=\"/items/448/\" glitch=\"item|npc_batterfly\">Batterfly</a>.",
+      "baseCost": 41,
+      "stackMax": 10,
+      "tags": [
+        "no_rube"
+      ],
+      "isTool": false,
+      "source": "items/batterfly_bar.js",
+      "use": {
+        "kind": "food",
+        "verb": "Eat",
+        "energy": 41,
+        "source": "items/batterfly_bar.js base_cost 41 × energy_factor 1 (include/food.js food_eat)"
+      }
+    },
     "beaker": {
       "label": "Beaker",
       "namePlural": "Beakers",

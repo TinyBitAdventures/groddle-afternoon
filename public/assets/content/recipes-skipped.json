@@ -2,8 +2,8 @@
   "_meta": {
     "generator": "build-recipes.mjs",
     "sourceRecipes": 339,
-    "imported": 315,
-    "skipped": 24,
+    "imported": 316,
+    "skipped": 23,
     "verbRecipes": 7
   },
   "skipped": [
@@ -216,16 +216,6 @@
       ],
       "reason": "Note Poles hold public notes; there is no note system.",
       "source": "catalog_recipes.js recipes[\"303\"]"
-    },
-    {
-      "id": "305",
-      "name": "Batterfly Bounty Booster Bar",
-      "tool": "awesome_pot",
-      "outputs": [
-        "batterfly_bar"
-      ],
-      "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
-      "source": "catalog_recipes.js recipes[\"305\"]"
     },
     {
       "id": "307",

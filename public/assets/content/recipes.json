@@ -9677,6 +9677,58 @@
     "learnt": 2,
     "source": "catalog_recipes.js recipes[\"304\"]"
   },
+  "batterfly_bar": {
+    "id": "305",
+    "name": "Batterfly Bounty Booster Bar",
+    "tool": "awesome_pot",
+    "energyCost": 33,
+    "xpReward": 5,
+    "waitMs": 3000,
+    "inputs": [
+      {
+        "classTsid": "grain",
+        "qty": 20
+      },
+      {
+        "classTsid": "oats",
+        "qty": 5
+      },
+      {
+        "classTsid": "hot_pepper",
+        "qty": 7
+      },
+      {
+        "classTsid": "cumin",
+        "qty": 5
+      },
+      {
+        "classTsid": "plum",
+        "qty": 5
+      },
+      {
+        "classTsid": "hot_n_fizzy_sauce",
+        "qty": 1
+      },
+      {
+        "classTsid": "olive_oil",
+        "qty": 1
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "batterfly_bar",
+        "qty": 1
+      }
+    ],
+    "skill": null,
+    "skills": [],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 3,
+    "source": "catalog_recipes.js recipes[\"305\"]",
+    "taughtBy": "batterfly_bounty"
+  },
   "potion_avatar_large": {
     "id": "306",
     "name": "Embiggenifying Potion",
