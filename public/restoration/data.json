@@ -113,7 +113,7 @@
     "public/js/location-navigation.js",
     "public/js/features/doors-feature.js"
    ],
-   "shot": null
+   "shot": "shots/navigation.webp"
   },
   {
    "id": "physics",
@@ -126,7 +126,7 @@
     "public/js/movement.js",
     "public/js/location-events.js"
    ],
-   "shot": null
+   "shot": "shots/physics.webp"
   },
   {
    "id": "street-events",
@@ -139,7 +139,7 @@
     "public/js/features/location-events-feature.js",
     "public/js/features/puzzles-feature.js"
    ],
-   "shot": null
+   "shot": "shots/street-events.webp"
   },
   {
    "id": "dametime",
@@ -202,7 +202,7 @@
    "evidence": [
     "public/js/features/camera-mode-feature.js"
    ],
-   "shot": null
+   "shot": "shots/camera.webp"
   },
   {
    "id": "newxp",
@@ -235,7 +235,7 @@
     "public/js/animal-kinship.js",
     "public/js/animal-husbandry.js"
    ],
-   "shot": null
+   "shot": "shots/piggies.webp"
   },
   {
    "id": "chickens",
@@ -260,7 +260,7 @@
     "public/js/animal-kinship.js",
     "public/js/tools.js"
    ],
-   "shot": null
+   "shot": "shots/butterflies.webp"
   },
   {
    "id": "trants",
@@ -274,7 +274,7 @@
     "public/js/trant-care.js",
     "public/js/woodcutting.js"
    ],
-   "shot": null
+   "shot": "shots/trants.webp"
   },
   {
    "id": "batterflies",
@@ -286,7 +286,7 @@
    "evidence": [
     "public/js/animal-husbandry.js"
    ],
-   "shot": null
+   "shot": "shots/batterflies.webp"
   },
   {
    "id": "foxes",
@@ -298,7 +298,7 @@
    "evidence": [
     "public/js/foxes.js"
    ],
-   "shot": null
+   "shot": "shots/foxes.webp"
   },
   {
    "id": "ecology",
@@ -324,7 +324,7 @@
     "public/js/garden.js",
     "public/js/master-garden.js"
    ],
-   "shot": null
+   "shot": "shots/gardens.webp"
   },
   {
    "id": "mining",
@@ -336,7 +336,7 @@
    "evidence": [
     "public/js/mining.js"
    ],
-   "shot": null
+   "shot": "shots/mining.webp"
   },
   {
    "id": "cooking",
@@ -349,7 +349,7 @@
     "public/js/making.js",
     "public/assets/content/recipes.json"
    ],
-   "shot": null
+   "shot": "shots/cooking.webp"
   },
   {
    "id": "machines",
@@ -398,7 +398,7 @@
    "evidence": [
     "public/js/quoins.js"
    ],
-   "shot": null
+   "shot": "shots/quoins.webp"
   },
   {
    "id": "shrines",
@@ -410,7 +410,7 @@
    "evidence": [
     "public/js/shrines.js"
    ],
-   "shot": null
+   "shot": "shots/shrines.webp"
   },
   {
    "id": "vendors",
@@ -435,7 +435,7 @@
    "evidence": [
     "public/js/imagination.js"
    ],
-   "shot": null
+   "shot": "shots/imagination.webp"
   },
   {
    "id": "levels",
@@ -462,7 +462,7 @@
     "public/js/achievements.js",
     "public/js/exploration.js"
    ],
-   "shot": null
+   "shot": "shots/badges.webp"
   },
   {
    "id": "auctions",
@@ -485,7 +485,7 @@
     "public/js/quests.js",
     "public/js/quest-offers.js"
    ],
-   "shot": null
+   "shot": "shots/quests.webp"
   },
   {
    "id": "quest-rooms",
@@ -513,7 +513,7 @@
     "public/js/winter-walk.js",
     "public/js/summers-day.js"
    ],
-   "shot": null
+   "shot": "shots/story-quests.webp"
   },
   {
    "id": "paradise",
@@ -525,7 +525,7 @@
    "evidence": [
     "public/js/paradise-flight.js"
    ],
-   "shot": null
+   "shot": "shots/paradise.webp"
   },
   {
    "id": "races",
@@ -538,7 +538,7 @@
     "public/js/races.js",
     "public/js/game-of-crowns.js"
    ],
-   "shot": null
+   "shot": "shots/races.webp"
   },
   {
    "id": "hog-haul",
@@ -550,7 +550,7 @@
    "evidence": [
     "public/js/hog-haul.js"
    ],
-   "shot": null
+   "shot": "shots/hog-haul.webp"
   },
   {
    "id": "street-jobs",
@@ -562,7 +562,7 @@
    "evidence": [
     "public/js/street-jobs.js"
    ],
-   "shot": null
+   "shot": "shots/street-jobs.webp"
   },
   {
    "id": "feats",
@@ -586,7 +586,7 @@
    "evidence": [
     "public/js/party-spaces.js"
    ],
-   "shot": null
+   "shot": "shots/parties.webp"
   },
   {
    "id": "smuggling",
@@ -600,7 +600,7 @@
     "public/js/features/smuggling-feature.js",
     "public/js/quest-rooms/penalty.js"
    ],
-   "shot": null
+   "shot": "shots/smuggling.webp"
   },
   {
    "id": "seasons",
@@ -626,7 +626,7 @@
     "public/js/home-decor.js",
     "public/js/home-cultivation.js"
    ],
-   "shot": null
+   "shot": "shots/homes.webp"
   },
   {
    "id": "mail",
@@ -650,7 +650,7 @@
    "evidence": [
     "public/js/neighbours.js"
    ],
-   "shot": null
+   "shot": "shots/neighbours.webp"
   },
   {
    "id": "tower",
@@ -695,7 +695,7 @@
     "public/js/skill-tree.js",
     "public/js/skills.js"
    ],
-   "shot": null
+   "shot": "shots/skills.webp"
   },
   {
    "id": "meditation",
@@ -708,7 +708,7 @@
     "public/js/meditation.js",
     "public/js/teleportation.js"
    ],
-   "shot": null
+   "shot": "shots/meditation.webp"
   },
   {
    "id": "icons",
@@ -720,7 +720,7 @@
    "evidence": [
     "public/js/giant-icons.js"
    ],
-   "shot": null
+   "shot": "shots/icons.webp"
   },
   {
    "id": "rube",
@@ -732,7 +732,7 @@
    "evidence": [
     "public/js/rube.js"
    ],
-   "shot": null
+   "shot": "shots/rube.webp"
   },
   {
    "id": "hell",
@@ -744,7 +744,7 @@
    "evidence": [
     "public/js/hell.js"
    ],
-   "shot": null
+   "shot": "shots/hell.webp"
   },
   {
    "id": "collectibles",
@@ -758,7 +758,7 @@
     "public/js/cubimals.js",
     "public/js/stoot-doll.js"
    ],
-   "shot": null
+   "shot": "shots/collectibles.webp"
   },
   {
    "id": "snaps",
@@ -835,7 +835,7 @@
      "An Autumn Day"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-an_autumn_day.webp"
    },
    {
     "id": "tile_puzzle",
@@ -844,7 +844,7 @@
      "An Old Fashioned B&E"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-tile_puzzle.webp"
    },
    {
     "id": "being_watched",
@@ -853,7 +853,7 @@
      "Being Watched"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-being_watched.webp"
    },
    {
     "id": "juju_camp",
@@ -872,7 +872,7 @@
      "Color Unblocking"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-color_unblocking.webp"
    },
    {
     "id": "gwendolyn",
@@ -883,7 +883,7 @@
      "Gwendolyn's Task III"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-gwendolyn.webp"
    },
    {
     "id": "clubhouse",
@@ -892,7 +892,7 @@
      "Join the Club"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-clubhouse.webp"
    },
    {
     "id": "le_miserable",
@@ -902,7 +902,7 @@
      "Le Misérable II"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-le_miserable.webp"
    },
    {
     "id": "mental_block",
@@ -912,7 +912,7 @@
      "Mental Block 2"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-mental_block.webp"
    },
    {
     "id": "kids_room",
@@ -922,7 +922,7 @@
      "Word Up"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-kids_room.webp"
    },
    {
     "id": "operation_grow",
@@ -931,7 +931,7 @@
      "Operation: Grow"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-operation_grow.webp"
    },
    {
     "id": "picto_pattern",
@@ -940,7 +940,7 @@
      "Picto-Pattern"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-picto_pattern.webp"
    },
    {
     "id": "radiant_glare",
@@ -949,7 +949,7 @@
      "Radiant Glare"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-radiant_glare.webp"
    },
    {
     "id": "rainbow_run",
@@ -958,7 +958,7 @@
      "The Numismatic Hustle "
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-rainbow_run.webp"
    },
    {
     "id": "penalty",
@@ -969,7 +969,7 @@
      "Smuggle the Smuggler III"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-penalty.webp"
    },
    {
     "id": "top_of_tree",
@@ -978,7 +978,7 @@
      "The High Jumper"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-top_of_tree.webp"
    },
    {
     "id": "esquibeth",
@@ -987,7 +987,7 @@
      "The Last Pilgrimage of Esquibeth"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-esquibeth.webp"
    },
    {
     "id": "rube_yard",
@@ -996,7 +996,7 @@
      "The Wrizzards and The Rube"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-rube_yard.webp"
    },
    {
     "id": "vision_quest",
@@ -1005,7 +1005,7 @@
      "Vision Quest"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-vision_quest.webp"
    },
    {
     "id": "light_perspective",
@@ -1014,7 +1014,7 @@
      "Walk Toward the Light"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-light_perspective.webp"
    },
    {
     "id": "back_alley",
@@ -1023,7 +1023,7 @@
      "We're Off to See the Lizard"
     ],
     "built": true,
-    "shot": null
+    "shot": "shots/room-back_alley.webp"
    }
   ]
  },
@@ -1078,7 +1078,7 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 174,
+  "commits": 176,
   "since": "2026-10-19",
   "recent": [
    {
