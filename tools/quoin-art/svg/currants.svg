@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="45" viewBox="0 0 40 45">
+  <!--
+    currants quoin: bronze coin with the currant mark.
+    Hand-traced from Tiny Speck's 1x quoin sheet (CC0): outlines follow the
+    1x alpha and colour edges, colours are sampled from its pixels. Drawn in
+    40 x 45 cell units where the body sits in frame 0 of its sheet row;
+    tools/quoin-art/build.mjs moves it per frame (frames.json).
+  -->
+  <defs>
+    <radialGradient id="rim" gradientUnits="userSpaceOnUse" cx="19" cy="21.05" r="12.2">
+      <stop offset="0.8934" stop-color="#fcfcfc" stop-opacity="0.86"/>
+      <stop offset="1" stop-color="#fcfcfc" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="face-fill" gradientUnits="userSpaceOnUse" x1="13" y1="26" x2="25" y2="14">
+      <stop offset="0" stop-color="#886a1f"/>
+      <stop offset="0.35" stop-color="#86671c"/>
+      <stop offset="0.65" stop-color="#75560c"/>
+      <stop offset="1" stop-color="#73540a"/>
+    </linearGradient>
+    <circle id="face" cx="19" cy="21.05" r="10.05"/>
+    <g id="mark" fill="none" stroke-width="2.1" stroke-linecap="round">
+      <path d="M22.28 17.61A4.8 4.8 0 1 0 22.28 23.79"/>
+      <path d="M19 16.9L15.6 22.9M21.9 17.6L18.5 23.6" stroke-width="1.15"/>
+    </g>
+    <mask id="bot" maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="45"><use href="#face" fill="#fff"/><use href="#face" fill="#000" transform="translate(-0.9 -1.5)"/></mask>
+  </defs>
+  <circle cx="19" cy="21.05" r="12.2" fill="url(#rim)"/>
+  <use href="#face" fill="url(#face-fill)"/>
+  <rect width="40" height="45" fill="#594410" mask="url(#bot)"/>
+  <use href="#mark" stroke="#5e4507" transform="translate(-0.5 -0.9)"/>
+  <use href="#mark" stroke="#b6a479"/>
+</svg>

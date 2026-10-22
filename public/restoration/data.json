@@ -1393,9 +1393,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 236,
+  "commits": 239,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "The Forest Community Machine Room building is whole again"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "Sound is on by default and the game remembers if you muted it"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Harvesting a tree plays its sound once instead of on a loop"
+   },
    {
     "date": "2026-10-22",
     "kind": "fix",
@@ -1500,24 +1515,9 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Climbing: no flicker at the top or bottom, and Up never jumps off a ladder"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Lighter project cards and a tidy legend on /compare/"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Batterflies no longer jump across the screen after eating"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "A page comparing Groddle Afternoon with the other Glitch remakes"
    }
   ]
  },
- "tests": 149,
+ "tests": 150,
  "generatedAt": "2026-10-22"
 }

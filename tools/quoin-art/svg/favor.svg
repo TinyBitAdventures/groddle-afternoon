@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="45" viewBox="0 0 40 45">
+  <!--
+    favor quoin: raspberry rounded square with a pink star.
+    Hand-traced from Tiny Speck's 1x quoin sheet (CC0): outlines follow the
+    1x alpha and colour edges, colours are sampled from its pixels. Drawn in
+    40 x 45 cell units where the body sits in frame 0 of its sheet row;
+    tools/quoin-art/build.mjs moves it per frame (frames.json).
+  -->
+  <defs>
+    <rect id="sq" x="10" y="15" width="18" height="18" rx="3.625"/>
+    <mask id="top" maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="45"><use href="#sq" fill="#fff"/><use href="#sq" fill="#000" transform="translate(0 1)"/></mask>
+    <mask id="bot" maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="45"><use href="#sq" fill="#fff"/><use href="#sq" fill="#000" transform="translate(0 -0.85)"/></mask>
+    <mask id="sides" maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="45"><use href="#sq" fill="#fff"/><rect x="10.5" y="0" width="17" height="45" fill="#000"/></mask>
+  </defs>
+  <rect x="8" y="13" width="22" height="22" rx="5.6" fill="#fcfcfc" fill-opacity="0.37"/>
+  <rect x="9" y="14" width="20" height="20" rx="4.6" fill="#fcfcfc" fill-opacity="0.6"/>
+  <use href="#sq" fill="#923a5d"/>
+  <rect width="40" height="45" fill="#883355" mask="url(#sides)"/>
+  <rect width="40" height="45" fill="#b98198" mask="url(#top)"/>
+  <rect width="40" height="45" fill="#661133" mask="url(#bot)"/>
+  <path d="M19.050 18.600L20.843 22.082L24.709 22.711L21.951 25.493L22.547 29.364L19.050 27.600L15.553 29.364L16.149 25.493L13.391 22.711L17.257 22.082Z" fill="#f2b8d0" stroke="#f2b8d0" stroke-width="0.3" stroke-linejoin="round"/>
+</svg>

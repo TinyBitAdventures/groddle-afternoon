@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="45" viewBox="0 0 40 45">
+  <!--
+    time quoin: stopwatch face, steel ring, hands at three o'clock.
+    Hand-traced from Tiny Speck's 1x quoin sheet (CC0): outlines follow the
+    1x alpha and colour edges, colours are sampled from its pixels. Drawn in
+    40 x 45 cell units where the body sits in frame 0 of its sheet row;
+    tools/quoin-art/build.mjs moves it per frame (frames.json).
+  -->
+  <defs>
+    <radialGradient id="rim" gradientUnits="userSpaceOnUse" cx="19" cy="20" r="12.15">
+      <stop offset="0.9012" stop-color="#fcfcfc" stop-opacity="0.6725"/>
+      <stop offset="1" stop-color="#fcfcfc" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="metal" gradientUnits="userSpaceOnUse" x1="0" y1="10" x2="0" y2="30">
+      <stop offset="0" stop-color="#9cbcbc"/>
+      <stop offset="0.55" stop-color="#99b9bb"/>
+      <stop offset="1" stop-color="#7f9799"/>
+    </linearGradient>
+  </defs>
+  <circle cx="19" cy="20" r="12.15" fill="url(#rim)"/>
+  <circle cx="19" cy="20" r="10" fill="url(#metal)"/>
+  <circle cx="19" cy="20" r="7.95" fill="#ffffff"/>
+  <circle cx="19" cy="20" r="7" fill="#e9f7fa"/>
+  <g><circle cx="22.500" cy="16.500" r="0.7" fill="#c1ced7"/><circle cx="22.500" cy="23.500" r="0.7" fill="#c1ced7"/><circle cx="15.500" cy="23.500" r="0.7" fill="#c1ced7"/><circle cx="15.500" cy="16.500" r="0.7" fill="#c1ced7"/><circle cx="19.000" cy="14.500" r="0.6" fill="#9aa3aa"/><circle cx="24.500" cy="20.000" r="0.6" fill="#9aa3aa"/><circle cx="19.000" cy="25.500" r="0.6" fill="#9aa3aa"/><circle cx="13.500" cy="20.000" r="0.6" fill="#9aa3aa"/></g>
+  <path d="M19.2 14.8V20.349999999999998H22.5" fill="none" stroke="#c1ced7" stroke-width="1.1125" stroke-linecap="round" stroke-linejoin="round" transform="translate(0.15 -0.85)"/>
+  <path d="M18.5 14.8V20.45H22.5" fill="none" stroke="#747b80" stroke-width="1.1125" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
