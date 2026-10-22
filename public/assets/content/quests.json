@@ -200,7 +200,8 @@
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "toggle flag leave"
+    "desc": "toggle flag leave",
+    "route": "quest-instances"
    }
   ],
   "rewards": {},
@@ -243,28 +244,14 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "npc",
-    "npc": "street_spirit"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_firebog"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_groddle"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_ix"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_zutto"
+    "type": "quest",
+    "quest": "blue_and_white_part1",
+    "override": true
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "an_autumn_day",
+  "offerNote": "street spirit giver; offered once A Summer’s Day is done",
+  "solo": true
  },
  "an_autumn_day_part2": {
   "classTsid": "an_autumn_day_part2",
@@ -278,7 +265,8 @@
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "toggle flag leave"
+    "desc": "toggle flag leave",
+    "route": "quest-instances"
    }
   ],
   "rewards": {},
@@ -294,7 +282,13 @@
   "familiarTurnin": false,
   "silentComplete": false,
   "showAlert": false,
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "hour_after:an_autumn_day",
+    "not": 0
+   }
+  ],
   "endNpcs": [
    "street_spirit",
    "street_spirit_firebog",
@@ -313,28 +307,14 @@
   "hasCanOffer": true,
   "offerTriggers": [
    {
-    "type": "npc",
-    "npc": "street_spirit"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_firebog"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_groddle"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_ix"
-   },
-   {
-    "type": "npc",
-    "npc": "street_spirit_zutto"
+    "type": "quest",
+    "quest": "an_autumn_day",
+    "override": true
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "an_autumn_day",
+  "offerNote": "street spirit giver; canOffer: an hour after part 1 and after the last repeat",
+  "solo": true
  },
  "animal_friend": {
   "classTsid": "animal_friend",
@@ -1101,7 +1081,8 @@
     "recipeId": "305",
     "recipeName": "Batterfly Bounty Booster Bar",
     "tool": "awesome_pot",
-    "outputClass": "batterfly_bar"
+    "outputClass": "batterfly_bar",
+    "recipeKey": "batterfly_bar"
    },
    {
     "id": "r408",
@@ -31087,14 +31068,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "You made it!"
+    "desc": "You made it!",
+    "route": "quest-instances"
    },
    {
     "id": "r528",
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "Complete the Journey"
+    "desc": "Complete the Journey",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -31122,7 +31105,13 @@
   "showAlert": false,
   "acceptLabel": "Do",
   "declineLabel": "Do not",
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "upgrades:walk_speed_3,jump_2",
+    "not": 0
+   }
+  ],
   "endNpcs": [],
   "locations": [
    "radiant_glare"
@@ -31136,8 +31125,9 @@
     "xp": 11306
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "radiant_glare",
+  "offerNote": "canOffer: walk_speed_3 and jump_2",
+  "solo": true
  },
  "radiant_glare_rem": {
   "classTsid": "radiant_glare_rem",
@@ -31151,14 +31141,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "You made it!"
+    "desc": "You made it!",
+    "route": "quest-instances"
    },
    {
     "id": "r541",
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "Complete the Journey"
+    "desc": "Complete the Journey",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -31186,6 +31178,16 @@
     "condition": "completed_quest",
     "value": "radiant_glare",
     "not": 0
+   },
+   {
+    "condition": "custom_code",
+    "value": "upgrades:walk_speed_3,jump_2",
+    "not": 0
+   },
+   {
+    "condition": "custom_code",
+    "value": "hour_after:radiant_glare",
+    "not": 0
    }
   ],
   "endNpcs": [],
@@ -31201,8 +31203,9 @@
     "npc": "play_cube"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "radiant_glare",
+  "offerNote": "canOffer: walk_speed_3 and jump_2; an hour after part 1 and after the last repeat or fail",
+  "solo": true
  },
  "rannacramble": {
   "classTsid": "rannacramble",
