@@ -103,9 +103,11 @@ describe('classifyQuests', () => {
     // Rebuilt quest rooms (public/js/quest-rooms/catalog.js) move from
     // instance_unbuilt to solo as each room lands.
     const built = builtInstanceQuests().length;
-    assert.equal(c.solo.length, 129 + built);
+    // Overworld features that brought once-excluded quests back (not rooms).
+    const featureQuests = ['smuggling_basic'].length;
+    assert.equal(c.solo.length, 129 + built + featureQuests);
     assert.equal(c.custom.length, 17);
-    assert.equal(c.excluded.length, 299 - built);
+    assert.equal(c.excluded.length, 299 - built - featureQuests);
     assert.equal(c.byReason.job.length, 200);
     assert.equal(c.byReason.multiplayer.length, 11);
     // Gwendolyn's Task and Smuggle the Smuggler were feature_unbuilt, not among the 32.
@@ -115,7 +117,7 @@ describe('classifyQuests', () => {
     assert.ok(c.byReason.needs_other_players.includes('kindly_randomness'));
     assert.ok(c.byReason.removed_feature.includes('say_cheese'));
     assert.ok(c.custom.some((row) => row.classTsid === 'phantom_glitch'));
-    assert.equal(questOfferIndex().length, 129 + built);
+    assert.equal(questOfferIndex().length, 129 + built + featureQuests);
   });
 
   it('marks NPC-only quests whose giver the remake lacks as unreachable', () => {

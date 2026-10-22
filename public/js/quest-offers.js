@@ -758,6 +758,7 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'shrines_donated:{a}' },
   { event: 'emblems_acquired:{a}' },
   { event: 'in_inventory:{a}', note: 'every pack gain (quest-offers feature diff)' },
+  { event: 'contraband_delivered', note: 'features/smuggling-feature.js sets it when the contact takes the box' },
   // game.js emitGameEvent (2026-10-19)
   { event: '{a}:{b}', note: 'every successful world verb and pack use' },
   { event: 'rocks_depleted:{a}' },
