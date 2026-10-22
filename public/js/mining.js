@@ -21,7 +21,7 @@ import {
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { skillPackageDetails } from './skill-packages.js';
-import { GEM_ITEMS, miningExpertBonus, rollGemSmall, smeltingOverrides } from './imagination-effects.js';
+import { GEM_ITEMS, MEGA_ROCK_CHUNKS, megaRockChance, miningExpertBonus, rollGemSmall, smeltingOverrides } from './imagination-effects.js';
 
 /**
  * @typedef {{
@@ -385,6 +385,10 @@ export function mineRock(rock, inv, pc, opts = {}) {
     rock.depleted = true;
     // GSJS: 8 min base; demo ~45s
     rock.respawnAt = (opts.now || Date.now()) + 45000;
+    // include/mining.js onRespawn: 0/5/10/20% of rocks come back as 150-chunk
+    // mega rocks, +50% of that with Rock Whisperer (the clearing player's card,
+    // passed to the respawn timer at mining.js:419). Rolled now, applied then.
+    rock.respawnChunks = rng() < megaRockChance(rock.rockType, upgrades) ? MEGA_ROCK_CHUNKS : 0;
     cleared = true;
     msgs.push('The rock crumbles away. It will reform soon.');
   }
@@ -418,7 +422,10 @@ export function mineRock(rock, inv, pc, opts = {}) {
 export function tickMineRock(rock, now = Date.now()) {
   if (!rock?.depleted) return false;
   if (now < (rock.respawnAt || 0)) return false;
-  rock.chunksRemaining = rock.chunksMax || 50;
+  rock.chunksRemaining = rock.respawnChunks > 0 ? rock.respawnChunks : rock.chunksMax || 50;
+  // onMegaRoxx: "I am huuuuuuuuuge!" (read it from rock.mega).
+  rock.mega = rock.respawnChunks > 0;
+  rock.respawnChunks = 0;
   rock.depleted = false;
   rock.respawnAt = 0;
   return true;

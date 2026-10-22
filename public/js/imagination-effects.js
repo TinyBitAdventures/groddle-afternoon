@@ -246,3 +246,194 @@ export function skillTimeFactor({ count = 0, brainCapacity = 20, categoryId = nu
   if (pct) factor *= (100 - pct) / 100;
   return factor;
 }
+
+/* ------------------------------------------------------------------ */
+/* Cards wired 2026-10-22 (register row G14)                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * catalog_tags.js *_task_limit_upgrade: the tools each batch-size card
+ * covers. crystalmalization_task_limit_upgrade has no card.
+ */
+export const TASK_LIMIT_TOOLS = Object.freeze({
+  food: Object.freeze(['awesome_pot', 'frying_pan', 'knife_and_board', 'mike_tyson_grill', 'saucepan']),
+  transmog: Object.freeze(['bubble_tuner', 'fruit_changing_machine', 'gassifier', 'spice_mill']),
+  drink: Object.freeze(['blender', 'cocktail_shaker']),
+  machine: Object.freeze(['blockmaker', 'fuelmaker', 'metalmaker', 'woodworker']),
+  fiberarts: Object.freeze(['loomer']),
+  tincturing: Object.freeze(['tincturing_kit']),
+});
+
+/**
+ * get_task_limit_multiplier (inc_making.js:1759-1806): Captain Cook,
+ * Tireless Transmogrifier, Boisterous Bartender and Mad Machinist I/II
+ * (x1.5 / x2), Luscious Loomer (x2.5), Tincturing Todd (x2).
+ */
+export function taskLimitMultiplier(tool, owned) {
+  const set = asSet(owned);
+  const has = (group) => TASK_LIMIT_TOOLS[group].includes(tool);
+  let m = 1;
+  const pair = (group, prefix) => {
+    if (!has(group)) return;
+    if (set.has(`${prefix}_2`)) m = 2;
+    else if (set.has(`${prefix}_1`)) m = 1.5;
+  };
+  pair('food', 'recipe_task_limit_food');
+  pair('transmog', 'recipe_task_limit_transmog');
+  pair('drink', 'recipe_task_limit_drink');
+  pair('machine', 'recipe_task_limit_machines');
+  if (has('fiberarts') && set.has('recipe_task_limit_loomer_1')) m = 2.5;
+  if (has('tincturing') && set.has('recipe_task_limit_tincturing_1')) m = 2;
+  return m;
+}
+
+/** main.js:795-799: a recipe's task_limit after the cards, Math.round. */
+export function adjustedTaskLimit(taskLimit, tool, owned) {
+  const base = Math.max(0, Math.floor(Number(taskLimit) || 0));
+  const m = taskLimitMultiplier(tool, owned);
+  return m === 1 ? base : Math.round(base * m);
+}
+
+/**
+ * inc_making.js:368-375: Better / Betterer Blockmaker burn 20 / 40% less
+ * fuel: tool_uses -= Math.round(tool_uses * pct).
+ */
+export function blockmakerFuel(fuel, owned) {
+  const n = Math.max(0, Number(fuel) || 0);
+  const set = asSet(owned);
+  if (set.has('blockmaking_save_fuel_2')) return n - Math.round(n * 0.4);
+  if (set.has('blockmaking_save_fuel_1')) return n - Math.round(n * 0.2);
+  return n;
+}
+
+/** still.js:286-297: Corn / Grain / Potato Hoocher put 20% more in the hopper. */
+export const HOOCHER_UPGRADES = Object.freeze({
+  corn: Object.freeze({ id: 'distilling_corn', name: 'Corn Hoocher' }),
+  grain: Object.freeze({ id: 'distilling_grain', name: 'Grain Hoocher' }),
+  potato: Object.freeze({ id: 'distilling_potato', name: 'Potato Hoocher' }),
+});
+
+export function distillingBonus(classTsid, owned) {
+  const row = HOOCHER_UPGRADES[classTsid];
+  return row && asSet(owned).has(row.id) ? { multiplier: 1.2, name: row.name } : { multiplier: 1, name: '' };
+}
+
+/** machine_stand assemble_* verbs need Master Assembler; machine_base fully_disassemble needs Master Exploder. */
+export function hasMasterAssembler(owned) {
+  return asSet(owned).has('engineering_assemble_machine');
+}
+
+export function hasMasterExploder(owned) {
+  return asSet(owned).has('engineering_disassemble_machine');
+}
+
+/** woodworker.js:264-265 and siblings: the installing overlay runs 2000 ms, 1000 with Speedy Assembler. */
+export function machinePartInstallMs(owned) {
+  return asSet(owned).has('engineering_reduce_time') ? 1000 : 2000;
+}
+
+/**
+ * Focusing Orb cards (focusing_orb.js): Double Max Relax doubles a Max
+ * Relax's energy, mood and iMG; Enlightenment / Focused Imagination pay
+ * bonus iMG 8% of the time (Max Luck always).
+ */
+export const MEDITATION_IMAGINATION_CHANCE = 0.08;
+
+export function meditationCards(owned) {
+  const set = asSet(owned);
+  return {
+    maxRelaxDouble: set.has('meditative_arts_max_relax'),
+    standingImagination: set.has('meditative_arts_imagination'),
+    focusedImagination: set.has('focused_meditation_imagination'),
+  };
+}
+
+/**
+ * Levitate Longer (focusing_orb.js:315-369): min energy 12 + round(tank *
+ * 0.008) instead of 20 + ..., energy cost 12, buff 8000 ms instead of 5000.
+ * Levitate with Style (catalog_buffs.js:1251-1257): gravity 0.798,
+ * vy_jump 1.176, friction_air 1.59 instead of gravity 0.85.
+ */
+export function levitationCards(owned) {
+  const set = asSet(owned);
+  const longer = set.has('levitation_time');
+  return {
+    minEnergyBase: longer ? 12 : 20,
+    energyCost: longer ? 12 : 20,
+    durationMs: longer ? 8000 : 5000,
+    physics: set.has('levitation_physics')
+      ? { jetpack: 1, gravity: 0.798, vy_jump: 1.176, friction_air: 1.59 }
+      : { jetpack: 1, gravity: 0.85 },
+  };
+}
+
+/** npc_fox.js:222 and 343: Bristling Bonus wears the brush 1.5x and adds 8 to 12 Fiber. */
+export function foxBrushingCard(owned) {
+  return asSet(owned).has('fox_brushing_bonus')
+    ? { toolWearMultiplier: 1.5, rangeAdd: Object.freeze([8, 12]) }
+    : { toolWearMultiplier: 1, rangeAdd: Object.freeze([0, 0]) };
+}
+
+/**
+ * include/mining.js onRespawn (143-171): a respawning rock is a 150-chunk
+ * mega rock at 0 / 5 / 10 / 20% (metal, dullite, beryl, sparkly), +50% of
+ * that with Rock Whisperer (mining.js:419 passes the clearing player's card).
+ */
+export const MEGA_ROCK_CHANCE = Object.freeze({ metal_rock: 0, dullite: 0.05, beryl: 0.1, sparkly: 0.2 });
+export const MEGA_ROCK_CHUNKS = 150;
+
+export function megaRockChance(rockType, owned) {
+  const chance = MEGA_ROCK_CHANCE[rockType] ?? 0.2;
+  return asSet(owned).has('mining_high_capacity_rock') ? chance + 0.5 * chance : chance;
+}
+
+/** npc_sloth.js:590-601, 825-834: Friend of Metal, 7% per collision with a hiding Sloth, 5 minutes apart, 1-3 Snails. */
+export const SLOTH_BONUS_SNAILS = Object.freeze({ upgrade: 'sloth_bonus_snails', chance: 0.07, cooldownMs: 5 * 60 * 1000, counts: Object.freeze([1, 2, 3]) });
+
+export function rollSlothBonusSnails(owned, lastAt, now = Date.now(), rng = Math.random, maxLuck = false) {
+  if (!asSet(owned).has(SLOTH_BONUS_SNAILS.upgrade)) return 0;
+  // (!last || last > 5 min) && is_chance(0.07) || max_luck, as written.
+  const ready = !lastAt || now - lastAt > SLOTH_BONUS_SNAILS.cooldownMs;
+  if (!((ready && rng() < SLOTH_BONUS_SNAILS.chance) || maxLuck)) return 0;
+  const counts = SLOTH_BONUS_SNAILS.counts;
+  return counts[Math.min(counts.length - 1, Math.floor(rng() * counts.length))];
+}
+
+/** spindle.js:425: Spellbound Spindle, 4% of spins make String instead of Thread (Max Luck does not help). */
+export function spellboundSpindle(owned, rng = Math.random) {
+  return asSet(owned).has('fiber_arts_bonus_1') && rng() < 0.04;
+}
+
+/** loomer.js:309: Wondrous Weave, 4% of General Fabric batches (or Max Luck) give 2 more. */
+export function wondrousWeave(owned, rng = Math.random, maxLuck = false) {
+  return asSet(owned).has('fiber_arts_bonus_2') && (rng() < 0.04 || maxLuck);
+}
+
+/**
+ * inc_making.js:840-875: Bonus Tool From Spare Parts. 5% of Tinkertool
+ * batches (or Max Luck) also make a random tool worth 0.5x to 2x the output's
+ * base cost. Candidates: catalog.class_tsids tagged tool, not no_rube, potion
+ * or deleted, minus five named classes; base_cost from each item file.
+ */
+export const BONUS_TOOL_CANDIDATES = Object.freeze({
+  ace_of_spades: 3000, alchemical_tongs: 600, awesome_pot: 300, beaker: 400, bean_seasoner: 175, blender: 150,
+  bubble_tuner: 150, cauldron: 3500, class_axe: 900, cocktail_shaker: 150, construction_tool: 500, crystallizer: 2500,
+  egg_seasoner: 175, fancy_pick: 1000, focusing_orb: 1200, fox_brush: 200, fruit_changing_machine: 200, frying_pan: 125,
+  gassifier: 150, grand_ol_grinder: 2000, hatchet: 100, high_class_hoe: 600, hoe: 60, irrigator_9000: 750,
+  knife_and_board: 75, loomer: 400, mike_tyson_grill: 175, ore_grinder: 200, pick: 500, quill: 400, saucepan: 200,
+  scraper: 300, shovel: 300, smelter: 700, spice_mill: 150, spindle: 200, splendid_spindle: 2000, still: 2000,
+  super_scraper: 2000, test_tube: 100, tincturing_kit: 1250, tinkertool: 500, watering_can: 75,
+});
+
+export function bonusToolCandidates(value) {
+  const v = Number(value) || 0;
+  return Object.keys(BONUS_TOOL_CANDIDATES).filter((id) => BONUS_TOOL_CANDIDATES[id] >= 0.5 * v && BONUS_TOOL_CANDIDATES[id] <= 2 * v);
+}
+
+export function rollBonusTool(owned, outputValue, rng = Math.random, maxLuck = false) {
+  if (!asSet(owned).has('toolcrafting_bonus_tool')) return null;
+  if (!(rng() < 0.05 || maxLuck)) return null;
+  const list = bonusToolCandidates(outputValue);
+  if (!list.length) return null;
+  return list[Math.min(list.length - 1, Math.floor(rng() * list.length))];
+}

@@ -103,8 +103,13 @@ function costTip(t, n) {
   return `${t.tooltip} Costs ${parts.join(' and ')}.`;
 }
 
-export function shuckDetails(learned = []) {
-  const d = skillPackageDetails(SHUCK_PACKAGE, learned) || {};
+/**
+ * The herbalism_extract_seeds row plus its img overlays: Seedy Powers 75%
+ * and Super Seedy Powers 100% chance of doubled seeds (catalog_skill_packages.js
+ * herbalism_extract_seeds img_upgrades).
+ */
+export function shuckDetails(learned = [], upgrades = []) {
+  const d = skillPackageDetails(SHUCK_PACKAGE, learned, upgrades) || {};
   return {
     energy: Number(d.energy_cost ?? 4),
     successRate: Number(d.success_rate ?? 75) / 100,
@@ -150,7 +155,7 @@ export function runTransform(classTsid, verb, count, inv, pc, learned = [], rng 
 
 function shuck(classTsid, n, inv, pc, learned, rng) {
   const herb = HERB_SEEDS[classTsid];
-  const d = shuckDetails(learned);
+  const d = shuckDetails(learned, pc?.imaginationUpgrades);
   pc.energy -= d.energy * n;
   if (rng() >= d.successRate) {
     return { ok: false, reason: 'failed', energy: d.energy * n, msg: `You tried to extract seeds, but you failed! (-${d.energy * n} energy)` };

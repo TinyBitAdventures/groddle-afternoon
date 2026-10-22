@@ -19,7 +19,17 @@ import {
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { highestSkillLevel, skillPackageDetails } from './skill-packages.js';
-import { rollMakingBonusImagination, scaledToolWear, smeltingOverrides, toolWearMultiplier } from './imagination-effects.js';
+import {
+  adjustedTaskLimit,
+  blockmakerFuel,
+  rollBonusTool,
+  rollMakingBonusImagination,
+  scaledToolWear,
+  smeltingOverrides,
+  spellboundSpindle,
+  toolWearMultiplier,
+  wondrousWeave,
+} from './imagination-effects.js';
 
 /**
  * @typedef {{
@@ -411,6 +421,15 @@ export function makingSkillAdjustments(recipe, learned, upgrades = []) {
       if (!barnacle) out.waitMultiplier = refining.duration / 4000;
       if (!barnacle && refining.rank >= 2) out.note = 'Refining II: twice as fast, 3 energy per chunk.';
     }
+  } else if (recipe?.tool === 'blockmaker') {
+    // inc_making.js:368-375: Better / Betterer Blockmaker burn 20 / 40% less
+    // fuel (the recipe's fuel_cell input is the per-unit tank use here).
+    const fuel = Number(recipe.toolWear) || 0;
+    const saved = blockmakerFuel(fuel, upgrades);
+    if (saved !== fuel) {
+      out.toolWear = saved;
+      out.note = `Uses ${saved} fuel instead of ${fuel}.`;
+    }
   } else if (recipe?.tool === 'smelter') {
     // smelter.js runs the `smelting` package: 5 energy and 3 wear per ingot,
     // The Green Smelt 3 energy, Strong Smelter 2 wear.
@@ -428,6 +447,38 @@ export function makingSkillAdjustments(recipe, learned, upgrades = []) {
 /** Per-unit energy a recipe really costs this player. */
 export function recipeEnergyCost(recipe, learned, upgrades = []) {
   return makingSkillAdjustments(recipe, learned, upgrades).energyCost;
+}
+
+/** Batch cap for recipes without a task_limit (the remake's old flat cap). */
+export const DEFAULT_TASK_LIMIT = 99;
+
+/**
+ * The most units one make can ask for: the recipe's task_limit (main.js
+ * recipe catalog, the client's quantity cap), after the batch-size cards
+ * (get_task_limit_multiplier). Recipes the source gave no limit keep 99.
+ */
+export function recipeTaskLimit(recipe, upgrades = []) {
+  const base = Number(recipe?.taskLimit) || 0;
+  if (!(base > 0)) return DEFAULT_TASK_LIMIT;
+  return Math.max(1, adjustedTaskLimit(base, recipe.tool, upgrades));
+}
+
+/** Spindle tools that read Spellbound Spindle (spindle.js / splendid_spindle.js onSpinComplete). */
+export const SPINDLE_TOOLS = Object.freeze(['spindle', 'splendid_spindle']);
+/** Loomer recipe 295 (General Fabric) reads Wondrous Weave (loomer.js onMakingComplete). */
+export const WONDROUS_WEAVE_RECIPE = '295';
+
+/**
+ * Batch-level card rolls. The source makes a batch in one go, so these fire
+ * once per make: Spellbound Spindle swaps the whole spin to String, Wondrous
+ * Weave and Bonus Tool From Spare Parts pay when the batch finishes. The
+ * remake commits a batch unit by unit (unitIndex 1..batchQty), so unit 1
+ * opens the record and buildCraftBatchResult reads it back.
+ */
+let batchExtras = null;
+
+export function currentBatchExtras() {
+  return batchExtras;
 }
 
 /** Fallback if recipes.json not loaded (classic knife/pan chain). */
@@ -925,8 +976,37 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     pc.imagination = (pc.imagination || 0) + recipe.xpReward;
     pc.xp = (pc.xp || 0) + recipe.xpReward;
   }
+  const rng = opts.rng || Math.random;
+  if (unitIndex === 1 || batchExtras?.recipeKey !== recipeKey) {
+    batchExtras = { recipeKey, swap: null, items: [], lines: [] };
+    // spindle.js:425: one 4% roll per spin (Max Luck deliberately left out).
+    if (SPINDLE_TOOLS.includes(recipe.tool) && spellboundSpindle(upgrades, rng)) {
+      batchExtras.swap = { from: 'thread', to: 'string' };
+      batchExtras.lines.push('The Giants have favored you and instead of spinning thread you spun String!');
+    }
+  }
+  const swap = batchExtras.swap;
   for (const out of recipe.outputs || []) {
-    addItem(inv, out.classTsid, out.qty);
+    addItem(inv, swap && out.classTsid === swap.from ? swap.to : out.classTsid, out.qty);
+  }
+  if (unitIndex === batchQty) {
+    // loomer.js:307-312 onMakingComplete: Wondrous Weave, +2 General Fabric.
+    if (String(recipe.id) === WONDROUS_WEAVE_RECIPE && wondrousWeave(upgrades, rng, Boolean(opts.maxLuck))) {
+      addItem(inv, 'general_fabric', 2);
+      batchExtras.items.push({ classTsid: 'general_fabric', qty: 2 });
+      batchExtras.lines.push('Hey, look at that. The Giants have favored you with 2 bonus General Fabrics. Lucky you!');
+    }
+    // inc_making.js:840-928: Bonus Tool From Spare Parts on the Tinkertool.
+    if (recipe.tool === 'tinkertool') {
+      const firstOut = recipe.outputs?.[0]?.classTsid;
+      const gift = rollBonusTool(upgrades, Number(ITEM_CATALOG[firstOut]?.baseCost) || 0, rng, Boolean(opts.maxLuck));
+      if (gift) {
+        addItem(inv, gift, 1);
+        const label = ITEM_CATALOG[gift]?.label || gift;
+        batchExtras.items.push({ classTsid: gift, qty: 1 });
+        batchExtras.lines.push(`You took the extra parts and made ${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label}.`);
+      }
+    }
   }
   // rollCraftingBonusImagination: the tool's *_imagination card can pay a
   // share of the output's base cost as bonus iMG.
@@ -956,6 +1036,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     msgs: [
       `You made ${recipe.name} with ${toolLabel} (${outLabels}). −${cost} energy, +${recipe.xpReward || 0} iMG.`,
       ...(bonusImagination ? [`Bonus imagination! +${bonusImagination} iMG.`] : []),
+      ...(unitIndex === 1 && swap ? [batchExtras.lines[0]] : []),
       ...(toolUse?.broke ? [toolUse.msg] : []),
     ],
     toolUse,
@@ -1146,19 +1227,27 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
     remain: countItem(inv, input.classTsid),
     label: ITEM_CATALOG[input.classTsid]?.label || input.classTsid,
   }));
+  const extras = batchExtras?.recipeKey === recipeKey ? batchExtras : null;
+  const swapped = (id) => (extras?.swap && id === extras.swap.from ? extras.swap.to : id);
   const outputs = (recipe.outputs || []).map((output) => ({
-    classTsid: output.classTsid,
+    classTsid: swapped(output.classTsid),
     qty: output.qty * count,
-    label: ITEM_CATALOG[output.classTsid]?.label || output.classTsid,
+    label: ITEM_CATALOG[swapped(output.classTsid)]?.label || swapped(output.classTsid),
   }));
+  for (const item of extras?.items || []) {
+    outputs.push({ classTsid: item.classTsid, qty: item.qty, label: ITEM_CATALOG[item.classTsid]?.label || item.classTsid, bonus: true });
+  }
   const canMakeMore = canCraft(inv, recipe, opts).ok
     && (pc.energy || 0) >= recipeEnergyCost(recipe, opts.learned);
-  const activityLine = formatCraftResultLine({
-    made: count,
-    recipeName: recipe.name,
-    energy,
-    xp,
-  });
+  const activityLine = [
+    formatCraftResultLine({
+      made: count,
+      recipeName: recipe.name,
+      energy,
+      xp,
+    }),
+    ...(extras?.lines || []),
+  ].join(' ');
 
   return {
     made: count,

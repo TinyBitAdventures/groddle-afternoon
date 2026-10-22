@@ -1379,12 +1379,12 @@
  "imagination": {
   "total": 275,
   "counts": {
-   "live": 194,
-   "later": 52,
+   "live": 231,
+   "later": 12,
    "starter": 9,
-   "none": 5,
-   "interface": 8,
-   "multiplayer": 7
+   "none": 6,
+   "multiplayer": 9,
+   "interface": 8
   }
  },
  "jobs": {
@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 248,
+  "commits": 249,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "Trees, dead trees, soil and resource nodes are sharp 3x art"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1510,14 +1515,9 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "The game runs on Pixi 8.22.0"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Vector shapes use the Pixi 8 fill and stroke calls"
    }
   ]
  },
- "tests": 158,
+ "tests": 159,
  "generatedAt": "2026-10-22"
 }

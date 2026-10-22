@@ -31,7 +31,7 @@ import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATAL
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=dametime-1';
 import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=catalog-unified-2';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js';
-import { setSeasonalRecipeCheck } from '../making.js?v=recipes-full-1';
+import { setSeasonalRecipeCheck } from '../making.js?v=making-g14-1';
 import { getToolCondition } from '../tools.js';
 import { landingY, nearestSurfaceY } from '../walk-surface.js';
 import { isBatterflyHabitat } from '../animal-husbandry.js';
@@ -39,7 +39,7 @@ import { emblemCostFor } from '../shrines.js';
 import { rollDropTable } from '../drop-tables.js';
 import { openNoteView, noteViewOpen } from '../note-view.js';
 import { payDrop } from './drops-feature.js?v=drops-1';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-1';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-2';
 import { SEASON_DATA } from '../seasons-data.js';
 import {
   CANDY_CLASSES,

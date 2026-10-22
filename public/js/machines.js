@@ -23,6 +23,7 @@
 
 import { addItem, countItem, removeItem } from './inventory.js?v=catalog-unified-3';
 import { ensureToolCondition, getToolCondition } from './tools.js';
+import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js';
 
 export const MACHINE_STAND = 'machine_stand';
 export const MACHINE_ENGINE = 'blockmaker_engine';
@@ -62,8 +63,25 @@ export function isMachine(classTsid) {
   return Boolean(MACHINE_ASSEMBLIES[classTsid]);
 }
 
+/**
+ * Energy to put the parts on: 20 per component (add_chassis), or nothing with
+ * Master Assembler, whose assemble_* verbs autoAssemble without a metabolic
+ * cost (machine_stand.js:136-180, 759-768).
+ */
+export function assemblyEnergy(machine, upgrades = []) {
+  const def = MACHINE_ASSEMBLIES[machine];
+  if (!def) return 0;
+  return hasMasterAssembler(upgrades) ? 0 : COMPONENT_ENERGY * def.parts.length;
+}
+
+/** Installing overlay per part (machine_base onApplyPart): 2000 ms, 1000 with Speedy Assembler. */
+export function assemblyMs(machine, upgrades = []) {
+  const def = MACHINE_ASSEMBLIES[machine];
+  return def ? def.parts.length * machinePartInstallMs(upgrades) : 0;
+}
+
 /** Can the player assemble this machine from the pack right now? */
-export function assemblyCheck(inv, pc, machine, learned = []) {
+export function assemblyCheck(inv, pc, machine, learned = [], upgrades = []) {
   const def = MACHINE_ASSEMBLIES[machine];
   if (!def) return { ok: false, reason: 'unknown', msg: 'That is not a machine.' };
   if (countItem(inv, MACHINE_STAND) < 1) return { ok: false, reason: 'stand', msg: 'You need a Machine Stand.' };
@@ -72,22 +90,46 @@ export function assemblyCheck(inv, pc, machine, learned = []) {
     return { ok: false, reason: 'parts', missing, msg: `You need ${missing.map((id) => MACHINE_PART_ITEMS[id]?.label || id).join(', ')}.` };
   }
   if (!learned.includes(ASSEMBLY_SKILL)) return { ok: false, reason: 'skill', msg: 'You need to know Engineering to do this.' };
-  const energy = COMPONENT_ENERGY * def.parts.length;
-  if ((pc?.energy || 0) <= energy) return { ok: false, reason: 'energy', msg: "You don't have enough energy to do that!", energy };
-  return { ok: true, energy, def };
+  const energy = assemblyEnergy(machine, upgrades);
+  if (energy && (pc?.energy || 0) <= energy) return { ok: false, reason: 'energy', msg: "You don't have enough energy to do that!", energy };
+  return { ok: true, energy, def, durationMs: assemblyMs(machine, upgrades) };
 }
 
 /**
  * Put the stand and three parts together into a working machine with a
  * quarter-full tank. Atomic: nothing changes unless every check passes.
  */
-export function assembleMachine(inv, pc, toolState, machine, learned = []) {
-  const check = assemblyCheck(inv, pc, machine, learned);
+export function assembleMachine(inv, pc, toolState, machine, learned = [], upgrades = []) {
+  const started = startAssembly(inv, pc, machine, learned, upgrades);
+  if (!started.ok) return started;
+  return finishAssembly(inv, toolState, started.pending);
+}
+
+/**
+ * Take the stand and parts and pay the energy; the machine appears when the
+ * installing overlays finish (finishAssembly). Atomic on failure.
+ */
+export function startAssembly(inv, pc, machine, learned = [], upgrades = [], now = Date.now()) {
+  const check = assemblyCheck(inv, pc, machine, learned, upgrades);
   if (!check.ok) return check;
-  const hadOne = countItem(inv, machine) > 0;
   removeItem(inv, MACHINE_STAND, 1);
   for (const part of check.def.parts) removeItem(inv, part, 1);
-  pc.energy -= check.energy;
+  if (check.energy) pc.energy -= check.energy;
+  return {
+    ok: true,
+    energy: check.energy,
+    durationMs: check.durationMs,
+    pending: { kind: 'assemble', machine, energy: check.energy, readyAt: now + check.durationMs },
+    msg: `Installing the ${check.def.label}'s parts…${check.energy ? ` (-${check.energy} energy)` : ''}`,
+  };
+}
+
+export function finishAssembly(inv, toolState, pending) {
+  const machine = pending?.machine;
+  const def = MACHINE_ASSEMBLIES[machine];
+  if (!def) return { ok: false, reason: 'unknown', msg: 'That is not a machine.' };
+  const energy = Number(pending.energy) || 0;
+  const hadOne = countItem(inv, machine) > 0;
   addItem(inv, machine, 1);
   const row = ensureToolCondition(toolState, machine);
   if (row && !hadOne) {
@@ -97,10 +139,75 @@ export function assembleMachine(inv, pc, toolState, machine, learned = []) {
   return {
     ok: true,
     machine,
-    energy: check.energy,
+    energy,
     fuel: row ? row.remaining : FRESH_FUEL,
-    msg: `You assembled a ${check.def.label}! (-${check.energy} energy) It has ${row ? row.remaining : FRESH_FUEL}/${MAX_FUEL} fuel.`,
+    msg: `You assembled a ${def.label}!${energy ? ` (-${energy} energy)` : ''} It has ${row ? row.remaining : FRESH_FUEL}/${MAX_FUEL} fuel.`,
   };
+}
+
+/** machine_base disassemble / fully_disassemble: 15 energy per removal. */
+export const DISASSEMBLY_ENERGY = 15;
+/** onFullyDisassemble overlay. */
+export const FULL_DISASSEMBLY_MS = 6600;
+
+/**
+ * Taking a machine apart. The source removes one part at a time (15 energy
+ * and a 2000 ms uninstalling overlay each, 1000 with Speedy Assembler) until
+ * only the stand is left; Master Exploder's fully_disassemble does it all for
+ * 15 energy in one 6600 ms overlay. Needs Engineering I and an idle machine.
+ * The tank's fuel goes with the machine.
+ */
+export function disassemblyPlan(machine, upgrades = [], { full = false } = {}) {
+  const def = MACHINE_ASSEMBLIES[machine];
+  if (!def) return null;
+  if (full) return { energy: DISASSEMBLY_ENERGY, durationMs: FULL_DISASSEMBLY_MS, full: true };
+  return { energy: DISASSEMBLY_ENERGY * def.parts.length, durationMs: def.parts.length * machinePartInstallMs(upgrades), full: false };
+}
+
+export function disassemblyCheck(inv, pc, machine, learned = [], upgrades = [], { full = false, busy = false } = {}) {
+  const def = MACHINE_ASSEMBLIES[machine];
+  if (!def) return { ok: false, reason: 'unknown', msg: 'That is not a machine.' };
+  if (full && !hasMasterExploder(upgrades)) return { ok: false, reason: 'card', msg: 'You need the Master Exploder upgrade.' };
+  if (countItem(inv, machine) < 1) return { ok: false, reason: 'missing', msg: `You don't have a ${def.label}.` };
+  if (!learned.includes(ASSEMBLY_SKILL)) return { ok: false, reason: 'skill', msg: 'You need to know Engineering to do this.' };
+  if (busy) return { ok: false, reason: 'busy', msg: 'The machine is still in use.' };
+  const plan = disassemblyPlan(machine, upgrades, { full });
+  if ((pc?.energy || 0) <= plan.energy) return { ok: false, reason: 'energy', msg: "You don't have enough energy to do that!", energy: plan.energy };
+  return { ok: true, def, ...plan };
+}
+
+export function startDisassembly(inv, pc, machine, learned = [], upgrades = [], opts = {}, now = Date.now()) {
+  const check = disassemblyCheck(inv, pc, machine, learned, upgrades, opts);
+  if (!check.ok) return check;
+  removeItem(inv, machine, 1);
+  pc.energy -= check.energy;
+  return {
+    ok: true,
+    energy: check.energy,
+    durationMs: check.durationMs,
+    pending: { kind: 'disassemble', machine, energy: check.energy, full: check.full, readyAt: now + check.durationMs },
+    msg: `Taking the ${check.def.label} apart… (-${check.energy} energy)`,
+  };
+}
+
+export function finishDisassembly(inv, toolState, pending) {
+  const def = MACHINE_ASSEMBLIES[pending?.machine];
+  if (!def) return { ok: false, reason: 'unknown', msg: 'That is not a machine.' };
+  addItem(inv, MACHINE_STAND, 1);
+  for (const part of def.parts) addItem(inv, part, 1);
+  if (toolState?.condition && countItem(inv, pending.machine) < 1) delete toolState.condition[pending.machine];
+  return {
+    ok: true,
+    machine: pending.machine,
+    msg: `You took the ${def.label} apart: a Machine Stand, ${def.parts.map((id) => MACHINE_PART_ITEMS[id]?.label || id).join(', ')}.`,
+  };
+}
+
+/** Finish a saved assembly or disassembly. */
+export function finishMachineWork(inv, toolState, pending) {
+  if (pending?.kind === 'assemble') return finishAssembly(inv, toolState, pending);
+  if (pending?.kind === 'disassemble') return finishDisassembly(inv, toolState, pending);
+  return { ok: false, reason: 'unknown', msg: '' };
 }
 
 /** machine_base refuel: +50 per Fuel Cell, only while 50 or more units fit. */
@@ -147,11 +254,14 @@ export const STILL = Object.freeze({
   distillables: Object.freeze({ grain: 1, corn: 6, potato: 7, grain_bushel: 250 }),
 });
 
+/** The Hoocher cards can push the hopper past hopper_size (still.js adds after the room check). */
+const HOPPER_CEILING = Math.ceil(STILL.hopperSize * 1.2);
+
 export function createStillState(seed = {}) {
   const n = (v) => Math.max(0, Math.floor(Number(v) || 0));
   const workingSince = Number(seed?.workingSince);
   return {
-    hopper: Math.min(STILL.hopperSize, n(seed?.hopper)),
+    hopper: Math.min(HOPPER_CEILING, n(seed?.hopper)),
     hooch: Math.min(STILL.maxHooch, n(seed?.hooch)),
     workingSince: Number.isFinite(workingSince) && workingSince > 0 ? workingSince : 0,
   };
@@ -170,11 +280,15 @@ export function advanceStill(state, now = Date.now()) {
 }
 
 export function stillRoom(state) {
-  return STILL.hopperSize - state.hopper;
+  return Math.max(0, STILL.hopperSize - state.hopper);
 }
 
-/** still.js distill: put as many of one distillable in as the hopper has room for, then start. */
-export function distillInStill(state, inv, classTsid, learned = [], now = Date.now()) {
+/**
+ * still.js distill: put as many of one distillable in as the hopper has room
+ * for, then start. Corn / Grain / Potato Hoocher (still.js:286-297, 346-357)
+ * add 20% more units than the room check counted.
+ */
+export function distillInStill(state, inv, classTsid, learned = [], now = Date.now(), upgrades = []) {
   advanceStill(state, now);
   const value = STILL.distillables[classTsid];
   if (!value) return { ok: false, reason: 'not_distillable', msg: 'That will not distill.' };
@@ -186,9 +300,18 @@ export function distillInStill(state, inv, classTsid, learned = [], now = Date.n
   const taken = Math.min(countItem(inv, classTsid), fit);
   if (taken < 1) return { ok: false, reason: 'room', msg: 'There is no room left in the hopper.' };
   removeItem(inv, classTsid, taken);
-  state.hopper += taken * value;
+  const bonus = distillingBonus(classTsid, upgrades);
+  // setHopperAmount(intval(hopper) + taken * base_cost * multiplier); reads intval.
+  state.hopper = Math.floor(state.hopper + taken * value * bonus.multiplier);
   if (!state.workingSince && state.hopper >= STILL.hoochCost) state.workingSince = now;
-  return { ok: true, taken, hopper: state.hopper, msg: `You added ${taken} to the hopper (${state.hopper}/${STILL.hopperSize}).` };
+  const extra = bonus.name ? Math.round(taken * value * (bonus.multiplier - 1)) : 0;
+  return {
+    ok: true,
+    taken,
+    extra,
+    hopper: state.hopper,
+    msg: `You added ${taken} to the hopper (${state.hopper}/${STILL.hopperSize}).${extra ? ` Your "${bonus.name}" upgrade got you an extra ${extra} units in the hopper!` : ''}`,
+  };
 }
 
 export function collectHooch(state, inv, learned = [], now = Date.now()) {

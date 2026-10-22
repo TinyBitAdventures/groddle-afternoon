@@ -84,6 +84,7 @@ import {
   useBalmPoint,
 } from '../rook-attack.js';
 import { verticalTextGradient } from '../text-gradient.js';
+import { shrinePrimeBonus } from '../imagination-effects.js';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
@@ -1348,6 +1349,11 @@ function strikeGate(engine, target) {
   return { ok: true };
 }
 
+/** The player primed the shrine, so their Shrine On card counts. */
+function primeBonusFor(engine) {
+  return shrinePrimeBonus(engine.pc?.imaginationUpgrades || []);
+}
+
 function offerOptions(engine, giantId) {
   const inv = engine.inv;
   const out = [];
@@ -1364,8 +1370,8 @@ function offerOptions(engine, giantId) {
       icon: meta.icon,
       count: n,
       emblem,
-      one: strikeDamageFor({ baseCost: base, count: 1, emblem }),
-      all: strikeDamageFor({ baseCost: base, count: n, emblem }),
+      one: strikeDamageFor({ baseCost: base, count: 1, emblem, primeBonus: primeBonusFor(engine) }),
+      all: strikeDamageFor({ baseCost: base, count: n, emblem, primeBonus: primeBonusFor(engine) }),
     });
   }
   return out.sort((a, b) => b.all - a.all).slice(0, 24);
@@ -1381,7 +1387,7 @@ function strike(engine, target, classTsid, count) {
   const n = Math.max(1, Math.min(count, countItem(engine.inv, classTsid)));
   if (!removeItem(engine.inv, classTsid, n)) return false;
   const emblem = classTsid === `emblem_${giantId}`;
-  const damage = strikeDamageFor({ baseCost: donationValueFor(classTsid), count: n, emblem });
+  const damage = strikeDamageFor({ baseCost: donationValueFor(classTsid), count: n, emblem, primeBonus: primeBonusFor(engine) });
   const a = here(engine);
   const r = applyStrike(a, damage, now(), PLAYER_LABEL);
   if (!r.ok) return false;

@@ -36,12 +36,15 @@ import {
   MAX_FUEL,
   STILL,
   advanceStill,
-  assembleMachine,
   assemblyCheck,
   collectHooch,
   createStillState,
+  disassemblyCheck,
   distillInStill,
+  finishMachineWork,
   isMachine,
+  startAssembly,
+  startDisassembly,
   refuelCheck,
   refuelMachine,
   stillEtaSeconds,
@@ -58,6 +61,7 @@ import {
   completePapersCheck,
 } from '../bureaucracy.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
+import { setMetalMakingMusic } from '../sound-moments.js';
 
 export const SUPPLY_FEATURE_ID = 'supply';
 export const CLERK_CLASS = 'npc_bureaucrat';
@@ -74,6 +78,10 @@ const EXTRA_ITEMS = {
 };
 
 let still = createStillState();
+/** Machine parts being installed or uninstalled: { kind, machine, energy, readyAt, full? }. */
+let work = null;
+/** metalmaker.js music_on: on by default, toggled by Turn Music Off / On. */
+let metalMusicOn = true;
 let last = '';
 let demoDone = false;
 let autoplayAt = 0;
@@ -110,6 +118,32 @@ function learned(engine) {
   return engine.learnedSkills || [];
 }
 
+function upgrades(engine) {
+  return engine.pc?.imaginationUpgrades || [];
+}
+
+function workReason() {
+  return work ? (work.kind === 'assemble' ? 'Installing parts…' : 'Uninstalling parts…') : '';
+}
+
+function syncMetalMusic(engine) {
+  setMetalMakingMusic(upgrades(engine).includes('metalmaking_music') && metalMusicOn);
+}
+
+/** Finish the installing / uninstalling overlay once its time is up. */
+function settleWork(engine, now = Date.now()) {
+  if (!work || now < work.readyAt) return;
+  const done = work;
+  work = null;
+  const res = finishMachineWork(engine.inv, engine.toolState, done);
+  if (!res.ok) return;
+  // metalmaker.js:1386 and siblings: machines_assembled:<machine>.
+  if (done.kind === 'assemble') engine.achievement?.(`machines_assembled:${done.machine}`, 1);
+  engine.updateHud?.();
+  say(engine, res.msg, true);
+  engine.save?.();
+}
+
 function label(id) {
   return ITEM_CATALOG[id]?.label || MACHINE_PART_ITEMS[id]?.label || id;
 }
@@ -141,25 +175,54 @@ function machineVerbs(classTsid, engine) {
   const inv = engine.inv;
   if (classTsid === MACHINE_STAND) {
     return MACHINE_IDS.map((machine) => {
-      const check = assemblyCheck(inv, engine.pc, machine, learned(engine));
+      const check = assemblyCheck(inv, engine.pc, machine, learned(engine), upgrades(engine));
       const def = MACHINE_ASSEMBLIES[machine];
+      const ok = check.ok && !work;
       return {
         id: `assemble:${machine}`,
         label: `Assemble a ${def.label}`,
-        enabled: check.ok,
-        reason: check.msg || '',
-        tooltip: `Stand + ${def.parts.map(label).join(' + ')}. Takes ${20 * def.parts.length} energy.`,
-        primary: check.ok,
+        enabled: ok,
+        reason: work ? workReason() : check.msg || '',
+        tooltip: `Stand + ${def.parts.map(label).join(' + ')}. ${check.energy ? `Takes ${check.energy} energy.` : 'Master Assembler: no energy.'}`,
+        primary: ok,
       };
     });
   }
   if (isMachine(classTsid)) {
     const fuel = getToolCondition(engine.toolState, classTsid).remaining;
+    // metalmaker.js turn_off_music / turn_on_music, only with Making Metal.
+    const music = classTsid === 'metalmaker' && upgrades(engine).includes('metalmaking_music')
+      ? [metalMusicOn
+        ? { id: 'music:off', label: 'Turn Music Off', enabled: true, tooltip: 'Stop playing Metal Music while the machine is working' }
+        : { id: 'music:on', label: 'Turn Music On', enabled: true, tooltip: 'Play Metal Music while the machine is working' }]
+      : [];
     const one = refuelCheck(inv, engine.toolState, classTsid);
     const rows = [
       { id: 'refuel:1', label: 'Refuel', enabled: one.ok, reason: one.msg || '', tooltip: `Add more fuel. Current level: ${fuel}/${MAX_FUEL}`, primary: one.ok },
     ];
     if (one.ok && one.cells > 1) rows.push({ id: 'refuel:all', label: `Refuel with ${one.cells} cells`, enabled: true, tooltip: `Fill the tank. Current level: ${fuel}/${MAX_FUEL}` });
+    rows.push(...music);
+    // machine_base disassemble (one part at a time, 15 energy each) and
+    // Master Exploder's fully_disassemble (15 energy, one go).
+    const busy = Boolean(work) || Boolean(engine.acting?.());
+    const apart = disassemblyCheck(inv, engine.pc, classTsid, learned(engine), upgrades(engine), { busy });
+    rows.push({
+      id: 'disassemble',
+      label: 'Disassemble',
+      enabled: apart.ok,
+      reason: work ? workReason() : apart.msg || '',
+      tooltip: `Uninstall every part, back to a Machine Stand. Takes ${apart.energy ?? 45} energy; the fuel is lost.`,
+    });
+    if (upgrades(engine).includes('engineering_disassemble_machine')) {
+      const full = disassemblyCheck(inv, engine.pc, classTsid, learned(engine), upgrades(engine), { busy, full: true });
+      rows.push({
+        id: 'disassemble:full',
+        label: 'Fully disassemble',
+        enabled: full.ok,
+        reason: work ? workReason() : full.msg || '',
+        tooltip: 'Fully disassemble the machine. Takes 15 energy.',
+      });
+    }
     return rows;
   }
   if (classTsid === STILL.classTsid) {
@@ -195,11 +258,32 @@ function runMachineVerb(classTsid, verbId, engine) {
   const inv = engine.inv;
   const [verb, arg] = String(verbId).split(':');
   if (classTsid === MACHINE_STAND && verb === 'assemble') {
-    const res = assembleMachine(inv, engine.pc, engine.toolState, arg, learned(engine));
-    if (res.ok) engine.updateHud?.();
-    // metalmaker.js:1386 and siblings: machines_assembled:<machine>.
-    if (res.ok) engine.achievement?.(`machines_assembled:${arg}`, 1);
-    say(engine, res.msg, res.ok);
+    if (work) return true;
+    const res = startAssembly(inv, engine.pc, arg, learned(engine), upgrades(engine));
+    if (res.ok) {
+      work = res.pending;
+      engine.updateHud?.();
+      engine.playSound?.('ENGINE1');
+      settleWork(engine);
+    }
+    say(engine, res.ok && work ? `${res.msg} (${(res.durationMs / 1000).toFixed(0)} s)` : res.msg, res.ok);
+    return true;
+  }
+  if (classTsid === 'metalmaker' && verb === 'music') {
+    metalMusicOn = arg === 'on';
+    syncMetalMusic(engine);
+    say(engine, metalMusicOn ? 'The Metalmaker will play Metal Music while it works.' : 'The Metalmaker will work without Metal Music.', true);
+    return true;
+  }
+  if (isMachine(classTsid) && verb === 'disassemble') {
+    if (work) return true;
+    const busy = Boolean(engine.acting?.());
+    const res = startDisassembly(inv, engine.pc, classTsid, learned(engine), upgrades(engine), { full: arg === 'full', busy });
+    if (res.ok) {
+      work = res.pending;
+      engine.updateHud?.();
+    }
+    say(engine, res.ok ? `${res.msg} (${(res.durationMs / 1000).toFixed(1).replace(/\.0$/, '')} s)` : res.msg, res.ok);
     return true;
   }
   if (isMachine(classTsid) && verb === 'refuel') {
@@ -210,7 +294,7 @@ function runMachineVerb(classTsid, verbId, engine) {
   }
   if (classTsid === STILL.classTsid) {
     const res = verb === 'distill'
-      ? distillInStill(still, inv, arg, learned(engine))
+      ? distillInStill(still, inv, arg, learned(engine), Date.now(), upgrades(engine))
       : verb === 'collect'
         ? collectHooch(still, inv, learned(engine))
         : null;
@@ -306,6 +390,8 @@ function autoplay(engine) {
   const results = [];
   for (const [classTsid, verbId] of steps) {
     supplyFeature.runPackVerb(classTsid, verbId, engine);
+    // The installing overlays take seconds; the demo does not wait for them.
+    settleWork(engine, Infinity);
     results.push(`${verbId}=${last.slice(0, 24)}`);
   }
   engine.setData('supplyAutoplay', 'done');
@@ -338,6 +424,8 @@ export const supplyFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    syncMetalMusic(engine);
+    if (work) settleWork(engine, now);
     if (autoplayAt && !autoplayDone && now >= autoplayAt) autoplay(engine);
   },
 
@@ -392,20 +480,28 @@ export const supplyFeature = {
 
   save() {
     advanceStill(still);
-    return { version: 1, still: { ...still } };
+    return { version: 1, still: { ...still }, ...(work ? { work: { ...work } } : {}), ...(metalMusicOn ? {} : { metalMusic: false }) };
   },
 
-  restore(slice) {
+  restore(slice, engine) {
     still = createStillState(slice?.still || {});
     advanceStill(still);
+    metalMusicOn = slice?.metalMusic !== false;
+    // A reload mid-install finishes the job (the overlays were seconds long).
+    const saved = slice?.work;
+    work = saved && MACHINE_ASSEMBLIES[saved.machine] && (saved.kind === 'assemble' || saved.kind === 'disassemble')
+      ? { ...saved, readyAt: 0 }
+      : null;
   },
 
   /** QA / tests. */
   _state() {
-    return { still: { ...still }, last };
+    return { still: { ...still }, last, work: work ? { ...work } : null };
   },
   _reset() {
     still = createStillState();
+    work = null;
+    metalMusicOn = true;
     last = '';
     demoDone = false;
     autoplayAt = 0;

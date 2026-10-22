@@ -135,9 +135,28 @@ export function soundForQuoin(type) {
   return QUOIN_KEYS[String(type || '').toLowerCase()] || 'QUOIN_GOT';
 }
 
-/** Making tools announce their own class name (players/inc_making.js:478). */
-export function soundForMakingTool(toolClassTsid) {
+/** Machines (making_type machine) hum ACTIVE while they run (inc_making.js:440-442). */
+export const MACHINE_MAKING_TOOLS = Object.freeze(['woodworker', 'metalmaker', 'fuelmaker', 'blockmaker']);
+
+/** Making Metal (metalmaking_music) with the Metalmaker's music on; set by the supply feature. */
+let metalMakingMusic = false;
+
+export function setMetalMakingMusic(on) {
+  metalMakingMusic = Boolean(on);
+}
+
+/**
+ * Making tools announce their own class name (players/inc_making.js:478);
+ * machines play ACTIVE instead, and a Metalmaker plays METALMAKER (metal
+ * music) when isPlayingMusic: the Making Metal card and its music on
+ * (metalmaker.js:787-800, 1535-1550).
+ */
+export function soundForMakingTool(toolClassTsid, opts = {}) {
   const t = String(toolClassTsid || '').trim();
+  if (MACHINE_MAKING_TOOLS.includes(t)) {
+    const music = opts.metalMusic ?? metalMakingMusic;
+    return t === 'metalmaker' && music ? 'METALMAKER' : 'ACTIVE';
+  }
   return t ? t.toUpperCase() : 'CRAFT_TICK';
 }
 

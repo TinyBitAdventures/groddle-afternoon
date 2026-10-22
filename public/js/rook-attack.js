@@ -492,9 +492,12 @@ export function resolveStun(a, joiners, now, label = 'Ur') {
 }
 
 /** Shrine strike damage (launchAttack) with the solo crowd multiplier and floor. */
-export function strikeDamageFor({ baseCost = 0, count = 1, emblem = false, solo = true } = {}) {
+export function strikeDamageFor({ baseCost = 0, count = 1, emblem = false, solo = true, primeBonus = 0 } = {}) {
   const n = Math.max(1, Math.floor(Number(count) || 1));
-  const source = Math.floor(emblem ? ROOK_SOURCE.strikeEmblem * n : Math.max(0, Number(baseCost) || 0) * n * ROOK_SOURCE.strikeBaseCostRate);
+  let source = Math.floor(emblem ? ROOK_SOURCE.strikeEmblem * n : Math.max(0, Number(baseCost) || 0) * n * ROOK_SOURCE.strikeBaseCostRate);
+  // shrines.js launchAttack 1040-1046: Shrine On I / II, the priming player's
+  // card, add round(25% / 50%) of the damage.
+  if (source > 0 && primeBonus > 0) source += Math.round(source * primeBonus);
   if (!solo) return source;
   return Math.max(ROOK_SOLO.strikeFloor, source * ROOK_SOLO.strikeCrowd);
 }

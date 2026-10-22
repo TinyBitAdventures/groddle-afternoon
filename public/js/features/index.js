@@ -6,17 +6,17 @@
 
 import { questFlagsFeature } from './quest-flags-feature.js?v=flags-1';
 import { hellFeature } from './hell-feature.js?v=hell-1';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-1';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-2';
 import { questOffersFeature } from './quest-offers-feature.js?v=offers-1';
-import { meditationFeature } from './meditation-feature.js?v=meditation-1';
+import { meditationFeature } from './meditation-feature.js?v=meditation-2';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-1';
 import { racesFeature } from './races-feature.js?v=races-2';
 import { crownsFeature } from './crowns-feature.js?v=crowns-2';
 import { patchesFeature } from './patches-feature.js?v=patches-1';
 import { foxesFeature } from './foxes-feature.js?v=foxes-1';
 import { heliKittiesFeature } from './heli-kitties-feature.js?v=kitties-1';
-import { homesFeature } from './homes-feature.js?v=homes-1';
-import { rookAttackFeature } from './rook-attack-feature.js?v=rooks-1';
+import { homesFeature } from './homes-feature.js?v=homes-2';
+import { rookAttackFeature } from './rook-attack-feature.js?v=rooks-2';
 import { streetFurnitureFeature } from './street-furniture-feature.js?v=furniture-1';
 import { doorsFeature } from './doors-feature.js?v=doors-1';
 import { locationEventsFeature } from './location-events-feature.js?v=location-events-1';
@@ -24,7 +24,7 @@ import { puzzlesFeature } from './puzzles-feature.js?v=puzzles-1';
 import { puzzleScenesFeature } from './puzzle-scenes-feature.js?v=puzzle-scenes-1';
 import { streetJobsFeature } from './street-jobs-feature.js?v=jobs-1';
 import { imaginationFeature } from './imagination-feature.js?v=imagination-1';
-import { supplyFeature } from './supply-feature.js?v=supply-1';
+import { supplyFeature } from './supply-feature.js?v=supply-2';
 import { giantIconsFeature } from './giant-icons-feature.js?v=icons-1';
 import { rubeFeature } from './rube-feature.js?v=rube-1';
 import { unlearningFeature } from './unlearning-feature.js?v=unlearn-1';
@@ -33,7 +33,7 @@ import { masterGardenFeature } from './master-garden-feature.js?v=mastergarden-1
 import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=husbandry-1';
 import { questInstancesFeature } from './quest-instances-feature.js?v=qi-1';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-2';
-import { seasonsFeature } from './seasons-feature.js?v=seasons-1';
+import { seasonsFeature } from './seasons-feature.js?v=seasons-2';
 import { cameraModeFeature } from './camera-mode-feature.js';
 import { newxpFeature } from './newxp-feature.js?v=newxp-2';
 

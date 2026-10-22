@@ -23,6 +23,9 @@
  * counts energyToday (stats) but never caps it (MEDITATION_DAILY_LIMIT).
  */
 
+import { MEDITATION_IMAGINATION_CHANCE, levitationCards, meditationCards } from './imagination-effects.js';
+import { skillPackageDetails } from './skill-packages.js';
+
 /** No daily cap on meditation energy (see above); dailyEnergyLimit is the pre-2012-10-31 top. */
 export const MEDITATION_DAILY_LIMIT = false;
 
@@ -159,6 +162,26 @@ function packageFor(table, learned) {
   return rank ? table[`meditativearts_${rank}`] : null;
 }
 
+/**
+ * The session row after img overlays: Clear Mind / Clearer Mind
+ * (meditative_arts_focus_1/2, duration_multiplier -0.2 / -0.5) stretch both
+ * duration and duration_max by 20 / 50% in getSkillPackageDetails.
+ */
+export function sessionPackage(kind, learned = [], upgrades = []) {
+  const table = kind === 'standing' ? MEDITATIVE_ARTS_PACKAGE : FOCUSED_MEDITATION_PACKAGE;
+  const pkg = packageFor(table, learned);
+  if (!pkg) return null;
+  const row = skillPackageDetails(kind === 'standing' ? 'meditative_arts' : 'focused_meditation', learned, upgrades);
+  if (!row || !Number.isFinite(row.duration) || !Number.isFinite(row.duration_max)) return pkg;
+  return { ...pkg, duration: row.duration, durationMax: row.duration_max };
+}
+
+/** common.js randInt(lo, hi) = lo + floor(random * (1 + hi - lo)), also for fractional bounds. */
+export function sourceRandInt(lo, hi, rng = Math.random) {
+  if (Number.isInteger(lo) && Number.isInteger(hi)) return randInt(lo, hi, rng);
+  return lo + Math.min(Math.floor(hi - lo), Math.floor(rng() * (1 + hi - lo)));
+}
+
 /** focusing_orb.getSkillMultiplier */
 export function skillMultiplier(learned = []) {
   const rank = meditativeArtsRank(learned);
@@ -228,8 +251,9 @@ export function dailyEnergyLimit(tank = DEFAULT_TANK, upgrades = []) {
   return bonus * tank;
 }
 
-export function levitationMinEnergy(tank = DEFAULT_TANK) {
-  return LEVITATION_PACKAGE.minEnergyBase + Math.round(tank * LEVITATION_PACKAGE.minEnergyTankFraction);
+/** Levitate Longer lowers the base from 20 to 12 (focusing_orb.js:315-320). */
+export function levitationMinEnergy(tank = DEFAULT_TANK, upgrades = []) {
+  return levitationCards(upgrades).minEnergyBase + Math.round(tank * LEVITATION_PACKAGE.minEnergyTankFraction);
 }
 
 export function createMeditationState(seed = {}) {
@@ -298,9 +322,9 @@ export function listOrbVerbs(state, ctx = {}) {
     let reason = '';
     if (ctx.unfairPlace) reason = MEDITATION_TEXT.levitateUnfair;
     else if (cooling || s.levitateUntil > now) reason = MEDITATION_TEXT.scatteredLevitate;
-    else if ((ctx.energy ?? 0) <= levitationMinEnergy(tank)) reason = MEDITATION_TEXT.levitateEnergy;
+    else if ((ctx.energy ?? 0) <= levitationMinEnergy(tank, ctx.upgrades)) reason = MEDITATION_TEXT.levitateEnergy;
     push('levitate', 'Imagine levitation',
-      `Gives a short burst of levitation using spacebar. Costs ${LEVITATION_PACKAGE.energyCost} energy`,
+      `Gives a short burst of levitation using spacebar. Costs ${levitationCards(ctx.upgrades).energyCost} energy`,
       !reason, reason);
   }
   if (has(learned, MEDITATION_SKILLS.focus)) {
@@ -348,11 +372,11 @@ export function startMeditation(state, verbId, ctx = {}) {
   }
   if (!verb.enabled) return { ok: false, error: verb.reason };
   const kind = verbId === 'meditate' ? 'standing' : 'focused';
-  const pkg = packageFor(kind === 'standing' ? MEDITATIVE_ARTS_PACKAGE : FOCUSED_MEDITATION_PACKAGE, learned);
+  const pkg = sessionPackage(kind, learned, ctx.upgrades);
   if (!pkg) return { ok: false, error: MEDITATION_TEXT.failed };
   const durationMs = ctx.maxLuck
     ? pkg.durationMax
-    : randInt(pkg.duration / 1000, pkg.durationMax / 1000, rng) * 1000;
+    : Math.round(sourceRandInt(pkg.duration / 1000, pkg.durationMax / 1000, rng) * 1000);
   const focus = verbId === 'focus_mood' ? 'mood' : verbId === 'focus_energy' ? 'energy' : 'both';
   const music = kind === 'standing'
     ? (rng() < 0.5 ? MEDITATION_MUSIC.MEDITATIVE_ARTS_01 : MEDITATION_MUSIC.MEDITATIVE_ARTS_02)
@@ -398,6 +422,7 @@ export function finishMeditation(state, session, ctx = {}) {
   const tank = ctx.tank || DEFAULT_TANK;
   const learned = ctx.learned || [];
   const rng = ctx.rng || Math.random;
+  const cards = meditationCards(ctx.upgrades);
   const elapsed = Math.max(0, now - session.startedAt);
   const seconds = Math.ceil(elapsed / 1000);
   const actualMs = seconds * 1000;
@@ -408,6 +433,16 @@ export function finishMeditation(state, session, ctx = {}) {
   let energy = 0;
   let mood = 0;
   let img = 0;
+  let imgBonus = 0;
+  // Double Max Relax (focusing_orb.js:783-791, 940-948): a Max Relax doubles
+  // the energy, mood and iMG it pays.
+  const doubleMaxRelax = () => {
+    if (!maxRelax || !cards.maxRelaxDouble) return;
+    if (energy) energy *= 2;
+    if (mood) mood *= 2;
+    img *= 2;
+  };
+  const imgCardHit = () => ctx.maxLuck || rng() < MEDITATION_IMAGINATION_CHANCE;
   const base = perSecondGain(session.kind, learned, tank) * seconds;
   if (session.kind === 'standing') {
     energy = base;
@@ -419,6 +454,9 @@ export function finishMeditation(state, session, ctx = {}) {
       if (mood) mood += bonus;
       img += bonus;
     }
+    doubleMaxRelax();
+    // Enlightenment (focusing_orb.js:950-958): 8% for bonus iMG = energy + mood.
+    if (cards.standingImagination && imgCardHit()) imgBonus = energy + mood;
   } else {
     if (session.focus === 'energy') energy = base;
     else mood = base;
@@ -434,7 +472,11 @@ export function finishMeditation(state, session, ctx = {}) {
         img += moodBonus;
       }
     }
+    doubleMaxRelax();
     if (zen) energy = 0;
+    // Focused Imagination (focusing_orb.js:798-821): 8% for bonus iMG equal
+    // to the energy (or, focusing mood, the mood) gained.
+    if (cards.focusedImagination && imgCardHit()) imgBonus = energy || mood;
   }
 
   // metabolics_add_* clamp to the tank (the daily top was removed 2012-10-31).
@@ -443,6 +485,7 @@ export function finishMeditation(state, session, ctx = {}) {
   const energyGained = Math.min(Math.round(energy), energyRoom, Math.floor(dailyRoom));
   const moodGained = Math.min(Math.round(mood), Math.max(0, (ctx.moodMax || 100) - (ctx.mood ?? 0)));
   const imgGained = Math.round(img);
+  const imgBonusGained = Math.round(imgBonus);
 
   const prevSeconds = s.totalSeconds;
   s = {
@@ -457,10 +500,11 @@ export function finishMeditation(state, session, ctx = {}) {
   const reachedZen = !zen && hasZen(s, ctx.dayKey, tank);
 
   let message = `${pick(MEDITATION_TEXT.end, rng)} That was relaxing.`;
+  // The source adds the card bonus to the standing and focus-energy lines only.
   if (session.kind === 'standing') {
-    message += ` +${moodGained} mood, +${energyGained} energy, +${imgGained} iMG`;
+    message += ` +${moodGained} mood, +${energyGained} energy, +${imgGained + imgBonusGained} iMG`;
   } else if (session.focus === 'energy') {
-    message += ` +${energyGained} energy, +${imgGained} iMG`;
+    message += ` +${energyGained} energy, +${imgGained + imgBonusGained} iMG`;
   } else {
     message += ` +${moodGained} mood, +${imgGained} iMG`;
   }
@@ -488,6 +532,8 @@ export function finishMeditation(state, session, ctx = {}) {
     energy: energyGained,
     mood: moodGained,
     img: imgGained,
+    imgBonus: imgBonusGained,
+    imgBonusCard: imgBonusGained ? (session.kind === 'standing' ? 'meditative_arts_imagination' : 'focused_meditation_imagination') : '',
     zen,
     reachedZen,
     sound: full ? 'MEDITATION_SUCCESS' : 'HORRIBLE_SOUND',
@@ -506,13 +552,15 @@ export function startLevitation(state, ctx = {}) {
   const verb = listOrbVerbs(s, { ...ctx, now }).find((v) => v.id === 'levitate');
   if (!verb) return { ok: false, error: MEDITATION_TEXT.failed };
   if (!verb.enabled) return { ok: false, error: verb.reason };
-  const until = now + LEVITATION_PACKAGE.durationMs;
+  // Levitate Longer: 12 energy and an 8000 ms buff (focusing_orb.js:335-369).
+  const lev = levitationCards(ctx.upgrades);
+  const until = now + lev.durationMs;
   return {
     ok: true,
     state: { ...s, levitateUntil: until, levitations: s.levitations + 1 },
-    energyCost: LEVITATION_PACKAGE.energyCost,
+    energyCost: lev.energyCost,
     until,
-    message: `You imagined levitation with a Focusing Orb. -${LEVITATION_PACKAGE.energyCost} energy`,
+    message: `You imagined levitation with a Focusing Orb. -${lev.energyCost} energy`,
   };
 }
 

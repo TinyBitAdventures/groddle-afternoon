@@ -58,10 +58,13 @@ export function skillPackageDetails(packageId, learned = [], upgrades = []) {
       }
     }
   }
-  if (durationMultiplier && Number.isFinite(out.duration)) {
-    out.duration += durationMultiplier > 0
-      ? -(out.duration * durationMultiplier)
-      : out.duration * Math.abs(durationMultiplier);
+  // duration and duration_max both scale (inc_skill_packages.js:659-669).
+  for (const key of ['duration', 'duration_max']) {
+    if (durationMultiplier && Number.isFinite(out[key])) {
+      out[key] += durationMultiplier > 0
+        ? -(out[key] * durationMultiplier)
+        : out[key] * Math.abs(durationMultiplier);
+    }
   }
   return out;
 }

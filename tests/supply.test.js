@@ -218,6 +218,13 @@ describe('supply feature pack verbs', () => {
     assert.equal(verbs.find((v) => v.id === 'assemble:woodworker').enabled, true);
     assert.equal(verbs.find((v) => v.id === 'assemble:blockmaker').enabled, false);
     assert.equal(supplyFeature.runPackVerb('machine_stand', 'assemble:woodworker', engine), true);
+    // Three installing overlays of 2000 ms (machine_base onApplyPart) before it appears.
+    assert.equal(countItem(inv, 'woodworker'), 0);
+    assert.equal(supplyFeature._state().work.kind, 'assemble');
+    assert.equal(supplyFeature.packVerbs('machine_stand', engine).every((v) => !v.enabled), true);
+    supplyFeature.onTick(16, Date.now() + 5000, engine);
+    assert.equal(countItem(inv, 'woodworker'), 0);
+    supplyFeature.onTick(16, Date.now() + 6100, engine);
     assert.equal(countItem(inv, 'woodworker'), 1);
     assert.ok(supplyFeature.packVerbs('woodworker', engine).some((v) => v.id === 'refuel:1'));
     assert.ok(supplyFeature.packVerbs('still', engine).some((v) => v.id === 'distill:grain'));

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=musicblocks-note-2';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=musicblocks-note-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-6';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-7';
 import {
   actionDurationFor,
   createTimedAction,
@@ -464,7 +464,8 @@ import {
   starterCraftIngredients,
   hasTool,
   MAKING_TOOL_SKILLS,
-} from './js/making.js?v=recipes-full-1';
+  recipeTaskLimit,
+} from './js/making.js?v=making-g14-1';
 import {
   createGarden,
   tickGarden,
@@ -501,7 +502,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=rock-cells-1';
+} from './js/mining.js?v=rock-cells-2';
 import {
   createActivityLog,
   appendActivity,
@@ -20220,7 +20221,7 @@ function renderMakePanel() {
       const check = canCraft(inv, recipe, opts);
       const maxMake = (() => {
         if (!check.ok && check.reason === 'ingredients') return 0;
-        let m = 99;
+        let m = recipeTaskLimit(recipe, pc.imaginationUpgrades);
         for (const inp of recipe.inputs || []) {
           m = Math.min(m, Math.floor(countItem(inv, inp.classTsid) / inp.qty));
         }

@@ -39,7 +39,6 @@ import {
   stationMessage,
 } from '../meditation-station.js?v=station-1';
 import {
-  LEVITATION_PACKAGE,
   MEDITATION_TEXT,
   ORB_CLASS,
   ORB_ITEM,
@@ -55,11 +54,14 @@ import {
   startLevitation,
   startMeditation,
 } from '../meditation.js';
-import { moodMax } from '../metabolics.js';
+import { energyMax, moodMax } from '../metabolics.js';
+import { levitationCards } from '../imagination-effects.js';
+import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js';
 import { sourceFromUrl } from '../textures.js';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
-const TANK = 100;
+/** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */
+const tankOf = (engine) => energyMax(engine?.pc);
 const WINTRY_PLACE = 'GM11E7ODKHO1QJE';
 const BREATH_MS = 4000;
 const ORB_HELD_SIZE = 52;
@@ -89,13 +91,28 @@ function learned(engine) {
   return engine.learnedSkills || [];
 }
 
+function upgrades(engine) {
+  return engine.pc?.imaginationUpgrades || [];
+}
+
+/**
+ * levitation_by_meditation physics as remake multipliers: gravity 0.85, or
+ * Levitate with Style's gravity 0.798, vy_jump 1.176 and friction_air 1.59
+ * (catalog_buffs.js:1251-1262) through the PhysicsSetting mapping.
+ */
+function levitationPhysics(engine) {
+  const m = physicsMultipliers(applyPhysicsAdjustments({}, levitationCards(upgrades(engine)).physics));
+  return { gravity: m.gravity, jump: m.jump };
+}
+
 function verbCtx(engine) {
   return {
     learned: learned(engine),
+    upgrades: upgrades(engine),
     now: Date.now(),
     dayKey: dayKey(),
     energy: engine.pc.energy,
-    tank: TANK,
+    tank: tankOf(engine),
     meditating: Boolean(session),
     unfairPlace: engine.transientInstance(),
     nearbyPlayers: 0,
@@ -111,7 +128,7 @@ function publish(engine, force = false) {
   engine.setData('meditationElapsed', session ? String(now - session.startedAt) : '0');
   engine.setData('meditationDuration', session ? String(session.durationMs) : '0');
   engine.setData('meditationCooldown', String(Math.max(0, Math.ceil((state.cooldownUntil - now) / 1000))));
-  engine.setData('meditationZen', hasZen(state, dayKey(), TANK) ? '1' : '0');
+  engine.setData('meditationZen', hasZen(state, dayKey(), tankOf(engine)) ? '1' : '0');
   engine.setData('meditationTotalSeconds', String(state.totalSeconds));
   engine.setData('meditationEnergyToday', String(state.energyToday));
   engine.setData('meditationLevitating', isLevitating(state, now) ? '1' : '0');
@@ -347,7 +364,8 @@ function end(engine, reason = 'timer', at = Date.now()) {
   const out = finishMeditation(state, done, {
     now: at,
     learned: learned(engine),
-    tank: TANK,
+    upgrades: upgrades(engine),
+    tank: tankOf(engine),
     dayKey: dayKey(),
     streetTsid: engine.streetTsid,
     energy: pc.energy,
@@ -360,24 +378,29 @@ function end(engine, reason = 'timer', at = Date.now()) {
   if (mood && engine.metabolicGate('mood', 'gain').ok === false) mood = 0;
   // Energy the gate refused does not count toward the daily top.
   state = { ...out.state, energyToday: Math.max(0, out.state.energyToday - (out.energy - energy)) };
-  pc.energy = Math.min(TANK, (pc.energy || 0) + energy);
+  pc.energy = Math.min(tankOf(engine), (pc.energy || 0) + energy);
   pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
-  if (out.img) {
-    pc.imagination = (pc.imagination || 0) + out.img;
-    pc.xp = (pc.xp || 0) + out.img;
+  const imgTotal = out.img + (out.imgBonus || 0);
+  if (imgTotal) {
+    pc.imagination = (pc.imagination || 0) + imgTotal;
+    pc.xp = (pc.xp || 0) + imgTotal;
   }
   engine.pushActivity(out.message);
+  if (out.imgBonus) {
+    const name = out.imgBonusCard === 'meditative_arts_imagination' ? 'Enlightenment' : 'Focused Imagination';
+    engine.pushActivity(`${name}: a flash of insight. +${out.imgBonus} iMG`);
+  }
   const player = engine.player;
   const parts = [];
   if (mood) parts.push(`+${mood} mood`);
   if (energy) parts.push(`+${energy} energy`);
-  if (out.img) parts.push(`+${out.img} iMG`);
+  if (imgTotal) parts.push(`+${imgTotal} iMG`);
   if (player && parts.length) engine.floatText(player.x, player.y - avatarHeight(engine) - 20, parts.join('  '), out.full ? 0xd6f5ff : 0xf0e6d0);
   if (out.maxRelax && player) showMaxRelax(engine);
   if (out.reachedZen) engine.toast(MEDITATION_TEXT.zenReached, 3600);
   for (const event of out.events) engine.achievement(event.counter, event.amount);
   stationAfterSession(engine, out.seconds);
-  engine.setData('meditationLast', `${reason}:${out.seconds}s:e${energy}:m${mood}:i${out.img}:${out.full ? 'full' : 'part'}`);
+  engine.setData('meditationLast', `${reason}:${out.seconds}s:e${energy}:m${mood}:i${out.img}:${out.full ? 'full' : 'part'}${out.imgBonus ? `:bonus${out.imgBonus}` : ''}${out.maxRelax ? ':maxrelax' : ''}`);
   engine.updateHud();
   engine.save();
   publish(engine, true);
@@ -427,7 +450,7 @@ function onKeyDown(event) {
   if (!isLevitating(state, Date.now()) || engine.busy()) return;
   const player = engine.player;
   if (!player || player.onGround) return;
-  player.vy = Math.min(player.vy, -7.4);
+  player.vy = Math.min(player.vy, -7.4 * levitationPhysics(engine).jump);
 }
 
 function demoSetup(engine) {
@@ -499,8 +522,8 @@ export const meditationFeature = {
     state = rollMeditationDay(state, dayKey());
   },
 
-  physics() {
-    return isLevitating(state, Date.now()) ? { gravity: LEVITATION_PACKAGE.physics.gravity } : null;
+  physics(engine) {
+    return isLevitating(state, Date.now()) ? levitationPhysics(engine || engineRef) : null;
   },
 
   onTick(dtMs, now, engine) {

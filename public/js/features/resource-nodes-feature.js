@@ -31,10 +31,11 @@
  * resourceDemo.
  */
 
-import { ITEM_CATALOG } from '../inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, addItem } from '../inventory.js?v=catalog-unified-3';
 import { platformYAt } from '../street-model.js';
 import { hiresSpriteUrl } from '../sprite-hires.js';
 import { rollResourceNodeDrop } from './drops-feature.js?v=drops-1';
+import { rollSlothBonusSnails } from '../imagination-effects.js';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,
   FIREFLY_WHISTLE_ACHIEVEMENT,
@@ -151,9 +152,12 @@ export function prepareStreetResourceNodes(slot, plan, { tsid = '', now = Date.n
 }
 
 export function normalizeResourceFeatureSlice(slice) {
+  const bonusSnailsAt = Number(slice?.bonusSnailsAt);
   return {
     jar: normalizeFireflyJarState(slice?.jar || {}),
     starterKit: slice?.starterKit === true,
+    // pc['last_bonus_snails'] (npc_sloth.js Friend of Metal), kept only once set.
+    ...(Number.isFinite(bonusSnailsAt) && bonusSnailsAt > 0 ? { bonusSnailsAt } : {}),
   };
 }
 
@@ -423,6 +427,9 @@ function svgDataUrl(svg) {
 // ---------------------------------------------------------------------------
 
 let jar = createFireflyJarState();
+/** Last Friend of Metal spit (ms), and the sloth the player is standing under. */
+let bonusSnailsAt = 0;
+let underSloth = null;
 const kit = { starterKit: false };
 let entities = [];
 let effects = [];
@@ -1181,6 +1188,37 @@ function triggerTrap(engine, entity) {
   applyResult(engine, entity, result);
 }
 
+/**
+ * npc_sloth.js onPlayerCollision (590-601) and the peekSpit state (825-834):
+ * walking under a hiding Sloth with Friend of Metal, 7% of the time (at most
+ * once every 5 minutes, always with Max Luck) it peeks down and spits 1-3
+ * Snails at you. The collision fires on entering its 200 px bottom_extender.
+ */
+const SLOTH_HITBOX_HALF = 100;
+
+function checkSloths(engine) {
+  const player = engine.player;
+  if (!player) return;
+  const under = entities.find((entity) => entity.classTsid === 'npc_sloth' && entity.view
+    && Math.abs(player.x - entity.x) <= SLOTH_HITBOX_HALF && player.y <= entity.y + 10) || null;
+  if (under === underSloth) return;
+  underSloth = under;
+  if (!under || under.node.out) return;
+  const buffs = engine.activeBuffIds?.() || [];
+  const now = Date.now();
+  const snails = rollSlothBonusSnails(engine.pc?.imaginationUpgrades || [], bonusSnailsAt, now, Math.random, buffs.includes('max_luck'));
+  if (!snails) return;
+  bonusSnailsAt = now;
+  addItem(engine.inv, 'snail', snails);
+  for (let i = 0; i < snails; i += 1) setTimeout(() => { if (under.view) spitSnail(engine, under); }, i * 260);
+  engine.playSound?.('SLOTH_PEAK_AND_SPIT');
+  engine.achievement?.('sloth:got_bonus_snails', 1);
+  engine.achievement?.('sloth:snails_received', snails);
+  engine.pushActivity?.(`A Sloth peeks out of the leaves and spits ${snails} Snail${snails === 1 ? '' : 's'} at you. Metal!`);
+  engine.refreshPack?.();
+  engine.save?.();
+}
+
 function checkTraps(engine) {
   const player = engine.player;
   if (!player) return;
@@ -1207,13 +1245,14 @@ export const resourceNodesFeature = {
   },
 
   save() {
-    return { jar: { ...jar }, starterKit: kit.starterKit };
+    return { jar: { ...jar }, starterKit: kit.starterKit, ...(bonusSnailsAt ? { bonusSnailsAt } : {}) };
   },
 
   restore(slice, engine) {
     const normalized = normalizeResourceFeatureSlice(slice);
     jar = normalized.jar;
     kit.starterKit = normalized.starterKit;
+    bonusSnailsAt = normalized.bonusSnailsAt || 0;
     if (engine) migrateResourceStarterKit(engine.inv, kit);
   },
 
@@ -1239,6 +1278,7 @@ export const resourceNodesFeature = {
     clearTimeout(autoplayTimer);
     clearEffects();
     entities = [];
+    underSloth = null;
     demoEntity = null;
   },
 
@@ -1253,7 +1293,10 @@ export const resourceNodesFeature = {
       else if (view.kind === 'trap' && entity.node.depleted) refreshTrap(engine, entity);
     }
     tickEffects(dtMs);
-    if (engine.started && !engine.transientInstance()) checkTraps(engine);
+    if (engine.started && !engine.transientInstance()) {
+      checkTraps(engine);
+      checkSloths(engine);
+    }
     if (now - lastTickAt < TICK_MS) return;
     lastTickAt = now;
     for (const entity of entities) {

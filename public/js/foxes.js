@@ -17,6 +17,7 @@
 
 import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js';
+import { foxBrushingCard, scaledToolWear } from './imagination-effects.js';
 
 export const FOX_ID = 'npc_fox';
 export const FOX_RANGER_ID = 'npc_fox_ranger';
@@ -207,10 +208,15 @@ export function foxBrushingPackage(learned = []) {
     : FOX_BRUSHING_PACKAGE.no_skill;
 }
 
-export function foxFiberRange(learned = []) {
-  const [lo, hi] = FOX_FIBER_RANGE.base;
-  if (!(learned || []).includes(FOX_BRUSHING_SKILL)) return [lo, hi];
-  return [lo + FOX_FIBER_RANGE.skillBonus[0], hi + FOX_FIBER_RANGE.skillBonus[1]];
+/** npc_fox.js:341-343: +10/+12 with Fox Brushing, then +8/+12 with Bristling Bonus. */
+export function foxFiberRange(learned = [], upgrades = []) {
+  let [lo, hi] = FOX_FIBER_RANGE.base;
+  if ((learned || []).includes(FOX_BRUSHING_SKILL)) {
+    lo += FOX_FIBER_RANGE.skillBonus[0];
+    hi += FOX_FIBER_RANGE.skillBonus[1];
+  }
+  const card = foxBrushingCard(upgrades);
+  return [lo + card.rangeAdd[0], hi + card.rangeAdd[1]];
 }
 
 /** GSJS randInt(min, max): inclusive on both ends, tolerant of min > max. */
@@ -477,16 +483,20 @@ export function brushFox(ctx) {
   }
   if (!fox || fox.gone) return fail('gone', FOX_TEXT.cantReach);
   const pkg = foxBrushingPackage(ctx.learned);
-  const toolCheck = canUseTool(toolState, FOX_BRUSH_ID, pkg.toolWear);
+  const upgrades = ctx.upgrades || pc?.imaginationUpgrades || [];
+  // npc_fox.js:221-223: Bristling Bonus wears the brush 1.5x (fractions carry).
+  const wearMultiplier = foxBrushingCard(upgrades).toolWearMultiplier;
+  const toolCheck = canUseTool(toolState, FOX_BRUSH_ID, Math.ceil(pkg.toolWear * wearMultiplier));
   if (!toolCheck.ok) return fail('brush_worn', FOX_TEXT.brushWorn, { miss: true });
   if ((pc.energy || 0) <= pkg.energyCost) return fail('tired', FOX_TEXT.tooTired);
 
   const wasMoving = FOX_MOVING_STATES.has(fox.state);
-  const wear = useToolCondition(toolState, FOX_BRUSH_ID, pkg.toolWear);
+  const wearPoints = scaledToolWear(toolState, FOX_BRUSH_ID, pkg.toolWear, wearMultiplier);
+  const wear = wearPoints > 0 ? useToolCondition(toolState, FOX_BRUSH_ID, wearPoints) : { wear: 0 };
   pc.energy = Math.max(0, (pc.energy || 0) - pkg.energyCost);
   pc.xp = (pc.xp || 0) + pkg.xpBonus;
   if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + pkg.xpBonus;
-  const [lo, hi] = foxFiberRange(ctx.learned);
+  const [lo, hi] = foxFiberRange(ctx.learned, upgrades);
   const fibers = randInt(lo, hi, rng);
   addItem(inv, FIBER_ID, fibers);
 
@@ -515,7 +525,7 @@ export function brushFox(ctx) {
     fibers,
     energy: -pkg.energyCost,
     xp: pkg.xpBonus,
-    wear: wear.wear || pkg.toolWear,
+    wear: wear.wear ?? wearPoints,
     broke: wear.broke === true,
     brokeMsg: wear.msg || '',
     wasMoving,

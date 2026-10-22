@@ -60,10 +60,11 @@ test('all nine missing production templates are registered with source names and
     assert.equal(course.starterTicket, false, 'new tickets come from the imagination shop, not the starter pack');
     assert.equal(remakeStatus(`ticket_to_paradise_${id}`).status, 'live');
   }
-  // The shipped four are untouched and Beam Me Down stays a puzzle scene.
+  // The shipped four are untouched and Beam Me Down stays a puzzle scene;
+  // its card is live because the puzzle-scenes feature activates the ticket.
   assert.equal(Object.keys(PARADISE_COURSES).length, 13);
   assert.equal(PARADISE_COURSES.beam_me_down, undefined);
-  assert.equal(remakeStatus('ticket_to_paradise_beam_me_down').status, 'later');
+  assert.equal(remakeStatus('ticket_to_paradise_beam_me_down').status, 'live');
 });
 
 test('official 33x44 ticket icons ship for every new course', () => {
