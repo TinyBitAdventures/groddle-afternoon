@@ -317,3 +317,12 @@ describe('street jobs rules', () => {
     assert.equal(plainText('<b>Hi</b><br>there<split butt_txt="OK" />Bye'), 'Hi\nthere\n\nBye');
   });
 });
+
+describe('street project phase names', () => {
+  it('fill {job_location} in phase titles shown in the panel and phase-complete text', () => {
+    const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'public/js/features/street-jobs-feature.js'), 'utf8');
+    assert.match(src, /function phaseTitle\(job, phase, def\)[\s\S]{0,120}jobText\(/);
+    // Every phase/def title reaches the UI through phaseTitle, never raw.
+    assert.doesNotMatch(src, /\$\{[^}]*(phase\.label|def\.title)[^}]*\}/);
+  });
+});

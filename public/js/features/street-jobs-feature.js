@@ -91,6 +91,11 @@ let demo = null; // { jobId, phase }
 /* Loading                                                              */
 /* ------------------------------------------------------------------ */
 
+/** A phase's name; the source's phase classes title themselves "{job_location}" (the new street's name). */
+function phaseTitle(job, phase, def) {
+  return jobText(phase?.label || def?.title || '', { location: job?.label });
+}
+
 function load() {
   if (catalog) return Promise.resolve(catalog);
   if (!loading) {
@@ -442,7 +447,7 @@ function finishPhase(engine, jobId) {
     // players/inc_jobs.js jobs_familiar_turnin_do phase text.
     steps = [
       {
-        text: `Yay! The ${phaseOrdinal(out.index)} phase, ${out.phase.label || out.def.title}, of the project ${job.title} has been completed! You did ${out.participation}% of the work.`,
+        text: `Yay! The ${phaseOrdinal(out.index)} phase, ${phaseTitle(job, out.phase, out.def)}, of the project ${job.title} has been completed! You did ${out.participation}% of the work.`,
         response: 'View Rewards',
       },
       { text: solo, response: 'Continue' },
@@ -763,7 +768,7 @@ function renderPanel(engine) {
     : phaseRequirements(state, catalog, jobId);
   const need = reqs.reduce((s, r) => s + r.need, 0) || 1;
   const got = reqs.reduce((s, r) => s + r.got, 0);
-  q('[data-sj-phase]').textContent = `Phase ${Math.min(job.phases.length, status.phase + 1)} of ${job.phases.length}: ${pcx.phase.label || def.title}`;
+  q('[data-sj-phase]').textContent = `Phase ${Math.min(job.phases.length, status.phase + 1)} of ${job.phases.length}: ${phaseTitle(job, pcx.phase, def)}`;
   q('[data-sj-bar]').style.width = `${Math.round((status.status === 'done' ? 1 : got / need) * 100)}%`;
 
   const list = q('[data-sj-reqs]');
