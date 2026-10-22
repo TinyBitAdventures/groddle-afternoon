@@ -55,8 +55,7 @@ export function rainbowCoins() {
 function drawRainbow(PIXI, cx, cy, r, alpha = 0.55) {
   const g = new PIXI.Graphics();
   BANDS.forEach((c, i) => {
-    g.lineStyle(26, c, alpha);
-    g.arc(cx, cy, r - i * 24, Math.PI, 0);
+    g.arc(cx, cy, r - i * 24, Math.PI, 0).stroke({ width: 26, color: c, alpha: alpha });
   });
   return g;
 }
@@ -91,13 +90,9 @@ export const room = {
     const g = new PIXI.Graphics();
     // Striped rainbow floor.
     BANDS.forEach((c, i) => {
-      g.beginFill(c);
-      g.drawRect(0, FLOOR + i * 24, W, 24);
-      g.endFill();
+      g.rect(0, FLOOR + i * 24, W, 24).fill(c);
     });
-    g.beginFill(0xffffff, 0.35);
-    g.drawRect(0, FLOOR, W, 6);
-    g.endFill();
+    g.rect(0, FLOOR, W, 6).fill({ color: 0xffffff, alpha: 0.35 });
     const platforms = rainbowPlatforms(kit);
     world.addChild(g);
     // Each cloud ledge is a recovered puffy block_cloud01 (850x416), its flat

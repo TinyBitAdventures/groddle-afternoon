@@ -3883,14 +3883,10 @@ function makePromptChip() {
     const gap = key && label ? 6 : 0;
     const w = Math.ceil(padX * 2 + capW + gap + (label ? labelText.width : 0));
     bg.clear();
-    bg.beginFill(0x1f2a22, 0.74);
-    bg.drawRoundedRect(0, 0, w, h, 8);
-    bg.endFill();
+    bg.roundRect(0, 0, w, h, 8).fill({ color: 0x1f2a22, alpha: 0.74 });
     cap.clear();
     if (key) {
-      cap.beginFill(0xfff8e6, 0.96);
-      cap.drawRoundedRect(padX, 3, capW, h - 6, 4);
-      cap.endFill();
+      cap.roundRect(padX, 3, capW, h - 6, 4).fill({ color: 0xfff8e6, alpha: 0.96 });
     }
     keyText.position.set(padX + 5, Math.round((h - keyText.height) / 2));
     labelText.position.set(padX + capW + gap, Math.round((h - labelText.height) / 2));
@@ -4215,14 +4211,8 @@ function showSpeechBubble(target, speech) {
   const width = clamp(Math.max(body.width, speaker.width) + 24, 156, 280);
   const height = Math.ceil(12 + speaker.height + 4 + body.height + 12);
   const bg = new PIXI.Graphics();
-  bg.lineStyle(2, 0x594c40, 0.34);
-  bg.beginFill(0xfffdf5, 0.97);
-  bg.drawRoundedRect(0, 0, width, height, 12);
-  bg.endFill();
-  bg.lineStyle(1, 0x594c40, 0.28);
-  bg.beginFill(0xfffdf5, 0.97);
-  bg.drawPolygon([width / 2 - 9, height - 1, width / 2, height + 11, width / 2 + 9, height - 1]);
-  bg.endFill();
+  bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
+  bg.poly([width / 2 - 9, height - 1, width / 2, height + 11, width / 2 + 9, height - 1]).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 1, color: 0x594c40, alpha: 0.28 });
   speaker.x = 12;
   speaker.y = 10;
   body.x = 12;
@@ -4288,9 +4278,7 @@ function floatText(x, y, text, color = 0xfff4d6) {
 function burst(x, y, color = 0xffe066, n = 10) {
   for (let i = 0; i < n; i++) {
     const g = new PIXI.Graphics();
-    g.beginFill(color, 0.9);
-    g.drawCircle(0, 0, 2 + Math.random() * 3);
-    g.endFill();
+    g.circle(0, 0, 2 + Math.random() * 3).fill({ color: color, alpha: 0.9 });
     g.x = x; g.y = y;
     g._vx = (Math.random() - 0.5) * 3.5;
     g._vy = -1 - Math.random() * 2.5;
@@ -4310,9 +4298,9 @@ function showSuperHarvestFx(target, itemClassTsid, amount) {
   const rainbow = new PIXI.Graphics();
   const colors = [0xf15b5a, 0xf8a33a, 0xf5d74e, 0x78c96b, 0x5ba8e5, 0x9566d7];
   colors.forEach((color, index) => {
-    rainbow.lineStyle(4, color, 0.92);
     rainbow.moveTo(-112, 29 + index * 3);
     rainbow.bezierCurveTo(-58, -30 + index * 2, 58, -30 + index * 2, 112, 29 + index * 3);
+    rainbow.stroke({ width: 4, color: color, alpha: 0.92 });
   });
   const heading = new PIXI.Text('SUPER HARVEST!', {
     fontFamily: 'Trebuchet MS, sans-serif',
@@ -5443,45 +5431,33 @@ function makeBackground() {
   for (let i = 0; i < bands.length; i++) {
     const y0 = bands[i][1];
     const y1 = i + 1 < bands.length ? bands[i + 1][1] : VIEW_H;
-    g.beginFill(bands[i][0]);
-    g.drawRect(0, y0, WORLD_W, y1 - y0 + 2);
-    g.endFill();
+    g.rect(0, y0, WORLD_W, y1 - y0 + 2).fill(bands[i][0]);
   }
-  g.beginFill(0x7aa85a, 0.55);
-  for (let x = -40; x < WORLD_W; x += 180) g.drawEllipse(x + 90, GROUND_Y - 30, 120, 50);
-  g.endFill();
-  g.beginFill(0x6b9848, 0.7);
-  for (let x = -20; x < WORLD_W; x += 140) g.drawEllipse(x + 70, GROUND_Y - 8, 90, 36);
-  g.endFill();
+  for (let x = -40; x < WORLD_W; x += 180) g.ellipse(x + 90, GROUND_Y - 30, 120, 50);
+  g.fill({ color: 0x7aa85a, alpha: 0.55 });
+  for (let x = -20; x < WORLD_W; x += 140) g.ellipse(x + 70, GROUND_Y - 8, 90, 36);
+  g.fill({ color: 0x6b9848, alpha: 0.7 });
 
   const plats = [
     { x: 700, y: GROUND_Y - 90, w: 160 },
     { x: 1150, y: GROUND_Y - 130, w: 140 },
     { x: 1600, y: GROUND_Y - 100, w: 180 },
   ];
-  g.beginFill(0x5f8a40);
-  plats.forEach((p) => g.drawRoundedRect(p.x - p.w / 2, p.y, p.w, 16, 6));
-  g.endFill();
+  plats.forEach((p) => g.roundRect(p.x - p.w / 2, p.y, p.w, 16, 6));
+  g.fill(0x5f8a40);
   makeBackground.platforms = plats;
 
-  g.beginFill(0x6b8f3c);
-  g.drawRect(0, GROUND_Y, WORLD_W, VIEW_H - GROUND_Y);
-  g.endFill();
-  g.beginFill(0x8b6914);
-  g.drawRect(0, GROUND_Y + 16, WORLD_W, VIEW_H);
-  g.endFill();
-  g.beginFill(0x6b4f35);
-  g.drawRect(0, GROUND_Y + 38, WORLD_W, VIEW_H);
-  g.endFill();
+  g.rect(0, GROUND_Y, WORLD_W, VIEW_H - GROUND_Y).fill(0x6b8f3c);
+  g.rect(0, GROUND_Y + 16, WORLD_W, VIEW_H).fill(0x8b6914);
+  g.rect(0, GROUND_Y + 38, WORLD_W, VIEW_H).fill(0x6b4f35);
 
   for (let x = 0; x < WORLD_W; x += 22) {
     const hh = 5 + (x * 17) % 12;
-    g.beginFill(0x4f7a38);
     g.moveTo(x, GROUND_Y + 1);
     g.lineTo(x + 4, GROUND_Y - hh);
     g.lineTo(x + 8, GROUND_Y + 1);
     g.closePath();
-    g.endFill();
+    g.fill(0x4f7a38);
   }
 
   const clouds = new PIXI.Graphics();
@@ -5489,10 +5465,9 @@ function makeBackground() {
     const x = 60 + i * 150 + (i % 3) * 30;
     const y = 40 + (i * 37) % 70;
     const r = 40 + (i * 13) % 30;
-    clouds.beginFill(0xffffff, 0.72);
-    clouds.drawEllipse(x, y, r, r * 0.5);
-    clouds.drawEllipse(x + r * 0.45, y + 5, r * 0.65, r * 0.38);
-    clouds.endFill();
+    clouds.ellipse(x, y, r, r * 0.5);
+    clouds.ellipse(x + r * 0.45, y + 5, r * 0.65, r * 0.38);
+    clouds.fill({ color: 0xffffff, alpha: 0.72 });
   }
 
   const locLabel = worldSession?.location
@@ -5641,20 +5616,12 @@ function spawnStootMemorial() {
   memorial.eventMode = 'none';
 
   const shadow = new PIXI.Graphics();
-  shadow.beginFill(0x111523, 0.82);
-  shadow.drawEllipse(0, -77, 174, 166);
-  shadow.endFill();
+  shadow.ellipse(0, -77, 174, 166).fill({ color: 0x111523, alpha: 0.82 });
   const frame = new PIXI.Graphics();
-  frame.lineStyle(8, 0x584028, 1);
-  frame.beginFill(0x201d2b, 0.98);
-  frame.drawRoundedRect(-116, -232, 232, 170, 14);
-  frame.endFill();
-  frame.lineStyle(2, 0xe5cc82, 0.72);
-  frame.drawRoundedRect(-104, -220, 208, 146, 10);
+  frame.roundRect(-116, -232, 232, 170, 14).fill({ color: 0x201d2b, alpha: 0.98 }).stroke({ width: 8, color: 0x584028, alpha: 1 });
+  frame.roundRect(-104, -220, 208, 146, 10).stroke({ width: 2, color: 0xe5cc82, alpha: 0.72 });
   const glow = new PIXI.Graphics();
-  glow.beginFill(0xffe6a0, 0.12);
-  glow.drawEllipse(0, -145, 150, 94);
-  glow.endFill();
+  glow.ellipse(0, -145, 150, 94).fill({ color: 0xffe6a0, alpha: 0.12 });
   const portrait = PIXI.Sprite.from('assets/sprites/spinning-wheel/stoot-doll.png');
   portrait.anchor.set(0.5);
   portrait.scale.set(1.55);
@@ -5937,16 +5904,13 @@ function makeLocalCompanion(profile) {
   name.anchor.set(0.5, 1);
   name.y = crowd ? -Math.round((crowd.frames[0]?.frame?.height || 130) + 6) : -104;
   const plate = new PIXI.Graphics();
-  plate.beginFill(0xfffdf5, 0.82);
-  plate.lineStyle(1, profile.color, 0.64);
-  plate.drawRoundedRect(
+  plate.roundRect(
     -Math.ceil(name.width / 2) - 7,
     name.y - name.height - 4,
     Math.ceil(name.width) + 14,
     Math.ceil(name.height) + 7,
     7
-  );
-  plate.endFill();
+  ).fill({ color: 0xfffdf5, alpha: 0.82 }).stroke({ width: 1, color: profile.color, alpha: 0.64 });
   plate.alpha = 0.72;
 
   root.addChild(body, plate, name);
@@ -8312,9 +8276,7 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
   spr.bob = 0;
   spr.zIndex = 27;
   const glow = new PIXI.Graphics();
-  glow.beginFill(def.glow ?? 0x9ee4ac, 0.2);
-  glow.drawCircle(0, 0, 34);
-  glow.endFill();
+  glow.circle(0, 0, 34).fill({ color: def.glow ?? 0x9ee4ac, alpha: 0.2 });
   glow.x = spr.x;
   glow.y = spr.baseY - 30;
   glow.zIndex = 26;
@@ -8364,10 +8326,7 @@ function spawnDroppedItemStack(stack) {
 
   if (stack.count > 1) {
     const badge = new PIXI.Graphics();
-    badge.beginFill(0x3b352d, 0.9);
-    badge.lineStyle(1, 0xfff7e6, 0.9);
-    badge.drawCircle(16, -33, 10);
-    badge.endFill();
+    badge.circle(16, -33, 10).fill({ color: 0x3b352d, alpha: 0.9 }).stroke({ width: 1, color: 0xfff7e6, alpha: 0.9 });
     badge.eventMode = 'none';
     const count = new PIXI.Text(String(stack.count), {
       fontFamily: 'Trebuchet MS, sans-serif',
@@ -10521,40 +10480,28 @@ function drawPlayroomBackground() {
   layer.platformsScreen = [{ id: 'playroom-floor', x1: 0, y1: 620, x2: 1150, y2: 620, pc_perm: 1 }];
 
   const room = new PIXI.Graphics();
-  room.beginFill(0xf7f0d9);
-  room.drawRect(0, 0, 1150, 620);
-  room.endFill();
+  room.rect(0, 0, 1150, 620).fill(0xf7f0d9);
 
   // Clean vector interpretation of the recorded playroom: patterned wall,
   // tall cyan windows, oversized furniture, and warm wooden floor.
   const colors = [0x72c8c8, 0xeba75f, 0xcf6179, 0x9bc761, 0x7aa9d1];
   for (let x = -70, i = 0; x < 1220; x += 165, i += 1) {
     const color = colors[i % colors.length];
-    room.beginFill(color, 0.9);
-    room.drawRoundedRect(x, 40 + (i % 2) * 20, 96, 72, 30);
-    room.drawCircle(x + 26, 35 + (i % 2) * 20, 23);
-    room.drawCircle(x + 76, 35 + (i % 2) * 20, 23);
-    room.endFill();
+    room.roundRect(x, 40 + (i % 2) * 20, 96, 72, 30);
+    room.circle(x + 26, 35 + (i % 2) * 20, 23);
+    room.circle(x + 76, 35 + (i % 2) * 20, 23);
+    room.fill({ color: color, alpha: 0.9 });
   }
   for (const x of [95, 850]) {
-    room.lineStyle(8, 0xffffff, 0.9);
-    room.beginFill(0x9fe1e7);
-    room.drawRoundedRect(x, 155, 190, 340, 8);
-    room.endFill();
-    room.lineStyle(5, 0xffffff, 0.85);
+    room.roundRect(x, 155, 190, 340, 8).fill(0x9fe1e7).stroke({ width: 8, color: 0xffffff, alpha: 0.9 });
     room.moveTo(x + 95, 160);
     room.lineTo(x + 95, 490);
     room.moveTo(x + 5, 325);
     room.lineTo(x + 185, 325);
+    room.stroke({ width: 5, color: 0xffffff, alpha: 0.85 });
   }
-  room.lineStyle(0);
-  room.beginFill(0x8b5f42);
-  room.drawRect(0, 620, 1150, 140);
-  room.endFill();
-  room.beginFill(0x6d4936);
-  room.drawRect(0, 604, 1150, 18);
-  room.endFill();
-  room.lineStyle(2, 0xb88962, 0.45);
+  room.rect(0, 620, 1150, 140).fill(0x8b5f42);
+  room.rect(0, 604, 1150, 18).fill(0x6d4936);
   for (let y = 646; y < 760; y += 28) {
     room.moveTo(0, y);
     room.lineTo(1150, y);
@@ -10564,21 +10511,16 @@ function drawPlayroomBackground() {
     room.lineTo(x + 35, 760);
   }
   // Tea table and chairs echo the source scene without copying compression.
-  room.lineStyle(0);
-  room.beginFill(0x694b38);
-  room.drawRoundedRect(785, 470, 310, 30, 10);
-  room.drawRect(830, 497, 26, 123);
-  room.drawRect(1035, 497, 26, 123);
-  room.endFill();
-  room.beginFill(0xf6f1df);
-  room.drawEllipse(880, 463, 22, 10);
-  room.drawEllipse(1008, 463, 22, 10);
-  room.endFill();
-  room.beginFill(0xcd4f68);
-  room.drawCircle(882, 438, 13);
-  room.beginFill(0x79b8c7);
-  room.drawCircle(1010, 438, 13);
-  room.endFill();
+  room.stroke({ width: 2, color: 0xb88962, alpha: 0.45 });
+  room.roundRect(785, 470, 310, 30, 10);
+  room.rect(830, 497, 26, 123);
+  room.rect(1035, 497, 26, 123);
+  room.fill(0x694b38);
+  room.ellipse(880, 463, 22, 10);
+  room.ellipse(1008, 463, 22, 10);
+  room.fill(0xf6f1df);
+  room.circle(882, 438, 13).fill(0xcd4f68);
+  room.circle(1010, 438, 13).fill(0x79b8c7);
   layer.addChild(room);
 
   const roomLabel = new PIXI.Text("MR. BLOCK'S PLAYROOM", {
@@ -11010,33 +10952,24 @@ function legalizeRoomBase(name, width = 1600, height = 760, groundY = 620) {
 function drawLegalizeSubwayStation(stationName, destinationName) {
   const layer = legalizeRoomBase(`legalize-subway-${stationName.toLowerCase().replace(/\W+/g, '-')}`);
   const wall = new PIXI.Graphics();
-  wall.beginFill(0x747774);
-  wall.drawRect(0, 0, 1600, 620);
-  wall.endFill();
-  wall.beginFill(0x2d302f);
-  wall.drawRect(0, 0, 1600, 92);
-  wall.endFill();
-  wall.beginFill(0x4f5351);
-  for (let x = 35; x < 1600; x += 205) wall.drawRect(x, 100, 7, 480);
-  wall.endFill();
+  wall.rect(0, 0, 1600, 620).fill(0x747774);
+  wall.rect(0, 0, 1600, 92).fill(0x2d302f);
+  for (let x = 35; x < 1600; x += 205) wall.rect(x, 100, 7, 480);
+  wall.fill(0x4f5351);
   layer.addChild(wall);
 
   const train = new PIXI.Graphics();
   train.name = 'legalize-subway-train';
-  train.beginFill(0xe4e6df);
-  train.lineStyle(5, 0x3c4546, 1);
-  train.drawRoundedRect(165, 260, 1120, 278, 74);
-  train.endFill();
-  train.beginFill(0x58676a);
-  train.drawRoundedRect(240, 300, 410, 118, 22);
-  train.drawRoundedRect(690, 300, 410, 118, 22);
-  train.endFill();
-  train.beginFill(0xa9c1c2, 0.72);
-  train.drawRoundedRect(272, 317, 160, 84, 14);
-  train.drawRoundedRect(452, 317, 160, 84, 14);
-  train.drawRoundedRect(722, 317, 160, 84, 14);
-  train.drawRoundedRect(902, 317, 160, 84, 14);
-  train.endFill();
+  train.setStrokeStyle({ width: 5, color: 0x3c4546, alpha: 1 });
+  train.roundRect(165, 260, 1120, 278, 74).fill(0xe4e6df).stroke();
+  train.setFillStyle(0x58676a);
+  train.roundRect(240, 300, 410, 118, 22).fill().stroke();
+  train.roundRect(690, 300, 410, 118, 22).fill().stroke();
+  train.setFillStyle({ color: 0xa9c1c2, alpha: 0.72 });
+  train.roundRect(272, 317, 160, 84, 14).fill().stroke();
+  train.roundRect(452, 317, 160, 84, 14).fill().stroke();
+  train.roundRect(722, 317, 160, 84, 14).fill().stroke();
+  train.roundRect(902, 317, 160, 84, 14).fill().stroke();
   train.zIndex = 1;
   layer.addChild(train);
 
@@ -11080,15 +11013,9 @@ function drawLegalizeSubwayStation(stationName, destinationName) {
 function drawLegalizeBackAlley() {
   const layer = legalizeRoomBase('legalize-back-alley-forest');
   const sky = new PIXI.Graphics();
-  sky.beginFill(0x142d20);
-  sky.drawRect(0, 0, 1600, 620);
-  sky.endFill();
-  sky.beginFill(0x285039, 0.74);
-  sky.drawEllipse(790, 300, 680, 310);
-  sky.endFill();
-  sky.beginFill(0xa8dca3, 0.13);
-  sky.drawPolygon([560, 0, 850, 0, 1060, 620, 770, 620]);
-  sky.endFill();
+  sky.rect(0, 0, 1600, 620).fill(0x142d20);
+  sky.ellipse(790, 300, 680, 310).fill({ color: 0x285039, alpha: 0.74 });
+  sky.poly([560, 0, 850, 0, 1060, 620, 770, 620]).fill({ color: 0xa8dca3, alpha: 0.13 });
   layer.addChild(sky);
 
   const rearTrees = [
@@ -11141,17 +11068,12 @@ function drawLegalizeBackAlley() {
 function drawGregariousGrangeExterior() {
   const layer = legalizeRoomBase('legalize-gregarious-grange');
   const meadow = new PIXI.Graphics();
-  meadow.beginFill(0xbde8ef);
-  meadow.drawRect(0, 0, 1600, 620);
-  meadow.endFill();
-  meadow.beginFill(0x7fb45e);
-  meadow.drawEllipse(320, 590, 760, 260);
-  meadow.drawEllipse(1180, 590, 880, 285);
-  meadow.drawRect(0, 520, 1600, 240);
-  meadow.endFill();
-  meadow.beginFill(0x5b933f);
-  meadow.drawRect(0, 610, 1600, 150);
-  meadow.endFill();
+  meadow.rect(0, 0, 1600, 620).fill(0xbde8ef);
+  meadow.ellipse(320, 590, 760, 260);
+  meadow.ellipse(1180, 590, 880, 285);
+  meadow.rect(0, 520, 1600, 240);
+  meadow.fill(0x7fb45e);
+  meadow.rect(0, 610, 1600, 150).fill(0x5b933f);
   layer.addChild(meadow);
 
   for (const [file, x, scale] of [
@@ -11177,9 +11099,7 @@ function drawGregariousGrangeExterior() {
   for (let i = 0; i < 44; i++) {
     const x = 30 + ((i * 149) % 1540);
     const y = 548 + ((i * 37) % 58);
-    flowers.beginFill(i % 3 === 0 ? 0xffffff : i % 3 === 1 ? 0xffdf6b : 0xf0a7d8);
-    flowers.drawCircle(x, y, 2.5);
-    flowers.endFill();
+    flowers.circle(x, y, 2.5).fill(i % 3 === 0 ? 0xffffff : i % 3 === 1 ? 0xffdf6b : 0xf0a7d8);
   }
   layer.addChild(flowers);
   layer.sortableChildren = true;
@@ -11189,29 +11109,21 @@ function drawGregariousGrangeExterior() {
 function drawBureaucraticHall() {
   const layer = legalizeRoomBase('legalize-bureaucratic-hall');
   const room = new PIXI.Graphics();
-  room.beginFill(0xe7e3d4);
-  room.drawRect(0, 0, 1600, 620);
-  room.endFill();
-  room.beginFill(0xd4cfbd);
-  room.drawRect(0, 500, 1600, 120);
-  room.endFill();
-  room.beginFill(0x77766d);
-  room.drawRect(0, 620, 1600, 140);
-  room.endFill();
-  room.lineStyle(2, 0xb9b3a1, 0.5);
+  room.rect(0, 0, 1600, 620).fill(0xe7e3d4);
+  room.rect(0, 500, 1600, 120).fill(0xd4cfbd);
+  room.rect(0, 620, 1600, 140).fill(0x77766d);
   for (let x = 0; x < 1600; x += 120) {
     room.moveTo(x, 620);
     room.lineTo(x + 60, 760);
   }
-  room.lineStyle(0);
-  room.beginFill(0x9a5735);
+  room.stroke({ width: 2, color: 0xb9b3a1, alpha: 0.5 });
   for (const x of [90, 180, 270, 360]) {
-    room.drawRoundedRect(x, 526, 58, 15, 6);
-    room.drawRoundedRect(x + 5, 541, 48, 36, 5);
-    room.drawRect(x + 11, 575, 6, 45);
-    room.drawRect(x + 41, 575, 6, 45);
+    room.roundRect(x, 526, 58, 15, 6);
+    room.roundRect(x + 5, 541, 48, 36, 5);
+    room.rect(x + 11, 575, 6, 45);
+    room.rect(x + 41, 575, 6, 45);
   }
-  room.endFill();
+  room.fill(0x9a5735);
   layer.addChild(room);
 
   const waiting = new PIXI.Text('WAITING\nAREA', {
@@ -11224,9 +11136,7 @@ function drawBureaucraticHall() {
   waiting.anchor.set(0.5);
   waiting.position.set(255, 460);
   const plaque = new PIXI.Graphics();
-  plaque.beginFill(0x4a4b46);
-  plaque.drawRoundedRect(195, 420, 120, 76, 5);
-  plaque.endFill();
+  plaque.roundRect(195, 420, 120, 76, 5).fill(0x4a4b46);
   layer.addChild(plaque, waiting);
 
   const tv = PIXI.Sprite.from('assets/decos/groddle/bureaucratic_hall_tv_1.png');
@@ -12077,10 +11987,7 @@ function createGreedyExitSprite(x, y) {
   const root = new PIXI.Container();
   root.name = 'greedy-story-exit';
   const sign = new PIXI.Graphics();
-  sign.beginFill(0x5c3d72, 0.94);
-  sign.lineStyle(3, 0xfff1ae, 0.94);
-  sign.drawRoundedRect(-82, -43, 164, 38, 14);
-  sign.endFill();
+  sign.roundRect(-82, -43, 164, 38, 14).fill({ color: 0x5c3d72, alpha: 0.94 }).stroke({ width: 3, color: 0xfff1ae, alpha: 0.94 });
   root.addChild(sign);
   const label = new PIXI.Text('RETURN TO UR →', {
     fontFamily: 'Fredoka, Arial, sans-serif',
@@ -12574,9 +12481,7 @@ function spawnWinterSnow() {
   snow.eventMode = 'none';
 
   const veil = new PIXI.Graphics();
-  veil.beginFill(winterWalkState?.stage === 'haven' ? 0x18345f : 0xc9efff, 0.055);
-  veil.drawRect(0, 0, VIEW_W, VIEW_H);
-  veil.endFill();
+  veil.rect(0, 0, VIEW_W, VIEW_H).fill({ color: winterWalkState?.stage === 'haven' ? 0x18345f : 0xc9efff, alpha: 0.055 });
   veil._winterVeil = true;
   snow.addChild(veil);
 
@@ -12642,9 +12547,7 @@ function spawnWinterMotes(stage) {
     sprite.tint = index === 2 && stage === 'surface' ? 0xe0a8ff : 0xc58cff;
     sprite.zIndex = 42;
     const glow = new PIXI.Graphics();
-    glow.beginFill(0x9b5de5, index === 2 && stage === 'surface' ? 0.34 : 0.2);
-    glow.drawCircle(0, 0, index === 2 && stage === 'surface' ? 30 : 23);
-    glow.endFill();
+    glow.circle(0, 0, index === 2 && stage === 'surface' ? 30 : 23).fill({ color: 0x9b5de5, alpha: index === 2 && stage === 'surface' ? 0.34 : 0.2 });
     sprite.addChildAt(glow, 0);
     entityLayer.addChild(sprite);
     winterWalkMotes.push({ stage, index, amount: rewards[index], sprite });
@@ -12684,16 +12587,10 @@ function spawnWinterPortal(stage) {
     const light = new PIXI.Graphics();
     const returning = stage === 'return';
     art = returning ? 'white-home-light' : art;
-    light.beginFill(0xffffff, returning ? 0.24 : 0.045);
-    light.drawEllipse(0, -78, returning ? 108 : 46, returning ? 152 : 82);
-    light.endFill();
-    light.beginFill(returning ? 0xf5feff : 0xcdf4ff, returning ? 0.52 : 0.12);
-    light.drawEllipse(0, -66, returning ? 56 : 26, returning ? 128 : 62);
-    light.endFill();
+    light.ellipse(0, -78, returning ? 108 : 46, returning ? 152 : 82).fill({ color: 0xffffff, alpha: returning ? 0.24 : 0.045 });
+    light.ellipse(0, -66, returning ? 56 : 26, returning ? 128 : 62).fill({ color: returning ? 0xf5feff : 0xcdf4ff, alpha: returning ? 0.52 : 0.12 });
     if (returning) {
-      light.beginFill(0xffffff, 0.34);
-      light.drawRect(-18, -206, 36, 206);
-      light.endFill();
+      light.rect(-18, -206, 36, 206).fill({ color: 0xffffff, alpha: 0.34 });
     }
     root.addChild(light);
 
@@ -13107,23 +13004,19 @@ function drawSummersDayMainBackground() {
   root.worldH = 940;
 
   const sky = new PIXI.Graphics();
-  sky.beginFill(0xf8fcff);
-  sky.drawRect(0, 0, root.worldW, root.worldH);
-  sky.beginFill(0xd7eff7, 0.82);
-  sky.drawRect(0, 260, root.worldW, 680);
-  sky.endFill();
+  sky.rect(0, 0, root.worldW, root.worldH).fill(0xf8fcff);
+  sky.rect(0, 260, root.worldW, 680).fill({ color: 0xd7eff7, alpha: 0.82 });
   sky.zIndex = -1000;
   root.addChild(sky);
 
   const far = new PIXI.Graphics();
   far.zIndex = -940;
-  far.beginFill(0xb7dce8, 0.74);
-  far.drawPolygon([
+  far.poly([
     0, 690, 240, 535, 510, 640, 790, 480, 1060, 630, 1360, 455,
     1680, 610, 1990, 500, 2290, 635, 2610, 470, 2920, 615, 3220, 490,
     3530, 620, 3860, 475, 4200, 610, 4200, 940, 0, 940,
   ]);
-  far.endFill();
+  far.fill({ color: 0xb7dce8, alpha: 0.74 });
   root.addChild(far);
 
   for (let i = 0; i < 9; i += 1) {
@@ -13140,25 +13033,22 @@ function drawSummersDayMainBackground() {
 
   const water = new PIXI.Graphics();
   water.zIndex = -760;
-  water.beginFill(0x9ed6e7, 0.82);
-  water.drawRoundedRect(1190, 770, 1260, 154, 54);
-  water.endFill();
-  water.lineStyle(4, 0xf8fdff, 0.8);
+  water.roundRect(1190, 770, 1260, 154, 54).fill({ color: 0x9ed6e7, alpha: 0.82 });
   for (let x = 1235; x < 2410; x += 150) {
     water.moveTo(x, 808 + (x % 300 ? 8 : 0));
     water.bezierCurveTo(x + 34, 795, x + 75, 825, x + 116, 808);
   }
+  water.stroke({ width: 4, color: 0xf8fdff, alpha: 0.8 });
   root.addChild(water);
   root.summersDayWater = water;
 
   const terrain = new PIXI.Graphics();
   terrain.zIndex = -720;
-  terrain.beginFill(0xf9fdff);
-  terrain.lineStyle(3, 0xd8f1f8, 0.76);
-  terrain.drawPolygon([0, 820, 1160, 820, 1240, 900, 0, 940]);
-  terrain.drawPolygon([2400, 790, 2920, 790, 3050, 940, 2320, 940]);
-  terrain.drawPolygon([2860, 740, 4200, 350, 4200, 940, 3000, 940]);
-  terrain.endFill();
+  terrain.setFillStyle(0xf9fdff);
+  terrain.setStrokeStyle({ width: 3, color: 0xd8f1f8, alpha: 0.76 });
+  terrain.poly([0, 820, 1160, 820, 1240, 900, 0, 940]).fill().stroke();
+  terrain.poly([2400, 790, 2920, 790, 3050, 940, 2320, 940]).fill().stroke();
+  terrain.poly([2860, 740, 4200, 350, 4200, 940, 3000, 940]).fill().stroke();
   root.addChild(terrain);
 
   const platforms = [
@@ -13182,15 +13072,14 @@ function drawSummersDayMainBackground() {
     const platform = platforms[index];
     const shelf = new PIXI.Graphics();
     shelf.zIndex = -650;
-    shelf.beginFill(0xf9fdff, 0.99);
-    shelf.drawRoundedRect(
+    shelf.roundRect(
       platform.x1,
       platform.y1 - 10,
       platform.x2 - platform.x1,
       20,
       10
     );
-    shelf.endFill();
+    shelf.fill({ color: 0xf9fdff, alpha: 0.99 });
     shelf.alpha = platform.visibleAt <= 1 ? 0.95 : 0.14;
     shelf._visibleAt = platform.visibleAt;
     root.addChild(shelf);
@@ -13204,9 +13093,7 @@ function drawSummersDayMainBackground() {
     const width = 124 + (i % 3) * 24;
     const height = 92 + ((i * 37) % 118);
     pillar.zIndex = -610;
-    pillar.beginFill(0xf9fdff, 0.92);
-    pillar.drawRoundedRect(x - width / 2, y - height, width, height, 30);
-    pillar.endFill();
+    pillar.roundRect(x - width / 2, y - height, width, height, 30).fill({ color: 0xf9fdff, alpha: 0.92 });
     root.addChild(pillar);
   }
 
@@ -13249,25 +13136,21 @@ function drawSummersDayBonusBackground() {
   root.worldW = 1280;
   root.worldH = 1520;
   const wash = new PIXI.Graphics();
-  wash.beginFill(0xfafdff);
-  wash.drawRect(0, 0, root.worldW, root.worldH);
-  wash.beginFill(0x9dd8e9, 0.82);
-  wash.drawRoundedRect(150, 42, 980, 1438, 86);
-  wash.endFill();
+  wash.rect(0, 0, root.worldW, root.worldH).fill(0xfafdff);
+  wash.roundRect(150, 42, 980, 1438, 86).fill({ color: 0x9dd8e9, alpha: 0.82 });
   wash.zIndex = -1000;
   root.addChild(wash);
   const walls = new PIXI.Graphics();
   walls.zIndex = -930;
-  walls.beginFill(0xf9fdff, 0.98);
-  walls.drawPolygon([
+  walls.poly([
     0, 0, 218, 0, 202, 180, 228, 355, 184, 520, 218, 705,
     190, 900, 230, 1080, 196, 1260, 220, 1520, 0, 1520,
   ]);
-  walls.drawPolygon([
+  walls.poly([
     1068, 0, 1280, 0, 1280, 1520, 1050, 1520, 1082, 1310, 1048, 1110,
     1094, 905, 1058, 720, 1090, 540, 1050, 360, 1084, 170,
   ]);
-  walls.endFill();
+  walls.fill({ color: 0xf9fdff, alpha: 0.98 });
   root.addChild(walls);
   const platforms = [
     { x1: 110, y1: 1430, x2: 1170, y2: 1430 },
@@ -13284,27 +13167,22 @@ function drawSummersDayBonusBackground() {
   root.platformsScreen = platforms;
   const floor = new PIXI.Graphics();
   floor.zIndex = -700;
-  floor.beginFill(0xf9fdff, 0.99);
-  floor.lineStyle(3, 0xd8f2f9, 0.84);
-  floor.drawRoundedRect(80, 1418, 1120, 116, 46);
-  floor.endFill();
+  floor.roundRect(80, 1418, 1120, 116, 46).fill({ color: 0xf9fdff, alpha: 0.99 }).stroke({ width: 3, color: 0xd8f2f9, alpha: 0.84 });
   root.addChild(floor);
   for (let index = 1; index < platforms.length; index += 1) {
     const platform = platforms[index];
     const shelf = new PIXI.Graphics();
     shelf.zIndex = -650;
-    shelf.beginFill(0xf9fdff, 0.99);
-    shelf.drawRoundedRect(
+    shelf.roundRect(
       platform.x1,
       platform.y1 - 11,
       platform.x2 - platform.x1,
       22,
       11
     );
-    shelf.endFill();
-    shelf.lineStyle(2, 0xd7f0f7, 0.72);
+    shelf.fill({ color: 0xf9fdff, alpha: 0.99 });
     shelf.moveTo(platform.x1 + 12, platform.y1 + 10);
-    shelf.lineTo(platform.x2 - 12, platform.y1 + 10);
+    shelf.lineTo(platform.x2 - 12, platform.y1 + 10).stroke({ width: 2, color: 0xd7f0f7, alpha: 0.72 });
     root.addChild(shelf);
   }
   root.summersDayAnnexArt = 'source-pulse-dots-and-ladder';
@@ -13354,13 +13232,11 @@ function makeSummersDayCheckpoint(id, x, y, index) {
     sprite.scale.set(0.72);
   } else {
     const marker = new PIXI.Graphics();
-    marker.beginFill(0xffffff, 0.86);
-    marker.drawRoundedRect(-24, -72, 48, 72, 20);
-    marker.endFill();
-    marker.lineStyle(3, 0x77b9cd, 0.88);
-    marker.drawRoundedRect(-24, -72, 48, 72, 20);
+    marker.roundRect(-24, -72, 48, 72, 20).fill({ color: 0xffffff, alpha: 0.86 });
+    marker.roundRect(-24, -72, 48, 72, 20);
     sprite = marker;
   }
+  marker.stroke({ width: 3, color: 0x77b9cd, alpha: 0.88 });
   sprite.position.set(x, y);
   sprite.alpha = index === 0 ? 1 : 0.14;
   sprite.zIndex = 38;
@@ -13943,32 +13819,25 @@ function drawRookWoodsBackground() {
   root.worldH = 900;
 
   const sky = new PIXI.Graphics();
-  sky.beginFill(0x262a24);
-  sky.drawRect(0, 0, root.worldW, root.worldH);
-  sky.beginFill(0x394038, 0.76);
-  sky.drawRect(0, 245, root.worldW, 350);
-  sky.beginFill(0x1b211d, 0.88);
-  sky.drawRect(0, 595, root.worldW, 305);
-  sky.endFill();
+  sky.rect(0, 0, root.worldW, root.worldH).fill(0x262a24);
+  sky.rect(0, 245, root.worldW, 350).fill({ color: 0x394038, alpha: 0.76 });
+  sky.rect(0, 595, root.worldW, 305).fill({ color: 0x1b211d, alpha: 0.88 });
   sky.zIndex = -1000;
   root.addChild(sky);
 
   const hills = new PIXI.Graphics();
   hills.zIndex = -900;
-  hills.beginFill(0x212923, 0.7);
-  hills.drawPolygon([
+  hills.poly([
     0, 650, 210, 505, 420, 620, 660, 470, 890, 625, 1120, 485,
     1360, 610, 1580, 450, 1820, 615, 2050, 490, 2300, 625, 2300, 900, 0, 900,
   ]);
-  hills.endFill();
+  hills.fill({ color: 0x212923, alpha: 0.7 });
   root.addChild(hills);
 
   const mist = new PIXI.Graphics();
   mist.zIndex = -880;
   for (let i = 0; i < 14; i += 1) {
-    mist.beginFill(0x8b9184, 0.035 + (i % 3) * 0.012);
-    mist.drawEllipse(100 + i * 175, 510 + (i % 4) * 34, 230, 58);
-    mist.endFill();
+    mist.ellipse(100 + i * 175, 510 + (i % 4) * 34, 230, 58).fill({ color: 0x8b9184, alpha: 0.035 + (i % 3) * 0.012 });
   }
   root.addChild(mist);
 
@@ -13996,21 +13865,21 @@ function drawRookWoodsBackground() {
   limbs.zIndex = -165;
   for (const limb of ROOK_FOREST_LIMBS) {
     const [startX, startY, ...rest] = limb.points;
-    limbs.lineStyle(limb.width + 11, 0x050806, limb.alpha * 0.42);
     limbs.moveTo(startX, startY);
     for (let index = 0; index < rest.length; index += 2) {
       limbs.lineTo(rest[index], rest[index + 1]);
     }
-    limbs.lineStyle(limb.width, 0x0a0d0a, limb.alpha);
+    limbs.stroke({ width: limb.width + 11, color: 0x050806, alpha: limb.alpha * 0.42 });
     limbs.moveTo(startX, startY);
     for (let index = 0; index < rest.length; index += 2) {
       limbs.lineTo(rest[index], rest[index + 1]);
     }
-    limbs.lineStyle(Math.max(3, limb.width * 0.1), 0x343a2e, limb.alpha * 0.24);
+    limbs.stroke({ width: limb.width, color: 0x0a0d0a, alpha: limb.alpha ?? 1 });
     limbs.moveTo(startX, startY - limb.width * 0.13);
     for (let index = 0; index < rest.length; index += 2) {
       limbs.lineTo(rest[index], rest[index + 1] - limb.width * 0.13);
     }
+    limbs.stroke({ width: Math.max(3, limb.width * 0.1), color: 0x343a2e, alpha: limb.alpha * 0.24 });
   }
   root.addChild(limbs);
 
@@ -14027,42 +13896,40 @@ function drawRookWoodsBackground() {
   const path = new PIXI.Graphics();
   path.zIndex = -80;
   for (const platform of platforms) {
-    path.lineStyle(62, 0x0b0e0c, 1);
     path.moveTo(platform.x1, platform.y1 + 16);
     path.lineTo(platform.x2, platform.y2 + 16);
-    path.lineStyle(27, 0x20251c, 1);
+    path.stroke({ width: 62, color: 0x0b0e0c, alpha: 1 });
     path.moveTo(platform.x1, platform.y1 + 3);
     path.lineTo(platform.x2, platform.y2 + 3);
-    path.lineStyle(5, 0x5d624b, 0.28);
+    path.stroke({ width: 27, color: 0x20251c, alpha: 1 });
     path.moveTo(platform.x1, platform.y1 - 2);
     path.lineTo(platform.x2, platform.y2 - 2);
+    path.stroke({ width: 5, color: 0x5d624b, alpha: 0.28 });
   }
   root.addChild(path);
 
   const foreground = new PIXI.Graphics();
   foreground.zIndex = -40;
-  foreground.beginFill(0x080b09);
-  foreground.drawPolygon([
+  foreground.poly([
     0, 797, 310, 790, 455, 805, 610, 790, 760, 705, 1010, 706,
     1208, 578, 1438, 578, 1610, 798, 1790, 792, 1940, 804, 2300, 792,
     2300, 900, 0, 900,
   ]);
-  foreground.endFill();
+  foreground.fill(0x080b09);
   root.addChild(foreground);
 
   const nest = new PIXI.Graphics();
   nest.zIndex = -25;
-  nest.lineStyle(6, 0x241a12, 1);
   for (let i = 0; i < 18; i += 1) {
     const angle = (i / 18) * Math.PI;
     nest.moveTo(2070 - Math.cos(angle) * 78, 778 - Math.sin(angle) * 12);
     nest.lineTo(2190 + Math.cos(angle * 1.7) * 34, 773 - Math.sin(angle * 1.3) * 28);
   }
+  nest.stroke({ width: 6, color: 0x241a12, alpha: 1 });
   root.addChild(nest);
 
   const birds = new PIXI.Graphics();
   birds.zIndex = -860;
-  birds.lineStyle(3, 0x0d110e, 0.52);
   for (let i = 0; i < 8; i += 1) {
     const bx = 330 + i * 245;
     const by = 215 + (i % 3) * 44;
@@ -14070,6 +13937,7 @@ function drawRookWoodsBackground() {
     birds.quadraticCurveTo(bx - 5, by - 8, bx, by);
     birds.quadraticCurveTo(bx + 6, by - 9, bx + 15, by + 2);
   }
+  birds.stroke({ width: 3, color: 0x0d110e, alpha: 0.52 });
   root.addChild(birds);
 
   root.platformsScreen = platforms;
@@ -14084,33 +13952,25 @@ function drawRookCrusher(spec) {
   root.eventMode = 'none';
 
   const shadow = new PIXI.Graphics();
-  shadow.beginFill(0x050706, 0.52);
-  shadow.drawEllipse(0, spec.size * 0.48, spec.size * 0.52, 15);
-  shadow.endFill();
+  shadow.ellipse(0, spec.size * 0.48, spec.size * 0.52, 15).fill({ color: 0x050706, alpha: 0.52 });
   root.addChild(shadow);
 
   const body = new PIXI.Graphics();
   const half = spec.size / 2;
-  body.lineStyle(4, 0x151812, 0.9);
-  body.beginFill(0x4b5142);
-  body.drawRoundedRect(-half, -half, spec.size, spec.size, 17);
-  body.endFill();
-  body.beginFill(0x68705c, 0.46);
-  body.drawPolygon([
+  body.setStrokeStyle({ width: 4, color: 0x151812, alpha: 0.9 });
+  body.roundRect(-half, -half, spec.size, spec.size, 17).fill(0x4b5142).stroke();
+  body.poly([
     -half + 9, -half + 10,
     half - 13, -half + 10,
     half - 24, -half + 31,
     -half + 18, -half + 27,
-  ]);
-  body.endFill();
-  body.beginFill(0x272c24, 0.52);
-  body.drawPolygon([
+  ]).fill({ color: 0x68705c, alpha: 0.46 }).stroke();
+  body.poly([
     half - 22, -half + 30,
     half - 8, -half + 13,
     half - 8, half - 13,
     half - 27, half - 5,
-  ]);
-  body.endFill();
+  ]).fill({ color: 0x272c24, alpha: 0.52 }).stroke();
   const pocks = [
     [-0.25, -0.22, 0.1],
     [0.22, -0.29, 0.075],
@@ -14119,11 +13979,9 @@ function drawRookCrusher(spec) {
     [-0.34, 0.31, 0.055],
   ];
   for (const [px, py, radius] of pocks) {
-    body.beginFill(0x252a22, 0.75);
-    body.drawEllipse(px * spec.size, py * spec.size, radius * spec.size, radius * spec.size * 0.78);
-    body.endFill();
-    body.lineStyle(2, 0x7d836c, 0.25);
-    body.drawEllipse(px * spec.size - 2, py * spec.size - 2, radius * spec.size * 0.72, radius * spec.size * 0.5);
+    body.ellipse(px * spec.size, py * spec.size, radius * spec.size, radius * spec.size * 0.78).fill({ color: 0x252a22, alpha: 0.75 }).stroke();
+    body.setStrokeStyle({ width: 2, color: 0x7d836c, alpha: 0.25 });
+    body.ellipse(px * spec.size - 2, py * spec.size - 2, radius * spec.size * 0.72, radius * spec.size * 0.5).stroke();
   }
   root.addChild(body);
   root._body = body;
@@ -14583,39 +14441,32 @@ function drawRookMuseumBackground() {
 
   const wall = new PIXI.Graphics();
   wall.zIndex = -1000;
-  wall.beginFill(0x2c1b15);
-  wall.drawRect(0, 0, root.worldW, root.worldH);
-  wall.beginFill(0x6f472e);
-  wall.drawRect(0, 40, root.worldW, 450);
-  wall.beginFill(0x54321f);
-  for (let x = 0; x < root.worldW; x += 86) wall.drawRect(x, 40, 4, 450);
-  wall.beginFill(0x281913);
-  wall.drawRect(0, 0, root.worldW, 46);
-  wall.drawRect(0, 482, root.worldW, 138);
-  wall.beginFill(0x9b6b3c);
-  wall.drawRect(0, 474, root.worldW, 12);
-  wall.beginFill(0xc69a5c, 0.24);
-  for (let x = 0; x < root.worldW; x += 145) wall.drawRect(x, 504, 110, 4);
-  wall.endFill();
+  wall.rect(0, 0, root.worldW, root.worldH).fill(0x2c1b15);
+  wall.rect(0, 40, root.worldW, 450).fill(0x6f472e);
+  for (let x = 0; x < root.worldW; x += 86) wall.rect(x, 40, 4, 450);
+  wall.fill(0x54321f);
+  wall.rect(0, 0, root.worldW, 46);
+  wall.rect(0, 482, root.worldW, 138);
+  wall.fill(0x281913);
+  wall.rect(0, 474, root.worldW, 12).fill(0x9b6b3c);
+  for (let x = 0; x < root.worldW; x += 145) wall.rect(x, 504, 110, 4);
+  wall.fill({ color: 0xc69a5c, alpha: 0.24 });
   root.addChild(wall);
 
   for (let x = 340; x < root.worldW; x += 470) {
     const light = new PIXI.Graphics();
     light.zIndex = -900;
-    light.beginFill(0xffe9aa, 0.045);
-    light.drawPolygon([x - 95, 48, x + 95, 48, x + 180, 482, x - 180, 482]);
-    light.endFill();
+    light.poly([x - 95, 48, x + 95, 48, x + 180, 482, x - 180, 482]).fill({ color: 0xffe9aa, alpha: 0.045 });
     root.addChild(light);
   }
 
   const trim = new PIXI.Graphics();
   trim.zIndex = -40;
-  trim.lineStyle(3, 0xd3aa69, 0.55);
   trim.moveTo(0, 475);
   trim.lineTo(root.worldW, 475);
-  trim.lineStyle(2, 0x1f120d, 0.8);
+  trim.stroke({ width: 3, color: 0xd3aa69, alpha: 0.55 });
   trim.moveTo(0, 500);
-  trim.lineTo(root.worldW, 500);
+  trim.lineTo(root.worldW, 500).stroke({ width: 2, color: 0x1f120d, alpha: 0.8 });
   root.addChild(trim);
 
   root.platformsScreen = [
@@ -14705,35 +14556,26 @@ function spawnRookMuseumGreeter() {
   const sprite = new PIXI.Container();
   sprite.zIndex = 58;
   const shadow = new PIXI.Graphics();
-  shadow.beginFill(0x1d100b, 0.35);
-  shadow.drawEllipse(0, 0, 38, 9);
-  shadow.endFill();
+  shadow.ellipse(0, 0, 38, 9).fill({ color: 0x1d100b, alpha: 0.35 });
   sprite.addChild(shadow);
   const body = new PIXI.Graphics();
-  body.lineStyle(3, 0x4e301e, 0.9);
-  body.beginFill(0x9b744c);
-  body.drawRoundedRect(-31, -96, 62, 72, 14);
-  body.endFill();
-  body.beginFill(0xc49a63);
-  body.drawRoundedRect(-38, -144, 76, 54, 18);
-  body.endFill();
-  body.beginFill(0xead6a5);
-  body.drawCircle(-13, -119, 7);
-  body.drawCircle(13, -119, 7);
-  body.beginFill(0x754534);
-  body.drawCircle(-13, -119, 3);
-  body.drawCircle(13, -119, 3);
-  body.beginFill(0xc44f3f);
-  body.drawCircle(0, -59, 7);
-  body.endFill();
+  body.setStrokeStyle({ width: 3, color: 0x4e301e, alpha: 0.9 });
+  body.roundRect(-31, -96, 62, 72, 14).fill(0x9b744c).stroke();
+  body.roundRect(-38, -144, 76, 54, 18).fill(0xc49a63).stroke();
+  body.setFillStyle(0xead6a5);
+  body.circle(-13, -119, 7).fill().stroke();
+  body.circle(13, -119, 7).fill().stroke();
+  body.setFillStyle(0x754534);
+  body.circle(-13, -119, 3).fill().stroke();
+  body.circle(13, -119, 3).fill().stroke();
+  body.circle(0, -59, 7).fill(0xc44f3f).stroke();
   sprite.addChild(body);
   const antenna = new PIXI.Graphics();
-  antenna.lineStyle(3, 0x765238, 1);
+  antenna.setStrokeStyle({ width: 3, color: 0x765238, alpha: 1 });
   antenna.moveTo(0, -145);
   antenna.lineTo(0, -164);
-  antenna.beginFill(0xe0b85e);
-  antenna.drawCircle(0, -168, 6);
-  antenna.endFill();
+  antenna.stroke();
+  antenna.circle(0, -168, 6).fill(0xe0b85e).stroke();
   sprite.addChild(antenna);
   sprite.position.set(185, 500);
   sprite.eventMode = 'static';
@@ -15139,11 +14981,8 @@ function drawEestiCatalogueRoom() {
 
   const base = new PIXI.Graphics();
   base.zIndex = -1000;
-  base.beginFill(0xe6d3a4);
-  base.drawRect(0, 0, root.worldW, 800);
-  base.beginFill(0x9b642c);
-  base.drawRect(0, 800, root.worldW, 110);
-  base.endFill();
+  base.rect(0, 0, root.worldW, 800).fill(0xe6d3a4);
+  base.rect(0, 800, root.worldW, 110).fill(0x9b642c);
   root.addChild(base);
 
   for (let x = 0; x < root.worldW; x += 600) {
@@ -15269,11 +15108,10 @@ function spawnSmallWorthless() {
   entityLayer.addChild(sprite);
 
   const glint = new PIXI.Graphics();
-  glint.lineStyle(2, 0xfff5af, 0.88);
   glint.moveTo(-8, 0);
   glint.lineTo(8, 0);
   glint.moveTo(0, -8);
-  glint.lineTo(0, 8);
+  glint.lineTo(0, 8).stroke({ width: 2, color: 0xfff5af, alpha: 0.88 });
   glint.zIndex = 53;
   glint.position.set(2580, 258);
   glint.visible = false;
@@ -15774,10 +15612,7 @@ function vectorStar(radius = 16, color = 0xffe96a, alpha = 1) {
     const r = index % 2 === 0 ? radius : radius * 0.43;
     points.push(Math.cos(angle) * r, Math.sin(angle) * r);
   }
-  star.beginFill(color, alpha);
-  star.lineStyle(Math.max(1, radius * 0.08), 0xfff8c5, alpha * 0.9);
-  star.drawPolygon(points);
-  star.endFill();
+  star.poly(points).fill({ color: color, alpha: alpha }).stroke({ width: Math.max(1, radius * 0.08), color: 0xfff8c5, alpha: alpha * 0.9 });
   return star;
 }
 
@@ -15816,10 +15651,8 @@ function paintParadiseSky(root, course) {
       (mix((from >> 16) & 0xff, (to >> 16) & 0xff) << 16) |
       (mix((from >> 8) & 0xff, (to >> 8) & 0xff) << 8) |
       mix(from & 0xff, to & 0xff);
-    sky.beginFill(color);
-    sky.drawRect(0, (course.height / bands) * index, course.width, course.height / bands + 2);
+    sky.rect(0, (course.height / bands) * index, course.width, course.height / bands + 2).fill(color);
   }
-  sky.endFill();
   sky.zIndex = -100;
   root.addChild(sky);
 
@@ -15829,13 +15662,9 @@ function paintParadiseSky(root, course) {
     const x = (index * 193 + 71) % course.width;
     const y = (index * 83 + 29) % Math.max(200, course.height * 0.84);
     const size = 0.8 + ((index * 17) % 22) / 10;
-    stars.beginFill(
-      course.id === 'cloud_rings' ? 0xfff4dc : 0xe7f7ff,
-      course.id === 'cloud_rings' ? 0.18 : course.id === 'slip_n_slide' ? 0.34 : 0.28 + (index % 5) * 0.08
-    );
-    stars.drawCircle(x, y, size);
+    stars.circle(x, y, size);
+    stars.fill({ color: course.id === 'cloud_rings' ? 0xfff4dc : 0xe7f7ff, alpha: course.id === 'cloud_rings' ? 0.18 : course.id === 'slip_n_slide' ? 0.34 : 0.28 + (index % 5) * 0.08 });
   }
-  stars.endFill();
   stars.zIndex = -90;
   root.addChild(stars);
   return sky;
@@ -15843,13 +15672,12 @@ function paintParadiseSky(root, course) {
 
 function buildCloudRingsBackground(root, course) {
   const mountains = new PIXI.Graphics();
-  mountains.beginFill(0x5f6f8c, 0.58);
-  mountains.drawPolygon([0, 810, 0, 470, 115, 405, 210, 470, 300, 610, 365, 810]);
-  mountains.drawPolygon([3215, 810, 3300, 600, 3385, 465, 3490, 385, 3600, 450, 3600, 810]);
-  mountains.beginFill(0x3f526f, 0.76);
-  mountains.drawPolygon([0, 850, 0, 600, 90, 530, 185, 620, 250, 850]);
-  mountains.drawPolygon([3370, 850, 3435, 620, 3525, 520, 3600, 580, 3600, 850]);
-  mountains.endFill();
+  mountains.poly([0, 810, 0, 470, 115, 405, 210, 470, 300, 610, 365, 810]);
+  mountains.poly([3215, 810, 3300, 600, 3385, 465, 3490, 385, 3600, 450, 3600, 810]);
+  mountains.fill({ color: 0x5f6f8c, alpha: 0.58 });
+  mountains.poly([0, 850, 0, 600, 90, 530, 185, 620, 250, 850]);
+  mountains.poly([3370, 850, 3435, 620, 3525, 520, 3600, 580, 3600, 850]);
+  mountains.fill({ color: 0x3f526f, alpha: 0.76 });
   mountains.zIndex = -60;
   root.addChild(mountains);
 
@@ -15925,10 +15753,8 @@ function buildStarlitBackground(root, course, points) {
 
   const cloudFloor = new PIXI.Graphics();
   for (let index = 0; index < 15; index += 1) {
-    cloudFloor.beginFill(index % 2 ? 0xb6a7cb : 0xd9d1e2, 0.82);
-    cloudFloor.drawEllipse(index * 115 - 40, 865 - (index % 3) * 16, 135, 58);
+    cloudFloor.ellipse(index * 115 - 40, 865 - (index % 3) * 16, 135, 58).fill({ color: index % 2 ? 0xb6a7cb : 0xd9d1e2, alpha: 0.82 });
   }
-  cloudFloor.endFill();
   cloudFloor.zIndex = -30;
   root.addChild(cloudFloor);
 
@@ -15993,31 +15819,27 @@ function addSlipRecoveredDeco(root, spec) {
 
 function buildSlipBackground(root, course) {
   const moon = new PIXI.Graphics();
-  moon.beginFill(0xffef9a, 0.78);
-  moon.drawCircle(0, 0, 72);
-  moon.beginFill(0x17485b, 1);
-  moon.drawCircle(28, -18, 70);
-  moon.endFill();
+  moon.circle(0, 0, 72).fill({ color: 0xffef9a, alpha: 0.78 });
+  moon.circle(28, -18, 70).fill({ color: 0x17485b, alpha: 1 });
   moon.position.set(2860, 175);
   moon.zIndex = -78;
   root.addChild(moon);
 
   const mountains = new PIXI.Graphics();
-  mountains.beginFill(0x79949a, 0.48);
-  mountains.drawPolygon([
+  mountains.poly([
     0, 690, 0, 520, 170, 405, 285, 555, 430, 350, 610, 540, 795, 365,
     1010, 565, 1200, 410, 1410, 575, 1640, 330, 1860, 555, 2090, 390,
     2290, 580, 2520, 350, 2760, 555, 3010, 390, 3250, 565, 3600, 430,
     3600, 690,
   ]);
-  mountains.beginFill(0xc7d7d9, 0.82);
-  mountains.drawPolygon([
+  mountains.fill({ color: 0x79949a, alpha: 0.48 });
+  mountains.poly([
     0, 700, 0, 570, 185, 440, 285, 555, 430, 383, 610, 550, 795, 405,
     1010, 575, 1200, 450, 1410, 585, 1640, 375, 1860, 565, 2090, 430,
     2290, 590, 2520, 395, 2760, 565, 3010, 430, 3250, 575, 3600, 470,
     3600, 700,
   ]);
-  mountains.endFill();
+  mountains.fill({ color: 0xc7d7d9, alpha: 0.82 });
   mountains.zIndex = -55;
   root.addChild(mountains);
 
@@ -16049,10 +15871,7 @@ function buildSlipBackground(root, course) {
     terrainPoints.push(x, slipTerrainY(x));
   }
   terrainPoints.push(course.width, course.height);
-  terrain.beginFill(0xdce8e9);
-  terrain.lineStyle(5, 0xf6fbfa, 1);
-  terrain.drawPolygon(terrainPoints);
-  terrain.endFill();
+  terrain.poly(terrainPoints).fill(0xdce8e9).stroke({ width: 5, color: 0xf6fbfa, alpha: 1 });
   terrain.zIndex = -10;
   root.addChild(terrain);
 
@@ -16060,9 +15879,7 @@ function buildSlipBackground(root, course) {
   for (let index = 0; index < 90; index += 1) {
     const flake = new PIXI.Graphics();
     const radius = 0.8 + (index % 4) * 0.55;
-    flake.beginFill(0xf8ffff, 0.32 + (index % 5) * 0.1);
-    flake.drawCircle(0, 0, radius);
-    flake.endFill();
+    flake.circle(0, 0, radius).fill({ color: 0xf8ffff, alpha: 0.32 + (index % 5) * 0.1 });
     flake.position.set((index * 167 + 31) % course.width, (index * 79 + 23) % 650);
     flake._speed = 0.18 + (index % 7) * 0.055;
     flake._drift = ((index % 5) - 2) * 0.035;
@@ -16239,9 +16056,7 @@ function spawnParadisePickup(course, point, index) {
     sprite.baseScale = course.id === 'cloud_rings' ? SCALE * 0.9 : SCALE * 0.82;
     sprite.scale.set(sprite.baseScale);
     const glow = new PIXI.Graphics();
-    glow.beginFill(QUOIN_TYPES[quoinType].color, 0.18);
-    glow.drawCircle(0, 0, 23);
-    glow.endFill();
+    glow.circle(0, 0, 23).fill({ color: QUOIN_TYPES[quoinType].color, alpha: 0.18 });
     sprite.addChildAt(glow, 0);
   }
   sprite.position.set(point.x, point.y);
@@ -16270,8 +16085,7 @@ function spawnCloudRing(course, index) {
   root._cloudPhase = index * 1.37;
   const profile = CLOUD_RING_PROFILES[index % CLOUD_RING_PROFILES.length];
   const glow = new PIXI.Graphics();
-  glow.lineStyle(72, profile.tint, 0.18);
-  glow.drawEllipse(0, 0, profile.outerRx - 20, profile.outerRy - 28);
+  glow.ellipse(0, 0, profile.outerRx - 20, profile.outerRy - 28).stroke({ width: 72, color: profile.tint, alpha: 0.18 });
   glow.zIndex = -2;
   root.addChild(glow);
   const puffs = cloudRingPuffLayout(index).map((puff, puffIndex) => {
@@ -16280,22 +16094,17 @@ function spawnCloudRing(course, index) {
     // thumbnail blur or recording artifacts into the remake.
     const sprite = new PIXI.Container();
     const shadow = new PIXI.Graphics();
-    shadow.beginFill(puff.shadowTint, 0.24);
-    shadow.drawEllipse(3, 5, puff.width * 0.5, puff.height * 0.45);
-    shadow.endFill();
+    shadow.ellipse(3, 5, puff.width * 0.5, puff.height * 0.45).fill({ color: puff.shadowTint, alpha: 0.24 });
     sprite.addChild(shadow);
     const body = new PIXI.Graphics();
-    body.beginFill(puff.tint, 0.96);
-    body.drawEllipse(0, 0, puff.width * 0.5, puff.height * 0.38);
-    body.drawEllipse(-puff.width * 0.22, -puff.height * 0.08, puff.width * 0.27, puff.height * 0.35);
-    body.drawEllipse(puff.width * 0.03, -puff.height * 0.19, puff.width * 0.31, puff.height * 0.4);
-    body.drawEllipse(puff.width * 0.27, -puff.height * 0.04, puff.width * 0.25, puff.height * 0.32);
-    body.endFill();
+    body.ellipse(0, 0, puff.width * 0.5, puff.height * 0.38);
+    body.ellipse(-puff.width * 0.22, -puff.height * 0.08, puff.width * 0.27, puff.height * 0.35);
+    body.ellipse(puff.width * 0.03, -puff.height * 0.19, puff.width * 0.31, puff.height * 0.4);
+    body.ellipse(puff.width * 0.27, -puff.height * 0.04, puff.width * 0.25, puff.height * 0.32);
+    body.fill({ color: puff.tint, alpha: 0.96 });
     sprite.addChild(body);
     const highlight = new PIXI.Graphics();
-    highlight.beginFill(0xffffff, 0.14);
-    highlight.drawEllipse(-puff.width * 0.08, -puff.height * 0.22, puff.width * 0.29, puff.height * 0.16);
-    highlight.endFill();
+    highlight.ellipse(-puff.width * 0.08, -puff.height * 0.22, puff.width * 0.29, puff.height * 0.16).fill({ color: 0xffffff, alpha: 0.14 });
     sprite.addChild(highlight);
     sprite.position.set(puff.x, puff.y);
     sprite.rotation = puff.rotation;
@@ -16311,14 +16120,13 @@ function spawnCloudRing(course, index) {
   const sparkle = new PIXI.Graphics();
   for (let dot = 0; dot < 14; dot += 1) {
     const angle = (dot / 14) * Math.PI * 2 + index * 0.4;
-    sparkle.beginFill(0xffffff, 0.3 + (dot % 3) * 0.16);
-    sparkle.drawCircle(
+    sparkle.circle(
       Math.cos(angle) * (profile.outerRx + 8),
       Math.sin(angle) * (profile.outerRy + 10),
       1.4 + (dot % 2)
     );
+    sparkle.fill({ color: 0xffffff, alpha: 0.3 + (dot % 3) * 0.16 });
   }
-  sparkle.endFill();
   sparkle.zIndex = 4;
   root.addChild(sparkle);
   root._cloudPuffs = puffs;
@@ -16344,12 +16152,10 @@ function spawnParadiseExit(course) {
   const glow = new PIXI.Graphics();
   // Reconstructed courses paint their own exit door; keep only a soft glow.
   if (course.art) glow.alpha = 0.35;
-  glow.beginFill(0xbfefff, 0.18);
-  glow.drawEllipse(0, -50, 62, 84);
-  glow.lineStyle(5, 0xf9ffff, 0.94);
-  glow.drawRoundedRect(-42, -120, 84, 112, 39);
-  glow.lineStyle(2, 0x7dadd1, 0.88);
-  glow.drawRoundedRect(-33, -110, 66, 101, 31);
+  glow.setFillStyle({ color: 0xbfefff, alpha: 0.18 });
+  glow.ellipse(0, -50, 62, 84).fill();
+  glow.roundRect(-42, -120, 84, 112, 39).fill().stroke({ width: 5, color: 0xf9ffff, alpha: 0.94 });
+  glow.roundRect(-33, -110, 66, 101, 31).fill().stroke({ width: 2, color: 0x7dadd1, alpha: 0.88 });
   root.addChild(glow);
   const arrow = new PIXI.Text('↓', {
     fontFamily: 'Trebuchet MS, sans-serif',
@@ -17017,9 +16823,7 @@ function paradiseSlidePhysics(dt) {
     Math.floor(time) % 6 === 0
   ) {
     const spray = new PIXI.Graphics();
-    spray.beginFill(0xf7ffff, 0.56);
-    spray.drawCircle(0, 0, 1.8 + (Math.floor(time) % 3));
-    spray.endFill();
+    spray.circle(0, 0, 1.8 + (Math.floor(time) % 3)).fill({ color: 0xf7ffff, alpha: 0.56 });
     spray.position.set(player.x - Math.sign(player.vx || 1) * 20, player.y - 5);
     spray._vx = -player.vx * 0.12;
     spray._vy = -0.2 - Math.abs(player.vx) * 0.03;
@@ -17048,9 +16852,7 @@ function paradiseFlightPhysics(dt) {
   player.pivot.y = Math.sin(time * 0.13) * 1.4;
   if (Math.abs(player.vx) + Math.abs(player.vy) > 2.4 && Math.floor(time) % 7 === 0) {
     const mote = new PIXI.Graphics();
-    mote.beginFill(0xf3fbff, 0.52);
-    mote.drawCircle(0, 0, 1.5 + (Math.floor(time) % 3));
-    mote.endFill();
+    mote.circle(0, 0, 1.5 + (Math.floor(time) % 3)).fill({ color: 0xf3fbff, alpha: 0.52 });
     mote.position.set(player.x - Math.sign(player.vx || 1) * 24, player.y - 35);
     mote._vx = -player.vx * 0.12;
     mote._vy = 0.18;
@@ -17871,18 +17673,17 @@ function drawHomeBackground(styleId, room) {
   );
   const art = new PIXI.Graphics();
   if (room === 'interior') {
-    art.beginFill(colors.wall).drawRect(0, 0, 1500, 620).endFill();
-    art.beginFill(0xf8eac8, 0.28);
-    for (let x = 0; x < 1500; x += 160) art.drawRect(x, 0, 5, 620);
-    art.endFill();
-    art.beginFill(colors.dark).drawRect(0, 620, 1500, 140).endFill();
-    art.beginFill(0xffffff, 0.28).drawEllipse(750, 180, 520, 140).endFill();
+    art.rect(0, 0, 1500, 620).fill(colors.wall);
+    for (let x = 0; x < 1500; x += 160) art.rect(x, 0, 5, 620);
+    art.fill({ color: 0xf8eac8, alpha: 0.28 });
+    art.rect(0, 620, 1500, 140).fill(colors.dark);
+    art.ellipse(750, 180, 520, 140).fill({ color: 0xffffff, alpha: 0.28 });
   } else {
-    art.beginFill(colors.sky).drawRect(0, 0, 1500, 620).endFill();
-    art.beginFill(0xffffff, 0.55).drawEllipse(180, 120, 190, 58).endFill();
-    art.beginFill(0xffffff, 0.38).drawEllipse(1180, 165, 250, 72).endFill();
-    art.beginFill(colors.ground).drawRect(0, 520, 1500, 240).endFill();
-    art.beginFill(colors.dark, 0.7).drawEllipse(760, 600, 1200, 100).endFill();
+    art.rect(0, 0, 1500, 620).fill(colors.sky);
+    art.ellipse(180, 120, 190, 58).fill({ color: 0xffffff, alpha: 0.55 });
+    art.ellipse(1180, 165, 250, 72).fill({ color: 0xffffff, alpha: 0.38 });
+    art.rect(0, 520, 1500, 240).fill(colors.ground);
+    art.ellipse(760, 600, 1200, 100).fill({ color: colors.dark, alpha: 0.7 });
   }
   container.addChild(art);
   if (room !== 'interior') {
@@ -17925,8 +17726,8 @@ function makeHomeReturnSprite() {
   marker.y = GROUND_Y;
   marker.zIndex = 20;
   const pole = new PIXI.Graphics();
-  pole.beginFill(0x70455b).drawRoundedRect(-7, -142, 14, 142, 6).endFill();
-  pole.beginFill(0xf2d76d).drawRoundedRect(-64, -145, 128, 46, 14).endFill();
+  pole.roundRect(-7, -142, 14, 142, 6).fill(0x70455b);
+  pole.roundRect(-64, -145, 128, 46, 14).fill(0xf2d76d);
   marker.addChild(pole);
   const label = new PIXI.Text('Return to Ur', {
     fontFamily: 'Trebuchet MS, sans-serif',
@@ -17988,7 +17789,7 @@ function spawnHomeSceneTargets(room) {
       state: { room: 'interior' },
     });
     const rug = new PIXI.Graphics();
-    rug.beginFill(0x9e5d7b, 0.8).drawEllipse(650, GROUND_Y + 2, 310, 42).endFill();
+    rug.ellipse(650, GROUND_Y + 2, 310, 42).fill({ color: 0x9e5d7b, alpha: 0.8 });
     rug.zIndex = 1;
     entityLayer.addChildAt(rug, 0);
   }
@@ -21078,10 +20879,7 @@ function spawnVendorNpc(placement = null) {
   body.scale.set(0.25);
   g.addChild(body);
   const crest = new PIXI.Graphics();
-  crest.beginFill(activeVendor.color, 0.96);
-  crest.lineStyle(2, 0xfff4cf, 1);
-  crest.drawCircle(35, -84, 13);
-  crest.endFill();
+  crest.circle(35, -84, 13).fill({ color: activeVendor.color, alpha: 0.96 }).stroke({ width: 2, color: 0xfff4cf, alpha: 1 });
   g.addChild(crest);
   const badge = new PIXI.Text(activeVendor.badge, {
     fontFamily: 'Trebuchet MS, sans-serif',
@@ -21198,9 +20996,7 @@ function spawnGarden(opts = {}) {
   bedFoot.y = originY;
   bedFoot.zIndex = 17;
   const footGfx = new PIXI.Graphics();
-  footGfx.beginFill(0xffffff, 0.001);
-  footGfx.drawRect(-bedW / 2, -10, bedW, 12);
-  footGfx.endFill();
+  footGfx.rect(-bedW / 2, -10, bedW, 12).fill({ color: 0xffffff, alpha: 0.001 });
   bedFoot.addChild(footGfx);
   entityLayer.addChild(bedFoot);
 
@@ -21298,11 +21094,10 @@ function drawGardenPlots(target) {
     const seed = plot?.seed ? SEED_CATALOG[plot.seed] : null;
     if (plot?.state === 'seeds') {
       const dots = new PIXI.Graphics();
-      dots.beginFill(0xf5e6a8, 0.95);
-      dots.drawCircle(-5, plantY - 2, 2.2);
-      dots.drawCircle(5, plantY - 1, 2);
-      dots.drawCircle(0, plantY - 5, 1.8);
-      dots.endFill();
+      dots.circle(-5, plantY - 2, 2.2);
+      dots.circle(5, plantY - 1, 2);
+      dots.circle(0, plantY - 5, 1.8);
+      dots.fill({ color: 0xf5e6a8, alpha: 0.95 });
       dots.eventMode = 'none';
       cell.addChild(dots);
     } else if (plot?.state === 'shoots') {
@@ -21332,13 +21127,12 @@ function drawGardenPlots(target) {
     } else if (plot?.state === 'dirty') {
       // Weeds already partly baked into dirty tile; add a few taller blades
       const weeds = new PIXI.Graphics();
-      weeds.beginFill(0x4a5a30, 0.9);
       weeds.moveTo(-7, plantY + 4);
       weeds.lineTo(-3, plantY - 10);
       weeds.lineTo(1, plantY + 4);
       weeds.lineTo(4, plantY - 8);
       weeds.lineTo(8, plantY + 4);
-      weeds.endFill();
+      weeds.fill({ color: 0x4a5a30, alpha: 0.9 });
       weeds.eventMode = 'none';
       cell.addChild(weeds);
     }

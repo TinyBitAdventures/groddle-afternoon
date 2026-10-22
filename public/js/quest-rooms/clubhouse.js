@@ -279,7 +279,7 @@ const SKETCHES = {
     poly(g, [[1, 1], [7, -8]]);
   },
   goat(g) {
-    g.drawRoundedRect(-14, -5, 24, 10, 4);
+    g.roundRect(-14, -5, 24, 10, 4);
     for (const x of [-11, -6, 4, 8]) poly(g, [[x, 5], [x, 18]]);
     poly(g, [[9, -3], [13, -13], [19, -11]]);
     poly(g, [[13, -13], [10, -21]]);
@@ -296,7 +296,7 @@ const SKETCHES = {
     for (const x of [-12, -4, 4, 12]) poly(g, [[x, 13], [x - 3, 20]]);
   },
   cauldron(g) {
-    g.drawEllipse(0, -4, 15, 4);
+    g.ellipse(0, -4, 15, 4);
     poly(g, arcPts(0, -4, 15, 0, 180 * D, 14, 15));
     poly(g, [[-8, 10], [-11, 17]]);
     poly(g, [[8, 10], [11, 17]]);
@@ -306,17 +306,17 @@ const SKETCHES = {
   fish(g) {
     poly(g, [...arcPts(-2, 8, 14, 215 * D, 325 * D, 10), ...arcPts(-2, -8, 14, 35 * D, 145 * D, 10)], true);
     poly(g, [[9, 0], [18, -8], [18, 8]], true);
-    g.drawCircle(-10, -2, 1.5);
+    g.circle(-10, -2, 1.5);
   },
   key(g) {
-    g.drawCircle(-11, 0, 6);
+    g.circle(-11, 0, 6);
     poly(g, [[-5, 0], [17, 0]]);
     poly(g, [[12, 0], [12, 7]]);
     poly(g, [[16, 0], [16, 5]]);
   },
   bird(g) {
-    g.drawEllipse(-1, 3, 11, 7);
-    g.drawCircle(10, -6, 5);
+    g.ellipse(-1, 3, 11, 7);
+    g.circle(10, -6, 5);
     poly(g, [[15, -7], [20, -5], [15, -4]]);
     poly(g, [[-11, 2], [-19, -4]]);
     poly(g, [[-3, 10], [-3, 17]]);
@@ -326,13 +326,13 @@ const SKETCHES = {
   mushroom(g) {
     poly(g, [...arcPts(0, 0, 16, 180 * D, 360 * D, 14, 13), [-16, 0]], true);
     poly(g, [[-4, 0], [-5, 17], [5, 17], [4, 0]]);
-    g.drawCircle(-6, -6, 2);
-    g.drawCircle(5, -8, 2);
+    g.circle(-6, -6, 2);
+    g.circle(5, -8, 2);
   },
   house(g) {
-    g.drawRect(-12, -3, 24, 20);
+    g.rect(-12, -3, 24, 20);
     poly(g, [[-16, -3], [0, -17], [16, -3]]);
-    g.drawRect(-3, 7, 6, 10);
+    g.rect(-3, 7, 6, 10);
   },
   boot(g) {
     poly(g, [[-8, -17], [4, -17], [4, 2], [14, 6], [16, 11], [16, 17], [-10, 17], [-10, 9], [-8, 6]], true);
@@ -343,9 +343,9 @@ const SKETCHES = {
     poly(g, [[0, 12], [7, 8]]);
     for (let i = 0; i < 5; i++) {
       const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
-      g.drawCircle(Math.cos(a) * 7, -8 + Math.sin(a) * 7, 4);
+      g.circle(Math.cos(a) * 7, -8 + Math.sin(a) * 7, 4);
     }
-    g.drawCircle(0, -8, 2.5);
+    g.circle(0, -8, 2.5);
   },
   snail(g) {
     const pts = [];
@@ -368,7 +368,7 @@ const SKETCHES = {
   lantern(g) {
     poly(g, [[0, -21], [0, -15]]);
     poly(g, [[-9, -9], [-5, -15], [5, -15], [9, -9]], true);
-    g.drawRect(-7, -9, 14, 18);
+    g.rect(-7, -9, 14, 18);
     poly(g, [[0, -9], [0, 9]]);
     poly(g, [[-7, 0], [7, 0]]);
     poly(g, [[-9, 9], [9, 9]]);
@@ -397,10 +397,10 @@ export function drawSketch(PIXI, g, id, { lit = false, scale = 1 } = {}) {
     ? [{ width: 7, color: 0xfff1b8, alpha: 0.35 }, { width: 3, color: 0xffffff, alpha: 1 }]
     : [{ width: 2.6, color: 0x4a2d14, alpha: 0.88 }];
   for (const pass of passes) {
-    g.lineStyle({ ...pass, width: pass.width / scale, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND });
+    g.setStrokeStyle({ ...pass, width: pass.width / scale, cap: 'round', join: 'round' });
     fn(g);
+    g.stroke();
   }
-  g.lineStyle(0);
   g.scale.set(scale);
   return g;
 }
@@ -409,24 +409,15 @@ export function drawSketch(PIXI, g, id, { lit = false, scale = 1 } = {}) {
 function plaque(PIXI, sketch, { w = 74, h = 56, lit = false, tilt = 0 } = {}) {
   const c = new PIXI.Container();
   const b = new PIXI.Graphics();
-  b.beginFill(0x2e2116, 0.35);
-  b.drawRoundedRect(-w / 2 + 3, -h / 2 + 4, w, h, 4);
-  b.endFill();
-  b.beginFill(0x5b3a1f);
-  b.drawRoundedRect(-w / 2, -h / 2, w, h, 4);
-  b.endFill();
-  b.beginFill(lit ? 0x6e5236 : 0xc9a06a);
-  b.drawRect(-w / 2 + 6, -h / 2 + 6, w - 12, h - 12);
-  b.endFill();
-  b.lineStyle(1, lit ? 0x5b432b : 0xae8350, 0.6);
+  b.roundRect(-w / 2 + 3, -h / 2 + 4, w, h, 4).fill({ color: 0x2e2116, alpha: 0.35 });
+  b.roundRect(-w / 2, -h / 2, w, h, 4).fill(0x5b3a1f);
+  b.rect(-w / 2 + 6, -h / 2 + 6, w - 12, h - 12).fill(lit ? 0x6e5236 : 0xc9a06a);
   for (let y = -h / 2 + 12; y < h / 2 - 6; y += 9) {
     b.moveTo(-w / 2 + 8, y);
     b.lineTo(w / 2 - 8, y + 1);
   }
-  b.lineStyle(0);
-  b.beginFill(0xa9adb2);
-  b.drawCircle(0, -h / 2 - 1, 3);
-  b.endFill();
+  b.stroke({ width: 1, color: lit ? 0x5b432b : 0xae8350, alpha: 0.6 });
+  b.circle(0, -h / 2 - 1, 3).fill(0xa9adb2);
   c.addChild(b);
   const s = new PIXI.Graphics();
   drawSketch(PIXI, s, sketch, { lit, scale: 0.95 });
@@ -444,82 +435,55 @@ function plaque(PIXI, sketch, { w = 74, h = 56, lit = false, tilt = 0 } = {}) {
 const WOOD = { wall: 0x8a6440, plank: 0x6b4a2b, light: 0xa77d50, post: 0x5d3f24, roof: 0x7a5a38, moss: 0x6f8f3a, dark: 0x22303b };
 
 function drawDeck(g, x1, x2, y, depth = 16) {
-  g.beginFill(0x3d2a18, 0.35);
-  g.drawRect(x1 + 4, y + 4, x2 - x1, depth);
-  g.endFill();
-  g.beginFill(WOOD.plank);
-  g.drawRect(x1, y, x2 - x1, depth);
-  g.endFill();
-  g.beginFill(WOOD.light);
-  g.drawRect(x1, y - 2, x2 - x1, 6);
-  g.endFill();
-  g.lineStyle(1, 0x4a321c, 0.7);
+  g.rect(x1 + 4, y + 4, x2 - x1, depth).fill({ color: 0x3d2a18, alpha: 0.35 });
+  g.rect(x1, y, x2 - x1, depth).fill(WOOD.plank);
+  g.rect(x1, y - 2, x2 - x1, 6).fill(WOOD.light);
   for (let x = x1 + 30; x < x2; x += 46) {
     g.moveTo(x, y + 4);
     g.lineTo(x, y + depth);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 1, color: 0x4a321c, alpha: 0.7 });
   // Diagonal struts under the deck.
-  g.lineStyle(7, WOOD.post, 1);
   for (const x of [x1 + 30, x2 - 30]) {
     if (x2 - x1 < 120) break;
     g.moveTo(x, y + depth);
     g.lineTo(x + (x < (x1 + x2) / 2 ? 46 : -46), y + depth + 70);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 7, color: WOOD.post, alpha: 1 });
 }
 
 function drawHut(g, x1, x2, y, h, { window: win = true } = {}) {
   // Back wall of vertical planks.
-  g.beginFill(WOOD.wall);
-  g.drawRect(x1, y - h, x2 - x1, h);
-  g.endFill();
+  g.rect(x1, y - h, x2 - x1, h).fill(WOOD.wall);
   for (let x = x1; x < x2; x += 22) {
-    g.beginFill(x % 44 === 0 ? 0x94704a : 0x80603e);
-    g.drawRect(x + 1, y - h, 20, h);
-    g.endFill();
-    g.beginFill(0x5d4129, 0.7);
-    g.drawRect(x + 20, y - h, 2, h);
-    g.endFill();
+    g.rect(x + 1, y - h, 20, h).fill(x % 44 === 0 ? 0x94704a : 0x80603e);
+    g.rect(x + 20, y - h, 2, h).fill({ color: 0x5d4129, alpha: 0.7 });
   }
   if (win) {
     const wx = x1 + (x2 - x1) * 0.28;
-    g.beginFill(WOOD.dark, 0.9);
-    g.drawRect(wx, y - h + 34, (x2 - x1) * 0.44, 62);
-    g.endFill();
-    g.lineStyle(5, WOOD.post, 1);
-    g.drawRect(wx, y - h + 34, (x2 - x1) * 0.44, 62);
-    g.lineStyle(0);
+    g.rect(wx, y - h + 34, (x2 - x1) * 0.44, 62).fill({ color: WOOD.dark, alpha: 0.9 });
+    g.rect(wx, y - h + 34, (x2 - x1) * 0.44, 62).stroke({ width: 5, color: WOOD.post, alpha: 1 });
   }
   // Corner posts and a mossy roof board.
-  g.beginFill(WOOD.post);
-  g.drawRect(x1 - 8, y - h - 14, 12, h + 14);
-  g.drawRect(x2 - 4, y - h - 14, 12, h + 14);
-  g.endFill();
-  g.beginFill(WOOD.roof);
+  g.rect(x1 - 8, y - h - 14, 12, h + 14);
+  g.rect(x2 - 4, y - h - 14, 12, h + 14);
+  g.fill(WOOD.post);
   g.moveTo(x1 - 26, y - h - 8);
   g.lineTo(x2 + 26, y - h - 20);
   g.lineTo(x2 + 26, y - h - 6);
   g.lineTo(x1 - 26, y - h + 6);
   g.closePath();
-  g.endFill();
-  g.beginFill(WOOD.moss, 0.9);
-  g.drawEllipse(x1 + (x2 - x1) * 0.35, y - h - 12, (x2 - x1) * 0.28, 6);
-  g.endFill();
+  g.fill(WOOD.roof);
+  g.ellipse(x1 + (x2 - x1) * 0.35, y - h - 12, (x2 - x1) * 0.28, 6).fill({ color: WOOD.moss, alpha: 0.9 });
 }
 
 function drawRungs(g, l) {
   for (let y = l.yBot - 18; y > l.yTop - 4; y -= 26) {
-    g.beginFill(0x3e2a17, 0.4);
-    g.drawRect(l.x - 22, y + 3, 44, 7);
-    g.endFill();
-    g.beginFill(0xb38652);
-    g.drawRoundedRect(l.x - 22, y, 44, 7, 2);
-    g.endFill();
-    g.beginFill(0x8f8f8f);
-    g.drawCircle(l.x - 17, y + 3.5, 1.5);
-    g.drawCircle(l.x + 17, y + 3.5, 1.5);
-    g.endFill();
+    g.rect(l.x - 22, y + 3, 44, 7).fill({ color: 0x3e2a17, alpha: 0.4 });
+    g.roundRect(l.x - 22, y, 44, 7, 2).fill(0xb38652);
+    g.circle(l.x - 17, y + 3.5, 1.5);
+    g.circle(l.x + 17, y + 3.5, 1.5);
+    g.fill(0x8f8f8f);
   }
 }
 
@@ -545,18 +509,12 @@ function buildClub(ctx) {
   const world = root.layer(1, 3);
   const g = new PIXI.Graphics();
   // The dusk field and its plank fence.
-  g.beginFill(0x9a7d43);
-  g.drawRect(0, FLOOR - 130, CLUB_W, 140);
-  g.endFill();
+  g.rect(0, FLOOR - 130, CLUB_W, 140).fill(0x9a7d43);
   world.addChild(g);
   for (let x = 0; x < CLUB_W + 200; x += 160) world.addChild(kit.deco(PIXI, 'fence_wood_1', x, FLOOR - 66, { scale: 0.62, sy: 0.3, tint: 0x8a7a60 }));
   const ground = new PIXI.Graphics();
-  ground.beginFill(0xc9a55a);
-  ground.drawRect(0, FLOOR - 70, CLUB_W, CLUB_H - FLOOR + 70);
-  ground.endFill();
-  ground.beginFill(0xb48f45);
-  ground.drawRect(0, FLOOR + 6, CLUB_W, CLUB_H - FLOOR);
-  ground.endFill();
+  ground.rect(0, FLOOR - 70, CLUB_W, CLUB_H - FLOOR + 70).fill(0xc9a55a);
+  ground.rect(0, FLOOR + 6, CLUB_W, CLUB_H - FLOOR).fill(0xb48f45);
   world.addChild(ground);
   for (let i = 0; i < 12; i++) world.addChild(kit.deco(PIXI, 'bling_mushroom_bunch_ground_1', 240 + i * 310, FLOOR + 6, { scale: 0.35, alpha: 0.85 }));
 
@@ -575,30 +533,16 @@ function buildClub(ctx) {
   // The clubhouse: a long front wall, the door, the interior and a mushroom roof.
   const cy = DECKS.club.y;
   drawHut(huts, CLUBHOUSE.wallX1, CLUBHOUSE.wallX2, cy, 200, { window: false });
-  huts.beginFill(0x2a1f16);
-  huts.drawRect(CLUBHOUSE.wallX2, cy - CLUBHOUSE.door.h - 10, CLUBHOUSE.door.x2 - CLUBHOUSE.wallX2, CLUBHOUSE.door.h + 10);
-  huts.endFill();
-  huts.beginFill(0x5e4630);
-  huts.drawRect(CLUBHOUSE.door.x2, cy - 214, DECKS.club.x2 - CLUBHOUSE.door.x2 - 10, 214);
-  huts.endFill();
+  huts.rect(CLUBHOUSE.wallX2, cy - CLUBHOUSE.door.h - 10, CLUBHOUSE.door.x2 - CLUBHOUSE.wallX2, CLUBHOUSE.door.h + 10).fill(0x2a1f16);
+  huts.rect(CLUBHOUSE.door.x2, cy - 214, DECKS.club.x2 - CLUBHOUSE.door.x2 - 10, 214).fill(0x5e4630);
   // The jars hut's shelf.
-  huts.beginFill(WOOD.post);
-  huts.drawRect(1325, DECKS.jars.y - 94, 190, 7);
-  huts.endFill();
+  huts.rect(1325, DECKS.jars.y - 94, 190, 7).fill(WOOD.post);
   for (let x = CLUBHOUSE.door.x2; x < DECKS.club.x2 - 10; x += 30) {
-    huts.beginFill(0x4c3826, 0.8);
-    huts.drawRect(x, cy - 214, 3, 214);
-    huts.endFill();
+    huts.rect(x, cy - 214, 3, 214).fill({ color: 0x4c3826, alpha: 0.8 });
   }
-  huts.beginFill(0x6e5238);
-  huts.drawRect(CLUBHOUSE.door.x2 - 4, cy - CLUBHOUSE.roofUp, DECKS.club.x2 - CLUBHOUSE.door.x2 - 2, 22);
-  huts.endFill();
-  huts.beginFill(WOOD.roof);
-  huts.drawRect(CLUBHOUSE.wallX1 - 30, cy - CLUBHOUSE.roofUp - 12, DECKS.club.x2 - CLUBHOUSE.wallX1 + 50, 18);
-  huts.endFill();
-  huts.beginFill(WOOD.moss, 0.95);
-  huts.drawRoundedRect(CLUBHOUSE.wallX1 - 20, cy - CLUBHOUSE.roofUp - 22, 440, 14, 7);
-  huts.endFill();
+  huts.rect(CLUBHOUSE.door.x2 - 4, cy - CLUBHOUSE.roofUp, DECKS.club.x2 - CLUBHOUSE.door.x2 - 2, 22).fill(0x6e5238);
+  huts.rect(CLUBHOUSE.wallX1 - 30, cy - CLUBHOUSE.roofUp - 12, DECKS.club.x2 - CLUBHOUSE.wallX1 + 50, 18).fill(WOOD.roof);
+  huts.roundRect(CLUBHOUSE.wallX1 - 20, cy - CLUBHOUSE.roofUp - 22, 440, 14, 7).fill({ color: WOOD.moss, alpha: 0.95 });
   world.addChild(huts);
   for (let i = 0; i < 9; i++) {
     const x = CLUBHOUSE.wallX1 + 10 + i * 48 + (i % 2) * 9;
@@ -692,25 +636,16 @@ function buildClub(ctx) {
 
 function drawPad(g, p, floor) {
   // A tall stalk and a shallow lily pad with a lighter rim, its top on the walk line.
-  g.beginFill(0x1d4a44);
   g.moveTo(p.x - 7, floor + 4);
   g.quadraticCurveTo(p.x - 14, (floor + p.y) / 2, p.x - 5, p.y + 10);
   g.lineTo(p.x + 5, p.y + 10);
   g.quadraticCurveTo(p.x - 2, (floor + p.y) / 2, p.x + 8, floor + 4);
   g.closePath();
-  g.endFill();
-  g.beginFill(0x133632, 0.6);
-  g.drawEllipse(p.x, p.y + 12, p.half + 6, 10);
-  g.endFill();
-  g.beginFill(0x3f8f80);
-  g.drawEllipse(p.x, p.y + 4, p.half + 8, 11);
-  g.endFill();
-  g.beginFill(0x67b5a2);
-  g.drawEllipse(p.x, p.y + 1, p.half + 2, 7);
-  g.endFill();
-  g.lineStyle(2, 0x9fdcc8, 0.55);
-  g.drawEllipse(p.x, p.y + 1, p.half * 0.55, 3.5);
-  g.lineStyle(0);
+  g.fill(0x1d4a44);
+  g.ellipse(p.x, p.y + 12, p.half + 6, 10).fill({ color: 0x133632, alpha: 0.6 });
+  g.ellipse(p.x, p.y + 4, p.half + 8, 11).fill(0x3f8f80);
+  g.ellipse(p.x, p.y + 1, p.half + 2, 7).fill(0x67b5a2);
+  g.ellipse(p.x, p.y + 1, p.half * 0.55, 3.5).stroke({ width: 2, color: 0x9fdcc8, alpha: 0.55 });
 }
 
 function buildProsa(ctx) {
@@ -728,12 +663,8 @@ function buildProsa(ctx) {
   for (let i = 0; i < 6; i++) mid.addChild(kit.deco(PIXI, 'tree_group_bg_2_maytang', 380 + i * 600, 910, { scale: 0.62, tint: 0x8c4f5f }));
   const world = root.layer(1, 3);
   const g = new PIXI.Graphics();
-  g.beginFill(0x1f5a4c);
-  g.drawRect(0, PROSA_FLOOR - 40, PROSA_W, PROSA_H);
-  g.endFill();
-  g.beginFill(0x2a6d5c);
-  g.drawRect(0, PROSA_FLOOR - 40, PROSA_W, 14);
-  g.endFill();
+  g.rect(0, PROSA_FLOOR - 40, PROSA_W, PROSA_H).fill(0x1f5a4c);
+  g.rect(0, PROSA_FLOOR - 40, PROSA_W, 14).fill(0x2a6d5c);
   world.addChild(g);
   for (let i = 0; i < 22; i++) {
     const x = 90 + i * 150 + (i % 3) * 30;
@@ -752,9 +683,8 @@ function buildProsa(ctx) {
   for (let i = 0; i < 70; i++) {
     const m = new PIXI.Graphics();
     const r = 2 + kit.hash01(`m${i}`) * 4.5;
-    m.beginFill(0xf4efe6, 0.45 + kit.hash01(`a${i}`) * 0.4);
-    m.drawCircle(0, 0, r);
-    m.endFill();
+    m.setFillStyle({ color: 0xf4efe6, alpha: 0.45 + kit.hash01(`a${i}`) * 0.4 });
+    m.circle(0, 0, r).fill();
     m.x = kit.hash01(`x${i}`) * PROSA_W;
     m.y = 300 + kit.hash01(`y${i}`) * 760;
     motes.addChild(m);
@@ -870,21 +800,14 @@ function enterClub(ctx) {
     .map((b) => makeButton(ctx, b, cy - CLUBHOUSE.buttonUp));
   // The door: shut until the frames are right.
   const door = new PIXI.Graphics();
-  door.beginFill(0x4a321c);
-  door.drawRoundedRect(-20, -CLUBHOUSE.door.h, 40, CLUBHOUSE.door.h, 16);
-  door.endFill();
-  door.beginFill(0x7b5532);
-  door.drawRoundedRect(-16, -CLUBHOUSE.door.h + 4, 32, CLUBHOUSE.door.h - 4, 13);
-  door.endFill();
-  door.lineStyle(2, 0x5b3c22, 0.9);
+  door.roundRect(-20, -CLUBHOUSE.door.h, 40, CLUBHOUSE.door.h, 16).fill(0x4a321c);
+  door.roundRect(-16, -CLUBHOUSE.door.h + 4, 32, CLUBHOUSE.door.h - 4, 13).fill(0x7b5532);
   for (const x of [-6, 4]) {
     door.moveTo(x, -CLUBHOUSE.door.h + 10);
     door.lineTo(x, -2);
   }
-  door.lineStyle(0);
-  door.beginFill(0xd8b25a);
-  door.drawCircle(9, -CLUBHOUSE.door.h / 2, 3);
-  door.endFill();
+  door.stroke({ width: 2, color: 0x5b3c22, alpha: 0.9 });
+  door.circle(9, -CLUBHOUSE.door.h / 2, 3).fill(0xd8b25a);
   door.x = CLUBHOUSE.door.x;
   door.y = cy;
   ctx.data.door = ctx.add(door, 3);
@@ -908,9 +831,7 @@ function makeButton(ctx, b, y) {
   const { PIXI } = ctx;
   const c = new PIXI.Container();
   const plate = new PIXI.Graphics();
-  plate.beginFill(0x3a2716, 0.5);
-  plate.drawCircle(0, 0, 17);
-  plate.endFill();
+  plate.circle(0, 0, 17).fill({ color: 0x3a2716, alpha: 0.5 });
   c.addChild(plate);
   const out = PIXI.Sprite.from(`${ART}wall_button_lockOut.png`);
   const inn = PIXI.Sprite.from(`${ART}wall_button_lockIn.png`);
@@ -1009,15 +930,9 @@ function enterProsa(ctx) {
   const { PIXI, kit } = ctx;
   const c = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0x4b3424);
-  g.drawRect(-5, -150, 10, 150);
-  g.endFill();
-  g.beginFill(0x7c5a3a);
-  g.drawRoundedRect(-34, -150, 68, 30, 5);
-  g.endFill();
-  g.lineStyle(2, 0x4b3424, 1);
-  g.drawRoundedRect(-34, -150, 68, 30, 5);
-  g.lineStyle(0);
+  g.rect(-5, -150, 10, 150).fill(0x4b3424);
+  g.roundRect(-34, -150, 68, 30, 5).fill(0x7c5a3a);
+  g.roundRect(-34, -150, 68, 30, 5).stroke({ width: 2, color: 0x4b3424, alpha: 1 });
   c.addChild(g);
   c.addChild(kit.label(PIXI, 'Exit', 0, -135, { size: 17, fill: 0xf6ead2, font: 'Georgia, serif' }));
   c.x = SIGNPOST.x;

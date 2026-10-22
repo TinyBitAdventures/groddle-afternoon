@@ -129,11 +129,8 @@ function buildSignpostSprite(PIXI, signpost, pos) {
     postH = post.height || 200;
   } else {
     const post = new PIXI.Graphics();
-    post.beginFill(0x5a3a22);
-    post.drawRoundedRect(-8, -200, 16, 200, 3);
-    post.beginFill(0x6b4423);
-    post.drawRoundedRect(-10, -12, 20, 14, 3);
-    post.endFill();
+    post.roundRect(-8, -200, 16, 200, 3).fill(0x5a3a22);
+    post.roundRect(-10, -12, 20, 14, 3).fill(0x6b4423);
     post.name = 'sign-post';
     holder.addChild(post);
     postH = 200;
@@ -188,9 +185,7 @@ function buildSignpostSprite(PIXI, signpost, pos) {
       // blur 15). A tint would only darken the brown arm, so this is a blurred
       // solid shape behind it.
       glow = new PIXI.Graphics();
-      glow.beginFill(SIGN_GLOW_COLOUR, 1);
-      glow.drawRoundedRect(leftSide ? -fitW : 0, -armH / 2, fitW, armH, 4);
-      glow.endFill();
+      glow.roundRect(leftSide ? -fitW : 0, -armH / 2, fitW, armH, 4).fill({ color: SIGN_GLOW_COLOUR, alpha: 1 });
       glow.filters = [new PIXI.BlurFilter(7, 3)];
       glow.visible = false;
       glow.name = 'sign-glow';
@@ -201,10 +196,7 @@ function buildSignpostSprite(PIXI, signpost, pos) {
       armHolder.addChild(arm);
     } else {
       const arm = new PIXI.Graphics();
-      arm.beginFill(0xd4b896);
-      arm.lineStyle(1, 0x8a6a40, 0.8);
-      arm.drawRoundedRect(leftSide ? -fitW : 0, -12, fitW, 24, 3);
-      arm.endFill();
+      arm.roundRect(leftSide ? -fitW : 0, -12, fitW, 24, 3).fill(0xd4b896).stroke({ width: 1, color: 0x8a6a40, alpha: 0.8 });
       arm.name = 'sign-arm';
       armSprite = arm;
       armHolder.addChild(arm);
@@ -594,9 +586,7 @@ function makePlaceholder(PIXI, deco, pos) {
   const g = new PIXI.Graphics();
   const w = deco.w || 48;
   const h = deco.h || 32;
-  g.beginFill(PLACEHOLDER, 0.45);
-  g.drawRoundedRect(-w / 2, -h, w, h, 3);
-  g.endFill();
+  g.roundRect(-w / 2, -h, w, h, 3).fill({ color: PLACEHOLDER, alpha: 0.45 });
   g.x = pos.x;
   g.y = pos.y;
   g.zIndex = deco.z || 0;
@@ -665,9 +655,7 @@ function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallbac
     const colour = n
       ? (Math.round(r / n) << 16) | (Math.round(g / n) << 8) | Math.round(b / n)
       : fallback;
-    fill.beginFill(colour);
-    fill.drawRect(0, sourceH - 1, W, depth + 1);
-    fill.endFill();
+    fill.rect(0, sourceH - 1, W, depth + 1).fill(colour);
     const fade = new PIXI.Sprite(fadeTexture(PIXI, colour));
     fade.x = 0;
     fade.y = sourceH - 1;
@@ -675,9 +663,7 @@ function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallbac
     fade.height = Math.min(depth + 1, 36);
     strip.addChild(fade);
     const solid = new PIXI.Graphics();
-    solid.beginFill(colour);
-    solid.drawRect(0, sourceH + 35, W, Math.max(0, depth - 35));
-    solid.endFill();
+    solid.rect(0, sourceH + 35, W, Math.max(0, depth - 35)).fill(colour);
     strip.addChild(solid);
     root.addChild(strip);
     root.groundSkirt = { depth, colour };
@@ -753,13 +739,9 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const themeTop = 0x8eb8d8;
   const themeMid = 0xb5d4a0;
   const themeBot = 0x6b8f3c;
-  sky.beginFill(themeTop);
-  sky.drawRect(0, 0, W, sourceH * 0.45);
-  sky.beginFill(themeMid);
-  sky.drawRect(0, sourceH * 0.4, W, sourceH * 0.35);
-  sky.beginFill(themeBot);
-  sky.drawRect(0, sourceH * 0.7, W, Math.max(sourceH * 0.35, H - sourceH * 0.7));
-  sky.endFill();
+  sky.rect(0, 0, W, sourceH * 0.45).fill(themeTop);
+  sky.rect(0, sourceH * 0.4, W, sourceH * 0.35).fill(themeMid);
+  sky.rect(0, sourceH * 0.7, W, Math.max(sourceH * 0.35, H - sourceH * 0.7)).fill(themeBot);
   sky.zIndex = -1000;
   if (!skyView) root.addChild(sky);
 
@@ -769,9 +751,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
     const x = 80 + i * (W / 18);
     const y = 40 + (i * 41) % 90;
     const r = 50 + (i * 17) % 40;
-    clouds.beginFill(0xffffff, 0.55);
-    clouds.drawEllipse(x, y, r, r * 0.45);
-    clouds.endFill();
+    clouds.ellipse(x, y, r, r * 0.45).fill({ color: 0xffffff, alpha: 0.55 });
   }
   clouds.zIndex = -900;
   if (!skyView) root.addChild(clouds);
@@ -876,9 +856,9 @@ export function buildStreetView(street, PIXI, opts = {}) {
     const platG = new PIXI.Graphics();
     platG.zIndex = 5000;
     for (const p of plats) {
-      platG.lineStyle(2, 0x3d2a14, 0.35);
       platG.moveTo(p.x1, p.y1);
       platG.lineTo(p.x2, p.y2);
+      platG.stroke({ width: 2, color: 0x3d2a14, alpha: 0.35 });
     }
     root.addChild(platG);
   }

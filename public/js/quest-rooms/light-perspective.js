@@ -373,35 +373,23 @@ function coneTex(PIXI) {
 
 function drawSlab(g, s) {
   const depth = s.thin ? 26 : 42;
-  g.beginFill(0x1f1e24);
-  g.drawRect(s.x1, s.y, s.x2 - s.x1, depth);
-  g.endFill();
-  g.beginFill(0x2c2b33);
-  g.drawRect(s.x1, s.y, s.x2 - s.x1, depth - 8);
-  g.endFill();
+  g.rect(s.x1, s.y, s.x2 - s.x1, depth).fill(0x1f1e24);
+  g.rect(s.x1, s.y, s.x2 - s.x1, depth - 8).fill(0x2c2b33);
   // Rough top edge and a few chips.
-  g.lineStyle(3, 0x56545e, 1);
   g.moveTo(s.x1, s.y + 1);
   g.lineTo(s.x2, s.y + 1);
-  g.lineStyle(0);
+  g.stroke({ width: 3, color: 0x56545e, alpha: 1 });
   for (let x = s.x1 + 30; x < s.x2 - 20; x += 70) {
-    g.beginFill(0x24232a);
-    g.drawRect(x, s.y + 12 + ((x / 70) % 2) * 8, 26, 4);
-    g.endFill();
+    g.rect(x, s.y + 12 + ((x / 70) % 2) * 8, 26, 4).fill(0x24232a);
   }
   if (s.pillar) {
-    g.beginFill(0x232229);
-    g.drawRect(s.x1, s.y + depth - 2, 60, LOW - s.y - depth + 2);
-    g.endFill();
-    g.lineStyle(2, 0x34333b, 1);
+    g.rect(s.x1, s.y + depth - 2, 60, LOW - s.y - depth + 2).fill(0x232229);
     g.moveTo(s.x1 + 58, s.y + depth);
     g.lineTo(s.x1 + 58, LOW);
-    g.lineStyle(0);
+    g.stroke({ width: 2, color: 0x34333b, alpha: 1 });
   }
   if (s.step) {
-    g.beginFill(0x2c2b33);
-    g.drawRect(s.x1, s.y, s.x2 - s.x1, s.step - s.y + depth - 8);
-    g.endFill();
+    g.rect(s.x1, s.y, s.x2 - s.x1, s.step - s.y + depth - 8).fill(0x2c2b33);
   }
 }
 
@@ -410,20 +398,13 @@ function drawCloud(PIXI, c) {
   const w = c.x2 - c.x1;
   const g = new PIXI.Graphics();
   // Soft glow under the cloud.
-  g.beginFill(col.hex, 0.18);
-  g.drawEllipse(0, 6, w / 2 + 18, 22);
-  g.endFill();
+  g.ellipse(0, 6, w / 2 + 18, 22).fill({ color: col.hex, alpha: 0.18 });
   // Lumpy underside, then a flat bright top.
-  g.beginFill(col.dim);
-  g.drawEllipse(0, 9, w / 2, 12);
-  for (let i = 0; i < 4; i++) g.drawCircle(-w * 0.3 + i * w * 0.2, 12 + (i % 2) * 2, w * 0.085);
-  g.endFill();
-  g.beginFill(col.hex);
-  g.drawEllipse(0, 2, w / 2 + 2, 8);
-  g.endFill();
-  g.beginFill(0xffffff, 0.28);
-  g.drawEllipse(-w * 0.12, 0, w * 0.26, 3);
-  g.endFill();
+  g.ellipse(0, 9, w / 2, 12);
+  for (let i = 0; i < 4; i++) g.circle(-w * 0.3 + i * w * 0.2, 12 + (i % 2) * 2, w * 0.085);
+  g.fill(col.dim);
+  g.ellipse(0, 2, w / 2 + 2, 8).fill(col.hex);
+  g.ellipse(-w * 0.12, 0, w * 0.26, 3).fill({ color: 0xffffff, alpha: 0.28 });
   g.x = (c.x1 + c.x2) / 2;
   g.y = c.y;
   return g;
@@ -433,13 +414,9 @@ function drawWall(PIXI, w) {
   const g = new PIXI.Graphics();
   const h = w.yBot - w.yTop;
   const width = w.x2 - w.x1;
-  g.beginFill(LIGHT_COLORS.red.hex, 0.16);
-  g.drawRoundedRect(-width, 0, width * 2, h, width);
-  g.endFill();
+  g.roundRect(-width, 0, width * 2, h, width).fill({ color: LIGHT_COLORS.red.hex, alpha: 0.16 });
   for (let y = 0, i = 0; y < h; y += 30, i++) {
-    g.beginFill(i % 2 ? 0xf0786b : 0xc9473d, 0.95);
-    g.drawRect(-width / 2 + 3, y, width - 6, Math.min(30, h - y));
-    g.endFill();
+    g.rect(-width / 2 + 3, y, width - 6, Math.min(30, h - y)).fill({ color: i % 2 ? 0xf0786b : 0xc9473d, alpha: 0.95 });
   }
   g.x = (w.x1 + w.x2) / 2;
   g.y = w.yTop;
@@ -448,16 +425,11 @@ function drawWall(PIXI, w) {
 
 function drawDish(PIXI, x, y) {
   const g = new PIXI.Graphics();
-  g.lineStyle(2, 0x111114, 1);
   g.moveTo(0, -y);
   g.lineTo(0, -12);
-  g.lineStyle(0);
-  g.beginFill(0x8a8a90);
-  g.drawEllipse(0, -6, 26, 8);
-  g.endFill();
-  g.beginFill(0x5c5c63);
-  g.drawEllipse(0, -2, 22, 5);
-  g.endFill();
+  g.stroke({ width: 2, color: 0x111114, alpha: 1 });
+  g.ellipse(0, -6, 26, 8).fill(0x8a8a90);
+  g.ellipse(0, -2, 22, 5).fill(0x5c5c63);
   g.x = x;
   g.y = y;
   return g;
@@ -477,9 +449,7 @@ function drawSign(PIXI, kit, s) {
   if (s.dots) {
     const d = new PIXI.Graphics();
     for (let i = 0; i < 3; i++) {
-      d.beginFill(0xf4f1ea, 0.8);
-      d.drawCircle(s.x, s.y + 40 + i * 30, 2.5);
-      d.endFill();
+      d.circle(s.x, s.y + 40 + i * 30, 2.5).fill({ color: 0xf4f1ea, alpha: 0.8 });
     }
     c.addChild(d);
   }
@@ -491,29 +461,20 @@ function bulbSprite(PIXI, color) {
   const c = new PIXI.Container();
   const col = LIGHT_COLORS[color];
   const glow = new PIXI.Graphics();
-  glow.beginFill(col.hex, 0.35);
-  glow.drawCircle(0, -14, 22);
-  glow.endFill();
+  glow.circle(0, -14, 22).fill({ color: col.hex, alpha: 0.35 });
   glow.blendMode = PIXI.BLEND_MODES.ADD;
   c.addChild(glow);
   const g = new PIXI.Graphics();
-  g.beginFill(0x6b6b72);
-  g.drawRoundedRect(-7, -4, 14, 6, 2);
-  g.endFill();
-  g.beginFill(col.hex);
-  g.drawRoundedRect(-9, -26, 18, 23, 8);
-  g.endFill();
-  g.lineStyle(1.5, 0x2a2a30, 0.8);
+  g.roundRect(-7, -4, 14, 6, 2).fill(0x6b6b72);
+  g.roundRect(-9, -26, 18, 23, 8).fill(col.hex);
   g.moveTo(-9, -18); g.lineTo(9, -18);
   g.moveTo(-9, -11); g.lineTo(9, -11);
   g.moveTo(0, -26); g.lineTo(0, -4);
-  g.lineStyle(0);
+  g.stroke({ width: 1.5, color: 0x2a2a30, alpha: 0.8 });
   c.addChild(g);
   // Generous invisible hit area for clicks.
   const hit = new PIXI.Graphics();
-  hit.beginFill(0xffffff, 0.001);
-  hit.drawRect(-18, -36, 36, 40);
-  hit.endFill();
+  hit.rect(-18, -36, 36, 40).fill({ color: 0xffffff, alpha: 0.001 });
   c.addChild(hit);
   c.glow = glow;
   c.body = g;
@@ -577,13 +538,10 @@ export const room = {
     }
     const g = new PIXI.Graphics();
     // The dark floor everything falls to.
-    g.beginFill(0x1c1b21);
-    g.drawRect(0, LOW, W, H - LOW);
-    g.endFill();
-    g.lineStyle(3, 0x47454f, 1);
+    g.rect(0, LOW, W, H - LOW).fill(0x1c1b21);
     g.moveTo(0, LOW + 1);
     g.lineTo(W, LOW + 1);
-    g.lineStyle(0);
+    g.stroke({ width: 3, color: 0x47454f, alpha: 1 });
     for (const s of layout.slabs) drawSlab(g, s);
     for (const l of layout.ladders) kit.drawLadder(g, kit.ladder(l.x, l.top - 2, l.bottom ?? LOW), { rail: 0x3c3b44, rung: 0x55535e, half: 14 });
     world.addChild(g);
@@ -592,7 +550,6 @@ export const room = {
     for (const p of layout.panels) {
       const xs = bulbXs(p);
       const knobY = p.bulbY + 34;
-      pipes.lineStyle(3, 0x8e8d96, 0.9);
       for (const bx of xs) {
         pipes.moveTo(bx, p.bulbY + 2);
         pipes.lineTo(bx, p.bulbY + 14);
@@ -602,18 +559,14 @@ export const room = {
       pipes.moveTo(p.x, p.bulbY + 14);
       pipes.lineTo(p.x, knobY);
       // Wire off towards the lamp.
-      pipes.lineStyle(2, 0x8e8d96, 0.6);
+      pipes.stroke({ width: 3, color: 0x8e8d96, alpha: 0.9 });
       const lamp = layout.lights.find((l) => l.panels?.includes(p.id));
       pipes.moveTo(p.x, knobY);
       pipes.lineTo(p.x + 70, knobY);
       pipes.lineTo(p.x + 70, p.hanging ? LOW : p.surface + 60);
       if (lamp && !p.hanging) pipes.lineTo(Math.min(lamp.x - 120, p.x + 260), p.surface + 60);
-      pipes.lineStyle(0);
-      pipes.beginFill(0x3a3a40);
-      pipes.lineStyle(2, 0x8e8d96, 1);
-      pipes.drawCircle(p.x, knobY, 7);
-      pipes.endFill();
-      pipes.lineStyle(0);
+      pipes.stroke({ width: 2, color: 0x8e8d96, alpha: 0.6 });
+      pipes.circle(p.x, knobY, 7).fill(0x3a3a40).stroke({ width: 2, color: 0x8e8d96, alpha: 1 });
     }
     world.addChild(pipes);
     // Fixtures: hanging bulbs, double bulbs, spotlight dishes.
@@ -631,9 +584,7 @@ export const room = {
         // A bright core that tints with the light (hidden when dark).
         const core = new PIXI.Graphics();
         for (const dx of offs) {
-          core.beginFill(0xffffff, 0.9);
-          core.drawCircle(l.x + dx, l.y + 26, 8);
-          core.endFill();
+          core.circle(l.x + dx, l.y + 26, 8).fill({ color: 0xffffff, alpha: 0.9 });
         }
         core.blendMode = PIXI.BLEND_MODES.ADD;
         core.visible = false;
@@ -697,9 +648,7 @@ export const room = {
       });
     }
     const doorHit = new PIXI.Graphics();
-    doorHit.beginFill(0xffffff, 0.001);
-    doorHit.drawRect(-55, -150, 110, 150);
-    doorHit.endFill();
+    doorHit.rect(-55, -150, 110, 150).fill({ color: 0xffffff, alpha: 0.001 });
     doorHit.x = layout.door.x;
     doorHit.y = layout.door.y;
     ctx.data.door = ctx.register({ classId: 'puzzle_exit_door', label: 'Exit', subtitle: 'The way out', sprite: doorHit });

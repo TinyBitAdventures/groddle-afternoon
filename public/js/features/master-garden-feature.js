@@ -131,10 +131,9 @@ function tickFx(fx, dtMs) {
   fx.drops.clear();
   fx.plots.forEach((pt, i) => {
     const t = (fx.age / 600 + i * 0.37) % 1;
-    fx.drops.beginFill(fx.color, 0.85 * (1 - t));
-    fx.drops.drawCircle(pt.x + Math.sin(i * 2.1) * 6, pt.y - 40 + t * 40, 3.2);
-    fx.drops.drawCircle(pt.x - 7 + Math.cos(i) * 4, pt.y - 30 + ((t + 0.5) % 1) * 30, 2.4);
-    fx.drops.endFill();
+    fx.drops.circle(pt.x + Math.sin(i * 2.1) * 6, pt.y - 40 + t * 40, 3.2);
+    fx.drops.circle(pt.x - 7 + Math.cos(i) * 4, pt.y - 30 + ((t + 0.5) % 1) * 30, 2.4);
+    fx.drops.fill({ color: fx.color, alpha: 0.85 * (1 - t) });
   });
   fx.root.alpha = k > 0.85 ? (1 - k) / 0.15 : 1;
 }

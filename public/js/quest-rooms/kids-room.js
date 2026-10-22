@@ -167,36 +167,24 @@ const TEA_X = 205;
 function drawPlayroom(PIXI, kit) {
   const root = kit.sceneRoot(PIXI, W, H);
   const room = new PIXI.Graphics();
-  room.beginFill(0xf7f0d9);
-  room.drawRect(0, 0, W, FLOOR);
-  room.endFill();
+  room.rect(0, 0, W, FLOOR).fill(0xf7f0d9);
   const colors = [0x72c8c8, 0xeba75f, 0xcf6179, 0x9bc761, 0x7aa9d1];
   for (let x = -70, i = 0; x < 1220; x += 165, i += 1) {
-    room.beginFill(colors[i % colors.length], 0.9);
-    room.drawRoundedRect(x, 40 + (i % 2) * 20, 96, 72, 30);
-    room.drawCircle(x + 26, 35 + (i % 2) * 20, 23);
-    room.drawCircle(x + 76, 35 + (i % 2) * 20, 23);
-    room.endFill();
+    room.roundRect(x, 40 + (i % 2) * 20, 96, 72, 30);
+    room.circle(x + 26, 35 + (i % 2) * 20, 23);
+    room.circle(x + 76, 35 + (i % 2) * 20, 23);
+    room.fill({ color: colors[i % colors.length], alpha: 0.9 });
   }
   for (const x of [40, 960]) {
-    room.lineStyle(8, 0xffffff, 0.9);
-    room.beginFill(0x9fe1e7);
-    room.drawRoundedRect(x, 155, 150, 300, 8);
-    room.endFill();
-    room.lineStyle(5, 0xffffff, 0.85);
+    room.roundRect(x, 155, 150, 300, 8).fill(0x9fe1e7).stroke({ width: 8, color: 0xffffff, alpha: 0.9 });
     room.moveTo(x + 75, 160);
     room.lineTo(x + 75, 450);
     room.moveTo(x + 5, 305);
     room.lineTo(x + 145, 305);
+    room.stroke({ width: 5, color: 0xffffff, alpha: 0.85 });
   }
-  room.lineStyle(0);
-  room.beginFill(0x8b5f42);
-  room.drawRect(0, FLOOR, W, H - FLOOR);
-  room.endFill();
-  room.beginFill(0x6d4936);
-  room.drawRect(0, FLOOR - 16, W, 18);
-  room.endFill();
-  room.lineStyle(2, 0xb88962, 0.45);
+  room.rect(0, FLOOR, W, H - FLOOR).fill(0x8b5f42);
+  room.rect(0, FLOOR - 16, W, 18).fill(0x6d4936);
   for (let y = 646; y < H; y += 28) {
     room.moveTo(0, y);
     room.lineTo(W, y);
@@ -205,31 +193,26 @@ function drawPlayroom(PIXI, kit) {
     room.moveTo(x, FLOOR);
     room.lineTo(x + 35, H);
   }
-  room.lineStyle(0);
+  room.stroke({ width: 2, color: 0xb88962, alpha: 0.45 });
   // Tea table, two little chairs and cups for friend Bear and friend Thing.
-  room.beginFill(0x694b38);
-  room.drawRoundedRect(TEA_X - 110, 520, 220, 24, 9);
-  room.drawRect(TEA_X - 80, 542, 20, 78);
-  room.drawRect(TEA_X + 60, 542, 20, 78);
-  room.drawRoundedRect(TEA_X - 190, 560, 64, 14, 5);
-  room.drawRect(TEA_X - 186, 572, 10, 48);
-  room.drawRect(TEA_X - 140, 572, 10, 48);
-  room.drawRect(TEA_X - 190, 500, 10, 62);
-  room.drawRoundedRect(TEA_X + 126, 560, 64, 14, 5);
-  room.drawRect(TEA_X + 130, 572, 10, 48);
-  room.drawRect(TEA_X + 176, 572, 10, 48);
-  room.drawRect(TEA_X + 180, 500, 10, 62);
-  room.endFill();
-  room.beginFill(0xf6f1df);
-  room.drawEllipse(TEA_X - 45, 514, 18, 8);
-  room.drawEllipse(TEA_X + 45, 514, 18, 8);
-  room.drawRoundedRect(TEA_X - 16, 488, 32, 28, 10);
-  room.endFill();
-  room.beginFill(0xcd4f68);
-  room.drawCircle(TEA_X - 45, 500, 10);
-  room.beginFill(0x79b8c7);
-  room.drawCircle(TEA_X + 45, 500, 10);
-  room.endFill();
+  room.roundRect(TEA_X - 110, 520, 220, 24, 9);
+  room.rect(TEA_X - 80, 542, 20, 78);
+  room.rect(TEA_X + 60, 542, 20, 78);
+  room.roundRect(TEA_X - 190, 560, 64, 14, 5);
+  room.rect(TEA_X - 186, 572, 10, 48);
+  room.rect(TEA_X - 140, 572, 10, 48);
+  room.rect(TEA_X - 190, 500, 10, 62);
+  room.roundRect(TEA_X + 126, 560, 64, 14, 5);
+  room.rect(TEA_X + 130, 572, 10, 48);
+  room.rect(TEA_X + 176, 572, 10, 48);
+  room.rect(TEA_X + 180, 500, 10, 62);
+  room.fill(0x694b38);
+  room.ellipse(TEA_X - 45, 514, 18, 8);
+  room.ellipse(TEA_X + 45, 514, 18, 8);
+  room.roundRect(TEA_X - 16, 488, 32, 28, 10);
+  room.fill(0xf6f1df);
+  room.circle(TEA_X - 45, 500, 10).fill(0xcd4f68);
+  room.circle(TEA_X + 45, 500, 10).fill(0x79b8c7);
   root.addChild(room);
   root.addChild(kit.label(PIXI, "MR. BLOCK'S PLAYROOM", 580, 140, { size: 22, fill: 0x8d7357, alpha: 0.42, weight: '900' }));
   return root;
@@ -384,10 +367,7 @@ function drawBoard(ctx) {
   if (ctx.data.board && !ctx.data.board.destroyed) ctx.data.board.destroy({ children: true });
   const board = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0x2f5a4a);
-  g.lineStyle(10, 0x9b6b3f, 1);
-  g.drawRoundedRect(330, 170, 500, 266, 12);
-  g.endFill();
+  g.roundRect(330, 170, 500, 266, 12).fill(0x2f5a4a).stroke({ width: 10, color: 0x9b6b3f, alpha: 1 });
   board.addChild(g);
   board.addChild(kit.label(PIXI, `WORDS  ${ctx.data.spelled.length}/${WORD_UP_WORDS.length}`, 580, 194, { size: 17, fill: 0xf4f0d6, weight: '900' }));
   WORD_UP_WORDS.forEach((word, i) => {

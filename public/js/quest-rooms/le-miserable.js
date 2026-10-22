@@ -148,7 +148,7 @@ function addResetButton(ctx, panel) {
   const { PIXI, kit } = ctx;
   const c = new PIXI.Container();
   const plate = new PIXI.Graphics();
-  plate.beginFill(0xe9e6df).lineStyle(2, 0x9a958c, 1).drawRoundedRect(-24, -66, 48, 56, 6).endFill();
+  plate.roundRect(-24, -66, 48, 56, 6).fill(0xe9e6df).stroke({ width: 2, color: 0x9a958c, alpha: 1 });
   c.addChild(plate);
   const sheet = kit.sheetFrames(PIXI, `${ART}reset_button.png`, 7, 1, 7);
   const btn = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
@@ -264,7 +264,7 @@ export const room = {
     door.x = sx(DOOR.x);
     door.y = sy(DOOR.y);
     const hit = new PIXI.Graphics();
-    hit.beginFill(0xffffff, 0.001).drawRect(-70, -160, 140, 160).endFill();
+    hit.rect(-70, -160, 140, 160).fill({ color: 0xffffff, alpha: 0.001 });
     door.addChild(hit);
     ctx.add(door, 25);
     ctx.data.door = ctx.register({ classId: 'door', label: 'Exit', subtitle: 'The way out of the lab', sprite: door });

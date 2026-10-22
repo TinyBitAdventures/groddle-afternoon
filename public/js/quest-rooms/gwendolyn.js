@@ -573,7 +573,7 @@ function stepSwoons(ctx, dtMs, now) {
           const a = now / 300 + (i * Math.PI * 2) / 3;
           const sx = s.spr.x + Math.cos(a) * 18;
           const sy = s.spr.y - 40 + Math.sin(a) * 5;
-          g.beginFill(0xfff3a0, 0.95).drawPolygon([sx, sy - 5, sx + 2, sy - 1, sx + 5, sy, sx + 2, sy + 1, sx, sy + 5, sx - 2, sy + 1, sx - 5, sy, sx - 2, sy - 1]).endFill();
+          g.poly([sx, sy - 5, sx + 2, sy - 1, sx + 5, sy, sx + 2, sy + 1, sx, sy + 5, sx - 2, sy + 1, sx - 5, sy, sx - 2, sy - 1]).fill({ color: 0xfff3a0, alpha: 0.95 });
         }
       }
     }
@@ -684,9 +684,7 @@ async function stepInside(ctx, ms = 2600) {
     const chest = p.y - h * 0.52;
     halo.clear();
     for (const [color, alpha, k] of [[0xd9c8ff, 0.09, 1], [0xc3dcff, 0.1, 0.78], [0xf2ecff, 0.12, 0.55]]) {
-      halo.beginFill(color, alpha * (0.8 + breath * 0.5));
-      halo.drawEllipse(p.x, chest, (h * 0.62 + breath * 10) * k, (h * 0.72 + breath * 12) * k);
-      halo.endFill();
+      halo.ellipse(p.x, chest, (h * 0.62 + breath * 10) * k, (h * 0.72 + breath * 12) * k).fill({ color: color, alpha: alpha * (0.8 + breath * 0.5) });
     }
     p.pivot.y = Math.min(1, t / 700) * (4 + breath * 6);
     orb.position.set(p.x + 28, p.y - h * 0.34 + ORB_TOOL_SHEET.deltaY + Math.sin(t / 900) * 3);
@@ -972,26 +970,26 @@ function drawTube(PIXI, g, x1, y1, x2, y2, width = 36, sag = 0) {
   const cy = (y1 + y2) / 2 + sag;
   const layers = [[width, PINK.deep, 1], [width - 10, PINK.mid, 1], [width * 0.32, PINK.light, 0.9]];
   for (const [w, color, alpha] of layers) {
-    g.lineStyle({ width: w, color, alpha, cap: PIXI.LINE_CAP.ROUND, join: PIXI.LINE_JOIN.ROUND });
+    g.setStrokeStyle({ width: w, color, alpha: alpha ?? 1, cap: 'round', join: 'round' });
     const lift = w === width ? 0 : w === width - 10 ? -1 : -width * 0.22;
     g.moveTo(x1, y1 + width / 2 - 2 + lift);
     g.quadraticCurveTo(cx, cy + width / 2 - 2 + lift, x2, y2 + width / 2 - 2 + lift);
+    g.stroke();
   }
-  g.lineStyle(0);
 }
 
 function drawEye(PIXI, eye) {
   const c = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0x2a1440, 0.25).drawEllipse(6, eye.r * 0.15, eye.r * 1.02, eye.r * 0.98).endFill();
-  g.beginFill(0xbfe9ff).drawCircle(0, 0, eye.r).endFill();
-  g.beginFill(0xffffff).drawCircle(-eye.r * 0.12, -eye.r * 0.12, eye.r * 0.86).endFill();
-  g.lineStyle(3, 0x7fb6d8, 0.8).drawCircle(0, 0, eye.r);
+  g.ellipse(6, eye.r * 0.15, eye.r * 1.02, eye.r * 0.98).fill({ color: 0x2a1440, alpha: 0.25 });
+  g.circle(0, 0, eye.r).fill(0xbfe9ff);
+  g.circle(-eye.r * 0.12, -eye.r * 0.12, eye.r * 0.86).fill(0xffffff);
+  g.circle(0, 0, eye.r).stroke({ width: 3, color: 0x7fb6d8, alpha: 0.8 });
   c.addChild(g);
   const iris = new PIXI.Graphics();
-  iris.beginFill(0x7b3fc2).drawCircle(0, 0, eye.r * 0.36).endFill();
-  iris.beginFill(0x2a0f45).drawCircle(0, 0, eye.r * 0.17).endFill();
-  iris.beginFill(0xffffff, 0.85).drawCircle(-eye.r * 0.1, -eye.r * 0.12, eye.r * 0.07).endFill();
+  iris.circle(0, 0, eye.r * 0.36).fill(0x7b3fc2);
+  iris.circle(0, 0, eye.r * 0.17).fill(0x2a0f45);
+  iris.circle(-eye.r * 0.1, -eye.r * 0.12, eye.r * 0.07).fill({ color: 0xffffff, alpha: 0.85 });
   c.addChild(iris);
   c.x = eye.x;
   c.y = eye.y;
@@ -1009,22 +1007,21 @@ function buildOuter(ctx) {
   space.addChild(kit.gradient(PIXI, [[0, '#1d0b3a'], [0.6, '#3a1660'], [1, '#2b0f4d']], 960, 640));
   const stars = new PIXI.Graphics();
   for (let i = 0; i < 90; i++) {
-    stars.beginFill(0xffffff, 0.35 + kit.hash01(`s${i}`) * 0.6);
-    stars.drawCircle(kit.hash01(`x${i}`) * 960, kit.hash01(`y${i}`) * 640, 0.8 + kit.hash01(`r${i}`) * 1.6);
-    stars.endFill();
+    stars.setFillStyle({ color: 0xffffff, alpha: 0.35 + kit.hash01(`s${i}`) * 0.6 });
+    stars.circle(kit.hash01(`x${i}`) * 960, kit.hash01(`y${i}`) * 640, 0.8 + kit.hash01(`r${i}`) * 1.6).fill();
   }
   space.addChild(stars);
   const world = root.layer(1, 2);
   // The head: grey rock rim around a sunburst brain.
   const head = L.head;
   const rim = new PIXI.Graphics();
-  rim.beginFill(0x8c8f99).drawRoundedRect(head.x - 34, head.y - 34, head.w + 68, head.h + 68, head.r + 30).endFill();
-  rim.beginFill(0xb9bcc6).drawRoundedRect(head.x - 18, head.y - 18, head.w + 36, head.h + 36, head.r + 14).endFill();
-  rim.beginFill(0x6f7280, 0.6).drawRoundedRect(head.x - 6, head.y - 6, head.w + 12, head.h + 12, head.r + 4).endFill();
+  rim.roundRect(head.x - 34, head.y - 34, head.w + 68, head.h + 68, head.r + 30).fill(0x8c8f99);
+  rim.roundRect(head.x - 18, head.y - 18, head.w + 36, head.h + 36, head.r + 14).fill(0xb9bcc6);
+  rim.roundRect(head.x - 6, head.y - 6, head.w + 12, head.h + 12, head.r + 4).fill({ color: 0x6f7280, alpha: 0.6 });
   world.addChild(rim);
   const burst = new PIXI.Container();
   const fill = new PIXI.Graphics();
-  fill.beginFill(0xff9a2e).drawRect(head.x, head.y, head.w, head.h).endFill();
+  fill.rect(head.x, head.y, head.w, head.h).fill(0xff9a2e);
   const cx = L.W * 0.45;
   const cy = 700;
   const R = 2600;
@@ -1032,17 +1029,16 @@ function buildOuter(ctx) {
   for (let i = 0; i < N; i++) {
     const a1 = (i / N) * Math.PI * 2;
     const a2 = ((i + 0.5) / N) * Math.PI * 2;
-    fill.beginFill(i % 2 ? 0xff5fa8 : 0xff7a3d);
     fill.moveTo(cx, cy);
     fill.lineTo(cx + Math.cos(a1) * R, cy + Math.sin(a1) * R);
     fill.lineTo(cx + Math.cos(a2) * R, cy + Math.sin(a2) * R);
     fill.closePath();
-    fill.endFill();
+    fill.fill(i % 2 ? 0xff5fa8 : 0xff7a3d);
   }
-  fill.beginFill(0xffc15a, 0.5).drawCircle(cx, cy, 80).endFill();
+  fill.circle(cx, cy, 80).fill({ color: 0xffc15a, alpha: 0.5 });
   burst.addChild(fill);
   const mask = new PIXI.Graphics();
-  mask.beginFill(0xffffff).drawRoundedRect(head.x, head.y, head.w, head.h, head.r).endFill();
+  mask.roundRect(head.x, head.y, head.w, head.h, head.r).fill(0xffffff);
   burst.addChild(mask);
   burst.mask = mask;
   world.addChild(burst);
@@ -1057,15 +1053,15 @@ function buildOuter(ctx) {
   ctx.data.eyes = L.eyes.map((eye) => world.addChild(drawEye(PIXI, eye)));
   // The checkered floor on a rock slab, and the rock base.
   const floor = new PIXI.Graphics();
-  floor.beginFill(0x9a9ca6).drawRect(0, L.FLOOR, L.W, 120).endFill();
-  floor.beginFill(0x7c7f8a).drawRect(0, L.FLOOR + 26, L.W, 120).endFill();
+  floor.rect(0, L.FLOOR, L.W, 120).fill(0x9a9ca6);
+  floor.rect(0, L.FLOOR + 26, L.W, 120).fill(0x7c7f8a);
   const T = 40;
   for (let x = L.checker.x1, i = 0; x < L.checker.x2; x += T, i++) {
     for (let r = 0; r < 2; r++) {
-      floor.beginFill((i + r) % 2 ? 0x2fd3e6 : 0xffffff).drawRect(x, L.FLOOR + r * 13, T, 13).endFill();
+      floor.rect(x, L.FLOOR + r * 13, T, 13).fill((i + r) % 2 ? 0x2fd3e6 : 0xffffff);
     }
   }
-  floor.lineStyle(2, 0x5f6270, 0.8).moveTo(0, L.FLOOR).lineTo(L.W, L.FLOOR);
+  floor.moveTo(0, L.FLOOR).lineTo(L.W, L.FLOOR).stroke({ width: 2, color: 0x5f6270, alpha: 0.8 });
   world.addChild(floor);
   // The walkable tubes.
   const tubes = new PIXI.Graphics();
@@ -1208,19 +1204,19 @@ function drawPrism(PIXI, x1, x2, top, bottom, palette, { tip = 0, alpha = 1 } = 
   const g = new PIXI.Graphics();
   const w = x2 - x1;
   const depth = Math.min(46, w * 0.22);
-  g.beginFill(0x8a7aa8, 0.12 * alpha).drawEllipse((x1 + x2) / 2 + 20, bottom + 6, w * 0.7, 14).endFill();
+  g.ellipse((x1 + x2) / 2 + 20, bottom + 6, w * 0.7, 14).fill({ color: 0x8a7aa8, alpha: 0.12 * alpha });
   if (tip) {
     // a spire
-    g.beginFill(front, alpha).moveTo(x1, bottom).lineTo((x1 + x2) / 2, top).lineTo(x2, bottom).closePath().endFill();
-    g.beginFill(side, alpha * 0.9).moveTo((x1 + x2) / 2, top).lineTo(x2, bottom).lineTo(x2 + depth * 0.6, bottom - 10).closePath().endFill();
-    g.beginFill(light, 0.55 * alpha).moveTo(x1 + w * 0.22, bottom).lineTo((x1 + x2) / 2 - 4, top + 30).lineTo(x1 + w * 0.32, bottom).closePath().endFill();
+    g.moveTo(x1, bottom).lineTo((x1 + x2) / 2, top).lineTo(x2, bottom).closePath().fill({ color: front, alpha: alpha });
+    g.moveTo((x1 + x2) / 2, top).lineTo(x2, bottom).lineTo(x2 + depth * 0.6, bottom - 10).closePath().fill({ color: side, alpha: alpha * 0.9 });
+    g.moveTo(x1 + w * 0.22, bottom).lineTo((x1 + x2) / 2 - 4, top + 30).lineTo(x1 + w * 0.32, bottom).closePath().fill({ color: light, alpha: 0.55 * alpha });
     return g;
   }
-  g.beginFill(side, alpha).moveTo(x2, top + 8).lineTo(x2 + depth, top - 6).lineTo(x2 + depth, bottom - 16).lineTo(x2, bottom).closePath().endFill();
-  g.beginFill(light, alpha).moveTo(x1, top + 8).lineTo(x1 + depth, top - 6).lineTo(x2 + depth, top - 6).lineTo(x2, top + 8).closePath().endFill();
-  g.beginFill(front, alpha).drawRect(x1, top + 8, w, bottom - top - 8).endFill();
-  g.beginFill(0xffffff, 0.22 * alpha).drawRect(x1 + w * 0.12, top + 12, w * 0.07, bottom - top - 16).endFill();
-  g.beginFill(light, 0.35 * alpha).drawRect(x1, bottom - (bottom - top) * 0.35, w, (bottom - top) * 0.35).endFill();
+  g.moveTo(x2, top + 8).lineTo(x2 + depth, top - 6).lineTo(x2 + depth, bottom - 16).lineTo(x2, bottom).closePath().fill({ color: side, alpha: alpha });
+  g.moveTo(x1, top + 8).lineTo(x1 + depth, top - 6).lineTo(x2 + depth, top - 6).lineTo(x2, top + 8).closePath().fill({ color: light, alpha: alpha });
+  g.rect(x1, top + 8, w, bottom - top - 8).fill({ color: front, alpha: alpha });
+  g.rect(x1 + w * 0.12, top + 12, w * 0.07, bottom - top - 16).fill({ color: 0xffffff, alpha: 0.22 * alpha });
+  g.rect(x1, bottom - (bottom - top) * 0.35, w, (bottom - top) * 0.35).fill({ color: light, alpha: 0.35 * alpha });
   return g;
 }
 
@@ -1229,55 +1225,52 @@ function drawHive(PIXI, x1, x2, top, bottom, palette) {
   const g = new PIXI.Graphics();
   const cx = (x1 + x2) / 2;
   const w = x2 - x1;
-  g.beginFill(0x8a7aa8, 0.14).drawEllipse(cx + 16, bottom + 6, w * 0.7, 14).endFill();
+  g.ellipse(cx + 16, bottom + 6, w * 0.7, 14).fill({ color: 0x8a7aa8, alpha: 0.14 });
   const tiers = 4;
   for (let i = 0; i < tiers; i++) {
     const t = i / tiers;
     const y = bottom - (bottom - top) * t;
     const rw = (w / 2) * (1 - t * 0.55) + 18;
-    g.beginFill(i % 2 ? side : front).drawEllipse(cx, y - (bottom - top) / (tiers * 2), rw, (bottom - top) / (tiers * 1.5)).endFill();
+    g.ellipse(cx, y - (bottom - top) / (tiers * 2), rw, (bottom - top) / (tiers * 1.5)).fill(i % 2 ? side : front);
   }
-  g.beginFill(front).drawEllipse(cx, top + 18, w * 0.2, 34).endFill();
-  g.beginFill(light, 0.4).drawEllipse(cx - w * 0.18, top + (bottom - top) * 0.45, w * 0.06, (bottom - top) * 0.3).endFill();
+  g.ellipse(cx, top + 18, w * 0.2, 34).fill(front);
+  g.ellipse(cx - w * 0.18, top + (bottom - top) * 0.45, w * 0.06, (bottom - top) * 0.3).fill({ color: light, alpha: 0.4 });
   return g;
 }
 
 function drawGlass(g, x1, x2, y) {
-  g.beginFill(0xe8f6ff, 0.55).moveTo(x1, y).lineTo(x2, y).lineTo(x2 - 8, y + 16).lineTo(x1 - 8, y + 16).closePath().endFill();
-  g.beginFill(0xffffff, 0.75).drawRect(x1, y - 1, x2 - x1, 3).endFill();
-  g.lineStyle(1.5, 0x9fd6f0, 0.8).moveTo(x1, y).lineTo(x2, y).lineTo(x2 - 8, y + 16).lineTo(x1 - 8, y + 16).closePath();
-  g.lineStyle(0);
+  g.moveTo(x1, y).lineTo(x2, y).lineTo(x2 - 8, y + 16).lineTo(x1 - 8, y + 16).closePath().fill({ color: 0xe8f6ff, alpha: 0.55 });
+  g.rect(x1, y - 1, x2 - x1, 3).fill({ color: 0xffffff, alpha: 0.75 });
+  g.moveTo(x1, y).lineTo(x2, y).lineTo(x2 - 8, y + 16).lineTo(x1 - 8, y + 16).closePath().stroke({ width: 1.5, color: 0x9fd6f0, alpha: 0.8 });
 }
 
 function drawCrack(g, x, y) {
   const pts = [[-130, 4], [-90, -4], [-60, 6], [-20, -6], [10, 5], [50, -5], [90, 4], [130, -2]];
-  g.beginFill(0x3b1a86);
   g.moveTo(x + pts[0][0], y + pts[0][1]);
   for (const [px, py] of pts) g.lineTo(x + px, y + py - 3);
   for (const [px, py] of [...pts].reverse()) g.lineTo(x + px + 6, y + py + 5);
-  g.closePath();
-  g.endFill();
+  g.closePath().fill(0x3b1a86);
 }
 
 function drawDome(PIXI, x, y, tint) {
   const g = new PIXI.Graphics();
-  g.beginFill(0x9aa3c8, 0.18).drawEllipse(x + 6, y + 4, 70, 12).endFill();
-  g.beginFill(0x8890b8).drawRect(x - 26, y - 42, 18, 42).endFill();
-  g.beginFill(0x9ba3c8).drawRect(x + 2, y - 56, 22, 56).endFill();
-  g.beginFill(0xff6fa0).drawEllipse(x - 30, y - 18, 14, 9).endFill();
-  g.beginFill(0x7ddc6a).drawEllipse(x + 32, y - 20, 14, 10).endFill();
-  g.beginFill(tint, 0.45).moveTo(x - 64, y).arc(x, y, 64, Math.PI, 0).closePath().endFill();
-  g.beginFill(0xffffff, 0.5).drawEllipse(x - 26, y - 44, 16, 7).endFill();
-  g.lineStyle(2, 0xb9c3e6, 0.8).arc(x, y, 64, Math.PI, 0);
+  g.ellipse(x + 6, y + 4, 70, 12).fill({ color: 0x9aa3c8, alpha: 0.18 });
+  g.rect(x - 26, y - 42, 18, 42).fill(0x8890b8);
+  g.rect(x + 2, y - 56, 22, 56).fill(0x9ba3c8);
+  g.ellipse(x - 30, y - 18, 14, 9).fill(0xff6fa0);
+  g.ellipse(x + 32, y - 20, 14, 10).fill(0x7ddc6a);
+  g.moveTo(x - 64, y).arc(x, y, 64, Math.PI, 0).closePath().fill({ color: tint, alpha: 0.45 });
+  g.ellipse(x - 26, y - 44, 16, 7).fill({ color: 0xffffff, alpha: 0.5 });
+  g.arc(x, y, 64, Math.PI, 0).stroke({ width: 2, color: 0xb9c3e6, alpha: 0.8 });
   return g;
 }
 
 function drawExitArrow(PIXI, kit, x, y) {
   const c = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0xc9b2ff).moveTo(-70, -14).lineTo(10, -14).lineTo(10, -34).lineTo(64, 0).lineTo(10, 34).lineTo(10, 14).lineTo(-70, 14).closePath().endFill();
-  g.beginFill(0xff8bc8, 0.85).moveTo(10, -34).lineTo(64, 0).lineTo(10, 0).closePath().endFill();
-  g.beginFill(0x7fe0f2, 0.85).moveTo(10, 34).lineTo(64, 0).lineTo(10, 0).closePath().endFill();
+  g.moveTo(-70, -14).lineTo(10, -14).lineTo(10, -34).lineTo(64, 0).lineTo(10, 34).lineTo(10, 14).lineTo(-70, 14).closePath().fill(0xc9b2ff);
+  g.moveTo(10, -34).lineTo(64, 0).lineTo(10, 0).closePath().fill({ color: 0xff8bc8, alpha: 0.85 });
+  g.moveTo(10, 34).lineTo(64, 0).lineTo(10, 0).closePath().fill({ color: 0x7fe0f2, alpha: 0.85 });
   c.addChild(g);
   c.addChild(kit.label(PIXI, 'EXIT', -26, 0, { size: 18, fill: 0xffffff, stroke: 0x7a5fc0, strokeThickness: 4, weight: '900' }));
   c.x = x;
@@ -1301,8 +1294,8 @@ function buildInner(ctx) {
   const world = root.layer(1, 3);
   // A glossy white floor with soft reflections.
   const floor = new PIXI.Graphics();
-  floor.beginFill(0xf4f1fb).drawRect(0, L.FLOOR, L.W, 120).endFill();
-  floor.beginFill(0xe7e2f6, 0.7).drawRect(0, L.FLOOR, L.W, 4).endFill();
+  floor.rect(0, L.FLOOR, L.W, 120).fill(0xf4f1fb);
+  floor.rect(0, L.FLOOR, L.W, 4).fill({ color: 0xe7e2f6, alpha: 0.7 });
   for (const x of L.cracks) drawCrack(floor, x, L.FLOOR + 12);
   world.addChild(floor);
   for (const dome of L.domes) world.addChild(drawDome(PIXI, dome.x, L.FLOOR, dome.tint));
@@ -1389,10 +1382,9 @@ function tickInner(ctx, dtMs, now) {
 function drawGroveTree(PIXI, x, floor, h, s, shade) {
   const g = new PIXI.Graphics();
   const trunk = shade.trunk;
-  g.lineStyle({ width: 14 * s, color: trunk, cap: PIXI.LINE_CAP.ROUND });
   g.moveTo(x, floor).bezierCurveTo(x - 8 * s, floor - h * 0.4, x + 10 * s, floor - h * 0.7, x, floor - h);
   const branches = [[-1, 0.45, 0.7], [1, 0.55, 0.6], [-1, 0.72, 0.5], [1, 0.82, 0.45]];
-  g.lineStyle({ width: 6 * s, color: trunk, cap: PIXI.LINE_CAP.ROUND });
+  g.stroke({ width: 14 * s, color: trunk, cap: 'round' });
   const ends = [];
   for (const [dir, at, len] of branches) {
     const by = floor - h * at;
@@ -1402,12 +1394,11 @@ function drawGroveTree(PIXI, x, floor, h, s, shade) {
     ends.push([ex, ey]);
   }
   ends.push([x, floor - h]);
-  g.lineStyle(0);
+  g.stroke({ width: 6 * s, color: trunk, cap: 'round' });
   for (const [i, [ex, ey]] of ends.entries()) {
     const r = (i === ends.length - 1 ? 34 : 24) * s;
-    g.beginFill(shade.leaf).drawCircle(ex, ey - r * 0.6, r).endFill();
-    g.lineStyle(3 * s, shade.edge, 0.9).drawCircle(ex, ey - r * 0.6, r * 0.62);
-    g.lineStyle(0);
+    g.circle(ex, ey - r * 0.6, r).fill(shade.leaf);
+    g.circle(ex, ey - r * 0.6, r * 0.62).stroke({ width: 3 * s, color: shade.edge, alpha: 0.9 });
   }
   return g;
 }
@@ -1423,15 +1414,15 @@ function buildChamber(ctx) {
   const world = root.layer(1, 2);
   for (const t of L.trees) world.addChild(drawGroveTree(PIXI, t.x, L.FLOOR, t.h, t.s, { trunk: 0x3a413e, leaf: 0x2b312f, edge: 0x59625e }));
   const ground = new PIXI.Graphics();
-  ground.beginFill(0x070908).drawRect(0, L.FLOOR, L.W, 120).endFill();
+  ground.rect(0, L.FLOOR, L.W, 120).fill(0x070908);
   for (let x = 30; x < L.W; x += 46) {
     const k = kit.hash01(`g${x}`);
-    ground.beginFill(0x1f2623).drawEllipse(x + k * 20, L.FLOOR + 2, 16 + k * 10, 5).endFill();
+    ground.ellipse(x + k * 20, L.FLOOR + 2, 16 + k * 10, 5).fill(0x1f2623);
   }
   world.addChild(ground);
   // A soft light where you came in (gwendolyn_chamber_exit).
   const exitGlow = new PIXI.Graphics();
-  for (let i = 5; i >= 1; i--) exitGlow.beginFill(0xcfe9e4, 0.05 * (6 - i)).drawEllipse(L.exit.x, L.FLOOR - 70, 26 + i * 12, 70 + i * 10).endFill();
+  for (let i = 5; i >= 1; i--) exitGlow.ellipse(L.exit.x, L.FLOOR - 70, 26 + i * 12, 70 + i * 10).fill({ color: 0xcfe9e4, alpha: 0.05 * (6 - i) });
   world.addChild(exitGlow);
   return {
     label: INSTANCES.chamber.label,
@@ -1448,7 +1439,7 @@ function enterChamber(ctx) {
   const L = chamberLayout(ctx.kit);
   ctx.data.chamber = L;
   const glow = new PIXI.Graphics();
-  for (let i = 6; i >= 1; i--) glow.beginFill(0xa9f0ff, 0.035 * (7 - i)).drawCircle(0, -90, 40 + i * 22).endFill();
+  for (let i = 6; i >= 1; i--) glow.circle(0, -90, 40 + i * 22).fill({ color: 0xa9f0ff, alpha: 0.035 * (7 - i) });
   glow.x = L.gwen.x;
   glow.y = L.gwen.y;
   ctx.add(glow, 38);

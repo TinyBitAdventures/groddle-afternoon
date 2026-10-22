@@ -186,34 +186,28 @@ const PUFFS = [
 ];
 
 function cloudShape(g, w, h, dy = 0) {
-  g.drawRoundedRect(-w * 0.46, -h * 0.05 + dy, w * 0.92, h * 0.55, h * 0.27);
-  for (const [px, py, pr] of PUFFS) g.drawCircle(px * w, py * h + dy, pr * w);
+  g.roundRect(-w * 0.46, -h * 0.05 + dy, w * 0.92, h * 0.55, h * 0.27);
+  for (const [px, py, pr] of PUFFS) g.circle(px * w, py * h + dy, pr * w);
 }
 
 /** A puffy vector cloud centred on (0, 0): shade, outline, fill. */
 function drawCloud(g, w, h, { fill = 0xf7f8fc, shade = 0xc9d1e1, line = 0xffffff, lineAlpha = 0.85, alpha = 1, stitch = false } = {}) {
   g.clear();
-  g.beginFill(shade, alpha);
   cloudShape(g, w, h, 5);
-  g.endFill();
-  g.lineStyle(4, line, lineAlpha * alpha);
-  g.beginFill(fill, alpha);
+  g.fill({ color: shade, alpha: alpha });
   cloudShape(g, w, h);
-  g.endFill();
-  g.lineStyle(0);
-  g.beginFill(fill, alpha);
+  g.fill({ color: fill, alpha: alpha }).stroke({ width: 4, color: line, alpha: lineAlpha * alpha });
   cloudShape(g, w, h);
-  g.endFill();
+  g.fill({ color: fill, alpha: alpha });
   if (stitch) {
     // The question cloud's stitched edge: a dashed ring inside the outline.
-    g.lineStyle(2, 0xffffff, 0.95);
     const rx = w * 0.44;
     const ry = h * 0.36;
     for (let a = 0; a < Math.PI * 2; a += 0.16) {
       g.moveTo(Math.cos(a) * rx, h * 0.08 + Math.sin(a) * ry);
       g.lineTo(Math.cos(a + 0.08) * rx, h * 0.08 + Math.sin(a + 0.08) * ry);
     }
-    g.lineStyle(0);
+    g.stroke({ width: 2, color: 0xffffff, alpha: 0.95 });
   }
 }
 
@@ -226,7 +220,6 @@ function drawTally(g, n, color = 0x15161a, size = 1) {
   const gap = 11 * size;
   const width = fives * (4 * step + gap) + Math.max(0, ones - 1) * step + (ones ? 0 : -gap);
   let x = -width / 2;
-  g.lineStyle(4 * size, color, 1);
   for (let f = 0; f < fives; f++) {
     for (let s = 0; s < 4; s++) {
       g.moveTo(x + s * step, -hgt / 2);
@@ -240,7 +233,7 @@ function drawTally(g, n, color = 0x15161a, size = 1) {
     g.moveTo(x + s * step, -hgt / 2);
     g.lineTo(x + s * step, hgt / 2);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 4 * size, color: color, alpha: 1 });
 }
 
 /** "+III" as a drawn sign and strokes, centred on (0, 0). */
@@ -252,28 +245,25 @@ function drawOp(g, op, color = 0x15161a, size = 1) {
   const signW = 12 * size;
   const width = signW + 8 * size + (n - 1) * step;
   const x0 = -width / 2;
-  g.lineStyle(3.5 * size, color, 1);
   g.moveTo(x0, 0);
   g.lineTo(x0 + signW, 0);
   if (op > 0) {
     g.moveTo(x0 + signW / 2, -signW / 2);
     g.lineTo(x0 + signW / 2, signW / 2);
   }
-  g.lineStyle(4 * size, color, 1);
+  g.stroke({ width: 3.5 * size, color: color, alpha: 1 });
   for (let s = 0; s < n; s++) {
     const x = x0 + signW + 8 * size + s * step;
     g.moveTo(x, -hgt / 2);
     g.lineTo(x, hgt / 2);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 4 * size, color: color, alpha: 1 });
 }
 
 function drawGlow(g, w, h, color = 0xffffff, strength = 1) {
   g.clear();
   for (let r = 5; r >= 1; r--) {
-    g.beginFill(color, 0.05 * strength * (6 - r));
-    g.drawEllipse(0, h * 0.1, w * (0.5 + r * 0.09), h * (0.42 + r * 0.12));
-    g.endFill();
+    g.ellipse(0, h * 0.1, w * (0.5 + r * 0.09), h * (0.42 + r * 0.12)).fill({ color: color, alpha: 0.05 * strength * (6 - r) });
   }
 }
 
@@ -370,9 +360,7 @@ export const room = {
     world.addChild(kit.deco(PIXI, 'door_asset_starter_01a', door.x + 12, island.surf + 4, { scale: 0.44 }));
     // The EXIT plank on a post beside the doorway, low enough to read under the room card.
     const post = new PIXI.Graphics();
-    post.beginFill(0x6b4a2b);
-    post.drawRoundedRect(door.x - 82, island.surf - 92, 8, 92, 3);
-    post.endFill();
+    post.roundRect(door.x - 82, island.surf - 92, 8, 92, 3).fill(0x6b4a2b);
     world.addChild(post);
     world.addChild(kit.deco(PIXI, 'firebog_sign_blank_plank', door.x - 78, island.surf - 96, { ay: 0.5, scale: 0.2, rotation: -0.08 }));
     const exitText = kit.label(PIXI, 'EXIT', door.x - 78, island.surf - 97, { size: 14, fill: 0xffffff, stroke: 0x5a3a1c, strokeThickness: 3 });
@@ -405,9 +393,7 @@ export const room = {
       ctx.data.buttons.push(makeButton(ctx, { ...s.reset, section: s.i, reset: true, outTex, inTex }));
     }
     const doorHit = new PIXI.Graphics();
-    doorHit.beginFill(0xffffff, 0.001);
-    doorHit.drawRect(-46, -150, 92, 150);
-    doorHit.endFill();
+    doorHit.rect(-46, -150, 92, 150).fill({ color: 0xffffff, alpha: 0.001 });
     doorHit.x = layout.door.x + 12;
     doorHit.y = layout.door.surf;
     ctx.data.door = ctx.register({ classId: 'puzzle_exit_door', label: 'Exit', subtitle: 'The way out', sprite: doorHit });
@@ -554,30 +540,20 @@ export const room = {
 function drawGround(PIXI, W) {
   const g = new PIXI.Graphics();
   // Dirt under the meadow.
-  g.beginFill(0x7a5a3a);
-  g.drawRect(0, FLOOR + 26, W, H - FLOOR);
-  g.endFill();
-  g.beginFill(0x5f4630);
-  g.drawRect(0, FLOOR + 70, W, H - FLOOR);
-  g.endFill();
+  g.rect(0, FLOOR + 26, W, H - FLOOR).fill(0x7a5a3a);
+  g.rect(0, FLOOR + 70, W, H - FLOOR).fill(0x5f4630);
   // Pale rolling meadow: the walk line is flat, the hills roll just under it.
-  g.beginFill(0xc9df93);
   g.moveTo(0, FLOOR + 40);
   for (let x = 0; x <= W; x += 40) g.lineTo(x, FLOOR - 4 + Math.sin(x / 210) * 5 + Math.sin(x / 67) * 2);
   g.lineTo(W, FLOOR + 40);
   g.closePath();
-  g.endFill();
-  g.beginFill(0xe3efb8, 0.8);
-  for (let x = 60; x < W; x += 380) g.drawEllipse(x, FLOOR + 6, 120, 7);
-  g.endFill();
-  g.beginFill(0xa9c66e);
-  g.drawRect(0, FLOOR + 30, W, 10);
-  g.endFill();
+  g.fill(0xc9df93);
+  for (let x = 60; x < W; x += 380) g.ellipse(x, FLOOR + 6, 120, 7);
+  g.fill({ color: 0xe3efb8, alpha: 0.8 });
+  g.rect(0, FLOOR + 30, W, 10).fill(0xa9c66e);
   // Pebbles in the dirt.
   for (let x = 90; x < W; x += 170) {
-    g.beginFill(0xa89880, 0.9);
-    g.drawEllipse(x + ((x * 7) % 60), FLOOR + 52 + ((x * 3) % 22), 14, 5);
-    g.endFill();
+    g.ellipse(x + ((x * 7) % 60), FLOOR + 52 + ((x * 3) % 22), 14, 5).fill({ color: 0xa89880, alpha: 0.9 });
   }
   return g;
 }
@@ -599,9 +575,7 @@ function makeButton(ctx, def) {
     c.addChild(sign);
   }
   const post = new PIXI.Graphics();
-  post.beginFill(0x3b4058);
-  post.drawRoundedRect(-5, -22, 10, 22, 3);
-  post.endFill();
+  post.roundRect(-5, -22, 10, 22, 3).fill(0x3b4058);
   c.addChild(post);
   const btn = new PIXI.Sprite(def.outTex);
   btn.anchor.set(0.5, 0.5);
@@ -730,14 +704,13 @@ function redrawSection(ctx, i) {
     const x2 = b.to.x - half;
     const y2 = b.to.surf + CLOUD_DY;
     if (solved || wrong) {
-      g.lineStyle(16, solved ? 0xeaf7a0 : 0xff5a4a, 0.22);
       g.moveTo(x1, y1);
       g.lineTo(x2, y2);
     }
-    g.lineStyle(solved || wrong ? 6 : 4, solved ? 0xeef8b8 : wrong ? 0xff6a5a : 0xcfd6e6, solved || wrong ? 0.95 : 0.4);
+    g.stroke({ width: 16, color: solved ? 0xeaf7a0 : 0xff5a4a, alpha: 0.22 });
     g.moveTo(x1, y1);
     g.lineTo(x2, y2);
-    g.lineStyle(0);
+    g.stroke({ width: solved || wrong ? 6 : 4, color: solved ? 0xeef8b8 : wrong ? 0xff6a5a : 0xcfd6e6, alpha: solved || wrong ? 0.95 : 0.4 });
   }
 }
 

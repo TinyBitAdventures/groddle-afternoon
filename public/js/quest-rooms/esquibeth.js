@@ -341,9 +341,7 @@ function inCave(L, x) {
 /** A block of columnar basalt: hex caps along the top, columns down the face. */
 function drawBasalt(g, x1, x2, top, bottom, pal, seedKey, kit) {
   const h = bottom - top;
-  g.beginFill(pal.face);
-  g.drawRect(x1, top, x2 - x1, h);
-  g.endFill();
+  g.rect(x1, top, x2 - x1, h).fill(pal.face);
   // Columns: strips of slightly different tone with dark seams.
   let x = x1;
   let i = 0;
@@ -353,31 +351,24 @@ function drawBasalt(g, x1, x2, top, bottom, pal, seedKey, kit) {
     const right = Math.min(x2, x + w);
     const r = kit.hash01(`${seedKey}:s${i}`);
     const tone = r > 0.66 ? pal.capEdge : r > 0.33 ? pal.seam : pal.face;
-    g.beginFill(tone, r > 0.66 ? 0.16 : r > 0.33 ? 0.28 : 0);
-    g.drawRect(x, top, right - x, h);
-    g.endFill();
+    g.rect(x, top, right - x, h).fill({ color: tone, alpha: r > 0.66 ? 0.16 : r > 0.33 ? 0.28 : 0 });
     // A sliver of light down one side of each column.
-    g.beginFill(pal.capEdge, 0.12);
-    g.drawRect(x + 2, top + 10, 3, h);
-    g.endFill();
-    g.lineStyle(1.5, pal.seam, 0.85);
+    g.rect(x + 2, top + 10, 3, h).fill({ color: pal.capEdge, alpha: 0.12 });
     g.moveTo(right, top + 8);
     g.lineTo(right, bottom);
-    g.lineStyle(0);
+    g.stroke({ width: 1.5, color: pal.seam, alpha: 0.85 });
     for (let j = 1; j < 8; j++) {
       const jy = top + 30 + j * (50 + kit.hash01(`${seedKey}:j${i}:${j}`) * 80);
       if (jy > bottom - 10) break;
-      g.lineStyle(1.2, pal.seam, 0.6);
       g.moveTo(x + 2, jy);
       g.lineTo(right - 2, jy + (kit.hash01(`${seedKey}:k${i}:${j}`) - 0.5) * 7);
-      g.lineStyle(0);
+      g.stroke({ width: 1.2, color: pal.seam, alpha: 0.6 });
     }
     lips.push([x, right, 8 + Math.round(kit.hash01(`${seedKey}:l${i}`) * 9)]);
     x = right;
     i += 1;
   }
   // The flat top: a lighter band with a ragged front lip and a few hex cracks.
-  g.beginFill(pal.cap);
   g.moveTo(x1, top - 3);
   g.lineTo(x2, top - 3);
   for (let k = lips.length - 1; k >= 0; k--) {
@@ -387,23 +378,20 @@ function drawBasalt(g, x1, x2, top, bottom, pal, seedKey, kit) {
   }
   g.lineTo(x1, top + 8);
   g.closePath();
-  g.endFill();
-  g.lineStyle(2, pal.capEdge, 0.95);
+  g.fill(pal.cap);
   g.moveTo(x1, top - 2);
   g.lineTo(x2, top - 2);
-  g.lineStyle(1, pal.seam, 0.45);
+  g.stroke({ width: 2, color: pal.capEdge, alpha: 0.95 });
   for (const [lx, rx] of lips) {
     if (kit.hash01(`${seedKey}:c${lx}`) < 0.5) continue;
     g.moveTo(rx, top - 1);
     g.lineTo(rx - 4, top + 5);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 1, color: pal.seam, alpha: 0.45 });
   // Depth: darker towards the bottom.
   for (let k = 0; k < 4; k++) {
     const y = top + h * (0.25 + k * 0.18);
-    g.beginFill(pal.deep, 0.16);
-    g.drawRect(x1, y, x2 - x1, bottom - y);
-    g.endFill();
+    g.rect(x1, y, x2 - x1, bottom - y).fill({ color: pal.deep, alpha: 0.16 });
   }
 }
 
@@ -417,18 +405,13 @@ function drawSlab(g, l, pal, kit) {
     const w = (l.x2 - l.x1) / n;
     const x = l.x1 + i * w;
     const len = 10 + kit.hash01(`drip${l.x1}:${i}`) * 30;
-    g.beginFill(i % 2 ? pal.face : pal.seam);
-    g.drawRect(x + 2, l.y + depth - 2, w - 4, len);
-    g.endFill();
-    g.beginFill(pal.deep, 0.6);
-    g.drawRect(x + 2, l.y + depth + len - 6, w - 4, 6);
-    g.endFill();
+    g.rect(x + 2, l.y + depth - 2, w - 4, len).fill(i % 2 ? pal.face : pal.seam);
+    g.rect(x + 2, l.y + depth + len - 6, w - 4, 6).fill({ color: pal.deep, alpha: 0.6 });
   }
 }
 
 /** A cave's ceiling: an overhang of rock with a jagged underside. */
 function drawCeiling(g, c, pal, kit, worldTop = 0) {
-  g.beginFill(pal.face);
   g.moveTo(c.x1, worldTop);
   g.lineTo(c.x2, worldTop);
   let x = c.x2;
@@ -443,35 +426,26 @@ function drawCeiling(g, c, pal, kit, worldTop = 0) {
   }
   g.lineTo(c.x1, c.ceiling);
   g.closePath();
-  g.endFill();
-  g.beginFill(pal.deep, 0.6);
-  g.drawRect(c.x1, worldTop, c.x2 - c.x1, c.ceiling - worldTop - 40);
-  g.endFill();
+  g.fill(pal.face);
+  g.rect(c.x1, worldTop, c.x2 - c.x1, c.ceiling - worldTop - 40).fill({ color: pal.deep, alpha: 0.6 });
 }
 
 /** The dark columned wall at the back of a cave. */
 function drawBackWall(g, c, floor, kit) {
-  g.beginFill(0x3b2f4a);
-  g.drawRect(c.x1, c.ceiling - 20, c.x2 - c.x1, floor - c.ceiling + 40);
-  g.endFill();
+  g.rect(c.x1, c.ceiling - 20, c.x2 - c.x1, floor - c.ceiling + 40).fill(0x3b2f4a);
   let x = c.x1;
   let i = 0;
   while (x < c.x2) {
     const w = 34 + kit.hash01(`wall${c.x1}:${i}`) * 50;
     const a = 0.12 + kit.hash01(`wallA${c.x1}:${i}`) * 0.2;
-    g.beginFill(0x8a78a0, a);
-    g.drawRect(x, c.ceiling, Math.max(6, w - 6), floor - c.ceiling);
-    g.endFill();
-    g.lineStyle(2, 0x241b30, 0.55);
+    g.rect(x, c.ceiling, Math.max(6, w - 6), floor - c.ceiling).fill({ color: 0x8a78a0, alpha: a });
     g.moveTo(x, c.ceiling);
     g.lineTo(x, floor);
-    g.lineStyle(0);
+    g.stroke({ width: 2, color: 0x241b30, alpha: 0.55 });
     x += w;
     i += 1;
   }
-  g.beginFill(0x1d1626, 0.35);
-  g.drawRect(c.x1, c.ceiling - 20, c.x2 - c.x1, 140);
-  g.endFill();
+  g.rect(c.x1, c.ceiling - 20, c.x2 - c.x1, 140).fill({ color: 0x1d1626, alpha: 0.35 });
 }
 
 /** A soft radial light (canvas texture), for openings and glows. */
@@ -494,7 +468,6 @@ function radial(PIXI, inner, outer, w, h) {
 
 /** The Giant glyphs on the loading stones, as vectors (local, ~100 px tall). */
 export function drawGlyph(g, symbol, color, width = 5, alpha = 1) {
-  g.lineStyle({ width, color, alpha, cap: 'round', join: 'round' });
   if (symbol === 'grendaline') {
     g.moveTo(-34, -40);
     g.quadraticCurveTo(-46, 6, -18, 34);
@@ -517,7 +490,7 @@ export function drawGlyph(g, symbol, color, width = 5, alpha = 1) {
     g.moveTo(-46, 6);
     g.quadraticCurveTo(0, -42, 46, 6);
     g.quadraticCurveTo(0, 40, -46, 6);
-    g.drawCircle(0, 6, 11);
+    g.circle(0, 6, 11);
     for (const [x1, y1, x2, y2] of [[-30, -26, -40, -42], [0, -34, 0, -52], [30, -26, 40, -42], [-24, 34, -32, 48], [24, 34, 32, 48]]) {
       g.moveTo(x1, y1);
       g.lineTo(x2, y2);
@@ -533,9 +506,9 @@ export function drawGlyph(g, symbol, color, width = 5, alpha = 1) {
     g.quadraticCurveTo(32, -16, 32, 0);
     g.moveTo(-20, -24);
     g.quadraticCurveTo(0, -48, 20, -24);
-    g.drawCircle(0, -48, 4);
+    g.circle(0, -48, 4);
   }
-  g.lineStyle(0);
+  g.stroke({ width, color, alpha, cap: 'round', join: 'round' });
 }
 
 function skyStops(kind) {
@@ -624,15 +597,11 @@ function buildGrotto(ctx, stage) {
   // The glyph stone, carved into the wall.
   const gl = L.glyph;
   const stone = new PIXI.Graphics();
-  stone.beginFill(0x6a5a7c, 0.95);
-  stone.lineStyle(3, 0x2c2238, 0.8);
   stone.moveTo(gl.x - 92, gl.y);
   stone.lineTo(gl.x - 96, gl.y - 120);
   stone.quadraticCurveTo(gl.x, gl.y - 215, gl.x + 96, gl.y - 120);
   stone.lineTo(gl.x + 92, gl.y);
-  stone.closePath();
-  stone.endFill();
-  stone.lineStyle(0);
+  stone.closePath().fill({ color: 0x6a5a7c, alpha: 0.95 }).stroke({ width: 3, color: 0x2c2238, alpha: 0.8 });
   world.addChild(stone);
   const carve = new PIXI.Graphics();
   carve.x = gl.x;
@@ -657,9 +626,7 @@ function buildHollow(ctx) {
   const root = kit.sceneRoot(PIXI, HOLLOW.width, HOLLOW.height);
   const world = root.layer(1, 1);
   const base = new PIXI.Graphics();
-  base.beginFill(0x231b29);
-  base.drawRect(0, 0, HOLLOW.width, HOLLOW.height);
-  base.endFill();
+  base.rect(0, 0, HOLLOW.width, HOLLOW.height).fill(0x231b29);
   world.addChild(base);
   const bg = PIXI.Sprite.from(`${ART}hollow.webp`);
   bg.scale.set(HOLLOW.scale);
@@ -871,7 +838,7 @@ function setupGrotto(ctx, stage, scene) {
     c.x = cx + dx;
     c.y = cy + dy;
     const dent = new PIXI.Graphics();
-    dent.beginFill(0x241b2e, 0.85).drawCircle(0, 0, 13).endFill();
+    dent.circle(0, 0, 13).fill({ color: 0x241b2e, alpha: 0.85 });
     c.addChild(dent);
     const plain = noteSprite(ctx, n, '1');
     const right = noteSprite(ctx, n, 'right');
@@ -897,7 +864,7 @@ function setupGrotto(ctx, stage, scene) {
     const t = song.length === 1 ? 0.5 : i / (song.length - 1);
     const a = Math.PI * (1.15 + 0.7 * t);
     const dot = new PIXI.Graphics();
-    dot.beginFill(0xffffff).drawCircle(0, 0, 4).endFill();
+    dot.circle(0, 0, 4).fill(0xffffff);
     dot.x = cx + Math.cos(a) * STAFF_RADIUS;
     dot.y = cy + 24 + Math.sin(a) * STAFF_RADIUS;
     dot.tint = 0x2a2133;
@@ -909,7 +876,7 @@ function setupGrotto(ctx, stage, scene) {
   btn.x = L.button.x;
   btn.y = L.button.y - 64;
   const plate = new PIXI.Graphics();
-  plate.beginFill(0x4b3d5c, 0.95).lineStyle(2, 0x2a2133, 1).drawRoundedRect(-20, -26, 40, 52, 8).endFill();
+  plate.roundRect(-20, -26, 40, 52, 8).fill({ color: 0x4b3d5c, alpha: 0.95 }).stroke({ width: 2, color: 0x2a2133, alpha: 1 });
   btn.addChild(plate);
   const sheet = kit.sheetFrames(PIXI, `${ART}button_in.png`, 8, 1, 8);
   const press = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
@@ -930,7 +897,7 @@ function setupGrotto(ctx, stage, scene) {
   // The stone itself: E opens a note menu (keys 1-5 work there too).
   const stoneHit = new PIXI.Container();
   const hit = new PIXI.Graphics();
-  hit.beginFill(0xffffff, 0.001).drawRect(-80, -200, 160, 200).endFill();
+  hit.rect(-80, -200, 160, 200).fill({ color: 0xffffff, alpha: 0.001 });
   stoneHit.addChild(hit);
   stoneHit.x = gl.x;
   stoneHit.y = gl.y;
@@ -957,18 +924,14 @@ function rockPile(ctx, x, floor, seed) {
   rocks.sort((a, b) => a[1] - b[1]);
   for (const [rx, ry, r, i] of rocks) {
     const shade = kit.hash01(`${seed}c${i}`) > 0.5 ? 0x6b5a7e : 0x584a6a;
-    g.beginFill(shade);
-    g.lineStyle(2, 0x2a2133, 0.9);
     const pts = [];
     for (let k = 0; k < 6; k++) {
       const a = (k / 6) * Math.PI * 2 + kit.hash01(`${seed}a${i}`);
       const rr = r * (0.8 + kit.hash01(`${seed}k${i}:${k}`) * 0.3);
       pts.push(rx + Math.cos(a) * rr, ry + Math.sin(a) * rr * 0.8);
     }
-    g.drawPolygon(pts);
-    g.endFill();
-    g.lineStyle(0);
-    g.beginFill(0x9d8bb0, 0.5).drawCircle(rx - r * 0.3, ry - r * 0.35, r * 0.25).endFill();
+    g.poly(pts).fill(shade).stroke({ width: 2, color: 0x2a2133, alpha: 0.9 });
+    g.circle(rx - r * 0.3, ry - r * 0.35, r * 0.25).fill({ color: 0x9d8bb0, alpha: 0.5 });
   }
   c.addChild(g);
   c.x = x;

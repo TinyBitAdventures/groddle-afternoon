@@ -167,41 +167,31 @@ export function drawPlatform(g, p, opts = {}) {
   const depth = p.depth ?? opts.depth ?? 18;
   const r = Math.min(8, depth / 2);
   if (p.style === 'branch') {
-    g.beginFill(hex(p.color ?? 0x6e4a2b));
+    g.setFillStyle(hex(p.color ?? 0x6e4a2b));
     g.moveTo(p.x1, p.y1 - 2);
     g.lineTo(p.x2, p.y2 - 4);
     g.lineTo(p.x2, p.y2 + 6);
     g.lineTo(p.x1, p.y1 + 14);
     g.closePath();
-    g.endFill();
+    g.fill();
     return;
   }
   if (p.y1 === p.y2) {
-    g.beginFill(pal.shadow, 0.35);
-    g.drawRoundedRect(p.x1 + 3, p.y1 + 4, p.x2 - p.x1, depth, r);
-    g.endFill();
-    g.beginFill(pal.side);
-    g.drawRoundedRect(p.x1, p.y1, p.x2 - p.x1, depth, r);
-    g.endFill();
-    g.beginFill(pal.top);
-    g.drawRoundedRect(p.x1, p.y1 - 1, p.x2 - p.x1, Math.min(7, depth / 2), Math.min(4, r));
-    g.endFill();
-    g.lineStyle(1.5, pal.edge, 0.9);
-    g.drawRoundedRect(p.x1, p.y1 - 1, p.x2 - p.x1, depth + 1, r);
-    g.lineStyle(0);
+    g.roundRect(p.x1 + 3, p.y1 + 4, p.x2 - p.x1, depth, r).fill({ color: pal.shadow, alpha: 0.35 });
+    g.roundRect(p.x1, p.y1, p.x2 - p.x1, depth, r).fill(pal.side);
+    g.roundRect(p.x1, p.y1 - 1, p.x2 - p.x1, Math.min(7, depth / 2), Math.min(4, r)).fill(pal.top);
+    g.roundRect(p.x1, p.y1 - 1, p.x2 - p.x1, depth + 1, r).stroke({ width: 1.5, color: pal.edge, alpha: 0.9 });
     return;
   }
-  g.beginFill(pal.side);
   g.moveTo(p.x1, p.y1);
   g.lineTo(p.x2, p.y2);
   g.lineTo(p.x2, p.y2 + depth);
   g.lineTo(p.x1, p.y1 + depth);
   g.closePath();
-  g.endFill();
-  g.lineStyle(3, pal.top, 1);
+  g.fill(pal.side);
   g.moveTo(p.x1, p.y1);
   g.lineTo(p.x2, p.y2);
-  g.lineStyle(0);
+  g.stroke({ width: 3, color: pal.top, alpha: 1 });
 }
 
 /** A climbable ladder zone (enterScene `walls`) plus its drawing. */
@@ -213,17 +203,16 @@ export function drawLadder(g, l, opts = {}) {
   const rail = hex(opts.rail ?? 0x7a5634);
   const rung = hex(opts.rung ?? 0xa47a4b);
   const half = opts.half ?? 16;
-  g.lineStyle(5, rail, 1);
   g.moveTo(l.x - half, l.yTop);
   g.lineTo(l.x - half, l.yBot);
   g.moveTo(l.x + half, l.yTop);
   g.lineTo(l.x + half, l.yBot);
-  g.lineStyle(4, rung, 1);
+  g.stroke({ width: 5, color: rail, alpha: 1 });
   for (let y = l.yBot - 14; y > l.yTop; y -= 22) {
     g.moveTo(l.x - half, y);
     g.lineTo(l.x + half, y);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 4, color: rung, alpha: 1 });
 }
 
 /** A soft, rounded text label (signs, room names). */
@@ -250,13 +239,10 @@ export function label(PIXI, text, x, y, opts = {}) {
 export function glow(PIXI, x, y, color = 0xffe680, radius = 14) {
   const g = new PIXI.Graphics();
   for (let i = 4; i >= 1; i--) {
-    g.beginFill(hex(color), 0.12 * (5 - i));
-    g.drawCircle(0, 0, radius * (0.6 + i * 0.25));
-    g.endFill();
+    g.setFillStyle({ color: hex(color), alpha: 0.12 * (5 - i) });
+    g.circle(0, 0, radius * (0.6 + i * 0.25)).fill();
   }
-  g.beginFill(0xffffff, 0.9);
-  g.drawCircle(0, 0, radius * 0.45);
-  g.endFill();
+  g.circle(0, 0, radius * 0.45).fill({ color: 0xffffff, alpha: 0.9 });
   g.x = x;
   g.y = y;
   return g;

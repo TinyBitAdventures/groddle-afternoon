@@ -487,29 +487,16 @@ function drawBlock(g, color, size = CELL) {
   const w = size - 4;
   const half = w / 2;
   const top = Math.round(size * 0.16);
-  g.beginFill(c.glow, 0.18);
-  g.drawEllipse(0, -1, half + 8, 7);
-  g.endFill();
-  g.beginFill(c.fill, 0.9);
-  g.drawRoundedRect(-half, -w + top / 2, w, w - top / 2, 5);
-  g.endFill();
-  g.beginFill(c.top, 0.95);
-  g.drawRoundedRect(-half, -w, w, top + 2, 5);
-  g.endFill();
-  g.beginFill(0xffffff, 0.22);
-  g.drawRoundedRect(-half + 5, -w + top + 5, 7, w - top - 14, 3);
-  g.endFill();
-  g.lineStyle(1.5, c.edge, 0.7);
-  g.drawRoundedRect(-half, -w, w, w, 5);
-  g.lineStyle(0);
+  g.ellipse(0, -1, half + 8, 7).fill({ color: c.glow, alpha: 0.18 });
+  g.roundRect(-half, -w + top / 2, w, w - top / 2, 5).fill({ color: c.fill, alpha: 0.9 });
+  g.roundRect(-half, -w, w, top + 2, 5).fill({ color: c.top, alpha: 0.95 });
+  g.roundRect(-half + 5, -w + top + 5, 7, w - top - 14, 3).fill({ color: 0xffffff, alpha: 0.22 });
+  g.roundRect(-half, -w, w, w, 5).stroke({ width: 1.5, color: c.edge, alpha: 0.7 });
 }
 
 /** The perforated block-dropping tube, its mouth at (0, 0). */
 function drawTube(g, len = 150) {
-  g.beginFill(0x000000, 0.25);
-  g.drawRoundedRect(-30, -len + 4, 64, len, 10);
-  g.endFill();
-  g.beginFill(0x8f9294);
+  g.roundRect(-30, -len + 4, 64, len, 10).fill({ color: 0x000000, alpha: 0.25 });
   g.moveTo(-26, -len);
   g.lineTo(26, -len);
   g.lineTo(22, -len * 0.45);
@@ -517,33 +504,24 @@ function drawTube(g, len = 150) {
   g.lineTo(-32, -6);
   g.lineTo(-22, -len * 0.45);
   g.closePath();
-  g.endFill();
-  g.beginFill(0xc3c6c8, 0.7);
-  g.drawRect(-20, -len, 9, len - 10);
-  g.endFill();
+  g.fill(0x8f9294);
+  g.rect(-20, -len, 9, len - 10).fill({ color: 0xc3c6c8, alpha: 0.7 });
   const holes = [[-8, 0.15, 7], [9, 0.22, 5], [-12, 0.34, 5], [6, 0.4, 8], [-4, 0.55, 6], [13, 0.6, 4], [-14, 0.7, 4], [4, 0.78, 6], [-6, 0.88, 4], [12, 0.9, 5]];
   for (const [hx, at, r] of holes) {
-    g.beginFill(0x2b2d2f, 0.9);
-    g.drawEllipse(hx, -len + at * len, r, r * 1.1);
-    g.endFill();
+    g.ellipse(hx, -len + at * len, r, r * 1.1).fill({ color: 0x2b2d2f, alpha: 0.9 });
   }
-  g.beginFill(0x6e7173);
-  g.drawEllipse(0, -6, 33, 9);
-  g.endFill();
-  g.beginFill(0x1d1f20);
-  g.drawEllipse(0, -5, 27, 6);
-  g.endFill();
+  g.ellipse(0, -6, 33, 9).fill(0x6e7173);
+  g.ellipse(0, -5, 27, 6).fill(0x1d1f20);
 }
 
 /** A grey down arrow (a tube stop), its tip at (0, 0). */
 function drawArrow(g) {
-  g.beginFill(0xb5b8ba, 0.55);
-  g.drawRect(-9, -64, 18, 34);
+  g.rect(-9, -64, 18, 34);
   g.moveTo(-26, -32);
   g.lineTo(26, -32);
   g.lineTo(0, 0);
   g.closePath();
-  g.endFill();
+  g.fill({ color: 0xb5b8ba, alpha: 0.55 });
 }
 
 /** Rounded billboard on two legs; returns { c, screen, w, h }. */
@@ -552,17 +530,12 @@ function billboard(PIXI, x, y, w, h, { face = 0x5f7a8c, faceLow = 0x4c6474, fram
   c.x = x;
   c.y = y;
   const g = new PIXI.Graphics();
-  g.beginFill(frame);
-  g.drawRect(-w * 0.3 - 6, -14, 12, 14);
-  g.drawRect(w * 0.3 - 6, -14, 12, 14);
-  g.drawRoundedRect(-w / 2, -h - 14, w, h, 14);
-  g.endFill();
-  g.beginFill(faceLow);
-  g.drawRoundedRect(-w / 2 + 9, -h - 5, w - 18, h - 18, 9);
-  g.endFill();
-  g.beginFill(face);
-  g.drawRoundedRect(-w / 2 + 9, -h - 5, w - 18, (h - 18) * 0.55, 9);
-  g.endFill();
+  g.rect(-w * 0.3 - 6, -14, 12, 14);
+  g.rect(w * 0.3 - 6, -14, 12, 14);
+  g.roundRect(-w / 2, -h - 14, w, h, 14);
+  g.fill(frame);
+  g.roundRect(-w / 2 + 9, -h - 5, w - 18, h - 18, 9).fill(faceLow);
+  g.roundRect(-w / 2 + 9, -h - 5, w - 18, (h - 18) * 0.55, 9).fill(face);
   c.addChild(g);
   return { c, w, h, top: -h - 14 };
 }
@@ -575,38 +548,24 @@ function terrain(PIXI, geo) {
   const g = new PIXI.Graphics();
   const black = 0x0b0c0d;
   const fillPoly = (pts) => {
-    g.beginFill(black);
-    g.drawPolygon(pts.flat());
-    g.endFill();
+    g.poly(pts.flat()).fill(black);
   };
   let groundStart = 0;
   geo.sections.forEach((s, i) => {
     // Ground up to the ladder shaft.
     fillPoly([[groundStart, SHELF_Y], [s.x0 - 34, SHELF_Y], [s.x0 - 34, H], [groundStart, H]]);
     // Corridor: back wall, floor, shelf slab.
-    g.beginFill(0x2a2c2e);
-    g.drawRect(s.corridor.x1, SHELF_Y + SHELF_T, s.corridor.x2 - s.corridor.x1, CORR_Y - SHELF_Y - SHELF_T);
-    g.endFill();
-    g.beginFill(0x35383a);
-    g.drawRect(s.corridor.x1, CORR_Y - 46, s.corridor.x2 - s.corridor.x1, 3);
-    g.endFill();
+    g.rect(s.corridor.x1, SHELF_Y + SHELF_T, s.corridor.x2 - s.corridor.x1, CORR_Y - SHELF_Y - SHELF_T).fill(0x2a2c2e);
+    g.rect(s.corridor.x1, CORR_Y - 46, s.corridor.x2 - s.corridor.x1, 3).fill(0x35383a);
     fillPoly([[s.corridor.x1, CORR_Y], [s.corridor.x2, CORR_Y], [s.corridor.x2, H], [s.corridor.x1, H]]);
-    g.beginFill(black);
-    g.drawRect(s.x0 - 6, SHELF_Y, s.cliff.x - s.x0 + 6, SHELF_T);
-    g.endFill();
-    g.beginFill(0x3d4043, 0.8);
-    g.drawRect(s.x0 - 6, SHELF_Y, s.cliff.x - s.x0 + 6, 3);
-    g.endFill();
+    g.rect(s.x0 - 6, SHELF_Y, s.cliff.x - s.x0 + 6, SHELF_T).fill(black);
+    g.rect(s.x0 - 6, SHELF_Y, s.cliff.x - s.x0 + 6, 3).fill({ color: 0x3d4043, alpha: 0.8 });
     // Towers and pedestals.
     for (const so of s.solids) {
-      g.beginFill(black);
-      g.drawRect(so.x1, so.top, so.x2 - so.x1, SHELF_Y - so.top + 2);
-      g.endFill();
+      g.rect(so.x1, so.top, so.x2 - so.x1, SHELF_Y - so.top + 2).fill(black);
     }
     for (const sl of s.slabs) {
-      g.beginFill(black);
-      g.drawRoundedRect(sl.x1, sl.top, sl.x2 - sl.x1, 22, 5);
-      g.endFill();
+      g.roundRect(sl.x1, sl.top, sl.x2 - sl.x1, 22, 5).fill(black);
     }
     // The ledge and the hill down to the next station.
     const lastOne = i === geo.sections.length - 1;
@@ -621,13 +580,11 @@ function terrain(PIXI, geo) {
   if (geo.end.kind === 'teleporter') {
     fillPoly([[geo.end.edge, SHELF_Y], [geo.W, SHELF_Y], [geo.W, H], [geo.end.edge, H]]);
     // A hanging pillar over the drop, and the door ledge.
-    g.beginFill(black);
-    g.drawRect(geo.end.edge + 130, 0, 60, SHELF_Y - 6.2 * CELL);
-    g.drawRoundedRect(geo.end.padX - 70, geo.end.ledgeY, 140, 22, 4);
-    g.endFill();
+    g.rect(geo.end.edge + 130, 0, 60, SHELF_Y - 6.2 * CELL);
+    g.roundRect(geo.end.padX - 70, geo.end.ledgeY, 140, 22, 4);
+    g.fill(black);
   }
   // Grass along the walkable tops (not the shelves).
-  g.beginFill(black);
   const tufts = (x1, y1, x2, y2) => {
     const len = Math.hypot(x2 - x1, y2 - y1);
     for (let d = 6; d < len - 6; d += 9) {
@@ -651,7 +608,7 @@ function terrain(PIXI, geo) {
     } else if (geo.end.kind === 'teleporter') tufts(geo.end.edge, SHELF_Y, geo.W, SHELF_Y);
     else tufts(s.cliff.end, s.cliff.top, geo.W, s.cliff.top);
   });
-  g.endFill();
+  g.fill(black);
   return g;
 }
 
@@ -692,13 +649,12 @@ export const room = {
     sky.addChild(kit.gradient(PIXI, [[0, '#3c3e40'], [0.5, '#66696b'], [1, '#8b8e90']], 960, 640));
     const far = root.layer(0.3, 1);
     const hills = new PIXI.Graphics();
-    hills.beginFill(0x2f3133, 0.35);
     for (let i = 0; i < 14; i++) {
       const x = i * 520;
       hills.moveTo(x - 200, 760);
       hills.quadraticCurveTo(x + 60, 520 + (i % 3) * 50, x + 360, 760);
     }
-    hills.endFill();
+    hills.fill({ color: 0x2f3133, alpha: 0.35 });
     far.addChild(hills);
     const world = root.layer(1, 3);
     world.addChild(terrain(PIXI, geo));
@@ -957,12 +913,8 @@ function makeStationView(ctx, s) {
   const v = { arrows: [], blocks: s.positions.map(() => []), shards: [] };
   v.layer = ctx.add(new PIXI.Container(), 12);
   v.glow = new PIXI.Graphics();
-  v.glow.beginFill(0xd8f6ff, 0.18);
-  v.glow.drawEllipse(0, 0, 46, 8);
-  v.glow.endFill();
-  v.glow.beginFill(0xffffff, 0.22);
-  v.glow.drawEllipse(0, 0, 26, 4);
-  v.glow.endFill();
+  v.glow.ellipse(0, 0, 46, 8).fill({ color: 0xd8f6ff, alpha: 0.18 });
+  v.glow.ellipse(0, 0, 26, 4).fill({ color: 0xffffff, alpha: 0.22 });
   v.layer.addChild(v.glow);
   s.positions.forEach((x) => {
     const a = new PIXI.Graphics();
@@ -985,12 +937,8 @@ function makeStationView(ctx, s) {
   v.board.x = s.board.x;
   v.board.y = s.board.y;
   const frame = new PIXI.Graphics();
-  frame.beginFill(0x15171a);
-  frame.drawRoundedRect(-84, -112, 168, 104, 8);
-  frame.endFill();
-  frame.lineStyle(2, 0x4b5156, 1);
-  frame.drawRoundedRect(-84, -112, 168, 104, 8);
-  frame.lineStyle(0);
+  frame.roundRect(-84, -112, 168, 104, 8).fill(0x15171a);
+  frame.roundRect(-84, -112, 168, 104, 8).stroke({ width: 2, color: 0x4b5156, alpha: 1 });
   v.board.addChild(frame);
   v.board.addChild(text(ctx.kit, PIXI, 'Limit', -40, -98, 13));
   v.count = text(ctx.kit, PIXI, '0', 12, -98, 19);
@@ -1007,9 +955,7 @@ function makeButton(ctx, section, kind, at) {
   const c = new PIXI.Container();
   if (kind === 'reset') c.addChild(kit.label(PIXI, 'Reset', 0, -46, { size: 12, fill: 0xffffff, stroke: 0x111111, strokeThickness: 3 }));
   const post = new PIXI.Graphics();
-  post.beginFill(0x1a1c1e);
-  post.drawRoundedRect(-5, -20, 10, 20, 3);
-  post.endFill();
+  post.roundRect(-5, -20, 10, 20, 3).fill(0x1a1c1e);
   c.addChild(post);
   const btn = new PIXI.Sprite(ctx.data.outTex);
   btn.anchor.set(0.5, 0.5);
@@ -1212,9 +1158,7 @@ function syncColumnTargets(ctx) {
         if (t.sprite && !t.sprite.destroyed) t.sprite.destroy();
       }
       const hit = new ctx.PIXI.Graphics();
-      hit.beginFill(0xffffff, 0.001);
-      hit.drawRect(-CELL / 2, top - s.bases[p], CELL, s.bases[p] - top);
-      hit.endFill();
+      hit.rect(-CELL / 2, top - s.bases[p], CELL, s.bases[p] - top).fill({ color: 0xffffff, alpha: 0.001 });
       hit.x = s.positions[p];
       hit.y = s.bases[p];
       map[key] = ctx.register({ classId: 'mental_block_blocks', label: 'Blocks', subtitle: 'Dropped from the tube', sprite: hit, mbColumn: { section: i, pos: p, top } });
@@ -1243,15 +1187,11 @@ function redrawStation(ctx, i, opts = {}) {
   const perRow = 5;
   const size = 14;
   const rows = Math.ceil(s.queue.length / perRow);
-  strip.lineStyle(2, 0xdfe6ea, 0.9);
-  strip.drawRoundedRect(-62, -82, 124, rows * 18 + 6, 4);
-  strip.lineStyle(0);
+  strip.roundRect(-62, -82, 124, rows * 18 + 6, 4).stroke({ width: 2, color: 0xdfe6ea, alpha: 0.9 });
   rest.forEach((c, k) => {
     const row = Math.floor(k / perRow);
     const col = k % perRow;
-    strip.beginFill(c === R ? 0xe0484d : 0x86e3f6);
-    strip.drawRoundedRect(-55 + col * 23, -78 + row * 18, size + 4, size, 3);
-    strip.endFill();
+    strip.roundRect(-55 + col * 23, -78 + row * 18, size + 4, size, 3).fill(c === R ? 0xe0484d : 0x86e3f6);
   });
   // The station map: shelf, solids, columns and the tube.
   const m = v.map;
@@ -1262,23 +1202,18 @@ function redrawStation(ctx, i, opts = {}) {
   const sy = 0.11;
   const mx = (x) => -75 + (x - x1) * sx;
   const my = (y) => -14 - (SHELF_Y - y) * sy;
-  m.beginFill(0x55595d);
-  m.drawRect(mx(x1), my(SHELF_Y), 150, 2);
-  m.drawRect(mx(s.cliff.x), my(s.cliff.top), mx(x2) - mx(s.cliff.x), my(SHELF_Y) - my(s.cliff.top));
-  for (const so of s.solids) m.drawRect(mx(so.x1), my(so.top), (so.x2 - so.x1) * sx, my(SHELF_Y) - my(so.top));
-  for (const sl of s.slabs) m.drawRect(mx(sl.x1), my(sl.top), (sl.x2 - sl.x1) * sx, 2);
-  m.endFill();
+  m.rect(mx(x1), my(SHELF_Y), 150, 2);
+  m.rect(mx(s.cliff.x), my(s.cliff.top), mx(x2) - mx(s.cliff.x), my(SHELF_Y) - my(s.cliff.top));
+  for (const so of s.solids) m.rect(mx(so.x1), my(so.top), (so.x2 - so.x1) * sx, my(SHELF_Y) - my(so.top));
+  for (const sl of s.slabs) m.rect(mx(sl.x1), my(sl.top), (sl.x2 - sl.x1) * sx, 2);
+  m.fill(0x55595d);
   st.cols.forEach((stack, p) => {
     stack.forEach((c, k) => {
-      m.beginFill(c === R ? 0xe0484d : 0x86e3f6);
-      m.drawRect(mx(s.positions[p]) - 3.5, my(s.bases[p] - (k + 1) * CELL), 7, CELL * sy - 1);
-      m.endFill();
+      m.rect(mx(s.positions[p]) - 3.5, my(s.bases[p] - (k + 1) * CELL), 7, CELL * sy - 1).fill(c === R ? 0xe0484d : 0x86e3f6);
     });
   });
   s.positions.forEach((x, p) => {
-    m.beginFill(p === st.tube ? 0xd8dcdf : 0x6b6f73);
-    m.drawRect(mx(x) - 3, -60, 6, 7);
-    m.endFill();
+    m.rect(mx(x) - 3, -60, 6, 7).fill(p === st.tube ? 0xd8dcdf : 0x6b6f73);
   });
 }
 
@@ -1375,9 +1310,7 @@ function makeEnd(ctx) {
     const sign = text(kit, PIXI, 'You done\ndid it!', end.padX - 150, SHELF_Y - 110, 26, 0xf5e61e, { stroke: 0x111111, strokeThickness: 4 });
     ctx.add(sign, 9);
     const hit = new PIXI.Graphics();
-    hit.beginFill(0xffffff, 0.001);
-    hit.drawRect(-60, -90, 120, 90);
-    hit.endFill();
+    hit.rect(-60, -90, 120, 90).fill({ color: 0xffffff, alpha: 0.001 });
     hit.x = end.padX;
     hit.y = SHELF_Y;
     ctx.data.endTarget = ctx.register({ classId: 'mental_block_teleporter', label: 'Teleporter', subtitle: 'The way out', sprite: hit });
@@ -1385,9 +1318,7 @@ function makeEnd(ctx) {
     const door = kit.deco(PIXI, 'door_asset_gray', end.x, end.y + 4, { scale: 0.28, tint: 0x9db3d6 });
     ctx.add(door, 5);
     const hit = new PIXI.Graphics();
-    hit.beginFill(0xffffff, 0.001);
-    hit.drawRect(-50, -150, 100, 150);
-    hit.endFill();
+    hit.rect(-50, -150, 100, 150).fill({ color: 0xffffff, alpha: 0.001 });
     hit.x = end.x;
     hit.y = end.y;
     ctx.data.endTarget = ctx.register({ classId: 'puzzle_exit_door', label: 'Exit', subtitle: 'The way out', sprite: hit });
@@ -1483,9 +1414,7 @@ function demoButton(ctx, parent, x, y, onPress, label = 'Demo Button') {
   spr.y = y;
   parent.addChild(spr);
   const hit = new PIXI.Graphics();
-  hit.beginFill(0xffffff, 0.001);
-  hit.drawCircle(0, 0, 18);
-  hit.endFill();
+  hit.circle(0, 0, 18).fill({ color: 0xffffff, alpha: 0.001 });
   hit.x = parent.x + x;
   hit.y = parent.y + y;
   const demo = {

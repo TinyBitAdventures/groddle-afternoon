@@ -840,12 +840,12 @@ function choreArt(engine, neighbour, layout) {
   for (const dx of [-70, 70]) {
     const arm = dx < 0 ? 30 : -30;
     const post = new PIXI.Graphics();
-    post.beginFill(0x5a3e2a).drawRoundedRect(dx - 4, -150, 8, 150, 3).endFill();
-    post.beginFill(0x5a3e2a).drawRect(Math.min(dx, dx + arm), -150, Math.abs(arm), 6).endFill();
+    post.roundRect(dx - 4, -150, 8, 150, 3).fill(0x5a3e2a);
+    post.rect(Math.min(dx, dx + arm), -150, Math.abs(arm), 6).fill(0x5a3e2a);
     box.addChild(post);
     const glow = new PIXI.Graphics();
-    glow.beginFill(0xffd77a, 0.18).drawCircle(dx + arm * 0.75, -110, 34).endFill();
-    glow.beginFill(0xffe6a0, 0.3).drawCircle(dx + arm * 0.75, -110, 20).endFill();
+    glow.circle(dx + arm * 0.75, -110, 34).fill({ color: 0xffd77a, alpha: 0.18 });
+    glow.circle(dx + arm * 0.75, -110, 20).fill({ color: 0xffe6a0, alpha: 0.3 });
     glow.visible = done;
     box.addChild(glow);
     const lamp = PIXI.Sprite.from(`${DECO}lantern.png`);

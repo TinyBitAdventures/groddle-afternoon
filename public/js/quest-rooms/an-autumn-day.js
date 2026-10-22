@@ -256,13 +256,12 @@ function drawWoodTree(g, x, base, h, trunk, leaf, leafAlpha, seed) {
     return v - Math.floor(v);
   };
   const w = 16 + r(1) * 18;
-  g.beginFill(trunk.color, trunk.alpha);
   g.moveTo(x - w, base);
   g.bezierCurveTo(x - w * 0.6, base - h * 0.4, x - w * 0.25 + (r(2) - 0.5) * 30, base - h * 0.75, x - 3, base - h);
   g.lineTo(x + 3, base - h);
   g.bezierCurveTo(x + w * 0.25 + (r(3) - 0.5) * 30, base - h * 0.75, x + w * 0.6, base - h * 0.4, x + w, base);
   g.closePath();
-  g.endFill();
+  g.fill({ color: trunk.color, alpha: trunk.alpha ?? 1 });
   const branches = 3 + Math.floor(r(4) * 3);
   for (let b = 0; b < branches; b++) {
     const at = 0.35 + (b / branches) * 0.55;
@@ -272,46 +271,37 @@ function drawWoodTree(g, x, base, h, trunk, leaf, leafAlpha, seed) {
     const len = 40 + r(10 + b) * 70;
     const ex = bx + side * len;
     const ey = by - 20 - r(20 + b) * 40;
-    g.lineStyle(5 - at * 3, trunk.color, trunk.alpha);
     g.moveTo(bx, by);
     g.quadraticCurveTo(bx + side * len * 0.5, by - 4, ex, ey);
-    g.lineStyle(0);
-    g.beginFill(leaf, leafAlpha);
-    g.drawEllipse(ex, ey - 3, 26 + r(30 + b) * 22, 7 + r(40 + b) * 4);
-    g.endFill();
+    g.stroke({ width: 5 - at * 3, color: trunk.color, alpha: trunk.alpha ?? 1 });
+    g.ellipse(ex, ey - 3, 26 + r(30 + b) * 22, 7 + r(40 + b) * 4).fill({ color: leaf, alpha: leafAlpha ?? 1 });
   }
-  g.beginFill(leaf, leafAlpha);
-  g.drawEllipse(x, base - h - 4, 30 + r(5) * 20, 8);
-  g.endFill();
+  g.ellipse(x, base - h - 4, 30 + r(5) * 20, 8).fill({ color: leaf, alpha: leafAlpha ?? 1 });
 }
 
 function drawBench(g, x, seatY) {
-  g.beginFill(INK);
-  for (let k = 0; k < 3; k++) g.drawRoundedRect(x - 60, seatY - 44 + k * 11, 120, 6, 2);
-  g.drawRect(x - 62, seatY - 3, 124, 7);
-  g.drawRect(x - 52, seatY - 48, 5, 50);
-  g.drawRect(x + 47, seatY - 48, 5, 50);
-  g.drawRect(x - 54, seatY, 6, 34);
-  g.drawRect(x + 48, seatY, 6, 34);
-  g.endFill();
+  for (let k = 0; k < 3; k++) g.roundRect(x - 60, seatY - 44 + k * 11, 120, 6, 2);
+  g.rect(x - 62, seatY - 3, 124, 7);
+  g.rect(x - 52, seatY - 48, 5, 50);
+  g.rect(x + 47, seatY - 48, 5, 50);
+  g.rect(x - 54, seatY, 6, 34);
+  g.rect(x + 48, seatY, 6, 34);
+  g.fill(INK);
 }
 
 function drawLamp(g, x, floor) {
-  g.beginFill(INK);
-  g.drawRect(x - 3, floor - 150, 6, 150);
-  g.drawRect(x - 9, floor - 6, 18, 6);
-  g.drawEllipse(x, floor - 166, 15, 20);
-  g.drawRect(x - 10, floor - 188, 20, 5);
-  g.endFill();
-  g.beginFill(0xffe7b0, 0.85);
-  for (const dx of [-6, 0, 6]) g.drawRoundedRect(x + dx - 1.5, floor - 176, 3, 16, 1.5);
-  g.endFill();
+  g.rect(x - 3, floor - 150, 6, 150);
+  g.rect(x - 9, floor - 6, 18, 6);
+  g.ellipse(x, floor - 166, 15, 20);
+  g.rect(x - 10, floor - 188, 20, 5);
+  g.fill(INK);
+  for (const dx of [-6, 0, 6]) g.roundRect(x + dx - 1.5, floor - 176, 3, 16, 1.5);
+  g.fill({ color: 0xffe7b0, alpha: 0.85 });
 }
 
 function drawFence(g, x1, x2, floor) {
-  g.beginFill(INK);
-  g.drawRect(x1, floor - 46, x2 - x1, 5);
-  g.drawRect(x1, floor - 24, x2 - x1, 5);
+  g.rect(x1, floor - 46, x2 - x1, 5);
+  g.rect(x1, floor - 24, x2 - x1, 5);
   for (let x = x1; x <= x2; x += 22) {
     g.moveTo(x, floor);
     g.lineTo(x, floor - 58);
@@ -320,29 +310,25 @@ function drawFence(g, x1, x2, floor) {
     g.lineTo(x + 8, floor);
     g.closePath();
   }
-  g.endFill();
+  g.fill(INK);
 }
 
 function drawStone(g, s, floor) {
-  g.beginFill(INK);
-  g.drawRoundedRect(s.x1, s.top, s.x2 - s.x1, floor - s.top + 6, 14);
-  g.endFill();
+  g.roundRect(s.x1, s.top, s.x2 - s.x1, floor - s.top + 6, 14).fill(INK);
 }
 
 function drawRockWall(g, w, floor) {
-  g.beginFill(INK);
   g.moveTo(w.x1 - 14, floor + 4);
   g.bezierCurveTo(w.x1 - 4, floor - 120, w.x1 - 10, w.top + 60, w.x1 + 6, w.top + 8);
   g.quadraticCurveTo(w.x1 + 30, w.top - 6, (w.x1 + w.x2) / 2, w.top - 2);
   g.quadraticCurveTo(w.x2 - 20, w.top - 8, w.x2 - 4, w.top + 10);
   g.bezierCurveTo(w.x2 + 6, w.top + 80, w.x2 + 2, floor - 140, w.x2 + 18, floor + 4);
   g.closePath();
-  g.endFill();
+  g.fill(INK);
   tufts(g, w.x1 + 6, w.x2 - 6, w.top, 9);
 }
 
 function tufts(g, x1, x2, y, step = 14) {
-  g.beginFill(INK);
   for (let x = x1; x < x2; x += step) {
     const h = 6 + ((x * 7) % 9);
     g.moveTo(x - 4, y + 1);
@@ -351,27 +337,24 @@ function tufts(g, x1, x2, y, step = 14) {
     g.lineTo(x + 3, y - h * 0.7);
     g.lineTo(x + 5, y + 1);
   }
-  g.endFill();
+  g.fill(INK);
 }
 
 function flowers(g, x, y, n, seed = 1) {
   for (let i = 0; i < n; i++) {
     const a = Math.sin(seed * 31 + i * 7.3);
     const b = Math.cos(seed * 17 + i * 3.1);
-    g.beginFill(i % 3 ? RED : RED_DARK, 0.95);
-    g.drawEllipse(x + a * n * 9, y - 6 - Math.abs(b) * 14, 13 + Math.abs(a) * 9, 8 + Math.abs(b) * 5);
-    g.endFill();
+    g.ellipse(x + a * n * 9, y - 6 - Math.abs(b) * 14, 13 + Math.abs(a) * 9, 8 + Math.abs(b) * 5).fill({ color: i % 3 ? RED : RED_DARK, alpha: 0.95 });
   }
 }
 
 function drawGround(g, W, H, floor) {
-  g.beginFill(INK);
   g.moveTo(0, floor + 2);
   for (let x = 0; x <= W; x += 120) g.lineTo(x, floor + 2 - ((x / 120) % 3 === 1 ? 4 : 0));
   g.lineTo(W, H);
   g.lineTo(0, H);
   g.closePath();
-  g.endFill();
+  g.fill(INK);
   tufts(g, 0, W, floor + 2, 11);
 }
 
@@ -391,14 +374,13 @@ function skyGradient(PIXI, kit, W, H, floor) {
 function lightRays(PIXI) {
   const g = new PIXI.Graphics();
   for (let i = 0; i < 5; i++) {
-    g.beginFill(0xffffff, 0.07);
     const x = 120 + i * 190;
     g.moveTo(x, 0);
     g.lineTo(x + 70, 0);
     g.lineTo(x + 230, 540);
     g.lineTo(x + 150, 540);
     g.closePath();
-    g.endFill();
+    g.fill({ color: 0xffffff, alpha: 0.07 });
   }
   return g;
 }
@@ -455,13 +437,12 @@ function drawMain(ctx) {
     ['tree_bare_thin_1', 4290, 0.5, true],
   ]) world.addChild(bareTree(PIXI, kit, name, x, FLOOR, s, flip));
   // A huge black trunk frames the clearing (the footage's dark left edge).
-  g.beginFill(INK);
   g.moveTo(2975, FLOOR + 6);
   g.bezierCurveTo(3010, FLOOR - 300, 2990, FLOOR - 700, 3030, 0);
   g.lineTo(3135, 0);
   g.bezierCurveTo(3120, FLOOR - 650, 3100, FLOOR - 260, 3150, FLOOR + 6);
   g.closePath();
-  g.endFill();
+  g.fill(INK);
   drawGround(g, W + PAD, H, FLOOR);
   drawBench(g, props.bench.x, props.bench.y);
   drawFence(g, 560, 700, FLOOR);
@@ -470,13 +451,12 @@ function drawMain(ctx) {
   for (const s of props.stones) drawStone(g, s, FLOOR);
   for (const w of props.walls) drawRockWall(g, w, FLOOR);
   // The fallen trunk with its root plate.
-  g.beginFill(INK);
-  g.drawRoundedRect(props.trunk.x1, props.trunk.top, props.trunk.x2 - props.trunk.x1, FLOOR - props.trunk.top + 6, 22);
+  g.roundRect(props.trunk.x1, props.trunk.top, props.trunk.x2 - props.trunk.x1, FLOOR - props.trunk.top + 6, 22);
   g.moveTo(props.trunk.x2 - 10, props.trunk.top + 10);
   g.lineTo(props.trunk.x2 + 40, props.trunk.top - 30);
   g.lineTo(props.trunk.x2 + 46, props.trunk.top - 24);
   g.lineTo(props.trunk.x2 + 6, props.trunk.top + 24);
-  g.endFill();
+  g.fill(INK);
   tufts(g, props.trunk.x1 + 10, props.trunk.x2 - 10, props.trunk.top, 12);
   for (const [x, n, s] of [[460, 5, 1], [820, 4, 2], [1530, 6, 3], [2240, 5, 4], [2470, 4, 5], [3260, 7, 6], [3900, 6, 7], [4340, 4, 8]]) {
     flowers(g, x, FLOOR + 2, n, s);
@@ -527,9 +507,7 @@ function drawFeelingRoom(ctx, feeling) {
   ], W + PAD, H));
   if (still) {
     const sun = new PIXI.Graphics();
-    sun.beginFill(0xfff1d6, 0.5);
-    sun.drawCircle(820, FLOOR - 300, 70);
-    sun.endFill();
+    sun.circle(820, FLOOR - 300, 70).fill({ color: 0xfff1d6, alpha: 0.5 });
     sky.addChild(sun);
   }
   screen.addChild(lightRays(PIXI));
@@ -592,9 +570,7 @@ function makeLeaves(ctx, layer, count, frozen) {
   const leaves = [];
   for (let i = 0; i < count; i++) {
     const g = new PIXI.Graphics();
-    g.beginFill(i % 3 ? 0xb5281e : 0x7d1c14, 0.9);
-    g.drawEllipse(0, 0, 6, 3);
-    g.endFill();
+    g.ellipse(0, 0, 6, 3).fill({ color: i % 3 ? 0xb5281e : 0x7d1c14, alpha: 0.9 });
     g.x = 80 + ((i * 397) % (ROOM.W - 160));
     g.y = 60 + ((i * 211) % (ROOM.FLOOR - 120));
     g.rotation = i;

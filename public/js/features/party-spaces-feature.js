@@ -799,10 +799,10 @@ function spawnBooster(engine, point) {
   const pad = new PIXI.Graphics();
   const s = space();
   const color = s.palette[0];
-  pad.beginFill(0x2b2b44, 0.85).drawRoundedRect(-34, -8, 68, 10, 5).endFill();
-  pad.beginFill(color, 1).drawRoundedRect(-28, -12, 56, 6, 3).endFill();
+  pad.roundRect(-34, -8, 68, 10, 5).fill({ color: 0x2b2b44, alpha: 0.85 });
+  pad.roundRect(-28, -12, 56, 6, 3).fill({ color: color, alpha: 1 });
   for (let i = -1; i <= 1; i += 1) {
-    pad.beginFill(0xffffff, 0.85).drawPolygon([i * 16 - 6, -16, i * 16 + 6, -16, i * 16, -26]).endFill();
+    pad.poly([i * 16 - 6, -16, i * 16 + 6, -16, i * 16, -26]).fill({ color: 0xffffff, alpha: 0.85 });
   }
   pad.x = point.x;
   pad.y = point.y + 2;
@@ -849,10 +849,10 @@ function buildOverlay(engine, s) {
   for (let i = 0; i < n; i += 1) {
     const g = new PIXI.Graphics();
     const color = s.palette[i % s.palette.length];
-    if (kind === 'bubbles') g.lineStyle(1.5, 0xffffff, 0.75).beginFill(color, 0.18).drawCircle(0, 0, 3 + (i % 5) * 1.6).endFill();
-    else if (kind === 'snow') g.beginFill(0xffffff, 0.9).drawCircle(0, 0, 1.4 + (i % 4) * 0.8).endFill();
-    else if (kind === 'sparkles') g.beginFill(color, 1).drawPolygon([0, -5, 1.4, -1.4, 5, 0, 1.4, 1.4, 0, 5, -1.4, 1.4, -5, 0, -1.4, -1.4]).endFill();
-    else g.beginFill(color, 1).drawRect(-3, -1.6, 6, 3.2).endFill();
+    if (kind === 'bubbles') g.circle(0, 0, 3 + (i % 5) * 1.6).fill({ color: color, alpha: 0.18 }).stroke({ width: 1.5, color: 0xffffff, alpha: 0.75 });
+    else if (kind === 'snow') g.circle(0, 0, 1.4 + (i % 4) * 0.8).fill({ color: 0xffffff, alpha: 0.9 });
+    else if (kind === 'sparkles') g.poly([0, -5, 1.4, -1.4, 5, 0, 1.4, 1.4, 0, 5, -1.4, 1.4, -5, 0, -1.4, -1.4]).fill({ color: color, alpha: 1 });
+    else g.rect(-3, -1.6, 6, 3.2).fill({ color: color, alpha: 1 });
     g.x = Math.random() * W;
     g.y = Math.random() * H;
     root.addChild(g);
@@ -862,19 +862,20 @@ function buildOverlay(engine, s) {
   if (kind !== 'bubbles') {
     const wire = new PIXI.Graphics();
     const sag = 22;
-    wire.lineStyle(2, 0x2a1d14, 0.7).moveTo(0, 4);
+    wire.moveTo(0, 4);
     for (let x = 0; x <= W; x += 24) wire.lineTo(x, 4 + sag * Math.sin((x / W) * Math.PI));
     root.addChild(wire);
     for (let i = 0; i < 18; i += 1) {
       const x = (i + 0.5) * (W / 18);
       const b = new PIXI.Graphics();
-      b.beginFill(0xffffff, 1).drawEllipse(0, 0, 4, 6).endFill();
+      b.ellipse(0, 0, 4, 6).fill({ color: 0xffffff, alpha: 1 });
       b.x = x;
       b.y = 10 + sag * Math.sin((x / W) * Math.PI);
       root.addChild(b);
       bulbs.push(b);
     }
   }
+  wire.stroke({ width: 2, color: 0x2a1d14, alpha: 0.7 });
   stage.addChild(root);
   overlay = { root, bits, bulbs, kind, palette: s.palette, t: 0, W, H };
   engine.setData('partyAmbience', kind);

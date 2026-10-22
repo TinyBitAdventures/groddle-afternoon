@@ -216,40 +216,37 @@ function drawAlley(ctx) {
   const world = root.layer(1, 2);
   // Light through the canopy (the recording's soft beams).
   const beams = new PIXI.Graphics();
-  beams.beginFill(0xc9f0c0, 0.09).drawPolygon([520, 0, 700, 0, 980, FLOOR, 760, FLOOR]).endFill();
-  beams.beginFill(0xc9f0c0, 0.06).drawPolygon([900, 0, 1010, 0, 1240, FLOOR, 1090, FLOOR]).endFill();
+  beams.poly([520, 0, 700, 0, 980, FLOOR, 760, FLOOR]).fill({ color: 0xc9f0c0, alpha: 0.09 });
+  beams.poly([900, 0, 1010, 0, 1240, FLOOR, 1090, FLOOR]).fill({ color: 0xc9f0c0, alpha: 0.06 });
   world.addChild(beams);
   // The ruined stone wall behind the Bureaucrat.
   const wall = new PIXI.Graphics();
-  wall.beginFill(0x6d7166).drawRoundedRect(560, FLOOR - 300, 300, 300, 10).endFill();
-  wall.lineStyle(2, 0x51554c, 0.8);
+  wall.roundRect(560, FLOOR - 300, 300, 300, 10).fill(0x6d7166);
   for (let row = 0; row < 7; row++) {
     const y = FLOOR - 300 + row * 43;
     wall.moveTo(562, y).lineTo(858, y);
     for (let x = 560 + (row % 2) * 40; x < 860; x += 80) wall.moveTo(x, y).lineTo(x, y + 43);
   }
-  wall.lineStyle(0);
-  wall.beginFill(0x4a4d45).drawRect(760, FLOOR - 82, 120, 82).endFill();
-  wall.beginFill(0x8d9186).drawRect(780, FLOOR - 64, 18, 26).drawRect(842, FLOOR - 64, 18, 26).endFill();
+  wall.stroke({ width: 2, color: 0x51554c, alpha: 0.8 });
+  wall.rect(760, FLOOR - 82, 120, 82).fill(0x4a4d45);
+  wall.rect(780, FLOOR - 64, 18, 26).rect(842, FLOOR - 64, 18, 26).fill(0x8d9186);
   world.addChild(wall);
   world.addChild(kit.deco(PIXI, 'forest_hole_back', 285, FLOOR, { scale: 1.05 }));
   // Forest floor: a mossy edge on dark earth, the recovered terrain mound behind the hole.
   const mound = kit.deco(PIXI, 'ground_forest_terrain_plat_01', 300, FLOOR + 30, { scale: 0.55, alpha: 0.9 });
   world.addChild(mound);
   const floor = new PIXI.Graphics();
-  floor.beginFill(0x2e2116).drawRect(-600, FLOOR, W + 1200, H - FLOOR + 200).endFill();
-  floor.beginFill(0x4f6b2c).drawRect(-600, FLOOR - 4, W + 1200, 12).endFill();
-  floor.beginFill(0x6d8a3c);
-  for (let x = -600; x < W + 600; x += 46) floor.drawEllipse(x + (x % 3) * 7, FLOOR - 3, 30, 7);
-  floor.endFill();
-  floor.beginFill(0x45331f);
-  for (let i = 0; i < 26; i++) floor.drawEllipse((i * 131) % W, FLOOR + 30 + ((i * 47) % 90), 10 + (i % 4) * 4, 5 + (i % 3) * 2);
-  floor.endFill();
+  floor.rect(-600, FLOOR, W + 1200, H - FLOOR + 200).fill(0x2e2116);
+  floor.rect(-600, FLOOR - 4, W + 1200, 12).fill(0x4f6b2c);
+  for (let x = -600; x < W + 600; x += 46) floor.ellipse(x + (x % 3) * 7, FLOOR - 3, 30, 7);
+  floor.fill(0x6d8a3c);
+  for (let i = 0; i < 26; i++) floor.ellipse((i * 131) % W, FLOOR + 30 + ((i * 47) % 90), 10 + (i % 4) * 4, 5 + (i % 3) * 2);
+  floor.fill(0x45331f);
   world.addChild(floor);
   // A fallen log on the path.
   const log = new PIXI.Graphics();
-  log.beginFill(0x5b3b22).drawRoundedRect(1120, FLOOR - 34, 260, 30, 14).endFill();
-  log.beginFill(0x7a5332).drawEllipse(1380, FLOOR - 19, 12, 15).endFill();
+  log.roundRect(1120, FLOOR - 34, 260, 30, 14).fill(0x5b3b22);
+  log.ellipse(1380, FLOOR - 19, 12, 15).fill(0x7a5332);
   world.addChild(log);
   [['tree_front_02', 70, 0.68], ['tree_front_01', 1500, 0.9]].forEach(([n, x, s]) => {
     world.addChild(kit.deco(PIXI, n, x, FLOOR + 30, { scale: s }));
@@ -267,14 +264,13 @@ function drawStation(ctx, stationName) {
   const world = root.layer(1, 1);
   // Cracked concrete wall and its ledge (Lily Linguistic "Subway" recordings).
   const wall = new PIXI.Graphics();
-  wall.beginFill(0x7b7d78).drawRect(-600, -200, W + 1200, FLOOR + 130).endFill();
-  wall.beginFill(0x6a6c67).drawRect(-600, FLOOR - 140, W + 1200, 22).endFill();
-  wall.beginFill(0x2b2c2a).drawRect(-600, FLOOR - 118, W + 1200, 48).endFill();
-  wall.lineStyle(3, 0x5c5e59, 0.9);
+  wall.rect(-600, -200, W + 1200, FLOOR + 130).fill(0x7b7d78);
+  wall.rect(-600, FLOOR - 140, W + 1200, 22).fill(0x6a6c67);
+  wall.rect(-600, FLOOR - 118, W + 1200, 48).fill(0x2b2c2a);
   for (const [x, y] of [[300, 120], [880, 220], [1180, 90], [1640, 250]]) {
     wall.moveTo(x, y).lineTo(x + 18, y + 60).lineTo(x + 6, y + 120).lineTo(x + 30, y + 190);
   }
-  wall.lineStyle(0);
+  wall.stroke({ width: 3, color: 0x5c5e59, alpha: 0.9 });
   world.addChild(wall);
   world.addChild(kit.label(PIXI, stationName.toUpperCase(), 900, FLOOR - 250, { size: 22, fill: 0xdad7c8, alpha: 0.75 }));
   // The platform face (recovered subway_platform_1): its yellow edge sits behind the walking line.
@@ -285,27 +281,25 @@ function drawStation(ctx, stationName) {
   // Train waiting at the far end.
   const train = new PIXI.Graphics();
   const tx = STATION.trainX;
-  train.lineStyle(4, 0x3c4546, 1).beginFill(0xe6e8e2);
-  train.drawRoundedRect(tx, FLOOR - 270, 520, 250, 90);
-  train.endFill().lineStyle(0);
-  train.beginFill(0x93a4a6).drawRoundedRect(tx + 40, FLOOR - 230, 120, 80, 24).drawRoundedRect(tx + 190, FLOOR - 230, 130, 80, 16).endFill();
-  train.beginFill(0x5e6d70).drawRect(tx, FLOOR - 70, 520, 18).endFill();
+  train.roundRect(tx, FLOOR - 270, 520, 250, 90).fill(0xe6e8e2).stroke({ width: 4, color: 0x3c4546, alpha: 1 });
+  train.roundRect(tx + 40, FLOOR - 230, 120, 80, 24).roundRect(tx + 190, FLOOR - 230, 130, 80, 16).fill(0x93a4a6);
+  train.rect(tx, FLOOR - 70, 520, 18).fill(0x5e6d70);
   world.addChild(train);
   // Pillars.
   for (const x of STATION.pillars) {
     const p = new PIXI.Graphics();
-    p.beginFill(0x8e908b).drawRect(x - 34, 0, 68, FLOOR + 14).endFill();
-    p.beginFill(0x767873).drawRect(x + 18, 0, 16, FLOOR + 14).endFill();
-    p.lineStyle(2, 0x5f615c, 0.8).moveTo(x - 10, FLOOR - 220).lineTo(x + 4, FLOOR - 170).lineTo(x - 6, FLOOR - 120);
+    p.rect(x - 34, 0, 68, FLOOR + 14).fill(0x8e908b);
+    p.rect(x + 18, 0, 16, FLOOR + 14).fill(0x767873);
+    p.moveTo(x - 10, FLOOR - 220).lineTo(x + 4, FLOOR - 170).lineTo(x - 6, FLOOR - 120).stroke({ width: 2, color: 0x5f615c, alpha: 0.8 });
     world.addChild(p);
   }
   // Subway map stand.
   const stand = new PIXI.Graphics();
   const mx = STATION.mapX;
-  stand.beginFill(0x8a8c87).drawRect(mx - 3, FLOOR - 70, 6, 70).endFill();
-  stand.beginFill(0x8a8c87).drawEllipse(mx, FLOOR, 22, 5).endFill();
-  stand.lineStyle(3, 0x9c9a90).beginFill(0xe9e5d6).drawRoundedRect(mx - 42, FLOOR - 140, 84, 72, 4).endFill();
-  stand.lineStyle(2, 0xb4ae9c).moveTo(mx - 28, FLOOR - 100).bezierCurveTo(mx - 10, FLOOR - 130, mx + 10, FLOOR - 80, mx + 28, FLOOR - 110);
+  stand.rect(mx - 3, FLOOR - 70, 6, 70).fill(0x8a8c87);
+  stand.ellipse(mx, FLOOR, 22, 5).fill(0x8a8c87);
+  stand.roundRect(mx - 42, FLOOR - 140, 84, 72, 4).fill(0xe9e5d6).stroke({ width: 3, color: 0x9c9a90 });
+  stand.moveTo(mx - 28, FLOOR - 100).bezierCurveTo(mx - 10, FLOOR - 130, mx + 10, FLOOR - 80, mx + 28, FLOOR - 110).stroke({ width: 2, color: 0xb4ae9c });
   world.addChild(stand);
   world.addChild(kit.label(PIXI, 'SUBWAY MAP', mx, FLOOR - 131, { size: 9, fill: 0x6b675c }));
   return root;
@@ -315,15 +309,14 @@ function exitSign(ctx, streetLabel) {
   const { PIXI, kit } = ctx;
   const c = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0x1f2120, 0.94).drawRoundedRect(-80, -150, 160, 56, 6).endFill();
-  g.beginFill(0xffffff).drawPolygon([50, -114, 64, -124, 64, -118, 72, -118, 72, -110, 64, -110, 64, -104]).endFill();
+  g.roundRect(-80, -150, 160, 56, 6).fill({ color: 0x1f2120, alpha: 0.94 });
+  g.poly([50, -114, 64, -124, 64, -118, 72, -118, 72, -110, 64, -110, 64, -104]).fill(0xffffff);
   // The stairway up to the street: a dark opening with lit steps.
-  g.beginFill(0x2a2b29).drawRoundedRect(-58, -90, 116, 90, 10).endFill();
-  g.beginFill(0x6e706b);
-  for (let i = 0; i < 5; i++) g.drawRect(-48 + i * 4, -14 - i * 15, 96 - i * 8, 6);
-  g.endFill();
-  g.lineStyle(3, 0x8e908b).drawRoundedRect(-58, -90, 116, 90, 10).lineStyle(0);
-  g.beginFill(0xffffff, 0.001).drawRect(-80, -150, 160, 150).endFill();
+  g.roundRect(-58, -90, 116, 90, 10).fill(0x2a2b29);
+  for (let i = 0; i < 5; i++) g.rect(-48 + i * 4, -14 - i * 15, 96 - i * 8, 6);
+  g.fill(0x6e706b);
+  g.roundRect(-58, -90, 116, 90, 10).stroke({ width: 3, color: 0x8e908b });
+  g.rect(-80, -150, 160, 150).fill({ color: 0xffffff, alpha: 0.001 });
   c.addChild(g);
   c.addChild(kit.label(PIXI, streetLabel, -8, -129, { size: 12, fill: 0xffffff, wrap: 110 }));
   c.x = STATION.exitX;
@@ -468,7 +461,7 @@ function puff(ctx, x, y) {
   const { PIXI } = ctx;
   const g = new PIXI.Graphics();
   for (const [dx, dy, r] of [[0, 0, 26], [-24, 10, 18], [24, 8, 20], [-10, -18, 16], [14, -16, 15]]) {
-    g.beginFill(0xe8e6df, 0.9).drawCircle(dx, dy, r).endFill();
+    g.circle(dx, dy, r).fill({ color: 0xe8e6df, alpha: 0.9 });
   }
   g.x = x;
   g.y = y;

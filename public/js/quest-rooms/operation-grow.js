@@ -89,29 +89,21 @@ export function growPlatforms() {
 /* ------------------------------------------------------------------ */
 
 function drawBank(g, b) {
-  g.beginFill(0x3e3326);
-  g.drawRoundedRect(b.x1, b.y, b.x2 - b.x1, FLOOR - b.y, 10);
-  g.endFill();
-  g.beginFill(0x5c7a3a);
-  g.drawRoundedRect(b.x1 - 4, b.y - 4, b.x2 - b.x1 + 8, 14, 7);
-  g.endFill();
+  g.roundRect(b.x1, b.y, b.x2 - b.x1, FLOOR - b.y, 10).fill(0x3e3326);
+  g.roundRect(b.x1 - 4, b.y - 4, b.x2 - b.x1 + 8, 14, 7).fill(0x5c7a3a);
 }
 
 /** Mab's card: her icon on a plank with seven dots, three of them lit. */
 function drawHint(PIXI, kit) {
   const c = new PIXI.Container();
   const post = new PIXI.Graphics();
-  post.beginFill(0x5a3d22);
-  post.drawRect(-5, -70, 10, 70);
-  post.endFill();
+  post.rect(-5, -70, 10, 70).fill(0x5a3d22);
   c.addChild(post);
   c.addChild(kit.deco(PIXI, 'firebog_sign_blank_plank', 0, -56, { scale: 0.4 }));
   const dots = new PIXI.Graphics();
   for (let i = 0; i < PATCHES; i++) {
     const lit = HINT_PATCHES.includes(i);
-    dots.beginFill(lit ? 0x8fd9ff : 0x3b2f22, lit ? 1 : 0.8);
-    dots.drawCircle(-66 + i * 22, -88, lit ? 7 : 4.5);
-    dots.endFill();
+    dots.circle(-66 + i * 22, -88, lit ? 7 : 4.5).fill({ color: lit ? 0x8fd9ff : 0x3b2f22, alpha: lit ? 1 : 0.8 });
   }
   c.addChild(dots);
   const mab = PIXI.Sprite.from('assets/sprites/icons/icon_mab@3x.png');
@@ -181,12 +173,8 @@ export const room = {
     }
     const world = root.layer(1, 3);
     const g = new PIXI.Graphics();
-    g.beginFill(0x3a2f24);
-    g.drawRect(-400, FLOOR, W + 800, H - FLOOR + 400);
-    g.endFill();
-    g.beginFill(0x4f6a35);
-    g.drawRect(-400, FLOOR - 6, W + 800, 14);
-    g.endFill();
+    g.rect(-400, FLOOR, W + 800, H - FLOOR + 400).fill(0x3a2f24);
+    g.rect(-400, FLOOR - 6, W + 800, 14).fill(0x4f6a35);
     for (const b of BANKS) drawBank(g, b);
     world.addChild(g);
     for (let i = 0; i < PATCHES - 1; i++) {
@@ -200,9 +188,7 @@ export const room = {
     world.addChild(kit.label(PIXI, 'Back to Ur', EXIT.x + 70, FLOOR - 82, { size: 15, fill: 0xf7e7c4 }));
     // The gloom: a dusk wash over everything, lifted as the patches bloom.
     const gloom = new PIXI.Graphics();
-    gloom.beginFill(0x12101c);
-    gloom.drawRect(-200, -200, W + 400, H + 400);
-    gloom.endFill();
+    gloom.rect(-200, -200, W + 400, H + 400).fill(0x12101c);
     gloom.alpha = 0.55;
     gloom.zIndex = 4;
     root.addChild(gloom);
@@ -230,16 +216,12 @@ export const room = {
     // Mab's note sits above the gloom so it can be found in the dark.
     ctx.add(drawHint(ctx.PIXI, ctx.kit), 12);
     const hint = new ctx.PIXI.Graphics();
-    hint.beginFill(0xffffff, 0.001);
-    hint.drawRect(-70, -150, 140, 150);
-    hint.endFill();
+    hint.rect(-70, -150, 140, 150).fill({ color: 0xffffff, alpha: 0.001 });
     hint.x = HINT.x;
     hint.y = HINT.y;
     ctx.data.hint = ctx.register({ classId: 'mab_hint', label: "Mab's Note", subtitle: 'Read it', sprite: hint });
     const exitHit = new ctx.PIXI.Graphics();
-    exitHit.beginFill(0xffffff, 0.001);
-    exitHit.drawRect(-60, -180, 120, 180);
-    exitHit.endFill();
+    exitHit.rect(-60, -180, 120, 180).fill({ color: 0xffffff, alpha: 0.001 });
     exitHit.x = EXIT.x;
     exitHit.y = EXIT.y;
     ctx.data.exit = ctx.register({ classId: 'bog_way_back', label: 'Back to Ur', subtitle: 'Complete the journey', sprite: exitHit });

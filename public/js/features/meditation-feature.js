@@ -195,9 +195,7 @@ function drawMeditationFx(engine, now) {
     [0xf2ecff, 0.1, 0.55],
   ];
   for (const [color, alpha, k] of layers) {
-    halo.beginFill(color, alpha * (0.75 + breath * 0.5));
-    halo.drawEllipse(cx, chest + 4, (h * 0.62 + breath * 10) * k, (h * 0.72 + breath * 12) * k);
-    halo.endFill();
+    halo.ellipse(cx, chest + 4, (h * 0.62 + breath * 10) * k, (h * 0.72 + breath * 12) * k).fill({ color: color, alpha: alpha * (0.75 + breath * 0.5) });
   }
 
   // Ground ripple: one flattened ring every two seconds.
@@ -205,13 +203,9 @@ function drawMeditationFx(engine, now) {
   ripple.clear();
   for (const lag of [0, 0.5]) {
     const p = ((t / 2000 + lag) % 1);
-    ripple.lineStyle(2, 0xe8f0ff, 0.42 * (1 - p));
-    ripple.drawEllipse(cx, feet - 2, 18 + p * 70, 5 + p * 14);
+    ripple.ellipse(cx, feet - 2, 18 + p * 70, 5 + p * 14).stroke({ width: 2, color: 0xe8f0ff, alpha: 0.42 * (1 - p) });
   }
-  ripple.lineStyle(0);
-  ripple.beginFill(0xbfd3ff, 0.16 + breath * 0.08);
-  ripple.drawEllipse(cx, feet - 2, 30, 7);
-  ripple.endFill();
+  ripple.ellipse(cx, feet - 2, 30, 7).fill({ color: 0xbfd3ff, alpha: 0.16 + breath * 0.08 });
 
   // Rising motes spiralling up around the avatar.
   const motes = fx.motes;
@@ -222,9 +216,7 @@ function drawMeditationFx(engine, now) {
     const x = cx + Math.cos(angle) * seed.radius * (0.7 + life * 0.5);
     const y = feet - 8 - life * (h + 40);
     const a = Math.sin(life * Math.PI) * 0.85;
-    motes.beginFill(life > 0.5 ? 0xfff6d8 : 0xe3eaff, a);
-    motes.drawCircle(x, y, 1.4 + (1 - life) * 1.8);
-    motes.endFill();
+    motes.circle(x, y, 1.4 + (1 - life) * 1.8).fill({ color: life > 0.5 ? 0xfff6d8 : 0xe3eaff, alpha: a });
   }
 
   // The orb, floating just in front of the chest (source delta_y -8).
@@ -232,21 +224,18 @@ function drawMeditationFx(engine, now) {
   const orbX = cx + (player.facing === 'left' ? -1 : 1) * h * 0.3;
   fx.orb.position.set(orbX, orbY);
   fx.orbGlow.clear();
-  fx.orbGlow.beginFill(0xeaf3ff, 0.18 + breath * 0.14);
-  fx.orbGlow.drawCircle(orbX, orbY, ORB_HELD_SIZE * 0.45 + breath * 5);
-  fx.orbGlow.endFill();
+  fx.orbGlow.circle(orbX, orbY, ORB_HELD_SIZE * 0.45 + breath * 5).fill({ color: 0xeaf3ff, alpha: 0.18 + breath * 0.14 });
 
   // Session ring: fills to the end of the rolled duration.
   const progress = Math.min(1, t / session.durationMs);
   const ring = fx.ring;
   ring.clear();
-  ring.lineStyle(3, 0xffffff, 0.18);
   const r = ORB_HELD_SIZE * 0.5 + 6;
-  ring.drawCircle(orbX, orbY, r);
-  ring.lineStyle(3, progress >= 1 ? 0xffd85a : 0xf4f8ff, 0.85);
+  ring.circle(orbX, orbY, r).stroke({ width: 3, color: 0xffffff, alpha: 0.18 });
   const start = -Math.PI / 2;
   ring.moveTo(orbX + Math.cos(start) * r, orbY + Math.sin(start) * r);
   ring.arc(orbX, orbY, r, start, start + progress * Math.PI * 2);
+  ring.stroke({ width: 3, color: progress >= 1 ? 0xffd85a : 0xf4f8ff, alpha: 0.85 });
 }
 
 function destroyMeditationFx(engine) {
@@ -265,9 +254,9 @@ function showMaxRelax(engine) {
   const colors = [0xff6b6b, 0xffa94d, 0xffe066, 0x69db7c, 0x4dabf7, 0xb197fc];
   colors.forEach((color, i) => {
     const r = 70 - i * 6;
-    g.lineStyle(5, color, 0.9);
     g.moveTo(-r, 0);
     g.arc(0, 0, r, Math.PI, Math.PI * 2);
+    g.stroke({ width: 5, color: color, alpha: 0.9 });
   });
   g.position.set(player.x, player.y - h + 6);
   g.zIndex = 41;
@@ -302,19 +291,15 @@ function drawLevitationFx(engine, now) {
   levFx.clear();
   for (let i = 0; i < 3; i += 1) {
     const p = ((now / 700 + i / 3) % 1);
-    levFx.beginFill(0xe6f0ff, 0.35 * (1 - p) * fade);
-    levFx.drawEllipse(player.x + Math.sin(now / 300 + i * 2) * 8, player.y + 4 + p * 16, 16 - p * 6, 5 - p * 2);
-    levFx.endFill();
+    levFx.ellipse(player.x + Math.sin(now / 300 + i * 2) * 8, player.y + 4 + p * 16, 16 - p * 6, 5 - p * 2);
+    levFx.fill({ color: 0xe6f0ff, alpha: 0.35 * (1 - p) * fade });
   }
   const h = avatarHeight(engine);
-  levFx.beginFill(0xe9e2ff, 0.1 * fade);
-  levFx.drawEllipse(player.x, player.y - h * 0.5, 36, h * 0.58);
-  levFx.endFill();
+  levFx.ellipse(player.x, player.y - h * 0.5, 36, h * 0.58).fill({ color: 0xe9e2ff, alpha: 0.1 * fade });
   for (let i = 0; i < 6; i += 1) {
     const a = now / 650 + (i * Math.PI) / 3;
-    levFx.beginFill(i % 2 ? 0xfff3c4 : 0xffffff, 0.75 * fade);
-    levFx.drawCircle(player.x + Math.cos(a) * 30, player.y - h * 0.5 + Math.sin(a) * h * 0.5, 1.8);
-    levFx.endFill();
+    levFx.circle(player.x + Math.cos(a) * 30, player.y - h * 0.5 + Math.sin(a) * h * 0.5, 1.8);
+    levFx.fill({ color: i % 2 ? 0xfff3c4 : 0xffffff, alpha: 0.75 * fade });
   }
 }
 

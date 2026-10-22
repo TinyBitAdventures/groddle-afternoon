@@ -365,7 +365,7 @@ function proxy(ctx, w, h) {
   const { PIXI } = ctx;
   const c = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0xffffff, 0.001).drawRect(-w / 2, -h, w, h).endFill();
+  g.rect(-w / 2, -h, w, h).fill({ color: 0xffffff, alpha: 0.001 });
   c.addChild(g);
   return c;
 }
@@ -607,11 +607,10 @@ function buildBackground(ctx) {
   }
   const world = root.layer(1, 3);
   const g = new PIXI.Graphics();
-  g.beginFill(0xb98d4f).drawRect(0, floor, W, H - floor).endFill();
-  g.beginFill(0x8f9a46).drawRect(0, floor - 4, W, 12).endFill();
-  g.beginFill(0xa77b40, 0.6);
-  for (let x = 40; x < W; x += 170) g.drawEllipse(x + (x % 7) * 9, floor + 34 + (x % 3) * 12, 46, 6);
-  g.endFill();
+  g.rect(0, floor, W, H - floor).fill(0xb98d4f);
+  g.rect(0, floor - 4, W, 12).fill(0x8f9a46);
+  for (let x = 40; x < W; x += 170) g.ellipse(x + (x % 7) * 9, floor + 34 + (x % 3) * 12, 46, 6);
+  g.fill({ color: 0xa77b40, alpha: 0.6 });
   world.addChild(g);
   // Big trees first, behind the camp.
   world.addChild(kit.deco(PIXI, 'tree_acacia_2', sx(-2860), floor + 6, { scale: 0.62 }));

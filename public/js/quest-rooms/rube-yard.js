@@ -71,20 +71,17 @@ function makeWrizzard(PIXI, kit, spot) {
   const hat = new PIXI.Graphics();
   const hx = side ? (spot.id === 'bush' || spot.id === 'logs' ? 14 : -14) : 2;
   const hy = side ? -30 : -44;
-  hat.beginFill(0x5b3c9e);
   hat.moveTo(hx - 13, hy);
   hat.lineTo(hx + 3, hy - 30);
   hat.lineTo(hx + 13, hy);
   hat.closePath();
-  hat.endFill();
-  hat.beginFill(0x7a58c4);
-  hat.drawEllipse(hx, hy, 17, 4.5);
-  hat.endFill();
-  hat.beginFill(0xffe066);
+  hat.fill(0x5b3c9e);
+  hat.ellipse(hx, hy, 17, 4.5).fill(0x7a58c4);
   for (const [sx, sy] of [[hx - 3, hy - 9], [hx + 3, hy - 18], [hx + 6, hy - 5]]) {
-    hat.drawStar?.(sx, sy, 5, 2.6, 1.1) ?? hat.drawCircle(sx, sy, 1.6);
+    // Pixi 7's bundle had no drawStar (graphics-extras), so these were always dots.
+    hat.circle(sx, sy, 1.6);
   }
-  hat.endFill();
+  hat.fill(0xffe066);
   c.addChild(hat);
   c.hitArea = new PIXI.Rectangle(-32, -82, 64, 88);
   c.eventMode = 'static';
@@ -113,15 +110,10 @@ export const room = {
     for (let i = 0; i < 5; i++) mid.addChild(kit.deco(PIXI, 'transition_hill_1', 200 + i * 640, 600, { scale: 0.45 }));
     const back = root.layer(1, 3);
     const g = new PIXI.Graphics();
-    g.beginFill(0x8bbd57);
-    g.drawRect(0, FLOOR - 18, W, 40);
-    g.endFill();
-    g.beginFill(0x6a4329);
-    g.drawRect(0, FLOOR + 14, W, H - FLOOR);
-    g.endFill();
-    g.beginFill(0x5c3a23);
-    for (let x = 30; x < W; x += 140) g.drawEllipse(x, FLOOR + 60 + (x % 3) * 18, 34, 7);
-    g.endFill();
+    g.rect(0, FLOOR - 18, W, 40).fill(0x8bbd57);
+    g.rect(0, FLOOR + 14, W, H - FLOOR).fill(0x6a4329);
+    for (let x = 30; x < W; x += 140) g.ellipse(x, FLOOR + 60 + (x % 3) * 18, 34, 7);
+    g.fill(0x5c3a23);
     back.addChild(g);
     // The Rube's house and his tree.
     back.addChild(kit.deco(PIXI, 'house_back_medium01', 230, FLOOR + 2, { scale: 0.62 }));

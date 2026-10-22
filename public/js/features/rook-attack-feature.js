@@ -443,7 +443,7 @@ function ensureUi(engine) {
   const root = new PIXI.Container();
   root.eventMode = 'passive';
   const sky = new PIXI.Graphics();
-  sky.beginFill(0x1b1030, 1).drawRect(0, 0, VIEW_W, SCREEN_H).endFill();
+  sky.rect(0, 0, VIEW_W, SCREEN_H).fill({ color: 0x1b1030, alpha: 1 });
   sky.alpha = 0;
   sky.eventMode = 'none';
   const rookLayer = new PIXI.Container();
@@ -493,7 +493,7 @@ function buildHud(engine) {
   head.anchor.set(0.5, 0.6);
   head.scale.set(0.92);
   const headMask = new PIXI.Graphics();
-  headMask.beginFill(0xffffff).drawCircle(0, 0, 34).endFill();
+  headMask.circle(0, 0, 34).fill(0xffffff);
   head.mask = headMask;
   head.animationSpeed = pixiSpeed(24);
   const clock = new PIXI.Text('', textStyle(15, { fill: 0xfff3e0 }));
@@ -561,14 +561,14 @@ function drawHud(engine, a) {
   const t = now();
   const r = 38;
   b.disc.clear();
-  b.disc.beginFill(0x2b1b33, 0.22).drawCircle(0, 3, r + 5).endFill();
-  b.disc.beginFill(0xffffff, 0.97).drawCircle(0, 0, r).endFill();
+  b.disc.circle(0, 3, r + 5).fill({ color: 0x2b1b33, alpha: 0.22 });
+  b.disc.circle(0, 0, r).fill({ color: 0xffffff, alpha: 0.97 });
   // Health: the crimson lower arc.
   const frac = a.maxHealth ? a.health / a.maxHealth : 0;
   b.arc.clear();
-  b.arc.lineStyle(9, 0xd8d0d6, 1).arc(0, 0, r - 1, 0, Math.PI);
-  if (frac > 0) b.arc.lineStyle(9, 0xb0132f, 1).arc(0, 0, r - 1, Math.PI - Math.PI * frac, Math.PI);
-  b.arc.lineStyle(0);
+  b.arc.arc(0, 0, r - 1, 0, Math.PI).stroke({ width: 9, color: 0xd8d0d6, alpha: 1 });
+  if (frac > 0) b.arc.arc(0, 0, r - 1, Math.PI - Math.PI * frac, Math.PI);
+  b.arc.stroke({ width: 9, color: 0xb0132f, alpha: 1 });
   // Stun: seven stars over the top.
   b.stars.clear();
   const filled = a.phase === 'stunned' || a.phase === 'dead' ? 7 : Math.floor((a.stun / a.maxStun) * 7 + 1e-6);
@@ -593,8 +593,8 @@ function drawHud(engine, a) {
   b.feedBox.clear();
   if (showFeed) {
     const h = Math.max(22, b.feed.height + 14);
-    b.feedBox.beginFill(0x000000, 0.1).drawRoundedRect(-150, 64, 300, h + 2, 8).endFill();
-    b.feedBox.beginFill(0xf2f2f0, 0.96).drawRoundedRect(-150, 62, 300, h, 8).endFill();
+    b.feedBox.roundRect(-150, 64, 300, h + 2, 8).fill({ color: 0x000000, alpha: 0.1 });
+    b.feedBox.roundRect(-150, 62, 300, h, 8).fill({ color: 0xf2f2f0, alpha: 0.96 });
   }
 }
 
@@ -605,8 +605,7 @@ function drawStar(g, x, y, r, fill, line) {
     const ang = -Math.PI / 2 + (i * Math.PI) / 5;
     pts.push(x + Math.cos(ang) * rad, y + Math.sin(ang) * rad);
   }
-  g.lineStyle(1, line, 1).beginFill(fill, 1).drawPolygon(pts).endFill();
-  g.lineStyle(0);
+  g.poly(pts).fill({ color: fill, alpha: 1 }).stroke({ width: 1, color: line, alpha: 1 });
 }
 
 function fmtClock(s) {
@@ -658,7 +657,7 @@ function updateOverlays(engine) {
   let k = 1;
   if (el < cur.inMs) k = el / cur.inMs;
   else if (el > cur.inMs + cur.holdMs) k = 1 - (el - cur.inMs - cur.holdMs) / cur.outMs;
-  ui.tint.beginFill(cur.color, cur.alpha * k).drawRect(0, 0, VIEW_W, SCREEN_H).endFill();
+  ui.tint.rect(0, 0, VIEW_W, SCREEN_H).fill({ color: cur.color, alpha: cur.alpha * k });
   ui.textLayer.alpha = Math.max(0, Math.min(1, k * 1.15));
 }
 
@@ -798,8 +797,8 @@ function spawnFeathers(engine, x, y, n = 9) {
   for (let i = 0; i < n; i += 1) {
     const f = new PIXI.Graphics();
     const len = 9 + Math.random() * 8;
-    f.beginFill(i % 3 ? 0x2a1d36 : 0x4b3a60, 0.95).drawEllipse(0, 0, len * 0.32, len).endFill();
-    f.lineStyle(1, 0x9b8bb0, 0.8).moveTo(0, -len).lineTo(0, len + 3);
+    f.ellipse(0, 0, len * 0.32, len).fill({ color: i % 3 ? 0x2a1d36 : 0x4b3a60, alpha: 0.95 });
+    f.moveTo(0, -len).lineTo(0, len + 3).stroke({ width: 1, color: 0x9b8bb0, alpha: 0.8 });
     f.x = x + (Math.random() - 0.5) * 120;
     f.y = y + (Math.random() - 0.5) * 40;
     f._vy = 0.03 + Math.random() * 0.04;
@@ -854,11 +853,11 @@ function updateBeams(dtMs) {
     const w = 6 + g._size * 5;
     const { _from: a, _to: b } = g;
     g.clear();
-    g.lineStyle(w * 2.6, 0x7ff0ff, 0.22 * k).moveTo(a.x, a.y).lineTo(b.x, b.y);
-    g.lineStyle(w * 1.4, 0xbff8ff, 0.5 * k).moveTo(a.x, a.y).lineTo(b.x, b.y);
-    g.lineStyle(w * 0.55, 0xffffff, 0.95 * k).moveTo(a.x, a.y).lineTo(b.x, b.y);
-    g.lineStyle(3, 0x9ff6ff, 0.8 * k).drawCircle(b.x, b.y, 20 + (1 - k) * 46);
-    g.lineStyle(0);
+    g.moveTo(a.x, a.y).lineTo(b.x, b.y);
+    g.stroke({ width: w * 2.6, color: 0x7ff0ff, alpha: 0.22 * k }).moveTo(a.x, a.y).lineTo(b.x, b.y);
+    g.stroke({ width: w * 1.4, color: 0xbff8ff, alpha: 0.5 * k }).moveTo(a.x, a.y).lineTo(b.x, b.y);
+    g.stroke({ width: w * 0.55, color: 0xffffff, alpha: 0.95 * k }).circle(b.x, b.y, 20 + (1 - k) * 46);
+    g.stroke({ width: 3, color: 0x9ff6ff, alpha: 0.8 * k });
     if (g._life <= 0) {
       g.destroy();
       return false;
@@ -874,9 +873,8 @@ function spawnRainbow(engine, x, y, word, scale = 1) {
   const g = new PIXI.Graphics();
   const colors = [0xe8473f, 0xf39a2b, 0xf6d43b, 0x5cc35c, 0x3f9be0, 0x8a5cd6];
   colors.forEach((col, i) => {
-    g.lineStyle(7 * scale, col, 0.9).arc(0, 0, (84 - i * 8) * scale, Math.PI, 0);
+    g.arc(0, 0, (84 - i * 8) * scale, Math.PI, 0).stroke({ width: 7 * scale, color: col, alpha: 0.9 });
   });
-  g.lineStyle(0);
   const label = new PIXI.Text(word, textStyle(20 * scale, { fill: [0xffe14a, 0xff7a3d], fillGradientStops: [0, 1] }));
   label.anchor.set(0.5);
   label.y = -32 * scale;
@@ -1176,8 +1174,8 @@ function startStun(engine, source = 'verb') {
 function spawnMote(engine, from) {
   const { PIXI } = engine;
   const m = new PIXI.Graphics();
-  m.beginFill(0xfff6b0, 0.35).drawCircle(0, 0, 10).endFill();
-  m.beginFill(0xffffff, 0.95).drawCircle(0, 0, 4).endFill();
+  m.circle(0, 0, 10).fill({ color: 0xfff6b0, alpha: 0.35 });
+  m.circle(0, 0, 4).fill({ color: 0xffffff, alpha: 0.95 });
   m.x = from.x;
   m.y = from.y;
   m._from = { ...from };
@@ -1231,23 +1229,22 @@ function updateOrb(engine, dtMs) {
   orb.root.x = c.x;
   orb.root.y = c.y;
   orb.glow.clear();
-  orb.glow.beginFill(col, 0.18).drawCircle(0, 0, r * 2.1 * pulse).endFill();
-  orb.glow.beginFill(col, 0.35).drawCircle(0, 0, r * 1.45 * pulse).endFill();
+  orb.glow.circle(0, 0, r * 2.1 * pulse).fill({ color: col, alpha: 0.18 });
+  orb.glow.circle(0, 0, r * 1.45 * pulse).fill({ color: col, alpha: 0.35 });
   if (orb.joiners >= 3) {
-    orb.glow.lineStyle(2, col, 0.55);
     for (let i = 0; i < 10; i += 1) {
       const ang = t / 700 + (i * Math.PI) / 5;
       orb.glow.moveTo(Math.cos(ang) * r * 1.3, Math.sin(ang) * r * 1.3).lineTo(Math.cos(ang) * r * 2.4, Math.sin(ang) * r * 2.4);
     }
-    orb.glow.lineStyle(0);
+    orb.glow.stroke({ width: 2, color: col, alpha: 0.55 });
   }
-  orb.glow.beginFill(0xffffff, 0.9).drawCircle(0, 0, r).endFill();
-  orb.glow.beginFill(col, 0.55).drawCircle(-r * 0.25, -r * 0.25, r * 0.55).endFill();
+  orb.glow.circle(0, 0, r).fill({ color: 0xffffff, alpha: 0.9 });
+  orb.glow.circle(-r * 0.25, -r * 0.25, r * 0.55).fill({ color: col, alpha: 0.55 });
   const left = Math.max(0, 1 - (t - orb.startedAt) / (ROOK_SOURCE.orbWindowMs / timeScale));
   orb.ring.clear();
-  orb.ring.lineStyle(4, 0x2b1b33, 0.35).arc(0, 0, r * 2.3, 0, Math.PI * 2);
-  orb.ring.lineStyle(4, 0x6ad35e, 0.95).arc(0, 0, r * 2.3, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left);
-  orb.ring.lineStyle(0);
+  orb.ring.arc(0, 0, r * 2.3, 0, Math.PI * 2);
+  orb.ring.stroke({ width: 4, color: 0x2b1b33, alpha: 0.35 }).arc(0, 0, r * 2.3, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left);
+  orb.ring.stroke({ width: 4, color: 0x6ad35e, alpha: 0.95 });
   orb.count.text = String(orb.joiners);
   // The window ends at 15 s, or a moment after the last joiner arrives.
   const allIn = orb.joiners >= orb.order.length && !orb.motes.length && t >= orb.nextJoinAt - (ROOK_SOLO.joinIntervalMs / timeScale) * 0.4;
@@ -1496,13 +1493,13 @@ function updatePrimeFx(engine) {
   const g = primed.ring;
   g.clear();
   const k = 1 + Math.sin(t / 180) * 0.08;
-  g.beginFill(0xfff2a0, 0.18).drawEllipse(spr.x, spr.y - 6, 90 * k, 18 * k).endFill();
-  g.lineStyle(3, 0xffe066, 0.8).drawEllipse(spr.x, spr.y - 6, 70 * k, 13 * k).lineStyle(0);
+  g.ellipse(spr.x, spr.y - 6, 90 * k, 18 * k).fill({ color: 0xfff2a0, alpha: 0.18 });
+  g.ellipse(spr.x, spr.y - 6, 70 * k, 13 * k).stroke({ width: 3, color: 0xffe066, alpha: 0.8 });
   // The bobbing "click to donate" arrow over the bowl.
   const ay = spr.y - 175 + Math.sin(t / 220) * 8;
-  g.beginFill(0xffd23c, 0.95).lineStyle(2, 0x9a6b00, 1).drawPolygon([spr.x - 16, ay - 18, spr.x + 16, ay - 18, spr.x + 16, ay, spr.x + 26, ay, spr.x, ay + 22, spr.x - 26, ay, spr.x - 16, ay]).endFill().lineStyle(0);
+  g.poly([spr.x - 16, ay - 18, spr.x + 16, ay - 18, spr.x + 16, ay, spr.x + 26, ay, spr.x, ay + 22, spr.x - 26, ay, spr.x - 16, ay]).fill({ color: 0xffd23c, alpha: 0.95 }).stroke({ width: 2, color: 0x9a6b00, alpha: 1 });
   const left = Math.max(0, primed.until - t);
-  g.lineStyle(4, 0xffe066, 0.95).arc(spr.x, ay - 44, 12, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * left) / ROOK_SOURCE.primeMs).lineStyle(0);
+  g.arc(spr.x, ay - 44, 12, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * left) / ROOK_SOURCE.primeMs).stroke({ width: 4, color: 0xffe066, alpha: 0.95 });
 }
 
 // ---------------------------------------------------------------------------

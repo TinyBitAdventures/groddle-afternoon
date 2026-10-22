@@ -96,9 +96,7 @@ function cloudBank(PIXI, root, scene, y, tint) {
     root.addChild(deco(PIXI, i % 2 ? 'cloud_fluffy_1' : 'cloud_fluffy_2', x, y + 120, { w: 420, h: 200, tint, alpha: 0.95 }));
   }
   const under = new PIXI.Graphics();
-  under.beginFill(tint ?? 0xe8eef4, 1);
-  under.drawRect(-640, y + 60, scene.width + 1280, 600);
-  under.endFill();
+  under.rect(-640, y + 60, scene.width + 1280, 600).fill({ color: tint ?? 0xe8eef4, alpha: 1 });
   root.addChild(under);
 }
 
@@ -131,9 +129,7 @@ function buildConstellation(engine) {
     return spr;
   });
   const eye = new PIXI.Graphics();
-  eye.beginFill(0xfff4b0, 0.95);
-  eye.drawCircle(0, 0, 14);
-  eye.endFill();
+  eye.circle(0, 0, 14).fill({ color: 0xfff4b0, alpha: 0.95 });
   eye.x = scene.eye.x;
   eye.y = scene.eye.y;
   eye.alpha = 0;
@@ -159,18 +155,16 @@ function buildBeamMeDown(engine) {
   for (const s of scene.saucers) {
     const g = new PIXI.Graphics();
     const top = s.y + 30;
-    g.beginFill(0xfff2b0, 0.16);
-    g.drawPolygon([
+    g.poly([
       s.x - scene.beamTop / 2, top, s.x + scene.beamTop / 2, top,
       s.x + scene.beamBottom / 2, top + scene.beamLength, s.x - scene.beamBottom / 2, top + scene.beamLength,
     ]);
-    g.endFill();
-    g.beginFill(0xfff8d8, 0.12);
-    g.drawPolygon([
+    g.fill({ color: 0xfff2b0, alpha: 0.16 });
+    g.poly([
       s.x - scene.beamTop / 4, top, s.x + scene.beamTop / 4, top,
       s.x + scene.beamBottom / 4, top + scene.beamLength, s.x - scene.beamBottom / 4, top + scene.beamLength,
     ]);
-    g.endFill();
+    g.fill({ color: 0xfff8d8, alpha: 0.12 });
     root.addChild(g);
     beams.push(g);
     const ufo = PIXI.Sprite.from(`${ART}ufo_1.png`);
@@ -204,12 +198,8 @@ function exitDoor(engine, scene) {
   const { PIXI } = engine;
   const door = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0x2b2230);
-  g.drawRoundedRect(-34, -108, 68, 108, 26);
-  g.endFill();
-  g.beginFill(0xe2c34a);
-  g.drawRoundedRect(-26, -96, 52, 20, 4);
-  g.endFill();
+  g.roundRect(-34, -108, 68, 108, 26).fill(0x2b2230);
+  g.roundRect(-26, -96, 52, 20, 4).fill(0xe2c34a);
   door.addChild(g);
   const label = new PIXI.Text('EXIT', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 15, fontWeight: '800', fill: 0x2b2230 });
   label.anchor.set(0.5, 0.5);
@@ -397,14 +387,12 @@ function drawConstellation(engine) {
   const pts = active.run.connected.map((i) => active.scene.stars[i]);
   if (active.run.complete) pts.push(active.scene.stars[0]);
   lines.clear();
-  lines.lineStyle(3, 0xf2efe0, 0.6);
   pts.forEach((p, i) => (i ? lines.lineTo(p.x, p.y) : lines.moveTo(p.x, p.y)));
+  lines.stroke({ width: 3, color: 0xf2efe0, alpha: 0.6 });
   glows.removeChildren();
   for (const p of pts) {
     const g = new PIXI.Graphics();
-    g.beginFill(0xfff2a0, 0.28);
-    g.drawCircle(p.x, p.y, 15);
-    g.endFill();
+    g.circle(p.x, p.y, 15).fill({ color: 0xfff2a0, alpha: 0.28 });
     glows.addChild(g);
   }
 }

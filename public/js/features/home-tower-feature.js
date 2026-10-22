@@ -222,9 +222,9 @@ function nameSign(PIXI, name) {
   text.anchor.set(0.5);
   const w = Math.max(90, text.width + 26);
   const g = new PIXI.Graphics();
-  g.beginFill(0x5b3d2b).drawRect(-w / 2 + 10, 0, 6, 40).drawRect(w / 2 - 16, 0, 6, 40).endFill();
-  g.beginFill(0x8d6444).drawRoundedRect(-w / 2, -16, w, 30, 6).endFill();
-  g.beginFill(0x6e4a32).drawRoundedRect(-w / 2 + 3, -13, w - 6, 24, 5).endFill();
+  g.rect(-w / 2 + 10, 0, 6, 40).rect(w / 2 - 16, 0, 6, 40).fill(0x5b3d2b);
+  g.roundRect(-w / 2, -16, w, 30, 6).fill(0x8d6444);
+  g.roundRect(-w / 2 + 3, -13, w - 6, 24, 5).fill(0x6e4a32);
   sign.addChild(g, text);
   return sign;
 }

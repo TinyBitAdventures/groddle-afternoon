@@ -309,68 +309,49 @@ const LAB = 0xd8d8d2;
 const LAB_DARK = 0xb9bab3;
 
 function hazardStrip(g, x1, x2, y, h = 14) {
-  g.beginFill(0x3d3a30);
-  g.drawRect(x1, y, x2 - x1, h);
-  g.endFill();
-  g.beginFill(0xd8b23c);
-  g.drawRect(x1, y, x2 - x1, 3);
-  g.drawRect(x1, y + h - 3, x2 - x1, 3);
-  g.endFill();
-  g.beginFill(0xf4fbff, 0.95);
-  for (let x = x1 + 10; x < x2 - 16; x += 30) g.drawRoundedRect(x, y + 5, 16, 4, 2);
-  g.endFill();
+  g.rect(x1, y, x2 - x1, h).fill(0x3d3a30);
+  g.rect(x1, y, x2 - x1, 3);
+  g.rect(x1, y + h - 3, x2 - x1, 3);
+  g.fill(0xd8b23c);
+  for (let x = x1 + 10; x < x2 - 16; x += 30) g.roundRect(x, y + 5, 16, 4, 2);
+  g.fill({ color: 0xf4fbff, alpha: 0.95 });
 }
 
 function glowLine(g, x1, y1, x2, y2) {
-  g.lineStyle(12, CYAN, 0.12);
   g.moveTo(x1, y1);
   g.lineTo(x2, y2);
-  g.lineStyle(6, CYAN, 0.35);
+  g.stroke({ width: 12, color: CYAN, alpha: 0.12 });
   g.moveTo(x1, y1);
   g.lineTo(x2, y2);
-  g.lineStyle(3, 0xc9fdff, 1);
+  g.stroke({ width: 6, color: CYAN, alpha: 0.35 });
   g.moveTo(x1, y1);
   g.lineTo(x2, y2);
-  g.lineStyle(0);
+  g.stroke({ width: 3, color: 0xc9fdff, alpha: 1 });
 }
 
 function lightLedge(g, x1, x2, y) {
-  g.beginFill(0x8f8a78, 0.35);
-  g.drawRoundedRect(x1 + 3, y + 5, x2 - x1, 14, 5);
-  g.endFill();
-  g.beginFill(0xa9a594);
-  g.drawRoundedRect(x1, y, x2 - x1, 14, 5);
-  g.endFill();
-  g.beginFill(0xd3cfbd);
-  g.drawRect(x1 + 3, y, x2 - x1 - 6, 4);
-  g.endFill();
-  g.beginFill(0xffffff, 0.95);
-  for (let x = x1 + 10; x < x2 - 14; x += 24) g.drawRoundedRect(x, y + 6, 12, 4, 2);
-  g.endFill();
+  g.roundRect(x1 + 3, y + 5, x2 - x1, 14, 5).fill({ color: 0x8f8a78, alpha: 0.35 });
+  g.roundRect(x1, y, x2 - x1, 14, 5).fill(0xa9a594);
+  g.rect(x1 + 3, y, x2 - x1 - 6, 4).fill(0xd3cfbd);
+  for (let x = x1 + 10; x < x2 - 14; x += 24) g.roundRect(x, y + 6, 12, 4, 2);
+  g.fill({ color: 0xffffff, alpha: 0.95 });
 }
 
 /** Redraw one tile: teal shaft, cyan walls and floor, lit steps. */
 function drawTile(g, t, open, flash = 0) {
   const r = tileRect(t);
   g.clear();
-  g.beginFill(TEAL_DEEP);
-  g.drawRect(r.x1, r.yTop, TILE_W, ROW_H);
-  g.endFill();
-  g.beginFill(TEAL, 0.9);
-  g.drawRect(r.x1 + 6, r.yTop + 6, TILE_W - 12, ROW_H - 12);
-  g.endFill();
+  g.rect(r.x1, r.yTop, TILE_W, ROW_H).fill(TEAL_DEEP);
+  g.rect(r.x1 + 6, r.yTop + 6, TILE_W - 12, ROW_H - 12).fill({ color: TEAL, alpha: 0.9 });
   // Smoky swirls behind the glass.
-  g.lineStyle(10, 0x2a8c95, 0.18);
   for (let i = 0; i < 3; i++) {
     const y = r.yTop + 60 + i * 80;
     g.moveTo(r.x1 + 20, y);
     g.bezierCurveTo(r.x1 + 120, y - 50, r.x1 + 220, y + 50, r.x2 - 20, y - 10);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 10, color: 0x2a8c95, alpha: 0.18 });
   if (flash > 0) {
-    g.beginFill(0xbffaff, 0.35 * flash);
-    g.drawRect(r.x1, r.yTop, TILE_W, ROW_H);
-    g.endFill();
+    g.rect(r.x1, r.yTop, TILE_W, ROW_H).fill({ color: 0xbffaff, alpha: 0.35 * flash });
   }
   if (!open.has('L')) glowLine(g, r.x1 + 4, r.yTop + 4, r.x1 + 4, r.yBot - 4);
   if (!open.has('R')) glowLine(g, r.x2 - 4, r.yTop + 4, r.x2 - 4, r.yBot - 4);
@@ -391,127 +372,91 @@ function drawTile(g, t, open, flash = 0) {
 function drawGlyph(g, open, size = 64) {
   g.clear();
   const h = size / 2;
-  g.beginFill(0x2b2e31);
-  g.lineStyle(4, 0x8b8d88, 1);
-  g.drawRoundedRect(-h - 10, -h - 10, size + 20, size + 20, 8);
-  g.endFill();
-  g.lineStyle(0);
-  g.beginFill(0x3a3f43);
-  g.drawRoundedRect(-h - 4, -h - 4, size + 8, size + 8, 5);
-  g.endFill();
+  g.roundRect(-h - 10, -h - 10, size + 20, size + 20, 8).fill(0x2b2e31).stroke({ width: 4, color: 0x8b8d88, alpha: 1 });
+  g.roundRect(-h - 4, -h - 4, size + 8, size + 8, 5).fill(0x3a3f43);
   const ends = { U: [0, -h], R: [h, 0], D: [0, h], L: [-h, 0] };
   for (const pass of [[10, 0.25], [5, 1]]) {
-    g.lineStyle(pass[0], CYAN, pass[1]);
     for (const s of open) {
       g.moveTo(0, 0);
       g.lineTo(ends[s][0], ends[s][1]);
     }
+    g.stroke({ width: pass[0], color: CYAN, alpha: pass[1] ?? 1 });
   }
-  g.lineStyle(0);
-  g.beginFill(CYAN);
-  g.drawCircle(0, 0, 4);
-  g.endFill();
+  g.circle(0, 0, 4).fill(CYAN);
 }
 
 function drawLadder(g, x, yTop, yBot) {
-  g.lineStyle(6, 0x5d6266, 1);
   g.moveTo(x - 18, yTop - 6);
   g.lineTo(x - 18, yBot);
   g.moveTo(x + 18, yTop - 6);
   g.lineTo(x + 18, yBot);
-  g.lineStyle(5, 0x8d9296, 1);
+  g.stroke({ width: 6, color: 0x5d6266, alpha: 1 });
   for (let y = yBot - 14; y > yTop; y -= 20) {
     g.moveTo(x - 18, y);
     g.lineTo(x + 18, y);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 5, color: 0x8d9296, alpha: 1 });
 }
 
 function drawLab(g) {
   // Wall: pale panels, seams and a few rivets.
-  g.beginFill(LAB);
-  g.drawRect(-400, TOP - 260, W + 800, FLOOR - TOP + 360);
-  g.endFill();
-  g.lineStyle(2, LAB_DARK, 0.8);
+  g.rect(-400, TOP - 260, W + 800, FLOOR - TOP + 360).fill(LAB);
   for (let x = 0; x < W; x += 200) {
     g.moveTo(x, TOP);
     g.lineTo(x, FLOOR);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 2, color: LAB_DARK, alpha: 0.8 });
   // Ceiling band.
-  g.beginFill(0x9c9d97);
-  g.drawRect(0, TOP - 260, W, 250);
-  g.endFill();
+  g.rect(0, TOP - 260, W, 250).fill(0x9c9d97);
   hazardStrip(g, 0, W, TOP - 14);
   // Floor.
-  g.beginFill(0x6f6d63);
-  g.drawRect(-400, FLOOR, W + 800, H - FLOOR + 400);
-  g.endFill();
+  g.rect(-400, FLOOR, W + 800, H - FLOOR + 400).fill(0x6f6d63);
   hazardStrip(g, 0, W, FLOOR);
   // The start pillar.
-  g.beginFill(0xeee9dc);
-  g.drawRect(70, TOP, 90, FLOOR - TOP);
-  g.endFill();
-  g.beginFill(0xd5cfbf);
-  g.drawRect(140, TOP, 20, FLOOR - TOP);
-  g.endFill();
+  g.rect(70, TOP, 90, FLOOR - TOP).fill(0xeee9dc);
+  g.rect(140, TOP, 20, FLOOR - TOP).fill(0xd5cfbf);
   // Service columns: ledges, ladders and panel framing.
   for (let c = 0; c < COLS; c++) {
     const x = greyX(c);
-    g.beginFill(0xcac9c1);
-    g.drawRect(x + 8, TOP, GREY_W - 16, FLOOR - TOP);
-    g.endFill();
+    g.rect(x + 8, TOP, GREY_W - 16, FLOOR - TOP).fill(0xcac9c1);
     hazardStrip(g, x, x + GREY_W, LINE);
     drawLadder(g, ladderX(c), LINE, FLOOR);
   }
   // End ledge and the reward room under it.
-  g.beginFill(0xc4c3bb);
-  g.drawRect(END_X1, LINE + 14, W - END_X1, FLOOR - LINE - 14);
-  g.endFill();
+  g.rect(END_X1, LINE + 14, W - END_X1, FLOOR - LINE - 14).fill(0xc4c3bb);
   hazardStrip(g, END_X1, TRAP.x1, LINE);
   hazardStrip(g, TRAP.x2, W, LINE);
-  g.beginFill(0x55524a);
-  g.drawRect(END_X1, LINE, 10, FLOOR - LINE);
-  g.endFill();
+  g.rect(END_X1, LINE, 10, FLOOR - LINE).fill(0x55524a);
   lightLedge(g, END_X1 + 100, END_X1 + 220, FLOOR - 95);
   lightLedge(g, END_X1 + 300, END_X1 + 420, FLOOR - 170);
   // Cracks the test subjects left behind.
-  g.lineStyle(3, 0x8e7f6c, 0.6);
   for (const [x, y] of [[END_X1 + 150, 760], [END_X1 + 270, 690], [END_X1 + 460, 780]]) {
     g.moveTo(x, y);
     g.lineTo(x + 18, y + 26);
     g.lineTo(x + 6, y + 48);
     g.lineTo(x + 26, y + 70);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 3, color: 0x8e7f6c, alpha: 0.6 });
 }
 
 function drawTrap(g, open) {
   g.clear();
   if (open) {
-    g.beginFill(0x2f2d28);
-    g.drawRect(TRAP.x1, LINE, TRAP.x2 - TRAP.x1, 14);
-    g.endFill();
+    g.rect(TRAP.x1, LINE, TRAP.x2 - TRAP.x1, 14).fill(0x2f2d28);
     return;
   }
   hazardStrip(g, TRAP.x1, TRAP.x2, LINE);
-  g.lineStyle(2, 0x2a2822, 1);
   g.moveTo((TRAP.x1 + TRAP.x2) / 2, LINE);
   g.lineTo((TRAP.x1 + TRAP.x2) / 2, LINE + 14);
-  g.lineStyle(0);
+  g.stroke({ width: 2, color: 0x2a2822, alpha: 1 });
 }
 
 function drawEndBox(PIXI, kit) {
   const c = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0xe9ffb8, 0.22);
-  g.drawRoundedRect(-52, -116, 104, 104, 8);
-  g.endFill();
-  g.lineStyle(5, 0xd7f59a, 0.95);
-  g.drawRect(-44, -108, 88, 88);
-  g.lineStyle(2, 0xf8ffe0, 0.9);
-  g.drawRect(-36, -100, 72, 72);
-  g.lineStyle(0);
+  g.roundRect(-52, -116, 104, 104, 8).fill({ color: 0xe9ffb8, alpha: 0.22 });
+  g.rect(-44, -108, 88, 88).stroke({ width: 5, color: 0xd7f59a, alpha: 0.95 });
+  g.rect(-36, -100, 72, 72).stroke({ width: 2, color: 0xf8ffe0, alpha: 0.9 });
   c.addChild(g);
   c.addChild(kit.label(PIXI, 'end', 0, -64, { size: 22, fill: 0xf3ffd6, stroke: 0x9ab85a, strokeThickness: 3 }));
   c.x = END_BOX.x;
@@ -522,26 +467,14 @@ function drawEndBox(PIXI, kit) {
 function drawDoor(PIXI, kit) {
   const c = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0x9fe8f7, 0.25);
-  g.drawRoundedRect(-64, -176, 128, 176, 10);
-  g.endFill();
-  g.lineStyle(6, 0x8fe3f5, 1);
-  g.drawRoundedRect(-58, -170, 116, 170, 8);
-  g.lineStyle(0);
-  g.beginFill(0xbdbfbc);
-  g.drawRect(-50, -162, 100, 162);
-  g.endFill();
-  g.beginFill(0xa5a7a3);
-  g.drawRect(-2, -162, 4, 162);
-  g.endFill();
-  g.beginFill(0xffffff, 0.8);
-  g.drawRoundedRect(-36, -160, 72, 8, 4);
-  g.endFill();
+  g.roundRect(-64, -176, 128, 176, 10).fill({ color: 0x9fe8f7, alpha: 0.25 });
+  g.roundRect(-58, -170, 116, 170, 8).stroke({ width: 6, color: 0x8fe3f5, alpha: 1 });
+  g.rect(-50, -162, 100, 162).fill(0xbdbfbc);
+  g.rect(-2, -162, 4, 162).fill(0xa5a7a3);
+  g.roundRect(-36, -160, 72, 8, 4).fill({ color: 0xffffff, alpha: 0.8 });
   c.addChild(g);
   const sign = new PIXI.Graphics();
-  sign.beginFill(0x3a3a36);
-  sign.drawRoundedRect(-150, -128, 66, 30, 4);
-  sign.endFill();
+  sign.roundRect(-150, -128, 66, 30, 4).fill(0x3a3a36);
   c.addChild(sign);
   c.addChild(kit.label(PIXI, 'EXIT', -117, -113, { size: 17, fill: 0xf1f1ea }));
   c.x = DOOR.x;
@@ -663,9 +596,7 @@ export const room = {
       ctx.data.buttons[t.id] = { target, out, pressed, until: 0 };
     }
     const doorHit = new PIXI.Graphics();
-    doorHit.beginFill(0xffffff, 0.001);
-    doorHit.drawRect(-64, -176, 128, 176);
-    doorHit.endFill();
+    doorHit.rect(-64, -176, 128, 176).fill({ color: 0xffffff, alpha: 0.001 });
     doorHit.x = DOOR.x;
     doorHit.y = DOOR.y;
     ctx.data.door = ctx.register({ classId: 'puzzle_exit_door', label: 'Exit', subtitle: 'The way out', sprite: doorHit });

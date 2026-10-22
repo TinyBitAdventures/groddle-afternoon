@@ -166,21 +166,13 @@ export const room = {
     const g = new PIXI.Graphics();
     // Toy-box floor: a warm wooden band with a lighter top, broken by the pit.
     for (const f of layout.floors) {
-      g.beginFill(0xc98b4f);
-      g.drawRect(f.x1, f.y, f.x2 - f.x1, H - f.y);
-      g.endFill();
-      g.beginFill(0xe9b77a);
-      g.drawRect(f.x1, f.y, f.x2 - f.x1, 10);
-      g.endFill();
+      g.rect(f.x1, f.y, f.x2 - f.x1, H - f.y).fill(0xc98b4f);
+      g.rect(f.x1, f.y, f.x2 - f.x1, 10).fill(0xe9b77a);
       for (let x = f.x1 + 40; x < f.x2; x += 120) {
-        g.beginFill(0xb5773f, 0.5);
-        g.drawRect(x, f.y + 22, 70, 6);
-        g.endFill();
+        g.rect(x, f.y + 22, 70, 6).fill({ color: 0xb5773f, alpha: 0.5 });
       }
     }
-    g.beginFill(0x3c2a1c, 0.55);
-    g.drawRect(PIT.x1, FLOOR + 40, PIT.x2 - PIT.x1, H - FLOOR);
-    g.endFill();
+    g.rect(PIT.x1, FLOOR + 40, PIT.x2 - PIT.x1, H - FLOOR).fill({ color: 0x3c2a1c, alpha: 0.55 });
     // The blue switch ledge, a grass toy block shelf.
     world.addChild(g);
     world.addChild(kit.deco(PIXI, 'block_grass01', (layout.ledge.x1 + layout.ledge.x2) / 2, layout.ledge.y - 8, { ay: 0, scale: (layout.ledge.x2 - layout.ledge.x1 + 20) / 384 }));
@@ -220,9 +212,7 @@ export const room = {
     crab.scale.x = -0.62;
     ctx.data.crab = ctx.register({ classId: 'npc_crab', label: 'Crab', subtitle: 'Loves a good tune', sprite: crab });
     const doorHit = new ctx.PIXI.Graphics();
-    doorHit.beginFill(0xffffff, 0.001);
-    doorHit.drawRect(-60, -190, 120, 190);
-    doorHit.endFill();
+    doorHit.rect(-60, -190, 120, 190).fill({ color: 0xffffff, alpha: 0.001 });
     doorHit.x = layout.door.x;
     doorHit.y = layout.door.y;
     ctx.data.door = ctx.register({ classId: 'puzzle_exit_door', label: 'Exit', subtitle: 'The way out', sprite: doorHit });

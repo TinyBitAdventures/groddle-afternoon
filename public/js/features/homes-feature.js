@@ -347,10 +347,10 @@ function drawRoomShell(PIXI, container, width) {
   const outside = new PIXI.Graphics();
   const OUTSIDE_W = 640;
   for (const [x0, x1] of [[-OUTSIDE_W, 0], [width, width + OUTSIDE_W]]) {
-    outside.beginFill(0x3a2a1f).drawRect(x0, ceilingTop - 200, x1 - x0, bottom - ceilingTop + 400).endFill();
+    outside.rect(x0, ceilingTop - 200, x1 - x0, bottom - ceilingTop + 400).fill(0x3a2a1f);
     for (let x = x0; x < x1; x += 46) {
-      outside.beginFill(0x2c1f17).drawRect(x, ceilingTop - 200, 4, bottom - ceilingTop + 400).endFill();
-      outside.beginFill(0x4a3627, 0.6).drawRect(x + 4, ceilingTop - 200, 3, bottom - ceilingTop + 400).endFill();
+      outside.rect(x, ceilingTop - 200, 4, bottom - ceilingTop + 400).fill(0x2c1f17);
+      outside.rect(x + 4, ceilingTop - 200, 3, bottom - ceilingTop + 400).fill({ color: 0x4a3627, alpha: 0.6 });
     }
   }
   container.addChild(outside);
@@ -371,27 +371,26 @@ function drawRoomShell(PIXI, container, width) {
   // Wainscoting / pillars for the "with Molding" and "with Pillars" swatches
   if (wallLook.wainscot) {
     const top = floorY - 112;
-    g.beginFill(PIXI.utils.string2hex(wallLook.wainscot)).drawRect(0, top, width, floorY - top).endFill();
+    g.setFillStyle(PIXI.utils.string2hex(wallLook.wainscot)).rect(0, top, width, floorY - top).fill();
     for (let x = endCapW + 18; x < width - endCapW - 60; x += 110) {
-      g.lineStyle(2, PIXI.utils.string2hex(shade(wallLook.wainscot, -0.25)), 0.7);
-      g.drawRoundedRect(x, top + 16, 88, floorY - top - 40, 3);
-      g.lineStyle(0);
+      g.setStrokeStyle({ width: 2, color: PIXI.utils.string2hex(shade(wallLook.wainscot, -0.25)), alpha: 0.7 });
+      g.roundRect(x, top + 16, 88, floorY - top - 40, 3).stroke();
     }
-    g.beginFill(PIXI.utils.string2hex(shade(wallLook.wainscot, 0.25))).drawRect(0, top - 6, width, 8).endFill();
+    g.setFillStyle(PIXI.utils.string2hex(shade(wallLook.wainscot, 0.25))).rect(0, top - 6, width, 8).fill();
   }
   if (wallLook.pillars) {
     const c = PIXI.utils.string2hex(wallLook.pillars);
     for (let x = SEGMENT_W; x < width - 20; x += SEGMENT_W) {
-      g.beginFill(c).drawRect(x - 14, wallTop, 28, floorY - wallTop).endFill();
-      g.beginFill(0xffffff, 0.22).drawRect(x - 14, wallTop, 6, floorY - wallTop).endFill();
-      g.beginFill(PIXI.utils.string2hex(shade(wallLook.pillars, 0.2))).drawRect(x - 20, wallTop, 40, 12).endFill();
+      g.rect(x - 14, wallTop, 28, floorY - wallTop).fill(c);
+      g.rect(x - 14, wallTop, 6, floorY - wallTop).fill({ color: 0xffffff, alpha: 0.22 });
+      g.setFillStyle(PIXI.utils.string2hex(shade(wallLook.pillars, 0.2))).rect(x - 20, wallTop, 40, 12).fill();
     }
   }
   // Crown molding under the ceiling, and its soft shadow on the wall
-  g.beginFill(0x000000, 0.12).drawRect(0, wallTop, width, 26).endFill();
-  g.beginFill(0x000000, 0.06).drawRect(0, wallTop + 26, width, 30).endFill();
-  g.beginFill(0xf4ecdc).drawRect(0, wallTop - 10, width, 12).endFill();
-  g.beginFill(0xd9cbb0).drawRect(0, wallTop + 1, width, 4).endFill();
+  g.rect(0, wallTop, width, 26).fill({ color: 0x000000, alpha: 0.12 });
+  g.rect(0, wallTop + 26, width, 30).fill({ color: 0x000000, alpha: 0.06 });
+  g.rect(0, wallTop - 10, width, 12).fill(0xf4ecdc);
+  g.rect(0, wallTop + 1, width, 4).fill(0xd9cbb0);
   container.addChild(g);
 
   // Floor: perspective band with a darker front lip
@@ -402,33 +401,30 @@ function drawRoomShell(PIXI, container, width) {
   container.addChild(floor);
   const fg = new PIXI.Graphics();
   // Depth: the floor darkens toward the wall and brightens toward the viewer.
-  for (let i = 0; i < 5; i += 1) fg.beginFill(0x000000, 0.14 - i * 0.025).drawRect(0, floorY + i * 4, width, 4).endFill();
-  fg.beginFill(0xffffff, 0.07).drawRect(0, floorY + deck - 14, width, 14).endFill();
+  for (let i = 0; i < 5; i += 1) fg.rect(0, floorY + i * 4, width, 4).fill({ color: 0x000000, alpha: 0.14 - i * 0.025 });
+  fg.rect(0, floorY + deck - 14, width, 14).fill({ color: 0xffffff, alpha: 0.07 });
   // The floor's front edge and the house's timber cross-section beneath it.
   const edge = PIXI.utils.string2hex(shade(floorLook.base || '#8a6a4a', 0.12));
   const beam = PIXI.utils.string2hex(shade('#6b4a2f', -0.15));
-  fg.beginFill(edge).drawRect(0, floorY + deck, width, 9).endFill();
-  fg.beginFill(beam).drawRect(0, floorY + deck + 9, width, bottom - floorY - deck - 9).endFill();
-  fg.beginFill(0x000000, 0.25).drawRect(0, floorY + deck + 9, width, 5).endFill();
+  fg.rect(0, floorY + deck, width, 9).fill(edge);
+  fg.rect(0, floorY + deck + 9, width, bottom - floorY - deck - 9).fill(beam);
+  fg.rect(0, floorY + deck + 9, width, 5).fill({ color: 0x000000, alpha: 0.25 });
   for (let x = 40; x < width; x += 160) {
-    fg.beginFill(0x000000, 0.2).drawRect(x, floorY + deck + 14, 54, 30).endFill();
-    fg.beginFill(0xffffff, 0.05).drawRect(x, floorY + deck + 14, 54, 4).endFill();
+    fg.rect(x, floorY + deck + 14, 54, 30).fill({ color: 0x000000, alpha: 0.2 });
+    fg.rect(x, floorY + deck + 14, 54, 4).fill({ color: 0xffffff, alpha: 0.05 });
   }
   // Baseboard
-  fg.beginFill(0xf1e7d6).drawRect(0, floorY - 18, width, 18).endFill();
-  fg.beginFill(0xd2c1a3).drawRect(0, floorY - 4, width, 4).endFill();
+  fg.rect(0, floorY - 18, width, 18).fill(0xf1e7d6);
+  fg.rect(0, floorY - 4, width, 4).fill(0xd2c1a3);
   container.addChild(fg);
 
   // End caps: the side walls, seen edge-on
   const caps = new PIXI.Graphics();
   const capColor = PIXI.utils.string2hex(shade(wallLook.base || '#c9c4ba', -0.32));
   for (const [x0, dir] of [[0, 1], [width, -1]]) {
-    caps.beginFill(capColor);
-    caps.drawPolygon([x0, ceilingTop - 120, x0 + dir * endCapW, wallTop - 10, x0 + dir * endCapW, floorY, x0, floorY + 84]);
-    caps.endFill();
-    caps.beginFill(0x000000, 0.18);
-    caps.drawPolygon([x0 + dir * (endCapW - 8), wallTop - 10, x0 + dir * endCapW, wallTop - 10, x0 + dir * endCapW, floorY, x0 + dir * (endCapW - 8), floorY + 4]);
-    caps.endFill();
+    caps.poly([x0, ceilingTop - 120, x0 + dir * endCapW, wallTop - 10, x0 + dir * endCapW, floorY, x0, floorY + 84]).fill(capColor);
+    caps.poly([x0 + dir * (endCapW - 8), wallTop - 10, x0 + dir * endCapW, wallTop - 10, x0 + dir * endCapW, floorY, x0 + dir * (endCapW - 8), floorY + 4]);
+    caps.fill({ color: 0x000000, alpha: 0.18 });
   }
   container.addChild(caps);
 
@@ -505,7 +501,7 @@ function spawnInteriorTargets(engine) {
   door.zIndex = 8;
   engine.entityLayer.addChild(door);
   const frame = new PIXI.Graphics();
-  frame.beginFill(0x6b4a2f).drawRect(-46, -246, 92, 10).drawRect(-46, -246, 8, 246).drawRect(38, -246, 8, 246).endFill();
+  frame.rect(-46, -246, 92, 10).rect(-46, -246, 8, 246).rect(38, -246, 8, 246).fill(0x6b4a2f);
   frame.x = door.x;
   frame.y = GROUND_Y;
   frame.zIndex = 7;
@@ -697,19 +693,19 @@ function streetBackground(engine, styleId) {
   // The walkable field and the soil cross-section below it.
   const field = new PIXI.Graphics();
   field.zIndex = -40;
-  field.beginFill(style.field).drawRect(-50, 586, width + 100, GROUND_Y - 586 + 40).endFill();
-  field.beginFill(style.fieldDark, 0.5).drawRect(-50, GROUND_Y + 10, width + 100, 30).endFill();
+  field.rect(-50, 586, width + 100, GROUND_Y - 586 + 40).fill(style.field);
+  field.rect(-50, GROUND_Y + 10, width + 100, 30).fill({ color: style.fieldDark, alpha: 0.5 });
   root.addChild(field);
   const soilFill = new PIXI.Graphics();
   soilFill.zIndex = -39.5;
-  soilFill.beginFill(style.soilColor || 0x5c3b25).drawRect(-50, GROUND_Y + 30, width + 100, 240).endFill();
+  soilFill.rect(-50, GROUND_Y + 30, width + 100, 240).fill(style.soilColor || 0x5c3b25);
   root.addChild(soilFill);
   const soilW = 1038 * 0.6;
   if (!style.soil) {
-    soilFill.beginFill(0x000000, 0.22).drawRect(-50, GROUND_Y + 30, width + 100, 6).endFill();
+    soilFill.rect(-50, GROUND_Y + 30, width + 100, 6).fill({ color: 0x000000, alpha: 0.22 });
     for (let x = 30; x < width; x += 140) {
       const r = 6 + hash01(`pebble:${x}`) * 10;
-      soilFill.beginFill(0x000000, 0.14).drawEllipse(x + hash01(`p2:${x}`) * 60, GROUND_Y + 70 + hash01(`p3:${x}`) * 50, r * 1.6, r).endFill();
+      soilFill.ellipse(x + hash01(`p2:${x}`) * 60, GROUND_Y + 70 + hash01(`p3:${x}`) * 50, r * 1.6, r).fill({ color: 0x000000, alpha: 0.14 });
     }
   }
   for (let x = -40; style.soil && x < width + soilW; x += soilW - 2) {
@@ -786,9 +782,9 @@ function makeGateSprite(engine) {
   const { PIXI } = engine;
   const marker = new PIXI.Container();
   const post = new PIXI.Graphics();
-  post.beginFill(0x6e4a32).drawRoundedRect(-6, -150, 12, 150, 5).endFill();
-  post.beginFill(0x8d6444).drawRoundedRect(-70, -150, 140, 44, 10).endFill();
-  post.beginFill(0xf6e7b6).drawRoundedRect(-64, -145, 128, 34, 8).endFill();
+  post.roundRect(-6, -150, 12, 150, 5).fill(0x6e4a32);
+  post.roundRect(-70, -150, 140, 44, 10).fill(0x8d6444);
+  post.roundRect(-64, -145, 128, 34, 8).fill(0xf6e7b6);
   marker.addChild(post);
   const label = new PIXI.Text('World Gate', {
     fontFamily: 'Trebuchet MS, sans-serif',
@@ -800,7 +796,7 @@ function makeGateSprite(engine) {
   label.y = -128;
   marker.addChild(label);
   const glow = new PIXI.Graphics();
-  glow.beginFill(0xbfe9ff, 0.35).drawEllipse(0, -6, 46, 10).endFill();
+  glow.ellipse(0, -6, 46, 10).fill({ color: 0xbfe9ff, alpha: 0.35 });
   marker.addChildAt(glow, 0);
   return marker;
 }
@@ -828,7 +824,7 @@ function spawnStreetTargets(engine) {
   // The house deco already paints its front door; this is its hit area.
   const doorX = bg?.houseDoorX ?? layout.houseX;
   const door = new PIXI.Graphics();
-  door.beginFill(0xffffff, 0.001).drawRect(-46, -150, 92, 150).endFill();
+  door.rect(-46, -150, 92, 150).fill({ color: 0xffffff, alpha: 0.001 });
   door.x = doorX;
   door.y = GROUND_Y;
   door.zIndex = 9;
@@ -870,14 +866,14 @@ function furnitureView(PIXI, item) {
   box.addChild(spr);
   if (item.slot === 'ceiling') {
     const cord = new PIXI.Graphics();
-    cord.beginFill(0x5a4a3a).drawRect(-1, -8, 2, 10).endFill();
+    cord.rect(-1, -8, 2, 10).fill(0x5a4a3a);
     box.addChildAt(cord, 0);
   }
   if (item.slot === 'wall' || item.slot === 'floor') {
     const shadow = new PIXI.Graphics();
     const { w } = furnitureSize(item.classTsid);
     if (item.slot === 'floor' && !item.on) {
-      shadow.beginFill(0x000000, 0.16).drawEllipse(0, -2, w * 0.46, 7).endFill();
+      shadow.ellipse(0, -2, w * 0.46, 7).fill({ color: 0x000000, alpha: 0.16 });
     }
     box.addChildAt(shadow, 0);
     if (item.slot === 'wall') {
@@ -944,10 +940,8 @@ function furnitureBounds(item) {
 
 function selectionOutline(PIXI, b) {
   const g = new PIXI.Graphics();
-  g.lineStyle(2, 0xffd76a, 1);
-  g.drawRoundedRect(b.x - 5, b.y - 5, b.w + 10, b.h + 10, 8);
-  g.lineStyle(0);
-  g.beginFill(0xffd76a, 0.08).drawRoundedRect(b.x - 5, b.y - 5, b.w + 10, b.h + 10, 8).endFill();
+  g.roundRect(b.x - 5, b.y - 5, b.w + 10, b.h + 10, 8).stroke({ width: 2, color: 0xffd76a, alpha: 1 });
+  g.roundRect(b.x - 5, b.y - 5, b.w + 10, b.h + 10, 8).fill({ color: 0xffd76a, alpha: 0.08 });
   g.zIndex = 9999;
   return g;
 }
@@ -1060,17 +1054,16 @@ function drawCultivationMarkers(engine) {
     const half = footprint(item.protoClass);
     const sel = selected?.kind === 'cultivation' && selected.id === item.id;
     const pad = new PIXI.Graphics();
-    pad.beginFill(sel ? 0xffd76a : 0xffffff, sel ? 0.28 : 0.14).drawRoundedRect(x - half, GROUND_Y - 4, half * 2, 14, 7).endFill();
-    pad.lineStyle(2, sel ? 0xffd76a : 0xffffff, sel ? 0.95 : 0.4).drawRoundedRect(x - half, GROUND_Y - 4, half * 2, 14, 7);
-    pad.lineStyle(0);
+    pad.roundRect(x - half, GROUND_Y - 4, half * 2, 14, 7).fill({ color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.28 : 0.14 });
+    pad.roundRect(x - half, GROUND_Y - 4, half * 2, 14, 7).stroke({ width: 2, color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.95 : 0.4 });
     if (cultivationDef(item.protoClass)?.kind === 'tower') {
       g.addChild(pad);
       continue;
     }
     // Lifespan bar (buildConfig lifespan.percentage_left)
     const left = lifespanLeft(item);
-    pad.beginFill(0x2b2a33, 0.55).drawRoundedRect(x - 30, GROUND_Y + 16, 60, 6, 3).endFill();
-    pad.beginFill(left > 0.3 ? 0x7cc35a : 0xe0a84a).drawRoundedRect(x - 30, GROUND_Y + 16, 60 * left, 6, 3).endFill();
+    pad.roundRect(x - 30, GROUND_Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
+    pad.roundRect(x - 30, GROUND_Y + 16, 60 * left, 6, 3).fill(left > 0.3 ? 0x7cc35a : 0xe0a84a);
     g.addChild(pad);
   }
   engine.entityLayer.addChild(g);
@@ -1702,8 +1695,8 @@ function updateGhost(engine) {
   g.x = at.x;
   g.y = GROUND_Y;
   g.pad.clear();
-  g.pad.beginFill(ok ? 0x7cc35a : 0xe0574a, 0.35).drawRoundedRect(-g.half, -10, g.half * 2, 20, 10).endFill();
-  g.pad.lineStyle(2, ok ? 0x7cc35a : 0xe0574a, 0.95).drawRoundedRect(-g.half, -10, g.half * 2, 20, 10);
+  g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).fill({ color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.35 });
+  g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).stroke({ width: 2, color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.95 });
 }
 
 function worldPoint(engine, event) {
@@ -1996,14 +1989,13 @@ function drawScaffold(engine, width) {
   g.zIndex = 2;
   const top = INTERIOR.wallTop - 10;
   for (let x = 330; x < width - 120; x += 210) {
-    g.beginFill(0x7a5634).drawRect(x, top, 16, GROUND_Y - top).endFill();
-    g.beginFill(0x5c3f25).drawRect(x + 12, top, 4, GROUND_Y - top).endFill();
+    g.rect(x, top, 16, GROUND_Y - top).fill(0x7a5634);
+    g.rect(x + 12, top, 4, GROUND_Y - top).fill(0x5c3f25);
   }
-  g.beginFill(0x8d6444).drawRect(300, top + 70, width - 400, 12).endFill();
-  g.lineStyle(10, 0x7a5634, 1);
+  g.rect(300, top + 70, width - 400, 12).fill(0x8d6444);
   for (let x = 330; x + 210 < width - 120; x += 420) g.moveTo(x + 16, GROUND_Y - 6).lineTo(x + 210, top + 82);
-  g.lineStyle(0);
-  for (let i = 0; i < 4; i += 1) g.beginFill(0x9c9c94).drawRoundedRect(width - 380 + i * 34, GROUND_Y - 22 - (i % 2) * 18, 30, 18, 3).endFill();
+  g.stroke({ width: 10, color: 0x7a5634, alpha: 1 });
+  for (let i = 0; i < 4; i += 1) g.roundRect(width - 380 + i * 34, GROUND_Y - 22 - (i % 2) * 18, 30, 18, 3).fill(0x9c9c94);
   engine.entityLayer.addChild(g);
 }
 

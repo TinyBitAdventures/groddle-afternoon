@@ -218,9 +218,9 @@ function drawPlate(engine) {
   const got = reqs.reduce((s, r) => s + r.got, 0);
   const perc = head.status === 'done' || head.status === 'built' ? 1 : got / need;
   const w = 74;
-  g.beginFill(0x2d2a24, 0.82).drawRoundedRect(-w / 2, -12, w, 22, 9).endFill();
-  g.beginFill(0x5c564a, 1).drawRoundedRect(-w / 2 + 5, 4, w - 10, 3, 1.5).endFill();
-  g.beginFill(0xf2c14e, 1).drawRoundedRect(-w / 2 + 5, 4, Math.max(2, (w - 10) * perc), 3, 1.5).endFill();
+  g.roundRect(-w / 2, -12, w, 22, 9).fill({ color: 0x2d2a24, alpha: 0.82 });
+  g.roundRect(-w / 2 + 5, 4, w - 10, 3, 1.5).fill({ color: 0x5c564a, alpha: 1 });
+  g.roundRect(-w / 2 + 5, 4, Math.max(2, (w - 10) * perc), 3, 1.5).fill({ color: 0xf2c14e, alpha: 1 });
   const label = new engine.PIXI.Text(
     head.status === 'done' || head.status === 'built'
       ? 'Complete'

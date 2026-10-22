@@ -292,7 +292,7 @@ function buildRainbow(engine) {
   root.eventMode = 'none';
   const g = new PIXI.Graphics();
   RAINBOW_COLORS.forEach((color, i) => {
-    g.lineStyle(9, color, 0.92).arc(0, 0, 92 - i * 8.5, Math.PI * 1.04, Math.PI * 1.96);
+    g.arc(0, 0, 92 - i * 8.5, Math.PI * 1.04, Math.PI * 1.96).stroke({ width: 9, color: color, alpha: 0.92 });
   });
   root.addChild(g);
   const word = 'Secret Spot!';
@@ -325,9 +325,7 @@ function buildRainbow(engine) {
   const stars = [];
   for (let i = 0; i < 9; i += 1) {
     const star = new PIXI.Graphics();
-    star.beginFill(i % 3 === 0 ? 0xffffff : 0xf9eca1).lineStyle(1, 0xa18831, i % 3 === 0 ? 0 : 0.9);
-    star.drawPolygon(starPoints(5, i % 3 === 0 ? 4 : 6, i % 3 === 0 ? 1.6 : 2.6));
-    star.endFill();
+    star.poly(starPoints(5, i % 3 === 0 ? 4 : 6, i % 3 === 0 ? 1.6 : 2.6)).fill(i % 3 === 0 ? 0xffffff : 0xf9eca1).stroke({ width: 1, color: 0xa18831, alpha: i % 3 === 0 ? 0 : 0.9 });
     const a = Math.PI * (1.08 + (0.84 * i) / 8);
     star.x = Math.cos(a) * (60 + (i % 2) * 70);
     star.y = Math.sin(a) * (60 + (i % 2) * 70) - 8;

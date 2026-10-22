@@ -400,9 +400,7 @@ function growFx(engine, sprite, scale) {
   for (let i = 0; i < 14; i += 1) {
     const leaf = new PIXI.Graphics();
     const green = [0x7fbf4d, 0x9bd66f, 0x5fa83a, 0xc7e98f][i % 4];
-    leaf.beginFill(green, 0.95);
-    leaf.drawEllipse(0, 0, 5, 2.6);
-    leaf.endFill();
+    leaf.ellipse(0, 0, 5, 2.6).fill({ color: green, alpha: 0.95 });
     const angle = -Math.PI / 2 + (i / 13 - 0.5) * 2.4;
     const speed = 1.6 + (i % 5) * 0.35;
     leaf.x = sprite.x;
@@ -431,9 +429,7 @@ function soilPuff(engine, x, y, color = 0x7a5532) {
   const { PIXI } = engine;
   for (let i = 0; i < 10; i += 1) {
     const clod = new PIXI.Graphics();
-    clod.beginFill(i % 3 ? color : 0x5b3d22, 0.9);
-    clod.drawCircle(0, 0, 2 + (i % 3));
-    clod.endFill();
+    clod.circle(0, 0, 2 + (i % 3)).fill({ color: i % 3 ? color : 0x5b3d22, alpha: 0.9 });
     clod.zIndex = 9000;
     engine.fxLayer.addChild(clod);
     const vx = (i - 4.5) * 0.45;

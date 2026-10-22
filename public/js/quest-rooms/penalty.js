@@ -118,13 +118,13 @@ function drawPatch(ctx) {
   const c = ctx.data.patchView;
   c.removeChildren();
   const hit = new PIXI.Graphics();
-  hit.beginFill(0xffffff, 0.001).drawRect(-70, -40, 140, 50).endFill();
+  hit.rect(-70, -40, 140, 50).fill({ color: 0xffffff, alpha: 0.001 });
   c.addChild(hit);
   if (ctx.data.plot.stage === 'dug') {
     // The tunnel under the dug patch.
     const g = new PIXI.Graphics();
-    g.beginFill(0x120d09, 0.92).drawEllipse(0, -6, 62, 18).endFill();
-    g.beginFill(0x000000, 0.9).drawEllipse(0, -4, 44, 11).endFill();
+    g.ellipse(0, -6, 62, 18).fill({ color: 0x120d09, alpha: 0.92 });
+    g.ellipse(0, -4, 44, 11).fill({ color: 0x000000, alpha: 0.9 });
     c.addChild(g);
   }
   const art = PIXI.Sprite.from(plotArtPath(ctx.data.plot));
@@ -256,10 +256,10 @@ export const room = {
     world.addChild(kit.deco(PIXI, 'penaltybox_sign_youarehere', 430, FLOOR + 4, { scale: 0.5 }));
     world.addChild(kit.deco(PIXI, 'penaltybox_sign_knockitoff', 1210, FLOOR + 4, { scale: 0.42 }));
     const g = new PIXI.Graphics();
-    g.beginFill(0x4a3a2e).drawRect(-200, FLOOR + 30, W + 400, H - FLOOR + 200).endFill();
+    g.rect(-200, FLOOR + 30, W + 400, H - FLOOR + 200).fill(0x4a3a2e);
     // The mud floor's walking band (the strip's art thins out at its left end).
-    g.beginFill(0x8a7a66).drawRect(-200, FLOOR - 6, W + 400, 40).endFill();
-    g.beginFill(0x9d8c76).drawRect(-200, FLOOR - 6, W + 400, 6).endFill();
+    g.rect(-200, FLOOR - 6, W + 400, 40).fill(0x8a7a66);
+    g.rect(-200, FLOOR - 6, W + 400, 6).fill(0x9d8c76);
     world.addChild(g);
     world.addChild(kit.deco(PIXI, 'penaltybox_middleplus_side', W / 2, FLOOR - 10, { ay: 0, scale: 0.62 }));
     // The cell door: a row of recovered bars from floor to roof.

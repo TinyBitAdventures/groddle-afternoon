@@ -379,9 +379,7 @@ function igniteFx(engine) {
   for (let i = 0; i < 9; i += 1) {
     const g = new PIXI.Graphics();
     const warm = i % 3 === 0;
-    g.beginFill(warm ? 0xffb347 : 0x9fa36a, warm ? 0.85 : 0.55);
-    g.drawCircle(0, 0, warm ? 7 : 11 + (i % 4) * 2);
-    g.endFill();
+    g.circle(0, 0, warm ? 7 : 11 + (i % 4) * 2).fill({ color: warm ? 0xffb347 : 0x9fa36a, alpha: warm ? 0.85 : 0.55 });
     g.x = (i - 4) * 6;
     g.vx = (i - 4) * 0.25;
     g.vy = -0.6 - (i % 3) * 0.35;

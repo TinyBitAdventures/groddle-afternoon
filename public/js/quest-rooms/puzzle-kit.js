@@ -90,13 +90,8 @@ export function makeSwitch(ctx, { id, color, x, y, on = false, label }) {
   const c = new PIXI.Container();
   const plate = new PIXI.Graphics();
   const col = COLORS[color]?.hex ?? 0xffffff;
-  plate.beginFill(0x3b3f45, 0.35);
-  plate.drawRoundedRect(-27, -64, 54, 62, 12);
-  plate.endFill();
-  plate.beginFill(col);
-  plate.lineStyle(3, 0xffffff, 0.9);
-  plate.drawRoundedRect(-24, -66, 48, 58, 11);
-  plate.endFill();
+  plate.roundRect(-27, -64, 54, 62, 12).fill({ color: 0x3b3f45, alpha: 0.35 });
+  plate.roundRect(-24, -66, 48, 58, 11).fill(col).stroke({ width: 3, color: 0xffffff, alpha: 0.9 });
   c.addChild(plate);
   const up = PIXI.Sprite.from(`${SWITCH_ART}wall_switch_lockUp.png`);
   const down = PIXI.Sprite.from(`${SWITCH_ART}wall_switch_lockDown.png`);
@@ -108,9 +103,7 @@ export function makeSwitch(ctx, { id, color, x, y, on = false, label }) {
   }
   // A short post so the plate stands on the ground.
   const post = new PIXI.Graphics();
-  post.beginFill(0x6b6f75);
-  post.drawRect(-4, -8, 8, 8);
-  post.endFill();
+  post.rect(-4, -8, 8, 8).fill(0x6b6f75);
   c.addChild(post);
   c.x = x;
   c.y = y;

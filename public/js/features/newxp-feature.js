@@ -771,31 +771,20 @@ function drawPlatforms(PIXI, root, platforms) {
   for (const p of platforms) {
     if (p.style === 'invisible' || p.style === 'stars' || p.style === 'cloud' || p.tree) continue;
     if (p.style === 'mushroom') {
-      g.beginFill(0xe8d6a8);
-      g.drawEllipse((p.x1 + p.x2) / 2, p.y1 + 6, (p.x2 - p.x1) / 2 + 6, 14);
-      g.endFill();
-      g.beginFill(0xd8bf86);
-      g.drawEllipse((p.x1 + p.x2) / 2, p.y1 + 12, (p.x2 - p.x1) / 2, 8);
-      g.endFill();
-      g.beginFill(0xf3ead2);
-      g.drawRect((p.x1 + p.x2) / 2 - 10, p.y1 + 14, 20, 60);
-      g.endFill();
+      g.ellipse((p.x1 + p.x2) / 2, p.y1 + 6, (p.x2 - p.x1) / 2 + 6, 14).fill(0xe8d6a8);
+      g.ellipse((p.x1 + p.x2) / 2, p.y1 + 12, (p.x2 - p.x1) / 2, 8).fill(0xd8bf86);
+      g.rect((p.x1 + p.x2) / 2 - 10, p.y1 + 14, 20, 60).fill(0xf3ead2);
       continue;
     }
     const w = p.x2 - p.x1;
     const cx = (p.x1 + p.x2) / 2;
     const top = { grass: 0x8cbf3f, pool: 0x4a8fe0, red: 0xc0564e }[p.style] || 0x8cbf3f;
-    g.beginFill(0x5b4636);
     g.moveTo(p.x1, p.y1 + 4);
     g.quadraticCurveTo(cx, p.y1 + 70, p.x2, p.y1 + 4);
     g.closePath();
-    g.endFill();
-    g.beginFill(top);
-    g.drawEllipse(cx, p.y1 + 4, w / 2, 11);
-    g.endFill();
-    g.beginFill(0xffffff, 0.12);
-    g.drawEllipse(cx - w * 0.12, p.y1 + 1, w * 0.3, 4);
-    g.endFill();
+    g.fill(0x5b4636);
+    g.ellipse(cx, p.y1 + 4, w / 2, 11).fill(top);
+    g.ellipse(cx - w * 0.12, p.y1 + 1, w * 0.3, 4).fill({ color: 0xffffff, alpha: 0.12 });
   }
   root.addChild(g);
   return g;
@@ -804,15 +793,11 @@ function drawPlatforms(PIXI, root, platforms) {
 /** Black void with a field of gold stars on the floor (the training levels). */
 function starVoid(PIXI, root, width, height, floorY) {
   const bg = new PIXI.Graphics();
-  bg.beginFill(0x000000);
-  bg.drawRect(-700, -500, width + 1400, height + 1000);
-  bg.endFill();
+  bg.rect(-700, -500, width + 1400, height + 1000).fill(0x000000);
   root.addChild(bg);
   const glow = new PIXI.Graphics();
   for (let i = 0; i < 6; i++) {
-    glow.beginFill(0x2c2a10, 0.08);
-    glow.drawEllipse(width / 2, floorY + 30, width / 2 + 300 - i * 40, 60 - i * 6);
-    glow.endFill();
+    glow.ellipse(width / 2, floorY + 30, width / 2 + 300 - i * 40, 60 - i * 6).fill({ color: 0x2c2a10, alpha: 0.08 });
   }
   root.addChild(glow);
   for (let x = -200, i = 0; x < width + 200; x += 46, i += 1) {
@@ -879,9 +864,7 @@ function buildClouds(engine) {
     world.addChild(kit.deco(PIXI, i % 2 ? 'cloud_fluffy_1' : 'cloud_fluffy_2', x, L.cloudY + 110 + (i % 2) * 14, { scale: 0.95 }));
   }
   const fill = new PIXI.Graphics();
-  fill.beginFill(0xf7fbff);
-  fill.drawRect(-300, L.cloudY + 90, 3640, 600);
-  fill.endFill();
+  fill.rect(-300, L.cloudY + 90, 3640, 600).fill(0xf7fbff);
   world.addChildAt(fill, 0);
   enterNewxpScene(engine, 'clouds', L, root, 'Somewhere above');
   run.views = { beats, root };
@@ -927,20 +910,13 @@ function buildTraining1(engine) {
   // The sloth's tree: its branches become platforms once it hides (hideTree).
   // A clean vector tree on isle_b (the archive has no newxp tree art).
   const tree = new PIXI.Graphics();
-  tree.beginFill(0x6e4a2b);
-  tree.drawPolygon([2282, 1352, 2318, 1352, 2310, 1180, 2296, 1060, 2290, 1180]);
-  tree.endFill();
-  tree.lineStyle(10, 0x6e4a2b, 1);
+  tree.poly([2282, 1352, 2318, 1352, 2310, 1180, 2296, 1060, 2290, 1180]).fill(0x6e4a2b);
   tree.moveTo(2300, 1200).lineTo(2180, 1110);
   tree.moveTo(2302, 1160).lineTo(2420, 1080);
-  tree.lineStyle(0);
+  tree.stroke({ width: 10, color: 0x6e4a2b, alpha: 1 });
   for (const [x, y, r] of [[2296, 1040, 70], [2200, 1090, 50], [2400, 1060, 56], [2250, 1000, 46], [2350, 990, 50]]) {
-    tree.beginFill(0x3f7f3a, 0.95);
-    tree.drawCircle(x, y, r);
-    tree.endFill();
-    tree.beginFill(0x5aa04a, 0.6);
-    tree.drawCircle(x - r * 0.25, y - r * 0.25, r * 0.55);
-    tree.endFill();
+    tree.circle(x, y, r).fill({ color: 0x3f7f3a, alpha: 0.95 });
+    tree.circle(x - r * 0.25, y - r * 0.25, r * 0.55).fill({ color: 0x5aa04a, alpha: 0.6 });
   }
   root.addChild(tree);
   const branches = new PIXI.Graphics();
@@ -952,21 +928,13 @@ function buildTraining1(engine) {
   root.addChild(ladder);
   // wall1: a dim glass wall until Walk Speed I.
   const wall = new PIXI.Graphics();
-  wall.beginFill(0x8fb8ff, 0.12);
-  wall.drawRoundedRect(1740, L.floorY - 400, 20, 400, 8);
-  wall.endFill();
+  wall.roundRect(1740, L.floorY - 400, 20, 400, 8).fill({ color: 0x8fb8ff, alpha: 0.12 });
   root.addChild(wall);
   // The tube (the teleport to training2) on the top island.
   const tube = new PIXI.Graphics();
-  tube.beginFill(0x9aa3ad);
-  tube.drawRoundedRect(L.tube.x - 70, L.tube.y - 330, 140, 60, 12);
-  tube.endFill();
-  tube.beginFill(0xcfe9ff, 0.28);
-  tube.drawRect(L.tube.x - 50, L.tube.y - 270, 100, 270);
-  tube.endFill();
-  tube.beginFill(0x9aa3ad);
-  tube.drawEllipse(L.tube.x, L.tube.y, 70, 12);
-  tube.endFill();
+  tube.roundRect(L.tube.x - 70, L.tube.y - 330, 140, 60, 12).fill(0x9aa3ad);
+  tube.rect(L.tube.x - 50, L.tube.y - 270, 100, 270).fill({ color: 0xcfe9ff, alpha: 0.28 });
+  tube.ellipse(L.tube.x, L.tube.y, 70, 12).fill(0x9aa3ad);
   root.addChild(tube);
   enterNewxpScene(engine, 'training1', L, root, 'Training: Movement');
   run.views = { shrooms, tree, branches, wall };
@@ -1169,25 +1137,16 @@ function buildTraining2(engine) {
   drawPlatforms(PIXI, root, L.platforms);
   const g = new PIXI.Graphics();
   // Table one (white cloth) and the wooden drinks bench.
-  g.beginFill(0xf4f4f4);
-  g.drawEllipse(L.tables.food.x, L.floorY - 76, 120, 18);
-  g.endFill();
-  g.beginFill(0xe6e6e6);
-  g.drawRect(L.tables.food.x - 120, L.floorY - 76, 240, 70);
-  g.endFill();
-  g.beginFill(0x9a5a2b);
-  g.drawRoundedRect(L.tables.drinks.x - 130, L.floorY - 70, 260, 66, 8);
-  g.endFill();
-  g.beginFill(0xb87240);
-  g.drawRoundedRect(L.tables.drinks.x - 130, L.floorY - 74, 260, 10, 4);
-  g.endFill();
+  g.ellipse(L.tables.food.x, L.floorY - 76, 120, 18).fill(0xf4f4f4);
+  g.rect(L.tables.food.x - 120, L.floorY - 76, 240, 70).fill(0xe6e6e6);
+  g.roundRect(L.tables.drinks.x - 130, L.floorY - 70, 260, 66, 8).fill(0x9a5a2b);
+  g.roundRect(L.tables.drinks.x - 130, L.floorY - 74, 260, 10, 4).fill(0xb87240);
   root.addChild(g);
   const walls = {};
   for (const b of L.barriers.filter((w) => w.id !== 'left')) {
     const w = new PIXI.Graphics();
-    w.beginFill(b.id === 'tube_building' ? 0x3d4450 : 0x8fb8ff, b.id === 'tube_building' ? 0.95 : 0.14);
-    w.drawRoundedRect(b.x - (b.id === 'tube_building' ? 40 : 10), b.y, b.id === 'tube_building' ? 80 : 20, b.h, 10);
-    w.endFill();
+    w.roundRect(b.x - (b.id === 'tube_building' ? 40 : 10), b.y, b.id === 'tube_building' ? 80 : 20, b.h, 10);
+    w.fill({ color: b.id === 'tube_building' ? 0x3d4450 : 0x8fb8ff, alpha: b.id === 'tube_building' ? 0.95 : 0.14 });
     root.addChild(w);
     walls[b.id] = w;
   }
@@ -1200,22 +1159,15 @@ function buildTraining2(engine) {
   // The Home Street Selection Machine behind the tube wall.
   const machine = new PIXI.Container();
   const body = new PIXI.Graphics();
-  body.beginFill(0x7d858f);
-  body.drawRoundedRect(3620, L.floorY - 470, 440, 90, 30);
-  body.endFill();
-  body.beginFill(0x5d6570);
-  for (let i = 0; i < 12; i++) body.drawCircle(3660 + i * 34, L.floorY - 425, 8);
-  body.endFill();
+  body.roundRect(3620, L.floorY - 470, 440, 90, 30).fill(0x7d858f);
+  for (let i = 0; i < 12; i++) body.circle(3660 + i * 34, L.floorY - 425, 8);
+  body.fill(0x5d6570);
   machine.addChild(body);
   const panelColors = { meadow: 0x6fb45a, firebog: 0xb5543c, uralia: 0x7a5fb0 };
   for (const c of L.machine.choices) {
     const p = new PIXI.Graphics();
-    p.beginFill(panelColors[c.style]);
-    p.drawRoundedRect(c.x - 58, L.floorY - 190, 116, 150, 10);
-    p.endFill();
-    p.beginFill(0x1d2a44, 0.85);
-    p.drawRoundedRect(c.x - 52, L.floorY - 182, 104, 64, 8);
-    p.endFill();
+    p.roundRect(c.x - 58, L.floorY - 190, 116, 150, 10).fill(panelColors[c.style]);
+    p.roundRect(c.x - 52, L.floorY - 182, 104, 64, 8).fill({ color: 0x1d2a44, alpha: 0.85 });
     machine.addChild(p);
     machine.addChild(kit.label(PIXI, c.label.replace('CHOOSE ', 'CHOOSE\n'), c.x, L.floorY - 150, { size: 11, fill: 0xffffff }));
   }
@@ -1453,9 +1405,7 @@ async function runTraining2(t) {
     spr.x = c.x;
     spr.y = L.floorY;
     const hit = new engine.PIXI.Graphics();
-    hit.beginFill(0xffffff, 0.001);
-    hit.drawRect(-58, -190, 116, 190);
-    hit.endFill();
+    hit.rect(-58, -190, 116, 190).fill({ color: 0xffffff, alpha: 0.001 });
     spr.addChild(hit);
     return registerFixture(engine, spr, 'newxp_machine', c.label.replace('CHOOSE ', 'Choose ').replace(' STYLE', ' style'), { nxStyle: c.style });
   });
@@ -1666,8 +1616,8 @@ function islandEnter(engine) {
       const { PIXI } = engine;
       const stall = new PIXI.Container();
       const g = new PIXI.Graphics();
-      g.beginFill(0x8a5a2e).drawRoundedRect(-60, -90, 120, 90, 8).endFill();
-      g.beginFill(0xe9c46a).drawRoundedRect(-70, -112, 140, 26, 6).endFill();
+      g.roundRect(-60, -90, 120, 90, 8).fill(0x8a5a2e);
+      g.roundRect(-70, -112, 140, 26, 6).fill(0xe9c46a);
       stall.addChild(g);
       stall.addChild(kit.icon(PIXI, 'bag_generic', 0, -40));
       stall.addChild(kit.label(PIXI, 'Cheap Bags', 0, -99, { size: 13, fill: 0x5b3a00 }));

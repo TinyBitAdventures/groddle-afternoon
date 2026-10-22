@@ -428,9 +428,7 @@ function groundAt(engine, x, refY) {
 function makeGlow(engine, x, y, color = 0xffb347, radius = 46) {
   const g = new engine.PIXI.Graphics();
   for (let i = 5; i >= 1; i -= 1) {
-    g.beginFill(color, 0.05 + (5 - i) * 0.012);
-    g.drawCircle(0, 0, (radius * i) / 5);
-    g.endFill();
+    g.circle(0, 0, (radius * i) / 5).fill({ color: color, alpha: 0.05 + (5 - i) * 0.012 });
   }
   g.x = x;
   g.y = y;
@@ -516,9 +514,8 @@ function startSnow(engine) {
   for (let i = 0; i < 46; i += 1) {
     const g = new PIXI.Graphics();
     const r = 1.2 + Math.random() * 2.2;
-    g.beginFill(0xffffff, 0.55 + Math.random() * 0.35);
-    g.drawCircle(0, 0, r);
-    g.endFill();
+    g.setFillStyle({ color: 0xffffff, alpha: 0.55 + Math.random() * 0.35 });
+    g.circle(0, 0, r).fill();
     g.x = Math.random() * cam.w;
     g.y = Math.random() * cam.h;
     root.addChild(g);
@@ -559,14 +556,13 @@ function spawnEgg(engine, cls, pt) {
   spr._worldHitH = 40;
   engine.entityLayer.addChild(spr);
   const sparkle = new PIXI.Graphics();
-  sparkle.beginFill(0xfff6b0, 0.9);
   for (const [dx, dy] of [[0, -9], [7, 0], [0, 9], [-7, 0]]) {
     sparkle.moveTo(0, 0);
     sparkle.lineTo(dx * 0.25 + dy * 0.12, dy * 0.25 + dx * 0.12);
     sparkle.lineTo(dx, dy);
     sparkle.lineTo(dx * 0.25 - dy * 0.12, dy * 0.25 - dx * 0.12);
   }
-  sparkle.endFill();
+  sparkle.fill({ color: 0xfff6b0, alpha: 0.9 });
   sparkle.x = spr.x + 10;
   sparkle.y = spr.y - 22;
   sparkle.zIndex = 10;
@@ -1054,9 +1050,7 @@ function burst(engine, color, n = 14) {
   const { PIXI } = engine;
   for (let i = 0; i < n; i += 1) {
     const g = new PIXI.Graphics();
-    g.beginFill(color, 0.95);
-    g.drawCircle(0, 0, 2 + Math.random() * 3);
-    g.endFill();
+    g.circle(0, 0, 2 + Math.random() * 3).fill({ color: color, alpha: 0.95 });
     g.x = p.x;
     g.y = (p.y || 0) - 70;
     engine.fxLayer.addChild(g);

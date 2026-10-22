@@ -108,7 +108,7 @@ function drawDream(ctx) {
   // Soft beige drapery folds behind everything.
   const folds = new PIXI.Graphics();
   for (let x = -200; x < W + 400; x += 140) {
-    folds.beginFill(0xd8c59d, 0.35).drawRoundedRect(x, -40, 70, FLOOR + 120, 35).endFill();
+    folds.roundRect(x, -40, 70, FLOOR + 120, 35).fill({ color: 0xd8c59d, alpha: 0.35 });
   }
   walls.addChild(folds);
   const eyes = EYES.map((e) => {
@@ -116,14 +116,14 @@ function drawDream(ctx) {
     c.x = e.x;
     c.y = e.y;
     const white = new PIXI.Graphics();
-    white.beginFill(0xc8b48a).drawEllipse(0, 0, e.r * 1.35, e.r * 0.95).endFill();
-    white.beginFill(0xfffbf0).drawEllipse(0, 0, e.r * 1.15, e.r * 0.78).endFill();
+    white.ellipse(0, 0, e.r * 1.35, e.r * 0.95).fill(0xc8b48a);
+    white.ellipse(0, 0, e.r * 1.15, e.r * 0.78).fill(0xfffbf0);
     const pupil = new PIXI.Graphics();
-    pupil.beginFill(0x6b5a3e).drawCircle(0, 0, e.r * 0.42).endFill();
-    pupil.beginFill(0x2a2117).drawCircle(0, 0, e.r * 0.22).endFill();
-    pupil.beginFill(0xffffff, 0.8).drawCircle(-e.r * 0.12, -e.r * 0.14, e.r * 0.08).endFill();
+    pupil.circle(0, 0, e.r * 0.42).fill(0x6b5a3e);
+    pupil.circle(0, 0, e.r * 0.22).fill(0x2a2117);
+    pupil.circle(-e.r * 0.12, -e.r * 0.14, e.r * 0.08).fill({ color: 0xffffff, alpha: 0.8 });
     const lid = new PIXI.Graphics();
-    lid.beginFill(0xd2bd93).drawEllipse(0, 0, e.r * 1.2, e.r * 0.82).endFill();
+    lid.ellipse(0, 0, e.r * 1.2, e.r * 0.82).fill(0xd2bd93);
     lid.scale.y = 0;
     c.addChild(white, pupil, lid);
     walls.addChild(c);
@@ -132,14 +132,13 @@ function drawDream(ctx) {
   const world = root.layer(1, 3);
   const g = new PIXI.Graphics();
   // A quilted floor.
-  g.beginFill(0xc7ae7f).drawRect(-600, FLOOR, W + 1200, 340).endFill();
-  g.beginFill(0xe2cfa6).drawRect(-600, FLOOR, W + 1200, 10).endFill();
-  g.lineStyle(2, 0xb39a6b, 0.6);
+  g.rect(-600, FLOOR, W + 1200, 340).fill(0xc7ae7f);
+  g.rect(-600, FLOOR, W + 1200, 10).fill(0xe2cfa6);
   for (let x = -600; x < W + 600; x += 80) g.moveTo(x, FLOOR + 12).lineTo(x + 40, FLOOR + 140);
-  g.lineStyle(0);
+  g.stroke({ width: 2, color: 0xb39a6b, alpha: 0.6 });
   // The dais.
-  g.beginFill(0xb59a69).drawRoundedRect(DAIS.x1, DAIS.y, DAIS.x2 - DAIS.x1, FLOOR - DAIS.y + 8, 10).endFill();
-  g.beginFill(0xe7d5ae).drawRoundedRect(DAIS.x1, DAIS.y - 4, DAIS.x2 - DAIS.x1, 12, 6).endFill();
+  g.roundRect(DAIS.x1, DAIS.y, DAIS.x2 - DAIS.x1, FLOOR - DAIS.y + 8, 10).fill(0xb59a69);
+  g.roundRect(DAIS.x1, DAIS.y - 4, DAIS.x2 - DAIS.x1, 12, 6).fill(0xe7d5ae);
   world.addChild(g);
   // Pillow clouds (recovered block_cloud01, flat top on the line, beige).
   for (const p of PILLOWS) {
@@ -156,9 +155,9 @@ function drawBooth(ctx) {
   const c = new PIXI.Container();
   const top = DAIS.y - 185;
   const g = new PIXI.Graphics();
-  g.beginFill(0x3b3528).drawRoundedRect(VEIL_X - 120, top, 240, 185, 8).endFill();
-  g.beginFill(0x6f5a3a).drawRect(VEIL_X - 110, DAIS.y - 54, 220, 16).endFill();
-  g.beginFill(0x5a482d).drawRect(VEIL_X - 100, DAIS.y - 38, 14, 38).drawRect(VEIL_X + 86, DAIS.y - 38, 14, 38).endFill();
+  g.roundRect(VEIL_X - 120, top, 240, 185, 8).fill(0x3b3528);
+  g.rect(VEIL_X - 110, DAIS.y - 54, 220, 16).fill(0x6f5a3a);
+  g.rect(VEIL_X - 100, DAIS.y - 38, 14, 38).rect(VEIL_X + 86, DAIS.y - 38, 14, 38).fill(0x5a482d);
   c.addChild(g);
   // Monitors showing a small, beige you.
   for (const [dx, s] of [[-62, 0.3], [40, 0.34]]) {
@@ -167,7 +166,7 @@ function drawBooth(ctx) {
     const fig = new PIXI.Graphics();
     const fx = VEIL_X + dx + 4;
     const fy = top + 10 + 282 * s * 0.62;
-    fig.beginFill(0xd9c9a3).drawCircle(fx, fy - 12, 6).drawRoundedRect(fx - 5, fy - 6, 10, 14, 3).endFill();
+    fig.circle(fx, fy - 12, 6).roundRect(fx - 5, fy - 6, 10, 14, 3).fill(0xd9c9a3);
     c.addChild(fig);
   }
   return c;
@@ -178,12 +177,12 @@ function drawVeil(ctx) {
   const c = new PIXI.Container();
   const top = DAIS.y - 195;
   const rod = new PIXI.Graphics();
-  rod.beginFill(0x8a6d43).drawRoundedRect(VEIL_X - 140, top - 8, 280, 10, 5).endFill();
-  rod.beginFill(0xa98852).drawCircle(VEIL_X - 142, top - 3, 9).drawCircle(VEIL_X + 142, top - 3, 9).endFill();
+  rod.roundRect(VEIL_X - 140, top - 8, 280, 10, 5).fill(0x8a6d43);
+  rod.circle(VEIL_X - 142, top - 3, 9).circle(VEIL_X + 142, top - 3, 9).fill(0xa98852);
   const half = (side) => {
     const h = new PIXI.Graphics();
-    h.beginFill(0x9d7f55).drawRect(0, 0, 130, 195).endFill();
-    for (let i = 0; i < 5; i++) h.beginFill(i % 2 ? 0xb39466 : 0x8c6f48, 0.85).drawRect(6 + i * 25, 0, 12, 195).endFill();
+    h.rect(0, 0, 130, 195).fill(0x9d7f55);
+    for (let i = 0; i < 5; i++) h.rect(6 + i * 25, 0, 12, 195).fill({ color: i % 2 ? 0xb39466 : 0x8c6f48, alpha: 0.85 });
     h.pivot.x = side < 0 ? 0 : 130;
     h.x = VEIL_X + side * 132;
     h.y = top;
@@ -194,7 +193,7 @@ function drawVeil(ctx) {
   c.addChild(left, right, rod);
   // A clickable area over the closed veil.
   const hit = new PIXI.Graphics();
-  hit.beginFill(0xffffff, 0.001).drawRect(VEIL_X - 135, top, 270, 195).endFill();
+  hit.rect(VEIL_X - 135, top, 270, 195).fill({ color: 0xffffff, alpha: 0.001 });
   c.addChild(hit);
   // Targets read their spot from the sprite position: anchor the veil at its foot.
   c.pivot.set(VEIL_X, DAIS.y);

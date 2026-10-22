@@ -79,27 +79,24 @@ export function crownQuoins() {
 function drawTrunk(PIXI) {
   const g = new PIXI.Graphics();
   const top = CROWN_Y - 30;
-  g.beginFill(0x5b3b22);
   g.moveTo(TRUNK_X - 34, GROUND + 4);
   g.lineTo(TRUNK_X - 18, top);
   g.lineTo(TRUNK_X + 18, top);
   g.lineTo(TRUNK_X + 34, GROUND + 4);
   g.closePath();
-  g.endFill();
-  g.beginFill(0x7a5132, 0.9);
+  g.fill(0x5b3b22);
   g.moveTo(TRUNK_X - 6, GROUND);
   g.lineTo(TRUNK_X - 2, top);
   g.lineTo(TRUNK_X + 12, top);
   g.lineTo(TRUNK_X + 22, GROUND);
   g.closePath();
-  g.endFill();
-  g.lineStyle(2, 0x3f2716, 0.55);
+  g.fill({ color: 0x7a5132, alpha: 0.9 });
   for (let y = GROUND - 60; y > top + 40; y -= 95) {
     const w = 22 - ((GROUND - y) / (GROUND - top)) * 10;
     g.moveTo(TRUNK_X - w, y);
     g.quadraticCurveTo(TRUNK_X - 4, y - 18, TRUNK_X + w * 0.6, y - 34);
   }
-  g.lineStyle(0);
+  g.stroke({ width: 2, color: 0x3f2716, alpha: 0.55 });
   return g;
 }
 
@@ -126,12 +123,8 @@ export const room = {
     const world = root.layer(1, 2);
     // The ground is just a soft shadow in the white memory.
     const shade = new PIXI.Graphics();
-    shade.beginFill(0xdfe6ee, 0.6);
-    shade.drawEllipse(TRUNK_X, GROUND + 6, 520, 20);
-    shade.endFill();
-    shade.beginFill(0xeef2f6, 1);
-    shade.drawRect(0, GROUND + 6, TREE_W, TREE_H - GROUND);
-    shade.endFill();
+    shade.ellipse(TRUNK_X, GROUND + 6, 520, 20).fill({ color: 0xdfe6ee, alpha: 0.6 });
+    shade.rect(0, GROUND + 6, TREE_W, TREE_H - GROUND).fill({ color: 0xeef2f6, alpha: 1 });
     world.addChild(shade);
     world.addChild(drawTrunk(PIXI));
     world.addChild(kit.deco(PIXI, 'tree_base_root_1', TRUNK_X + 8, GROUND + 14, { scale: 0.62 }));

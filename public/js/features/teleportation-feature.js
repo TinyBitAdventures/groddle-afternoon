@@ -155,17 +155,15 @@ function drawWarpFx(engine, fx, now, duration) {
   const width = 18 + p * 46;
   for (const [k, color, alpha] of [[1, 0xd9c8ff, 0.07], [0.72, 0xe4d9ff, 0.1], [0.46, 0xf3eeff, 0.14], [0.22, 0xffffff, 0.22]]) {
     const w = width * k;
-    g.beginFill(color, alpha * (0.5 + p * 1.5));
-    g.drawRoundedRect(player.x - w / 2, player.y - h - 60 + (1 - k) * 20, w, h + 66 - (1 - k) * 20, w / 2);
-    g.endFill();
+    g.roundRect(player.x - w / 2, player.y - h - 60 + (1 - k) * 20, w, h + 66 - (1 - k) * 20, w / 2);
+    g.fill({ color: color, alpha: alpha * (0.5 + p * 1.5) });
   }
   for (let i = 0; i < 18; i += 1) {
     const life = ((now - fx.born) / 900 + i / 18) % 1;
     const angle = i * 2.4 + life * 6;
     const r = (1 - p * 0.6) * (22 + (i % 5) * 6);
-    g.beginFill(i % 3 ? 0xe9e2ff : 0xfff3c4, Math.sin(life * Math.PI) * (0.4 + p * 0.6));
-    g.drawCircle(player.x + Math.cos(angle) * r, player.y - life * (h + 50), 1.6 + (i % 3));
-    g.endFill();
+    g.circle(player.x + Math.cos(angle) * r, player.y - life * (h + 50), 1.6 + (i % 3));
+    g.fill({ color: i % 3 ? 0xe9e2ff : 0xfff3c4, alpha: Math.sin(life * Math.PI) * (0.4 + p * 0.6) });
   }
   player.alpha = 1 - p * 0.85;
 }

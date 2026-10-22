@@ -227,12 +227,12 @@ export function buildNeighbourBackground(PIXI, neighbour) {
 
   const field = new PIXI.Graphics();
   field.zIndex = -40;
-  field.beginFill(style.field).drawRect(-50, 586, width + 100, groundY - 586 + 40).endFill();
-  field.beginFill(style.fieldDark, 0.5).drawRect(-50, groundY + 10, width + 100, 30).endFill();
+  field.rect(-50, 586, width + 100, groundY - 586 + 40).fill(style.field);
+  field.rect(-50, groundY + 10, width + 100, 30).fill({ color: style.fieldDark, alpha: 0.5 });
   root.addChild(field);
   const soilFill = new PIXI.Graphics();
   soilFill.zIndex = -39.5;
-  soilFill.beginFill(style.soilColor).drawRect(-50, groundY + 30, width + 100, 240).endFill();
+  soilFill.rect(-50, groundY + 30, width + 100, 240).fill(style.soilColor);
   root.addChild(soilFill);
   const [sw, sh] = size(style.soil);
   const soilW = sw * 0.6;

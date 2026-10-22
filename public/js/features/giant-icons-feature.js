@@ -274,19 +274,16 @@ function giantLoveFx(engine, giant) {
   const rays = new PIXI.Graphics();
   for (let i = 0; i < 12; i += 1) {
     const a = (i / 12) * Math.PI * 2;
-    rays.beginFill(i % 2 ? 0xffe27a : 0xffb3d4, 0.32);
     rays.moveTo(0, 0);
     rays.lineTo(Math.cos(a - 0.12) * 120, Math.sin(a - 0.12) * 120);
     rays.lineTo(Math.cos(a + 0.12) * 120, Math.sin(a + 0.12) * 120);
-    rays.endFill();
+    rays.fill({ color: i % 2 ? 0xffe27a : 0xffb3d4, alpha: 0.32 });
   }
   const heart = new PIXI.Graphics();
-  heart.beginFill(0xff4d7d);
-  heart.lineStyle(4, 0xffffff, 0.9);
   heart.moveTo(0, 26);
   heart.bezierCurveTo(-48, -6, -30, -46, 0, -22);
   heart.bezierCurveTo(30, -46, 48, -6, 0, 26);
-  heart.endFill();
+  heart.fill(0xff4d7d).stroke({ width: 4, color: 0xffffff, alpha: 0.9 });
   const text = new PIXI.Text('GIANT LOVE!', {
     fontFamily: 'Arial Black, Arial, sans-serif',
     fontSize: 26,

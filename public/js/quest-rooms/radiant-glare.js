@@ -306,29 +306,19 @@ function drawLamp(PIXI, side, x, y) {
   const g = new PIXI.Graphics();
   const s = side === 'L' ? 1 : -1;
   // Wall bracket.
-  g.beginFill(0x1f1d26);
-  g.drawRect(s > 0 ? 0 : -10, -5, 10, 10);
-  g.endFill();
+  g.rect(s > 0 ? 0 : -10, -5, 10, 10).fill(0x1f1d26);
   // The dish, a dark half-cone opening into the room.
-  g.beginFill(0x2b2933);
-  g.lineStyle(2, 0x6c6878, 1);
   g.moveTo(8 * s, -10);
   g.lineTo(26 * s, -32);
   g.lineTo(30 * s, 32);
   g.lineTo(8 * s, 10);
-  g.closePath();
-  g.endFill();
-  g.lineStyle(0);
+  g.closePath().fill(0x2b2933).stroke({ width: 2, color: 0x6c6878, alpha: 1 });
   for (let i = -24; i <= 24; i += 8) {
-    g.beginFill(0x55515f);
-    g.drawRect(14 * s + (s < 0 ? -2 : 0), i, 2, 4);
-    g.endFill();
+    g.rect(14 * s + (s < 0 ? -2 : 0), i, 2, 4).fill(0x55515f);
   }
   c.addChild(g);
   const lens = new PIXI.Graphics();
-  lens.beginFill(0xf4f2f8);
-  lens.drawEllipse(30 * s, 0, 6, 30);
-  lens.endFill();
+  lens.ellipse(30 * s, 0, 6, 30).fill(0xf4f2f8);
   c.addChild(lens);
   c.lens = lens;
   c.x = x;
@@ -339,37 +329,22 @@ function drawLamp(PIXI, side, x, y) {
 function drawDisc(PIXI, w, color) {
   const g = new PIXI.Graphics();
   const hx = w / 2;
-  g.beginFill(0x000000, 0.18);
-  g.drawEllipse(0, 14, hx * 0.92, 8);
-  g.endFill();
-  g.beginFill(color, 0.75);
-  g.drawEllipse(0, 6, hx, 11);
-  g.endFill();
-  g.beginFill(color);
-  g.drawEllipse(0, 1, hx, 9);
-  g.endFill();
-  g.beginFill(0xffffff, 0.35);
-  g.drawEllipse(-hx * 0.12, -1, hx * 0.7, 4);
-  g.endFill();
+  g.ellipse(0, 14, hx * 0.92, 8).fill({ color: 0x000000, alpha: 0.18 });
+  g.ellipse(0, 6, hx, 11).fill({ color: color, alpha: 0.75 });
+  g.ellipse(0, 1, hx, 9).fill(color);
+  g.ellipse(-hx * 0.12, -1, hx * 0.7, 4).fill({ color: 0xffffff, alpha: 0.35 });
   // Scalloped underside, the footage's cloud discs.
   for (let i = -2; i <= 2; i++) {
-    g.beginFill(color, 0.55);
-    g.drawEllipse(i * hx * 0.36, 11, hx * 0.22, 6);
-    g.endFill();
+    g.ellipse(i * hx * 0.36, 11, hx * 0.22, 6).fill({ color: color, alpha: 0.55 });
   }
   return g;
 }
 
 function drawSlab(g, y) {
-  g.beginFill(0x1c1b21);
-  g.drawRect(0, y, W, SLAB);
-  g.endFill();
-  g.beginFill(0x55535e);
-  g.drawRect(0, y - 3, W, 5);
-  g.endFill();
-  g.beginFill(0x2a2930, 0.8);
-  for (let x = 30; x < W; x += 140) g.drawRect(x, y + 30 + ((x / 140) % 3) * 22, 70, 4);
-  g.endFill();
+  g.rect(0, y, W, SLAB).fill(0x1c1b21);
+  g.rect(0, y - 3, W, 5).fill(0x55535e);
+  for (let x = 30; x < W; x += 140) g.rect(x, y + 30 + ((x / 140) % 3) * 22, 70, 4);
+  g.fill({ color: 0x2a2930, alpha: 0.8 });
 }
 
 function drawRainbow(PIXI) {
@@ -378,40 +353,32 @@ function drawRainbow(PIXI) {
   // A soft halo, then the bands under the walking line.
   for (let pass = 0; pass < 2; pass++) {
     bands.forEach((color, i) => {
-      g.lineStyle(pass ? 9 : 22, color, pass ? 0.72 : 0.12);
+      g.setStrokeStyle({ width: pass ? 9 : 22, color: color, alpha: pass ? 0.72 : 0.12 });
       for (let x = 200; x <= 900; x += 10) {
         const y = rainbowY(x) + 6 + i * 9;
         if (x === 200) g.moveTo(x, y);
         else g.lineTo(x, y);
       }
+      g.stroke();
     });
   }
-  g.lineStyle(0);
   return g;
 }
 
 function drawDoor(PIXI, x, y) {
   const c = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.beginFill(0x18171c);
-  g.lineStyle(3, 0x6c6878, 1);
   g.moveTo(-34, 0);
   g.lineTo(-34, -78);
   g.arc(0, -78, 34, Math.PI, 0);
   g.lineTo(34, 0);
-  g.closePath();
-  g.endFill();
-  g.lineStyle(0);
+  g.closePath().fill(0x18171c).stroke({ width: 3, color: 0x6c6878, alpha: 1 });
   for (let i = 0; i < 8; i++) {
     for (let r = 0; r < 2; r++) {
-      g.beginFill((i + r) % 2 ? 0xf2f2f2 : 0x222126);
-      g.drawRect(-32 + i * 8, -16 + r * 8, 8, 8);
-      g.endFill();
+      g.rect(-32 + i * 8, -16 + r * 8, 8, 8).fill((i + r) % 2 ? 0xf2f2f2 : 0x222126);
     }
   }
-  g.beginFill(0x8f8b9b);
-  g.drawCircle(22, -52, 3);
-  g.endFill();
+  g.circle(22, -52, 3).fill(0x8f8b9b);
   c.addChild(g);
   c.x = x;
   c.y = y;
@@ -421,24 +388,15 @@ function drawDoor(PIXI, x, y) {
 function drawConsole(PIXI, k) {
   const g = new PIXI.Graphics();
   const y = k.top;
-  g.beginFill(0x17161b);
-  g.lineStyle(2, 0x4d4a57, 1);
-  g.drawRoundedRect(k.x1, y, k.x2 - k.x1, FLOORS.mixer - y, 4);
-  g.endFill();
-  g.lineStyle(0);
+  g.roundRect(k.x1, y, k.x2 - k.x1, FLOORS.mixer - y, 4).fill(0x17161b).stroke({ width: 2, color: 0x4d4a57, alpha: 1 });
   // The rail on top: two posts, a bar, the bank knobs either side of the lamp.
-  g.lineStyle(4, 0x8f8b9b, 1);
   g.moveTo(k.x1 + 40, y);
   g.lineTo(k.x1 + 40, y - 36);
   g.lineTo(k.x2 - 40, y - 36);
   g.lineTo(k.x2 - 40, y);
-  g.lineStyle(0);
+  g.stroke({ width: 4, color: 0x8f8b9b, alpha: 1 });
   for (const kx of [k.x1 + 80, k.x2 - 80]) {
-    g.beginFill(0x2b2933);
-    g.lineStyle(3, 0x8f8b9b, 1);
-    g.drawCircle(kx, y - 36, 10);
-    g.endFill();
-    g.lineStyle(0);
+    g.circle(kx, y - 36, 10).fill(0x2b2933).stroke({ width: 3, color: 0x8f8b9b, alpha: 1 });
   }
   return g;
 }
@@ -447,7 +405,6 @@ function drawTotem(PIXI, t) {
   const g = new PIXI.Graphics();
   const slabY = t.top;
   const knobB = t.bankB + 34;
-  g.lineStyle(4, 0x8f8b9b, 1);
   // The lower bank hangs from the slab; the upper bank sits on a knob at the top of a tall stem.
   for (let i = -1; i <= 1; i++) {
     g.moveTo(t.cx + i * 40, t.bankA - 22);
@@ -458,17 +415,9 @@ function drawTotem(PIXI, t) {
   }
   g.moveTo(t.cx, knobB);
   g.lineTo(t.cx, slabY);
-  g.lineStyle(0);
-  g.beginFill(0x2b2933);
-  g.lineStyle(3, 0x8f8b9b, 1);
-  g.drawCircle(t.cx, knobB, 10);
-  g.endFill();
-  g.lineStyle(0);
-  g.beginFill(0x17161b);
-  g.lineStyle(2, 0x4d4a57, 1);
-  g.drawRoundedRect(t.x1, slabY, t.x2 - t.x1, 26, 4);
-  g.endFill();
-  g.lineStyle(0);
+  g.stroke({ width: 4, color: 0x8f8b9b, alpha: 1 });
+  g.circle(t.cx, knobB, 10).fill(0x2b2933).stroke({ width: 3, color: 0x8f8b9b, alpha: 1 });
+  g.roundRect(t.x1, slabY, t.x2 - t.x1, 26, 4).fill(0x17161b).stroke({ width: 2, color: 0x4d4a57, alpha: 1 });
   return g;
 }
 
@@ -476,23 +425,13 @@ function drawTotem(PIXI, t) {
 function makeBulb(PIXI, color) {
   const c = new PIXI.Container();
   const glow = new PIXI.Graphics();
-  glow.beginFill(LIGHT[color].glow, 0.35);
-  glow.drawCircle(0, -12, 20);
-  glow.endFill();
+  glow.circle(0, -12, 20).fill({ color: LIGHT[color].glow, alpha: 0.35 });
   const g = new PIXI.Graphics();
-  g.beginFill(LIGHT[color].hex);
-  g.drawEllipse(0, -14, 10, 12);
-  g.endFill();
-  g.beginFill(0x8f8b9b);
-  g.drawRect(-6, -4, 12, 8);
-  g.endFill();
-  g.beginFill(0xffffff, 0.5);
-  g.drawEllipse(-3, -18, 3, 5);
-  g.endFill();
+  g.ellipse(0, -14, 10, 12).fill(LIGHT[color].hex);
+  g.rect(-6, -4, 12, 8).fill(0x8f8b9b);
+  g.ellipse(-3, -18, 3, 5).fill({ color: 0xffffff, alpha: 0.5 });
   const hit = new PIXI.Graphics();
-  hit.beginFill(0xffffff, 0.001);
-  hit.drawRect(-18, -34, 36, 42);
-  hit.endFill();
+  hit.rect(-18, -34, 36, 42).fill({ color: 0xffffff, alpha: 0.001 });
   c.addChild(hit, glow, g);
   c.set = (on) => {
     glow.visible = on;
@@ -513,15 +452,9 @@ function makeMixLamp(PIXI) {
     g.clear();
     const col = color ? LIGHT[color].hex : 0x3a3842;
     if (color) {
-      glow.beginFill(LIGHT[color].glow, 0.35);
-      glow.drawCircle(0, 0, 22);
-      glow.endFill();
+      glow.circle(0, 0, 22).fill({ color: LIGHT[color].glow, alpha: 0.35 });
     }
-    g.beginFill(col);
-    g.lineStyle(2, 0x8f8b9b, 1);
-    g.drawRoundedRect(-9, -13, 18, 26, 6);
-    g.endFill();
-    g.lineStyle(0);
+    g.roundRect(-9, -13, 18, 26, 6).fill(col).stroke({ width: 2, color: 0x8f8b9b, alpha: 1 });
   };
   c.set(null);
   return c;
@@ -578,10 +511,9 @@ export const room = {
     const world = root.layer(1, 2);
     // Walls: a faint frame either side of the shaft.
     const walls = new PIXI.Graphics();
-    walls.beginFill(0x2a2832, 0.9);
-    walls.drawRect(0, 0, 8, H);
-    walls.drawRect(W - 8, 0, 8, H);
-    walls.endFill();
+    walls.rect(0, 0, 8, H);
+    walls.rect(W - 8, 0, 8, H);
+    walls.fill({ color: 0x2a2832, alpha: 0.9 });
     world.addChild(walls);
     // A soft "radiant glare" from above the top floor.
     const glare = kit.gradient(PIXI, [[0, '#fff6d8'], [0.5, '#6f6880'], [1, '#3f3b4d']], W, 360);
@@ -608,25 +540,15 @@ export const room = {
     const g = new PIXI.Graphics();
     for (const y of [FLOORS.mixer, FLOORS.totem, FLOORS.glare]) drawSlab(g, y);
     // The bottom floor.
-    g.beginFill(0x1c1b21);
-    g.drawRect(0, FLOORS.lamps, W, H - FLOORS.lamps);
-    g.endFill();
-    g.beginFill(0x55535e);
-    g.drawRect(0, FLOORS.lamps - 3, W, 5);
-    g.endFill();
+    g.rect(0, FLOORS.lamps, W, H - FLOORS.lamps).fill(0x1c1b21);
+    g.rect(0, FLOORS.lamps - 3, W, 5).fill(0x55535e);
     // The stone ledge under the last ladder.
     const ledge = layout.solids.find((s) => s.id === 'rg_ledge');
-    g.beginFill(0x1c1b21);
-    g.drawRect(ledge.x1, ledge.y, ledge.x2 - ledge.x1, 26);
-    g.endFill();
-    g.beginFill(0x55535e);
-    g.drawRect(ledge.x1, ledge.y - 3, ledge.x2 - ledge.x1, 5);
-    g.endFill();
+    g.rect(ledge.x1, ledge.y, ledge.x2 - ledge.x1, 26).fill(0x1c1b21);
+    g.rect(ledge.x1, ledge.y - 3, ledge.x2 - ledge.x1, 5).fill(0x55535e);
     // Ladder shafts through the slabs, then the ladders.
     for (const l of layout.ladders) {
-      g.beginFill(0x0f0e12);
-      g.drawRect(l.x - 26, l.yTop, 52, SLAB);
-      g.endFill();
+      g.rect(l.x - 26, l.yTop, 52, SLAB).fill(0x0f0e12);
     }
     world.addChild(g);
     const lg = new PIXI.Graphics();
@@ -703,9 +625,7 @@ export const room = {
       return { ...b, spr, target };
     });
     const doorHit = new ctx.PIXI.Graphics();
-    doorHit.beginFill(0xffffff, 0.001);
-    doorHit.drawRect(-40, -116, 80, 116);
-    doorHit.endFill();
+    doorHit.rect(-40, -116, 80, 116).fill({ color: 0xffffff, alpha: 0.001 });
     doorHit.x = layout.door.x;
     doorHit.y = layout.door.y;
     ctx.data.door = ctx.register({ classId: 'puzzle_exit_door', label: 'Exit', subtitle: 'The way out', sprite: doorHit });

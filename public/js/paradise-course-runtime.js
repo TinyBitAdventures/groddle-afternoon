@@ -124,9 +124,7 @@ function decoHeightAt(name, width) {
 
 function rect(parent, x, y, w, h, color, alpha = 1, z = -20) {
   const g = new PIXI.Graphics();
-  g.beginFill(color, alpha);
-  g.drawRect(x, y, w, h);
-  g.endFill();
+  g.rect(x, y, w, h).fill({ color: color, alpha: alpha });
   g.zIndex = z;
   parent.addChild(g);
   return g;
@@ -199,9 +197,7 @@ function motes(art, parent, course, count, { color = 0xffffff, alpha = 0.45, ris
   for (let index = 0; index < count; index += 1) {
     const dot = new PIXI.Graphics();
     const tint = colors ? colors[index % colors.length] : color;
-    dot.beginFill(tint, alpha * (0.55 + (index % 4) * 0.15));
-    dot.drawCircle(0, 0, size * (0.6 + (index % 5) * 0.22));
-    dot.endFill();
+    dot.circle(0, 0, size * (0.6 + (index % 5) * 0.22)).fill({ color: tint, alpha: alpha * (0.55 + (index % 4) * 0.15) });
     dot.position.set((index * 197 + 53) % course.width, (index * 389 + 71) % course.height);
     dot.zIndex = z;
     dot._rise = rise * (0.6 + (index % 7) * 0.12);
@@ -214,7 +210,7 @@ function motes(art, parent, course, count, { color = 0xffffff, alpha = 0.45, ris
 function windStreaks(art, parent, count, area, { vx = 0, vy = 0, length = 90, alpha = 0.32, z = -12, color = 0xffffff, vertical = false } = {}) {
   for (let index = 0; index < count; index += 1) {
     const streak = new PIXI.Graphics();
-    streak.lineStyle(2 + (index % 2), color, alpha);
+    streak.setStrokeStyle({ width: 2 + (index % 2), color: color, alpha: alpha });
     if (vertical) {
       streak.moveTo(0, 0);
       streak.bezierCurveTo(6, -length * 0.35, -6, -length * 0.65, 0, -length);
@@ -222,6 +218,7 @@ function windStreaks(art, parent, count, area, { vx = 0, vy = 0, length = 90, al
       streak.moveTo(0, 0);
       streak.bezierCurveTo(length * 0.35, -6, length * 0.65, 6, length, 0);
     }
+    streak.stroke();
     streak.position.set(
       area.x1 + ((index * 271) % Math.max(1, area.x2 - area.x1)),
       area.y1 + ((index * 157) % Math.max(1, area.y2 - area.y1))
@@ -339,9 +336,7 @@ function paintAbysmalThrill(root, course, fg, art) {
   }
   // Seabed.
   const bed = new PIXI.Graphics();
-  bed.beginFill(0x1d2522);
-  bed.drawPolygon([0, 3280, 300, 3272, 640, 3286, 980, 3270, 1400, 3282, 1400, course.height, 0, course.height]);
-  bed.endFill();
+  bed.poly([0, 3280, 300, 3272, 640, 3286, 980, 3270, 1400, 3282, 1400, course.height, 0, course.height]).fill(0x1d2522);
   bed.zIndex = -9;
   root.addChild(bed);
   deco(art, root, 'boat', 1060, 3290, { width: 280, tint: 0x8e989b, rotation: 0.06, z: -8 });
@@ -353,9 +348,9 @@ function paintAbysmalThrill(root, course, fg, art) {
   for (const [gx, count] of [[470, 7], [880, 6], [1250, 5]]) {
     for (let blade = 0; blade < count; blade += 1) {
       const lean = (blade - count / 2) * 9;
-      grass.lineStyle(4, 0xd8e2df, 0.85);
       grass.moveTo(gx + blade * 7, 3286);
       grass.quadraticCurveTo(gx + blade * 7 + lean * 0.4, 3240, gx + blade * 7 + lean, 3214 - (blade % 3) * 12);
+      grass.stroke({ width: 4, color: 0xd8e2df, alpha: 0.85 });
     }
   }
   grass.zIndex = -6;
@@ -390,10 +385,8 @@ function paintArborHollow(root, course, fg, art) {
   // Shadowed background trunks and boughs.
   const back = new PIXI.Graphics();
   for (const [x, w] of [[140, 70], [420, 110], [1250, 120], [1500, 80]]) {
-    back.beginFill(0x1a2a1c, 0.85);
-    back.drawRect(x - w / 2, 600, w, course.height);
+    back.rect(x - w / 2, 600, w, course.height).fill({ color: 0x1a2a1c, alpha: 0.85 });
   }
-  back.endFill();
   back.zIndex = -70;
   root.addChild(back);
   for (let index = 0; index < 16; index += 1) {
@@ -435,34 +428,26 @@ function paintArborHollow(root, course, fg, art) {
   const nest = course.platforms.find((plat) => plat.id === 'nest');
   const nestArt = new PIXI.Graphics();
   const nx = (nest.x1 + nest.x2) / 2;
-  nestArt.beginFill(0x5b3a1f);
-  nestArt.drawEllipse(nx, nest.y + 18, 104, 34);
-  nestArt.endFill();
+  nestArt.ellipse(nx, nest.y + 18, 104, 34).fill(0x5b3a1f);
   for (let twig = 0; twig < 26; twig += 1) {
     const angle = (twig / 26) * Math.PI * 2;
-    nestArt.lineStyle(4, twig % 2 ? 0x7a5230 : 0x93683c, 1);
     nestArt.moveTo(nx + Math.cos(angle) * 96, nest.y + 18 + Math.sin(angle) * 26);
     nestArt.lineTo(nx + Math.cos(angle + 0.9) * 112, nest.y + 8 + Math.sin(angle + 0.9) * 34);
+    nestArt.stroke({ width: 4, color: twig % 2 ? 0x7a5230 : 0x93683c, alpha: 1 });
   }
-  nestArt.lineStyle(0);
   nestArt.zIndex = -18;
   root.addChild(nestArt);
   const egg = new PIXI.Graphics();
-  egg.beginFill(0xf3e7c4);
-  egg.drawEllipse(nx + 38, nest.y - 16, 30, 38);
-  egg.endFill();
-  egg.beginFill(0xd9c48f, 0.8);
-  for (const [ex, ey, r] of [[28, -30, 4], [46, -12, 3], [34, 2, 3.5], [50, -34, 2.5]]) egg.drawCircle(nx + ex, nest.y + ey, r);
-  egg.endFill();
+  egg.ellipse(nx + 38, nest.y - 16, 30, 38).fill(0xf3e7c4);
+  for (const [ex, ey, r] of [[28, -30, 4], [46, -12, 3], [34, 2, 3.5], [50, -34, 2.5]]) egg.circle(nx + ex, nest.y + ey, r);
+  egg.fill({ color: 0xd9c48f, alpha: 0.8 });
   egg.zIndex = -19;
   root.addChild(egg);
   // Forest floor.
   const ground = new PIXI.Graphics();
-  ground.beginFill(0x24331c);
-  ground.drawRect(0, floor, course.width, course.height - floor);
-  ground.beginFill(0x3b5226);
-  ground.drawPolygon([0, floor + 6, 220, floor - 4, 520, floor + 4, 900, floor - 6, 1300, floor + 4, 1600, floor - 2, 1600, floor + 18, 0, floor + 22]);
-  ground.endFill();
+  ground.rect(0, floor, course.width, course.height - floor).fill(0x24331c);
+  ground.poly([0, floor + 6, 220, floor - 4, 520, floor + 4, 900, floor - 6, 1300, floor + 4, 1600, floor - 2, 1600, floor + 18, 0, floor + 22]);
+  ground.fill(0x3b5226);
   ground.zIndex = -9;
   root.addChild(ground);
   deco(art, root, 'mushroom_amanita_1', 560, floor + 4, { height: 128, z: -11 });
@@ -481,9 +466,7 @@ function paintBippityBop(root, course, fg, art) {
   for (let index = 0; index < 18; index += 1) {
     const ray = new PIXI.Graphics();
     const x = index * 270 + 60;
-    ray.beginFill(0xffffff, 0.05 + (index % 3) * 0.025);
-    ray.drawPolygon([x, 110, x + 60 + (index % 4) * 20, 110, x + 260, 820, x + 150, 820]);
-    ray.endFill();
+    ray.poly([x, 110, x + 60 + (index % 4) * 20, 110, x + 260, 820, x + 150, 820]).fill({ color: 0xffffff, alpha: 0.05 + (index % 3) * 0.025 });
     ray.zIndex = -70;
     ray._phase = index * 0.8;
     root.addChild(ray);
@@ -550,15 +533,11 @@ function paintUpdraft(root, course, fg, art) {
   hole.position.set(course.holeX, course.holeY);
   hole.zIndex = -16;
   const dark = new PIXI.Graphics();
-  dark.beginFill(0x203c6e, 0.95);
-  dark.drawEllipse(0, 0, 120, 82);
-  dark.beginFill(0x10234a, 1);
-  dark.drawEllipse(-10, 4, 76, 50);
-  dark.endFill();
+  dark.ellipse(0, 0, 120, 82).fill({ color: 0x203c6e, alpha: 0.95 });
+  dark.ellipse(-10, 4, 76, 50).fill({ color: 0x10234a, alpha: 1 });
   hole.addChild(dark);
   const swirl = new PIXI.Graphics();
   for (let arm = 0; arm < 4; arm += 1) {
-    swirl.lineStyle(5, 0xdcecff, 0.75);
     const start = (arm / 4) * Math.PI * 2;
     for (let step = 0; step <= 18; step += 1) {
       const angle = start + step * 0.22;
@@ -568,6 +547,7 @@ function paintUpdraft(root, course, fg, art) {
       if (step === 0) swirl.moveTo(px, py);
       else swirl.lineTo(px, py);
     }
+    swirl.stroke({ width: 5, color: 0xdcecff, alpha: 0.75 });
   }
   hole.addChild(swirl);
   hole._swirl = swirl;
@@ -581,9 +561,7 @@ function paintUpdraft(root, course, fg, art) {
   }
   for (const zone of course.zones || []) {
     const column = new PIXI.Graphics();
-    column.beginFill(0xffffff, 0.08);
-    column.drawRoundedRect(zone.x1, 80, zone.x2 - zone.x1, course.height - 160, 60);
-    column.endFill();
+    column.roundRect(zone.x1, 80, zone.x2 - zone.x1, course.height - 160, 60).fill({ color: 0xffffff, alpha: 0.08 });
     column.zIndex = -50;
     root.addChild(column);
     windStreaks(art, root, 10, { x1: zone.x1 + 10, x2: zone.x2 - 10, y1: 120, y2: course.height - 120 }, { vy: -4.5, vertical: true, length: 70, alpha: 0.45 });
@@ -602,11 +580,8 @@ function paintUpdraft(root, course, fg, art) {
 
 function paintSkyPlunge(root, course, fg, art) {
   const sun = new PIXI.Graphics();
-  sun.beginFill(0xfff6d8, 0.35);
-  sun.drawCircle(1120, 260, 170);
-  sun.beginFill(0xfff8e4, 0.9);
-  sun.drawCircle(1120, 260, 82);
-  sun.endFill();
+  sun.circle(1120, 260, 170).fill({ color: 0xfff6d8, alpha: 0.35 });
+  sun.circle(1120, 260, 82).fill({ color: 0xfff8e4, alpha: 0.9 });
   sun.zIndex = -90;
   root.addChild(sun);
   for (let index = 0; index < 30; index += 1) {

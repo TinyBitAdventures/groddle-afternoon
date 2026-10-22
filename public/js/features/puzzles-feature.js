@@ -200,14 +200,8 @@ function spawnBubbles(engine, def) {
     for (let i = 0; i < count; i += 1) {
       const g = new PIXI.Graphics();
       const r = 3 + ((i * 7) % 6);
-      g.lineStyle(2, 0xffffff, 0.9);
-      g.beginFill(0xdff6ff, 0.18);
-      g.drawCircle(0, 0, r);
-      g.endFill();
-      g.lineStyle(0);
-      g.beginFill(0xffffff, 0.8);
-      g.drawCircle(-r * 0.35, -r * 0.35, Math.max(1, r * 0.25));
-      g.endFill();
+      g.circle(0, 0, r).fill({ color: 0xdff6ff, alpha: 0.18 }).stroke({ width: 2, color: 0xffffff, alpha: 0.9 });
+      g.circle(-r * 0.35, -r * 0.35, Math.max(1, r * 0.25)).fill({ color: 0xffffff, alpha: 0.8 });
       layer.addChild(g);
       bubbles.push({ g, u: ((i * 37) % 100) / 100, v: (i * 0.61803) % 1, speed: 0.004 + ((i * 13) % 7) * 0.0012 });
     }
