@@ -77,3 +77,4 @@ import { smugglingFeature } from './smuggling-feature.js?v=smuggling-1'; FEATURE
 import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-1'; FEATURES.push(homeTowerFeature);
 import { secretSpotsFeature } from './secret-spots-feature.js?v=secrets-1'; FEATURES.push(secretSpotsFeature);
 import { musicblocksFeature } from './musicblocks-feature.js?v=musicblocks-1'; FEATURES.push(musicblocksFeature);
+import { shrineHintFeature } from './shrine-hint-feature.js?v=shrine-hint-1'; FEATURES.push(shrineHintFeature);
