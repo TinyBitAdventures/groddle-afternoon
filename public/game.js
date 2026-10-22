@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=musicblocks-note-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-8';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-9';
 import {
   actionDurationFor,
   createTimedAction,
