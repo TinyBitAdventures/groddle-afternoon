@@ -752,6 +752,7 @@ import {
 import { moodMax } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
+import { QUOIN_FRAME_BOB, advanceQuoinClock, quoinBobBetweenFrames } from './js/quoin-motion.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
@@ -8450,7 +8451,9 @@ function spawnWorldQuoin(spot, typeId = 'xp', opts = {}) {
   q.animationSpeed = typeId === 'qurazy' ? 0.42 : 0.28;
   q.loop = true;
   // AbstractItemstackView: each quoin starts on a random one of its 24 frames.
-  q.gotoAndPlay(Math.floor(Math.random() * q.totalFrames));
+  // The quoin tick drives the frames from frameClock so the bob can ease between them.
+  q.frameClock = Math.floor(Math.random() * q.totalFrames);
+  q.gotoAndStop(q.frameClock);
   // quoin.as draws its 40x50 tiles at the world's own scale.
   q.baseScale = QUOIN_SCALE;
   q.scale.set(q.baseScale);
@@ -9264,8 +9267,12 @@ function physics(dt) {
 
   for (const q of quoins) {
     q.phase += 0.05 * dt;
-    // Whole pixels and a fixed scale keep the 40x50 bitmap from resampling.
-    q.y = Math.round(q.baseY + Math.sin(q.phase) * 8);
+    q.frameClock = advanceQuoinClock(q.frameClock, q.animationSpeed, dt, q.totalFrames);
+    const frame = Math.floor(q.frameClock);
+    if (q.currentFrame !== frame) q.gotoAndStop(frame);
+    // The 3x sheet draws at sub-pixel positions: no rounding, and the baked
+    // whole-pixel bob eases from one frame to the next (js/quoin-motion.js).
+    q.y = q.baseY + Math.sin(q.phase) * 8 + quoinBobBetweenFrames(q.typeId, q.frameClock) * q.scale.y;
   }
 
   for (const b of butterflies) {
@@ -23147,6 +23154,10 @@ async function main() {
       };
     },
     /** Idle/AFK QA (&idledemo=1): loaded idle sheets with load/bake ms, AFK and the idle timer. */
+    /** World quoins as drawn: sprite y plus the frame's baked bob (QA for js/quoin-motion.js). */
+    quoins() {
+      return quoins.map((q) => ({ type: q.typeId, x: q.x, y: q.y, frame: q.currentFrame, clock: q.frameClock, drawnY: q.y + (QUOIN_FRAME_BOB[q.typeId]?.[q.currentFrame] || 0) * q.scale.y }));
+    },
     idleState() {
       return {
         anim: player?.glitchState || null,

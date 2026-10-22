@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 241,
+  "commits": 242,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "\"And so it begins...\" draws again instead of empty sky"
+   },
    {
     "date": "2026-10-22",
     "kind": "fix",
@@ -1510,14 +1515,9 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "The whole Glitch wardrobe in the builder: 626 articles, with search"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Drop the made-up XS Musicblock icons"
    }
   ]
  },
- "tests": 152,
+ "tests": 153,
  "generatedAt": "2026-10-22"
 }
