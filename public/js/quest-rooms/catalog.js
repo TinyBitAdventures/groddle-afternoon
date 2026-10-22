@@ -71,6 +71,7 @@ export const BUILT_ROOMS = Object.freeze([
   'an_autumn_day',
   'being_watched',
   'back_alley',
+  'clubhouse',
 ]);
 
 /**
@@ -94,6 +95,10 @@ export const OFFER_OVERRIDES = Object.freeze({
   join_club: {
     offerTriggers: [{ type: 'xp', xp: 30128 }],
     why: 'bag_butler is not in the remake; same xp threshold through the Magic Rock',
+  },
+  join_club_reminisce: {
+    prerequisites: [{ condition: 'custom_code', value: 'hour_after:join_club', not: 0 }],
+    why: 'canOffer: admins only (pc.is_god) in the source; opened to players through the Play Cube an hour after Join the Club and an hour after the last try',
   },
   // Street spirits gave it after A Summer's Day; their talk menu offers no quests.
   an_autumn_day: {

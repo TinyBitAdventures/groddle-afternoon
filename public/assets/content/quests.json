@@ -27892,14 +27892,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "Access Clubhouse"
+    "desc": "Access Clubhouse",
+    "route": "quest-instances"
    },
    {
     "id": "r532",
     "type": "flag",
     "name": "instance_exit_via_signpost",
     "num": 1,
-    "desc": "Get the Picture"
+    "desc": "Get the Picture",
+    "route": "quest-instances"
    },
    {
     "id": "r535",
@@ -27907,7 +27909,8 @@
     "name": "talk_to_butler",
     "num": 1,
     "classId": "bag_butler",
-    "desc": "Tell your Butler about the club."
+    "desc": "Tell your Butler about the club.",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -27942,13 +27945,14 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "npc",
-    "npc": "bag_butler",
-    "xp": 30128
+    "type": "xp",
+    "xp": 30128,
+    "override": true
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "clubhouse",
+  "offerNote": "bag_butler is not in the remake; same xp threshold through the Magic Rock",
+  "solo": true
  },
  "join_club_reminisce": {
   "classTsid": "join_club_reminisce",
@@ -27962,14 +27966,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "Access Clubhouse"
+    "desc": "Access Clubhouse",
+    "route": "quest-instances"
    },
    {
     "id": "r552",
     "type": "flag",
     "name": "instance_exit_via_signpost",
     "num": 1,
-    "desc": "Get the Picture"
+    "desc": "Get the Picture",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -27993,7 +27999,13 @@
   "familiarTurnin": false,
   "silentComplete": false,
   "showAlert": false,
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "hour_after:join_club",
+    "not": 0
+   }
+  ],
   "endNpcs": [],
   "locations": [
    "clubhouse_part_1_reminisce",
@@ -28008,8 +28020,9 @@
     "npc": "play_cube"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "clubhouse",
+  "offerNote": "canOffer: admins only (pc.is_god) in the source; opened to players through the Play Cube an hour after Join the Club and an hour after the last try",
+  "solo": true
  },
  "jump_in_hole": {
   "classTsid": "jump_in_hole",
