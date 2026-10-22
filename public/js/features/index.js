@@ -71,3 +71,4 @@ export const FEATURES = [
   seasonsFeature,
   cameraModeFeature,
 ];
+import { smugglingFeature } from './smuggling-feature.js?v=smuggling-1'; FEATURES.push(smugglingFeature);

@@ -153,6 +153,10 @@ export const REMAKE_QUEST_NPCS = Object.freeze([
   // Offer and turn in Gwendolyn's Task II and III inside the room (quest-rooms/gwendolyn.js).
   'npc_squid',
   'npc_gwendolyn',
+  // Gives Contraband and offers Smuggle the Smuggler (features/smuggling-feature.js).
+  'npc_smuggler',
+  // The imprisoned Smuggler in quest-rooms/penalty.js (part 1's end NPC, offers II and III).
+  'npc_rare_item_vendor',
 ]);
 const GSJS_STREET_SPIRITS = new Set([
   'street_spirit', 'street_spirit_groddle', 'street_spirit_firebog', 'street_spirit_zutto', 'street_spirit_ix',

@@ -32208,9 +32208,16 @@
   "instanced": false,
   "needsStart": true,
   "hasCanOffer": false,
-  "offerTriggers": [],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "offerTriggers": [
+   {
+    "type": "npc",
+    "npc": "npc_smuggler",
+    "override": true
+   }
+  ],
+  "instanceRoom": "penalty",
+  "offerNote": "no offer trigger survives; the give Smuggler offers it after a delivery (smuggling-feature.js checks the shovel/ace_of_spades onStarted gate)",
+  "solo": true
  },
  "smuggle_the_smuggler_part2": {
   "classTsid": "smuggle_the_smuggler_part2",
@@ -32225,7 +32232,8 @@
     "name": "'VERB:'+patch+':'+dig",
     "num": 1,
     "classId": "shovel",
-    "desc": "Dig your way out."
+    "desc": "Dig your way out.",
+    "route": "quest-instances"
    }
   ],
   "rewards": {},
@@ -32254,8 +32262,8 @@
     "inferred": true
    }
   ],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "instanceRoom": "penalty",
+  "solo": true
  },
  "smuggle_the_smuggler_part3": {
   "classTsid": "smuggle_the_smuggler_part3",
@@ -32296,8 +32304,8 @@
     "inferred": true
    }
   ],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "instanceRoom": "penalty",
+  "solo": true
  },
  "smuggling_basic": {
   "classTsid": "smuggling_basic",
@@ -32344,8 +32352,7 @@
     "npc": "npc_smuggler"
    }
   ],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "solo": true
  },
  "snappy_explorer": {
   "classTsid": "snappy_explorer",

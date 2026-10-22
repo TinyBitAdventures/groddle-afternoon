@@ -54,6 +54,10 @@ export const QUEST_ROOMS = Object.freeze({
   tower_quest_part2: 'gwendolyn',
   tower_quest_part3: 'gwendolyn',
   tower_quest_part3repeat: 'gwendolyn',
+  // Smuggle the Smuggler (onStarted instance `penalty`; the template is lost).
+  smuggle_the_smuggler_part1: 'penalty',
+  smuggle_the_smuggler_part2: 'penalty',
+  smuggle_the_smuggler_part3: 'penalty',
 });
 
 /** Rooms that exist and pass QA. A quest is solo-offerable once its room is here. */
@@ -77,6 +81,7 @@ export const BUILT_ROOMS = Object.freeze([
   'operation_grow',
   'gwendolyn',
   'mental_block',
+  'penalty',
 ]);
 
 /**
@@ -172,6 +177,10 @@ export const OFFER_OVERRIDES = Object.freeze({
     offerTriggers: [{ type: 'street', street: 'GTJ10M515812V0C' }],
     prerequisites: [{ condition: 'over_level', value: 12, not: 0 }],
     why: "Room 23's Greeterbot Sentry G-42 (level 12 gate) and Ghost of Gwendolyn are not rebuilt; the Magic Rock offers it in Corridor Five, by Room 23's door, at level 12",
+  },
+  smuggle_the_smuggler_part1: {
+    offerTriggers: [{ type: 'npc', npc: 'npc_smuggler' }],
+    why: 'no offer trigger survives; the give Smuggler offers it after a delivery (smuggling-feature.js checks the shovel/ace_of_spades onStarted gate)',
   },
   btc_room_3_reminisce: {
     prerequisites: [{ condition: 'custom_code', value: 'hour_after:btc_room_3', not: 0 }],

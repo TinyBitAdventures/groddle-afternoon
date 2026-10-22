@@ -93,7 +93,7 @@ const ROOM_TITLES = {
   back_alley: "We're Off to See the Lizard", rube_yard: 'The Wrizzards and The Rube', mental_block: 'Mental Block',
   color_unblocking: 'Color Unblocking', light_perspective: 'Walk Toward the Light', radiant_glare: 'Radiant Glare',
   picto_pattern: 'Picto-Pattern', tile_puzzle: 'An Old Fashioned B&E', clubhouse: 'Join the Club',
-  operation_grow: 'Operation: Grow', gwendolyn: "Gwendolyn's Task",
+  operation_grow: 'Operation: Grow', gwendolyn: "Gwendolyn's Task", penalty: 'Smuggle the Smuggler',
 };
 
 function roomStats() {

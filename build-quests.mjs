@@ -252,8 +252,7 @@ const EXCLUDE = {
   radiant_glare: 'instance_unbuilt', radiant_glare_rem: 'instance_unbuilt', rube_spy: 'instance_unbuilt',
   stale_but_necessary: 'instance_unbuilt', where_the_blue_grew: 'instance_unbuilt', numismatic_hustle: 'instance_unbuilt',
   // features or givers the remake does not have
-  build_a_tower: 'feature_unbuilt', smuggle_the_smuggler_part1: 'feature_unbuilt',
-  smuggle_the_smuggler_part2: 'feature_unbuilt', smuggle_the_smuggler_part3: 'feature_unbuilt', smuggling_basic: 'feature_unbuilt',
+  build_a_tower: 'feature_unbuilt',
   meditativearts_meditation_station: 'feature_unbuilt',
 };
 

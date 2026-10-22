@@ -221,7 +221,7 @@ function enterDoor(engine, target) {
     destination: dest,
   });
   if (!check.ok) return refuse(engine, target, check.code, check.msg);
-  const gate = engine.travelGate(dest.street);
+  const gate = engine.travelGate(dest.street, { via: 'door' });
   if (gate && gate.ok === false) return refuse(engine, target, 'gate', gate.msg || 'You cannot go through right now.');
   if (check.consumeKey) {
     removeItem(engine.inv, check.consumeKey, 1);
