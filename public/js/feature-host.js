@@ -107,6 +107,20 @@ export function createFeatureHost(features = []) {
       if (!feature || typeof feature.verbsFor !== 'function') return null;
       return feature.verbsFor(target, engine) || [];
     },
+    /**
+     * A target's own (content.js) verb list passed through every feature's
+     * decorateVerbs(target, verbs, engine), which returns a new list or null
+     * to leave it alone (tree poison adds and hides tree verbs).
+     */
+    decorateVerbs(target, verbs, engine) {
+      let out = verbs;
+      for (const feature of list) {
+        if (typeof feature.decorateVerbs !== 'function') continue;
+        const next = feature.decorateVerbs(target, out, engine);
+        if (Array.isArray(next)) out = next;
+      }
+      return out;
+    },
     runVerb(target, verbId, engine) {
       const feature = owner(target);
       if (!feature || typeof feature.runVerb !== 'function') return false;

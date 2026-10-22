@@ -104,8 +104,8 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
     },
   },
   Botany: {
-    status: 'partial',
-    note: 'Unlocks the Bean Seasoner, which turns plain beans into seeds for other trees. Poisoning and curing trees are not here yet.',
+    status: 'live',
+    note: 'Unlocks the Bean Seasoner, which turns plain beans into seeds for other trees, and the Tree Poison recipe in the Cauldron. Pour Tree Poison on a tree and it dies in three minutes (Tree Poison Antidote saves it); the dead tree clears with a Hatchet into a Patch for a new bean.',
   },
   'Master Gardener': {
     status: 'live',

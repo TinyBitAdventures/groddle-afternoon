@@ -3,8 +3,8 @@
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=musicblocks-note-3';
-import { createFeatureHost } from './js/feature-host.js?v=features-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-7';
+import { createFeatureHost } from './js/feature-host.js?v=features-2';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-8';
 import {
   actionDurationFor,
   createTimedAction,
@@ -400,7 +400,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=features-1';
+} from './js/player-save.js?v=features-2';
 import {
   HOME_INTERIOR_TSID,
   HOME_PURCHASE_COST,
@@ -4487,7 +4487,7 @@ function openVerbMenu(target) {
   if (currentAction) return;
   menuTarget = target;
   // A feature may take over any target's menu (rooked trees/animals, shrines under attack).
-  const verbs = features.query('verbOverride', target, engine) ?? features.verbsFor(target, engine) ?? getVerbsFor(target, {
+  const verbs = features.query('verbOverride', target, engine) ?? features.verbsFor(target, engine) ?? features.decorateVerbs(target, getVerbsFor(target, {
     pc,
     inv,
     tools: toolState,
@@ -4495,7 +4495,7 @@ function openVerbMenu(target) {
     learned: skillState.learned,
     imaginationUpgrades: pc.imaginationUpgrades || [],
     streetTsid: currentStreetTsid,
-  });
+  }), engine);
   const menu = document.getElementById('verb-menu');
   const list = document.getElementById('verb-menu-list');
   const title = document.getElementById('verb-menu-title');
@@ -7531,17 +7531,27 @@ const engine = {
    * Apply a catalog buff from a feature (seasonal treats); with `extendMs`
    * an already-running buff is lengthened instead (buffs_extend_time).
    */
-  applyBuff(classTsid, { extendMs = 0 } = {}) {
+  applyBuff(classTsid, { extendMs = 0, durationSec = 0, args = null } = {}) {
     const now = Date.now();
     if (extendMs > 0 && hasBuff(buffState, classTsid, now)) {
       const res = extendBuff(buffState, classTsid, extendMs, now);
       updateHud();
       return res;
     }
-    const res = applyBuff(buffState, classTsid, pc, now);
+    // buffs_apply(id, { duration, ...args }): a duration override and the buff's args.
+    const res = applyBuff(buffState, classTsid, pc, now, args ? { args } : {});
+    if (res.ok && durationSec > 0) res.buff.expiresAt = res.buff.appliedAt + durationSec * 1000;
     if (res.ok) handleBuffEvents([{ type: 'activated', classTsid, buff: res.buff, effects: res.effects || {} }]);
     return res;
   },
+  /** buffs_remove: end a running buff now. */
+  removeBuff(classTsid) {
+    const res = removeBuff(buffState, classTsid, pc, Date.now());
+    if (res.ok) updateHud();
+    return res;
+  },
+  /** The running row of a buff (args, expiresAt), or null. */
+  buffRow: (classTsid) => (hasBuff(buffState, classTsid, Date.now()) ? buffState.active[classTsid] : null),
   award: (payload) => enqueueAward(payload),
   busy() {
     return Boolean(
@@ -7723,6 +7733,15 @@ const engine = {
   },
   /** The persistent per-street world slot (gardens, trees, rocks). */
   streetWorld: (tsid) => streetWorldState(tsid),
+  /** createItemStack on the current street: a ground stack anyone can pick up. */
+  dropWorldStack(classTsid, count, x, y) {
+    const result = dropInventoryStack(droppedItemState, { [classTsid]: count }, currentStreetTsid, classTsid, count, { x, y }, { now: Date.now(), merge: false });
+    if (result.ok) {
+      saveDroppedItems();
+      refreshDroppedWorldItems();
+    }
+    return result;
+  },
   /** TSIDs of every street this save has entered (the persistent world keys). */
   visitedStreets: () => Object.keys(persistentWorldState.streets || {}),
   /** A garden bed through the street garden path ({ x, y, gardenType, cols, rows, label, garden, detached }). */

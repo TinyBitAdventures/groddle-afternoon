@@ -29,6 +29,12 @@
  *   &patchtree=trant_fruit|wood_tree|... and &patchmaturity=<n> pick the grown tree.
  * Canvas data: patchCount, patchStages, patchPositions, patchDemo, patchLastVerb,
  * patchTrees, patchToolAnimation.
+ *
+ * Adopted plots (tree-death-feature.js): a street tree that dies leaves its
+ * dead tree (or, for a Wood Tree, a Patch) here as an extra plot keyed
+ * `tree:<street tree index>`, with its spot in slot.adopted. From then on it
+ * is an ordinary plot: clear, tend, plant, pet, grow. `adoptPlot` and
+ * `killTree` are the hooks; trees grown here die through `killPlotTree`.
  */
 
 import { ensureItem } from '../inventory.js?v=catalog-unified-3';
@@ -42,6 +48,7 @@ import {
   SOIL_ITEM_DEFS,
   canPlantBean,
   createPlot,
+  killPlotTree,
   normalizePlot,
   performPlotVerb,
   plotArtPath,
@@ -112,6 +119,17 @@ export function soilSpawnPlan(counts, placement) {
       if (!Number.isFinite(point?.x) || !Number.isFinite(point?.y)) return;
       plan.push({ key: `${classTsid}:${index}`, classTsid, x: point.x, y: point.y });
     });
+  }
+  return plan;
+}
+
+/** Plots a dead street tree left behind (slot.adopted: key -> { x, y }). */
+export function adoptedPlan(slot) {
+  const plan = [];
+  for (const [key, spot] of Object.entries(slot?.adopted || {})) {
+    const plot = normalizePlot(slot.plots?.[key]);
+    if (!plot || !Number.isFinite(spot?.x) || !Number.isFinite(spot?.y)) continue;
+    plan.push({ key, classTsid: plot.classTsid, x: spot.x, y: spot.y, adopted: true });
   }
   return plan;
 }
@@ -425,6 +443,12 @@ function growFx(engine, sprite, scale) {
   }
 }
 
+/** Grey-brown dust where a tree has just died (no source overlay for die()). */
+function deathPuff(engine, x, y) {
+  soilPuff(engine, x, y - 40, 0x6b6253);
+  soilPuff(engine, x + 18, y - 90, 0x857a66);
+}
+
 /** Puff of soil when tending or digging finishes. */
 function soilPuff(engine, x, y, color = 0x7a5532) {
   const { PIXI } = engine;
@@ -660,14 +684,17 @@ async function spawnStreet(engine, items, myGeneration) {
   const { PIXI } = engine;
   await Promise.all(soilSpritePaths().map((path) => loadBase(PIXI, path)));
   if (myGeneration !== generation) return;
-  entities = items.map((item, index) => ({
+  // A street tree that died while this street loaded (adoptPlot) is already building.
+  const adoptedMeanwhile = entities.filter((e) => e.adopted && !items.some((item) => item.key === e.key));
+  const spawned = items.map((item, index) => ({
     ...item,
     direction: index % 2 ? -1 : 1,
     sprite: null,
     target: null,
   }));
+  entities = [...spawned, ...adoptedMeanwhile];
   demoEntity = entities.find((e) => e.demo) || null;
-  await Promise.all(entities.map((entity) => buildView(engine, entity, myGeneration)));
+  await Promise.all(spawned.map((entity) => buildView(engine, entity, myGeneration)));
   if (myGeneration !== generation) return;
   publish(engine);
   scheduleAutoplay(engine);
@@ -702,7 +729,7 @@ export const patchesFeature = {
     // Home streets pass their cultivated Patches (js/features/homes-feature.js).
     const counts = street?.soilCounts || soilCountsForStreet(street?.tsid || engine.streetTsid);
     const now = Date.now();
-    let planned = soilSpawnPlan(counts, (key) => engine.placement(key));
+    let planned = [...soilSpawnPlan(counts, (key) => engine.placement(key)), ...adoptedPlan(slot)];
     planned = setupDemo(engine, slot, planned);
     const items = prepareStreetPlots(slot, planned, { tsid: engine.streetTsid, hubId: hubIdOf(engine), now });
     // Catch up on time spent away (seedlings, regrowth, tree maturity).
@@ -865,6 +892,62 @@ export const patchesFeature = {
   restore(slice) {
     const at = Number(slice?.lastNewDayAt);
     lastNewDayAt = Number.isFinite(at) && at > 0 ? at : 0;
+  },
+
+  /**
+   * A dead street tree's plot (tree-death-feature): `soilClass` is a dead
+   * trant class or `patch`. Saved under `key` with its spot; shown at once
+   * when the street is loaded.
+   */
+  adoptPlot(engine, { key, soilClass, x, y }) {
+    const slot = engine.streetSlot(PATCHES_FEATURE_ID);
+    slot.plots ||= {};
+    slot.adopted ||= {};
+    const now = Date.now();
+    const plot = createPlot(soilClass, { now, hubId: hubIdOf(engine), seed: `${engine.streetTsid}:${key}` });
+    slot.plots[key] = plot;
+    slot.adopted[key] = { x: Math.round(x), y: Math.round(y) };
+    const old = entities.find((e) => e.key === key);
+    if (old) {
+      dropView(engine, old);
+      entities = entities.filter((e) => e !== old);
+    }
+    const entity = { key, classTsid: plot.classTsid, x, y, plot, adopted: true, direction: entities.length % 2 ? -1 : 1, sprite: null, target: null };
+    entities.push(entity);
+    buildView(engine, entity, generation, {}).then(() => {
+      if (entity.sprite && !entity.sprite.destroyed) deathPuff(engine, entity.sprite.x, entity.sprite.y);
+      publish(engine);
+    });
+    publish(engine);
+    return entity;
+  },
+
+  /** A grown tree registered by this feature (target.grownFromBean) dies. */
+  killTree(engine, target) {
+    const entity = entities.find((row) => row.target === target);
+    if (!entity) return null;
+    const out = killPlotTree(entity.plot, Date.now());
+    if (!out) return null;
+    const x = entity.sprite?.x ?? entity.x;
+    const y = entity.sprite?.y ?? entity.y;
+    buildView(engine, entity, generation, {}).then(() => {
+      deathPuff(engine, x, y);
+      publish(engine);
+    });
+    publish(engine);
+    engine.save();
+    return { ...out, x, y, key: entity.key };
+  },
+
+  /** QA: the plot entity for a key on the loaded street. */
+  entityByKey(key) {
+    return entities.find((e) => e.key === key) || null;
+  },
+
+  /** QA autoplay: run one plot verb by key (tree-death-feature's patch cycle route). */
+  runPlotVerb(engine, key, verbId) {
+    const entity = entities.find((e) => e.key === key);
+    return entity ? performVerb(engine, entity, verbId) : null;
   },
 
   /** QA / tests. */

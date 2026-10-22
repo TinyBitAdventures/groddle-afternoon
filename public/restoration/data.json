@@ -276,12 +276,13 @@
    "group": "creatures",
    "name": "Trants and Wood Trees",
    "status": "source",
-   "blurb": "Six living trees to pet, water and harvest (with super harvests), and Wood Trees for planks.",
+   "blurb": "Six living trees to pet, water and harvest (with super harvests), Wood Trees for planks, and Tree Poison: a poisoned tree dies into a dead tree you clear and replant.",
    "spot": "tree",
    "evidence": [
     "public/js/trants.js",
     "public/js/trant-care.js",
-    "public/js/woodcutting.js"
+    "public/js/woodcutting.js",
+    "public/js/tree-poison.js"
    ],
    "shot": "shots/trants.webp"
   },
@@ -1347,9 +1348,9 @@
  "skills": {
   "total": 105,
   "counts": {
-   "live": 97,
-   "partial": 4,
+   "live": 98,
    "later": 1,
+   "partial": 3,
    "multiplayer": 3
   }
  },
@@ -1393,9 +1394,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 249,
+  "commits": 250,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "37 more imagination cards work: batch sizes, machines, meditation, mega rocks and more"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1510,14 +1516,9 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "Streets cull off-screen decos and free textures far from the camera"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "The game runs on Pixi 8.22.0"
    }
   ]
  },
- "tests": 159,
+ "tests": 160,
  "generatedAt": "2026-10-22"
 }

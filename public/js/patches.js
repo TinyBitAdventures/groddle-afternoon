@@ -29,6 +29,8 @@
  *    but do not lose health or die of neglect: the remake's daily pet/water
  *    model (js/trant-care.js) does not reproduce the source's hourly tendable
  *    windows, so source health decay would kill every planted tree in a day.
+ *    They do die of Tree Poison (js/tree-poison.js): `killPlotTree` is
+ *    trants.js die() / wood_tree.js onDie for a tree grown in a plot.
  */
 
 import { createTrantState, fruitCapacityAt, refillFruit, resetTrantDay } from './trants.js?v=trant-harvest-2';
@@ -551,6 +553,31 @@ export function growTree(plot, now = Date.now()) {
     resetAt: now,
   };
   return plot.tree;
+}
+
+/**
+ * trants.js die(): a grown trant becomes its dead class (cleared later with a
+ * Hatchet); wood_tree.js onDie: a Wood Tree becomes a Patch at once.
+ * Returns { classId, soilClass } or null when there is no tree.
+ */
+export function killPlotTree(plot, now = Date.now()) {
+  if (plot?.stage !== 'tree' || !plot.tree) return null;
+  const classId = plot.tree.classId;
+  if (classId === 'wood_tree') {
+    plot.kind = 'patch';
+    setDirty(plot, now);
+    return { classId, soilClass: 'patch' };
+  }
+  const deadClass = `${classId}_dead`;
+  if (!DEAD_TRANT_CLASSES.includes(deadClass)) return null;
+  plot.stage = 'dead';
+  plot.since = now;
+  plot.dueAt = 0;
+  plot.seedling = null;
+  plot.tree = null;
+  plot.deadClass = deadClass;
+  plot.classTsid = deadClass;
+  return { classId, soilClass: deadClass };
 }
 
 /** trants.js recalcCycles: minutes between maturity rolls. */

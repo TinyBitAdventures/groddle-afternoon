@@ -91,7 +91,7 @@ import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tow
 import { towerApi } from './home-tower-feature.js?v=home-tower-1';
 import { lookFor, paintTile, shade } from '../home-looks.js?v=home-looks-1';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-2';
-import { patchesFeature } from './patches-feature.js?v=patches-1';
+import { patchesFeature } from './patches-feature.js?v=patches-2';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import { textureFromUrl } from '../textures.js';
 
