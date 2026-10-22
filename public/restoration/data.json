@@ -679,6 +679,20 @@
    "shot": null
   },
   {
+   "id": "craftybot",
+   "group": "home",
+   "name": "Craftybot",
+   "status": "source",
+   "blurb": "A crafting robot delivered in a box by your Magic Rock: queue jobs and it fetches the ingredients and tools, crafts every step, burns fuel and crystals, and hands you the results.",
+   "spot": null,
+   "evidence": [
+    "public/js/craftybot.js",
+    "public/js/features/craftybot-feature.js",
+    "public/assets/content/craftybot-specs.json"
+   ],
+   "shot": null
+  },
+  {
    "id": "chat",
    "group": "home",
    "name": "Chat, groups and friends",
@@ -788,14 +802,14 @@
   }
  ],
  "tally": {
-  "source": 39,
+  "source": 40,
   "rebuilt": 5,
   "lost": 3,
   "solo": 7,
   "reimagined": 1
  },
- "back": 52,
- "possible": 52,
+ "back": 53,
+ "possible": 53,
  "quests": {
   "total": 445,
   "story": 245,
@@ -1375,8 +1389,8 @@
   "skipped": 23
  },
  "icons": {
-  "items": 772,
-  "sharp": 771
+  "items": 773,
+  "sharp": 772
  },
  "imagination": {
   "total": 275,
@@ -1395,9 +1409,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 257,
+  "commits": 258,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Rooms 4, 8 and 16 in Jethimadh Tower Base: spinach garden and drinks, two keys, a spinach jump"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1512,14 +1531,9 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Award cards no longer show raw item-link markup"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "One shared header on the home page, the restoration report and the compare page"
    }
   ]
  },
- "tests": 164,
+ "tests": 165,
  "generatedAt": "2026-10-22"
 }

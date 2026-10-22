@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-12';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-13';
 import {
   actionDurationFor,
   createTimedAction,
@@ -7745,6 +7745,15 @@ const engine = {
     }
     return result;
   },
+  /** Every street's dropped stacks (js/world-items.js state), for features that fetch from the ground. */
+  get droppedItems() {
+    return droppedItemState;
+  },
+  /** Save and redraw dropped stacks after a feature changed droppedItems. */
+  droppedItemsChanged() {
+    saveDroppedItems();
+    refreshDroppedWorldItems();
+  },
   /** TSIDs of every street this save has entered (the persistent world keys). */
   visitedStreets: () => Object.keys(persistentWorldState.streets || {}),
   /** A garden bed through the street garden path ({ x, y, gardenType, cols, rows, label, garden, detached }). */
@@ -8391,6 +8400,8 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
 }
 
 function sizeDroppedItemSprite(spr) {
+  // The load callback can land after a refresh destroyed this sprite.
+  if (!spr || spr.destroyed) return;
   const width = Math.max(1, spr.texture?.orig?.width || spr.texture?.width || 36);
   const height = Math.max(1, spr.texture?.orig?.height || spr.texture?.height || 36);
   const scale = Math.min(1.25, 48 / Math.max(width, height));

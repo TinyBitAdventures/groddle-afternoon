@@ -1,0 +1,19 @@
+{
+ "about": "Craftybot (npc_crafty_bot.swf sprite 45, CC0 glitch-items) for js/features/craftybot-feature.js. The 1x sheets are the OGA __x1_ cells cropped to a shared 128x129 box at (9, 11) so every 3x sheet fits the budget; the SWF's two-frame 'craft' label has no OGA sheet (the feature holds craftStart's last frame). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/craftybot.json",
+ "firstDraw": true,
+ "budget": {"maxSide": 8192, "maxMB": 64},
+ "jobs": [
+  {"name": "craftybot", "swf": "inhabitants/craftybot/npc_crafty_bot.swf", "sprite": 45, "sheets": [
+   {"path": "assets/sprites/craftybot/craftybot_idle0.webp", "label": "idle0", "fw": 128, "fh": 129, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/craftybot/craftybot_walk.webp", "label": "walk", "fw": 128, "fh": 129, "cols": 6, "frames": 29},
+   {"path": "assets/sprites/craftybot/craftybot_collapse.webp", "label": "collapse", "fw": 128, "fh": 129, "cols": 7, "frames": 97},
+   {"path": "assets/sprites/craftybot/craftybot_craftStart.webp", "label": "craftStart", "fw": 128, "fh": 129, "cols": 7, "frames": 13},
+   {"path": "assets/sprites/craftybot/craftybot_craftEnd.webp", "label": "craftEnd", "fw": 128, "fh": 129, "cols": 6, "frames": 17},
+   {"path": "assets/sprites/craftybot/craftybot_expand.webp", "label": "expand", "fw": 128, "fh": 129, "cols": 7, "frames": 93},
+   {"path": "assets/sprites/craftybot/craftybot_sleepMode.webp", "label": "sleepMode", "fw": 128, "fh": 129, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/craftybot/craftybot_peek.webp", "label": "peek", "fw": 128, "fh": 129, "cols": 7, "frames": 75},
+   {"path": "assets/sprites/craftybot/craftybot_idle1.webp", "label": "idle1", "fw": 128, "fh": 129, "cols": 7, "frames": 60},
+   {"path": "assets/sprites/craftybot/craftybot_idle2.webp", "label": "idle2", "fw": 128, "fh": 129, "cols": 7, "frames": 61}
+  ] }
+ ]
+}

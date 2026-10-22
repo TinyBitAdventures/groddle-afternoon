@@ -82,3 +82,4 @@ import { towerRoomsFeature } from './tower-rooms-feature.js?v=tower-rooms-2'; FE
 import { treeDeathFeature } from './tree-death-feature.js?v=tree-death-2'; FEATURES.push(treeDeathFeature);
 import { enchantedForestFeature } from './enchanted-forest-feature.js?v=g5-1'; FEATURES.push(enchantedForestFeature);
 import { jujuBanditsFeature } from './juju-bandits-feature.js?v=g5-1'; FEATURES.push(jujuBanditsFeature);
+import { craftybotFeature } from './craftybot-feature.js?v=craftybot-1'; FEATURES.push(craftybotFeature);
