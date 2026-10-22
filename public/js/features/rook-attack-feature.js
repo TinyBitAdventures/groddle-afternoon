@@ -87,6 +87,8 @@ import {
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
 const VIEW_H = 408;
+// The whole canvas: the pack allowance below the location viewport shows street too.
+const SCREEN_H = 540;
 const PLAYER_LABEL = 'Ur';
 const ORB_CLASS = 'focusing_orb';
 const BALM_CLASS = 'potion_rook_balm';
@@ -441,7 +443,7 @@ function ensureUi(engine) {
   const root = new PIXI.Container();
   root.eventMode = 'passive';
   const sky = new PIXI.Graphics();
-  sky.beginFill(0x1b1030, 1).drawRect(0, 0, VIEW_W, VIEW_H).endFill();
+  sky.beginFill(0x1b1030, 1).drawRect(0, 0, VIEW_W, SCREEN_H).endFill();
   sky.alpha = 0;
   sky.eventMode = 'none';
   const rookLayer = new PIXI.Container();
@@ -656,7 +658,7 @@ function updateOverlays(engine) {
   let k = 1;
   if (el < cur.inMs) k = el / cur.inMs;
   else if (el > cur.inMs + cur.holdMs) k = 1 - (el - cur.inMs - cur.holdMs) / cur.outMs;
-  ui.tint.beginFill(cur.color, cur.alpha * k).drawRect(0, 0, VIEW_W, VIEW_H).endFill();
+  ui.tint.beginFill(cur.color, cur.alpha * k).drawRect(0, 0, VIEW_W, SCREEN_H).endFill();
   ui.textLayer.alpha = Math.max(0, Math.min(1, k * 1.15));
 }
 
