@@ -511,6 +511,7 @@ import {
   resolveIndexTsid,
 } from './js/street-loader.js';
 import {
+  ladderTopDeck,
   resolveGround as resolveStreetGround,
   groundBeneath,
   streetWidth,
@@ -6909,6 +6910,16 @@ const engine = {
   mailUnread: () => unreadMailCount(mailboxState, Date.now()),
   /** Whether the player owns a home street (Visiting Stone opt-in, visitor letters). */
   homeOwned: () => homeState.owned === true,
+  /** newxp: the Magic Rock imagines the home street for free (no deed cost). */
+  grantHome(style = 'meadow') {
+    if (homeState.owned) return false;
+    const result = purchaseHome(homeState, { currants: HOME_PURCHASE_COST }, style, Date.now());
+    if (!result.ok) return false;
+    seedMailbox(mailboxState, Date.now());
+    updateHomeChrome();
+    savePlayerState();
+    return true;
+  },
   /** Deliver one letter ({ sender, text, deliveryAt, attachment, currants }) to the player's mail. */
   deliverMail(message) {
     const row = deliverMail(mailboxState, { sentAt: Date.now(), ...message });
@@ -8368,8 +8379,9 @@ function handleInput() {
     }
     // Top of wall — mount onto any platform nearby or stop climbing
     if (player.y <= wall.yTop + 4 && up) {
-      const ground = resolveGround(player.x, player.y);
-      if (ground != null && Math.abs(ground - player.y) < 48) {
+      // A climber moves upward, so ordinary ground checks skip the deck.
+      const ground = ladderTopDeck(streetPlatforms, player.x, player.y, wall.yBot);
+      if (ground != null) {
         stopClimb();
         player.y = ground;
         player.onGround = true;

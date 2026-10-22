@@ -295,6 +295,23 @@ export function resolveGround(platforms, feetX, feetY, vy = 0, snap = 12) {
 }
 
 /**
+ * The deck to step onto when a climber holds Up at a ladder's top. A
+ * climbing avatar moves upward, so resolveGround would skip every platform;
+ * this looks in a band around the feet instead (archived ladders mostly end
+ * up to 48 px above their deck, rebuilt rooms at or just below it) and never
+ * returns the floor the ladder stands on.
+ * @returns {number|null} surface y
+ */
+export function ladderTopDeck(platforms, feetX, feetY, ladderBottomY) {
+  if (!platforms?.length) return null;
+  const hit = resolveGround(platforms, feetX, feetY + 56, 0, 104);
+  if (!hit) return null;
+  const dy = hit.y - feetY;
+  if (dy <= -48 || dy >= 96 || hit.y >= ladderBottomY - 8) return null;
+  return hit.y;
+}
+
+/**
  * @param {StreetData} street
  * @param {number} screenX
  * @param {number} [radius=60]
