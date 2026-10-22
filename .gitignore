@@ -1,7 +1,7 @@
 .DS_Store
 node_modules/
 test-results/
-shots/
+/shots/
 # Research workspaces, not game files (SWF probes, reference video frames)
 character-probe/
 _ref-frames/

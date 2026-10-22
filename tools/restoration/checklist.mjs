@@ -1,0 +1,232 @@
+/**
+ * The restoration checklist: every system of the original Glitch, and how
+ * much of it the remake has brought back. tools/build-restoration.mjs reads
+ * this, adds the numbers it can compute from the repo (quests, rooms, badges,
+ * skills, streets, sounds, recipes, commits) and writes
+ * public/restoration/data.json for the walkthrough page at /restoration/.
+ *
+ * Keep it in sync as work lands: flip an item's `status`, point `evidence`
+ * at the files that prove it, then `node tools/build-restoration.mjs`.
+ * tests/restoration.test.js fails when evidence is missing or data.json is
+ * stale.
+ *
+ * status:
+ *   source      Restored from the source: rules, numbers and copy from the original server code
+ *   rebuilt     Rebuilt: the original level or art was never archived, so it is reconstructed from footage
+ *   reimagined  Reimagined: nothing survives, so it is designed fresh in the original's spirit
+ *   solo        Adapted for solo play: a multiplayer system reworked so one player can enjoy it
+ *   progress    In progress
+ *   missing     Not yet
+ *   lost        Can't come back: needs other players, or nothing about it survives
+ *
+ * spot: where the item sits in the page's street diorama (optional).
+ * shot: a screenshot under spike/shots/ to illustrate it (optional).
+ */
+
+export const STATUS = Object.freeze({
+  source: { label: 'Restored from source', short: 'Restored', tone: 'moss', mark: '✓',
+    desc: 'Its rules, numbers and words come straight from the original server code Tiny Speck released.' },
+  rebuilt: { label: 'Rebuilt from footage', short: 'Rebuilt', tone: 'sky', mark: '✓',
+    desc: 'The rules survive but the level or art does not, so it is reconstructed from gameplay recordings.' },
+  reimagined: { label: 'Reimagined', short: 'Reimagined', tone: 'plum', mark: '✓',
+    desc: 'Nothing about it survives, so it is designed fresh in the spirit of the original.' },
+  solo: { label: 'Adapted for solo play', short: 'Solo', tone: 'sun', mark: '✓',
+    desc: 'A multiplayer system reworked so one player can enjoy it: rival Glitches, companions, a hired hand.' },
+  progress: { label: 'In progress', short: 'In progress', tone: 'sand', mark: '…',
+    desc: 'On the workbench right now.' },
+  missing: { label: 'Not yet', short: 'Not yet', tone: 'stone', mark: '',
+    desc: 'Recoverable, but not started.' },
+  lost: { label: "Can't come back", short: 'Lost', tone: 'dusk', mark: '×',
+    desc: 'It needed other people, or nothing about it survives.' },
+});
+
+export const GROUPS = Object.freeze([
+  { id: 'world', name: 'The world', blurb: 'Streets, hubs and the physics of getting around Ur.' },
+  { id: 'creatures', name: 'Creatures & trees', blurb: 'Piggies, chickens, butterflies, trants and the things that roam.' },
+  { id: 'making', name: 'Gathering & making', blurb: 'Gardens, mining, cooking, machines: the crafting economy.' },
+  { id: 'economy', name: 'Giants & economy', blurb: 'Quoins, currants, vendors, shrines and imagination.' },
+  { id: 'quests', name: 'Quests & adventures', blurb: 'Story quests, quest rooms, races and Paradise.' },
+  { id: 'home', name: 'Home & neighbours', blurb: 'Houses, furniture, mail and the people next door.' },
+  { id: 'late', name: 'Late game', blurb: 'Rooks, Icons, the Rube, skills and the long tail.' },
+]);
+
+export const CHECKLIST = Object.freeze([
+  // —— The world ——
+  { id: 'streets', group: 'world', name: 'Original streets', status: 'source', spot: 'signpost',
+    blurb: 'Over 1,400 archived streets with their real geometry, layered art, parallax, colour grading and signposts.',
+    evidence: ['public/js/street-loader.js', 'public/js/street-render.js', 'public/assets/streets/index.json'], shot: 'street.png' },
+  { id: 'navigation', group: 'world', name: 'Doors, ladders and walls', status: 'source',
+    blurb: 'Doors between streets, climbable ladders and solid walls restored from the location files, keys included.',
+    evidence: ['public/js/location-navigation.js', 'public/js/features/doors-feature.js'] },
+  { id: 'physics', group: 'world', name: 'Glitch physics', status: 'source', spot: 'player',
+    blurb: 'The client’s walk, jump, Triple Jump, ladder and air rules, plus each street’s own physics (underwater, low gravity, tiny).',
+    evidence: ['public/js/movement.js', 'public/js/location-events.js'] },
+  { id: 'street-events', group: 'world', name: 'Street scripts and puzzles', status: 'rebuilt',
+    blurb: 'Archived street event scripts run again; puzzle streets got their lost switches and triggers rebuilt.',
+    evidence: ['public/js/features/location-events-feature.js', 'public/js/features/puzzles-feature.js'] },
+  { id: 'dametime', group: 'world', name: 'Dametime and the day cycle', status: 'source', spot: 'clock',
+    blurb: 'The official calendar: ten-second minutes, four-hour days, eight-day weeks, and a new day that refreshes Ur.',
+    evidence: ['public/js/game-day.js'] },
+  { id: 'map', group: 'world', name: 'Hub maps and travel', status: 'source',
+    blurb: 'Every region’s map with its streets, and travel by signpost or map.',
+    evidence: ['public/js/map-graph.js', 'public/js/travel.js'] },
+  { id: 'music', group: 'world', name: 'Music and sounds', status: 'source',
+    blurb: 'The published soundtrack per region, recovered sound files, and gentle synth stand-ins for the sounds that were lost.',
+    evidence: ['public/js/ambient-music.js', 'public/js/sound-board.js'] },
+  { id: 'avatar', group: 'world', name: 'Your Glitch', status: 'source', spot: 'player',
+    blurb: 'A real player’s recovered animation sheets: walk, climb, jump, happy, angry, surprised, with a colour builder.',
+    evidence: ['public/js/avatar-anims.js', 'public/js/character-builder.js'] },
+  { id: 'camera', group: 'world', name: 'Camera Mode', status: 'source',
+    blurb: 'Press C to look around the street; with Eyeballery, the whole street.',
+    evidence: ['public/js/features/camera-mode-feature.js'] },
+  { id: 'newxp', group: 'world', name: 'The new-player tutorial', status: 'progress',
+    blurb: 'Gentle Island and the training levels, as an optional start.',
+    evidence: [] },
+  { id: 'secrets', group: 'world', name: 'Eleven Secret Locations', status: 'progress',
+    blurb: 'Beacons on twenty secret spots across Ur, each with a Giant’s message.',
+    evidence: [] },
+
+  // —— Creatures & trees ——
+  { id: 'piggies', group: 'creatures', name: 'Piggies', status: 'source', spot: 'piggy',
+    blurb: 'Pet, nibble for meat, feed, name, capture and incubate, with the exact Animal Kinship tables.',
+    evidence: ['public/js/animal-kinship.js', 'public/js/animal-husbandry.js'] },
+  { id: 'chickens', group: 'creatures', name: 'Chickens', status: 'source', spot: 'chicken',
+    blurb: 'Squeeze for grain, incubate eggs, raise chicks.',
+    evidence: ['public/js/animal-kinship.js'] },
+  { id: 'butterflies', group: 'creatures', name: 'Butterflies', status: 'source', spot: 'butterfly',
+    blurb: 'Massage with lotion, then milk; the onboarding quests start here.',
+    evidence: ['public/js/animal-kinship.js', 'public/js/tools.js'] },
+  { id: 'trants', group: 'creatures', name: 'Trants and Wood Trees', status: 'source', spot: 'tree',
+    blurb: 'Six living trees to pet, water and harvest (with super harvests), and Wood Trees for planks.',
+    evidence: ['public/js/trants.js', 'public/js/trant-care.js', 'public/js/woodcutting.js'] },
+  { id: 'batterflies', group: 'creatures', name: 'Batterflies and guano', status: 'source',
+    blurb: 'Cave Batterflies that turn food into guano, and the bar that boosts them.',
+    evidence: ['public/js/animal-husbandry.js'] },
+  { id: 'foxes', group: 'creatures', name: 'Foxes and Heli Kitties', status: 'source',
+    blurb: 'Fox brushing in the preserves and the kitties overhead.',
+    evidence: ['public/js/foxes.js'] },
+  { id: 'ecology', group: 'creatures', name: 'Who lives where', status: 'source',
+    blurb: 'Each street’s real population of animals, trees, rocks and shrines from the archive.',
+    evidence: ['public/js/street-ecology.js', 'public/assets/content/street-ecology.json'] },
+
+  // —— Gathering & making ——
+  { id: 'gardens', group: 'making', name: 'Gardens and herbs', status: 'source', spot: 'garden',
+    blurb: 'Hoe, plant, water and harvest crops and herbs, with the Master Gardener potions.',
+    evidence: ['public/js/garden.js', 'public/js/master-garden.js'] },
+  { id: 'mining', group: 'making', name: 'Mining and metal', status: 'source', spot: 'rock',
+    blurb: 'Mine four rock types, smelt, grind and make metal with the original tools.',
+    evidence: ['public/js/mining.js'] },
+  { id: 'cooking', group: 'making', name: 'Cooking and making', status: 'source',
+    blurb: 'The recipe catalog across every making tool, with skill rules and tool wear.',
+    evidence: ['public/js/making.js', 'public/assets/content/recipes.json'] },
+  { id: 'machines', group: 'making', name: 'Machines and the Still', status: 'source',
+    blurb: 'Assemble Blockmakers, Fuelmakers and Woodworkers; fuel them; distil hooch.',
+    evidence: ['public/js/machines.js'] },
+  { id: 'resources', group: 'making', name: 'Peat, dirt, jellisacs and more', status: 'source',
+    blurb: 'Harvestable street resources and their rare drops.',
+    evidence: ['public/js/features/resource-nodes-feature.js', 'public/js/drop-tables.js'] },
+  { id: 'tools', group: 'making', name: 'Tools that wear and mend', status: 'source',
+    blurb: 'Every tool’s exact condition, breakage and Tinkertool repairs.',
+    evidence: ['public/js/tools.js'] },
+
+  // —— Giants & economy ——
+  { id: 'quoins', group: 'economy', name: 'Quoins', status: 'source', spot: 'quoin',
+    blurb: 'All eight quoin types, daily limits, multipliers and Qurazy quoins.',
+    evidence: ['public/js/quoins.js'] },
+  { id: 'shrines', group: 'economy', name: 'Giants and shrines', status: 'source', spot: 'shrine',
+    blurb: 'Donate at the eleven Giants’ shrines for favor and emblems.',
+    evidence: ['public/js/shrines.js'] },
+  { id: 'vendors', group: 'economy', name: 'Street spirit vendors', status: 'source', spot: 'vendor',
+    blurb: 'The original stores, stock and prices, buying and selling.',
+    evidence: ['public/js/vendor.js', 'public/js/store-catalog.js'] },
+  { id: 'imagination', group: 'economy', name: 'Imagination upgrades', status: 'source',
+    blurb: 'The upgrade card shop with its hand of three cards, re-deals and effects.',
+    evidence: ['public/js/imagination.js'] },
+  { id: 'levels', group: 'economy', name: 'Levels, energy and mood', status: 'source',
+    blurb: 'The official XP table, level rewards, metabolics and food variety.',
+    evidence: ['public/js/progression.js', 'public/js/food.js', 'public/js/metabolics.js'] },
+  { id: 'badges', group: 'economy', name: 'Badges', status: 'source',
+    blurb: 'The full badge catalog with official art and the original counters.',
+    evidence: ['public/js/achievements.js', 'public/js/exploration.js'] },
+  { id: 'auctions', group: 'economy', name: 'Auctions and trading', status: 'lost',
+    blurb: 'The player auction house and trading needed other players.',
+    evidence: [] },
+
+  // —— Quests & adventures ——
+  { id: 'quests', group: 'quests', name: 'Story and skill quests', status: 'source', spot: 'rock-magic',
+    blurb: 'Hundreds of original quests with their dialogue, offered by the Magic Rock.',
+    evidence: ['public/js/quests.js', 'public/js/quest-offers.js'] },
+  { id: 'quest-rooms', group: 'quests', name: 'Quest rooms', status: 'rebuilt',
+    blurb: 'Private quest instances: almost none survive, so each is rebuilt from the quest code and gameplay footage.',
+    evidence: ['public/js/features/quest-instances-feature.js', 'public/js/quest-rooms/catalog.js'] },
+  { id: 'story-quests', group: 'quests', name: 'Hand-built story quests', status: 'rebuilt',
+    blurb: 'Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more.',
+    evidence: ['public/js/ghost-quest.js', 'public/js/rook-woods.js', 'public/js/winter-walk.js', 'public/js/summers-day.js'] },
+  { id: 'paradise', group: 'quests', name: 'Ticket to Paradise', status: 'rebuilt',
+    blurb: 'Private flying and sliding courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide. More are on the way.',
+    evidence: ['public/js/paradise-flight.js'] },
+  { id: 'races', group: 'quests', name: 'Races and Game of Crowns', status: 'solo',
+    blurb: 'Seven race courses rebuilt from footage, raced against recovered rival Glitches.',
+    evidence: ['public/js/races.js', 'public/js/game-of-crowns.js'] },
+  { id: 'hog-haul', group: 'quests', name: 'The Great Hog Haul', status: 'solo',
+    blurb: 'The piggy-wrangling race, on its real cave street, against a rival.',
+    evidence: ['public/js/hog-haul.js'] },
+  { id: 'street-jobs', group: 'quests', name: 'Street projects', status: 'solo',
+    blurb: 'Build new streets and upgrades together: here, with a hired hand.',
+    evidence: ['public/js/street-jobs.js'] },
+  { id: 'feats', group: 'quests', name: 'Feats', status: 'solo',
+    blurb: 'The Last Feat’s incantation chain, with local companions taking the other parts.',
+    evidence: ['public/js/feats.js'] },
+  { id: 'parties', group: 'quests', name: 'Party spaces', status: 'solo',
+    blurb: 'All eight party packs and their party streets.',
+    evidence: ['public/js/party-spaces.js'] },
+  { id: 'smuggling', group: 'quests', name: 'The Smuggler', status: 'progress',
+    blurb: 'Contraband deliveries and the jailbreak quests.',
+    evidence: [] },
+  { id: 'seasons', group: 'quests', name: 'Holidays', status: 'source',
+    blurb: 'Zilloween, Glitchmas, the Egg Hunt and Pi Day.',
+    evidence: ['public/js/seasons.js'] },
+
+  // —— Home & neighbours ——
+  { id: 'homes', group: 'home', name: 'Your house and yard', status: 'source', spot: 'mailbox',
+    blurb: 'Buy a house, decorate rooms, cultivate the yard, keep animals.',
+    evidence: ['public/js/homes.js', 'public/js/home-decor.js', 'public/js/home-cultivation.js'] },
+  { id: 'mail', group: 'home', name: 'Mail', status: 'source',
+    blurb: 'Mailboxes, postage, parcels and replies.',
+    evidence: ['public/js/mailbox.js'] },
+  { id: 'neighbours', group: 'home', name: 'Neighbours', status: 'reimagined',
+    blurb: 'Visiting Stones lead to six authored neighbours, standing in for other players’ homes.',
+    evidence: ['public/js/neighbours.js'] },
+  { id: 'tower', group: 'home', name: 'Your Tower', status: 'progress',
+    blurb: 'The tall public building on your home street.',
+    evidence: [] },
+  { id: 'chat', group: 'home', name: 'Chat, groups and friends', status: 'lost',
+    blurb: 'Global chat, groups and buddy lists were about other people.',
+    evidence: [] },
+
+  // —— Late game ——
+  { id: 'rooks', group: 'late', name: 'Rook attacks', status: 'solo',
+    blurb: 'The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival.',
+    evidence: ['public/js/rook-attack.js'] },
+  { id: 'skills', group: 'late', name: 'Skills', status: 'source',
+    blurb: 'All 105 skills to learn, with the real effects where their systems exist.',
+    evidence: ['public/js/skill-tree.js', 'public/js/skills.js'] },
+  { id: 'meditation', group: 'late', name: 'Meditation and teleportation', status: 'source',
+    blurb: 'Focusing Orb meditation, levitation, teleport points and scripts.',
+    evidence: ['public/js/meditation.js', 'public/js/teleportation.js'] },
+  { id: 'icons', group: 'late', name: 'Giant Icons', status: 'source',
+    blurb: 'Make an Icon from eleven emblems and tend it for the Giants’ love.',
+    evidence: ['public/js/giant-icons.js'] },
+  { id: 'rube', group: 'late', name: 'The Rube', status: 'source',
+    blurb: 'The mysterious trader who appears and offers a swap.',
+    evidence: ['public/js/rube.js'] },
+  { id: 'hell', group: 'late', name: 'Hell (Naraka)', status: 'source',
+    blurb: 'Croak and work your way out by squishing grapes.',
+    evidence: ['public/js/hell.js'] },
+  { id: 'collectibles', group: 'late', name: 'Musicblocks, Cubimals and the Stoot doll', status: 'source',
+    blurb: 'Collectible tunes, both Cubimal series and the memorial pull-string doll.',
+    evidence: ['public/js/musicblocks.js', 'public/js/cubimals.js', 'public/js/stoot-doll.js'] },
+  { id: 'snaps', group: 'late', name: 'Snapshots', status: 'lost',
+    blurb: 'Snapshottery was retired before Glitch closed.',
+    evidence: [] },
+]);

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="How much of Tiny Speck's Glitch has the Groddle Afternoon remake brought back? A walk through every system, checked off as it lands." />
+  <title>Groddle Field Notes · Restoration</title>
+  <link rel="stylesheet" href="restoration.css" />
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap">
+      <p class="kicker">Groddle Field Notes · Restoration report</p>
+      <h1>How much of Glitch is back?</h1>
+      <p class="lead">
+        Glitch closed in December 2012. Tiny Speck released its art, music and server code into the public domain,
+        and almost everything else was lost: the maps of private quest rooms, most of the sound library, the
+        multiplayer world itself. Groddle Afternoon is a fresh web build that puts the pieces back together,
+        rule by rule from the original code, and room by room from players' recordings where nothing else survives.
+      </p>
+      <div class="scoreboard" id="scoreboard" aria-live="polite">
+        <div class="score-main">
+          <span class="score-num" data-bind="back">0</span>
+          <span class="score-of">of <span data-bind="possible">0</span> systems are playable again</span>
+        </div>
+        <div class="score-bar" id="score-bar" role="img" aria-label="Systems by restoration status"></div>
+        <ul class="score-legend" id="score-legend"></ul>
+      </div>
+      <nav class="jump" aria-label="On this page">
+        <a href="#street">Walk a street</a>
+        <a href="#systems">Every system</a>
+        <a href="#numbers">By the numbers</a>
+        <a href="#rooms">Quest rooms</a>
+        <a href="#recent">Recently restored</a>
+        <a href="#honest">What can't come back</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- —— The street diorama ——————————————————————————————— -->
+    <section class="band" id="street" aria-labelledby="street-h">
+      <div class="wrap">
+        <h2 id="street-h">Walk a street</h2>
+        <p class="section-lead">A simplified Hechey Track, drawn with the game's own sprites. Click anything you'd find on a street in Ur to see what's been restored behind it.</p>
+        <div class="street-layout">
+          <div class="diorama-frame" id="diorama-frame">
+            <div class="diorama" id="diorama" aria-label="Street diorama">
+              <div class="d-sky"></div>
+              <img class="d-forest" src="../assets/decos/groddle/wallpaper_tree_short_1.png" alt="" style="left:-120px" />
+              <img class="d-forest" src="../assets/decos/groddle/wallpaper_tree_short_1.png" alt="" style="left:560px; transform:scaleX(-1)" />
+              <img class="d-pine" src="../assets/decos/groddle/tree_coniferous_fg_1.png" alt="" style="left:196px" />
+              <img class="d-pine" src="../assets/decos/groddle/tree_coniferous_fg_2.png" alt="" style="left:446px; width:170px" />
+              <img class="d-pine" src="../assets/decos/groddle/tree_coniferous_fg_1.png" alt="" style="left:744px; width:140px" />
+              <img class="d-pine" src="../assets/decos/groddle/tree_coniferous_fg_2.png" alt="" style="left:1060px; width:160px" />
+              <img class="d-deco" src="../assets/decos/groddle/bush_3.png" alt="" style="left:340px; bottom:92px; width:250px" />
+              <img class="d-deco" src="../assets/decos/groddle/bush_3.png" alt="" style="left:690px; bottom:92px; width:230px; transform:scaleX(-1)" />
+              <div class="d-ground"></div>
+              <img class="d-deco" src="../assets/decos/groddle/groddle_bush1.png" alt="" style="left:-20px; bottom:88px; width:170px" />
+              <img class="d-deco" src="../assets/decos/groddle/groddle_bush1.png" alt="" style="left:1080px; bottom:88px; width:150px; transform:scaleX(-1)" />
+              <img class="d-deco d-front" src="../assets/decos/groddle/groddle_grass_2.png" alt="" style="left:410px; bottom:70px; width:70px" />
+              <img class="d-deco d-front" src="../assets/decos/groddle/groddle_grass_2.png" alt="" style="left:960px; bottom:70px; width:64px" />
+              <button class="spot" data-spot="clock" style="left:470px; top:18px" aria-label="Dametime and the day cycle">
+                <span class="d-nameplate">Hechey Track · Groddle Forest · <b id="d-clock">5:33 PM</b></span>
+              </button>
+              <button class="spot" data-spot="signpost" style="left:76px; bottom:98px" aria-label="Original streets">
+                <span class="d-sign"><span class="d-sign-arm">Grand Mile</span><span class="d-sign-arm d-sign-arm-r">Evanfell Craine</span><span class="d-sign-post"></span></span>
+              </button>
+              <button class="spot" data-spot="vendor" style="left:186px; bottom:98px" aria-label="Street spirit vendors">
+                <img src="../assets/decos/groddle/vendor.png" alt="" style="width:104px" />
+              </button>
+              <button class="spot" data-spot="tree" style="left:322px; bottom:96px" aria-label="Trants and Wood Trees">
+                <img src="../assets/sprites/trants/frames/trant_fruit_m10.png" alt="" style="width:214px" />
+              </button>
+              <button class="spot" data-spot="butterfly" style="left:420px; bottom:258px" aria-label="Butterflies">
+                <span class="sheet sheet-butterfly"></span>
+              </button>
+              <button class="spot" data-spot="quoin" style="left:560px; bottom:214px" aria-label="Quoins">
+                <span class="sheet sheet-quoin"></span>
+              </button>
+              <button class="spot" data-spot="quoin" style="left:612px; bottom:240px" aria-label="Quoins" tabindex="-1">
+                <span class="sheet sheet-quoin sheet-quoin-qurazy"></span>
+              </button>
+              <button class="spot spot-walker" data-spot="player" style="left:486px; bottom:96px" aria-label="Your Glitch and the physics of Ur">
+                <span class="sheet sheet-glitch"></span>
+              </button>
+              <button class="spot" data-spot="piggy" style="left:582px; bottom:94px" aria-label="Piggies">
+                <span class="piggy-walk"><span class="sheet sheet-piggy"></span></span>
+              </button>
+              <button class="spot" data-spot="garden" style="left:770px; bottom:88px" aria-label="Gardens and herbs">
+                <span class="d-garden"><img src="../assets/sprites/garden/garden_new__x1_1_png_1354833270.png" alt="" /><img src="../assets/sprites/garden/garden_new__x1_1_png_1354833270.png" alt="" /></span>
+              </button>
+              <button class="spot" data-spot="rock" style="left:978px; bottom:96px" aria-label="Mining and metal">
+                <span class="sheet sheet-rock"></span>
+              </button>
+              <button class="spot" data-spot="chicken" style="left:878px; bottom:94px" aria-label="Chickens">
+                <span class="sheet sheet-chicken"></span>
+              </button>
+              <button class="spot" data-spot="shrine" style="left:1078px; bottom:96px" aria-label="Giants and shrines">
+                <span class="sheet sheet-shrine"></span>
+              </button>
+              <button class="spot" data-spot="mailbox" style="left:1166px; bottom:96px" aria-label="Your house and yard">
+                <img src="../assets/sprites/street-furniture/mailbox-left-idle.png" alt="" style="width:62px" />
+              </button>
+              <button class="spot" data-spot="rock-magic" style="left:84px; bottom:300px" aria-label="Story and skill quests">
+                <img class="d-float" src="../assets/sprites/icons/npc_cubimal_magicrock@3x.png" alt="" style="width:64px" />
+              </button>
+              <p class="d-hint" aria-hidden="true">Click anything</p>
+            </div>
+          </div>
+          <aside class="spot-card" id="spot-card" aria-live="polite">
+            <p class="spot-card-empty">Pick something on the street: a piggy, the tree, a quoin, the shrine…</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- —— Every system ——————————————————————————————— -->
+    <section class="band band-alt" id="systems" aria-labelledby="systems-h">
+      <div class="wrap">
+        <h2 id="systems-h">Every system, checked off</h2>
+        <p class="section-lead">The whole game, system by system. This list lives in the code and is rebuilt with every session, so it ticks over as things land.</p>
+        <div class="filters" id="filters" role="toolbar" aria-label="Filter by status"></div>
+        <div class="groups" id="groups"></div>
+      </div>
+    </section>
+
+    <!-- —— Numbers ——————————————————————————————— -->
+    <section class="band" id="numbers" aria-labelledby="numbers-h">
+      <div class="wrap">
+        <h2 id="numbers-h">By the numbers</h2>
+        <p class="section-lead">Counted straight from the repository: nothing here is typed in by hand.</p>
+        <div class="tiles" id="tiles"></div>
+        <div class="quest-split">
+          <h3>Where the 445 original quests stand</h3>
+          <div class="split-bar" id="quest-bar" role="img"></div>
+          <ul class="split-legend" id="quest-legend"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- —— Rooms ——————————————————————————————— -->
+    <section class="band band-alt" id="rooms" aria-labelledby="rooms-h">
+      <div class="wrap">
+        <h2 id="rooms-h">Quest rooms, rebuilt</h2>
+        <p class="section-lead">Many of Glitch's best quests happened in private rooms built just for you. Only two of those rooms survive in the archive, so each one is reconstructed from the quest's code (its timers, flags, dialogue and rewards) and recordings players and Tiny Speck's own level designer left behind.</p>
+        <div class="rooms" id="room-grid"></div>
+      </div>
+    </section>
+
+    <!-- —— Recent ——————————————————————————————— -->
+    <section class="band" id="recent" aria-labelledby="recent-h">
+      <div class="wrap">
+        <h2 id="recent-h">Recently restored</h2>
+        <p class="section-lead">The latest additions and fixes, straight from the project's history.</p>
+        <ol class="recent" id="recent-list"></ol>
+      </div>
+    </section>
+
+    <!-- —— Honest ——————————————————————————————— -->
+    <section class="band band-alt" id="honest" aria-labelledby="honest-h">
+      <div class="wrap">
+        <h2 id="honest-h">What can't come back, and how the rest was made</h2>
+        <div class="honest">
+          <div>
+            <h3>Gone for good</h3>
+            <ul class="honest-list" id="lost-list"></ul>
+            <p class="note">Things that only made sense with other players are adapted for one where it works (races against rival Glitches, Feats with companions, street projects with a hired hand) and left out where it doesn't.</p>
+          </div>
+          <div>
+            <h3>How to read the tags</h3>
+            <dl class="legend-list" id="legend-list"></dl>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p id="foot-meta">Generated from the repository.</p>
+      <p>Tiny Speck's Glitch art, music and code are CC0. Groddle Afternoon is a fan remake and uses no Glitch logo. Screenshots are from the remake itself; recordings were used only as reference.</p>
+      <p><a href="../">Play Groddle Afternoon</a> · <a href="../changelog.html">Build archive</a></p>
+    </div>
+  </footer>
+
+  <template id="detail-tpl">
+    <div class="detail">
+      <p class="detail-kicker"></p>
+      <h3 class="detail-title"></h3>
+      <span class="pill"></span>
+      <p class="detail-blurb"></p>
+      <img class="detail-shot" alt="" loading="lazy" />
+      <details class="detail-evidence"><summary>Where it lives in the code</summary><ul></ul></details>
+    </div>
+  </template>
+
+  <script src="restoration.js" type="module"></script>
+</body>
+</html>
