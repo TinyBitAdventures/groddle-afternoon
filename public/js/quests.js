@@ -82,8 +82,18 @@ export function parseQuestConversation(raw = '') {
   return beats;
 }
 
+/**
+ * What `{pc_label}` (the player's name in GSJS copy) reads as. The remake has
+ * no player names, so the copy says "friend", as A Summer's Day already did.
+ */
+let questPlayerLabel = 'friend';
+export function setQuestPlayerLabel(label) {
+  questPlayerLabel = String(label || '').trim() || 'friend';
+}
+
 export function cleanQuestMarkup(raw = '') {
   return String(raw || '')
+    .replace(/\{pc_label\}/g, questPlayerLabel)
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<a\b[^>]*>(.*?)<\/a>/gis, '$1')
     .replace(/<b\b[^>]*>(.*?)<\/b>/gis, '$1')
