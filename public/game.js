@@ -4304,7 +4304,10 @@ function showSpeechBubble(target, speech) {
   const height = Math.ceil(12 + speaker.height + 4 + body.height + 12);
   const bg = new PIXI.Graphics();
   bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
-  bg.poly([width / 2 - 9, height - 1, width / 2, height + 11, width / 2 + 9, height - 1]).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 1, color: 0x594c40, alpha: 0.28 });
+  // Tail: fill over the bubble's bottom border so the two read as one shape,
+  // then outline only its two slanted sides at the bubble's border weight.
+  bg.poly([width / 2 - 9, height - 2, width / 2, height + 11, width / 2 + 9, height - 2]).fill({ color: 0xfffdf5, alpha: 0.97 });
+  bg.moveTo(width / 2 - 9, height).lineTo(width / 2, height + 11).lineTo(width / 2 + 9, height).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
   speaker.x = 12;
   speaker.y = 10;
   body.x = 12;
