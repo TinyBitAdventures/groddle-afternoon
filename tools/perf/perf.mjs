@@ -87,6 +87,25 @@ export const ROUTES = {
       await page.waitForTimeout(9000);
     },
   },
+  // Other Glitches on screen (the vector NPC looks, js/npc-glitches.js).
+  companions: {
+    label: 'Hechey Track with the three local companions',
+    query: `?${COMMON}&companions=1`,
+    settle: 3500,
+    run: walk,
+  },
+  party: {
+    label: 'Toxic Moon party space with three dancing guests',
+    query: `?${COMMON}&partydemo=moon`,
+    settle: 4500,
+    run: walk,
+  },
+  crowns: {
+    label: 'Game of Crowns arena with the rivals running',
+    query: `?${COMMON}&racedemo=it_game`,
+    settle: 4500,
+    run: walk,
+  },
   builder: {
     label: 'Character builder, six heavy random looks',
     query: `?${COMMON}`,
@@ -286,15 +305,23 @@ function rendererStats() {
   if (Array.isArray(managed)) {
     let bytes = 0;
     let n = 0;
+    // Other Glitches' sheets (vector NPC looks, or the old raster crowd) and the player's.
+    let npcBytes = 0;
+    let playerBytes = 0;
     for (const t of managed) {
       if (!t) continue;
       const w = t.pixelWidth ?? t.realWidth ?? 0;
       const h = t.pixelHeight ?? t.realHeight ?? 0;
       bytes += w * h * 4;
       n++;
+      const label = String(t.label || '');
+      if (/avatar\/(npc|crowd)\//.test(label)) npcBytes += w * h * 4;
+      else if (/avatar\/(vector|glitch-62d8)\//.test(label)) playerBytes += w * h * 4;
     }
     out.rendererTextures = n;
     out.rendererTextureMB = +(bytes / 1048576).toFixed(1);
+    out.npcTextureMB = +(npcBytes / 1048576).toFixed(1);
+    out.playerTextureMB = +(playerBytes / 1048576).toFixed(1);
   }
   return out;
 }
@@ -421,7 +448,7 @@ async function main() {
     for (const dpr of DPRS) {
       const r = await runRoute(browser, name, dpr);
       results.push(r);
-      console.log(`${name} dpr${dpr}: boot ${r.bootMs} ms, ${r.fps} fps, cpu p95 ${r.cpu.p95} ms, draws ${r.draws.p50}, heap ${r.heapMB} MB, tex ${r.gpuTextureMB} MB, net ${r.networkMB} MB, ${r.api}/${r.rendererType} pixi ${r.pixi}${r.issues.length ? `, ${r.issues.length} issues` : ''}`);
+      console.log(`${name} dpr${dpr}: boot ${r.bootMs} ms, ${r.fps} fps, cpu p95 ${r.cpu.p95} ms, draws ${r.draws.p50}, heap ${r.heapMB} MB, tex ${r.gpuTextureMB} MB (npc ${r.npcTextureMB}, player ${r.playerTextureMB}), net ${r.networkMB} MB, ${r.api}/${r.rendererType} pixi ${r.pixi}${r.issues.length ? `, ${r.issues.length} issues` : ''}`);
       for (const i of r.issues.slice(0, 5)) console.log(`   ! ${i}`);
     }
   }

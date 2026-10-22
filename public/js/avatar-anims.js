@@ -272,32 +272,11 @@ export function animForState(state, { idles = false } = {}) {
 }
 
 /**
- * Other Glitches (race and Game of Crowns rivals, party guests, the Hog Haul
- * rival): six more players' base sheets from the same CDX recovery
- * (c2.glitch.bz/avatars/2012-12-NN/<id>..._base.png), 15 cells each, walk
- * frames 0-11 and idle cell 14. feetY / midX measured over the walk frames.
- */
-export const GLITCH_CROWD = Object.freeze([
-  { id: '2af0a374', fw: 130, fh: 144, feetY: 143, midX: 71 },
-  { id: '6c41f6ba', fw: 94, fh: 126, feetY: 124, midX: 55 },
-  { id: '730692de', fw: 90, fh: 124, feetY: 123, midX: 56 },
-  { id: '8ac9d32b', fw: 104, fh: 129, feetY: 126, midX: 58 },
-  { id: 'b338c47c', fw: 108, fh: 131, feetY: 129, midX: 56 },
-  { id: '01f12f85', fw: 102, fh: 135, feetY: 133, midX: 52 },
-].map((c) => Object.freeze({ ...c, file: `assets/sprites/avatar/crowd/${c.id}.png`, cells: 15 })));
-
-/**
- * scale.x for a Glitch-sheet sprite (drawn facing right) or a portrait one
- * (drawn facing left) moving in `facing` (negative = left).
+ * scale.x for a Glitch-sheet sprite (drawn facing right: the vector NPC
+ * Glitches, js/npc-glitch.js) or a portrait one (drawn facing left) moving
+ * in `facing` (negative = left).
  */
 export function crowdScaleX(scale, facing, facesRight) {
   const left = facing < 0;
   return (left === Boolean(facesRight)) ? -scale : scale;
-}
-
-/** A stable crowd index for a name, so one Glitch keeps one face everywhere. */
-export function crowdIndexFor(name) {
-  let h = 0;
-  for (const ch of String(name || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return h % GLITCH_CROWD.length;
 }

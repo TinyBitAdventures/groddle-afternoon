@@ -19,7 +19,7 @@
  *     &raceautoplay=buy                    buy + activate a Space Race ticket
  */
 
-import { crowdIndexFor, crowdScaleX } from '../avatar-anims.js';
+import { crowdScaleX } from '../avatar-anims.js';
 import {
   RACES,
   RACE_ACHIEVEMENTS,
@@ -502,18 +502,20 @@ function spawnRaceEntities(engine) {
   finishSprite = drawFinishPosts(PIXI, course.finish);
   finishSprite.zIndex = 9;
   engine.entityLayer.addChild(finishSprite);
-  // Another Glitch's real walk cycle; the tinted portrait strip is the fallback.
-  const crowd = engine.glitchCrowd?.(crowdIndexFor(run.rivalName || run.raceId));
-  const frames = crowd?.frames || engine.textures?.avatarStyledWalk?.frames || [];
-  if (frames.length) {
-    rivalSprite = new PIXI.AnimatedSprite(frames);
-    rivalSprite.anchor.set(0.5, 1);
-    rivalSprite.updateAnchor = Boolean(crowd);
-    rivalSprite.animationSpeed = crowd ? crowd.animationSpeed : 0.18;
-    rivalSprite.crowdScale = crowd ? crowd.scale : RIVAL_SCALE;
-    rivalSprite.facesRight = Boolean(crowd);
+  // The rival is a vector Glitch with its name's look (engine.npcGlitch); the tinted portrait strip is the fallback.
+  const npc = engine.npcGlitch?.(run.rivalName || run.raceId) || null;
+  const frames = npc ? null : engine.textures?.avatarStyledWalk?.frames || [];
+  if (npc || frames.length) {
+    rivalSprite = npc ? npc.sprite : new PIXI.AnimatedSprite(frames);
+    rivalSprite.npc = npc;
+    if (!npc) {
+      rivalSprite.anchor.set(0.5, 1);
+      rivalSprite.animationSpeed = 0.18;
+      rivalSprite.tint = run.rivalTint;
+    }
+    rivalSprite.crowdScale = npc ? npc.scale : RIVAL_SCALE;
+    rivalSprite.facesRight = Boolean(npc);
     rivalSprite.scale.set(rivalSprite.crowdScale);
-    if (!crowd) rivalSprite.tint = run.rivalTint;
     rivalSprite.x = course.spawn.rival.x;
     rivalSprite.y = course.spawn.rival.y;
     rivalSprite.zIndex = 46;
@@ -558,7 +560,10 @@ function placeRival(x, y, mode, facing) {
   rivalSprite.y = y;
   const scale = rivalSprite.crowdScale || RIVAL_SCALE;
   rivalSprite.scale.set(crowdScaleX(scale, facing, rivalSprite.facesRight), scale);
-  if (mode === 'walk' || mode === 'climb') {
+  if (rivalSprite.npc) {
+    // walk / climb / jump play the Glitch's own animations; anything else stands (idle4 and idles).
+    rivalSprite.npc.setMode(mode === 'walk' || mode === 'climb' || mode === 'jump' ? mode : 'stand');
+  } else if (mode === 'walk' || mode === 'climb') {
     const speed = rivalSprite.facesRight ? 0.5 : 0.2;
     rivalSprite.animationSpeed = mode === 'climb' ? speed / 2 : speed;
     if (!rivalSprite.playing) rivalSprite.play();
@@ -729,7 +734,11 @@ function showResult(engine) {
   }
   const race = RACES[run.raceId];
   // inc_race.js: the winner plays happy and the loser angry, 2 s on.
-  if (run.status === 'won' || run.status === 'lost') engine.playEmotion?.(run.status === 'won' ? 'happy' : 'angry', 2000);
+  if (run.status === 'won' || run.status === 'lost') {
+    engine.playEmotion?.(run.status === 'won' ? 'happy' : 'angry', 2000);
+    // The rival too: angry when you won, happy when it did.
+    rivalSprite?.npc?.emote(run.status === 'won' ? 'angry' : 'happy');
+  }
   if (run.status === 'won') {
     engine.questFlag(RACE_FLAGS.win);
     engine.achievement(RACE_ACHIEVEMENTS.won, 1);

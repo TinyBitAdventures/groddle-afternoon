@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 244,
+  "commits": 245,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Jumping into the Great Hole to Ix takes you to Groddle Ladder"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1510,14 +1515,9 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "The tutorial sends you home before you leave Gentle Island"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Meditation has no daily energy limit"
    }
   ]
  },
- "tests": 155,
+ "tests": 156,
  "generatedAt": "2026-10-22"
 }

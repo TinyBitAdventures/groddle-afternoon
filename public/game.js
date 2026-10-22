@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=musicblocks-note-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-3';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-5';
 import {
   actionDurationFor,
   createTimedAction,
@@ -611,9 +611,10 @@ import {
   planSignpostTravel,
 } from './js/travel.js';
 import { AVATAR_SHEETS, facingScaleX, facingFromVelocity } from './js/avatar.js';
-import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, GLITCH_CROWD, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdIndexFor, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js';
+import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js';
 import { landingY } from './js/walk-surface.js';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js';
+import { createNpcGlitchKit } from './js/npc-glitch.js?v=npc-glitch-1';
 import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js';
 import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js';
 import {
@@ -1059,8 +1060,6 @@ const SHEETS = {
   vectorAvatarAngry: glitchSheetDef('angry', VECTOR_AVATAR),
   vectorAvatarHappy: glitchSheetDef('happy', VECTOR_AVATAR),
   vectorAvatarSurprise: glitchSheetDef('surprise', VECTOR_AVATAR),
-  // Other Glitches' walk sheets (rivals, party guests).
-  ...Object.fromEntries(GLITCH_CROWD.map((c, i) => [`glitchCrowd${i}`, { url: c.file, fw: c.fw, fh: c.fh, cols: c.cells, rows: 1 }])),
   avatarStyledAlt: { url: 'assets/sprites/avatar_styled_alt.png', whole: true },
 };
 
@@ -1530,6 +1529,8 @@ let assistedFeatChain = null;
 let featCompanionTimers = [];
 /** Clean, street-local Glitch actors shared by Feats and Emotional Bear actions. */
 let localCompanions = [];
+/** Other Glitches' vector looks (js/npc-glitch.js), made once the renderer starts. */
+let npcGlitches = null;
 /** Original-style live follow session; intentionally reset by a page reload. */
 const companionFollowState = createCompanionFollowState();
 let playerSpeechTarget = null;
@@ -5944,24 +5945,26 @@ function makeLocalCompanion(profile) {
   const appearance =
     APPEARANCE_PRESETS[profile.preset]?.appearance ||
     APPEARANCE_PRESETS.classic.appearance;
-  // Another real Glitch, the same one the name has in races and parties.
-  const crowd = engine.glitchCrowd(crowdIndexFor(profile.name));
-  const pack = crowd ? { walkFrames: crowd.frames, idleFrame: crowd.idle } : getAppearanceTextures(appearance);
+  // A vector Glitch with this name's look, the same one it has in races and parties.
+  const npc = engine.npcGlitch(profile.name);
+  const pack = npc ? null : getAppearanceTextures(appearance);
   const root = new PIXI.Container();
-  const body = new PIXI.AnimatedSprite(pack.walkFrames);
-  body.texturesIdle = [pack.idleFrame];
-  body.texturesWalk = pack.walkFrames;
-  body.anchor.set(0.5, 1);
-  body.updateAnchor = Boolean(crowd);
-  body.facesRight = Boolean(crowd);
-  body.baseScale = crowd ? crowd.scale : SCALE * 0.39;
+  const body = npc ? npc.sprite : new PIXI.AnimatedSprite(pack.walkFrames);
+  body.npc = npc;
+  if (!npc) {
+    body.texturesIdle = [pack.idleFrame];
+    body.texturesWalk = pack.walkFrames;
+    body.anchor.set(0.5, 1);
+    body.textures = body.texturesIdle;
+    body.animationSpeed = 0.16;
+    body.loop = true;
+    body.autoUpdate = false;
+    body.gotoAndStop(0);
+  }
+  body.facesRight = Boolean(npc);
+  body.baseScale = npc ? npc.scale : SCALE * 0.39;
   body.facing = profile.gatherOffset < 0 ? 'right' : 'left';
   body.scale.set(companionScaleX(body), body.baseScale);
-  body.textures = body.texturesIdle;
-  body.animationSpeed = crowd ? crowd.animationSpeed : 0.16;
-  body.loop = true;
-  body.autoUpdate = false;
-  body.gotoAndStop(0);
   body.animState = 'idle';
 
   const name = new PIXI.Text({ text: profile.name, style: {
@@ -5972,7 +5975,7 @@ function makeLocalCompanion(profile) {
     dropShadow: { alpha: 0.92, blur: 2, color: 0xffffff, distance: 0 },
   } });
   name.anchor.set(0.5, 1);
-  name.y = crowd ? -Math.round((crowd.frames[0]?.frame?.height || 130) + 6) : -104;
+  name.y = npc ? -Math.round((npc.look.entry.sheets.base.fh || 140) + 6) : -104;
   const plate = new PIXI.Graphics();
   plate.roundRect(
     -Math.ceil(name.width / 2) - 7,
@@ -5996,6 +5999,11 @@ function setLocalCompanionAnim(actor, state) {
   const body = actor?.body;
   if (!body || body.destroyed || body.animState === state) return;
   body.animState = state;
+  // Vector Glitches walk, and stand in their idle4 loop with random idles.
+  if (body.npc) {
+    body.npc.setMode(state === 'walk' ? 'walk' : 'stand');
+    return;
+  }
   if (state === 'walk') {
     body.textures = body.texturesWalk;
     body.autoUpdate = true;
@@ -6160,7 +6168,7 @@ function spawnLocalCompanions() {
   if (app?.canvas) {
     app.canvas.dataset.localCompanionCount = String(localCompanions.length);
     app.canvas.dataset.localCompanionNames = localCompanions.map((actor) => actor.name).join(',');
-    app.canvas.dataset.localCompanionArt = 'clean-avatar-sheets';
+    app.canvas.dataset.localCompanionArt = localCompanions.every((actor) => actor.body?.npc) ? 'vector-npc' : 'portrait-fallback';
   }
   syncLocalCompanionFollowActors();
   return localCompanions;
@@ -7764,18 +7772,17 @@ const engine = {
     };
   },
   /**
-   * Another Glitch's real walk cycle (GLITCH_CROWD, by index) for rivals and
-   * guests: 12 walk frames anchored on their feet (set updateAnchor), facing
-   * right, at world scale and 30 fps. Null until the sheets load.
+   * Another Glitch as a vector avatar (js/npc-glitch.js) for companions,
+   * rivals and guests: the name's own baked look (js/npc-glitch-sheets.js),
+   * feet-anchored, facing right, at world scale. `actor.sprite` is the
+   * AnimatedSprite; `actor.setMode('stand'|'walk'|'dance'|'jump'|'drop'|
+   * 'climb'|'climbPause'|...)` picks the animation (standing idles itself),
+   * `actor.emote('happy')` plays an emotion. `salt` varies idle timing for
+   * the same name in one scene, `speed` scales the frame rate. Null before
+   * the renderer starts.
    */
-  glitchCrowd(index = 0) {
-    const n = GLITCH_CROWD.length;
-    const i = ((Math.floor(Number(index) || 0) % n) + n) % n;
-    const c = GLITCH_CROWD[i];
-    const sheet = textures[`glitchCrowd${i}`];
-    if (!sheet?.frames?.length) return null;
-    for (const tex of sheet.frames) tex.defaultAnchor = { x: c.midX / c.fw, y: c.feetY / c.fh };
-    return { id: c.id, frames: sheet.frames.slice(0, 12), idle: sheet.frames[14], scale: 1, facesRight: true, animationSpeed: ANIM_FPS / 60 };
+  npcGlitch(name, opts = {}) {
+    return npcGlitches?.actor(String(name || ''), opts) || null;
   },
   crowdScaleX,
   /** Loaded texture sheets (e.g. avatarStyledWalk for stand-in racers). */
@@ -10060,23 +10067,27 @@ function spawnHogHaulPen(point) {
 }
 
 function spawnHogHaulRival(point) {
-  const crowd = engine.glitchCrowd(3);
-  const frames = crowd?.frames || textures.avatarStyledWalk?.frames || [];
-  if (!frames.length) return null;
-  const rival = new PIXI.AnimatedSprite(frames);
-  rival.anchor.set(0.5, 1);
-  rival.updateAnchor = Boolean(crowd);
-  rival.animationSpeed = crowd ? crowd.animationSpeed : 0.18;
-  rival.loop = true;
-  rival.crowdScale = crowd ? crowd.scale : SCALE * 0.4;
-  rival.facesRight = Boolean(crowd);
+  // The rival is a vector Glitch with its own look (js/npc-glitch.js).
+  const npc = engine.npcGlitch(hogHaulState?.rivalLabel || 'Gomez Addams');
+  const frames = npc ? null : textures.avatarStyledWalk?.frames || [];
+  if (!npc && !frames.length) return null;
+  const rival = npc ? npc.sprite : new PIXI.AnimatedSprite(frames);
+  rival.npc = npc;
+  if (!npc) {
+    rival.anchor.set(0.5, 1);
+    rival.animationSpeed = 0.18;
+    rival.loop = true;
+    rival.tint = 0xd8b5ff;
+  }
+  rival.crowdScale = npc ? npc.scale : SCALE * 0.4;
+  rival.facesRight = Boolean(npc);
   rival.scale.set(rival.crowdScale);
-  if (!crowd) rival.tint = 0xd8b5ff;
   rival.alpha = 0.88;
   rival.x = point.x + 82;
   rival.y = point.y;
   rival.zIndex = 46;
-  rival.play();
+  if (npc) npc.setMode('walk');
+  else rival.play();
   entityLayer.addChild(rival);
   hogHaulRivalSprite = rival;
   return rival;
@@ -10105,7 +10116,8 @@ function updateHogHaulRival(dt) {
   const rival = hogHaulRivalSprite;
   if (!rival || rival.destroyed || !hogHaulRivalWaypoints.length) return;
   if (!hogHaulState || !['countdown', 'running'].includes(hogHaulState.status)) {
-    rival.stop();
+    if (rival.npc) rival.npc.setMode('stand');
+    else rival.stop();
     return;
   }
   const point = hogHaulRivalWaypoints[hogHaulRivalWaypointIndex % hogHaulRivalWaypoints.length];
@@ -10121,7 +10133,8 @@ function updateHogHaulRival(dt) {
   rival.y += (dy / distance) * step;
   const scale = rival.crowdScale || SCALE * 0.4;
   rival.scale.set(crowdScaleX(scale, dx, rival.facesRight), scale);
-  if (!rival.playing) rival.play();
+  if (rival.npc) rival.npc.setMode('walk');
+  else if (!rival.playing) rival.play();
 }
 
 function setupHogHaulWorld() {
@@ -21623,6 +21636,8 @@ async function main() {
   });
   // Character, NPC and shrine sheets swap to 3x when first drawn.
   installHiresFirstDraw(app.renderer, whenLoaded);
+  // Other Glitches: baked vector looks, 2x files on a sharp screen (js/npc-glitch.js).
+  npcGlitches = createNpcGlitchKit({ PIXI, ticker: app.ticker, stage: app.stage, hires: vectorBakeScale() === 3, canvas: app.canvas, idleWaitMs: IDLE_TIMING.waitMs });
   app.canvas.setAttribute('role', 'application');
   app.canvas.setAttribute('aria-label', 'Groddle game world');
   app.canvas.tabIndex = 0;

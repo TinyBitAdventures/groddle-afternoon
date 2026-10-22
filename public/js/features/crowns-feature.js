@@ -206,18 +206,20 @@ function setupArena(street, engine) {
     const start = START_POINTS[i + 1];
     let sprite = null;
     let label = null;
-    // Each rival is another real Glitch; the tinted portrait strip is the fallback.
-    const crowd = engine.glitchCrowd?.(i + 1);
-    const frames = crowd?.frames || engine.textures?.avatarStyledWalk?.frames || [];
-    if (frames.length) {
-      sprite = new PIXI.AnimatedSprite(frames);
-      sprite.anchor.set(0.5, 1);
-      sprite.updateAnchor = Boolean(crowd);
-      sprite.animationSpeed = crowd ? crowd.animationSpeed : 0.2;
-      sprite.crowdScale = crowd ? crowd.scale : RIVAL_SCALE;
-      sprite.facesRight = Boolean(crowd);
+    // Each rival is a vector Glitch with its name's look (engine.npcGlitch); the tinted portrait strip is the fallback.
+    const npc = engine.npcGlitch?.(r.name) || null;
+    const frames = npc ? null : engine.textures?.avatarStyledWalk?.frames || [];
+    if (npc || frames.length) {
+      sprite = npc ? npc.sprite : new PIXI.AnimatedSprite(frames);
+      sprite.npc = npc;
+      if (!npc) {
+        sprite.anchor.set(0.5, 1);
+        sprite.animationSpeed = 0.2;
+        sprite.tint = r.tint;
+      }
+      sprite.crowdScale = npc ? npc.scale : RIVAL_SCALE;
+      sprite.facesRight = Boolean(npc);
       sprite.scale.set(sprite.crowdScale);
-      if (!crowd) sprite.tint = r.tint;
       sprite.zIndex = 46;
       sprite.eventMode = 'none';
       engine.entityLayer.addChild(sprite);
@@ -276,7 +278,10 @@ function placeActor(a) {
   a.sprite.y = a.y;
   const scale = a.sprite.crowdScale || RIVAL_SCALE;
   a.sprite.scale.set(crowdScaleX(scale, a.facing, a.sprite.facesRight), scale);
-  if (a.mode === 'walk' || a.mode === 'climb') {
+  if (a.sprite.npc) {
+    // The Glitch's own walk, climb, jump and fall; standing idles (idle4 and random idles).
+    a.sprite.npc.setMode(['walk', 'climb', 'jump', 'drop'].includes(a.mode) ? a.mode : 'stand');
+  } else if (a.mode === 'walk' || a.mode === 'climb') {
     if (!a.sprite.playing) a.sprite.play();
   } else if (a.sprite.playing) a.sprite.gotoAndStop(a.mode === 'jump' || a.mode === 'drop' ? 3 : 0);
   if (a.label && !a.label.destroyed) {
