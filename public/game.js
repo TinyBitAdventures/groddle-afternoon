@@ -3780,8 +3780,12 @@ function trantTextureKey(classTsid, maturity) {
 }
 
 async function loadSheets() {
-  for (const [key, def] of Object.entries(SHEETS)) {
-    const tex = await loadTexture(def.url);
+  // Every sheet loads at once (the browser fetches and decodes in parallel);
+  // the table fills in the original order.
+  const entries = Object.entries(SHEETS);
+  const sheets = await Promise.all(entries.map(([, def]) => loadTexture(def.url)));
+  entries.forEach(([key, def], i) => {
+    const tex = sheets[i];
     if (def.whole || !def.fw) {
       textures[key] = { def, frames: [tex] };
     } else {
@@ -3790,20 +3794,18 @@ async function loadSheets() {
         frames: sliceSheet(tex.source, def, def.frameCount ?? null),
       };
     }
-  }
+  });
   // Living trant maturity frames (one complete plant cell from each OGA sheet)
+  const trantKeys = [];
   for (const classTsid of Object.keys(TRANT_META)) {
-    for (const m of TRANT_MAT_STAGES) {
-      const key = `${classTsid}_m${m}`;
-      const url = `assets/sprites/trants/frames/${key}.png?v=${TRANT_FRAME_VERSION}`;
-      try {
-        const tex = await loadTexture(url);
-        textures[key] = { def: { url, whole: true }, frames: [tex] };
-      } catch {
-        // Optional: fall back to raw sheet or treeFruit later at spawn
-      }
-    }
+    for (const m of TRANT_MAT_STAGES) trantKeys.push(`${classTsid}_m${m}`);
   }
+  const trantUrl = (key) => `assets/sprites/trants/frames/${key}.png?v=${TRANT_FRAME_VERSION}`;
+  // Optional: a missing stage falls back to the raw sheet or treeFruit at spawn.
+  const trants = await Promise.all(trantKeys.map((key) => loadTexture(trantUrl(key)).catch(() => null)));
+  trantKeys.forEach((key, i) => {
+    if (trants[i]) textures[key] = { def: { url: trantUrl(key), whole: true }, frames: [trants[i]] };
+  });
 }
 
 async function loadTrantTables() {
@@ -21474,7 +21476,7 @@ async function main() {
     resolution: renderResolution(VIEW_W, VIEW_W, window.devicePixelRatio || 1),
     autoDensity: true,
     preference: rendererPreference(),
-    // GPU textures unused for 20 s (old streets, sheets no longer drawn) are freed.
+    // GPU textures unused for 20 s (culled decos, old streets) are freed.
     gcMaxUnusedTime: 20000,
     gcFrequency: 5000,
   });
@@ -21496,6 +21498,9 @@ async function main() {
   features.init(engine);
 
   world = new PIXI.Container();
+  // The camera moves `world` every frame; as a render group only its own
+  // transform changes, not every street deco's and entity's below it.
+  world.isRenderGroup = true;
   entityLayer = new PIXI.Container();
   entityLayer.sortableChildren = true;
   fxLayer = new PIXI.Container();
@@ -23195,6 +23200,7 @@ async function main() {
     updateSpinningWheel();
     features.tick((1000 / 60) * dt, Date.now(), engine);
     bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H);
+    bgLayer?.cullDecos?.(-world.x, -world.y, VIEW_W, VIEW_H);
 
     buffTickAccum += dt;
     if (buffTickAccum >= 24) {

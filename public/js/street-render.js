@@ -442,6 +442,7 @@ function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
     holder.filters = [...(colour ? [colour] : []), new PIXI.BlurFilter({ strength: blur * 0.5, quality: 2 })];
     const moved = lc.removeChildren();
     for (const child of moved) {
+      child.culled = false;
       child.x -= region.x;
       child.y -= region.y;
       holder.addChild(child);
@@ -452,6 +453,7 @@ function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
       frame: new PIXI.Rectangle(0, 0, region.width, region.height),
       resolution: BLURRED_LAYER_RESOLUTION,
     });
+    trimTexturePool(PIXI);
     holder.destroy({ children: true });
     const baked = new PIXI.Sprite(texture);
     baked.x = region.x;
@@ -478,6 +480,38 @@ function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
 /** Most GPU memory one street may spend on recoloured deco textures. */
 export const RECOLOUR_BUDGET_BYTES = 192 * 1024 * 1024;
 
+/** A recoloured texture nobody has been near for this long is freed. */
+export const RECOLOUR_EVICT_MS = 12000;
+
+let poolTrim = null;
+/**
+ * Bakes leave their filter scratch textures (often 2048x4096) in Pixi's
+ * TexturePool for good; free the idle ones once a burst of bakes is done.
+ */
+function trimTexturePool(PIXI) {
+  if (poolTrim || !PIXI.TexturePool?.clear) return;
+  poolTrim = setTimeout(() => {
+    poolTrim = null;
+    PIXI.TexturePool.clear(true);
+  }, 250);
+}
+
+/** Render one deco texture through the layer's colour matrix. */
+function bakeRecolour(PIXI, renderer, base, colour) {
+  trimTexturePool(PIXI);
+  const holder = new PIXI.Sprite(frameTexture(base));
+  holder.filters = [colour];
+  const texture = renderer.generateTexture({
+    target: holder,
+    frame: new PIXI.Rectangle(0, 0, base.width, base.height),
+    resolution: base.resolution,
+  });
+  holder.texture.destroy();
+  holder.filters = null;
+  holder.destroy();
+  return texture;
+}
+
 /**
  * Static deco layers take the client's colour matrix once per texture instead
  * of a full-screen filter pass per layer every frame (14-20 passes on the
@@ -485,8 +519,10 @@ export const RECOLOUR_BUDGET_BYTES = 192 * 1024 * 1024;
  * recolouring each deco before compositing gives the same pixels as filtering
  * the composited layer wherever it is opaque, at the texture's own resolution.
  * Layers holding anything but sprites, or past the street's memory budget,
- * keep the live filter.
- * @param {{ textures: Map<string, any>, bytes: number }} cache per street
+ * keep the live filter. Each recoloured texture remembers its decos, so
+ * cullDecos can free it while they are all far off screen and bake it again
+ * (see evictRecolours / ensureRecoloured) when one comes back.
+ * @param {{ textures: Map<string, any>, entries: Map<string, any>, bytes: number }} cache per street
  */
 function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
   const sprites = lc.children;
@@ -504,27 +540,22 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
     }
     if (cache.bytes + bytes > RECOLOUR_BUDGET_BYTES) return;
     cache.bytes += bytes;
-    const holder = new PIXI.Sprite();
-    holder.filters = [colour];
+    const now = performance.now();
     for (const spr of sprites) {
       if (!isLoaded(spr.texture)) continue;
-      const base = spr.texture.source;
+      const original = spr.texture;
+      const base = original.source;
       const id = `${key}|${base.uid}`;
-      let texture = cache.textures.get(id);
-      if (!texture) {
-        holder.texture = frameTexture(base);
-        texture = renderer.generateTexture({
-          target: holder,
-          frame: new PIXI.Rectangle(0, 0, base.width, base.height),
-          resolution: base.resolution,
-        });
-        holder.texture.destroy();
-        cache.textures.set(id, texture);
+      let entry = cache.entries.get(id);
+      if (!entry) {
+        entry = { id, base, colour, texture: bakeRecolour(PIXI, renderer, base, colour), users: new Set(), seen: now, bytes: base.pixelWidth * base.pixelHeight * 4 };
+        cache.entries.set(id, entry);
+        cache.textures.set(id, entry.texture);
       }
-      spr.texture = texture;
+      entry.users.add(spr);
+      spr.recolour = { entry, original };
+      spr.texture = entry.texture;
     }
-    holder.filters = null;
-    holder.destroy();
     lc.filters = null;
     lc.recoloured = true;
   };
@@ -541,6 +572,41 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
   for (const base of pending) {
     onLoaded(base, done);
     onFailed(base, done);
+  }
+}
+
+/** Bake a freed recoloured texture again for a deco coming into view. */
+function ensureRecoloured(PIXI, renderer, cache, spr) {
+  const entry = spr.recolour?.entry;
+  if (!entry || entry.texture) return;
+  entry.texture = bakeRecolour(PIXI, renderer, entry.base, entry.colour);
+  cache.textures.set(entry.id, entry.texture);
+  cache.rebakes += 1;
+  for (const user of entry.users) if (!user.destroyed) user.texture = entry.texture;
+}
+
+/** Free recoloured textures whose decos have all been culled for a while. */
+function evictRecolours(cache, now) {
+  for (const entry of cache.entries.values()) {
+    if (!entry.texture) continue;
+    let near = false;
+    for (const user of entry.users) {
+      if (!user.destroyed && !user.culled) {
+        near = true;
+        break;
+      }
+    }
+    if (near) {
+      entry.seen = now;
+      continue;
+    }
+    if (now - entry.seen < RECOLOUR_EVICT_MS) continue;
+    // The decos are culled: park them on their (shared) original texture.
+    for (const user of entry.users) if (!user.destroyed) user.texture = user.recolour.original;
+    entry.texture.destroy(true);
+    entry.texture = null;
+    cache.textures.delete(entry.id);
+    cache.evictions += 1;
   }
 }
 
@@ -631,13 +697,20 @@ function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallbac
     for (let x0 = 0; x0 < W; x0 += CHUNK) {
       const w = Math.min(CHUNK, Math.ceil(W - x0));
       const rt = PIXI.RenderTexture.create({ width: w, height: ROWS });
-      // Pixi 7 applied the transform on top of the layer's own local transform.
-      lc.updateLocalTransform();
-      const transform = new PIXI.Matrix(1, 0, 0, 1, -x0, -(sourceH - ROWS)).append(lc.localTransform);
-      const wasGroup = lc.isRenderGroup;
-      renderer.render({ container: lc, target: rt, transform, clear: true });
-      // Pixi 8 turns a rendered container into a render group; undo that.
-      if (!wasGroup) lc.disableRenderGroup();
+      // Pixi 8 drops the filters of the container it renders (and makes it a
+      // render group), so render the layer inside a throwaway parent: its live
+      // colour filter and local transform apply as they did in Pixi 7.
+      const parent = lc.parent;
+      const index = parent ? parent.getChildIndex(lc) : -1;
+      const shell = new PIXI.Container();
+      shell.addChild(lc);
+      // Decos culled for the camera still belong in the strip.
+      const culled = lc.children.filter((child) => child.culled);
+      for (const child of culled) child.culled = false;
+      renderer.render({ container: shell, target: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -x0, -(sourceH - ROWS)), clear: true });
+      for (const child of culled) child.culled = true;
+      if (parent) parent.addChildAt(lc, index);
+      shell.destroy();
       try {
         const { pixels: px } = renderer.extract.pixels(rt);
         for (let i = 0; i < px.length; i += 16) {
@@ -696,6 +769,50 @@ function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallbac
   }
 }
 
+/** Screen pixels past the view edge that still count as visible (pre-uploads). */
+export const CULL_MARGIN = 256;
+
+/** A deco's axis-aligned box in its layer's coordinates (sprites only). */
+export function decoBox(spr) {
+  const tex = spr.texture;
+  if (!tex) return null;
+  const w = tex.orig.width;
+  const h = tex.orig.height;
+  const sx = spr.scale.x;
+  const sy = spr.scale.y;
+  const ax = spr.anchor?.x ?? 0;
+  const ay = spr.anchor?.y ?? 0;
+  const xa = -ax * w * sx;
+  const xb = (1 - ax) * w * sx;
+  const ya = -ay * h * sy;
+  const yb = (1 - ay) * h * sy;
+  if (spr.rotation) {
+    const r = Math.max(Math.hypot(xa, ya), Math.hypot(xb, ya), Math.hypot(xa, yb), Math.hypot(xb, yb));
+    return { x0: spr.x - r, y0: spr.y - r, x1: spr.x + r, y1: spr.y + r };
+  }
+  return { x0: spr.x + Math.min(xa, xb), y0: spr.y + Math.min(ya, yb), x1: spr.x + Math.max(xa, xb), y1: spr.y + Math.max(ya, yb) };
+}
+
+/** Cull one layer's sprites against the camera; returns how many are culled. */
+function cullLayer(lc, camX, camY, vpW, vpH, rebake) {
+  if (lc.destroyed || !lc.visible) return 0;
+  const x0 = camX - lc.x - CULL_MARGIN;
+  const y0 = camY - lc.y - CULL_MARGIN;
+  const x1 = x0 + vpW + CULL_MARGIN * 2;
+  const y1 = y0 + vpH + CULL_MARGIN * 2;
+  let culled = 0;
+  for (const child of lc.children) {
+    if (!child.texture || child.bakedLayerSprite) continue;
+    const b = decoBox(child);
+    if (!b) continue;
+    const out = b.x1 < x0 || b.x0 > x1 || b.y1 < y0 || b.y0 > y1;
+    if (!out && child.recolour && !child.recolour.entry.texture) rebake(child);
+    child.culled = out;
+    if (out) culled += 1;
+  }
+  return culled;
+}
+
 /**
  * @param {import('./street-model.js').StreetData} street
  * @param {typeof PIXI} PIXI
@@ -712,7 +829,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
   const available = opts.available || decoManifest || new Set();
   const root = new PIXI.Container();
   root.sortableChildren = true;
-  const recolourCache = { textures: new Map(), bytes: 0 };
+  const recolourCache = { textures: new Map(), entries: new Map(), bytes: 0, evictions: 0, rebakes: 0, lastEvict: 0 };
   root.recolourCache = recolourCache;
   // Decos are destroyed with the view but not their textures; free the copies.
   root.once('destroyed', () => {
@@ -776,6 +893,9 @@ export function buildStreetView(street, PIXI, opts = {}) {
     // decos use layer-local coordinates (needs the imported w/h).
     const parallax = layer.id !== 'middleground' && layer.w > 0 && layer.h > 0;
     lc.parallaxLayer = parallax ? { w: layer.w, h: layer.h } : null;
+    // A parallax layer moves on its own every frame: as a render group its
+    // children keep their transforms and only the group offset changes.
+    if (parallax) lc.isRenderGroup = true;
     const colour = colourFilter(PIXI, layer.filters);
     if (colour) lc.filters = [colour];
 
@@ -840,10 +960,31 @@ export function buildStreetView(street, PIXI, opts = {}) {
   // it share the decos' treatment (Hell One's greyscale Glitches).
   const middleground = (street.layers || []).find((layer) => layer.id === 'middleground');
   root.middlegroundMatrix = glitchLayerMatrix(middleground?.filters || {});
+  /**
+   * Cull decos outside the camera (plus a margin) so Pixi skips them: fewer
+   * draws, and their textures go unused so Pixi's texture GC can free them.
+   * Call once per frame after updateParallax; it only re-tests once the
+   * camera has moved a quarter of the margin.
+   */
+  let lastCull = null;
+  root.cullDecos = (camX, camY, vpW, vpH, force = false) => {
+    const now = performance.now();
+    if (now - recolourCache.lastEvict > 2000) {
+      recolourCache.lastEvict = now;
+      evictRecolours(recolourCache, now);
+    }
+    if (!force && lastCull && Math.abs(lastCull.x - camX) < CULL_MARGIN / 4 && Math.abs(lastCull.y - camY) < CULL_MARGIN / 4 && lastCull.w === vpW && lastCull.h === vpH) return;
+    lastCull = { x: camX, y: camY, w: vpW, h: vpH };
+    let culled = 0;
+    const rebake = (spr) => ensureRecoloured(PIXI, opts.renderer, recolourCache, spr);
+    for (const lc of layerContainers) culled += cullLayer(lc, camX, camY, vpW, vpH, rebake);
+    root.culledDecos = culled;
+  };
   /** Call once per frame with the camera's top-left in screen space. */
   root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => {
     for (const lc of root.parallaxLayers) {
       const at = parallaxLayerOffset(lc.parallaxLayer, camX, camY, vpW, vpH, W, sourceH);
+      if (lc.x !== at.x || lc.y !== at.y) lastCull = null;
       lc.x = at.x;
       lc.y = at.y;
     }
