@@ -3,7 +3,7 @@
 import { chromium } from 'playwright';
 
 const [query = '', out = 'shot.png', waitArg = '6000', actionsArg = '[]'] = process.argv.slice(2);
-const url = `https://groddle.localhost/${query.startsWith('?') ? query : `?${query}`}`;
+const url = `https://groddle.localhost/${query.startsWith("?") || /^[\w-]+\.html/.test(query) ? query : `?${query}`}`;
 const browser = await chromium.launch({
   args: ['--ignore-certificate-errors', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
@@ -20,7 +20,7 @@ page.on('response', (r) => {
 page.on('pageerror', (e) => logs.push(`pageerror: ${e.message} @ ${String(e.stack || '').split('\n').slice(1, 4).join(' | ')}`));
 // INIT='js' runs before page scripts (e.g. feature switches for perf checks).
 if (process.env.INIT) await page.addInitScript(process.env.INIT);
-await page.goto(url, { waitUntil: 'load' });
+await page.goto(url, { waitUntil: 'load', timeout: Number(process.env.GOTO_TIMEOUT) || 30000 });
 await page.waitForTimeout(Number(waitArg));
 for (const a of JSON.parse(actionsArg)) {
   if (a.key) await page.keyboard.press(a.key);

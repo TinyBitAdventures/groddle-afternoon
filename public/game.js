@@ -307,6 +307,7 @@ import {
   groupLabelCount,
 } from './js/achievements.js?v=full-browser-1';
 import { applyStreetVisit } from './js/exploration.js';
+import { createCombobox } from './js/combobox.js';
 import {
   INCANTATION_LINES,
   INCANTATION_FEAT_TITLE,
@@ -1175,6 +1176,8 @@ let actionToolFx = null;
 
 /** @type {import('./js/street-model.js').StreetData|null} */
 let currentStreet = null;
+/** Map panel region picker (js/combobox.js), built on first open. */
+let hubCombobox = null;
 /** @type {any[]|null} */
 let streetPlatforms = null;
 /** @type {{ id?:string, x:number, yTop:number, yBot:number, source?:string }[]} */
@@ -17976,6 +17979,9 @@ async function openMap(hubId) {
     } else if (prev && prev !== targetHub) {
       hubSelect.value = targetHub;
     }
+    // Themed type-to-search picker in front of the (hidden) select.
+    hubCombobox ||= createCombobox(hubSelect, { placeholder: 'Find a region…', label: 'Regions' });
+    hubCombobox.refresh();
   }
 
   const view = buildHubMapView(hubData, currentStreetTsid, STREET_INDEX.streets);
