@@ -270,7 +270,7 @@ const PANEL_CSS = `
 .img-card.dealing:nth-child(2){animation-delay:.09s}.img-card.dealing:nth-child(3){animation-delay:.18s}
 @keyframes img-deal{from{transform:translateY(-90px) rotate(-8deg) scale(.7);opacity:0}to{transform:none;opacity:1}}
 .img-card:hover:not(.flipped){transform:translateY(-6px)}
-.img-card.flipped{transform:rotateY(180deg) scale(1.05)}
+.img-card.flipped{transform:rotateY(180deg) scale(1.05);animation:none}
 .img-card.bought{animation:img-bought .9s ease-in forwards;pointer-events:none}
 @keyframes img-bought{0%{transform:rotateY(0) scale(1)}35%{transform:translateY(-24px) scale(1.12);filter:brightness(1.4)}100%{transform:translateY(-180px) scale(.4);opacity:0}}
 .img-face{position:absolute;inset:0;border-radius:8px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;
@@ -368,6 +368,9 @@ function buildCard(card, slot, ctx, { dealing = false } = {}) {
     dataset: { slot: String(slot), upgrade: card.class_tsid },
     'aria-label': `${text.name}, ${formatCost(card.cost)}`,
   });
+  // The deal animation holds its last frame (fill both), which would override
+  // the flip and hover transforms; drop it once the card has landed.
+  if (dealing) btn.addEventListener('animationend', () => btn.classList.remove('dealing'), { once: true });
   const front = el('div', { class: `img-face img-front${text.keepable ? ' keepable' : ''}` });
   front.append(...frontLayers(text.config));
   if (text.config.bg === 'gold') front.append(el('div', { class: 'img-sparkle' }));
