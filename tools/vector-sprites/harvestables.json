@@ -1,0 +1,1673 @@
+{
+ "about": "World harvestables the game draws (trees, dead trees, the paper tree, resource nodes), paired with their glitch-items SWF (CC0). The trant-* jobs come from trant-states.mjs (maturity clip, health frame, and the child states the client's ActionScript sets); edit that script, not those entries, and rerun it with --write. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/harvestables.json",
+ "minScore": 0.9,
+ "firstDraw": true,
+ "jobs": [
+  {
+   "name": "trant-bean-m1",
+   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+   "sprite": 162,
+   "state": {
+    "set": {
+     "branch2": 10
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bean_m1.png",
+     "fw": 198,
+     "fh": 270,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bean-m3",
+   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+   "sprite": 136,
+   "state": {
+    "set": {
+     "branch2": 10,
+     "branch1": 10
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bean_m3.png",
+     "fw": 198,
+     "fh": 270,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bean-m5",
+   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+   "sprite": 112,
+   "state": {
+    "set": {
+     "branch4": 10,
+     "branch3": 10,
+     "branch2": 10,
+     "branch1": 10
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bean_m5.png",
+     "fw": 198,
+     "fh": 270,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bean-m7",
+   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+   "sprite": 89,
+   "state": {
+    "set": {
+     "branch4": 10,
+     "branch5": 10,
+     "branch3": 10,
+     "branch6": 10,
+     "branch2": 10,
+     "branch1": 10
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bean_m7.png",
+     "fw": 198,
+     "fh": 270,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bean-m10",
+   "swf": "harvestable_resources/bean_tree/trant_bean.swf",
+   "sprite": 29,
+   "state": {
+    "set": {
+     "branch8": 10,
+     "branch3": 10,
+     "branch5": 10,
+     "branch7": 10,
+     "branch4": 10,
+     "branch6": 10,
+     "branch2": 10,
+     "branch1": 10
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bean_m10.png",
+     "fw": 198,
+     "fh": 270,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bubble-m1",
+   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+   "sprite": 42,
+   "renderer": "svg",
+   "state": {
+    "set": {
+     "stalk_base": 1,
+     "stalk_1": 2,
+     "stalk_2": 1,
+     "stalk_3": 1
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bubble_m1.png",
+     "fw": 167,
+     "fh": 277,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bubble-m3",
+   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+   "sprite": 58,
+   "renderer": "svg",
+   "state": {
+    "set": {
+     "stalk_base": 1,
+     "stalk_1": 2,
+     "stalk_2": 1,
+     "stalk_3": 1,
+     "stalk_4": 1,
+     "stalk_5": 1,
+     "stalk_6": 1
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bubble_m3.png",
+     "fw": 167,
+     "fh": 277,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bubble-m5",
+   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+   "sprite": 142,
+   "renderer": "svg",
+   "state": {
+    "set": {
+     "stalk_base": 1,
+     "stalk_ngro": 10,
+     "stalk_1": 2,
+     "stalk_2": 1,
+     "stalk_3": 2,
+     "stalk_4": 2,
+     "stalk_5": 1,
+     "stalk_6": 1,
+     "stalk_7": 1,
+     "stalk_8": 1
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bubble_m5.png",
+     "fw": 167,
+     "fh": 277,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bubble-m7",
+   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+   "sprite": 173,
+   "renderer": "svg",
+   "state": {
+    "set": {
+     "stalk_base": 1,
+     "stalk_ngro": 10,
+     "stalk_1": 2,
+     "stalk_2": 2,
+     "stalk_3": 1,
+     "stalk_4": 2,
+     "stalk_5": 1,
+     "stalk_6": 1,
+     "stalk_7": 1,
+     "stalk_8": 1,
+     "stalk_9": 1,
+     "stalk_10": 1,
+     "stalk_11": 1
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bubble_m7.png",
+     "fw": 167,
+     "fh": 277,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bubble-m10",
+   "swf": "harvestable_resources/bubble_tree/trant_bubble.swf",
+   "sprite": 190,
+   "renderer": "svg",
+   "state": {
+    "set": {
+     "stalk_base": 1,
+     "stalk_ngro": 10,
+     "stalk_1": 1,
+     "stalk_2": 1,
+     "stalk_3": 1,
+     "stalk_4": 1,
+     "stalk_5": 1,
+     "stalk_6": 1,
+     "stalk_7": 1,
+     "stalk_8": 1,
+     "stalk_9": 1,
+     "stalk_10": 1,
+     "stalk_11": 1,
+     "stalk_12": 1,
+     "stalk_13": 1,
+     "stalk_14": 1,
+     "stalk_15": 1,
+     "stalk_16": 1,
+     "stalk_17": 1
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_bubble_m10.png",
+     "fw": 167,
+     "fh": 277,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-egg-m1",
+   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+   "sprite": 84,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_egg_m1.png",
+     "fw": 296,
+     "fh": 278,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-egg-m3",
+   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+   "sprite": 76,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_egg_m3.png",
+     "fw": 296,
+     "fh": 278,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-egg-m5",
+   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+   "sprite": 61,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_egg_m5.png",
+     "fw": 296,
+     "fh": 278,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-egg-m7",
+   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+   "sprite": 47,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_egg_m7.png",
+     "fw": 296,
+     "fh": 278,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-egg-m10",
+   "swf": "harvestable_resources/egg_plant/trant_egg.swf",
+   "sprite": 22,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_egg_m10.png",
+     "fw": 296,
+     "fh": 278,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 10,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-fruit-m1",
+   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+   "sprite": 40,
+   "state": {
+    "set": {
+     "fol_1": 20,
+     "fol_2": 9,
+     "fol_3": 20,
+     "fol_4": 20,
+     "fol_5": 20,
+     "fol_6": 20,
+     "fol_7": 20,
+     "fol_8": 20,
+     "fol_9": 20,
+     "fol_10": 20
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_fruit_m1.png",
+     "fw": 271,
+     "fh": 249,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-fruit-m3",
+   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+   "sprite": 46,
+   "state": {
+    "set": {
+     "fol_1": 9,
+     "fol_2": 9,
+     "fol_8": 20,
+     "fol_3": 20,
+     "fol_4": 20,
+     "fol_5": 20,
+     "fol_6": 20,
+     "fol_7": 20,
+     "fol_9": 20,
+     "fol_10": 20,
+     "fol_12": 20,
+     "fol_11": 9,
+     "fol_13": 9,
+     "fol_14": 9,
+     "fol_15": 20,
+     "fol_16": 9
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_fruit_m3.png",
+     "fw": 271,
+     "fh": 249,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-fruit-m5",
+   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+   "sprite": 56,
+   "state": {
+    "set": {
+     "fol_1": 20,
+     "fol_2": 9,
+     "fol_8": 20,
+     "fol_3": 20,
+     "fol_4": 20,
+     "fol_5": 20,
+     "fol_6": 20,
+     "fol_7": 20,
+     "fol_9": 20,
+     "fol_10": 20,
+     "fol_12": 20,
+     "fol_11": 9,
+     "fol_13": 9,
+     "fol_14": 9,
+     "fol_15": 20,
+     "fol_16": 9,
+     "cherry_1": 2,
+     "cherry_2": 3,
+     "cherry_3": 1,
+     "cherry_4": 2,
+     "cherry_5": 3,
+     "cherry_6": 1,
+     "cherry_7": 2,
+     "cherry_8": 3
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_fruit_m5.png",
+     "fw": 271,
+     "fh": 249,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-fruit-m7",
+   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+   "sprite": 62,
+   "state": {
+    "set": {
+     "fol_1": 20,
+     "fol_2": 20,
+     "fol_3": 20,
+     "fol_4": 20,
+     "fol_5": 20,
+     "fol_6": 20,
+     "fol_7": 9,
+     "fol_9": 20,
+     "fol_10": 20,
+     "fol_11": 20,
+     "fol_12": 20,
+     "fol_18": 9,
+     "fol_8": 20,
+     "fol_13": 9,
+     "fol_14": 20,
+     "fol_15": 9,
+     "fol_17": 20,
+     "fol_16": 9,
+     "fol_19": 20,
+     "fol_20": 20,
+     "fol_23": 9,
+     "fol_21": 9,
+     "fol_22": 20,
+     "fol_25": 20,
+     "fol_26": 9,
+     "fol_24": 9,
+     "fol_27": 20,
+     "fol_28": 9,
+     "fol_29": 9,
+     "fol_30": 20,
+     "cherry_1": 2,
+     "cherry_2": 3,
+     "cherry_3": 1,
+     "cherry_4": 2,
+     "cherry_5": 3,
+     "cherry_6": 1,
+     "cherry_7": 2,
+     "cherry_8": 3,
+     "cherry_9": 1,
+     "cherry_10": 2,
+     "cherry_11": 3,
+     "cherry_12": 1,
+     "cherry_13": 2,
+     "cherry_14": 3,
+     "cherry_15": 1
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_fruit_m7.png",
+     "fw": 271,
+     "fh": 249,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-fruit-m10",
+   "swf": "harvestable_resources/fruit_tree/trant_fruit.swf",
+   "sprite": 71,
+   "state": {
+    "set": {
+     "fol_19": 20,
+     "fol_10": 20,
+     "fol_12": 20,
+     "fol_13": 20,
+     "fol_1": 20,
+     "fol_3": 20,
+     "fol_4": 20,
+     "fol_6": 20,
+     "fol_5": 20,
+     "fol_11": 20,
+     "fol_9": 20,
+     "fol_24": 20,
+     "fol_18": 20,
+     "fol_27": 20,
+     "fol_28": 9,
+     "fol_31": 20,
+     "fol_29": 9,
+     "fol_25": 20,
+     "fol_2": 20,
+     "fol_7": 20,
+     "fol_8": 20,
+     "fol_16": 20,
+     "fol_15": 20,
+     "fol_22": 20,
+     "fol_21": 20,
+     "fol_17": 20,
+     "fol_30": 20,
+     "fol_32": 20,
+     "fol_26": 9,
+     "fol_35": 20,
+     "fol_39": 9,
+     "fol_33": 20,
+     "fol_38": 20,
+     "fol_34": 9,
+     "fol_41": 9,
+     "fol_42": 20,
+     "fol_43": 20,
+     "fol_44": 9,
+     "fol_46": 9,
+     "fol_40": 9,
+     "fol_53": 20,
+     "fol_54": 20,
+     "fol_20": 20,
+     "fol_55": 20,
+     "fol_56": 20,
+     "fol_57": 20,
+     "fol_51": 9,
+     "fol_61": 9,
+     "fol_62": 9,
+     "fol_63": 20,
+     "fol_47": 20,
+     "fol_36": 9,
+     "fol_68": 20,
+     "fol_64": 9,
+     "fol_65": 20,
+     "fol_48": 20,
+     "fol_67": 20,
+     "fol_59": 20,
+     "fol_23": 20,
+     "fol_37": 20,
+     "fol_45": 9,
+     "fol_52": 20,
+     "fol_58": 9,
+     "fol_66": 9,
+     "fol_49": 20,
+     "fol_50": 20,
+     "fol_60": 20,
+     "fol_69": 20,
+     "fol_70": 20,
+     "fol_14": 9,
+     "fol_72": 9,
+     "fol_71": 9,
+     "cherry_1": 2,
+     "cherry_2": 3,
+     "cherry_3": 1,
+     "cherry_4": 2,
+     "cherry_5": 3,
+     "cherry_6": 1,
+     "cherry_7": 2,
+     "cherry_8": 3,
+     "cherry_9": 1,
+     "cherry_10": 2,
+     "cherry_11": 3,
+     "cherry_12": 1,
+     "cherry_13": 2,
+     "cherry_14": 3,
+     "cherry_15": 1,
+     "cherry_16": 2,
+     "cherry_17": 3,
+     "cherry_18": 1,
+     "cherry_19": 2,
+     "cherry_20": 3,
+     "cherry_21": 1,
+     "cherry_22": 2,
+     "cherry_23": 3,
+     "cherry_24": 1,
+     "cherry_25": 2,
+     "cherry_26": 3,
+     "cherry_27": 1,
+     "cherry_28": 2,
+     "cherry_29": 3,
+     "cherry_30": 1
+    }
+   },
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_fruit_m10.png",
+     "fw": 271,
+     "fh": 249,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-gas-m1",
+   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+   "sprite": 71,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_gas_m1.png",
+     "fw": 276,
+     "fh": 258,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-gas-m3",
+   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+   "sprite": 165,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_gas_m3.png",
+     "fw": 276,
+     "fh": 258,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-gas-m5",
+   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+   "sprite": 237,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_gas_m5.png",
+     "fw": 276,
+     "fh": 258,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-gas-m7",
+   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+   "sprite": 297,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_gas_m7.png",
+     "fw": 276,
+     "fh": 258,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-gas-m10",
+   "swf": "harvestable_resources/gas_plant/trant_gas.swf",
+   "sprite": 377,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_gas_m10.png",
+     "fw": 276,
+     "fh": 258,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-spice-m1",
+   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+   "sprite": 26,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_spice_m1.png",
+     "fw": 318,
+     "fh": 250,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-spice-m3",
+   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+   "sprite": 59,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_spice_m3.png",
+     "fw": 318,
+     "fh": 250,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-spice-m5",
+   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+   "sprite": 102,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_spice_m5.png",
+     "fw": 318,
+     "fh": 250,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-spice-m7",
+   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+   "sprite": 134,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_spice_m7.png",
+     "fw": 318,
+     "fh": 250,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-spice-m10",
+   "swf": "harvestable_resources/spice_plant/trant_spice.swf",
+   "sprite": 185,
+   "sheets": [
+    {
+     "path": "assets/sprites/trants/frames/trant_spice_m10.png",
+     "fw": 318,
+     "fh": 250,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bean-dead",
+   "swf": "harvestable_resources/trant_bean_dead/trant_bean_dead.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/trant-bean-dead.png",
+     "fw": 119,
+     "fh": 159,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-bubble-dead",
+   "swf": "harvestable_resources/trant_bubble_dead/trant_bubble_dead.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/trant-bubble-dead.png",
+     "fw": 104,
+     "fh": 150,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-egg-dead",
+   "swf": "harvestable_resources/trant_egg_dead/trant_egg_dead.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/trant-egg-dead.png",
+     "fw": 119,
+     "fh": 169,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-fruit-dead",
+   "swf": "harvestable_resources/trant_fruit_dead/trant_fruit_dead.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/trant-fruit-dead.png",
+     "fw": 119,
+     "fh": 145,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-gas-dead",
+   "swf": "harvestable_resources/trant_gas_dead/trant_gas_dead.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/trant-gas-dead.png",
+     "fw": 120,
+     "fh": 114,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "trant-spice-dead",
+   "swf": "harvestable_resources/trant_spice_dead/trant_spice_dead.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/trant-spice-dead.png",
+     "fw": 104,
+     "fh": 120,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "patch-dirty",
+   "swf": "harvestable_resources/patch/patch.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/patch-dirty.png",
+     "fw": 115,
+     "fh": 32,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "patch-clean",
+   "swf": "harvestable_resources/patch/patch.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/patch-clean.png",
+     "fw": 115,
+     "fh": 32,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 3,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "patch-dug",
+   "swf": "harvestable_resources/patch/patch.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/patch-dug.png",
+     "fw": 115,
+     "fh": 32,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 4,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "patch-dark-dirty",
+   "swf": "harvestable_resources/patch/patch_dark/patch_dark.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/patch-dark-dirty.png",
+     "fw": 115,
+     "fh": 32,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "patch-dark-clean",
+   "swf": "harvestable_resources/patch/patch_dark/patch_dark.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/patch-dark-clean.png",
+     "fw": 115,
+     "fh": 32,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 3,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "patch-dark-dug",
+   "swf": "harvestable_resources/patch/patch_dark/patch_dark.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/patch-dark-dug.png",
+     "fw": 115,
+     "fh": 32,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 4,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "patch-seedling",
+   "swf": "harvestable_resources/patch_seedling/patch_seedling.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/soil/patch-seedling.png",
+     "fw": 104,
+     "fh": 46,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "garden-seedling",
+   "swf": "harvestable_resources/garden/garden_new.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/garden/plot_seedling.png",
+     "fw": 81,
+     "fh": 43,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "barnacle-pod",
+   "swf": "harvestable_resources/barnacle_pod/barnacle_pod.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/cultivation/barnacle_pod.png",
+     "fw": 162,
+     "fh": 177,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "jellisac-mound",
+   "swf": "harvestable_resources/jellisac_mound/jellisac_mound.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/cultivation/jellisac_mound.png",
+     "fw": 228,
+     "fh": 145,
+     "cols": 1,
+     "frames": 1,
+     "swfStart": 1,
+     "swfCount": 1,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "paper-tree-pet-false-water-false",
+   "character": "paper-tree",
+   "swf": "harvestable_resources/paper_tree/paper_tree.swf",
+   "sprite": 101,
+   "clip": "normal",
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/paper-tree-pet-false-water-false.png",
+     "fw": 232,
+     "fh": 216,
+     "cols": 4,
+     "frames": 22,
+     "swfStart": 1,
+     "swfCount": 22,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "paper-tree-pet-true-water-false",
+   "character": "paper-tree",
+   "swf": "harvestable_resources/paper_tree/paper_tree.swf",
+   "sprite": 26,
+   "clip": "needs_pet",
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/paper-tree-pet-true-water-false.png",
+     "fw": 232,
+     "fh": 216,
+     "cols": 4,
+     "frames": 22,
+     "swfStart": 1,
+     "swfCount": 22,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "paper-tree-pet-false-water-true",
+   "character": "paper-tree",
+   "swf": "harvestable_resources/paper_tree/paper_tree.swf",
+   "sprite": 76,
+   "clip": "needs_water",
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/paper-tree-pet-false-water-true.png",
+     "fw": 232,
+     "fh": 216,
+     "cols": 4,
+     "frames": 22,
+     "swfStart": 1,
+     "swfCount": 22,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "paper-tree-pet-true-water-true",
+   "character": "paper-tree",
+   "swf": "harvestable_resources/paper_tree/paper_tree.swf",
+   "sprite": 51,
+   "clip": "needs_pet_and_water",
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/paper-tree-pet-true-water-true.png",
+     "fw": 232,
+     "fh": 216,
+     "cols": 4,
+     "frames": 22,
+     "swfStart": 1,
+     "swfCount": 22,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "mortar-barnacle-blister1",
+   "character": "mortar-barnacle",
+   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
+   "sprite": 36,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/mortar-barnacle-blister1.png",
+     "fw": 39,
+     "fh": 44,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "mortar-barnacle-blister2",
+   "character": "mortar-barnacle",
+   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
+   "sprite": 30,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/mortar-barnacle-blister2.png",
+     "fw": 35,
+     "fh": 40,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "mortar-barnacle-blister3",
+   "character": "mortar-barnacle",
+   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
+   "sprite": 24,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/mortar-barnacle-blister3.png",
+     "fw": 35,
+     "fh": 39,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "mortar-barnacle-blister4",
+   "character": "mortar-barnacle",
+   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
+   "sprite": 18,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/mortar-barnacle-blister4.png",
+     "fw": 36,
+     "fh": 40,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "mortar-barnacle-blister5",
+   "character": "mortar-barnacle",
+   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
+   "sprite": 12,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/mortar-barnacle-blister5.png",
+     "fw": 32,
+     "fh": 39,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "mortar-barnacle-blister6",
+   "character": "mortar-barnacle",
+   "swf": "harvestable_resources/mortar_barnacle/mortar_barnacle.swf",
+   "sprite": 6,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/mortar-barnacle-blister6.png",
+     "fw": 39,
+     "fh": 47,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ice-knob-knob1",
+   "character": "ice-knob",
+   "swf": "harvestable_resources/ice_knob/ice_knob.swf",
+   "sprite": 922,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/ice-knob-knob1.png",
+     "fw": 45,
+     "fh": 69,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ice-knob-knob2",
+   "character": "ice-knob",
+   "swf": "harvestable_resources/ice_knob/ice_knob.swf",
+   "sprite": 668,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/ice-knob-knob2.png",
+     "fw": 54,
+     "fh": 68,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ice-knob-knob3",
+   "character": "ice-knob",
+   "swf": "harvestable_resources/ice_knob/ice_knob.swf",
+   "sprite": 464,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/ice-knob-knob3.png",
+     "fw": 46,
+     "fh": 71,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ice-knob-knob4",
+   "character": "ice-knob",
+   "swf": "harvestable_resources/ice_knob/ice_knob.swf",
+   "sprite": 253,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/ice-knob-knob4.png",
+     "fw": 72,
+     "fh": 52,
+     "cols": 4,
+     "frames": 4,
+     "mirror": false,
+     "frameList": [
+      1,
+      2,
+      3,
+      5
+     ]
+    }
+   ]
+  },
+  {
+   "name": "jellisac-jellysack1",
+   "character": "jellisac",
+   "swf": "harvestable_resources/jellisac/jellisac.swf",
+   "sprite": 1221,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/jellisac-jellysack1.png",
+     "fw": 40,
+     "fh": 48,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 5,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "jellisac-jellysack2",
+   "character": "jellisac",
+   "swf": "harvestable_resources/jellisac/jellisac.swf",
+   "sprite": 906,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/jellisac-jellysack2.png",
+     "fw": 42,
+     "fh": 46,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 5,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "jellisac-jellysack3",
+   "character": "jellisac",
+   "swf": "harvestable_resources/jellisac/jellisac.swf",
+   "sprite": 606,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/jellisac-jellysack3.png",
+     "fw": 44,
+     "fh": 39,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 5,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "jellisac-jellysack4",
+   "character": "jellisac",
+   "swf": "harvestable_resources/jellisac/jellisac.swf",
+   "sprite": 304,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/jellisac-jellysack4.png",
+     "fw": 47,
+     "fh": 52,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 5,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "dirt-pile-dirt1",
+   "character": "dirt-pile",
+   "swf": "harvestable_resources/dirt_pile/dirt_pile.swf",
+   "sprite": 23,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/dirt-pile-dirt1.png",
+     "fw": 195,
+     "fh": 71,
+     "cols": 4,
+     "frames": 11,
+     "swfStart": 11,
+     "swfCount": 1,
+     "step": -1,
+     "mirror": false,
+     "shift": 0
+    }
+   ]
+  },
+  {
+   "name": "dirt-pile-dirt2",
+   "character": "dirt-pile",
+   "swf": "harvestable_resources/dirt_pile/dirt_pile.swf",
+   "sprite": 24,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/dirt-pile-dirt2.png",
+     "fw": 195,
+     "fh": 71,
+     "cols": 4,
+     "frames": 11,
+     "swfStart": 11,
+     "swfCount": 1,
+     "step": -1,
+     "mirror": false,
+     "shift": 0
+    }
+   ]
+  },
+  {
+   "name": "peat-1",
+   "character": "peat",
+   "swf": "harvestable_resources/peat_base/peat_1/peat_1.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/peat-1.png",
+     "fw": 211,
+     "fh": 52,
+     "cols": 3,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 5,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "peat-2",
+   "character": "peat",
+   "swf": "harvestable_resources/peat_base/peat_2/peat_2.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/peat-2.png",
+     "fw": 166,
+     "fh": 46,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 5,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "peat-3",
+   "character": "peat",
+   "swf": "harvestable_resources/peat_base/peat_3/peat_3.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/resources/peat-3.png",
+     "fw": 178,
+     "fh": 57,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 5,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "wood-tree",
+   "swf": "harvestable_resources/wood_tree/wood_tree.swf",
+   "sprite": 14,
+   "clip": "tree2",
+   "sheets": [
+    {
+     "path": "assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png",
+     "fw": 88,
+     "fh": 138,
+     "cols": 6,
+     "frames": 6,
+     "swfStart": 1,
+     "swfCount": 6,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "rock-metal",
+   "swf": "harvestable_resources/rock_metal/rock_metal_1/rock_metal_1.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/mining/rock_metal.png",
+     "fw": 137,
+     "fh": 100,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 6,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "rock-dullite",
+   "swf": "harvestable_resources/rock_dullite/rock_dullite_1/rock_dullite_1.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/mining/rock_dullite.png",
+     "fw": 131,
+     "fh": 114,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 6,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "rock-beryl",
+   "swf": "harvestable_resources/rock_beryl/rock_beryl_1/rock_beryl_1.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/mining/rock_beryl.png",
+     "fw": 134,
+     "fh": 120,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 6,
+     "mirror": false
+    }
+   ]
+  },
+  {
+   "name": "rock-sparkly",
+   "swf": "harvestable_resources/rock_sparkly/rock_sparkly_1/rock_sparkly_1.swf",
+   "sprite": 0,
+   "sheets": [
+    {
+     "path": "assets/sprites/mining/rock_sparkly.png",
+     "fw": 131,
+     "fh": 127,
+     "cols": 5,
+     "frames": 5,
+     "swfStart": 1,
+     "swfCount": 6,
+     "mirror": false
+    }
+   ]
+  }
+ ]
+}

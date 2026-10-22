@@ -30,6 +30,16 @@
  *    than the SWF (3 x that scale; the 3x file is still 3x the OGA pixels).
  *  - job "parts": { "<placed class>": "<class>" | null } renders a runtime
  *    variant (swf-parts.mjs swaps the placed part symbols in a work copy).
+ *  - job "state": { "set": { "<instance>": frame | null }, "pad": n } freezes
+ *    what the item's ActionScript sets (gotoAndStop / visible) on the
+ *    sprite's named children (swf-state.mjs; harvestables.json).
+ *  - job "renderer": "svg" renders FFDec's SVG export in Chromium, for art
+ *    with multiply/overlay/hard-light blend modes (svg-raster.mjs).
+ *  - sheet "frameList": [n, ...] gives each cell's SWF frame (the barnacle
+ *    and ice sheets skip the "bigger" state).
+ *  - job "sprite": 0 renders the root timeline (FFDec frame export).
+ *  - sheet "swfStart" (+ "swfCount") pins the SWF frame when the sheet has
+ *    no FrameLabel (a still picked by state, e.g. trant health 10).
  *
  * Usage:
  *   node tools/vector-sprites/build.mjs [--manifest tools/vector-sprites/animals.json]
@@ -43,6 +53,8 @@ import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { FFDEC, JAVA, swfSprites } from './swf-labels.mjs';
 import { swapParts } from './swf-parts.mjs';
+import { freezeState } from './swf-state.mjs';
+import { rasteriseSvgs } from './svg-raster.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
@@ -71,6 +83,8 @@ const manifestPath = resolve(opt('manifest', join(HERE, 'animals.json')));
 const only = opt('only', '');
 const WORK = resolve(opt('work', join(os.tmpdir(), 'vector-sprites')));
 const DRY = args.includes('--dry');
+/** A manifest's "minScore" raises SHEET_MIN (harvestables: 0.9, the test's bar). */
+let sheetMin = SHEET_MIN;
 
 // ---------------------------------------------------------------------------
 // Pixels (ImageMagick for codecs, plain typed arrays for the maths)
@@ -194,16 +208,34 @@ const scoreOf = ({ ea, ec, m }) => (m === 0 ? 1 : 1 - (ea / m + ec / (3 * m)) / 
 // FFDec export (one per SWF sprite, cached)
 // ---------------------------------------------------------------------------
 
-function exportSprite(swf, id, zoom = 3) {
-  const dir = join(WORK, `${basename(swf, '.swf')}_${id}${zoom === 3 ? '' : `_z${zoom}`}`);
+async function exportSprite(swf, id, zoom = 3, renderer = 'png') {
+  const dir = join(WORK, `${basename(swf, '.swf')}_${id}${zoom === 3 ? '' : `_z${zoom}`}${renderer === 'svg' ? '_svg' : ''}`);
   const done = join(dir, '.done');
+  // Sprite 0 is the root timeline (FFDec frame export, stage colour left out).
+  const find = (d) => (id === 0 ? (existsSync(join(d, 'root')) ? 'root' : null) : readdirSync(d).find((n) => n === `DefineSprite_${id}` || n.startsWith(`DefineSprite_${id}_`)));
+  const ffdec = (format, out) => execFileSync(JAVA, ['-jar', FFDEC, '-zoom', String(zoom),
+    ...(id === 0 ? ['-ignorebackground', '-format', `frame:${format}`, '-export', 'frame', join(out, 'root')] : ['-selectid', String(id), '-format', `sprite:${format}`, '-export', 'sprite', out]),
+    swf], { stdio: 'ignore' });
   if (!existsSync(done)) {
     mkdirSync(dir, { recursive: true });
-    console.log(`  ffdec: ${basename(swf)} sprite ${id} @${zoom}x`);
-    execFileSync(JAVA, ['-jar', FFDEC, '-zoom', String(zoom), '-selectid', String(id), '-format', 'sprite:png', '-export', 'sprite', dir, swf], { stdio: 'ignore' });
+    console.log(`  ffdec: ${basename(swf)} sprite ${id} @${zoom}x${renderer === 'svg' ? ' (svg)' : ''}`);
+    if (renderer === 'svg') {
+      // FFDec's PNG renderer blends multiply/overlay against transparent
+      // black; its SVG keeps mix-blend-mode, which Chromium composites right.
+      const svgDir = join(dir, 'svg');
+      ffdec('svg', svgDir);
+      const sub = find(svgDir);
+      if (!sub) throw new Error(`no svg export for sprite ${id} in ${svgDir}`);
+      mkdirSync(join(dir, sub), { recursive: true });
+      const jobs = readdirSync(join(svgDir, sub)).filter((n) => n.endsWith('.svg'))
+        .map((n) => ({ svg: join(svgDir, sub, n), png: join(dir, sub, n.replace(/\.svg$/, '.png')) }));
+      await rasteriseSvgs(jobs);
+    } else {
+      ffdec('png', dir);
+    }
     writeFileSync(done, '');
   }
-  const sub = readdirSync(dir).find((n) => n === `DefineSprite_${id}` || n.startsWith(`DefineSprite_${id}_`));
+  const sub = find(dir);
   if (!sub) throw new Error(`no export for sprite ${id} in ${dir}`);
   return join(dir, sub);
 }
@@ -230,11 +262,14 @@ function buildSheet(job, sheet, labels, frameDir) {
   const ogaImg = readRGBA(oga);
   const { cells } = sheetCells(sheet, ogaImg);
   const label = labels.find((l) => l.name === sheet.label);
-  if (!label && !sheet.swfStart) return { status: 'rejected', reason: `label ${sheet.label} not in sprite ${job.sprite}` };
-  const start = sheet.swfStart ?? label.start;
+  if (!label && !sheet.swfStart && !sheet.frameList) return { status: 'rejected', reason: `label ${sheet.label} not in sprite ${job.sprite}` };
+  // frameList: cell k shows SWF frame frameList[k] (states the sheet skips).
+  const list = sheet.frameList;
+  const start = list ? list[0] : (sheet.swfStart ?? label.start);
   const swfCount = sheet.swfCount ?? label?.count ?? cells.length;
   const cellImgs = cells.map((c) => crop(ogaImg, c.x, c.y, sheet.fw, sheet.fh));
   const step = sheet.step ?? 1;
+  const frameOf = (k, shift) => (list ? list[k] : start + k * step) + shift;
 
   const renders = new Map();
   const render = (n, mirror) => {
@@ -260,7 +295,7 @@ function buildSheet(job, sheet, labels, frameDir) {
   const samples = nonEmpty.filter((_, i) => i % every === 0).slice(0, 8);
   // Cell k shows SWF frame start + k + shift; a shift may not leave the label.
   const labelEnd = start + swfCount - 1;
-  const shifts = (sheet.shift !== undefined ? [sheet.shift] : [0, 1, -1])
+  const shifts = (sheet.shift !== undefined || list ? [sheet.shift ?? 0] : [0, 1, -1])
     .filter((s) => sheet.shift !== undefined || (start + s >= start && start + s + (cells.length - 1) * step <= labelEnd) || s === 0);
   const mirrors = sheet.mirror !== undefined ? [sheet.mirror] : [false, true];
   let best = null;
@@ -269,7 +304,7 @@ function buildSheet(job, sheet, labels, frameDir) {
       // Estimate the 1x offset from centroids at phase 0, then search around it.
       const est = [];
       for (const c of samples) {
-        const e = render(start + c.k * step + shift, mirror);
+        const e = render(frameOf(c.k, shift), mirror);
         if (!e) continue;
         const a = centroid(cellImgs[c.k]);
         const b = centroid(phase(e, 0, 0));
@@ -285,7 +320,7 @@ function buildSheet(job, sheet, labels, frameDir) {
             for (let qy = ey - 4; qy <= ey + 4; qy++) {
               const acc = { ea: 0, ec: 0, m: 0 };
               for (const c of samples) {
-                const e = render(start + c.k * step + shift, mirror);
+                const e = render(frameOf(c.k, shift), mirror);
                 if (!e) { acc.m += 1e9; continue; }
                 const r = compare(cellImgs[c.k], phase(e, px, py), qx, qy);
                 acc.ea += r.ea; acc.ec += r.ec; acc.m += r.m;
@@ -307,7 +342,7 @@ function buildSheet(job, sheet, labels, frameDir) {
   // Score every frame with the global placement; also its own best nearby.
   const frames = [];
   for (const c of cells) {
-    const n = start + c.k * step + best.shift;
+    const n = frameOf(c.k, best.shift);
     const e = render(n, best.mirror);
     if (!e) { frames.push({ k: c.k, swf: n, score: 0, missing: true }); continue; }
     const g = scoreOf(compare(cellImgs[c.k], phase(e, best.px, best.py), best.qx, best.qy));
@@ -343,7 +378,7 @@ function buildSheet(job, sheet, labels, frameDir) {
     sprite: job.sprite,
     ...(job.zoom && job.zoom !== 3 ? { zoom: job.zoom } : {}),
     label: sheet.label ?? null,
-    swfFrames: [start + best.shift, start + best.shift + (cells.length - 1) * step],
+    swfFrames: list ? cells.map((c) => frameOf(c.k, best.shift)) : [start + best.shift, start + best.shift + (cells.length - 1) * step],
     ...(step !== 1 ? { step } : {}),
     swfLabelFrames: swfCount,
     cells: cells.length,
@@ -359,7 +394,7 @@ function buildSheet(job, sheet, labels, frameDir) {
     drift: drift.map((f) => ({ k: f.k, ...f.ownBest })),
   };
   const reasons = [];
-  if (mean < SHEET_MIN) reasons.push(`mean score ${mean.toFixed(3)} < ${SHEET_MIN}`);
+  if (mean < sheetMin) reasons.push(`mean score ${mean.toFixed(3)} < ${sheetMin}`);
   if (min < FRAME_MIN) reasons.push(`frame ${solid.find((f) => f.score === min).k} score ${min.toFixed(3)} < ${FRAME_MIN}`);
   if (faintMin < FAINT_MIN) reasons.push(`faint frame score ${faintMin.toFixed(3)} < ${FAINT_MIN}`);
   if (drift.length) reasons.push(`${drift.length} frame(s) prefer another offset`);
@@ -372,7 +407,7 @@ function buildSheet(job, sheet, labels, frameDir) {
   const H = ogaImg.h * 3;
   const out = new Uint8Array(W * H * 4);
   for (const c of cells) {
-    const file = join(frameDir, `${start + c.k * step + best.shift}.png`);
+    const file = join(frameDir, `${frameOf(c.k, best.shift)}.png`);
     const raw = readRGBA(file);
     const img = best.mirror ? mirrorRaw(raw) : raw;
     const cx = c.x * 3;
@@ -566,8 +601,9 @@ export function overBudget({ w, h }, budget) {
 
 const characterOf = (job) => job.character || job.name;
 
-function main() {
+async function main() {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  sheetMin = Math.max(SHEET_MIN, manifest.minScore ?? 0);
   const results = existsSync(RESULTS) ? JSON.parse(readFileSync(RESULTS, 'utf8')) : {};
   mkdirSync(WORK, { recursive: true });
   const record = (job, sheet, r) => {
@@ -607,8 +643,18 @@ function main() {
       source = join(WORK, `${basename(swf, '.swf')}.${job.name}.${tag}.swf`);
       if (!existsSync(source)) console.log(`  parts: ${swapParts(swf, source, job.parts)} placements swapped`);
     }
+    if (job.state) {
+      const tag = createHash('sha1').update(JSON.stringify(job.state)).digest('hex').slice(0, 8);
+      const stated = join(WORK, `${basename(source, '.swf')}.${job.name}.state-${tag}.swf`);
+      if (!existsSync(stated)) {
+        const r = freezeState(source, stated, job.sprite, job.state);
+        console.log(`  state: ${r.placements} placements frozen (${r.frozen} new sprites), ${r.dropped} hidden${r.missing.length ? `, missing ${r.missing.join(' ')}` : ''}`);
+        if (r.missing.length) throw new Error(`${job.name}: state names not placed in sprite ${job.sprite}: ${r.missing.join(' ')}`);
+      }
+      source = stated;
+    }
     const labels = swfSprites(source).find((s) => s.id === job.sprite)?.labels || [];
-    const frameDir = exportSprite(source, job.sprite, job.zoom ?? 3);
+    const frameDir = await exportSprite(source, job.sprite, job.zoom ?? 3, job.renderer ?? 'png');
     for (const sheet of sheets) {
       const t = Date.now();
       let r;
@@ -655,4 +701,4 @@ function main() {
   writeModule(results);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) await main();
