@@ -91,7 +91,10 @@ export function soundForVerb(classId, verbId, result = {}) {
 
 /**
  * Tool sound loop while a timed verb runs (the server announced the tool's
- * class name, looped, for skill packages and making jobs).
+ * class name, looped, for skill packages and making jobs; trants.js loops
+ * WATERING_CAN and stops it). Verbs without a tool (harvesting a trant,
+ * petting, nibbling, squeezing, milking, massaging) play their sound once
+ * when they finish (soundForVerb; items/include/trants.js announce_sound).
  * @returns {{ key: string, intervalMs: number } | null}
  */
 export function actionLoopFor(classId, verbId) {
@@ -100,12 +103,6 @@ export function actionLoopFor(classId, verbId) {
   if (verb === 'mine') return { key: 'PICK', intervalMs: 620 };
   if (cls === 'wood_tree' && verb === 'harvest') return { key: 'HATCHET', intervalMs: 700 };
   if (verb === 'water' || verb === 'water_all') return { key: 'WATERING_CAN', intervalMs: 900 };
-  if (verb === 'harvest') return { key: 'PET_TRANT', intervalMs: 900 };
-  if (verb === 'massage') return { key: 'BUTTERFLY_LOTION', intervalMs: 600 };
-  if (verb === 'milk') return { key: 'BUTTERFLY_SING', intervalMs: 1100 };
-  if (verb === 'pet' && cls === 'npc_piggy') return { key: 'PET_PIGGY', intervalMs: 1200 };
-  if (verb === 'nibble') return { key: 'ITEM_EAT', intervalMs: 900 };
-  if (verb === 'squeeze') return { key: 'HAPPY_CHICKEN', intervalMs: 900 };
   if (verb === 'smash') return { key: 'PICK', intervalMs: 600 };
   if (verb === 'hoe' || verb === 'clear') return { key: 'HOE', intervalMs: 700 };
   return null;

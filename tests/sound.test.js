@@ -170,6 +170,10 @@ describe('sound moments', () => {
     assert.equal(actionLoopFor('wood_tree', 'harvest').key, 'HATCHET');
     assert.equal(actionLoopFor('trant_egg', 'water').key, 'WATERING_CAN');
     assert.equal(actionLoopFor('npc_piggy', 'talk_to'), null);
+    // No tool, no loop: these play their sound once when they finish.
+    for (const [cls, verb] of [['trant_fruit', 'harvest'], ['trant_bean', 'harvest'], ['npc_piggy', 'pet'], ['npc_piggy', 'nibble'], ['npc_chicken', 'squeeze'], ['npc_butterfly', 'milk'], ['npc_butterfly', 'massage']]) {
+      assert.equal(actionLoopFor(cls, verb), null, `${cls} ${verb}`);
+    }
   });
 
   test('quoins, awards, donations, panels, food and events', () => {
