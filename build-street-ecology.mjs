@@ -10,6 +10,7 @@
 import { readFile, writeFile, access } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isInteriorHub } from './public/js/street-ecology.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const streetIndexPath = join(root, 'public/assets/streets/index.json');
@@ -130,6 +131,9 @@ function furnitureFromLabels(labels) {
  * private Stoot memorial), so the row is emitted with `empty: true` even when
  * no mapped labels are present.
  */
+/** items/quoin.js is labelled "Coin"; older objrefs keep the "Quoin" label. */
+const QUOIN_LABELS = Object.freeze(new Set(['Quoin', 'Coin']));
+
 const CURATED_EMPTY_STREETS = Object.freeze(new Set(['GIFPV9EMLT72DP4']));
 
 const GIANT_ALIASES = Object.freeze({
@@ -208,6 +212,19 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const furnitureCounts = furnitureFromLabels(labels);
   if (Object.keys(furnitureCounts).length) furniture[tsid] = furnitureCounts;
   const ecology = ecologyFromLabels(labels);
+  if (isInteriorHub(meta.hubId)) {
+    // Indoor hubs (street-ecology.js INTERIOR_HUBS): static counts and the
+    // archived quoins only; their spawners are not animals, so none is kept.
+    streets[tsid] = {
+      label: meta.label || tsid,
+      sourceTsid,
+      counts: ecology.counts,
+      ...(ecology.giantId ? { giantId: ecology.giantId } : {}),
+      interior: true,
+      quoins: labels.filter((label) => QUOIN_LABELS.has(label)).length,
+    };
+    continue;
+  }
   if (!Object.keys(ecology.counts).length && !ecology.giantId && !ecology.spawners) continue;
   streets[tsid] = {
     label: meta.label || tsid,

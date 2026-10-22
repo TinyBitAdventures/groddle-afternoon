@@ -611,7 +611,10 @@ function spawnAll(engine) {
   clearSnow();
   if (!engine.street) return publish(engine);
   const inHome = HOME_TSIDS.has(engine.streetTsid);
-  const blocked = engine.transientInstance?.() && !inHome;
+  // Interiors (the Jethimadh Tower Base corridors and rooms) and source-empty
+  // streets (the Stoot memorial, puzzle courses) get no lanterns, eggs or canes.
+  const bare = Boolean(engine.population?.interior || engine.population?.sourceEmpty);
+  const blocked = (engine.transientInstance?.() || bare) && !inHome;
   if (!blocked && !inHome) {
     if (isOn('zilloween')) {
       const points = engine.placement(LANTERN_GROUP) || [];
@@ -1314,7 +1317,8 @@ export const seasonsFeature = {
   },
 
   placementGroups(population, street) {
-    if (!street?.tsid || !engineRef) return [];
+    // Indoor hubs (street-ecology.js INTERIOR_HUBS) and source-empty streets get no street decor.
+    if (!street?.tsid || !engineRef || population?.interior || population?.sourceEmpty) return [];
     refreshSeason(engineRef, true);
     const groups = [];
     if (isOn('zilloween')) groups.push({ key: LANTERN_GROUP, count: lanternCount({ worldW: (street.bounds?.r || 0) - (street.bounds?.l || 0) || 2000 }), clearance: 110 });

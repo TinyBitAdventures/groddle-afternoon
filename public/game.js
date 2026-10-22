@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-13';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-14';
 import {
   actionDurationFor,
   createTimedAction,
@@ -737,7 +737,7 @@ import {
   populationForStreet,
   planStreetPlacements,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=official-ecology-3';
+} from './js/street-ecology.js?v=official-ecology-4';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js';
 import {
   actionLoopFor,

@@ -6,7 +6,7 @@
  * platforms, walls, ladders and the TowerSpot boxes
  * (features/home-tower-feature.js) need nothing here. This file adds what a
  * street JSON cannot carry:
- * - an empty ecology (the tower is all corridor: counts {} like C1-C6);
+ * - an interior ecology (nothing archived: no animals, fruit, Musicblocks or quoins);
  * - the door plaques' painted text ("Way Out", "Tower St South"), drawn from
  *   the decos' signText the way the source's firebog_sign_blank sign_txt was;
  * - each room's key (Room 15 Purple-Orange Circle, Room 8 Teal-Red Hexagon,
@@ -236,11 +236,15 @@ export const towerRoomsFeature = {
     if (typeof slice.keyDay === 'string' && slice.keyDay && !state.keyDays[ROOM_15_TSID]) state.keyDays[ROOM_15_TSID] = slice.keyDay;
   },
 
-  /** The corridors have counts {} in the ecology catalog; so do their rooms. */
+  /**
+   * The rooms are indoors like the corridors (street-ecology.js INTERIOR_HUBS,
+   * hub 77): nothing archived, so no animals, apples, Musicblocks, quoins or
+   * seasonal street decor; their keys, spinach and drinks come from here.
+   */
   ecologyOverride(street) {
     const room = anyTowerRoomByTsid(street?.tsid);
     if (!room) return null;
-    return { label: room.label, sourceTsid: room.sourceTsid, counts: {}, spawners: 1 };
+    return { label: room.label, sourceTsid: room.sourceTsid, counts: {}, interior: true, quoins: 0 };
   },
 
   onStreetEnter(street, engine) {

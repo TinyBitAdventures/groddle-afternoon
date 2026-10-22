@@ -83,6 +83,16 @@ export function turned(sprite, cx, cy, length, thickness, r = 90, extra = {}) {
 
 const flat = (id, x1, x2, y, why, pc = -1) => ({ id: `plat_${id}`, x1, y1: y, x2, y2: y, pc_perm: pc, why });
 
+/**
+ * World kept under each room's lowest floor (as tower-challenge-rooms.js
+ * BELOW_FLOOR): the camera holds the feet ~100 px over the view's bottom and
+ * the pack covers another 132 px, so a room that ends near its floor shows
+ * the page under it. Room 15 runs to y 300 (400 under its floor), the
+ * Ventilation Room 420 under its bottom floor; arrivals and doors keep their
+ * world coordinates (screen space counts from the top-left).
+ */
+const BELOW_FLOOR = 300;
+
 /* ------------------------------------------------------------------ */
 /* Room 15 (LIF1G7Q75312T8B)                                            */
 /* ------------------------------------------------------------------ */
@@ -95,19 +105,21 @@ function buildRoom15() {
     decos.push(...piece.decos);
     return piece;
   };
-  const bounds = { l: -1000, r: 1000, t: -1000, b: 0 };
+  const bounds = { l: -1000, r: 1000, t: -1000, b: BELOW_FLOOR };
 
   // Chamber shell: a corridor section stood taller (frame caps and walls, the
-  // three wood backdrops and their shadow), like a numbered room off C4E.
+  // three wood backdrops and their shadow), like a numbered room off C4E. The
+  // roof stays put; everything that ended at y 0 runs on to the new bottom.
+  const down = BELOW_FLOOR;
   decos.push(
-    { sprite: 'jethimadh_int_bg_left', x: -560, y: -30, w: 900, h: 930, z: 1, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_center', x: 0, y: -24, w: 640, h: 940, z: 2, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_right', x: 560, y: -30, w: 900, h: 930, z: 0, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_int_bg_shadow_50percent', x: 0, y: -40, w: 1960, h: 900, z: 3, r: 0, layer: 'mg' },
-    { sprite: 'jethimadh_frame_cap', x: -760, y: -10, w: 480, h: 980, z: 8, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_frame_cap', x: 760, y: -10, w: 480, h: 980, z: 8, r: 0, flip: true, layer: 'fg' },
+    { sprite: 'jethimadh_int_bg_left', x: -560, y: -30 + down, w: 900, h: 930 + down, z: 1, r: 0, layer: 'mg' },
+    { sprite: 'jethimadh_int_bg_center', x: 0, y: -24 + down, w: 640, h: 940 + down, z: 2, r: 0, layer: 'mg' },
+    { sprite: 'jethimadh_int_bg_right', x: 560, y: -30 + down, w: 900, h: 930 + down, z: 0, r: 0, layer: 'mg' },
+    { sprite: 'jethimadh_int_bg_shadow_50percent', x: 0, y: -40 + down, w: 1960, h: 900 + down, z: 3, r: 0, layer: 'mg' },
+    { sprite: 'jethimadh_frame_cap', x: -760, y: -10 + down, w: 480, h: 980 + down, z: 8, r: 0, layer: 'fg' },
+    { sprite: 'jethimadh_frame_cap', x: 760, y: -10 + down, w: 480, h: 980 + down, z: 8, r: 0, flip: true, layer: 'fg' },
     { sprite: 'jethimadh_frame_wall', x: 0, y: -958, w: 1060, h: 42, z: 8, r: 0, layer: 'fg' },
-    { sprite: 'jethimadh_frame_wall', x: 0, y: -10, w: 1060, h: 42, z: 8, r: 0, layer: 'fg' },
+    { sprite: 'jethimadh_frame_wall', x: 0, y: -10 + down, w: 1060, h: 42, z: 8, r: 0, layer: 'fg' },
   );
 
   // Floor: two steps pieces meeting in a dip (the corridors' floor art), joined in the middle.
@@ -143,8 +155,8 @@ function buildRoom15() {
   // Ceiling and end walls.
   platforms.push(flat('r15_ceiling', -960, 960, -965, 'Chamber roof (solid from below).', 1));
   const barriers = [
-    { id: 'wall_r15_left', x: -968, y: -1000, h: 1000, pc_perm: null, why: 'Chamber end.' },
-    { id: 'wall_r15_right', x: 968, y: -1000, h: 1000, pc_perm: null, why: 'Chamber end.' },
+    { id: 'wall_r15_left', x: -968, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
+    { id: 'wall_r15_right', x: 968, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
   ];
 
   // Lanterns, two columns and the door plaque (the corridors' furniture).
@@ -192,7 +204,7 @@ function buildRoom15() {
 
 /** The vertical span: C6's door near the top, C4's at mid height, Tower St South at the bottom. */
 export const VENT = Object.freeze({
-  bounds: Object.freeze({ l: -750, r: 750, t: -2900, b: 2700 }),
+  bounds: Object.freeze({ l: -750, r: 750, t: -2900, b: 3000 }),
   inner: 620,
   c6Floor: -2540,
   c4Floor: 240,
@@ -213,11 +225,14 @@ function buildVent() {
   // Shaft shell: a corridor turned on end. The frame cap's curve closes the
   // top and bottom; frame walls run down both sides; the wood backdrops are
   // turned 90 degrees so the grain runs up the shaft.
+  // The bottom cap sits under the view (bounds.b, 420 px below the floor), so
+  // the backdrop runs on under the floor like Rooms 4, 8 and 16.
+  const sink = bounds.b - 2700;
   decos.push(
     turned('jethimadh_frame_cap', 0, -2540, 720, 1300, 90, { z: 8, layer: 'fg' }),
-    turned('jethimadh_frame_cap', 0, 2310, 720, 1300, -90, { z: 8, layer: 'fg' }),
+    turned('jethimadh_frame_cap', 0, 2310 + sink, 720, 1300, -90, { z: 8, layer: 'fg' }),
   );
-  for (let y = -1900; y <= 1900; y += 760) {
+  for (let y = -1900; y <= 1900 + sink; y += 760) {
     decos.push(turned('jethimadh_frame_wall', -630, y, 1000, 42, 90, { z: 8, layer: 'fg' }));
     decos.push(turned('jethimadh_frame_wall', 630, y, 1000, 42, 90, { z: 8, layer: 'fg' }));
   }
@@ -228,8 +243,8 @@ function buildVent() {
     decos.push(turned('jethimadh_int_bg_center', 0, y, 900, 1300, n % 2 ? -90 : 90, { z: 2 + (n % 2), layer: 'mg' }));
     n += 1;
   }
-  decos.push(turned('jethimadh_int_bg_right', 0, 2200, 1000, 1250, 90, { z: 1, layer: 'mg' }));
-  decos.push(turned('jethimadh_int_bg_shadow_50percent', 0, 0, 5500, 1240, 90, { z: 5, layer: 'mg' }));
+  decos.push(turned('jethimadh_int_bg_right', 0, 2200 + sink, 1000 + sink, 1250, 90, { z: 1, layer: 'mg' }));
+  decos.push(turned('jethimadh_int_bg_shadow_50percent', 0, sink / 2, 5500 + sink, 1240, 90, { z: 5, layer: 'mg' }));
 
   // Doors: two "Way Out" doors on right-hand ledges and Tower St South at the bottom.
   const c6Why = 'Arrival 400,-2540 from Corridor Six door_1304678594671 (archived). W: "Exits to C6W (labeled \'Way Out\')"; F 8885 "nothing in the dark space above the uppermost exit door".';
@@ -322,7 +337,7 @@ function buildVent() {
     route: route.map((p) => ({ left: p.left, right: p.right, top: p.top, low: p.low })),
     why: {
       room: 'W: three hidden locations ([9]-[11]), "Exits to C6W (labeled \'Way Out\'), C4 (also labeled \'Way Out\'), and Tower St South. BRING SPINACH." G: "a high vertical shaft".',
-      size: 'The archived arrivals put C6\'s door at y -2540 and C4\'s at +240 (2780 px apart); F calls C4 "the mid-height Way Out", so the shaft runs as far again below it to the street exit (t -2900, b 2700). 1500 wide like the archived vertical streets (l -750, r 750).',
+      size: 'The archived arrivals put C6\'s door at y -2540 and C4\'s at +240 (2780 px apart); F calls C4 "the mid-height Way Out", so the shaft runs as far again below it to the street exit (t -2900, floor 2600; the world runs to b 3000 so the view never shows past the bottom). 1500 wide like the archived vertical streets (l -750, r 750).',
     },
   };
 }

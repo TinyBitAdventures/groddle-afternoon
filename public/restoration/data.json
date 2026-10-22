@@ -1409,9 +1409,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 258,
+  "commits": 259,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Craftybot, the crafting robot delivered to your home"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1526,14 +1531,9 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Groddle Forest no longer plays the Goodnight Groddle lullaby, and Musicblock cards drop the restoration count"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Award cards no longer show raw item-link markup"
    }
   ]
  },
- "tests": 165,
+ "tests": 166,
  "generatedAt": "2026-10-22"
 }

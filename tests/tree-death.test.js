@@ -43,7 +43,7 @@ import { createPlot, killPlotTree, performPlotVerb, growTree } from '../public/j
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { FEATURES } from '../public/js/features/index.js';
 import { adoptedPlan } from '../public/js/features/patches-feature.js';
-import { patchesFeature } from '../public/js/features/patches-feature.js?v=patches-3';
+import { patchesFeature } from '../public/js/features/patches-feature.js?v=patches-4';
 import {
   decorateTreeVerbs,
   streetTreeIndex,

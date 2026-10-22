@@ -227,8 +227,9 @@ describe('rebuilt tower rooms: the secret spots', () => {
   });
 
   it('spot 10: a platform on the left about three quarters up; spot 11: on the left just under the middle door', () => {
-    const { t, b } = VENT.bounds;
-    const up = (y) => (b - y) / (b - t);
+    // Heights from the shaft's bottom floor (the world runs on below it, out of reach).
+    const { t } = VENT.bounds;
+    const up = (y) => (VENT.floor - y) / (VENT.floor - t);
     const s10 = vent.spots.find((x) => x.id === 'TowerSpot_10');
     const s11 = vent.spots.find((x) => x.id === 'TowerSpot_11');
     assert.ok(up(s10.y) > 0.66 && up(s10.y) < 0.85, `spot 10 at ${up(s10.y)}`);
@@ -291,8 +292,8 @@ describe('rebuilt tower rooms: the secret spots', () => {
 });
 
 describe('tower-rooms feature', () => {
-  it('gives the rooms the corridors\' empty ecology and leaves other streets alone', () => {
-    assert.deepEqual(towerRoomsFeature.ecologyOverride({ tsid: VENT_ROOM_TSID }), { label: 'Ventilation Room', sourceTsid: 'LIF102JCHL027DO', counts: {}, spawners: 1 });
+  it('gives the rooms an interior ecology like the corridors and leaves other streets alone', () => {
+    assert.deepEqual(towerRoomsFeature.ecologyOverride({ tsid: VENT_ROOM_TSID }), { label: 'Ventilation Room', sourceTsid: 'LIF102JCHL027DO', counts: {}, interior: true, quoins: 0 });
     assert.equal(towerRoomsFeature.ecologyOverride({ tsid: ROOM_15_TSID }).label, 'Room 15');
     assert.equal(towerRoomsFeature.ecologyOverride({ tsid: 'GTJ10K7P3812R8F' }), null);
   });

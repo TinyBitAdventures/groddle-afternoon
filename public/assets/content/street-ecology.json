@@ -7451,19 +7451,22 @@
       "label": "Corridor Two",
       "sourceTsid": "LIF1Q3IQM7122SP",
       "counts": {},
-      "spawners": 1
+      "interior": true,
+      "quoins": 7
     },
     "GIF1Q48RM712F87": {
       "label": "Corridor Three",
       "sourceTsid": "LIF1Q48RM712F87",
       "counts": {},
-      "spawners": 1
+      "interior": true,
+      "quoins": 3
     },
     "GIF1QBNPP7123J0": {
       "label": "Corridor One",
       "sourceTsid": "LIF1QBNPP7123J0",
       "counts": {},
-      "spawners": 1
+      "interior": true,
+      "quoins": 0
     },
     "GIF1SGGD7EU12T5": {
       "label": "Lentua Lane",
@@ -11108,7 +11111,8 @@
       "label": "Corridor Four",
       "sourceTsid": "LTJ10K7P3812R8F",
       "counts": {},
-      "spawners": 1
+      "interior": true,
+      "quoins": 0
     },
     "GTJ10KOCHTU1N89": {
       "label": "Lemmen Connect",
@@ -11125,13 +11129,15 @@
       "label": "Corridor Five",
       "sourceTsid": "LTJ10M515812V0C",
       "counts": {},
-      "spawners": 1
+      "interior": true,
+      "quoins": 5
     },
     "GTJ110817812KO4": {
       "label": "Corridor Six",
       "sourceTsid": "LTJ110817812KO4",
       "counts": {},
-      "spawners": 1
+      "interior": true,
+      "quoins": 5
     },
     "GTJ112E9DIO1BPE": {
       "label": "Leeteg",

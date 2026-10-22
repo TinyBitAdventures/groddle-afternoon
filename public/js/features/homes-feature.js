@@ -97,7 +97,7 @@ import { towerApi } from './home-tower-feature.js?v=home-tower-2';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-1';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-2';
-import { patchesFeature } from './patches-feature.js?v=patches-3';
+import { patchesFeature } from './patches-feature.js?v=patches-4';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import { textureFromUrl } from '../textures.js';
 

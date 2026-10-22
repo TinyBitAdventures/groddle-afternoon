@@ -3,7 +3,24 @@
  * placement on recovered locations-xml platforms.
  */
 
-export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-3';
+export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-4';
+
+/**
+ * Interior hubs: every street in them is indoors, and their archived item
+ * lists hold no animals, fruit or Musicblocks. Jethimadh Tower: Base (hub 77,
+ * inc_data_maps_prod.js) is six corridors whose objrefs are Quoins (labelled
+ * "Quoin" or "Coin", the same quoin class), a Qurazy marker and one spawner
+ * each; the Glitch Forever wiki has those spawners dropping keys and drinks
+ * (C3's key, C5's Cloud 11 Smoothies, C6's Slow Gin Fizz), never animals.
+ * build-street-ecology.mjs marks their rows `interior: true` with the archived
+ * quoin count; populationForStreet then keeps only the exact static counts.
+ * Rows a feature builds for rebuilt rooms (tower-rooms-feature) do the same.
+ */
+export const INTERIOR_HUBS = Object.freeze({ 77: 'Jethimadh Tower: Base' });
+
+export function isInteriorHub(hubId) {
+  return hubId != null && hubId !== '' && Object.prototype.hasOwnProperty.call(INTERIOR_HUBS, String(hubId));
+}
 
 /** @type {{source?:string, sourceSnapshot?:string, streetCount?:number, streets:Record<string, any>}} */
 let catalog = { streets: {} };
@@ -165,6 +182,33 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     };
   }
   const counts = entry?.counts || {};
+  if (entry?.interior === true) {
+    // Indoors: exactly what the archived row lists, no spawner-inferred
+    // animals, no fallback scenery, no ambient apples or Musicblocks, and the
+    // archived quoin count instead of the outdoor eight.
+    const butterflies = Math.min(whole(counts.npc_butterfly), 3);
+    return {
+      source: 'tinyspeck-locations-xml',
+      sourceTsid: entry.sourceTsid || null,
+      interior: true,
+      giantId: entry.giantId || null,
+      piggies: Math.min(whole(counts.npc_piggy), 6),
+      chickens: Math.min(whole(counts.npc_chicken), 3),
+      butterflies,
+      flyingButterflies: butterflies,
+      treeClasses: expandClasses(counts, TREE_CLASSES, 8),
+      rockClasses: expandClasses(counts, ROCK_CLASSES, 10),
+      gardens: Math.min(whole(counts.garden), 2),
+      vendor: whole(counts.street_spirit) > 0,
+      shrine: !!entry.giantId,
+      apples: 0,
+      musicblocks: 0,
+      quoins: whole(entry.quoins, 0, 40),
+      companions: entry.companions !== false,
+      resourceCounts: resourceCountsFrom(counts),
+      resourceNodeClasses: expandResourceClasses(counts),
+    };
+  }
   const seed = stableEcologyHash(tsid);
   const spawners = whole(entry?.spawners, 0, 8);
   let piggies = Math.min(whole(counts.npc_piggy), 6);

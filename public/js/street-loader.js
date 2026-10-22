@@ -91,6 +91,22 @@ export function resolveIndexTsid(tsid) {
 }
 
 /**
+ * Street JSON written outside import-locations-xml.mjs (the Jethimadh Tower
+ * Base corridors and rebuilt rooms, Towers basements, puzzle and party
+ * streets: 64 files) carries no hubId/hubName, so the location chip fell back
+ * to "Groddle Forest". The index row has the hub from inc_data_maps_prod.js;
+ * fill whichever the JSON lacks (a JSON value always wins).
+ * @param {object} data street JSON (mutated)
+ * @param {{ hubId?: string, hubName?: string }|undefined} meta its index row
+ */
+export function applyIndexHub(data, meta) {
+  if (!data || !meta) return data;
+  if ((data.hubId == null || data.hubId === '') && meta.hubId != null && meta.hubId !== '') data.hubId = String(meta.hubId);
+  if (!data.hubName && meta.hubName) data.hubName = meta.hubName;
+  return data;
+}
+
+/**
  * @param {string} tsid
  */
 export async function loadStreetData(tsid) {
@@ -103,6 +119,7 @@ export async function loadStreetData(tsid) {
   if (!res.ok) throw new Error(`Failed to load street ${key}: HTTP ${res.status}`);
   const data = await res.json();
   assertStreetGeometry(data);
+  applyIndexHub(data, meta);
   // Hidden signpost connects stay in the JSON (source data) but never show.
   data.signposts = navigableSignposts(data.signposts);
   cache.set(key, data);
@@ -133,6 +150,7 @@ export async function loadStreetDataFromFs(tsid, baseDir) {
   const path = join(baseDir, rel);
   const data = JSON.parse(await readFile(path, 'utf8'));
   assertStreetGeometry(data);
+  applyIndexHub(data, meta);
   data.signposts = navigableSignposts(data.signposts);
   cache.set(key, data);
   return data;
