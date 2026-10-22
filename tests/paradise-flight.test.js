@@ -228,7 +228,7 @@ test('course endings enforce their source objectives and reward once', () => {
 
 test('client ships real ticket art, a flight HUD, and deterministic QA entry', () => {
   const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
-  const html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+  const html = fs.readFileSync(path.join(publicDir, 'play/index.html'), 'utf8');
   const css = fs.readFileSync(path.join(publicDir, 'style.css'), 'utf8');
   for (const course of Object.values(PARADISE_COURSES)) {
     assert.equal(fs.existsSync(path.join(

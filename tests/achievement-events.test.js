@@ -170,7 +170,7 @@ describe('video badge client integration', () => {
 
   it('ships a searchable, filtered, incrementally rendered full badge catalog', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     const style = readFileSync(join(publicRoot, 'style.css'), 'utf8');
     assert.match(html, /id="achieve-search"/);
     assert.match(html, /data-achieve-status="progress"/);
@@ -188,7 +188,7 @@ describe('video badge client integration', () => {
 
   it('wires canonical events, original status prose, Giant rewards, QA state, and cache busting', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     assert.match(game, /worldVerbAchievementCounters\(target\.classId, verbId, result\)/);
     assert.match(game, /makingToolAchievementCounter\(record\.recipe\.tool\)/);
     assert.match(game, /update\.def\.statusText[\s\S]*update\.def\.desc/);

@@ -160,7 +160,7 @@ test('main and Annex expiry are exact and block late progress', () => {
 
 test('client integration uses recovered clean decos, HUD, buoyancy, and deterministic QA', () => {
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
-  const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+  const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'public/style.css'), 'utf8');
   for (const file of [
     'backhill1_blue.png',

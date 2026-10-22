@@ -105,7 +105,7 @@ test.describe('pull-string interaction', () => {
     );
     const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
     const content = fs.readFileSync(path.join(root, 'public/content.js'), 'utf8');
-    const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
     assert.match(game, /function handleStootDollTarget\(/);
     assert.match(game, /function pullPackedStootDoll\(/);
     assert.match(game, /data\.tsid === STOOT_MEMORIAL_STREET_ID/);

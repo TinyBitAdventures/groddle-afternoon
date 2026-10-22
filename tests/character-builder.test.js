@@ -158,7 +158,7 @@ describe('pixel classify + recolor', () => {
 
 describe('UI wiring', () => {
   it('index and game wire avatar builder panel', () => {
-    const html = readFileSync(join(__dirname, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(__dirname, '../public/play/index.html'), 'utf8');
     assert.ok(html.includes('id="avatar-panel"'));
     assert.ok(html.includes('id="avatar-preview"'));
     assert.ok(html.includes('id="avatar-btn"'));

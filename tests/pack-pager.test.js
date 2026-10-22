@@ -55,7 +55,7 @@ test('pack pager advances by whole slots and clamps the final page', () => {
 });
 
 test('pack chrome ships discoverable controls and non-clipping scroll behavior', () => {
-  const html = readFileSync(join(here, '../public/index.html'), 'utf8');
+  const html = readFileSync(join(here, '../public/play/index.html'), 'utf8');
   const css = readFileSync(join(here, '../public/style.css'), 'utf8');
   const game = readFileSync(join(here, '../public/game.js'), 'utf8');
   assert.match(html, /data-pack-pager="items"[\s\S]*?aria-label="Previous items"/);

@@ -278,7 +278,7 @@ describe('Musicblock game integration', () => {
   it('wires pack action, local audio, ambient ducking, world drops, and collection UI', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     const content = readFileSync(join(publicRoot, 'content.js'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     assert.match(game, /data-pack-play/);
     assert.match(game, /playPackMusicblock/);
     assert.match(game, /playMusicblockAudio/);

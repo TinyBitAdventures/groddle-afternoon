@@ -95,7 +95,7 @@ test('the three source words solve in order and finish the puzzle', () => {
 test('client ships the clean room, original block art, verbs, HUD, and deterministic QA route', () => {
   const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
   const content = fs.readFileSync(path.join(publicDir, 'content.js'), 'utf8');
-  const html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+  const html = fs.readFileSync(path.join(publicDir, 'play/index.html'), 'utf8');
   const css = fs.readFileSync(path.join(publicDir, 'style.css'), 'utf8');
 
   for (const letter of ['A', 'B', 'E', 'M', 'S', 'T']) {

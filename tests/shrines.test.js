@@ -143,7 +143,7 @@ describe('shrine official art and client wiring', () => {
   it('wires shrine verbs, panel, world spawning, animation, and persistence', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     const content = readFileSync(join(publicRoot, 'content.js'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     assert.match(content, /classId\.startsWith\('npc_shrine_'\)/);
     assert.match(game, /spawnShrine/);
     assert.match(game, /playShrineDonation/);

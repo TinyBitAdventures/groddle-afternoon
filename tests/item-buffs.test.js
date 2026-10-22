@@ -175,7 +175,7 @@ describe('buff save and client wiring', () => {
 
   it('wires pack actions, honest effects panel, HUD strip, physics, QA, and cache versions', () => {
     const game = readFileSync(join(root, 'game.js'), 'utf8');
-    const html = readFileSync(join(root, 'index.html'), 'utf8');
+    const html = readFileSync(join(root, 'play/index.html'), 'utf8');
     const css = readFileSync(join(root, 'style.css'), 'utf8');
     assert.match(game, /activateBuffItem\(buffState, inv, pc/);
     assert.match(game, /tickBuffs\(buffState, pc/);

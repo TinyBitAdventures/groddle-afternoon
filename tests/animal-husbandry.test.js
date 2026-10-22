@@ -371,7 +371,7 @@ describe('Animal husbandry wiring', () => {
   it('registers the feature, the picker count step, the event emits, and the unskipped machine recipes', () => {
     const index = readFileSync(join(publicDir, 'js/features/index.js'), 'utf8');
     assert.match(index, /animalHusbandryFeature/);
-    const html = readFileSync(join(publicDir, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicDir, 'play/index.html'), 'utf8');
     assert.match(html, /id="feed-picker-qty"/);
     const game = readFileSync(join(publicDir, 'game.js'), 'utf8');
     assert.match(game, /animal_max_reward:\$\{target\.classId\}/);

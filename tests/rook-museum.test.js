@@ -96,7 +96,7 @@ test('the source-authored Focusing Orb lesson retains its overload warning', () 
 test('client ships clean recovered museum art and full transient integration', () => {
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   const content = fs.readFileSync(path.join(root, 'public/content.js'), 'utf8');
-  const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+  const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'public/style.css'), 'utf8');
   const assetRoot = path.join(root, 'public/assets/sprites/quests/rook-museum');
 

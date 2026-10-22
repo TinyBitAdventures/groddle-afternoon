@@ -321,7 +321,7 @@ describe('plot lifecycle clean → plant → water → grow → harvest → clea
 
 describe('UI wiring for garden', () => {
   it('game/content expose on-map garden_plot interaction + assets', () => {
-    const html = readFileSync(join(__dirname, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(__dirname, '../public/play/index.html'), 'utf8');
     assert.ok(html.includes('id="garden-panel"') || html.includes('garden-panel'));
     const game = readFileSync(join(__dirname, '../public/game.js'), 'utf8');
     assert.ok(game.includes('spawnGarden') || game.includes('garden_new'));

@@ -121,7 +121,7 @@ describe('Incantations of Absurdity Feat', () => {
 describe('Feat client integration', () => {
   it('ships the recovered client Feat badge and local chat panel wiring', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     const css = readFileSync(join(publicRoot, 'style.css'), 'utf8');
     assert.match(game, /submitIncantation\(featState, text, participant/);
     assert.match(game, /'feats:contributed'/);

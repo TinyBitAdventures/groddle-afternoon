@@ -58,7 +58,7 @@ describe('world action timing', () => {
 
   it('is wired into the world verb menu, ticker, input lock, and progress HUD', () => {
     const game = readFileSync(join(here, '../public/game.js'), 'utf8');
-    const html = readFileSync(join(here, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(here, '../public/play/index.html'), 'utf8');
     const css = readFileSync(join(here, '../public/style.css'), 'utf8');
     assert.match(game, /beginVerbAction\(target, v\)/);
     assert.match(game, /updateCurrentAction\(\(1000 \/ 60\) \* dt\)/);

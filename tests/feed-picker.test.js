@@ -50,7 +50,7 @@ describe('original-style target-item feed picker', () => {
   });
 
   it('ships the compact Feed what dialog with item-grid semantics', () => {
-    const html = readFileSync(join(publicDir, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicDir, 'play/index.html'), 'utf8');
     const css = readFileSync(join(publicDir, 'style.css'), 'utf8');
     assert.match(html, /id="feed-picker"[^>]*role="dialog"[^>]*aria-modal="true"/);
     assert.match(html, /id="feed-picker-title"[^>]*>Feed what\?</);

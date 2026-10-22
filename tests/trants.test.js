@@ -306,7 +306,7 @@ describe('trant harvest (GSJS-extracted)', () => {
   it('wires timed harvest animation, rainbow super FX, deterministic QA, and mute-by-default', () => {
     const game = readFileSync(join(root, 'game.js'), 'utf8');
     const content = readFileSync(join(root, 'content.js'), 'utf8');
-    const html = readFileSync(join(root, 'index.html'), 'utf8');
+    const html = readFileSync(join(root, 'play/index.html'), 'utf8');
     assert.match(content, /durationMs:\s*arbor\.durationMs/);
     assert.match(game, /playTrantHarvestAnimation\(target, durationMs\)/);
     assert.match(game, /function showSuperHarvestFx/);

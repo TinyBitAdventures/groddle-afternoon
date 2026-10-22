@@ -192,7 +192,7 @@ describe('source-authored Emotional Bear', () => {
       assert.equal(existsSync(join(publicRoot, 'assets', 'sprites', 'icons', file)), true, file);
     }
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     const css = readFileSync(join(publicRoot, 'style.css'), 'utf8');
     assert.match(game, /openEmotionalBearPicker/);
     assert.match(game, /upgradePackedEmotionalBear/);

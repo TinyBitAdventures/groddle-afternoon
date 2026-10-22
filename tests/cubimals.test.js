@@ -197,7 +197,7 @@ describe('Cubimal achievements and clean art', () => {
 
   it('wires package use, freedom, deterministic QA, and the cache marker', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     assert.match(game, /function openPackedCubimalBox\(/);
     assert.match(game, /function setPackedCubimalFree\(/);
     assert.match(game, /stat === 'xp' \? 'iMG' : stat/);

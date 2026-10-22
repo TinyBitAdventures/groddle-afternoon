@@ -142,7 +142,7 @@ test('Crusher hits retain source mood math and run-state accounting', () => {
 
 test('client ships recovered Egg art and transient-instance integration', () => {
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
-  const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+  const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'public/style.css'), 'utf8');
   const egg = path.join(
     root,

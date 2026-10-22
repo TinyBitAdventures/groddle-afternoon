@@ -27,7 +27,7 @@ test.describe('responsive chrome polish', () => {
   });
 
   test('ships a static boot cover and removes it only after initialization', () => {
-    const html = fs.readFileSync(path.join(publicRoot, 'index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(publicRoot, 'play/index.html'), 'utf8');
     const css = fs.readFileSync(path.join(publicRoot, 'style.css'), 'utf8');
     const game = fs.readFileSync(path.join(publicRoot, 'game.js'), 'utf8');
     assert.match(html, /<body class="is-booting">/);

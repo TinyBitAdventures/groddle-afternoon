@@ -133,7 +133,7 @@ describe('playable home and mailbox integration', () => {
   it('ships the home deed, map teleport, physical mailbox, and mail UI', () => {
     const root = join(import.meta.dirname, '..', 'public');
     const game = readFileSync(join(root, 'game.js'), 'utf8');
-    const html = readFileSync(join(root, 'index.html'), 'utf8');
+    const html = readFileSync(join(root, 'play/index.html'), 'utf8');
     const css = readFileSync(join(root, 'style.css'), 'utf8');
     const content = readFileSync(join(root, 'content.js'), 'utf8');
     assert.match(game, /async function teleportHome/);

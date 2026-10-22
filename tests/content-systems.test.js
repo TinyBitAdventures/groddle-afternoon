@@ -264,7 +264,7 @@ describe('skills + buffs on mined catalogs', () => {
 
 describe('client wiring artifacts', () => {
   it('index.html has panels and buttons for all four systems', () => {
-    const html = readFileSync(join(__dirname, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(__dirname, '../public/play/index.html'), 'utf8');
     for (const id of [
       'quest-panel',
       'achieve-panel',

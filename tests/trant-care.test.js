@@ -217,7 +217,7 @@ test.describe('living-trant world and client integration', () => {
 
   test('wires dynamic duration, cancellable animation, QA, condition, and mute default', () => {
     const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
-    const html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(publicDir, 'play/index.html'), 'utf8');
     assert.match(game, /function playWateringCanAnimation\(target, durationMs = 0\)/);
     assert.match(game, /watering-can-tool\.png/);
     assert.match(game, /Number\.isFinite\(verb\.durationMs\)/);

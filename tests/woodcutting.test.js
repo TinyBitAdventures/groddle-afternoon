@@ -146,7 +146,7 @@ test.describe('Wood Tree client integration', () => {
 
   test('wires maturity visuals, animation, deterministic QA, saves, and mute-by-default', () => {
     const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
-    const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
     assert.match(game, /function textureForWoodTree\(maturity\)/);
     assert.match(game, /function refreshWoodTreeVisual\(target\)/);
     assert.match(game, /function playHatchetAnimation\(target\)/);

@@ -144,7 +144,7 @@ describe('quoin client integration', () => {
   it('ships the complete official sheet and wires animated rewards, persistence, and HUD state', () => {
     assert.ok(existsSync(join(publicRoot, QUOIN_SHEET.url)));
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     assert.match(game, /new PIXI\.AnimatedSprite\(frames\)/);
     assert.match(game, /collectQuoin\(quoinState/);
     assert.match(game, /applyQuestProgress\(questState, 'quoins_collected'/);

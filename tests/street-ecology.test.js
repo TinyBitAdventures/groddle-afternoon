@@ -176,7 +176,7 @@ describe('one-pass platform placement', () => {
 describe('runtime wiring', () => {
   it('loads source ecology before entering and exposes deterministic QA evidence', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     const generator = readFileSync(join(__dirname, '../build-street-ecology.mjs'), 'utf8');
     assert.match(game, /loadStreetEcologyCatalog/);
     assert.match(game, /populationForStreet/);

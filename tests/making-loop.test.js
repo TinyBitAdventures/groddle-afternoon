@@ -401,7 +401,7 @@ describe('consume craft outputs', () => {
 
 describe('UI wiring', () => {
   it('index/game wire making panel, tool chips, and activity feed', () => {
-    const html = readFileSync(join(__dirname, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(__dirname, '../public/play/index.html'), 'utf8');
     assert.ok(html.includes('id="make-panel"'));
     assert.ok(html.includes('id="make-btn"'));
     assert.ok(html.includes('id="make-tools"'));

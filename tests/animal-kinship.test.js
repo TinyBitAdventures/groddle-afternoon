@@ -336,7 +336,7 @@ describe('verb and live-client integration', () => {
   it('ships deterministic rank/failure QA, result attributes, and fresh cache wiring', () => {
     const game = readFileSync(join(publicDir, 'game.js'), 'utf8');
     const content = readFileSync(join(publicDir, 'content.js'), 'utf8');
-    const html = readFileSync(join(publicDir, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicDir, 'play/index.html'), 'utf8');
     assert.match(game, /bootParams\.has\('animaldemo'\)/);
     assert.match(game, /bootParams\.get\('animalrank'\)/);
     assert.match(game, /bootParams\.get\('animalroll'\)|get\('animalroll'\)/);

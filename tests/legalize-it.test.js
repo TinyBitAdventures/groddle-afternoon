@@ -128,7 +128,7 @@ test('purchase costs 50 currants and activation is a separate pack action', () =
 test('client integration ships recovered clean quest art and a playable route', () => {
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   const content = fs.readFileSync(path.join(root, 'public/content.js'), 'utf8');
-  const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+  const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
   const css = fs.readFileSync(path.join(root, 'public/style.css'), 'utf8');
   const spriteRoot = path.join(root, 'public/assets/sprites/quests/legalize');
 

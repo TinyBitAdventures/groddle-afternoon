@@ -191,7 +191,7 @@ describe('tool save and client wiring', () => {
     }
     const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
     const css = fs.readFileSync(path.join(publicDir, 'style.css'), 'utf8');
-    const html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(publicDir, 'play/index.html'), 'utf8');
     assert.match(game, /beginToolRepair/);
     assert.match(game, /toolremaining/);
     assert.match(game, /pack-slot-wear/);

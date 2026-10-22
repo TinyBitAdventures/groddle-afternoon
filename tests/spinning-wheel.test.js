@@ -176,7 +176,7 @@ test.describe('shrine source and client integration', () => {
     }
     const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
     const content = fs.readFileSync(path.join(root, 'public/content.js'), 'utf8');
-    const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(root, 'public/play/index.html'), 'utf8');
     assert.match(game, /function useGameshowTicket\(/);
     assert.match(game, /function updateSpinningWheel\(/);
     const soundKeys = fs.readFileSync(path.join(root, 'public/js/sound-keys.js'), 'utf8');

@@ -15,7 +15,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const game = readFileSync(join(here, '../public/game.js'), 'utf8');
-const html = readFileSync(join(here, '../public/index.html'), 'utf8');
+const html = readFileSync(join(here, '../public/play/index.html'), 'utf8');
 const css = readFileSync(join(here, '../public/style.css'), 'utf8');
 const content = readFileSync(join(here, '../public/content.js'), 'utf8');
 const quoins = readFileSync(join(here, '../public/js/quoins.js'), 'utf8');

@@ -1,816 +1,168 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Groddle Afternoon</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-2" />
-  <script src="vendor/pixi/pixi-8.22.0.min.js"></script>
+  <meta name="description" content="Groddle Afternoon is a fan remake of Tiny Speck's Glitch that runs in your browser, rebuilt from the art, music and code Tiny Speck gave to the public domain." />
+  <script>
+    // Old game links and QA routes (/?autostart=1...) open the game at /play/.
+    if (location.search) location.replace('play/' + location.search + location.hash);
+  </script>
+  <link rel="stylesheet" href="restoration/restoration.css" />
+  <link rel="stylesheet" href="landing/landing.css" />
   <link rel="icon" href="favicon.svg?v=quoin" type="image/svg+xml" />
   <link rel="icon" href="favicon.ico?v=quoin" sizes="32x32" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=quoin" />
 </head>
-<body class="is-booting">
-  <div id="wrap" class="glitch-chrome">
-    <div id="boot-loader" class="boot-loader" role="status" aria-live="polite">
-      <div class="boot-loader-card">
-        <img src="assets/sprites/trants/frames/trant_bubble_m3.png" alt="" />
+<body class="landing">
+  <nav class="topnav" aria-label="Site">
+    <div class="wrap topnav-row">
+      <a class="wordmark" href="./"><img src="favicon.svg?v=quoin" alt="" width="28" height="28" />Groddle Afternoon</a>
+      <div class="topnav-links">
+        <a href="restoration/">Restoration</a>
+        <a href="compare/">Compare</a>
+        <a href="#development">Development</a>
+        <a class="btn btn-small" href="play/">Play</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="kicker">A fan remake of Glitch (2009 to 2012)</p>
+        <h1>Groddle Afternoon</h1>
+        <p class="lead">
+          Tiny Speck's Glitch was a gentle, funny world made of imagination: you squeezed chickens, petted piggies,
+          talked to trees and found quoins floating over the streets of Ur. It closed in December 2012. Tiny Speck
+          gave its art, music and code to the public domain, and Groddle Afternoon puts them back together in your browser.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-play" href="play/">Play in your browser</a>
+          <a class="btn btn-quiet" href="restoration/">See what's been restored</a>
+        </div>
+        <p class="hero-note">Free, no account. Plays on a computer with a keyboard, and your game saves in this browser.</p>
+      </div>
+      <a class="hero-shot" href="play/" aria-label="Play Groddle Afternoon">
+        <img src="landing/hero.webp" width="1600" height="977" alt="The game on Hechey Track in Groddle Forest: a Glitch with silver hair beside an herb garden, a piggy, a butterfly and a fruit tree." />
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section class="band numbers" aria-labelledby="numbers-h">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="numbers-h">How much of Ur is back</h2>
+          <a class="more" href="restoration/">Full restoration report</a>
+        </div>
+        <ul class="stat-grid" id="stats" aria-live="polite">
+          <li class="stat"><span class="stat-num" data-stat="systems">52 of 55</span><span class="stat-label">game systems playable</span></li>
+          <li class="stat"><span class="stat-num" data-stat="quests">193</span><span class="stat-label">quests you can play</span></li>
+          <li class="stat"><span class="stat-num" data-stat="rooms">21 of 21</span><span class="stat-label">private quest rooms rebuilt</span></li>
+          <li class="stat"><span class="stat-num" data-stat="streets">1,368</span><span class="stat-label">streets of the world map</span></li>
+          <li class="stat"><span class="stat-num" data-stat="skills">97 of 105</span><span class="stat-label">skills to learn</span></li>
+          <li class="stat"><span class="stat-num" data-stat="sounds">367</span><span class="stat-label">sounds from the original game</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band band-alt" aria-labelledby="todo-h">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="todo-h">Things to do in Ur</h2>
+        </div>
+        <ul class="todo-grid">
+          <li class="todo">
+            <img src="restoration/shots/gardens.webp" width="960" height="409" loading="lazy" alt="A crop garden on Hechey Track with piggies and a fruit tree." />
+            <h3>Grow, harvest and cook</h3>
+            <p>Plant crop gardens, water trants, milk butterflies, then turn it all into meals on a stove or a grill.</p>
+          </li>
+          <li class="todo">
+            <img src="restoration/shots/mining.webp" width="960" height="409" loading="lazy" alt="A Glitch swings a pick at a rock." />
+            <h3>Mine, make and build</h3>
+            <p>Swing a pick, smelt metal, assemble machines and help build new streets through hundreds of street projects.</p>
+          </li>
+          <li class="todo">
+            <img src="restoration/shots/room-esquibeth.webp" width="960" height="409" loading="lazy" alt="A quiet scene from The Last Pilgrimage of Esquibeth." />
+            <h3>Quests and secret rooms</h3>
+            <p>Story quests from the Magic Rock, all 21 private quest rooms and pilgrimages, rebuilt from the original rules.</p>
+          </li>
+          <li class="todo">
+            <img src="restoration/shots/rooks.webp" width="960" height="409" loading="lazy" alt="The Rook darkens the sky over a street." />
+            <h3>Fight off the Rook</h3>
+            <p>When the Rook attacks, prime the shrines, stun it with a Focusing Orb and nurse the street back to life.</p>
+          </li>
+          <li class="todo">
+            <img src="restoration/shots/paradise.webp" width="960" height="409" loading="lazy" alt="Flying through Radial Heights in Paradise." />
+            <h3>Paradise and races</h3>
+            <p>Fly through Cloud Rings and Radial Heights, slide down Slip 'N Slide and race the Great Hog Haul.</p>
+          </li>
+          <li class="todo">
+            <img src="restoration/shots/homes.webp" width="960" height="409" loading="lazy" alt="A Glitch's home street with a house." />
+            <h3>A home of your own</h3>
+            <p>Claim a house, decorate it and raise a tower up to nine floors. Dress your Glitch from 626 pieces of the original wardrobe.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" id="development" aria-labelledby="dev-h">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="dev-h">Follow the development</h2>
+        </div>
+        <p class="section-lead">
+          Every rule comes from Tiny Speck's own server code where it survives. Where it doesn't, the quest rooms and
+          streets are rebuilt from players' recordings, the community wiki and archived pages, and each of those
+          rebuilds says so in the restoration report.
+        </p>
+        <div class="dev-grid">
+          <a class="dev-card" href="restoration/">
+            <span class="dev-kicker">Restoration report</span>
+            <span class="dev-title">Every system, checked off as it lands</span>
+            <span class="dev-text">Walk a street and click anything on it, browse every system by status, and see what can't come back.</span>
+          </a>
+          <a class="dev-card" href="compare/">
+            <span class="dev-kicker">Compare</span>
+            <span class="dev-title">Other Glitch remakes, side by side</span>
+            <span class="dev-text">Children of Ur, Eleven and Odd Giants, with what each one has brought back and how to play it.</span>
+          </a>
+          <div class="dev-card dev-log">
+            <span class="dev-kicker">Recently restored</span>
+            <ul class="log-list" id="log-list">
+              <li>The game runs on Pixi 8.22.0</li>
+            </ul>
+            <span class="dev-text" id="log-meta"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-alt solo-note" aria-labelledby="honest-h">
+      <div class="wrap solo-grid">
         <div>
-          <strong id="boot-loader-title">Loading Groddle Afternoon</strong>
-          <span id="boot-loader-copy">Gathering a little scrap of Ur…</span>
+          <h2 id="honest-h">One Glitch at a time, for now</h2>
+          <p class="section-lead">
+            Glitch was a world you shared. Groddle Afternoon plays on your own: races, Game of Crowns, parties and
+            street projects come with rival and helper Glitches instead of other players. Auctions, chat and groups were
+            all about other people, so they aren't here yet, and the restoration report lists each one plainly.
+          </p>
         </div>
+        <a class="btn btn-play" href="play/">Play Groddle Afternoon</a>
       </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p>Glitch was made by Tiny Speck. Its art, music and code are CC0 (public domain), and every picture and sound in the game comes from that release or is drawn fresh from it.</p>
+      <p>Groddle Afternoon is a fan remake, not made by or affiliated with Tiny Speck or Slack, and it uses no Glitch logo.</p>
+      <p><a href="play/">Play</a> · <a href="restoration/">Restoration report</a> · <a href="compare/">Other remakes</a> · <a href="changelog.html">Build archive</a></p>
     </div>
-    <!-- Top bar: metabolics + tools (Glitch-inspired) -->
-    <header class="top-bar">
-      <div class="brand">
-        <span class="brand-mark">Ur</span>
-        <span class="brand-sub">Groddle Afternoon</span>
-      </div>
-      <div class="metabolics-cluster">
-        <div class="meta-pill mood">
-          <span class="meta-ico">☺</span>
-          <span class="meta-label">Mood</span>
-          <div class="meta-ring"><div id="bar-mood" class="meta-fill"></div></div>
-        </div>
-        <div class="meta-pill energy">
-          <span class="meta-ico">⚡</span>
-          <span class="meta-label">Energy</span>
-          <div class="meta-ring"><div id="bar-energy" class="meta-fill"></div></div>
-        </div>
-        <div id="level-meter" class="level-meter" role="meter" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <span class="level-label">Level <strong id="stat-level">5</strong></span>
-          <div class="level-track" aria-hidden="true"><i id="bar-level"></i></div>
-          <span id="stat-xp" class="level-xp">0 / 0 XP</span>
-        </div>
-        <div class="meta-stat">iMG <strong id="stat-img">0</strong></div>
-        <div class="meta-stat currants">
-          <span class="currant-coin">◎</span>
-          <strong id="stat-currants">0</strong>
-        </div>
-        <div id="quoin-stat" class="meta-stat quoin-stat" role="status" aria-label="0 of 100 quoins collected today. Multiplier 1.">
-          <span aria-hidden="true">◉</span> <strong>0/100</strong><small>×1</small>
-        </div>
-      </div>
-      <div class="top-actions">
-        <button id="quest-btn" type="button" class="chrome-btn" title="Quests (Q)">Quests</button>
-        <button id="make-btn" type="button" class="chrome-btn" title="Making (C)">Make</button>
-        <button id="map-btn" type="button" class="chrome-btn" title="Map (G)">Map</button>
-        <button id="study-chip" type="button" class="chrome-btn is-studying" hidden>Study</button>
-        <div class="more-menu">
-          <button id="more-btn" type="button" class="chrome-btn more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="more-list" title="Badges, skills, buffs, home and more">Menu <span class="more-chevron" aria-hidden="true"></span></button>
-          <div id="more-list" class="more-list" hidden>
-            <button id="achieve-btn" type="button" class="chrome-btn" title="Achievements (B)">Badges</button>
-            <button id="feat-btn" type="button" class="chrome-btn feat-chrome-btn" title="Current Feat (H)">
-              <img src="assets/sprites/feat_badge_small.png" alt="" /> Feat
-            </button>
-            <button id="skills-btn" type="button" class="chrome-btn" title="Skills (K)">Skills</button>
-            <button id="buffs-btn" type="button" class="chrome-btn" title="Buffs (U)">Buffs</button>
-            <button id="home-btn" type="button" class="chrome-btn home-chrome-btn" title="Home">
-              Home <span id="mail-unread-badge" class="mail-unread-badge" hidden>0</span>
-            </button>
-            <button id="vendor-btn" type="button" class="chrome-btn" title="Vendor (V)">Vendor</button>
-            <button id="avatar-btn" type="button" class="chrome-btn" title="Look (L)">Look</button>
-          </div>
-        </div>
-        <button id="mute-btn" type="button" class="chrome-btn mute-btn" title="Unmute audio" aria-label="Unmute audio" aria-pressed="true"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path class="mute-x" d="M13 7.5l4 5M17 7.5l-4 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"/><path class="mute-waves" d="M13 7.2a4 4 0 0 1 0 5.6M15.2 5a7 7 0 0 1 0 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg></button>
-      </div>
-    </header>
+  </footer>
 
-    <div id="game-root">
-      <div id="overlay" class="overlay">
-        <div class="card">
-          <h2>Welcome to a scrap of Ur</h2>
-          <p>
-            <kbd>A</kbd>/<kbd>D</kbd> move ·
-            tap <kbd>W</kbd>/<kbd>Space</kbd> to jump ·
-            <kbd>↑</kbd> climb ladders ·
-            <kbd>Enter</kbd> verbs ·
-            <kbd>G</kbd> map ·
-            <kbd>Q</kbd> quests ·
-            <kbd>B</kbd> badges ·
-            <kbd>H</kbd> feat ·
-            <kbd>K</kbd> skills ·
-            <kbd>U</kbd> buffs ·
-            <kbd>C</kbd> make ·
-            <kbd>V</kbd> vendor
-          </p>
-          <p class="quest-preview">
-            Gather grain/meat · Make flour &amp; sammiches · land and jump 3× quickly for a Triple Jump.
-            Start on <strong>Hechey Track</strong>.
-          </p>
-          <button id="start-btn" type="button">Start exploring</button>
-          <button id="start-customize-btn" type="button" class="btn-secondary">Customize look first</button>
-          <p class="fine">Art CC0 Tiny Speck · remake experiment</p>
-        </div>
-      </div>
-
-      <!-- The Great Hog Haul — reconstructed two-player race chrome -->
-      <section id="hog-haul-hud" class="hog-haul-hud" hidden aria-live="polite">
-        <div class="hog-haul-scoreboard">
-          <span><b data-hog-player>Glitch</b>: <strong data-hog-player-score>0</strong></span>
-          <span><b data-hog-rival>Gomez Addams</b>: <strong data-hog-rival-score>0</strong></span>
-        </div>
-        <p class="hog-haul-objective" data-hog-objective>Find a Pig Bait sack.</p>
-        <div class="hog-haul-cargo" data-hog-cargo aria-label="Carrying nothing">
-          <img data-hog-cargo-icon alt="" />
-          <span data-hog-cargo-label>Hands free</span>
-        </div>
-      </section>
-
-      <div id="hog-haul-ready" class="hog-haul-screen" hidden role="dialog" aria-modal="true" aria-labelledby="hog-haul-ready-title">
-        <div class="hog-haul-screen-shade"></div>
-        <div class="hog-haul-ready-card">
-          <img src="assets/sprites/races/race_ticket_hogtie_piggy__x1_iconic_png_1354836452.png" alt="" />
-          <p>The Great Hog Haul</p>
-          <h2 id="hog-haul-ready-title">Hogtie three Piggies and put them in the Pig Pen!</h2>
-          <div class="hog-haul-loop" aria-label="Race steps">
-            <span>1. Grab bait</span><i>›</i><span>2. Catch a Piggy</span><i>›</i><span>3. Run to the pen</span>
-          </div>
-          <button type="button" id="hog-haul-ready-btn" class="btn-glitch-primary">I’m ready!</button>
-        </div>
-      </div>
-
-      <div id="hog-haul-countdown" class="hog-haul-countdown" hidden aria-live="assertive"></div>
-
-      <div id="hog-haul-result" class="hog-haul-screen" hidden role="dialog" aria-modal="true" aria-labelledby="hog-haul-result-title">
-        <div class="hog-haul-screen-shade"></div>
-        <div class="hog-haul-result-card">
-          <div class="hog-haul-result-rays" aria-hidden="true"></div>
-          <img src="assets/sprites/races/race_ticket_hogtie_piggy__x1_iconic_png_1354836452.png" alt="" />
-          <p data-hog-result-kicker>THE GREAT HOG HAUL</p>
-          <h2 id="hog-haul-result-title" data-hog-result-title>You won!</h2>
-          <p data-hog-result-reward></p>
-          <button type="button" id="hog-haul-leave-btn" class="btn-glitch-primary">Leave the game</button>
-        </div>
-      </div>
-
-      <!-- Four Letter Words — clean reconstruction of Mr. Block's puzzle room -->
-      <section id="four-letter-hud" class="four-letter-hud" hidden aria-live="polite">
-        <div class="four-letter-heading">
-          <img src="assets/sprites/quests/four-letter/quest-icon.png" alt="" />
-          <div>
-            <strong>Four Letter Words</strong>
-            <span data-four-letter-progress>Riddle 1 of 3</span>
-          </div>
-          <button type="button" id="four-letter-leave-btn">Leave</button>
-        </div>
-        <p data-four-letter-riddle>Talk to Mr. Block.</p>
-        <div class="four-letter-word" aria-label="Current four-letter word">
-          <span data-four-letter-cell="0">B</span>
-          <span data-four-letter-cell="1">S</span>
-          <span data-four-letter-cell="2">M</span>
-          <span data-four-letter-cell="3">E</span>
-        </div>
-      </section>
-
-      <!-- Legalize It — recorded subway round trip and Bureaucratic Hall queue -->
-      <section id="legalize-hud" class="legalize-hud" hidden aria-live="polite">
-        <div class="legalize-heading">
-          <img src="assets/sprites/quests/legalize/card_carrying_qualification__x1_iconic_png_1354833115.png" alt="" />
-          <div>
-            <strong>Legalize It</strong>
-            <span data-legalize-stage>Gregarious Grange Subway Station</span>
-          </div>
-          <b data-legalize-progress>1 / 5</b>
-          <button type="button" id="legalize-leave-btn">Leave</button>
-        </div>
-        <p data-legalize-objective>Take the subway to The Back Alley.</p>
-        <div class="legalize-progress" aria-label="Application progress">
-          <i data-legalize-dot="alley"></i>
-          <i data-legalize-dot="subway"></i>
-          <i data-legalize-dot="hall"></i>
-          <i data-legalize-dot="waiting"></i>
-          <i data-legalize-dot="activate"></i>
-        </div>
-      </section>
-
-      <!-- The Greedy Street Spirit — production five-act bedtime-story theatre -->
-      <section id="greedy-street-hud" class="greedy-street-hud" hidden aria-live="polite">
-        <div class="greedy-street-heading">
-          <span class="greedy-street-mark" aria-hidden="true">★</span>
-          <div>
-            <strong>The Greedy Street Spirit</strong>
-            <span data-greedy-stage>Storyland · Act I</span>
-          </div>
-          <time data-greedy-timer>5:00</time>
-          <button type="button" id="greedy-street-leave-btn">Leave</button>
-        </div>
-        <p data-greedy-objective>Press the Wall Button to read Act I.</p>
-        <blockquote data-greedy-line>Once upon a time…</blockquote>
-        <div class="greedy-street-progress" aria-label="Story acts">
-          <i data-greedy-act="1">I</i>
-          <i data-greedy-act="2">II</i>
-          <i data-greedy-act="3">III</i>
-          <i data-greedy-act="4">IV</i>
-          <i data-greedy-act="5">V</i>
-        </div>
-      </section>
-
-      <!-- Winter Walk — timed two-stage traversal reconstructed on clean Drifa art -->
-      <section id="winter-walk-hud" class="winter-walk-hud" hidden aria-live="polite">
-        <div class="winter-walk-heading">
-          <img src="assets/sprites/icons/ice.png" alt="" />
-          <div>
-            <strong>Winter Walk</strong>
-            <span data-winter-stage>Snowy path</span>
-          </div>
-          <time data-winter-timer>5:00</time>
-          <button type="button" id="winter-walk-leave-btn">Leave</button>
-        </div>
-        <p data-winter-objective>Cross the snowy path to Winter Haven.</p>
-        <div class="winter-walk-progress">
-          <span><b data-winter-motes>0 / 12</b> winter motes</span>
-          <span><b data-winter-img>0</b> iMG gathered</span>
-        </div>
-      </section>
-
-      <!-- A Summer's Day — five-minute collision memory and two-minute Annex -->
-      <section id="summers-day-hud" class="summers-day-hud" hidden aria-live="polite">
-        <div class="summers-day-heading">
-          <span class="summers-day-mark" aria-hidden="true"></span>
-          <div>
-            <strong>A Summer’s Day</strong>
-            <span data-summer-stage>The shared memory</span>
-          </div>
-          <time data-summer-timer>5:00</time>
-          <button type="button" id="summers-day-leave-btn">Leave</button>
-        </div>
-        <p data-summer-objective>Walk into the pale woods.</p>
-        <div class="summers-day-progress">
-          <span><b data-summer-progress>0 / 15 moments</b></span>
-          <span data-summer-bonus>Follow what the Giants remember</span>
-        </div>
-      </section>
-
-      <!-- Rooks' Woods — two-minute Crusher gauntlet and Rook Egg objective -->
-      <section id="rook-woods-hud" class="rook-woods-hud" hidden aria-live="polite">
-        <div class="rook-woods-heading">
-          <div class="rook-woods-egg-icon" aria-hidden="true"></div>
-          <div>
-            <strong>Rooks’ Woods</strong>
-            <span data-rook-tool>Find the Rook Egg</span>
-          </div>
-          <time data-rook-timer>2:00</time>
-          <button type="button" id="rook-woods-leave-btn">Leave</button>
-        </div>
-        <p data-rook-objective>Evade the Crushers and smash the Rook Egg.</p>
-        <div class="rook-woods-progress">
-          <span><b data-rook-hits>0</b> Crusher hits</span>
-          <span><b data-rook-egg>Intact</b> Egg</span>
-        </div>
-      </section>
-
-      <!-- Museum of the Rook — source-authored six-exhibit Greeterbot tour -->
-      <section id="rook-museum-hud" class="rook-museum-hud" hidden aria-live="polite">
-        <div class="rook-museum-heading">
-          <div class="rook-museum-mark" aria-hidden="true">R</div>
-          <div>
-            <strong>Museum of the Rook</strong>
-            <span data-rook-museum-stage>Greeterbot orientation</span>
-          </div>
-          <b data-rook-museum-count>0 / 6</b>
-          <button type="button" id="rook-museum-leave-btn">Leave</button>
-        </div>
-        <p data-rook-museum-objective>Speak with Greeterbot Sentry G-42.</p>
-        <div class="rook-museum-progress" aria-label="Exhibits visited">
-          <i data-rook-museum-dot="button_1"></i>
-          <i data-rook-museum-dot="button_2"></i>
-          <i data-rook-museum-dot="button_3"></i>
-          <i data-rook-museum-dot="button_4"></i>
-          <i data-rook-museum-dot="button_5"></i>
-          <i data-rook-museum-dot="button_6"></i>
-        </div>
-      </section>
-
-      <!-- De-Embiggenify — two-minute miniature search in Eesti Life Catalogue Page 17 -->
-      <section id="de-embiggenify-hud" class="de-embiggenify-hud" hidden aria-live="polite">
-        <div class="de-embiggenify-heading">
-          <img src="assets/sprites/icons/small_worthless.png" alt="" />
-          <div>
-            <strong>De-Embiggenify</strong>
-            <span data-eesti-stage>Find Mr. Hairball</span>
-          </div>
-          <time data-eesti-timer>2:00</time>
-          <button type="button" id="de-embiggenify-leave-btn">Leave</button>
-        </div>
-        <p data-eesti-objective>Find and speak with Mr. Hairball.</p>
-        <div class="de-embiggenify-progress">
-          <span data-eesti-hairball>① Find Mr. Hairball</span>
-          <span data-eesti-object>② Find the shiny object</span>
-          <span data-eesti-return>③ Bring it back</span>
-        </div>
-      </section>
-
-      <!-- Ticket to Paradise — shared chrome for flight and snowy sliding courses -->
-      <section id="paradise-flight-hud" class="paradise-flight-hud" hidden aria-live="polite">
-        <div class="paradise-flight-heading">
-          <img data-paradise-icon src="assets/sprites/icons/paradise_ticket_cloud_rings.png" alt="" />
-          <div>
-            <strong data-paradise-title>Cloud Rings</strong>
-            <span data-paradise-controls>Spacebar to fly · arrows to steer</span>
-          </div>
-          <time data-paradise-timer>4:00</time>
-          <button type="button" id="paradise-flight-leave-btn">Leave</button>
-        </div>
-        <p data-paradise-objective>Fly through every cloud ring.</p>
-        <div class="paradise-flight-progress">
-          <span><b data-paradise-progress>0 / 5 rings</b></span>
-          <span data-paradise-tickets>1/11 tickets today</span>
-        </div>
-      </section>
-
-      <!-- Character builder (palette recolor of styled Glitch avatar) -->
-      <div id="avatar-panel" class="glitch-modal avatar-panel" hidden>
-        <div class="glitch-modal-card avatar-card">
-          <div class="glitch-modal-head">
-            <h2>Character builder</h2>
-            <button type="button" id="avatar-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <p class="panel-meta">Pick colors for hair, skin, shirt, pants, and shoes. Saved on this device.</p>
-          <div class="avatar-builder-layout">
-            <div class="avatar-preview-col">
-              <canvas id="avatar-preview" width="172" height="248" aria-label="Avatar preview"></canvas>
-              <div class="avatar-preset-row" id="avatar-presets" role="list"></div>
-            </div>
-            <div class="avatar-controls-col">
-              <div class="avatar-tabs" id="avatar-tabs" role="tablist">
-                <button type="button" class="avatar-tab active" data-slot="hair">Hair</button>
-                <button type="button" class="avatar-tab" data-slot="skin">Skin</button>
-                <button type="button" class="avatar-tab" data-slot="shirt">Shirt</button>
-                <button type="button" class="avatar-tab" data-slot="pants">Pants</button>
-                <button type="button" class="avatar-tab" data-slot="shoes">Shoes</button>
-              </div>
-              <div class="avatar-swatches" id="avatar-swatches" role="listbox" aria-label="Colors"></div>
-              <div class="avatar-actions">
-                <button type="button" class="btn-glitch-back" id="avatar-random">Random</button>
-                <button type="button" class="btn-glitch-back" id="avatar-reset">Reset</button>
-                <button type="button" class="btn-glitch-primary" id="avatar-apply">Save look</button>
-              </div>
-              <p class="avatar-hint">Press <kbd>L</kbd> anytime</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Street nameplate -->
-      <div id="street-nameplate" class="street-nameplate">
-        <span id="street-name" data-tsid="">…</span>
-        <span class="street-time-divider" aria-hidden="true">·</span>
-        <span id="dametime-clock" class="dametime-clock" role="status" aria-label="Dametime">…</span>
-      </div>
-      <div id="daylight-overlay" class="daylight-overlay" data-phase="day" aria-hidden="true"></div>
-      <div id="buff-strip" class="buff-strip" aria-label="Current effects" hidden></div>
-
-      <!-- Activity / toast feed -->
-      <div id="activity-feed" class="activity-feed" aria-live="polite"></div>
-
-      <!-- Avatar-anchored committed world action -->
-      <div id="action-progress" class="action-progress" role="status" aria-live="polite" hidden>
-        <div class="action-progress-card">
-          <div class="action-progress-copy">
-            <strong data-action-label>Doing a thing…</strong>
-            <span>Move or Esc to cancel</span>
-          </div>
-          <div class="action-progress-track" aria-hidden="true"><i data-action-fill></i></div>
-        </div>
-      </div>
-
-      <!-- Persistent play context, inspired by Glitch's quest/activity sidebar -->
-      <aside id="play-context" class="play-context" aria-label="Quest and activity tracker">
-        <section class="play-context-card quest-tracker">
-          <button type="button" id="quest-tracker-open" class="play-context-head" title="Open full quest log">
-            <span>Current quests</span>
-            <span id="quest-tracker-count" class="play-context-count">0</span>
-          </button>
-          <div id="quest-tracker-list" class="quest-tracker-list"></div>
-        </section>
-        <section class="play-context-card local-activity">
-          <div class="play-context-head play-context-label">
-            <span>Local activity</span>
-            <span class="activity-live-dot" aria-hidden="true"></span>
-          </div>
-          <div id="activity-history" class="activity-history" role="log" aria-live="polite"></div>
-        </section>
-      </aside>
-
-      <!-- Verb menu -->
-      <div id="verb-menu" class="verb-menu" hidden>
-        <div class="verb-menu-card">
-          <div class="verb-menu-head">
-            <div id="verb-menu-title" class="verb-menu-title">Item</div>
-            <button type="button" id="verb-menu-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <p id="verb-menu-sub" class="verb-menu-sub"></p>
-          <ul id="verb-menu-list" class="verb-menu-list"></ul>
-          <p class="verb-menu-hint">Enter selects · ↑/↓ move · Esc cancels</p>
-        </div>
-      </div>
-
-      <!-- Original target-item flow: choose an eligible pack stack after Feed -->
-      <div id="feed-picker" class="verb-menu feed-picker" hidden role="dialog" aria-modal="true" aria-labelledby="feed-picker-title">
-        <div class="verb-menu-card feed-picker-card">
-          <div class="verb-menu-head">
-            <div id="feed-picker-title" class="verb-menu-title">Feed what?</div>
-            <button type="button" id="feed-picker-close" class="verb-menu-x" aria-label="Close feed picker">×</button>
-          </div>
-          <p id="feed-picker-sub" class="verb-menu-sub">Choose something from your pack.</p>
-          <div id="feed-picker-grid" class="feed-picker-grid" role="listbox" aria-label="Eligible food"></div>
-          <!-- requires_target_item_count: how many of the chosen stack (Piggy, Batterfly, Piggy Feeder) -->
-          <div id="feed-picker-qty" class="feed-picker-qty" hidden>
-            <img id="feed-picker-qty-icon" class="feed-picker-qty-icon" alt="" />
-            <div class="feed-picker-qty-body">
-              <div id="feed-picker-qty-label" class="feed-picker-qty-label"></div>
-              <div class="feed-picker-qty-row">
-                <button type="button" id="feed-picker-qty-minus" class="feed-picker-qty-step" aria-label="One fewer">−</button>
-                <input id="feed-picker-qty-input" class="feed-picker-qty-input" type="number" min="1" value="1" inputmode="numeric" aria-label="How many" />
-                <button type="button" id="feed-picker-qty-plus" class="feed-picker-qty-step" aria-label="One more">+</button>
-                <button type="button" id="feed-picker-qty-max" class="feed-picker-qty-max">Max</button>
-              </div>
-            </div>
-            <div class="feed-picker-qty-actions">
-              <button type="button" id="feed-picker-qty-back" class="feed-picker-qty-back">Back</button>
-              <button type="button" id="feed-picker-qty-go" class="feed-picker-qty-go">Feed 1</button>
-            </div>
-          </div>
-          <p id="feed-picker-hint" class="verb-menu-hint">Enter selects · arrow keys move · Esc cancels</p>
-        </div>
-      </div>
-
-      <!-- Emotional Bear targets the local street companions used by the Feat replay. -->
-      <div id="emotional-bear-picker" class="verb-menu emotional-bear-picker" hidden role="dialog" aria-modal="true" aria-labelledby="emotional-bear-picker-title">
-        <div class="verb-menu-card emotional-bear-picker-card">
-          <div class="verb-menu-head">
-            <div id="emotional-bear-picker-title" class="verb-menu-title">Emote with whom?</div>
-            <button type="button" id="emotional-bear-picker-close" class="verb-menu-x" aria-label="Close Emotional Bear targets">×</button>
-          </div>
-          <p id="emotional-bear-picker-sub" class="verb-menu-sub">Choose a street companion.</p>
-          <div id="emotional-bear-picker-grid" class="emotional-bear-picker-grid" role="listbox" aria-label="Street companions"></div>
-          <p class="verb-menu-hint">The bear emotes on your behalf · Esc cancels</p>
-        </div>
-      </div>
-      <div id="emotional-bear-fx" class="emotional-bear-fx" hidden role="status" aria-live="polite">
-        <img id="emotional-bear-fx-art" src="" alt="" />
-        <strong id="emotional-bear-fx-copy"></strong>
-      </div>
-
-      <!-- Quest log panel -->
-      <div id="quest-panel" class="side-panel quest-panel" hidden>
-        <div class="side-card">
-          <div class="side-head">
-            <h2>Quest Log</h2>
-            <button type="button" id="quest-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <p class="panel-meta" id="quest-meta"></p>
-          <div id="quest" class="quest-log-body"></div>
-        </div>
-      </div>
-
-      <!-- Authored quest conversation, preserving original <split> response cadence -->
-      <div id="quest-dialogue" class="quest-dialogue" hidden role="dialog" aria-modal="true" aria-labelledby="quest-dialogue-title">
-        <div class="quest-dialogue-shade"></div>
-        <div class="quest-dialogue-card">
-          <div class="quest-dialogue-orb" aria-hidden="true">✦</div>
-          <p id="quest-dialogue-kicker" class="mr-kicker">New quest</p>
-          <h2 id="quest-dialogue-title">Quest</h2>
-          <p id="quest-dialogue-copy" class="quest-dialogue-copy"></p>
-          <button type="button" id="quest-dialogue-next" class="btn-glitch-primary">Continue</button>
-          <button type="button" id="quest-dialogue-cancel" class="quest-dialogue-cancel">Maybe later</button>
-        </div>
-      </div>
-
-      <div id="rook-museum-exhibit" class="rook-museum-exhibit" hidden role="dialog" aria-modal="true" aria-labelledby="rook-museum-exhibit-title">
-        <div class="rook-museum-exhibit-shade"></div>
-        <article class="rook-museum-exhibit-card">
-          <button type="button" id="rook-museum-exhibit-close" class="rook-museum-exhibit-close" aria-label="Close">×</button>
-          <div class="rook-museum-exhibit-visual" data-rook-museum-visual>
-            <img data-rook-museum-art src="" alt="" />
-            <div class="rook-museum-orb-glow" data-rook-museum-orb-glow hidden></div>
-          </div>
-          <div class="rook-museum-exhibit-copy">
-            <p class="mr-kicker" data-rook-museum-kicker>Museum exhibit</p>
-            <h2 id="rook-museum-exhibit-title" data-rook-museum-title>Exhibit</h2>
-            <p data-rook-museum-page></p>
-            <footer>
-              <span data-rook-museum-page-count>1 / 1</span>
-              <button type="button" id="rook-museum-exhibit-next" class="btn-glitch-primary">Continue</button>
-            </footer>
-          </div>
-        </article>
-      </div>
-
-      <!-- Achievements / badges -->
-      <div id="achieve-panel" class="side-panel achieve-panel" hidden>
-        <div class="side-card">
-          <div class="side-head">
-            <h2>Achievements</h2>
-            <button type="button" id="achieve-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <div class="badge-browser-tools">
-            <label class="badge-search" for="achieve-search">
-              <span class="visually-hidden">Search badges</span>
-              <input id="achieve-search" type="search" autocomplete="off" placeholder="Search badges…" />
-            </label>
-            <div class="badge-status-filters" role="group" aria-label="Badge status">
-              <button type="button" class="active" data-achieve-status="all" aria-pressed="true">All</button>
-              <button type="button" data-achieve-status="progress" aria-pressed="false">In progress</button>
-              <button type="button" data-achieve-status="unlocked" aria-pressed="false">Unlocked</button>
-              <button type="button" data-achieve-status="locked" aria-pressed="false">Locked</button>
-            </div>
-            <label class="badge-category-select" for="achieve-category">
-              <span>Category</span>
-              <select id="achieve-category">
-                <option value="all">All categories</option>
-              </select>
-            </label>
-          </div>
-          <p class="panel-meta" id="achieve-meta" aria-live="polite"></p>
-          <div id="achieve-body" class="quest-log-body"></div>
-        </div>
-      </div>
-
-      <!-- Collaborative Feats -->
-      <div id="feat-panel" class="side-panel feat-panel" hidden>
-        <div class="side-card feat-card">
-          <div class="side-head">
-            <div class="feat-title-lockup">
-              <img src="assets/sprites/feat_badge_small.png" alt="" />
-              <h2>Current Feat</h2>
-            </div>
-            <button type="button" id="feat-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <p class="feat-kicker">THE LAST FEAT REPLAY</p>
-          <h3 id="feat-title">The First Glimmer of the Giants’ Awakening</h3>
-          <p class="feat-copy">
-            Three different Glitches must say these incantations in order.
-            Another line during an active chain breaks it.
-          </p>
-          <div id="feat-chain" class="feat-chain" aria-label="Incantation chain"></div>
-          <div class="feat-stats">
-            <span><b id="feat-total">0</b> street points</span>
-            <span><b id="feat-personal">0</b> yours</span>
-            <span><b id="feat-complete">0</b> chains</span>
-          </div>
-          <p id="feat-prompt" class="feat-prompt">Gather two companions to begin.</p>
-          <div class="feat-actions">
-            <button type="button" id="feat-gather" class="btn-glitch-primary">Gather a chain</button>
-            <button type="button" id="feat-say" class="content-action-btn" hidden>Say my line</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Skills -->
-      <div id="skills-panel" class="side-panel skills-panel" hidden>
-        <div class="side-card">
-          <div class="side-head">
-            <h2>Skills</h2>
-            <button type="button" id="skills-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <p class="panel-meta" id="skills-meta"></p>
-          <div id="skills-body" class="quest-log-body"></div>
-        </div>
-      </div>
-
-      <!-- Buffs -->
-      <div id="buffs-panel" class="side-panel buffs-panel" hidden>
-        <div class="side-card">
-          <div class="side-head">
-            <h2>Buffs</h2>
-            <button type="button" id="buffs-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <p class="panel-meta" id="buffs-meta"></p>
-          <div id="buffs-body" class="quest-log-body"></div>
-        </div>
-      </div>
-
-      <!-- Making / crafting (tool-driven, GSJS catalog_recipes) -->
-      <div id="make-panel" class="glitch-modal make-panel" hidden>
-        <div class="glitch-modal-card make-card">
-          <div class="glitch-modal-head">
-            <h2 id="make-title">Making</h2>
-            <div class="glitch-modal-tabs make-tool-tabs" id="make-tools" role="toolbar" aria-label="Tool"></div>
-            <button type="button" id="make-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <div class="make-search-row">
-            <input type="search" id="make-search" class="make-search" placeholder="Find a recipe or ingredient" aria-label="Find a recipe or ingredient" autocomplete="off" />
-          </div>
-          <p class="panel-meta" id="make-meta">Pick a tool, then a recipe</p>
-          <div id="make-list" class="make-grid" role="list"></div>
-          <div id="make-detail" class="make-detail" hidden></div>
-          <div id="make-progress" class="make-progress" hidden></div>
-          <div id="make-result" class="make-result" hidden></div>
-        </div>
-      </div>
-
-      <!-- Crop garden tend UI (GSJS garden_new plots) -->
-      <div id="garden-panel" class="glitch-modal garden-panel" hidden>
-        <div class="glitch-modal-card garden-card">
-          <div class="glitch-modal-head">
-            <h2 id="garden-title">Crop Garden</h2>
-            <button type="button" id="garden-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <p class="panel-meta" id="garden-meta">Plant · water · harvest · clear</p>
-          <div id="garden-seed-bar" class="garden-seed-bar" role="toolbar" aria-label="Seeds"></div>
-          <div id="garden-plots" class="garden-plots" role="list"></div>
-          <p class="garden-foot">
-            Growth needs water. Dirty plots must be cleared before planting again.
-            <button type="button" class="btn-glitch-primary" id="garden-water-all">Water all dry</button>
-          </p>
-        </div>
-      </div>
-
-      <!-- Giant shrine donation / favor interface -->
-      <div id="shrine-panel" class="glitch-modal shrine-panel" hidden>
-        <div class="glitch-modal-card shrine-card">
-          <div class="glitch-modal-head">
-            <div class="shrine-title-lockup">
-              <span class="shrine-glyph" aria-hidden="true">✦</span>
-              <h2 id="shrine-title">Shrine</h2>
-            </div>
-            <button type="button" id="shrine-close" class="verb-menu-x" aria-label="Close shrine">×</button>
-          </div>
-          <p id="shrine-desc" class="shrine-desc"></p>
-          <section class="shrine-favor-card" aria-label="Giant favor">
-            <div class="shrine-favor-head">
-              <strong id="shrine-favor-label">Favor 0 / 1,000</strong>
-              <span id="shrine-emblems">No emblems yet</span>
-            </div>
-            <div class="shrine-favor-track" aria-hidden="true"><i id="shrine-favor-fill"></i></div>
-            <div id="shrine-daily" class="shrine-daily"></div>
-            <button type="button" id="shrine-claim" class="btn-glitch-primary" hidden>Claim emblem</button>
-          </section>
-          <div id="shrine-all-favor" class="shrine-all-favor" aria-label="Favor with all Giants"></div>
-          <h3 class="shrine-section-title">Choose something to donate</h3>
-          <div id="shrine-list" class="shrine-grid" role="list"></div>
-          <div id="shrine-detail" class="shrine-detail" hidden></div>
-          <p id="shrine-tip" class="shrine-tip">More valuable offerings earn more favor.</p>
-        </div>
-      </div>
-
-      <!-- Vendor panel (shelf grid like original street spirit) -->
-      <div id="vendor-panel" class="glitch-modal vendor-panel" hidden>
-        <div class="glitch-modal-card vendor-card">
-          <div class="glitch-modal-head">
-            <h2 id="vendor-title">Street Spirit</h2>
-            <div class="glitch-modal-tabs vendor-tabs">
-              <button type="button" class="vendor-tab active" data-tab="buy">Buy</button>
-              <button type="button" class="vendor-tab" data-tab="sell">Sell</button>
-            </div>
-            <button type="button" id="vendor-close" class="verb-menu-x" aria-label="Close">×</button>
-          </div>
-          <p id="vendor-desc" class="vendor-desc" hidden></p>
-          <div id="vendor-sell-drop" class="vendor-sell-drop" hidden aria-live="polite">
-            <span class="vendor-drop-arrow" aria-hidden="true">↥</span>
-            <strong>Drag an item from your pack</strong>
-            <span>or choose one below</span>
-          </div>
-          <div id="vendor-list" class="vendor-shelf" role="list"></div>
-          <div id="vendor-detail" class="vendor-detail" hidden></div>
-          <p class="vendor-foot">You have <span class="currant-coin">◎</span> <strong id="vendor-currants">0</strong> currants</p>
-        </div>
-      </div>
-
-      <!-- Hub-style interactive map -->
-      <div id="home-panel" class="home-panel" hidden role="dialog" aria-modal="true" aria-labelledby="home-panel-title">
-        <div class="home-card">
-          <div class="home-head">
-            <div>
-              <span class="home-kicker">A place of your own</span>
-              <h2 id="home-panel-title">Home</h2>
-            </div>
-            <button type="button" id="home-close" class="verb-menu-x" aria-label="Close home">×</button>
-          </div>
-          <div id="home-body" class="home-body"></div>
-        </div>
-      </div>
-
-      <div id="mail-panel" class="mail-panel" hidden role="dialog" aria-modal="true" aria-labelledby="mail-panel-title">
-        <div class="mail-card">
-          <div class="mail-head">
-            <div>
-              <span class="mail-kicker">Mailbox (1)</span>
-              <h2 id="mail-panel-title">Your mail</h2>
-            </div>
-            <div class="mail-head-actions">
-              <button type="button" id="mail-compose-btn" class="btn-glitch-primary">Write mail</button>
-              <button type="button" id="mail-close" class="verb-menu-x" aria-label="Close mail">×</button>
-            </div>
-          </div>
-          <div class="mail-tabs" role="tablist" aria-label="Mailbox folders">
-            <button type="button" data-mail-folder="inbox" class="active">Inbox</button>
-            <button type="button" data-mail-folder="archived">Archived</button>
-            <button type="button" data-mail-folder="sent">Sent</button>
-          </div>
-          <div class="mail-layout">
-            <div id="mail-list" class="mail-list" aria-label="Messages"></div>
-            <div id="mail-reader" class="mail-reader"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="map-panel" class="map-panel" hidden>
-        <div class="map-card map-hub">
-          <div class="map-head">
-            <h2 id="map-hub-title">Groddle Forest</h2>
-            <div class="map-hub-picker">
-              <select id="map-hub-select" title="Browse hub maps" aria-label="Region"></select>
-            </div>
-            <button type="button" id="map-close" class="verb-menu-x" aria-label="Close map">×</button>
-          </div>
-          <p class="map-sub">Original street geometry · yellow = travel · red star = you</p>
-          <div id="map-canvas" class="map-canvas"></div>
-          <ul id="map-list" class="map-list-hidden" hidden></ul>
-          <p class="map-hint"><kbd>G</kbd> map · Esc closes</p>
-        </div>
-      </div>
-
-      <!-- Local chat, including source-authored Feat phrase detection -->
-      <section id="local-chat-dock" class="local-chat-dock" aria-label="Local chat">
-        <div id="local-chat-stream" class="local-chat-stream" aria-live="polite"></div>
-        <form id="local-chat-form" autocomplete="off">
-          <label class="visually-hidden" for="local-chat-input">Local chat</label>
-          <input id="local-chat-input" type="text" maxlength="180" placeholder="Local chat…" />
-          <button type="submit">Say</button>
-        </form>
-      </section>
-
-      <!-- Bottom pack bar (Glitch-style dual row: items + tools) -->
-      <div class="pack-bar" id="pack-bar">
-        <div class="pack-rows">
-          <div class="pack-row-shell" data-pack-pager="items">
-            <button type="button" class="pack-scroll pack-scroll-left" data-pack-scroll="-1"
-              aria-label="Previous items" title="Previous items">‹</button>
-            <div id="pack-items" class="pack-slots pack-items" role="list" aria-label="Items"></div>
-            <button type="button" class="pack-scroll pack-scroll-right" data-pack-scroll="1"
-              aria-label="More items" title="More items">›</button>
-          </div>
-          <div class="pack-row-shell" data-pack-pager="tools">
-            <button type="button" class="pack-scroll pack-scroll-left" data-pack-scroll="-1"
-              aria-label="Previous tools" title="Previous tools">‹</button>
-            <div id="pack-tools" class="pack-slots pack-tools" role="list" aria-label="Tools"></div>
-            <button type="button" class="pack-scroll pack-scroll-right" data-pack-scroll="1"
-              aria-label="More tools" title="More tools">›</button>
-          </div>
-          <!-- legacy id kept for tests/selectors; mirrors items row -->
-          <div id="inventory" class="pack-slots pack-items pack-legacy" hidden aria-hidden="true"></div>
-        </div>
-        <div class="pack-hint">Click for actions<br/>Shift-click to quick use</div>
-        <section id="pack-popover" class="pack-popover" role="dialog" aria-modal="false" aria-labelledby="pack-popover-title" hidden></section>
-      </div>
-
-      <div id="toast" class="toast" hidden></div>
-
-      <!-- Full-screen street load (LoadingLocationView-style crossfade) -->
-      <div id="screen-transition" class="screen-transition" hidden aria-hidden="true" role="status">
-        <div class="screen-transition-inner">
-          <p class="st-leave" data-st-leave></p>
-          <p class="st-leave-hub" data-st-leave-hub></p>
-          <div class="st-snap-wrap" data-st-snap-wrap hidden>
-            <img class="st-snap" data-st-snap alt="" />
-          </div>
-          <p class="st-welcome">Welcome to</p>
-          <h2 class="st-enter" data-st-enter>…</h2>
-          <p class="st-enter-hub" data-st-enter-hub></p>
-          <div class="st-progress" aria-hidden="true">
-            <i data-st-bar></i>
-          </div>
-          <p class="st-status" data-st-status>loading…</p>
-        </div>
-      </div>
-
-      <!-- Full-screen award / quest complete (AchievementView-style) -->
-      <div id="award-screen" class="award-screen" hidden aria-hidden="true" role="dialog" aria-label="Award">
-        <div class="award-rays" aria-hidden="true"></div>
-        <div class="award-card">
-          <div class="award-badge" data-award-badge>
-            <img data-award-img alt="" hidden />
-            <span data-award-glyph>◉</span>
-          </div>
-          <p class="award-kicker" data-award-kicker>Well done!</p>
-          <button type="button" class="award-close" data-award-close hidden aria-label="Close quest completion">×</button>
-          <h2 class="award-title" data-award-title></h2>
-          <p class="award-body" data-award-body hidden></p>
-          <p class="award-sub" data-award-sub hidden></p>
-          <button type="button" class="award-next" data-award-next hidden>OK</button>
-        </div>
-      </div>
-
-      <!-- New Day (NewDayView.as — morning crossfade + energy refill) -->
-      <div id="new-day-screen" class="new-day-screen" hidden aria-hidden="true" role="dialog" aria-label="A new day">
-        <div class="new-day-sun" aria-hidden="true"></div>
-        <div class="new-day-rays" aria-hidden="true"></div>
-        <img class="new-day-mountains" src="assets/ui/newday/new_day_mountains.png" alt="" />
-        <div class="new-day-card">
-          <p class="new-day-date" data-nd-date></p>
-          <h2 class="new-day-title">A NEW DAY</h2>
-          <p class="new-day-refill">Complete energy refill</p>
-          <p class="new-day-stats" data-nd-stats></p>
-          <button type="button" class="new-day-btn" data-nd-ok>Onwards and upwards!</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
-  <script type="module" src="game.js?v=official-ecology-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-3&amp;summer=summers-day-7&amp;paradise=flight-10&amp;viewport=rail-safe-2&amp;worldart=trants-rocks-signs-2&amp;badges=catalog-art-3&amp;feat=street-players-5&amp;legalize=6&amp;eesti=page17-2&amp;wheel=1&amp;stootdoll=6&amp;cubimals=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-3&amp;camera=ground-2&amp;phantom=finale-2&amp;award=quest-pages-3&amp;rook=forest-2"></script>
+  <script src="landing/landing.js" type="module"></script>
 </body>
 </html>

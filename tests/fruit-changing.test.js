@@ -136,7 +136,7 @@ describe('Fruit Changing interface wiring', () => {
   it('opens from the pack, labels conversion clearly, and animates the real sheet', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     const css = readFileSync(join(publicRoot, 'style.css'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     assert.match(game, /classTsid === 'fruit_changing_machine'/);
     assert.match(game, /Convert fruit/);
     assert.match(game, /Transmogrify/);

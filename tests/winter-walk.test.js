@@ -80,7 +80,7 @@ test('five-minute expiry is exact and blocks late route progress', () => {
 
 test('client ships clean recovered exit art, three-phase routing, snow, and autoplay QA', () => {
   const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
-  const html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+  const html = fs.readFileSync(path.join(publicDir, 'play/index.html'), 'utf8');
   const css = fs.readFileSync(path.join(publicDir, 'style.css'), 'utf8');
   assert.equal(fs.existsSync(path.join(publicDir, 'assets', 'sprites', 'icons', 'ice.png')), true);
   assert.equal(

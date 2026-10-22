@@ -127,7 +127,7 @@ describe('dropped item client integration', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
     const content = readFileSync(join(publicRoot, 'content.js'), 'utf8');
     const css = readFileSync(join(publicRoot, 'style.css'), 'utf8');
-    const html = readFileSync(join(publicRoot, 'index.html'), 'utf8');
+    const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     assert.match(game, /dropInventoryStack/);
     assert.match(game, /pickupDroppedStack/);
     assert.match(game, /spawnDroppedItemStack/);

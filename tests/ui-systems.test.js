@@ -100,7 +100,7 @@ describe('pack / inventory', () => {
     assert.equal(rows.itemCount, items.length);
     assert.equal(rows.toolCount, tools.length);
     // HTML pack has two row containers; currants live in the top bar only
-    const html = readFileSync(join(__dirnameUi, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(__dirnameUi, '../public/play/index.html'), 'utf8');
     assert.ok(html.includes('id="pack-items"'));
     assert.ok(html.includes('id="pack-tools"'));
     assert.ok(html.includes('id="stat-currants"'));
@@ -140,7 +140,7 @@ describe('pack / inventory', () => {
   });
 
   it('ships a contextual pack action card with use, recipe, tool, and vendor paths', () => {
-    const html = readFileSync(join(__dirnameUi, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(__dirnameUi, '../public/play/index.html'), 'utf8');
     const css = readFileSync(join(__dirnameUi, '../public/style.css'), 'utf8');
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
     assert.match(html, /id="pack-popover"/);
@@ -180,7 +180,7 @@ describe('pack / inventory', () => {
   });
 
   it('starts fresh gameplay muted and offers an explicit unmute control', () => {
-    const html = readFileSync(join(__dirnameUi, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(__dirnameUi, '../public/play/index.html'), 'utf8');
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
     assert.match(game, /muted:\s*true/);
     assert.match(html, /id="mute-btn"[^>]*title="Unmute audio"[^>]*aria-label="Unmute audio"[^>]*aria-pressed="true"/);
@@ -228,7 +228,7 @@ describe('quest system UI state', () => {
   });
 
   it('ships the persistent quest and local activity HUD', () => {
-    const html = readFileSync(join(__dirnameUi, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(__dirnameUi, '../public/play/index.html'), 'utf8');
     assert.match(html, /id="play-context"/);
     assert.match(html, /id="quest-tracker-list"/);
     assert.match(html, /id="activity-history"/);
@@ -301,7 +301,7 @@ describe('vendor buy/sell', () => {
   });
 
   it('wires the pack drag payload, sell drop zone, receipt, and click fallback', () => {
-    const html = readFileSync(join(__dirnameUi, '../public/index.html'), 'utf8');
+    const html = readFileSync(join(__dirnameUi, '../public/play/index.html'), 'utf8');
     const css = readFileSync(join(__dirnameUi, '../public/style.css'), 'utf8');
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
     assert.match(html, /id="vendor-sell-drop"/);
