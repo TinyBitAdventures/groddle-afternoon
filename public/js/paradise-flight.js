@@ -1,5 +1,7 @@
 /** Source-authored Ticket to Paradise economy and reusable flight-course state. */
 
+import { EXTRA_PARADISE_COURSES } from './paradise-courses.js';
+
 export const PARADISE_DURATION_MS = 4 * 60 * 1000;
 export const PARADISE_DAILY_LIMIT = 11;
 
@@ -280,6 +282,8 @@ export const PARADISE_COURSES = Object.freeze({
     ]),
     completionReward: reward('xp', 1098),
   }),
+  // The nine reconstructed courses (Aerial Boost, Mountain Scaling, ...).
+  ...EXTRA_PARADISE_COURSES,
 });
 
 export const PARADISE_TICKET_IDS = Object.freeze(

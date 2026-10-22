@@ -292,7 +292,13 @@ import {
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=paradise-flight-7';
+} from './js/paradise-flight.js?v=paradise-flight-8';
+import { resolveParadiseCourseAlias } from './js/paradise-courses.js';
+import {
+  buildParadiseCourseArt,
+  paradiseCoursePreloadUrls,
+  paradiseCourseRuntime,
+} from './js/paradise-course-runtime.js';
 import {
   createAchievementState,
   applyAchievementProgress as applyAchievementProgressRaw,
@@ -1494,14 +1500,14 @@ ensureItem('moon', {
 for (const course of Object.values(PARADISE_COURSES)) {
   ensureItem(course.ticketId, {
     label: `Ticket to ${course.name}`,
-    desc:
-      course.id === 'cloud_rings'
+    desc: course.ticketDesc ||
+      (course.id === 'cloud_rings'
         ? "Activate this card to glide through soft cloud rings, collecting quoins as you go. Don't forget to enjoy the view!"
         : course.id === 'radial_heights'
           ? 'Activate this card to spiral through Radial Heights. Find all the stars, and see what awaits!'
           : course.id === 'starlit_night'
             ? 'Activate this card to float through Starlit Night. Play a twinkling melody as you collect quoins among the stars.'
-            : "Activate this card to frolic amidst the snowy hills of this winter wonderland. Can you play a tune as you collect the quoins?",
+            : "Activate this card to frolic amidst the snowy hills of this winter wonderland. Can you play a tune as you collect the quoins?"),
   });
 }
 
@@ -8309,7 +8315,9 @@ function handleInput() {
     return;
   }
   if (paradiseIsInstanced()) {
-    if (paradiseCourse()?.movement === 'slide') handleParadiseSlideInput();
+    if (paradiseCourseRuntime.owns(paradiseCourse())) {
+      paradiseCourseRuntime.input(paradiseCourseHost(), paradiseCourse());
+    } else if (paradiseCourse()?.movement === 'slide') handleParadiseSlideInput();
     else {
       clearJumpQueue(jumpState);
       handleParadiseFlightInput();
@@ -8452,7 +8460,9 @@ function handleInput() {
 function physics(dt) {
   time += dt;
   if (paradiseIsInstanced()) {
-    if (paradiseCourse()?.movement === 'slide') paradiseSlidePhysics(dt);
+    if (paradiseCourseRuntime.owns(paradiseCourse())) {
+      paradiseCourseRuntime.physics(paradiseCourseHost(), paradiseCourse(), dt);
+    } else if (paradiseCourse()?.movement === 'slide') paradiseSlidePhysics(dt);
     else paradiseFlightPhysics(dt);
   } else if (summersDayInBuoyancy()) {
     summersDayBuoyancyPhysics(dt);
@@ -14950,6 +14960,29 @@ function updateDeEmbiggenify() {
   renderDeEmbiggenifyHud(now);
 }
 
+/** Narrow game hooks for js/paradise-course-runtime.js (the nine reconstructed courses). */
+function paradiseCourseHost() {
+  return {
+    player,
+    keys,
+    bgLayer,
+    preview: new URLSearchParams(location.search).get('paradisepreview') || '',
+    consumeJump: () => {
+      const queued = hasQueuedJump(jumpState, movementNow());
+      if (queued) clearJumpQueue(jumpState);
+      return queued;
+    },
+    playSfx,
+    burst,
+    toast,
+    setPlayerAnim,
+    applyPlayerFacing,
+    dampingAlpha,
+    now: () => Date.now(),
+    time: () => time,
+  };
+}
+
 function paradiseIsInstanced() {
   return Boolean(
     paradiseRun &&
@@ -15039,7 +15072,7 @@ function paintParadiseSky(root, course) {
     starlit_night: [0x170d3e, 0x382264, 0x65447d, 0x79678d],
     slip_n_slide: [0x102f42, 0x17485b, 0x2a6170, 0x477b82],
   };
-  const colors = palettes[course.id];
+  const colors = palettes[course.id] || course.palette;
   const sky = new PIXI.Graphics();
   const bands = 28;
   for (let index = 0; index < bands; index += 1) {
@@ -15061,7 +15094,8 @@ function paintParadiseSky(root, course) {
   root.addChild(sky);
 
   const stars = new PIXI.Graphics();
-  for (let index = 0; index < (course.id === 'cloud_rings' ? 45 : course.id === 'slip_n_slide' ? 95 : 180); index += 1) {
+  const starCount = course.skyStars ?? (course.id === 'cloud_rings' ? 45 : course.id === 'slip_n_slide' ? 95 : 180);
+  for (let index = 0; index < starCount; index += 1) {
     const x = (index * 193 + 71) % course.width;
     const y = (index * 83 + 29) % Math.max(200, course.height * 0.84);
     const size = 0.8 + ((index * 17) % 22) / 10;
@@ -15340,6 +15374,12 @@ async function loadParadiseSourcePoints(course) {
 }
 
 async function loadParadiseVisualAssets(course) {
+  if (course?.art) {
+    await Promise.all(
+      paradiseCoursePreloadUrls(course).map((src) => PIXI.Assets.load(src).catch(() => null))
+    );
+    return;
+  }
   if (course?.id === 'radial_heights') {
     const src = `assets/decos/groddle/${RADIAL_HEIGHTS_MOON.asset}?v=radial-322`;
     await PIXI.Assets.load({
@@ -15443,6 +15483,7 @@ function buildParadiseBackground(course, points) {
   if (course.id === 'cloud_rings') buildCloudRingsBackground(root, course);
   else if (course.id === 'radial_heights') buildRadialBackground(root, course);
   else if (course.id === 'starlit_night') buildStarlitBackground(root, course, points);
+  else if (course.art) buildParadiseCourseArt(root, course, { foreground: entityLayer });
   else buildSlipBackground(root, course);
   return root;
 }
@@ -15571,6 +15612,8 @@ function spawnParadiseExit(course) {
   );
   root.zIndex = 44;
   const glow = new PIXI.Graphics();
+  // Reconstructed courses paint their own exit door; keep only a soft glow.
+  if (course.art) glow.alpha = 0.35;
   glow.beginFill(0xbfefff, 0.18);
   glow.drawEllipse(0, -50, 62, 84);
   glow.lineStyle(5, 0xf9ffff, 0.94);
@@ -15590,7 +15633,7 @@ function spawnParadiseExit(course) {
   arrow.position.set(0, -68);
   root.addChild(arrow);
   const label = new PIXI.Text(
-    course.id === 'radial_heights' ? "EXIT'S DOWN HERE!" : 'WAY HOME',
+    course.id === 'radial_heights' ? "EXIT'S DOWN HERE!" : course.exitLabel ?? 'WAY HOME',
     {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 12,
@@ -15611,7 +15654,7 @@ function spawnParadiseExit(course) {
 
 function announceParadiseFlight(course) {
   const promptText = new PIXI.Text(
-    course.movement === 'slide' ? 'BUILD SPEED · SPACEBAR JUMPS!' : 'PRESS SPACEBAR TO FLY!',
+    course.prompt || (course.movement === 'slide' ? 'BUILD SPEED · SPACEBAR JUMPS!' : 'PRESS SPACEBAR TO FLY!'),
     {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 26,
@@ -15653,9 +15696,9 @@ function renderParadiseFlightHud() {
   if (icon) icon.src = `assets/sprites/icons/${course.ticketId}.png`;
   if (title) title.textContent = course.name;
   if (controls) {
-    controls.textContent = course.movement === 'slide'
+    controls.textContent = course.controls || (course.movement === 'slide'
       ? 'Arrows build speed · Spacebar jumps'
-      : 'Spacebar to fly · arrows to steer';
+      : 'Spacebar to fly · arrows to steer');
   }
   if (timer) {
     timer.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
@@ -15666,7 +15709,7 @@ function renderParadiseFlightHud() {
     progressEl.textContent = course.ringCount
       ? `${progress.rings} / ${progress.ringTotal} rings · ${progress.collected} quoins`
       : `${progress.collected} / ${progress.total} ${
-          course.id === 'radial_heights' || course.id === 'slip_n_slide' ? 'stars' : 'lights'
+          course.progressNoun || (course.id === 'radial_heights' || course.id === 'slip_n_slide' ? 'stars' : 'lights')
         }`;
   }
   if (tickets) tickets.textContent = `${paradiseState.ticketsToday}/${PARADISE_DAILY_LIMIT} tickets today`;
@@ -15710,6 +15753,8 @@ function renderParadiseFlightHud() {
         paradiseBackdropStars.filter((star) => star?._litStartedAt > 0).length
       );
       app.view.dataset.paradiseStarlitSourceStars = String(paradiseBackdropStars.length);
+    } else if (course.art) {
+      Object.assign(app.view.dataset, paradiseCourseRuntime.dataset(paradiseCourseHost(), course));
     } else if (course.id === 'slip_n_slide') {
       app.view.dataset.paradiseSlipArt = 'recovered-k03-landmarks';
       app.view.dataset.paradiseSlipLandmarks = String(
@@ -15730,6 +15775,8 @@ function setupParadiseCourse(course, sourcePoints) {
       ? cloudRingPickupPoints(course)
       : course.id === 'slip_n_slide'
         ? slipPickupPoints(course)
+      : course.pickups
+        ? course.pickups.map((point) => ({ ...point, radius: 13 }))
       : fallbackParadisePoints(course);
   if (bgLayer && world) {
     world.removeChild(bgLayer);
@@ -15818,6 +15865,11 @@ function setupParadiseCourse(course, sourcePoints) {
       }
     }
     if (previewFinish && app?.view) app.view.dataset.paradisePreview = 'slip-finish';
+    if (course.art) {
+      paradiseCourseRuntime.enter(paradiseCourseHost(), course);
+      const preview = new URLSearchParams(location.search).get('paradisepreview');
+      if (preview && app?.view) app.view.dataset.paradisePreview = `${course.id}-${preview}`;
+    }
   }
   camTarget = cameraTargetForPlayer(player.x);
   camY = cameraTargetY(
@@ -15851,7 +15903,7 @@ async function transitionIntoParadise(course, points, useTransition = true) {
     radial_heights: [0x08243a, 0x3f7380],
     starlit_night: [0x180f43, 0x725184],
     slip_n_slide: [0x14384a, 0x4b7c82],
-  }[course.id];
+  }[course.id] || course.transitionColors;
   await runStreetTransition(el, {
     fromLabel: currentStreet?.label || '',
     fromHub: currentStreet?.hubName || '',
@@ -15890,9 +15942,9 @@ async function startParadiseFlight(courseId, opts = {}) {
       loadParadiseVisualAssets(course),
     ]);
     await transitionIntoParadise(course, points, opts.useTransition !== false);
-    const controls = course.movement === 'slide'
+    const controls = course.controlsHint || (course.movement === 'slide'
       ? 'Use the arrows to build speed. Spacebar jumps.'
-      : 'Spacebar to fly. Arrow keys steer.';
+      : 'Spacebar to fly. Arrow keys steer.');
     pushActivity(`${course.name}: ${controls} ${course.objective}.`);
     toast(controls, 3600);
     return paradiseRun;
@@ -16321,6 +16373,7 @@ function updateParadiseFlight(dt) {
     returnFromParadise({ expired: true });
     return;
   }
+  if (course.art) paradiseCourseRuntime.tick(paradiseCourseHost(), course, dt);
   for (const flake of bgLayer?.paradiseSnowflakes || []) {
     flake.y += flake._speed * dt;
     flake.x += flake._drift * dt;
@@ -21101,7 +21154,18 @@ async function main() {
   // This slice introduces one source ticket for each supplied Paradise video.
   // Preserve deliberate zeroes after a ticket has been activated or dropped.
   for (const ticketId of PARADISE_TICKET_IDS) {
+    // The nine reconstructed courses are dealt by the imagination shop.
+    if (paradiseCourseForTicket(ticketId)?.starterTicket === false) continue;
     if (inv[ticketId] === undefined) inv[ticketId] = 1;
+  }
+  // Pack-economy QA: &paradiseticket=<course>|all puts one ticket in the pack.
+  if (bootParams.has('paradiseticket')) {
+    const wanted = String(bootParams.get('paradiseticket') || '').toLowerCase();
+    for (const course of Object.values(PARADISE_COURSES)) {
+      if (wanted === 'all' || resolveParadiseCourseAlias(wanted, PARADISE_COURSES) === course.id) {
+        inv[course.ticketId] = Math.max(1, Number(inv[course.ticketId]) || 0);
+      }
+    }
   }
   // Deterministic source-item QA: plain keeps both accessories available,
   // while kiss/moon/all exercise each official persistent bear state.
@@ -21260,7 +21324,7 @@ async function main() {
           ? 'starlit_night'
           : paradiseDemoRaw === 'slip' || paradiseDemoRaw === 'slide'
             ? 'slip_n_slide'
-          : null;
+          : resolveParadiseCourseAlias(paradiseDemoRaw);
   const winterDemo = ['winter', 'winter-walk', 'snow', 'winter2'].includes(questDemo);
   const winterDemoRepeat =
     questDemo === 'winter2' || bootParams.get('winterrepeat') === '1';

@@ -41,8 +41,8 @@ const RULES = [
   // Keepable cards.
   [/^keepable_reshuffle$/, 'live', 'Puts a Reshuffle Card in your pack: a free re-deal of your hand.'],
   [/^keepable_instant_resurrection$/, 'live', 'Puts a Get Out of Hell Free Card in your pack: resurrect at once, fully refreshed.'],
-  [/^ticket_to_paradise_(cloud_rings|radial_heights|starlit_night|slip_n_slide)$/, 'live', 'Puts this Paradise ticket in your pack.'],
-  [/^ticket_to_paradise_/, 'later', 'This Paradise course has no recording to rebuild it from yet.'],
+  [/^ticket_to_paradise_(cloud_rings|radial_heights|starlit_night|slip_n_slide|aerial_boost|mountain_scaling|abysmal_thrill|arbor_hollow|bippity_bop|cloud_flight|updraft|sky_plunge|drafty_uplift)$/, 'live', 'Puts this Paradise ticket in your pack.'],
+  [/^ticket_to_paradise_/, 'later', 'This Paradise course cannot be reached by ticket yet.'],
 
   // Mining and metal.
   [/^mining_time_[123]$/, 'live', 'Mining takes 10 / 25 / 50% less time.'],
