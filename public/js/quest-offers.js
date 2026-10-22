@@ -150,6 +150,9 @@ export const REMAKE_QUEST_NPCS = Object.freeze([
   'npc_maintenance_bot',
   // Offers and turns in Carry That Weight II in her camp (quest-rooms/juju-camp.js).
   'npc_juju_grandma',
+  // Offer and turn in Gwendolyn's Task II and III inside the room (quest-rooms/gwendolyn.js).
+  'npc_squid',
+  'npc_gwendolyn',
 ]);
 const GSJS_STREET_SPIRITS = new Set([
   'street_spirit', 'street_spirit_groddle', 'street_spirit_firebog', 'street_spirit_zutto', 'street_spirit_ix',

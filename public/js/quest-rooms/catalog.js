@@ -75,6 +75,7 @@ export const BUILT_ROOMS = Object.freeze([
   'light_perspective',
   'tile_puzzle',
   'operation_grow',
+  'gwendolyn',
 ]);
 
 /**
@@ -160,6 +161,14 @@ export const OFFER_OVERRIDES = Object.freeze({
     ],
     why: 'canOffer: walk_speed_3 and jump_2; an hour after part 1, after the last repeat and after a fail',
   },
+  // Room 23 (the tower_quest instance behind Corridor Five's locked Red-Green
+  // Triangle Key door, with Greeterbot Sentry G-42 and the Ghost of Gwendolyn)
+  // is not rebuilt.
+  tower_quest: {
+    offerTriggers: [{ type: 'street', street: 'GTJ10M515812V0C' }],
+    prerequisites: [{ condition: 'over_level', value: 12, not: 0 }],
+    why: "Room 23's Greeterbot Sentry G-42 (level 12 gate) and Ghost of Gwendolyn are not rebuilt; the Magic Rock offers it in Corridor Five, by Room 23's door, at level 12",
+  },
   btc_room_3_reminisce: {
     prerequisites: [{ condition: 'custom_code', value: 'hour_after:btc_room_3', not: 0 }],
     why: 'canOffer: an hour after part 1 and after the last repeat or fail',
@@ -200,6 +209,17 @@ export const ROOM_ITEMS = Object.freeze({
     sellable: false,
     donatable: false,
     tags: ['no_rube', 'no_trade', 'no_auction', 'toys'],
+  },
+  // items/random_kindness.js: Gwendolyn's Task III's reward; its bestow verb needs another player.
+  random_kindness: {
+    label: 'Random Kindness',
+    namePlural: 'Random Kindnesses',
+    desc: 'This priceless item dispenses random kindness.',
+    stackMax: 1,
+    baseCost: 0,
+    isTool: true,
+    sellable: false,
+    tags: ['tool', 'no_auction', 'toys'],
   },
   // items/juju_trowel.js, note_hint.js, juju_paperweight.js (Carry That Weight).
   juju_trowel: {

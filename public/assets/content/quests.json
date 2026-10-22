@@ -34600,7 +34600,13 @@
   "silentComplete": false,
   "showAlert": false,
   "acceptLabel": "Kind of.",
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "over_level",
+    "value": 12,
+    "not": 0
+   }
+  ],
   "endNpcs": [
    "npc_squid"
   ],
@@ -34610,16 +34616,14 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "npc",
-    "npc": "npc_gwendolyn"
-   },
-   {
-    "type": "npc",
-    "npc": "npc_squid"
+    "type": "street",
+    "street": "GTJ10M515812V0C",
+    "override": true
    }
   ],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "instanceRoom": "gwendolyn",
+  "offerNote": "Room 23's Greeterbot Sentry G-42 (level 12 gate) and Ghost of Gwendolyn are not rebuilt; the Magic Rock offers it in Corridor Five, by Room 23's door, at level 12",
+  "solo": true
  },
  "tower_quest_part2": {
   "classTsid": "tower_quest_part2",
@@ -34656,8 +34660,8 @@
     "npc": "npc_squid"
    }
   ],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "instanceRoom": "gwendolyn",
+  "solo": true
  },
  "tower_quest_part3": {
   "classTsid": "tower_quest_part3",
@@ -34714,8 +34718,8 @@
     "npc": "npc_squid"
    }
   ],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "instanceRoom": "gwendolyn",
+  "solo": true
  },
  "tower_quest_part3repeat": {
   "classTsid": "tower_quest_part3repeat",
@@ -34764,8 +34768,8 @@
     "npc": "npc_squid"
    }
   ],
-  "solo": false,
-  "soloReason": "feature_unbuilt"
+  "instanceRoom": "gwendolyn",
+  "solo": true
  },
  "transcendentalradiation_radiate_to_five_people": {
   "classTsid": "transcendentalradiation_radiate_to_five_people",

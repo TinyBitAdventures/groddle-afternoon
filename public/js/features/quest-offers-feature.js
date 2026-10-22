@@ -99,7 +99,9 @@ function presentOffer(engine, now = Date.now()) {
     if (result.ok) {
       engine.pushActivity(`New quest: ${card.def.title}`);
       engine.refreshPack();
-      if (result.completable) finish([{ classTsid: card.classTsid, def: card.def }], engine);
+      // A rebuilt quest room turns its own quest in: a room quest with no
+      // requirements (Le Misérable, Gwendolyn's Task) must not complete on accept.
+      if (result.completable?.length && !card.def.instanceRoom) finish([{ classTsid: card.classTsid, def: card.def }], engine);
     }
     engine.save();
   };
