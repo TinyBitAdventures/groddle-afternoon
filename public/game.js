@@ -2674,7 +2674,7 @@ function renderPackPopover(classTsid, anchor = null) {
       ${toolCondition?.tracked && toolCondition.needsRepair && toolCondition.repairable ? `<button type="button" class="pack-pop-repair" data-pack-repair ${canRepair ? '' : 'disabled'} title="${canRepair ? 'Repair with your Tinkertool' : 'Needs Tinkering, energy, and a working Tinkertool'}">Repair · ${repairQuote?.ok ? `${repairQuote.energy} energy` : 'unavailable'}</button>` : ''}
       ${features.packVerbs(classTsid, engine).map((verb) => `<button type="button" class="pack-bear-action pack-feature-verb${verb.primary ? ' pack-pop-primary' : ''}" data-feature-pack-verb="${escapeHtml(verb.id)}" data-feature-id="${escapeHtml(verb.featureId)}" ${verb.enabled === false ? 'disabled' : ''} title="${escapeHtml(verb.enabled === false ? verb.reason || '' : verb.tooltip || '')}">${escapeHtml(verb.label)}</button>`).join('')}
       ${recipeTarget ? `<button type="button" data-pack-make>${escapeHtml(makeLabel)}</button>` : ''}
-      <button type="button" data-pack-drop>Drop</button>
+      <button type="button" data-pack-drop ${packDropBlockReason(classTsid) ? `disabled title="${escapeHtml(packDropBlockReason(classTsid))}"` : ''}>Drop</button>
       ${canSellHere ? `<button type="button" class="pack-pop-sell" data-pack-sell>Sell for ◎ ${sellPrice}</button>` : ''}
     </div>
     ${dropPrompt}`;
@@ -7664,8 +7664,25 @@ function refreshDroppedWorldItems() {
 }
 
 /** Pack action: place a chosen stack at the player's feet, merging nearby matches. */
+/**
+ * takeable_drop_conditions: quest items (and classes whose canDrop says no)
+ * stay in the pack. The remake marks them with the `quest-item` or `no_drop`
+ * tag.
+ */
+function packDropBlockReason(classTsid) {
+  const tags = ITEM_CATALOG[classTsid]?.tags || [];
+  if (tags.includes('quest-item')) return "This item is needed for a quest and can't be dropped.";
+  if (tags.includes('no_drop')) return "This item can't be dropped.";
+  return '';
+}
+
 function dropPackItem(classTsid, requested = 1) {
   if (!state.started || !player || !currentStreetTsid) return;
+  const blocked = packDropBlockReason(classTsid);
+  if (blocked) {
+    toast(blocked);
+    return;
+  }
   const count = normalizeStackQuantity(requested, inv[classTsid] || 0);
   if (!count) {
     toast('That stack is no longer in your pack.');
