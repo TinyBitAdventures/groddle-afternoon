@@ -1393,9 +1393,34 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 195,
+  "commits": 200,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Your pick swings at the rock while you mine"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "Notices sit above the pack and appear without sliding"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Butterflies, Mr. Hairball, the tutorial dustbunny and shrines animate on their real frame grids"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Rook attack overlay covers the whole street"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Build your Glitch from the original wardrobe, sharp on Retina"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1490,31 +1515,6 @@
     "date": "2026-10-21",
     "kind": "new",
     "text": "A restoration walkthrough at /restoration/: how much of Glitch is back"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Gwendolyn's Task: Area 42, the Outer and Inner Mind, and Gwendolyn's Chamber"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "An Old Fashioned B&E's tile maze and Operation: Grow's bog field"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "fix",
-    "text": "Holding Up at a ladder's top steps onto the deck"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Walk Toward the Light: a dark room of coloured lights and clouds"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Join the Club: the treehouse clubhouse and Pintura Prosa"
    }
   ]
  },

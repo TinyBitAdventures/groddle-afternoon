@@ -14,6 +14,12 @@
  *    brightness, alpha.
  *  - com/tinyspeck/core/data/AvatarSwfParticulars.as: hats that allow hair,
  *    coats that keep shirt sleeves.
+ *
+ * The rig (assets/avatar/base.json) is Avatar.swf's avatarContainer plus the
+ * coat sleeve, shoulder, hair lock, headdress and tail containers recovered
+ * from Avatar2011.fla (tools/avatar-compositor/xfl.mjs). The client's
+ * sideBraceletCloseContainer_mc is in neither file, and addSocks is never
+ * called, so the side bracelet and socks stay unwearable.
  */
 
 // ---------------------------------------------------------------------------
@@ -203,6 +209,9 @@ export const SHIRT_AND_DRESS_SLEEVES = Object.freeze([
 ]);
 export const COATS_THAT_ALLOW_SLEEVES = Object.freeze(['elizabethan_robe', 'mongolian_fighting', 'Fisherman_vest']);
 
+/** Hair containers a hat's HairMask clips when hat and hair are worn together. */
+export const HAT_MASKED_HAIR = Object.freeze(['sideHairContainer_mc', 'backHairContainer_mc', 'sideHairCloseContainer_mc', 'sideHairOffsideContainer_mc']);
+
 /** AvatarSwf.addShoes: 'boot' or 'ball' in the name (but not ballet) uses the boot containers. */
 export function isBoot(name) {
   const n = String(name || '').toLowerCase();
@@ -359,9 +368,12 @@ export function frameDrawList(rig, look, frameIndex) {
     if ((container === 'sideEyeCloseContainer_mc' || container === 'sideEyeOffsideContainer_mc' || container === 'sideMouthContainer_mc') && skull) {
       return skull.node.ops.map((o) => ({ src: 'base', s: o.s, m: mulM(skull.m, o.m) }));
     }
-    if (assign.hatAndHair && (container === 'sideHairContainer_mc' || container === 'backHairContainer_mc')) {
-      const hatC = container === 'sideHairContainer_mc' ? 'sideHatContainer_mc' : 'backHatContainer_mc';
-      const maskPart = container === 'sideHairContainer_mc' ? 'sideHatHairMask' : 'backHatHairMask';
+    // The hat's HairMask (in the hat container) also masks the front and
+    // back hair locks (AvatarSwf: side_hair_close_mask, side_hair_offside_mask).
+    if (assign.hatAndHair && HAT_MASKED_HAIR.includes(container)) {
+      const back = container === 'backHairContainer_mc';
+      const hatC = back ? 'backHatContainer_mc' : 'sideHatContainer_mc';
+      const maskPart = back ? 'backHatHairMask' : 'sideHatHairMask';
       const row = containerM.get(hatC);
       const hat = assign.map.get(hatC)?.[0];
       if (row && hat) {

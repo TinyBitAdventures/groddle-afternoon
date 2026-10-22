@@ -5,7 +5,7 @@
  * compositor draws (js/avatar-compositor.js).
  *
  * Saved shape (all optional; missing parts fall back to the catalog default):
- *   outfit:  { eyes, mouth, nose, ears, hair, hat, shirt, dress, pants, skirt, shoes } -> article name | 'none'
+ *   outfit:  { eyes, mouth, nose, ears, hair, hat, shirt, coat, dress, pants, skirt, shoes } -> article name | 'none'
  *   variant: { [type]: index into the article's GSJS colourways }
  *   tint:    { [type]: 'rrggbb' }  custom color_1 (overrides the colourway's)
  *   skinColor / hairColor: GSJS data_avatar_colors id, or skinTint / hairTint 'rrggbb'
@@ -13,9 +13,9 @@
  */
 
 /** Article types the builder offers, in tab order. */
-export const LOOK_TYPES = Object.freeze(['hair', 'hat', 'eyes', 'mouth', 'nose', 'ears', 'shirt', 'dress', 'pants', 'skirt', 'shoes']);
+export const LOOK_TYPES = Object.freeze(['hair', 'hat', 'eyes', 'mouth', 'nose', 'ears', 'shirt', 'coat', 'dress', 'pants', 'skirt', 'shoes']);
 /** Types a look may leave empty. */
-export const OPTIONAL_TYPES = Object.freeze(['hat', 'dress', 'skirt', 'hair', 'shirt', 'pants', 'shoes', 'nose', 'ears']);
+export const OPTIONAL_TYPES = Object.freeze(['hat', 'coat', 'dress', 'skirt', 'hair', 'shirt', 'pants', 'shoes', 'nose', 'ears']);
 
 const HEX = /^[0-9a-f]{6}$/i;
 export const cleanHex = (v) => {
@@ -174,7 +174,8 @@ export function variantSwatch(colors) {
 /**
  * A random look from the catalog: every face part, a hair style (a hat one
  * time in four, only with hair it allows), a top (a dress one time in six),
- * a bottom, shoes, real colourways and palette colours.
+ * a coat one time in four, a bottom, shoes, real colourways and palette
+ * colours.
  */
 export function randomVectorFields(catalog, rng = Math.random) {
   const pick = (list) => list[Math.floor(rng() * list.length) % list.length];
@@ -200,6 +201,7 @@ export function randomVectorFields(catalog, rng = Math.random) {
     }
   }
   if (!outfit.hat) outfit.hat = 'none';
+  if (!(rng() < 0.25 && choose('coat'))) outfit.coat = 'none';
   const skin = catalog?.palettes?.skin || [];
   const hair = catalog?.palettes?.hair || [];
   return normalizeVectorFields({ outfit, variant, skinColor: skin.length ? pick(skin).id : undefined, hairColor: hair.length ? pick(hair).id : undefined }, catalog);

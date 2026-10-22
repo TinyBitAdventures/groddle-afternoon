@@ -10,8 +10,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  ARTICLE_CONTAINERS, SKIN_NODES, applyCM, colorMatrixFor, drawListBounds, expandRig, frameDrawList,
-  hardLightMatrix, isBoot, lookMatrices, slotAssignments,
+  ARTICLE_CONTAINERS, HAT_MASKED_HAIR, SKIN_NODES, SLOT_PARTS, applyCM, colorMatrixFor, drawListBounds, expandRig,
+  frameDrawList, hardLightMatrix, isBoot, lookMatrices, slotAssignments,
 } from '../public/js/avatar-rig.js';
 import {
   articleColors, lookKey, normalizeVectorFields, randomVectorFields, resolveLook, vectorFieldsFromColors,
@@ -20,6 +20,7 @@ import { SHEET_FRAMES } from '../public/js/avatar-anims.js';
 import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js';
 import { compactD } from '../tools/avatar-compositor/shapes.mjs';
+import { customEase, easeAt, layerAt, readSymbol, tweenElement } from '../tools/avatar-compositor/xfl.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -136,7 +137,11 @@ describe('catalog and looks', () => {
           if (part.frames !== 0) assert.equal(part.frames.length, RIG_FRAMES.length);
           for (const v of part.variants) for (const op of flat(v.map((o) => (o.clip ? { clip: o.clip, items: o.ops } : o)))) assert.ok(data.shapes[op.s], `${item.name} shape ${op.s}`);
         }
-        if (['shirt', 'pants', 'shoes', 'hat', 'skirt', 'dress'].includes(type)) assert.ok(item.variants?.length >= 1, `${item.name} colourways`);
+        if (['shirt', 'coat', 'pants', 'shoes', 'hat', 'skirt', 'dress'].includes(type)) assert.ok(item.variants?.length >= 1, `${item.name} colourways`);
+        // Wearable whole: every part it ships has a container in the rig.
+        const kind = type === 'shoes' && isBoot(item.name) ? 'boots' : type;
+        const containers = new Map(SLOT_PARTS[kind].map(([p, c]) => [p, c]));
+        for (const part of item.parts.filter((p) => !/HairMask$/.test(p))) assert.ok(rig.slots.includes(containers.get(part)), `${type}/${item.name} ${part} has no container`);
         n += 1;
       }
     }
@@ -166,6 +171,84 @@ describe('catalog and looks', () => {
       for (const [type, name] of Object.entries(f.outfit)) if (name !== 'none') assert.ok(catalog.types[type].some((x) => x.name === name), `${type} ${name}`);
       if (f.outfit.hat && f.outfit.hat !== 'none') assert.ok(catalog.hatHair[f.outfit.hat].includes(f.outfit.hair));
     }
+  });
+});
+
+describe('recovered containers (Avatar2011.fla)', () => {
+  it('eases and tweens like the compiled SWF', () => {
+    // XFL acceleration > 0 eases in (slow start), < 0 eases out.
+    assert.equal(easeAt({ accel: 100 }, 0.5), 0.25);
+    assert.equal(easeAt({ accel: -100 }, 0.5), 0.75);
+    assert.equal(easeAt({ accel: 0 }, 0.3), 0.3);
+    const curve = [[0, 0], [0.4545, 0], [0.5977, 1], [1, 1]];
+    assert.ok(Math.abs(customEase(curve, 0)) < 1e-6 && Math.abs(customEase(curve, 1) - 1) < 1e-6);
+    assert.ok(customEase(curve, 0.1) < 0.05 && customEase(curve, 0.9) > 0.95, 'an S-curve: slow at both ends');
+    const e0 = { m: [1, 0, 0, 1, 0, 0], tp: [0, 0], alpha: 1 };
+    const e1 = { m: [0, 1, -1, 0, 10, 20], tp: [0, 0], alpha: 1 };
+    const half = tweenElement(e0, e1, 0.5).m;
+    assert.ok(Math.abs(half[0] - Math.SQRT1_2) < 1e-9 && Math.abs(half[1] - Math.SQRT1_2) < 1e-9, 'rotates the short way');
+    assert.deepEqual(half.slice(4), [5, 10]);
+    const layer = readSymbol(`<DOMSymbolItem name="x"><timeline><DOMTimeline name="x"><layers><DOMLayer name="a"><frames>
+      <DOMFrame index="0" duration="4" tweenType="motion" acceleration="100"><elements><DOMSymbolInstance libraryItemName="c" name="c_mc"><matrix><Matrix tx="0"/></matrix></DOMSymbolInstance></elements></DOMFrame>
+      <DOMFrame index="4"><elements><DOMSymbolInstance libraryItemName="c" name="c_mc"><matrix><Matrix tx="8"/></matrix><color><Color alphaMultiplier="0"/></color></DOMSymbolInstance></elements></DOMFrame>
+      </frames></DOMLayer></layers></DOMTimeline></timeline></DOMSymbolItem>`).layers[0];
+    assert.equal(layerAt(layer, 3)[0].m[4], 2); // eased in: 8 * 0.5^2
+    assert.equal(layerAt(layer, 5)[0].alpha, 0);
+  });
+
+  it('adds the coat, shoulder, hair-lock, headdress and tail containers at their FLA depths', () => {
+    const r = rig.recovered;
+    assert.ok(r && r.check.maxPx <= 0.25 && r.check.placements > 10000, 'shared containers match Avatar.swf');
+    const want = ['sideCoatSleeveUpperCloseContainer_mc', 'sideCoatSleeveLowerOffsideContainer_mc', 'backCoatSleeveUpperLeftContainer_mc',
+      'sideShoulderCloseContainer_mc', 'sideShoulderOffsideContainer_mc', 'sideHairCloseContainer_mc', 'sideHairOffsideContainer_mc',
+      'sideHeaddressCloseContainer_mc', 'sideHeaddressOffsideContainer_mc', 'sideTailContainer_mc', 'backTailContainer_mc'];
+    for (const c of want) assert.ok(c in r.containers && rig.slots.includes(c), c);
+    assert.deepEqual(r.missing, ['sideBraceletCloseContainer_mc']);
+    // Paint order at the stand: far hair lock under the body, tail under the
+    // torso, front lock and headdress over the close arm and its coat sleeve.
+    const rows = rig.table[RIG_FRAMES.indexOf(801)];
+    const pos = (pred) => rows.findIndex(pred);
+    const slot = (name) => pos((r2) => r2.slot === name);
+    const node = (name) => pos((r2) => r2.n !== undefined && rig.nodes[r2.n].name === name);
+    assert.ok(slot('sideHairOffsideContainer_mc') < node('sideArmUpperOffside_mc'));
+    assert.ok(slot('sideTailContainer_mc') < node('sideTorso_mc'));
+    assert.ok(node('sideArmUpperClose_mc') < slot('sideCoatSleeveUpperCloseContainer_mc'));
+    assert.ok(slot('sideCoatSleeveUpperCloseContainer_mc') < slot('sideHairCloseContainer_mc'));
+    assert.ok(slot('sideHairCloseContainer_mc') < slot('sideHeaddressCloseContainer_mc'));
+    // The climb shows the back: back coat sleeves, no side hair locks.
+    const climb = rig.table[RIG_FRAMES.indexOf(1150)];
+    assert.ok(climb.some((r2) => r2.slot === 'backCoatSleeveUpperLeftContainer_mc'));
+    assert.ok(!climb.some((r2) => r2.slot === 'sideHairCloseContainer_mc'));
+  });
+
+  it('a coat draws its sleeves and hides the shirt sleeves; a tail and hair locks follow the walk', () => {
+    const look = resolveLook({ outfit: { coat: 'navy_coat', pants: 'unicorn_pants', hair: 'pigtails', hat: 'none' } }, catalog);
+    const { look: L } = lookCtx(look);
+    const sleeveShirt = SLOT_PARTS.shirt.filter(([p]) => /^sleeve/.test(p));
+    assert.ok(L.assign.hidden.has(sleeveShirt[0][1]));
+    const walk = SHEET_FRAMES.base.slice(0, 12);
+    const tailAt = [];
+    for (const fn of walk) {
+      const items = flat(frameDrawList(rig, L, RIG_FRAMES.indexOf(fn)));
+      assert.ok(items.filter((it) => it.src === 'navy_coat').length > 4, `coat at ${fn}`);
+      assert.ok(items.some((it) => it.src === 'pigtails'), `hair at ${fn}`);
+      tailAt.push(JSON.stringify(items.filter((it) => it.src === 'unicorn_pants').map((it) => it.m.map((v) => v.toFixed(1)))));
+    }
+    assert.ok(new Set(tailAt).size > 1, 'pants and tail move with the walk');
+    // Hair locks sit in the recovered containers.
+    const assign = slotAssignments({ hair: { name: 'pigtails', parts: catalog.types.hair.find((h) => h.name === 'pigtails').parts } });
+    assert.ok(assign.map.has('sideHairCloseContainer_mc') || assign.map.has('sideHairOffsideContainer_mc'));
+  });
+
+  it("a hat's hair mask clips the front and back hair locks too", () => {
+    const hat = catalog.types.hat.find((h) => catalog.hatHair[h.name]?.some((hair) => catalog.types.hair.find((x) => x.name === hair)?.parts.some((p) => /HairClose|HairOffside/.test(p))));
+    if (!hat) return;
+    const hair = catalog.hatHair[hat.name].find((n) => catalog.types.hair.find((x) => x.name === n)?.parts.some((p) => /HairClose|HairOffside/.test(p)));
+    const { look: L } = lookCtx(resolveLook({ outfit: { hat: hat.name, hair } }, catalog));
+    assert.ok(L.assign.hatAndHair);
+    const items = frameDrawList(rig, L, RIG_FRAMES.indexOf(801));
+    assert.ok(items.some((it) => it.clip && it.items.some((x) => x.src === hair)), `${hat.name} masks ${hair}`);
+    assert.ok(HAT_MASKED_HAIR.includes('sideHairCloseContainer_mc'));
   });
 });
 

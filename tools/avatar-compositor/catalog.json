@@ -79,7 +79,14 @@
       "hair_07",
       "hair_09",
       "hair_12",
-      "electro_longbangs"
+      "electro_longbangs",
+      "Corn_rows",
+      "Madonna",
+      "MopHair",
+      "Mullet",
+      "clownMop",
+      "pigtails",
+      "BrowPatch"
     ],
     "hat": [
       "cap",
@@ -89,7 +96,16 @@
       "chef_hat",
       "flat_cap",
       "striped_tuque",
-      "viking"
+      "viking",
+      "top_hat",
+      "steampunk_hat",
+      "deer",
+      "cleopatra_headdress_royal",
+      "Garden_gnome_hat",
+      "bobbles",
+      "cosma_hat",
+      "pumpkin_mask",
+      "spriggan_mask"
     ],
     "shirt": [
       "classic_undershirt",
@@ -103,6 +119,33 @@
       "flowy_shirt",
       "Shirt_and_Tie"
     ],
+    "coat": [
+      "navy_coat",
+      "rain_coat",
+      "plain_hoodie",
+      "flower_hoodie",
+      "tinyfox_hoodie",
+      "tweed_jacket",
+      "pea_coat",
+      "plaid_coat",
+      "fur_collar_coat",
+      "jacket_with_vest",
+      "Reflective_Jacket",
+      "lab_coat",
+      "chef_coat",
+      "pirate_coat",
+      "military_coat",
+      "tuxedo_and_bowtie",
+      "Male_steampunk_top",
+      "bath_robe",
+      "Fisherman_vest",
+      "chicken_suit_top",
+      "unicorn_top",
+      "Mini_dino_top",
+      "Godzilla_Top",
+      "GlitchamaphoneFoxTop",
+      "mab"
+    ],
     "pants": [
       "plain_trousers",
       "regular_jeans",
@@ -111,7 +154,14 @@
       "polkadot_pants",
       "leggings_pants",
       "drawstring_sweats",
-      "checker_pants"
+      "checker_pants",
+      "unicorn_pants",
+      "Mini_dino_pants",
+      "Godzilla_Pants",
+      "GlitchamaphoneFoxPants",
+      "GlitchamaphoneChickenPants",
+      "brazil_carnival_tail",
+      "rook_outfit_pants"
     ],
     "skirt": [
       "short_skirt",

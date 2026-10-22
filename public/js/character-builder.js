@@ -206,6 +206,25 @@ export const APPEARANCE_PRESETS = {
       hairColor: 111,
     }),
   },
+  dapper: {
+    id: 'dapper',
+    label: 'Dapper',
+    appearance: vectorPreset({
+      outfit: { hair: 'Mullet', hat: 'top_hat', eyes: 'eyes_20101109C', mouth: 'mouth_12', nose: 'nose_manly_1', ears: 'ears_0001', shirt: 'classic_undershirt', coat: 'tuxedo_and_bowtie', pants: 'plain_trousers', shoes: 'Men_DressShoes' },
+      variant: { pants: 13 },
+      skinColor: 1,
+      hairColor: 22,
+    }),
+  },
+  dino: {
+    id: 'dino',
+    label: 'Dino',
+    appearance: vectorPreset({
+      outfit: { hair: 'pigtails', hat: 'none', eyes: 'eyes_big_eyebrows', mouth: 'mouth_10', nose: 'nose_0010', ears: 'ears_0005', shirt: 'plain_tee_light', coat: 'Mini_dino_top', pants: 'Mini_dino_pants', shoes: 'bunny_slippers' },
+      skinColor: 50,
+      hairColor: 80,
+    }),
+  },
   glitch: {
     id: 'glitch',
     label: 'Recovered',

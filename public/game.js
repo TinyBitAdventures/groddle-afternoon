@@ -6570,12 +6570,13 @@ function closeAvatarPanel() {
 
 /** Builder tabs: colour slots for the older looks, parts for the vector Glitch. */
 const CLASSIC_BUILDER_TABS = [['hair', 'Hair'], ['skin', 'Skin'], ['shirt', 'Shirt'], ['pants', 'Pants'], ['shoes', 'Shoes']];
-const VECTOR_BUILDER_TABS = [['hair', 'Hair'], ['face', 'Face'], ['skin', 'Skin'], ['top', 'Top'], ['bottom', 'Bottom'], ['shoes', 'Shoes'], ['hat', 'Hat']];
+const VECTOR_BUILDER_TABS = [['hair', 'Hair'], ['face', 'Face'], ['skin', 'Skin'], ['top', 'Top'], ['coat', 'Coat'], ['bottom', 'Bottom'], ['shoes', 'Shoes'], ['hat', 'Hat']];
 /** Which article types each vector tab edits, with section titles. */
 const VECTOR_TAB_TYPES = {
   hair: [['hair', 'Hair style']],
   face: [['eyes', 'Eyes'], ['mouth', 'Mouth'], ['nose', 'Nose'], ['ears', 'Ears']],
   top: [['shirt', 'Top'], ['dress', 'Dress']],
+  coat: [['coat', 'Coat']],
   bottom: [['pants', 'Trousers'], ['skirt', 'Skirt']],
   shoes: [['shoes', 'Shoes']],
   hat: [['hat', 'Hat']],
@@ -6746,7 +6747,7 @@ function renderStyleChips(box, type, title) {
   const row = document.createElement('div');
   row.className = 'avatar-style-row';
   const current = vectorPartName(type);
-  const optional = ['hat', 'dress', 'skirt', 'nose', 'ears'].includes(type);
+  const optional = ['hat', 'coat', 'dress', 'skirt', 'nose', 'ears'].includes(type);
   const options = optional ? [{ name: 'none', label: 'None' }, ...items] : items;
   for (const item of options) {
     const btn = document.createElement('button');

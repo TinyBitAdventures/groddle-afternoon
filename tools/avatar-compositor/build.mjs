@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Vector Glitch avatar data and the default look's sheets, from Tiny Speck's
- * CC0 glitch-avatars SWFs (base_avatar/Avatar.swf + vanity/wardrobe parts).
+ * CC0 glitch-avatars SWFs (base_avatar/Avatar.swf + vanity/wardrobe parts,
+ * plus the missing containers from base_avatar/Avatar2011.fla).
  *
  *   node tools/avatar-compositor/build.mjs data     # rig, articles, catalog -> public/assets/avatar/
  *   node tools/avatar-compositor/build.mjs render   # default look -> assets/sprites/avatar/vector/ (+ @3x)
@@ -11,7 +12,9 @@
  * data: Avatar.swf's avatarContainer (sprite 409) is flattened at every swf
  * frame the game's sheets use (js/avatar-anims.js SHEET_FRAMES); each
  * container keeps its per-frame matrix, so an article part placed in it
- * follows the limb exactly as AvatarSwf.addArticlePartToContainer did. Each
+ * follows the limb exactly as AvatarSwf.addArticlePartToContainer did. The
+ * 17 article containers that SWF lacks (coat sleeves and shoulders, front and
+ * back hair locks, headdresses, tails) come from Avatar2011.fla (xfl.mjs). Each
  * catalog article (tools/avatar-compositor/catalog.json) is flattened the
  * same way (face parts animate on the same frame numbers). Shapes come from
  * FFDec's SVG export. Colours: GSJS default colours per article and the
@@ -33,6 +36,7 @@ import os from 'node:os';
 import { readSwf } from './swf.mjs';
 import { exportShapes } from './shapes.mjs';
 import { buildRig, flattenPart, nodeContent, shapeIds } from './rig.mjs';
+import { mergeContainers, readAvatarFla, validateAgainstSwf } from './xfl.mjs';
 import { loadGsjsAvatarData, loadHatHairMap } from './gsjs.mjs';
 import { ARTICLE_CONTAINERS, SLOT_PARTS } from '../../public/js/avatar-rig.js';
 import { SHEET_FRAMES } from '../../public/js/avatar-anims.js';
@@ -96,10 +100,45 @@ function bitmapIdsOf(shapes) {
 // data
 // ---------------------------------------------------------------------------
 
+/**
+ * Article containers the public Avatar.swf lacks (coat sleeves and
+ * shoulders, front/back hair, headdresses, tails), merged in from
+ * Avatar2011.fla's avatarContainer after its shared containers are checked
+ * against the SWF at every sheet frame (xfl.mjs).
+ */
+function recoverContainers(swf, rootId) {
+  const fla = join(AVATARS, 'base_avatar/Avatar2011.fla');
+  const root = swf.sprites.get(rootId);
+  const inSwf = new Set([...swf.sprites.values()].flatMap((t) => t.frames.flat()).filter((op) => op.name).map((op) => op.name));
+  const absent = ARTICLE_CONTAINERS.filter((c) => !inSwf.has(c));
+  if (!existsSync(fla)) {
+    console.warn(`no ${fla}: ${absent.length} containers stay empty (git sparse-checkout add /base_avatar/Avatar2011.fla)`);
+    return null;
+  }
+  const symbol = readAvatarFla(fla);
+  const check = validateAgainstSwf(symbol, root, RIG_FRAMES);
+  if (check.compared < 10000 || check.maxPx > 0.25 || check.maxM > 0.01 || check.alphaMismatches) {
+    throw new Error(`Avatar2011.fla does not reproduce Avatar.swf: ${JSON.stringify(check)}`);
+  }
+  const inFla = new Set(symbol.layers.flatMap((l) => l.frames.flatMap((f) => f.els.map((e) => e.name))));
+  const names = absent.filter((c) => inFla.has(c));
+  const { timeline, depths } = mergeContainers(swf, rootId, symbol, names);
+  swf.sprites.set(rootId, timeline);
+  const r3 = (v) => Math.round(v * 1000) / 1000;
+  console.log(`Avatar2011.fla: ${names.length} containers merged; shared containers within ${r3(check.maxPx)} px over ${check.compared} placements; still missing: ${absent.filter((c) => !inFla.has(c)).join(', ') || 'none'}`);
+  return {
+    source: 'glitch-avatars/base_avatar/Avatar2011.fla (CC0), LIBRARY/~containers/avatarContainer.xml',
+    containers: Object.fromEntries(Object.entries(depths).sort((a, b) => a[1] - b[1])),
+    missing: absent.filter((c) => !inFla.has(c)),
+    check: { placements: check.compared, maxPx: r3(check.maxPx), maxMatrix: Math.round(check.maxM * 1e4) / 1e4 },
+  };
+}
+
 function buildBase() {
   const file = join(AVATARS, 'base_avatar/Avatar.swf');
   const swf = readSwf(file);
   const rootId = swf.classes.get('avatarContainer');
+  const recovered = recoverContainers(swf, rootId);
   const rig = buildRig(swf, rootId, RIG_FRAMES, ARTICLE_CONTAINERS, LEG_CONTAINERS);
   const { shapes: allShapes, bitmaps } = exportShapes(file, workFor(file), swf.shapeBounds);
   const nodes = rig.nodes.map((n) => {
@@ -116,6 +155,7 @@ function buildBase() {
   const bmp = writeBitmaps(bitmaps, bitmapIdsOf(shapes), 'base');
   const data = {
     source: 'glitch-avatars/base_avatar/Avatar.swf (CC0), sprite avatarContainer',
+    recovered,
     frames: RIG_FRAMES,
     nodes,
     ...packTable(rig),
