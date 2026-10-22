@@ -65,13 +65,21 @@ function makeSourceIndex(data) {
 }
 
 /* —— Project cards ———————————————————————————— */
+const CARD_LEAD_FACTS = ['Status', 'Platform', 'How to play'];
 function renderCards(data, restoration, src) {
   const cards = $('#cards');
   for (const p of data.projects) {
-    const facts = el('dl', { class: 'facts' }, p.facts.map((f) => [
+    const factList = (list) => el('dl', { class: 'facts' }, list.map((f) => [
       el('dt', {}, f.label),
       el('dd', {}, f.text, ' ', src.refs(f.sources)),
     ]));
+    // The other projects lead with what a visitor asks first; the build details fold away.
+    const lead = p.ours ? p.facts : p.facts.filter((f) => CARD_LEAD_FACTS.includes(f.label));
+    const rest = p.ours ? [] : p.facts.filter((f) => !CARD_LEAD_FACTS.includes(f.label));
+    const facts = [
+      factList(lead),
+      rest.length ? el('details', { class: 'card-more' }, el('summary', {}, 'More details'), factList(rest)) : null,
+    ];
     let numbers = null;
     if (p.ours && restoration) {
       numbers = el('ul', { class: 'card-numbers', 'aria-label': 'Counted from the repository' },
@@ -79,15 +87,17 @@ function renderCards(data, restoration, src) {
           el('b', {}, fmt(n.num), n.of != null ? el('small', {}, ` / ${fmt(n.of)}`) : null),
           el('span', {}, n.label, n.note ? `, ${n.note}` : ''))));
     }
-    cards.append(el('article', { class: `card${p.ours ? ' card-ours' : ''}`, id: `project-${p.id}`, 'aria-labelledby': `project-${p.id}-h` },
-      el('div', { class: 'card-head' },
-        el('p', { class: 'card-kicker' }, `${p.approach} · ${p.years}`),
-        el('h3', { id: `project-${p.id}-h` }, p.name),
-        el('span', { class: 'pill', style: `--tone:var(--${p.badge.tone})` }, p.badge.label)),
-      el('p', { class: 'card-summary' }, p.summary),
-      numbers,
-      facts,
-      el('p', { class: 'card-link' }, el('a', linkAttrs(p.link.url), p.link.label, isExternal(p.link.url) ? el('span', { class: 'ext', 'aria-hidden': 'true' }, ' ↗') : null))));
+    const head = el('div', { class: 'card-head' },
+      el('p', { class: 'card-kicker' }, `${p.approach} · ${p.years}`),
+      el('h3', { id: `project-${p.id}-h` }, p.name),
+      el('span', { class: 'pill', style: `--tone:var(--${p.badge.tone})` }, p.badge.label));
+    const summary = el('p', { class: 'card-summary' }, p.summary);
+    const link = el('p', { class: 'card-link' }, el('a', linkAttrs(p.link.url), p.link.label, isExternal(p.link.url) ? el('span', { class: 'ext', 'aria-hidden': 'true' }, ' ↗') : null));
+    // Ours spans the row: numbers on the left, its facts beside them.
+    const body = p.ours
+      ? [el('div', { class: 'ours-main' }, head, summary, numbers), el('div', { class: 'ours-facts' }, ...facts, link)]
+      : [head, summary, ...facts, link];
+    cards.append(el('article', { class: `card${p.ours ? ' card-ours' : ''}`, id: `project-${p.id}`, 'aria-labelledby': `project-${p.id}-h` }, ...body));
   }
   const others = $('#others-list');
   for (const o of data.others) {
@@ -103,7 +113,7 @@ function renderMatrix(data, restoration, src) {
 
   $('#matrix-legend').append(...STATUS_KEYS.map((k) => el('li', {},
     el('span', { class: `mark mark-${k}`, 'aria-hidden': 'true' }, statuses[k].mark),
-    el('b', {}, statuses[k].label), ` ${statuses[k].desc}`)));
+    el('b', {}, statuses[k].label), el('span', { class: 'legend-desc' }, statuses[k].desc))));
 
   // Resolve every cell first, so the header can carry a tally.
   const grid = data.rows.map((row) => projects.map((p) => {
