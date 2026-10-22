@@ -319,6 +319,6 @@ describe('trant harvest (GSJS-extracted)', () => {
     assert.match(game, /dataset\.trantHarvestYield/);
     assert.match(game, /TRANT_FRAME_VERSION = 'all-species-cell-2'/);
     assert.match(html, /game\.js\?v=official-ecology-1/);
-    assert.match(game, /muted:\s*true/);
+    assert.match(game, /muted: loadMutedPreference\(\)/);
   });
 });

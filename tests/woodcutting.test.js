@@ -159,6 +159,6 @@ test.describe('Wood Tree client integration', () => {
     assert.match(game, /woodTreeChanged/);
     assert.match(game, /if \(inv\.hatchet === undefined\) inv\.hatchet = 1/);
     assert.match(html, /game\.js\?v=official-ecology-1/);
-    assert.match(game, /muted: true/);
+    assert.match(game, /muted: loadMutedPreference\(\)/);
   });
 });

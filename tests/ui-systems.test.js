@@ -179,11 +179,12 @@ describe('pack / inventory', () => {
     assert.equal((game.match(/\$\{conditionMarkup\}/g) || []).length, 1);
   });
 
-  it('starts fresh gameplay muted and offers an explicit unmute control', () => {
+  it('starts with sound on, remembers a mute, and offers the mute control', () => {
     const html = readFileSync(join(__dirnameUi, '../public/play/index.html'), 'utf8');
     const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
-    assert.match(game, /muted:\s*true/);
-    assert.match(html, /id="mute-btn"[^>]*title="Unmute audio"[^>]*aria-label="Unmute audio"[^>]*aria-pressed="true"/);
+    assert.match(game, /muted:\s*loadMutedPreference\(\)/);
+    assert.match(game, /state\.muted = !state\.muted;\n\s*saveMutedPreference\(state\.muted\);/);
+    assert.match(html, /id="mute-btn"[^>]*title="Mute audio"[^>]*aria-label="Mute audio"[^>]*aria-pressed="false"/);
     assert.match(html, /id="start-btn"[^>]*>Start exploring</);
     assert.doesNotMatch(html, /Start \(enables sound\)/);
   });

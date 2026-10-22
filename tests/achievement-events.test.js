@@ -199,6 +199,6 @@ describe('video badge client integration', () => {
     assert.match(game, /screen-fx\.js\?v=award-text-1/);
     assert.match(html, /game\.js\?v=official-ecology-1/);
     assert.match(html, /badges=catalog-art-3/);
-    assert.match(game, /muted:\s*true/);
+    assert.match(game, /muted: loadMutedPreference\(\)/);
   });
 });

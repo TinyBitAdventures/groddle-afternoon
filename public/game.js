@@ -751,6 +751,7 @@ import {
 } from './js/sound-moments.js';
 import { moodMax } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js';
+import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
@@ -1540,8 +1541,8 @@ let state = {
   questDone: false,
   toastTimer: 0,
   energyTick: 0,
-  // Start quietly; players can opt into audio once they are ready.
-  muted: true,
+  // Sound is on unless the player muted it last time (js/audio-pref.js).
+  muted: loadMutedPreference(),
 };
 
 const audio = {
@@ -3712,7 +3713,17 @@ function setAmbientForStreet(street, opts = {}) {
   applyMute();
 }
 
+function syncMuteButton() {
+  const btn = document.getElementById('mute-btn');
+  if (!btn) return;
+  const label = state.muted ? 'Unmute audio' : 'Mute audio';
+  btn.title = label;
+  btn.setAttribute('aria-label', label);
+  btn.setAttribute('aria-pressed', String(state.muted));
+}
+
 function applyMute() {
+  syncMuteButton();
   if (!audio.musicGain) return;
   const vol = state.muted || ambientThemeId === SILENT_THEME ? 0 : audio.musicblock ? 0.055 : 0.26;
   try {
@@ -3725,13 +3736,6 @@ function applyMute() {
     audio.board?.stopAll();
     stopActionSoundLoop();
     stopCraftSoundLoop();
-  }
-  const btn = document.getElementById('mute-btn');
-  if (btn) {
-    const label = state.muted ? 'Unmute audio' : 'Mute audio';
-    btn.title = label;
-    btn.setAttribute('aria-label', label);
-    btn.setAttribute('aria-pressed', String(state.muted));
   }
 }
 
@@ -23093,14 +23097,22 @@ async function main() {
     avatarBuilderSlot = tab.dataset.slot || 'hair';
     renderAvatarBuilder();
   });
+  syncMuteButton();
   document.getElementById('mute-btn')?.addEventListener('click', async () => {
     state.muted = !state.muted;
+    saveMutedPreference(state.muted);
     if (!state.muted && audio.ctx?.state === 'suspended') {
       try { await audio.ctx.resume(); } catch (_) { /* audio remains opt-in */ }
     }
     applyMute();
     playSound('UI_TOGGLE', { volume: 0.5 });
   });
+  // Browsers hold audio until the first click or key press; start it then, unless muted.
+  const resumeAudioOnGesture = async () => {
+    if (state.muted || audio.ctx?.state !== 'suspended') return;
+    try { await audio.ctx.resume(); } catch (_) { /* tries again on the next gesture */ }
+  };
+  for (const type of ['pointerdown', 'keydown']) window.addEventListener(type, resumeAudioOnGesture, { capture: true });
   // Panel open/close and dialog button clicks (client CLICK_SUCCESS/FAILURE).
   watchPanelSounds(document, playSound, soundForPanel);
   watchButtonClicks(document, playSound);

@@ -227,7 +227,7 @@ test.describe('living-trant world and client integration', () => {
     assert.match(game, /bootParams\.has\('wateringremaining'\)/);
     assert.match(game, /livingTrantPlanForStreet\(currentStreetTsid/);
     assert.match(game, /getVerbsFor\(target, \{[\s\S]*?tools: toolState/);
-    assert.match(game, /muted: true/);
+    assert.match(game, /muted: loadMutedPreference\(\)/);
     assert.match(html, /game\.js\?v=official-ecology-1/);
   });
 });
