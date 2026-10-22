@@ -16,17 +16,13 @@ export function hiresIconUrl(url) {
 }
 
 /**
- * Serve the 3x icons everywhere at their original size: Pixi reads the
- * resolution from an `@3x` URL (Texture.from), and icon <img> elements get a
+ * Serve the 3x icons everywhere at their original size: js/textures.js loads
+ * the `@3x` file (resolution 3 from the name), and icon <img> elements get a
  * `3x` srcset (kept in step when their src changes).
+ * @param {{ addUrlRoute: Function }} textures the js/textures.js module
  */
-export function installHiresIcons(PIXI, root = globalThis.document) {
-  if (PIXI?.Texture && !PIXI.Texture.from.hiresIcons) {
-    const from = PIXI.Texture.from.bind(PIXI.Texture);
-    const patched = (source, ...rest) => from(typeof source === 'string' ? hiresIconUrl(source) || source : source, ...rest);
-    patched.hiresIcons = true;
-    PIXI.Texture.from = patched;
-  }
+export function installHiresIcons(textures, root = globalThis.document) {
+  if (typeof textures?.addUrlRoute === 'function') textures.addUrlRoute('hires-icons', hiresIconUrl);
   if (!root?.body || typeof MutationObserver === 'undefined') return;
   const upgrade = (img) => {
     const hi = hiresIconUrl(img.getAttribute('src'));

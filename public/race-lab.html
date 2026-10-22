@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Race course lab — Groddle</title>
-  <script src="vendor/pixi/pixi-7.4.2.min.js"></script>
+  <script src="vendor/pixi/pixi-8.22.0.min.js"></script>
   <style>
     body { margin: 0; padding: 16px; font-family: "Trebuchet MS", system-ui, sans-serif; background: #1a1a22; color: #f0ebe3; }
     h1 { margin: 0 0 4px; font-size: 1.3rem; color: #95a3d6; }
@@ -36,8 +36,9 @@
     const W = zoom ? 960 : 1600;
     const H = zoom ? 540 : 900;
     const scale = zoom || Math.min(W / course.width, H / course.height);
-    const app = new PIXI.Application({ width: W, height: H, backgroundColor: 0x222222, antialias: true });
-    document.getElementById('stage').appendChild(app.view);
+    const app = new PIXI.Application();
+    await app.init({ width: W, height: H, background: 0x222222, antialias: true, preference: 'webgl' });
+    document.getElementById('stage').appendChild(app.canvas);
     const world = new PIXI.Container();
     world.scale.set(scale);
     const camX = zoom ? Number(params.get('x')) || 0 : 0;
@@ -52,18 +53,17 @@
     world.addChild(drawFinishPosts(PIXI, course.finish));
     const lines = new PIXI.Graphics();
     const route = (nodes, color) => {
-      lines.lineStyle(zoom ? 2 : 6, color, 0.9);
       nodes.forEach((n, i) => (i ? lines.lineTo(n.x, n.y - 4) : lines.moveTo(n.x, n.y - 4)));
-      lines.lineStyle(0);
-      for (const n of nodes) if (n.mode === 'jump') lines.beginFill(color).drawCircle(n.x, n.y - 4, zoom ? 3 : 9).endFill();
+      lines.stroke({ width: zoom ? 2 : 6, color, alpha: 0.9 });
+      for (const n of nodes) if (n.mode === 'jump') lines.circle(n.x, n.y - 4, zoom ? 3 : 9).fill(color);
     };
     if (params.get('route') !== '0') {
       route(course.route, 0xffd55b);
       if (course.rivalRoute) route(course.rivalRoute, 0xc9a6ff);
     }
     const spawn = new PIXI.Graphics();
-    spawn.beginFill(0xffd55b).drawRect(course.spawn.player.x - 14, course.spawn.player.y - 90, 28, 90).endFill();
-    spawn.beginFill(0xc9a6ff).drawRect(course.spawn.rival.x - 14, course.spawn.rival.y - 90, 28, 90).endFill();
+    spawn.rect(course.spawn.player.x - 14, course.spawn.player.y - 90, 28, 90).fill(0xffd55b);
+    spawn.rect(course.spawn.rival.x - 14, course.spawn.rival.y - 90, 28, 90).fill(0xc9a6ff);
     world.addChild(lines, spawn);
     const rival = routeDurationMs(course.rivalRoute || course.route, { pace: course.rivalPace, gravity: course.gravity });
     const best = routeDurationMs(course.route, { pace: 1, gravity: course.gravity });

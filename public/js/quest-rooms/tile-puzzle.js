@@ -33,6 +33,7 @@
  */
 
 import { BODY_H, JUMP_GAP, JUMP_RISE, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=cu-1';
+import { textureFromUrl } from '../textures.js';
 
 const ART = 'assets/sprites/quest-rooms/tile_puzzle/';
 
@@ -458,7 +459,7 @@ function drawEndBox(PIXI, kit) {
   g.rect(-44, -108, 88, 88).stroke({ width: 5, color: 0xd7f59a, alpha: 0.95 });
   g.rect(-36, -100, 72, 72).stroke({ width: 2, color: 0xf8ffe0, alpha: 0.9 });
   c.addChild(g);
-  c.addChild(kit.label(PIXI, 'end', 0, -64, { size: 22, fill: 0xf3ffd6, stroke: 0x9ab85a, strokeThickness: 3 }));
+  c.addChild(kit.label(PIXI, 'end', 0, -64, { size: 22, fill: 0xf3ffd6, stroke: { color: 0x9ab85a, width: 3 } }));
   c.x = END_BOX.x;
   c.y = END_BOX.y;
   return c;
@@ -582,8 +583,8 @@ export const room = {
       ctx.data.glyphs[t.id] = glyph;
       drawGlyph(glyph, tileOpen(ctx.data.rots, t.id));
       const c = new PIXI.Container();
-      const out = PIXI.Sprite.from(`${ART}wall_button_lockOut.png`);
-      const pressed = PIXI.Sprite.from(`${ART}wall_button_lockIn.png`);
+      const out = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockOut.png`));
+      const pressed = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockIn.png`));
       for (const s of [out, pressed]) {
         s.anchor.set(0.5, 0.5);
         s.scale.set(1.2);

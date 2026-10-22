@@ -65,6 +65,8 @@
  *    lavender, with recovered Alakol cliff decos tinted for the far walls.
  */
 
+import { isLoaded, onLoaded, textureFromUrl } from '../textures.js';
+
 export const ROOM_ID = 'esquibeth';
 export const MAIN = 'last_pilgrimage_of_esquibeth';
 export const REMINISCE = 'last_pilgrimage_of_esquibeth_reminisce';
@@ -628,10 +630,10 @@ function buildHollow(ctx) {
   const base = new PIXI.Graphics();
   base.rect(0, 0, HOLLOW.width, HOLLOW.height).fill(0x231b29);
   world.addChild(base);
-  const bg = PIXI.Sprite.from(`${ART}hollow.webp`);
+  const bg = new PIXI.Sprite(textureFromUrl(`${ART}hollow.webp`));
   bg.scale.set(HOLLOW.scale);
   world.addChild(bg);
-  const giant = PIXI.Sprite.from(`${ART}hollow_grendaline.webp`);
+  const giant = new PIXI.Sprite(textureFromUrl(`${ART}hollow_grendaline.webp`));
   giant.scale.set(HOLLOW.scale);
   giant.alpha = 0;
   world.addChild(giant);
@@ -776,7 +778,7 @@ function ghostAnim(ctx, spr, name, { loop = false } = {}) {
       else setTimeout(resolve, (GHOST_SHEETS[name][2] / 30) * 1000 + 120);
     };
     if (sheet.frames.length) go();
-    else sheet.base.once('loaded', () => setTimeout(go, 0));
+    else onLoaded(sheet.base, () => setTimeout(go, 0));
   });
 }
 
@@ -889,7 +891,7 @@ function setupGrotto(ctx, stage, scene) {
     press.gotoAndStop(0);
   };
   if (sheet.frames.length) ready();
-  else sheet.base.once('loaded', () => setTimeout(ready, 0));
+  else onLoaded(sheet.base, () => setTimeout(ready, 0));
   btn.addChild(press);
   ctx.add(btn, -4);
   d.button = ctx.register({ classId: 'esquibeth_button', label: 'Playback Button', subtitle: 'Carved beside the stone', sprite: btn });
@@ -1165,7 +1167,7 @@ function setupHollow(ctx, scene) {
       conch.play();
     };
     if (sheet.frames.length) ready();
-    else sheet.base.once('loaded', () => setTimeout(ready, 0));
+    else onLoaded(sheet.base, () => setTimeout(ready, 0));
     conch.anchor.set(0.5, 0.62);
     conch.scale.set(0.8);
     conch.animationSpeed = 0.25;
@@ -1551,7 +1553,7 @@ export const room = {
     ctx.setData('esqMisses', String(d.misses || 0));
     const gh = d.danceGhost || d.playbackGhost;
     ctx.setData('esqGhostSpr', gh && !gh.destroyed && gh.visible ? `${Math.round(gh.x)},${Math.round(gh.y)}` : '');
-    ctx.setData('esqGiant', d.giant && !d.giant.destroyed ? `${d.giant.alpha.toFixed(2)}:${d.giant.texture?.valid ? 'ok' : 'loading'}` : '');
+    ctx.setData('esqGiant', d.giant && !d.giant.destroyed ? `${d.giant.alpha.toFixed(2)}:${isLoaded(d.giant.texture) ? 'ok' : 'loading'}` : '');
     if (d.layout) {
       const gl = d.layout.glyph;
       ctx.setData('esqGlyph', `${gl.x},${gl.y - GLYPH_CENTRE_UP}`);

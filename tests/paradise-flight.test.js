@@ -246,14 +246,14 @@ test('client ships real ticket art, a flight HUD, and deterministic QA entry', (
   assert.match(game, /dataset\.paradiseSpeed/);
   assert.match(game, /dataset\.paradiseSlipArt = 'recovered-k03-landmarks'/);
   assert.match(game, /dataset\.paradiseRadialArt = 'source-moon-and-stars'/);
-  assert.match(game, /resourceOptions: \{\s*width: RADIAL_HEIGHTS_MOON\.width/);
+  assert.match(game, /loadTexture\(src, \{ width: RADIAL_HEIGHTS_MOON\.width/);
   assert.match(game, /paradisepreview'\) === 'moon'/);
   assert.match(game, /dataset\.paradiseStarlitArt = 'source-starfield-and-moon-states'/);
   assert.match(game, /course\.id === 'starlit_night' && sourcePoints\.length/);
   assert.match(game, /starlitMoonPlainAlpha\(bgLayer\.paradiseMoonFadeStartedAt, now\)/);
   assert.match(game, /starlitPreview === 'smile'/);
   assert.match(game, /paradiseObjectiveComplete\(paradiseRun\) && starlitRevealComplete/);
-  assert.match(game, /PIXI\.Assets\.load\(`assets\/decos\/groddle\/\$\{sprite\}\.png`\)/);
+  assert.match(game, /loadTexture\(`assets\/decos\/groddle\/\$\{sprite\}\.png`\)/);
   assert.match(game, /paradisepreview'\) === 'finish'/);
   assert.match(game, /dataset\.paradiseRingArt = 'clean-cloud-puffs'/);
   assert.match(game, /cloudRingPuffLayout\(index\)/);

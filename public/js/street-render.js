@@ -11,6 +11,7 @@ import {
   pickConnection,
 } from './street-model.js';
 import { availableStreetTsids } from './street-loader.js';
+import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './textures.js';
 
 const DECO_BASE = 'assets/decos/groddle/';
 const PLACEHOLDER = 0x5a7a4a;
@@ -33,20 +34,15 @@ const SIGN_LABEL_STYLE = Object.freeze({
   fontSize: SIGN_FONT_SIZE,
   fontWeight: '700',
   // The glow's strength 3 is approximated by a soft stroke under a blur.
-  stroke: 'rgba(255,255,255,0.45)',
-  strokeThickness: 3,
+  stroke: { color: 'rgba(255,255,255,0.45)', width: 3 },
   lineJoin: 'round',
-  dropShadow: true,
-  dropShadowColor: 0xffffff,
-  dropShadowBlur: 2,
-  dropShadowDistance: 0,
-  dropShadowAlpha: 0.6,
+  dropShadow: { alpha: 0.6, blur: 2, color: 0xffffff, distance: 0 },
   padding: 3,
 });
 
 /** makeSign: an arm fits its label plus 8px either side (holder units). */
 export function signArmWidth(PIXI, labelText) {
-  const metrics = PIXI.TextMetrics.measureText(String(labelText), new PIXI.TextStyle(SIGN_LABEL_STYLE));
+  const metrics = PIXI.CanvasTextMetrics.measureText(String(labelText), new PIXI.TextStyle(SIGN_LABEL_STYLE));
   return Math.ceil(metrics.width + 2 * SIGN_ARM_PAD_X);
 }
 
@@ -68,15 +64,15 @@ export async function loadSignpostTextures(PIXI) {
       .map(
         ([key, url]) =>
           new Promise((resolve) => {
-            const tex = PIXI.Texture.from(url);
+            const tex = textureFromUrl(url);
             const done = () => {
               signTextures[key] = tex;
               resolve();
             };
-            if (tex.baseTexture?.valid) done();
+            if (isLoaded(tex.source)) done();
             else {
-              tex.baseTexture?.once?.('loaded', done);
-              tex.baseTexture?.once?.('error', done);
+              onLoaded(tex.source, done);
+              onFailed(tex.source, done);
               // safety
               setTimeout(done, 2000);
             }
@@ -110,28 +106,28 @@ function buildSignpostSprite(PIXI, signpost, pos) {
 
   const tex = signTextures || {};
   // Shadow
-  if (tex.shadow && !tex.shadow.baseTexture?.destroyed) {
+  if (tex.shadow && !tex.shadow.source?.destroyed) {
     const shadow = new PIXI.Sprite(tex.shadow);
     shadow.anchor.set(0.5, 1);
     shadow.y = 6;
     shadow.alpha = 0.75;
-    shadow.name = 'sign-shadow';
+    shadow.label = 'sign-shadow';
     holder.addChild(shadow);
   }
   // Post (not brightened on hover — only arms + text)
   let postH = 200;
-  if (tex.post && !tex.post.baseTexture?.destroyed) {
+  if (tex.post && !tex.post.source?.destroyed) {
     const post = new PIXI.Sprite(tex.post);
     post.anchor.set(0.5, 1);
     post.y = 0;
-    post.name = 'sign-post';
+    post.label = 'sign-post';
     holder.addChild(post);
     postH = post.height || 200;
   } else {
     const post = new PIXI.Graphics();
     post.roundRect(-8, -200, 16, 200, 3).fill(0x5a3a22);
     post.roundRect(-10, -12, 20, 14, 3).fill(0x6b4423);
-    post.name = 'sign-post';
+    post.label = 'sign-post';
     holder.addChild(post);
     postH = 200;
   }
@@ -148,7 +144,7 @@ function buildSignpostSprite(PIXI, signpost, pos) {
     armHolder.y = armY;
     armHolder.rotation = ((leftSide ? 5.5 : -5.5) * Math.PI) / 180;
     armHolder.x = leftSide ? -2 : 2;
-    armHolder.name = 'sign-arm-holder';
+    armHolder.label = 'sign-arm-holder';
 
     const labelText = conn.label || conn.tsid || 'Somewhere';
     const isLoaded = (() => {
@@ -162,7 +158,7 @@ function buildSignpostSprite(PIXI, signpost, pos) {
     // SignpostView.createSignTextField: 14px text drawn at 2.8x then scaled
     // down, with a soft white glow (StaticFilters.white1pxSignpost_GlowA).
     const baseFill = isLoaded ? 0x2a1a08 : 0x4a3a28;
-    const label = new PIXI.Text(labelText, { ...SIGN_LABEL_STYLE, fill: baseFill });
+    const label = new PIXI.Text({ text: labelText, style: { ...SIGN_LABEL_STYLE, fill: baseFill } });
     label.resolution = SIGN_TEXT_RESOLUTION;
     label.anchor.set(0.5, 0.5);
     const fitW = signArmWidth(PIXI, labelText);
@@ -171,7 +167,7 @@ function buildSignpostSprite(PIXI, signpost, pos) {
     let armSprite = null;
     let glow = null;
     holder.addChild(armHolder);
-    if (tex.arm && !tex.arm.baseTexture?.destroyed) {
+    if (tex.arm && !tex.arm.source?.destroyed) {
       const armH = Math.max(22, tex.arm.height || 30);
       const makeArm = () => {
         const arm = new PIXI.Sprite(tex.arm);
@@ -186,18 +182,18 @@ function buildSignpostSprite(PIXI, signpost, pos) {
       // solid shape behind it.
       glow = new PIXI.Graphics();
       glow.roundRect(leftSide ? -fitW : 0, -armH / 2, fitW, armH, 4).fill({ color: SIGN_GLOW_COLOUR, alpha: 1 });
-      glow.filters = [new PIXI.BlurFilter(7, 3)];
+      glow.filters = [new PIXI.BlurFilter({ strength: 7, quality: 3 })];
       glow.visible = false;
-      glow.name = 'sign-glow';
+      glow.label = 'sign-glow';
       armHolder.addChild(glow);
       const arm = makeArm();
-      arm.name = 'sign-arm';
+      arm.label = 'sign-arm';
       armSprite = arm;
       armHolder.addChild(arm);
     } else {
       const arm = new PIXI.Graphics();
       arm.roundRect(leftSide ? -fitW : 0, -12, fitW, 24, 3).fill(0xd4b896).stroke({ width: 1, color: 0x8a6a40, alpha: 0.8 });
-      arm.name = 'sign-arm';
+      arm.label = 'sign-arm';
       armSprite = arm;
       armHolder.addChild(arm);
     }
@@ -205,7 +201,7 @@ function buildSignpostSprite(PIXI, signpost, pos) {
 
     label.x = leftSide ? -armW * 0.5 : armW * 0.5;
     label.y = -1;
-    label.name = 'sign-label';
+    label.label = 'sign-label';
     label._baseFill = baseFill;
     armHolder.addChild(label);
     g.signHoverParts.labels.push(label);
@@ -230,15 +226,15 @@ function buildSignpostSprite(PIXI, signpost, pos) {
   });
 
   if (!shown.length) {
-    const empty = new PIXI.Text('Signpost', {
+    const empty = new PIXI.Text({ text: 'Signpost', style: {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 12,
       fill: 0x3a2a18,
       fontWeight: '700',
-    });
+    } });
     empty.anchor.set(0.5, 1);
     empty.y = -postH - 8;
-    empty.name = 'sign-label';
+    empty.label = 'sign-label';
     empty._baseFill = 0x3a2a18;
     holder.addChild(empty);
     g.signHoverParts.labels.push(empty);
@@ -429,8 +425,8 @@ const BLURRED_LAYER_RESOLUTION = 0.5;
 function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
   const bases = new Set();
   for (const child of lc.children) {
-    const base = child.texture?.baseTexture;
-    if (base && !base.valid) bases.add(base);
+    const base = child.texture?.source;
+    if (base && !isLoaded(base)) bases.add(base);
   }
   const bake = () => {
     if (lc.destroyed || !lc.children.length) return;
@@ -443,7 +439,7 @@ function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
       Math.ceil(bounds.height + pad * 2)
     );
     const holder = new PIXI.Container();
-    holder.filters = [...(colour ? [colour] : []), new PIXI.BlurFilter(blur * 0.5, 2)];
+    holder.filters = [...(colour ? [colour] : []), new PIXI.BlurFilter({ strength: blur * 0.5, quality: 2 })];
     const moved = lc.removeChildren();
     for (const child of moved) {
       child.x -= region.x;
@@ -451,8 +447,9 @@ function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
       holder.addChild(child);
     }
     holder.sortableChildren = true;
-    const texture = renderer.generateTexture(holder, {
-      region: new PIXI.Rectangle(0, 0, region.width, region.height),
+    const texture = renderer.generateTexture({
+      target: holder,
+      frame: new PIXI.Rectangle(0, 0, region.width, region.height),
       resolution: BLURRED_LAYER_RESOLUTION,
     });
     holder.destroy({ children: true });
@@ -473,8 +470,8 @@ function bakeBlurredLayer(PIXI, renderer, lc, blur, colour) {
     if (pending === 0) bake();
   };
   for (const base of bases) {
-    base.once('loaded', done);
-    base.once('error', done);
+    onLoaded(base, done);
+    onFailed(base, done);
   }
 }
 
@@ -500,24 +497,25 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
     let bytes = 0;
     const fresh = new Set();
     for (const spr of sprites) {
-      const base = spr.texture.baseTexture;
-      if (!spr.texture.valid || cache.textures.has(`${key}|${base.uid}`) || fresh.has(base)) continue;
+      const base = spr.texture.source;
+      if (!isLoaded(spr.texture) || cache.textures.has(`${key}|${base.uid}`) || fresh.has(base)) continue;
       fresh.add(base);
-      bytes += base.realWidth * base.realHeight * 4;
+      bytes += base.pixelWidth * base.pixelHeight * 4;
     }
     if (cache.bytes + bytes > RECOLOUR_BUDGET_BYTES) return;
     cache.bytes += bytes;
     const holder = new PIXI.Sprite();
     holder.filters = [colour];
     for (const spr of sprites) {
-      if (!spr.texture.valid) continue;
-      const base = spr.texture.baseTexture;
+      if (!isLoaded(spr.texture)) continue;
+      const base = spr.texture.source;
       const id = `${key}|${base.uid}`;
       let texture = cache.textures.get(id);
       if (!texture) {
-        holder.texture = new PIXI.Texture(base);
-        texture = renderer.generateTexture(holder, {
-          region: new PIXI.Rectangle(0, 0, base.width, base.height),
+        holder.texture = frameTexture(base);
+        texture = renderer.generateTexture({
+          target: holder,
+          frame: new PIXI.Rectangle(0, 0, base.width, base.height),
           resolution: base.resolution,
         });
         holder.texture.destroy();
@@ -530,7 +528,7 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
     lc.filters = null;
     lc.recoloured = true;
   };
-  const pending = new Set(sprites.map((spr) => spr.texture.baseTexture).filter((base) => !base.valid));
+  const pending = new Set(sprites.map((spr) => spr.texture.source).filter((base) => !isLoaded(base)));
   if (!pending.size) {
     bake();
     return;
@@ -541,8 +539,8 @@ function bakeLayerColour(PIXI, renderer, lc, colour, cache) {
     if (left === 0) bake();
   };
   for (const base of pending) {
-    base.once('loaded', done);
-    base.once('error', done);
+    onLoaded(base, done);
+    onFailed(base, done);
   }
 }
 
@@ -633,19 +631,26 @@ function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallbac
     for (let x0 = 0; x0 < W; x0 += CHUNK) {
       const w = Math.min(CHUNK, Math.ceil(W - x0));
       const rt = PIXI.RenderTexture.create({ width: w, height: ROWS });
-      renderer.render(lc, { renderTexture: rt, transform: new PIXI.Matrix(1, 0, 0, 1, -x0, -(sourceH - ROWS)), clear: true });
+      // Pixi 7 applied the transform on top of the layer's own local transform.
+      lc.updateLocalTransform();
+      const transform = new PIXI.Matrix(1, 0, 0, 1, -x0, -(sourceH - ROWS)).append(lc.localTransform);
+      const wasGroup = lc.isRenderGroup;
+      renderer.render({ container: lc, target: rt, transform, clear: true });
+      // Pixi 8 turns a rendered container into a render group; undo that.
+      if (!wasGroup) lc.disableRenderGroup();
       try {
-        const px = renderer.extract.pixels(rt);
+        const { pixels: px } = renderer.extract.pixels(rt);
         for (let i = 0; i < px.length; i += 16) {
           const a = px[i + 3];
           if (a < 200) continue;
-          r += px[i] * 255 / a;
-          g += px[i + 1] * 255 / a;
-          b += px[i + 2] * 255 / a;
+          // Pixi 7's extract un-premultiplied first; this keeps its averaged colour.
+          r += (px[i] * 255 / a) * 255 / a;
+          g += (px[i + 1] * 255 / a) * 255 / a;
+          b += (px[i + 2] * 255 / a) * 255 / a;
           n += 1;
         }
       } catch { /* extract can fail on a lost context: the stretch still draws */ }
-      const spr = new PIXI.Sprite(new PIXI.Texture(rt.baseTexture, new PIXI.Rectangle(0, ROWS - 1, w, 1)));
+      const spr = new PIXI.Sprite(frameTexture(rt.source, new PIXI.Rectangle(0, ROWS - 1, w, 1)));
       spr.x = x0;
       spr.y = sourceH - 1;
       spr.width = w;
@@ -673,7 +678,7 @@ function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallbac
     if (child instanceof PIXI.Sprite) sprites.push(child);
     (child.children || []).forEach(walk);
   });
-  const pending = [...new Set(sprites.map((spr) => spr.texture.baseTexture).filter((base) => !base.valid))];
+  const pending = [...new Set(sprites.map((spr) => spr.texture.source).filter((base) => !isLoaded(base)))];
   // Let a pending colour bake swap textures first.
   const later = () => setTimeout(build, 0);
   if (!pending.length) {
@@ -686,8 +691,8 @@ function buildGroundSkirt(PIXI, renderer, root, lc, W, sourceH, depthPx, fallbac
     if (left === 0) later();
   };
   for (const base of pending) {
-    base.once('loaded', done);
-    base.once('error', done);
+    onLoaded(base, done);
+    onFailed(base, done);
   }
 }
 
@@ -792,7 +797,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
         continue;
       }
       const url = `${decoBase}${deco.sprite}.png`;
-      const tex = PIXI.Texture.from(url);
+      const tex = textureFromUrl(url);
       const spr = new PIXI.Sprite(tex);
       spr.anchor.set(0.5, 1);
       // h_flip mirrors the deco about its registration point.
@@ -804,7 +809,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
         if (deco.flip) spr.scale.x = -Math.abs(spr.scale.x);
       };
       sizeDeco();
-      if (!tex.valid) tex.baseTexture.once('loaded', sizeDeco);
+      if (!isLoaded(tex)) onLoaded(tex.source, sizeDeco);
       if (deco.hidden) spr.visible = false;
       spr.x = pos.x;
       spr.y = pos.y;

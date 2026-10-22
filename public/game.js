@@ -1,6 +1,6 @@
 /**
  * Groddle Afternoon — original street geometry + layered decos
- * PixiJS 7 · locations-xml streets · CoU PNG decos · quests/items
+ * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=social-follow-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-1';
@@ -753,6 +753,9 @@ import { installHiresIcons } from './js/icon-hires.js';
 import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
+import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
+import * as textureUrls from './js/textures.js';
+import { installPixiFixes } from './js/pixi-fixes.js';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -1088,13 +1091,12 @@ function installMoreMenu() {
 
 /** Keep the backing store at the canvas's displayed density (js/render-density.js). */
 function syncRenderResolution() {
-  if (!app?.renderer || !app.view) return;
-  const cssWidth = app.view.getBoundingClientRect().width;
+  if (!app?.renderer || !app.canvas) return;
+  const cssWidth = app.canvas.getBoundingClientRect().width;
   const next = renderResolution(cssWidth, VIEW_W, window.devicePixelRatio || 1);
   if (Math.abs(next - app.renderer.resolution) < RESOLUTION_STEP / 2) return;
-  app.renderer.resolution = next;
-  app.renderer.resize(VIEW_W, VIEW_H);
-  app.view.dataset.renderResolution = String(next);
+  app.renderer.resize(VIEW_W, VIEW_H, next);
+  app.canvas.dataset.renderResolution = String(next);
 }
 
 /**
@@ -1746,10 +1748,10 @@ function announceAchievementUpdates(updates = []) {
       const giant = String(rewards.favor.giant);
       rewardBits.push(`+${Number(rewards.favor.points).toLocaleString()} ${giant[0].toUpperCase()}${giant.slice(1)} favor`);
     }
-    if (app?.view) {
-      app.view.dataset.achievementUnlocked = update.classTsid || update.def.classTsid;
-      app.view.dataset.achievementReward = rewardBits.join(' · ');
-      app.view.dataset.achievementUnlockedCount = String(achieveState.unlocked.length);
+    if (app?.canvas) {
+      app.canvas.dataset.achievementUnlocked = update.classTsid || update.def.classTsid;
+      app.canvas.dataset.achievementReward = rewardBits.join(' · ');
+      app.canvas.dataset.achievementUnlockedCount = String(achieveState.unlocked.length);
     }
     pushActivity(`Badge earned: ${update.def.name || update.def.title || 'Achievement'}.`);
     enqueueAward({
@@ -2011,11 +2013,11 @@ function refreshPackPager(box) {
   box.dataset.packOverflow = pager.overflow ? '1' : '0';
   box.dataset.packScrollLeft = String(Math.round(pager.left));
   box.dataset.packScrollMax = String(Math.round(pager.max));
-  if (app?.view) {
+  if (app?.canvas) {
     const prefix = box.id === 'pack-tools' ? 'packTool' : 'packItem';
-    app.view.dataset[`${prefix}Overflow`] = pager.overflow ? '1' : '0';
-    app.view.dataset[`${prefix}ScrollLeft`] = String(Math.round(pager.left));
-    app.view.dataset[`${prefix}ScrollMax`] = String(Math.round(pager.max));
+    app.canvas.dataset[`${prefix}Overflow`] = pager.overflow ? '1' : '0';
+    app.canvas.dataset[`${prefix}ScrollLeft`] = String(Math.round(pager.left));
+    app.canvas.dataset[`${prefix}ScrollMax`] = String(Math.round(pager.max));
   }
 }
 
@@ -2087,7 +2089,7 @@ function closeEmotionalBearPicker(result = 'cancelled') {
   const panel = document.getElementById('emotional-bear-picker');
   if (panel) panel.hidden = true;
   emotionalBearPendingAction = null;
-  if (app?.view) app.view.dataset.emotionalBearPicker = result;
+  if (app?.canvas) app.canvas.dataset.emotionalBearPicker = result;
 }
 
 function showEmotionalBearFx(animation, copy, durationMs, anthropomorphize = false) {
@@ -2188,11 +2190,11 @@ function runEmotionalBearAction(actionId, target = '') {
     );
     burst(player.x, player.y - 45, 0xf09ac1, 18);
   }
-  if (app?.view) {
-    app.view.dataset.emotionalBearAction = actionId;
-    app.view.dataset.emotionalBearTarget = target || 'self';
-    app.view.dataset.emotionalBearState = emotionalBearIconState(emotionalBearState);
-    app.view.dataset.emotionalBearTotal = String(emotionalBearState.totalEmotes);
+  if (app?.canvas) {
+    app.canvas.dataset.emotionalBearAction = actionId;
+    app.canvas.dataset.emotionalBearTarget = target || 'self';
+    app.canvas.dataset.emotionalBearState = emotionalBearIconState(emotionalBearState);
+    app.canvas.dataset.emotionalBearTotal = String(emotionalBearState.totalEmotes);
   }
   updateHud();
   return true;
@@ -2240,7 +2242,7 @@ function openEmotionalBearPicker(actionId) {
   }
   panel.hidden = false;
   requestAnimationFrame(() => grid.querySelector('button')?.focus({ preventScroll: true }));
-  if (app?.view) app.view.dataset.emotionalBearPicker = actionId;
+  if (app?.canvas) app.canvas.dataset.emotionalBearPicker = actionId;
   return true;
 }
 
@@ -2257,7 +2259,7 @@ function upgradePackedEmotionalBear(upgrade) {
   playSfx('pickup', { volume: 0.55, rate: 1.32 });
   pushActivity(result.message);
   toast(result.message, 4200);
-  if (app?.view) app.view.dataset.emotionalBearState = result.iconState;
+  if (app?.canvas) app.canvas.dataset.emotionalBearState = result.iconState;
   updateHud();
   renderPackPopover(EMOTIONAL_BEAR_ID);
   return true;
@@ -3334,12 +3336,12 @@ function openPackedCubimalBox(classTsid) {
     pc
   );
   announceAchievementUpdates(achievementUpdates);
-  if (app?.view) {
-    app.view.dataset.cubimalPackage = classTsid;
-    app.view.dataset.cubimalSeries = String(result.package.series);
-    app.view.dataset.cubimalPrize = result.prize.classTsid;
-    app.view.dataset.cubimalCollection = `${result.collection.owned}/${result.collection.total}`;
-    app.view.dataset.cubimalRoll = String(roll);
+  if (app?.canvas) {
+    app.canvas.dataset.cubimalPackage = classTsid;
+    app.canvas.dataset.cubimalSeries = String(result.package.series);
+    app.canvas.dataset.cubimalPrize = result.prize.classTsid;
+    app.canvas.dataset.cubimalCollection = `${result.collection.owned}/${result.collection.total}`;
+    app.canvas.dataset.cubimalRoll = String(roll);
   }
   enqueueAward({
     kind: 'generic',
@@ -3393,10 +3395,10 @@ function setPackedCubimalFree(classTsid, opts = {}) {
     pc
   );
   announceAchievementUpdates(achievementUpdates);
-  if (app?.view) {
-    app.view.dataset.cubimalFreed = classTsid;
-    app.view.dataset.cubimalFreeReward = String(result.reward);
-    app.view.dataset.cubimalFreeResponse = result.response;
+  if (app?.canvas) {
+    app.canvas.dataset.cubimalFreed = classTsid;
+    app.canvas.dataset.cubimalFreeReward = String(result.reward);
+    app.canvas.dataset.cubimalFreeResponse = result.response;
   }
   enqueueAward({
     kind: 'generic',
@@ -3486,7 +3488,7 @@ async function loadAudio() {
     isMuted: () => state.muted,
     volume: sfxVolumeSetting(),
     // A cold file starts after playSound returns; keep data-last-sound honest.
-    onPlayed: (last) => { if (app?.view) app.view.dataset.lastSound = last; },
+    onPlayed: (last) => { if (app?.canvas) app.canvas.dataset.lastSound = last; },
   });
   audio.board.preload(PRELOAD_SOUND_KEYS);
   await Promise.all(
@@ -3528,8 +3530,8 @@ function sfxVolumeSetting() {
 function playSound(key, opts = {}) {
   if (state.muted || !audio.board) return null;
   const handle = audio.board.play(key, opts);
-  if (app?.view && handle) {
-    app.view.dataset.lastSound = handle.kind === 'loading' ? `${handle.key}:loading` : audio.board.stats.last;
+  if (app?.canvas && handle) {
+    app.canvas.dataset.lastSound = handle.kind === 'loading' ? `${handle.key}:loading` : audio.board.stats.last;
   }
   return handle;
 }
@@ -3558,7 +3560,7 @@ function playSynthSfx(name) {
  */
 function playFeatureVerbSound(target, verbId) {
   if (target?.classId !== 'street_door' || verbId !== 'enter') return;
-  const outcome = app?.view?.dataset.doorLast || '';
+  const outcome = app?.canvas?.dataset.doorLast || '';
   if (outcome === 'open' || outcome === 'unlocked') {
     playSound('DOOR_OPEN', { volume: 0.6 });
     setTimeout(() => playSound('DOOR_CLOSE', { volume: 0.5 }), 900);
@@ -3630,7 +3632,7 @@ async function playMusicblockAudio(def) {
   gain.gain.linearRampToValueAtTime(0.0001, t + durationSec);
   src.start(0);
   src.stop(t + durationSec);
-  if (app?.view) app.view.dataset.lastSound = `${def.soundKey}:file`;
+  if (app?.canvas) app.canvas.dataset.lastSound = `${def.soundKey}:file`;
   applyMute();
 }
 
@@ -3739,25 +3741,18 @@ function sliceSheet(baseTexture, { fw, fh, cols, rows }, frameCount = null) {
   let n = 0;
   for (let r = 0; r < rows && n < total; r++) {
     for (let c = 0; c < cols && n < total; c++) {
-      frames.push(new PIXI.Texture(baseTexture, new PIXI.Rectangle(c * fw, r * fh, fw, fh)));
+      frames.push(frameTexture(baseTexture, new PIXI.Rectangle(c * fw, r * fh, fw, fh)));
       n++;
     }
   }
   return frames;
 }
 
-function loadTexture(url) {
-  return new Promise((resolve, reject) => {
-    const tex = PIXI.Texture.from(url);
-    // Linear filter softens the x1 animal sheets when scaled; nearest looks blocky.
-    if (tex.baseTexture) tex.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
-    if (tex.baseTexture.valid) return resolve(tex);
-    tex.baseTexture.on('loaded', () => {
-      tex.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
-      resolve(tex);
-    });
-    tex.baseTexture.on('error', reject);
-  });
+function loadTexture(url, opts) {
+  const tex = textureFromUrl(url, opts);
+  // Linear filter softens the x1 animal sheets when scaled; nearest looks blocky.
+  tex.source.scaleMode = 'linear';
+  return whenLoaded(tex).then(() => tex);
 }
 
 /** Maturity art stages we ship (nearest-stage lookup). */
@@ -3792,7 +3787,7 @@ async function loadSheets() {
     } else {
       textures[key] = {
         def,
-        frames: sliceSheet(tex.baseTexture, def, def.frameCount ?? null),
+        frames: sliceSheet(tex.source, def, def.frameCount ?? null),
       };
     }
   }
@@ -3866,8 +3861,8 @@ function makePromptChip() {
   const chip = new PIXI.Container();
   const bg = new PIXI.Graphics();
   const cap = new PIXI.Graphics();
-  const keyText = new PIXI.Text('', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 11, fontWeight: '700', fill: 0x2b2418 });
-  const labelText = new PIXI.Text('', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 12, fontWeight: '700', fill: 0xfffaf0 });
+  const keyText = new PIXI.Text({ text: '', style: { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 11, fontWeight: '700', fill: 0x2b2418 } });
+  const labelText = new PIXI.Text({ text: '', style: { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 12, fontWeight: '700', fill: 0xfffaf0 } });
   chip.addChild(bg, cap, keyText, labelText);
   chip.promptKey = '';
   chip.promptLabel = '';
@@ -3919,9 +3914,9 @@ function clearSignpostBoardHover() {
   if (!hoveredSignBoard) return;
   setSignpostHover(hoveredSignBoard.view, false);
   hoveredSignBoard = null;
-  if (app?.view) {
-    app.view.style.cursor = '';
-    app.view.dataset.signpostHoverLabel = '';
+  if (app?.canvas) {
+    app.canvas.style.cursor = '';
+    app.canvas.dataset.signpostHoverLabel = '';
   }
 }
 
@@ -3934,9 +3929,9 @@ function setSignpostBoardHover(hit) {
   if (!hit) return;
   hoveredSignBoard = hit;
   setSignpostHover(hit.view, true, hit.index);
-  if (app?.view) {
-    app.view.style.cursor = 'pointer';
-    app.view.dataset.signpostHoverLabel =
+  if (app?.canvas) {
+    app.canvas.style.cursor = 'pointer';
+    app.canvas.dataset.signpostHoverLabel =
       hit.connection?.label || hit.connection?.tsid || '';
   }
 }
@@ -3997,7 +3992,7 @@ function createSpriteOutline(source, opts = {}) {
   const thickness = Math.max(1, opts.thickness ?? 2);
   const outline = new PIXI.Container();
   outline.eventMode = 'none';
-  outline.name = 'hover-outline';
+  outline.label = 'hover-outline';
 
   /** @type {PIXI.Sprite[]} */
   const copies = [];
@@ -4175,12 +4170,12 @@ function positionSpeechBubble(bubble) {
     cameraY + meta.height + 24,
     cameraY + LOCATION_VIEW_H - 18
   );
-  if (app?.view) {
-    app.view.dataset.speechTarget = `${Math.round(spr.x)},${Math.round(spr.y)}`;
-    app.view.dataset.speechBubble = `${Math.round(bubble.x)},${Math.round(bubble.y)}`;
-    app.view.dataset.speechScreen = `${Math.round(bubble.x - cameraX)},${Math.round(bubble.y - cameraY)}`;
-    app.view.dataset.speechSafeRight = horizontalLocationViewWidth().toFixed(2);
-    app.view.dataset.speechWidth = Number(meta.width).toFixed(2);
+  if (app?.canvas) {
+    app.canvas.dataset.speechTarget = `${Math.round(spr.x)},${Math.round(spr.y)}`;
+    app.canvas.dataset.speechBubble = `${Math.round(bubble.x)},${Math.round(bubble.y)}`;
+    app.canvas.dataset.speechScreen = `${Math.round(bubble.x - cameraX)},${Math.round(bubble.y - cameraY)}`;
+    app.canvas.dataset.speechSafeRight = horizontalLocationViewWidth().toFixed(2);
+    app.canvas.dataset.speechWidth = Number(meta.width).toFixed(2);
   }
   return true;
 }
@@ -4193,21 +4188,21 @@ function showSpeechBubble(target, speech) {
     if (bubble._speechFx?.target === target) removeSpeechBubble(bubble);
   }
 
-  const body = new PIXI.Text(text, {
+  const body = new PIXI.Text({ text: text, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 15,
     fill: 0x453b34,
     lineHeight: 19,
     wordWrap: true,
     wordWrapWidth: 246,
-  });
-  const speaker = new PIXI.Text(String(speech.speaker || target.label || ''), {
+  } });
+  const speaker = new PIXI.Text({ text: String(speech.speaker || target.label || ''), style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 12,
     fill: 0x7f6c55,
     fontWeight: '700',
     letterSpacing: 0.4,
-  });
+  } });
   const width = clamp(Math.max(body.width, speaker.width) + 24, 156, 280);
   const height = Math.ceil(12 + speaker.height + 4 + body.height + 12);
   const bg = new PIXI.Graphics();
@@ -4234,10 +4229,10 @@ function showSpeechBubble(target, speech) {
   speechBubbles.push(bubble);
   fxLayer.addChild(bubble);
   positionSpeechBubble(bubble);
-  if (app?.view) {
-    app.view.dataset.speechSpeaker = String(speech.speaker || target.label || '');
-    app.view.dataset.lastSpeech = text;
-    app.view.dataset.speechBubbles = String(speechBubbles.length);
+  if (app?.canvas) {
+    app.canvas.dataset.speechSpeaker = String(speech.speaker || target.label || '');
+    app.canvas.dataset.lastSpeech = text;
+    app.canvas.dataset.speechBubbles = String(speechBubbles.length);
   }
   return bubble;
 }
@@ -4255,20 +4250,17 @@ function updateSpeechBubbles(dt) {
     bubble.alpha = Math.min(fadeIn, fadeOut);
     if (meta.life >= meta.max) removeSpeechBubble(bubble);
   }
-  if (app?.view) app.view.dataset.speechBubbles = String(speechBubbles.length);
+  if (app?.canvas) app.canvas.dataset.speechBubbles = String(speechBubbles.length);
 }
 
 function floatText(x, y, text, color = 0xfff4d6) {
-  const t = new PIXI.Text(wholeStatAmounts(text), {
+  const t = new PIXI.Text({ text: wholeStatAmounts(text), style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 15,
     fill: color,
     fontWeight: '700',
-    dropShadow: true,
-    dropShadowColor: 0x000000,
-    dropShadowBlur: 2,
-    dropShadowDistance: 1,
-  });
+    dropShadow: { blur: 2, color: 0x000000, distance: 1 },
+  } });
   t.anchor.set(0.5);
   t.x = x; t.y = y; t._life = 0; t._vy = -0.7;
   fxLayer.addChild(t);
@@ -4302,39 +4294,31 @@ function showSuperHarvestFx(target, itemClassTsid, amount) {
     rainbow.bezierCurveTo(-58, -30 + index * 2, 58, -30 + index * 2, 112, 29 + index * 3);
     rainbow.stroke({ width: 4, color: color, alpha: 0.92 });
   });
-  const heading = new PIXI.Text('SUPER HARVEST!', {
+  const heading = new PIXI.Text({ text: 'SUPER HARVEST!', style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 27,
     fill: 0xfff8d6,
     fontWeight: '900',
     letterSpacing: 1.5,
-    stroke: 0x54402d,
-    strokeThickness: 5,
-    dropShadow: true,
-    dropShadowColor: 0x000000,
-    dropShadowAlpha: 0.28,
-    dropShadowBlur: 3,
-    dropShadowDistance: 2,
-  });
+    stroke: { color: 0x54402d, width: 5 },
+    dropShadow: { alpha: 0.28, blur: 3, color: 0x000000, distance: 2 },
+  } });
   heading.anchor.set(0.5);
   heading.y = 19;
-  const itemIcon = PIXI.Sprite.from(
-    ITEM_CATALOG[itemId]?.icon || `assets/sprites/icons/${itemId}.png`
-  );
+  const itemIcon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[itemId]?.icon || `assets/sprites/icons/${itemId}.png`));
   itemIcon.anchor.set(0.5);
   const largest = Math.max(itemIcon.texture.width || 1, itemIcon.texture.height || 1);
   const itemScale = Math.min(1.05, 38 / largest);
   itemIcon.scale.set(itemScale);
   itemIcon.x = -18;
   itemIcon.y = 62;
-  const countText = new PIXI.Text(`+${count}`, {
+  const countText = new PIXI.Text({ text: `+${count}`, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 21,
     fill: 0xffffff,
     fontWeight: '900',
-    stroke: 0x4a3829,
-    strokeThickness: 4,
-  });
+    stroke: { color: 0x4a3829, width: 4 },
+  } });
   countText.anchor.set(0, 0.5);
   countText.x = 8;
   countText.y = 62;
@@ -4349,10 +4333,10 @@ function showSuperHarvestFx(target, itemClassTsid, amount) {
   fx._baseY = fx.y;
   fxLayer.addChild(fx);
   burst(target.sprite.x, target.sprite.y - 70, 0xffd95a, 18);
-  if (app?.view) {
-    app.view.dataset.superHarvestFx = 'playing';
-    app.view.dataset.superHarvestItem = itemId;
-    app.view.dataset.superHarvestAmount = String(count);
+  if (app?.canvas) {
+    app.canvas.dataset.superHarvestFx = 'playing';
+    app.canvas.dataset.superHarvestItem = itemId;
+    app.canvas.dataset.superHarvestAmount = String(count);
   }
   return fx;
 }
@@ -4363,7 +4347,7 @@ function showMusicblockFx(def) {
     if (child._musicFx) fxLayer.removeChild(child);
   }
 
-  const icon = PIXI.Sprite.from(ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.png`);
+  const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.png`));
   icon.anchor.set(0.5);
   icon.scale.set(1.35);
   icon._musicFx = 'block';
@@ -4380,16 +4364,13 @@ function showMusicblockFx(def) {
     : [0x8ee3a1, 0x7dc9ff, 0xc6a2ff];
   const count = Math.max(10, Math.ceil(def.durationMs / 700));
   for (let i = 0; i < count; i++) {
-    const note = new PIXI.Text(glyphs[i % glyphs.length], {
+    const note = new PIXI.Text({ text: glyphs[i % glyphs.length], style: {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 18 + (i % 3) * 3,
       fill: colors[i % colors.length],
       fontWeight: '700',
-      dropShadow: true,
-      dropShadowColor: 0x3b274c,
-      dropShadowBlur: 2,
-      dropShadowDistance: 1,
-    });
+      dropShadow: { blur: 2, color: 0x3b274c, distance: 1 },
+    } });
     note.anchor.set(0.5);
     note._musicFx = 'note';
     note._life = 0;
@@ -4480,8 +4461,8 @@ function markFeedPickerChoice(button) {
     choice.classList.toggle('is-selected', selected);
     choice.setAttribute('aria-selected', selected ? 'true' : 'false');
   });
-  if (app?.view && button?.dataset?.food) {
-    app.view.dataset.feedPickerSelection = button.dataset.food;
+  if (app?.canvas && button?.dataset?.food) {
+    app.canvas.dataset.feedPickerSelection = button.dataset.food;
   }
 }
 
@@ -4491,7 +4472,7 @@ function closeFeedPicker(result = 'cancelled') {
   showFeedPickerQty(null);
   feedPickerTarget = null;
   feedPickerOptions = [];
-  if (app?.view && result) app.view.dataset.feedPickerResult = result;
+  if (app?.canvas && result) app.canvas.dataset.feedPickerResult = result;
 }
 
 /** Eligible stacks for the picker's verb (Feed keeps the original animal list). */
@@ -4542,7 +4523,7 @@ function setFeedPickerQty(value) {
   const go = document.getElementById('feed-picker-qty-go');
   if (input) input.value = String(n);
   if (go) go.textContent = `${FEED_PICKER_VERB_LABELS[feedPickerVerb] || 'Feed'} ${n}`;
-  if (app?.view) app.view.dataset.feedPickerCount = String(n);
+  if (app?.canvas) app.canvas.dataset.feedPickerCount = String(n);
   return n;
 }
 
@@ -4558,7 +4539,7 @@ function chooseFeedPickerItem(classTsid) {
   const food = feedPickerOptions.find((option) => option.classTsid === classTsid);
   if (!target || !food || currentAction) return false;
   if (pickerTakesCount(target.classId, feedPickerVerb) && pickerMaxCount(target.classId, classTsid, inv) > 1) {
-    if (app?.view) app.view.dataset.feedPickerSelection = classTsid;
+    if (app?.canvas) app.canvas.dataset.feedPickerSelection = classTsid;
     showFeedPickerQty(food);
     return true;
   }
@@ -4577,7 +4558,7 @@ function commitFeedPick(classTsid, count = 1) {
     toast(`You have no ${food.label}.`, 2400);
     return false;
   }
-  if (app?.view) app.view.dataset.feedPickerSelection = classTsid;
+  if (app?.canvas) app.canvas.dataset.feedPickerSelection = classTsid;
   closeFeedPicker('selected');
   const counted = pickerTakesCount(target.classId, verbId);
   return beginVerbAction(target, {
@@ -4639,13 +4620,13 @@ function openFeedPicker(target, verb = null) {
   }
 
   panel.hidden = false;
-  if (app?.view) {
-    app.view.dataset.feedPickerVerb = verbId;
-    app.view.dataset.feedPickerCount = '';
-    app.view.dataset.feedPickerTarget = target.classId;
-    app.view.dataset.feedPickerOptions = options.map((option) => option.classTsid).join(',');
-    app.view.dataset.feedPickerSelection = '';
-    app.view.dataset.feedPickerResult = 'open';
+  if (app?.canvas) {
+    app.canvas.dataset.feedPickerVerb = verbId;
+    app.canvas.dataset.feedPickerCount = '';
+    app.canvas.dataset.feedPickerTarget = target.classId;
+    app.canvas.dataset.feedPickerOptions = options.map((option) => option.classTsid).join(',');
+    app.canvas.dataset.feedPickerSelection = '';
+    app.canvas.dataset.feedPickerResult = 'open';
   }
   requestAnimationFrame(() => {
     const first = grid.querySelector('.feed-picker-choice');
@@ -4657,8 +4638,8 @@ function openFeedPicker(target, verb = null) {
 
 function positionActionProgress() {
   const el = document.getElementById('action-progress');
-  if (!el || el.hidden || !player || !app?.view) return;
-  const canvas = app.view;
+  if (!el || el.hidden || !player || !app?.canvas) return;
+  const canvas = app.canvas;
   const canvasW = canvas.clientWidth || canvas.width || VIEW_W;
   const canvasH = canvas.clientHeight || canvas.height || VIEW_H;
   const screenX = (player.x - camTarget) * (canvasW / VIEW_W);
@@ -4701,8 +4682,8 @@ function clearActionToolFx(status = 'cancelled') {
   actionToolFx = null;
   if (fx?.parent) fx.parent.removeChild(fx);
   if (fx && !fx.destroyed) fx.destroy();
-  if (app?.view && fx?._toolAnimationDataset) {
-    app.view.dataset[fx._toolAnimationDataset] = status;
+  if (app?.canvas && fx?._toolAnimationDataset) {
+    app.canvas.dataset[fx._toolAnimationDataset] = status;
   }
 }
 
@@ -4713,7 +4694,7 @@ function stopTrantHarvestAnimation(target, status = 'complete') {
   spr.scale.set(fx.baseScaleX, fx.baseScaleY);
   spr.rotation = fx.baseRotation;
   delete spr._trantHarvestFx;
-  if (app?.view) app.view.dataset.trantHarvestAnimation = status;
+  if (app?.canvas) app.canvas.dataset.trantHarvestAnimation = status;
 }
 
 function playTrantHarvestAnimation(target, durationMs = 0) {
@@ -4728,7 +4709,7 @@ function playTrantHarvestAnimation(target, durationMs = 0) {
     baseRotation: spr.rotation || 0,
   };
   burst(spr.x, spr.y - Math.min(120, Math.abs(spr.height) * 0.55), 0x9bd66f, 8);
-  if (app?.view) app.view.dataset.trantHarvestAnimation = 'playing';
+  if (app?.canvas) app.canvas.dataset.trantHarvestAnimation = 'playing';
   return spr._trantHarvestFx;
 }
 
@@ -4764,7 +4745,7 @@ function playButterflyCareAnimation(target, verbId, durationMs = 0) {
     baseScale: Math.abs(spr.baseScale || spr.scale.y || ENTITY_SCALE.butterfly),
   };
   burst(spr.x, spr.y - 30, verbId === 'milk' ? 0x9adcf8 : 0xd7a9ff, verbId === 'milk' ? 12 : 16);
-  if (app?.view) app.view.dataset.butterflyCareAnimation = `${verbId}:playing`;
+  if (app?.canvas) app.canvas.dataset.butterflyCareAnimation = `${verbId}:playing`;
 }
 
 function playHatchetAnimation(target) {
@@ -4785,12 +4766,12 @@ function playHatchetAnimation(target) {
   tool._toolAnimationDataset = 'hatchetAnimation';
   actionToolFx = tool;
   fxLayer.addChild(tool);
-  if (app?.view) app.view.dataset.hatchetAnimation = 'playing';
+  if (app?.canvas) app.canvas.dataset.hatchetAnimation = 'playing';
   tool.onComplete = () => {
     if (actionToolFx === tool) actionToolFx = null;
     if (tool.parent) tool.parent.removeChild(tool);
     if (!tool.destroyed) tool.destroy();
-    if (app?.view) app.view.dataset.hatchetAnimation = 'complete';
+    if (app?.canvas) app.canvas.dataset.hatchetAnimation = 'complete';
   };
   tool.play();
   return tool;
@@ -4814,12 +4795,12 @@ function playWateringCanAnimation(target, durationMs = 0) {
   tool._toolAnimationDataset = 'wateringCanAnimation';
   actionToolFx = tool;
   fxLayer.addChild(tool);
-  if (app?.view) app.view.dataset.wateringCanAnimation = 'playing';
+  if (app?.canvas) app.canvas.dataset.wateringCanAnimation = 'playing';
   tool.onComplete = () => {
     if (actionToolFx === tool) actionToolFx = null;
     if (tool.parent) tool.parent.removeChild(tool);
     if (!tool.destroyed) tool.destroy();
-    if (app?.view) app.view.dataset.wateringCanAnimation = 'complete';
+    if (app?.canvas) app.canvas.dataset.wateringCanAnimation = 'complete';
   };
   tool.play();
   return tool;
@@ -4840,7 +4821,7 @@ async function playPickAnimation(target, durationMs = 0) {
   if (!pickToolFrames.has(pick)) {
     const tex = await loadTexture(PICK_TOOL_SHEETS[pick]).catch(() => null);
     if (!tex) return null;
-    pickToolFrames.set(pick, sliceSheet(tex.baseTexture, PICK_TOOL_DEF, PICK_SWING_FRAMES));
+    pickToolFrames.set(pick, sliceSheet(tex.source, PICK_TOOL_DEF, PICK_SWING_FRAMES));
   }
   // The verb may have finished or been cancelled while the sheet loaded.
   if (!fxLayer || !player || !target?.sprite || currentAction?.target !== target) return null;
@@ -4864,15 +4845,15 @@ async function playPickAnimation(target, durationMs = 0) {
   tool._toolAnimationDataset = 'pickAnimation';
   actionToolFx = tool;
   fxLayer.addChild(tool);
-  if (app?.view) {
-    app.view.dataset.pickAnimation = 'playing';
-    app.view.dataset.pickAnimationTool = pick;
+  if (app?.canvas) {
+    app.canvas.dataset.pickAnimation = 'playing';
+    app.canvas.dataset.pickAnimationTool = pick;
   }
   tool.onComplete = () => {
     if (actionToolFx === tool) actionToolFx = null;
     if (tool.parent) tool.parent.removeChild(tool);
     if (!tool.destroyed) tool.destroy();
-    if (app?.view) app.view.dataset.pickAnimation = 'complete';
+    if (app?.canvas) app.canvas.dataset.pickAnimation = 'complete';
   };
   tool.play();
   return tool;
@@ -5081,8 +5062,8 @@ function executeVerb(target, verbId) {
       ? clamp(forcedRoll, 0, 0.999999)
       : buffedRandom(buffState, Math.random, Date.now()),
   });
-  if (baseVerb === 'feed' && app?.view) {
-    app.view.dataset.feedPickerResult = result.ok ? 'success' : 'failed';
+  if (baseVerb === 'feed' && app?.canvas) {
+    app.canvas.dataset.feedPickerResult = result.ok ? 'success' : 'failed';
   }
   let reactionText = null;
   if (result.ok && result.speech?.text) {
@@ -5127,10 +5108,10 @@ function executeVerb(target, verbId) {
 
   if (result.trantCareAttempted) {
     const condition = getToolCondition(toolState, 'watering_can');
-    if (app?.view) {
-      app.view.dataset.trantCareResult = result.ok ? 'success' : (result.trantCare?.reason || 'failed');
-      app.view.dataset.wateringCanRemaining = String(condition.remaining);
-      app.view.dataset.trantCareClass = target.classId;
+    if (app?.canvas) {
+      app.canvas.dataset.trantCareResult = result.ok ? 'success' : (result.trantCare?.reason || 'failed');
+      app.canvas.dataset.wateringCanRemaining = String(condition.remaining);
+      app.canvas.dataset.trantCareClass = target.classId;
     }
     if (target.classId === 'wood_tree') {
       refreshWoodTreeVisual(target);
@@ -5144,20 +5125,20 @@ function executeVerb(target, verbId) {
 
   if (result.animalKinshipAttempted) {
     const care = result.animalKinship || {};
-    if (app?.view) {
-      app.view.dataset.animalKinshipResult = result.ok ? 'success' : (care.reason || 'failed');
-      app.view.dataset.animalKinshipClass = target.classId;
-      app.view.dataset.animalKinshipVerb = baseVerb;
-      app.view.dataset.animalKinshipRank = String(care.rank ?? 0);
-      app.view.dataset.animalKinshipUses = String(care.usesToday ?? 0);
-      app.view.dataset.animalKinshipYield = String(care.itemCount || 0);
-      app.view.dataset.animalKinshipSuper = care.superHarvest ? '1' : '0';
+    if (app?.canvas) {
+      app.canvas.dataset.animalKinshipResult = result.ok ? 'success' : (care.reason || 'failed');
+      app.canvas.dataset.animalKinshipClass = target.classId;
+      app.canvas.dataset.animalKinshipVerb = baseVerb;
+      app.canvas.dataset.animalKinshipRank = String(care.rank ?? 0);
+      app.canvas.dataset.animalKinshipUses = String(care.usesToday ?? 0);
+      app.canvas.dataset.animalKinshipYield = String(care.itemCount || 0);
+      app.canvas.dataset.animalKinshipSuper = care.superHarvest ? '1' : '0';
       if (target.classId === 'npc_butterfly') {
         const lotion = getToolCondition(toolState, 'butterfly_lotion');
-        app.view.dataset.butterflyMassageUses = String(target.state?.massageUsesToday || 0);
-        app.view.dataset.butterflyMilkUses = String(target.state?.milkUsesToday || 0);
-        app.view.dataset.butterflyLotionRemaining = String(lotion.remaining);
-        app.view.dataset.butterflyLotionTubes = String(inv.butterfly_lotion || 0);
+        app.canvas.dataset.butterflyMassageUses = String(target.state?.massageUsesToday || 0);
+        app.canvas.dataset.butterflyMilkUses = String(target.state?.milkUsesToday || 0);
+        app.canvas.dataset.butterflyLotionRemaining = String(lotion.remaining);
+        app.canvas.dataset.butterflyLotionTubes = String(inv.butterfly_lotion || 0);
       }
     }
     // Quest counters piggy_nibble_max_reward / butterfly_milk_max_reward /
@@ -5175,15 +5156,15 @@ function executeVerb(target, verbId) {
 
   if (result.ok && result.harvest) {
     const harvest = result.harvest;
-    if (app?.view) {
-      app.view.dataset.trantHarvestClass = target.classId;
-      app.view.dataset.trantHarvestFruit = harvest.fruitClass;
-      app.view.dataset.trantHarvestYield = String(harvest.amount || 0);
-      app.view.dataset.trantHarvestBase = String(harvest.baseAmount || 0);
-      app.view.dataset.trantHarvestSuper = harvest.superHarvest ? '1' : '0';
-      app.view.dataset.trantHarvestRemaining = String(harvest.remainingOnTree || 0);
-      app.view.dataset.trantHarvestUses = String(harvest.harvestsToday || 0);
-      app.view.dataset.trantHarvestLimit = String(harvest.harvestsLimit || 0);
+    if (app?.canvas) {
+      app.canvas.dataset.trantHarvestClass = target.classId;
+      app.canvas.dataset.trantHarvestFruit = harvest.fruitClass;
+      app.canvas.dataset.trantHarvestYield = String(harvest.amount || 0);
+      app.canvas.dataset.trantHarvestBase = String(harvest.baseAmount || 0);
+      app.canvas.dataset.trantHarvestSuper = harvest.superHarvest ? '1' : '0';
+      app.canvas.dataset.trantHarvestRemaining = String(harvest.remainingOnTree || 0);
+      app.canvas.dataset.trantHarvestUses = String(harvest.harvestsToday || 0);
+      app.canvas.dataset.trantHarvestLimit = String(harvest.harvestsLimit || 0);
     }
     if (harvest.superHarvest) {
       showSuperHarvestFx(target, harvest.fruitClass, harvest.superAmount);
@@ -5204,8 +5185,8 @@ function executeVerb(target, verbId) {
     if (result.woodTreeChanged) {
       refreshWoodTreeVisual(target);
       const condition = getToolCondition(toolState, 'hatchet');
-      app.view.dataset.woodYield = String(result.woodHarvest?.plankYield || 0);
-      app.view.dataset.hatchetRemaining = String(condition.remaining);
+      app.canvas.dataset.woodYield = String(result.woodHarvest?.plankYield || 0);
+      app.canvas.dataset.hatchetRemaining = String(condition.remaining);
       if (condition.broken) toast('Ooops! You done broke your Hatchet. Repair it with the Tinkertool.', 4200);
     }
     if (result.animalChanged && target.state) {
@@ -5286,7 +5267,7 @@ function executeVerb(target, verbId) {
       announceAchievementUpdates(achievementUpdates);
     }
     if (achievementEvents.length) {
-      app.view.dataset.achievementCounter = achievementEvents
+      app.canvas.dataset.achievementCounter = achievementEvents
         .map((event) => `${event.counter}=${event.amount}`)
         .join(',');
     }
@@ -5323,7 +5304,7 @@ function executeVerb(target, verbId) {
   if (!result.remove && target?.sprite && !target.sprite.destroyed) {
     recentInteractionTarget = target;
     recentInteractionUntil = Date.now() + 6000;
-    if (app?.view) app.view.dataset.recentInteractionTarget = target.classId || '';
+    if (app?.canvas) app.canvas.dataset.recentInteractionTarget = target.classId || '';
   }
 
   // show item gains
@@ -5473,12 +5454,12 @@ function makeBackground() {
   const locLabel = worldSession?.location
     ? `${worldSession.location.label} (${worldSession.location.tsid}) · T = teleport/door`
     : 'Street';
-  const label = new PIXI.Text(locLabel, {
+  const label = new PIXI.Text({ text: locLabel, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 13,
     fill: theme === 'house' ? 0x3a2a18 : 0x2b3a20,
     fontWeight: '600',
-  });
+  } });
   label.x = 16;
   label.y = GROUND_Y + 48;
   label.alpha = 0.55;
@@ -5550,7 +5531,7 @@ function setSpinningWheelVisual(target, phase) {
     sprite.animationSpeed = phase === 'spin' ? 0.38 : 0.62;
     sprite.gotoAndPlay(0);
   }
-  if (app?.view) app.view.dataset.spinningWheelPhase = phase;
+  if (app?.canvas) app.canvas.dataset.spinningWheelPhase = phase;
 }
 
 function removeSpinningWheelTarget() {
@@ -5563,9 +5544,9 @@ function removeSpinningWheelTarget() {
   spinningWheelTarget = null;
   spinningWheelLastPhase = '';
   spinningWheelPrompted = false;
-  if (app?.view) {
-    app.view.dataset.spinningWheelPhase = 'destroyed';
-    app.view.dataset.spinningWheelActive = '0';
+  if (app?.canvas) {
+    app.canvas.dataset.spinningWheelPhase = 'destroyed';
+    app.canvas.dataset.spinningWheelActive = '0';
   }
 }
 
@@ -5593,10 +5574,10 @@ function spawnSpinningWheel({ now = Date.now() } = {}) {
   spinningWheelLastPhase = '';
   spinningWheelPrompted = false;
   setSpinningWheelVisual(spinningWheelTarget, 'appear');
-  if (app?.view) {
-    app.view.dataset.spinningWheelActive = '1';
-    app.view.dataset.spinningWheelOwner = wheel.ownerId;
-    app.view.dataset.spinningWheelReward = '';
+  if (app?.canvas) {
+    app.canvas.dataset.spinningWheelActive = '1';
+    app.canvas.dataset.spinningWheelOwner = wheel.ownerId;
+    app.canvas.dataset.spinningWheelReward = '';
   }
   return spinningWheelTarget;
 }
@@ -5622,33 +5603,32 @@ function spawnStootMemorial() {
   frame.roundRect(-104, -220, 208, 146, 10).stroke({ width: 2, color: 0xe5cc82, alpha: 0.72 });
   const glow = new PIXI.Graphics();
   glow.ellipse(0, -145, 150, 94).fill({ color: 0xffe6a0, alpha: 0.12 });
-  const portrait = PIXI.Sprite.from('assets/sprites/spinning-wheel/stoot-doll.png');
+  const portrait = new PIXI.Sprite(textureFromUrl('assets/sprites/spinning-wheel/stoot-doll.png'));
   portrait.anchor.set(0.5);
   portrait.scale.set(1.55);
   portrait.y = -150;
-  const title = new PIXI.Text('STOOT', {
+  const title = new PIXI.Text({ text: 'STOOT', style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 24,
     fill: 0xffefc2,
     fontWeight: '900',
     letterSpacing: 3,
-    stroke: 0x251b17,
-    strokeThickness: 4,
-  });
+    stroke: { color: 0x251b17, width: 4 },
+  } });
   title.anchor.set(0.5);
   title.y = -205;
-  const inscription = new PIXI.Text('An old friend, still making Ur brighter.', {
+  const inscription = new PIXI.Text({ text: 'An old friend, still making Ur brighter.', style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 12,
     fill: 0xf5ead0,
     fontStyle: 'italic',
-  });
+  } });
   inscription.anchor.set(0.5);
   inscription.y = -91;
   memorial.addChild(shadow, frame, glow, portrait, title, inscription);
   entityLayer.addChild(memorial);
 
-  const doll = PIXI.Sprite.from('assets/sprites/spinning-wheel/stoot-doll.png');
+  const doll = new PIXI.Sprite(textureFromUrl('assets/sprites/spinning-wheel/stoot-doll.png'));
   doll.anchor.set(0.5, 1);
   doll.scale.set(1.18);
   doll.x = memorial.x - 132;
@@ -5664,10 +5644,10 @@ function spawnStootMemorial() {
     sprite: doll,
     state: createStootDollState(),
   });
-  if (app?.view) {
-    app.view.dataset.stootMemorial = 'clean-cc0';
-    app.view.dataset.stootDollActive = '1';
-    app.view.dataset.stootDollAudio = 'recovered-c2';
+  if (app?.canvas) {
+    app.canvas.dataset.stootMemorial = 'clean-cc0';
+    app.canvas.dataset.stootDollActive = '1';
+    app.canvas.dataset.stootDollAudio = 'recovered-c2';
   }
   return memorial;
 }
@@ -5695,12 +5675,12 @@ function handleStootDollTarget(target, verbId, { context = 'world', animate = tr
       if (!target.sprite?.destroyed) target.sprite.scale.set(baseScale);
     }, 180);
   }
-  if (app?.view) {
-    app.view.dataset.stootDollContext = context;
-    app.view.dataset.stootDollPulls = String(result.pullCount);
-    app.view.dataset.stootDollQuoteIndex = String(result.index);
-    app.view.dataset.stootDollQuote = result.quote;
-    app.view.dataset.stootDollSoundKey = result.soundKey || '';
+  if (app?.canvas) {
+    app.canvas.dataset.stootDollContext = context;
+    app.canvas.dataset.stootDollPulls = String(result.pullCount);
+    app.canvas.dataset.stootDollQuoteIndex = String(result.index);
+    app.canvas.dataset.stootDollQuote = result.quote;
+    app.canvas.dataset.stootDollSoundKey = result.soundKey || '';
   }
   // Clean production voice files (c2.glitch.bz Stewart_Doll_1-14) were
   // recovered from the Wayback CDX index; quotes 0-28 never had audio.
@@ -5772,12 +5752,12 @@ function handleSpinningWheelTarget(target, verbId) {
   setSpinningWheelVisual(target, 'spin');
   playSfx('spinningWheel', { volume: 0.72 });
   pushActivity('You spin the Spinning Wheel. Round and round it goes!');
-  if (app?.view) {
-    app.view.dataset.spinningWheelColor = result.color;
-    app.view.dataset.spinningWheelReward = result.reward.kind === 'currants'
+  if (app?.canvas) {
+    app.canvas.dataset.spinningWheelColor = result.color;
+    app.canvas.dataset.spinningWheelReward = result.reward.kind === 'currants'
       ? `${result.reward.amount}:currants`
       : `${result.reward.amount}:${result.reward.classTsid}`;
-    app.view.dataset.spinningWheelTier = String(result.tier);
+    app.canvas.dataset.spinningWheelTier = String(result.tier);
   }
 }
 
@@ -5815,9 +5795,9 @@ function updateSpinningWheel() {
         volume: result.tier === 4 ? 0.76 : 0.58,
         rate: result.tier === 1 ? 0.86 : 1.08,
       });
-      if (app?.view) {
-        app.view.dataset.spinningWheelAwarded = result.label;
-        app.view.dataset.spinningWheelRewardApplied = '1';
+      if (app?.canvas) {
+        app.canvas.dataset.spinningWheelAwarded = result.label;
+        app.canvas.dataset.spinningWheelRewardApplied = '1';
       }
       updateHud();
     }
@@ -5890,17 +5870,13 @@ function makeLocalCompanion(profile) {
   body.gotoAndStop(0);
   body.animState = 'idle';
 
-  const name = new PIXI.Text(profile.name, {
+  const name = new PIXI.Text({ text: profile.name, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 12,
     fill: 0x4e4943,
     fontWeight: '700',
-    dropShadow: true,
-    dropShadowColor: 0xffffff,
-    dropShadowAlpha: 0.92,
-    dropShadowBlur: 2,
-    dropShadowDistance: 0,
-  });
+    dropShadow: { alpha: 0.92, blur: 2, color: 0xffffff, distance: 0 },
+  } });
   name.anchor.set(0.5, 1);
   name.y = crowd ? -Math.round((crowd.frames[0]?.frame?.height || 130) + 6) : -104;
   const plate = new PIXI.Graphics();
@@ -5938,18 +5914,18 @@ function setLocalCompanionAnim(actor, state) {
 }
 
 function publishCompanionFollowState() {
-  if (!app?.view) return;
+  if (!app?.canvas) return;
   const followee = companionFollowState.active
     ? localCompanionTarget(companionFollowState.followee)
     : null;
-  app.view.dataset.followActive = companionFollowState.active ? '1' : '0';
-  app.view.dataset.followee = companionFollowState.followee || '';
-  app.view.dataset.followStreets = String(companionFollowState.streetsFollowed || 0);
-  app.view.dataset.followVisited = companionFollowState.visitedStreets.join(',');
-  app.view.dataset.followDistance = followee?.sprite && player
+  app.canvas.dataset.followActive = companionFollowState.active ? '1' : '0';
+  app.canvas.dataset.followee = companionFollowState.followee || '';
+  app.canvas.dataset.followStreets = String(companionFollowState.streetsFollowed || 0);
+  app.canvas.dataset.followVisited = companionFollowState.visitedStreets.join(',');
+  app.canvas.dataset.followDistance = followee?.sprite && player
     ? String(Math.round(Math.abs(followee.sprite.x - player.x)))
     : '';
-  app.view.dataset.followAchievement = achieveState.unlocked.includes(STALKER_ACHIEVEMENT_ID)
+  app.canvas.dataset.followAchievement = achieveState.unlocked.includes(STALKER_ACHIEVEMENT_ID)
     ? 'unlocked'
     : companionFollowState.achievementAwarded
       ? 'already-awarded'
@@ -6087,10 +6063,10 @@ function spawnLocalCompanions() {
     register(actor);
     return actor;
   });
-  if (app?.view) {
-    app.view.dataset.localCompanionCount = String(localCompanions.length);
-    app.view.dataset.localCompanionNames = localCompanions.map((actor) => actor.name).join(',');
-    app.view.dataset.localCompanionArt = 'clean-avatar-sheets';
+  if (app?.canvas) {
+    app.canvas.dataset.localCompanionCount = String(localCompanions.length);
+    app.canvas.dataset.localCompanionNames = localCompanions.map((actor) => actor.name).join(',');
+    app.canvas.dataset.localCompanionArt = 'clean-avatar-sheets';
   }
   syncLocalCompanionFollowActors();
   return localCompanions;
@@ -6118,9 +6094,9 @@ function showLocalCompanionSpeech(name, text, opts = {}) {
   actor.socialTargetX = localCompanionGatherTarget(name, player?.x, WORLD_W);
   actor.socialUntil = Date.now() + Math.max(2_500, Number(opts.durationMs) || 7_200);
   actor.speakingUntil = actor.socialUntil;
-  if (app?.view) {
-    app.view.dataset.localCompanionSpeaker = name;
-    app.view.dataset.localCompanionSpeech = String(text).slice(0, 180);
+  if (app?.canvas) {
+    app.canvas.dataset.localCompanionSpeaker = name;
+    app.canvas.dataset.localCompanionSpeech = String(text).slice(0, 180);
   }
   return showSpeechBubble(actor, {
     speaker: name,
@@ -6177,8 +6153,8 @@ function updateLocalCompanions(dt) {
     sprite._namePlate.alpha =
       actor.state?.following || now < actor.speakingUntil ? 1 : 0.72;
   }
-  if (app?.view && localCompanions.length) {
-    app.view.dataset.localCompanionPositions = localCompanions
+  if (app?.canvas && localCompanions.length) {
+    app.canvas.dataset.localCompanionPositions = localCompanions
       .map((actor) => `${actor.name}:${Math.round(actor.sprite.x)},${Math.round(actor.sprite.y)}`)
       .join('|');
   }
@@ -6215,14 +6191,14 @@ function glitchAnimPack(key, app) {
     const sheet = await loadGlitchIdleSheet(name);
     if (native) return sheet;
     const tinted = recolorGlitchSheet(sheet, app);
-    return { ...tinted, release: () => tinted.frames[0]?.baseTexture?.destroy() };
+    return { ...tinted, release: () => tinted.frames[0]?.source?.destroy() };
   };
   return animPackFromSheets(key, sheets, GLITCH_AVATAR, idleLoader);
 }
 
 /** A recovered sheet recoloured for a Glitch-style look (classifyGlitchPixel regions). */
 function recolorGlitchSheet(sheet, app) {
-  const img = sheet?.frames?.[0]?.baseTexture?.resource?.source;
+  const img = sheet?.frames?.[0]?.source?.resource;
   if (!img) return sheet;
   const canvas = document.createElement('canvas');
   canvas.width = img.width;
@@ -6232,7 +6208,7 @@ function recolorGlitchSheet(sheet, app) {
   const data = g.getImageData(0, 0, canvas.width, canvas.height);
   recolorImageData(data.data, canvas.width, canvas.height, app, classifyGlitchPixel);
   g.putImageData(data, 0, 0);
-  return { def: sheet.def, frames: sliceSheet(PIXI.BaseTexture.from(canvas), sheet.def, sheet.def.frameCount ?? null) };
+  return { def: sheet.def, frames: sliceSheet(new PIXI.CanvasSource({ resource: canvas }), sheet.def, sheet.def.frameCount ?? null) };
 }
 
 /** Idle sheets loaded on demand (never at boot): url -> Promise<{ def, frames }>. */
@@ -6241,12 +6217,12 @@ function loadIdleSheetTexture(def) {
   if (!idleSheetTextures.has(def.url)) {
     idleSheetTextures.set(def.url, loadTexture(def.url).then((tex) => ({
       def,
-      frames: sliceSheet(tex.baseTexture, def, def.frameCount ?? null),
+      frames: sliceSheet(tex.source, def, def.frameCount ?? null),
       // Free the decoded sheet (and its 3x upgrade); the next use fetches it again.
       release() {
         idleSheetTextures.delete(def.url);
-        PIXI.Texture.removeFromCache?.(tex);
-        tex.baseTexture.destroy();
+        forgetTexture(def.url);
+        tex.source.destroy();
       },
     }))
       .catch((err) => {
@@ -6274,7 +6250,7 @@ function animPackFromSheets(key, sheets, av, idleLoader = null) {
 }
 
 function anchorSheetFrames(sheet, def) {
-  for (const tex of sheet?.frames || []) tex.defaultAnchor.set(def.midX / def.fw, def.feetY / def.fh);
+  for (const tex of sheet?.frames || []) tex.defaultAnchor = { x: def.midX / def.fw, y: def.feetY / def.fh };
 }
 
 /**
@@ -6310,7 +6286,7 @@ function ensureIdleSheet(pack, name) {
     pack.sheets[name] = sheet;
     fillPackAnims(pack);
     idleSheetLog.push({ sheet: name, at: Math.round(started), ms: Math.round(performance.now() - started), ...(sheet.stats || {}) });
-    if (app?.view) app.view.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
+    if (app?.canvas) app.canvas.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
     // Replay the current state with the real frames (only if it draws from this sheet).
     if (player?.anims === pack.anims && idleSheetFor(player.glitchState) === name) player.glitchState = null;
     return true;
@@ -6387,7 +6363,7 @@ function vectorAnimPack(key, app) {
         const loaded = {};
         const defs = {};
         for (const [name, sh] of Object.entries(sheets)) {
-          const base = PIXI.BaseTexture.from(sh.canvas, { resolution: scale, scaleMode: PIXI.SCALE_MODES.LINEAR });
+          const base = new PIXI.CanvasSource({ resource: sh.canvas, resolution: scale, scaleMode: 'linear' });
           bake.bases.push(base);
           defs[name] = sh.def;
           loaded[name] = { frames: sliceSheet(base, { fw: sh.def.fw, fh: sh.def.fh, cols: sh.def.cols, rows: sh.def.rows }, sh.def.cells) };
@@ -6397,7 +6373,7 @@ function vectorAnimPack(key, app) {
           if (!vectorBakes.has(lk)) return null;
           const { canvas, def, stats } = await bakeIdleSheet(bake.prep, name, scale);
           if (!vectorBakes.has(lk)) return null;
-          const base = PIXI.BaseTexture.from(canvas, { resolution: scale, scaleMode: PIXI.SCALE_MODES.LINEAR });
+          const base = new PIXI.CanvasSource({ resource: canvas, resolution: scale, scaleMode: 'linear' });
           bake.bases.push(base);
           const release = () => {
             bake.bases = bake.bases.filter((b) => b !== base);
@@ -6477,7 +6453,7 @@ function getAppearanceTextures(appearance) {
   }
 
   // Use HTMLImageElement sources when possible
-  const idleImg = idleBase.baseTexture?.resource?.source;
+  const idleImg = idleBase.source?.resource;
   let idleFrame = recolorTextureFromImage(idleImg || idleBase, app, {
     whole: true,
   });
@@ -6486,14 +6462,14 @@ function getAppearanceTextures(appearance) {
   if (app.bodyStyle === 'alt') {
     // Single-frame alt body for walk until a walk strip exists
     const altTex = textures.avatarStyledAlt?.frames?.[0] || idleFrame;
-    const altImg = altTex.baseTexture?.resource?.source;
+    const altImg = altTex.source?.resource;
     const recolored = recolorTextureFromImage(altImg || altTex, app, { whole: true });
     idleFrame = recolored;
     walkFrames = [recolored, recolored, recolored, recolored, recolored, recolored, recolored, recolored];
   } else {
     const walkImg =
-      walkBase?.frames?.[0]?.baseTexture?.resource?.source ||
-      walkBase?.baseTexture?.resource?.source;
+      walkBase?.frames?.[0]?.source?.resource ||
+      walkBase?.source?.resource;
     // Full strip recolor then slice frames
     const stripTex = recolorTextureFromImage(walkImg || idleImg, app, {
       whole: true,
@@ -6505,10 +6481,10 @@ function getAppearanceTextures(appearance) {
     const fh = AVATAR_SHEETS.walk.fh;
     const cols = AVATAR_SHEETS.walk.cols;
     walkFrames = [];
-    const base = stripTex.baseTexture;
+    const base = stripTex.source;
     for (let i = 0; i < cols; i++) {
       walkFrames.push(
-        new PIXI.Texture(base, new PIXI.Rectangle(i * fw, 0, fw, fh))
+        frameTexture(base, new PIXI.Rectangle(i * fw, 0, fw, fh))
       );
     }
     // Also recolor idle from idle image specifically
@@ -6527,8 +6503,8 @@ function getAppearanceTextures(appearance) {
  */
 function recolorTextureFromImage(source, appearance, opts = {}) {
   let img = source;
-  if (source && source.baseTexture) {
-    img = source.baseTexture.resource?.source || source;
+  if (source && source.source) {
+    img = source.source.resource || source;
   }
   const w =
     opts.forceSize?.w ||
@@ -6550,7 +6526,7 @@ function recolorTextureFromImage(source, appearance, opts = {}) {
     ctx.drawImage(img, 0, 0, w, h);
   } catch {
     // CORS or bad source — return original if Texture
-    if (source?.baseTexture) return source;
+    if (source?.source) return source;
     return PIXI.Texture.from(canvas);
   }
   const imageData = ctx.getImageData(0, 0, w, h);
@@ -7090,9 +7066,9 @@ function applyGlitchState(st) {
   const idles = Boolean(player.pack?.idleLoader);
   const { anim, loop, then } = animForState(st, { idles });
   player.glitchState = st;
-  if (app?.view) {
-    app.view.dataset.playerAnim = st;
-    app.view.dataset.playerAnimName = anim;
+  if (app?.canvas) {
+    app.canvas.dataset.playerAnim = st;
+    app.canvas.dataset.playerAnimName = anim;
   }
   player.animState = st === 'climb' || st === 'climbPause' ? 'climb' : st.startsWith('walk') ? 'walk' : STANDING_STATES.has(st) ? 'idle' : 'air';
   player.textures = player.anims[anim];
@@ -7174,7 +7150,7 @@ function dropIdleSheet(pack, name) {
     fillPackAnims(p);
   }
   sheet.release?.();
-  if (app?.view && player?.pack === pack) app.view.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
+  if (app?.canvas && player?.pack === pack) app.canvas.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
 }
 
 /** AvatarController: a key or click restarts the AFK timer and returns from AFK. */
@@ -7187,7 +7163,7 @@ function noteAvatarInput() {
   const asleep = now - afkState.since > 1500 && player?.pack?.sheets?.idleSleepy;
   afkState.wakeUntil = asleep ? now + (ANIMS.idleSleepyEnd.length / ANIM_FPS) * 1000 : 0;
   idleClock.reset();
-  if (app?.view) app.view.dataset.playerAfk = '0';
+  if (app?.canvas) app.canvas.dataset.playerAfk = '0';
   pushActivity("You've returned from AFK");
   toast("You've returned from AFK", 2000);
 }
@@ -7196,14 +7172,14 @@ function noteAvatarInput() {
 function tickAvatarAfk() {
   if (!player || !state.started) return;
   const now = Date.now();
-  if (app?.view && app.view.dataset.playerAfk == null) app.view.dataset.playerAfk = afkState.afk ? '1' : '0';
+  if (app?.canvas && app.canvas.dataset.playerAfk == null) app.canvas.dataset.playerAfk = afkState.afk ? '1' : '0';
   if (!afkState.afk && !AFK_QA_OFF && now - afkState.lastInputAt > IDLE_TIMING.afkMs) {
     const moving = Math.abs(player.vx) > 0.35 || !player.onGround || climb.active || player.climbing;
     if (!moving && !isScreenFxBlocking() && !engine.transientInstance()) {
       afkState.afk = true;
       afkState.since = now;
       afkState.wakeUntil = 0;
-      if (app?.view) app.view.dataset.playerAfk = '1';
+      if (app?.canvas) app.canvas.dataset.playerAfk = '1';
       pushActivity("You've gone AFK");
       toast("You've gone AFK", 2500);
     }
@@ -7327,7 +7303,7 @@ function recordStreetVisit(tsid, { announce = true } = {}) {
     apply: (counter, amount) => applyAchievementProgress(achieveState, counter, amount, pc),
   });
   if (announce) announceAchievementUpdates(updates);
-  if (app?.view) app.view.dataset.locationsVisited = String(groupLabelCount(achieveState, 'locations_visited'));
+  if (app?.canvas) app.canvas.dataset.locationsVisited = String(groupLabelCount(achieveState, 'locations_visited'));
   return updates;
 }
 
@@ -7575,7 +7551,7 @@ const engine = {
   preloadSounds: (keys) => (audio.board ? audio.board.preload(keys) : Promise.resolve([])),
   save: () => savePlayerState(),
   setData(key, value) {
-    if (app?.view) app.view.dataset[key] = String(value);
+    if (app?.canvas) app.canvas.dataset[key] = String(value);
   },
   param(name) {
     return new URLSearchParams(location.search).get(name);
@@ -7704,7 +7680,7 @@ const engine = {
     const c = GLITCH_CROWD[i];
     const sheet = textures[`glitchCrowd${i}`];
     if (!sheet?.frames?.length) return null;
-    for (const tex of sheet.frames) tex.defaultAnchor.set(c.midX / c.fw, c.feetY / c.fh);
+    for (const tex of sheet.frames) tex.defaultAnchor = { x: c.midX / c.fw, y: c.feetY / c.fh };
     return { id: c.id, frames: sheet.frames.slice(0, 12), idle: sheet.frames[14], scale: 1, facesRight: true, animationSpeed: ANIM_FPS / 60 };
   },
   crowdScaleX,
@@ -8117,13 +8093,8 @@ function spawnTrees(spots) {
       tex = textureForTrant(classId, trantState.maturity);
     }
     if (!tex) return;
-    // Prefer high-quality linear filtering without mip-chain blur on big sheets
-    if (tex.baseTexture) {
-      tex.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
-      if (tex.baseTexture.mipmap !== undefined) {
-        tex.baseTexture.mipmap = PIXI.MIPMAP_MODES?.OFF ?? tex.baseTexture.mipmap;
-      }
-    }
+    // Linear filtering without a mip chain (Pixi 8 sources have none by default).
+    if (tex.source) tex.source.scaleMode = 'linear';
     const spr = new PIXI.Sprite(tex);
     spr.anchor.set(0.5, 1);
     spr.roundPixels = true;
@@ -8171,11 +8142,11 @@ function refreshWoodTreeVisual(target) {
     target.sprite.scale.set((target.sprite._woodDirection || 1) * scale, scale);
   }
   target.subtitle = woodTreeStatusLabel(state);
-  if (app?.view) {
-    app.view.dataset.woodMaturity = String(state.maturity);
-    app.view.dataset.woodHarvested = String(state.harvestedToday);
-    app.view.dataset.woodPlanks = String(inv.plank || 0);
-    app.view.dataset.hatchetRemaining = String(getToolCondition(toolState, 'hatchet').remaining);
+  if (app?.canvas) {
+    app.canvas.dataset.woodMaturity = String(state.maturity);
+    app.canvas.dataset.woodHarvested = String(state.harvestedToday);
+    app.canvas.dataset.woodPlanks = String(inv.plank || 0);
+    app.canvas.dataset.hatchetRemaining = String(getToolCondition(toolState, 'hatchet').remaining);
   }
 }
 
@@ -8263,9 +8234,7 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
   const def = planMusicblockDrop(musicblockState, inv, currentStreetTsid);
   if (!def || !point) return [];
   const collection = listMusicblockCollection(inv);
-  const spr = PIXI.Sprite.from(
-    ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.png`
-  );
+  const spr = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[def.classTsid]?.icon || `assets/sprites/icons/${def.classTsid}.png`));
   spr.anchor.set(0.5, 1);
   spr.baseScale = 1.65;
   spr.scale.set(spr.baseScale);
@@ -8309,12 +8278,12 @@ function spawnDroppedItemStack(stack) {
     label: stack.classTsid.replace(/_/g, ' '),
     icon: `assets/sprites/icons/${stack.classTsid}.png`,
   };
-  const spr = PIXI.Sprite.from(item.icon || `assets/sprites/icons/${stack.classTsid}.png`);
-  spr.name = 'world-item-stack';
+  const spr = new PIXI.Sprite(textureFromUrl(item.icon || `assets/sprites/icons/${stack.classTsid}.png`));
+  spr.label = 'world-item-stack';
   spr.anchor.set(0.5, 1);
   sizeDroppedItemSprite(spr);
-  if (!spr.texture?.baseTexture?.valid) {
-    spr.texture?.baseTexture?.once?.('loaded', () => sizeDroppedItemSprite(spr));
+  if (!isLoaded(spr.texture?.source)) {
+    onLoaded(spr.texture?.source, () => sizeDroppedItemSprite(spr));
   }
   spr.x = stack.x;
   spr.baseY = stack.y;
@@ -8328,13 +8297,13 @@ function spawnDroppedItemStack(stack) {
     const badge = new PIXI.Graphics();
     badge.circle(16, -33, 10).fill({ color: 0x3b352d, alpha: 0.9 }).stroke({ width: 1, color: 0xfff7e6, alpha: 0.9 });
     badge.eventMode = 'none';
-    const count = new PIXI.Text(String(stack.count), {
+    const count = new PIXI.Text({ text: String(stack.count), style: {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 12,
       fontWeight: '800',
       fill: 0xffffff,
       align: 'center',
-    });
+    } });
     count.anchor.set(0.5);
     count.position.set(16, -33);
     count.eventMode = 'none';
@@ -8370,8 +8339,8 @@ function refreshDroppedWorldItems() {
   }
   droppedItemSprites = [];
   const streetStacks = listDroppedStacks(droppedItemState, currentStreetTsid);
-  app.view.dataset.droppedStacks = String(streetStacks.length);
-  app.view.dataset.droppedStootDolls = String(
+  app.canvas.dataset.droppedStacks = String(streetStacks.length);
+  app.canvas.dataset.droppedStootDolls = String(
     streetStacks.filter((stack) => stack.classTsid === STOOT_DOLL_ID).length
   );
   for (const stack of streetStacks) {
@@ -8885,20 +8854,20 @@ function gameplayInputBlocked() {
 }
 
 function publishJumpState(result = null) {
-  if (!app?.view) return;
-  app.view.dataset.jumpChain = String(jumpState.chainCount || 0);
-  app.view.dataset.tripleJumps = String(jumpState.tripleJumps || 0);
+  if (!app?.canvas) return;
+  app.canvas.dataset.jumpChain = String(jumpState.chainCount || 0);
+  app.canvas.dataset.tripleJumps = String(jumpState.tripleJumps || 0);
   if (player) {
-    app.view.dataset.playerX = player.x.toFixed(2);
-    app.view.dataset.playerY = player.y.toFixed(2);
+    app.canvas.dataset.playerX = player.x.toFixed(2);
+    app.canvas.dataset.playerY = player.y.toFixed(2);
     if (Number.isFinite(camTarget)) {
-      app.view.dataset.playerScreenX = (player.x - camTarget).toFixed(2);
+      app.canvas.dataset.playerScreenX = (player.x - camTarget).toFixed(2);
     }
   }
-  if (Number.isFinite(camTarget)) app.view.dataset.cameraX = camTarget.toFixed(2);
-  app.view.dataset.cameraRightInset = cameraRightInset.toFixed(2);
-  if (result?.reason) app.view.dataset.lastJump = result.reason;
-  if (result?.multiplier) app.view.dataset.jumpMultiplier = result.multiplier.toFixed(3);
+  if (Number.isFinite(camTarget)) app.canvas.dataset.cameraX = camTarget.toFixed(2);
+  app.canvas.dataset.cameraRightInset = cameraRightInset.toFixed(2);
+  if (result?.reason) app.canvas.dataset.lastJump = result.reason;
+  if (result?.multiplier) app.canvas.dataset.jumpMultiplier = result.multiplier.toFixed(3);
 }
 
 function performPlayerJump(result, baseVelocity, now) {
@@ -9238,7 +9207,7 @@ function physics(dt) {
       tree.scale.set(harvestFx.baseScaleX, harvestFx.baseScaleY);
       tree.rotation = harvestFx.baseRotation;
       delete tree._trantHarvestFx;
-      if (app?.view) app.view.dataset.trantHarvestAnimation = 'complete';
+      if (app?.canvas) app.canvas.dataset.trantHarvestAnimation = 'complete';
     }
   }
 
@@ -9305,7 +9274,7 @@ function physics(dt) {
         b.scale.x = care.direction * care.baseScale;
         b.scale.y = care.baseScale;
         b.rotation = 0;
-        if (app?.view) app.view.dataset.butterflyCareAnimation = `${care.verbId}:complete`;
+        if (app?.canvas) app.canvas.dataset.butterflyCareAnimation = `${care.verbId}:complete`;
         delete b._butterflyCare;
       }
       continue;
@@ -9344,7 +9313,7 @@ function physics(dt) {
       if (t._life > t._max) {
         fxLayer.removeChild(t);
         if (!t.destroyed) t.destroy({ children: true });
-        if (app?.view) app.view.dataset.superHarvestFx = 'complete';
+        if (app?.canvas) app.canvas.dataset.superHarvestFx = 'complete';
       }
     } else if (t._musicFx) {
       t._life += dt;
@@ -9466,12 +9435,12 @@ function physics(dt) {
   if (camY === undefined || Number.isNaN(camY)) camY = targetY;
   camY += (targetY - camY) * dampingAlpha(0.12, dt);
   world.y = -Math.round(camY * 2) / 2;
-  if (app?.view) {
-    app.view.dataset.cameraY = camY.toFixed(2);
-    app.view.dataset.cameraWorldHeight = streetH.toFixed(2);
-    app.view.dataset.locationViewportHeight = String(LOCATION_VIEW_H);
-    app.view.dataset.playerScreenY = (player.y - camY).toFixed(2);
-    app.view.dataset.groundClearance =
+  if (app?.canvas) {
+    app.canvas.dataset.cameraY = camY.toFixed(2);
+    app.canvas.dataset.cameraWorldHeight = streetH.toFixed(2);
+    app.canvas.dataset.locationViewportHeight = String(LOCATION_VIEW_H);
+    app.canvas.dataset.playerScreenY = (player.y - camY).toFixed(2);
+    app.canvas.dataset.groundClearance =
       (LOCATION_VIEW_H - (player.y - camY)).toFixed(2);
   }
 
@@ -9524,18 +9493,18 @@ function announceQuestCompletions(updates = []) {
       primaryLabel: 'OK',
       onPage: completionPages.length
         ? ({ index, total, final }) => {
-            if (!app?.view) return;
-            app.view.dataset.questAwardClass =
+            if (!app?.canvas) return;
+            app.canvas.dataset.questAwardClass =
               update.classTsid || update.def.classTsid || '';
-            app.view.dataset.questAwardPage = String(index);
-            app.view.dataset.questAwardPages = String(total);
-            app.view.dataset.questAwardFinal = final ? 'true' : 'false';
-            app.view.dataset.questAwardDismissed = 'false';
+            app.canvas.dataset.questAwardPage = String(index);
+            app.canvas.dataset.questAwardPages = String(total);
+            app.canvas.dataset.questAwardFinal = final ? 'true' : 'false';
+            app.canvas.dataset.questAwardDismissed = 'false';
           }
         : undefined,
       onDismiss: completionPages.length || update.onDismiss
         ? () => {
-            if (app?.view) app.view.dataset.questAwardDismissed = 'true';
+            if (app?.canvas) app.canvas.dataset.questAwardDismissed = 'true';
             update.onDismiss?.();
           }
         : undefined,
@@ -9615,7 +9584,7 @@ function spawnPhantomQuestEncounter() {
   sprite.y = point.y + 2;
   sprite.zIndex = 44;
   sprite.alpha = encounter.kind === 'final' ? 0.94 : 0.9;
-  if (encounter.kind === 'echo') sprite.blendMode = PIXI.BLEND_MODES.SCREEN;
+  if (encounter.kind === 'echo') sprite.blendMode = 'screen';
   sprite.loop = false;
   sprite.eventMode = 'none';
   sprite.cursor = 'pointer';
@@ -9639,20 +9608,20 @@ function spawnPhantomQuestEncounter() {
     phantomTarget.state.appearing = false;
     sprite.eventMode = 'static';
     sprite.onFrameChange = null;
-    if (app?.view) app.view.dataset.ghostMaterialized = 'true';
+    if (app?.canvas) app.canvas.dataset.ghostMaterialized = 'true';
   };
   sprite.onComplete = () => {
     if (sprite.destroyed) return;
     sprite.gotoAndStop(sprite.totalFrames - 1);
     sprite.eventMode = 'static';
     if (phantomTarget?.sprite === sprite) phantomTarget.state.appearing = false;
-    if (app?.view) app.view.dataset.ghostAppearAnimation = 'complete';
+    if (app?.canvas) app.canvas.dataset.ghostAppearAnimation = 'complete';
   };
   recentInteractionTarget = phantomTarget;
   recentInteractionUntil = Date.now() + 10_000;
-  if (app?.view) {
-    app.view.dataset.ghostEncounter = encounter.kind;
-    app.view.dataset.ghostStreet = currentStreetTsid;
+  if (app?.canvas) {
+    app.canvas.dataset.ghostEncounter = encounter.kind;
+    app.canvas.dataset.ghostStreet = currentStreetTsid;
   }
   if (encounter.kind === 'echo') {
     pushActivity('You feel a chill. Something half-imagined is nearby.');
@@ -9681,12 +9650,12 @@ function completePhantomHeartHandoff(target) {
   const updates = applyQuestProgress(questState, 'got_heart', 1, pc);
   toast('A Faded Heart settles into your pack.', 3400);
   playSfx('pickup', { volume: 0.55, rate: 0.82 });
-  if (app?.view) {
-    app.view.dataset.ghostHeart = 'granted';
-    app.view.dataset.ghostFinale = 'handoff';
-    app.view.dataset.ghostHandoffFrames = String(PHANTOM_GIVE_HEART_FRAME_COUNT);
-    app.view.dataset.ghostHandoffDuration = String(PHANTOM_GIVE_HEART_DURATION_MS);
-    app.view.dataset.ghostQuest = questState.completed.includes(PHANTOM_QUEST_ID)
+  if (app?.canvas) {
+    app.canvas.dataset.ghostHeart = 'granted';
+    app.canvas.dataset.ghostFinale = 'handoff';
+    app.canvas.dataset.ghostHandoffFrames = String(PHANTOM_GIVE_HEART_FRAME_COUNT);
+    app.canvas.dataset.ghostHandoffDuration = String(PHANTOM_GIVE_HEART_DURATION_MS);
+    app.canvas.dataset.ghostQuest = questState.completed.includes(PHANTOM_QUEST_ID)
       ? 'complete'
       : 'active';
   }
@@ -9698,9 +9667,9 @@ function completePhantomHeartHandoff(target) {
     if (!sprite.destroyed) sprite.gotoAndStop(sprite.totalFrames - 1);
     setTimeout(() => {
       target.state.handoff = false;
-      if (app?.view) {
-        app.view.dataset.ghostFinale = 'complete';
-        app.view.dataset.ghostHandoffAnimation = 'complete';
+      if (app?.canvas) {
+        app.canvas.dataset.ghostFinale = 'complete';
+        app.canvas.dataset.ghostHandoffAnimation = 'complete';
       }
       announceQuestCompletions(updates);
       updateHud();
@@ -9728,9 +9697,9 @@ function handlePhantomInteraction(target, verbId) {
     pushActivity(
       `You noticed the Phantom Glitch. ${result.found}/${PHANTOM_HAUNT_COUNT} hauntings found.`
     );
-    if (app?.view) {
-      app.view.dataset.ghostFound = String(result.found);
-      app.view.dataset.ghostRemaining = String(result.remaining);
+    if (app?.canvas) {
+      app.canvas.dataset.ghostFound = String(result.found);
+      app.canvas.dataset.ghostRemaining = String(result.remaining);
     }
     fadePhantomTarget(target, () => {
       if (result.finalReady) {
@@ -9748,7 +9717,7 @@ function handlePhantomInteraction(target, verbId) {
       return;
     }
     if (isQuestDialogueOpen()) return;
-    if (app?.view) app.view.dataset.ghostFinale = 'conversation';
+    if (app?.canvas) app.canvas.dataset.ghostFinale = 'conversation';
     openScriptedQuestDialogue({
       title: 'Notice the Unnoticeable',
       kicker: 'Phantom Glitch',
@@ -9802,9 +9771,9 @@ function rememberFadedHeartInWorld() {
   if (!updates.some((update) => update.completed)) {
     showGhostVignette('You remembered the half-forgotten Glitch.');
   }
-  if (app?.view) {
-    app.view.dataset.ghostRemembered = String(result.remembered);
-    app.view.dataset.ghostMemoryStreet = currentStreetTsid;
+  if (app?.canvas) {
+    app.canvas.dataset.ghostRemembered = String(result.remembered);
+    app.canvas.dataset.ghostMemoryStreet = currentStreetTsid;
   }
   announceQuestCompletions(updates);
   updateHud();
@@ -9891,13 +9860,13 @@ function renderHogHaulHud() {
         ? 'Pig Bait'
         : 'Hands free';
   }
-  if (app?.view) {
-    app.view.dataset.hogHaulStatus = hogHaulState.status;
-    app.view.dataset.hogHaulPlayerScore = String(hogHaulState.playerScore);
-    app.view.dataset.hogHaulRivalScore = String(hogHaulState.rivalScore);
-    app.view.dataset.hogHaulHasBait = hogHaulState.hasBait ? '1' : '0';
-    app.view.dataset.hogHaulCarryingPig = hogHaulState.carryingPig ? '1' : '0';
-    app.view.dataset.hogHaulObjective = hogHaulObjective(hogHaulState);
+  if (app?.canvas) {
+    app.canvas.dataset.hogHaulStatus = hogHaulState.status;
+    app.canvas.dataset.hogHaulPlayerScore = String(hogHaulState.playerScore);
+    app.canvas.dataset.hogHaulRivalScore = String(hogHaulState.rivalScore);
+    app.canvas.dataset.hogHaulHasBait = hogHaulState.hasBait ? '1' : '0';
+    app.canvas.dataset.hogHaulCarryingPig = hogHaulState.carryingPig ? '1' : '0';
+    app.canvas.dataset.hogHaulObjective = hogHaulObjective(hogHaulState);
   }
 }
 
@@ -10287,7 +10256,7 @@ function finishHogHaulRace() {
   if (resultScreen) resultScreen.hidden = false;
   const countdown = document.getElementById('hog-haul-countdown');
   if (countdown) countdown.hidden = true;
-  if (app?.view) app.view.dataset.hogHaulOutcome = hogHaulState.status;
+  if (app?.canvas) app.canvas.dataset.hogHaulOutcome = hogHaulState.status;
   renderHogHaulHud();
   updateHud();
 }
@@ -10312,9 +10281,9 @@ async function leaveHogHaulRace() {
     spawnY: destination.y,
     quiet: true,
   });
-  if (app?.view) {
-    app.view.dataset.hogHaulStatus = 'left';
-    app.view.dataset.hogHaulOutcome = outcome;
+  if (app?.canvas) {
+    app.canvas.dataset.hogHaulStatus = 'left';
+    app.canvas.dataset.hogHaulOutcome = outcome;
   }
   if (outcome === 'lost') {
     toast('The Great Hog Haul is still in your Quest Log. Try again anytime.', 4200);
@@ -10475,7 +10444,7 @@ function fourLetterTexture(letter) {
 
 function drawPlayroomBackground() {
   const layer = new PIXI.Container();
-  layer.name = 'four-letter-playroom';
+  layer.label = 'four-letter-playroom';
   layer.worldH = 760;
   layer.platformsScreen = [{ id: 'playroom-floor', x1: 0, y1: 620, x2: 1150, y2: 620, pc_perm: 1 }];
 
@@ -10523,13 +10492,13 @@ function drawPlayroomBackground() {
   room.circle(1010, 438, 13).fill(0x79b8c7);
   layer.addChild(room);
 
-  const roomLabel = new PIXI.Text("MR. BLOCK'S PLAYROOM", {
+  const roomLabel = new PIXI.Text({ text: "MR. BLOCK'S PLAYROOM", style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 22,
     fontWeight: '900',
     fill: 0x8d7357,
     letterSpacing: 3,
-  });
+  } });
   roomLabel.anchor.set(0.5);
   roomLabel.position.set(575, 165);
   roomLabel.alpha = 0.42;
@@ -10566,12 +10535,12 @@ function renderFourLetterHud(spinningIndex = -1) {
     cell.textContent = fourLetterState.letters[i];
     cell.classList.toggle('is-spinning', i === spinningIndex);
   }
-  if (app?.view) {
-    app.view.dataset.fourLetterStatus = fourLetterState.status;
-    app.view.dataset.fourLetterRiddle = String(fourLetterState.riddleIndex + 1);
-    app.view.dataset.fourLetterWord = fourLetterWord(fourLetterState);
-    app.view.dataset.fourLetterSolved = fourLetterState.solvedWords.join(',');
-    app.view.dataset.fourLetterObjective = fourLetterObjective(fourLetterState);
+  if (app?.canvas) {
+    app.canvas.dataset.fourLetterStatus = fourLetterState.status;
+    app.canvas.dataset.fourLetterRiddle = String(fourLetterState.riddleIndex + 1);
+    app.canvas.dataset.fourLetterWord = fourLetterWord(fourLetterState);
+    app.canvas.dataset.fourLetterSolved = fourLetterState.solvedWords.join(',');
+    app.canvas.dataset.fourLetterObjective = fourLetterObjective(fourLetterState);
   }
 }
 
@@ -10604,7 +10573,7 @@ function spawnFourLetterBlocks() {
 
 function spawnFourLetterMrBlock() {
   const spr = new PIXI.Sprite(textures.mrBlock?.frames?.[0] || PIXI.Texture.WHITE);
-  spr.name = 'mr-block';
+  spr.label = 'mr-block';
   spr.anchor.set(0.5, 1);
   spr.scale.set(1.15);
   spr.x = 690;
@@ -10779,7 +10748,7 @@ async function startFourLetterQuest(opts = {}) {
       onComplete: () => {
         startFourLetterPuzzle(fourLetterState);
         renderFourLetterHud();
-        if (app?.view) app.view.dataset.fourLetterStatus = fourLetterState.status;
+        if (app?.canvas) app.canvas.dataset.fourLetterStatus = fourLetterState.status;
       },
     });
     return fourLetterState;
@@ -10815,7 +10784,7 @@ async function leaveFourLetterQuest({ abandon = false } = {}) {
     spawnY: destination.y,
     quiet: true,
   });
-  if (app?.view) app.view.dataset.fourLetterStatus = abandon ? 'abandoned' : 'completed';
+  if (app?.canvas) app.canvas.dataset.fourLetterStatus = abandon ? 'abandoned' : 'completed';
   savePlayerState();
   savePlayerLocation(destination);
   updateHud();
@@ -10918,24 +10887,24 @@ function renderLegalizeHud() {
       index < progress
     );
   });
-  if (app?.view) {
-    app.view.dataset.legalizeStage = legalizeRun.stage;
-    app.view.dataset.legalizeHandoffs = String(legalizeRun.handoffs);
-    app.view.dataset.legalizeClerk = String(legalizeRun.clerkIndex);
-    app.view.dataset.legalizeObjective = legalizeObjective(legalizeRun);
-    app.view.dataset.legalizeCardOwned = legalizeRun.cardOwned ? '1' : '0';
-    app.view.dataset.legalizeActivated = legalizeRun.activated ? '1' : '0';
-    app.view.dataset.legalizeRoute =
+  if (app?.canvas) {
+    app.canvas.dataset.legalizeStage = legalizeRun.stage;
+    app.canvas.dataset.legalizeHandoffs = String(legalizeRun.handoffs);
+    app.canvas.dataset.legalizeClerk = String(legalizeRun.clerkIndex);
+    app.canvas.dataset.legalizeObjective = legalizeObjective(legalizeRun);
+    app.canvas.dataset.legalizeCardOwned = legalizeRun.cardOwned ? '1' : '0';
+    app.canvas.dataset.legalizeActivated = legalizeRun.activated ? '1' : '0';
+    app.canvas.dataset.legalizeRoute =
       'gregarious-subway>back-alley>gregarious-subway>gregarious-grange>bureaucratic-hall';
-    app.view.dataset.legalizeBackAlleyBriefed =
+    app.canvas.dataset.legalizeBackAlleyBriefed =
       ['back_alley_briefed', 'back_alley_station', 'gregarious_arrival', 'grange_exterior',
         'hall_waiting', 'hall_called', 'hall_processing', 'card_owned', 'complete']
         .includes(legalizeRun.stage)
         ? '1'
         : '0';
-    app.view.dataset.legalizeArt = 'recovered-subway-forest-hall';
-    app.view.dataset.legalizeClerkArt = 'recovered-animated-bureaucrats';
-    app.view.dataset.legalizeQuestion = 'Beige|Other';
+    app.canvas.dataset.legalizeArt = 'recovered-subway-forest-hall';
+    app.canvas.dataset.legalizeClerkArt = 'recovered-animated-bureaucrats';
+    app.canvas.dataset.legalizeQuestion = 'Beige|Other';
   }
 }
 
@@ -10959,7 +10928,7 @@ function drawLegalizeSubwayStation(stationName, destinationName) {
   layer.addChild(wall);
 
   const train = new PIXI.Graphics();
-  train.name = 'legalize-subway-train';
+  train.label = 'legalize-subway-train';
   train.setStrokeStyle({ width: 5, color: 0x3c4546, alpha: 1 });
   train.roundRect(165, 260, 1120, 278, 74).fill(0xe4e6df).stroke();
   train.setFillStyle(0x58676a);
@@ -10973,7 +10942,7 @@ function drawLegalizeSubwayStation(stationName, destinationName) {
   train.zIndex = 1;
   layer.addChild(train);
 
-  const platform = PIXI.Sprite.from('assets/decos/groddle/subway_platform_1.png');
+  const platform = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/subway_platform_1.png'));
   platform.anchor.set(0, 1);
   platform.position.set(0, 760);
   platform.width = 1600;
@@ -10983,25 +10952,25 @@ function drawLegalizeSubwayStation(stationName, destinationName) {
   // Re-add the train after the opaque platform PNG so it remains visible.
   layer.addChild(train);
 
-  const title = new PIXI.Text(stationName.toUpperCase(), {
+  const title = new PIXI.Text({ text: stationName.toUpperCase(), style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 23,
     fontWeight: '900',
     fill: 0xd9d6c7,
     letterSpacing: 3,
-  });
+  } });
   title.anchor.set(0.5);
   title.position.set(800, 115);
   title.alpha = 0.72;
   title.zIndex = 2;
   layer.addChild(title);
 
-  const destination = new PIXI.Text(`NEXT TRAIN · ${destinationName}`, {
+  const destination = new PIXI.Text({ text: `NEXT TRAIN · ${destinationName}`, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 16,
     fontWeight: '700',
     fill: 0xf1efe2,
-  });
+  } });
   destination.anchor.set(0.5);
   destination.position.set(800, 154);
   destination.alpha = 0.76;
@@ -11027,7 +10996,7 @@ function drawLegalizeBackAlley() {
     ['tree_background_03.png', 1390, 500, 1.9],
   ];
   for (const [file, x, y, scale] of rearTrees) {
-    const tree = PIXI.Sprite.from(`assets/decos/groddle/${file}`);
+    const tree = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${file}`));
     tree.anchor.set(0.5, 1);
     tree.position.set(x, y);
     tree.scale.set(scale);
@@ -11035,13 +11004,13 @@ function drawLegalizeBackAlley() {
     layer.addChild(tree);
   }
 
-  const hole = PIXI.Sprite.from('assets/decos/groddle/forest_hole_back.png');
+  const hole = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/forest_hole_back.png'));
   hole.anchor.set(0.5, 1);
   hole.position.set(285, 620);
   hole.scale.set(1.05);
   layer.addChild(hole);
 
-  const floor = PIXI.Sprite.from('assets/decos/groddle/ground_forest_terrain_plat_01.png');
+  const floor = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/ground_forest_terrain_plat_01.png'));
   floor.anchor.set(0.5, 1);
   floor.position.set(800, 760);
   floor.width = 1660;
@@ -11054,7 +11023,7 @@ function drawLegalizeBackAlley() {
     ['tree_front_01.png', 1240, 640, 0.92],
   ];
   for (const [file, x, y, scale] of frontTrees) {
-    const tree = PIXI.Sprite.from(`assets/decos/groddle/${file}`);
+    const tree = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${file}`));
     tree.anchor.set(0.5, 1);
     tree.position.set(x, y);
     tree.scale.set(scale);
@@ -11081,14 +11050,14 @@ function drawGregariousGrangeExterior() {
     ['tree_deciduous2.png', 455, 1.12],
     ['tree_deciduous3.png', 1450, 1.08],
   ]) {
-    const tree = PIXI.Sprite.from(`assets/decos/groddle/${file}`);
+    const tree = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${file}`));
     tree.anchor.set(0.5, 1);
     tree.position.set(x, 620);
     tree.scale.set(scale);
     layer.addChild(tree);
   }
 
-  const subway = PIXI.Sprite.from('assets/decos/groddle/subway_station_entrance.png');
+  const subway = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/subway_station_entrance.png'));
   subway.anchor.set(0.5, 1);
   subway.position.set(335, 620);
   subway.scale.set(0.34);
@@ -11126,26 +11095,26 @@ function drawBureaucraticHall() {
   room.fill(0x9a5735);
   layer.addChild(room);
 
-  const waiting = new PIXI.Text('WAITING\nAREA', {
+  const waiting = new PIXI.Text({ text: 'WAITING\nAREA', style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 17,
     fontWeight: '900',
     fill: 0xeee9d9,
     align: 'center',
-  });
+  } });
   waiting.anchor.set(0.5);
   waiting.position.set(255, 460);
   const plaque = new PIXI.Graphics();
   plaque.roundRect(195, 420, 120, 76, 5).fill(0x4a4b46);
   layer.addChild(plaque, waiting);
 
-  const tv = PIXI.Sprite.from('assets/decos/groddle/bureaucratic_hall_tv_1.png');
+  const tv = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_tv_1.png'));
   tv.anchor.set(0.5);
   tv.position.set(690, 215);
   tv.scale.set(0.72);
   layer.addChild(tv);
 
-  const light = PIXI.Sprite.from('assets/decos/groddle/bureaucratic_hall_light_1.png');
+  const light = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_light_1.png'));
   light.anchor.set(0.5, 0);
   light.position.set(1110, 18);
   light.scale.set(1.35);
@@ -11203,7 +11172,7 @@ function installLegalizeScene(layer, { tsid, label, hubName, spawnX }) {
 function makeLegalizeBureaucrat(index, x, y, scale = 0.86) {
   const idle = textures[`bureaucrat${index}Idle`]?.frames;
   const talk = textures[`bureaucrat${index}Talk`]?.frames;
-  const fallback = PIXI.Texture.from(`${LEGALIZE_ASSET_ROOT}/${LEGALIZE_BUREAUCRAT_ART[index]}`);
+  const fallback = textureFromUrl(`${LEGALIZE_ASSET_ROOT}/${LEGALIZE_BUREAUCRAT_ART[index]}`);
   const spr = new PIXI.AnimatedSprite(idle?.length ? idle : [fallback]);
   spr.texturesIdle = idle?.length ? idle : [fallback];
   spr.texturesTalk = talk?.length ? talk : spr.texturesIdle;
@@ -11235,9 +11204,7 @@ function spawnLegalizeTransitGate({
   x = 1370,
   scale = 3.4,
 }) {
-  const gate = PIXI.Sprite.from(
-    `${LEGALIZE_ASSET_ROOT}/subway_gate__x1_1_png_1354832987.png`
-  );
+  const gate = new PIXI.Sprite(textureFromUrl(`${LEGALIZE_ASSET_ROOT}/subway_gate__x1_1_png_1354832987.png`));
   gate.anchor.set(0.5, 1);
   gate.position.set(x, GROUND_Y);
   gate.scale.set(scale);
@@ -11296,7 +11263,7 @@ function spawnLegalizeBackAlley() {
     state: { legalizeState: legalizeRun },
   }));
 
-  const entrance = PIXI.Sprite.from('assets/decos/groddle/subway_station_entrance.png');
+  const entrance = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/subway_station_entrance.png'));
   entrance.anchor.set(0.5, 1);
   entrance.position.set(285, GROUND_Y);
   entrance.scale.set(0.53);
@@ -11361,7 +11328,7 @@ function spawnLegalizeGregariousExterior() {
     spawnX: 390,
   });
   legalizeTargets = [];
-  const hall = PIXI.Sprite.from('assets/decos/groddle/bureaucratic_hall_exterior_1.png');
+  const hall = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_exterior_1.png'));
   hall.anchor.set(0.5, 1);
   hall.position.set(1110, GROUND_Y);
   hall.scale.set(0.27);
@@ -11396,7 +11363,7 @@ function spawnLegalizeHall() {
       state: { legalizeState: legalizeRun, clerkIndex: index },
     });
   });
-  const counter = PIXI.Sprite.from('assets/decos/groddle/bureaucratic_hall_counter_1.png');
+  const counter = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_counter_1.png'));
   counter.anchor.set(0.5, 1);
   counter.position.set(830, GROUND_Y);
   counter.width = 1020;
@@ -11778,7 +11745,7 @@ async function leaveLegalizeIt({ abandon = false } = {}) {
       spawnY: destination.y,
       quiet: true,
     });
-    if (app?.view) app.view.dataset.legalizeStatus = abandon ? 'abandoned' : 'completed';
+    if (app?.canvas) app.canvas.dataset.legalizeStatus = abandon ? 'abandoned' : 'completed';
     savePlayerState();
     savePlayerLocation(destination);
     updateHud();
@@ -11939,10 +11906,10 @@ function applyGreedySceneEvent(eventId) {
     view.visible = true;
     shown += 1;
   }
-  if (app?.view) {
-    app.view.dataset.greedySceneEvent = eventId;
-    app.view.dataset.greedySceneChanged = `${hidden}:${shown}`;
-    app.view.dataset.greedySceneMissing = String(missing);
+  if (app?.canvas) {
+    app.canvas.dataset.greedySceneEvent = eventId;
+    app.canvas.dataset.greedySceneChanged = `${hidden}:${shown}`;
+    app.canvas.dataset.greedySceneMissing = String(missing);
   }
   return { hidden, shown, missing };
 }
@@ -11951,26 +11918,20 @@ function greedyButtonSprite(actIndex, x, y) {
   const root = new PIXI.Container();
   root.name = `greedy-story-act-${actIndex + 1}`;
   root.sortableChildren = true;
-  const button = PIXI.Sprite.from(
-    'assets/sprites/quests/greedy-street-spirit/wall_button__x1_out_png_1354839763.png'
-  );
+  const button = new PIXI.Sprite(textureFromUrl('assets/sprites/quests/greedy-street-spirit/wall_button__x1_out_png_1354839763.png'));
   button.anchor.set(0.5, 1);
   button.width = 126;
   button.height = 18;
   button.zIndex = 1;
   root.addChild(button);
-  const label = new PIXI.Text(`ACT ${['I', 'II', 'III', 'IV', 'V'][actIndex]}`, {
+  const label = new PIXI.Text({ text: `ACT ${['I', 'II', 'III', 'IV', 'V'][actIndex]}`, style: {
     fontFamily: 'Fredoka, Arial, sans-serif',
     fontSize: 17,
     fontWeight: '800',
     fill: 0xfff6c8,
-    stroke: 0x422b54,
-    strokeThickness: 4,
-    dropShadow: true,
-    dropShadowColor: 0x24172e,
-    dropShadowBlur: 2,
-    dropShadowDistance: 1,
-  });
+    stroke: { color: 0x422b54, width: 4 },
+    dropShadow: { blur: 2, color: 0x24172e, distance: 1 },
+  } });
   label.anchor.set(0.5, 1);
   label.y = -20;
   label.zIndex = 2;
@@ -11985,16 +11946,16 @@ function greedyButtonSprite(actIndex, x, y) {
 
 function createGreedyExitSprite(x, y) {
   const root = new PIXI.Container();
-  root.name = 'greedy-story-exit';
+  root.label = 'greedy-story-exit';
   const sign = new PIXI.Graphics();
   sign.roundRect(-82, -43, 164, 38, 14).fill({ color: 0x5c3d72, alpha: 0.94 }).stroke({ width: 3, color: 0xfff1ae, alpha: 0.94 });
   root.addChild(sign);
-  const label = new PIXI.Text('RETURN TO UR →', {
+  const label = new PIXI.Text({ text: 'RETURN TO UR →', style: {
     fontFamily: 'Fredoka, Arial, sans-serif',
     fontSize: 15,
     fontWeight: '800',
     fill: 0xfff9dd,
-  });
+  } });
   label.anchor.set(0.5);
   label.y = -24;
   root.addChild(label);
@@ -12040,14 +12001,14 @@ function renderGreedyStreetHud() {
   if (greedyStreetExit?.sprite) {
     greedyStreetExit.sprite.alpha = greedyStreetState.status === 'ready' ? 1 : 0.38;
   }
-  if (app?.view) {
-    app.view.dataset.greedyStoryStatus = greedyStreetState.status;
-    app.view.dataset.greedyStoryRepeat = greedyStreetState.repeat ? '1' : '0';
-    app.view.dataset.greedyStoryActs = greedyStreetState.actsRead.join(',');
-    app.view.dataset.greedyStorySteps = greedyStreetState.actSteps.join(',');
-    app.view.dataset.greedyStoryRemaining = String(remaining);
-    app.view.dataset.greedyStoryObjective = greedyObjective(greedyStreetState);
-    app.view.dataset.greedyStoryProductionTsid = GREEDY_STREET_PRODUCTION_TSID;
+  if (app?.canvas) {
+    app.canvas.dataset.greedyStoryStatus = greedyStreetState.status;
+    app.canvas.dataset.greedyStoryRepeat = greedyStreetState.repeat ? '1' : '0';
+    app.canvas.dataset.greedyStoryActs = greedyStreetState.actsRead.join(',');
+    app.canvas.dataset.greedyStorySteps = greedyStreetState.actSteps.join(',');
+    app.canvas.dataset.greedyStoryRemaining = String(remaining);
+    app.canvas.dataset.greedyStoryObjective = greedyObjective(greedyStreetState);
+    app.canvas.dataset.greedyStoryProductionTsid = GREEDY_STREET_PRODUCTION_TSID;
   }
 }
 
@@ -12186,14 +12147,10 @@ function pressGreedyStoryButton(target) {
   applyGreedySceneEvent(result.eventId);
   if (target.sprite?._buttonArt) {
     const art = target.sprite._buttonArt;
-    art.texture = PIXI.Texture.from(
-      'assets/sprites/quests/greedy-street-spirit/wall_button__x1_in_png_1354839762.png'
-    );
+    art.texture = textureFromUrl('assets/sprites/quests/greedy-street-spirit/wall_button__x1_in_png_1354839762.png');
     window.setTimeout(() => {
       if (!art.destroyed) {
-        art.texture = PIXI.Texture.from(
-          'assets/sprites/quests/greedy-street-spirit/wall_button__x1_out_png_1354839763.png'
-        );
+        art.texture = textureFromUrl('assets/sprites/quests/greedy-street-spirit/wall_button__x1_out_png_1354839763.png');
       }
     }, 240);
   }
@@ -12255,9 +12212,9 @@ function finishGreedyRepeat() {
     def: result.def,
   }]);
   pushActivity("Wasn't that sweet? Now that naptime is over, here's some breakfast. +4 Waffles.");
-  if (app?.view) {
-    app.view.dataset.greedyStoryReward = 'waffles:4';
-    app.view.dataset.greedyStoryCooldown = String(
+  if (app?.canvas) {
+    app.canvas.dataset.greedyStoryReward = 'waffles:4';
+    app.canvas.dataset.greedyStoryCooldown = String(
       ensureGreedyStory(questState).lastRepeatCompletedAt
     );
   }
@@ -12301,7 +12258,7 @@ async function returnFromGreedyStreetSpirit({ abandon = false, expired = false }
       quiet: true,
     });
     savePlayerLocation(destination);
-    if (app?.view) app.view.dataset.greedyStoryStatus = status;
+    if (app?.canvas) app.canvas.dataset.greedyStoryStatus = status;
     if (expired) toast('Storyland faded before the bedtime story was finished.', 4200);
     else if (abandon) {
       toast("You've missed some of the story. You can begin again later.", 3600);
@@ -12350,10 +12307,10 @@ function completeGreedyStreetSpiritWithPiggy(target) {
   pushActivity(`${completion} +1 Emotional Bear · +100 favor with Pot.`);
   toast('Quest complete · Emotional Bear acquired!', 4600);
   playSfx('quest', { volume: 0.74, rate: 1.05 });
-  if (app?.view) {
-    app.view.dataset.greedyStoryStatus = 'complete';
-    app.view.dataset.greedyStoryReward = 'emotional_bear:1';
-    app.view.dataset.greedyStoryPiggy = 'talked';
+  if (app?.canvas) {
+    app.canvas.dataset.greedyStoryStatus = 'complete';
+    app.canvas.dataset.greedyStoryReward = 'emotional_bear:1';
+    app.canvas.dataset.greedyStoryPiggy = 'talked';
   }
   savePlayerState();
   updateHud();
@@ -12476,7 +12433,7 @@ function spawnWinterSnow() {
   clearWinterAtmosphere();
   if (!entityLayer) return null;
   const snow = new PIXI.Container();
-  snow.name = 'winter-snow';
+  snow.label = 'winter-snow';
   snow.zIndex = 110;
   snow.eventMode = 'none';
 
@@ -12570,14 +12527,14 @@ function spawnWinterPortal(stage) {
   if (stage === 'haven') {
     art = 'recovered-exit-ladder';
     const ladder = new PIXI.Sprite(
-      PIXI.Texture.from('assets/decos/groddle/ladder_interior_4steps.png')
+      textureFromUrl('assets/decos/groddle/ladder_interior_4steps.png')
     );
     ladder.anchor.set(0.5, 1);
     ladder.scale.set(0.58);
     root.addChild(ladder);
 
     const sign = new PIXI.Sprite(
-      PIXI.Texture.from('assets/decos/groddle/sign_exit_starter_01a.png')
+      textureFromUrl('assets/decos/groddle/sign_exit_starter_01a.png')
     );
     sign.anchor.set(0.5);
     sign.position.set(78, -112);
@@ -12596,7 +12553,7 @@ function spawnWinterPortal(stage) {
 
     if (!returning) {
       const ice = new PIXI.Sprite(
-        PIXI.Texture.from('assets/decos/groddle/snow_skirt_01b_al1.png')
+        textureFromUrl('assets/decos/groddle/snow_skirt_01b_al1.png')
       );
       ice.anchor.set(0.5, 0);
       ice.position.set(0, -174);
@@ -12624,9 +12581,9 @@ function spawnWinterPortal(stage) {
     sprite: root,
     state: { stage, active: true },
   });
-  if (app?.view) {
-    app.view.dataset.winterWalkPortalArt = art;
-    app.view.dataset.winterWalkPortalCount = '1';
+  if (app?.canvas) {
+    app.canvas.dataset.winterWalkPortalArt = art;
+    app.canvas.dataset.winterWalkPortalCount = '1';
   }
   return winterWalkPortal;
 }
@@ -12659,14 +12616,14 @@ function renderWinterWalkHud() {
   if (objective) objective.textContent = winterWalkObjective(winterWalkState);
   if (motes) motes.textContent = `${progress.collected} / ${progress.total}`;
   if (img) img.textContent = winterWalkState.imgEarned.toLocaleString();
-  if (app?.view) {
-    app.view.dataset.winterWalkStatus = winterWalkState.status;
-    app.view.dataset.winterWalkStage = winterWalkState.stage;
-    app.view.dataset.winterWalkRemaining = String(remaining);
-    app.view.dataset.winterWalkMotes = `${progress.collected}/${progress.total}`;
-    app.view.dataset.winterWalkImg = String(winterWalkState.imgEarned);
-    app.view.dataset.winterWalkObjective = winterWalkObjective(winterWalkState);
-    app.view.dataset.winterWalkRoute = 'surface>haven>return';
+  if (app?.canvas) {
+    app.canvas.dataset.winterWalkStatus = winterWalkState.status;
+    app.canvas.dataset.winterWalkStage = winterWalkState.stage;
+    app.canvas.dataset.winterWalkRemaining = String(remaining);
+    app.canvas.dataset.winterWalkMotes = `${progress.collected}/${progress.total}`;
+    app.canvas.dataset.winterWalkImg = String(winterWalkState.imgEarned);
+    app.canvas.dataset.winterWalkObjective = winterWalkObjective(winterWalkState);
+    app.canvas.dataset.winterWalkRoute = 'surface>haven>return';
   }
 }
 
@@ -12849,7 +12806,7 @@ async function returnFromWinterWalk({ abandon = false, expired = false } = {}) {
     });
     savePlayerLocation(destination);
     savePlayerState();
-    if (app?.view) app.view.dataset.winterWalkStatus = status;
+    if (app?.canvas) app.canvas.dataset.winterWalkStatus = status;
     if (expired) toast('The winter path faded. You can try the walk again.', 4000);
     else if (abandon) toast('You leave the winter path for another time.', 3200);
     updateHud();
@@ -12986,7 +12943,7 @@ function summersDayLocationLabel(tsid = currentStreetTsid) {
 }
 
 function summerDeco(url, x, y, scale, opts = {}) {
-  const sprite = new PIXI.Sprite(PIXI.Texture.from(url));
+  const sprite = new PIXI.Sprite(textureFromUrl(url));
   sprite.anchor.set(opts.anchorX ?? 0.5, opts.anchorY ?? 1);
   sprite.position.set(x, y);
   sprite.scale.set((opts.flip ? -1 : 1) * scale, scale);
@@ -12998,7 +12955,7 @@ function summerDeco(url, x, y, scale, opts = {}) {
 
 function drawSummersDayMainBackground() {
   const root = new PIXI.Container();
-  root.name = 'summers-day-main-background';
+  root.label = 'summers-day-main-background';
   root.sortableChildren = true;
   root.worldW = 4200;
   root.worldH = 940;
@@ -13131,7 +13088,7 @@ function drawSummersDayMainBackground() {
 
 function drawSummersDayBonusBackground() {
   const root = new PIXI.Container();
-  root.name = 'summers-day-annex-background';
+  root.label = 'summers-day-annex-background';
   root.sortableChildren = true;
   root.worldW = 1280;
   root.worldH = 1520;
@@ -13193,24 +13150,21 @@ function makeSummersDayCheckpoint(id, x, y, index) {
   let sprite;
   let guideText = null;
   if (id.startsWith('bird')) {
-    sprite = new PIXI.Sprite(PIXI.Texture.from('assets/decos/groddle/owl_1.png'));
+    sprite = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/owl_1.png'));
     sprite.anchor.set(0.5, 1);
     sprite.scale.set(0.36);
     const memoryWhite = new PIXI.ColorMatrixFilter();
     memoryWhite.greyscale(1, false);
     memoryWhite.brightness(5, true);
     sprite.filters = [memoryWhite];
-    guideText = new PIXI.Text(SUMMERS_DAY_GUIDE_LINES[id] || '', {
+    guideText = new PIXI.Text({ text: SUMMERS_DAY_GUIDE_LINES[id] || '', style: {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 18,
       fontWeight: '700',
       fill: 0xffffff,
       align: 'center',
-      dropShadow: true,
-      dropShadowColor: 0x6ca8bb,
-      dropShadowBlur: 3,
-      dropShadowDistance: 1,
-    });
+      dropShadow: { blur: 3, color: 0x6ca8bb, distance: 1 },
+    } });
     guideText.anchor.set(0.5, 1);
     guideText.position.set(
       x + (index % 2 === 0 ? 138 : -138),
@@ -13219,24 +13173,23 @@ function makeSummersDayCheckpoint(id, x, y, index) {
     guideText.alpha = 0;
     guideText.zIndex = 39;
   } else if (id.startsWith('orb') || id.startsWith('dot')) {
-    sprite = new PIXI.Sprite(PIXI.Texture.from('assets/decos/groddle/pulseDot.png'));
+    sprite = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/pulseDot.png'));
     sprite.anchor.set(0.5);
     sprite.scale.set(id.startsWith('orb') ? 0.76 : 0.62);
   } else if (id.startsWith('stone')) {
-    sprite = new PIXI.Sprite(PIXI.Texture.from('assets/decos/groddle/boulder_1.png'));
+    sprite = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/boulder_1.png'));
     sprite.anchor.set(0.5, 1);
     sprite.scale.set(0.115);
   } else if (id === 'water') {
-    sprite = new PIXI.Sprite(PIXI.Texture.from('assets/decos/groddle/water_ripple_double_1.png'));
+    sprite = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/water_ripple_double_1.png'));
     sprite.anchor.set(0.5);
     sprite.scale.set(0.72);
   } else {
     const marker = new PIXI.Graphics();
     marker.roundRect(-24, -72, 48, 72, 20).fill({ color: 0xffffff, alpha: 0.86 });
-    marker.roundRect(-24, -72, 48, 72, 20);
+    marker.roundRect(-24, -72, 48, 72, 20).stroke({ width: 3, color: 0x77b9cd, alpha: 0.88 });
     sprite = marker;
   }
-  marker.stroke({ width: 3, color: 0x77b9cd, alpha: 0.88 });
   sprite.position.set(x, y);
   sprite.alpha = index === 0 ? 1 : 0.14;
   sprite.zIndex = 38;
@@ -13284,7 +13237,7 @@ function spawnSummersDayBonusRoom() {
   ];
   summersDayBonusQuoins = spots.map(([x, y], index) => {
     const sprite = new PIXI.Sprite(
-      PIXI.Texture.from('assets/decos/groddle/pulseDot.png')
+      textureFromUrl('assets/decos/groddle/pulseDot.png')
     );
     sprite.anchor.set(0.5);
     sprite.position.set(x, y);
@@ -13301,7 +13254,7 @@ function spawnSummersDayBonusRoom() {
   exit.position.set(620, 185);
   exit.zIndex = 40;
   const ladder = new PIXI.Sprite(
-    PIXI.Texture.from('assets/decos/groddle/firebog_ladder.png')
+    textureFromUrl('assets/decos/groddle/firebog_ladder.png')
   );
   ladder.anchor.set(0.5, 1);
   ladder.scale.set(0.62);
@@ -13346,28 +13299,28 @@ function renderSummersDayHud() {
         ? `${progress.bonusCollected} / ${progress.bonusTotal} pale iMG dots`
         : 'Follow what the Giants remember';
   }
-  if (app?.view) {
-    app.view.dataset.summerDayStatus = summersDayRun.status;
-    app.view.dataset.summerDayStage = summersDayRun.stage;
-    app.view.dataset.summerDayCheckpoint =
+  if (app?.canvas) {
+    app.canvas.dataset.summerDayStatus = summersDayRun.status;
+    app.canvas.dataset.summerDayStage = summersDayRun.stage;
+    app.canvas.dataset.summerDayCheckpoint =
       SUMMERS_DAY_CHECKPOINTS[summersDayRun.checkpoints.length] || 'complete';
-    app.view.dataset.summerDayProgress = `${progress.current}/${progress.total}`;
-    app.view.dataset.summerDayRemaining = String(remaining);
-    app.view.dataset.summerDayBonusQuoins = `${progress.bonusCollected}/${progress.bonusTotal}`;
-    app.view.dataset.summerDayBonusImg = String(summersDayRun.bonusImgEarned || 0);
-    app.view.dataset.summerDayObjective = summersDayObjective(summersDayRun);
-    app.view.dataset.summerDayMainTsid = SUMMERS_DAY_MAIN_PRODUCTION_TSID;
-    app.view.dataset.summerDayBonusTsid = SUMMERS_DAY_BONUS_PRODUCTION_TSID;
-    app.view.dataset.summerDayMainArt =
+    app.canvas.dataset.summerDayProgress = `${progress.current}/${progress.total}`;
+    app.canvas.dataset.summerDayRemaining = String(remaining);
+    app.canvas.dataset.summerDayBonusQuoins = `${progress.bonusCollected}/${progress.bonusTotal}`;
+    app.canvas.dataset.summerDayBonusImg = String(summersDayRun.bonusImgEarned || 0);
+    app.canvas.dataset.summerDayObjective = summersDayObjective(summersDayRun);
+    app.canvas.dataset.summerDayMainTsid = SUMMERS_DAY_MAIN_PRODUCTION_TSID;
+    app.canvas.dataset.summerDayBonusTsid = SUMMERS_DAY_BONUS_PRODUCTION_TSID;
+    app.canvas.dataset.summerDayMainArt =
       bgLayer?.summersDayMainArt || 'not-in-main';
-    app.view.dataset.summerDayGuideArt = 'source-white-owl';
-    app.view.dataset.summerDayAnnexArt =
+    app.canvas.dataset.summerDayGuideArt = 'source-white-owl';
+    app.canvas.dataset.summerDayAnnexArt =
       bgLayer?.summersDayAnnexArt || 'not-in-annex';
-    app.view.dataset.summerDayAnnexDots = String(SUMMERS_DAY_BONUS_DOT_COUNT);
-    app.view.dataset.summerDayAnnexDotReward = String(SUMMERS_DAY_BONUS_DOT_IMG);
-    app.view.dataset.summerDayAnnexExit =
+    app.canvas.dataset.summerDayAnnexDots = String(SUMMERS_DAY_BONUS_DOT_COUNT);
+    app.canvas.dataset.summerDayAnnexDotReward = String(SUMMERS_DAY_BONUS_DOT_IMG);
+    app.canvas.dataset.summerDayAnnexExit =
       summersDayExit?.art || 'not-in-annex';
-    app.view.dataset.summerDayGuide =
+    app.canvas.dataset.summerDayGuide =
       SUMMERS_DAY_GUIDE_LINES[
         SUMMERS_DAY_CHECKPOINTS[summersDayRun.checkpoints.length]
       ] || '';
@@ -13571,10 +13524,10 @@ async function returnFromSummersDay({ expired = false, abandon = false, completi
     savePlayerLocation(destination);
     updateDametimeChrome();
     savePlayerState();
-    if (app?.view) {
-      app.view.dataset.summerDayStatus = status;
-      app.view.dataset.summerDayCompleted = status === 'complete' ? '1' : '0';
-      app.view.dataset.summerDayPendingQurazies = String(
+    if (app?.canvas) {
+      app.canvas.dataset.summerDayStatus = status;
+      app.canvas.dataset.summerDayCompleted = status === 'complete' ? '1' : '0';
+      app.canvas.dataset.summerDayPendingQurazies = String(
         ensureSummersDayStory(questState).pendingQurazies
       );
     }
@@ -13675,7 +13628,7 @@ function summersDayBuoyancyPhysics(dt) {
   if (player.y <= 537 && player.vy < 0) player.vy *= -0.18;
   if (player.y >= 828 && player.vy > 0) player.vy *= -0.18;
   player.rotation += (clamp(player.vy * 0.018, -0.1, 0.1) - player.rotation) * dampingAlpha(0.14, dt);
-  if (app?.view) app.view.dataset.summerDayBuoyancy = '1';
+  if (app?.canvas) app.canvas.dataset.summerDayBuoyancy = '1';
 }
 
 function updateSummersDay(dt) {
@@ -13786,7 +13739,7 @@ function updateSummersDay(dt) {
       }
     }
   }
-  if (app?.view && !summersDayInBuoyancy()) app.view.dataset.summerDayBuoyancy = '0';
+  if (app?.canvas && !summersDayInBuoyancy()) app.canvas.dataset.summerDayBuoyancy = '0';
   renderSummersDayHud();
 }
 
@@ -13796,16 +13749,11 @@ function rookWoodsIsInstanced() {
 
 function rookEggTexture(state = ROOK_EGG_INITIAL_STATE) {
   if (!rookEggTextures.length) {
-    const texture = PIXI.Texture.from(
-      'assets/sprites/quests/rook-woods/rook-egg-states.png'
-    );
+    const texture = textureFromUrl('assets/sprites/quests/rook-woods/rook-egg-states.png');
     rookEggTextures = Array.from(
       { length: 5 },
       (_, index) =>
-        new PIXI.Texture(
-          texture.baseTexture,
-          new PIXI.Rectangle(index * 171, 0, 171, 168)
-        )
+        frameTexture(texture.source, new PIXI.Rectangle(index * 171, 0, 171, 168))
     );
   }
   const index = clamp(ROOK_EGG_INITIAL_STATE - Number(state || 5), 0, 4);
@@ -13848,7 +13796,7 @@ function drawRookWoodsBackground() {
     const layer = layerById.get(spec.layer);
     if (!layer) continue;
     const sprite = new PIXI.Sprite(
-      PIXI.Texture.from(`assets/decos/groddle/${spec.asset}`)
+      textureFromUrl(`assets/decos/groddle/${spec.asset}`)
     );
     sprite.anchor.set(spec.anchorX, spec.anchorY);
     sprite.position.set(spec.x, spec.y);
@@ -14068,13 +14016,13 @@ function renderRookWoodsHud() {
       ? `${tool.profile.label} ready · ${Math.round(tool.condition.condition.remaining)} condition`
       : 'No working smashing tool';
   }
-  if (app?.view) {
-    app.view.dataset.rookWoodsStatus = rookWoodsState.status;
-    app.view.dataset.rookWoodsRemaining = String(remaining);
-    app.view.dataset.rookWoodsHits = String(rookWoodsState.hits);
-    app.view.dataset.rookEggState = String(rookWoodsState.eggState);
-    app.view.dataset.rookWoodsObjective = rookWoodsObjective(rookWoodsState);
-    app.view.dataset.rookTool = tool.ok ? tool.classTsid : 'none';
+  if (app?.canvas) {
+    app.canvas.dataset.rookWoodsStatus = rookWoodsState.status;
+    app.canvas.dataset.rookWoodsRemaining = String(remaining);
+    app.canvas.dataset.rookWoodsHits = String(rookWoodsState.hits);
+    app.canvas.dataset.rookEggState = String(rookWoodsState.eggState);
+    app.canvas.dataset.rookWoodsObjective = rookWoodsObjective(rookWoodsState);
+    app.canvas.dataset.rookTool = tool.ok ? tool.classTsid : 'none';
   }
 }
 
@@ -14121,12 +14069,12 @@ function setupRookWoodsInstance() {
     name.dataset.tsid = ROOK_WOODS_STREET_ID;
   }
   setAmbientForStreet({ hubName: 'Rook Woods' }, { force: true });
-  if (app?.view) {
-    app.view.dataset.rookWoodsSource = 'rook_egg_smash.js + crusher.js + supplied video';
-    app.view.dataset.rookForestArt = ROOK_FOREST_ART_ID;
-    app.view.dataset.rookForestLayers = String(ROOK_FOREST_DEPTH_LAYERS.length);
-    app.view.dataset.rookForestDecos = String(ROOK_FOREST_DECOS.length);
-    app.view.dataset.rookForestLimbs = String(ROOK_FOREST_LIMBS.length);
+  if (app?.canvas) {
+    app.canvas.dataset.rookWoodsSource = 'rook_egg_smash.js + crusher.js + supplied video';
+    app.canvas.dataset.rookForestArt = ROOK_FOREST_ART_ID;
+    app.canvas.dataset.rookForestLayers = String(ROOK_FOREST_DEPTH_LAYERS.length);
+    app.canvas.dataset.rookForestDecos = String(ROOK_FOREST_DECOS.length);
+    app.canvas.dataset.rookForestLimbs = String(ROOK_FOREST_LIMBS.length);
   }
   savePlayerLocation(rookWoodsSourceLocation);
   renderRookWoodsHud();
@@ -14237,7 +14185,7 @@ async function returnFromRookWoods({ abandon = false, expired = false } = {}) {
     });
     savePlayerLocation(destination);
     savePlayerState();
-    if (app?.view) app.view.dataset.rookWoodsStatus = status;
+    if (app?.canvas) app.canvas.dataset.rookWoodsStatus = status;
     if (expired) toast("The Rooks' Woods closed. You can try again later.", 4000);
     else if (abandon) toast('You leave the Rook Egg for another attempt.', 3200);
     updateHud();
@@ -14324,7 +14272,7 @@ function beginRookCrusherHit(entry, now) {
   pushActivity(
     `A Crusher knocked you back to the start.${moodLoss ? ` -${moodLoss} mood.` : ''}`
   );
-  if (app?.view) app.view.dataset.rookLastHit = entry.spec.id;
+  if (app?.canvas) app.canvas.dataset.rookLastHit = entry.spec.id;
   renderRookWoodsHud();
   updateHud();
   return true;
@@ -14477,13 +14425,13 @@ function drawRookMuseumBackground() {
 }
 
 function makeRookMuseumPlacard(exhibit) {
-  const label = new PIXI.Text(exhibit.shortTitle, {
+  const label = new PIXI.Text({ text: exhibit.shortTitle, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 14,
     fontWeight: '700',
     fill: 0xf2dab0,
     align: 'center',
-  });
+  } });
   label.anchor.set(0.5, 1);
   label.position.set(exhibit.x, 453);
   label.zIndex = 42;
@@ -14492,7 +14440,7 @@ function makeRookMuseumPlacard(exhibit) {
 
 function makeRookMuseumSpeaker(exhibit) {
   const sprite = new PIXI.Sprite(
-    PIXI.Texture.from(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_speaker__x1_stop_png_1354835940.png`)
+    textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_speaker__x1_stop_png_1354835940.png`)
   );
   sprite.anchor.set(0.5, 1);
   sprite.scale.set(0.68);
@@ -14518,9 +14466,7 @@ function spawnRookMuseumExhibits() {
     let sprite;
     if (exhibit.kind === 'painting') {
       sprite = new PIXI.Sprite(
-        PIXI.Texture.from(
-          `${ROOK_MUSEUM_ASSET_ROOT}/paintings/painting-${exhibit.painting}c.jpg`
-        )
+        textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/paintings/painting-${exhibit.painting}c.jpg`)
       );
       sprite.anchor.set(0.5, 1);
       sprite.width = 330;
@@ -14528,18 +14474,14 @@ function spawnRookMuseumExhibits() {
       sprite.position.set(exhibit.x, 408);
     } else if (exhibit.kind === 'orb') {
       sprite = new PIXI.Sprite(
-        PIXI.Texture.from(
-          `${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_focusing_orb__x1_1_png_1354835872.png`
-        )
+        textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_focusing_orb__x1_1_png_1354835872.png`)
       );
       sprite.anchor.set(0.5, 1);
       sprite.scale.set(0.86);
       sprite.position.set(exhibit.x, 425);
     } else {
       sprite = new PIXI.Sprite(
-        PIXI.Texture.from(
-          `${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_shrine_holofilm__x1_stop_png_1354835839.png`
-        )
+        textureFromUrl(`${ROOK_MUSEUM_ASSET_ROOT}/rook_hall_shrine_holofilm__x1_stop_png_1354835839.png`)
       );
       sprite.anchor.set(0.5, 1);
       sprite.scale.set(0.66);
@@ -14613,11 +14555,11 @@ function renderRookMuseumHud() {
   for (const dot of hud.querySelectorAll('[data-rook-museum-dot]')) {
     dot.classList.toggle('visited', visited.includes(dot.dataset.rookMuseumDot));
   }
-  if (app?.view) {
-    app.view.dataset.rookMuseumStatus = rookMuseumState.status;
-    app.view.dataset.rookMuseumVisited = String(visited.length);
-    app.view.dataset.rookMuseumObjective = rookMuseumObjective(rookMuseumState);
-    app.view.dataset.rookMuseumProductionTsid = ROOK_MUSEUM_PRODUCTION_TSID;
+  if (app?.canvas) {
+    app.canvas.dataset.rookMuseumStatus = rookMuseumState.status;
+    app.canvas.dataset.rookMuseumVisited = String(visited.length);
+    app.canvas.dataset.rookMuseumObjective = rookMuseumObjective(rookMuseumState);
+    app.canvas.dataset.rookMuseumProductionTsid = ROOK_MUSEUM_PRODUCTION_TSID;
   }
 }
 
@@ -14669,9 +14611,9 @@ function renderRookMuseumExhibitPage() {
     art.alt = 'Primitive shrine holofilm';
     if (glow) glow.hidden = true;
   }
-  if (app?.view) {
-    app.view.dataset.rookMuseumExhibit = exhibit.id;
-    app.view.dataset.rookMuseumPage = String(rookMuseumPageIndex + 1);
+  if (app?.canvas) {
+    app.canvas.dataset.rookMuseumExhibit = exhibit.id;
+    app.canvas.dataset.rookMuseumPage = String(rookMuseumPageIndex + 1);
   }
 }
 
@@ -14704,9 +14646,9 @@ function closeRookMuseumExhibit() {
   rookMuseumActiveExhibit = null;
   rookMuseumPageIndex = 0;
   if (rookMuseumState) rookMuseumState.activeExhibitId = null;
-  if (app?.view) {
-    delete app.view.dataset.rookMuseumExhibit;
-    delete app.view.dataset.rookMuseumPage;
+  if (app?.canvas) {
+    delete app.canvas.dataset.rookMuseumExhibit;
+    delete app.canvas.dataset.rookMuseumPage;
   }
 }
 
@@ -14764,9 +14706,9 @@ function finishRookMuseumQuest() {
   playSfx('quest', { volume: 0.7 });
   pushActivity('You completed It’s Educational II. +400 iMG.');
   toast('Museum training complete · +400 iMG', 4200);
-  if (app?.view) {
-    app.view.dataset.rookMuseumReward = '400';
-    app.view.dataset.rookMuseumQuestCompleted = completed?.ok ? '1' : '0';
+  if (app?.canvas) {
+    app.canvas.dataset.rookMuseumReward = '400';
+    app.canvas.dataset.rookMuseumQuestCompleted = completed?.ok ? '1' : '0';
   }
   if (completed?.ok) {
     announceQuestCompletions([{
@@ -14961,7 +14903,7 @@ function deEmbiggenifyIsInstanced() {
 }
 
 function addEestiDeco(root, file, x, y, width, height, zIndex = 0, anchorX = 0.5) {
-  const sprite = new PIXI.Sprite(PIXI.Texture.from(`${EESTI_DECO_ROOT}/${file}`));
+  const sprite = new PIXI.Sprite(textureFromUrl(`${EESTI_DECO_ROOT}/${file}`));
   sprite.anchor.set(anchorX, 1);
   sprite.position.set(x, y);
   sprite.width = width;
@@ -15058,9 +15000,7 @@ function drawEestiCatalogueRoom() {
 function spawnMrHairball() {
   const idleFrames = textures.dustBunnyIdle?.frames;
   const talkFrames = textures.dustBunnyTalk?.frames;
-  const fallback = PIXI.Texture.from(
-    `${EESTI_ASSET_ROOT}/npc_dustbunny__x1_idle_stand_png_1354831147.png`
-  );
+  const fallback = textureFromUrl(`${EESTI_ASSET_ROOT}/npc_dustbunny__x1_idle_stand_png_1354831147.png`);
   const sprite = new PIXI.AnimatedSprite(idleFrames?.length ? idleFrames : [fallback]);
   sprite.texturesIdle = idleFrames?.length ? idleFrames : [fallback];
   sprite.texturesTalk = talkFrames?.length ? talkFrames : sprite.texturesIdle;
@@ -15094,9 +15034,7 @@ function setMrHairballAnimation(mode = 'idle') {
 
 function spawnSmallWorthless() {
   const sprite = new PIXI.Sprite(
-    PIXI.Texture.from(
-      `${EESTI_ASSET_ROOT}/small_worthless__x1_1_x1_2_png_1354829517.png`
-    )
+    textureFromUrl(`${EESTI_ASSET_ROOT}/small_worthless__x1_1_x1_2_png_1354829517.png`)
   );
   sprite.anchor.set(0.5, 1);
   sprite.scale.set(1.25);
@@ -15124,7 +15062,7 @@ function spawnSmallWorthless() {
     sprite,
     state: { deEmbiggenifyState, glint },
   });
-  const cake = new PIXI.Sprite(PIXI.Texture.from(`${EESTI_DECO_ROOT}/k04_cake_01.png`));
+  const cake = new PIXI.Sprite(textureFromUrl(`${EESTI_DECO_ROOT}/k04_cake_01.png`));
   cake.anchor.set(0.5, 1);
   cake.position.set(2610, 292);
   cake.width = 112;
@@ -15181,17 +15119,17 @@ function renderDeEmbiggenifyHud(now = Date.now()) {
       smallWorthlessTarget.state.glint.alpha = 0.52 + Math.sin(now * 0.006) * 0.3;
     }
   }
-  if (app?.view) {
-    app.view.dataset.deEmbiggenifyStatus = deEmbiggenifyState.status;
-    app.view.dataset.deEmbiggenifyObjective = deEmbiggenifyObjective(deEmbiggenifyState);
-    app.view.dataset.deEmbiggenifyRemaining = String(remaining);
-    app.view.dataset.deEmbiggenifyProductionTsid = EESTI_PRODUCTION_TSID;
-    app.view.dataset.deEmbiggenifyPlayerScale = String(player?.baseScale || 0);
-    app.view.dataset.deEmbiggenifyArt = 'recovered-eesti-page-17';
-    app.view.dataset.deEmbiggenifyLandmarks = EESTI_ROOM_ROUTE.join('>');
-    app.view.dataset.deEmbiggenifyTableArt = 'k04_table_03';
-    app.view.dataset.deEmbiggenifyMusic = EESTI_MUSIC_FILE.split('/').pop();
-    app.view.dataset.deEmbiggenifySourceSpawn =
+  if (app?.canvas) {
+    app.canvas.dataset.deEmbiggenifyStatus = deEmbiggenifyState.status;
+    app.canvas.dataset.deEmbiggenifyObjective = deEmbiggenifyObjective(deEmbiggenifyState);
+    app.canvas.dataset.deEmbiggenifyRemaining = String(remaining);
+    app.canvas.dataset.deEmbiggenifyProductionTsid = EESTI_PRODUCTION_TSID;
+    app.canvas.dataset.deEmbiggenifyPlayerScale = String(player?.baseScale || 0);
+    app.canvas.dataset.deEmbiggenifyArt = 'recovered-eesti-page-17';
+    app.canvas.dataset.deEmbiggenifyLandmarks = EESTI_ROOM_ROUTE.join('>');
+    app.canvas.dataset.deEmbiggenifyTableArt = 'k04_table_03';
+    app.canvas.dataset.deEmbiggenifyMusic = EESTI_MUSIC_FILE.split('/').pop();
+    app.canvas.dataset.deEmbiggenifySourceSpawn =
       `${EESTI_SOURCE_SPAWN.x},${EESTI_SOURCE_SPAWN.y}`;
   }
 }
@@ -15264,9 +15202,9 @@ function finishDeEmbiggenifyQuest() {
   playSfx('quest', { volume: 0.72 });
   pushActivity('You completed De-Embiggenify II. +200 iMG, +200 currants, +50 mood, +1 Emotional Bear.');
   toast('Emotional Bear received · +200 iMG · +200 currants', 4600);
-  if (app?.view) {
-    app.view.dataset.deEmbiggenifyReward = '200-img,200-currants,50-mood,1-emotional-bear';
-    app.view.dataset.deEmbiggenifyQuestCompleted = completed?.ok ? '1' : '0';
+  if (app?.canvas) {
+    app.canvas.dataset.deEmbiggenifyReward = '200-img,200-currants,50-mood,1-emotional-bear';
+    app.canvas.dataset.deEmbiggenifyQuestCompleted = completed?.ok ? '1' : '0';
   }
   if (completed?.ok) {
     announceQuestCompletions([{
@@ -15388,8 +15326,8 @@ async function startDeEmbiggenify(opts = {}) {
       y: player?.y ?? GROUND_Y,
     };
     deEmbiggenifyPlayerBaseScale = player?.baseScale ?? null;
-    if (app?.view) {
-      app.view.dataset.deEmbiggenifySourceScale = String(
+    if (app?.canvas) {
+      app.canvas.dataset.deEmbiggenifySourceScale = String(
         deEmbiggenifyPlayerBaseScale || 0
       );
     }
@@ -15431,8 +15369,8 @@ async function returnFromDeEmbiggenify({ abandon = false, expired = false } = {}
   if (deEmbiggenifyPlayerBaseScale && player) {
     player.baseScale = deEmbiggenifyPlayerBaseScale;
     applyPlayerFacing();
-    if (app?.view) {
-      app.view.dataset.deEmbiggenifyRestoredScale = String(player.baseScale);
+    if (app?.canvas) {
+      app.canvas.dataset.deEmbiggenifyRestoredScale = String(player.baseScale);
     }
   }
   deEmbiggenifyState = null;
@@ -15452,7 +15390,7 @@ async function returnFromDeEmbiggenify({ abandon = false, expired = false } = {}
     } else {
       await enterStreet(STREET_INDEX.default, { quiet: true });
     }
-    if (app?.view) app.view.dataset.deEmbiggenifyStatus = status;
+    if (app?.canvas) app.canvas.dataset.deEmbiggenifyStatus = status;
     savePlayerState();
     updateHud();
     return true;
@@ -15618,7 +15556,7 @@ function vectorStar(radius = 16, color = 0xffe96a, alpha = 1) {
 
 function addParadiseCloud(root, x, y, width, height, alpha = 0.9, tint = 0xffffff) {
   const kind = width > 520 ? 'cloud_fluffy_2' : 'cloud_fluffy_1';
-  const cloud = new PIXI.Sprite(PIXI.Texture.from(`assets/decos/groddle/${kind}.png`));
+  const cloud = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${kind}.png`));
   cloud.anchor.set(0.5, 1);
   cloud.position.set(x, y);
   cloud.width = width;
@@ -15723,7 +15661,7 @@ function buildRadialBackground(root, course) {
   addParadiseCloud(root, 1000, 1160, 440, 120, 0.72, 0xdbe7e8);
 
   const moonAsset = `assets/decos/groddle/${RADIAL_HEIGHTS_MOON.asset}?v=radial-322`;
-  const moonTexture = PIXI.Assets.get(moonAsset) || PIXI.Texture.from(moonAsset);
+  const moonTexture = textureFromUrl(moonAsset);
   const moon = new PIXI.Sprite(moonTexture);
   moon.anchor.set(0.5);
   moon.position.set(RADIAL_HEIGHTS_MOON.x, RADIAL_HEIGHTS_MOON.y);
@@ -15738,7 +15676,7 @@ function buildRadialBackground(root, course) {
 function buildStarlitBackground(root, course, points) {
   const starFieldAsset = 'assets/decos/groddle/stars_2.png';
   const starFields = STARLIT_NIGHT_STAR_FIELDS.map((spec, index) => {
-    const field = new PIXI.Sprite(PIXI.Assets.get(starFieldAsset) || PIXI.Texture.from(starFieldAsset));
+    const field = new PIXI.Sprite(textureFromUrl(starFieldAsset));
     field.anchor.set(0.5);
     field.position.set(spec.x, spec.y);
     field.width = spec.width;
@@ -15761,7 +15699,7 @@ function buildStarlitBackground(root, course, points) {
   points.forEach((point, index) => {
     const starAsset = `assets/decos/groddle/star_asset_0${point.major ? '1' : '2'}.png`;
     const ghost = new PIXI.Sprite(
-      PIXI.Assets.get(starAsset) || PIXI.Texture.from(starAsset)
+      textureFromUrl(starAsset)
     );
     ghost.anchor.set(0.5);
     ghost.position.set(point.x, point.y);
@@ -15777,7 +15715,7 @@ function buildStarlitBackground(root, course, points) {
 
   const makeMoonState = (spec, version, zIndex) => {
     const src = `assets/decos/groddle/${spec.asset}?v=${version}`;
-    const sprite = new PIXI.Sprite(PIXI.Assets.get(src) || PIXI.Texture.from(src));
+    const sprite = new PIXI.Sprite(textureFromUrl(src));
     sprite.anchor.set(0.5);
     sprite.position.set(spec.x, spec.y);
     sprite.width = spec.width;
@@ -15795,7 +15733,7 @@ function buildStarlitBackground(root, course, points) {
 }
 
 function addSlipRecoveredDeco(root, spec) {
-  const texture = PIXI.Texture.from(`assets/decos/groddle/${spec.sprite}.png`);
+  const texture = textureFromUrl(`assets/decos/groddle/${spec.sprite}.png`);
   const sprite = new PIXI.Sprite(texture);
   sprite.anchor.set(0.5, 1);
   sprite.position.set(
@@ -15811,8 +15749,8 @@ function addSlipRecoveredDeco(root, spec) {
     sprite.width = spec.width;
     sprite.height = spec.width * (sourceHeight / sourceWidth);
   };
-  if (texture.baseTexture.valid) applySize();
-  else texture.baseTexture.once('loaded', applySize);
+  if (isLoaded(texture.source)) applySize();
+  else onLoaded(texture.source, applySize);
   root.addChild(sprite);
   return sprite;
 }
@@ -15923,21 +15861,13 @@ async function loadParadiseSourcePoints(course) {
 async function loadParadiseVisualAssets(course) {
   if (course?.art) {
     await Promise.all(
-      paradiseCoursePreloadUrls(course).map((src) => PIXI.Assets.load(src).catch(() => null))
+      paradiseCoursePreloadUrls(course).map((src) => loadTexture(src).catch(() => null))
     );
     return;
   }
   if (course?.id === 'radial_heights') {
     const src = `assets/decos/groddle/${RADIAL_HEIGHTS_MOON.asset}?v=radial-322`;
-    await PIXI.Assets.load({
-      src,
-      data: {
-        resourceOptions: {
-          width: RADIAL_HEIGHTS_MOON.width,
-          height: RADIAL_HEIGHTS_MOON.height,
-        },
-      },
-    }).catch(() => null);
+    await loadTexture(src, { width: RADIAL_HEIGHTS_MOON.width, height: RADIAL_HEIGHTS_MOON.height }).catch(() => null);
     return;
   }
   if (course?.id === 'starlit_night') {
@@ -15947,19 +15877,11 @@ async function loadParadiseVisualAssets(course) {
     ];
     await Promise.all([
       ...moonAssets.map(([spec, version]) =>
-        PIXI.Assets.load({
-          src: `assets/decos/groddle/${spec.asset}?v=${version}`,
-          data: {
-            resourceOptions: {
-              width: spec.width,
-              height: spec.height,
-            },
-          },
-        }).catch(() => null)
+        loadTexture(`assets/decos/groddle/${spec.asset}?v=${version}`, { width: spec.width, height: spec.height }).catch(() => null)
       ),
-      PIXI.Assets.load('assets/decos/groddle/stars_2.png').catch(() => null),
-      PIXI.Assets.load('assets/decos/groddle/star_asset_01.png').catch(() => null),
-      PIXI.Assets.load('assets/decos/groddle/star_asset_02.png').catch(() => null),
+      loadTexture('assets/decos/groddle/stars_2.png').catch(() => null),
+      loadTexture('assets/decos/groddle/star_asset_01.png').catch(() => null),
+      loadTexture('assets/decos/groddle/star_asset_02.png').catch(() => null),
     ]);
     return;
   }
@@ -15970,7 +15892,7 @@ async function loadParadiseVisualAssets(course) {
   ]);
   await Promise.all(
     [...sprites].map((sprite) =>
-      PIXI.Assets.load(`assets/decos/groddle/${sprite}.png`).catch(() => null)
+      loadTexture(`assets/decos/groddle/${sprite}.png`).catch(() => null)
     )
   );
 }
@@ -16157,27 +16079,24 @@ function spawnParadiseExit(course) {
   glow.roundRect(-42, -120, 84, 112, 39).fill().stroke({ width: 5, color: 0xf9ffff, alpha: 0.94 });
   glow.roundRect(-33, -110, 66, 101, 31).fill().stroke({ width: 2, color: 0x7dadd1, alpha: 0.88 });
   root.addChild(glow);
-  const arrow = new PIXI.Text('↓', {
+  const arrow = new PIXI.Text({ text: '↓', style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 27,
     fontWeight: '900',
     fill: 0xffffff,
-    stroke: 0x34506f,
-    strokeThickness: 3,
-  });
+    stroke: { color: 0x34506f, width: 3 },
+  } });
   arrow.anchor.set(0.5);
   arrow.position.set(0, -68);
   root.addChild(arrow);
   const label = new PIXI.Text(
-    course.id === 'radial_heights' ? "EXIT'S DOWN HERE!" : course.exitLabel ?? 'WAY HOME',
-    {
+    { text: course.id === 'radial_heights' ? "EXIT'S DOWN HERE!" : course.exitLabel ?? 'WAY HOME', style: {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 12,
       fontWeight: '900',
       fill: 0xffffff,
-      stroke: 0x314764,
-      strokeThickness: 4,
-    }
+      stroke: { color: 0x314764, width: 4 },
+    } }
   );
   label.anchor.set(0.5);
   label.position.set(0, -140);
@@ -16190,19 +16109,14 @@ function spawnParadiseExit(course) {
 
 function announceParadiseFlight(course) {
   const promptText = new PIXI.Text(
-    course.prompt || (course.movement === 'slide' ? 'BUILD SPEED · SPACEBAR JUMPS!' : 'PRESS SPACEBAR TO FLY!'),
-    {
+    { text: course.prompt || (course.movement === 'slide' ? 'BUILD SPEED · SPACEBAR JUMPS!' : 'PRESS SPACEBAR TO FLY!'), style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 26,
     fontWeight: '900',
     fill: 0xffffff,
-    stroke: 0x283a66,
-    strokeThickness: 5,
-    dropShadow: true,
-    dropShadowColor: 0x11152f,
-    dropShadowBlur: 6,
-    dropShadowDistance: 2,
-    }
+    stroke: { color: 0x283a66, width: 5 },
+    dropShadow: { blur: 6, color: 0x11152f, distance: 2 },
+    } }
   );
   promptText.anchor.set(0.5);
   promptText.position.set(course.spawn.x + 260, course.spawn.y - 145);
@@ -16249,54 +16163,54 @@ function renderParadiseFlightHud() {
         }`;
   }
   if (tickets) tickets.textContent = `${paradiseState.ticketsToday}/${PARADISE_DAILY_LIMIT} tickets today`;
-  if (app?.view) {
-    app.view.dataset.paradiseCourse = course.id;
-    app.view.dataset.paradiseStatus = paradiseRun.status;
-    app.view.dataset.paradiseRemaining = String(remaining);
-    app.view.dataset.paradiseCollected = String(progress.collected);
-    app.view.dataset.paradiseTotal = String(progress.total);
-    app.view.dataset.paradiseRings = String(progress.rings);
-    app.view.dataset.paradiseRingTotal = String(progress.ringTotal);
-    app.view.dataset.paradiseObjective = paradiseObjective(paradiseRun);
-    app.view.dataset.paradiseExit = paradiseExit?.active ? 'open' : 'closed';
+  if (app?.canvas) {
+    app.canvas.dataset.paradiseCourse = course.id;
+    app.canvas.dataset.paradiseStatus = paradiseRun.status;
+    app.canvas.dataset.paradiseRemaining = String(remaining);
+    app.canvas.dataset.paradiseCollected = String(progress.collected);
+    app.canvas.dataset.paradiseTotal = String(progress.total);
+    app.canvas.dataset.paradiseRings = String(progress.rings);
+    app.canvas.dataset.paradiseRingTotal = String(progress.ringTotal);
+    app.canvas.dataset.paradiseObjective = paradiseObjective(paradiseRun);
+    app.canvas.dataset.paradiseExit = paradiseExit?.active ? 'open' : 'closed';
     if (course.id === 'cloud_rings') {
-      app.view.dataset.paradiseRingArt = 'clean-cloud-puffs';
-      app.view.dataset.paradiseRingPuffs = String(
+      app.canvas.dataset.paradiseRingArt = 'clean-cloud-puffs';
+      app.canvas.dataset.paradiseRingPuffs = String(
         paradiseRings.reduce(
           (total, entry) => total + (entry.sprite?._cloudPuffs?.length || 0),
           0
         )
       );
     } else if (course.id === 'radial_heights') {
-      app.view.dataset.paradiseRadialArt = 'source-moon-and-stars';
-      app.view.dataset.paradiseRadialMoon = [
+      app.canvas.dataset.paradiseRadialArt = 'source-moon-and-stars';
+      app.canvas.dataset.paradiseRadialMoon = [
         RADIAL_HEIGHTS_MOON.x,
         RADIAL_HEIGHTS_MOON.y,
         RADIAL_HEIGHTS_MOON.width,
       ].join(',');
-      app.view.dataset.paradiseSourceStars = String(paradisePickups.length);
+      app.canvas.dataset.paradiseSourceStars = String(paradisePickups.length);
     } else if (course.id === 'starlit_night') {
-      app.view.dataset.paradiseStarlitArt = 'source-starfield-and-moon-states';
-      app.view.dataset.paradiseStarlitFields = String(
+      app.canvas.dataset.paradiseStarlitArt = 'source-starfield-and-moon-states';
+      app.canvas.dataset.paradiseStarlitFields = String(
         bgLayer?.paradiseStarlitStarFields?.length || 0
       );
-      app.view.dataset.paradiseStarlitMoon = [
+      app.canvas.dataset.paradiseStarlitMoon = [
         STARLIT_NIGHT_MOON.plain.x,
         STARLIT_NIGHT_MOON.plain.y,
         STARLIT_NIGHT_MOON.plain.width,
       ].join(',');
-      app.view.dataset.paradiseStarlitLit = String(
+      app.canvas.dataset.paradiseStarlitLit = String(
         paradiseBackdropStars.filter((star) => star?._litStartedAt > 0).length
       );
-      app.view.dataset.paradiseStarlitSourceStars = String(paradiseBackdropStars.length);
+      app.canvas.dataset.paradiseStarlitSourceStars = String(paradiseBackdropStars.length);
     } else if (course.art) {
-      Object.assign(app.view.dataset, paradiseCourseRuntime.dataset(paradiseCourseHost(), course));
+      Object.assign(app.canvas.dataset, paradiseCourseRuntime.dataset(paradiseCourseHost(), course));
     } else if (course.id === 'slip_n_slide') {
-      app.view.dataset.paradiseSlipArt = 'recovered-k03-landmarks';
-      app.view.dataset.paradiseSlipLandmarks = String(
+      app.canvas.dataset.paradiseSlipArt = 'recovered-k03-landmarks';
+      app.canvas.dataset.paradiseSlipLandmarks = String(
         bgLayer?.paradiseSlipLandmarks?.length || 0
       );
-      app.view.dataset.paradiseSlipTrees = String(
+      app.canvas.dataset.paradiseSlipTrees = String(
         bgLayer?.paradiseSlipTrees?.length || 0
       );
     }
@@ -16385,8 +16299,8 @@ function setupParadiseCourse(course, sourcePoints) {
     player.onGround = course.movement === 'slide';
     player.rotation = 0;
     setPlayerAnim('idle');
-    if (previewRing && app?.view) app.view.dataset.paradisePreview = 'cloud-ring';
-    if (previewMoon && app?.view) app.view.dataset.paradisePreview = 'radial-moon';
+    if (previewRing && app?.canvas) app.canvas.dataset.paradisePreview = 'cloud-ring';
+    if (previewMoon && app?.canvas) app.canvas.dataset.paradisePreview = 'radial-moon';
     if (previewStarlitMoon && bgLayer) {
       if (starlitPreview === 'smile') {
         const now = Date.now();
@@ -16395,16 +16309,16 @@ function setupParadiseCourse(course, sourcePoints) {
           if (star) star._litStartedAt = now - STARLIT_NIGHT_STAR_FADE_MS;
         }
       }
-      if (app?.view) {
-        app.view.dataset.paradisePreview =
+      if (app?.canvas) {
+        app.canvas.dataset.paradisePreview =
           starlitPreview === 'smile' ? 'starlit-moon-smile' : 'starlit-moon-plain';
       }
     }
-    if (previewFinish && app?.view) app.view.dataset.paradisePreview = 'slip-finish';
+    if (previewFinish && app?.canvas) app.canvas.dataset.paradisePreview = 'slip-finish';
     if (course.art) {
       paradiseCourseRuntime.enter(paradiseCourseHost(), course);
       const preview = new URLSearchParams(location.search).get('paradisepreview');
-      if (preview && app?.view) app.view.dataset.paradisePreview = `${course.id}-${preview}`;
+      if (preview && app?.canvas) app.canvas.dataset.paradisePreview = `${course.id}-${preview}`;
     }
   }
   camTarget = cameraTargetForPlayer(player.x);
@@ -16630,7 +16544,7 @@ async function returnFromParadise({ expired = false, abandon = false } = {}) {
     });
     savePlayerLocation(destination);
     savePlayerState();
-    if (app?.view) app.view.dataset.paradiseStatus = finalStatus;
+    if (app?.canvas) app.canvas.dataset.paradiseStatus = finalStatus;
     if (expired) toast('Your four minutes in Paradise are up. Another ticket can take you back.', 4500);
     else if (abandon) toast('You leave Paradise and return to Ur.', 3200);
     updateHud();
@@ -16831,10 +16745,10 @@ function paradiseSlidePhysics(dt) {
     spray._max = 34;
     fxLayer.addChild(spray);
   }
-  if (app?.view) {
-    app.view.dataset.paradiseSlope = slope.toFixed(3);
-    app.view.dataset.paradiseGrounded = player.onGround ? '1' : '0';
-    app.view.dataset.paradiseSpeed = Math.abs(player.vx).toFixed(2);
+  if (app?.canvas) {
+    app.canvas.dataset.paradiseSlope = slope.toFixed(3);
+    app.canvas.dataset.paradiseGrounded = player.onGround ? '1' : '0';
+    app.canvas.dataset.paradiseSpeed = Math.abs(player.vx).toFixed(2);
   }
 }
 
@@ -16877,14 +16791,14 @@ function updateParadiseFlight(dt) {
     if (plain && !plain.destroyed) {
       plain.alpha = starlitMoonPlainAlpha(bgLayer.paradiseMoonFadeStartedAt, now);
     }
-    if (app?.view) {
-      app.view.dataset.paradiseStarlitLit = String(
+    if (app?.canvas) {
+      app.canvas.dataset.paradiseStarlitLit = String(
         paradiseBackdropStars.filter((star) => star?._litStartedAt > 0).length
       );
-      app.view.dataset.paradiseStarlitMoonAlpha = plain
+      app.canvas.dataset.paradiseStarlitMoonAlpha = plain
         ? plain.alpha.toFixed(3)
         : '0.000';
-      app.view.dataset.paradiseStarlitMoonState = !bgLayer?.paradiseMoonFadeStartedAt
+      app.canvas.dataset.paradiseStarlitMoonState = !bgLayer?.paradiseMoonFadeStartedAt
         ? 'plain'
         : plain?.alpha > 0
           ? 'revealing'
@@ -17066,7 +16980,7 @@ function spawnIlmenskieJones({ released = false } = {}) {
   }
   const frames = textures.jonesWalk?.frames || [];
   const spr = new PIXI.AnimatedSprite(frames.length ? frames.slice(0, 8) : [PIXI.Texture.WHITE]);
-  spr.name = 'ilmenskie-jones';
+  spr.label = 'ilmenskie-jones';
   spr.anchor.set(0.5, 1);
   spr.animationSpeed = 0.08;
   spr.loop = true;
@@ -17085,9 +16999,9 @@ function spawnIlmenskieJones({ released = false } = {}) {
     sprite: spr,
     state: { rescueState: rescue, released },
   });
-  if (app?.view) {
-    app.view.dataset.ilmenskiePhase = rescue.phase;
-    app.view.dataset.ilmenskieObjective = ilmenskieObjective(rescue, currentStreetTsid);
+  if (app?.canvas) {
+    app.canvas.dataset.ilmenskiePhase = rescue.phase;
+    app.canvas.dataset.ilmenskieObjective = ilmenskieObjective(rescue, currentStreetTsid);
   }
   return ilmenskieTarget;
 }
@@ -17133,9 +17047,9 @@ function handleIlmenskieTarget(target, verbId) {
   playSfx('pickup', { volume: 0.52, rate: 0.82 });
   toast('You picked up Ilmenskie Jones. Open Map to teleport out.', 4200);
   pushActivity('You picked up Ilmenskie Jones.');
-  if (app?.view) {
-    app.view.dataset.ilmenskiePhase = rescue.phase;
-    app.view.dataset.ilmenskieObjective = ilmenskieObjective(rescue, currentStreetTsid);
+  if (app?.canvas) {
+    app.canvas.dataset.ilmenskiePhase = rescue.phase;
+    app.canvas.dataset.ilmenskieObjective = ilmenskieObjective(rescue, currentStreetTsid);
   }
   savePlayerState();
   updateHud();
@@ -17161,9 +17075,9 @@ async function teleportToAxisDenyde() {
   });
   savePlayerLocation(rescue.sourceLocation);
   savePlayerState();
-  if (app?.view) {
-    app.view.dataset.ilmenskiePhase = rescue.phase;
-    app.view.dataset.ilmenskieObjective = ilmenskieObjective(rescue, currentStreetTsid);
+  if (app?.canvas) {
+    app.canvas.dataset.ilmenskiePhase = rescue.phase;
+    app.canvas.dataset.ilmenskieObjective = ilmenskieObjective(rescue, currentStreetTsid);
   }
   toast(rescue.pickedUpJones ? 'The cavern is still sealed. Teleport back out.' : 'Axis Denyde. Find Ilmenskie Jones.', 3600);
   return true;
@@ -17182,9 +17096,9 @@ async function teleportFromAxisDenyde() {
   });
   savePlayerLocation(destination);
   savePlayerState();
-  if (app?.view) {
-    app.view.dataset.ilmenskiePhase = rescue.phase;
-    app.view.dataset.ilmenskieObjective = ilmenskieObjective(rescue, currentStreetTsid);
+  if (app?.canvas) {
+    app.canvas.dataset.ilmenskiePhase = rescue.phase;
+    app.canvas.dataset.ilmenskieObjective = ilmenskieObjective(rescue, currentStreetTsid);
   }
   toast('You escaped the Sealed Cavern. Release Jones from your pack.', 4200);
   pushActivity('You teleported out of Axis Denyde with Ilmenskie Jones.');
@@ -17219,9 +17133,9 @@ function releasePackedIlmenskieJones() {
       if (target?.sprite && !target.sprite.destroyed) target.sprite.destroy();
       interactables = interactables.filter((entry) => entry !== target);
       ilmenskieTarget = null;
-      if (app?.view) {
-        app.view.dataset.ilmenskiePhase = 'released';
-        app.view.dataset.ilmenskieObjective = 'Ilmenskie Jones rescued';
+      if (app?.canvas) {
+        app.canvas.dataset.ilmenskiePhase = 'released';
+        app.canvas.dataset.ilmenskieObjective = 'Ilmenskie Jones rescued';
       }
       savePlayerState();
       updateHud();
@@ -17256,16 +17170,16 @@ function updateHomeChrome() {
     homeMailboxTarget.subtitle = unread
       ? `${unread} unread message${unread === 1 ? '' : 's'}`
       : 'Your very own mail';
-    homeMailboxTarget.sprite.texture = PIXI.Texture.from(unread > 0
+    homeMailboxTarget.sprite.texture = textureFromUrl(unread > 0
       ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png'
       : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png');
   }
-  if (app?.view) {
-    app.view.dataset.homeOwned = homeState.owned ? '1' : '0';
-    app.view.dataset.homeStyle = homeState.style || '';
-    app.view.dataset.homeRoom = homeState.inHome ? homeState.room : '';
-    app.view.dataset.mailUnread = String(unread);
-    app.view.dataset.mailTotal = String(mailboxState.messages.length);
+  if (app?.canvas) {
+    app.canvas.dataset.homeOwned = homeState.owned ? '1' : '0';
+    app.canvas.dataset.homeStyle = homeState.style || '';
+    app.canvas.dataset.homeRoom = homeState.inHome ? homeState.room : '';
+    app.canvas.dataset.mailUnread = String(unread);
+    app.canvas.dataset.mailTotal = String(mailboxState.messages.length);
   }
 }
 
@@ -17692,7 +17606,7 @@ function drawHomeBackground(styleId, room) {
       firebog: { path: 'assets/decos/groddle/k03_gingerbreadhouse_01.png', width: 1180 },
       uralia: { path: 'assets/decos/groddle/cl2_housePurple_back_01.png', width: 320 },
     }[style.id];
-    const house = PIXI.Sprite.from(houseAsset.path);
+    const house = new PIXI.Sprite(textureFromUrl(houseAsset.path));
     house.anchor.set(0.5, 1);
     house.x = 1020;
     house.y = 620;
@@ -17710,7 +17624,7 @@ function makeHomeDoorSprite(room) {
     firebog: { path: 'assets/decos/groddle/door_asset_house_large_05.png', height: 668 },
     uralia: { path: 'assets/decos/groddle/door_asset_house_medium_03.png', height: 586 },
   }[homeState.style] || { path: 'assets/decos/groddle/door_asset_house_large_01.png', height: 668 };
-  const sprite = PIXI.Sprite.from(asset.path);
+  const sprite = new PIXI.Sprite(textureFromUrl(asset.path));
   sprite.anchor.set(0.5, 1);
   sprite.x = room === 'interior' ? 1220 : 1000;
   sprite.y = GROUND_Y;
@@ -17729,12 +17643,12 @@ function makeHomeReturnSprite() {
   pole.roundRect(-7, -142, 14, 142, 6).fill(0x70455b);
   pole.roundRect(-64, -145, 128, 46, 14).fill(0xf2d76d);
   marker.addChild(pole);
-  const label = new PIXI.Text('Return to Ur', {
+  const label = new PIXI.Text({ text: 'Return to Ur', style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 15,
     fontWeight: '700',
     fill: 0x563f59,
-  });
+  } });
   label.anchor.set(0.5);
   label.y = -122;
   marker.addChild(label);
@@ -17748,9 +17662,9 @@ function spawnHomeSceneTargets(room) {
   homeReturnTarget = null;
   if (room === 'street') {
     const unread = unreadMailCount(mailboxState, Date.now());
-    const mailbox = PIXI.Sprite.from(unread > 0
+    const mailbox = new PIXI.Sprite(textureFromUrl(unread > 0
       ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png'
-      : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png');
+      : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png'));
     mailbox.anchor.set(0.5, 1);
     mailbox.x = 430;
     mailbox.y = GROUND_Y;
@@ -17847,7 +17761,7 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
     name.textContent = `${currentStreet.label} · ${HOME_STYLES[homeState.style]?.label || 'Meadow'} Home`;
     name.dataset.tsid = targetTsid;
   }
-  if (app?.view) app.view.dataset.homeScene = room;
+  if (app?.canvas) app.canvas.dataset.homeScene = room;
   updateHomeChrome();
   updateHud();
   return currentStreet;
@@ -17994,12 +17908,12 @@ function clearWorldEntities() {
   butterflies = [];
   trees = [];
   localCompanions = [];
-  if (app?.view) {
-    app.view.dataset.localCompanionCount = '0';
-    app.view.dataset.localCompanionNames = '';
-    app.view.dataset.localCompanionPositions = '';
-    app.view.dataset.localCompanionSpeaker = '';
-    app.view.dataset.localCompanionSpeech = '';
+  if (app?.canvas) {
+    app.canvas.dataset.localCompanionCount = '0';
+    app.canvas.dataset.localCompanionNames = '';
+    app.canvas.dataset.localCompanionPositions = '';
+    app.canvas.dataset.localCompanionSpeaker = '';
+    app.canvas.dataset.localCompanionSpeech = '';
   }
   // Unregister plot interactables with gardens
   for (const g of gardens) {
@@ -18295,12 +18209,12 @@ async function enterStreet(tsid, opts = {}) {
   if (firstVisit) emitGameEvent(`street_first_visit:${data.tsid}`);
   recordStreetVisit(data.tsid);
   emitGameEvent(`street_entered:${String(data.label || '').toLowerCase().replace(/[^a-z0-9]+/g, '_')}`);
-  if (app?.view) {
+  if (app?.canvas) {
     const pop = currentStreetPopulation;
-    app.view.dataset.ecologySource = pop.source;
-    app.view.dataset.ecologySourceTsid = pop.sourceTsid || '';
-    app.view.dataset.ecologyOfficialGiant = pop.giantId || '';
-    app.view.dataset.ecologyPopulation = [
+    app.canvas.dataset.ecologySource = pop.source;
+    app.canvas.dataset.ecologySourceTsid = pop.sourceTsid || '';
+    app.canvas.dataset.ecologyOfficialGiant = pop.giantId || '';
+    app.canvas.dataset.ecologyPopulation = [
       `piggies=${pop.piggies}`,
       `chickens=${pop.chickens}`,
       `butterflies=${pop.butterflies + pop.flyingButterflies}`,
@@ -18311,8 +18225,8 @@ async function enterStreet(tsid, opts = {}) {
       `shrine=${Number(pop.shrine)}`,
     ].join(',');
     const gap = nearestPlacementGap(currentStreetPlacement, 'player');
-    app.view.dataset.ecologyPlayerClearance = Number.isFinite(gap) ? String(Math.round(gap)) : 'none';
-    app.view.dataset.ecologyCandidates = String(currentStreetPlacement.candidateCount);
+    app.canvas.dataset.ecologyPlayerClearance = Number.isFinite(gap) ? String(Math.round(gap)) : 'none';
+    app.canvas.dataset.ecologyCandidates = String(currentStreetPlacement.candidateCount);
   }
   camTarget = cameraTargetForPlayer(player.x);
   const streetH = activeCameraWorldHeight();
@@ -19130,10 +19044,10 @@ function handleFeatResult(result, participant) {
       toast(`Chain complete! ${result.chainParticipants.join(', ')} scored six points.`, 3800);
       assistedFeatChain = null;
     }
-    app.view.dataset.featStep = String(result.step);
-    app.view.dataset.featPoints = String(featState.totalPoints);
-    app.view.dataset.featChains = String(featState.chainsCompleted);
-    app.view.dataset.featParticipant = participant;
+    app.canvas.dataset.featStep = String(result.step);
+    app.canvas.dataset.featPoints = String(featState.totalPoints);
+    app.canvas.dataset.featChains = String(featState.chainsCompleted);
+    app.canvas.dataset.featParticipant = participant;
   }
   renderFeatPanel();
   updateFeatChrome();
@@ -19392,12 +19306,12 @@ function renderAchievePanel() {
   box.dataset.badgeMatching = String(allRows.length);
   box.dataset.badgeRendered = String(visibleRows.length);
   box.dataset.badgeCatalog = String(catN);
-  if (app?.view) {
-    app.view.dataset.badgeMatching = String(allRows.length);
-    app.view.dataset.badgeRendered = String(visibleRows.length);
-    app.view.dataset.badgeCatalog = String(catN);
-    app.view.dataset.badgeFilter = achievementBrowser.status;
-    app.view.dataset.badgeCategory = achievementBrowser.category;
+  if (app?.canvas) {
+    app.canvas.dataset.badgeMatching = String(allRows.length);
+    app.canvas.dataset.badgeRendered = String(visibleRows.length);
+    app.canvas.dataset.badgeCatalog = String(catN);
+    app.canvas.dataset.badgeFilter = achievementBrowser.status;
+    app.canvas.dataset.badgeCategory = achievementBrowser.category;
   }
 }
 
@@ -19948,7 +19862,7 @@ function updateMakeCraft(deltaMs) {
       }
     }
     announceAchievementUpdates(achievementUpdates);
-    if (achievementCounter) app.view.dataset.achievementCounter = achievementCounter;
+    if (achievementCounter) app.canvas.dataset.achievementCounter = achievementCounter;
     updateHud();
     playSound('CRAFT_TICK', { volume: 0.35, jitter: 0.08 });
   }
@@ -20791,7 +20705,7 @@ async function ensureShrineTextures(giantId) {
     textures[key] = {
       def: { ...def, url },
       // Official sheets: open has 22 populated frames, close 23 (the rest of the grid is blank).
-      frames: sliceSheet(tex.baseTexture, def, motion === 'open' ? 22 : 23),
+      frames: sliceSheet(tex.source, def, motion === 'open' ? 22 : 23),
     };
   }
 }
@@ -20874,29 +20788,29 @@ function spawnVendorNpc(placement = null) {
   g.x = placement ? p.x : p.x + 120;
   g.y = p.y;
   g.zIndex = 40;
-  const body = PIXI.Sprite.from('assets/decos/groddle/vendor.png');
+  const body = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/vendor.png'));
   body.anchor.set(0.5, 1);
   body.scale.set(0.25);
   g.addChild(body);
   const crest = new PIXI.Graphics();
   crest.circle(35, -84, 13).fill({ color: activeVendor.color, alpha: 0.96 }).stroke({ width: 2, color: 0xfff4cf, alpha: 1 });
   g.addChild(crest);
-  const badge = new PIXI.Text(activeVendor.badge, {
+  const badge = new PIXI.Text({ text: activeVendor.badge, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: activeVendor.badge.length > 1 ? 9 : 12,
     fill: 0xffffff,
     fontWeight: '800',
-  });
+  } });
   badge.anchor.set(0.5, 0.5);
   badge.x = 35;
   badge.y = -84;
   g.addChild(badge);
-  const label = new PIXI.Text(activeVendor.label, {
+  const label = new PIXI.Text({ text: activeVendor.label, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 12,
     fill: 0x2a1a40,
     fontWeight: '700',
-  });
+  } });
   label.anchor.set(0.5, 1);
   label.y = -124;
   g.addChild(label);
@@ -20963,7 +20877,7 @@ function spawnGarden(opts = {}) {
   root.zIndex = 18;
   root.eventMode = 'none';
 
-  const wood = new PIXI.Sprite(PIXI.Texture.from('assets/sprites/garden/bed_frame_wood.png'));
+  const wood = new PIXI.Sprite(textureFromUrl('assets/sprites/garden/bed_frame_wood.png'));
   wood.anchor.set(0.5, 1);
   wood.width = bedW + 8;
   wood.height = bedH + 10;
@@ -20974,13 +20888,12 @@ function spawnGarden(opts = {}) {
   root.bedFrame = wood;
 
   const tag = new PIXI.Text(
-    opts.label || (gardenType === 'herb' ? 'Herbs' : 'Garden'),
-    {
+    { text: opts.label || (gardenType === 'herb' ? 'Herbs' : 'Garden'), style: {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 11,
       fill: 0x3d4a28,
       fontWeight: '700',
-    }
+    } }
   );
   tag.anchor.set(0.5, 1);
   tag.y = -bedH - 4;
@@ -21081,7 +20994,7 @@ function drawGardenPlots(target) {
     cell.plotTarget = plotTarget;
 
     // Raised 3D soil mound (front face + shaded top) — not a flat UI square
-    const dirt = new PIXI.Sprite(PIXI.Texture.from(plotDirtTexture(plot)));
+    const dirt = new PIXI.Sprite(textureFromUrl(plotDirtTexture(plot)));
     dirt.anchor.set(0.5, 1);
     dirt.width = GARDEN_DIRT_W;
     dirt.height = GARDEN_DIRT_H;
@@ -21102,7 +21015,7 @@ function drawGardenPlots(target) {
       cell.addChild(dots);
     } else if (plot?.state === 'shoots') {
       const sprout = new PIXI.Sprite(
-        PIXI.Texture.from('assets/sprites/garden/plot_seedling.png')
+        textureFromUrl('assets/sprites/garden/plot_seedling.png')
       );
       sprout.anchor.set(0.5, 1);
       sprout.scale.set(0.95);
@@ -21111,14 +21024,14 @@ function drawGardenPlots(target) {
       cell.addChild(sprout);
     } else if (plot?.state === 'crop' && seed) {
       const stalk = new PIXI.Sprite(
-        PIXI.Texture.from('assets/sprites/garden/plot_seedling.png')
+        textureFromUrl('assets/sprites/garden/plot_seedling.png')
       );
       stalk.anchor.set(0.5, 1);
       stalk.scale.set(1.25);
       stalk.y = plantY;
       stalk.eventMode = 'none';
       cell.addChild(stalk);
-      const produce = new PIXI.Sprite(PIXI.Texture.from(cropIcon(seed.cropId)));
+      const produce = new PIXI.Sprite(textureFromUrl(cropIcon(seed.cropId)));
       produce.anchor.set(0.5, 1);
       produce.scale.set(0.52);
       produce.y = plantY - 26;
@@ -21235,8 +21148,8 @@ function spawnMineRocks(typesOverride = null, placements = null) {
     spawnMineRock(classTsid, x, y, i);
   });
   streetWorldState().rocks.length = types.length;
-  if (app?.view) {
-    app.view.dataset.rockPopulation = mineRocks
+  if (app?.canvas) {
+    app.canvas.dataset.rockPopulation = mineRocks
       .map((target) => {
         const root = target.sprite;
         return `${target.classId}:${root?.rockFrameW || 0}x${root?.rockFrameH || 0}:${root?.rockFrames?.length || 0}`;
@@ -21273,7 +21186,7 @@ function spawnMineRock(classTsid, x, y, index = 0) {
   root._mineHitH = 90;
 
   const loadedFrames = textures[def.textureKey]?.frames || [];
-  const fallbackTexture = PIXI.Texture.from(`${def.worldSheet}?v=exact-rock-cells-1`);
+  const fallbackTexture = textureFromUrl(`${def.worldSheet}?v=exact-rock-cells-1`);
   const spr = new PIXI.Sprite(loadedFrames[0] || fallbackTexture);
   spr.anchor.set(0.5, 1);
   // Use exact, preloaded frame cells. Creating a subtexture before an image
@@ -21290,12 +21203,12 @@ function spawnMineRock(classTsid, x, y, index = 0) {
   root.rockFrameH = fh;
   root.rockBaseTex = fallbackTexture;
 
-  const tag = new PIXI.Text(def.label, {
+  const tag = new PIXI.Text({ text: def.label, style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 11,
     fill: 0x4a4035,
     fontWeight: '700',
-  });
+  } });
   tag.anchor.set(0.5, 1);
   tag.y = -fh * 0.85 - 4;
   tag.eventMode = 'none';
@@ -21329,11 +21242,8 @@ function refreshMineRockVisual(target) {
   const frames = root.rockFrames || [];
   if (frames[fi]) {
     root.rockSprite.texture = frames[fi];
-  } else if (base?.baseTexture?.valid) {
-    root.rockSprite.texture = new PIXI.Texture(
-      base.baseTexture || base,
-      new PIXI.Rectangle(fi * fw, 0, fw, fh)
-    );
+  } else if (isLoaded(base?.source)) {
+    root.rockSprite.texture = frameTexture(base.source || base, new PIXI.Rectangle(fi * fw, 0, fw, fh));
   }
   root.rockSprite.alpha = rock.depleted ? 0.35 : 1;
   if (root.rockTag) {
@@ -21525,6 +21435,14 @@ function runGardenPlotAction(key, action) {
   renderGardenPanel();
 }
 
+/**
+ * Renderer backend: WebGL (WebGL 2) by default; `?renderer=webgpu` tries
+ * WebGPU (Pixi falls back to WebGL when the browser has none).
+ */
+function rendererPreference() {
+  return new URLSearchParams(location.search).get('renderer') === 'webgpu' ? 'webgpu' : 'webgl';
+}
+
 async function main() {
   const root = document.getElementById('game-root');
   syncCameraSafeArea();
@@ -21537,32 +21455,38 @@ async function main() {
       if (world) world.x = -Math.round(camTarget * 2) / 2;
     }
   });
-  // Pixi 7 renders every filter at resolution 1 by default. The street colour
-  // matrix sits on the middleground and on entityLayer (1,169 of 1,422
-  // streets), so avatars, animals and decos were drawn at half density on
-  // Retina. A falsy resolution makes FilterSystem use the renderer's.
-  PIXI.Filter.defaultResolution = null;
+  // Pixi renders filters at resolution 1 by default. The street colour matrix
+  // sits on the middleground and on entityLayer (1,169 of 1,422 streets), so
+  // avatars, animals and decos were drawn at half density on Retina.
+  // 'inherit' makes FilterSystem use the renderer's resolution.
+  PIXI.Filter.defaultOptions.resolution = 'inherit';
+  installPixiFixes(PIXI);
   // 3x pack icons in Pixi sprites and <img>s, at their original sizes.
-  installHiresIcons(PIXI);
+  installHiresIcons(textureUrls);
   // 3x animal sheets from the vector SWFs (js/sprite-hires.js), same frame rects.
-  installHiresSprites(PIXI);
-  app = new PIXI.Application({
+  installHiresSprites(textureUrls);
+  app = new PIXI.Application();
+  await app.init({
     width: VIEW_W,
     height: VIEW_H,
-    backgroundColor: 0x8ec8e8,
+    background: 0x8ec8e8,
     antialias: false,
     resolution: renderResolution(VIEW_W, VIEW_W, window.devicePixelRatio || 1),
     autoDensity: true,
+    preference: rendererPreference(),
+    // GPU textures unused for 20 s (old streets, sheets no longer drawn) are freed.
+    gcMaxUnusedTime: 20000,
+    gcFrequency: 5000,
   });
   // Character, NPC and shrine sheets swap to 3x when first drawn.
-  installHiresFirstDraw(app.renderer, PIXI);
-  app.view.setAttribute('role', 'application');
-  app.view.setAttribute('aria-label', 'Groddle game world');
-  app.view.tabIndex = 0;
-  root.insertBefore(app.view, document.getElementById('overlay'));
+  installHiresFirstDraw(app.renderer, whenLoaded);
+  app.canvas.setAttribute('role', 'application');
+  app.canvas.setAttribute('aria-label', 'Groddle game world');
+  app.canvas.tabIndex = 0;
+  root.insertBefore(app.canvas, document.getElementById('overlay'));
   syncRenderResolution();
   // Panels and the HUD can resize the canvas without a window resize.
-  if (typeof ResizeObserver === 'function') new ResizeObserver(() => syncRenderResolution()).observe(app.view);
+  if (typeof ResizeObserver === 'function') new ResizeObserver(() => syncRenderResolution()).observe(app.canvas);
 
   await loadSheets();
   // The vector avatar's catalog (looks, colourways); the default look's sheets are already loaded.
@@ -22030,10 +21954,10 @@ async function main() {
         : homeDemo === 'cultivate' ? 'street' : homeState.room || 'street';
       await renderHomeScene(homeState.room, { spawnX: homeState.room === 'interior' ? 1030 : 250 });
     }
-    if (streetDemoTsid && app?.view) app.view.dataset.streetDemo = streetDemoTsid;
+    if (streetDemoTsid && app?.canvas) app.canvas.dataset.streetDemo = streetDemoTsid;
     if (stootDemoTsid) {
       inv[GAMESHOW_TICKET_ID] = Math.max(1, inv[GAMESHOW_TICKET_ID] || 0);
-      if (app?.view) app.view.dataset.stootDemo = '1';
+      if (app?.canvas) app.canvas.dataset.stootDemo = '1';
     }
     if (savedLoc) {
       pushActivity(`Welcome back — ${currentStreet?.label || startTsid}`);
@@ -22124,7 +22048,7 @@ async function main() {
   const companionDemo = String(bootParams.get('companiondemo') || '').toLowerCase();
   if (companionDemo && localCompanions.length) {
     gatherLocalCompanions(20_000);
-    app.view.dataset.localCompanionDemo = companionDemo;
+    app.canvas.dataset.localCompanionDemo = companionDemo;
     if (companionDemo === 'feat') {
       openFeatPanel();
       gatherFeatChain();
@@ -22145,7 +22069,7 @@ async function main() {
     const target = requested || localCompanionTarget('Bumbishfish') || localCompanions[0];
     if (target) {
       handleLocalCompanionTarget(target, 'follow');
-      app.view.dataset.followDemo = target.name;
+      app.canvas.dataset.followDemo = target.name;
     }
     if (bootParams.get('followautoplay') === '1' && companionFollowState.active) {
       for (const streetTsid of LAST_FEAT_STREET_IDS.slice(1)) {
@@ -22166,7 +22090,7 @@ async function main() {
     camY = cameraTargetY(player.y, activeCameraWorldHeight(), LOCATION_VIEW_H);
     world.x = -camTarget;
     world.y = -camY;
-    app.view.dataset.ghostDemo = phantomTarget.state.kind;
+    app.canvas.dataset.ghostDemo = phantomTarget.state.kind;
   }
 
   // Put one mined badge exactly N matching actions from completion. Combine
@@ -22176,15 +22100,15 @@ async function main() {
     const distance = Math.max(1, Math.floor(Number(bootParams.get('achievementremaining')) || 1));
     const seeded = seedAchievementNearCompletion(achieveState, achievementDemoId, distance);
     if (seeded.ok) {
-      app.view.dataset.achievementDemo = achievementDemoId;
-      app.view.dataset.achievementDemoRemaining = String(distance);
-      app.view.dataset.achievementDemoProgress = JSON.stringify(seeded.progress);
+      app.canvas.dataset.achievementDemo = achievementDemoId;
+      app.canvas.dataset.achievementDemoRemaining = String(distance);
+      app.canvas.dataset.achievementDemoProgress = JSON.stringify(seeded.progress);
     }
   }
 
   if (jumpDemoProfile) {
     pushActivity(`${jumpDemoProfile.label} ready. Land and jump three times within half a second.`);
-    app.view.dataset.jumpUpgrade = jumpDemoProfile.id;
+    app.canvas.dataset.jumpUpgrade = jumpDemoProfile.id;
   }
 
   // Deterministic shrine QA: place the player beside the current street's shrine.
@@ -22212,7 +22136,7 @@ async function main() {
       player.vy = 0;
       player.onGround = true;
       hoverTarget = rockTarget;
-      app.view.dataset.rockDemo = rockTarget.classId;
+      app.canvas.dataset.rockDemo = rockTarget.classId;
     }
   }
 
@@ -22241,8 +22165,8 @@ async function main() {
       player.onGround = true;
       hoverTarget = animalTarget;
       animalTarget.subtitle = animalStatusLabel(requested, animalTarget.state);
-      app.view.dataset.animalDemo = requested;
-      app.view.dataset.animalDemoRank = String(animalRank);
+      app.canvas.dataset.animalDemo = requested;
+      app.canvas.dataset.animalDemoRank = String(animalRank);
     }
   }
 
@@ -22275,7 +22199,7 @@ async function main() {
         dialogueTarget.state ||= {};
         dialogueTarget.state.dialogueTurn = Math.floor(requestedTurn);
       }
-      app.view.dataset.dialogueDemo = requested;
+      app.canvas.dataset.dialogueDemo = requested;
     }
   }
 
@@ -22318,9 +22242,9 @@ async function main() {
       careTarget.subtitle = careTarget.classId === 'wood_tree'
         ? woodTreeStatusLabel(careTarget.state)
         : trantStatusLabel(careTarget.state, TRANT_META[careTarget.classId]);
-      app.view.dataset.careDemo = careTarget.classId;
-      app.view.dataset.careSkillRank = String(careRank);
-      app.view.dataset.wateringCanRemaining = String(
+      app.canvas.dataset.careDemo = careTarget.classId;
+      app.canvas.dataset.careSkillRank = String(careRank);
+      app.canvas.dataset.wateringCanRemaining = String(
         getToolCondition(toolState, 'watering_can').remaining
       );
     }
@@ -22377,7 +22301,7 @@ async function main() {
           scale
         );
       }
-      app.view.dataset.trantFrame = `${requested}:m${nearestTrantMatStage(maturity)}`;
+      app.canvas.dataset.trantFrame = `${requested}:m${nearestTrantMatStage(maturity)}`;
     }
     skillState.learned = skillState.learned.filter((id) => !id.startsWith('gardening_'));
     const harvestRank = clamp(Math.floor(Number(bootParams.get('harvestrank')) || 0), 0, 5);
@@ -22432,10 +22356,10 @@ async function main() {
         harvestTarget.state,
         TRANT_META[harvestTarget.classId]
       );
-      app.view.dataset.harvestDemo = harvestTarget.classId;
-      app.view.dataset.harvestRank = String(harvestRank);
-      app.view.dataset.harvestFruit = String(harvestTarget.state.fruitCount);
-      app.view.dataset.harvestSuperMode = superMode;
+      app.canvas.dataset.harvestDemo = harvestTarget.classId;
+      app.canvas.dataset.harvestRank = String(harvestRank);
+      app.canvas.dataset.harvestFruit = String(harvestTarget.state.fruitCount);
+      app.canvas.dataset.harvestSuperMode = superMode;
     }
   }
 
@@ -22465,7 +22389,7 @@ async function main() {
       player.onGround = true;
       hoverTarget = woodTarget;
       refreshWoodTreeVisual(woodTarget);
-      app.view.dataset.woodDemo = 'ready';
+      app.canvas.dataset.woodDemo = 'ready';
     }
   }
 
@@ -22957,11 +22881,11 @@ async function main() {
   });
 
   // World pointer moves — hover pick by true sprite bounds (not foot-anchor distance)
-  app.view.addEventListener('pointermove', (e) => {
+  app.canvas.addEventListener('pointermove', (e) => {
     if (!state.started || menuTarget || isMapOpen() || isScreenFxBlocking()) return;
     recentInteractionTarget = null;
     recentInteractionUntil = 0;
-    const bounds = app.view.getBoundingClientRect();
+    const bounds = app.canvas.getBoundingClientRect();
     const wx = (e.clientX - bounds.left) * (VIEW_W / bounds.width) + camTarget;
     const wy = (e.clientY - bounds.top) * (VIEW_H / bounds.height) + (camY || 0);
     const signBoard = signpostBoardAt(portalSprites, wx, wy);
@@ -22974,11 +22898,11 @@ async function main() {
     if (hit) setHoverTarget(hit);
     else if (hoverTarget) clearHoverGlow();
   });
-  app.view.addEventListener('pointerleave', clearSignpostBoardHover);
+  app.canvas.addEventListener('pointerleave', clearSignpostBoardHover);
 
-  app.view.addEventListener('pointerdown', (e) => {
+  app.canvas.addEventListener('pointerdown', (e) => {
     if (!state.started || menuTarget || isMapOpen() || isScreenFxBlocking()) return;
-    const bounds = app.view.getBoundingClientRect();
+    const bounds = app.canvas.getBoundingClientRect();
     const sx = (e.clientX - bounds.left) * (VIEW_W / bounds.width) + camTarget;
     const sy = (e.clientY - bounds.top) * (VIEW_H / bounds.height) + (camY || 0);
 
@@ -23164,6 +23088,21 @@ async function main() {
     setInterval(play, 4000);
   }
   window.groddleQA = {
+    /** Renderer QA: backend, Pixi version and GPU texture use (tools/perf, tools/playtest). */
+    renderStats() {
+      const r = app?.renderer;
+      const managed = r?.texture?.managedTextures || [];
+      let bytes = 0;
+      for (const s of managed) if (s) bytes += (s.pixelWidth || 0) * (s.pixelHeight || 0) * 4;
+      return {
+        pixi: PIXI.VERSION,
+        renderer: r?.name || null,
+        resolution: r?.resolution ?? null,
+        gpuTextures: managed.length,
+        gpuTextureMB: +(bytes / 1048576).toFixed(1),
+        images: textureUrls.textureStats(),
+      };
+    },
     /** Idle/AFK QA (&idledemo=1): loaded idle sheets with load/bake ms, AFK and the idle timer. */
     idleState() {
       return {
@@ -23182,14 +23121,14 @@ async function main() {
         sheets: player?.pack?.sheets ? Object.keys(player.pack.sheets) : [],
         loads: idleSheetLog.slice(),
         // The feet on the page (for crops).
-        feet: player && app?.view ? (() => {
-          const r = app.view.getBoundingClientRect();
+        feet: player && app?.canvas ? (() => {
+          const r = app.canvas.getBoundingClientRect();
           return { x: r.left + (player.x + world.x) * (r.width / VIEW_W), y: r.top + (player.y + world.y) * (r.height / VIEW_H), scale: r.width / VIEW_W };
         })() : null,
       };
     },
     snapshot() {
-      const rect = app.view.getBoundingClientRect();
+      const rect = app.canvas.getBoundingClientRect();
       const sx = rect.width / VIEW_W;
       const sy = rect.height / VIEW_H;
       const toPage = (wx, wy) => ({ x: rect.left + (wx + world.x) * sx, y: rect.top + (wy + world.y) * sy });
@@ -23234,9 +23173,9 @@ async function main() {
   let buffTickAccum = 0;
   let skillTickAccum = 0;
   let dametimeTickAccum = 0;
-  app.ticker.add((delta) => {
+  app.ticker.add((ticker) => {
     if (!state.started) return;
-    const dt = Math.min(delta, 2.5);
+    const dt = Math.min(ticker.deltaTime, 2.5);
     updateCurrentAction((1000 / 60) * dt);
     updateMakeCraft((1000 / 60) * dt);
     handleInput();
@@ -23350,9 +23289,9 @@ async function main() {
       settlePrompt(want, performance.now());
       if (prompt.visible) {
         prompt.x = clampWorldOverlayX(prompt.x, prompt.width, 12);
-        app.view.dataset.promptScreenX = (prompt.x - camTarget).toFixed(2);
-        app.view.dataset.promptSafeRight = horizontalLocationViewWidth().toFixed(2);
-        app.view.dataset.promptWidth = prompt.width.toFixed(2);
+        app.canvas.dataset.promptScreenX = (prompt.x - camTarget).toFixed(2);
+        app.canvas.dataset.promptSafeRight = horizontalLocationViewWidth().toFixed(2);
+        app.canvas.dataset.promptWidth = prompt.width.toFixed(2);
       }
     } else {
       prompt.visible = false;

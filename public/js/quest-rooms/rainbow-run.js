@@ -104,7 +104,7 @@ export const room = {
       world.addChild(c);
     });
     // Start and finish flags.
-    world.addChild(kit.label(PIXI, 'START', 120, FLOOR - 70, { size: 26, fill: 0xffffff, stroke: 0x5a7894, strokeThickness: 5 }));
+    world.addChild(kit.label(PIXI, 'START', 120, FLOOR - 70, { size: 26, fill: 0xffffff, stroke: { color: 0x5a7894, width: 5 } }));
     return {
       label: 'Rainbow Run',
       width: W,

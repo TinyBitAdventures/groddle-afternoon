@@ -18,6 +18,8 @@
  * offer_accept sheets (108x154 cells, facing left).
  */
 
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
+
 const W = 1900;
 const H = 760;
 const FLOOR = 620;
@@ -49,16 +51,16 @@ const STASH = ['plank', 'meat', 'cherry', 'apple', 'bun', 'paper', 'pumpkin', 'l
   'cloud_11_smoothie', 'rubeweed', 'tinkertool', 'pick', 'hoe', 'watering_can', 'plain_bubble', 'egg_plain', 'grain', 'sammich'];
 
 function rubeFrames(PIXI, file, cols, count) {
-  const base = PIXI.BaseTexture.from(`${RUBE_DIR}${file}`);
+  const base = sourceFromUrl(`${RUBE_DIR}${file}`);
   const frames = [];
   const cut = () => {
     frames.length = 0;
     for (let i = 0; i < count; i++) {
-      frames.push(new PIXI.Texture(base, new PIXI.Rectangle((i % cols) * CELL.w, Math.floor(i / cols) * CELL.h, CELL.w, CELL.h)));
+      frames.push(frameTexture(base, new PIXI.Rectangle((i % cols) * CELL.w, Math.floor(i / cols) * CELL.h, CELL.w, CELL.h)));
     }
   };
-  if (base.valid) cut();
-  else base.once('loaded', cut);
+  if (isLoaded(base)) cut();
+  else onLoaded(base, cut);
   return { base, frames };
 }
 
@@ -150,7 +152,7 @@ export const room = {
         rube.gotoAndPlay(0);
       };
       if (set.frames.length) start();
-      else set.base.once('loaded', () => setTimeout(start, 0));
+      else onLoaded(set.base, () => setTimeout(start, 0));
     };
     play(talk);
     ctx.data.rubePlay = (which) => play(which === 'cheer' ? cheer : talk, which !== 'cheer');
@@ -162,7 +164,7 @@ export const room = {
     });
     const jar = ctx.add(kit.deco(PIXI, 'jar4_empty', 520, FLOOR + 2, { scale: 0.62 }), 31);
     ctx.data.jar = jar;
-    ctx.data.jarCount = ctx.add(kit.label(PIXI, '', 520, FLOOR - 74, { size: 16, fill: 0x5b3c9e, stroke: 0xffffff, strokeThickness: 4 }), 33);
+    ctx.data.jarCount = ctx.add(kit.label(PIXI, '', 520, FLOOR - 74, { size: 16, fill: 0x5b3c9e, stroke: { color: 0xffffff, width: 4 } }), 33);
     // The stash heap.
     STASH.forEach((cls, i) => {
       const row = Math.floor(i / 7);

@@ -44,6 +44,7 @@ import {
   normalizeDoorState,
   visibleDoors,
 } from '../doors.js';
+import { isLoaded, onLoaded, textureFromUrl } from '../textures.js';
 
 export const DOORS_FEATURE_ID = 'doors';
 const DECO_BASE = 'assets/decos/groddle/';
@@ -130,7 +131,7 @@ function addExtra(engine, view, child) {
 function buildView(engine, door, available) {
   const { PIXI } = engine;
   const hasArt = door.sprite && available.has(door.sprite);
-  const tex = hasArt ? PIXI.Texture.from(`${DECO_BASE}${door.sprite}.png`) : drawnDoorTexture(PIXI, door);
+  const tex = hasArt ? textureFromUrl(`${DECO_BASE}${door.sprite}.png`) : drawnDoorTexture(PIXI, door);
   const sprite = new PIXI.Sprite(tex);
   sprite.anchor.set(0.5, 1);
   sprite.x = door.x;
@@ -139,14 +140,14 @@ function buildView(engine, door, available) {
   sprite.zIndex = DOOR_Z;
   sprite.roundPixels = true;
   applyRect(sprite, door);
-  if (!tex.baseTexture?.valid) tex.baseTexture?.once?.('loaded', () => !sprite.destroyed && applyRect(sprite, door));
+  if (!isLoaded(tex.source)) onLoaded(tex.source, () => !sprite.destroyed && applyRect(sprite, door));
   sprite._worldHitW = Math.max(40, door.w || 60);
   sprite._worldHitH = Math.max(60, door.h || 110);
   engine.entityLayer.addChild(sprite);
   const view = { door, sprite, extras: [], target: null, art: hasArt ? 'deco' : 'drawn' };
 
   if (door.key_id && DOOR_KEYS[door.key_id]) {
-    const badge = new PIXI.Sprite(PIXI.Texture.from(`assets/sprites/icons/${doorKeyClass(door.key_id)}.png`));
+    const badge = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${doorKeyClass(door.key_id)}.png`));
     badge.anchor.set(0.5, 0.5);
     badge.x = door.x;
     badge.y = door.y - Math.max(40, (door.h || 110) * 0.62);
@@ -154,14 +155,13 @@ function buildView(engine, door, available) {
     addExtra(engine, view, badge);
   }
   if (door.house_number) {
-    const plate = new PIXI.Text(String(door.house_number), {
+    const plate = new PIXI.Text({ text: String(door.house_number), style: {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 13,
       fontWeight: '700',
       fill: 0xfff6dc,
-      stroke: 0x3a2a18,
-      strokeThickness: 3,
-    });
+      stroke: { color: 0x3a2a18, width: 3 },
+    } });
     plate.anchor.set(0.5, 1);
     plate.x = door.x;
     plate.y = door.y - (door.h || 110) - 4;

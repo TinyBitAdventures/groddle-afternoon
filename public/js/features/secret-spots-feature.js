@@ -52,6 +52,7 @@ import {
   streetKeyFor,
   triggerSecretSpot,
 } from '../secret-spots.js?v=secrets-1';
+import { verticalTextGradient } from '../text-gradient.js';
 
 export const SECRET_SPOTS_FEATURE_ID = 'secret-spots';
 const MARKER_Z = 4;
@@ -105,7 +106,7 @@ function maybeStart(engine, opts = {}) {
 
 /** One soft radial blob: #EFFEFD at the centre (ratio 0.5) to transparent #A7F6FE at 0.965. */
 function blobTexture(PIXI) {
-  if (blobTex && !blobTex.baseTexture?.destroyed) return blobTex;
+  if (blobTex && !blobTex.source?.destroyed) return blobTex;
   const size = 64;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -301,19 +302,14 @@ function buildRainbow(engine) {
   const span = 1.6; // radians across the arc
   [...word].forEach((ch, i) => {
     const a = -Math.PI / 2 - span / 2 + (span * i) / (word.length - 1);
-    const t = new PIXI.Text(ch, {
+    const t = new PIXI.Text({ text: ch, style: {
       fontFamily: '"Trebuchet MS", sans-serif',
       fontSize: 24,
       fontWeight: '900',
-      fill: [0xfefcc8, 0xf1e896],
-      stroke: 0x6e3f1a,
-      strokeThickness: 5,
-      dropShadow: true,
-      dropShadowColor: 0x763b1a,
-      dropShadowDistance: 2,
-      dropShadowBlur: 0,
-      dropShadowAlpha: 0.8,
-    });
+      fill: verticalTextGradient([0xfefcc8, 0xf1e896]),
+      stroke: { color: 0x6e3f1a, width: 5 },
+      dropShadow: { alpha: 0.8, blur: 0, color: 0x763b1a, distance: 2 },
+    } });
     t.resolution = 3;
     t.anchor.set(0.5, 1);
     t.x = Math.cos(a) * radius;

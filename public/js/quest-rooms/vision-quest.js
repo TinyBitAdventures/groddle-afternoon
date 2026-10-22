@@ -25,6 +25,8 @@
  * returns. The avatar stays put while looking.
  */
 
+import { frameTexture, onLoaded, sourceFromUrl } from '../textures.js';
+
 export const STREET = 'GNV1T7PCUM53T25';
 const BOUNDS = { l: -1500, t: -600 };
 const sx = (x) => x - BOUNDS.l;
@@ -87,8 +89,8 @@ function objectSprite(ctx, cls) {
   }
   if (cls === 'trant_fruit') return kit.deco(PIXI, 'tree_fruit_single', x, y + 4, { dir: 'assets/sprites/', scale: 0.85 });
   if (cls === 'rock_sparkly_1') {
-    const base = PIXI.BaseTexture.from('assets/sprites/mining/rock_sparkly.png');
-    const tex = new PIXI.Texture(base, new PIXI.Rectangle(0, 0, 131, 127));
+    const base = sourceFromUrl('assets/sprites/mining/rock_sparkly.png');
+    const tex = frameTexture(base, new PIXI.Rectangle(0, 0, 131, 127));
     const spr = new PIXI.Sprite(tex);
     spr.anchor.set(0.5, 1);
     spr.x = x;
@@ -293,7 +295,7 @@ export const room = {
         frog.play();
       };
       if (sheet.frames.length) set();
-      else sheet.base.once('loaded', () => setTimeout(set, 0));
+      else onLoaded(sheet.base, () => setTimeout(set, 0));
     };
     ctx.data.frogIdle = use(frogIdle);
     ctx.data.frogTalk = use(frogTalk);

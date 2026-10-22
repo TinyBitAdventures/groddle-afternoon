@@ -73,6 +73,7 @@ import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=ca
 import { runStreetTransition } from '../screen-fx.js';
 import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
 import { startCrowns } from './crowns-feature.js?v=crowns-1';
+import { textureFromUrl } from '../textures.js';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
 const RIVAL_SCALE = 1.35 * 0.4;
@@ -518,14 +519,13 @@ function spawnRaceEntities(engine) {
     rivalSprite.zIndex = 46;
     rivalSprite.eventMode = 'none';
     engine.entityLayer.addChild(rivalSprite);
-    rivalLabel = new PIXI.Text(run.rivalName, {
+    rivalLabel = new PIXI.Text({ text: run.rivalName, style: {
       fontFamily: 'Arial',
       fontSize: 13,
       fontWeight: '700',
       fill: 0xffffff,
-      stroke: 0x2a1d14,
-      strokeThickness: 3,
-    });
+      stroke: { color: 0x2a1d14, width: 3 },
+    } });
     rivalLabel.anchor.set(0.5, 1);
     rivalLabel.zIndex = 47;
     engine.entityLayer.addChild(rivalLabel);
@@ -836,7 +836,7 @@ function publish(engine) {
 
 function spawnDispenser(engine, point) {
   const { PIXI } = engine;
-  const sprite = PIXI.Sprite.from(`${RACE_ICON_DIR}race_ticket_dispenser.png`);
+  const sprite = new PIXI.Sprite(textureFromUrl(`${RACE_ICON_DIR}race_ticket_dispenser.png`));
   sprite.anchor.set(0.5, 1);
   sprite.x = point.x;
   sprite.y = point.y + 2;

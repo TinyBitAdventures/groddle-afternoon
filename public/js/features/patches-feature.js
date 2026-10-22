@@ -54,6 +54,7 @@ import {
   soilSpritePaths,
   tickPlot,
 } from '../patches.js';
+import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';
@@ -185,14 +186,14 @@ const frameTextures = new Map();
 function loadBase(PIXI, url) {
   if (baseTextures.has(url)) return baseTextures.get(url);
   const promise = new Promise((resolve) => {
-    const tex = PIXI.Texture.from(url);
-    const base = tex.baseTexture;
-    if (base.valid) {
+    const tex = textureFromUrl(url);
+    const base = tex.source;
+    if (isLoaded(base)) {
       resolve(tex);
       return;
     }
-    base.once('loaded', () => resolve(tex));
-    base.once('error', () => resolve(null));
+    onLoaded(base, () => resolve(tex));
+    onFailed(base, () => resolve(null));
   });
   baseTextures.set(url, promise);
   return promise;
@@ -204,7 +205,7 @@ function sheetFrame(PIXI, base, sheet, index) {
     const cols = sheet.cols || sheet.count;
     const x = (index % cols) * sheet.fw;
     const y = Math.floor(index / cols) * sheet.fh;
-    frameTextures.set(key, new PIXI.Texture(base, new PIXI.Rectangle(x, y, sheet.fw, sheet.fh)));
+    frameTextures.set(key, frameTexture(base, new PIXI.Rectangle(x, y, sheet.fw, sheet.fh)));
   }
   return frameTextures.get(key);
 }
@@ -217,7 +218,7 @@ async function texturesForPlot(engine, plot) {
       const tex = await loadBase(PIXI, WOOD_SHEET.url);
       if (!tex) return null;
       const m = Math.max(1, Math.min(6, tree.state.maturity || 1));
-      return sheetFrame(PIXI, tex.baseTexture, WOOD_SHEET, m - 1);
+      return sheetFrame(PIXI, tex.source, WOOD_SHEET, m - 1);
     }
     return loadBase(PIXI, treeFrameUrl(tree.classId, tree.state.maturity));
   }
@@ -465,7 +466,7 @@ async function startToolFx(engine, entity, verb) {
   const { PIXI } = engine;
   const tex = await loadBase(PIXI, sheet.url);
   if (!tex || !engine.player || !entity.sprite) return;
-  const frames = Array.from({ length: sheet.count }, (_, i) => sheetFrame(PIXI, tex.baseTexture, sheet, i));
+  const frames = Array.from({ length: sheet.count }, (_, i) => sheetFrame(PIXI, tex.source, sheet, i));
   const tool = new PIXI.AnimatedSprite(frames);
   const left = entity.sprite.x < engine.player.x;
   tool.anchor.set(0.5);

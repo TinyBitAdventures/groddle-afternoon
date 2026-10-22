@@ -37,6 +37,7 @@ import {
 } from '../master-garden.js';
 import { rollDropTable } from '../drop-tables.js';
 import { payDrop } from './drops-feature.js?v=drops-1';
+import { textureFromUrl } from '../textures.js';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';
 
@@ -110,7 +111,7 @@ function pourFx(engine, potionClass, target) {
   const p = engine.player;
   if (!PIXI || !p || !engine.fxLayer) return null;
   const root = new PIXI.Container();
-  const bottle = PIXI.Sprite.from(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.png`);
+  const bottle = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[potionClass]?.icon || `assets/sprites/icons/${potionClass}.png`));
   bottle.anchor.set(0.5);
   bottle.x = p.x;
   bottle.y = (p.y || 0) - 135;

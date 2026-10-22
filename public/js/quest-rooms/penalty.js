@@ -26,6 +26,7 @@
 
 import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js';
 import { getQuestCatalog } from '../content-catalogs.js';
+import { onLoaded, textureFromUrl } from '../textures.js';
 
 export const PART_1 = 'smuggle_the_smuggler_part1';
 export const PART_2 = 'smuggle_the_smuggler_part2';
@@ -110,7 +111,7 @@ function vendorClip(ctx, clip) {
     spr.play();
   };
   if (sheet.frames.length) set();
-  else sheet.base.once('loaded', () => setTimeout(set, 0));
+  else onLoaded(sheet.base, () => setTimeout(set, 0));
 }
 
 function drawPatch(ctx) {
@@ -127,7 +128,7 @@ function drawPatch(ctx) {
     g.ellipse(0, -4, 44, 11).fill({ color: 0x000000, alpha: 0.9 });
     c.addChild(g);
   }
-  const art = PIXI.Sprite.from(plotArtPath(ctx.data.plot));
+  const art = new PIXI.Sprite(textureFromUrl(plotArtPath(ctx.data.plot)));
   art.anchor.set(0.5, 1);
   art.scale.set(1.6);
   art.y = 6;

@@ -77,6 +77,7 @@ import {
   spawnOffset,
   sparedBySignpost,
 } from '../smuggling.js';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const SMUGGLING_FEATURE_ID = 'smuggling';
 const ART = 'assets/sprites/smuggling/';
@@ -184,12 +185,12 @@ function frames(engine, prefix, clip, defs) {
   if (sheetCache.has(key)) return sheetCache.get(key);
   const [cols, count] = defs[clip];
   const { PIXI } = engine;
-  const base = PIXI.BaseTexture.from(`${ART}${key}.webp`);
+  const base = sourceFromUrl(`${ART}${key}.webp`);
   const list = [];
   for (let i = 0; i < count; i += 1) {
     const x = (i % cols) * CELL.w;
     const y = Math.floor(i / cols) * CELL.h;
-    list.push(new PIXI.Texture(base, new PIXI.Rectangle(x, y, CELL.w, CELL.h)));
+    list.push(frameTexture(base, new PIXI.Rectangle(x, y, CELL.w, CELL.h)));
   }
   sheetCache.set(key, list);
   return list;
@@ -856,7 +857,7 @@ function caught(engine) {
   engine.pushActivity?.(TEXT.caught);
   engine.playSound?.('DEIMAGINATOR_TAKES_BOX', { volume: 0.7 });
   // The box lands at its feet and is gone 2 s later (onDropped).
-  const box = engine.PIXI.Sprite.from('assets/sprites/icons/contraband.png');
+  const box = new engine.PIXI.Sprite(textureFromUrl('assets/sprites/icons/contraband.png'));
   box.anchor.set(0.5, 1);
   box.x = deim.x;
   box.y = deim.y;

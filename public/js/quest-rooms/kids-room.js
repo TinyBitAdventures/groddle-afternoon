@@ -30,6 +30,7 @@
 
 import { applyRewards } from '../quests.js';
 import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=catalog-unified-3';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
 
 const W = 1150;
 const H = 760;
@@ -219,9 +220,9 @@ function drawPlayroom(PIXI, kit) {
 }
 
 function blockTexture(PIXI, letter, frame = 0) {
-  const base = PIXI.BaseTexture.from(`${BLOCK_ART}${letter}.png`);
-  const make = () => new PIXI.Texture(base, new PIXI.Rectangle(frame * 139, 0, 139, 197));
-  return base.valid ? make() : null;
+  const base = sourceFromUrl(`${BLOCK_ART}${letter}.png`);
+  const make = () => frameTexture(base, new PIXI.Rectangle(frame * 139, 0, 139, 197));
+  return isLoaded(base) ? make() : null;
 }
 
 function setBlockLetter(ctx, block, letter) {
@@ -231,8 +232,8 @@ function setBlockLetter(ctx, block, letter) {
   const tex = blockTexture(PIXI, letter);
   if (tex) block.sprite.texture = tex;
   else {
-    const base = PIXI.BaseTexture.from(url);
-    base.once('loaded', () => {
+    const base = sourceFromUrl(url);
+    onLoaded(base, () => {
       if (block.letter === letter && !block.sprite.destroyed) block.sprite.texture = blockTexture(PIXI, letter);
     });
   }
@@ -241,11 +242,11 @@ function setBlockLetter(ctx, block, letter) {
 
 function mrBlockSprite(ctx, letter) {
   const { PIXI } = ctx;
-  const base = PIXI.BaseTexture.from(`${ROOM_ART}mr-block-${letter}.png`);
+  const base = sourceFromUrl(`${ROOM_ART}mr-block-${letter}.png`);
   const spr = new PIXI.Sprite(PIXI.Texture.EMPTY);
-  const apply = () => { spr.texture = new PIXI.Texture(base, new PIXI.Rectangle(0, 0, 121, 117)); };
-  if (base.valid) apply();
-  else base.once('loaded', apply);
+  const apply = () => { spr.texture = frameTexture(base, new PIXI.Rectangle(0, 0, 121, 117)); };
+  if (isLoaded(base)) apply();
+  else onLoaded(base, apply);
   spr.anchor.set(0.5, 1);
   spr.scale.set(1.15);
   return spr;

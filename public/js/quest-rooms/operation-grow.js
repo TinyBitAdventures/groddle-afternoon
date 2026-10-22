@@ -27,6 +27,7 @@
  */
 
 import { JUMP_GAP, JUMP_RISE } from './puzzle-kit.js?v=cu-1';
+import { textureFromUrl } from '../textures.js';
 
 export const W = 2500;
 export const H = 960;
@@ -106,7 +107,7 @@ function drawHint(PIXI, kit) {
     dots.circle(-66 + i * 22, -88, lit ? 7 : 4.5).fill({ color: lit ? 0x8fd9ff : 0x3b2f22, alpha: lit ? 1 : 0.8 });
   }
   c.addChild(dots);
-  const mab = PIXI.Sprite.from('assets/sprites/icons/icon_mab@3x.png');
+  const mab = new PIXI.Sprite(textureFromUrl('assets/sprites/icons/icon_mab@3x.png'));
   mab.anchor.set(0.5, 1);
   mab.scale.set(0.42);
   mab.x = -60;
@@ -124,11 +125,11 @@ function makePatch(ctx, i) {
   const glow = kit.glow(PIXI, 0, -26, 0x7fd4ff, 24);
   glow.alpha = 0;
   c.addChild(glow);
-  const soil = PIXI.Sprite.from('assets/sprites/soil/patch-dark-dirty.png');
+  const soil = new PIXI.Sprite(textureFromUrl('assets/sprites/soil/patch-dark-dirty.png'));
   soil.anchor.set(0.5, 0.75);
   soil.scale.set(1.2);
   c.addChild(soil);
-  const wilt = PIXI.Sprite.from('assets/sprites/soil/patch-seedling.png');
+  const wilt = new PIXI.Sprite(textureFromUrl('assets/sprites/soil/patch-seedling.png'));
   wilt.anchor.set(0.5, 1);
   wilt.scale.set(0.9);
   wilt.y = -4;

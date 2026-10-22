@@ -58,6 +58,8 @@ import {
   titheIcon,
   useEmblem,
 } from '../giant-icons.js';
+import { textureFromUrl } from '../textures.js';
+import { verticalTextGradient } from '../text-gradient.js';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
 const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.png`;
@@ -230,7 +232,7 @@ function confirmPlace(giant, engine) {
 function spawnIcon(engine, row) {
   const { PIXI } = engine;
   const def = GIANT_ICON_DATA[row.giant];
-  const spr = PIXI.Sprite.from(WORLD_ART(def.iconClass));
+  const spr = new PIXI.Sprite(textureFromUrl(WORLD_ART(def.iconClass)));
   spr.anchor.set(0.5, 1);
   spr.x = row.x;
   spr.y = row.y + 2;
@@ -284,14 +286,13 @@ function giantLoveFx(engine, giant) {
   heart.bezierCurveTo(-48, -6, -30, -46, 0, -22);
   heart.bezierCurveTo(30, -46, 48, -6, 0, 26);
   heart.fill(0xff4d7d).stroke({ width: 4, color: 0xffffff, alpha: 0.9 });
-  const text = new PIXI.Text('GIANT LOVE!', {
+  const text = new PIXI.Text({ text: 'GIANT LOVE!', style: {
     fontFamily: 'Arial Black, Arial, sans-serif',
     fontSize: 26,
     fontWeight: '900',
-    fill: [0xfff27a, 0xff8fc0],
-    stroke: 0x5a2a7a,
-    strokeThickness: 6,
-  });
+    fill: verticalTextGradient([0xfff27a, 0xff8fc0]),
+    stroke: { color: 0x5a2a7a, width: 6 },
+  } });
   text.anchor.set(0.5);
   text.y = 52;
   root.addChild(rays, heart, text);

@@ -93,6 +93,7 @@ import { lookFor, paintTile, shade } from '../home-looks.js?v=home-looks-1';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-1';
 import { patchesFeature } from './patches-feature.js?v=patches-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
+import { textureFromUrl } from '../textures.js';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -356,13 +357,13 @@ function drawRoomShell(PIXI, container, width) {
   container.addChild(outside);
 
   // Ceiling band
-  const ceil = new PIXI.TilingSprite(tileTexture(PIXI, 'ceiling', decor.ceiling), width, wallTop - ceilingTop + 120);
+  const ceil = new PIXI.TilingSprite({ texture: tileTexture(PIXI, 'ceiling', decor.ceiling), width: width, height: wallTop - ceilingTop + 120 });
   ceil.y = ceilingTop - 120;
   ceil.tileScale.set(0.6, 0.6);
   container.addChild(ceil);
 
   // Wall
-  const wall = new PIXI.TilingSprite(tileTexture(PIXI, 'wall', decor.wall), width, floorY - wallTop);
+  const wall = new PIXI.TilingSprite({ texture: tileTexture(PIXI, 'wall', decor.wall), width: width, height: floorY - wallTop });
   wall.y = wallTop;
   wall.tileScale.set(0.75, 0.75);
   container.addChild(wall);
@@ -371,19 +372,19 @@ function drawRoomShell(PIXI, container, width) {
   // Wainscoting / pillars for the "with Molding" and "with Pillars" swatches
   if (wallLook.wainscot) {
     const top = floorY - 112;
-    g.setFillStyle(PIXI.utils.string2hex(wallLook.wainscot)).rect(0, top, width, floorY - top).fill();
+    g.setFillStyle(new PIXI.Color(wallLook.wainscot).toNumber()).rect(0, top, width, floorY - top).fill();
     for (let x = endCapW + 18; x < width - endCapW - 60; x += 110) {
-      g.setStrokeStyle({ width: 2, color: PIXI.utils.string2hex(shade(wallLook.wainscot, -0.25)), alpha: 0.7 });
+      g.setStrokeStyle({ width: 2, color: new PIXI.Color(shade(wallLook.wainscot, -0.25)).toNumber(), alpha: 0.7 });
       g.roundRect(x, top + 16, 88, floorY - top - 40, 3).stroke();
     }
-    g.setFillStyle(PIXI.utils.string2hex(shade(wallLook.wainscot, 0.25))).rect(0, top - 6, width, 8).fill();
+    g.setFillStyle(new PIXI.Color(shade(wallLook.wainscot, 0.25)).toNumber()).rect(0, top - 6, width, 8).fill();
   }
   if (wallLook.pillars) {
-    const c = PIXI.utils.string2hex(wallLook.pillars);
+    const c = new PIXI.Color(wallLook.pillars).toNumber();
     for (let x = SEGMENT_W; x < width - 20; x += SEGMENT_W) {
       g.rect(x - 14, wallTop, 28, floorY - wallTop).fill(c);
       g.rect(x - 14, wallTop, 6, floorY - wallTop).fill({ color: 0xffffff, alpha: 0.22 });
-      g.setFillStyle(PIXI.utils.string2hex(shade(wallLook.pillars, 0.2))).rect(x - 20, wallTop, 40, 12).fill();
+      g.setFillStyle(new PIXI.Color(shade(wallLook.pillars, 0.2)).toNumber()).rect(x - 20, wallTop, 40, 12).fill();
     }
   }
   // Crown molding under the ceiling, and its soft shadow on the wall
@@ -395,7 +396,7 @@ function drawRoomShell(PIXI, container, width) {
 
   // Floor: perspective band with a darker front lip
   const deck = 46;
-  const floor = new PIXI.TilingSprite(tileTexture(PIXI, 'floor', decor.floor), width, deck);
+  const floor = new PIXI.TilingSprite({ texture: tileTexture(PIXI, 'floor', decor.floor), width: width, height: deck });
   floor.y = floorY;
   floor.tileScale.set(0.7, 0.3);
   container.addChild(floor);
@@ -404,8 +405,8 @@ function drawRoomShell(PIXI, container, width) {
   for (let i = 0; i < 5; i += 1) fg.rect(0, floorY + i * 4, width, 4).fill({ color: 0x000000, alpha: 0.14 - i * 0.025 });
   fg.rect(0, floorY + deck - 14, width, 14).fill({ color: 0xffffff, alpha: 0.07 });
   // The floor's front edge and the house's timber cross-section beneath it.
-  const edge = PIXI.utils.string2hex(shade(floorLook.base || '#8a6a4a', 0.12));
-  const beam = PIXI.utils.string2hex(shade('#6b4a2f', -0.15));
+  const edge = new PIXI.Color(shade(floorLook.base || '#8a6a4a', 0.12)).toNumber();
+  const beam = new PIXI.Color(shade('#6b4a2f', -0.15)).toNumber();
   fg.rect(0, floorY + deck, width, 9).fill(edge);
   fg.rect(0, floorY + deck + 9, width, bottom - floorY - deck - 9).fill(beam);
   fg.rect(0, floorY + deck + 9, width, 5).fill({ color: 0x000000, alpha: 0.25 });
@@ -420,7 +421,7 @@ function drawRoomShell(PIXI, container, width) {
 
   // End caps: the side walls, seen edge-on
   const caps = new PIXI.Graphics();
-  const capColor = PIXI.utils.string2hex(shade(wallLook.base || '#c9c4ba', -0.32));
+  const capColor = new PIXI.Color(shade(wallLook.base || '#c9c4ba', -0.32)).toNumber();
   for (const [x0, dir] of [[0, 1], [width, -1]]) {
     caps.poly([x0, ceilingTop - 120, x0 + dir * endCapW, wallTop - 10, x0 + dir * endCapW, floorY, x0, floorY + 84]).fill(capColor);
     caps.poly([x0 + dir * (endCapW - 8), wallTop - 10, x0 + dir * endCapW, wallTop - 10, x0 + dir * endCapW, floorY, x0 + dir * (endCapW - 8), floorY + 4]);
@@ -439,7 +440,7 @@ function drawRoomShell(PIXI, container, width) {
     spr.width = rx * 2;
     spr.height = ry * 2;
     spr.alpha = alpha;
-    spr.blendMode = PIXI.BLEND_MODES.ADD;
+    spr.blendMode = 'add';
     light.addChild(spr);
   };
   for (const item of decor.placed) {
@@ -493,7 +494,7 @@ function interiorDoorX() {
 
 function spawnInteriorTargets(engine) {
   const { PIXI } = engine;
-  const door = PIXI.Sprite.from(`${DECO}door_asset_apartment_room_interior.png`);
+  const door = new PIXI.Sprite(textureFromUrl(`${DECO}door_asset_apartment_room_interior.png`));
   door.anchor.set(0.5, 1);
   door.scale.set(0.45);
   door.x = interiorDoorX();
@@ -637,7 +638,7 @@ function hash01(seed) {
 }
 
 function decoSprite(PIXI, item, x, y, flip = false) {
-  const spr = PIXI.Sprite.from(`${DECO}${item.s}.png`);
+  const spr = new PIXI.Sprite(textureFromUrl(`${DECO}${item.s}.png`));
   spr.anchor.set(0.5, 1);
   spr.width = item.w * item.scale;
   spr.height = item.h * item.scale;
@@ -709,7 +710,7 @@ function streetBackground(engine, styleId) {
     }
   }
   for (let x = -40; style.soil && x < width + soilW; x += soilW - 2) {
-    const soil = PIXI.Sprite.from(`${DECO}${style.soil}.png`);
+    const soil = new PIXI.Sprite(textureFromUrl(`${DECO}${style.soil}.png`));
     soil.anchor.set(0, 0);
     soil.width = soilW;
     soil.height = 150;
@@ -735,7 +736,7 @@ function streetBackground(engine, styleId) {
 
   // The house, centred on its lot
   const h = style.house;
-  const house = PIXI.Sprite.from(`${DECO}${h.path}.png`);
+  const house = new PIXI.Sprite(textureFromUrl(`${DECO}${h.path}.png`));
   house.anchor.set(0.5, 1);
   house.scale.set(h.scale);
   house.x = layout.houseX;
@@ -786,12 +787,12 @@ function makeGateSprite(engine) {
   post.roundRect(-70, -150, 140, 44, 10).fill(0x8d6444);
   post.roundRect(-64, -145, 128, 34, 8).fill(0xf6e7b6);
   marker.addChild(post);
-  const label = new PIXI.Text('World Gate', {
+  const label = new PIXI.Text({ text: 'World Gate', style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 15,
     fontWeight: '700',
     fill: 0x5b3d2b,
-  });
+  } });
   label.anchor.set(0.5);
   label.y = -128;
   marker.addChild(label);
@@ -806,9 +807,9 @@ function spawnStreetTargets(engine) {
   const layout = homeStreetLayout(cult);
   const bg = scene?.background;
   const unread = Number(engine.homeContext?.().unread) || 0;
-  const mailbox = PIXI.Sprite.from(unread > 0
+  const mailbox = new PIXI.Sprite(textureFromUrl(unread > 0
     ? 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_has_mail_idle_png_1354832230.png'
-    : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png');
+    : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png'));
   mailbox.anchor.set(0.5, 1);
   mailbox.x = Math.round(bg?.houseSignX ?? layout.houseX - 260);
   mailbox.y = GROUND_Y + 4;
@@ -860,7 +861,7 @@ function furnitureView(PIXI, item) {
   const def = furnitureDef(item.classTsid);
   const s = furnitureScale(item.classTsid);
   const box = new PIXI.Container();
-  const spr = PIXI.Sprite.from(def.art.path);
+  const spr = new PIXI.Sprite(textureFromUrl(def.art.path));
   spr.anchor.set(0.5, item.slot === 'ceiling' ? 0 : 1);
   spr.scale.set((item.facingRight ? 1 : -1) * s, s);
   box.addChild(spr);
@@ -877,7 +878,7 @@ function furnitureView(PIXI, item) {
     }
     box.addChildAt(shadow, 0);
     if (item.slot === 'wall') {
-      const silhouette = PIXI.Sprite.from(def.art.path);
+      const silhouette = new PIXI.Sprite(textureFromUrl(def.art.path));
       silhouette.anchor.set(0.5, 1);
       silhouette.scale.copyFrom(spr.scale);
       silhouette.tint = 0x000000;
@@ -888,20 +889,19 @@ function furnitureView(PIXI, item) {
     }
   }
   if (item.display?.classTsid) {
-    const icon = PIXI.Sprite.from(ITEM_CATALOG[item.display.classTsid]?.icon || `assets/sprites/icons/${item.display.classTsid}.png`);
+    const icon = new PIXI.Sprite(textureFromUrl(ITEM_CATALOG[item.display.classTsid]?.icon || `assets/sprites/icons/${item.display.classTsid}.png`));
     icon.anchor.set(0.5);
     icon.width = 34;
     icon.height = 34;
     icon.y = -35;
     box.addChild(icon);
-    const badge = new PIXI.Text(String(item.display.count), {
+    const badge = new PIXI.Text({ text: String(item.display.count), style: {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 11,
       fontWeight: '700',
       fill: 0xffffff,
-      stroke: 0x3b2a1f,
-      strokeThickness: 3,
-    });
+      stroke: { color: 0x3b2a1f, width: 3 },
+    } });
     badge.anchor.set(1, 1);
     badge.x = 28;
     badge.y = -6;
@@ -998,7 +998,7 @@ function spawnCultivations(engine) {
     const def = cultivationDef(item.protoClass);
     if (!def.art) continue;
     const art = POD_ART[def.art];
-    const spr = PIXI.Sprite.from(`assets/sprites/cultivation/${def.art}.png`);
+    const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.png`));
     spr.anchor.set(0.5, 1);
     spr.x = cultivationWorldX(item);
     spr.y = GROUND_Y + 6;
@@ -1652,7 +1652,7 @@ function makeGhost(engine) {
   g.zIndex = 95;
   if (placing.kind === 'furniture') {
     const def = furnitureDef(placing.classTsid);
-    const spr = PIXI.Sprite.from(def.art.path);
+    const spr = new PIXI.Sprite(textureFromUrl(def.art.path));
     spr.anchor.set(0.5, def.slot === 'ceiling' ? 0 : 1);
     spr.scale.set(furnitureScale(def.classTsid));
     spr.alpha = 0.72;
@@ -1663,14 +1663,13 @@ function makeGhost(engine) {
     g.addChild(pad);
     g.pad = pad;
     g.half = half;
-    const label = new PIXI.Text(cultivationDef(placing.protoClass).label, {
+    const label = new PIXI.Text({ text: cultivationDef(placing.protoClass).label, style: {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: 13,
       fontWeight: '700',
       fill: 0xffffff,
-      stroke: 0x3b2a1f,
-      strokeThickness: 4,
-    });
+      stroke: { color: 0x3b2a1f, width: 4 },
+    } });
     label.anchor.set(0.5, 1);
     label.y = -18;
     g.addChild(label);

@@ -55,6 +55,7 @@ import {
   starterResourceTools,
   tickResourceNode,
 } from '../resource-nodes.js';
+import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
 export const RESOURCE_GROUP_PREFIX = 'resource:';
@@ -490,10 +491,10 @@ function ensureSheet(engine, def) {
   if (!sheetLoads.has(def.path)) {
     sheetLoads.set(
       def.path,
-      engine.PIXI.Assets.load(hiresSpriteUrl(def.path) || def.path)
+      loadTexture(hiresSpriteUrl(def.path) || def.path, { raw: true })
         .then((texture) => {
-          const base = texture.baseTexture;
-          const entry = { base, bounds: scanBounds(base.resource?.source, def) };
+          const base = texture.source;
+          const entry = { base, bounds: scanBounds(base.resource, def) };
           sheets.set(def.path, entry);
           return entry;
         })
@@ -509,7 +510,7 @@ function frameTexture(engine, def, index) {
   const rect = sheetFrameRect(def, index);
   const key = `${def.path}#${rect.index}`;
   if (!frameTextures.has(key)) {
-    frameTextures.set(key, new engine.PIXI.Texture(sheet.base, new engine.PIXI.Rectangle(rect.x, rect.y, rect.w, rect.h)));
+    frameTextures.set(key, sheetFrameTexture(sheet.base, new engine.PIXI.Rectangle(rect.x, rect.y, rect.w, rect.h)));
   }
   return frameTextures.get(key);
 }
@@ -530,9 +531,8 @@ function sheetFrames(engine, def) {
 function ensureSvgTextures(engine) {
   if (svgTextures) return Promise.resolve(svgTextures);
   if (!svgLoad) {
-    const { PIXI } = engine;
-    const load = (svg) => PIXI.Assets.load({ src: svgDataUrl(svg), data: { resourceOptions: { scale: SVG_SCALE } } })
-      .catch(() => PIXI.Texture.from(svgDataUrl(svg), { resourceOptions: { scale: SVG_SCALE } }));
+    const load = (svg) => loadTexture(svgDataUrl(svg), { scale: SVG_SCALE })
+      .catch(() => textureFromUrl(svgDataUrl(svg), { scale: SVG_SCALE }));
     svgLoad = Promise.all([
       load(slothTreeSvg()),
       load(slothHiddenSvg()),
@@ -630,7 +630,7 @@ function buildFireflyView(engine, entity) {
   root._worldHitH = 64;
   const glow = new PIXI.Sprite(svgTextures?.glow || PIXI.Texture.EMPTY);
   glow.anchor.set(0.5);
-  glow.blendMode = PIXI.BLEND_MODES.ADD;
+  glow.blendMode = 'add';
   glow.scale.set(0.5);
   const fly = new PIXI.AnimatedSprite(frames);
   fly.anchor.set(0.5);
@@ -908,7 +908,7 @@ function flyToPlayer(engine, from, delayMs) {
   const { PIXI } = engine;
   const dot = new PIXI.Sprite(svgTextures.glow);
   dot.anchor.set(0.5);
-  dot.blendMode = PIXI.BLEND_MODES.ADD;
+  dot.blendMode = 'add';
   dot.scale.set(0.45);
   dot.x = from.x;
   dot.y = from.y;
@@ -950,7 +950,7 @@ function showJar(engine, flies, state = 'closing') {
 
 function spitSnail(engine, entity) {
   const { PIXI } = engine;
-  const snail = PIXI.Sprite.from('assets/sprites/icons/snail.png');
+  const snail = new PIXI.Sprite(textureFromUrl('assets/sprites/icons/snail.png'));
   snail.anchor.set(0.5);
   snail.scale.set(0.6);
   const from = {

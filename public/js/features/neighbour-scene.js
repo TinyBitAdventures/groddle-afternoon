@@ -8,6 +8,7 @@
  */
 
 import { NEIGHBOUR_SCENE, hash01, neighbourLayout } from '../neighbours.js?v=neighbours-1';
+import { textureFromUrl } from '../textures.js';
 
 const DECO = 'assets/decos/groddle/';
 const VIEW_W = 960;
@@ -135,7 +136,7 @@ function size(name) {
 
 function decoSprite(PIXI, name, scale, x, y, flip = false) {
   const [w, h] = size(name);
-  const spr = PIXI.Sprite.from(`${DECO}${name}.png`);
+  const spr = new PIXI.Sprite(textureFromUrl(`${DECO}${name}.png`));
   spr.anchor.set(0.5, 1);
   spr.width = w * scale;
   spr.height = h * scale;
@@ -237,7 +238,7 @@ export function buildNeighbourBackground(PIXI, neighbour) {
   const [sw, sh] = size(style.soil);
   const soilW = sw * 0.6;
   for (let x = -40; x < width + soilW; x += soilW - 2) {
-    const soil = PIXI.Sprite.from(`${DECO}${style.soil}.png`);
+    const soil = new PIXI.Sprite(textureFromUrl(`${DECO}${style.soil}.png`));
     soil.anchor.set(0, 0);
     soil.width = soilW;
     soil.height = Math.min(150, sh * 0.6);
@@ -263,7 +264,7 @@ export function buildNeighbourBackground(PIXI, neighbour) {
   root.addChild(near);
 
   const h = neighbour.house;
-  const house = PIXI.Sprite.from(`${DECO}${h.path}.png`);
+  const house = new PIXI.Sprite(textureFromUrl(`${DECO}${h.path}.png`));
   house.anchor.set(0.5, 1);
   house.width = h.w * h.scale;
   house.height = h.h * h.scale;

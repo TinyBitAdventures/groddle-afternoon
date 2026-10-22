@@ -27,6 +27,8 @@
  * `leave` and turns the quest in with the source completion text.
  */
 
+import { onLoaded } from '../textures.js';
+
 export const QUEST = 'stale_but_necessary';
 /** source: questInstanceLocation(..., 5*60). */
 export const NAP_MS = 5 * 60 * 1000;
@@ -291,7 +293,7 @@ export const room = {
       watcher.play();
     };
     if (ctx.data.bIdle.frames.length) idle();
-    else ctx.data.bIdle.base.once('loaded', () => setTimeout(idle, 0));
+    else onLoaded(ctx.data.bIdle.base, () => setTimeout(idle, 0));
     ctx.add(watcher, 13);
     ctx.data.watcher = watcher;
     const veil = drawVeil(ctx);

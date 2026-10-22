@@ -43,6 +43,7 @@ import {
   rubeTalk,
   streetCanHostRube,
 } from '../rube.js';
+import { frameTexture, sourceFromUrl } from '../textures.js';
 
 export const RUBE_FEATURE_ID = 'rube';
 const SONG = 'assets/audio/ambient/The_Rube_Song_1290596637.mp3';
@@ -105,12 +106,12 @@ function frames(engine, clip) {
   const def = CLIPS[clip];
   if (frameCache.has(clip)) return frameCache.get(clip);
   const { PIXI } = engine;
-  const base = PIXI.BaseTexture.from(ART + def.file);
+  const base = sourceFromUrl(ART + def.file);
   const list = [];
   for (let i = 0; i < def.frames; i += 1) {
     const x = (i % def.cols) * CELL.w;
     const y = Math.floor(i / def.cols) * CELL.h;
-    list.push(new PIXI.Texture(base, new PIXI.Rectangle(x, y, CELL.w, CELL.h)));
+    list.push(frameTexture(base, new PIXI.Rectangle(x, y, CELL.w, CELL.h)));
   }
   frameCache.set(clip, list);
   return list;

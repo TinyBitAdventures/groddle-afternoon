@@ -350,7 +350,7 @@ export const LIGHT_ROOM_FACTS = Object.freeze({ W, H, LOW, JUMP_RISE, JUMP_GAP, 
 
 let coneTexture = null;
 function coneTex(PIXI) {
-  if (coneTexture && !coneTexture.baseTexture?.destroyed) return coneTexture;
+  if (coneTexture && !coneTexture.source?.destroyed) return coneTexture;
   const c = document.createElement('canvas');
   c.width = 256;
   c.height = 320;
@@ -440,8 +440,7 @@ function drawSign(PIXI, kit, s) {
   const t = kit.label(PIXI, s.text, s.x, s.y, {
     size: s.big ? 17 : 14,
     fill: 0xf4f1ea,
-    stroke: 0x1d1b22,
-    strokeThickness: 3,
+    stroke: { color: 0x1d1b22, width: 3 },
     weight: '800',
     wrap: s.big ? 200 : 210,
   });
@@ -462,7 +461,7 @@ function bulbSprite(PIXI, color) {
   const col = LIGHT_COLORS[color];
   const glow = new PIXI.Graphics();
   glow.circle(0, -14, 22).fill({ color: col.hex, alpha: 0.35 });
-  glow.blendMode = PIXI.BLEND_MODES.ADD;
+  glow.blendMode = 'add';
   c.addChild(glow);
   const g = new PIXI.Graphics();
   g.roundRect(-7, -4, 14, 6, 2).fill(0x6b6b72);
@@ -530,7 +529,7 @@ export const room = {
       spr.y = l.y - (l.kind === 'dish' ? 4 : 0);
       spr.width = l.cone[0];
       spr.height = l.cone[1];
-      spr.blendMode = PIXI.BLEND_MODES.ADD;
+      spr.blendMode = 'add';
       spr.alpha = 0;
       spr.visible = false;
       cones.addChild(spr);
@@ -586,7 +585,7 @@ export const room = {
         for (const dx of offs) {
           core.circle(l.x + dx, l.y + 26, 8).fill({ color: 0xffffff, alpha: 0.9 });
         }
-        core.blendMode = PIXI.BLEND_MODES.ADD;
+        core.blendMode = 'add';
         core.visible = false;
         c.addChild(core);
         c.core = core;

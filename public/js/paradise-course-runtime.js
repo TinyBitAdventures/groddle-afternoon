@@ -17,6 +17,7 @@
  */
 
 import { stepParadiseBody, usesParadiseBody } from './paradise-courses.js';
+import { isLoaded, onLoaded, textureFromUrl } from './textures.js';
 
 const DECO_ROOT = 'assets/decos/groddle';
 const decoUrl = (name) => `${DECO_ROOT}/${name}.png`;
@@ -80,7 +81,7 @@ function makeArt(root, course) {
 
 /** Recovered deco sprite sized by width (keeps aspect) or explicit width/height. */
 function deco(art, parent, name, x, y, o = {}) {
-  const texture = PIXI.Assets.get(decoUrl(name)) || PIXI.Texture.from(decoUrl(name));
+  const texture = textureFromUrl(decoUrl(name));
   const sprite = new PIXI.Sprite(texture);
   sprite.anchor.set(o.ax ?? 0.5, o.ay ?? 1);
   sprite.position.set(x, y);
@@ -107,8 +108,8 @@ function deco(art, parent, name, x, y, o = {}) {
     sprite._baseScaleX = sprite.scale.x;
     sprite._baseScaleY = sprite.scale.y;
   };
-  if (texture.baseTexture.valid) applySize();
-  else texture.baseTexture.once('loaded', applySize);
+  if (isLoaded(texture.source)) applySize();
+  else onLoaded(texture.source, applySize);
   parent.addChild(sprite);
   art.decos += 1;
   return sprite;
@@ -116,7 +117,7 @@ function deco(art, parent, name, x, y, o = {}) {
 
 /** Natural height of a deco at a given width (after preload). */
 function decoHeightAt(name, width) {
-  const texture = PIXI.Assets.get(decoUrl(name)) || PIXI.Texture.from(decoUrl(name));
+  const texture = textureFromUrl(decoUrl(name));
   const w0 = Math.max(1, texture.orig?.width || texture.width || 1);
   const h0 = Math.max(1, texture.orig?.height || texture.height || 1);
   return width * (h0 / w0);
@@ -131,21 +132,16 @@ function rect(parent, x, y, w, h, color, alpha = 1, z = -20) {
 }
 
 function textSign(art, parent, x, y, text, { size = 24, color = 0xffffff, stroke = 0x5b5a86, z = -2, align = 'center' } = {}) {
-  const label = new PIXI.Text(text, {
+  const label = new PIXI.Text({ text: text, style: {
     fontFamily: FONT,
     fontSize: size,
     fontWeight: '700',
     fill: color,
     align,
-    stroke,
-    strokeThickness: Math.max(2, Math.round(size / 8)),
+    stroke: { color: stroke, width: Math.max(2, Math.round(size / 8)) },
     lineJoin: 'round',
-    dropShadow: true,
-    dropShadowColor: 0x1d1d34,
-    dropShadowAlpha: 0.35,
-    dropShadowBlur: 4,
-    dropShadowDistance: 1,
-  });
+    dropShadow: { alpha: 0.35, blur: 4, color: 0x1d1d34, distance: 1 },
+  } });
   label.anchor.set(0.5);
   label.position.set(x, y);
   label.zIndex = z;
@@ -157,9 +153,9 @@ function textSign(art, parent, x, y, text, { size = 24, color = 0xffffff, stroke
 /** A plank sign with the word EXIT, like the recorded course exits. */
 function exitPlank(art, parent, x, y, { width = 104, rotation = -0.08, z = -4, tint } = {}) {
   const plank = deco(art, parent, 'firebog_sign_blank_plank', x, y, { width, ay: 0.5, rotation, z, tint });
-  const label = new PIXI.Text('EXIT', {
-    fontFamily: FONT, fontSize: 20, fontWeight: '900', fill: 0xfff4dc, stroke: 0x4a2c16, strokeThickness: 4,
-  });
+  const label = new PIXI.Text({ text: 'EXIT', style: {
+    fontFamily: FONT, fontSize: 20, fontWeight: '900', fill: 0xfff4dc, stroke: { color: 0x4a2c16, width: 4 }, 
+  } });
   label.anchor.set(0.5);
   label.position.set(x, y);
   label.rotation = rotation;
@@ -317,7 +313,7 @@ function paintAbysmalThrill(root, course, fg, art) {
   for (let index = 0; index < 7; index += 1) {
     const ray = deco(art, root, 'bureaucratic_hall_light_ray_1', 300 + index * 150, -60 + (index % 2) * 80, {
       width: 520, height: 1700, ay: 0, alpha: 0.12, tint: 0x9fd4ff, z: -60,
-      rotation: -0.18 + index * 0.06, blend: PIXI.BLEND_MODES.ADD,
+      rotation: -0.18 + index * 0.06, blend: 'add',
     });
     ray._phase = index * 0.9;
     art.rays.push(ray);

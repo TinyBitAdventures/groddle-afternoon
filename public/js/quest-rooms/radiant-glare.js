@@ -527,7 +527,7 @@ export const room = {
     for (const lamp of layout.lamps) {
       const spr = new PIXI.Sprite(coneTex);
       spr.anchor.set(0, 0.5);
-      spr.blendMode = PIXI.BLEND_MODES.ADD;
+      spr.blendMode = 'add';
       const len = W - 30;
       spr.scale.set((lamp.side === 'L' ? 1 : -1) * (len / 512), 1.35);
       spr.x = lamp.side === 'L' ? 26 : W - 26;

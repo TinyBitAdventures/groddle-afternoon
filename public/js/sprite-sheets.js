@@ -1,4 +1,5 @@
-import { upgradeBaseTexture } from './sprite-hires.js';
+import { upgradeSource } from './sprite-hires.js';
+import { frameTexture, loadTexture, whenLoaded } from './textures.js';
 
 /**
  * Grid sprite-sheet slicing for feature modules (foxes, Heli Kitties).
@@ -34,10 +35,10 @@ export function createSheetLoader(PIXI) {
       if (!loads.has(def.path)) {
         loads.set(
           def.path,
-          PIXI.Assets.load(def.path)
+          loadTexture(def.path, { raw: true })
             .then((texture) => {
-              bases.set(def.path, texture.baseTexture);
-              return texture.baseTexture;
+              bases.set(def.path, texture.source);
+              return texture.source;
             })
             .catch(() => null)
         );
@@ -54,13 +55,13 @@ export function createSheetLoader(PIXI) {
       const base = bases.get(def.path);
       if (!base) return [];
       // Features load every sheet on each street; only drawn ones swap to 3x.
-      upgradeBaseTexture(PIXI, base, def.path);
+      upgradeSource(base, def.path, whenLoaded);
       const out = [];
       for (let i = 0; i < def.frames; i += 1) {
         const key = `${def.path}#${i}`;
         if (!textures.has(key)) {
           const r = cellRect(def, i);
-          textures.set(key, new PIXI.Texture(base, new PIXI.Rectangle(r.x, r.y, r.w, r.h)));
+          textures.set(key, frameTexture(base, new PIXI.Rectangle(r.x, r.y, r.w, r.h)));
         }
         out.push(textures.get(key));
       }

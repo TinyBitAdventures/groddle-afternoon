@@ -59,6 +59,7 @@ import {
   isJobBuilt,
 } from '../street-jobs.js?v=jobs-1';
 import { energyMax, moodMax } from '../metabolics.js';
+import { textureFromUrl } from '../textures.js';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
 const BOARD_CLASS = 'street_job_board';
@@ -179,7 +180,7 @@ function groundYAt(engine, x, fromY) {
 function spawnBoard(engine, point) {
   const { PIXI } = engine;
   const spr = new PIXI.Container();
-  const sign = PIXI.Sprite.from(BOARD_ART);
+  const sign = new PIXI.Sprite(textureFromUrl(BOARD_ART));
   sign.anchor.set(0.5, 1);
   spr.addChild(sign);
   const plate = new PIXI.Graphics();
@@ -222,12 +223,11 @@ function drawPlate(engine) {
   g.roundRect(-w / 2 + 5, 4, w - 10, 3, 1.5).fill({ color: 0x5c564a, alpha: 1 });
   g.roundRect(-w / 2 + 5, 4, Math.max(2, (w - 10) * perc), 3, 1.5).fill({ color: 0xf2c14e, alpha: 1 });
   const label = new engine.PIXI.Text(
-    head.status === 'done' || head.status === 'built'
+    { text: head.status === 'done' || head.status === 'built'
       ? 'Complete'
       : head.status === 'delayed' || head.status === 'cooldown'
         ? 'Resting'
-        : `Phase ${Math.min(job.phases.length, head.phase + 1)}/${job.phases.length}`,
-    { fontFamily: 'Arial', fontSize: 10, fontWeight: '700', fill: 0xfff6dc },
+        : `Phase ${Math.min(job.phases.length, head.phase + 1)}/${job.phases.length}`, style: { fontFamily: 'Arial', fontSize: 10, fontWeight: '700', fill: 0xfff6dc } },
   );
   label.anchor.set(0.5, 0.5);
   label.y = -4;
@@ -267,7 +267,7 @@ function drawBarricades(engine) {
       const left = Boolean(i % 2);
       const label = c.label || c.tsid || 'Somewhere';
       const armW = signArmWidth(PIXI, label);
-      const art = PIXI.Sprite.from(BARRICADE_ART);
+      const art = new PIXI.Sprite(textureFromUrl(BARRICADE_ART));
       art.anchor.set(0.5, 0.5);
       art.scale.set(0.085);
       art.alpha = 0.95;
@@ -277,14 +277,13 @@ function drawBarricades(engine) {
       art.y = (-SIGN_POST_H + i * 28 + 32) * SIGN_SCALE;
       wrap.addChild(art);
     });
-    const tag = new PIXI.Text(closed.length === 1 ? `${closed[0].label}: under construction` : `${closed.length} roads under construction`, {
+    const tag = new PIXI.Text({ text: closed.length === 1 ? `${closed[0].label}: under construction` : `${closed.length} roads under construction`, style: {
       fontFamily: 'Arial',
       fontSize: 11,
       fontWeight: '700',
       fill: 0xfff6dc,
-      stroke: 0x3b2f22,
-      strokeThickness: 3,
-    });
+      stroke: { color: 0x3b2f22, width: 3 },
+    } });
     tag.anchor.set(0.5, 0);
     tag.y = (-SIGN_POST_H + Math.min(shown.length, 4) * 28 + 40) * SIGN_SCALE;
     // The planks say it from afar; the words only show close up, in front
@@ -315,7 +314,7 @@ function drawFlora(engine) {
   const art = kinds.flatMap((k) => FLORA_ART[k] || []);
   const points = engine.placement('street-job-flora');
   points.forEach((p, i) => {
-    const spr = engine.PIXI.Sprite.from(`assets/decos/groddle/${art[i % art.length]}.png`);
+    const spr = new engine.PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${art[i % art.length]}.png`));
     spr.anchor.set(0.5, 1);
     spr.scale.set(0.55);
     spr.x = p.x;
@@ -548,7 +547,7 @@ function startWork(engine, jobId, rid, maxUnits = Infinity) {
     return false;
   }
   const { PIXI } = engine;
-  const icon = PIXI.Sprite.from(itemIcon(check.tool));
+  const icon = new PIXI.Sprite(textureFromUrl(itemIcon(check.tool)));
   icon.anchor.set(0.5, 1);
   icon.scale.set(0.8);
   icon.zIndex = 40;

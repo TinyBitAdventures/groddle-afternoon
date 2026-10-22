@@ -85,6 +85,7 @@ import {
   towerSpotsFor,
   workCheck,
 } from '../home-tower.js?v=home-tower-1';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const HOME_TOWER_FEATURE_ID = 'home-tower';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -197,7 +198,7 @@ function publish(engine, force = false) {
 function chassisContainer(PIXI, style, extra) {
   const box = new PIXI.Container();
   for (const op of composeTower(style, extra)) {
-    const spr = PIXI.Sprite.from(`${TOWER_ART_DIR}${op.file}`);
+    const spr = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}${op.file}`));
     spr.anchor.set(op.anchorX, op.anchorY);
     // Articles are rasterised at 2x.
     spr.scale.set(op.scaleX * 0.5, op.scaleY * 0.5);
@@ -211,14 +212,13 @@ function chassisContainer(PIXI, style, extra) {
 function nameSign(PIXI, name) {
   // getExtraConfig sign_sd: the user name, upper case, on the scaffolding sign.
   const sign = new PIXI.Container();
-  const text = new PIXI.Text(name.toUpperCase(), {
+  const text = new PIXI.Text({ text: name.toUpperCase(), style: {
     fontFamily: 'Trebuchet MS, sans-serif',
     fontSize: 15,
     fontWeight: '700',
     fill: 0xfff4d6,
-    stroke: 0x3b2a1f,
-    strokeThickness: 3,
-  });
+    stroke: { color: 0x3b2a1f, width: 3 },
+  } });
   text.anchor.set(0.5);
   const w = Math.max(90, text.width + 26);
   const g = new PIXI.Graphics();
@@ -230,20 +230,20 @@ function nameSign(PIXI, name) {
 }
 
 function protoSprite(PIXI, state) {
-  const spr = PIXI.Sprite.from(`${TOWER_ART_DIR}${PROTO_ART[state]}`);
+  const spr = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}${PROTO_ART[state]}`));
   spr.anchor.set(0.5, PROTO_ART.footY);
   spr.scale.set(0.5);
   return spr;
 }
 
 function rockFrames(PIXI) {
-  const base = PIXI.BaseTexture.from(ROCK_SHEET.file);
+  const base = sourceFromUrl(ROCK_SHEET.file);
   const frames = [];
   const make = () => {
     const fw = base.width / ROCK_SHEET.cols;
     const fh = base.height / ROCK_SHEET.rows;
     for (let i = 0; i < ROCK_SHEET.count; i += 1) {
-      frames.push(new PIXI.Texture(base, new PIXI.Rectangle((i % ROCK_SHEET.cols) * fw, Math.floor(i / ROCK_SHEET.cols) * fh, fw, fh)));
+      frames.push(frameTexture(base, new PIXI.Rectangle((i % ROCK_SHEET.cols) * fw, Math.floor(i / ROCK_SHEET.cols) * fh, fw, fh)));
     }
   };
   return { base, frames, make };
@@ -261,8 +261,8 @@ function spawnRock(engine, x, groundY) {
     anim.textures = sheet.frames;
     anim.play();
   };
-  if (sheet.base.valid) apply();
-  else sheet.base.once('loaded', apply);
+  if (isLoaded(sheet.base)) apply();
+  else onLoaded(sheet.base, apply);
   const box = new PIXI.Container();
   box.addChild(anim);
   box.x = x;
@@ -353,16 +353,16 @@ function spawnFloor(engine, { width, groundY, doorX }) {
   const floor = tower.floor;
   const targets = {};
   // Elevator (signpost_asset_elevator_tower is lost; the CoU apartment elevator stands in).
-  const lift = PIXI.Sprite.from(`${TOWER_ART_DIR}elevator.png`);
+  const lift = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}elevator.png`));
   lift.anchor.set(0.5, 1);
   lift.scale.set(0.5);
   lift.x = TOWER_GEO.elevatorX - 20;
   lift.y = groundY + 2;
   lift.zIndex = 5;
   engine.entityLayer.addChild(lift);
-  const plate = new PIXI.Text(`${TOWER_GEO.elevatorLabel} · ${floor + 1}`, {
-    fontFamily: 'Trebuchet MS, sans-serif', fontSize: 13, fontWeight: '700', fill: 0xfff4d6, stroke: 0x3b2a1f, strokeThickness: 3,
-  });
+  const plate = new PIXI.Text({ text: `${TOWER_GEO.elevatorLabel} · ${floor + 1}`, style: {
+    fontFamily: 'Trebuchet MS, sans-serif', fontSize: 13, fontWeight: '700', fill: 0xfff4d6, stroke: { color: 0x3b2a1f, width: 3 }, 
+  } });
   plate.anchor.set(0, 1);
   plate.x = lift.x + 104;
   plate.y = groundY - 150;
@@ -377,7 +377,7 @@ function spawnFloor(engine, { width, groundY, doorX }) {
     state: { floor },
   });
   if (floor === 0) {
-    const door = PIXI.Sprite.from('assets/decos/groddle/door_asset_apartment_room_interior.png');
+    const door = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/door_asset_apartment_room_interior.png'));
     door.anchor.set(0.5, 1);
     door.scale.set(0.45);
     door.x = doorX;
@@ -394,7 +394,7 @@ function spawnFloor(engine, { width, groundY, doorX }) {
     });
   }
   if (isConstructionFloor(floor)) {
-    const bench = PIXI.Sprite.from(`${TOWER_ART_DIR}tower_expander.png`);
+    const bench = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}tower_expander.png`));
     bench.anchor.set(0.5, 1);
     bench.scale.set(1.25);
     bench.x = TOWER_GEO.workbenchX + 60;
@@ -470,7 +470,7 @@ function startWork(engine, rid) {
     return false;
   }
   const { PIXI } = engine;
-  const icon = PIXI.Sprite.from(itemIcon(check.tool));
+  const icon = new PIXI.Sprite(textureFromUrl(itemIcon(check.tool)));
   icon.anchor.set(0.5, 1);
   icon.scale.set(0.8);
   icon.zIndex = 40;

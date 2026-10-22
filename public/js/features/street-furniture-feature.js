@@ -110,6 +110,7 @@ import {
 } from '../neighbours.js?v=neighbours-1';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-1';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=furniture-1';
+import { textureFromUrl } from '../textures.js';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';
@@ -421,7 +422,7 @@ function streetNotes(engine, count) {
 
 function buildNote(engine, x, y, index, row) {
   const { PIXI } = engine;
-  const spr = PIXI.Sprite.from(NOTE_ART.path);
+  const spr = new PIXI.Sprite(textureFromUrl(NOTE_ART.path));
   spr.anchor.set(0.5, 1);
   spr.x = x;
   spr.y = y + 1;
@@ -503,7 +504,7 @@ function boardPins(engine, index) {
 function buildBoard(engine, x, y, index, opts = {}) {
   const { PIXI } = engine;
   const pins = opts.pins || boardPins(engine, index);
-  const spr = PIXI.Sprite.from(BOARD_ART.path(Math.min(BOARD_CAPACITY, pins.length)));
+  const spr = new PIXI.Sprite(textureFromUrl(BOARD_ART.path(Math.min(BOARD_CAPACITY, pins.length))));
   spr.anchor.set(0.5, 0.99);
   spr.x = x;
   spr.y = y + 2;
@@ -529,7 +530,7 @@ function pinsFor(engine, entity) {
 function setPins(engine, entity, pins) {
   if (entity.pins) entity.pins = pins;
   else slot(engine).boards[entity.index] = pins;
-  entity.sprite.texture = engine.PIXI.Texture.from(BOARD_ART.path(Math.min(BOARD_CAPACITY, pins.length)));
+  entity.sprite.texture = textureFromUrl(BOARD_ART.path(Math.min(BOARD_CAPACITY, pins.length)));
   entity.target.subtitle = `${pins.length} of ${BOARD_CAPACITY} notes pinned`;
   lastAction = `board:${boardArtState(pins.length)}`;
 }
@@ -591,7 +592,7 @@ function addToBoard(engine, entity, { reopen = true } = {}) {
 
 function buildStone(engine, x, y, index, opts = {}) {
   const { PIXI } = engine;
-  const spr = PIXI.Sprite.from(STONE_ART.path);
+  const spr = new PIXI.Sprite(textureFromUrl(STONE_ART.path));
   spr.anchor.set(0.5, 0.99);
   spr.x = x;
   spr.y = y + 3;
@@ -786,7 +787,7 @@ async function goBack(engine) {
 }
 
 function sprite(engine, path, { x, y, w, h, z = 10, anchorY = 1 }) {
-  const spr = engine.PIXI.Sprite.from(path);
+  const spr = new engine.PIXI.Sprite(textureFromUrl(path));
   spr.anchor.set(0.5, anchorY);
   if (w) spr.width = w;
   if (h) spr.height = h;
@@ -806,7 +807,7 @@ function choreArt(engine, neighbour, layout) {
     box.x = layout.choreX;
     box.y = y + 6;
     box.zIndex = 10;
-    const planter = PIXI.Sprite.from(`${DECO}firebog_planter_box_2x3.png`);
+    const planter = new PIXI.Sprite(textureFromUrl(`${DECO}firebog_planter_box_2x3.png`));
     planter.anchor.set(0.5, 1);
     planter.width = 764 * 0.3;
     planter.height = 174 * 0.3;
@@ -848,7 +849,7 @@ function choreArt(engine, neighbour, layout) {
     glow.circle(dx + arm * 0.75, -110, 20).fill({ color: 0xffe6a0, alpha: 0.3 });
     glow.visible = done;
     box.addChild(glow);
-    const lamp = PIXI.Sprite.from(`${DECO}lantern.png`);
+    const lamp = new PIXI.Sprite(textureFromUrl(`${DECO}lantern.png`));
     lamp.anchor.set(0.5, 0);
     lamp.width = 54 * 0.6;
     lamp.height = 110 * 0.6;
@@ -873,7 +874,7 @@ function paintGarden(engine, box, neighbour, done) {
   [-62, 0, 62].forEach((dx, i) => {
     const name = done ? kinds[i] : 'grass_solid';
     const [w, h, s] = sizes[name];
-    const p = PIXI.Sprite.from(`${DECO}${name}.png`);
+    const p = new PIXI.Sprite(textureFromUrl(`${DECO}${name}.png`));
     p.anchor.set(0.5, 1);
     p.width = w * s;
     p.height = h * s * (done ? 1 : 0.8);
@@ -889,7 +890,7 @@ function refreshChoreArt(engine, neighbour) {
   if (!art || art.destroyed) return;
   const done = nb.chores[neighbour.id] === dayKey();
   if (neighbour.chore === 'garden') paintGarden(engine, art, neighbour, done);
-  else if (neighbour.chore === 'gift') art.texture = engine.PIXI.Texture.from(done ? GIFT_ART.open : GIFT_ART.wrapped);
+  else if (neighbour.chore === 'gift') art.texture = textureFromUrl(done ? GIFT_ART.open : GIFT_ART.wrapped);
   else if (neighbour.chore === 'lanterns') {
     for (const glow of art._glows || []) glow.visible = done;
     for (const lamp of art._lamps || []) lamp.tint = done ? 0xffffff : 0x8a8a9a;

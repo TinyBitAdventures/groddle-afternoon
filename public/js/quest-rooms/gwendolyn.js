@@ -58,6 +58,7 @@
 import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
 import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js';
 import { moodMax } from '../metabolics.js';
+import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const ROOM_ID = 'gwendolyn';
 const ART = `assets/sprites/quest-rooms/${ROOM_ID}/`;
@@ -472,7 +473,7 @@ function playActor(actor, state, { loop = true, then = null } = {}) {
     actor.spr.gotoAndPlay(0);
   };
   if (sheet.frames.length) apply();
-  else sheet.base.once('loaded', () => setTimeout(apply, 0));
+  else onLoaded(sheet.base, () => setTimeout(apply, 0));
 }
 
 const SQUID_ANCHOR = [151 / 235, 184 / 251]; // body bottom-centre in the 235 x 251 cell
@@ -542,7 +543,7 @@ function swoonerfly(ctx, offX, offY) {
   const spr = new PIXI.AnimatedSprite(fall.frames.length ? fall.frames : [PIXI.Texture.EMPTY]);
   spr.anchor.set(0.5, 1);
   spr.animationSpeed = 0.5;
-  if (!fall.frames.length) fall.base.once('loaded', () => setTimeout(() => { if (!spr.destroyed) { spr.textures = fall.frames; spr.play(); } }, 0));
+  if (!fall.frames.length) onLoaded(fall.base, () => setTimeout(() => { if (!spr.destroyed) { spr.textures = fall.frames; spr.play(); } }, 0));
   else spr.play();
   const destY = groundAt(ctx, p.x + offX, p.y) + offY * 0.4;
   spr.x = p.x + offX;
@@ -561,7 +562,7 @@ function stepSwoons(ctx, dtMs, now) {
       if (s.spr.y >= s.destY) {
         s.landed = true;
         s.spr.stop();
-        s.spr.texture = ctx.PIXI.Texture.from(`${ART}swoonerfly_rest.png`);
+        s.spr.texture = textureFromUrl(`${ART}swoonerfly_rest.png`);
         s.starsUntil = now + 3000; // the 'rooked' overlay, 3000 ms
         s.stars = ctx.add(new ctx.PIXI.Graphics(), 47);
       }
@@ -662,12 +663,12 @@ async function stepInside(ctx, ms = 2600) {
   const root = ctx.add(new PIXI.Container(), 60);
   const halo = new PIXI.Graphics();
   root.addChild(halo);
-  const base = PIXI.BaseTexture.from(ORB_TOOL_SHEET.url);
+  const base = sourceFromUrl(ORB_TOOL_SHEET.url);
   const frames = [];
   for (let i = 0; i < ORB_TOOL_SHEET.frames; i++) {
     const col = i % ORB_TOOL_SHEET.cols;
     const row = Math.floor(i / ORB_TOOL_SHEET.cols);
-    frames.push(new PIXI.Texture(base, new PIXI.Rectangle(col * ORB_TOOL_SHEET.frameW, row * ORB_TOOL_SHEET.frameH, ORB_TOOL_SHEET.frameW, ORB_TOOL_SHEET.frameH)));
+    frames.push(frameTexture(base, new PIXI.Rectangle(col * ORB_TOOL_SHEET.frameW, row * ORB_TOOL_SHEET.frameH, ORB_TOOL_SHEET.frameW, ORB_TOOL_SHEET.frameH)));
   }
   const orb = new PIXI.AnimatedSprite(frames);
   orb.anchor.set(0.5);
@@ -1272,7 +1273,7 @@ function drawExitArrow(PIXI, kit, x, y) {
   g.moveTo(10, -34).lineTo(64, 0).lineTo(10, 0).closePath().fill({ color: 0xff8bc8, alpha: 0.85 });
   g.moveTo(10, 34).lineTo(64, 0).lineTo(10, 0).closePath().fill({ color: 0x7fe0f2, alpha: 0.85 });
   c.addChild(g);
-  c.addChild(kit.label(PIXI, 'EXIT', -26, 0, { size: 18, fill: 0xffffff, stroke: 0x7a5fc0, strokeThickness: 4, weight: '900' }));
+  c.addChild(kit.label(PIXI, 'EXIT', -26, 0, { size: 18, fill: 0xffffff, stroke: { color: 0x7a5fc0, width: 4 },  weight: '900' }));
   c.x = x;
   c.y = y;
   return c;

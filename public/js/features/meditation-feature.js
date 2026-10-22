@@ -56,6 +56,7 @@ import {
   startMeditation,
 } from '../meditation.js';
 import { moodMax } from '../metabolics.js';
+import { sourceFromUrl } from '../textures.js';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 const TANK = 100;
@@ -123,15 +124,14 @@ function publish(engine, force = false) {
 function orbTextures(engine) {
   if (orbFrames) return orbFrames;
   const { PIXI } = engine;
-  const base = PIXI.BaseTexture.from(ORB_TOOL_SHEET.url);
+  const base = sourceFromUrl(ORB_TOOL_SHEET.url);
   orbFrames = [];
   for (let i = 0; i < ORB_TOOL_SHEET.frames; i += 1) {
     const col = i % ORB_TOOL_SHEET.cols;
     const row = Math.floor(i / ORB_TOOL_SHEET.cols);
     orbFrames.push(
       new PIXI.Texture(
-        base,
-        new PIXI.Rectangle(col * ORB_TOOL_SHEET.frameW, row * ORB_TOOL_SHEET.frameH, ORB_TOOL_SHEET.frameW, ORB_TOOL_SHEET.frameH)
+        { source: base, frame: new PIXI.Rectangle(col * ORB_TOOL_SHEET.frameW, row * ORB_TOOL_SHEET.frameH, ORB_TOOL_SHEET.frameW, ORB_TOOL_SHEET.frameH) }
       )
     );
   }

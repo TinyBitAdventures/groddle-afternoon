@@ -10,6 +10,8 @@
  * rooms keep every required rise <= 100 px and every gap <= 150 px.
  */
 
+import { textureFromUrl } from '../textures.js';
+
 export const JUMP_RISE = 100;
 export const JUMP_GAP = 150;
 export const BODY_H = 70;
@@ -93,8 +95,8 @@ export function makeSwitch(ctx, { id, color, x, y, on = false, label }) {
   plate.roundRect(-27, -64, 54, 62, 12).fill({ color: 0x3b3f45, alpha: 0.35 });
   plate.roundRect(-24, -66, 48, 58, 11).fill(col).stroke({ width: 3, color: 0xffffff, alpha: 0.9 });
   c.addChild(plate);
-  const up = PIXI.Sprite.from(`${SWITCH_ART}wall_switch_lockUp.png`);
-  const down = PIXI.Sprite.from(`${SWITCH_ART}wall_switch_lockDown.png`);
+  const up = new PIXI.Sprite(textureFromUrl(`${SWITCH_ART}wall_switch_lockUp.png`));
+  const down = new PIXI.Sprite(textureFromUrl(`${SWITCH_ART}wall_switch_lockDown.png`));
   for (const s of [up, down]) {
     s.anchor.set(0.5, 0.5);
     s.scale.set(1.15);
@@ -124,7 +126,7 @@ export function makeSwitch(ctx, { id, color, x, y, on = false, label }) {
 
 /** A soft vertical light beam (OGA light_beam 161x382, tinted). */
 export function beamSprite(ctx, x, y, color, height = 300) {
-  const spr = ctx.PIXI.Sprite.from(`${SWITCH_ART}light_beam.png`);
+  const spr = new ctx.PIXI.Sprite(textureFromUrl(`${SWITCH_ART}light_beam.png`));
   spr.anchor.set(0.5, 1);
   spr.x = x;
   spr.y = y;

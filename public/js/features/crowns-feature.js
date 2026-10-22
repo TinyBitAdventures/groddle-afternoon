@@ -51,6 +51,7 @@ import {
 import { RACE_RIVALS } from '../races.js?v=races-1';
 import { wallsScreen } from '../street-model.js';
 import { addItem } from '../inventory.js?v=catalog-unified-3';
+import { textureFromUrl } from '../textures.js';
 
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';
@@ -220,7 +221,7 @@ function setupArena(street, engine) {
       sprite.zIndex = 46;
       sprite.eventMode = 'none';
       engine.entityLayer.addChild(sprite);
-      label = new PIXI.Text(r.name, { fontFamily: 'Arial', fontSize: 13, fontWeight: '700', fill: 0xffffff, stroke: 0x2a1d14, strokeThickness: 3 });
+      label = new PIXI.Text({ text: r.name, style: { fontFamily: 'Arial', fontSize: 13, fontWeight: '700', fill: 0xffffff, stroke: { color: 0x2a1d14, width: 3 } } });
       label.anchor.set(0.5, 1);
       label.zIndex = 47;
       engine.entityLayer.addChild(label);
@@ -229,7 +230,7 @@ function setupArena(street, engine) {
     placeActor(actors[r.name]);
   });
   lockSprites = game.locks.map((lock) => {
-    const sprite = PIXI.Sprite.from(`${CROWN_DIR}crown_game_lock.png`);
+    const sprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}crown_game_lock.png`));
     sprite.anchor.set(0.5, 1);
     sprite.scale.set(1.2);
     sprite.x = lock.x;
@@ -238,7 +239,7 @@ function setupArena(street, engine) {
     engine.entityLayer.addChild(sprite);
     return sprite;
   });
-  crownSprite = PIXI.Sprite.from(`${CROWN_DIR}game_crown_unlocked.png`);
+  crownSprite = new PIXI.Sprite(textureFromUrl(`${CROWN_DIR}game_crown_unlocked.png`));
   crownSprite.anchor.set(0.5, 1);
   crownSprite.scale.set(0.8);
   crownSprite.zIndex = 60;
@@ -470,7 +471,7 @@ function tick(dtMs, now, engine) {
     const locked = crownsLocked(game, game.itId, now);
     const tex = `${CROWN_DIR}game_crown_${locked ? 'locked' : 'unlocked'}.png`;
     if (crownSprite._tex !== tex) {
-      crownSprite.texture = engine.PIXI.Texture.from(tex);
+      crownSprite.texture = textureFromUrl(tex);
       crownSprite._tex = tex;
     }
     crownSprite.x = holder.x;

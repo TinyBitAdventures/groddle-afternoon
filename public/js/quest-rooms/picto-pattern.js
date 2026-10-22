@@ -32,6 +32,7 @@
  */
 
 import { pushOutOfSolids, spawnQuoins, takeQuoins, JUMP_RISE, JUMP_GAP } from './puzzle-kit.js?v=pp-1';
+import { textureFromUrl } from '../textures.js';
 
 const ROOM_ID = 'picto_pattern';
 const ART = `assets/sprites/quest-rooms/${ROOM_ID}/`;
@@ -302,7 +303,7 @@ export const room = {
     world.addChild(drawGround(PIXI, W));
     // The title plank, tilted, at the start (footage: "Picto Pattern").
     world.addChild(kit.deco(PIXI, 'firebog_sign_blank_plank', 100, FLOOR - 112, { ay: 0.5, scale: 0.36, rotation: -0.1 }));
-    const title = kit.label(PIXI, 'Picto Pattern', 100, FLOOR - 114, { size: 17, fill: 0xffffff, stroke: 0x5a3a1c, strokeThickness: 4 });
+    const title = kit.label(PIXI, 'Picto Pattern', 100, FLOOR - 114, { size: 17, fill: 0xffffff, stroke: { color: 0x5a3a1c, width: 4 } });
     title.rotation = -0.1;
     world.addChild(title);
 
@@ -363,7 +364,7 @@ export const room = {
     post.roundRect(door.x - 82, island.surf - 92, 8, 92, 3).fill(0x6b4a2b);
     world.addChild(post);
     world.addChild(kit.deco(PIXI, 'firebog_sign_blank_plank', door.x - 78, island.surf - 96, { ay: 0.5, scale: 0.2, rotation: -0.08 }));
-    const exitText = kit.label(PIXI, 'EXIT', door.x - 78, island.surf - 97, { size: 14, fill: 0xffffff, stroke: 0x5a3a1c, strokeThickness: 3 });
+    const exitText = kit.label(PIXI, 'EXIT', door.x - 78, island.surf - 97, { size: 14, fill: 0xffffff, stroke: { color: 0x5a3a1c, width: 3 } });
     exitText.rotation = -0.08;
     world.addChild(exitText);
     return {
@@ -386,8 +387,8 @@ export const room = {
     ctx.data.prevX = layout.spawn.x;
     ctx.data.phase = 'play';
     ctx.data.buttons = [];
-    const outTex = PIXI.Texture.from(`${ART}wall_button_lockOut.png`);
-    const inTex = PIXI.Texture.from(`${ART}wall_button_lockIn.png`);
+    const outTex = textureFromUrl(`${ART}wall_button_lockOut.png`);
+    const inTex = textureFromUrl(`${ART}wall_button_lockIn.png`);
     for (const s of layout.sections) {
       for (const b of s.buttons) ctx.data.buttons.push(makeButton(ctx, { ...b, section: s.i, outTex, inTex }));
       ctx.data.buttons.push(makeButton(ctx, { ...s.reset, section: s.i, reset: true, outTex, inTex }));
@@ -562,7 +563,7 @@ function makeButton(ctx, def) {
   const { PIXI, kit } = ctx;
   const c = new PIXI.Container();
   if (def.reset) {
-    c.addChild(kit.label(PIXI, 'Reset', 0, -46, { size: 12, fill: 0xffffff, stroke: 0x2a2f45, strokeThickness: 3 }));
+    c.addChild(kit.label(PIXI, 'Reset', 0, -46, { size: 12, fill: 0xffffff, stroke: { color: 0x2a2f45, width: 3 } }));
   } else {
     const sign = new PIXI.Container();
     sign.y = -52;

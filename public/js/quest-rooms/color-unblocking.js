@@ -187,7 +187,7 @@ export const room = {
     }
     world.addChild(kit.deco(PIXI, 'door_asset_yellowPurple', layout.door.x, layout.door.y + 4, { scale: 0.62 }));
     world.addChild(kit.deco(PIXI, 'sign_exit_starter_01a', layout.door.x, layout.door.y - 196, { scale: 0.7 }));
-    world.addChild(kit.label(PIXI, 'START', 160, FLOOR - 120, { size: 22, fill: 0xffffff, stroke: 0xb8742f, strokeThickness: 5 }));
+    world.addChild(kit.label(PIXI, 'START', 160, FLOOR - 120, { size: 22, fill: 0xffffff, stroke: { color: 0xb8742f, width: 5 } }));
     return {
       label: 'Color Unblocking',
       width: W,

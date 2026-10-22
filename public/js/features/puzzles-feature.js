@@ -41,6 +41,7 @@ import {
   stepTriggers,
 } from '../puzzle-triggers.js';
 import { moodMax } from '../metabolics.js';
+import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const PUZZLES_FEATURE_ID = 'puzzles';
 const DATA_MS = 250;
@@ -97,12 +98,11 @@ let quoinFrames = null;
 function quoinTexture(engine, type) {
   const { PIXI } = engine;
   if (!quoinFrames) {
-    const base = PIXI.BaseTexture.from(QUOIN_SHEET.url);
+    const base = sourceFromUrl(QUOIN_SHEET.url);
     quoinFrames = {};
     for (const def of Object.values(QUOIN_TYPES)) {
       quoinFrames[def.id] = new PIXI.Texture(
-        base,
-        new PIXI.Rectangle(0, def.row * QUOIN_SHEET.frameHeight, QUOIN_SHEET.frameWidth, QUOIN_SHEET.frameHeight),
+        { source: base, frame: new PIXI.Rectangle(0, def.row * QUOIN_SHEET.frameHeight, QUOIN_SHEET.frameWidth, QUOIN_SHEET.frameHeight) },
       );
     }
   }
@@ -163,7 +163,7 @@ const ART_BASE = 'assets/sprites/puzzles/';
 function spawnArt(engine, def) {
   const { PIXI } = engine;
   for (const a of def.art || []) {
-    const spr = PIXI.Sprite.from(`${ART_BASE}${a.sprite}.png`);
+    const spr = new PIXI.Sprite(textureFromUrl(`${ART_BASE}${a.sprite}.png`));
     spr.anchor.set(0.5, 1);
     spr.x = a.x;
     spr.y = a.y;
@@ -172,12 +172,12 @@ function spawnArt(engine, def) {
       spr.width = a.w;
       spr.height = a.h;
     };
-    if (spr.texture.valid) size();
-    else spr.texture.baseTexture.once('loaded', size);
+    if (isLoaded(spr.texture)) size();
+    else onLoaded(spr.texture.source, size);
     if (a.tint != null) spr.tint = Number(a.tint);
     spr.alpha = a.alpha ?? 0.6;
     spr.zIndex = a.z ?? 5;
-    if (a.blend === 'add') spr.blendMode = PIXI.BLEND_MODES.ADD;
+    if (a.blend === 'add') spr.blendMode = 'add';
     spr.puzzleArt = a;
     engine.entityLayer.addChild(spr);
     run.sprites.push(spr);

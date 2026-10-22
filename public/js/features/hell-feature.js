@@ -42,6 +42,7 @@ import {
   shouldCroak,
   squishGrape,
 } from '../hell.js';
+import { frameTexture, sourceFromUrl } from '../textures.js';
 
 const GRAPE_SCALE = 0.8;
 const GRAVE_GIANTS = new Set(HELL_SPRITES.graveside.giants);
@@ -61,9 +62,9 @@ function clearPromptTimers() {
 function grapeTexture(engine, variant) {
   const { PIXI } = engine;
   const sheet = HELL_SPRITES.grapesWorld;
-  const base = PIXI.BaseTexture.from(sheet.url);
+  const base = sourceFromUrl(sheet.url);
   const frame = Math.max(0, Math.min(sheet.frames - 1, variant | 0));
-  return new PIXI.Texture(base, new PIXI.Rectangle(frame * sheet.frameW, 0, sheet.frameW, sheet.frameH));
+  return frameTexture(base, new PIXI.Rectangle(frame * sheet.frameW, 0, sheet.frameW, sheet.frameH));
 }
 
 function publish(engine) {
@@ -205,10 +206,10 @@ function spawnGrave(street, engine) {
   const giant = GRAVE_GIANTS.has(marker.giant) ? marker.giant : 'generic';
   const sheet = HELL_SPRITES.graveside;
   const { PIXI } = engine;
-  const base = PIXI.BaseTexture.from(sheet.urlPattern.replace('<giant>', giant));
+  const base = sourceFromUrl(sheet.urlPattern.replace('<giant>', giant));
   const frame = Math.max(0, sheet.states.indexOf(marker.state || 'none'));
   graveSprite = new PIXI.Sprite(
-    new PIXI.Texture(base, new PIXI.Rectangle(frame * sheet.frameW, 0, sheet.frameW, sheet.frameH))
+    frameTexture(base, new PIXI.Rectangle(frame * sheet.frameW, 0, sheet.frameW, sheet.frameH))
   );
   graveSprite.anchor.set(0.5, 1);
   graveSprite.x = marker.x;

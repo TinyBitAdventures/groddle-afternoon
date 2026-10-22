@@ -31,6 +31,8 @@
  * the reference recording (j9xJLETQzi4) shows quoins there.
  */
 
+import { onLoaded } from '../textures.js';
+
 export const STREET = 'GIFM4BD43383DKV';
 const BOUNDS = { l: -2000, t: -1000 };
 const sx = (x) => x - BOUNDS.l;
@@ -100,7 +102,7 @@ function useBot(ctx, sheet) {
     bot.play();
   };
   if (sheet.frames.length) set();
-  else sheet.base.once('loaded', () => setTimeout(set, 0));
+  else onLoaded(sheet.base, () => setTimeout(set, 0));
 }
 
 /** onPlayerCollision -> talk_to -> offerQuests: turn in what is ready, offer part 2. */
@@ -162,7 +164,7 @@ function addResetButton(ctx, panel) {
     btn.gotoAndStop(0);
   };
   if (sheet.frames.length) ready();
-  else sheet.base.once('loaded', () => setTimeout(ready, 0));
+  else onLoaded(sheet.base, () => setTimeout(ready, 0));
   c.addChild(btn);
   c.addChild(kit.label(PIXI, 'Reset', 0, -58, { size: 11, fill: 0x45413b, weight: '900' }));
   c.x = sx(panel.reset);

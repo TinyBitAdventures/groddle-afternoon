@@ -86,6 +86,7 @@ import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '
 import { getQuestCatalog } from '../content-catalogs.js';
 import { locationEventsApi } from './location-events-feature.js?v=location-events-1';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 const ART = 'assets/sprites/newxp/';
@@ -623,7 +624,7 @@ function makeNpc(engine, kind, x, y, extra = {}) {
         anim.play();
       };
       if (sheet.ready()) apply();
-      else sheet.base.once('loaded', () => setTimeout(apply, 0));
+      else onLoaded(sheet.base, () => setTimeout(apply, 0));
     },
     face(dir) {
       anim.scale.x = Math.abs(anim.scale.x) * (dir < 0 ? -1 : 1);
@@ -669,10 +670,10 @@ function stepNpcs(dtMs) {
 let quoinFrames = null;
 function quoinTexture(PIXI, type = 'xp') {
   if (!quoinFrames) {
-    const base = PIXI.BaseTexture.from(QUOIN_SHEET.url);
+    const base = sourceFromUrl(QUOIN_SHEET.url);
     quoinFrames = {};
     for (const def of Object.values(QUOIN_TYPES)) {
-      quoinFrames[def.id] = new PIXI.Texture(base, new PIXI.Rectangle(0, def.row * QUOIN_SHEET.frameHeight, QUOIN_SHEET.frameWidth, QUOIN_SHEET.frameHeight));
+      quoinFrames[def.id] = frameTexture(base, new PIXI.Rectangle(0, def.row * QUOIN_SHEET.frameHeight, QUOIN_SHEET.frameWidth, QUOIN_SHEET.frameHeight));
     }
   }
   return quoinFrames[type] || quoinFrames.xp;
@@ -722,7 +723,7 @@ function takeQuoin(engine, q) {
 function addPickup(engine, id, classTsid, count, x, y, onPick) {
   const { PIXI } = engine;
   const box = new PIXI.Container();
-  const spr = PIXI.Sprite.from(`assets/sprites/icons/${classTsid}.png`);
+  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${classTsid}.png`));
   spr.anchor.set(0.5, 1);
   spr.scale.set(0.8);
   box.addChild(spr);
@@ -806,8 +807,8 @@ function starVoid(PIXI, root, width, height, floorY) {
       const s = kit.deco(PIXI, 'star_asset_01', x + h * 40, floorY + 6 + row * 22 + h * 10, { ay: 0.5, tint: 0xf0d27a, alpha: 0.75 + h * 0.25 });
       const size = 14 + h * 16 + row * 4;
       const fit = () => { s.width = size; s.height = size; };
-      if (s.texture.valid) fit();
-      else s.texture.baseTexture.once('loaded', fit);
+      if (isLoaded(s.texture)) fit();
+      else onLoaded(s.texture.source, fit);
       root.addChild(s);
     }
   }
@@ -855,7 +856,7 @@ function buildClouds(engine) {
   }
   const world = root.layer(1, 2);
   const beats = L.beats.map((b) => {
-    const text = kit.label(PIXI, b.text, b.x, b.y, { size: b.text.length < 12 ? 64 : 34, fill: 0xffffff, wrap: 560, stroke: 0x6fa7c9, strokeThickness: 2 });
+    const text = kit.label(PIXI, b.text, b.x, b.y, { size: b.text.length < 12 ? 64 : 34, fill: 0xffffff, wrap: 560, stroke: { color: 0x6fa7c9, width: 2 } });
     text.alpha = 0;
     world.addChild(text);
     return text;
@@ -1030,7 +1031,7 @@ async function runTraining1(t) {
   // door_flamingo: the flamingo heads up to the door; the sloth waits in the tree
   setStep('climb');
   fl.moveTo(L.doorway.x, L.doorway.y, 400, 'fly').then(() => fl.setMode(null));
-  const sloth = engine.PIXI.Sprite.from(`${ART}sloth.png`);
+  const sloth = new engine.PIXI.Sprite(textureFromUrl(`${ART}sloth.png`));
   sloth.anchor.set(0.35, 0.1);
   sloth.x = L.sloth.x;
   sloth.y = L.sloth.y;
@@ -1151,7 +1152,7 @@ function buildTraining2(engine) {
     walls[b.id] = w;
   }
   // Egg Plant (trant_egg) on its ledge.
-  const egg = PIXI.Sprite.from('assets/sprites/trants/frames/trant_egg_m10.png');
+  const egg = new PIXI.Sprite(textureFromUrl('assets/sprites/trants/frames/trant_egg_m10.png'));
   egg.anchor.set(0.5, 1);
   egg.x = L.eggPlant.x;
   egg.y = L.eggPlant.y + 8;

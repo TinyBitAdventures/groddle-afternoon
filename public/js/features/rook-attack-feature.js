@@ -83,6 +83,7 @@ import {
   strikeDamageFor,
   useBalmPoint,
 } from '../rook-attack.js';
+import { verticalTextGradient } from '../text-gradient.js';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
@@ -469,11 +470,7 @@ function textStyle(size, extra = {}) {
     fontWeight: '900',
     fill: 0xffffff,
     align: 'center',
-    dropShadow: true,
-    dropShadowColor: 0x000000,
-    dropShadowAlpha: 0.45,
-    dropShadowBlur: 3,
-    dropShadowDistance: 2,
+    dropShadow: { alpha: 0.45, blur: 3, color: 0x000000, distance: 2 },
     lineJoin: 'round',
     ...extra,
   };
@@ -496,21 +493,21 @@ function buildHud(engine) {
   headMask.circle(0, 0, 34).fill(0xffffff);
   head.mask = headMask;
   head.animationSpeed = pixiSpeed(24);
-  const clock = new PIXI.Text('', textStyle(15, { fill: 0xfff3e0 }));
+  const clock = new PIXI.Text({ text: '', style: textStyle(15, { fill: 0xfff3e0 }) });
   clock.anchor.set(0.5, 0);
   clock.y = 44;
-  const phase = new PIXI.Text('', textStyle(11, { fill: 0xffe7a8, fontWeight: '800', letterSpacing: 1 }));
+  const phase = new PIXI.Text({ text: '', style: textStyle(11, { fill: 0xffe7a8, fontWeight: '800', letterSpacing: 1 }) });
   phase.anchor.set(0.5, 1);
   phase.y = -46;
-  const stamp = new PIXI.Text('STUN!', textStyle(24, { fill: 0xffffff, stroke: 0x2a1438, strokeThickness: 5 }));
+  const stamp = new PIXI.Text({ text: 'STUN!', style: textStyle(24, { fill: 0xffffff, stroke: { color: 0x2a1438, width: 5 } }) });
   stamp.anchor.set(0.5);
   stamp.alpha = 0;
-  const armor = new PIXI.Text('', textStyle(11, { fill: 0xbaf7d0, fontWeight: '800' }));
+  const armor = new PIXI.Text({ text: '', style: textStyle(11, { fill: 0xbaf7d0, fontWeight: '800' }) });
   armor.anchor.set(0, 0.5);
   armor.x = 46;
   armor.y = -20;
   const feedBox = new PIXI.Graphics();
-  const feed = new PIXI.Text('', {
+  const feed = new PIXI.Text({ text: '', style: {
     fontFamily: 'Trebuchet MS, Verdana, sans-serif',
     fontSize: 12,
     fill: 0x4a4a52,
@@ -518,7 +515,7 @@ function buildHud(engine) {
     wordWrap: true,
     wordWrapWidth: 270,
     lineHeight: 16,
-  });
+  } });
   feed.anchor.set(0.5, 0);
   feed.y = 70;
   badge.addChild(disc, headMask, arc, stars, head, phase, clock, stamp, armor, feedBox, feed);
@@ -633,13 +630,13 @@ function updateOverlays(engine) {
   if (!cur.startedAt) {
     cur.startedAt = t;
     ui.textLayer.removeChildren().forEach((c) => c.destroy());
-    const big = new PIXI.Text(cur.txt, textStyle(46, { wordWrap: true, wordWrapWidth: 880 }));
+    const big = new PIXI.Text({ text: cur.txt, style: textStyle(46, { wordWrap: true, wordWrapWidth: 880 }) });
     big.anchor.set(0.5);
     big.x = VIEW_W / 2;
     big.y = VIEW_H * 0.43;
     ui.textLayer.addChild(big);
     if (cur.sub) {
-      const sub = new PIXI.Text(cur.sub, textStyle(21, { fontWeight: '800', wordWrap: true, wordWrapWidth: 560 }));
+      const sub = new PIXI.Text({ text: cur.sub, style: textStyle(21, { fontWeight: '800', wordWrap: true, wordWrapWidth: 560 }) });
       sub.anchor.set(0.5, 0);
       sub.x = VIEW_W / 2;
       sub.y = VIEW_H * 0.53;
@@ -875,7 +872,7 @@ function spawnRainbow(engine, x, y, word, scale = 1) {
   colors.forEach((col, i) => {
     g.arc(0, 0, (84 - i * 8) * scale, Math.PI, 0).stroke({ width: 7 * scale, color: col, alpha: 0.9 });
   });
-  const label = new PIXI.Text(word, textStyle(20 * scale, { fill: [0xffe14a, 0xff7a3d], fillGradientStops: [0, 1] }));
+  const label = new PIXI.Text({ text: word, style: textStyle(20 * scale, { fill: verticalTextGradient([0xffe14a, 0xff7a3d], [0, 1]) }) });
   label.anchor.set(0.5);
   label.y = -32 * scale;
   c.addChild(g, label);
@@ -1145,7 +1142,7 @@ function startStun(engine, source = 'verb') {
   root.zIndex = 40;
   const glow = new PIXI.Graphics();
   const ring = new PIXI.Graphics();
-  const count = new PIXI.Text('0', textStyle(20, { fill: 0x3a2b52, dropShadow: false }));
+  const count = new PIXI.Text({ text: '0', style: textStyle(20, { fill: 0x3a2b52, dropShadow: false }) });
   count.anchor.set(0.5);
   root.addChild(glow, ring, count);
   root.eventMode = 'static';

@@ -329,11 +329,9 @@ class Session {
     const m = Object.fromEntries(metrics.map((x) => [x.name, x.value]));
     const lt = await this.page.evaluate(() => ({ n: window.__pt?.longTasks.length || 0, ms: Math.round(window.__pt?.longTaskMs || 0), max: Math.max(0, ...(window.__pt?.longTasks || [0])) }));
     const tex = await this.page.evaluate(() => {
-      const u = window.PIXI?.utils;
-      if (!u) return null;
-      const bases = Object.values(u.BaseTextureCache || {});
-      const px = bases.reduce((n, b) => n + (b.valid ? (b.realWidth || 0) * (b.realHeight || 0) : 0), 0);
-      return { textures: Object.keys(u.TextureCache || {}).length, bases: bases.length, mpx: +(px / 1e6).toFixed(1) };
+      const r = window.groddleQA?.renderStats?.();
+      if (!r) return null;
+      return { textures: r.gpuTextures, bases: r.images.loaded, mpx: r.images.mpx, gpuMB: r.gpuTextureMB };
     });
     return { heapMB: +(m.JSHeapUsedSize / 1048576).toFixed(1), nodes: m.Nodes, listeners: m.JSEventListeners, longTasks: lt, tex };
   }

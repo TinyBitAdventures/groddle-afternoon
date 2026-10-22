@@ -56,6 +56,7 @@ import {
   completePapers,
   completePapersCheck,
 } from '../bureaucracy.js';
+import { frameTexture, sourceFromUrl } from '../textures.js';
 
 export const SUPPLY_FEATURE_ID = 'supply';
 export const CLERK_CLASS = 'npc_bureaucrat';
@@ -84,8 +85,8 @@ function achievements(engine) {
 
 function spawnClerk(engine, point) {
   const { PIXI } = engine;
-  const base = PIXI.BaseTexture.from(CLERK_ART);
-  const spr = new PIXI.Sprite(new PIXI.Texture(base, new PIXI.Rectangle(0, 0, CLERK_FRAME.w, CLERK_FRAME.h)));
+  const base = sourceFromUrl(CLERK_ART);
+  const spr = new PIXI.Sprite(frameTexture(base, new PIXI.Rectangle(0, 0, CLERK_FRAME.w, CLERK_FRAME.h)));
   spr.anchor.set(0.5, 1);
   spr.x = point.x;
   spr.y = point.y + 2;

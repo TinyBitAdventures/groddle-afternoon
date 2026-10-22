@@ -234,17 +234,13 @@ const RED = 0xc3161d;
 const RED_DARK = 0x86101a;
 
 function wordText(PIXI, text, opts = {}) {
-  const t = new PIXI.Text(text, {
+  const t = new PIXI.Text({ text: text, style: {
     fontFamily: 'Nunito, "Trebuchet MS", sans-serif',
     fontSize: opts.size || WORD_SIZE,
     fontWeight: opts.weight || '900',
     fill: opts.fill ?? 0xffffff,
-    dropShadow: true,
-    dropShadowColor: 0x4a1a10,
-    dropShadowAlpha: 0.55,
-    dropShadowBlur: 4,
-    dropShadowDistance: 2,
-  });
+    dropShadow: { alpha: 0.55, blur: 4, color: 0x4a1a10, distance: 2 },
+  } });
   t.anchor.set(0.5, opts.ay ?? 0.5);
   return t;
 }

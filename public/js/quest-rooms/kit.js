@@ -9,6 +9,8 @@
  * here as clean vectors.
  */
 
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+
 export const DECO_DIR = 'assets/decos/groddle/';
 export const ICON_DIR = 'assets/sprites/icons/';
 export const ROOM_ART_DIR = 'assets/sprites/quest-rooms/';
@@ -61,7 +63,7 @@ export function sceneRoot(PIXI, width, height) {
 
 /** A recovered deco, bottom-centre anchored by default. */
 export function deco(PIXI, name, x, y, opts = {}) {
-  const spr = PIXI.Sprite.from(`${opts.dir || DECO_DIR}${name}.png`);
+  const spr = new PIXI.Sprite(textureFromUrl(`${opts.dir || DECO_DIR}${name}.png`));
   spr.anchor.set(opts.ax ?? 0.5, opts.ay ?? 1);
   const s = opts.scale ?? 1;
   spr.scale.set(opts.flip ? -s : s, opts.sy ?? s);
@@ -86,7 +88,7 @@ export function roomArt(PIXI, roomId, name, x, y, opts = {}) {
 
 /** Frames cut from a horizontal/grid sheet once it has loaded. */
 export function sheetFrames(PIXI, url, cols, rows, count = cols * rows) {
-  const base = PIXI.BaseTexture.from(url);
+  const base = sourceFromUrl(url);
   const frames = [];
   const cut = () => {
     const fw = Math.floor(base.width / cols);
@@ -95,12 +97,12 @@ export function sheetFrames(PIXI, url, cols, rows, count = cols * rows) {
     for (let i = 0; i < count; i++) {
       const cx = (i % cols) * fw;
       const cy = Math.floor(i / cols) * fh;
-      frames.push(new PIXI.Texture(base, new PIXI.Rectangle(cx, cy, fw, fh)));
+      frames.push(frameTexture(base, new PIXI.Rectangle(cx, cy, fw, fh)));
     }
   };
-  if (base.valid) cut();
-  else base.once('loaded', cut);
-  return { base, frames, ready: () => base.valid && frames.length > 0 };
+  if (isLoaded(base)) cut();
+  else onLoaded(base, cut);
+  return { base, frames, ready: () => isLoaded(base) && frames.length > 0 };
 }
 
 /** An animated sprite from a sheet (starts on frame 0 once loaded). */
@@ -117,7 +119,7 @@ export function animated(PIXI, url, cols, rows, opts = {}) {
     if (opts.play !== false) spr.play();
   };
   if (sheet.frames.length) start();
-  else sheet.base.once('loaded', () => setTimeout(start, 0));
+  else onLoaded(sheet.base, () => setTimeout(start, 0));
   return spr;
 }
 
@@ -217,17 +219,17 @@ export function drawLadder(g, l, opts = {}) {
 
 /** A soft, rounded text label (signs, room names). */
 export function label(PIXI, text, x, y, opts = {}) {
-  const t = new PIXI.Text(text, {
+  const t = new PIXI.Text({ text: text, style: {
     fontFamily: opts.font || 'Nunito, "Trebuchet MS", sans-serif',
     fontSize: opts.size || 18,
     fontWeight: opts.weight || '800',
     fill: opts.fill ?? 0x3d3d3d,
     align: 'center',
-    stroke: opts.stroke ?? 0xffffff,
-    strokeThickness: opts.strokeThickness ?? 0,
+    // { color, width } like a Pixi 8 text stroke; none by default.
+    stroke: opts.stroke ?? null,
     wordWrap: Boolean(opts.wrap),
     wordWrapWidth: opts.wrap || 300,
-  });
+  } });
   t.anchor.set(opts.ax ?? 0.5, opts.ay ?? 0.5);
   t.x = x;
   t.y = y;

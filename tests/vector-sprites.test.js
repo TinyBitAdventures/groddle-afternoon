@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeBaseTexture } from '../public/js/sprite-hires.js';
+import { HIRES_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeSource } from '../public/js/sprite-hires.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -79,54 +79,52 @@ describe('3x vector sprite sheets', () => {
     }
   });
 
-  it('routes Texture.from to the 3x file once on dense screens, passing other sources through', () => {
-    const calls = [];
-    const lowDensity = { Texture: { from: (src) => src } };
-    const lowFrom = lowDensity.Texture.from;
-    installHiresSprites(lowDensity, { dpr: 1, viewWidth: 1200 });
-    assert.equal(lowDensity.Texture.from, lowFrom);
+  it('routes sheet URLs to the 3x file on dense screens, leaving other URLs alone', () => {
+    const routes = new Map();
+    const textures = { addUrlRoute: (name, fn) => routes.set(name, fn) };
+    installHiresSprites(textures, { dpr: 1, viewWidth: 1200 });
+    assert.equal(routes.size, 0);
     assert.equal(hiresSpriteUrl('assets/sprites/npc_piggy__x1_walk_png_1354829432.png'), null);
-    const PIXI = { Texture: { from: (src) => (calls.push(src), src) } };
-    installHiresSprites(PIXI, { dpr: 2, viewWidth: 1280 });
-    installHiresSprites(PIXI, { dpr: 2, viewWidth: 1280 });
+    installHiresSprites(textures, { dpr: 2, viewWidth: 1280 });
+    installHiresSprites(textures, { dpr: 2, viewWidth: 1280 });
+    assert.equal(routes.size, 1);
+    const route = routes.get('hires-sprites');
     const walkUrl = 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png';
-    PIXI.Texture.from(walkUrl);
-    PIXI.Texture.from('assets/sprites/icons/apple.png');
-    const canvas = {};
-    PIXI.Texture.from(canvas);
-    assert.deepEqual(calls, [HIRES_SPRITES.get(walkUrl), 'assets/sprites/icons/apple.png', canvas]);
+    assert.equal(route(walkUrl), HIRES_SPRITES.get(walkUrl));
+    assert.equal(route('assets/sprites/icons/apple.png'), null);
   });
 
-  it('upgrades a loaded 1x BaseTexture in place, once, keeping its logical size', async () => {
+  it('upgrades a loaded 1x TextureSource in place, once, keeping its logical size', async () => {
     const realFetch = globalThis.fetch;
     const realBitmap = globalThis.createImageBitmap;
     const fetched = [];
     globalThis.fetch = async (url) => (fetched.push(url), { ok: true, blob: async () => ({ url }) });
     globalThis.createImageBitmap = async () => ({ width: 2112, height: 558, close() {} });
     try {
-      class ImageBitmapResource {
-        constructor(bitmap) { this.source = bitmap; }
-      }
-      const PIXI = { ImageBitmapResource };
-      const old = { unbound: false, destroyed: false, unbind() { this.unbound = true; }, destroy() { this.destroyed = true; } };
-      const base = {
-        resource: old, resolution: 1, width: 704, height: 186, updates: 0,
-        setResource(r) { this.resource = r; this.width = r.source.width / this.resolution; this.height = r.source.height / this.resolution; },
+      const old = { closed: false, close() { this.closed = true; } };
+      const source = {
+        resource: old, resolution: 1, width: 704, height: 186, pixelWidth: 704, pixelHeight: 186, updates: 0,
+        resize(w, h, res) {
+          Object.assign(this, { width: w, height: h, resolution: res, pixelWidth: w * res, pixelHeight: h * res });
+          return true;
+        },
         update() { this.updates += 1; },
       };
       const url = 'assets/sprites/npc_piggy__x1_walk_png_1354829432.png';
-      const a = upgradeBaseTexture(PIXI, base, url);
-      const b = upgradeBaseTexture(PIXI, base, url);
+      const waited = [];
+      const whenLoaded = (s) => (waited.push(s), Promise.resolve(s));
+      const a = upgradeSource(source, url, whenLoaded);
+      const b = upgradeSource(source, url, whenLoaded);
       assert.equal(a, b);
       assert.equal(await a, true);
+      assert.deepEqual(waited, [source]);
       assert.deepEqual(fetched, [HIRES_SPRITES.get(url)]);
-      assert.equal(base.resolution, 3);
-      assert.deepEqual([base.width, base.height], [704, 186]);
-      assert.ok(base.resource instanceof ImageBitmapResource);
-      assert.equal(base.resource.src, HIRES_SPRITES.get(url));
-      assert.ok(old.unbound && old.destroyed);
-      assert.equal(base.updates, 1);
-      assert.equal(await upgradeBaseTexture(PIXI, { resource: old }, 'assets/sprites/icons/apple.png'), false);
+      assert.equal(source.resolution, 3);
+      assert.deepEqual([source.width, source.height, source.pixelWidth], [704, 186, 2112]);
+      assert.equal(source.resource.width, 2112);
+      assert.equal(source.hiresSrc, HIRES_SPRITES.get(url));
+      assert.ok(old.closed);
+      assert.equal(await upgradeSource({ resource: old }, 'assets/sprites/icons/apple.png'), false);
     } finally {
       globalThis.fetch = realFetch;
       globalThis.createImageBitmap = realBitmap;

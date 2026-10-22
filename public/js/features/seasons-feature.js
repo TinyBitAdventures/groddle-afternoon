@@ -93,6 +93,7 @@ import {
   yetiMailDue,
   yetiQuote,
 } from '../seasons.js';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const SEASONS_FEATURE_ID = 'seasons';
 const LANTERN_GROUP = 'seasons:lantern';
@@ -197,7 +198,7 @@ function grantFavor(engine, giant, amount) {
 }
 
 function tex(engine, url) {
-  if (!textures.has(url)) textures.set(url, engine.PIXI.Texture.from(url));
+  if (!textures.has(url)) textures.set(url, textureFromUrl(url));
   return textures.get(url);
 }
 
@@ -205,12 +206,12 @@ function talkFrames(engine, face) {
   const key = `talk:${face}`;
   if (textures.has(key)) return textures.get(key);
   const [w, h] = TALK_SIZE[face] || TALK_SIZE[1];
-  const base = engine.PIXI.BaseTexture.from(`assets/sprites/seasons/pumpkin_lit_${face}_talk.png`);
+  const base = sourceFromUrl(`assets/sprites/seasons/pumpkin_lit_${face}_talk.png`);
   const frames = [];
   for (let i = 0; i < TALK_FRAMES; i += 1) {
     const x = (i % TALK_COLS) * w;
     const y = Math.floor(i / TALK_COLS) * h;
-    frames.push(new engine.PIXI.Texture(base, new engine.PIXI.Rectangle(x, y, w, h)));
+    frames.push(frameTexture(base, new engine.PIXI.Rectangle(x, y, w, h)));
   }
   textures.set(key, frames);
   return frames;
@@ -432,7 +433,7 @@ function makeGlow(engine, x, y, color = 0xffb347, radius = 46) {
   }
   g.x = x;
   g.y = y;
-  g.blendMode = engine.PIXI.BLEND_MODES.ADD;
+  g.blendMode = 'add';
   g.zIndex = 4;
   engine.entityLayer.addChild(g);
   return g;
@@ -472,7 +473,7 @@ function spawnLantern(engine, pt, index) {
 
 function spawnGhost(engine) {
   const { PIXI } = engine;
-  const spr = PIXI.Sprite.from('assets/decos/groddle/background_ghost_transparent.png');
+  const spr = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/background_ghost_transparent.png'));
   spr.anchor.set(0.5, 1);
   spr.scale.set(0.42);
   spr.alpha = 0.16;
@@ -492,7 +493,7 @@ function spawnCandyCanes(engine) {
   posts.slice(0, 6).forEach((post, i) => {
     const sx = post.x - l + (i % 2 ? 58 : -58);
     const sy = groundAt(engine, sx, post.y - t);
-    const spr = engine.PIXI.Sprite.from('assets/decos/groddle/bling_candycane_1.png');
+    const spr = new engine.PIXI.Sprite(textureFromUrl('assets/decos/groddle/bling_candycane_1.png'));
     spr.anchor.set(0.5, 1);
     spr.scale.set(0.3);
     if (i % 2) spr.scale.x = -0.3;
@@ -547,7 +548,7 @@ function spawnEgg(engine, cls, pt) {
   const { PIXI } = engine;
   const n = EGG_CLASSES.indexOf(cls) + 1;
   const y = groundAt(engine, pt.x, pt.y);
-  const spr = PIXI.Sprite.from(`assets/sprites/seasons/egghunt_egg_${n}_world.png`);
+  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/seasons/egghunt_egg_${n}_world.png`));
   spr.anchor.set(0.5, 1);
   spr.x = pt.x;
   spr.y = y + 2;
@@ -582,7 +583,7 @@ function spawnPlaced(engine, row) {
   const { PIXI } = engine;
   const lit = isLitPumpkin(row.cls);
   const y = groundAt(engine, row.x, row.y);
-  const spr = lit ? new PIXI.AnimatedSprite(talkFrames(engine, faceOf(row.cls))) : PIXI.Sprite.from(`assets/sprites/icons/${row.cls}.png`);
+  const spr = lit ? new PIXI.AnimatedSprite(talkFrames(engine, faceOf(row.cls))) : new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${row.cls}.png`));
   spr.anchor.set(0.5, 1);
   spr.x = row.x;
   spr.y = y + 3;
@@ -688,7 +689,7 @@ function startCarve(engine) {
 
 function showToolOverHead(engine, tool) {
   if (carving?.toolSprite && !carving.toolSprite.destroyed) carving.toolSprite.destroy();
-  const spr = engine.PIXI.Sprite.from(`assets/sprites/icons/${tool}.png`);
+  const spr = new engine.PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${tool}.png`));
   spr.anchor.set(0.5);
   spr.zIndex = 40;
   engine.fxLayer?.addChild(spr);
@@ -873,7 +874,7 @@ function pullCracker(engine) {
   if (countItem(engine.inv, 'glitchmas_cracker') < 1) return true;
   const helper = nearestLover(engine, CRACKER.helpRange);
   cracker = { waitingSince: Date.now(), sprite: null };
-  const spr = engine.PIXI.Sprite.from('assets/sprites/seasons/glitchmas_cracker_world.png');
+  const spr = new engine.PIXI.Sprite(textureFromUrl('assets/sprites/seasons/glitchmas_cracker_world.png'));
   spr.anchor.set(0.5);
   spr.zIndex = 40;
   engine.fxLayer?.addChild(spr);

@@ -40,6 +40,8 @@
  * clue streets are the archived streets with their `juju_dig` boxes.
  */
 
+import { onLoaded } from '../textures.js';
+
 const Q1 = 'help_juju_bandits';
 const Q2 = 'help_juju_bandits_2';
 const ROOM_ID = 'juju_camp';
@@ -355,7 +357,7 @@ function npcView(ctx, urlFor, sheets, opts) {
       else spr.gotoAndPlay(0);
     };
     if (sheet.frames.length) apply();
-    else sheet.base.once('loaded', () => setTimeout(apply, 0));
+    else onLoaded(sheet.base, () => setTimeout(apply, 0));
   };
   return spr;
 }

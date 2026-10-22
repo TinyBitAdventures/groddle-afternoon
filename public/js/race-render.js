@@ -8,6 +8,8 @@
  * updateParallax(camX, camY) for the far layers.
  */
 
+import { textureFromUrl } from './textures.js';
+
 const DECO_DIR = 'assets/decos/groddle/';
 
 /** Loading-screen colours per theme (top, bottom). */
@@ -287,7 +289,7 @@ function drawHill(g, p, ctx) {
 
 function drawIsland(g, p, ctx) {
   const art = p.art || 'cloud_rock_1';
-  const sprite = ctx.PIXI.Sprite.from(`${DECO_DIR}${art}.png`);
+  const sprite = new ctx.PIXI.Sprite(textureFromUrl(`${DECO_DIR}${art}.png`));
   const w = p.x2 - p.x1;
   // cloud_rock_* tops sit ~11% down the sprite; scale the lilac top to the ledge.
   const nominal = { cloud_rock_1: 534, cloud_rock_2: 454, cloud_rock_3: 490, cloud_rock_4: 514 }[art] || 500;
@@ -336,7 +338,7 @@ function drawStoneSlab(g, p) {
 }
 
 function drawColumn(g, p, ctx) {
-  const sprite = ctx.PIXI.Sprite.from(`${DECO_DIR}pillar_1.png`);
+  const sprite = new ctx.PIXI.Sprite(textureFromUrl(`${DECO_DIR}pillar_1.png`));
   const w = p.x2 - p.x1;
   sprite.anchor.set(0.5, 0.012);
   sprite.scale.set((w + 24) / 310);
@@ -467,7 +469,7 @@ function drawRockFace(g, w, ctx) {
 function drawSlimeLadder(g, w, ctx) {
   let i = 0;
   for (let y = w.yBot; y > w.yTop - 10; y -= 58) {
-    const sprite = ctx.PIXI.Sprite.from(`${DECO_DIR}arbito_ladder_tile_center_0${(i % 3) + 1}_stone.png`);
+    const sprite = new ctx.PIXI.Sprite(textureFromUrl(`${DECO_DIR}arbito_ladder_tile_center_0${(i % 3) + 1}_stone.png`));
     sprite.anchor.set(0.5, 1);
     sprite.scale.set(0.6);
     sprite.x = w.x;
@@ -603,7 +605,7 @@ function paintSpace(PIXI, root, course) {
 }
 
 function addParallaxSprite(PIXI, root, name, x, y, opts = {}) {
-  const sprite = PIXI.Sprite.from(`${DECO_DIR}${name}.png`);
+  const sprite = new PIXI.Sprite(textureFromUrl(`${DECO_DIR}${name}.png`));
   sprite.anchor.set(opts.ax ?? 0.5, opts.ay ?? 1);
   sprite.x = x;
   sprite.y = y;
@@ -764,7 +766,7 @@ export function renderRaceCourse(PIXI, course) {
   const back = new PIXI.Container();
   const front = new PIXI.Container();
   for (const deco of course.decor || []) {
-    const sprite = PIXI.Sprite.from(`${DECO_DIR}${deco.name}.png`);
+    const sprite = new PIXI.Sprite(textureFromUrl(`${DECO_DIR}${deco.name}.png`));
     sprite.anchor.set(deco.ax ?? 0.5, deco.ay ?? 1);
     sprite.x = deco.x;
     sprite.y = deco.y;
@@ -861,14 +863,13 @@ export function drawWinnerRainbow(PIXI) {
     g.arc(0, 0, 110 - i * 9, Math.PI * 1.02, Math.PI * 1.98).stroke({ width: 9, color: color, alpha: 0.9 });
   });
   c.addChild(g);
-  const text = new PIXI.Text('Winner', {
+  const text = new PIXI.Text({ text: 'Winner', style: {
     fontFamily: 'Arial',
     fontSize: 26,
     fontWeight: '900',
     fill: 0xffffff,
-    stroke: 0x6b3fa0,
-    strokeThickness: 5,
-  });
+    stroke: { color: 0x6b3fa0, width: 5 },
+  } });
   text.anchor.set(0.5, 1);
   text.y = -112;
   c.addChild(text);

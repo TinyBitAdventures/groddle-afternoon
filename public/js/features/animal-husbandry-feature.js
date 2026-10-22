@@ -83,6 +83,7 @@ import {
   stickPlaceState,
 } from '../animal-husbandry.js';
 import { moodMax } from '../metabolics.js';
+import { textureFromUrl } from '../textures.js';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -192,7 +193,7 @@ function emit(engine, counter, amount = 1) {
 
 function makeSprite(engine, url, { anchorY = 1, scale = 1, z = 20 } = {}) {
   const { PIXI } = engine;
-  const spr = PIXI.Sprite.from(url);
+  const spr = new PIXI.Sprite(textureFromUrl(url));
   spr.anchor.set(0.5, anchorY);
   spr.scale.set(scale);
   spr.zIndex = z;
@@ -206,14 +207,13 @@ function addCountBadge(engine, spr, count) {
     spr._countBadge.text = count > 1 ? String(count) : '';
     return;
   }
-  const t = new PIXI.Text(count > 1 ? String(count) : '', {
+  const t = new PIXI.Text({ text: count > 1 ? String(count) : '', style: {
     fontFamily: 'system-ui, sans-serif',
     fontSize: 11,
     fontWeight: '800',
     fill: 0xffffff,
-    stroke: 0x335b8c,
-    strokeThickness: 3,
-  });
+    stroke: { color: 0x335b8c, width: 3 },
+  } });
   t.anchor.set(0, 1);
   t.x = 6;
   t.y = -4;

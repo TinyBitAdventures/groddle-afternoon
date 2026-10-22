@@ -75,16 +75,16 @@ import { getQuestCatalog } from '../content-catalogs.js';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { runStreetTransition } from '../screen-fx.js';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
+import { sourceFromUrl } from '../textures.js';
 
 let quoinFrames = null;
 function quoinTexture(PIXI, type) {
   if (!quoinFrames) {
-    const base = PIXI.BaseTexture.from(QUOIN_SHEET.url);
+    const base = sourceFromUrl(QUOIN_SHEET.url);
     quoinFrames = {};
     for (const def of Object.values(QUOIN_TYPES)) {
       quoinFrames[def.id] = new PIXI.Texture(
-        base,
-        new PIXI.Rectangle(0, def.row * QUOIN_SHEET.frameHeight, QUOIN_SHEET.frameWidth, QUOIN_SHEET.frameHeight),
+        { source: base, frame: new PIXI.Rectangle(0, def.row * QUOIN_SHEET.frameHeight, QUOIN_SHEET.frameWidth, QUOIN_SHEET.frameHeight) },
       );
     }
   }

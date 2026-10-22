@@ -39,6 +39,7 @@ import {
   sceneTsid,
 } from '../puzzle-scenes.js';
 import { moodMax } from '../metabolics.js';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const PUZZLE_SCENES_FEATURE_ID = 'puzzle-scenes';
 const TICKET = 'paradise_ticket_beam_me_down';
@@ -75,7 +76,7 @@ function skyTexture(PIXI, h, stops) {
 }
 
 function deco(PIXI, name, x, y, { w, h, alpha = 1, tint, ax = 0.5, ay = 1, rotation = 0 } = {}) {
-  const spr = PIXI.Sprite.from(`${DECO}${name}.png`);
+  const spr = new PIXI.Sprite(textureFromUrl(`${DECO}${name}.png`));
   spr.anchor.set(ax, ay);
   spr.x = x;
   spr.y = y;
@@ -86,8 +87,8 @@ function deco(PIXI, name, x, y, { w, h, alpha = 1, tint, ax = 0.5, ay = 1, rotat
     if (w) spr.width = w;
     if (h) spr.height = h;
   };
-  if (spr.texture.valid) size();
-  else spr.texture.baseTexture.once('loaded', size);
+  if (isLoaded(spr.texture)) size();
+  else onLoaded(spr.texture.source, size);
   return spr;
 }
 
@@ -167,7 +168,7 @@ function buildBeamMeDown(engine) {
     g.fill({ color: 0xfff8d8, alpha: 0.12 });
     root.addChild(g);
     beams.push(g);
-    const ufo = PIXI.Sprite.from(`${ART}ufo_1.png`);
+    const ufo = new PIXI.Sprite(textureFromUrl(`${ART}ufo_1.png`));
     ufo.anchor.set(0.5, 0.75);
     ufo.x = s.x;
     ufo.y = s.y + 30;
@@ -176,16 +177,16 @@ function buildBeamMeDown(engine) {
   }
   // Start cloud with its sign, and the landing cloud floor.
   root.addChild(deco(PIXI, 'cloud_fluffy_1', (scene.startCloud.x0 + scene.startCloud.x1) / 2, scene.startCloud.y + 70, { w: 520, h: 210, tint: 0xe8eef4 }));
-  const sign = new PIXI.Text(scene.sign.replace(' here!', '\nhere!'), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 22, fontWeight: '700', fill: 0xffffff, align: 'center' });
+  const sign = new PIXI.Text({ text: scene.sign.replace(' here!', '\nhere!'), style: { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 22, fontWeight: '700', fill: 0xffffff, align: 'center' } });
   sign.anchor.set(0.5, 1);
   sign.x = (scene.startCloud.x0 + scene.startCloud.x1) / 2;
   sign.y = scene.startCloud.y - 110;
   sign.alpha = 0.9;
   root.addChild(sign);
   cloudBank(PIXI, root, scene, scene.floorY, 0xe8eef4);
-  const bravo = new PIXI.Text(scene.completion.replace('! ', '!\n').replace('You made', 'You\nmade'), {
+  const bravo = new PIXI.Text({ text: scene.completion.replace('! ', '!\n').replace('You made', 'You\nmade'), style: {
     fontFamily: 'Trebuchet MS, sans-serif', fontSize: 46, fontWeight: '800', fill: 0xe8d23a, align: 'center', lineHeight: 50,
-  });
+  } });
   bravo.anchor.set(0.5, 1);
   bravo.x = scene.width / 2;
   bravo.y = scene.floorY - 160;
@@ -201,7 +202,7 @@ function exitDoor(engine, scene) {
   g.roundRect(-34, -108, 68, 108, 26).fill(0x2b2230);
   g.roundRect(-26, -96, 52, 20, 4).fill(0xe2c34a);
   door.addChild(g);
-  const label = new PIXI.Text('EXIT', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 15, fontWeight: '800', fill: 0x2b2230 });
+  const label = new PIXI.Text({ text: 'EXIT', style: { fontFamily: 'Trebuchet MS, sans-serif', fontSize: 15, fontWeight: '800', fill: 0x2b2230 } });
   label.anchor.set(0.5, 0.5);
   label.y = -86;
   door.addChild(label);
@@ -223,10 +224,10 @@ let quoinFrames = null;
 function quoinTexture(engine, type) {
   const { PIXI } = engine;
   if (!quoinFrames) {
-    const base = PIXI.BaseTexture.from(QUOIN_SHEET.url);
+    const base = sourceFromUrl(QUOIN_SHEET.url);
     quoinFrames = {};
     for (const def of Object.values(QUOIN_TYPES)) {
-      quoinFrames[def.id] = new PIXI.Texture(base, new PIXI.Rectangle(0, def.row * QUOIN_SHEET.frameHeight, QUOIN_SHEET.frameWidth, QUOIN_SHEET.frameHeight));
+      quoinFrames[def.id] = frameTexture(base, new PIXI.Rectangle(0, def.row * QUOIN_SHEET.frameHeight, QUOIN_SHEET.frameWidth, QUOIN_SHEET.frameHeight));
     }
   }
   return quoinFrames[type] || quoinFrames.xp;
@@ -404,7 +405,7 @@ function stepConstellation() {
   const showHint = active.run.connected.length === 0 || active.run.misses > 0 || Date.now() - active.lastClickAt > 6000;
   stars.forEach((spr, i) => {
     const pulse = showHint && i === hint ? 1 + Math.sin(t * 6) * 0.18 : 1;
-    if (spr.texture.valid) spr.scale.set((active.scene.starSize / spr.texture.width) * pulse);
+    if (isLoaded(spr.texture)) spr.scale.set((active.scene.starSize / spr.texture.width) * pulse);
   });
   if (active.run.complete) eye.alpha = Math.min(1, eye.alpha + 0.02);
 }

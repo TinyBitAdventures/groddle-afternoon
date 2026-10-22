@@ -41,6 +41,8 @@
  * signpost are drawn here.
  */
 
+import { textureFromUrl } from '../textures.js';
+
 export const ROOM_MS = 5 * 60 * 1000; // source: questInstanceLocation(..., 5*60)
 export const PICTURE_REACH = 175; // source: club_house_picture jump_in conditions
 export const BUTTON_RESET_MS = 1000; // source: wall_switch reset_timer "1000"
@@ -617,7 +619,7 @@ function buildClub(ctx) {
     world.addChild(p);
   }
   // ENTER plaque.
-  world.addChild(kit.label(PIXI, 'ENTER', CLUBHOUSE.enterX, cy - 128, { size: 15, fill: 0xf1e2c4, stroke: 0x4a321c, strokeThickness: 5, font: 'Georgia, serif' }));
+  world.addChild(kit.label(PIXI, 'ENTER', CLUBHOUSE.enterX, cy - 128, { size: 15, fill: 0xf1e2c4, stroke: { color: 0x4a321c, width: 5 },  font: 'Georgia, serif' }));
 
   return {
     label: 'The Society of Keen-Eyed Noticers',
@@ -813,7 +815,7 @@ function enterClub(ctx) {
   ctx.data.door = ctx.add(door, 3);
   setDoor(ctx, Boolean(ctx.data.solved));
   // The Curious Painting over the fireplace.
-  const pic = ctx.PIXI.Sprite.from(`${ART}club_house_picture.png`);
+  const pic = new ctx.PIXI.Sprite(textureFromUrl(`${ART}club_house_picture.png`));
   pic.anchor.set(0.5, 1);
   pic.scale.set(0.62);
   pic.x = CLUBHOUSE.fireplaceX;
@@ -833,8 +835,8 @@ function makeButton(ctx, b, y) {
   const plate = new PIXI.Graphics();
   plate.circle(0, 0, 17).fill({ color: 0x3a2716, alpha: 0.5 });
   c.addChild(plate);
-  const out = PIXI.Sprite.from(`${ART}wall_button_lockOut.png`);
-  const inn = PIXI.Sprite.from(`${ART}wall_button_lockIn.png`);
+  const out = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockOut.png`));
+  const inn = new PIXI.Sprite(textureFromUrl(`${ART}wall_button_lockIn.png`));
   for (const s of [out, inn]) {
     s.anchor.set(0.5);
     s.scale.set(0.82);

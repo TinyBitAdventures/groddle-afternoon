@@ -61,6 +61,7 @@ import {
   startParty,
   teleporterPhase,
 } from '../party-spaces.js';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const PARTY_FEATURE_ID = 'party-spaces';
 const HOLD = 'party';
@@ -134,11 +135,11 @@ function ensurePackItems() {
 }
 
 function sheetFrames(PIXI, url) {
-  const base = PIXI.BaseTexture.from(url);
+  const base = sourceFromUrl(url);
   const frames = [];
   for (let r = 0; r < PORTAL_ROWS; r += 1) {
     for (let c = 0; c < PORTAL_COLS; c += 1) {
-      frames.push(new PIXI.Texture(base, new PIXI.Rectangle(c * PORTAL_W, r * PORTAL_H, PORTAL_W, PORTAL_H)));
+      frames.push(frameTexture(base, new PIXI.Rectangle(c * PORTAL_W, r * PORTAL_H, PORTAL_W, PORTAL_H)));
     }
   }
   return frames;
@@ -650,10 +651,10 @@ function groundNear(engine, x, y) {
 function spawnAtm(engine, point) {
   const { PIXI } = engine;
   const sprite = new PIXI.Container();
-  const art = PIXI.Sprite.from(`${ART}party_atm.png`);
+  const art = new PIXI.Sprite(textureFromUrl(`${ART}party_atm.png`));
   art.anchor.set(0.5, 1);
   art.scale.set(0.9);
-  const screen = new PIXI.Text('', { fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: '700', fill: 0x8dff8d });
+  const screen = new PIXI.Text({ text: '', style: { fontFamily: 'Courier New, monospace', fontSize: 13, fontWeight: '700', fill: 0x8dff8d } });
   screen.anchor.set(0.5, 0.5);
   screen.y = -112;
   sprite.addChild(art, screen);
@@ -676,10 +677,10 @@ function spawnAtm(engine, point) {
 function spawnStack(engine, group, point) {
   const { PIXI } = engine;
   const sprite = new PIXI.Container();
-  const icon = PIXI.Sprite.from(itemIcon(group.classTsid));
+  const icon = new PIXI.Sprite(textureFromUrl(itemIcon(group.classTsid)));
   icon.anchor.set(0.5, 1);
   icon.scale.set(0.85);
-  const badge = new PIXI.Text('', { fontFamily: 'Arial', fontSize: 12, fontWeight: '800', fill: 0xffffff, stroke: 0x3b2410, strokeThickness: 3 });
+  const badge = new PIXI.Text({ text: '', style: { fontFamily: 'Arial', fontSize: 12, fontWeight: '800', fill: 0xffffff, stroke: { color: 0x3b2410, width: 3 } } });
   badge.anchor.set(0, 1);
   badge.x = 12;
   badge.y = -2;
@@ -758,7 +759,7 @@ function spawnGuest(engine, guest, point, index) {
   sprite.cursor = 'pointer';
   sprite.play();
   engine.entityLayer.addChild(sprite);
-  const name = new PIXI.Text(guest.name, { fontFamily: 'Arial', fontSize: 12, fontWeight: '700', fill: 0xffffff, stroke: 0x2a1d14, strokeThickness: 3 });
+  const name = new PIXI.Text({ text: guest.name, style: { fontFamily: 'Arial', fontSize: 12, fontWeight: '700', fill: 0xffffff, stroke: { color: 0x2a1d14, width: 3 } } });
   name.anchor.set(0.5, 1);
   name.zIndex = 31;
   engine.entityLayer.addChild(name);
@@ -864,6 +865,7 @@ function buildOverlay(engine, s) {
     const sag = 22;
     wire.moveTo(0, 4);
     for (let x = 0; x <= W; x += 24) wire.lineTo(x, 4 + sag * Math.sin((x / W) * Math.PI));
+    wire.stroke({ width: 2, color: 0x2a1d14, alpha: 0.7 });
     root.addChild(wire);
     for (let i = 0; i < 18; i += 1) {
       const x = (i + 0.5) * (W / 18);
@@ -875,7 +877,6 @@ function buildOverlay(engine, s) {
       bulbs.push(b);
     }
   }
-  wire.stroke({ width: 2, color: 0x2a1d14, alpha: 0.7 });
   stage.addChild(root);
   overlay = { root, bits, bulbs, kind, palette: s.palette, t: 0, W, H };
   engine.setData('partyAmbience', kind);

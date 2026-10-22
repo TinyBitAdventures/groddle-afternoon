@@ -48,6 +48,7 @@
  */
 
 import { pushOutOfSolids, spawnQuoins, takeQuoins, BODY_H } from './puzzle-kit.js?v=mb-1';
+import { textureFromUrl } from '../textures.js';
 
 const ROOM_ID = 'mental_block';
 const ART = `assets/sprites/quest-rooms/${ROOM_ID}/`;
@@ -541,7 +542,7 @@ function billboard(PIXI, x, y, w, h, { face = 0x5f7a8c, faceLow = 0x4c6474, fram
 }
 
 function text(kit, PIXI, str, x, y, size, fill = 0xffffff, opts = {}) {
-  return kit.label(PIXI, str, x, y, { size, fill, stroke: opts.stroke ?? 0x000000, strokeThickness: opts.strokeThickness ?? 0, wrap: opts.wrap, weight: opts.weight || '800', ax: opts.ax, ay: opts.ay });
+  return kit.label(PIXI, str, x, y, { size, fill, stroke: opts.stroke, wrap: opts.wrap, weight: opts.weight || '800', ax: opts.ax, ay: opts.ay });
 }
 
 function terrain(PIXI, geo) {
@@ -699,8 +700,8 @@ export const room = {
     // QA: ?mbstation=N starts at station N with the ones before it cleared.
     for (let k = 0; k < qaStart(ctx, geo); k++) ctx.data.state[k].cleared = true;
     ctx.data.columnTargets = {};
-    ctx.data.outTex = PIXI.Texture.from(`${ART}wall_button_lockOut.png`);
-    ctx.data.inTex = PIXI.Texture.from(`${ART}wall_button_lockIn.png`);
+    ctx.data.outTex = textureFromUrl(`${ART}wall_button_lockOut.png`);
+    ctx.data.inTex = textureFromUrl(`${ART}wall_button_lockIn.png`);
     ctx.data.view = geo.sections.map((s) => makeStationView(ctx, s));
     ctx.data.buttons = [];
     geo.sections.forEach((s) => {
@@ -953,7 +954,7 @@ function makeStationView(ctx, s) {
 function makeButton(ctx, section, kind, at) {
   const { PIXI, kit } = ctx;
   const c = new PIXI.Container();
-  if (kind === 'reset') c.addChild(kit.label(PIXI, 'Reset', 0, -46, { size: 12, fill: 0xffffff, stroke: 0x111111, strokeThickness: 3 }));
+  if (kind === 'reset') c.addChild(kit.label(PIXI, 'Reset', 0, -46, { size: 12, fill: 0xffffff, stroke: { color: 0x111111, width: 3 } }));
   const post = new PIXI.Graphics();
   post.roundRect(-5, -20, 10, 20, 3).fill(0x1a1c1e);
   c.addChild(post);
@@ -1291,13 +1292,13 @@ function makeEnd(ctx) {
     // Teleporter_Base (550x1058): the pad's foot at y 1020, the top emitter's
     // rim at y ~30; the emitter hangs under the door ledge.
     const sc = (SHELF_Y + 4 - end.ledgeY) / 990;
-    const base = PIXI.Sprite.from(`${ART}Teleporter_Base.png`);
+    const base = new PIXI.Sprite(textureFromUrl(`${ART}Teleporter_Base.png`));
     base.anchor.set(0.5, 1020 / 1058);
     base.scale.set(sc);
     base.x = end.padX;
     base.y = SHELF_Y + 4;
     ctx.add(base, 6);
-    const beam = PIXI.Sprite.from(`${ART}Teleporter_Beam.png`);
+    const beam = new PIXI.Sprite(textureFromUrl(`${ART}Teleporter_Beam.png`));
     beam.anchor.set(0.5, 1020 / 1058);
     beam.scale.set(sc);
     beam.x = end.padX;
@@ -1307,7 +1308,7 @@ function makeEnd(ctx) {
     ctx.data.beam = beam;
     const door = kit.deco(PIXI, 'door_asset_gray', end.padX, end.ledgeY + 2, { scale: 0.27, tint: 0x9db3d6 });
     ctx.add(door, 5);
-    const sign = text(kit, PIXI, 'You done\ndid it!', end.padX - 150, SHELF_Y - 110, 26, 0xf5e61e, { stroke: 0x111111, strokeThickness: 4 });
+    const sign = text(kit, PIXI, 'You done\ndid it!', end.padX - 150, SHELF_Y - 110, 26, 0xf5e61e, { stroke: { color: 0x111111, width: 4 } });
     ctx.add(sign, 9);
     const hit = new PIXI.Graphics();
     hit.rect(-60, -90, 120, 90).fill({ color: 0xffffff, alpha: 0.001 });

@@ -36,6 +36,8 @@
  * is named in the activity feed and the room objective.
  */
 
+import { onLoaded, textureFromUrl } from '../textures.js';
+
 export const QUEST = 'fuelmaking_refuel_robot';
 const ART = 'assets/sprites/quest-rooms/back_alley/';
 const LEGALIZE = 'assets/sprites/quests/legalize/';
@@ -332,7 +334,7 @@ function useSheet(spr, sheet, speed) {
     spr.play();
   };
   if (sheet.frames.length) set();
-  else sheet.base.once('loaded', () => setTimeout(set, 0));
+  else onLoaded(sheet.base, () => setTimeout(set, 0));
 }
 
 /* ------------------------------------------------------------------ */
@@ -395,7 +397,7 @@ function enterStation(ctx) {
   if (ctx.param('backalleymade') === '1') ctx.progress('made_fuel_cell');
   ctx.data.botTalk = kit.sheetFrames(PIXI, `${BOT_ART}bot_talk.png`, 12, 6, 69);
   ctx.data.botHappy = kit.sheetFrames(PIXI, `${ART}bot_attract.png`, 12, 5, 57);
-  const moveTex = PIXI.Texture.from(`${ART}bot_move.png`);
+  const moveTex = textureFromUrl(`${ART}bot_move.png`);
   ctx.data.botMoveTex = moveTex;
   const bot = new PIXI.AnimatedSprite([moveTex]);
   bot.anchor.set(0.5, 1);
