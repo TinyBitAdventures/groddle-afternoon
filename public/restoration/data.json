@@ -1393,9 +1393,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 229,
+  "commits": 231,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "A home page at / and the game at /play/"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Room 15 and the Ventilation Room in Jethimadh Tower Base, with their four secret spots"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1505,19 +1515,9 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "The favicon is now an iMG quoin"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Street project phases show the new street's name, not {job_location}"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Coats, hair locks, headdresses and tails in the Glitch wardrobe"
    }
   ]
  },
- "tests": 146,
+ "tests": 147,
  "generatedAt": "2026-10-22"
 }
