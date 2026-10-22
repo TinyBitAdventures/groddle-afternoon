@@ -1,39 +1,58 @@
 /**
- * Room 15 and the Ventilation Room of the Jethimadh Tower Base as a feature
- * module (see js/feature-host.js). The rooms themselves are ordinary street
- * JSON written by tools/build-tower-rooms.mjs from js/tower-rooms.js, so
- * doors, platforms, walls and the TowerSpot boxes (features/home-tower-feature.js)
- * need nothing here. This file adds what a street JSON cannot carry:
+ * The rebuilt Jethimadh Tower Base rooms as a feature module (see
+ * js/feature-host.js): Room 15 and the Ventilation Room (js/tower-rooms.js),
+ * Rooms 4, 8 and 16 (js/tower-challenge-rooms.js). The rooms themselves are
+ * ordinary street JSON written by tools/build-tower-rooms.mjs, so doors,
+ * platforms, walls, ladders and the TowerSpot boxes
+ * (features/home-tower-feature.js) need nothing here. This file adds what a
+ * street JSON cannot carry:
  * - an empty ecology (the tower is all corridor: counts {} like C1-C6);
  * - the door plaques' painted text ("Way Out", "Tower St South"), drawn from
  *   the decos' signText the way the source's firebog_sign_blank sign_txt was;
- * - Room 15's Purple-Orange Circle Key (door_key_6, Room 16's key): one per
- *   game day when none is in the pack, by walking onto it (the rule of
- *   Corridor One's key_drop box, location.js).
+ * - each room's key (Room 15 Purple-Orange Circle, Room 8 Teal-Red Hexagon,
+ *   Room 16 Red-Green Triangle): one per game day when none is in the pack,
+ *   by walking onto it (the rule of Corridor One's key_drop box, location.js);
+ * - Room 4's garden (4 spinach plots, empty ones replanted once a game day)
+ *   and its six drinks, and Room 16's Spinach: floor items you pick up, each
+ *   back once a game day.
  *
  * QA (rooms are reached through their real corridor doors, see doors-feature):
  *   ?autostart=1&questoffer=off&doordemo=GTJ10K7P3812R8F&doorindex=0&doorkey=4&doorautoplay=1
  *       C4E's locked door into Room 15
  *   ?autostart=1&questoffer=off&doordemo=GTJ110817812KO4&doorindex=2&doorautoplay=1
  *       C6W's door into the top of the Ventilation Room
+ *   ?autostart=1&questoffer=off&doordemo=GIF1Q3IQM7122SP&doorindex=0&doorkey=1&doorautoplay=1
+ *       C2's locked door into Room 4
+ *   ?autostart=1&questoffer=off&doordemo=GTJ10K7P3812R8F&doorindex=2&doorkey=3&doorautoplay=1
+ *       C4W's locked door into Room 8 (its way out leads on to C4E)
+ *   ?autostart=1&questoffer=off&doordemo=GTJ110817812KO4&doorindex=3&doorkey=6&doorautoplay=1
+ *       C6W's locked door into Room 16
  *   &towerroomspinach=1  eat a Spinach (High Jumper, 7 s) on arrival in a rebuilt room;
  *                        =hold keeps it up while you are in one
- * Canvas data: towerRoom, towerRoomSigns, towerRoomKey, towerRoomKeyDay.
+ * Canvas data: towerRoom, towerRoomSigns, towerRoomKey, towerRoomKeyDay,
+ * towerRoomItems, towerRoomGarden, towerRoomLast.
  */
 
 import { addItem, countItem } from '../inventory.js?v=catalog-unified-3';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { DOOR_TEXT, doorKeyClass, insideBottomRect } from '../doors.js';
 import { textureFromUrl } from '../textures.js';
-import { towerRoomByTsid } from '../tower-rooms.js?v=tower-rooms-1';
+import { ROOM_15_TSID } from '../tower-rooms.js?v=tower-rooms-1';
+import { anyTowerRoomByTsid } from '../tower-challenge-rooms.js?v=challenge-rooms-1';
 
 export const TOWER_ROOMS_FEATURE_ID = 'tower-rooms';
 const KEY_CHECK_MS = 250;
+const ITEM_CLASS = 'tower_room_item';
 
-let state = { v: 1, keyDay: '' };
+const fresh = () => ({ v: 2, keyDays: {}, taken: {}, gardenDays: {} });
+let state = fresh();
 let views = [];
 let keyView = null;
+let itemRows = [];
 let lastKeyCheck = 0;
+
+const today = () => getGameDayKey(Date.now());
+const strMap = (m) => Object.fromEntries(Object.entries(m && typeof m === 'object' ? m : {}).filter(([, v]) => typeof v === 'string'));
 
 function clear() {
   for (const v of views) {
@@ -42,14 +61,15 @@ function clear() {
   }
   views = [];
   keyView = null;
+  itemRows = [];
 }
 
 function keyBox(street) {
   return (street?.boxes || []).find((b) => Number(b.key) > 0) || null;
 }
 
-function keyDue(engine, box) {
-  return Boolean(box) && state.keyDay !== getGameDayKey(Date.now()) && countItem(engine.inv, doorKeyClass(box.key)) < 1;
+function keyDue(engine, tsid, box) {
+  return Boolean(box) && state.keyDays[tsid] !== today() && countItem(engine.inv, doorKeyClass(box.key)) < 1;
 }
 
 /** Plaque text, centred on its sign (decos are bottom-centre, world space). */
@@ -100,8 +120,9 @@ function checkKey(engine, now) {
   if (!box) return;
   keyView.y = box.y - 32 - Math.abs(Math.sin(now / 420)) * 6;
   if (!insideBottomRect(box, engine.player.x, engine.player.y)) return;
-  if (!keyDue(engine, box)) return;
-  state.keyDay = getGameDayKey(Date.now());
+  const tsid = engine.streetTsid;
+  if (!keyDue(engine, tsid, box)) return;
+  state.keyDays[tsid] = today();
   addItem(engine.inv, doorKeyClass(box.key), 1);
   engine.pushActivity(DOOR_TEXT.foundKey);
   engine.floatText(engine.player.x, engine.player.y - 90, DOOR_TEXT.foundKey, 0xffe08a);
@@ -109,40 +130,141 @@ function checkKey(engine, now) {
   engine.refreshPack();
   engine.save();
   engine.setData('towerRoomKey', 'taken');
-  engine.setData('towerRoomKeyDay', state.keyDay);
+  engine.setData('towerRoomKeyDay', state.keyDays[tsid]);
+  engine.setData('towerRoomLast', `key:${doorKeyClass(box.key)}`);
   keyView.visible = false;
+}
+
+/* ------------------------------------------------------------------ */
+/* Floor items (Room 4's drinks, Room 16's Spinach)                     */
+/* ------------------------------------------------------------------ */
+
+const takenKey = (tsid, item) => `${tsid}:${item.id}`;
+const itemsWaiting = () => itemRows.filter((r) => !r.picked).length;
+
+function drawItem(engine, street, item) {
+  const { PIXI } = engine;
+  const box = new PIXI.Container();
+  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/icons/${item.cls}.png`));
+  spr.anchor.set(0.5, 1);
+  spr.scale.set(0.8);
+  box.addChild(spr);
+  box.x = item.x - street.bounds.l;
+  box.y = item.y - street.bounds.t;
+  box.zIndex = 28;
+  engine.entityLayer.addChild(box);
+  views.push(box);
+  const target = engine.register({
+    classId: ITEM_CLASS,
+    featureId: TOWER_ROOMS_FEATURE_ID,
+    label: item.count > 1 ? `${item.label} ×${item.count}` : item.label,
+    sprite: box,
+    towerItem: item.id,
+  });
+  const row = { item, target, sprite: box, picked: false };
+  itemRows.push(row);
+  return row;
+}
+
+function pickUp(engine, row) {
+  if (!row || row.picked) return false;
+  row.picked = true;
+  const { item } = row;
+  state.taken[takenKey(engine.streetTsid, item)] = today();
+  addItem(engine.inv, item.cls, item.count);
+  engine.unregister(row.target);
+  row.sprite.visible = false;
+  engine.refreshPack();
+  engine.playSound?.('ITEM_PICKUP', { volume: 0.5 });
+  engine.pushActivity(`You picked up ${item.count > 1 ? `${item.count} ` : ''}${item.label}.`);
+  engine.setData('towerRoomItems', itemsWaiting());
+  engine.setData('towerRoomLast', `item:${item.cls}`);
+  engine.save();
+  return true;
+}
+
+/* ------------------------------------------------------------------ */
+/* Room 4's garden                                                      */
+/* ------------------------------------------------------------------ */
+
+/** Replant every empty plot (clean or dirty, no seed) with the room's crop, ready to harvest. */
+export function restockGarden(garden, seed, now = Date.now()) {
+  let n = 0;
+  for (const plot of Object.values(garden?.plots || {})) {
+    if (plot.seed || !['clean', 'dirty'].includes(plot.state)) continue;
+    plot.state = 'crop';
+    plot.seed = seed;
+    plot.wet = false;
+    plot.wetAt = null;
+    plot.stageStartedAt = now;
+    plot.growthMs = 0;
+    n += 1;
+  }
+  return n;
+}
+
+function spawnGarden(engine, room, street) {
+  const g = room.garden;
+  if (!g || typeof engine.spawnGarden !== 'function') return null;
+  const entity = engine.spawnGarden({ x: g.x - street.bounds.l, y: g.y - street.bounds.t + 2, cols: g.cols, rows: g.rows, label: 'Spinach' });
+  const garden = entity?.state?.garden;
+  if (!garden) return null;
+  if (state.gardenDays[room.tsid] !== today()) {
+    state.gardenDays[room.tsid] = today();
+    if (restockGarden(garden, g.seed)) engine.refreshGarden?.(entity);
+    engine.save();
+  }
+  const crops = Object.values(garden.plots || {}).filter((p) => p.state === 'crop').length;
+  engine.setData('towerRoomGarden', `${crops}/${Object.keys(garden.plots || {}).length}`);
+  return entity;
 }
 
 export const towerRoomsFeature = {
   id: TOWER_ROOMS_FEATURE_ID,
 
   save() {
-    return { ...state };
+    return { v: 2, keyDays: { ...state.keyDays }, taken: { ...state.taken }, gardenDays: { ...state.gardenDays } };
   },
 
   restore(slice) {
-    state = { v: 1, keyDay: typeof slice?.keyDay === 'string' ? slice.keyDay : '' };
+    state = fresh();
+    if (!slice || typeof slice !== 'object') return;
+    state.keyDays = strMap(slice.keyDays);
+    state.taken = strMap(slice.taken);
+    state.gardenDays = strMap(slice.gardenDays);
+    // v1 saves held Room 15's key day only.
+    if (typeof slice.keyDay === 'string' && slice.keyDay && !state.keyDays[ROOM_15_TSID]) state.keyDays[ROOM_15_TSID] = slice.keyDay;
   },
 
   /** The corridors have counts {} in the ecology catalog; so do their rooms. */
   ecologyOverride(street) {
-    const room = towerRoomByTsid(street?.tsid);
+    const room = anyTowerRoomByTsid(street?.tsid);
     if (!room) return null;
     return { label: room.label, sourceTsid: room.sourceTsid, counts: {}, spawners: 1 };
   },
 
   onStreetEnter(street, engine) {
     clear();
-    const room = towerRoomByTsid(street?.tsid);
+    const room = anyTowerRoomByTsid(street?.tsid);
     engine.setData('towerRoom', room ? room.tsid : '');
     if (!room) return;
     engine.setData('towerRoomSigns', drawSigns(engine, street));
     const box = keyBox(street);
     if (box) {
-      const due = keyDue(engine, box);
+      const due = keyDue(engine, room.tsid, box);
       if (due) keyView = drawKey(engine, box);
       engine.setData('towerRoomKey', due ? 'waiting' : 'taken');
+    } else {
+      engine.setData('towerRoomKey', '');
     }
+    const day = today();
+    for (const item of room.items || []) {
+      if (state.taken[takenKey(room.tsid, item)] === day) continue;
+      drawItem(engine, street, item);
+    }
+    engine.setData('towerRoomItems', itemsWaiting());
+    if (!room.garden) engine.setData('towerRoomGarden', '');
+    spawnGarden(engine, room, street);
     if (['1', 'hold'].includes(engine.param('towerroomspinach'))) engine.applyBuff('high_jumper');
   },
 
@@ -150,8 +272,24 @@ export const towerRoomsFeature = {
     clear();
   },
 
+  verbsFor(target) {
+    if (target?.classId !== ITEM_CLASS) return null;
+    return [{ id: 'pickup', label: 'Pick up', sort: 55, tooltip: 'Put it in your pack', enabled: true, reason: '', durationMs: 0 }];
+  },
+
+  runVerb(target, verbId, engine) {
+    if (target?.classId !== ITEM_CLASS) return false;
+    if (verbId === 'pickup') pickUp(engine, itemRows.find((r) => r.target === target));
+    return true;
+  },
+
   onTick(_dtMs, now, engine) {
     if (keyView) checkKey(engine, now);
-    if (engine.param('towerroomspinach') === 'hold' && towerRoomByTsid(engine.streetTsid) && !engine.hasBuff('high_jumper')) engine.applyBuff('high_jumper');
+    if (engine.param('towerroomspinach') === 'hold' && anyTowerRoomByTsid(engine.streetTsid) && !engine.hasBuff('high_jumper')) engine.applyBuff('high_jumper');
+  },
+
+  /** QA / tests. */
+  _state() {
+    return { state, items: itemRows.map((r) => ({ id: r.item.id, picked: r.picked })) };
   },
 };

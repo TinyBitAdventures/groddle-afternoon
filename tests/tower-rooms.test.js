@@ -22,7 +22,19 @@ import {
   turned,
 } from '../public/js/tower-rooms.js';
 import { inTowerSpot, towerSpotsFor } from '../public/js/home-tower.js';
-import { towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js';
+import { restockGarden, towerRoomsFeature } from '../public/js/features/tower-rooms-feature.js';
+import {
+  ALL_TOWER_ROOMS,
+  CHALLENGE_ROOMS,
+  CHALLENGE_ROOM_DOOR_LINKS,
+  ROOM_16_TSID,
+  ROOM_4_DRINKS,
+  ROOM_4_TSID,
+  ROOM_8_TSID,
+  anyTowerRoomByTsid,
+  anyTowerRoomStreet,
+} from '../public/js/tower-challenge-rooms.js';
+import { ladderTopDeck } from '../public/js/street-model.js';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streets = join(spike, 'public/assets/streets');
@@ -285,20 +297,230 @@ describe('tower-rooms feature', () => {
     assert.equal(towerRoomsFeature.ecologyOverride({ tsid: 'GTJ10K7P3812R8F' }), null);
   });
 
-  it('saves the day the key was taken', () => {
+  it('saves the day each key, item and garden restock was taken (and reads v1 saves)', () => {
     towerRoomsFeature.restore({ keyDay: '2026-10-22:3' });
-    assert.deepEqual(towerRoomsFeature.save(), { v: 1, keyDay: '2026-10-22:3' });
+    assert.deepEqual(towerRoomsFeature.save(), { v: 2, keyDays: { [ROOM_15_TSID]: '2026-10-22:3' }, taken: {}, gardenDays: {} });
+    const v2 = { v: 2, keyDays: { [ROOM_8_TSID]: 'd1', [ROOM_16_TSID]: 'd2' }, taken: { [`${ROOM_4_TSID}:r4_gurly_drink`]: 'd1' }, gardenDays: { [ROOM_4_TSID]: 'd3' } };
+    towerRoomsFeature.restore(v2);
+    assert.deepEqual(towerRoomsFeature.save(), v2);
+    towerRoomsFeature.restore({ v: 2, keyDays: { x: 5 }, taken: null });
+    assert.deepEqual(towerRoomsFeature.save(), { v: 2, keyDays: {}, taken: {}, gardenDays: {} });
     towerRoomsFeature.restore(undefined);
-    assert.equal(towerRoomsFeature.save().keyDay, '');
+    assert.deepEqual(towerRoomsFeature.save().keyDays, {});
   });
 
   it('the street JSON is the builder output (doors linked by the build script)', () => {
-    for (const room of TOWER_ROOMS) {
-      const built = towerRoomStreet(room);
+    for (const room of ALL_TOWER_ROOMS) {
+      const built = anyTowerRoomStreet(room);
       const s = street(room.tsid);
       assert.deepEqual(s.platforms, built.platforms);
       assert.deepEqual(s.layers, built.layers);
       assert.deepEqual(s.boxes, built.boxes);
+      assert.deepEqual(s.ladders, built.ladders);
     }
+  });
+
+  it('owns the floor items\' Pick up verb and nothing else', () => {
+    assert.deepEqual(towerRoomsFeature.verbsFor({ classId: 'tower_room_item' }).map((v) => v.id), ['pickup']);
+    assert.equal(towerRoomsFeature.verbsFor({ classId: 'garden_plot' }), null);
+    for (const tsid of [ROOM_4_TSID, ROOM_8_TSID, ROOM_16_TSID]) {
+      assert.deepEqual(towerRoomsFeature.ecologyOverride({ tsid }).counts, {});
+    }
+  });
+
+  it('replants only empty plots with ready spinach', () => {
+    const garden = { plots: {
+      '1-1': { state: 'dirty', seed: null, wet: false },
+      '2-1': { state: 'clean', seed: null, wet: true, wetAt: 5 },
+      '3-1': { state: 'seeds', seed: 'seed_onion', wet: true },
+      '4-1': { state: 'crop', seed: 'seed_spinach', wet: false },
+    } };
+    assert.equal(restockGarden(garden, 'seed_spinach', 1000), 2);
+    assert.deepEqual(Object.values(garden.plots).map((p) => [p.state, p.seed]), [
+      ['crop', 'seed_spinach'], ['crop', 'seed_spinach'], ['seeds', 'seed_onion'], ['crop', 'seed_spinach'],
+    ]);
+    assert.equal(garden.plots['2-1'].wet, false);
+    assert.equal(restockGarden(garden, 'seed_spinach'), 0);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Rooms 4, 8 and 16 (js/tower-challenge-rooms.js)                      */
+/* ------------------------------------------------------------------ */
+
+const room4 = anyTowerRoomByTsid(ROOM_4_TSID);
+const room8 = anyTowerRoomByTsid(ROOM_8_TSID);
+const room16 = anyTowerRoomByTsid(ROOM_16_TSID);
+
+/** Sample points along platforms (world). */
+const along = (plats) => plats.flatMap((p) => [0, 0.25, 0.5, 0.75, 1].map((k) => [p.x1 + (p.x2 - p.x1) * k, p.y1 + (p.y2 - p.y1) * k]));
+/** Can a running jump carry the avatar from some point of A onto some point of B? */
+function canReach(A, B, opt = {}) {
+  const top = apex(opt.jump || 1, opt.gravity || 1) * 0.8;
+  for (const [ax, ay] of along(A)) {
+    for (const [bx, by] of along(B)) {
+      const rise = ay - by;
+      if (rise <= top && Math.abs(bx - ax) <= reach(rise + 20, opt) * 0.9) return true;
+    }
+  }
+  return false;
+}
+const piece = (room, name) => room.platforms.filter((p) => p.id.replace(/_\d+$/, '') === `plat_${name}`);
+function walkChain(room, names) {
+  for (let i = 1; i < names.length; i += 1) {
+    assert.ok(canReach(piece(room, names[i - 1]), piece(room, names[i])), `${room.label}: ${names[i - 1]} -> ${names[i]}`);
+  }
+}
+
+describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
+  it('are written and indexed with the hub 77 names from inc_data_maps_prod.js', () => {
+    const index = JSON.parse(readFileSync(join(streets, 'index.json'), 'utf8')).streets;
+    assert.deepEqual(CHALLENGE_ROOMS.map((r) => [r.tsid, r.sourceTsid, r.label]), [
+      [ROOM_4_TSID, 'LIF1Q6PMN7123NQ', 'Room 4'],
+      [ROOM_8_TSID, 'LIF1FHA10312KLV', 'Room 8'],
+      [ROOM_16_TSID, 'LTJ11V9DK812UNL', 'Room 16'],
+    ]);
+    for (const room of CHALLENGE_ROOMS) {
+      assert.equal(index[room.tsid].label, room.label);
+      assert.equal(index[room.tsid].hubId, '77');
+      assert.equal(index[room.tsid].reconstructed, true);
+      assertStreetGeometry(street(room.tsid));
+    }
+    assert.equal(ALL_TOWER_ROOMS.length, 5);
+  });
+
+  const mapsFile = join(spike, '../glitch-GameServerJS/inc_data_maps_prod.js');
+  it('keep the hub 77 names and the drinks\' GSJS names', { skip: !existsSync(mapsFile) && 'GSJS checkout not beside this worktree' }, () => {
+    const maps = readFileSync(mapsFile, 'utf8');
+    for (const room of CHALLENGE_ROOMS) assert.match(maps, new RegExp(`"${room.sourceTsid}"\\s*:\\s*"${room.label}"`));
+    for (const d of ROOM_4_DRINKS) {
+      const item = readFileSync(join(spike, `../glitch-GameServerJS/items/${d.cls}.js`), 'utf8');
+      assert.match(item, new RegExp(`var name_single = "${d.label}"`));
+    }
+  });
+
+  it('use only art the archived corridors use, all of it on disk', () => {
+    const corridorArt = new Set();
+    for (const tsid of ['GIF1QBNPP7123J0', 'GIF1Q3IQM7122SP', 'GIF1Q48RM712F87', 'GTJ10K7P3812R8F', 'GTJ10M515812V0C', 'GTJ110817812KO4']) {
+      for (const layer of street(tsid).layers) for (const d of layer.decos) corridorArt.add(d.sprite);
+    }
+    corridorArt.add('jethimadh_frame_cap').add('jethimadh_frame_wall'); // Room 15's shell (the corridors' firebog.swf set)
+    const manifest = new Set(JSON.parse(readFileSync(join(spike, 'public/assets/decos/manifest.json'), 'utf8')));
+    for (const room of CHALLENGE_ROOMS) {
+      const s = street(room.tsid);
+      for (const layer of s.layers) {
+        for (const d of layer.decos) {
+          assert.ok(corridorArt.has(d.sprite), `${room.label}: ${d.sprite}`);
+          assert.ok(manifest.has(d.sprite), d.sprite);
+        }
+      }
+      for (const door of s.doors) assert.ok(existsSync(join(spike, 'public/assets/decos/groddle', `${door.sprite}.webp`)), door.sprite);
+      for (const p of room.platforms) assert.ok(p.why, `${p.id} has a derivation note`);
+      for (const d of room.doors) assert.ok(d.why, d.id);
+      for (const l of room.ladders) assert.ok(l.why, l.id);
+      for (const i of room.items || []) assert.ok(i.why, i.id);
+    }
+  });
+
+  it('the archived corridor doors lead in at their archived arrivals, still locked by their keys', () => {
+    const want = {
+      door_1304676445973: { room: ROOM_4_TSID, x: -1080, y: -1701, key: 1 },
+      door_1304677515848: { room: ROOM_8_TSID, x: -736, y: -630, key: 3 },
+      door_1304678594665: { room: ROOM_16_TSID, x: -7, y: -407, key: 6 },
+    };
+    for (const link of CHALLENGE_ROOM_DOOR_LINKS) {
+      const door = street(link.street).doors.find((d) => d.id === link.door);
+      const w = want[link.door];
+      assert.deepEqual([door.connect.x, door.connect.y, door.connect.street], [w.x, w.y, w.room]);
+      assert.deepEqual([door.key_id, door.is_locked], [w.key, true]);
+      const target = street(w.room);
+      const floor = floorAt(target.platforms, w.x, w.y);
+      assert.ok(Math.abs(floor - w.y) <= 6, `${link.door} floor ${floor}`);
+      assert.deepEqual(door.connect.arrive, { x: w.x - target.bounds.l, y: Math.round(floor - target.bounds.t) });
+      // The room's way out stands where you arrive.
+      const out = anyTowerRoomByTsid(w.room).doors[0];
+      assert.deepEqual([out.x, out.y], [w.x, w.y]);
+    }
+  });
+
+  it('Rooms 4 and 16 lead back to their own corridor doors; Room 8 leads on into C4\'s east half', () => {
+    const back = (tsid, corridor, doorId) => {
+      const s = street(tsid);
+      const c = street(corridor);
+      const d = c.doors.find((x) => x.id === doorId);
+      assert.equal(s.doors.length, 1);
+      assert.equal(s.doors[0].connect.street, corridor);
+      return { arrive: s.doors[0].connect.arrive, door: d, c };
+    };
+    const r4 = back(ROOM_4_TSID, 'GIF1Q3IQM7122SP', 'door_1304676445973');
+    assert.ok(Math.abs(r4.arrive.x - r4.door.x) <= 2);
+    const r16 = back(ROOM_16_TSID, 'GTJ110817812KO4', 'door_1304678594665');
+    assert.ok(Math.abs(r16.arrive.x - r16.door.x) <= 2);
+    const r8 = back(ROOM_8_TSID, 'GTJ10K7P3812R8F', 'door_1304677515848');
+    // East of C4's split (walls at world 26 and 183), west of the C6E door (world 492).
+    const wx = r8.arrive.x + r8.c.bounds.l;
+    const walls = r8.c.barriers.map((w) => w.x);
+    assert.ok(walls.includes(26) && walls.includes(183));
+    assert.ok(wx > 183 && wx < 492, `Room 8 exit lands at world x ${wx}`);
+    // Every room door stands on a floor and is unlocked from the inside.
+    for (const tsid of [ROOM_4_TSID, ROOM_8_TSID, ROOM_16_TSID]) {
+      const s = street(tsid);
+      for (const d of s.doors) {
+        assert.equal(d.is_locked, false);
+        const floor = floorAt(platformsScreen(s).map((p) => ({ ...p, pc_perm: -1 })), d.x, d.y);
+        assert.ok(floor != null && Math.abs(floor - d.y) <= 3, `${d.id} floats: ${floor} vs ${d.y}`);
+      }
+    }
+  });
+
+  it('room 4: a ladder from the floor to the way out, four spinach plots and six drinks on the floor', () => {
+    const s = street(ROOM_4_TSID);
+    assert.equal(s.ladders.length, 1);
+    const l = room4.ladders[0];
+    // Its foot is on the floor, its top on the way-out ledge (game.js ladderTopDeck mounts it).
+    assert.ok(Math.abs(floorAt(room4.platforms, l.x, l.y) - l.y) <= 2);
+    const top = l.y - l.h;
+    const deck = ladderTopDeck(room4.platforms, l.x, top, l.y);
+    assert.ok(deck != null && Math.abs(deck - top) <= 2, `deck ${deck} vs top ${top}`);
+    assert.ok(room4.wayOut.left <= l.x && l.x <= room4.wayOut.right);
+    assert.equal(room4.wayOut.top, room4.doors[0].y);
+    // Garden: 4 x 1 on the floor's middle flat, spinach.
+    assert.deepEqual([room4.garden.cols * room4.garden.rows, room4.garden.seed], [4, 'seed_spinach']);
+    const bedHalf = (4 * 52 + 20) / 2; // game.js GARDEN_CELL_W 52, pads 10
+    const mid = room4.platforms.find((p) => p.id === 'plat_r4_floor_mid');
+    assert.ok(mid.x1 <= room4.garden.x - bedHalf && room4.garden.x + bedHalf <= mid.x2 && mid.y1 === room4.garden.y);
+    // Six different drinks, each on the floor.
+    assert.deepEqual(room4.items.map((i) => i.cls), ROOM_4_DRINKS.map((d) => d.cls));
+    for (const item of room4.items) assert.equal(item.y, Math.round(floorAt(room4.platforms, item.x, -100)));
+  });
+
+  it('room 8: plain-jump ledges up to the way out and to the Teal-Red Hexagon Key\'s shelf', () => {
+    walkChain(room8, ['r8_floor_l', 'r8_climb_00', 'r8_climb_01', 'r8_climb_02', 'r8_climb_03', 'r8_climb_04', 'r8_climb_05', 'r8_wayout']);
+    walkChain(room8, ['r8_floor_r', 'r8_key_00', 'r8_key_01', 'r8_key_02', 'r8_key_03', 'r8_key_04', 'r8_key_05', 'r8_key_shelf']);
+    const s = street(ROOM_8_TSID);
+    const key = s.boxes.find((b) => b.key);
+    assert.equal(key.key, 4);
+    const shelf = floorAt(room8.platforms, key.x + s.bounds.l, key.y + s.bounds.t - 30);
+    assert.ok(key.y + s.bounds.t - shelf >= 0 && key.y + s.bounds.t - shelf <= key.h);
+    assert.ok(Math.min(...piece(room8, 'r8_key_shelf').map((p) => Math.min(p.y1, p.y2))) < -600, 'the key sits high in the room');
+  });
+
+  it('room 16: Spinach on the floor and a Red-Green Triangle Key only a spinach jump reaches', () => {
+    walkChain(room16, ['r16_floor_r', 'r16_climb_00', 'r16_climb_01', 'r16_climb_02', 'r16_wayout']);
+    walkChain(room16, ['r16_floor_l', 'r16_left_00', 'r16_left_01', 'r16_left_02', 'r16_left_03']);
+    const s = street(ROOM_16_TSID);
+    const key = s.boxes.find((b) => b.key);
+    assert.equal(key.key, 5);
+    const shelf = [...piece(room16, 'r16_key_shelf'), ...piece(room16, 'r16_key_shelf_lip')];
+    assert.ok(canReach(piece(room16, 'r16_left_03'), shelf, SPINACH), 'spinach jump from the last left ledge');
+    for (const id of new Set(room16.platforms.map((p) => p.id.replace(/_\d+$/, '')))) {
+      if (id === 'plat_r16_key_shelf' || id === 'plat_r16_key_shelf_lip' || id === 'plat_r16_ceiling') continue;
+      assert.equal(canReach(room16.platforms.filter((p) => p.id.replace(/_\d+$/, '') === id), shelf), false, `${id} reaches the key without spinach`);
+    }
+    const kx = key.x + s.bounds.l;
+    const shelfY = floorAt(room16.platforms, kx, key.y + s.bounds.t - 30);
+    assert.ok(key.y + s.bounds.t - shelfY >= 0 && key.y + s.bounds.t - shelfY <= key.h);
+    assert.deepEqual(room16.items.map((i) => [i.cls, i.count]), [['spinach', 3]]);
+    assert.equal(room16.items[0].y, Math.round(floorAt(room16.platforms, room16.items[0].x, -100)));
   });
 });

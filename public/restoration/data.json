@@ -1395,9 +1395,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 255,
+  "commits": 257,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "The home page shows this round's additions"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Enchanted Forest hollows, Juju Bandits from Savanna Dust Traps, and house un-expand"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1507,16 +1517,6 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "One shared header on the home page, the restoration report and the compare page"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "A home page at / and the game at /play/"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Room 15 and the Ventilation Room in Jethimadh Tower Base, with their four secret spots"
    }
   ]
  },

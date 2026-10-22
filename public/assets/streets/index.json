@@ -12890,6 +12890,33 @@
       "platforms": 47,
       "decos": 385,
       "reconstructed": true
+    },
+    "GIF1Q6PMN7123NQ": {
+      "label": "Room 4",
+      "file": "assets/streets/GIF1Q6PMN7123NQ.json",
+      "hubId": "77",
+      "hubName": "Jethimadh Tower: Base",
+      "platforms": 35,
+      "decos": 36,
+      "reconstructed": true
+    },
+    "GIF1FHA10312KLV": {
+      "label": "Room 8",
+      "file": "assets/streets/GIF1FHA10312KLV.json",
+      "hubId": "77",
+      "hubName": "Jethimadh Tower: Base",
+      "platforms": 165,
+      "decos": 33,
+      "reconstructed": true
+    },
+    "GTJ11V9DK812UNL": {
+      "label": "Room 16",
+      "file": "assets/streets/GTJ11V9DK812UNL.json",
+      "hubId": "77",
+      "hubName": "Jethimadh Tower: Base",
+      "platforms": 116,
+      "decos": 28,
+      "reconstructed": true
     }
   }
 }

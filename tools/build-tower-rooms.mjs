@@ -1,6 +1,7 @@
 /**
- * Write the rebuilt Jethimadh Tower Base rooms (public/js/tower-rooms.js) as
- * street JSON, list them in assets/streets/index.json, and link the corridor
+ * Write the rebuilt Jethimadh Tower Base rooms (public/js/tower-rooms.js:
+ * Room 15 and the Ventilation Room; public/js/tower-challenge-rooms.js:
+ * Rooms 4, 8 and 16) as street JSON, list them in assets/streets/index.json, and link the corridor
  * doors that lead to them (connect.street + arrive), the way
  * build-street-navigation.mjs links doors to imported streets. Also links the
  * rooms' own doors back out. Safe to re-run; run it again after a street
@@ -14,7 +15,11 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { arrivalInTarget, streetAliases } from '../public/js/location-navigation.js';
-import { TOWER_ROOMS, TOWER_ROOM_DOOR_LINKS, towerRoomIndexEntry, towerRoomStreet } from '../public/js/tower-rooms.js';
+import { TOWER_ROOM_DOOR_LINKS } from '../public/js/tower-rooms.js';
+import { ALL_TOWER_ROOMS, CHALLENGE_ROOM_DOOR_LINKS, anyTowerRoomIndexEntry, anyTowerRoomStreet } from '../public/js/tower-challenge-rooms.js';
+
+const ROOMS = ALL_TOWER_ROOMS;
+const LINKS = [...TOWER_ROOM_DOOR_LINKS, ...CHALLENGE_ROOM_DOOR_LINKS];
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -45,8 +50,8 @@ function put(file, value) {
 
 // 1. Index rows first, so the rooms resolve as door targets.
 let indexChanged = false;
-for (const room of TOWER_ROOMS) {
-  const row = towerRoomIndexEntry(room);
+for (const room of ROOMS) {
+  const row = anyTowerRoomIndexEntry(room);
   if (JSON.stringify(index.streets[room.tsid]) !== JSON.stringify(row)) {
     index.streets[room.tsid] = row;
     indexChanged = true;
@@ -54,7 +59,7 @@ for (const room of TOWER_ROOMS) {
 }
 
 // 2. The rooms, with their own doors linked to the corridors / street.
-const rooms = new Map(TOWER_ROOMS.map((room) => [room.tsid, towerRoomStreet(room)]));
+const rooms = new Map(ROOMS.map((room) => [room.tsid, anyTowerRoomStreet(room)]));
 for (const street of rooms.values()) loaded.set(street.tsid, street);
 for (const street of rooms.values()) {
   for (const door of street.doors) {
@@ -69,7 +74,7 @@ for (const street of rooms.values()) {
 
 // 3. The archived corridor doors into the rooms.
 const touched = new Set();
-for (const link of TOWER_ROOM_DOOR_LINKS) {
+for (const link of LINKS) {
   const corridor = streetFor(link.street);
   const door = (corridor.doors || []).find((d) => d.id === link.door);
   if (!door?.connect) throw new Error(`${link.street} has no door ${link.door}`);
