@@ -10,7 +10,7 @@
     if (location.search) location.replace('play/' + location.search + location.hash);
   </script>
   <link rel="stylesheet" href="restoration/restoration.css" />
-  <link rel="stylesheet" href="landing/landing.css" />
+  <link rel="stylesheet" href="landing/landing.css?v=2" />
   <link rel="stylesheet" href="site/site-nav.css" />
   <link rel="icon" href="favicon.svg?v=quoin" type="image/svg+xml" />
   <link rel="icon" href="favicon.ico?v=quoin" sizes="32x32" />
@@ -43,10 +43,10 @@
           <a class="btn btn-play" href="play/">Play in your browser</a>
           <a class="btn btn-quiet" href="restoration/">See what's been restored</a>
         </div>
-        <p class="hero-note">Free, no account. Plays on a computer with a keyboard, and your game saves in this browser.</p>
+        <p class="hero-note">New to Ur? Start fresh on Gentle Island, the original tutorial, map reveal and all. Free, no account; plays on a computer with a keyboard and saves in this browser.</p>
       </div>
       <a class="hero-shot" href="play/" aria-label="Play Groddle Afternoon">
-        <img src="landing/hero.webp" width="1600" height="977" alt="The game on Hechey Track in Groddle Forest: a Glitch with silver hair beside an herb garden, a piggy, a butterfly and a fruit tree." />
+        <img src="landing/hero.webp" width="1600" height="977" alt="The game on Hechey Track in Groddle Forest: a Glitch with silver hair under a blossoming fruit tree, with a chicken, a piggy, the Groceries Vendor, a sparkly rock and a floating quoin." />
       </a>
     </div>
   </header>
@@ -60,10 +60,12 @@
         </div>
         <ul class="stat-grid" id="stats" aria-live="polite">
           <li class="stat"><span class="stat-num" data-stat="systems">52 of 55</span><span class="stat-label">game systems playable</span></li>
-          <li class="stat"><span class="stat-num" data-stat="quests">193</span><span class="stat-label">quests you can play</span></li>
+          <li class="stat"><span class="stat-num" data-stat="quests">194</span><span class="stat-label">quests you can play</span></li>
           <li class="stat"><span class="stat-num" data-stat="rooms">21 of 21</span><span class="stat-label">private quest rooms rebuilt</span></li>
+          <li class="stat"><span class="stat-num" data-stat="jobs">689</span><span class="stat-label">street projects to build</span></li>
           <li class="stat"><span class="stat-num" data-stat="streets">1,368</span><span class="stat-label">streets of the world map</span></li>
-          <li class="stat"><span class="stat-num" data-stat="skills">97 of 105</span><span class="stat-label">skills to learn</span></li>
+          <li class="stat"><span class="stat-num" data-stat="skills">98 of 105</span><span class="stat-label">skills to learn</span></li>
+          <li class="stat"><span class="stat-num" data-stat="cards">240 of 275</span><span class="stat-label">imagination upgrade cards</span></li>
           <li class="stat"><span class="stat-num" data-stat="sounds">367</span><span class="stat-label">sounds from the original game</span></li>
         </ul>
       </div>
@@ -76,36 +78,63 @@
         </div>
         <ul class="todo-grid">
           <li class="todo">
-            <img src="restoration/shots/gardens.webp" width="960" height="409" loading="lazy" alt="A crop garden on Hechey Track with piggies and a fruit tree." />
+            <img src="landing/card-grow.webp" width="1200" height="511" loading="lazy" alt="A Glitch beside an herb garden on Hechey Track, with a fruit tree and a piggy." />
             <h3>Grow, harvest and cook</h3>
-            <p>Plant crop gardens, water trants, milk butterflies, then turn it all into meals on a stove or a grill.</p>
+            <p>Plant gardens, water and pet trees, milk butterflies and cook what you grow. Poison a tree and it dies; clear it, and plant a new one.</p>
           </li>
           <li class="todo">
-            <img src="restoration/shots/mining.webp" width="960" height="409" loading="lazy" alt="A Glitch swings a pick at a rock." />
+            <img src="landing/card-mine.webp" width="1200" height="511" loading="lazy" alt="A Glitch at a metal rock on Hechey Track." />
             <h3>Mine, make and build</h3>
-            <p>Swing a pick, smelt metal, assemble machines and help build new streets through hundreds of street projects.</p>
+            <p>Swing a pick, run Woodworkers and Blockmakers, and help build 689 new streets through the original street projects.</p>
           </li>
           <li class="todo">
-            <img src="restoration/shots/room-esquibeth.webp" width="960" height="409" loading="lazy" alt="A quiet scene from The Last Pilgrimage of Esquibeth." />
+            <img src="landing/card-quests.webp" width="1200" height="511" loading="lazy" alt="Winter Walk: snowy cliffs and icicles." />
             <h3>Quests and secret rooms</h3>
-            <p>Story quests from the Magic Rock, all 21 private quest rooms and pilgrimages, rebuilt from the original rules.</p>
+            <p>Story quests from the Magic Rock, all 21 private quest rooms, pilgrimages and the secret rooms of Jethimadh Tower.</p>
           </li>
           <li class="todo">
-            <img src="restoration/shots/rooks.webp" width="960" height="409" loading="lazy" alt="The Rook darkens the sky over a street." />
+            <img src="landing/card-rook.webp" width="1200" height="511" loading="lazy" alt="The Rook swoops low over Hechey Track." />
             <h3>Fight off the Rook</h3>
             <p>When the Rook attacks, prime the shrines, stun it with a Focusing Orb and nurse the street back to life.</p>
           </li>
           <li class="todo">
-            <img src="restoration/shots/paradise.webp" width="960" height="409" loading="lazy" alt="Flying through Radial Heights in Paradise." />
-            <h3>Paradise and races</h3>
-            <p>Fly through Cloud Rings and Radial Heights, slide down Slip 'N Slide and race the Great Hog Haul.</p>
+            <img src="landing/card-races.webp" width="1200" height="511" loading="lazy" alt="Grab 'Em Good: a night race through giant trees for floating quoins." />
+            <h3>Races and Paradise</h3>
+            <p>Race rivals in Grab 'Em Good and the Great Hog Haul, and fly through Cloud Rings and Radial Heights.</p>
           </li>
           <li class="todo">
-            <img src="restoration/shots/homes.webp" width="960" height="409" loading="lazy" alt="A Glitch's home street with a house." />
+            <img src="landing/card-home.webp" width="1200" height="511" loading="lazy" alt="A decorated house with wallpaper, furniture and a reading lamp." />
             <h3>A home of your own</h3>
-            <p>Claim a house, decorate it and raise a tower up to nine floors. Dress your Glitch from 626 pieces of the original wardrobe.</p>
+            <p>Paper your rooms wall by wall with Tiny Speck's own 109 wallpapers, floors and ceilings, decorate, and raise a tower.</p>
+          </li>
+          <li class="todo">
+            <img src="landing/card-explore.webp" width="1200" height="511" loading="lazy" alt="Groddle Ladder in Ix: a starry yellow sky over strange trees." />
+            <h3>Explore Ur</h3>
+            <p>Jump into the Great Hole to Ix, find the Enchanted Forest hollows, and help the Juju Bandits that come out of the Savanna.</p>
+          </li>
+          <li class="todo">
+            <img src="landing/card-skills.webp" width="1200" height="511" loading="lazy" alt="The imagination shop: three upgrade cards to choose from." />
+            <h3>Skills and imagination</h3>
+            <p>Learn 98 skills and spend imagination on 240 of the original upgrade cards, from bigger batches to longer levitation.</p>
           </li>
         </ul>
+      </div>
+    </section>
+
+    <section class="band art-note" aria-labelledby="art-h">
+      <div class="wrap art-grid">
+        <div>
+          <h2 id="art-h">Drawn from the original files</h2>
+          <p class="section-lead">
+            Every picture in Groddle Afternoon is Tiny Speck's own art. Glitch was drawn in vectors, so the trees,
+            quoins, Glitches and street scenery are rendered again from their original Flash files: sharp on today's
+            screens, and still exactly the shapes and colours they always were.
+          </p>
+        </div>
+        <figure class="art-pair">
+          <div><img src="landing/art-1x.webp" width="566" height="520" loading="lazy" alt="A blossoming fruit tree from the 2012 image, enlarged and soft." /><figcaption>The 2012 image, enlarged</figcaption></div>
+          <div><img src="landing/art-3x.webp" width="566" height="520" loading="lazy" alt="The same fruit tree rendered again from Tiny Speck's file, crisp." /><figcaption>Rendered again from Tiny Speck's file</figcaption></div>
+        </figure>
       </div>
     </section>
 
@@ -164,6 +193,6 @@
     </div>
   </footer>
 
-  <script src="landing/landing.js" type="module"></script>
+  <script src="landing/landing.js?v=2" type="module"></script>
 </body>
 </html>

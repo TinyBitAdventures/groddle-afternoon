@@ -34,6 +34,9 @@ async function main() {
   if (data.streets) setStat('streets', fmt(data.streets.onMapsImported ?? data.streets.imported));
   if (data.skills) setStat('skills', of(data.skills.counts?.live, data.skills.total));
   if (data.sounds) setStat('sounds', fmt(data.sounds.playable ?? data.sounds.withFile));
+  if (data.jobs) setStat('jobs', fmt(data.jobs.playableJobs));
+  const img = data.imagination;
+  if (img?.counts && img.total) setStat('cards', of((img.counts.live || 0) + (img.counts.starter || 0), img.total));
 
   const recent = (data.git?.recent || []).filter((r) => r.kind === 'new' || r.kind === 'improve' || r.kind === 'fix').slice(0, 5);
   const list = document.getElementById('log-list');
