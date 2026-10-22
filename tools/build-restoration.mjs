@@ -24,6 +24,8 @@ import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js';
 import { remakeStatus } from '../public/js/imagination-remake.js';
 import { SHOTS } from './restoration/shots.mjs';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { ROOM_NOTES } from './restoration/rooms.mjs';
+import { parseQuestConversation } from '../public/js/quests.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -103,12 +105,21 @@ function roomStats() {
     if (!rooms.has(roomId)) rooms.set(roomId, { id: roomId, title: ROOM_TITLES[roomId] || roomId, quests: [] });
     rooms.get(roomId).quests.push(quests[questId]?.title || questId);
   }
-  const list = [...rooms.values()].map((r) => ({
-    ...r,
-    quests: [...new Set(r.quests)],
-    built: BUILT_ROOMS.includes(r.id),
-    shot: shotFile(`room:${r.id}`),
-  }));
+  const firstQuest = Object.fromEntries(Object.entries(QUEST_ROOMS).reverse().map(([q, room]) => [room, q]));
+  const list = [...rooms.values()].map((r) => {
+    // The original offer's opening line, as the quest-giver said it.
+    const offer = parseQuestConversation(quests[firstQuest[r.id]]?.offer || '')[0]?.text || '';
+    const hd = `shots/hd/room-${r.id}.webp`;
+    return {
+      ...r,
+      quests: [...new Set(r.quests)],
+      built: BUILT_ROOMS.includes(r.id),
+      shot: shotFile(`room:${r.id}`),
+      hd: existsSync(join(pub, 'restoration', hd)) ? hd : null,
+      offer: offer.length > 420 ? `${offer.slice(0, 417).replace(/\s+\S*$/, '')}…` : offer,
+      note: ROOM_NOTES[r.id] || null,
+    };
+  });
   list.sort((a, b) => Number(b.built) - Number(a.built) || a.title.localeCompare(b.title));
   return { total: list.length, built: list.filter((r) => r.built).length, rooms: list };
 }

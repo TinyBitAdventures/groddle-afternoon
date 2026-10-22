@@ -6,6 +6,8 @@
  *   node tools/restoration/capture.mjs                 every missing shot
  *   node tools/restoration/capture.mjs --all           re-capture everything
  *   node tools/restoration/capture.mjs rooks room:juju_camp
+ *   node tools/restoration/capture.mjs --hd            room modal images: 2x, no room card,
+ *                                                     public/restoration/shots/hd/room-<id>.webp
  *
  * The HUD rail, chat dock and activity feed are hidden so the street reads
  * cleanly. 'world' shots crop to the street view above the pack; 'panel'
@@ -29,24 +31,27 @@ const HIDE = `
 
 const args = process.argv.slice(2);
 const all = args.includes('--all');
+// HD: the room modal's large image, at device scale 2 with the room card hidden.
+const hd = args.includes('--hd');
+const HIDE_HD = `${HIDE} #quest-instance-hud, .qi-hud { visibility: hidden !important; }`;
 const only = args.filter((a) => !a.startsWith('--'));
-const keys = (only.length ? only : Object.keys(SHOTS)).filter((k) => SHOTS[k]);
-const fileFor = (key) => join(outDir, `${key.replace(/^room:/, 'room-')}.webp`);
+const keys = (only.length ? only : Object.keys(SHOTS)).filter((k) => SHOTS[k] && (!hd || k.startsWith('room:')));
+const fileFor = (key) => join(hd ? join(outDir, 'hd') : outDir, `${key.replace(/^room:/, 'room-')}.webp`);
 
-mkdirSync(outDir, { recursive: true });
+mkdirSync(hd ? join(outDir, 'hd') : outDir, { recursive: true });
 const browser = await chromium.launch({ args: ['--ignore-certificate-errors', '--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
 let done = 0;
 for (const key of keys) {
   const target = fileFor(key);
   if (!all && !only.length && existsSync(target)) continue;
   const spec = SHOTS[key];
-  const context = await browser.newContext({ viewport: { width: 1280, height: 860 }, ignoreHTTPSErrors: true });
+  const context = await browser.newContext({ viewport: { width: 1280, height: 860 }, deviceScaleFactor: hd ? 2 : 1, ignoreHTTPSErrors: true });
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   try {
     await page.goto(`${BASE}${spec.route}`, { waitUntil: 'load', timeout: 120000 });
-    await page.addStyleTag({ content: HIDE });
+    await page.addStyleTag({ content: hd ? HIDE_HD : HIDE });
     await page.waitForTimeout(spec.wait || 9000);
     for (const step of spec.steps || []) {
       if (step.click) await page.click(step.click, { timeout: 10000 }).catch(() => {});
@@ -63,7 +68,7 @@ for (const key of keys) {
     }, spec.frame || 'world');
     const png = join(tmpdir(), `resto-${process.pid}-${key.replace(/[^a-z0-9]/gi, '_')}.png`);
     await page.screenshot({ path: png, clip: box });
-    execFileSync('cwebp', ['-quiet', '-q', '80', '-resize', '960', '0', png, '-o', target]);
+    execFileSync('cwebp', ['-quiet', '-q', hd ? '82' : '80', '-resize', hd ? '1600' : '960', '0', png, '-o', target]);
     rmSync(png, { force: true });
     done += 1;
     console.log(`${key} -> ${target.replace(`${root}/`, '')}${errors.length ? ` (page errors: ${errors.slice(0, 2).join(' | ')})` : ''}`);

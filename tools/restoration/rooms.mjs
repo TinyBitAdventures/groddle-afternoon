@@ -1,0 +1,182 @@
+/**
+ * Explainers for the quest-room modals on the restoration page. One entry per
+ * room in public/js/quest-rooms/catalog.js QUEST_ROOMS (tests/restoration.test.js
+ * holds every room to one). The builder adds each room's first quest offer
+ * line from quests.json and the HD screenshot path.
+ *
+ *   about    what the quest was in Glitch
+ *   play     how it plays in the remake
+ *   source   what comes straight from the original code
+ *   rebuilt  what had to be reconstructed, and from what
+ *   footage  reference recordings (YouTube ids) used to rebuild it
+ */
+export const ROOM_NOTES = Object.freeze({
+  rainbow_run: {
+    tagline: '30 coins in 30 seconds on a rainbow.',
+    about: 'The Numismatic Hustle dropped you into a private Rainbow Run: grab thirty coins before a thirty-second clock runs out.',
+    play: 'Click Ready, sit through the 3-2-1, then sprint and hop across rainbow clouds collecting coins. Thirty or more and the rainbow is yours; fewer and the quest fails so you can try again.',
+    source: 'The ready screen, countdown, 30-second clock, coin counter, success and failure lines, and the FUTURE_SWING_30 cue.',
+    rebuilt: 'The course itself was never archived. It is a bright rainbow reconstruction with 44 coins, sized so 30 of them take a brisk, clean run.',
+    footage: [],
+  },
+  top_of_tree: {
+    tagline: "The Magic Rock's memory of a very tall tree.",
+    about: "The High Jumper sent you into the Magic Rock's memory-place: a white void with one enormous tree whose branches are too far apart to jump.",
+    play: 'Pick up Spinach, activate it from your pack for its jump boost, and climb the alternating branches to the top. The Rock nags if you forget the Spinach.',
+    source: "The two-minute visit, the Rock's lines (\"Trial and error, baby. Just get started…\") and its 30 and 45 second nags, the free energy, and the top_of_tree flag.",
+    rebuilt: 'The tree is rebuilt from the GlitchAddict recording with recovered branch decos; each gap needs the Spinach jump.',
+    footage: [{ id: 'cY1G2GIoJ94', label: 'The High Jumper (GlitchAddict)' }],
+  },
+  color_unblocking: {
+    tagline: 'Wall switches that make coloured blocks vanish.',
+    about: 'Color Unblocking was the first of the colour puzzle levels: switches on the wall turn coloured toy blocks on and off, and you have to clear a path to the exit.',
+    play: 'Press switches to remove red, green, blue and purple towers in the right order; one switch also drops a bridge, so order matters. The first finish earns the Play Cube, which lets you replay every puzzle level.',
+    source: 'The five-minute limit, the exit flag, the crab at the end, the 250 iMG / 100 energy / 50 Ti favor reward and the Play Cube.',
+    rebuilt: "The level's layout and switch scripts were lost; it is rebuilt from the level designer's run-throughs using the original toy-block and switch art.",
+    footage: [{ id: 'b_oNR5Qzf_I', label: 'Colour Unblocking (level designer)' }, { id: 'mpDOdmZbXA4', label: 'Colour Unblocking (SnygystFS)' }],
+  },
+  vision_quest: {
+    tagline: 'Help a short-sighted frog pass his eye test.',
+    about: 'In the Institute of Ocular Testing, the Myopic Delivery Frog needs to name an object across the room to join the delivery service, and he cannot see it.',
+    play: 'Press C for Camera Mode, look across the room at the mystery object, then talk to the frog and pick the right description. Wrong answers get his glasses offered; the right one sends him flying off happy.',
+    source: "This room survives in the archive, so it runs on the real Institute street. The six possible objects, all of the frog's lines and his seven wrong guesses are original.",
+    rebuilt: 'Only the Camera Mode viewfinder is new: the remake had no client camera at the time, so the room supplies one.',
+    footage: [],
+  },
+  le_miserable: {
+    tagline: 'Light panels, a shrink ray and a crawl space.',
+    about: 'Le Misérable took place in the Fireflex 3000 Lab: match three light panels to switch on a machine, shrink yourself, and crawl through to the other side.',
+    play: 'Step on floor pads to cycle each column of lights until the panels match their answers, then ride the shrinking beam, crawl under the low walls and grow back. MaintenanceBot M-64 hands out both parts.',
+    source: "The lab is one of only two rooms that survived. It runs the street's own 234 event scripts; only the lost pads, reset buttons and machines are rebuilt around them.",
+    rebuilt: 'The pads, buttons and machines were items whose positions were lost, placed from the circle marks on the floor and the recording.',
+    footage: [{ id: 'j9xJLETQzi4', label: 'Le Miserable and A Summer’s Day' }, { id: '2e2SzNogFiQ', label: 'Le Miserable (SnygystFS)' }],
+  },
+  kids_room: {
+    tagline: "Spell words for Mr. Block in a tiny playroom.",
+    about: "Child's Play and Word Up shrank you into Mr. Block's playroom. First you bring him something starting with his letter, then you spin letter blocks into as many words as you can.",
+    play: "Give Mr. Block an item whose name starts with his letter. In Word Up, spin three letter blocks for three minutes; the more of the 24 words you find, the bigger the bonus. A plush tea party carries on in the corner.",
+    source: "The letter rule, the 24-word list, the reward tiers at 3, 10 and 20 words, and the tea party's exact lines.",
+    rebuilt: 'The playroom shares the clean vector room built for Four Letter Words, with the recovered letter-block and Mr. Block art.',
+    footage: [],
+  },
+  rube_yard: {
+    tagline: "Catch ten Wrizzards hiding in The Rube's yard.",
+    about: "The Wrizzards and The Rube had you search the mysterious trader's yard for ten escaped Wrizzards.",
+    play: "Look behind crates, barrels and the log pile and click each Wrizzard; it hops back into The Rube's jar.",
+    source: 'The five-minute limit, the ten-Wrizzard counter and the 500 iMG / 500 currants / 100 mood reward.',
+    rebuilt: "Neither the yard nor any Wrizzard art survives. The yard is built from recovered clutter, and the Wrizzards are lizard decos in a wizard hat.",
+    footage: [],
+  },
+  juju_camp: {
+    tagline: "Dig up the Juju bandits' clues across Kajuu.",
+    about: "Carry That Weight sent you to the Juju Bandits' hideout, where Grandma sets you hunting for her lost Ancestral Paperweight with secret clues.",
+    play: "Hear Grandma's briefing, take the trowel and the first hint, then read each riddle to find the right street in Kajuu and dig there. Three clues lead to the Paperweight; bring it back to her for Part II.",
+    source: "Grandma's conversations, the clue table (four hubs × five streets), the grandson's scene and its lines, the 20 archived dig spots and the rewards.",
+    rebuilt: "The hideout's geometry was lost; it is built from the camp's own tent, campfire and paper decos.",
+    footage: [],
+  },
+  picto_pattern: {
+    tagline: 'Add and subtract until you reach 11.',
+    about: 'Picto-Pattern was a number puzzle: turn a starting number into 11 in a set number of steps, using tally-mark clouds.',
+    play: "At each of three stations, press the coloured step buttons to fill a chain of clouds. A wrong total flashes red and empties; the right one turns the chain into walkable clouds that lead on.",
+    source: 'The five-minute limit, the target of 11, the solved and leave flags, and the reward of 11 Cloud 11 Smoothies.',
+    rebuilt: "The three puzzles (14 in three steps, 8 in four, 1 in six) are taken from the level designer's run-through; clouds and tally marks are drawn fresh.",
+    footage: [{ id: 'UryaMaICZFg', label: 'Picto Pattern (level designer)' }],
+  },
+  radiant_glare: {
+    tagline: 'Climb a dark shaft by mixing coloured light.',
+    about: 'Radiant Glare was a vertical light puzzle: platforms only exist in light of their own colour.',
+    play: 'Touch orbs to light timed lamps, mix colours on a two-bank console (yellow and blue make green), and use the "clicking on it works just as well" totem to reach the rainbow and the exit.',
+    source: 'The five-minute limit, flags and rewards for both the quest and its replay.',
+    rebuilt: "Rebuilt from the level designer's run-through; the lamps' timings are measured from the video.",
+    footage: [{ id: 'ZQQydNM9THI', label: 'Radiant Glare (level designer)' }],
+  },
+  light_perspective: {
+    tagline: 'A dark room where clouds appear in coloured light.',
+    about: 'Walk Toward the Light taught colour mixing step by step: each lesson adds a new way light can help or hinder you.',
+    play: 'Seven lessons: timed bulbs, red walls that orbs put out, a "fall" section, and switches that mix red, yellow and blue into the colour that crosses, ending at "Astounding! You truly are a Champ!"',
+    source: 'The five-minute limit, the solved flag at the exit door and both reward sets.',
+    rebuilt: "Rebuilt from the level designer's run-through, using his sign text for each lesson.",
+    footage: [{ id: 'Et0RkY43A5Q', label: 'Walk Toward the Light (level designer)' }],
+  },
+  mental_block: {
+    tagline: 'Drop blocks from a tube to build a way up.',
+    about: 'Mental Block and its sequel were block-drop puzzles: build a staircase to a high ledge from a fixed sequence of blocks.',
+    play: 'At each station, move the tube and drop blocks in order. Blue blocks stack on anything; red ones stack only on red and crush the blue beneath. Reset if you box yourself in.',
+    source: 'The flags, rewards and the "Are you stuck?" prompt (not a timer: the sequel takes longer than five minutes).',
+    rebuilt: "Each station's block order, tube stops and ledge heights are measured from the level designer's two videos.",
+    footage: [{ id: 'mgsdduCR_Gc', label: 'Mental Block (level designer)' }, { id: 'Y0GgASrJ_GE', label: 'Mental Block 2 (level designer)' }],
+  },
+  an_autumn_day: {
+    tagline: 'A silhouette memory of drifting words.',
+    about: "An Autumn Day, the sequel to A Summer's Day, was a short shared memory of the Giants: a black-on-sunset wood and a feeling to recall.",
+    play: 'Follow the crow, climb the floating words, and jump into the scrambled sentence to put "Almost forgot this feeling of …" back together. The last word picks a feeling room with a hidden Qurazy quoin.',
+    source: 'The four linked places, the five-minute limit, the leave flag and the hourly repeat; the original AUTUMN_DAY music.',
+    rebuilt: "Layout and puzzle rebuilt from Lily Linguistic's recording; the feeling rooms beyond Wonder are drawn from their names.",
+    footage: [{ id: 'OuO_TtcfAyI', label: 'An Autumn Day (Lily Linguistic)' }],
+  },
+  esquibeth: {
+    tagline: "Walk Esquibeth's last pilgrimage and learn her song.",
+    about: "The Last Pilgrimage of Esquibeth retold a Glitch legend: follow her ghost through grottos and up a waterfall, collecting notes and replaying her song at each Giant stone.",
+    play: 'Find the notes, then play back the ghost\'s melody (click or keys 1 to 5). At the top, Esquibeth dances, Grendaline appears, and you keep the Conch as a memento.',
+    source: "The quest rules and rewards, the Conch's Play and Blow, and the Hollow's own background painting from Tiny Speck's overlay files.",
+    rebuilt: 'Narration was read from two full recordings, and her song (E G D, E C, A D) was matched from their audio against the recovered bell sounds.',
+    footage: [{ id: 'BgRgIaeaj9Q', label: 'The Last Pilgrimage of Esquibeth' }, { id: 'fvin5awPESI', label: 'The Last Pilgrimage of Esquibeth (SnygystFS)' }],
+  },
+  being_watched: {
+    tagline: 'A beige dream and something behind the veil.',
+    about: 'Being Watched began with a stale cup of water and a nap, and a dream where eyes follow you everywhere.',
+    play: 'Hop across pillow clouds past blinking wall eyes, peek behind the veil, and find out who has been watching.',
+    source: 'The five-minute nap, the Peek Behind the Veil and Ride It Out flags, and the rewards.',
+    rebuilt: "No footage or layout survives, so the dream is reimagined; the Bureaucrat's three lines behind the veil are new writing.",
+    footage: [],
+  },
+  back_alley: {
+    tagline: 'A shady deal, a fuel cell and a stranded robot.',
+    about: "We're Off to See the Lizard: a Shady Bureaucrat in the back alley asks you to refuel a maintenance robot stuck in a subway station.",
+    play: "Hear the proposition, make a Fuel Cell in a Fuelmaker, take any subway door, find the robot on the platform and refuel it.",
+    source: "The Bureaucrat's four lines, the three-minute alley clock, the robot's lines and the rewards.",
+    rebuilt: 'The subway platform is rebuilt from two subway recordings; the remake has no subway network, so any subway door opens it.',
+    footage: [],
+  },
+  clubhouse: {
+    tagline: 'Only the observant may enter.',
+    about: 'Join the Club invited you to the Society of Keen-Eyed Noticers, whose treehouse door opens only for those who notice things.',
+    play: 'Climb the treehouses, find the burnt sketch in each, set the clubhouse frames to match and press ENTER. Inside, jump into the Curious Painting for a bonus meadow of Qurazy quoins.',
+    source: "The five-minute clock, the painting's reach, the wall buttons' reset time, the flags and rewards.",
+    rebuilt: "Layout and puzzle rebuilt from SnygystFS's recording; only one sketch was readable in it, so the decoys are new.",
+    footage: [{ id: 'ScgY1IJgzAo', label: 'Join The Club (SnygystFS)' }],
+  },
+  tile_puzzle: {
+    tagline: 'Rotate pipe tiles to break into the lab.',
+    about: 'An Old Fashioned B&E had you sneak into a pale lab maze, with a voice over the speakers promising cheese.',
+    play: 'Press the wall buttons to rotate pipe tiles until a path opens, climb the ladders, reach the end box, and drop through to a room of quoins that is, sadly, not cheese.',
+    source: 'The five-minute limit, the exit flag and both reward sets.',
+    rebuilt: "The speaker's lines are transcribed from GranniesgotGame's recording; the tile puzzle is reconstructed around the lab seen there.",
+    footage: [{ id: '8qWMCIV6bYE', label: 'BTC Room #3 (GranniesgotGame)' }],
+  },
+  operation_grow: {
+    tagline: 'Bring a gloomy bog back to bloom.',
+    about: "Operation: Grow sent you to Mab's forgotten bog fields to make the blue grow again.",
+    play: "Tend the seven gloomy patches; each tends its neighbours too. Mab's note on the bank shows the only answer.",
+    source: 'The spawn point, five-minute limit, flags and rewards.',
+    rebuilt: 'No recording was found, so the puzzle is designed from the quest text with recovered bog plants and patches.',
+    footage: [],
+  },
+  gwendolyn: {
+    tagline: 'A desert, a mind in space, and a ghost.',
+    about: "Gwendolyn's Task is a three-part journey set by the ghost of Gwendolyn: survive the desert heat of Area 42, walk through your own mind, and find her chamber.",
+    play: 'Follow the squid through the scorching desert, climb the pink tube path of the Outer Mind, cross the crystal Inner Mind, and meet Gwendolyn for a Random Kindness.',
+    source: "Area 42 survives and runs on its real street; the heat, the desert script, the cactus and squid dialogue and the rewards are original.",
+    rebuilt: 'The Outer Mind, Inner Mind and chamber are rebuilt from three runthrough recordings.',
+    footage: [{ id: 'V51lCz1q0qI', label: "Gwendolyn's Quest" }, { id: '01_XPTF2lZ0', label: 'The Gwendolyn Quest' }, { id: '89tShFGl3uc', label: "Gwendolyn's Chamber runthrough" }],
+  },
+  penalty: {
+    tagline: 'Break the Smuggler out of jail.',
+    about: 'Smuggle the Smuggler followed the contraband runs: the Smuggler has been locked up, and you have to dig him out.',
+    play: 'Talk to the imprisoned Smuggler, dig through the patch with a shovel, and crawl out to freedom together.',
+    source: "The three quests' dialogue, flags, the shovel requirement and the rewards.",
+    rebuilt: "The cell's layout is lost; it is built from the recovered penalty-box decos.",
+    footage: [{ id: 'Spfk2xfVyXA', label: 'Smuggler Quest' }],
+  },
+});

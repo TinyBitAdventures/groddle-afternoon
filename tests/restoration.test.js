@@ -15,6 +15,7 @@ import { CHECKLIST, GROUPS, STATUS } from '../tools/restoration/checklist.mjs';
 import { SHOTS } from '../tools/restoration/shots.mjs';
 import { buildRestorationData, comparable } from '../tools/build-restoration.mjs';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js';
+import { ROOM_NOTES } from '../tools/restoration/rooms.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PLAYABLE = new Set(['source', 'rebuilt', 'reimagined', 'solo']);
@@ -51,6 +52,18 @@ describe('restoration checklist', () => {
       if (key.startsWith('room:')) assert.ok(rooms.has(key.slice(5)), key);
       else assert.ok(CHECKLIST.some((i) => i.id === key), key);
     }
+  });
+});
+
+describe('quest room explainers', () => {
+  it('every room has a complete explainer', () => {
+    for (const room of new Set(Object.values(QUEST_ROOMS))) {
+      const note = ROOM_NOTES[room];
+      assert.ok(note, `${room} needs an entry in tools/restoration/rooms.mjs`);
+      for (const field of ['tagline', 'about', 'play', 'source', 'rebuilt']) assert.ok(note[field], `${room}.${field}`);
+      for (const f of note.footage) assert.match(f.id, /^[\w-]{11}$/, `${room} footage id`);
+    }
+    for (const id of Object.keys(ROOM_NOTES)) assert.ok(Object.values(QUEST_ROOMS).includes(id), `stale note ${id}`);
   });
 });
 

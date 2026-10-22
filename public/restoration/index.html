@@ -143,7 +143,7 @@
     <section class="band band-alt" id="rooms" aria-labelledby="rooms-h">
       <div class="wrap">
         <h2 id="rooms-h">Quest rooms, rebuilt</h2>
-        <p class="section-lead">Many of Glitch's best quests happened in private rooms built just for you. Only two of those rooms survive in the archive, so each one is reconstructed from the quest's code (its timers, flags, dialogue and rewards) and recordings players and Tiny Speck's own level designer left behind.</p>
+        <p class="section-lead">Many of Glitch's best quests happened in private rooms built just for you. Only a handful survive in the archive, so most are reconstructed from the quest's code (its timers, flags, dialogue and rewards) and recordings players and Tiny Speck's own level designer left behind. Pick a room to read its story.</p>
         <div class="rooms" id="room-grid"></div>
       </div>
     </section>
@@ -183,6 +183,35 @@
       <p><a href="../">Play Groddle Afternoon</a> · <a href="../changelog.html">Build archive</a></p>
     </div>
   </footer>
+
+  <dialog class="room-modal" id="room-modal" aria-labelledby="room-modal-title">
+    <div class="rm-media">
+      <img class="rm-shot" alt="" />
+      <button class="rm-close" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="rm-body">
+      <div class="rm-head">
+        <div>
+          <p class="rm-kicker"></p>
+          <h3 class="rm-title" id="room-modal-title"></h3>
+          <p class="rm-tagline"></p>
+        </div>
+        <span class="pill rm-pill"></span>
+      </div>
+      <blockquote class="rm-offer"><p></p><cite>The quest's opening line in Glitch</cite></blockquote>
+      <div class="rm-grid">
+        <section><h4>In Glitch</h4><p class="rm-about"></p></section>
+        <section><h4>How it plays here</h4><p class="rm-play"></p></section>
+        <section><h4>Straight from the original</h4><p class="rm-source"></p></section>
+        <section><h4>Rebuilt</h4><p class="rm-rebuilt"></p></section>
+      </div>
+      <div class="rm-footage"><h4>Rebuilt with help from</h4><ul></ul></div>
+      <nav class="rm-nav" aria-label="Other quest rooms">
+        <button type="button" class="rm-prev">← <span></span></button>
+        <button type="button" class="rm-next"><span></span> →</button>
+      </nav>
+    </div>
+  </dialog>
 
   <template id="detail-tpl">
     <div class="detail">

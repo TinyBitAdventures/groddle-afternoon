@@ -186,15 +186,75 @@ function renderNumbers(data) {
 /* —— Rooms ———————————————————————————— */
 function renderRooms(data) {
   const grid = $('#room-grid');
-  for (const r of data.rooms.rooms) {
+  const rooms = data.rooms.rooms;
+  rooms.forEach((r, index) => {
     const shot = r.shot
-      ? el('img', { class: 'room-shot', src: r.shot, alt: `${r.title} in Groddle Afternoon`, loading: 'lazy' })
+      ? el('img', { class: 'room-shot', src: r.shot, alt: '', loading: 'lazy' })
       : el('div', { class: 'room-shot is-empty' }, r.built ? 'Screenshot coming' : 'On the workbench');
     const status = r.built ? 'rebuilt' : 'progress';
     const pill = el('span', { class: 'pill', style: `--tone:${tone(status, data)}` }, r.built ? 'Rebuilt' : 'In progress');
-    grid.append(el('article', { class: `room${r.built ? '' : ' is-pending'}` }, shot,
-      el('div', { class: 'room-body' }, el('h3', {}, r.title), el('p', {}, r.quests.join(' · ')), pill)));
+    const card = el('button', { type: 'button', class: `room${r.built ? '' : ' is-pending'}`, 'aria-haspopup': 'dialog', 'aria-label': `${r.title}: about this quest room`, onclick: () => openRoom(index) }, shot,
+      el('div', { class: 'room-body' },
+        el('h3', {}, r.title),
+        el('p', {}, r.note?.tagline || r.quests.join(' · ')),
+        pill, r.note ? el('span', { class: 'room-more' }, 'Read more') : null));
+    grid.append(card);
+  });
+
+  const modal = $('#room-modal');
+  let current = 0;
+  const fill = (sel, text) => { $(sel, modal).textContent = text || ''; };
+  function openRoom(index) {
+    current = (index + rooms.length) % rooms.length;
+    const r = rooms[current];
+    const note = r.note || {};
+    const img = $('.rm-shot', modal);
+    img.src = r.hd || r.shot || '';
+    img.alt = `${r.title}, rebuilt in Groddle Afternoon`;
+    img.hidden = !(r.hd || r.shot);
+    const questNames = r.quests.join(' · ');
+    fill('.rm-kicker', questNames === r.title ? 'Quest room' : questNames);
+    fill('.rm-title', r.title);
+    fill('.rm-tagline', note.tagline);
+    const pill = $('.rm-pill', modal);
+    pill.textContent = r.built ? 'Rebuilt' : 'In progress';
+    pill.style.setProperty('--tone', tone(r.built ? 'rebuilt' : 'progress', data));
+    const offer = $('.rm-offer', modal);
+    offer.hidden = !r.offer;
+    $('p', offer).textContent = r.offer ? `“${r.offer}”` : '';
+    fill('.rm-about', note.about);
+    fill('.rm-play', note.play);
+    fill('.rm-source', note.source);
+    fill('.rm-rebuilt', note.rebuilt);
+    const foot = $('.rm-footage', modal);
+    const list = $('ul', foot);
+    list.replaceChildren(...(note.footage || []).map((f) => el('li', {}, el('a', { href: `https://www.youtube.com/watch?v=${f.id}`, target: '_blank', rel: 'noopener' }, f.label))));
+    foot.hidden = !(note.footage || []).length;
+    $('.rm-prev span', modal).textContent = rooms[(current - 1 + rooms.length) % rooms.length].title;
+    $('.rm-next span', modal).textContent = rooms[(current + 1) % rooms.length].title;
+    if (!modal.open) modal.showModal();
+    modal.scrollTop = 0;
   }
+  $('.rm-close', modal).addEventListener('click', () => modal.close());
+  $('.rm-prev', modal).addEventListener('click', () => openRoom(current - 1));
+  $('.rm-next', modal).addEventListener('click', () => openRoom(current + 1));
+  // Click on the backdrop (outside the dialog box) closes it.
+  modal.addEventListener('click', (e) => {
+    const r = modal.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) modal.close();
+  });
+  modal.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') openRoom(current - 1);
+    if (e.key === 'ArrowRight') openRoom(current + 1);
+  });
+  // Deep link: #room-<id> opens that room.
+  const fromHash = () => {
+    const m = /^#room-(.+)$/.exec(location.hash);
+    const i = m ? rooms.findIndex((r) => r.id === m[1]) : -1;
+    if (i >= 0) openRoom(i);
+  };
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
 }
 
 /* —— Recent + honest + footer ———————————————————————————— */
