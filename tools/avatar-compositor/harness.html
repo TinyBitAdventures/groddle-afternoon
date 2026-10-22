@@ -4,14 +4,15 @@
 <body>
 <script type="module">
   // Offline driver for tools/avatar-compositor/build.mjs (render, score).
-  import { prepareLook, sheetLayout, paintSheet, sheetDef, paintPreview, SHEET_ORDER } from '/js/avatar-compositor.js';
+  import { prepareLook, prepareIdle, sheetLayout, paintSheet, sheetDef, paintPreview, bakeIdleSheet, SHEET_ORDER, IDLE_SHEET_ORDER } from '/js/avatar-compositor.js';
   import { resolveLook } from '/js/avatar-looks.js';
 
   /** { sheet: { def, 1: dataUrl, 3: dataUrl } } */
   window.renderLook = async (look, scales = [1, 3], only = null) => {
     const prep = await prepareLook(look, '/assets/avatar/');
+    await prepareIdle(prep);
     const out = {};
-    for (const name of SHEET_ORDER) {
+    for (const name of [...SHEET_ORDER, ...IDLE_SHEET_ORDER]) {
       if (only && !only.includes(name)) continue;
       const layout = sheetLayout(prep, name);
       out[name] = { def: sheetDef(layout, `${name}.png`) };
@@ -37,6 +38,19 @@
     const t = performance.now();
     for (const name of SHEET_ORDER) paintSheet(prep, sheetLayout(prep, name), scale);
     return performance.now() - t;
+  };
+  /** Time the lazy idle bakes of a look: each sheet painted in slices (ms per slice). */
+  window.timeIdleBake = async (look, scale = 3, budgetMs = 4) => {
+    const prep = await prepareLook(look, '/assets/avatar/');
+    let t = performance.now();
+    await prepareIdle(prep);
+    const out = { prepareIdleMs: performance.now() - t, sheets: {} };
+    for (const name of IDLE_SHEET_ORDER) {
+      t = performance.now();
+      const r = await bakeIdleSheet(prep, name, scale, { budgetMs });
+      out.sheets[name] = { wallMs: performance.now() - t, ...r.stats, cells: r.def.cells, px: [r.canvas.width, r.canvas.height] };
+    }
+    return out;
   };
   window.harnessReady = true;
 </script>

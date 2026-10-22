@@ -77,7 +77,7 @@ export function flattenSprite(swf, id, n, opts = {}, m = IDENTITY, a = 1, groups
       continue;
     }
     if (p.name && opts.seen) opts.seen(p.name, pm, pa);
-    const marker = p.name && opts.stop ? opts.stop(p.name, childPath, pm, pa, m) : null;
+    const marker = p.name && opts.stop ? opts.stop(p.name, childPath, pm, pa, m, p.id) : null;
     if (marker) ops = [marker];
     else if (pa <= 0 && !opts.keepHidden) ops = [];
     else if (kind === 'shape') {
@@ -118,7 +118,7 @@ export function buildRig(swf, rootId, frames, slotNames, watchNames = []) {
     const ops = flattenSprite(swf, rootId, n, {
       keepHidden: false,
       seen: (name, pm) => { if (watch.has(name)) seenHere[name] = roundMatrix(pm); },
-      stop: (name, path, pm, pa, parentM) => {
+      stop: (name, path, pm, pa, parentM, id) => {
         if (pa <= 0) return { hidden: true };
         if (slots.has(name)) {
           const hook = { slot: name, m: roundMatrix(pm) };
@@ -129,7 +129,9 @@ export function buildRig(swf, rootId, frames, slotNames, watchNames = []) {
         }
         if (/_mc$/.test(name) && !/Container/.test(name)) {
           // A body part (sideTorso_mc ...): static content, drawn by node.
-          const key = `${path}`;
+          // Keyed by symbol too, in case a path holds another symbol on
+          // some frames (the idle and sleepy frames reuse the same parts).
+          const key = `${path}#${id}`;
           return { node: key, m: roundMatrix(pm), a: pa < 1 ? r4(pa) : undefined, name };
         }
         return null;
@@ -142,7 +144,7 @@ export function buildRig(swf, rootId, frames, slotNames, watchNames = []) {
         if (o.node) {
           if (!nodeIndex.has(o.node)) {
             nodeIndex.set(o.node, nodes.length);
-            nodes.push({ path: o.node, name: o.name, frame: n });
+            nodes.push({ path: o.node.replace(/#\d+$/, ''), name: o.name, frame: n });
           }
           const row = { n: nodeIndex.get(o.node), m: o.m };
           if (o.a !== undefined) row.a = o.a;

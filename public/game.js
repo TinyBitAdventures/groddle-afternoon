@@ -610,10 +610,10 @@ import {
   planSignpostTravel,
 } from './js/travel.js';
 import { AVATAR_SHEETS, facingScaleX, facingFromVelocity } from './js/avatar.js';
-import { ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, GLITCH_CROWD, animForState, avatarAnimState, crowdIndexFor, crowdScaleX, frameRef } from './js/avatar-anims.js';
+import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, GLITCH_CROWD, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdIndexFor, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js';
 import { landingY } from './js/walk-surface.js';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js';
-import { bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js';
+import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview as paintVectorPreview, prepareLook } from './js/avatar-compositor.js';
 import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js';
 import {
   createDefaultAppearance,
@@ -5859,6 +5859,7 @@ function makePlayer() {
   body.anchor.set(0.5, 1);
   // Glitch sheets: each frame carries its sheet's feet anchor; drawn at world scale.
   body.anims = pack.anims || null;
+  body.pack = pack;
   body.updateAnchor = Boolean(pack.anims);
   // Portrait ~172×248; keep a bit under entity scale so pigs/chickens read correctly.
   body.baseScale = pack.anims ? GLITCH_AVATAR.scale : SCALE * 0.42;
@@ -6231,43 +6232,121 @@ function glitchAnimPack(key, app) {
   // The sheets in their own colours, or recoloured once per look (classifyGlitchPixel regions).
   const native = key === appearanceCacheKey(createGlitchSheetsAppearance());
   const sheets = {};
-  for (const [name, sheet] of Object.entries(loaded)) {
-    const img = sheet?.frames?.[0]?.baseTexture?.resource?.source;
-    if (native || !img) {
-      sheets[name] = sheet;
-      continue;
-    }
-    const canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const g = canvas.getContext('2d');
-    g.drawImage(img, 0, 0);
-    const data = g.getImageData(0, 0, canvas.width, canvas.height);
-    recolorImageData(data.data, canvas.width, canvas.height, app, classifyGlitchPixel);
-    g.putImageData(data, 0, 0);
-    sheets[name] = { frames: sliceSheet(PIXI.BaseTexture.from(canvas), sheet.def) };
-  }
-  return animPackFromSheets(key, sheets, GLITCH_AVATAR);
+  for (const [name, sheet] of Object.entries(loaded)) sheets[name] = native ? sheet : recolorGlitchSheet(sheet, app);
+  // The player's idle sheets (also recovered) load when first needed.
+  const idleLoader = async (name) => {
+    const sheet = await loadGlitchIdleSheet(name);
+    if (native) return sheet;
+    const tinted = recolorGlitchSheet(sheet, app);
+    return { ...tinted, release: () => tinted.frames[0]?.baseTexture?.destroy() };
+  };
+  return animPackFromSheets(key, sheets, GLITCH_AVATAR, idleLoader);
 }
+
+/** A recovered sheet recoloured for a Glitch-style look (classifyGlitchPixel regions). */
+function recolorGlitchSheet(sheet, app) {
+  const img = sheet?.frames?.[0]?.baseTexture?.resource?.source;
+  if (!img) return sheet;
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const g = canvas.getContext('2d');
+  g.drawImage(img, 0, 0);
+  const data = g.getImageData(0, 0, canvas.width, canvas.height);
+  recolorImageData(data.data, canvas.width, canvas.height, app, classifyGlitchPixel);
+  g.putImageData(data, 0, 0);
+  return { def: sheet.def, frames: sliceSheet(PIXI.BaseTexture.from(canvas), sheet.def, sheet.def.frameCount ?? null) };
+}
+
+/** Idle sheets loaded on demand (never at boot): url -> Promise<{ def, frames }>. */
+const idleSheetTextures = new Map();
+function loadIdleSheetTexture(def) {
+  if (!idleSheetTextures.has(def.url)) {
+    idleSheetTextures.set(def.url, loadTexture(def.url).then((tex) => ({
+      def,
+      frames: sliceSheet(tex.baseTexture, def, def.frameCount ?? null),
+      // Free the decoded sheet (and its 3x upgrade); the next use fetches it again.
+      release() {
+        idleSheetTextures.delete(def.url);
+        PIXI.Texture.removeFromCache?.(tex);
+        tex.baseTexture.destroy();
+      },
+    }))
+      .catch((err) => {
+        idleSheetTextures.delete(def.url);
+        throw err;
+      }));
+  }
+  return idleSheetTextures.get(def.url);
+}
+const loadGlitchIdleSheet = (name) => loadIdleSheetTexture(glitchSheetDef(name, GLITCH_AVATAR));
+const loadVectorIdleSheet = (name) => loadIdleSheetTexture(glitchSheetDef(name, VECTOR_AVATAR));
 
 /**
  * Sheets laid out like GLITCH_AVATAR (one per animation group, cells in
  * SHEET_FRAMES order) as an animation pack, each frame anchored on its
  * sheet's feet.
  */
-function animPackFromSheets(key, sheets, av) {
-  for (const [name, sheet] of Object.entries(sheets)) {
-    const def = av.sheets[name];
-    for (const tex of sheet?.frames || []) tex.defaultAnchor.set(def.midX / def.fw, def.feetY / def.fh);
-  }
+function animPackFromSheets(key, sheets, av, idleLoader = null) {
+  for (const [name, sheet] of Object.entries(sheets)) anchorSheetFrames(sheet, av.sheets[name]);
+  const pack = { key, sheets: { ...sheets }, av, idleLoader, idleLoading: new Map(), anims: {} };
+  fillPackAnims(pack);
+  pack.idleFrame = pack.anims.idle0[0];
+  pack.walkFrames = pack.anims.walk2x;
+  return pack;
+}
+
+function anchorSheetFrames(sheet, def) {
+  for (const tex of sheet?.frames || []) tex.defaultAnchor.set(def.midX / def.fw, def.feetY / def.fh);
+}
+
+/**
+ * Every source animation as textures from the pack's loaded sheets; a frame
+ * on a sheet that is not loaded yet (the idle sheets) shows the still stand.
+ * Fills pack.anims in place, so a sprite holding it sees new sheets.
+ */
+function fillPackAnims(pack) {
+  const { sheets } = pack;
   const toTextures = (list) => list.map((fn) => {
     const ref = frameRef(fn);
     return (ref && sheets[ref.sheet]?.frames?.[ref.index]) || sheets.base.frames[14];
   });
-  const anims = Object.fromEntries(Object.entries(ANIMS).map(([name, list]) => [name, toTextures(list)]));
-  anims.fallLoop = toTextures(FALL_LOOP);
-  return { key, idleFrame: anims.idle0[0], walkFrames: anims.walk2x, anims };
+  for (const [name, list] of Object.entries(ANIMS)) pack.anims[name] = toTextures(list);
+  pack.anims.fallLoop = toTextures(FALL_LOOP);
+  pack.anims.afk = toTextures(AFK_SEQUENCE);
 }
+
+/**
+ * Load (or bake) one idle sheet into a pack the first time it is needed:
+ * the stand's idle4 after a moment standing, a random idle just before it
+ * plays, the doze before AFK. Resolves true once its frames are in.
+ */
+function ensureIdleSheet(pack, name) {
+  if (!pack?.idleLoader || !IDLE_SHEETS.includes(name)) return Promise.resolve(false);
+  if (pack.sheets[name]) return Promise.resolve(true);
+  if (pack.idleLoading.has(name)) return pack.idleLoading.get(name);
+  const started = performance.now();
+  const job = pack.idleLoader(name).then((sheet) => {
+    if (!sheet?.frames?.length) return false;
+    if (sheet.def && !Object.isFrozen(pack.av.sheets)) pack.av.sheets[name] = sheet.def;
+    anchorSheetFrames(sheet, pack.av.sheets[name]);
+    pack.sheets[name] = sheet;
+    fillPackAnims(pack);
+    idleSheetLog.push({ sheet: name, at: Math.round(started), ms: Math.round(performance.now() - started), ...(sheet.stats || {}) });
+    if (app?.view) app.view.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
+    // Replay the current state with the real frames (only if it draws from this sheet).
+    if (player?.anims === pack.anims && idleSheetFor(player.glitchState) === name) player.glitchState = null;
+    return true;
+  }).catch((err) => {
+    pack.idleLoading.delete(name);
+    console.warn('avatar idle sheet failed', name, err);
+    return false;
+  });
+  pack.idleLoading.set(name, job);
+  return job;
+}
+/** QA: how long each idle sheet took to load or bake (window.groddleQA.idleSheets()). */
+const idleSheetLog = [];
 
 // —— Vector Glitch looks (js/avatar-compositor.js) ——
 /** assets/avatar/catalog.json once loaded (character builder, look resolving). */
@@ -6291,7 +6370,8 @@ function vectorDefaultPack(key) {
     surprise: textures.vectorAvatarSurprise,
   };
   if (!sheets.base?.frames?.length) return null;
-  return animPackFromSheets(key, sheets, VECTOR_AVATAR);
+  // Idle sheets are prerendered too (1x, 3x on first draw) but fetched on demand.
+  return animPackFromSheets(key, sheets, VECTOR_AVATAR, loadVectorIdleSheet);
 }
 
 let vectorDefaultKey = null;
@@ -6318,11 +6398,14 @@ function vectorAnimPack(key, app) {
   let bake = vectorBakes.get(lk);
   if (bake?.pack) return { ...bake.pack, key };
   if (!bake) {
-    bake = { promise: null, pack: null, bases: [] };
+    bake = { promise: null, pack: null, bases: [], prep: null, scale: vectorBakeScale() };
     vectorBakes.set(lk, bake);
-    const scale = vectorBakeScale();
+    const scale = bake.scale;
     bake.promise = prepareLook(look)
-      .then((prep) => bakeLook(prep, scale))
+      .then((prep) => {
+        bake.prep = prep;
+        return bakeLook(prep, scale);
+      })
       .then(({ sheets }) => {
         const loaded = {};
         const defs = {};
@@ -6332,7 +6415,20 @@ function vectorAnimPack(key, app) {
           defs[name] = sh.def;
           loaded[name] = { frames: sliceSheet(base, { fw: sh.def.fw, fh: sh.def.fh, cols: sh.def.cols, rows: sh.def.rows }, sh.def.cells) };
         }
-        bake.pack = animPackFromSheets(lk, loaded, { sheets: defs });
+        // Idle sheets bake one at a time when first needed, painted in slices.
+        const idleLoader = async (name) => {
+          if (!vectorBakes.has(lk)) return null;
+          const { canvas, def, stats } = await bakeIdleSheet(bake.prep, name, scale);
+          if (!vectorBakes.has(lk)) return null;
+          const base = PIXI.BaseTexture.from(canvas, { resolution: scale, scaleMode: PIXI.SCALE_MODES.LINEAR });
+          bake.bases.push(base);
+          const release = () => {
+            bake.bases = bake.bases.filter((b) => b !== base);
+            base.destroy();
+          };
+          return { def, stats, release, frames: sliceSheet(base, { fw: def.fw, fh: def.fh, cols: def.cols, rows: def.rows }, def.cells) };
+        };
+        bake.pack = animPackFromSheets(lk, loaded, { sheets: defs }, idleLoader);
         trimVectorBakes(lk);
         // The player may have moved on to another look while this baked.
         if (appearanceCacheKey(playerAppearance) === key || (player && player.appearanceKey === `${key}#pending`)) applyPlayerAppearance();
@@ -6514,6 +6610,7 @@ function syncClimbBorrow(state) {
 
 function swapPlayerPack(pack) {
   if (player.appearanceKey === pack.key) return;
+  player.pack = pack;
   const was = player.animState || 'idle';
   player.texturesIdle = [pack.idleFrame];
   player.texturesWalk = pack.walkFrames;
@@ -6914,20 +7011,40 @@ function commitAvatarAppearance() {
 
 /** The Glitch sheet state for a requested walk/idle/climb (AvatarAnimationState). */
 function glitchAnimState(requested) {
-  if (requested === 'climb') return 'climb';
+  const now = Date.now();
+  if (requested === 'climb') {
+    idleClock.reset();
+    return 'climb';
+  }
   // onGround flickers on slopes; a few frames off the floor make it a jump or fall.
   const airborne = !player.onGround && (player.airFrames || 0) > 3;
   const floorY = airborne ? landingY(streetPlatforms, player.x, player.y) : null;
-  const now = Date.now();
-  return avatarAnimState({
+  const pack = player.pack;
+  const idles = Boolean(pack?.idleLoader);
+  const hit = player.hit && now < (player.hitUntil || 0) ? player.hit : null;
+  // AvatarView: the idle timer runs while standing (or hit) and resets otherwise.
+  const standing = !airborne && requested !== 'walk';
+  const randomIdle = idles ? idleClock.step(now, standing || Boolean(hit)) : null;
+  const st = avatarAnimState({
     airborne,
     moving: requested === 'walk',
-    hit: player.hit && now < (player.hitUntil || 0) ? player.hit : null,
+    hit,
     emotion: player.emotion && now < (player.emotionUntil || 0) ? player.emotion : null,
-    vx: player.vx * 60,
+    // walk1x/walk2x compare against the client's px/s (vx_max 335 = the remake's 4.4 px/frame).
+    vx: player.vx * (335 / 4.4),
+    vxMax: (player.vxMax ?? 4.4) * (335 / 4.4),
     vy: player.vy * 60,
     distFromFloor: floorY == null ? null : floorY - player.y,
+    idles,
+    choices: choicesDialogOpen(),
+    afk: afkState.afk,
+    waking: now < afkState.wakeUntil,
+    randomIdle,
   }, player.glitchState || 'stand');
+  // getStandInForStand: a hit or an emotion resets the idle timer.
+  if (st === 'hit1' || st === 'hit2' || EMOTIONS.includes(st)) idleClock.reset();
+  if (idles) loadIdleSheetsFor(pack, st, standing, now);
+  return st;
 }
 
 function applyGlitchState(st) {
@@ -6935,10 +7052,14 @@ function applyGlitchState(st) {
     if ((st === 'walk1x' || st === 'walk2x' || st === 'climb') && player.playing === false) player.play();
     return;
   }
-  const { anim, loop, then } = animForState(st);
+  const idles = Boolean(player.pack?.idleLoader);
+  const { anim, loop, then } = animForState(st, { idles });
   player.glitchState = st;
-  if (app?.view) app.view.dataset.playerAnim = st;
-  player.animState = st === 'climb' || st === 'climbPause' ? 'climb' : st.startsWith('walk') ? 'walk' : st === 'stand' ? 'idle' : 'air';
+  if (app?.view) {
+    app.view.dataset.playerAnim = st;
+    app.view.dataset.playerAnimName = anim;
+  }
+  player.animState = st === 'climb' || st === 'climbPause' ? 'climb' : st.startsWith('walk') ? 'walk' : STANDING_STATES.has(st) ? 'idle' : 'air';
   player.textures = player.anims[anim];
   player.animationSpeed = ANIM_FPS / 60;
   player.loop = loop;
@@ -6951,9 +7072,111 @@ function applyGlitchState(st) {
         player.gotoAndPlay(0);
       }
     : null;
-  if (st === 'stand') player.gotoAndStop(0);
+  if (player.textures.length < 2) player.gotoAndStop(0);
   else player.gotoAndPlay(0);
   applyPlayerFacing();
+}
+
+// —— Standing idles and AFK (AvatarView, AvatarController, TSFrontController) ——
+/** Glitch states that stand in for the stand (hits, emotions, idles, the doze). */
+const STANDING_STATES = new Set(['stand', 'idle0', 'idle1', 'idle2', 'idle3', 'idle4', 'afk', 'wake', 'hit1', 'hit2', ...EMOTIONS]);
+/**
+ * QA: &idledemo=1 shortens the timers (random idle after 4 s, AFK after
+ * 20 s); &idledemo=idle0..idle4 also forces that random idle; &idledemo=afk
+ * goes AFK after 3 s. Other *demo / *autoplay routes never go AFK.
+ */
+const IDLE_QA = new URLSearchParams(location.search).get('idledemo');
+const IDLE_TIMING = IDLE_QA
+  ? { waitMs: 4000, idleMs: RANDOM_IDLE_MS, leadMs: 2000, afkMs: IDLE_QA === 'afk' ? 3000 : 20000, standPreloadMs: 500 }
+  : { waitMs: RANDOM_IDLE_WAIT_MS, idleMs: RANDOM_IDLE_MS, leadMs: 3000, afkMs: AFK_TIMEOUT_MS, standPreloadMs: 2000 };
+const idleClock = createIdleClock({
+  waitMs: IDLE_TIMING.waitMs,
+  idleMs: IDLE_TIMING.idleMs,
+  leadMs: IDLE_TIMING.leadMs,
+  ...(/^idle[0-4]$/.test(IDLE_QA || '') ? { pick: () => IDLE_QA } : {}),
+});
+const AFK_QA_OFF = !IDLE_QA && [...new URLSearchParams(location.search).keys()].some((k) => /(demo|autoplay)$/.test(k));
+/** pc.afk and AvatarController's afkTimer (last key or click). */
+const afkState = { afk: false, since: 0, lastInputAt: Date.now(), wakeUntil: 0 };
+
+/** ChoicesDialog focus: a conversation or a choice picker is open. */
+function choicesDialogOpen() {
+  return isQuestDialogueOpen() || ['feed-picker', 'emotional-bear-picker'].some((id) => {
+    const el = document.getElementById(id);
+    return Boolean(el && !el.hidden);
+  });
+}
+
+/**
+ * Lazy idle sheets: idle4 after standing a moment (or a dialog), the random
+ * idle when it is picked (a few seconds before it plays), the doze ten
+ * seconds before AFK. A random idle sheet that is not the one coming up is
+ * dropped from the pack when another loads (one at a time in memory).
+ */
+function loadIdleSheetsFor(pack, st, standing, now) {
+  if (standing && (idleClock.standingMs(now) >= IDLE_TIMING.standPreloadMs || st === 'idle4')) ensureIdleSheet(pack, 'idle4');
+  // A random idle only shows when nothing outranks it (AFK, a dialog).
+  const upcoming = afkState.afk || st === 'idle4' ? null : idleSheetFor(idleClock.upcoming);
+  if (upcoming && upcoming !== 'idle4' && !pack.sheets[upcoming]) {
+    for (const other of ['idle1', 'idle2', 'idle3']) if (other !== upcoming && pack.sheets[other] && st !== other) dropIdleSheet(pack, other);
+    ensureIdleSheet(pack, upcoming);
+  }
+  if (afkState.afk || (!AFK_QA_OFF && now - afkState.lastInputAt > IDLE_TIMING.afkMs - Math.min(10000, IDLE_TIMING.afkMs / 2))) ensureIdleSheet(pack, 'idleSleepy');
+}
+
+/**
+ * Free a random idle sheet: every cached pack holding it falls back to the
+ * still stand for it (until it loads again), then its texture is destroyed.
+ */
+function dropIdleSheet(pack, name) {
+  const sheet = pack.sheets[name];
+  if (!sheet) return;
+  const packs = new Set([pack, ...appearanceTexCache.values(), ...[...vectorBakes.values()].map((b) => b.pack)]);
+  for (const p of packs) {
+    if (p?.sheets?.[name] !== sheet) continue;
+    delete p.sheets[name];
+    p.idleLoading?.delete(name);
+    fillPackAnims(p);
+  }
+  sheet.release?.();
+  if (app?.view && player?.pack === pack) app.view.dataset.playerIdleSheets = Object.keys(pack.sheets).filter((n) => IDLE_SHEETS.includes(n)).join(',');
+}
+
+/** AvatarController: a key or click restarts the AFK timer and returns from AFK. */
+function noteAvatarInput() {
+  const now = Date.now();
+  afkState.lastInputAt = now;
+  if (!afkState.afk) return;
+  afkState.afk = false;
+  // Standing still, the doze ends with idleSleepyEnd (the client cut straight to the stand).
+  const asleep = now - afkState.since > 1500 && player?.pack?.sheets?.idleSleepy;
+  afkState.wakeUntil = asleep ? now + (ANIMS.idleSleepyEnd.length / ANIM_FPS) * 1000 : 0;
+  idleClock.reset();
+  if (app?.view) app.view.dataset.playerAfk = '0';
+  pushActivity("You've returned from AFK");
+  toast("You've returned from AFK", 2000);
+}
+
+/** TSFrontController.goAFK after AFK_TIMEOUT without input: not while moving or in a quest instance. */
+function tickAvatarAfk() {
+  if (!player || !state.started) return;
+  const now = Date.now();
+  if (app?.view && app.view.dataset.playerAfk == null) app.view.dataset.playerAfk = afkState.afk ? '1' : '0';
+  if (!afkState.afk && !AFK_QA_OFF && now - afkState.lastInputAt > IDLE_TIMING.afkMs) {
+    const moving = Math.abs(player.vx) > 0.35 || !player.onGround || climb.active || player.climbing;
+    if (!moving && !isScreenFxBlocking() && !engine.transientInstance()) {
+      afkState.afk = true;
+      afkState.since = now;
+      afkState.wakeUntil = 0;
+      if (app?.view) app.view.dataset.playerAfk = '1';
+      pushActivity("You've gone AFK");
+      toast("You've gone AFK", 2500);
+    }
+  }
+  // Keep standing stand-ins current while input is blocked (dialogs freeze handleInput).
+  if (player.anims && STANDING_STATES.has(player.glitchState || 'stand') && player.onGround && Math.abs(player.vx) <= 0.35 && !climb.active) {
+    setPlayerAnim('idle');
+  }
 }
 
 function setPlayerAnim(state) {
@@ -8834,6 +9057,7 @@ function handleInput() {
   // vx_accel_add_in_air 0.22 against _floor 0.3.
   const accel = 0.58 * (player.onGround ? movementBuff.accel : movementBuff.airAccel * (0.22 / 0.3));
   const max = 4.4 * movementBuff.speed;
+  player.vxMax = max;
   const jumpVelocity = -9.6 * movementBuff.jump;
   if (left) {
     player.vx = Math.max(player.vx - accel, -max);
@@ -8872,8 +9096,19 @@ function handleInput() {
   }
   // Walk cycle whenever moving horizontally (don't require onGround —
   // slope/platform frames often flicker onGround and were freezing anim at frame 0)
-  if (Math.abs(player.vx) > 0.35) setPlayerAnim('walk');
-  else setPlayerAnim('idle');
+  if (Math.abs(player.vx) > 0.35) {
+    player.walkHold = 4;
+    setPlayerAnim('walk');
+  } else if ((left !== right) && player.walkHold > 0) {
+    // Reversing passes through |vx| <= 0.35 for a frame or two: keep the
+    // stride going (and turn) instead of flashing the stand and restarting
+    // the walk at frame 0. Against a wall it still stops after 4 frames.
+    player.walkHold -= 1;
+    setPlayerAnim('walk');
+  } else {
+    player.walkHold = 0;
+    setPlayerAnim('idle');
+  }
 }
 
 function physics(dt) {
@@ -22480,6 +22715,9 @@ async function main() {
     closePackPopover();
   });
 
+  // AvatarController: any key or click restarts the AFK timer (and returns from AFK).
+  window.addEventListener('keydown', noteAvatarInput, { capture: true });
+  window.addEventListener('pointerdown', noteAvatarInput, { capture: true });
   window.addEventListener('keydown', (e) => {
     if (e.target?.matches?.('input, textarea, select, [contenteditable="true"]')) {
       if (e.key === 'Escape') {
@@ -23055,6 +23293,30 @@ async function main() {
     setInterval(play, 4000);
   }
   window.groddleQA = {
+    /** Idle/AFK QA (&idledemo=1): loaded idle sheets with load/bake ms, AFK and the idle timer. */
+    idleState() {
+      return {
+        anim: player?.glitchState || null,
+        frame: player?.currentFrame ?? null,
+        x: player?.x ?? null,
+        y: player?.y ?? null,
+        vx: player?.vx ?? null,
+        vy: player?.vy ?? null,
+        onGround: Boolean(player?.onGround),
+        sx: player?.scale?.x ?? null,
+        afk: afkState.afk,
+        standingMs: idleClock.standingMs(Date.now()),
+        upcoming: idleClock.upcoming,
+        random: idleClock.random,
+        sheets: player?.pack?.sheets ? Object.keys(player.pack.sheets) : [],
+        loads: idleSheetLog.slice(),
+        // The feet on the page (for crops).
+        feet: player && app?.view ? (() => {
+          const r = app.view.getBoundingClientRect();
+          return { x: r.left + (player.x + world.x) * (r.width / VIEW_W), y: r.top + (player.y + world.y) * (r.height / VIEW_H), scale: r.width / VIEW_W };
+        })() : null,
+      };
+    },
     snapshot() {
       const rect = app.view.getBoundingClientRect();
       const sx = rect.width / VIEW_W;
@@ -23108,6 +23370,7 @@ async function main() {
     updateMakeCraft((1000 / 60) * dt);
     handleInput();
     physics(dt);
+    tickAvatarAfk();
     updateHogHaul((1000 / 60) * dt);
     updateFourLetterQuest();
     updateLegalizeIt();

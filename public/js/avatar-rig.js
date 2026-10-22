@@ -430,15 +430,57 @@ export function frameDrawList(rig, look, frameIndex) {
  */
 export function expandRig(base) {
   if (base.expanded) return base;
-  base.table = base.table.map((rows, f) => rows.map((r) => {
-    const m = r.slice(1, 7);
-    const out = r[0] >= 0 ? { n: r[0], m } : { slot: base.slots[-r[0] - 1], m };
-    if (r.length > 7) out.a = r[7];
-    if (out.slot && base.head?.[f]) out.pm = base.head[f];
-    return out;
-  }));
+  base.table = expandTable(base.table, base.slots, base.head);
   base.expanded = true;
   return base;
+}
+
+function expandTable(table, slots, head) {
+  return table.map((rows, f) => rows.map((r) => {
+    const m = r.slice(1, 7);
+    const out = r[0] >= 0 ? { n: r[0], m } : { slot: slots[-r[0] - 1], m };
+    if (r.length > 7) out.a = r[7];
+    if (out.slot && head?.[f]) out.pm = head[f];
+    return out;
+  }));
+}
+
+/**
+ * Append base.idle.json (the idle and sleepy frames, tools/avatar-compositor
+ * build.mjs) to an expanded rig: frames, table rows, container matrices and
+ * the shapes only those frames draw. Idempotent.
+ */
+export function mergeIdleRig(rig, idle) {
+  if (rig.idleMerged) return rig;
+  expandRig(rig);
+  rig.frames = [...rig.frames, ...idle.frames];
+  rig.table = [...rig.table, ...expandTable(idle.table, rig.slots, idle.head)];
+  if (rig.containers) rig.containers = [...rig.containers, ...(idle.containers || [])];
+  Object.assign(rig.shapes, idle.shapes || {});
+  rig.bitmaps = { ...(rig.bitmaps || {}), ...(idle.bitmaps || {}) };
+  rig.idleMerged = true;
+  return rig;
+}
+
+/**
+ * Append an article's <name>.idle.json: each part's variant index per idle
+ * frame (into its core variants plus the extra ones) and the extra shapes.
+ * coreCount / idleCount: the rig's core and idle frame counts (a part's
+ * frames 0 means variant 0 throughout). Idempotent.
+ */
+export function mergeIdleArticle(data, idle, coreCount, idleCount) {
+  if (data.idleMerged) return data;
+  for (const [name, part] of Object.entries(data.parts)) {
+    const extra = idle.parts?.[name] || { frames: 0, variants: [] };
+    const core = part.frames === 0 ? new Array(coreCount).fill(0) : part.frames;
+    const add = extra.frames === 0 ? new Array(idleCount).fill(0) : extra.frames;
+    part.frames = [...core, ...add];
+    part.variants = [...part.variants, ...(extra.variants || [])];
+  }
+  Object.assign(data.shapes, idle.shapes || {});
+  data.bitmaps = { ...(data.bitmaps || {}), ...(idle.bitmaps || {}) };
+  data.idleMerged = true;
+  return data;
 }
 
 /** Colour matrices for a look: skin, hair groups and every article's color_N. */

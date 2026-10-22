@@ -11,12 +11,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   ARTICLE_CONTAINERS, HAT_MASKED_HAIR, SKIN_NODES, SLOT_PARTS, applyCM, colorMatrixFor, drawListBounds, expandRig,
-  frameDrawList, hardLightMatrix, isBoot, lookMatrices, slotAssignments,
+  frameDrawList, hardLightMatrix, isBoot, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments,
 } from '../public/js/avatar-rig.js';
 import {
   articleColors, lookKey, normalizeVectorFields, randomVectorFields, resolveLook, vectorFieldsFromColors,
 } from '../public/js/avatar-looks.js';
-import { SHEET_FRAMES } from '../public/js/avatar-anims.js';
+import { CORE_FRAMES, IDLE_FRAMES, IDLE_SHEETS, SHEET_FRAMES } from '../public/js/avatar-anims.js';
 import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js';
 import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js';
 import { compactD } from '../tools/avatar-compositor/shapes.mjs';
@@ -26,13 +26,17 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
 const A = join(pub, 'assets/avatar');
 const json = (f) => JSON.parse(readFileSync(f, 'utf8'));
-const rig = expandRig(json(join(A, 'base.json')));
+const coreRig = json(join(A, 'base.json'));
+const coreFrameList = coreRig.frames.slice();
+// The idle frames load later in the game (prepareIdle); the tests use the merged rig.
+const rig = mergeIdleRig(expandRig(coreRig), json(join(A, 'base.idle.json')));
 const catalog = json(join(A, 'catalog.json'));
-const RIG_FRAMES = [...new Set(Object.values(SHEET_FRAMES).flat())].sort((a, b) => a - b);
+const RIG_FRAMES = [...CORE_FRAMES, ...IDLE_FRAMES];
+const article = (type, name) => mergeIdleArticle(json(join(A, 'articles', type, `${name}.json`)), json(join(A, 'articles', type, `${name}.idle.json`)), CORE_FRAMES.length, IDLE_FRAMES.length);
 
 function articlesFor(look) {
   const m = new Map();
-  for (const [type, a] of Object.entries(look.outfit)) m.set(a.name, json(join(A, 'articles', type, `${a.name}.json`)));
+  for (const [type, a] of Object.entries(look.outfit)) m.set(a.name, article(type, a.name));
   return m;
 }
 function lookCtx(look) {
@@ -110,7 +114,11 @@ describe('slot rules (AvatarSwf.initializeHead)', () => {
 
 describe('rig data (Avatar.swf avatarContainer)', () => {
   it('holds every swf frame the sheets use, with slots the client fills', () => {
+    // base.json: the core sheets' frames; base.idle.json adds the idle and sleepy ones.
+    assert.deepEqual(coreFrameList, CORE_FRAMES);
     assert.deepEqual(rig.frames, RIG_FRAMES);
+    assert.equal(new Set(RIG_FRAMES).size, RIG_FRAMES.length);
+    for (const name of IDLE_SHEETS) for (const fn of SHEET_FRAMES[name]) assert.ok(IDLE_FRAMES.includes(fn), `${name} ${fn}`);
     assert.equal(rig.table.length, RIG_FRAMES.length);
     for (const s of rig.slots) assert.ok(ARTICLE_CONTAINERS.includes(s), s);
     assert.ok(rig.nodes.every((n) => SKIN_NODES.includes(n.name)), 'body parts are skin parts');
@@ -131,7 +139,7 @@ describe('catalog and looks', () => {
     let n = 0;
     for (const [type, items] of Object.entries(catalog.types)) {
       for (const item of items) {
-        const data = json(join(A, 'articles', type, `${item.name}.json`));
+        const data = article(type, item.name);
         assert.ok(Object.keys(data.parts).length, `${type}/${item.name} parts`);
         for (const part of Object.values(data.parts)) {
           if (part.frames !== 0) assert.equal(part.frames.length, RIG_FRAMES.length);
@@ -322,5 +330,16 @@ describe('game wiring', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     for (const s of ['vectorAvatarBase', 'animPackFromSheets', 'bakeLook', 'vectorBakeScale', 'renderVectorControls', 'loadAvatarCatalog', 'glitchAnimPack']) assert.ok(game.includes(s), s);
     assert.ok(existsSync(join(pub, 'js/avatar-compositor.js')));
+  });
+
+  it('loads or bakes the idle sheets on demand, never at boot', () => {
+    const game = readFileSync(join(pub, 'game.js'), 'utf8');
+    const sheetsBlock = game.slice(game.indexOf('const SHEETS = {'), game.indexOf('const keys = new Set();'));
+    assert.ok(sheetsBlock.includes('vectorAvatarBase'));
+    assert.ok(!/(vector|glitch)Avatar(Idle|idle)|SheetDef\('idle/.test(sheetsBlock), 'no avatar idle sheet in the boot SHEETS');
+    for (const s of ['ensureIdleSheet', 'bakeIdleSheet', 'loadVectorIdleSheet', 'loadGlitchIdleSheet', 'createIdleClock', 'noteAvatarInput', 'tickAvatarAfk', "You've gone AFK", "You've returned from AFK"]) assert.ok(game.includes(s), s);
+    // Every idle sheet ships 1x + 3x for the default look and has its idle frames split out.
+    for (const n of IDLE_SHEETS) assert.ok(VECTOR_AVATAR.sheets[n] && existsSync(join(pub, VECTOR_AVATAR.dir, VECTOR_AVATAR.sheets[n].file)), n);
+    assert.ok(existsSync(join(A, 'base.idle.json')));
   });
 });

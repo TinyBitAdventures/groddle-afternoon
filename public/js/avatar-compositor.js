@@ -13,14 +13,19 @@
  *  - articles/<type>/<name>.json: one article's parts per frame and shapes
  *  - catalog.json: what the character builder offers, colours from GSJS
  */
-import { SHEET_FRAMES } from './avatar-anims.js';
-import { applyCM, drawListBounds, expandRig, frameDrawList, lookMatrices, slotAssignments } from './avatar-rig.js';
+import { CORE_FRAMES, IDLE_FRAMES, SHEET_FRAMES } from './avatar-anims.js';
+import { applyCM, drawListBounds, expandRig, frameDrawList, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments } from './avatar-rig.js';
 
 export const AVATAR_DATA_DIR = 'assets/avatar/';
 /** Widest sheet row at 3x (px); taller sheets wrap into rows. */
 export const SHEET_MAX_WIDTH_3X = 4096;
 /** Sheets in bake order (the stand/walk sheet first, emotions last). */
 export const SHEET_ORDER = Object.freeze(['base', 'jump', 'climb', 'happy', 'surprise', 'angry']);
+/**
+ * The idle sheets, baked one at a time when first needed (idle4 is the
+ * looping stand, the doze last); their frames load with prepareIdle.
+ */
+export const IDLE_SHEET_ORDER = Object.freeze(['idle4', 'idle1', 'idle2', 'idle3', 'idleSleepy']);
 
 const rgba = (c, a = 1) => `rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${Math.max(0, Math.min(1, c[3] * a)).toFixed(4)})`;
 
@@ -167,8 +172,12 @@ function loadImage(url) {
 
 async function sourceFrom(data, dir) {
   const bitmaps = new Map();
-  for (const [id, file] of Object.entries(data.bitmaps || {})) bitmaps.set(Number(id), await loadImage(`${dir}${file}`));
+  await addBitmaps(bitmaps, data.bitmaps, dir);
   return { shapes: data.shapes, bitmaps };
+}
+
+async function addBitmaps(bitmaps, files, dir) {
+  for (const [id, file] of Object.entries(files || {})) if (!bitmaps.has(Number(id))) bitmaps.set(Number(id), await loadImage(`${dir}${file}`));
 }
 
 /** The rig and the base shapes (cached). */
@@ -214,7 +223,33 @@ export async function prepareLook(look, dir = AVATAR_DATA_DIR) {
     look: { assign: slotAssignments(look.outfit, { hatAllowsHair: allowsHair }), articles, matrices: lookMatrices(look), face: look.face || {} },
   };
   ctx.shapeOf = (src, id) => sources.get(src)?.shapes?.[id];
+  ctx.outfit = look.outfit || {};
+  ctx.dir = dir;
   return ctx;
+}
+
+/**
+ * Add the idle and sleepy frames (base.idle.json, articles' .idle.json) to
+ * a prepared look, so sheetLayout/paintSheet can draw the idle sheets. The
+ * rig and article data are shared between looks and merged once.
+ */
+export async function prepareIdle(prep) {
+  const dir = prep.dir || AVATAR_DATA_DIR;
+  const rig = prep.rig;
+  const extra = await loadJson(`${dir}base.idle.json`);
+  if (!rig.idleMerged) mergeIdleRig(rig, extra);
+  await addBitmaps(rig._source.bitmaps, extra.bitmaps, dir);
+  await Promise.all(Object.entries(prep.outfit || {}).map(async ([type, a]) => {
+    if (!a || !a.name || a.name === 'none') return;
+    const data = prep.look.articles.get(a.name);
+    if (!data) return;
+    const more = await loadJson(`${dir}articles/${type}/${a.name}.idle.json`);
+    if (!data.idleMerged) mergeIdleArticle(data, more, CORE_FRAMES.length, IDLE_FRAMES.length);
+    const src = prep.sources.get(a.name);
+    if (src) await addBitmaps(src.bitmaps, more.bitmaps, dir);
+  }));
+  prep.idleReady = true;
+  return prep;
 }
 
 /** Draw list for a swf frame number. */
@@ -248,9 +283,38 @@ export function sheetLayout(prep, name) {
   // idle frame 801 in rig units (the rig origin sits at the hips), so the
   // avatar stays put when it changes sheets.
   const stand = drawListBounds(drawListFor(prep, 801), prep.shapeOf) || [0, 0, 0, 0];
-  const feetY = oy + Math.round(stand[3]);
+  // The feet line is the painted sole, not the shape bounds (their curve
+  // control points and strokes reach ~2 px lower): the row under the stand's
+  // lowest opaque row, as on the recovered sheets.
+  const feetY = oy + standSoleRow(prep, stand) + 1;
   const midX = ox + Math.round((stand[0] + stand[2]) / 2);
   return { name, frames, cells: frames.length, fw, fh, ox, oy, cols, rows, feetY, midX };
+}
+
+/**
+ * The stand's (frame 801) lowest row with alpha > 50% at 1x, in rows below
+ * the rig origin. Painted once per prepared look.
+ */
+function standSoleRow(prep, stand) {
+  if (prep.standSoleRow != null) return prep.standSoleRow;
+  const top = Math.floor(stand[1]) - 1;
+  const left = Math.floor(stand[0]) - 1;
+  const w = Math.ceil(stand[2]) - left + 2;
+  const h = Math.ceil(stand[3]) - top + 2;
+  let row = Math.round(stand[3]);
+  if (typeof document !== 'undefined' && w > 0 && h > 0) {
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    paintItems(ctx, drawListFor(prep, 801), prep.sources, [1, 0, 0, 1, -left, -top]);
+    const px = ctx.getImageData(0, 0, w, h).data;
+    let bottom = -1;
+    for (let y = h - 1; y >= 0 && bottom < 0; y--) for (let x = 0; x < w; x++) if (px[(y * w + x) * 4 + 3] > 128) { bottom = y; break; }
+    if (bottom >= 0) row = bottom + top;
+  }
+  prep.standSoleRow = row;
+  return row;
 }
 
 /** Paint one sheet at `scale` into a new canvas. */
@@ -270,6 +334,53 @@ export function paintSheet(prep, layout, scale, canvas = document.createElement(
     ctx.restore();
   });
   return canvas;
+}
+
+/**
+ * paintSheet spread over several tasks: paints frames until `budgetMs` has
+ * passed, then yields (setTimeout 0) so the game keeps drawing while a
+ * custom look's idle sheet bakes. Resolves the canvas.
+ */
+export async function paintSheetSpread(prep, layout, scale, { budgetMs = 4, canvas = document.createElement('canvas'), stats = null } = {}) {
+  canvas.width = layout.cols * layout.fw * scale;
+  canvas.height = layout.rows * layout.fh * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let t0 = performance.now();
+  for (let k = 0; k < layout.frames.length; k++) {
+    const cx = (k % layout.cols) * layout.fw * scale;
+    const cy = Math.floor(k / layout.cols) * layout.fh * scale;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(cx, cy, layout.fw * scale, layout.fh * scale);
+    ctx.clip();
+    paintItems(ctx, drawListFor(prep, layout.frames[k]), prep.sources, [scale, 0, 0, scale, cx + layout.ox * scale, cy + layout.oy * scale]);
+    ctx.restore();
+    const spent = performance.now() - t0;
+    if (spent >= budgetMs && k < layout.frames.length - 1) {
+      if (stats) { stats.slices = (stats.slices || 0) + 1; stats.maxSliceMs = Math.max(stats.maxSliceMs || 0, spent); stats.paintMs = (stats.paintMs || 0) + spent; }
+      await new Promise((r) => setTimeout(r, 0));
+      t0 = performance.now();
+    } else if (stats && k === layout.frames.length - 1) {
+      stats.slices = (stats.slices || 0) + 1; stats.maxSliceMs = Math.max(stats.maxSliceMs || 0, spent); stats.paintMs = (stats.paintMs || 0) + spent;
+    }
+  }
+  return canvas;
+}
+
+/**
+ * Bake one idle sheet of a prepared look without stalling a frame: loads
+ * the idle frames (prepareIdle), lays the sheet out, paints it in slices.
+ * Resolves { canvas, def, stats }.
+ */
+export async function bakeIdleSheet(prep, name, scale, { budgetMs = 4 } = {}) {
+  await prepareIdle(prep);
+  const stats = { layoutMs: 0 };
+  const t = performance.now();
+  const layout = sheetLayout(prep, name);
+  stats.layoutMs = performance.now() - t;
+  const canvas = await paintSheetSpread(prep, layout, scale, { budgetMs, stats });
+  return { canvas, def: sheetDef(layout, `${name}.png`), stats };
 }
 
 /** GLITCH_AVATAR-style sheet def for a layout (anchored on the standing feet). */

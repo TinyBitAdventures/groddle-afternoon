@@ -1393,9 +1393,24 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 200,
+  "commits": 203,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "The favicon is now an iMG quoin"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Street project phases show the new street's name, not {job_location}"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Coats, hair locks, headdresses and tails in the Glitch wardrobe"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1500,21 +1515,6 @@
     "date": "2026-10-21",
     "kind": "new",
     "text": "The Last Pilgrimage of Esquibeth: a four-location song walk to the Conch"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Smuggling: Warm and Smuggly deliveries, Deimaginators and the Smuggle the Smuggler jailbreak"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Mental Block and Mental Block 2: block-drop puzzle rooms"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "A restoration walkthrough at /restoration/: how much of Glitch is back"
    }
   ]
  },

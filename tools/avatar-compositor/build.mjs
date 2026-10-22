@@ -39,7 +39,7 @@ import { buildRig, flattenPart, nodeContent, shapeIds } from './rig.mjs';
 import { mergeContainers, readAvatarFla, validateAgainstSwf } from './xfl.mjs';
 import { loadGsjsAvatarData, loadHatHairMap } from './gsjs.mjs';
 import { ARTICLE_CONTAINERS, SLOT_PARTS } from '../../public/js/avatar-rig.js';
-import { SHEET_FRAMES } from '../../public/js/avatar-anims.js';
+import { CORE_FRAMES, IDLE_FRAMES } from '../../public/js/avatar-anims.js';
 import { resolveLook } from '../../public/js/avatar-looks.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -57,8 +57,16 @@ const opt = (name, fallback) => {
 const WORK = resolve(opt('work', join(os.tmpdir(), 'avatar-compositor')));
 const cmd = args.find((a) => !a.startsWith('--') && args[args.indexOf(a) - 1]?.startsWith('--') !== true) || 'all';
 
-/** Every swf frame a sheet holds, sorted. */
-export const RIG_FRAMES = [...new Set(Object.values(SHEET_FRAMES).flat())].sort((a, b) => a - b);
+/**
+ * Every swf frame a sheet holds: the core sheets' frames (sorted), then the
+ * idle sheets' own. The data is built over all of them and split at
+ * CORE_FRAMES.length: base.json / <article>.json hold the core frames that
+ * every look loads, base.idle.json / <article>.idle.json the idle and sleepy
+ * frames a look loads only when its avatar first idles (js/avatar-rig.js
+ * mergeIdleRig / mergeIdleArticle put them back together).
+ */
+export const RIG_FRAMES = [...CORE_FRAMES, ...IDLE_FRAMES];
+const NC = CORE_FRAMES.length;
 
 const LEG_CONTAINERS = ['sideLegLowerCloseContainer_mc', 'sideLegLowerOffsideContainer_mc', 'backLegLowerLeftNakedContainer_mc', 'backLegLowerRightNakedContainer_mc'];
 
@@ -153,18 +161,77 @@ function buildBase() {
   const shapes = {};
   for (const id of [...ids].sort((a, b) => a - b)) shapes[id] = roundShape(allShapes.get(id));
   const bmp = writeBitmaps(bitmaps, bitmapIdsOf(shapes), 'base');
+  const packed = packTable(rig);
+  // Shapes the core frames draw (their rows' nodes) stay in base.json.
+  const coreIds = new Set();
+  for (const rows of rig.table.slice(0, NC)) for (const r of rows) {
+    if (r.n !== undefined) shapeIds(nodes[r.n].ops, coreIds);
+    if (r.s !== undefined) coreIds.add(r.s);
+  }
+  const [coreShapes, idleShapes] = splitShapes(shapes, coreIds);
   const data = {
     source: 'glitch-avatars/base_avatar/Avatar.swf (CC0), sprite avatarContainer',
     recovered,
-    frames: RIG_FRAMES,
+    frames: CORE_FRAMES,
     nodes,
-    ...packTable(rig),
-    shapes,
-    bitmaps: bmp,
+    slots: packed.slots,
+    table: packed.table.slice(0, NC),
+    head: packed.head.slice(0, NC),
+    containers: packed.containers.slice(0, NC),
+    shapes: coreShapes,
+    bitmaps: pickBitmaps(bmp, coreShapes),
+  };
+  const idle = {
+    frames: IDLE_FRAMES,
+    table: packed.table.slice(NC),
+    head: packed.head.slice(NC),
+    containers: packed.containers.slice(NC),
+    shapes: idleShapes,
+    bitmaps: pickBitmaps(bmp, idleShapes, data.bitmaps),
   };
   const bytes = writeJson(join(OUT, 'base.json'), data);
-  console.log(`base.json: ${nodes.length} body parts, ${Object.keys(shapes).length} shapes, ${RIG_FRAMES.length} frames, ${(bytes / 1024).toFixed(0)} KB`);
+  const idleBytes = writeJson(join(OUT, 'base.idle.json'), idle);
+  console.log(`base.json: ${nodes.length} body parts, ${Object.keys(coreShapes).length} shapes, ${NC} frames, ${(bytes / 1024).toFixed(0)} KB; base.idle.json: ${IDLE_FRAMES.length} frames, ${Object.keys(idleShapes).length} more shapes, ${(idleBytes / 1024).toFixed(0)} KB`);
   return { swf, data };
+}
+
+/** Shapes split into [those in `ids`, the rest]. */
+function splitShapes(shapes, ids) {
+  const a = {};
+  const b = {};
+  for (const [id, sh] of Object.entries(shapes)) (ids.has(Number(id)) ? a : b)[id] = sh;
+  return [a, b];
+}
+
+/** The bitmap files `shapes` fill with, less any `already` listed. */
+function pickBitmaps(bmp, shapes, already = {}) {
+  const ids = bitmapIdsOf(shapes);
+  return Object.fromEntries(Object.entries(bmp).filter(([id]) => ids.has(Number(id)) && !already[id]));
+}
+
+/**
+ * An article part flattened over RIG_FRAMES, split at the core frames:
+ * core { frames: 0 | [variant per core frame], variants } with only the
+ * variants core frames use (renumbered), idle { frames: [index into core
+ * variants + extra], variants: extra } or null when the idle frames add
+ * nothing and reuse variant 0 of a static part.
+ */
+function splitPart(flat) {
+  const all = flat.frames === 0 ? RIG_FRAMES.map(() => 0) : flat.frames;
+  const order = [];
+  const remap = new Map();
+  const take = (v) => {
+    if (!remap.has(v)) { remap.set(v, order.length); order.push(v); }
+    return remap.get(v);
+  };
+  const core = all.slice(0, NC).map(take);
+  const coreCount = order.length;
+  const idle = all.slice(NC).map(take);
+  const variants = order.map((v) => flat.variants[v]);
+  return {
+    core: { frames: core.every((v) => v === 0) ? 0 : core, variants: variants.slice(0, coreCount) },
+    idle: { frames: idle.every((v) => v === 0) ? 0 : idle, variants: variants.slice(coreCount) },
+  };
 }
 
 /**
@@ -226,9 +293,22 @@ function buildArticle(type, name, gsjsEntry) {
   const groups = new Set();
   const collect = (ops) => { for (const o of ops) { if (o.g) o.g.forEach((g) => groups.add(g)); if (o.ops) { collect(o.ops); collect(o.clip); } } };
   for (const p of Object.values(parts)) p.variants.forEach(collect);
-  const data = { name, type, source: `glitch-avatars/${relative(AVATARS, file)} (CC0)`, parts, groups: [...groups].sort(), shapes, bitmaps: bmp };
+  // Split at the core frames (RIG_FRAMES): <name>.json and <name>.idle.json.
+  const coreParts = {};
+  const idleParts = {};
+  const coreIds = new Set();
+  for (const [part, flat] of Object.entries(parts)) {
+    const { core, idle } = splitPart(flat);
+    coreParts[part] = core;
+    for (const v of core.variants) shapeIds(v, coreIds);
+    if (idle.frames !== 0 || idle.variants.length) idleParts[part] = idle;
+  }
+  const [coreShapes, idleShapes] = splitShapes(shapes, coreIds);
+  const data = { name, type, source: `glitch-avatars/${relative(AVATARS, file)} (CC0)`, parts: coreParts, groups: [...groups].sort(), shapes: coreShapes, bitmaps: pickBitmaps(bmp, coreShapes) };
+  const idle = { parts: idleParts, shapes: idleShapes, bitmaps: pickBitmaps(bmp, idleShapes, data.bitmaps) };
   const bytes = writeJson(join(OUT, 'articles', type, `${name}.json`), data);
-  return { data, bytes };
+  const idleBytes = writeJson(join(OUT, 'articles', type, `${name}.idle.json`), idle);
+  return { data: { ...data, parts }, bytes: bytes + idleBytes, coreBytes: bytes, idleBytes };
 }
 
 function buildData() {
@@ -249,13 +329,15 @@ function buildData() {
   for (const [id, c] of Object.entries(gs.faces)) if (!faceByClass.has(c.article_class_name)) faceByClass.set(c.article_class_name, { id, ...c });
   const catalog = { source: 'glitch-avatars + glitch-GameServerJS (CC0)', types: {}, hatHair: {}, palettes: {}, defaultLook: manifest.defaultLook, looks: manifest.looks || {} };
   let total = 0;
+  let idleTotal = 0;
   for (const [type, entries] of Object.entries(manifest.articles)) {
     catalog.types[type] = [];
     for (const [index, e] of entries.entries()) {
       const name = typeof e === 'string' ? e : e.name;
       const g = byClass.get(name) || faceByClass.get(name);
-      const { data, bytes } = buildArticle(type, name, g);
+      const { data, bytes, idleBytes } = buildArticle(type, name, g);
       total += bytes;
+      idleTotal += idleBytes;
       const item = { name, label: e.label || labelOf(name, type, index), parts: Object.keys(data.parts), groups: data.groups };
       if (g?.id) item.gsjsId = Number(g.id);
       // Every GSJS colourway of the article (data_clothing has one id per colourway).
@@ -273,7 +355,7 @@ function buildData() {
   }
   catalog.defaults = gs.defaults;
   const bytes = writeJson(join(OUT, 'catalog.json'), catalog);
-  console.log(`articles: ${(total / 1024).toFixed(0)} KB; catalog.json ${(bytes / 1024).toFixed(0)} KB`);
+  console.log(`articles: ${(total / 1024).toFixed(0)} KB (idle files ${(idleTotal / 1024).toFixed(0)} KB); catalog.json ${(bytes / 1024).toFixed(0)} KB`);
 }
 
 /** Builder label: words from the class name, or "Eyes 3" for coded names. */

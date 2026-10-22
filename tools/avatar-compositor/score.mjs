@@ -1,6 +1,9 @@
 /**
  * Pose check: the composed default look against the recovered 62d8dab1
- * player sheets (assets/sprites/avatar/glitch-62d8/), frame for frame.
+ * player sheets (assets/sprites/avatar/glitch-62d8/), frame for frame. The
+ * same player's idle1-4 and idleSleepy sheets are recovered too (Wayback
+ * c2.glitch.bz/avatars/2012-10-19/62d8dab1..._1350661246_idle*.png), so the
+ * idle sheets are checked the same way.
  *
  * The outfits differ (62d8's exact articles are unknown), so the comparison
  * is on silhouettes: alpha agreement 1 - sum|a - b| / sum max(a, b) at one
@@ -77,7 +80,8 @@ export async function score({ write = true } = {}) {
     const md = VECTOR_AVATAR.sheets[name];
     const refImg = readAlpha(join(PUBLIC, GLITCH_AVATAR.dir, rd.file));
     const mineImg = readAlpha(join(PUBLIC, VECTOR_AVATAR.dir, md.file));
-    const refs = frames.map((_, k) => cell(refImg, k * rd.fw, 0, rd.fw, rd.fh));
+    const rc = rd.cols ?? rd.cells;
+    const refs = frames.map((_, k) => cell(refImg, (k % rc) * rd.fw, Math.floor(k / rc) * rd.fh, rd.fw, rd.fh));
     const mine = frames.map((_, k) => cell(mineImg, (k % md.cols) * md.fw, Math.floor(k / md.cols) * md.fh, md.fw, md.fh));
     // Feet-to-feet start: mine origin (midX, feetY) onto ref (midX, feetY), then search.
     const ex = rd.midX - md.midX;
