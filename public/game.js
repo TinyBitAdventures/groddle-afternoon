@@ -1092,6 +1092,91 @@ function installMoreMenu() {
   });
 }
 
+/**
+ * The player menu (PlayerInfoUI.as toggleMenu): clicking your name or the
+ * level pill drops down PlayerStatsUI (level, iMG 'til the next level, mood,
+ * energy, currants) above the PlayerInfoButtons the remake has (Skills,
+ * Vanity, Wardrobe). Profile, Groups, Friends, Keys, Encyclopedia, Forums,
+ * Auctions, Preferences and Account had nothing behind them without the
+ * website and other players, so they are left out.
+ */
+function renderPlayerMenu(menu) {
+  const info = levelInfoForXp(pc.xp);
+  const fmt = (n) => Math.round(Number(n) || 0).toLocaleString();
+  menu.replaceChildren();
+  const head = document.createElement('div');
+  head.className = 'pm-head';
+  head.innerHTML = `<span class="pm-level-label">Level:</span><span class="pm-level">${info.level}</span>`;
+  const stats = document.createElement('dl');
+  stats.className = 'pm-stats';
+  const row = (label, value, cls = '') => {
+    const dt = document.createElement('dt');
+    dt.textContent = label;
+    const dd = document.createElement('dd');
+    if (cls) dd.className = cls;
+    dd.innerHTML = value;
+    stats.append(dt, dd);
+  };
+  if (!info.atCap) row('iMG', `<b>${fmt(info.remaining)}</b><small>’til level ${info.level + 1}</small>`, 'pm-img');
+  row('Mood', `<b>${fmt(pc.mood)}</b>/${fmt(moodMax(pc))}`);
+  row('Energy', `<b>${fmt(pc.energy)}</b>/${fmt(energyCap())}`);
+  row('Currants', `<b>${fmt(pc.currants)}</b>`);
+  const buttons = document.createElement('div');
+  buttons.className = 'pm-buttons';
+  for (const [label, run] of [
+    ['Skills', () => document.getElementById('skills-btn')?.click()],
+    ['Vanity', () => openLookBuilderOn('hair')],
+    ['Wardrobe', () => openLookBuilderOn('top')],
+  ]) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chrome-btn';
+    btn.textContent = label;
+    btn.addEventListener('click', run);
+    buttons.append(btn);
+  }
+  menu.append(head, stats, buttons);
+}
+
+/** Vanity and Wardrobe open the look builder on a face or clothing tab. */
+function openLookBuilderOn(slot) {
+  avatarBuilderSlot = slot;
+  if (!state.started) {
+    openBuilderOnStart = true;
+    beginGame();
+    return;
+  }
+  if (isAvatarOpen()) renderAvatarBuilder();
+  else openAvatarPanel();
+}
+
+function installPlayerMenu() {
+  const btn = document.getElementById('player-menu-btn');
+  const menu = document.getElementById('player-menu');
+  const meter = document.getElementById('level-meter');
+  if (!btn || !menu) return;
+  const setOpen = (open) => {
+    if (open) renderPlayerMenu(menu);
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+  };
+  const toggle = () => setOpen(menu.hidden);
+  btn.addEventListener('click', toggle);
+  meter?.addEventListener('click', toggle);
+  menu.addEventListener('click', (e) => {
+    if (e.target.closest('button')) setOpen(false);
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (!menu.hidden && !e.target.closest('#player-menu, #player-menu-btn, #level-meter')) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu.hidden) {
+      setOpen(false);
+      btn.focus();
+    }
+  });
+}
+
 /** Keep the backing store at the canvas's displayed density (js/render-density.js). */
 function syncRenderResolution() {
   if (!app?.renderer || !app.canvas) return;
@@ -23213,6 +23298,7 @@ async function main() {
     } }));
   }
   installMoreMenu();
+  installPlayerMenu();
   document.querySelector('.top-actions')?.addEventListener('click', () => {
     if (currentAction) cancelCurrentAction({ quiet: true });
     closePackPopover();

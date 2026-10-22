@@ -6,7 +6,7 @@
   <base href="../" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Groddle Afternoon</title>
-    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-2" />
+    <link rel="stylesheet" href="style.css?v=feed-picker-1&amp;pmenu=1&amp;hud=hud-balance-1&amp;feature=greedy-story-2&amp;winter=winter-walk-2&amp;feat=incantations-3&amp;legalize=1&amp;pack=original-pager-1&amp;badgebrowser=full-catalog-2&amp;home=mailbox-2" />
   <script src="vendor/pixi/pixi-8.22.0.min.js"></script>
   <link rel="icon" href="favicon.svg?v=quoin" type="image/svg+xml" />
   <link rel="icon" href="favicon.ico?v=quoin" sizes="32x32" />
@@ -25,10 +25,11 @@
     </div>
     <!-- Top bar: metabolics + tools (Glitch-inspired) -->
     <header class="top-bar">
-      <div class="brand">
+      <button id="player-menu-btn" type="button" class="brand" aria-haspopup="true" aria-expanded="false" aria-controls="player-menu" title="Your stats, skills and look">
         <span class="brand-mark">Ur</span>
         <span class="brand-sub">Groddle Afternoon</span>
-      </div>
+      </button>
+      <div id="player-menu" class="player-menu" role="dialog" aria-label="Player menu" hidden></div>
       <div class="metabolics-cluster">
         <div class="meta-pill mood">
           <span class="meta-ico">☺</span>
@@ -40,7 +41,7 @@
           <span class="meta-label">Energy</span>
           <div class="meta-ring"><div id="bar-energy" class="meta-fill"></div></div>
         </div>
-        <div id="level-meter" class="level-meter" role="meter" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div id="level-meter" class="level-meter" role="meter" title="Level progress: click for your stats" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <span class="level-label">Level <strong id="stat-level">5</strong></span>
           <div class="level-track" aria-hidden="true"><i id="bar-level"></i></div>
           <span id="stat-xp" class="level-xp">0 / 0 XP</span>

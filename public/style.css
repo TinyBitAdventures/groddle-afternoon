@@ -965,8 +965,37 @@ footer a { color: inherit; }
   border-radius: 12px 12px 0 0;
   padding: 0.38rem 0.6rem;
   box-shadow: 0 2px 0 #c5d5e0 inset;
+  position: relative;
 }
-.brand { display: flex; flex-direction: column; min-width: 6rem; }
+.brand {
+  display: flex; flex-direction: column; align-items: flex-start; min-width: 6rem;
+  font: inherit; color: inherit; text-align: left; background: none; border: 0;
+  padding: 0.15rem 0.35rem; margin: -0.15rem -0.35rem; border-radius: 8px; cursor: pointer;
+}
+.brand:hover, .brand[aria-expanded="true"] { background: rgba(58, 126, 168, 0.1); }
+.brand:focus-visible { outline: 2px solid #3a7ea8; outline-offset: 1px; }
+.level-meter { cursor: pointer; }
+
+/* Player menu (PlayerInfoUI): the stats panel and its buttons, under the name. */
+.player-menu {
+  position: absolute; top: calc(100% + 6px); left: 0.5rem; z-index: 60;
+  width: 248px; padding: 0.7rem 0.75rem 0.6rem;
+  background: #fbfdff; border: 1px solid #a8bcc9; border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(30, 60, 80, 0.22);
+  color: #2b4a5c; font-size: 0.85rem;
+}
+.player-menu[hidden] { display: none; }
+.pm-head { display: flex; align-items: baseline; gap: 0.4rem; margin-bottom: 0.45rem; }
+.pm-level-label { font-weight: 700; color: #5b7484; }
+.pm-level { font-size: 1.6rem; font-weight: 800; color: #3a7ea8; line-height: 1; }
+.pm-stats { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.7rem; margin: 0 0 0.6rem; }
+.pm-stats dt { color: #5b7484; font-weight: 700; }
+.pm-stats dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.pm-stats dd b { color: #2b4a5c; }
+.pm-stats dd small { display: block; color: #6c8494; font-size: 0.72rem; }
+.pm-img b { color: #8a5aa6; }
+.pm-buttons { display: flex; flex-direction: column; gap: 0.2rem; border-top: 1px solid #dbe6ed; padding-top: 0.5rem; }
+.pm-buttons .chrome-btn { width: 100%; justify-content: flex-start; }
 .brand-mark {
   font-weight: 800;
   font-size: 1.15rem;
