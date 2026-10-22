@@ -592,10 +592,14 @@
    "id": "smuggling",
    "group": "quests",
    "name": "The Smuggler",
-   "status": "progress",
-   "blurb": "Contraband deliveries and the jailbreak quests.",
+   "status": "source",
+   "blurb": "Carry Contraband across Ur without a Deimaginator catching you, then break the wrongfully imprisoned Smuggler out of his cell.",
    "spot": null,
-   "evidence": [],
+   "evidence": [
+    "public/js/smuggling.js",
+    "public/js/features/smuggling-feature.js",
+    "public/js/quest-rooms/penalty.js"
+   ],
    "shot": null
   },
   {
@@ -768,25 +772,25 @@
   }
  ],
  "tally": {
-  "source": 37,
+  "source": 38,
   "rebuilt": 4,
-  "progress": 4,
+  "progress": 3,
   "lost": 3,
   "solo": 6,
   "reimagined": 1
  },
- "back": 48,
+ "back": 49,
  "possible": 52,
  "quests": {
   "total": 445,
   "story": 245,
-  "playable": 180,
+  "playable": 186,
   "buckets": [
    {
     "id": "playable",
     "label": "Playable",
     "note": "Offered and finishable in the remake.",
-    "count": 180
+    "count": 186
    },
    {
     "id": "job",
@@ -798,7 +802,7 @@
     "id": "building",
     "label": "Still being rebuilt",
     "note": "Their rooms or systems are on the workbench.",
-    "count": 8
+    "count": 2
    },
    {
     "id": "players",
@@ -821,8 +825,8 @@
   ]
  },
  "rooms": {
-  "total": 20,
-  "built": 19,
+  "total": 21,
+  "built": 21,
   "rooms": [
    {
     "id": "an_autumn_day",
@@ -957,10 +961,30 @@
     "shot": null
    },
    {
+    "id": "penalty",
+    "title": "Smuggle the Smuggler",
+    "quests": [
+     "Smuggle the Smuggler",
+     "Smuggle the Smuggler II",
+     "Smuggle the Smuggler III"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
     "id": "top_of_tree",
     "title": "The High Jumper",
     "quests": [
      "The High Jumper"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "esquibeth",
+    "title": "The Last Pilgrimage of Esquibeth",
+    "quests": [
+     "The Last Pilgrimage of Esquibeth"
     ],
     "built": true,
     "shot": null
@@ -1000,15 +1024,6 @@
     ],
     "built": true,
     "shot": null
-   },
-   {
-    "id": "esquibeth",
-    "title": "The Last Pilgrimage of Esquibeth",
-    "quests": [
-     "The Last Pilgrimage of Esquibeth"
-    ],
-    "built": false,
-    "shot": null
    }
   ]
  },
@@ -1043,7 +1058,7 @@
   "skipped": 23
  },
  "icons": {
-  "items": 750,
+  "items": 754,
   "sharp": 681
  },
  "imagination": {
@@ -1063,9 +1078,19 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 170,
+  "commits": 174,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "The Last Pilgrimage of Esquibeth: a four-location song walk to the Conch"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Smuggling: Warm and Smuggly deliveries, Deimaginators and the Smuggle the Smuggler jailbreak"
+   },
    {
     "date": "2026-10-21",
     "kind": "new",
@@ -1175,19 +1200,9 @@
     "date": "2026-10-21",
     "kind": "fix",
     "text": "Nothing shows through the loading screen"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "improve",
-    "text": "A calmer screen: one-row top bar, brief popups, small prompts"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "fix",
-    "text": "Energy and mood gains show whole numbers"
    }
   ]
  },
- "tests": 127,
+ "tests": 130,
  "generatedAt": "2026-10-21"
 }
