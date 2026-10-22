@@ -780,13 +780,13 @@
  "quests": {
   "total": 445,
   "story": 245,
-  "playable": 177,
+  "playable": 180,
   "buckets": [
    {
     "id": "playable",
     "label": "Playable",
     "note": "Offered and finishable in the remake.",
-    "count": 177
+    "count": 180
    },
    {
     "id": "job",
@@ -798,7 +798,7 @@
     "id": "building",
     "label": "Still being rebuilt",
     "note": "Their rooms or systems are on the workbench.",
-    "count": 11
+    "count": 8
    },
    {
     "id": "players",
@@ -822,7 +822,7 @@
  },
  "rooms": {
   "total": 20,
-  "built": 18,
+  "built": 19,
   "rooms": [
    {
     "id": "an_autumn_day",
@@ -896,6 +896,16 @@
     "quests": [
      "Le Misérable",
      "Le Misérable II"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "mental_block",
+    "title": "Mental Block",
+    "quests": [
+     "Mental Block",
+     "Mental Block 2"
     ],
     "built": true,
     "shot": null
@@ -992,16 +1002,6 @@
     "shot": null
    },
    {
-    "id": "mental_block",
-    "title": "Mental Block",
-    "quests": [
-     "Mental Block",
-     "Mental Block 2"
-    ],
-    "built": false,
-    "shot": null
-   },
-   {
     "id": "esquibeth",
     "title": "The Last Pilgrimage of Esquibeth",
     "quests": [
@@ -1063,9 +1063,14 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 168,
+  "commits": 170,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Mental Block and Mental Block 2: block-drop puzzle rooms"
+   },
    {
     "date": "2026-10-21",
     "kind": "new",
@@ -1180,14 +1185,9 @@
     "date": "2026-10-21",
     "kind": "fix",
     "text": "Energy and mood gains show whole numbers"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "improve",
-    "text": "Cleaner quoins and sharper ground apples"
    }
   ]
  },
- "tests": 126,
+ "tests": 127,
  "generatedAt": "2026-10-21"
 }
