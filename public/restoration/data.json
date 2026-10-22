@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 243,
+  "commits": 244,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Click your name or level for the player menu"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1510,14 +1515,9 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Meditation has no daily energy limit"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Ticket races follow the final rules: every win pays, no second-place prize"
    }
   ]
  },
- "tests": 154,
+ "tests": 155,
  "generatedAt": "2026-10-22"
 }

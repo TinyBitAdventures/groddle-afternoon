@@ -528,6 +528,7 @@ import {
   findClimbWallNear,
   barriersScreen,
   blockBarrierCrossing,
+  buriedSignpostUnder,
 } from './js/street-model.js';
 import {
   buildStreetView,
@@ -8614,7 +8615,13 @@ function resolveGround(px, py) {
         best = y;
       }
     }
-    if (best != null && py >= best - 80) return best;
+    // A gap over a buried signpost is a hole to jump into (the Great Hole to
+    // Ix): fall, and never get pulled back up onto the rim from below, until
+    // updateBuriedSignposts takes its link. Other gaps keep the old bridge,
+    // since imported streets have seams.
+    const hole = currentStreet ? buriedSignpostUnder(currentStreet, px, Infinity) : null;
+    if (best != null && py >= best - 80 && !(hole && py > best + 24)) return best;
+    if (hole) return worldToScreen(currentStreet, px, currentStreet.bounds?.b ?? 0).y;
     return streetPlatforms.reduce((m, p) => Math.max(m, p.y1, p.y2), 0);
   }
   return GROUND_Y;
@@ -20598,6 +20605,26 @@ function updateShrineWalkBy() {
   }
 }
 
+let buriedTravelUntil = 0;
+
+/**
+ * Dropping into a hole over a buried signpost takes its link (the
+ * Great Hole to Ix drops you into Groddle Ladder; street-model.js
+ * buriedSignpostUnder). Travel goes as through a door, so street projects and
+ * smuggling never leave you stuck at the bottom of the pit.
+ */
+function updateBuriedSignposts() {
+  if (!currentStreet || !player || climb.active || isScreenFxBlocking()) return;
+  const now = performance.now();
+  if (now < buriedTravelUntil) return;
+  const hit = buriedSignpostUnder(currentStreet, player.x, player.y);
+  if (!hit) return;
+  const conn = pickConnection(hit.signpost, availableStreetTsids());
+  if (!conn) return;
+  buriedTravelUntil = now + 3000;
+  travelTo(conn.tsid, { label: conn.label, arrive: conn.arrive, via: 'door' });
+}
+
 function grantShrineEmblem(target) {
   const giantId = target?.state?.giantId;
   const result = claimShrineEmblem(shrineState, giantId, inv, pc);
@@ -23322,6 +23349,7 @@ async function main() {
     physics(dt);
     tickAvatarAfk();
     updateShrineWalkBy();
+    updateBuriedSignposts();
     updateHogHaul((1000 / 60) * dt);
     updateFourLetterQuest();
     updateLegalizeIt();

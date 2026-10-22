@@ -320,6 +320,7 @@ export function signpostNear(street, screenX, radius = 120) {
   let best = null;
   let bestD = radius;
   for (const s of street.signposts || []) {
+    if (isBuriedSignpost(street, s)) continue;
     const pos = worldToScreen(street, s.x, s.y);
     const d = Math.abs(pos.x - screenX);
     if (d <= bestD) {
@@ -368,6 +369,47 @@ export function pickConnection(signpost, availableTsids) {
  * @param {number} screenX
  * @param {number} [radius=120]
  */
+/**
+ * A signpost buried under the street's floor stands in for a
+ * Collision-triggered Teleporter (items/teleporter.js onPlayerCollision; its
+ * target lives in item instance data the location dump doesn't have). The
+ * Great Hole to Ix keeps its link to Groddle Ladder at y 150, under the gap in
+ * the floor you jump into. Nobody can walk up to one, so it never prompts.
+ */
+export function isBuriedSignpost(street, signpost) {
+  return Number(signpost?.y) > (street?.bounds?.b ?? 0) - 20;
+}
+
+/** The hole's rim: the deepest floor beside a buried signpost (screen y), or null. */
+export function buriedSignpostRim(street, signpost, reach = 110) {
+  const pos = worldToScreen(street, signpost.x, signpost.y);
+  let rim = null;
+  for (const p of street?.platforms || []) {
+    const a = worldToScreen(street, p.x1, p.y1);
+    const b = worldToScreen(street, p.x2, p.y2);
+    if (Math.max(a.x, b.x) < pos.x - reach - 40 || Math.min(a.x, b.x) > pos.x + reach + 40) continue;
+    rim = Math.max(rim ?? -Infinity, a.y, b.y);
+  }
+  return rim;
+}
+
+/**
+ * The buried signpost the player has dropped into: within `reach` of it and
+ * `depth` below the hole's rim (or near the street's bottom when no floor is beside it).
+ */
+export function buriedSignpostUnder(street, screenX, screenY, { reach = 110, depth = 60 } = {}) {
+  for (const s of street?.signposts || []) {
+    if (!isBuriedSignpost(street, s)) continue;
+    const pos = worldToScreen(street, s.x, s.y);
+    if (Math.abs(pos.x - screenX) > reach) continue;
+    const bottom = worldToScreen(street, s.x, street.bounds?.b ?? 0).y;
+    const rim = buriedSignpostRim(street, s, reach);
+    const trigger = rim == null ? bottom - 80 : Math.min(rim + depth, bottom - 80);
+    if (screenY >= trigger) return { signpost: s, screen: pos, rim };
+  }
+  return null;
+}
+
 export function signpostNearWide(street, screenX, radius = 120) {
   return signpostNear(street, screenX, radius);
 }
