@@ -72,6 +72,7 @@ export const BUILT_ROOMS = Object.freeze([
   'being_watched',
   'back_alley',
   'clubhouse',
+  'light_perspective',
 ]);
 
 /**
@@ -145,6 +146,17 @@ export const OFFER_OVERRIDES = Object.freeze({
   mental_block_2: {
     prerequisites: [{ condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 }],
     why: 'canOffer: walk_speed_3 and jump_2',
+  },
+  puzzle_level_light_perspective: {
+    prerequisites: [{ condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 }],
+    why: 'canOffer: walk_speed_3 and jump_2',
+  },
+  puzzle_level_light_perspective_rem: {
+    prerequisites: [
+      { condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 },
+      { condition: 'custom_code', value: 'hour_after:puzzle_level_light_perspective', not: 0 },
+    ],
+    why: 'canOffer: walk_speed_3 and jump_2; an hour after part 1, after the last repeat and after a fail',
   },
   radiant_glare: {
     prerequisites: [{ condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 }],

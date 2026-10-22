@@ -30911,7 +30911,8 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "Solved Puzzle"
+    "desc": "Solved Puzzle",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -30939,6 +30940,11 @@
     "condition": "over_level",
     "value": 13,
     "not": 0
+   },
+   {
+    "condition": "custom_code",
+    "value": "upgrades:walk_speed_3,jump_2",
+    "not": 0
    }
   ],
   "endNpcs": [],
@@ -30954,8 +30960,9 @@
     "xp": 7652
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "light_perspective",
+  "offerNote": "canOffer: walk_speed_3 and jump_2",
+  "solo": true
  },
  "puzzle_level_light_perspective_rem": {
   "classTsid": "puzzle_level_light_perspective_rem",
@@ -30969,14 +30976,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "Solved Puzzle"
+    "desc": "Solved Puzzle",
+    "route": "quest-instances"
    },
    {
     "id": "r550",
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "Return from the Puzzle"
+    "desc": "Return from the Puzzle",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -31009,6 +31018,16 @@
     "condition": "completed_quest",
     "value": "puzzle_level_light_perspective",
     "not": 0
+   },
+   {
+    "condition": "custom_code",
+    "value": "upgrades:walk_speed_3,jump_2",
+    "not": 0
+   },
+   {
+    "condition": "custom_code",
+    "value": "hour_after:puzzle_level_light_perspective",
+    "not": 0
    }
   ],
   "endNpcs": [],
@@ -31024,8 +31043,9 @@
     "npc": "play_cube"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "light_perspective",
+  "offerNote": "canOffer: walk_speed_3 and jump_2; an hour after part 1, after the last repeat and after a fail",
+  "solo": true
  },
  "questswhere_the_heart_isjs": {
   "classTsid": "questswhere_the_heart_isjs",
