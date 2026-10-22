@@ -20,9 +20,12 @@
  *                EZ Cooking's street is lost, so it goes straight on.
  *  6. island     Gentle Island (hub 129, imported): the rock's bag quest
  *                (978 currants, buy_two_bags at the cheap bag vendor on
- *                Progress Way), then On to the Big Time: Gentle Island Exit
- *                drops you on a random newxp_exits street, and 15 s later
- *                the quest completes with its Greeter Twig relic.
+ *                Progress Way); then home (Progress Way is held: "Not so
+ *                fast — head home first …") for the rock's Skill Learning
+ *                Brain talk, which offers On to the Big Time; back on the
+ *                island, Gentle Island Exit drops you on a random
+ *                newxp_exits street, and 15 s later the quest completes
+ *                with its Greeter Twig relic.
  *
  * Opt-in: a brand-new save's start card offers "Start with the tutorial" or
  * "Skip to Ur"; existing saves and autostart routes are never redirected.
@@ -60,12 +63,15 @@ import {
   cloudsLayout,
   firstSkill,
   inBox,
+  inHitBox,
   isNewxpSceneTsid,
+  islandExitOpen,
   nextStage,
   normalizeNewxpSave,
   pickNewxpExit,
   shouldResume,
   startNewxp,
+  street4Check,
   talkPages,
   training1Layout,
   training2Layout,
@@ -1764,11 +1770,69 @@ async function afterBags(engine, t) {
       return Boolean(a && !a.hidden && a.getClientRects().length);
     };
     await until(t, () => !awardOpen() && !engine.questDialogueOpen() && !engine.shopOpen(), { every: 300 });
-    // buy_two_bags onComplete_custom.
+    // buy_two_bags onComplete_custom, then revealImagination/openImagination:
+    // the source opened the iMG menu on its "go home" callout; here the Home
+    // panel opens on Teleport home.
     await vog(t, LINES.backAndForth);
-    offerLeave(engine, t);
+    if (!engine.homeOwned?.()) engine.grantHome?.(save.homeStyle || 'meadow');
+    save.island = 'go_home';
+    engine.save();
+    engine.setData('newxpIsland', save.island);
+    setStep('go_home');
+    openHomePanel(engine);
   } catch (err) {
     if (!(err instanceof Cancel)) console.warn('newxp after bags', err);
+  } finally {
+    islandBusy = false;
+  }
+}
+
+/** The Home panel (#home-btn), standing in for the source iMG menu's go-home callout. */
+function openHomePanel(engine) {
+  const panel = document.getElementById('home-panel');
+  if (panel && !panel.hidden) return;
+  document.getElementById('home-btn')?.click();
+  if (auto) {
+    setTimeout(() => document.querySelector('#home-panel [data-home-action="teleport"]')?.click(), 400);
+  }
+}
+
+/**
+ * home.js (is_postnewxp) → magic_rock.js give-skill-learning → home.js
+ * closedImaginationMenu / closedImaginationMenu2 → checkSideStreetsConvo
+ * (force_bye) → remind-img → giveQuests. The remake grants the Skill
+ * Learning card to every save, so the gift is the talk alone.
+ */
+async function homeWrapUp(engine, t) {
+  islandBusy = true;
+  try {
+    setStep('home_gift');
+    await sleep(t, 2000);
+    const p = P();
+    const rock = makeNpc(engine, 'rock', Math.min((p?.x || 250) + 240, (engine.street?.bounds?.r || 1500) - 80), engine.groundY, { register: true, classId: 'newxp_rock', subtitle: 'Your Magic Rock', base: 'idle' });
+    run.npcs.push(rock);
+    rock.face(-1);
+    await talk(t, rock, LINES.homeGift, { buttons: ['Nice'] });
+    const studying = document.getElementById('study-chip')?.hidden === false;
+    if (!studying) {
+      await talk(t, rock, LINES.skillBrain, { buttons: ['Will do'] });
+      // open-skills: the Skills panel; the rock carries on when it closes.
+      const panel = () => document.getElementById('skills-panel');
+      if (!auto) document.getElementById('skills-btn')?.click();
+      await sleep(t, 300);
+      await until(t, () => !panel() || panel().hidden, { every: 300 });
+    }
+    await talk(t, rock, LINES.wellKid, { buttons: ['OK'] });
+    await talk(t, rock, LINES.chapterBye, { buttons: ['Bye'] });
+    await sleep(t, auto ? 300 : 4000);
+    await vog(t, LINES.whenReady);
+    save.island = 'home_done';
+    engine.save();
+    engine.setData('newxpIsland', save.island);
+    setStep('leave_offer');
+    offerLeave(engine, t);
+  } catch (err) {
+    if (!(err instanceof Cancel)) console.warn('newxp home', err);
   } finally {
     islandBusy = false;
   }
@@ -1777,7 +1841,7 @@ async function afterBags(engine, t) {
 /** home.js giveQuests: quests_offer('leave_gentle_island'). */
 function offerLeave(engine, t) {
   const def = getQuestCatalog().leave_gentle_island;
-  if (!def || save.island !== 'bags_done') return;
+  if (!def || save.island !== 'home_done') return;
   const pages = talkPages(def.offer, {}, 'OK');
   engine.offerQuestDialogue({
     title: def.title,
@@ -1800,6 +1864,14 @@ function offerLeave(engine, t) {
 
 async function autoLeave(engine, t) {
   try {
+    // From the home street, Return to Ur first (back to the remembered island street).
+    if (engine.homeContext?.().inHome) {
+      document.getElementById('home-btn')?.click();
+      await sleep(t, 300);
+      document.querySelector('#home-panel [data-home-action="return"]')?.click();
+      await until(t, () => !engine.homeContext?.().inHome, { every: 300 });
+      await sleep(t, 600);
+    }
     await engine.enter(GENTLE_ISLAND.exit, { spawnX: 5600, quiet: true, bypassFeatureGates: true });
     alive(t);
     place(ISLAND_BOXES.gentle_island_exit.x, ISLAND_BOXES.gentle_island_exit.y - 40);
@@ -1810,7 +1882,7 @@ async function autoLeave(engine, t) {
 
 /** player.js teleportHome: choose_one(config.newxp_exits). */
 async function leaveIsland(engine) {
-  if (save.island !== 'leaving' && save.island !== 'bags_done') return;
+  if (!islandExitOpen(save.island)) return;
   const exit = pickNewxpExit(Math.random, (tsid) => engine.streetExists(tsid));
   if (!exit) return;
   save.island = 'exited';
@@ -1868,21 +1940,37 @@ function islandTick(engine, now) {
   const p = P();
   if (!p) return;
   const tsid = engine.streetTsid;
-  // street4_check: no leaving Progress Way without the bags.
+  // newbie_island.js street4_check: Progress Way is held until On to the
+  // Big Time is accepted (no bags: back 250; bags but not home yet: back 150).
   const gate = ISLAND_BOXES.street4_check;
-  if (tsid === gate.tsid && inBox(gate, p.x, p.y) && !questDone(engine, 'buy_two_bags')) {
+  const block = tsid === gate.tsid && inHitBox(gate, p.x, p.y) ? street4Check(save.island, questDone(engine, 'buy_two_bags')) : null;
+  // One message per bump: walking straight back in re-pushes without stacking VoGs.
+  const speak = block && now - (run.data.gateAt || 0) > 4000;
+  if (speak) run.data.gateAt = now;
+  if (block === 'noBags') {
     place(p.x - 250, p.y);
-    vog(token, LINES.noBagsYet).catch(() => {});
+    if (speak) vog(token, LINES.noBagsYet).catch(() => {});
+  } else if (block === 'notSoFast') {
+    place(p.x - 150, p.y);
+    if (speak) vog(token, LINES.notSoFast).then(() => { if (save.island === 'go_home') openHomePanel(engine); }).catch(() => {});
   }
   const exitBox = ISLAND_BOXES.gentle_island_exit;
-  if (tsid === exitBox.tsid && inBox(exitBox, p.x, p.y) && (save.island === 'leaving' || save.island === 'bags_done') && !run.data.leaving) {
+  if (tsid === exitBox.tsid && inHitBox(exitBox, p.x, p.y) && islandExitOpen(save.island) && !run.data.leaving) {
     run.data.leaving = true;
     leaveIsland(engine).finally(() => { if (run) run.data.leaving = false; });
   }
   if (save.island === 'quest_given' && questDone(engine, 'buy_two_bags') && !islandBusy) {
     save.island = 'bags_done';
     engine.save();
+  }
+  if (save.island === 'bags_done' && !islandBusy && !run.data.afterBags) {
+    run.data.afterBags = true;
     afterBags(engine, token);
+  }
+  // home.js playerEnterCallback (is_postnewxp): the rock's wrap-up at home.
+  if (save.island === 'go_home' && tsid === HOME_STREET_TSID && !islandBusy && !run.data.homeTalk) {
+    run.data.homeTalk = true;
+    homeWrapUp(engine, token);
   }
   if (save.island === 'quest_given' && now > reminderAt && GENTLE_ISLAND_TSIDS.includes(tsid)) {
     reminderAt = now + BAG_REMINDER_MS;
@@ -1978,6 +2066,10 @@ function startTutorial(engine, stage = 'clouds') {
   save = startNewxp(save, stage);
   if (stage !== 'clouds' && !save.skill && STAGES.indexOf(stage) > STAGES.indexOf('house')) save.skill = firstSkill(engine.param('newxpskill'))?.id || 'animalkinship_1';
   if (stage !== 'clouds' && !save.name) save.name = 'Tester';
+  // A forced later stage still has the home street the house stage imagines.
+  if (STAGES.indexOf(stage) > STAGES.indexOf('house') && !engine.homeOwned?.()) {
+    engine.grantHome?.(save.homeStyle || engine.param('newxpstyle') || 'meadow');
+  }
   if (STAGES.indexOf(stage) >= STAGES.indexOf('training2')) {
     for (const id of ['walk_speed_1', 'jump_1']) if (!save.upgrades.includes(id)) save.upgrades.push(id);
   }
@@ -2214,7 +2306,7 @@ export const newxpFeature = {
     }
     if (target?.classId === 'newxp_rock' && verbId === 'talk') {
       run.data.rockTalk = true;
-      if (save.stage === 'island' && save.island === 'bags_done') offerLeave(engine, token);
+      if (save.stage === 'island' && save.island === 'home_done') offerLeave(engine, token);
       else if (save.stage === 'island' && target.npc) say(target.npc, LINES.goodLuck, 2500);
       return true;
     }

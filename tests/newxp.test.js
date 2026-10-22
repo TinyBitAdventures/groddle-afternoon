@@ -11,6 +11,7 @@ import {
   FIRST_SKILLS,
   GENTLE_ISLAND,
   ISLAND_BOXES,
+  ISLAND_STEPS,
   ISLAND_CURRANTS,
   LEAVE_FLAG_DELAY_MS,
   LINES,
@@ -24,8 +25,10 @@ import {
   UPGRADE_HANDS,
   cloudsLayout,
   inBox,
+  inHitBox,
   indexTsid,
   isNewxpSceneTsid,
+  islandExitOpen,
   nextStage,
   normalizeNewxpSave,
   pickNewxpExit,
@@ -33,6 +36,7 @@ import {
   reachablePlatforms,
   shouldResume,
   startNewxp,
+  street4Check,
   talkPages,
   training1Layout,
   training2Layout,
@@ -233,5 +237,45 @@ describe('newxp save', () => {
   it('is registered as a feature', () => {
     const src = readFileSync(join(ROOT, 'js/features/index.js'), 'utf8');
     assert.match(src, /newxpFeature/);
+  });
+});
+
+describe('newxp island order (newbie_island.js, home.js, magic_rock.js)', () => {
+  it('goes home after the bags and only then offers On to the Big Time', () => {
+    assert.deepEqual([...ISLAND_STEPS], ['arrive', 'quest_given', 'bags_done', 'go_home', 'home_done', 'leaving', 'exited']);
+    // street4_check: back 250 without bags, back 150 with bags until the quest is accepted.
+    assert.equal(street4Check('quest_given', false), 'noBags');
+    for (const step of ['bags_done', 'go_home', 'home_done']) assert.equal(street4Check(step, true), 'notSoFast', step);
+    assert.equal(street4Check('leaving', true), null);
+    for (const step of ISLAND_STEPS) assert.equal(islandExitOpen(step), step === 'leaving', step);
+    assert.equal(normalizeNewxpSave({ island: 'go_home' }).island, 'go_home');
+    assert.equal(normalizeNewxpSave({ island: 'home_done' }).island, 'home_done');
+  });
+
+  it('tests the archived island boxes against the avatar body, so Progress Way\'s gate fires', () => {
+    // Progress Way's floor under street4_check is at y 959 (944-963), below the box bottom (950).
+    assert.equal(inBox(ISLAND_BOXES.street4_check, 4700, 959), false);
+    assert.equal(inHitBox(ISLAND_BOXES.street4_check, 4700, 959), true);
+    assert.equal(inHitBox(ISLAND_BOXES.street4_check, 4500, 959), false);
+    assert.equal(inHitBox(ISLAND_BOXES.gentle_island_exit, 5724, 1122), true);
+    assert.equal(inHitBox(ISLAND_BOXES.gentle_island_exit, 5000, 1122), false);
+  });
+
+  it('uses the source wording for the home wrap-up', () => {
+    assert.deepEqual(talkPages(LINES.homeGift, {}, 'Nice').map((p) => p.button), ['Yay me', 'Do Tell!', 'Nice']);
+    assert.deepEqual(talkPages(LINES.skillBrain, {}, 'Will do').map((p) => p.button), ['Good', 'Interesting …', 'Will do']);
+    assert.deepEqual(talkPages(LINES.wellKid, {}, 'OK').map((p) => p.button), ['Yeah', 'OK']);
+    if (!existsSync(join(GS, 'locations/newbie_island.js'))) return;
+    const island = readFileSync(join(GS, 'locations/newbie_island.js'), 'utf8');
+    const home = readFileSync(join(GS, 'locations/home.js'), 'utf8');
+    const rock = readFileSync(join(GS, 'items/magic_rock.js'), 'utf8');
+    const bags = readFileSync(join(GS, 'quests/buy_two_bags.js'), 'utf8');
+    assert.ok(island.includes(LINES.notSoFast), 'notSoFast');
+    assert.ok(island.includes(LINES.noBagsYet), 'noBagsYet');
+    assert.ok(bags.includes(LINES.backAndForth), 'backAndForth');
+    for (const key of ['homeGift', 'skillBrain', 'wellKid']) assert.ok(home.includes(LINES[key].replace(/"/g, '\\"')), key);
+    assert.ok(rock.includes(LINES.chapterBye), 'chapterBye');
+    // The one adaptation: the source's "use the iMG Menu" is the Home panel's Return to Ur here.
+    assert.ok(home.includes(LINES.whenReady.replace('use Return to Ur', 'use the iMG Menu')), 'whenReady');
   });
 });

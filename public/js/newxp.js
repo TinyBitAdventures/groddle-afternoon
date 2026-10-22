@@ -247,6 +247,20 @@ export const LINES = Object.freeze({
   bagReminder: 'You haven\'t gotten your bags from the vendor. Don\'t forget!',
   noBagsYet: 'You haven\'t bought your bags from the vendor yet. You really need to do that …',
   backAndForth: 'You can go back and forth between your home street and world at almost any time',
+  // newbie_island.js street4_check, first page (the second, "Use the iMG menu
+  // to go back to your home street.", is the Home panel opening instead).
+  notSoFast: 'Not so fast — head home first so we can wrap this up',
+  // home.js playerEnterCallback (is_postnewxp) and magic_rock.js give-skill-learning.
+  homeGift: 'You little adventurer, you — nicely done.<split butt_txt="Yay me">I have a little present for you as well …<split butt_txt="Do Tell!">I got you this very fancy upgrade: the Skill Learning Brain!',
+  // home.js closedImaginationMenu (only when no skill is being learned).
+  skillBrain: 'Now you have a Skill Learning Brain! You can learn skills on your own, but learning takes time.<split butt_txt="Good">As you learn more and level up, you\'ll unlock all kinds of skills — Teleportation and Mining, Machine use and Potionmaking — the list is long.<split butt_txt="Interesting …">But for now, your choices are a bit more humble. Choose one of the skills you\'ve unlocked so far to begin.',
+  // home.js closedImaginationMenu2.
+  wellKid: 'Well kid, you seem to know what you’re doing … at least enough to get started.<split butt_txt="Yeah">So I’m going to pipe down now and stick close to your house for later. I have a lot of reading to catch up on.',
+  // magic_rock.js checkSideStreetsConvo (force_bye).
+  chapterBye: 'This chapter is just fascinating … bye!',
+  // magic_rock.js remind-img; the source says "use the iMG Menu" (the remake's
+  // way back is the Home panel's Return to Ur, as 'Q' stands in for 'L' above).
+  whenReady: 'When you’re ready, use Return to Ur to go back to Gentle Island and head to the real world.',
   relic: 'Lo, a relic of the Island came along with you!',
   greeterTwig: 'It’s a Greeter Twig! You can use it to summon another player to come and say hi.',
   explore: 'Good luck! And just explore … try everything, see what happens. You\'ll learn all you need that way.',
@@ -384,7 +398,27 @@ export function pickNewxpExit(rng = Math.random, exists = () => true) {
 /* Save                                                                 */
 /* ------------------------------------------------------------------ */
 
-const ISLAND_STEPS = ['arrive', 'quest_given', 'bags_done', 'leaving', 'exited'];
+/**
+ * The island steps in source order. After the bags (buy_two_bags
+ * onComplete_custom) the player goes home: newbie_island.js street4_check
+ * holds Progress Way ("Not so fast — head home first …") until
+ * leave_gentle_island is accepted, and home.js offers that quest only after
+ * the Magic Rock's Skill Learning Brain talk on the home street
+ * (is_postnewxp, magic_rock.js give-skill-learning / check-sidestreets /
+ * remind-img, home.js giveQuests).
+ */
+export const ISLAND_STEPS = Object.freeze(['arrive', 'quest_given', 'bags_done', 'go_home', 'home_done', 'leaving', 'exited']);
+
+/** newbie_island.js hitBox street4_check: null (pass), 'noBags' (back 250) or 'notSoFast' (back 150). */
+export function street4Check(island, bagsDone) {
+  if (island === 'leaving' || island === 'exited') return null;
+  return bagsDone ? 'notSoFast' : 'noBags';
+}
+
+/** The Gentle Island Exit box only fires once leave_gentle_island is accepted. */
+export function islandExitOpen(island) {
+  return island === 'leaving';
+}
 
 export function normalizeNewxpSave(seed = {}) {
   const s = seed && typeof seed === 'object' ? seed : {};
@@ -437,6 +471,18 @@ export function shouldResume(save, params = {}) {
 export function inBox(box, x, y) {
   if (!box) return false;
   return x >= box.x - box.w / 2 && x <= box.x + box.w / 2 && y >= box.y - box.h && y <= box.y + 4;
+}
+
+/**
+ * An archived street hitbox (street4_check, gentle_island_exit) against the
+ * avatar's body: the client tested the avatar's box, not its feet. Progress
+ * Way's floor under street4_check sits 5-9 px below the box bottom (944-963),
+ * so a feet-only test never fired there.
+ */
+export const AVATAR_BODY_H = 100;
+export function inHitBox(box, x, y, bodyH = AVATAR_BODY_H) {
+  if (!box) return false;
+  return x >= box.x - box.w / 2 && x <= box.x + box.w / 2 && y >= box.y - box.h && y - bodyH <= box.y;
 }
 
 /* ------------------------------------------------------------------ */
