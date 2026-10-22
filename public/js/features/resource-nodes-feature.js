@@ -33,6 +33,7 @@
 
 import { ITEM_CATALOG } from '../inventory.js?v=catalog-unified-3';
 import { platformYAt } from '../street-model.js';
+import { hiresSpriteUrl } from '../sprite-hires.js';
 import { rollResourceNodeDrop } from './drops-feature.js?v=drops-1';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,
@@ -456,7 +457,8 @@ function scanBounds(source, def) {
     canvas.width = def.width;
     canvas.height = def.height;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    ctx.drawImage(source, 0, 0);
+    // Drawn at the sheet's 1x size, so a 3x source scans in the same cells.
+    ctx.drawImage(source, 0, 0, def.width, def.height);
     const { data } = ctx.getImageData(0, 0, def.width, def.height);
     const out = [];
     for (let i = 0; i < def.frameCount; i += 1) {
@@ -488,7 +490,7 @@ function ensureSheet(engine, def) {
   if (!sheetLoads.has(def.path)) {
     sheetLoads.set(
       def.path,
-      engine.PIXI.Assets.load(def.path)
+      engine.PIXI.Assets.load(hiresSpriteUrl(def.path) || def.path)
         .then((texture) => {
           const base = texture.baseTexture;
           const entry = { base, bounds: scanBounds(base.resource?.source, def) };

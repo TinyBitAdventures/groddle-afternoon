@@ -744,6 +744,7 @@ import {
 } from './js/sound-moments.js';
 import { moodMax } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js';
+import { installHiresSprites } from './js/sprite-hires.js';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 
@@ -21044,6 +21045,8 @@ async function main() {
   PIXI.Filter.defaultResolution = null;
   // 3x pack icons in Pixi sprites and <img>s, at their original sizes.
   installHiresIcons(PIXI);
+  // 3x animal sheets from the vector SWFs (js/sprite-hires.js), same frame rects.
+  installHiresSprites(PIXI);
   app = new PIXI.Application({
     width: VIEW_W,
     height: VIEW_H,

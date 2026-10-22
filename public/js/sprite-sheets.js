@@ -1,3 +1,5 @@
+import { upgradeBaseTexture } from './sprite-hires.js';
+
 /**
  * Grid sprite-sheet slicing for feature modules (foxes, Heli Kitties).
  * A sheet def is { path, fw, fh, cols, frames, first? }: fixed fw×fh cells read
@@ -51,6 +53,8 @@ export function createSheetLoader(PIXI) {
     frames(def) {
       const base = bases.get(def.path);
       if (!base) return [];
+      // Features load every sheet on each street; only drawn ones swap to 3x.
+      upgradeBaseTexture(PIXI, base, def.path);
       const out = [];
       for (let i = 0; i < def.frames; i += 1) {
         const key = `${def.path}#${i}`;

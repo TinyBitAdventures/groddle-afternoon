@@ -1,0 +1,53 @@
+{
+  "about": "Animal sheets the game draws in the world, paired with their vector SWF (glitch-items, CC0). path is relative to public/; label is the SWF FrameLabel shown in cell `first` (default 0); frames = cells to fill. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/animals.json",
+  "jobs": [
+    { "name": "piggy", "swf": "inhabitants/piggy/npc_piggy.swf", "sprite": 79, "sheets": [
+      { "path": "assets/sprites/npc_piggy__x1_walk_png_1354829432.png", "label": "walk", "fw": 88, "fh": 62, "cols": 8, "frames": 24 },
+      { "path": "assets/sprites/npc_piggy__x1_nibble_png_1354829441.png", "label": "nibble", "fw": 88, "fh": 62, "cols": 10, "frames": 60 }
+    ] },
+    { "name": "chicken", "swf": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "sheets": [
+      { "path": "assets/sprites/npc_chicken__x1_walk_png_1354830385.png", "label": "walk", "fw": 148, "fh": 110, "cols": 6, "frames": 24 },
+      { "path": "assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png", "label": "pecking_once", "fw": 148, "fh": 110, "cols": 6, "frames": 32 }
+    ] },
+    { "name": "batterfly", "swf": "inhabitants/batterfly/npc_batterfly.swf", "sprite": 81, "sheets": [
+      { "path": "assets/sprites/animals/npc_batterfly_profile.webp", "label": "profile", "fw": 111, "fh": 96, "cols": 8, "frames": 40 },
+      { "path": "assets/sprites/animals/npc_batterfly_chew.webp", "label": "chew", "fw": 111, "fh": 96, "cols": 9, "frames": 120 }
+    ] },
+    { "name": "fox-orange", "swf": "inhabitants/fox/npc_fox.swf", "sprite": 151, "sheets": [
+      { "path": "assets/sprites/foxes/fox-orange-run.png", "label": "run", "fw": 153, "fh": 139, "cols": 6, "frames": 12 },
+      { "path": "assets/sprites/foxes/fox-orange-pause.png", "label": "pause", "fw": 153, "fh": 139, "cols": 6, "frames": 56 },
+      { "path": "assets/sprites/foxes/fox-orange-eatStart.png", "label": "eatStart", "fw": 153, "fh": 139, "cols": 5, "frames": 10 },
+      { "path": "assets/sprites/foxes/fox-orange-eat.png", "label": "eat", "fw": 153, "fh": 139, "cols": 5, "frames": 20 },
+      { "path": "assets/sprites/foxes/fox-orange-eatEnd.png", "label": "eatEnd", "fw": 153, "fh": 139, "cols": 5, "frames": 20 },
+      { "path": "assets/sprites/foxes/fox-orange-brushed.png", "label": "brushed", "fw": 153, "fh": 139, "cols": 2, "frames": 2 }
+    ] },
+    { "name": "fox-silver", "swf": "inhabitants/fox/npc_fox.swf", "sprite": 80, "sheets": [
+      { "path": "assets/sprites/foxes/fox-silver-run.png", "label": "run", "fw": 153, "fh": 139, "cols": 6, "frames": 12 },
+      { "path": "assets/sprites/foxes/fox-silver-pause.png", "label": "pause", "fw": 153, "fh": 139, "cols": 6, "frames": 56 },
+      { "path": "assets/sprites/foxes/fox-silver-eatStart.png", "label": "eatStart", "fw": 153, "fh": 139, "cols": 5, "frames": 10 },
+      { "path": "assets/sprites/foxes/fox-silver-eat.png", "label": "eat", "fw": 153, "fh": 139, "cols": 5, "frames": 20 },
+      { "path": "assets/sprites/foxes/fox-silver-eatEnd.png", "label": "eatEnd", "fw": 153, "fh": 139, "cols": 5, "frames": 20 },
+      { "path": "assets/sprites/foxes/fox-silver-brushed.png", "label": "brushed", "fw": 153, "fh": 139, "cols": 2, "frames": 2 }
+    ] },
+    { "name": "heli-kitty", "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf", "sprite": 114, "sheets": [
+      { "path": "assets/sprites/kitties/kitty-appear.png", "label": "3appear", "fw": 136, "fh": 115, "cols": 7, "frames": 47 },
+      { "path": "assets/sprites/kitties/kitty-fly.png", "label": "3fly", "fw": 136, "fh": 115, "cols": 7, "frames": 20 },
+      { "path": "assets/sprites/kitties/kitty-sleepStart.png", "label": "3sleepStart", "fw": 136, "fh": 115, "cols": 7, "frames": 26 },
+      { "path": "assets/sprites/kitties/kitty-sleep.png", "label": "3sleep", "fw": 136, "fh": 115, "cols": 7, "frames": 57 },
+      { "path": "assets/sprites/kitties/kitty-blink.png", "label": "3blink", "fw": 136, "fh": 115, "cols": 5, "frames": 5 },
+      { "path": "assets/sprites/kitties/kitty-happy.png", "label": "3happy", "fw": 136, "fh": 115, "cols": 7, "frames": 38 },
+      { "path": "assets/sprites/kitties/kitty-chew.png", "label": "3chew", "fw": 136, "fh": 115, "cols": 5, "frames": 15 },
+      { "path": "assets/sprites/kitties/kitty-jump.png", "label": "3jump", "fw": 136, "fh": 115, "cols": 6, "frames": 16 },
+      { "path": "assets/sprites/kitties/kitty-hitBall.png", "label": "3hitBall", "fw": 136, "fh": 115, "cols": 5, "frames": 9 },
+      { "path": "assets/sprites/kitties/kitty-disappear.png", "label": "3disappear", "fw": 136, "fh": 115, "cols": 7, "frames": 27 }
+    ] },
+    { "name": "salmon", "swf": "inhabitants/salmon/npc_salmon.swf", "sprite": 16, "sheets": [
+      { "path": "assets/sprites/resources/salmon-swim-right.png", "label": "swimRight", "fw": 59, "fh": 37, "cols": 11, "frames": 22 },
+      { "path": "assets/sprites/resources/salmon-swim-right-up15.png", "label": "swimRightUp15", "fw": 59, "fh": 37, "cols": 11, "frames": 22 },
+      { "path": "assets/sprites/resources/salmon-swim-right-up30.png", "label": "swimRightUp30", "fw": 59, "fh": 37, "cols": 11, "frames": 22 },
+      { "path": "assets/sprites/resources/salmon-swim-right-down15.png", "label": "swimRightDown15", "fw": 59, "fh": 37, "cols": 11, "frames": 22 },
+      { "path": "assets/sprites/resources/salmon-swim-right-down30.png", "label": "swimRightDown30", "fw": 59, "fh": 37, "cols": 11, "frames": 22 },
+      { "path": "assets/sprites/resources/salmon-turn-right.png", "label": "turnRight", "fw": 59, "fh": 37, "cols": 11, "frames": 11 }
+    ] }
+  ]
+}
