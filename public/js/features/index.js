@@ -78,3 +78,4 @@ import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-1'; FEATU
 import { secretSpotsFeature } from './secret-spots-feature.js?v=secrets-1'; FEATURES.push(secretSpotsFeature);
 import { musicblocksFeature } from './musicblocks-feature.js?v=musicblocks-1'; FEATURES.push(musicblocksFeature);
 import { shrineHintFeature } from './shrine-hint-feature.js?v=shrine-hint-1'; FEATURES.push(shrineHintFeature);
+import { towerRoomsFeature } from './tower-rooms-feature.js?v=tower-rooms-1'; FEATURES.push(towerRoomsFeature);

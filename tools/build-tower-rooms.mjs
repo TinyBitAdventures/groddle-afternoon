@@ -1,0 +1,91 @@
+/**
+ * Write the rebuilt Jethimadh Tower Base rooms (public/js/tower-rooms.js) as
+ * street JSON, list them in assets/streets/index.json, and link the corridor
+ * doors that lead to them (connect.street + arrive), the way
+ * build-street-navigation.mjs links doors to imported streets. Also links the
+ * rooms' own doors back out. Safe to re-run; run it again after a street
+ * re-import or a build-street-navigation.mjs pass.
+ *
+ *   node tools/build-tower-rooms.mjs          write
+ *   node tools/build-tower-rooms.mjs --check  exit 1 if anything is stale
+ */
+
+import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { arrivalInTarget, streetAliases } from '../public/js/location-navigation.js';
+import { TOWER_ROOMS, TOWER_ROOM_DOOR_LINKS, towerRoomIndexEntry, towerRoomStreet } from '../public/js/tower-rooms.js';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const streetsDir = join(root, 'public/assets/streets');
+const check = process.argv.includes('--check');
+const stale = [];
+
+const read = (file) => JSON.parse(readFileSync(join(streetsDir, file), 'utf8'));
+const index = read('index.json');
+const loaded = new Map();
+const streetFor = (key) => {
+  if (!loaded.has(key)) loaded.set(key, read(`${key}.json`));
+  return loaded.get(key);
+};
+const resolveKey = (tsid) => streetAliases(tsid).find((alias) => index.streets[alias]) || null;
+
+function put(file, value) {
+  const text = `${JSON.stringify(value)}\n`;
+  let before = '';
+  try {
+    before = readFileSync(join(streetsDir, file), 'utf8');
+  } catch {
+    /* new file */
+  }
+  if (before === text) return;
+  stale.push(file);
+  if (!check) writeFileSync(join(streetsDir, file), text);
+}
+
+// 1. Index rows first, so the rooms resolve as door targets.
+let indexChanged = false;
+for (const room of TOWER_ROOMS) {
+  const row = towerRoomIndexEntry(room);
+  if (JSON.stringify(index.streets[room.tsid]) !== JSON.stringify(row)) {
+    index.streets[room.tsid] = row;
+    indexChanged = true;
+  }
+}
+
+// 2. The rooms, with their own doors linked to the corridors / street.
+const rooms = new Map(TOWER_ROOMS.map((room) => [room.tsid, towerRoomStreet(room)]));
+for (const street of rooms.values()) loaded.set(street.tsid, street);
+for (const street of rooms.values()) {
+  for (const door of street.doors) {
+    const key = resolveKey(door.connect.tsid);
+    door.connect.street = key;
+    const arrive = key ? arrivalInTarget(streetFor(key), door.connect.x, door.connect.y) : null;
+    if (arrive) door.connect.arrive = { x: arrive.x, y: arrive.y };
+    else delete door.connect.arrive;
+  }
+  put(`${street.tsid}.json`, street);
+}
+
+// 3. The archived corridor doors into the rooms.
+const touched = new Set();
+for (const link of TOWER_ROOM_DOOR_LINKS) {
+  const corridor = streetFor(link.street);
+  const door = (corridor.doors || []).find((d) => d.id === link.door);
+  if (!door?.connect) throw new Error(`${link.street} has no door ${link.door}`);
+  const room = rooms.get(link.room);
+  const arrive = arrivalInTarget(room, door.connect.x, door.connect.y);
+  if (!arrive?.snapped) throw new Error(`${link.door}: no floor at ${door.connect.x},${door.connect.y} in ${link.room}`);
+  door.connect.street = link.room;
+  door.connect.arrive = { x: arrive.x, y: arrive.y };
+  touched.add(link.street);
+}
+for (const key of touched) put(`${key}.json`, streetFor(key));
+
+if (indexChanged) {
+  stale.push('index.json');
+  if (!check) writeFileSync(join(streetsDir, 'index.json'), `${JSON.stringify(index, null, 2)}\n`);
+}
+
+console.log(`${check ? 'stale' : 'wrote'}: ${stale.length ? stale.join(', ') : 'nothing'}`);
+if (check && stale.length) process.exit(1);

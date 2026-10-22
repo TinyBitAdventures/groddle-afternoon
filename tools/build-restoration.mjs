@@ -144,7 +144,8 @@ function skillStats() {
 
 function streetStats() {
   const index = json('assets/streets/index.json').streets;
-  const imported = Object.keys(index);
+  // Rebuilt rooms (js/tower-rooms.js) sit in the index but are not archive imports.
+  const imported = Object.keys(index).filter((t) => !index[t].reconstructed);
   const mapped = new Set(Object.values(HUB_MAP_STREETS).flat());
   return {
     imported: imported.length,

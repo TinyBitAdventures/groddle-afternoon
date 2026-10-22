@@ -37,6 +37,8 @@
  *   article rasterised at 2x with its registration point (assets/sprites/home-tower).
  */
 
+import { TOWER_ROOM_SPOTS } from './tower-rooms.js?v=tower-rooms-1';
+
 export const TOWER_PROTO = 'proto_furniture_tower_chassis';
 export const TOWER_CHASSIS = 'furniture_tower_chassis';
 export const TOWER_EXPANDER = 'tower_expander';
@@ -559,23 +561,19 @@ export function towerSecretText(count) {
 
 /**
  * Seven TowerSpot hitboxes survive in the archived Base streets (they come
- * with the street's `boxes`). TowerSpot_05, 09, 10 and 11 are lost from the
- * snapshot; these reconstructions (world coordinates, bottom-centre, the
- * source's 200 x 200 box) sit on quiet ledges of the same corridors.
+ * with the street's `boxes`). TowerSpot_05, 09, 10 and 11 sat in Room 15 and
+ * the Ventilation Room, which the snapshot lost; js/tower-rooms.js rebuilds
+ * both rooms and their spots (world coordinates, bottom-centre, the source's
+ * 200 x 200 box), and its street JSON carries them as `reconstructed` boxes.
  */
-export const RECONSTRUCTED_TOWER_SPOTS = Object.freeze([
-  { id: 'TowerSpot_05', tsid: 'GTJ10K7P3812R8F', wx: -1590, wy: -410, w: 200, h: 200 },
-  { id: 'TowerSpot_09', tsid: 'GTJ10K7P3812R8F', wx: 1540, wy: -684, w: 200, h: 200 },
-  { id: 'TowerSpot_10', tsid: 'GTJ10M515812V0C', wx: -1560, wy: -689, w: 200, h: 200 },
-  { id: 'TowerSpot_11', tsid: 'GIF1QBNPP7123J0', wx: -1110, wy: -690, w: 200, h: 200 },
-]);
+export const RECONSTRUCTED_TOWER_SPOTS = TOWER_ROOM_SPOTS;
 
 /** Every TowerSpot box on a street, in street screen coordinates. */
 export function towerSpotsFor(street) {
   if (!street) return [];
   const out = (street.boxes || [])
     .filter((b) => /^TowerSpot_\d\d$/.test(b?.id || ''))
-    .map((b) => ({ id: b.id, x: b.x, y: b.y, w: b.w || 200, h: b.h || 200, source: 'archive' }));
+    .map((b) => ({ id: b.id, x: b.x, y: b.y, w: b.w || 200, h: b.h || 200, source: b.reconstructed ? 'reconstructed' : 'archive' }));
   const { l = 0, t = 0 } = street.bounds || {};
   for (const s of RECONSTRUCTED_TOWER_SPOTS) {
     if (s.tsid !== street.tsid || out.some((b) => b.id === s.id)) continue;

@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 228,
+  "commits": 229,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "The third shrine you pass says \"Lo, a shrine to …\""
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1510,14 +1515,9 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Coats, hair locks, headdresses and tails in the Glitch wardrobe"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Your pick swings at the rock while you mine"
    }
   ]
  },
- "tests": 145,
+ "tests": 146,
  "generatedAt": "2026-10-22"
 }

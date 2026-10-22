@@ -12845,6 +12845,24 @@
       "platforms": 13,
       "decos": 251,
       "internalLabel": "samudra 05"
+    },
+    "GIF1G7Q75312T8B": {
+      "label": "Room 15",
+      "file": "assets/streets/GIF1G7Q75312T8B.json",
+      "hubId": "77",
+      "hubName": "Jethimadh Tower: Base",
+      "platforms": 113,
+      "decos": 26,
+      "reconstructed": true
+    },
+    "GIF102JCHL027DO": {
+      "label": "Ventilation Room",
+      "file": "assets/streets/GIF102JCHL027DO.json",
+      "hubId": "77",
+      "hubName": "Jethimadh Tower: Base",
+      "platforms": 464,
+      "decos": 84,
+      "reconstructed": true
     }
   }
 }

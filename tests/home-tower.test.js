@@ -244,26 +244,33 @@ describe('Jethimadh Tower Base secrets', () => {
   const BASE = ['GIF1QBNPP7123J0', 'GIF1Q3IQM7122SP', 'GIF1Q48RM712F87', 'GTJ10K7P3812R8F', 'GTJ10M515812V0C', 'GTJ110817812KO4'];
   const street = (tsid) => JSON.parse(readFileSync(join(root, 'assets/streets', `${tsid}.json`), 'utf8'));
 
-  it('finds all eleven spots across the six corridors (seven archived, four reconstructed)', () => {
-    const all = BASE.flatMap((tsid) => towerSpotsFor(street(tsid)));
-    const ids = all.map((b) => b.id).sort();
+  it('finds all eleven spots: seven archived in the corridors, four in the rebuilt rooms', () => {
+    const ROOMS = ['GIF1G7Q75312T8B', 'GIF102JCHL027DO'];
+    const corridors = BASE.flatMap((tsid) => towerSpotsFor(street(tsid)));
+    const rooms = ROOMS.flatMap((tsid) => towerSpotsFor(street(tsid)));
+    const ids = [...corridors, ...rooms].map((b) => b.id).sort();
     assert.deepEqual(ids, Array.from({ length: 11 }, (_, i) => `TowerSpot_${String(i + 1).padStart(2, '0')}`));
-    assert.equal(all.filter((b) => b.source === 'archive').length, 7);
+    assert.equal(corridors.length, 7);
+    assert.ok(corridors.every((b) => b.source === 'archive'));
+    assert.deepEqual(rooms.map((b) => `${b.id}:${b.source}`), ['TowerSpot_05:reconstructed', 'TowerSpot_09:reconstructed', 'TowerSpot_10:reconstructed', 'TowerSpot_11:reconstructed']);
   });
 
-  it('puts each reconstructed spot on a walkable floor line', () => {
+  it('puts each reconstructed spot over a walkable floor inside its room', () => {
+    assert.deepEqual(RECONSTRUCTED_TOWER_SPOTS.map((s) => `${s.id}@${s.tsid}`), [
+      'TowerSpot_05@GIF1G7Q75312T8B', 'TowerSpot_09@GIF102JCHL027DO', 'TowerSpot_10@GIF102JCHL027DO', 'TowerSpot_11@GIF102JCHL027DO',
+    ]);
     for (const spot of RECONSTRUCTED_TOWER_SPOTS) {
       const s = street(spot.tsid);
-      const yAt = (p) => p.y1 + ((spot.wx - p.x1) / (p.x2 - p.x1)) * (p.y2 - p.y1);
-      const floor = s.platforms
-        .filter((p) => p.pc_perm === -1 && spot.wx >= Math.min(p.x1, p.x2) && spot.wx <= Math.max(p.x1, p.x2))
-        .sort((a, b) => Math.abs(yAt(a) - spot.wy) - Math.abs(yAt(b) - spot.wy))[0];
-      assert.ok(floor, spot.id);
-      const y = yAt(floor);
-      assert.ok(Math.abs(y - spot.wy) <= 12, `${spot.id} ${y} vs ${spot.wy}`);
-      // Standing on that floor is inside the box.
       const box = towerSpotsFor(s).find((b) => b.id === spot.id);
-      assert.equal(inTowerSpot(box, box.x + 20, y - s.bounds.t), true);
+      assert.equal(box.x, spot.wx - s.bounds.l);
+      assert.equal(box.y, spot.wy - s.bounds.t);
+      // A floor (pc_perm -1) under the box centre whose standing feet are inside the box.
+      const yAt = (p) => p.y1 + ((spot.wx - p.x1) / (p.x2 - p.x1 || 1)) * (p.y2 - p.y1);
+      const floors = s.platforms
+        .filter((p) => p.pc_perm === -1 && spot.wx >= Math.min(p.x1, p.x2) && spot.wx <= Math.max(p.x1, p.x2))
+        .map(yAt)
+        .filter((y) => inTowerSpot(box, box.x, y - s.bounds.t));
+      assert.ok(floors.length, `${spot.id} has no floor inside its box`);
     }
   });
 

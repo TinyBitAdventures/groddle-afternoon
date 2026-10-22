@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=social-follow-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-1';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-2';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-3';
 import {
   actionDurationFor,
   createTimedAction,
