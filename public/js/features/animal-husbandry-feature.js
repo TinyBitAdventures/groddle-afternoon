@@ -269,14 +269,15 @@ function buildBatterfly(engine, key, x, y, state) {
 function stepBatterfly(entity, dtMs) {
   const spr = entity.sprite;
   if (!spr || spr.destroyed) return;
-  entity.phase += dtMs / 1000;
   if (entity.chewUntil && now() > entity.chewUntil) {
     entity.chewUntil = 0;
     spr.textures = loader.frames(BATTERFLY_SHEETS.profile);
     spr.loop = true;
     spr.play();
   }
+  // The flight path pauses while it chews, so it resumes where it stopped instead of jumping ahead.
   if (entity.chewUntil) return;
+  entity.phase += dtMs / 1000;
   // flyAround: lazy loops in the lower part of the street.
   const dx = Math.sin(entity.phase * 0.35) * 170;
   const dy = Math.sin(entity.phase * 0.9) * 26 + Math.cos(entity.phase * 0.21) * 34;

@@ -390,3 +390,11 @@ describe('Animal husbandry wiring', () => {
     }
   });
 });
+
+describe('Batterfly flight after feeding', () => {
+  it('pauses the flight path while chewing, so it resumes in place instead of jumping ahead', () => {
+    const src = readFileSync(new URL('../public/js/features/animal-husbandry-feature.js', import.meta.url), 'utf8');
+    const step = src.slice(src.indexOf('function stepBatterfly'), src.indexOf('function chewBatterfly'));
+    assert.ok(step.indexOf('if (entity.chewUntil) return;') < step.indexOf('entity.phase += dtMs / 1000;'));
+  });
+});
