@@ -247,8 +247,8 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
     note: 'Lets you run a Fuelmaker (assembled with Engineering): Jellisac, Peat and White Gas become Fuel Cells that refuel every machine.',
   },
   Furnituremaking: {
-    status: 'later',
-    note: 'The Construction Tool and furniture building are not here yet.',
+    status: 'live',
+    note: 'The Construction Tool (sold by the vendors) needs Furnituremaking I to build furniture for your house; Furnituremaking II with Engineering adds the bigger pieces.',
   },
   'Fiber Arts': {
     status: 'live',
@@ -266,19 +266,19 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
   },
   Levitation: {
     status: 'live',
-    note: 'Lets you imagine levitation with a Focusing Orb. Its Rambler First Class badge (251 streets) is not counted here yet.',
+    note: 'Lets you imagine levitation with a Focusing Orb. Its Rambler First Class badge needs 251 different streets.',
   },
   'Transcendental Radiation': {
     status: 'multiplayer',
     note: 'Radiates mood to other players nearby, so it does nothing on a solo street.',
   },
   'Martial Imagination': {
-    status: 'later',
-    note: 'For stunning Rooks with a Focusing Orb during Rook attacks, which are not here yet.',
+    status: 'partial',
+    note: 'In Ur it let you start stun attacks on a Rook with a Focusing Orb. Rook attacks are here, but fought alone, so anyone may stun; the skill is not required.',
   },
   Piety: {
-    status: 'later',
-    note: 'For priming shrines against Rook attacks, which are not here yet.',
+    status: 'partial',
+    note: 'In Ur it let you prime shrines against an attacking Rook. Rook attacks are here, but fought alone, so anyone may prime a shrine; the skill is not required.',
   },
   Teleportation: {
     status: 'live',
@@ -289,8 +289,8 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
     note: 'With Teleportation IV, lets you write Teleportation Scripts on Paper with a Quill.',
   },
   Eyeballery: {
-    status: 'later',
-    note: 'Frees the camera to look around the whole street. There is no free camera here yet.',
+    status: 'live',
+    note: 'Camera Mode (press C) looks 400 px around you; with Eyeballery it looks across the whole street.',
   },
   'Bureaucratic Arts': {
     status: 'live',

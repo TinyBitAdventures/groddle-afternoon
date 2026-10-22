@@ -34,6 +34,7 @@ import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=husbandr
 import { questInstancesFeature } from './quest-instances-feature.js?v=qi-1';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-1';
 import { seasonsFeature } from './seasons-feature.js?v=seasons-1';
+import { cameraModeFeature } from './camera-mode-feature.js';
 
 export { questFlagsFeature };
 
@@ -68,4 +69,5 @@ export const FEATURES = [
   questInstancesFeature,
   partySpacesFeature,
   seasonsFeature,
+  cameraModeFeature,
 ];

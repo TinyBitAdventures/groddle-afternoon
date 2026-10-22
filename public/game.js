@@ -1177,6 +1177,8 @@ let actionToolFx = null;
 
 /** @type {import('./js/street-model.js').StreetData|null} */
 let currentStreet = null;
+/** Camera Mode offset from the avatar, in world pixels (engine.setCameraLook). */
+const cameraLook = { x: 0, y: 0 };
 /** Map panel region picker (js/combobox.js), built on first open. */
 let hubCombobox = null;
 /** @type {any[]|null} */
@@ -6838,6 +6840,19 @@ const engine = {
   get stage() {
     return app?.stage || null;
   },
+  /**
+   * Hold the camera centred `dx`/`dy` world pixels away from the avatar
+   * (Camera Mode). The street clamps still apply. Returns the offset the
+   * view actually reached, so a caller can stop panning at the street edge.
+   */
+  setCameraLook(dx = 0, dy = 0) {
+    cameraLook.x = Number(dx) || 0;
+    cameraLook.y = Number(dy) || 0;
+    return { x: cameraLook.x, y: cameraLook.y };
+  },
+  get cameraLook() {
+    return { x: cameraLook.x, y: cameraLook.y };
+  },
   /** Offset the camera for this frame only (screen shake). */
   nudgeCamera(dx = 0, dy = 0) {
     if (!world) return;
@@ -8728,13 +8743,15 @@ function physics(dt) {
   }
 
   entityLayer.children.sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0) || a.y - b.y);
-  const target = cameraTargetForPlayer(player.x, player.vx);
+  // Camera Mode (features/camera-mode-feature.js) looks away from the avatar;
+  // the usual clamps keep the view inside the street.
+  const target = cameraTargetForPlayer(player.x + cameraLook.x, cameraLook.x ? 0 : player.vx);
   camTarget += (target - camTarget) * dampingAlpha(0.08, dt);
   world.x = -Math.round(camTarget * 2) / 2;
   // Vertical follow for tall original streets
   const anchor = streetCameraAnchor();
   const streetH = activeCameraWorldHeight(anchor);
-  const targetY = cameraTargetY(player.y, streetH, LOCATION_VIEW_H, anchor);
+  const targetY = cameraTargetY(player.y + cameraLook.y, streetH, LOCATION_VIEW_H, anchor);
   if (camY === undefined || Number.isNaN(camY)) camY = targetY;
   camY += (targetY - camY) * dampingAlpha(0.12, dt);
   world.y = -Math.round(camY * 2) / 2;
