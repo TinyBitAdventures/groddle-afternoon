@@ -20,14 +20,17 @@
  * street's cultivated population and exact placement points.
  *
  * Art: recovered CC0 furniture frames (assets/sprites/furniture), the CC0
- * Groddle / Firebog / Uralia decos for the street, procedural swatches
- * (js/home-looks.js) for the house shell.
+ * Groddle / Firebog / Uralia decos for the street, and the house shell from
+ * Tiny Speck's home_wallpaper.swf / home_groddle.swf / home_tower.swf pieces
+ * (js/home-wallpaper.js, tools/home-wallpaper/build.py). Swatches are stamped
+ * like the client's HandOfDecorator: pick one, click a wall segment's middle
+ * (that segment), elsewhere on the wall (the room), the floor or the ceiling.
  *
  * QA: ?autostart=1&fresh=1&homedemo=decorate (furnished room, Decorate open)
  *     ?autostart=1&fresh=1&homedemo=cultivate (lived-in yard, Cultivate open)
  *     add &homeautoplay=1 to run the scripted place / move / flip / swatch /
  *     pick up (decorate) or cultivate / expand / remove (cultivate) loop.
- * Canvas data: homeDecorPlaced, homeDecorStorage, homeDecorWall/Floor/Ceiling,
+ * Canvas data: homeDecorPlaced, homeDecorStorage, homeDecorWall/Walls/Floor/Ceiling, homeStamping,
  * homeDecorSegments, homeMode, homeCultivations, homeYard, homeAutoplay.
  */
 
@@ -39,7 +42,6 @@ import {
 } from '../homes-catalog.js?v=homes-catalog-1';
 import {
   INTERIOR,
-  SEGMENT_W,
   arrangeStarterRoom,
   createHomeDecorState,
   displayDeposit,
@@ -65,7 +67,7 @@ import {
   setHomeTexture,
   snapPlacement,
   textureConfig,
-} from '../home-decor.js?v=home-decor-1';
+} from '../home-decor.js?v=home-decor-2';
 import {
   nearestFreeRx,
   FIREFLY_HIVE,
@@ -88,8 +90,9 @@ import {
   towerItem,
 } from '../home-cultivation.js?v=home-cultivation-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-1';
-import { towerApi } from './home-tower-feature.js?v=home-tower-1';
-import { lookFor, paintTile, shade } from '../home-looks.js?v=home-looks-1';
+import { towerApi } from './home-tower-feature.js?v=home-tower-2';
+import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-1';
+import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-2';
 import { patchesFeature } from './patches-feature.js?v=patches-2';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
@@ -233,6 +236,8 @@ let mode = null; // 'decorate' | 'cultivate' | null
 let tab = 'furniture';
 let placing = null; // { kind: 'furniture'|'cultivation', classTsid|protoClass, moveId? }
 let selected = null; // { kind, id }
+let stamping = null; // { kind: 'wall'|'floor'|'ceiling', key } while a swatch is on the cursor
+let stampHover = null; // { kind, segment?, center? } under the cursor
 let scene = null; // live scene context while a home room is shown
 let pointer = { x: 0, y: 0, inside: false };
 let lastNodeCheck = 0;
@@ -246,6 +251,8 @@ function publish(engine) {
   engine.setData('homeDecorPlaced', decor.placed.length);
   engine.setData('homeDecorStorage', Object.values(decor.storage).reduce((a, b) => a + b, 0));
   engine.setData('homeDecorWall', decor.wall);
+  engine.setData('homeDecorWalls', (decor.walls || []).join(','));
+  engine.setData('homeStamping', stamping ? `${stamping.kind}:${stamping.key}` : '');
   engine.setData('homeDecorFloor', decor.floor);
   engine.setData('homeDecorCeiling', decor.ceiling);
   engine.setData('homeDecorSegments', decor.wallSegments);
@@ -268,18 +275,20 @@ function towerFloorDecor(index) {
       floor: TOWER_CONFIG.START_TEXTURE_FLOOR,
       ceiling: TOWER_CONFIG.START_TEXTURE_CEILING,
       wallSegments: TOWER_GEO.wallSegments,
+      layout: 'tower',
       starterKit: true,
     }));
   }
   const slice = towerDecor[index];
   slice.storage = houseDecor.storage;
   slice.wallSegments = TOWER_GEO.wallSegments;
+  slice.layout = 'tower';
   return slice;
 }
 
 /** The unfinished floor while a new one is going up (not decoratable, never saved). */
 function constructionDecor() {
-  return createHomeDecorState({ wall: 'grey_unfinished', floor: 'starter_crappy', ceiling: 'starter_crappy_ceiling', wallSegments: TOWER_GEO.wallSegments, starterKit: true });
+  return createHomeDecorState({ wall: 'grey_unfinished', floor: 'starter_crappy', ceiling: 'starter_crappy_ceiling', wallSegments: TOWER_GEO.wallSegments, layout: 'tower', starterKit: true });
 }
 
 function inTower() {
@@ -328,108 +337,68 @@ const towerBridge = {
 // Scene: the house interior
 // ---------------------------------------------------------------------------
 
-const textureCache = new Map();
-function tileTexture(PIXI, kind, key) {
-  const id = `${kind}:${key}`;
-  if (!textureCache.has(id)) textureCache.set(id, PIXI.Texture.from(paintTile(kind, key, 256)));
-  return textureCache.get(id);
+/** Back-buffer pixels per world pixel (render-density.js) above which the 3x pieces load. */
+function wantsHiresPieces(engine) {
+  const scale = engine?.app?.renderer?.resolution || globalThis.devicePixelRatio || 1;
+  return wantsHiresDecos(scale);
 }
 
-function drawRoomShell(PIXI, container, width) {
-  container.removeChildren().forEach((child) => child.destroy({ children: true }));
-  const { floorY, wallTop, ceilingTop, endCapW } = INTERIOR;
-  const wallLook = lookFor('wall', decor.wall);
-  const floorLook = lookFor('floor', decor.floor);
-  const bottom = floorY + 220;
+function pieceSprite(engine, row, hires) {
+  const { PIXI } = engine;
+  const tex = textureFromUrl(pieceUrl(row.piece, hires));
+  if (row.tile) {
+    // The cross-section frame is a 1500 / 1200 px strip the source repeats (and lets
+    // overhang past the house); here it is repeated and clipped to the house.
+    const strip = new PIXI.Container();
+    for (let x = 0; x < row.w; x += row.tile) {
+      const spr = new PIXI.Sprite(tex);
+      spr.width = row.tile;
+      spr.height = row.h;
+      spr.x = row.x + x;
+      spr.y = row.y;
+      strip.addChild(spr);
+    }
+    if (row.w % row.tile) {
+      const clip = new PIXI.Graphics().rect(row.x, row.y, row.w, row.h).fill(0xffffff);
+      strip.addChild(clip);
+      strip.mask = clip;
+    }
+    return strip;
+  }
+  const spr = new PIXI.Sprite(tex);
+  spr.width = row.w;
+  spr.height = row.h;
+  if (row.flip) spr.scale.x *= -1;
+  spr.x = row.flip ? row.x + row.w : row.x;
+  spr.y = row.y;
+  return spr;
+}
 
-  // The house's outer timber wall beyond both end caps: the camera keeps the
-  // avatar clear of the right-hand rail, which can reveal a little past the
-  // room's end, so that edge reads as the house rather than open sky.
+/**
+ * The room from Tiny Speck's pieces (js/home-wallpaper.js roomPieces): floor and ceiling
+ * tiles, wallpaper per segment with its end caps, wall / floor / ceiling shadows, the groddle
+ * (or tower) cross-section frame, attic and basement. Outside the house, a dark timber wall
+ * covers what the camera can see past the end frames.
+ */
+function drawRoomShell(engine, container, opts = {}) {
+  const { PIXI } = engine;
+  container.removeChildren().forEach((child) => child.destroy({ children: true }));
+  const room = roomPieces(decor, { floorY: INTERIOR.floorY, construction: Boolean(opts.construction) });
+  const width = room.width;
+  const top = room.top - 200;
+  const bottom = room.bottom + 200;
   const outside = new PIXI.Graphics();
   const OUTSIDE_W = 640;
   for (const [x0, x1] of [[-OUTSIDE_W, 0], [width, width + OUTSIDE_W]]) {
-    outside.rect(x0, ceilingTop - 200, x1 - x0, bottom - ceilingTop + 400).fill(0x3a2a1f);
-    for (let x = x0; x < x1; x += 46) {
-      outside.rect(x, ceilingTop - 200, 4, bottom - ceilingTop + 400).fill(0x2c1f17);
-      outside.rect(x + 4, ceilingTop - 200, 3, bottom - ceilingTop + 400).fill({ color: 0x4a3627, alpha: 0.6 });
-    }
+    outside.rect(x0, top, x1 - x0, bottom - top).fill(0x2a2019);
+    for (let x = x0; x < x1; x += 46) outside.rect(x, top, 4, bottom - top).fill(0x221a14);
   }
+  outside.rect(0, room.bottom, width, 200).fill(0x3b2a1e);
   container.addChild(outside);
+  const hires = wantsHiresPieces(engine);
+  for (const row of room.pieces) container.addChild(pieceSprite(engine, row, hires));
 
-  // Ceiling band
-  const ceil = new PIXI.TilingSprite({ texture: tileTexture(PIXI, 'ceiling', decor.ceiling), width: width, height: wallTop - ceilingTop + 120 });
-  ceil.y = ceilingTop - 120;
-  ceil.tileScale.set(0.6, 0.6);
-  container.addChild(ceil);
-
-  // Wall
-  const wall = new PIXI.TilingSprite({ texture: tileTexture(PIXI, 'wall', decor.wall), width: width, height: floorY - wallTop });
-  wall.y = wallTop;
-  wall.tileScale.set(0.75, 0.75);
-  container.addChild(wall);
-
-  const g = new PIXI.Graphics();
-  // Wainscoting / pillars for the "with Molding" and "with Pillars" swatches
-  if (wallLook.wainscot) {
-    const top = floorY - 112;
-    g.setFillStyle(new PIXI.Color(wallLook.wainscot).toNumber()).rect(0, top, width, floorY - top).fill();
-    for (let x = endCapW + 18; x < width - endCapW - 60; x += 110) {
-      g.setStrokeStyle({ width: 2, color: new PIXI.Color(shade(wallLook.wainscot, -0.25)).toNumber(), alpha: 0.7 });
-      g.roundRect(x, top + 16, 88, floorY - top - 40, 3).stroke();
-    }
-    g.setFillStyle(new PIXI.Color(shade(wallLook.wainscot, 0.25)).toNumber()).rect(0, top - 6, width, 8).fill();
-  }
-  if (wallLook.pillars) {
-    const c = new PIXI.Color(wallLook.pillars).toNumber();
-    for (let x = SEGMENT_W; x < width - 20; x += SEGMENT_W) {
-      g.rect(x - 14, wallTop, 28, floorY - wallTop).fill(c);
-      g.rect(x - 14, wallTop, 6, floorY - wallTop).fill({ color: 0xffffff, alpha: 0.22 });
-      g.setFillStyle(new PIXI.Color(shade(wallLook.pillars, 0.2)).toNumber()).rect(x - 20, wallTop, 40, 12).fill();
-    }
-  }
-  // Crown molding under the ceiling, and its soft shadow on the wall
-  g.rect(0, wallTop, width, 26).fill({ color: 0x000000, alpha: 0.12 });
-  g.rect(0, wallTop + 26, width, 30).fill({ color: 0x000000, alpha: 0.06 });
-  g.rect(0, wallTop - 10, width, 12).fill(0xf4ecdc);
-  g.rect(0, wallTop + 1, width, 4).fill(0xd9cbb0);
-  container.addChild(g);
-
-  // Floor: perspective band with a darker front lip
-  const deck = 46;
-  const floor = new PIXI.TilingSprite({ texture: tileTexture(PIXI, 'floor', decor.floor), width: width, height: deck });
-  floor.y = floorY;
-  floor.tileScale.set(0.7, 0.3);
-  container.addChild(floor);
-  const fg = new PIXI.Graphics();
-  // Depth: the floor darkens toward the wall and brightens toward the viewer.
-  for (let i = 0; i < 5; i += 1) fg.rect(0, floorY + i * 4, width, 4).fill({ color: 0x000000, alpha: 0.14 - i * 0.025 });
-  fg.rect(0, floorY + deck - 14, width, 14).fill({ color: 0xffffff, alpha: 0.07 });
-  // The floor's front edge and the house's timber cross-section beneath it.
-  const edge = new PIXI.Color(shade(floorLook.base || '#8a6a4a', 0.12)).toNumber();
-  const beam = new PIXI.Color(shade('#6b4a2f', -0.15)).toNumber();
-  fg.rect(0, floorY + deck, width, 9).fill(edge);
-  fg.rect(0, floorY + deck + 9, width, bottom - floorY - deck - 9).fill(beam);
-  fg.rect(0, floorY + deck + 9, width, 5).fill({ color: 0x000000, alpha: 0.25 });
-  for (let x = 40; x < width; x += 160) {
-    fg.rect(x, floorY + deck + 14, 54, 30).fill({ color: 0x000000, alpha: 0.2 });
-    fg.rect(x, floorY + deck + 14, 54, 4).fill({ color: 0xffffff, alpha: 0.05 });
-  }
-  // Baseboard
-  fg.rect(0, floorY - 18, width, 18).fill(0xf1e7d6);
-  fg.rect(0, floorY - 4, width, 4).fill(0xd2c1a3);
-  container.addChild(fg);
-
-  // End caps: the side walls, seen edge-on
-  const caps = new PIXI.Graphics();
-  const capColor = new PIXI.Color(shade(wallLook.base || '#c9c4ba', -0.32)).toNumber();
-  for (const [x0, dir] of [[0, 1], [width, -1]]) {
-    caps.poly([x0, ceilingTop - 120, x0 + dir * endCapW, wallTop - 10, x0 + dir * endCapW, floorY, x0, floorY + 84]).fill(capColor);
-    caps.poly([x0 + dir * (endCapW - 8), wallTop - 10, x0 + dir * endCapW, wallTop - 10, x0 + dir * endCapW, floorY, x0 + dir * (endCapW - 8), floorY + 4]);
-    caps.fill({ color: 0x000000, alpha: 0.18 });
-  }
-  container.addChild(caps);
-
-  // Warm light: a gentle vignette plus glow pools under every lamp
+  // Warm light: glow pools under every lamp
   const light = new PIXI.Container();
   const glow = glowTexture(PIXI);
   const pool = (x, y, rx, ry, alpha) => {
@@ -443,6 +412,7 @@ function drawRoomShell(PIXI, container, width) {
     spr.blendMode = 'add';
     light.addChild(spr);
   };
+  const { floorY } = INTERIOR;
   for (const item of decor.placed) {
     if (!/lamp/.test(item.classTsid)) continue;
     const { w, h } = furnitureSize(item.classTsid);
@@ -455,6 +425,8 @@ function drawRoomShell(PIXI, container, width) {
     }
   }
   container.addChild(light);
+  container.room = room;
+  return room;
 }
 
 let glowTex = null;
@@ -474,39 +446,42 @@ function glowTexture(PIXI) {
   return glowTex;
 }
 
-function interiorBackground(engine) {
+function interiorBackground(engine, opts = {}) {
   const { PIXI } = engine;
   const width = interiorWidth(decor);
   const root = new PIXI.Container();
   const shell = new PIXI.Container();
-  root.addChild(shell);
-  drawRoomShell(PIXI, shell, width);
+  const marks = new PIXI.Graphics();
+  root.addChild(shell, marks);
+  root.room = drawRoomShell(engine, shell, opts);
   root.shell = shell;
-  root.worldH = GROUND_Y + 102;
+  root.marks = marks;
+  root.worldH = root.room.bottom;
   root.platformsScreen = [{ id: 'home-floor', x1: 0, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: 1 }];
-  root.redraw = () => drawRoomShell(PIXI, shell, interiorWidth(decor));
+  root.redraw = () => {
+    root.room = drawRoomShell(engine, shell, opts);
+    drawStampMarks(engine);
+  };
   return root;
 }
 
+/** inc_homes.js door_pos: 84 px in from the right end, on the end wall. */
 function interiorDoorX() {
-  return interiorWidth(decor) - INTERIOR.endCapW - 70;
+  return interiorWidth(decor) - 84;
 }
 
 function spawnInteriorTargets(engine) {
   const { PIXI } = engine;
-  const door = new PIXI.Sprite(textureFromUrl(`${DECO}door_asset_apartment_room_interior.png`));
+  // home_groddle.swf door_asset_entry_basic, 75 x 236 on the right end wall.
+  const spec = scene?.background?.room?.door || { piece: 'door_asset_entry_basic', x: interiorDoorX(), y: GROUND_Y + 18, w: 75, h: 236 };
+  const door = new PIXI.Sprite(textureFromUrl(pieceUrl(spec.piece, wantsHiresPieces(engine))));
   door.anchor.set(0.5, 1);
-  door.scale.set(0.45);
-  door.x = interiorDoorX();
-  door.y = GROUND_Y - 2;
+  door.width = spec.w;
+  door.height = spec.h;
+  door.x = spec.x;
+  door.y = spec.y;
   door.zIndex = 8;
   engine.entityLayer.addChild(door);
-  const frame = new PIXI.Graphics();
-  frame.rect(-46, -246, 92, 10).rect(-46, -246, 8, 246).rect(38, -246, 8, 246).fill(0x6b4a2f);
-  frame.x = door.x;
-  frame.y = GROUND_Y;
-  frame.zIndex = 7;
-  engine.entityLayer.addChild(frame);
   const target = engine.register({
     classId: 'home_door',
     label: 'Front Door',
@@ -1140,7 +1115,7 @@ const CSS = `
 .homes-bar .hb-tile[disabled]{opacity:.5;cursor:not-allowed}
 .homes-bar .hb-tile img{width:44px;height:44px;object-fit:contain}
 .homes-bar .hb-tile .hb-count{position:absolute;right:5px;top:4px;font-size:10px;font-weight:700;background:#5a8f4a;color:#fff;border-radius:8px;padding:0 5px}
-.homes-bar .hb-swatch{width:58px;height:38px;border-radius:6px;border:1px solid rgba(0,0,0,.15);background-size:cover}
+.homes-bar .hb-swatch{width:50px;height:50px;border-radius:6px;border:1px solid rgba(0,0,0,.15);background-color:#ddd5c6;background-size:cover}
 .homes-bar .hb-cost{font-weight:700;color:#7a4fb5}
 .homes-bar .hb-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px}
 .homes-bar .hb-row button,.homes-bar .hb-actions button{border:1px solid rgba(90,70,40,.2);background:#fff;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;color:#4a3a28;cursor:pointer}
@@ -1186,11 +1161,68 @@ function ensureUi(engine) {
 }
 
 function swatchUrl(kind, key) {
-  try {
-    return paintTile(kind, key, 96).toDataURL();
-  } catch {
-    return '';
+  const piece = swatchPiece(kind, key);
+  return piece ? pieceUrl(piece) : '';
+}
+
+// ---------------------------------------------------------------------------
+// Swatch stamping (client HandOfDecorator startStampingWall / Floor / Ceiling)
+// ---------------------------------------------------------------------------
+
+function beginStamping(engine, kind, key) {
+  stamping = { kind, key };
+  stampHover = null;
+  placing = null;
+  selected = null;
+  destroyGhost();
+  renderBar(engine);
+  drawStampMarks(engine);
+  publish(engine);
+}
+
+function stopStamping(engine) {
+  if (!stamping && !stampHover) return;
+  stamping = null;
+  stampHover = null;
+  drawStampMarks(engine);
+}
+
+/** What a stamp would hit at a world point: one wall segment (its centre), a room's walls, the floor or the ceiling. */
+function stampTargetAt(p) {
+  const room = scene?.background?.room;
+  if (!stamping || !room) return null;
+  if (stamping.kind === 'wall') {
+    const hit = wallTargetAt(room, p.x, p.y);
+    return hit ? { kind: 'wall', segment: hit.segment, center: hit.center } : null;
   }
+  return surfaceAt(room, p.x, p.y) === stamping.kind ? { kind: stamping.kind } : null;
+}
+
+/** The glow over the target: the single segment when in its centre, else the whole room. */
+function drawStampMarks(engine) {
+  const marks = scene?.background?.marks;
+  if (!marks || marks.destroyed) return;
+  marks.clear();
+  const room = scene.background.room;
+  if (!stamping || !stampHover || !room) return;
+  const rects = stampHover.kind === 'wall'
+    ? (stampHover.center ? room.walls.filter((t) => t.segment === stampHover.segment) : room.walls)
+    : [room[stampHover.kind]];
+  for (const r of rects) {
+    marks.rect(r.x + 2, r.y + 2, r.w - 4, r.h - 4).fill({ color: 0xffe28a, alpha: 0.16 });
+    marks.rect(r.x + 2, r.y + 2, r.w - 4, r.h - 4).stroke({ width: 4, color: 0xffd34d, alpha: 0.9 });
+  }
+}
+
+function stampAt(engine, p) {
+  const hit = stampTargetAt(p);
+  const { kind, key } = stamping;
+  stopStamping(engine);
+  if (!hit) {
+    renderBar(engine);
+    return null;
+  }
+  return applySwatch(engine, kind, key, hit.kind === 'wall' && hit.center ? { segment: hit.segment } : {});
 }
 
 function renderModes(engine) {
@@ -1231,6 +1263,7 @@ function renderBar(engine) {
       text: label,
       onclick: () => {
         tab = id;
+        stopStamping(engine);
         renderBar(engine);
       },
     })));
@@ -1333,7 +1366,12 @@ function renderDecorateBody(engine, body) {
   }
   const kind = tab;
   const current = decor[kind];
-  body.append(el('p', { class: 'hb-note', text: `Now: ${textureConfig(kind, current)?.name || current}. Swatches are free to apply.` }));
+  const mixed = kind === 'wall' && decor.walls?.some((row) => row !== decor.wall);
+  const now = mixed ? 'a mix of wallpapers' : textureConfig(kind, current)?.name || current;
+  const how = kind === 'wall'
+    ? 'Pick a swatch, then click a wall: the middle of a segment papers just that segment, anywhere else papers the whole room.'
+    : `Pick a swatch, then click the ${kind}.`;
+  body.append(el('p', { class: 'hb-note', text: stamping ? `Click the room to apply ${textureConfig(stamping.kind, stamping.key)?.name}. Esc cancels.` : `Now: ${now}. ${how} Swatches are free to apply.` }));
   let lastCat = '';
   const grid = [];
   const flush = () => {
@@ -1345,12 +1383,13 @@ function renderDecorateBody(engine, body) {
       body.append(el('h4', { text: row.category }));
       lastCat = row.category;
     }
+    const armed = stamping?.kind === kind && stamping.key === row.key;
     grid.push(el('button', {
       type: 'button',
-      class: `hb-tile${row.key === current ? ' on' : ''}`,
+      class: `hb-tile${armed || (!stamping && row.key === current && !mixed) ? ' on' : ''}`,
       'data-swatch': `${kind}:${row.key}`,
-      title: row.name,
-      onclick: () => applySwatch(engine, kind, row.key),
+      title: row.costCredits ? `${row.name} (${row.costCredits} credits in the original)` : row.name,
+      onclick: () => (armed ? (stopStamping(engine), renderBar(engine)) : beginStamping(engine, kind, row.key)),
     }, [el('span', { class: 'hb-swatch', style: `background-image:url(${swatchUrl(kind, row.key)})` }), el('span', { text: row.name })]));
   }
   flush();
@@ -1446,6 +1485,7 @@ function setMode(engine, next) {
   mode = next;
   placing = null;
   selected = null;
+  stopStamping(engine);
   tab = tab || 'furniture';
   destroyGhost();
   if (scene?.room === 'street') {
@@ -1510,11 +1550,12 @@ function openStore(engine) {
   engine.openShop?.(furnitureStoreProfile());
 }
 
-function applySwatch(engine, kind, key) {
-  const result = setHomeTexture(decor, kind, key);
+function applySwatch(engine, kind, key, opts = {}) {
+  const result = setHomeTexture(decor, kind, key, opts);
   if (!result.ok) return result;
   engine.playSound?.('UI_TOGGLE', { volume: 0.45 });
-  engine.pushActivity(`You changed your ${kind === 'wall' ? 'wallpaper' : kind} to ${result.name}.`);
+  const what = kind === 'wall' ? (result.segment != null ? 'one wall' : 'wallpaper') : kind;
+  engine.pushActivity(`You changed your ${what} to ${result.name}.`);
   scene?.background?.redraw?.();
   renderBar(engine);
   publish(engine);
@@ -1726,6 +1767,14 @@ function bindPointer(engine) {
     if (!mode || !scene || !isCanvas(e)) return;
     const p = worldPoint(engine, e);
     pointer = { ...p, inside: true };
+    if (stamping) {
+      const hit = stampTargetAt(p);
+      if (JSON.stringify(hit) !== JSON.stringify(stampHover)) {
+        stampHover = hit;
+        drawStampMarks(engine);
+      }
+      return;
+    }
     updateGhost(engine);
   }, true);
   root.addEventListener('pointerdown', (e) => {
@@ -1736,6 +1785,10 @@ function bindPointer(engine) {
     pointer = { ...p, inside: true };
     if (placing) {
       placeAtPointer(engine, p);
+      return;
+    }
+    if (stamping) {
+      stampAt(engine, p);
       return;
     }
     if (mode === 'decorate') {
@@ -1755,7 +1808,10 @@ function bindPointer(engine) {
     if (!mode || e.key !== 'Escape') return;
     if (e.target?.matches?.('input, textarea, select')) return;
     e.stopImmediatePropagation();
-    if (placing) {
+    if (stamping) {
+      stopStamping(engine);
+      renderBar(engine);
+    } else if (placing) {
       placing = null;
       destroyGhost();
       renderBar(engine);
@@ -1769,6 +1825,48 @@ function bindPointer(engine) {
     }
     publish(engine);
   }, true);
+}
+
+/**
+ * The source room is 471 px from ceiling to floor front, taller than the remake's 408 px
+ * location view with the avatar at 75%. Inside, the camera looks up a little (the most that
+ * keeps the feet 40 px clear of the pack) so the whole wall shows, and in Decorate mode far
+ * enough to show the ceiling band too. Camera Mode's own look always wins.
+ */
+const WALK_LOOK_Y = -62;
+const DECORATE_LOOK_Y = -105;
+let lastLookY = 0;
+
+function interiorCameraLook(engine) {
+  if (typeof engine?.setCameraLook !== 'function') return;
+  const want = mode === 'decorate' ? DECORATE_LOOK_Y : WALK_LOOK_Y;
+  const now = engine.cameraLook || { x: 0, y: 0 };
+  const ours = now.x === 0 && (now.y === 0 || now.y === lastLookY);
+  if (!ours || now.y === want) return;
+  engine.setCameraLook(0, want);
+  lastLookY = want;
+}
+
+function releaseCameraLook(engine) {
+  const now = engine?.cameraLook;
+  if (lastLookY && now && now.x === 0 && now.y === lastLookY) engine.setCameraLook(0, 0);
+  lastLookY = 0;
+}
+
+/** The house's side walls (inc_homes.js walls 76 px inside each end; tower.js floor_start 130). */
+function keepInsideWalls(engine) {
+  const room = scene?.background?.room;
+  const p = engine.player;
+  if (!room || !p || !Number.isFinite(p.x)) return;
+  const lo = room.innerLeft + 12;
+  const hi = room.innerRight - 12;
+  if (p.x < lo) {
+    p.x = lo;
+    if (p.vx < 0) p.vx = 0;
+  } else if (p.x > hi) {
+    p.x = hi;
+    if (p.vx > 0) p.vx = 0;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1824,9 +1922,9 @@ function demoSetup(engine) {
       // First run: tidy the starter layout away and show a finished room.
       for (const row of [...decor.placed]) if (placedItem(decor, row.id)) pickUpFurniture(decor, row.id);
       furnishDemoRoom(decor);
-      decor.wall = 'creamy_stripes';
-      decor.floor = 'woodpanel';
-      decor.ceiling = 'whitewood_ceiling';
+      setHomeTexture(decor, 'wall', 'creamy_stripes');
+      setHomeTexture(decor, 'floor', 'woodpanel');
+      setHomeTexture(decor, 'ceiling', 'whitewood_ceiling');
     }
     decor.storage.furniture_armchair = (decor.storage.furniture_armchair || 0) + 1;
     engine.inv.musicblock_d_blue_05 = Math.max(3, engine.inv.musicblock_d_blue_05 || 0);
@@ -1897,7 +1995,9 @@ function runDecorateAutoplay(engine) {
       runFurnitureAction(engine, 'flip');
     }],
     ['wallpaper', () => applySwatch(engine, 'wall', 'brown_molding')],
+    ['segment', () => applySwatch(engine, 'wall', 'red_brick', { segment: 3 })],
     ['floor', () => applySwatch(engine, 'floor', 'woodpanel_3_floor')],
+    ['ceiling', () => applySwatch(engine, 'ceiling', 'wood')],
     ['display', () => {
       const box = decor.placed.find((row) => row.classTsid === 'bag_furniture_sdb');
       if (!box) return;
@@ -1946,7 +2046,7 @@ function homeX(engine) {
 function towerFloorScene(engine, floor) {
   const construction = towerApi.isConstructionFloor(floor);
   decor = construction ? constructionDecor() : towerFloorDecor(floor);
-  const background = interiorBackground(engine);
+  const background = interiorBackground(engine, { construction });
   const width = interiorWidth(decor);
   const via = towerApi.takeFloorArrival();
   return {
@@ -1956,12 +2056,12 @@ function towerFloorScene(engine, floor) {
       if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) return Math.max(80, Math.min(width - 80, opts.spawnX));
       if (homeX(engine) != null) return homeX(engine);
       // tower_get_teleport_point (w - 150) from outside; the elevator connect (x 200) between floors.
-      if (via === 'door' || (!via && floor === 0)) return interiorDoorX() - 80;
+      if (via === 'door' || (!via && floor === 0)) return TOWER_GEO.arriveX;
       return TOWER_GEO.elevatorX + 70;
     },
     spawnTargets() {
       scene = { room: 'interior', tower: floor, construction, background, furnitureLayer: null, ghost: null, markers: null };
-      towerApi.spawnFloor(engine, { width, groundY: GROUND_Y, doorX: interiorDoorX() });
+      towerApi.spawnFloor(engine, { width, groundY: GROUND_Y, doorX: TOWER_GEO.exitX });
       return {};
     },
     enter() {
@@ -1971,31 +2071,12 @@ function towerFloorScene(engine, floor) {
       layer.zIndex = FURNITURE_Z;
       engine.entityLayer.addChild(layer);
       scene.furnitureLayer = layer;
-      if (construction) {
-        if (mode === 'decorate') mode = null;
-        drawScaffold(engine, width);
-      }
+      // tower_build_expansion: the bare tower base (home_tower.swf) until the floor is built.
+      if (construction && mode === 'decorate') mode = null;
       renderFurniture(engine);
       afterEnter(engine);
     },
   };
-}
-
-/** The floor under construction: bare timber framing over the unfinished walls. */
-function drawScaffold(engine, width) {
-  const { PIXI } = engine;
-  const g = new PIXI.Graphics();
-  g.zIndex = 2;
-  const top = INTERIOR.wallTop - 10;
-  for (let x = 330; x < width - 120; x += 210) {
-    g.rect(x, top, 16, GROUND_Y - top).fill(0x7a5634);
-    g.rect(x + 12, top, 4, GROUND_Y - top).fill(0x5c3f25);
-  }
-  g.rect(300, top + 70, width - 400, 12).fill(0x8d6444);
-  for (let x = 330; x + 210 < width - 120; x += 420) g.moveTo(x + 16, GROUND_Y - 6).lineTo(x + 210, top + 82);
-  g.stroke({ width: 10, color: 0x7a5634, alpha: 1 });
-  for (let i = 0; i < 4; i += 1) g.roundRect(width - 380 + i * 34, GROUND_Y - 22 - (i % 2) * 18, 30, 18, 3).fill(0x9c9c94);
-  engine.entityLayer.addChild(g);
 }
 
 function homeScene(room, engine) {
@@ -2102,7 +2183,7 @@ export const homesFeature = {
     cult = normalizeCultivationState(slice?.cult || {});
     towerDecor = (Array.isArray(slice?.towerDecor) ? slice.towerDecor : [])
       .slice(0, TOWER_CONFIG.MAX_FLOORS)
-      .map((row) => normalizeHomeDecorState({ ...row, wallSegments: TOWER_GEO.wallSegments, starterKit: true }));
+      .map((row) => normalizeHomeDecorState({ ...row, wallSegments: TOWER_GEO.wallSegments, layout: 'tower', starterKit: true }));
   },
 
   /** renderHomeScene: the scene for 'interior' or 'street'. */
@@ -2110,7 +2191,8 @@ export const homesFeature = {
     return homeScene(room, engine);
   },
 
-  onStreetClear() {
+  onStreetClear(engine) {
+    releaseCameraLook(engine);
     destroyGhost();
     scene = null;
     if (ui) {
@@ -2153,6 +2235,10 @@ export const homesFeature = {
   onTick(dtMs, now, engine) {
     if (!scene) return;
     if (scene.room === 'street') wearFromNodes(engine, now);
+    else {
+      keepInsideWalls(engine);
+      interiorCameraLook(engine);
+    }
   },
 
   onEvent(counter, amount, engine) {

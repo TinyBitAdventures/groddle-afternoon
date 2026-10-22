@@ -127,7 +127,7 @@ describe('decorating the house', () => {
     assert.equal(shelf.item.slot, 'wall');
     assert.ok(shelf.item.y <= INTERIOR.floorY - INTERIOR.wallMarginBottom);
     const lamp = placeFurniture(state, inv, 'furniture_ceilinglamp', { x: 500, y: 600 });
-    assert.equal(lamp.item.y, INTERIOR.wallTop);
+    assert.equal(lamp.item.y, INTERIOR.ceilingY);
     const rug = placeFurniture(state, inv, 'furniture_rug', { x: 500 });
     assert.equal(rug.item.slot, 'rug');
     assert.equal(placeFurniture(state, inv, 'furniture_chair', { x: 500 }).reason, 'none');

@@ -15,7 +15,7 @@ import { crownsFeature } from './crowns-feature.js?v=crowns-3';
 import { patchesFeature } from './patches-feature.js?v=patches-2';
 import { foxesFeature } from './foxes-feature.js?v=foxes-1';
 import { heliKittiesFeature } from './heli-kitties-feature.js?v=kitties-1';
-import { homesFeature } from './homes-feature.js?v=homes-3';
+import { homesFeature } from './homes-feature.js?v=homes-4';
 import { rookAttackFeature } from './rook-attack-feature.js?v=rooks-2';
 import { streetFurnitureFeature } from './street-furniture-feature.js?v=furniture-1';
 import { doorsFeature } from './doors-feature.js?v=doors-1';
@@ -74,7 +74,7 @@ export const FEATURES = [
   newxpFeature,
 ];
 import { smugglingFeature } from './smuggling-feature.js?v=smuggling-1'; FEATURES.push(smugglingFeature);
-import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-1'; FEATURES.push(homeTowerFeature);
+import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-2'; FEATURES.push(homeTowerFeature);
 import { secretSpotsFeature } from './secret-spots-feature.js?v=secrets-1'; FEATURES.push(secretSpotsFeature);
 import { musicblocksFeature } from './musicblocks-feature.js?v=musicblocks-1'; FEATURES.push(musicblocksFeature);
 import { shrineHintFeature } from './shrine-hint-feature.js?v=shrine-hint-1'; FEATURES.push(shrineHintFeature);

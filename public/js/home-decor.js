@@ -12,12 +12,23 @@
  *                              for each extra wall segment, up to MAX_WALL_SEGMENTS
  * - config_base.js             home_limits START/MIN/MAX_WALL_SEGMENTS, start textures
  *
+ * - locations/inc_homes.js     homes_rebuild_floor geometry (150 px segments,
+ *                              floor / wall / ceiling bands, end walls at 76 px),
+ *                              per-segment wallpaper (homes_set_wp), homes_extend
+ * - locations/tower.js         tower_build_floor: 145 px elevator offset, six
+ *                              wall segments and a right end, 28 px frames
+ *
  * Remake decisions:
- * - The house interior is one floor. Wall segments are 200 px wide; the room
- *   starts at the source START_WALL_SEGMENTS (7, including end caps) and grows
- *   by one segment per Wall Segment up to MAX_WALL_SEGMENTS (20).
+ * - The house interior is one floor. Wall segments are the source 150 px; the
+ *   room starts at the source START_WALL_SEGMENTS (7, including end caps) and
+ *   grows by one segment per Wall Segment up to MAX_WALL_SEGMENTS (20).
+ * - Wallpaper is kept per wall segment like the source (`walls`, end caps
+ *   included); `wall` is the paper last applied to the whole room. Floor and
+ *   ceiling are one swatch per floor.
  * - Wallpaper, floor and ceiling swatches cost credits (real money) in the
  *   source. The remake has no credits, so every visible swatch is free to apply.
+ * - Saves from before the 150 px geometry (no `geo`) have their furniture
+ *   spread onto the narrower room in proportion.
  * - Furniture upgrades (catalog_furniture.js) were credit purchases with SWF art
  *   that is not recoverable; the remake places the recovered base frames.
  * - Glitch furniture never rotated; it faces left or right (`facing_right`).
@@ -30,17 +41,37 @@ import {
   HOME_TEXTURE_CONFIGS,
 } from './homes-catalog.js?v=homes-catalog-1';
 
-export const SEGMENT_W = 200;
-/** Interior geometry in world pixels. The floor line matches the home scene ground. */
+export const SEGMENT_W = 150;
+/** Room geometry version stored with the house (2 = source 150 px segments). */
+export const DECOR_GEO = 2;
+/**
+ * Interior geometry in world pixels (inc_homes.js homes_rebuild_floor, relative to
+ * the floor platform at floorY): floor band 65 px behind and 43 px in front of the
+ * walk line, a 300 px wall above it, the 63 px ceiling band, the ceiling platform
+ * 413 px up, and the side walls 76 px inside each end segment.
+ */
 export const INTERIOR = Object.freeze({
   floorY: 620,
-  wallTop: 352,
-  ceilingTop: 290,
-  floorFront: 700,
-  endCapW: 56,
+  wallTop: 620 - 365,
+  ceilingY: 620 - 413,
+  ceilingTop: 620 - 428,
+  floorFront: 620 + 43,
+  endCapW: 76,
   wallMarginTop: 14,
   wallMarginBottom: 22,
 });
+/** tower.js tower_get_geo_config / tower_get_bounds: one tower floor. */
+export const TOWER_ROOM = Object.freeze({
+  wallSegments: 6,
+  leftOffset: 145,
+  frameHeight: 28,
+  width: 145 + (6 + 1) * 150 - 17,
+  /** floor_start (the elevator side) and floor_end platforms. */
+  innerLeft: 130,
+  innerRight: 145 + (6 + 1) * 150 - 17 - 76,
+});
+/** The pre-G7 geometry, for migrating old saves. */
+const OLD_GEO = Object.freeze({ segmentW: 200, endCapW: 56, towerW: 1200 });
 
 export const TEXTURE_KINDS = Object.freeze(['wall', 'floor', 'ceiling']);
 const TEXTURE_CONFIG_KEY = { wall: 'walls', floor: 'floors', ceiling: 'ceilings' };
@@ -147,6 +178,8 @@ export function normalizeHomeDecorState(seed = {}) {
     Math.min(HOME_LIMITS.MAX_WALL_SEGMENTS, Math.floor(finite(seed?.wallSegments, HOME_LIMITS.START_WALL_SEGMENTS)))
   );
   const out = {
+    geo: DECOR_GEO,
+    layout: seed?.layout === 'tower' ? 'tower' : 'house',
     starterKit: seed?.starterKit === true,
     storage,
     placed,
@@ -157,7 +190,63 @@ export function normalizeHomeDecorState(seed = {}) {
     const key = cleanKey(seed?.[kind]);
     out[kind] = textureOk(kind, key) ? key : defaultTexture(kind);
   }
+  const slots = wallSlots(out);
+  let walls = (Array.isArray(seed?.walls) ? seed.walls : []).slice(0, 64).map((key) => (textureOk('wall', cleanKey(key)) ? cleanKey(key) : out.wall));
+  if (!walls.length) walls = Array(slots).fill(out.wall);
+  // Like homes_extend / homes_unexpand: segments come and go before the right end cap.
+  while (walls.length < slots) walls.splice(walls.length - 1, 0, walls[Math.max(0, walls.length - 2)]);
+  if (walls.length > slots) walls = [...walls.slice(0, slots - 1), walls[walls.length - 1]];
+  out.walls = walls;
+  fitPlacements(out, Number(seed?.geo) === DECOR_GEO ? null : seed);
   return out;
+}
+
+/** Wallpaper slots: every segment including both end caps (house), or six walls and the right end (tower). */
+export function wallSlots(state) {
+  return state?.layout === 'tower' ? TOWER_ROOM.wallSegments + 1 : state?.wallSegments || HOME_LIMITS.START_WALL_SEGMENTS;
+}
+
+/**
+ * Keep placed furniture inside the room. Saves from the old 200 px geometry are
+ * spread onto the new floor in proportion; ceiling pieces hang from the ceiling
+ * platform and wall pieces stay on the wall.
+ */
+function fitPlacements(state, legacy) {
+  const { left, right, width } = interiorBounds(state);
+  let mapX = (x) => x;
+  if (legacy && state.placed.length) {
+    const oldW = state.layout === 'tower' ? OLD_GEO.towerW : state.wallSegments * OLD_GEO.segmentW;
+    const oldL = OLD_GEO.endCapW;
+    const oldR = oldW - OLD_GEO.endCapW;
+    mapX = (x) => left + ((x - oldL) / (oldR - oldL)) * (right - left);
+  }
+  const byId = new Map(state.placed.map((row) => [row.id, row]));
+  const hosts = state.placed.filter((row) => !row.on || !byId.has(row.on));
+  const moved = new Map();
+  for (const row of hosts) {
+    const before = { x: row.x, y: row.y };
+    const half = furnitureSize(row.classTsid).w / 2;
+    row.x = Math.round(Math.max(left + half, Math.min(right - half, mapX(row.x))));
+    if (row.slot === 'ceiling') row.y = INTERIOR.ceilingY;
+    else if (row.slot === 'wall') {
+      const h = furnitureSize(row.classTsid).h;
+      const top = INTERIOR.wallTop + INTERIOR.wallMarginTop + h;
+      const bottom = INTERIOR.floorY - INTERIOR.wallMarginBottom;
+      row.y = Math.round(Math.max(top, Math.min(bottom, row.y)));
+    }
+    moved.set(row.id, { dx: row.x - before.x, dy: row.y - before.y });
+  }
+  // Tabletop decor follows its host.
+  for (let pass = 0; pass < 4; pass += 1) {
+    for (const row of state.placed) {
+      if (!row.on || moved.has(row.id) || !moved.has(row.on)) continue;
+      const d = moved.get(row.on);
+      row.x += d.dx;
+      row.y += d.dy;
+      moved.set(row.id, d);
+    }
+  }
+  return width;
 }
 
 export function createHomeDecorState(seed = {}) {
@@ -165,12 +254,14 @@ export function createHomeDecorState(seed = {}) {
 }
 
 export function interiorWidth(state) {
+  if (state?.layout === 'tower') return TOWER_ROOM.width;
   return Math.max(HOME_LIMITS.MIN_WALL_SEGMENTS, state?.wallSegments || HOME_LIMITS.START_WALL_SEGMENTS) * SEGMENT_W;
 }
 
-/** Inner floor span (between the end caps). */
+/** Inner floor span (between the side walls; the tower's left side is the elevator). */
 export function interiorBounds(state) {
   const width = interiorWidth(state);
+  if (state?.layout === 'tower') return { left: TOWER_ROOM.innerLeft, right: TOWER_ROOM.innerRight, width };
   return { left: INTERIOR.endCapW, right: width - INTERIOR.endCapW, width };
 }
 
@@ -246,7 +337,7 @@ export function snapPlacement(state, classTsid, at = {}, excludeId = null) {
     const y = Math.round(Math.max(top, Math.min(bottom, finite(at.y, (top + bottom) / 2))));
     return { x, y, slot: 'wall', on: null };
   }
-  if (def.slot === 'ceiling') return { x, y: INTERIOR.wallTop, slot: 'ceiling', on: null };
+  if (def.slot === 'ceiling') return { x, y: INTERIOR.ceilingY, slot: 'ceiling', on: null };
   if (def.slot === 'rug') return { x, y: INTERIOR.floorY + 18, slot: 'rug', on: null };
   if (def.tabletop) {
     const host = surfaceUnder(state, x, excludeId);
@@ -362,12 +453,35 @@ export function pickUpFurniture(state, id) {
   return { ok: true, lifted: lifted.map((row) => row.classTsid) };
 }
 
-export function setHomeTexture(state, kind, key) {
+/**
+ * Apply a swatch. Floors and ceilings take one per floor (homes_set_floor /
+ * homes_set_ceiling). Wallpaper goes on the whole room, or with `segment` on one
+ * wall segment (the client's HandOfDecorator: dropping a swatch in the middle of
+ * a segment papers that segment, anywhere else on the wall papers the room).
+ */
+export function setHomeTexture(state, kind, key, { segment = null } = {}) {
   if (!TEXTURE_KINDS.includes(kind)) return { ok: false, reason: 'bad_kind' };
   if (!textureOk(kind, key)) return { ok: false, reason: 'unknown', msg: 'That swatch is not available.' };
+  const name = textureConfig(kind, key).name;
+  if (kind === 'wall') {
+    const slots = wallSlots(state);
+    if (!Array.isArray(state.walls) || state.walls.length !== slots) state.walls = Array(slots).fill(state.wall);
+    if (segment != null) {
+      const i = Math.floor(Number(segment));
+      if (!Number.isFinite(i) || i < 0 || i >= slots) return { ok: false, reason: 'bad_segment' };
+      if (state.walls[i] === key) return { ok: false, reason: 'same' };
+      state.walls[i] = key;
+      if (state.walls.every((row) => row === key)) state.wall = key;
+      return { ok: true, key, name, segment: i };
+    }
+    if (state.wall === key && state.walls.every((row) => row === key)) return { ok: false, reason: 'same' };
+    state.wall = key;
+    state.walls = Array(slots).fill(key);
+    return { ok: true, key, name };
+  }
   if (state[kind] === key) return { ok: false, reason: 'same' };
   state[kind] = key;
-  return { ok: true, key, name: textureConfig(kind, key).name };
+  return { ok: true, key, name };
 }
 
 /**
@@ -391,6 +505,10 @@ export function expandInterior(state, inv = {}) {
   if (!quote.ok) return quote;
   inv.wall_segment -= quote.items.wall_segment;
   state.wallSegments += 1;
+  // homes_extend: the new segment repeats the last wall before the right end cap.
+  if (Array.isArray(state.walls) && state.walls.length >= 2) {
+    state.walls.splice(state.walls.length - 1, 0, state.walls[state.walls.length - 2]);
+  }
   return { ok: true, wallSegments: state.wallSegments, width: interiorWidth(state) };
 }
 
@@ -442,15 +560,15 @@ export function renderOrder(state) {
  */
 export function arrangeStarterRoom(state) {
   const plan = [
-    ['bag_furniture_smallcabinet', 200],
-    ['furniture_floorlamp', 330],
-    ['furniture_table', 600],
-    ['furniture_chair', 452, null, { facingRight: true }],
-    ['furniture_ceilinglamp', 600],
-    ['furniture_shelf', 200, 486],
-    ['furniture_shelf', 860, 470],
-    ['bag_furniture_sdb', 1010, 560],
-    ['bag_furniture_sdb', 1100, 560],
+    ['bag_furniture_smallcabinet', 160],
+    ['furniture_floorlamp', 262],
+    ['furniture_table', 480],
+    ['furniture_chair', 362, null, { facingRight: true }],
+    ['furniture_ceilinglamp', 480],
+    ['furniture_shelf', 160, 430],
+    ['furniture_shelf', 690, 410],
+    ['bag_furniture_sdb', 810, 560],
+    ['bag_furniture_sdb', 890, 560],
   ];
   for (const [classTsid, x, y, extra] of plan) {
     if (!state.storage[classTsid]) continue;
@@ -466,19 +584,19 @@ export function furnishDemoRoom(state) {
     const placed = placeFurniture(state, {}, classTsid, { x, y: y ?? INTERIOR.floorY }, extra);
     return placed.item;
   };
-  add('furniture_rug', 520);
-  add('furniture_bookcase', 170);
-  add('furniture_table', 520);
-  add('furniture_chair', 372, null, { facingRight: true });
-  add('furniture_chair', 668, null, { facingRight: false });
-  add('furniture_tablelamp', 470);
-  add('furniture_floorlamp', 790);
-  add('furniture_sofa', 960);
-  add('furniture_shelf', 960, 470);
-  add('furniture_painting', 340, 486);
-  add('furniture_largewindow', 690, 486);
-  add('bag_furniture_sdb', 1170, 520);
-  add('furniture_ceilinglamp', 520);
-  add('furniture_walllamp', 1090, 476);
+  add('furniture_rug', 420);
+  add('furniture_bookcase', 150);
+  add('furniture_table', 420);
+  add('furniture_chair', 300, null, { facingRight: true });
+  add('furniture_chair', 540, null, { facingRight: false });
+  add('furniture_tablelamp', 380);
+  add('furniture_floorlamp', 640);
+  add('furniture_sofa', 790);
+  add('furniture_shelf', 790, 420);
+  add('furniture_painting', 290, 440);
+  add('furniture_largewindow', 560, 440);
+  add('bag_furniture_sdb', 920, 500);
+  add('furniture_ceilinglamp', 420);
+  add('furniture_walllamp', 680, 420);
   return state;
 }

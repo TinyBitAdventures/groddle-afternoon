@@ -86,6 +86,13 @@ import {
   workCheck,
 } from '../home-tower.js?v=home-tower-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { pieceUrl } from '../home-wallpaper.js?v=home-wallpaper-1';
+import { wantsHiresDecos } from '../deco-hires.js';
+
+/** 3x tower pieces where the screen has more than 2.25 backing pixels per world pixel. */
+function hires(engine) {
+  return wantsHiresDecos(engine?.app?.renderer?.resolution || globalThis.devicePixelRatio || 1);
+}
 
 export const HOME_TOWER_FEATURE_ID = 'home-tower';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -352,19 +359,21 @@ function spawnFloor(engine, { width, groundY, doorX }) {
   const { PIXI } = engine;
   const floor = tower.floor;
   const targets = {};
-  // Elevator (signpost_asset_elevator_tower is lost; the CoU apartment elevator stands in).
-  const lift = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}elevator.png`));
+  // Elevator: home_tower.swf signpost_asset_elevator_tower, 180 x 514 at x 90 (tower_build_elevator),
+  // standing on the floor's bound (the walk line + 43 + the 28 px frame).
+  const lift = new PIXI.Sprite(textureFromUrl(pieceUrl('signpost_asset_elevator_tower', hires(engine))));
   lift.anchor.set(0.5, 1);
-  lift.scale.set(0.5);
-  lift.x = TOWER_GEO.elevatorX - 20;
-  lift.y = groundY + 2;
+  lift.width = 180;
+  lift.height = 514;
+  lift.x = 90;
+  lift.y = groundY + 43 + 28;
   lift.zIndex = 5;
   engine.entityLayer.addChild(lift);
   const plate = new PIXI.Text({ text: `${TOWER_GEO.elevatorLabel} · ${floor + 1}`, style: {
     fontFamily: 'Trebuchet MS, sans-serif', fontSize: 13, fontWeight: '700', fill: 0xfff4d6, stroke: { color: 0x3b2a1f, width: 3 }, 
   } });
   plate.anchor.set(0, 1);
-  plate.x = lift.x + 104;
+  plate.x = lift.x + 84;
   plate.y = groundY - 150;
   plate.zIndex = 6;
   engine.entityLayer.addChild(plate);
@@ -377,11 +386,13 @@ function spawnFloor(engine, { width, groundY, doorX }) {
     state: { floor },
   });
   if (floor === 0) {
-    const door = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/door_asset_apartment_room_interior.png'));
+    // tower_build_exit: door_asset_entry_basic (75 x 236) at exit_door (w - 67, b - 53).
+    const door = new PIXI.Sprite(textureFromUrl(pieceUrl('door_asset_entry_basic', hires(engine))));
     door.anchor.set(0.5, 1);
-    door.scale.set(0.45);
+    door.width = 75;
+    door.height = 236;
     door.x = doorX;
-    door.y = groundY - 2;
+    door.y = groundY + 43 + 28 - 53;
     door.zIndex = 8;
     engine.entityLayer.addChild(door);
     targets.exit = engine.register({

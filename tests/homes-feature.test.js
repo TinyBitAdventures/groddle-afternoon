@@ -12,7 +12,7 @@ import {
   rockItems,
   soilKeyMap,
 } from '../public/js/features/homes-feature.js';
-import { FLOOR_LOOKS, CEILING_LOOKS, WALL_LOOKS } from '../public/js/home-looks.js';
+import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js';
 import { canPlantBean } from '../public/js/patches.js';
 
@@ -91,10 +91,10 @@ describe('homes feature helpers', () => {
     assert.equal(homesFeature.save().decor.wall, 'grey_unfinished');
   });
 
-  it('draws every visible source swatch', () => {
-    for (const key of Object.keys(HOME_TEXTURE_CONFIGS.walls)) assert.ok(WALL_LOOKS[key], `wall ${key}`);
-    for (const key of Object.keys(HOME_TEXTURE_CONFIGS.floors)) assert.ok(FLOOR_LOOKS[key], `floor ${key}`);
-    for (const key of Object.keys(HOME_TEXTURE_CONFIGS.ceilings)) assert.ok(CEILING_LOOKS[key], `ceiling ${key}`);
+  it('draws every visible source swatch from its recovered pieces', () => {
+    for (const kind of ['walls', 'floors', 'ceilings']) {
+      assert.deepEqual(Object.keys(WALLPAPER_MAPS[kind]).sort(), Object.keys(HOME_TEXTURE_CONFIGS[kind]).sort(), kind);
+    }
   });
 
   it('is registered and wired into the home scene', () => {

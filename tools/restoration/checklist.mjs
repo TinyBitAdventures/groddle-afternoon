@@ -189,8 +189,8 @@ export const CHECKLIST = Object.freeze([
 
   // —— Home & neighbours ——
   { id: 'homes', group: 'home', name: 'Your house and yard', status: 'source', spot: 'mailbox',
-    blurb: 'Buy a house, decorate rooms, cultivate the yard, keep animals.',
-    evidence: ['public/js/homes.js', 'public/js/home-decor.js', 'public/js/home-cultivation.js'] },
+    blurb: 'Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard, keep animals.',
+    evidence: ['public/js/homes.js', 'public/js/home-decor.js', 'public/js/home-wallpaper.js', 'public/js/home-cultivation.js'] },
   { id: 'mail', group: 'home', name: 'Mail', status: 'source',
     blurb: 'Mailboxes, postage, parcels and replies.',
     evidence: ['public/js/mailbox.js'] },
