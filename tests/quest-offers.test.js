@@ -108,7 +108,9 @@ describe('classifyQuests', () => {
     assert.equal(c.excluded.length, 299 - built);
     assert.equal(c.byReason.job.length, 200);
     assert.equal(c.byReason.multiplayer.length, 11);
-    assert.equal((c.byReason.instance_unbuilt || []).length, 32 - built);
+    // Gwendolyn's Task (tower_quest*) was feature_unbuilt, not one of the 32.
+    const onceInstance = builtInstanceQuests().filter((id) => !id.startsWith('tower_quest')).length;
+    assert.equal((c.byReason.instance_unbuilt || []).length, 32 - onceInstance);
     for (const id of builtInstanceQuests()) assert.ok(c.solo.some((row) => row.classTsid === id), id);
     assert.ok(c.byReason.needs_other_players.includes('kindly_randomness'));
     assert.ok(c.byReason.removed_feature.includes('say_cheese'));
