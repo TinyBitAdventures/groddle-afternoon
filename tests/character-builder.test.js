@@ -173,4 +173,11 @@ describe('UI wiring', () => {
     const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
     assert.ok(css.includes('avatar-swatch'));
   });
+
+  it('long wardrobe lists get a search box and Show all', () => {
+    const game = readFileSync(join(__dirname, '../public/game.js'), 'utf8');
+    for (const s of ['addChipFinder', 'VECTOR_CHIP_PAGE', 'vectorChipState', 'avatar-search', 'avatar-more-chip']) assert.ok(game.includes(s), s);
+    const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
+    assert.ok(css.includes('.avatar-search') && css.includes('.avatar-style-chip[hidden]'));
+  });
 });

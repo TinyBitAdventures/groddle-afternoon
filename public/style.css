@@ -2219,6 +2219,30 @@ button.play-context-head:focus-visible {
   background: #eef8e8;
   color: #2e5a20;
 }
+.avatar-style-chip[hidden],
+.avatar-note[hidden] { display: none; }
+.avatar-search {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.55rem;
+  margin: 0 0 0.35rem;
+  border-radius: 999px;
+  border: 1px solid #c5bdaa;
+  background: #fff;
+  color: #2b2a33;
+}
+.avatar-search:focus {
+  outline: none;
+  border-color: #5a9e3e;
+  box-shadow: 0 0 0 2px #cfe6c0;
+}
+.avatar-more-chip {
+  border-style: dashed;
+  color: #2e5a20;
+}
 .avatar-palette {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(22px, 1fr));

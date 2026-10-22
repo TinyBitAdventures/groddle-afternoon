@@ -14,7 +14,7 @@ import {
   frameDrawList, hardLightMatrix, isBoot, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments,
 } from '../public/js/avatar-rig.js';
 import {
-  articleColors, lookKey, normalizeVectorFields, randomVectorFields, resolveLook, vectorFieldsFromColors,
+  COLOR_FIELDS, articleColors, expandCatalog, lookKey, normalizeVectorFields, randomVectorFields, resolveLook, vectorFieldsFromColors,
 } from '../public/js/avatar-looks.js';
 import { CORE_FRAMES, IDLE_FRAMES, IDLE_SHEETS, SHEET_FRAMES } from '../public/js/avatar-anims.js';
 import { VECTOR_AVATAR, VECTOR_AVATAR_HIRES } from '../public/js/avatar-vector-sheets.js';
@@ -30,7 +30,8 @@ const coreRig = json(join(A, 'base.json'));
 const coreFrameList = coreRig.frames.slice();
 // The idle frames load later in the game (prepareIdle); the tests use the merged rig.
 const rig = mergeIdleRig(expandRig(coreRig), json(join(A, 'base.idle.json')));
-const catalog = json(join(A, 'catalog.json'));
+const catalogRaw = readFileSync(join(A, 'catalog.json'), 'utf8');
+const catalog = expandCatalog(JSON.parse(catalogRaw));
 const RIG_FRAMES = [...CORE_FRAMES, ...IDLE_FRAMES];
 const article = (type, name) => mergeIdleArticle(json(join(A, 'articles', type, `${name}.json`)), json(join(A, 'articles', type, `${name}.idle.json`)), CORE_FRAMES.length, IDLE_FRAMES.length);
 
@@ -47,6 +48,8 @@ function lookCtx(look) {
   };
 }
 const flat = (items) => items.flatMap((it) => (it.clip ? flat(it.items) : [it]));
+/** Article part ops (masks nest: { clip, ops }) as draw-item shaped groups for flat(). */
+const asItems = (ops) => ops.map((o) => (o.clip ? { clip: o.clip, items: asItems(o.ops) } : o));
 
 /** Absolute points of a path (M/L/Q or relative m/l/q), for round trips. */
 function points(d) {
@@ -143,9 +146,13 @@ describe('catalog and looks', () => {
         assert.ok(Object.keys(data.parts).length, `${type}/${item.name} parts`);
         for (const part of Object.values(data.parts)) {
           if (part.frames !== 0) assert.equal(part.frames.length, RIG_FRAMES.length);
-          for (const v of part.variants) for (const op of flat(v.map((o) => (o.clip ? { clip: o.clip, items: o.ops } : o)))) assert.ok(data.shapes[op.s], `${item.name} shape ${op.s}`);
+          for (const v of part.variants) for (const op of flat(asItems(v))) assert.ok(data.shapes[op.s], `${item.name} shape ${op.s}`);
         }
         if (['shirt', 'coat', 'pants', 'shoes', 'hat', 'skirt', 'dress'].includes(type)) assert.ok(item.variants?.length >= 1, `${item.name} colourways`);
+        // Idles and AFK work in every look: each article ships its idle frames.
+        assert.ok(existsSync(join(A, 'articles', type, `${item.name}.idle.json`)), `${type}/${item.name}.idle.json`);
+        assert.deepEqual(Object.keys(data.parts).sort(), [...item.parts].sort(), `${type}/${item.name} parts listed`);
+        for (const part of Object.values(data.parts)) assert.equal(part.frames === 0 ? RIG_FRAMES.length : part.frames.length, RIG_FRAMES.length);
         // Wearable whole: every part it ships has a container in the rig.
         const kind = type === 'shoes' && isBoot(item.name) ? 'boots' : type;
         const containers = new Map(SLOT_PARTS[kind].map(([p, c]) => [p, c]));
@@ -153,7 +160,10 @@ describe('catalog and looks', () => {
         n += 1;
       }
     }
-    assert.ok(n >= 60, `${n} articles`);
+    assert.ok(n >= 600, `${n} articles`);
+    // One name per article across types (the compositor keys articles by name).
+    const names = Object.values(catalog.types).flat().map((i) => i.name);
+    assert.equal(new Set(names).size, names.length);
     assert.ok(catalog.palettes.skin.length >= 50 && catalog.palettes.hair.length >= 50);
   });
 
@@ -179,6 +189,89 @@ describe('catalog and looks', () => {
       for (const [type, name] of Object.entries(f.outfit)) if (name !== 'none') assert.ok(catalog.types[type].some((x) => x.name === name), `${type} ${name}`);
       if (f.outfit.hat && f.outfit.hat !== 'none') assert.ok(catalog.hatHair[f.outfit.hat].includes(f.outfit.hair));
     }
+  });
+});
+
+describe('the whole GSJS wardrobe', () => {
+  const items = (type) => catalog.types[type] || [];
+  const idleIdx = RIG_FRAMES.indexOf(IDLE_FRAMES[0]);
+  const stand = RIG_FRAMES.indexOf(801);
+  const srcCount = (L, i, name) => flat(frameDrawList(rig, L, i)).filter((it) => it.src === name).length;
+
+  it('packs colours small and expands them to the GSJS fields', () => {
+    const raw = JSON.parse(catalogRaw);
+    const v = raw.types.pants.find((p) => p.name === 'plain_trousers').variants[0];
+    assert.equal(typeof v.colors.color_1, 'string');
+    assert.deepEqual(Object.keys(catalog.types.pants.find((p) => p.name === 'plain_trousers').variants[0].colors.color_1), COLOR_FIELDS);
+    assert.equal(typeof catalog.palettes.hair[0].colors.color_1.tintColor, 'string');
+    assert.equal(expandCatalog(catalog), catalog, 'idempotent');
+    assert.ok(catalogRaw.length < 700 * 1024, `catalog.json ${catalogRaw.length} bytes`);
+  });
+
+  it('every article draws in the stand or idle frames (idle data present)', () => {
+    for (const [type, list] of Object.entries(catalog.types)) {
+      for (const item of list) {
+        const outfit = { [type]: { name: item.name, parts: item.parts } };
+        const look = { outfit: { [type]: { name: item.name, colors: articleColors(item) } }, colors: {}, face: {} };
+        const articles = new Map([[item.name, article(type, item.name)]]);
+        const L = { assign: slotAssignments(outfit), articles, matrices: lookMatrices(look), face: {} };
+        let idle = 0;
+        for (let i = idleIdx; i < RIG_FRAMES.length; i++) idle += srcCount(L, i, item.name);
+        assert.ok(idle > 0 || srcCount(L, stand, item.name) > 0, `${type}/${item.name} draws nothing`);
+      }
+    }
+  });
+
+  it('a hat hides hair unless it allows it, and masks the hair it allows', () => {
+    const hairs = new Set(items('hair').map((h) => h.name));
+    for (const hat of items('hat')) {
+      const allowed = (catalog.hatHair[hat.name] || []).filter((h) => hairs.has(h));
+      const banned = items('hair').find((h) => !allowed.includes(h.name));
+      if (!banned) continue;
+      const off = lookCtx(resolveLook({ outfit: { hat: hat.name, hair: banned.name } }, catalog)).look;
+      assert.ok(!off.assign.hatAndHair && srcCount(off, stand, banned.name) === 0, `${hat.name} hides ${banned.name}`);
+      assert.ok(srcCount(off, stand, hat.name) + srcCount(off, idleIdx, hat.name) > 0 || !hat.parts.some((p) => /^side/.test(p)), `${hat.name} draws`);
+      if (!allowed.length) continue;
+      const on = lookCtx(resolveLook({ outfit: { hat: hat.name, hair: allowed[0] } }, catalog)).look;
+      assert.ok(on.assign.hatAndHair, `${hat.name} with ${allowed[0]}`);
+      if (hat.parts.includes('sideHatHairMask')) {
+        const list = frameDrawList(rig, on, stand);
+        const loose = list.filter((it) => !it.clip && it.src === allowed[0]).length;
+        assert.equal(loose, 0, `${hat.name} masks ${allowed[0]}`);
+      }
+    }
+  });
+
+  it('coats paint over the top and hide its sleeves; skirts exclude dresses; boots take the boot containers', () => {
+    const torso = (L, name) => flat(frameDrawList(rig, L, stand)).map((it, i) => (it.src === name ? i : -1)).filter((i) => i >= 0);
+    for (const coat of items('coat')) {
+      const L = lookCtx(resolveLook({ outfit: { coat: coat.name, shirt: 'classic_undershirt' } }, catalog)).look;
+      assert.equal(L.assign.hidden.size > 0, !['elizabethan_robe', 'mongolian_fighting', 'Fisherman_vest'].includes(coat.name), coat.name);
+      if (!coat.parts.includes('coatClose')) continue;
+      const shirtAt = torso(L, 'classic_undershirt');
+      const coatAt = torso(L, coat.name);
+      assert.ok(coatAt.length && Math.max(...coatAt) > Math.max(...shirtAt), `${coat.name} over the shirt`);
+    }
+    const dress = items('dress')[0].name;
+    for (const skirt of items('skirt')) {
+      const a = slotAssignments({ skirt: { name: skirt.name, parts: skirt.parts }, dress: { name: dress } });
+      assert.ok(![...a.map.values()].flat().some((e) => e.type === 'dress'), `${skirt.name} excludes the dress`);
+    }
+    for (const shoe of items('shoes')) {
+      const a = slotAssignments({ shoes: { name: shoe.name, parts: shoe.parts } });
+      const containers = [...a.map.keys()];
+      assert.ok(containers.length, `${shoe.name} has slots`);
+      assert.equal(containers.some((c) => /Boot/.test(c)), isBoot(shoe.name), shoe.name);
+    }
+  });
+
+  it('one class worn in two slots stays two articles (the chalky white suit)', () => {
+    const shirt = items('shirt').find((i) => i.name === 'chaulkywhite_coatshirtvest');
+    const coat = items('coat').find((i) => i.name === 'chaulkywhite_coatshirtvest_coat');
+    assert.ok(shirt && coat);
+    assert.ok(shirt.parts.includes('shirtTorso') && coat.parts.includes('coatClose'));
+    const L = lookCtx(resolveLook({ outfit: { shirt: shirt.name, coat: coat.name } }, catalog)).look;
+    assert.ok(srcCount(L, stand, shirt.name) > 0 && srcCount(L, stand, coat.name) > 0);
   });
 });
 

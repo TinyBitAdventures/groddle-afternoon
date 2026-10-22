@@ -28,6 +28,34 @@ export function tintColor(hex) {
   return { tintColor: hex, tintAmount: '100', brightness: '0', saturation: '0', contrast: '0', alpha: '100' };
 }
 
+/**
+ * catalog.json packs each GSJS colour filter (article colourways, palettes)
+ * as one string of these fields joined by spaces (tools/avatar-compositor
+ * build.mjs packColors).
+ */
+export const COLOR_FIELDS = Object.freeze(['tintColor', 'brightness', 'saturation', 'contrast', 'tintAmount', 'alpha']);
+
+function unpackColors(colors) {
+  const out = {};
+  for (const [k, v] of Object.entries(colors || {})) {
+    if (typeof v !== 'string') { out[k] = v; continue; }
+    const vals = v.split(' ');
+    out[k] = Object.fromEntries(COLOR_FIELDS.map((f, i) => [f, vals[i] ?? '']));
+  }
+  return out;
+}
+
+/** catalog.json as loaded, with its packed colours back as objects. Idempotent (marks the catalog). */
+export function expandCatalog(catalog) {
+  if (!catalog || catalog.colorsExpanded) return catalog;
+  for (const items of Object.values(catalog.types || {})) {
+    for (const item of items) for (const v of item.variants || []) v.colors = unpackColors(v.colors);
+  }
+  for (const list of Object.values(catalog.palettes || {})) for (const p of list) p.colors = unpackColors(p.colors);
+  catalog.colorsExpanded = true;
+  return catalog;
+}
+
 /** Catalog lookup helpers. */
 export function catalogItem(catalog, type, name) {
   return catalog?.types?.[type]?.find((i) => i.name === name) || null;

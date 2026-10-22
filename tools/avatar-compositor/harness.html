@@ -4,7 +4,7 @@
 <body>
 <script type="module">
   // Offline driver for tools/avatar-compositor/build.mjs (render, score).
-  import { prepareLook, prepareIdle, sheetLayout, paintSheet, sheetDef, paintPreview, bakeIdleSheet, SHEET_ORDER, IDLE_SHEET_ORDER } from '/js/avatar-compositor.js';
+  import { loadCatalog, prepareLook, prepareIdle, sheetLayout, paintSheet, sheetDef, paintPreview, bakeIdleSheet, SHEET_ORDER, IDLE_SHEET_ORDER } from '/js/avatar-compositor.js';
   import { resolveLook } from '/js/avatar-looks.js';
 
   /** { sheet: { def, 1: dataUrl, 3: dataUrl } } */
@@ -30,7 +30,7 @@
     return c.toDataURL('image/png');
   };
 
-  window.resolveLook = async (fields) => resolveLook(fields, await (await fetch('/assets/avatar/catalog.json')).json());
+  window.resolveLook = async (fields) => resolveLook(fields, await loadCatalog('/assets/avatar/'));
 
   /** Time a full 3x bake of a look (ms). */
   window.timeBake = async (look, scale = 3) => {

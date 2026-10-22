@@ -15,6 +15,7 @@
  */
 import { CORE_FRAMES, IDLE_FRAMES, SHEET_FRAMES } from './avatar-anims.js';
 import { applyCM, drawListBounds, expandRig, frameDrawList, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments } from './avatar-rig.js';
+import { expandCatalog } from './avatar-looks.js';
 
 export const AVATAR_DATA_DIR = 'assets/avatar/';
 /** Widest sheet row at 3x (px); taller sheets wrap into rows. */
@@ -187,8 +188,9 @@ export async function loadRig(dir = AVATAR_DATA_DIR) {
   return base;
 }
 
+/** catalog.json with its packed colours expanded (avatar-looks.js expandCatalog). */
 export async function loadCatalog(dir = AVATAR_DATA_DIR) {
-  return loadJson(`${dir}catalog.json`);
+  return expandCatalog(await loadJson(`${dir}catalog.json`));
 }
 
 /** Article data for every part of an outfit. */

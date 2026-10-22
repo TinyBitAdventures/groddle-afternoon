@@ -1393,9 +1393,19 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 210,
+  "commits": 212,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Drop the made-up XS Musicblock icons"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Every recovered Musicblock tune to collect, and Esquibeth's own melody"
+   },
    {
     "date": "2026-10-22",
     "kind": "fix",
@@ -1505,16 +1515,6 @@
     "date": "2026-10-21",
     "kind": "fix",
     "text": "Upgrade cards flip when you pick one"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "improve",
-    "text": "A sharp Fruit Changing Machine in the making panel"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "improve",
-    "text": "A roomier screen: no footer line, no quest/activity rail, a two-row pack"
    }
   ]
  },

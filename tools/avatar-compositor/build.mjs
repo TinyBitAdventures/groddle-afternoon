@@ -40,7 +40,7 @@ import { mergeContainers, readAvatarFla, validateAgainstSwf } from './xfl.mjs';
 import { loadGsjsAvatarData, loadHatHairMap } from './gsjs.mjs';
 import { ARTICLE_CONTAINERS, SLOT_PARTS } from '../../public/js/avatar-rig.js';
 import { CORE_FRAMES, IDLE_FRAMES } from '../../public/js/avatar-anims.js';
-import { resolveLook } from '../../public/js/avatar-looks.js';
+import { COLOR_FIELDS, expandCatalog, resolveLook } from '../../public/js/avatar-looks.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
@@ -318,15 +318,20 @@ function buildData() {
   rmSync(join(OUT, 'articles'), { recursive: true, force: true });
   rmSync(join(OUT, 'textures'), { recursive: true, force: true });
   buildBase();
+  // GSJS articles by slot and class: one class name can be two articles
+  // (chaulkywhite_coatshirtvest is a shirt and a coat, two SWFs).
   const byClass = new Map();
   const variantsOf = new Map();
   for (const [id, c] of Object.entries(gs.clothing)) {
-    if (!byClass.has(c.article_class_name)) byClass.set(c.article_class_name, { id, ...c });
-    if (!variantsOf.has(c.article_class_name)) variantsOf.set(c.article_class_name, []);
-    variantsOf.get(c.article_class_name).push({ id: Number(id), colors: c.colors || {} });
+    const key = `${c.slot}/${c.article_class_name}`;
+    if (!byClass.has(key)) byClass.set(key, { id, ...c });
+    if (!variantsOf.has(key)) variantsOf.set(key, []);
+    variantsOf.get(key).push({ id: Number(id), colors: c.colors || {} });
   }
-  const faceByClass = new Map();
-  for (const [id, c] of Object.entries(gs.faces)) if (!faceByClass.has(c.article_class_name)) faceByClass.set(c.article_class_name, { id, ...c });
+  for (const [id, c] of Object.entries(gs.faces)) {
+    const key = `${c.slot}/${c.article_class_name}`;
+    if (!byClass.has(key)) byClass.set(key, { id, ...c });
+  }
   const catalog = { source: 'glitch-avatars + glitch-GameServerJS (CC0)', types: {}, hatHair: {}, palettes: {}, defaultLook: manifest.defaultLook, looks: manifest.looks || {} };
   let total = 0;
   let idleTotal = 0;
@@ -334,15 +339,17 @@ function buildData() {
     catalog.types[type] = [];
     for (const [index, e] of entries.entries()) {
       const name = typeof e === 'string' ? e : e.name;
-      const g = byClass.get(name) || faceByClass.get(name);
+      // `class`: the GSJS article_class_name when the catalog name differs (a class worn in two slots).
+      const cls = (typeof e === 'object' && e.class) || name;
+      const g = byClass.get(`${type}/${cls}`);
       const { data, bytes, idleBytes } = buildArticle(type, name, g);
       total += bytes;
       idleTotal += idleBytes;
-      const item = { name, label: e.label || labelOf(name, type, index), parts: Object.keys(data.parts), groups: data.groups };
+      const item = { name, label: e.label || labelOf(cls, type, index), parts: Object.keys(data.parts), groups: data.groups };
       if (g?.id) item.gsjsId = Number(g.id);
       // Every GSJS colourway of the article (data_clothing has one id per colourway).
-      const variants = variantsOf.get(name);
-      if (variants?.length) item.variants = variants.sort((a, b) => a.id - b.id);
+      const variants = variantsOf.get(`${type}/${cls}`);
+      if (variants?.length) item.variants = variants.sort((a, b) => a.id - b.id).map((v) => ({ id: v.id, colors: packColors(v.colors) }));
       catalog.types[type].push(item);
       if (type === 'hat' && hatHair[name]) catalog.hatHair[name] = hatHair[name];
       console.log(`  ${type}/${name}: ${Object.keys(data.parts).length} parts, groups ${data.groups.join(',') || '-'}, ${(bytes / 1024).toFixed(0)} KB`);
@@ -351,11 +358,26 @@ function buildData() {
   for (const slot of ['skin', 'hair']) {
     catalog.palettes[slot] = Object.entries(gs.colors)
       .filter(([, c]) => c.slot === slot)
-      .map(([id, c]) => ({ id: Number(id), color: String(c.color).toLowerCase(), colors: c.colors }));
+      .map(([id, c]) => ({ id: Number(id), color: String(c.color).toLowerCase(), colors: packColors(c.colors) }));
   }
   catalog.defaults = gs.defaults;
   const bytes = writeJson(join(OUT, 'catalog.json'), catalog);
   console.log(`articles: ${(total / 1024).toFixed(0)} KB (idle files ${(idleTotal / 1024).toFixed(0)} KB); catalog.json ${(bytes / 1024).toFixed(0)} KB`);
+}
+
+/**
+ * A GSJS colour filter as one string, COLOR_FIELDS joined by spaces
+ * (js/avatar-looks.js expandCatalog turns them back into objects on load):
+ * a fifth of the catalog's size with every colourway listed.
+ */
+function packColors(colors = {}) {
+  const out = {};
+  for (const [k, c] of Object.entries(colors)) {
+    const vals = COLOR_FIELDS.map((f) => String(c?.[f] ?? ''));
+    if (vals.some((v) => /\s/.test(v)) || Object.keys(c || {}).some((f) => !COLOR_FIELDS.includes(f))) throw new Error(`colour ${k} does not pack: ${JSON.stringify(c)}`);
+    out[k] = vals.join(' ');
+  }
+  return out;
 }
 
 /** Builder label: words from the class name, or "Eyes 3" for coded names. */
@@ -422,7 +444,7 @@ function saveSheet(stem, dataUrl) {
 }
 
 async function render() {
-  const catalog = JSON.parse(readFileSync(join(OUT, 'catalog.json'), 'utf8'));
+  const catalog = expandCatalog(JSON.parse(readFileSync(join(OUT, 'catalog.json'), 'utf8')));
   const look = resolveLook(catalog.defaultLook, catalog);
   const result = await withPage((page) => page.evaluate(async (l) => window.renderLook(l, [1, 3]), look));
   rmSync(SHEETS_OUT, { recursive: true, force: true });

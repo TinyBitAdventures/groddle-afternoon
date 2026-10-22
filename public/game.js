@@ -6816,6 +6816,9 @@ function sectionTitle(text) {
 }
 
 function renderVectorControls(box) {
+  // Keep the list's scroll while picking within a tab; a new tab starts at the top.
+  const keepScroll = box.dataset.tab === avatarBuilderSlot ? box.scrollTop : 0;
+  box.dataset.tab = avatarBuilderSlot;
   box.dataset.mode = 'parts';
   box.innerHTML = '';
   if (!avatarCatalog) {
@@ -6847,6 +6850,60 @@ function renderVectorControls(box) {
     return;
   }
   for (const [type, title] of VECTOR_TAB_TYPES[tab] || []) renderStyleChips(box, type, title);
+  box.scrollTop = keepScroll;
+}
+
+/** Long wardrobe lists show this many styles (plus the one worn) until "Show all" or a search. */
+const VECTOR_CHIP_PAGE = 24;
+/** Per article type, kept across re-renders: { q: search text, all: list expanded }. */
+const vectorChipState = new Map();
+
+/**
+ * Search box and "Show all" for a long style row: filters the chips in
+ * place (label or article name), keeping the worn style and None visible.
+ */
+function addChipFinder(box, row, type, title, total) {
+  const state = vectorChipState.get(type) || { q: '', all: false };
+  vectorChipState.set(type, state);
+  const search = document.createElement('input');
+  search.type = 'search';
+  search.className = 'avatar-search';
+  search.placeholder = `Search ${total} ${title.toLowerCase()} styles`;
+  search.setAttribute('aria-label', `Search ${title.toLowerCase()} styles`);
+  search.value = state.q;
+  search.dataset.type = type;
+  const more = document.createElement('button');
+  more.type = 'button';
+  more.className = 'avatar-style-chip avatar-more-chip';
+  const empty = document.createElement('p');
+  empty.className = 'avatar-note';
+  empty.textContent = 'No style matches that.';
+  const apply = () => {
+    const q = state.q.trim().toLowerCase();
+    let index = 0;
+    let shown = 0;
+    let hidden = 0;
+    row.querySelectorAll('.avatar-style-chip[data-name]').forEach((chip) => {
+      const none = chip.dataset.name === 'none';
+      const i = none ? -1 : index++;
+      const match = q
+        ? chip.textContent.toLowerCase().includes(q) || chip.dataset.name.toLowerCase().includes(q)
+        : none || state.all || chip.classList.contains('active') || i < VECTOR_CHIP_PAGE;
+      chip.hidden = !match;
+      if (match) shown += 1;
+      else hidden += 1;
+    });
+    more.hidden = Boolean(q) || (!state.all && !hidden);
+    more.textContent = state.all ? 'Show fewer' : `Show all ${total}`;
+    empty.hidden = !q || shown > 0;
+    row.dataset.shown = String(shown);
+  };
+  search.addEventListener('input', () => { state.q = search.value; apply(); });
+  more.addEventListener('click', () => { state.all = !state.all; apply(); });
+  box.insertBefore(search, row);
+  row.appendChild(more);
+  box.insertBefore(empty, row.nextSibling);
+  apply();
 }
 
 /** Style chips for one article type, then the chosen article's colourways. */
@@ -6881,6 +6938,7 @@ function renderStyleChips(box, type, title) {
     row.appendChild(btn);
   }
   box.appendChild(row);
+  if (items.length > VECTOR_CHIP_PAGE) addChipFinder(box, row, type, title, items.length);
   const item = catalogItem(avatarCatalog, type, current);
   if (type === 'hat' && item && vectorPartName('hair') !== 'none' && !avatarCatalog.hatHair?.[item.name]?.includes(vectorPartName('hair'))) {
     const note = document.createElement('p');
