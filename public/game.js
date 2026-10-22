@@ -304,7 +304,9 @@ import {
   browseAchievementLog,
   seedAchievementNearCompletion,
   unlockAchievement,
+  groupLabelCount,
 } from './js/achievements.js?v=full-browser-1';
+import { applyStreetVisit } from './js/exploration.js';
 import {
   INCANTATION_LINES,
   INCANTATION_FEAT_TITLE,
@@ -454,6 +456,7 @@ import {
   starterToolsInventory,
   starterCraftIngredients,
   hasTool,
+  MAKING_TOOL_SKILLS,
 } from './js/making.js?v=recipes-full-1';
 import {
   createGarden,
@@ -6609,6 +6612,39 @@ function applyAchievementProgress(state, counter, amount = 1, pcRef = pc) {
   features.event(counter, amount, engine);
   playGameEventSound(counter);
   return updates;
+}
+
+/**
+ * Street-visit badge counters (js/exploration.js): explorer badges, hub
+ * Completists. Scenes built without a street (homes, rebuilt rooms) never
+ * count, like the original's quarters and greeting locations.
+ */
+function recordStreetVisit(tsid, { announce = true } = {}) {
+  const meta = STREET_INDEX.streets?.[tsid];
+  if (!meta || engine.inScene()) return [];
+  const updates = applyStreetVisit({
+    state: achieveState,
+    tsid,
+    hubId: meta.hubId,
+    indexStreets: STREET_INDEX.streets,
+    apply: (counter, amount) => applyAchievementProgress(achieveState, counter, amount, pc),
+  });
+  if (announce) announceAchievementUpdates(updates);
+  if (app?.view) app.view.dataset.locationsVisited = String(groupLabelCount(achieveState, 'locations_visited'));
+  return updates;
+}
+
+/**
+ * Saves from before street visits counted: credit every street already
+ * visited once (persistentWorldState keeps one slot per visited street).
+ */
+function backfillStreetVisits() {
+  if (groupLabelCount(achieveState, 'locations_visited') > 0) return;
+  const updates = [];
+  for (const tsid of Object.keys(persistentWorldState.streets || {})) {
+    updates.push(...recordStreetVisit(tsid, { announce: false }));
+  }
+  announceAchievementUpdates(updates);
 }
 
 /** Quest-only game events (no badge counter of their own). */
@@ -17617,6 +17653,7 @@ async function enterStreet(tsid, opts = {}) {
   spawnIlmenskieJones();
   features.streetEnter(data, engine, opts);
   if (firstVisit) emitGameEvent(`street_first_visit:${data.tsid}`);
+  recordStreetVisit(data.tsid);
   emitGameEvent(`street_entered:${String(data.label || '').toLowerCase().replace(/[^a-z0-9]+/g, '_')}`);
   if (app?.view) {
     const pop = currentStreetPopulation;
@@ -19253,6 +19290,19 @@ function updateMakeCraft(deltaMs) {
       ...applyAchievementProgress(achieveState, `making_known_tool:${record.recipe.tool}`, 1, pc),
       ...(record.recipe.id ? applyAchievementProgress(achieveState, `making_known_recipe:${record.recipe.id}`, 1, pc) : []),
     );
+    // inc_making.js:881: cooking tools count each output under making_food
+    // (Chowhound, Culinarian Supreme: distinct foods made).
+    // construction_tool.js:314: every furniture piece made (Domestic Completist).
+    if (record.recipe.tool === 'construction_tool') {
+      for (const output of record.recipe.outputs || []) {
+        achievementUpdates.push(...applyAchievementProgress(achieveState, `furniture_made:${output.classTsid}`, output.qty || 1, pc));
+      }
+    }
+    if (MAKING_TOOL_SKILLS[record.recipe.tool]?.makingType === 'cooking') {
+      for (const output of record.recipe.outputs || []) {
+        achievementUpdates.push(...applyAchievementProgress(achieveState, `making_food:${output.classTsid}`, 1, pc));
+      }
+    }
     announceAchievementUpdates(achievementUpdates);
     if (achievementCounter) app.view.dataset.achievementCounter = achievementCounter;
     updateHud();
@@ -20973,6 +21023,7 @@ async function main() {
     const mainQuests = ['animalkinship_pet_piggies', 'animalkinship_milk_butterflies'];
     state.questDone = mainQuests.every((id) => questState.completed.includes(id));
     handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });
+    backfillStreetVisits();
   }
   const homeDemo = String(bootParams.get('homedemo') || '').toLowerCase();
   if (homeDemo) {

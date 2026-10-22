@@ -147,7 +147,14 @@ export function normalizeAchievementSnapshot(seed = {}) {
     }
     progress[classTsid] = { progress: counters };
   }
-  return { progress, unlocked: cleanStringArray(seed?.unlocked) };
+  // Distinct labels per counter group (group_count badges).
+  const groups = {};
+  for (const [rawGroup, labels] of Object.entries(seed?.groups || {})) {
+    const group = String(rawGroup || '').trim();
+    if (!group || !Array.isArray(labels)) continue;
+    groups[group] = [...new Set(labels.map((label) => String(label || '').trim()).filter(Boolean))];
+  }
+  return { progress, unlocked: cleanStringArray(seed?.unlocked), groups };
 }
 
 export function normalizeBuffSnapshot(seed = {}) {

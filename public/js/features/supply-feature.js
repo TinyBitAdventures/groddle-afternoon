@@ -195,6 +195,8 @@ function runMachineVerb(classTsid, verbId, engine) {
   if (classTsid === MACHINE_STAND && verb === 'assemble') {
     const res = assembleMachine(inv, engine.pc, engine.toolState, arg, learned(engine));
     if (res.ok) engine.updateHud?.();
+    // metalmaker.js:1386 and siblings: machines_assembled:<machine>.
+    if (res.ok) engine.achievement?.(`machines_assembled:${arg}`, 1);
     say(engine, res.msg, res.ok);
     return true;
   }

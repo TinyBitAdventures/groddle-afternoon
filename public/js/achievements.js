@@ -12,7 +12,28 @@ export function createAchievementState() {
     progress: {},
     /** @type {string[]} */
     unlocked: [],
+    /** Distinct labels seen per counter group, for group_count conditions. @type {Record<string, string[]>} */
+    groups: {},
   };
+}
+
+/**
+ * Record a counter's label under its group and return the group's distinct
+ * label count (inc_achievements.js: group_count conditions compare
+ * counters_get_group_count, the number of labels in the group). A group may
+ * itself contain a colon (`VERB:iconize`), so the caller passes it.
+ */
+export function noteGroupLabel(state, group, label) {
+  if (!group || !label) return 0;
+  if (!state.groups || typeof state.groups !== 'object') state.groups = {};
+  const list = state.groups[group] || (state.groups[group] = []);
+  if (!list.includes(label)) list.push(label);
+  return list.length;
+}
+
+/** Distinct labels recorded for a group. */
+export function groupLabelCount(state, group) {
+  return state?.groups?.[group]?.length || 0;
 }
 
 /** Build the exact GSJS `group:label` counter key used by achievement conditions. */
@@ -258,11 +279,23 @@ export function applyAchievementProgress(state, counterName, amount = 1, pc = nu
   const delta = Math.max(0, Math.floor(Number(amount) || 0));
   if (!delta) return updates;
 
+  // group_count groups this counter belongs to (`VERB:iconize:ti` is label
+  // `ti` of group `VERB:iconize`): record the label once per group.
+  const groupCounts = new Map();
+  const groupCountFor = (c) => {
+    if (c.type !== 'group_count' || !c.group || !counterName.startsWith(`${c.group}:`)) return null;
+    if (!groupCounts.has(c.group)) {
+      groupCounts.set(c.group, noteGroupLabel(state, c.group, counterName.slice(c.group.length + 1)));
+    }
+    return groupCounts.get(c.group);
+  };
+
   for (const [id, def] of Object.entries(cat)) {
     if (state.unlocked.includes(id)) continue;
     const conds = def.conditions || [];
     if (!conds.length) continue;
     const matches = conds.filter((c) => {
+      if (c.type === 'group_count') return groupCountFor(c) != null;
       const exactCounter = group
         ? `${c.group}:${c.name}` === counterName
         : c.name === counterName;
@@ -275,7 +308,9 @@ export function applyAchievementProgress(state, counterName, amount = 1, pc = nu
     if (!state.progress[id]) state.progress[id] = { progress: {} };
     for (const c of matches) {
       const cur = state.progress[id].progress[c.name] || 0;
-      state.progress[id].progress[c.name] = Math.min(c.num, cur + delta);
+      state.progress[id].progress[c.name] = c.type === 'group_count'
+        ? Math.min(c.num, Math.max(cur, groupCounts.get(c.group) || 0))
+        : Math.min(c.num, cur + delta);
     }
     const done = conds.every((c) => (state.progress[id].progress[c.name] || 0) >= c.num);
     if (done) {
