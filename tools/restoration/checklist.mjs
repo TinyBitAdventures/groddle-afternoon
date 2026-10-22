@@ -82,9 +82,9 @@ export const CHECKLIST = Object.freeze([
   { id: 'newxp', group: 'world', name: 'The new-player tutorial', status: 'rebuilt',
     blurb: 'An optional start: fall through the clouds, learn to walk and jump with the Welcoming Flamingo and the Dustbunny, get your home street and first skill, buy two bags on Gentle Island, and head out into Ur.',
     evidence: ['public/js/newxp.js', 'public/js/features/newxp-feature.js'] },
-  { id: 'secrets', group: 'world', name: 'Eleven Secret Locations', status: 'progress',
-    blurb: 'Beacons on twenty secret spots across Ur, each with a Giant’s message.',
-    evidence: [] },
+  { id: 'secrets', group: 'world', name: 'Eleven Secret Locations', status: 'source',
+    blurb: 'Twenty DNAja-vu beacons across Ur, a Giant’s message at each, and Lem’s at the eleventh.',
+    evidence: ['public/js/secret-spots.js', 'public/js/features/secret-spots-feature.js'] },
 
   // —— Creatures & trees ——
   { id: 'piggies', group: 'creatures', name: 'Piggies', status: 'source', spot: 'piggy',

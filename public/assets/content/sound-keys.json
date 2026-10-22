@@ -2,8 +2,8 @@
  "generatedBy": "build-sound-keys.mjs",
  "soundsXml": "http://c2.glitch.bz/sounds/2012-12/sounds_1354665929.xml (not archived)",
  "counts": {
-  "keys": 636,
-  "original": 604,
+  "keys": 638,
+  "original": 606,
   "music": 205,
   "remake": 32,
   "recoveredWayback": 38,
@@ -12,6 +12,28 @@
   "aliases": 3
  },
  "keys": {
+  "11_SECRET_LOCATIONS_BEACON_LOOP": {
+   "category": "event",
+   "moment": "players/inc_eleven_secrets.js:217 (showSecretLocationMarker)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_eleven_secrets.js:217 (showSecretLocationMarker)"
+   ]
+  },
+  "11_SECRET_LOCATIONS_COLLISION": {
+   "category": "event",
+   "moment": "players/inc_eleven_secrets.js:238 (triggerSecretLocationMarker)",
+   "uses": 1,
+   "via": [
+    "announce_sound"
+   ],
+   "sources": [
+    "gsjs:players/inc_eleven_secrets.js:238 (triggerSecretLocationMarker)"
+   ]
+  },
   "ABANDONDED_APARTMENTS2": {
    "category": "music",
    "moment": "inc_data_sounds.js (music_map)",

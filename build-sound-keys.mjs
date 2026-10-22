@@ -221,7 +221,8 @@ function contextName(lines, index) {
 
 const keys = new Map();
 function note(key, { category = '', where, context = '', via }) {
-  if (!key || !/^[A-Za-z][A-Za-z0-9_]*$/.test(key)) return;
+  // Keys may start with a number word prefix (11_SECRET_LOCATIONS_BEACON_LOOP, inc_eleven_secrets.js).
+  if (!key || !/^(?:[A-Za-z]|\d+_[A-Za-z])[A-Za-z0-9_]*$/.test(key)) return;
   const row = keys.get(key) || { key, category, uses: 0, sources: [], via: new Set() };
   row.uses += 1;
   row.via.add(via);

@@ -75,3 +75,4 @@ export const FEATURES = [
 ];
 import { smugglingFeature } from './smuggling-feature.js?v=smuggling-1'; FEATURES.push(smugglingFeature);
 import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-1'; FEATURES.push(homeTowerFeature);
+import { secretSpotsFeature } from './secret-spots-feature.js?v=secrets-1'; FEATURES.push(secretSpotsFeature);

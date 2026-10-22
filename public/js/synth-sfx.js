@@ -277,6 +277,18 @@ export const SYNTH_RECIPES = Object.freeze({
     for (let i = 0; i < 6; i += 1) tone(c, o, t + i * 0.035, { f: NOTE(PENTA[(i * 3 + (p.variant || 0)) % PENTA.length], 1318 * p.r), peak: 0.035, decay: 0.18 });
     return noise(c, o, t, { filter: 'highpass', f: 6000, attack: 0.05, peak: 0.02, decay: 0.25 }) + 0.2;
   },
+  // Eleven Secret Locations: the beacon over a pending DNAja-vu spot (a soft
+  // airy shimmer, looped) and the jolt when the avatar walks into one.
+  secretBeacon: (c, o, t, p) => {
+    noise(c, o, t, { filter: 'bandpass', f: 2400 * p.r, f2: 4200 * p.r, q: 3, attack: 0.25, peak: 0.012, decay: 0.6 });
+    tone(c, o, t + 0.05, { f: 1568 * p.r, peak: 0.022, attack: 0.18, decay: 0.7, vibrato: 9, vibratoRate: 5 });
+    return 0.32 + tone(c, o, t + 0.32, { f: 2093 * p.r, peak: 0.016, attack: 0.2, decay: 0.8, vibrato: 9, vibratoRate: 5 });
+  },
+  secretJolt: (c, o, t, p) => {
+    noise(c, o, t, { filter: 'bandpass', f: 500, f2: 5200, q: 1.4, attack: 0.01, peak: 0.07, decay: 0.28 });
+    tone(c, o, t, { type: 'triangle', f: 220 * p.r, f2: 880 * p.r, glide: 0.18, peak: 0.08, decay: 0.25, vibrato: 30, vibratoRate: 22 });
+    return 0.2 + arp(c, o, t + 0.2, [12, 7, 16, 19], { base: 659 * p.r, step: 0.05, peak: 0.05, decay: 0.5 });
+  },
   fanfare: (c, o, t, p) => {
     arp(c, o, t, [0, 4, 7], { base: 523 * p.r, step: 0.1, peak: 0.08, decay: 0.3, kind: 'triangle' });
     return bell(c, o, t + 0.32, { f: 1046 * p.r, peak: 0.1, decay: 1.1 }) + 0.32;
@@ -676,6 +688,8 @@ const KEY_RECIPES = {
   PET_TRANT: 'rustle',
   HARVEST: 'harvest',
   RAINBOW_SUPERHARVEST: 'sparkle',
+  '11_SECRET_LOCATIONS_BEACON_LOOP': 'secretBeacon',
+  '11_SECRET_LOCATIONS_COLLISION': 'secretJolt',
   WATERING_CAN: 'watering',
   IRRIGATOR_9000: 'watering',
   HOE: 'hoeScrape',
