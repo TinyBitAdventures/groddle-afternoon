@@ -35,7 +35,7 @@ describe('3x vector sprite sheets', () => {
     assert.ok(HIRES_SPRITES.has(walkUrl));
     assert.match(hiresSpriteUrl(walkUrl), /@3x\.(png|webp)$/);
     assert.match(hiresSpriteUrl(`./${walkUrl}?v=2`), /@3x\.(png|webp)\?v=2$/);
-    assert.equal(hiresSpriteUrl('assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png'), null);
+    assert.equal(hiresSpriteUrl('assets/sprites/npc_piggy__x1_chew_png_1354829433.png'), null);
     assert.equal(hiresSpriteUrl(hiresSpriteUrl(walkUrl)), null);
   });
 

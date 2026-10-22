@@ -744,7 +744,7 @@ import {
 } from './js/sound-moments.js';
 import { moodMax } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js';
-import { installHiresSprites } from './js/sprite-hires.js';
+import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js';
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 
@@ -21061,6 +21061,8 @@ async function main() {
     resolution: renderResolution(VIEW_W, VIEW_W, window.devicePixelRatio || 1),
     autoDensity: true,
   });
+  // Character, NPC and shrine sheets swap to 3x when first drawn.
+  installHiresFirstDraw(app.renderer, PIXI);
   app.view.setAttribute('role', 'application');
   app.view.setAttribute('aria-label', 'Groddle game world');
   app.view.tabIndex = 0;

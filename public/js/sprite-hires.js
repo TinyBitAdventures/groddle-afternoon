@@ -8,6 +8,12 @@
 export const HIRES_SPRITES = new Map([
   ["assets/sprites/animals/npc_batterfly_chew.webp", "assets/sprites/animals/npc_batterfly_chew@3x.webp"],
   ["assets/sprites/animals/npc_batterfly_profile.webp", "assets/sprites/animals/npc_batterfly_profile@3x.webp"],
+  ["assets/sprites/foxes/bait-bait1.png", "assets/sprites/foxes/bait-bait1@3x.webp"],
+  ["assets/sprites/foxes/bait-bait2.png", "assets/sprites/foxes/bait-bait2@3x.webp"],
+  ["assets/sprites/foxes/bait-bait3.png", "assets/sprites/foxes/bait-bait3@3x.webp"],
+  ["assets/sprites/foxes/bait-stink1.png", "assets/sprites/foxes/bait-stink1@3x.webp"],
+  ["assets/sprites/foxes/bait-stink2.png", "assets/sprites/foxes/bait-stink2@3x.webp"],
+  ["assets/sprites/foxes/bait-stink3.png", "assets/sprites/foxes/bait-stink3@3x.webp"],
   ["assets/sprites/foxes/fox-orange-brushed.png", "assets/sprites/foxes/fox-orange-brushed@3x.webp"],
   ["assets/sprites/foxes/fox-orange-eat.png", "assets/sprites/foxes/fox-orange-eat@3x.webp"],
   ["assets/sprites/foxes/fox-orange-eatEnd.png", "assets/sprites/foxes/fox-orange-eatEnd@3x.webp"],
@@ -20,6 +26,10 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/foxes/fox-silver-eatStart.png", "assets/sprites/foxes/fox-silver-eatStart@3x.webp"],
   ["assets/sprites/foxes/fox-silver-pause.png", "assets/sprites/foxes/fox-silver-pause@3x.webp"],
   ["assets/sprites/foxes/fox-silver-run.png", "assets/sprites/foxes/fox-silver-run@3x.webp"],
+  ["assets/sprites/foxes/ranger-idle0.png", "assets/sprites/foxes/ranger-idle0@3x.webp"],
+  ["assets/sprites/foxes/ranger-idle1.png", "assets/sprites/foxes/ranger-idle1@3x.webp"],
+  ["assets/sprites/foxes/ranger-idle2.png", "assets/sprites/foxes/ranger-idle2@3x.webp"],
+  ["assets/sprites/foxes/ranger-talk.png", "assets/sprites/foxes/ranger-talk@3x.webp"],
   ["assets/sprites/kitties/kitty-appear.png", "assets/sprites/kitties/kitty-appear@3x.webp"],
   ["assets/sprites/kitties/kitty-blink.png", "assets/sprites/kitties/kitty-blink@3x.webp"],
   ["assets/sprites/kitties/kitty-chew.png", "assets/sprites/kitties/kitty-chew@3x.webp"],
@@ -30,16 +40,205 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/kitties/kitty-jump.png", "assets/sprites/kitties/kitty-jump@3x.webp"],
   ["assets/sprites/kitties/kitty-sleep.png", "assets/sprites/kitties/kitty-sleep@3x.webp"],
   ["assets/sprites/kitties/kitty-sleepStart.png", "assets/sprites/kitties/kitty-sleepStart@3x.webp"],
+  ["assets/sprites/newxp/dustbunny_idle.png", "assets/sprites/newxp/dustbunny_idle@3x.webp"],
+  ["assets/sprites/newxp/dustbunny_talk.png", "assets/sprites/newxp/dustbunny_talk@3x.webp"],
+  ["assets/sprites/newxp/dustbunny_walk_right.png", "assets/sprites/newxp/dustbunny_walk_right@3x.webp"],
+  ["assets/sprites/newxp/dustbunny_walk.png", "assets/sprites/newxp/dustbunny_walk@3x.webp"],
+  ["assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png", "assets/sprites/npc_butterfly__x1_fly-side_png_1354829525@3x.webp"],
+  ["assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530.png", "assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530@3x.webp"],
   ["assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png", "assets/sprites/npc_chicken__x1_pecking_once_png_1354830398@3x.webp"],
   ["assets/sprites/npc_chicken__x1_walk_png_1354830385.png", "assets/sprites/npc_chicken__x1_walk_png_1354830385@3x.webp"],
   ["assets/sprites/npc_piggy__x1_nibble_png_1354829441.png", "assets/sprites/npc_piggy__x1_nibble_png_1354829441@3x.webp"],
   ["assets/sprites/npc_piggy__x1_walk_png_1354829432.png", "assets/sprites/npc_piggy__x1_walk_png_1354829432@3x.webp"],
+  ["assets/sprites/quest-rooms/back_alley/bot_attract.png", "assets/sprites/quest-rooms/back_alley/bot_attract@3x.webp"],
+  ["assets/sprites/quest-rooms/back_alley/bot_move.png", "assets/sprites/quest-rooms/back_alley/bot_move@3x.webp"],
+  ["assets/sprites/quest-rooms/color_unblocking/npc_crab_idle0.png", "assets/sprites/quest-rooms/color_unblocking/npc_crab_idle0@3x.webp"],
+  ["assets/sprites/quest-rooms/color_unblocking/npc_crab_talk.png", "assets/sprites/quest-rooms/color_unblocking/npc_crab_talk@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/cactus_idle.webp", "assets/sprites/quest-rooms/gwendolyn/cactus_idle@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/cactus_talk.webp", "assets/sprites/quest-rooms/gwendolyn/cactus_talk@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/gwendolyn_idle.webp", "assets/sprites/quest-rooms/gwendolyn/gwendolyn_idle@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/gwendolyn_talk.webp", "assets/sprites/quest-rooms/gwendolyn/gwendolyn_talk@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png", "assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest.png", "assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest@3x.webp"],
+  ["assets/sprites/quest-rooms/kids_room/mr-block-A.png", "assets/sprites/quest-rooms/kids_room/mr-block-A@3x.webp"],
+  ["assets/sprites/quest-rooms/kids_room/mr-block-B.png", "assets/sprites/quest-rooms/kids_room/mr-block-B@3x.webp"],
+  ["assets/sprites/quest-rooms/kids_room/mr-block-E.png", "assets/sprites/quest-rooms/kids_room/mr-block-E@3x.webp"],
+  ["assets/sprites/quest-rooms/kids_room/mr-block-M.png", "assets/sprites/quest-rooms/kids_room/mr-block-M@3x.webp"],
+  ["assets/sprites/quest-rooms/kids_room/mr-block-S.png", "assets/sprites/quest-rooms/kids_room/mr-block-S@3x.webp"],
+  ["assets/sprites/quest-rooms/kids_room/mr-block-T.png", "assets/sprites/quest-rooms/kids_room/mr-block-T@3x.webp"],
+  ["assets/sprites/quest-rooms/le_miserable/bot_idle.png", "assets/sprites/quest-rooms/le_miserable/bot_idle@3x.webp"],
+  ["assets/sprites/quest-rooms/le_miserable/bot_talk.png", "assets/sprites/quest-rooms/le_miserable/bot_talk@3x.webp"],
+  ["assets/sprites/quest-rooms/vision_quest/crab_idle.png", "assets/sprites/quest-rooms/vision_quest/crab_idle@3x.webp"],
+  ["assets/sprites/quest-rooms/vision_quest/frog_idle.png", "assets/sprites/quest-rooms/vision_quest/frog_idle@3x.webp"],
+  ["assets/sprites/quest-rooms/vision_quest/frog_move.png", "assets/sprites/quest-rooms/vision_quest/frog_move@3x.webp"],
+  ["assets/sprites/quest-rooms/vision_quest/frog_talk.png", "assets/sprites/quest-rooms/vision_quest/frog_talk@3x.webp"],
+  ["assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_idle_stand_png_1354831147.png", "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_idle_stand_png_1354831147@3x.webp"],
+  ["assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_talk_png_1354831143.png", "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_talk_png_1354831143@3x.webp"],
+  ["assets/sprites/quests/four-letter/letter-block-A.png", "assets/sprites/quests/four-letter/letter-block-A@3x.webp"],
+  ["assets/sprites/quests/four-letter/letter-block-B.png", "assets/sprites/quests/four-letter/letter-block-B@3x.webp"],
+  ["assets/sprites/quests/four-letter/letter-block-E.png", "assets/sprites/quests/four-letter/letter-block-E@3x.webp"],
+  ["assets/sprites/quests/four-letter/letter-block-M.png", "assets/sprites/quests/four-letter/letter-block-M@3x.webp"],
+  ["assets/sprites/quests/four-letter/letter-block-S.png", "assets/sprites/quests/four-letter/letter-block-S@3x.webp"],
+  ["assets/sprites/quests/four-letter/letter-block-T.png", "assets/sprites/quests/four-letter/letter-block-T@3x.webp"],
+  ["assets/sprites/quests/four-letter/mr-block.png", "assets/sprites/quests/four-letter/mr-block@3x.webp"],
+  ["assets/sprites/quests/ilmenskie/jones-walk.png", "assets/sprites/quests/ilmenskie/jones-walk@3x.webp"],
+  ["assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png", "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995@3x.webp"],
+  ["assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png", "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993@3x.webp"],
+  ["assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.png", "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004@3x.webp"],
+  ["assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png", "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002@3x.webp"],
+  ["assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.png", "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012@3x.webp"],
+  ["assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png", "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010@3x.webp"],
+  ["assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.png", "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021@3x.webp"],
+  ["assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png", "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019@3x.webp"],
   ["assets/sprites/resources/salmon-swim-right-down15.png", "assets/sprites/resources/salmon-swim-right-down15@3x.webp"],
   ["assets/sprites/resources/salmon-swim-right-down30.png", "assets/sprites/resources/salmon-swim-right-down30@3x.webp"],
   ["assets/sprites/resources/salmon-swim-right-up15.png", "assets/sprites/resources/salmon-swim-right-up15@3x.webp"],
   ["assets/sprites/resources/salmon-swim-right-up30.png", "assets/sprites/resources/salmon-swim-right-up30@3x.webp"],
   ["assets/sprites/resources/salmon-swim-right.png", "assets/sprites/resources/salmon-swim-right@3x.webp"],
   ["assets/sprites/resources/salmon-turn-right.png", "assets/sprites/resources/salmon-turn-right@3x.webp"],
+  ["assets/sprites/rooks/butterfly-fly-rooked.png", "assets/sprites/rooks/butterfly-fly-rooked@3x.webp"],
+  ["assets/sprites/rooks/butterfly-rest-rooked.png", "assets/sprites/rooks/butterfly-rest-rooked@3x.webp"],
+  ["assets/sprites/rooks/chicken-rooked1.png", "assets/sprites/rooks/chicken-rooked1@3x.webp"],
+  ["assets/sprites/rooks/chicken-rooked2.png", "assets/sprites/rooks/chicken-rooked2@3x.webp"],
+  ["assets/sprites/rooks/forehorseman-frantic.webp", "assets/sprites/rooks/forehorseman-frantic@3x.webp"],
+  ["assets/sprites/rooks/kitty-sad.png", "assets/sprites/rooks/kitty-sad@3x.webp"],
+  ["assets/sprites/rooks/piggy-rooked1.png", "assets/sprites/rooks/piggy-rooked1@3x.webp"],
+  ["assets/sprites/rooks/piggy-rooked2.png", "assets/sprites/rooks/piggy-rooked2@3x.webp"],
+  ["assets/sprites/rooks/rook-head-angry1.png", "assets/sprites/rooks/rook-head-angry1@3x.webp"],
+  ["assets/sprites/rooks/rook-head-angry2.png", "assets/sprites/rooks/rook-head-angry2@3x.webp"],
+  ["assets/sprites/rooks/rook-head-angry3.png", "assets/sprites/rooks/rook-head-angry3@3x.webp"],
+  ["assets/sprites/rooks/rook-head-dead.png", "assets/sprites/rooks/rook-head-dead@3x.webp"],
+  ["assets/sprites/rooks/rook-head-idle1.png", "assets/sprites/rooks/rook-head-idle1@3x.webp"],
+  ["assets/sprites/rooks/rook-head-killShot.png", "assets/sprites/rooks/rook-head-killShot@3x.webp"],
+  ["assets/sprites/rooks/rook-head-stun.png", "assets/sprites/rooks/rook-head-stun@3x.webp"],
+  ["assets/sprites/rooks/rook-head-stunned.png", "assets/sprites/rooks/rook-head-stunned@3x.webp"],
+  ["assets/sprites/rooks/rook-head-stunnedHit.png", "assets/sprites/rooks/rook-head-stunnedHit@3x.webp"],
+  ["assets/sprites/rooks/rook-head-taunt.png", "assets/sprites/rooks/rook-head-taunt@3x.webp"],
+  ["assets/sprites/shrines/alph_close.png", "assets/sprites/shrines/alph_close@3x.webp"],
+  ["assets/sprites/shrines/alph_open.png", "assets/sprites/shrines/alph_open@3x.webp"],
+  ["assets/sprites/shrines/cosma_close.png", "assets/sprites/shrines/cosma_close@3x.webp"],
+  ["assets/sprites/shrines/cosma_open.png", "assets/sprites/shrines/cosma_open@3x.webp"],
+  ["assets/sprites/shrines/friendly_close.png", "assets/sprites/shrines/friendly_close@3x.webp"],
+  ["assets/sprites/shrines/friendly_open.png", "assets/sprites/shrines/friendly_open@3x.webp"],
+  ["assets/sprites/shrines/grendaline_close.png", "assets/sprites/shrines/grendaline_close@3x.webp"],
+  ["assets/sprites/shrines/grendaline_open.png", "assets/sprites/shrines/grendaline_open@3x.webp"],
+  ["assets/sprites/shrines/humbaba_close.png", "assets/sprites/shrines/humbaba_close@3x.webp"],
+  ["assets/sprites/shrines/humbaba_open.png", "assets/sprites/shrines/humbaba_open@3x.webp"],
+  ["assets/sprites/shrines/lem_close.png", "assets/sprites/shrines/lem_close@3x.webp"],
+  ["assets/sprites/shrines/lem_open.png", "assets/sprites/shrines/lem_open@3x.webp"],
+  ["assets/sprites/shrines/mab_close.png", "assets/sprites/shrines/mab_close@3x.webp"],
+  ["assets/sprites/shrines/mab_open.png", "assets/sprites/shrines/mab_open@3x.webp"],
+  ["assets/sprites/shrines/pot_close.png", "assets/sprites/shrines/pot_close@3x.webp"],
+  ["assets/sprites/shrines/pot_open.png", "assets/sprites/shrines/pot_open@3x.webp"],
+  ["assets/sprites/shrines/spriggan_close.png", "assets/sprites/shrines/spriggan_close@3x.webp"],
+  ["assets/sprites/shrines/spriggan_open.png", "assets/sprites/shrines/spriggan_open@3x.webp"],
+  ["assets/sprites/shrines/ti_close.png", "assets/sprites/shrines/ti_close@3x.webp"],
+  ["assets/sprites/shrines/ti_open.png", "assets/sprites/shrines/ti_open@3x.webp"],
+  ["assets/sprites/shrines/zille_close.png", "assets/sprites/shrines/zille_close@3x.webp"],
+  ["assets/sprites/shrines/zille_open.png", "assets/sprites/shrines/zille_open@3x.webp"],
+]);
+
+/**
+ * Sheets that stay 1x until the renderer first draws them (characters, NPCs,
+ * shrines: big sheets that are often loaded and rarely all on screen).
+ * installHiresSprites leaves them out of the eager Texture.from route and
+ * installHiresFirstDraw swaps them in place on first upload.
+ */
+export const FIRST_DRAW_SPRITES = new Set([
+  "assets/sprites/foxes/bait-bait1.png",
+  "assets/sprites/foxes/bait-bait2.png",
+  "assets/sprites/foxes/bait-bait3.png",
+  "assets/sprites/foxes/bait-stink1.png",
+  "assets/sprites/foxes/bait-stink2.png",
+  "assets/sprites/foxes/bait-stink3.png",
+  "assets/sprites/foxes/ranger-idle0.png",
+  "assets/sprites/foxes/ranger-idle1.png",
+  "assets/sprites/foxes/ranger-idle2.png",
+  "assets/sprites/foxes/ranger-talk.png",
+  "assets/sprites/newxp/dustbunny_idle.png",
+  "assets/sprites/newxp/dustbunny_talk.png",
+  "assets/sprites/newxp/dustbunny_walk_right.png",
+  "assets/sprites/newxp/dustbunny_walk.png",
+  "assets/sprites/quest-rooms/back_alley/bot_attract.png",
+  "assets/sprites/quest-rooms/back_alley/bot_move.png",
+  "assets/sprites/quest-rooms/color_unblocking/npc_crab_idle0.png",
+  "assets/sprites/quest-rooms/color_unblocking/npc_crab_talk.png",
+  "assets/sprites/quest-rooms/gwendolyn/cactus_idle.webp",
+  "assets/sprites/quest-rooms/gwendolyn/cactus_talk.webp",
+  "assets/sprites/quest-rooms/gwendolyn/gwendolyn_idle.webp",
+  "assets/sprites/quest-rooms/gwendolyn/gwendolyn_talk.webp",
+  "assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png",
+  "assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest.png",
+  "assets/sprites/quest-rooms/kids_room/mr-block-A.png",
+  "assets/sprites/quest-rooms/kids_room/mr-block-B.png",
+  "assets/sprites/quest-rooms/kids_room/mr-block-E.png",
+  "assets/sprites/quest-rooms/kids_room/mr-block-M.png",
+  "assets/sprites/quest-rooms/kids_room/mr-block-S.png",
+  "assets/sprites/quest-rooms/kids_room/mr-block-T.png",
+  "assets/sprites/quest-rooms/le_miserable/bot_idle.png",
+  "assets/sprites/quest-rooms/le_miserable/bot_talk.png",
+  "assets/sprites/quest-rooms/vision_quest/crab_idle.png",
+  "assets/sprites/quest-rooms/vision_quest/frog_idle.png",
+  "assets/sprites/quest-rooms/vision_quest/frog_move.png",
+  "assets/sprites/quest-rooms/vision_quest/frog_talk.png",
+  "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_idle_stand_png_1354831147.png",
+  "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_talk_png_1354831143.png",
+  "assets/sprites/quests/four-letter/letter-block-A.png",
+  "assets/sprites/quests/four-letter/letter-block-B.png",
+  "assets/sprites/quests/four-letter/letter-block-E.png",
+  "assets/sprites/quests/four-letter/letter-block-M.png",
+  "assets/sprites/quests/four-letter/letter-block-S.png",
+  "assets/sprites/quests/four-letter/letter-block-T.png",
+  "assets/sprites/quests/four-letter/mr-block.png",
+  "assets/sprites/quests/ilmenskie/jones-walk.png",
+  "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png",
+  "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png",
+  "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.png",
+  "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png",
+  "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.png",
+  "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png",
+  "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.png",
+  "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png",
+  "assets/sprites/rooks/butterfly-fly-rooked.png",
+  "assets/sprites/rooks/butterfly-rest-rooked.png",
+  "assets/sprites/rooks/chicken-rooked1.png",
+  "assets/sprites/rooks/chicken-rooked2.png",
+  "assets/sprites/rooks/forehorseman-frantic.webp",
+  "assets/sprites/rooks/kitty-sad.png",
+  "assets/sprites/rooks/piggy-rooked1.png",
+  "assets/sprites/rooks/piggy-rooked2.png",
+  "assets/sprites/rooks/rook-head-angry1.png",
+  "assets/sprites/rooks/rook-head-angry2.png",
+  "assets/sprites/rooks/rook-head-angry3.png",
+  "assets/sprites/rooks/rook-head-dead.png",
+  "assets/sprites/rooks/rook-head-idle1.png",
+  "assets/sprites/rooks/rook-head-killShot.png",
+  "assets/sprites/rooks/rook-head-stun.png",
+  "assets/sprites/rooks/rook-head-stunned.png",
+  "assets/sprites/rooks/rook-head-stunnedHit.png",
+  "assets/sprites/rooks/rook-head-taunt.png",
+  "assets/sprites/shrines/alph_close.png",
+  "assets/sprites/shrines/alph_open.png",
+  "assets/sprites/shrines/cosma_close.png",
+  "assets/sprites/shrines/cosma_open.png",
+  "assets/sprites/shrines/friendly_close.png",
+  "assets/sprites/shrines/friendly_open.png",
+  "assets/sprites/shrines/grendaline_close.png",
+  "assets/sprites/shrines/grendaline_open.png",
+  "assets/sprites/shrines/humbaba_close.png",
+  "assets/sprites/shrines/humbaba_open.png",
+  "assets/sprites/shrines/lem_close.png",
+  "assets/sprites/shrines/lem_open.png",
+  "assets/sprites/shrines/mab_close.png",
+  "assets/sprites/shrines/mab_open.png",
+  "assets/sprites/shrines/pot_close.png",
+  "assets/sprites/shrines/pot_open.png",
+  "assets/sprites/shrines/spriggan_close.png",
+  "assets/sprites/shrines/spriggan_open.png",
+  "assets/sprites/shrines/ti_close.png",
+  "assets/sprites/shrines/ti_open.png",
+  "assets/sprites/shrines/zille_close.png",
+  "assets/sprites/shrines/zille_open.png",
 ]);
 
 let enabled = true;
@@ -49,9 +248,17 @@ export function hiresSpriteUrl(url) {
   if (!enabled) return null;
   const s = String(url || '');
   const q = s.indexOf('?');
-  const path = (q < 0 ? s : s.slice(0, q)).replace(/^\.?\//, '');
-  const hi = HIRES_SPRITES.get(path);
+  const hi = HIRES_SPRITES.get(sheetPath(s));
   return hi ? hi + (q < 0 ? '' : s.slice(q)) : null;
+}
+
+/** A sheet URL as its HIRES_SPRITES key (from `assets/`, no query). */
+function sheetPath(url) {
+  const s = String(url || '');
+  const q = s.indexOf('?');
+  const path = q < 0 ? s : s.slice(0, q);
+  const at = path.indexOf('assets/');
+  return at < 0 ? path.replace(/^\.?\//, '') : path.slice(at);
 }
 
 /**
@@ -64,7 +271,8 @@ export function installHiresSprites(PIXI, { dpr = globalThis.devicePixelRatio ||
   enabled = dpr * Math.max(1, viewWidth / 960) >= 1.5;
   if (!enabled || !PIXI?.Texture || PIXI.Texture.from.hiresSprites) return;
   const from = PIXI.Texture.from.bind(PIXI.Texture);
-  const patched = (source, ...rest) => from(typeof source === 'string' ? hiresSpriteUrl(source) || source : source, ...rest);
+  const eager = (source) => (FIRST_DRAW_SPRITES.has(sheetPath(source)) ? null : hiresSpriteUrl(source));
+  const patched = (source, ...rest) => from(typeof source === 'string' ? eager(source) || source : source, ...rest);
   patched.hiresSprites = true;
   for (const key of Object.keys(PIXI.Texture.from)) patched[key] = PIXI.Texture.from[key];
   PIXI.Texture.from = patched;
@@ -104,4 +312,34 @@ export function upgradeBaseTexture(PIXI, base, url) {
     })
     .catch(() => false);
   return base.hiresUpgrade;
+}
+
+/** The listed 1x sheet a BaseTexture was loaded from, or null. */
+export function baseTextureSheet(base) {
+  const ids = [base?.cacheId, ...(base?.textureCacheIds || []), base?.resource?.src, base?.resource?.url];
+  for (const id of ids) {
+    if (typeof id !== 'string' || !id) continue;
+    const path = sheetPath(id);
+    if (HIRES_SPRITES.has(path)) return path;
+  }
+  return null;
+}
+
+/**
+ * Swap any listed sheet to 3x the first time the renderer uploads its 1x
+ * texture (TextureSystem.initTexture runs once per BaseTexture), whatever
+ * loaded it: game.js SHEETS, quest-room kits, feature modules. Sheets that
+ * are loaded but never drawn keep their 1x pixels.
+ */
+export function installHiresFirstDraw(renderer, PIXI) {
+  const system = renderer?.texture;
+  if (!enabled || !system?.initTexture || system.hiresFirstDraw) return;
+  const init = system.initTexture.bind(system);
+  system.initTexture = (base) => {
+    const gl = init(base);
+    const path = base?.hiresUpgrade ? null : baseTextureSheet(base);
+    if (path) upgradeBaseTexture(PIXI, base, path);
+    return gl;
+  };
+  system.hiresFirstDraw = true;
 }

@@ -1,5 +1,5 @@
 {
-  "about": "Animal sheets the game draws in the world, paired with their vector SWF (glitch-items, CC0). path is relative to public/; label is the SWF FrameLabel shown in cell `first` (default 0); frames = cells to fill. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/animals.json",
+  "about": "Animal sheets the game draws in the world, paired with their vector SWF (glitch-items, CC0; the butterfly SWF is a Wayback recovery, ~/Documents/glitch-audit/wayback/items-swf). path is relative to public/; label is the SWF FrameLabel shown in cell `first` (default 0); frames = cells to fill. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/animals.json",
   "jobs": [
     { "name": "piggy", "swf": "inhabitants/piggy/npc_piggy.swf", "sprite": 79, "sheets": [
       { "path": "assets/sprites/npc_piggy__x1_walk_png_1354829432.png", "label": "walk", "fw": 88, "fh": 62, "cols": 8, "frames": 24 },
@@ -40,6 +40,12 @@
       { "path": "assets/sprites/kitties/kitty-jump.png", "label": "3jump", "fw": 136, "fh": 115, "cols": 6, "frames": 16 },
       { "path": "assets/sprites/kitties/kitty-hitBall.png", "label": "3hitBall", "fw": 136, "fh": 115, "cols": 5, "frames": 9 },
       { "path": "assets/sprites/kitties/kitty-disappear.png", "label": "3disappear", "fw": 136, "fh": 115, "cols": 7, "frames": 27 }
+    ] },
+    { "name": "butterfly", "swf": "../wayback/items-swf/npc_butterfly-1306966114.swf", "sprite": 8, "zoom": 0.315, "sheets": [
+      { "path": "assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png", "label": "fly", "fw": 70, "fh": 65, "cols": 14, "frames": 84 }
+    ] },
+    { "name": "butterfly-rest", "swf": "../wayback/items-swf/npc_butterfly-1306966114.swf", "sprite": 10, "zoom": 2.1, "sheets": [
+      { "path": "assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530.png", "label": "rest", "fw": 70, "fh": 65, "cols": 6, "frames": 6 }
     ] },
     { "name": "salmon", "swf": "inhabitants/salmon/npc_salmon.swf", "sprite": 16, "sheets": [
       { "path": "assets/sprites/resources/salmon-swim-right.png", "label": "swimRight", "fw": 59, "fh": 37, "cols": 11, "frames": 22 },

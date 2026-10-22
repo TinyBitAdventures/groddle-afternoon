@@ -16,6 +16,21 @@
  *  5. tools/vector-sprites/results.json (scores, placement) and the generated
  *     public/js/sprite-hires.js (1x path -> 3x path) are updated.
  *
+ * Manifest options (characters.json uses them):
+ *  - "budget": { "maxSide": px, "maxMB": decoded MB } rejects a sheet whose 3x
+ *    file would be larger, before any rendering.
+ *  - "firstDraw": true (manifest or job) keeps the sheet out of the eager
+ *    Texture.from route: it swaps to 3x when the renderer first draws it.
+ *  - job "character": sheets sharing one are all-or-nothing (a character
+ *    that is sharp in one state and soft in the next looks broken), so one
+ *    rejected sheet holds back the others. Defaults to the job name.
+ *  - job "swf" may be absolute (Wayback recoveries outside glitch-items).
+ *  - sheet "step": cell k shows SWF frame start + shift + k * step.
+ *  - job "zoom": FFDec zoom when the OGA sheet was drawn at another scale
+ *    than the SWF (3 x that scale; the 3x file is still 3x the OGA pixels).
+ *  - job "parts": { "<placed class>": "<class>" | null } renders a runtime
+ *    variant (swf-parts.mjs swaps the placed part symbols in a work copy).
+ *
  * Usage:
  *   node tools/vector-sprites/build.mjs [--manifest tools/vector-sprites/animals.json]
  *        [--only <substring>] [--work <dir>] [--dry]
@@ -25,7 +40,9 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { basename, dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
+import { createHash } from 'node:crypto';
 import { FFDEC, JAVA, swfSprites } from './swf-labels.mjs';
+import { swapParts } from './swf-parts.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
@@ -177,13 +194,13 @@ const scoreOf = ({ ea, ec, m }) => (m === 0 ? 1 : 1 - (ea / m + ec / (3 * m)) / 
 // FFDec export (one per SWF sprite, cached)
 // ---------------------------------------------------------------------------
 
-function exportSprite(swf, id) {
-  const dir = join(WORK, `${basename(swf, '.swf')}_${id}`);
+function exportSprite(swf, id, zoom = 3) {
+  const dir = join(WORK, `${basename(swf, '.swf')}_${id}${zoom === 3 ? '' : `_z${zoom}`}`);
   const done = join(dir, '.done');
   if (!existsSync(done)) {
     mkdirSync(dir, { recursive: true });
-    console.log(`  ffdec: ${basename(swf)} sprite ${id} @3x`);
-    execFileSync(JAVA, ['-jar', FFDEC, '-zoom', '3', '-selectid', String(id), '-format', 'sprite:png', '-export', 'sprite', dir, swf], { stdio: 'ignore' });
+    console.log(`  ffdec: ${basename(swf)} sprite ${id} @${zoom}x`);
+    execFileSync(JAVA, ['-jar', FFDEC, '-zoom', String(zoom), '-selectid', String(id), '-format', 'sprite:png', '-export', 'sprite', dir, swf], { stdio: 'ignore' });
     writeFileSync(done, '');
   }
   const sub = readdirSync(dir).find((n) => n === `DefineSprite_${id}` || n.startsWith(`DefineSprite_${id}_`));
@@ -217,6 +234,7 @@ function buildSheet(job, sheet, labels, frameDir) {
   const start = sheet.swfStart ?? label.start;
   const swfCount = sheet.swfCount ?? label?.count ?? cells.length;
   const cellImgs = cells.map((c) => crop(ogaImg, c.x, c.y, sheet.fw, sheet.fh));
+  const step = sheet.step ?? 1;
 
   const renders = new Map();
   const render = (n, mirror) => {
@@ -238,12 +256,12 @@ function buildSheet(job, sheet, labels, frameDir) {
   // Global search on up to 8 non-empty sample cells.
   const nonEmpty = cells.filter((c, i) => centroid(cellImgs[i]));
   if (!nonEmpty.length) return { status: 'rejected', reason: 'OGA sheet is empty' };
-  const step = Math.max(1, Math.floor(nonEmpty.length / 8));
-  const samples = nonEmpty.filter((_, i) => i % step === 0).slice(0, 8);
+  const every = Math.max(1, Math.floor(nonEmpty.length / 8));
+  const samples = nonEmpty.filter((_, i) => i % every === 0).slice(0, 8);
   // Cell k shows SWF frame start + k + shift; a shift may not leave the label.
   const labelEnd = start + swfCount - 1;
   const shifts = (sheet.shift !== undefined ? [sheet.shift] : [0, 1, -1])
-    .filter((s) => sheet.shift !== undefined || (start + s >= start && start + s + cells.length - 1 <= labelEnd) || s === 0);
+    .filter((s) => sheet.shift !== undefined || (start + s >= start && start + s + (cells.length - 1) * step <= labelEnd) || s === 0);
   const mirrors = sheet.mirror !== undefined ? [sheet.mirror] : [false, true];
   let best = null;
   for (const shift of shifts) {
@@ -251,7 +269,7 @@ function buildSheet(job, sheet, labels, frameDir) {
       // Estimate the 1x offset from centroids at phase 0, then search around it.
       const est = [];
       for (const c of samples) {
-        const e = render(start + c.k + shift, mirror);
+        const e = render(start + c.k * step + shift, mirror);
         if (!e) continue;
         const a = centroid(cellImgs[c.k]);
         const b = centroid(phase(e, 0, 0));
@@ -267,7 +285,7 @@ function buildSheet(job, sheet, labels, frameDir) {
             for (let qy = ey - 4; qy <= ey + 4; qy++) {
               const acc = { ea: 0, ec: 0, m: 0 };
               for (const c of samples) {
-                const e = render(start + c.k + shift, mirror);
+                const e = render(start + c.k * step + shift, mirror);
                 if (!e) { acc.m += 1e9; continue; }
                 const r = compare(cellImgs[c.k], phase(e, px, py), qx, qy);
                 acc.ea += r.ea; acc.ec += r.ec; acc.m += r.m;
@@ -289,7 +307,7 @@ function buildSheet(job, sheet, labels, frameDir) {
   // Score every frame with the global placement; also its own best nearby.
   const frames = [];
   for (const c of cells) {
-    const n = start + c.k + best.shift;
+    const n = start + c.k * step + best.shift;
     const e = render(n, best.mirror);
     if (!e) { frames.push({ k: c.k, swf: n, score: 0, missing: true }); continue; }
     const g = scoreOf(compare(cellImgs[c.k], phase(e, best.px, best.py), best.qx, best.qy));
@@ -323,8 +341,10 @@ function buildSheet(job, sheet, labels, frameDir) {
   const result = {
     swf: relative(ITEMS, job.swf),
     sprite: job.sprite,
+    ...(job.zoom && job.zoom !== 3 ? { zoom: job.zoom } : {}),
     label: sheet.label ?? null,
-    swfFrames: [start + best.shift, start + best.shift + cells.length - 1],
+    swfFrames: [start + best.shift, start + best.shift + (cells.length - 1) * step],
+    ...(step !== 1 ? { step } : {}),
     swfLabelFrames: swfCount,
     cells: cells.length,
     fw: sheet.fw,
@@ -352,7 +372,7 @@ function buildSheet(job, sheet, labels, frameDir) {
   const H = ogaImg.h * 3;
   const out = new Uint8Array(W * H * 4);
   for (const c of cells) {
-    const file = join(frameDir, `${start + c.k + best.shift}.png`);
+    const file = join(frameDir, `${start + c.k * step + best.shift}.png`);
     const raw = readRGBA(file);
     const img = best.mirror ? mirrorRaw(raw) : raw;
     const cx = c.x * 3;
@@ -395,6 +415,7 @@ function buildSheet(job, sheet, labels, frameDir) {
 export function writeModule(results) {
   const ok = Object.entries(results).filter(([, r]) => r.status === 'ok').sort(([a], [b]) => a.localeCompare(b));
   const entries = ok.map(([path, r]) => `  [${JSON.stringify(path)}, ${JSON.stringify(r.hires)}],`).join('\n');
+  const firstDraw = ok.filter(([, r]) => r.firstDraw).map(([path]) => `  ${JSON.stringify(path)},`).join('\n');
   writeFileSync(MODULE, `/**
  * Sprite sheets with a sharp 3x render (generated by
  * tools/vector-sprites/build.mjs; do not edit by hand). Each @3x file is
@@ -406,6 +427,16 @@ export const HIRES_SPRITES = new Map([
 ${entries}
 ]);
 
+/**
+ * Sheets that stay 1x until the renderer first draws them (characters, NPCs,
+ * shrines: big sheets that are often loaded and rarely all on screen).
+ * installHiresSprites leaves them out of the eager Texture.from route and
+ * installHiresFirstDraw swaps them in place on first upload.
+ */
+export const FIRST_DRAW_SPRITES = new Set([
+${firstDraw}
+]);
+
 let enabled = true;
 
 /** The 3x URL for a sheet URL (query string kept), or null. */
@@ -413,9 +444,17 @@ export function hiresSpriteUrl(url) {
   if (!enabled) return null;
   const s = String(url || '');
   const q = s.indexOf('?');
-  const path = (q < 0 ? s : s.slice(0, q)).replace(/^\\.?\\//, '');
-  const hi = HIRES_SPRITES.get(path);
+  const hi = HIRES_SPRITES.get(sheetPath(s));
   return hi ? hi + (q < 0 ? '' : s.slice(q)) : null;
+}
+
+/** A sheet URL as its HIRES_SPRITES key (from \`assets/\`, no query). */
+function sheetPath(url) {
+  const s = String(url || '');
+  const q = s.indexOf('?');
+  const path = q < 0 ? s : s.slice(0, q);
+  const at = path.indexOf('assets/');
+  return at < 0 ? path.replace(/^\\.?\\//, '') : path.slice(at);
 }
 
 /**
@@ -428,7 +467,8 @@ export function installHiresSprites(PIXI, { dpr = globalThis.devicePixelRatio ||
   enabled = dpr * Math.max(1, viewWidth / 960) >= 1.5;
   if (!enabled || !PIXI?.Texture || PIXI.Texture.from.hiresSprites) return;
   const from = PIXI.Texture.from.bind(PIXI.Texture);
-  const patched = (source, ...rest) => from(typeof source === 'string' ? hiresSpriteUrl(source) || source : source, ...rest);
+  const eager = (source) => (FIRST_DRAW_SPRITES.has(sheetPath(source)) ? null : hiresSpriteUrl(source));
+  const patched = (source, ...rest) => from(typeof source === 'string' ? eager(source) || source : source, ...rest);
   patched.hiresSprites = true;
   for (const key of Object.keys(PIXI.Texture.from)) patched[key] = PIXI.Texture.from[key];
   PIXI.Texture.from = patched;
@@ -469,22 +509,103 @@ export function upgradeBaseTexture(PIXI, base, url) {
     .catch(() => false);
   return base.hiresUpgrade;
 }
+
+/** The listed 1x sheet a BaseTexture was loaded from, or null. */
+export function baseTextureSheet(base) {
+  const ids = [base?.cacheId, ...(base?.textureCacheIds || []), base?.resource?.src, base?.resource?.url];
+  for (const id of ids) {
+    if (typeof id !== 'string' || !id) continue;
+    const path = sheetPath(id);
+    if (HIRES_SPRITES.has(path)) return path;
+  }
+  return null;
+}
+
+/**
+ * Swap any listed sheet to 3x the first time the renderer uploads its 1x
+ * texture (TextureSystem.initTexture runs once per BaseTexture), whatever
+ * loaded it: game.js SHEETS, quest-room kits, feature modules. Sheets that
+ * are loaded but never drawn keep their 1x pixels.
+ */
+export function installHiresFirstDraw(renderer, PIXI) {
+  const system = renderer?.texture;
+  if (!enabled || !system?.initTexture || system.hiresFirstDraw) return;
+  const init = system.initTexture.bind(system);
+  system.initTexture = (base) => {
+    const gl = init(base);
+    const path = base?.hiresUpgrade ? null : baseTextureSheet(base);
+    if (path) upgradeBaseTexture(PIXI, base, path);
+    return gl;
+  };
+  system.hiresFirstDraw = true;
+}
 `);
 }
 
 // ---------------------------------------------------------------------------
 
+/** Pixel size of an image file. */
+function imageSize(file) {
+  const [w, h] = execFileSync('magick', ['identify', '-format', '%w %h', `${file}[0]`], { encoding: 'utf8' }).trim().split(' ').map(Number);
+  return { w, h };
+}
+
+/** Why a sheet's 3x file would break the manifest budget, or null. */
+export function overBudget({ w, h }, budget) {
+  if (!budget) return null;
+  const W = w * 3;
+  const H = h * 3;
+  const mb = (W * H * 4) / 2 ** 20;
+  if (budget.maxSide && Math.max(W, H) > budget.maxSide) return `3x is ${W}x${H}, over the ${budget.maxSide} px texture side`;
+  if (budget.maxMB && mb > budget.maxMB) return `3x is ${W}x${H} = ${mb.toFixed(1)} MB decoded, over ${budget.maxMB} MB`;
+  return null;
+}
+
+const characterOf = (job) => job.character || job.name;
+
 function main() {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
   const results = existsSync(RESULTS) ? JSON.parse(readFileSync(RESULTS, 'utf8')) : {};
   mkdirSync(WORK, { recursive: true });
+  const record = (job, sheet, r) => {
+    const { frames, ...summary } = r;
+    results[sheet.path] = {
+      animal: job.name,
+      ...(job.character ? { character: job.character } : {}),
+      ...summary,
+      ...((job.firstDraw ?? manifest.firstDraw) ? { firstDraw: true } : {}),
+      frameScores: frames?.map((f) => f.score),
+    };
+  };
+  // Budget first: a character with any oversized sheet is not rendered at all.
+  const tooBig = new Map();
   for (const job of manifest.jobs) {
-    const sheets = job.sheets.filter((s) => !only || s.path.includes(only) || job.name.includes(only));
+    for (const sheet of job.sheets) {
+      const why = overBudget(imageSize(join(PUBLIC, sheet.path)), manifest.budget);
+      if (why && !tooBig.has(characterOf(job))) tooBig.set(characterOf(job), `${basename(sheet.path)}: ${why}`);
+    }
+  }
+  for (const job of manifest.jobs) {
+    const sheets = job.sheets.filter((s) => !only || s.path.includes(only) || job.name.includes(only) || characterOf(job).includes(only));
     if (!sheets.length) continue;
-    const swf = join(ITEMS, job.swf);
+    const swf = resolve(ITEMS, job.swf);
     console.log(`${job.name}: ${job.swf} sprite ${job.sprite}`);
-    const labels = swfSprites(swf).find((s) => s.id === job.sprite)?.labels || [];
-    const frameDir = exportSprite(swf, job.sprite);
+    const big = tooBig.get(characterOf(job));
+    if (big) {
+      for (const sheet of sheets) {
+        record(job, sheet, { status: 'rejected', reason: `over budget (${big})` });
+        console.log(`  NO  ${basename(sheet.path)} (over budget: ${big})`);
+      }
+      continue;
+    }
+    let source = swf;
+    if (job.parts) {
+      const tag = createHash('sha1').update(JSON.stringify(job.parts)).digest('hex').slice(0, 8);
+      source = join(WORK, `${basename(swf, '.swf')}.${job.name}.${tag}.swf`);
+      if (!existsSync(source)) console.log(`  parts: ${swapParts(swf, source, job.parts)} placements swapped`);
+    }
+    const labels = swfSprites(source).find((s) => s.id === job.sprite)?.labels || [];
+    const frameDir = exportSprite(source, job.sprite, job.zoom ?? 3);
     for (const sheet of sheets) {
       const t = Date.now();
       let r;
@@ -493,10 +614,30 @@ function main() {
       } catch (err) {
         r = { status: 'rejected', reason: String(err.message || err) };
       }
-      const { frames, ...summary } = r;
-      results[sheet.path] = { animal: job.name, ...summary, frameScores: frames?.map((f) => f.score) };
+      record(job, sheet, r);
       const tag = r.status === 'ok' ? 'ok ' : r.status === 'dry' ? 'dry' : 'NO ';
       console.log(`  ${tag} ${basename(sheet.path)} score ${r.score ?? '-'} min ${r.minFrame ?? '-'} mirror ${r.mirror ?? '-'} shift ${r.shift ?? '-'} offset ${r.offset3x ?? '-'}${r.bytes ? ` ${(r.bytes / 1024).toFixed(0)} KB` : ''}${r.reason ? ` (${r.reason})` : ''} ${((Date.now() - t) / 1000).toFixed(1)}s`);
+    }
+  }
+  // All-or-nothing per character: hold back the passing sheets of a
+  // character that has a rejected (or unbuilt) one.
+  const groups = new Map();
+  for (const job of manifest.jobs) {
+    for (const sheet of job.sheets) {
+      const c = characterOf(job);
+      if (!groups.has(c)) groups.set(c, []);
+      groups.get(c).push(sheet.path);
+    }
+  }
+  for (const [c, paths] of groups) {
+    const bad = paths.find((p) => !['ok', 'dry'].includes(results[p]?.status));
+    if (!bad) continue;
+    for (const p of paths) {
+      const r = results[p];
+      if (!r || !['ok', 'dry'].includes(r.status)) continue;
+      if (r.hires && existsSync(join(PUBLIC, r.hires)) && !DRY) unlinkSync(join(PUBLIC, r.hires));
+      results[p] = { ...r, status: 'rejected', reason: `held back: ${c} also needs ${basename(bad)} (${results[bad]?.status || 'not built'})`, hires: undefined, bytes: undefined };
+      console.log(`  held ${basename(p)}: ${c} also needs ${basename(bad)}`);
     }
   }
   if (DRY) {

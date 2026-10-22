@@ -1,0 +1,303 @@
+{
+ "about": "Character, NPC and shrine sheets the game draws, paired with their vector SWF (glitch-items, CC0; the butterfly SWF is a Wayback recovery). Same shape as animals.json; character groups are all-or-nothing, budget caps each 3x sheet, and every sheet swaps to 3x on first draw (js/sprite-hires.js installHiresFirstDraw). Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/characters.json [--only <character>]",
+ "firstDraw": true,
+ "budget": {"maxSide": 8192, "maxMB": 64},
+ "jobs": [
+  {"name": "bureaucrat-0", "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf", "sprite": 121, "zoom": 3.428571, "parts": {"hair04": "hair01", "glasses01": null, "legFar04": "legFar01", "footClose04": "footClose01", "necklace02": null, "tie02": "tie01"}, "sheets": [
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png", "label": "idle1", "fw": 97, "fh": 89, "cols": 10, "frames": 57},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png", "label": "talk", "fw": 97, "fh": 89, "cols": 9, "frames": 26}
+  ] },
+  {"name": "bureaucrat-1", "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf", "sprite": 121, "zoom": 3.428571, "parts": {"armFar01": "armFar02", "armUpperClose01": "armUpperClose02", "armLowerClose01": "armLowerClose02", "hair04": "hair02", "glasses01": null, "legFar04": "legFar02", "legClose01": "legClose02", "footClose04": "footClose02", "necklace02": null, "body01": "body02"}, "sheets": [
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.png", "label": "idle1", "fw": 97, "fh": 91, "cols": 10, "frames": 57},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png", "label": "talk", "fw": 97, "fh": 91, "cols": 9, "frames": 26}
+  ] },
+  {"name": "bureaucrat-2", "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf", "sprite": 121, "zoom": 3.428571, "parts": {"armFar01": "armFar03", "armUpperClose01": "armUpperClose03", "armLowerClose01": "armLowerClose03", "glasses01": null, "legFar04": "legFar03", "legClose01": "legClose03", "footClose04": "footClose03", "necklace02": "necklace01", "tie02": null, "body01": "body03"}, "sheets": [
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.png", "label": "idle1", "fw": 97, "fh": 96, "cols": 10, "frames": 57},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png", "label": "talk", "fw": 97, "fh": 96, "cols": 9, "frames": 26}
+  ] },
+  {"name": "bureaucrat-3", "swf": "inhabitants/bureaucrat/npc_bureaucrat.swf", "sprite": 121, "zoom": 3.428571, "parts": {"armFar01": "armFar04", "armUpperClose01": "armUpperClose04", "armLowerClose01": "armLowerClose04", "hair04": "hair05", "glasses01": null, "legClose01": "legClose04", "tie02": null, "body01": "body04"}, "sheets": [
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.png", "label": "idle1", "fw": 97, "fh": 101, "cols": 10, "frames": 57},
+   {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png", "label": "talk", "fw": 97, "fh": 101, "cols": 9, "frames": 26}
+  ] },
+  {"name": "phantom", "swf": "quest_items/phantom_glitch/phantom_glitch.swf", "sprite": 65, "sheets": [
+   {"path": "assets/sprites/quests/phantom-appear.png", "label": "appear", "fw": 126, "fh": 214, "cols": 7, "frames": 54},
+   {"path": "assets/sprites/quests/phantom-give-heart.png", "label": "giveHeart", "fw": 126, "fh": 214, "cols": 7, "frames": 89}
+  ] },
+  {"name": "letter-block-A", "character": "letter-blocks", "swf": "quest_items/letter_block/letter_block.swf", "sprite": 167, "sheets": [
+   {"path": "assets/sprites/quests/four-letter/letter-block-A.png", "label": "idle_stand", "fw": 139, "fh": 197, "cols": 2, "frames": 2}
+  ] },
+  {"name": "letter-block-B", "character": "letter-blocks", "swf": "quest_items/letter_block/letter_block.swf", "sprite": 141, "sheets": [
+   {"path": "assets/sprites/quests/four-letter/letter-block-B.png", "label": "idle_stand", "fw": 139, "fh": 197, "cols": 2, "frames": 2}
+  ] },
+  {"name": "letter-block-E", "character": "letter-blocks", "swf": "quest_items/letter_block/letter_block.swf", "sprite": 115, "sheets": [
+   {"path": "assets/sprites/quests/four-letter/letter-block-E.png", "label": "idle_stand", "fw": 139, "fh": 197, "cols": 2, "frames": 2}
+  ] },
+  {"name": "letter-block-M", "character": "letter-blocks", "swf": "quest_items/letter_block/letter_block.swf", "sprite": 89, "sheets": [
+   {"path": "assets/sprites/quests/four-letter/letter-block-M.png", "label": "idle_stand", "fw": 139, "fh": 197, "cols": 2, "frames": 2}
+  ] },
+  {"name": "letter-block-S", "character": "letter-blocks", "swf": "quest_items/letter_block/letter_block.swf", "sprite": 63, "sheets": [
+   {"path": "assets/sprites/quests/four-letter/letter-block-S.png", "label": "idle_stand", "fw": 139, "fh": 197, "cols": 2, "frames": 2}
+  ] },
+  {"name": "letter-block-T", "character": "letter-blocks", "swf": "quest_items/letter_block/letter_block.swf", "sprite": 37, "sheets": [
+   {"path": "assets/sprites/quests/four-letter/letter-block-T.png", "label": "idle_stand", "fw": 139, "fh": 197, "cols": 2, "frames": 2}
+  ] },
+  {"name": "mr-block-A", "character": "mr-block", "swf": "quest_items/letterblock/npc_letterblock.swf", "sprite": 12, "sheets": [
+   {"path": "assets/sprites/quest-rooms/kids_room/mr-block-A.png", "label": "idle_stand", "fw": 121, "fh": 117, "cols": 2, "frames": 2}
+  ] },
+  {"name": "mr-block-B", "character": "mr-block", "swf": "quest_items/letterblock/npc_letterblock.swf", "sprite": 10, "sheets": [
+   {"path": "assets/sprites/quest-rooms/kids_room/mr-block-B.png", "label": "idle_stand", "fw": 121, "fh": 117, "cols": 2, "frames": 2},
+   {"path": "assets/sprites/quests/four-letter/mr-block.png", "label": "idle_stand", "fw": 121, "fh": 117, "cols": 2, "frames": 2}
+  ] },
+  {"name": "mr-block-E", "character": "mr-block", "swf": "quest_items/letterblock/npc_letterblock.swf", "sprite": 8, "sheets": [
+   {"path": "assets/sprites/quest-rooms/kids_room/mr-block-E.png", "label": "idle_stand", "fw": 121, "fh": 117, "cols": 2, "frames": 2}
+  ] },
+  {"name": "mr-block-M", "character": "mr-block", "swf": "quest_items/letterblock/npc_letterblock.swf", "sprite": 6, "sheets": [
+   {"path": "assets/sprites/quest-rooms/kids_room/mr-block-M.png", "label": "idle_stand", "fw": 121, "fh": 117, "cols": 2, "frames": 2}
+  ] },
+  {"name": "mr-block-S", "character": "mr-block", "swf": "quest_items/letterblock/npc_letterblock.swf", "sprite": 4, "sheets": [
+   {"path": "assets/sprites/quest-rooms/kids_room/mr-block-S.png", "label": "idle_stand", "fw": 121, "fh": 117, "cols": 2, "frames": 2}
+  ] },
+  {"name": "mr-block-T", "character": "mr-block", "swf": "quest_items/letterblock/npc_letterblock.swf", "sprite": 2, "sheets": [
+   {"path": "assets/sprites/quest-rooms/kids_room/mr-block-T.png", "label": "idle_stand", "fw": 121, "fh": 117, "cols": 2, "frames": 2}
+  ] },
+  {"name": "dustbunny", "swf": "inhabitants/dustbunny/npc_dustbunny.swf", "sprite": 39, "sheets": [
+   {"path": "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_idle_stand_png_1354831147.png", "label": "idle_stand", "fw": 104, "fh": 59, "cols": 9, "frames": 172},
+   {"path": "assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_talk_png_1354831143.png", "label": "talk", "fw": 104, "fh": 59, "cols": 9, "frames": 50},
+   {"path": "assets/sprites/newxp/dustbunny_idle.png", "label": "idle_stand", "fw": 104, "fh": 59, "cols": 9, "frames": 172},
+   {"path": "assets/sprites/newxp/dustbunny_talk.png", "label": "talk", "fw": 104, "fh": 59, "cols": 9, "frames": 50},
+   {"path": "assets/sprites/newxp/dustbunny_walk.png", "label": "walk", "fw": 104, "fh": 59, "cols": 8, "frames": 8},
+   {"path": "assets/sprites/newxp/dustbunny_walk_right.png", "label": "walk_right", "fw": 104, "fh": 59, "cols": 9, "frames": 9}
+  ] },
+  {"name": "ilmenskie-jones", "swf": "inhabitants/ilmenskie_jones/npc_piggy_explorer.swf", "sprite": 77, "sheets": [
+   {"path": "assets/sprites/quests/ilmenskie/jones-walk.png", "label": "walk", "fw": 87, "fh": 64, "cols": 8, "frames": 24}
+  ] },
+  {"name": "forehorseman", "swf": "inhabitants/forehorseman/npc_forehorseman.swf", "sprite": 53, "sheets": [
+   {"path": "assets/sprites/rooks/forehorseman-frantic.webp", "label": "frantic", "fw": 191, "fh": 202, "cols": 8, "frames": 47, "step": 2}
+  ] },
+  {"name": "rook-head", "swf": "misc/rook_head/rook_head.swf", "sprite": 107, "sheets": [
+   {"path": "assets/sprites/rooks/rook-head-idle1.png", "label": "idle1", "fw": 108, "fh": 127, "cols": 9, "frames": 60},
+   {"path": "assets/sprites/rooks/rook-head-angry1.png", "label": "angry1", "fw": 108, "fh": 127, "cols": 9, "frames": 102},
+   {"path": "assets/sprites/rooks/rook-head-angry2.png", "label": "angry2", "fw": 108, "fh": 127, "cols": 9, "frames": 54},
+   {"path": "assets/sprites/rooks/rook-head-angry3.png", "label": "angry3", "fw": 108, "fh": 127, "cols": 9, "frames": 54},
+   {"path": "assets/sprites/rooks/rook-head-stun.png", "label": "stun", "fw": 108, "fh": 127, "cols": 8, "frames": 24},
+   {"path": "assets/sprites/rooks/rook-head-stunned.png", "label": "stunned", "fw": 108, "fh": 127, "cols": 8, "frames": 30},
+   {"path": "assets/sprites/rooks/rook-head-stunnedHit.png", "label": "stunnedHit", "fw": 108, "fh": 127, "cols": 8, "frames": 30},
+   {"path": "assets/sprites/rooks/rook-head-killShot.png", "label": "killShot", "fw": 108, "fh": 127, "cols": 8, "frames": 30},
+   {"path": "assets/sprites/rooks/rook-head-dead.png", "label": "dead", "fw": 108, "fh": 127, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/rooks/rook-head-taunt.png", "label": "taunt", "fw": 108, "fh": 127, "cols": 8, "frames": 39}
+  ] },
+  {"name": "rooked-piggy", "swf": "inhabitants/piggy/npc_piggy.swf", "sprite": 79, "sheets": [
+   {"path": "assets/sprites/rooks/piggy-rooked1.png", "label": "rooked1", "fw": 88, "fh": 62, "cols": 10, "frames": 10},
+   {"path": "assets/sprites/rooks/piggy-rooked2.png", "label": "rooked2", "fw": 88, "fh": 62, "cols": 8, "frames": 24}
+  ] },
+  {"name": "rooked-chicken", "swf": "inhabitants/chicken/npc_chicken.swf", "sprite": 183, "sheets": [
+   {"path": "assets/sprites/rooks/chicken-rooked1.png", "label": "rooked1", "fw": 148, "fh": 110, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/rooks/chicken-rooked2.png", "label": "rooked2", "fw": 148, "fh": 110, "cols": 6, "frames": 27}
+  ] },
+  {"name": "sad-kitty", "swf": "inhabitants/heli_kitty/npc_kitty_chicken.swf", "sprite": 114, "sheets": [
+   {"path": "assets/sprites/rooks/kitty-sad.png", "label": "3sad", "fw": 136, "fh": 115, "cols": 6, "frames": 17}
+  ] },
+  {"name": "rooked-butterfly", "swf": "../wayback/items-swf/npc_butterfly-1306966114.swf", "sprite": 9, "zoom": 0.335, "sheets": [
+   {"path": "assets/sprites/rooks/butterfly-fly-rooked.png", "label": "fly", "fw": 70, "fh": 65, "cols": 14, "frames": 14},
+   {"path": "assets/sprites/rooks/butterfly-rest-rooked.png", "label": "rest", "fw": 70, "fh": 65, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png", "label": "fly", "fw": 70, "fh": 65, "cols": 14, "frames": 14},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest.png", "label": "rest", "fw": 70, "fh": 65, "cols": 1, "frames": 1}
+  ] },
+  {"name": "gwendolyn", "swf": "inhabitants/gwendolyn/npc_gwendolyn.swf", "sprite": 298, "sheets": [
+   {"path": "assets/sprites/quest-rooms/gwendolyn/gwendolyn_idle.webp", "label": "idle", "fw": 116, "fh": 191, "cols": 8, "frames": 76},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/gwendolyn_talk.webp", "label": "talk", "fw": 116, "fh": 191, "cols": 8, "frames": 74}
+  ] },
+  {"name": "cactus", "swf": "inhabitants/cactus/npc_cactus.swf", "sprite": 52, "sheets": [
+   {"path": "assets/sprites/quest-rooms/gwendolyn/cactus_idle.webp", "label": "idle", "fw": 157, "fh": 126, "cols": 6, "frames": 44},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/cactus_talk.webp", "label": "talk", "fw": 157, "fh": 126, "cols": 6, "frames": 74}
+  ] },
+  {"name": "squid-blue", "swf": "inhabitants/squid/npc_squid.swf", "sprite": 341, "sheets": [
+   {"path": "assets/sprites/quest-rooms/gwendolyn/squid_blue_idle.webp", "label": "idle", "fw": 235, "fh": 251, "cols": 4, "frames": 48},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/squid_blue_talk.webp", "label": "talk", "fw": 235, "fh": 251, "cols": 15, "frames": 87},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/squid_blue_bamfin.webp", "label": "bamfIn", "fw": 235, "fh": 251, "cols": 3, "frames": 9},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/squid_blue_bamfout.webp", "label": "bamfOut", "fw": 235, "fh": 251, "cols": 3, "frames": 8}
+  ] },
+  {"name": "squid-purple", "swf": "inhabitants/squid/npc_squid.swf", "sprite": 174, "sheets": [
+   {"path": "assets/sprites/quest-rooms/gwendolyn/squid_purple_idle.webp", "label": "idle", "fw": 235, "fh": 251, "cols": 4, "frames": 48},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/squid_purple_talk.webp", "label": "talk", "fw": 235, "fh": 251, "cols": 15, "frames": 87},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/squid_purple_bamfin.webp", "label": "bamfIn", "fw": 235, "fh": 251, "cols": 3, "frames": 9},
+   {"path": "assets/sprites/quest-rooms/gwendolyn/squid_purple_bamfout.webp", "label": "bamfOut", "fw": 235, "fh": 251, "cols": 3, "frames": 8}
+  ] },
+  {"name": "juju-grandma", "swf": "inhabitants/juju_grandma/npc_juju_grandma.swf", "sprite": 26, "sheets": [
+   {"path": "assets/sprites/quest-rooms/juju_camp/grandma_idle.png", "label": "idle", "fw": 138, "fh": 135, "cols": 7, "frames": 72},
+   {"path": "assets/sprites/quest-rooms/juju_camp/grandma_talk.png", "label": "talk", "fw": 138, "fh": 135, "cols": 7, "frames": 67},
+   {"path": "assets/sprites/quest-rooms/juju_camp/grandma_angry.png", "label": "angry", "fw": 138, "fh": 135, "cols": 7, "frames": 126}
+  ] },
+  {"name": "juju-red", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": null}, "sheets": [
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_red_spawn.png", "label": "spawn", "fw": 240, "fh": 254, "cols": 4, "frames": 23},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_red_walk.png", "label": "walk", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_red_walk_end.png", "label": "walk_end", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_red_shrink.png", "label": "shrink", "fw": 240, "fh": 254, "cols": 4, "frames": 21}
+  ] },
+  {"name": "juju-green", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": null, "red_hand_right": "green_hand_right", "red_arm_right": "green_arm_right", "red_face": "green_face", "red_Body": "green_Body", "red_leg_right": "green_leg_right", "red_leg_left": "green_leg_left", "red_hand_left": "green_hand_left", "red_arm_left": "green_arm_left"}, "sheets": [
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_green_spawn.png", "label": "spawn", "fw": 240, "fh": 254, "cols": 4, "frames": 23},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_green_walk.png", "label": "walk", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_green_walk_end.png", "label": "walk_end", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_green_shrink.png", "label": "shrink", "fw": 240, "fh": 254, "cols": 4, "frames": 21}
+  ] },
+  {"name": "juju-yellow", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": null, "red_hand_right": "yellow_hand_right", "red_arm_right": "yellow_arm_right", "red_face": "yellow_face", "red_Body": "yellow_Body", "red_leg_right": "yellow_leg_right", "red_leg_left": "yellow_leg_left", "red_hand_left": "yellow_hand_left", "red_arm_left": "yellow_arm_left"}, "sheets": [
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_yellow_spawn.png", "label": "spawn", "fw": 240, "fh": 254, "cols": 4, "frames": 23},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk.png", "label": "walk", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk_end.png", "label": "walk_end", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_yellow_shrink.png", "label": "shrink", "fw": 240, "fh": 254, "cols": 4, "frames": 21}
+  ] },
+  {"name": "crab", "swf": "inhabitants/crab/npc_crab.swf", "sprite": 133, "sheets": [
+   {"path": "assets/sprites/quest-rooms/vision_quest/crab_idle.png", "label": "idle0", "fw": 131, "fh": 129, "cols": 6, "frames": 30},
+   {"path": "assets/sprites/quest-rooms/color_unblocking/npc_crab_idle0.png", "label": "idle0", "fw": 131, "fh": 129, "cols": 6, "frames": 30},
+   {"path": "assets/sprites/quest-rooms/color_unblocking/npc_crab_talk.png", "label": "talk", "fw": 131, "fh": 129, "cols": 7, "frames": 58}
+  ] },
+  {"name": "myopic-frog", "swf": "inhabitants/myopic_frog/npc_myopic_frog.swf", "sprite": 116, "sheets": [
+   {"path": "assets/sprites/quest-rooms/vision_quest/frog_idle.png", "label": "idle", "fw": 55, "fh": 61, "cols": 16, "frames": 48},
+   {"path": "assets/sprites/quest-rooms/vision_quest/frog_talk.png", "label": "talk", "fw": 55, "fh": 61, "cols": 16, "frames": 61},
+   {"path": "assets/sprites/quest-rooms/vision_quest/frog_move.png", "label": "move", "fw": 55, "fh": 61, "cols": 12, "frames": 24}
+  ] },
+  {"name": "maintenance-bot", "swf": "inhabitants/maintenance_bot/npc_maintenance_bot.swf", "sprite": 16, "sheets": [
+   {"path": "assets/sprites/quest-rooms/le_miserable/bot_idle.png", "label": "idle", "fw": 81, "fh": 88, "cols": 12, "frames": 24},
+   {"path": "assets/sprites/quest-rooms/le_miserable/bot_talk.png", "label": "talk", "fw": 81, "fh": 88, "cols": 12, "frames": 69},
+   {"path": "assets/sprites/quest-rooms/back_alley/bot_attract.png", "label": "attract", "fw": 81, "fh": 88, "cols": 12, "frames": 57},
+   {"path": "assets/sprites/quest-rooms/back_alley/bot_move.png", "label": "move", "fw": 81, "fh": 88, "cols": 1, "frames": 1}
+  ] },
+  {"name": "rare-item-vendor", "swf": "inhabitants/rare_item_vendor/npc_rare_item_vendor.swf", "sprite": 76, "sheets": [
+   {"path": "assets/sprites/quest-rooms/penalty/vendor_idle.webp", "label": "idle", "fw": 187, "fh": 91, "cols": 5, "frames": 110},
+   {"path": "assets/sprites/quest-rooms/penalty/vendor_talk.webp", "label": "talk", "fw": 187, "fh": 91, "cols": 5, "frames": 72},
+   {"path": "assets/sprites/quest-rooms/penalty/vendor_walk.webp", "label": "walk", "fw": 187, "fh": 91, "cols": 4, "frames": 16}
+  ] },
+  {"name": "fox-ranger", "swf": "inhabitants/fox_ranger/npc_fox_ranger.swf", "sprite": 28, "sheets": [
+   {"path": "assets/sprites/foxes/ranger-idle0.png", "label": "idle0", "fw": 62, "fh": 105, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/foxes/ranger-idle1.png", "label": "idle1", "fw": 62, "fh": 105, "cols": 9, "frames": 9},
+   {"path": "assets/sprites/foxes/ranger-idle2.png", "label": "idle2", "fw": 62, "fh": 105, "cols": 15, "frames": 90},
+   {"path": "assets/sprites/foxes/ranger-talk.png", "label": "talk", "fw": 62, "fh": 105, "cols": 15, "frames": 90}
+  ] },
+  {"name": "fox-bait", "swf": "misc/fox_bait/fox_bait.swf", "sprite": 10, "sheets": [
+   {"path": "assets/sprites/foxes/bait-bait1.png", "label": "bait1", "fw": 41, "fh": 144, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/foxes/bait-bait2.png", "label": "bait2", "fw": 41, "fh": 144, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/foxes/bait-bait3.png", "label": "bait3", "fw": 41, "fh": 144, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/foxes/bait-stink1.png", "label": "stink1", "fw": 41, "fh": 144, "cols": 21, "frames": 42},
+   {"path": "assets/sprites/foxes/bait-stink2.png", "label": "stink2", "fw": 41, "fh": 144, "cols": 22, "frames": 43},
+   {"path": "assets/sprites/foxes/bait-stink3.png", "label": "stink3", "fw": 41, "fh": 144, "cols": 21, "frames": 42}
+  ] },
+  {"name": "shrine-alph", "swf": "shrines/npc_shrine_base/npc_shrine_alph/npc_shrine_alph.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/alph_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/alph_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-cosma", "swf": "shrines/npc_shrine_base/npc_shrine_cosma/npc_shrine_cosma.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/cosma_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/cosma_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-friendly", "swf": "shrines/npc_shrine_base/npc_shrine_friendly/npc_shrine_friendly.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/friendly_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/friendly_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-grendaline", "swf": "shrines/npc_shrine_base/npc_shrine_grendaline/npc_shrine_grendaline.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/grendaline_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/grendaline_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-humbaba", "swf": "shrines/npc_shrine_base/npc_shrine_humbaba/npc_shrine_humbaba.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/humbaba_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/humbaba_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-lem", "swf": "shrines/npc_shrine_base/npc_shrine_lem/npc_shrine_lem.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/lem_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/lem_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-mab", "swf": "shrines/npc_shrine_base/npc_shrine_mab/npc_shrine_mab.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/mab_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/mab_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-pot", "swf": "shrines/npc_shrine_base/npc_shrine_pot/npc_shrine_pot.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/pot_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/pot_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-spriggan", "swf": "shrines/npc_shrine_base/npc_shrine_spriggan/npc_shrine_spriggan.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/spriggan_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/spriggan_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-ti", "swf": "shrines/npc_shrine_base/npc_shrine_ti/npc_shrine_ti.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/ti_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/ti_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "shrine-zille", "swf": "shrines/npc_shrine_base/npc_shrine_zille/npc_shrine_zille.swf", "sprite": 38, "sheets": [
+   {"path": "assets/sprites/shrines/zille_open.png", "label": "open", "fw": 151, "fh": 188, "cols": 6, "frames": 22},
+   {"path": "assets/sprites/shrines/zille_close.png", "label": "close", "fw": 151, "fh": 188, "cols": 6, "frames": 23}
+  ] },
+  {"name": "smuggler-red_1", "swf": "inhabitants/smuggler/npc_smuggler.swf", "sprite": 82, "sheets": [
+   {"path": "assets/sprites/smuggling/smuggler_red_1_arriveWithBox.webp", "label": "arriveWithBox", "fw": 251, "fh": 186, "cols": 3, "frames": 24},
+   {"path": "assets/sprites/smuggling/smuggler_red_1_idleWithBox.webp", "label": "idleWithBox", "fw": 251, "fh": 186, "cols": 16, "frames": 109},
+   {"path": "assets/sprites/smuggling/smuggler_red_1_talkWithBox.webp", "label": "talkWithBox", "fw": 251, "fh": 186, "cols": 15, "frames": 72},
+   {"path": "assets/sprites/smuggling/smuggler_red_1_giveBox.webp", "label": "giveBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30},
+   {"path": "assets/sprites/smuggling/smuggler_red_1_talkNoBox.webp", "label": "talkNoBox", "fw": 251, "fh": 186, "cols": 15, "frames": 72},
+   {"path": "assets/sprites/smuggling/smuggler_red_1_idleNoBox.webp", "label": "idleNoBox", "fw": 251, "fh": 186, "cols": 16, "frames": 109},
+   {"path": "assets/sprites/smuggling/smuggler_red_1_exitNoBox.webp", "label": "exitNoBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30},
+   {"path": "assets/sprites/smuggling/smuggler_red_1_exitWithBox.webp", "label": "exitWithBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30}
+  ] },
+  {"name": "smuggler-red_2", "swf": "inhabitants/smuggler/npc_smuggler.swf", "sprite": 82, "sheets": [
+   {"path": "assets/sprites/smuggling/smuggler_red_2_arriveWithBox.webp", "label": "arriveWithBox", "fw": 251, "fh": 186, "cols": 3, "frames": 24},
+   {"path": "assets/sprites/smuggling/smuggler_red_2_idleWithBox.webp", "label": "idleWithBox", "fw": 251, "fh": 186, "cols": 16, "frames": 109},
+   {"path": "assets/sprites/smuggling/smuggler_red_2_talkWithBox.webp", "label": "talkWithBox", "fw": 251, "fh": 186, "cols": 15, "frames": 72},
+   {"path": "assets/sprites/smuggling/smuggler_red_2_giveBox.webp", "label": "giveBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30},
+   {"path": "assets/sprites/smuggling/smuggler_red_2_talkNoBox.webp", "label": "talkNoBox", "fw": 251, "fh": 186, "cols": 15, "frames": 72},
+   {"path": "assets/sprites/smuggling/smuggler_red_2_idleNoBox.webp", "label": "idleNoBox", "fw": 251, "fh": 186, "cols": 16, "frames": 109},
+   {"path": "assets/sprites/smuggling/smuggler_red_2_exitNoBox.webp", "label": "exitNoBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30},
+   {"path": "assets/sprites/smuggling/smuggler_red_2_exitWithBox.webp", "label": "exitWithBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30}
+  ] },
+  {"name": "smuggler-green_1", "swf": "inhabitants/smuggler/npc_smuggler.swf", "sprite": 82, "sheets": [
+   {"path": "assets/sprites/smuggling/smuggler_green_1_arriveNoBox.webp", "label": "arriveNoBox", "fw": 251, "fh": 186, "cols": 3, "frames": 24},
+   {"path": "assets/sprites/smuggling/smuggler_green_1_idleNoBox.webp", "label": "idleNoBox", "fw": 251, "fh": 186, "cols": 16, "frames": 109},
+   {"path": "assets/sprites/smuggling/smuggler_green_1_talkNoBox.webp", "label": "talkNoBox", "fw": 251, "fh": 186, "cols": 15, "frames": 72},
+   {"path": "assets/sprites/smuggling/smuggler_green_1_takeBox.webp", "label": "takeBox", "fw": 251, "fh": 186, "cols": 3, "frames": 25},
+   {"path": "assets/sprites/smuggling/smuggler_green_1_talkWithBox.webp", "label": "talkWithBox", "fw": 251, "fh": 186, "cols": 15, "frames": 72},
+   {"path": "assets/sprites/smuggling/smuggler_green_1_exitWithBox.webp", "label": "exitWithBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30},
+   {"path": "assets/sprites/smuggling/smuggler_green_1_exitNoBox.webp", "label": "exitNoBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30}
+  ] },
+  {"name": "smuggler-green_2", "swf": "inhabitants/smuggler/npc_smuggler.swf", "sprite": 82, "sheets": [
+   {"path": "assets/sprites/smuggling/smuggler_green_2_arriveNoBox.webp", "label": "arriveNoBox", "fw": 251, "fh": 186, "cols": 3, "frames": 24},
+   {"path": "assets/sprites/smuggling/smuggler_green_2_idleNoBox.webp", "label": "idleNoBox", "fw": 251, "fh": 186, "cols": 16, "frames": 109},
+   {"path": "assets/sprites/smuggling/smuggler_green_2_talkNoBox.webp", "label": "talkNoBox", "fw": 251, "fh": 186, "cols": 15, "frames": 72},
+   {"path": "assets/sprites/smuggling/smuggler_green_2_takeBox.webp", "label": "takeBox", "fw": 251, "fh": 186, "cols": 3, "frames": 25},
+   {"path": "assets/sprites/smuggling/smuggler_green_2_talkWithBox.webp", "label": "talkWithBox", "fw": 251, "fh": 186, "cols": 15, "frames": 72},
+   {"path": "assets/sprites/smuggling/smuggler_green_2_exitWithBox.webp", "label": "exitWithBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30},
+   {"path": "assets/sprites/smuggling/smuggler_green_2_exitNoBox.webp", "label": "exitNoBox", "fw": 251, "fh": 186, "cols": 3, "frames": 30}
+  ] },
+  {"name": "deimaginator", "swf": "inhabitants/deimaginator/npc_deimaginator.swf", "sprite": 46, "sheets": [
+   {"path": "assets/sprites/smuggling/deimaginator_appear.webp", "label": "appear", "fw": 251, "fh": 186, "cols": 3, "frames": 25},
+   {"path": "assets/sprites/smuggling/deimaginator_walk.webp", "label": "walk", "fw": 251, "fh": 186, "cols": 3, "frames": 16},
+   {"path": "assets/sprites/smuggling/deimaginator_idle1.webp", "label": "idle1", "fw": 251, "fh": 186, "cols": 15, "frames": 135},
+   {"path": "assets/sprites/smuggling/deimaginator_talk.webp", "label": "talk", "fw": 251, "fh": 186, "cols": 15, "frames": 89},
+   {"path": "assets/sprites/smuggling/deimaginator_disappear.webp", "label": "disappear", "fw": 251, "fh": 186, "cols": 3, "frames": 30}
+  ] },
+  {"name": "rube", "swf": "inhabitants/rube/npc_rube.swf", "sprite": 78, "sheets": [
+   {"path": "assets/sprites/rube/rube_spawn_in.webp", "label": "spawn_in", "fw": 108, "fh": 154, "cols": 9, "frames": 205},
+   {"path": "assets/sprites/rube/rube_walk.webp", "label": "walk", "fw": 108, "fh": 154, "cols": 8, "frames": 15},
+   {"path": "assets/sprites/rube/rube_walk_end.webp", "label": "walk_end", "fw": 108, "fh": 154, "cols": 7, "frames": 14},
+   {"path": "assets/sprites/rube/rube_talk.webp", "label": "talk", "fw": 108, "fh": 154, "cols": 7, "frames": 20},
+   {"path": "assets/sprites/rube/rube_offer_trade.png", "label": "offer_trade", "fw": 108, "fh": 154, "cols": 34, "frames": 340},
+   {"path": "assets/sprites/rube/rube_offer_accept.webp", "label": "offer_accept", "fw": 108, "fh": 154, "cols": 9, "frames": 70},
+   {"path": "assets/sprites/rube/rube_offer_reject.webp", "label": "offer_reject", "fw": 108, "fh": 154, "cols": 9, "frames": 130},
+   {"path": "assets/sprites/rube/rube_fade_out.webp", "label": "fade_out", "fw": 108, "fh": 154, "cols": 9, "frames": 97}
+  ] },
+  {"name": "flamingo", "swf": "inhabitants/flamingo/npc_flamingo.swf", "sprite": 933, "sheets": [
+   {"path": "assets/sprites/newxp/flamingo_idle.png", "label": "idle0", "fw": 290, "fh": 249, "cols": 1, "frames": 1},
+   {"path": "assets/sprites/newxp/flamingo_talk_tall.png", "label": "talkTall", "fw": 290, "fh": 249, "cols": 13, "frames": 89},
+   {"path": "assets/sprites/newxp/flamingo_talk_short.png", "label": "talkShort", "fw": 290, "fh": 249, "cols": 13, "frames": 89},
+   {"path": "assets/sprites/newxp/flamingo_flying.png", "label": "flying", "fw": 290, "fh": 249, "cols": 3, "frames": 12},
+   {"path": "assets/sprites/newxp/flamingo_hover.png", "label": "hover", "fw": 290, "fh": 249, "cols": 3, "frames": 12}
+  ] },
+  {"name": "magic-rock", "swf": "inhabitants/magic_rock/magic_rock.swf", "sprite": 52, "sheets": [
+   {"path": "assets/sprites/newxp/rock_read.png", "label": "read", "fw": 75, "fh": 348, "cols": 9, "frames": 18},
+   {"path": "assets/sprites/newxp/rock_talk.png", "label": "talk", "fw": 75, "fh": 348, "cols": 13, "frames": 91},
+   {"path": "assets/sprites/newxp/rock_appear.png", "label": "appear2", "fw": 75, "fh": 348, "cols": 10, "frames": 20}
+  ] },
+  {"name": "hell-bartender", "swf": "inhabitants/hell_bartender/hell_bartender.swf", "sprite": 34, "sheets": [
+   {"path": "assets/sprites/hell/hell_bartender-idle1.png", "label": "idle1", "fw": 244, "fh": 197, "cols": 14, "frames": 81},
+   {"path": "assets/sprites/hell/hell_bartender-idle2.png", "label": "idle2", "fw": 244, "fh": 197, "cols": 15, "frames": 87},
+   {"path": "assets/sprites/hell/hell_bartender-talk-left.png", "label": "talk_left", "fw": 244, "fh": 197, "cols": 16, "frames": 110},
+   {"path": "assets/sprites/hell/hell_bartender-talk-right.png", "label": "talk_right", "fw": 244, "fh": 197, "cols": 15, "frames": 103},
+   {"path": "assets/sprites/hell/hell_bartender-talk-right-out.png", "label": "talk_right_out", "fw": 244, "fh": 197, "cols": 4, "frames": 7}
+  ] }
+ ]
+}
