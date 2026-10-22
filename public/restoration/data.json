@@ -212,7 +212,7 @@
    "group": "world",
    "name": "The new-player tutorial",
    "status": "rebuilt",
-   "blurb": "An optional start: fall through the clouds, learn to walk and jump with the Welcoming Flamingo and the Dustbunny, get your home street and first skill, buy two bags on Gentle Island, and head out into Ur.",
+   "blurb": "An optional start: fall through the clouds, learn to walk and jump with the Welcoming Flamingo and the Dustbunny, get your home street and first skill, buy two bags on Gentle Island, go home for the Magic Rock's send-off, and head out into Ur.",
    "spot": null,
    "evidence": [
     "public/js/newxp.js",
@@ -543,7 +543,7 @@
    "group": "quests",
    "name": "Races and Game of Crowns",
    "status": "solo",
-   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches.",
+   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules.",
    "spot": null,
    "evidence": [
     "public/js/races.js",
@@ -1393,9 +1393,14 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 212,
+  "commits": 213,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "The whole Glitch wardrobe in the builder: 626 articles, with search"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1510,11 +1515,6 @@
     "date": "2026-10-21",
     "kind": "new",
     "text": "A favicon: a Groddle piggy"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "fix",
-    "text": "Upgrade cards flip when you pick one"
    }
   ]
  },
