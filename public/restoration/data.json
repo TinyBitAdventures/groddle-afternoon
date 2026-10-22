@@ -520,10 +520,12 @@
    "group": "quests",
    "name": "Ticket to Paradise",
    "status": "rebuilt",
-   "blurb": "Private flying and sliding courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide. More are on the way.",
+   "blurb": "Thirteen private courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide, Aerial Boost, Mountain Scaling, Abysmal Thrill, Arbor Hollow, Bippity Bop, Cloud Flight, Updraft, Sky Plunge and Drafty Uplift.",
    "spot": null,
    "evidence": [
-    "public/js/paradise-flight.js"
+    "public/js/paradise-flight.js",
+    "public/js/paradise-courses.js",
+    "public/js/paradise-course-runtime.js"
    ],
    "shot": "shots/paradise.webp"
   },
@@ -1058,14 +1060,14 @@
   "skipped": 23
  },
  "icons": {
-  "items": 754,
+  "items": 763,
   "sharp": 681
  },
  "imagination": {
   "total": 275,
   "counts": {
-   "live": 188,
-   "later": 58,
+   "live": 194,
+   "later": 52,
    "starter": 9,
    "none": 5,
    "interface": 8,
@@ -1078,9 +1080,14 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 176,
+  "commits": 178,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Nine more Ticket to Paradise courses"
+   },
    {
     "date": "2026-10-21",
     "kind": "new",
@@ -1195,14 +1202,9 @@
     "date": "2026-10-21",
     "kind": "fix",
     "text": "Interaction hints no longer flicker"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "fix",
-    "text": "Nothing shows through the loading screen"
    }
   ]
  },
- "tests": 130,
+ "tests": 131,
  "generatedAt": "2026-10-21"
 }
