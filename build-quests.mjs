@@ -200,6 +200,8 @@ const INFERRED_GATES = {
 /* ------------------------------------------------------------------ */
 // Quests the remake already runs through a dedicated module in game.js.
 const CUSTOM = new Set([
+  // newxp-feature.js (Gentle Island tutorial) drives these; the Magic Rock never offers them.
+  'animalkinship_1', 'ezcooking_1', 'lightgreenthumb_1', 'buy_two_bags', 'leave_gentle_island',
   'blue_and_white_part1', 'blue_and_white_part2', // summers-day.js
   'winter_walk', 'winter_walk_part2', // winter-walk.js
   'greedy_street_spirit', 'greedy_street_spirit_reminisce', // greedy-street-spirit.js
@@ -222,10 +224,10 @@ const PREREQ_PROXY = {
   soilappreciation_1: { skill: 'soil_appreciation_1' },
 };
 const EXCLUDE = {
-  // newxp tutorials (no Gentle Island / newxp instances in the remake)
-  animalkinship_1: 'newxp_tutorial', ezcooking_1: 'newxp_tutorial', lightgreenthumb_1: 'newxp_tutorial',
-  soilappreciation_1: 'newxp_tutorial', learn_first_skill: 'newxp_tutorial', leave_gentle_island: 'newxp_tutorial',
-  buy_two_bags: 'newxp_tutorial', tutorial_reinforcement: 'newxp_tutorial', firefly_whistle: 'newxp_tutorial',
+  // newxp tutorial quests nothing in the final source starts (Gentle Island's own are CUSTOM above);
+  // soilappreciation_1's practice street is lost.
+  soilappreciation_1: 'newxp_tutorial', learn_first_skill: 'newxp_tutorial',
+  tutorial_reinforcement: 'newxp_tutorial', firefly_whistle: 'newxp_tutorial',
   // test / placeholder / seasonal
   cal_test_1: 'removed_or_test', jason_test_quest: 'removed_or_test', chris_test: 'removed_or_test',
   missing: 'removed_or_test', glitchmas2010: 'removed_or_test', get_first_tool: 'removed_or_test',

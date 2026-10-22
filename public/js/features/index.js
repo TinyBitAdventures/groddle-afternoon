@@ -35,6 +35,7 @@ import { questInstancesFeature } from './quest-instances-feature.js?v=qi-1';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-1';
 import { seasonsFeature } from './seasons-feature.js?v=seasons-1';
 import { cameraModeFeature } from './camera-mode-feature.js';
+import { newxpFeature } from './newxp-feature.js?v=newxp-1';
 
 export { questFlagsFeature };
 
@@ -70,6 +71,7 @@ export const FEATURES = [
   partySpacesFeature,
   seasonsFeature,
   cameraModeFeature,
+  newxpFeature,
 ];
 import { smugglingFeature } from './smuggling-feature.js?v=smuggling-1'; FEATURES.push(smugglingFeature);
 import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-1'; FEATURES.push(homeTowerFeature);

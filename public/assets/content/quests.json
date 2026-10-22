@@ -535,8 +535,8 @@
   "prereqProxy": {
    "skill": "animalkinship_1"
   },
-  "solo": false,
-  "soloReason": "newxp_tutorial"
+  "solo": true,
+  "custom": true
  },
  "animalkinship_massage_butterflies": {
   "classTsid": "animalkinship_massage_butterflies",
@@ -2411,8 +2411,8 @@
     "event": "newxp_island"
    }
   ],
-  "solo": false,
-  "soloReason": "newxp_tutorial"
+  "solo": true,
+  "custom": true
  },
  "cal_test_1": {
   "classTsid": "cal_test_1",
@@ -4403,8 +4403,8 @@
   "prereqProxy": {
    "skill": "ezcooking_1"
   },
-  "solo": false,
-  "soloReason": "newxp_tutorial"
+  "solo": true,
+  "custom": true
  },
  "ezcooking_make_level1_recipes": {
   "classTsid": "ezcooking_make_level1_recipes",
@@ -28550,8 +28550,8 @@
     "event": "newxp_home"
    }
   ],
-  "solo": false,
-  "soloReason": "newxp_tutorial"
+  "solo": true,
+  "custom": true
  },
  "letter_block_1": {
   "classTsid": "letter_block_1",
@@ -28772,8 +28772,8 @@
   "prereqProxy": {
    "skill": "light_green_thumb_1"
   },
-  "solo": false,
-  "soloReason": "newxp_tutorial"
+  "solo": true,
+  "custom": true
  },
  "lightgreenthumb_break_watering_can": {
   "classTsid": "lightgreenthumb_break_watering_can",

@@ -1,0 +1,584 @@
+/**
+ * The original new-player experience ("newxp", Gentle Island tutorial) as an
+ * opt-in start. Pure rules and source data; the feature that runs it is
+ * js/features/newxp-feature.js.
+ *
+ * Sources (GameServerJS, design data only):
+ *  - config_prod.js newxp_locations (intro LIFBFC7TDJ535UL, training1
+ *    LIFBLMAVDJ53NP1, training2 LIFD0KCDEJ53L7K, newbie_island
+ *    LA952QGCH3D31E2) and newxp_exits (115 drop points; all imported).
+ *  - locations/newxp_intro.js, newxp_training1.js, newxp_training2.js,
+ *    newxp_house_exterior.js, inc_newxp.js, newbie_island.js,
+ *    skillquest_ak_v2.js / skillquest_lgt_v2.js / skillquest_ezc_v2.js.
+ *  - players/inc_newxp.js, players/player.js goToNewNewStartingLevel and
+ *    teleportHome, players/inc_physics.js setDefaultPhysics,
+ *    items/magic_rock.js, items/npc_sloth.js, locations/home.js.
+ *  - quests animalkinship_1 / ezcooking_1 / lightgreenthumb_1 (handed out
+ *    finished by the Magic Rock: quests_give_finished, no rewards),
+ *    buy_two_bags and leave_gentle_island (normal rewards).
+ *  - inc_data_imagination.js walk_speed_1/2, jump_1/2 physics rewards.
+ *
+ * Lost and rebuilt: the geometry of the three newxp instance templates (no
+ * G*.xml for them in the archive) and the client overlays' text, which was
+ * read from the 10-minute playthrough (K2q5GXruLvE). Gentle Island (hub 129,
+ * six streets) and the Animal Kinship / Light Green Thumb practice streets
+ * are imported and used as they are.
+ */
+
+export const NEWXP_SAVE_VERSION = 1;
+
+export const NEWXP_LOCATIONS = Object.freeze({
+  newxp_intro: 'LIFBFC7TDJ535UL',
+  newxp_training1: 'LIFBLMAVDJ53NP1',
+  newxp_training2: 'LIFD0KCDEJ53L7K',
+  newbie_island: 'LA952QGCH3D31E2',
+});
+
+/** Ordered stages. Scene stages are feature-built (geometry lost). */
+export const STAGES = Object.freeze(['clouds', 'training1', 'training2', 'house', 'skill', 'island', 'done']);
+export const SCENE_STAGES = Object.freeze(['clouds', 'training1', 'training2']);
+
+export const SCENE_TSIDS = Object.freeze({
+  clouds: 'NEWXP_CLOUDS',
+  training1: 'NEWXP_TRAINING1',
+  training2: 'NEWXP_TRAINING2',
+});
+
+export function isNewxpSceneTsid(tsid) {
+  return Object.values(SCENE_TSIDS).includes(String(tsid || ''));
+}
+
+/** Imported Gentle Island (hub 129) and practice streets (G* index keys). */
+export const GENTLE_ISLAND = Object.freeze({
+  surveyors_stroll: 'GA952QGCH3D31E2', // NB_Street1, the Magic Rock
+  high_jumpers_gully: 'GA94O989H3D3RN7',
+  diversionary_path: 'GA94AEO5H3D35LP',
+  doonboggle_trail: 'GA94GCF7H3D30IM',
+  progress_way: 'GA94UK1BH3D3FJL', // the cheap bag vendor
+  exit: 'GA93VBH3H3D38HF', // Gentle Island Exit
+});
+export const GENTLE_ISLAND_TSIDS = Object.freeze(Object.values(GENTLE_ISLAND));
+// source: inc_skillquest.js newbie_island arrival (-2302, -77), bounds l -2500 t -1200.
+export const ISLAND_ARRIVAL = Object.freeze({ tsid: GENTLE_ISLAND.surveyors_stroll, x: 198, y: 1100 });
+
+/** Street boxes (screen space, bottom-centre) the island script reacts to. */
+export const ISLAND_BOXES = Object.freeze({
+  // newbie_island.js hitBox street4_check / gentle_island_exit.
+  street4_check: { tsid: GENTLE_ISLAND.progress_way, x: 4700, y: 950, w: 200, h: 200 },
+  gentle_island_exit: { tsid: GENTLE_ISLAND.exit, x: 5724, y: 1122, w: 600, h: 300 },
+});
+
+/**
+ * The three first skills (magic_rock.js showSkillChooser / onOverlayClicked)
+ * and their practice streets (config newxp_locations). Only Animal Kinship
+ * and Light Green Thumb were archived; EZ Cooking's street is lost.
+ */
+export const FIRST_SKILLS = Object.freeze([
+  { id: 'animalkinship_1', quest: 'animalkinship_1', choice: 'skill_animal_kinship', name: 'Animal Kinship', art: 'animalkinship', street: 'GHFRK14DDU53RQQ', finishBox: 'quest:flag:finish_animalkinship', practice: 'So … it’s Animal Kinship, eh? Alright then. Let’s practice!', reply: 'OK' },
+  { id: 'ezcooking_1', quest: 'ezcooking_1', choice: 'skill_ezcooking', name: 'EZ Cooking', art: 'ezcooking', street: null, finishBox: null, practice: 'Ah, EZ Cooking. Let\'s get started!', reply: 'Aiight' },
+  { id: 'light_green_thumb_1', quest: 'lightgreenthumb_1', choice: 'skill_lightgreenthumb', name: 'Light Green Thumb', art: 'lightgreenthumb', street: 'GUVCT29PSU53G9V', finishBox: 'quest:flag:finish_lightgreenthumb', practice: 'Light Green Thumb? Let’s practice!', reply: 'Aiight' },
+]);
+// source: quests/*_1.js onStarted teleportToLocationDelayed(..., 123, -958); street bounds t -1000.
+export const PRACTICE_ARRIVAL = Object.freeze({ x: 123, y: 42 });
+
+export function firstSkill(id) {
+  return FIRST_SKILLS.find((s) => s.id === id || s.choice === id || s.quest === id) || null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Physics                                                              */
+/* ------------------------------------------------------------------ */
+
+// source: inc_physics.js setDefaultPhysics "NEW DEFAULT" imagination layer.
+export const NEWXP_DEFAULT_PHYSICS = Object.freeze({ vx_max: 0.4597, vy_jump: 0.7105 });
+// source: inc_data_imagination.js reward type 1 data.
+export const NEWXP_UPGRADES = Object.freeze({
+  walk_speed_1: { name: 'Walk Speed I', cost: 2, vx_max: 0.6567 },
+  jump_1: { name: 'High Jumper I', cost: 3, vy_jump: 0.907 },
+  jump_2: { name: 'High Jumper II', cost: 6, vy_jump: 1 },
+  walk_speed_2: { name: 'Walk Speed II', cost: 6, vx_max: 0.8268 },
+});
+// The remake's normal movement is Walk Speed II + High Jumper II (imagination.js REMAKE_BASELINE_PHYSICS).
+const BASELINE = { vx_max: 0.8268, vy_jump: 1 };
+
+/** Remake speed/jump multipliers for the newxp imagination layer. */
+export function tutorialPhysics(upgrades = []) {
+  const set = new Set(upgrades);
+  let vx = NEWXP_DEFAULT_PHYSICS.vx_max;
+  let vy = NEWXP_DEFAULT_PHYSICS.vy_jump;
+  for (const id of ['walk_speed_1', 'walk_speed_2']) if (set.has(id)) vx = Math.max(vx, NEWXP_UPGRADES[id].vx_max);
+  for (const id of ['jump_1', 'jump_2']) if (set.has(id)) vy = Math.max(vy, NEWXP_UPGRADES[id].vy_jump);
+  return { speed: vx / BASELINE.vx_max, jump: vy / BASELINE.vy_jump };
+}
+
+/**
+ * Safe reach for level design in remake pixels: the avatar's apex is 110 px
+ * at jump 1 (jump velocity -9.6 * jump, gravity 0.42/frame), scaling with
+ * jump squared; the horizontal reach is 60% of the airborne run.
+ */
+export function reachFor(physics) {
+  const jump = physics?.jump ?? 1;
+  const speed = physics?.speed ?? 1;
+  const apex = 110 * jump * jump;
+  const airFrames = (2 * 9.6 * jump) / 0.42;
+  return { rise: Math.floor(apex - 10), gap: Math.floor(0.6 * 4.4 * speed * airFrames) };
+}
+
+/** Platform ids reachable from `startId` by walking, jumping, dropping and ladders. */
+export function reachablePlatforms(platforms, ladders, startId, reach) {
+  const byId = new Map(platforms.map((p) => [p.id, p]));
+  const seen = new Set([startId]);
+  const queue = [startId];
+  const yOf = (p) => (p.y1 + p.y2) / 2;
+  while (queue.length) {
+    const a = byId.get(queue.shift());
+    for (const b of platforms) {
+      if (seen.has(b.id)) continue;
+      const rise = yOf(a) - yOf(b);
+      const gap = Math.max(0, b.x1 - a.x2, a.x1 - b.x2);
+      let ok = false;
+      if (rise <= 0) ok = gap <= reach.gap + Math.min(300, -rise); // drop or level hop
+      else ok = rise <= reach.rise && gap <= reach.gap;
+      if (!ok) {
+        for (const l of ladders || []) {
+          const onA = l.x >= a.x1 - 10 && l.x <= a.x2 + 10 && Math.abs(l.yBot - yOf(a)) <= 30;
+          const onB = l.x >= b.x1 - 30 && l.x <= b.x2 + 30 && l.yTop <= yOf(b) + 10 && l.yTop >= yOf(b) - reach.rise;
+          if (onA && onB) ok = true;
+        }
+      }
+      if (ok) {
+        seen.add(b.id);
+        queue.push(b.id);
+      }
+    }
+  }
+  return seen;
+}
+
+/* ------------------------------------------------------------------ */
+/* Dialogue (source-exact; <split butt_txt> marks the next button)     */
+/* ------------------------------------------------------------------ */
+
+export const LINES = Object.freeze({
+  // newxp_intro: client overlays read from the playthrough.
+  moveInstructions: 'Use Arrow Keys to move (or W,A,S,D Keys if you prefer)',
+  cloudBeats: [
+    'THE ELEVEN GIANTS WHO THOUGHT AND SANG AND IMAGINED EVERYTHING INTO EXISTENCE …',
+    '… THESE GIANTS ARE SOMETIMES LUCKY ENOUGH TO IMAGINE SOMEONE LIKE YOU.',
+    'YOU HAVE YOUR OWN IMAGINATION, AND YOU CAN HELP GROW AND SHAPE THIS WORLD.',
+    'LET’S GO!',
+  ],
+  // inc_data_overlays.js instruction overlays (text from the playthrough).
+  buttonInstructions: 'Use Enter to advance through conversations',
+  jumpInstructions: 'Use the Space Bar to jump',
+  jumpAcrossInstructions: 'Hold an Arrow Key and press the Space Bar to jump across',
+  climbInstructions: 'Use Up/Down Keys to climb ladders',
+  interactInstructions: 'Use Enter to interact with glowing objects or players',
+  // newxp_training1.js
+  t1Talk1: 'Well, well — welcome.<br><br>I’m a “Welcoming Flamingo”.<br>But I am not a patient Flamingo.',
+  t1Talk2: '… not patient at all, he isn\'t. So, let\'s get a move on. This way!',
+  t1Slow1: 'See, this. You walk so slowly.<br>It’s maddening! You’ve got to imagine yourself faster!!',
+  t1Slow2: 'Sorry about that.<split butt_txt="It\'s OK">But, you should get to walking faster.<br>You’ll need some imagination.',
+  t1CatchUp: 'Good. Now catch up to those flamingos.',
+  t1JumpTalk: 'Good. Now follow me up here …',
+  t1GoGetQuoin: 'Go and get that quoin.',
+  t1JumpHigher: 'Go and get that quoin. You need to jump higher.',
+  t1Door1: 'Yeah! You know how to moooove!',
+  t1Name: 'And so you deserve the honor of a name. What shall we call you?',
+  t1NamePrompt: 'What should we call you?',
+  t1Look: 'So, {name}, is it? Surely you don’t imagine yourself looking so very, very plain. Put together a basic look for yourself to get started.',
+  t1Bye: 'You seem fairly well set up now, {name}. And we must be off to welcome the next new player. Good luck!',
+  // items/npc_sloth.js newxp_talk
+  sloth: 'You’re doing greeeeeeeeeeeat…<br>Keep going!',
+  // newxp_img1/2/3_overlay (text from the playthrough)
+  img1: { title: 'You got some imagination', body: 'You can use imagination to upgrade and customize your character.', button: 'Choose Upgrade' },
+  img2: { title: 'You got more imagination', body: 'At various thresholds, as you earn more, you’ll level up. (But you’ll need a lot more than this!)', button: 'Choose Upgrade' },
+  img3: { title: 'Even more imagination', body: 'Nicely done. We’ll sock this one away till later', button: 'Okay' },
+  upgradeHelp: 'Select a card above to learn about the upgrade',
+  // newxp_training2.js
+  t2Talk1: 'Wow. Okay! Hihi {name}.<br>Let\'s scratch your back, so to speak.',
+  t2Talk5: 'And then you scratch mine! HA!<br> Just follow my lead.',
+  t2Food: 'Some food, for your energy needs.<br>Feel free to pick it up.',
+  t2EatNag: ['Go on. Eat!', 'Eat it. Mmmm!'],
+  t2FoodRest: 'You\'ll want the rest of that food later,<br>so pick it up.',
+  t2NotYet: 'You need to come on and do<br>what I am telling! For real!',
+  t2Drinks: 'Ok! You\'ll need drinks to keep up your mood. Please pick one up.',
+  t2DrinkIt: 'Good, now drink it!',
+  t2DrinkFirst: 'Ahut! Uht! Look! Drink one<br>of those drinks!',
+  t2DrinkRest: 'Snag the rest of those drinks for later. They\'ll come in handy.',
+  t2Egg1: 'OK, {name}. I have helped<br>you out. Now it\'s time for you to<br>do the same.<split butt_txt="OK">I\'m an aficionado of EGGs, but without<br>any appendages I can\'t get them myself.',
+  t2Egg1c: 'Please jump your way to the EGG PLANT<br>up there and bring me an EGG.',
+  t2Egg2: 'Go up to the Egg Plant and get an Egg for the Dustbunny.',
+  t2Egg3: 'Mmmm. EGGs! Love \'em!',
+  t2HaveEgg: 'You got an EGG! Please gimme it!!!',
+  t2NoEgg: 'Heyyyyyyy. You were going to<br>get me an EGG. Fair\'s fair!<br>Go get one!',
+  t2GiveHint: 'Drag an Egg onto the Dustbunny. Or, click on the Dustbunny to give it an Egg.',
+  t2Harvest: 'Harvest …',
+  t2Delicious: 'Delicious!',
+  t2Thanks: 'Thank you very much, {name}.<br>That was SO GOOD!<br><split butt_txt="No problem">As a token of my thanks,<br>let me remove these walls.',
+  t2FindRock: 'Go and find your magic rock. Should be over on the right …',
+  t2Bye: 'Good luck, {name} — enjoy your new home!',
+  rockUpHere: '{name}! Up here!',
+  rockTicket: '{name}, my new chum.<br>I have a ticket for you.<split butt_txt="Good">You can use it to pick the home street<br>style that fits your vibe the best.<split butt_txt="OK">It\'s pretty easy to change your mind<br>later - just need a little imagination.<split butt_txt="Right">So make your choice and I\'ll meet you<br>at your new place.',
+  rockOhRight: 'Oh right, the ticket.',
+  // first_inv / first_eat / first_drink overlays (text from the playthrough)
+  firstInventory: 'Things you pick up will go into your inventory.',
+  firstEat: 'Eating food gives you energy, and energy keeps you alive.',
+  firstDrink: 'Drinks give you mood. The higher your mood, the more imagination you earn.',
+  watchEnergy: 'Watch your energy',
+  keepMood: 'Keep your mood up',
+  machine: 'Home Street Selection Machine',
+  // items/magic_rock.js (house exterior / home)
+  ooof: 'Ooof.',
+  homeStreet: 'Well, this is your home street. It’s not much yet, but I’m sure you’ll build it up nicely.',
+  chooseSkill: 'There’s so much more you can do with your house and your land — but to do much more you’re going to need some skills, and you’re going to need to get out into the world to put those skills to work.<split butt_txt="OK">Do you want to choose a skill now? Or do you want a few more minutes to look around?',
+  giveMinute: 'OK, no problem. Take your time and when you’re ready, come talk to me.',
+  takePick: 'Good. I can give you one skill instantly; the rest you’ll have to learn over time. Take your pick …',
+  goodChoice: '{skill} is a good choice. I’ll send you to a special place to practice and then you’ll be off to The Island …',
+  // newbie_island.js / magic_rock.js on Gentle Island
+  islandHello: 'Well, {name}, what did I say?  {skill} was a solid choice.<split butt_txt="Thanks">All that skillin’ is going to get you lots of stuff. And, hmmmm, your inventory is not SO big.<split butt_txt="Hmmm">Looks like you need some bags. You can hold more stuff if you have some bags.',
+  watchThis: 'Watch this part: the rock is about to give you a quest.',
+  explainQuest: 'You need to go and find the CHEAP BAG VENDOR on PROGRESS WAY.<split butt_txt="OK">Bags cost about 500 currants each, I think. You should get two. I can give you the money, let’s see here …',
+  currants: 'Currants are the currency of Ur.//They make it easier to trade with vendors and other players.',
+  shortChange: 'Hmmm. Looks like I was a little short — that’s not quite enough for two bags.<split butt_txt="Dang">Oh well — shouldn’t be THAT hard for you to rustle up a few more currants on your way to find the CHEAP BAG VENDOR on PROGRESS WAY (like I previously mentioned). Good luck!',
+  thatWasQuest: 'That was a quest. It shows up in your quest log.',
+  questLogHint: 'Use the ‘Q’ key to bring up your Quest Log whenever you want',
+  goodLuck: 'Good luck …',
+  bagReminder: 'You haven\'t gotten your bags from the vendor. Don\'t forget!',
+  noBagsYet: 'You haven\'t bought your bags from the vendor yet. You really need to do that …',
+  backAndForth: 'You can go back and forth between your home street and world at almost any time',
+  relic: 'Lo, a relic of the Island came along with you!',
+  greeterTwig: 'It’s a Greeter Twig! You can use it to summon another player to come and say hi.',
+  explore: 'Good luck! And just explore … try everything, see what happens. You\'ll learn all you need that way.',
+});
+
+/** Fill {name}/{skill} and turn a source talk string into pages. */
+export function talkPages(text, vars = {}, finalButton = 'OK') {
+  const filled = String(text || '').replace(/\{(\w+)\}/g, (_, k) => (vars[k] != null ? String(vars[k]) : ''));
+  const parts = filled.split(/<split\s+butt_txt="([^"]*)"\s*\/?>/);
+  const pages = [];
+  for (let i = 0; i < parts.length; i += 2) {
+    const body = parts[i].replace(/^(<br>\s*)+|(<br>\s*)+$/g, '').trim();
+    const button = i + 1 < parts.length ? parts[i + 1] : finalButton;
+    pages.push({ text: body, button });
+  }
+  return pages;
+}
+
+/** announce_vog_fade text: '//' separates the faded pages. */
+export function vogPages(text) {
+  return String(text || '').split('//').map((s) => s.trim()).filter(Boolean);
+}
+
+/* ------------------------------------------------------------------ */
+/* Items, rewards, prices                                               */
+/* ------------------------------------------------------------------ */
+
+// newxp_training2.js special_items (class, count).
+export const TRAINING2_FOOD = Object.freeze([
+  { id: 'food_2', classTsid: 'common_crudites', count: 1 },
+  { id: 'food_3', classTsid: 'flummery', count: 1 },
+]);
+export const TRAINING2_DRINKS = Object.freeze([
+  { id: 'drink_1', classTsid: 'spicy_grog', count: 1 },
+  { id: 'drink_2', classTsid: 'fruity_juice', count: 3 },
+  { id: 'drink_3', classTsid: 'spicy_grog', count: 3 },
+]);
+// food_eaten: metabolics_set_energy(80); playerEnter sets energy/mood 99.
+export const TRAINING2_ENERGY_AFTER_EAT = 80;
+export const TRAINING2_ENTER_METABOLICS = 99;
+// newbie_island.js revealCurrants2: stats_add_currants(978).
+export const ISLAND_CURRANTS = 978;
+// The cheap bag vendor's prices are lost; the rock says "about 500 currants each".
+export const CHEAP_BAG_PRICE = 500;
+export const BAGS_NEEDED = 2;
+// location.js: leave_gentle_island flag 15 s after reaching a real street.
+export const LEAVE_FLAG_DELAY_MS = 15_000;
+// players/inc_newxp.js newxpQuestReminder: every 5 minutes.
+export const BAG_REMINDER_MS = 5 * 60_000;
+
+/** iMG quoins in the training levels (training1 xp benefits from the source; the rest from the playthrough HUD). */
+export const QUOIN_BENEFITS = Object.freeze({
+  img_pickup_walk: 2, // newxp_training1.js slow_create_coin benefit 2
+  img_pickup_jump: 3, // newxp_training1.js timFix benefit 3
+  img_pickup_ladder: 1, // playthrough: IMG 0 -> 1
+  img_pickup_1: 6, // playthrough: IMG 1 -> 7, buys High Jumper II (6)
+  img_pickup_egg_a: 4, // playthrough: "+4 IMG" by the Egg Plant
+  img_pickup_egg_b: 6, // playthrough: IMG 1 -> 11 in all, buys Walk Speed II (6)
+});
+
+/** The upgrade hands dealt in the playthrough (the buyable card is `buy`). */
+export const UPGRADE_HANDS = Object.freeze({
+  walk: { cards: ['jump_1', 'walk_speed_2', 'walk_speed_1'], buy: 'walk_speed_1' },
+  jump: { cards: ['jump_1', 'walk_speed_2', 'jump_2'], buy: 'jump_1' },
+  jump2: { cards: ['walk_speed_2', 'jump_1', 'jump_2'], buy: 'jump_2' },
+  walk2: { cards: ['mappery', 'walk_speed_2', 'camera_mode'], buy: 'walk_speed_2' },
+});
+
+/* ------------------------------------------------------------------ */
+/* Exits                                                                */
+/* ------------------------------------------------------------------ */
+
+// config_prod.js newxp_exits [tsid, x, y]: every one is imported (G index key).
+export const NEWXP_EXITS = Object.freeze([
+  ['LCRR4REARA12CM5', -2295, -1300], ['LHV1AMP8TL02B40', -2355, -1300], ['LLI17P0T8J029N7', 2344, -1300],
+  ['LHV1CIQLVL02C6H', -2355, -1300], ['LHV1IHMG1312A0S', 2421, -1300], ['LCRL3F8I3L12O0J', 2525, -1300],
+  ['LCR12D911T12E57', 2457, -1300], ['LCR8F1FLBI12F2H', 2320, -1300], ['LCR137T2HK123RR', -2355, -1300],
+  ['LHVTUCELRV02V9I', 2293, -1300], ['LA51701PF262LC8', -800, -1300], ['LA5FUB7R0N627KI', -414, -2700],
+  ['LA58KK7B9O522PC', 380, -2700], ['LA517MT2M262D0F', -2280, -1300], ['LA519RU9M462NJ1', 2367, -1300],
+  ['LA51BMHT2562Q3D', -2207, -1300], ['LA55645B8O528MI', -2525, -1300], ['LHVSU0QSQIA2TIM', 2434, -1300],
+  ['LHV1KT9J0LA2IIA', -1425, -1300], ['LHVT10TNRIA23L2', -262, -1300], ['LHV1H71LPKA2P7G', -2488, -1300],
+  ['LHV23IAU9LA2E7A', 2267, -1300], ['LHVT0JVHRIA2IE9', -2354, -1300], ['LA912UEGE492F2G', 2301, -1300],
+  ['LA91O38QQ192K8J', -2357, -1300], ['LA912LITC492EU2', 808, -1300], ['LA9143HLH4929K7', -2357, -1300],
+  ['LA9FDN44SG92SDQ', -2287, -1300], ['LA9I92MRBE92S8Q', 2297, -1300], ['LA9111H84492V1K', 2345, -1300],
+  ['LA9BRBV8Q492K6R', -2322, -1300], ['LA99NEQK1F92ICE', -2355, -1300], ['LIF8I91P8J02A85', 1521, -1700],
+  ['LHVMCDF3LA32K2R', 1786, -1500], ['LIF13QL5IG02UAI', -1950, -1500], ['LHVQM0MUB032B5S', -1712, -1500],
+  ['LHVLJEBAJ832SJA', 1655, -1500], ['LHVMHDIBNA32QPF', 1935, -1500], ['LHV8NMVAGE228A2', -1775, -1500],
+  ['LHVVLBM1VL22A6Q', -1382, -1500], ['LIFNRF3P0E02J90', 1821, -1500], ['LHVD0VVK8U2262J', -1777, -1500],
+  ['LCR1UERKPIN1G7N', -2473, -1300], ['LCR103UREMK11MT', -2201, -1300], ['LCR143M18PK1774', -2364, -1300],
+  ['LCR10S7GVKJ1ABI', -2525, -1300], ['LCR13CE52PK1L81', -2415, -1300], ['LLIF37ASJFE1AVQ', 2182, -1300],
+  ['LCR13O9VQEM1M3P', -2423, -1300], ['LLIF3AQTOFE19OR', 2373, -1300], ['LCR10K63BQL14PE', -1389, -1600],
+  ['LCR1460502K1790', 2306, -1300], ['LCR131F8U1K1PF9', 2311, -1300], ['LCR1OU9H34K19OE', -160, -2300],
+  ['LCRHJHOFQNL1PHP', 1489, -1600], ['LCR12NU45AM12BB', -1563, -1600], ['LCR11JA67NJ15N3', -2400, -1300],
+  ['LCRO4M7LH5L1QOO', -2392, -1300], ['LCRVT5V0BDO1HLF', 2508, -1300], ['LCR11DNA3EL10TD', -2443, -1300],
+  ['LCR111KI08O1HLB', -2501, -1300], ['LLI334UG2UD1IKQ', 2358, -1300], ['LCR10K0NLRK1GKE', 2390, -1300],
+  ['LLI32HBOUTD1GQV', 2438, -1300], ['LCR1664750O1D23', 1242, -1600], ['LCRHSGTEION115H', 2080, -1300],
+  ['LIFN3FI0TNU10PS', -2190, -1400], ['LIF1SGGD7EU12T5', 1074, -1400], ['LIF1609JRKV151E', 1859, -1400],
+  ['LIF15S7VPRV1DIP', 283, -1500], ['LIFMGTCIQGU13TS', 2478, -1150], ['LIFN5CQH1OU1P61', -1900, -1400],
+  ['LHV1BIOIL142P25', 2657, -1300], ['LHV3ISF18352QIP', -2427, -1300], ['LHV17CFO5V327AJ', 2262, -1300],
+  ['LHVHP2BJI652O9S', 2328, -1300], ['LHV1FUFU9442AKR', 2333, -1300], ['LHV2JBHA9152QAS', -2722, -1300],
+  ['LA9KL58B1D82CDV', -2390, -1300], ['LA9KKVJDTC829U8', 2428, -1300], ['LA9KL68C1D825IA', -2462, -1300],
+  ['LA9T11KPMD82B1S', -2372, -1300], ['LA9GLRKMQF82961', 2440, -1300], ['LA961CLV4G8252G', -2405, -1300],
+  ['LA9BSVRN5I82JIQ', 2406, -1300], ['LA9L02KJ2D829LS', 2325, -1300], ['LUV1V6AR27G26QO', 2599, -1300],
+  ['LUVTKR868NF27QG', -2459, -1300], ['LUVQMVII88F2O29', 2468, -1300], ['LUVL8CLKD5F2TNB', 2310, -1300],
+  ['LUVUVJBM5DF2UR6', -2484, -1300], ['LUVL2G4TQ7F2L1T', -1213, -1300], ['LUVMBSKJQ5F289H', -2296, -1300],
+  ['LUVNUGNGN5F2BOT', 2270, -1300], ['LUVCMP7BM7F2JET', -495, -1300], ['LIFE9GRB8S62L1H', 695, -1300],
+  ['LIFQMHF4MT72V9Q', 2389, -1300], ['LIF16SBFB972GLK', 2400, -1300], ['LIF14KB3T872MAH', 470, -1300],
+  ['LIF1AQ6CK972734', -305, -1300], ['LIFCLLMITT727LH', 2418, -1300], ['LIF18TO5NB72AMR', 2522, -1300],
+  ['LIFR3G1FFE72K0S', -2401, -1300], ['LTJ103NK29K1TNJ', 834, -1300], ['LTJ112E9DIO1BPE', 2335, -1300],
+  ['LTJ13ELOLPQ1DP3', -2388, -1300], ['LLI599R12JI1216', 2488, -1300], ['LLI57EKC2HI1EH8', 2395, -1300],
+  ['LIFIEGBN9E72ILT', 2397, -1300], ['LIF16PJS9972LC8', 2331, -1300], ['LIF153KDV872SE5', -2318, -1300],
+  ['LIF7SHGS3E72T8L', 2414, -1300], ['LIFVTRAAJE72GHD', -2315, -1300], ['LIF16GDJ89724E3', 2435, -1300],
+  ['LIF16IHL8972EAC', -2381, -1300],
+]);
+
+/** The imported index key (G...) for a source location tsid (L...). */
+export function indexTsid(sourceTsid) {
+  const t = String(sourceTsid || '');
+  return t.startsWith('L') ? `G${t.slice(1)}` : t;
+}
+
+/**
+ * player.js teleportHome: choose_one(config.newxp_exits). `exists(tsid)`
+ * filters to imported streets; `left` is the street's bounds.l so the
+ * source x becomes a screen x (the source y drops you in from above).
+ */
+export function pickNewxpExit(rng = Math.random, exists = () => true) {
+  const rows = NEWXP_EXITS.filter(([tsid]) => exists(indexTsid(tsid)));
+  if (!rows.length) return null;
+  const [tsid, x, y] = rows[Math.min(rows.length - 1, Math.floor(rng() * rows.length))];
+  return { sourceTsid: tsid, tsid: indexTsid(tsid), x, y };
+}
+
+/* ------------------------------------------------------------------ */
+/* Save                                                                 */
+/* ------------------------------------------------------------------ */
+
+const ISLAND_STEPS = ['arrive', 'quest_given', 'bags_done', 'leaving', 'exited'];
+
+export function normalizeNewxpSave(seed = {}) {
+  const s = seed && typeof seed === 'object' ? seed : {};
+  const status = ['off', 'active', 'done', 'skipped'].includes(s.status) ? s.status : 'off';
+  const stage = STAGES.includes(s.stage) ? s.stage : 'clouds';
+  return {
+    v: NEWXP_SAVE_VERSION,
+    status,
+    stage,
+    name: String(s.name || '').replace(/[<>]/g, '').trim().slice(0, 19),
+    upgrades: Array.isArray(s.upgrades) ? s.upgrades.filter((id) => NEWXP_UPGRADES[id]) : [],
+    homeStyle: ['meadow', 'firebog', 'uralia'].includes(s.homeStyle) ? s.homeStyle : '',
+    skill: firstSkill(s.skill)?.id || '',
+    island: ISLAND_STEPS.includes(s.island) ? s.island : 'arrive',
+    exit: s.exit && typeof s.exit === 'object' && typeof s.exit.tsid === 'string' ? { tsid: s.exit.tsid, x: Number(s.exit.x) || 0 } : null,
+    leftAt: Number.isFinite(s.leftAt) ? s.leftAt : 0,
+    startedAt: Number.isFinite(s.startedAt) ? s.startedAt : 0,
+    doneAt: Number.isFinite(s.doneAt) ? s.doneAt : 0,
+  };
+}
+
+/** Begin (or restart) the tutorial at a stage. */
+export function startNewxp(save, stage = 'clouds', now = Date.now()) {
+  const next = normalizeNewxpSave(save);
+  next.status = 'active';
+  next.stage = STAGES.includes(stage) && stage !== 'done' ? stage : 'clouds';
+  if (next.stage === 'clouds') {
+    next.upgrades = [];
+    next.island = 'arrive';
+    next.exit = null;
+    next.leftAt = 0;
+  }
+  next.startedAt = now;
+  return next;
+}
+
+/** The stage after `stage` (EZ Cooking has no practice street: skill goes straight to the island). */
+export function nextStage(stage) {
+  const i = STAGES.indexOf(stage);
+  return i < 0 || i >= STAGES.length - 1 ? 'done' : STAGES[i + 1];
+}
+
+/** Whether a reload should resume the tutorial (QA routes never do). */
+export function shouldResume(save, params = {}) {
+  if (params.fresh || params.resetgame) return false;
+  return save?.status === 'active';
+}
+
+/** Bottom-centre box hit (street boxes: x ± w/2, y - h .. y). */
+export function inBox(box, x, y) {
+  if (!box) return false;
+  return x >= box.x - box.w / 2 && x <= box.x + box.w / 2 && y >= box.y - box.h && y <= box.y + 4;
+}
+
+/* ------------------------------------------------------------------ */
+/* Scene layouts (rebuilt; remake pixels, y down, y = walking surface)  */
+/* ------------------------------------------------------------------ */
+
+const plat = (id, x1, y1, x2, y2 = y1, style = 'invisible', extra = {}) => ({ id, x1, y1, x2, y2, style, ...extra });
+
+/** newxp_intro: the cloud level. Fall in, walk right past the giant words, drop through. */
+export function cloudsLayout() {
+  const W = 3800;
+  const H = 1400;
+  const CLOUD = 1000;
+  return {
+    width: W,
+    height: H,
+    cloudY: CLOUD,
+    spawn: { x: 260, y: 160 },
+    platforms: [
+      plat('cloud', 0, CLOUD, 3350, CLOUD, 'cloud'),
+      plat('below', 3360, H - 30, W, H - 30),
+    ],
+    walls: [],
+    barriers: [{ id: 'cloud_back', x: 30, y: CLOUD - 600, h: 600, pc_perm: null }],
+    beats: LINES.cloudBeats.map((text, i) => ({ text, x: 800 + i * 700, y: CLOUD - 190 })),
+    // Falling past this line (beyond the cloud edge) lands in training1.
+    dropX: 3360,
+    dropY: CLOUD + 120,
+  };
+}
+
+/**
+ * newxp_training1: source x + 1500, y + 1720 (floor -119 -> 1601).
+ * Mushroom caps are within the newxp default jump (apex 55); the islands up
+ * to the door need High Jumper I (apex 90); wall1 waits for Walk Speed I.
+ */
+export function training1Layout() {
+  const FLOOR = 1600;
+  const islands = [
+    plat('cap1', 2330, 1564, 2420, 1564, 'mushroom'),
+    plat('cap2', 2450, 1528, 2540, 1528, 'mushroom'),
+    plat('cap3', 2570, 1492, 2660, 1492, 'mushroom'),
+    plat('isle_a', 2390, 1420, 2540, 1420, 'grass'),
+    plat('isle_b', 2220, 1350, 2380, 1350, 'pool'),
+    plat('isle_c', 1990, 1280, 2150, 1280, 'red'),
+    plat('tree_d', 2180, 1210, 2340, 1210, 'branch', { tree: true }),
+    plat('tree_e', 2380, 1140, 2520, 1140, 'branch', { tree: true }),
+    plat('top', 2380, 760, 3150, 760, 'grass'),
+  ];
+  return {
+    width: 3200,
+    height: 1700,
+    floorY: FLOOR,
+    spawn: { x: 174, y: 300 },
+    platforms: [plat('floor', 0, FLOOR, 3200, FLOOR, 'stars'), ...islands],
+    ladders: [{ id: 'ladder', x: 2480, yTop: 760, yBot: 1140 }],
+    barriers: [
+      { id: 'wall1', x: 1750, y: FLOOR - 400, h: 400, pc_perm: null },
+      { id: 'left', x: 40, y: FLOOR - 900, h: 900, pc_perm: null },
+    ],
+    flamingo: { x: 517, y: FLOOR },
+    flyaway: 517 + 900,
+    mushroom: { x: 2224, y: FLOOR },
+    walkCoin: { maxX: 1630, y: FLOOR - 46 },
+    jumpCoin: { x: 2615, y: 1462 },
+    afterJumpCoin: { x: 2730, y: FLOOR },
+    ladderCoin: { x: 2480, y: 950 },
+    sloth: { x: 2121, y: 1080, peekBox: { x: 2300, y: 1350, w: 160, h: 200 } },
+    doorway: { x: 2714, y: 760 },
+    door: { x: 2600, y: 760 },
+    tube: { x: 3000, y: 760, box: { x: 3000, y: 760, w: 120, h: 140 } },
+    boxes: {
+      pre_pickup_walk: { x: 900, y: FLOOR, w: 80, h: 300 },
+      jumpInstructions: { x: 2250, y: FLOOR, w: 200, h: 300 },
+      spacebarPlusArrows: { x: 2615, y: 1492, w: 200, h: 200 },
+      upDownForLadders: { x: 2450, y: 1140, w: 160, h: 120 },
+      at_door: { x: 2700, y: 760, w: 300, h: 200 },
+    },
+  };
+}
+
+/**
+ * newxp_training2: source x + 3000, y + 1510 (floor -110 -> 1400).
+ * location_targets map straight across; the walls and the Egg Plant ledges
+ * are rebuilt from the playthrough.
+ */
+export function training2Layout() {
+  const FLOOR = 1400;
+  const X = (sx) => sx + 3000;
+  return {
+    width: 4100,
+    height: 1500,
+    floorY: FLOOR,
+    spawn: { x: X(-2776), y: 500 },
+    platforms: [
+      plat('floor', 0, FLOOR, 4100, FLOOR, 'stars'),
+      plat('egg_p1', 2600, 1325, 2720, 1325, 'grass'),
+      plat('egg_p2', 2740, 1250, 2860, 1250, 'pool'),
+      plat('egg_p3', 2880, 1175, 3000, 1175, 'red'),
+      plat('egg_ledge', 3020, 1100, 3250, 1100, 'grass'),
+      plat('rock_step', 3330, 1330, 3440, 1330, 'grass'),
+      plat('rock_ledge', 3470, 1260, 3620, 1260, 'grass'),
+    ],
+    ladders: [],
+    barriers: [
+      { id: 'left', x: 40, y: FLOOR - 900, h: 900, pc_perm: null },
+      { id: 'wall_to_drinks', x: 1760, y: FLOOR - 500, h: 500, pc_perm: null },
+      { id: 'wall_to_eggplant', x: 2260, y: FLOOR - 500, h: 500, pc_perm: null },
+      { id: 'tube_building', x: 3300, y: FLOOR - 800, h: 800, pc_perm: null },
+    ],
+    dustbunny: {
+      initial: X(-2460), table1a: X(-1603), table1b: X(-1451), table2a: X(-1092), table2b: X(-856),
+      eggs1: X(-607), eggs2: X(-191), building: 3180, y: FLOOR, // source building 644 sits behind the tube wall here
+    },
+    tables: { food: { x: 1470, y: FLOOR }, drinks: { x: 1968, y: FLOOR } },
+    items: {
+      food_2: { x: X(-1475), y: FLOOR - 76 },
+      food_3: { x: X(-1584), y: FLOOR - 76 },
+      drink_1: { x: X(-1096), y: FLOOR - 70 },
+      drink_2: { x: X(-1031), y: FLOOR - 70 },
+      drink_3: { x: X(-967), y: FLOOR - 70 },
+    },
+    quoins: {
+      img_pickup_1: { x: 1100, y: FLOOR - 46 },
+      img_pickup_egg_a: { x: 2800, y: 1214 },
+      img_pickup_egg_b: { x: 2940, y: 1139 },
+    },
+    eggPlant: { x: X(57) + 60, y: 1100 }, // source trant_egg x 57 (+60 onto the rebuilt ledge)
+    rock: { x: 3545, y: 1260 },
+    machine: { x: 3820, y: FLOOR, choices: [
+      { style: 'meadow', label: 'CHOOSE MEADOW STYLE', x: 3700 },
+      { style: 'firebog', label: 'CHOOSE FIREBOG STYLE', x: 3840 },
+      { style: 'uralia', label: 'CHOOSE URALIA STYLE', x: 3980 },
+    ] },
+    boxes: {
+      to_food: { x: 1300, y: FLOOR, w: 80, h: 300 },
+      leave_food: { x: 1720, y: FLOOR, w: 60, h: 300 },
+      to_drink: { x: 1800, y: FLOOR, w: 60, h: 300 },
+      leave_drink: { x: 2230, y: FLOOR, w: 50, h: 300 },
+      dustbunny_egg: { x: 2400, y: FLOOR, w: 80, h: 300 },
+      magicrock_reveal: { x: 3200, y: FLOOR, w: 120, h: 300 },
+      magicrock_talk: { x: 3545, y: 1260, w: 200, h: 140 },
+    },
+  };
+}

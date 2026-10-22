@@ -106,8 +106,8 @@ describe('classifyQuests', () => {
     // Overworld features that brought once-excluded quests back (not rooms).
     const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station'].length;
     assert.equal(c.solo.length, 129 + built + featureQuests);
-    assert.equal(c.custom.length, 17);
-    assert.equal(c.excluded.length, 299 - built - featureQuests);
+    assert.equal(c.custom.length, 22); // + 5 Gentle Island tutorial quests (newxp-feature.js)
+    assert.equal(c.excluded.length, 294 - built - featureQuests);
     assert.equal(c.byReason.job.length, 200);
     assert.equal(c.byReason.multiplayer.length, 11);
     // Gwendolyn's Task and Smuggle the Smuggler were feature_unbuilt, not among the 32.
