@@ -6407,7 +6407,8 @@
     "name": "solve_clue",
     "num": 3,
     "classId": "note_hint",
-    "desc": "Solve all the clues"
+    "desc": "Solve all the clues",
+    "route": "quest-instances"
    },
    {
     "id": "r358",
@@ -6465,12 +6466,29 @@
   ],
   "offerTriggers": [
    {
-    "type": "npc",
-    "npc": "npc_juju_bandit"
+    "type": "region",
+    "region": "86",
+    "override": true
+   },
+   {
+    "type": "region",
+    "region": "91",
+    "override": true
+   },
+   {
+    "type": "region",
+    "region": "95",
+    "override": true
+   },
+   {
+    "type": "region",
+    "region": "90",
+    "override": true
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "juju_camp",
+  "offerNote": "npc_juju_bandit is not in the remake; offered in its four Kajuu hubs (Baqala, Zhambu, Xalanga, Choru)",
+  "solo": true
  },
  "help_juju_bandits_2": {
   "classTsid": "help_juju_bandits_2",
@@ -6485,7 +6503,8 @@
     "name": "return_weight",
     "num": 1,
     "classId": "juju_paperweight",
-    "desc": "Return the Ancestral Paperweight"
+    "desc": "Return the Ancestral Paperweight",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -6535,8 +6554,8 @@
     "quest": "help_juju_bandits"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "juju_camp",
+  "solo": true
  },
  "help_mine": {
   "classTsid": "help_mine",

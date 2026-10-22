@@ -148,6 +148,8 @@ export const REMAKE_QUEST_NPCS = Object.freeze([
   'play_cube', 'conch',
   // Offers Le Misérable II inside its room (quest-rooms/le-miserable.js).
   'npc_maintenance_bot',
+  // Offers and turns in Carry That Weight II in her camp (quest-rooms/juju-camp.js).
+  'npc_juju_grandma',
 ]);
 const GSJS_STREET_SPIRITS = new Set([
   'street_spirit', 'street_spirit_groddle', 'street_spirit_firebog', 'street_spirit_zutto', 'street_spirit_ix',

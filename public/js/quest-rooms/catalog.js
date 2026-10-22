@@ -58,6 +58,7 @@ export const BUILT_ROOMS = Object.freeze([
   'kids_room',
   'rube_yard',
   'le_miserable',
+  'juju_camp',
 ]);
 
 /**
@@ -145,6 +146,37 @@ export const ROOM_ITEMS = Object.freeze({
     sellable: false,
     donatable: false,
     tags: ['no_rube', 'no_trade', 'no_auction', 'toys'],
+  },
+  // items/juju_trowel.js, note_hint.js, juju_paperweight.js (Carry That Weight).
+  juju_trowel: {
+    label: 'Juju Trowel',
+    namePlural: 'Juju Trowels',
+    desc: 'A rustic trowel fashioned by Juju Bandits for delicate digging in the dense savanna dirt.',
+    stackMax: 1,
+    baseCost: 0,
+    sellable: false,
+    donatable: false,
+    tags: ['no_rube', 'no_trade', 'no_auction', 'no_vendor', 'no_donate', 'no_discovery_dialog', 'quest-item'],
+  },
+  note_hint: {
+    label: 'Secret Juju Hint',
+    namePlural: 'Secret Juju Hints',
+    desc: 'If you can decipher this clue, it might lead you somewhere interesting.',
+    stackMax: 1,
+    baseCost: 0,
+    sellable: false,
+    donatable: false,
+    tags: ['no_rube', 'no_trade', 'no_auction', 'no_vendor', 'no_donate', 'no_discovery_dialog', 'quest-item', 'bureaucracy'],
+  },
+  juju_paperweight: {
+    label: 'Ancestral Paperweight',
+    namePlural: 'Ancestral Paperweight',
+    desc: 'An ancient decorative weight of uncanny beauty and density, this relic is used by the Juju Bandits to secure the bounty of their traditional paper hunts.',
+    stackMax: 1,
+    baseCost: 0,
+    sellable: false,
+    donatable: false,
+    tags: ['no_rube', 'no_trade', 'no_auction', 'no_vendor', 'no_donate', 'quest-item'],
   },
 });
 
