@@ -560,7 +560,7 @@ const SHEETS = {
   },
   dustbunny: {
     name: 'Dustbunny', scale: 1.15, anchor: [0.5, 0.96], headY: 70,
-    modes: { idle: ['dustbunny_idle', 9, 20, 172], talk: ['dustbunny_talk', 9, 6, 54], walk: ['dustbunny_walk', 8, 1, 8], walkRight: ['dustbunny_walk_right', 9, 1, 9] },
+    modes: { idle: ['dustbunny_idle', 9, 20, 172], talk: ['dustbunny_talk', 9, 6, 50], walk: ['dustbunny_walk', 8, 1, 8], walkRight: ['dustbunny_walk_right', 9, 1, 9] },
   },
   rock: {
     name: 'Magic Rock', scale: 1, anchor: [0.5, 0.95], headY: 80,

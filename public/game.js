@@ -858,7 +858,7 @@ const SHEETS = {
   },
   butterfly: {
     url: 'assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png',
-    fw: 70, fh: 78, cols: 14, rows: 5,
+    fw: 70, fh: 65, cols: 14, rows: 6,
   },
   // Official rest sheet (x1) — not the tiny hand-cropped 39×28 single used before.
   butterflyRest: {
@@ -1016,11 +1016,11 @@ const SHEETS = {
   },
   dustBunnyIdle: {
     url: 'assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_idle_stand_png_1354831147.png',
-    fw: 78, fh: 118, cols: 12, rows: 10, frameCount: 120,
+    fw: 104, fh: 59, cols: 9, rows: 20, frameCount: 172,
   },
   dustBunnyTalk: {
     url: 'assets/sprites/quests/de-embiggenify/npc_dustbunny__x1_talk_png_1354831143.png',
-    fw: 78, fh: 118, cols: 12, rows: 3, frameCount: 36,
+    fw: 104, fh: 59, cols: 9, rows: 6, frameCount: 50,
   },
   jonesWalk: {
     url: 'assets/sprites/quests/ilmenskie/jones-walk.png',
@@ -7691,7 +7691,8 @@ function spawnButterflies(xs, flyingSpots) {
     });
   });
   // Flying butterflies — also interactable (Enter when near, or click). Same scale as rest.
-  const frames = textures.butterfly.frames.slice(0, 14);
+  // One 12-frame wing cycle (the sheet repeats it 7 times).
+  const frames = textures.butterfly.frames.slice(0, 12);
   const flyPlan = flyingSpots !== undefined
     ? flyingSpots
     : Array.from({ length: 5 }, (_, i) => ({
@@ -20621,8 +20622,8 @@ async function ensureShrineTextures(giantId) {
     const tex = await loadTexture(url);
     textures[key] = {
       def: { ...def, url },
-      // Official sheets have 23 populated frames (the final grid cell is blank).
-      frames: sliceSheet(tex.baseTexture, def, 23),
+      // Official sheets: open has 22 populated frames, close 23 (the rest of the grid is blank).
+      frames: sliceSheet(tex.baseTexture, def, motion === 'open' ? 22 : 23),
     };
   }
 }
