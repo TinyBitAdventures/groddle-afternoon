@@ -1212,7 +1212,9 @@ let currentStreetPopulation = null;
 let currentStreetPlacement = null;
 let currentStreetTsid = STREET_INDEX.default;
 /** Climb state: original Glitch walls and ladders */
-let climb = { active: false, wall: null };
+// regrabLock: AvatarController gets on a ladder on an Up/Down key press, not a held key; after leaving
+// one, a still-held Up/Down must not pull the avatar straight back on.
+let climb = { active: false, wall: null, regrabLock: false };
 let homeMailboxTarget = null;
 let homeDoorTarget = null;
 let homeReturnTarget = null;
@@ -7049,7 +7051,7 @@ function glitchAnimState(requested) {
 
 function applyGlitchState(st) {
   if (player.glitchState === st) {
-    if ((st === 'walk1x' || st === 'walk2x' || st === 'climb') && player.playing === false) player.play();
+    if ((st === 'walk1x' || st === 'walk2x' || (st === 'climb' && player.vy !== 0)) && player.playing === false) player.play();
     return;
   }
   const idles = Boolean(player.pack?.idleLoader);
@@ -8996,22 +8998,15 @@ function handleInput() {
     player.vx = 0;
     // AvatarPhysicsHandler: a ladder climbs at vx_max, the walk speed.
     const climbSpeed = 4.4 * movementBuff.speed;
-    if (up && !down) {
-      player.vy = -climbSpeed;
-      setPlayerAnim('climb');
-    } else if (down && !up) {
-      player.vy = climbSpeed;
-      setPlayerAnim('climb');
-    } else {
-      player.vy = 0;
-      // Pause pose at current climb frame
-      if (player.playing) player.stop();
-    }
+    if (up && !down) player.vy = -climbSpeed;
+    else if (down && !up) player.vy = climbSpeed;
+    else player.vy = 0;
     // Getting off (AvatarPhysicsHandler triggerGetOffLadder): left/right
     // win over Space and hop off sideways at vx_off_ladder with a tenth of a
     // jump; Space alone jumps straight up and uses the air jump.
     if (jumpRequested || (left && !right) || (right && !left)) {
       const side = left && !right ? -1 : right && !left ? 1 : 0;
+      climb.regrabLock = up || down;
       clearJumpQueue(jumpState);
       noteGrounded(jumpState, false, now);
       stopClimb({ jumpOff: true, side, jumpVelocity: -9.6 * movementBuff.jump, maxSpeed: 4.4 * movementBuff.speed });
@@ -9041,15 +9036,23 @@ function handleInput() {
         player.vy = 0;
       }
     }
+    // CLIMB vs CLIMB_PAUSE: the cycle runs only while the avatar moves on the
+    // ladder; at rest (or held against the top) it holds the current frame.
+    if (climb.active) {
+      if (player.vy !== 0) setPlayerAnim('climb');
+      else if (player.playing) player.stop();
+    }
     applyPlayerFacing();
     return;
   }
+
+  if (!up && !down) climb.regrabLock = false;
 
   // Up or Down over a ladder gets on it (AvatarController onUpKey/onDownKey);
   // there is no grabbing by flying or falling into one. Down at the very
   // bottom would only stand you on its last rung, so it walks on instead.
   const atBase = climbHit && player.onGround && player.y >= climbHit.yBot - 4;
-  if (climbHit && (up !== down) && Math.abs(player.x - climbHit.x) < 28 && !(down && atBase)) {
+  if (climbHit && !climb.regrabLock && (up !== down) && Math.abs(player.x - climbHit.x) < 28 && !(down && atBase)) {
     startClimb(climbHit);
     return;
   }
@@ -9077,7 +9080,7 @@ function handleInput() {
     if (Math.abs(player.vx) < 0.05) player.vx = 0;
   }
   applyPlayerFacing();
-  if (jumpRequested && player.onGround && climbHit && up) {
+  if (jumpRequested && player.onGround && climbHit && up && !climb.regrabLock) {
     clearJumpQueue(jumpState);
     startClimb(climbHit);
     return;

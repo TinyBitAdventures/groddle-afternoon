@@ -44,3 +44,20 @@ describe('ladder tops', () => {
     assert.equal(mounted, withDeck);
   });
 });
+
+describe('climbing input (game.js)', () => {
+  const game = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'public/game.js'), 'utf8');
+
+  it('does not re-grab a ladder with a still-held Up/Down right after leaving it', () => {
+    // Hopping off sideways or jumping while Up/Down is held must not flip back onto the ladder next frame.
+    assert.match(game, /climb\.regrabLock = up \|\| down;/);
+    assert.match(game, /if \(!up && !down\) climb\.regrabLock = false;/);
+    assert.match(game, /climbHit && !climb\.regrabLock && \(up !== down\)/);
+    assert.match(game, /climbHit && up && !climb\.regrabLock\)/);
+  });
+
+  it('runs the climb cycle only while moving on the ladder (CLIMB_PAUSE holds the frame)', () => {
+    assert.match(game, /if \(player\.vy !== 0\) setPlayerAnim\('climb'\);\s*else if \(player\.playing\) player\.stop\(\);/);
+    assert.match(game, /st === 'climb' && player\.vy !== 0\) \) && player\.playing === false|\(st === 'climb' && player\.vy !== 0\)\) && player\.playing === false/);
+  });
+});
