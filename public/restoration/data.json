@@ -1374,7 +1374,7 @@
  },
  "icons": {
   "items": 772,
-  "sharp": 681
+  "sharp": 771
  },
  "imagination": {
   "total": 275,
@@ -1393,9 +1393,14 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 225,
+  "commits": 226,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "Shrines hand over a waiting emblem as you walk past"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1510,11 +1515,6 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Butterflies, Mr. Hairball, the tutorial dustbunny and shrines animate on their real frame grids"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Rook attack overlay covers the whole street"
    }
   ]
  },
