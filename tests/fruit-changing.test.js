@@ -82,12 +82,14 @@ describe('official Fruit Changing Machine catalog', () => {
       const icon = join(publicRoot, `assets/sprites/icons/${id}.png`);
       assert.ok(existsSync(icon), `missing ${id} iconic art`);
     }
-    const animation = join(publicRoot, 'assets/sprites/making/fruit_changing_machine-tool.png');
-    const png = readFileSync(animation);
-    assert.equal(png.readUInt32BE(16), 792);
-    assert.equal(png.readUInt32BE(20), 330);
-    assert.equal(792 / 44, 18);
-    assert.equal(330 / 66, 5);
+    // 17 working frames rendered at 3x from the vector SWF: 17 x 132 by 198 (44 x 66 at 1x).
+    const animation = join(publicRoot, 'assets/sprites/making/fruit_changing_machine-work@3x.webp');
+    const webp = readFileSync(animation);
+    assert.equal(webp.toString('ascii', 0, 4), 'RIFF');
+    assert.equal(webp.toString('ascii', 12, 16), 'VP8L');
+    const bits = webp.readUInt32LE(21);
+    assert.equal((bits & 0x3fff) + 1, 17 * 132);
+    assert.equal(((bits >> 14) & 0x3fff) + 1, 198);
   });
 });
 
@@ -140,7 +142,7 @@ describe('Fruit Changing interface wiring', () => {
     assert.match(game, /Transmogrify/);
     assert.match(game, /11 fruits|recipes\.length.*fruits/s);
     assert.match(game, /mp-tool-fruit-machine/);
-    assert.match(css, /fruit_changing_machine-tool\.png/);
+    assert.match(css, /fruit_changing_machine-work@3x\.webp/);
     assert.match(css, /@keyframes fruit-machine-work/);
     assert.match(css, /background-position: -748px 0/);
     const making = readFileSync(join(publicRoot, 'js/making.js'), 'utf8');

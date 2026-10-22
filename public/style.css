@@ -2409,7 +2409,9 @@ button.play-context-head:focus-visible {
   display: block;
   width: 44px;
   height: 66px;
-  background: url('assets/sprites/making/fruit_changing_machine-tool.png') 0 0 / 792px 330px no-repeat;
+  /* 17 working frames rendered at 3x from glitch-items fruit_changing_machine.swf
+     (scene tool_animation, FFDec -zoom 3), drawn at 1x size for sharpness. */
+  background: url('assets/sprites/making/fruit_changing_machine-work@3x.webp') 0 0 / 748px 66px no-repeat;
   transform: scale(1.42);
   animation: fruit-machine-work 1.35s steps(17, end) infinite;
 }
