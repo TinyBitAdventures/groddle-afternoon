@@ -411,7 +411,7 @@ describe('UI wiring', () => {
     assert.ok(html.includes('id="activity-feed"'));
     assert.ok(html.includes('id="pack-items"'));
     assert.ok(html.includes('id="pack-tools"'));
-    assert.ok(html.includes('id="pack-currants"'));
+    assert.ok(html.includes('id="stat-currants"'));
     assert.ok(html.includes('vendor-shelf') || html.includes('id="vendor-list"'));
     const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
     assert.ok(css.includes('act-loss'));

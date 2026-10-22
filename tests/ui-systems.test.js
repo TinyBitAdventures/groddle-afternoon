@@ -99,11 +99,12 @@ describe('pack / inventory', () => {
     assert.equal(isToolItem('apple'), false);
     assert.equal(rows.itemCount, items.length);
     assert.equal(rows.toolCount, tools.length);
-    // HTML pack has two row containers + currants
+    // HTML pack has two row containers; currants live in the top bar only
     const html = readFileSync(join(__dirnameUi, '../public/index.html'), 'utf8');
     assert.ok(html.includes('id="pack-items"'));
     assert.ok(html.includes('id="pack-tools"'));
-    assert.ok(html.includes('id="pack-currants"'));
+    assert.ok(html.includes('id="stat-currants"'));
+    assert.ok(!html.includes('id="pack-currants"'));
   });
 
   it('use consumable changes pack + metabolics', () => {
