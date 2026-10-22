@@ -6,6 +6,8 @@
  * pack; 'panel' keeps the whole game area so an open panel shows.
  */
 const Q = '?autostart=1&fresh=1&resetgame=1&questoffer=off&questfx=0';
+// Clicks the first visible dialogue button (OK / Click anywhere / Next).
+
 
 export const SHOTS = Object.freeze({
   streets: { route: `${Q}`, wait: 9000 },
@@ -13,7 +15,6 @@ export const SHOTS = Object.freeze({
   physics: { route: `${Q}&streetdemo=GUVUMTSQ2FC34ES`, wait: 11000 },
   'street-events': { route: `${Q}&puzzledemo=GHVOD0F3T403694`, wait: 12000 },
   camera: { route: `${Q}&camerademo=1&cameraskill=1&cameralook=-1100,-60`, wait: 12000 },
-  avatar: { route: `${Q}&emotiondemo=happy`, wait: 9000 },
   piggies: { route: `${Q}&animaldemo=piggy&animalrank=2`, wait: 9000 },
   butterflies: { route: `${Q}&animaldemo=butterfly&animalrank=2&tooldemo=butterfly_lotion&toolremaining=5`, wait: 9000 },
   trants: { route: `${Q}&harvestdemo=fruit&harvestrank=2&harvestreset=1`, wait: 9000 },
@@ -41,10 +42,11 @@ export const SHOTS = Object.freeze({
   icons: { route: `${Q}&icondemo=1&iconautoplay=place`, wait: 16000 },
   rube: { route: `${Q}&rubedemo=1&rubeautoplay=offer&rubeseed=3`, wait: 20000, frame: 'panel' },
   hell: { route: `${Q}&helldemo=croak`, wait: 12000 },
+  smuggling: { route: `${Q}&smugglingdemo=give`, wait: 12000 },
   collectibles: { route: `${Q}&stootdemo=1&stootdollautoplay=1&stootquote=38`, wait: 12000 },
 
   'room:rainbow_run': { route: `${Q}&questdemo=numismatic_hustle&questautoplay=ready`, wait: 16000 },
-  'room:top_of_tree': { route: `${Q}&questdemo=high_jump`, wait: 12000 },
+  'room:top_of_tree': { route: `${Q}&questdemo=high_jump`, wait: 12000, steps: [{ eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }] },
   'room:color_unblocking': { route: `${Q}&questdemo=puzzle_level_color_blockage`, wait: 12000 },
   'room:vision_quest': { route: `${Q}&questdemo=eyeballery_identify_object`, wait: 14000 },
   'room:kids_room': { route: `${Q}&questdemo=letter_block_1`, wait: 12000 },
@@ -58,6 +60,10 @@ export const SHOTS = Object.freeze({
   'room:back_alley': { route: `${Q}&questdemo=fuelmaking_refuel_robot&backalleystage=station`, wait: 14000 },
   'room:clubhouse': { route: `${Q}&questdemo=join_club`, wait: 14000 },
   'room:light_perspective': { route: `${Q}&questdemo=puzzle_level_light_perspective&questautoplay=mix`, wait: 18000 },
-  'room:tile_puzzle': { route: `${Q}&questdemo=btc_room_3`, wait: 12000 },
+  'room:tile_puzzle': { route: `${Q}&questdemo=btc_room_3`, wait: 12000, steps: [{ eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }] },
   'room:operation_grow': { route: `${Q}&questdemo=where_the_blue_grew`, wait: 12000 },
+  'room:gwendolyn': { route: `${Q}&questdemo=tower_quest&questautoplay=desert`, wait: 40000 },
+  'room:mental_block': { route: `${Q}&questdemo=mental_block`, wait: 14000 },
+  'room:esquibeth': { route: `${Q}&questdemo=last_pilgrimage_of_esquibeth&esqstage=waterfall_04_wider`, wait: 22000 },
+  'room:penalty': { route: `${Q}&questdemo=smuggle_the_smuggler_part1`, wait: 14000 },
 });

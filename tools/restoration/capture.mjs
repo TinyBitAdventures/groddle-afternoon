@@ -21,7 +21,8 @@ import { SHOTS } from './shots.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const outDir = join(root, 'public', 'restoration', 'shots');
-const BASE = 'https://groddle.localhost/';
+// CAPTURE_BASE serves another checkout (e.g. a clean worktree on a local port).
+const BASE = process.env.CAPTURE_BASE || 'https://groddle.localhost/';
 const HIDE = `
   #play-context, #local-chat-dock, #activity-feed, #toast, .qi-hint { visibility: hidden !important; }
 `;
