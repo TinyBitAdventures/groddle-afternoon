@@ -24,6 +24,14 @@
  *   and race_leave. Only the flags are kept.
  * - quests/space_race.js, quests/amazing_race.js: the two recovered quest descs.
  *   The other five ready lines are read from the supplied race recordings.
+ * - Grab 'Em Good (config_prod.js shared_instances.quoin_grab, race_type
+ *   "most_quoins"): players/inc_games.js games_quoin_grab_splash ("Get the
+ *   most quoins to win!"), games_end_quoin_grab (winner +50 xp +100 currants,
+ *   loser nothing, achievements_increment('quoin_grab', 'won' | 'lost'));
+ *   groups/global_game.js quoin_grab_get_quoin (one point per quoin; the
+ *   grabber wins when their lead beats the quoins left, or takes the last);
+ *   items/quoin.js (game quoins pay their benefit, skip the daily limit and
+ *   never respawn); quests/grab_em_good.js desc.
  *
  * The production race streets are absent from the public locations archive,
  * so race-courses.js holds clean reconstructions of each course. Race state is
@@ -48,6 +56,12 @@ export const RACE_GENERIC_TICKET = 'race_ticket';
 export const RACE_SCENE_PREFIX = 'RACE_';
 export const RACE_FLAGS = Object.freeze({ win: 'multiplayer_quest_win', leave: 'race_leave' });
 export const RACE_ACHIEVEMENTS = Object.freeze({ won: 'race:won', lost: 'race:lost' });
+/** games_end_quoin_grab: achievements_increment('quoin_grab', 'won' | 'lost'). */
+export const QUOIN_GRAB_ACHIEVEMENTS = Object.freeze({ won: 'quoin_grab:won', lost: 'quoin_grab:lost' });
+/** games_quoin_grab_splash text. */
+export const QUOIN_GRAB_SPLASH_TEXT = 'Get the most quoins to win!';
+/** Grab 'Em Good quoins are mood quoins; the recording shows +11 (benefit 10 at a 1.1 multiplier). */
+export const QUOIN_GRAB_QUOIN = Object.freeze({ type: 'mood', benefit: 10 });
 
 /** Solo stand-in rivals (js/local-companions.js) with their avatar tints. */
 export const RACE_RIVALS = Object.freeze([
@@ -58,7 +72,8 @@ export const RACE_RIVALS = Object.freeze([
 
 /**
  * The seven finish-line races (config_prod.js shared_instances.race.locations
- * order = each ticket's location_id).
+ * order = each ticket's location_id), plus Grab 'Em Good, the quoin_grab
+ * shared instance (race_type "most_quoins", no location_id).
  */
 export const RACES = Object.freeze({
   amazing_race: Object.freeze({
@@ -145,18 +160,45 @@ export const RACES = Object.freeze({
     descSource: 'recording feBQ5kjPzfk',
     video: 'feBQ5kjPzfk',
   }),
+  grab_em_good: Object.freeze({
+    id: 'grab_em_good',
+    title: "Grab 'Em Good",
+    ticket: 'race_ticket_grab_em_good',
+    ticketLabel: "Grab 'Em Good Ticket",
+    ticketDesc: "Challenge another player to Grab 'Em Good.",
+    locationIndex: null,
+    game: 'quoin_grab',
+    raceType: 'most_quoins',
+    productionTsid: 'LIF11MB3O8P1TAR',
+    // config_prod.js multiplayer_quest_locations.grab_em_good start_points.
+    startPoints: Object.freeze([Object.freeze({ x: -319, y: 757 }), Object.freeze({ x: 356, y: 753 })]),
+    desc: 'Collect all the quoins. Whoever gets the most wins!',
+    descSource: 'quests/grab_em_good.js',
+    splash: QUOIN_GRAB_SPLASH_TEXT,
+    video: 'zBiGJR6jIJM',
+  }),
 });
 
+/** The seven finish-line races, in location_id order. */
 export const RACE_IDS = Object.freeze(
   Object.values(RACES)
+    .filter((race) => race.raceType !== 'most_quoins')
     .sort((a, b) => a.locationIndex - b.locationIndex)
     .map((race) => race.id)
 );
 
+/** Every ticket game the races feature runs (record keys). */
+export const RACE_GAME_IDS = Object.freeze(Object.keys(RACES));
+export const GRAB_EM_GOOD_ID = 'grab_em_good';
+
+export function isQuoinGrab(raceId) {
+  return RACES[raceId]?.raceType === 'most_quoins';
+}
+
 /**
  * Store 20 in catalog order. Tickets for games this lane does not run (The
- * Great Hog Haul has its own quest route; Grab 'Em Good is not rebuilt) are
- * listed as unavailable so the shelf still reads like the original.
+ * Great Hog Haul has its own quest route) are listed as unavailable so the
+ * shelf still reads like the original.
  */
 export const RACE_STORE_ITEMS = Object.freeze([
   Object.freeze({ classTsid: 'race_ticket_hogtie_piggy', label: 'The Great Hog Haul Ticket', cost: 60 }),
@@ -208,12 +250,13 @@ export function isRaceSceneTsid(tsid) {
 
 /**
  * The generic Race Ticket rolls randInt(0, races + 1): one of the seven races,
- * or (the last two values) Hog Haul / Grab 'Em Good. Solo play has neither
- * two-player game on this route, so those rolls fall back onto a race.
+ * or (the last two values) Hog Haul / Grab 'Em Good. Hog Haul has no ticket
+ * route here, so that roll falls back onto a race.
  */
 export function pickGenericRace(roll = Math.random()) {
   const n = RACE_IDS.length;
   const choice = Math.max(0, Math.min(n + 1, Math.floor(Number(roll) * (n + 2))));
+  if (choice === n + 1) return GRAB_EM_GOOD_ID;
   return RACE_IDS[choice % n];
 }
 
@@ -234,7 +277,7 @@ export function startDelayMessage(raceTitle, playerName = 'you', rivalName = 'Am
 
 function cleanCounts(seed) {
   const out = {};
-  for (const id of RACE_IDS) {
+  for (const id of RACE_GAME_IDS) {
     const n = Math.floor(Number(seed?.[id]) || 0);
     if (n > 0) out[id] = n;
   }
@@ -244,7 +287,7 @@ function cleanCounts(seed) {
 /** Lifetime race counters, best times, and the pre-race return point. */
 export function normalizeRaceRecord(seed = {}) {
   const best = {};
-  for (const id of RACE_IDS) {
+  for (const id of RACE_GAME_IDS) {
     const ms = Math.floor(Number(seed?.best?.[id]) || 0);
     if (ms > 0) best[id] = ms;
   }
@@ -289,6 +332,11 @@ export function createRaceRun(raceId, seed = {}) {
     falls: 0,
     playerProgress: 0,
     ticket: seed.ticket || null,
+    kind: isQuoinGrab(raceId) ? 'quoins' : 'finish',
+    // Grab 'Em Good: global_game.js scores (one per quoin) and the quoins on the street.
+    scores: { you: 0, rival: 0 },
+    quoinTotal: Math.max(0, Math.floor(Number(seed.quoinTotal) || 0)),
+    lastGrab: null,
   };
 }
 
@@ -322,7 +370,8 @@ export function tickRace(run, now = Date.now()) {
     run.status = 'running';
     events.push({ type: 'started' });
   }
-  if (run.status === 'running' && now - run.startAt >= run.rivalDurationMs) {
+  // Grab 'Em Good ends on a quoin grab (grabRaceQuoin), never on the clock.
+  if (run.status === 'running' && run.kind !== 'quoins' && now - run.startAt >= run.rivalDurationMs) {
     run.status = 'lost';
     run.finishedAt = run.startAt + run.rivalDurationMs;
     events.push({ type: 'lost', winner: run.rivalName });
@@ -364,6 +413,78 @@ export function forfeitRace(run, now = Date.now()) {
 
 export function raceIsLive(run) {
   return Boolean(run && ['staging', 'countdown', 'running'].includes(run.status));
+}
+
+/* ------------------------------------------------------------------ */
+/* Grab 'Em Good (global_game.js quoin_grab_*)                         */
+/* ------------------------------------------------------------------ */
+
+/** Quoins nobody has grabbed yet. */
+export function quoinGrabRemaining(run) {
+  if (!run) return 0;
+  return Math.max(0, (run.quoinTotal || 0) - (run.scores?.you || 0) - (run.scores?.rival || 0));
+}
+
+/**
+ * quoin_grab_get_quoin: after a grab, the grabber wins when their lead over
+ * every other player is larger than the quoins left, or when the last quoin
+ * is gone. Only the grabber can be named the winner on their own grab.
+ */
+export function quoinGrabWinner(scores, total, grabber) {
+  const mine = Math.max(0, Number(scores?.[grabber]) || 0);
+  let remaining = Math.max(0, Math.floor(Number(total) || 0));
+  let lead = 0;
+  for (const [who, score] of Object.entries(scores || {})) {
+    remaining -= Math.max(0, Number(score) || 0);
+    if (who !== grabber) lead = Math.max(lead, mine - Math.max(0, Number(score) || 0));
+  }
+  return lead > remaining || remaining <= 0 ? grabber : null;
+}
+
+/** The fewest quoins that settle a game of `total` (71 → 36). */
+export function quoinGrabTarget(total) {
+  return Math.floor(Math.max(0, Number(total) || 0) / 2) + 1;
+}
+
+/**
+ * One grab by 'you' or 'rival' while the game runs. Returns the result:
+ * { ok, who, score, remaining, winner } and settles run.status when the grab
+ * decides the game (won / lost).
+ */
+export function grabRaceQuoin(run, who, now = Date.now()) {
+  if (!run || run.kind !== 'quoins' || run.status !== 'running' || !['you', 'rival'].includes(who)) {
+    return { ok: false };
+  }
+  if (quoinGrabRemaining(run) <= 0) return { ok: false };
+  run.scores[who] += 1;
+  run.lastGrab = who;
+  const winner = quoinGrabWinner(run.scores, run.quoinTotal, who);
+  if (winner) {
+    run.status = winner === 'you' ? 'won' : 'lost';
+    run.finishedAt = now;
+  }
+  run.playerProgress = run.quoinTotal ? run.scores.you / run.quoinTotal : 0;
+  run.rivalProgress = run.quoinTotal ? run.scores.rival / run.quoinTotal : 0;
+  return { ok: true, who, score: run.scores[who], remaining: quoinGrabRemaining(run), winner };
+}
+
+/**
+ * The score overlay (quoin_grab_show_overlays): one "label: score" line per
+ * player, then "Remaining: N".
+ */
+export function quoinGrabOverlayLines(run, playerName = 'You') {
+  if (!run) return [];
+  return [
+    `${playerName}: ${run.scores?.you || 0}`,
+    `${run.rivalName}: ${run.scores?.rival || 0}`,
+    `Remaining: ${quoinGrabRemaining(run)}`,
+  ];
+}
+
+/** Mood paid by one game quoin (items/quoin.js: benefit × the personal multiplier, rounded). */
+export function quoinGrabMood(multiplier = 1) {
+  const m = Number(multiplier);
+  return Math.max(0, Math.round(QUOIN_GRAB_QUOIN.benefit * (Number.isFinite(m) && m > 0 ? m : 1)));
 }
 
 /**

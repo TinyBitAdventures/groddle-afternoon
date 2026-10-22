@@ -6,7 +6,10 @@
  * ticket activation from the pack, the source start delay, the race scene
  * (engine.enterScene), the ready card, READY/3/2/1/GO countdown, the stand-in
  * rival, checkpoints and hazard respawns, the finish posts, the result screen
- * with source rewards, and the return to the pre-race street.
+ * with source rewards, and the return to the pre-race street. Grab 'Em Good
+ * (the quoin_grab game) runs on the same flow: its course carries 71 mood
+ * quoins, both racers score one per grab, and the first grab that puts a
+ * racer's lead past the quoins left (or takes the last one) ends it.
  *
  * QA:
  *   ?autostart=1&racedemo=<race_id>        enter a course, auto-ready
@@ -15,8 +18,12 @@
  *     &raceassist=1                        the rival never leaves the start
  *     &racerivalseconds=N                  rival finishes after N seconds
  *     &racepreview=finish|<checkpoint>     start beside the finish / a checkpoint
+ *                                          (Grab 'Em Good: finish|canopy = below the canopy)
  *   ?autostart=1&racedemo=dispenser        a dispenser beside you, store open
  *     &raceautoplay=buy                    buy + activate a Space Race ticket
+ *     &raceticket=<ticket class>           ...or that ticket (e.g. race_ticket_grab_em_good)
+ *   ?autostart=1&racedemo=grab_em_good     Grab 'Em Good; raceassist freezes the rival,
+ *                                          racerivalseconds=N times its own tree to N s
  */
 
 import { crowdScaleX } from '../avatar-anims.js';
@@ -26,7 +33,6 @@ import {
   RACE_DISPENSER_CLASS,
   RACE_FLAGS,
   RACE_GENERIC_TICKET,
-  RACE_IDS,
   RACE_START_DELAY_MS,
   RACE_STORE_ITEMS,
   RACE_TICKET_PRICE,
@@ -52,6 +58,10 @@ import {
   RACE_SPLASH_TEXT,
   RACE_STARTING_SOON,
   RACE_STARTING_SOON_MS,
+  QUOIN_GRAB_ACHIEVEMENTS,
+  grabRaceQuoin,
+  quoinGrabMood,
+  quoinGrabRemaining,
   raceSceneTsid,
   routeDurationMs,
   routeLengths,
@@ -60,20 +70,22 @@ import {
   settleRace,
   startDelayMessage,
   tickRace,
-} from '../races.js?v=races-1';
-import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=races-1';
+} from '../races.js?v=races-2';
+import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=races-2';
 import {
   drawCheckpointFlag,
   drawFinishPosts,
   drawWinnerRainbow,
   raceLoadingColors,
   renderRaceCourse,
-} from '../race-render.js?v=races-1';
+} from '../race-render.js?v=races-2';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { runStreetTransition } from '../screen-fx.js';
 import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
-import { startCrowns } from './crowns-feature.js?v=crowns-1';
+import { startCrowns } from './crowns-feature.js?v=crowns-3';
 import { textureFromUrl } from '../textures.js';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=quoins-1';
+import { moodMax } from '../metabolics.js';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
 const RIVAL_SCALE = 1.35 * 0.4;
@@ -102,6 +114,10 @@ let starting = false;
 let lastSafe = null;
 let engineRef = null;
 let pinX = 0;
+// Grab 'Em Good: live quoin sprites and when each scripted racer reaches them.
+let quoinSprites = [];
+let rivalFrozen = false;
+let autoTimeline = null;
 
 /* ------------------------------------------------------------------ */
 /* Items                                                              */
@@ -237,6 +253,7 @@ function buildChrome(engine) {
     <div class="hog-haul-scoreboard">
       <span><b>You</b>: <strong data-race-you-pct>0%</strong></span>
       <span><b data-race-rival>Amp</b>: <strong data-race-rival-pct>0%</strong></span>
+      <span data-race-remaining-wrap hidden><b>Remaining</b>: <strong data-race-remaining>0</strong></span>
     </div>
     <div class="race-track" aria-hidden="true"><i data-race-them style="left:0%"></i><i data-race-you style="left:0%"></i><b>🏁</b></div>
     <p class="hog-haul-objective"><span data-race-objective></span><span class="race-time" data-race-time>0:00.0</span></p>
@@ -433,7 +450,9 @@ async function startRace(raceId, engine, opts = {}) {
   rivalOpts = { pace: course.rivalPace, gravity: course.gravity };
   rivalTimeline = routeTimeline(rivalRoute(), rivalOpts);
   routeLens = routeLengths(course.route);
-  const natural = routeDurationMs(rivalRoute(), rivalOpts);
+  // Grab 'Em Good times the rival on its own tree (it then works down yours).
+  const ownRival = course.kind === 'quoins' ? rivalRoute().slice(0, course.route.length) : rivalRoute();
+  const natural = routeDurationMs(ownRival, rivalOpts);
   clearTimeout(soonTimer);
   soonTimer = null;
   run = createRaceRun(raceId, {
@@ -443,9 +462,12 @@ async function startRace(raceId, engine, opts = {}) {
       ? 3_600_000
       : Number.isFinite(rivalSeconds) && rivalSeconds > 0 ? rivalSeconds * 1000 : natural,
     ticket: opts.ticket || null,
+    quoinTotal: course.quoins?.length || 0,
   });
   if (rivalSeconds > 0) rivalOpts = { ...rivalOpts, pace: course.rivalPace * (natural / (rivalSeconds * 1000)) };
   rivalTimeline = routeTimeline(rivalRoute(), rivalOpts);
+  rivalFrozen = course.kind === 'quoins' && params.get('raceassist') === '1';
+  autoTimeline = routeTimeline(course.route, { pace: 1.25, gravity: course.gravity });
   resultApplied = false;
   progressHint = 0;
   lastSafe = null;
@@ -491,6 +513,52 @@ async function startRace(raceId, engine, opts = {}) {
   return true;
 }
 
+/** Time (ms from GO) at a float route index on a timeline. */
+function timeAtIndex(times, at) {
+  if (at == null || !times?.length) return Infinity;
+  const i = Math.max(0, Math.min(times.length - 1, Math.floor(at)));
+  const j = Math.min(times.length - 1, i + 1);
+  return times[i] + (times[j] - times[i]) * (at - i);
+}
+
+/** Grab 'Em Good's quoins: mood quoins that bob in place and never respawn. */
+function spawnQuoins(engine) {
+  const { PIXI } = engine;
+  const frames = engine.textures?.quoin?.frames || [];
+  const start = QUOIN_TYPES.mood.row * QUOIN_SHEET.columns;
+  const mood = frames.slice(start, start + QUOIN_SHEET.columns);
+  quoinSprites = course.quoins.map((q, index) => {
+    let sprite;
+    if (mood.length) {
+      sprite = new PIXI.AnimatedSprite(mood);
+      sprite.animationSpeed = 0.28;
+      sprite.gotoAndPlay(index % mood.length);
+    } else {
+      sprite = new PIXI.Graphics().circle(0, 0, 16).fill(QUOIN_TYPES.mood.color).stroke({ width: 2, color: 0xffffff });
+    }
+    sprite.anchor?.set(0.5, 0.5);
+    sprite.x = q.x;
+    sprite.y = q.y;
+    sprite.zIndex = 25;
+    sprite.eventMode = 'none';
+    engine.entityLayer.addChild(sprite);
+    return {
+      ...q,
+      index,
+      sprite,
+      live: true,
+      rivalMs: rivalFrozen ? Infinity : timeAtIndex(rivalTimeline, q.rivalAt),
+      autoMs: timeAtIndex(autoTimeline, q.at),
+    };
+  });
+}
+
+function takeQuoin(q) {
+  q.live = false;
+  if (q.sprite && !q.sprite.destroyed) q.sprite.destroy();
+  q.sprite = null;
+}
+
 function spawnRaceEntities(engine) {
   const { PIXI } = engine;
   checkpointSprites = course.checkpoints.map((cp) => {
@@ -499,9 +567,12 @@ function spawnRaceEntities(engine) {
     engine.entityLayer.addChild(flag);
     return flag;
   });
-  finishSprite = drawFinishPosts(PIXI, course.finish);
-  finishSprite.zIndex = 9;
-  engine.entityLayer.addChild(finishSprite);
+  if (course.finish) {
+    finishSprite = drawFinishPosts(PIXI, course.finish);
+    finishSprite.zIndex = 9;
+    engine.entityLayer.addChild(finishSprite);
+  }
+  if (course.kind === 'quoins') spawnQuoins(engine);
   // The rival is a vector Glitch with its name's look (engine.npcGlitch); the tinted portrait strip is the fallback.
   const npc = engine.npcGlitch?.(run.rivalName || run.raceId) || null;
   const frames = npc ? null : engine.textures?.avatarStyledWalk?.frames || [];
@@ -536,9 +607,13 @@ function spawnRaceEntities(engine) {
   pinX = course.spawn.player.x;
   const preview = new URLSearchParams(location.search).get('racepreview');
   if (preview && engine.player) {
-    const cp = preview === 'finish'
-      ? { x: course.finish.x - 260 * Math.sign(course.finish.x - course.spawn.player.x || 1), y: course.finish.y }
-      : course.checkpoints[Number(preview)];
+    // Grab 'Em Good has no posts: "finish" / "canopy" starts on the bough under the canopy.
+    const top = course.kind === 'quoins' ? course.route[course.route.length - 3] : null;
+    const cp = top && (preview === 'finish' || preview === 'canopy')
+      ? { x: top.x, y: top.y }
+      : preview === 'finish' && course.finish
+        ? { x: course.finish.x - 260 * Math.sign(course.finish.x - course.spawn.player.x || 1), y: course.finish.y }
+        : course.checkpoints[Number(preview)];
     if (cp) {
       const p = platformUnder(course.platforms, cp.x, cp.y, 4);
       engine.player.x = cp.x;
@@ -581,7 +656,8 @@ function showReady(engine) {
   const icon = `${RACE_ICON_DIR}${race.ticket}.png`;
   hud.ready.querySelector('[data-race-ready-icon]').src = icon;
   hud.ready.querySelector('[data-race-ready-kicker]').textContent = race.title;
-  hud.ready.querySelector('[data-race-ready-desc]').textContent = RACE_SPLASH_TEXT;
+  // games_quoin_grab_splash has its own line; the races share games_race_splash.
+  hud.ready.querySelector('[data-race-ready-desc]').textContent = race.splash || RACE_SPLASH_TEXT;
   hud.ready.hidden = false;
   hud.bar.hidden = false;
   renderHud(engine, true);
@@ -676,6 +752,11 @@ function raceTick(engine, now) {
   }
   if (run.status !== 'running') return;
 
+  if (run.kind === 'quoins') {
+    quoinTick(engine, now);
+    return;
+  }
+
   const pose = routePoseAt(rivalRoute(), now - run.startAt, rivalOpts, rivalTimeline);
   placeRival(pose.x, pose.y, pose.mode, pose.facing);
   run.rivalProgress = pose.progress;
@@ -712,8 +793,61 @@ function raceTick(engine, now) {
   }
 
   const f = course.finish;
-  if (Math.abs(player.x - f.x) < 52 && player.y <= f.y + 8 && player.y >= f.y - 150) {
+  if (f && Math.abs(player.x - f.x) < 52 && player.y <= f.y + 8 && player.y >= f.y - 150) {
     if (finishRace(run, now)) showResult(engine);
+  }
+}
+
+/**
+ * Grab 'Em Good while running: the rival walks its route and takes each quoin
+ * it reaches; you take any quoin your avatar touches (items/quoin.js
+ * onPlayerCollision). Each grab may settle the game (grabRaceQuoin).
+ */
+function quoinTick(engine, now) {
+  const elapsed = now - run.startAt;
+  if (!rivalFrozen) {
+    const pose = routePoseAt(rivalRoute(), elapsed, rivalOpts, rivalTimeline);
+    placeRival(pose.x, pose.y, pose.mode, pose.facing);
+  }
+  const player = engine.player;
+  const auto = engine.param('raceautoplay') === '1';
+  if (auto) {
+    const pose = routePoseAt(course.route, now - autoplayStartAt, { pace: 1.25, gravity: course.gravity }, autoTimeline);
+    player.x = pose.x;
+    player.y = pose.y;
+    player.vx = 0;
+    player.vy = 0;
+    player.onGround = pose.mode !== 'jump';
+  }
+  const bob = Math.sin(now / 320);
+  for (const q of quoinSprites) {
+    if (!q.live) continue;
+    if (q.sprite) q.sprite.y = q.y + bob * 3;
+    const touched = auto
+      ? now - autoplayStartAt >= q.autoMs
+      : Math.abs(player.x - q.x) <= 40 && q.y >= player.y - 118 && q.y <= player.y + 18;
+    const rival = !touched && elapsed >= q.rivalMs;
+    if (!touched && !rival) continue;
+    takeQuoin(q);
+    const result = grabRaceQuoin(run, touched ? 'you' : 'rival', now);
+    if (!result.ok) continue;
+    const amount = quoinGrabMood(engine.quoinState?.multiplier);
+    if (touched) {
+      // Game quoins pay their benefit but skip the daily quoin limit.
+      const pc = engine.pc;
+      pc.mood = Math.max(0, Math.min(moodMax(pc), (pc.mood || 0) + amount));
+      engine.floatText(q.x, q.y - 24, `+${amount} mood`, 0xb5e35b);
+      engine.playSound('QUOIN_GOT', { volume: 0.6, jitter: 0.04 });
+      engine.updateHud();
+    } else {
+      engine.floatText(q.x, q.y - 24, `+${amount} mood`, 0xd9c8ff);
+      engine.playSound('QUOIN_GOT', { volume: 0.22, jitter: 0.04 });
+    }
+    engine.setData('raceLastGrab', `${result.who}:${q.index}`);
+    if (result.winner) {
+      showResult(engine);
+      return;
+    }
   }
 }
 
@@ -739,9 +873,11 @@ function showResult(engine) {
     // The rival too: angry when you won, happy when it did.
     rivalSprite?.npc?.emote(run.status === 'won' ? 'angry' : 'happy');
   }
+  const quoins = run.kind === 'quoins';
+  const counters = quoins ? QUOIN_GRAB_ACHIEVEMENTS : RACE_ACHIEVEMENTS;
   if (run.status === 'won') {
     engine.questFlag(RACE_FLAGS.win);
-    engine.achievement(RACE_ACHIEVEMENTS.won, 1);
+    engine.achievement(counters.won, 1);
     engine.pushActivity(`You won ${race.title}! +${reward.currants} currants · +${reward.xp} iMG.`);
     engine.playSound('YOU_WIN', { volume: 0.7 });
     const rainbow = drawWinnerRainbow(engine.PIXI);
@@ -750,7 +886,7 @@ function showResult(engine) {
     rainbow.zIndex = 60;
     engine.entityLayer.addChild(rainbow);
   } else if (run.status === 'lost') {
-    engine.achievement(RACE_ACHIEVEMENTS.lost, 1);
+    engine.achievement(counters.lost, 1);
     engine.pushActivity(`${run.rivalName} won ${race.title}.`);
   } else {
     engine.pushActivity(`You left ${race.title}.`);
@@ -764,9 +900,11 @@ function showResult(engine) {
   hud.result.querySelector('[data-race-result-detail]').textContent = copy.detail;
   const time = raceElapsedMs(run, Date.now());
   const best = record.best[run.raceId];
-  hud.result.querySelector('[data-race-result-time]').textContent = run.status === 'won'
-    ? `Your time ${formatRaceTime(time)}${best ? ` · Best ${formatRaceTime(best)}` : ''}${run.falls ? ` · ${run.falls} fall${run.falls === 1 ? '' : 's'}` : ''}`
-    : run.status === 'lost' ? `You were ${Math.round(run.playerProgress * 100)}% of the way there.` : '';
+  hud.result.querySelector('[data-race-result-time]').textContent = quoins
+    ? `You grabbed ${run.scores.you} of ${run.quoinTotal} quoins · ${run.rivalName} ${run.scores.rival}${run.status === 'won' ? ` · ${formatRaceTime(time)}` : ''}`
+    : run.status === 'won'
+      ? `Your time ${formatRaceTime(time)}${best ? ` · Best ${formatRaceTime(best)}` : ''}${run.falls ? ` · ${run.falls} fall${run.falls === 1 ? '' : 's'}` : ''}`
+      : run.status === 'lost' ? `You were ${Math.round(run.playerProgress * 100)}% of the way there.` : '';
   hud.countdown.hidden = true;
   hud.ready.hidden = true;
   hud.result.hidden = false;
@@ -806,17 +944,24 @@ function renderHud(engine, force = false) {
   const now = Date.now();
   if (!force && now - lastHudAt < 90) return;
   lastHudAt = now;
+  const quoins = run.kind === 'quoins';
   const you = Math.round((run.playerProgress || 0) * 100);
   const them = Math.round((run.rivalProgress || 0) * 100);
-  hud.bar.querySelector('[data-race-you-pct]').textContent = `${you}%`;
+  // quoin_grab_show_overlays: "label: score" per player, then "Remaining: N".
+  hud.bar.querySelector('[data-race-you-pct]').textContent = quoins ? String(run.scores.you) : `${you}%`;
   hud.bar.querySelector('[data-race-rival]').textContent = run.rivalName;
-  hud.bar.querySelector('[data-race-rival-pct]').textContent = `${them}%`;
+  hud.bar.querySelector('[data-race-rival-pct]').textContent = quoins ? String(run.scores.rival) : `${them}%`;
+  hud.bar.querySelector('[data-race-remaining-wrap]').hidden = !quoins;
+  hud.bar.querySelector('[data-race-remaining]').textContent = String(quoinGrabRemaining(run));
+  hud.bar.querySelector('.race-track').hidden = quoins;
   hud.bar.querySelector('[data-race-you]').style.left = `${you}%`;
   hud.bar.querySelector('[data-race-them]').style.left = `${them}%`;
   hud.bar.querySelector('[data-race-time]').textContent = formatRaceTime(raceElapsedMs(run, now));
   hud.bar.querySelector('[data-race-objective]').textContent =
     run.status === 'staging' || run.status === 'countdown'
       ? RACES[run.raceId].desc
+      : run.status === 'running' && quoins
+        ? (run.scores.rival > run.scores.you + 2 ? `${run.rivalName} is grabbing more!` : run.scores.you > run.scores.rival + 2 ? 'You are in the lead!' : 'Neck and neck!')
       : run.status === 'running'
         ? (them > you + 8 ? `${run.rivalName} is pulling ahead!` : you > them + 8 ? 'You are in the lead!' : 'Neck and neck!')
         : run.status === 'won' ? 'You won!' : `${run.rivalName} won.`;
@@ -836,6 +981,11 @@ function publish(engine) {
   engine.setData('raceTickets', String(RACE_STORE_ITEMS.reduce((n, row) => n + countItem(engine.inv, row.classTsid), 0)));
   engine.setData('raceDispenser', dispenserTarget ? '1' : '0');
   engine.setData('raceCourseSource', course ? 'reconstructed' : '');
+  engine.setData('raceKind', run ? run.kind : '');
+  engine.setData('raceQuoinsYou', run?.kind === 'quoins' ? String(run.scores.you) : '');
+  engine.setData('raceQuoinsRival', run?.kind === 'quoins' ? String(run.scores.rival) : '');
+  engine.setData('raceQuoinsRemaining', run?.kind === 'quoins' ? String(quoinGrabRemaining(run)) : '');
+  engine.setData('raceQuoinsTotal', run?.kind === 'quoins' ? String(run.quoinTotal) : '');
   if (run && ['won', 'lost', 'forfeit'].includes(run.status)) engine.setData('raceOutcome', run.status);
 }
 
@@ -873,7 +1023,7 @@ function handleDemo(engine) {
     demoHandled = true;
     return;
   }
-  if (RACE_IDS.includes(demo) && playable(demo)) {
+  if (RACES[demo] && playable(demo)) {
     demoHandled = true;
     setTimeout(() => startRace(demo, engine, { useTransition: false }), 300);
   } else if (demo !== 'dispenser') {
@@ -883,10 +1033,11 @@ function handleDemo(engine) {
     if ((engine.pc.currants || 0) < 200) engine.pc.currants = 500;
     openStore(engine);
     if (engine.param('raceautoplay') === 'buy') {
+      const ticket = engine.param('raceticket') || 'race_ticket_space_race';
       setTimeout(() => {
-        buyTicket('race_ticket_space_race', engine);
+        buyTicket(ticket, engine);
         closeStore();
-        activateTicket('race_ticket_space_race', engine, { delayMs: 1200 });
+        activateTicket(ticket, engine, { delayMs: 1200 });
       }, 700);
     }
   }
@@ -954,6 +1105,7 @@ export const racesFeature = {
     rivalLabel = null;
     finishSprite = null;
     checkpointSprites = [];
+    quoinSprites = [];
     dispenserTarget = null;
   },
 

@@ -48,7 +48,7 @@ import {
   tagCrowns,
   tickCrowns,
 } from '../game-of-crowns.js?v=crowns-1';
-import { RACE_RIVALS } from '../races.js?v=races-1';
+import { RACE_RIVALS } from '../races.js?v=races-2';
 import { wallsScreen } from '../street-model.js';
 import { addItem } from '../inventory.js?v=catalog-unified-3';
 import { textureFromUrl } from '../textures.js';

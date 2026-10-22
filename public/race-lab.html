@@ -25,6 +25,11 @@
     import { raceCourse, RACE_COURSE_IDS } from './js/race-courses.js';
     import { renderRaceCourse, drawFinishPosts, drawCheckpointFlag } from './js/race-render.js';
     import { RACES, routeDurationMs, formatRaceTime } from './js/races.js';
+    import * as textureUrls from './js/textures.js';
+    import { installHiresDecos } from './js/deco-hires.js';
+
+    // Decos ship as WebP; route the .png deco URLs the renderer asks for, as the game does.
+    installHiresDecos(textureUrls);
 
     // ?race=<id> overview, or &x=&y=&zoom=1 for a 960x540 window at full size.
     const params = new URLSearchParams(location.search);
@@ -50,7 +55,7 @@
     bg.updateParallax?.(camX, camY);
     world.addChild(bg);
     for (const cp of course.checkpoints) world.addChild(drawCheckpointFlag(PIXI, cp));
-    world.addChild(drawFinishPosts(PIXI, course.finish));
+    if (course.finish) world.addChild(drawFinishPosts(PIXI, course.finish));
     const lines = new PIXI.Graphics();
     const route = (nodes, color) => {
       nodes.forEach((n, i) => (i ? lines.lineTo(n.x, n.y - 4) : lines.moveTo(n.x, n.y - 4)));
@@ -64,12 +69,18 @@
     const spawn = new PIXI.Graphics();
     spawn.rect(course.spawn.player.x - 14, course.spawn.player.y - 90, 28, 90).fill(0xffd55b);
     spawn.rect(course.spawn.rival.x - 14, course.spawn.rival.y - 90, 28, 90).fill(0xc9a6ff);
-    world.addChild(lines, spawn);
-    const rival = routeDurationMs(course.rivalRoute || course.route, { pace: course.rivalPace, gravity: course.gravity });
+    // Grab 'Em Good quoins: gold = your side, lilac = the rival's, white = shared.
+    const coins = new PIXI.Graphics();
+    for (const q of course.quoins || []) {
+      coins.circle(q.x, q.y, zoom ? 12 : 16).fill({ color: q.owner === 'rival' ? 0xc9a6ff : q.owner === 'shared' ? 0xffffff : 0xb5e35b, alpha: 0.95 });
+    }
+    world.addChild(lines, spawn, coins);
+    const ownRoute = course.kind === 'quoins' ? course.rivalRoute.slice(0, course.route.length) : course.rivalRoute || course.route;
+    const rival = routeDurationMs(ownRoute, { pace: course.rivalPace, gravity: course.gravity });
     const best = routeDurationMs(course.route, { pace: 1, gravity: course.gravity });
     document.getElementById('title').textContent = `${RACES[id].title} · ${course.width}×${course.height}`;
     document.getElementById('meta').textContent =
-      `${course.source} Gravity ${course.gravity} · ${course.platforms.length} ledges · ${course.walls.length} climbs · ${course.checkpoints.length} checkpoints · rival ${formatRaceTime(rival)} · clean run ${formatRaceTime(best)}. Yellow: your route; lilac: the rival's.`;
+      `${course.source} Gravity ${course.gravity} · ${course.platforms.length} ledges · ${course.walls.length} climbs · ${course.checkpoints.length} checkpoints${course.quoins?.length ? ` · ${course.quoins.length} quoins` : ''} · rival ${formatRaceTime(rival)}${course.kind === 'quoins' ? ' to the canopy' : ''} · clean run ${formatRaceTime(best)}. Yellow: your route; lilac: the rival's.`;
     document.body.dataset.ready = '1';
   </script>
 </body>

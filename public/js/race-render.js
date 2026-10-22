@@ -21,6 +21,7 @@ export const RACE_THEME_LOADING = Object.freeze({
   star: ['#120a24', '#7d2ec2'],
   canyon: ['#5fb7c9', '#e8d79a'],
   lava: ['#170606', '#7a1410'],
+  forest: ['#2b2d31', '#3d6a24'],
 });
 
 export function raceLoadingColors(course) {
@@ -396,9 +397,96 @@ function drawSummit(g, p, ctx) {
   drawRockMass(g, p, ctx, { ...ROCK, grass: 0x7fae3e, grassDark: 0x5a8a2a }, { bottom: p.y1 + 220, jag: 70, inset: 60 });
 }
 
+/*
+ * Grab 'Em Good: Groddle pine boughs and plank shelves drawn with the
+ * recovered decos. Each entry: logical size, the walkable span of the art
+ * (fractions of its width), the needle-top line (fraction of its height,
+ * measured from the alpha), and which end the woody stub is on.
+ */
+const BOUGH_ART = {
+  platform_branch_a01: { w: 520, h: 230, f0: 0.22, f1: 1, top: 0.34, stub: -1 },
+  platform_branch_a02: { w: 664, h: 186, f0: 0.15, f1: 0.92, top: 0.04, stub: 1 },
+  platform_branch_a03: { w: 300, h: 108, f0: 0.03, f1: 0.97, top: 0.12, stub: -1 },
+  platform_branch_a04: { w: 730, h: 208, f0: 0.08, f1: 0.82, top: 0.06, stub: 1 },
+};
+const PLANK_ART = {
+  platform_wood_board_1: { w: 532, h: 252, f0: 0.08, f1: 0.98, top: 0.12, stub: -1 },
+  platform_wood_board_2: { w: 532, h: 220, f0: 0.08, f1: 0.98, top: 0.14, stub: -1 },
+};
+
+function pickArt(table, len, seed) {
+  // The art whose walkable span needs the scale nearest 0.75, ties broken by the seed.
+  let best = null;
+  for (const [name, art] of Object.entries(table)) {
+    const scale = len / ((art.f1 - art.f0) * art.w);
+    const score = Math.abs(Math.log(scale / 0.75)) + ((hashString(`${seed}:${name}`) % 100) / 400);
+    if (!best || score < best.score) best = { name, art, scale, score };
+  }
+  return best;
+}
+
+function placeSpanArt(ctx, p, table, sink = 4) {
+  const len = p.x2 - p.x1;
+  const { name, art, scale } = pickArt(table, len, p.id);
+  // Point the stub at the trunk the ledge grows from (mirrored ledges sit on the other side).
+  const trunk = p.trunk == null ? null : p.mirrored ? ctx.course.width - p.trunk : p.trunk;
+  const towards = trunk == null ? (p.mirrored ? 1 : -1) : Math.sign(trunk - (p.x1 + p.x2) / 2) || -1;
+  const flip = towards !== art.stub;
+  const sprite = new ctx.PIXI.Sprite(textureFromUrl(`${DECO_DIR}${name}.png`));
+  sprite.anchor.set(0, 0);
+  const span0 = flip ? 1 - art.f1 : art.f0;
+  const left = p.x1 - span0 * art.w * scale;
+  sprite.scale.set(flip ? -scale : scale, scale);
+  sprite.x = flip ? left + art.w * scale : left;
+  sprite.y = p.y1 - art.top * art.h * scale - sink;
+  ctx.under.addChild(sprite);
+  return sprite;
+}
+
+function drawBough(g, p, ctx) {
+  placeSpanArt(ctx, p, BOUGH_ART);
+}
+
+function drawPlank(g, p, ctx) {
+  placeSpanArt(ctx, p, PLANK_ART, 0);
+}
+
+function drawCanopy(g, p, ctx) {
+  // Two long boughs meeting over the middle, under a leafy crown.
+  const mid = (p.x1 + p.x2) / 2;
+  drawBough(g, { ...p, id: `${p.id}:l`, x2: mid + 20, trunk: p.x1 - 200, mirrored: false }, ctx);
+  drawBough(g, { ...p, id: `${p.id}:r`, x1: mid - 20, trunk: p.x2 + 200, mirrored: false }, ctx);
+}
+
+const FOREST_DIRT = 0x6a4a2c;
+const FOREST_GRASS = 0x7fbf2a;
+const FOREST_GRASS_DARK = 0x4e8a1e;
+
+function drawForestHill(g, p, ctx) {
+  // The grassy dirt mound the racers start on: dirt down to the floor, a fat grass lip on top.
+  const bottom = (ctx.course.floor?.y ?? ctx.course.height) + 60;
+  g.poly([p.x1, p.y1, p.x2, p.y2, p.x2, bottom, p.x1, bottom]).fill(FOREST_DIRT);
+  const rand = seeded(hashString(p.id));
+  for (let i = 0; i < Math.max(2, Math.floor((p.x2 - p.x1) / 60)); i += 1) {
+    const x = p.x1 + 20 + rand() * Math.max(1, p.x2 - p.x1 - 40);
+    const y = Math.max(p.y1, p.y2) + 30 + rand() * 50;
+    g.ellipse(x, y, 16 + rand() * 20, 6 + rand() * 6).fill({ color: 0x573b22, alpha: 0.6 });
+  }
+  g.poly([p.x1 - 6, p.y1 - 6, p.x2 + 6, p.y2 - 6, p.x2 + 6, p.y2 + 16, p.x1 - 6, p.y1 + 16]).fill(FOREST_GRASS);
+  g.poly([p.x1 - 6, p.y1 + 10, p.x2 + 6, p.y2 + 10, p.x2 + 6, p.y2 + 18, p.x1 - 6, p.y1 + 18]).fill(FOREST_GRASS_DARK);
+  for (let x = p.x1 + 8; x < p.x2 - 8; x += 22 + rand() * 26) {
+    const y = p.y1 + ((x - p.x1) / (p.x2 - p.x1 || 1)) * (p.y2 - p.y1);
+    g.poly([x - 5, y - 4, x, y - 13 - rand() * 6, x + 5, y - 4]).fill(FOREST_GRASS);
+  }
+}
+
 function drawGroundFloor(g, p, ctx) {
   const theme = ctx.course.theme;
-  if (theme === 'crystal') {
+  if (theme === 'forest') {
+    g.rect(p.x1 - 200, p.y1, p.x2 - p.x1 + 400, ctx.course.height - p.y1 + 300).fill(0x3c2a1a);
+    g.rect(p.x1 - 200, p.y1 - 8, p.x2 - p.x1 + 400, 26).fill(FOREST_GRASS_DARK);
+    g.rect(p.x1 - 200, p.y1 - 8, p.x2 - p.x1 + 400, 12).fill(0x64a325);
+  } else if (theme === 'crystal') {
     g.rect(p.x1, p.y1, p.x2 - p.x1, ctx.course.height - p.y1 + 200).fill(0xf1eefb);
     g.rect(p.x1, p.y1 - 6, p.x2 - p.x1, 8).fill(0xffffff);
   } else if (theme === 'star') {
@@ -447,6 +535,10 @@ const PLATFORM_STYLES = {
   whiteBlock: drawWhiteBlock,
   cloudTop: drawCloudTop,
   summit: drawSummit,
+  bough: drawBough,
+  plank: drawPlank,
+  canopy: drawCanopy,
+  forestHill: drawForestHill,
   'floor-ground': drawGroundFloor,
   'floor-lava': drawLavaFloor,
 };
@@ -744,7 +836,26 @@ function paintAmazing(PIXI, root, course) {
   root.addChild(cave);
 }
 
+function paintForest(PIXI, root, course) {
+  // Night-time Groddle Forest: a flat grey night sky, ranks of pines behind.
+  root.addChild(gradientSprite(PIXI, [[0, '#2a2b2f'], [0.55, '#3a3c40'], [0.85, '#3f4a3b'], [1, '#2d3a24']], course.width, course.height + 200));
+  const rand = seeded(hashString(`${course.id}:pines`));
+  const floorY = course.floor?.y ?? course.height;
+  const pines = ['tree_coniferous_1', 'tree_coniferous_2', 'tree_coniferous_3', 'tree_coniferous_4'];
+  for (const [parallax, tint, y0, step, scale] of [[0.35, 0x2c3f2a, floorY - 520, 260, 0.9], [0.55, 0x3f6a2c, floorY - 230, 210, 0.75], [0.7, 0x4f8a2e, floorY + 10, 300, 0.55]]) {
+    for (let x = -300; x < course.width + 400; x += step + rand() * step * 0.6) {
+      addParallaxSprite(PIXI, root, pines[Math.floor(rand() * pines.length)], x, y0 + rand() * 40, {
+        scale: scale * (0.8 + rand() * 0.4), tint, parallax, parallaxY: 1, flip: rand() > 0.5,
+      });
+    }
+  }
+  for (let x = -200; x < course.width + 600; x += 820) {
+    addParallaxSprite(PIXI, root, 'pinehills_2', x, floorY + 30, { scale: 0.6, tint: 0x4a7f2a, parallax: 0.85, parallaxY: 1 });
+  }
+}
+
 const THEMES = {
+  forest: paintForest,
   space: paintSpace,
   lava: paintLava,
   canyon: paintCanyon,

@@ -1,6 +1,7 @@
 /**
  * Glitch Races: ticket store, race lifecycle, source rewards, rival pacing,
- * and course reachability for every reconstructed course.
+ * and course reachability for every reconstructed course, plus the Grab 'Em
+ * Good quoin game (global_game.js quoin_grab_*).
  * Run: node --test tests/races.test.js
  */
 import { describe, it } from 'node:test';
@@ -10,7 +11,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  GRAB_EM_GOOD_ID,
+  QUOIN_GRAB_ACHIEVEMENTS,
+  QUOIN_GRAB_SPLASH_TEXT,
   RACES,
+  RACE_GAME_IDS,
   RACE_IDS,
   RACE_COUNTDOWN_MS,
   RACE_DISPENSER_STREETS,
@@ -26,6 +31,13 @@ import {
   createRaceRun,
   finishRace,
   forfeitRace,
+  grabRaceQuoin,
+  isQuoinGrab,
+  quoinGrabMood,
+  quoinGrabOverlayLines,
+  quoinGrabRemaining,
+  quoinGrabTarget,
+  quoinGrabWinner,
   hasRaceDispenser,
   isRaceSceneTsid,
   normalizeRaceRecord,
@@ -85,9 +97,12 @@ describe('race catalog and ticket store', () => {
     assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket.png')));
   });
 
-  it('rolls the generic ticket onto a race', () => {
-    for (let i = 0; i < 20; i += 1) assert.ok(RACE_IDS.includes(pickGenericRace(i / 20)));
+  it('rolls the generic ticket onto a race, or Grab \'Em Good on the last value', () => {
+    // race_ticket.js: randInt(0, 8): 0-6 a race, 7 Hog Haul (no ticket route here), 8 quoin_grab.
+    for (let i = 0; i < 8; i += 1) assert.ok(RACE_IDS.includes(pickGenericRace(i / 9 + 0.01)), `roll ${i}`);
     assert.equal(pickGenericRace(0), 'amazing_race');
+    assert.equal(pickGenericRace(8 / 9 + 0.01), GRAB_EM_GOOD_ID);
+    assert.equal(pickGenericRace(0.999), GRAB_EM_GOOD_ID);
   });
 
   it('names race scenes so reloads can recognise them', () => {
@@ -234,7 +249,7 @@ describe('route kinematics', () => {
 });
 
 describe('course reachability', () => {
-  for (const id of RACE_COURSE_IDS) {
+  for (const id of RACE_COURSE_IDS.filter((r) => raceCourse(r).kind !== 'quoins')) {
     describe(id, () => {
       const course = raceCourse(id);
 
@@ -299,4 +314,182 @@ describe('course reachability', () => {
       });
     });
   }
+});
+
+describe("Grab 'Em Good (quoin_grab)", () => {
+  const race = RACES.grab_em_good;
+  const course = raceCourse('grab_em_good');
+
+  it('keeps the GSJS catalog: ticket, production street, start points, desc and splash', () => {
+    assert.equal(race.title, "Grab 'Em Good");
+    assert.equal(race.ticket, 'race_ticket_grab_em_good');
+    assert.equal(race.ticketLabel, "Grab 'Em Good Ticket");
+    assert.equal(race.ticketDesc, "Challenge another player to Grab 'Em Good.");
+    assert.equal(race.productionTsid, 'LIF11MB3O8P1TAR');
+    assert.equal(race.raceType, 'most_quoins');
+    assert.equal(race.game, 'quoin_grab');
+    assert.deepEqual(race.startPoints.map((p) => p.x), [-319, 356]);
+    assert.equal(race.desc, 'Collect all the quoins. Whoever gets the most wins!');
+    assert.equal(race.splash, 'Get the most quoins to win!');
+    assert.equal(QUOIN_GRAB_SPLASH_TEXT, race.splash);
+    assert.equal(raceForTicket('race_ticket_grab_em_good').id, 'grab_em_good');
+    assert.ok(isQuoinGrab('grab_em_good'));
+    assert.ok(!isQuoinGrab('space_race'));
+    assert.ok(!RACE_IDS.includes('grab_em_good'), 'not one of the seven finish-line races');
+    assert.ok(RACE_GAME_IDS.includes('grab_em_good'));
+    assert.deepEqual(QUOIN_GRAB_ACHIEVEMENTS, { won: 'quoin_grab:won', lost: 'quoin_grab:lost' });
+    assert.ok(RACE_STORE_ITEMS.some((row) => row.classTsid === race.ticket && row.cost === 60));
+  });
+
+  it('settles like quoin_grab_get_quoin: lead past the quoins left, or the last quoin', () => {
+    assert.equal(quoinGrabTarget(71), 36);
+    assert.equal(quoinGrabWinner({ you: 35, rival: 0 }, 71, 'you'), null, '35 of 71 can still be caught');
+    assert.equal(quoinGrabWinner({ you: 36, rival: 0 }, 71, 'you'), 'you');
+    assert.equal(quoinGrabWinner({ you: 20, rival: 23 }, 71, 'rival'), null);
+    assert.equal(quoinGrabWinner({ you: 35, rival: 36 }, 71, 'rival'), 'rival');
+    // Only the grabber can be named: a lead does not win on the other racer's grab.
+    assert.equal(quoinGrabWinner({ you: 36, rival: 1 }, 71, 'rival'), null);
+    // The last quoin ends it for whoever takes it.
+    assert.equal(quoinGrabWinner({ you: 2, rival: 2 }, 4, 'rival'), 'rival');
+  });
+
+  it('scores one per grab, shows the overlay lines, and ends on the deciding grab', () => {
+    const run = createRaceRun('grab_em_good', { now: 0, rival: { name: 'Amp', tint: 1 }, quoinTotal: 71 });
+    assert.equal(run.kind, 'quoins');
+    assert.equal(grabRaceQuoin(run, 'you', 1).ok, false, 'no grabs before GO');
+    beginRaceCountdown(run, 0);
+    tickRace(run, RACE_COUNTDOWN_MS);
+    assert.equal(run.status, 'running');
+    assert.deepEqual(tickRace(run, RACE_COUNTDOWN_MS + 3_600_000), [], 'the clock never ends a quoin game');
+    for (let i = 0; i < 20; i += 1) grabRaceQuoin(run, 'rival', 5_000 + i);
+    for (let i = 0; i < 35; i += 1) assert.equal(grabRaceQuoin(run, 'you', 6_000 + i).winner, null);
+    assert.deepEqual(quoinGrabOverlayLines(run, 'Gomez'), ['Gomez: 35', 'Amp: 20', 'Remaining: 16']);
+    const last = grabRaceQuoin(run, 'you', 9_000);
+    assert.equal(last.winner, 'you');
+    assert.equal(run.status, 'won');
+    assert.equal(quoinGrabRemaining(run), 15);
+    assert.equal(grabRaceQuoin(run, 'rival', 9_001).ok, false, 'nothing after the end');
+    const settled = settleRace(run, {});
+    assert.deepEqual(settled.reward, { currants: 100, xp: 50 });
+    assert.equal(settled.record.wins.grab_em_good, 1);
+    assert.equal(normalizeRaceRecord(settled.record).wins.grab_em_good, 1, 'the record keeps Grab \'Em Good');
+  });
+
+  it('pays the loser nothing', () => {
+    const run = createRaceRun('grab_em_good', { now: 0, rival: { name: 'Amp', tint: 1 }, quoinTotal: 71 });
+    beginRaceCountdown(run, 0);
+    tickRace(run, RACE_COUNTDOWN_MS);
+    for (let i = 0; i < 36; i += 1) grabRaceQuoin(run, 'rival', 5_000 + i);
+    assert.equal(run.status, 'lost');
+    const settled = settleRace(run, {});
+    assert.deepEqual(settled.reward, RACE_LOSS_REWARD);
+    assert.equal(settled.record.losses.grab_em_good, 1);
+    assert.equal(raceResultCopy(run).title, 'Amp IS THE WINNER!');
+  });
+
+  it('pays mood quoins at benefit 10 times the quoin multiplier (the recording shows +11)', () => {
+    assert.equal(quoinGrabMood(1), 10);
+    assert.equal(quoinGrabMood(1.1), 11);
+    assert.equal(quoinGrabMood(undefined), 10);
+  });
+
+  it('lays 71 quoins: 35 on each tree and one on the shared canopy', () => {
+    assert.equal(course.kind, 'quoins');
+    assert.equal(course.quoins.length, 71);
+    const count = (owner) => course.quoins.filter((q) => q.owner === owner).length;
+    assert.equal(count('you'), 35);
+    assert.equal(count('rival'), 35);
+    assert.equal(count('shared'), 1);
+    assert.equal(count('you') + count('shared'), quoinGrabTarget(71), 'clearing your tree and the canopy settles it');
+    // The two sides mirror each other across the middle.
+    const mine = course.quoins.filter((q) => q.owner === 'you').map((q) => `${course.width - q.x},${q.y}`).sort();
+    const theirs = course.quoins.filter((q) => q.owner === 'rival').map((q) => `${q.x},${q.y}`).sort();
+    assert.deepEqual(mine, theirs);
+  });
+
+  it('starts both racers on the shared mound, mirrored like the config start points', () => {
+    const { player, rival } = course.spawn;
+    assert.equal(player.y, rival.y);
+    assert.equal(player.x + rival.x, course.width, 'symmetric about the middle');
+    assert.ok(Math.abs(course.width / 2 - player.x - 319) < 1);
+    const solid = course.platforms.filter((p) => !p.hazard);
+    assert.ok(platformUnder(solid, player.x, player.y) && platformUnder(solid, rival.x, rival.y));
+  });
+
+  it('keeps every surface and route stop inside the world and on solid ground', () => {
+    const solid = course.platforms.filter((p) => !p.hazard);
+    for (const p of course.platforms) {
+      assert.ok(p.x1 >= 0 && p.x2 <= course.width, `${p.id} x ${p.x1}-${p.x2}`);
+      assert.ok(p.y1 > 0 && p.y2 <= course.height, `${p.id} y ${p.y1}/${p.y2}`);
+    }
+    for (const node of [...course.route, ...course.rivalRoute]) {
+      assert.ok(node.x >= 24 && node.x <= course.width - 24, `route x ${node.x}`);
+      assert.ok(platformUnder(solid, node.x, node.y), `node ${node.mode} ${node.x},${node.y}`);
+    }
+  });
+
+  it('only asks for jumps the avatar can make, both ways', () => {
+    for (const route of [course.route, course.rivalRoute]) {
+      for (let i = 1; i < route.length; i += 1) {
+        const node = route[i];
+        if (node.mode !== 'jump') continue;
+        const from = route[i - 1];
+        const rise = from.y - node.y;
+        if (rise <= 0) continue; // hopping back down a bough
+        assert.ok(canJump(node.x - from.x, rise, course.gravity), `jump ${i}: dx ${node.x - from.x}, rise ${rise}`);
+      }
+    }
+  });
+
+  it('puts every quoin where a racer can touch it: standing on a ledge or at the top of a jump', () => {
+    // Avatar box ~100 px tall from the feet; a full jump lifts the feet 110 px and
+    // carries it 60 px past a ledge edge on the way to the quoins between boughs.
+    const solid = course.platforms.filter((p) => !p.hazard);
+    for (const q of course.quoins) {
+      const ok = solid.some((p) => {
+        for (const dx of [-60, -30, 0, 30, 60]) {
+          const top = Math.min(p.y1, p.y2);
+          const x = q.x + dx;
+          if (x < Math.min(p.x1, p.x2) || x > Math.max(p.x1, p.x2)) continue;
+          const y = p.y1 + ((x - p.x1) / ((p.x2 - p.x1) || 1)) * (p.y2 - p.y1);
+          if (q.y <= y + 10 && q.y >= y - 220 && top > 0) return true;
+        }
+        return false;
+      });
+      assert.ok(ok, `quoin ${q.x},${q.y} (${q.owner})`);
+    }
+  });
+
+  it('routes each scripted racer through every quoin it is meant to take', () => {
+    const S = course.route.length - 1;
+    assert.equal(course.rivalRoute.length, 2 * S + 1, 'its own tree, then yours in reverse');
+    const end = course.route[S];
+    const summit = course.rivalRoute[S];
+    assert.deepEqual([summit.x, summit.y], [end.x, end.y], 'both trees meet on the canopy');
+    for (const q of course.quoins) {
+      for (const [route, at] of [[course.route, q.at], [course.rivalRoute, q.rivalAt]]) {
+        if (at == null) continue;
+        assert.ok(at >= 0 && at <= route.length - 1, `index ${at}`);
+        const a = route[Math.floor(at)];
+        const b = route[Math.min(route.length - 1, Math.floor(at) + 1)];
+        const u = at - Math.floor(at);
+        const x = a.x + (b.x - a.x) * u;
+        const y = a.y + (b.y - a.y) * u;
+        assert.ok(Math.abs(x - q.x) < 80 && Math.abs(y - q.y) < 140, `quoin ${q.x},${q.y} vs route ${Math.round(x)},${Math.round(y)}`);
+      }
+    }
+    assert.ok(course.quoins.every((q) => q.rivalAt != null), 'the rival can reach every quoin');
+  });
+
+  it('paces the rival so a clean climb wins', () => {
+    const own = routeDurationMs(course.rivalRoute.slice(0, course.route.length), { pace: course.rivalPace, gravity: course.gravity });
+    assert.ok(own > 35_000 && own < 90_000, `rival's own tree ${Math.round(own)} ms`);
+    const best = routeDurationMs(course.route, { pace: 1, gravity: course.gravity });
+    assert.ok(best < own * 0.8, 'a clean run clears your tree well before the rival clears its own');
+  });
+
+  it('ships the ticket art and only recovered decos', () => {
+    assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket_grab_em_good.png')));
+    for (const d of course.decor) assert.ok(existsSync(join(root, 'assets/decos/groddle', `${d.name}.webp`)), d.name);
+  });
 });

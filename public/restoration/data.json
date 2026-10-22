@@ -1394,9 +1394,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 250,
+  "commits": 251,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Poisoned trees die, and dead trees clear into Patches to replant"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1511,11 +1516,6 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "Shrines hand over a waiting emblem as you walk past"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Streets cull off-screen decos and free textures far from the camera"
    }
   ]
  },

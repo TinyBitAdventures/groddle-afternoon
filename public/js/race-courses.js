@@ -1,5 +1,5 @@
 /**
- * Race course geometry for the seven Glitch Races.
+ * Race course geometry for the seven Glitch Races and Grab 'Em Good.
  *
  * None of the production race streets (config_prod.js
  * shared_instances.race.locations) survive in the public locations archive,
@@ -28,7 +28,28 @@ class CourseBuilder {
     this.props = [];
     this.finish = null;
     this.spawn = null;
+    this.quoins = [];
     this.gravity = opts.gravity || 1;
+  }
+
+  /**
+   * A game quoin at (x, y) (its centre), collected by a scripted racer at
+   * float route index `at` (default: the projection on the last segment).
+   */
+  quoin(x, y, opts = {}) {
+    let at = opts.at;
+    if (at == null) {
+      const n = this.route.length - 1;
+      const a = this.route[n - 1] || this.route[n];
+      const b = this.route[n];
+      const span = b.x - a.x;
+      const u = Math.abs(span) < 1 ? 1 : Math.max(0, Math.min(1, (x - a.x) / span));
+      at = n - 1 + u;
+      if (n < 1) at = 0;
+    }
+    const { at: _at, ...rest } = opts;
+    this.quoins.push({ x: Math.round(x), y: Math.round(y), at: Math.round(at * 1000) / 1000, ...rest });
+    return this;
   }
 
   plat(xa, ya, xb, yb, style = 'ledge', extra = {}) {
@@ -206,6 +227,9 @@ class CourseBuilder {
     for (const prop of this.props.filter((row) => !row.shared && !row.mirrored)) {
       this.props.push({ ...prop, x: mx(prop.x), flip: !prop.flip, mirrored: true });
     }
+    for (const q of this.quoins.filter((row) => !row.shared && !row.mirrored)) {
+      this.quoins.push({ ...q, x: mx(q.x), mirrored: true });
+    }
     this.rivalRoute = this.route.map((n) => ({ ...n, x: mx(n.x) }));
     this.spawn = { player: this.spawn.player, rival: { x: this.rivalRoute[0].x, y: this.rivalRoute[0].y } };
     return this;
@@ -229,6 +253,7 @@ class CourseBuilder {
       spawn: this.spawn,
       decor: this.decor,
       props: this.props,
+      quoins: this.quoins,
     });
   }
 }
@@ -612,11 +637,170 @@ function buildStarSprint() {
   });
 }
 
+/* ------------------------------------------------------------------ */
+/* Grab 'Em Good (recording zBiGJR6jIJM; GSJS quoin_grab)              */
+/* A night-time Groddle Forest (wiki 2011-03-31): both racers start on  */
+/* a grassy dirt mound (config start points x = -319 / 356, a mirrored  */
+/* pair), then climb pine boughs and plank shelves around two pairs of  */
+/* giant trunks, grabbing mood quoins in rows and jump arcs. 71 quoins  */
+/* (wiki: "out of a total of 71"; the recording's scores and Remaining  */
+/* always sum to 71): 35 on each side and one on the shared canopy at   */
+/* the top, so a racer who clears their own tree and the canopy has    */
+/* the 36 that settle it. No hazards: a fall lands on the forest floor. */
+/* ------------------------------------------------------------------ */
+
+function buildGrabEmGood() {
+  const W = 3000;
+  const C = W / 2;
+  const FY = 2400;
+  const HY = FY - 90;
+  const TO = 380; // outer trunk (left half; mirrored at W - x)
+  const TI = 1020; // inner trunk
+  const b = new CourseBuilder({ gravity: 1 });
+  const bough = (x1, x2, y, trunk, style = 'bough', extra = {}) => b.plat(x1, y, x2, y, style, { trunk, ...extra });
+  const walk = (x, y) => b.node(x, y, 'walk');
+  const jump = (x, y) => b.node(x, y, 'jump');
+  /** Jump to (x, y) with one quoin in the arc, just above the landing height. */
+  const leap = (x, y) => {
+    const from = b.route[b.route.length - 1];
+    jump(x, y);
+    b.quoin((from.x + x) / 2, y - 40);
+  };
+  /** Walk to (x, y), out to a row quoin at qx and (optionally) back to bx. */
+  const fetch = (x, y, qx, bx = null) => {
+    walk(x, y);
+    b.quoin(qx, y - 50);
+    if (bx != null) walk(bx, y);
+  };
+
+  // The shared dirt mound the racers start on.
+  b.plat(C - 680, FY, C - 420, HY, 'forestHill', { shared: true });
+  b.plat(C - 420, HY, C + 420, HY, 'forestHill', { shared: true });
+  b.plat(C + 420, HY, C + 680, FY, 'forestHill', { shared: true });
+  b.node(C - 319, HY, 'start');
+  b.spawn = { player: { x: C - 319, y: HY }, rival: { x: C + 319, y: HY } };
+
+  // Pine boughs and plank shelves around the outer and inner trunks.
+  bough(420, 690, 2315, TO);
+  bough(110, 350, 2230, TO);
+  bough(420, 700, 2145, TO);
+  bough(90, 350, 2060, TO);
+  bough(420, 720, 1975, TO);
+  bough(170, 340, 1890, TO, 'plank');
+  bough(420, 700, 1805, TO);
+  bough(790, 960, 1745, null);
+  bough(1060, 1300, 1680, TI);
+  bough(760, 985, 1595, TI);
+  bough(1060, 1320, 1510, TI);
+  bough(830, 985, 1425, TI, 'plank');
+  bough(1060, 1300, 1340, TI);
+  bough(740, 985, 1255, TI);
+  bough(1060, 1340, 1170, TI);
+  bough(760, 985, 1085, TI);
+  bough(1060, 1290, 1000, TI);
+  // The shared canopy between the inner trunks, with the 71st quoin.
+  b.plat(1250, 915, W - 1250, 915, 'canopy', { shared: true });
+
+  // The route: down the mound, up the outer tree, across, up the inner tree.
+  walk(C - 420 + 4, HY);
+  b.quoin(1130, HY - 50);
+  walk(800, FY);
+  walk(660, FY);
+  leap(650, 2315);
+  fetch(434, 2315, 560);
+  leap(336, 2230);
+  fetch(150, 2230, 180, 336);
+  leap(446, 2145);
+  fetch(600, 2145, 560, 434);
+  leap(336, 2060);
+  fetch(130, 2060, 150, 336);
+  leap(446, 1975);
+  fetch(620, 1975, 600, 434);
+  leap(326, 1890);
+  fetch(200, 1890, 230, 326);
+  leap(446, 1805);
+  fetch(686, 1805, 600);
+  leap(816, 1745);
+  fetch(946, 1745, 880);
+  leap(1086, 1680);
+  fetch(1286, 1680, 1200, 1074);
+  leap(971, 1595);
+  fetch(780, 1595, 800, 971);
+  leap(1086, 1510);
+  fetch(1250, 1510, 1200, 1074);
+  leap(971, 1425);
+  fetch(880, 1425, 890, 971);
+  leap(1086, 1340);
+  fetch(1250, 1340, 1200, 1074);
+  leap(971, 1255);
+  fetch(760, 1255, 790, 971);
+  leap(1086, 1170);
+  fetch(1300, 1170, 1220, 1074);
+  leap(971, 1085);
+  // Out along the bough and back, so the leap across the trunk has a run-up.
+  fetch(800, 1085, 830, 971);
+  leap(1086, 1000);
+  walk(1276, 1000);
+  leap(1290, 915);
+  walk(C, 915);
+  b.quoin(C, 915 - 50, { shared: true });
+
+  // Trunks, bare branches and the canopy (recovered Groddle tree-stack decos).
+  for (const [x, branches] of [[TO, [[2190, 1, 'tree_stack_branch_3'], [1640, -1, 'tree_stack_branch_1'], [1330, 1, 'tree_stack_branch_4']]],
+    [TI, [[2050, -1, 'tree_stack_branch_2'], [1900, 1, 'tree_stack_branch_4'], [1560, 1, 'tree_stack_branch_1'], [1220, -1, 'tree_stack_branch_3']]]]) {
+    for (const [y, side, name] of branches) b.deco(name, x + side * 40, y, { scale: 0.75, flip: side < 0, ax: 0, back: true });
+    b.deco('tree_stack_trunk', x, FY - 360, { scale: 0.7, back: true });
+    b.deco('tree_stack_trunk', x, FY - 360 - 975, { scale: 0.7, back: true });
+    b.deco('tree_stack_trunk', x, FY - 360 - 1950, { scale: 0.7, back: true });
+    b.deco('tree_stack_base', x, FY + 14, { scale: 0.8, back: true });
+  }
+  for (const [x, y, name, scale, flip] of [
+    [TO - 40, 980, 'tree_stack_leafy_1', 0.62, false], [TO + 150, 760, 'tree_stack_leafy_2', 0.8, true],
+    [TO - 60, 640, 'tree_stack_leafy_2', 0.7, false], [TI - 120, 820, 'tree_stack_leafy_1', 0.6, true],
+    [TI + 60, 650, 'tree_stack_leafy_2', 0.75, false], [TI - 10, 520, 'tree_stack_leafy_1', 0.55, false],
+    [700, 470, 'tree_stack_leafy_2', 0.7, true],
+  ]) {
+    b.deco(name, x, y, { scale, flip, front: y < 700 });
+  }
+  // The dense crown over the shared canopy.
+  b.deco('tree_stack_leafy_1', C, 800, { scale: 0.75, shared: true });
+  b.deco('tree_stack_leafy_2', C - 250, 720, { scale: 0.7, shared: true });
+  b.deco('tree_stack_leafy_2', C + 250, 720, { scale: 0.7, flip: true, shared: true });
+  b.deco('pinecluster_2', 620, FY + 6, { scale: 0.45 });
+  b.deco('groddle_fern_1', 860, FY + 4, { scale: 0.7 });
+  b.mirror(W);
+
+  // The rival clears its own tree, takes the canopy, then works down yours.
+  const S = b.route.length - 1;
+  for (let i = S - 1; i >= 0; i -= 1) {
+    const from = b.route[i + 1];
+    const to = b.route[i];
+    b.rivalRoute.push({ x: to.x, y: to.y, mode: from.mode === 'jump' ? 'jump' : 'walk' });
+  }
+  for (const q of b.quoins) {
+    if (q.shared) Object.assign(q, { owner: 'shared', rivalAt: q.at });
+    else if (q.mirrored) Object.assign(q, { owner: 'rival', rivalAt: q.at, at: null });
+    else Object.assign(q, { owner: 'you', rivalAt: Math.round((2 * S - q.at) * 1000) / 1000 });
+  }
+
+  return b.build({
+    id: 'grab_em_good',
+    kind: 'quoins',
+    width: W,
+    height: FY + 100,
+    theme: 'forest',
+    floor: { y: FY, kind: 'ground' },
+    rivalPace: 0.62,
+    source: "Reconstructed from recording zBiGJR6jIJM with recovered Groddle tree-stack decos (production street LIF11MB3O8P1TAR is not archived).",
+  });
+}
+
 const BUILDERS = {
   amazing_race: buildAmazingRace,
   canyon_run: buildCanyonRun,
   lava_leap: buildLavaLeap,
   crystal_climb: buildCrystalClimb,
+  grab_em_good: buildGrabEmGood,
   space_race: buildSpaceRace,
   star_sprint: buildStarSprint,
   time_warp: buildTimeWarp,
