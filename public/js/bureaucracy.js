@@ -12,7 +12,10 @@
  *   grants you_have_papers (the Bureaucratic Arts II prerequisite) and is used
  *   up.
  *
- * The card itself stays with the Legalize It quest (js/legalize-it.js).
+ * The Legalize It quest (js/legalize-it.js) walks a new player through buying
+ * the card inside the Hall; the street clerk also sells it, like getItems,
+ * to anyone without the badge (no Bureaucratic Arts needed). Street projects
+ * such as job_street_ph4_02c ask for Card-Carrying Qualifications.
  */
 
 import { addItem, countItem, removeItem } from './inventory.js?v=catalog-unified-3';
@@ -31,6 +34,13 @@ export const HALL_STREETS = Object.freeze({
 });
 
 export const BUREAUCRACY_ITEMS = Object.freeze({
+  card_carrying_qualification: Object.freeze({
+    label: 'Card-Carrying Qualification',
+    cost: 50,
+    skill: null,
+    untilBadge: CARD_BADGE,
+    desc: 'This is the most basic, entry-level, bureaucratic item of all. Being qualified to carry cards is a prerequisite to becoming the sort of person who can have Papers at all, let alone Papers which are in order.',
+  }),
   your_papers: Object.freeze({
     label: 'Your Papers',
     cost: 100,
@@ -45,12 +55,17 @@ export const BUREAUCRACY_ITEMS = Object.freeze({
   }),
 });
 
-/** The clerk's menu, with why each document is unavailable. */
+/**
+ * The clerk's menu, with why each document is unavailable. The card is left
+ * off once you hold its badge (npc_bureaucrat.js getItems `continue`).
+ */
 export function clerkOffers(learned = [], achievements = []) {
   const hasCard = achievements.includes(CARD_BADGE);
-  return Object.entries(BUREAUCRACY_ITEMS).map(([classTsid, def]) => {
+  const rows = Object.entries(BUREAUCRACY_ITEMS).filter(([, def]) => !(def.untilBadge && achievements.includes(def.untilBadge)));
+  return rows.map(([classTsid, def]) => {
     let reason = '';
-    if (!learned.includes('bureaucraticarts_1')) reason = "Go away, we don't have time to waste on people who have not learned any Bureaucratic Arts.";
+    if (!def.skill) reason = ''; // the card: anyone without its badge
+    else if (!learned.includes('bureaucraticarts_1')) reason = "Go away, we don't have time to waste on people who have not learned any Bureaucratic Arts.";
     else if (!learned.includes(def.skill)) reason = 'You need Bureaucratic Arts II for a General Building Permit.';
     else if (!hasCard) reason = 'You need the Card-Carrying Qualification first.';
     return { classTsid, label: def.label, cost: def.cost, ok: !reason, reason };

@@ -1389,8 +1389,8 @@
  },
  "jobs": {
   "sourceJobs": 909,
-  "playableJobs": 460,
-  "offeringStreets": 399
+  "playableJobs": 689,
+  "offeringStreets": 593
  },
  "git": {
   "commits": 226,
@@ -1518,6 +1518,6 @@
    }
   ]
  },
- "tests": 143,
+ "tests": 144,
  "generatedAt": "2026-10-22"
 }

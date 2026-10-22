@@ -19,6 +19,9 @@
  *
  * Writes public/assets/content/street-jobs.json. tools/job-obtainable.mjs
  * decides which item requirements a solo player can meet in the remake.
+ * tools/retired-items.mjs turns requirements for retired items (Bricks,
+ * Grade A and AAA Earth Blocks) into Urth Blocks at the rate each item's
+ * onLoad replaceWith uses; the row keeps the source amount in `retired`.
  */
 
 import { readFile, readdir, writeFile } from 'node:fs/promises';
@@ -26,6 +29,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { obtainableItems } from './tools/job-obtainable.mjs';
+import { loadRetiredItems, retireRequirement } from './tools/retired-items.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const gsjs = process.env.GRODDLE_GSJS || '/Users/austin/Documents/glitch-audit/glitch-GameServerJS';
@@ -44,6 +48,8 @@ const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
 
 const TEST_CLASSES = /^job_(myles_test|cw_test|justin_all_work_test|multi_phase_test|notes_as_requirements_test)/;
 
+const retiredItems = {};
+
 async function loadClasses() {
   const dir = join(gsjs, 'quests');
   const out = {};
@@ -53,7 +59,7 @@ async function loadClasses() {
     // Only the data declarations matter; the generated functions call server APIs.
     vm.runInNewContext(src.replace(/^function [\s\S]*?^}/gm, ''), ctx);
     const id = file.slice(0, -3);
-    const requirements = Object.entries(ctx.requirements || {}).map(([rid, r]) => ({
+    let requirements = Object.entries(ctx.requirements || {}).map(([rid, r]) => ({
       id: rid,
       bucket: String(r.bucket_id || '1'),
       group: num(r.group_id) || 1,
@@ -66,6 +72,9 @@ async function loadClasses() {
       ...(r.type === 'work' ? { energy: num(r.energy), wear: num(r.wear), verb: r.verb_name || 'work', verbPast: r.verb_past || 'worked' } : {}),
       desc: r.desc || '',
     }));
+    const itemIds = requirements.filter((r) => r.type === 'item' && r.classId).map((r) => r.classId);
+    Object.assign(retiredItems, await loadRetiredItems(gsjs, itemIds.filter((i) => !(i in retiredItems))));
+    requirements = requirements.map((r) => retireRequirement(r, retiredItems));
     const rewards = ctx.rewards || {};
     const perf = ctx.performance_rewards || {};
     out[id] = {

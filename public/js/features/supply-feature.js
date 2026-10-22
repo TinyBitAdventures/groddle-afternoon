@@ -11,7 +11,8 @@
  *    Compress, Age, Poke and Shuck (js/item-transforms.js).
  *  - A Bureaucrat outside the Bureaucratic Halls (Gregarious Grange, Baeli
  *    Bray, Chego Chase) sells Your Papers and General Building Permits to
- *    those with Bureaucratic Arts (js/bureaucracy.js); Complete Your Papers
+ *    those with Bureaucratic Arts, and a Card-Carrying Qualification to
+ *    anyone without its badge (js/bureaucracy.js); Complete Your Papers
  *    in the pack for the You Have Papers badge.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&supplydemo=1 grants a Machine Stand,
