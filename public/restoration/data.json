@@ -1387,9 +1387,49 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 183,
+  "commits": 192,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Vision Quest's piggy walks with whole frames"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "improve",
+    "text": "Sharp piggies, chickens, foxes, Heli Kitties, Batterflies and salmon on Retina"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Classic and Alt-body looks climb ladders with real climb frames"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "improve",
+    "text": "The pack drops its currant counter; currants show in the top bar"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "A favicon: a Groddle piggy"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Upgrade cards flip when you pick one"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "improve",
+    "text": "A sharp Fruit Changing Machine in the making panel"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "improve",
+    "text": "A roomier screen: no footer line, no quest/activity rail, a two-row pack"
+   },
    {
     "date": "2026-10-21",
     "kind": "improve",
@@ -1469,49 +1509,9 @@
     "date": "2026-10-21",
     "kind": "new",
     "text": "Being Watched and We're Off to See the Lizard"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "fix",
-    "text": "Quest text says \"friend\" instead of a raw {pc_label}"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "An Autumn Day: a silhouette memory of drifting words and three feelings"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Radiant Glare: climb a dark shaft by mixing coloured light"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "fix",
-    "text": "Batterfly Bounty Booster can be finished: its quest teaches the Batterfly Bar recipe"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "fix",
-    "text": "Streets with lost music play their region's music, and NO_MUSIC streets are quiet"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Picto-Pattern: turn numbers into 11 with cloud steps"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "fix",
-    "text": "Quest items can't be dropped from the pack"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "fix",
-    "text": "Leaving a street before its art loads no longer throws"
    }
   ]
  },
- "tests": 135,
+ "tests": 136,
  "generatedAt": "2026-10-21"
 }
