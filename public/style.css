@@ -1343,7 +1343,11 @@ footer a { color: inherit; }
   to { opacity: 1; transform: none; }
 }
 
-/* Persistent quest + activity context, replacing development diagnostics. */
+/* Persistent quest + activity context. Hidden to keep the street clear: the
+   Quests panel and the activity popups carry the same information. The camera
+   reserves no rail width while it is hidden (game.js syncCameraSafeArea). */
+.play-context[hidden],
+.play-context { display: none !important; }
 .play-context {
   position: absolute;
   top: 48px;
@@ -1508,6 +1512,9 @@ button.play-context-head:focus-visible {
 }
 
 /* Bottom pack — dual row like original (items over tools) */
+/* The legacy #inventory row stays in the DOM for old code paths; [hidden]
+   must win over .pack-slots' display rule or it leaves an empty third row. */
+.pack-slots[hidden] { display: none !important; }
 .pack-bar {
   position: absolute;
   left: 0; right: 0; bottom: 0;
