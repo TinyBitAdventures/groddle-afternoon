@@ -49,6 +49,9 @@ import {
   raceForTicket,
   raceIsLive,
   raceResultCopy,
+  RACE_SPLASH_TEXT,
+  RACE_STARTING_SOON,
+  RACE_STARTING_SOON_MS,
   raceSceneTsid,
   routeDurationMs,
   routeLengths,
@@ -90,6 +93,7 @@ let progressHint = 0;
 let resultApplied = false;
 let lastHudAt = 0;
 let startTimer = null;
+let soonTimer = null; // the 5 s "YAY! THE GAME IS STARTING SOON." wait after Click to Start
 let autoplayStartAt = 0;
 let respawnUntil = 0;
 let demoHandled = false;
@@ -174,6 +178,7 @@ const STYLE = `
   border: 1px solid rgba(255,255,255,.5); border-radius: 999px; color: #fff; font: 700 .7rem/1.4 inherit;
   background: rgba(30,22,18,.65); cursor: pointer; }
 .race-ready-hint { margin: -10px 0 18px; color: #f2d36c; font-size: .78rem; font-weight: 900; letter-spacing: .08em; }
+.hog-haul-countdown.race-soon { font-size: clamp(1.4rem, 4.6vw, 2.6rem); letter-spacing: 0; text-align: center; padding: 0 16px; }
 .race-start-banner { position: absolute; z-index: 82; top: 15%; left: 50%; width: min(520px, calc(100% - 32px));
   transform: translateX(-50%); color: #fff; text-align: center; font-size: clamp(1.2rem, 3.4vw, 1.9rem);
   font-weight: 900; line-height: 1.15; text-shadow: 0 3px 0 #472b13, 0 6px 18px rgba(0,0,0,.7); pointer-events: none; }
@@ -241,7 +246,6 @@ function buildChrome(engine) {
       <img data-race-ready-icon alt="" />
       <p data-race-ready-kicker>Race</p>
       <h2 id="race-ready-title" data-race-ready-desc></h2>
-      <p class="race-ready-hint">(CLICK WHEN READY)</p>
       <button type="button" class="btn-glitch-primary" data-race-ready-btn>Click to Start</button>
     </div>`);
   const countdown = el('div', { id: 'race-countdown', class: 'hog-haul-countdown', hidden: true, 'aria-live': 'assertive' });
@@ -429,6 +433,8 @@ async function startRace(raceId, engine, opts = {}) {
   rivalTimeline = routeTimeline(rivalRoute(), rivalOpts);
   routeLens = routeLengths(course.route);
   const natural = routeDurationMs(rivalRoute(), rivalOpts);
+  clearTimeout(soonTimer);
+  soonTimer = null;
   run = createRaceRun(raceId, {
     now: Date.now(),
     rival: opts.rival,
@@ -570,20 +576,34 @@ function showReady(engine) {
   const icon = `${RACE_ICON_DIR}${race.ticket}.png`;
   hud.ready.querySelector('[data-race-ready-icon]').src = icon;
   hud.ready.querySelector('[data-race-ready-kicker]').textContent = race.title;
-  hud.ready.querySelector('[data-race-ready-desc]').textContent = race.desc;
+  hud.ready.querySelector('[data-race-ready-desc]').textContent = RACE_SPLASH_TEXT;
   hud.ready.hidden = false;
   hud.bar.hidden = false;
   renderHud(engine, true);
 }
 
 function readyUp(engine) {
-  if (!run || run.status !== 'staging') return;
-  beginRaceCountdown(run, Date.now());
+  if (!run || run.status !== 'staging' || soonTimer) return;
+  // shared_instance_manager.js: once everyone has clicked, 5 s of "YAY! THE
+  // GAME IS STARTING SOON." (GAME_STARTING_SOON), then the 4 s countdown.
   hud.ready.hidden = true;
   hud.countdown.hidden = false;
   hud.countdown.classList.remove('is-go');
-  hud.countdown.textContent = 'READY?';
-  engine.playSound('COUNT_DOWN', { volume: 0.55 });
+  hud.countdown.classList.add('race-soon');
+  hud.countdown.textContent = RACE_STARTING_SOON;
+  engine.playSound('GAME_STARTING_SOON', { volume: 0.5 });
+  engine.setData('raceStarting', 'soon');
+  const thisRun = run;
+  soonTimer = setTimeout(() => {
+    soonTimer = null;
+    if (!hud || run !== thisRun || run.status !== 'staging') return;
+    beginRaceCountdown(run, Date.now());
+    hud.countdown.classList.remove('race-soon');
+    hud.countdown.textContent = 'READY?';
+    engine.playSound('COUNT_DOWN', { volume: 0.55 });
+    engine.setData('raceStarting', 'countdown');
+    publish(engine);
+  }, RACE_STARTING_SOON_MS);
   publish(engine);
 }
 
@@ -695,6 +715,9 @@ function raceTick(engine, now) {
 function showResult(engine) {
   if (!run || resultApplied) return;
   resultApplied = true;
+  clearTimeout(soonTimer);
+  soonTimer = null;
+  hud.countdown.classList.remove('race-soon');
   const settled = settleRace(run, record);
   record = { ...settled.record, returnTo: record.returnTo, pendingTicket: null };
   const reward = settled.reward;
@@ -719,7 +742,7 @@ function showResult(engine) {
     engine.entityLayer.addChild(rainbow);
   } else if (run.status === 'lost') {
     engine.achievement(RACE_ACHIEVEMENTS.lost, 1);
-    engine.pushActivity(`${run.rivalName} won ${race.title}. +${reward.currants} currants · +${reward.xp} iMG for 2nd place.`);
+    engine.pushActivity(`${run.rivalName} won ${race.title}.`);
   } else {
     engine.pushActivity(`You left ${race.title}.`);
   }

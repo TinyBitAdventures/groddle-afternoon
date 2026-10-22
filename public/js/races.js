@@ -9,12 +9,19 @@
  *   with location_id 0-6 into config_prod.js shared_instances.race.locations.
  * - config_prod.js multiplayer_quest_locations: titles, production TSIDs,
  *   two start points each, race_type "finish_line".
- * - locations/inc_race.js: ready overlay (quest desc + "(CLICK WHEN READY)"),
- *   4000 ms "321_countdown", winner 100 currants + 50 xp and second place
- *   25 currants + 5 xp, each capped to the first 10 wins / losses per race,
- *   flags multiplayer_quest_win and race_leave.
- * - players/inc_games.js: "Starting <race> between <a> and <b> in 5 seconds!",
- *   achievements_increment('race', 'won' | 'lost').
+ * - players/inc_games.js (the ticket races since the @glitchlog note of
+ *   2011-10-25, "Race code got a major overhaul (no longer tied up with
+ *   quests)"): "Starting <race> between <a> and <b> in 5 seconds!",
+ *   games_race_splash "Be the first to the finish line to win!" + "Click to
+ *   Start", games_end_race winner +50 xp +100 currants on every win, the
+ *   loser nothing, achievements_increment('race', 'won' | 'lost').
+ * - groups/shared_instance_manager.js: after Click to Start, "YAY! THE GAME
+ *   IS STARTING SOON." for 5 s (GAME_STARTING_SOON), then the 4000 ms
+ *   "321_countdown" (COUNT_DOWN).
+ * - locations/inc_race.js (the older quest races, which the 2011-07 beta
+ *   recordings show): per-race quest desc + "(CLICK WHEN READY)", second
+ *   place 25 currants + 5 xp, a ten-race cap; flags multiplayer_quest_win
+ *   and race_leave. Only the flags are kept.
  * - quests/space_race.js, quests/amazing_race.js: the two recovered quest descs.
  *   The other five ready lines are read from the supplied race recordings.
  *
@@ -29,8 +36,13 @@ export const RACE_TICKET_STACK = 5;
 export const RACE_START_DELAY_MS = 5_000;
 export const RACE_COUNTDOWN_MS = 4_000;
 export const RACE_WIN_REWARD = Object.freeze({ currants: 100, xp: 50 });
-export const RACE_LOSS_REWARD = Object.freeze({ currants: 25, xp: 5 });
-export const RACE_REWARD_CAP = 10;
+/** games_end_race pays the loser nothing (inc_race.js's 25 + 5 was quest-only). */
+export const RACE_LOSS_REWARD = Object.freeze({ currants: 0, xp: 0 });
+/** games_race_splash text, shared by every ticket race. */
+export const RACE_SPLASH_TEXT = 'Be the first to the finish line to win!';
+/** shared_instance_manager.js dismissOverlaysAndStart: the 5 s wait before the countdown. */
+export const RACE_STARTING_SOON = 'YAY! THE GAME IS STARTING SOON.';
+export const RACE_STARTING_SOON_MS = 5_000;
 export const RACE_DISPENSER_CLASS = 'race_ticket_dispenser';
 export const RACE_GENERIC_TICKET = 'race_ticket';
 export const RACE_SCENE_PREFIX = 'RACE_';
@@ -355,9 +367,9 @@ export function raceIsLive(run) {
 }
 
 /**
- * Settle a finished race against the lifetime record (inc_race.js
- * race_finish): counters increment first, rewards only while the count for
- * this race is still within the first ten.
+ * Settle a finished race against the lifetime record (inc_games.js
+ * games_end_race): counters always increment, every win pays, a loss pays
+ * nothing.
  */
 export function settleRace(run, record) {
   const next = normalizeRaceRecord(record);
@@ -368,12 +380,11 @@ export function settleRace(run, record) {
   let reward = { currants: 0, xp: 0 };
   if (run.status === 'won') {
     next.wins[id] = (next.wins[id] || 0) + 1;
-    if (next.wins[id] <= RACE_REWARD_CAP) reward = { ...RACE_WIN_REWARD };
+    reward = { ...RACE_WIN_REWARD };
     const ms = Math.max(1, run.finishedAt - run.startAt);
     if (!next.best[id] || ms < next.best[id]) next.best[id] = ms;
   } else if (run.status === 'lost') {
     next.losses[id] = (next.losses[id] || 0) + 1;
-    if (next.losses[id] <= RACE_REWARD_CAP) reward = { ...RACE_LOSS_REWARD };
   }
   return { ok: true, record: next, reward, outcome: run.status };
 }
@@ -387,10 +398,8 @@ export function raceResultCopy(run, reward = { currants: 0, xp: 0 }) {
     };
   }
   if (run?.status === 'lost') {
-    return {
-      title: `${run.rivalName} IS THE WINNER!`,
-      detail: `(You get ${reward.currants} currants and ${reward.xp} xp for 2nd place)`,
-    };
+    // games_end_race: the other_winner frame with the winner's name, no reward.
+    return { title: `${run.rivalName} IS THE WINNER!`, detail: '' };
   }
   return { title: 'You left the race.', detail: `${run?.rivalName || 'Your rival'} wins by default.` };
 }

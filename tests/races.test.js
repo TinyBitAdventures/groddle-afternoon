@@ -15,7 +15,9 @@ import {
   RACE_COUNTDOWN_MS,
   RACE_DISPENSER_STREETS,
   RACE_LOSS_REWARD,
-  RACE_REWARD_CAP,
+  RACE_SPLASH_TEXT,
+  RACE_STARTING_SOON,
+  RACE_STARTING_SOON_MS,
   RACE_STORE_ITEMS,
   RACE_TICKET_PRICE,
   RACE_WIN_REWARD,
@@ -126,7 +128,9 @@ describe('race lifecycle', () => {
     assert.ok(!finishRace(run, 24_100));
   });
 
-  it('settles inc_race.js rewards with the ten-race cap', () => {
+  // players/inc_games.js games_end_race: the ticket races since the
+  // @glitchlog race-code overhaul (2011-10-25) pay every win and no loss.
+  it('settles inc_games.js rewards: every win pays, a loss pays nothing', () => {
     let record = normalizeRaceRecord({});
     const play = (status) => {
       const run = createRaceRun('canyon_run', { now: 0, rivalDurationMs: 60_000 });
@@ -139,14 +143,20 @@ describe('race lifecycle', () => {
       return out;
     };
     assert.deepEqual(play('won').reward, RACE_WIN_REWARD);
-    assert.deepEqual(play('lost').reward, RACE_LOSS_REWARD);
-    for (let i = 1; i < RACE_REWARD_CAP; i += 1) play('won');
-    assert.equal(record.wins.canyon_run, RACE_REWARD_CAP);
-    assert.deepEqual(play('won').reward, { currants: 0, xp: 0 });
+    assert.deepEqual(RACE_WIN_REWARD, { currants: 100, xp: 50 });
+    assert.deepEqual(play('lost').reward, { currants: 0, xp: 0 });
+    assert.deepEqual(RACE_LOSS_REWARD, { currants: 0, xp: 0 });
+    for (let i = 1; i < 12; i += 1) play('won');
+    assert.equal(record.wins.canyon_run, 12);
+    assert.equal(record.losses.canyon_run, 1);
+    assert.deepEqual(play('won').reward, RACE_WIN_REWARD);
     assert.equal(record.best.canyon_run, 36_000);
   });
 
-  it('uses the recorded result copy', () => {
+  it('uses the games splash and result copy', () => {
+    assert.equal(RACE_SPLASH_TEXT, 'Be the first to the finish line to win!');
+    assert.equal(RACE_STARTING_SOON, 'YAY! THE GAME IS STARTING SOON.');
+    assert.equal(RACE_STARTING_SOON_MS, 5000);
     const won = { status: 'won', rivalName: 'Amp' };
     assert.deepEqual(raceResultCopy(won, RACE_WIN_REWARD), {
       title: 'YOU WON!',
@@ -154,7 +164,7 @@ describe('race lifecycle', () => {
     });
     assert.deepEqual(raceResultCopy({ status: 'lost', rivalName: 'Amp' }, RACE_LOSS_REWARD), {
       title: 'Amp IS THE WINNER!',
-      detail: '(You get 25 currants and 5 xp for 2nd place)',
+      detail: '',
     });
   });
 
