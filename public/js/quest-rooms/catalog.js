@@ -47,6 +47,13 @@ export const QUEST_ROOMS = Object.freeze({
   join_club: 'clubhouse',
   join_club_reminisce: 'clubhouse',
   where_the_blue_grew: 'operation_grow',
+  // Gwendolyn's Task (onStarted instances_create_delayed: tower_quest_desert
+  // LCR8MP0IJI1299U, tower_quest_headspace LCR8MQ9JJI12IIK, tower_quest_crystine
+  // LCR8MRAKJI12UOP; none survive in the locations dump).
+  tower_quest: 'gwendolyn',
+  tower_quest_part2: 'gwendolyn',
+  tower_quest_part3: 'gwendolyn',
+  tower_quest_part3repeat: 'gwendolyn',
 });
 
 /** Rooms that exist and pass QA. A quest is solo-offerable once its room is here. */
@@ -59,6 +66,7 @@ export const BUILT_ROOMS = Object.freeze([
   'rube_yard',
   'le_miserable',
   'juju_camp',
+  'picto_pattern',
 ]);
 
 /**

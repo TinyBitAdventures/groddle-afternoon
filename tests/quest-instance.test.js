@@ -119,8 +119,8 @@ describe('quest instance runtime', () => {
 describe('quest room catalog', () => {
   before(() => loadContentCatalogsFromDir(join(root, 'public/assets/content')));
 
-  it('maps all 32 once-excluded instance quests to rooms', () => {
-    assert.equal(Object.keys(QUEST_ROOMS).length, 32);
+  it('maps the 32 once-excluded instance quests and Gwendolyn\'s Task to rooms', () => {
+    assert.equal(Object.keys(QUEST_ROOMS).length, 36);
     const catalog = getQuestCatalog();
     for (const id of Object.keys(QUEST_ROOMS)) assert.ok(catalog[id], id);
   });

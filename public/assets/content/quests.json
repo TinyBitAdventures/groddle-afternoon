@@ -30200,14 +30200,16 @@
     "type": "flag",
     "name": "solved_puzzle",
     "num": 1,
-    "desc": "Solved Puzzle"
+    "desc": "Solved Puzzle",
+    "route": "quest-instances"
    },
    {
     "id": "r557",
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "Complete the Journey"
+    "desc": "Complete the Journey",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -30254,8 +30256,8 @@
     "xp": 34490
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "picto_pattern",
+  "solo": true
  },
  "pied_pepper": {
   "classTsid": "pied_pepper",
