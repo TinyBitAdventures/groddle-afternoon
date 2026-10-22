@@ -169,7 +169,7 @@ function renderNumbers(data) {
     tile(data.jobs.playableJobs, data.jobs.sourceJobs, 'Street projects', `Build-a-street jobs offered on ${fmt(data.jobs.offeringStreets)} streets.`, data.jobs.playableJobs / data.jobs.sourceJobs),
     tile(data.recipes.imported, null, 'Recipes', `From the original catalog; ${data.recipes.skipped} belong to tools or items that never shipped.`),
     tile(data.icons.items, null, 'Item icons', `${fmt(data.icons.sharp)} re-rendered at triple resolution from the original vector art.`),
-    tile(data.sounds.ambientTracks, null, 'Music tracks', `The published soundtrack, plus ${data.sounds.recoveredWayback} in-game sound files recovered from web archives.`),
+    tile(data.sounds.musicTracks ?? data.sounds.ambientTracks, null, 'Music tracks', `The published soundtrack and ringtones. ${fmt(data.sounds.playable ?? data.sounds.withFile)} of ${fmt(data.sounds.keys)} sound keys play a real recording (${data.sounds.recoveredWayback} from web archives, ${data.sounds.archiveorgSfx ?? 0} from Tiny Speck's archived sound effects); the rest are gentle synth stand-ins.`),
   );
 
   const bar = $('#quest-bar');

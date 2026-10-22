@@ -93,12 +93,17 @@ export const WINTRY_PLACE_TSIDS = Object.freeze([
   'GM11E7ODKHO1QJE',
 ]);
 
-/** Published Wayback stand-ins for the unrecovered c2 meditation sound keys. */
+/**
+ * The meditation music_map keys (inc_data_sounds.js:131-134) by title:
+ * Round_Two_in_Seven_2 is the archive.org ringtone of the same name, and
+ * meditation_korg / meditation_wurly are the downloads page's Korg and Wurly
+ * variations. meditation_ac15 is lost; the AC30 variation stands in.
+ */
 export const MEDITATION_MUSIC = Object.freeze({
-  MEDITATIVE_ARTS_01: 'assets/audio/ambient/meditation1_1344997850.mp3',
-  MEDITATIVE_ARTS_02: 'assets/audio/ambient/meditation2_1344997844.mp3',
-  FOCUSED_MEDITATION_ENERGY: 'assets/audio/ambient/meditation3_1344997842.mp3',
-  FOCUSED_MEDITATION_MOOD: 'assets/audio/ambient/meditation4_1344997846.mp3',
+  MEDITATIVE_ARTS_01: 'assets/audio/sfx/MEDITATIVE_ARTS_01.mp3',
+  MEDITATIVE_ARTS_02: 'assets/audio/ambient/meditation1_1344997850.mp3',
+  FOCUSED_MEDITATION_ENERGY: 'assets/audio/ambient/meditation2_1344997844.mp3',
+  FOCUSED_MEDITATION_MOOD: 'assets/audio/ambient/meditation3_1344997842.mp3',
 });
 
 export const MEDITATION_TEXT = Object.freeze({

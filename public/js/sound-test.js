@@ -74,6 +74,12 @@ export async function openSoundTest(host) {
   doc.body.appendChild(panel);
 
   let shown = [];
+  const ORIGIN_TAGS = { 'wayback-c2': 'recovered', 'archiveorg-sfx': 'archive.org', 'downloads-best-fit': 'downloads' };
+  function fileTag(row) {
+    const owner = row.alias ? catalog.keys[row.alias] : row;
+    const tag = ORIGIN_TAGS[owner?.origin] || 'recovered';
+    return row.alias ? `${tag} · as ${row.alias}` : tag;
+  }
   function what(row) {
     if (row.play.file) return 'file';
     if (row.play.recipe) return 'synth';
@@ -99,13 +105,13 @@ export async function openSoundTest(host) {
       name.appendChild(el(doc, 'b', {}, r.key));
       const w = what(r);
       name.appendChild(el(doc, 'span', { class: `st-tag ${w === 'file' ? '' : w === 'synth' ? 'synth' : 'none'}` },
-        w === 'file' ? (r.origin === 'wayback-c2' || r.play.file.includes('/sfx/') ? 'recovered' : 'downloads') : w === 'synth' ? `synth: ${r.play.recipe}` : 'not recovered'));
+        w === 'file' ? fileTag(r) : w === 'synth' ? `synth: ${r.play.recipe}` : 'not recovered'));
       const meta = el(doc, 'div', { class: 'st-meta' }, `${r.category} · ${r.moment || ''}${r.url ? ` · ${r.url.replace('http://c2.glitch.bz/sounds/', 'c2:')}` : ''}`);
       li.append(btn, name, meta);
       list.appendChild(li);
     }
     const counts = catalog.counts || {};
-    footer.textContent = `${shown.length} shown · ${counts.keys || rows.length} keys · ${counts.withFile || 0} with files · ${rows.filter((r) => !r.play.file && r.play.recipe).length} synthesized`;
+    footer.textContent = `${shown.length} shown · ${counts.keys || rows.length} keys · ${rows.filter((r) => r.play.file).length} play a recording (${counts.withFile || 0} files) · ${rows.filter((r) => !r.play.file && r.play.recipe).length} synthesized`;
     const view = doc.querySelector('canvas');
     if (view) {
       view.dataset.soundTestShown = String(shown.length);

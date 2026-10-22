@@ -91,7 +91,8 @@ const PLAYER_LABEL = 'Ur';
 const ORB_CLASS = 'focusing_orb';
 const BALM_CLASS = 'potion_rook_balm';
 const ARMOR_CLASS = 'essence_of_rookswort';
-const ROOK_MUSIC = 'assets/audio/ambient/rooks_woods_1344997275.mp3';
+/** music_map ROOK_FLOCK (archive.org 'rook flight'): inc_rook.js:40 loops it for the whole attack. */
+const ROOK_MUSIC = 'assets/audio/sfx/ROOK_FLOCK.mp3';
 const ROOK_HOME = Object.freeze({ x: 580, y: 170, scale: 0.82 });
 
 const DIR = 'assets/sprites/rooks/';
@@ -977,7 +978,7 @@ function removeForehorseman(engine) {
 function startMusic(engine) {
   if (musicStop || musicFor) return;
   musicFor = engine.streetTsid;
-  engine.playCue(ROOK_MUSIC, { volume: 0.55 }).then((stop) => {
+  engine.playCue(ROOK_MUSIC, { volume: 0.55, loop: true }).then((stop) => {
     if (musicFor !== engine.streetTsid) {
       stop();
       return;

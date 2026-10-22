@@ -155,9 +155,20 @@ function streetStats() {
 }
 
 function soundStats() {
-  const { counts } = json('assets/content/sound-keys.json');
+  const { counts, keys } = json('assets/content/sound-keys.json');
   const ambient = readdirSync(join(pub, 'assets/audio/ambient')).filter((f) => f.endsWith('.mp3')).length;
-  return { keys: counts.keys, withFile: counts.withFile, recoveredWayback: counts.recoveredWayback, ambientTracks: ambient };
+  // Ringtone-set music (Musicblocks, Goodnight Groddle, Round Two in Seven ...) installed under sfx/.
+  const archiveMusic = Object.values(keys).filter((r) => r.origin === 'archiveorg-sfx' && r.category === 'music'
+    && r.archiveItem === 'esquebeth-quest').length;
+  return {
+    keys: counts.keys,
+    withFile: counts.withFile,
+    playable: counts.playable,
+    recoveredWayback: counts.recoveredWayback,
+    archiveorgSfx: counts.archiveorgSfx,
+    ambientTracks: ambient,
+    musicTracks: ambient + archiveMusic,
+  };
 }
 
 function recipeStats() {

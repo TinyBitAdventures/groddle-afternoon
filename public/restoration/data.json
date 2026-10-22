@@ -171,11 +171,12 @@
    "group": "world",
    "name": "Music and sounds",
    "status": "source",
-   "blurb": "The published soundtrack per region, recovered sound files, and gentle synth stand-ins for the sounds that were lost.",
+   "blurb": "The published soundtrack per region, the ringtone Musicblocks and meditation tracks, real recordings for most sound keys (Wayback files plus Tiny Speck's archived sound effects set), and gentle synth stand-ins for the sounds still lost.",
    "spot": null,
    "evidence": [
     "public/js/ambient-music.js",
-    "public/js/sound-board.js"
+    "public/js/sound-board.js",
+    "tools/sound/archiveorg-sfx-map.json"
    ],
    "shot": null
   },
@@ -1358,9 +1359,12 @@
  },
  "sounds": {
   "keys": 638,
-  "withFile": 55,
+  "withFile": 281,
+  "playable": 364,
   "recoveredWayback": 38,
-  "ambientTracks": 34
+  "archiveorgSfx": 216,
+  "ambientTracks": 34,
+  "musicTracks": 58
  },
  "recipes": {
   "imported": 323,
@@ -1512,6 +1516,6 @@
    }
   ]
  },
- "tests": 136,
- "generatedAt": "2026-10-21"
+ "tests": 137,
+ "generatedAt": "2026-10-22"
 }

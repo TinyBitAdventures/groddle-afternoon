@@ -17,7 +17,10 @@
  * The production sounds XML (c2.glitch.bz/sounds/2012-12/sounds_1354665929.xml)
  * that mapped SFX keys to files is not archived, so CDN urls are only known for
  * music_map keys and for the files recovered by name from the Wayback CDX index
- * (see RECOVERED). Everything else gets a Web Audio recipe in js/synth-sfx.js.
+ * (see RECOVERED). The archive.org Glitch SFX, unused-SFX and ringtone items are
+ * matched to keys by hand in tools/sound/archiveorg-sfx-map.json (installed by
+ * tools/sound/install-archiveorg-sfx.mjs). Everything else gets a Web Audio
+ * recipe in js/synth-sfx.js.
  *
  * Run from spike root:
  *   node build-sound-keys.mjs
@@ -103,12 +106,53 @@ const DOWNLOADS = {
   NEWDAY: { file: 'assets/audio/new_day_fanfare.mp3', name: 'new_day_fanfare.mp3', fit: 'stand-in fanfare until the rooster is recovered' },
 };
 
+/**
+ * Downloads-page music that also answers a music_map key: the in-game
+ * Musicblock cuts, the Meditation variations (titles from the archive.org music
+ * item), and tracks whose title is the key.
+ */
+Object.assign(DOWNLOADS, {
+  MUSICBLOCK_D_GREEN_02: { file: 'assets/audio/ambient/Musicblock-DG-2_1291896713.mp3', name: 'Musicblock-DG-2_1291896713.mp3', fit: 'Musicblock DG-2 (in-game cut)' },
+  MUSICBLOCK_D_GREEN_03: { file: 'assets/audio/ambient/Musicblock-DG-3_1291896740.mp3', name: 'Musicblock-DG-3_1291896740.mp3', fit: 'Musicblock DG-3 (in-game cut)' },
+  MUSICBLOCK_D_RED_01: { file: 'assets/audio/ambient/Musicblock-DR-1_1291896467.mp3', name: 'Musicblock-DR-1_1291896467.mp3', fit: 'Musicblock DR-1 (in-game cut)' },
+  MUSICBLOCK_D_RED_05: { file: 'assets/audio/ambient/Musicblock-DR-5_1291896506.mp3', name: 'Musicblock-DR-5_1291896506.mp3', fit: 'Musicblock DR-5 (in-game cut)' },
+  MUSICBLOCK_X_SHINY_02: { file: 'assets/audio/ambient/Musicblock-XS-2_1292035400.mp3', name: 'Musicblock-XS-2_1292035400.mp3', fit: 'Musicblock XS-2 (in-game cut)' },
+  MUSICBLOCK_X_SHINY_03: { file: 'assets/audio/ambient/Musicblock-XS-3_1291896779.mp3', name: 'Musicblock-XS-3_1291896779.mp3', fit: 'Musicblock XS-3 (in-game cut)' },
+  FOCUSED_MEDITATION_ENERGY: { file: 'assets/audio/ambient/meditation2_1344997844.mp3', name: 'meditation2_1344997844.mp3', fit: 'Meditation (Korg) = music_map meditation_korg' },
+  FOCUSED_MEDITATION_MOOD: { file: 'assets/audio/ambient/meditation3_1344997842.mp3', name: 'meditation3_1344997842.mp3', fit: 'Meditation (Wurly) = music_map meditation_wurly' },
+  MEDITATIVE_ARTS_02: { file: 'assets/audio/ambient/meditation1_1344997850.mp3', name: 'meditation1_1344997850.mp3', fit: 'Meditation (AC30), nearest to music_map meditation_ac15' },
+  ELEVATOR_MUSIC: { file: 'assets/audio/ambient/elevator_music_1344997334.mp3', name: 'elevator_music_1344997334.mp3', fit: 'Elevator Music' },
+  WAITING_MUZAK: { file: 'assets/audio/ambient/waiting_muzak_1344997267.mp3', name: 'waiting_muzak_1344997267.mp3', fit: 'Waiting Muzak' },
+  RUBE_APPEARS: { file: 'assets/audio/ambient/The_Rube_Song_1290596637.mp3', name: 'The_Rube_Song_1290596637.mp3', fit: 'The Rube Song = ringtone "The Rube (yappi youpi)" = music_map X_yappi_youpi' },
+});
+
 /** Keys that borrow another key's recovered file (best fit, documented). */
 const ALIASES = {
   ITEM_GIVE: 'HERE_YOU_GO_LIGHTER',
-  ITEM_GIVEN_TO_YOU: 'HERE_YOU_GO_LIGHTER',
-  PET_PIGGY: 'PIGGY_PLOP',
 };
+
+/**
+ * archive.org Glitch audio (tools/sound/archiveorg-sfx-map.json): one installed
+ * file per key, plus the aliases each match lists. These win over the
+ * downloads-page best fits (NEWDAY, STREET_LOADED); Wayback c2 files win over them.
+ */
+const ARCHIVE_MAP = JSON.parse(readFileSync(join(root, 'tools/sound/archiveorg-sfx-map.json'), 'utf8'));
+const ARCHIVEORG = {};
+for (const entry of ARCHIVE_MAP.files) {
+  const item = ARCHIVE_MAP.items[entry.item];
+  ARCHIVEORG[entry.key] = {
+    file: `assets/audio/sfx/${entry.key}.mp3`,
+    source: `https://archive.org/download/${item.id}/${encodeURIComponent(entry.file)}`,
+    archiveItem: item.id,
+    archiveFile: entry.file,
+    ...(entry.why ? { why: entry.why } : {}),
+    ...(entry.doubt ? { doubt: entry.doubt } : {}),
+  };
+  for (const alias of entry.aliases || []) {
+    if (ALIASES[alias]) throw new Error(`alias ${alias} mapped twice`);
+    ALIASES[alias] = entry.key;
+  }
+}
 
 /** Hand-written in-game moments for the keys the remake plays. */
 const MOMENTS = {
@@ -135,7 +179,7 @@ const MOMENTS = {
   PACK_FULL: 'Pickup refused: pack is full',
   ITEM_EAT: 'Eat a food item',
   ITEM_DRINK: 'Drink a drink item',
-  BURP: 'Overeating burp',
+  BURP: 'Arrive by dinosaur transit (GSJS location.js:289)',
   QUOIN_GOT: 'Touch a quoin (all types)',
   QUORAZY_QUOIN: 'Touch a Qurazy quoin',
   TRIPLE_JUMP: 'Third jump of a Triple Jump chain',
@@ -185,7 +229,7 @@ const MOMENTS = {
   HI_FLOWERS: 'Hi signs thrown between players',
   FLIP_BACK: 'Imagination card flips back',
   FLIP_OVER: 'Imagination card flips over',
-  HERE_YOU_GO_LIGHTER: 'Recovered c2 file with no surviving key; a "here you go" hand-over, so ITEM_GIVE and ITEM_GIVEN_TO_YOU borrow it',
+  HERE_YOU_GO_LIGHTER: 'Recovered c2 file with no surviving key; a "here you go" hand-over, so ITEM_GIVE borrows it',
   WATER_SPLASH: 'Recovered c2 file with no surviving key; a water splash (2012-06, the Paradise / Summer\'s Day era)',
   BW_A1: 'Recovered c2 bell note (2012-08 waterfall puzzle bells, Blue & White set)',
   BW_C2: 'Recovered c2 bell note (2012-08 waterfall puzzle bells, Blue & White set)',
@@ -392,6 +436,14 @@ for (const [key, row] of Object.entries(RECOVERED)) {
   entry.keyFrom = row.keyFrom;
   if (!existsSync(join(PUBLIC, row.file))) throw new Error(`missing recovered file ${row.file}`);
 }
+for (const [key, row] of Object.entries(ARCHIVEORG)) {
+  if (!keys.has(key)) throw new Error(`archive.org map names uncatalogued key ${key}`);
+  const entry = keys.get(key);
+  if (entry.file) throw new Error(`archive.org map ${key} would replace ${entry.file}`);
+  Object.assign(entry, { file: row.file, origin: 'archiveorg-sfx', source: row.source, archiveItem: row.archiveItem,
+    archiveFile: row.archiveFile, why: row.why, doubt: row.doubt });
+  if (!existsSync(join(PUBLIC, row.file))) throw new Error(`missing archive.org file ${row.file} (run tools/sound/install-archiveorg-sfx.mjs)`);
+}
 for (const [key, row] of Object.entries(DOWNLOADS)) {
   if (!keys.has(key)) note(key, { category: 'downloads', where: 'downloads.html', context: row.fit, via: 'downloads' });
   const entry = keys.get(key);
@@ -430,12 +482,16 @@ for (const key of [...keys.keys()].sort((a, b) => a.localeCompare(b))) {
     ...(row.url ? { url: row.url } : {}),
     ...(row.file ? { file: row.file, origin: row.origin } : {}),
     ...(row.keyFrom ? { keyFrom: row.keyFrom } : {}),
-    ...(row.fit ? { fit: row.fit } : {}),
+    ...(row.source ? { source: row.source, archiveItem: row.archiveItem, archiveFile: row.archiveFile } : {}),
+    ...(row.why ? { why: row.why } : {}),
+    ...(row.doubt ? { doubt: row.doubt } : {}),
+    ...(row.fit && !row.source ? { fit: row.fit } : {}),
     ...(ALIASES[key] ? { alias: ALIASES[key] } : {}),
   };
 }
 for (const [alias, target] of Object.entries(ALIASES)) {
   if (!catalog[alias]) throw new Error(`alias ${alias} is not catalogued`);
+  if (catalog[alias].file) throw new Error(`alias ${alias} already has its own file`);
   if (!catalog[target]?.file) throw new Error(`alias target ${target} has no file`);
 }
 
@@ -447,9 +503,11 @@ const counts = {
   music: Object.values(catalog).filter((r) => r.category === 'music').length,
   remake: Object.values(catalog).filter((r) => r.category === 'remake').length,
   recoveredWayback: Object.keys(RECOVERED).length,
-  downloadsBestFit: Object.keys(DOWNLOADS).length,
+  downloadsBestFit: Object.values(catalog).filter((r) => r.origin === 'downloads-best-fit').length,
+  archiveorgSfx: Object.keys(ARCHIVEORG).length,
   withFile: Object.keys(files).length,
   aliases: Object.keys(ALIASES).length,
+  playable: Object.keys(catalog).filter((k) => files[k] || files[ALIASES[k]]).length,
 };
 
 writeFileSync(

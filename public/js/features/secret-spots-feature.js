@@ -538,7 +538,8 @@ function beacon(engine, now) {
   lastBeacon = now;
   const d = Math.min(...live.map((m) => Math.hypot(m.box.x - engine.player.x, (m.box.y - engine.player.y) * 1.5)));
   if (d > BEACON_RANGE) return;
-  engine.playSound(SECRET_SOUNDS.beacon, { volume: 0.12 + 0.3 * (1 - d / BEACON_RANGE) });
+  // The recovered beacon take runs 8.9 s; play one shimmer per tick.
+  engine.playSound(SECRET_SOUNDS.beacon, { volume: 0.12 + 0.3 * (1 - d / BEACON_RANGE), maxSeconds: BEACON_EVERY_MS / 1000 });
 }
 
 /* ------------------------------------------------------------------ */

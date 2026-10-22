@@ -3450,7 +3450,7 @@ let ambientThemeId = 'default';
 let ambientTrackUrl = null;
 
 async function loadAudio() {
-  await loadAmbientMusicConfig('assets/content/ambient-music.json?v=streetmusic-1');
+  await loadAmbientMusicConfig('assets/content/ambient-music.json?v=streetmusic-2');
   const files = {
     music: 'assets/audio/groddle.mp3', // legacy default / fallback
   };
@@ -3475,6 +3475,8 @@ async function loadAudio() {
     getDestination: () => audio.sfxGain,
     isMuted: () => state.muted,
     volume: sfxVolumeSetting(),
+    // A cold file starts after playSound returns; keep data-last-sound honest.
+    onPlayed: (last) => { if (app?.view) app.view.dataset.lastSound = last; },
   });
   audio.board.preload(PRELOAD_SOUND_KEYS);
   await Promise.all(
@@ -3495,6 +3497,9 @@ const PRELOAD_SOUND_KEYS = [
   'QUEST_COMPLETE', 'LEVEL_UP', 'TRIPLE_JUMP', 'DISCOVER_USEFUL_NEW_ITEM', 'QUORAZY_QUOIN',
   'QUEST_ADDED', 'CLIENT_LOADED', 'STREET_LOADED', 'HARVEST', 'PETRIFIED_ROCK', 'PIGGY_PLOP',
   'HERE_YOU_GO_LIGHTER', 'NEWDAY', 'WATER_SPLASH',
+  // Small archive.org takes heard every minute (all under 60 KB).
+  'ITEM_PICKUP', 'ITEM_DROP', 'QUOIN_GOT', 'CLICK_SUCCESS', 'CLICK_FAILURE', 'PET_PIGGY', 'PICK', 'HATCHET',
+  'WATERING_CAN', 'ITEM_EAT',
 ];
 
 /** SFX bus level: ?sfxvol=0..1, else DEFAULT_SFX_VOLUME. */
@@ -7008,8 +7013,8 @@ const engine = {
   closeMap: () => closeMap(),
   /** QA routes: learn a skill outright (prerequisites skipped). */
   grantSkill: (classTsid) => grantSkill(skillState, classTsid, true),
-  /** A music cue over the ducked street BGM (the Musicblock duck); resolves to stop(). */
-  async playCue(url, { volume = 0.6 } = {}) {
+  /** A music cue over the ducked street BGM (the Musicblock duck); resolves to stop(). loop repeats it until stop(). */
+  async playCue(url, { volume = 0.6, loop = false } = {}) {
     const key = `cue:${url}`;
     if (!audio.ctx) return () => {};
     try {
@@ -7021,6 +7026,7 @@ const engine = {
     const src = audio.ctx.createBufferSource();
     const gain = audio.ctx.createGain();
     src.buffer = audio.buffers[key];
+    src.loop = Boolean(loop);
     gain.gain.value = volume;
     src.connect(gain);
     gain.connect(audio.sfxGain);

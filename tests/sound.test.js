@@ -88,8 +88,12 @@ describe('sound-key catalog', () => {
       assert.ok(mpeg, `${key} is not MPEG audio`);
       if (file.startsWith('assets/audio/sfx/')) {
         assert.equal(path.basename(file), `${key}.mp3`);
-        assert.match(catalog.keys[key].url, /^http:\/\/c2\.glitch\.bz\/sounds\/20\d\d-\d\d\//);
-        assert.equal(catalog.keys[key].origin, 'wayback-c2');
+        if (catalog.keys[key].origin === 'archiveorg-sfx') {
+          assert.match(catalog.keys[key].source, /^https:\/\/archive\.org\/download\/[a-z0-9-]+\/.+\.mp3$/);
+        } else {
+          assert.match(catalog.keys[key].url, /^http:\/\/c2\.glitch\.bz\/sounds\/20\d\d-\d\d\//);
+          assert.equal(catalog.keys[key].origin, 'wayback-c2');
+        }
       }
     }
     for (const [alias, target] of Object.entries(SOUND_ALIASES)) assert.ok(SOUND_FILES[target], alias);
@@ -109,7 +113,11 @@ describe('sound-key catalog', () => {
       if (r.recipe) assert.ok(SYNTH_RECIPES[r.recipe], `${key} → missing recipe ${r.recipe}`);
       if (!r.file) synthesized += 1;
     }
-    assert.ok(synthesized >= 300, `${synthesized} synthesized`);
+    // Recipes still cover the keys no recovered file answers (puzzle notes,
+    // card deals, remake moments ...).
+    assert.ok(synthesized >= 100 && synthesized <= 200, `${synthesized} synthesized`);
+    const real = Object.keys(catalog.keys).filter((k) => resolveSound(k).file).length;
+    assert.ok(real >= 350, `only ${real} keys play a real file`);
   });
 });
 
@@ -229,11 +237,32 @@ describe('sound board', () => {
 
   test('plays a recipe for a synthesized key and respects mute', () => {
     const h = host();
-    const handle = h.board.play('CLICK_SUCCESS');
+    const handle = h.board.play('CARD_DEAL3');
     assert.equal(handle.kind, 'synth');
-    assert.equal(handle.recipe, 'click');
+    assert.equal(handle.recipe, recipeForKey('CARD_DEAL3', 'ui'));
     const muted = host({ muted: true });
-    assert.equal(muted.board.play('CLICK_SUCCESS'), null);
+    assert.equal(muted.board.play('CARD_DEAL3'), null);
+  });
+
+  test('prefers a recovered file over the recipe once it is warm', async () => {
+    const h = host();
+    const played = [];
+    const board = createSoundBoard({
+      getContext: () => h.ctx,
+      getDestination: () => h.ctx.createGain(),
+      now: () => 0,
+      onPlayed: (last) => played.push(last),
+      fetchImpl: async () => ({ ok: true, arrayBuffer: async () => new ArrayBuffer(8) }),
+    });
+    assert.ok(resolveSound('PET_PIGGY').file);
+    await board.preload(['PET_PIGGY', 'CLICK_SUCCESS', 'PICK']);
+    assert.equal(board.play('PET_PIGGY').kind, 'file');
+    assert.equal(board.play('CLICK_SUCCESS').kind, 'file');
+    assert.deepEqual(played, ['PET_PIGGY:file', 'CLICK_SUCCESS:file']);
+    const loop = board.loop('PICK', { intervalMs: 620 });
+    assert.equal(loop.key, 'PICK');
+    assert.equal(played.at(-1), 'PICK:file');
+    loop.stop();
   });
 
   test('throttles exact repeats but allows multiples on request', () => {

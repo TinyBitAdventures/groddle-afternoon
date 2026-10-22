@@ -7,9 +7,11 @@
   "music": 205,
   "remake": 32,
   "recoveredWayback": 38,
-  "downloadsBestFit": 17,
-  "withFile": 55,
-  "aliases": 3
+  "downloadsBestFit": 27,
+  "archiveorgSfx": 216,
+  "withFile": 281,
+  "aliases": 83,
+  "playable": 364
  },
  "keys": {
   "11_SECRET_LOCATIONS_BEACON_LOOP": {
@@ -21,7 +23,12 @@
    ],
    "sources": [
     "gsjs:players/inc_eleven_secrets.js:217 (showSecretLocationMarker)"
-   ]
+   ],
+   "file": "assets/audio/sfx/11_SECRET_LOCATIONS_BEACON_LOOP.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/secret%20location-beacon.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "secret location-beacon.mp3"
   },
   "11_SECRET_LOCATIONS_COLLISION": {
    "category": "event",
@@ -32,7 +39,12 @@
    ],
    "sources": [
     "gsjs:players/inc_eleven_secrets.js:238 (triggerSecretLocationMarker)"
-   ]
+   ],
+   "file": "assets/audio/sfx/11_SECRET_LOCATIONS_COLLISION.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/secret%20location-collision.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "secret location-collision.mp3"
   },
   "ABANDONDED_APARTMENTS2": {
    "category": "music",
@@ -79,7 +91,8 @@
    ],
    "sources": [
     "gsjs:items/ace_of_spades.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "SHOVEL"
   },
   "ACHIEVEMENT_UNLOCKED": {
    "category": "reward",
@@ -90,7 +103,13 @@
    ],
    "sources": [
     "gsjs:players/inc_achievements.js:436 (achievements_grant)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ACHIEVEMENT_UNLOCKED.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/success-achievement%20unlocked.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "success-achievement unlocked.mp3",
+   "why": "BADGE_FANFARE was the remake's synth stand-in for ACHIEVEMENT_UNLOCKED."
   },
   "ACTIVATE_1": {
    "category": "event",
@@ -103,7 +122,14 @@
     "street:GIFM4BD43383DKV (Le Miserable puzzle_1_verify)",
     "street:GIFM4BD43383DKV (Le Miserable puzzle_2_verify)",
     "street:GIFM4BD43383DKV (Le Miserable puzzle_3_verify)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ACTIVATE_1.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/activate.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "activate.mp3",
+   "why": "Name. ACTIVATE_1 is Le Misérable's puzzle_N_verify cue; ACTIVATE_GAME_TELEPORTER (game_teleporter.js:195) borrows it.",
+   "doubt": "alias only"
   },
   "ACTIVATE_GAME_TELEPORTER": {
    "category": "travel",
@@ -114,7 +140,8 @@
    ],
    "sources": [
     "gsjs:items/game_teleporter.js:195 (initInstanceProps)"
-   ]
+   ],
+   "alias": "ACTIVATE_1"
   },
   "ACTIVE": {
    "category": "event",
@@ -130,7 +157,14 @@
     "gsjs:items/woodworker.js:1428 (onPlayerEnter)",
     "gsjs:players/inc_making.js:442 (making_make_known)",
     "gsjs:players/inc_making.js:641 (tryToMake)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ACTIVE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/blockmaker.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "blockmaker.mp3",
+   "why": "ACTIVE loops (999) while a making machine runs: blockmaker.js:1449, fuelmaker.js:1444, metalmaker.js:1550, inc_making.js:442. No BLOCKMAKER key exists.",
+   "doubt": "machine loop by context"
   },
   "ALCHEMICAL_TONGS": {
    "category": "tool",
@@ -141,7 +175,12 @@
    ],
    "sources": [
     "gsjs:items/alchemical_tongs.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ALCHEMICAL_TONGS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/alchemical%20tongs.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "alchemical tongs.mp3"
   },
   "AMBIENT_CAVERNS1": {
    "category": "music",
@@ -1099,7 +1138,12 @@
     "gsjs:items/magic_chicken_stick.js:262 (parent_verb_magic_animal_stick_place)",
     "gsjs:items/magic_pig_stick.js:238 (parent_verb_magic_animal_stick_place)",
     "gsjs:items/magic_pig_stick.js:261 (parent_verb_magic_animal_stick_place)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ANIMAL_STICK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/animal%20stick.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "animal stick.mp3"
   },
   "ASSLANDIA": {
    "category": "music",
@@ -1137,7 +1181,12 @@
    ],
    "sources": [
     "gsjs:items/awesome_pot.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/AWESOME_POT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/awesome%20pot.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "awesome pot.mp3"
   },
   "BADGE_FANFARE": {
    "category": "remake",
@@ -1148,7 +1197,8 @@
    ],
    "sources": [
     "remake (Badge overlay (synth stand-in for ACHIEVEMENT_UNLOCKED))"
-   ]
+   ],
+   "alias": "ACHIEVEMENT_UNLOCKED"
   },
   "BARNACLE_IS_RELEASED": {
    "category": "animal",
@@ -1160,7 +1210,12 @@
    "sources": [
     "gsjs:items/mortar_barnacle.js:296 (onScrapingComplete)",
     "gsjs:items/test_item3.js:296 (onScrapingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BARNACLE_IS_RELEASED.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/barnacle%20release.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "barnacle release.mp3"
   },
   "BEAKER": {
    "category": "tool",
@@ -1171,7 +1226,12 @@
    ],
    "sources": [
     "gsjs:items/beaker.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BEAKER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/beaker.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "beaker.mp3"
   },
   "BEAN_SEASONER": {
    "category": "tool",
@@ -1182,7 +1242,13 @@
    ],
    "sources": [
     "gsjs:items/bean_seasoner.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BEAN_SEASONER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/bean%20seasoner.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "bean seasoner.mp3",
+   "why": "Egg Seasoner is the sibling seasoner tool with no file of its own."
   },
   "BEEN_TREE": {
    "category": "nature",
@@ -1193,7 +1259,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:327 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BEEN_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20been%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest been tree.mp3",
+   "why": "trants.js:327 onHarvestingComplete. Unused take; no released file."
   },
   "BEGIN_LEARNING_SKILL": {
    "category": "ui",
@@ -1204,7 +1276,12 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/port/SkillInfoUI.as:355 (learnIt)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BEGIN_LEARNING_SKILL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/begin%20learning%20skill.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "begin learning skill.mp3"
   },
   "BIG_STAR_1": {
    "category": "event",
@@ -1367,7 +1444,13 @@
    ],
    "sources": [
     "gsjs:items/avatar_embiggenifier.js:100 (onPlayerCollision)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BIGENNIFY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/embiggenify.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "embiggenify.mp3",
+   "why": "avatar_embiggenifier.js:100 (GSJS spells it BIGENNIFY); the Embiggenifying Potion (potion_avatar_large.js) borrows it."
   },
   "BLENDER": {
    "category": "tool",
@@ -1378,7 +1461,12 @@
    ],
    "sources": [
     "gsjs:items/blender.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BLENDER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/blender.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "blender.mp3"
   },
   "BLUE__WHITE": {
    "category": "music",
@@ -1401,7 +1489,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:330 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUBBLE_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20bubble%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest bubble tree.mp3",
+   "why": "trants.js:330. Unused take; no released file."
   },
   "BUBBLE_TUNER": {
    "category": "tool",
@@ -1412,7 +1506,12 @@
    ],
    "sources": [
     "gsjs:items/bubble_tuner.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUBBLE_TUNER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/bubble%20tuner.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "bubble tuner.mp3"
   },
   "BUREAUCRATIC_HALL_MUZAK": {
    "category": "music",
@@ -1428,14 +1527,20 @@
   },
   "BURP": {
    "category": "event",
-   "moment": "Overeating burp",
+   "moment": "Arrive by dinosaur transit (GSJS location.js:289)",
    "uses": 1,
    "via": [
     "announce_sound"
    ],
    "sources": [
     "gsjs:locations/location.js:298 (onPlayerEnter)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BURP.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/dinosaur-burp.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "dinosaur-burp.mp3",
+   "why": "BURP is announced when you arrive by dinosaur transit (location.js:289 'dinosaur transit sound effect'), not when overeating."
   },
   "BUTLER_DOLL_FALL": {
    "category": "event",
@@ -1446,7 +1551,13 @@
    ],
    "sources": [
     "gsjs:items/bag_butler.js:5214 (playSound)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUTLER_DOLL_FALL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/butler-fall.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "butler-fall.mp3",
+   "why": "bag_butler.js:5214. Listed as unused, but the key exists in GSJS."
   },
   "BUTLER_DOLL_IDLE_2": {
    "category": "event",
@@ -1457,7 +1568,13 @@
    ],
    "sources": [
     "gsjs:items/bag_butler.js:5211 (playSound)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUTLER_DOLL_IDLE_2.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/butler-idle.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "butler-idle.mp3",
+   "why": "bag_butler.js:5211. Listed as unused, but the key exists in GSJS."
   },
   "BUTTERFLY_LOTION": {
    "category": "tool",
@@ -1468,7 +1585,14 @@
    ],
    "sources": [
     "gsjs:items/butterfly_lotion.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUTTERFLY_LOTION.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/massage%20butterfly%201.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "massage butterfly 1.mp3",
+   "why": "Massaging a butterfly uses Butterfly Lotion; the remake loops BUTTERFLY_LOTION for the massage verb (sound-moments.js). Unused take; takes 2-4 are variants.",
+   "doubt": "rejected take"
   },
   "BUTTERFLY_NET": {
    "category": "tool",
@@ -1491,7 +1615,12 @@
    "sources": [
     "gsjs:items/npc_batterfly.js:1021 (parent_verb_npc_butterfly_sing_to)",
     "gsjs:items/npc_butterfly.js:680 (is_potion)"
-   ]
+   ],
+   "file": "assets/audio/sfx/BUTTERFLY_SING.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/butterfly-sing%20to.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "butterfly-sing to.mp3"
   },
   "BUTTON_2": {
    "category": "event",
@@ -1600,7 +1729,12 @@
    "sources": [
     "client:com/tinyspeck/engine/view/gameoverlay/CameraMan.as:500 (snap)",
     "client:com/tinyspeck/engine/view/gameoverlay/SnapTravelView.as:254 (showSnap)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CAMERA_SHUTTER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/camera%20shutter.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "camera shutter.mp3"
   },
   "CAMERA_WIND": {
    "category": "ui",
@@ -1611,7 +1745,12 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/gameoverlay/CameraMan.as:438 (startUserMode)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CAMERA_WIND.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/camera%20wind.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "camera wind.mp3"
   },
   "CANCEL_DISPATCHER": {
    "category": "event",
@@ -1829,7 +1968,12 @@
     "gsjs:items/npc_chicken.js:1558 (onSqueezeComplete)",
     "gsjs:items/npc_kitty_chicken.js:1718 (onSqueezeComplete)",
     "gsjs:items/npc_test.js:1600 (onSqueezeComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CHICKEN_SQUEEZED.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/squeeze%20chicken.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "squeeze chicken.mp3"
   },
   "CHOOSE_LEVEL": {
    "category": "ui",
@@ -1840,7 +1984,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/port/LocationSelectorDialog.as:638 (onButtonChosen)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CHOOSE_LEVEL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/elevator%20choose%20level.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "elevator choose level.mp3",
+   "why": "LocationSelectorDialog.as:638 onButtonChose."
   },
   "CHOOSE_ROD": {
    "category": "event",
@@ -1873,7 +2023,8 @@
    ],
    "sources": [
     "gsjs:items/class_axe.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "HATCHET"
   },
   "CLASSIC_AXE": {
    "category": "tool",
@@ -1884,7 +2035,8 @@
    ],
    "sources": [
     "gsjs:items/classic_axe.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "HATCHET"
   },
   "CLICK_FAILURE": {
    "category": "ui",
@@ -1901,7 +2053,14 @@
     "gsjs:items/hairball_flower.js:386 (onExtractSeedsComplete)",
     "gsjs:items/include/garden.js:137 (is_watering_can)",
     "gsjs:items/include/garden.js:221 (is_watering_can)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CLICK_FAILURE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/fail.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "fail.mp3",
+   "why": "The generic failure blip; CLICK_FAILURE plays on disabled buttons and refused verbs.",
+   "doubt": "generic name"
   },
   "CLICK_SUCCESS": {
    "category": "ui",
@@ -1917,7 +2076,14 @@
     "client:com/tinyspeck/engine/admin/HandOfGod.as:230 (editProps)",
     "client:com/tinyspeck/engine/admin/HandOfGod.as:237 (destroySelection)",
     "client:com/tinyspeck/engine/control/HandOfDecorator.as:2094 (onEscapeKey)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CLICK_SUCCESS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/button%20moleskin.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "button moleskin.mp3",
+   "why": "A 0.15 s button click; CLICK_SUCCESS is the client's enabled-button click (TowerNameUI.as:181 and every dialog).",
+   "doubt": "button name only"
   },
   "CLIENT_LOADED": {
    "category": "travel",
@@ -1942,7 +2108,8 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/gameoverlay/maps/HubMapDialog.as:545 (end)"
-   ]
+   ],
+   "alias": "OPEN_HUB_MAP"
   },
   "CLOUD_DROP_2": {
    "category": "music",
@@ -1983,7 +2150,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuSkills.as:40 (buildBase)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CLOUD1.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/imagination%20cloud.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "imagination cloud.mp3",
+   "why": "CLOUD1-7 are the iMG menu's cloud buttons (ImgMenuSkills.as:40 ...)."
   },
   "CLOUD2": {
    "category": "ui",
@@ -1994,7 +2167,8 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuQuests.as:37 (buildBase)"
-   ]
+   ],
+   "alias": "CLOUD1"
   },
   "CLOUD3": {
    "category": "ui",
@@ -2005,7 +2179,8 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuUpgrade.as:26 (buildBase)"
-   ]
+   ],
+   "alias": "CLOUD1"
   },
   "CLOUD4": {
    "category": "ui",
@@ -2017,7 +2192,8 @@
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuKeys.as:27 (buildBase)",
     "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuYourLooks.as:30 (buildBase)"
-   ]
+   ],
+   "alias": "CLOUD1"
   },
   "CLOUD5": {
    "category": "ui",
@@ -2028,7 +2204,8 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuTeleport.as:31 (buildBase)"
-   ]
+   ],
+   "alias": "CLOUD1"
   },
   "CLOUD6": {
    "category": "ui",
@@ -2039,7 +2216,8 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuHome.as:30 (buildBase)"
-   ]
+   ],
+   "alias": "CLOUD1"
   },
   "CLOUD7": {
    "category": "ui",
@@ -2050,7 +2228,8 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/ui/imagination/ImgMenuBackToWorld.as:28 (buildBase)"
-   ]
+   ],
+   "alias": "CLOUD1"
   },
   "CLOUDHOPOLIS": {
    "category": "music",
@@ -2073,7 +2252,12 @@
    ],
    "sources": [
     "gsjs:items/cocktail_shaker.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/COCKTAIL_SHAKER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/cocktail%20shaker.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "cocktail shaker.mp3"
   },
   "COLLECT": {
    "category": "making",
@@ -2114,7 +2298,12 @@
     "gsjs:locations/location.js:4532 (doIncantationsFeat)",
     "gsjs:locations/location.js:4544 (doIncantationsFeat)",
     "client:com/tinyspeck/engine/view/ui/quest/QuestQueue.as:161 (handleNextThingInQueue)"
-   ]
+   ],
+   "file": "assets/audio/sfx/COMPLETE_QUEST_REQUIREMENT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/success-complete%20quest%20requirment.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "success-complete quest requirment.mp3"
   },
   "CONCH": {
    "category": "music",
@@ -2142,7 +2331,12 @@
    ],
    "sources": [
     "gsjs:items/npc_mail_dispatcher.js:334 (sendParcel)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CONFIRM_DELIVERY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/confirm%20delivery.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "confirm delivery.mp3"
   },
   "CONSTRUCTION_TOOL": {
    "category": "tool",
@@ -2153,7 +2347,13 @@
    ],
    "sources": [
     "gsjs:items/construction_tool.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CONSTRUCTION_TOOL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/Construction%20Tool.mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "Construction Tool.mp3",
+   "why": "The Construction Tool's own class sound while it works (ringtone cut)."
   },
   "COUNT_DOWN": {
    "category": "event",
@@ -2164,7 +2364,13 @@
    ],
    "sources": [
     "gsjs:groups/shared_instance_manager.js:685 (startCountdown)"
-   ]
+   ],
+   "file": "assets/audio/sfx/COUNT_DOWN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/game%20of%20crowns-countdown.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "game of crowns-countdown.mp3",
+   "why": "shared_instance_manager.js:685 startCountdown."
   },
   "CRAFT_DONE": {
    "category": "remake",
@@ -2199,7 +2405,14 @@
     "gsjs:players/inc_making.js:795 (finishMakingKnown)",
     "gsjs:players/inc_making.js:1192 (finishMakingUnknown)",
     "gsjs:players/inc_making.js:1233 (finishMakingUnknown)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRAFTING_RESULT_NOTHING.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/crafty%20bot-shake%20head.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "crafty bot-shake head.mp3",
+   "why": "The Crafty Bot shaking its head 'no'; CRAFTING_RESULT_NOTHING plays when making yields nothing (inc_making.js:795, 1192).",
+   "doubt": "moment by meaning"
   },
   "CRAFTYBOT_COLLAPSE": {
    "category": "making",
@@ -2210,7 +2423,12 @@
    ],
    "sources": [
     "gsjs:items/npc_crafty_bot.js:1028 (collapse)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRAFTYBOT_COLLAPSE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/craftybot-collapse.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "craftybot-collapse.mp3"
   },
   "CRAFTYBOT_CRAFT_END": {
    "category": "making",
@@ -2221,7 +2439,12 @@
    ],
    "sources": [
     "gsjs:items/npc_crafty_bot.js:2979 (setState)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRAFTYBOT_CRAFT_END.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/craftybot-end%20process.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "craftybot-end process.mp3"
   },
   "CRAFTYBOT_CRAFT_START": {
    "category": "making",
@@ -2232,7 +2455,12 @@
    ],
    "sources": [
     "gsjs:items/npc_crafty_bot.js:3018 (setState)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRAFTYBOT_CRAFT_START.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/craftybot-start.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "craftybot-start.mp3"
   },
   "CRAFTYBOT_EXPAND": {
    "category": "making",
@@ -2243,7 +2471,12 @@
    ],
    "sources": [
     "gsjs:items/npc_crafty_bot.js:1876 (expand)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRAFTYBOT_EXPAND.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/craftybot-expand.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "craftybot-expand.mp3"
   },
   "CRAFTYBOT_IDLE_1": {
    "category": "making",
@@ -2265,7 +2498,12 @@
    ],
    "sources": [
     "gsjs:items/npc_crafty_bot.js:244 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRAFTYBOT_KICK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/craftybot-kick.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "craftybot-kick.mp3"
   },
   "CRAFTYBOT_PEEK": {
    "category": "making",
@@ -2276,7 +2514,13 @@
    ],
    "sources": [
     "gsjs:items/npc_crafty_bot.js:2534 (onPlayerCollision)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRAFTYBOT_PEEK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/craftybot-peak.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "craftybot-peak.mp3",
+   "why": "Spelling: 'peak' in the file, PEEK in npc_crafty_bot.js:2534."
   },
   "CRAFTYBOT_WALK": {
    "category": "making",
@@ -2287,7 +2531,12 @@
    ],
    "sources": [
     "gsjs:items/npc_crafty_bot.js:3013 (setState)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRAFTYBOT_WALK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/craftybot-walk.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "craftybot-walk.mp3"
   },
   "CROAK": {
    "category": "event",
@@ -2298,7 +2547,12 @@
    ],
    "sources": [
     "gsjs:players/player.js:1254 (croak)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CROAK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/croak.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "croak.mp3"
   },
   "CROWN_CHANGES_HANDS": {
    "category": "event",
@@ -2309,7 +2563,14 @@
    ],
    "sources": [
     "gsjs:groups/global_game.js:220 (setIt)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CROWN_CHANGES_HANDS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/game%20of%20crowns-crown%201.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "game of crowns-crown 1.mp3",
+   "why": "global_game.js:220, heard by everyone else when the crown moves.",
+   "doubt": "which numbered crown take is which"
   },
   "CRUSHER_COLLISION": {
    "category": "event",
@@ -2342,7 +2603,13 @@
    ],
    "sources": [
     "gsjs:items/crystallizer.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CRYSTALLIZER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/crystalizer.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "crystalizer.mp3",
+   "why": "Spelling: the file says crystalizer."
   },
   "CUBIMAL_RACE": {
    "category": "event",
@@ -2358,7 +2625,12 @@
     "gsjs:items/npc_cubimal_batterfly.js:729 (onBattleStart)",
     "gsjs:items/npc_cubimal_batterfly.js:959 (onRaceStart)",
     "gsjs:items/npc_cubimal_bureaucrat.js:729 (onBattleStart)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CUBIMAL_RACE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/cubimal-race.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "cubimal-race.mp3"
   },
   "CUBIMAL_WIND_DOWN": {
    "category": "event",
@@ -2390,7 +2662,12 @@
     "gsjs:items/npc_combat_cubimal.js:510",
     "gsjs:items/npc_combat_cubimal.js:547 (parent_verb_npc_cubimal_base_battle)",
     "gsjs:items/npc_combat_cubimal.js:586 (parent_verb_npc_cubimal_base_paper_battle)"
-   ]
+   ],
+   "file": "assets/audio/sfx/CUBIMAL_WIND_UP.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/cubimal-wind%20up.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "cubimal-wind up.mp3"
   },
   "DANCER_POSE_FROG": {
    "category": "animal",
@@ -2401,7 +2678,8 @@
    ],
    "sources": [
     "gsjs:items/npc_yoga_frog.js:314 (doYoga)"
-   ]
+   ],
+   "alias": "WARRIOR_POSE_FROG"
   },
   "DE_EMBIGGENIFY": {
    "category": "music",
@@ -2424,7 +2702,8 @@
    ],
    "sources": [
     "gsjs:items/npc_deimaginator.js:243 (caughtPlayer)"
-   ]
+   ],
+   "alias": "SMUGGLER_GIVES_OR_TAKES_BOX"
   },
   "DINOSAUR_INTESTINES": {
    "category": "music",
@@ -2461,7 +2740,12 @@
    ],
    "sources": [
     "gsjs:items/include/shrines.js:373 (doDonate)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DONATE_TO_SHRINE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/shrine%20donation.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "shrine donation.mp3"
   },
   "DONATION_1ST_TIER": {
    "category": "reward",
@@ -2472,7 +2756,12 @@
    ],
    "sources": [
     "gsjs:items/include/shrines.js:640 (doDonate)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DONATION_1ST_TIER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/shrine%20donation-1st%20tier.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "shrine donation-1st tier.mp3"
   },
   "DONATION_2ND_TIER": {
    "category": "reward",
@@ -2483,7 +2772,12 @@
    ],
    "sources": [
     "gsjs:items/include/shrines.js:643 (doDonate)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DONATION_2ND_TIER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/shrine%20donation-2nd%20tier.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "shrine donation-2nd tier.mp3"
   },
   "DONATION_3RD_TIER": {
    "category": "reward",
@@ -2494,7 +2788,12 @@
    ],
    "sources": [
     "gsjs:items/include/shrines.js:646 (doDonate)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DONATION_3RD_TIER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/shrine%20donation-3rd%20tier.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "shrine donation-3rd tier.mp3"
   },
   "DONATION_4TH_TIER": {
    "category": "reward",
@@ -2509,7 +2808,12 @@
     "gsjs:items/include/shrines.js:649 (doDonate)",
     "gsjs:items/potion_draught_of_giant_amicability.js:599 (onQuaff)",
     "gsjs:items/potion_favor.js:599 (onQuaff)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DONATION_4TH_TIER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/shrine%20donation-4th%20tier.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "shrine donation-4th tier.mp3"
   },
   "DONATION_RECIEVE_EMBLEM": {
    "category": "reward",
@@ -2520,7 +2824,14 @@
    ],
    "sources": [
     "gsjs:items/include/shrines.js:131 (give_emblem)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DONATION_RECIEVE_EMBLEM.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/success-choir.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "success-choir.mp3",
+   "why": "A Giant's emblem (shrines.js:131 give_emblem) is the biggest shrine reward; the choir is the only heavenly sting left.",
+   "doubt": "moment by meaning"
   },
   "DOOR_CLOSE": {
    "category": "ui",
@@ -2531,7 +2842,12 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/gameoverlay/LoadingLocationView.as:411 (done)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DOOR_CLOSE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/door-close.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "door-close.mp3"
   },
   "DOOR_CREAK": {
    "category": "remake",
@@ -2542,7 +2858,13 @@
    ],
    "sources": [
     "remake (Doors and house entrances)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DOOR_CREAK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/door-open%20close.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "door-open close.mp3",
+   "why": "Open-and-close in one take; DOOR_CREAK is the remake's house-entrance door moment."
   },
   "DOOR_OPEN": {
    "category": "ui",
@@ -2554,7 +2876,12 @@
    "sources": [
     "client:com/tinyspeck/engine/control/engine/NetController.as:428 (actuallyStartLocationMove)",
     "client:com/tinyspeck/engine/control/engine/NetController.as:1428 (removeTsidsFromHash)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DOOR_OPEN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/door-open.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "door-open.mp3"
   },
   "DUST_TRAP_SMACK_DOWN": {
    "category": "event",
@@ -2565,7 +2892,12 @@
    ],
    "sources": [
     "gsjs:items/dust_trap.js:155 (doPlayerResponse)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DUST_TRAP_SMACK_DOWN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/dust%20trap%20smack%20down.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "dust trap smack down.mp3"
   },
   "DUST_TRAP_UP": {
    "category": "event",
@@ -2576,7 +2908,13 @@
    ],
    "sources": [
     "gsjs:items/dust_trap.js:241 (reset)"
-   ]
+   ],
+   "file": "assets/audio/sfx/DUST_TRAP_UP.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/dust%20trap%20reset.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "dust trap reset.mp3",
+   "why": "dust_trap.js:241 reset() announces DUST_TRAP_UP."
   },
   "DUSTY_STICK": {
    "category": "tool",
@@ -2600,7 +2938,12 @@
     "gsjs:items/extremely_hallowed_shrine_powder.js:285 (isShrine)",
     "gsjs:items/fertilidust.js:346 (onUse)",
     "gsjs:items/powder_of_startling_fecundity.js:372 (onUse)"
-   ]
+   ],
+   "file": "assets/audio/sfx/EFFECT_EXTREME.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/powder-effect%20extreme.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "powder-effect extreme.mp3"
   },
   "EFFECT_MILD": {
    "category": "event",
@@ -2614,7 +2957,12 @@
     "gsjs:items/fertilidust_lite.js:278 (isTrant)",
     "gsjs:items/juju_shoo_shoo_powder.js:305 (onUse)",
     "gsjs:items/powder_of_mild_fecundity.js:369 (onUse)"
-   ]
+   ],
+   "file": "assets/audio/sfx/EFFECT_MILD.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/powder-effect%20mild.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "powder-effect mild.mp3"
   },
   "EGG_SEASONER": {
    "category": "tool",
@@ -2625,7 +2973,8 @@
    ],
    "sources": [
     "gsjs:items/egg_seasoner.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "BEAN_SEASONER"
   },
   "EGG_TREE": {
    "category": "nature",
@@ -2636,7 +2985,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:333 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/EGG_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20egg%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest egg tree.mp3",
+   "why": "trants.js:333. Unused take; no released file."
   },
   "ELEVATOR_MUSIC": {
    "category": "music",
@@ -2648,7 +3003,10 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-01/1294276855-Elevator_Music_2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-01/1294276855-Elevator_Music_2.mp3",
+   "file": "assets/audio/ambient/elevator_music_1344997334.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Elevator Music"
   },
   "ELEVATOR_OPENS": {
    "category": "ui",
@@ -2659,7 +3017,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/port/LocationSelectorDialog.as:301 (showElevator)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ELEVATOR_OPENS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/elevator%20click%20on.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "elevator click on.mp3",
+   "why": "LocationSelectorDialog.as:301 showElevator, when you click an elevator."
   },
   "EMO_BEAR_HUG": {
    "category": "event",
@@ -2681,7 +3045,12 @@
    ],
    "sources": [
     "gsjs:items/emotional_bear.js:185"
-   ]
+   ],
+   "file": "assets/audio/sfx/EMOTIONAL_BEAR_HIGH_5.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/emo%20bear-high%20five.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "emo bear-high five.mp3"
   },
   "ENCHANTED_WOOD": {
    "category": "music",
@@ -2757,7 +3126,8 @@
    ],
    "sources": [
     "gsjs:items/extremely_hallowed_shrine_powder.js (use_sound)"
-   ]
+   ],
+   "alias": "SPARKLE_POWDER"
   },
   "FAILED_AT_CHARADES": {
    "category": "event",
@@ -2769,7 +3139,14 @@
    "sources": [
     "gsjs:items/catalog_buffs.js:418",
     "gsjs:main.js:1773 (doLocalChat)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FAILED_AT_CHARADES.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/sad%20trombone-sadder.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "sad trombone-sadder.mp3",
+   "why": "The charades buff fails (catalog_buffs.js:418, main.js:1773): a sad trombone.",
+   "doubt": "moment by meaning"
   },
   "FAIRLY_HALLOWED_SHRINE_POWDER": {
    "category": "powder",
@@ -2780,7 +3157,8 @@
    ],
    "sources": [
     "gsjs:items/fairly_hallowed_shrine_powder.js (use_sound)"
-   ]
+   ],
+   "alias": "SPARKLE_POWDER"
   },
   "FANCY_PICK": {
    "category": "tool",
@@ -2791,7 +3169,8 @@
    ],
    "sources": [
     "gsjs:items/fancy_pick.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "PICK"
   },
   "FEED_PIGGY": {
    "category": "animal",
@@ -2803,7 +3182,12 @@
    "sources": [
     "gsjs:items/npc_kitty.js:381 (initInstanceProps)",
     "gsjs:items/npc_piggy.js:742 (is_potion)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FEED_PIGGY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/piggy-feed.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "piggy-feed.mp3"
   },
   "FERTILIDUST": {
    "category": "powder",
@@ -2814,7 +3198,8 @@
    ],
    "sources": [
     "gsjs:items/fertilidust.js (use_sound)"
-   ]
+   ],
+   "alias": "SPARKLE_POWDER"
   },
   "FERTILIDUST_LITE": {
    "category": "powder",
@@ -2825,7 +3210,8 @@
    ],
    "sources": [
     "gsjs:items/fertilidust_lite.js (use_sound)"
-   ]
+   ],
+   "alias": "SPARKLE_POWDER"
   },
   "FIREFLY_WHISTLE_1": {
    "category": "music",
@@ -2940,7 +3326,13 @@
    ],
    "sources": [
     "gsjs:items/npc_kitty_chicken.js:1220 (onPlayerCollision)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FLYING_KITTY_MEW.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/heli-kitty%20mew.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "heli-kitty mew.mp3",
+   "why": "npc_kitty_chicken.js:1220; the remake's KITTY_MEW borrows it."
   },
   "FLYING_KITTY_PURR": {
    "category": "animal",
@@ -2951,7 +3343,12 @@
    ],
    "sources": [
     "gsjs:items/npc_kitty_chicken.js:244 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FLYING_KITTY_PURR.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/heli-kitty%20purr.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "heli-kitty purr.mp3"
   },
   "FOCUSED_MEDITATION_ENERGY": {
    "category": "music",
@@ -2963,7 +3360,10 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-02/1297359267-meditation_korg.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297359267-meditation_korg.mp3",
+   "file": "assets/audio/ambient/meditation2_1344997844.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Meditation (Korg) = music_map meditation_korg"
   },
   "FOCUSED_MEDITATION_MOOD": {
    "category": "music",
@@ -2975,7 +3375,10 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-02/1297359604-meditation_wurly.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297359604-meditation_wurly.mp3",
+   "file": "assets/audio/ambient/meditation3_1344997842.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Meditation (Wurly) = music_map meditation_wurly"
   },
   "FOCUSING_ORB": {
    "category": "tool",
@@ -3056,7 +3459,13 @@
    ],
    "sources": [
     "gsjs:items/fox_bait.js:139 (is_bait)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FOX_BAIT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/fox%20bait%20ignte.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "fox bait ignte.mp3",
+   "why": "fox_bait.js:139: lighting the bait."
   },
   "FOX_BAIT_LAND": {
    "category": "animal",
@@ -3067,7 +3476,12 @@
    ],
    "sources": [
     "gsjs:items/fox_bait.js:203 (land)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FOX_BAIT_LAND.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/fox%20bait%20land.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "fox bait land.mp3"
   },
   "FOX_BRUSH": {
    "category": "tool",
@@ -3078,7 +3492,8 @@
    ],
    "sources": [
     "gsjs:items/fox_brush.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "FOX_BRUSH_HIT"
   },
   "FOX_BRUSH_HIT": {
    "category": "animal",
@@ -3089,7 +3504,13 @@
    ],
    "sources": [
     "gsjs:items/npc_fox.js:232 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FOX_BRUSH_HIT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/fox%20brush-hit.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "fox brush-hit.mp3",
+   "why": "FOX_BRUSH (tool class sound while brushing) borrows the hit."
   },
   "FOX_BRUSH_MISS": {
    "category": "animal",
@@ -3102,7 +3523,12 @@
     "gsjs:items/npc_fox.js:216 (initInstanceProps)",
     "gsjs:items/npc_fox.js:228 (initInstanceProps)",
     "gsjs:items/npc_fox.js:337 (endBrushing)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FOX_BRUSH_MISS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/fox%20brush-miss.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "fox brush-miss.mp3"
   },
   "FOX_EAT": {
    "category": "animal",
@@ -3114,7 +3540,12 @@
    "sources": [
     "gsjs:items/furniture_rug.js:85 (initInstanceProps)",
     "gsjs:items/npc_fox.js:507 (onPathing)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FOX_EAT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/fox%20eat.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "fox eat.mp3"
   },
   "FOX_YIP": {
    "category": "remake",
@@ -3136,7 +3567,12 @@
    ],
    "sources": [
     "gsjs:items/fruit_changing_machine.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FRUIT_CHANGING_MACHINE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/fruitchanging%20machine.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "fruitchanging machine.mp3"
   },
   "FRUIT_TREE": {
    "category": "nature",
@@ -3147,7 +3583,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:336 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FRUIT_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20fruit%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest fruit tree.mp3",
+   "why": "trants.js:336. Unused take; no released file."
   },
   "FRYING_PAN": {
    "category": "tool",
@@ -3158,7 +3600,12 @@
    ],
    "sources": [
     "gsjs:items/frying_pan.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/FRYING_PAN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/frying%20pan.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "frying pan.mp3"
   },
   "FUELMAKER_CASE1": {
    "category": "making",
@@ -3243,7 +3690,12 @@
    ],
    "sources": [
     "gsjs:groups/shared_instance_manager.js:313 (dismissOverlaysAndStart)"
-   ]
+   ],
+   "file": "assets/audio/sfx/GAME_STARTING_SOON.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/game%20of%20crowns-game%20starting%20soon.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "game of crowns-game starting soon.mp3"
   },
   "GARDEN_CLEAR": {
    "category": "remake",
@@ -3265,7 +3717,14 @@
    ],
    "sources": [
     "remake (Plant seeds in a garden plot)"
-   ]
+   ],
+   "file": "assets/audio/sfx/GARDEN_PLANT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/plant%20squish.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "plant squish.mp3",
+   "why": "A soft squish of seeds into soil; GARDEN_PLANT is the remake's plant-a-plot moment.",
+   "doubt": "remake-only key"
   },
   "GAS_TREE": {
    "category": "nature",
@@ -3276,7 +3735,13 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:339 (onHarvestingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/GAS_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20gass%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest gass tree.mp3",
+   "why": "trants.js:339. Unused take; no released file."
   },
   "GASSIFIER": {
    "category": "tool",
@@ -3287,7 +3752,12 @@
    ],
    "sources": [
     "gsjs:items/gassifier.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/GASSIFIER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/gassifier.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "gassifier.mp3"
   },
   "GLITCHMAS_CRACKER": {
    "category": "event",
@@ -3299,7 +3769,12 @@
    "sources": [
     "gsjs:items/glitchmas_cracker.js:340 (onOverlayClicked)",
     "gsjs:items/glitchmas_cracker.js:345 (onOverlayClicked)"
-   ]
+   ],
+   "file": "assets/audio/sfx/GLITCHMAS_CRACKER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/glitchmas%20cracker%20grab%20and%20pull.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "glitchmas cracker grab and pull.mp3"
   },
   "GLITCHMAS_PARTY_LOCATION": {
    "category": "music",
@@ -3327,7 +3802,12 @@
     "street:GNVV9IM8PL4301V (A Summer's Day ball_4)",
     "street:GNVV9IM8PL4301V (A Summer's Day dot_1)",
     "street:GNVV9IM8PL4301V (A Summer's Day dot_2)"
-   ]
+   ],
+   "file": "assets/audio/sfx/GLOWING_ORB_COLLIDE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/glowing%20orb%20collide.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "glowing orb collide.mp3"
   },
   "GOC_MUSIC_1": {
    "category": "music",
@@ -3376,7 +3856,12 @@
     "gsjs:admin.js:137 (broadcastGodMessage)",
     "gsjs:items/include/shrines.js:1254 (open_giant_screen)",
     "gsjs:main.js:1819 (is_shrine)"
-   ]
+   ],
+   "file": "assets/audio/sfx/GONG_GIANTS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/giant%20gong.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "giant gong.mp3"
   },
   "GOODNIGHT_GRODDLE": {
    "category": "music",
@@ -3388,7 +3873,13 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-06/1307035523-Goodnight_Groddle_Master.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-06/1307035523-Goodnight_Groddle_Master.mp3",
+   "file": "assets/audio/sfx/GOODNIGHT_GRODDLE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/GNG%20(Goodnight%20Groddle).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "GNG (Goodnight Groddle).mp3",
+   "why": "music_map GOODNIGHT_GRODDLE and MUSICBLOCK_GOODNIGHT_GRODDLE share Goodnight_Groddle_Master.mp3 (Laura Starrs)."
   },
   "GRAND_OL_GRINDER": {
    "category": "tool",
@@ -3399,7 +3890,8 @@
    ],
    "sources": [
     "gsjs:items/grand_ol_grinder.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "ORE_GRINDER"
   },
   "GREETING_NEEDED": {
    "category": "event",
@@ -3497,7 +3989,13 @@
    ],
    "sources": [
     "gsjs:items/hatchet.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/HATCHET.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/hatchet.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "hatchet.mp3",
+   "why": "The Class Axe and Classic Axe are upgraded hatchets with no file of their own."
   },
   "HEARTBEAT": {
    "category": "event",
@@ -3524,7 +4022,7 @@
   },
   "HERE_YOU_GO_LIGHTER": {
    "category": "recovered",
-   "moment": "Recovered c2 file with no surviving key; a \"here you go\" hand-over, so ITEM_GIVE and ITEM_GIVEN_TO_YOU borrow it",
+   "moment": "Recovered c2 file with no surviving key; a \"here you go\" hand-over, so ITEM_GIVE borrows it",
    "uses": 1,
    "via": [
     "wayback"
@@ -3547,7 +4045,12 @@
    "sources": [
     "client:com/tinyspeck/engine/control/engine/AnnouncementController.as:783 (doEmoteHi)",
     "client:com/tinyspeck/engine/control/engine/AnnouncementController.as:791 (doEmoteHi)"
-   ]
+   ],
+   "file": "assets/audio/sfx/HI_FLOWERS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/hi%20flowers-single.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "hi flowers-single.mp3"
   },
   "HI_FLOWERS_2X": {
    "category": "ui",
@@ -3558,7 +4061,12 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/control/engine/AnnouncementController.as:689 (doEmoteHiBonus)"
-   ]
+   ],
+   "file": "assets/audio/sfx/HI_FLOWERS_2X.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/hi%20flowers-double.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "hi flowers-double.mp3"
   },
   "HI_FLOWERS_HIT": {
    "category": "ui",
@@ -3569,7 +4077,12 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/control/engine/MissileController.as:99 (doMissilehit)"
-   ]
+   ],
+   "file": "assets/audio/sfx/HI_FLOWERS_HIT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/hi%20flowers-hit.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "hi flowers-hit.mp3"
   },
   "HIGH_CLASS_HOE": {
    "category": "tool",
@@ -3580,7 +4093,8 @@
    ],
    "sources": [
     "gsjs:items/high_class_hoe.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "HOE"
   },
   "HIT_TRIGGER_SUMMER": {
    "category": "event",
@@ -3596,7 +4110,12 @@
     "street:GNVV9IM8PL4301V (A Summer's Day button_down)",
     "street:GNVV9IM8PL4301V (A Summer's Day water_plat_1)",
     "street:GNVV9IM8PL4301V (A Summer's Day button2_down)"
-   ]
+   ],
+   "file": "assets/audio/sfx/HIT_TRIGGER_SUMMER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/summer%20quest%20trigger.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "summer quest trigger.mp3"
   },
   "HOE": {
    "category": "tool",
@@ -3612,7 +4131,13 @@
     "gsjs:items/include/master_garden.js:285 (potionTendGarden)",
     "gsjs:items/include/master_garden.js:288 (potionTendGarden)",
     "gsjs:items/hoe.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/HOE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/hoe.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "hoe.mp3",
+   "why": "The High Class Hoe is the upgraded hoe with no file of its own."
   },
   "HOME_STREET_FIREBOGS": {
    "category": "music",
@@ -3664,7 +4189,12 @@
     "gsjs:items/focusing_orb.js:1292 (endTranscendentalRadiationNew)",
     "gsjs:items/include/shrines.js:301 (evalDonate)",
     "gsjs:items/sneezing_powder.js:256 (is_antidote)"
-   ]
+   ],
+   "file": "assets/audio/sfx/HORRIBLE_SOUND.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/meditation-horrible%20sound.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "meditation-horrible sound.mp3"
   },
   "ICE_CREAM_TRUCK": {
    "category": "music",
@@ -3687,7 +4217,12 @@
    ],
    "sources": [
     "gsjs:items/ice_knob.js:320 (onScrapingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ICE_CUBE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/ice%20cube.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "ice cube.mp3"
   },
   "ICON_GIANT_LOVE": {
    "category": "reward",
@@ -3698,7 +4233,12 @@
    ],
    "sources": [
     "gsjs:items/include/icon.js:586 (showBonus)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ICON_GIANT_LOVE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/giant%20love.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "giant love.mp3"
   },
   "IDLE_FROG": {
    "category": "animal",
@@ -3720,7 +4260,12 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/gameoverlay/ImgMenuView.as:290 (hide)"
-   ]
+   ],
+   "file": "assets/audio/sfx/IMAGINATION_CLOSE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/imagination-close.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "imagination-close.mp3"
   },
   "IMAGINATION_OPEN": {
    "category": "ui",
@@ -3731,7 +4276,12 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/gameoverlay/ImgMenuView.as:236 (show)"
-   ]
+   ],
+   "file": "assets/audio/sfx/IMAGINATION_OPEN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/imagination-open.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "imagination-open.mp3"
   },
   "IMAGINATION_PURCHASE": {
    "category": "downloads",
@@ -3757,7 +4307,13 @@
    "sources": [
     "client:com/tinyspeck/engine/port/RightSideManager.as:260 (chatUpdate)",
     "client:com/tinyspeck/engine/port/RightSideView.as:542 (chatUpdate)"
-   ]
+   ],
+   "file": "assets/audio/sfx/INCOMING_CHAT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/private%20message.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "private message.mp3",
+   "why": "RightSideManager.as:260 chatUpdate (a message in an open chat); new windows get INCOMING_CHAT_NEW."
   },
   "INCOMING_CHAT_NEW": {
    "category": "ui",
@@ -3768,7 +4324,12 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/port/RightSideView.as:527 (chatUpdate)"
-   ]
+   ],
+   "file": "assets/audio/sfx/INCOMING_CHAT_NEW.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/new%20chat%20window.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "new chat window.mp3"
   },
   "INTERACT_DISPATCHER": {
    "category": "event",
@@ -3791,7 +4352,12 @@
    "sources": [
     "gsjs:items/bag_butler.js:5901 (checkMail)",
     "gsjs:items/npc_mailbox.js:221 (checkMail)"
-   ]
+   ],
+   "file": "assets/audio/sfx/INTERACT_MAILBOX.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/mailbox%20interact.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "mailbox interact.mp3"
   },
   "IRRIGATOR_9000": {
    "category": "tool",
@@ -3802,7 +4368,8 @@
    ],
    "sources": [
     "gsjs:items/irrigator_9000.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "WATERING_CAN"
   },
   "ITEM_DRINK": {
    "category": "item",
@@ -3813,7 +4380,12 @@
    ],
    "sources": [
     "gsjs:items/include/drink.js:121 (drink_drink)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ITEM_DRINK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/drink.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "drink.mp3"
   },
   "ITEM_DROP": {
    "category": "item",
@@ -3824,7 +4396,12 @@
    ],
    "sources": [
     "gsjs:items/include/takeable.js:211 (takeable_drop)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ITEM_DROP.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/drop.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "drop.mp3"
   },
   "ITEM_EAT": {
    "category": "item",
@@ -3835,7 +4412,12 @@
    ],
    "sources": [
     "gsjs:items/include/food.js:189 (food_eat)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ITEM_EAT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/eat.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "eat.mp3"
   },
   "ITEM_GIVE": {
    "category": "item",
@@ -3859,7 +4441,12 @@
    "sources": [
     "gsjs:items/include/takeable.js:281 (takeable_give)"
    ],
-   "alias": "HERE_YOU_GO_LIGHTER"
+   "file": "assets/audio/sfx/ITEM_GIVEN_TO_YOU.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/item-recieve%20(here%20you%20go).mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "item-recieve (here you go).mp3",
+   "why": "takeable.js:281; replaces the HERE_YOU_GO_LIGHTER alias (ITEM_GIVE keeps that one)."
   },
   "ITEM_PICKUP": {
    "category": "item",
@@ -3870,7 +4457,13 @@
    ],
    "sources": [
     "gsjs:items/include/takeable.js:100 (takeable_pickup)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ITEM_PICKUP.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/pick%20up.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "pick up.mp3",
+   "why": "takeable.js:100 takeable_pickup."
   },
   "JAL1": {
    "category": "music",
@@ -3905,7 +4498,14 @@
    ],
    "sources": [
     "gsjs:items/npc_juju_bandit.js:225 (escape)"
-   ]
+   ],
+   "file": "assets/audio/sfx/JUJU_BANDIT_SHRINK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/juju%20takes%20item.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "juju takes item.mp3",
+   "why": "npc_juju_bandit.js:225 escape(), right after the bandit grabs an item.",
+   "doubt": "moment by order"
   },
   "JUJU_BANDIT_SPAWN": {
    "category": "event",
@@ -3916,7 +4516,12 @@
    ],
    "sources": [
     "gsjs:items/npc_juju_bandit.js:205 (appear)"
-   ]
+   ],
+   "file": "assets/audio/sfx/JUJU_BANDIT_SPAWN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/juju%20spawn.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "juju spawn.mp3"
   },
   "JUJU_SHOO_SHOO_POWDER": {
    "category": "powder",
@@ -3927,7 +4532,8 @@
    ],
    "sources": [
     "gsjs:items/juju_shoo_shoo_powder.js (use_sound)"
-   ]
+   ],
+   "alias": "SPARKLE_POWDER"
   },
   "JUMP": {
    "category": "remake",
@@ -3938,7 +4544,14 @@
    ],
    "sources": [
     "remake (Ordinary jump)"
-   ]
+   ],
+   "file": "assets/audio/sfx/JUMP.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/jump%201.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "jump 1.mp3",
+   "why": "The remake's ordinary jump (TRIPLE_JUMP has its own file). Unused take.",
+   "doubt": "rejected take, remake-only key"
   },
   "KISS_RECV": {
    "category": "event",
@@ -3950,7 +4563,8 @@
    "sources": [
     "gsjs:items/emotional_bear.js:285",
     "gsjs:items/lips.js:150"
-   ]
+   ],
+   "alias": "KISS_SEND"
   },
   "KISS_SEND": {
    "category": "event",
@@ -3962,7 +4576,13 @@
    "sources": [
     "gsjs:items/emotional_bear.js:287",
     "gsjs:items/lips.js:152"
-   ]
+   ],
+   "file": "assets/audio/sfx/KISS_SEND.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/emo%20bear%20kiss.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "emo bear kiss.mp3",
+   "why": "emotional_bear.js:285-287 kiss: sender and receiver."
   },
   "KITTY_MEW": {
    "category": "remake",
@@ -3973,7 +4593,8 @@
    ],
    "sources": [
     "remake (Heli kitty mew)"
-   ]
+   ],
+   "alias": "FLYING_KITTY_MEW"
   },
   "KNIFE_AND_BOARD": {
    "category": "tool",
@@ -3986,7 +4607,12 @@
    "sources": [
     "gsjs:items/pumpkin.js:392 (onCarveStep1Complete)",
     "gsjs:items/knife_and_board.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/KNIFE_AND_BOARD.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/knife%20and%20board.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "knife and board.mp3"
   },
   "LEVEL_UP": {
    "category": "reward",
@@ -4321,7 +4947,13 @@
     "gsjs:items/include/loneliness.js:407 (lonelinessEndPartyOverlay)",
     "gsjs:items/include/loneliness.js:421 (lonelinessEndPartyOverlay)",
     "gsjs:items/include/loneliness.js:435 (lonelinessEndPartyOverlay)"
-   ]
+   ],
+   "file": "assets/audio/sfx/LONELINESS_FIREWORKS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/fireworks.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "fireworks.mp3",
+   "why": "loneliness.js:366 end-of-party fireworks overlay."
   },
   "LOOMER": {
    "category": "tool",
@@ -4332,7 +4964,12 @@
    ],
    "sources": [
     "gsjs:items/loomer.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/LOOMER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/loomer.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "loomer.mp3"
   },
   "MAILBOX_ALL_DONE": {
    "category": "event",
@@ -4344,7 +4981,13 @@
    "sources": [
     "gsjs:items/bag_butler.js:6441 (parent_mailStop)",
     "gsjs:items/npc_mailbox.js:249 (mailStop)"
-   ]
+   ],
+   "file": "assets/audio/sfx/MAILBOX_ALL_DONE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/mailbox%20close.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "mailbox close.mp3",
+   "why": "npc_mailbox.js:249 mailStop."
   },
   "MAKING_WAITING_COOKING": {
    "category": "making",
@@ -4355,7 +4998,14 @@
    ],
    "sources": [
     "gsjs:players/inc_making.js:677 (tryToMake)"
-   ]
+   ],
+   "file": "assets/audio/sfx/MAKING_WAITING_COOKING.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/process.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "process.mp3",
+   "why": "inc_making.js:677 tryToMake: waiting while it cooks. Unused take.",
+   "doubt": "rejected take, moment by name"
   },
   "MB_B1": {
    "category": "event",
@@ -4435,7 +5085,12 @@
     "gsjs:items/focusing_orb.js:972 (endStandingMeditation)",
     "gsjs:items/focusing_orb.js:1133 (endTranscendentalMeditation)",
     "gsjs:items/focusing_orb.js:1293 (endTranscendentalRadiationNew)"
-   ]
+   ],
+   "file": "assets/audio/sfx/MEDITATION_SUCCESS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/meditation-success.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "meditation-success.mp3"
   },
   "MEDITATIVE_ARTS_01": {
    "category": "music",
@@ -4447,7 +5102,13 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-01/1294257766-Round_Two_in_Seven_2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-01/1294257766-Round_Two_in_Seven_2.mp3",
+   "file": "assets/audio/sfx/MEDITATIVE_ARTS_01.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/Meditation%20(Round%20Two%20in%20Seven).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "Meditation (Round Two in Seven).mp3",
+   "why": "music_map MEDITATIVE_ARTS_01 = Round_Two_in_Seven_2.mp3; focusing_orb.js:2007 plays it for Meditative Arts."
   },
   "MEDITATIVE_ARTS_02": {
    "category": "music",
@@ -4459,7 +5120,10 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-02/1297227011-meditation_ac15.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-02/1297227011-meditation_ac15.mp3",
+   "file": "assets/audio/ambient/meditation1_1344997850.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Meditation (AC30), nearest to music_map meditation_ac15"
   },
   "METALMAKER": {
    "category": "music",
@@ -4491,7 +5155,12 @@
    ],
    "sources": [
     "gsjs:items/mike_tyson_grill.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/MIKE_TYSON_GRILL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/mike%20tyson%20grill.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "mike tyson grill.mp3"
   },
   "MINE_HIT": {
    "category": "remake",
@@ -4518,7 +5187,12 @@
     "street:GHFCVOD2GN631RJ (Starlit Night exit_message)",
     "street:GHFCVOD2GN631RJ (Starlit Night exit_message2)",
     "street:GHFQOLEIHN63P27 (Radial Heights moon_appear)"
-   ]
+   ],
+   "file": "assets/audio/sfx/MOON_APPEARS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/moon%20appears.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "moon appears.mp3"
   },
   "MOONWALK": {
    "category": "music",
@@ -4573,7 +5247,13 @@
     "gsjs:items/musicblock_b_brown_01.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492303-B_brown_1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492303-B_brown_1.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_B_BROWN_01.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/BB-1.mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "BB-1.mp3",
+   "why": "Ringtone of Musicblock BB-1 (Brandon Brown)."
   },
   "MUSICBLOCK_B_BROWN_02": {
    "category": "music",
@@ -4587,7 +5267,13 @@
     "gsjs:items/musicblock_b_brown_02.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492313-B_brown_2_short.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492313-B_brown_2_short.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_B_BROWN_02.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/BB-2.mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "BB-2.mp3",
+   "why": "Ringtone of Musicblock BB-2."
   },
   "MUSICBLOCK_B_BROWN_03": {
    "category": "music",
@@ -4601,7 +5287,13 @@
     "gsjs:items/musicblock_b_brown_03.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492331-B_brown_3.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492331-B_brown_3.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_B_BROWN_03.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/BB-3.mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "BB-3.mp3",
+   "why": "Ringtone of Musicblock BB-3."
   },
   "MUSICBLOCK_B_BROWN_04": {
    "category": "music",
@@ -4615,7 +5307,13 @@
     "gsjs:items/musicblock_b_brown_04.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492342-B_brown_4_short.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492342-B_brown_4_short.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_B_BROWN_04.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/BB-4.mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "BB-4.mp3",
+   "why": "Ringtone of Musicblock BB-4."
   },
   "MUSICBLOCK_B_BROWN_05": {
    "category": "music",
@@ -4629,7 +5327,13 @@
     "gsjs:items/musicblock_b_brown_05.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492353-B_brown_5.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492353-B_brown_5.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_B_BROWN_05.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/BB-5.mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "BB-5.mp3",
+   "why": "Ringtone of Musicblock BB-5."
   },
   "MUSICBLOCK_D_BLUE_01": {
    "category": "music",
@@ -4643,7 +5347,13 @@
     "gsjs:items/musicblock_d_blue_01.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492439-Chill_Dude_corrected.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492439-Chill_Dude_corrected.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_BLUE_01.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DB-1%20(Chill%20Dude).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DB-1 (Chill Dude).mp3",
+   "why": "Ringtone of Musicblock DB-1."
   },
   "MUSICBLOCK_D_BLUE_02": {
    "category": "music",
@@ -4657,7 +5367,13 @@
     "gsjs:items/musicblock_d_blue_02.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492569-Spanish_Fly.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492569-Spanish_Fly.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_BLUE_02.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DB-2%20(Spanish%20Fly).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DB-2 (Spanish Fly).mp3",
+   "why": "Ringtone of Musicblock DB-2."
   },
   "MUSICBLOCK_D_BLUE_03": {
    "category": "music",
@@ -4671,7 +5387,13 @@
     "gsjs:items/musicblock_d_blue_03.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492590-Swampy.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492590-Swampy.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_BLUE_03.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DB-3%20(Swampy).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DB-3 (Swampy).mp3",
+   "why": "Ringtone of Musicblock DB-3."
   },
   "MUSICBLOCK_D_BLUE_04": {
    "category": "music",
@@ -4685,7 +5407,13 @@
     "gsjs:items/musicblock_d_blue_04.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492613-Tin_Whistle.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492613-Tin_Whistle.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_BLUE_04.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DB-4%20(Tin%20Whistle).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DB-4 (Tin Whistle).mp3",
+   "why": "Ringtone of Musicblock DB-4."
   },
   "MUSICBLOCK_D_BLUE_05": {
    "category": "music",
@@ -4699,7 +5427,13 @@
     "gsjs:items/musicblock_d_blue_05.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492465-Euro_Pop.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492465-Euro_Pop.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_BLUE_05.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DB-5%20(Uro%20Pop).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DB-5 (Uro Pop).mp3",
+   "why": "Ringtone of Musicblock DB-5."
   },
   "MUSICBLOCK_D_GREEN_01": {
    "category": "music",
@@ -4713,7 +5447,13 @@
     "gsjs:items/musicblock_d_green_01.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492475-Front_Porch.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492475-Front_Porch.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_GREEN_01.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DG-1%20(Front%20Porch).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DG-1 (Front Porch).mp3",
+   "why": "Ringtone of Musicblock DG-1."
   },
   "MUSICBLOCK_D_GREEN_02": {
    "category": "music",
@@ -4727,7 +5467,10 @@
     "gsjs:items/musicblock_d_green_02.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492623-Travelin_Banjer.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492623-Travelin_Banjer.mp3",
+   "file": "assets/audio/ambient/Musicblock-DG-2_1291896713.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Musicblock DG-2 (in-game cut)"
   },
   "MUSICBLOCK_D_GREEN_03": {
    "category": "music",
@@ -4741,7 +5484,10 @@
     "gsjs:items/musicblock_d_green_03.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492540-Kiss_Me_Quickly_corrected.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492540-Kiss_Me_Quickly_corrected.mp3",
+   "file": "assets/audio/ambient/Musicblock-DG-3_1291896740.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Musicblock DG-3 (in-game cut)"
   },
   "MUSICBLOCK_D_GREEN_04": {
    "category": "music",
@@ -4755,7 +5501,13 @@
     "gsjs:items/musicblock_d_green_04.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492602-Think_About_It.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492602-Think_About_It.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_GREEN_04.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DG-4%20(Think%20About%20It).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DG-4 (Think About It).mp3",
+   "why": "Ringtone of Musicblock DG-4."
   },
   "MUSICBLOCK_D_GREEN_05": {
    "category": "music",
@@ -4769,7 +5521,13 @@
     "gsjs:items/musicblock_d_green_05.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492486-How_the_West_Was_Won.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492486-How_the_West_Was_Won.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_GREEN_05.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DG-5%20(How%20the%20West%20Was%20Won).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DG-5 (How the West Was Won).mp3",
+   "why": "Ringtone of Musicblock DG-5."
   },
   "MUSICBLOCK_D_RED_01": {
    "category": "music",
@@ -4783,7 +5541,10 @@
     "gsjs:items/musicblock_d_red_01.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492451-Ciao.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492451-Ciao.mp3",
+   "file": "assets/audio/ambient/Musicblock-DR-1_1291896467.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Musicblock DR-1 (in-game cut)"
   },
   "MUSICBLOCK_D_RED_02": {
    "category": "music",
@@ -4797,7 +5558,13 @@
     "gsjs:items/musicblock_d_red_02.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492428-Bubblicious_corrected.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492428-Bubblicious_corrected.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_RED_02.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DR-2%20(Bubblicious).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DR-2 (Bubblicious).mp3",
+   "why": "Ringtone of Musicblock DR-2."
   },
   "MUSICBLOCK_D_RED_03": {
    "category": "music",
@@ -4811,7 +5578,13 @@
     "gsjs:items/musicblock_d_red_03.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492292-Astor.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492292-Astor.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_RED_03.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DR-3%20(Astor).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DR-3 (Astor).mp3",
+   "why": "Ringtone of Musicblock DR-3."
   },
   "MUSICBLOCK_D_RED_04": {
    "category": "music",
@@ -4825,7 +5598,13 @@
     "gsjs:items/musicblock_d_red_04.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492279-8_Bit_Groddle.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492279-8_Bit_Groddle.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_D_RED_04.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/DR-4%20(8%20Bit%20Groddle).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "DR-4 (8 Bit Groddle).mp3",
+   "why": "Ringtone of Musicblock DR-4."
   },
   "MUSICBLOCK_D_RED_05": {
    "category": "music",
@@ -4839,7 +5618,10 @@
     "gsjs:items/musicblock_d_red_05.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317493230-Round_1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317493230-Round_1.mp3",
+   "file": "assets/audio/ambient/Musicblock-DR-5_1291896506.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Musicblock DR-5 (in-game cut)"
   },
   "MUSICBLOCK_GOODNIGHT_GRODDLE": {
    "category": "music",
@@ -4853,7 +5635,8 @@
     "gsjs:items/musicblock_goodnight_groddle.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-06/1307035523-Goodnight_Groddle_Master.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-06/1307035523-Goodnight_Groddle_Master.mp3",
+   "alias": "GOODNIGHT_GRODDLE"
   },
   "MUSICBLOCK_SB_SECRET_01": {
    "category": "music",
@@ -4867,7 +5650,13 @@
     "gsjs:items/musicblock_sb_secret_01.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2010-09/1285727979-MUSICBLOCK_SB_SECRET_01.mp3"
+   "url": "http://c2.glitch.bz/sounds/2010-09/1285727979-MUSICBLOCK_SB_SECRET_01.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_SB_SECRET_01.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/SB-1.mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "SB-1.mp3",
+   "why": "Stewart Butterfield's block (musicblock_sb_secret_01); the ringtone set's only SB tune."
   },
   "MUSICBLOCK_TRUMPETS": {
    "category": "music",
@@ -4895,7 +5684,13 @@
     "gsjs:items/musicblock_x_shiny_01.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492636-X_shiny_1_short_SOUINNG_100A.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492636-X_shiny_1_short_SOUINNG_100A.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_X_SHINY_01.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/XS-1%20(SOUINNG).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "XS-1 (SOUINNG).mp3",
+   "why": "Ringtone of Musicblock XS-1 (Xavier Vochelle)."
   },
   "MUSICBLOCK_X_SHINY_02": {
    "category": "music",
@@ -4909,7 +5704,10 @@
     "gsjs:items/musicblock_x_shiny_02.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492647-X_shiny_2_short_Mellovoices_100A.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492647-X_shiny_2_short_Mellovoices_100A.mp3",
+   "file": "assets/audio/ambient/Musicblock-XS-2_1292035400.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Musicblock XS-2 (in-game cut)"
   },
   "MUSICBLOCK_X_SHINY_03": {
    "category": "music",
@@ -4923,7 +5721,10 @@
     "gsjs:items/musicblock_x_shiny_03.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492660-X_shiny_3_Short_fluttyGroove_100A.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492660-X_shiny_3_Short_fluttyGroove_100A.mp3",
+   "file": "assets/audio/ambient/Musicblock-XS-3_1291896779.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Musicblock XS-3 (in-game cut)"
   },
   "MUSICBLOCK_X_SHINY_04": {
    "category": "music",
@@ -4937,7 +5738,13 @@
     "gsjs:items/musicblock_x_shiny_04.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492671-X_shiny_4_short_wouaaaou_100A.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492671-X_shiny_4_short_wouaaaou_100A.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_X_SHINY_04.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/XS-4%20(wouaaaou).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "XS-4 (wouaaaou).mp3",
+   "why": "Ringtone of Musicblock XS-4."
   },
   "MUSICBLOCK_X_SHINY_05": {
    "category": "music",
@@ -4951,7 +5758,13 @@
     "gsjs:items/musicblock_x_shiny_05.js (play)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492681-X_shiny_5_Short_ZUTTO_100A.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492681-X_shiny_5_Short_ZUTTO_100A.mp3",
+   "file": "assets/audio/sfx/MUSICBLOCK_X_SHINY_05.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/XS-5%20(Zutto).mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "XS-5 (Zutto).mp3",
+   "why": "music_map MUSICBLOCK_X_SHINY_05 = X_shiny_5_Short_ZUTTO_100A.mp3."
   },
   "NEIGHBOUR_WAVE": {
    "category": "remake",
@@ -4962,7 +5775,14 @@
    ],
    "sources": [
     "remake (Neighbour chore greeting)"
-   ]
+   ],
+   "file": "assets/audio/sfx/NEIGHBOUR_WAVE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/friend%20comes%20online.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "friend comes online.mp3",
+   "why": "No buddy-online key survives in the client; the remake's neighbour greeting is the nearest moment.",
+   "doubt": "remake-only key"
   },
   "NEW_XP_BEFORE_CHAIN_PULL": {
    "category": "music",
@@ -5010,9 +5830,12 @@
    "sources": [
     "gsjs:players/player.js:911 (doNewDay)"
    ],
-   "file": "assets/audio/new_day_fanfare.mp3",
-   "origin": "downloads-best-fit",
-   "fit": "stand-in fanfare until the rooster is recovered"
+   "file": "assets/audio/sfx/NEWDAY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/new%20day.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "new day.mp3",
+   "why": "Replaces the new_day_fanfare stand-in."
   },
   "NEWXP_YOU": {
    "category": "event",
@@ -5040,7 +5863,12 @@
    "sources": [
     "gsjs:items/npc_kitty.js:507",
     "gsjs:items/npc_piggy.js:886"
-   ]
+   ],
+   "file": "assets/audio/sfx/NIBBLE_PIGGY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/piggy-nibble%203.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "piggy-nibble 3.mp3"
   },
   "NO_MUSIC": {
    "category": "music",
@@ -5063,7 +5891,12 @@
    ],
    "sources": [
     "gsjs:items/no_no_powder.js (use_sound)"
-   ]
+   ],
+   "file": "assets/audio/sfx/NO_NO_POWDER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/no-no%20powder.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "no-no powder.mp3"
   },
   "OPEN_HUB_MAP": {
    "category": "ui",
@@ -5074,7 +5907,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/view/gameoverlay/maps/HubMapDialog.as:958 (start)"
-   ]
+   ],
+   "file": "assets/audio/sfx/OPEN_HUB_MAP.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/hub%20map.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "hub map.mp3",
+   "why": "HubMapDialog.as:958 open; the close (:545) reuses the one map swish."
   },
   "OPENING_SCREEN": {
    "category": "ui",
@@ -5111,7 +5950,13 @@
    ],
    "sources": [
     "gsjs:items/ore_grinder.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/ORE_GRINDER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/ore%20grinder.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "ore grinder.mp3",
+   "why": "The Grand Ol' Grinder is the upgraded Ore Grinder with no file of its own."
   },
   "PACK_FULL": {
    "category": "item",
@@ -5134,7 +5979,12 @@
    ],
    "sources": [
     "gsjs:items/npc_mail_dispatcher.js:242 (doParcel)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PACKAGE_SENT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/package%20sent.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "package sent.mp3"
   },
   "PAPER_TREE": {
    "category": "nature",
@@ -5145,7 +5995,13 @@
    ],
    "sources": [
     "gsjs:items/paper_tree.js:497 (givePaper)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PAPER_TREE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/harvest%20paper%20tree.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "harvest paper tree.mp3",
+   "why": "paper_tree.js:497 givePaper. Unused take; no released file."
   },
   "PARALAXING_STREETS": {
    "category": "music",
@@ -5168,7 +6024,8 @@
    ],
    "sources": [
     "gsjs:locations/inc_transit.js:71 (transit_pay_fare)"
-   ]
+   ],
+   "alias": "PAY_FIFTY_CURRANTS"
   },
   "PAY_FIFTY_CURRANTS": {
    "category": "item",
@@ -5179,7 +6036,13 @@
    ],
    "sources": [
     "gsjs:items/game_teleporter.js:227 (onConversation)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PAY_FIFTY_CURRANTS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/pay%20fifty%20currants.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "pay fifty currants.mp3",
+   "why": "game_teleporter.js:227 and inc_transit.js:71 (subway fare) spell it both ways."
   },
   "PET_PIGGY": {
    "category": "animal",
@@ -5192,7 +6055,12 @@
     "gsjs:items/npc_kitty.js:433",
     "gsjs:items/npc_piggy.js:956"
    ],
-   "alias": "PIGGY_PLOP"
+   "file": "assets/audio/sfx/PET_PIGGY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/piggy-pet%20result.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "piggy-pet result.mp3",
+   "why": "Replaces the PIGGY_PLOP alias."
   },
   "PET_TRANT": {
    "category": "nature",
@@ -5203,7 +6071,12 @@
    ],
    "sources": [
     "gsjs:items/include/trants.js:88 (onPettingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PET_TRANT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/trant-pet.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "trant-pet.mp3"
   },
   "PETRIFIED_ROCK": {
    "category": "nature",
@@ -5248,7 +6121,13 @@
    "sources": [
     "gsjs:items/pumpkin.js:224",
     "gsjs:items/pick.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PICK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/pick.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "pick.mp3",
+   "why": "The Fancy Pick is the upgraded pick with no file of its own."
   },
   "PIGGY_PLOP": {
    "category": "downloads",
@@ -5274,7 +6153,12 @@
    "sources": [
     "gsjs:items/npc_kitty.js:517",
     "gsjs:items/npc_piggy.js:896"
-   ]
+   ],
+   "file": "assets/audio/sfx/PIGGY_SCOFFS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/piggy-scoffs.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "piggy-scoffs.mp3"
   },
   "PLATES1": {
    "category": "making",
@@ -5321,7 +6205,13 @@
    "sources": [
     "gsjs:players/inc_houses.js:134 (houses_auth_request)",
     "gsjs:players/inc_houses.js:135 (houses_auth_request)"
-   ]
+   ],
+   "file": "assets/audio/sfx/POL_GATE_KNOCKED.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/knock.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "knock.mp3",
+   "why": "inc_houses.js:134: knocking at someone's home gate."
   },
   "POTION_ALPHABET_SAUCE": {
    "category": "tool",
@@ -5332,7 +6222,8 @@
    ],
    "sources": [
     "gsjs:items/potion_alphabet_sauce.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_AMOROUS_PHILTRE": {
    "category": "tool",
@@ -5343,7 +6234,8 @@
    ],
    "sources": [
     "gsjs:items/potion_amorous_philtre.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_ANCESTRAL_SPIRITS": {
    "category": "tool",
@@ -5354,7 +6246,8 @@
    ],
    "sources": [
     "gsjs:items/potion_ancestral_spirits.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_ANIMAL_YOUTH": {
    "category": "tool",
@@ -5365,7 +6258,8 @@
    ],
    "sources": [
     "gsjs:items/potion_animal_youth.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_AVATAR_LARGE": {
    "category": "tool",
@@ -5376,7 +6270,8 @@
    ],
    "sources": [
     "gsjs:items/potion_avatar_large.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "BIGENNIFY"
   },
   "POTION_AVATAR_MIXUP": {
    "category": "tool",
@@ -5387,7 +6282,8 @@
    ],
    "sources": [
     "gsjs:items/potion_avatar_mixup.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_AVATAR_SMALL": {
    "category": "tool",
@@ -5398,7 +6294,14 @@
    ],
    "sources": [
     "gsjs:items/potion_avatar_small.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/POTION_AVATAR_SMALL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/embiggenify-potion%20wears%20off.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "embiggenify-potion wears off.mp3",
+   "why": "The De-Embiggenifying Potion (potion_avatar_small.js) undoes the Embiggenifying one. Not DE_EMBIGGENIFY: that music_map key is the street music of Eesti Life Catalog Page 17 and the Giant Living Room / Kitchen.",
+   "doubt": "moment by meaning"
   },
   "POTION_CHARADES": {
    "category": "tool",
@@ -5409,7 +6312,8 @@
    ],
    "sources": [
     "gsjs:items/potion_charades.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_CHRIS": {
    "category": "tool",
@@ -5420,7 +6324,8 @@
    ],
    "sources": [
     "gsjs:items/potion_chris.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_DRAUGHT_OF_GIANT_AMICABILITY": {
    "category": "tool",
@@ -5431,7 +6336,8 @@
    ],
    "sources": [
     "gsjs:items/potion_draught_of_giant_amicability.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_ELIXIR_OF_AVARICE": {
    "category": "tool",
@@ -5442,7 +6348,8 @@
    ],
    "sources": [
     "gsjs:items/potion_elixir_of_avarice.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_FAVOR": {
    "category": "tool",
@@ -5453,7 +6360,8 @@
    ],
    "sources": [
     "gsjs:items/potion_favor.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_GARDEN_CLEAR": {
    "category": "tool",
@@ -5464,7 +6372,8 @@
    ],
    "sources": [
     "gsjs:items/potion_garden_clear.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_GARDEN_FERTILIZE": {
    "category": "tool",
@@ -5475,7 +6384,8 @@
    ],
    "sources": [
     "gsjs:items/potion_garden_fertilize.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_GARDEN_HARVEST": {
    "category": "tool",
@@ -5486,7 +6396,8 @@
    ],
    "sources": [
     "gsjs:items/potion_garden_harvest.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_GARDEN_PLANT": {
    "category": "tool",
@@ -5497,7 +6408,8 @@
    ],
    "sources": [
     "gsjs:items/potion_garden_plant.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_GARDEN_WATER": {
    "category": "tool",
@@ -5508,7 +6420,8 @@
    ],
    "sources": [
     "gsjs:items/potion_garden_water.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_GENERIC": {
    "category": "event",
@@ -5524,7 +6437,14 @@
     "gsjs:items/potion_amorous_philtre.js:504 (is_tinkertool)",
     "gsjs:items/potion_ancestral_spirits.js:413 (is_tinkertool)",
     "gsjs:items/potion_ancestral_spirits.js:504 (is_tinkertool)"
-   ]
+   ],
+   "file": "assets/audio/sfx/POTION_GENERIC.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/potion%20pour.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "potion pour.mp3",
+   "why": "potion_alphabet_sauce.js:496 parent_verb_potion_base_pour announces POTION_GENERIC. Each potion class key (its tool class sound while in use) borrows the pour.",
+   "doubt": "aliases only"
   },
   "POTION_KEYCUTTER_TONIC": {
    "category": "tool",
@@ -5535,7 +6455,8 @@
    ],
    "sources": [
     "gsjs:items/potion_keycutter_tonic.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_RAINBOW_JUICE": {
    "category": "tool",
@@ -5546,7 +6467,8 @@
    ],
    "sources": [
     "gsjs:items/potion_rainbow_juice.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_ROCKY_REGENERATION_SOLUTION": {
    "category": "tool",
@@ -5557,7 +6479,8 @@
    ],
    "sources": [
     "gsjs:items/potion_rocky_regeneration_solution.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_ROOK_BALM": {
    "category": "tool",
@@ -5568,7 +6491,8 @@
    ],
    "sources": [
     "gsjs:items/potion_rook_balm.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_TRANTSFORMATION_FLUID": {
    "category": "tool",
@@ -5579,7 +6503,8 @@
    ],
    "sources": [
     "gsjs:items/potion_trantsformation_fluid.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_TREE_POISON": {
    "category": "tool",
@@ -5590,7 +6515,8 @@
    ],
    "sources": [
     "gsjs:items/potion_tree_poison.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_TREE_POISON_ANTIDOTE": {
    "category": "tool",
@@ -5601,7 +6527,8 @@
    ],
    "sources": [
     "gsjs:items/potion_tree_poison_antidote.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POTION_XP": {
    "category": "tool",
@@ -5612,7 +6539,8 @@
    ],
    "sources": [
     "gsjs:items/potion_xp.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "POTION_GENERIC"
   },
   "POWDER_OF_MILD_FECUNDITY": {
    "category": "powder",
@@ -5623,7 +6551,8 @@
    ],
    "sources": [
     "gsjs:items/powder_of_mild_fecundity.js (use_sound)"
-   ]
+   ],
+   "alias": "SPARKLE_POWDER"
   },
   "POWDER_OF_STARTLING_FECUNDITY": {
    "category": "powder",
@@ -5634,7 +6563,8 @@
    ],
    "sources": [
     "gsjs:items/powder_of_startling_fecundity.js (use_sound)"
-   ]
+   ],
+   "alias": "SPARKLE_POWDER"
   },
   "Prisencolinensinainciusol": {
    "category": "ui",
@@ -5663,7 +6593,12 @@
     "gsjs:items/npc_cubimal_batterfly.js:564 (checkWin)",
     "gsjs:items/npc_cubimal_bureaucrat.js:564 (checkWin)",
     "gsjs:items/npc_cubimal_butler.js:564 (checkWin)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PROTO_PUFF.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/proto-puff.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "proto-puff.mp3"
   },
   "PURCHASE_ITEM": {
    "category": "item",
@@ -5679,7 +6614,13 @@
     "gsjs:items/bag_furniture_smallcabinet.js:700 (sellItem)",
     "gsjs:items/bag_furniture_wallcabinet.js:690 (sellItem)",
     "gsjs:items/furniture_armchair.js:601 (sellItem)"
-   ]
+   ],
+   "file": "assets/audio/sfx/PURCHASE_ITEM.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/buy%20kaching.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "buy kaching.mp3",
+   "why": "Buy with a till ka-ching; PURCHASE_ITEM is the store purchase (bag_furniture_cabinet.js:690 sellItem)."
   },
   "PURPLE_LOCATION": {
    "category": "music",
@@ -5753,7 +6694,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/port/QuestsDialog.as:184 (tweenOpenClose)"
-   ]
+   ],
+   "file": "assets/audio/sfx/QUEST_DIALOGUE_BOX.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/quest%20dialogue%20box.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "quest dialogue box.mp3",
+   "why": "QuestsDialog.as:184 tweenOpenClose plays the open or close key; one take survives."
   },
   "QUEST_DIALOGUE_BOX_CLOSE": {
    "category": "ui",
@@ -5764,7 +6711,8 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/port/QuestsDialog.as:184 (tweenOpenClose)"
-   ]
+   ],
+   "alias": "QUEST_DIALOGUE_BOX"
   },
   "QUEST_OFFER": {
    "category": "remake",
@@ -5797,7 +6745,8 @@
    ],
    "sources": [
     "remake (Currant quoin)"
-   ]
+   ],
+   "alias": "QUOIN_GOT"
   },
   "QUOIN_ENERGY": {
    "category": "remake",
@@ -5808,7 +6757,8 @@
    ],
    "sources": [
     "remake (Energy quoin)"
-   ]
+   ],
+   "alias": "QUOIN_GOT"
   },
   "QUOIN_FAVOR": {
    "category": "remake",
@@ -5819,7 +6769,8 @@
    ],
    "sources": [
     "remake (Favor quoin)"
-   ]
+   ],
+   "alias": "QUOIN_GOT"
   },
   "QUOIN_GOT": {
    "category": "quoin",
@@ -5833,7 +6784,13 @@
     "gsjs:items/crown_game_lock.js:49 (onPlayerCollision)",
     "gsjs:items/moving_quoin.js:306 (onPlayerCollision)",
     "gsjs:items/quoin.js:267 (onPlayerCollision)"
-   ]
+   ],
+   "file": "assets/audio/sfx/QUOIN_GOT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/quoin.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "quoin.mp3",
+   "why": "GSJS plays QUOIN_GOT for every quoin type; the remake's per-type keys borrow it."
   },
   "QUOIN_MOOD": {
    "category": "remake",
@@ -5844,7 +6801,8 @@
    ],
    "sources": [
     "remake (Mood quoin)"
-   ]
+   ],
+   "alias": "QUOIN_GOT"
   },
   "QUOIN_MYSTERY": {
    "category": "remake",
@@ -5855,7 +6813,8 @@
    ],
    "sources": [
     "remake (Mystery quoin)"
-   ]
+   ],
+   "alias": "QUOIN_GOT"
   },
   "QUOIN_SHARD_2": {
    "category": "quoin",
@@ -5866,7 +6825,14 @@
    ],
    "sources": [
     "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
-   ]
+   ],
+   "file": "assets/audio/sfx/QUOIN_SHARD_2.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/quoin%20shard.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "quoin shard.mp3",
+   "why": "quoin.js:94 picks QUOIN_SHARD_<players 2-9>; the unnumbered take is the first tier.",
+   "doubt": "tier by order"
   },
   "QUOIN_SHARD_3": {
    "category": "quoin",
@@ -5877,7 +6843,12 @@
    ],
    "sources": [
     "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
-   ]
+   ],
+   "file": "assets/audio/sfx/QUOIN_SHARD_3.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/quoin%20shard-3.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "quoin shard-3.mp3"
   },
   "QUOIN_SHARD_4": {
    "category": "quoin",
@@ -5888,7 +6859,12 @@
    ],
    "sources": [
     "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
-   ]
+   ],
+   "file": "assets/audio/sfx/QUOIN_SHARD_4.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/quoin%20shard-4.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "quoin shard-4.mp3"
   },
   "QUOIN_SHARD_5": {
    "category": "quoin",
@@ -5899,7 +6875,14 @@
    ],
    "sources": [
     "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
-   ]
+   ],
+   "file": "assets/audio/sfx/QUOIN_SHARD_5.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/quoin%20shard-5.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "quoin shard-5.mp3",
+   "why": "Takes 6-9 are lost; bigger crowds reuse the top surviving tier.",
+   "doubt": "aliases only"
   },
   "QUOIN_SHARD_6": {
    "category": "quoin",
@@ -5910,7 +6893,8 @@
    ],
    "sources": [
     "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
-   ]
+   ],
+   "alias": "QUOIN_SHARD_5"
   },
   "QUOIN_SHARD_7": {
    "category": "quoin",
@@ -5921,7 +6905,8 @@
    ],
    "sources": [
     "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
-   ]
+   ],
+   "alias": "QUOIN_SHARD_5"
   },
   "QUOIN_SHARD_8": {
    "category": "quoin",
@@ -5932,7 +6917,8 @@
    ],
    "sources": [
     "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
-   ]
+   ],
+   "alias": "QUOIN_SHARD_5"
   },
   "QUOIN_SHARD_9": {
    "category": "quoin",
@@ -5943,7 +6929,8 @@
    ],
    "sources": [
     "gsjs:items/quoin.js:94 (onPlayerCollision (shared quoin))"
-   ]
+   ],
+   "alias": "QUOIN_SHARD_5"
   },
   "QUOIN_TIME": {
    "category": "remake",
@@ -5954,7 +6941,8 @@
    ],
    "sources": [
     "remake (Time quoin)"
-   ]
+   ],
+   "alias": "QUOIN_GOT"
   },
   "QUOIN_XP": {
    "category": "remake",
@@ -5965,7 +6953,8 @@
    ],
    "sources": [
     "remake (iMG quoin)"
-   ]
+   ],
+   "alias": "QUOIN_GOT"
   },
   "QUORAZY_QUOIN": {
    "category": "quoin",
@@ -6002,7 +6991,8 @@
    ],
    "sources": [
     "gsjs:players/player.js:3039 (show_rainbow)"
-   ]
+   ],
+   "alias": "RAINBOW_SUPERHARVEST"
   },
   "RAINBOW_FULLYREVIVED": {
    "category": "reward",
@@ -6013,7 +7003,8 @@
    ],
    "sources": [
     "gsjs:items/include/rook.js:224 (doReviveComplete)"
-   ]
+   ],
+   "alias": "RAINBOW_SUPERHARVEST"
   },
   "RAINBOW_GOODJOB": {
    "category": "reward",
@@ -6024,7 +7015,8 @@
    ],
    "sources": [
     "gsjs:players/player.js:3042 (show_rainbow)"
-   ]
+   ],
+   "alias": "RAINBOW_SUPERHARVEST"
   },
   "RAINBOW_MAXRELAX": {
    "category": "reward",
@@ -6035,7 +7027,8 @@
    ],
    "sources": [
     "gsjs:players/player.js:3045 (show_rainbow)"
-   ]
+   ],
+   "alias": "RAINBOW_SUPERHARVEST"
   },
   "RAINBOW_RANDOMKINDNESS": {
    "category": "reward",
@@ -6046,7 +7039,8 @@
    ],
    "sources": [
     "gsjs:players/player.js:3048 (show_rainbow)"
-   ]
+   ],
+   "alias": "RAINBOW_SUPERHARVEST"
   },
   "RAINBOW_SECRETSPOT": {
    "category": "reward",
@@ -6057,7 +7051,8 @@
    ],
    "sources": [
     "gsjs:players/player.js:3063 (show_rainbow)"
-   ]
+   ],
+   "alias": "RAINBOW_SUPERHARVEST"
   },
   "RAINBOW_SPINDOCTOR": {
    "category": "reward",
@@ -6068,7 +7063,8 @@
    ],
    "sources": [
     "gsjs:players/player.js:3051 (show_rainbow)"
-   ]
+   ],
+   "alias": "RAINBOW_SUPERHARVEST"
   },
   "RAINBOW_SUPERHARVEST": {
    "category": "nature",
@@ -6079,7 +7075,13 @@
    ],
    "sources": [
     "gsjs:players/player.js:3054 (show_rainbow)"
-   ]
+   ],
+   "file": "assets/audio/sfx/RAINBOW_SUPERHARVEST.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/rainbow.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "rainbow.mp3",
+   "why": "player.js:3039-3063 show_rainbow announces RAINBOW_<type>; one rainbow sting survives for all of them."
   },
   "RAINBOW_WINNER": {
    "category": "reward",
@@ -6090,7 +7092,8 @@
    ],
    "sources": [
     "gsjs:players/player.js:3057 (show_rainbow)"
-   ]
+   ],
+   "alias": "RAINBOW_SUPERHARVEST"
   },
   "RAINBOW_YOUDIDIT": {
    "category": "reward",
@@ -6102,7 +7105,8 @@
    "sources": [
     "gsjs:main.js:1791 (doLocalChat)",
     "gsjs:players/player.js:3060 (show_rainbow)"
-   ]
+   ],
+   "alias": "RAINBOW_SUPERHARVEST"
   },
   "RANDOM_KINDNESS": {
    "category": "tool",
@@ -6136,7 +7140,12 @@
    "sources": [
     "gsjs:items/npc_kitty.js:926 (onNibbleComplete)",
     "gsjs:items/npc_piggy.js:1662 (onNibbleComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/RECEIVE_MEAT_FROM_PIGGY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/piggy-recieve%20meat.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "piggy-recieve meat.mp3"
   },
   "RESET_TRIGGER_SUMMER": {
    "category": "event",
@@ -6148,7 +7157,12 @@
    "sources": [
     "street:GNVV9IM8PL4301V (A Summer's Day button_up)",
     "street:GNVV9IM8PL4301V (A Summer's Day button2_up)"
-   ]
+   ],
+   "file": "assets/audio/sfx/RESET_TRIGGER_SUMMER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/summer%20quest%20re-trigger.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "summer quest re-trigger.mp3"
   },
   "REVEAL_1": {
    "category": "event",
@@ -6159,7 +7173,13 @@
    ],
    "sources": [
     "gsjs:locations/location.js:4556 (doIncantationsFeat)"
-   ]
+   ],
+   "file": "assets/audio/sfx/REVEAL_1.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/puzzle%20reveal.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "puzzle reveal.mp3",
+   "why": "location.js:4556 doIncantationsFeat reveal. 'success-puzzle' is the same take."
   },
   "ROCKS_DISAPPEAR": {
    "category": "recovered",
@@ -6186,7 +7206,14 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2010-10/1287601674-Master_Rook_attack.mp3"
+   "url": "http://c2.glitch.bz/sounds/2010-10/1287601674-Master_Rook_attack.mp3",
+   "file": "assets/audio/sfx/ROOK_ATTACK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/The%20Rook.mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "The Rook.mp3",
+   "why": "music_map ROOK_ATTACK = Master_Rook_attack.mp3, played on each wing beat (inc_rook.js:255). The ringtone is a different piece from 'rook flight' (ROOK_FLOCK, r 0.38).",
+   "doubt": "name and length only"
   },
   "ROOK_CAW": {
    "category": "remake",
@@ -6209,7 +7236,13 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2010-10/1287601688-Master_Rook_flight.mp3"
+   "url": "http://c2.glitch.bz/sounds/2010-10/1287601688-Master_Rook_flight.mp3",
+   "file": "assets/audio/sfx/ROOK_FLOCK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/rook%20flight.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "rook flight.mp3",
+   "why": "music_map ROOK_FLOCK = Master_Rook_flight.mp3; inc_rook.js:40 loops it for the whole attack."
   },
   "ROOK_HALL_VO_1": {
    "category": "music",
@@ -6295,7 +7328,10 @@
     "gsjs:items/npc_rube.js:651 (setTarget)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-10/1317492698-X_yappi_youpi.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-10/1317492698-X_yappi_youpi.mp3",
+   "file": "assets/audio/ambient/The_Rube_Song_1290596637.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "The Rube Song = ringtone \"The Rube (yappi youpi)\" = music_map X_yappi_youpi"
   },
   "SALMON_CATCH": {
    "category": "animal",
@@ -6306,7 +7342,12 @@
    ],
    "sources": [
     "gsjs:items/npc_salmon.js:219 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SALMON_CATCH.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/salmon-catch.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "salmon-catch.mp3"
   },
   "SALMON_RELEASE": {
    "category": "animal",
@@ -6317,7 +7358,12 @@
    ],
    "sources": [
     "gsjs:items/salmon.js:91"
-   ]
+   ],
+   "file": "assets/audio/sfx/SALMON_RELEASE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/salmon-release.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "salmon-release.mp3"
   },
   "SAUCEPAN": {
    "category": "tool",
@@ -6328,7 +7374,13 @@
    ],
    "sources": [
     "gsjs:items/saucepan.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SAUCEPAN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/sauce%20pan.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "sauce pan.mp3",
+   "why": "Spelling: the file says sauce pan."
   },
   "SAVE_AND_CHECKOUT": {
    "category": "event",
@@ -6350,7 +7402,12 @@
    ],
    "sources": [
     "gsjs:items/jellisac.js:219 (onScoopingComplete)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SCOOPED_JELLISAC.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/jellisac-scoop.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "jellisac-scoop.mp3"
   },
   "SCRAPER": {
    "category": "tool",
@@ -6361,7 +7418,13 @@
    ],
    "sources": [
     "gsjs:items/scraper.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SCRAPER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/scraper.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "scraper.mp3",
+   "why": "The Super Scraper is the upgraded scraper with no file of its own."
   },
   "SHOVEL": {
    "category": "tool",
@@ -6372,7 +7435,13 @@
    ],
    "sources": [
     "gsjs:items/shovel.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SHOVEL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/shovel.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "shovel.mp3",
+   "why": "The Ace of Spades is the fancy shovel."
   },
   "SHRINE_EMBLEM": {
    "category": "remake",
@@ -6383,7 +7452,8 @@
    ],
    "sources": [
     "remake (Claim a Giant emblem)"
-   ]
+   ],
+   "alias": "DONATION_RECIEVE_EMBLEM"
   },
   "SIGNPOST_TRAVEL": {
    "category": "remake",
@@ -6406,7 +7476,12 @@
    "sources": [
     "gsjs:players/inc_skills.js:1435 (skills_give)",
     "gsjs:players/inc_skills.js:1545 (skills_remove_notify)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SKILL_ACHIEVED.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/skill%20achieved.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "skill achieved.mp3"
   },
   "SLOTH_ARRIVES": {
    "category": "animal",
@@ -6432,7 +7507,12 @@
    ],
    "sources": [
     "gsjs:items/npc_sloth.js:724 (setState)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SLOTH_EAT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/sloth%20eat.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "sloth eat.mp3"
   },
   "SLOTH_KNOCKER": {
    "category": "animal",
@@ -6443,7 +7523,12 @@
    ],
    "sources": [
     "gsjs:items/sloth_knocker.js:54"
-   ]
+   ],
+   "file": "assets/audio/sfx/SLOTH_KNOCKER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/sloth%20knocker.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "sloth knocker.mp3"
   },
   "SLOTH_PEAK_AND_SPIT": {
    "category": "animal",
@@ -6454,7 +7539,13 @@
    ],
    "sources": [
     "gsjs:items/npc_sloth.js:743 (setState)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SLOTH_PEAK_AND_SPIT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/sloth%20eat%20spit.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "sloth eat spit.mp3",
+   "why": "npc_sloth.js:743 state 'peak and spit' (eat, then spit)."
   },
   "SLOTH_SPIT": {
    "category": "animal",
@@ -6465,7 +7556,12 @@
    ],
    "sources": [
     "gsjs:items/npc_sloth.js:376 (createSnail)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SLOTH_SPIT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/sloth%20spit.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "sloth spit.mp3"
   },
   "SMALLIFY": {
    "category": "event",
@@ -6476,7 +7572,14 @@
    ],
    "sources": [
     "gsjs:items/avatar_smallifier.js:100 (onPlayerCollision)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SMALLIFY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/embiggenify-return%20to%20normal.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "embiggenify-return to normal.mp3",
+   "why": "Shrinking back down; SMALLIFY is the Avatar Smallifier (avatar_smallifier.js:100).",
+   "doubt": "shrink by meaning"
   },
   "SMELTER": {
    "category": "tool",
@@ -6487,7 +7590,12 @@
    ],
    "sources": [
     "gsjs:items/smelter.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SMELTER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/smelter.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "smelter.mp3"
   },
   "SMUGGLER_GIVES_OR_TAKES_BOX": {
    "category": "event",
@@ -6502,7 +7610,13 @@
     "gsjs:items/npc_smuggler.js:1120 (conversation_run_receive_repeat1)",
     "gsjs:items/npc_smuggler.js:1231 (conversation_run_receive_repeat2)",
     "gsjs:items/npc_smuggler.js:1342 (conversation_run_receive_repeat3)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SMUGGLER_GIVES_OR_TAKES_BOX.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/smuggler%20npc-gives%20or%20takes%20package.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "smuggler npc-gives or takes package.mp3",
+   "why": "npc_deimaginator.js is the smuggling NPC; caughtPlayer (js:243) takes the box back."
   },
   "SMUGGLING_NPC_ARRIVES": {
    "category": "event",
@@ -6516,7 +7630,12 @@
     "gsjs:items/npc_deimaginator.js:458 (targetJumpComplete)",
     "gsjs:items/npc_smuggler.js:287 (giveAppearForPlayer)",
     "gsjs:items/npc_smuggler.js:467 (receiveAppearForPlayer)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SMUGGLING_NPC_ARRIVES.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/smuggler%20npc%20arrives.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "smuggler npc arrives.mp3"
   },
   "SMUGGLING_NPC_LEAVES": {
    "category": "event",
@@ -6532,7 +7651,12 @@
     "gsjs:items/npc_smuggler.js:324 (giveDoDisappear)",
     "gsjs:items/npc_smuggler.js:388 (giveTimeOut)",
     "gsjs:items/npc_smuggler.js:499 (receiveDoDisappear)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SMUGGLING_NPC_LEAVES.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/smuggler%20npc%20leaves.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "smuggler npc leaves.mp3"
   },
   "SNAPPY_LOOP": {
    "category": "music",
@@ -6557,7 +7681,13 @@
     "gsjs:items/catalog_buffs.js:2462",
     "gsjs:items/sneezing_powder.js:281 (onUse)",
     "gsjs:players/player.js:2633 (sneeze)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SNEEZING_AHCHOO.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/sneeze.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "sneeze.mp3",
+   "why": "catalog_buffs.js:2462 sneezing buff, sneezing_powder.js:281."
   },
   "SNEEZING_POWDER": {
    "category": "powder",
@@ -6568,7 +7698,8 @@
    ],
    "sources": [
     "gsjs:items/sneezing_powder.js (use_sound)"
-   ]
+   ],
+   "alias": "SPARKLE_POWDER"
   },
   "SPARKLE_POWDER": {
    "category": "powder",
@@ -6579,7 +7710,13 @@
    ],
    "sources": [
     "gsjs:items/sparkle_powder.js (use_sound)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SPARKLE_POWDER.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/powder-sprinkle.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "powder-sprinkle.mp3",
+   "why": "Every powder plays its own use_sound class key when sprinkled; one generic sprinkle survives (No-No Powder has its own)."
   },
   "SPECIAL_ITEM_THAT_ONLY_BETA_TESTERS_GET": {
    "category": "event",
@@ -6590,7 +7727,13 @@
    ],
    "sources": [
     "gsjs:items/special_item_that_only_beta_testers_get.js:300 (bounce)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SPECIAL_ITEM_THAT_ONLY_BETA_TESTERS_GET.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/beta%20pickle%20flop.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "beta pickle flop.mp3",
+   "why": "The Special Item That Only Beta Testers Get is the beta pickle; its bounce() announces its class key (special_item_that_only_beta_testers_get.js:300)."
   },
   "SPICE_MILL": {
    "category": "tool",
@@ -6601,7 +7744,12 @@
    ],
    "sources": [
     "gsjs:items/spice_mill.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SPICE_MILL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/spice%20mill.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "spice mill.mp3"
   },
   "SPICE_TREE": {
    "category": "nature",
@@ -6650,7 +7798,13 @@
    ],
    "sources": [
     "gsjs:items/spindle.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SPINDLE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/spindle.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "spindle.mp3",
+   "why": "The Splendid Spindle is the upgraded spindle with no file of its own."
   },
   "SPINNING_WHEEL": {
    "category": "event",
@@ -6687,7 +7841,12 @@
    ],
    "sources": [
     "gsjs:items/plank.js:84"
-   ]
+   ],
+   "file": "assets/audio/sfx/SPLANK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/splank.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "splank.mp3"
   },
   "SPLENDID_SPINDLE": {
    "category": "tool",
@@ -6698,7 +7857,8 @@
    ],
    "sources": [
     "gsjs:items/splendid_spindle.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "SPINDLE"
   },
   "SQUISH_GRAPES": {
    "category": "event",
@@ -6710,7 +7870,12 @@
    "sources": [
     "gsjs:items/bunch_of_grapes_hell.js:65",
     "gsjs:items/include/shrines.js:869 (showSplatterOverlayFinish)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SQUISH_GRAPES.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/squish%20grapes.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "squish grapes.mp3"
   },
   "STAND1": {
    "category": "making",
@@ -6947,7 +8112,12 @@
    ],
    "sources": [
     "gsjs:items/still.js:166 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/STILL_COLLECT.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/still-collect.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "still-collect.mp3"
   },
   "STILL_READY": {
    "category": "making",
@@ -6959,7 +8129,12 @@
    "sources": [
     "gsjs:items/still.js:413 (finishWorking)",
     "gsjs:items/still.js:416 (finishWorking)"
-   ]
+   ],
+   "file": "assets/audio/sfx/STILL_READY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/still-ready.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "still-ready.mp3"
   },
   "STREET_LOADED": {
    "category": "ui",
@@ -6974,9 +8149,12 @@
     "gsjs:main.js:1466 (doEndMove)",
     "client:com/tinyspeck/engine/view/gameoverlay/LoadingLocationView.as:408 (done)"
    ],
-   "file": "assets/audio/game_loaded_2.mp3",
-   "origin": "downloads-best-fit",
-   "fit": "Game Loaded (second take)"
+   "file": "assets/audio/sfx/STREET_LOADED.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/street%20loaded.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "street loaded.mp3",
+   "why": "Replaces the game_loaded_2 best fit."
   },
   "SUBWAY_BUTTON": {
    "category": "travel",
@@ -6987,7 +8165,12 @@
    ],
    "sources": [
     "gsjs:items/subway_gate.js:54 (initInstanceProps)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SUBWAY_BUTTON.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/subway-button.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "subway-button.mp3"
   },
   "SUBWAY_CAR_HUM": {
    "category": "music",
@@ -7022,7 +8205,8 @@
    ],
    "sources": [
     "gsjs:items/super_scraper.js (tool class sound while working)"
-   ]
+   ],
+   "alias": "SCRAPER"
   },
   "SWITCH_PRESS_BLOOIAN": {
    "category": "event",
@@ -7038,7 +8222,12 @@
     "street:GHVP8TCLT40336S (Blooian depn_swch_4_down)",
     "street:GHVP8TCLT40336S (Blooian depn_swch_5_down)",
     "street:GHVP8TCLT40336S (Blooian depn_swch_6_down)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SWITCH_PRESS_BLOOIAN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/switch-press%20blooian.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "switch-press blooian.mp3"
   },
   "SWITCH_RESET_BLOOIAN": {
    "category": "event",
@@ -7054,7 +8243,12 @@
     "street:GHVP8TCLT40336S (Blooian depn_swch_4_up)",
     "street:GHVP8TCLT40336S (Blooian depn_swch_5_up)",
     "street:GHVP8TCLT40336S (Blooian depn_swch_6_up)"
-   ]
+   ],
+   "file": "assets/audio/sfx/SWITCH_RESET_BLOOIAN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/switch-reset%20blooian.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "switch-reset blooian.mp3"
   },
   "TALK_FROG": {
    "category": "animal",
@@ -7087,7 +8281,14 @@
    ],
    "sources": [
     "gsjs:players/player.js:677 (teleportToLocation)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TELEPORT_AWAY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/beam%20up.mp3",
+   "archiveItem": "glitch-mmo-tiny-speck-unused-sfx",
+   "archiveFile": "beam up.mp3",
+   "why": "player.js:675-677 teleportToLocation. Unused/rejected take; no released file.",
+   "doubt": "rejected take"
   },
   "TELEPORT_AWAY_HUB": {
    "category": "travel",
@@ -7098,7 +8299,8 @@
    ],
    "sources": [
     "gsjs:players/player.js:675 (teleportToLocation)"
-   ]
+   ],
+   "alias": "TELEPORT_AWAY"
   },
   "TELEPORTER_VISIBLE_APPEAR": {
    "category": "event",
@@ -7111,7 +8313,12 @@
    "sources": [
     "gsjs:players/inc_party.js:513 (party_create_teleporter)",
     "street:GIFM4BD43383DKV (Le Miserable win_condition)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TELEPORTER_VISIBLE_APPEAR.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/teleporter%20appears.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "teleporter appears.mp3"
   },
   "TELEPORTER_VISIBLE_DISAPPEARS": {
    "category": "travel",
@@ -7125,7 +8332,14 @@
     "gsjs:items/teleporter_custom.js:98 (parent_onPlayerCollision)",
     "gsjs:items/teleporter_ground.js:97 (onPlayerCollision)",
     "gsjs:items/teleporter_visible.js:93 (onPlayerCollision)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TELEPORTER_VISIBLE_DISAPPEARS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/disappear.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "disappear.mp3",
+   "why": "teleporter.js:73: the visible teleporter vanishes when you touch it.",
+   "doubt": "generic name"
   },
   "TELEPORTER_VISIBLE_PORTAL": {
    "category": "event",
@@ -7138,7 +8352,12 @@
    "sources": [
     "gsjs:players/inc_party.js:514 (party_create_teleporter)",
     "street:GIFM4BD43383DKV (Le Miserable win_condition)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TELEPORTER_VISIBLE_PORTAL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/portal.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "portal.mp3"
   },
   "TEST": {
    "category": "music",
@@ -7177,7 +8396,12 @@
    ],
    "sources": [
     "gsjs:items/test_tube.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TEST_TUBE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/test%20tube.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "test tube.mp3"
   },
   "TICKET_TO_PARADISE1": {
    "category": "music",
@@ -7216,7 +8440,12 @@
    "sources": [
     "gsjs:items/tinkertool.js:464 (startRepair)",
     "gsjs:items/tinkertool.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TINKERTOOL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/tinkertool.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "tinkertool.mp3"
   },
   "TOGGLE_VIEWPORT_SCALE_ONE_CLICK": {
    "category": "ui",
@@ -7227,7 +8456,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/control/TSFrontController.as:3245 (setViewportScale)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TOGGLE_VIEWPORT_SCALE_ONE_CLICK.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/scroll%20clicking%202.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "scroll clicking 2.mp3",
+   "why": "TSFrontController.as:3245 zoom step: one scroll click."
   },
   "TOGGLE_VIEWPORT_SCALE_THREE_CLICKS": {
    "category": "ui",
@@ -7238,7 +8473,13 @@
    ],
    "sources": [
     "client:com/tinyspeck/engine/control/TSFrontController.as:3246 (setViewportScale)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TOGGLE_VIEWPORT_SCALE_THREE_CLICKS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/scroll%20clicking%20three.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "scroll clicking three.mp3",
+   "why": "TSFrontController.as:3246: three scroll clicks."
   },
   "TOOL_BREAKS": {
    "category": "making",
@@ -7254,7 +8495,12 @@
     "gsjs:items/beaker.js:342 (doBreak)",
     "gsjs:items/bean_seasoner.js:338 (doBreak)",
     "gsjs:items/blender.js:335 (doBreak)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TOOL_BREAKS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/tool%20breaks.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "tool breaks.mp3"
   },
   "TOXIC_MOON": {
    "category": "music",
@@ -7295,7 +8541,13 @@
     "gsjs:locations/inc_transit.js:367 (transit_arrive)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-01/1295655628-train_arrives2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-01/1295655628-train_arrives2.mp3",
+   "file": "assets/audio/sfx/TRAIN_ARRIVES.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/subway%20arrives.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "subway arrives.mp3",
+   "why": "inc_transit.js:342 announces TRAIN_ARRIVES when the subway pulls in."
   },
   "TRAIN_DEPARTS": {
    "category": "music",
@@ -7309,7 +8561,13 @@
     "gsjs:locations/inc_transit.js:423 (transit_doors_close)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2011-01/1295655636-train_departs2.mp3"
+   "url": "http://c2.glitch.bz/sounds/2011-01/1295655636-train_departs2.mp3",
+   "file": "assets/audio/sfx/TRAIN_DEPARTS.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/subway-departs.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "subway-departs.mp3",
+   "why": "inc_transit.js:423 (subway only)."
   },
   "TRANSCENDENTAL_MEDITATION_01": {
    "category": "music",
@@ -7358,7 +8616,8 @@
    ],
    "sources": [
     "gsjs:items/npc_yoga_frog.js:317 (doYoga)"
-   ]
+   ],
+   "alias": "WARRIOR_POSE_FROG"
   },
   "TRIPLE_JUMP": {
    "category": "ui",
@@ -7383,7 +8642,12 @@
    ],
    "sources": [
     "gsjs:players/inc_achievements.js:430 (achievements_grant)"
-   ]
+   ],
+   "file": "assets/audio/sfx/TROPHY_RECEIVED.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/success-trophy%20recieved.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "success-trophy recieved.mp3"
   },
   "trumpet": {
    "category": "ui",
@@ -7454,7 +8718,14 @@
    ],
    "sources": [
     "remake (Mute and other small toggles)"
-   ]
+   ],
+   "file": "assets/audio/sfx/UI_TOGGLE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/scroll%20clicking%203.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "scroll clicking 3.mp3",
+   "why": "The shortest single click; UI_TOGGLE is the remake's mute and small-toggle moment.",
+   "doubt": "remake-only key"
   },
   "UNDERGROUND_PUZZLES": {
    "category": "music",
@@ -7477,7 +8748,14 @@
    ],
    "sources": [
     "remake (Sell an item to a vendor)"
-   ]
+   ],
+   "file": "assets/audio/sfx/VENDOR_SELL.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/buy.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "buy.mp3",
+   "why": "The plainer 'buy' take; VENDOR_SELL is the remake's sell-to-vendor moment, which had no key of its own.",
+   "doubt": "remake-only key"
   },
   "VERB_MENU_OPEN": {
    "category": "remake",
@@ -7511,7 +8789,10 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-01/1326989321-Waiting_Muzak_2.1.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-01/1326989321-Waiting_Muzak_2.1.mp3",
+   "file": "assets/audio/ambient/waiting_muzak_1344997267.mp3",
+   "origin": "downloads-best-fit",
+   "fit": "Waiting Muzak"
   },
   "WARRIOR_POSE_FROG": {
    "category": "animal",
@@ -7522,7 +8803,13 @@
    ],
    "sources": [
     "gsjs:items/npc_yoga_frog.js:311 (doYoga)"
-   ]
+   ],
+   "file": "assets/audio/sfx/WARRIOR_POSE_FROG.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/yoga%20frog-pose.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "yoga frog-pose.mp3",
+   "why": "npc_yoga_frog.js:311-317 doYoga picks one of three poses; one pose take survives."
   },
   "WATER_SPLASH": {
    "category": "event",
@@ -7550,7 +8837,14 @@
    "sources": [
     "gsjs:inc_data_sounds.js (music_map)"
    ],
-   "url": "http://c2.glitch.bz/sounds/2012-08/1346270583-Bells_Waterfall_1.3_low_less_echo.mp3"
+   "url": "http://c2.glitch.bz/sounds/2012-08/1346270583-Bells_Waterfall_1.3_low_less_echo.mp3",
+   "file": "assets/audio/sfx/WATERFALL_MELODY.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/esquebeth-quest/Esquebeth%20Puzzle.mp3",
+   "archiveItem": "esquebeth-quest",
+   "archiveFile": "Esquebeth Puzzle.mp3",
+   "why": "Esquibeth's pilgrimage is the 2012 waterfall puzzle (the sfx item's 'esquibeth symbol glow' and 'esquibeth-rock disappears' match the c2 WATERFALL_SYMBOL_GLOW and ROCKS_DISAPPEAR files, r 0.99), and the ringtone 'Esquebeth Quest' is WATERFALL_SUCCESS (r 0.96). The puzzle tune is the bell melody the player repeats: music_map WATERFALL_MELODY = Bells_Waterfall_1.3.",
+   "doubt": "not verifiable: the c2 file is lost"
   },
   "WATERFALL_MELODY_LONG": {
    "category": "music",
@@ -7608,7 +8902,13 @@
     "gsjs:items/include/master_garden.js:196 (potionTendGarden)",
     "gsjs:items/include/master_garden.js:199 (potionTendGarden)",
     "gsjs:items/watering_can.js (tool class sound while working)"
-   ]
+   ],
+   "file": "assets/audio/sfx/WATERING_CAN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/watering%20can.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "watering can.mp3",
+   "why": "The Irrigator 9000 is the upgraded watering can with no file of its own."
   },
   "WHISTLE_SONG": {
    "category": "music",
@@ -7645,7 +8945,14 @@
    ],
    "sources": [
     "gsjs:items/special_item_that_only_beta_testers_get.js:447 (scream)"
-   ]
+   ],
+   "file": "assets/audio/sfx/WILHELM_SCREAM.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/beta%20pickle%20gag.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "beta pickle gag.mp3",
+   "why": "The same pickle's scream() announces WILHELM_SCREAM (js:447); the gag is its other sound.",
+   "doubt": "a gag, not a scream"
   },
   "WINTER_HUB1": {
    "category": "music",
@@ -7840,7 +9147,13 @@
    ],
    "sources": [
     "gsjs:players/inc_games.js:697 (games_end_it_game)"
-   ]
+   ],
+   "file": "assets/audio/sfx/YOU_LOSE.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/game%20of%20crowns-lose.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "game of crowns-lose.mp3",
+   "why": "inc_games.js:697 games_end_it_game."
   },
   "YOU_LOSE_CROWN": {
    "category": "event",
@@ -7851,7 +9164,14 @@
    ],
    "sources": [
     "gsjs:players/inc_games.js:526 (games_is_not_it)"
-   ]
+   ],
+   "file": "assets/audio/sfx/YOU_LOSE_CROWN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/game%20of%20crowns-crown%202.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "game of crowns-crown 2.mp3",
+   "why": "inc_games.js:526.",
+   "doubt": "which numbered crown take is which"
   },
   "YOU_TAKE_CROWN": {
    "category": "event",
@@ -7866,7 +9186,14 @@
     "street:GIFM4BD43383DKV (Le Miserable p1_sounds_b)",
     "street:GIFM4BD43383DKV (Le Miserable p2_sounds_b)",
     "street:GIFM4BD43383DKV (Le Miserable p3_sounds_b)"
-   ]
+   ],
+   "file": "assets/audio/sfx/YOU_TAKE_CROWN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/game%20of%20crowns-crown%203.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "game of crowns-crown 3.mp3",
+   "why": "inc_games.js:447; the longest, brightest take. Le Misérable also reuses YOU_TAKE_CROWN as its success chime.",
+   "doubt": "which numbered crown take is which"
   },
   "YOU_WIN": {
    "category": "ui",
@@ -7879,7 +9206,12 @@
    "sources": [
     "gsjs:players/inc_games.js:688 (games_end_it_game)",
     "client:com/tinyspeck/engine/view/ui/imagination/ImaginationPurchaseUpgradeUI.as:226 (show)"
-   ]
+   ],
+   "file": "assets/audio/sfx/YOU_WIN.mp3",
+   "origin": "archiveorg-sfx",
+   "source": "https://archive.org/download/glitch-mmo-sfx-tiny-speck/success-you%20win%20game%20of%20crowns.mp3",
+   "archiveItem": "glitch-mmo-sfx-tiny-speck",
+   "archiveFile": "success-you win game of crowns.mp3"
   },
   "ZUTTO1": {
    "category": "music",

@@ -1,10 +1,12 @@
 {
   "source": "glitch-GameServerJS/main.js ambient_library + ambient_hub_map; public-domain music from glitchthegame.com/downloads (Wayback 2013-12-14)",
-  "note": "Original client picked a random track from ambient_library[set] when entering a hub. Streets could override via geometry.music_file (announce_music). Full c2.glitch.bz/sounds ambient libraries (Forest_Theme_*, CAVERN_*, Highlands_*, etc.) were never archived at exact CDN URLs — we use the complete public /downloads/ music catalog as stand-ins keyed to hub themes.",
+  "note": "Original client picked a random track from ambient_library[set] when entering a hub. Streets could override via geometry.music_file (announce_music). Full c2.glitch.bz/sounds ambient libraries (Forest_Theme_*, CAVERN_*, Highlands_*, etc.) were never archived at exact CDN URLs — we use the complete public /downloads/ music catalog as stand-ins keyed to hub themes. The archive.org music item (glitch-mmo-tiny-speck-music, 31 tracks) matches files we already ship byte for byte; its ringtone item (esquebeth-quest) adds Meditation (Round Two in Seven) = MEDITATIVE_ARTS_01, Goodnight Groddle = GOODNIGHT_GRODDLE and 20 more Musicblock tunes, and the sfx item adds ROOK_FLOCK (rook flight); ROOK_ATTACK is the ringtone 'The Rook' (best guess). Those live in assets/audio/sfx/<KEY>.mp3 (tools/sound/archiveorg-sfx-map.json).",
   "recovered": {
     "downloadsCatalog": 46,
     "cdnAmbientLibraries": 0,
-    "localAmbientTracks": 34
+    "localAmbientTracks": 34,
+    "archiveorgRingtones": 22,
+    "archiveorgRookCues": 2
   },
   "defaultTheme": "default",
   "themes": {
@@ -16,7 +18,8 @@
         "assets/audio/ambient/Groddle-Forest-Theme_1291876879.mp3",
         "assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3",
         "assets/audio/ambient/Groddle-Theme-Dreamland-Mix_1291876965.mp3",
-        "assets/audio/ambient/enchanted_woods_1344997332.mp3"
+        "assets/audio/ambient/enchanted_woods_1344997332.mp3",
+        "assets/audio/sfx/GOODNIGHT_GRODDLE.mp3"
       ]
     },
     "caverns": {
@@ -75,7 +78,8 @@
         "assets/audio/ambient/meditation1_1344997850.mp3",
         "assets/audio/ambient/meditation2_1344997844.mp3",
         "assets/audio/ambient/meditation3_1344997842.mp3",
-        "assets/audio/ambient/meditation4_1344997846.mp3"
+        "assets/audio/ambient/meditation4_1344997846.mp3",
+        "assets/audio/sfx/MEDITATIVE_ARTS_01.mp3"
       ]
     },
     "bortola_muufo": {
@@ -138,14 +142,17 @@
       "label": "Rook woods",
       "gsjsKeys": ["ROOK_ATTACK", "ROOK_FLOCK"],
       "tracks": [
+        "assets/audio/sfx/ROOK_FLOCK.mp3",
+        "assets/audio/sfx/ROOK_ATTACK.mp3",
         "assets/audio/ambient/rooks_woods_1344997275.mp3",
         "assets/audio/ambient/Dirge-of-the-Damned_1291886020.mp3"
       ]
     },
     "meditation": {
       "label": "Meditation / focus",
-      "gsjsKeys": ["FOCUSED_MEDITATION_ENERGY", "TRANSCENDENTAL_MEDITATION_01"],
+      "gsjsKeys": ["MEDITATIVE_ARTS_01", "MEDITATIVE_ARTS_02", "FOCUSED_MEDITATION_ENERGY", "FOCUSED_MEDITATION_MOOD", "TRANSCENDENTAL_MEDITATION_01"],
       "tracks": [
+        "assets/audio/sfx/MEDITATIVE_ARTS_01.mp3",
         "assets/audio/ambient/Meditation_1291879502.mp3",
         "assets/audio/ambient/meditation1_1344997850.mp3",
         "assets/audio/ambient/meditation2_1344997844.mp3",
@@ -160,14 +167,35 @@
     },
     "musicblocks": {
       "label": "Musicblocks (collectible snippets)",
-      "gsjsKeys": ["MUSICBLOCK_D_GREEN_01", "MUSICBLOCK_D_RED_01"],
+      "gsjsKeys": ["MUSICBLOCK_D_GREEN_01", "MUSICBLOCK_D_RED_01", "MUSICBLOCK_GOODNIGHT_GRODDLE"],
       "tracks": [
         "assets/audio/ambient/Musicblock-DG-2_1291896713.mp3",
         "assets/audio/ambient/Musicblock-DG-3_1291896740.mp3",
         "assets/audio/ambient/Musicblock-DR-1_1291896467.mp3",
         "assets/audio/ambient/Musicblock-DR-5_1291896506.mp3",
         "assets/audio/ambient/Musicblock-XS-2_1292035400.mp3",
-        "assets/audio/ambient/Musicblock-XS-3_1291896779.mp3"
+        "assets/audio/ambient/Musicblock-XS-3_1291896779.mp3",
+        "assets/audio/sfx/MUSICBLOCK_B_BROWN_01.mp3",
+        "assets/audio/sfx/MUSICBLOCK_B_BROWN_02.mp3",
+        "assets/audio/sfx/MUSICBLOCK_B_BROWN_03.mp3",
+        "assets/audio/sfx/MUSICBLOCK_B_BROWN_04.mp3",
+        "assets/audio/sfx/MUSICBLOCK_B_BROWN_05.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_BLUE_01.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_BLUE_02.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_BLUE_03.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_BLUE_04.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_BLUE_05.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_GREEN_01.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_GREEN_04.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_GREEN_05.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_RED_02.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_RED_03.mp3",
+        "assets/audio/sfx/MUSICBLOCK_D_RED_04.mp3",
+        "assets/audio/sfx/MUSICBLOCK_X_SHINY_01.mp3",
+        "assets/audio/sfx/MUSICBLOCK_X_SHINY_04.mp3",
+        "assets/audio/sfx/MUSICBLOCK_X_SHINY_05.mp3",
+        "assets/audio/sfx/MUSICBLOCK_SB_SECRET_01.mp3",
+        "assets/audio/sfx/GOODNIGHT_GRODDLE.mp3"
       ]
     },
     "party_moon": {

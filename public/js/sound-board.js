@@ -41,6 +41,7 @@ export function resolveSound(name) {
  *   fetchImpl?: typeof fetch,
  *   volume?: number,
  *   now?: () => number,
+ *   onPlayed?: (last: string) => void,
  * }} host
  */
 export function createSoundBoard(host) {
@@ -97,7 +98,8 @@ export function createSoundBoard(host) {
 
   function track(handle, seconds) {
     voices.add(handle);
-    setTimeout(() => voices.delete(handle), Math.ceil((seconds + 0.3) * 1000));
+    // unref: a looping voice (600 s) must not hold a Node test runner open.
+    setTimeout(() => voices.delete(handle), Math.ceil((seconds + 0.3) * 1000))?.unref?.();
     return handle;
   }
 
@@ -132,10 +134,17 @@ export function createSoundBoard(host) {
     if (opts.loop) src.loop = true;
     src.connect(gain);
     src.start(0);
-    if (opts.maxSeconds) src.stop(ctx.currentTime + opts.maxSeconds);
+    if (opts.maxSeconds) {
+      // Fade the last 120 ms so a capped long take does not click.
+      const end = ctx.currentTime + opts.maxSeconds;
+      gain.gain.setValueAtTime(gain.gain.value, Math.max(ctx.currentTime, end - 0.12));
+      gain.gain.linearRampToValueAtTime(0.0001, end);
+      src.stop(end + 0.02);
+    }
     src.onended = () => { try { gain.disconnect(); } catch { /* */ } };
     stats.file += 1;
     stats.last = `${resolved.key}:file`;
+    host.onPlayed?.(stats.last);
     const seconds = opts.loop ? 600 : buffer.duration / (opts.rate ?? 1);
     return track({ key: resolved.key, kind: 'file', stop: stopper(ctx, gain, src) }, seconds);
   }
@@ -154,6 +163,7 @@ export function createSoundBoard(host) {
     setTimeout(() => { try { gain.disconnect(); } catch { /* */ } }, Math.ceil((seconds + 0.5) * 1000));
     stats.synth += 1;
     stats.last = `${resolved.key}:synth:${resolved.recipe}`;
+    host.onPlayed?.(stats.last);
     return track({ key: resolved.key, kind: 'synth', recipe: resolved.recipe, stop: stopper(ctx, gain, null) }, seconds);
   }
 
@@ -206,7 +216,8 @@ export function createSoundBoard(host) {
 
   /**
    * Repeat a key while an action runs. Files loop natively; recipes re-fire
-   * every intervalMs. Returns a handle whose stop() ends the loop.
+   * every intervalMs. A cold file ticks its recipe until the file arrives, then
+   * hands over to the native loop. Returns a handle whose stop() ends the loop.
    */
   function loop(name, { intervalMs = 650, durationMs = 0, volume = 0.6, rate = 1, jitter = 0.04 } = {}) {
     const resolved = resolveSound(name);
@@ -221,8 +232,15 @@ export function createSoundBoard(host) {
       if (resolved.file) load(resolved.file);
       const tick = () => {
         if (stopped || now() >= endAt) return;
-        current = play(resolved.key, { volume, rate, jitter, allowMultiple: true, synth: true, seed: Math.floor(Math.random() * 1000) });
-        timer = setTimeout(tick, intervalMs);
+        if (resolved.file && buffers.has(resolved.file)) {
+          const left = endAt === Infinity ? 0 : (endAt - now()) / 1000;
+          current = play(resolved.key, { volume, rate, loop: true, allowMultiple: true, maxSeconds: left });
+          return;
+        }
+        current = resolved.recipe
+          ? play(resolved.key, { volume, rate, jitter, allowMultiple: true, synth: true, seed: Math.floor(Math.random() * 1000) })
+          : null;
+        timer = setTimeout(tick, resolved.recipe ? intervalMs : 120);
       };
       tick();
     }
