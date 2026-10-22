@@ -817,6 +817,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
       spr.anchor.set(0.5, 1);
       // h_flip mirrors the deco about its registration point.
       const sizeDeco = () => {
+        // The street may be gone before a slow texture arrives.
+        if (spr.destroyed) return;
         if (deco.w > 0) spr.width = deco.w;
         if (deco.h > 0) spr.height = deco.h;
         if (deco.flip) spr.scale.x = -Math.abs(spr.scale.x);
