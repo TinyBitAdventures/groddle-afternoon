@@ -512,6 +512,70 @@ export function expandInterior(state, inv = {}) {
   return { ok: true, wallSegments: state.wallSegments, width: interiorWidth(state) };
 }
 
+/**
+ * locations/inc_homes.js homes_get_expand_costs `unexpand` (2012-03-30, one
+ * floor): wall segments past MIN_WALL_SEGMENTS can come off again, and each
+ * refunds the parts it was built from. The refund steps with the segment so a
+ * full set of four gives the beams and the girder back:
+ *   segs = count - (START - MIN), raised by 4 until >= 0
+ *   2 Wood Posts and 6 Boards per floor, 8 Barnacle Talc on even segs (else 7),
+ *   a Beam on even segs, a Girder every fourth.
+ */
+export const UNEXPAND_TEXT = Object.freeze({
+  button: 'Un-expand',
+  title: 'Un-expand your house',
+  body: 'Un-expanding will remove one expansion from the right side of your house, making your house narrower by one wall segment.',
+  refund: 'You’ll be refunded the following materials:',
+  confirmTitle: 'Un-expand your house?',
+  confirm: "Are you sure you want to un-expand? Your stuff will automatically move over, don't worry.",
+  yes: 'Yes. Un-expand it!',
+  no: 'Nevermind',
+  min: 'Your house is already sooo small!',
+});
+
+export function quoteInteriorUnexpand(state) {
+  const inner = Math.max(0, Math.floor(finite(state?.wallSegments, HOME_LIMITS.START_WALL_SEGMENTS)) - 2);
+  const count = state?.layout === 'tower' ? 0 : Math.max(0, inner - (HOME_LIMITS.MIN_WALL_SEGMENTS - 2));
+  if (!count) return { ok: false, reason: 'min', count: 0, items: {}, msg: UNEXPAND_TEXT.min };
+  let segs = count - (HOME_LIMITS.START_WALL_SEGMENTS - HOME_LIMITS.MIN_WALL_SEGMENTS);
+  while (segs < 0) segs += 4;
+  const floors = 1;
+  const items = {
+    wood_post: floors * 2,
+    board: floors * 6,
+    barnacle_talc: floors * (segs % 2 === 0 ? 8 : 7),
+  };
+  if (segs % 2 === 0) items.beam = floors;
+  if (segs % 4 === 0) items.girder = floors;
+  return { ok: true, count, items };
+}
+
+/**
+ * homes_unexpand: the last wall segment before the right end cap goes (its
+ * wallpaper with it: the second-to-last swatch is dropped), and everything
+ * standing in the last 300 px moves 150 px left. Returns the refund.
+ */
+export function unexpandInterior(state, inv = {}) {
+  const quote = quoteInteriorUnexpand(state);
+  if (!quote.ok) return quote;
+  const edge = interiorWidth(state) - 300;
+  state.wallSegments -= 1;
+  if (Array.isArray(state.walls) && state.walls.length >= 2) {
+    const last = state.walls.pop();
+    state.walls[state.walls.length - 1] = last;
+  }
+  const moved = [];
+  for (const row of state.placed) {
+    if (row.x >= edge) {
+      row.x -= SEGMENT_W;
+      moved.push(row.id);
+    }
+  }
+  fitPlacements(state, null);
+  for (const [cls, n] of Object.entries(quote.items)) inv[cls] = (Number(inv[cls]) || 0) + n;
+  return { ok: true, wallSegments: state.wallSegments, width: interiorWidth(state), items: { ...quote.items }, moved, edge };
+}
+
 /** Storage Display Box: deposit pack items of one class (bag_furniture_sdb). */
 export function displayDeposit(state, inv, id, classTsid, qty = 1) {
   const box = itemById(state, id);

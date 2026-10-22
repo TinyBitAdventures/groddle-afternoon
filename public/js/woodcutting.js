@@ -8,6 +8,7 @@
 
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { woodHarvestOverrides } from './imagination-effects.js';
+import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=g5-1';
 
 export const WOOD_TREE_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 
@@ -47,14 +48,20 @@ export function ensureWoodTreeState(state = {}) {
   state.totalHarvests = whole(state.totalHarvests, 0);
   state.petted = state.petted === true;
   state.watered = state.watered === true;
+  if (state.enchanted !== true) delete state.enchanted;
   delete state.harvest_count;
   delete state.harvested;
   return state;
 }
 
-export function plankYieldForMaturity(maturity) {
+/**
+ * plankProdMap[maturity - 1]. An enchanted tree (wood_tree_enchanted.js,
+ * state.enchanted) has its own map, 10-60 instead of 25-80.
+ */
+export function plankYieldForMaturity(maturity, state = null) {
   const index = whole(maturity, 1, 1, 6) - 1;
-  return WOOD_TREE_HARVEST.plankYieldByMaturity[index];
+  const map = state?.enchanted === true ? ENCHANTED_WOOD_TREE.plankYieldByMaturity : WOOD_TREE_HARVEST.plankYieldByMaturity;
+  return map[index];
 }
 
 export function woodMaturityLabel(maturity) {
@@ -64,7 +71,7 @@ export function woodMaturityLabel(maturity) {
 export function woodTreeStatusLabel(state = {}) {
   const s = ensureWoodTreeState(state);
   if (s.maturity <= 0) return 'Cleared · only a patch remains';
-  const yieldCount = plankYieldForMaturity(s.maturity);
+  const yieldCount = plankYieldForMaturity(s.maturity, s);
   const base = s.harvestedToday
     ? `${woodMaturityLabel(s.maturity)} · harvested today`
     : `${woodMaturityLabel(s.maturity)} · ${yieldCount} planks · Hatchet required`;
@@ -110,7 +117,7 @@ export function quoteWoodTreeHarvest(state, inv = {}, pc = {}, toolState = {}) {
     durationMs: WOOD_TREE_HARVEST.durationMs,
     energyCost,
     hatchetWear,
-    plankYield: plankYieldForMaturity(s.maturity),
+    plankYield: plankYieldForMaturity(s.maturity, s),
     maturity: s.maturity,
     condition: tool.condition,
   };

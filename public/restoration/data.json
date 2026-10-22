@@ -1395,9 +1395,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 254,
+  "commits": 255,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Tiny Speck's own 109 wallpapers, floors and ceilings, papered wall by wall"
+   },
    {
     "date": "2026-10-22",
     "kind": "fix",
@@ -1512,14 +1517,9 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Room 15 and the Ventilation Room in Jethimadh Tower Base, with their four secret spots"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "The third shrine you pass says \"Lo, a shrine to …\""
    }
   ]
  },
- "tests": 161,
+ "tests": 164,
  "generatedAt": "2026-10-22"
 }

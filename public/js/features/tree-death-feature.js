@@ -69,7 +69,7 @@ import {
   quotePoisonVerb,
   treeDeathOutcome,
 } from '../tree-poison.js';
-import { patchesFeature } from './patches-feature.js?v=patches-2';
+import { patchesFeature } from './patches-feature.js?v=patches-3';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';
@@ -104,9 +104,12 @@ const overlays = new Map();
 // Pure helpers (tested in tests/tree-death.test.js)
 // ---------------------------------------------------------------------------
 
-/** A tree target this feature works on: living, not owned by another feature. */
+/**
+ * A tree target this feature works on: living, not owned by another feature.
+ * wood_tree.js poison conditions return null for wood_tree_enchanted.
+ */
 export function isTreeTarget(target) {
-  return Boolean(target && !target.featureId && target.state && isPoisonableTree(target.classId) && target.sprite);
+  return Boolean(target && !target.featureId && target.state && target.state.enchanted !== true && isPoisonableTree(target.classId) && target.sprite);
 }
 
 /** The street tree slot (game.js spawnTrees keeps trees[i].state === target.state). */

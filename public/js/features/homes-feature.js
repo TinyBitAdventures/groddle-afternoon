@@ -62,12 +62,15 @@ import {
   placeFurniture,
   placedItem,
   quoteInteriorExpansion,
+  quoteInteriorUnexpand,
   renderOrder,
   restackFurniture,
   setHomeTexture,
   snapPlacement,
   textureConfig,
-} from '../home-decor.js?v=home-decor-2';
+  unexpandInterior,
+  UNEXPAND_TEXT,
+} from '../home-decor.js?v=home-decor-3';
 import {
   nearestFreeRx,
   FIREFLY_HIVE,
@@ -94,7 +97,7 @@ import { towerApi } from './home-tower-feature.js?v=home-tower-2';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-1';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-2';
-import { patchesFeature } from './patches-feature.js?v=patches-2';
+import { patchesFeature } from './patches-feature.js?v=patches-3';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import { textureFromUrl } from '../textures.js';
 
@@ -1360,6 +1363,12 @@ function renderDecorateBody(engine, body) {
         text: `Expand house (${engine.inv.wall_segment || 0} Wall Segment${(engine.inv.wall_segment || 0) === 1 ? '' : 's'})`,
         onclick: () => expandHouse(engine),
       }),
+      el('button', {
+        type: 'button',
+        'data-home-unexpand': 'house',
+        text: UNEXPAND_TEXT.button,
+        onclick: () => confirmUnexpand(engine),
+      }),
     ]));
     if (!quote.ok && quote.msg) body.append(el('p', { class: 'hb-note', text: quote.msg }));
     return;
@@ -1601,6 +1610,59 @@ function expandHouse(engine) {
   engine.refreshPack();
   engine.save();
   engine.refreshHomeScene?.();
+  return result;
+}
+
+const ITEM_NAMES = Object.freeze({
+  wood_post: ['Wood Post', 'Wood Posts'],
+  board: ['Board', 'Boards'],
+  barnacle_talc: ['Barnacle Talc', 'Barnacle Talc'],
+  beam: ['Beam', 'Beams'],
+  girder: ['Girder', 'Girders'],
+});
+
+/** HouseExpandDialog TYPE_UNEXPAND: what comes back, "2 Wood Posts, 6 Boards and 1 Beam". */
+function refundList(items) {
+  const parts = Object.entries(items).map(([cls, n]) => `${n} ${(ITEM_NAMES[cls] || [cls, cls])[n === 1 ? 0 : 1]}`);
+  return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}` : parts.join('');
+}
+
+/** DecorateToolbarUI Un-expand -> HouseExpandDialog -> its confirm dialog -> houses_unexpand. */
+function confirmUnexpand(engine) {
+  const quote = quoteInteriorUnexpand(decor);
+  if (!quote.ok) {
+    engine.toast(quote.msg, 2400);
+    return quote;
+  }
+  engine.offerQuestDialogue({
+    title: UNEXPAND_TEXT.title,
+    kicker: 'Decorate',
+    beats: [
+      { text: `${UNEXPAND_TEXT.body} ${UNEXPAND_TEXT.refund} ${refundList(quote.items)}.`, response: 'Un-expand it' },
+      { text: UNEXPAND_TEXT.confirm, response: UNEXPAND_TEXT.yes },
+    ],
+    acceptLabel: UNEXPAND_TEXT.yes,
+    declineLabel: UNEXPAND_TEXT.no,
+    onAccept: () => unexpandHouse(engine),
+  });
+  return quote;
+}
+
+function unexpandHouse(engine) {
+  const result = unexpandInterior(decor, engine.inv);
+  if (!result.ok) {
+    engine.toast(result.msg || UNEXPAND_TEXT.min);
+    return result;
+  }
+  // homes_unexpand moves players standing in the last 300 px over too.
+  const p = engine.player;
+  if (p && scene?.room === 'interior' && !scene.tower && p.x >= result.edge) p.x -= 150;
+  engine.pushActivity(`You un-expanded your house. Refunded: ${refundList(result.items)}.`);
+  engine.refreshPack();
+  engine.save();
+  engine.refreshHomeScene?.();
+  renderBar(engine);
+  engine.setData('homeUnexpanded', result.wallSegments);
   return result;
 }
 

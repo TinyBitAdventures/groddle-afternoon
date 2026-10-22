@@ -92,15 +92,12 @@ export const BUILT_ROOMS = Object.freeze([
  * feature (questCustomPrereq).
  */
 export const OFFER_OVERRIDES = Object.freeze({
-  // npc_juju_bandit roamed the four Kajuu hubs; onAccepted picks the clue hub from where you stand.
+  // npc_juju_bandit.js giveQuest offers it (setAvailableQuests): the bandit a Savanna Dust Trap
+  // brings while the quest is 'none' (features/juju-bandits-feature.js). onAccepted picks the
+  // clue hub from where you stand.
   help_juju_bandits: {
-    offerTriggers: [
-      { type: 'region', region: '86' },
-      { type: 'region', region: '91' },
-      { type: 'region', region: '95' },
-      { type: 'region', region: '90' },
-    ],
-    why: 'npc_juju_bandit is not in the remake; offered in its four Kajuu hubs (Baqala, Zhambu, Xalanga, Choru)',
+    offerTriggers: [{ type: 'npc', npc: 'npc_juju_bandit' }],
+    why: 'npc_juju_bandit offers it: a Dust Trap in Baqala, Zhambu, Xalanga or Choru brings one half the time while the quest is new (dust_trap.js, juju_bandit_curse)',
   },
   // The Bag Butler handed out the invitation (xp 30128); there is no butler.
   join_club: {

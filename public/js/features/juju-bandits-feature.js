@@ -1,0 +1,504 @@
+/**
+ * Overworld Juju Bandits as a feature module (see js/feature-host.js;
+ * rules and copy in js/juju-bandits.js).
+ *
+ * A Dust Trap that pays out in a Savanna hub (Baqala, Choru, Zhambu,
+ * Xalanga) may bring a Juju Bandit 1 s later (dust_trap.js, juju_bandit_curse):
+ * while Carry That Weight is new, half the time, and that Juju wants your help
+ * rather than your stuff. It appears 250 px away ("One of the notorious Juju
+ * Bandits has appeared, and he… needs your help?"), declares, follows once you
+ * move, and when it reaches you (50 x 50 px) offers the quest. Accept and it
+ * shrinks away; say no and it rage quits ("You haven't seen the last of the
+ * Juju Bandits!", juju_bandits/escaped). Leaving the street mid-chase counts
+ * as an escape too (onPlayerExit -> rageQuit).
+ *
+ * The thieving Juju (the same chase, then one item taken, or a rage quit when
+ * you stand by a signpost) waits on the Ancestral Nostalgia timer its chance
+ * comes from; &jujudemo=steal brings one for QA.
+ *
+ * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=<Savanna street>
+ *   &jujudemo=offer|steal   a Juju appears 1 s after load (offer needs the quest new)
+ *   &jujuroll=0..1          the dust_trap.js roll for real Dust Trap triggers
+ *   &jujuitem=<class>       the item a stealing Juju wants (default: the first it finds)
+ *   &jujuautoplay=accept|decline  answer the offer
+ * Canvas data: jujuState, jujuMode, jujuItem, jujuLast, jujuEscaped, jujuX.
+ */
+
+import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-3';
+import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js';
+import { groundBeneath, platformYAt, platformsScreen } from '../street-model.js';
+import { sheetFrames } from '../quest-rooms/kit.js?v=qi-1';
+import {
+  JUJU_BANDIT,
+  JUJU_QUEST,
+  JUJU_SHEETS,
+  JUJU_PLAYER_LABEL,
+  JUJU_SHEET_COLS,
+  JUJU_TEXT,
+  jujuAnchor,
+  jujuCurse,
+  jujuLine,
+  jujuSheetUrl,
+  jujuSpawnX,
+  jujuWants,
+  nearSignpost,
+  redeclareDelay,
+  withinReach,
+} from '../juju-bandits.js?v=g5-1';
+
+export const JUJU_FEATURE_ID = 'juju-bandits';
+const Z = 30;
+const FPS_SPEED = 0.5; // 30 fps sheets on a 60 fps ticker
+/** The tallest lip it walks up (it never jumps; apiFindPath had npc_can_jump false). */
+const STEP_UP = 30;
+
+let bandit = null;
+let pendingCurseAt = 0;
+let escaped = 0;
+let last = '';
+let demoDone = false;
+let platforms = [];
+let demoMode = null;
+
+const pcLabel = () => JUJU_PLAYER_LABEL;
+
+function questCtx(engine) {
+  return {
+    level: engine.pc.level,
+    xp: engine.pc.xp,
+    skills: engine.learnedSkills,
+    achievements: engine.unlockedAchievements,
+    inv: engine.inv,
+    pc: engine.pc,
+    hub: engine.street?.hubId || '',
+    now: Date.now(),
+  };
+}
+
+function publish(engine) {
+  engine.setData('jujuState', bandit ? bandit.state : '');
+  engine.setData('jujuMode', bandit ? bandit.mode : '');
+  engine.setData('jujuItem', bandit?.itemClass || '');
+  engine.setData('jujuLast', last);
+  engine.setData('jujuEscaped', escaped);
+  engine.setData('jujuX', bandit ? Math.round(bandit.x) : '');
+  engine.setData('jujuY', bandit ? Math.round(bandit.y) : '');
+}
+
+/* ------------------------------------------------------------------ */
+/* View                                                                 */
+/* ------------------------------------------------------------------ */
+
+function setState(engine, name) {
+  if (!bandit) return;
+  bandit.state = name;
+  const def = JUJU_SHEETS[name];
+  const url = jujuSheetUrl(bandit.variant, bandit.bandana, name);
+  const sheet = (bandit.sheets[name] ||= sheetFrames(engine.PIXI, url, JUJU_SHEET_COLS, Math.ceil(def.frames / JUJU_SHEET_COLS), def.frames));
+  const spr = bandit.sprite;
+  const a = jujuAnchor(name);
+  const apply = () => {
+    if (!bandit || bandit.sprite !== spr || spr.destroyed || bandit.state !== name || !sheet.frames.length) return;
+    spr.anchor.set(a.x, a.y);
+    spr.textures = sheet.frames;
+    spr.loop = def.loop;
+    spr.onComplete = null;
+    if (def.loop && def.loopFrom) {
+      // npc_juju_bandit.as loop_froms: the walk loops back to frame 8.
+      spr.onFrameChange = (f) => { if (f === def.frames - 1) spr.gotoAndPlay(def.loopFrom); };
+    } else spr.onFrameChange = null;
+    spr.gotoAndPlay(0);
+  };
+  if (sheet.frames.length) apply();
+  else bandit.waiting = { name, apply, sheet };
+  publish(engine);
+  engine.setData('jujuState', name);
+}
+
+function dropView() {
+  if (!bandit) return;
+  for (const obj of [bandit.sprite, bandit.hit]) {
+    if (obj && !obj.destroyed) {
+      obj.parent?.removeChild(obj);
+      obj.destroy({ children: true });
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Behaviour (npc_juju_bandit.js)                                       */
+/* ------------------------------------------------------------------ */
+
+function say(engine, text, ms = 4000) {
+  if (bandit?.hit) engine.say(bandit.talker, text, ms);
+}
+
+function spawn(engine, { mode, itemClass, now = Date.now() }) {
+  const { PIXI } = engine;
+  const p = engine.player;
+  const street = engine.street;
+  const width = street.bounds.r - street.bounds.l;
+  platforms = platformsScreen(street);
+  const x = jujuSpawnX(p.x, width, Math.random());
+  // apiGetPointOnTheClosestPlatformLineBelow(x, pc.y - 800), then apiFindPath to
+  // the player. The remake's Juju only walks and drops (no pathfinder), so it
+  // appears on the floor nearest your own level there, and falls back to the
+  // source point.
+  const ground = floorNear(platforms, x, p.y) || groundBeneath(platforms, x, p.y - JUJU_BANDIT.spawnSearchUp, 0);
+  if (!ground) return false;
+  const variant = JUJU_BANDIT.variants[Math.floor(Math.random() * 3)];
+  const bandana = JUJU_BANDIT.bandanas[Math.floor(Math.random() * 3)];
+  const sprite = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
+  sprite.animationSpeed = FPS_SPEED;
+  sprite.zIndex = Z;
+  sprite.x = x;
+  sprite.y = ground.y;
+  engine.entityLayer.addChild(sprite);
+  // A body-sized stand-in so bubbles sit on the Juju, not its 254 px frame.
+  const hit = new PIXI.Container();
+  hit.x = x;
+  hit.y = ground.y;
+  hit.eventMode = 'none';
+  const g = new PIXI.Graphics();
+  g.rect(-28, -76, 56, 76).fill({ color: 0xffffff, alpha: 0.001 });
+  hit.addChild(g);
+  engine.entityLayer.addChild(hit);
+  bandit = {
+    mode,
+    itemClass,
+    variant,
+    bandana,
+    x,
+    y: ground.y,
+    dir: p.x < x ? -1 : 1,
+    sprite,
+    hit,
+    talker: { sprite: hit, label: JUJU_BANDIT.label },
+    sheets: {},
+    state: '',
+    spawning: true,
+    playerStartX: p.x,
+    readyToSteal: false,
+    done: false,
+    walkTo: null,
+    at: { alert: now + JUJU_BANDIT.alertMs, declare: now + JUJU_BANDIT.declareMs, follow: 0, escape: 0, gone: 0 },
+  };
+  sprite.scale.x = bandit.dir;
+  setState(engine, 'spawn');
+  engine.playSound?.('JUJU_BANDIT_SPAWN', { volume: 0.5 });
+  last = `appeared:${mode}`;
+  publish(engine);
+  return true;
+}
+
+/** The platform at x whose top is nearest feet height y (within 160 px), or null. */
+function floorNear(list, x, y) {
+  let best = null;
+  for (const p of list) {
+    const py = platformYAt(p, x, 0);
+    if (py == null || Math.abs(py - y) > 160) continue;
+    if (!best || Math.abs(py - y) < Math.abs(best.y - y)) best = { y: py, platform: p };
+  }
+  return best;
+}
+
+function stopMoving(engine) {
+  if (!bandit) return;
+  bandit.walkTo = null;
+  setState(engine, bandit.state === 'walk' ? 'walk_end' : 'idle1');
+}
+
+function escape(engine, now) {
+  if (!bandit) return;
+  bandit.at = { alert: 0, declare: 0, follow: 0, escape: 0, gone: now + JUJU_BANDIT.shrinkMs };
+  bandit.walkTo = null;
+  setState(engine, 'shrink');
+  engine.playSound?.('JUJU_BANDIT_SHRINK', { volume: 0.5 });
+}
+
+function rageQuit(engine, now, reason = 'declined') {
+  if (!bandit) return;
+  say(engine, JUJU_TEXT.rageQuit, 3500);
+  bandit.done = true;
+  bandit.walkTo = null;
+  bandit.at = { alert: 0, declare: 0, follow: 0, escape: now + JUJU_BANDIT.rageQuitMs, gone: 0 };
+  escaped += 1;
+  engine.achievement('juju_bandits:escaped', 1);
+  setState(engine, 'idle2');
+  last = `rage_quit:${reason}`;
+  engine.save();
+}
+
+function giveQuest(engine, now) {
+  if (!bandit?.readyToSteal || bandit.done) return;
+  bandit.done = true;
+  bandit.at.follow = 0;
+  bandit.at.declare = 0;
+  stopMoving(engine);
+  const card = npcQuestOffers(engine.questState, JUJU_BANDIT.classTsid, engine.pc, questCtx(engine)).offered.find((c) => c.classTsid === JUJU_QUEST);
+  if (!card) {
+    rageQuit(engine, now, 'no_offer');
+    return;
+  }
+  last = 'offering';
+  publish(engine);
+  let answered = false;
+  const finish = (accepted) => {
+    if (answered) return;
+    answered = true;
+    if (bandit) bandit.offerOpen = false;
+    const t = Date.now();
+    if (accepted) {
+      const result = acceptOffer(engine.questState, JUJU_QUEST, questCtx(engine));
+      if (result.ok) {
+        engine.pushActivity(`New quest: ${card.def.title}`);
+        engine.refreshPack();
+        engine.save();
+        last = 'accepted';
+        escape(engine, t);
+        publish(engine);
+        return;
+      }
+    }
+    // onConversationEnding with no quest: rageQuit.
+    rageQuit(engine, t);
+    publish(engine);
+  };
+  bandit.offerOpen = true;
+  engine.offerQuestDialogue({
+    title: card.def.title,
+    kicker: JUJU_BANDIT.label,
+    beats: card.beats,
+    acceptLabel: card.acceptLabel,
+    declineLabel: card.declineLabel,
+    onAccept: () => finish(true),
+    onDecline: () => finish(false),
+  });
+  bandit.finishOffer = finish;
+  const auto = engine.param('jujuautoplay');
+  if (auto === 'accept') setTimeout(() => engine.acceptOpenOffer(), 600);
+  if (auto === 'decline') setTimeout(() => finish(false), 600);
+}
+
+function stealItem(engine, now) {
+  if (!bandit?.readyToSteal || bandit.done) return;
+  const p = engine.player;
+  const street = engine.street;
+  const signposts = (street.signposts || []).map((s) => ({ x: s.x - street.bounds.l, y: s.y - street.bounds.t }));
+  if (nearSignpost(p.x, p.y, signposts)) {
+    rageQuit(engine, now, 'signpost');
+    return;
+  }
+  // takeItemsFromBag: none left -> switchTargets (a ground stack) -> rageQuit.
+  if (countItem(engine.inv, bandit.itemClass) < 1) {
+    rageQuit(engine, now, 'nothing');
+    return;
+  }
+  removeItem(engine.inv, bandit.itemClass, 1);
+  engine.refreshPack();
+  bandit.done = true;
+  bandit.walkTo = null;
+  bandit.at = { alert: 0, declare: 0, follow: 0, escape: now + JUJU_BANDIT.stealEscapeMs, gone: 0 };
+  engine.pushActivity(jujuLine(JUJU_TEXT.stolen, pcLabel(engine), bandit.itemClass));
+  setState(engine, 'swipe');
+  say(engine, JUJU_TEXT.gotIt, 3000);
+  last = `stole:${bandit.itemClass}`;
+  engine.save();
+}
+
+function act(engine, now) {
+  if (bandit.mode === 'offer') giveQuest(engine, now);
+  else stealItem(engine, now);
+}
+
+function makeDeclaration(engine, now) {
+  bandit.at.follow = 0;
+  stopMoving(engine);
+  const p = engine.player;
+  if (withinReach(p, bandit) && !bandit.spawning) {
+    act(engine, now);
+    return;
+  }
+  const pool = bandit.mode === 'offer' ? JUJU_TEXT.offerLines : JUJU_TEXT.stealLines;
+  say(engine, jujuLine(pool[Math.floor(Math.random() * pool.length)], pcLabel(engine), bandit.itemClass));
+  bandit.at.follow = now + JUJU_BANDIT.followAfterDeclareMs;
+  bandit.at.declare = now + redeclareDelay();
+}
+
+function targetFollow(engine, now) {
+  bandit.readyToSteal = true;
+  const p = engine.player;
+  if (bandit.spawning) {
+    if (Math.abs(p.x - bandit.playerStartX) <= JUJU_BANDIT.spawnMoveTolerance) {
+      bandit.at.follow = now + JUJU_BANDIT.spawnRetryMs;
+      return;
+    }
+    bandit.spawning = false;
+  }
+  if (withinReach(p, bandit)) {
+    act(engine, now);
+    return;
+  }
+  bandit.walkTo = p.x;
+  bandit.at.follow = now + JUJU_BANDIT.followMs;
+}
+
+function walk(engine, dtMs) {
+  if (bandit.walkTo == null) return;
+  const dx = bandit.walkTo - bandit.x;
+  if (Math.abs(dx) < 4) {
+    stopMoving(engine);
+    return;
+  }
+  const dir = Math.sign(dx);
+  const step = Math.min(Math.abs(dx), (JUJU_BANDIT.walkSpeed * dtMs) / 1000) * dir;
+  const nx = bandit.x + step;
+  // npc_can_climb / can_fall, no jumping: follow the ground, stop at a wall of a step.
+  const ground = groundBeneath(platforms, nx, bandit.y, STEP_UP);
+  if (!ground || ground.y < bandit.y - STEP_UP) {
+    stopMoving(engine);
+    return;
+  }
+  bandit.x = nx;
+  bandit.y = ground.y;
+  if (bandit.dir !== dir) {
+    bandit.dir = dir;
+    bandit.sprite.scale.x = dir;
+  }
+  if (bandit.state !== 'walk') setState(engine, 'walk');
+}
+
+/* ------------------------------------------------------------------ */
+/* Feature                                                              */
+/* ------------------------------------------------------------------ */
+
+function curse(engine, mode = null) {
+  const status = questStatus(engine.questState, JUJU_QUEST);
+  const roll = Number(engine.param('jujuroll'));
+  const forced = mode || null;
+  const result = forced
+    ? { ok: true, mode: forced, itemClass: engine.param('jujuitem') || jujuWants(engine.inv)[0] || 'paper' }
+    : jujuCurse({
+      hubId: engine.street?.hubId,
+      inv: engine.inv,
+      questStatus: status,
+      pursued: Boolean(bandit),
+      roll: Number.isFinite(roll) && engine.param('jujuroll') !== null ? roll : Math.random(),
+    });
+  // QA: a demo thief needs something to take.
+  if (forced === 'steal' && countItem(engine.inv, result.itemClass) < 1) {
+    addItem(engine.inv, result.itemClass, 3);
+    engine.refreshPack();
+  }
+  if (!result.ok) {
+    last = `no-juju:${result.reason}`;
+    publish(engine);
+    return false;
+  }
+  return spawn(engine, { mode: result.mode, itemClass: result.itemClass });
+}
+
+export const jujuBanditsFeature = {
+  id: JUJU_FEATURE_ID,
+
+  save() {
+    return { escaped };
+  },
+
+  restore(slice) {
+    escaped = Math.max(0, Math.floor(Number(slice?.escaped) || 0));
+  },
+
+  onStreetEnter(street, engine) {
+    bandit = null;
+    pendingCurseAt = 0;
+    platforms = platformsScreen(street);
+    const demo = engine.param('jujudemo');
+    if (!demoDone && (demo === 'offer' || demo === 'steal')) {
+      demoDone = true;
+      pendingCurseAt = Date.now() + JUJU_BANDIT.curseDelayMs;
+      demoMode = demo;
+    }
+    publish(engine);
+  },
+
+  onStreetClear(engine) {
+    // onPlayerExit: a Juju still after you rage quits (one more escape).
+    if (bandit && !bandit.done) {
+      escaped += 1;
+      engine?.achievement?.('juju_bandits:escaped', 1);
+      last = 'left_street';
+    }
+    dropView();
+    bandit = null;
+    pendingCurseAt = 0;
+  },
+
+  /** dust_trap.js doDrop: every payout may bring a Juju (pc.juju_bandit_curse after 1 s). */
+  onEvent(counter, _amount, engine) {
+    if (counter !== 'dust_trap:trigger' || bandit || pendingCurseAt) return;
+    pendingCurseAt = Date.now() + JUJU_BANDIT.curseDelayMs;
+  },
+
+  onTick(dtMs, now, engine) {
+    if (pendingCurseAt && now >= pendingCurseAt) {
+      pendingCurseAt = 0;
+      const mode = demoMode;
+      demoMode = null;
+      if (!bandit && engine.player && engine.street) curse(engine, mode);
+    }
+    if (!bandit) return;
+    // The offer closed with Escape: "Not right now".
+    if (bandit.offerOpen && bandit.finishOffer && !engine.questDialogueOpen()) {
+      bandit.offerOpen = false;
+      bandit.finishOffer(false);
+    }
+    if (!bandit) return;
+    if (bandit.waiting && bandit.waiting.sheet.frames.length) {
+      const w = bandit.waiting;
+      bandit.waiting = null;
+      w.apply();
+    }
+    const at = bandit.at;
+    if (at.gone && now >= at.gone) {
+      dropView();
+      bandit = null;
+      last = last === 'accepted' ? 'gone:accepted' : `gone:${last}`;
+      publish(engine);
+      return;
+    }
+    if (at.escape && now >= at.escape) {
+      at.escape = 0;
+      escape(engine, now);
+    }
+    if (!bandit.done) {
+      if (at.alert && now >= at.alert) {
+        at.alert = 0;
+        engine.pushActivity(bandit.mode === 'offer' ? JUJU_TEXT.alertOffer : JUJU_TEXT.alertSteal);
+      }
+      if (at.declare && now >= at.declare) makeDeclaration(engine, now);
+      if (bandit && !bandit.done && at.follow && now >= at.follow) targetFollow(engine, now);
+      if (bandit && !bandit.done) {
+        walk(engine, dtMs);
+        // onPlayerCollision: the 50 x 50 hit box.
+        if (bandit.readyToSteal && withinReach(engine.player, bandit)) act(engine, now);
+      }
+    }
+    if (bandit && now - (bandit.publishedAt || 0) > 500) {
+      bandit.publishedAt = now;
+      publish(engine);
+    }
+    if (bandit && !bandit.sprite.destroyed) {
+      bandit.sprite.x = bandit.x;
+      bandit.sprite.y = bandit.y;
+      bandit.hit.x = bandit.x;
+      bandit.hit.y = bandit.y;
+    }
+  },
+
+  /** QA / tests. */
+  _state() {
+    return { bandit, escaped, last };
+  },
+};
+

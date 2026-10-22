@@ -38,6 +38,7 @@ import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catal
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
 import { moodMax } from './metabolics.js';
 import { musicblockItemMeta } from './musicblocks.js';
+import { isEnchantedForest } from './enchanted-forests.js?v=g5-1';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -251,6 +252,8 @@ const CAVE_WORDS = /(cave|cavern|grotto|tunnel|hollow)/i;
 
 export function isBatterflyHabitat(street = {}) {
   if (!street) return false;
+  // The Enchanted Forest wood tree hollows (js/enchanted-forests.js) are no caves.
+  if (isEnchantedForest(street.tsid)) return false;
   if (BATTERFLY_CAVE_HUBS.includes(String(street.hubName || ''))) return true;
   return CAVE_WORDS.test(String(street.label || '')) || CAVE_WORDS.test(String(street.internalLabel || ''));
 }

@@ -159,6 +159,8 @@ export const REMAKE_QUEST_NPCS = Object.freeze([
   'npc_rare_item_vendor',
   // The Magic Rock on your home street offers Build a Tower (features/home-tower-feature.js).
   'magic_rock',
+  // A Savanna Dust Trap's Juju Bandit offers Carry That Weight (features/juju-bandits-feature.js).
+  'npc_juju_bandit',
 ]);
 const GSJS_STREET_SPIRITS = new Set([
   'street_spirit', 'street_spirit_groddle', 'street_spirit_firebog', 'street_spirit_zutto', 'street_spirit_ix',

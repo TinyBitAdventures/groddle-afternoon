@@ -60,7 +60,7 @@ import {
   solveQuestInstance,
   stepQuestInstance,
 } from '../quest-instance.js?v=qi-1';
-import { QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, roomModulePath } from '../quest-rooms/catalog.js?v=qi-1';
+import { QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, roomModulePath } from '../quest-rooms/catalog.js?v=qi-2';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { locationEventsApi } from './location-events-feature.js?v=location-events-1';
 import {

@@ -59,7 +59,7 @@ import {
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=woodcutting-1';
+} from './js/woodcutting.js?v=woodcutting-2';
 import { findWorkingRookTool } from './js/rook-woods.js?v=rook-woods-1';
 import {
   HERDKEEPING,

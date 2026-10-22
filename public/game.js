@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=musicblocks-note-3';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-10';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-11';
 import {
   actionDurationFor,
   createTimedAction,
@@ -673,7 +673,7 @@ import {
   ensureWoodTreeState,
   resetWoodTreeDay,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=woodcutting-1';
+} from './js/woodcutting.js?v=woodcutting-2';
 import {
   GIANTS,
   createShrineState,
@@ -8260,7 +8260,8 @@ function spawnTrees(spots) {
 function refreshWoodTreeVisual(target) {
   if (target?.classId !== 'wood_tree' || !target.sprite || !target.state) return;
   const state = ensureWoodTreeState(target.state);
-  const tex = textureForWoodTree(state.maturity);
+  // A feature's own tree art (enchanted-forest-feature) supplies its texture.
+  const tex = target.woodTexture ? target.woodTexture(state) : textureForWoodTree(state.maturity);
   if (tex) {
     target.sprite.texture = tex;
     const scale = trantDisplayScale(tex, { targetH: 190, maxScale: 1 });

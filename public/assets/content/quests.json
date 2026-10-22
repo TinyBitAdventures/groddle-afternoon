@@ -6458,28 +6458,13 @@
   ],
   "offerTriggers": [
    {
-    "type": "region",
-    "region": "86",
-    "override": true
-   },
-   {
-    "type": "region",
-    "region": "91",
-    "override": true
-   },
-   {
-    "type": "region",
-    "region": "95",
-    "override": true
-   },
-   {
-    "type": "region",
-    "region": "90",
+    "type": "npc",
+    "npc": "npc_juju_bandit",
     "override": true
    }
   ],
   "instanceRoom": "juju_camp",
-  "offerNote": "npc_juju_bandit is not in the remake; offered in its four Kajuu hubs (Baqala, Zhambu, Xalanga, Choru)",
+  "offerNote": "npc_juju_bandit offers it: a Dust Trap in Baqala, Zhambu, Xalanga or Choru brings one half the time while the quest is new (dust_trap.js, juju_bandit_curse)",
   "solo": true
  },
  "help_juju_bandits_2": {
