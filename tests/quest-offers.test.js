@@ -104,15 +104,21 @@ describe('classifyQuests', () => {
     // instance_unbuilt to solo as each room lands.
     const built = builtInstanceQuests().length;
     // Overworld features that brought once-excluded quests back (not rooms).
-    const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station'].length;
+    // soilappreciation_1: its newxp practice street is lost; tend + dig anywhere, as its text says.
+    const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station', 'soilappreciation_1'].length;
     assert.equal(c.solo.length, 129 + built + featureQuests);
     assert.equal(c.custom.length, 22); // + 5 Gentle Island tutorial quests (newxp-feature.js)
     assert.equal(c.excluded.length, 294 - built - featureQuests);
     assert.equal(c.byReason.job.length, 200);
     assert.equal(c.byReason.multiplayer.length, 11);
     // Gwendolyn's Task and Smuggle the Smuggler were feature_unbuilt, not among the 32.
+    // +1: firefly_whistle (the Fireflex 3000 Lab, once counted as tutorial).
     const onceInstance = builtInstanceQuests().filter((id) => !/^(tower_quest|smuggle_the_smuggler)/.test(id)).length;
-    assert.equal((c.byReason.instance_unbuilt || []).length, 32 - onceInstance);
+    assert.equal((c.byReason.instance_unbuilt || []).length, 33 - onceInstance);
+    assert.ok(c.byReason.instance_unbuilt.includes('firefly_whistle'));
+    // No tutorial leftovers: the 2011 Magic Rock chain is retired; Gentle Island's quests are custom.
+    assert.equal((c.byReason.newxp_tutorial || []).length, 0);
+    for (const id of ['learn_first_skill', 'tutorial_reinforcement']) assert.ok(c.byReason.removed_feature.includes(id), id);
     for (const id of builtInstanceQuests()) assert.ok(c.solo.some((row) => row.classTsid === id), id);
     assert.ok(c.byReason.needs_other_players.includes('kindly_randomness'));
     assert.ok(c.byReason.removed_feature.includes('say_cheese'));

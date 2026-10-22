@@ -4682,7 +4682,7 @@
   "hasCanOffer": false,
   "offerTriggers": [],
   "solo": false,
-  "soloReason": "newxp_tutorial"
+  "soloReason": "instance_unbuilt"
  },
  "fly_paradise": {
   "classTsid": "fly_paradise",
@@ -28504,7 +28504,7 @@
   "hasCanOffer": false,
   "offerTriggers": [],
   "solo": false,
-  "soloReason": "newxp_tutorial"
+  "soloReason": "removed_feature"
  },
  "leave_gentle_island": {
   "classTsid": "leave_gentle_island",
@@ -32425,12 +32425,20 @@
   "completion": "You’re on your way now, digster! Here’s a little sumthin’ for your effort.",
   "requirements": [
    {
-    "id": "r370",
-    "type": "flag",
-    "name": "finish_soilappreciation",
+    "id": "r370a",
+    "type": "counter",
+    "name": "patches_tended",
     "num": 1,
-    "classId": "hoe",
-    "desc": "Do it all!"
+    "classId": "patch",
+    "desc": "Tend a Patch"
+   },
+   {
+    "id": "r370b",
+    "type": "counter",
+    "name": "dig_dirt",
+    "num": 1,
+    "classId": "shovel",
+    "desc": "Dig a Dirt Pile or a Patch"
    }
   ],
   "rewards": {
@@ -32479,8 +32487,7 @@
   "prereqProxy": {
    "skill": "soil_appreciation_1"
   },
-  "solo": false,
-  "soloReason": "newxp_tutorial"
+  "solo": true
  },
  "soilappreciation_collect_loam": {
   "classTsid": "soilappreciation_collect_loam",
@@ -34969,7 +34976,7 @@
   "hasCanOffer": false,
   "offerTriggers": [],
   "solo": false,
-  "soloReason": "newxp_tutorial"
+  "soloReason": "removed_feature"
  },
  "ultimate_smoothie_1": {
   "classTsid": "ultimate_smoothie_1",

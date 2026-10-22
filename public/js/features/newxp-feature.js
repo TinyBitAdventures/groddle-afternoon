@@ -25,7 +25,14 @@
  *                Brain talk, which offers On to the Big Time; back on the
  *                island, Gentle Island Exit drops you on a random
  *                newxp_exits street, and 15 s later the quest completes
- *                with its Greeter Twig relic.
+ *                with its Greeter Twig relic. Along the way the island's own
+ *                scripts run: no map until the Surveyor's Stroll Qurazy opens
+ *                the first upgrade hand (imagination_reduce_to_hand) and
+ *                Mappery reveals the map on Progress Way; High Jumper's
+ *                Gully's two quoins open more hands; the Exit's Qurazy points
+ *                at the upgrade menu; hint signs, the Doonboggle Musicblock
+ *                and Spinach garden, the Gameshow Ticket and the singing
+ *                street spirit (see "Gentle Island scripts").
  *
  * Opt-in: a brand-new save's start card offers "Start with the tutorial" or
  * "Skip to Ur"; existing saves and autostart routes are never redirected.
@@ -34,7 +41,10 @@
  * it end to end (&newxphold=<stage> stops on reaching that stage,
  * &newxpskill=animalkinship_1|ezcooking_1|light_green_thumb_1,
  * &newxpstyle=meadow|firebog|uralia). Canvas data: newxpStatus, newxpStage,
- * newxpStep, newxpUpgrades, newxpIsland, newxpAutoplay, newxpLast.
+ * newxpStep, newxpUpgrades, newxpIsland, newxpAutoplay, newxpLast, newxpFlags,
+ * newxpCard (island:<hand>), newxpIslandCard, newxpStreetEvent, newxpGarden.
+ * The island autoplay also tours the gully and Doonboggle (&newxpisland=quick
+ * skips them); &newxpcard=<id> picks that card from an island hand.
  */
 
 import {
@@ -46,7 +56,19 @@ import {
   GENTLE_ISLAND_TSIDS,
   ISLAND_ARRIVAL,
   ISLAND_BOXES,
+  ISLAND_CONFIRM,
   ISLAND_CURRANTS,
+  ISLAND_LINES,
+  ISLAND_MUSICBLOCKS,
+  ISLAND_MUSICBLOCK_AT,
+  ISLAND_QUOINS,
+  ISLAND_SIGNS,
+  ISLAND_TICKET_AT,
+  SPIRIT_SING,
+  islandBoxesFor,
+  islandHand,
+  reduceToHand,
+  sourceToStreet,
   LEAVE_FLAG_DELAY_MS,
   LINES,
   NEWXP_UPGRADES,
@@ -77,9 +99,10 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../newxp.js';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
+} from '../newxp.js?v=newxp-2';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js';
+import { soundForQuoin } from '../sound-moments.js';
 import { IMAGINATION_UPGRADES } from '../imagination.js';
 import { assignQuest, completeQuest } from '../quests.js';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js';
@@ -214,6 +237,13 @@ const CSS = `
 .nx-start button.alt{background:#fff;color:#4a5a2a;box-shadow:0 2px 0 #cfe0a8}
 body.nx-hide-meta .metabolics-cluster>:not(.meta-pill),body.nx-hide-energy .meta-pill.energy,body.nx-hide-mood .meta-pill.mood{visibility:hidden}
 body.nx-hide-pack #pack-bar{visibility:hidden}
+body.nx-hide-map #map-btn,body.nx-hide-map #street-nameplate,body.nx-hide-currants .meta-stat.currants{visibility:hidden}
+body.nx-island-map #map-panel .map-feature-card:not(.nx-map-card),body.nx-island-map #map-panel .map-home-card,body.nx-island-map #map-panel .map-quest-teleport,body.nx-island-map #map-panel .map-hub-picker{display:none!important}
+@keyframes nx-callout{0%,100%{box-shadow:0 0 0 0 rgba(255,214,90,.0)}50%{box-shadow:0 0 0 6px rgba(255,214,90,.85)}}
+.nx-callout{animation:nx-callout .9s ease-in-out 4;border-radius:8px}
+@keyframes nx-map-pulse{0%,100%{stroke:#ffd23f;stroke-width:9}50%{stroke:#fff6c2;stroke-width:13}}
+#map-panel.nx-map-progress .map-street[data-tsid="GA94UK1BH3D3FJL"] .map-seg{animation:nx-map-pulse 1s ease-in-out infinite}
+.nx-map-card{margin:0 0 8px;padding:8px 12px;border-radius:10px;background:#fff6d6;color:#5b4300;font:800 13px Nunito,"Trebuchet MS",sans-serif;text-align:center}
 body.nx-hide-actions .top-actions>:not(#mute-btn),body.nx-hide-actions .quest-tracker{visibility:hidden}
 `;
 
@@ -257,6 +287,12 @@ function ensureUi() {
   // Enter advances conversations (the source's button_instructions overlay);
   // capture it before the game opens a verb menu.
   window.addEventListener('keydown', (e) => {
+    // hideUIOnLoad 'map': no map on Gentle Island until Mappery.
+    if ((e.key === 'g' || e.key === 'G') && document.body.classList.contains('nx-hide-map') && !e.target?.matches?.('input, textarea, select')) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
     if (e.key !== 'Enter') return;
     const open = [ui.bubble, ui.vog, ui.card].find((n) => !n.hidden);
     if (!open) return;
@@ -378,14 +414,14 @@ const opt0 = (opts) => {
 };
 
 /** sendBubble: a short line with no buttons. */
-function say(who, text, ms = 3000) {
+function say(who, text, ms = 3000, { log = true } = {}) {
   ensureUi();
   ui.sayFor = who;
   ui.say.innerHTML = text;
   ui.say.hidden = false;
   ui.sayUntil = Date.now() + ms;
   positionBubbles();
-  engineRef?.pushActivity(`${who?.name || 'Someone'}: ${plain(text)}`);
+  if (log) engineRef?.pushActivity(`${who?.name || 'Someone'}: ${plain(text)}`);
 }
 
 /** announce_vog_fade: big words over the scene; '//' pages; click or wait. */
@@ -481,6 +517,12 @@ async function upgradeHand(t, key) {
     if (auto) setTimeout(() => resolve(), 260);
   });
   alive(t);
+  return gotCard(t, buy);
+}
+
+/** upgrade_granted / upgrade_confirmed: spend the iMG, then the "Got it!" card. */
+async function gotCard(t, buy) {
+  const imgOf = (id) => IMAGINATION_UPGRADES[id] || {};
   const u = imgOf(buy);
   const cost = NEWXP_UPGRADES[buy]?.cost ?? u.cost ?? 0;
   ui.card.innerHTML = `<div class="nx-got"><h3>Got it! ${u.name || buy}</h3><p>${u.desc || ''}</p><button type="button" data-nx-got>OK</button></div>`;
@@ -501,6 +543,39 @@ async function upgradeHand(t, key) {
   engineRef.setData('newxpCard', '');
   alive(t);
   return buy;
+}
+
+/**
+ * The island quoins' menu (open_img_menu section 'upgrades', hide_close):
+ * the dealt hand, every affordable card buyable, no way to close it.
+ */
+async function islandUpgradeHand(t, cards) {
+  ensureUi();
+  rooted = true;
+  const pc = engineRef.pc;
+  const have = Number(pc.imagination) || 0;
+  const imgOf = (id) => IMAGINATION_UPGRADES[id] || {};
+  const html = cards.map((id) => {
+    const u = imgOf(id);
+    const cost = NEWXP_UPGRADES[id].cost;
+    const ok = cost <= have;
+    return `<button type="button" class="nx-up${ok ? '' : ' dim'}" data-nx-upgrade="${id}" ${ok ? '' : 'disabled'}>
+      ${cardLayers(u.config)}<span class="nx-up-cost">${cost}i</span><span class="nx-up-name">${u.name || NEWXP_UPGRADES[id].name}</span></button>`;
+  }).join('');
+  ui.card.innerHTML = `<h2>Upgrade</h2><div class="nx-hand">${html}</div><div>${LINES.upgradeHelp}</div>`;
+  ui.card.hidden = false;
+  engineRef.playSound('IMAGINATION_OPEN', { volume: 0.5 });
+  engineRef.setData('newxpCard', `island:${cards.join('+')}`);
+  const affordable = cards.filter((id) => NEWXP_UPGRADES[id].cost <= have);
+  const pick = await new Promise((resolve) => {
+    ui.card.querySelectorAll('[data-nx-upgrade]:not([disabled])').forEach((b) => b.addEventListener('click', () => resolve(b.dataset.nxUpgrade), { once: true }));
+    if (auto) {
+      const want = engineRef.param('newxpcard');
+      setTimeout(() => resolve(affordable.includes(want) ? want : affordable[0]), 260);
+    }
+  });
+  alive(t);
+  return gotCard(t, pick);
 }
 
 /** magic_rock.js showSkillChooser: three first skills. */
@@ -680,15 +755,15 @@ function quoinTexture(PIXI, type = 'xp') {
 }
 
 /** An iMG quoin with a location_event_id; `onTake` runs once when touched. */
-function addQuoin(engine, id, x, y, onTake) {
-  const spr = new engine.PIXI.Sprite(quoinTexture(engine.PIXI, 'xp'));
+function addQuoin(engine, id, x, y, onTake, { type = 'xp', reach = 78, amount = null } = {}) {
+  const spr = new engine.PIXI.Sprite(quoinTexture(engine.PIXI, type));
   spr.anchor.set(0.5, 0.5);
   spr.scale.set(0.6);
   spr.x = x;
   spr.y = y;
   spr.zIndex = 30;
   engine.entityLayer.addChild(spr);
-  const q = { id, x, y, spr, taken: false, onTake };
+  const q = { id, x, y, spr, taken: false, onTake, type, reach, amount };
   run.quoins.push(q);
   return q;
 }
@@ -700,7 +775,7 @@ function stepQuoins(engine) {
   for (const q of run.quoins) {
     if (q.taken || q.spr.destroyed) continue;
     q.spr.y = q.y + Math.sin(t + q.x) * 3;
-    if (Math.abs(q.x - p.x) < 34 && q.y > p.y - 78 && q.y < p.y + 12) takeQuoin(engine, q);
+    if (Math.abs(q.x - p.x) < 34 && q.y > p.y - (q.reach || 78) && q.y < p.y + 12) takeQuoin(engine, q);
   }
 }
 
@@ -708,12 +783,12 @@ function takeQuoin(engine, q) {
   if (q.taken) return;
   q.taken = true;
   q.spr.visible = false;
-  const n = QUOIN_BENEFITS[q.id] || 1;
+  const n = q.amount ?? QUOIN_BENEFITS[q.id] ?? 1;
   const pc = engine.pc;
   pc.xp = (Number(pc.xp) || 0) + n;
   pc.imagination = (Number(pc.imagination) || 0) + n;
-  engine.floatText(q.x, q.y - 14, `+${n} iMG`, '#ffffff');
-  engine.playSound('QUOIN_XP', { volume: 0.5 });
+  engine.floatText(q.x, q.y - 14, q.type === 'qurazy' ? `Qurazy! +${n} iMG` : `+${n} iMG`, '#ffffff');
+  engine.playSound(soundForQuoin(q.type || 'xp'), { volume: q.type === 'qurazy' ? 0.82 : 0.5, rate: q.type === 'qurazy' ? 1.2 : 1 });
   engine.updateHud();
   engine.setData('newxpLast', `quoin:${q.id}`);
   q.onTake?.(q);
@@ -739,6 +814,7 @@ function addPickup(engine, id, classTsid, count, x, y, onPick) {
 }
 
 function ITEM_LABEL(classTsid) {
+  if (ITEM_CATALOG[classTsid]?.label) return ITEM_CATALOG[classTsid].label;
   return classTsid.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
@@ -1609,6 +1685,10 @@ function islandEnter(engine) {
   if (run.data.enteredTsid === tsid && run.data.rock && !run.data.rock.sprite.destroyed) return;
   run.data.enteredTsid = tsid;
   engine.setData('newxpIsland', save.island);
+  if (GENTLE_ISLAND_TSIDS.includes(tsid) && run.data.scriptsTsid !== tsid) {
+    run.data.scriptsTsid = tsid;
+    islandStreetScripts(engine);
+  }
   if (tsid === GENTLE_ISLAND.progress_way) {
     // The street spirit is the cheap bag vendor; if none spawned, a stall stands in.
     setTimeout(() => {
@@ -1645,7 +1725,10 @@ async function islandRockScript(engine, t, rock) {
     await vog(t, LINES.watchThis);
     const ans = await talk(t, rock, LINES.explainQuest, { choices: [{ label: 'Currants? What are currants?', value: 'explain-currants' }] });
     if (ans) await vog(t, LINES.currants);
-    // revealCurrants: the counter appears, then +978.
+    // revealCurrants: the counter appears (callout), then +978.
+    setFlag('currants_revealed');
+    islandHud(engine);
+    callout('.meta-stat.currants', 3000);
     await sleep(t, 2000);
     engine.pc.currants = (Number(engine.pc.currants) || 0) + ISLAND_CURRANTS;
     engine.floatText(P().x, P().y - 90, `+${ISLAND_CURRANTS} currants`, '#ffe28a');
@@ -1667,7 +1750,7 @@ async function islandRockScript(engine, t, rock) {
     await sleep(t, 2000);
     say(rock, LINES.goodLuck, 3000);
     setStep('find_bags');
-    if (auto) autoBags(engine, t);
+    if (auto) autoIslandTour(engine, t).then(() => autoBags(engine, t)).catch(() => {});
   } catch (err) {
     if (!(err instanceof Cancel)) console.warn('newxp island', err);
   } finally {
@@ -1891,6 +1974,8 @@ function islandTick(engine, now) {
   const p = P();
   if (!p) return;
   const tsid = engine.streetTsid;
+  islandHud(engine);
+  if (GENTLE_ISLAND_TSIDS.includes(tsid)) islandScriptsTick(engine, now);
   // newbie_island.js street4_check: Progress Way is held until On to the
   // Big Time is accepted (no bags: back 250; bags but not home yet: back 150).
   const gate = ISLAND_BOXES.street4_check;
@@ -1914,12 +1999,12 @@ function islandTick(engine, now) {
     save.island = 'bags_done';
     engine.save();
   }
-  if (save.island === 'bags_done' && !islandBusy && !run.data.afterBags) {
+  if (save.island === 'bags_done' && !islandBusy && !scriptBusy && !run.data.afterBags) {
     run.data.afterBags = true;
     afterBags(engine, token);
   }
   // home.js playerEnterCallback (is_postnewxp): the rock's wrap-up at home.
-  if (save.island === 'go_home' && tsid === HOME_STREET_TSID && !islandBusy && !run.data.homeTalk) {
+  if (save.island === 'go_home' && tsid === HOME_STREET_TSID && !islandBusy && !scriptBusy && !run.data.homeTalk) {
     run.data.homeTalk = true;
     homeWrapUp(engine, token);
   }
@@ -1932,6 +2017,404 @@ function islandTick(engine, now) {
     finishTutorial(engine, token);
   }
   engine.setData('newxpBags', bagsBought(engine));
+}
+
+/* ------------------------------------------------------------------ */
+/* Gentle Island scripts: upgrade quoins, Mappery, signs, side streets  */
+/* ------------------------------------------------------------------ */
+
+const hasFlag = (f) => save.flags.includes(f);
+function setFlag(f) {
+  if (save.flags.includes(f)) return;
+  save.flags.push(f);
+  engineRef?.save();
+  engineRef?.setData('newxpFlags', save.flags.join(','));
+}
+
+const onIsland = (engine) => GENTLE_ISLAND_TSIDS.includes(engine.streetTsid);
+const islandLive = (engine) => active() && save.stage === 'island' && onIsland(engine);
+let scriptBusy = false;
+
+/** newbie_island.js hideUIOnLoad: no map or location until Mappery; Surveyor's Stroll hides currants until the rock's gift. */
+function islandHud(engine) {
+  if (typeof document === 'undefined') return;
+  const live = islandLive(engine);
+  const b = document.body.classList;
+  b.toggle('nx-hide-map', live && !save.upgrades.includes('mappery'));
+  // hideUIOnLoad 'world_map' / 'home_street_visiting': the island map shows only the island.
+  b.toggle('nx-island-map', live);
+  b.toggle('nx-hide-currants', live && engine.streetTsid === GENTLE_ISLAND.surveyors_stroll && save.island === 'arrive' && !hasFlag('currants_revealed'));
+}
+
+/** ui_callout: a short pulse on one piece of chrome. */
+function callout(selector, ms = 3600) {
+  if (typeof document === 'undefined') return;
+  const node = document.querySelector(selector);
+  if (!node) return;
+  node.classList.remove('nx-callout');
+  void node.offsetWidth;
+  node.classList.add('nx-callout');
+  setTimeout(() => node.classList.remove('nx-callout'), ms);
+}
+
+/** vp_canvas: a black wash over the street at `alpha` (0 clears it). */
+function dim(alpha) {
+  ensureUi();
+  positionBubbles();
+  ui.fade.style.opacity = String(alpha);
+}
+
+/** A screen point on this street from source coordinates. */
+function streetPoint(engine, src) {
+  return sourceToStreet(engine.street?.bounds, src.x, src.y);
+}
+
+/** Spawn the island event quoins for this street that are still to find. */
+function islandQuoins(engine) {
+  for (const def of ISLAND_QUOINS) {
+    if (def.tsid !== engine.streetTsid || hasFlag(def.event)) continue;
+    if (run.quoins.some((q) => q.id === def.id && !q.taken)) continue;
+    let at;
+    if (def.source) {
+      at = streetPoint(engine, def.source);
+      at.y -= 30; // the item's registration point is its bottom; the sprite is centred
+    } else {
+      const ground = groundBelow(engine, def.rebuilt.x, 0);
+      at = { x: def.rebuilt.x, y: ground - def.rebuilt.above };
+    }
+    const amount = def.type === 'qurazy' ? qrazyRewardForLevel(engine.pc.level) : QUOIN_TYPES.xp.baseAmount;
+    addQuoin(engine, def.id, at.x, at.y, () => islandQuoinEvent(engine, def), { type: def.type, reach: 110, amount });
+  }
+}
+
+/** The quoin's location_event_id. */
+async function islandQuoinEvent(engine, def) {
+  if (hasFlag(def.event)) return;
+  setFlag(def.event);
+  const t = token;
+  scriptBusy = true;
+  try {
+    engine.setData('newxpLast', `island_event:${def.event}`);
+    if (def.event === 'explain_upgrades') {
+      // pc_vog, then callout_upgrades: open_img_menu + the upgrades callout.
+      await vog(t, ISLAND_LINES.explainUpgrades);
+      if (typeof document !== 'undefined') {
+        document.getElementById('img-btn')?.click();
+        callout('#img-btn');
+      }
+      return;
+    }
+    const hand = islandHand(save.upgrades);
+    if (!hand.length) return;
+    // imagination_reduce_to_hand, then (2 s later for Mappery) the menu with no close button.
+    engine.pc.imagination = reduceToHand(hand, engine.pc.imagination);
+    engine.updateHud();
+    if (def.event === 'mappery_upgrade') await sleep(t, 2000);
+    const id = await islandUpgradeHand(t, hand);
+    engine.setData('newxpIslandCard', id);
+    await upgradeConfirmed(engine, t, id);
+  } catch (err) {
+    if (!(err instanceof Cancel)) console.warn('newxp island quoin', err);
+  } finally {
+    scriptBusy = false;
+  }
+}
+
+/** newbie_island.js upgradeConfirmed (2 s after the card). */
+async function upgradeConfirmed(engine, t, id) {
+  if (id === 'mappery') return revealMappery(engine, t);
+  const key = ISLAND_CONFIRM[id];
+  if (!key) return null;
+  await sleep(t, 2000);
+  await vog(t, ISLAND_LINES[key]);
+  return null;
+}
+
+/** upgradeConfirmed('mappery') → revealMappery → revealMappery2 → calloutMap. */
+async function revealMappery(engine, t) {
+  setStep('mappery');
+  await sleep(t, 2000);
+  await vog(t, ISLAND_LINES.mappery);
+  // A 0.3 black canvas for a moment, the map and location come on, the minimap callout.
+  islandHud(engine);
+  dim(0.3);
+  callout('#street-nameplate');
+  await sleep(t, 3000);
+  dim(0);
+  await vog(t, ISLAND_LINES.mappery2);
+  // calloutMap: the map icon, the hub map opened on Progress Way, the activity line.
+  callout('#map-btn');
+  if (run) run.data.mapHint = true;
+  engine.pushActivity(ISLAND_LINES.mapperyActivity);
+  setStep('map_progress_way');
+  await sleep(t, 800);
+  if (engine.streetTsid === GENTLE_ISLAND.progress_way) return null;
+  await engine.openMap(String(engine.street?.hubId || '129'));
+  if (typeof document !== 'undefined') document.getElementById('map-panel')?.classList.add('nx-map-progress');
+  if (auto) {
+    await sleep(t, 400);
+    const g = typeof document !== 'undefined' ? document.querySelector(`#map-canvas .map-street[data-tsid="${GENTLE_ISLAND.progress_way}"]`) : null;
+    if (g) g.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  }
+  return null;
+}
+
+/** The hint signs' text (the client printed sign_txt over the invisible groddle_sign_blank decos). */
+function islandSigns(engine) {
+  const street = engine.street;
+  if (!street || !run) return;
+  run.data.signs = [];
+  for (const layer of street.layers || []) {
+    const raw = layer.id !== 'middleground' && layer.w > 0 && layer.h > 0;
+    for (const deco of layer.decos || []) {
+      const sign = ISLAND_SIGNS[deco.id];
+      if (!sign?.face) continue;
+      const pos = raw || /^T_/.test(String(layer.id || '')) ? { x: deco.x, y: deco.y } : sourceToStreet(street.bounds, deco.x, deco.y);
+      const h = deco.h || 248;
+      const label = new engine.PIXI.Text({
+        text: sign.text.replace(/<br>\s*/g, '\n'),
+        style: {
+          fontFamily: 'Nunito, "Trebuchet MS", sans-serif',
+          fontWeight: '800',
+          fontSize: 22,
+          fill: 0xffffff,
+          align: 'center',
+          wordWrap: true,
+          wordWrapWidth: Math.max(160, (deco.w || 400) * 0.9),
+          dropShadow: { color: 0x5b3a1a, alpha: 1, blur: 0, distance: 3, angle: Math.PI / 3 },
+        },
+      });
+      label.anchor.set(0.5, 0.5);
+      label.x = pos.x;
+      label.y = pos.y - h / 2;
+      label.zIndex = 3;
+      label.visible = false;
+      engine.entityLayer.addChild(label);
+      run.fixtures.push(label);
+      run.data.signs.push({ id: deco.id, label });
+    }
+  }
+}
+
+/** Follow each sign deco's show/hide (and its fade) from the street's own events. */
+function syncSigns(engine) {
+  const views = engine.decoViews;
+  for (const row of run?.data?.signs || []) {
+    if (row.label.destroyed) continue;
+    const view = views?.get(row.id);
+    row.label.visible = Boolean(view && !view.destroyed && view.visible);
+    row.label.alpha = view ? view.alpha : 0;
+  }
+}
+
+function fireStreetEvent(engine, name) {
+  const ok = locationEventsApi.fire(engine, name);
+  engine.setData('newxpStreetEvent', name);
+  return ok;
+}
+
+/** The Collision-triggered Event Boxes, rebuilt (enter edge). */
+function islandBoxes(engine, p) {
+  run.data.inBox ||= new Set();
+  // has_ak: the source hid the butterfly hints from players who know Animal Kinship. Every remake save
+  // starts with it as a demo skill, so the tutorial asks whether it was the skill the rock gave.
+  const hasAk = save.skill === 'animalkinship_1';
+  for (const box of islandBoxesFor(engine.streetTsid)) {
+    const key = `${box.tsid}:${box.event}`;
+    const inside = inHitBox({ x: box.x, y: box.y, w: box.w, h: box.h }, p.x, p.y);
+    if (!inside) {
+      run.data.inBox.delete(key);
+      continue;
+    }
+    if (run.data.inBox.has(key)) continue;
+    run.data.inBox.add(key);
+    if (box.unlessAk && hasAk) continue;
+    if (box.event === 'crazy') {
+      // flag cray: once; and only while the Qurazy is still there.
+      if (hasFlag('cray') || hasFlag('mappery_upgrade')) continue;
+      setFlag('cray');
+      vog(token, `${ISLAND_LINES.crazy}//${ISLAND_LINES.crazy2}`).catch(() => {});
+      continue;
+    }
+    const offFlag = `${box.event.replace(/_on$/, '')}_off_called`;
+    if (hasFlag(offFlag)) continue;
+    fireStreetEvent(engine, box.event);
+  }
+}
+
+/** eventFired: items_added / verb_activate / verb_massage turn the hints off. */
+function islandHints(engine) {
+  const tsid = engine.streetTsid;
+  const inv = engine.inv;
+  const d = run.data;
+  if (tsid === GENTLE_ISLAND.high_jumpers_gully) {
+    const spinach = countItem(inv, 'spinach');
+    if (d.spinachSeen == null) d.spinachSeen = spinach;
+    if (spinach > d.spinachSeen && !hasFlag('spinach_hint_off_called')) {
+      setFlag('spinach_hint_off_called');
+      fireStreetEvent(engine, 'spinach_hint_off');
+    }
+    d.spinachSeen = spinach;
+    if (engine.hasBuff?.('spinach') && !hasFlag('spinach_hint2_off_called')) {
+      setFlag('spinach_hint2_off_called');
+      fireStreetEvent(engine, 'spinach_hint2_off');
+    }
+  }
+  if (tsid === GENTLE_ISLAND.progress_way || tsid === GENTLE_ISLAND.diversionary_path) {
+    const lotion = countItem(inv, 'butterfly_lotion');
+    if (d.lotionSeen == null) d.lotionSeen = lotion;
+    if (lotion > d.lotionSeen && !hasFlag('butterfly_lotion_msg_off_called')) {
+      setFlag('butterfly_lotion_msg_off_called');
+      fireStreetEvent(engine, 'butterfly_lotion_msg_off');
+    }
+    d.lotionSeen = lotion;
+  }
+}
+
+/** NB_Side_Street2: a random Musicblock at (-988, -467) and the garden full of Spinach. */
+function doonboggleSetup(engine) {
+  if (!hasFlag('musicblock')) {
+    if (!save.musicblock) {
+      save.musicblock = ISLAND_MUSICBLOCKS[Math.floor(Math.random() * ISLAND_MUSICBLOCKS.length)];
+      engine.save();
+    }
+    const at = streetPoint(engine, ISLAND_MUSICBLOCK_AT);
+    addPickup(engine, 'musicblock', save.musicblock, 1, at.x, groundBelow(engine, at.x, at.y - 40), () => {
+      setFlag('musicblock');
+      if (!hasFlag('musicblock_msg_off_called')) {
+        setFlag('musicblock_msg_off_called');
+        fireStreetEvent(engine, 'musicblock_msg_off');
+      }
+    });
+  }
+  if (!hasFlag('garden')) {
+    // garden.js setNewXPGarden: every plot a ripe Spinach crop.
+    setTimeout(() => {
+      if (!run || engine.streetTsid !== GENTLE_ISLAND.doonboggle_trail) return;
+      const target = (engine.interactables || []).find((it) => it.classId === 'garden_new');
+      const garden = target?.state?.garden;
+      if (!garden?.plots) return;
+      const now = Date.now();
+      for (const plot of Object.values(garden.plots)) {
+        plot.seed = 'seed_spinach';
+        plot.state = 'crop';
+        plot.stageStartedAt = now;
+        plot.growthMs = 0;
+      }
+      engine.refreshGarden(target);
+      setFlag('garden');
+      engine.setData('newxpGarden', Object.keys(garden.plots).length);
+    }, 300);
+  }
+}
+
+/** High Jumper's Gully: the Gameshow Ticket on its stand (gst_off / hide_gst once taken). */
+function gullySetup(engine) {
+  if (hasFlag('gst')) {
+    fireStreetEvent(engine, 'hide_gst');
+    return;
+  }
+  const at = streetPoint(engine, ISLAND_TICKET_AT);
+  addPickup(engine, 'gameshow_ticket', 'gameshow_ticket', 1, at.x, groundBelow(engine, at.x, at.y - 40), () => {
+    setFlag('gst');
+    fireStreetEvent(engine, 'gst_off');
+    fireStreetEvent(engine, 'hide_gst');
+  });
+}
+
+/** Progress Way: the street spirit sings until you walk up to her (singTo / onPlayerCollision). */
+function spiritWho(engine) {
+  const it = (engine.interactables || []).find((x) => String(x.classId || '').startsWith('street_spirit'));
+  const sprite = it?.sprite || run?.data?.stall;
+  if (!sprite || sprite.destroyed) return null;
+  return { name: 'Street Spirit', x: sprite.x, head: () => (sprite.destroyed ? null : { x: sprite.x, y: sprite.y - 130 }) };
+}
+
+function spiritTick(engine, now, p) {
+  if (hasFlag('spirit_sang') || engine.streetTsid !== GENTLE_ISLAND.progress_way || scriptBusy) return;
+  const who = spiritWho(engine);
+  if (!who) return;
+  const d = run.data;
+  if (Math.abs(p.x - who.x) <= SPIRIT_SING.hitW / 2 && p.y > who.head().y - SPIRIT_SING.hitH + 130 && !engine.acting() && !islandBusy) {
+    setFlag('spirit_sang');
+    spiritOh(engine, token, who);
+    return;
+  }
+  if (!d.singAt || now >= d.singAt) {
+    d.singAt = now + SPIRIT_SING.everyMs;
+    d.songIndex = ((d.songIndex ?? -1) + 1) % ISLAND_LINES.song.length;
+    say(who, ISLAND_LINES.song[d.songIndex], 3000, { log: d.songIndex === 0 && !d.sangOnce });
+    d.sangOnce = true;
+  }
+}
+
+async function spiritOh(engine, t, who) {
+  scriptBusy = true;
+  try {
+    rooted = true;
+    if (ui) ui.say.hidden = true;
+    await sleep(t, SPIRIT_SING.lockMs);
+    await talk(t, who, ISLAND_LINES.spiritOh, { buttons: ['OK'] });
+  } catch (err) {
+    if (!(err instanceof Cancel)) console.warn('newxp spirit', err);
+  } finally {
+    rooted = false;
+    scriptBusy = false;
+  }
+}
+
+/** Per street entry on Gentle Island during the tutorial. */
+function islandStreetScripts(engine) {
+  const tsid = engine.streetTsid;
+  islandHud(engine);
+  islandSigns(engine);
+  islandQuoins(engine);
+  if (tsid === GENTLE_ISLAND.doonboggle_trail) doonboggleSetup(engine);
+  if (tsid === GENTLE_ISLAND.high_jumpers_gully) gullySetup(engine);
+  if (tsid === GENTLE_ISLAND.progress_way && run?.data.mapHint) {
+    run.data.mapHint = false;
+    if (typeof document !== 'undefined') document.getElementById('map-panel')?.classList.remove('nx-map-progress');
+  }
+}
+
+/** Per frame on Gentle Island during the tutorial. */
+function islandScriptsTick(engine, now) {
+  const p = P();
+  if (!p || !run) return;
+  islandHud(engine);
+  syncSigns(engine);
+  islandBoxes(engine, p);
+  islandHints(engine);
+  spiritTick(engine, now, p);
+}
+
+/** Autoplay: the island's own beats (the Qurazy and Mappery, the gully's quoins, the side streets). */
+async function autoIslandTour(engine, t) {
+  const grab = async (id) => {
+    const q = run?.quoins.find((x) => x.id === id && !x.taken);
+    if (!q) return;
+    place(q.x, q.y + 40);
+    await until(t, () => q.taken, { every: 120 });
+    await until(t, () => !scriptBusy && ui?.card.hidden !== false && ui?.vog.hidden !== false, { every: 200 });
+  };
+  await grab('qurazy_stroll');
+  await until(t, () => engine.streetTsid === GENTLE_ISLAND.progress_way || !engine.busy(), { every: 300 });
+  if (engine.param('newxpautoplay') !== '1' || engine.param('newxpisland') === 'quick') return;
+  for (const tsid of [GENTLE_ISLAND.high_jumpers_gully, GENTLE_ISLAND.doonboggle_trail]) {
+    await engine.enter(tsid, { quiet: true, bypassFeatureGates: true });
+    alive(t);
+    await sleep(t, 600);
+    if (tsid === GENTLE_ISLAND.high_jumpers_gully) {
+      await grab('zoom_upgrade');
+      await grab('other_upgrade');
+      const ticket = run?.pickups.find((r) => r.id === 'gameshow_ticket' && !r.picked);
+      if (ticket) pickUp(engine, ticket);
+    } else {
+      const block = run?.pickups.find((r) => r.id === 'musicblock' && !r.picked);
+      if (block) pickUp(engine, block);
+    }
+    await sleep(t, 400);
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -1991,7 +2474,9 @@ function teardown(engine) {
   token += 1;
   clearRun(engine);
   rooted = false;
+  scriptBusy = false;
   hud({});
+  if (typeof document !== 'undefined') document.body.classList.remove('nx-hide-map', 'nx-hide-currants', 'nx-island-map');
   if (ui) {
     for (const n of [ui.bubble, ui.vog, ui.card, ui.say, ui.instr]) n.hidden = true;
     ui.pill.hidden = true;
@@ -2023,6 +2508,10 @@ function startTutorial(engine, stage = 'clouds') {
   }
   if (STAGES.indexOf(stage) >= STAGES.indexOf('training2')) {
     for (const id of ['walk_speed_1', 'jump_1']) if (!save.upgrades.includes(id)) save.upgrades.push(id);
+  }
+  // training2 sold High Jumper II and Walk Speed II.
+  if (STAGES.indexOf(stage) > STAGES.indexOf('training2')) {
+    for (const id of ['jump_2', 'walk_speed_2']) if (!save.upgrades.includes(id)) save.upgrades.push(id);
   }
   engine.stopFollowing?.();
   engine.closeMap?.();
@@ -2080,6 +2569,7 @@ function publish(engine, now) {
   engine.setData('newxpUpgrades', save.upgrades.join(','));
   engine.setData('newxpIsland', save.island);
   engine.setData('newxpRooted', rooted ? '1' : '0');
+  engine.setData('newxpFlags', save.flags.join(','));
 }
 
 export const newxpFeature = {
@@ -2099,6 +2589,11 @@ export const newxpFeature = {
   onStreetEnter(street, engine) {
     if (!engine.started && !hadSave && !engine.param('autostart') && !engine.param('newxp')) showStartCard(engine);
     if (active() && save.stage === 'island' && run && !isNewxpSceneTsid(street?.tsid)) islandEnter(engine);
+    // players/inc_newxp.js newxpReturnToGentleIsland: back on the island after finishing it.
+    if (save.status === 'done' && GENTLE_ISLAND_TSIDS.includes(street?.tsid) && !hasFlag('returned') && engine.started) {
+      setFlag('returned');
+      setTimeout(() => vog(token, ISLAND_LINES.returnToIsland).catch(() => {}), 1500);
+    }
   },
 
   onStreetClear(engine) {
@@ -2114,6 +2609,12 @@ export const newxpFeature = {
       run.data.rock = null;
       run.data.stall = null;
       run.data.enteredTsid = '';
+      run.data.scriptsTsid = '';
+      run.data.signs = [];
+      run.data.inBox = null;
+      run.data.spinachSeen = null;
+      run.data.lotionSeen = null;
+      run.data.singAt = 0;
     }
     if (ui) {
       ui.bubbleFor = null;
@@ -2173,6 +2674,11 @@ export const newxpFeature = {
   onEvent(counter, amount, engine) {
     if (!active() || !run) return;
     const [cls, verb] = String(counter).split(':');
+    // newbie_island.js eventFired verb_massage: the flying-butterflies hint is done.
+    if (cls === 'npc_butterfly' && /massage/.test(String(verb)) && islandLive(engine) && !hasFlag('butterfly_msg_off_called')) {
+      setFlag('butterfly_msg_off_called');
+      fireStreetEvent(engine, 'butterfly_msg_off');
+    }
     if (run.stage === 'training2') {
       if (TRAINING2_FOOD.some((f) => f.classTsid === cls) && verb && verb !== 'pickup') run.data.eaten = true;
       if (TRAINING2_DRINKS.some((d) => d.classTsid === cls) && verb && verb !== 'pickup') run.data.drank = true;
@@ -2204,6 +2710,11 @@ export const newxpFeature = {
     if (inTutorialScene(engine)) return { ok: false, msg: 'Follow the tutorial (or skip it from the Tutorial card).' };
     if (save.stage === 'island' && save.island !== 'exited' && !GENTLE_ISLAND_TSIDS.includes(tsid)) return { ok: false, msg: 'You can\'t do that yet' };
     return null;
+  },
+
+  mapCards(engine) {
+    if (!run?.data?.mapHint || !islandLive(engine) || typeof document === 'undefined') return [];
+    return [el('div', { class: 'nx-map-card', 'data-newxp-map': 'progress-way' }, ISLAND_LINES.mapperyActivity)];
   },
 
   reloadLocation(saved, engine) {

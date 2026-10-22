@@ -169,6 +169,12 @@ const REQUIREMENT_OVERRIDES = {
   // Source: any 60 s meditation counted; the text asks for the same street on 11 game days, gaps of 6 at most
   // (js/meditation-station.js).
   meditativearts_meditation_station: [{ id: 'r470', type: 'counter', name: 'meditation_station_days', num: 11, classId: 'focusing_orb', desc: 'Meditate on the same street on 11 game days' }],
+  // Source: one "Do it all!" flag on its newxp practice street (LHFS40864GB396O, skillquest_sa.js), whose
+  // geometry is lost; the quest text asks to "tend patches and dig dirt piles", so one of each anywhere.
+  soilappreciation_1: [
+    { id: 'r370a', type: 'counter', name: 'patches_tended', num: 1, classId: 'patch', desc: 'Tend a Patch' },
+    { id: 'r370b', type: 'counter', name: 'dig_dirt', num: 1, classId: 'shovel', desc: 'Dig a Dirt Pile or a Patch' },
+  ],
 };
 
 const INFERRED_GATES = {
@@ -224,10 +230,11 @@ const PREREQ_PROXY = {
   soilappreciation_1: { skill: 'soil_appreciation_1' },
 };
 const EXCLUDE = {
-  // newxp tutorial quests nothing in the final source starts (Gentle Island's own are CUSTOM above);
-  // soilappreciation_1's practice street is lost.
-  soilappreciation_1: 'newxp_tutorial', learn_first_skill: 'newxp_tutorial',
-  tutorial_reinforcement: 'newxp_tutorial', firefly_whistle: 'newxp_tutorial',
+  // The 2011 Magic Rock tutorial chain: nothing in the final source starts learn_first_skill, and only it
+  // starts tutorial_reinforcement (Gentle Island's own quests are CUSTOM above).
+  learn_first_skill: 'removed_feature', tutorial_reinforcement: 'removed_feature',
+  // A firefly offers it (npc_firefly.js); its room, the Fireflex 3000 Lab (LM113UBSS8P18ET, hub 61), is not built.
+  firefly_whistle: 'instance_unbuilt',
   // test / placeholder / seasonal
   cal_test_1: 'removed_or_test', jason_test_quest: 'removed_or_test', chris_test: 'removed_or_test',
   missing: 'removed_or_test', glitchmas2010: 'removed_or_test', get_first_tool: 'removed_or_test',

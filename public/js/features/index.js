@@ -35,7 +35,7 @@ import { questInstancesFeature } from './quest-instances-feature.js?v=qi-1';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-2';
 import { seasonsFeature } from './seasons-feature.js?v=seasons-1';
 import { cameraModeFeature } from './camera-mode-feature.js';
-import { newxpFeature } from './newxp-feature.js?v=newxp-1';
+import { newxpFeature } from './newxp-feature.js?v=newxp-2';
 
 export { questFlagsFeature };
 

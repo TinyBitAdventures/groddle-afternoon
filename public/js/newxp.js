@@ -23,6 +23,16 @@
  * read from the 10-minute playthrough (K2q5GXruLvE). Gentle Island (hub 129,
  * six streets) and the Animal Kinship / Light Green Thumb practice streets
  * are imported and used as they are.
+ *
+ * Gentle Island scripts (newbie_island.js and the six streets' location
+ * events): the quoins with a location_event_id (the Qurazy on Surveyor's
+ * Stroll opens the first upgrade hand and Mappery's map reveal; two quoins
+ * on High Jumper's Gully; the Exit's Qurazy explains the upgrade menu), the
+ * hint signs (sign_txt on invisible groddle_sign_blank decos), the side
+ * streets' Musicblock and Spinach garden, the Gameshow Ticket stand and the
+ * singing street spirit. Lost and rebuilt: the Qurazy markers and the
+ * Collision-triggered Event Boxes were instance items, so their spots are
+ * placed in front of what they point at.
  */
 
 export const NEWXP_SAVE_VERSION = 1;
@@ -91,13 +101,45 @@ export function firstSkill(id) {
 
 // source: inc_physics.js setDefaultPhysics "NEW DEFAULT" imagination layer.
 export const NEWXP_DEFAULT_PHYSICS = Object.freeze({ vx_max: 0.4597, vy_jump: 0.7105 });
-// source: inc_data_imagination.js reward type 1 data.
+// source: inc_data_imagination.js reward type 1 data; condition type 1 (in
+// tutorial) plus the type 3 prerequisite in `needs`. The last five are the
+// Gentle Island hands (newbie_island.js mappery_upgrade / zoom_upgrade /
+// other_upgrade quoins).
 export const NEWXP_UPGRADES = Object.freeze({
   walk_speed_1: { name: 'Walk Speed I', cost: 2, vx_max: 0.6567 },
   jump_1: { name: 'High Jumper I', cost: 3, vy_jump: 0.907 },
-  jump_2: { name: 'High Jumper II', cost: 6, vy_jump: 1 },
+  jump_2: { name: 'High Jumper II', cost: 6, vy_jump: 1, needs: 'walk_speed_1' },
   walk_speed_2: { name: 'Walk Speed II', cost: 6, vx_max: 0.8268 },
+  mappery: { name: 'Mappery', cost: 20, needs: 'jump_1' },
+  camera_mode: { name: 'Camera Mode', cost: 75, needs: 'jump_2' },
+  zoomability: { name: 'Zoomability', cost: 75, needs: 'walk_speed_2' },
+  encyclopeddling: { name: 'Encyclopeddling', cost: 90, needs: 'mappery' },
+  skill_learning: { name: 'Skill Learning Brain', cost: 500, needs: 'mappery' },
 });
+export const ISLAND_HAND_SIZE = 3;
+
+/**
+ * The hand an island quoin opens (imagination_get_next_upgrades in a newxp
+ * location: only tutorial cards, owned ones and unmet prerequisites left
+ * out). The source dealt at random; here the deck order of
+ * inc_data_imagination.js, so the first island hand is the source's only
+ * possible one (Mappery, Camera Mode, Zoomability).
+ */
+export function islandHand(owned = []) {
+  const have = new Set(owned);
+  return Object.entries(NEWXP_UPGRADES)
+    .filter(([id, u]) => !have.has(id) && (!u.needs || have.has(u.needs)))
+    .slice(0, ISLAND_HAND_SIZE)
+    .map(([id]) => id);
+}
+
+/** inc_imagination.js imagination_reduce_to_hand: top iMG up to the cheapest card in the hand. */
+export function reduceToHand(hand, imagination) {
+  const costs = (hand || []).map((id) => NEWXP_UPGRADES[id]?.cost).filter((c) => c > 0);
+  const cheapest = costs.length ? Math.min(...costs) : 0;
+  const have = Math.max(0, Number(imagination) || 0);
+  return cheapest && cheapest > have ? cheapest : have;
+}
 // The remake's normal movement is Walk Speed II + High Jumper II (imagination.js REMAKE_BASELINE_PHYSICS).
 const BASELINE = { vx_max: 0.8268, vy_jump: 1 };
 
@@ -434,6 +476,8 @@ export function normalizeNewxpSave(seed = {}) {
     skill: firstSkill(s.skill)?.id || '',
     island: ISLAND_STEPS.includes(s.island) ? s.island : 'arrive',
     exit: s.exit && typeof s.exit === 'object' && typeof s.exit.tsid === 'string' ? { tsid: s.exit.tsid, x: Number(s.exit.x) || 0 } : null,
+    flags: Array.isArray(s.flags) ? [...new Set(s.flags.filter((f) => ISLAND_FLAGS.includes(f)))] : [],
+    musicblock: ISLAND_MUSICBLOCKS.includes(s.musicblock) ? s.musicblock : '',
     leftAt: Number.isFinite(s.leftAt) ? s.leftAt : 0,
     startedAt: Number.isFinite(s.startedAt) ? s.startedAt : 0,
     doneAt: Number.isFinite(s.doneAt) ? s.doneAt : 0,
@@ -447,6 +491,8 @@ export function startNewxp(save, stage = 'clouds', now = Date.now()) {
   next.stage = STAGES.includes(stage) && stage !== 'done' ? stage : 'clouds';
   if (next.stage === 'clouds') {
     next.upgrades = [];
+    next.flags = [];
+    next.musicblock = '';
     next.island = 'arrive';
     next.exit = null;
     next.leftAt = 0;
@@ -627,4 +673,144 @@ export function training2Layout() {
       magicrock_talk: { x: 3545, y: 1260, w: 200, h: 140 },
     },
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* Gentle Island scripts (newbie_island.js and the six streets' events) */
+/* ------------------------------------------------------------------ */
+
+/** newbie_island.js instance_me per street (the location XML's instance_me). */
+export const ISLAND_INSTANCE = Object.freeze({
+  [GENTLE_ISLAND.surveyors_stroll]: 'NB_Street1',
+  [GENTLE_ISLAND.high_jumpers_gully]: 'NB_Street2',
+  [GENTLE_ISLAND.progress_way]: 'NB_Street3',
+  [GENTLE_ISLAND.exit]: 'NB_Street4',
+  [GENTLE_ISLAND.diversionary_path]: 'NB_Side_Street1',
+  [GENTLE_ISLAND.doonboggle_trail]: 'NB_Side_Street2',
+});
+
+/**
+ * Island copy, exact from the source (announce_vog_fade text uses '//' for
+ * pages; the client's [[class=…]] css prefix is dropped).
+ */
+export const ISLAND_LINES = Object.freeze({
+  // LA952QGCH3D31E2.xml events crazy / crazy2 (pc_vog).
+  crazy: 'Look - a Qurazy Quoin!',
+  crazy2: 'You can find Qurazy Quoins as you explore the world. They give you imagination!',
+  // newbie_island.js upgradeConfirmed / revealMappery2 / calloutMap.
+  mappery: 'Mappery is the full package: it comes with everything …//… a minimap showing your current location …',
+  mappery2: '… and a big ol’ area map which lets you set destinations and get directions.',
+  mapperyActivity: 'Click on the street “Progress Way” and set it as your destination.',
+  camera_mode: 'Press the ‘C’ key to enter Camera Mode, then use the arrow keys to peek around your current location.',
+  zoomability: 'Use the + and - keys to zoom in and out. The 0 (zero) key will reset you to normal zoom level.',
+  encyclopeddling: 'O, what mystical new power of insight is this!?//Now you can press the "i" key at any time to tap directly into the great Encyclopedia.',
+  // LA93VBH3H3D38HF.xml explain_upgrades (pc_vog), then callout_upgrades opens the menu.
+  explainUpgrades: 'Oh right! Upgrades! You are now free to choose them whenever you wish.//There’s a special cloud for it in the Imagination menu …',
+  // items/street_spirit_groddle.js song_lines (singTo) and onPlayerCollision on NB_Street3.
+  song: [
+    '♫ … my milkshake brings all the boys to the yard … ♫',
+    '♫ … and they’re like •  it’s better than yours … ♫',
+    '♫ … damn right •  it’s better than yours … ♫',
+    '♫ … I could teach you, but I’d have to charge … ♫',
+  ],
+  spiritOh: '<b style="font-size:30px">Oh!</b><split butt_txt="Oh?">This is embarrassing! I thought I was alone!<split butt_txt="It’s OK">Well, anyway, {name}, if you are looking for bags on the cheap, I am your girl. Come BUY from me if you need bags!',
+  // players/inc_newxp.js newxpReturnToGentleIsland (return_to_gentle_island overlay).
+  returnToIsland: 'Though you are on your own now, you are not really alone.//You should find that the other players are pretty helpful, so if you have any questions, just ask.',
+});
+
+/**
+ * Which upgradeConfirmed lines describe something the remake has. Zoom and
+ * the Encyclopedia were never rebuilt, so those cards are granted silently
+ * rather than teaching a key that does nothing.
+ */
+export const ISLAND_CONFIRM = Object.freeze({
+  mappery: 'mappery',
+  camera_mode: 'camera_mode',
+});
+
+/** Source coordinates (x, y from the street's bounds) to remake street pixels. */
+export function sourceToStreet(bounds, x, y) {
+  return { x: x - (bounds?.l ?? 0), y: y - (bounds?.t ?? 0) };
+}
+
+/**
+ * The island quoins that carry a location_event_id (newbie_island.js
+ * playerEnterCallback). NB_Street2's two are matched by their source x, y;
+ * the Qurazy markers on NB_Street1 and NB_Street4 were instance items that
+ * were not archived, so their spots are rebuilt (`rebuilt`, street pixels).
+ */
+export const ISLAND_QUOINS = Object.freeze([
+  { id: 'qurazy_stroll', tsid: GENTLE_ISLAND.surveyors_stroll, type: 'qurazy', event: 'mappery_upgrade', rebuilt: { x: 2620, above: 60 } },
+  { id: 'zoom_upgrade', tsid: GENTLE_ISLAND.high_jumpers_gully, type: 'xp', event: 'zoom_upgrade', source: { x: -1135, y: -1322 } },
+  { id: 'other_upgrade', tsid: GENTLE_ISLAND.high_jumpers_gully, type: 'xp', event: 'other_upgrade', source: { x: 122, y: -1288 } },
+  { id: 'qurazy_exit', tsid: GENTLE_ISLAND.exit, type: 'qurazy', event: 'explain_upgrades', rebuilt: { x: 3000, above: 60 } },
+]);
+
+/**
+ * Hint signs: groddle_sign_blank decos whose sign_txt the client printed
+ * (G*.xml), keyed by the deco id the street events show and hide. Each sign
+ * is two stacked decos (a mud backing and the face); the text sits on the
+ * face, `face: true`.
+ */
+export const ISLAND_SIGNS = Object.freeze({
+  // High Jumper's Gully: spinach_hint_on / spinach_hint2_on.
+  groddle_sign_blank_1343929965175: { text: 'Activating Spinach helps you jump Really High!', face: true },
+  groddle_sign_blank_1343929965176: { text: 'Activating Spinach helps you jump<br> Really High!' },
+  groddle_sign_blank_1343176167389: { text: 'Click Spinach. Activate. Juuuuump!', face: true },
+  groddle_sign_blank_1343176167390: { text: 'Click Spinach. Activate. Juuuuump!' },
+  // Diversionary Path: butterfly_msg_on.
+  groddle_sign_blank_1343260081007: { text: 'Jump and hit the enter key while in the air to get flying butterflies', face: true },
+  groddle_sign_blank_1343260081008: { text: 'Jump and hit the enter key while in the air to get flying butterflies' },
+  // Doonboggle Trail: musicblock_msg_on / musicblock_msg2_on.
+  groddle_sign_blank_1343169537341: { text: 'Musicblocks are collectible. They let you play music for yourself, and others.', face: true },
+  groddle_sign_blank_1343260081002: { text: 'Musicblocks are collectible. They let you play music for yourself, and others.' },
+  groddle_sign_blank_1343260081003: { text: 'Go ahead and give it a try!', face: true },
+  groddle_sign_blank_1343260081004: { text: 'Go ahead and give it a try!' },
+  // Progress Way: butterfly_lotion_msg_on / butterfly_msg_on.
+  groddle_sign_blank_1342730285889: { text: 'Lotion helps you massage butterflies', face: true },
+  groddle_sign_blank_1343260081005: { text: 'Lotion helps you massage butterflies' },
+  groddle_sign_blank_1342730285890: { text: 'Jump and hit the enter key while in the air to get flying butterflies', face: true },
+  groddle_sign_blank_1343260081006: { text: 'Jump and hit the enter key while in the air to get flying butterflies' },
+});
+
+/**
+ * The Collision-triggered Event Boxes that fired the island's sign events
+ * were instance items, and none was archived. Rebuilt in front of the sign
+ * each one shows (street pixels, bottom-centre boxes like the street boxes).
+ * `unlessAk`: the source sets has_ak for players with Animal Kinship, which
+ * the butterfly events exit on.
+ */
+export const ISLAND_EVENT_BOXES = Object.freeze([
+  { tsid: GENTLE_ISLAND.surveyors_stroll, event: 'crazy', x: 2250, y: 1010, w: 260, h: 500 },
+  { tsid: GENTLE_ISLAND.high_jumpers_gully, event: 'spinach_hint_on', x: 1410, y: 1930, w: 520, h: 400 },
+  { tsid: GENTLE_ISLAND.diversionary_path, event: 'butterfly_msg_on', x: 3570, y: 1080, w: 420, h: 500, unlessAk: true },
+  { tsid: GENTLE_ISLAND.doonboggle_trail, event: 'musicblock_msg_on', x: 1010, y: 1080, w: 420, h: 400 },
+  { tsid: GENTLE_ISLAND.progress_way, event: 'butterfly_lotion_msg_on', x: 643, y: 1100, w: 360, h: 400, unlessAk: true },
+  { tsid: GENTLE_ISLAND.progress_way, event: 'butterfly_msg_on', x: 1178, y: 1080, w: 360, h: 400, unlessAk: true },
+]);
+
+/** newbie_island.js playerEnterCallback NB_Side_Street2: choose_one of these at (-988, -467). */
+export const ISLAND_MUSICBLOCKS = Object.freeze([
+  'musicblock_b_brown_01', 'musicblock_b_brown_02', 'musicblock_b_brown_03', 'musicblock_b_brown_04', 'musicblock_b_brown_05',
+  'musicblock_d_blue_01', 'musicblock_d_blue_02', 'musicblock_d_blue_03', 'musicblock_d_blue_04', 'musicblock_d_blue_05',
+  'musicblock_d_green_01', 'musicblock_d_green_02', 'musicblock_d_green_03', 'musicblock_d_green_04', 'musicblock_d_green_05',
+  'musicblock_d_red_01', 'musicblock_d_red_02', 'musicblock_d_red_03', 'musicblock_d_red_04', 'musicblock_d_red_05',
+  'musicblock_x_shiny_01', 'musicblock_x_shiny_02', 'musicblock_x_shiny_03', 'musicblock_x_shiny_04', 'musicblock_x_shiny_05',
+]);
+export const ISLAND_MUSICBLOCK_AT = Object.freeze({ x: -988, y: -467 });
+/** The Gameshow Ticket stand on High Jumper's Gully (deco newxp_gameshow_ticket_stand_01a, source x, y). */
+export const ISLAND_TICKET_AT = Object.freeze({ x: 656, y: -1247 });
+/** street_spirit_groddle.js: apiSetHitBox(160, 400) while singing, a line every 3750 ms. */
+export const SPIRIT_SING = Object.freeze({ everyMs: 3750, hitW: 160, hitH: 400, lockMs: 2000 });
+
+/** Persistent island flags (once per save, as the source's per-instance flags were once per island). */
+export const ISLAND_FLAGS = Object.freeze([
+  'mappery_upgrade', 'zoom_upgrade', 'other_upgrade', 'explain_upgrades', 'cray', 'currants_revealed',
+  'musicblock', 'garden', 'gst', 'spirit_sang', 'spinach_hint_off_called', 'spinach_hint2_off_called',
+  'musicblock_msg_off_called', 'butterfly_lotion_msg_off_called', 'butterfly_msg_off_called', 'returned',
+]);
+
+/** The island event boxes on one street. */
+export function islandBoxesFor(tsid) {
+  return ISLAND_EVENT_BOXES.filter((b) => b.tsid === tsid);
 }

@@ -11,6 +11,19 @@ import {
   FIRST_SKILLS,
   GENTLE_ISLAND,
   ISLAND_BOXES,
+  ISLAND_CONFIRM,
+  ISLAND_EVENT_BOXES,
+  ISLAND_FLAGS,
+  ISLAND_INSTANCE,
+  ISLAND_LINES,
+  ISLAND_MUSICBLOCKS,
+  ISLAND_MUSICBLOCK_AT,
+  ISLAND_QUOINS,
+  ISLAND_SIGNS,
+  ISLAND_TICKET_AT,
+  islandHand,
+  reduceToHand,
+  sourceToStreet,
   ISLAND_STEPS,
   ISLAND_CURRANTS,
   LEAVE_FLAG_DELAY_MS,
@@ -277,5 +290,136 @@ describe('newxp island order (newbie_island.js, home.js, magic_rock.js)', () => 
     assert.ok(rock.includes(LINES.chapterBye), 'chapterBye');
     // The one adaptation: the source's "use the iMG Menu" is the Home panel's Return to Ur here.
     assert.ok(home.includes(LINES.whenReady.replace('use Return to Ur', 'use the iMG Menu')), 'whenReady');
+  });
+});
+
+const LOC = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'streets', 'mnt', 'stos', 'location_data');
+const decodeXml = (t) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+
+describe('newxp Gentle Island scripts (newbie_island.js and the street events)', () => {
+  const owned = ['walk_speed_1', 'jump_1', 'jump_2', 'walk_speed_2'];
+
+  it('deals the tutorial hands and tops iMG up to the cheapest card (imagination_reduce_to_hand)', () => {
+    assert.deepEqual(islandHand(owned), ['mappery', 'camera_mode', 'zoomability']);
+    assert.deepEqual(islandHand([...owned, 'mappery']), ['camera_mode', 'zoomability', 'encyclopeddling']);
+    assert.deepEqual(islandHand([...owned, 'mappery', 'camera_mode']), ['zoomability', 'encyclopeddling', 'skill_learning']);
+    assert.deepEqual(islandHand(['walk_speed_1']), ['jump_1', 'jump_2', 'walk_speed_2']);
+    assert.equal(reduceToHand(['mappery', 'camera_mode', 'zoomability'], 5), 20);
+    assert.equal(reduceToHand(['mappery', 'camera_mode', 'zoomability'], 33), 33);
+    assert.equal(reduceToHand(['camera_mode', 'zoomability', 'encyclopeddling'], 0), 75);
+    assert.equal(reduceToHand([], 4), 4);
+    // inc_data_imagination.js costs.
+    assert.deepEqual(['mappery', 'camera_mode', 'zoomability', 'encyclopeddling', 'skill_learning'].map((id) => NEWXP_UPGRADES[id].cost), [20, 75, 75, 90, 500]);
+    // Only the confirmations the remake can keep: no zoom, no Encyclopedia.
+    assert.deepEqual(Object.keys(ISLAND_CONFIRM).sort(), ['camera_mode', 'mappery']);
+  });
+
+  it('puts each event quoin on its street, with the street event it fires', () => {
+    const events = { mappery_upgrade: GENTLE_ISLAND.surveyors_stroll, zoom_upgrade: GENTLE_ISLAND.high_jumpers_gully, other_upgrade: GENTLE_ISLAND.high_jumpers_gully, explain_upgrades: GENTLE_ISLAND.exit };
+    for (const q of ISLAND_QUOINS) {
+      assert.equal(events[q.event], q.tsid, q.id);
+      assert.ok(street(q.tsid).events[q.event], `${q.tsid} has ${q.event}`);
+      assert.ok(q.source || q.rebuilt, q.id);
+    }
+    // NB_Street2's two quoins, by their source x, y; into street pixels.
+    const gully = street(GENTLE_ISLAND.high_jumpers_gully);
+    assert.deepEqual(sourceToStreet(gully.bounds, -1135, -1322), { x: 365, y: 678 });
+    assert.deepEqual(sourceToStreet(gully.bounds, 122, -1288), { x: 1622, y: 712 });
+    assert.deepEqual(Object.values(ISLAND_INSTANCE).sort(), ['NB_Side_Street1', 'NB_Side_Street2', 'NB_Street1', 'NB_Street2', 'NB_Street3', 'NB_Street4']);
+    if (!existsSync(join(GS, 'locations/newbie_island.js'))) return;
+    const island = readFileSync(join(GS, 'locations/newbie_island.js'), 'utf8');
+    for (const q of ISLAND_QUOINS.filter((x) => x.source)) assert.ok(island.includes(`q.x == ${q.source.x} && q.y == ${q.source.y}`), q.id);
+    for (const q of ISLAND_QUOINS) assert.ok(island.includes(`'${q.event}'`) || island.includes(`"${q.event}"`) || q.event === 'explain_upgrades', q.event);
+    assert.ok(island.includes("quoin_event_id = 'explain_upgrades'"));
+    for (const key of ['mappery', 'mappery2', 'mapperyActivity', 'camera_mode', 'zoomability']) assert.ok(island.includes(ISLAND_LINES[key]), key);
+    assert.ok(island.includes(ISLAND_LINES.encyclopeddling.replace(/"/g, '\\"').replace('O, what', '[[class=nuxp_big]]O, what')), 'encyclopeddling');
+    const choices = /choose_one\(\[([\s\S]*?)\]\)/.exec(island)[1].match(/'([^']+)'/g).map((x) => x.slice(1, -1));
+    assert.deepEqual(choices, [...ISLAND_MUSICBLOCKS]);
+    assert.ok(island.includes(`createItemStack(block_class, 1, ${ISLAND_MUSICBLOCK_AT.x}, ${ISLAND_MUSICBLOCK_AT.y})`));
+  });
+
+  it('keeps the rebuilt Qurazy spots on reachable ground', () => {
+    const reach = reachFor({ speed: 1, jump: 1 });
+    for (const q of ISLAND_QUOINS.filter((x) => x.rebuilt)) {
+      const s = street(q.tsid);
+      const plats = s.platforms.map((p) => ({ ...p, x1: p.x1 - s.bounds.l, x2: p.x2 - s.bounds.l, y1: p.y1 - s.bounds.t, y2: p.y2 - s.bounds.t }))
+        .filter((p) => p.pc_perm !== 0);
+      // groundBelow(x, 0): the top walk line at x, as the feature places it.
+      const top = (x) => plats.filter((p) => Math.min(p.x1, p.x2) <= x && Math.max(p.x1, p.x2) >= x)
+        .sort((a, b) => Math.min(a.y1, a.y2) - Math.min(b.y1, b.y2))[0];
+      const under = top(q.rebuilt.x);
+      const entry = top(300); // both streets are entered from the left
+      assert.ok(under && entry, q.id);
+      assert.ok(reachablePlatforms(plats, [], entry.id, reach).has(under.id), `${q.id} on ${under.id}`);
+    }
+  });
+
+  it('prints the hint signs the street events show, from the decos\' sign_txt', () => {
+    const byStreet = new Map();
+    for (const tsid of Object.values(GENTLE_ISLAND)) {
+      for (const layer of street(tsid).layers || []) for (const d of layer.decos || []) if (d.id) byStreet.set(d.id, tsid);
+    }
+    for (const [id, sign] of Object.entries(ISLAND_SIGNS)) {
+      const tsid = byStreet.get(id);
+      assert.ok(tsid, `${id} is a deco on the island`);
+      const shown = Object.values(street(tsid).events).some((acts) => acts.some((a) => a.type === 'deco_show' && a.deco === id));
+      assert.ok(shown, `${id} is shown by an event`);
+      assert.ok(sign.text.length > 8, id);
+    }
+    // One face per pair.
+    assert.equal(Object.values(ISLAND_SIGNS).filter((s) => s.face).length, 7);
+    if (!existsSync(LOC)) return;
+    for (const [id, sign] of Object.entries(ISLAND_SIGNS)) {
+      const xml = readFileSync(join(LOC, `${byStreet.get(id)}.xml`), 'utf8');
+      const at = xml.indexOf(`<object id="${id}">`);
+      const txt = /<str id="sign_txt">([^<]*)<\/str>/.exec(xml.slice(at, at + 900))?.[1];
+      assert.equal(decodeXml(txt || '').replace(/<\/?font[^>]*>/g, ''), sign.text, id);
+    }
+  });
+
+  it('rebuilds a trigger box for each sign event, on the street that has the event', () => {
+    for (const box of ISLAND_EVENT_BOXES) {
+      const s = street(box.tsid);
+      assert.ok(s.events[box.event], `${box.tsid} ${box.event}`);
+      assert.ok(box.x > 0 && box.x < s.bounds.r - s.bounds.l, box.event);
+      assert.ok(box.y > 0 && box.y < s.bounds.b - s.bounds.t + 200, box.event);
+    }
+    // The sign events: deco_show of signs whose text the island prints (crazy is a VOG).
+    for (const box of ISLAND_EVENT_BOXES.filter((b) => b.event !== 'crazy')) {
+      const shows = street(box.tsid).events[box.event].filter((a) => a.type === 'deco_show').map((a) => a.deco);
+      assert.ok(shows.some((id) => ISLAND_SIGNS[id]), box.event);
+    }
+    const stroll = street(GENTLE_ISLAND.surveyors_stroll).events;
+    assert.deepEqual(stroll.crazy.find((a) => a.type === 'pc_vog').lines, [ISLAND_LINES.crazy]);
+    assert.deepEqual(stroll.crazy2.find((a) => a.type === 'pc_vog').lines, [ISLAND_LINES.crazy2]);
+    const exit = street(GENTLE_ISLAND.exit).events;
+    assert.equal(exit.explain_upgrades.find((a) => a.type === 'pc_vog').lines.join('//'), ISLAND_LINES.explainUpgrades);
+    // The ticket stand deco sits where the Gameshow Ticket goes.
+    const gully = street(GENTLE_ISLAND.high_jumpers_gully);
+    const stand = gully.layers.flatMap((l) => l.decos || []).find((d) => d.sprite === 'newxp_gameshow_ticket_stand_01a');
+    assert.deepEqual([stand.x, stand.y], [ISLAND_TICKET_AT.x, ISLAND_TICKET_AT.y]);
+  });
+
+  it('quotes the street spirit and the return overlay from the source', () => {
+    if (!existsSync(join(GS, 'items/street_spirit_groddle.js'))) return;
+    const spirit = readFileSync(join(GS, 'items/street_spirit_groddle.js'), 'utf8');
+    for (const line of ISLAND_LINES.song) assert.ok(spirit.includes(line), line);
+    assert.ok(spirit.includes('This is embarrassing! I thought I was alone!<split butt_txt=\\"It’s OK\\">Well, anyway, '));
+    assert.ok(spirit.includes('if you are looking for bags on the cheap, I am your girl. Come BUY from me if you need bags!'));
+    assert.deepEqual(talkPages(ISLAND_LINES.spiritOh, { name: 'Pip' }, 'OK').map((p) => p.button), ['Oh?', 'It’s OK', 'OK']);
+    const players = readFileSync(join(GS, 'players/inc_newxp.js'), 'utf8');
+    assert.ok(players.includes(ISLAND_LINES.returnToIsland));
+  });
+
+  it('saves the island flags and the chosen Musicblock', () => {
+    const s = normalizeNewxpSave({ flags: ['mappery_upgrade', 'bogus', 'mappery_upgrade', 'gst'], musicblock: 'musicblock_d_red_03' });
+    assert.deepEqual(s.flags, ['mappery_upgrade', 'gst']);
+    assert.equal(s.musicblock, 'musicblock_d_red_03');
+    assert.equal(normalizeNewxpSave({ musicblock: 'apple' }).musicblock, '');
+    const fresh = startNewxp(s, 'clouds');
+    assert.deepEqual(fresh.flags, []);
+    assert.equal(fresh.musicblock, '');
+    assert.equal(startNewxp(s, 'island').flags.length, 2);
+    for (const q of ISLAND_QUOINS) assert.ok(ISLAND_FLAGS.includes(q.event), q.event);
   });
 });

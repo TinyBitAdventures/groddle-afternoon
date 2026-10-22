@@ -797,13 +797,13 @@
  "quests": {
   "total": 445,
   "story": 245,
-  "playable": 193,
+  "playable": 194,
   "buckets": [
    {
     "id": "playable",
     "label": "Playable",
     "note": "Offered and finishable in the remake.",
-    "count": 193
+    "count": 194
    },
    {
     "id": "job",
@@ -815,7 +815,7 @@
     "id": "building",
     "label": "Still being rebuilt",
     "note": "Their rooms or systems are on the workbench.",
-    "count": 0
+    "count": 1
    },
    {
     "id": "players",
@@ -827,13 +827,13 @@
     "id": "retired",
     "label": "Retired before shutdown",
     "note": "Tests, removed features, broken or unreachable in the original.",
-    "count": 21
+    "count": 23
    },
    {
     "id": "tutorial",
     "label": "Tutorial island",
     "note": "The new-player experience, being rebuilt.",
-    "count": 4
+    "count": 0
    }
   ]
  },
@@ -1393,9 +1393,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 245,
+  "commits": 246,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "The other Glitches you meet are vector Glitches with their own looks and idles"
+   },
    {
     "date": "2026-10-22",
     "kind": "fix",
@@ -1510,11 +1515,6 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Restoration scorecard for the coverage loop"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "The tutorial sends you home before you leave Gentle Island"
    }
   ]
  },
