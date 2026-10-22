@@ -1,0 +1,377 @@
+{
+  "checked": "2026-10-22",
+  "statuses": {
+    "yes": { "label": "Yes", "mark": "✓", "tone": "moss", "desc": "A public source shows it in the game." },
+    "partial": { "label": "Partly", "mark": "◐", "tone": "sun", "desc": "Some of it, or adapted from the original design. The note says how." },
+    "no": { "label": "No", "mark": "×", "tone": "dusk", "desc": "Left out on purpose, or the project says it is not there." },
+    "unknown": { "label": "Unknown", "mark": "?", "tone": "stone", "desc": "No public source says either way. Not a judgement." }
+  },
+  "sources": {
+    "eg-faq": { "title": "Eleven FAQ (Wayback Machine copy of elevengiants.com)", "url": "https://web.archive.org/web/2026/http://elevengiants.com/FAQ.php", "checked": "2026-10-22" },
+    "eg-home": { "title": "Eleven homepage and latest news, 2019-08-30 (Wayback Machine copy)", "url": "https://web.archive.org/web/2026/http://www.elevengiants.com/", "checked": "2026-10-22" },
+    "eg-team": { "title": "Eleven team page (Wayback Machine copy)", "url": "https://web.archive.org/web/2026/http://elevengiants.com/team.php", "checked": "2026-10-22" },
+    "eg-server": { "title": "ElevenGiants/eleven-server on GitHub (README, licence, commits)", "url": "https://github.com/ElevenGiants/eleven-server", "checked": "2026-10-22" },
+    "eg-gsjs": { "title": "ElevenGiants/eleven-gsjs on GitHub", "url": "https://github.com/ElevenGiants/eleven-gsjs", "checked": "2026-10-22" },
+    "eg-forum": { "title": "Eleven Forums (welcome post dated 2014-12-09; recent activity)", "url": "https://forum.elevengiants.com/", "checked": "2026-10-22" },
+    "eg-forum-2023": { "title": "Eleven Forums: \"Still accepting alpha tester?\" (player reply, 2023-07-07)", "url": "https://forum.elevengiants.com/discussion/1365", "checked": "2026-10-22" },
+    "eg-engadget": { "title": "Engadget: \"Eleven alpha tester: Game is 'identical to Glitch'\" (2015-01-08)", "url": "https://www.engadget.com/2015-01-08-eleven-alpha-tester-game-is-identical-to-glitch.html", "checked": "2026-10-22" },
+    "eg-vid-meadow": { "title": "Video: Eleven Giants Groddle Meadow (SuperArtoo, 2019-01-20)", "url": "https://www.youtube.com/watch?v=ewxs6XjllWo", "checked": "2026-10-22" },
+    "eg-vid-home": { "title": "Video: Eleven Giants home street (SuperArtoo, 2019-01-07)", "url": "https://www.youtube.com/watch?v=nlW1QqNZXBg", "checked": "2026-10-22" },
+    "eg-vid-zilloween": { "title": "Video: Eleven Giants Zilloween (SuperArtoo, 2019-01-23)", "url": "https://www.youtube.com/watch?v=WFRNZZhL7LE", "checked": "2026-10-22" },
+    "eg-vid-shops": { "title": "Video: Eleven Giants shops (SuperArtoo, 2019-05-28)", "url": "https://www.youtube.com/watch?v=OdvqophP5Ck", "checked": "2026-10-22" },
+    "mop-merge": { "title": "MassivelyOP headline: \"Children of Ur and Eleven join forces\" (2019-03-21)", "url": "https://massivelyop.com/2019/03/21/children-of-ur-and-eleven-join-forces-to-create-the-ultimate-glitch-revival/", "checked": "2026-10-22" },
+    "cou-home": { "title": "Children of Ur homepage (Wayback Machine copy, January 2026)", "url": "https://web.archive.org/web/2026/http://childrenofur.com/", "checked": "2026-10-22" },
+    "cou-client": { "title": "ChildrenOfUr/coUclient on GitHub (Dart browser client, MIT, archived)", "url": "https://github.com/ChildrenOfUr/coUclient", "checked": "2026-10-22" },
+    "cou-server": { "title": "ChildrenOfUr/coUserver on GitHub (Dart server, MIT, archived)", "url": "https://github.com/ChildrenOfUr/coUserver", "checked": "2026-10-22" },
+    "cou-streets": { "title": "coUserver: CAT422 street data (1,423 files)", "url": "https://github.com/ChildrenOfUr/coUserver/tree/master/CAT422", "checked": "2026-10-22" },
+    "cou-entities": { "title": "coUserver: entities (animals, plants, rocks, shrines, vendors, mailbox)", "url": "https://github.com/ChildrenOfUr/coUserver/tree/master/lib/entities", "checked": "2026-10-22" },
+    "cou-lib": { "title": "coUserver: lib (quests, skills, achievements, auctions, upgrades, chat)", "url": "https://github.com/ChildrenOfUr/coUserver/tree/master/lib", "checked": "2026-10-22" },
+    "cou-scproxy": { "title": "ChildrenOfUr/scproxy: SoundCloud helper for the client", "url": "https://github.com/ChildrenOfUr/scproxy", "checked": "2026-10-22" },
+    "cou-libregame": { "title": "Libregamewiki: Children of Ur", "url": "https://libregamewiki.org/Children_of_Ur", "checked": "2026-10-22" },
+    "cou-revival": { "title": "davidmanheim/ChildrenOfUr: local revival of the archived code (August 2026)", "url": "https://github.com/davidmanheim/ChildrenOfUr", "checked": "2026-10-22" },
+    "cou-vid": { "title": "Video: Children of Ur, very early alpha stream (Button Mash, 2019-03-06)", "url": "https://www.youtube.com/watch?v=UqdRwLaIdp0", "checked": "2026-10-22" },
+    "og-site": { "title": "Odd Giants website", "url": "https://oddgiants.com/", "checked": "2026-10-22" },
+    "og-help": { "title": "Odd Giants Help and FAQ", "url": "https://oddgiants.com/help", "checked": "2026-10-22" },
+    "og-downloads": { "title": "Odd Giants downloads (Windows, macOS, Linux)", "url": "https://oddgiants.com/downloads", "checked": "2026-10-22" },
+    "og-config": { "title": "Odd Giants public API: version and account count", "url": "https://api.oddgiants.com/public/configs", "checked": "2026-10-22" },
+    "og-encyclopedia": { "title": "Odd Giants encyclopedia", "url": "https://oddgiants.com/encyclopedia", "checked": "2026-10-22" },
+    "og-patreon": { "title": "Odd Giants on Patreon", "url": "https://www.patreon.com/oddgiants", "checked": "2026-10-22" },
+    "og-0-3-5": { "title": "Odd Giants 0.3.5 patch notes (2021-04-11)", "url": "https://oddgiants.com/forums/announcements/21", "checked": "2026-10-22" },
+    "og-0-4-0": { "title": "Odd Giants 0.4.0 patch notes (2021-05-16)", "url": "https://oddgiants.com/forums/announcements/22", "checked": "2026-10-22" },
+    "og-0-4-2": { "title": "Odd Giants 0.4.2 server update (2021-05-21)", "url": "https://oddgiants.com/forums/announcements/25", "checked": "2026-10-22" },
+    "og-0-5-0": { "title": "Odd Giants 0.5.0 patch notes (2021-06-14)", "url": "https://oddgiants.com/forums/announcements/28", "checked": "2026-10-22" },
+    "og-0-7-0": { "title": "Odd Giants 0.7.0 patch notes (2021-10-04)", "url": "https://oddgiants.com/forums/announcements/58", "checked": "2026-10-22" },
+    "og-0-8-0": { "title": "Odd Giants 0.8.0 patch notes (2021-10-22)", "url": "https://oddgiants.com/forums/announcements/64", "checked": "2026-10-22" },
+    "og-0-8-1": { "title": "Odd Giants 0.8.1 server update (2021-11-10)", "url": "https://oddgiants.com/forums/announcements/67", "checked": "2026-10-22" },
+    "og-0-10-0": { "title": "Odd Giants 0.10.0 patch notes (2022-02-26)", "url": "https://oddgiants.com/forums/announcements/194", "checked": "2026-10-22" },
+    "og-0-12-0": { "title": "Odd Giants 0.12.0 patch notes (2022-05-15)", "url": "https://oddgiants.com/forums/announcements/324", "checked": "2026-10-22" },
+    "og-0-14-1": { "title": "Odd Giants 0.14.1 patch notes (2022-10-21)", "url": "https://oddgiants.com/forums/announcements/470", "checked": "2026-10-22" },
+    "og-0-15-0": { "title": "Odd Giants 0.15.0 patch notes (2022-12-04)", "url": "https://oddgiants.com/forums/announcements/522", "checked": "2026-10-22" },
+    "og-0-17-0": { "title": "Odd Giants 0.17.0 patch notes (2024-07-16)", "url": "https://oddgiants.com/forums/announcements/1727", "checked": "2026-10-22" },
+    "og-0-18-0": { "title": "Odd Giants 0.18.0 patch notes (2025-05-05)", "url": "https://oddgiants.com/forums/announcements/1761", "checked": "2026-10-22" },
+    "og-0-19-0": { "title": "Odd Giants 0.19.0 patch notes (2026-08-02)", "url": "https://oddgiants.com/forums/announcements/1794", "checked": "2026-10-22" },
+    "og-setsideb": { "title": "Set Side B: Revival of Glitch: Odd Giants (2022-10-29)", "url": "https://setsideb.com/tag/ur/", "checked": "2026-10-22" },
+    "og-vid-look": { "title": "Video: \"Learn how to change your look!\" Odd Giants #2 (yorkcommatyler)", "url": "https://www.youtube.com/watch?v=XdXqAiPk3nY", "checked": "2026-10-22" },
+    "wikipedia": { "title": "Wikipedia: Glitch (video game)", "url": "https://en.wikipedia.org/wiki/Glitch_(video_game)", "checked": "2026-10-22" },
+    "ts-gsjs": { "title": "tinyspeck/glitch-GameServerJS README (CC0 1.0, logo and trademark excluded)", "url": "https://github.com/tinyspeck/glitch-GameServerJS", "checked": "2026-10-22" },
+    "ga-restoration": { "title": "Groddle Field Notes: restoration report (built from this repository)", "url": "../restoration/", "checked": "2026-10-22" }
+  },
+  "projects": [
+    {
+      "id": "cou",
+      "name": "Children of Ur",
+      "years": "2013 to 2019",
+      "approach": "Rewrite",
+      "badge": { "label": "Archived · server offline", "tone": "stone" },
+      "summary": "A browser MMO that rebuilt Glitch in Dart and called itself a spinoff, with new areas and updated storylines alongside the original world.",
+      "link": { "label": "Source code on GitHub", "url": "https://github.com/ChildrenOfUr" },
+      "facts": [
+        { "label": "Client", "text": "Dart, compiled to JavaScript, in the browser. No Flash.", "sources": ["cou-client"] },
+        { "label": "Server and rules", "text": "Dart server and auth server; game systems rewritten from the original ActionScript and data rather than running Tiny Speck's server code.", "sources": ["cou-server", "cou-libregame"] },
+        { "label": "Platform", "text": "Web browser.", "sources": ["cou-home"] },
+        { "label": "Licence and code", "text": "Client and server are MIT on GitHub (client 74 stars). Last client commit 2019-02-22; repositories archived.", "sources": ["cou-client", "cou-server"] },
+        { "label": "Status", "text": "Released alphas up to 1.4.x. The site now redirects to a host that answers with an error, so the game cannot be played online. A 2019 headline reports the team joining forces with Eleven.", "sources": ["cou-libregame", "cou-home", "mop-merge"] },
+        { "label": "How to play", "text": "Not playable online today. In August 2026 one developer published a local Docker setup that runs the archived code on your own machine.", "sources": ["cou-revival"] },
+        { "label": "Team", "text": "Size not published.", "sources": ["cou-home"] }
+      ]
+    },
+    {
+      "id": "eleven",
+      "name": "Eleven (Eleven Giants)",
+      "years": "2014 to today",
+      "approach": "Faithful revival",
+      "badge": { "label": "Closed alpha · website down today", "tone": "dusk" },
+      "summary": "A volunteer effort to get the released Glitch code running again, so the game looks and plays exactly as it did, with early help from Tiny Speck.",
+      "link": { "label": "Eleven Forums", "url": "https://forum.elevengiants.com/" },
+      "facts": [
+        { "label": "Client", "text": "The original Flash client, with plans to reduce the reliance on Flash later.", "sources": ["eg-faq"] },
+        { "label": "Server and rules", "text": "A Node.js server rebuilds the missing layer between client and server and runs Tiny Speck's original server JavaScript (GSJS).", "sources": ["eg-faq", "eg-server", "eg-gsjs"] },
+        { "label": "Platform", "text": "The original Flash client ran in a web browser. How testers run it since Flash reached end of life in 2020 is not documented publicly.", "sources": ["eg-faq"] },
+        { "label": "Licence and code", "text": "eleven-server and eleven-gsjs are MIT on GitHub (48 and 21 stars). The README says further components needed to start the game are not public. Last non-automated commit 2020-06-12.", "sources": ["eg-server", "eg-gsjs"] },
+        { "label": "Status", "text": "Alpha testing began in December 2014 with 13 players, 31 by January 2015. The website answered with an error today; the forum is online. A player reported in 2023 that the game was broken and unattended (community report).", "sources": ["eg-forum", "eg-engadget", "eg-forum-2023"] },
+        { "label": "How to play", "text": "Invite only: the last news post (August 2019) opened an interest list and admitted players in small batches.", "sources": ["eg-home"] },
+        { "label": "Team", "text": "About 28 volunteers listed on the team page.", "sources": ["eg-team"] }
+      ]
+    },
+    {
+      "id": "odd",
+      "name": "Odd Giants",
+      "years": "2019 to today",
+      "approach": "Remake",
+      "badge": { "label": "Live alpha · v0.19.0", "tone": "moss" },
+      "summary": "An online multiplayer remake built in Unity that aims to bring back most of the old game plus new features of its own, with regular releases and community events.",
+      "link": { "label": "oddgiants.com", "url": "https://oddgiants.com/" },
+      "facts": [
+        { "label": "Client", "text": "Unity desktop application (about 2 GB download).", "sources": ["og-help", "og-downloads"] },
+        { "label": "Server and rules", "text": "Own online servers. Server code is not public, so whether it uses Tiny Speck's server code is unknown.", "sources": ["og-site"] },
+        { "label": "Platform", "text": "Windows, macOS and Linux. A Steam release is planned.", "sources": ["og-downloads", "og-help"] },
+        { "label": "Licence and code", "text": "Closed source; no public repository found.", "sources": ["og-site"] },
+        { "label": "Status", "text": "Version 0.19.0 released 2026-08-02; regular patch notes since 2021; a player count of 3,377 reported by its API.", "sources": ["og-0-19-0", "og-config"] },
+        { "label": "How to play", "text": "Free account, then download. The FAQ says payment is not required to play; Patreon is optional, and future premium accounts would be cosmetic only.", "sources": ["og-help", "og-patreon"] },
+        { "label": "Team", "text": "A small team of developers and artists; size not published.", "sources": ["og-site"] }
+      ]
+    },
+    {
+      "id": "groddle",
+      "name": "Groddle Afternoon",
+      "years": "2026",
+      "approach": "Fresh take",
+      "ours": true,
+      "badge": { "label": "In development · not yet public", "tone": "sun" },
+      "summary": "This project. A single-player web game that rebuilds Glitch rule by rule from Tiny Speck's released code and art, and fills the gaps from players' recordings.",
+      "link": { "label": "Restoration report", "url": "../restoration/" },
+      "facts": [
+        { "label": "Client", "text": "PixiJS 7 in the browser. No Flash, nothing to install.", "sources": ["ga-restoration"] },
+        { "label": "Server and rules", "text": "No server: the original server code (GSJS) is mined as the design reference and its rules are rewritten in modern JavaScript. Saves stay on your device.", "sources": ["ga-restoration"] },
+        { "label": "Platform", "text": "Web browser.", "sources": ["ga-restoration"] },
+        { "label": "Licence and code", "text": "Uses Tiny Speck's CC0 art and code plus recovered audio; no Glitch logo or trademark. Repository is local only for now.", "sources": ["ts-gsjs", "ga-restoration"] },
+        { "label": "Status", "text": "In development; not yet public.", "sources": ["ga-restoration"] },
+        { "label": "How to play", "text": "Not yet public.", "sources": ["ga-restoration"] },
+        { "label": "Team", "text": "A one-person project.", "sources": ["ga-restoration"] }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "streets", "name": "Original streets to explore",
+      "ours": ["streets"],
+      "cells": {
+        "cou": { "status": "yes", "note": "1,423 street files ship in the archived server.", "sources": ["cou-streets"] },
+        "eleven": { "status": "yes", "note": "A 2019 player video walks Groddle Meadow.", "sources": ["eg-vid-meadow"] },
+        "odd": { "status": "yes", "note": "More than 1,300 locations, per its Help page.", "sources": ["og-help"] }
+      }
+    },
+    {
+      "id": "avatar", "name": "Avatar and wardrobe",
+      "ours": ["avatar"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source on in-game avatar customisation.", "sources": [] },
+        "eleven": { "status": "yes", "note": "The project site offers a Wardrobe and Vanity tool.", "sources": ["eg-home"] },
+        "odd": { "status": "yes", "note": "Change your look in game; new clothing added in 0.18.0.", "sources": ["og-vid-look", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "animals", "name": "Piggies, chickens and butterflies",
+      "ours": ["piggies", "chickens", "butterflies"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Server classes for piggy, chicken, butterfly, batterfly, fox, helikitty and more.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "Runs the original code, but no public source shows these working.", "sources": [] },
+        "odd": { "status": "yes", "note": "Chickens and piggies in 0.4.0, butterflies in 0.5.0.", "sources": ["og-0-4-0", "og-0-5-0"] }
+      }
+    },
+    {
+      "id": "trees", "name": "Trees and harvesting",
+      "ours": ["trants"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Bean, bubble, fruit, gas, spice, paper, wood trees and egg plants.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Trees grow from trants since 0.5.0.", "sources": ["og-0-5-0"] }
+      }
+    },
+    {
+      "id": "gardens", "name": "Gardening",
+      "ours": ["gardens"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Garden entity and croppery items in the server.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Home-street gardens since 0.10.0.", "sources": ["og-0-10-0"] }
+      }
+    },
+    {
+      "id": "mining", "name": "Mining",
+      "ours": ["mining"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Beryl, dullite, metal and sparkly rocks.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Mining moved server side in 0.3.5.", "sources": ["og-0-3-5"] }
+      }
+    },
+    {
+      "id": "crafting", "name": "Crafting and cooking",
+      "ours": ["cooking", "machines"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Recipe data and item actions in the server.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Crafting and tool wear since 0.4.0.", "sources": ["og-0-4-0"] }
+      }
+    },
+    {
+      "id": "skills", "name": "Skills",
+      "ours": ["skills"],
+      "cells": {
+        "cou": { "status": "partial", "note": "10 skill lines defined in the archived server data.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Skill learning since the early alphas; Teleportation and Piety skills mentioned in notes.", "sources": ["og-0-3-5", "og-0-8-0", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "quests", "name": "Quests",
+      "ours": ["quests"],
+      "cells": {
+        "cou": { "status": "partial", "note": "12 quests written for the project, such as Race to the Forest.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Quests since 0.5.0, more added since; total count not published.", "sources": ["og-0-5-0", "og-0-19-0"] }
+      }
+    },
+    {
+      "id": "instances", "name": "Private quest rooms and Paradise",
+      "ours": ["quest-rooms", "paradise"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "partial", "note": "Cloud Rings and Cloud Flight instances added in 0.19.0.", "sources": ["og-0-19-0"] }
+      }
+    },
+    {
+      "id": "achievements", "name": "Achievements and badges",
+      "ours": ["badges"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Achievement data in 18 categories in the server.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Achievements since 0.4.0, many added since.", "sources": ["og-0-4-0", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "giants", "name": "Giants and shrines",
+      "ours": ["shrines"],
+      "cells": {
+        "cou": { "status": "yes", "note": "A shrine class for each of the eleven Giants.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Shrines and Giant affiliation in 0.4.0; bestowments in 0.18.0.", "sources": ["og-0-4-0", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "imagination", "name": "Imagination upgrades",
+      "ours": ["imagination"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Upgrade data and an upgrade manager in the server.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Imagination cards since the early alphas; new cards in 0.19.0.", "sources": ["og-0-3-5", "og-0-19-0"] }
+      }
+    },
+    {
+      "id": "homes", "name": "Houses and home streets",
+      "ours": ["homes"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No housing code found in the archived server.", "sources": ["cou-lib"] },
+        "eleven": { "status": "yes", "note": "A 2019 player video tours a home street.", "sources": ["eg-vid-home"] },
+        "odd": { "status": "yes", "note": "Home streets in 0.10.0, houses in 0.12.0, wall customising in 0.18.0.", "sources": ["og-0-10-0", "og-0-12-0", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "mail", "name": "Mail",
+      "ours": ["mail"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Mailbox entity in the server.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Mailbox between players since 0.17.0.", "sources": ["og-0-17-0"] }
+      }
+    },
+    {
+      "id": "players", "name": "Other players and chat",
+      "ours": ["chat"],
+      "cells": {
+        "cou": { "status": "yes", "note": "A massively multiplayer browser game with a chat server.", "sources": ["cou-home", "cou-lib"] },
+        "eleven": { "status": "yes", "note": "A massively multiplayer game, tested by groups of alpha players.", "sources": ["eg-home", "eg-engadget"] },
+        "odd": { "status": "yes", "note": "Online multiplayer with local, global and private chat and friends.", "sources": ["og-help", "og-0-17-0", "og-0-19-0"] }
+      }
+    },
+    {
+      "id": "trading", "name": "Auctions and trading",
+      "ours": ["auctions"],
+      "cells": {
+        "cou": { "status": "yes", "note": "An auctions service in the server.", "sources": ["cou-lib"] },
+        "eleven": { "status": "unknown", "note": "The FAQ notes the auction pages belonged to a web app Tiny Speck never released.", "sources": ["eg-faq"] },
+        "odd": { "status": "yes", "note": "A Vendor Auction (0.8.1): items players sell appear for others to buy.", "sources": ["og-0-8-1"] }
+      }
+    },
+    {
+      "id": "feats", "name": "Feats and world events",
+      "ours": ["feats"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Feats since 0.15.0; a new feat in 0.19.0.", "sources": ["og-0-15-0", "og-0-19-0"] }
+      }
+    },
+    {
+      "id": "holidays", "name": "Holidays",
+      "ours": ["seasons"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "yes", "note": "A 2019 player video shows Zilloween.", "sources": ["eg-vid-zilloween"] },
+        "odd": { "status": "yes", "note": "Zilloween quests (0.14.1); Glitchmas and an egg hunt on its calendar (0.18.0).", "sources": ["og-0-14-1", "og-0-18-0"] }
+      }
+    },
+    {
+      "id": "hell", "name": "Hell (Naraka)",
+      "ours": ["hell"],
+      "cells": {
+        "cou": { "status": "yes", "note": "Hell bartender and hell grapes in the server.", "sources": ["cou-entities"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Run out of energy and you squish grapes in Naraka (0.7.0).", "sources": ["og-0-7-0"] }
+      }
+    },
+    {
+      "id": "parties", "name": "Party spaces",
+      "ours": ["parties"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Eight party locations, opened with party packs (0.18.0).", "sources": ["og-0-18-0"] }
+      }
+    },
+    {
+      "id": "street-projects", "name": "Street projects",
+      "ours": ["street-jobs"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "unknown", "note": "Not mentioned in its patch notes.", "sources": [] }
+      }
+    },
+    {
+      "id": "teleport", "name": "Teleportation",
+      "ours": ["meditation"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Map teleportation with the Teleportation I skill (0.8.0).", "sources": ["og-0-8-0"] }
+      }
+    },
+    {
+      "id": "music", "name": "Music and sound",
+      "ours": ["music"],
+      "cells": {
+        "cou": { "status": "yes", "note": "The client streams music through a SoundCloud helper.", "sources": ["cou-scproxy"] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "Location music from the early alphas; sound effects and music blocks since 0.4.", "sources": ["og-0-3-5", "og-0-4-0", "og-0-4-2"] }
+      }
+    },
+    {
+      "id": "tutorial", "name": "New-player tutorial",
+      "ours": ["newxp"],
+      "cells": {
+        "cou": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "eleven": { "status": "unknown", "note": "No public source.", "sources": [] },
+        "odd": { "status": "yes", "note": "A tutorial level, improved in 0.19.0.", "sources": ["og-0-19-0"] }
+      }
+    }
+  ],
+  "others": [
+    { "name": "Children of Ur, local revival", "text": "A developer's August 2026 Docker setup that runs the archived Children of Ur client, server and auth server locally, with fixes and content recovery notes.", "url": "https://github.com/davidmanheim/ChildrenOfUr", "checked": "2026-10-22" },
+    { "name": "Children of Ur minidemo", "text": "A planned single-player, simplified demo for the Children of Ur site; archived in 2015.", "url": "https://github.com/ChildrenOfUr/minidemo", "checked": "2026-10-22" },
+    { "name": "unUrthed", "text": "An HTML5 mini-game of Glitch from 2013.", "url": "https://github.com/harkyman/unUrthed", "checked": "2026-10-22" }
+  ],
+  "resources": [
+    { "name": "Tiny Speck on GitHub", "text": "The released server code (GameServerJS), Flash client, items, avatars, locations and overlays, under CC0 1.0. The Glitch logo and trademark are not included.", "url": "https://github.com/tinyspeck", "checked": "2026-10-22" },
+    { "name": "glitchthegame.com (Wayback Machine)", "text": "Tiny Speck's retirement site: the public-domain art downloads, music and the encyclopedia.", "url": "https://web.archive.org/web/20131206092459/http://www.glitchthegame.com/public-domain-game-art/", "checked": "2026-10-22" },
+    { "name": "OpenGameArt: Glitch Sprite Assets", "text": "The CC0 PNG spritesheets in two archives.", "url": "https://opengameart.org/content/glitch-sprite-assets-huge-collection", "checked": "2026-10-22" },
+    { "name": "Internet Archive: Glitch music and sound effects", "text": "Tiny Speck's music, sound effects and unused sound effects.", "url": "https://archive.org/details/glitch-mmo-tiny-speck-music", "checked": "2026-10-22" },
+    { "name": "Glitch Forever wiki", "text": "A community wiki of quests, places and history, still online.", "url": "https://glitchen.org/w/Main_Page", "checked": "2026-10-22" },
+    { "name": "Glitch Strategy wiki (Wayback Machine)", "text": "The 2011 to 2012 fan wiki.", "url": "https://web.archive.org/web/2012/http://www.glitch-strategy.com/wiki/Glitch_Wiki", "checked": "2026-10-22" },
+    { "name": "Children of Ur art conversions", "text": "SVG items and PNG location art converted from the CC0 release.", "url": "https://github.com/ChildrenOfUr/coU-sprites", "checked": "2026-10-22" },
+    { "name": "Soundscapes of Ur", "text": "The soundtrack from composer Daniel Simmons.", "url": "https://danielsimmons.bandcamp.com/", "checked": "2026-10-22" },
+    { "name": "Wikipedia: Glitch", "text": "Background on the original game, which closed on 9 December 2012.", "url": "https://en.wikipedia.org/wiki/Glitch_(video_game)", "checked": "2026-10-22" }
+  ]
+}

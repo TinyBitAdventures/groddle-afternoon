@@ -1393,9 +1393,19 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 203,
+  "commits": 205,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Climbing: no ghosting when hopping off, no bouncing at rest, jump off while moving"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Your Glitch idles, dozes off when you're away, and walks with feet on the ground"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1505,19 +1515,9 @@
     "date": "2026-10-21",
     "kind": "new",
     "text": "Build a Tower on your home street, and the Meditation Station"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Nine more Ticket to Paradise courses"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "The Last Pilgrimage of Esquibeth: a four-location song walk to the Conch"
    }
   ]
  },
- "tests": 139,
+ "tests": 140,
  "generatedAt": "2026-10-22"
 }
