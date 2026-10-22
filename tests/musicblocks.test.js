@@ -16,10 +16,20 @@ import {
   getMusicblock,
   isMusicblock,
   listMusicblockCollection,
+  MUSICBLOCK_ENDGAME_DROP,
+  MUSICBLOCK_SERIES,
+  MUSICBLOCK_STREET_POOL,
+  musicblockCollectionNote,
+  musicblockItemMeta,
+  musicblockSeriesProgress,
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
 } from '../public/js/musicblocks.js';
+import { SOUND_ALIASES, SOUND_FILES } from '../public/js/sound-keys.js';
+import { DROP_TABLES } from '../public/js/drop-tables-data.js';
+import { SOIL_DROP_TABLES } from '../public/js/patches.js';
+import { SPINNING_WHEEL_DROP_TABLE } from '../public/js/spinning-wheel.js';
 import {
   ITEM_CATALOG,
   countItem,
@@ -34,23 +44,86 @@ function pc(overrides = {}) {
   return { energy: 20, mood: 50, xp: 0, imagination: 0, ...overrides };
 }
 
+const GSJS = join(here, '../../glitch-GameServerJS');
+const gsjsVar = (src, name) => src.match(new RegExp(`^var ${name} = (.*);$`, 'm'))?.[1];
+
 describe('official Musicblock catalog', () => {
-  it('ships recovered tunes with matching item art and GSJS metadata', () => {
+  it('makes every recovered tune an item with GSJS metadata, CC0 art and its class sound', () => {
     ensureMusicblockItems();
-    assert.equal(Object.keys(MUSICBLOCK_CATALOG).length, 4);
+    const recovered = Object.keys(SOUND_FILES).concat(Object.keys(SOUND_ALIASES))
+      .filter((key) => /^MUSICBLOCK_/.test(key) && (SOUND_FILES[key] || SOUND_FILES[SOUND_ALIASES[key]]));
+    assert.equal(recovered.length, 27);
+    assert.deepEqual(Object.values(MUSICBLOCK_CATALOG).map((def) => def.soundKey).sort(), recovered.sort());
+    // musicblock_trumpets (T-1) has no recovered tune, so no item.
+    assert.equal(MUSICBLOCK_CATALOG.musicblock_trumpets, undefined);
     for (const def of Object.values(MUSICBLOCK_CATALOG)) {
       assert.equal(isMusicblock(def.classTsid), true);
       assert.equal(getMusicblock(def.classTsid), def);
-      assert.match(def.label, /^Musicblock D[GR]-\d$/);
-      assert.ok(def.durationMs >= 6000);
+      assert.equal(def.soundKey, def.classTsid.toUpperCase());
       assert.ok(existsSync(join(publicRoot, def.audio)), `missing ${def.audio}`);
-      assert.ok(
-        existsSync(join(publicRoot, `assets/sprites/icons/${def.classTsid}.png`)),
-        `missing ${def.classTsid} icon`
-      );
+      assert.ok(existsSync(join(publicRoot, def.icon)), `missing ${def.icon}`);
       assert.equal(ITEM_CATALOG[def.classTsid].label, def.label);
+      assert.equal(ITEM_CATALOG[def.classTsid].icon, def.icon);
+      assert.equal(ITEM_CATALOG[def.classTsid].baseCost, def.baseCost);
+      if (existsSync(GSJS)) {
+        const src = readFileSync(join(GSJS, `items/${def.classTsid}.js`), 'utf8');
+        assert.equal(JSON.parse(gsjsVar(src, 'label')), def.label);
+        assert.equal(JSON.parse(gsjsVar(src, 'description')), def.desc);
+        assert.equal(Number(gsjsVar(src, 'base_cost')), def.baseCost);
+        assert.equal(Number(gsjsVar(src, 'stackmax')), def.stackMax);
+        assert.equal(Number(src.match(/"music_duration"\s*:\s*"(\d+)"/)[1]), def.durationMs);
+      }
     }
     assert.deepEqual(starterMusicblocks(), { musicblock_d_green_02: 1 });
+  });
+
+  it('groups the five series exactly as the collection trophies do', () => {
+    const achievements = JSON.parse(readFileSync(join(publicRoot, 'assets/content/achievements.json'), 'utf8'));
+    const text = JSON.stringify(achievements);
+    for (const series of Object.values(MUSICBLOCK_SERIES)) {
+      const ids = Object.values(MUSICBLOCK_CATALOG).filter((def) => def.collection === series.id).map((def) => def.classTsid);
+      assert.equal(ids.length, 5, series.id);
+      assert.ok(text.includes(series.badge), series.badge);
+      for (const id of ids) assert.ok(text.includes(id), `${series.badge} ${id}`);
+      if (existsSync(GSJS)) {
+        const src = readFileSync(join(GSJS, `achievements/${series.badge}.js`), 'utf8');
+        assert.deepEqual([...src.matchAll(/label\s*:\s*"(musicblock_[a-z_0-9]+)"/g)].map((m) => m[1]).sort(), ids.sort());
+      }
+    }
+    assert.equal(MUSICBLOCK_CATALOG.musicblock_sb_secret_01.collection, null);
+    assert.equal(MUSICBLOCK_CATALOG.musicblock_goodnight_groddle.collection, null);
+  });
+
+  it('every recovered block is obtainable in the remake', () => {
+    const sources = new Map(Object.keys(MUSICBLOCK_CATALOG).map((id) => [id, []]));
+    const scan = (label, value) => {
+      for (const id of JSON.stringify(value).match(/musicblock_[a-z_0-9]+/g) || []) sources.get(id)?.push(label);
+    };
+    for (const [table, rows] of Object.entries(DROP_TABLES)) scan(`drop:${table}`, rows);
+    scan('soil', SOIL_DROP_TABLES);
+    scan('spinning-wheel', SPINNING_WHEEL_DROP_TABLE);
+    // Street drops: one missing series tune per street, then GNG.
+    const state = createMusicblockState();
+    const inv = createInventory();
+    for (let i = 0; i < 40; i++) {
+      const def = planMusicblockDrop(state, inv, `street-${i}`);
+      if (!def) break;
+      sources.get(def.classTsid).push('street');
+      collectMusicblock(state, inv, def.classTsid, `street-${i}`);
+    }
+    for (const [id, from] of sources) assert.ok(from.length, `${id} has no source`);
+    assert.deepEqual(sources.get('musicblock_goodnight_groddle'), ['street']);
+    assert.ok(sources.get('musicblock_sb_secret_01').includes('soil'));
+    // GSJS newbie_island / greeting spawns use the 25 series blocks.
+    assert.equal(MUSICBLOCK_STREET_POOL.length, 25);
+    assert.equal(MUSICBLOCK_ENDGAME_DROP, 'musicblock_goodnight_groddle');
+  });
+
+  it('drop modules register the GSJS item data, not stand-ins', () => {
+    const meta = musicblockItemMeta('musicblock_x_shiny_04');
+    assert.equal(meta.baseCost, 600);
+    assert.equal(meta.icon, 'assets/sprites/icons/musicblock_x_shiny_04.png');
+    assert.equal(musicblockItemMeta('nope'), null);
   });
 });
 
@@ -160,21 +233,32 @@ describe('Musicblock street collection', () => {
     assert.equal(planMusicblockDrop(state, inv, streetTsid), null);
   });
 
-  it('completes the recovered four-tune collection across streets', () => {
+  it('completes every series across streets, then offers Goodnight Groddle once', () => {
     const state = createMusicblockState();
     const inv = createInventory(starterMusicblocks());
-    for (let i = 0; i < 3; i++) {
-      const streetTsid = `street-${i}`;
-      const def = planMusicblockDrop(state, inv, streetTsid);
-      assert.ok(def);
-      assert.equal(collectMusicblock(state, inv, def.classTsid, streetTsid).ok, true);
+    let i = 0;
+    for (; i < 30; i++) {
+      const def = planMusicblockDrop(state, inv, `street-${i}`);
+      if (!def) break;
+      if (i < 24) assert.ok(def.collection, `street ${i} gave ${def.classTsid} before the series were done`);
+      assert.equal(collectMusicblock(state, inv, def.classTsid, `street-${i}`).ok, true);
     }
-    const collection = listMusicblockCollection(inv);
-    assert.equal(collection.owned, 4);
-    assert.equal(collection.total, 4);
-    assert.equal(collection.complete, true);
-    assert.deepEqual(collection.missing, []);
+    assert.equal(i, 25);
+    for (const series of Object.keys(MUSICBLOCK_SERIES)) assert.equal(musicblockSeriesProgress(inv, series).complete, true);
+    assert.equal(countItem(inv, 'musicblock_goodnight_groddle'), 1);
+    assert.equal(countItem(inv, 'musicblock_sb_secret_01'), 0);
+    assert.equal(listMusicblockCollection(inv).owned, 26);
     assert.equal(planMusicblockDrop(state, inv, 'one-more-street'), null);
+    assert.equal(musicblockCollectionNote(inv, 'musicblock_d_blue_03'), 'Recovered tunes 26/27 · DB series 5/5');
+    assert.equal(musicblockCollectionNote(inv, 'musicblock_goodnight_groddle'), 'Recovered tunes 26/27');
+  });
+
+  it('pays SB-1 its own first hearing (1000 XP)', () => {
+    const state = createMusicblockState();
+    const player = pc();
+    const result = playMusicblock(state, player, 'musicblock_sb_secret_01', 1000);
+    assert.equal(result.effects.xp, 1000);
+    assert.match(result.msg, /oneness with the Giants/);
   });
 
   it('normalizes saved street collection state and repairs older session shapes', () => {
@@ -207,6 +291,33 @@ describe('Musicblock game integration', () => {
     assert.match(game, /data-musicblock-collection/);
     assert.match(game, /in_inventory:\$\{picked\.def\.classTsid\}/);
     assert.match(content, /musicblockPickup: picked/);
+    // Tunes load on first play (not at boot) and report the class sound key.
+    assert.doesNotMatch(game, /files\[`musicblock:\$\{def\.classTsid\}`\]/);
+    assert.match(game, /dataset\.lastSound = `\$\{def\.soundKey\}:file`/);
+    assert.match(game, /musicblockCollectionNote\(inv, classTsid\)/);
+    assert.match(game, /fresh tune \+\$\{musicblockDef\.freshXp\} iMG/);
+    // Completing a series is a collection trophy (inc_achievements.js:428).
+    assert.match(game, /category === 'trophies' \? 'TROPHY_RECEIVED'/);
     assert.match(html, /game\.js\?v=(?:official-ecology-1|trant-harvest-[12]|badge-events-1|butterfly-care-1|feed-picker-1|animal-kinship-[12]|trant-care-[1-3]|woodcutting-[1-4]|dialogue-[1-3]|movement-1|food-memory-1|dametime-1|musicblocks-collect-2|fruit-machine-[12]|vendor-profiles-1|world-items-[12]|world-persistence-1|shrines-[1-4]|quoins-[12]|item-buffs-[12]|tool-condition-1)/);
+  });
+});
+
+describe('Musicblock collection badges from any source', () => {
+  it('emits in_inventory the first time a block reaches the pack', async () => {
+    const { musicblocksFeature, newlyOwnedMusicblocks } = await import('../public/js/features/musicblocks-feature.js');
+    assert.deepEqual(newlyOwnedMusicblocks(new Set(['musicblock_d_blue_01']), {
+      musicblock_d_blue_01: 2, musicblock_d_blue_02: 1, apple: 3, musicblock_trumpets: 1,
+    }), ['musicblock_d_blue_02']);
+    const events = [];
+    const engine = { inv: { musicblock_d_green_02: 1 }, achievement: (counter, n) => events.push([counter, n]) };
+    musicblocksFeature.onTick(16, 1_000, engine); // first look: what game.js already counted at boot
+    engine.inv.musicblock_x_shiny_03 = 1; // a Chicken squeeze drop
+    musicblocksFeature.onTick(16, 1_500, engine); // throttled
+    assert.deepEqual(events, []);
+    musicblocksFeature.onTick(16, 2_100, engine);
+    musicblocksFeature.onTick(16, 3_200, engine);
+    assert.deepEqual(events, [['in_inventory:musicblock_x_shiny_03', 1]]);
+    const index = readFileSync(join(publicRoot, 'js/features/index.js'), 'utf8');
+    assert.match(index, /FEATURES\.push\(musicblocksFeature\)/);
   });
 });

@@ -2,16 +2,17 @@
  "generatedBy": "build-sound-keys.mjs",
  "soundsXml": "http://c2.glitch.bz/sounds/2012-12/sounds_1354665929.xml (not archived)",
  "counts": {
-  "keys": 638,
+  "keys": 641,
   "original": 606,
-  "music": 205,
+  "music": 208,
   "remake": 32,
   "recoveredWayback": 38,
   "downloadsBestFit": 27,
   "archiveorgSfx": 216,
-  "withFile": 281,
+  "overlayFla": 3,
+  "withFile": 284,
   "aliases": 83,
-  "playable": 364
+  "playable": 367
  },
  "keys": {
   "11_SECRET_LOCATIONS_BEACON_LOOP": {
@@ -3116,6 +3117,48 @@
     "gsjs:items/metalmaker.js:871 (onApplyPartStep)",
     "gsjs:items/woodworker.js:796 (onApplyPartStep)"
    ]
+  },
+  "ESQUIBETH_PLAYBACK_A": {
+   "category": "music",
+   "moment": "Esquibeth's ghost plays the song at the Eastern Grotto glyph (phrase A)",
+   "uses": 1,
+   "via": [
+    "overlay"
+   ],
+   "sources": [
+    "overlay:glitch-overlays/npc_esquibeth_playbackA.fla (1346434877-Puzzle_Melody_Section_A_2.1.mp3)"
+   ],
+   "file": "assets/audio/sfx/ESQUIBETH_PLAYBACK_A.mp3",
+   "origin": "overlay-fla",
+   "overlaySource": "glitch-overlays/npc_esquibeth_playbackA.fla LIBRARY/1346434877-Puzzle_Melody_Section_A_2.1.mp3"
+  },
+  "ESQUIBETH_PLAYBACK_AB": {
+   "category": "music",
+   "moment": "Esquibeth's ghost plays the song at the Western Grotto glyph (phrases A and B)",
+   "uses": 1,
+   "via": [
+    "overlay"
+   ],
+   "sources": [
+    "overlay:glitch-overlays/npc_esquibeth_playbackAB.fla (1346436214-Puzzle_Melody_Section_A_and_B_2.1.mp3)"
+   ],
+   "file": "assets/audio/sfx/ESQUIBETH_PLAYBACK_AB.mp3",
+   "origin": "overlay-fla",
+   "overlaySource": "glitch-overlays/npc_esquibeth_playbackAB.fla LIBRARY/1346436214-Puzzle_Melody_Section_A_and_B_2.1.mp3"
+  },
+  "ESQUIBETH_PLAYBACK_ABC": {
+   "category": "music",
+   "moment": "Esquibeth's ghost plays the whole song at the Waterfall Climb glyph (phrases A, B and C)",
+   "uses": 1,
+   "via": [
+    "overlay"
+   ],
+   "sources": [
+    "overlay:glitch-overlays/npc_esquibeth_playbackABC.fla (1346436215-Puzzle_Melody_Section_A_and_B_and_C_2.1.mp3)"
+   ],
+   "file": "assets/audio/sfx/ESQUIBETH_PLAYBACK_ABC.mp3",
+   "origin": "overlay-fla",
+   "overlaySource": "glitch-overlays/npc_esquibeth_playbackABC.fla LIBRARY/1346436215-Puzzle_Melody_Section_A_and_B_and_C_2.1.mp3"
   },
   "EXTREMELY_HALLOWED_SHRINE_POWDER": {
    "category": "powder",
@@ -8843,8 +8886,8 @@
    "source": "https://archive.org/download/esquebeth-quest/Esquebeth%20Puzzle.mp3",
    "archiveItem": "esquebeth-quest",
    "archiveFile": "Esquebeth Puzzle.mp3",
-   "why": "Esquibeth's pilgrimage is the 2012 waterfall puzzle (the sfx item's 'esquibeth symbol glow' and 'esquibeth-rock disappears' match the c2 WATERFALL_SYMBOL_GLOW and ROCKS_DISAPPEAR files, r 0.99), and the ringtone 'Esquebeth Quest' is WATERFALL_SUCCESS (r 0.96). The puzzle tune is the bell melody the player repeats: music_map WATERFALL_MELODY = Bells_Waterfall_1.3.",
-   "doubt": "not verifiable: the c2 file is lost"
+   "why": "Esquibeth's pilgrimage is the 2012 waterfall puzzle (the sfx item's 'esquibeth symbol glow' and 'esquibeth-rock disappears' match the c2 WATERFALL_SYMBOL_GLOW and ROCKS_DISAPPEAR files, r 0.99), and the ringtone 'Esquebeth Quest' is WATERFALL_SUCCESS (r 0.96). The puzzle tune is the bell melody the player repeats: music_map WATERFALL_MELODY = Bells_Waterfall_1.3. Its notes, read off the bells (BW_E2 BW_G2 BW_D2 BW_E2 BW_C2 BW_A1 BW_D2), are the whole song, phrases A B C.",
+   "doubt": "c2 file lost; an earlier take (2012-08-29) than the playback overlays' Puzzle_Melody_Section_*_2.1 (2012-08-31), which are what both recordings play, so the remake does not wire it"
   },
   "WATERFALL_MELODY_LONG": {
    "category": "music",

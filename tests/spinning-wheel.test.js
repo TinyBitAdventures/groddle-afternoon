@@ -147,7 +147,7 @@ test.describe('shrine source and client integration', () => {
     assert.equal(ITEM_CATALOG.musicblock_d_green_04.baseCost, 600);
     const slots = listPackItemSlots(createInventory({ musicblock_x_shiny_01: 1 }));
     assert.equal(slots.find((slot) => slot.classTsid === 'musicblock_x_shiny_01').icon,
-      'assets/sprites/icons/musicblock_x_shiny_01.svg');
+      'assets/sprites/icons/musicblock_x_shiny_01.png');
   });
 
   test('ships complete clean sprite sheets and runtime wiring', () => {

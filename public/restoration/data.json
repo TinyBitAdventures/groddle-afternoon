@@ -171,7 +171,7 @@
    "group": "world",
    "name": "Music and sounds",
    "status": "source",
-   "blurb": "The published soundtrack per region, the ringtone Musicblocks and meditation tracks, real recordings for most sound keys (Wayback files plus Tiny Speck's archived sound effects set), and gentle synth stand-ins for the sounds still lost.",
+   "blurb": "The published soundtrack per region, every recovered Musicblock and meditation track, Esquibeth's melody from her own overlay files, real recordings for most sound keys (Wayback files plus Tiny Speck's archived sound effects set), and gentle synth stand-ins for the sounds still lost.",
    "spot": null,
    "evidence": [
     "public/js/ambient-music.js",
@@ -765,7 +765,7 @@
    "group": "late",
    "name": "Musicblocks, Cubimals and the Stoot doll",
    "status": "source",
-   "blurb": "Collectible tunes, both Cubimal series and the memorial pull-string doll.",
+   "blurb": "All 27 recovered Musicblock tunes (five series of five, SB-1 and Goodnight Groddle) with their collector trophies, both Cubimal series and the memorial pull-string doll.",
    "spot": null,
    "evidence": [
     "public/js/musicblocks.js",
@@ -1242,7 +1242,7 @@
      "tagline": "Walk Esquibeth's last pilgrimage and learn her song.",
      "about": "The Last Pilgrimage of Esquibeth retold a Glitch legend: follow her ghost through grottos and up a waterfall, collecting notes and replaying her song at each Giant stone.",
      "play": "Find the notes, then play back the ghost's melody (click or keys 1 to 5). At the top, Esquibeth dances, Grendaline appears, and you keep the Conch as a memento.",
-     "source": "The quest rules and rewards, the Conch's Play and Blow, and the Hollow's own background painting from Tiny Speck's overlay files.",
+     "source": "The quest rules and rewards, the Conch's Play and Blow, the Hollow's own background painting, and the melody Esquibeth's ghost plays at each stone, all from Tiny Speck's overlay files.",
      "rebuilt": "Narration was read from two full recordings, and her song (E G D, E C, A D) was matched from their audio against the recovered bell sounds.",
      "footage": [
       {
@@ -1360,9 +1360,9 @@
   "hubs": 60
  },
  "sounds": {
-  "keys": 638,
-  "withFile": 281,
-  "playable": 364,
+  "keys": 641,
+  "withFile": 284,
+  "playable": 367,
   "recoveredWayback": 38,
   "archiveorgSfx": 216,
   "ambientTracks": 34,
@@ -1373,7 +1373,7 @@
   "skipped": 23
  },
  "icons": {
-  "items": 766,
+  "items": 772,
   "sharp": 681
  },
  "imagination": {
@@ -1393,9 +1393,29 @@
   "offeringStreets": 399
  },
  "git": {
-  "commits": 205,
+  "commits": 210,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Climbing: no flicker at the top or bottom, and Up never jumps off a ladder"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "Lighter project cards and a tidy legend on /compare/"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Batterflies no longer jump across the screen after eating"
+   },
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "A page comparing Groddle Afternoon with the other Glitch remakes"
+   },
    {
     "date": "2026-10-22",
     "kind": "fix",
@@ -1495,26 +1515,6 @@
     "date": "2026-10-21",
     "kind": "improve",
     "text": "A roomier screen: no footer line, no quest/activity rail, a two-row pack"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "improve",
-    "text": "Every quest room on the restoration page opens a story with a sharp screenshot"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "The Eleven Secret Locations: DNAja-vu beacons, Giant messages and the 11 Clusters badge"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Opt-in Gentle Island tutorial for new games"
-   },
-   {
-    "date": "2026-10-21",
-    "kind": "new",
-    "text": "Build a Tower on your home street, and the Meditation Station"
    }
   ]
  },

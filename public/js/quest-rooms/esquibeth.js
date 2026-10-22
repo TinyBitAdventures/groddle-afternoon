@@ -35,7 +35,14 @@
  *    quest; Play pays the musicblock freshness XP).
  *  - Sounds (inc_data_sounds.js): the five bells BW_A1/C2/D2/E2/G2,
  *    AMBIENT_WATERFALL(_LEVEL3), WATERFALL_SYMBOL_GLOW, WATERFALL_SUCCESS,
- *    ROCKS_DISAPPEAR and CONCH.
+ *    ROCKS_DISAPPEAR and CONCH. The ghost's song is not a sound key: each
+ *    playback overlay (glitch-overlays/npc_esquibeth_playbackA/AB/ABC.fla)
+ *    streams its own take from frame 84, LIBRARY/Puzzle_Melody_Section_A,
+ *    _A_and_B and _A_and_B_and_C_2.1.mp3 (installed as ESQUIBETH_PLAYBACK_*).
+ *    Both recordings carry those takes at the ghost's playbacks (chroma match
+ *    0.88-0.95). music_map WATERFALL_MELODY (Bells_Waterfall_1.3, 2012-08-29)
+ *    is an earlier take of the same seven notes (E G D E C A D); it never
+ *    stands out in either recording, so the room does not play it.
  *
  * Lost: all four location geometries and their location events (the
  * narration, the note pickups, the song check, the exits). Rebuilt from the
@@ -92,6 +99,14 @@ export const SONGS = Object.freeze({
 });
 /** Esquibeth's beat offsets (ms) for the seven notes, from the ABC playback. */
 export const SONG_BEATS_MS = Object.freeze([0, 1800, 2400, 4050, 4700, 6400, 7550]);
+/** npc_esquibeth_playbackA/AB/ABC: the overlay's own melody take per grotto. */
+export const PLAYBACK_SOUNDS = Object.freeze({
+  waterfall_01: 'ESQUIBETH_PLAYBACK_A',
+  waterfall_02: 'ESQUIBETH_PLAYBACK_AB',
+  waterfall_03: 'ESQUIBETH_PLAYBACK_ABC',
+});
+/** The takes' first bell sounds 50 ms into the file. */
+export const PLAYBACK_LEAD_MS = 50;
 /** Esquibeth_End_Overlay: her last dance, 384 frames at 30 fps. */
 export const DANCE_MS = 12_800;
 /** location.js: the end vog waits 5 s after the next arrival. */
@@ -1046,13 +1061,21 @@ async function ghostPlayback(ctx) {
     await ghostAnim(ctx, spr, 'appear');
     if (ctx.stage !== stage) return;
     ghostAnim(ctx, spr, 'idle', { loop: true });
-    const t0 = Date.now();
+    // The overlay's recorded take carries the song; the separate bells are
+    // the fallback when it cannot load.
+    const melody = PLAYBACK_SOUNDS[stage];
+    const warm = melody && ctx.engine.preloadSounds ? await ctx.engine.preloadSounds([melody]) : null;
+    if (ctx.stage !== stage || d.phase !== 'song') return;
+    const recorded = Boolean(warm?.[0]);
+    d.playbackSound = recorded ? melody : null;
+    if (recorded) d.playbackHandle = ctx.sound(melody, { volume: 0.8 });
+    const t0 = Date.now() + (recorded ? PLAYBACK_LEAD_MS : 0);
     for (const [i, n] of song.entries()) {
       const at = t0 + SONG_BEATS_MS[i];
       await ctx.wait(Math.max(0, at - Date.now()));
       if (ctx.stage !== stage || d.phase !== 'song') return;
       d.ghostBeat = i;
-      ctx.sound(BELLS[n], { volume: 0.6 });
+      if (!recorded) ctx.sound(BELLS[n], { volume: 0.6 });
       flash(ctx, n, 'right', 480);
       ghostAnim(ctx, spr, `note${n}`).then(() => {
         if (!spr.destroyed && d.ghostPlaying && spr.loop === false && d.ghostBeat === i) ghostAnim(ctx, spr, 'idle', { loop: true });
@@ -1061,6 +1084,8 @@ async function ghostPlayback(ctx) {
     await ctx.wait(1100);
     await ghostVanish(ctx, spr);
   } finally {
+    if (ctx.stage !== stage) try { d.playbackHandle?.stop?.(); } catch { /* ended */ }
+    d.playbackHandle = null;
     d.ghostPlaying = false;
     d.ghostBeat = -1;
     d.songHeard = true;
@@ -1404,6 +1429,8 @@ export const room = {
     }
     setupGrotto(ctx, stage, d.scene);
     startMusic(ctx, stage === 'waterfall_03' ? 'AMBIENT_WATERFALL_LEVEL3' : 'AMBIENT_WATERFALL');
+    // Warm the ghost's melody so her notes land on the recording's beats.
+    if (PLAYBACK_SOUNDS[stage]) ctx.engine.preloadSounds?.([PLAYBACK_SOUNDS[stage]]);
     if (stage === 'waterfall_01' && !d.introDone) intro(ctx);
   },
 
@@ -1554,6 +1581,7 @@ export const room = {
     ctx.setData('esqNotes', (d.found || []).join(','));
     ctx.setData('esqEntered', (d.entered || []).join(','));
     ctx.setData('esqGhost', d.ghostPlaying ? '1' : '0');
+    ctx.setData('esqMelody', d.playbackSound || '');
     ctx.setData('esqExit', d.exitOpen ? '1' : '0');
     ctx.setData('esqRevealed', d.revealed ? '1' : '0');
     ctx.setData('esqConch', String(ctx.count('conch')));

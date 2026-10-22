@@ -645,10 +645,11 @@ import {
   getMusicblock,
   isMusicblock,
   listMusicblockCollection,
+  musicblockCollectionNote,
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=catalog-unified-2';
+} from './js/musicblocks.js?v=musicblocks-all-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -1763,6 +1764,8 @@ function announceAchievementUpdates(updates = []) {
         '',
       subtitle: rewardBits.join(' · '),
       iconUrl: badgeIconFor(update.classTsid || update.def.classTsid),
+      // inc_achievements.js:428: collection trophies say TROPHY_RECEIVED, every other badge ACHIEVEMENT_UNLOCKED.
+      sound: update.def.category === 'trophies' ? 'TROPHY_RECEIVED' : undefined,
     });
   }
 }
@@ -2584,10 +2587,6 @@ function renderPackPopover(classTsid, anchor = null) {
     ? '<button type="button" class="pack-bear-upgrade" data-show-emotional-bear>Show Emotional Bear</button>'
     : '';
   const musicblockDef = getMusicblock(classTsid);
-  const musicblockCollection = musicblockDef ? listMusicblockCollection(inv) : null;
-  const musicblockSeries = musicblockCollection
-    ? musicblockCollection.rows.filter((row) => row.collection === musicblockDef.collection)
-    : [];
   const relatedRecipes = listRecipes().filter((recipe) =>
     (recipe.inputs || []).some((input) => input.classTsid === classTsid)
   );
@@ -2633,7 +2632,7 @@ function renderPackPopover(classTsid, anchor = null) {
     ? `<span class="pack-pop-effect buff">${escapeHtml(useInfo.buff.def.name)}${useInfo.buff.durationSeconds ? ` · ${useInfo.buff.durationSeconds}s` : ''}</span>`
     : '';
   const effects = musicblockDef
-    ? '<span class="pack-pop-effect loss">−2 energy</span><span class="pack-pop-effect">+2 mood</span><span class="pack-pop-effect music">fresh tune +50 iMG</span>'
+    ? `<span class="pack-pop-effect loss">−2 energy</span><span class="pack-pop-effect">+2 mood</span><span class="pack-pop-effect music">fresh tune +${musicblockDef.freshXp} iMG</span>`
     : metabolicEffects + buffEffect;
   const foodMemory = useInfo.food
     ? `<div class="pack-food-memory${useInfo.food.quote.img > 0 ? ' has-bonus' : ''}">
@@ -2648,9 +2647,7 @@ function renderPackPopover(classTsid, anchor = null) {
     : relatedRecipes.length
       ? `Used in ${relatedRecipes.length} ${relatedRecipes.length === 1 ? 'recipe' : 'recipes'}`
       : '';
-  const collectionNote = musicblockCollection
-    ? `Recovered tunes ${musicblockCollection.owned}/${musicblockCollection.total} · ${musicblockDef.collection} series ${musicblockSeries.filter((row) => row.owned).length}/${musicblockSeries.length}`
-    : '';
+  const collectionNote = musicblockDef ? musicblockCollectionNote(inv, classTsid) : '';
   const sellPrice = vendorSellUnitPrice(classTsid, { ...vendorSellOpts(), upgrades: pc.imaginationUpgrades });
   const canSellHere = isVendorOpen() && !slot.isTool && slot.sellable !== false && sellPrice > 0;
   const makeLabel = slot.isTool
@@ -3474,9 +3471,6 @@ async function loadAudio() {
   for (const url of allAmbientTrackUrls()) {
     files[`amb:${url}`] = url;
   }
-  for (const def of Object.values(MUSICBLOCK_CATALOG)) {
-    files[`musicblock:${def.classTsid}`] = def.audio;
-  }
   audio.ctx = new (window.AudioContext || window.webkitAudioContext)();
   audio.musicGain = audio.ctx.createGain();
   audio.sfxGain = audio.ctx.createGain();
@@ -3598,8 +3592,21 @@ function stopCraftSoundLoop() {
   craftSoundLoop = null;
 }
 
-function playMusicblockAudio(def) {
-  if (!audio.ctx || !def || !audio.buffers[`musicblock:${def.classTsid}`]) return;
+/**
+ * The block's class sound (musicblock_base play: announce_sound(CLASS_TSID)),
+ * loaded on first play, cut at music_duration with a short fade, ducking BGM.
+ */
+let musicblockPlayToken = 0;
+async function playMusicblockAudio(def) {
+  if (!audio.ctx || !def?.audio) return;
+  const token = ++musicblockPlayToken;
+  const key = `musicblock:${def.classTsid}`;
+  try {
+    audio.buffers[key] ||= await audio.ctx.decodeAudioData(await (await fetch(def.audio)).arrayBuffer());
+  } catch {
+    return;
+  }
+  if (token !== musicblockPlayToken || state.muted) return;
   if (audio.musicblock) {
     const previous = audio.musicblock;
     audio.musicblock = null;
@@ -3607,8 +3614,7 @@ function playMusicblockAudio(def) {
   }
   const src = audio.ctx.createBufferSource();
   const gain = audio.ctx.createGain();
-  src.buffer = audio.buffers[`musicblock:${def.classTsid}`];
-  gain.gain.value = 0.72;
+  src.buffer = audio.buffers[key];
   src.connect(gain);
   gain.connect(audio.sfxGain);
   audio.musicblock = src;
@@ -3618,8 +3624,13 @@ function playMusicblockAudio(def) {
     applyMute();
   };
   const durationSec = Math.min(src.buffer.duration, Math.max(0.5, def.durationMs / 1000));
+  const t = audio.ctx.currentTime;
+  gain.gain.setValueAtTime(0.72, t);
+  gain.gain.setValueAtTime(0.72, t + Math.max(0, durationSec - 0.6));
+  gain.gain.linearRampToValueAtTime(0.0001, t + durationSec);
   src.start(0);
-  src.stop(audio.ctx.currentTime + durationSec);
+  src.stop(t + durationSec);
+  if (app?.view) app.view.dataset.lastSound = `${def.soundKey}:file`;
   applyMute();
 }
 
@@ -7538,6 +7549,8 @@ const engine = {
   playSound,
   /** Repeat a key while something runs; returns { stop() }. */
   playSoundLoop,
+  /** Warm sound keys so a timed cue starts on the beat; resolves to their buffers (null if missing). */
+  preloadSounds: (keys) => (audio.board ? audio.board.preload(keys) : Promise.resolve([])),
   save: () => savePlayerState(),
   setData(key, value) {
     if (app?.view) app.view.dataset[key] = String(value);
@@ -8241,7 +8254,7 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
   spr.bob = 0;
   spr.zIndex = 27;
   const glow = new PIXI.Graphics();
-  glow.beginFill(def.collection === 'DR' ? 0xf5a5b5 : 0x9ee4ac, 0.2);
+  glow.beginFill(def.glow ?? 0x9ee4ac, 0.2);
   glow.drawCircle(0, 0, 34);
   glow.endFill();
   glow.x = spr.x;

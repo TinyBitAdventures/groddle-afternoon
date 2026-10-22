@@ -34,13 +34,13 @@ describe('archive.org sound mapping', () => {
     }
   });
 
-  test('every installed sfx file is mapped (Wayback c2 or archive.org)', () => {
+  test('every installed sfx file is mapped (Wayback c2, archive.org or an overlay source)', () => {
     for (const name of fs.readdirSync(SFX_DIR).filter((f) => f.endsWith('.mp3'))) {
       const key = name.replace(/\.mp3$/, '');
       const row = catalog[key];
       assert.ok(row, `${name} has no catalog key`);
       assert.equal(row.file, `assets/audio/sfx/${name}`, `${name} is installed but not mapped`);
-      assert.ok(['wayback-c2', 'archiveorg-sfx'].includes(row.origin), `${name} origin ${row.origin}`);
+      assert.ok(['wayback-c2', 'archiveorg-sfx', 'overlay-fla'].includes(row.origin), `${name} origin ${row.origin}`);
     }
   });
 

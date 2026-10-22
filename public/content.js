@@ -52,7 +52,7 @@ import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=musicblocks-collect-2';
+} from './js/musicblocks.js?v=musicblocks-all-1';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-1';
 import {
   ensureWoodTreeState,

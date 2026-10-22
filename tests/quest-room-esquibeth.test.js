@@ -196,6 +196,36 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
     assert.equal(mod.CONCH_ITEM.baseCost, 700);
   });
 
+  it("plays the playback overlay's own melody take for the ghost", async () => {
+    const { SOUND_FILES, SOUND_CATEGORIES } = await import('../public/js/sound-keys.js');
+    const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/sound-keys.json'), 'utf8')).keys;
+    // DOMSoundItem externalFileSize in glitch-overlays/npc_esquibeth_playback*.fla.
+    const takes = {
+      waterfall_01: ['ESQUIBETH_PLAYBACK_A', 'npc_esquibeth_playbackA.fla', 104414],
+      waterfall_02: ['ESQUIBETH_PLAYBACK_AB', 'npc_esquibeth_playbackAB.fla', 142297],
+      waterfall_03: ['ESQUIBETH_PLAYBACK_ABC', 'npc_esquibeth_playbackABC.fla', 215622],
+    };
+    assert.deepEqual(Object.keys(mod.PLAYBACK_SOUNDS), mod.STAGES.slice(0, 3));
+    for (const [stage, [key, fla, bytes]] of Object.entries(takes)) {
+      assert.equal(mod.PLAYBACK_SOUNDS[stage], key);
+      assert.equal(SOUND_FILES[key], `assets/audio/sfx/${key}.mp3`);
+      assert.equal(SOUND_CATEGORIES[key], 'music');
+      assert.equal(catalog[key].origin, 'overlay-fla');
+      assert.ok(catalog[key].overlaySource.startsWith(`glitch-overlays/${fla} LIBRARY/`), key);
+      assert.equal(readFileSync(join(root, 'public', SOUND_FILES[key])).length, bytes, key);
+    }
+    assert.equal(mod.PLAYBACK_LEAD_MS, 50);
+    const src = readFileSync(join(root, 'public/js/quest-rooms/esquibeth.js'), 'utf8');
+    // The take carries the song; separate bells only when it cannot load.
+    assert.match(src, /if \(recorded\) d\.playbackHandle = ctx\.sound\(melody/);
+    assert.match(src, /if \(!recorded\) ctx\.sound\(BELLS\[n\]/);
+    assert.match(src, /preloadSounds\?\.\(\[PLAYBACK_SOUNDS\[stage\]\]\)/);
+    // music_map WATERFALL_MELODY is an earlier take that neither recording plays.
+    assert.doesNotMatch(src, /sound\('WATERFALL_MELODY'/);
+    const game = readFileSync(join(root, 'public/game.js'), 'utf8');
+    assert.match(game, /preloadSounds: \(keys\) =>/);
+  });
+
   it('offers Blow once after part 1, and Play otherwise', () => {
     const mem = {};
     const pc = { xp: 0, imagination: 0, mood: 10, energy: 50, giantFavor: { grendaline: 0 } };

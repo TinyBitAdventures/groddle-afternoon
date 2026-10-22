@@ -54,9 +54,9 @@ export function achievementConditionLabel(condition = {}, catalogLabel = '') {
   const knownLabel = String(catalogLabel || '').trim();
   if (knownLabel && knownLabel !== name) return knownLabel;
 
-  const musicblock = name.match(/^musicblock_d_(green|red)_(\d{2})$/i);
+  const musicblock = name.match(/^musicblock_(d_green|d_red|d_blue|b_brown|x_shiny)_(\d{2})$/i);
   if (musicblock) {
-    const collection = musicblock[1].toLowerCase() === 'green' ? 'DG' : 'DR';
+    const collection = { d_green: 'DG', d_red: 'DR', d_blue: 'DB', b_brown: 'BB', x_shiny: 'XS' }[musicblock[1].toLowerCase()];
     return `Musicblock ${collection}-${Number(musicblock[2])}`;
   }
 

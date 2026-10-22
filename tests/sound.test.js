@@ -90,6 +90,8 @@ describe('sound-key catalog', () => {
         assert.equal(path.basename(file), `${key}.mp3`);
         if (catalog.keys[key].origin === 'archiveorg-sfx') {
           assert.match(catalog.keys[key].source, /^https:\/\/archive\.org\/download\/[a-z0-9-]+\/.+\.mp3$/);
+        } else if (catalog.keys[key].origin === 'overlay-fla') {
+          assert.match(catalog.keys[key].overlaySource, /^glitch-overlays\/[\w]+\.fla LIBRARY\/\d+-[\w.]+\.mp3$/);
         } else {
           assert.match(catalog.keys[key].url, /^http:\/\/c2\.glitch\.bz\/sounds\/20\d\d-\d\d\//);
           assert.equal(catalog.keys[key].origin, 'wayback-c2');

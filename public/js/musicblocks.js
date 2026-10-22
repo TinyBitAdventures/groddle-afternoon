@@ -3,59 +3,127 @@
  *
  * The original blocks are reusable collectibles: playing costs 2 energy,
  * grants 2 mood, and awards freshness XP depending on when that exact tune
- * was last heard. The recovered public-domain MP3s below are shipped locally.
+ * was last heard. The tunes are Tiny Speck's CC0 recordings (sound-key catalog).
  */
 
 import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-3';
 import { GAME_DAY_MS } from './game-day.js';
 import { moodMax } from './metabolics.js';
+import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js';
 
 export const MUSICBLOCK_MONTH_MS = Math.round(30.5 * 24 * 60 * 60 * 1000);
 export const MUSICBLOCK_REPLAY_MS = 4 * 60 * 60 * 1000;
 
-export const MUSICBLOCK_CATALOG = {
-  musicblock_d_green_02: {
-    classTsid: 'musicblock_d_green_02',
-    label: 'Musicblock DG-2',
-    desc: 'Dig those crazy pincer-snapping beats.',
-    durationMs: 6000,
-    audio: 'assets/audio/ambient/Musicblock-DG-2_1291896713.mp3',
-    collection: 'DG',
-    baseCost: 400,
-  },
-  musicblock_d_green_03: {
-    classTsid: 'musicblock_d_green_03',
-    label: 'Musicblock DG-3',
-    desc: 'Some would ban this musicblock. Might not be a bad idea.',
-    durationMs: 8000,
-    audio: 'assets/audio/ambient/Musicblock-DG-3_1291896740.mp3',
-    collection: 'DG',
-    baseCost: 500,
-  },
-  musicblock_d_red_01: {
-    classTsid: 'musicblock_d_red_01',
-    label: 'Musicblock DR-1',
-    desc: 'Music to drink a Cloud 11 Smoothie by.',
-    durationMs: 10000,
-    audio: 'assets/audio/ambient/Musicblock-DR-1_1291896467.mp3',
-    collection: 'DR',
-    baseCost: 400,
-  },
-  musicblock_d_red_05: {
-    classTsid: 'musicblock_d_red_05',
-    label: 'Musicblock DR-5',
-    desc: 'This friendly little tune reaches into your brain and scratches your hypothalamus. Tickly.',
-    durationMs: 14000,
-    audio: 'assets/audio/ambient/Musicblock-DR-5_1291896506.mp3',
-    collection: 'DR',
-    baseCost: 700,
-  },
-};
+/**
+ * Every recovered Musicblock tune is a collectible item (GSJS items/musicblock_*.js).
+ * Labels, descriptions, base costs, stack sizes and music_duration come from the
+ * item files; the series match the collection_musicblocks_* trophies. The tune
+ * itself is the class sound the source announces on play
+ * (announce_sound(class_tsid.toUpperCase())), resolved through the sound-key
+ * catalog. Musicblock T-1 (musicblock_trumpets) is left out: its tune was never
+ * recovered.
+ */
+export const MUSICBLOCK_SERIES = Object.freeze({
+  DG: Object.freeze({ id: 'DG', colour: 'green', badge: 'collection_musicblocks_dg', glow: 0x9ee4ac }),
+  DR: Object.freeze({ id: 'DR', colour: 'red', badge: 'collection_musicblocks_dr', glow: 0xf5a5b5 }),
+  DB: Object.freeze({ id: 'DB', colour: 'blue', badge: 'collection_musicblocks_db', glow: 0x9cc8f5 }),
+  BB: Object.freeze({ id: 'BB', colour: 'brown', badge: 'collection_musicblocks_bb', glow: 0xe0bb8a }),
+  XS: Object.freeze({ id: 'XS', colour: 'shiny', badge: 'collection_musicblocks_xs', glow: 0xbdf2f2 }),
+});
+
+function row(classTsid, label, collection, durationMs, baseCost, stackMax, desc) {
+  const soundKey = classTsid.toUpperCase();
+  return Object.freeze({
+    classTsid,
+    label,
+    desc,
+    durationMs,
+    soundKey,
+    audio: SOUND_FILES[soundKey] || SOUND_FILES[SOUND_ALIASES[soundKey]] || null,
+    icon: `assets/sprites/icons/${classTsid}.png`,
+    collection,
+    glow: collection ? MUSICBLOCK_SERIES[collection].glow : 0xe6d29a,
+    baseCost,
+    stackMax,
+    // musicblock_base play: SB-1's first hearing pays 1000 XP, every other tune 50.
+    freshXp: classTsid === 'musicblock_sb_secret_01' ? 1000 : 50,
+  });
+}
+
+export const MUSICBLOCK_CATALOG = Object.freeze({
+  musicblock_d_green_01: row("musicblock_d_green_01", "Musicblock DG-1", "DG", 11000, 400, 5,
+    "Hoe Magazine gave this musicblock 6.8 out of a possible 7 pointlets."),
+  musicblock_d_green_02: row("musicblock_d_green_02", "Musicblock DG-2", "DG", 6000, 400, 5,
+    "Dig those crazy pincer-snapping beats."),
+  musicblock_d_green_03: row("musicblock_d_green_03", "Musicblock DG-3", "DG", 8000, 500, 5,
+    "Some would ban this musicblock. Might not be a bad idea."),
+  musicblock_d_green_04: row("musicblock_d_green_04", "Musicblock DG-4", "DG", 13000, 600, 5,
+    "This one is like that song from that guy who did that other musicblock."),
+  musicblock_d_green_05: row("musicblock_d_green_05", "Musicblock DG-5", "DG", 15000, 700, 5,
+    "Rock out with your block out. This is the musicblock anthem that's taking Groddle Forest by storm."),
+  musicblock_d_red_01: row("musicblock_d_red_01", "Musicblock DR-1", "DR", 10000, 400, 5,
+    "Music to drink a Cloud 11 Smoothie by."),
+  musicblock_d_red_02: row("musicblock_d_red_02", "Musicblock DR-2", "DR", 10000, 400, 5,
+    "The bestselling theme song from 'A Pig Petter's Diary'."),
+  musicblock_d_red_03: row("musicblock_d_red_03", "Musicblock DR-3", "DR", 9000, 500, 5,
+    "Underpants have been known to become airborne at the sound of this musicblock. Watch your back."),
+  musicblock_d_red_04: row("musicblock_d_red_04", "Musicblock DR-4", "DR", 9000, 600, 5,
+    "The best ear-wormy racket-pop currants can buy."),
+  musicblock_d_red_05: row("musicblock_d_red_05", "Musicblock DR-5", "DR", 14000, 700, 5,
+    "This friendly little tune reaches into your brain and scratches your hypothalamus. Tickly."),
+  musicblock_d_blue_01: row("musicblock_d_blue_01", "Musicblock DB-1", "DB", 15000, 400, 5,
+    "Knees, prepare to be slapped. This musicblock takes no prisoners with its twangy goodness."),
+  musicblock_d_blue_02: row("musicblock_d_blue_02", "Musicblock DB-2", "DB", 9000, 400, 5,
+    "Like the songs that giants hum to themselves when they're feeling blue. Unless they ARE blue, in which case they don't sing this way at all."),
+  musicblock_d_blue_03: row("musicblock_d_blue_03", "Musicblock DB-3", "DB", 13000, 500, 5,
+    "Warning: May cause you to do the chicken boogie."),
+  musicblock_d_blue_04: row("musicblock_d_blue_04", "Musicblock DB-4", "DB", 12000, 600, 5,
+    "Feet everywhere will tap despite themselves when they hear this."),
+  musicblock_d_blue_05: row("musicblock_d_blue_05", "Musicblock DB-5", "DB", 11000, 700, 5,
+    "If you could amplify butterfly song, this is roughly what it would sound like."),
+  musicblock_b_brown_01: row("musicblock_b_brown_01", "Musicblock BB-1", "BB", 8000, 400, 5,
+    "The hit single off the best selling album \"Music For Batterflies\", inspired by the enchanting noises inside a batterfly's gastrointestinal tract."),
+  musicblock_b_brown_02: row("musicblock_b_brown_02", "Musicblock BB-2", "BB", 8000, 400, 5,
+    "Warning: excessive volume may cause eyeball jelly to vibrate (in a good way)."),
+  musicblock_b_brown_03: row("musicblock_b_brown_03", "Musicblock BB-3", "BB", 8000, 500, 5,
+    "Lie back, close your eyes, and let the music wash over you, like the a cool sea breeze on a hot Alakol day. Or the tongues of a thousand piggies."),
+  musicblock_b_brown_04: row("musicblock_b_brown_04", "Musicblock BB-4", "BB", 8000, 600, 5,
+    "Voted Head-bumpingest, Toe-tappingest, Ear-wormingest, Air-drummingest Music Block of the Year, every year, for three centuries running."),
+  musicblock_b_brown_05: row("musicblock_b_brown_05", "Musicblock BB-5", "BB", 8000, 700, 5,
+    "Like the noise of Tii's sleeping brain, creating whole new rhythmical logarithms of imagination, but in musical form."),
+  musicblock_x_shiny_01: row("musicblock_x_shiny_01", "Musicblock XS-1", "XS", 5000, 400, 5,
+    "This is sort of an experimental, free-form, jazzy, fusiony something-or-other. Heavy on the experimental."),
+  musicblock_x_shiny_02: row("musicblock_x_shiny_02", "Musicblock XS-2", "XS", 8000, 400, 5,
+    "It's a little-known fact that this snappy little ditty was the inspiration for the phrase 'snappy little ditty'."),
+  musicblock_x_shiny_03: row("musicblock_x_shiny_03", "Musicblock XS-3", "XS", 5000, 500, 5,
+    "This rare musicblock is a bootleg from a Lapulapu Cavern rave dance party."),
+  musicblock_x_shiny_04: row("musicblock_x_shiny_04", "Musicblock XS-4", "XS", 6000, 600, 5,
+    "Rare recording of classic Glitch-hop before it all went mainstream."),
+  musicblock_x_shiny_05: row("musicblock_x_shiny_05", "Musicblock XS-5", "XS", 6000, 700, 5,
+    "If you played a butterfly song backward, this is roughly what it would sound like. You can barely hear the demons."),
+  musicblock_goodnight_groddle: row("musicblock_goodnight_groddle", "Musicblock GNG", null, 64000, 5000, 1,
+    "Once upon a time, this was the song that sent the world into slumber."),
+  musicblock_sb_secret_01: row("musicblock_sb_secret_01", "Musicblock SB-1", null, 35000, 10000, 1,
+    "This is the rare original recording of the song the Giants were humming when they were imagining the world."),
+});
+
+/** Item catalog meta for one block (other modules that drop blocks register through this). */
+export function musicblockItemMeta(classTsid) {
+  const def = MUSICBLOCK_CATALOG[classTsid];
+  if (!def) return null;
+  return {
+    label: def.label,
+    namePlural: def.label,
+    desc: def.desc,
+    icon: def.icon,
+    baseCost: def.baseCost,
+    stackMax: def.stackMax,
+    tags: ['musicblock', 'collectible', 'no_rube'],
+  };
+}
 
 export function ensureMusicblockItems() {
-  for (const def of Object.values(MUSICBLOCK_CATALOG)) {
-    ensureItem(def.classTsid, { label: def.label, desc: def.desc });
-  }
+  for (const classTsid of Object.keys(MUSICBLOCK_CATALOG)) ensureItem(classTsid, musicblockItemMeta(classTsid));
 }
 
 export function starterMusicblocks() {
@@ -102,6 +170,36 @@ export function listMusicblockCollection(inv) {
   };
 }
 
+/** Owned/total for one series (DG, DR, DB, BB, XS); null for SB-1 and GNG. */
+export function musicblockSeriesProgress(inv, collection) {
+  if (!collection || !MUSICBLOCK_SERIES[collection]) return null;
+  const rows = Object.values(MUSICBLOCK_CATALOG).filter((def) => def.collection === collection);
+  const owned = rows.filter((def) => countItem(inv, def.classTsid) > 0).length;
+  return { collection, owned, total: rows.length, complete: owned === rows.length };
+}
+
+/** The pack popover line: whole collection, plus the block's series when it has one. */
+export function musicblockCollectionNote(inv, classTsid) {
+  const def = getMusicblock(classTsid);
+  if (!def) return '';
+  const all = listMusicblockCollection(inv);
+  const series = musicblockSeriesProgress(inv, def.collection);
+  const head = `Recovered tunes ${all.owned}/${all.total}`;
+  return series ? `${head} · ${series.collection} series ${series.owned}/${series.total}` : head;
+}
+
+/**
+ * Street spawns: locations/newbie_island.js and the greeting locations
+ * (location.js:663) place one random block from the five series. SB-1 only
+ * comes out of the soil (patches.js musicblocks_brown). GNG was Tiny Speck's
+ * thank-you from the Special Item That Only Beta Testers Get, which the remake
+ * does not have, so it turns up on a street once all 25 series tunes are owned.
+ */
+export const MUSICBLOCK_STREET_POOL = Object.freeze(
+  Object.values(MUSICBLOCK_CATALOG).filter((def) => def.collection).map((def) => def.classTsid)
+);
+export const MUSICBLOCK_ENDGAME_DROP = 'musicblock_goodnight_groddle';
+
 function stableHash(value) {
   let hash = 2166136261;
   for (const char of String(value || '')) {
@@ -114,9 +212,10 @@ function stableHash(value) {
 /** One deterministic unowned block per uncollected street. */
 export function planMusicblockDrop(state, inv, streetTsid) {
   if (!state || !streetTsid || state.collectedStreets?.[streetTsid]) return null;
-  const collection = listMusicblockCollection(inv);
-  if (!collection.missing.length) return null;
-  return collection.missing[stableHash(streetTsid) % collection.missing.length];
+  let missing = MUSICBLOCK_STREET_POOL.filter((classTsid) => countItem(inv, classTsid) < 1);
+  if (!missing.length && countItem(inv, MUSICBLOCK_ENDGAME_DROP) < 1) missing = [MUSICBLOCK_ENDGAME_DROP];
+  if (!missing.length) return null;
+  return MUSICBLOCK_CATALOG[missing[stableHash(streetTsid) % missing.length]];
 }
 
 /** Pick up a world block and return collection progress. */
@@ -129,15 +228,16 @@ export function collectMusicblock(state, inv, classTsid, streetTsid) {
   if (!state.collectedStreets) state.collectedStreets = {};
   if (streetTsid) state.collectedStreets[streetTsid] = true;
   const collection = listMusicblockCollection(inv);
-  const seriesRows = collection.rows.filter((row) => row.collection === def.collection);
+  const series = musicblockSeriesProgress(inv, def.collection);
   return {
     ok: true,
     reason: 'collected',
     def,
     newDiscovery: before < 1,
     collection,
-    seriesOwned: seriesRows.filter((row) => row.owned).length,
-    seriesTotal: seriesRows.length,
+    seriesOwned: series ? series.owned : 0,
+    seriesTotal: series ? series.total : 0,
+    seriesComplete: Boolean(series?.complete),
   };
 }
 
@@ -164,9 +264,11 @@ export function playMusicblock(state, pc, classTsid, now = Date.now()) {
   let msg = 'Good stuff, but play it too much and it gets stale, you know?';
 
   if (previous == null) {
-    xp = 50;
+    xp = def.freshXp;
     freshness = 'fresh';
-    msg = 'Totally fresh tunes! Rad!';
+    msg = classTsid === 'musicblock_sb_secret_01'
+      ? 'You feel the oneness with the Giants, harking back to the time the world was imagined.'
+      : 'Totally fresh tunes! Rad!';
   } else if (at - previous >= MUSICBLOCK_MONTH_MS) {
     xp = 100;
     freshness = 'returning';

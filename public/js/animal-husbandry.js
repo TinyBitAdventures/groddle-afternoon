@@ -37,6 +37,7 @@
 import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-3';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
 import { moodMax } from './metabolics.js';
+import { musicblockItemMeta } from './musicblocks.js';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -69,11 +70,11 @@ export const HUSBANDRY_ITEMS = Object.freeze({
   butterfly_milker: { label: 'Butterfly Milker', namePlural: 'Butterfly Milkers', baseCost: 400, stackMax: 1, desc: 'A mechanized butterfly milker. It will gently milk your butterflies in your absence. Good for busy farmers or those with chapped hands.' },
   piggy_feeder: { label: 'Piggy Feeder', namePlural: 'Piggy Feeders', baseCost: 200, stackMax: 1, desc: 'A piggy feeder is a must-have device for lazy farmers. It will feed your pigs while you are away.' },
   bacon: { label: 'Rasher of Bacon', namePlural: 'Rashers of Bacon', baseCost: 20, stackMax: 20, desc: "A delicious, greasy, surprise Piggy treat from the Piggy's newly discovered Orthogonal Meat Generator (OMG).", tags: ['food'] },
-  musicblock_d_blue_01: { label: 'Musicblock DB-1', namePlural: 'Musicblock DB-1s', baseCost: 200, stackMax: 1, desc: 'A blue Musicblock.' },
-  musicblock_d_red_02: { label: 'Musicblock DR-2', namePlural: 'Musicblock DR-2s', baseCost: 200, stackMax: 1, desc: 'A red Musicblock.' },
-  musicblock_b_brown_04: { label: 'Musicblock BB-4', namePlural: 'Musicblock BB-4s', baseCost: 200, stackMax: 1, desc: 'A brown Musicblock.' },
-  musicblock_d_green_05: { label: 'Musicblock DG-5', namePlural: 'Musicblock DG-5s', baseCost: 200, stackMax: 1, desc: 'A green Musicblock.' },
-  musicblock_x_shiny_03: { label: 'Musicblock XS-3', namePlural: 'Musicblock XS-3s', baseCost: 200, stackMax: 1, desc: 'A shiny Musicblock.' },
+  musicblock_d_blue_01: musicblockItemMeta('musicblock_d_blue_01'),
+  musicblock_d_red_02: musicblockItemMeta('musicblock_d_red_02'),
+  musicblock_b_brown_04: musicblockItemMeta('musicblock_b_brown_04'),
+  musicblock_d_green_05: musicblockItemMeta('musicblock_d_green_05'),
+  musicblock_x_shiny_03: musicblockItemMeta('musicblock_x_shiny_03'),
 });
 
 /** Register the items above (keeps any richer existing catalog entry). */

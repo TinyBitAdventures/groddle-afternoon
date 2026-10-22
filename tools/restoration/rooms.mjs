@@ -119,7 +119,7 @@ export const ROOM_NOTES = Object.freeze({
     tagline: "Walk Esquibeth's last pilgrimage and learn her song.",
     about: "The Last Pilgrimage of Esquibeth retold a Glitch legend: follow her ghost through grottos and up a waterfall, collecting notes and replaying her song at each Giant stone.",
     play: 'Find the notes, then play back the ghost\'s melody (click or keys 1 to 5). At the top, Esquibeth dances, Grendaline appears, and you keep the Conch as a memento.',
-    source: "The quest rules and rewards, the Conch's Play and Blow, and the Hollow's own background painting from Tiny Speck's overlay files.",
+    source: "The quest rules and rewards, the Conch's Play and Blow, the Hollow's own background painting, and the melody Esquibeth's ghost plays at each stone, all from Tiny Speck's overlay files.",
     rebuilt: 'Narration was read from two full recordings, and her song (E G D, E C, A D) was matched from their audio against the recovered bell sounds.',
     footage: [{ id: 'BgRgIaeaj9Q', label: 'The Last Pilgrimage of Esquibeth' }, { id: 'fvin5awPESI', label: 'The Last Pilgrimage of Esquibeth (SnygystFS)' }],
   },

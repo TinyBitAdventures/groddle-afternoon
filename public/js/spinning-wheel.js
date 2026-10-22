@@ -7,6 +7,7 @@
  */
 
 import { addItem, ensureItem } from './inventory.js?v=catalog-unified-3';
+import { musicblockItemMeta } from './musicblocks.js';
 
 export const GAMESHOW_TICKET_ID = 'gameshow_ticket';
 export const SPINNING_WHEEL_APPEAR_MS = 1_200;
@@ -22,31 +23,11 @@ const ITEM_DEFS = Object.freeze({
     desc: "One glittery, razzling, dazzling game show ticket. Ain't nothing you can do but USE it.",
     baseCost: 0,
   }),
-  musicblock_x_shiny_01: Object.freeze({
-    label: 'Musicblock XS-1',
-    desc: 'This is sort of an experimental, free-form, jazzy, fusiony something-or-other. Heavy on the experimental.',
-    baseCost: 400,
-  }),
-  musicblock_x_shiny_02: Object.freeze({
-    label: 'Musicblock XS-2',
-    desc: "It's a little-known fact that this snappy little ditty was the inspiration for the phrase 'snappy little ditty'.",
-    baseCost: 400,
-  }),
-  musicblock_b_brown_03: Object.freeze({
-    label: 'Musicblock BB-3',
-    desc: 'Lie back, close your eyes, and let the music wash over you, like a cool sea breeze on a hot Alakol day.',
-    baseCost: 500,
-  }),
-  musicblock_d_green_04: Object.freeze({
-    label: 'Musicblock DG-4',
-    desc: 'This one is like that song from that guy who did that other musicblock.',
-    baseCost: 600,
-  }),
-  musicblock_d_red_05: Object.freeze({
-    label: 'Musicblock DR-5',
-    desc: 'This friendly little tune reaches into your brain and scratches your hypothalamus. Tickly.',
-    baseCost: 700,
-  }),
+  musicblock_x_shiny_01: Object.freeze(musicblockItemMeta('musicblock_x_shiny_01')),
+  musicblock_x_shiny_02: Object.freeze(musicblockItemMeta('musicblock_x_shiny_02')),
+  musicblock_b_brown_03: Object.freeze(musicblockItemMeta('musicblock_b_brown_03')),
+  musicblock_d_green_04: Object.freeze(musicblockItemMeta('musicblock_d_green_04')),
+  musicblock_d_red_05: Object.freeze(musicblockItemMeta('musicblock_d_red_05')),
   cubimal_package: Object.freeze({
     label: 'Cubimal Series 1 Box',
     desc: 'Contains one Series 1 Cubimal. Open it up to find out which one is inside.',
@@ -164,12 +145,7 @@ function pickByRoll(rows, roll) {
 
 export function ensureSpinningWheelItems() {
   for (const [classTsid, def] of Object.entries(ITEM_DEFS)) {
-    ensureItem(classTsid, {
-      ...def,
-      icon: classTsid.startsWith('musicblock_x_shiny_')
-        ? `assets/sprites/icons/${classTsid}.svg`
-        : undefined,
-    });
+    ensureItem(classTsid, def);
   }
 }
 

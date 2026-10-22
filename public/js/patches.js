@@ -34,6 +34,7 @@
 import { createTrantState, fruitCapacityAt, refillFruit, resetTrantDay } from './trants.js?v=trant-harvest-2';
 import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=woodcutting-1';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
+import { musicblockItemMeta } from './musicblocks.js';
 
 export const PATCH_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 export const SOIL_SPRITE_ROOT = 'assets/sprites/soil';
@@ -198,12 +199,12 @@ export const SOIL_ITEM_DEFS = Object.freeze({
   loam: Object.freeze({ label: 'Lump of Loam', namePlural: 'Lumps of Loam', baseCost: 10, stackMax: 24, desc: "Moist and fertile, and leagues above plain old earth. Any building project's pride." }),
   gem_diamond: Object.freeze({ label: 'Walloping Big Diamond', namePlural: 'Walloping Big Diamonds', baseCost: 2000, stackMax: 3, desc: "Yep, that's a walloping big diamond." }),
   plank: Object.freeze({ label: 'Plank', namePlural: 'Planks', baseCost: 5, stackMax: 250, desc: 'A plain wooden plank with many uses.' }),
-  musicblock_b_brown_02: Object.freeze({ label: 'Musicblock BB-2', namePlural: 'Musicblock BB-2s', baseCost: 200, stackMax: 1, desc: 'A brown Musicblock, dug from the soil of Ur.' }),
-  musicblock_b_brown_05: Object.freeze({ label: 'Musicblock BB-5', namePlural: 'Musicblock BB-5s', baseCost: 200, stackMax: 1, desc: 'A brown Musicblock, dug from the soil of Ur.' }),
-  musicblock_x_shiny_04: Object.freeze({ label: 'Musicblock XS-4', namePlural: 'Musicblock XS-4s', baseCost: 200, stackMax: 1, desc: 'A shiny Musicblock.', icon: 'assets/sprites/icons/musicblock_x_shiny_02.svg' }),
-  musicblock_d_red_04: Object.freeze({ label: 'Musicblock DR-4', namePlural: 'Musicblock DR-4s', baseCost: 200, stackMax: 1, desc: 'A red Musicblock.' }),
-  musicblock_d_blue_05: Object.freeze({ label: 'Musicblock DB-5', namePlural: 'Musicblock DB-5s', baseCost: 200, stackMax: 1, desc: 'A blue Musicblock.' }),
-  musicblock_sb_secret_01: Object.freeze({ label: 'Musicblock SB-1', namePlural: 'Musicblock SB-1s', baseCost: 200, stackMax: 1, desc: 'A secret Musicblock, buried by a Mabbite long ago.' }),
+  musicblock_b_brown_02: Object.freeze(musicblockItemMeta('musicblock_b_brown_02')),
+  musicblock_b_brown_05: Object.freeze(musicblockItemMeta('musicblock_b_brown_05')),
+  musicblock_x_shiny_04: Object.freeze(musicblockItemMeta('musicblock_x_shiny_04')),
+  musicblock_d_red_04: Object.freeze(musicblockItemMeta('musicblock_d_red_04')),
+  musicblock_d_blue_05: Object.freeze(musicblockItemMeta('musicblock_d_blue_05')),
+  musicblock_sb_secret_01: Object.freeze(musicblockItemMeta('musicblock_sb_secret_01')),
 });
 
 /** patch.js / patch_seedling.js `responses` (sendResponse talkback). */
