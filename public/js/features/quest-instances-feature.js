@@ -245,6 +245,17 @@ function customPrereq(questId, prereq, engine) {
     if (other !== questId && theirs.doneAt && now - theirs.doneAt < HOUR_MS) return false;
     return true;
   }
+  // canOffer waits of several hours (hours_after:4:<quest>: Esquibeth's reminisce, a game day).
+  const hours = value.match(/^hours_after:(\d+(?:\.\d+)?):(.+)$/);
+  if (hours) {
+    const ms = Number(hours[1]) * HOUR_MS;
+    const mine = save.memory[questId] || {};
+    const theirs = save.memory[hours[2]] || {};
+    if (mine.doneAt && now - mine.doneAt < ms) return false;
+    if (mine.failedAt && now - mine.failedAt < ms) return false;
+    if (hours[2] !== questId && theirs.doneAt && now - theirs.doneAt < ms) return false;
+    return true;
+  }
   if (value.startsWith('upgrades:')) {
     const have = new Set(engine.pc?.imaginationUpgrades || []);
     return value.slice('upgrades:'.length).split(',').every((id) => have.has(id));
@@ -1243,6 +1254,9 @@ export const questInstancesFeature = {
         tooltip: 'Relive a puzzle you have solved',
       });
     }
+    for (const def of itemRooms(engine, classTsid)) {
+      for (const verb of def.itemVerbs(worldContext(engine), classTsid) || []) out.push(verb);
+    }
     if (!run) {
       for (const def of activeWorldRooms(engine)) {
         for (const verb of def.world.packVerbs?.(worldContext(engine), classTsid) || []) out.push(verb);
@@ -1255,6 +1269,9 @@ export const questInstancesFeature = {
     if (REMINISCE_ITEMS[classTsid] && verbId === 'reminisce') {
       openReminisce(engine, classTsid);
       return true;
+    }
+    for (const def of itemRooms(engine, classTsid)) {
+      if (def.runItemVerb?.(worldContext(engine), classTsid, verbId) === true) return true;
     }
     for (const def of activeWorldRooms(engine)) {
       if (def.world.runPackVerb?.(worldContext(engine), classTsid, verbId) === true) return true;
@@ -1285,6 +1302,27 @@ export const questInstancesFeature = {
     return { run, room: room?.id || null, save, demo };
   },
 };
+
+/**
+ * Rooms that own pack verbs for an item class whether or not a quest is
+ * running (the Conch's Play and Blow): the rooms of the quests that item
+ * offers (offerTriggers npc), loaded on first use, with `itemVerbs`.
+ */
+function itemRooms(engine, classTsid) {
+  if (!REMINISCE_ITEMS[classTsid]) return [];
+  const out = [];
+  const seen = new Set();
+  for (const [questId, roomId] of Object.entries(QUEST_ROOMS)) {
+    if (seen.has(roomId)) continue;
+    const triggers = questDef(questId)?.offerTriggers || [];
+    if (!triggers.some((t) => t?.type === 'npc' && t.npc === classTsid)) continue;
+    seen.add(roomId);
+    const def = loaded.get(roomId);
+    if (def === undefined) loadRoom(roomId);
+    else if (def?.itemVerbs && (def.itemClasses || []).includes(classTsid)) out.push(def);
+  }
+  return out;
+}
 
 function openReminisce(engine, itemClass) {
   const offers = npcQuestOffers(engine.questState, REMINISCE_ITEMS[itemClass], engine.pc, questCtx(engine))

@@ -28151,7 +28151,8 @@
     "name": "got_conch",
     "num": 1,
     "classId": "conch",
-    "desc": "Find the Conch"
+    "desc": "Find the Conch",
+    "route": "quest-instances"
    }
   ],
   "rewards": {},
@@ -28180,14 +28181,15 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "event",
-    "event": "shrine_donation",
-    "afterQuest": "donate_to_all_shrines",
-    "delaySec": 1800
+    "type": "quest",
+    "quest": "donate_to_all_shrines",
+    "delaySec": 1800,
+    "override": true
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "esquibeth",
+  "offerNote": "shrine_donation event trigger; offered after donate_to_all_shrines",
+  "solo": true
  },
  "last_pilgrimage_of_esquibeth_reminisce": {
   "classTsid": "last_pilgrimage_of_esquibeth_reminisce",
@@ -28201,14 +28203,16 @@
     "type": "flag",
     "name": "esquibeth_exit_revealed",
     "num": 1,
-    "desc": "Go on the Journey"
+    "desc": "Go on the Journey",
+    "route": "quest-instances"
    },
    {
     "id": "r549",
     "type": "flag",
     "name": "leave",
     "num": 1,
-    "desc": "Return from the Journey"
+    "desc": "Return from the Journey",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -28232,7 +28236,13 @@
   "familiarTurnin": true,
   "silentComplete": false,
   "showAlert": false,
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "hours_after:4:last_pilgrimage_of_esquibeth",
+    "not": 0
+   }
+  ],
   "endNpcs": [],
   "locations": [
    "waterfall_01",
@@ -28249,8 +28259,9 @@
     "npc": "conch"
    }
   ],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "instanceRoom": "esquibeth",
+  "offerNote": "canOffer: a game day (4 hours) after part 1 and after the last repeat or fail; offered by the Conch Reminisce verb",
+  "solo": true
  },
  "lava_leap": {
   "classTsid": "lava_leap",

@@ -82,6 +82,7 @@ export const BUILT_ROOMS = Object.freeze([
   'gwendolyn',
   'mental_block',
   'penalty',
+  'esquibeth',
 ]);
 
 /**
@@ -135,6 +136,10 @@ export const OFFER_OVERRIDES = Object.freeze({
   last_pilgrimage_of_esquibeth: {
     offerTriggers: [{ type: 'quest', quest: 'donate_to_all_shrines', delaySec: 1800 }],
     why: 'shrine_donation event trigger; offered after donate_to_all_shrines',
+  },
+  last_pilgrimage_of_esquibeth_reminisce: {
+    prerequisites: [{ condition: 'custom_code', value: 'hours_after:4:last_pilgrimage_of_esquibeth', not: 0 }],
+    why: 'canOffer: a game day (4 hours) after part 1 and after the last repeat or fail; offered by the Conch Reminisce verb',
   },
   // Drinking a Cup of Water after getting your papers; the remake has no tainted cup.
   stale_but_necessary: {
@@ -222,6 +227,16 @@ export const ROOM_ITEMS = Object.freeze({
     sellable: false,
     donatable: false,
     tags: ['no_rube', 'no_trade', 'no_auction', 'toys'],
+  },
+  // items/conch.js: The Last Pilgrimage of Esquibeth's memento; Play and Blow live in quest-rooms/esquibeth.js.
+  conch: {
+    label: 'Conch',
+    desc: 'A Conch!',
+    stackMax: 1,
+    baseCost: 700,
+    sellable: false,
+    donatable: false,
+    tags: ['no_rube', 'no_donate', 'no_auction', 'no_mail', 'no_trade'],
   },
   // items/random_kindness.js: Gwendolyn's Task III's reward; its bestow verb needs another player.
   random_kindness: {
