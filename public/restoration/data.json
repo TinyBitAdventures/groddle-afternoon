@@ -1,0 +1,1193 @@
+{
+ "status": {
+  "source": {
+   "label": "Restored from source",
+   "short": "Restored",
+   "tone": "moss",
+   "mark": "✓",
+   "desc": "Its rules, numbers and words come straight from the original server code Tiny Speck released."
+  },
+  "rebuilt": {
+   "label": "Rebuilt from footage",
+   "short": "Rebuilt",
+   "tone": "sky",
+   "mark": "✓",
+   "desc": "The rules survive but the level or art does not, so it is reconstructed from gameplay recordings."
+  },
+  "reimagined": {
+   "label": "Reimagined",
+   "short": "Reimagined",
+   "tone": "plum",
+   "mark": "✓",
+   "desc": "Nothing about it survives, so it is designed fresh in the spirit of the original."
+  },
+  "solo": {
+   "label": "Adapted for solo play",
+   "short": "Solo",
+   "tone": "sun",
+   "mark": "✓",
+   "desc": "A multiplayer system reworked so one player can enjoy it: rival Glitches, companions, a hired hand."
+  },
+  "progress": {
+   "label": "In progress",
+   "short": "In progress",
+   "tone": "sand",
+   "mark": "…",
+   "desc": "On the workbench right now."
+  },
+  "missing": {
+   "label": "Not yet",
+   "short": "Not yet",
+   "tone": "stone",
+   "mark": "",
+   "desc": "Recoverable, but not started."
+  },
+  "lost": {
+   "label": "Can't come back",
+   "short": "Lost",
+   "tone": "dusk",
+   "mark": "×",
+   "desc": "It needed other people, or nothing about it survives."
+  }
+ },
+ "groups": [
+  {
+   "id": "world",
+   "name": "The world",
+   "blurb": "Streets, hubs and the physics of getting around Ur."
+  },
+  {
+   "id": "creatures",
+   "name": "Creatures & trees",
+   "blurb": "Piggies, chickens, butterflies, trants and the things that roam."
+  },
+  {
+   "id": "making",
+   "name": "Gathering & making",
+   "blurb": "Gardens, mining, cooking, machines: the crafting economy."
+  },
+  {
+   "id": "economy",
+   "name": "Giants & economy",
+   "blurb": "Quoins, currants, vendors, shrines and imagination."
+  },
+  {
+   "id": "quests",
+   "name": "Quests & adventures",
+   "blurb": "Story quests, quest rooms, races and Paradise."
+  },
+  {
+   "id": "home",
+   "name": "Home & neighbours",
+   "blurb": "Houses, furniture, mail and the people next door."
+  },
+  {
+   "id": "late",
+   "name": "Late game",
+   "blurb": "Rooks, Icons, the Rube, skills and the long tail."
+  }
+ ],
+ "items": [
+  {
+   "id": "streets",
+   "group": "world",
+   "name": "Original streets",
+   "status": "source",
+   "blurb": "Over 1,400 archived streets with their real geometry, layered art, parallax, colour grading and signposts.",
+   "spot": "signpost",
+   "evidence": [
+    "public/js/street-loader.js",
+    "public/js/street-render.js",
+    "public/assets/streets/index.json"
+   ],
+   "shot": "shots/streets.webp"
+  },
+  {
+   "id": "navigation",
+   "group": "world",
+   "name": "Doors, ladders and walls",
+   "status": "source",
+   "blurb": "Doors between streets, climbable ladders and solid walls restored from the location files, keys included.",
+   "spot": null,
+   "evidence": [
+    "public/js/location-navigation.js",
+    "public/js/features/doors-feature.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "physics",
+   "group": "world",
+   "name": "Glitch physics",
+   "status": "source",
+   "blurb": "The client’s walk, jump, Triple Jump, ladder and air rules, plus each street’s own physics (underwater, low gravity, tiny).",
+   "spot": "player",
+   "evidence": [
+    "public/js/movement.js",
+    "public/js/location-events.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "street-events",
+   "group": "world",
+   "name": "Street scripts and puzzles",
+   "status": "rebuilt",
+   "blurb": "Archived street event scripts run again; puzzle streets got their lost switches and triggers rebuilt.",
+   "spot": null,
+   "evidence": [
+    "public/js/features/location-events-feature.js",
+    "public/js/features/puzzles-feature.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "dametime",
+   "group": "world",
+   "name": "Dametime and the day cycle",
+   "status": "source",
+   "blurb": "The official calendar: ten-second minutes, four-hour days, eight-day weeks, and a new day that refreshes Ur.",
+   "spot": "clock",
+   "evidence": [
+    "public/js/game-day.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "map",
+   "group": "world",
+   "name": "Hub maps and travel",
+   "status": "source",
+   "blurb": "Every region’s map with its streets, and travel by signpost or map.",
+   "spot": null,
+   "evidence": [
+    "public/js/map-graph.js",
+    "public/js/travel.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "music",
+   "group": "world",
+   "name": "Music and sounds",
+   "status": "source",
+   "blurb": "The published soundtrack per region, recovered sound files, and gentle synth stand-ins for the sounds that were lost.",
+   "spot": null,
+   "evidence": [
+    "public/js/ambient-music.js",
+    "public/js/sound-board.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "avatar",
+   "group": "world",
+   "name": "Your Glitch",
+   "status": "source",
+   "blurb": "A real player’s recovered animation sheets: walk, climb, jump, happy, angry, surprised, with a colour builder.",
+   "spot": "player",
+   "evidence": [
+    "public/js/avatar-anims.js",
+    "public/js/character-builder.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "camera",
+   "group": "world",
+   "name": "Camera Mode",
+   "status": "source",
+   "blurb": "Press C to look around the street; with Eyeballery, the whole street.",
+   "spot": null,
+   "evidence": [
+    "public/js/features/camera-mode-feature.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "newxp",
+   "group": "world",
+   "name": "The new-player tutorial",
+   "status": "progress",
+   "blurb": "Gentle Island and the training levels, as an optional start.",
+   "spot": null,
+   "evidence": [],
+   "shot": null
+  },
+  {
+   "id": "secrets",
+   "group": "world",
+   "name": "Eleven Secret Locations",
+   "status": "progress",
+   "blurb": "Beacons on twenty secret spots across Ur, each with a Giant’s message.",
+   "spot": null,
+   "evidence": [],
+   "shot": null
+  },
+  {
+   "id": "piggies",
+   "group": "creatures",
+   "name": "Piggies",
+   "status": "source",
+   "blurb": "Pet, nibble for meat, feed, name, capture and incubate, with the exact Animal Kinship tables.",
+   "spot": "piggy",
+   "evidence": [
+    "public/js/animal-kinship.js",
+    "public/js/animal-husbandry.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "chickens",
+   "group": "creatures",
+   "name": "Chickens",
+   "status": "source",
+   "blurb": "Squeeze for grain, incubate eggs, raise chicks.",
+   "spot": "chicken",
+   "evidence": [
+    "public/js/animal-kinship.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "butterflies",
+   "group": "creatures",
+   "name": "Butterflies",
+   "status": "source",
+   "blurb": "Massage with lotion, then milk; the onboarding quests start here.",
+   "spot": "butterfly",
+   "evidence": [
+    "public/js/animal-kinship.js",
+    "public/js/tools.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "trants",
+   "group": "creatures",
+   "name": "Trants and Wood Trees",
+   "status": "source",
+   "blurb": "Six living trees to pet, water and harvest (with super harvests), and Wood Trees for planks.",
+   "spot": "tree",
+   "evidence": [
+    "public/js/trants.js",
+    "public/js/trant-care.js",
+    "public/js/woodcutting.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "batterflies",
+   "group": "creatures",
+   "name": "Batterflies and guano",
+   "status": "source",
+   "blurb": "Cave Batterflies that turn food into guano, and the bar that boosts them.",
+   "spot": null,
+   "evidence": [
+    "public/js/animal-husbandry.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "foxes",
+   "group": "creatures",
+   "name": "Foxes and Heli Kitties",
+   "status": "source",
+   "blurb": "Fox brushing in the preserves and the kitties overhead.",
+   "spot": null,
+   "evidence": [
+    "public/js/foxes.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "ecology",
+   "group": "creatures",
+   "name": "Who lives where",
+   "status": "source",
+   "blurb": "Each street’s real population of animals, trees, rocks and shrines from the archive.",
+   "spot": null,
+   "evidence": [
+    "public/js/street-ecology.js",
+    "public/assets/content/street-ecology.json"
+   ],
+   "shot": null
+  },
+  {
+   "id": "gardens",
+   "group": "making",
+   "name": "Gardens and herbs",
+   "status": "source",
+   "blurb": "Hoe, plant, water and harvest crops and herbs, with the Master Gardener potions.",
+   "spot": "garden",
+   "evidence": [
+    "public/js/garden.js",
+    "public/js/master-garden.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "mining",
+   "group": "making",
+   "name": "Mining and metal",
+   "status": "source",
+   "blurb": "Mine four rock types, smelt, grind and make metal with the original tools.",
+   "spot": "rock",
+   "evidence": [
+    "public/js/mining.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "cooking",
+   "group": "making",
+   "name": "Cooking and making",
+   "status": "source",
+   "blurb": "The recipe catalog across every making tool, with skill rules and tool wear.",
+   "spot": null,
+   "evidence": [
+    "public/js/making.js",
+    "public/assets/content/recipes.json"
+   ],
+   "shot": null
+  },
+  {
+   "id": "machines",
+   "group": "making",
+   "name": "Machines and the Still",
+   "status": "source",
+   "blurb": "Assemble Blockmakers, Fuelmakers and Woodworkers; fuel them; distil hooch.",
+   "spot": null,
+   "evidence": [
+    "public/js/machines.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "resources",
+   "group": "making",
+   "name": "Peat, dirt, jellisacs and more",
+   "status": "source",
+   "blurb": "Harvestable street resources and their rare drops.",
+   "spot": null,
+   "evidence": [
+    "public/js/features/resource-nodes-feature.js",
+    "public/js/drop-tables.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "tools",
+   "group": "making",
+   "name": "Tools that wear and mend",
+   "status": "source",
+   "blurb": "Every tool’s exact condition, breakage and Tinkertool repairs.",
+   "spot": null,
+   "evidence": [
+    "public/js/tools.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "quoins",
+   "group": "economy",
+   "name": "Quoins",
+   "status": "source",
+   "blurb": "All eight quoin types, daily limits, multipliers and Qurazy quoins.",
+   "spot": "quoin",
+   "evidence": [
+    "public/js/quoins.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "shrines",
+   "group": "economy",
+   "name": "Giants and shrines",
+   "status": "source",
+   "blurb": "Donate at the eleven Giants’ shrines for favor and emblems.",
+   "spot": "shrine",
+   "evidence": [
+    "public/js/shrines.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "vendors",
+   "group": "economy",
+   "name": "Street spirit vendors",
+   "status": "source",
+   "blurb": "The original stores, stock and prices, buying and selling.",
+   "spot": "vendor",
+   "evidence": [
+    "public/js/vendor.js",
+    "public/js/store-catalog.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "imagination",
+   "group": "economy",
+   "name": "Imagination upgrades",
+   "status": "source",
+   "blurb": "The upgrade card shop with its hand of three cards, re-deals and effects.",
+   "spot": null,
+   "evidence": [
+    "public/js/imagination.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "levels",
+   "group": "economy",
+   "name": "Levels, energy and mood",
+   "status": "source",
+   "blurb": "The official XP table, level rewards, metabolics and food variety.",
+   "spot": null,
+   "evidence": [
+    "public/js/progression.js",
+    "public/js/food.js",
+    "public/js/metabolics.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "badges",
+   "group": "economy",
+   "name": "Badges",
+   "status": "source",
+   "blurb": "The full badge catalog with official art and the original counters.",
+   "spot": null,
+   "evidence": [
+    "public/js/achievements.js",
+    "public/js/exploration.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "auctions",
+   "group": "economy",
+   "name": "Auctions and trading",
+   "status": "lost",
+   "blurb": "The player auction house and trading needed other players.",
+   "spot": null,
+   "evidence": [],
+   "shot": null
+  },
+  {
+   "id": "quests",
+   "group": "quests",
+   "name": "Story and skill quests",
+   "status": "source",
+   "blurb": "Hundreds of original quests with their dialogue, offered by the Magic Rock.",
+   "spot": "rock-magic",
+   "evidence": [
+    "public/js/quests.js",
+    "public/js/quest-offers.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "quest-rooms",
+   "group": "quests",
+   "name": "Quest rooms",
+   "status": "rebuilt",
+   "blurb": "Private quest instances: almost none survive, so each is rebuilt from the quest code and gameplay footage.",
+   "spot": null,
+   "evidence": [
+    "public/js/features/quest-instances-feature.js",
+    "public/js/quest-rooms/catalog.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "story-quests",
+   "group": "quests",
+   "name": "Hand-built story quests",
+   "status": "rebuilt",
+   "blurb": "Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more.",
+   "spot": null,
+   "evidence": [
+    "public/js/ghost-quest.js",
+    "public/js/rook-woods.js",
+    "public/js/winter-walk.js",
+    "public/js/summers-day.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "paradise",
+   "group": "quests",
+   "name": "Ticket to Paradise",
+   "status": "rebuilt",
+   "blurb": "Private flying and sliding courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide. More are on the way.",
+   "spot": null,
+   "evidence": [
+    "public/js/paradise-flight.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "races",
+   "group": "quests",
+   "name": "Races and Game of Crowns",
+   "status": "solo",
+   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches.",
+   "spot": null,
+   "evidence": [
+    "public/js/races.js",
+    "public/js/game-of-crowns.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "hog-haul",
+   "group": "quests",
+   "name": "The Great Hog Haul",
+   "status": "solo",
+   "blurb": "The piggy-wrangling race, on its real cave street, against a rival.",
+   "spot": null,
+   "evidence": [
+    "public/js/hog-haul.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "street-jobs",
+   "group": "quests",
+   "name": "Street projects",
+   "status": "solo",
+   "blurb": "Build new streets and upgrades together: here, with a hired hand.",
+   "spot": null,
+   "evidence": [
+    "public/js/street-jobs.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "feats",
+   "group": "quests",
+   "name": "Feats",
+   "status": "solo",
+   "blurb": "The Last Feat’s incantation chain, with local companions taking the other parts.",
+   "spot": null,
+   "evidence": [
+    "public/js/feats.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "parties",
+   "group": "quests",
+   "name": "Party spaces",
+   "status": "solo",
+   "blurb": "All eight party packs and their party streets.",
+   "spot": null,
+   "evidence": [
+    "public/js/party-spaces.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "smuggling",
+   "group": "quests",
+   "name": "The Smuggler",
+   "status": "progress",
+   "blurb": "Contraband deliveries and the jailbreak quests.",
+   "spot": null,
+   "evidence": [],
+   "shot": null
+  },
+  {
+   "id": "seasons",
+   "group": "quests",
+   "name": "Holidays",
+   "status": "source",
+   "blurb": "Zilloween, Glitchmas, the Egg Hunt and Pi Day.",
+   "spot": null,
+   "evidence": [
+    "public/js/seasons.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "homes",
+   "group": "home",
+   "name": "Your house and yard",
+   "status": "source",
+   "blurb": "Buy a house, decorate rooms, cultivate the yard, keep animals.",
+   "spot": "mailbox",
+   "evidence": [
+    "public/js/homes.js",
+    "public/js/home-decor.js",
+    "public/js/home-cultivation.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "mail",
+   "group": "home",
+   "name": "Mail",
+   "status": "source",
+   "blurb": "Mailboxes, postage, parcels and replies.",
+   "spot": null,
+   "evidence": [
+    "public/js/mailbox.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "neighbours",
+   "group": "home",
+   "name": "Neighbours",
+   "status": "reimagined",
+   "blurb": "Visiting Stones lead to six authored neighbours, standing in for other players’ homes.",
+   "spot": null,
+   "evidence": [
+    "public/js/neighbours.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "tower",
+   "group": "home",
+   "name": "Your Tower",
+   "status": "progress",
+   "blurb": "The tall public building on your home street.",
+   "spot": null,
+   "evidence": [],
+   "shot": null
+  },
+  {
+   "id": "chat",
+   "group": "home",
+   "name": "Chat, groups and friends",
+   "status": "lost",
+   "blurb": "Global chat, groups and buddy lists were about other people.",
+   "spot": null,
+   "evidence": [],
+   "shot": null
+  },
+  {
+   "id": "rooks",
+   "group": "late",
+   "name": "Rook attacks",
+   "status": "solo",
+   "blurb": "The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival.",
+   "spot": null,
+   "evidence": [
+    "public/js/rook-attack.js"
+   ],
+   "shot": "shots/rooks.webp"
+  },
+  {
+   "id": "skills",
+   "group": "late",
+   "name": "Skills",
+   "status": "source",
+   "blurb": "All 105 skills to learn, with the real effects where their systems exist.",
+   "spot": null,
+   "evidence": [
+    "public/js/skill-tree.js",
+    "public/js/skills.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "meditation",
+   "group": "late",
+   "name": "Meditation and teleportation",
+   "status": "source",
+   "blurb": "Focusing Orb meditation, levitation, teleport points and scripts.",
+   "spot": null,
+   "evidence": [
+    "public/js/meditation.js",
+    "public/js/teleportation.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "icons",
+   "group": "late",
+   "name": "Giant Icons",
+   "status": "source",
+   "blurb": "Make an Icon from eleven emblems and tend it for the Giants’ love.",
+   "spot": null,
+   "evidence": [
+    "public/js/giant-icons.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "rube",
+   "group": "late",
+   "name": "The Rube",
+   "status": "source",
+   "blurb": "The mysterious trader who appears and offers a swap.",
+   "spot": null,
+   "evidence": [
+    "public/js/rube.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "hell",
+   "group": "late",
+   "name": "Hell (Naraka)",
+   "status": "source",
+   "blurb": "Croak and work your way out by squishing grapes.",
+   "spot": null,
+   "evidence": [
+    "public/js/hell.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "collectibles",
+   "group": "late",
+   "name": "Musicblocks, Cubimals and the Stoot doll",
+   "status": "source",
+   "blurb": "Collectible tunes, both Cubimal series and the memorial pull-string doll.",
+   "spot": null,
+   "evidence": [
+    "public/js/musicblocks.js",
+    "public/js/cubimals.js",
+    "public/js/stoot-doll.js"
+   ],
+   "shot": null
+  },
+  {
+   "id": "snaps",
+   "group": "late",
+   "name": "Snapshots",
+   "status": "lost",
+   "blurb": "Snapshottery was retired before Glitch closed.",
+   "spot": null,
+   "evidence": [],
+   "shot": null
+  }
+ ],
+ "tally": {
+  "source": 37,
+  "rebuilt": 4,
+  "progress": 4,
+  "lost": 3,
+  "solo": 6,
+  "reimagined": 1
+ },
+ "back": 48,
+ "possible": 52,
+ "quests": {
+  "total": 445,
+  "story": 245,
+  "playable": 177,
+  "buckets": [
+   {
+    "id": "playable",
+    "label": "Playable",
+    "note": "Offered and finishable in the remake.",
+    "count": 177
+   },
+   {
+    "id": "job",
+    "label": "Street projects",
+    "note": "Build-a-street jobs: counted under Street projects.",
+    "count": 200
+   },
+   {
+    "id": "building",
+    "label": "Still being rebuilt",
+    "note": "Their rooms or systems are on the workbench.",
+    "count": 11
+   },
+   {
+    "id": "players",
+    "label": "Needed other players",
+    "note": "Multiplayer races and favours between players.",
+    "count": 27
+   },
+   {
+    "id": "retired",
+    "label": "Retired before shutdown",
+    "note": "Tests, removed features, broken or unreachable in the original.",
+    "count": 21
+   },
+   {
+    "id": "tutorial",
+    "label": "Tutorial island",
+    "note": "The new-player experience, being rebuilt.",
+    "count": 9
+   }
+  ]
+ },
+ "rooms": {
+  "total": 20,
+  "built": 18,
+  "rooms": [
+   {
+    "id": "an_autumn_day",
+    "title": "An Autumn Day",
+    "quests": [
+     "An Autumn Day"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "tile_puzzle",
+    "title": "An Old Fashioned B&E",
+    "quests": [
+     "An Old Fashioned B&E"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "being_watched",
+    "title": "Being Watched",
+    "quests": [
+     "Being Watched"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "juju_camp",
+    "title": "Carry That Weight",
+    "quests": [
+     "Carry That Weight",
+     "Carry That Weight II"
+    ],
+    "built": true,
+    "shot": "shots/room-juju_camp.webp"
+   },
+   {
+    "id": "color_unblocking",
+    "title": "Color Unblocking",
+    "quests": [
+     "Color Unblocking"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "gwendolyn",
+    "title": "Gwendolyn's Task",
+    "quests": [
+     "Gwendolyn's Task",
+     "Gwendolyn's Task II",
+     "Gwendolyn's Task III"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "clubhouse",
+    "title": "Join the Club",
+    "quests": [
+     "Join the Club"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "le_miserable",
+    "title": "Le Misérable",
+    "quests": [
+     "Le Misérable",
+     "Le Misérable II"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "kids_room",
+    "title": "Mr. Block's playroom",
+    "quests": [
+     "Child's Play",
+     "Word Up"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "operation_grow",
+    "title": "Operation: Grow",
+    "quests": [
+     "Operation: Grow"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "picto_pattern",
+    "title": "Picto-Pattern",
+    "quests": [
+     "Picto-Pattern"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "radiant_glare",
+    "title": "Radiant Glare",
+    "quests": [
+     "Radiant Glare"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "rainbow_run",
+    "title": "Rainbow Run",
+    "quests": [
+     "The Numismatic Hustle "
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "top_of_tree",
+    "title": "The High Jumper",
+    "quests": [
+     "The High Jumper"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "rube_yard",
+    "title": "The Wrizzards and The Rube",
+    "quests": [
+     "The Wrizzards and The Rube"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "vision_quest",
+    "title": "Vision Quest",
+    "quests": [
+     "Vision Quest"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "light_perspective",
+    "title": "Walk Toward the Light",
+    "quests": [
+     "Walk Toward the Light"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "back_alley",
+    "title": "We're Off to See the Lizard",
+    "quests": [
+     "We're Off to See the Lizard"
+    ],
+    "built": true,
+    "shot": null
+   },
+   {
+    "id": "mental_block",
+    "title": "Mental Block",
+    "quests": [
+     "Mental Block",
+     "Mental Block 2"
+    ],
+    "built": false,
+    "shot": null
+   },
+   {
+    "id": "esquibeth",
+    "title": "The Last Pilgrimage of Esquibeth",
+    "quests": [
+     "The Last Pilgrimage of Esquibeth"
+    ],
+    "built": false,
+    "shot": null
+   }
+  ]
+ },
+ "badges": {
+  "total": 663,
+  "officialArt": 661,
+  "reimaginedArt": 2
+ },
+ "skills": {
+  "total": 105,
+  "counts": {
+   "live": 97,
+   "partial": 4,
+   "later": 1,
+   "multiplayer": 3
+  }
+ },
+ "streets": {
+  "imported": 1422,
+  "onMaps": 3295,
+  "onMapsImported": 1368,
+  "hubs": 60
+ },
+ "sounds": {
+  "keys": 636,
+  "withFile": 55,
+  "recoveredWayback": 38,
+  "ambientTracks": 34
+ },
+ "recipes": {
+  "imported": 323,
+  "skipped": 23
+ },
+ "icons": {
+  "items": 750,
+  "sharp": 681
+ },
+ "imagination": {
+  "total": 275,
+  "counts": {
+   "live": 188,
+   "later": 58,
+   "starter": 9,
+   "none": 5,
+   "interface": 8,
+   "multiplayer": 7
+  }
+ },
+ "jobs": {
+  "sourceJobs": 909,
+  "playableJobs": 460,
+  "offeringStreets": 399
+ },
+ "git": {
+  "commits": 168,
+  "since": "2026-10-19",
+  "recent": [
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "A restoration walkthrough at /restoration/: how much of Glitch is back"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Gwendolyn's Task: Area 42, the Outer and Inner Mind, and Gwendolyn's Chamber"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "An Old Fashioned B&E's tile maze and Operation: Grow's bog field"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Holding Up at a ladder's top steps onto the deck"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Walk Toward the Light: a dark room of coloured lights and clouds"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Join the Club: the treehouse clubhouse and Pintura Prosa"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Camera Mode: press C to look around the street, all of it with Eyeballery"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Being Watched and We're Off to See the Lizard"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Quest text says \"friend\" instead of a raw {pc_label}"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "An Autumn Day: a silhouette memory of drifting words and three feelings"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Radiant Glare: climb a dark shaft by mixing coloured light"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Batterfly Bounty Booster can be finished: its quest teaches the Batterfly Bar recipe"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Streets with lost music play their region's music, and NO_MUSIC streets are quiet"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Picto-Pattern: turn numbers into 11 with cloud steps"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Quest items can't be dropped from the pack"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Leaving a street before its art loads no longer throws"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Carry That Weight: the Juju Hideout and the Kajuu dig hunt"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "improve",
+    "text": "The Map's region picker is a themed search box"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "new",
+    "text": "Explorer, Completist and cooking badges count distinct streets and foods"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Interaction hints no longer flicker"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Nothing shows through the loading screen"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "improve",
+    "text": "A calmer screen: one-row top bar, brief popups, small prompts"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "fix",
+    "text": "Energy and mood gains show whole numbers"
+   },
+   {
+    "date": "2026-10-21",
+    "kind": "improve",
+    "text": "Cleaner quoins and sharper ground apples"
+   }
+  ]
+ },
+ "tests": 126,
+ "generatedAt": "2026-10-21"
+}
