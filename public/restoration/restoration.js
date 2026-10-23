@@ -22,6 +22,11 @@ const el = (tag, attrs = {}, ...kids) => {
 const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 const tone = (status, data) => `var(--${data.status[status]?.tone || 'stone'})`;
 
+/** A Play link into the game (practice mode, new tab), or null. */
+const playLink = (href, label = 'Play', cls = '') => (href
+  ? el('a', { class: `play-link ${cls}`.trim(), href, target: '_blank', rel: 'noopener', title: 'Opens a practice copy: your saved game is untouched' }, label)
+  : null);
+
 const STATUS_ORDER = ['source', 'rebuilt', 'reimagined', 'solo', 'progress', 'missing', 'lost'];
 
 /* —— Scoreboard ———————————————————————————— */
@@ -49,6 +54,11 @@ function detailFor(item, data) {
   pill.textContent = data.status[item.status].label;
   pill.style.setProperty('--tone', tone(item.status, data));
   $('.detail-blurb', node).textContent = item.blurb;
+  const play = $('.detail-play', node);
+  if (item.play) {
+    play.href = item.play;
+    play.hidden = false;
+  } else play.remove();
   const img = $('.detail-shot', node);
   if (item.shot) {
     img.src = item.shot;
@@ -138,6 +148,11 @@ function setupBoard(data) {
         el('span', { class: 'item-blurb' }, it.blurb),
         it.shot ? el('img', { class: 'item-shot', src: it.shot, alt: `${it.name} in Groddle Afternoon`, loading: 'lazy' }) : null);
         li.append(btn);
+        const play = playLink(it.play, 'Play', 'item-play');
+        if (play) {
+          play.setAttribute('aria-label', `Play ${it.name}`);
+          li.append(play);
+        }
         return li;
       }))));
   }
@@ -198,7 +213,8 @@ function renderRooms(data) {
         el('h3', {}, r.title),
         el('p', {}, r.note?.tagline || r.quests.join(' · ')),
         pill, r.note ? el('span', { class: 'room-more' }, 'Read more') : null));
-    grid.append(card);
+    const play = playLink(r.play, 'Play this room', 'room-play');
+    grid.append(el('div', { class: 'room-cell' }, card, play));
   });
 
   const modal = $('#room-modal');
@@ -219,6 +235,9 @@ function renderRooms(data) {
     const pill = $('.rm-pill', modal);
     pill.textContent = r.built ? 'Rebuilt' : 'In progress';
     pill.style.setProperty('--tone', tone(r.built ? 'rebuilt' : 'progress', data));
+    const roomPlay = $('.rm-playlink', modal);
+    roomPlay.hidden = !r.play;
+    if (r.play) roomPlay.href = r.play;
     const offer = $('.rm-offer', modal);
     offer.hidden = !r.offer;
     $('p', offer).textContent = r.offer ? `“${r.offer}”` : '';
@@ -257,6 +276,32 @@ function renderRooms(data) {
   fromHash();
 }
 
+/* —— Designers' levels ———————————————————————————— */
+function renderDesigners(data) {
+  const d = data.designers;
+  if (!d) return;
+  const card = (l) => el('div', { class: 'level' },
+    el('a', { class: 'level-open', href: l.play, target: '_blank', rel: 'noopener', 'aria-label': `Play ${l.title} (practice copy)` },
+      l.shot ? el('img', { class: 'room-shot', src: l.shot, alt: '', loading: 'lazy' }) : el('div', { class: 'room-shot is-empty' }, l.title),
+      el('div', { class: 'level-body' },
+        el('p', { class: 'level-kind' }, l.kind),
+        el('h4', {}, l.title),
+        l.note ? el('p', { class: 'level-note' }, l.note) : null,
+        el('span', { class: 'play-link' }, 'Play'))),
+    l.video ? el('a', { class: 'level-watch', href: `https://www.youtube.com/watch?v=${l.video}`, target: '_blank', rel: 'noopener' }, 'Watch the designer’s recording') : null,
+    l.extra ? el('a', { class: 'level-watch', href: `https://www.youtube.com/watch?v=${l.extra.video}`, target: '_blank', rel: 'noopener' }, l.extra.label) : null);
+  const groups = $('#designer-groups');
+  for (const who of d.designers) {
+    const levels = d.levels.filter((l) => l.designer === who.id);
+    if (!levels.length) continue;
+    groups.append(el('section', { class: 'designer', 'aria-label': who.name },
+      el('h3', {}, who.name, el('span', { class: 'designer-count' }, ` · ${levels.length} levels`)),
+      el('p', { class: 'designer-about' }, who.about),
+      el('div', { class: 'levels' }, levels.map(card))));
+  }
+  $('#text-levels').append(...d.text.map(card));
+}
+
 /* —— Recent + honest + footer ———————————————————————————— */
 function renderRest(data) {
   const list = $('#recent-list');
@@ -280,4 +325,5 @@ setupDiorama(data);
 setupBoard(data);
 renderNumbers(data);
 renderRooms(data);
+renderDesigners(data);
 renderRest(data);

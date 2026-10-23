@@ -46,6 +46,7 @@
         <a href="#systems">Every system</a>
         <a href="#numbers">By the numbers</a>
         <a href="#rooms">Quest rooms</a>
+        <a href="#designers">Designers’ levels</a>
         <a href="#recent">Recently restored</a>
         <a href="#honest">What can't come back</a>
         <a href="../compare/">Other remakes compared</a>
@@ -164,8 +165,21 @@
       </div>
     </section>
 
+    <!-- —— Designers' levels ——————————————————————————————— -->
+    <section class="band" id="designers" aria-labelledby="designers-h">
+      <div class="wrap">
+        <h2 id="designers-h">Play the designers’ levels</h2>
+        <p class="section-lead">Two of Tiny Speck’s own level designers recorded the levels they built: Ian Passmore in 2015, and Lisa Trac as LT_IndieGameDev in 2012. Tiny Speck never released these levels’ layouts, so each one here is rebuilt from the quest code, Tiny Speck’s art and those recordings. Open the rebuild and the recording side by side.</p>
+        <p class="practice-note">Every <b>Play</b> link on this page opens a practice copy in its own tab: it starts fresh and never touches your saved game.</p>
+        <div id="designer-groups"></div>
+        <h3 class="levels-h">Rebuilt from words alone</h3>
+        <p class="section-lead">No recording of these is known, so they come from the upgrade cards, item text and players’ forum posts.</p>
+        <div class="levels" id="text-levels"></div>
+      </div>
+    </section>
+
     <!-- —— Recent ——————————————————————————————— -->
-    <section class="band" id="recent" aria-labelledby="recent-h">
+    <section class="band band-alt" id="recent" aria-labelledby="recent-h">
       <div class="wrap">
         <h2 id="recent-h">Recently restored</h2>
         <p class="section-lead">The latest additions and fixes, straight from the project's history.</p>
@@ -174,7 +188,7 @@
     </section>
 
     <!-- —— Honest ——————————————————————————————— -->
-    <section class="band band-alt" id="honest" aria-labelledby="honest-h">
+    <section class="band" id="honest" aria-labelledby="honest-h">
       <div class="wrap">
         <h2 id="honest-h">What can't come back, and how the rest was made</h2>
         <div class="honest">
@@ -212,7 +226,7 @@
           <h3 class="rm-title" id="room-modal-title"></h3>
           <p class="rm-tagline"></p>
         </div>
-        <span class="pill rm-pill"></span>
+        <div class="rm-actions"><span class="pill rm-pill"></span><a class="play-link rm-playlink" target="_blank" rel="noopener" hidden>Play this room</a></div>
       </div>
       <blockquote class="rm-offer"><p></p><cite>The quest's opening line in Glitch</cite></blockquote>
       <div class="rm-grid">
@@ -234,6 +248,7 @@
       <p class="detail-kicker"></p>
       <h3 class="detail-title"></h3>
       <span class="pill"></span>
+      <a class="play-link detail-play" target="_blank" rel="noopener" hidden>Play it</a>
       <p class="detail-blurb"></p>
       <img class="detail-shot" alt="" loading="lazy" />
       <details class="detail-evidence"><summary>Where it lives in the code</summary><ul></ul></details>

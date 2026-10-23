@@ -16,6 +16,7 @@ import { SHOTS } from '../tools/restoration/shots.mjs';
 import { buildRestorationData, comparable } from '../tools/build-restoration.mjs';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js';
 import { ROOM_NOTES } from '../tools/restoration/rooms.mjs';
+import { DESIGNER_LEVELS, TEXT_LEVELS } from '../tools/restoration/designer-levels.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PLAYABLE = new Set(['source', 'rebuilt', 'reimagined', 'solo']);
@@ -46,10 +47,12 @@ describe('restoration checklist', () => {
     for (const spot of spots) assert.ok(CHECKLIST.some((i) => i.spot === spot), spot);
   });
 
-  it('screenshot keys name checklist items or quest rooms', () => {
+  it('screenshot keys name checklist items, quest rooms or designer levels', () => {
     const rooms = new Set(Object.values(QUEST_ROOMS));
+    const levels = new Set([...DESIGNER_LEVELS, ...TEXT_LEVELS].map((l) => l.shot));
     for (const key of Object.keys(SHOTS)) {
       if (key.startsWith('room:')) assert.ok(rooms.has(key.slice(5)), key);
+      else if (key.startsWith('level:')) assert.ok(levels.has(key), key);
       else assert.ok(CHECKLIST.some((i) => i.id === key), key);
     }
   });

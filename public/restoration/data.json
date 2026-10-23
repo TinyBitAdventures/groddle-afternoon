@@ -100,7 +100,8 @@
     "public/js/street-render.js",
     "public/assets/streets/index.json"
    ],
-   "shot": "shots/streets.webp"
+   "shot": "shots/streets.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&practice=1"
   },
   {
    "id": "navigation",
@@ -113,7 +114,8 @@
     "public/js/location-navigation.js",
     "public/js/features/doors-feature.js"
    ],
-   "shot": "shots/navigation.webp"
+   "shot": "shots/navigation.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&doordemo=GLI32G3NUTD100I&practice=1"
   },
   {
    "id": "physics",
@@ -126,7 +128,8 @@
     "public/js/movement.js",
     "public/js/location-events.js"
    ],
-   "shot": "shots/physics.webp"
+   "shot": "shots/physics.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GUVUMTSQ2FC34ES&practice=1"
   },
   {
    "id": "street-events",
@@ -139,7 +142,8 @@
     "public/js/features/location-events-feature.js",
     "public/js/features/puzzles-feature.js"
    ],
-   "shot": "shots/street-events.webp"
+   "shot": "shots/street-events.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&puzzledemo=GHVOD0F3T403694&practice=1"
   },
   {
    "id": "dametime",
@@ -151,7 +155,8 @@
    "evidence": [
     "public/js/game-day.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=dusk&practice=1"
   },
   {
    "id": "map",
@@ -164,7 +169,8 @@
     "public/js/map-graph.js",
     "public/js/travel.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&practice=1"
   },
   {
    "id": "music",
@@ -178,7 +184,8 @@
     "public/js/sound-board.js",
     "tools/sound/archiveorg-sfx-map.json"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&soundtest=1&practice=1"
   },
   {
    "id": "avatar",
@@ -193,7 +200,8 @@
     "public/js/avatar-anims.js",
     "public/js/character-builder.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&practice=1"
   },
   {
    "id": "camera",
@@ -205,7 +213,8 @@
    "evidence": [
     "public/js/features/camera-mode-feature.js"
    ],
-   "shot": "shots/camera.webp"
+   "shot": "shots/camera.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&camerademo=1&cameraskill=1&practice=1"
   },
   {
    "id": "newxp",
@@ -218,7 +227,8 @@
     "public/js/newxp.js",
     "public/js/features/newxp-feature.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&resetgame=1&questoffer=off&newxp=1&practice=1"
   },
   {
    "id": "secrets",
@@ -231,7 +241,8 @@
     "public/js/secret-spots.js",
     "public/js/features/secret-spots-feature.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&secretdemo=1&practice=1"
   },
   {
    "id": "piggies",
@@ -244,7 +255,8 @@
     "public/js/animal-kinship.js",
     "public/js/animal-husbandry.js"
    ],
-   "shot": "shots/piggies.webp"
+   "shot": "shots/piggies.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=piggy&animalrank=2&practice=1"
   },
   {
    "id": "chickens",
@@ -256,7 +268,8 @@
    "evidence": [
     "public/js/animal-kinship.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=chicken&animalrank=7&practice=1"
   },
   {
    "id": "butterflies",
@@ -269,7 +282,8 @@
     "public/js/animal-kinship.js",
     "public/js/tools.js"
    ],
-   "shot": "shots/butterflies.webp"
+   "shot": "shots/butterflies.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=butterfly&animalrank=2&tooldemo=butterfly_lotion&toolremaining=5&practice=1"
   },
   {
    "id": "trants",
@@ -284,7 +298,8 @@
     "public/js/woodcutting.js",
     "public/js/tree-poison.js"
    ],
-   "shot": "shots/trants.webp"
+   "shot": "shots/trants.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&harvestdemo=fruit&harvestrank=2&harvestreset=1&practice=1"
   },
   {
    "id": "batterflies",
@@ -296,7 +311,8 @@
    "evidence": [
     "public/js/animal-husbandry.js"
    ],
-   "shot": "shots/batterflies.webp"
+   "shot": "shots/batterflies.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA9114MS8B32FB2&practice=1"
   },
   {
    "id": "foxes",
@@ -308,7 +324,8 @@
    "evidence": [
     "public/js/foxes.js"
    ],
-   "shot": "shots/foxes.webp"
+   "shot": "shots/foxes.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&foxdemo=1&practice=1"
   },
   {
    "id": "ecology",
@@ -321,7 +338,8 @@
     "public/js/street-ecology.js",
     "public/assets/content/street-ecology.json"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GCR10K3BPJK1U6F&practice=1"
   },
   {
    "id": "gardens",
@@ -334,7 +352,8 @@
     "public/js/garden.js",
     "public/js/master-garden.js"
    ],
-   "shot": "shots/gardens.webp"
+   "shot": "shots/gardens.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&mastergardendemo=1&practice=1"
   },
   {
    "id": "mining",
@@ -346,7 +365,8 @@
    "evidence": [
     "public/js/mining.js"
    ],
-   "shot": "shots/mining.webp"
+   "shot": "shots/mining.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&rockdemo=sparkly&practice=1"
   },
   {
    "id": "cooking",
@@ -359,7 +379,8 @@
     "public/js/making.js",
     "public/assets/content/recipes.json"
    ],
-   "shot": "shots/cooking.webp"
+   "shot": "shots/cooking.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&practice=1"
   },
   {
    "id": "machines",
@@ -371,7 +392,8 @@
    "evidence": [
     "public/js/machines.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&supplydemo=1&practice=1"
   },
   {
    "id": "resources",
@@ -384,7 +406,8 @@
     "public/js/features/resource-nodes-feature.js",
     "public/js/drop-tables.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&resdemo=peat_1&practice=1"
   },
   {
    "id": "tools",
@@ -396,7 +419,8 @@
    "evidence": [
     "public/js/tools.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&tooldemo=pick&toolremaining=94&practice=1"
   },
   {
    "id": "quoins",
@@ -408,7 +432,8 @@
    "evidence": [
     "public/js/quoins.js"
    ],
-   "shot": "shots/quoins.webp"
+   "shot": "shots/quoins.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&quoindemo=qurazy&practice=1"
   },
   {
    "id": "shrines",
@@ -420,7 +445,8 @@
    "evidence": [
     "public/js/shrines.js"
    ],
-   "shot": "shots/shrines.webp"
+   "shot": "shots/shrines.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&shrinedemo=1&practice=1"
   },
   {
    "id": "vendors",
@@ -433,7 +459,8 @@
     "public/js/vendor.js",
     "public/js/store-catalog.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&vendor=toys&practice=1"
   },
   {
    "id": "imagination",
@@ -445,7 +472,8 @@
    "evidence": [
     "public/js/imagination.js"
    ],
-   "shot": "shots/imagination.webp"
+   "shot": "shots/imagination.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&imgdemo=1&imglevel=12&practice=1"
   },
   {
    "id": "levels",
@@ -460,7 +488,8 @@
     "public/js/metabolics.js",
     "public/js/mood-decay.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&leveldemo=1&practice=1"
   },
   {
    "id": "badges",
@@ -473,7 +502,8 @@
     "public/js/achievements.js",
     "public/js/exploration.js"
    ],
-   "shot": "shots/badges.webp"
+   "shot": "shots/badges.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&badgeqa=1&practice=1"
   },
   {
    "id": "auctions",
@@ -483,7 +513,8 @@
    "blurb": "The player auction house and trading needed other players.",
    "spot": null,
    "evidence": [],
-   "shot": null
+   "shot": null,
+   "play": null
   },
   {
    "id": "quests",
@@ -496,7 +527,8 @@
     "public/js/quests.js",
     "public/js/quest-offers.js"
    ],
-   "shot": "shots/quests.webp"
+   "shot": "shots/quests.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=now&practice=1"
   },
   {
    "id": "quest-rooms",
@@ -509,7 +541,8 @@
     "public/js/features/quest-instances-feature.js",
     "public/js/quest-rooms/catalog.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": null
   },
   {
    "id": "story-quests",
@@ -524,7 +557,8 @@
     "public/js/winter-walk.js",
     "public/js/summers-day.js"
    ],
-   "shot": "shots/story-quests.webp"
+   "shot": "shots/story-quests.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=winter&practice=1"
   },
   {
    "id": "paradise",
@@ -538,7 +572,8 @@
     "public/js/paradise-courses.js",
     "public/js/paradise-course-runtime.js"
    ],
-   "shot": "shots/paradise.webp"
+   "shot": "shots/paradise.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=cloud_rings&practice=1"
   },
   {
    "id": "races",
@@ -551,7 +586,8 @@
     "public/js/races.js",
     "public/js/game-of-crowns.js"
    ],
-   "shot": "shots/races.webp"
+   "shot": "shots/races.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&racedemo=space_race&practice=1"
   },
   {
    "id": "hog-haul",
@@ -563,7 +599,8 @@
    "evidence": [
     "public/js/hog-haul.js"
    ],
-   "shot": "shots/hog-haul.webp"
+   "shot": "shots/hog-haul.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=hoghaul&racedemo=1&practice=1"
   },
   {
    "id": "street-jobs",
@@ -575,7 +612,8 @@
    "evidence": [
     "public/js/street-jobs.js"
    ],
-   "shot": "shots/street-jobs.webp"
+   "shot": "shots/street-jobs.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&jobdemo=351&practice=1"
   },
   {
    "id": "feats",
@@ -587,7 +625,8 @@
    "evidence": [
     "public/js/feats.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&companiondemo=feat&practice=1"
   },
   {
    "id": "parties",
@@ -599,7 +638,8 @@
    "evidence": [
     "public/js/party-spaces.js"
    ],
-   "shot": "shots/parties.webp"
+   "shot": "shots/parties.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&partydemo=moon&practice=1"
   },
   {
    "id": "smuggling",
@@ -613,7 +653,8 @@
     "public/js/features/smuggling-feature.js",
     "public/js/quest-rooms/penalty.js"
    ],
-   "shot": "shots/smuggling.webp"
+   "shot": "shots/smuggling.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&smugglingdemo=give&practice=1"
   },
   {
    "id": "seasons",
@@ -625,7 +666,8 @@
    "evidence": [
     "public/js/seasons.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&season=zilloween&seasondemo=1&practice=1"
   },
   {
    "id": "homes",
@@ -640,7 +682,8 @@
     "public/js/home-wallpaper.js",
     "public/js/home-cultivation.js"
    ],
-   "shot": "shots/homes.webp"
+   "shot": "shots/homes.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=decorate&practice=1"
   },
   {
    "id": "mail",
@@ -652,7 +695,8 @@
    "evidence": [
     "public/js/mailbox.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=mail&practice=1"
   },
   {
    "id": "neighbours",
@@ -664,7 +708,8 @@
    "evidence": [
     "public/js/neighbours.js"
    ],
-   "shot": "shots/neighbours.webp"
+   "shot": "shots/neighbours.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&stonedemo=1&practice=1"
   },
   {
    "id": "tower",
@@ -677,7 +722,8 @@
     "public/js/home-tower.js",
     "public/js/features/home-tower-feature.js"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home&towerdemo=built&towerfloors=5&practice=1"
   },
   {
    "id": "craftybot",
@@ -691,7 +737,8 @@
     "public/js/features/craftybot-feature.js",
     "public/assets/content/craftybot-specs.json"
    ],
-   "shot": null
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home&craftybotdemo=bot&practice=1"
   },
   {
    "id": "chat",
@@ -701,7 +748,8 @@
    "blurb": "Global chat, groups and buddy lists were about other people.",
    "spot": null,
    "evidence": [],
-   "shot": null
+   "shot": null,
+   "play": null
   },
   {
    "id": "rooks",
@@ -713,7 +761,8 @@
    "evidence": [
     "public/js/rook-attack.js"
    ],
-   "shot": "shots/rooks.webp"
+   "shot": "shots/rooks.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&rookdemo=attack&practice=1"
   },
   {
    "id": "skills",
@@ -726,7 +775,8 @@
     "public/js/skill-tree.js",
     "public/js/skills.js"
    ],
-   "shot": "shots/skills.webp"
+   "shot": "shots/skills.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&skilltree=mining_3&practice=1"
   },
   {
    "id": "meditation",
@@ -739,7 +789,8 @@
     "public/js/meditation.js",
     "public/js/teleportation.js"
    ],
-   "shot": "shots/meditation.webp"
+   "shot": "shots/meditation.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&meditatedemo=all&meditateroll=0.99&practice=1"
   },
   {
    "id": "icons",
@@ -751,7 +802,8 @@
    "evidence": [
     "public/js/giant-icons.js"
    ],
-   "shot": "shots/icons.webp"
+   "shot": "shots/icons.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&icondemo=1&practice=1"
   },
   {
    "id": "rube",
@@ -763,7 +815,8 @@
    "evidence": [
     "public/js/rube.js"
    ],
-   "shot": "shots/rube.webp"
+   "shot": "shots/rube.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&rubedemo=1&rubeseed=3&practice=1"
   },
   {
    "id": "hell",
@@ -775,7 +828,8 @@
    "evidence": [
     "public/js/hell.js"
    ],
-   "shot": "shots/hell.webp"
+   "shot": "shots/hell.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&helldemo=croak&practice=1"
   },
   {
    "id": "collectibles",
@@ -789,7 +843,8 @@
     "public/js/cubimals.js",
     "public/js/stoot-doll.js"
    ],
-   "shot": "shots/collectibles.webp"
+   "shot": "shots/collectibles.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&stootdemo=1&stootquote=38&practice=1"
   },
   {
    "id": "snaps",
@@ -799,7 +854,8 @@
    "blurb": "Snapshottery was retired before Glitch closed.",
    "spot": null,
    "evidence": [],
-   "shot": null
+   "shot": null,
+   "play": null
   }
  ],
  "tally": {
@@ -866,6 +922,7 @@
     ],
     "built": true,
     "shot": "shots/room-an_autumn_day.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=an_autumn_day&practice=1",
     "hd": "shots/hd/room-an_autumn_day.webp",
     "offer": "As you may or may not know, many choices lack a right or wrong answer.",
     "note": {
@@ -890,6 +947,7 @@
     ],
     "built": true,
     "shot": "shots/room-tile_puzzle.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=btc_room_3&practice=1",
     "hd": "shots/hd/room-tile_puzzle.webp",
     "offer": "Psst … I figured out how to get in.",
     "note": {
@@ -914,6 +972,7 @@
     ],
     "built": true,
     "shot": "shots/room-being_watched.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=stale_but_necessary&practice=1",
     "hd": "shots/hd/room-being_watched.webp",
     "offer": "Umm, You don't look so good.",
     "note": {
@@ -934,6 +993,7 @@
     ],
     "built": true,
     "shot": "shots/room-juju_camp.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=help_juju_bandits&practice=1",
     "hd": "shots/hd/room-juju_camp.webp",
     "offer": "friend! You're going to help us whether you like it or not!",
     "note": {
@@ -953,6 +1013,7 @@
     ],
     "built": true,
     "shot": "shots/room-color_unblocking.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=puzzle_level_color_blockage&practice=1",
     "hd": "shots/hd/room-color_unblocking.webp",
     "offer": "You look like a fashionable young glitch. \"On trend\", \"in-the-know\", so to speak.",
     "note": {
@@ -983,6 +1044,7 @@
     ],
     "built": true,
     "shot": "shots/room-gwendolyn.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=tower_quest&practice=1",
     "hd": "shots/hd/room-gwendolyn.webp",
     "offer": "Hear me. I am Gwendolyn, disciple of Cosma, daughter of Egeria, drowned as I lived in the waters of Grendaline’s Rising.",
     "note": {
@@ -1015,6 +1077,7 @@
     ],
     "built": true,
     "shot": "shots/room-clubhouse.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=join_club&practice=1",
     "hd": "shots/hd/room-clubhouse.webp",
     "offer": "Welcome home friend.  While you were away, you received an intriguing invitation. It appears you've been invited to join the club.",
     "note": {
@@ -1040,6 +1103,7 @@
     ],
     "built": true,
     "shot": "shots/room-le_miserable.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=le_miserable&practice=1",
     "hd": "shots/hd/room-le_miserable.webp",
     "offer": "Do you remember the future of one of our pasts? Or was it the past of one of our futures?",
     "note": {
@@ -1069,6 +1133,7 @@
     ],
     "built": true,
     "shot": "shots/room-mental_block.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=mental_block&practice=1",
     "hd": "shots/hd/room-mental_block.webp",
     "offer": "Everything ok? You seem somewhat puzzled.",
     "note": {
@@ -1098,6 +1163,7 @@
     ],
     "built": true,
     "shot": "shots/room-kids_room.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=letter_block_1&practice=1",
     "hd": "shots/hd/room-kids_room.webp",
     "offer": "Hey, kid. How do you feel about getting small?",
     "note": {
@@ -1117,6 +1183,7 @@
     ],
     "built": true,
     "shot": "shots/room-operation_grow.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=where_the_blue_grew&practice=1",
     "hd": "shots/hd/room-operation_grow.webp",
     "offer": "So dark.",
     "note": {
@@ -1136,6 +1203,7 @@
     ],
     "built": true,
     "shot": "shots/room-picto_pattern.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=picto_pattern&practice=1",
     "hd": "shots/hd/room-picto_pattern.webp",
     "offer": "Pop Quiz! How many Giants are there?",
     "note": {
@@ -1160,6 +1228,7 @@
     ],
     "built": true,
     "shot": "shots/room-radiant_glare.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=radiant_glare&practice=1",
     "hd": "shots/hd/room-radiant_glare.webp",
     "offer": "Young Glitch, you once walked toward the light, proving your eyes are sharp. But, without practice, your skills may become dull.",
     "note": {
@@ -1184,6 +1253,7 @@
     ],
     "built": true,
     "shot": "shots/room-rainbow_run.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=numismatic_hustle&practice=1",
     "hd": "shots/hd/room-rainbow_run.webp",
     "offer": "Psst.",
     "note": {
@@ -1205,6 +1275,7 @@
     ],
     "built": true,
     "shot": "shots/room-penalty.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=smuggle_the_smuggler_part1&practice=1",
     "hd": "shots/hd/room-penalty.webp",
     "offer": "I've got a job that needs doing. A dangerous job that needs doing.",
     "note": {
@@ -1229,6 +1300,7 @@
     ],
     "built": true,
     "shot": "shots/room-top_of_tree.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=high_jump&practice=1",
     "hd": "shots/hd/room-top_of_tree.webp",
     "offer": "You know that poem in the beginning of The Great Gatsby?",
     "note": {
@@ -1253,6 +1325,7 @@
     ],
     "built": true,
     "shot": "shots/room-esquibeth.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=last_pilgrimage_of_esquibeth&practice=1",
     "hd": "shots/hd/room-esquibeth.webp",
     "offer": "Kid, you now know a little something about the Giants. You’ve matured. I think you are ready to contribute to a Feat.",
     "note": {
@@ -1281,6 +1354,7 @@
     ],
     "built": true,
     "shot": "shots/room-rube_yard.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=rube_spy&practice=1",
     "hd": "shots/hd/room-rube_yard.webp",
     "offer": "Hey friend! Wanna make a tra … I mean, do you wanna help me out?",
     "note": {
@@ -1300,6 +1374,7 @@
     ],
     "built": true,
     "shot": "shots/room-vision_quest.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=eyeballery_identify_object&practice=1",
     "hd": "shots/hd/room-vision_quest.webp",
     "offer": "So you like looking at things, right? And I hear with your mastery of Eyeballery, you’re pretty good at it too.",
     "note": {
@@ -1319,6 +1394,7 @@
     ],
     "built": true,
     "shot": "shots/room-light_perspective.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=puzzle_level_light_perspective&practice=1",
     "hd": "shots/hd/room-light_perspective.webp",
     "offer": "Pssst. You there. How are your eyes?",
     "note": {
@@ -1343,6 +1419,7 @@
     ],
     "built": true,
     "shot": "shots/room-back_alley.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=fuelmaking_refuel_robot&backalleystage=station&practice=1",
     "hd": "shots/hd/room-back_alley.webp",
     "offer": "psst, kid. hey. hey, kid. psst. hey. fuelmaking.",
     "note": {
@@ -1353,6 +1430,324 @@
      "rebuilt": "The subway platform is rebuilt from two subway recordings; the remake has no subway network, so any subway door opens it.",
      "footage": []
     }
+   }
+  ]
+ },
+ "designers": {
+  "designers": [
+   {
+    "id": "passmore",
+    "name": "Ian Passmore",
+    "about": "Level designer at Tiny Speck. Uploaded his own run-throughs in 2015."
+   },
+   {
+    "id": "trac",
+    "name": "Lisa Trac",
+    "about": "Level designer and scripter at Tiny Speck. Posted as LT_IndieGameDev on YouTube in 2012."
+   }
+  ],
+  "levels": [
+   {
+    "id": "radial_heights",
+    "designer": "passmore",
+    "title": "Radial Heights",
+    "kind": "Ticket to Paradise",
+    "video": "QMVkLBBeymA",
+    "shot": "shots/level-radial_heights.webp",
+    "note": "He also recorded the easter egg he hid in it.",
+    "extra": {
+     "video": "Y_rABBmdAqc",
+     "label": "Watch the easter egg"
+    },
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=radial_heights&practice=1"
+   },
+   {
+    "id": "arbor_hollow",
+    "designer": "passmore",
+    "title": "Arbor Hollow",
+    "kind": "Ticket to Paradise",
+    "video": "ELtkACMJkNU",
+    "shot": "shots/level-arbor_hollow.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=arbor_hollow&practice=1"
+   },
+   {
+    "id": "abysmal_thrill",
+    "designer": "passmore",
+    "title": "Abysmal Thrill",
+    "kind": "Ticket to Paradise",
+    "video": "9ZnoxQLVNsc",
+    "shot": "shots/level-abysmal_thrill.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=abysmal_thrill&practice=1"
+   },
+   {
+    "id": "le_miserable",
+    "designer": "passmore",
+    "title": "Le Misérable",
+    "kind": "Quest room",
+    "video": "qzj6oHxwrcw",
+    "shot": "shots/room-le_miserable.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=le_miserable&practice=1"
+   },
+   {
+    "id": "join_club",
+    "designer": "passmore",
+    "title": "Join the Club",
+    "kind": "Quest room",
+    "video": "q6VVOR5PVns",
+    "shot": "shots/room-clubhouse.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=join_club&practice=1"
+   },
+   {
+    "id": "esquibeth",
+    "designer": "passmore",
+    "title": "The Last Pilgrimage of Esquibeth",
+    "kind": "Quest room",
+    "video": "BgRgIaeaj9Q",
+    "shot": "shots/room-esquibeth.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=last_pilgrimage_of_esquibeth&practice=1"
+   },
+   {
+    "id": "orangian",
+    "designer": "passmore",
+    "title": "Orangian",
+    "kind": "Puzzle street",
+    "video": "pRFUG9YxpQ0",
+    "shot": "shots/level-orangian.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&puzzledemo=GHVCKEPHO403BN5&practice=1"
+   },
+   {
+    "id": "blooian",
+    "designer": "passmore",
+    "title": "Blooian",
+    "kind": "Puzzle street",
+    "video": "aPs9HUHwtMg",
+    "shot": "shots/level-blooian.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&puzzledemo=GHVP8TCLT40336S&practice=1"
+   },
+   {
+    "id": "aerial_boost",
+    "designer": "trac",
+    "title": "Aerial Boost",
+    "kind": "Ticket to Paradise",
+    "video": "SlXjnIYvqtc",
+    "shot": "shots/level-aerial_boost.webp",
+    "note": "Known only from her recording.",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=aerial_boost&practice=1"
+   },
+   {
+    "id": "mountain_scaling",
+    "designer": "trac",
+    "title": "Mountain Scaling",
+    "kind": "Ticket to Paradise",
+    "video": "qjZT5cPUcnM",
+    "shot": "shots/level-mountain_scaling.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=mountain_scaling&practice=1"
+   },
+   {
+    "id": "starlit_night",
+    "designer": "trac",
+    "title": "Starlit Night",
+    "kind": "Ticket to Paradise",
+    "video": "SrwP--bBO0s",
+    "shot": "shots/level-starlit_night.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=starlit_night&practice=1"
+   },
+   {
+    "id": "slip_n_slide",
+    "designer": "trac",
+    "title": "Slip ’N Slide",
+    "kind": "Ticket to Paradise",
+    "video": "KKo6VHicdA4",
+    "shot": "shots/level-slip_n_slide.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=slip_n_slide&practice=1"
+   },
+   {
+    "id": "beam_me_down",
+    "designer": "trac",
+    "title": "Beam Me Down",
+    "kind": "Ticket to Paradise",
+    "video": "JyE3RpWp9nc",
+    "shot": "shots/level-beam_me_down.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&scenedemo=beam_me_down&practice=1"
+   },
+   {
+    "id": "constellation",
+    "designer": "trac",
+    "title": "Constellation",
+    "kind": "Bonus level",
+    "video": "-iW1b8ix3W8",
+    "shot": "shots/level-constellation.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&scenedemo=constellation&practice=1"
+   },
+   {
+    "id": "winter_walk",
+    "designer": "trac",
+    "title": "Winter Walk",
+    "kind": "Story quest",
+    "video": "WlAMZpSGPgQ",
+    "shot": "shots/level-winter_walk.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=winter&practice=1"
+   },
+   {
+    "id": "greedy",
+    "designer": "trac",
+    "title": "The Greedy Street Spirit",
+    "kind": "Story quest",
+    "video": "hn9J_fDveXI",
+    "shot": "shots/level-greedy.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=greedy&practice=1"
+   },
+   {
+    "id": "radiant_glare",
+    "designer": "trac",
+    "title": "Radiant Glare",
+    "kind": "Quest room",
+    "video": "ZQQydNM9THI",
+    "shot": "shots/room-radiant_glare.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=radiant_glare&practice=1"
+   },
+   {
+    "id": "picto_pattern",
+    "designer": "trac",
+    "title": "Picto-Pattern",
+    "kind": "Quest room",
+    "video": "UryaMaICZFg",
+    "shot": "shots/room-picto_pattern.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=picto_pattern&practice=1"
+   },
+   {
+    "id": "mental_block",
+    "designer": "trac",
+    "title": "Mental Block",
+    "kind": "Quest room",
+    "video": "mgsdduCR_Gc",
+    "shot": "shots/room-mental_block.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=mental_block&practice=1"
+   },
+   {
+    "id": "color_unblocking",
+    "designer": "trac",
+    "title": "Color Unblocking",
+    "kind": "Quest room",
+    "video": "b_oNR5Qzf_I",
+    "shot": "shots/room-color_unblocking.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=puzzle_level_color_blockage&practice=1"
+   },
+   {
+    "id": "light_perspective",
+    "designer": "trac",
+    "title": "Walk Toward the Light",
+    "kind": "Quest room",
+    "video": "Et0RkY43A5Q",
+    "shot": "shots/room-light_perspective.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=puzzle_level_light_perspective&practice=1"
+   },
+   {
+    "id": "griinolyza",
+    "designer": "trac",
+    "title": "Griinolyza",
+    "kind": "Puzzle street",
+    "video": "VxAyiFj2gVU",
+    "shot": "shots/level-griinolyza.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&puzzledemo=GHVOD0F3T403694&practice=1"
+   },
+   {
+    "id": "purplysa",
+    "designer": "trac",
+    "title": "Purplysa",
+    "kind": "Puzzle street",
+    "video": "2j0v9FgQPig",
+    "shot": "shots/level-purplysa.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&puzzledemo=GHVP7QOKT403F5Q&practice=1"
+   },
+   {
+    "id": "amberlyza",
+    "designer": "trac",
+    "title": "Amberlyza",
+    "kind": "Puzzle street",
+    "video": "YvRCmwdipuo",
+    "shot": "shots/level-amberlyza.webp",
+    "note": "",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&puzzledemo=GHVDKQ2O6S23LVJ&practice=1"
+   }
+  ],
+  "text": [
+   {
+    "id": "sky_plunge",
+    "designer": null,
+    "title": "Sky Plunge",
+    "kind": "Ticket to Paradise",
+    "video": null,
+    "shot": "shots/level-sky_plunge.webp",
+    "note": "Rebuilt from the upgrade card and players’ forum posts; no recording is known.",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=sky_plunge&practice=1"
+   },
+   {
+    "id": "updraft",
+    "designer": null,
+    "title": "Updraft",
+    "kind": "Ticket to Paradise",
+    "video": null,
+    "shot": "shots/level-updraft.webp",
+    "note": "Tiny Speck built this course, but it may never have reached players.",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=updraft&practice=1"
+   },
+   {
+    "id": "drafty_uplift",
+    "designer": null,
+    "title": "Drafty Uplift",
+    "kind": "Ticket to Paradise",
+    "video": null,
+    "shot": "shots/level-drafty_uplift.webp",
+    "note": "Tiny Speck built this course, but it may never have reached players.",
+    "extra": null,
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=drafty_uplift&practice=1"
    }
   ]
  },
@@ -1535,6 +1930,6 @@
    }
   ]
  },
- "tests": 172,
+ "tests": 173,
  "generatedAt": "2026-10-23"
 }

@@ -36,7 +36,7 @@ const hd = args.includes('--hd');
 const HIDE_HD = `${HIDE} #quest-instance-hud, .qi-hud { visibility: hidden !important; }`;
 const only = args.filter((a) => !a.startsWith('--'));
 const keys = (only.length ? only : Object.keys(SHOTS)).filter((k) => SHOTS[k] && (!hd || k.startsWith('room:')));
-const fileFor = (key) => join(hd ? join(outDir, 'hd') : outDir, `${key.replace(/^room:/, 'room-')}.webp`);
+const fileFor = (key) => join(hd ? join(outDir, 'hd') : outDir, `${key.replace(/^(room|level):/, '$1-')}.webp`);
 
 mkdirSync(hd ? join(outDir, 'hd') : outDir, { recursive: true });
 const browser = await chromium.launch({ args: ['--ignore-certificate-errors', '--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });

@@ -387,3 +387,46 @@ button.room:focus-visible { outline: 3px solid var(--accent); outline-offset: 3p
 @media (prefers-reduced-motion: reduce) {
   .sheet, .piggy-walk, .d-float { animation: none !important; }
 }
+
+/* —— Play links (practice mode) —— */
+.play-link {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px;
+  background: var(--moss); color: #fff; font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap;
+}
+.play-link::before { content: ''; border-left: 7px solid currentColor; border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; }
+a.play-link:hover, a.play-link:focus-visible { background: #3d7031; }
+a.play-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.play-link[hidden] { display: none; }
+.item { display: grid; grid-template-columns: 1fr auto; align-items: start; column-gap: 8px; }
+.item .item-play { margin-top: 8px; }
+.detail-play { margin-left: 8px; vertical-align: middle; }
+.rm-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; }
+.room-cell { display: flex; flex-direction: column; gap: 8px; }
+.room-cell > button.room { flex: 1; }
+.room-cell > .room-play { align-self: flex-start; }
+.practice-note { margin: -4px 0 18px; font-size: 14px; color: var(--muted); }
+
+/* —— Designers' levels —— */
+.designer { margin-bottom: 28px; }
+.designer h3, .levels-h { margin: 0 0 2px; font-size: 22px; }
+.designer-count { font-size: 15px; color: var(--muted); font-weight: 400; }
+.designer-about { margin: 0 0 12px; font-size: 14px; color: var(--muted); }
+.levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 8px; }
+.level { display: flex; flex-direction: column; gap: 6px; }
+.level-open {
+  display: flex; flex-direction: column; flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden; color: inherit; text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.level-open:hover, .level-open:focus-visible { transform: translateY(-3px); border-color: var(--moss); box-shadow: 0 14px 30px -18px rgba(48, 70, 44, 0.55); }
+.level-open:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.level-body { padding: 10px 12px 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; flex: 1; }
+.level-kind { margin: 0; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.level h4 { margin: 0; font-size: 17px; }
+.level-note { margin: 0; font-size: 13px; color: var(--muted); }
+.level-body .play-link { margin-top: auto; }
+.level-watch { font-size: 13px; font-weight: 700; color: var(--sky); padding-left: 4px; }
+@media (max-width: 560px) {
+  .levels { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .level h4 { font-size: 15px; }
+}

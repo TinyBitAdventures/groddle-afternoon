@@ -23,6 +23,8 @@ import { HUB_MAP_STREETS } from '../public/js/hub-maps-data.js';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination-data.js';
 import { remakeStatus } from '../public/js/imagination-remake.js';
 import { SHOTS } from './restoration/shots.mjs';
+import { playFor, playHref } from './restoration/play-links.mjs';
+import { DESIGNERS, DESIGNER_LEVELS, TEXT_LEVELS } from './restoration/designer-levels.mjs';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import { ROOM_NOTES } from './restoration/rooms.mjs';
 import { parseQuestConversation } from '../public/js/quests.js';
@@ -34,7 +36,7 @@ const out = join(pub, 'restoration', 'data.json');
 
 /** Page-relative path of a captured screenshot, or null until capture.mjs has run. */
 export function shotPath(key) {
-  return `shots/${key.replace(/^room:/, 'room-')}.webp`;
+  return `shots/${key.replace(/^(room|level):/, '$1-')}.webp`;
 }
 function shotFile(key) {
   if (!SHOTS[key]) return null;
@@ -115,6 +117,7 @@ function roomStats() {
       quests: [...new Set(r.quests)],
       built: BUILT_ROOMS.includes(r.id),
       shot: shotFile(`room:${r.id}`),
+      play: BUILT_ROOMS.includes(r.id) ? playFor(`room:${r.id}`) : null,
       hd: existsSync(join(pub, 'restoration', hd)) ? hd : null,
       offer: offer.length > 420 ? `${offer.slice(0, 417).replace(/\s+\S*$/, '')}…` : offer,
       note: ROOM_NOTES[r.id] || null,
@@ -237,7 +240,14 @@ function checklist() {
     spot: item.spot || null,
     evidence: item.evidence.filter((p) => existsSync(join(root, p))),
     shot: shotFile(item.id),
+    play: item.status === 'lost' ? null : playFor(item.id),
   }));
+}
+
+/** Levels Tiny Speck's designers recorded, plus the text-only courses, with play links. */
+function designerLevels() {
+  const row = (l) => ({ ...l, route: undefined, play: playHref(l.route), shot: shotFile(l.shot) });
+  return { designers: DESIGNERS, levels: DESIGNER_LEVELS.map(row), text: TEXT_LEVELS.map(row) };
 }
 
 export async function buildRestorationData() {
@@ -257,6 +267,7 @@ export async function buildRestorationData() {
     possible,
     quests: questStats(),
     rooms: roomStats(),
+    designers: designerLevels(),
     badges: badgeStats(),
     skills: skillStats(),
     streets: streetStats(),
