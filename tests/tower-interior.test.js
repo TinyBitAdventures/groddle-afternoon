@@ -61,9 +61,10 @@ describe('Jethimadh Tower Base is an interior hub', () => {
       assert.deepEqual(row.counts, {}, tsid);
       assert.equal(row.spawners, undefined, tsid);
     }
-    // No other row is interior.
-    const interior = Object.keys(catalog.streets).filter((tsid) => catalog.streets[tsid].interior);
-    assert.deepEqual(interior.sort(), Object.keys(CORRIDOR_QUOINS).sort());
+    // The only rows interior by hub are the six corridors (the rooms have no
+    // archived location); other interior rows come from G43's door/art rules.
+    const byHub = Object.keys(catalog.streets).filter((tsid) => /^hub 77 /.test(catalog.streets[tsid].interiorWhy || ''));
+    assert.deepEqual(byHub.sort(), Object.keys(CORRIDOR_QUOINS).sort());
   });
 
   it('an interior population has no animals, apples, Musicblocks, scenery or fallback, and only its quoins', () => {
@@ -90,7 +91,7 @@ describe('Jethimadh Tower Base is an interior hub', () => {
   });
 
   it('outdoor streets are unchanged: spawners still infer animals, eight quoins, four apples', () => {
-    const pop = populationForStreet('GIF15OTSM102353', { counts: {}, spawners: 1 });
+    const pop = populationForStreet('GIF15OTSM102353', { counts: { trant_fruit: 1 }, spawners: 1 });
     assert.equal(pop.interior, undefined);
     assert.equal(pop.piggies + pop.chickens + pop.butterflies, 1);
     assert.deepEqual([pop.apples, pop.musicblocks, pop.quoins], [4, 1, 8]);

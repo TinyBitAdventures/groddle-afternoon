@@ -1,7 +1,7 @@
 {
   "source": "tinyspeck/glitch-locations locations-xml.zip item references (CC0)",
   "sourceSnapshot": "2012-12 late-game L-prefixed location objects",
-  "streetCount": 1256,
+  "streetCount": 1283,
   "streets": {
     "GA5101HF7F429V5": {
       "label": "Empty Via 5",
@@ -116,6 +116,14 @@
       "counts": {
         "dust_trap": 3
       }
+    },
+    "GA5134UPLRU29OH": {
+      "label": "Gregarious Towers",
+      "sourceTsid": "LA5134UPLRU29OH",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_abandoned_apartment_int_01a",
+      "quoins": 0
     },
     "GA5135VC0J52RGQ": {
       "label": "Rube's Way 6",
@@ -2445,6 +2453,14 @@
       "counts": {},
       "spawners": 1
     },
+    "GA9EBPF8M2031HB": {
+      "label": "Hauki Seeks Manor Basement",
+      "sourceTsid": "LA9EBPF8M2031HB",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairdoor_up_01a_bia",
+      "quoins": 0
+    },
     "GA9EJ02SANM2BT7": {
       "label": "Dasha Mula",
       "sourceTsid": "LA9EJ02SANM2BT7",
@@ -2561,6 +2577,14 @@
         "street_spirit": 1
       },
       "giantId": "cosma"
+    },
+    "GA9H1V6OGRU2FSB": {
+      "label": "Hauki Seeks Manor",
+      "sourceTsid": "LA9H1V6OGRU2FSB",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairdoor_down_01a_bia",
+      "quoins": 0
     },
     "GA9H82Q59BO2EEE": {
       "label": "Chermoo Lama",
@@ -2864,6 +2888,14 @@
       "counts": {},
       "spawners": 1
     },
+    "GA9MU59GB792T80": {
+      "label": "Besara Community Machine Room",
+      "sourceTsid": "LA9MU59GB792T80",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "interior art bldg_int_machine.swf",
+      "quoins": 0
+    },
     "GA9N5MTRTF828OT": {
       "label": "Hanmo Hiss",
       "sourceTsid": "LA9N5MTRTF828OT",
@@ -3034,6 +3066,22 @@
       },
       "giantId": "alph"
     },
+    "GA9S04AB15F3H53": {
+      "label": "Giant Living Room",
+      "sourceTsid": "LA9S04AB15F3H53",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "interior art kukubee2.swf",
+      "quoins": 3
+    },
+    "GA9S09UB15F34AE": {
+      "label": "Giant Kitchen",
+      "sourceTsid": "LA9S09UB15F34AE",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "interior art kukubee2.swf",
+      "quoins": 0
+    },
     "GA9S90EJ0G8241N": {
       "label": "Shoga Links",
       "sourceTsid": "LA9S90EJ0G8241N",
@@ -3185,6 +3233,14 @@
       "counts": {
         "garden": 10
       }
+    },
+    "GCR101Q98A12EHH": {
+      "label": "Meadow Community Machine Room",
+      "sourceTsid": "LCR101Q98A12EHH",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "interior art bldg_int_machine.swf",
+      "quoins": 0
     },
     "GCR101SU5VL1P09": {
       "label": "Follybottom Stritt",
@@ -3853,6 +3909,14 @@
       "giantId": "ti",
       "spawners": 3
     },
+    "GCR18H2DTFS17FB": {
+      "label": "SM Apartment 01",
+      "sourceTsid": "LCR18H2DTFS17FB",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "inc_data_pols_prod.js POL template sm_apartment_01",
+      "quoins": 0
+    },
     "GCR195Q63RK143M": {
       "label": "Grimssea Bottom",
       "sourceTsid": "LCR195Q63RK143M",
@@ -4355,7 +4419,9 @@
       "label": "Autumn Lodge",
       "sourceTsid": "LDOC74759ST2IG1",
       "counts": {},
-      "spawners": 2
+      "interior": true,
+      "interiorWhy": "Autumn Lodge: inside a hollow log (layers \"log top\", \"log back\", \"log bottom\"; 97 apartment_hall_floor pieces); its two spawners hold the two archived Fried Eggs, not animals",
+      "quoins": 7
     },
     "GDOE4V402DD2S3O": {
       "label": "Hari Haring",
@@ -4372,7 +4438,9 @@
       "label": "Mazza'la Gala",
       "sourceTsid": "LDOE67MFL6E2FBR",
       "counts": {},
-      "spawners": 27
+      "interior": true,
+      "interiorWhy": "door art door_asset_interior1",
+      "quoins": 0
     },
     "GDOEDH6P6GC2R2T": {
       "label": "Juom Guson",
@@ -4597,6 +4665,14 @@
         "street_spirit": 1
       }
     },
+    "GDONEDVHC4030KF": {
+      "label": "Gregarious Towers Basement",
+      "sourceTsid": "LDONEDVHC4030KF",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairdoor_up_01a_bia",
+      "quoins": 0
+    },
     "GDOOD6S77DD228S": {
       "label": "Keywot Whot",
       "sourceTsid": "LDOOD6S77DD228S",
@@ -4626,6 +4702,14 @@
       "sourceTsid": "LDOOS17UPNJ2HT7",
       "counts": {},
       "spawners": 22
+    },
+    "GDOOSA8V29J24I3": {
+      "label": "The forgotten floor",
+      "sourceTsid": "LDOOSA8V29J24I3",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "The forgotten floor: an apartment hall (apartment_hall_wall, sign_apartment_groddle, bldg_int_apt art) reached only by teleporter; archived items are notes, a cherry, cubimals and teleporters",
+      "quoins": 0
     },
     "GDOPA4JQBTQ2AA9": {
       "label": "Tamar Garna",
@@ -4949,6 +5033,14 @@
       },
       "giantId": "pot"
     },
+    "GHFBQQ4N68733LB": {
+      "label": "Eesti Life Catalog Page 17",
+      "sourceTsid": "LHFBQQ4N68733LB",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "interior art kukubee2.swf",
+      "quoins": 2
+    },
     "GHFC3I4EKMI20JD": {
       "label": "Paala Latte",
       "sourceTsid": "LHFC3I4EKMI20JD",
@@ -5089,6 +5181,14 @@
         "street_spirit": 1
       },
       "giantId": "zille"
+    },
+    "GHFHLFAFI473PSP": {
+      "label": "Eesti Life Catalog Page 17",
+      "sourceTsid": "LHFHLFAFI473PSP",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "interior art kukubee2.swf",
+      "quoins": 2
     },
     "GHFHNQ3RFUC3JMI": {
       "label": "Moonlit Grove",
@@ -6162,6 +6262,14 @@
       "giantId": "lem",
       "spawners": 1
     },
+    "GHV6HOCAH203RMF": {
+      "label": "Hakusan Heaps Towers Basement",
+      "sourceTsid": "LHV6HOCAH203RMF",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairdoor_up_01a_bia",
+      "quoins": 0
+    },
     "GHV73IC58DT2RO7": {
       "label": "Naama Habitat",
       "sourceTsid": "LHV73IC58DT2RO7",
@@ -6347,6 +6455,14 @@
       "counts": {},
       "spawners": 1
     },
+    "GHVCKEPHO403BN5": {
+      "label": "Orangian",
+      "sourceTsid": "LHVCKEPHO403BN5",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairs_up_basic",
+      "quoins": 11
+    },
     "GHVCUKA1I0B3UE8": {
       "label": "Awn Terio",
       "sourceTsid": "LHVCUKA1I0B3UE8",
@@ -6390,6 +6506,14 @@
       "giantId": "zille",
       "spawners": 1
     },
+    "GHVDKQ2O6S23LVJ": {
+      "label": "Amberlyza",
+      "sourceTsid": "LHVDKQ2O6S23LVJ",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairs_up_basic",
+      "quoins": 12
+    },
     "GHVE9CULH652BV2": {
       "label": "Pitika Parse",
       "sourceTsid": "LHVE9CULH652BV2",
@@ -6406,7 +6530,10 @@
       "sourceTsid": "LHVEI9NVJ203LRO",
       "counts": {
         "garden": 3
-      }
+      },
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairdoor_up_01a_bia",
+      "quoins": 0
     },
     "GHVFCFD8FRA37T6": {
       "label": "Stornur Sezzez",
@@ -6628,6 +6755,38 @@
       },
       "giantId": "lem"
     },
+    "GHVOD0F3T403694": {
+      "label": "Griinolyza",
+      "sourceTsid": "LHVOD0F3T403694",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairs_up_basic",
+      "quoins": 13
+    },
+    "GHVP6H0KT403N8A": {
+      "label": "Piryan",
+      "sourceTsid": "LHVP6H0KT403N8A",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairs_up_basic",
+      "quoins": 17
+    },
+    "GHVP7QOKT403F5Q": {
+      "label": "Purplysa",
+      "sourceTsid": "LHVP7QOKT403F5Q",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairs_up_basic",
+      "quoins": 12
+    },
+    "GHVP8TCLT40336S": {
+      "label": "Blooian",
+      "sourceTsid": "LHVP8TCLT40336S",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairs_up_basic",
+      "quoins": 15
+    },
     "GHVPJPLE4TA27LD": {
       "label": "Totakuru Trample",
       "sourceTsid": "LHVPJPLE4TA27LD",
@@ -6681,6 +6840,14 @@
         "street_spirit": 1
       },
       "giantId": "spriggan"
+    },
+    "GHVQMS17V813FN7": {
+      "label": "Fernucopia",
+      "sourceTsid": "LHVQMS17V813FN7",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairs_up_basic",
+      "quoins": 19
     },
     "GHVQU18N3O021A5": {
       "label": "Ekorran Roughs",
@@ -6777,6 +6944,22 @@
       },
       "giantId": "ti",
       "spawners": 1
+    },
+    "GHVUFJ6HGRU2V0E": {
+      "label": "Hakusan Heaps Towers",
+      "sourceTsid": "LHVUFJ6HGRU2V0E",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_abandoned_apartment_int_01a",
+      "quoins": 0
+    },
+    "GHVUR3UKGRU2SD2": {
+      "label": "Egret Taun Towers",
+      "sourceTsid": "LHVUR3UKGRU2SD2",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_abandoned_apartment_int_01a",
+      "quoins": 0
     },
     "GHVVLBM1VL22A6Q": {
       "label": "Savi Sense",
@@ -7452,6 +7635,7 @@
       "sourceTsid": "LIF1Q3IQM7122SP",
       "counts": {},
       "interior": true,
+      "interiorWhy": "hub 77 Jethimadh Tower: Base",
       "quoins": 7
     },
     "GIF1Q48RM712F87": {
@@ -7459,6 +7643,7 @@
       "sourceTsid": "LIF1Q48RM712F87",
       "counts": {},
       "interior": true,
+      "interiorWhy": "hub 77 Jethimadh Tower: Base",
       "quoins": 3
     },
     "GIF1QBNPP7123J0": {
@@ -7466,6 +7651,7 @@
       "sourceTsid": "LIF1QBNPP7123J0",
       "counts": {},
       "interior": true,
+      "interiorWhy": "hub 77 Jethimadh Tower: Base",
       "quoins": 0
     },
     "GIF1SGGD7EU12T5": {
@@ -7896,6 +8082,14 @@
       },
       "giantId": "friendly"
     },
+    "GIF84CCRN203N7P": {
+      "label": "Sabudana Drama Towers Basement",
+      "sourceTsid": "LIF84CCRN203N7P",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairdoor_up_01a_bia",
+      "quoins": 0
+    },
     "GIF85V4ON6E2UVV": {
       "label": "Ramfeon Cima",
       "sourceTsid": "LIF85V4ON6E2UVV",
@@ -8018,6 +8212,14 @@
       },
       "giantId": "spriggan",
       "spawners": 2
+    },
+    "GIFB19E1FUM1LH9": {
+      "label": "Eesti Life Catalog Page 17",
+      "sourceTsid": "LIFB19E1FUM1LH9",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "interior art kukubee2.swf",
+      "quoins": 2
     },
     "GIFBD8FM0UG2QCR": {
       "label": "Steeha Sham",
@@ -8757,6 +8959,14 @@
         "trant_bubble": 1
       },
       "giantId": "alph"
+    },
+    "GIFI4FP9GRU2CC8": {
+      "label": "Sabudana Drama Towers",
+      "sourceTsid": "LIFI4FP9GRU2CC8",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_stairdoor_down_01a_bia",
+      "quoins": 0
     },
     "GIFI9G70SV72H3C": {
       "label": "Thiruvan Thrive",
@@ -10420,6 +10630,14 @@
       },
       "giantId": "grendaline"
     },
+    "GM4118MEHFDMM": {
+      "label": "Uncle Friendly's Emporium",
+      "sourceTsid": "LM4118MEHFDMM",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "door art door_asset_shoppeIn",
+      "quoins": 0
+    },
     "GM413RQ6LRG9N": {
       "label": "West Spice",
       "sourceTsid": "LM413RQ6LRG9N",
@@ -11112,6 +11330,7 @@
       "sourceTsid": "LTJ10K7P3812R8F",
       "counts": {},
       "interior": true,
+      "interiorWhy": "hub 77 Jethimadh Tower: Base",
       "quoins": 0
     },
     "GTJ10KOCHTU1N89": {
@@ -11130,6 +11349,7 @@
       "sourceTsid": "LTJ10M515812V0C",
       "counts": {},
       "interior": true,
+      "interiorWhy": "hub 77 Jethimadh Tower: Base",
       "quoins": 5
     },
     "GTJ110817812KO4": {
@@ -11137,6 +11357,7 @@
       "sourceTsid": "LTJ110817812KO4",
       "counts": {},
       "interior": true,
+      "interiorWhy": "hub 77 Jethimadh Tower: Base",
       "quoins": 5
     },
     "GTJ112E9DIO1BPE": {
@@ -12017,6 +12238,14 @@
         "npc_salmon": 34
       },
       "spawners": 1
+    },
+    "GUVEF6S1UM53T97": {
+      "label": "Eesti Life Catalog Page 17",
+      "sourceTsid": "LUVEF6S1UM53T97",
+      "counts": {},
+      "interior": true,
+      "interiorWhy": "interior art kukubee2.swf",
+      "quoins": 2
     },
     "GUVEJ2PKGAF2771": {
       "label": "Panguni Ploy",

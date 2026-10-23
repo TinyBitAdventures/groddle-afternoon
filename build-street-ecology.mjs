@@ -10,7 +10,7 @@
 import { readFile, writeFile, access } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isInteriorHub } from './public/js/street-ecology.js';
+import { interiorReason } from './public/js/street-ecology.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const streetIndexPath = join(root, 'public/assets/streets/index.json');
@@ -18,6 +18,32 @@ const outputPath = join(root, 'public/assets/content/street-ecology.json');
 const locationRoot =
   process.env.GRODDLE_LOCATION_XML ||
   '/Users/austin/Documents/glitch-audit/streets/mnt/stos/location_data';
+const gsjsRoot = process.env.GRODDLE_GSJS || join(root, '..', 'glitch-GameServerJS');
+
+/**
+ * GameServerJS building lists for street-ecology.js interiorReason(), as
+ * G-prefixed tsids: config_prod.js `machine_rooms` and the POL templates in
+ * inc_data_pols_prod.js (template key -> template_tsid).
+ */
+async function buildingLists() {
+  const g = (tsid) => `G${tsid.slice(1)}`;
+  const machineRooms = new Set();
+  const polTemplates = new Map();
+  try {
+    const config = await readFile(join(gsjsRoot, 'config_prod.js'), 'utf8');
+    const list = config.match(/var machine_rooms = \[([^\]]*)\]/)?.[1] || '';
+    for (const m of list.matchAll(/'([A-Z0-9]+)'/g)) machineRooms.add(g(m[1]));
+  } catch {
+    console.warn('config_prod.js not found: machine_rooms skipped');
+  }
+  try {
+    const pols = await readFile(join(gsjsRoot, 'inc_data_pols_prod.js'), 'utf8');
+    for (const m of pols.matchAll(/"([a-z_0-9]+)"\s*:\s*\{\s*"template_tsid"\s*:\s*"([A-Z0-9]+)"/g)) polTemplates.set(g(m[2]), m[1]);
+  } catch {
+    console.warn('inc_data_pols_prod.js not found: POL templates skipped');
+  }
+  return { machineRooms, polTemplates };
+}
 
 const LABEL_TO_CLASS = Object.freeze({
   Piggy: 'npc_piggy',
@@ -191,6 +217,7 @@ function ecologyFromLabels(labels) {
 }
 
 const index = JSON.parse(await readFile(streetIndexPath, 'utf8'));
+const lists = await buildingLists();
 const streets = {};
 const soil = {};
 const wildlife = {};
@@ -212,15 +239,18 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const furnitureCounts = furnitureFromLabels(labels);
   if (Object.keys(furnitureCounts).length) furniture[tsid] = furnitureCounts;
   const ecology = ecologyFromLabels(labels);
-  if (isInteriorHub(meta.hubId)) {
-    // Indoor hubs (street-ecology.js INTERIOR_HUBS): static counts and the
-    // archived quoins only; their spawners are not animals, so none is kept.
+  const geometry = JSON.parse(await readFile(join(root, 'public', meta.file), 'utf8'));
+  const interiorWhy = interiorReason({ ...geometry, tsid, hubId: meta.hubId ?? geometry.hubId }, lists);
+  if (interiorWhy) {
+    // Indoors (street-ecology.js interiorReason): static counts and the
+    // archived quoins only; spawners indoors hold items, not animals.
     streets[tsid] = {
       label: meta.label || tsid,
       sourceTsid,
       counts: ecology.counts,
       ...(ecology.giantId ? { giantId: ecology.giantId } : {}),
       interior: true,
+      interiorWhy,
       quoins: labels.filter((label) => QUOIN_LABELS.has(label)).length,
     };
     continue;

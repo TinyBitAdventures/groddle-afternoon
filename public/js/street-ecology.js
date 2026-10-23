@@ -3,7 +3,7 @@
  * placement on recovered locations-xml platforms.
  */
 
-export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-4';
+export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-5';
 
 /**
  * Interior hubs: every street in them is indoors, and their archived item
@@ -20,6 +20,61 @@ export const INTERIOR_HUBS = Object.freeze({ 77: 'Jethimadh Tower: Base' });
 
 export function isInteriorHub(hubId) {
   return hubId != null && hubId !== '' && Object.prototype.hasOwnProperty.call(INTERIOR_HUBS, String(hubId));
+}
+
+/**
+ * Interior streets in outdoor hubs (G43). build-street-ecology.mjs asks
+ * interiorReason() for every street and writes `interior: true` plus the
+ * reason (`interiorWhy`) on the row, so no fallback piggies, trees, vendor or
+ * shrine appear indoors. The tests, in order:
+ *
+ * - door art: the street's own doors use the art drawn for a door seen from
+ *   inside (`*_int*`, `*interior*`, stair doors, `shoppeIn`). This finds the
+ *   five abandoned-apartment lobbies, their five basements (location.js lists
+ *   the same basements as "Apt basements"), Uncle Friendly's Emporium, the
+ *   Jethimadh Tower Base rooms, Mazza'la Gala and the Underground Puzzles.
+ * - art sets: every SWF the street draws from is an interior set
+ *   (`bldg_int_*`, `pol_int_*`, or one listed in INTERIOR_ART_SETS): the two
+ *   community machine rooms, Giant Living Room, Giant Kitchen and the Eesti
+ *   Life catalog rooms. Outdoor streets that borrow a few interior decos keep
+ *   outdoor art too, so they never match.
+ * - GameServerJS lists, passed in by the build: config_prod.js
+ *   `machine_rooms`, and inc_data_pols_prod.js POL templates (SM Apartment 01,
+ *   the bottle-tree apartment).
+ * - INTERIOR_STREETS: the few interiors no source field marks, each with why.
+ */
+export const INTERIOR_DOOR_ART = /(?:_int(?:_|\d|$)|interior|stairdoor|stairs_(?:up|down)|shoppeIn$)/i;
+
+export const INTERIOR_ART_SETS = Object.freeze({
+  'kukubee2.swf': 'k04 room art only: floors, wallpaper, counters, fridge (Giant Kitchen, Giant Living Room, Eesti Life Catalog Page 17)',
+});
+
+export const INTERIOR_STREETS = Object.freeze({
+  GDOOSA8V29J24I3: 'The forgotten floor: an apartment hall (apartment_hall_wall, sign_apartment_groddle, bldg_int_apt art) reached only by teleporter; archived items are notes, a cherry, cubimals and teleporters',
+  GDOC74759ST2IG1: 'Autumn Lodge: inside a hollow log (layers "log top", "log back", "log bottom"; 97 apartment_hall_floor pieces); its two spawners hold the two archived Fried Eggs, not animals',
+});
+
+function isInteriorArtSet(swf) {
+  return /^(?:bldg|pol)_int_/.test(swf) || Object.prototype.hasOwnProperty.call(INTERIOR_ART_SETS, swf);
+}
+
+/**
+ * Why a street is indoors, or null. `street` is a street JSON (or index row)
+ * with tsid, hubId, doors and swf_file; `lists` holds GameServerJS building
+ * lists as G-prefixed tsids ({ machineRooms, polTemplates }).
+ */
+export function interiorReason(street, lists = {}) {
+  const tsid = String(street?.tsid || '');
+  if (isInteriorHub(street?.hubId)) return `hub ${street.hubId} ${INTERIOR_HUBS[String(street.hubId)]}`;
+  const door = (street?.doors || []).find((d) => INTERIOR_DOOR_ART.test(String(d?.sprite || '')));
+  if (door) return `door art ${door.sprite}`;
+  const swfs = String(street?.swf_file || '').split(',').map((s) => s.trim()).filter(Boolean);
+  if (swfs.length && swfs.every(isInteriorArtSet)) return `interior art ${[...new Set(swfs)].join(',')}`;
+  const g = tsid.startsWith('L') ? `G${tsid.slice(1)}` : tsid;
+  if (lists.machineRooms?.has?.(g)) return 'config_prod.js machine_rooms';
+  if (lists.polTemplates?.has?.(g)) return `inc_data_pols_prod.js POL template ${lists.polTemplates.get?.(g) || ''}`.trim();
+  if (Object.prototype.hasOwnProperty.call(INTERIOR_STREETS, g)) return INTERIOR_STREETS[g];
+  return null;
 }
 
 /** @type {{source?:string, sourceSnapshot?:string, streetCount?:number, streets:Record<string, any>}} */
@@ -215,7 +270,14 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
   let chickens = Math.min(whole(counts.npc_chicken), 3);
   let butterflies = Math.min(whole(counts.npc_butterfly), 3);
 
-  for (let i = 0; i < spawners; i += 1) {
+  // A spawner refills its class whenever a player enters (items/spawner.js
+  // onPlayerEnter -> onSpawnTimer), so the archived snapshot holds what it
+  // spawns. On a street whose snapshot has no animal, tree, rock, garden,
+  // resource or shrine at all (Abbasid Jail and Walkway, Volcano Villa), the
+  // spawner is not an animal spawner and guesses nothing. Living streets keep
+  // the roaming-animal guess.
+  const living = Object.keys(counts).length > 0 || !!entry?.giantId;
+  for (let i = 0; living && i < spawners; i += 1) {
     const species = stableEcologyHash(`${tsid}:spawner:${i}`) % 3;
     if (species === 0) piggies = Math.min(6, piggies + 1);
     else if (species === 1) chickens = Math.min(3, chickens + 1);

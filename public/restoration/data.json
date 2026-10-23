@@ -1409,9 +1409,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 259,
+  "commits": 260,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Jethimadh Tower corridors and rooms spawn only their own quoins, named Jethimadh Tower: Base"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1526,14 +1531,9 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Harvesting a tree plays its sound once instead of on a loop"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Groddle Forest no longer plays the Goodnight Groddle lullaby, and Musicblock cards drop the restoration count"
    }
   ]
  },
- "tests": 166,
+ "tests": 167,
  "generatedAt": "2026-10-22"
 }
