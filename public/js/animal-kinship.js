@@ -19,7 +19,7 @@ import {
 } from './tools.js?v=tools-2';
 import { SKILL_PACKAGES, skillPackageDetails } from './skill-packages.js';
 import { moodMax } from './metabolics.js';
-import { incPiggyMood, piggyNibbleRefusal } from './animal-mood.js';
+import { petPiggy, piggyNibbleRefusal } from './animal-mood.js';
 
 export const ANIMAL_KINSHIP_RANK_IDS = Object.freeze(
   Array.from({ length: 7 }, (_, index) => `animalkinship_${index + 1}`)
@@ -369,8 +369,10 @@ export function performAnimalKinship(state, classId, verbId, ctx = {}) {
 
   s[actionState.daily] = integer(s[actionState.daily]) + 1;
   s[actionState.total] = integer(s[actionState.total]) + 1;
-  // onPetComplete: incMood(1), capped at 2 (npc_piggy.js 1717, 1352-1362).
-  if (classId === 'npc_piggy' && verbId === 'pet') incPiggyMood(s, 1);
+  // onPetComplete: incMood(1), capped at 2 (npc_piggy.js 1717, 1352-1362),
+  // and the has_been_petted flag the source never set (G63b: the next daily
+  // tick keeps this piggy's mood; js/animal-mood.js PIGGY_PET_PROTECTS_MOOD).
+  if (classId === 'npc_piggy' && verbId === 'pet') petPiggy(s);
   if (actionState.legacy === 'squeezedToday') s.squeezedToday = s[actionState.daily];
   else s[actionState.legacy] = true;
 

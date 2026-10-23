@@ -8,13 +8,13 @@
  *   game_days_to_ms(0.5) (two real hours), is_daily starts at 1.
  * - npc_piggy.js onTwiceDaily 1832-2040: a rooked or sad piggy skips the
  *   tick; is_daily flips; on the daily half the piggy loses 1 mood unless
- *   has_been_petted (never set anywhere in GSJS, so the loss is every game
- *   day; a pet's +1 is what keeps it up), then if other animals on the street
- *   average mood >= 1 a mood-0 piggy goes to 1 ("Other animals make me
- *   happy!"); hunger +1 each half day below 2, then +1 only on the daily half
- *   up to 10; at 10 the onCroaking interval starts and there is a 50% chance
- *   it dies (smoke puff, die()); a hungry piggy paths to food on the street,
- *   else to a trant with fruit.
+ *   has_been_petted (1920-1927; see PIGGY_PET_PROTECTS_MOOD for the remake's
+ *   deliberate fix), then if other animals on the street average mood >= 1 a
+ *   mood-0 piggy goes to 1 ("Other animals make me happy!"); hunger +1 each
+ *   half day below 2, then +1 only on the daily half up to 10; at 10 the
+ *   onCroaking interval starts and there is a 50% chance it dies (smoke
+ *   puff, die(); see PIGGY_STARVATION_DEATH for who can); a hungry piggy
+ *   paths to food on the street, else to a trant with fruit.
  * - npc_piggy.js decMood/incMood 1301-1362: mood stays within 0..2.
  * - npc_piggy.js onPetComplete 1709-1717: a successful pet adds 1 mood.
  * - npc_piggy.js nibble handler 862-910: petted today (or Animal Kinship VI)
@@ -53,15 +53,52 @@ export const PIGGY_HUNGER = Object.freeze({
 });
 
 /**
- * Starvation death (npc_piggy.js onTwiceDaily 1958-1973: at hunger 10 a 50%
- * chance per tick of the smoke puff and die(), which drops 10 Meat and a Plop
- * at npc_piggy.js 1036-1041). Off until Austin decides whether the remake's
- * piggies can starve; while off a starving piggy stays at 10 and keeps
- * croaking. The pure tick below reports `die` only when this is true; the
- * street side (removing the piggy, dropping the Meat and Plop) is not built.
+ * A pet protects the mood that day (G63b, Austin's call 2026-10-23).
+ * npc_piggy.js onTwiceDaily 1920-1927 skips decMood(1) when has_been_petted
+ * and then clears it, but nothing in GSJS ever sets has_been_petted (onCreate
+ * 1454 only zeroes it; npc_kitty.js 718/1198-1201 has the same dead flag), so
+ * in the original every piggy lost 1 mood a game day even if you petted it.
+ * That is a source bug, and the remake fixes it on purpose: a successful pet
+ * (onPetComplete 1709-1717, performAnimalKinship) sets `hasBeenPetted`, and
+ * the next daily tick skips the mood loss for that piggy and clears the flag.
+ * Street, back-yard and released piggies all share this tick.
  */
-export const PIGGY_STARVATION_DEATH = false;
+export const PIGGY_PET_PROTECTS_MOOD = true;
+
+/**
+ * Starvation death (G63, Austin's call 2026-10-23): only piggies you own can
+ * starve. npc_piggy.js onTwiceDaily 1958-1973: at hunger 10 every tick starts
+ * onCroaking and rolls is_chance(0.5); on a hit the smoke_puff overlay plays
+ * (delta_y 95, 1.5 s) and die() runs 500 ms later, which puts 10 Meat at
+ * (x, y-20) and a Plop at (x+80, y-20) and deletes the piggy (1036-1041).
+ * GSJS has no death line or activity text. In the remake:
+ * - owned piggies (your back yard herd, which a Piggy Feeder keeps fed, and
+ *   the piggies you released or raised, which the animal-husbandry feature
+ *   keeps in its street slot) roll the 50% and die;
+ * - archived street-ecology piggies never die: they stay at 10 and keep
+ *   croaking "I'm about to croak!" until something feeds them.
+ * piggyCanStarve() is the rule; the tick takes `owned` in its ctx.
+ */
+export const PIGGY_STARVATION_DEATH = Object.freeze({ owned: true, ecology: false });
 export const PIGGY_DEATH_CHANCE = 0.5;
+
+/** die() 1036-1041: what a starved piggy leaves (the Plop is plop.js's default, 1 Corn Seed). */
+export const PIGGY_DEATH_DROPS = Object.freeze({ meat: 10, plop: 1, meatDx: 0, plopDx: 80 });
+/** The smoke_puff overlay (1964-1971) and the apiSetTimer('die', 500) after it (1972). */
+export const PIGGY_DEATH_PUFF = Object.freeze({ overlay: 'smoke_puff', deltaY: 95, durationMs: 1500, dieAfterMs: 500 });
+
+/** Whether this piggy can starve (PIGGY_STARVATION_DEATH): only ones you own. */
+export function piggyCanStarve({ owned = false } = {}) {
+  return owned ? PIGGY_STARVATION_DEATH.owned : PIGGY_STARVATION_DEATH.ecology;
+}
+
+/** QA: a forced roll from a URL param (&animaldeathroll=0 always dies, 0.99 never), else Math.random. */
+export function forcedRoll(raw) {
+  const n = Number(raw);
+  if (raw === null || raw === undefined || raw === '' || !Number.isFinite(n)) return Math.random;
+  const v = Math.min(0.999999, Math.max(0, n));
+  return () => v;
+}
 
 /** onCroaking runs on apiSetInterval(..., 1): once a minute. */
 export const CROAK_INTERVAL_MS = 60 * 1000;
@@ -280,6 +317,7 @@ export function ensurePiggyMood(state = {}, now = Date.now()) {
   }
   if (s.isDaily === undefined) s.isDaily = 1;
   s.isDaily = s.isDaily ? 1 : 0;
+  s.hasBeenPetted = s.hasBeenPetted ? 1 : 0;
   s.croaking = s.hunger === PIGGY_HUNGER.max && s.croaking === true;
   s.moodVersion = 1;
   return s;
@@ -297,6 +335,17 @@ export function decPiggyMood(state, delta = 1) {
   const before = clamp(num(state.mood, PIGGY_MOOD.start), PIGGY_MOOD.min, PIGGY_MOOD.max);
   state.mood = Math.max(PIGGY_MOOD.min, before - delta);
   return before - state.mood;
+}
+
+/**
+ * onPetComplete after a successful pet: +1 mood (1717) and, as the remake's
+ * fix of the source bug (PIGGY_PET_PROTECTS_MOOD), the has_been_petted flag
+ * the next daily tick reads. Returns the mood change.
+ */
+export function petPiggy(state) {
+  const change = incPiggyMood(state, 1);
+  if (PIGGY_PET_PROTECTS_MOOD) state.hasBeenPetted = 1;
+  return change;
 }
 
 /** Eating (feed with base cost >= 5, onFoodPathing, the Piggy Feeder) clears hunger and the croak. */
@@ -325,10 +374,11 @@ export function piggyNibbleRefusal(state = {}) {
 
 /**
  * One onTwiceDaily tick. ctx: { sad, rooked, neighbourMoods: number[],
- * findFood: () => food|null, rng, deathEnabled }. Mutates `state` and
- * returns the events: { type: 'happy' } (the bubble), { type: 'croak' }
- * (the interval starts), { type: 'die' } (only with deathEnabled),
- * { type: 'seek', food } (path to that food).
+ * findFood: () => food|null, rng, owned, deathEnabled }. Mutates `state`
+ * and returns the events: { type: 'happy' } (the bubble), { type: 'croak' }
+ * (the interval starts), { type: 'die' } (an owned piggy lost the 50% roll;
+ * `deathEnabled` overrides piggyCanStarve for tests), { type: 'seek', food }
+ * (path to that food).
  */
 export function piggyTwiceDailyTick(state, ctx = {}) {
   const events = [];
@@ -337,8 +387,10 @@ export function piggyTwiceDailyTick(state, ctx = {}) {
   s.isDaily = s.isDaily ? 0 : 1;
   const daily = s.isDaily === 1;
   if (daily) {
-    // has_been_petted is reset here but never set in GSJS: every game day costs 1 mood.
-    decPiggyMood(s, 1);
+    // npc_piggy.js 1923-1927: a piggy petted since the last daily tick keeps
+    // its mood, then the flag clears (set by petPiggy, the remake's fix).
+    if (!s.hasBeenPetted) decPiggyMood(s, 1);
+    s.hasBeenPetted = 0;
     const moods = (ctx.neighbourMoods || []).map((m) => num(m, PIGGY_MOOD.start));
     if (moods.length) {
       const avg = moods.reduce((a, b) => a + b, 0) / moods.length;
@@ -354,7 +406,7 @@ export function piggyTwiceDailyTick(state, ctx = {}) {
   else {
     s.croaking = true;
     events.push({ type: 'croak', line: PIGGY_LINES.croak });
-    const deathEnabled = ctx.deathEnabled ?? PIGGY_STARVATION_DEATH;
+    const deathEnabled = ctx.deathEnabled ?? piggyCanStarve({ owned: ctx.owned === true });
     const rng = typeof ctx.rng === 'function' ? ctx.rng : Math.random;
     if (deathEnabled && rng() < PIGGY_DEATH_CHANCE) {
       events.push({ type: 'die' });
@@ -371,9 +423,10 @@ export function piggyTwiceDailyTick(state, ctx = {}) {
 /**
  * Replay every due tick for a street's piggies in time order (a long absence
  * works like the server's intervals). rows: [{ state, ...anything }].
- * ctxFor(row) -> { sad, rooked, findFood }; `eat(row, food)` lands an
- * offline seek at once (returns true when it ate). Returns
- * [{ row, events }] for ticks that produced events.
+ * ctxFor(row) -> { sad, rooked, findFood, owned }; `eat(row, food)` lands an
+ * offline seek at once (returns true when it ate). A row that dies is marked
+ * `dead` and ticks no more. Returns [{ row, events, at }] for ticks that
+ * produced events.
  */
 export function advancePiggies(rows = [], now = Date.now(), { ctxFor = () => ({}), eat = null, rng = Math.random, deathEnabled } = {}) {
   const out = [];

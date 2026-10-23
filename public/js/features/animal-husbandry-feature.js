@@ -23,14 +23,28 @@
  * ordinary npc_piggy / npc_chicken / npc_butterfly targets, so pet, nibble,
  * squeeze, milk and feed all come from content.js; their state lives in this
  * feature's per-street slot.
+ * - Starvation (G63): these piggies and the back yard herd are yours, so at
+ *   hunger 10 they can die (js/animal-mood.js PIGGY_STARVATION_DEATH): a
+ *   smoke puff, and 500 ms later the piggy is gone from the street and its
+ *   slot, leaving 10 Meat (a ground stack) and a Plop (npc_piggy.js
+ *   1958-1973, 1036-1041). The animal-mood feature ticks street piggies and
+ *   calls the target's `husbandryStarve`; advanceYard ticks the yard, and a
+ *   yard death while you are away waits in the yard slot's `starved` list
+ *   until you get home. Street-ecology piggies never die.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&animaldemo=batterfly|plop|incubate|name|herd
  * (+ &animalautoplay=1, &questoffer=off). The back yard route is
  * ?autostart=1&fresh=1&resetgame=1&homedemo=home&animaldemo=remote&animalautoplay=1.
- * &animalfast=1 shortens incubation to 6 s for headless runs. Canvas data:
+ * &animalfast=1 shortens incubation to 6 s for headless runs. Starvation:
+ * &animaldemo=starve releases a Piggy beside you at hunger 10 whose next tick
+ * is 3 s away (yard: &homedemo=home&animaldemo=remote&animalhunger=10 does the
+ * same for the first yard piggy); &animaldeathroll=0 forces the 50% roll
+ * (0.99 spares it) and &animaldeathfx=hold keeps the puff up for screenshots.
+ * Canvas data:
  * husbandryDemo, husbandryLast, batterflyCount, batterflyStreetCount,
  * guanoOnStreet, plopsOnStreet, pendingPlops, packPlops, incubation,
- * extraAnimals, yardMachines, yardSticks, hogtied, namedAnimal.
+ * extraAnimals, yardMachines, yardSticks, hogtied, namedAnimal, starvedPiggies,
+ * yardStarved.
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
@@ -84,7 +98,7 @@ import {
 } from '../animal-husbandry.js';
 import { moodMax } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
-import { SAD_BABY, isSadIn } from '../animal-mood.js';
+import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
 import { animalPlaceIsDepressing } from './animal-mood-feature.js?v=g57-1';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
@@ -129,6 +143,8 @@ export function normalizeHusbandrySlot(slot = {}) {
   s.animals = Array.isArray(s.animals) ? s.animals.filter((a) => a && ANIMAL_CLASSES.has(a.classId)) : [];
   s.sticks = Array.isArray(s.sticks) ? s.sticks.filter((k) => k && MAGIC_STICKS[k.classTsid]) : [];
   s.machines = Array.isArray(s.machines) ? s.machines.filter((m) => m && REMOTE_MACHINES[m.classTsid]) : [];
+  // Back yard piggies that starved while you were away: their Meat and Plop land when you get home.
+  s.starved = Array.isArray(s.starved) ? s.starved.filter((d) => d && Number.isFinite(Number(d.x))) : [];
   s.seq = Number(s.seq) || 0;
   return s;
 }
@@ -155,6 +171,7 @@ let hogtieAt = 0;
 let yardAt = 0;
 let incubationAt = 0;
 let questFlags = new Set();
+let starvedCount = 0;
 
 const now = () => Date.now();
 const isYard = (engine) => engine.streetTsid === YARD_TSID;
@@ -324,14 +341,14 @@ function dropGuano(engine, x, count) {
   }
 }
 
-function dropPlop(engine, x, seedClass, seedCount) {
+function dropPlop(engine, x, seedClass, seedCount, { silent = false, refY } = {}) {
   const s = slot(engine);
   s.seq += 1;
-  const y = surfaceAt(engine, x);
+  const y = surfaceAt(engine, x, refY);
   const row = { id: `p${s.seq}`, x: Math.round(x), y: Math.round(y), seedClass, seedCount };
   s.plops.push(row);
   buildPile(engine, 'plop', row);
-  engine.playSound('PIGGY_PLOP', { volume: 0.6 });
+  if (!silent) engine.playSound('PIGGY_PLOP', { volume: 0.6 });
 }
 
 function buildPile(engine, kind, row) {
@@ -437,7 +454,10 @@ function buildExtraAnimal(engine, row) {
     state: row.state,
     husbandryAnimal: row.id,
   });
-  extras.push({ row, sprite: spr, target, vx: (row.id.length % 2 ? 1 : -1) * 0.45, baseX: row.x, phase: row.id.length });
+  const entity = { row, sprite: spr, target, vx: (row.id.length % 2 ? 1 : -1) * 0.45, baseX: row.x, phase: row.id.length };
+  // G63: a piggy you own can starve; the animal-mood feature calls this when its tick says die.
+  if (row.classId === 'npc_piggy') target.husbandryStarve = (opts) => starveExtra(engine, entity, opts);
+  extras.push(entity);
 }
 
 function stickFor(engine, classId) {
@@ -484,6 +504,119 @@ function removeExtra(engine, entity) {
   s.animals = s.animals.filter((a) => a !== entity.row);
   extras = extras.filter((e) => e !== entity);
   engine.unregister(entity.target);
+}
+
+// —— Starvation (G63: only piggies you own) ————————————————————————————————
+
+/** QA: &animaldeathroll=<0..1> forces the starvation roll (0 dies, 0.99 lives). */
+export function deathRollFor(engine) {
+  return forcedRoll(engine?.param?.('animaldeathroll'));
+}
+
+/**
+ * The smoke_puff overlay (npc_piggy.js 1964-1971): no OpenGameArt sheet of it
+ * exists, so a short grey Pixi puff over the piggy, as long as the overlay
+ * (1.5 s). &animaldeathfx=hold keeps it up for headless screenshots.
+ */
+function smokePuff(engine, x, y) {
+  const { PIXI } = engine;
+  if (!PIXI?.Graphics || !engine.entityLayer) return null;
+  const g = new PIXI.Graphics();
+  const blobs = [[0, 0, 30], [-26, 8, 22], [26, 8, 22], [-14, -20, 20], [16, -22, 21], [0, 18, 20], [-34, -6, 15], [34, -8, 15]];
+  for (const [bx, by, r] of blobs) g.circle(bx, by, r).fill({ color: 0xd9d4cb, alpha: 0.9 });
+  for (const [bx, by, r] of blobs.slice(0, 5)) g.circle(bx - r * 0.25, by - r * 0.3, r * 0.55).fill({ color: 0xf4f1ea, alpha: 0.85 });
+  g.x = x;
+  g.y = y;
+  g.zIndex = 70;
+  engine.entityLayer.addChild(g);
+  if (engine.param('animaldeathfx') === 'hold') {
+    g.scale.set(1.25);
+    return g;
+  }
+  const start = now();
+  const tick = () => {
+    if (g.destroyed) return;
+    const k = (now() - start) / PIGGY_DEATH_PUFF.durationMs;
+    if (k >= 1) {
+      g.destroy();
+      return;
+    }
+    g.alpha = k < 0.25 ? 1 : 1 - (k - 0.25) / 0.75;
+    g.scale.set(0.5 + k * 0.9);
+    g.y = y - k * 24;
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  return g;
+}
+
+/** die() 1036-1041 on this street: 10 Meat at the piggy, a Plop 80 px along. */
+function dropStarvedRemains(engine, x, refY) {
+  const meatX = Math.round(x + PIGGY_DEATH_DROPS.meatDx);
+  // World stacks sit 74 px above the ground like a player drop (game.js dropPackStack, tree death).
+  engine.dropWorldStack('meat', PIGGY_DEATH_DROPS.meat, meatX, surfaceAt(engine, meatX, refY) - 74);
+  // A die() Plop has no seed_class: examining it gives plop.js's default, 1 Corn Seed (219-228).
+  const plopX = Math.max(30, Math.min((engine.worldW || Infinity) - 30, x + PIGGY_DEATH_DROPS.plopDx));
+  dropPlop(engine, plopX, 'seed_corn', PIGGY_DEATH_DROPS.plop, { silent: true, refY });
+}
+
+/** Remake activity line (GSJS has no death text; the puff is all the source shows). */
+function starvedLine(row, where) {
+  const name = row?.state?.userName ? row.state.userName : where === 'yard' ? 'A Piggy in your back yard' : 'Your Piggy';
+  return `${name} starved, and went up in a puff of smoke.`;
+}
+
+/**
+ * A piggy you own dies of hunger on the street you stand on: the puff, then
+ * 500 ms later (apiSetTimer('die', 500)) it leaves the world and its slot and
+ * the Meat and Plop land. The slot row goes at once so a reload in between
+ * cannot bring it back. `row` alone (no sprite) is a yard row from advanceYard.
+ */
+function starveExtra(engine, entity, { replay = false, row = entity?.row, where = isYard(engine) ? 'yard' : 'street' } = {}) {
+  if (!row) return false;
+  const spr = entity?.sprite && !entity.sprite.destroyed ? entity.sprite : null;
+  const x = spr ? spr.x : Number(row.x) || 0;
+  const refY = spr ? spr.y : undefined;
+  const ground = surfaceAt(engine, x, refY);
+  const s = slot(engine);
+  s.animals = s.animals.filter((a) => a !== row);
+  if (entity) {
+    extras = extras.filter((e) => e !== entity);
+    if (spr) spr._moodHold = true; // stop walking while the puff covers it
+  }
+  smokePuff(engine, x, ground - PIGGY_DEATH_PUFF.deltaY * 0.45);
+  const gen = generation;
+  const tsid = engine.streetTsid;
+  const finish = () => {
+    if (entity) engine.unregister(entity.target);
+    if (gen === generation && engine.streetTsid === tsid) dropStarvedRemains(engine, x, refY ?? ground);
+    else yardOrStreetLater(engine, tsid, x);
+    engine.save();
+    publish(engine, true);
+  };
+  setTimeout(finish, PIGGY_DEATH_PUFF.dieAfterMs);
+  starvedCount += 1;
+  engine.pushActivity(starvedLine(row, where));
+  lastAction = `starved:${where}${replay ? ':replay' : ''}`;
+  engine.save();
+  return true;
+}
+
+/** The street changed inside the 500 ms: land the remains when that street is next entered. */
+function yardOrStreetLater(engine, tsid, x) {
+  const s = slot(engine, tsid);
+  s.starved.push({ x: Math.round(x), at: now() });
+}
+
+/** Remains that are owed to this street (yard deaths while away, or a death cut short by travel). */
+function landStarvedRemains(engine) {
+  const s = slot(engine);
+  if (!s.starved.length) return;
+  const owed = s.starved;
+  s.starved = [];
+  for (const d of owed) dropStarvedRemains(engine, Number(d.x) || 0);
+  lastAction = `starved:landed:${owed.length}`;
+  engine.save();
 }
 
 // —— Sticks and machines (back yard) ——————————————————————————————————
@@ -556,6 +689,7 @@ function spawnStreet(engine) {
     for (const row of s.machines) buildPlaced(engine, 'machine', row);
   }
   for (const row of s.animals) buildExtraAnimal(engine, row);
+  landStarvedRemains(engine);
   // Chickens whose incubation finished while we were away lose the egg (onIncubationComplete: player not found).
   for (const target of engine.interactables) {
     if (target.classId !== 'npc_chicken' || !target.state?.incubatingEgg) continue;
@@ -580,7 +714,7 @@ function hideEcologyAnimal(engine, target) {
 function advanceYardNow(engine) {
   const yard = yardSlot(engine);
   if (!yard.machines.length && !yard.animals.length) return;
-  const events = advanceYard(yard, now(), { upgrades: engine.pc.imaginationUpgrades || [] });
+  const events = advanceYard(yard, now(), { upgrades: engine.pc.imaginationUpgrades || [], deathRng: deathRollFor(engine) });
   for (const ev of events) {
     if (ev.type === 'full') {
       const def = REMOTE_MACHINES[ev.classTsid];
@@ -592,6 +726,20 @@ function advanceYardNow(engine) {
     } else if (ev.type === 'happy' && isYard(engine)) {
       const cheered = extras.find((e) => e.row === ev.animal);
       if (cheered) engine.say(cheered.target, ev.line, 3000);
+    } else if (ev.type === 'die') {
+      // advanceYard already took it out of the herd. At home: the puff and the
+      // remains now (the catch-up on arrival runs before the herd is built, so
+      // there may be no sprite). Away: the remains wait in the yard slot.
+      if (isYard(engine)) {
+        const entity = extras.find((e) => e.row === ev.animal) || null;
+        starveExtra(engine, entity, { row: ev.animal, where: 'yard', replay: !entity });
+      } else {
+        yard.starved.push({ x: Math.round(Number(ev.animal.x) || 0), at: ev.at });
+        starvedCount += 1;
+        engine.pushActivity(starvedLine(ev.animal, 'yard'));
+        lastAction = 'starved:yard:away';
+        engine.save();
+      }
     } else if (ev.type === 'ascend') {
       gainXp(engine, ev.xp);
       // The drops land where the butterfly was (yard ground piles would need
@@ -899,7 +1047,7 @@ let engine_ref = null;
 function setupDemo(engine) {
   if (demoUsed) return;
   const mode = String(engine.param('animaldemo') || '');
-  if (!['batterfly', 'plop', 'incubate', 'name', 'herd', 'remote', 'sad'].includes(mode)) return;
+  if (!['batterfly', 'plop', 'incubate', 'name', 'herd', 'remote', 'sad', 'starve'].includes(mode)) return;
   if (mode === 'remote' && !isYard(engine)) return; // waits for the home street
   demoUsed = true;
   demoMode = mode;
@@ -1005,6 +1153,30 @@ function setupDemo(engine) {
     // A Hog-tied Piggy released here, and a Piglet in the pack (the animal-mood feature's QA).
     grant(engine, [HERDKEEPING.skill, 'animalkinship_1', 'animalkinship_2', 'animalkinship_3', 'animalkinship_4', 'animalkinship_5'], { hogtied_piggy: 1, piglet: 1, potato: 3 });
     later(1200, () => releasePiggyHere(engine));
+    return;
+  }
+
+  if (mode === 'starve') {
+    // G63 QA: release a Hog-tied Piggy here (so it is yours), starving, with
+    // its next twice-daily tick 3 s away; &animaldeathroll=0 makes it die.
+    grant(engine, [HERDKEEPING.skill], { hogtied_piggy: 1 });
+    later(1200, () => {
+      if (!releasePiggyHere(engine)) return;
+      const row = slot(engine).animals.at(-1);
+      if (!row) return;
+      Object.assign(row.state, { hunger: 10, croaking: true, mood: 1, hungerAt: now() + 3000 });
+      const entity = extras.find((e) => e.row === row);
+      if (entity) {
+        // Out from under the avatar (and the start street's Jack-O-Lantern) so the remains read in a screenshot.
+        const x = Math.min(engine.worldW - 120, row.x + 260);
+        row.x = x;
+        entity.baseX = x;
+        entity.sprite.x = x;
+        entity.target.subtitle = animalStatusLabel('npc_piggy', row.state);
+      }
+      lastAction = 'starve:released';
+      publish(engine, true);
+    });
     return;
   }
 
@@ -1193,6 +1365,8 @@ function publish(engine, force = false) {
   engine.setData('yardSticks', yard.sticks.map((k) => `${k.classTsid}@${k.x}`).join(','));
   engine.setData('hogtied', String(engine.inv.hogtied_piggy || 0));
   engine.setData('husbandryFlags', [...questFlags].join(','));
+  engine.setData('starvedPiggies', String(starvedCount));
+  engine.setData('yardStarved', String(yard.starved.length));
   const chicken = engine.interactables.find((t2) => t2.classId === 'npc_chicken' && t2.state?.incubatingEgg);
   engine.setData('incubation', chicken ? `${chicken.state.incubatingEgg}:${incubationPhase(chicken.state, t, incubationTiming(engine))}` : '');
   engine.setData('packBabies', ['chick', 'piglet', 'caterpillar'].map((id) => `${id}=${engine.inv[id] || 0}`).join(','));

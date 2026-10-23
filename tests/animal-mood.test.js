@@ -8,14 +8,21 @@ import { fileURLToPath } from 'node:url';
 import {
   DISALLOW_ANIMALS_TSIDS,
   NIBBLE_NA_FAIL,
+  PIGGY_DEATH_CHANCE,
+  PIGGY_DEATH_DROPS,
+  PIGGY_DEATH_PUFF,
   PIGGY_LINES,
+  PIGGY_PET_PROTECTS_MOOD,
   PIGGY_STARVATION_DEATH,
   PIGGY_TICK_MS,
   SAD_BABY,
   SAD_PIGGY_LINES,
   advancePiggies,
   ensurePiggyMood,
+  forcedRoll,
   incPiggyMood,
+  petPiggy,
+  piggyCanStarve,
   isSadIn,
   locationIsDepressing,
   piggyNibbleRefusal,
@@ -28,7 +35,7 @@ import { advanceYard, capturePiggy, captureVerbState, feedPiggyStack, normalizeH
 import { getVerbsFor, runVerb } from '../public/content.js';
 import { animalMoodFeature, describeAnimalPlace } from '../public/js/features/animal-mood-feature.js';
 import { remakeStatus } from '../public/js/imagination-remake.js';
-import { animalHusbandryFeature } from '../public/js/features/animal-husbandry-feature.js';
+import { animalHusbandryFeature, deathRollFor, normalizeHusbandrySlot } from '../public/js/features/animal-husbandry-feature.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const GSJS = join(homedir(), 'Documents/glitch-audit/glitch-GameServerJS/items');
@@ -93,7 +100,7 @@ describe('Piggy mood and hunger (npc_piggy.js onTwiceDaily)', () => {
     assert.ok(Number.isFinite(createAnimalState('npc_piggy').hungerAt));
   });
 
-  it('loses a mood every game day (has_been_petted is never set) and stays in 0..2', () => {
+  it('loses a mood every game day without a pet and stays in 0..2', () => {
     const s = ensurePiggyMood({ mood: 2, hunger: 0 }, 0);
     piggyTwiceDailyTick(s); // is_daily 1 -> 0: half day
     assert.equal(s.mood, 2);
@@ -138,14 +145,51 @@ describe('Piggy mood and hunger (npc_piggy.js onTwiceDaily)', () => {
     assert.equal(s.hunger, 10);
   });
 
-  it('keeps starvation death off unless enabled', () => {
-    assert.equal(PIGGY_STARVATION_DEATH, false);
-    const s = ensurePiggyMood({ hunger: 10, hungerAt: 1 }, 0);
-    assert.ok(!piggyTwiceDailyTick(s, { rng: () => 0 }).some((e) => e.type === 'die'));
-    const t = ensurePiggyMood({ hunger: 10, hungerAt: 1 }, 0);
-    assert.deepEqual(piggyTwiceDailyTick(t, { rng: () => 0, deathEnabled: true }).map((e) => e.type), ['croak', 'die']);
-    const u = ensurePiggyMood({ hunger: 10, hungerAt: 1 }, 0);
-    assert.ok(!piggyTwiceDailyTick(u, { rng: () => 0.6, deathEnabled: true }).some((e) => e.type === 'die'));
+  it('lets only owned piggies starve (G63: PIGGY_STARVATION_DEATH)', () => {
+    assert.deepEqual({ ...PIGGY_STARVATION_DEATH }, { owned: true, ecology: false });
+    assert.equal(PIGGY_DEATH_CHANCE, 0.5);
+    assert.equal(piggyCanStarve({ owned: true }), true);
+    assert.equal(piggyCanStarve({ owned: false }), false);
+    assert.equal(piggyCanStarve(), false);
+    const ecology = ensurePiggyMood({ hunger: 10, hungerAt: 1 }, 0);
+    for (let i = 0; i < 6; i += 1) {
+      assert.deepEqual(piggyTwiceDailyTick(ecology, { rng: () => 0 }).map((e) => e.type), ['croak'], 'an ecology piggy keeps croaking');
+    }
+    assert.equal(ecology.hunger, 10);
+    const owned = ensurePiggyMood({ hunger: 10, hungerAt: 1 }, 0);
+    assert.deepEqual(piggyTwiceDailyTick(owned, { rng: () => 0, owned: true }).map((e) => e.type), ['croak', 'die']);
+    const lucky = ensurePiggyMood({ hunger: 10, hungerAt: 1 }, 0);
+    assert.deepEqual(piggyTwiceDailyTick(lucky, { rng: () => 0.5, owned: true }).map((e) => e.type), ['croak'], 'is_chance(0.5) misses at 0.5');
+    const below = ensurePiggyMood({ hunger: 9, hungerAt: 1, isDaily: 1 }, 0);
+    assert.ok(!piggyTwiceDailyTick(below, { rng: () => 0, owned: true }).some((e) => e.type === 'die'), 'no roll below 10');
+    const forced = ensurePiggyMood({ hunger: 10, hungerAt: 1 }, 0);
+    assert.ok(!piggyTwiceDailyTick(forced, { rng: () => 0, owned: true, deathEnabled: false }).some((e) => e.type === 'die'));
+    assert.deepEqual(PIGGY_DEATH_DROPS, { meat: 10, plop: 1, meatDx: 0, plopDx: 80 });
+    assert.equal(PIGGY_DEATH_PUFF.dieAfterMs, 500);
+  });
+
+  it('replays an owned piggy starving on arrival, and never an ecology one', () => {
+    const t0 = 0;
+    const rows = [
+      { owned: true, state: ensurePiggyMood({ hunger: 10, mood: 1, hungerAt: t0 + 10 }, t0) },
+      { owned: false, state: ensurePiggyMood({ hunger: 10, mood: 1, hungerAt: t0 + 20 }, t0) },
+    ];
+    const out = advancePiggies(rows, t0 + PIGGY_TICK_MS * 6, { ctxFor: (row) => ({ owned: row.owned }), rng: () => 0 });
+    assert.equal(rows[0].dead, true);
+    assert.equal(rows[0].state.hungerAt, t0 + 10 + PIGGY_TICK_MS, 'the dead piggy ticks no more');
+    assert.equal(out.filter((r) => r.events.some((e) => e.type === 'die')).length, 1);
+    assert.ok(!rows[1].dead);
+    assert.equal(rows[1].state.hunger, 10);
+    assert.equal(out.filter((r) => r.row === rows[1]).length, 6, 'the ecology piggy croaks every tick of the absence');
+  });
+
+  it('forces the death roll from &animaldeathroll for QA', () => {
+    assert.equal(forcedRoll(null), Math.random);
+    assert.equal(forcedRoll(''), Math.random);
+    assert.equal(forcedRoll('0')(), 0);
+    assert.equal(forcedRoll('2')(), 0.999999);
+    assert.equal(deathRollFor({ param: (k) => (k === 'animaldeathroll' ? '0' : null) })(), 0);
+    assert.equal(deathRollFor({ param: () => null }), Math.random);
   });
 
   it('skips the tick while sad or rooked', () => {
@@ -202,6 +246,64 @@ describe('Piggy mood and hunger (npc_piggy.js onTwiceDaily)', () => {
     const s = createAnimalState('npc_piggy', { hunger: 1 });
     resetAnimalDay('npc_piggy', s);
     assert.equal(s.hunger, 1);
+  });
+});
+
+describe('A pet protects the mood that day (G63b: npc_piggy.js 1920-1927, fixed)', () => {
+  const pc = () => ({ energy: 100, mood: 40, imagination: 0, xp: 0 });
+
+  it('a successful pet sets has_been_petted and the next daily tick keeps the mood, then clears it', () => {
+    assert.equal(PIGGY_PET_PROTECTS_MOOD, true);
+    const s = createAnimalState('npc_piggy', { mood: 1, hunger: 0, isDaily: 0 });
+    assert.equal(s.hasBeenPetted, 0);
+    const pet = performAnimalKinship(s, 'npc_piggy', 'pet', { pc: pc(), inv: {}, learned: AK6, rng: () => 0.5 });
+    assert.equal(pet.ok, true);
+    assert.equal(s.mood, 2, 'onPetComplete +1');
+    assert.equal(s.hasBeenPetted, 1);
+    piggyTwiceDailyTick(s); // the daily half
+    assert.equal(s.mood, 2, 'petted since the last daily tick: no loss');
+    assert.equal(s.hasBeenPetted, 0, 'the tick clears the flag');
+    piggyTwiceDailyTick(s); // half day
+    piggyTwiceDailyTick(s); // next daily, no pet
+    assert.equal(s.mood, 1);
+  });
+
+  it('a half-day tick keeps the flag for the daily one; a failed pet sets nothing', () => {
+    const s = ensurePiggyMood({ mood: 1, hunger: 0, isDaily: 1 }, 0);
+    petPiggy(s);
+    assert.equal(s.mood, 2);
+    piggyTwiceDailyTick(s); // 1 -> 0: half day
+    assert.equal(s.hasBeenPetted, 1);
+    piggyTwiceDailyTick(s); // daily
+    assert.equal(s.mood, 2);
+    assert.equal(s.hasBeenPetted, 0);
+    const missed = createAnimalState('npc_piggy', { mood: 1 });
+    const res = performAnimalKinship(missed, 'npc_piggy', 'pet', { pc: pc(), inv: {}, learned: [], rng: () => 0.999 });
+    assert.equal(res.ok, false);
+    assert.equal(missed.hasBeenPetted, 0);
+    assert.equal(missed.mood, 1);
+  });
+
+  it('a sad or rooked piggy skips the tick and keeps the flag (source order)', () => {
+    const s = ensurePiggyMood({ mood: 1, isDaily: 0, hasBeenPetted: 1 }, 0);
+    piggyTwiceDailyTick(s, { sad: true });
+    assert.equal(s.hasBeenPetted, 1);
+    assert.equal(ensurePiggyMood({ hasBeenPetted: true }, 0).hasBeenPetted, 1, 'saves normalise to 0/1');
+  });
+
+  it('protects street replays and back yard piggies alike', () => {
+    const rows = [{ state: ensurePiggyMood({ mood: 1, hunger: 0, isDaily: 0, hungerAt: 5 }, 0) }];
+    petPiggy(rows[0].state);
+    advancePiggies(rows, 5);
+    assert.equal(rows[0].state.mood, 2, 'a released piggy petted before you left');
+    const yard = {
+      animals: [{ classId: 'npc_piggy', state: { hunger: 0, mood: 1, isDaily: 0, hungerAt: 1000 } }],
+      machines: [],
+    };
+    petPiggy(yard.animals[0].state);
+    advanceYard(yard, 1000);
+    assert.equal(yard.animals[0].state.mood, 2);
+    assert.equal(yard.animals[0].state.hasBeenPetted, 0);
   });
 });
 
@@ -348,6 +450,81 @@ describe('Back yard herd (advanceYard) moods', () => {
     assert.equal(yard.animals[0].state.mood, 1, 'the other piggy (mood 2) cheers it up');
     assert.equal(events.filter((e) => e.type === 'happy').length, 1);
     assert.equal(yard.animals[1].state.mood, 1);
+  });
+
+  it('starves a yard piggy at hunger 10 (it is yours) and takes it out of the herd', () => {
+    const doomed = { classId: 'npc_piggy', x: 300, state: { hunger: 10, mood: 1, hungerAt: 1000 } };
+    const fed = { classId: 'npc_piggy', x: 360, state: { hunger: 0, mood: 1, hungerAt: 1e12 } };
+    const yard = { animals: [doomed, fed], machines: [] };
+    const events = advanceYard(yard, 2000, { rng: () => 0.99, deathRng: () => 0 });
+    const die = events.find((e) => e.type === 'die');
+    assert.equal(die.animal, doomed);
+    assert.equal(die.at, 1000);
+    assert.deepEqual(yard.animals, [fed]);
+    assert.deepEqual(events.map((e) => e.type), ['croak', 'die']);
+  });
+
+  it('keeps the yard herd alive when the roll misses or a Piggy Feeder has food', () => {
+    const spared = { animals: [{ classId: 'npc_piggy', state: { hunger: 10, hungerAt: 1000 } }], machines: [] };
+    assert.ok(!advanceYard(spared, 2000, { deathRng: () => 0.5 }).some((e) => e.type === 'die'));
+    assert.equal(spared.animals.length, 1);
+    const feeder = { classTsid: 'piggy_feeder', x: 0, inside: 5, nextAt: 500 };
+    const fed = { animals: [{ classId: 'npc_piggy', state: { hunger: 10, croaking: true, hungerAt: 1000 } }], machines: [feeder] };
+    assert.ok(!advanceYard(fed, 2000, { deathRng: () => 0 }).some((e) => e.type === 'die'));
+    assert.equal(fed.animals[0].state.hunger, 1, 'fed at 500 ms, then one half-day of hunger');
+  });
+
+  it('keeps a starved yard piggy owed to the yard slot (remains land on arrival)', () => {
+    const s = normalizeHusbandrySlot({ starved: [{ x: 200, at: 5 }, null, { x: 'no' }] });
+    assert.deepEqual(s.starved, [{ x: 200, at: 5 }]);
+    assert.deepEqual(normalizeHusbandrySlot({}).starved, []);
+  });
+});
+
+describe('animal-mood feature: who starves on the street (G63)', () => {
+  function streetEngine(targets, params = {}) {
+    const data = {};
+    return {
+      data,
+      started: true,
+      street: { tsid: 'GCR10K3BPJK1U6F', hubId: '56', hubName: 'Groddle Forest' },
+      streetTsid: 'GCR10K3BPJK1U6F',
+      inScene: () => false,
+      transientInstance: () => false,
+      interactables: targets,
+      droppedItems: { streets: {} },
+      textures: {},
+      platforms: [],
+      player: { x: 0, y: 0 },
+      acting: () => false,
+      param: (k) => (k in params ? params[k] : null),
+      setData: (k, v) => { data[k] = v; },
+      say: () => {},
+      save: () => {},
+    };
+  }
+  const piggy = (extra = {}) => ({
+    classId: 'npc_piggy',
+    state: createAnimalState('npc_piggy', { hunger: 10, croaking: true, mood: 1, hungerAt: Date.now() - 10 }),
+    sprite: { x: 400, y: 500, scale: { x: 1 }, visible: true, destroyed: false },
+    ...extra,
+  });
+
+  it('calls husbandryStarve for a released piggy and only croaks an ecology one', () => {
+    animalMoodFeature.onStreetClear();
+    const calls = [];
+    const owned = piggy({ husbandryAnimal: 'a1', husbandryStarve: (opts) => { calls.push(opts); return true; } });
+    const wild = piggy();
+    wild.state.hungerAt = owned.state.hungerAt - 100; // ticks first, so the death is the last event
+    const engine = streetEngine([wild, owned], { animaldeathroll: '0' });
+    animalMoodFeature.onTick(16, 0, engine);
+    assert.equal(calls.length, 1, 'the owned piggy starved once');
+    assert.deepEqual(calls[0], { replay: true }, 'a tick that fell due before you arrived replays');
+    assert.equal(wild.state.hunger, 10);
+    assert.equal(wild.state.croaking, true);
+    assert.ok(wild.state.hungerAt > Date.now(), 'the ecology piggy ticked and lives');
+    assert.match(animalMoodFeature._state().lastEvent, /^die:replay$/);
+    animalMoodFeature.onStreetClear();
   });
 });
 

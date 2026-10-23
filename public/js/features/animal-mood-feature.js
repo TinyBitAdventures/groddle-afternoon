@@ -11,9 +11,15 @@
  * - Food dropped on the street, or a trant you harvest, water or pet with
  *   fruit on it, sends every hungry piggy to it: on arrival it eats one,
  *   chews, says "Yum!" and its hunger goes to 0.
- * - A piggy at hunger 10 says "I'm about to croak!" once a minute. It does
- *   not die: PIGGY_STARVATION_DEATH in js/animal-mood.js is off (a design
- *   decision for Austin).
+ * - A piggy at hunger 10 says "I'm about to croak!" once a minute. Only a
+ *   piggy you own (released or raised: the animal-husbandry feature's
+ *   extras) can starve: each tick at 10 rolls 50% and the tick's die event
+ *   calls the target's husbandryStarve (smoke puff, gone, 10 Meat and a
+ *   Plop), live or replayed on arrival. Street-ecology piggies never die
+ *   and keep croaking (PIGGY_STARVATION_DEATH, Austin's call G63). The back
+ *   yard herd starves through advanceYard.
+ * - A pet sets has_been_petted, so the next daily tick keeps that piggy's
+ *   mood (PIGGY_PET_PROTECTS_MOOD, Austin's fix of the source bug G63b).
  * - Nibble: petted (or Animal Kinship VI) but mood 0 or hunger > 2, the
  *   piggy refuses at once (no action bar), sulks and says nibble_na_fail.
  * - Piggies (and the Chick, Piglet and Caterpillar in your pack) are sad in
@@ -25,7 +31,11 @@
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=piggy
  *   &animalrank=6&animalreset=1&animalmood=0 (E → nibble refuses);
  *   &animalhunger=9&animalfood=potato drops 3 Potatoes 220 px away and the
- *   piggy walks over and eats one; &animalhunger=10 croaks.
+ *   piggy walks over and eats one; &animalhunger=10 croaks. Add
+ *   &animaldeathroll=0 (or 0.99) to put the demo piggy's next tick 3 s away
+ *   and force the starvation roll: an ecology piggy only croaks, an owned one
+ *   (&animaldemo=starve, or the yard's &homedemo=home&animaldemo=remote)
+ *   dies.
  *   Sad: &animaldemo=sad&streetdemo=GA9114MS8B32FB2 releases a Hog-tied
  *   Piggy in Churni Sanctum (Ilmenskie Deeps) and puts a Piglet in the
  *   pack. Canvas: animalMoodDepressing, animalMoodSad, animalMoodPiggy
@@ -53,6 +63,7 @@ import {
   SAD_PIGGY_LINES,
   advancePiggies,
   ensurePiggyMood,
+  forcedRoll,
   isSadIn,
   locationIsDepressing,
   pickLine,
@@ -119,6 +130,7 @@ let publishAt = 0;
 let lastEvent = '';
 let qaApplied = false;
 let foodDemoDone = false;
+let tickCount = 0; // QA: twice-daily ticks that produced events (at hunger 10 every tick croaks)
 
 const now = () => Date.now();
 
@@ -390,19 +402,35 @@ function ctxFor(engine, depressing) {
     sad: isSadIn('npc_piggy', depressing),
     rooked: isRooked(row.target, engine),
     findFood: () => findFoodFor(engine, row.target),
+    // PIGGY_STARVATION_DEATH: only piggies you own (released or raised) can starve.
+    owned: isExtra(row.target),
   });
+}
+
+/** &animaldeathroll forces the 50% starvation roll for QA. */
+function deathRoll(engine) {
+  return forcedRoll(engine.param('animaldeathroll'));
 }
 
 function handleTickEvents(engine, results, { live }) {
   for (const { row, events } of results) {
+    tickCount += 1;
     for (const ev of events) {
       if (ev.type === 'happy' && live) say(engine, row.target, ev.line, 3000);
-      if (ev.type === 'croak') recordFor(row.target).nextCroakAt = Math.min(recordFor(row.target).nextCroakAt || Infinity, now() + 1500);
+      if (ev.type === 'croak') {
+        recordFor(row.target).nextCroakAt = Math.min(recordFor(row.target).nextCroakAt || Infinity, now() + 1500);
+        lastEvent = `croak:tick:${isExtra(row.target) ? 'owned' : 'ecology'}`;
+      }
       if (ev.type === 'seek' && live && !ev.ate) {
         const r = recordFor(row.target);
         if (canSeek(engine, r)) startSeek(engine, r, ev.food);
       }
-      if (ev.type === 'die') lastEvent = 'die:disabled-world-side';
+      if (ev.type === 'die') {
+        // npc_piggy.js 1958-1973: only an owned piggy rolls this (ctx.owned);
+        // the husbandry feature plays the puff and drops the Meat and Plop.
+        const starve = row.target.husbandryStarve;
+        lastEvent = typeof starve === 'function' && starve({ replay: !live }) ? `die:${live ? 'live' : 'replay'}` : 'die:unowned';
+      }
     }
     row.target.subtitle = animalStatusLabel('npc_piggy', row.state);
   }
@@ -422,6 +450,7 @@ function adoptNew(engine) {
     const rows = piggyRows(engine);
     handleTickEvents(engine, advancePiggies(rows, now(), {
       ctxFor: ctxFor(engine, depressing),
+      rng: deathRoll(engine),
       eat: (row, food) => {
         if (!eatOffline(engine, food)) return false;
         satePiggy(row.state);
@@ -442,7 +471,7 @@ function liveTicks(engine) {
   const rows = piggyRows(engine);
   if (!rows.some((row) => Number(row.state.hungerAt) <= now())) return;
   const depressing = animalPlaceIsDepressing(engine);
-  handleTickEvents(engine, advancePiggies(rows, now(), { ctxFor: ctxFor(engine, depressing) }), { live: true });
+  handleTickEvents(engine, advancePiggies(rows, now(), { ctxFor: ctxFor(engine, depressing), rng: deathRoll(engine) }), { live: true });
 }
 
 /** onContainerItemAdded: new food on the street sends the hungry piggies. */
@@ -495,6 +524,8 @@ function applyQaParams(engine) {
     s.hunger = Math.max(0, Math.min(PIGGY_HUNGER.max, Math.floor(Number(hunger))));
     s.croaking = s.hunger === PIGGY_HUNGER.max;
     if (s.croaking) recordFor(target).nextCroakAt = now() + 2000;
+    // Starvation QA: the next twice-daily tick lands in 3 s (yard piggies tick in advanceYard).
+    if (engine.param('animaldeathroll') !== null) s.hungerAt = now() + 3000;
   }
   target.subtitle = animalStatusLabel('npc_piggy', s);
   lastEvent = `qa:mood=${s.mood}:hunger=${s.hunger}`;
@@ -536,6 +567,7 @@ function publish(engine, force = false) {
   const pose = demo ? `${Math.round(demo.sprite.x)}:${demo.sprite.scale.x >= 0 ? 'R' : 'L'}:${records.get(demo)?.mode || 'idle'}` : '';
   engine.setData('animalMoodPose', pose);
   engine.setData('animalMoodLast', lastEvent);
+  engine.setData('animalMoodTicks', String(tickCount));
 }
 
 function resetStreet(engine) {

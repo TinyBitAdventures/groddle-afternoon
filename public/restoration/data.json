@@ -1805,9 +1805,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 291,
+  "commits": 292,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "An \"Every change\" page lists everything restored, day by day"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1922,11 +1927,6 @@
     "date": "2026-10-23",
     "kind": "fix",
     "text": "Juju Bandits no longer appear on ledges they can't walk down from"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Smugglers, Rube, the squids, the flamingos, Grandma and the Juju Bandits are sharp on Retina"
    }
   ]
  },

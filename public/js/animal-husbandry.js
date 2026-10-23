@@ -930,26 +930,31 @@ function isLeftMost(machine, machines) {
 }
 
 /**
- * npc_animal onTwiceDaily (js/animal-mood.js): mood -1 each game day, the
- * other yard piggies cheer up a mood-0 piggy, hunger +1 each half day below
- * 2, then only on the daily tick, croaking at 10. The yard has no sad
- * animals (it is not a depressing place) and its food comes from the Piggy
- * Feeder pass below; dropped food is handled live on the street.
+ * npc_animal onTwiceDaily (js/animal-mood.js): mood -1 each game day unless
+ * petted since the last one, the other yard piggies cheer up a mood-0 piggy,
+ * hunger +1 each half day below 2, then only on the daily tick, croaking at
+ * 10 with the 50% starvation roll: the yard herd is yours, so it can die
+ * (PIGGY_STARVATION_DEATH). The yard has no sad animals (it is not a
+ * depressing place) and its food comes from the Piggy Feeder pass below;
+ * dropped food is handled live on the street.
  */
-function hungerTick(subject, animals) {
+function hungerTick(subject, animals, rng) {
   const neighbourMoods = animals
     .filter((a) => a !== subject && a.classId === 'npc_piggy')
     .map((a) => a.state.mood);
-  return piggyTwiceDailyTick(subject.state, { neighbourMoods });
+  return piggyTwiceDailyTick(subject.state, { neighbourMoods, owned: true, rng });
 }
 
 /**
  * Advance a back yard (animals + machines) to `now`, replaying every hunger
  * tick, feeder pass and collector pass in time order so a long absence works
- * like the server's intervals did. Returns events: { type: 'full', classTsid }
- * and { type: 'ascend', animal, drops }.
+ * like the server's intervals did. Returns events: { type: 'full', classTsid },
+ * { type: 'ascend', animal, drops }, { type: 'happy'|'croak', animal, line }
+ * and { type: 'die', animal, at } (a starved piggy, already taken out of
+ * yard.animals; the caller puts down its Meat and Plop). `deathRng` rolls
+ * only the starvation chance (QA forces it), `rng` everything else.
  */
-export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.random } = {}) {
+export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.random, deathRng = rng } = {}) {
   const events = [];
   if (!yard) return events;
   const animals = (yard.animals ||= []);
@@ -985,10 +990,15 @@ export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.
     }
     if (!kind || at > now) break;
     if (kind === 'hunger') {
-      for (const ev of hungerTick(subject, animals)) {
+      const tick = hungerTick(subject, animals, deathRng);
+      for (const ev of tick) {
         if (ev.type === 'happy' || ev.type === 'croak') events.push({ type: ev.type, animal: subject, line: ev.line });
       }
       subject.state.hungerAt += HALF_DAY_MS;
+      if (tick.some((ev) => ev.type === 'die')) {
+        animals.splice(animals.indexOf(subject), 1);
+        events.push({ type: 'die', animal: subject, at });
+      }
       continue;
     }
     const m = subject;
