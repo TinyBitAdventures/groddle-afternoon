@@ -277,8 +277,11 @@ function towerPieces(state, W, construction) {
     }
   }
   // The floor's own frame below, and the next floor's (or the roof's) above.
+  // tower_build_expansion (tower.js 1050-1056) gives the construction floor
+  // only the base frame over its open top; the frame under it is the top
+  // frame of the finished floor below (tower_build_floor is_top).
   add(out, 'frame_h', T.hz, 0, B, width, fh, { tile: T.hzW });
-  add(out, 'frame_h', T.hz, 0, B - 458 - fh, width, fh, { tile: T.hzW });
+  if (!construction) add(out, 'frame_h', T.hz, 0, B - 458 - fh, width, fh, { tile: T.hzW });
   const order = new Map(LAYERS.map((name, i) => [name, i]));
   const pieces = out.map((row, i) => ({ row, i })).sort((a, b) => order.get(a.row.layer) - order.get(b.row.layer) || a.i - b.i).map(({ row }) => row);
   return {

@@ -137,6 +137,12 @@ describe('room composition (inc_homes.js homes_rebuild_floor)', () => {
     assert.ok(c.pieces.some((p) => p.piece === 'towerbase_floor'));
     assert.ok(c.pieces.some((p) => p.piece === 'towerbase_wallpaper_right'));
     assert.equal(c.walls.length, 0);
+    // tower.js 1050-1056: only the base frame over the open top (where the regular top frame sat); the regular frame stays under it
+    const frames = (r) => r.pieces.filter((p) => p.layer === 'frame_h').map((p) => `${p.piece}@${p.y}`);
+    const fl = frames(t);
+    const fc = frames(c);
+    assert.equal(fl.length, 2);
+    assert.deepEqual(fc, [`crosssection_tower_base_horizontal_1177px@${fl[1].split("@")[1]}`, fl[0]]);
   });
 
   it('hits a segment centre (45 px inset) for one segment, its edge for the whole room', () => {

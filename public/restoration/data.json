@@ -1410,9 +1410,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 277,
+  "commits": 278,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Hair seen from behind keeps its streaks instead of a white cap"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1527,11 +1532,6 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Speech bubble tails join their bubble instead of sitting under a line"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Browsers reload the feature registry with Grab 'Em Good in it"
    }
   ]
  },
