@@ -5,7 +5,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertStreetGeometry, platformsScreen } from '../public/js/street-model.js';
@@ -31,8 +31,10 @@ import {
   ROOM_4_DRINKS,
   ROOM_4_TSID,
   ROOM_8_TSID,
+  TOWER_ROOM_4_ART_ROOT,
   anyTowerRoomByTsid,
   anyTowerRoomStreet,
+  flats,
 } from '../public/js/tower-challenge-rooms.js';
 import { ladderTopDeck } from '../public/js/street-model.js';
 
@@ -400,18 +402,21 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
     }
   });
 
-  it('use only art the archived corridors use, all of it on disk', () => {
+  it('use only art on disk: Room 8 the corridors\' set, Room 4 wardrobia felt (G72), Room 16 firebog bottletree (G72)', () => {
     const corridorArt = new Set();
     for (const tsid of ['GIF1QBNPP7123J0', 'GIF1Q3IQM7122SP', 'GIF1Q48RM712F87', 'GTJ10K7P3812R8F', 'GTJ10M515812V0C', 'GTJ110817812KO4']) {
       for (const layer of street(tsid).layers) for (const d of layer.decos) corridorArt.add(d.sprite);
     }
     corridorArt.add('jethimadh_frame_cap').add('jethimadh_frame_wall'); // Room 15's shell (the corridors' firebog.swf set)
     const manifest = new Set(JSON.parse(readFileSync(join(spike, 'public/assets/decos/manifest.json'), 'utf8')));
+    const firebogDir = join(spike, '../research/audio-hunt/raw/glitch-locations/source/firebog');
+    const firebog = existsSync(firebogDir) ? new Set(readdirSync(firebogDir).filter((f) => f.endsWith('.swf')).map((f) => f.slice(0, -4))) : null;
     for (const room of CHALLENGE_ROOMS) {
       const s = street(room.tsid);
       for (const layer of s.layers) {
         for (const d of layer.decos) {
-          assert.ok(corridorArt.has(d.sprite), `${room.label}: ${d.sprite}`);
+          if (room.tsid === ROOM_8_TSID) assert.ok(corridorArt.has(d.sprite), `${room.label}: ${d.sprite}`);
+          else if (room.tsid === ROOM_16_TSID && firebog) assert.ok(firebog.has(d.sprite), `${room.label}: ${d.sprite} is not a firebog.swf deco`);
           assert.ok(manifest.has(d.sprite), d.sprite);
         }
       }
@@ -421,6 +426,45 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
       for (const l of room.ladders) assert.ok(l.why, l.id);
       for (const i of room.items || []) assert.ok(i.why, i.id);
     }
+    // Room 4 is drawn from its art rows only: wardrobia pieces (tools/room-art tower_room_4) and the corridor ladder.
+    assert.ok(street(ROOM_4_TSID).layers.every((l) => l.decos.every((d) => /^ladder_/.test(d.sprite))), 'Room 4\'s street keeps only its ladder art');
+    assert.equal(street(ROOM_4_TSID).swf_file, 'wardrobia.swf');
+    assert.deepEqual(street(ROOM_4_TSID).gradient, { top: 'cbe5f8', bottom: 'cbe5f8' });
+    const plan = JSON.parse(readFileSync(join(spike, 'tools/room-art/tower_room_4.json'), 'utf8')).pieces;
+    for (const a of room4.art) {
+      assert.ok(a.z < 0, `${a.name} stays behind the avatar`);
+      if (a.fill != null) continue;
+      const file = a.src.replace(/\.png$/, '.webp');
+      assert.ok(existsSync(join(spike, 'public', file)), file);
+      if (a.src.startsWith(TOWER_ROOM_4_ART_ROOT)) assert.match(plan[a.name].swf, /^bundle:wardrobia\.swf#/);
+      else assert.match(a.name, /^ladder_/);
+    }
+    assert.equal(room4.art.filter((a) => a.signText).map((a) => [a.name, a.signText]).join(), 'wardrobia_arrow_1,EXIT');
+  });
+
+  it('G72 dressing follows the unchanged platforms: felt ground on every Room 4 floor run, planks on every Room 16 run', () => {
+    // Each felt band's grass top (bottom-centre anchor turned by r) runs within 12 px of 28 px over every floor run.
+    const grounds = room4.art.filter((a) => a.name === 'platform_with_xsection_1').map((g) => {
+      const t = (g.r * Math.PI) / 180;
+      const tx = g.x + g.h * Math.sin(t);
+      const ty = g.y - g.h * Math.cos(t);
+      return { left: tx - (g.w / 2) * Math.cos(t), right: tx + (g.w / 2) * Math.cos(t), top: (x) => ty + Math.tan(t) * (x - tx) };
+    });
+    for (const f of flats(room4.platforms).filter((r) => r.y > -600 && !/_lip_/.test(r.id))) {
+      const xc = (f.x1 + f.x2) / 2;
+      assert.ok(grounds.some((g) => g.left <= f.x1 && f.x2 <= g.right && Math.abs(g.top(xc) - (f.y - 28)) <= 12), `${f.id} has felt ground`);
+    }
+    const island = room4.art.find((a) => a.name === 'platform_with_skirt_1');
+    assert.ok(island.x - island.w / 2 <= room4.wayOut.left && room4.wayOut.right <= island.x + island.w / 2);
+    const planks = street(ROOM_16_TSID).layers[0].decos.filter((d) => d.sprite === 'platform_bottletree_flat');
+    for (const f of flats(room16.platforms)) {
+      assert.ok(planks.some((d) => d.x - d.w / 2 <= f.x1 && f.x2 <= d.x + d.w / 2 && d.y === f.y + 22), `${f.id} has planks`);
+    }
+    // Room 16's way out is the pod's mouth: the pod stands round the archived arrival.
+    const pod = street(ROOM_16_TSID).layers[0].decos.find((d) => d.sprite === 'bottletree_body2');
+    const door = room16.doors[0];
+    assert.equal(door.sprite, 'ground_cutaway_hollow1');
+    assert.ok(Math.abs(pod.x - door.x) <= 2 && pod.y > door.y && pod.y - pod.h < door.y - door.h);
   });
 
   it('the archived corridor doors lead in at their archived arrivals, still locked by their keys', () => {

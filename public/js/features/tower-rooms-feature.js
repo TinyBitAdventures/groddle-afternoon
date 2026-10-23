@@ -16,7 +16,10 @@
  *   by walking onto it (the rule of Corridor One's key_drop box, location.js);
  * - Room 4's garden (4 spinach plots, empty ones replanted once a game day)
  *   and its six drinks, and Room 16's Spinach: floor items you pick up, each
- *   back once a game day.
+ *   back once a game day;
+ * - a room's `art` rows (Room 4's wardrobia felt meadow, G72: its art lives
+ *   in assets/sprites/tower-rooms/, outside the street deco set), drawn
+ *   behind the avatar in row order, with any painted signText.
  *
  * QA (rooms are reached through their real corridor doors, see doors-feature):
  *   ?autostart=1&questoffer=off&doordemo=GTJ10K7P3812R8F&doorindex=0&doorkey=4&doorautoplay=1
@@ -31,7 +34,7 @@
  *       C6W's locked door into Room 16
  *   &towerroomspinach=1  eat a Spinach (High Jumper, 7 s) on arrival in a rebuilt room;
  *                        =hold keeps it up while you are in one
- * Canvas data: towerRoom, towerRoomSigns, towerRoomKey, towerRoomKeyDay,
+ * Canvas data: towerRoom, towerRoomArt, towerRoomSigns, towerRoomKey, towerRoomKeyDay,
  * towerRoomItems, towerRoomGarden, towerRoomLast.
  */
 
@@ -40,8 +43,8 @@ import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { DOOR_TEXT, doorKeyClass, insideBottomRect } from '../doors.js';
 import { textureFromUrl } from '../textures.js';
 import { ROOM_15_TSID } from '../tower-rooms.js?v=tower-rooms-1';
-import { anyTowerRoomByTsid as baseRoomByTsid } from '../tower-challenge-rooms.js?v=challenge-rooms-2';
-import { midTowerRoomByTsid } from '../tower-mid-rooms.js?v=mid-tower-2';
+import { anyTowerRoomByTsid as baseRoomByTsid } from '../tower-challenge-rooms.js?v=challenge-rooms-3';
+import { midTowerRoomByTsid } from '../tower-mid-rooms.js?v=mid-tower-3';
 
 const anyTowerRoomByTsid = (tsid) => baseRoomByTsid(tsid) || midTowerRoomByTsid(tsid);
 
@@ -101,6 +104,65 @@ function drawSigns(engine, street) {
     engine.entityLayer.addChild(t);
     views.push(t);
     n += 1;
+  }
+  return n;
+}
+
+/** Sign text in the plaques' style, centred at (x, y) in street-screen space. */
+function signLabel(engine, text, x, y, z, fill = 0xf3e2b8, stroke = 0x2b1a0e) {
+  const t = new engine.PIXI.Text({ text, style: {
+    fontFamily: '"Trebuchet MS", sans-serif',
+    fontSize: text.length > 10 ? 15 : 19,
+    fontWeight: '700',
+    fill,
+    stroke: { color: stroke, width: 3 },
+    align: 'center',
+  } });
+  t.resolution = 3;
+  t.anchor.set(0.5, 0.5);
+  t.x = x;
+  t.y = y;
+  t.zIndex = z;
+  t.eventMode = 'none';
+  engine.entityLayer.addChild(t);
+  views.push(t);
+  return t;
+}
+
+/**
+ * A room's `art` rows (world space, bottom-centre anchors, negative z so they
+ * stay behind doors, items and the avatar): a sprite from `src`, or a `fill`
+ * rectangle. Returns the number drawn.
+ */
+function drawArt(engine, room, street) {
+  const { PIXI } = engine;
+  const { l, t } = street.bounds;
+  let n = 0;
+  for (const a of room.art || []) {
+    if (a.fill != null) {
+      const g = new PIXI.Graphics();
+      g.rect(a.x1 - l, a.y1 - t, a.x2 - a.x1, a.y2 - a.y1).fill(a.fill);
+      g.zIndex = a.z;
+      g.eventMode = 'none';
+      engine.entityLayer.addChild(g);
+      views.push(g);
+      n += 1;
+      continue;
+    }
+    const s = new PIXI.Sprite(textureFromUrl(a.src));
+    s.anchor.set(0.5, 1);
+    s.x = a.x - l;
+    s.y = a.y - t;
+    s.width = a.w;
+    s.height = a.h;
+    if (a.flip) s.scale.x = -Math.abs(s.scale.x);
+    if (a.r) s.angle = a.r;
+    s.zIndex = a.z;
+    s.eventMode = 'none';
+    engine.entityLayer.addChild(s);
+    views.push(s);
+    n += 1;
+    if (a.signText) signLabel(engine, a.signText, s.x - (a.flip ? -1 : 1) * a.w * 0.08, s.y - a.h / 2, a.z + 0.5, 0xffffff, 0x3b5fa8);
   }
   return n;
 }
@@ -257,6 +319,7 @@ export const towerRoomsFeature = {
     const room = anyTowerRoomByTsid(street?.tsid);
     engine.setData('towerRoom', room ? room.tsid : '');
     if (!room) return;
+    engine.setData('towerRoomArt', drawArt(engine, room, street));
     engine.setData('towerRoomSigns', drawSigns(engine, street));
     const box = keyBox(street);
     if (box) {

@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 316,
+  "commits": 317,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Notes, a blog of build write-ups that replaces the old build archive page"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1924,11 +1929,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Yellow Crumb really does double your learning speed for a minute"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Buying Brain Capacity speeds up the skill you're studying"
    }
   ]
  },

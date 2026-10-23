@@ -50,7 +50,7 @@
  */
 
 import { towerRoomIndexEntry } from './tower-rooms.js?v=tower-rooms-1';
-import { DOOR, anyTowerRoomStreet, barriersFor, collector, flat, ladder, lantern, plaque, shell } from './tower-challenge-rooms.js?v=challenge-rooms-2';
+import { DOOR, anyTowerRoomStreet, barriersFor, collector, flat, ladder, lantern, plaque, shell } from './tower-challenge-rooms.js?v=challenge-rooms-3';
 import { HALL, HALL_TSID, buildHall } from './hall-rejected-concepts.js';
 
 export const STAIRS_TSID = 'GIFFUV4ATQ72I6D';
@@ -201,9 +201,15 @@ function buildStairs() {
     lantern(1050, f1.high.y - 120),
     lantern(-2300, f2.high.y - 120),
   );
-  // Plaques beside the doors at mid height, as the corridors hang theirs.
-  plaque(c, arrival.x + 190, arrival.y - 70, 'Tower St West');
+  // Plaques beside the doors at mid height, as the corridors hang theirs. G72:
+  // a player Snap of the Stairs (jtower_stairs/, reference only) shows the
+  // arched door at the low end with an "EXIT" plaque beside it; both plaques
+  // sit in front of the second flight's backdrop (z 40+), which hid them. The
+  // EXIT plaque hangs just past flight 1's first pillar (x -2278, FG), which
+  // stands where the corridors' plaque spot would be.
+  plaque(c, arrival.x + 380, arrival.y - 70, 'EXIT');
   plaque(c, mezzDoorX + 190, f2.high.y - 70, 'Mezzanine');
+  for (const d of c.decos) if (d.sprite === 'jethimadh_int_door_sign' || d.sprite === 'firebog_sign_blank') d.z += 30;
   c.platforms.push(flat('st_ceiling', bounds.l + 40, bounds.r - 40, bounds.t + 35, 'Stairwell roof (solid from below).', 1));
 
   return {
@@ -239,6 +245,7 @@ function buildStairs() {
     why: {
       room: 'Maps: LIFFUV4ATQ72I6D "Stairs" in hub 96 "Jethimadh Tower: Mid". B: "visit Tower St. West, climb the Stairs to reach the Mezzanine". N: "Enter the Tower via the giant door on Tower St. West ... and ascend the stairway to the Mezzanine."',
       size: 'Remake: the arrival x -2463 puts the door near the left end, so the street starts at -2750; two Corridor Four flights (each 3274 wide, 273 up) stacked as a switchback reach 1157 px over the arrival. 300+ px of world under the lowest floor (b 210) like the base rooms.',
+      decor: 'G72: Tower St West\'s archived door into the Stairs carries swf_file_versioned .../locations/firebog/1316548751.swf (streets GIF5UU8FO3029OK.xml), the corridors\' bundle, and a player Snap (2012-12-09, jtower_stairs/, reference only) shows the corridor set itself: a tilted curved wooden tube (jethimadh_int_bg_*), stepped sliced-tree "pews" (jethimadh_int_steps_1), a spotted pillar (jethimadh_int_pillar_1), a hanging lantern (jethimadh_int_lantern_1), the arched door (door_asset_jethimadh_int) with an EXIT plaque. So the Corridor Four flights stay; the low door\'s plaque reads EXIT and both plaques are lifted in front of the second flight. A second Snap (2012-06, Ancient filter) is too blurred to read.',
     },
   };
 }

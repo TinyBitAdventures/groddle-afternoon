@@ -91,6 +91,21 @@ describe('Jethimadh Tower: Mid rooms: street data', () => {
     assert.ok(existsSync(join(spike, 'public', GREETERBOT.art)));
   });
 
+  it('the Stairs keep the corridor set (G72 Snap) with an EXIT plaque by the low door, in front of both flights and clear of the FG pillar', () => {
+    const plaques = stairs.decos.filter((d) => d.sprite === 'jethimadh_int_door_sign');
+    const signs = stairs.decos.filter((d) => d.signText).map((d) => d.signText);
+    assert.deepEqual(signs, ['EXIT', 'Mezzanine']);
+    const backdrop = Math.max(...stairs.decos.filter((d) => d.layer === 'mg' && !d.signText && d.sprite !== 'jethimadh_int_door_sign').map((d) => d.z));
+    for (const p of plaques) assert.ok(p.z > backdrop, `plaque z ${p.z} over ${backdrop}`);
+    const exit = plaques.find((p) => Math.abs(p.y - (stairs.doors[0].y - 70)) <= 1);
+    const out = stairs.doors.find((d) => d.connect.label === 'Tower St West');
+    assert.ok(exit.x > out.x && exit.x - out.x < 450);
+    for (const pillar of stairs.decos.filter((d) => d.layer === 'fg' && /pillar/.test(d.sprite) && d.y > out.y - 600)) {
+      assert.ok(Math.abs(pillar.x - exit.x) >= (pillar.w + exit.w) / 2 - 20, `pillar at ${pillar.x} covers the plaque at ${exit.x}`);
+    }
+    assert.match(stairs.why.decor, /firebog\/1316548751\.swf/);
+  });
+
   it('keep 300+ px of world under the lowest floor', () => {
     for (const room of MID_TOWER_ROOMS) assert.ok(room.bounds.b - lowestFloor(room) >= 300, room.label);
   });

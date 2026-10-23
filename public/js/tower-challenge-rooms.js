@@ -21,15 +21,27 @@
  *      half, left of the C6E door.
  *   F  Forum thread 3343 (tower test day, 2011-05): Room 4 "I drank the
  *      drinks, harvested the plots and replanted"; "my was it purty".
- * Art is only the corridors' own CC0 set (firebog.swf jethimadh_int_*,
- * jethimadh_frame_*, the corridors' ladder and decor_plants pieces,
- * door_asset_jethimadh_int); no pixels from screenshots or video.
+ * Art: Room 8 is the corridors' own CC0 set (firebog.swf jethimadh_int_*,
+ * jethimadh_frame_*, the corridors' ladder, door_asset_jethimadh_int). Rooms
+ * 4 and 16 are not tower interiors (G72): players' Snaps
+ * (research/wayback/raw/snaps/jtower_room_4/, jtower_room_16/, reference
+ * only) show a felt-craft meadow and a black cave round a wooden bottletree
+ * pod, and the archived corridor doors name each room's location SWF:
+ *   Corridor Two  door_1304676445973 connect swf .../locations/wardrobia/1304967037.swf
+ *   Corridor Six  door_1304678594665 connect swf .../locations/firebog/1331248191.swf
+ * Room 4 is dressed from the CC0 wardrobia.swf set (tools/room-art set
+ * tower_room_4, drawn by features/tower-rooms-feature.js from `art`), Room 16
+ * from firebog.swf's bottletree pieces already among the street decos. No
+ * deco lists survive for either, so the layouts are read off the Snaps; the
+ * platforms, ladder, doors, keys and items are unchanged. No pixels from
+ * screenshots or video.
  *
  * tools/build-tower-rooms.mjs writes all five rooms' street JSON. The shell,
  * ladder, plaque, lantern and wall helpers are exported for js/tower-mid-rooms.js.
  */
 
 import { stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=tower-rooms-1';
+import { TOWER_ROOM_4_FILES } from './tower-room-4-art.js';
 
 export const ROOM_4_TSID = 'GIF1Q6PMN7123NQ';
 export const ROOM_8_TSID = 'GIF1FHA10312KLV';
@@ -155,6 +167,16 @@ export function plaque(c, x, y, text) {
 
 export const lantern = (x, y, big = false) => ({ sprite: 'jethimadh_int_lantern_1', x, y, w: big ? 353 : 300, h: big ? 533 : 450, z: 3, r: 0, layer: 'fg' });
 
+/** The flat walkable runs of a platform list (floor-type, |rise| <= 4 px, 16+ px long), world. */
+export function flats(platforms) {
+  return platforms
+    .filter((p) => p.pc_perm === -1 && Math.abs(p.y2 - p.y1) <= 4 && Math.abs(p.x2 - p.x1) >= 16)
+    .map((p) => ({ id: p.id, x1: Math.min(p.x1, p.x2), x2: Math.max(p.x1, p.x2), y: Math.round((p.y1 + p.y2) / 2) }));
+}
+
+export const TOWER_ROOM_4_ART_ROOT = 'assets/sprites/tower-rooms/room_4/';
+const DECO_ROOT = 'assets/decos/groddle/';
+
 export const barriersFor = (bounds, id) => [
   { id: `wall_${id}_left`, x: bounds.l + 32, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
   { id: `wall_${id}_right`, x: bounds.r - 32, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
@@ -174,10 +196,84 @@ export const ROOM_4_DRINKS = Object.freeze([
   { cls: 'slow_gin_fizz', label: 'Slow Gin Fizz' },
 ]);
 
+/** sky_large_1's linen blue (the CC0 render's mid-tone), the room's sky gradient behind the felt. */
+export const ROOM_4_SKY = 'cbe5f8';
+/** platform_with_xsection_1's soil (the CC0 render's brown), filled under the felt ground. */
+const ROOM_4_SOIL = 0x8f7d4f;
+
+/**
+ * Room 4's dressing as draw rows for features/tower-rooms-feature.js (world
+ * space, bottom-centre anchors, z behind the avatar): wardrobia.swf pieces from
+ * tools/room-art (TOWER_ROOM_4_FILES) and the corridor ladder from the street
+ * decos. Every floor run gets felt ground whose grass top sits 28 px over it.
+ */
+function room4Art(c, bounds, fl) {
+  const art = [];
+  const felt = (name, x, y, { w, h, z, flip, r, signText } = {}) => {
+    const [file, fw, fh] = TOWER_ROOM_4_FILES[name];
+    const row = { name, src: `${TOWER_ROOM_4_ART_ROOT}${file}`, x: Math.round(x), y: Math.round(y), w: Math.round(w ?? fw), h: Math.round(h ?? fh), z, r: r || 0 };
+    if (flip) row.flip = true;
+    if (signText) row.signText = signText;
+    art.push(row);
+    return row;
+  };
+  const ground = (x) => floorY(c.platforms, x);
+
+  // The sky: one linen swatch past every edge of the room, the stitched patch rising from the meadow.
+  felt('sky_large_1', 0, bounds.b + 120, { w: 3700, h: 2900, z: -99 });
+  felt('sky_patch_1', 260, fl.mid - 20, { w: 700, h: 360, z: -90, r: -62 });
+  for (const [name, x, y, s] of [
+    ['fabric_cloud_1', -520, -520, 1], ['fabric_cloud_2', 760, -430, 1], ['fabric_cloud_2', 120, -900, 0.9],
+    ['fabric_cloud_1', 900, -1180, 0.9], ['fabric_cloud_2', -760, -1150, 1], ['fabric_cloud_1', -160, -1460, 1],
+    ['fabric_cloud_2', 520, -1800, 1], ['fabric_cloud_1', -1000, -1950, 0.8], ['fabric_cloud_2', 1050, -2000, 0.8],
+  ]) felt(name, x, y, { w: TOWER_ROOM_4_FILES[name][1] * s, h: TOWER_ROOM_4_FILES[name][2] * s, z: -88 });
+
+  // Hills behind the meadow, the pines and the shelves (Snaps: pines a screen apart, shelves at head height).
+  felt('platform_mound_1', -980, ground(-980) + 50, { z: -80 });
+  felt('platform_mound_1', 1000, ground(1000) + 50, { z: -80, flip: true });
+  for (const [name, x] of [['fabric_tree_mid_1', -1090], ['fabric_tree_mid_1', -590], ['fabric_tree_flat_1', 240], ['fabric_tree_mid_1', 860], ['fabric_tree_flat_1', 1130]]) {
+    felt(name, x, ground(x) - 14, { z: -76 });
+  }
+  felt('wardrobia_shelf_long', -470, ground(-470) - 64, { z: -74 });
+  felt('wardrobia_shelf_short', 470, ground(470) - 64, { z: -74 });
+
+  // Soil under the meadow, then felt ground along every floor run (deepest runs in front).
+  art.push({ name: 'soil', fill: ROOM_4_SOIL, x1: bounds.l, x2: bounds.r, y1: -40, y2: bounds.b + 700, z: -70 });
+  // The floor's two steps pieces fall 61 px to the middle in 12-20 px steps: each side is one felt
+  // band tilted along its runs (the grass top within ~10 px of every step), the middle flat a level band
+  // in front, so the felt reads as one rolling meadow as in the Snaps.
+  const runs = flats(c.platforms).filter((f) => f.y > -600);
+  const H = 190;
+  const DEPTH = 28;
+  for (const side of [-1, 1]) {
+    const mine = runs.filter((f) => /_floor_[lr]_/.test(f.id) && Math.sign(f.x1 + f.x2) === side);
+    const outer = mine.reduce((a, b) => (Math.abs(a.x1 + a.x2) > Math.abs(b.x1 + b.x2) ? a : b));
+    const inner = mine.reduce((a, b) => (Math.abs(a.x1 + a.x2) < Math.abs(b.x1 + b.x2) ? a : b));
+    const [ox, ix] = [(outer.x1 + outer.x2) / 2, (inner.x1 + inner.x2) / 2];
+    const slope = (inner.y - outer.y) / (ix - ox);
+    const angle = Math.atan(slope);
+    const topX = side * (bounds.r + 60 + 120) / 2; // the band runs from past the end wall to the middle
+    const topY = outer.y + slope * (topX - ox) - DEPTH;
+    felt('platform_with_xsection_1', topX - H * Math.sin(angle), topY + H * Math.cos(angle), { w: bounds.r + 60 - 120 + 40, h: H, z: -69, r: (angle * 180) / Math.PI });
+  }
+  const mid = runs.find((f) => f.id === 'plat_r4_floor_mid');
+  felt('platform_with_xsection_1', 0, mid.y - DEPTH + H, { w: 520, h: H, z: -68 });
+  for (const x of [-1150, -930, -660, -360, -150, 150, 380, 700, 980, 1200]) felt('fabric_flowers_1', x, ground(x) + 6, { z: -50 });
+
+  // The way out: a felt island under the door, the corridor ladder up to it, the EXIT arrow pointing at the door.
+  felt('platform_with_skirt_1', -965, -1701 - 18 + 120, { w: 660, h: 120, z: -45 });
+  felt('fabric_flowers_1', -700, -1668, { z: -44 });
+  felt('wardrobia_arrow_1', -1222, -1712, { w: 104, h: 74, z: -43, signText: 'EXIT' });
+  for (const d of c.decos) {
+    if (!/^ladder_/.test(d.sprite)) continue;
+    art.push({ name: d.sprite, src: `${DECO_ROOT}${d.sprite}.png`, x: d.x, y: d.y, w: d.w, h: d.h, z: -40 + (d.z - 10), r: 0 });
+  }
+  return art.sort((a, b) => a.z - b.z);
+}
+
 function buildRoom4() {
   const c = collector();
   const bounds = { l: -1300, r: 1300, t: -2100, b: BELOW_FLOOR };
-  c.decos.push(...shell(bounds));
 
   const fl = floor(c, 'r4', bounds, { top: -170, w: 1200, h: 150 });
 
@@ -200,24 +296,9 @@ function buildRoom4() {
   const drinkX = [-640, -470, -300, 300, 470, 640];
   const items = ROOM_4_DRINKS.map((d, i) => ({ id: `r4_${d.cls}`, cls: d.cls, label: d.label, count: 1, x: drinkX[i], y: floorY(c.platforms, drinkX[i]), why: drinkWhy }));
 
-  // "purty" (F 3343): the corridors' plant pots and baskets (C3, C6) round the garden, lanterns up the walls.
-  c.decos.push(
-    { sprite: 'decor_plants6', x: -200, y: fl.mid + 4, w: 217, h: 157, z: 4, r: 0, layer: 'fg' },
-    { sprite: 'decor_plants1', x: 200, y: fl.mid + 4, w: 160, h: 163, z: 4, r: 0, layer: 'fg' },
-    { sprite: 'decor_plants4', x: -980, y: -150, w: 200, h: 143, z: 4, r: 0, layer: 'fg' },
-    { sprite: 'decor_plants3', x: 980, y: -150, w: 174, h: 147, z: 4, r: 0, layer: 'fg' },
-    { sprite: 'decor_plants_basket', x: 1100, y: -158, w: 165, h: 65, z: 5, r: 0, layer: 'fg' },
-    { sprite: 'decor_plants_basket', x: -560, y: -1700, w: 165, h: 65, z: 5, r: 0, layer: 'fg' },
-    { sprite: 'firebog_light_pool', x: 0, y: fl.mid + 30, w: 640, h: 146, z: 3, r: 0, layer: 'mg' },
-  );
-  for (const [x, y] of [[-420, -380], [420, -380], [-1020, -900], [600, -1000], [-300, -1450], [700, -1750]]) c.decos.push(lantern(x, y, y > -500));
-  c.decos.push(
-    { sprite: 'jethimadh_int_pillar_1_mod', x: -420, y: -96, w: 230, h: 860, z: 5, r: 0, flip: true, layer: 'fg' },
-    { sprite: 'jethimadh_int_pillar_1', x: 420, y: -96, w: 230, h: 860, z: 6, r: 0, layer: 'fg' },
-  );
-  plaque(c, -900, -1733, 'Way Out');
-
   c.platforms.push(flat('r4_ceiling', bounds.l + 40, bounds.r - 40, bounds.t + 35, 'Chamber roof (solid from below).', 1));
+
+  const art = room4Art(c, bounds, fl);
 
   return {
     tsid: ROOM_4_TSID,
@@ -226,7 +307,12 @@ function buildRoom4() {
     bounds,
     platforms: c.platforms,
     barriers: barriersFor(bounds, 'r4'),
-    decos: c.decos,
+    // The street JSON keeps the ladder's art (a street needs decos); the felt over it is the art rows,
+    // which draw the ladder again in front.
+    decos: c.decos.filter((d) => /^ladder_/.test(d.sprite)),
+    art,
+    swf: 'wardrobia.swf',
+    gradient: { top: ROOM_4_SKY, bottom: ROOM_4_SKY },
     ladders,
     doors: [
       {
@@ -245,7 +331,7 @@ function buildRoom4() {
     why: {
       room: 'W: "Room 4 || Yellow-Purple Triangle Key || Located in C2. Key is acquired automatically. Bring a Hoe & 4 packets of Seeds. *Optional. Within are 4 plots with spinach and six different drinks". W trivia: "During development, challenge Room 4 had been called Back of the Wardrobe."',
       size: 'Remake: 2600 wide, 2100 above y 0 (no source bounds survive); the archived arrival y -1701 puts the way out high in the room, so the room is tall and the garden sits on its floor.',
-      decor: 'F 3343 Room 4 "my was it purty": the corridors\' decor_plants pots and basket (C3, C6) round the garden and a light pool under it.',
+      decor: 'G72: Corridor Two\'s archived door into Room 4 carries swf_file_versioned .../locations/wardrobia/1304967037.swf (streets GIF1Q3IQM7122SP.xml), and two player Snaps (2012-11/12, jtower_room_4/, reference only) show the wardrobia felt meadow: linen sky, a stitched sky patch, fabric clouds, felt pines and flowers, felt ground over a soil cross-section with stones, wooden shelves, a stitched blue EXIT arrow, the four spinach plots in the grass. No deco list survives: the layout is read off the Snaps over the unchanged platforms (felt ground along every floor run, the way-out ledge a felt island with a hanging skirt, the corridor ladder kept); F 3343 "my was it purty".',
     },
   };
 }
@@ -335,10 +421,47 @@ function buildRoom8() {
 /* Room 16 (LTJ11V9DK812UNL)                                            */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Room 16's dressing (G72), all firebog.swf street decos, laid out from the
+ * Snap round the archived arrival -7,-407: the pod's mouth is the way out.
+ * The corridor steps art is dropped; every flat run of the unchanged
+ * platforms gets bottletree planks whose top sits on it.
+ */
+function room16Decos(c, outPiece) {
+  const mg = (sprite, x, y, w, h, z, extra = {}) => ({ sprite, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h), z, r: 0, ...extra, layer: 'mg' });
+  const podX = -7;
+  const decos = [
+    // A dark haze under the cave roof.
+    mg('crosssection_underground_fill_1', 0, -640, 2400, 520, 0),
+    // Golden curling vines in from both walls.
+    mg('treetop_noflowers_1', -990, -640, 760, 380, 1, { r: 90 }),
+    mg('treetop_noflowers_2', -990, -230, 620, 300, 1, { r: 90, flip: true }),
+    mg('treetop_noflowers_3', 990, -660, 760, 340, 1, { r: -90 }),
+    mg('treetop_noflowers_1', 990, -250, 620, 310, 1, { r: -90, flip: true }),
+    // Ringed branch arms out of the pod's sides, mossy tips up.
+    mg('legs_moss_noBase', podX + 250, -770, 170, 316, 2),
+    mg('legs_moss_noBase', podX - 250, -770, 170, 316, 2, { flip: true }),
+    mg('legs_moss_2', podX + 260, -560, 200, 233, 2, { r: 40 }),
+    mg('legs_moss_2', podX - 260, -560, 200, 233, 2, { r: -40, flip: true }),
+    // The pod, its eye holes, and the roots hanging under its mouth.
+    mg('bottletree_body2', podX, -340, 560, 659, 3),
+    mg('ground_cutaway_hollow1', podX - 70, -790, 58, 70, 4),
+    mg('ground_cutaway_hollow1', podX + 70, -790, 58, 70, 4),
+    mg('hanging_braches1', podX, outPiece.top + 240, 300, 254, 4),
+    // Big ringed pipes in the lower corners.
+    mg('legs_moss_back_1', -860, 300, 330, 446, 9),
+    mg('legs_moss_2', 870, 300, 380, 442, 9, { flip: true }),
+  ];
+  for (const [x, y] of [[-330, -700], [300, -860], [-150, -930], [360, -560], [-420, -470], [170, -300], [-660, -820], [660, -720], [-560, -560], [560, -420]]) {
+    decos.push(mg('fireflies', x, y, 302, 97, 5));
+  }
+  for (const f of flats(c.platforms)) decos.push(mg('platform_bottletree_flat', (f.x1 + f.x2) / 2, f.y + 22, f.x2 - f.x1 + 24, 30, 7));
+  return decos;
+}
+
 function buildRoom16() {
   const c = collector();
   const bounds = { l: -1000, r: 1000, t: -1000, b: BELOW_FLOOR };
-  c.decos.push(...shell(bounds));
   floor(c, 'r16', bounds, { top: -160, w: 900, h: 140 });
 
   // Way out: the arrival is the middle of the room, so the door ledge floats there.
@@ -373,16 +496,7 @@ function buildRoom16() {
 
   c.platforms.push(flat('r16_ceiling', bounds.l + 40, bounds.r - 40, bounds.t + 35, 'Chamber roof (solid from below).', 1));
 
-  c.decos.push(
-    lantern(-300, -330, true),
-    lantern(340, -330, true),
-    lantern(800, -620),
-    lantern(-200, -760),
-    { sprite: 'jethimadh_int_pillar_1', x: 220, y: -96, w: 230, h: 860, z: 6, r: 0, layer: 'fg' },
-    { sprite: 'blotch_outer', x: -760, y: -800, w: 272, h: 130, z: 4, r: 0, layer: 'mg' },
-    { sprite: 'blotch_inner', x: 520, y: -720, w: 240, h: 120, z: 4, r: 0, layer: 'mg' },
-  );
-  plaque(c, 140, -440, 'Way Out');
+  const decos = room16Decos(c, outPiece);
 
   return {
     tsid: ROOM_16_TSID,
@@ -391,7 +505,7 @@ function buildRoom16() {
     bounds,
     platforms: c.platforms,
     barriers: barriersFor(bounds, 'r16'),
-    decos: c.decos,
+    decos,
     ladders: [],
     doors: [
       {
@@ -399,6 +513,8 @@ function buildRoom16() {
         x: -7,
         y: -407,
         ...DOOR,
+        // G72: the Snap shows the way out as the pod's mouth, a dark hollow (firebog ground_cutaway_hollow1).
+        sprite: 'ground_cutaway_hollow1',
         connect: { tsid: 'LTJ110817812KO4', label: 'Corridor Six', x: 984, y: -467, hub_id: '77' },
         why: 'Back through C6W\'s Room 16 door (world 984,-467), the way you came in.',
       },
@@ -412,6 +528,7 @@ function buildRoom16() {
     why: {
       room: 'W: "Room 16 || Purple-Orange Circle Key || Located in C6W. Contains Spinach, which is used to get a Red-Green Triangle Key."',
       size: 'Remake: a 2000 wide chamber like Room 15, 1000 above y 0; the arrival -7,-407 is its middle.',
+      decor: 'G72: Corridor Six\'s archived door into Room 16 carries swf_file_versioned .../locations/firebog/1331248191.swf (streets GTJ110817812KO4.xml), and a player Snap (2012-11-20, "in the mouth of weirdness", jtower_room_16/, reference only) shows a black cave round a huge wooden bottletree pod: two round eye holes, the avatar standing in its arched mouth on hanging roots, ringed branch arms with mossy tips, golden curling vines from the edges, fireflies, big ringed pipes in the lower corners. All firebog.swf street decos (bottletree_body2, ground_cutaway_hollow1, legs_moss_*, treetop_noflowers_*, hanging_braches1, fireflies, platform_bottletree_flat). No deco list survives: laid out from the Snap round the archived arrival (the mouth is the way out); every ledge keeps its platforms, dressed in bottletree planks along its flat runs.',
     },
   };
 }
@@ -435,6 +552,8 @@ const strip = ({ why, ...rest }) => rest;
 /** The street JSON for any rebuilt room: tower-rooms.js's format plus ladders. */
 export function anyTowerRoomStreet(room) {
   const street = towerRoomStreet(room);
+  if (room.swf) street.swf_file = room.swf;
+  if (room.gradient) street.gradient = { ...room.gradient };
   if (room.ladders?.length) {
     street.ladders = room.ladders.map(strip);
     street.stats.ladderCount = street.ladders.length;

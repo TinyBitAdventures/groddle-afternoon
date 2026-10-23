@@ -47,7 +47,7 @@ import {
   STOOT_RETURN,
   boxToScreen,
   midTowerRoomByTsid,
-} from '../tower-mid-rooms.js?v=mid-tower-2';
+} from '../tower-mid-rooms.js?v=mid-tower-3';
 import { CLICK_ANYWHERE, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, WALL_BUTTON } from '../hall-rejected-concepts.js';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';

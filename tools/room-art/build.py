@@ -22,6 +22,14 @@ Sets (each: decos, world scale per deco, output folder, a plan and a generated J
   recoloured teal with bright cyan orbs, so the set renders plants1 twice: as drawn, and through a
   luminance ramp read off the Snap (opts 'ramp'). The cyan orb glow is magic_mushroom_light_blue
   (lighting1.swf). js/operation-grow-scene.js lays the field out.
+- tower_room_4 (G72): Jethimadh Tower's challenge Room 4 (LIF1Q6PMN7123NQ, "Back of the Wardrobe" in
+  development) is not in the public locations dump, but Corridor Two's archived door into it names its
+  location SWF: swf_file_versioned .../locations/wardrobia/1304967037.swf (GIF1Q3IQM7122SP.xml).
+  Two player Snaps (research/wayback/raw/snaps/jtower_room_4/, reference only) show that felt-craft
+  meadow: linen sky, stitched sky patch, fabric clouds, felt pines and flowers, the felt ground with
+  its soil cross-section, wooden shelves and the stitched blue arrow, every one a deco in the CC0
+  wardrobia.swf bundle. js/tower-challenge-rooms.js lays them out; features/tower-rooms-feature.js
+  draws them.
 
 A piece spec may carry a fifth element, an options dict: 'deco' renders another deco under this piece's
 name (a recoloured copy), 'ramp' maps each pixel's luminance (0.299 R + 0.587 G + 0.114 B) through
@@ -92,6 +100,29 @@ SETS = {
             'k04_sock_01': (0.085, 2, 0),
             'k04_babyrings_01': (0.24, 2, 0),
             'k04_book_01_blue': (0.045, 2, 0),
+        },
+    },
+    # World scales from the Snaps against the avatar (~130 world px tall): shelves, clouds and the
+    # arrow are drawn near their stage size, the pines about 1.3x; the sky is a soft texture at 1x.
+    'tower_room_4': {
+        'bundle': 'wardrobia.swf',
+        'out': 'assets/sprites/tower-rooms/room_4',
+        'js': 'js/tower-room-4-art.js',
+        'export': 'TOWER_ROOM_4_FILES',
+        'pieces': {
+            'sky_large_1': (2, 1, 0),
+            'sky_patch_1': (1.4, 1.5, 0),
+            'fabric_cloud_1': (1, 2, 0),
+            'fabric_cloud_2': (1, 2, 0),
+            'fabric_tree_mid_1': (1.3, 2, 0),
+            'fabric_tree_flat_1': (1.3, 2, 0),
+            'fabric_flowers_1': (0.8, 2, 0),
+            'platform_with_xsection_1': (1, 2, 0),
+            'platform_with_skirt_1': (1, 2, 0),
+            'platform_mound_1': (1, 2, 0),
+            'wardrobia_shelf_long': (1, 2, 0),
+            'wardrobia_shelf_short': (1, 2, 0),
+            'wardrobia_arrow_1': (1.05, 2, 0),
         },
     },
     'sky_plunge': {
