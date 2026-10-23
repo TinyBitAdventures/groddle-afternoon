@@ -1791,8 +1791,8 @@
  "imagination": {
   "total": 275,
   "counts": {
-   "live": 234,
-   "later": 9,
+   "live": 236,
+   "later": 7,
    "starter": 9,
    "none": 6,
    "multiplayer": 9,
@@ -1805,9 +1805,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 296,
+  "commits": 298,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Long speech bubbles stay below the street name"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Your Butler hears about the club and finishes Join the Club at home"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1917,19 +1927,9 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Your home street is tall enough to see a nine-floor Tower"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Furniture stays off the Tower's elevator and the house's corner walls"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Ix mountains, mesas, cacti and vines keep the base art the original drew"
    }
   ]
  },
- "tests": 178,
+ "tests": 179,
  "generatedAt": "2026-10-23"
 }

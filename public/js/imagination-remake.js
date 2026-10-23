@@ -103,7 +103,7 @@ const RULES = [
   [/^animal_kinship_super_harvest_[123]$/, 'live', 'Bigger, more frequent animal super harvests.'],
   [/^animal_kinship_grain$/, 'live', 'Squeezing a chicken at Animal Kinship VII gives 10 Grain with a x4 chance.'],
   [/^animal_husbandry_twin_animals_[12]$/, 'live', 'An incubating Chicken hatches a bonus baby animal 5 / 10% of the time.'],
-  [/^herdkeeping_animal_sadness_[12]$/, 'later', 'Sad animals in caverns, Hell and other gloomy places are in the remake, but these cards raise the crowding limit (how many animals a yard holds before they sulk or leave), and crowding is not in the remake yet.'],
+  [/^herdkeeping_animal_sadness_[12]$/, 'live', 'Your back yard holds 10% / 20% more Piggies, Chickens and Butterflies before they sulk, leave or puff away from crowding (18 Piggies on a starter yard become 20 / 22).'],
   [/^herdkeeping_(pig|chicken|butterfly)_stick$/, 'live', 'Change radius on a placed Magic Stick: how far your yard animals may roam (300 to 50 px).'],
   [/^remoteherdkeeping_production_[12]$/, 'live', 'Back-yard Meat Collectors and Butterfly Milkers collect every 22 / 20 minutes instead of 24.'],
   [/^herdkeeping_|^remoteherdkeeping_/, 'later', 'Herdkeeping and collectors are not in the remake.'],

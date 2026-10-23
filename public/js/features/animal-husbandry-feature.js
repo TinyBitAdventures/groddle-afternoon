@@ -99,7 +99,7 @@ import {
 import { moodMax } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalPlaceIsDepressing } from './animal-mood-feature.js?v=g57-1';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g57-1';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -172,6 +172,7 @@ let yardAt = 0;
 let incubationAt = 0;
 let questFlags = new Set();
 let starvedCount = 0;
+let yardSelfFed = { stack: 0, trant: 0 }; // G64: yard piggies that fed themselves (replay)
 
 const now = () => Date.now();
 const isYard = (engine) => engine.streetTsid === YARD_TSID;
@@ -457,6 +458,8 @@ function buildExtraAnimal(engine, row) {
   const entity = { row, sprite: spr, target, vx: (row.id.length % 2 ? 1 : -1) * 0.45, baseX: row.x, phase: row.id.length };
   // G63: a piggy you own can starve; the animal-mood feature calls this when its tick says die.
   if (row.classId === 'npc_piggy') target.husbandryStarve = (opts) => starveExtra(engine, entity, opts);
+  // G64: crowding sends it away; the animal-mood feature calls this when it leaves or puffs away.
+  target.husbandryVanish = () => vanishExtra(engine, entity);
   extras.push(entity);
 }
 
@@ -499,6 +502,25 @@ function stepExtra(engine, entity, dtMs) {
   entity.row.x = Math.round(spr.x);
 }
 
+/**
+ * A released or raised animal leaves for good (crowding, js/animal-crowding.js):
+ * its slot row goes at once, so a reload cannot bring it back; the returned
+ * finisher takes it off the street when its puff is done (apiDelete).
+ */
+function vanishExtra(engine, entity) {
+  const s = slot(engine);
+  s.animals = s.animals.filter((a) => a !== entity.row);
+  const gen = generation;
+  lastAction = `crowd:gone:${entity.row.classId}`;
+  engine.save();
+  return () => {
+    if (gen !== generation) return;
+    extras = extras.filter((e) => e !== entity);
+    engine.unregister(entity.target);
+    publish(engine, true);
+  };
+}
+
 function removeExtra(engine, entity) {
   const s = slot(engine);
   s.animals = s.animals.filter((a) => a !== entity.row);
@@ -518,36 +540,9 @@ export function deathRollFor(engine) {
  * exists, so a short grey Pixi puff over the piggy, as long as the overlay
  * (1.5 s). &animaldeathfx=hold keeps it up for headless screenshots.
  */
+/** The smoke_puff overlay (shared with crowding departures, animal-mood-feature.js). */
 function smokePuff(engine, x, y) {
-  const { PIXI } = engine;
-  if (!PIXI?.Graphics || !engine.entityLayer) return null;
-  const g = new PIXI.Graphics();
-  const blobs = [[0, 0, 30], [-26, 8, 22], [26, 8, 22], [-14, -20, 20], [16, -22, 21], [0, 18, 20], [-34, -6, 15], [34, -8, 15]];
-  for (const [bx, by, r] of blobs) g.circle(bx, by, r).fill({ color: 0xd9d4cb, alpha: 0.9 });
-  for (const [bx, by, r] of blobs.slice(0, 5)) g.circle(bx - r * 0.25, by - r * 0.3, r * 0.55).fill({ color: 0xf4f1ea, alpha: 0.85 });
-  g.x = x;
-  g.y = y;
-  g.zIndex = 70;
-  engine.entityLayer.addChild(g);
-  if (engine.param('animaldeathfx') === 'hold') {
-    g.scale.set(1.25);
-    return g;
-  }
-  const start = now();
-  const tick = () => {
-    if (g.destroyed) return;
-    const k = (now() - start) / PIGGY_DEATH_PUFF.durationMs;
-    if (k >= 1) {
-      g.destroy();
-      return;
-    }
-    g.alpha = k < 0.25 ? 1 : 1 - (k - 0.25) / 0.75;
-    g.scale.set(0.5 + k * 0.9);
-    g.y = y - k * 24;
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-  return g;
+  return sharedSmokePuff(engine, x, y, { hold: engine.param('animaldeathfx') === 'hold' });
 }
 
 /** die() 1036-1041 on this street: 10 Meat at the piggy, a Plop 80 px along. */
@@ -714,8 +709,21 @@ function hideEcologyAnimal(engine, target) {
 function advanceYardNow(engine) {
   const yard = yardSlot(engine);
   if (!yard.machines.length && !yard.animals.length) return;
-  const events = advanceYard(yard, now(), { upgrades: engine.pc.imaginationUpgrades || [], deathRng: deathRollFor(engine) });
+  const food = yardFood(engine);
+  const events = advanceYard(yard, now(), { upgrades: engine.pc.imaginationUpgrades || [], deathRng: deathRollFor(engine), food });
+  let fed = false;
   for (const ev of events) {
+    if (ev.type === 'ate') {
+      // G64: a hungry yard piggy ate a dropped food item or a fruit off a yard tree (npc_piggy.js 1977-2018, 1482-1533).
+      yardSelfFed[ev.kind] = (yardSelfFed[ev.kind] || 0) + 1;
+      fed = true;
+      lastAction = `yard:ate:${ev.kind}:${ev.classTsid}`;
+      if (isYard(engine)) {
+        const eater = extras.find((e) => e.row === ev.animal);
+        if (eater) engine.say(eater.target, 'Yum!', 3000);
+      }
+      continue;
+    }
     if (ev.type === 'full') {
       const def = REMOTE_MACHINES[ev.classTsid];
       emit(engine, `${ev.classTsid}:full`);
@@ -750,13 +758,44 @@ function advanceYardNow(engine) {
       if (gone) {
         extras = extras.filter((e) => e !== gone);
         engine.unregister(gone.target);
+        // onContainerItemRemoved: the butterflies left behind check the crowd (G64).
+        animalCrowdChanged(engine, 'npc_butterfly', { removed: true });
       }
     }
   }
+  if (fed) settleYardFood(engine, food);
   if (isYard(engine)) {
     refreshPlacedLabels();
     for (const e of extras) e.target.subtitle = animalStatusLabel(e.row.classId, e.row.state);
   }
+}
+
+/**
+ * What the yard herd can feed itself from while you are away: the yard's
+ * dropped food stacks, the grown Patch trees in the yard's patches slot
+ * (patches-feature.js keeps them under engine.streetSlot('patches', yard)),
+ * and the Magic Pig Stick's range for the stacks.
+ */
+function yardFood(engine) {
+  const stacks = engine.droppedItems?.streets?.[YARD_TSID] || [];
+  const plots = engine.streetSlot?.('patches', YARD_TSID)?.plots || {};
+  const trees = Object.values(plots)
+    .filter((p) => p?.stage === 'tree' && p.tree?.classId && p.tree.classId !== 'wood_tree' && p.tree.state)
+    .map((p) => p.tree.state);
+  const pig = yardSlot(engine).sticks.find((k) => k.classTsid === 'magic_pig_stick');
+  return { stacks, trees, stick: pig ? { x: Number(pig.x) || 0, distance: Number(pig.distance) || STICK_DISTANCE } : null };
+}
+
+/** Drop emptied stacks and save what the herd ate. */
+function settleYardFood(engine, food) {
+  const streets = engine.droppedItems?.streets;
+  const rows = streets?.[YARD_TSID];
+  if (Array.isArray(rows)) {
+    for (let i = rows.length - 1; i >= 0; i -= 1) if (!(rows[i]?.count > 0)) rows.splice(i, 1);
+    if (!rows.length) delete streets[YARD_TSID];
+    engine.droppedItemsChanged?.();
+  }
+  engine.save();
 }
 
 // —— Naming ——————————————————————————————————————————————————————————————
@@ -851,8 +890,10 @@ function capture(engine, target) {
     learned: engine.learnedSkills,
     streetTsid: engine.streetTsid,
     ownYard: isYard(engine),
-    // A sad piggy is happy to be captured, with no location cooldown.
-    sad: isSadIn('npc_piggy', animalPlaceIsDepressing(engine)),
+    // A sad piggy is happy to be captured (439-444): somewhere depressing (and
+    // then with no location cooldown, 383-386) or sulking from crowding (G64).
+    sad: isSadIn('npc_piggy', animalPlaceIsDepressing(engine)) || animalCrowdSad(target),
+    depressing: isSadIn('npc_piggy', animalPlaceIsDepressing(engine)),
     rng: rollFor(engine),
   });
   if (res.bubble) engine.say(target, res.bubble, 3500);
@@ -905,6 +946,8 @@ function releasePiggyHere(engine, { escaped = false } = {}) {
   const entity = extras.find((e) => e.row === row);
   // onReleased: somewhere depressing the piggy goes straight to sadness instead.
   if (entity && !escaped && !animalPlaceIsDepressing(engine)) engine.say(entity.target, res.bubble, 3500);
+  // onContainerItemAdded: the other piggies here check the crowd (G64).
+  animalCrowdChanged(engine, 'npc_piggy', { exclude: entity?.target });
   engine.pushActivity(escaped ? HERDKEEPING.escapeLine : 'You released the Piggy.');
   lastAction = escaped ? 'hogtie:escaped' : 'hogtie:released';
   engine.updateHud();
@@ -934,7 +977,9 @@ function feedPackBaby(engine, babyClass, foodClass) {
   emit(engine, `${babyClass}:feed`);
   if (res.grew) {
     const x = (engine.player?.x || 200) + 50;
-    addExtraAnimal(engine, res.grew, x);
+    const grown = addExtraAnimal(engine, res.grew, x);
+    // onContainerItemAdded: the others of its class here check the crowd (G64).
+    animalCrowdChanged(engine, res.grew, { exclude: extras.find((e) => e.row === grown)?.target });
     emit(engine, res.counter);
     engine.pushActivity({ base: `You fed the ${itemLabel(babyClass)}`, effects: { xp: res.xp } });
     engine.pushActivity(res.msg);
@@ -1047,8 +1092,9 @@ let engine_ref = null;
 function setupDemo(engine) {
   if (demoUsed) return;
   const mode = String(engine.param('animaldemo') || '');
-  if (!['batterfly', 'plop', 'incubate', 'name', 'herd', 'remote', 'sad', 'starve'].includes(mode)) return;
+  if (!['batterfly', 'plop', 'incubate', 'name', 'herd', 'remote', 'sad', 'starve', 'crowd'].includes(mode)) return;
   if (mode === 'remote' && !isYard(engine)) return; // waits for the home street
+  if (mode === 'crowd' && engine.param('homedemo') && !isYard(engine)) return; // the yard crowd waits for home
   demoUsed = true;
   demoMode = mode;
   engine_ref = engine;
@@ -1180,6 +1226,37 @@ function setupDemo(engine) {
     return;
   }
 
+  if (mode === 'crowd') {
+    // G64 QA: fill this street (or, with &homedemo=home, your back yard) to its
+    // crowding limit with released animals, then every one of the class checks.
+    const cls = ['npc_chicken', 'npc_butterfly'].includes(engine.param('animalcrowdclass')) ? engine.param('animalcrowdclass') : 'npc_piggy';
+    const card = engine.param('animalcard');
+    if (isYard(engine) && (card === '1' || card === '2')) {
+      const ups = (engine.pc.imaginationUpgrades ||= []);
+      for (const id of card === '2' ? ['herdkeeping_animal_sadness_1', 'herdkeeping_animal_sadness_2'] : ['herdkeeping_animal_sadness_1']) {
+        if (!ups.includes(id)) ups.push(id);
+      }
+    }
+    later(1500, () => {
+      const max = crowdLimit(engine, cls);
+      const have = engine.interactables.filter((t) => t.classId === cls && !t.featureId && t.sprite?.visible !== false).length;
+      const over = Math.max(0, Math.floor(Number(engine.param('animalcrowdover')) || 0));
+      const add = Math.max(0, Math.min(60, max - have + over));
+      const px = engine.player?.x || 400;
+      const span = Math.min(900, Math.max(300, add * 40));
+      for (let i = 0; i < add; i += 1) {
+        const x = Math.max(60, Math.min(engine.worldW - 60, px - span / 2 + (span * (i + 0.5)) / Math.max(1, add)));
+        addExtraAnimal(engine, cls, x);
+      }
+      lastAction = `crowd:${cls}:${have + add}/${max}`;
+      engine.save();
+      // Every animal of the class checks once (the demo skips the one-by-one arrivals).
+      animalCrowdChanged(engine, cls);
+      publish(engine, true);
+    });
+    return;
+  }
+
   if (mode === 'remote') {
     grant(engine, [HERDKEEPING.skill, REMOTE_SKILL], { potato: 30 });
     const yard = yardSlot(engine);
@@ -1201,6 +1278,21 @@ function setupDemo(engine) {
       feeder.inside = 40;
       yard.machines.push(collector, milker, feeder);
       for (const m of yard.machines) m.nextAt = t - back + 20 * 60 * 1000;
+      if (engine.param('animalyardfood') === '1') {
+        // G64 QA: 3 Potatoes on the yard ground and a fruiting Fruit Tree in
+        // the yard's first Patch plot (a fixture: drawn only where the yard
+        // has a Patch) for the hungry herd to find while "away".
+        engine.dropWorldStack('potato', 3, Math.round(stickX + 60), surfaceAt(engine, stickX + 60) - 74);
+        const soil = engine.streetSlot('patches', YARD_TSID);
+        soil.plots ||= {};
+        soil.plots['patch:0'] ||= {
+          classTsid: 'patch',
+          kind: 'patch',
+          stage: 'tree',
+          since: t - back,
+          tree: { classId: 'trant_fruit', state: { classTsid: 'trant_fruit', maturity: 6, health: 7, fruitCount: 5 }, grownAt: t - back, lastCycleAt: t - back, resetAt: t },
+        };
+      }
       // Rebuild the yard with the seeded objects (replaying the 40 hours),
       // then run this demo again for the autoplay half.
       clearEntities(engine);
@@ -1367,6 +1459,7 @@ function publish(engine, force = false) {
   engine.setData('husbandryFlags', [...questFlags].join(','));
   engine.setData('starvedPiggies', String(starvedCount));
   engine.setData('yardStarved', String(yard.starved.length));
+  engine.setData('yardSelfFed', `stack:${yardSelfFed.stack || 0},trant:${yardSelfFed.trant || 0}`);
   const chicken = engine.interactables.find((t2) => t2.classId === 'npc_chicken' && t2.state?.incubatingEgg);
   engine.setData('incubation', chicken ? `${chicken.state.incubatingEgg}:${incubationPhase(chicken.state, t, incubationTiming(engine))}` : '');
   engine.setData('packBabies', ['chick', 'piglet', 'caterpillar'].map((id) => `${id}=${engine.inv[id] || 0}`).join(','));

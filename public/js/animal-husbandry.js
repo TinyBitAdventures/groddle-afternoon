@@ -40,6 +40,7 @@ import { moodMax } from './metabolics.js';
 import { musicblockItemMeta } from './musicblocks.js';
 import { isEnchantedForest } from './enchanted-forests.js?v=g5-1';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js';
+import { isCrowdSad } from './animal-crowding.js';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -757,10 +758,13 @@ export function hogtieEscapeDelayMs(chance = HERDKEEPING.escapeChance, rng = Mat
 
 /**
  * Capture a Piggy. Mutates pc/inv/pack state. On success the caller removes
- * the piggy from the street (`removePiggy`).
+ * the piggy from the street (`removePiggy`). `sad` is isSad() (always
+ * captured, 439-444); `depressing` is locationIsDepressing() (no location
+ * cooldown, 383-386) and defaults to `sad`: a piggy sulking from crowding
+ * (js/animal-crowding.js) is sad but still minds the cooldown.
  */
-export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', now = Date.now(), ownYard = false, sad = false, rng = Math.random } = {}) {
-  const gate = captureVerbState({ inv, learned, energy: pc?.energy || 0, streetTsid, now, ownYard, depressing: sad });
+export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', now = Date.now(), ownYard = false, sad = false, depressing = sad, rng = Math.random } = {}) {
+  const gate = captureVerbState({ inv, learned, energy: pc?.energy || 0, streetTsid, now, ownYard, depressing });
   if (!gate.enabled) return { ok: false, msg: gate.reason };
   const effects = { energy: 0, mood: 0, xp: 0, items: {} };
   if ((inv.pig_bait || 0) < 1) return { ok: false, msg: HERDKEEPING.noBait, effects };
@@ -934,27 +938,67 @@ function isLeftMost(machine, machines) {
  * petted since the last one, the other yard piggies cheer up a mood-0 piggy,
  * hunger +1 each half day below 2, then only on the daily tick, croaking at
  * 10 with the 50% starvation roll: the yard herd is yours, so it can die
- * (PIGGY_STARVATION_DEATH). The yard has no sad animals (it is not a
- * depressing place) and its food comes from the Piggy Feeder pass below;
- * dropped food is handled live on the street.
+ * (PIGGY_STARVATION_DEATH). The yard is never a depressing place, but a
+ * piggy sulking from crowding (crowdSadUntil, js/animal-crowding.js) skips
+ * its tick. A hungry piggy eats a stack on the ground or a fruit off a
+ * yard tree at once (yardFoodFinder), besides the Piggy Feeder pass below.
  */
-function hungerTick(subject, animals, rng) {
+function hungerTick(subject, animals, rng, at, findFood) {
   const neighbourMoods = animals
     .filter((a) => a !== subject && a.classId === 'npc_piggy')
     .map((a) => a.state.mood);
-  return piggyTwiceDailyTick(subject.state, { neighbourMoods, owned: true, rng });
+  // A piggy sulking from crowding skips the tick (onTwiceDaily 1834: isSad()).
+  return piggyTwiceDailyTick(subject.state, { neighbourMoods, owned: true, rng, sad: isCrowdSad(subject.state, at), findFood });
+}
+
+/**
+ * The yard's food for a hungry piggy's tick (npc_piggy.js onTwiceDaily
+ * 1879-1915, then 1977-2018): a food stack on the ground first, else a tree
+ * with fruit. `food.stacks` are the yard's dropped stacks ({ classTsid,
+ * count, x }); `food.trees` are tree states with a fruitCount (the yard's
+ * grown Patch trees). A placed Magic Pig Stick ({ x, distance }) limits the
+ * stacks to x ± distance (move_limits 1880-1883, 1899, 1908); the remake
+ * keeps no x for a yard tree away from home, so trees always count.
+ */
+function yardFoodFinder(food) {
+  if (!food) return null;
+  return (subject) => {
+    const stick = food.stick;
+    const inLimits = (x) => !stick || !Number.isFinite(Number(x)) || Math.abs(Number(x) - stick.x) <= stick.distance;
+    const stack = (food.stacks || []).find((row) => row && row.count > 0 && isFoodItem(row.classTsid) && inLimits(row.x));
+    if (stack) return { kind: 'stack', row: stack };
+    const tree = (food.trees || []).find((t) => t && Number(t.fruitCount) > 0);
+    return tree ? { kind: 'trant', state: tree } : null;
+  };
+}
+
+/** onFoodPathing 1482-1533, landed at once (the yard replays while you are away): one item or one fruit. */
+function eatYardFood(found) {
+  if (found?.kind === 'stack' && found.row.count > 0) {
+    found.row.count -= 1;
+    return found.row.classTsid;
+  }
+  if (found?.kind === 'trant' && Number(found.state.fruitCount) > 0) {
+    found.state.fruitCount = Number(found.state.fruitCount) - 1;
+    return found.state.classTsid || 'trant';
+  }
+  return null;
 }
 
 /**
  * Advance a back yard (animals + machines) to `now`, replaying every hunger
  * tick, feeder pass and collector pass in time order so a long absence works
  * like the server's intervals did. Returns events: { type: 'full', classTsid },
- * { type: 'ascend', animal, drops }, { type: 'happy'|'croak', animal, line }
- * and { type: 'die', animal, at } (a starved piggy, already taken out of
- * yard.animals; the caller puts down its Meat and Plop). `deathRng` rolls
- * only the starvation chance (QA forces it), `rng` everything else.
+ * { type: 'ascend', animal, drops }, { type: 'happy'|'croak', animal, line },
+ * { type: 'ate', animal, kind: 'stack'|'trant', classTsid, at } (a hungry
+ * piggy fed itself from `food`, see yardFoodFinder; the caller saves the
+ * stack or tree it mutated) and { type: 'die', animal, at } (a starved
+ * piggy, already taken out of yard.animals; the caller puts down its Meat
+ * and Plop). `deathRng` rolls only the starvation chance (QA forces it),
+ * `rng` everything else. Animals sulking from crowding skip their hunger
+ * tick and the collectors (isCrowdSad at the pass time).
  */
-export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.random, deathRng = rng } = {}) {
+export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.random, deathRng = rng, food = null } = {}) {
   const events = [];
   if (!yard) return events;
   const animals = (yard.animals ||= []);
@@ -990,9 +1034,16 @@ export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.
     }
     if (!kind || at > now) break;
     if (kind === 'hunger') {
-      const tick = hungerTick(subject, animals, deathRng);
+      const tick = hungerTick(subject, animals, deathRng, at, yardFoodFinder(food));
       for (const ev of tick) {
         if (ev.type === 'happy' || ev.type === 'croak') events.push({ type: ev.type, animal: subject, line: ev.line });
+        if (ev.type === 'seek') {
+          const ate = eatYardFood(ev.food);
+          if (ate) {
+            satePiggy(subject.state);
+            events.push({ type: 'ate', animal: subject, kind: ev.food.kind, classTsid: ate, at });
+          }
+        }
       }
       subject.state.hungerAt += HALF_DAY_MS;
       if (tick.some((ev) => ev.type === 'die')) {
@@ -1019,6 +1070,8 @@ export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.
     if (count >= 23 || (count > 3 && rng() < (count - 3) * 0.05)) continue;
     for (const a of [...animals]) {
       if (a.classId !== def.animal) continue;
+      // meat_collector.js 371 / butterfly_milker.js 366: never a sad animal.
+      if (isCrowdSad(a.state, at)) continue;
       if (m.classTsid === 'meat_collector' && Number(a.state.hunger) !== 0) continue;
       m.inside = (m.inside || 0) + 1;
       if (m.classTsid === 'butterfly_milker') {

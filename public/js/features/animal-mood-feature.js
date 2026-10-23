@@ -27,6 +27,18 @@
  *   rooked2 a fifth of the time), complain every 30 s, and refuse pet,
  *   nibble, feed and name; capture always works and has no location
  *   cooldown.
+ * - Crowding (G64, js/animal-crowding.js): every Piggy, Chicken and
+ *   Butterfly on a street checks when another of its class arrives
+ *   (chickens and butterflies also when one leaves). Near the street's
+ *   limit (getSadnessMax: by width, halved on public streets, raised in
+ *   your back yard by the Happy Animals cards) it may sulk for 3 minutes
+ *   (stops, crowding lines every 30 s, sulk clips, sad verbs refused), say
+ *   it is OUT of here and leave in a puff 7 s later, or, at the limit,
+ *   puff away at once. A sad spell checks again 5 minutes after it ends.
+ *   Ecology animals that leave stay gone (state.crowdGone); released and
+ *   raised ones leave their husbandry slot (target.husbandryVanish).
+ *   Chickens and Butterflies somewhere depressing leave or vanish on load
+ *   (npc_chicken.js / npc_butterfly.js onLoad).
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=piggy
  *   &animalrank=6&animalreset=1&animalmood=0 (E → nibble refuses);
@@ -41,6 +53,16 @@
  *   pack. Canvas: animalMoodDepressing, animalMoodSad, animalMoodPiggy
  *   (mood:hunger of the demo piggy), animalMoodSeeking, animalMoodCroaking,
  *   animalMoodLast.
+ *   Crowding: &animaldemo=crowd (animal-husbandry-feature.js) fills the
+ *   street with released Piggies to its limit and every Piggy checks;
+ *   &animalcrowdclass=npc_chicken|npc_butterfly crowds that class instead,
+ *   &animalcrowdover=N adds N past the limit, &animalcrowdroll=<0..1> forces
+ *   every crowding roll (0.5 all sulk after 12 s, 0.03 all leave, 0.95 all
+ *   puff away at the limit), &animalcrowdfx=hold keeps the puffs up. In the
+ *   yard (&homedemo=home) &animalcard=1|2 grants Happy Animals / Super Happy
+ *   Animals first. Canvas: animalCrowd (class:population/limit),
+ *   animalCrowdSad, animalCrowdPending, animalCrowdLeaving, animalCrowdGone,
+ *   animalCrowdChecks, animalCrowdCard, animalCrowdLast.
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
@@ -51,7 +73,25 @@ import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
 import { animalStatusLabel } from '../animals.js?v=husbandry-1';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=butterfly-care-1';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js';
-import { rookAttackFeature } from './rook-attack-feature.js?v=rooks-2';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=rooks-2';
+import {
+  CHECK_ON_REMOVE,
+  CROWD_CLASSES,
+  CROWD_LEAVE_LINE,
+  CROWD_SAD_REASONS,
+  CROWD_TIMING,
+  canStartSadness,
+  crowdCard,
+  crowdSadClip,
+  crowdSadLinePool,
+  gloomOnLoad,
+  isCrowdSad,
+  sadnessCheck,
+  sadnessEnd,
+  sadnessMax,
+  sadnessStart,
+  streetWidth,
+} from '../animal-crowding.js';
 import {
   CROAK_INTERVAL_MS,
   EAT_PAUSE_MS,
@@ -59,6 +99,8 @@ import {
   NIBBLE_NA_FAIL,
   PIGGY_HUNGER,
   PIGGY_LINES,
+  PIGGY_DEATH_PUFF,
+  SAD_BABY_LINES,
   SAD_INTERVAL_MS,
   SAD_PIGGY_LINES,
   advancePiggies,
@@ -83,6 +125,17 @@ export const PIGGY_MOOD_SHEETS = Object.freeze({
   tooMuchNibble: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_too_much_nibble_png_1354829441.png', fw: 88, fh: 62, cols: 11, frames: 65 }),
   chew: Object.freeze({ path: 'assets/sprites/npc_piggy__x1_chew_png_1354829433.png', fw: 88, fh: 62, cols: 11, frames: 53 }),
   rooked2: Object.freeze({ path: 'assets/sprites/rooks/piggy-rooked2.png', fw: 88, fh: 62, cols: 8, frames: 24 }),
+});
+
+/**
+ * onSadnessInterval's other clips: OGA npc_chicken sit (740×440, 5×4 of
+ * 148×110, 20 frames, measured), and the rook feature's chicken rooked2 and
+ * butterfly fly-rooked sheets.
+ */
+export const CROWD_SHEETS = Object.freeze({
+  chickenSit: Object.freeze({ path: 'assets/sprites/animals/npc_chicken_sit.png', fw: 148, fh: 110, cols: 5, frames: 20 }),
+  chickenRooked2: ROOK_SHEETS.chicken2,
+  butterflyFlyRooked: ROOK_SHEETS.bflyFly,
 });
 
 // ---------------------------------------------------------------------------
@@ -325,6 +378,8 @@ function eatOffline(engine, food) {
 function canSeek(engine, r) {
   const s = r.target.state;
   if (r.mode === 'sad' || r.mode === 'eat') return false;
+  // isSad(): a piggy sulking from crowding will not walk to food (npc_piggy.js 1394, 1419).
+  if (isCrowdSad(s, now()) || crowd.get(r.target)?.mode === 'leaving') return false;
   if (!(Number(s.hunger) > 0)) return false;
   return !isRooked(r.target, engine);
 }
@@ -391,6 +446,415 @@ function sadInterval(engine, r) {
   lastEvent = `sad:${clip}`;
 }
 
+// —— Crowding (G64) ————————————————————————————————————————————————————————
+
+let crowd = new Map(); // target -> { mode: 'pending'|'sad'|'leaving', startAt, until, lineAt, puffAt, goneAt, saved, finish }
+let crowdSeen = new Set(); // crowd-class targets already adopted on this street
+let crowdStats = { checks: 0, gone: 0 };
+let crowdLast = '';
+
+/** A smoke_puff overlay (also the starvation puff, animal-husbandry-feature.js). `hold` keeps it up for screenshots. */
+export function smokePuff(engine, x, y, { hold = false } = {}) {
+  const { PIXI } = engine;
+  if (!PIXI?.Graphics || !engine.entityLayer) return null;
+  const g = new PIXI.Graphics();
+  const blobs = [[0, 0, 30], [-26, 8, 22], [26, 8, 22], [-14, -20, 20], [16, -22, 21], [0, 18, 20], [-34, -6, 15], [34, -8, 15]];
+  for (const [bx, by, r] of blobs) g.circle(bx, by, r).fill({ color: 0xd9d4cb, alpha: 0.9 });
+  for (const [bx, by, r] of blobs.slice(0, 5)) g.circle(bx - r * 0.25, by - r * 0.3, r * 0.55).fill({ color: 0xf4f1ea, alpha: 0.85 });
+  g.x = x;
+  g.y = y;
+  g.zIndex = 70;
+  engine.entityLayer.addChild(g);
+  if (hold) {
+    g.scale.set(1.25);
+    return g;
+  }
+  const start = now();
+  const tick = () => {
+    if (g.destroyed) return;
+    const k = (now() - start) / PIGGY_DEATH_PUFF.durationMs;
+    if (k >= 1) {
+      g.destroy();
+      return;
+    }
+    g.alpha = k < 0.25 ? 1 : 1 - (k - 0.25) / 0.75;
+    g.scale.set(0.5 + k * 0.9);
+    g.y = y - k * 24;
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  return g;
+}
+
+function crowdActive(engine) {
+  // Races and the Great Hog Haul game keep their own animals.
+  if (typeof engine?.inScene === 'function' && engine.inScene()) return false;
+  return engine?.streetTsid !== HOG_HAUL_STREET_ID;
+}
+
+/** countItemClass: the live animals of a class on this street (leaving ones count until they are gone). */
+function crowdAnimals(engine, classId) {
+  return (engine.interactables || []).filter((t) => t?.classId === classId && !t.featureId && t.state
+    && t.sprite && !t.sprite.destroyed && t.sprite.visible !== false && !t._crowdGone);
+}
+
+/** getSadnessMax for this street: the back yard is your POL, so it is not halved and your cards count. */
+export function crowdLimit(engine, classId) {
+  const yard = engine?.streetTsid === YARD_TSID;
+  return sadnessMax(classId, {
+    width: streetWidth(engine?.street?.bounds, engine?.worldW),
+    pol: yard,
+    upgrades: yard ? engine?.pc?.imaginationUpgrades || [] : [],
+  });
+}
+
+/** isSad()'s is_sad half for a target (a crowd sulk running now). */
+export function animalCrowdSad(target) {
+  return isCrowdSad(target?.state, now());
+}
+
+function crowdRoll(engine) {
+  return forcedRoll(engine.param('animalcrowdroll'));
+}
+
+function groundUnder(engine, spr) {
+  const y = nearestSurfaceY(engine.platforms, spr.x, spr.y + 40);
+  return Number.isFinite(y) ? y : engine.groundY;
+}
+
+/** fullStop (and a butterfly drops to the platform below it, onSadnessStart 173-179). */
+function crowdHold(engine, target, rec) {
+  const spr = target.sprite;
+  if (!spr || spr.destroyed) return;
+  if (!rec.saved) {
+    rec.saved = {
+      textures: spr.textures,
+      loop: spr.loop,
+      speed: spr.animationSpeed,
+      vx: spr.vx,
+      range: spr.range,
+      ambient: spr._ambient,
+      groundY: spr._groundY,
+    };
+  }
+  if (isExtra(target)) {
+    spr._moodHold = true;
+    if (target.classId === 'npc_butterfly') spr.y = groundUnder(engine, spr) - 22;
+    return;
+  }
+  if (target.classId === 'npc_butterfly') {
+    spr.vx = 0;
+    if (spr._ambient) {
+      spr._ambient = false;
+      spr._groundY = groundUnder(engine, spr) - 2;
+    }
+    return;
+  }
+  spr.baseX = spr.x;
+  spr.range = 2;
+  spr.vx = (spr.vx < 0 ? -1 : 1) * 1e-6;
+}
+
+/** onSadnessEnd → onRevived: walk (or fly) again. */
+function crowdRelease(engine, target, rec) {
+  const spr = target.sprite;
+  const saved = rec?.saved;
+  if (rec) rec.saved = null;
+  if (!spr || spr.destroyed || !saved) return;
+  if (saved.textures && typeof spr.gotoAndPlay === 'function') {
+    spr.textures = saved.textures;
+    spr.loop = saved.loop ?? true;
+    spr.animationSpeed = saved.speed ?? spr.animationSpeed;
+    spr.onComplete = null;
+    spr.gotoAndPlay(0);
+  }
+  if (isExtra(target)) {
+    spr._moodHold = false;
+    spr._moodRebase = spr.x;
+    return;
+  }
+  if (target.classId === 'npc_butterfly') {
+    spr.vx = saved.vx || 0;
+    spr._ambient = saved.ambient;
+    spr._groundY = saved.groundY;
+    return;
+  }
+  spr.baseX = spr.x;
+  spr.range = saved.range ?? 90;
+  const speed = target.classId === 'npc_chicken' ? 0.5 : 0.45;
+  spr.vx = (Math.random() < 0.5 ? -1 : 1) * (Math.abs(saved.vx) > 0.01 ? Math.abs(saved.vx) : speed);
+}
+
+function crowdClipDef(classId, clip) {
+  if (classId === 'npc_piggy') return clip === 'rooked2' ? PIGGY_MOOD_SHEETS.rooked2 : PIGGY_MOOD_SHEETS.tooMuchNibble;
+  if (classId === 'npc_chicken') return clip === 'rooked2' ? CROWD_SHEETS.chickenRooked2 : CROWD_SHEETS.chickenSit;
+  if (classId === 'npc_butterfly') return CROWD_SHEETS.butterflyFlyRooked;
+  return null;
+}
+
+/** onSadnessInterval: the bubble and the sulk clip. */
+function crowdInterval(engine, target, rec, depressing) {
+  const pool = crowdSadLinePool(target.classId, { depressing, depressedLines: SAD_PIGGY_LINES, babyLines: SAD_BABY_LINES });
+  say(engine, target, pickLine(pool), CROWD_TIMING.bubbleMs);
+  const clip = crowdSadClip(target.classId);
+  const def = crowdClipDef(target.classId, clip);
+  const spr = target.sprite;
+  const clipFrames = def ? frames(def) : [];
+  if (clipFrames.length && spr && !spr.destroyed && typeof spr.gotoAndPlay === 'function') {
+    spr.textures = clipFrames;
+    spr.loop = target.classId === 'npc_butterfly';
+    spr.animationSpeed = pixiSpeed(24);
+    spr.onComplete = null;
+    spr.gotoAndPlay(0);
+  }
+  rec.lineAt = now() + CROWD_TIMING.intervalMs;
+  crowdLast = `sulk:${target.classId}:${clip}`;
+}
+
+function crowdRecord(target) {
+  let rec = crowd.get(target);
+  if (!rec) {
+    rec = { mode: null, startAt: 0, until: 0, lineAt: 0, puffAt: 0, goneAt: 0, saved: null, finish: null };
+    crowd.set(target, rec);
+  }
+  return rec;
+}
+
+/** Take the animal off the street for good: the husbandry slot row now, an ecology animal's crowdGone flag. */
+function markGone(engine, target, rec) {
+  if (isExtra(target) && typeof target.husbandryVanish === 'function') rec.finish = target.husbandryVanish();
+  else if (target.state) target.state.crowdGone = now();
+  delete target.state?.crowdSadUntil;
+  delete target.state?.crowdCheckAt;
+  engine.save?.();
+}
+
+/** apiDelete: gone from the world; chickens and butterflies left behind check again. */
+function removeGone(engine, target, rec, { cascade = true } = {}) {
+  target._crowdGone = true;
+  crowd.delete(target);
+  records.delete(target);
+  crowdStats.gone += 1;
+  if (typeof rec?.finish === 'function') rec.finish();
+  else {
+    if (target.sprite && !target.sprite.destroyed) target.sprite.visible = false;
+    const list = engine.interactables || [];
+    const at = list.indexOf(target);
+    if (at >= 0) list.splice(at, 1);
+  }
+  if (cascade) animalCrowdChanged(engine, target.classId, { removed: true });
+}
+
+function puffAt(engine, target) {
+  const spr = target.sprite;
+  if (!spr || spr.destroyed) return;
+  const grounded = (spr.anchor?.y ?? 1) >= 0.9;
+  const y = grounded ? spr.y - PIGGY_DEATH_PUFF.deltaY * 0.45 : spr.y;
+  smokePuff(engine, spr.x, y, { hold: engine.param('animalcrowdfx') === 'hold' });
+}
+
+/** onSadnessCheck for one animal at this population. Returns the outcome (or null). */
+function runCrowdCheck(engine, target, population, max) {
+  const rec = crowd.get(target);
+  if (rec?.mode === 'leaving' || target._crowdGone) return null;
+  crowdStats.checks += 1;
+  const depressing = animalPlaceIsDepressing(engine);
+  const res = sadnessCheck({
+    classId: target.classId,
+    population,
+    max,
+    incubating: Boolean(target.state?.incubatingEgg),
+    depressing: isSadIn(target.classId, depressing),
+    rng: crowdRoll(engine),
+  });
+  const t = now();
+  if (res.outcome === 'sad') {
+    const r = crowdRecord(target);
+    if (r.mode !== 'sad') r.mode = 'pending';
+    r.startAt = t + res.delayMs;
+    crowdLast = `check:${target.classId}:sad:${population}/${max}`;
+  } else if (res.outcome === 'leave') {
+    const r = crowdRecord(target);
+    if (r.mode === 'sad') crowdRelease(engine, target, r);
+    r.mode = 'leaving';
+    r.puffAt = t + CROWD_TIMING.leavePuffMs;
+    r.goneAt = t + CROWD_TIMING.leaveMs;
+    say(engine, target, CROWD_LEAVE_LINE, CROWD_TIMING.leaveMs);
+    markGone(engine, target, r);
+    crowdLast = `check:${target.classId}:leave:${population}/${max}`;
+  } else if (res.outcome === 'vanish') {
+    const r = crowdRecord(target);
+    if (r.mode === 'sad') crowdRelease(engine, target, r);
+    r.mode = 'leaving';
+    r.puffAt = 0;
+    r.goneAt = t + CROWD_TIMING.vanishMs;
+    puffAt(engine, target);
+    markGone(engine, target, r);
+    crowdLast = `check:${target.classId}:vanish:${population}/${max}`;
+  }
+  // 'depressed': a piggy somewhere depressing is already sad by place (startSad).
+  return res.outcome;
+}
+
+/**
+ * onContainerItemAdded / onContainerItemRemoved: an animal of `classId`
+ * arrived on (or left) this street, so every other one of its class checks.
+ * The animal-husbandry feature calls this after a release, a baby growing
+ * up, a capture or an ascension; this feature after its own departures.
+ * `exclude` is the newcomer. Returns how many checked.
+ */
+export function animalCrowdChanged(engine, classId, { removed = false, exclude = null } = {}) {
+  if (!CROWD_CLASSES.includes(classId) || !engine || !crowdActive(engine)) return 0;
+  if (removed && !CHECK_ON_REMOVE[classId]) return 0;
+  const animals = crowdAnimals(engine, classId);
+  const max = crowdLimit(engine, classId);
+  let n = 0;
+  for (const target of animals) {
+    if (target === exclude) continue;
+    runCrowdCheck(engine, target, animals.length, max);
+    n += 1;
+  }
+  publish(engine, true);
+  return n;
+}
+
+/** onSadnessStart (3 minutes of is_sad). */
+function startCrowdSad(engine, target, rec, { until = 0 } = {}) {
+  const depressing = animalPlaceIsDepressing(engine);
+  rec.startAt = 0;
+  if (!canStartSadness(target.classId, { incubating: Boolean(target.state?.incubatingEgg) }) || isRooked(target, engine)) {
+    if (rec.mode === 'pending') crowd.delete(target);
+    return;
+  }
+  // A piggy somewhere depressing is already sad by place (its own hold and lines).
+  if (target.classId === 'npc_piggy' && isSadIn('npc_piggy', depressing)) {
+    crowd.delete(target);
+    return;
+  }
+  const st = sadnessStart(now(), { depressing: isSadIn(target.classId, depressing) });
+  rec.until = until || st.until;
+  rec.lineAt = until ? now() + 1000 : st.firstLineAt;
+  rec.mode = 'sad';
+  target.state.crowdSadUntil = rec.until;
+  delete target.state.crowdCheckAt;
+  const piggy = records.get(target);
+  if (piggy && (piggy.mode === 'seek' || piggy.mode === 'eat')) release(engine, piggy);
+  crowdHold(engine, target, rec);
+  target.subtitle = 'Sad · too crowded';
+  crowdLast = `sad:${target.classId}`;
+  engine.save?.();
+}
+
+/** onSadnessEnd: up again, and maybe another check in 5 minutes. */
+function endCrowdSad(engine, target, rec) {
+  crowdRelease(engine, target, rec);
+  crowd.delete(target);
+  const s = target.state;
+  delete s.crowdSadUntil;
+  const res = sadnessEnd({ population: crowdAnimals(engine, target.classId).length, max: crowdLimit(engine, target.classId), spells: s.crowdSpells });
+  if (res.spells) s.crowdSpells = res.spells;
+  else delete s.crowdSpells;
+  if (res.recheck) s.crowdCheckAt = now() + CROWD_TIMING.recheckMs;
+  else delete s.crowdCheckAt;
+  target.subtitle = animalStatusLabel(target.classId, s);
+  crowdLast = `revived:${target.classId}:${res.recheck ? 'recheck' : 'done'}`;
+  engine.save?.();
+}
+
+/**
+ * New crowd-class animals on this street: hide ecology animals that already
+ * left, resume a saved sulk or a due check, and apply the gloomy onLoad
+ * (chickens leave in 1 s, butterflies vanish). Nothing else checks on load.
+ */
+function adoptCrowd(engine) {
+  if (!crowdActive(engine)) return;
+  const depressing = animalPlaceIsDepressing(engine);
+  const t = now();
+  for (const classId of CROWD_CLASSES) {
+    for (const target of crowdAnimals(engine, classId)) {
+      if (crowdSeen.has(target)) continue;
+      crowdSeen.add(target);
+      const s = target.state;
+      if (Number(s.crowdGone) > 0 && !isExtra(target)) {
+        removeGone(engine, target, null, { cascade: false });
+        continue;
+      }
+      const gloom = gloomOnLoad(classId, depressing);
+      if (gloom) {
+        const r = crowdRecord(target);
+        r.mode = 'leaving';
+        r.goneAt = t + gloom.delayMs;
+        markGone(engine, target, r);
+        crowdLast = `gloom:${classId}:${gloom.outcome}`;
+        continue;
+      }
+      if (isCrowdSad(s, t)) startCrowdSad(engine, target, crowdRecord(target), { until: Number(s.crowdSadUntil) });
+      else if (Number(s.crowdSadUntil) > 0) endCrowdSad(engine, target, crowdRecord(target));
+    }
+  }
+}
+
+/** Every frame: pending starts, sulks, departures, and the 5-minute rechecks (once a second). */
+function stepCrowd(engine, { scan = false } = {}) {
+  const t = now();
+  const depressing = animalPlaceIsDepressing(engine);
+  for (const [target, rec] of [...crowd]) {
+    if (!target.sprite || target.sprite.destroyed || !(engine.interactables || []).includes(target)) {
+      crowd.delete(target);
+      continue;
+    }
+    if (rec.mode === 'leaving') {
+      if (rec.puffAt && t >= rec.puffAt) {
+        rec.puffAt = 0;
+        puffAt(engine, target);
+      }
+      if (t >= rec.goneAt) removeGone(engine, target, rec);
+      continue;
+    }
+    if (rec.startAt && t >= rec.startAt) startCrowdSad(engine, target, rec);
+    if (rec.mode !== 'sad') continue;
+    if (t >= rec.until) {
+      endCrowdSad(engine, target, rec);
+      continue;
+    }
+    crowdHold(engine, target, rec);
+    if (t >= rec.lineAt) crowdInterval(engine, target, rec, isSadIn(target.classId, depressing));
+  }
+  if (!scan) return;
+  for (const classId of CROWD_CLASSES) {
+    const animals = crowdAnimals(engine, classId);
+    for (const target of animals) {
+      const due = Number(target.state?.crowdCheckAt);
+      if (!(due > 0) || due > t || crowd.has(target)) continue;
+      delete target.state.crowdCheckAt;
+      runCrowdCheck(engine, target, animals.length, crowdLimit(engine, classId));
+    }
+  }
+}
+
+function publishCrowd(engine) {
+  const parts = CROWD_CLASSES.map((c) => `${c}:${crowdAnimals(engine, c).length}/${crowdLimit(engine, c)}`);
+  const modes = [...crowd.values()];
+  engine.setData('animalCrowd', crowdActive(engine) ? parts.join(',') : '');
+  engine.setData('animalCrowdSad', String(modes.filter((r) => r.mode === 'sad').length));
+  engine.setData('animalCrowdPending', String(modes.filter((r) => r.mode === 'pending').length));
+  engine.setData('animalCrowdLeaving', String(modes.filter((r) => r.mode === 'leaving').length));
+  engine.setData('animalCrowdGone', String(crowdStats.gone));
+  engine.setData('animalCrowdChecks', String(crowdStats.checks));
+  engine.setData('animalCrowdCard', engine.streetTsid === YARD_TSID ? crowdCard(engine.pc?.imaginationUpgrades || [])?.id || 'none' : '');
+  engine.setData('animalCrowdLast', crowdLast);
+}
+
+function resetCrowd() {
+  for (const [target, rec] of crowd) {
+    // A sulk that is still running is saved on the animal and resumes next visit.
+    if (rec.mode === 'sad' && target.sprite && !target.sprite.destroyed) crowdRelease(null, target, rec);
+  }
+  crowd = new Map();
+  crowdSeen = new Set();
+  crowdStats = { checks: 0, gone: 0 };
+}
+
 // —— Ticks ——————————————————————————————————————————————————————————————
 
 function piggyRows(engine) {
@@ -399,7 +863,8 @@ function piggyRows(engine) {
 
 function ctxFor(engine, depressing) {
   return (row) => ({
-    sad: isSadIn('npc_piggy', depressing),
+    // isSad(): somewhere depressing, or a crowd sulk running (onTwiceDaily 1834).
+    sad: isSadIn('npc_piggy', depressing) || isCrowdSad(row.state, now()),
     rooked: isRooked(row.target, engine),
     findFood: () => findFoodFor(engine, row.target),
     // PIGGY_STARVATION_DEATH: only piggies you own (released or raised) can starve.
@@ -568,6 +1033,7 @@ function publish(engine, force = false) {
   engine.setData('animalMoodPose', pose);
   engine.setData('animalMoodLast', lastEvent);
   engine.setData('animalMoodTicks', String(tickCount));
+  publishCrowd(engine);
 }
 
 function resetStreet(engine) {
@@ -586,15 +1052,17 @@ export const animalMoodFeature = {
 
   init(engine) {
     loader = createSheetLoader(engine.PIXI);
-    loader.loadAll(Object.values(PIGGY_MOOD_SHEETS));
+    loader.loadAll([...Object.values(PIGGY_MOOD_SHEETS), ...Object.values(CROWD_SHEETS)]);
   },
 
   onStreetEnter(street, engine) {
     placeCache = { tsid: null, depressing: false };
     resetStreet(engine);
+    resetCrowd();
   },
 
   onStreetClear() {
+    resetCrowd();
     records = new Map();
     knownStacks = new Map();
     streetKey = null;
@@ -604,21 +1072,27 @@ export const animalMoodFeature = {
     if (!engine.started) return;
     if (streetKey !== engine.streetTsid) resetStreet(engine);
     const time = now();
-    if (time >= scanAt) {
+    const scan = time >= scanAt;
+    if (scan) {
       scanAt = time + 1000;
       // Forget piggies that left (captured, hidden, street rebuilt).
       for (const target of [...records.keys()]) {
         if (!target.sprite || target.sprite.destroyed || target.sprite.visible === false || !engine.interactables.includes(target)) records.delete(target);
       }
       adoptNew(engine);
+      adoptCrowd(engine);
       liveTicks(engine);
       runFoodDemo(engine);
       // Keep the world labels honest (game.js rewrites them after verbs).
       for (const r of records.values()) {
-        if (isRooked(r.target, engine)) continue;
+        if (isRooked(r.target, engine) || crowd.get(r.target)?.mode === 'sad') continue;
         r.target.subtitle = r.mode === 'sad' ? 'Sad · hates it here' : animalStatusLabel('npc_piggy', r.target.state);
       }
+      for (const [target, rec] of crowd) {
+        if (rec.mode === 'sad' && !isRooked(target, engine)) target.subtitle = 'Sad · too crowded';
+      }
     }
+    stepCrowd(engine, { scan });
     watchDrops(engine);
     const acting = engine.acting();
     for (const r of records.values()) {
@@ -660,20 +1134,29 @@ export const animalMoodFeature = {
 
   /** Sad piggies refuse; a piggy not in the mood refuses nibble at once. */
   decorateVerbs(target, verbs, engine) {
-    if (target?.classId !== 'npc_piggy' || !target.state || target.featureId) return null;
+    if (!target?.state || target.featureId) return null;
+    const crowdSad = isCrowdSad(target.state, now());
+    if (target.classId === 'npc_chicken' || target.classId === 'npc_butterfly') {
+      if (!crowdSad) return null;
+      // isSad(): the chicken's butter_up / incubate / squeeze, the butterfly's sing_to / milk / massage.
+      const reasons = CROWD_SAD_REASONS[target.classId];
+      return verbs.map((v) => (reasons[v.id] ? { ...v, enabled: false, reason: reasons[v.id] } : v));
+    }
+    if (target.classId !== 'npc_piggy') return null;
     const depressing = animalPlaceIsDepressing(engine);
-    if (isSadIn('npc_piggy', depressing)) {
+    if (isSadIn('npc_piggy', depressing) || crowdSad) {
       return verbs.map((v) => {
         if (['pet', 'nibble', 'feed'].includes(v.id)) return { ...v, enabled: false, reason: PIGGY_LINES.sad };
         if (v.id === 'name') return { ...v, enabled: false, reason: PIGGY_LINES.sadName };
         if (v.id === 'capture') {
+          // A sad piggy is always caught (439-444); only a depressing place lifts the location cooldown (383-386).
           const gate = captureVerbState({
             inv: engine.inv,
             learned: engine.learnedSkills,
             energy: engine.pc?.energy || 0,
             streetTsid: engine.streetTsid,
             ownYard: engine.streetTsid === YARD_TSID,
-            depressing: true,
+            depressing: isSadIn('npc_piggy', depressing),
           });
           return { ...v, enabled: gate.enabled, reason: gate.reason };
         }
@@ -709,6 +1192,13 @@ export const animalMoodFeature = {
 
   /** Tests. */
   _state() {
-    return { records: records.size, knownStacks: knownStacks.size, lastEvent };
+    return {
+      records: records.size,
+      knownStacks: knownStacks.size,
+      lastEvent,
+      crowd: [...crowd].map(([target, rec]) => ({ target, mode: rec.mode, startAt: rec.startAt, until: rec.until, goneAt: rec.goneAt })),
+      crowdStats: { ...crowdStats },
+      crowdLast,
+    };
   },
 };

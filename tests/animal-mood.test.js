@@ -203,6 +203,9 @@ describe('Piggy mood and hunger (npc_piggy.js onTwiceDaily)', () => {
   it('sends a hungry piggy to food and replays an absence in time order', () => {
     const s = ensurePiggyMood({ hunger: 0 }, 0);
     const food = { kind: 'stack', id: 'w1' };
+    // npc_piggy.js 1879: a piggy at hunger 0 only looks for food on the daily half.
+    assert.deepEqual(piggyTwiceDailyTick(s, { findFood: () => food }).map((e) => e.type), [], 'half day from hunger 0: no scan');
+    assert.equal(s.hunger, 1);
     assert.deepEqual(piggyTwiceDailyTick(s, { findFood: () => food }).map((e) => e.type), ['seek']);
 
     const t0 = 0;
@@ -545,9 +548,11 @@ describe('Source copy (GSJS)', { skip: !existsSync(GSJS) }, () => {
 });
 
 describe('Imagination card notes', () => {
-  it('keeps the herdkeeping sadness cards out of the shop until crowding limits exist', () => {
-    const { status, note } = remakeStatus('herdkeeping_animal_sadness_1');
-    assert.equal(status, 'later');
-    assert.match(note, /crowd/i);
+  it('deals the herdkeeping sadness cards now that crowding limits exist (G64)', () => {
+    for (const id of ['herdkeeping_animal_sadness_1', 'herdkeeping_animal_sadness_2']) {
+      const { status, note } = remakeStatus(id);
+      assert.equal(status, 'live', id);
+      assert.match(note, /crowd/i);
+    }
   });
 });

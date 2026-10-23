@@ -401,6 +401,9 @@ export function piggyTwiceDailyTick(state, ctx = {}) {
     }
   }
   const hunger = clamp(Math.floor(num(s.hunger, 0)), 0, PIGGY_HUNGER.max);
+  // npc_piggy.js 1879: the street is only scanned for food on the daily half
+  // or when the piggy was already hungry before this tick's rise.
+  const scanned = daily || hunger > 0;
   if (hunger < PIGGY_HUNGER.halfDayRise) s.hunger = hunger + 1;
   else if (hunger < PIGGY_HUNGER.max) s.hunger = hunger + (daily ? 1 : 0);
   else {
@@ -413,7 +416,7 @@ export function piggyTwiceDailyTick(state, ctx = {}) {
       return events;
     }
   }
-  if (s.hunger > 0 && typeof ctx.findFood === 'function') {
+  if (scanned && s.hunger > 0 && typeof ctx.findFood === 'function') {
     const food = ctx.findFood();
     if (food) events.push({ type: 'seek', food });
   }

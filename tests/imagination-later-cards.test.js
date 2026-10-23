@@ -98,7 +98,6 @@ describe('statuses (imagination-remake.js)', () => {
       'ancestral_lands_time_1', 'ancestral_lands_time_2',
       'element_handling_bonus_1', 'element_handling_bonus_2',
       'furnituremaking_bonus_upgrade_1', 'furnituremaking_bonus_upgrade_2', 'furnituremaking_bonus_upgrade_3',
-      'herdkeeping_animal_sadness_1', 'herdkeeping_animal_sadness_2',
     ]);
   });
 });
