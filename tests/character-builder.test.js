@@ -21,6 +21,7 @@ import {
   saveAppearance,
   loadAppearance,
   APPEARANCE_PRESETS,
+  PRESET_GROUPS,
   COLOR_SWATCHES,
   appearanceCacheKey,
   resolveBodySheets,
@@ -221,6 +222,38 @@ describe('vector presets', () => {
     }
   });
 
+  it('dresses a dozen matching costumes from the GSJS wardrobe, nothing recoloured', () => {
+    const costumes = Object.values(APPEARANCE_PRESETS).filter((p) => p.group === 'costumes');
+    assert.ok(costumes.length >= 12, `${costumes.length} costumes`);
+    assert.ok(PRESET_GROUPS.some((g) => g.id === 'costumes'));
+    // Sets named after films, brands or characters stay out.
+    const banned = /catwoman|godzilla|tron|ultraman|skywalker|boardwalk|japnese_school_girl/i;
+    for (const p of costumes) {
+      const v = p.appearance.vector;
+      assert.equal(p.appearance.bodyStyle, 'vector', p.id);
+      assert.ok(v.outfit.hat && v.outfit.hat !== 'none', `${p.id} wears its costume headpiece`);
+      for (const [type, name] of Object.entries(v.outfit)) {
+        if (name === 'none') continue;
+        assert.doesNotMatch(name, banned, p.id);
+        const it = catalog.types[type]?.find((i) => i.name === name);
+        assert.ok(it, `${p.id} ${type}/${name} is in the catalog`);
+        assert.ok(!it.reimagined && !it.swfOnly, `${p.id} ${type}/${name} is a GSJS article`);
+        assert.ok((v.variant[type] ?? 0) < Math.max(1, (it.variants || []).length), `${p.id} ${type} colourway`);
+      }
+      for (const type of ['eyes', 'mouth', 'nose', 'ears', 'shirt', 'pants', 'coat']) assert.ok(v.outfit[type], `${p.id} fills ${type}`);
+      assert.deepEqual(v.tint, {}, p.id);
+      assert.ok(!v.skinTint && !v.hairTint, p.id);
+      assert.ok(catalog.palettes.skin.some((c) => c.id === v.skinColor), `${p.id} skin`);
+      assert.ok(catalog.palettes.hair.some((c) => c.id === v.hairColor), `${p.id} hair`);
+    }
+    // The giants and the Rook wear their own masks over their own robes.
+    const giants = { costume_rook: ['rook_mask', 'rook_outfit_top'], costume_mab: ['mab_mask', 'mab'], costume_cosma: ['cosma_hat', 'cosma_coat'], costume_alph: ['alph_mask', 'alph_lem'], costume_lem: ['Lem_mask', 'alph_lem'], costume_grendaline: ['grendaline_mask', 'Grendaline_tii_outfit'] };
+    for (const [id, [hat, coat]] of Object.entries(giants)) {
+      assert.equal(APPEARANCE_PRESETS[id].appearance.vector.outfit.hat, hat, id);
+      assert.equal(APPEARANCE_PRESETS[id].appearance.vector.outfit.coat, coat, id);
+    }
+  });
+
   it('gives every vector preset its own look, and keeps the bitmap presets', () => {
     const keys = new Map();
     for (const p of Object.values(APPEARANCE_PRESETS)) {
@@ -229,7 +262,7 @@ describe('vector presets', () => {
       assert.ok(!keys.has(key), `${p.id} looks like ${keys.get(key)}`);
       keys.set(key, p.id);
     }
-    assert.equal(keys.size, 15);
+    assert.equal(keys.size, 28);
     assert.equal(APPEARANCE_PRESETS.glitch.appearance.bodyStyle, 'glitch');
     assert.equal(APPEARANCE_PRESETS.classic.appearance.bodyStyle, 'classic');
     assert.equal(APPEARANCE_PRESETS.alt_base.appearance.bodyStyle, 'alt');

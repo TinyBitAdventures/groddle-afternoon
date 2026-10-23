@@ -2173,6 +2173,8 @@ button.play-context-head:focus-visible {
 }
 @media (max-width: 560px) {
   .avatar-presets { max-width: none; width: 100%; }
+  /* #game-root canvas is full width; on one column that made the preview fill the phone. */
+  #game-root #avatar-preview { width: 150px !important; height: 214px !important; }
 }
 .avatar-preset-chip {
   font: inherit;

@@ -181,7 +181,53 @@ function vectorPreset(fields) {
 export const PRESET_GROUPS = Object.freeze([
   { id: 'looks', label: 'Looks' },
   { id: 'starter', label: 'Starter' },
+  { id: 'costumes', label: 'Costumes' },
 ]);
+
+/**
+ * Matching costume sets from the GSJS wardrobe (inc_data_clothing.js): each
+ * article in its own colourway (catalog variant index = GSJS colourway id),
+ * the rest of the look filled from ordinary articles and real palette ids so
+ * it reads finished. Nothing is recoloured. Giants' masks and robes share id
+ * runs (masks 1122-1132, robes 1180-1191; Rook 1130, 1153-1154).
+ */
+const COSTUMES = [
+  // Rook: rook_mask 1130, rook_outfit_top 1153, rook_outfit_pants 1154.
+  ['rook', 'Rook', { outfit: { hair: 'hair_B0018', hat: 'rook_mask', eyes: 'eyes_20101109E', mouth: 'mouth_20101109E', nose: 'nose_0001', ears: 'ears_0002', shirt: 'plain_tee_dark', coat: 'rook_outfit_top', pants: 'rook_outfit_pants', shoes: 'nevermore_boots' }, variant: { shirt: 3, shoes: 0 }, skinColor: 52, hairColor: 81 }],
+  // Mab: mab_mask 1129, mab 1191.
+  ['mab', 'Mab', { outfit: { hair: 'Curly_pixie_hair', hat: 'mab_mask', eyes: 'eyes_01', mouth: 'mouth_09', nose: 'nose_0009', ears: 'ears_0005', shirt: 'plain_tee_dark', coat: 'mab', pants: 'plain_trousers', shoes: 'laborer_boots' }, variant: { shirt: 0, pants: 3, shoes: 0 }, skinColor: 50, hairColor: 83 }],
+  // Cosma: cosma_hat 652, cosma_coat 619.
+  ['cosma', 'Cosma', { outfit: { hair: 'loopy_bun', hat: 'cosma_hat', eyes: 'eyes_girly_2', mouth: 'mouth_little_lady', nose: 'nose_skinny_1', ears: 'ears_0001', shirt: 'plain_tee_light', coat: 'cosma_coat', pants: 'leggings_pants', shoes: 'khussa' }, variant: { shirt: 0, coat: 0, pants: 1, shoes: 3 }, skinColor: 41, hairColor: 76 }],
+  // Alph: alph_mask 1124, alph_lem 1189.
+  ['alph', 'Alph', { outfit: { hair: 'hair_07', hat: 'alph_mask', eyes: 'eyes_big_eyebrows', mouth: 'mouth_12', nose: 'nose_manly_1', ears: 'ears_0003', shirt: 'classic_undershirt', coat: 'alph_lem', pants: 'plain_trousers', shoes: 'steeltoe_boots' }, variant: { shirt: 0, coat: 0, pants: 7, shoes: 0 }, skinColor: 13, hairColor: 74 }],
+  // Lem: Lem_mask 1126, alph_lem 1190.
+  ['lem', 'Lem', { outfit: { hair: 'hair_09', hat: 'Lem_mask', eyes: 'eyes_20101109B', mouth: 'mouth_01', nose: 'nose_0017', ears: 'ears_0009', shirt: 'plain_tee_dark', coat: 'alph_lem', pants: 'plain_trousers', shoes: 'chelsea_boots' }, variant: { shirt: 4, coat: 1, pants: 15, shoes: 1 }, skinColor: 45, hairColor: 65 }],
+  // Grendaline: grendaline_mask 1128, Grendaline_tii_outfit 1188.
+  ['grendaline', 'Grendaline', { outfit: { hair: 'wavy_tieback_ponytail', hat: 'grendaline_mask', eyes: 'eyes_girly_1', mouth: 'mouth_20101109C', nose: 'nose_curl', ears: 'ears_fish', shirt: 'plain_tee_light', coat: 'Grendaline_tii_outfit', pants: 'leggings_pants', shoes: 'fairy_shoes' }, variant: { shirt: 0, coat: 1, pants: 1, shoes: 1 }, skinColor: 31, hairColor: 84 }],
+  // Chicken suit: chicken_hat 471, chicken_suit_top 444, chicken_suit_pants 484, chicken_feet 485.
+  ['chicken', 'Chicken suit', { outfit: { hair: 'hair_03', hat: 'chicken_hat', eyes: 'eyes_03', mouth: 'mouth_tongue', nose: 'nose_0001', ears: 'ears_0001', shirt: 'plain_tee_light', coat: 'chicken_suit_top', pants: 'chicken_suit_pants', shoes: 'chicken_feet' }, variant: { hat: 0, shirt: 2, coat: 0, pants: 0 }, skinColor: 4, hairColor: 69 }],
+  // Bunny suit: bunny_suit_hat 295, bunny_suit_coat 594, bunny_suit_pants 511, bunny_slippers 473.
+  ['bunny', 'Bunny suit', { outfit: { hair: 'pigtails', hat: 'bunny_suit_hat', eyes: 'eyes_girly_2', mouth: 'mouth_10', nose: 'nose_curl', ears: 'ears_0001', shirt: 'plain_tee_light', coat: 'bunny_suit_coat', pants: 'bunny_suit_pants', shoes: 'bunny_slippers' }, variant: { hat: 0, shirt: 1, coat: 0, pants: 1, shoes: 0 }, skinColor: 1, hairColor: 87 }],
+  // Unicorn: unicorn_hat 834, unicorn_top 843, unicorn_pants 844.
+  ['unicorn', 'Unicorn', { outfit: { hair: 'loopy_bun', hat: 'unicorn_hat', eyes: 'eyes_rainbow', mouth: 'mouth_B0013', nose: 'nose_0017', ears: 'ears_0001', shirt: 'plain_tee_light', coat: 'unicorn_top', pants: 'unicorn_pants', shoes: 'ballet_shoes' }, variant: { hat: 1, shirt: 1, coat: 1, pants: 1, shoes: 0 }, skinColor: 52, hairColor: 122 }],
+  // Gorilla: gorilla_mask 868, gorilla_coat 787, gorilla_pants 867 (bare feet).
+  ['gorilla', 'Gorilla', { outfit: { hair: 'Buzzcut', hat: 'gorilla_mask', eyes: 'eyes_20101109C', mouth: 'mouth_old', nose: 'nose_jughead', ears: 'ears_0005', shirt: 'plain_tee_dark', coat: 'gorilla_coat', pants: 'gorilla_pants', shoes: 'none' }, variant: { hat: 0, shirt: 3, coat: 0, pants: 0 }, skinColor: 70, hairColor: 81 }],
+  // Garden gnome: Garden_gnome_hat 1118, garden_gnome_top 1175.
+  ['gnome', 'Garden gnome', { outfit: { hair: 'baldTop', hat: 'Garden_gnome_hat', eyes: 'eyes_20101109A', mouth: 'mouth_20101109D', nose: 'nose_0010', ears: 'ears_0002', shirt: 'plain_tee_light', coat: 'garden_gnome_top', pants: 'plain_trousers', shoes: 'clogs' }, variant: { hat: 1, shirt: 4, coat: 1, pants: 13, shoes: 2 }, skinColor: 15, hairColor: 76 }],
+  // Cardboard robot: cardboard_robot_hat 394, cardboard_robot_top 393, cardboard_robot_pants 404.
+  ['robot', 'Cardboard robot', { outfit: { hair: 'Buzzcut', hat: 'cardboard_robot_hat', eyes: 'eyes_robot', mouth: 'mouth_black', nose: 'nose_triangle', ears: 'ears_0003', shirt: 'classic_undershirt', coat: 'cardboard_robot_top', pants: 'cardboard_robot_pants', shoes: 'steeltoe_boots' }, variant: { shirt: 1, shoes: 1 }, skinColor: 62, hairColor: 20 }],
+  // Maki roll: maki_roll_hat 729, maki_costume 721.
+  ['maki', 'Maki roll', { outfit: { hair: 'hair_12', hat: 'maki_roll_hat', eyes: 'eyes_02', mouth: 'mouth_20101109F', nose: 'nose_0006', ears: 'ears_0001', shirt: 'plain_tee_dark', coat: 'maki_costume', pants: 'plain_trousers', shoes: 'geta' }, variant: { shirt: 3, pants: 10 }, skinColor: 56, hairColor: 81 }],
+];
+
+function costumePresets() {
+  return Object.fromEntries(COSTUMES.map(([id, label, fields]) => [`costume_${id}`, {
+    id: `costume_${id}`,
+    label,
+    group: 'costumes',
+    appearance: vectorPreset(fields),
+  }]));
+}
 
 /**
  * Tiny Speck's four new-player looks: every "Start fresh" slot on one choice
@@ -304,6 +350,7 @@ export const APPEARANCE_PRESETS = {
     }),
   },
   ...starterPresets(),
+  ...costumePresets(),
   glitch: {
     id: 'glitch',
     label: 'Recovered',
