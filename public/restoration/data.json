@@ -1760,9 +1760,9 @@
  "skills": {
   "total": 105,
   "counts": {
-   "live": 98,
+   "live": 99,
    "later": 1,
-   "partial": 3,
+   "partial": 2,
    "multiplayer": 3
   }
  },
@@ -1786,14 +1786,14 @@
   "skipped": 23
  },
  "icons": {
-  "items": 773,
-  "sharp": 772
+  "items": 774,
+  "sharp": 773
  },
  "imagination": {
   "total": 275,
   "counts": {
-   "live": 236,
-   "later": 7,
+   "live": 238,
+   "later": 5,
    "starter": 9,
    "none": 6,
    "multiplayer": 9,
@@ -1806,9 +1806,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 301,
+  "commits": 304,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Every Glitch is drawn from Tiny Speck's vector parts; the bitmap avatars are retired"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Dress up as a giant, the Rook, a chicken or a garden gnome from the Costumes presets"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Start fresh with Tiny Speck's new-player avatar picker, four choices for each part"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1913,24 +1928,9 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Pick every Tower floor, roof and decoration the original offered"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "The floor under construction has only the Tower's base frame over it"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Hair seen from behind keeps its streaks instead of a white cap"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Radial Heights cheers \"Good work, you've got all the stars!\" when you find them all"
    }
   ]
  },
- "tests": 180,
+ "tests": 181,
  "generatedAt": "2026-10-23"
 }

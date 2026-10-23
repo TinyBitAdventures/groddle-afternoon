@@ -96,7 +96,6 @@ describe('statuses (imagination-remake.js)', () => {
     const later = Object.keys(IMAGINATION_UPGRADES).filter((id) => remakeStatus(id).status === 'later').sort();
     assert.deepEqual(later, [
       'ancestral_lands_time_1', 'ancestral_lands_time_2',
-      'element_handling_bonus_1', 'element_handling_bonus_2',
       'furnituremaking_bonus_upgrade_1', 'furnituremaking_bonus_upgrade_2', 'furnituremaking_bonus_upgrade_3',
     ]);
   });

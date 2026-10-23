@@ -80,7 +80,9 @@ const RULES = [
   [/^fiber_arts_bonus_2$/, 'live', '4% of General Fabric batches on a Loomer give 2 more Fabric.'],
   [/^distilling_(corn|grain|potato)$/, 'live', 'That crop puts 20% more into the Still hopper.'],
   [/^crystallography_craft_multiple_crystals$/, 'none', 'Secret card with no server effect.'],
-  [/^element_handling_bonus_[12]$/, 'later', 'The Shake verb lives on the Elemental Pouch, and bags are not in the remake (elements stack in the pack).'],
+  // bag_elemental_pouch.js verbs.shake 53-114 + doShake 669-690 (js/elemental-pouch.js).
+  [/^element_handling_bonus_1$/, 'live', 'Adds Shake to your Elemental Pouch: once a day, each element in it grows by 4, 5 or 6% (rounded), up to 5000 of each.'],
+  [/^element_handling_bonus_2$/, 'live', 'Super Shake: each element grows by 8 to 12% instead (rounded), up to 5000 of each.'],
   [/^tinkering_repairing_gives_mood$/, 'live', 'Repairs with the Tinkertool also lift your mood.'],
 
   // Trees, gardens and animals.

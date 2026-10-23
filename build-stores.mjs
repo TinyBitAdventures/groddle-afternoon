@@ -72,10 +72,12 @@ for (const [rawId, meta] of Object.entries(KEEP)) {
     // Machine parts and pasture machines have no remake system yet and no
     // recovered icon, so stock only what the pack can actually show.
     // Icons that arrived with drop tables still have no system behind them:
-    // bags (no bag slots) and the snapshot Camera (no photos).
+    // bags (no bag slots) and the snapshot Camera (no photos). The Elemental
+    // Pouch is the exception: js/elemental-pouch.js gives it its Shake and
+    // Rename verbs while elements stay in the pack (G83).
     // js/seasons.js SEASONAL_STOCK adds these only during Glitchmas.
     if (SEASONAL.has(entry.class_tsid)) continue;
-    if (/^bag_/.test(entry.class_tsid) || entry.class_tsid === 'camera') {
+    if ((/^bag_/.test(entry.class_tsid) && entry.class_tsid !== 'bag_elemental_pouch') || entry.class_tsid === 'camera') {
       skipped.push(`${store.name}: ${entry.class_tsid}`);
       continue;
     }

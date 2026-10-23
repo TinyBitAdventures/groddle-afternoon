@@ -125,6 +125,11 @@ export const STORE_CATALOG = Object.freeze([
         "cost": 1344
       },
       {
+        "classTsid": "bag_elemental_pouch",
+        "label": "Elemental Pouch",
+        "cost": 56
+      },
+      {
         "classTsid": "ore_grinder",
         "label": "Grinder",
         "cost": 224
@@ -565,6 +570,11 @@ export const STORE_CATALOG = Object.freeze([
         "cost": 3745
       },
       {
+        "classTsid": "bag_elemental_pouch",
+        "label": "Elemental Pouch",
+        "cost": 54
+      },
+      {
         "classTsid": "alchemical_tongs",
         "label": "Alchemical Tongs",
         "cost": 642
@@ -765,6 +775,11 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "spice_mill",
         "label": "Spice Mill",
         "cost": 158
+      },
+      {
+        "classTsid": "bag_elemental_pouch",
+        "label": "Elemental Pouch",
+        "cost": 53
       },
       {
         "classTsid": "test_tube",
@@ -1445,6 +1460,11 @@ export const STORE_CATALOG = Object.freeze([
         "classTsid": "tinkertool",
         "label": "Tinkertool",
         "cost": 750
+      },
+      {
+        "classTsid": "bag_elemental_pouch",
+        "label": "Elemental Pouch",
+        "cost": 75
       },
       {
         "classTsid": "alchemical_tongs",

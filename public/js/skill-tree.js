@@ -180,8 +180,9 @@ export const SKILL_REMAKE_NOTES = Object.freeze({
 
   // Alchemy
   'Element Handling': {
-    status: 'partial',
-    note: 'A step toward Alchemy and Refining. The Elemental Pouch it lets you carry is not here; elements simply stack in your pack.',
+    status: 'live',
+    // inc_data_skills.js 1076-1110; quests/elementhandling_buy_elemental_pouch.js; bag_elemental_pouch.js canPickup 661-667.
+    note: 'A step toward Alchemy and Refining. The Magic Rock then asks you to buy an Elemental Pouch from a Hardware, Alchemical Goods, Tool or Mining Vendor, and fills it with 100 each of Red, Green and Blue Elements. Only Element Handlers can pick a pouch up off the ground. Elements still stack in your pack, which counts as the pouch for its Shake cards.',
   },
   Alchemy: {
     status: 'live',
