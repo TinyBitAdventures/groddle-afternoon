@@ -1,9 +1,11 @@
 // Usage: node tools/shot.mjs "<query>" shots/out.png [waitMs] [actions-json]
 // actions: [{"key":"e"},{"wait":500},{"click":"#selector"},{"eval":"js"},{"hold":"d","ms":800}]
+// BASE=http://127.0.0.1:8771/ shoots a local server (e.g. over a worktree) instead of Cove.
 import { chromium } from 'playwright';
 
 const [query = '', out = 'shot.png', waitArg = '6000', actionsArg = '[]'] = process.argv.slice(2);
-const url = `https://groddle.localhost/${query.startsWith("?") || /^[\w/-]+\.html/.test(query) ? query : `?${query}`}`;
+const base = String(process.env.BASE || 'https://groddle.localhost/').replace(/\/?$/, '/');
+const url = `${base}${query.startsWith("?") || /^[\w/-]+\.html/.test(query) ? query : `?${query}`}`;
 const browser = await chromium.launch({
   args: ['--ignore-certificate-errors', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
