@@ -133,10 +133,10 @@ describe('decorating the house', () => {
     assert.equal(placeFurniture(state, inv, 'furniture_chair', { x: 500 }).reason, 'none');
   });
 
-  it('clamps inside the end caps', () => {
+  it('clamps onto the bookshelf plat, clear of the end caps (inc_homes.js 1497-1532)', () => {
     const state = createHomeDecorState();
     const at = snapPlacement(state, 'furniture_bed', { x: -500 });
-    assert.equal(at.x, INTERIOR.endCapW + 142);
+    assert.equal(at.x, SEGMENT_W + 142);
   });
 
   it('rests tabletop decor on tables and carries it when the table moves', () => {

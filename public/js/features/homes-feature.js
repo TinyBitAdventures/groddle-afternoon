@@ -30,6 +30,8 @@
  *     ?autostart=1&fresh=1&homedemo=cultivate (lived-in yard, Cultivate open)
  *     add &homeautoplay=1 to run the scripted place / move / flip / swatch /
  *     pick up (decorate) or cultivate / expand / remove (cultivate) loop.
+ *     &homefurniture=furniture_rug,furniture_painting puts those in furniture storage
+ *     (shared with Tower floors: &homedemo=home&towerdemo=inside, then Decorate).
  * Canvas data: homeDecorPlaced, homeDecorStorage, homeDecorWall/Walls/Floor/Ceiling, homeStamping,
  * homeDecorSegments, homeMode, homeCultivations, homeYard, homeAutoplay.
  */
@@ -70,7 +72,7 @@ import {
   textureConfig,
   unexpandInterior,
   UNEXPAND_TEXT,
-} from '../home-decor.js?v=home-decor-3';
+} from '../home-decor.js?v=home-decor-4';
 import {
   nearestFreeRx,
   FIREFLY_HIVE,
@@ -1975,7 +1977,19 @@ function wearFromNodes(engine, now) {
 // QA demo + autoplay
 // ---------------------------------------------------------------------------
 
+/** QA &homefurniture=furniture_rug,furniture_painting: one of each into furniture storage, once. */
+let demoFurnitureDone = false;
+function demoFurniture(engine) {
+  const raw = String(engine.param('homefurniture') || '');
+  if (demoFurnitureDone || !raw) return;
+  demoFurnitureDone = true;
+  for (const cls of raw.split(',').map((c) => c.trim())) {
+    if (furnitureDef(cls)) houseDecor.storage[cls] = (houseDecor.storage[cls] || 0) + 1;
+  }
+}
+
 function demoSetup(engine) {
+  demoFurniture(engine);
   if (demoDone || !scene) return;
   const demo = String(engine.param('homedemo') || '').toLowerCase();
   if (demo !== 'decorate' && demo !== 'cultivate') return;

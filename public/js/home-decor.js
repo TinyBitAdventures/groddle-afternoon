@@ -17,6 +17,12 @@
  *                              per-segment wallpaper (homes_set_wp), homes_extend
  * - locations/tower.js         tower_build_floor: 145 px elevator offset, six
  *                              wall segments and a right end, 28 px frames
+ * - locations/inc_geo_builder.js geo_builder_room_plats (122-182): the placement
+ *                              plats per userdeco set (ceiling, wall, bookshelf,
+ *                              chair, rug, front), from the room's start_x / end_x
+ *                              (tower.js 455-458; inc_homes.js 1497-1563 for houses)
+ * - glitch-client HandOfDecorator.as 1144-1149: a piece snaps onto its plat with
+ *                              its half width kept inside the plat's ends
  *
  * Remake decisions:
  * - The house interior is one floor. Wall segments are the source 150 px; the
@@ -70,6 +76,14 @@ export const TOWER_ROOM = Object.freeze({
   innerLeft: 130,
   innerRight: 145 + (6 + 1) * 150 - 17 - 76,
 });
+/**
+ * geo_builder_room_plats: each placement plat runs from start_x + inset to
+ * end_x - inset (ceiling / wall pulled in 10 px, bookshelf on the room, chair,
+ * front and rug pushed out 10 / 20 / 42 px).
+ */
+export const PLACEMENT_INSET = Object.freeze({ ceiling: 10, wall: 10, bookshelf: 0, chair: -10, rug: -42, front: -20 });
+/** The plat a slot falls back to when a class names no known set. */
+const SLOT_PLAT = Object.freeze({ ceiling: 'ceiling', wall: 'wall', rug: 'rug', floor: 'bookshelf' });
 /** The pre-G7 geometry, for migrating old saves. */
 const OLD_GEO = Object.freeze({ segmentW: 200, endCapW: 56, towerW: 1200 });
 
@@ -207,9 +221,9 @@ export function wallSlots(state) {
 }
 
 /**
- * Keep placed furniture inside the room. Saves from the old 200 px geometry are
- * spread onto the new floor in proportion; ceiling pieces hang from the ceiling
- * platform and wall pieces stay on the wall.
+ * Keep placed furniture on its placement plats. Saves from the old 200 px
+ * geometry are spread onto the new floor in proportion; ceiling pieces hang
+ * from the ceiling platform and wall pieces stay on the wall.
  */
 function fitPlacements(state, legacy) {
   const { left, right, width } = interiorBounds(state);
@@ -225,8 +239,7 @@ function fitPlacements(state, legacy) {
   const moved = new Map();
   for (const row of hosts) {
     const before = { x: row.x, y: row.y };
-    const half = furnitureSize(row.classTsid).w / 2;
-    row.x = Math.round(Math.max(left + half, Math.min(right - half, mapX(row.x))));
+    row.x = horizontalClamp(state, row.classTsid, mapX(row.x));
     if (row.slot === 'ceiling') row.y = INTERIOR.ceilingY;
     else if (row.slot === 'wall') {
       const h = furnitureSize(row.classTsid).h;
@@ -301,9 +314,38 @@ export function placedItem(state, id) {
   return itemById(state, id);
 }
 
+/**
+ * The room's placement-plat start_x / end_x. Tower: tower.js 455-456
+ * (left_offset + 32, left_offset + 6 x 150: 177 and 1045, clear of the
+ * elevator column). House: inc_homes.js 1497-1498, the wall segments between
+ * the two 150 px end caps (150 and width - 150).
+ */
+export function placementRoom(state) {
+  if (state?.layout === 'tower') {
+    return { start: TOWER_ROOM.leftOffset + 32, end: TOWER_ROOM.leftOffset + TOWER_ROOM.wallSegments * SEGMENT_W };
+  }
+  return { start: SEGMENT_W, end: interiorWidth(state) - SEGMENT_W };
+}
+
+/**
+ * Where a piece may stand: the widest of the plats its placement_set names
+ * (the client looks for the closest plat that can hold the class).
+ */
+export function placementSpan(state, classTsid) {
+  const room = placementRoom(state);
+  const def = furnitureDef(classTsid);
+  const sets = (def?.placementSet || []).filter((set) => set in PLACEMENT_INSET);
+  if (!sets.length) sets.push(SLOT_PLAT[def?.slot] || 'bookshelf');
+  return {
+    left: Math.min(...sets.map((set) => room.start + PLACEMENT_INSET[set])),
+    right: Math.max(...sets.map((set) => room.end - PLACEMENT_INSET[set])),
+  };
+}
+
 function horizontalClamp(state, classTsid, x) {
-  const { left, right } = interiorBounds(state);
-  const half = furnitureSize(classTsid).w / 2;
+  const { left, right } = placementSpan(state, classTsid);
+  // HandOfDecorator: half_width_it_takes = Math.ceil(width / 2).
+  const half = Math.ceil(furnitureSize(classTsid).w / 2);
   return Math.round(Math.max(left + half, Math.min(right - half, finite(x, left + half))));
 }
 
