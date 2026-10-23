@@ -79,11 +79,27 @@ describe('Operation: Grow geometry', () => {
     assert.ok(mod.SPAWN.x > mod.BANKS[0].x2 && mod.SPAWN.x < mod.patchX(0));
   });
 
-  it('ships its art', () => {
+  it('ships its art: the Snap\'s Firebog stalks, baobabs, boulders and orb glow', async () => {
+    const { OPERATION_GROW_FILES } = await import('../public/js/operation-grow-art.js');
+    const scene = await import('../public/js/operation-grow-scene.js');
+    const plan = JSON.parse(readFileSync(join(root, 'tools/room-art/operation_grow.json'), 'utf8'));
+    assert.deepEqual(Object.keys(plan.pieces).sort(), Object.keys(OPERATION_GROW_FILES).sort());
+    for (const name of ['plants1', 'plants1_blue', 'magic_mushroom_light_blue', 'bottletree_silhouette_blue', 'bg2_tree1_dusk']) {
+      assert.ok(OPERATION_GROW_FILES[name], name);
+    }
+    // The blue stalk is plants1 recoloured, not new art.
+    assert.equal(plan.pieces.plants1_blue.swf, 'bundle:firebog.swf#plants1');
+    assert.ok(plan.pieces.plants1_blue.ramp.length >= 3);
+    for (const [file] of Object.values(OPERATION_GROW_FILES)) {
+      assert.ok(existsSync(join(root, 'public', scene.GROW_ART_DIR, file)), file);
+    }
+    // 15 orbs, all inside the stalk's 78 x 232 world box.
+    assert.equal(scene.STALK_ORBS.length, 15);
+    const [, w, h] = OPERATION_GROW_FILES.plants1;
+    for (const [dx, dy] of scene.STALK_ORBS) assert.ok(Math.abs(dx) <= w / 2 && dy < 0 && -dy <= h, `${dx},${dy}`);
     for (const f of [
-      'assets/sprites/soil/patch-dark-dirty.png', 'assets/sprites/soil/patch-seedling.png',
-      'assets/decos/groddle/bling_branchflowerbrush_blue_1.webp', 'assets/decos/groddle/mushroom_aqua_1.webp',
-      'assets/decos/groddle/firebog_sign_blank_plank.webp', 'assets/decos/groddle/underground_bogwillow.webp',
+      'assets/decos/groddle/gravel_1.webp', 'assets/decos/groddle/backhill3_blue.webp',
+      'assets/decos/groddle/ground_spots_dark_1.webp', 'assets/decos/groddle/firebog_sign_blank_plank.webp',
       mod.room.icon,
     ]) assert.ok(existsSync(join(root, 'public', f)), f);
   });

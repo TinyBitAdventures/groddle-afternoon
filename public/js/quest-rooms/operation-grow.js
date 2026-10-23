@@ -12,22 +12,27 @@
  * currants, 200 Mab favor.
  *
  * Lost: the template, its puzzle items and their event scripts, and no
- * recording has turned up. The room is rebuilt from the quest text alone
+ * recording has turned up, so the puzzle is designed from the quest text
  * ("Solve the puzzle to brighten up the gloomy, forgotten bog fields. I bet
- * Mab left a hint somewhere to help you out."): seven gloomy bog patches in a
+ * Mab left a hint somewhere to help you out."): seven gloomy stalks in a
  * row, where tending one stirs it and its two neighbours between gloom and
  * bloom (a lights-out row, the kind of toggle the source's
- * clickable_broadcaster + deco_show/hide events built). The field brightens
- * as patches bloom. Mab's hint is her card on a plank up on the mossy banks
- * left of the start: a row of seven dots with the first, middle and last
- * picked out. Solving locks the field in bloom; the way back sits at the far
- * end (or Leave). Art: recovered soil patches, Firebog decos (bogwillow,
- * cattails, aqua mushrooms, blue wildflowers, plank sign; drawn firefly glows) and
- * the Mab icon.
+ * clickable_broadcaster + deco_show/hide events built). Mab's hint is her
+ * card on a plank up on the banks left of the start: a row of seven dots with
+ * the first, middle and last picked out. Solving locks the field in bloom;
+ * the way back sits at the far end (or Leave).
+ *
+ * The look comes from the room's one player Snap (research/wayback/raw/snaps/
+ * where_the_blue_grew/, reference only): a dusky blue field of Firebog decos,
+ * its rows of `plants1` stalks one green and the rest teal with glowing cyan
+ * orbs. js/operation-grow-scene.js builds it; a gloomy patch is the green
+ * stalk and tending blooms it blue. Mab's card keeps her icon and the
+ * Firebog plank sign.
  */
 
 import { JUMP_GAP, JUMP_RISE } from './puzzle-kit.js?v=cu-1';
 import { textureFromUrl } from '../textures.js';
+import { buildGrowBackground, makeStalk } from '../operation-grow-scene.js?v=g67-1';
 
 export const W = 2500;
 export const H = 960;
@@ -90,8 +95,8 @@ export function growPlatforms() {
 /* ------------------------------------------------------------------ */
 
 function drawBank(g, b) {
-  g.roundRect(b.x1, b.y, b.x2 - b.x1, FLOOR - b.y, 10).fill(0x3e3326);
-  g.roundRect(b.x1 - 4, b.y - 4, b.x2 - b.x1 + 8, 14, 7).fill(0x5c7a3a);
+  g.roundRect(b.x1, b.y, b.x2 - b.x1, FLOOR - b.y, 10).fill(0x3b4248);
+  g.roundRect(b.x1 - 4, b.y - 4, b.x2 - b.x1 + 8, 14, 7).fill(0x5d6f74);
 }
 
 /** Mab's card: her icon on a plank with seven dots, three of them lit. */
@@ -118,33 +123,15 @@ function drawHint(PIXI, kit) {
   return c;
 }
 
-/** One patch: soil, a wilted sprout or blue blooms, and a glow while blooming. */
+/** One patch: a stalk in its gravel ring, green while gloomy, blue with lit orbs in bloom. */
 function makePatch(ctx, i) {
   const { PIXI, kit } = ctx;
-  const c = new PIXI.Container();
-  const glow = kit.glow(PIXI, 0, -26, 0x7fd4ff, 24);
-  glow.alpha = 0;
-  c.addChild(glow);
-  const soil = new PIXI.Sprite(textureFromUrl('assets/sprites/soil/patch-dark-dirty.png'));
-  soil.anchor.set(0.5, 0.75);
-  soil.scale.set(1.2);
-  c.addChild(soil);
-  const wilt = new PIXI.Sprite(textureFromUrl('assets/sprites/soil/patch-seedling.png'));
-  wilt.anchor.set(0.5, 1);
-  wilt.scale.set(0.9);
-  wilt.y = -4;
-  wilt.tint = 0x6f6a5e;
-  c.addChild(wilt);
-  const bloom = new PIXI.Container();
-  bloom.addChild(kit.deco(PIXI, 'bling_branchflowerbrush_blue_1', 0, -2, { scale: 0.62 }));
-  bloom.addChild(kit.deco(PIXI, i % 2 ? 'mushroom_aqua_1' : 'mushroom_aqua_2', i % 2 ? -34 : 36, 0, { scale: i % 2 ? 0.42 : 0.3 }));
-  bloom.addChild(kit.deco(PIXI, 'wildflowers_blue_1', 0, 4, { scale: 0.8 }));
-  bloom.alpha = 0;
-  c.addChild(bloom);
+  const stalk = makeStalk(PIXI, kit, i);
+  const c = stalk.container;
   c.x = patchX(i);
   c.y = FLOOR;
   const target = ctx.register({ classId: 'bog_patch', label: 'Gloomy Patch', subtitle: 'Tend it', sprite: c, ogPatch: i });
-  return { i, target, glow, wilt, bloom, soil, shown: 0 };
+  return { i, target, stalk, shown: 0 };
 }
 
 export const room = {
@@ -161,27 +148,11 @@ export const room = {
   build(ctx) {
     const { PIXI, kit } = ctx;
     ctx.data.state = startState();
-    const root = kit.sceneRoot(PIXI, W, H);
-    const sky = root.layer(0, 0);
-    sky.addChild(kit.gradient(PIXI, [[0, '#4a4f6b'], [0.55, '#7f8f8a'], [1, '#c7d6b5']], 960, 640));
-    const far = root.layer(0.3, 1);
-    for (let i = 0; i < 9; i++) {
-      far.addChild(kit.deco(PIXI, 'underground_bogwillow', 120 + i * 320, 700 + (i % 2) * 30, { scale: 0.9 + (i % 3) * 0.15, alpha: 0.55, tint: 0x6f8a70 }));
-    }
-    const mid = root.layer(0.6, 2);
-    for (let i = 0; i < 14; i++) {
-      mid.addChild(kit.deco(PIXI, i % 2 ? 'cattail_1' : 'cattail_2', 80 + i * 190, 830, { scale: 0.32 + (i % 3) * 0.05, alpha: 0.75 }));
-    }
+    const root = buildGrowBackground(PIXI, kit, { W, H, FLOOR, BANKS, EXIT });
     const world = root.layer(1, 3);
     const g = new PIXI.Graphics();
-    g.rect(-400, FLOOR, W + 800, H - FLOOR + 400).fill(0x3a2f24);
-    g.rect(-400, FLOOR - 6, W + 800, 14).fill(0x4f6a35);
     for (const b of BANKS) drawBank(g, b);
     world.addChild(g);
-    for (let i = 0; i < PATCHES - 1; i++) {
-      world.addChild(kit.deco(PIXI, 'firebog_puddle_1', patchX(i) + PATCH_DX / 2, FLOOR + 14, { scale: 0.16, alpha: 0.8 }));
-    }
-    for (const x of [60, 980, 1640, 2200, 2460]) world.addChild(kit.deco(PIXI, 'underground_bogwillow_1', x, FLOOR + 4, { scale: 0.7 }));
     // The way back: a blue light shaft over a plank.
     ctx.data.exitBeam = kit.deco(PIXI, 'light_shafts_blue', EXIT.x, FLOOR + 10, { scale: 0.22, alpha: 0.15 });
     world.addChild(ctx.data.exitBeam);
@@ -190,14 +161,14 @@ export const room = {
     // The gloom: a dusk wash over everything, lifted as the patches bloom.
     const gloom = new PIXI.Graphics();
     gloom.rect(-200, -200, W + 400, H + 400).fill(0x12101c);
-    gloom.alpha = 0.55;
+    gloom.alpha = 0.38;
     gloom.zIndex = 4;
     root.addChild(gloom);
     ctx.data.gloom = gloom;
     ctx.data.fireflies = [];
     const flies = root.layer(1, 5);
     for (let i = 0; i < 18; i++) {
-      const f = kit.glow(PIXI, 560 + i * 105 + (i % 3) * 23, FLOOR - 90 - ((i * 37) % 150), 0xe8ff8a, 5);
+      const f = kit.glow(PIXI, 560 + i * 105 + (i % 3) * 23, FLOOR - 90 - ((i * 37) % 150), 0x9ff6ff, 5);
       f.alpha = 0;
       flies.addChild(f);
       ctx.data.fireflies.push(f);
@@ -228,13 +199,18 @@ export const room = {
     ctx.data.exit = ctx.register({ classId: 'bog_way_back', label: 'Back to Ur', subtitle: 'Complete the journey', sprite: exitHit });
     ctx.data.tends = [];
     ctx.data.phase = 'play';
+    // QA framing: &growstate=0101010 previews bloom states (no progress), &growx=<world x> places the avatar.
+    const qs = String(ctx.engine.param?.('growstate') || '');
+    if (/^[01]{7}$/.test(qs)) ctx.data.state = [...qs].map((ch) => ch === '1');
+    const qx = Number(ctx.engine.param?.('growx'));
+    if (qx > 0) setTimeout(() => ctx.place(Math.min(W - 40, qx), FLOOR), 400);
   },
 
   tick(ctx, dtMs = 16) {
     const frac = bloomFraction(ctx.data.state || []);
     const k = Math.min(1, (dtMs || 16) / 180);
     if (ctx.data.gloom && !ctx.data.gloom.destroyed) {
-      const want = ctx.data.phase === 'solved' ? 0 : 0.55 * (1 - frac * 0.7);
+      const want = ctx.data.phase === 'solved' ? 0 : 0.38 * (1 - frac * 0.7);
       ctx.data.gloom.alpha += (want - ctx.data.gloom.alpha) * k;
     }
     const t = Date.now() / 1000;
@@ -249,10 +225,7 @@ export const room = {
     for (const p of ctx.data.patches || []) {
       const want = ctx.data.state[p.i] ? 1 : 0;
       p.shown += (want - p.shown) * Math.min(1, k * 1.6);
-      p.bloom.alpha = p.shown;
-      p.bloom.scale.set(0.6 + 0.4 * p.shown);
-      p.wilt.alpha = 1 - p.shown;
-      p.glow.alpha = p.shown * (0.75 + 0.25 * Math.sin(t * 2 + p.i));
+      p.stalk.setBloom(p.shown, t);
     }
   },
 

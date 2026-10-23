@@ -1,0 +1,320 @@
+{
+ "source": "tinyspeck/glitch-locations firebog.swf, lighting1.swf (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "bg2_tree1_dusk": {
+   "scale": 0.34,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    282.25,
+    370.95
+   ],
+   "px": [
+    192,
+    252
+   ],
+   "file": "bg2_tree1_dusk@2x.webp",
+   "swf": "bundle:firebog.swf#bg2_tree1",
+   "swf_sha": "7f0b2ac600176327",
+   "key": "7f0b2ac600176327:0.34:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#26404f\"], [255, \"#4a6e84\"]]",
+   "ramp": [
+    [
+     0,
+     "#26404f"
+    ],
+    [
+     255,
+     "#4a6e84"
+    ]
+   ],
+   "out_px": [
+    192,
+    252
+   ],
+   "world": [
+    96,
+    126
+   ],
+   "bytes": 11636,
+   "lossless": false,
+   "err": 1.53,
+   "sha": "9d61c8e267e1acc4"
+  },
+  "bottletree_silhouette_blue": {
+   "scale": 0.45,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    87.05,
+    117.5
+   ],
+   "px": [
+    78,
+    106
+   ],
+   "file": "bottletree_silhouette_blue@2x.webp",
+   "swf": "bundle:firebog.swf#background_bottletree_silhouette",
+   "swf_sha": "88d628d644e79c60",
+   "key": "88d628d644e79c60:0.45:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#5a8db0\"], [255, \"#8cbcdc\"]]",
+   "ramp": [
+    [
+     0,
+     "#5a8db0"
+    ],
+    [
+     255,
+     "#8cbcdc"
+    ]
+   ],
+   "out_px": [
+    78,
+    106
+   ],
+   "world": [
+    39,
+    53
+   ],
+   "bytes": 3950,
+   "lossless": false,
+   "err": 1.39,
+   "sha": "89fcda7cecb371d6"
+  },
+  "magic_mushroom_light_blue": {
+   "scale": 0.5,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    176.0,
+    176.0
+   ],
+   "px": [
+    176,
+    176
+   ],
+   "file": "magic_mushroom_light_blue@2x.webp",
+   "swf": "bundle:lighting1.swf#magic_mushroom_light_blue",
+   "swf_sha": "c30c6ac85831e28b",
+   "key": "c30c6ac85831e28b:0.5:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    176,
+    176
+   ],
+   "world": [
+    88,
+    88
+   ],
+   "bytes": 6836,
+   "lossless": false,
+   "err": 0.86,
+   "sha": "d17071136c1290ad"
+  },
+  "plants1": {
+   "scale": 2.2,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    35.3,
+    105.4
+   ],
+   "px": [
+    155,
+    464
+   ],
+   "file": "plants1@2x.webp",
+   "swf": "bundle:firebog.swf#plants1",
+   "swf_sha": "77e891e83d7f1904",
+   "key": "77e891e83d7f1904:2.2:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    155,
+    464
+   ],
+   "world": [
+    78,
+    232
+   ],
+   "bytes": 21076,
+   "lossless": false,
+   "err": 3.88,
+   "sha": "4fc94133bdc83049"
+  },
+  "plants1_blue": {
+   "scale": 2.2,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    35.3,
+    105.4
+   ],
+   "px": [
+    155,
+    464
+   ],
+   "file": "plants1_blue@2x.webp",
+   "swf": "bundle:firebog.swf#plants1",
+   "swf_sha": "77e891e83d7f1904",
+   "key": "77e891e83d7f1904:2.2:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#001c1c\"], [40, \"#003838\"], [88, \"#006868\"], [115, \"#00b4b4\"], [162, \"#00ecec\"], [179, \"#3cffff\"], [255, \"#d2ffff\"]]",
+   "ramp": [
+    [
+     0,
+     "#001c1c"
+    ],
+    [
+     40,
+     "#003838"
+    ],
+    [
+     88,
+     "#006868"
+    ],
+    [
+     115,
+     "#00b4b4"
+    ],
+    [
+     162,
+     "#00ecec"
+    ],
+    [
+     179,
+     "#3cffff"
+    ],
+    [
+     255,
+     "#d2ffff"
+    ]
+   ],
+   "out_px": [
+    155,
+    464
+   ],
+   "world": [
+    78,
+    232
+   ],
+   "bytes": 22086,
+   "lossless": false,
+   "err": 3.55,
+   "sha": "e433309091eb131c"
+  },
+  "stone_moss_2_slate": {
+   "scale": 0.45,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    189.35,
+    70.75
+   ],
+   "px": [
+    170,
+    64
+   ],
+   "file": "stone_moss_2_slate@2x.webp",
+   "swf": "bundle:firebog.swf#stone_moss_2",
+   "swf_sha": "f7a527be0874b940",
+   "key": "f7a527be0874b940:0.45:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#1e2b30\"], [70, \"#3e555a\"], [130, \"#5f7c80\"], [200, \"#86a4a6\"], [255, \"#b4cccc\"]]",
+   "ramp": [
+    [
+     0,
+     "#1e2b30"
+    ],
+    [
+     70,
+     "#3e555a"
+    ],
+    [
+     130,
+     "#5f7c80"
+    ],
+    [
+     200,
+     "#86a4a6"
+    ],
+    [
+     255,
+     "#b4cccc"
+    ]
+   ],
+   "out_px": [
+    170,
+    64
+   ],
+   "world": [
+    85,
+    32
+   ],
+   "bytes": 2408,
+   "lossless": false,
+   "err": 2.06,
+   "sha": "02c234213f7bec1a"
+  },
+  "stone_moss_group_1_slate": {
+   "scale": 0.5,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    189.5,
+    99.5
+   ],
+   "px": [
+    190,
+    100
+   ],
+   "file": "stone_moss_group_1_slate@2x.webp",
+   "swf": "bundle:firebog.swf#stone_moss_group_1",
+   "swf_sha": "a280492f4f5ceb5a",
+   "key": "a280492f4f5ceb5a:0.5:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#1e2b30\"], [70, \"#3e555a\"], [130, \"#5f7c80\"], [200, \"#86a4a6\"], [255, \"#b4cccc\"]]",
+   "ramp": [
+    [
+     0,
+     "#1e2b30"
+    ],
+    [
+     70,
+     "#3e555a"
+    ],
+    [
+     130,
+     "#5f7c80"
+    ],
+    [
+     200,
+     "#86a4a6"
+    ],
+    [
+     255,
+     "#b4cccc"
+    ]
+   ],
+   "out_px": [
+    190,
+    100
+   ],
+   "world": [
+    95,
+    50
+   ],
+   "bytes": 3466,
+   "lossless": false,
+   "err": 2.17,
+   "sha": "b717c93460e89386"
+  }
+ }
+}

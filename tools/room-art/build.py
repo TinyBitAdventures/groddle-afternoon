@@ -12,6 +12,20 @@ Sets (each: decos, world scale per deco, output folder, a plan and a generated J
 - sky_plunge (G68): the Sky Plunge landing's two doors (Snap research/wayback/raw/snaps/
   paradise_sky_plunge/: tall, round-topped dark wooden doors with an oval window) are the CC0
   door_asset_heights_interior deco (groddle1.swf bundle). js/paradise-course-runtime.js places them.
+- rube_yard (G66): The Rube's yard (template LIFJM2QDA093KA6, lost). Its two Snaps (research/wayback/
+  raw/snaps/rube_spy/) show a junk garden built from Firebog and Groddle bling decos; most are already
+  in assets/decos/groddle, these three are not: the "Open House" sign and the rook skull on its box
+  (firebog.swf) and the "Please wait here for the next available agent" sign (groddle1.swf).
+  js/rube-yard-scene.js lays the yard out.
+- operation_grow (G67): Operation Grow (template LIFI8QG9A093USI, lost). Its Snap (raw/snaps/
+  where_the_blue_grew/) shows rows of the Firebog `plants1` stalk, one in its own green and the rest
+  recoloured teal with bright cyan orbs, so the set renders plants1 twice: as drawn, and through a
+  luminance ramp read off the Snap (opts 'ramp'). The cyan orb glow is magic_mushroom_light_blue
+  (lighting1.swf). js/operation-grow-scene.js lays the field out.
+
+A piece spec may carry a fifth element, an options dict: 'deco' renders another deco under this piece's
+name (a recoloured copy), 'ramp' maps each pixel's luminance (0.299 R + 0.587 G + 0.114 B) through
+[[luma, '#rrggbb'], ...] stops, keeping alpha. Pieces without options build exactly as before.
 
 This reuses the street deco pipeline (tools/deco-pipeline/build.py): the deco SWF a bundle embeds is
 rendered once by FFDec (render_batch), its stage is resampled with Lanczos onto the output size
@@ -89,6 +103,50 @@ SETS = {
             'door_asset_heights_interior': (0.9, 2, 0),
         },
     },
+    # Rube's yard scales: the Snaps frame the same width as the remake's view (the avatar is ~85 of
+    # 640 Snap px, ~130 world px here), so one Snap px is ~1.5 world px.
+    'rube_yard': {
+        'bundle': 'firebog.swf',
+        'out': 'assets/sprites/quest-rooms/rube_yard',
+        'js': 'js/rube-yard-art.js',
+        'export': 'RUBE_YARD_FILES',
+        'pieces': {
+            'open_house_sign': (0.8, 2, 0),
+            'rook_hall_skull_deco': (0.65, 2, 0),
+            'bureaucratic_hall_sign_wait_1': (0.85, 2, 0, 'groddle1.swf'),
+        },
+    },
+    # Operation Grow: the Snap's big stalks stand ~230 world px (stage 106 px tall -> 2.2).
+    'operation_grow': {
+        'bundle': 'firebog.swf',
+        'out': 'assets/sprites/quest-rooms/operation_grow',
+        'js': 'js/operation-grow-art.js',
+        'export': 'OPERATION_GROW_FILES',
+        'pieces': {
+            'plants1': (2.2, 2, 0),
+            'plants1_blue': (2.2, 2, 0, 'firebog.swf', {
+                'deco': 'plants1',
+                # Snap PIFOC6038Q53T2J: stem #386858 -> #006868, dark orbs #20a068 -> ~#00b4b4, light
+                # orbs #68c0a0 / #70d8a0 -> ~#00ecec / #3cffff (the stems' outline keeps its darker step).
+                'ramp': [[0, '#001c1c'], [40, '#003838'], [88, '#006868'], [115, '#00b4b4'],
+                         [162, '#00ecec'], [179, '#3cffff'], [255, '#d2ffff']],
+            }),
+            'magic_mushroom_light_blue': (0.5, 2, 0, 'lighting1.swf'),
+            # The Snap's horizon baobabs are the Firebog bottletree silhouettes in pale blue, the big
+            # one by the dome a darker blue, and its boulders the mossy stones in slate (ramps read
+            # off the Snap: #73a7cc, ~#35546a, #627b75..#8fa3a6).
+            'bottletree_silhouette_blue': (0.45, 2, 0, 'firebog.swf', {
+                'deco': 'background_bottletree_silhouette', 'ramp': [[0, '#5a8db0'], [255, '#8cbcdc']]}),
+            'bg2_tree1_dusk': (0.34, 2, 0, 'firebog.swf', {
+                'deco': 'bg2_tree1', 'ramp': [[0, '#26404f'], [255, '#4a6e84']]}),
+            'stone_moss_group_1_slate': (0.5, 2, 0, 'firebog.swf', {
+                'deco': 'stone_moss_group_1',
+                'ramp': [[0, '#1e2b30'], [70, '#3e555a'], [130, '#5f7c80'], [200, '#86a4a6'], [255, '#b4cccc']]}),
+            'stone_moss_2_slate': (0.45, 2, 0, 'firebog.swf', {
+                'deco': 'stone_moss_2',
+                'ramp': [[0, '#1e2b30'], [70, '#3e555a'], [130, '#5f7c80'], [200, '#86a4a6'], [255, '#b4cccc']]}),
+        },
+    },
 }
 
 
@@ -100,6 +158,25 @@ def set_paths(name):
 def piece(spec, cfg):
     scale, density, band = spec[:3]
     return scale, density, band, (spec[3] if len(spec) > 3 else cfg['bundle'])
+
+
+def piece_opts(spec):
+    """The optional fifth element of a piece spec ({} when absent)."""
+    return spec[4] if len(spec) > 4 else {}
+
+
+def apply_ramp(img, ramp):
+    """Map each pixel's luminance through [[luma, '#rrggbb'], ...] stops (linear between), keeping alpha."""
+    import numpy as np
+    from PIL import Image
+    a = np.asarray(img.convert('RGBA'), dtype=np.float32)
+    luma = a[..., 0] * 0.299 + a[..., 1] * 0.587 + a[..., 2] * 0.114
+    xs = [float(s[0]) for s in ramp]
+    out = a.copy()
+    for ch in range(3):
+        ys = [int(s[1][1 + 2 * ch:3 + 2 * ch], 16) for s in ramp]
+        out[..., ch] = np.interp(luma, xs, ys)
+    return Image.fromarray(np.clip(out + 0.5, 0, 255).astype('uint8'), 'RGBA')
 
 
 def file_name(name, density):
@@ -152,13 +229,18 @@ def build_set(args, set_name, index):
     todo = []
     for name, spec in PIECES.items():
         scale, density, band, bundle = piece(spec, cfg)
-        swf = audit.bundled_swf(args.work, bundle, name, index)
+        opts = piece_opts(spec)
+        src_name = opts.get('deco', name)
+        swf = audit.bundled_swf(args.work, bundle, src_name, index)
         swf_sha = deco.sha(swf)[:16]
         stage = swfinfo.read(swf)['stage']
         px = [max(1, round(stage[0] * scale * density)), max(1, round(stage[1] * scale * density))]
         row = {'scale': scale, 'density': density, 'band': band, 'stage': stage, 'px': px,
-               'file': file_name(name, density), 'swf': f'bundle:{bundle}#{name}', 'swf_sha': swf_sha}
+               'file': file_name(name, density), 'swf': f'bundle:{bundle}#{src_name}', 'swf_sha': swf_sha}
         row['key'] = key(name, scale, density, band, swf_sha)
+        if opts.get('ramp'):
+            row['ramp'] = opts['ramp']
+            row['key'] += ':ramp=' + json.dumps(opts['ramp'])
         old = rows.get(name) or {}
         if not args.force and old.get('key') == row['key'] and os.path.exists(os.path.join(OUT, row['file'])):
             continue
@@ -177,6 +259,8 @@ def build_set(args, set_name, index):
             img = deco.stage_resample(deco.load(found[name]), row['stage'], zoom, row['px'])
             if row['band']:
                 img = seamless(img, row['band'])
+            if row.get('ramp'):
+                img = apply_ramp(img, row['ramp'])
             row['out_px'] = list(img.size)
             row['world'] = [math.floor(img.size[0] / row['density'] + 0.5), math.floor(img.size[1] / row['density'] + 0.5)]  # as JS Math.round
             dst = os.path.join(OUT, row['file'])
@@ -217,9 +301,11 @@ def cmd_check():
         rows = json.load(open(PLAN))['pieces']
         for name, spec in cfg['pieces'].items():
             scale, density, band, bundle = piece(spec, cfg)
+            opts = piece_opts(spec)
             row = rows.get(name)
             if not row or row['scale'] != scale or row['density'] != density or row.get('band') != band \
-                    or row['swf'] != f'bundle:{bundle}#{name}':
+                    or row['swf'] != f'bundle:{bundle}#{opts.get("deco", name)}' \
+                    or row.get('ramp') != opts.get('ramp'):
                 print(f'{set_name}/{name}: not built as {spec}'); bad += 1; continue
             path = os.path.join(OUT, row['file'])
             if not os.path.exists(path) or deco.sha(path)[:16] != row['sha']:

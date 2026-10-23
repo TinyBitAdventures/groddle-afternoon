@@ -9,19 +9,24 @@
  * leaving early fails it. Rewards 500 iMG, 500 currants, 100 mood.
  *
  * Neither the yard's geometry nor any Wrizzard art or item script survives
- * (no items/*wrizzard*), so this is a reconstruction: The Rube's yard of
- * recovered CC0 clutter (crates, barrels, a log pile, fence, bush, his house,
- * a heap of tradeable odds and ends) with ten Wrizzards, the offer's
- * "jar of Wrizzards" drawn as the recovered lizard decos wearing a clean
- * vector wizard hat, peeking out from behind things. Click one to catch it;
- * it hops into The Rube's empty jar. The Rube uses his recovered talk and
- * offer_accept sheets (108x154 cells, facing left).
+ * (no items/*wrizzard*). Two player Snaps of the yard (research/wayback/raw/
+ * snaps/rube_spy/, reference only) show a dusky junk garden under a dark
+ * canopy, and its green lizards are the Firebog lizard1/lizard2 decos the
+ * Wrizzards are drawn from here. js/rube-yard-scene.js dresses the yard from
+ * those Snaps with CC0 Groddle bling and Firebog decos; the Wrizzards (the
+ * offer's "jar of Wrizzards": the lizards in a clean vector wizard hat) peek
+ * out from behind its junk: a stone monument, the red toadstool, the jars on
+ * a table, the big tree's roots, the bird bath, the mossy stone, the rook
+ * skull, the birdhouse post, the face tree and The Rube's stash by his cave.
+ * Click one to catch it; it hops into The Rube's empty jar. The Rube uses his
+ * recovered talk and offer_accept sheets (108x154 cells, facing left).
  */
 
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
+import { YARD_FRONT, YARD_H, YARD_W, buildRubeYardBackground, yardDeco } from '../rube-yard-scene.js?v=g66-1';
 
-const W = 1900;
-const H = 760;
+const W = YARD_W;
+const H = YARD_H;
 const FLOOR = 620;
 export const WRIZZARDS_NEEDED = 10;
 const RUBE_DIR = 'assets/sprites/rube/';
@@ -32,16 +37,17 @@ const CELL = { w: 108, h: 154 };
  * peeking offsets. `under: true` draws the Wrizzard behind the cover.
  */
 export const HIDING_SPOTS = Object.freeze([
-  { id: 'crate_top', cover: 'crate_1', x: 380, y: FLOOR, scale: 0.62, wx: 392, wy: FLOOR - 112, peek: 24, lizard: 'lizard1', under: true },
-  { id: 'barrel', cover: 'barrel_1', x: 560, y: FLOOR, scale: 0.6, wx: 560, wy: FLOOR - 104, peek: 26, lizard: 'lizard1', under: true },
-  { id: 'jar_shelf', cover: 'crate_2', x: 720, y: FLOOR, scale: 0.5, wx: 742, wy: FLOOR - 82, peek: 20, lizard: 'lizard2', under: true },
-  { id: 'logs', cover: 'log_pile2', x: 930, y: FLOOR + 6, scale: 0.55, wx: 990, wy: FLOOR - 70, peek: 22, lizard: 'lizard2', under: true },
-  { id: 'fence', cover: 'fence_wood_1', x: 1140, y: FLOOR + 4, scale: 0.42, wx: 1150, wy: FLOOR - 136, peek: 30, lizard: 'lizard1', under: true },
-  { id: 'bush', cover: 'heights_bush_1', x: 1320, y: FLOOR + 8, scale: 0.6, wx: 1290, wy: FLOOR - 88, peek: 26, lizard: 'lizard2', under: true },
-  { id: 'box', cover: 'k04_box_01', x: 1500, y: FLOOR, scale: 0.2, wx: 1530, wy: FLOOR - 118, peek: 22, lizard: 'lizard1', under: true },
+  { id: 'crate_top', cover: 'bling_stonemonument_1', x: 384, y: FLOOR + 2, scale: 0.28, wx: 392, wy: FLOOR - 112, peek: 24, lizard: 'lizard1', under: true },
+  { id: 'barrel', cover: 'mushroom_amanita_1', x: 566, y: FLOOR + 2, scale: 0.36, wx: 560, wy: FLOOR - 104, peek: 26, lizard: 'lizard1', under: true },
+  { id: 'jar_shelf', cover: 'table', x: 735, y: FLOOR + 4, scale: 0.45, wx: 742, wy: FLOOR - 82, peek: 20, lizard: 'lizard2', under: true,
+    props: [['jar5', 742, FLOOR - 58, 0.64], ['jar3', 700, FLOOR - 58, 0.45]] },
+  { id: 'logs', cover: 'tree_base_root_1', x: 994, y: FLOOR + 4, scale: 0.42, flip: true, wx: 990, wy: FLOOR - 70, peek: 22, lizard: 'lizard2', under: true },
+  { id: 'fence', cover: 'bling_birdbath', x: 1145, y: FLOOR + 4, scale: 0.72, wx: 1150, wy: FLOOR - 136, peek: 30, lizard: 'lizard1', under: true },
+  { id: 'bush', cover: 'bling_stonemonument_2', x: 1300, y: FLOOR + 4, scale: 0.42, wx: 1290, wy: FLOOR - 88, peek: 26, lizard: 'lizard2', under: true },
+  { id: 'box', cover: 'rook_hall_skull_deco', x: 1510, y: FLOOR - 12, scale: 1, wx: 1530, wy: FLOOR - 118, peek: 22, lizard: 'lizard1', under: true },
   { id: 'stash', cover: null, x: 1665, y: FLOOR, scale: 1, wx: 1668, wy: FLOOR - 44, peek: 26, lizard: 'lizard2', under: true },
   // The camera shows ~300 px above the floor and the room card covers its top
-  // ~140, so each Wrizzard's middle stays within ~160 px (the eave, the trunk).
+  // ~140, so each Wrizzard's middle stays within ~160 px (the birdhouse post, the face tree).
   { id: 'roof', cover: null, x: 0, y: 0, scale: 1, wx: 350, wy: FLOOR - 120, peek: 24, lizard: 'lizard1', under: true },
   { id: 'tree', cover: null, x: 0, y: 0, scale: 1, wx: 1790, wy: FLOOR - 110, peek: 22, lizard: 'lizard1', under: false },
 ]);
@@ -103,24 +109,8 @@ export const room = {
 
   build(ctx) {
     const { PIXI, kit } = ctx;
-    const root = kit.sceneRoot(PIXI, W, H);
-    const sky = root.layer(0, 0);
-    sky.addChild(kit.gradient(PIXI, [[0, '#9ed8f0'], [0.6, '#e7f3e6'], [1, '#f6e9c8']], 960, 620));
-    const far = root.layer(0.2, 1);
-    for (let i = 0; i < 4; i++) far.addChild(kit.deco(PIXI, 'pinehills_distant_1', 300 + i * 700, 560, { scale: 0.42, alpha: 0.75 }));
-    const mid = root.layer(0.5, 2);
-    for (let i = 0; i < 5; i++) mid.addChild(kit.deco(PIXI, 'transition_hill_1', 200 + i * 640, 600, { scale: 0.45 }));
-    const back = root.layer(1, 3);
-    const g = new PIXI.Graphics();
-    g.rect(0, FLOOR - 18, W, 40).fill(0x8bbd57);
-    g.rect(0, FLOOR + 14, W, H - FLOOR).fill(0x6a4329);
-    for (let x = 30; x < W; x += 140) g.ellipse(x, FLOOR + 60 + (x % 3) * 18, 34, 7);
-    g.fill(0x5c3a23);
-    back.addChild(g);
-    // The Rube's house and his tree.
-    back.addChild(kit.deco(PIXI, 'house_back_medium01', 230, FLOOR + 2, { scale: 0.62 }));
-    back.addChild(kit.deco(PIXI, 'tree_deciduous3', 1810, FLOOR + 4, { scale: 0.36 }));
-    for (let x = 60; x < W; x += 220) back.addChild(kit.deco(PIXI, 'groddle_grass_1', x, FLOOR + 4, { scale: 0.45, flip: x % 440 === 60 }));
+    const root = buildRubeYardBackground(PIXI, kit);
+    ctx.data.eyeGlow = root.eyeGlow;
     return {
       label: 'The Wrizzards and The Rube',
       width: W,
@@ -181,10 +171,16 @@ export const room = {
       w.visible = !caught;
       w.on('pointertap', () => catchWrizzard(ctx, spot.id));
       ctx.add(w, w.zIndex);
-      if (spot.cover) ctx.add(kit.deco(PIXI, spot.cover, spot.x, spot.y, { scale: spot.scale }), 26);
+      if (spot.cover) ctx.add(yardDeco(PIXI, kit, spot.cover, spot.x, spot.y, { scale: spot.scale, flip: spot.flip }), 26);
+      for (const [name, px, py, ps] of spot.props || []) ctx.add(yardDeco(PIXI, kit, name, px, py, { scale: ps }), 27);
       ctx.data.wrizzards.push({ spot, sprite: w, phase: kit.hash01(spot.id) * Math.PI * 2 });
     }
+    // The candy cane on the front lawn stands in front of the avatar.
+    for (const [name, x, y, opts] of YARD_FRONT) ctx.add(yardDeco(PIXI, kit, name, x, y, opts), 60);
     updateJar(ctx);
+    // QA framing: &rubeyardx=<world x> stands the avatar there (no Wrizzard is caught).
+    const qaX = Number(ctx.engine.param?.('rubeyardx'));
+    if (qaX > 0) setTimeout(() => ctx.place(Math.min(W - 40, qaX), FLOOR), 400);
     if (!ctx.data.greeted) {
       ctx.data.greeted = true;
       setTimeout(() => ctx.say(ctx.data.rube, 'Help a Rube out, will ya?', 4200), 900);
@@ -193,6 +189,8 @@ export const room = {
 
   tick(ctx) {
     const t = Date.now() / 1000;
+    // The eyes in the tree hollow glow on and off.
+    if (ctx.data.eyeGlow && !ctx.data.eyeGlow.destroyed) ctx.data.eyeGlow.alpha = 0.25 + 0.2 * Math.max(0, Math.sin(t * 0.9));
     for (const w of ctx.data.wrizzards || []) {
       if (w.sprite.destroyed) continue;
       if (w.hop) {
@@ -242,6 +240,7 @@ export const room = {
     ctx.setData('wrizzardsFound', String(ctx.data.found?.length || 0));
     ctx.setData('wrizzardSpots', String(HIDING_SPOTS.length));
     ctx.setData('wrizzardArt', 'recovered-lizards-vector-hats');
+    ctx.setData('rubeYardArt', 'snap-junk-garden');
   },
 
   async autoplay(ctx, mode) {

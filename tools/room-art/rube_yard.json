@@ -1,0 +1,110 @@
+{
+ "source": "tinyspeck/glitch-locations firebog.swf, groddle1.swf (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "bureaucratic_hall_sign_wait_1": {
+   "scale": 0.85,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    66.15,
+    123.3
+   ],
+   "px": [
+    112,
+    210
+   ],
+   "file": "bureaucratic_hall_sign_wait_1@2x.webp",
+   "swf": "bundle:groddle1.swf#bureaucratic_hall_sign_wait_1",
+   "swf_sha": "f5c6deeb4484477e",
+   "key": "f5c6deeb4484477e:0.85:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    112,
+    210
+   ],
+   "world": [
+    56,
+    105
+   ],
+   "bytes": 6992,
+   "lossless": false,
+   "err": 3.13,
+   "sha": "b243402f47f79b86"
+  },
+  "open_house_sign": {
+   "scale": 0.8,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    77.0,
+    122.15
+   ],
+   "px": [
+    123,
+    195
+   ],
+   "file": "open_house_sign@2x.webp",
+   "swf": "bundle:firebog.swf#open_house_sign",
+   "swf_sha": "3823600a8bf9c707",
+   "key": "3823600a8bf9c707:0.8:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    123,
+    195
+   ],
+   "world": [
+    62,
+    98
+   ],
+   "bytes": 18266,
+   "lossless": true,
+   "err": 5.87,
+   "sha": "1ae6635da026f53f"
+  },
+  "rook_hall_skull_deco": {
+   "scale": 0.65,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    253.5,
+    179.75
+   ],
+   "px": [
+    330,
+    234
+   ],
+   "file": "rook_hall_skull_deco@2x.webp",
+   "swf": "bundle:firebog.swf#rook_hall_skull_deco",
+   "swf_sha": "6a2f5e030a2e72dc",
+   "key": "6a2f5e030a2e72dc:0.65:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    330,
+    234
+   ],
+   "world": [
+    165,
+    117
+   ],
+   "bytes": 11206,
+   "lossless": false,
+   "err": 2.47,
+   "sha": "f16414a0e42b00fb"
+  }
+ }
+}

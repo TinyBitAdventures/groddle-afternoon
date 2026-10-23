@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 310,
+  "commits": 311,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "The Hall's buttons raise Tiny Speck's own exhibit captions"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1924,14 +1929,9 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Rook attacks come about every two hours instead of every hour"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Piggies get moody, hungry and sad, and walk over to eat dropped food"
    }
   ]
  },
- "tests": 184,
+ "tests": 185,
  "generatedAt": "2026-10-23"
 }
