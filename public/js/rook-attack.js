@@ -104,6 +104,10 @@ export const ROOK_SOURCE = Object.freeze({
 });
 
 export const ROOK_SOLO = Object.freeze({
+  // Minutes between attacks. The source admin default is 60/60 (ROOK_SOURCE), but players logged one
+  // every 1.75-2 h (+/-10 min) in late 2011 (forum general 10986, 29929); Austin chose ~2 h (G55, 2026-10-23).
+  scheduleMinMin: 105,
+  scheduleMaxMin: 120,
   metabolicScale: 0.2,
   heraldMs: 30000,
   heraldWarnEveryMs: 15000,
@@ -268,10 +272,11 @@ export function normalizeRookSave(seed = {}) {
   };
 }
 
-/** Minutes between attacks (groups/rook_attack.js setAttackTimer; admin default 60/60). */
+/** Time to the next attack: groups/rook_attack.js setAttackTimer picks uniformly between a min and max
+ * in minutes; the remake uses the observed 105-120 (ROOK_SOLO), not the 60/60 admin default. */
 export function attackDelayMs(rng = Math.random) {
-  const min = ROOK_SOURCE.scheduleMinMin;
-  const max = ROOK_SOURCE.scheduleMaxMin;
+  const min = ROOK_SOLO.scheduleMinMin;
+  const max = ROOK_SOLO.scheduleMaxMin;
   const minutes = Math.floor(min + (max - min) * rng());
   return minutes * 60 * 1000;
 }

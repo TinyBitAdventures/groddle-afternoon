@@ -1805,9 +1805,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 285,
+  "commits": 286,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Piggies get moody, hungry and sad, and walk over to eat dropped food"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1922,11 +1927,6 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "The Stairs and the Mezzanine in Jethimadh Tower, where the Greeterbot sends you into the Museum of the Rook"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Apartment towers, basements, machine rooms and other indoor streets spawn only what was archived there"
    }
   ]
  },

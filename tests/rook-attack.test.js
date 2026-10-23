@@ -54,7 +54,9 @@ describe('rook attack source constants', () => {
     assert.equal(ROOK_SOURCE.clearAfterDeathS, 15);
     assert.equal(ROOK_SOURCE.reviveMs, 10000);
     assert.equal(ROOK_SOURCE.balmPoints, 5);
-    assert.equal(attackDelayMs(() => 0.5), 60 * 60 * 1000);
+    assert.equal(attackDelayMs(() => 0), 105 * 60 * 1000);
+    assert.equal(attackDelayMs(() => 0.5), 112 * 60 * 1000);
+    assert.ok(attackDelayMs(() => 0.999) <= 120 * 60 * 1000);
   });
 
   it('maps orb joiners to the exact stun table', () => {
