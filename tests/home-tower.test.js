@@ -40,7 +40,16 @@ import {
   projectRequirements,
   protoArtState,
   setFloorLabel,
+  setTowerConfig,
+  setTowerStyle,
   startExpansion,
+  stepConfig,
+  randomTowerConfig,
+  normalizeTowerConfig,
+  towerConfigRows,
+  TOWER_DEFAULT_CONFIG,
+  TOWER_PART_CHOICES,
+  TOWER_VARIANT_ART,
   towerBounds,
   towerSecretText,
   towerSpotsFor,
@@ -286,9 +295,6 @@ describe('exterior art', () => {
   it('ships every style article and stacks one extra floor per floor above two', () => {
     for (const [id, art] of Object.entries(TOWER_ART)) {
       assert.ok(TOWER_STYLES[id], id);
-      for (const part of Object.values(art.parts)) {
-        if (part) assert.ok(existsSync(join(root, TOWER_ART_DIR, part[0])), part[0]);
-      }
       const two = composeTower(id, 0);
       const nine = composeTower(id, 7);
       assert.equal(nine.filter((op) => op.part.startsWith('floor_') && /\d$/.test(op.part)).length, 7, id);
@@ -301,6 +307,109 @@ describe('exterior art', () => {
     for (const f of ['proto_1.webp', 'proto_2.webp', 'proto_3.webp', 'elevator.png', 'tower_expander.png']) {
       assert.ok(existsSync(join(root, TOWER_ART_DIR, f)), f);
     }
+  });
+
+  it('ships every choice the client offered, one WebP per drawn article', () => {
+    let files = 0;
+    for (const id of Object.keys(TOWER_STYLES)) {
+      const counts = TOWER_PART_CHOICES[id];
+      const art = TOWER_VARIANT_ART[id];
+      for (const part of ['floor_ground', 'floor_top', 'extra_floor', 'deco_ground', 'deco_side']) {
+        assert.equal(art[part].length, counts[part], `${id} ${part}`);
+        for (const row of art[part]) {
+          if (!row) continue;
+          files += 1;
+          assert.match(row[0], /\.webp$/);
+          assert.ok(existsSync(join(root, TOWER_ART_DIR, row[0])), row[0]);
+        }
+      }
+      // door_<n> are the invisible hit areas of floor_ground_<n>
+      assert.equal(art.door.length, counts.floor_ground, `${id} doors`);
+      assert.ok(art.door.every((d) => d === null), `${id} doors draw nothing`);
+      // every floor and top choice draws something; each deco list has one "none" choice
+      for (const part of ['floor_ground', 'floor_top', 'extra_floor']) assert.ok(art[part].every(Boolean), `${id} ${part}`);
+      for (const part of ['deco_ground', 'deco_side']) assert.equal(art[part].filter((r) => !r).length, 1, `${id} ${part} none`);
+    }
+    assert.equal(files, 165);
+  });
+
+  it('offers the choice counts of each chassis .as config_options', { skip: !existsSync(join(GS, '..', 'glitch-items')) }, () => {
+    const items = join(GS, '..', 'glitch-items', 'furniture');
+    const as = {
+      base: 'furniture_base/furniture_tower_chassis/furniture_tower_chassis.as',
+      tree: 'furniture_tower_chassis/furniture_tower_chassis_tree_tower.as',
+      quarry: 'furniture_tower_chassis/furniture_tower_chassis_rock_tower.as',
+      mushroom: 'furniture_tower_chassis/furniture_tower_chassis_mushroom_tower.as',
+      spaceship: 'furniture_tower_chassis/furniture_tower_chassis_spaceship_tower.as',
+      adobe: 'furniture_tower_chassis/furniture_tower_chassis_basic_tower.as',
+    };
+    for (const [id, rel] of Object.entries(as)) {
+      const src = readFileSync(join(items, rel), 'utf8').replace(/\s+/g, ' ');
+      const block = /config_options = \{([^}]*)\}/.exec(src)[1];
+      const n = (k) => new RegExp(`${k}: \\[([^\\]]*)\\]`).exec(block)[1].split(',').length;
+      assert.deepEqual({ ...TOWER_PART_CHOICES[id] }, {
+        floor_ground: n('floor_ground'), floor_top: n('floor_top'), extra_floor: n('floor_1'),
+        deco_ground: n('deco_ground'), deco_side: n('deco_side'),
+      }, id);
+      for (let f = 2; f <= 7; f += 1) assert.equal(n(`floor_${f}`), n('floor_1'), `${id} floor_${f}`);
+    }
+  });
+
+  it('starts each style from its catalog config and keeps choices in range', () => {
+    // catalog_furniture.js add_furniture_29 over getDefaultUpgradeConfig (all '1')
+    assert.equal(normalizeTowerConfig('base').floor_top, 1);
+    assert.equal(normalizeTowerConfig('quarry').floor_top, 3);
+    assert.equal(normalizeTowerConfig('mushroom').deco_ground, 2);
+    assert.equal(normalizeTowerConfig('spaceship').deco_side, 2);
+    assert.equal(normalizeTowerConfig('adobe').floor_top, 2);
+    for (const [id, def] of Object.entries(TOWER_DEFAULT_CONFIG)) {
+      for (const [k, v] of Object.entries(def)) assert.ok(v <= TOWER_PART_CHOICES[id][k], `${id} ${k}`);
+    }
+    const cfg = normalizeTowerConfig('adobe', { floor_top: 9, floor_1: 4, floor_2: 0, deco_side: 'x', floor_ground: 3 });
+    assert.equal(cfg.floor_top, 2, 'out of range falls back to the default');
+    assert.equal(cfg.floor_1, 4);
+    assert.equal(cfg.floor_2, 1);
+    assert.equal(cfg.floor_ground, 3);
+    // saved with the tower, and a new style starts from its own config
+    const t = normalizeTowerState({ built: true, floors: 5, style: 'base', config: { floor_top: 6, floor_1: 8 } });
+    assert.equal(t.config.floor_top, 6);
+    assert.equal(normalizeTowerState(JSON.parse(JSON.stringify(t))).config.floor_1, 8);
+    setTowerConfig(t, { ...t.config, deco_ground: 4 });
+    assert.equal(t.config.deco_ground, 4);
+    setTowerStyle(t, 'base');
+    assert.equal(t.config.floor_top, 6, 'same style keeps the choices');
+    setTowerStyle(t, 'quarry');
+    assert.deepEqual(t.config, normalizeTowerConfig('quarry'));
+    assert.equal(setTowerStyle(t, 'castle'), false);
+  });
+
+  it('lists the client rows: top, the floors the Tower has, ground, decos', () => {
+    // config_option_names_sort; floor_N past extra_floors and deco_side under 1 extra floor are excluded
+    assert.deepEqual(towerConfigRows('base', 0).map((r) => r.key), ['floor_top', 'floor_ground', 'deco_ground']);
+    assert.deepEqual(towerConfigRows('base', 2).map((r) => r.key), ['floor_top', 'floor_2', 'floor_1', 'floor_ground', 'deco_ground', 'deco_side']);
+    assert.deepEqual(towerConfigRows('tree', 7).map((r) => r.label), ['Top Floor', '7th Floor', '6th Floor', '5th Floor', '4th Floor', '3rd Floor', '2nd Floor', '1st Floor', 'Ground Floor', 'Ground Floor Deco', 'Side Deco']);
+    assert.equal(towerConfigRows('tree', 7)[1].choices, 14);
+    // ConfiggerChoiceElementUI: < > wrap around
+    const cfg = normalizeTowerConfig('spaceship');
+    assert.equal(stepConfig('spaceship', cfg, 'floor_ground', -1).floor_ground, 3);
+    assert.equal(stepConfig('spaceship', { ...cfg, floor_ground: 3 }, 'floor_ground', 1).floor_ground, 1);
+    let seed = 0;
+    const r = randomTowerConfig('tree', () => ((seed = (seed * 9301 + 49297) % 233280) / 233280));
+    assert.deepEqual(r, normalizeTowerConfig('tree', r));
+  });
+
+  it('draws the chosen articles: the ground floor, each extra floor, the top and decos', () => {
+    const ops = composeTower('base', 2, { floor_ground: 6, floor_1: 8, floor_2: 7, floor_top: 6, deco_ground: 3, deco_side: 2 });
+    const file = (part) => ops.find((op) => op.part === part)?.file;
+    assert.equal(file('floor_ground'), 'base_floor_ground_6.webp');
+    assert.equal(file('floor_1'), 'base_extra_floor_8.webp');
+    assert.equal(file('floor_2'), 'base_extra_floor_7.webp');
+    assert.equal(file('floor_top'), 'base_floor_top_6.webp');
+    assert.equal(file('deco_ground'), 'base_deco_ground_3.webp');
+    assert.equal(file('deco_side'), 'base_deco_side_2.webp');
+    assert.equal(file('door'), undefined);
+    // base deco 1 is the empty "none" symbol
+    assert.equal(composeTower('base', 2).some((op) => op.part.startsWith('deco_')), false);
   });
 });
 

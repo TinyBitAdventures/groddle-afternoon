@@ -31,7 +31,7 @@ import {
   TOWER_PLACEMENT_WARNING,
   TOWER_PROTO,
   TOWER_WIDTH,
-} from './home-tower.js?v=home-tower-1';
+} from './home-tower.js?v=home-tower-2';
 
 export const YARD_SEGMENT_W = 150;
 /** The house, porch, mailbox and World Gate stand on a fixed lot between the yards. */

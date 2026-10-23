@@ -198,7 +198,7 @@ export const CHECKLIST = Object.freeze([
     blurb: 'Visiting Stones lead to six authored neighbours, standing in for other players’ homes.',
     evidence: ['public/js/neighbours.js'] },
   { id: 'tower', group: 'home', name: 'Your Tower', status: 'solo',
-    blurb: 'Cultivate a Tower on your home street, build it as a project, pick one of five styles and raise it to nine floors marked L to 8 on the elevator, each decorated on its own; every new floor goes up at a Workbench on a planked frame open to the stars. The Jethimadh Tower Base hides eleven secret spots.',
+    blurb: 'Cultivate a Tower on your home street, build it as a project, pick one of six styles and every floor, roof and decoration the original offered, and raise it to nine floors marked L to 8 on the elevator, each decorated on its own; every new floor goes up at a Workbench on a planked frame open to the stars. The Jethimadh Tower Base hides eleven secret spots.',
     evidence: ['public/js/home-tower.js', 'public/js/features/home-tower-feature.js'] },
   { id: 'craftybot', group: 'home', name: 'Craftybot', status: 'source',
     blurb: 'A crafting robot delivered in a box by your Magic Rock: queue jobs and it fetches the ingredients and tools, crafts every step, burns fuel and crystals, and hands you the results.',

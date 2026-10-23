@@ -8,7 +8,8 @@
  *    (job_cult_tower: items, timed work at 1.5 s a unit), and once built the
  *    chassis exterior composed from the recovered SWF articles (base + five
  *    styles, one extra floor article per floor above two), Enter, Customize
- *    (style + the sign name) and the name sign;
+ *    (style, one choice per part as the client's ConfiggerUI offered, Randomize,
+ *    the sign name) and the name sign;
  *  - inside: one floor at a time, built by homes-feature.js (decorate reuses the
  *    house system); this module adds the elevator (tower_build_elevator: one
  *    stop per floor plus the construction floor, renamable floors), the exit
@@ -30,7 +31,9 @@
  * QA (with ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home):
  *   &towerdemo=proto    a fresh Tower proto and every project item in the pack
  *   &towerdemo=built    a built Tower (&towerfloors=2..9, &towerstyle=<style>,
- *                       &towerlook=-600 looks up the street like Camera Mode)
+ *                       &towerlook=-600 looks up the street like Camera Mode,
+ *                       &towerconfig=floor_top:6,floor_1:10,... picks articles,
+ *                       &towerpanel=customize opens the Customize panel)
  *   &towerdemo=inside   built, standing on its ground floor
  *   &towerdemo=expand   built, expanding, on the construction floor with the floor items
  *   &towerdemo=quest    level 19, no Tower: the Magic Rock offers Build a Tower
@@ -38,7 +41,7 @@
  *                       proto: contribute + work to the finished Tower; expand: the
  *                       floor project to the new floor); &towerfast=1 shortens work units
  *   ?streetdemo=GIF1Q3IQM7122SP&towerdemo=secrets  stands on TowerSpot_02
- * Canvas data: towerState, towerFloors, towerStyle, towerProject, towerFloor, towerMark,
+ * Canvas data: towerState, towerFloors, towerStyle, towerConfig, towerProject, towerFloor, towerMark,
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
@@ -84,13 +87,19 @@ import {
   projectPercent,
   projectRequirements,
   protoArtState,
+  randomTowerConfig,
   setFloorLabel,
+  setTowerConfig,
+  setTowerStyle,
   startExpansion,
+  stepConfig,
+  towerArticle,
+  towerConfigRows,
   towerLabel,
   towerSecretText,
   towerSpotsFor,
   workCheck,
-} from '../home-tower.js?v=home-tower-1';
+} from '../home-tower.js?v=home-tower-2';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { pieceUrl } from '../home-wallpaper.js?v=home-wallpaper-1';
 import { wantsHiresDecos } from '../deco-hires.js';
@@ -195,6 +204,7 @@ function publish(engine, force = false) {
   engine.setData('towerFloors', tower.built ? tower.floors : 0);
   engine.setData('towerExpanding', tower.expanding ? '1' : '0');
   engine.setData('towerStyle', tower.style);
+  engine.setData('towerConfig', configString(tower.config));
   engine.setData('towerName', tower.name);
   engine.setData('towerProject', project && item ? `${project.jobId}:${projectPercent(project.jobId, project.got)}` : '');
   engine.setData('towerFloor', tower.floor == null ? '' : tower.floor);
@@ -209,9 +219,9 @@ function publish(engine, force = false) {
 /* Street views                                                         */
 /* ------------------------------------------------------------------ */
 
-function chassisContainer(PIXI, style, extra) {
+function chassisContainer(PIXI, style, extra, config) {
   const box = new PIXI.Container();
-  for (const op of composeTower(style, extra)) {
+  for (const op of composeTower(style, extra, config)) {
     const spr = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}${op.file}`));
     spr.anchor.set(op.anchorX, op.anchorY);
     // Articles are rasterised at 2x.
@@ -294,6 +304,21 @@ function spawnRock(engine, x, groundY) {
   });
 }
 
+/** The built Tower's chassis and name sign into its street container. */
+function drawExterior(engine, box) {
+  const { PIXI } = engine;
+  for (const child of box.removeChildren()) child.destroy({ children: true });
+  box.addChild(chassisContainer(PIXI, tower.style, extraFloors(tower), tower.config));
+  // QA: the world y of the Tower's top (the home street must show it; cameraY is on the canvas).
+  engine.setData('towerTopY', Math.round(box.y + towerBounds(composeTower(tower.style, extraFloors(tower), tower.config)).t));
+  if (tower.name) {
+    const sign = nameSign(PIXI, tower.name);
+    sign.x = 8;
+    sign.y = -150;
+    box.addChild(sign);
+  }
+}
+
 /**
  * homes-feature spawnCultivations: draw the Tower (proto or built) at its
  * cultivation spot and the Magic Rock when it has the quest to give.
@@ -311,15 +336,7 @@ function spawnStreet(engine, { item, x, groundY, rockX }) {
     let label = 'Tower';
     let subtitle = '';
     if (tower.built && item.endClass === TOWER_CHASSIS) {
-      box.addChild(chassisContainer(PIXI, tower.style, extraFloors(tower)));
-      // QA: the world y of the Tower's top (the home street must show it; cameraY is on the canvas).
-      engine.setData('towerTopY', Math.round(box.y + towerBounds(composeTower(tower.style, extraFloors(tower))).t));
-      if (tower.name) {
-        const sign = nameSign(PIXI, tower.name);
-        sign.x = 8;
-        sign.y = -150;
-        box.addChild(sign);
-      }
+      drawExterior(engine, box);
       label = towerLabel(tower);
       subtitle = `${tower.floors} floors${tower.expanding ? ' · a new floor is going up' : ''}`;
     } else {
@@ -669,6 +686,17 @@ const CSS = `
 .ht-styles{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin:.2rem 0 .6rem}
 .ht-styles button{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.4rem;white-space:normal}
 .ht-styles img{height:62px;width:100%;object-fit:contain}
+.home-tower-panel.ht-docked{justify-content:flex-start;align-items:stretch;background:transparent;pointer-events:none;padding:8px}
+.home-tower-panel.ht-docked .ht-card{pointer-events:auto;width:min(380px,94vw);max-height:none;overflow:auto}
+.ht-docked .ht-styles img{height:44px}
+.ht-config{display:grid;gap:.25rem;max-height:40vh;overflow:auto;margin:.1rem 0 .4rem}
+.ht-opt{display:grid;grid-template-columns:1fr auto 30px 30px;gap:.35rem;align-items:center;background:rgba(255,255,255,.86);border:1px solid #e1d9c9;border-radius:8px;padding:.25rem .45rem}
+.ht-opt-label b{display:block;font-size:.8rem;color:#3a352c}
+.ht-dots{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.ht-dots i{width:6px;height:6px;border-radius:50%;background:#8fafbf;opacity:.4}
+.ht-dots i.is-on{opacity:1}
+.ht-opt small{font-size:.7rem;color:#7a7264}
+.ht-opt button{padding:.15rem 0;font-size:1rem;line-height:1}
 .ht-name{display:flex;gap:.4rem;align-items:center;margin:.3rem 0 .2rem}
 .ht-name input{flex:1;font:inherit;font-size:.85rem;padding:.3rem .45rem;border:1px solid #c9b48a;border-radius:7px}
 .ht-note{margin:.45rem 0 0;font-size:.76rem;color:#6d6555}
@@ -722,12 +750,47 @@ function openPanel(engine, mode) {
   if (!ensurePanel()) return;
   panelMode = mode;
   panel.hidden = false;
+  // ChassisManager: the configger docks at the side, with no dimming, and the
+  // camera centres the Tower in the rest of the view (scaleVP).
+  panel.classList.toggle('ht-docked', mode === 'customize');
+  if (mode === 'customize') lookAtTower(engine);
   renderPanel(engine);
 }
 
 function closePanel() {
   if (panel) panel.hidden = true;
   panelMode = null;
+  releaseTowerLook();
+}
+
+/**
+ * scaleVP: itemstack_pt.x = tower x - WIDTH_OF_CONFIG_UI / 2, and y the
+ * Tower's middle (the remake does not zoom out, so it frames the middle).
+ */
+const CONFIG_UI_W = 380;
+let towerLook = null;
+
+function lookAtTower(engine) {
+  const box = streetView?.container;
+  const p = engine?.player;
+  if (!box || box.destroyed || !p || typeof engine.setCameraLook !== 'function') return;
+  const now = engine.cameraLook || { x: 0, y: 0 };
+  if ((now.x || now.y) && !(towerLook && now.x === towerLook.x && now.y === towerLook.y)) return;
+  const b = towerBounds(composeTower(tower.style, extraFloors(tower), tower.config));
+  const mid = box.y + (b.t + b.b) / 2;
+  // cameraTargetY puts the target 75% down the 408 px view: centre `mid` instead.
+  const dy = Math.round(mid - p.y + 408 * 0.25);
+  const dx = Math.round(box.x - p.x - CONFIG_UI_W / 2);
+  towerLook = { x: dx, y: dy, engine };
+  engine.setCameraLook(dx, dy);
+}
+
+function releaseTowerLook() {
+  if (!towerLook) return;
+  const { engine } = towerLook;
+  const now = engine?.cameraLook;
+  if (now && now.x === towerLook.x && now.y === towerLook.y) engine.setCameraLook(0, 0);
+  towerLook = null;
 }
 
 function renderPanel(engine) {
@@ -833,35 +896,98 @@ function renderElevator(engine, q, body) {
     : 'Your Tower is as tall as it gets.'));
 }
 
+/** QA / canvas form of a config: "floor_top:3,floor_1:2,...". */
+function configString(config) {
+  return Object.entries(config || {}).map(([k, v]) => `${k}:${v}`).join(',');
+}
+
+function parseConfigString(text) {
+  const out = {};
+  for (const pair of String(text || '').split(',')) {
+    const [k, v] = pair.split(':');
+    if (k && v) out[k.trim()] = Number(v);
+  }
+  return out;
+}
+
+/**
+ * Re-draw the street Tower after a Customize change and keep the panel open
+ * (ChassisManager previews every change in place until the player is done).
+ */
+function applyCustomize(engine) {
+  engine.save();
+  publish(engine, true);
+  if (streetView?.container && !streetView.container.destroyed && tower.built) {
+    drawExterior(engine, streetView.container);
+    if (streetView.target) streetView.target.label = towerLabel(tower);
+    lookAtTower(engine);
+  } else {
+    engine.refreshHomeScene?.();
+  }
+  renderPanel(engine);
+}
+
+/**
+ * ChassisManager / ConfiggerUI: the style picker, then one row per part with
+ * its label, a dot per choice (the current one lit) and < > buttons that wrap,
+ * a Randomize button, and the tower name (TowerNameUI, 25 chars).
+ */
 function renderCustomize(engine, q, body) {
   q('[data-ht-kicker]').textContent = towerLabel(tower);
   q('[data-ht-title]').textContent = 'Customize your Tower';
   const grid = el('div', { class: 'ht-styles' });
   for (const style of Object.values(TOWER_STYLES)) {
     const b = el('button', { type: 'button', class: tower.style === style.id ? 'is-on' : '', dataset: { htStyle: style.id } });
-    b.append(el('img', { src: `${TOWER_ART_DIR}${style.id}_floor_top.webp`, alt: '' }), el('span', {}, style.name));
+    const thumb = towerArticle(style.id, 'floor_top', normalizeTowerState({ style: style.id }).config.floor_top);
+    b.append(el('img', { src: thumb ? `${TOWER_ART_DIR}${thumb[0]}` : '', alt: '' }), el('span', {}, style.name));
     b.addEventListener('click', () => {
-      tower.style = style.id;
+      if (tower.style === style.id) return;
+      setTowerStyle(tower, style.id);
       engine.pushActivity(`Your Tower is now a ${style.name}.`);
-      engine.save();
-      renderPanel(engine);
-      engine.refreshHomeScene?.();
+      applyCustomize(engine);
     });
     grid.append(b);
   }
   body.append(grid);
+  const list = el('div', { class: 'ht-config', dataset: { htConfig: tower.style } });
+  for (const row of towerConfigRows(tower.style, extraFloors(tower))) {
+    const cur = tower.config[row.key];
+    const line = el('div', { class: 'ht-opt', dataset: { htOpt: row.key } });
+    const dots = el('span', { class: 'ht-dots', 'aria-hidden': 'true' });
+    for (let i = 1; i <= row.choices; i += 1) dots.append(el('i', { class: i === cur ? 'is-on' : '' }));
+    const label = el('div', { class: 'ht-opt-label' });
+    label.append(el('b', {}, row.label), dots);
+    const step = (dir) => {
+      setTowerConfig(tower, stepConfig(tower.style, tower.config, row.key, dir));
+      applyCustomize(engine);
+    };
+    const prev = el('button', { type: 'button', 'aria-label': `Previous ${row.label}`, dataset: { htStep: `${row.key}:-1` } }, '‹');
+    const next = el('button', { type: 'button', 'aria-label': `Next ${row.label}`, dataset: { htStep: `${row.key}:1` } }, '›');
+    prev.addEventListener('click', () => step(-1));
+    next.addEventListener('click', () => step(1));
+    const count = el('small', {}, `${cur} of ${row.choices}`);
+    line.append(label, count, prev, next);
+    list.append(line);
+  }
+  body.append(list);
+  const tools = el('div', { class: 'ht-name' });
+  const random = el('button', { type: 'button', dataset: { htRandom: '1' } }, 'Randomize');
+  random.addEventListener('click', () => {
+    setTowerConfig(tower, randomTowerConfig(tower.style));
+    applyCustomize(engine);
+  });
+  tools.append(random);
+  body.append(tools);
   const row = el('div', { class: 'ht-name' });
   const input = el('input', { type: 'text', maxlength: '25', placeholder: 'Name your Tower (shown on its sign)', value: tower.name, 'aria-label': 'Tower name' });
   const save = el('button', { type: 'button', class: 'primary' }, 'Set name');
   save.addEventListener('click', () => {
     tower.name = cleanTowerName(input.value);
-    engine.save();
-    renderPanel(engine);
-    engine.refreshHomeScene?.();
+    applyCustomize(engine);
   });
   row.append(input, save);
   body.append(row);
-  body.append(el('p', { class: 'ht-note' }, 'Tower styles cost credits in the original; here they are free, like wallpaper.'));
+  body.append(el('p', { class: 'ht-note' }, 'Tower styles cost credits in the original; here they are free, like wallpaper. Floor rows appear as your Tower grows.'));
 }
 
 /* ------------------------------------------------------------------ */
@@ -1056,7 +1182,8 @@ function demoStreet(engine) {
     tower.builtAt = Date.now();
     const floors = Number(engine.param('towerfloors'));
     tower.floors = Number.isFinite(floors) ? Math.max(2, Math.min(9, floors)) : tower.floors;
-    if (TOWER_STYLES[engine.param('towerstyle')]) tower.style = engine.param('towerstyle');
+    if (TOWER_STYLES[engine.param('towerstyle')]) setTowerStyle(tower, engine.param('towerstyle'));
+    if (engine.param('towerconfig')) setTowerConfig(tower, { ...tower.config, ...parseConfigString(engine.param('towerconfig')) });
     if (engine.param('towername')) tower.name = cleanTowerName(engine.param('towername'));
     tower.project = {};
   } else {
@@ -1078,6 +1205,8 @@ function demoStreet(engine) {
       // QA &towerlook=<dy>: look up the street the way Camera Mode does (engine.setCameraLook).
       const look = Number(engine.param('towerlook'));
       if (kind !== 'inside' && kind !== 'expand' && Number.isFinite(look)) engine.setCameraLook?.(0, look);
+      // QA &towerpanel=customize: open the Customize panel (the Tower's customize verb).
+      if (built && engine.param('towerpanel') === 'customize') openPanel(engine, 'customize');
       startAutoplay(engine);
     });
   }, 0);

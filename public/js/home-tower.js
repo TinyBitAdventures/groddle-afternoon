@@ -37,11 +37,16 @@
  *   like the house swatches.
  * - Removing an unfinished Tower needed Wine of the Dead to cancel a started
  *   project; the remake keeps that rule (and removes an untouched one freely).
- * - Exterior art: the six recovered chassis SWFs (base + five styles), each
- *   article rasterised at 2x with its registration point (assets/sprites/home-tower).
+ * - Exterior art: the six recovered chassis SWFs (base + five styles), every
+ *   article choice rasterised at 2x with its registration point
+ *   (assets/sprites/home-tower, tools/tower-art/build.mjs); Customize picks a
+ *   choice per part as the client's ChassisManager / ConfiggerUI did.
  */
 
 import { TOWER_ROOM_SPOTS } from './tower-rooms.js?v=tower-rooms-1';
+import { TOWER_PART_CHOICES, TOWER_VARIANT_ART } from './home-tower-art.js?v=tower-art-1';
+
+export { TOWER_PART_CHOICES, TOWER_VARIANT_ART };
 
 export const TOWER_PROTO = 'proto_furniture_tower_chassis';
 export const TOWER_CHASSIS = 'furniture_tower_chassis';
@@ -230,8 +235,9 @@ export function floorJobFor(floors) {
  * items/catalog_furniture.js add_furniture_29 (upgrade id, name, credits) and
  * the base chassis (getDefaultUpgradeConfig). The art rows are the recovered
  * SWF compositions: maincontainer scale, bottom_floor_h / floor_h from each
- * chassis .as, articles [file, originX, originY, w, h] at 1x, and the named
- * containers [x, y, scaleX, scaleY, depth].
+ * chassis .as and the named containers [x, y, scaleX, scaleY, depth]. Every
+ * article choice (floor_ground_1..n, floor_top_*, extra_floor_*, deco_*) lives
+ * in the generated js/home-tower-art.js (tools/tower-art/build.mjs).
  */
 export const TOWER_STYLES = Object.freeze({
   base: { id: 'base', upgradeId: '', name: 'Tower', credits: 0 },
@@ -245,39 +251,125 @@ export const TOWER_STYLES = Object.freeze({
 export const TOWER_ART_DIR = 'assets/sprites/home-tower/';
 export const TOWER_ART = Object.freeze({
   base: { scale: [-0.8147888, 0.8147888], bottomFloorH: 165, floorH: 93,
-    parts: {"floor_ground":["base_floor_ground.webp",226.6,128.1,412,175],"door":["base_door.webp",57,104,82,104],"floor_top":["base_floor_top.webp",179.65,132,326,162],"deco_ground":null,"deco_side":null,"extra_floor":["base_extra_floor.webp",143.45,87.35,283,118]},
     containers: {"floor_ground":[10.75,-7.9,1.02844,1.26611,1],"floor_1":[2,-166.8,1,1,3],"floor_2":[2,-259.9,1,1,5],"floor_3":[2,-353.9,1,1,7],"floor_4":[2,-447.9,1,1,9],"floor_5":[2,-540.9,1,1,11],"floor_6":[2,-633.85,1,1,13],"floor_7":[2,-727.9,1,1,15],"floor_top":[11.95,-821.05,1,1,17],"door":[-27.2,6.25,1,1,21],"deco_ground":[-267.8,-85.3,1,1,23],"deco_side":[109.55,-399.45,1,1,25]} },
   tree: { scale: [1, 1], bottomFloorH: 231, floorH: 73,
-    parts: {"floor_ground":["tree_floor_ground.webp",12.55,-6.2,374,153],"door":["tree_door.webp",50.5,91.55,77,100],"floor_top":["tree_floor_top.webp",15.15,1.8,334,134],"deco_ground":["tree_deco_ground.webp",0,0,246,65],"deco_side":["tree_deco_side.webp",2.5,0,99,87],"extra_floor":["tree_extra_floor.webp",0.75,1.3,232,106]},
     containers: {"floor_ground":[-174.75,-128.25,1,1,1],"floor_1":[-105.85,-203.8,1,1,3],"floor_2":[-105.85,-276.8,1,1,5],"floor_3":[-105.85,-349.8,1,1,7],"floor_4":[-106.85,-422.8,1,1,9],"floor_5":[-106.85,-495.8,1,1,11],"floor_6":[-106.85,-568.8,1,1,13],"floor_7":[-106.85,-641.8,1,1,15],"floor_top":[-147.9,-742.95,1,1,17],"deco_side":[-19.7,-249.15,1,1,19],"deco_ground":[-52.35,-17.85,1,1,21],"door":[52.6,1.35,0.77271,0.77049,23]} },
   quarry: { scale: [-0.8147888, 0.8147888], bottomFloorH: 123, floorH: 93,
-    parts: {"floor_ground":["quarry_floor_ground.webp",213.2,142.15,425,223],"door":["quarry_door.webp",57,91,82,91],"floor_top":["quarry_floor_top.webp",186.95,142.6,363,188],"deco_ground":null,"deco_side":null,"extra_floor":["quarry_extra_floor.webp",141.8,97.4,297,142]},
     containers: {"floor_ground":[10.45,4,1,1,1],"floor_1":[2,-128.05,1,1,3],"floor_2":[1.75,-220.85,1,1,5],"floor_3":[2,-315.15,1,1,7],"floor_4":[2,-409.15,1,1,9],"floor_5":[2,-502.15,1,1,11],"floor_6":[2,-595.1,1,1,13],"floor_7":[2,-689.15,1,1,15],"floor_top":[11.95,-782.3,1,1,17],"door":[-30.7,39.3,1,1,19],"deco_ground":[-267.8,-85.3,1,1,21],"deco_side":[109.55,-360.7,1,1,23]} },
   mushroom: { scale: [1, 1], bottomFloorH: 233, floorH: 74,
-    parts: {"floor_ground":["mushroom_floor_ground.webp",-32.4,-9.75,317,156],"door":["mushroom_door.webp",49.2,81.45,77,89],"floor_top":["mushroom_floor_top.webp",89.8,49,406,226],"deco_ground":["mushroom_deco_ground.webp",-34.5,-21,156,51],"deco_side":["mushroom_deco_side.webp",-43.65,-7.4,64,73],"extra_floor":["mushroom_extra_floor.webp",2.2,-0.15,232,112]},
     containers: {"floor_ground":[-222.95,-165.5,1,1,1],"floor_1":[-147.05,-235.05,1,1,3],"floor_2":[-147.05,-309.05,1,1,5],"deco_side":[-61.9,-279.4,1,1,7],"deco_ground":[-101.55,-55.1,1,1,9],"door":[9.4,-29.5,0.77271,0.77049,25],"floor_3":[-147.05,-383.05,1,1,13],"floor_4":[-147.05,-457.05,1,1,15],"floor_5":[-147.05,-531.05,1,1,17],"floor_6":[-147.05,-605.05,1,1,19],"floor_7":[-147.05,-679.05,1,1,21],"floor_top":[-147.05,-753.05,1,1,23]} },
   spaceship: { scale: [-0.8147888, 0.8147888], bottomFloorH: 126, floorH: 86,
-    parts: {"floor_ground":["spaceship_floor_ground.webp",154.8,142.45,304,146],"door":["spaceship_door.webp",57,91,82,91],"floor_top":["spaceship_floor_top.webp",308.7,245.85,632,301],"deco_ground":null,"deco_side":["spaceship_deco_side.webp",312.9,-90.3,418,101],"extra_floor":["spaceship_extra_floor.webp",141.85,95.15,292,124]},
     containers: {"floor_ground":[10.45,4,1,1,1],"floor_1":[2,-128.05,1,1,3],"floor_2":[2,-214.05,1,1,5],"floor_3":[2,-300.05,1,1,7],"floor_4":[2,-386.05,1,1,9],"floor_5":[2,-472.05,1,1,11],"floor_6":[2,-558.05,1,1,13],"floor_7":[2,-644.05,1,1,15],"door":[-43.05,-1.05,1,1,17],"deco_ground":[-267.8,-85.3,1,1,19],"floor_top":[12.85,-729.6,1,1,21],"deco_side":[109.55,-360.7,1,1,23]} },
   adobe: { scale: [1, 1], bottomFloorH: 211, floorH: 73,
-    parts: {"floor_ground":["adobe_floor_ground.webp",6.4,-0.15,301,156],"door":["adobe_door.webp",55.65,78.65,77,88],"floor_top":["adobe_floor_top.webp",0,12,234,137],"deco_ground":["adobe_deco_ground.webp",0,0,157,48],"deco_side":["adobe_deco_side.webp",0,0,63,82],"extra_floor":["adobe_extra_floor.webp",1.5,0,231,100]},
     containers: {"floor_ground":[-160.05,-122.4,1,1,1],"floor_1":[-128.05,-187.1,1,1,3],"deco_side":[96.95,-205.7,1,1,5],"floor_2":[-128.05,-260.1,1,1,7],"floor_3":[-128.05,-333.1,1,1,9],"floor_4":[-128.05,-406.1,1,1,11],"floor_5":[-128.05,-479.1,1,1,13],"floor_6":[-128.05,-552.1,1,1,15],"floor_7":[-128.05,-625.1,1,1,17],"floor_top":[-133.05,-722.1,1,1,19],"deco_ground":[-53.4,-7.9,1,1,21],"door":[30.4,2.9,0.77271,0.77049,23]} },
 });
 
+/* ------------------------------------------------------------------ */
+/* Exterior choices (Customize)                                          */
+/* ------------------------------------------------------------------ */
+
 /**
- * initializehead(): the chassis articles for a style and extra-floor count, in
- * depth order, as sprite placements relative to the item's foot:
- * { file, anchorX, anchorY, x, y, scaleX, scaleY, depth, part }.
- * floor_top_container.y = -(bottom_floor_h + floor_h * extra_floors);
- * deco_side shows only with extra floors; floors 1..7 hold extra_floor art.
+ * The parts an owner picks, in the client's row order
+ * (furniture_tower_chassis*.as config_option_names_sort, labels from
+ * config_option_names). floor_N rows show only up to the extra floors the
+ * Tower has (initializehead pushes the others onto user_config_exclusions),
+ * deco_side only with at least required_extra_floors_for_deco_side (1)
+ * extra floor (ConfigOption.populateConfigChoicesForItemstack).
  */
-export function composeTower(styleId, extraFloors = 0) {
-  const art = TOWER_ART[styleId] || TOWER_ART.base;
+export const TOWER_CONFIG_ROWS = Object.freeze([
+  { key: 'floor_top', part: 'floor_top', label: 'Top Floor' },
+  ...[7, 6, 5, 4, 3, 2, 1].map((n) => ({ key: `floor_${n}`, part: 'extra_floor', floor: n, label: `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'} Floor` })),
+  { key: 'floor_ground', part: 'floor_ground', label: 'Ground Floor' },
+  { key: 'deco_ground', part: 'deco_ground', label: 'Ground Floor Deco' },
+  { key: 'deco_side', part: 'deco_side', label: 'Side Deco' },
+].map((r) => Object.freeze(r)));
+const CONFIG_KEYS = TOWER_CONFIG_ROWS.map((r) => r.key);
+
+/**
+ * Each style's starting config: items/catalog_furniture.js add_furniture_29
+ * (Quarry tops with 3, Mushroom's ground deco is 2, Spaceship's side deco 2,
+ * Adobe's top 2) over getDefaultUpgradeConfig (all 1) for the base Tower.
+ * Changing style starts from that style's config, as the client's upgrade
+ * picker did; floors the catalog leaves out default to 1 (initializehead).
+ */
+export const TOWER_DEFAULT_CONFIG = Object.freeze({
+  base: Object.freeze({}),
+  tree: Object.freeze({}),
+  quarry: Object.freeze({ floor_top: 3 }),
+  mushroom: Object.freeze({ deco_ground: 2 }),
+  spaceship: Object.freeze({ deco_side: 2 }),
+  adobe: Object.freeze({ floor_top: 2 }),
+});
+
+/** How many choices a config key has for a style. */
+export function configChoices(styleId, key) {
+  const counts = TOWER_PART_CHOICES[styleId] || TOWER_PART_CHOICES.base;
+  const row = TOWER_CONFIG_ROWS.find((r) => r.key === key);
+  return row ? counts[row.part] || 1 : 0;
+}
+
+/** A full, valid config for a style: every key 1..choices, defaults filled in. */
+export function normalizeTowerConfig(styleId, seed = {}) {
+  const style = TOWER_STYLES[styleId] ? styleId : 'base';
+  const def = TOWER_DEFAULT_CONFIG[style] || {};
+  const src = seed && typeof seed === 'object' ? seed : {};
+  const out = {};
+  for (const key of CONFIG_KEYS) {
+    const max = configChoices(style, key);
+    const v = Math.floor(Number(src[key]));
+    out[key] = Number.isInteger(v) && v >= 1 && v <= max ? v : Math.min(max, def[key] || 1);
+  }
+  return out;
+}
+
+/** The config rows the Customize panel shows for a Tower with `extra` extra floors. */
+export function towerConfigRows(styleId, extra = 0) {
+  const n = Math.max(0, Math.min(7, Math.floor(Number(extra) || 0)));
+  return TOWER_CONFIG_ROWS
+    .filter((r) => (r.floor ? r.floor <= n : r.key !== 'deco_side' || n >= 1))
+    .map((r) => ({ ...r, choices: configChoices(styleId, r.key) }));
+}
+
+/** ConfiggerChoiceElementUI prev / next: step one choice and wrap around. */
+export function stepConfig(styleId, config, key, dir) {
+  const max = configChoices(styleId, key);
+  if (!max) return config;
+  const cur = Math.floor(Number(config?.[key])) || 1;
+  const next = ((cur - 1 + (dir < 0 ? -1 : 1)) % max + max) % max + 1;
+  return { ...normalizeTowerConfig(styleId, config), [key]: next };
+}
+
+/** The client's Randomize button: a random choice for every row. */
+export function randomTowerConfig(styleId, rand = Math.random) {
+  const out = {};
+  for (const key of CONFIG_KEYS) out[key] = 1 + Math.floor(rand() * configChoices(styleId, key));
+  return normalizeTowerConfig(styleId, out);
+}
+
+/** The article a style draws for a part and choice ([file, ox, oy, w, h] or null). */
+export function towerArticle(styleId, part, choice = 1) {
+  const list = (TOWER_VARIANT_ART[styleId] || TOWER_VARIANT_ART.base)[part] || [];
+  return list[Math.max(1, Math.floor(Number(choice)) || 1) - 1] || null;
+}
+
+/**
+ * initializehead(): the chassis articles for a style, extra-floor count and
+ * config, in depth order, as sprite placements relative to the item's foot:
+ * { file, anchorX, anchorY, x, y, scaleX, scaleY, depth, part }.
+ * floor_ground_<n> and door_<n> share the ground floor's choice;
+ * floor_top_container.y = -(bottom_floor_h + floor_h * extra_floors);
+ * deco_side shows only with extra floors; floors 1..7 hold extra_floor_<floor_N>.
+ */
+export function composeTower(styleId, extraFloors = 0, config = null) {
+  const style = TOWER_ART[styleId] ? styleId : 'base';
+  const art = TOWER_ART[style];
+  const cfg = normalizeTowerConfig(style, config || {});
   const extra = Math.max(0, Math.min(7, Math.floor(Number(extraFloors) || 0)));
   const [mx, my] = art.scale;
   const ops = [];
   const place = (part, containerKey, override = {}) => {
-    const p = art.parts[part];
+    const choice = part === 'door' ? cfg.floor_ground : part === 'extra_floor' ? cfg[containerKey] : cfg[part];
+    const p = towerArticle(style, part, choice);
     const c = art.containers[containerKey];
     if (!p || !c) return;
     const [file, ox, oy, w, h] = p;
@@ -376,12 +468,33 @@ export function normalizeTowerState(seed = {}) {
     project: built ? {} : cleanGot(TOWER_JOB, src.project),
     expansion: expanding ? cleanGot(floorJobFor(floors), src.expansion) : {},
     style: TOWER_STYLES[src.style] ? src.style : 'base',
+    // furniture_tower_chassis user_config: the chosen article per part.
+    config: normalizeTowerConfig(TOWER_STYLES[src.style] ? src.style : 'base', src.config),
     name: cleanTowerName(src.name),
     floorLabels,
     visited: src.visited === true,
     secrets: [...new Set((Array.isArray(src.secrets) ? src.secrets : []).map(cleanId).filter((id) => /^TowerSpot_\d\d$/.test(id)))].slice(0, 11),
     floor: Number.isInteger(src.floor) && src.floor >= 0 && src.floor <= floors ? src.floor : null,
   };
+}
+
+/**
+ * The upgrade picker: a new style starts from its catalog config (the
+ * current style keeps the owner's choices). Returns false for an unknown style.
+ */
+export function setTowerStyle(state, styleId) {
+  if (!TOWER_STYLES[styleId]) return false;
+  if (state.style !== styleId) {
+    state.style = styleId;
+    state.config = normalizeTowerConfig(styleId, {});
+  }
+  return true;
+}
+
+/** furniture_tower_chassis user_config for the current style, cleaned. */
+export function setTowerConfig(state, config) {
+  state.config = normalizeTowerConfig(state.style, config);
+  return state.config;
 }
 
 export function createTowerState(seed = {}) {
