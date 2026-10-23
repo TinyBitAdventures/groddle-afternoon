@@ -1807,9 +1807,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 313,
+  "commits": 316,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "The loading card says when you were last here, what the street is home to, and welcomes you to a new hub"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Garden plots answer every plant, water, hoe and pick with their own lines"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1919,19 +1929,9 @@
     "date": "2026-10-23",
     "kind": "fix",
     "text": "Buying Brain Capacity speeds up the skill you're studying"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Eat a Ticket to Paradise for 20 iMG, and no ascending from Hell"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Flip your Tower to face the other way"
    }
   ]
  },
- "tests": 185,
+ "tests": 186,
  "generatedAt": "2026-10-23"
 }

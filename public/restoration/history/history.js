@@ -2,7 +2,8 @@
  * Groddle Field Notes · Every change. Renders ../history.json (written by
  * tools/build-restoration.mjs from the git log): every 📦 NEW, 👌 IMPROVE
  * and 🐛 FIX commit, grouped by day, with a kind filter and a search box.
- * #new, #improve or #fix in the address opens that filter.
+ * #new, #improve or #fix in the address opens that filter; #d-<yyyy-mm-dd>
+ * scrolls to that day.
  */
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -81,3 +82,7 @@ function render() {
 }
 
 render();
+
+// #d-2026-10-19 (a day link from the Notes blog) scrolls once the days exist.
+const day = /^#d-\d{4}-\d{2}-\d{2}$/.test(location.hash) && document.getElementById(location.hash.slice(1));
+if (day) day.closest('section').scrollIntoView();

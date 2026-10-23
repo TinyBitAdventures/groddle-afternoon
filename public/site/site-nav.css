@@ -1,5 +1,6 @@
 /* Groddle Field Notes · the shared site header on the home page, the
-   restoration report and the compare page. Uses each page's own tokens
+   restoration report, its history page, the compare page and the Notes
+   blog. Uses each page's own tokens
    (--bg, --fg, --muted, --border, --accent), so it follows the page's
    light or dark theme. The markup is identical on every page apart from
    the path prefix and aria-current (tests/site-nav.test.js). */

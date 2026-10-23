@@ -1,0 +1,1341 @@
+{
+  "about": "Groddle Afternoon build notes. One object per post, newest first. Text fields are HTML fragments. Posts with \"archived\" were lifted word for word from the old build archive by tools/changelog/extract.mjs; \"draft\": true builds the page but leaves it out of the list. Rebuild the pages with: node tools/changelog/build.mjs",
+  "archive": {
+    "source": {
+      "commit": "51140eed",
+      "path": "public/changelog.html"
+    },
+    "title": "Groddle Field Notes · Build archive",
+    "eyebrow": "GRODDLE AFTERNOON · BUILD NOTES",
+    "heading": "Many long nights in Ur.",
+    "lead": "From the first recovered street to returning quests, untangled trees, restored rocks, and an interface that learned some manners."
+  },
+  "posts": [
+    {
+      "slug": "2026-10-23-vector-parts",
+      "date": "2026-10-23",
+      "meta": "OCT 23, 2026 · VECTOR PARTS",
+      "label": "VECTOR PARTS",
+      "draft": true,
+      "title": "Every Glitch got sharp, and the Butler learned to say hi",
+      "summary": "Avatars are drawn from Tiny Speck’s own vector parts, your Butler can be rebuilt piece by piece, and the Hall of Rejected Concepts is open again.",
+      "eyebrow": "VECTOR AVATARS · THE BUTLER · REJECTED CONCEPTS · PLAYERS’ SNAPS · ANIMALS",
+      "tags": [
+        "VECTOR AVATARS",
+        "THE BUTLER",
+        "REJECTED CONCEPTS",
+        "PLAYERS’ SNAPS",
+        "ANIMALS"
+      ],
+      "subtitle": "Drawn from the pieces Tiny Speck left behind.",
+      "lead": "Every Glitch in the game is now drawn from Tiny Speck’s vector parts, and the old bitmap avatars are gone: they were real players’ avatars caught by the Wayback Machine, so they were only ever reference. New players start from the original avatar picker, with four choices for each of nine parts, and the presets gained four Starter looks and thirteen Costumes. Your Butler can be rebuilt part by part from its own Flash doll and trades hi signs with you each day. Behind the Mezzanine, the Hall of Rejected Concepts is open again, and a few rooms that never made it into the archive now look the way players’ Snaps show them.",
+      "stat": {
+        "num": "14",
+        "caption": "exhibits back in the Hall of Rejected Concepts, each with the caption its button raised"
+      },
+      "image": {
+        "src": "landing/reimagined/real_bowler_hat-1.webp",
+        "alt": "The default Glitch in a brown bowler hat.",
+        "caption": "The default Glitch, drawn from Tiny Speck’s vector parts.",
+        "width": 359,
+        "height": 360
+      },
+      "cards": [
+        {
+          "mark": "✦",
+          "title": "Every Glitch drawn sharp",
+          "text": "You, the rivals, guests and companions are all drawn from Tiny Speck’s vector parts now, and old saves move to the nearest vector look. Start fresh opens the original new-player picker: nine parts, four choices each. Four Starter looks and thirteen Costumes join the presets, so you can dress as the Rook, a giant, a chicken or a garden gnome."
+        },
+        {
+          "mark": "♢",
+          "title": "A Butler of your own making",
+          "text": "The Butler’s Flash doll was flattened into 171 parts, so you can change its head, face, accessory, body, arms and legs one at a time, or randomize the lot. Press 5 to flash your hi sign for the day: the Butler says hi back once a day, with a bonus when your signs match."
+        },
+        {
+          "mark": "◎",
+          "title": "The Hall of Rejected Concepts",
+          "text": "Behind the Mezzanine, fourteen exhibits stand in their recorded order, from the Rube to Avatars. The room is laid out from ten players’ Snaps and two recordings, and each Wall Button raises Tiny Speck’s own caption for its exhibit, like “A bunny. Why? Because bunny.”"
+        },
+        {
+          "mark": "❦",
+          "title": "Rooms as players saw them",
+          "text": "Mr. Block’s playroom is the giant Kid’s Room again, with monster wallpaper, a bed, a panda and a tea party. The Rube’s yard is a dusky junk garden of flamingos, lanterns and a rook skull, and Operation Grow’s stalks turn teal and glow as they bloom. None of the three survived in the archive, so they are dressed from players’ Snaps."
+        },
+        {
+          "mark": "↓",
+          "title": "Sky Plunge lands softly",
+          "text": "The only picture of the course, a player’s Snap from October 2012, sets the landing: a cream-gold sky, sun rays and a white cloud floor, with a Back to Top door and “AHHHHH YEAHHHH!!!!!” in the clouds. A Qurazy quoin hides on the way down."
+        },
+        {
+          "mark": "ᴥ",
+          "title": "Crowded streets",
+          "text": "Pack too many animals onto one street and they sulk, grumble and sometimes leave, and at the limit one puffs away. Hechey Track holds 20 piggies and a starter yard 18; the Happy Animals cards raise your yard to 20, then 22."
+        },
+        {
+          "mark": "✶",
+          "title": "Shake the Elemental Pouch",
+          "text": "Buy one from a hardware, alchemical, tool or mining vendor, which also completes Get Elemental!, and shake it once a game day for bonus elements."
+        },
+        {
+          "mark": "♫",
+          "title": "Lanterns, loading cards and chatty plots",
+          "text": "Jack-O-Lanterns are drawn sharp from their Flash files, all 74 frames in the original order. The loading card remembers when you were last on a street and what lives there, and garden plots answer every plant, water, hoe and pick with lines from all 31 of the original talkback pools."
+        }
+      ]
+    },
+    {
+      "slug": "2026-10-19-whole-world",
+      "date": "2026-10-19",
+      "meta": "OCT 19, 2026 · THE WHOLE WORLD",
+      "label": "THE WHOLE WORLD",
+      "title": "Ur got its depth, its names, its kitchens, and its afterlife",
+      "summary": "Every street now scrolls in true parallax under its own sky, the Magic Rock hands out real quests, and croaking sends you to Naraka.",
+      "eyebrow": "PARALLAX · 285 RECIPES · NARAKA · MAGIC ROCK QUESTS · PUBLIC STREET NAMES",
+      "tags": [
+        "PARALLAX",
+        "285 RECIPES",
+        "NARAKA",
+        "MAGIC ROCK QUESTS",
+        "PUBLIC STREET NAMES"
+      ],
+      "subtitle": "From a scrap of Ur toward all of it.",
+      "lead": "The first street import had quietly dropped each layer's size, colour treatment, and sky. Restoring them from the archived location XML turned flat backdrops into deep, blurred forests and Naraka's red sky with black silhouettes, using a port of the client's own colour matrix. Mirrored decorations face the right way again, and 573 streets now carry the names players actually saw. The making panel grew from 41 to 285 source recipes across 28 tools, every street spirit sells its real stock, croaking at zero energy sends you to Hell One to squish eleven bunches of grapes, and the Magic Rock now offers the original quests with their original dialogue.",
+      "stat": {
+        "num": "7,794",
+        "caption": "street layers whose original colour treatment returned"
+      },
+      "cards": [
+        {
+          "mark": "⌁",
+          "title": "True parallax and skies",
+          "text": "Background and foreground canvases slide with the client's parallax rule, 1,226 streets get their own gradient sky, and blurred layers bake once at half resolution."
+        },
+        {
+          "mark": "✶",
+          "title": "Croak and come back",
+          "text": "Zero energy sends you to Hell One. Squish eleven bunches of Hellish Grapes to return at ten percent energy; the dead walk greyscale, like the original."
+        },
+        {
+          "mark": "✉",
+          "title": "The Magic Rock's quests",
+          "text": "One quest offer at a time, with the original conversations. Accepted quests advance from crafting, vendors, mail, harvests, verbs, visits, and your pack."
+        },
+        {
+          "mark": "◍",
+          "title": "A full kitchen",
+          "text": "Saucepans, the Famous Pugilist Grill, cocktail shakers, the Awesome Pot, seasoners, and the cauldron, with source energy and mood for 193 foods and 26 drinks."
+        },
+        {
+          "mark": "⌂",
+          "title": "Every street spirit",
+          "text": "Fifteen stores at source prices, and 893 streets now host the vendor the production map assigned them."
+        },
+        {
+          "mark": "✿",
+          "title": "A world to harvest",
+          "text": "Barnacles, ice nubbins, jellisacs, dirt piles, peat bogs, paper trees, fireflies, salmon, sloths, and dust traps fill the streets the archive says they lived on."
+        },
+        {
+          "mark": "❦",
+          "title": "Plant a tree",
+          "text": "Tend a Patch, plant a seasoned bean, pet the seedling, and watch a living tree take its place on the street."
+        },
+        {
+          "mark": "ᴥ",
+          "title": "Foxes and Heli Kitties",
+          "text": "Fox preserves have their Rangers, licenses, bait, and brushable foxes; Heli Kitties hover, startle, and purr on 33 streets."
+        },
+        {
+          "mark": "◎",
+          "title": "Meditate and teleport",
+          "text": "The Focusing Orb meditates, focuses, and levitates; teleport points and one-way Teleportation Scripts join the map."
+        },
+        {
+          "mark": "⚑",
+          "title": "Seven races and Game of Crowns",
+          "text": "Ticket Dispensers start Space Race, Crystal Climb, The Amazing Race, Time Warp, Canyon Run, Lava Leap, and Star Sprint, rebuilt from their recordings."
+        },
+        {
+          "mark": "⌂",
+          "title": "Make a house a home",
+          "text": "Decorate with 43 pieces of recovered furniture, choose wallpaper and floors, and cultivate gardens, trees, and rocks on your home street."
+        },
+        {
+          "mark": "✦",
+          "title": "The whole skill tree",
+          "text": "All 105 skills are browsable; ranks now change mining, refining, gardening, and cooking, and starter skills bring their prerequisites."
+        },
+        {
+          "mark": "✉",
+          "title": "Neighbours and notes",
+          "text": "Street mailboxes open your mail anywhere, notes and notice boards carry new Glitch-voiced writing, and Visiting Stones lead to six neighbours' homes."
+        },
+        {
+          "mark": "☾",
+          "title": "The Rooks return",
+          "text": "A Forehorseman heralds the attack; stun the Rook with your Focusing Orb and shrine, then revive rooked critters and trees with balm."
+        },
+        {
+          "mark": "↯",
+          "title": "Friends stay grounded",
+          "text": "Local companions no longer climb into the canopy, and the stand-in Glitches are now off unless you ask for them."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-10-19-whole-world"
+      }
+    },
+    {
+      "slug": "2026-07-27-catalogue-scale",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · CATALOGUE SCALE",
+      "label": "CATALOGUE SCALE",
+      "title": "Eesti Page 17 put the furniture back",
+      "summary": "The tiny quest now crosses the recording’s white sofa, sleepy cat, lamp, ornate chair, curled table, and cake in the right order.",
+      "eyebrow": "RECOVERED K04 ROOM · SOURCE DIALOGUE · ORIGINAL MUSIC",
+      "tags": [
+        "RECOVERED K04 ROOM",
+        "SOURCE DIALOGUE",
+        "ORIGINAL MUSIC"
+      ],
+      "subtitle": "A very big little room feels like itself again.",
+      "lead": "The catalogue room had been mirrored and built from the wrong sofa, chair, and table variants. It now follows the supplied run from left to right with the exact clean K04 furniture, three framed cats, tabletop ornaments, and the cake hiding its shiny secret. Mr. Hairball animates while speaking, the two quest conversations retain their real boundary and wording, and reaching the hiding spot creates the item through collision like the source location. The recovered Eesti soundtrack replaces generic ambient music; no recording pixels or audio were used.",
+      "stat": {
+        "num": "−1832",
+        "caption": "the recovered production instance’s original entry x-coordinate"
+      },
+      "cards": [
+        {
+          "mark": "⌁",
+          "title": "The correct curled table",
+          "text": "<em>k04_table_03</em> restores the recording’s long twin-curled silhouette in place of the unrelated pedestal table."
+        },
+        {
+          "mark": "↗",
+          "title": "A physical search path",
+          "text": "Sofa, chair, and table platforms form the miniature climb, while contact behind the cake now discovers the object automatically."
+        },
+        {
+          "mark": "♫",
+          "title": "Eesti has its own music",
+          "text": "The clean recovered <em>eesti_life_catalogue</em> track is now the dedicated ambience for production hub 49."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-eesti-page-17"
+      }
+    },
+    {
+      "slug": "2026-07-27-red-tape",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · RED TAPE",
+      "label": "RED TAPE",
+      "title": "Legalize It took the long way around",
+      "summary": "The recorded subway round trip, forest briefing, Hall wait, and single clerk handoff now form one source-correct route.",
+      "eyebrow": "SEVEN SCENES · RECOVERED CLERKS · EXACT QUESTION",
+      "tags": [
+        "SEVEN SCENES",
+        "RECOVERED CLERKS",
+        "EXACT QUESTION"
+      ],
+      "subtitle": "A qualification should require a little travel.",
+      "lead": "The quest no longer jumps from an invented Back Alley platform directly into the Hall. It now travels from Gregarious Grange Subway Station into the forest, hears all four Shady Bureaucrat beats, rides back through the station, crosses Gregarious Grange, waits ten seconds in the Hall, and survives one recorded clerk transfer before the Beige-or-Other question. Clean recovered art and animation sheets replace placeholders; recording blur and compression remain outside the game.",
+      "stat": {
+        "num": "50",
+        "caption": "currants, cash only, followed by a separate pack activation"
+      },
+      "cards": [
+        {
+          "mark": "↔",
+          "title": "The whole round trip",
+          "text": "Two subway platforms, the Back Alley forest, Gregarious Grange, and the Hall each keep their own clean composition and camera context."
+        },
+        {
+          "mark": "10",
+          "title": "Please wait",
+          "text": "Walking into the waiting area now begins the source ten-second delay before the first named clerk calls Ur forward."
+        },
+        {
+          "mark": "B?",
+          "title": "Beige or Other",
+          "text": "The recorded final question and one handoff replace the invented multi-clerk loop, while purchase and activation remain separate actions."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-legalize-route"
+      }
+    },
+    {
+      "slug": "2026-07-27-blue-sky-memory",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · BLUE-SKY MEMORY",
+      "label": "BLUE-SKY MEMORY",
+      "title": "A Summer’s Day remembered its true colors",
+      "summary": "The owl’s four recorded challenges now lead through bright white silhouettes to eight pale Annex dots and the recovered hanging ladder.",
+      "eyebrow": "SOURCE DIALOGUE · RECOVERED PULSE DOTS · CLEAN ART",
+      "tags": [
+        "SOURCE DIALOGUE",
+        "RECOVERED PULSE DOTS",
+        "CLEAN ART"
+      ],
+      "subtitle": "The Annex is blue, white, and worth the climb.",
+      "lead": "The memory now keeps its authored pale-blue light instead of inheriting Dametime tint. A small white owl delivers all four source-observed prompts beside clean white platform and pillar silhouettes, while the Annex restores eight pale pulse dots worth exactly 8 iMG apiece and the original hanging-ladder exit. Every visual is clean recovered or native vector art—no recording pixels or compression artifacts were carried over.",
+      "stat": {
+        "num": "64",
+        "caption": "optional Annex iMG when all eight pale memory dots are gathered"
+      },
+      "cards": [
+        {
+          "mark": "♧",
+          "title": "The owl speaks again",
+          "text": "“Hey, I’m up here!”, “Not bad.”, “Almost there.”, and “Wow, you’re pretty good!” restore the four recorded guide beats."
+        },
+        {
+          "mark": "••",
+          "title": "Eight pale rewards",
+          "text": "Recovered <em>pulseDot</em> art replaces generic quoins; each optional pickup grants the source-exact +8 iMG."
+        },
+        {
+          "mark": "⇧",
+          "title": "The way home hangs overhead",
+          "text": "The recovered Firebog ladder now descends from the Annex ceiling in place of the invented rounded door."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-summer-memory"
+      }
+    },
+    {
+      "slug": "2026-07-27-first-snow",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · FIRST SNOW",
+      "label": "FIRST SNOW",
+      "title": "Winter Walk found its way home",
+      "summary": "The five-minute journey now climbs through Winter Haven, returns to the surface, and ends in the recording’s final white light.",
+      "eyebrow": "THREE-PHASE ROUTE · RECOVERED EXIT ART",
+      "tags": [
+        "THREE-PHASE ROUTE",
+        "RECOVERED EXIT ART"
+      ],
+      "subtitle": "The missing third act is back.",
+      "lead": "Winter Haven no longer sends the player straight home through a duplicate generic portal. Its recovered wooden ladder and EXIT sign lead back into Winter Walk, where three source-valued motes—1,098, 600, and 720 iMG—cross the last snowy platforms to a clean white home light.",
+      "stat": {
+        "num": "15",
+        "caption": "winter motes across surface, Haven, and homeward finale"
+      },
+      "cards": [
+        {
+          "mark": "↘",
+          "title": "Snow to stone",
+          "text": "The wide surface traverse still descends into the vertical Haven within the original five-minute clock."
+        },
+        {
+          "mark": "⇧",
+          "title": "A real exit",
+          "text": "Recovered clean ladder and EXIT-sign art replace the invented glowing doorway at the top of Winter Haven."
+        },
+        {
+          "mark": "☼",
+          "title": "Homeward light",
+          "text": "The recorded return load, exact final reward trio, and bright surface exit now complete the route before Ur resumes."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-winter-homeward"
+      }
+    },
+    {
+      "slug": "2026-07-27-near-dawn",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · NEAR DAWN",
+      "label": "NEAR DAWN",
+      "title": "Starlit Night learned how to light up",
+      "summary": "Twenty source stars now bloom across the recovered night field before the plain moon gives way to its original smile.",
+      "eyebrow": "RECOVERED EVENT GRAPH · ORIGINAL VECTOR STATES",
+      "tags": [
+        "RECOVERED EVENT GRAPH",
+        "ORIGINAL VECTOR STATES"
+      ],
+      "subtitle": "The reward is the sky changing around you.",
+      "lead": "The generic star field, drawn moon, and invented gold wash are gone. Eight clean source star panels fill the location, each revealed star uses its original artwork and one-second fade, and the final quoin now waits for the production 1.5-second moon transformation before opening the way home.",
+      "stat": {
+        "num": "22",
+        "caption": "reward quoins driving 20 star reveals and one smiling-moon finale"
+      },
+      "cards": [
+        {
+          "mark": "✦",
+          "title": "The actual night field",
+          "text": "Eight recovered <em>stars_2</em> panels restore the dense, softly layered sky from the source street."
+        },
+        {
+          "mark": "★",
+          "title": "Stars with a cue",
+          "text": "Twenty hidden source stars now fade into their exact coordinates as the corresponding rewards are gathered."
+        },
+        {
+          "mark": "☻",
+          "title": "A moon-sized payoff",
+          "text": "The original plain and smiling SWFs now perform the recovered 1.5-second final reveal before the exit unlocks."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-starlit-reveal"
+      }
+    },
+    {
+      "slug": "2026-07-27-deep-night",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · DEEP NIGHT",
+      "label": "DEEP NIGHT",
+      "title": "Radial Heights found its moon again",
+      "summary": "The 53-star spiral now curls past the enormous smiling moon that defines the source course’s finale.",
+      "eyebrow": "ORIGINAL VECTOR ART · SOURCE STREET COORDINATES",
+      "tags": [
+        "ORIGINAL VECTOR ART",
+        "SOURCE STREET COORDINATES"
+      ],
+      "subtitle": "A proper landmark among the stars.",
+      "lead": "The empty lower spiral now carries the recovered CC0 moon at its exact production position and 322-pixel size. Its original SWF was exported directly to scalable vector art, so the friendly face stays crisp without borrowing blur or compression from the gameplay recording.",
+      "stat": {
+        "num": "53",
+        "caption": "source-authored stars orbiting one restored smiling moon"
+      },
+      "cards": [
+        {
+          "mark": "☾",
+          "title": "The missing finale",
+          "text": "The giant moon now anchors the lower spiral exactly where the original street placed it."
+        },
+        {
+          "mark": "✦",
+          "title": "One coordinate system",
+          "text": "Moon and collectibles share the recovered GHFQOLEIHN63P27 screen-space layout."
+        },
+        {
+          "mark": "◇",
+          "title": "Crisp at course scale",
+          "text": "The original SWF is rasterized from vector paths at 322×322 instead of stretching a thumbnail."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-radial-moon"
+      }
+    },
+    {
+      "slug": "2026-07-27-later",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · LATER",
+      "label": "LATER",
+      "title": "Slip ’N Slide found its winter landmarks",
+      "summary": "The snowy run now passes the same friendly snowman, log cabins, ice spires, tree copses, and way-home castle seen in the source.",
+      "eyebrow": "RECOVERED K03 ART · SOURCE-GUIDED COMPOSITION",
+      "tags": [
+        "RECOVERED K03 ART",
+        "SOURCE-GUIDED COMPOSITION"
+      ],
+      "subtitle": "A hill is better when you know where you are.",
+      "lead": "The momentum course keeps its smooth authored collision hills, but generic triangle trees and an inferred finish shape are gone. Clean original K03 artwork now makes each stretch recognizable while preserving every star, jump, slope, and reward.",
+      "stat": {
+        "num": "32",
+        "caption": "preloaded recovered scenery pieces with no mid-run pop-in"
+      },
+      "cards": [
+        {
+          "mark": "☃",
+          "title": "A familiar welcome",
+          "text": "The exact smiling K03 snowman and first log cabin now establish the opening hill."
+        },
+        {
+          "mark": "♢",
+          "title": "Readable hill rhythm",
+          "text": "Two ice spires, two cabins, two snowy copses, and 24 archived trees give the long course distinct beats."
+        },
+        {
+          "mark": "⌂",
+          "title": "The castle way home",
+          "text": "The recovered snow castle now frames the final stars and exit, matching the recorded destination."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-slip-landmarks"
+      }
+    },
+    {
+      "slug": "2026-07-27-after-midnight",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · AFTER MIDNIGHT",
+      "label": "AFTER MIDNIGHT",
+      "title": "Cloud Rings finally fills the sky",
+      "summary": "Five clean, full-height cloud tunnels replace the small blurry hoops that used to interrupt Paradise.",
+      "eyebrow": "RECORDED SCALE · NATIVE VECTOR ART",
+      "tags": [
+        "RECORDED SCALE",
+        "NATIVE VECTOR ART"
+      ],
+      "subtitle": "Fly through a wall of weather.",
+      "lead": "The source course frames each ring as an enormous colored cloud mass that continues beyond the top and bottom of the location view. The remake now builds that same silhouette from crisp procedural lobes, with a generous readable opening and none of the blur caused by enlarging tiny cloud thumbnails.",
+      "stat": {
+        "num": "160",
+        "caption": "animated vector cloud lobes across five towering rings"
+      },
+      "cards": [
+        {
+          "mark": "☁",
+          "title": "Viewport-scale tunnels",
+          "text": "Each colored ring now reaches beyond the visible sky, matching the imposing foreground framing of the recorded course."
+        },
+        {
+          "mark": "◇",
+          "title": "Crisp at every scale",
+          "text": "Layered vector bodies, shadows, and highlights replace visibly stretched low-resolution puffs."
+        },
+        {
+          "mark": "→",
+          "title": "Still fair to fly",
+          "text": "Larger collision openings preserve smooth traversal while all five rings, rewards, and the way home complete normally."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-cloud-walls"
+      }
+    },
+    {
+      "slug": "2026-07-27-late-night",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · LATE NIGHT",
+      "label": "LATE NIGHT",
+      "title": "The Faded Heart gets its full goodbye",
+      "summary": "The Phantom now finishes materializing and giving its Heart before any reward screen interrupts the street.",
+      "eyebrow": "RECOVERED ANIMATION · RECORDED CADENCE",
+      "tags": [
+        "RECOVERED ANIMATION",
+        "RECORDED CADENCE"
+      ],
+      "subtitle": "First the apparition. Then the reward.",
+      "lead": "Ordinary echoes now emerge through the complete clean 54-frame sequence instead of snapping into place. The final Phantom plays all 89 recovered heart-handoff frames, holds the revealed Heart for a breath, and only then yields to the original four-page quest completion.",
+      "stat": {
+        "num": "89",
+        "caption": "clean handoff frames preserved from first shimmer to final Heart"
+      },
+      "cards": [
+        {
+          "mark": "◌",
+          "title": "Echoes materialize",
+          "text": "Each haunting becomes readable during its source animation, remains clickable, and settles into the final silhouette."
+        },
+        {
+          "mark": "♡",
+          "title": "A complete handoff",
+          "text": "The 4.635-second recovered sheet and 700-millisecond Heart reveal now play without an early fade."
+        },
+        {
+          "mark": "▣",
+          "title": "Awards wait their turn",
+          "text": "Quest pages appear after the scene, with any earned level-up still queued safely behind them."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-phantom-handoff"
+      }
+    },
+    {
+      "slug": "2026-07-27-night",
+      "date": "2026-07-27",
+      "meta": "JUL 27, 2026 · NIGHT",
+      "label": "NIGHT",
+      "title": "Rooks’ Woods grew crooked again",
+      "summary": "A layered bare-forest silhouette now makes every rise, root, and stretch of solid ground easier to read.",
+      "eyebrow": "CLEAN ARCHIVE ART · RECORDED SILHOUETTE",
+      "tags": [
+        "CLEAN ARCHIVE ART",
+        "RECORDED SILHOUETTE"
+      ],
+      "subtitle": "The path belongs to the forest.",
+      "lead": "The alpha run’s defining low canopy and enormous crooked limbs return through recovered CC0 tree, branch, and root art. Four deterministic depth layers bind the authored collision path into the scenery while keeping the avatar and ground edge distinct.",
+      "stat": {
+        "num": "4",
+        "caption": "forest depths composed without a single recording pixel"
+      },
+      "cards": [
+        {
+          "mark": "♧",
+          "title": "Thirty-one clean decos",
+          "text": "Thin distance trees, broken midground trunks, hanging canopy roots, and broad foreground bases come from the recovered art archive."
+        },
+        {
+          "mark": "⌁",
+          "title": "Crooked by design",
+          "text": "Five authored limbs restore the hunched woodland rhythm visible in the reference without copying its dark, compressed pixels."
+        },
+        {
+          "mark": "▰",
+          "title": "Ground stays legible",
+          "text": "The original playable platform map is unchanged; roots now visually explain its rises while the top edge remains a continuous navigation cue."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-27-rook-forest"
+      }
+    },
+    {
+      "slug": "2026-07-26-after-midnight",
+      "date": "2026-07-26",
+      "meta": "JUL 26, 2026 · AFTER MIDNIGHT",
+      "label": "AFTER MIDNIGHT",
+      "title": "The Last Feat found its Glitch train",
+      "summary": "Local Glitches can now be followed from street to street, just as the recording shows.",
+      "eyebrow": "SOCIAL MOVEMENT · ORIGINAL SERVER CONTRACT",
+      "tags": [
+        "SOCIAL MOVEMENT",
+        "ORIGINAL SERVER CONTRACT"
+      ],
+      "subtitle": "Pick a Glitch. Fall into step.",
+      "lead": "The Last Feat is not only a three-line Incantation. Its players form a moving group first. Amp, Bumbishfish, and Lily Linguistic are now interactable world players: choose Follow and the avatar smoothly trails that Glitch until manual movement takes over or Stop following is selected.",
+      "stat": {
+        "num": "3",
+        "caption": "distinct streets followed for the original non-creepy designation"
+      },
+      "cards": [
+        {
+          "mark": "↝",
+          "title": "A real follow verb",
+          "text": "Companions use the same hover, click, and verb-menu language as every other street actor."
+        },
+        {
+          "mark": "⋯",
+          "title": "The group carries on",
+          "text": "The selected name and trailing assist survive ordinary street loads while direct movement remains in the player’s hands."
+        },
+        {
+          "mark": "★",
+          "title": "Source badge restored",
+          "text": "Three unique streets grant Stalker, Non-Creepy Designation with its original 200 iMG and 25 Friendly favor."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-26-follow"
+      }
+    },
+    {
+      "slug": "2026-07-26-midnight",
+      "date": "2026-07-26",
+      "meta": "JUL 26, 2026 · MIDNIGHT",
+      "label": "MIDNIGHT",
+      "title": "The Stoot memorial has room to breathe",
+      "summary": "The private shrine no longer fills itself with unrelated street ecology.",
+      "eyebrow": "SOURCE-EMPTY STREET · RECORDED MEMORIAL",
+      "tags": [
+        "SOURCE-EMPTY STREET",
+        "RECORDED MEMORIAL"
+      ],
+      "subtitle": "One strange monument. Nothing in the way.",
+      "lead": "The archived <span class=\"code\">unnnn</span> location contains no ordinary item population, exactly as the supplied memorial recording shows. It now stays free of fallback trants, rocks, vendors, shrines, animals, quoins, and local companions, while the clean authored memorial and its pull-string doll load on every visit.",
+      "stat": {
+        "num": "0",
+        "caption": "unrelated ecology actors left in the private memorial"
+      },
+      "cards": [
+        {
+          "mark": "∅",
+          "title": "Empty by source",
+          "text": "A new explicit ecology row preserves the archived XML’s absence of location items instead of inventing fallback content."
+        },
+        {
+          "mark": "◎",
+          "title": "Always a memorial",
+          "text": "The monument now initializes whenever the recovered street loads, including saved and ordinary visits—not only its QA route."
+        },
+        {
+          "mark": "↗",
+          "title": "Recorded arrival",
+          "text": "The player arrives beside rather than inside the plaque, and the missing hub label is restored as Alphermia Prime."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-26-stoot-private"
+      }
+    },
+    {
+      "slug": "2026-07-26-late-night",
+      "date": "2026-07-26",
+      "meta": "JUL 26, 2026 · LATE NIGHT",
+      "label": "LATE NIGHT",
+      "title": "Cloud Rings became cloud tunnels",
+      "summary": "Five airy, color-shifting passages replace the old geometric hoops.",
+      "eyebrow": "PARADISE COURSE · CLEAN SOURCE ART",
+      "tags": [
+        "PARADISE COURSE",
+        "CLEAN SOURCE ART"
+      ],
+      "subtitle": "Fly through the clouds, not an outline.",
+      "lead": "The supplied Cloud Rings recording establishes enormous, soft vertical tunnels in yellow, orange, and purple. The remake now builds all five from clean local CC0 cloud puffs, preserving the navigable openings and course collision logic without copying a single recorded pixel.",
+      "stat": {
+        "num": "5×18",
+        "caption": "primary animated cloud puffs, plus clean depth shadows"
+      },
+      "cards": [
+        {
+          "mark": "☁",
+          "title": "Soft source artwork",
+          "text": "Two recovered fluffy-cloud assets form varied, overlapping silhouettes instead of thin vector ellipses."
+        },
+        {
+          "mark": "◯",
+          "title": "Openings preserved",
+          "text": "Each color profile keeps a deliberate inner flight corridor, so the new volume never changes the five-ring objective."
+        },
+        {
+          "mark": "✓",
+          "title": "Course verified",
+          "text": "Deterministic flight still collects all five rings and unlocks the exit; the full regression suite remains green."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-26-cloud-rings"
+      }
+    },
+    {
+      "slug": "2026-07-26-night",
+      "date": "2026-07-26",
+      "meta": "JUL 26, 2026 · NIGHT",
+      "label": "NIGHT",
+      "title": "Every quest gets the last word",
+      "summary": "Source-authored completion conversations now finish before transient rooms let go.",
+      "eyebrow": "QUEST SYSTEM · RECORDED FINALES",
+      "tags": [
+        "QUEST SYSTEM",
+        "RECORDED FINALES"
+      ],
+      "subtitle": "The reward can wait for the punchline.",
+      "lead": "Four Letter Words and Ilmenskie Jones confirmed that the Faded Heart panel was not a one-off. Every catalog quest now reads its original completion pages and player responses, keeps rewards for the final page, and waits for OK or close before leaving a temporary quest room.",
+      "stat": {
+        "num": "264",
+        "caption": "catalog quests with recovered multi-page completion writing"
+      },
+      "cards": [
+        {
+          "mark": "▤",
+          "title": "Original client art",
+          "text": "The recovered quest book now anchors the dark live-world panel, alongside its source-style close control."
+        },
+        {
+          "mark": "…",
+          "title": "Authored cadence",
+          "text": "Every <span class=\"code\">&lt;split butt_txt&gt;</span> response becomes a real player-paced page instead of flattened prose."
+        },
+        {
+          "mark": "+",
+          "title": "Reward pills restored",
+          "text": "iMG, currants, mood, energy, favor, and items receive readable source-colored pills on the final page only."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-26-quest-completions"
+      }
+    },
+    {
+      "slug": "2026-07-26-later",
+      "date": "2026-07-26",
+      "meta": "JUL 26, 2026 · LATER",
+      "label": "LATER",
+      "title": "The Phantom found time to speak—twice",
+      "summary": "The handoff and its quiet four-page epilogue now follow the original recording.",
+      "eyebrow": "VIDEO FIDELITY · AUTHORED CADENCE",
+      "tags": [
+        "VIDEO FIDELITY",
+        "AUTHORED CADENCE"
+      ],
+      "subtitle": "Listen first. Remember after.",
+      "lead": "The supplied finale recording shows four player-paced exchanges before the Phantom hands over the Faded Heart, followed by four more Quest Complete pages. The remake now preserves both halves, triggers the clean handoff animation and reward exactly once, and waits for every original response.",
+      "stat": {
+        "num": "4+4",
+        "caption": "recorded dialogue beats before and after the heart changes hands"
+      },
+      "cards": [
+        {
+          "mark": "♟",
+          "title": "The street stays alive",
+          "text": "The completion view is a compact dark panel over the live world, not a full-screen celebration that hides the scene."
+        },
+        {
+          "mark": "›",
+          "title": "Every response restored",
+          "text": "“I dunno.”, “Yeah…”, and “Do you think?” advance the exact source-authored lines before the final OK."
+        },
+        {
+          "mark": "+",
+          "title": "Rewards wait their turn",
+          "text": "iMG, energy, and mood remain hidden until the final remembrance page, matching the recorded reward reveal."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-26-heart"
+      }
+    },
+    {
+      "slug": "2026-07-26-late",
+      "date": "2026-07-26",
+      "meta": "JUL 26, 2026 · LATE",
+      "label": "LATE",
+      "title": "The ground came back into view",
+      "summary": "One source-backed camera rule now frames homes, authored rooms, and every imported street.",
+      "eyebrow": "CAMERA CONTRACT · ONE WALKABLE WORLD",
+      "tags": [
+        "CAMERA CONTRACT",
+        "ONE WALKABLE WORLD"
+      ],
+      "subtitle": "Feet, ground, then pack.",
+      "lead": "The home reported a 540px world with its ground at y=620. Other scenes mixed raw art bounds, collision bounds, and hand-set camera starts. The camera now derives its usable world height from the deepest walkable ground instead.",
+      "stat": {
+        "num": "102",
+        "caption": "internal pixels of consistent ground clearance above the pack"
+      },
+      "cards": [
+        {
+          "mark": "¾",
+          "title": "Original vertical anchor",
+          "text": "The released client’s center plus scaled 150/600 y-offset resolves to a 75% avatar anchor, now shared by ordinary streets and homes."
+        },
+        {
+          "mark": "⌂",
+          "title": "Authored rooms repaired",
+          "text": "Home exterior, interior, and other constructed scenes no longer trust a declared height that ends above their collision ground."
+        },
+        {
+          "mark": "✓",
+          "title": "Catalog-wide regression",
+          "text": "Automated coverage checks the lowest platform across more than 1,400 imported streets, plus the exact malformed-home case."
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-26-camera"
+      }
+    },
+    {
+      "slug": "2026-07-25-world-woke-up",
+      "date": "2026-07-25",
+      "dateEnd": "2026-07-26",
+      "meta": "JUL 25–26, 2026",
+      "title": "The night the world woke up",
+      "summary": "Stories, races, flight courses, world systems, and a generous pile of polish.",
+      "tags": [],
+      "cards": [],
+      "blocks": [
+        {
+          "type": "section",
+          "id": "journeys",
+          "title": "Journeys",
+          "blocks": [
+            {
+              "type": "quests",
+              "label": "Interactive map of added adventures",
+              "items": [
+                {
+                  "key": "phantom",
+                  "n": "01",
+                  "short": "Faded Heart",
+                  "label": "Notice the Unnoticeable",
+                  "kind": "Story quest",
+                  "title": "Notice the Unnoticeable",
+                  "text": "Seven strange hauntings lead to the Phantom Glitch, a persistent Faded Heart, and the follow-up Remember the Rememberable journey across thirteen streets.",
+                  "source": "GSJS quest rules + supplied beta footage",
+                  "play": "Street hunt, final encounter, reusable memory item",
+                  "finish": "Exact progress, rewards, cooldowns, and persistence"
+                },
+                {
+                  "key": "hog",
+                  "n": "02",
+                  "short": "Hog Haul",
+                  "label": "The Great Hog Haul",
+                  "kind": "Race",
+                  "title": "The Great Hog Haul",
+                  "text": "A ready countdown opens a real first-to-three race: bait one Piggy, carry one hogtied Piggy, and reach the pen while a visible rival closes in.",
+                  "source": "Original race scripts + recovered cave street",
+                  "play": "Bait, capture, carry, score, repeat",
+                  "finish": "Winner reward, loss state, and safe street return"
+                },
+                {
+                  "key": "greedy",
+                  "n": "03",
+                  "short": "Greedy Spirit",
+                  "label": "The Greedy Street Spirit",
+                  "kind": "Five-act story",
+                  "title": "The Greedy Street Spirit",
+                  "text": "Piggy introduces a five-minute, five-act theatre story assembled from the production scene graph. Emotional Bear can later replay it through Reminisce.",
+                  "source": "Production XML events + clean recovered SWFs",
+                  "play": "Sixteen narrated scenes and five Wall Buttons",
+                  "finish": "Emotional Bear first reward; four Waffles on repeat"
+                },
+                {
+                  "key": "alley",
+                  "n": "04",
+                  "short": "Back Alley",
+                  "label": "Legalize It",
+                  "kind": "Quest route",
+                  "title": "Legalize It",
+                  "text": "The Back Alley, hall queue, paperwork fee, activation card, and completion route now form one playable source-authored quest.",
+                  "source": "Quest scripts + clean Back Alley reconstruction",
+                  "play": "Travel, queue, purchase, activate",
+                  "finish": "Exact fee, reward, and persistent card state"
+                },
+                {
+                  "key": "letters",
+                  "n": "05",
+                  "short": "Four Letters",
+                  "label": "Four Letter Words",
+                  "kind": "Puzzle",
+                  "title": "Four Letter Words",
+                  "text": "Mr. Block’s room now shrinks the avatar, spins six recovered blocks, and accepts MAST, TAME, then BEAT in the original order.",
+                  "source": "Letter Block scripts + supplied runthrough",
+                  "play": "Talk, spin letters, solve three words",
+                  "finish": "Exact iMG, currant, mood, and Lem favor reward"
+                },
+                {
+                  "key": "jones",
+                  "n": "06",
+                  "short": "Ilmenskie",
+                  "label": "Ilmenskie Jones",
+                  "kind": "Rescue",
+                  "title": "Ilmenskie Jones",
+                  "text": "Map teleportation reaches the sealed Axis Denyde cavern. Jones can be met, hogtied into the pack, carried out, and released only on a safe street.",
+                  "source": "Teleportation quest + imported cavern geometry",
+                  "play": "Teleport, talk, pick up, escape, release",
+                  "finish": "Persistent rescue state and source-exact rewards"
+                },
+                {
+                  "key": "rook",
+                  "n": "07",
+                  "short": "Rook stories",
+                  "label": "Rooks Woods and Museum",
+                  "kind": "Two adventures",
+                  "title": "Rooks’ Woods & Museum",
+                  "text": "A timed Crusher gauntlet and five-state Rook Egg sit beside a six-exhibit museum tour with Greeterbot, speaker buttons, and the Focusing Orb lesson.",
+                  "source": "Rook quests, clean overlays, supplied videos",
+                  "play": "Survive and smash; then listen and learn",
+                  "finish": "Tool wear, timers, exact rewards, safe exits"
+                },
+                {
+                  "key": "memories",
+                  "n": "08",
+                  "short": "Old memories",
+                  "label": "Winter Walk and A Summer's Day",
+                  "kind": "Memory routes",
+                  "title": "Winter Walk & A Summer’s Day",
+                  "text": "Snowy Drifa paths, a vertical Haven, water buoyancy, owl encounters, pressure stones, an Annex, and physical reward quoins rebuild two distinct memories.",
+                  "source": "Quest event graphs + recovered CC0 streets",
+                  "play": "Traverse, collect, climb, swim, reveal",
+                  "finish": "First-run rewards and separate repeat behavior"
+                },
+                {
+                  "key": "paradise",
+                  "n": "09",
+                  "short": "Paradise",
+                  "label": "Ticket to Paradise courses",
+                  "kind": "Four courses",
+                  "title": "Ticket to Paradise",
+                  "text": "Cloud Rings, Radial Heights, Starlit Night, and Slip N Slide now share a real ticket economy while preserving their own flight or slope-driven movement.",
+                  "source": "Production templates + four supplied videos",
+                  "play": "Flight inertia, rings, stars, sliding, jumps",
+                  "finish": "Four-minute instances and safe return to Ur"
+                },
+                {
+                  "key": "stoot",
+                  "n": "10",
+                  "short": "Stoot & Feat",
+                  "label": "Stoot Memorial and Incantations feat",
+                  "kind": "Memorial & Feat",
+                  "title": "Stoot, the doll, and the last feat",
+                  "text": "The Stoot memorial, 43-line pull-string doll, Gameshow Ticket wheel, and Incantations of Absurdity chat chain bring back playful social oddities.",
+                  "source": "Original item and Feat scripts + memorial footage",
+                  "play": "Pull, spin, chat in sequence",
+                  "finish": "Persistent items, scores, exact prize tables"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "id": "fixes",
+          "title": "World fixes",
+          "blocks": [
+            {
+              "type": "intro",
+              "eyebrow": "SMALL THINGS · LARGE RELIEF",
+              "heading": "The world stopped fighting the player.",
+              "lead": "Visual repairs use clean source art and authored geometry—not recording blur, seams, or compression."
+            },
+            {
+              "type": "signs",
+              "label": "Road sign hover demonstration",
+              "arms": [
+                {
+                  "text": "Ramsley Sway",
+                  "side": "right"
+                },
+                {
+                  "text": "Balliure Heath",
+                  "side": "left"
+                }
+              ],
+              "caption": "Hover each road name. Only that wooden arm responds."
+            },
+            {
+              "type": "cards",
+              "variant": "fix",
+              "cards": [
+                {
+                  "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><path d=\"M12 21V10M12 10c-5 0-7-3-7-6 4 0 7 1 7 6Zm0 0c5 0 7-3 7-6-4 0-7 1-7 6Z\"/></svg>",
+                  "title": "All trees, one plant each",
+                  "text": "Thirty exact maturity cells now cover Fruit, Egg, Bean, Bubble, Gas, and Spice trees. Wood Tree keeps all six source stages."
+                },
+                {
+                  "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><path d=\"m4 18 4-8 4 3 3-7 5 12H4Z\"/><path d=\"M8 18h8\"/></svg>",
+                  "title": "Deposits returned",
+                  "text": "Metal, Dullite, Beryl, and Sparkly Rocks each preload five valid depletion frames, removing the blank Sparkly node."
+                },
+                {
+                  "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><path d=\"M4 17h16M7 13h10M10 9h4\"/><path d=\"M12 4v5\"/></svg>",
+                  "title": "Grounded feet",
+                  "text": "Street collision, character scaling, and vertical camera framing keep the avatar on the walkable surface instead of sinking below the UI."
+                },
+                {
+                  "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"3\"/><path d=\"M7 9h10M7 13h7\"/></svg>",
+                  "title": "HUD breathing room",
+                  "text": "Safe camera edges, larger selected controls, paged inventory rows, complete activity bubbles, and readable achievement labels rebalance the interface."
+                },
+                {
+                  "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><path d=\"M12 3v18M4 8h8M12 12h8\"/><path d=\"m8 5 4 3-4 3m8-2-4 3 4 3\"/></svg>",
+                  "title": "Individual road signs",
+                  "text": "Hover and click are inverse-transformed into each rotated road-name board. The post and neighboring destinations stay inert."
+                },
+                {
+                  "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M12 7v5l3 2\"/></svg>",
+                  "title": "A calmer boot",
+                  "text": "A static loading cover now hides zeroed counters and half-built scenery until the world is genuinely ready—or explains a startup failure."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "id": "systems",
+          "title": "Systems",
+          "blocks": [
+            {
+              "type": "cards",
+              "cards": [
+                {
+                  "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><path d=\"M5 4h14v16H5z\"/><path d=\"M8 8h8M8 12h8M8 16h5\"/></svg>",
+                  "title": "Source-authored quests",
+                  "text": "Original objectives, timers, dialogue, rewards, repeat rules, and safe return behavior now drive every reconstructed adventure."
+                },
+                {
+                  "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M8 12h8M12 8v8\"/></svg>",
+                  "title": "Persistent Ur",
+                  "text": "Quest stories, tools, trees, rocks, animals, badges, skills, food memories, quoins, and dropped stacks survive travel and reload."
+                },
+                {
+                  "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><path d=\"M4 15c3-7 13-7 16 0\"/><path d=\"M7 15v4m10-4v4M9 8l3-4 3 4\"/></svg>",
+                  "title": "Smooth movement",
+                  "text": "Camera lookahead, platform-aware placement, climbing, flight inertia, slide momentum, and Triple Jump make traversal feel intentional."
+                }
+              ]
+            },
+            {
+              "type": "lists",
+              "cards": [
+                {
+                  "title": "What joined the world",
+                  "items": [
+                    "Animal Kinship, living-trant care, Wood Tree harvesting, gardens, and complete mining loops.",
+                    "Giant shrines, vendors, crafting tools, food memory, buffs, tool condition, and repair.",
+                    "Dametime, ambient music, quoins, Musicblocks, Cubimals, skill study, and level progression.",
+                    "Emotional Bear emotes and the repeatable Greedy Street Spirit Reminisce story.",
+                    "Amp, Bumbishfish, and Lily Linguistic now walk the street as clean local Glitches, gather for Feats, and visibly react to Emotional Bear emotes."
+                  ]
+                },
+                {
+                  "title": "The clean-art promise",
+                  "text": "The gameplay recordings are behavioral references. Visuals come from CC0 location data, original atlases, recovered SWFs, or crisp authored replacements.",
+                  "items": [
+                    "No video blur copied into the game.",
+                    "No compression seams treated as geometry.",
+                    "No broken alpha frames promoted as assets."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "id": "ledger",
+          "title": "Ledger",
+          "blocks": [
+            {
+              "type": "stats",
+              "id": "proof",
+              "items": [
+                {
+                  "num": "521",
+                  "unit": "/521",
+                  "caption": "automated tests passing after the companion, tree, rock, signpost, and quest passes."
+                },
+                {
+                  "num": "30",
+                  "caption": "verified living-tree maturity cells, each cropped from one exact source atlas cell."
+                },
+                {
+                  "num": "4",
+                  "unit": "×5",
+                  "caption": "mineable rock families with five valid visual depletion states apiece."
+                }
+              ]
+            },
+            {
+              "type": "table",
+              "label": "Verification ledger",
+              "head": [
+                "Area",
+                "Result",
+                "Evidence"
+              ],
+              "rows": [
+                [
+                  "Quest and world regressions",
+                  "All suites passing",
+                  "121 suites"
+                ],
+                [
+                  "Local street companions",
+                  "Three clean actors, anchored chat, Feat and Bear reactions",
+                  "3 Glitches"
+                ],
+                [
+                  "Living-tree source cells",
+                  "Every species and shipped maturity valid",
+                  "30 PNGs"
+                ],
+                [
+                  "Mining atlases",
+                  "Preloaded before Pixi subtexture slicing",
+                  "20 frames"
+                ],
+                [
+                  "Road-sign interaction",
+                  "Each arm isolated; post inert",
+                  "2 live targets"
+                ],
+                [
+                  "Browser runtime",
+                  "Bubble, Gas, and all rock demos settled cleanly",
+                  "0 errors"
+                ],
+                [
+                  "Deployment parity",
+                  "Source and groddle.localhost match",
+                  "SHA-256"
+                ]
+              ],
+              "numCol": 2
+            }
+          ],
+          "anchors": [
+            "proof"
+          ]
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-26"
+      }
+    },
+    {
+      "slug": "2026-07-21-systems-night",
+      "date": "2026-07-21",
+      "dateEnd": "2026-07-22",
+      "meta": "JUL 21–22, 2026",
+      "title": "The great systems night",
+      "summary": "A playable street became a persistent little world with rules, rhythms, and residents.",
+      "eyebrow": "ONE SESSION · MANY LOOPS",
+      "tags": [
+        "ONE SESSION",
+        "MANY LOOPS"
+      ],
+      "subtitle": "Ur learned how to remember.",
+      "lead": "This pass connected actions, crafting, creatures, progression, time, sound, persistence, and official street populations into one continuous game loop.",
+      "stat": {
+        "num": "375",
+        "caption": "tests across 99 suites at the final live verification"
+      },
+      "cards": [],
+      "blocks": [
+        {
+          "type": "milestones",
+          "label": "Clickable milestones from the July 21 to 22 build",
+          "items": [
+            {
+              "button": "Feel",
+              "kind": "Feel",
+              "title": "Actions gained a pulse",
+              "text": "Physical verbs became timed and cancellable. Crafting gained per-item progress, partial completion, tool animation, and honest reward timing."
+            },
+            {
+              "button": "Keep",
+              "kind": "Keep",
+              "title": "The pack became a place",
+              "text": "Items could be used, sold, dropped, merged, collected, and restored after reload. Versioned saves came to cover the wider world state."
+            },
+            {
+              "button": "Care",
+              "kind": "Care",
+              "title": "Residents found their routines",
+              "text": "Piggies, Chickens, Butterflies, and six trant species gained rank-aware care, feeding, harvests, daily limits, dialogue, and persistent state."
+            },
+            {
+              "button": "World",
+              "kind": "World",
+              "title": "Every street found its cast",
+              "text": "Official archived location data supplied 1,084 street rows of animals, trees, rocks, gardens, vendors, Giant shrines, and confirmed empty private locations, placed with one collision-aware planner."
+            }
+          ]
+        },
+        {
+          "type": "lists",
+          "cards": [
+            {
+              "title": "Systems that joined the loop",
+              "items": [
+                "Official XP levels, skill study, Dametime, food memory, buffs, tool wear, and repair.",
+                "Street Spirit vendors, four catalogs, drag-to-sell, drop piles, Giant donations, and eight quoin types.",
+                "Musicblocks, Triple Jump, camera polish, speech bubbles, Wood Trees, living trants, and Animal Kinship.",
+                "Exact achievement counters and three recovered gameplay-video badges."
+              ]
+            },
+            {
+              "title": "What live QA proved",
+              "items": [
+                "Completed actions rewarded; cancelled actions did not.",
+                "Animal care, quest progress, inventory, favors, and tool condition survived reloads.",
+                "Fresh games started muted and browser logs finished clean.",
+                "Source and groddle.localhost deployment matched."
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ledger",
+          "label": "July 21 to 22 evidence",
+          "items": [
+            {
+              "num": "1,084",
+              "caption": "official street ecology rows generated from the archived late-game snapshot, including a confirmed empty private street"
+            },
+            {
+              "num": "8",
+              "caption": "official quoin families, with multipliers, caps, rewards, and persistence"
+            },
+            {
+              "num": "0",
+              "caption": "browser warnings or errors at the final live check"
+            }
+          ]
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-22"
+      }
+    },
+    {
+      "slug": "2026-07-20-first-spark",
+      "date": "2026-07-20",
+      "dateEnd": "2026-07-21",
+      "meta": "JUL 20–21, 2026",
+      "title": "The first spark",
+      "summary": "An archive audit turned into a real street, a real pack, and the beginnings of a new Ur.",
+      "eyebrow": "AUDIT → PROTOTYPE → GAME",
+      "tags": [
+        "AUDIT → PROTOTYPE → GAME"
+      ],
+      "subtitle": "The leftovers were enough.",
+      "lead": "Tiny Speck’s CC0 repositories, OpenGameArt bundles, Wayback captures, GSJS rules, location XML, and avatar sources were mapped into a practical modern-web remake path.",
+      "stat": {
+        "num": "46/46",
+        "caption": "tracks and sound files recovered from the complete public downloads catalog"
+      },
+      "cards": [
+        {
+          "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><path d=\"M4 18V8l8-4 8 4v10\"/><path d=\"M8 18v-6h8v6\"/></svg>",
+          "title": "Real streets",
+          "text": "Location platforms, layers, decos, signs, connections, and hub maps replaced the original flat green strip."
+        },
+        {
+          "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><path d=\"M5 6h14v13H5z\"/><path d=\"M8 3v6m8-6v6M8 13h8\"/></svg>",
+          "title": "Daily life",
+          "text": "Tree care, gardens, mining, making, vendors, quests, badges, and pack actions formed the first recognizable Glitch rhythm."
+        },
+        {
+          "mark": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><path d=\"M9 18V5l10-2v13\"/><circle cx=\"6\" cy=\"18\" r=\"3\"/><circle cx=\"16\" cy=\"16\" r=\"3\"/></svg>",
+          "title": "Recovered voice",
+          "text": "Original art, item icons, tree stages, rock sheets, avatar vectors, music, and SFX gave the new engine an authentic vocabulary."
+        }
+      ],
+      "cardsAt": 1,
+      "blocks": [
+        {
+          "type": "milestones",
+          "label": "Clickable milestones from the July 20 to 21 foundation build",
+          "items": [
+            {
+              "button": "Audit",
+              "kind": "Audit",
+              "title": "The archive was charted",
+              "text": "The surviving client, server rules, locations, avatars, items, overlays, sounds, and fan-remake history were inventoried in a dedicated glitch-audit workspace."
+            },
+            {
+              "button": "Street",
+              "kind": "Street",
+              "title": "A street became walkable",
+              "text": "A PixiJS spike gained platforms, signposts, quoins, particles, verbs, map travel, recovered street geometry, and a clothed, customizable avatar."
+            },
+            {
+              "button": "Loops",
+              "kind": "Loops",
+              "title": "The first daily loops arrived",
+              "text": "Trees, crop gardens, tool-driven making, Street Spirit trading, mining, quests, achievements, skills, buffs, and the two-row pack began working together."
+            },
+            {
+              "button": "Sound",
+              "kind": "Sound",
+              "title": "Ur found its soundtrack",
+              "text": "The complete recoverable public music catalog was pulled from Wayback and mapped into hub-tuned ambient pools; missing CDN-only libraries were documented honestly."
+            }
+          ]
+        },
+        {
+          "type": "ledger",
+          "label": "July 20 to 21 evidence",
+          "items": [
+            {
+              "num": "441",
+              "caption": "quest definitions extracted into a browsable catalog and runner foundation"
+            },
+            {
+              "num": "663",
+              "caption": "achievement definitions cataloged from the surviving GSJS content"
+            },
+            {
+              "num": "100%",
+              "caption": "of the publicly released downloads-page music and SFX recovered"
+            }
+          ]
+        }
+      ],
+      "archived": {
+        "id": "release-2026-07-20"
+      }
+    }
+  ]
+}

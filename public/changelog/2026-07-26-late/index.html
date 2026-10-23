@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="One source-backed camera rule now frames homes, authored rooms, and every imported street." />
+  <title>The ground came back into view · Groddle Field Notes</title>
+  <link rel="stylesheet" href="../../restoration/restoration.css" />
+  <link rel="stylesheet" href="../../changelog/changelog.css" />
+  <link rel="stylesheet" href="../../site/site-nav.css" />
+  <link rel="icon" href="../../favicon.svg?v=quoin" type="image/svg+xml" />
+  <link rel="icon" href="../../favicon.ico?v=quoin" sizes="32x32" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png?v=quoin" />
+</head>
+<body class="notes">
+  <nav class="site-nav" aria-label="Site">
+    <div class="wrap site-nav-row">
+      <a class="wordmark" href="../../"><img src="../../favicon.svg?v=quoin" alt="" width="28" height="28" /><span>Groddle Afternoon</span></a>
+      <div class="site-nav-links">
+        <a href="../../restoration/">Restoration</a>
+        <a href="../../compare/">Compare</a>
+        <a href="../../changelog/" aria-current="page">Notes</a>
+        <a class="site-nav-dev" href="../../#development">Development</a>
+        <a class="site-nav-play" href="../../play/">Play</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="masthead note-head">
+    <div class="wrap">
+      <p class="kicker"><a href="../">Groddle Field Notes · Notes</a> · <time datetime="2026-07-26">JUL 26, 2026 · LATE</time></p>
+      <h1>The ground came back into view</h1>
+      <p class="lead">One source-backed camera rule now frames homes, authored rooms, and every imported street.</p>
+      <ul class="note-tags" aria-label="Topics">
+        <li>CAMERA CONTRACT</li>
+        <li>ONE WALKABLE WORLD</li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <article class="band note-body">
+      <div class="wrap">
+      <div class="note-intro">
+        <div>
+          <h2>Feet, ground, then pack.</h2>
+          <p class="note-text">The home reported a 540px world with its ground at y=620. Other scenes mixed raw art bounds, collision bounds, and hand-set camera starts. The camera now derives its usable world height from the deepest walkable ground instead.</p>
+        </div>
+        <aside class="note-stamp">
+          <strong>102</strong>
+          <span>internal pixels of consistent ground clearance above the pack</span>
+        </aside>
+      </div>
+      <div class="note-features">
+          <article class="note-feature">
+            <div class="note-mark" aria-hidden="true">¾</div>
+            <h3>Original vertical anchor</h3>
+            <p>The released client’s center plus scaled 150/600 y-offset resolves to a 75% avatar anchor, now shared by ordinary streets and homes.</p>
+          </article>
+          <article class="note-feature">
+            <div class="note-mark" aria-hidden="true">⌂</div>
+            <h3>Authored rooms repaired</h3>
+            <p>Home exterior, interior, and other constructed scenes no longer trust a declared height that ends above their collision ground.</p>
+          </article>
+          <article class="note-feature">
+            <div class="note-mark" aria-hidden="true">✓</div>
+            <h3>Catalog-wide regression</h3>
+            <p>Automated coverage checks the lowest platform across more than 1,400 imported streets, plus the exact malformed-home case.</p>
+          </article>
+        </div>
+      </div>
+    </article>
+
+    <nav class="band band-alt note-after" aria-label="More notes">
+      <div class="wrap">
+        <div class="note-history">
+        <p>This note is older than the day-by-day history, which starts on 19 October 2026.</p>
+        <p><a href="../../restoration/history/">Every change since then</a></p>
+        </div>
+        <div class="note-pager">
+          <a class="note-pager-older" href="../2026-07-25-world-woke-up/" rel="prev"><span>Older</span>The night the world woke up</a>
+          <a class="note-pager-newer" href="../2026-07-26-later/" rel="next"><span>Newer</span>The Phantom found time to speak—twice</a>
+        </div>
+        <p class="note-all"><a href="../">All notes</a></p>
+      </div>
+    </nav>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p>Tiny Speck's Glitch art, music and code are CC0. Groddle Afternoon is a fan remake and uses no Glitch logo.</p>
+      <p><a href="../../">Home</a> · <a href="../../play/">Play Groddle Afternoon</a> · <a href="../../restoration/">Restoration report</a> · <a href="../../restoration/history/">Every change</a></p>
+    </div>
+  </footer>
+</body>
+</html>
