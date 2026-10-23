@@ -452,12 +452,13 @@
    "group": "economy",
    "name": "Levels, energy and mood",
    "status": "source",
-   "blurb": "The official XP table, level rewards, metabolics and food variety.",
+   "blurb": "The official XP table, level rewards, metabolics, idle mood loss and food variety.",
    "spot": null,
    "evidence": [
     "public/js/progression.js",
     "public/js/food.js",
-    "public/js/metabolics.js"
+    "public/js/metabolics.js",
+    "public/js/mood-decay.js"
    ],
    "shot": null
   },
@@ -1395,8 +1396,8 @@
  "imagination": {
   "total": 275,
   "counts": {
-   "live": 231,
-   "later": 12,
+   "live": 234,
+   "later": 9,
    "starter": 9,
    "none": 6,
    "multiplayer": 9,
@@ -1409,9 +1410,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 264,
+  "commits": 265,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "Juju Bandits steal on their own after time in the Ancestral Lands"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1526,14 +1532,9 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "\"And so it begins...\" draws again instead of empty sky"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "163 street decos show Tiny Speck's real art again"
    }
   ]
  },
- "tests": 168,
+ "tests": 169,
  "generatedAt": "2026-10-22"
 }

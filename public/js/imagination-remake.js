@@ -30,7 +30,7 @@ const RULES = [
   [/^brain_capacity$/, 'live', 'Each skill beyond your brain capacity makes study 5% slower; this raises the capacity (max 60).'],
   [/^learntime_/, 'live', 'Skills in this category study faster by the card percentage.'],
   [/^food_variety_bonus$/, 'live', 'Meals you have not eaten lately give bonus iMG.'],
-  [/^periodic_mood_loss_reduced_[123]$/, 'later', 'The remake has no periodic mood loss to reduce (onTimePlaying mood decay is a design call left open).'],
+  [/^periodic_mood_loss_reduced_[123]$/, 'live', 'Idle mood loss from above 80% runs 1/6 / 1/3 / 1/2 slower (1.25 / 1.0 / 0.75% of max mood a minute instead of 1.5%, still at least 4).'],
 
   // Reward multipliers.
   [/^achievement_reward_bonus_[1-5]$/, 'live', 'Badge rewards +2% to +10%.'],

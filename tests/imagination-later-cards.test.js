@@ -99,7 +99,6 @@ describe('statuses (imagination-remake.js)', () => {
       'element_handling_bonus_1', 'element_handling_bonus_2',
       'furnituremaking_bonus_upgrade_1', 'furnituremaking_bonus_upgrade_2', 'furnituremaking_bonus_upgrade_3',
       'herdkeeping_animal_sadness_1', 'herdkeeping_animal_sadness_2',
-      'periodic_mood_loss_reduced_1', 'periodic_mood_loss_reduced_2', 'periodic_mood_loss_reduced_3',
     ]);
   });
 });
