@@ -36,22 +36,28 @@
  *      mezzanine"; "Head left (when you're in the floor space) and take
  *      spinach"; "just keep jumping, pressing left". Forum 29729 (2012-11):
  *      the Hall of Rejected Concepts "next to the Rook Museum".
+ *   V  Two player recordings of the Hall (reference-videos/raw/-03T3bLY7a0,
+ *      E6BIN3OfEkI): the Mezzanine's Hall door under a "Hall of Rejected
+ *      Concepts" plaque; the Hall itself is js/hall-rejected-concepts.js.
  * Art is the tower's own CC0 set (firebog.swf jethimadh_int_*, frame, ladder,
  * lock door; the Rook Hall spotlights) and the Greeterbot's own SWF
  * (glitch-items inhabitants/widget_bot npc_widget.swf, symbol widgetWood,
  * frame 1 exported at 2x); no pixels from screenshots or video.
  *
- * tools/build-tower-rooms.mjs writes both street JSON files with the base
- * tower rooms and links Tower St West's door.
+ * tools/build-tower-rooms.mjs writes the three street JSON files (Stairs,
+ * Mezzanine, Hall of Rejected Concepts) with the base tower rooms and links
+ * Tower St West's door.
  */
 
 import { towerRoomIndexEntry } from './tower-rooms.js?v=tower-rooms-1';
 import { DOOR, anyTowerRoomStreet, barriersFor, collector, flat, ladder, lantern, plaque, shell } from './tower-challenge-rooms.js?v=challenge-rooms-2';
+import { HALL, HALL_TSID, buildHall } from './hall-rejected-concepts.js';
 
 export const STAIRS_TSID = 'GIFFUV4ATQ72I6D';
 export const MEZZANINE_TSID = 'GIFGJ2246R72LJL';
 export const STOOT_SHRINE_TSID = 'GIFPV9EMLT72DP4';
 export const TOWER_ST_WEST_TSID = 'GIF5UU8FO3029OK';
+export { HALL_TSID };
 export const MID_TOWER_HUB = Object.freeze({ hubId: '96', hubName: 'Jethimadh Tower: Mid' });
 export const MID_TOWER_SOURCE = 'reconstruction: Jethimadh Tower Mid (not in tinyspeck/glitch-locations); doors, names and the Mezzanine\'s clone data from the archive, the rest from player records; art from the tower\'s CC0 set';
 
@@ -288,6 +294,8 @@ function buildMezzanine() {
     c.decos.push(deco);
   }
   c.decos.push(lantern(-260, -330), lantern(200, -330));
+  // V: the Hall door's plaque (the recordings show it beside the door; here over it, the lobby being narrower).
+  plaque(c, hallDoorX, floor - DOOR.h + 4, 'Hall of Rejected\nConcepts');
 
   // Floors: the lobby floor (the clone's platform height) and the
   // floorboards under it, solid from below except over the ladder shaft in
@@ -316,7 +324,7 @@ function buildMezzanine() {
 
   const greeterWhy = 'Maps / quests: rook_hall_start sends you to "the Mezzanine in Jethimadh Tower" to "speak to Greeterbot Sentry G-42" (end_npcs npc_quest_giver_widget). Placed between the stairs door and the museum door (remake).';
   const museumWhy = 'B "enter the door to the Rook museum"; N "If you have been chosen, you will be invited to enter the Rook Museum". The door goes the Greeterbot\'s way: npc_quest_giver_widget.enterHall (LA91BDTNHS82D36, arrive -2270,-136), the remake\'s transient museum.';
-  const hallWhy = 'B "the locked door to the Hall of Records (next door)"; forum 29729: the Hall of Rejected Concepts (LA9L33D5CNE3I0J) opened "next to the Rook Museum" in 2012-11. No layout survives, so the door is not working; it wears the corridors\' lock door art.';
+  const hallWhy = 'B "the locked door to the Hall of Records (next door)" (2011); forum 29729: the Hall of Rejected Concepts (LA9L33D5CNE3I0J) opened behind it "next to the Rook Museum" in 2012-11. V: the door wears a "Hall of Rejected Concepts" plaque and leads to the Hall\'s left end (js/hall-rejected-concepts.js).';
   const stootWhy = 'unnnn\'s objrefs include two Collision-triggered Teleporters (positions lost); H "Left + Up + Space", F 13777 "Head left (when you\'re in the floor space)", "just keep jumping, pressing left". A jump at the crawlspace\'s left end (box 60 px over its floor: a plain jump, spinach not needed) takes you to the Stoot Shrine.';
 
   return {
@@ -351,7 +359,7 @@ function buildMezzanine() {
         x: hallDoorX,
         y: floor,
         ...DOOR,
-        connect: { tsid: 'LA9L33D5CNE3I0J', label: 'Hall of Rejected Concepts', x: 0, y: 0, hub_id: '96' },
+        connect: { tsid: 'LA9L33D5CNE3I0J', label: 'Hall of Rejected Concepts', x: HALL.doorX, y: HALL.floor, hub_id: '96' },
         why: hallWhy,
       },
     ],
@@ -368,8 +376,6 @@ function buildMezzanine() {
       },
     ],
     greeterbot: { x: MEZZ.greeterX, y: floor, why: greeterWhy },
-    // The corridors' lock art (door_asset_jethimadh_tower_interior_lock02, a door-sized overlay) over the Hall door; mid-tower-feature draws it above the door.
-    hallLock: { x: hallDoorX, y: floor, w: DOOR.w, h: DOOR.h, sprite: 'door_asset_jethimadh_tower_interior_lock02', why: hallWhy },
     why: {
       room: 'Maps: LIFGJ2246R72LJL "Mezzanine" in hub 96. B/N: the lobby of the Rook Museum, reached up the Stairs, with the museum door, the Greeterbot and the locked Hall of Records next door; H/F: a hidden space under its floorboards that leads on to unnnn.',
       size: 'unnnn was cloned from the Mezzanine (sources LIFGJ2246R72LJL): its bounds -500..500 x -700..0, floor y -12 and street-sized deco layers are kept. The crawlspace runs below (to y 290) with 400 px of world under it (b 700), so the view never shows past the bottom.',
@@ -393,7 +399,10 @@ export const STOOT_RETURN = Object.freeze({
   why: 'unnnn\'s second Collision-triggered Teleporter (position lost): the remake puts it at the room\'s left end, the side you came in from, and lands you in the crawlspace beside the teleporter that brought you.',
 });
 
-export const MID_TOWER_ROOMS = Object.freeze([buildStairs(), buildMezzanine()]);
+const MEZZANINE_ROOM = buildMezzanine();
+const HALL_ROOM = buildHall({ hub: MID_TOWER_HUB, mezzanine: { sourceTsid: MEZZANINE_ROOM.sourceTsid, hallDoorX: MEZZ.hallDoorX, floor: MEZZ.floor } });
+
+export const MID_TOWER_ROOMS = Object.freeze([buildStairs(), MEZZANINE_ROOM, HALL_ROOM]);
 
 /** The archived door that leads into the rebuilt rooms. */
 export const MID_TOWER_DOOR_LINKS = Object.freeze([

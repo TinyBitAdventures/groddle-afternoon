@@ -12933,7 +12933,16 @@
       "hubId": "96",
       "hubName": "Jethimadh Tower: Mid",
       "platforms": 4,
-      "decos": 34,
+      "decos": 36,
+      "reconstructed": true
+    },
+    "GA9L33D5CNE3I0J": {
+      "label": "Hall of Rejected Concepts",
+      "file": "assets/streets/GA9L33D5CNE3I0J.json",
+      "hubId": "96",
+      "hubName": "Jethimadh Tower: Mid",
+      "platforms": 2,
+      "decos": 63,
       "reconstructed": true
     }
   }

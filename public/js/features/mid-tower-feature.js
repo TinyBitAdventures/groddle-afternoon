@@ -18,13 +18,23 @@
  * - The teleporter under the floorboards (Mezzanine box mezz_stoot_teleporter:
  *   jump at the crawlspace's left end) to unnnn, the Stoot Shrine, and unnnn's
  *   way back (STOOT_RETURN: walk into its left end).
+ * - The Hall of Rejected Concepts (js/hall-rejected-concepts.js), behind the
+ *   Mezzanine's Hall door: its fourteen exhibits (CC0 museum_* art on
+ *   museum_stand_1 plinths) and a Wall Button each (items/wall_button.js:
+ *   Press, in for reset_timer 1000 ms, nothing past `distance` 1000 px). A
+ *   press raises the client's in-window announcement ("Click anywhere...",
+ *   Enter / Space / Escape too) naming the exhibit, as the recordings show.
  *
  * QA (real input): ?autostart=1&questoffer=off&doordemo=GIF5UU8FO3029OK&doorautoplay=1
  *   enters the tower from Tower St West; or &streetdemo=GIFGJ2246R72LJL for the
- *   Mezzanine. &midtowerquest=start puts It's Educational in the quest log
+ *   Mezzanine, &streetdemo=GA9L33D5CNE3I0J (&streetx=<screen x>) for the Hall.
+ *   &midtowerquest=start puts It's Educational in the quest log
  *   (=done marks both parts done, for the repeat conversation).
+ *   &hallpress=<exhibit id> presses that exhibit's button on arrival in the Hall.
  * Canvas data: midTowerRoom, greeterbot (waiting | museum | repeat |
- * declined | refused), midTowerLast, midTowerTeleports.
+ * declined | refused), midTowerLast, midTowerTeleports, hallExhibits,
+ * hallButton (last exhibit pressed), hallPresses, hallSeen, hallOverlay
+ * (the announcement's text while it is up).
  */
 
 import { insideBottomRect } from '../doors.js';
@@ -37,7 +47,8 @@ import {
   STOOT_RETURN,
   boxToScreen,
   midTowerRoomByTsid,
-} from '../tower-mid-rooms.js?v=mid-tower-1';
+} from '../tower-mid-rooms.js?v=mid-tower-2';
+import { CLICK_ANYWHERE, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, WALL_BUTTON } from '../hall-rejected-concepts.js';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';
 export const ROOK_HALL_START = 'rook_hall_start';
@@ -53,6 +64,12 @@ let teleporting = false;
 let lastCheck = 0;
 let enteredAt = 0;
 let teleports = 0;
+let hallButtons = [];
+let hallStreet = null;
+let hallPresses = 0;
+const hallSeen = new Set();
+let overlayEl = null;
+let overlayDone = null;
 
 function clear(engine) {
   if (greeter && engine) engine.unregister(greeter);
@@ -63,6 +80,10 @@ function clear(engine) {
   views = [];
   greeter = null;
   teleportBoxes = [];
+  for (const b of hallButtons) if (b.timer) clearTimeout(b.timer);
+  hallButtons = [];
+  hallStreet = null;
+  closeOverlay();
 }
 
 /**
@@ -137,19 +158,145 @@ function drawGreeter(engine, room, street) {
   return greeter;
 }
 
-/** The Hall door's lock: the corridors' door-sized lock overlay, drawn above the door sprite. */
-function drawLock(engine, lock, street) {
+/* ------------------------------------------------------------------ */
+/* The Hall of Rejected Concepts                                        */
+/* ------------------------------------------------------------------ */
+
+function artSprite(engine, art, x, y, street, z, size = {}) {
   const { PIXI } = engine;
-  const sprite = new PIXI.Sprite(textureFromUrl(`assets/decos/groddle/${lock.sprite}.png`));
+  const sprite = new PIXI.Sprite(textureFromUrl(`${HALL_ART_ROOT}${HALL_ART[art].file}`));
   sprite.anchor.set(0.5, 1);
-  sprite.x = lock.x - street.bounds.l;
-  sprite.y = lock.y - street.bounds.t;
-  sprite.width = lock.w;
-  sprite.height = lock.h;
-  sprite.zIndex = 4;
+  sprite.x = x - street.bounds.l;
+  sprite.y = y - street.bounds.t;
+  if (size.w) sprite.width = size.w;
+  if (size.h) sprite.height = size.h;
+  sprite.zIndex = z;
   sprite.eventMode = 'none';
   engine.entityLayer.addChild(sprite);
   views.push(sprite);
+  return sprite;
+}
+
+/** The exhibits, their plinths and buttons, behind the avatar (zIndex below 0). */
+function drawHall(engine, room, street) {
+  const { PIXI } = engine;
+  hallStreet = street;
+  for (const ex of room.exhibits) {
+    if (ex.plinth) artSprite(engine, 'museum_stand_1', ex.plinth.x, ex.plinth.y, street, -12, { w: ex.plinth.w, h: ex.plinth.h });
+    for (const p of ex.pieces) artSprite(engine, p.art, p.x, p.y, street, -11);
+    const c = new PIXI.Container();
+    const out = new PIXI.Sprite(textureFromUrl(WALL_BUTTON.artOut));
+    const inn = new PIXI.Sprite(textureFromUrl(WALL_BUTTON.artIn));
+    for (const s of [out, inn]) {
+      s.anchor.set(0.5, 0.5);
+      s.width = WALL_BUTTON.w;
+      s.height = WALL_BUTTON.h;
+      c.addChild(s);
+    }
+    inn.visible = false;
+    c.x = ex.button.x - street.bounds.l;
+    c.y = ex.button.y - street.bounds.t;
+    c.zIndex = -10;
+    engine.entityLayer.addChild(c);
+    views.push(c);
+    const target = engine.register({
+      classId: HALL_BUTTON_CLASS,
+      featureId: MID_TOWER_FEATURE_ID,
+      label: WALL_BUTTON.label,
+      subtitle: ex.label,
+      sprite: c,
+      hallExhibit: ex.id,
+    });
+    hallButtons.push({ ex, target, out, inn, timer: 0 });
+  }
+  engine.setData('hallExhibits', room.exhibits.length);
+  engine.setData('hallPresses', hallPresses);
+  engine.setData('hallSeen', hallSeen.size);
+}
+
+function setPressed(b, pressed) {
+  if (b.out.destroyed || b.inn.destroyed) return;
+  b.out.visible = !pressed;
+  b.inn.visible = pressed;
+}
+
+/** wall_switch press in "resetting" mode: in, its on_press_down event (the announcement), out again after reset_timer. */
+export function pressHallButton(engine, target) {
+  const b = hallButtons.find((row) => row.target === target);
+  if (!b) return false;
+  const p = engine.player;
+  if (p && hallStreet) {
+    const bx = b.ex.button.x - hallStreet.bounds.l;
+    const by = b.ex.button.y - hallStreet.bounds.t;
+    if (Math.hypot(p.x - bx, p.y - by) > WALL_BUTTON.distance) {
+      engine.setData('midTowerLast', `hall_far:${b.ex.id}`);
+      return true;
+    }
+  }
+  setPressed(b, true);
+  if (b.timer) clearTimeout(b.timer);
+  b.timer = setTimeout(() => {
+    b.timer = 0;
+    setPressed(b, false);
+  }, WALL_BUTTON.resetMs);
+  hallPresses += 1;
+  hallSeen.add(b.ex.id);
+  engine.setData('hallButton', b.ex.id);
+  engine.setData('hallPresses', hallPresses);
+  engine.setData('hallSeen', hallSeen.size);
+  engine.setData('midTowerLast', `hall:${b.ex.id}`);
+  announce(engine, b.ex.label);
+  return true;
+}
+
+function overlayHost() {
+  return document.getElementById('rook-woods-hud')?.parentElement || document.getElementById('game-root') || document.body;
+}
+
+function closeOverlay() {
+  if (overlayDone) overlayDone();
+}
+
+/** The client's in-window announcement: big white lines over the world, "Click anywhere..." under them. */
+function announce(engine, text) {
+  engine.pushActivity(text);
+  if (typeof document === 'undefined') return;
+  closeOverlay();
+  if (!overlayEl) {
+    overlayEl = document.createElement('div');
+    overlayEl.className = 'hall-announcement';
+    overlayEl.setAttribute('role', 'dialog');
+    overlayEl.setAttribute('aria-live', 'polite');
+    overlayEl.style.cssText = 'position:absolute;inset:0;z-index:86;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;text-align:center;padding:0 16px';
+    overlayEl.innerHTML = `<p style="margin:0;max-width:520px;font:900 clamp(1.4rem,4vw,2.3rem)/1.15 Nunito,'Trebuchet MS',sans-serif;color:#fff;text-shadow:0 2px 0 #2a2a2a,0 0 14px rgba(0,0,0,.6)"></p>
+      <span style="font:800 .8rem Nunito,sans-serif;color:#fff;text-shadow:0 1px 2px #000">&#9656; ${CLICK_ANYWHERE}</span>`;
+    overlayHost().appendChild(overlayEl);
+  }
+  overlayEl.querySelector('p').textContent = text;
+  overlayEl.style.display = 'flex';
+  engine.setData('hallOverlay', text);
+  const onKey = (event) => {
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      done();
+    }
+  };
+  const done = () => {
+    if (overlayDone !== done) return;
+    overlayDone = null;
+    overlayEl.style.display = 'none';
+    overlayEl.removeEventListener('click', done);
+    window.removeEventListener('keydown', onKey, true);
+    engine.setData('hallOverlay', '');
+  };
+  overlayDone = done;
+  // The click that pressed the button must not also dismiss the announcement.
+  setTimeout(() => {
+    if (overlayDone !== done) return;
+    overlayEl.addEventListener('click', done);
+    window.addEventListener('keydown', onKey, true);
+  }, 250);
 }
 
 /** Teleporter boxes for the current street, screen space: { box, street, arrive, label }. */
@@ -197,7 +344,12 @@ export const midTowerFeature = {
     const room = midTowerRoomByTsid(street?.tsid);
     engine.setData('midTowerRoom', room ? room.tsid : '');
     teleportBoxes = boxesFor(street);
-    if (room?.hallLock) drawLock(engine, room.hallLock, street);
+    if (room?.exhibits) {
+      drawHall(engine, room, street);
+      const press = engine.param('hallpress');
+      const row = press && hallButtons.find((b) => b.ex.id === press);
+      if (row) setTimeout(() => pressHallButton(engine, row.target), 600);
+    }
     if (room?.greeterbot) {
       drawGreeter(engine, room, street);
       engine.setData('greeterbot', 'waiting');
@@ -216,11 +368,18 @@ export const midTowerFeature = {
   },
 
   verbsFor(target) {
+    if (target?.classId === HALL_BUTTON_CLASS && hallButtons.some((b) => b.target === target)) {
+      return [{ id: WALL_BUTTON.verb, label: WALL_BUTTON.verbLabel, sort: 50, tooltip: WALL_BUTTON.tooltip, enabled: true, reason: '', durationMs: 0 }];
+    }
     if (target?.classId !== GREETERBOT.classId || target !== greeter) return null;
     return [{ id: 'talk_to', label: 'Talk to', sort: 50, tooltip: 'Listen to what they have to say', enabled: true, reason: '', durationMs: 0 }];
   },
 
   runVerb(target, verbId, engine) {
+    if (target?.classId === HALL_BUTTON_CLASS) {
+      if (verbId === WALL_BUTTON.verb) pressHallButton(engine, target);
+      return true;
+    }
     if (target !== greeter) return false;
     if (verbId === 'talk_to') greet(engine, target);
     return true;
@@ -248,6 +407,13 @@ export const midTowerFeature = {
 
   /** QA / tests. */
   _state() {
-    return { greeter: Boolean(greeter), boxes: teleportBoxes.map((r) => ({ id: r.id, street: r.street, box: r.box, arrive: r.arrive })), teleports };
+    return {
+      greeter: Boolean(greeter),
+      boxes: teleportBoxes.map((r) => ({ id: r.id, street: r.street, box: r.box, arrive: r.arrive })),
+      teleports,
+      hall: hallButtons.map((b) => ({ id: b.ex.id, target: b.target, pressed: b.inn.visible === true })),
+      hallPresses,
+      hallSeen: [...hallSeen],
+    };
   },
 };

@@ -2,6 +2,8 @@
  * Jethimadh Tower: Mid (G41): the rebuilt Stairs and Mezzanine
  * (js/tower-mid-rooms.js, tools/build-tower-rooms.mjs), the Greeterbot,
  * museum door and Stoot Shrine teleporters (features/mid-tower-feature.js).
+ * The Hall of Rejected Concepts behind the Mezzanine (G73) has its own file,
+ * tests/hall-rejected-concepts.test.js.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -70,7 +72,7 @@ describe('Jethimadh Tower: Mid rooms: street data', () => {
       assert.equal(index[room.tsid].hubId, '96');
       assert.equal(index[room.tsid].hubName, 'Jethimadh Tower: Mid');
     }
-    assert.deepEqual(MID_TOWER_ROOMS.map((r) => r.sourceTsid), ['LIFFUV4ATQ72I6D', 'LIFGJ2246R72LJL']);
+    assert.deepEqual(MID_TOWER_ROOMS.map((r) => r.sourceTsid), ['LIFFUV4ATQ72I6D', 'LIFGJ2246R72LJL', 'LA9L33D5CNE3I0J']);
   });
 
   it('keep the hub 96 names from inc_data_maps_prod.js', { skip: !existsSync(mapsFile) && 'GSJS checkout not beside this worktree' }, () => {
@@ -86,7 +88,6 @@ describe('Jethimadh Tower: Mid rooms: street data', () => {
       for (const d of room.decos) assert.ok(existsSync(join(decos, `${d.sprite}.webp`)), `${room.label}: ${d.sprite}`);
       for (const d of room.doors) assert.ok(existsSync(join(decos, `${d.sprite}.webp`)), `${room.label}: ${d.sprite}`);
     }
-    assert.ok(existsSync(join(decos, `${mezz.hallLock.sprite}.webp`)));
     assert.ok(existsSync(join(spike, 'public', GREETERBOT.art)));
   });
 
@@ -133,14 +134,15 @@ describe('Jethimadh Tower: Mid rooms: doors', () => {
     assert.deepEqual(down.connect.arrive, { x: up.x, y: up.y });
   });
 
-  it('the museum door and the Hall door have no street (the museum is the quest instance, the Hall never survived)', () => {
+  it('the museum door has no street (the museum is the quest instance); the Hall door leads to the rebuilt Hall (G73)', () => {
     const mz = street(MEZZANINE_TSID);
     const museum = mz.doors.find((d) => d.id === MUSEUM_DOOR_ID);
     assert.equal(museum.connect.tsid, 'LA91BDTNHS82D36');
     assert.equal(museum.connect.street, null);
     const hall = mz.doors.find((d) => d.connect.tsid === 'LA9L33D5CNE3I0J');
     assert.equal(hall.connect.label, 'Hall of Rejected Concepts');
-    assert.equal(hall.connect.street, null);
+    assert.equal(hall.connect.street, 'GA9L33D5CNE3I0J');
+    assert.equal(mezz.hallLock, undefined, 'the Hall door is no longer locked');
   });
 });
 

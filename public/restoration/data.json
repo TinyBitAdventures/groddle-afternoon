@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 306,
+  "commits": 307,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Sharp Jack-O-Lanterns, Chocolate Eggs and Glitchmas Crackers drawn from Tiny Speck's vectors"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1924,14 +1929,9 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Play any restored system, quest room or designer level straight from the restoration page"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Sweaters, jerseys, kilts and coats keep their colours from behind instead of white patches"
    }
   ]
  },
- "tests": 182,
+ "tests": 183,
  "generatedAt": "2026-10-23"
 }
