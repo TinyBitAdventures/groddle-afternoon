@@ -57,16 +57,25 @@ export function normalizeSkillState(seed = {}) {
     // Repair hostile/corrupt snapshots with more than one active study.
     if (!isPaused && hasActive) isPaused = true;
     if (!isPaused) hasActive = true;
+    const timeFactor = cleanTimeFactor(rawRow.timeFactor);
+    const endsAt = isPaused ? 0 : Math.max(0, Math.floor(finite(rawRow.endsAt, 0)));
+    // The source's queue start (reset on every resume). Saves from before it
+    // was stored derive it from the stored points and time factor.
+    const resumedAt = isPaused
+      ? 0
+      : Math.max(0, Math.floor(finite(rawRow.resumedAt, 0))) ||
+        Math.max(0, endsAt - Math.max(1, Math.round((pointsRemaining / SKILL_POINTS_PER_SECOND) * timeFactor)) * 1000);
     queue[classTsid] = {
       classTsid,
       totalPoints,
       pointsRemaining,
       startedAt: Math.max(0, Math.floor(finite(rawRow.startedAt, 0))),
-      endsAt: isPaused ? 0 : Math.max(0, Math.floor(finite(rawRow.endsAt, 0))),
+      endsAt,
+      resumedAt,
       pausedAt: isPaused ? Math.max(0, Math.floor(finite(rawRow.pausedAt, 0))) : 0,
       isPaused,
       acceleratedUntil: isPaused ? 0 : Math.max(0, Math.floor(finite(rawRow.acceleratedUntil, 0))),
-      timeFactor: cleanTimeFactor(rawRow.timeFactor),
+      timeFactor,
     };
   }
   return { learned, queue };
@@ -173,6 +182,7 @@ export function pauseSkillStudy(state, classTsid, now = Date.now()) {
     Math.ceil((remainingSeconds * SKILL_POINTS_PER_SECOND) / cleanTimeFactor(row.timeFactor))
   );
   row.endsAt = 0;
+  row.resumedAt = 0;
   row.pausedAt = now;
   row.isPaused = true;
   row.acceleratedUntil = 0;
@@ -202,6 +212,7 @@ export function startSkillStudy(state, classTsid, ctx = {}, now = Date.now()) {
     pointsRemaining,
     startedAt: existing?.startedAt || now,
     endsAt: now + durationSeconds * 1000,
+    resumedAt: now,
     pausedAt: 0,
     isPaused: false,
     acceleratedUntil: existing?.acceleratedUntil > now ? existing.acceleratedUntil : 0,
@@ -217,6 +228,34 @@ export function startSkillStudy(state, classTsid, ctx = {}, now = Date.now()) {
     pausedIds,
     completed: due.completed,
   };
+}
+
+/**
+ * skills_increase_brain_capacity (players/inc_skills.js:1893-1931): when the
+ * learning-time modifier changes, `percent` = new / old modifier, and every
+ * unpaused study moves its end earlier by round((end - start) * (1 - percent))
+ * seconds, never sooner than one second from now. `start` is the source's
+ * queue start, which resets on every resume (`resumedAt` here). Paused
+ * studies keep their points; the source recomputes their time from points with
+ * the current modifier (skills_points_to_seconds), so their stored factor
+ * takes the new modifier too, as does the active one for a later pause.
+ */
+export function rescaleStudiesForLearningModifier(state, percent, now = Date.now()) {
+  const ratio = finite(percent, 1);
+  if (!(ratio > 0) || ratio === 1) return { ok: false, reason: 'unchanged', percent: ratio, rescaled: [] };
+  const rescaled = [];
+  for (const [classTsid, row] of Object.entries(state?.queue || {})) {
+    if (!row || typeof row !== 'object') continue;
+    row.timeFactor = cleanTimeFactor(cleanTimeFactor(row.timeFactor) * ratio);
+    if (row.isPaused) continue;
+    const start = Math.max(0, finite(row.resumedAt, 0)) || finite(row.startedAt, now);
+    const spanSeconds = Math.max(0, (finite(row.endsAt, now) - start) / 1000);
+    const timeChange = Math.round(spanSeconds * (1 - ratio));
+    const before = row.endsAt;
+    row.endsAt = Math.max(row.endsAt - timeChange * 1000, now + 1000);
+    rescaled.push({ classTsid, before, endsAt: row.endsAt, timeChange });
+  }
+  return { ok: true, reason: 'rescaled', percent: ratio, rescaled };
 }
 
 /** Compatibility name retained for callers from the instant-learning prototype. */

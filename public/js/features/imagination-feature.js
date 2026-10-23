@@ -48,7 +48,8 @@ import {
   remakeMovementMultipliers,
   reshuffleHand,
 } from '../imagination.js';
-import { skillTimeFactor } from '../imagination-effects.js';
+import { brainCapacityRescale, skillTimeFactor } from '../imagination-effects.js';
+import { rescaleStudiesForLearningModifier } from '../skills.js';
 import { isOfferedInRemake, remakeStatus } from '../imagination-remake.js';
 import { hellFeature } from './hell-feature.js?v=hell-1';
 
@@ -172,6 +173,22 @@ function applyEffect(effect, engine = engineRef) {
   return notes;
 }
 
+/**
+ * skills_increase_brain_capacity: a bigger brain shortens the study in
+ * progress by the new/old learning-time modifier (Stoot's 2012 fix).
+ */
+function rescaleStudyForBrainCapacity(engine, capacityBefore) {
+  const queue = engine?.skillQueue;
+  if (!queue || capacityBefore === state.brainCapacity) return null;
+  const count = (engine.learnedSkills || []).length + Object.keys(queue).length;
+  const percent = brainCapacityRescale(count, capacityBefore, state.brainCapacity);
+  const result = rescaleStudiesForLearningModifier({ queue }, percent, Date.now());
+  engine.setData('imgStudyRescale', result.ok
+    ? `${percent.toFixed(4)}:${result.rescaled.map((row) => `${row.classTsid}-${row.timeChange}s`).join(',')}`
+    : 'unchanged');
+  return result;
+}
+
 // ---------------------------------------------------------------------------
 // Shop actions
 // ---------------------------------------------------------------------------
@@ -185,6 +202,7 @@ function buySlot(slot, engine = engineRef) {
   const before = state.hand[slot];
   const pc = engine.pc;
   const wallet = { imagination: Number(pc.imagination) || 0 };
+  const capacityBefore = state.brainCapacity;
   const result = purchaseCard(state, owned(engine), wallet, slot, ctxFor(engine), { rng });
   if (!result.ok) {
     play('CLICK_FAILURE');
@@ -195,6 +213,7 @@ function buySlot(slot, engine = engineRef) {
   }
   pc.imagination = wallet.imagination;
   const notes = applyEffect(result.effect, engine);
+  if (result.effect?.brainCapacity) rescaleStudyForBrainCapacity(engine, capacityBefore);
   play('IMAGINATION_PURCHASE', { volume: 0.7 });
   const name = result.text?.name || result.card.class_tsid;
   engine.pushActivity(`You got the ${name} upgrade!`);

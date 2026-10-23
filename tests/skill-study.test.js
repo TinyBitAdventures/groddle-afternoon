@@ -16,9 +16,11 @@ import {
   grantSkill,
   normalizeSkillState,
   pauseSkillStudy,
+  rescaleStudiesForLearningModifier,
   startSkillStudy,
   tickSkillStudy,
 } from '../public/js/skills.js?v=study-1';
+import { brainCapacityRescale } from '../public/js/imagination-effects.js';
 
 const root = join(import.meta.dirname, '..', 'public');
 
@@ -103,5 +105,83 @@ describe('skill study client wiring', () => {
     assert.match(game, /bootParams\.has\('skilldemo'\)/);
     assert.match(game, /Study · \$\{remaining\}/);
     assert.match(css, /skill-study-card\.studying/);
+  });
+});
+
+describe('brain capacity rescales studies (skills_increase_brain_capacity)', () => {
+  it('uses new / old learning-time modifier for the same known + queued count', () => {
+    // 25 known + 1 queued over capacity 20 -> 1.05^6; capacity 25 -> 1.05^1.
+    assert.ok(Math.abs(brainCapacityRescale(26, 20, 25) - 1.05 ** -5) < 1e-12);
+    assert.equal(brainCapacityRescale(12, 20, 25), 1);
+    assert.equal(brainCapacityRescale(26, 26, 30), 1);
+  });
+
+  it('moves the active end earlier by round((end - start) * (1 - percent)) seconds', () => {
+    const state = createSkillState();
+    const t0 = 1_000_000;
+    startSkillStudy(state, 'animalkinship_1', { level: 99, timeFactor: 2 }, t0);
+    const row = state.queue.animalkinship_1;
+    assert.equal(row.resumedAt, t0);
+    assert.equal(row.endsAt, t0 + 120_000); // 600 points / 10 * 2
+    const percent = 0.8;
+    const now = t0 + 30_000;
+    const result = rescaleStudiesForLearningModifier(state, percent, now);
+    assert.equal(result.ok, true);
+    // Source scales the whole span since the queue start, not just what remains.
+    assert.equal(result.rescaled[0].timeChange, Math.round(120 * (1 - percent)));
+    assert.equal(row.endsAt, t0 + 120_000 - 24_000);
+    assert.ok(Math.abs(row.timeFactor - 1.6) < 1e-12);
+    assert.equal(getStudyStatus(state, 'animalkinship_1', now).remainingSeconds, 66);
+    // A later pause converts what is left at the new factor (skills_seconds_to_points).
+    const paused = pauseSkillStudy(state, 'animalkinship_1', now);
+    assert.equal(paused.ok, true);
+    assert.equal(row.pointsRemaining, Math.ceil((66 * SKILL_POINTS_PER_SECOND) / 1.6));
+  });
+
+  it('never ends sooner than one second from now and leaves unchanged modifiers alone', () => {
+    const state = createSkillState();
+    startSkillStudy(state, 'animalkinship_1', { level: 99, timeFactor: 1 }, 0);
+    rescaleStudiesForLearningModifier(state, 0.1, 59_000);
+    assert.equal(state.queue.animalkinship_1.endsAt, 60_000);
+    assert.equal(rescaleStudiesForLearningModifier(state, 1, 59_500).reason, 'unchanged');
+  });
+
+  it('keeps paused points, gives them the new factor, and resume recomputes from points', () => {
+    const state = createSkillState();
+    startSkillStudy(state, 'animalkinship_1', { level: 99, timeFactor: 2 }, 0);
+    startSkillStudy(state, 'ezcooking_1', { level: 99, timeFactor: 2 }, 30_000);
+    const paused = state.queue.animalkinship_1;
+    assert.equal(paused.isPaused, true);
+    const points = paused.pointsRemaining;
+    const resumedBefore = state.queue.ezcooking_1.resumedAt;
+    rescaleStudiesForLearningModifier(state, 0.5, 40_000);
+    assert.equal(paused.pointsRemaining, points);
+    assert.equal(paused.endsAt, 0);
+    assert.equal(paused.timeFactor, 1);
+    assert.equal(getStudyStatus(state, 'animalkinship_1', 40_000).remainingSeconds, Math.ceil(points / SKILL_POINTS_PER_SECOND));
+    assert.equal(state.queue.ezcooking_1.resumedAt, resumedBefore);
+    // Resuming recomputes the duration from points with the factor of the day.
+    const resumed = startSkillStudy(state, 'animalkinship_1', { level: 99, timeFactor: 1 }, 50_000);
+    assert.equal(resumed.durationSeconds, Math.round(points / SKILL_POINTS_PER_SECOND));
+  });
+
+  it('saves keep the queue start; older saves derive it from points and factor', () => {
+    const state = createSkillState();
+    startSkillStudy(state, 'animalkinship_1', { level: 99, timeFactor: 1.5 }, 5_000);
+    const copy = normalizeSkillState(JSON.parse(JSON.stringify(state)));
+    assert.equal(copy.queue.animalkinship_1.resumedAt, 5_000);
+    const legacy = JSON.parse(JSON.stringify(state));
+    delete legacy.queue.animalkinship_1.resumedAt;
+    assert.equal(normalizeSkillState(legacy).queue.animalkinship_1.resumedAt, 5_000);
+  });
+});
+
+describe('the imagination shop rescales on a Brain Capacity purchase', () => {
+  it('captures capacity before the purchase and rescales the live queue after it', () => {
+    const feature = readFileSync(join(root, 'js/features/imagination-feature.js'), 'utf8');
+    assert.match(feature, /const capacityBefore = state\.brainCapacity;\s*const result = purchaseCard\(/);
+    assert.match(feature, /if \(result\.effect\?\.brainCapacity\) rescaleStudyForBrainCapacity\(engine, capacityBefore\);/);
+    assert.match(feature, /brainCapacityRescale\(count, capacityBefore, state\.brainCapacity\)/);
+    assert.match(feature, /rescaleStudiesForLearningModifier\(\{ queue \}, percent, Date\.now\(\)\)/);
   });
 });

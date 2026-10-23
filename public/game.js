@@ -22126,6 +22126,15 @@ async function main() {
     for (const achievementId of def.reqAchievements || []) {
       if (!achieveState.unlocked.includes(achievementId)) achieveState.unlocked.push(achievementId);
     }
+    // `&skillknown=N`: know at least N skills first (brain-capacity QA needs > 20).
+    const knownTarget = Math.min(200, Math.floor(Number(bootParams.get('skillknown')) || 0));
+    for (const id of Object.keys(getSkillCatalog())) {
+      if (skillState.learned.length >= knownTarget) break;
+      if (id !== demoSkill && !skillState.learned.includes(id)) grantSkill(skillState, id, true);
+    }
+    if (knownTarget >= 11 && !achieveState.unlocked.includes('first_eleven_skills')) {
+      achieveState.unlocked.push('first_eleven_skills');
+    }
     startSkillStudy(skillState, demoSkill, skillStudyContext(), Date.now());
     const remaining = Number(bootParams.get('skillremaining'));
     if (Number.isFinite(remaining) && remaining > 0) {

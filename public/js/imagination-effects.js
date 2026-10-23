@@ -236,6 +236,14 @@ export function learningTimeModifier(count, brainCapacity = 20) {
 }
 
 /**
+ * skills_increase_brain_capacity's `percent` (inc_skills.js:1894-1900):
+ * new / old learning-time modifier for the same known + queued count.
+ */
+export function brainCapacityRescale(count, oldCapacity, newCapacity) {
+  return learningTimeModifier(count, newCapacity) / learningTimeModifier(count, oldCapacity);
+}
+
+/**
  * Seconds factor for one skill (skills_points_to_seconds): the learning
  * modifier, then the category reduction (100 - percent) / 100 when one is set.
  * @param {{ count: number, brainCapacity: number, categoryId?: number, reductions?: Record<number, number> }} ctx
