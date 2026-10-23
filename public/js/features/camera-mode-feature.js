@@ -50,7 +50,7 @@ let listeners = null;
 let overlay = null;
 
 function blocked(engine) {
-  return engine.busy() || engine.acting() || engine.inScene() || Boolean(engine.instanceHold) || engine.transientInstance?.();
+  return engine.busy({ ignoreHome: true }) || engine.acting() || engine.inScene() || Boolean(engine.instanceHold) || engine.transientInstance?.();
 }
 
 function showOverlay(on, range) {
@@ -166,7 +166,7 @@ export const cameraModeFeature = {
   onTick(dtMs, now, engine) {
     if (!active) return;
     // Anything that takes over the screen ends Camera Mode.
-    if (engine.busy() || engine.acting()) {
+    if (engine.busy({ ignoreHome: true }) || engine.acting()) {
       setActive(engine, false);
       return;
     }

@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 
 const [query = '', out = 'shot.png', waitArg = '6000', actionsArg = '[]'] = process.argv.slice(2);
 const base = String(process.env.BASE || 'https://groddle.localhost/').replace(/\/?$/, '/');
-const url = `${base}${query.startsWith("?") || /^[\w/-]+\.html/.test(query) ? query : `?${query}`}`;
+const url = `${base}${query.startsWith('/') ? query.slice(1) : query.startsWith('?') || /^[\w/-]+\.html/.test(query) ? query : `?${query}`}`;
 const browser = await chromium.launch({
   args: ['--ignore-certificate-errors', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });

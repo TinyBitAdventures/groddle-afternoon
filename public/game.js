@@ -7559,7 +7559,8 @@ const engine = {
   /** The running row of a buff (args, expiresAt), or null. */
   buffRow: (classTsid) => (hasBuff(buffState, classTsid, Date.now()) ? buffState.active[classTsid] : null),
   award: (payload) => enqueueAward(payload),
-  busy() {
+  /** `{ ignoreHome: true }` lets a feature (Camera Mode) run at home while panels and verbs still block it. */
+  busy({ ignoreHome = false } = {}) {
     return Boolean(
       currentAction ||
         menuTarget ||
@@ -7568,7 +7569,7 @@ const engine = {
         anyTransientInstance() ||
         engine.inScene() ||
         engine.instanceHold ||
-        homeIsInstanced() ||
+        (!ignoreHome && homeIsInstanced()) ||
         // Any open panel (Feat, quests, make, vendor, map, mailbox, ...).
         document.querySelector('.glitch-modal:not([hidden]), [id$="-panel"]:not([hidden])')
     );

@@ -1410,9 +1410,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 272,
+  "commits": 274,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Your home street is tall enough to see a nine-floor Tower"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Furniture stays off the Tower's elevator and the house's corner walls"
+   },
    {
     "date": "2026-10-23",
     "kind": "fix",
@@ -1522,16 +1532,6 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "37 more imagination cards work: batch sizes, machines, meditation, mega rocks and more"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Trees, dead trees, soil and resource nodes are sharp 3x art"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Street decos are sharp on Retina and half the download"
    }
   ]
  },
