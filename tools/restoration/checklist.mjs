@@ -74,7 +74,7 @@ export const CHECKLIST = Object.freeze([
     blurb: 'The published soundtrack per region, every recovered Musicblock and meditation track, Esquibeth\'s melody from her own overlay files, real recordings for most sound keys (Wayback files plus Tiny Speck\'s archived sound effects set), and gentle synth stand-ins for the sounds still lost.',
     evidence: ['public/js/ambient-music.js', 'public/js/sound-board.js', 'tools/sound/archiveorg-sfx-map.json'] },
   { id: 'avatar', group: 'world', name: 'Your Glitch', status: 'source', spot: 'player',
-    blurb: 'Tiny Speck’s own vector avatar, rebuilt part by part: walk, climb, jump, happy, angry, surprised, with real hair, eyes, mouths, hats and clothes in their original colourways, sharp on Retina.',
+    blurb: 'Tiny Speck’s own vector avatar, rebuilt part by part: walk, climb, jump, happy, angry, surprised, with real hair, eyes, mouths, hats and clothes in their original colourways, sharp on Retina. Seventeen pieces Tiny Speck left in greyscale are reimagined with colours borrowed from their siblings, and tagged as such.',
     evidence: ['public/js/avatar-rig.js', 'public/js/avatar-compositor.js', 'public/js/avatar-anims.js', 'public/js/character-builder.js'] },
   { id: 'camera', group: 'world', name: 'Camera Mode', status: 'source',
     blurb: 'Press C to look around the street; with Eyeballery, the whole street.',

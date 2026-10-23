@@ -375,8 +375,16 @@ function buildData({ only = null } = {}) {
       // face parts take the look's palette colours as usual). Appended to
       // their type's list, so no GSJS article's colourway indices move.
       const own = typeof e === 'object' && e.ownColours;
-      if (own && g) throw new Error(`${type}/${name}: ownColours, but GSJS lists it`);
-      const src = g || (own && e.asset ? { asset: e.asset } : undefined);
+      // Greyscale masters (manifest `reimagined`): SWFs GSJS never listed
+      // whose fills are grey, so they need colourways. They borrow a
+      // sibling GSJS article's (`borrowedColours: 'type/class'`, slots
+      // remapped by `colourMap`, missing slots filled by `fill`) or carry
+      // designed ones (`colourways`). Row G52: invented pairings, so the
+      // catalog marks them reimagined and the builder says so.
+      const reim = typeof e === 'object' && e.reimagined;
+      if ((own || reim) && g) throw new Error(`${type}/${name}: ${own ? 'ownColours' : 'reimagined'}, but GSJS lists it`);
+      if (own && reim) throw new Error(`${type}/${name}: ownColours and reimagined`);
+      const src = g || ((own || reim) && e.asset ? { asset: e.asset } : undefined);
       const key = `${type}/${name}`;
       let data;
       if (only && !only.has(key)) {
@@ -398,12 +406,23 @@ function buildData({ only = null } = {}) {
       const variants = variantsOf.get(`${type}/${cls}`);
       if (variants?.length) item.variants = variants.sort((a, b) => a.id - b.id).map((v) => ({ id: v.id, colors: packColors(v.colors) }));
       else if (own && !(type in FACE_DIRS)) item.variants = [{ colors: {} }];
-      if (own) item.swfOnly = true;
+      else if (reim) Object.assign(item, reimaginedColours(key, e, data.groups, variantsOf));
+      if (own || reim) item.swfOnly = true;
       catalog.types[type].push(item);
       if (type === 'hat' && hatHair[name]) catalog.hatHair[name] = hatHair[name];
     }
   }
   if (pending.size) throw new Error(`--only: not in the manifest: ${[...pending].join(', ')}`);
+  // A reimagined article names its colour source in the builder's words.
+  for (const list of Object.values(catalog.types)) {
+    for (const item of list) {
+      if (!item.borrowedColours) continue;
+      const [t, n] = item.borrowedColours.split('/');
+      const sib = catalog.types[t]?.find((i) => i.name === n);
+      if (!sib) throw new Error(`${item.name}: borrowedColours ${item.borrowedColours} is not in the catalog`);
+      item.borrowedLabel = sib.label;
+    }
+  }
   for (const slot of ['skin', 'hair']) {
     catalog.palettes[slot] = Object.entries(gs.colors)
       .filter(([, c]) => c.slot === slot)
@@ -412,6 +431,53 @@ function buildData({ only = null } = {}) {
   catalog.defaults = gs.defaults;
   const bytes = writeJson(join(OUT, 'catalog.json'), catalog);
   console.log(`articles: ${(total / 1024).toFixed(0)} KB (idle files ${(idleTotal / 1024).toFixed(0)} KB); catalog.json ${(bytes / 1024).toFixed(0)} KB`);
+}
+
+/**
+ * Colourways for a reimagined greyscale master (manifest entry e):
+ *   borrowedColours: 'type/class'  a GSJS article; its colourways in id order
+ *   pick: [gsjs ids]               only these of the sibling's colourways
+ *   colourMap: { color_N: 'color_M' | null }  this master's slot <- the sibling's
+ *                                  slot (null keeps the SWF's grey); unmapped slots keep their name
+ *   fill: { color_N: 'color_M' | filter | null }  when a sibling colourway lacks
+ *                                  the slot: its own color_M, a fixed filter, or grey
+ *   colourways: [{ color_N: filter }]  designed instead (no sibling fits)
+ * A filter is a GSJS colour object or its packed string (packColors). A
+ * borrowed tintAmount 0 is kept: GSJS uses it to leave a slot's own fills.
+ * Every other slot the master draws must receive a colour, or the build stops.
+ * Returns the catalog fields: variants ({ from: gsjs id, colors }), reimagined,
+ * borrowedColours or designedColours.
+ */
+function reimaginedColours(key, e, groups, variantsOf) {
+  const unpack = (c) => (typeof c === 'string' ? Object.fromEntries(COLOR_FIELDS.map((f, i) => [f, c.split(' ')[i] ?? ''])) : c);
+  const slots = groups.filter((g) => /^color_\d+$/.test(g));
+  const grey = new Set([...Object.entries(e.colourMap || {}), ...Object.entries(e.fill || {})].filter(([, v]) => v === null).map(([k]) => k));
+  const check = (colors, what) => {
+    const missing = slots.filter((s) => !colors[s] && !grey.has(s));
+    if (missing.length) throw new Error(`${key}: ${what} leaves ${missing.join(', ')} grey`);
+    return packColors(colors);
+  };
+  if (e.colourways) {
+    if (e.borrowedColours) throw new Error(`${key}: borrowedColours and colourways`);
+    return { reimagined: true, designedColours: true, variants: e.colourways.map((cw, i) => ({ colors: check(Object.fromEntries(Object.entries(cw).map(([k, v]) => [k, unpack(v)])), `colourway ${i + 1}`) })) };
+  }
+  const list = variantsOf.get(e.borrowedColours);
+  if (!list?.length) throw new Error(`${key}: borrowedColours ${e.borrowedColours} has no GSJS colourways`);
+  const picked = [...list].sort((a, b) => a.id - b.id).filter((v) => !e.pick || e.pick.includes(v.id));
+  if (e.pick && picked.length !== e.pick.length) throw new Error(`${key}: pick ${e.pick} not all in ${e.borrowedColours}`);
+  const isSlot = (v) => typeof v === 'string' && /^color_\d+$/.test(v);
+  const variants = picked.map((v) => {
+    const colors = {};
+    for (const s of slots) {
+      const from = e.colourMap && s in e.colourMap ? e.colourMap[s] : s;
+      if (from === null) continue;
+      let c = v.colors[from];
+      if (!c && e.fill?.[s]) c = isSlot(e.fill[s]) ? v.colors[e.fill[s]] : unpack(e.fill[s]);
+      if (c) colors[s] = c;
+    }
+    return { from: v.id, colors: check(colors, `${e.borrowedColours} ${v.id}`) };
+  });
+  return { reimagined: true, borrowedColours: e.borrowedColours, variants };
 }
 
 /** An article's bitmap textures (writeBitmaps names them <type>-<name>-<id>.png). */

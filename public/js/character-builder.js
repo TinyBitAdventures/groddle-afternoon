@@ -8,6 +8,11 @@
  * the classic/alt portraits.
  */
 import { normalizeVectorFields, vectorFieldsFromColors } from './avatar-looks.js';
+import { installReimaginedTags } from './avatar-reimagined.js';
+
+// The builder's wardrobe chips (game.js) get a "Reimagined" tag on the
+// greyscale masters the remake coloured (js/avatar-reimagined.js, row G52).
+if (typeof document !== 'undefined') installReimaginedTags(document);
 
 /** @typedef {{ r: number, g: number, b: number }} Rgb */
 

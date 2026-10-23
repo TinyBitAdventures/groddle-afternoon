@@ -120,8 +120,10 @@ function steerTop(fields, catalog, hex, rng) {
     fields.variant[type] = own.index;
     return;
   }
+  // GSJS articles only, like randomVectorFields: SWF-only and reimagined
+  // ones (swfOnly) never steer a look, so adding one reshuffles nobody.
   const options = (catalog.types?.[type] || [])
-    .filter((item) => !skipped(item.name))
+    .filter((item) => !item.swfOnly && !skipped(item.name))
     .map((item) => ({ item, near: nearestVariant(item, hex) }))
     .filter((o) => o.near && o.near.d <= SIGNATURE_MATCH);
   if (!options.length) return;

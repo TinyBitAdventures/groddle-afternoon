@@ -254,7 +254,38 @@
       "yeti",
       "zille_mask",
       "zombie_boy_mask",
-      "zombie_girl_mask"
+      "zombie_girl_mask",
+      {
+        "name": "Women_Plain_Hat",
+        "reimagined": true,
+        "borrowedColours": "dress/Women_Plain_Dress",
+        "colourMap": {
+          "color_5": "color_4"
+        }
+      },
+      {
+        "name": "banana_hat",
+        "reimagined": true,
+        "colourways": [
+          {
+            "color_1": "F5D63D 0 0 10 100 100",
+            "color_2": "FFF6C2 0 0 0 100 100"
+          },
+          {
+            "color_1": "A8C83A -6 0 10 100 100",
+            "color_2": "EAF2C0 0 0 0 100 100"
+          },
+          {
+            "color_1": "D9A520 -10 -10 20 100 100",
+            "color_2": "F3E3B0 0 0 0 100 100"
+          }
+        ]
+      },
+      {
+        "name": "real_bowler_hat",
+        "reimagined": true,
+        "borrowedColours": "hat/bowler_hat"
+      }
     ],
     "shirt": [
       "classic_undershirt",
@@ -346,7 +377,62 @@
       "Xmas_RainPiggy_Sweater",
       "Xmas_Tree_Sweater",
       "Xmas_Yeti_Sweater",
-      "yeti_shirt"
+      "yeti_shirt",
+      {
+        "name": "chaulkywhite_shirtvest",
+        "reimagined": true,
+        "borrowedColours": "shirt/chaulkywhite_coatshirtvest",
+        "colourMap": {
+          "color_6": "color_13",
+          "color_7": "color_5",
+          "color_11": "color_12"
+        },
+        "fill": {
+          "color_6": "color_9"
+        }
+      },
+      {
+        "name": "cola_bottle_shirt",
+        "reimagined": true,
+        "colourways": [
+          {
+            "color_1": "D62D2D 0 0 0 100 100",
+            "color_2": "F2F2F2 0 0 0 100 100",
+            "color_3": "5C2A12 -10 0 20 100 100",
+            "color_4": "F2F2F2 0 0 0 100 100",
+            "color_5": "E8B43C 0 0 0 100 100"
+          },
+          {
+            "color_1": "F2F2F2 0 0 0 100 100",
+            "color_2": "D62D2D 0 0 0 100 100",
+            "color_3": "5C2A12 -10 0 20 100 100",
+            "color_4": "D62D2D 0 0 0 100 100",
+            "color_5": "E8B43C 0 0 0 100 100"
+          },
+          {
+            "color_1": "3290CF 0 0 0 100 100",
+            "color_2": "F7F4BE 0 0 0 100 100",
+            "color_3": "67BF67 0 0 0 100 100",
+            "color_4": "FFFFFF 0 0 0 100 100",
+            "color_5": "FACC14 0 0 0 100 100"
+          }
+        ]
+      },
+      {
+        "name": "frilly_tank_blouse_belly",
+        "reimagined": true,
+        "borrowedColours": "shirt/frilly_tank_blouse"
+      },
+      {
+        "name": "mushroom_shirt_light",
+        "reimagined": true,
+        "borrowedColours": "shirt/mushroom_shirt"
+      },
+      {
+        "name": "nintendo_shirt_lighter",
+        "reimagined": true,
+        "borrowedColours": "shirt/nintendo_shirt"
+      }
     ],
     "coat": [
       "navy_coat",
@@ -446,6 +532,31 @@
       {
         "name": "RideRainbow",
         "ownColours": true
+      },
+      {
+        "name": "alph_lem_mab",
+        "reimagined": true,
+        "borrowedColours": "coat/alph_lem",
+        "fill": {
+          "color_2": "color_1",
+          "color_5": "color_3",
+          "color_6": null
+        }
+      },
+      {
+        "name": "banana_coat",
+        "reimagined": true,
+        "colourways": [
+          {
+            "color_1": "F5D63D 0 0 10 100 100"
+          },
+          {
+            "color_1": "A8C83A -6 0 10 100 100"
+          },
+          {
+            "color_1": "D9A520 -10 -10 20 100 100"
+          }
+        ]
       }
     ],
     "pants": [
@@ -517,7 +628,22 @@
       "Tron_pants",
       "ultraman_pants",
       "vertical_striped_pants",
-      "wide_belt_regular_jeans"
+      "wide_belt_regular_jeans",
+      {
+        "name": "kiss_pants",
+        "reimagined": true,
+        "borrowedColours": "coat/kissballoon_hoodie"
+      },
+      {
+        "name": "mongolia_fighting_pants",
+        "reimagined": true,
+        "borrowedColours": "coat/mongolian_fighting"
+      },
+      {
+        "name": "rainbow_leggings",
+        "reimagined": true,
+        "borrowedColours": "pants/rainbow_pan"
+      }
     ],
     "skirt": [
       "short_skirt",
@@ -542,7 +668,12 @@
       "sweet_heart_skirt",
       "three_layer_skirt",
       "Tutu",
-      "vintage_polkadot_skirt"
+      "vintage_polkadot_skirt",
+      {
+        "name": "bell_skirt",
+        "reimagined": true,
+        "borrowedColours": "shirt/bell_top"
+      }
     ],
     "dress": [
       "Nevermore_Dress",
@@ -599,7 +730,32 @@
       "toga_male",
       "tree_print_summer_dress",
       "Women_Plain_Dress",
-      "womens_pirate_dress"
+      "womens_pirate_dress",
+      {
+        "name": "teaport",
+        "reimagined": true,
+        "label": "Teapot",
+        "colourways": [
+          {
+            "color_1": "2B4FA0 0 0 0 100 100",
+            "color_2": "F7F7F2 4 0 0 100 100",
+            "color_3": "3A5FB8 0 0 10 100 100",
+            "color_4": "E8B43C 0 0 0 100 100"
+          },
+          {
+            "color_1": "E8B43C 0 0 0 100 100",
+            "color_2": "6B3A1E -10 0 20 100 100",
+            "color_3": "C98B4A 0 0 0 100 100",
+            "color_4": "E8B43C 0 0 0 100 100"
+          },
+          {
+            "color_1": "C24E73 0 0 0 100 100",
+            "color_2": "FFD1E0 0 0 0 100 100",
+            "color_3": "C26150 0 0 0 100 100",
+            "color_4": "E8B43C 0 0 0 100 100"
+          }
+        ]
+      }
     ],
     "shoes": [
       "converse",
@@ -659,7 +815,22 @@
       "top_fur_boots",
       "torero_shoes",
       "wide_strap_sandals",
-      "women_pirate_boot"
+      "women_pirate_boot",
+      {
+        "name": "slouch_boots",
+        "reimagined": true,
+        "borrowedColours": "shoes/top_fur_boots"
+      },
+      {
+        "name": "sweet_heart_shoes",
+        "reimagined": true,
+        "borrowedColours": "skirt/sweet_heart_skirt",
+        "colourMap": {
+          "color_1": "color_2",
+          "color_2": "color_1",
+          "color_4": "color_1"
+        }
+      }
     ]
   },
   "defaultLook": {

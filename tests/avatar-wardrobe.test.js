@@ -20,6 +20,14 @@ const catalog = expandCatalog(json(join(A, 'catalog.json')));
 const manifest = json(join(root, 'tools/avatar-compositor/catalog.json'));
 const item = (type, name) => catalog.types[type].find((i) => i.name === name);
 const ids = (type, name) => item(type, name).variants.map((v) => v.id);
+/** Row G52: the greyscale masters shipped with borrowed (or designed) colours. */
+const REIMAGINED = [
+  'hat/Women_Plain_Hat', 'hat/banana_hat', 'hat/real_bowler_hat',
+  'coat/alph_lem_mab', 'coat/banana_coat',
+  'shirt/chaulkywhite_shirtvest', 'shirt/cola_bottle_shirt', 'shirt/frilly_tank_blouse_belly', 'shirt/mushroom_shirt_light', 'shirt/nintendo_shirt_lighter',
+  'pants/kiss_pants', 'pants/mongolia_fighting_pants', 'pants/rainbow_leggings',
+  'dress/teaport', 'skirt/bell_skirt', 'shoes/slouch_boots', 'shoes/sweet_heart_shoes',
+];
 
 describe('saved colourway indices', () => {
   // Saved looks store variant[type] as an index into the article's colourways
@@ -53,27 +61,27 @@ describe('saved colourway indices', () => {
     }
   });
 
-  it('SWF-only articles come after every GSJS article and have one colourway, the SWF\'s own fills', () => {
+  it('SWF-only articles come after every GSJS article; own-colour ones have one colourway, the SWF\'s own fills', () => {
     let extras = 0;
     for (const [type, entries] of Object.entries(manifest.articles)) {
-      const own = entries.map((e) => (typeof e === 'object' && e.ownColours ? e.name : null));
-      const first = own.findIndex(Boolean);
+      const extra = entries.map((e) => (typeof e === 'object' && (e.ownColours || e.reimagined) ? e : null));
+      const first = extra.findIndex(Boolean);
       if (first < 0) continue;
-      assert.ok(own.slice(first).every(Boolean), `${type}: SWF-only articles are appended`);
-      for (const name of own.slice(first)) {
-        const it = item(type, name);
-        assert.ok(it, `${type}/${name} in the catalog`);
-        assert.equal(it.gsjsId, undefined, name);
-        assert.equal(it.swfOnly, true, name);
-        if (type !== 'hair') assert.deepEqual(it.variants, [{ colors: {} }], name);
+      assert.ok(extra.slice(first).every(Boolean), `${type}: SWF-only articles are appended`);
+      for (const e of extra.slice(first)) {
+        const it = item(type, e.name);
+        assert.ok(it, `${type}/${e.name} in the catalog`);
+        assert.equal(it.gsjsId, undefined, e.name);
+        assert.equal(it.swfOnly, true, e.name);
+        if (e.ownColours && type !== 'hair') assert.deepEqual(it.variants, [{ colors: {} }], e.name);
         extras += 1;
       }
     }
     assert.deepEqual(
       Object.entries(catalog.types).flatMap(([t, l]) => l.filter((i) => !i.gsjsId && t !== 'nose').map((i) => `${t}/${i.name}`)).sort(),
-      ['coat/RideRainbow', 'hair/BrowStache'],
+      ['coat/RideRainbow', 'hair/BrowStache', ...REIMAGINED].sort(),
     );
-    assert.equal(extras, 2);
+    assert.equal(extras, 2 + REIMAGINED.length);
   });
 
   it('random looks (and the seeded NPC looks) draw only from the GSJS wardrobe', () => {
@@ -149,6 +157,67 @@ describe('morph shapes (shape tweens)', () => {
           assert.ok(data.shapes[c.s]?.p.some((p) => p.f && p.d.length > 20), `frame ${fn}: mask ${c.s} outline`);
         }
       }
+    }
+  });
+});
+
+describe('reimagined greyscale masters (row G52)', () => {
+  const entries = Object.entries(manifest.articles).flatMap(([type, list]) => list.filter((e) => typeof e === 'object' && e.reimagined).map((e) => ({ type, ...e })));
+
+  it('lists the 17 masters, each marked and named for its colour source', () => {
+    assert.deepEqual(entries.map((e) => `${e.type}/${e.name}`).sort(), [...REIMAGINED].sort());
+    for (const e of entries) {
+      const it = item(e.type, e.name);
+      assert.equal(it.reimagined, true, e.name);
+      assert.equal(it.swfOnly, true, e.name);
+      if (e.colourways) {
+        assert.equal(it.designedColours, true, e.name);
+        assert.equal(it.borrowedColours, undefined, e.name);
+        assert.equal(it.variants.length, e.colourways.length, e.name);
+      } else {
+        const [t, n] = e.borrowedColours.split('/');
+        const sib = item(t, n);
+        assert.ok(sib?.gsjsId, `${e.name}: ${e.borrowedColours} is a GSJS article`);
+        assert.equal(it.borrowedColours, e.borrowedColours);
+        assert.equal(it.borrowedLabel, sib.label);
+        // Every sibling colourway (or the picked ones), in the sibling's own order.
+        assert.deepEqual(it.variants.map((v) => v.from), sib.variants.map((v) => v.id).filter((id) => !e.pick || e.pick.includes(id)), e.name);
+      }
+    }
+  });
+
+  it('every colour slot a master draws gets a colour in every colourway (bar the ones left grey on purpose)', () => {
+    for (const e of entries) {
+      const it = item(e.type, e.name);
+      const data = json(join(A, 'articles', e.type, `${e.name}.json`));
+      const slots = data.groups.filter((g) => /^color_\d+$/.test(g));
+      assert.ok(slots.length, `${e.name}: a greyscale master has colour slots`);
+      const grey = new Set([...Object.entries(e.colourMap || {}), ...Object.entries(e.fill || {})].filter(([, v]) => v === null).map(([k]) => k));
+      it.variants.forEach((v, i) => {
+        for (const s of slots) if (!grey.has(s)) assert.ok(v.colors[s]?.tintColor, `${e.name} colourway ${i}: ${s}`);
+      });
+    }
+  });
+
+  it('pins a few borrowed colourways, index for index', () => {
+    const from = (type, name) => item(type, name).variants.map((v) => v.from);
+    assert.deepEqual(from('shirt', 'mushroom_shirt_light'), [141, 149, 164, 353, 1409, 1452, 1521]);
+    assert.deepEqual(from('hat', 'real_bowler_hat'), [539, 574, 583, 1331]);
+    assert.deepEqual(from('shoes', 'sweet_heart_shoes'), [456, 554, 1332, 1462]);
+    // A remapped slot: the shirt-vest's sleeves wear the sibling's shirt colour (color_5).
+    const sv = item('shirt', 'chaulkywhite_shirtvest');
+    const sib = item('shirt', 'chaulkywhite_coatshirtvest');
+    sv.variants.forEach((v, i) => assert.deepEqual(v.colors.color_7, sib.variants[i].colors.color_5));
+    assert.equal(item('dress', 'teaport').label, 'Teapot');
+  });
+
+  it('come after every GSJS article of their type, so no saved index moves', () => {
+    for (const name of REIMAGINED) {
+      const [type, n] = name.split('/');
+      const list = catalog.types[type];
+      const at = list.findIndex((i) => i.name === n);
+      assert.ok(list.slice(0, at).every((i) => i.gsjsId || i.swfOnly), name);
+      assert.ok(list.slice(at).every((i) => i.swfOnly), name);
     }
   });
 });
