@@ -61,16 +61,65 @@ export const morphShapeId = (id, ratio = 0) => (ratio + 1) * MORPH_ID_BASE + id;
 export const morphOfShapeId = (s) => (s >= MORPH_ID_BASE ? { id: s % MORPH_ID_BASE, ratio: Math.floor(s / MORPH_ID_BASE) - 1 } : null);
 
 /**
+ * Flash blend modes that read what is beneath (everything but normal and
+ * layer). A display object with one composites against what its parent has
+ * drawn so far: the Flash player precomposes a container holding such a
+ * child in its own buffer (BlendMode.LAYER docs), so the blend never reaches
+ * past the parent.
+ */
+export const BACKDROP_BLENDS = Object.freeze(['multiply', 'screen', 'lighten', 'darken', 'difference', 'add', 'subtract', 'invert', 'alpha', 'erase', 'overlay', 'hardlight']);
+const backdropBlend = (p) => BACKDROP_BLENDS.includes(p.blendMode);
+
+/** A sprite's colour transform on every shape op it drew (blend groups included, not mask groups). */
+function tintOps(ops, cp) {
+  for (const o of ops) {
+    if (o.s !== undefined && !o.cx) o.cx = cp;
+    else if (o.bm) tintOps(o.ops, cp);
+  }
+}
+
+/** A mask's ops without blend groups (a mask uses only its outlines). */
+const unblend = (ops) => ops.flatMap((o) => (o.bm ? unblend(o.ops) : [o]));
+
+/**
+ * Ops as one blend group { bm, ops, a?, n? }; a lone layer group inside is
+ * merged. n: 'color_10' when the group is a part's own color_10 child, whose
+ * blend mode AvatarSwf resets to NORMAL when the look colours color_10
+ * (js/avatar-rig.js frameDrawList).
+ */
+function blendGroup(bm, ops, a, n) {
+  const inner = ops.length === 1 && ops[0].bm === 'layer' && ops[0].a === undefined ? ops[0].ops : ops;
+  const out = { bm, ops: inner };
+  if (a < 1) out.a = r4(a);
+  if (n) out.n = n;
+  return out;
+}
+
+/**
  * Flatten one sprite instance at absolute frame n into draw ops (in the
  * instance's own coordinates): { s: shapeId, m, a?, g?: [colour groups,
- * innermost first], cx? } and clip groups { clip: ops, ops }. `stop(name,
- * path)` may return a marker to emit instead of descending (slots).
+ * innermost first], cx? }, clip groups { clip: ops, ops } and blend groups
+ * { bm, ops, a? } (bm a Flash blend mode name: the ops paint into their own
+ * layer, which composites onto what is beneath with that mode at alpha a;
+ * 'layer' is a plain isolated group). `stop(name, path)` may return a marker
+ * to emit instead of descending (slots).
  */
-export function flattenSprite(swf, id, n, opts = {}, m = IDENTITY, a = 1, groups = [], path = '') {
-  const out = [];
+export function flattenSprite(swf, id, n, opts = {}, m = IDENTITY, a = 1, groups = [], path = '', level = 0) {
   const t = swf.sprites.get(id);
-  if (!t) return out;
+  if (!t) return [];
   const list = [...displayListAt(t, Math.min(n, t.frameCount)).values()].sort((x, y) => x.depth - y.depth);
+  // A child that blends with what is beneath it: this sprite becomes an
+  // isolated layer (its alpha applies to the layer, not to each child).
+  if (list.some((p) => !p.clipDepth && backdropBlend(p) && alphaOf(p.cxform, 1) > 0)) {
+    const inner = flattenList(swf, list, n, opts, m, 1, groups, path, level);
+    return inner.length ? [blendGroup('layer', inner, a)] : [];
+  }
+  return flattenList(swf, list, n, opts, m, a, groups, path, level);
+}
+
+/** flattenSprite for one display list (depth order); level 0 is the flattened sprite's own children. */
+function flattenList(swf, list, n, opts, m, a, groups, path, level) {
+  const out = [];
   let clipUntil = -1;
   let clipGroup = null;
   for (const p of list) {
@@ -85,7 +134,7 @@ export function flattenSprite(swf, id, n, opts = {}, m = IDENTITY, a = 1, groups
       // A mask layer: its shapes clip the following depths up to clipDepth.
       const clip = kind === 'shape' || kind === 'morph'
         ? [{ s: kind === 'morph' ? morphShapeId(p.id, p.ratio || 0) : p.id, m: roundMatrix(pm) }]
-        : flattenSprite(swf, p.id, n, {}, pm, 1, [], childPath);
+        : unblend(flattenSprite(swf, p.id, n, {}, pm, 1, [], childPath, level + 1));
       clipGroup = { clip, ops: [] };
       clipUntil = p.clipDepth;
       continue;
@@ -102,10 +151,20 @@ export function flattenSprite(swf, id, n, opts = {}, m = IDENTITY, a = 1, groups
       if (cp) op.cx = cp;
       ops = [op];
     } else if (kind === 'sprite') {
-      ops = flattenSprite(swf, p.id, n, opts, pm, pa, g, childPath);
+      const blended = p.blendMode && p.blendMode !== 'normal';
+      ops = flattenSprite(swf, p.id, n, opts, pm, blended ? 1 : pa, g, childPath, level + 1);
       const cp = colorPart(p.cxform);
-      if (cp) for (const o of ops) if (o.s !== undefined && !o.cx) o.cx = cp;
+      if (cp) tintOps(ops, cp);
     } else ops = [];
+    // A blend mode on this placement: its content as one layer, composited
+    // with that mode (a layer at full alpha is just its content).
+    if (ops.length && p.blendMode && p.blendMode !== 'normal' && !marker && pa > 0) {
+      if (kind !== 'sprite' && pa < 1) for (const o of ops) delete o.a;
+      // A part's direct color_10 child: AvatarSwf (addShadowToHair,
+      // maybeColorIt) sets its blendMode, so the runtime decides.
+      const own10 = level === 0 && p.name === 'color_10' ? 'color_10' : undefined;
+      if (p.blendMode !== 'layer' || pa < 1) ops = [blendGroup(p.blendMode, ops, pa, own10)];
+    }
     if (clipGroup) clipGroup.ops.push(...ops);
     else out.push(...ops);
   }
@@ -165,6 +224,7 @@ export function buildRig(swf, rootId, frames, slotNames, watchNames = []) {
           rows.push(row);
         } else if (o.slot) rows.push(o);
         else if (o.clip) throw new Error('mask layers in the base rig are not supported');
+        else if (o.bm) throw new Error('blend modes in the base rig are not supported');
         else if (o.s !== undefined) rows.push({ s: o.s, m: o.m, ...(o.a ? { a: o.a } : {}) });
       }
     };
@@ -210,7 +270,8 @@ export function flattenPart(swf, partId, frames) {
 export function shapeIds(ops, out = new Set()) {
   for (const o of ops) {
     if (o.s !== undefined) out.add(o.s);
-    if (o.clip) { shapeIds(o.clip, out); shapeIds(o.ops, out); }
+    if (o.clip) shapeIds(o.clip, out);
+    if (o.ops) shapeIds(o.ops, out);
   }
   return out;
 }

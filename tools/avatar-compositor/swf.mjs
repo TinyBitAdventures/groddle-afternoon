@@ -74,6 +74,32 @@ function readCxform(b, withAlpha = true) {
   return { m, o };
 }
 
+/** PlaceObject3 BlendMode byte -> flash.display.BlendMode name (0 and 1 are normal). */
+export const BLEND_MODES = Object.freeze(['normal', 'normal', 'layer', 'multiply', 'screen', 'lighten', 'darken', 'difference', 'add', 'subtract', 'invert', 'alpha', 'erase', 'overlay', 'hardlight']);
+
+const FILTER_KINDS = ['dropShadow', 'blur', 'glow', 'bevel', 'gradientGlow', 'convolution', 'colorMatrix', 'gradientBevel'];
+
+/** FILTERLIST: { kinds: [filter names], end } (sizes from the SWF 19 spec). */
+function readFilterList(buf, pos) {
+  const n = buf[pos];
+  let q = pos + 1;
+  const kinds = [];
+  for (let i = 0; i < n; i++) {
+    const id = buf[q];
+    q += 1;
+    kinds.push(FILTER_KINDS[id] || `filter${id}`);
+    if (id === 0) q += 23;
+    else if (id === 1) q += 9;
+    else if (id === 2) q += 15;
+    else if (id === 3) q += 27;
+    else if (id === 4 || id === 7) q += 1 + buf[q] * 5 + 19;
+    else if (id === 5) q += 2 + 8 + 4 * buf[q] * buf[q + 1] + 5;
+    else if (id === 6) q += 80;
+    else throw new Error(`unknown filter id ${id}`);
+  }
+  return { kinds, end: q };
+}
+
 function cstring(buf, pos) {
   let end = pos;
   while (buf[end] !== 0) end += 1;
@@ -128,10 +154,12 @@ function readTimeline(buf, start, end, swf) {
         if (f1 & 0x20) { const s = cstring(buf, q); place.name = s.s; q = s.end; }
         if (f1 & 0x40) { place.clipDepth = buf.readUInt16LE(q); q += 2; }
         if (code === 70) {
-          if (f2 & 0x01) place.filters = true; // not used by the avatar art
+          // Filters (kinds only; the avatar art uses none) come before the blend mode.
+          if (f2 & 0x01) { const fl = readFilterList(buf, q); place.filters = fl.kinds; q = fl.end; }
           if (f2 & 0x02) {
-            // Filters come before the blend mode; only record that one exists.
-            place.blendMode = f2 & 0x01 ? 'unknown' : buf[q];
+            // Kept when 'normal' too: a move may reset an earlier blend mode.
+            place.blendMode = BLEND_MODES[buf[q]] || `unknown${buf[q]}`;
+            q += 1;
           }
         }
         ops.push(place);

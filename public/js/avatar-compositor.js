@@ -14,7 +14,7 @@
  *  - catalog.json: what the character builder offers, colours from GSJS
  */
 import { CORE_FRAMES, IDLE_FRAMES, SHEET_FRAMES } from './avatar-anims.js';
-import { applyCM, drawListBounds, expandRig, frameDrawList, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments } from './avatar-rig.js';
+import { applyCM, drawListBounds, expandRig, transformBounds, frameDrawList, lookMatrices, mergeIdleArticle, mergeIdleRig, slotAssignments } from './avatar-rig.js';
 import { expandCatalog } from './avatar-looks.js';
 
 export const AVATAR_DATA_DIR = 'assets/avatar/';
@@ -63,12 +63,71 @@ function tintedBitmap(img, cm, key) {
 }
 
 /**
+ * Flash blend modes (tools/avatar-compositor/rig.mjs blend groups) as Canvas
+ * 2D composite operations; Canvas follows the W3C compositing formulas, as
+ * Flash does for these (over a transparent backdrop the layer shows as is).
+ * Flash's subtract and invert have no Canvas equivalent and no avatar
+ * article uses them (nor alpha): they paint normally.
+ */
+export const BLEND_OPS = Object.freeze({
+  layer: 'source-over', multiply: 'multiply', screen: 'screen', lighten: 'lighten', darken: 'darken',
+  difference: 'difference', add: 'lighter', overlay: 'overlay', hardlight: 'hard-light', erase: 'destination-out',
+});
+
+/** Off-screen layers for blend groups, one per nesting depth (reused, grown as needed). */
+const layerPool = [];
+function layerCanvas(depth, w, h) {
+  let c = layerPool[depth];
+  if (!c) {
+    c = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(w, h) : document.createElement('canvas');
+    layerPool[depth] = c;
+  }
+  if (c.width < w || c.height < h) { c.width = Math.max(c.width, w); c.height = Math.max(c.height, h); }
+  return c;
+}
+
+/**
+ * A blend group: its items paint into an off-screen layer the size of their
+ * device bounds, which then composites onto ctx with the group's mode and
+ * alpha (ctx's clip still applies), the way the Flash player renders a
+ * display object with a blend mode.
+ */
+function paintBlended(ctx, group, sources, base, depth) {
+  const a = group.a ?? 1;
+  if (a <= 0 || !group.items.length) return;
+  const b = drawListBounds(group.items, (src, id) => sources.get(src)?.shapes?.[id]);
+  // No outline bounds (should not happen): the whole canvas.
+  const d = b ? transformBounds(base, b) : [0, 0, ctx.canvas.width, ctx.canvas.height];
+  // Strokes and anti-aliasing reach past the outline bounds.
+  const x0 = Math.max(0, Math.floor(d[0]) - 2);
+  const y0 = Math.max(0, Math.floor(d[1]) - 2);
+  const x1 = Math.min(ctx.canvas.width, Math.ceil(d[2]) + 2);
+  const y1 = Math.min(ctx.canvas.height, Math.ceil(d[3]) + 2);
+  const w = x1 - x0;
+  const h = y1 - y0;
+  if (w <= 0 || h <= 0) return;
+  const layer = layerCanvas(depth, w, h);
+  const lctx = layer.getContext('2d');
+  lctx.setTransform(1, 0, 0, 1, 0, 0);
+  lctx.clearRect(0, 0, w, h);
+  paintItems(lctx, group.items, sources, mul([1, 0, 0, 1, -x0, -y0], base), depth + 1);
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = Math.min(1, a);
+  ctx.globalCompositeOperation = BLEND_OPS[group.bm] || 'source-over';
+  ctx.drawImage(layer, 0, 0, w, h, x0, y0, w, h);
+  ctx.restore();
+}
+
+/**
  * Paint draw items. sources: Map<src, { shapes, bitmaps: Map<id, image> }>.
  * base: device transform [a,b,c,d,e,f] applied before each item's matrix.
+ * depth: blend-group nesting (picks the off-screen layer).
  */
-export function paintItems(ctx, items, sources, base) {
+export function paintItems(ctx, items, sources, base, depth = 0) {
   for (const it of items) {
-    if (it.clip) { paintClipped(ctx, it, sources, base); continue; }
+    if (it.clip) { paintClipped(ctx, it, sources, base, depth); continue; }
+    if (it.bm) { paintBlended(ctx, it, sources, base, depth); continue; }
     const src = sources.get(it.src);
     const shape = src?.shapes?.[it.s];
     if (!shape || (it.a ?? 1) <= 0) continue;
@@ -117,7 +176,7 @@ export function paintItems(ctx, items, sources, base) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
-function paintClipped(ctx, group, sources, base) {
+function paintClipped(ctx, group, sources, base, depth = 0) {
   const clip = new Path2D();
   for (const c of group.clip) {
     const m = mul(base, c.m);
@@ -135,7 +194,7 @@ function paintClipped(ctx, group, sources, base) {
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clip(clip);
-  paintItems(ctx, group.items, sources, base);
+  paintItems(ctx, group.items, sources, base, depth);
   ctx.restore();
 }
 

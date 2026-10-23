@@ -47,9 +47,9 @@ function lookCtx(look) {
     shapeOf: (src, id) => (src === 'base' ? rig.shapes[id] : articles.get(src)?.shapes[id]),
   };
 }
-const flat = (items) => items.flatMap((it) => (it.clip ? flat(it.items) : [it]));
-/** Article part ops (masks nest: { clip, ops }) as draw-item shaped groups for flat(). */
-const asItems = (ops) => ops.map((o) => (o.clip ? { clip: o.clip, items: asItems(o.ops) } : o));
+const flat = (items) => items.flatMap((it) => (it.clip || it.bm ? flat(it.items) : [it]));
+/** Article part ops (masks nest: { clip, ops }, blend groups { bm, ops }) as draw-item shaped groups for flat(). */
+const asItems = (ops) => ops.map((o) => (o.clip ? { clip: o.clip, items: asItems(o.ops) } : o.bm ? { bm: o.bm, items: asItems(o.ops) } : o));
 
 /** Absolute points of a path (M/L/Q or relative m/l/q), for round trips. */
 function points(d) {
@@ -348,7 +348,7 @@ describe('recovered containers (Avatar2011.fla)', () => {
     const { look: L } = lookCtx(resolveLook({ outfit: { hat: hat.name, hair } }, catalog));
     assert.ok(L.assign.hatAndHair);
     const items = frameDrawList(rig, L, RIG_FRAMES.indexOf(801));
-    assert.ok(items.some((it) => it.clip && it.items.some((x) => x.src === hair)), `${hat.name} masks ${hair}`);
+    assert.ok(items.some((it) => it.clip && flat(it.items).some((x) => x.src === hair)), `${hat.name} masks ${hair}`);
     assert.ok(HAT_MASKED_HAIR.includes('sideHairCloseContainer_mc'));
   });
 });

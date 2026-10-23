@@ -321,10 +321,35 @@ function cxMatrix(cx) {
   return [cx.m[0], 0, 0, 0, cx.o[0], 0, cx.m[1], 0, 0, cx.o[1], 0, 0, cx.m[2], 0, cx.o[2], 0, 0, 0, 1, 0];
 }
 
+/** Flash blend modes that read what is beneath (tools/avatar-compositor/rig.mjs BACKDROP_BLENDS). */
+const BACKDROP = new Set(['multiply', 'screen', 'lighten', 'darken', 'difference', 'add', 'subtract', 'invert', 'alpha', 'erase', 'overlay', 'hardlight']);
+const readsBackdrop = (items) => items.some((it) => (it.bm && BACKDROP.has(it.bm)) || ((it.bm || it.clip) && readsBackdrop(it.items)));
+
+/**
+ * Open the layer groups a draw list no longer needs: an isolated layer at
+ * full alpha changes nothing once no item inside blends with what is beneath
+ * it (a hair's layer after its color_10 went back to normal).
+ */
+function inlineLayers(items) {
+  return items.flatMap((it) => {
+    if (it.clip) return [{ ...it, items: inlineLayers(it.items) }];
+    if (!it.bm) return [it];
+    const inner = inlineLayers(it.items);
+    if (it.bm === 'layer' && it.a >= 1 && !readsBackdrop(inner)) return inner;
+    return [{ ...it, items: inner }];
+  });
+}
+
+/** Shape items of a draw list, blend groups opened (for masks, which use outlines only). */
+const shapeItems = (items) => items.flatMap((it) => (it.bm ? shapeItems(it.items) : [it]));
+
 /**
  * One frame as paint-ordered draw items:
  *   { src, s: shapeId, m: [a,b,c,d,e,f], a: alpha, cm: 4x5 | null }
  *   { clip: [{ src, s, m }], items: [...] }   (mask group)
+ *   { bm, a, items: [...] }   (blend group: the items paint into their own
+ *     layer, which composites with the Flash blend mode bm at alpha a;
+ *     js/avatar-compositor.js BLEND_OPS)
  * rig: built rig ({ frames, nodes, table }); look: { assign (slotAssignments),
  * articles: Map<name, data>, colors: { skin, hair: { color_1, color_10 } },
  * face } with colour matrices precomputed (lookMatrices).
@@ -356,13 +381,24 @@ export function frameDrawList(rig, look, frameIndex) {
           list.push({ clip: op.clip.map((c) => ({ src, s: c.s, m: mulM(m, c.m) })), items: walk(op.ops) });
           continue;
         }
+        if (op.bm) {
+          const items = walk(op.ops);
+          // AvatarSwf sets a part's color_10 child to BlendMode.NORMAL when
+          // the look colours color_10 (hair: addShadowToHair, every hair
+          // palette has one; articles: maybeColorIt, when the colourway does).
+          if (op.n === 'color_10' && colors?.color_10) {
+            const a = op.a ?? 1;
+            list.push(...(a < 1 ? items.map((it) => (it.clip ? it : { ...it, a: (it.a ?? 1) * a })) : items));
+          } else list.push({ bm: op.bm, a: op.a ?? 1, items });
+          continue;
+        }
         let cm = groupMatrix(op.g, colors, extraCM);
         if (op.cx) cm = cm ? concatCM(cxMatrix(op.cx), cm) : cxMatrix(op.cx);
         list.push({ src, s: op.s, m: mulM(m, op.m), a: (op.a ?? 1), cm });
       }
       return list;
     };
-    return walk(v);
+    return inlineLayers(walk(v));
   };
   const maskFor = (container) => {
     if ((container === 'sideEyeCloseContainer_mc' || container === 'sideEyeOffsideContainer_mc' || container === 'sideMouthContainer_mc') && skull) {
@@ -378,7 +414,7 @@ export function frameDrawList(rig, look, frameIndex) {
       const hat = assign.map.get(hatC)?.[0];
       if (row && hat) {
         const ops = partOps({ article: hat.article, part: maskPart }, row.m, null);
-        if (ops.length) return ops.map((o) => ({ src: o.src, s: o.s, m: o.m }));
+        if (ops.length) return shapeItems(ops).map((o) => ({ src: o.src, s: o.s, m: o.m }));
       }
     }
     if (assign.boots) {
@@ -523,11 +559,15 @@ export function drawListBounds(items, shapeOf) {
     return sh?.b ? transformBounds(it.m, sh.b) : null;
   };
   for (const it of items) {
+    if (it.bm) {
+      if ((it.a ?? 1) > 0 && it.bm !== 'erase' && it.bm !== 'alpha') grow(drawListBounds(it.items, shapeOf));
+      continue;
+    }
     if (it.clip) {
       let cb = null;
       for (const c of it.clip) { const r = boundsOf(c); if (r) cb = cb ? [Math.min(cb[0], r[0]), Math.min(cb[1], r[1]), Math.max(cb[2], r[2]), Math.max(cb[3], r[3])] : r; }
       let ib = null;
-      for (const c of it.items) { const r = c.clip ? drawListBounds([c], shapeOf) : boundsOf(c); if (r) ib = ib ? [Math.min(ib[0], r[0]), Math.min(ib[1], r[1]), Math.max(ib[2], r[2]), Math.max(ib[3], r[3])] : r; }
+      for (const c of it.items) { const r = c.clip || c.bm ? drawListBounds([c], shapeOf) : boundsOf(c); if (r) ib = ib ? [Math.min(ib[0], r[0]), Math.min(ib[1], r[1]), Math.max(ib[2], r[2]), Math.max(ib[3], r[3])] : r; }
       if (cb && ib) grow([Math.max(cb[0], ib[0]), Math.max(cb[1], ib[1]), Math.min(cb[2], ib[2]), Math.min(cb[3], ib[3])]);
       continue;
     }

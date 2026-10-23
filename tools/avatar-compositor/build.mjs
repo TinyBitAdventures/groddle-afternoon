@@ -310,7 +310,7 @@ function buildArticle(type, name, gsjsEntry) {
   const shapes = outlinesFor(file, swf, ids, allShapes);
   const bmp = writeBitmaps(bitmaps, bitmapIdsOf(shapes), `${type}-${name}`);
   const groups = new Set();
-  const collect = (ops) => { for (const o of ops) { if (o.g) o.g.forEach((g) => groups.add(g)); if (o.ops) { collect(o.ops); collect(o.clip); } } };
+  const collect = (ops) => { for (const o of ops) { if (o.g) o.g.forEach((g) => groups.add(g)); if (o.ops) collect(o.ops); if (o.clip) collect(o.clip); } };
   for (const p of Object.values(parts)) p.variants.forEach(collect);
   // Split at the core frames (RIG_FRAMES): <name>.json and <name>.idle.json.
   const coreParts = {};

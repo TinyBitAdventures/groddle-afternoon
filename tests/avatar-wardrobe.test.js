@@ -139,7 +139,9 @@ describe('morph shapes (shape tweens)', () => {
     const back = data.parts.backHair;
     for (const fn of [1145, 1150, 1155, 1163]) {
       const v = back.variants[back.frames === 0 ? 0 : back.frames[CORE_FRAMES.indexOf(fn)]];
-      const masks = v.filter((o) => o.clip);
+      // Masks, also inside blend groups (the color_10 highlight multiplies, rig.mjs).
+      const clipsIn = (ops) => ops.flatMap((o) => (o.clip ? [o] : o.bm ? clipsIn(o.ops) : []));
+      const masks = clipsIn(v);
       assert.equal(masks.length, 4, `frame ${fn}`);
       for (const m of masks) {
         for (const c of m.clip) {

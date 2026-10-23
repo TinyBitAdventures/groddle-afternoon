@@ -1410,9 +1410,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 278,
+  "commits": 281,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Decorating your house and Tower keeps the view above the pack and still reaches the ceiling"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Pick every Tower floor, roof and decoration the original offered"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "The floor under construction has only the Tower's base frame over it"
+   },
    {
     "date": "2026-10-23",
     "kind": "fix",
@@ -1517,24 +1532,9 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "The home page shows this round's additions"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Enchanted Forest hollows, Juju Bandits from Savanna Dust Traps, and house un-expand"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Tiny Speck's own 109 wallpapers, floors and ceilings, papered wall by wall"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Speech bubble tails join their bubble instead of sitting under a line"
    }
   ]
  },
- "tests": 171,
+ "tests": 172,
  "generatedAt": "2026-10-23"
 }
