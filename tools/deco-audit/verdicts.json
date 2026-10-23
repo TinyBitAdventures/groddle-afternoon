@@ -272,6 +272,18 @@
    "street": "GA910DULG012JIE Punar Grotta",
    "placed": 55
   },
+  "cave_crystal_4": {
+   "swf": "bundle:zutto1.swf#cave_crystal_4",
+   "size": [
+    342,
+    202
+   ],
+   "sha256": "e7c5df187ca4e670418dc2c0f7300a4ea9b736e06f4e12e039c4cb8d9b39a037",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GA91JU4QQ712DJN Arjun Plunge",
+   "placed": 13
+  },
   "cave_crystal_5": {
    "swf": "bundle:zutto1.swf#cave_crystal_5",
    "size": [
@@ -464,6 +476,30 @@
    "street": "GA91JU4QQ712DJN Arjun Plunge",
    "placed": 84
   },
+  "cave_stalactite_6": {
+   "swf": "bundle:zutto1.swf#cave_stalactite_6",
+   "size": [
+    156,
+    320
+   ],
+   "sha256": "376fd6dcd55a867ccea224208acef3993aaf86ef4b5c249d53d241052213510b",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GLI1D5DO1671QPA The Other Drop",
+   "placed": 26
+  },
+  "cl2_cactus_01": {
+   "swf": "bundle:leavens1.swf#cl2_cactus_01",
+   "size": [
+    146,
+    370
+   ],
+   "sha256": "a5272e3c4bd880bcde31489d3aa92d03d058b33327bce13933c6317e93e952c4",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 10
+  },
   "cl2_cactus_Back_02": {
    "swf": "bundle:leavens1.swf#cl2_cactus_Back_02",
    "size": [
@@ -475,6 +511,162 @@
    "renderer": "ffdec raster",
    "street": "GM410QQ0CHARO Flipside",
    "placed": 3
+  },
+  "cl2_cactus_Back_03": {
+   "swf": "bundle:leavens1.swf#cl2_cactus_Back_03",
+   "size": [
+    42,
+    150
+   ],
+   "sha256": "3d7da5acd774ba7fa1f795c7c55a39758a0f8fe937172291b2b06e8f53dec12e",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 2
+  },
+  "cl2_mountains_01": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_01",
+   "size": [
+    468,
+    894
+   ],
+   "sha256": "691ef138607e75efe463f3e0b1f17add8589399982937c437d7c81cb3c75af56",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 5
+  },
+  "cl2_mountains_02": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_02",
+   "size": [
+    420,
+    886
+   ],
+   "sha256": "79369a21358e4c203305793da117e21ea5d1b1ed34f43ff0e31418000e30afa1",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 4
+  },
+  "cl2_mountains_03": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_03",
+   "size": [
+    756,
+    946
+   ],
+   "sha256": "0dee058a8236f78c5804f0644f36b38921fc858c3537037159c6bd112ea7b3a0",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 3
+  },
+  "cl2_mountains_04": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_04",
+   "size": [
+    576,
+    1512
+   ],
+   "sha256": "1fc46a0181a3d44922bb703be90f1b7beaf356cd987658a3b57a3ac146490e6c",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 5
+  },
+  "cl2_mountains_05": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_05",
+   "size": [
+    736,
+    1390
+   ],
+   "sha256": "12b4babe7a2e94306d65760864e4a52343ad966f716351413360710ae044b489",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM413RQ6LRG9N West Spice",
+   "placed": 3
+  },
+  "cl2_mountains_06": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_06",
+   "size": [
+    1476,
+    1156
+   ],
+   "sha256": "0894169c63602caa4c11120f63f1fbdd812c14010831ba40bf08b9a86f69b07c",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM413RQ6LRG9N West Spice",
+   "placed": 5
+  },
+  "cl2_mountains_wayBack_01": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_wayBack_01",
+   "size": [
+    1096,
+    2004
+   ],
+   "sha256": "e05bb269b63b29e05f13a188f55d08a0eeb5e592c2f2f992bf6658b75040b58d",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 2
+  },
+  "cl2_mountains_wayBack_02": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_wayBack_02",
+   "size": [
+    1448,
+    2072
+   ],
+   "sha256": "47d8f149a74d0064b257c4e331a965e34ec7b56c36b8d7f68ccece7020265a0a",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 1
+  },
+  "cl2_mountains_wayBack_03": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_wayBack_03",
+   "size": [
+    1392,
+    1552
+   ],
+   "sha256": "6c92151ef9f79e39f803d0e3506f42bcdce5c012bf47099b1a2ccd1593d20d08",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 3
+  },
+  "cl2_mountains_wayBack_04": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_wayBack_04",
+   "size": [
+    458,
+    1090
+   ],
+   "sha256": "b5cf9517f9559d65d09882b94b172e3934b8857e77fdf468a1162ea828627eaf",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 2
+  },
+  "cl2_mountains_wayBack_05": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_wayBack_05",
+   "size": [
+    1372,
+    1378
+   ],
+   "sha256": "df7ecded3269904ab7c24c49a8860d9d260230e3e4487861c173808046f18862",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GA5PPFP86NF2FOS Hell One",
+   "placed": 7
+  },
+  "cl2_mountains_wayBack_06": {
+   "swf": "bundle:leavens1.swf#cl2_mountains_wayBack_06",
+   "size": [
+    1396,
+    1408
+   ],
+   "sha256": "8a4e8b7db4cb8dba1596f8ff2b8f8c9b356a937bec31835253ee1e3985a8847e",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM410QQ0CHARO Flipside",
+   "placed": 2
   },
   "climbingtree_02_piece_shadow": {
    "swf": "bundle:corey3.swf#climbingtree_02_piece_shadow",
@@ -499,6 +691,138 @@
    "renderer": "ffdec raster",
    "street": "GA99VU1246A2VND Vilong Hari",
    "placed": 7
+  },
+  "craggyMountain_background_02": {
+   "swf": "bundle:leavens1.swf#craggyMountain_background_02",
+   "size": [
+    494,
+    690
+   ],
+   "sha256": "648a860b00279d693d5b87fe34af512e2a171b2356be6f943239c5556e29d8da",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4103L52ID23 Old Main Street",
+   "placed": 2
+  },
+  "craggyMountain_background_03": {
+   "swf": "bundle:leavens1.swf#craggyMountain_background_03",
+   "size": [
+    88,
+    548
+   ],
+   "sha256": "e619dd6b84b1b7226ffd39731577c59c5aac37889664e66c88f3c79d7f79b449",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4103L52ID23 Old Main Street",
+   "placed": 3
+  },
+  "craggyMountain_background_05": {
+   "swf": "bundle:leavens1.swf#craggyMountain_background_05",
+   "size": [
+    38,
+    260
+   ],
+   "sha256": "f74de67e3fb7f28bb3dfd1c1224f864a215c48308df4a8902e27da68d880ce74",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4109NI2R640 Guillermo Gamera Way",
+   "placed": 2
+  },
+  "craggyMountain_background_08": {
+   "swf": "bundle:leavens1.swf#craggyMountain_background_08",
+   "size": [
+    1668,
+    1434
+   ],
+   "sha256": "67b90960f690e021dd82e0871f8da90dbd1844939ad1cf4323a808a7d0fb0748",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4103L52ID23 Old Main Street",
+   "placed": 6
+  },
+  "craggyMountain_background_09": {
+   "swf": "bundle:leavens1.swf#craggyMountain_background_09",
+   "size": [
+    388,
+    1386
+   ],
+   "sha256": "d71c7be9eece22fab0b529770a20c3bf131d8ac2f9718db1a9044f0ec2331c4d",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4103L52ID23 Old Main Street",
+   "placed": 3
+  },
+  "craggyMountain_background_10": {
+   "swf": "bundle:leavens1.swf#craggyMountain_background_10",
+   "size": [
+    1180,
+    1312
+   ],
+   "sha256": "9b447731721b01e2aa3fae8ebc4fc5c107e8ef284d526764b1ef2adbb536cea4",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4103L52ID23 Old Main Street",
+   "placed": 5
+  },
+  "craggyMountain_background_11": {
+   "swf": "bundle:leavens1.swf#craggyMountain_background_11",
+   "size": [
+    404,
+    1318
+   ],
+   "sha256": "bd4d7f7616375d1a3546096ac821b26a167606601f199eca18722295b1646693",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4103L52ID23 Old Main Street",
+   "placed": 3
+  },
+  "craggyMountain_background_12": {
+   "swf": "bundle:leavens1.swf#craggyMountain_background_12",
+   "size": [
+    80,
+    308
+   ],
+   "sha256": "b9766a541c049052f7ff694d48bfc168ddb856ed22df7e82ae2a3454a5ae673d",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4109NI2R640 Guillermo Gamera Way",
+   "placed": 3
+  },
+  "craggyMountain_mid_01": {
+   "swf": "bundle:leavens1.swf#craggyMountain_mid_01",
+   "size": [
+    1460,
+    776
+   ],
+   "sha256": "8f397132616cf3293c506bf2abc94d8e0c333491e37a233d8c9ae9579f50f196",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4109NI2R640 Guillermo Gamera Way",
+   "placed": 4
+  },
+  "craggyMountain_mid_03": {
+   "swf": "bundle:leavens1.swf#craggyMountain_mid_03",
+   "size": [
+    404,
+    532
+   ],
+   "sha256": "ac102d8fe11fbd9c003a8f5b6fb6a218c3c65218569f459fc4e8abfc3c83b02a",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4109NI2R640 Guillermo Gamera Way",
+   "placed": 2
+  },
+  "craggyMountain_mid_04": {
+   "swf": "bundle:leavens1.swf#craggyMountain_mid_04",
+   "size": [
+    1136,
+    728
+   ],
+   "sha256": "e5581d16abda947b8ae0888e74fafdc5d3241b8a551073d0054829543ea54275",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4109NI2R640 Guillermo Gamera Way",
+   "placed": 2
   },
   "decor_plants1": {
    "swf": "bundle:firebog.swf#decor_plants1",
@@ -1844,6 +2168,18 @@
    "street": "GDOC74759ST2IG1 Autumn Lodge",
    "placed": 1
   },
+  "tree_front_04": {
+   "swf": "bundle:leavens1.swf#tree_front_04",
+   "size": [
+    64,
+    134
+   ],
+   "sha256": "a68d95a05c6353d759bb41c8d4a9efbaf05ab5ff09d454d47dedbddb77cf18e2",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM4109NI2R640 Guillermo Gamera Way",
+   "placed": 4
+  },
   "tree_int_ladder_1": {
    "swf": "bundle:zutto1.swf#tree_int_ladder_1",
    "size": [
@@ -1891,6 +2227,102 @@
    "renderer": "ffdec raster",
    "street": "GA91SD0IEQA24L5 Goli Grabs",
    "placed": 86
+  },
+  "vine_02": {
+   "swf": "bundle:leavens1.swf#vine_02",
+   "size": [
+    84,
+    190
+   ],
+   "sha256": "a4ead43e5fc9785b90b5f1347a4d7666f98da026eb3f83570f744eeea94af4b8",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM416LNIKVLM1 Baby Steppes",
+   "placed": 4
+  },
+  "vine_05": {
+   "swf": "bundle:leavens1.swf#vine_05",
+   "size": [
+    134,
+    276
+   ],
+   "sha256": "31ce9231ededad38600123a9bcf2bd04c416fc6d4d1fe2e903a531ce965ee6fa",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM416LNIKVLM1 Baby Steppes",
+   "placed": 3
+  },
+  "vine_06": {
+   "swf": "bundle:leavens1.swf#vine_06",
+   "size": [
+    92,
+    142
+   ],
+   "sha256": "123c69479a6ccdc587154a0da7b6758acb66d7f7d0647164e7fae804030d9802",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM416LNIKVLM1 Baby Steppes",
+   "placed": 2
+  },
+  "vine_07": {
+   "swf": "bundle:leavens1.swf#vine_07",
+   "size": [
+    130,
+    152
+   ],
+   "sha256": "75d8ce7567bdbf6c801394f30f4c8afcffb2d131895076035c412ca04c293662",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM416LNIKVLM1 Baby Steppes",
+   "placed": 1
+  },
+  "vine_08": {
+   "swf": "bundle:leavens1.swf#vine_08",
+   "size": [
+    132,
+    222
+   ],
+   "sha256": "352f61586d97c349948f6d5c17242ea73da00a8379d608b06b5a28cfaf802012",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM416LNIKVLM1 Baby Steppes",
+   "placed": 7
+  },
+  "vine_09": {
+   "swf": "bundle:leavens1.swf#vine_09",
+   "size": [
+    146,
+    324
+   ],
+   "sha256": "615afb3633df54a5b27c5f3bc6e5c07d5eb88e15599f51bb181f34dccff6df3b",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GA5PPFP86NF2FOS Hell One",
+   "placed": 5
+  },
+  "vine_10": {
+   "swf": "bundle:leavens1.swf#vine_10",
+   "size": [
+    192,
+    176
+   ],
+   "sha256": "484a4d4633ebe906f515f9ed87e81fe961c2a3d16dd2b387d483e510c7ea7bb4",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GM416LNIKVLM1 Baby Steppes",
+   "placed": 3
+  },
+  "vine_11": {
+   "swf": "bundle:leavens1.swf#vine_11",
+   "size": [
+    110,
+    190
+   ],
+   "sha256": "87230f34feaad4786fa9340f2ab12e8710bd3a1d9a75e5fa8e0a456836a8c8c6",
+   "cause": "stage base art cropped: the coU export kept only the part inside the placed box, but the client scales the whole SWF stage (with the base art it buries in the ground) to the placed w x h (DecoRenderer.syncRendererWithModel); the Wayback Flipside and Guillermo Gamera Way renders show the base art",
+   "renderer": "ffdec raster",
+   "street": "GA5PPFP86NF2FOS Hell One",
+   "placed": 3
   },
   "wall_seam_separated_01a_starter": {
    "swf": "bundle:starter.swf#wall_seam_separated_01a_starter",
@@ -1974,10 +2406,6 @@
    "verdict": "fine",
    "reason": "SWF frame 1 is empty (animated effect that draws later frames); the PNG is a later frame"
   },
-  "cave_crystal_4": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
   "cave_large_rock_1": {
    "verdict": "ambiguous",
    "reason": "same rock; the PNG frame differs from the SWF stage and street placements match neither aspect; race-courses.js draws it at natural size, so the framing is left as is"
@@ -1985,110 +2413,6 @@
   "cave_large_rock_2": {
    "verdict": "ambiguous",
    "reason": "same rock; the PNG frame differs from the SWF stage and street placements match neither aspect; race-courses.js draws it at natural size, so the framing is left as is"
-  },
-  "cave_stalactite_6": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_cactus_01": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_cactus_Back_03": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_01": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_02": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_03": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_04": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_05": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_06": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_wayBack_01": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_wayBack_02": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_wayBack_03": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_wayBack_04": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_wayBack_05": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "cl2_mountains_wayBack_06": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_background_02": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_background_03": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_background_05": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_background_08": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_background_09": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_background_10": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_background_11": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_background_12": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_mid_01": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_mid_03": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "craggyMountain_mid_04": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
   },
   "door_asset_jethimadh_tower_interior_lock02": {
    "verdict": "ambiguous",
@@ -2226,45 +2550,9 @@
    "verdict": "fine",
    "reason": "animated deco (57/57 frames): frame 1 differs from the frame the PNG shows; nothing missing"
   },
-  "tree_front_04": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
   "underground_bogwillow": {
    "verdict": "ambiguous",
    "reason": "berry glows use overlay and multiply blends over transparent pixels; the PNG, FFDec raster and FFDec SVG all differ (green glow vs dark halos). Without a Flash renderer the PNG stays"
-  },
-  "vine_02": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "vine_05": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "vine_06": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "vine_07": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "vine_08": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "vine_09": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "vine_10": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
-  },
-  "vine_11": {
-   "verdict": "ambiguous",
-   "reason": "street placements are exactly half the PNG size, not the SWF stage: the PNG matches what was placed; the SWF stage holds extra base art (ix/ilmenskie). Left as is"
   },
   "waterTest": {
    "verdict": "fine",
