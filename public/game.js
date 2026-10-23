@@ -363,7 +363,8 @@ import {
   buffedRandom,
   formatBuffRemaining,
   consumeRewardBuff,
-} from './js/buffs.js?v=item-buffs-1';
+  studyBuffBlockReason,
+} from './js/buffs.js?v=item-buffs-2';
 import {
   loadContentCatalogs,
   getContentMeta,
@@ -2514,11 +2515,14 @@ function getPackUseInfo(classTsid) {
   }
   const buff = getBuffItemInfo(classTsid);
   if (buff?.def) {
+    // Yellow Crumb: only while studying and below maximum acceleration.
+    const reason = studyBuffBlockReason(buff, studyBuffContext());
     return {
-      usable: true,
+      usable: !reason,
       verb: buff.verb,
       effects: {},
       message: buff.message,
+      reason,
       buff,
     };
   }
@@ -2810,11 +2814,11 @@ function renderPackPopover(classTsid, anchor = null) {
     ${buffNote ? `<p class="pack-pop-recipes">${escapeHtml(buffNote)}</p>` : ''}
     ${collectionNote ? `<p class="pack-pop-recipes" data-musicblock-collection>${escapeHtml(collectionNote)}</p>` : ''}
     ${recipeNote ? `<p class="pack-pop-recipes">${escapeHtml(recipeNote)}</p>` : ''}
-    ${useInfo.paradise && useInfo.reason ? `<p class="pack-pop-recipes" data-paradise-block>${escapeHtml(useInfo.reason)}</p>` : ''}
+    ${(useInfo.paradise || useInfo.buff) && useInfo.reason ? `<p class="pack-pop-recipes" data-pack-use-block>${escapeHtml(useInfo.reason)}</p>` : ''}
     <div class="pack-pop-actions">
       ${musicblockDef ? `<button type="button" class="pack-pop-primary" data-pack-play>Play tune</button>` : ''}
       ${useInfo.usable ? `<button type="button" class="pack-pop-primary" data-pack-use ${useInfo.food && !useInfo.food.gate.ok ? 'disabled' : ''}>${escapeHtml(useInfo.verb)}${useInfo.singleAction ? '' : ' one'}</button>` : ''}
-      ${useInfo.paradise && !useInfo.usable ? `<button type="button" class="pack-pop-primary" data-pack-use disabled title="${escapeHtml(useInfo.reason)}">${escapeHtml(useInfo.verb)}</button>` : ''}
+      ${(useInfo.paradise || useInfo.buff) && !useInfo.usable ? `<button type="button" class="pack-pop-primary" data-pack-use disabled title="${escapeHtml(useInfo.reason)}">${escapeHtml(useInfo.verb)}</button>` : ''}
       ${useInfo.paradise ? `<button type="button" class="pack-bear-action" data-pack-eat-ticket title="${escapeHtml(PARADISE_TICKET_EAT.tooltip)}">Eat one</button>` : ''}
       ${bearActionMarkup}
       ${bearReminisceMarkup}
@@ -3380,11 +3384,18 @@ function usePackItem(classTsid) {
     }
   }
   const r = buffInfo?.def
-    ? activateBuffItem(buffState, inv, pc, classTsid, Date.now())
+    ? activateBuffItem(buffState, inv, pc, classTsid, Date.now(), { study: studyBuffContext(), dead: playerIsDead() })
     : useItem(inv, pc, classTsid);
   if (!r.ok) {
     toast(r.msgs[0] || 'Cannot use that.');
     return;
+  }
+  // Crumb of Knowledge / Crumbly Thoughts on_apply: skills_start_acceleration.
+  if (r.info?.studyAccelerationSeconds) {
+    const sped = accelerateActiveStudy(skillState, r.info.studyAccelerationSeconds, Date.now());
+    if (app?.canvas) app.canvas.dataset.buffStudyAcceleration = sped.ok ? `${sped.classTsid}:${sped.applied}` : sped.reason;
+    if (sped.completed?.length) handleSkillCompletions(sped.completed);
+    updateSkillChrome();
   }
   emitGameEvent(`${classTsid}:${String(ordinaryInfo?.verb || 'use').toLowerCase()}`);
   let foodResult = null;
@@ -16608,6 +16619,15 @@ async function startParadiseFlight(courseId, opts = {}) {
   } finally {
     paradiseStartPromise = null;
   }
+}
+
+/** skills_is_learning / skills_at_max_acceleration for the Yellow Crumb items. */
+function studyBuffContext(now = Date.now()) {
+  const active = getActiveStudy(skillState, now);
+  return {
+    learning: Boolean(active),
+    atMaxAcceleration: Boolean(active?.isAccelerated && active.acceleratedUntil >= active.endsAt),
+  };
 }
 
 /** Hell's own state (hell-feature isDead): the source's pc.is_dead. */

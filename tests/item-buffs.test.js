@@ -24,7 +24,9 @@ import {
   formatBuffRemaining,
   hasBuff,
   consumeRewardBuff,
+  studyBuffBlockReason,
 } from '../public/js/buffs.js?v=item-buffs-1';
+import { accelerateActiveStudy, createSkillState, getStudyStatus, startSkillStudy } from '../public/js/skills.js';
 import { applyRewards } from '../public/js/quests.js?v=item-buffs-1';
 import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=player-save-5';
 
@@ -44,6 +46,8 @@ describe('official item buff mappings', () => {
       'purple_flower',
       'rubeweed',
       'silvertongue',
+      'yellow_crumb_flower',
+      'essence_of_yellow_crumb',
     ]);
     for (const classTsid of Object.keys(BUFF_ITEM_CATALOG)) {
       const info = getBuffItemInfo(classTsid);
@@ -189,5 +193,74 @@ describe('buff save and client wiring', () => {
     assert.match(css, /\.buff-chip/);
     assert.match(css, /body\.buff-purple-pulse::after/);
     assert.match(game, /!state\.muted && audio\.ctx\?\.state === 'suspended'/);
+  });
+});
+
+describe('Yellow Crumb items speed up the study in progress', () => {
+  it('munch needs a study below maximum acceleration (yellow_crumb_flower.js verbs.munch)', () => {
+    const crumb = getBuffItemInfo('yellow_crumb_flower');
+    assert.equal(crumb.buffId, 'yellow_crumb_flower');
+    assert.equal(crumb.def.name, 'Crumb of Knowledge');
+    assert.equal(crumb.durationSeconds, 60);
+    assert.equal(crumb.studyAccelerationSeconds, 60);
+    assert.equal(crumb.verb, 'Munch');
+    assert.equal(crumb.message, 'You feel studious.');
+    assert.equal(crumb.effectHint, 'The Yellow Crumb Flower can help you focus.');
+    assert.equal(studyBuffBlockReason(crumb, {}), 'You must be learning a skill to munch Yellow Crumb Flower.');
+    assert.equal(
+      studyBuffBlockReason(crumb, { learning: true, atMaxAcceleration: true }),
+      'You are already learning at the maximum speed.'
+    );
+    assert.equal(studyBuffBlockReason(crumb, { learning: true }), '');
+    assert.equal(studyBuffBlockReason(getBuffItemInfo('spinach'), {}), '');
+
+    const state = createBuffState();
+    const inv = { yellow_crumb_flower: 2 };
+    const pc = { energy: 50, mood: 50 };
+    const idle = activateBuffItem(state, inv, pc, 'yellow_crumb_flower', 1000, { study: { learning: false } });
+    assert.equal(idle.ok, false);
+    assert.equal(inv.yellow_crumb_flower, 2);
+    const ok = activateBuffItem(state, inv, pc, 'yellow_crumb_flower', 1000, { study: { learning: true } });
+    assert.equal(ok.ok, true);
+    assert.equal(inv.yellow_crumb_flower, 1);
+    const again = activateBuffItem(state, inv, pc, 'yellow_crumb_flower', 2000, { study: { learning: true } });
+    assert.equal(again.msgs[0], 'The effects of eating too much of this herb could be serious!');
+    assert.equal(hasBuff(state, 'yellow_crumb_flower', 60_999), true);
+    assert.equal(hasBuff(state, 'yellow_crumb_flower', 61_000), false);
+  });
+
+  it('Crumb of Knowledge doubles study speed for one minute (skills_start_acceleration(60))', () => {
+    const skills = createSkillState();
+    startSkillStudy(skills, 'animalkinship_1', { level: 99 }, 0); // 60 s study
+    const sped = accelerateActiveStudy(skills, getBuffItemInfo('yellow_crumb_flower').studyAccelerationSeconds, 0);
+    // Capped at half the time left, like every source acceleration.
+    assert.equal(sped.applied, 30);
+    assert.equal(getStudyStatus(skills, 'animalkinship_1', 0).remainingSeconds, 30);
+  });
+
+  it('Essence of Yellow Crumb gives Crumbly Thoughts and ten minutes of acceleration', () => {
+    const essence = getBuffItemInfo('essence_of_yellow_crumb');
+    assert.equal(essence.buffId, 'crumbly_thoughts');
+    assert.equal(essence.durationSeconds, 600);
+    assert.equal(essence.studyAccelerationSeconds, 600);
+    assert.equal(essence.verb, 'Imbibe');
+    assert.equal(studyBuffBlockReason(essence, {}), 'You must be learning a skill to imbibe Essence of Yellow Crumb.');
+    const state = createBuffState();
+    const inv = { essence_of_yellow_crumb: 1 };
+    assert.equal(
+      activateBuffItem(state, inv, {}, 'essence_of_yellow_crumb', 0, { dead: true, study: { learning: true } }).msgs[0],
+      'You are too dead for that now.'
+    );
+    assert.equal(activateBuffItem(state, inv, {}, 'essence_of_yellow_crumb', 0, { study: { learning: true } }).ok, true);
+    assert.equal(
+      activateBuffItem(state, { essence_of_yellow_crumb: 1 }, {}, 'essence_of_yellow_crumb', 1, { study: { learning: true } }).msgs[0],
+      'You are already under the effects of Essence of Yellow Crumb.'
+    );
+  });
+
+  it('the pack applies the acceleration after the buff lands', () => {
+    const game = readFileSync(join(root, 'game.js'), 'utf8');
+    assert.match(game, /activateBuffItem\(buffState, inv, pc, classTsid, Date\.now\(\), \{ study: studyBuffContext\(\), dead: playerIsDead\(\) \}\)/);
+    assert.match(game, /accelerateActiveStudy\(skillState, r\.info\.studyAccelerationSeconds, Date\.now\(\)\)/);
   });
 });

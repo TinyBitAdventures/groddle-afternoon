@@ -56,7 +56,47 @@ export const BUFF_ITEM_CATALOG = Object.freeze({
     effectHint: '+5 mood, -5 energy; 5% bonus on the next quest or badge reward',
     requirements: { energy: 5 },
   },
+  // items/yellow_crumb_flower.js verbs.munch + catalog_buffs.js
+  // yellow_crumb_flower (Crumb of Knowledge, 60 s): on_apply
+  // pc.skills_start_acceleration(60), i.e. double study speed for a minute.
+  yellow_crumb_flower: {
+    buffId: 'yellow_crumb_flower',
+    verb: 'Munch',
+    itemName: 'Yellow Crumb Flower',
+    message: 'You feel studious.',
+    effectHint: 'The Yellow Crumb Flower can help you focus.',
+    activeReason: 'The effects of eating too much of this herb could be serious!',
+    requiresStudy: true,
+    studyAccelerationSeconds: 60,
+  },
+  // items/essence_of_yellow_crumb.js verbs.imbibe + catalog_buffs.js
+  // crumbly_thoughts (600 s): on_apply skills_start_acceleration(60 * 10).
+  essence_of_yellow_crumb: {
+    buffId: 'crumbly_thoughts',
+    verb: 'Imbibe',
+    itemName: 'Essence of Yellow Crumb',
+    message: 'Your thoughts have focused down into a single point. Direct application of your dangerously sharp mental acuity can pierce any problem, increasing the speed at which you can learn your current skill.',
+    effectHint: 'Drink to gain remarkable mental clarity, increasing your learning speed',
+    activeReason: 'You are already under the effects of Essence of Yellow Crumb.',
+    deadReason: 'You are too dead for that now.',
+    requiresStudy: true,
+    studyAccelerationSeconds: 600,
+  },
 });
+
+/**
+ * Munch/imbibe conditions shared by the two Yellow Crumb items: a skill must
+ * be studying and not already at maximum acceleration
+ * (skills_is_learning / skills_at_max_acceleration).
+ * @param {{ learning?: boolean, atMaxAcceleration?: boolean }} study
+ */
+export function studyBuffBlockReason(info, study = {}) {
+  if (!info?.requiresStudy) return '';
+  const verb = String(info.verb || 'use').toLowerCase();
+  if (!study.learning) return `You must be learning a skill to ${verb} ${info.itemName}.`;
+  if (study.atMaxAcceleration) return 'You are already learning at the maximum speed.';
+  return '';
+}
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, Number(value) || 0));
@@ -197,14 +237,21 @@ export function removeBuff(state, classTsid, pc = null, now = Date.now()) {
   return { ok: true, reason: 'removed', buff };
 }
 
-/** Consume one real pack item and create its official buff. */
-export function activateBuffItem(state, inv, pc, classTsid, now = Date.now()) {
+/**
+ * Consume one real pack item and create its official buff.
+ * `ctx.study` ({ learning, atMaxAcceleration }) and `ctx.dead` feed the
+ * Yellow Crumb conditions; the caller applies `info.studyAccelerationSeconds`.
+ */
+export function activateBuffItem(state, inv, pc, classTsid, now = Date.now(), ctx = {}) {
   const info = getBuffItemInfo(classTsid);
   if (!info?.def) return { ok: false, reason: 'not_buff_item', msgs: ['That item has no activatable effect.'] };
   if ((inv?.[classTsid] || 0) < 1) return { ok: false, reason: 'missing', msgs: [`No ${classTsid} in pack.`] };
+  if (info.deadReason && ctx.dead) return { ok: false, reason: 'dead', msgs: [info.deadReason] };
   if (hasBuff(state, info.buffId, now)) {
-    return { ok: false, reason: 'already_active', msgs: [`${info.def.name} is already active or waiting to begin.`] };
+    return { ok: false, reason: 'already_active', msgs: [info.activeReason || `${info.def.name} is already active or waiting to begin.`] };
   }
+  const studyBlock = studyBuffBlockReason(info, ctx.study);
+  if (studyBlock) return { ok: false, reason: 'study', msgs: [studyBlock] };
   const needsEnergy = Number(info.requirements?.energy) || 0;
   const needsMood = Number(info.requirements?.mood) || 0;
   if ((pc?.energy || 0) < needsEnergy) return { ok: false, reason: 'energy', msgs: [`You need ${needsEnergy} energy to ${info.verb.toLowerCase()} that.`] };
