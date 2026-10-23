@@ -674,7 +674,7 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals.",
+   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals. A Butler arrives in a box to greet you home and hold what neighbours leave.",
    "spot": "mailbox",
    "evidence": [
     "public/js/homes.js",
@@ -1805,9 +1805,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 292,
+  "commits": 293,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Petting a piggy keeps it happy that day, and piggies you own can starve"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1922,14 +1927,9 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Tower floors marked L, 1, 2 on the elevator, and new floors take you up to the Workbench"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Juju Bandits no longer appear on ledges they can't walk down from"
    }
   ]
  },
- "tests": 176,
+ "tests": 177,
  "generatedAt": "2026-10-23"
 }

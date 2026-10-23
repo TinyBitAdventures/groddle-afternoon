@@ -123,7 +123,8 @@ export const STONE_TEXT = Object.freeze({
   optedOut: "You've been opted out - you will no longer receive random visitors to your street.",
   lowLevel: 'You need to reach level 4 first.',
   noHome: 'You need a home street first.',
-  // Two of the three source VOG variants: the third names a butler, which the remake has none of.
+  noButler: "You haven't yet unboxed your butler in your front yard.",
+  // visiting_stone.js onPlayerCollision: vog before you have a Butler, vogHigh after.
   vog: [
     'Hmm! Over there, near the end of the street … it’s a Visiting Stone!',
     'Visiting Stones can instantly transport you to the home streets of people looking for more visitors.',
@@ -138,7 +139,11 @@ export const STONE_TEXT = Object.freeze({
   extra: 'Visiting Stones can typically be found in "dead-end locations" of most regions.',
 });
 
-/** The remake's stand-in for the visiting butler named in the opt-in reply. */
+/**
+ * The opt-in reply names your Butler (butler.getLabel(pc)); before the Butler
+ * feature existed the remake said "your mailbox", and it still does if a
+ * caller has no Butler to name.
+ */
 export const STONE_BUTLER_STANDIN = 'your mailbox';
 
 // ---------------------------------------------------------------------------
@@ -408,18 +413,25 @@ export function stoneVerbs(ctx = {}) {
 }
 
 /**
- * visiting_can_opt_in: level 4 and a home street. The source also wants three
- * cultivated items and an unboxed butler; the remake has no butler, and
- * cultivation lives in the homes feature, so those two checks are skipped.
+ * visiting_can_opt_in: level 4, a home street and an unboxed Butler
+ * (ctx.hasButler; callers that leave it out skip the check). The source also
+ * wants three cultivated items; cultivation lives in the homes feature, so
+ * that check is skipped.
  */
 export function canOptIn(ctx = {}) {
   if (whole(ctx.level) < STONE_LEVEL) return { ok: false, error: 'low_level', reason: STONE_TEXT.lowLevel };
   if (!ctx.homeOwned) return { ok: false, error: 'no_home', reason: STONE_TEXT.noHome };
+  if (ctx.hasButler === false) return { ok: false, error: 'no_butler', reason: STONE_TEXT.noButler };
   return { ok: true };
 }
 
-/** onPlayerCollision VOG lines (once per player), split on the source "//". */
+/**
+ * onPlayerCollision VOG lines (once per player), split on the source "//".
+ * The source picks by pc.has_butler(); without that (ctx.hasButler unset)
+ * level 4 and a home stand in.
+ */
 export function stoneVog(ctx = {}) {
+  if (typeof ctx.hasButler === 'boolean') return ctx.hasButler ? STONE_TEXT.vogHigh : STONE_TEXT.vog;
   return whole(ctx.level) >= STONE_LEVEL && ctx.homeOwned ? STONE_TEXT.vogHigh : STONE_TEXT.vog;
 }
 

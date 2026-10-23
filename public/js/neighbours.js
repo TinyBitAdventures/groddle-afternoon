@@ -13,9 +13,15 @@
  * birdhouse, or light the lanterns. Doing it the first time brings a thank-you
  * letter by mail, and a note posted in their mailbox gets a reply.
  *
- * Opting in at a stone ("get visitors") makes one neighbour drop by your own
- * home street each new game day and leave a letter with a small gift. Every
- * reward and line here is remake design: the source had no solo neighbours.
+ * Opting in at a stone ("get visitors", which needs an unboxed Butler as
+ * visiting_can_opt_in did) makes one neighbour drop by your own home street
+ * each new game day. They hand the gift and their line to your Butler, as a
+ * visiting player did with leave_package and leave_message (bag_butler.js),
+ * and the Butler gives them to you ("packages" / "messages"). Without a Butler,
+ * or when it can't carry any more, the visit arrives as a letter in the
+ * mailbox. Thank-you letters and note replies come by post, so they stay mail.
+ * Every reward and line here is remake design: the source had no solo
+ * neighbours.
  */
 
 export const NEIGHBOUR_SCENE_PREFIX = 'NB_';
@@ -281,7 +287,9 @@ export function postNoteReply(state, neighbour, note, ctx = {}) {
 
 /**
  * Random visitors (get visitors): one neighbour drops by per new game day while
- * opted in and the player has a home. Returns the letter, or null.
+ * opted in and the player has a home. Returns the letter, or null; the
+ * street-furniture feature hands it to the Butler (butlerApi.receiveVisitor)
+ * before falling back to engine.deliverMail.
  */
 export function visitorLetter(state, ctx = {}) {
   if (!state.allowVisits || !ctx.homeOwned || !ctx.dayKey || state.lastVisitorDay === ctx.dayKey) return null;

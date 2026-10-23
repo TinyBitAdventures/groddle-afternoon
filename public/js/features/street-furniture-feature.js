@@ -111,6 +111,7 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-1';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=furniture-1';
 import { textureFromUrl } from '../textures.js';
+import { butlerApi } from './butler-feature.js?v=butler-1';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';
@@ -176,6 +177,16 @@ function dayKey() {
 function homeInfo(engine) {
   const ctx = engine.homeContext?.() || {};
   return { owned: engine.homeOwned ? engine.homeOwned() : ctx.owned === true, inHome: ctx.inHome === true };
+}
+
+/**
+ * Butler hand-off (items/bag_butler.js, visiting_stone.js, inc_visiting.js):
+ * the opt-in needs an unboxed Butler and its reply names it; the VOG picks by
+ * has_butler; drop-by visitors leave their gift and line with it. Stone QA
+ * routes (stonedemo) skip the Butler check so they run without one.
+ */
+function hasButler(engine) {
+  return butlerApi.owned() || Boolean(engine.param?.('stonedemo'));
 }
 
 function learned(engine) {
@@ -623,7 +634,7 @@ function visitBlock(engine) {
 
 function stoneVerbList(engine, entity) {
   const home = homeInfo(engine);
-  const verbs = stoneVerbs({ level: engine.pc.level, homeOwned: home.owned === true, allowVisits: nb.allowVisits, blocked: visitBlock(engine) });
+  const verbs = stoneVerbs({ level: engine.pc.level, homeOwned: home.owned === true, hasButler: hasButler(engine), allowVisits: nb.allowVisits, blocked: visitBlock(engine) });
   if (!entity.home) return verbs;
   const back = nb.returnTo ? 'Back to where you came from' : 'Back into Ur';
   return [
@@ -659,7 +670,7 @@ function askVisit(engine, entity, opts = {}) {
 
 function askOptIn(engine, entity) {
   const home = homeInfo(engine);
-  const gate = canOptIn({ level: engine.pc.level, homeOwned: home.owned === true });
+  const gate = canOptIn({ level: engine.pc.level, homeOwned: home.owned === true, hasButler: hasButler(engine) });
   if (!gate.ok) return engine.toast(gate.reason, 2400);
   engine.offerQuestDialogue({
     title: 'Visiting Stone',
@@ -673,7 +684,7 @@ function askOptIn(engine, entity) {
     onAccept: () => {
       nb.allowVisits = true;
       nb.lastVisitorDay = dayKey();
-      engine.say(entity.target, STONE_TEXT.optInDone(STONE_BUTLER_STANDIN), 6000);
+      engine.say(entity.target, STONE_TEXT.optInDone(butlerApi.label() || STONE_BUTLER_STANDIN), 6000);
       engine.pushActivity(STONE_TEXT.optedIn);
       lastAction = 'stone:opt_in';
       engine.save();
@@ -705,7 +716,7 @@ function checkStoneVog(engine) {
   if (!stone) return;
   seenStone = true;
   const home = homeInfo(engine);
-  const lines = stoneVog({ level: engine.pc.level, homeOwned: home.owned === true });
+  const lines = stoneVog({ level: engine.pc.level, homeOwned: home.owned === true, hasButler: butlerApi.owned() });
   lines.forEach((line, i) => vogTimers.push(setTimeout(() => engine.toast(line, 3600), i * 3800)));
   lastAction = 'stone:vog';
   engine.save();
@@ -1048,7 +1059,8 @@ function deliverVisitor(engine) {
   const home = homeInfo(engine);
   const letter = visitorLetter(nb, { dayKey: dayKey(), homeOwned: home.owned === true, now: Date.now() });
   if (!letter) return;
-  engine.deliverMail?.(letter);
+  // With a Butler the neighbour leaves the gift and the line with it (leave_package + message).
+  if (!butlerApi.receiveVisitor(engine, letter)) engine.deliverMail?.(letter);
   lettersSent += 1;
   engine.pushActivity(`${letter.sender} stopped by your home street.`);
   engine.save();
@@ -1217,6 +1229,7 @@ export const streetFurnitureFeature = {
   id: FURNITURE_FEATURE_ID,
 
   init(engine) {
+    butlerApi.setVisitState(() => nb.allowVisits, () => canOptIn({ level: engine.pc.level, homeOwned: homeInfo(engine).owned === true, hasButler: butlerApi.owned() }).ok);
     loader = createSheetLoader(engine.PIXI);
     ensureItems();
     loadWildlifeCatalog();
