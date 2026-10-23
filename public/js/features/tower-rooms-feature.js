@@ -1,7 +1,9 @@
 /**
  * The rebuilt Jethimadh Tower Base rooms as a feature module (see
  * js/feature-host.js): Room 15 and the Ventilation Room (js/tower-rooms.js),
- * Rooms 4, 8 and 16 (js/tower-challenge-rooms.js). The rooms themselves are
+ * Rooms 4, 8 and 16 (js/tower-challenge-rooms.js), and the Mid tower's Stairs
+ * and Mezzanine (js/tower-mid-rooms.js; their Greeterbot and teleporters are
+ * features/mid-tower-feature.js). The rooms themselves are
  * ordinary street JSON written by tools/build-tower-rooms.mjs, so doors,
  * platforms, walls, ladders and the TowerSpot boxes
  * (features/home-tower-feature.js) need nothing here. This file adds what a
@@ -38,7 +40,10 @@ import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { DOOR_TEXT, doorKeyClass, insideBottomRect } from '../doors.js';
 import { textureFromUrl } from '../textures.js';
 import { ROOM_15_TSID } from '../tower-rooms.js?v=tower-rooms-1';
-import { anyTowerRoomByTsid } from '../tower-challenge-rooms.js?v=challenge-rooms-1';
+import { anyTowerRoomByTsid as baseRoomByTsid } from '../tower-challenge-rooms.js?v=challenge-rooms-2';
+import { midTowerRoomByTsid } from '../tower-mid-rooms.js?v=mid-tower-1';
+
+const anyTowerRoomByTsid = (tsid) => baseRoomByTsid(tsid) || midTowerRoomByTsid(tsid);
 
 export const TOWER_ROOMS_FEATURE_ID = 'tower-rooms';
 const KEY_CHECK_MS = 250;

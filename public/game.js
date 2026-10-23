@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-15';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-16';
 import {
   actionDurationFor,
   createTimedAction,
@@ -7716,6 +7716,10 @@ const engine = {
       cancelable: true,
     });
   },
+  /** Enter the Museum of the Rook instance (as ?questdemo=rookmuseum does): the Mezzanine Greeterbot (mid-tower-feature). */
+  startRookMuseum: (opts = {}) => startRookMuseum(opts),
+  /** A scripted NPC conversation: beats, onComplete; cancelable adds a second button (primaryLabel / cancelLabel, onCancel). */
+  scriptedDialogue: (opts) => openScriptedQuestDialogue(opts),
   stopFollowing: () => stopCompanionFollowForInstance(),
   transientInstance: () => anyTransientInstance() || engine.inScene() || Boolean(engine.instanceHold),
   homeContext() {
@@ -14833,6 +14837,10 @@ function beginRookMuseumOrientation() {
       },
     });
   if (questState.completed.includes(ROOK_HALL_START_QUEST_ID)) {
+    // Part one done but part two left unfinished: the Greeterbot offers it again (rook_hall.js).
+    if (!questState.active?.[ROOK_HALL_QUEST_ID] && !questState.completed.includes(ROOK_HALL_QUEST_ID)) {
+      assignQuest(questState, ROOK_HALL_QUEST_ID, { ignorePrereq: true });
+    }
     beginTourDialogue();
     return;
   }
@@ -14859,8 +14867,9 @@ function finishRookMuseumQuest() {
   if (active) active.progress.learn_rook = 1;
   const completed = active ? completeQuest(questState, ROOK_HALL_QUEST_ID, pc) : null;
   playSfx('quest', { volume: 0.7 });
-  pushActivity('You completed It’s Educational II. +400 iMG.');
-  toast('Museum training complete · +400 iMG', 4200);
+  // A return visit (hall_repeat) reviews the exhibits without a second reward.
+  pushActivity(completed?.ok ? 'You completed It’s Educational II. +400 iMG.' : 'You reviewed the Museum of the Rook.');
+  toast(completed?.ok ? 'Museum training complete · +400 iMG' : 'Museum review complete', 4200);
   if (app?.canvas) {
     app.canvas.dataset.rookMuseumReward = '400';
     app.canvas.dataset.rookMuseumQuestCompleted = completed?.ok ? '1' : '0';

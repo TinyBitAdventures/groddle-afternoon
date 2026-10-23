@@ -1409,9 +1409,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 260,
+  "commits": 261,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "fix",
+    "text": "Apartment towers, basements, machine rooms and other indoor streets spawn only what was archived there"
+   },
    {
     "date": "2026-10-22",
     "kind": "fix",
@@ -1526,14 +1531,9 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "Sound is on by default and the game remembers if you muted it"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Harvesting a tree plays its sound once instead of on a loop"
    }
   ]
  },
- "tests": 167,
+ "tests": 168,
  "generatedAt": "2026-10-22"
 }

@@ -1,10 +1,11 @@
 /**
  * Write the rebuilt Jethimadh Tower Base rooms (public/js/tower-rooms.js:
  * Room 15 and the Ventilation Room; public/js/tower-challenge-rooms.js:
- * Rooms 4, 8 and 16) as street JSON, list them in assets/streets/index.json, and link the corridor
- * doors that lead to them (connect.street + arrive), the way
+ * Rooms 4, 8 and 16; public/js/tower-mid-rooms.js: the Stairs and the Mezzanine of Jethimadh
+ * Tower: Mid) as street JSON, list them in assets/streets/index.json, and link the corridor
+ * doors (and Tower St West's tower door) that lead to them (connect.street + arrive), the way
  * build-street-navigation.mjs links doors to imported streets. Also links the
- * rooms' own doors back out. Safe to re-run; run it again after a street
+ * rooms' own doors back out and resolves teleporter boxes' arrivals. Safe to re-run; run it again after a street
  * re-import or a build-street-navigation.mjs pass.
  *
  *   node tools/build-tower-rooms.mjs          write
@@ -17,9 +18,13 @@ import { fileURLToPath } from 'node:url';
 import { arrivalInTarget, streetAliases } from '../public/js/location-navigation.js';
 import { TOWER_ROOM_DOOR_LINKS } from '../public/js/tower-rooms.js';
 import { ALL_TOWER_ROOMS, CHALLENGE_ROOM_DOOR_LINKS, anyTowerRoomIndexEntry, anyTowerRoomStreet } from '../public/js/tower-challenge-rooms.js';
+import { MID_TOWER_DOOR_LINKS, MID_TOWER_ROOMS, midTowerIndexEntry, midTowerRoomStreet } from '../public/js/tower-mid-rooms.js';
 
-const ROOMS = ALL_TOWER_ROOMS;
-const LINKS = [...TOWER_ROOM_DOOR_LINKS, ...CHALLENGE_ROOM_DOOR_LINKS];
+const ROOMS = [...ALL_TOWER_ROOMS, ...MID_TOWER_ROOMS];
+const LINKS = [...TOWER_ROOM_DOOR_LINKS, ...CHALLENGE_ROOM_DOOR_LINKS, ...MID_TOWER_DOOR_LINKS];
+const MID = new Set(MID_TOWER_ROOMS.map((room) => room.tsid));
+const indexEntry = (room) => (MID.has(room.tsid) ? midTowerIndexEntry(room) : anyTowerRoomIndexEntry(room));
+const roomStreet = (room) => (MID.has(room.tsid) ? midTowerRoomStreet(room) : anyTowerRoomStreet(room));
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -51,7 +56,7 @@ function put(file, value) {
 // 1. Index rows first, so the rooms resolve as door targets.
 let indexChanged = false;
 for (const room of ROOMS) {
-  const row = anyTowerRoomIndexEntry(room);
+  const row = indexEntry(room);
   if (JSON.stringify(index.streets[room.tsid]) !== JSON.stringify(row)) {
     index.streets[room.tsid] = row;
     indexChanged = true;
@@ -59,7 +64,7 @@ for (const room of ROOMS) {
 }
 
 // 2. The rooms, with their own doors linked to the corridors / street.
-const rooms = new Map(ROOMS.map((room) => [room.tsid, anyTowerRoomStreet(room)]));
+const rooms = new Map(ROOMS.map((room) => [room.tsid, roomStreet(room)]));
 for (const street of rooms.values()) loaded.set(street.tsid, street);
 for (const street of rooms.values()) {
   for (const door of street.doors) {
@@ -68,6 +73,14 @@ for (const street of rooms.values()) {
     const arrive = key ? arrivalInTarget(streetFor(key), door.connect.x, door.connect.y) : null;
     if (arrive) door.connect.arrive = { x: arrive.x, y: arrive.y };
     else delete door.connect.arrive;
+  }
+  for (const box of street.boxes || []) {
+    if (!box.teleport) continue;
+    const key = resolveKey(box.teleport.tsid);
+    const arrive = key ? arrivalInTarget(streetFor(key), box.teleport.x, box.teleport.y) : null;
+    if (!arrive?.snapped) throw new Error(`${street.tsid} ${box.id}: no floor at ${box.teleport.x},${box.teleport.y} in ${box.teleport.tsid}`);
+    box.teleport.street = key;
+    box.teleport.arrive = { x: arrive.x, y: arrive.y };
   }
   put(`${street.tsid}.json`, street);
 }

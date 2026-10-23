@@ -12917,6 +12917,24 @@
       "platforms": 116,
       "decos": 28,
       "reconstructed": true
+    },
+    "GIFFUV4ATQ72I6D": {
+      "label": "Stairs",
+      "file": "assets/streets/GIFFUV4ATQ72I6D.json",
+      "hubId": "96",
+      "hubName": "Jethimadh Tower: Mid",
+      "platforms": 77,
+      "decos": 44,
+      "reconstructed": true
+    },
+    "GIFGJ2246R72LJL": {
+      "label": "Mezzanine",
+      "file": "assets/streets/GIFGJ2246R72LJL.json",
+      "hubId": "96",
+      "hubName": "Jethimadh Tower: Mid",
+      "platforms": 4,
+      "decos": 34,
+      "reconstructed": true
     }
   }
 }

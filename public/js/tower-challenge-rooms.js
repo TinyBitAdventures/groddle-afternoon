@@ -25,7 +25,8 @@
  * jethimadh_frame_*, the corridors' ladder and decor_plants pieces,
  * door_asset_jethimadh_int); no pixels from screenshots or video.
  *
- * tools/build-tower-rooms.mjs writes all five rooms' street JSON.
+ * tools/build-tower-rooms.mjs writes all five rooms' street JSON. The shell,
+ * ladder, plaque, lantern and wall helpers are exported for js/tower-mid-rooms.js.
  */
 
 import { stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=tower-rooms-1';
@@ -34,7 +35,7 @@ export const ROOM_4_TSID = 'GIF1Q6PMN7123NQ';
 export const ROOM_8_TSID = 'GIF1FHA10312KLV';
 export const ROOM_16_TSID = 'GTJ11V9DK812UNL';
 
-const DOOR = { w: 196, h: 214, sprite: 'door_asset_jethimadh_int' };
+export const DOOR = { w: 196, h: 214, sprite: 'door_asset_jethimadh_int' };
 const LADDER_W = 50;
 /**
  * Bounds bottom: the world runs 300 px under y 0 (400+ under each floor), the
@@ -44,7 +45,7 @@ const LADDER_W = 50;
  */
 const BELOW_FLOOR = 300;
 
-const flat = (id, x1, x2, y, why, pc = -1) => ({ id: `plat_${id}`, x1: Math.round(x1), y1: Math.round(y), x2: Math.round(x2), y2: Math.round(y), pc_perm: pc, why });
+export const flat = (id, x1, x2, y, why, pc = -1) => ({ id: `plat_${id}`, x1: Math.round(x1), y1: Math.round(y), x2: Math.round(x2), y2: Math.round(y), pc_perm: pc, why });
 
 /** The floor under x: the lowest walkable surface (world y, largest). */
 export function floorY(platforms, x) {
@@ -61,7 +62,7 @@ export function floorY(platforms, x) {
 }
 
 /** Collect a room's platforms and decos from steps pieces and plain rows. */
-function collector() {
+export function collector() {
   const platforms = [];
   const decos = [];
   const add = (piece) => {
@@ -77,7 +78,7 @@ function collector() {
  * backdrops, their shadow, frame caps at both ends, frame walls top and
  * bottom), scaled to the room's bounds.
  */
-function shell(bounds) {
+export function shell(bounds) {
   const { l, r, t, b } = bounds;
   const cx = (l + r) / 2;
   const sx = (r - l) / 2000;
@@ -136,7 +137,7 @@ function climb(c, id, steps, why) {
 }
 
 /** A ladder (x centre, y bottom, h up) and the corridors' ladder art up it. */
-function ladder(c, id, x, bottom, top, why) {
+export function ladder(c, id, x, bottom, top, why) {
   const h = bottom - top;
   const segs = Math.max(1, Math.round((h - 40) / 198));
   for (let i = 0; i < segs; i += 1) {
@@ -147,14 +148,14 @@ function ladder(c, id, x, bottom, top, why) {
 }
 
 /** The door plaque (jethimadh_int_door_sign + a blank firebog sign with painted text). */
-function plaque(c, x, y, text) {
+export function plaque(c, x, y, text) {
   c.decos.push({ sprite: 'jethimadh_int_door_sign', x, y, w: 188, h: 110, z: 11, r: 0, layer: 'mg' });
   c.decos.push({ sprite: 'firebog_sign_blank', x, y: y - 17, w: 138, h: 80, z: 16, r: 0, layer: 'mg', signText: text });
 }
 
-const lantern = (x, y, big = false) => ({ sprite: 'jethimadh_int_lantern_1', x, y, w: big ? 353 : 300, h: big ? 533 : 450, z: 3, r: 0, layer: 'fg' });
+export const lantern = (x, y, big = false) => ({ sprite: 'jethimadh_int_lantern_1', x, y, w: big ? 353 : 300, h: big ? 533 : 450, z: 3, r: 0, layer: 'fg' });
 
-const barriersFor = (bounds, id) => [
+export const barriersFor = (bounds, id) => [
   { id: `wall_${id}_left`, x: bounds.l + 32, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
   { id: `wall_${id}_right`, x: bounds.r - 32, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Chamber end.' },
 ];
