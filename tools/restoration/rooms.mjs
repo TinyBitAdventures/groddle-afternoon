@@ -56,15 +56,15 @@ export const ROOM_NOTES = Object.freeze({
     about: "Child's Play and Word Up shrank you into Mr. Block's playroom. First you bring him something starting with his letter, then you spin letter blocks into as many words as you can.",
     play: "Give Mr. Block an item whose name starts with his letter. In Word Up, spin three letter blocks for three minutes; the more of the 24 words you find, the bigger the bonus. A plush tea party carries on in the corner.",
     source: "The letter rule, the 24-word list, the reward tiers at 3, 10 and 20 words, and the tea party's exact lines.",
-    rebuilt: 'The playroom shares the clean vector room built for Four Letter Words, with the recovered letter-block and Mr. Block art.',
+    rebuilt: "The room's geometry was lost; players' Snaps show a giant child's bedroom, so it is furnished with Tiny Speck's own Kid's Room set (bed, panda, tea party, crayons, sneaker) around the recovered letter blocks and Mr. Block.",
     footage: [],
   },
   rube_yard: {
     tagline: "Catch ten Wrizzards hiding in The Rube's yard.",
     about: "The Wrizzards and The Rube had you search the mysterious trader's yard for ten escaped Wrizzards.",
-    play: "Look behind crates, barrels and the log pile and click each Wrizzard; it hops back into The Rube's jar.",
+    play: "Search the junk garden (behind the toadstool, the jars, the tree roots, the bird bath and the rook skull) and click each Wrizzard; it hops back into The Rube's jar.",
     source: 'The five-minute limit, the ten-Wrizzard counter and the 500 iMG / 500 currants / 100 mood reward.',
-    rebuilt: "Neither the yard nor any Wrizzard art survives. The yard is built from recovered clutter, and the Wrizzards are lizard decos in a wizard hat.",
+    rebuilt: "The yard's geometry and the Wrizzard art were lost. Two players' Snaps show a dusky junk garden, so it is dressed with Tiny Speck's own Groddle and Firebog decos; the Wrizzards are lizard decos in a wizard hat.",
     footage: [],
   },
   juju_camp: {
@@ -160,7 +160,7 @@ export const ROOM_NOTES = Object.freeze({
     about: "Operation: Grow sent you to Mab's forgotten bog fields to make the blue grow again.",
     play: "Tend the seven gloomy patches; each tends its neighbours too. Mab's note on the bank shows the only answer.",
     source: 'The spawn point, five-minute limit, flags and rewards.',
-    rebuilt: 'No recording was found, so the puzzle is designed from the quest text with recovered bog plants and patches.',
+    rebuilt: "The puzzle is designed from the quest text; the field is dressed from a player's Snap with Firebog's own stalks, which turn blue as they bloom.",
     footage: [],
   },
   gwendolyn: {
