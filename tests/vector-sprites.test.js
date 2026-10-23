@@ -4,10 +4,10 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HIRES_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeSource } from '../public/js/sprite-hires.js';
+import { HIRES_SPRITES, SPLIT_SPRITES, hiresSpriteUrl, installHiresSprites, upgradeSource } from '../public/js/sprite-hires.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -52,14 +52,21 @@ describe('3x vector sprite sheets', () => {
 
   it('the list matches the @3x sheets on disk and the pipeline results', () => {
     const ok = Object.entries(results).filter(([, r]) => r.status === 'ok');
-    assert.deepEqual(ok.map(([p]) => p).sort(), [...HIRES_SPRITES.keys()].sort());
-    // Each pipeline sheet has exactly its listed 3x file beside it (no stale
-    // .png next to a .webp, nothing left behind by a rejected sheet).
+    assert.deepEqual(ok.filter(([, r]) => !r.parts).map(([p]) => p).sort(), [...HIRES_SPRITES.keys()].sort());
+    assert.deepEqual(ok.filter(([, r]) => r.parts).map(([p]) => p).sort(), [...SPLIT_SPRITES.keys()].sort());
+    // Each pipeline sheet has exactly its listed 3x file (or parts) beside it
+    // (no stale .png next to a .webp, nothing left by a rejected sheet).
     for (const [path, r] of Object.entries(results)) {
       const stem = path.replace(/\.(png|webp)$/, '');
-      const found = ['png', 'webp'].map((ext) => `${stem}@3x.${ext}`).filter((f) => existsSync(join(pub, f)));
-      assert.deepEqual(found, r.status === 'ok' ? [r.hires] : [], path);
-      if (r.status === 'ok') assert.equal(HIRES_SPRITES.get(path), r.hires, path);
+      const dir = dirname(join(pub, path));
+      const base = stem.split('/').pop();
+      const found = readdirSync(dir)
+        .filter((f) => f === `${base}@3x.png` || f === `${base}@3x.webp` || (f.startsWith(`${base}.p`) && /^\d+@3x\.(png|webp)$/.test(f.slice(base.length + 2))))
+        .map((f) => `${dirname(path)}/${f}`)
+        .sort();
+      const want = r.status !== 'ok' ? [] : r.parts ? r.parts.map((p) => p.hires).sort() : [r.hires];
+      assert.deepEqual(found, want, path);
+      if (r.status === 'ok' && !r.parts) assert.equal(HIRES_SPRITES.get(path), r.hires, path);
     }
   });
 

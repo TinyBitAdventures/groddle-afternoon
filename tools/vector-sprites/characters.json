@@ -128,23 +128,104 @@
    {"path": "assets/sprites/quest-rooms/juju_camp/grandma_talk.png", "label": "talk", "fw": 138, "fh": 135, "cols": 7, "frames": 67},
    {"path": "assets/sprites/quest-rooms/juju_camp/grandma_angry.png", "label": "angry", "fw": 138, "fh": 135, "cols": 7, "frames": 126}
   ] },
-  {"name": "juju-red", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": null}, "sheets": [
+  {"name": "juju-red", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": null, "red_leg_right": "red_leg_left", "red_leg_left": "red_leg_right"}, "record": {"clips": ["JuJuAnimation", "red_face", "red_hand_left", "red_hand_right"]}, "sheets": [
    {"path": "assets/sprites/quest-rooms/juju_camp/bandit_red_spawn.png", "label": "spawn", "fw": 240, "fh": 254, "cols": 4, "frames": 23},
-   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_red_walk.png", "label": "walk", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_red_walk.png", "label": "walk", "shift": 8, "fw": 240, "fh": 254, "cols": 4, "frames": 16},
    {"path": "assets/sprites/quest-rooms/juju_camp/bandit_red_walk_end.png", "label": "walk_end", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
    {"path": "assets/sprites/quest-rooms/juju_camp/bandit_red_shrink.png", "label": "shrink", "fw": 240, "fh": 254, "cols": 4, "frames": 21}
   ] },
-  {"name": "juju-green", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": null, "red_hand_right": "green_hand_right", "red_arm_right": "green_arm_right", "red_face": "green_face", "red_Body": "green_Body", "red_leg_right": "green_leg_right", "red_leg_left": "green_leg_left", "red_hand_left": "green_hand_left", "red_arm_left": "green_arm_left"}, "sheets": [
+  {"name": "juju-green", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": null, "red_hand_right": "green_hand_right", "red_arm_right": "green_arm_right", "red_face": "green_face", "red_Body": "green_Body", "red_leg_right": "green_leg_left", "red_leg_left": "green_leg_right", "red_hand_left": "green_hand_left", "red_arm_left": "green_arm_left"}, "record": {"clips": ["JuJuAnimation", "green_face", "green_hand_left", "green_hand_right"]}, "sheets": [
    {"path": "assets/sprites/quest-rooms/juju_camp/bandit_green_spawn.png", "label": "spawn", "fw": 240, "fh": 254, "cols": 4, "frames": 23},
-   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_green_walk.png", "label": "walk", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_green_walk.png", "label": "walk", "shift": 8, "fw": 240, "fh": 254, "cols": 4, "frames": 16},
    {"path": "assets/sprites/quest-rooms/juju_camp/bandit_green_walk_end.png", "label": "walk_end", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
    {"path": "assets/sprites/quest-rooms/juju_camp/bandit_green_shrink.png", "label": "shrink", "fw": 240, "fh": 254, "cols": 4, "frames": 21}
   ] },
-  {"name": "juju-yellow", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": null, "red_hand_right": "yellow_hand_right", "red_arm_right": "yellow_arm_right", "red_face": "yellow_face", "red_Body": "yellow_Body", "red_leg_right": "yellow_leg_right", "red_leg_left": "yellow_leg_left", "red_hand_left": "yellow_hand_left", "red_arm_left": "yellow_arm_left"}, "sheets": [
+  {"name": "juju-yellow", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": null, "red_hand_right": "yellow_hand_right", "red_arm_right": "yellow_arm_right", "red_face": "yellow_face", "red_Body": "yellow_Body", "red_leg_right": "yellow_leg_left", "red_leg_left": "yellow_leg_right", "red_hand_left": "yellow_hand_left", "red_arm_left": "yellow_arm_left"}, "record": {"clips": ["JuJuAnimation", "yellow_face", "yellow_hand_left", "yellow_hand_right"]}, "sheets": [
    {"path": "assets/sprites/quest-rooms/juju_camp/bandit_yellow_spawn.png", "label": "spawn", "fw": 240, "fh": 254, "cols": 4, "frames": 23},
-   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk.png", "label": "walk", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
+   {"path": "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk.png", "label": "walk", "shift": 8, "fw": 240, "fh": 254, "cols": 4, "frames": 16},
    {"path": "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk_end.png", "label": "walk_end", "fw": 240, "fh": 254, "cols": 4, "frames": 16},
    {"path": "assets/sprites/quest-rooms/juju_camp/bandit_yellow_shrink.png", "label": "shrink", "fw": 240, "fh": 254, "cols": 4, "frames": 21}
+  ] },
+  {"name": "juju-bandit-red-blue", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": "blue_bandana", "red_leg_right": "red_leg_left", "red_leg_left": "red_leg_right"}, "record": {"clips": ["JuJuAnimation", "red_face", "red_hand_left", "red_hand_right"]}, "sheets": [
+   {"path": "assets/sprites/juju_bandit/juju_red_blue_spawn.webp", "label": "spawn", "fw": 182, "fh": 219, "cols": 8, "frames": 23},
+   {"path": "assets/sprites/juju_bandit/juju_red_blue_walk.webp", "label": "walk", "shift": 8, "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_red_blue_walk_end.webp", "label": "walk_end", "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_red_blue_idle1.webp", "label": "idle1", "fw": 95, "fh": 102, "cols": 8, "frames": 60},
+   {"path": "assets/sprites/juju_bandit/juju_red_blue_idle2.webp", "label": "idle2", "fw": 95, "fh": 102, "cols": 8, "frames": 75},
+   {"path": "assets/sprites/juju_bandit/juju_red_blue_swipe.webp", "label": "swipe", "fw": 114, "fh": 102, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/juju_bandit/juju_red_blue_shrink.webp", "label": "shrink", "fw": 182, "fh": 219, "cols": 8, "frames": 21}
+  ] },
+  {"name": "juju-bandit-red-black", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": "black_bandana", "red_leg_right": "red_leg_left", "red_leg_left": "red_leg_right"}, "record": {"clips": ["JuJuAnimation", "red_face", "red_hand_left", "red_hand_right"]}, "sheets": [
+   {"path": "assets/sprites/juju_bandit/juju_red_black_spawn.webp", "label": "spawn", "fw": 182, "fh": 219, "cols": 8, "frames": 23},
+   {"path": "assets/sprites/juju_bandit/juju_red_black_walk.webp", "label": "walk", "shift": 8, "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_red_black_walk_end.webp", "label": "walk_end", "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_red_black_idle1.webp", "label": "idle1", "fw": 95, "fh": 102, "cols": 8, "frames": 60},
+   {"path": "assets/sprites/juju_bandit/juju_red_black_idle2.webp", "label": "idle2", "fw": 95, "fh": 102, "cols": 8, "frames": 75},
+   {"path": "assets/sprites/juju_bandit/juju_red_black_swipe.webp", "label": "swipe", "fw": 114, "fh": 102, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/juju_bandit/juju_red_black_shrink.webp", "label": "shrink", "fw": 182, "fh": 219, "cols": 8, "frames": 21}
+  ] },
+  {"name": "juju-bandit-red-red", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_leg_right": "red_leg_left", "red_leg_left": "red_leg_right"}, "record": {"clips": ["JuJuAnimation", "red_face", "red_hand_left", "red_hand_right"]}, "sheets": [
+   {"path": "assets/sprites/juju_bandit/juju_red_red_spawn.webp", "label": "spawn", "fw": 182, "fh": 219, "cols": 8, "frames": 23},
+   {"path": "assets/sprites/juju_bandit/juju_red_red_walk.webp", "label": "walk", "shift": 8, "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_red_red_walk_end.webp", "label": "walk_end", "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_red_red_idle1.webp", "label": "idle1", "fw": 95, "fh": 102, "cols": 8, "frames": 60},
+   {"path": "assets/sprites/juju_bandit/juju_red_red_idle2.webp", "label": "idle2", "fw": 95, "fh": 102, "cols": 8, "frames": 75},
+   {"path": "assets/sprites/juju_bandit/juju_red_red_swipe.webp", "label": "swipe", "fw": 114, "fh": 102, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/juju_bandit/juju_red_red_shrink.webp", "label": "shrink", "fw": 182, "fh": 219, "cols": 8, "frames": 21}
+  ] },
+  {"name": "juju-bandit-green-blue", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": "blue_bandana", "red_hand_right": "green_hand_right", "red_arm_right": "green_arm_right", "red_face": "green_face", "red_Body": "green_Body", "red_hand_left": "green_hand_left", "red_arm_left": "green_arm_left", "red_leg_right": "green_leg_left", "red_leg_left": "green_leg_right"}, "record": {"clips": ["JuJuAnimation", "green_face", "green_hand_left", "green_hand_right"]}, "sheets": [
+   {"path": "assets/sprites/juju_bandit/juju_green_blue_spawn.webp", "label": "spawn", "fw": 182, "fh": 219, "cols": 8, "frames": 23},
+   {"path": "assets/sprites/juju_bandit/juju_green_blue_walk.webp", "label": "walk", "shift": 8, "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_green_blue_walk_end.webp", "label": "walk_end", "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_green_blue_idle1.webp", "label": "idle1", "fw": 95, "fh": 102, "cols": 8, "frames": 60},
+   {"path": "assets/sprites/juju_bandit/juju_green_blue_idle2.webp", "label": "idle2", "fw": 95, "fh": 102, "cols": 8, "frames": 75},
+   {"path": "assets/sprites/juju_bandit/juju_green_blue_swipe.webp", "label": "swipe", "fw": 114, "fh": 102, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/juju_bandit/juju_green_blue_shrink.webp", "label": "shrink", "fw": 182, "fh": 219, "cols": 8, "frames": 21}
+  ] },
+  {"name": "juju-bandit-green-black", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": "black_bandana", "red_hand_right": "green_hand_right", "red_arm_right": "green_arm_right", "red_face": "green_face", "red_Body": "green_Body", "red_hand_left": "green_hand_left", "red_arm_left": "green_arm_left", "red_leg_right": "green_leg_left", "red_leg_left": "green_leg_right"}, "record": {"clips": ["JuJuAnimation", "green_face", "green_hand_left", "green_hand_right"]}, "sheets": [
+   {"path": "assets/sprites/juju_bandit/juju_green_black_spawn.webp", "label": "spawn", "fw": 182, "fh": 219, "cols": 8, "frames": 23},
+   {"path": "assets/sprites/juju_bandit/juju_green_black_walk.webp", "label": "walk", "shift": 8, "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_green_black_walk_end.webp", "label": "walk_end", "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_green_black_idle1.webp", "label": "idle1", "fw": 95, "fh": 102, "cols": 8, "frames": 60},
+   {"path": "assets/sprites/juju_bandit/juju_green_black_idle2.webp", "label": "idle2", "fw": 95, "fh": 102, "cols": 8, "frames": 75},
+   {"path": "assets/sprites/juju_bandit/juju_green_black_swipe.webp", "label": "swipe", "fw": 114, "fh": 102, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/juju_bandit/juju_green_black_shrink.webp", "label": "shrink", "fw": 182, "fh": 219, "cols": 8, "frames": 21}
+  ] },
+  {"name": "juju-bandit-green-red", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_hand_right": "green_hand_right", "red_arm_right": "green_arm_right", "red_face": "green_face", "red_Body": "green_Body", "red_hand_left": "green_hand_left", "red_arm_left": "green_arm_left", "red_leg_right": "green_leg_left", "red_leg_left": "green_leg_right"}, "record": {"clips": ["JuJuAnimation", "green_face", "green_hand_left", "green_hand_right"]}, "sheets": [
+   {"path": "assets/sprites/juju_bandit/juju_green_red_spawn.webp", "label": "spawn", "fw": 182, "fh": 219, "cols": 8, "frames": 23},
+   {"path": "assets/sprites/juju_bandit/juju_green_red_walk.webp", "label": "walk", "shift": 8, "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_green_red_walk_end.webp", "label": "walk_end", "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_green_red_idle1.webp", "label": "idle1", "fw": 95, "fh": 102, "cols": 8, "frames": 60},
+   {"path": "assets/sprites/juju_bandit/juju_green_red_idle2.webp", "label": "idle2", "fw": 95, "fh": 102, "cols": 8, "frames": 75},
+   {"path": "assets/sprites/juju_bandit/juju_green_red_swipe.webp", "label": "swipe", "fw": 114, "fh": 102, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/juju_bandit/juju_green_red_shrink.webp", "label": "shrink", "fw": 182, "fh": 219, "cols": 8, "frames": 21}
+  ] },
+  {"name": "juju-bandit-yellow-blue", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": "blue_bandana", "red_hand_right": "yellow_hand_right", "red_arm_right": "yellow_arm_right", "red_face": "yellow_face", "red_Body": "yellow_Body", "red_hand_left": "yellow_hand_left", "red_arm_left": "yellow_arm_left", "red_leg_right": "yellow_leg_left", "red_leg_left": "yellow_leg_right"}, "record": {"clips": ["JuJuAnimation", "yellow_face", "yellow_hand_left", "yellow_hand_right"]}, "sheets": [
+   {"path": "assets/sprites/juju_bandit/juju_yellow_blue_spawn.webp", "label": "spawn", "fw": 182, "fh": 219, "cols": 8, "frames": 23},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_blue_walk.webp", "label": "walk", "shift": 8, "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_blue_walk_end.webp", "label": "walk_end", "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_blue_idle1.webp", "label": "idle1", "fw": 95, "fh": 102, "cols": 8, "frames": 60},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_blue_idle2.webp", "label": "idle2", "fw": 95, "fh": 102, "cols": 8, "frames": 75},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_blue_swipe.webp", "label": "swipe", "fw": 114, "fh": 102, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_blue_shrink.webp", "label": "shrink", "fw": 182, "fh": 219, "cols": 8, "frames": 21}
+  ] },
+  {"name": "juju-bandit-yellow-black", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_bandana": "black_bandana", "red_hand_right": "yellow_hand_right", "red_arm_right": "yellow_arm_right", "red_face": "yellow_face", "red_Body": "yellow_Body", "red_hand_left": "yellow_hand_left", "red_arm_left": "yellow_arm_left", "red_leg_right": "yellow_leg_left", "red_leg_left": "yellow_leg_right"}, "record": {"clips": ["JuJuAnimation", "yellow_face", "yellow_hand_left", "yellow_hand_right"]}, "sheets": [
+   {"path": "assets/sprites/juju_bandit/juju_yellow_black_spawn.webp", "label": "spawn", "fw": 182, "fh": 219, "cols": 8, "frames": 23},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_black_walk.webp", "label": "walk", "shift": 8, "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_black_walk_end.webp", "label": "walk_end", "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_black_idle1.webp", "label": "idle1", "fw": 95, "fh": 102, "cols": 8, "frames": 60},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_black_idle2.webp", "label": "idle2", "fw": 95, "fh": 102, "cols": 8, "frames": 75},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_black_swipe.webp", "label": "swipe", "fw": 114, "fh": 102, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_black_shrink.webp", "label": "shrink", "fw": 182, "fh": 219, "cols": 8, "frames": 21}
+  ] },
+  {"name": "juju-bandit-yellow-red", "swf": "inhabitants/juju_bandits/npc_juju_bandit.swf", "sprite": 226, "parts": {"red_hand_right": "yellow_hand_right", "red_arm_right": "yellow_arm_right", "red_face": "yellow_face", "red_Body": "yellow_Body", "red_hand_left": "yellow_hand_left", "red_arm_left": "yellow_arm_left", "red_leg_right": "yellow_leg_left", "red_leg_left": "yellow_leg_right"}, "record": {"clips": ["JuJuAnimation", "yellow_face", "yellow_hand_left", "yellow_hand_right"]}, "sheets": [
+   {"path": "assets/sprites/juju_bandit/juju_yellow_red_spawn.webp", "label": "spawn", "fw": 182, "fh": 219, "cols": 8, "frames": 23},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_red_walk.webp", "label": "walk", "shift": 8, "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_red_walk_end.webp", "label": "walk_end", "fw": 95, "fh": 102, "cols": 8, "frames": 16},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_red_idle1.webp", "label": "idle1", "fw": 95, "fh": 102, "cols": 8, "frames": 60},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_red_idle2.webp", "label": "idle2", "fw": 95, "fh": 102, "cols": 8, "frames": 75},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_red_swipe.webp", "label": "swipe", "fw": 114, "fh": 102, "cols": 8, "frames": 14},
+   {"path": "assets/sprites/juju_bandit/juju_yellow_red_shrink.webp", "label": "shrink", "fw": 182, "fh": 219, "cols": 8, "frames": 21}
   ] },
   {"name": "crab", "swf": "inhabitants/crab/npc_crab.swf", "sprite": 133, "sheets": [
    {"path": "assets/sprites/quest-rooms/vision_quest/crab_idle.png", "label": "idle0", "fw": 131, "fh": 129, "cols": 6, "frames": 30},
@@ -162,7 +243,7 @@
    {"path": "assets/sprites/quest-rooms/back_alley/bot_attract.png", "label": "attract", "fw": 81, "fh": 88, "cols": 12, "frames": 57},
    {"path": "assets/sprites/quest-rooms/back_alley/bot_move.png", "label": "move", "fw": 81, "fh": 88, "cols": 1, "frames": 1}
   ] },
-  {"name": "rare-item-vendor", "swf": "inhabitants/rare_item_vendor/npc_rare_item_vendor.swf", "sprite": 76, "sheets": [
+  {"name": "rare-item-vendor", "swf": "inhabitants/rare_item_vendor/npc_rare_item_vendor.swf", "sprite": 81, "sheets": [
    {"path": "assets/sprites/quest-rooms/penalty/vendor_idle.webp", "label": "idle", "fw": 187, "fh": 91, "cols": 5, "frames": 110},
    {"path": "assets/sprites/quest-rooms/penalty/vendor_talk.webp", "label": "talk", "fw": 187, "fh": 91, "cols": 5, "frames": 72},
    {"path": "assets/sprites/quest-rooms/penalty/vendor_walk.webp", "label": "walk", "fw": 187, "fh": 91, "cols": 4, "frames": 16}
@@ -272,15 +353,15 @@
   ] },
   {"name": "rube", "swf": "inhabitants/rube/npc_rube.swf", "sprite": 78, "sheets": [
    {"path": "assets/sprites/rube/rube_spawn_in.webp", "label": "spawn_in", "fw": 108, "fh": 154, "cols": 9, "frames": 205},
-   {"path": "assets/sprites/rube/rube_walk.webp", "label": "walk", "fw": 108, "fh": 154, "cols": 8, "frames": 15},
+   {"path": "assets/sprites/rube/rube_walk.webp", "label": "walk", "shift": 9, "fw": 108, "fh": 154, "cols": 8, "frames": 15},
    {"path": "assets/sprites/rube/rube_walk_end.webp", "label": "walk_end", "fw": 108, "fh": 154, "cols": 7, "frames": 14},
    {"path": "assets/sprites/rube/rube_talk.webp", "label": "talk", "fw": 108, "fh": 154, "cols": 7, "frames": 20},
-   {"path": "assets/sprites/rube/rube_offer_trade.png", "label": "offer_trade", "fw": 108, "fh": 154, "cols": 34, "frames": 340},
+   {"path": "assets/sprites/rube/rube_offer_trade.png", "label": "offer_trade", "shift": 96, "fw": 108, "fh": 154, "cols": 34, "frames": 340},
    {"path": "assets/sprites/rube/rube_offer_accept.webp", "label": "offer_accept", "fw": 108, "fh": 154, "cols": 9, "frames": 70},
    {"path": "assets/sprites/rube/rube_offer_reject.webp", "label": "offer_reject", "fw": 108, "fh": 154, "cols": 9, "frames": 130},
    {"path": "assets/sprites/rube/rube_fade_out.webp", "label": "fade_out", "fw": 108, "fh": 154, "cols": 9, "frames": 97}
   ] },
-  {"name": "flamingo", "swf": "inhabitants/flamingo/npc_flamingo.swf", "sprite": 933, "sheets": [
+  {"name": "flamingo", "swf": "inhabitants/flamingo/npc_flamingo.swf", "sprite": 933, "record": {"clips": [], "place": true}, "sheets": [
    {"path": "assets/sprites/newxp/flamingo_idle.png", "label": "idle0", "fw": 290, "fh": 249, "cols": 1, "frames": 1},
    {"path": "assets/sprites/newxp/flamingo_talk_tall.png", "label": "talkTall", "fw": 290, "fh": 249, "cols": 13, "frames": 89},
    {"path": "assets/sprites/newxp/flamingo_talk_short.png", "label": "talkShort", "fw": 290, "fh": 249, "cols": 13, "frames": 89},
@@ -290,7 +371,7 @@
   {"name": "magic-rock", "swf": "inhabitants/magic_rock/magic_rock.swf", "sprite": 52, "sheets": [
    {"path": "assets/sprites/newxp/rock_read.png", "label": "read", "fw": 75, "fh": 348, "cols": 9, "frames": 18},
    {"path": "assets/sprites/newxp/rock_talk.png", "label": "talk", "fw": 75, "fh": 348, "cols": 13, "frames": 91},
-   {"path": "assets/sprites/newxp/rock_appear.png", "label": "appear2", "fw": 75, "fh": 348, "cols": 10, "frames": 20}
+   {"path": "assets/sprites/newxp/rock_appear.png", "label": "appear1", "frameList": [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,1], "fw": 75, "fh": 348, "cols": 10, "frames": 20}
   ] },
   {"name": "hell-bartender", "swf": "inhabitants/hell_bartender/hell_bartender.swf", "sprite": 34, "sheets": [
    {"path": "assets/sprites/hell/hell_bartender-idle1.png", "label": "idle1", "fw": 244, "fh": 197, "cols": 14, "frames": 81},

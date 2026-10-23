@@ -12,13 +12,19 @@
  *     own best offset must agree.
  *  4. Matching sheets are written next to the 1x file as <name>@3x.png (or
  *     .webp when lossless WebP is clearly smaller), exactly 3x its pixel size,
- *     every frame clipped to its cell. Rejected sheets are reported, not written.
+ *     every frame clipped to its cell (or as parts, see "budget"). Rejected
+ *     sheets are reported, not written. Frames under 1% of the sheet's median
+ *     alpha (a vanishing sparkle) are scored but not gated.
  *  5. tools/vector-sprites/results.json (scores, placement) and the generated
  *     public/js/sprite-hires.js (1x path -> 3x path) are updated.
  *
  * Manifest options (characters.json uses them):
- *  - "budget": { "maxSide": px, "maxMB": decoded MB } rejects a sheet whose 3x
- *    file would be larger, before any rendering.
+ *  - "budget": { "maxSide": px, "maxMB": decoded MB } caps each 3x file. A
+ *    sheet whose 3x is bigger is written as parts (<name>.p1@3x.webp, ...):
+ *    its cells in frame order, each part in the squarest grid that fits;
+ *    the 1x sheet is unchanged and js/sprite-hires.js points every frame at
+ *    its part (SPLIT_SPRITES). Only a character with a cell too big for any
+ *    part is rejected, before rendering.
  *  - "firstDraw": true (manifest or job) keeps the sheet out of the eager
  *    URL route: it swaps to 3x when the renderer first draws it.
  *  - job "character": sheets sharing one are all-or-nothing (a character
@@ -30,6 +36,10 @@
  *    than the SWF (3 x that scale; the 3x file is still 3x the OGA pixels).
  *  - job "parts": { "<placed class>": "<class>" | null } renders a runtime
  *    variant (swf-parts.mjs swaps the placed part symbols in a work copy).
+ *  - job "record": { "clips": ["<class>", ...] } bakes what the client's
+ *    sprite-sheet recorder drew: the item's animated_mcs (clips) on their
+ *    own copy of each label, every other nested clip on frame 1
+ *    (swf-record.mjs; the Juju Bandits).
  *  - job "state": { "set": { "<instance>": frame | null }, "pad": n } freezes
  *    what the item's ActionScript sets (gotoAndStop / visible) on the
  *    sprite's named children (swf-state.mjs; harvestables.json).
@@ -52,7 +62,8 @@ import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { FFDEC, JAVA, swfSprites } from './swf-labels.mjs';
-import { swapParts } from './swf-parts.mjs';
+import { swapParts, symbolClasses } from './swf-parts.mjs';
+import { recordState } from './swf-record.mjs';
 import { freezeState } from './swf-state.mjs';
 import { rasteriseSvgs } from './svg-raster.mjs';
 
@@ -73,6 +84,12 @@ export const SHEET_MIN = 0.88;
  */
 export const FAINT_SHARE = 0.15;
 export const FAINT_MIN = 0.5;
+/**
+ * Vanishing frames (under this share of the median alpha mass: the last
+ * wisp of a Juju Bandit's shrink sparkles, a spawn's first sub-pixel dot)
+ * are mostly antialiasing noise at 1x; they are scored but not gated.
+ */
+export const EMPTY_SHARE = 0.01;
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => {
@@ -85,6 +102,8 @@ const WORK = resolve(opt('work', join(os.tmpdir(), 'vector-sprites')));
 const DRY = args.includes('--dry');
 /** A manifest's "minScore" raises SHEET_MIN (harvestables: 0.9, the test's bar). */
 let sheetMin = SHEET_MIN;
+/** The manifest "budget" (each 3x file), set in main. */
+let budget = null;
 
 // ---------------------------------------------------------------------------
 // Pixels (ImageMagick for codecs, plain typed arrays for the maths)
@@ -260,7 +279,7 @@ function sheetCells(sheet, ogaImg) {
 function buildSheet(job, sheet, labels, frameDir) {
   const oga = join(PUBLIC, sheet.path);
   const ogaImg = readRGBA(oga);
-  const { cells } = sheetCells(sheet, ogaImg);
+  const { cells, cols: gridCols } = sheetCells(sheet, ogaImg);
   const label = labels.find((l) => l.name === sheet.label);
   if (!label && !sheet.swfStart && !sheet.frameList) return { status: 'rejected', reason: `label ${sheet.label} not in sprite ${job.sprite}` };
   // frameList: cell k shows SWF frame frameList[k] (states the sheet skips).
@@ -364,12 +383,15 @@ function buildSheet(job, sheet, labels, frameDir) {
   const masses = cells.map((c) => centroid(cellImgs[c.k])?.mass || 0);
   const nz = masses.filter((m) => m > 0).sort((a, b) => a - b);
   const medMass = nz[Math.floor(nz.length / 2)] || 0;
-  for (const f of frames) f.faint = masses[f.k] < medMass * FAINT_SHARE;
+  for (const f of frames) {
+    f.faint = masses[f.k] < medMass * FAINT_SHARE;
+    f.empty = masses[f.k] < medMass * EMPTY_SHARE;
+  }
   const solid = frames.filter((f) => !f.faint);
   const scores = frames.map((f) => f.score);
   const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
   const min = Math.min(...solid.map((f) => f.score));
-  const faintMin = Math.min(1, ...frames.filter((f) => f.faint).map((f) => f.score));
+  const faintMin = Math.min(1, ...frames.filter((f) => f.faint && !f.empty).map((f) => f.score));
   // A frame whose own best placement differs by more than one 3x pixel
   // and is clearly better means the global offset does not hold.
   const drift = solid.filter((f) => f.ownBest && (Math.abs(f.ownBest.dx) > 1 || Math.abs(f.ownBest.dy) > 1) && f.ownBest.score - f.score > 0.02);
@@ -390,6 +412,7 @@ function buildSheet(job, sheet, labels, frameDir) {
     score: +mean.toFixed(4),
     minFrame: +min.toFixed(4),
     faintFrames: frames.filter((f) => f.faint).length,
+    ...(frames.some((f) => f.empty) ? { emptyFrames: frames.filter((f) => f.empty).length } : {}),
     faintMin: +faintMin.toFixed(4),
     drift: drift.map((f) => ({ k: f.k, ...f.ownBest })),
   };
@@ -402,45 +425,112 @@ function buildSheet(job, sheet, labels, frameDir) {
   if (reasons.length) return { ...result, status: 'rejected', reason: reasons.join('; '), frames };
   if (DRY) return { ...result, status: 'dry', frames };
 
-  // Compose the 3x sheet: each frame clipped to its own cell.
-  const W = ogaImg.w * 3;
-  const H = ogaImg.h * 3;
-  const out = new Uint8Array(W * H * 4);
-  for (const c of cells) {
-    const file = join(frameDir, `${frameOf(c.k, best.shift)}.png`);
-    const raw = readRGBA(file);
-    const img = best.mirror ? mirrorRaw(raw) : raw;
-    const cx = c.x * 3;
-    const cy = c.y * 3;
-    const cw = sheet.fw * 3;
-    const ch = sheet.fh * 3;
-    for (let y = 0; y < img.h; y++) {
-      const ty = y + dy;
-      if (ty < 0 || ty >= ch) continue;
-      for (let x = 0; x < img.w; x++) {
-        const tx = x + dx;
-        if (tx < 0 || tx >= cw) continue;
-        const s = (y * img.w + x) * 4;
-        const d = ((cy + ty) * W + cx + tx) * 4;
-        out[d] = img.raw[s]; out[d + 1] = img.raw[s + 1]; out[d + 2] = img.raw[s + 2]; out[d + 3] = img.raw[s + 3];
-      }
+  // Compose the 3x sheet: each frame clipped to its own cell. A sheet whose
+  // 3x would break the budget as one file is written as parts instead, its
+  // cells in frame order, each part in its own squarer grid within budget.
+  const fw3 = sheet.fw * 3;
+  const fh3 = sheet.fh * 3;
+  const first = sheet.first ?? 0;
+  const split = overBudget({ w: ogaImg.w, h: ogaImg.h }, budget)
+    ? packParts(cells.length, sheet.fw, sheet.fh, budget)?.map((p) => ({ ...p, from: first + p.from }))
+    : null;
+  if (overBudget({ w: ogaImg.w, h: ogaImg.h }, budget) && !split) return { ...result, status: 'rejected', reason: `one 3x cell is over budget`, frames };
+  const layouts = split || [{ W: ogaImg.w * 3, H: ogaImg.h * 3, at: (c) => ({ x: c.x * 3, y: c.y * 3 }), cells }];
+  if (split) {
+    for (const part of split) {
+      part.W = part.cols * fw3;
+      part.H = Math.ceil(part.count / part.cols) * fh3;
+      part.cells = cells.filter((c) => first + c.k >= part.from && first + c.k < part.from + part.count);
+      part.at = (c) => {
+        const j = first + c.k - part.from;
+        return { x: (j % part.cols) * fw3, y: Math.floor(j / part.cols) * fh3 };
+      };
     }
   }
   const stem = oga.slice(0, -extname(oga).length);
-  const png = `${stem}@3x.png`;
-  const webp = `${stem}@3x.webp`;
-  const tmpPng = join(WORK, `${basename(stem)}@3x.tmp.png`);
-  execFileSync('magick', ['-size', `${W}x${H}`, '-depth', '8', 'rgba:-', '-define', 'png:compression-level=9', '-define', 'png:compression-filter=5', '-strip', `PNG32:${tmpPng}`], { input: out, maxBuffer: 1 << 26 });
-  const tmpWebp = join(WORK, `${basename(stem)}@3x.tmp.webp`);
-  execFileSync('cwebp', ['-quiet', '-lossless', '-exact', '-z', '9', tmpPng, '-o', tmpWebp]);
-  const pngBytes = statSync(tmpPng).size;
-  const webpBytes = statSync(tmpWebp).size;
-  // Lossless WebP keeps the exact pixels; use it when it saves a fifth.
-  const useWebp = extname(oga) === '.webp' || webpBytes < pngBytes * 0.8;
-  for (const f of [png, webp]) if (existsSync(f)) unlinkSync(f);
-  if (useWebp) { renameSync(tmpWebp, webp); unlinkSync(tmpPng); } else { renameSync(tmpPng, png); unlinkSync(tmpWebp); }
-  const file = useWebp ? webp : png;
-  return { ...result, status: 'ok', hires: relative(PUBLIC, file), bytes: statSync(file).size, frames };
+  // Drop this sheet's old 3x files (one file or parts) before writing.
+  const base = basename(stem);
+  for (const f of readdirSync(dirname(oga))) {
+    const part = f.startsWith(`${base}.p`) && /^\d+@3x\.(png|webp)$/.test(f.slice(base.length + 2));
+    if (part || f === `${base}@3x.png` || f === `${base}@3x.webp`) unlinkSync(join(dirname(oga), f));
+  }
+  const written = [];
+  layouts.forEach((layout, i) => {
+    const { W, H } = layout;
+    const out = new Uint8Array(W * H * 4);
+    for (const c of layout.cells) {
+      const file = join(frameDir, `${frameOf(c.k, best.shift)}.png`);
+      const raw = readRGBA(file);
+      const img = best.mirror ? mirrorRaw(raw) : raw;
+      const { x: cx, y: cy } = layout.at(c);
+      for (let y = 0; y < img.h; y++) {
+        const ty = y + dy;
+        if (ty < 0 || ty >= fh3) continue;
+        for (let x = 0; x < img.w; x++) {
+          const tx = x + dx;
+          if (tx < 0 || tx >= fw3) continue;
+          const s = (y * img.w + x) * 4;
+          const d = ((cy + ty) * W + cx + tx) * 4;
+          out[d] = img.raw[s]; out[d + 1] = img.raw[s + 1]; out[d + 2] = img.raw[s + 2]; out[d + 3] = img.raw[s + 3];
+        }
+      }
+    }
+    const name = split ? `${stem}.p${i + 1}@3x` : `${stem}@3x`;
+    const tmpPng = join(WORK, `${basename(name)}.tmp.png`);
+    execFileSync('magick', ['-size', `${W}x${H}`, '-depth', '8', 'rgba:-', '-define', 'png:compression-level=9', '-define', 'png:compression-filter=5', '-strip', `PNG32:${tmpPng}`], { input: out, maxBuffer: 1 << 26 });
+    const tmpWebp = join(WORK, `${basename(name)}.tmp.webp`);
+    execFileSync('cwebp', ['-quiet', '-lossless', '-exact', '-z', '9', tmpPng, '-o', tmpWebp]);
+    // Lossless WebP keeps the exact pixels; use it when it saves a fifth.
+    const useWebp = extname(oga) === '.webp' || statSync(tmpWebp).size < statSync(tmpPng).size * 0.8;
+    const file = `${name}.${useWebp ? 'webp' : 'png'}`;
+    if (useWebp) { renameSync(tmpWebp, file); unlinkSync(tmpPng); } else { renameSync(tmpPng, file); unlinkSync(tmpWebp); }
+    written.push({ hires: relative(PUBLIC, file), bytes: statSync(file).size, ...(split ? { from: layout.from, count: layout.count, cols: layout.cols, w: W, h: H } : {}) });
+  });
+  if (!split) return { ...result, status: 'ok', hires: written[0].hires, bytes: written[0].bytes, frames };
+  return {
+    ...result,
+    status: 'ok',
+    cols: gridCols,
+    parts: written,
+    bytes: written.reduce((a, p) => a + p.bytes, 0),
+    frames,
+  };
+}
+
+/**
+ * Split n cells of fw x fh (1x) into the fewest parts whose 3x files each
+ * fit the budget, in frame order, each in the grid with the least area
+ * (then the shortest side). [{ from, count, cols }] (from 0), or null when
+ * one cell does not fit.
+ */
+export function packParts(n, fw, fh, { maxSide = Infinity, maxMB = Infinity } = {}) {
+  const fw3 = fw * 3;
+  const fh3 = fh * 3;
+  const maxBytes = maxMB * 2 ** 20;
+  const grid = (p) => {
+    let best = null;
+    for (let c = 1; c <= p; c++) {
+      const r = Math.ceil(p / c);
+      const W = c * fw3;
+      const H = r * fh3;
+      if (W > maxSide || H > maxSide || W * H * 4 > maxBytes) continue;
+      const key = [W * H, Math.max(W, H)];
+      if (!best || key[0] < best.key[0] || (key[0] === best.key[0] && key[1] < best.key[1])) best = { cols: c, key };
+    }
+    return best?.cols ?? null;
+  };
+  if (!grid(1)) return null;
+  for (let k = 1; k <= n; k++) {
+    const p = Math.ceil(n / k);
+    if (!grid(p)) continue;
+    const parts = [];
+    for (let from = 0; from < n; from += p) {
+      const count = Math.min(p, n - from);
+      parts.push({ from, count, cols: grid(count) });
+    }
+    return parts;
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -449,7 +539,8 @@ function buildSheet(job, sheet, labels, frameDir) {
 
 export function writeModule(results) {
   const ok = Object.entries(results).filter(([, r]) => r.status === 'ok').sort(([a], [b]) => a.localeCompare(b));
-  const entries = ok.map(([path, r]) => `  [${JSON.stringify(path)}, ${JSON.stringify(r.hires)}],`).join('\n');
+  const entries = ok.filter(([, r]) => !r.parts).map(([path, r]) => `  [${JSON.stringify(path)}, ${JSON.stringify(r.hires)}],`).join('\n');
+  const split = ok.filter(([, r]) => r.parts).map(([path, r]) => `  [${JSON.stringify(path)}, { fw: ${r.fw}, fh: ${r.fh}, cols: ${r.cols}, parts: [${r.parts.map((p) => `[${JSON.stringify(p.hires)}, ${p.from}, ${p.count}, ${p.cols}]`).join(', ')}] }],`).join('\n');
   const firstDraw = ok.filter(([, r]) => r.firstDraw).map(([path]) => `  ${JSON.stringify(path)},`).join('\n');
   writeFileSync(MODULE, `/**
  * Sprite sheets with a sharp 3x render (generated by
@@ -464,6 +555,18 @@ ${entries}
 ]);
 
 /**
+ * Sheets whose 3x would break the texture budget as one file (8192 px side,
+ * 64 MB decoded): the cells are split, in frame order, into part files that
+ * each fit. 1x path -> { fw, fh, cols (1x cell grid), parts: [[url, from,
+ * count, cols], ...] }: part p holds 1x cells from..from+count-1 in its own
+ * cols-wide grid. The 1x sheet is unchanged; on first draw every frame
+ * Texture cut from it is pointed at its part (frame rect still in 1x units).
+ */
+export const SPLIT_SPRITES = new Map([
+${split}
+]);
+
+/**
  * Sheets that stay 1x until the renderer first draws them (characters, NPCs,
  * shrines: big sheets that are often loaded and rarely all on screen).
  * installHiresSprites leaves them out of the eager URL route and
@@ -474,8 +577,10 @@ ${firstDraw}
 ]);
 
 let enabled = true;
+/** js/textures.js, for the frames of split sheets (installHiresSprites). */
+let frameSource = null;
 
-/** The 3x URL for a sheet URL (query string kept), or null. */
+/** The 3x URL for a sheet URL (query string kept), or null (split sheets too). */
 export function hiresSpriteUrl(url) {
   if (!enabled) return null;
   const s = String(url || '');
@@ -498,13 +603,23 @@ function sheetPath(url) {
  * (game.js SHEETS, features, quest rooms). Only when sprites are drawn at
  * 1.5+ device pixels per art pixel (DPR x the 960px view's zoom): below that
  * the 1x sheets already fill the screen, and a 3x texture would only cost
- * memory and alias when minified. First-draw sheets stay 1x here.
- * @param {{ addUrlRoute: Function }} textures the js/textures.js module
+ * memory and alias when minified. First-draw sheets stay 1x here. Split
+ * sheets have their frame Textures tracked so they can move to the parts.
+ * @param {{ addUrlRoute: Function, trackFrameTextures?: Function, framesOf?: Function }} textures the js/textures.js module
  */
 export function installHiresSprites(textures, { dpr = globalThis.devicePixelRatio || 1, viewWidth = globalThis.innerWidth || 960 } = {}) {
   enabled = dpr * Math.max(1, viewWidth / 960) >= 1.5;
   if (!enabled || typeof textures?.addUrlRoute !== 'function') return;
   textures.addUrlRoute('hires-sprites', (url) => (FIRST_DRAW_SPRITES.has(sheetPath(url)) ? null : hiresSpriteUrl(url)));
+  if (typeof textures.trackFrameTextures === 'function' && typeof textures.framesOf === 'function') {
+    frameSource = textures;
+    textures.trackFrameTextures({
+      match: (url) => SPLIT_SPRITES.has(sheetPath(url)),
+      added: (source, texture) => {
+        if (source.hiresParts) pointAtPart(source, texture);
+      },
+    });
+  }
 }
 
 /**
@@ -512,12 +627,15 @@ export function installHiresSprites(textures, { dpr = globalThis.devicePixelRati
  * has loaded. Every Texture already cut from it keeps its 1x frame rect and
  * turns sharp. Feature sheet loaders call this when a sheet is first drawn,
  * so sheets that are only preloaded never pay for 3x pixels. Resolves true
- * once swapped.
+ * once swapped. A split sheet loads its parts instead and its frames move
+ * to them.
  * @param {any} source a Pixi 8 TextureSource
  * @param {string} url its 1x sheet URL
  * @param {(source: any) => Promise<any>} [whenLoaded] js/textures.js whenLoaded
  */
 export function upgradeSource(source, url, whenLoaded = (s) => Promise.resolve(s)) {
+  const split = enabled ? SPLIT_SPRITES.get(sheetPath(url)) : null;
+  if (split) return upgradeSplit(source, split, whenLoaded);
   const hi = hiresSpriteUrl(url);
   if (!hi || !source || source.destroyed) return Promise.resolve(false);
   if (source.hiresUpgrade) return source.hiresUpgrade;
@@ -545,13 +663,75 @@ export function upgradeSource(source, url, whenLoaded = (s) => Promise.resolve(s
   return source.hiresUpgrade;
 }
 
+/** Load a split sheet's parts as resolution-3 sources and move its frames there. */
+function upgradeSplit(source, split, whenLoaded) {
+  if (!source || source.destroyed || !frameSource) return Promise.resolve(false);
+  if (source.hiresUpgrade) return source.hiresUpgrade;
+  const bitmap = (url) => fetch(url).then((res) => {
+    if (!res.ok) throw new Error(\`\${url}: \${res.status}\`);
+    return res.blob();
+  }).then((blob) => createImageBitmap(blob));
+  source.hiresUpgrade = Promise.resolve(whenLoaded(source))
+    .then(() => Promise.all(split.parts.map(([url]) => bitmap(url))))
+    .then((bitmaps) => {
+      if (source.destroyed) {
+        for (const b of bitmaps) b.close?.();
+        return false;
+      }
+      const Source = source.constructor;
+      source.hiresSplit = split;
+      source.hiresParts = split.parts.map(([url, from, count, cols], i) => ({
+        from,
+        count,
+        cols,
+        source: new Source({
+          resource: bitmaps[i],
+          resolution: 3,
+          label: url,
+          alphaMode: source.alphaMode,
+          scaleMode: source.scaleMode,
+          autoGarbageCollect: source.autoGarbageCollect,
+        }),
+      }));
+      for (const texture of frameSource.framesOf(source)) pointAtPart(source, texture);
+      return true;
+    })
+    .catch(() => false);
+  return source.hiresUpgrade;
+}
+
+/**
+ * Point one frame Texture of a split sheet at the part holding its cell
+ * (same 1x size, the cell's place in the part). Frames that span cells or
+ * fall outside every part stay on the 1x sheet.
+ */
+export function pointAtPart(source, texture) {
+  const split = source?.hiresSplit;
+  const frame = texture?.frame;
+  if (!split || !frame || texture.destroyed || texture.source !== source) return false;
+  const col = Math.floor((frame.x + 0.5) / split.fw);
+  const row = Math.floor((frame.y + 0.5) / split.fh);
+  const dx = frame.x - col * split.fw;
+  const dy = frame.y - row * split.fh;
+  if (col >= split.cols || dx + frame.width > split.fw + 0.5 || dy + frame.height > split.fh + 0.5) return false;
+  const cell = row * split.cols + col;
+  const part = source.hiresParts.find((p) => cell >= p.from && cell < p.from + p.count);
+  if (!part || part.source.destroyed) return false;
+  const j = cell - part.from;
+  frame.x = (j % part.cols) * split.fw + dx;
+  frame.y = Math.floor(j / part.cols) * split.fh + dy;
+  texture.source = part.source;
+  texture.update();
+  return true;
+}
+
 /** The listed 1x sheet a TextureSource was loaded from, or null. */
 export function sourceSheet(source) {
   const ids = [source?.label, source?.groddleUrl];
   for (const id of ids) {
     if (typeof id !== 'string' || !id) continue;
     const path = sheetPath(id);
-    if (HIRES_SPRITES.has(path)) return path;
+    if (HIRES_SPRITES.has(path) || SPLIT_SPRITES.has(path)) return path;
   }
   return null;
 }
@@ -561,7 +741,8 @@ export function sourceSheet(source) {
  * texture (the WebGL or WebGPU texture system's _initSource runs once per
  * TextureSource, and again after Pixi's texture GC unloads it), whatever
  * loaded it: game.js SHEETS, quest-room kits, feature modules. Sheets that
- * are loaded but never drawn keep their 1x pixels.
+ * are loaded but never drawn keep their 1x pixels. A split sheet drawn
+ * again at 1x (a frame cut after its parts arrived) re-points its frames.
  * @param {any} renderer a Pixi 8 renderer
  * @param {(source: any) => Promise<any>} [whenLoaded] js/textures.js whenLoaded
  */
@@ -571,8 +752,12 @@ export function installHiresFirstDraw(renderer, whenLoaded) {
   const init = system._initSource.bind(system);
   system._initSource = (source) => {
     const gpu = init(source);
-    const path = source?.hiresUpgrade ? null : sourceSheet(source);
-    if (path) upgradeSource(source, path, whenLoaded);
+    if (source?.hiresParts && frameSource) {
+      for (const texture of frameSource.framesOf(source)) pointAtPart(source, texture);
+    } else {
+      const path = source?.hiresUpgrade ? null : sourceSheet(source);
+      if (path) upgradeSource(source, path, whenLoaded);
+    }
     return gpu;
   };
   system.hiresFirstDraw = true;
@@ -604,6 +789,7 @@ const characterOf = (job) => job.character || job.name;
 async function main() {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
   sheetMin = Math.max(SHEET_MIN, manifest.minScore ?? 0);
+  budget = manifest.budget || null;
   const results = existsSync(RESULTS) ? JSON.parse(readFileSync(RESULTS, 'utf8')) : {};
   mkdirSync(WORK, { recursive: true });
   const record = (job, sheet, r) => {
@@ -616,12 +802,14 @@ async function main() {
       frameScores: frames?.map((f) => f.score),
     };
   };
-  // Budget first: a character with any oversized sheet is not rendered at all.
+  // Budget first: a sheet over budget as one 3x file is split into parts
+  // (buildSheet); a character with a cell too big for any part is not
+  // rendered at all.
   const tooBig = new Map();
   for (const job of manifest.jobs) {
     for (const sheet of job.sheets) {
-      const why = overBudget(imageSize(join(PUBLIC, sheet.path)), manifest.budget);
-      if (why && !tooBig.has(characterOf(job))) tooBig.set(characterOf(job), `${basename(sheet.path)}: ${why}`);
+      const why = overBudget({ w: sheet.fw, h: sheet.fh }, manifest.budget);
+      if (why && !tooBig.has(characterOf(job))) tooBig.set(characterOf(job), `${basename(sheet.path)}: one cell ${why}`);
     }
   }
   for (const job of manifest.jobs) {
@@ -642,6 +830,25 @@ async function main() {
       const tag = createHash('sha1').update(JSON.stringify(job.parts)).digest('hex').slice(0, 8);
       source = join(WORK, `${basename(swf, '.swf')}.${job.name}.${tag}.swf`);
       if (!existsSync(source)) console.log(`  parts: ${swapParts(swf, source, job.parts)} placements swapped`);
+    }
+    if (job.record) {
+      // Only the frames these sheets use (plus a margin for the shift search).
+      const rootLabels = swfSprites(source).find((s) => s.id === job.sprite)?.labels || [];
+      const ranges = sheets.map((sh) => {
+        if (sh.frameList) return [Math.min(...sh.frameList) - 2, Math.max(...sh.frameList) + 2];
+        const l = rootLabels.find((x) => x.name === sh.label);
+        const a = sh.swfStart ?? l?.start ?? 1;
+        let b = sh.swfStart ? a + (sh.swfCount ?? sh.frames ?? 1) : (l?.end ?? a);
+        if (sh.frames) b = Math.min(b, a + (sh.frames + 1) * (sh.step ?? 1));
+        return [a - 2, b + 2 + Math.abs(sh.shift ?? 0)];
+      });
+      const tag = createHash('sha1').update(JSON.stringify([job.record, ranges])).digest('hex').slice(0, 8);
+      const recorded = join(WORK, `${basename(source, '.swf')}.${job.name}.rec-${tag}.swf`);
+      if (!existsSync(recorded)) {
+        const r = recordState(source, recorded, job.sprite, { ...job.record, classes: symbolClasses(swf), frames: ranges });
+        console.log(`  record: ${r.frames} frames baked (${r.sprites} one-frame sprites)`);
+      }
+      source = recorded;
     }
     if (job.state) {
       const tag = createHash('sha1').update(JSON.stringify(job.state)).digest('hex').slice(0, 8);
@@ -684,8 +891,10 @@ async function main() {
     for (const p of paths) {
       const r = results[p];
       if (!r || !['ok', 'dry'].includes(r.status)) continue;
-      if (r.hires && existsSync(join(PUBLIC, r.hires)) && !DRY) unlinkSync(join(PUBLIC, r.hires));
-      results[p] = { ...r, status: 'rejected', reason: `held back: ${c} also needs ${basename(bad)} (${results[bad]?.status || 'not built'})`, hires: undefined, bytes: undefined };
+      for (const f of r.parts ? r.parts.map((x) => x.hires) : [r.hires]) {
+        if (f && existsSync(join(PUBLIC, f)) && !DRY) unlinkSync(join(PUBLIC, f));
+      }
+      results[p] = { ...r, status: 'rejected', reason: `held back: ${c} also needs ${basename(bad)} (${results[bad]?.status || 'not built'})`, hires: undefined, parts: undefined, bytes: undefined };
       console.log(`  held ${basename(p)}: ${c} also needs ${basename(bad)}`);
     }
   }
@@ -695,7 +904,8 @@ async function main() {
   }
   for (const [path, r] of Object.entries(results)) {
     if (r.status !== 'ok') continue;
-    if (!existsSync(join(PUBLIC, r.hires))) delete results[path];
+    const files = r.parts ? r.parts.map((p) => p.hires) : [r.hires];
+    if (files.some((f) => !existsSync(join(PUBLIC, f)))) delete results[path];
   }
   writeFileSync(RESULTS, `${JSON.stringify(results, null, 1)}\n`);
   writeModule(results);

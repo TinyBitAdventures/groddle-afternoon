@@ -82,6 +82,6 @@ import { towerRoomsFeature } from './tower-rooms-feature.js?v=tower-rooms-4'; FE
 import { midTowerFeature } from './mid-tower-feature.js?v=mid-tower-1'; FEATURES.push(midTowerFeature);
 import { treeDeathFeature } from './tree-death-feature.js?v=tree-death-4'; FEATURES.push(treeDeathFeature);
 import { enchantedForestFeature } from './enchanted-forest-feature.js?v=g5-1'; FEATURES.push(enchantedForestFeature);
-import { jujuBanditsFeature } from './juju-bandits-feature.js?v=g39-1'; FEATURES.push(jujuBanditsFeature);
+import { jujuBanditsFeature } from './juju-bandits-feature.js?v=g39-2'; FEATURES.push(jujuBanditsFeature);
 import { craftybotFeature } from './craftybot-feature.js?v=craftybot-3'; FEATURES.push(craftybotFeature);
 import { moodDecayFeature } from './mood-decay-feature.js?v=mood-decay-1'; FEATURES.push(moodDecayFeature);

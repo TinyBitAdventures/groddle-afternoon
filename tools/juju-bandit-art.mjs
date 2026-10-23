@@ -12,6 +12,15 @@
  * Long loops are trimmed to what the bandit plays: idle1 (standing while it
  * declares) keeps its first 60 frames, idle2 (the 2.5 s rage quit) 75.
  *
+ * These are the client's own recordings of npc_juju_bandit.swf sprite 226,
+ * so they match the SWF once it is rendered the way the recorder drew it:
+ * the holder, face and hands (animated_mcs) each on their own copy of the
+ * label, other nested clips on frame 1, both legs in the opposite container
+ * (initializehead), and the walk sheet is the SWF's walk loop (label frames
+ * 8-23, loop_froms walk: 8), so it loops whole. Their sharp 3x versions come
+ * from tools/vector-sprites/characters.json (juju-bandit-<variant>-<bandana>,
+ * "record"); re-run that build after this script.
+ *
  *   node tools/juju-bandit-art.mjs
  */
 import { execFileSync } from 'node:child_process';

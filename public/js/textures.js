@@ -166,7 +166,36 @@ export function textureFromUrl(url, opts = {}) {
  */
 export function frameTexture(source, frame) {
   const s = sourceOf(source);
-  return new (pixi().Texture)({ source: s, frame, dynamic: Boolean(s?.[LOAD]) });
+  const texture = new (pixi().Texture)({ source: s, frame, dynamic: Boolean(s?.[LOAD]) });
+  const url = s?.[LOAD]?.url;
+  if (url && frameTracker?.match(url)) {
+    let set = frameSets.get(s);
+    if (!set) frameSets.set(s, (set = new Set()));
+    set.add(texture);
+    texture.once('destroy', () => set.delete(texture));
+    frameTracker.added?.(s, texture);
+  }
+  return texture;
+}
+
+/** @type {WeakMap<any, Set<any>>} source -> frame Textures cut by frameTexture */
+const frameSets = new WeakMap();
+/** @type {{ match: (url: string) => boolean, added?: (source: any, texture: any) => void } | null} */
+let frameTracker = null;
+
+/**
+ * Keep the frame Textures cut from URL sources whose URL passes `match`, so
+ * they can be moved to other sources later (js/sprite-hires.js points the
+ * frames of a sheet whose 3x is split into parts at the right part). `added`
+ * runs for each new frame of a tracked source.
+ */
+export function trackFrameTextures(tracker) {
+  frameTracker = tracker || null;
+}
+
+/** The live frame Textures frameTexture cut from a tracked source. */
+export function framesOf(textureOrSource) {
+  return [...(frameSets.get(sourceOf(textureOrSource)) || [])];
 }
 
 /** textureFromUrl, resolved once the image is in (rejects when it fails). */

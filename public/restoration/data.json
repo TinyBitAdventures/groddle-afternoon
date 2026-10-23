@@ -1410,9 +1410,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 265,
+  "commits": 266,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "Mood slowly drifts down while you play, and the Steady On, Mood Loser cards slow it"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1527,14 +1532,9 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "Quoins float smoothly instead of shaking"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "\"And so it begins...\" draws again instead of empty sky"
    }
   ]
  },
  "tests": 169,
- "generatedAt": "2026-10-22"
+ "generatedAt": "2026-10-23"
 }

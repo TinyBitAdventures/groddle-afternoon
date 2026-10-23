@@ -55,6 +55,70 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/foxes/ranger-idle2.png", "assets/sprites/foxes/ranger-idle2@3x.webp"],
   ["assets/sprites/foxes/ranger-talk.png", "assets/sprites/foxes/ranger-talk@3x.webp"],
   ["assets/sprites/garden/plot_seedling.png", "assets/sprites/garden/plot_seedling@3x.webp"],
+  ["assets/sprites/hell/hell_bartender-talk-right-out.png", "assets/sprites/hell/hell_bartender-talk-right-out@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_black_idle1.webp", "assets/sprites/juju_bandit/juju_green_black_idle1@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_black_idle2.webp", "assets/sprites/juju_bandit/juju_green_black_idle2@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_black_shrink.webp", "assets/sprites/juju_bandit/juju_green_black_shrink@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_black_spawn.webp", "assets/sprites/juju_bandit/juju_green_black_spawn@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_black_swipe.webp", "assets/sprites/juju_bandit/juju_green_black_swipe@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_black_walk_end.webp", "assets/sprites/juju_bandit/juju_green_black_walk_end@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_black_walk.webp", "assets/sprites/juju_bandit/juju_green_black_walk@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_blue_idle1.webp", "assets/sprites/juju_bandit/juju_green_blue_idle1@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_blue_idle2.webp", "assets/sprites/juju_bandit/juju_green_blue_idle2@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_blue_shrink.webp", "assets/sprites/juju_bandit/juju_green_blue_shrink@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_blue_spawn.webp", "assets/sprites/juju_bandit/juju_green_blue_spawn@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_blue_swipe.webp", "assets/sprites/juju_bandit/juju_green_blue_swipe@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_blue_walk_end.webp", "assets/sprites/juju_bandit/juju_green_blue_walk_end@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_blue_walk.webp", "assets/sprites/juju_bandit/juju_green_blue_walk@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_red_idle1.webp", "assets/sprites/juju_bandit/juju_green_red_idle1@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_red_idle2.webp", "assets/sprites/juju_bandit/juju_green_red_idle2@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_red_shrink.webp", "assets/sprites/juju_bandit/juju_green_red_shrink@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_red_spawn.webp", "assets/sprites/juju_bandit/juju_green_red_spawn@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_red_swipe.webp", "assets/sprites/juju_bandit/juju_green_red_swipe@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_red_walk_end.webp", "assets/sprites/juju_bandit/juju_green_red_walk_end@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_green_red_walk.webp", "assets/sprites/juju_bandit/juju_green_red_walk@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_black_idle1.webp", "assets/sprites/juju_bandit/juju_red_black_idle1@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_black_idle2.webp", "assets/sprites/juju_bandit/juju_red_black_idle2@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_black_shrink.webp", "assets/sprites/juju_bandit/juju_red_black_shrink@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_black_spawn.webp", "assets/sprites/juju_bandit/juju_red_black_spawn@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_black_swipe.webp", "assets/sprites/juju_bandit/juju_red_black_swipe@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_black_walk_end.webp", "assets/sprites/juju_bandit/juju_red_black_walk_end@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_black_walk.webp", "assets/sprites/juju_bandit/juju_red_black_walk@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_blue_idle1.webp", "assets/sprites/juju_bandit/juju_red_blue_idle1@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_blue_idle2.webp", "assets/sprites/juju_bandit/juju_red_blue_idle2@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_blue_shrink.webp", "assets/sprites/juju_bandit/juju_red_blue_shrink@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_blue_spawn.webp", "assets/sprites/juju_bandit/juju_red_blue_spawn@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_blue_swipe.webp", "assets/sprites/juju_bandit/juju_red_blue_swipe@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_blue_walk_end.webp", "assets/sprites/juju_bandit/juju_red_blue_walk_end@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_blue_walk.webp", "assets/sprites/juju_bandit/juju_red_blue_walk@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_red_idle1.webp", "assets/sprites/juju_bandit/juju_red_red_idle1@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_red_idle2.webp", "assets/sprites/juju_bandit/juju_red_red_idle2@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_red_shrink.webp", "assets/sprites/juju_bandit/juju_red_red_shrink@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_red_spawn.webp", "assets/sprites/juju_bandit/juju_red_red_spawn@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_red_swipe.webp", "assets/sprites/juju_bandit/juju_red_red_swipe@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_red_walk_end.webp", "assets/sprites/juju_bandit/juju_red_red_walk_end@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_red_red_walk.webp", "assets/sprites/juju_bandit/juju_red_red_walk@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_black_idle1.webp", "assets/sprites/juju_bandit/juju_yellow_black_idle1@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_black_idle2.webp", "assets/sprites/juju_bandit/juju_yellow_black_idle2@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_black_shrink.webp", "assets/sprites/juju_bandit/juju_yellow_black_shrink@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_black_spawn.webp", "assets/sprites/juju_bandit/juju_yellow_black_spawn@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_black_swipe.webp", "assets/sprites/juju_bandit/juju_yellow_black_swipe@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_black_walk_end.webp", "assets/sprites/juju_bandit/juju_yellow_black_walk_end@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_black_walk.webp", "assets/sprites/juju_bandit/juju_yellow_black_walk@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_blue_idle1.webp", "assets/sprites/juju_bandit/juju_yellow_blue_idle1@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_blue_idle2.webp", "assets/sprites/juju_bandit/juju_yellow_blue_idle2@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_blue_shrink.webp", "assets/sprites/juju_bandit/juju_yellow_blue_shrink@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_blue_spawn.webp", "assets/sprites/juju_bandit/juju_yellow_blue_spawn@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_blue_swipe.webp", "assets/sprites/juju_bandit/juju_yellow_blue_swipe@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_blue_walk_end.webp", "assets/sprites/juju_bandit/juju_yellow_blue_walk_end@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_blue_walk.webp", "assets/sprites/juju_bandit/juju_yellow_blue_walk@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_red_idle1.webp", "assets/sprites/juju_bandit/juju_yellow_red_idle1@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_red_idle2.webp", "assets/sprites/juju_bandit/juju_yellow_red_idle2@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_red_shrink.webp", "assets/sprites/juju_bandit/juju_yellow_red_shrink@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_red_spawn.webp", "assets/sprites/juju_bandit/juju_yellow_red_spawn@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_red_swipe.webp", "assets/sprites/juju_bandit/juju_yellow_red_swipe@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_red_walk_end.webp", "assets/sprites/juju_bandit/juju_yellow_red_walk_end@3x.webp"],
+  ["assets/sprites/juju_bandit/juju_yellow_red_walk.webp", "assets/sprites/juju_bandit/juju_yellow_red_walk@3x.webp"],
   ["assets/sprites/kitties/kitty-appear.png", "assets/sprites/kitties/kitty-appear@3x.webp"],
   ["assets/sprites/kitties/kitty-blink.png", "assets/sprites/kitties/kitty-blink@3x.webp"],
   ["assets/sprites/kitties/kitty-chew.png", "assets/sprites/kitties/kitty-chew@3x.webp"],
@@ -73,6 +137,11 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/newxp/dustbunny_talk.png", "assets/sprites/newxp/dustbunny_talk@3x.webp"],
   ["assets/sprites/newxp/dustbunny_walk_right.png", "assets/sprites/newxp/dustbunny_walk_right@3x.webp"],
   ["assets/sprites/newxp/dustbunny_walk.png", "assets/sprites/newxp/dustbunny_walk@3x.webp"],
+  ["assets/sprites/newxp/flamingo_flying.png", "assets/sprites/newxp/flamingo_flying@3x.webp"],
+  ["assets/sprites/newxp/flamingo_hover.png", "assets/sprites/newxp/flamingo_hover@3x.webp"],
+  ["assets/sprites/newxp/flamingo_idle.png", "assets/sprites/newxp/flamingo_idle@3x.webp"],
+  ["assets/sprites/newxp/rock_appear.png", "assets/sprites/newxp/rock_appear@3x.webp"],
+  ["assets/sprites/newxp/rock_read.png", "assets/sprites/newxp/rock_read@3x.webp"],
   ["assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png", "assets/sprites/npc_butterfly__x1_fly-side_png_1354829525@3x.webp"],
   ["assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530.png", "assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530@3x.webp"],
   ["assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png", "assets/sprites/npc_chicken__x1_pecking_once_png_1354830398@3x.webp"],
@@ -87,8 +156,26 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/quest-rooms/gwendolyn/cactus_talk.webp", "assets/sprites/quest-rooms/gwendolyn/cactus_talk@3x.webp"],
   ["assets/sprites/quest-rooms/gwendolyn/gwendolyn_idle.webp", "assets/sprites/quest-rooms/gwendolyn/gwendolyn_idle@3x.webp"],
   ["assets/sprites/quest-rooms/gwendolyn/gwendolyn_talk.webp", "assets/sprites/quest-rooms/gwendolyn/gwendolyn_talk@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/squid_blue_bamfin.webp", "assets/sprites/quest-rooms/gwendolyn/squid_blue_bamfin@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/squid_blue_bamfout.webp", "assets/sprites/quest-rooms/gwendolyn/squid_blue_bamfout@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/squid_purple_bamfin.webp", "assets/sprites/quest-rooms/gwendolyn/squid_purple_bamfin@3x.webp"],
+  ["assets/sprites/quest-rooms/gwendolyn/squid_purple_bamfout.webp", "assets/sprites/quest-rooms/gwendolyn/squid_purple_bamfout@3x.webp"],
   ["assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png", "assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall@3x.webp"],
   ["assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest.png", "assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_green_shrink.png", "assets/sprites/quest-rooms/juju_camp/bandit_green_shrink@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_green_spawn.png", "assets/sprites/quest-rooms/juju_camp/bandit_green_spawn@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_green_walk_end.png", "assets/sprites/quest-rooms/juju_camp/bandit_green_walk_end@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_green_walk.png", "assets/sprites/quest-rooms/juju_camp/bandit_green_walk@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_red_shrink.png", "assets/sprites/quest-rooms/juju_camp/bandit_red_shrink@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_red_spawn.png", "assets/sprites/quest-rooms/juju_camp/bandit_red_spawn@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_red_walk_end.png", "assets/sprites/quest-rooms/juju_camp/bandit_red_walk_end@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_red_walk.png", "assets/sprites/quest-rooms/juju_camp/bandit_red_walk@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_yellow_shrink.png", "assets/sprites/quest-rooms/juju_camp/bandit_yellow_shrink@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_yellow_spawn.png", "assets/sprites/quest-rooms/juju_camp/bandit_yellow_spawn@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk_end.png", "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk_end@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk.png", "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/grandma_idle.png", "assets/sprites/quest-rooms/juju_camp/grandma_idle@3x.webp"],
+  ["assets/sprites/quest-rooms/juju_camp/grandma_talk.png", "assets/sprites/quest-rooms/juju_camp/grandma_talk@3x.webp"],
   ["assets/sprites/quest-rooms/kids_room/mr-block-A.png", "assets/sprites/quest-rooms/kids_room/mr-block-A@3x.webp"],
   ["assets/sprites/quest-rooms/kids_room/mr-block-B.png", "assets/sprites/quest-rooms/kids_room/mr-block-B@3x.webp"],
   ["assets/sprites/quest-rooms/kids_room/mr-block-E.png", "assets/sprites/quest-rooms/kids_room/mr-block-E@3x.webp"],
@@ -97,6 +184,8 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/quest-rooms/kids_room/mr-block-T.png", "assets/sprites/quest-rooms/kids_room/mr-block-T@3x.webp"],
   ["assets/sprites/quest-rooms/le_miserable/bot_idle.png", "assets/sprites/quest-rooms/le_miserable/bot_idle@3x.webp"],
   ["assets/sprites/quest-rooms/le_miserable/bot_talk.png", "assets/sprites/quest-rooms/le_miserable/bot_talk@3x.webp"],
+  ["assets/sprites/quest-rooms/penalty/vendor_talk.webp", "assets/sprites/quest-rooms/penalty/vendor_talk@3x.webp"],
+  ["assets/sprites/quest-rooms/penalty/vendor_walk.webp", "assets/sprites/quest-rooms/penalty/vendor_walk@3x.webp"],
   ["assets/sprites/quest-rooms/vision_quest/crab_idle.png", "assets/sprites/quest-rooms/vision_quest/crab_idle@3x.webp"],
   ["assets/sprites/quest-rooms/vision_quest/frog_idle.png", "assets/sprites/quest-rooms/vision_quest/frog_idle@3x.webp"],
   ["assets/sprites/quest-rooms/vision_quest/frog_move.png", "assets/sprites/quest-rooms/vision_quest/frog_move@3x.webp"],
@@ -163,6 +252,11 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/rooks/rook-head-stunned.png", "assets/sprites/rooks/rook-head-stunned@3x.webp"],
   ["assets/sprites/rooks/rook-head-stunnedHit.png", "assets/sprites/rooks/rook-head-stunnedHit@3x.webp"],
   ["assets/sprites/rooks/rook-head-taunt.png", "assets/sprites/rooks/rook-head-taunt@3x.webp"],
+  ["assets/sprites/rube/rube_fade_out.webp", "assets/sprites/rube/rube_fade_out@3x.webp"],
+  ["assets/sprites/rube/rube_offer_accept.webp", "assets/sprites/rube/rube_offer_accept@3x.webp"],
+  ["assets/sprites/rube/rube_talk.webp", "assets/sprites/rube/rube_talk@3x.webp"],
+  ["assets/sprites/rube/rube_walk_end.webp", "assets/sprites/rube/rube_walk_end@3x.webp"],
+  ["assets/sprites/rube/rube_walk.webp", "assets/sprites/rube/rube_walk@3x.webp"],
   ["assets/sprites/shrines/alph_close.png", "assets/sprites/shrines/alph_close@3x.webp"],
   ["assets/sprites/shrines/alph_open.png", "assets/sprites/shrines/alph_open@3x.webp"],
   ["assets/sprites/shrines/cosma_close.png", "assets/sprites/shrines/cosma_close@3x.webp"],
@@ -185,6 +279,25 @@ export const HIRES_SPRITES = new Map([
   ["assets/sprites/shrines/ti_open.png", "assets/sprites/shrines/ti_open@3x.webp"],
   ["assets/sprites/shrines/zille_close.png", "assets/sprites/shrines/zille_close@3x.webp"],
   ["assets/sprites/shrines/zille_open.png", "assets/sprites/shrines/zille_open@3x.webp"],
+  ["assets/sprites/smuggling/deimaginator_appear.webp", "assets/sprites/smuggling/deimaginator_appear@3x.webp"],
+  ["assets/sprites/smuggling/deimaginator_disappear.webp", "assets/sprites/smuggling/deimaginator_disappear@3x.webp"],
+  ["assets/sprites/smuggling/deimaginator_walk.webp", "assets/sprites/smuggling/deimaginator_walk@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_green_1_arriveNoBox.webp", "assets/sprites/smuggling/smuggler_green_1_arriveNoBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_green_1_exitNoBox.webp", "assets/sprites/smuggling/smuggler_green_1_exitNoBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_green_1_exitWithBox.webp", "assets/sprites/smuggling/smuggler_green_1_exitWithBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_green_1_takeBox.webp", "assets/sprites/smuggling/smuggler_green_1_takeBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_green_2_arriveNoBox.webp", "assets/sprites/smuggling/smuggler_green_2_arriveNoBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_green_2_exitNoBox.webp", "assets/sprites/smuggling/smuggler_green_2_exitNoBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_green_2_exitWithBox.webp", "assets/sprites/smuggling/smuggler_green_2_exitWithBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_green_2_takeBox.webp", "assets/sprites/smuggling/smuggler_green_2_takeBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_red_1_arriveWithBox.webp", "assets/sprites/smuggling/smuggler_red_1_arriveWithBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_red_1_exitNoBox.webp", "assets/sprites/smuggling/smuggler_red_1_exitNoBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_red_1_exitWithBox.webp", "assets/sprites/smuggling/smuggler_red_1_exitWithBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_red_1_giveBox.webp", "assets/sprites/smuggling/smuggler_red_1_giveBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_red_2_arriveWithBox.webp", "assets/sprites/smuggling/smuggler_red_2_arriveWithBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_red_2_exitNoBox.webp", "assets/sprites/smuggling/smuggler_red_2_exitNoBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_red_2_exitWithBox.webp", "assets/sprites/smuggling/smuggler_red_2_exitWithBox@3x.webp"],
+  ["assets/sprites/smuggling/smuggler_red_2_giveBox.webp", "assets/sprites/smuggling/smuggler_red_2_giveBox@3x.webp"],
   ["assets/sprites/soil/patch-clean.png", "assets/sprites/soil/patch-clean@3x.webp"],
   ["assets/sprites/soil/patch-dark-clean.png", "assets/sprites/soil/patch-dark-clean@3x.webp"],
   ["assets/sprites/soil/patch-dark-dirty.png", "assets/sprites/soil/patch-dark-dirty@3x.webp"],
@@ -232,6 +345,49 @@ export const HIRES_SPRITES = new Map([
 ]);
 
 /**
+ * Sheets whose 3x would break the texture budget as one file (8192 px side,
+ * 64 MB decoded): the cells are split, in frame order, into part files that
+ * each fit. 1x path -> { fw, fh, cols (1x cell grid), parts: [[url, from,
+ * count, cols], ...] }: part p holds 1x cells from..from+count-1 in its own
+ * cols-wide grid. The 1x sheet is unchanged; on first draw every frame
+ * Texture cut from it is pointed at its part (frame rect still in 1x units).
+ */
+export const SPLIT_SPRITES = new Map([
+  ["assets/sprites/hell/hell_bartender-idle1.png", { fw: 244, fh: 197, cols: 14, parts: [["assets/sprites/hell/hell_bartender-idle1.p1@3x.webp", 0, 27, 3], ["assets/sprites/hell/hell_bartender-idle1.p2@3x.webp", 27, 27, 3], ["assets/sprites/hell/hell_bartender-idle1.p3@3x.webp", 54, 27, 3]] }],
+  ["assets/sprites/hell/hell_bartender-idle2.png", { fw: 244, fh: 197, cols: 15, parts: [["assets/sprites/hell/hell_bartender-idle2.p1@3x.webp", 0, 29, 5], ["assets/sprites/hell/hell_bartender-idle2.p2@3x.webp", 29, 29, 5], ["assets/sprites/hell/hell_bartender-idle2.p3@3x.webp", 58, 29, 5]] }],
+  ["assets/sprites/hell/hell_bartender-talk-left.png", { fw: 244, fh: 197, cols: 16, parts: [["assets/sprites/hell/hell_bartender-talk-left.p1@3x.webp", 0, 28, 4], ["assets/sprites/hell/hell_bartender-talk-left.p2@3x.webp", 28, 28, 4], ["assets/sprites/hell/hell_bartender-talk-left.p3@3x.webp", 56, 28, 4], ["assets/sprites/hell/hell_bartender-talk-left.p4@3x.webp", 84, 26, 2]] }],
+  ["assets/sprites/hell/hell_bartender-talk-right.png", { fw: 244, fh: 197, cols: 15, parts: [["assets/sprites/hell/hell_bartender-talk-right.p1@3x.webp", 0, 35, 5], ["assets/sprites/hell/hell_bartender-talk-right.p2@3x.webp", 35, 35, 5], ["assets/sprites/hell/hell_bartender-talk-right.p3@3x.webp", 70, 33, 3]] }],
+  ["assets/sprites/newxp/flamingo_talk_short.png", { fw: 290, fh: 249, cols: 13, parts: [["assets/sprites/newxp/flamingo_talk_short.p1@3x.webp", 0, 23, 4], ["assets/sprites/newxp/flamingo_talk_short.p2@3x.webp", 23, 23, 4], ["assets/sprites/newxp/flamingo_talk_short.p3@3x.webp", 46, 23, 4], ["assets/sprites/newxp/flamingo_talk_short.p4@3x.webp", 69, 20, 4]] }],
+  ["assets/sprites/newxp/flamingo_talk_tall.png", { fw: 290, fh: 249, cols: 13, parts: [["assets/sprites/newxp/flamingo_talk_tall.p1@3x.webp", 0, 23, 4], ["assets/sprites/newxp/flamingo_talk_tall.p2@3x.webp", 23, 23, 4], ["assets/sprites/newxp/flamingo_talk_tall.p3@3x.webp", 46, 23, 4], ["assets/sprites/newxp/flamingo_talk_tall.p4@3x.webp", 69, 20, 4]] }],
+  ["assets/sprites/newxp/rock_talk.png", { fw: 75, fh: 348, cols: 13, parts: [["assets/sprites/newxp/rock_talk.p1@3x.webp", 0, 46, 23], ["assets/sprites/newxp/rock_talk.p2@3x.webp", 46, 45, 15]] }],
+  ["assets/sprites/quest-rooms/gwendolyn/squid_blue_idle.webp", { fw: 235, fh: 251, cols: 4, parts: [["assets/sprites/quest-rooms/gwendolyn/squid_blue_idle.p1@3x.webp", 0, 24, 6], ["assets/sprites/quest-rooms/gwendolyn/squid_blue_idle.p2@3x.webp", 24, 24, 6]] }],
+  ["assets/sprites/quest-rooms/gwendolyn/squid_blue_talk.webp", { fw: 235, fh: 251, cols: 15, parts: [["assets/sprites/quest-rooms/gwendolyn/squid_blue_talk.p1@3x.webp", 0, 29, 6], ["assets/sprites/quest-rooms/gwendolyn/squid_blue_talk.p2@3x.webp", 29, 29, 6], ["assets/sprites/quest-rooms/gwendolyn/squid_blue_talk.p3@3x.webp", 58, 29, 6]] }],
+  ["assets/sprites/quest-rooms/gwendolyn/squid_purple_idle.webp", { fw: 235, fh: 251, cols: 4, parts: [["assets/sprites/quest-rooms/gwendolyn/squid_purple_idle.p1@3x.webp", 0, 24, 6], ["assets/sprites/quest-rooms/gwendolyn/squid_purple_idle.p2@3x.webp", 24, 24, 6]] }],
+  ["assets/sprites/quest-rooms/gwendolyn/squid_purple_talk.webp", { fw: 235, fh: 251, cols: 15, parts: [["assets/sprites/quest-rooms/gwendolyn/squid_purple_talk.p1@3x.webp", 0, 29, 6], ["assets/sprites/quest-rooms/gwendolyn/squid_purple_talk.p2@3x.webp", 29, 29, 6], ["assets/sprites/quest-rooms/gwendolyn/squid_purple_talk.p3@3x.webp", 58, 29, 6]] }],
+  ["assets/sprites/quest-rooms/juju_camp/grandma_angry.png", { fw: 138, fh: 135, cols: 7, parts: [["assets/sprites/quest-rooms/juju_camp/grandma_angry.p1@3x.webp", 0, 63, 7], ["assets/sprites/quest-rooms/juju_camp/grandma_angry.p2@3x.webp", 63, 63, 7]] }],
+  ["assets/sprites/quest-rooms/penalty/vendor_idle.webp", { fw: 187, fh: 91, cols: 5, parts: [["assets/sprites/quest-rooms/penalty/vendor_idle.p1@3x.webp", 0, 55, 5], ["assets/sprites/quest-rooms/penalty/vendor_idle.p2@3x.webp", 55, 55, 5]] }],
+  ["assets/sprites/rube/rube_offer_reject.webp", { fw: 108, fh: 154, cols: 9, parts: [["assets/sprites/rube/rube_offer_reject.p1@3x.webp", 0, 65, 13], ["assets/sprites/rube/rube_offer_reject.p2@3x.webp", 65, 65, 13]] }],
+  ["assets/sprites/rube/rube_offer_trade.png", { fw: 108, fh: 154, cols: 34, parts: [["assets/sprites/rube/rube_offer_trade.p1@3x.webp", 0, 85, 17], ["assets/sprites/rube/rube_offer_trade.p2@3x.webp", 85, 85, 17], ["assets/sprites/rube/rube_offer_trade.p3@3x.webp", 170, 85, 17], ["assets/sprites/rube/rube_offer_trade.p4@3x.webp", 255, 85, 17]] }],
+  ["assets/sprites/rube/rube_spawn_in.webp", { fw: 108, fh: 154, cols: 9, parts: [["assets/sprites/rube/rube_spawn_in.p1@3x.webp", 0, 103, 13], ["assets/sprites/rube/rube_spawn_in.p2@3x.webp", 103, 102, 17]] }],
+  ["assets/sprites/smuggling/deimaginator_idle1.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/deimaginator_idle1.p1@3x.webp", 0, 34, 5], ["assets/sprites/smuggling/deimaginator_idle1.p2@3x.webp", 34, 34, 5], ["assets/sprites/smuggling/deimaginator_idle1.p3@3x.webp", 68, 34, 5], ["assets/sprites/smuggling/deimaginator_idle1.p4@3x.webp", 102, 33, 3]] }],
+  ["assets/sprites/smuggling/deimaginator_talk.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/deimaginator_talk.p1@3x.webp", 0, 30, 5], ["assets/sprites/smuggling/deimaginator_talk.p2@3x.webp", 30, 30, 5], ["assets/sprites/smuggling/deimaginator_talk.p3@3x.webp", 60, 29, 5]] }],
+  ["assets/sprites/smuggling/smuggler_green_1_idleNoBox.webp", { fw: 251, fh: 186, cols: 16, parts: [["assets/sprites/smuggling/smuggler_green_1_idleNoBox.p1@3x.webp", 0, 37, 3], ["assets/sprites/smuggling/smuggler_green_1_idleNoBox.p2@3x.webp", 37, 37, 3], ["assets/sprites/smuggling/smuggler_green_1_idleNoBox.p3@3x.webp", 74, 35, 5]] }],
+  ["assets/sprites/smuggling/smuggler_green_1_talkNoBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_green_1_talkNoBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_green_1_talkNoBox.p2@3x.webp", 36, 36, 6]] }],
+  ["assets/sprites/smuggling/smuggler_green_1_talkWithBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_green_1_talkWithBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_green_1_talkWithBox.p2@3x.webp", 36, 36, 6]] }],
+  ["assets/sprites/smuggling/smuggler_green_2_idleNoBox.webp", { fw: 251, fh: 186, cols: 16, parts: [["assets/sprites/smuggling/smuggler_green_2_idleNoBox.p1@3x.webp", 0, 37, 3], ["assets/sprites/smuggling/smuggler_green_2_idleNoBox.p2@3x.webp", 37, 37, 3], ["assets/sprites/smuggling/smuggler_green_2_idleNoBox.p3@3x.webp", 74, 35, 5]] }],
+  ["assets/sprites/smuggling/smuggler_green_2_talkNoBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_green_2_talkNoBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_green_2_talkNoBox.p2@3x.webp", 36, 36, 6]] }],
+  ["assets/sprites/smuggling/smuggler_green_2_talkWithBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_green_2_talkWithBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_green_2_talkWithBox.p2@3x.webp", 36, 36, 6]] }],
+  ["assets/sprites/smuggling/smuggler_red_1_idleNoBox.webp", { fw: 251, fh: 186, cols: 16, parts: [["assets/sprites/smuggling/smuggler_red_1_idleNoBox.p1@3x.webp", 0, 37, 3], ["assets/sprites/smuggling/smuggler_red_1_idleNoBox.p2@3x.webp", 37, 37, 3], ["assets/sprites/smuggling/smuggler_red_1_idleNoBox.p3@3x.webp", 74, 35, 5]] }],
+  ["assets/sprites/smuggling/smuggler_red_1_idleWithBox.webp", { fw: 251, fh: 186, cols: 16, parts: [["assets/sprites/smuggling/smuggler_red_1_idleWithBox.p1@3x.webp", 0, 37, 3], ["assets/sprites/smuggling/smuggler_red_1_idleWithBox.p2@3x.webp", 37, 37, 3], ["assets/sprites/smuggling/smuggler_red_1_idleWithBox.p3@3x.webp", 74, 35, 5]] }],
+  ["assets/sprites/smuggling/smuggler_red_1_talkNoBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_red_1_talkNoBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_red_1_talkNoBox.p2@3x.webp", 36, 36, 6]] }],
+  ["assets/sprites/smuggling/smuggler_red_1_talkWithBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_red_1_talkWithBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_red_1_talkWithBox.p2@3x.webp", 36, 36, 6]] }],
+  ["assets/sprites/smuggling/smuggler_red_2_idleNoBox.webp", { fw: 251, fh: 186, cols: 16, parts: [["assets/sprites/smuggling/smuggler_red_2_idleNoBox.p1@3x.webp", 0, 37, 3], ["assets/sprites/smuggling/smuggler_red_2_idleNoBox.p2@3x.webp", 37, 37, 3], ["assets/sprites/smuggling/smuggler_red_2_idleNoBox.p3@3x.webp", 74, 35, 5]] }],
+  ["assets/sprites/smuggling/smuggler_red_2_idleWithBox.webp", { fw: 251, fh: 186, cols: 16, parts: [["assets/sprites/smuggling/smuggler_red_2_idleWithBox.p1@3x.webp", 0, 37, 3], ["assets/sprites/smuggling/smuggler_red_2_idleWithBox.p2@3x.webp", 37, 37, 3], ["assets/sprites/smuggling/smuggler_red_2_idleWithBox.p3@3x.webp", 74, 35, 5]] }],
+  ["assets/sprites/smuggling/smuggler_red_2_talkNoBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_red_2_talkNoBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_red_2_talkNoBox.p2@3x.webp", 36, 36, 6]] }],
+  ["assets/sprites/smuggling/smuggler_red_2_talkWithBox.webp", { fw: 251, fh: 186, cols: 15, parts: [["assets/sprites/smuggling/smuggler_red_2_talkWithBox.p1@3x.webp", 0, 36, 6], ["assets/sprites/smuggling/smuggler_red_2_talkWithBox.p2@3x.webp", 36, 36, 6]] }],
+]);
+
+/**
  * Sheets that stay 1x until the renderer first draws them (characters, NPCs,
  * shrines: big sheets that are often loaded and rarely all on screen).
  * installHiresSprites leaves them out of the eager URL route and
@@ -272,6 +428,74 @@ export const FIRST_DRAW_SPRITES = new Set([
   "assets/sprites/foxes/ranger-idle2.png",
   "assets/sprites/foxes/ranger-talk.png",
   "assets/sprites/garden/plot_seedling.png",
+  "assets/sprites/hell/hell_bartender-idle1.png",
+  "assets/sprites/hell/hell_bartender-idle2.png",
+  "assets/sprites/hell/hell_bartender-talk-left.png",
+  "assets/sprites/hell/hell_bartender-talk-right-out.png",
+  "assets/sprites/hell/hell_bartender-talk-right.png",
+  "assets/sprites/juju_bandit/juju_green_black_idle1.webp",
+  "assets/sprites/juju_bandit/juju_green_black_idle2.webp",
+  "assets/sprites/juju_bandit/juju_green_black_shrink.webp",
+  "assets/sprites/juju_bandit/juju_green_black_spawn.webp",
+  "assets/sprites/juju_bandit/juju_green_black_swipe.webp",
+  "assets/sprites/juju_bandit/juju_green_black_walk_end.webp",
+  "assets/sprites/juju_bandit/juju_green_black_walk.webp",
+  "assets/sprites/juju_bandit/juju_green_blue_idle1.webp",
+  "assets/sprites/juju_bandit/juju_green_blue_idle2.webp",
+  "assets/sprites/juju_bandit/juju_green_blue_shrink.webp",
+  "assets/sprites/juju_bandit/juju_green_blue_spawn.webp",
+  "assets/sprites/juju_bandit/juju_green_blue_swipe.webp",
+  "assets/sprites/juju_bandit/juju_green_blue_walk_end.webp",
+  "assets/sprites/juju_bandit/juju_green_blue_walk.webp",
+  "assets/sprites/juju_bandit/juju_green_red_idle1.webp",
+  "assets/sprites/juju_bandit/juju_green_red_idle2.webp",
+  "assets/sprites/juju_bandit/juju_green_red_shrink.webp",
+  "assets/sprites/juju_bandit/juju_green_red_spawn.webp",
+  "assets/sprites/juju_bandit/juju_green_red_swipe.webp",
+  "assets/sprites/juju_bandit/juju_green_red_walk_end.webp",
+  "assets/sprites/juju_bandit/juju_green_red_walk.webp",
+  "assets/sprites/juju_bandit/juju_red_black_idle1.webp",
+  "assets/sprites/juju_bandit/juju_red_black_idle2.webp",
+  "assets/sprites/juju_bandit/juju_red_black_shrink.webp",
+  "assets/sprites/juju_bandit/juju_red_black_spawn.webp",
+  "assets/sprites/juju_bandit/juju_red_black_swipe.webp",
+  "assets/sprites/juju_bandit/juju_red_black_walk_end.webp",
+  "assets/sprites/juju_bandit/juju_red_black_walk.webp",
+  "assets/sprites/juju_bandit/juju_red_blue_idle1.webp",
+  "assets/sprites/juju_bandit/juju_red_blue_idle2.webp",
+  "assets/sprites/juju_bandit/juju_red_blue_shrink.webp",
+  "assets/sprites/juju_bandit/juju_red_blue_spawn.webp",
+  "assets/sprites/juju_bandit/juju_red_blue_swipe.webp",
+  "assets/sprites/juju_bandit/juju_red_blue_walk_end.webp",
+  "assets/sprites/juju_bandit/juju_red_blue_walk.webp",
+  "assets/sprites/juju_bandit/juju_red_red_idle1.webp",
+  "assets/sprites/juju_bandit/juju_red_red_idle2.webp",
+  "assets/sprites/juju_bandit/juju_red_red_shrink.webp",
+  "assets/sprites/juju_bandit/juju_red_red_spawn.webp",
+  "assets/sprites/juju_bandit/juju_red_red_swipe.webp",
+  "assets/sprites/juju_bandit/juju_red_red_walk_end.webp",
+  "assets/sprites/juju_bandit/juju_red_red_walk.webp",
+  "assets/sprites/juju_bandit/juju_yellow_black_idle1.webp",
+  "assets/sprites/juju_bandit/juju_yellow_black_idle2.webp",
+  "assets/sprites/juju_bandit/juju_yellow_black_shrink.webp",
+  "assets/sprites/juju_bandit/juju_yellow_black_spawn.webp",
+  "assets/sprites/juju_bandit/juju_yellow_black_swipe.webp",
+  "assets/sprites/juju_bandit/juju_yellow_black_walk_end.webp",
+  "assets/sprites/juju_bandit/juju_yellow_black_walk.webp",
+  "assets/sprites/juju_bandit/juju_yellow_blue_idle1.webp",
+  "assets/sprites/juju_bandit/juju_yellow_blue_idle2.webp",
+  "assets/sprites/juju_bandit/juju_yellow_blue_shrink.webp",
+  "assets/sprites/juju_bandit/juju_yellow_blue_spawn.webp",
+  "assets/sprites/juju_bandit/juju_yellow_blue_swipe.webp",
+  "assets/sprites/juju_bandit/juju_yellow_blue_walk_end.webp",
+  "assets/sprites/juju_bandit/juju_yellow_blue_walk.webp",
+  "assets/sprites/juju_bandit/juju_yellow_red_idle1.webp",
+  "assets/sprites/juju_bandit/juju_yellow_red_idle2.webp",
+  "assets/sprites/juju_bandit/juju_yellow_red_shrink.webp",
+  "assets/sprites/juju_bandit/juju_yellow_red_spawn.webp",
+  "assets/sprites/juju_bandit/juju_yellow_red_swipe.webp",
+  "assets/sprites/juju_bandit/juju_yellow_red_walk_end.webp",
+  "assets/sprites/juju_bandit/juju_yellow_red_walk.webp",
   "assets/sprites/mining/rock_beryl.png",
   "assets/sprites/mining/rock_dullite.png",
   "assets/sprites/mining/rock_metal.png",
@@ -280,6 +504,14 @@ export const FIRST_DRAW_SPRITES = new Set([
   "assets/sprites/newxp/dustbunny_talk.png",
   "assets/sprites/newxp/dustbunny_walk_right.png",
   "assets/sprites/newxp/dustbunny_walk.png",
+  "assets/sprites/newxp/flamingo_flying.png",
+  "assets/sprites/newxp/flamingo_hover.png",
+  "assets/sprites/newxp/flamingo_idle.png",
+  "assets/sprites/newxp/flamingo_talk_short.png",
+  "assets/sprites/newxp/flamingo_talk_tall.png",
+  "assets/sprites/newxp/rock_appear.png",
+  "assets/sprites/newxp/rock_read.png",
+  "assets/sprites/newxp/rock_talk.png",
   "assets/sprites/quest-rooms/back_alley/bot_attract.png",
   "assets/sprites/quest-rooms/back_alley/bot_move.png",
   "assets/sprites/quest-rooms/color_unblocking/npc_crab_idle0.png",
@@ -288,8 +520,31 @@ export const FIRST_DRAW_SPRITES = new Set([
   "assets/sprites/quest-rooms/gwendolyn/cactus_talk.webp",
   "assets/sprites/quest-rooms/gwendolyn/gwendolyn_idle.webp",
   "assets/sprites/quest-rooms/gwendolyn/gwendolyn_talk.webp",
+  "assets/sprites/quest-rooms/gwendolyn/squid_blue_bamfin.webp",
+  "assets/sprites/quest-rooms/gwendolyn/squid_blue_bamfout.webp",
+  "assets/sprites/quest-rooms/gwendolyn/squid_blue_idle.webp",
+  "assets/sprites/quest-rooms/gwendolyn/squid_blue_talk.webp",
+  "assets/sprites/quest-rooms/gwendolyn/squid_purple_bamfin.webp",
+  "assets/sprites/quest-rooms/gwendolyn/squid_purple_bamfout.webp",
+  "assets/sprites/quest-rooms/gwendolyn/squid_purple_idle.webp",
+  "assets/sprites/quest-rooms/gwendolyn/squid_purple_talk.webp",
   "assets/sprites/quest-rooms/gwendolyn/swoonerfly_fall.png",
   "assets/sprites/quest-rooms/gwendolyn/swoonerfly_rest.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_green_shrink.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_green_spawn.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_green_walk_end.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_green_walk.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_red_shrink.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_red_spawn.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_red_walk_end.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_red_walk.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_yellow_shrink.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_yellow_spawn.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk_end.png",
+  "assets/sprites/quest-rooms/juju_camp/bandit_yellow_walk.png",
+  "assets/sprites/quest-rooms/juju_camp/grandma_angry.png",
+  "assets/sprites/quest-rooms/juju_camp/grandma_idle.png",
+  "assets/sprites/quest-rooms/juju_camp/grandma_talk.png",
   "assets/sprites/quest-rooms/kids_room/mr-block-A.png",
   "assets/sprites/quest-rooms/kids_room/mr-block-B.png",
   "assets/sprites/quest-rooms/kids_room/mr-block-E.png",
@@ -298,6 +553,9 @@ export const FIRST_DRAW_SPRITES = new Set([
   "assets/sprites/quest-rooms/kids_room/mr-block-T.png",
   "assets/sprites/quest-rooms/le_miserable/bot_idle.png",
   "assets/sprites/quest-rooms/le_miserable/bot_talk.png",
+  "assets/sprites/quest-rooms/penalty/vendor_idle.webp",
+  "assets/sprites/quest-rooms/penalty/vendor_talk.webp",
+  "assets/sprites/quest-rooms/penalty/vendor_walk.webp",
   "assets/sprites/quest-rooms/vision_quest/crab_idle.png",
   "assets/sprites/quest-rooms/vision_quest/frog_idle.png",
   "assets/sprites/quest-rooms/vision_quest/frog_move.png",
@@ -357,6 +615,14 @@ export const FIRST_DRAW_SPRITES = new Set([
   "assets/sprites/rooks/rook-head-stunned.png",
   "assets/sprites/rooks/rook-head-stunnedHit.png",
   "assets/sprites/rooks/rook-head-taunt.png",
+  "assets/sprites/rube/rube_fade_out.webp",
+  "assets/sprites/rube/rube_offer_accept.webp",
+  "assets/sprites/rube/rube_offer_reject.webp",
+  "assets/sprites/rube/rube_offer_trade.png",
+  "assets/sprites/rube/rube_spawn_in.webp",
+  "assets/sprites/rube/rube_talk.webp",
+  "assets/sprites/rube/rube_walk_end.webp",
+  "assets/sprites/rube/rube_walk.webp",
   "assets/sprites/shrines/alph_close.png",
   "assets/sprites/shrines/alph_open.png",
   "assets/sprites/shrines/cosma_close.png",
@@ -379,6 +645,41 @@ export const FIRST_DRAW_SPRITES = new Set([
   "assets/sprites/shrines/ti_open.png",
   "assets/sprites/shrines/zille_close.png",
   "assets/sprites/shrines/zille_open.png",
+  "assets/sprites/smuggling/deimaginator_appear.webp",
+  "assets/sprites/smuggling/deimaginator_disappear.webp",
+  "assets/sprites/smuggling/deimaginator_idle1.webp",
+  "assets/sprites/smuggling/deimaginator_talk.webp",
+  "assets/sprites/smuggling/deimaginator_walk.webp",
+  "assets/sprites/smuggling/smuggler_green_1_arriveNoBox.webp",
+  "assets/sprites/smuggling/smuggler_green_1_exitNoBox.webp",
+  "assets/sprites/smuggling/smuggler_green_1_exitWithBox.webp",
+  "assets/sprites/smuggling/smuggler_green_1_idleNoBox.webp",
+  "assets/sprites/smuggling/smuggler_green_1_takeBox.webp",
+  "assets/sprites/smuggling/smuggler_green_1_talkNoBox.webp",
+  "assets/sprites/smuggling/smuggler_green_1_talkWithBox.webp",
+  "assets/sprites/smuggling/smuggler_green_2_arriveNoBox.webp",
+  "assets/sprites/smuggling/smuggler_green_2_exitNoBox.webp",
+  "assets/sprites/smuggling/smuggler_green_2_exitWithBox.webp",
+  "assets/sprites/smuggling/smuggler_green_2_idleNoBox.webp",
+  "assets/sprites/smuggling/smuggler_green_2_takeBox.webp",
+  "assets/sprites/smuggling/smuggler_green_2_talkNoBox.webp",
+  "assets/sprites/smuggling/smuggler_green_2_talkWithBox.webp",
+  "assets/sprites/smuggling/smuggler_red_1_arriveWithBox.webp",
+  "assets/sprites/smuggling/smuggler_red_1_exitNoBox.webp",
+  "assets/sprites/smuggling/smuggler_red_1_exitWithBox.webp",
+  "assets/sprites/smuggling/smuggler_red_1_giveBox.webp",
+  "assets/sprites/smuggling/smuggler_red_1_idleNoBox.webp",
+  "assets/sprites/smuggling/smuggler_red_1_idleWithBox.webp",
+  "assets/sprites/smuggling/smuggler_red_1_talkNoBox.webp",
+  "assets/sprites/smuggling/smuggler_red_1_talkWithBox.webp",
+  "assets/sprites/smuggling/smuggler_red_2_arriveWithBox.webp",
+  "assets/sprites/smuggling/smuggler_red_2_exitNoBox.webp",
+  "assets/sprites/smuggling/smuggler_red_2_exitWithBox.webp",
+  "assets/sprites/smuggling/smuggler_red_2_giveBox.webp",
+  "assets/sprites/smuggling/smuggler_red_2_idleNoBox.webp",
+  "assets/sprites/smuggling/smuggler_red_2_idleWithBox.webp",
+  "assets/sprites/smuggling/smuggler_red_2_talkNoBox.webp",
+  "assets/sprites/smuggling/smuggler_red_2_talkWithBox.webp",
   "assets/sprites/soil/patch-clean.png",
   "assets/sprites/soil/patch-dark-clean.png",
   "assets/sprites/soil/patch-dark-dirty.png",
@@ -426,8 +727,10 @@ export const FIRST_DRAW_SPRITES = new Set([
 ]);
 
 let enabled = true;
+/** js/textures.js, for the frames of split sheets (installHiresSprites). */
+let frameSource = null;
 
-/** The 3x URL for a sheet URL (query string kept), or null. */
+/** The 3x URL for a sheet URL (query string kept), or null (split sheets too). */
 export function hiresSpriteUrl(url) {
   if (!enabled) return null;
   const s = String(url || '');
@@ -450,13 +753,23 @@ function sheetPath(url) {
  * (game.js SHEETS, features, quest rooms). Only when sprites are drawn at
  * 1.5+ device pixels per art pixel (DPR x the 960px view's zoom): below that
  * the 1x sheets already fill the screen, and a 3x texture would only cost
- * memory and alias when minified. First-draw sheets stay 1x here.
- * @param {{ addUrlRoute: Function }} textures the js/textures.js module
+ * memory and alias when minified. First-draw sheets stay 1x here. Split
+ * sheets have their frame Textures tracked so they can move to the parts.
+ * @param {{ addUrlRoute: Function, trackFrameTextures?: Function, framesOf?: Function }} textures the js/textures.js module
  */
 export function installHiresSprites(textures, { dpr = globalThis.devicePixelRatio || 1, viewWidth = globalThis.innerWidth || 960 } = {}) {
   enabled = dpr * Math.max(1, viewWidth / 960) >= 1.5;
   if (!enabled || typeof textures?.addUrlRoute !== 'function') return;
   textures.addUrlRoute('hires-sprites', (url) => (FIRST_DRAW_SPRITES.has(sheetPath(url)) ? null : hiresSpriteUrl(url)));
+  if (typeof textures.trackFrameTextures === 'function' && typeof textures.framesOf === 'function') {
+    frameSource = textures;
+    textures.trackFrameTextures({
+      match: (url) => SPLIT_SPRITES.has(sheetPath(url)),
+      added: (source, texture) => {
+        if (source.hiresParts) pointAtPart(source, texture);
+      },
+    });
+  }
 }
 
 /**
@@ -464,12 +777,15 @@ export function installHiresSprites(textures, { dpr = globalThis.devicePixelRati
  * has loaded. Every Texture already cut from it keeps its 1x frame rect and
  * turns sharp. Feature sheet loaders call this when a sheet is first drawn,
  * so sheets that are only preloaded never pay for 3x pixels. Resolves true
- * once swapped.
+ * once swapped. A split sheet loads its parts instead and its frames move
+ * to them.
  * @param {any} source a Pixi 8 TextureSource
  * @param {string} url its 1x sheet URL
  * @param {(source: any) => Promise<any>} [whenLoaded] js/textures.js whenLoaded
  */
 export function upgradeSource(source, url, whenLoaded = (s) => Promise.resolve(s)) {
+  const split = enabled ? SPLIT_SPRITES.get(sheetPath(url)) : null;
+  if (split) return upgradeSplit(source, split, whenLoaded);
   const hi = hiresSpriteUrl(url);
   if (!hi || !source || source.destroyed) return Promise.resolve(false);
   if (source.hiresUpgrade) return source.hiresUpgrade;
@@ -497,13 +813,75 @@ export function upgradeSource(source, url, whenLoaded = (s) => Promise.resolve(s
   return source.hiresUpgrade;
 }
 
+/** Load a split sheet's parts as resolution-3 sources and move its frames there. */
+function upgradeSplit(source, split, whenLoaded) {
+  if (!source || source.destroyed || !frameSource) return Promise.resolve(false);
+  if (source.hiresUpgrade) return source.hiresUpgrade;
+  const bitmap = (url) => fetch(url).then((res) => {
+    if (!res.ok) throw new Error(`${url}: ${res.status}`);
+    return res.blob();
+  }).then((blob) => createImageBitmap(blob));
+  source.hiresUpgrade = Promise.resolve(whenLoaded(source))
+    .then(() => Promise.all(split.parts.map(([url]) => bitmap(url))))
+    .then((bitmaps) => {
+      if (source.destroyed) {
+        for (const b of bitmaps) b.close?.();
+        return false;
+      }
+      const Source = source.constructor;
+      source.hiresSplit = split;
+      source.hiresParts = split.parts.map(([url, from, count, cols], i) => ({
+        from,
+        count,
+        cols,
+        source: new Source({
+          resource: bitmaps[i],
+          resolution: 3,
+          label: url,
+          alphaMode: source.alphaMode,
+          scaleMode: source.scaleMode,
+          autoGarbageCollect: source.autoGarbageCollect,
+        }),
+      }));
+      for (const texture of frameSource.framesOf(source)) pointAtPart(source, texture);
+      return true;
+    })
+    .catch(() => false);
+  return source.hiresUpgrade;
+}
+
+/**
+ * Point one frame Texture of a split sheet at the part holding its cell
+ * (same 1x size, the cell's place in the part). Frames that span cells or
+ * fall outside every part stay on the 1x sheet.
+ */
+export function pointAtPart(source, texture) {
+  const split = source?.hiresSplit;
+  const frame = texture?.frame;
+  if (!split || !frame || texture.destroyed || texture.source !== source) return false;
+  const col = Math.floor((frame.x + 0.5) / split.fw);
+  const row = Math.floor((frame.y + 0.5) / split.fh);
+  const dx = frame.x - col * split.fw;
+  const dy = frame.y - row * split.fh;
+  if (col >= split.cols || dx + frame.width > split.fw + 0.5 || dy + frame.height > split.fh + 0.5) return false;
+  const cell = row * split.cols + col;
+  const part = source.hiresParts.find((p) => cell >= p.from && cell < p.from + p.count);
+  if (!part || part.source.destroyed) return false;
+  const j = cell - part.from;
+  frame.x = (j % part.cols) * split.fw + dx;
+  frame.y = Math.floor(j / part.cols) * split.fh + dy;
+  texture.source = part.source;
+  texture.update();
+  return true;
+}
+
 /** The listed 1x sheet a TextureSource was loaded from, or null. */
 export function sourceSheet(source) {
   const ids = [source?.label, source?.groddleUrl];
   for (const id of ids) {
     if (typeof id !== 'string' || !id) continue;
     const path = sheetPath(id);
-    if (HIRES_SPRITES.has(path)) return path;
+    if (HIRES_SPRITES.has(path) || SPLIT_SPRITES.has(path)) return path;
   }
   return null;
 }
@@ -513,7 +891,8 @@ export function sourceSheet(source) {
  * texture (the WebGL or WebGPU texture system's _initSource runs once per
  * TextureSource, and again after Pixi's texture GC unloads it), whatever
  * loaded it: game.js SHEETS, quest-room kits, feature modules. Sheets that
- * are loaded but never drawn keep their 1x pixels.
+ * are loaded but never drawn keep their 1x pixels. A split sheet drawn
+ * again at 1x (a frame cut after its parts arrived) re-points its frames.
  * @param {any} renderer a Pixi 8 renderer
  * @param {(source: any) => Promise<any>} [whenLoaded] js/textures.js whenLoaded
  */
@@ -523,8 +902,12 @@ export function installHiresFirstDraw(renderer, whenLoaded) {
   const init = system._initSource.bind(system);
   system._initSource = (source) => {
     const gpu = init(source);
-    const path = source?.hiresUpgrade ? null : sourceSheet(source);
-    if (path) upgradeSource(source, path, whenLoaded);
+    if (source?.hiresParts && frameSource) {
+      for (const texture of frameSource.framesOf(source)) pointAtPart(source, texture);
+    } else {
+      const path = source?.hiresUpgrade ? null : sourceSheet(source);
+      if (path) upgradeSource(source, path, whenLoaded);
+    }
     return gpu;
   };
   system.hiresFirstDraw = true;

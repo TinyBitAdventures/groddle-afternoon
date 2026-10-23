@@ -59,7 +59,7 @@ import {
   redeclareDelay,
   stealChanceForSeconds,
   withinReach,
-} from '../juju-bandits.js?v=g39-1';
+} from '../juju-bandits.js?v=g39-2';
 
 export const JUJU_FEATURE_ID = 'juju-bandits';
 const Z = 30;

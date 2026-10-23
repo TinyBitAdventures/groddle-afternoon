@@ -11,11 +11,15 @@ import { fileURLToPath } from 'node:url';
 import {
   FIRST_DRAW_SPRITES,
   HIRES_SPRITES,
+  SPLIT_SPRITES,
   hiresSpriteUrl,
   installHiresFirstDraw,
   installHiresSprites,
+  pointAtPart,
   sourceSheet,
+  upgradeSource,
 } from '../public/js/sprite-hires.js';
+import { packParts } from '../tools/vector-sprites/build.mjs';
 
 /** A js/textures.js stand-in: records the URL routes it is given. */
 function fakeTextures() {
@@ -57,7 +61,8 @@ const SHARP = [
   'bureaucrat-0', 'bureaucrat-1', 'bureaucrat-2', 'bureaucrat-3', 'letter-blocks', 'mr-block',
   'dustbunny', 'ilmenskie-jones', 'forehorseman', 'rook-head', 'rooked-piggy', 'rooked-chicken',
   'sad-kitty', 'rooked-butterfly', 'gwendolyn', 'cactus', 'crab', 'myopic-frog', 'maintenance-bot',
-  'fox-ranger', 'fox-bait',
+  'fox-ranger', 'fox-bait', 'juju-red', 'juju-green', 'juju-yellow',
+  ...['red', 'green', 'yellow'].flatMap((v) => ['blue', 'black', 'red'].map((b) => `juju-bandit-${v}-${b}`)),
   ...['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille'].map((g) => `shrine-${g}`),
 ];
 
@@ -111,21 +116,44 @@ describe('3x character sheets', () => {
     }
   });
 
-  it('every built sheet is exactly 3x, within budget, matched frame for frame, and swaps on first draw', () => {
+  it('every built sheet is exactly 3x (one file or parts), within budget, matched frame for frame, and swaps on first draw', () => {
     const { maxSide, maxMB } = manifest.budget;
+    const within = (b, file) => {
+      assert.ok(Math.max(b.w, b.h) <= maxSide, `${file} ${b.w}x${b.h}`);
+      assert.ok((b.w * b.h * 4) / 2 ** 20 <= maxMB, `${file} over ${maxMB} MB`);
+    };
     let built = 0;
+    let split = 0;
     for (const paths of groups.values()) {
       for (const path of paths) {
         const r = results[path];
         if (r.status !== 'ok') continue;
         built += 1;
-        assert.equal(HIRES_SPRITES.get(path), r.hires, path);
         assert.ok(FIRST_DRAW_SPRITES.has(path), `${path} is not first-draw`);
         const a = imageSize(join(pub, path));
-        const b = imageSize(join(pub, r.hires));
-        assert.deepEqual(b, { w: a.w * 3, h: a.h * 3 }, r.hires);
-        assert.ok(Math.max(b.w, b.h) <= maxSide, `${r.hires} ${b.w}x${b.h}`);
-        assert.ok((b.w * b.h * 4) / 2 ** 20 <= maxMB, `${r.hires} over ${maxMB} MB`);
+        if (r.parts) {
+          split += 1;
+          // Too big for one texture: the cells in frame order, in parts that each fit.
+          assert.ok(overBudget(a), `${path} fits as one file but was split`);
+          assert.equal(HIRES_SPRITES.has(path), false, path);
+          const entry = SPLIT_SPRITES.get(path);
+          assert.deepEqual(entry, { fw: r.fw, fh: r.fh, cols: r.cols, parts: r.parts.map((p) => [p.hires, p.from, p.count, p.cols]) }, path);
+          assert.equal(r.cols, Math.floor(a.w / r.fw), path);
+          let next = r.parts[0].from;
+          for (const p of r.parts) {
+            assert.equal(p.from, next, `${path} parts out of order`);
+            next += p.count;
+            const b = imageSize(join(pub, p.hires));
+            assert.deepEqual(b, { w: p.cols * r.fw * 3, h: Math.ceil(p.count / p.cols) * r.fh * 3 }, p.hires);
+            within(b, p.hires);
+          }
+          assert.equal(next - r.parts[0].from, r.cells, `${path} parts hold every cell`);
+        } else {
+          assert.equal(HIRES_SPRITES.get(path), r.hires, path);
+          const b = imageSize(join(pub, r.hires));
+          assert.deepEqual(b, { w: a.w * 3, h: a.h * 3 }, r.hires);
+          within(b, r.hires);
+        }
         assert.ok(r.score >= 0.9, `${path} score ${r.score}`);
         assert.ok(r.minFrame >= 0.8, `${path} worst frame ${r.minFrame}`);
         assert.equal(r.drift.length, 0, `${path} frames prefer another offset`);
@@ -133,25 +161,42 @@ describe('3x character sheets', () => {
       }
     }
     assert.ok(built >= SHARP.length);
+    assert.ok(split > 0);
   });
 
-  it('over-budget characters were never rendered', () => {
+  it('only a character with one cell over budget stays 1x for size', () => {
     const { maxSide, maxMB } = manifest.budget;
-    for (const [name, paths] of groups) {
-      const big = paths.find((p) => {
-        const { w, h } = imageSize(join(pub, p));
-        return Math.max(w, h) * 3 > maxSide || (w * h * 36) / 2 ** 20 > maxMB;
-      });
-      if (!big) continue;
-      for (const p of paths) {
-        assert.equal(results[p].status, 'rejected', `${name}: ${p}`);
-        assert.match(results[p].reason, /over budget/, p);
-        assert.ok(!existsSync(join(pub, p.replace(/\.(png|webp)$/, '@3x.png'))), p);
-        assert.ok(!existsSync(join(pub, p.replace(/\.(png|webp)$/, '@3x.webp'))), p);
+    for (const job of manifest.jobs) {
+      for (const sheet of job.sheets) {
+        const r = results[sheet.path];
+        const cellOver = sheet.fw * 3 > maxSide || sheet.fh * 3 > maxSide || (sheet.fw * sheet.fh * 36) / 2 ** 20 > maxMB;
+        if (!cellOver) assert.doesNotMatch(r.reason || '', /over budget/, sheet.path);
       }
     }
   });
+
+  it('packs an oversized sheet into the fewest squarer parts within budget', () => {
+    const budget = manifest.budget;
+    // Deimaginator idle1: 135 cells of 251 x 186 (11295 x 5022 at 3x as one strip).
+    const parts = packParts(135, 251, 186, budget);
+    assert.equal(parts.length, 4);
+    assert.deepEqual(parts.map((p) => p.from), [0, 34, 68, 102]);
+    assert.equal(parts.reduce((n, p) => n + p.count, 0), 135);
+    for (const p of parts) {
+      const W = p.cols * 251 * 3;
+      const H = Math.ceil(p.count / p.cols) * 186 * 3;
+      assert.ok(Math.max(W, H) <= budget.maxSide && (W * H * 4) / 2 ** 20 <= budget.maxMB, `${W}x${H}`);
+    }
+    assert.deepEqual(packParts(4, 10, 10, budget), [{ from: 0, count: 4, cols: 2 }]);
+    assert.equal(packParts(1, 3000, 10, budget), null);
+  });
 });
+
+/** Would this 1x sheet's 3x break the manifest budget as one file? */
+function overBudget({ w, h }) {
+  const { maxSide, maxMB } = manifest.budget;
+  return Math.max(w, h) * 3 > maxSide || (w * h * 36) / 2 ** 20 > maxMB;
+}
 
 describe('first-draw 3x swap', () => {
   const sheet = [...FIRST_DRAW_SPRITES][0];
@@ -204,6 +249,80 @@ describe('first-draw 3x swap', () => {
     } finally {
       globalThis.fetch = realFetch;
       globalThis.createImageBitmap = realBitmap;
+    }
+  });
+
+  it('moves the frames of a split sheet to its 3x parts on first draw, frame rects in 1x units', async () => {
+    const [path, split] = [...SPLIT_SPRITES][0];
+    assert.ok(path && split.parts.length >= 1);
+    const realFetch = globalThis.fetch;
+    const realBitmap = globalThis.createImageBitmap;
+    const fetched = [];
+    globalThis.fetch = async (url) => (fetched.push(url), { ok: true, blob: async () => ({ url }) });
+    globalThis.createImageBitmap = async (blob) => ({ url: blob.url, width: 30, height: 30, close() {} });
+    try {
+      // A js/textures.js stand-in that tracks frames like frameTexture does.
+      const sets = new Map();
+      let tracker = null;
+      const textures = {
+        ...fakeTextures(),
+        trackFrameTextures(t) { tracker = t; },
+        framesOf: (source) => [...(sets.get(source) || [])],
+      };
+      installHiresSprites(textures, { dpr: 2, viewWidth: 1280 });
+      assert.ok(tracker.match(path) && !tracker.match('assets/sprites/icons/apple.png'));
+      assert.equal(hiresSpriteUrl(path), null, 'split sheets are never URL-routed');
+      class Source {
+        constructor(opts = {}) { Object.assign(this, opts); }
+      }
+      const base = new Source({ label: path, width: split.fw * split.cols, height: 1000, alphaMode: 'premultiply-alpha-on-upload', scaleMode: 'linear' });
+      const frame = (cell, dx = 0) => {
+        const t = {
+          source: base,
+          updates: 0,
+          frame: { x: (cell % split.cols) * split.fw + dx, y: Math.floor(cell / split.cols) * split.fh, width: split.fw - dx, height: split.fh },
+          update() { this.updates += 1; },
+        };
+        if (!sets.has(base)) sets.set(base, new Set());
+        sets.get(base).add(t);
+        tracker.added?.(base, t);
+        return t;
+      };
+      const [, from0, count0] = split.parts[0];
+      const [, fromN, countN] = split.parts.at(-1);
+      const cells = [from0, from0 + count0 - 1, fromN + countN - 1];
+      const frames = cells.map((c) => frame(c, 0));
+      const inset = frame(cells[1], 2);
+      const inits = [];
+      const renderer = { texture: { _initSource(source) { inits.push(source); return 'gl'; } } };
+      installHiresFirstDraw(renderer, (src) => Promise.resolve(src));
+      renderer.texture._initSource(base);
+      assert.equal(await base.hiresUpgrade, true);
+      assert.deepEqual(fetched, split.parts.map(([url]) => url));
+      assert.equal(base.hiresParts.length, split.parts.length);
+      for (const [i, t] of frames.entries()) {
+        const cell = cells[i];
+        const part = base.hiresParts.find((p) => cell >= p.from && cell < p.from + p.count);
+        assert.equal(t.source, part.source, `cell ${cell}`);
+        assert.equal(part.source.resolution, 3);
+        assert.equal(part.source.alphaMode, base.alphaMode);
+        const j = cell - part.from;
+        assert.deepEqual([t.frame.x, t.frame.y, t.frame.width, t.frame.height], [(j % part.cols) * split.fw, Math.floor(j / part.cols) * split.fh, split.fw, split.fh]);
+        assert.equal(t.updates, 1);
+      }
+      assert.equal(inset.frame.x % split.fw, 2, 'an inset frame keeps its offset in the cell');
+      // A frame cut after the parts arrived moves at once.
+      const late = frame(cells[2]);
+      assert.notEqual(late.source, base);
+      // The renderer re-uploading the 1x sheet does not refetch.
+      renderer.texture._initSource(base);
+      assert.equal(fetched.length, split.parts.length);
+      assert.equal(await upgradeSource(base, path), true);
+      assert.equal(pointAtPart(base, { source: base, frame: { x: 0, y: 0, width: split.fw * 2, height: split.fh }, update() {} }), false, 'a frame spanning cells stays 1x');
+    } finally {
+      globalThis.fetch = realFetch;
+      globalThis.createImageBitmap = realBitmap;
+      installHiresSprites(fakeTextures(), { dpr: 2, viewWidth: 1280 });
     }
   });
 

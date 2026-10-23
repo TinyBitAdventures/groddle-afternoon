@@ -296,11 +296,12 @@ const SWIPE = Object.freeze({ x: 99, y: 86, w: 114, h: 102 });
 
 /**
  * States the overworld Juju plays (npc_juju_bandit.as animations), cropped
- * by tools/juju-bandit-art.mjs. `loopFrom` is the .as loop_froms (walk: 8).
+ * by tools/juju-bandit-art.mjs. The walk sheet is already the SWF's walk
+ * loop (label frames 8-23, the .as loop_froms walk: 8), so it loops whole.
  */
 export const JUJU_SHEETS = Object.freeze({
   spawn: Object.freeze({ oga: 'spawn', frames: 23, crop: SPARKLE, loop: false }),
-  walk: Object.freeze({ oga: 'walk', frames: 16, crop: BODY, loop: true, loopFrom: 8 }),
+  walk: Object.freeze({ oga: 'walk', frames: 16, crop: BODY, loop: true }),
   walk_end: Object.freeze({ oga: 'walk_end', frames: 16, crop: BODY, loop: false }),
   idle1: Object.freeze({ oga: 'idle1_part1', frames: 60, crop: BODY, loop: true }),
   idle2: Object.freeze({ oga: 'idle2_part1', frames: 75, crop: BODY, loop: true }),
