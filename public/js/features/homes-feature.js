@@ -108,7 +108,27 @@ const HOME_STREET_TSID = 'RH_HOME_EXT';
 const VIEW_W = 960;
 const VIEW_H = 540;
 const DECO = 'assets/decos/groddle/';
+/** The house interior and Tower floors: walk line of the room shell. */
 const GROUND_Y = 620;
+/**
+ * The home street's walk line. Every home street is cloned from one of the
+ * `*_high` templates (inc_data_homes_prod.js homes_exterior_configs 818-890,
+ * config_base.js:235 START_EXT_TEMPLATE meadow_ext_default_high;
+ * inc_homes.js homes_rebuild_exterior 2861-2912 clones the template geo and
+ * homes_yard_rebuild 2309-2335 only moves l / r), so the street is as tall
+ * with a Tower as without one. Measured on the archived street renders
+ * (research/wayback/raw/home-images/homestreets, 720 px wide): the start yard
+ * (3 + 8 segments of 150 px, config_base.js:216-217) renders 720x436 and the
+ * full 40-segment yard 720x120, both a street 1,000 px tall; a Tower's foot
+ * sits 104/120 down (LHVK368BJ1V2PKG, 9 floors, its top 70 px under the
+ * street top), so the ground is about 870 px below the top.
+ */
+export const STREET_GROUND_Y = 870;
+/** Saves before STREET_GROUND_Y kept home-street stacks on the old 620 line. */
+const OLD_STREET_GROUND_Y = 620;
+const STREET_LIFT = STREET_GROUND_Y - OLD_STREET_GROUND_Y;
+/** The street's world height: the soil band under the walk line (bgLayer.worldH). */
+export const STREET_WORLD_H = STREET_GROUND_Y + 102;
 const FURNITURE_Z = 12;
 
 // ---------------------------------------------------------------------------
@@ -234,6 +254,8 @@ export function ensureFurnitureItems() {
 let houseDecor = createHomeDecorState();
 /** One decor slice per Tower floor; furniture storage is shared with the house (one furniture bag). */
 let towerDecor = [];
+/** The home-street walk line the save was made on (old saves: 620); see liftOldStreetRows. */
+let savedStreetGround = STREET_GROUND_Y;
 /** The decor being shown and edited: the house, or the Tower floor you stand on. */
 let decor = houseDecor;
 let cult = createCultivationState();
@@ -326,7 +348,7 @@ const towerBridge = {
     const rx = nearestFreeRx(cult, TOWER_PROTO, 640);
     if (rx == null) return { ok: false, reason: 'no_room' };
     beginCultivate(engine, TOWER_PROTO, { confirmed: true });
-    return placeAtPointer(engine, { x: homeStreetLayout(cult).houseX + rx, y: GROUND_Y });
+    return placeAtPointer(engine, { x: homeStreetLayout(cult).houseX + rx, y: STREET_GROUND_Y });
   },
   removeTower(engine) {
     const item = towerItem(cult);
@@ -662,7 +684,7 @@ function streetBackground(engine, styleId) {
       let i = 0;
       for (let x = (item.offset || 0) - 200; x < span; x += item.every) {
         const jx = item.jitter ? (hash01(`${styleId}:${li}:${item.s}:${i}`) - 0.5) * item.jitter * 2 : 0;
-        lc.addChild(decoSprite(PIXI, item, x + jx, item.y, hash01(`${item.s}:${i}:flip`) > 0.5));
+        lc.addChild(decoSprite(PIXI, item, x + jx, item.y + STREET_LIFT, hash01(`${item.s}:${i}:flip`) > 0.5));
         i += 1;
       }
     }
@@ -674,19 +696,19 @@ function streetBackground(engine, styleId) {
   // The walkable field and the soil cross-section below it.
   const field = new PIXI.Graphics();
   field.zIndex = -40;
-  field.rect(-50, 586, width + 100, GROUND_Y - 586 + 40).fill(style.field);
-  field.rect(-50, GROUND_Y + 10, width + 100, 30).fill({ color: style.fieldDark, alpha: 0.5 });
+  field.rect(-50, 586 + STREET_LIFT, width + 100, OLD_STREET_GROUND_Y - 586 + 40).fill(style.field);
+  field.rect(-50, STREET_GROUND_Y + 10, width + 100, 30).fill({ color: style.fieldDark, alpha: 0.5 });
   root.addChild(field);
   const soilFill = new PIXI.Graphics();
   soilFill.zIndex = -39.5;
-  soilFill.rect(-50, GROUND_Y + 30, width + 100, 240).fill(style.soilColor || 0x5c3b25);
+  soilFill.rect(-50, STREET_GROUND_Y + 30, width + 100, 240).fill(style.soilColor || 0x5c3b25);
   root.addChild(soilFill);
   const soilW = 1038 * 0.6;
   if (!style.soil) {
-    soilFill.rect(-50, GROUND_Y + 30, width + 100, 6).fill({ color: 0x000000, alpha: 0.22 });
+    soilFill.rect(-50, STREET_GROUND_Y + 30, width + 100, 6).fill({ color: 0x000000, alpha: 0.22 });
     for (let x = 30; x < width; x += 140) {
       const r = 6 + hash01(`pebble:${x}`) * 10;
-      soilFill.ellipse(x + hash01(`p2:${x}`) * 60, GROUND_Y + 70 + hash01(`p3:${x}`) * 50, r * 1.6, r).fill({ color: 0x000000, alpha: 0.14 });
+      soilFill.ellipse(x + hash01(`p2:${x}`) * 60, STREET_GROUND_Y + 70 + hash01(`p3:${x}`) * 50, r * 1.6, r).fill({ color: 0x000000, alpha: 0.14 });
     }
   }
   for (let x = -40; style.soil && x < width + soilW; x += soilW - 2) {
@@ -695,7 +717,7 @@ function streetBackground(engine, styleId) {
     soil.width = soilW;
     soil.height = 150;
     soil.x = x;
-    soil.y = GROUND_Y + 26;
+    soil.y = STREET_GROUND_Y + 26;
     soil.zIndex = -39;
     root.addChild(soil);
   }
@@ -709,7 +731,7 @@ function streetBackground(engine, styleId) {
       const px = x + jx;
       i += 1;
       if (px > layout.lotLeft + 40 && px < layout.lotRight - 40) continue;
-      near.addChild(decoSprite(PIXI, item, px, GROUND_Y + 22 + (item.below || 0), hash01(`${item.s}:${i}`) > 0.5));
+      near.addChild(decoSprite(PIXI, item, px, STREET_GROUND_Y + 22 + (item.below || 0), hash01(`${item.s}:${i}`) > 0.5));
     }
   }
   root.addChild(near);
@@ -720,7 +742,7 @@ function streetBackground(engine, styleId) {
   house.anchor.set(0.5, 1);
   house.scale.set(h.scale);
   house.x = layout.houseX;
-  house.y = GROUND_Y + 14;
+  house.y = STREET_GROUND_Y + 14;
   house.zIndex = -20;
   root.addChild(house);
   // A planted border in front of the house hides the deco's For Sale sign.
@@ -741,12 +763,12 @@ function streetBackground(engine, styleId) {
   style.trim.forEach((name, i) => {
     const meta = trimItems[name];
     if (!meta) return;
-    trim.addChild(decoSprite(PIXI, { s: name, ...meta }, left + h.w * h.scale * (h.signX + 0.05 + i * 0.07), GROUND_Y + 20, i % 2 === 1));
+    trim.addChild(decoSprite(PIXI, { s: name, ...meta }, left + h.w * h.scale * (h.signX + 0.05 + i * 0.07), STREET_GROUND_Y + 20, i % 2 === 1));
   });
   root.addChild(trim);
 
-  root.worldH = GROUND_Y + 102;
-  root.platformsScreen = [{ id: 'home-ground', x1: 0, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: 1 }];
+  root.worldH = STREET_WORLD_H;
+  root.platformsScreen = [{ id: 'home-ground', x1: 0, y1: STREET_GROUND_Y, x2: width, y2: STREET_GROUND_Y, pc_perm: 1 }];
   root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => {
     sky.x = camX;
     sky.y = camY;
@@ -792,7 +814,7 @@ function spawnStreetTargets(engine) {
     : 'assets/sprites/mailbox/npc_mailbox_variant_mailboxRight_x1_idle_png_1354832227.png'));
   mailbox.anchor.set(0.5, 1);
   mailbox.x = Math.round(bg?.houseSignX ?? layout.houseX - 260);
-  mailbox.y = GROUND_Y + 4;
+  mailbox.y = STREET_GROUND_Y + 4;
   mailbox.zIndex = 30;
   engine.entityLayer.addChild(mailbox);
   const mailTarget = engine.register({
@@ -807,7 +829,7 @@ function spawnStreetTargets(engine) {
   const door = new PIXI.Graphics();
   door.rect(-46, -150, 92, 150).fill({ color: 0xffffff, alpha: 0.001 });
   door.x = doorX;
-  door.y = GROUND_Y;
+  door.y = STREET_GROUND_Y;
   door.zIndex = 9;
   engine.entityLayer.addChild(door);
   const doorTarget = engine.register({
@@ -819,7 +841,7 @@ function spawnStreetTargets(engine) {
   });
   const gate = makeGateSprite(engine);
   gate.x = layout.lotLeft + 40;
-  gate.y = GROUND_Y + 2;
+  gate.y = STREET_GROUND_Y + 2;
   gate.zIndex = 20;
   engine.entityLayer.addChild(gate);
   const ctx = engine.homeContext?.() || {};
@@ -954,7 +976,7 @@ function spawnCultivations(engine) {
   // Rocks: the street's own rock slots, in cultivation order.
   const rocks = rockItems(cult.items);
   rocks.forEach((item, index) => {
-    engine.spawnMineRock?.(rockClassFor(item.endClass), cultivationWorldX(item), GROUND_Y, index);
+    engine.spawnMineRock?.(rockClassFor(item.endClass), cultivationWorldX(item), STREET_GROUND_Y, index);
   });
   if (world) world.rocks.length = rocks.length;
   // Gardens: their plots live with the cultivation.
@@ -963,7 +985,7 @@ function spawnCultivations(engine) {
     if (def.kind !== 'garden' || !engine.spawnGarden) continue;
     const target = engine.spawnGarden({
       x: cultivationWorldX(item),
-      y: GROUND_Y + 2,
+      y: STREET_GROUND_Y + 2,
       gardenType: def.gardenType,
       cols: def.cols,
       rows: def.rows,
@@ -981,7 +1003,7 @@ function spawnCultivations(engine) {
     const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.png`));
     spr.anchor.set(0.5, 1);
     spr.x = cultivationWorldX(item);
-    spr.y = GROUND_Y + 6;
+    spr.y = STREET_GROUND_Y + 6;
     spr.zIndex = 14;
     spr.width = art.w;
     spr.height = art.h;
@@ -993,7 +1015,7 @@ function spawnCultivations(engine) {
     for (const node of cultivationNodes(item, now)) {
       const cls = node.classTsid.startsWith('peat_') ? 'peat_1' : node.classTsid;
       population.resourceNodeClasses.push(node.classTsid);
-      (points[`resource:${cls}`] ||= []).push({ x: cultivationWorldX(item) + node.dx, y: GROUND_Y + node.dy });
+      (points[`resource:${cls}`] ||= []).push({ x: cultivationWorldX(item) + node.dx, y: STREET_GROUND_Y + node.dy });
     }
   }
   if (population.resourceNodeClasses.length) {
@@ -1005,7 +1027,7 @@ function spawnCultivations(engine) {
   for (const item of cult.items) {
     if (cultivationDef(item.protoClass).kind !== 'patch') continue;
     soilCounts[item.endClass] = (soilCounts[item.endClass] || 0) + 1;
-    (soilPoints[`soil:${item.endClass}`] ||= []).push({ x: cultivationWorldX(item), y: GROUND_Y });
+    (soilPoints[`soil:${item.endClass}`] ||= []).push({ x: cultivationWorldX(item), y: STREET_GROUND_Y });
   }
   if (Object.keys(soilCounts).length) {
     patchesFeature.onStreetEnter({ tsid: HOME_STREET_TSID, soilCounts }, shimEngine(engine, engine.population, soilPoints));
@@ -1016,7 +1038,7 @@ function spawnCultivations(engine) {
   towerApi.spawnStreet(engine, {
     item: tower,
     x: tower ? cultivationWorldX(tower) : null,
-    groundY: GROUND_Y,
+    groundY: STREET_GROUND_Y,
     rockX: layout.houseX + 200,
   });
   // Lifespan rings while cultivating.
@@ -1034,16 +1056,16 @@ function drawCultivationMarkers(engine) {
     const half = footprint(item.protoClass);
     const sel = selected?.kind === 'cultivation' && selected.id === item.id;
     const pad = new PIXI.Graphics();
-    pad.roundRect(x - half, GROUND_Y - 4, half * 2, 14, 7).fill({ color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.28 : 0.14 });
-    pad.roundRect(x - half, GROUND_Y - 4, half * 2, 14, 7).stroke({ width: 2, color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.95 : 0.4 });
+    pad.roundRect(x - half, STREET_GROUND_Y - 4, half * 2, 14, 7).fill({ color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.28 : 0.14 });
+    pad.roundRect(x - half, STREET_GROUND_Y - 4, half * 2, 14, 7).stroke({ width: 2, color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.95 : 0.4 });
     if (cultivationDef(item.protoClass)?.kind === 'tower') {
       g.addChild(pad);
       continue;
     }
     // Lifespan bar (buildConfig lifespan.percentage_left)
     const left = lifespanLeft(item);
-    pad.roundRect(x - 30, GROUND_Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
-    pad.roundRect(x - 30, GROUND_Y + 16, 60 * left, 6, 3).fill(left > 0.3 ? 0x7cc35a : 0xe0a84a);
+    pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
+    pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60 * left, 6, 3).fill(left > 0.3 ? 0x7cc35a : 0xe0a84a);
     g.addChild(pad);
   }
   engine.entityLayer.addChild(g);
@@ -1725,7 +1747,7 @@ function placeAtPointer(engine, at) {
     if (result.ok) {
       engine.pushActivity(`You imagined a ${result.label} into your yard for ${result.cost.toLocaleString()} iMG.`);
       if (cultivationDef(result.item.protoClass)?.kind === 'tower') towerApi.onCultivated(engine, result.item);
-      engine.floatText?.(at.x, GROUND_Y - 120, `-${result.cost} iMG`, 0xb38cff);
+      engine.floatText?.(at.x, STREET_GROUND_Y - 120, `-${result.cost} iMG`, 0xb38cff);
       selected = { kind: 'cultivation', id: result.item.id };
     }
   }
@@ -1798,7 +1820,7 @@ function updateGhost(engine) {
   const rx = Math.round(at.x - homeStreetLayout(cult).houseX);
   const ok = placementCheck(cult, placing.protoClass, rx, placing.moveId || null).ok;
   g.x = at.x;
-  g.y = GROUND_Y;
+  g.y = STREET_GROUND_Y;
   g.pad.clear();
   g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).fill({ color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.35 });
   g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).stroke({ width: 2, color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.95 });
@@ -2098,7 +2120,7 @@ function runCultivateAutoplay(engine) {
       beginCultivate(engine, 'proto_dirt_pile');
       const layout = homeStreetLayout(cult);
       const rx = [-420, -260, 1500, 640, 900].find((x) => placementCheck(cult, 'proto_dirt_pile', x).ok) ?? 600;
-      placeAtPointer(engine, { x: layout.houseX + rx, y: GROUND_Y });
+      placeAtPointer(engine, { x: layout.houseX + rx, y: STREET_GROUND_Y });
     }, 1500],
     ['expand', () => growYard(engine, 'right'), 1500],
     ['remove', () => {
@@ -2120,6 +2142,37 @@ function homeX(engine) {
   return raw != null && raw !== '' && Number.isFinite(Number(raw)) ? Number(raw) : null;
 }
 
+/**
+ * Rows saved on the home street before it grew taller stand on the old walk
+ * line; move the ones there (within 40 px) down onto the new one. Pure; returns
+ * how many rows moved.
+ */
+export function liftOldStreetRows(rows, fromGround = OLD_STREET_GROUND_Y, toGround = STREET_GROUND_Y) {
+  if (!Array.isArray(rows) || fromGround === toGround) return 0;
+  let moved = 0;
+  for (const row of rows) {
+    const y = Number(row?.y);
+    if (!Number.isFinite(y) || y > fromGround + 40 || y < fromGround - 40) continue;
+    row.y = Math.round(y + (toGround - fromGround));
+    moved += 1;
+  }
+  return moved;
+}
+
+/**
+ * Once per save: dropped stacks (game.js world items) and Animal Husbandry's
+ * Guano / Piggy Plop piles keep a y; the rest of the street snaps to the ground.
+ */
+function liftOldStreetSave(engine) {
+  if (savedStreetGround === STREET_GROUND_Y) return;
+  const from = savedStreetGround;
+  savedStreetGround = STREET_GROUND_Y;
+  let moved = liftOldStreetRows(engine.droppedItems?.streets?.[HOME_STREET_TSID], from);
+  const husbandry = engine.streetSlot?.('animal-husbandry', HOME_STREET_TSID);
+  moved += liftOldStreetRows(husbandry?.guano, from) + liftOldStreetRows(husbandry?.plops, from);
+  if (moved) engine.save?.();
+}
+
 function towerFloorScene(engine, floor) {
   const construction = towerApi.isConstructionFloor(floor);
   decor = construction ? constructionDecor() : towerFloorDecor(floor);
@@ -2128,6 +2181,7 @@ function towerFloorScene(engine, floor) {
   const via = towerApi.takeFloorArrival();
   return {
     width,
+    groundY: GROUND_Y,
     background,
     spawnFor(opts = {}) {
       if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) return Math.max(80, Math.min(width - 80, opts.spawnX));
@@ -2173,6 +2227,7 @@ function homeScene(room, engine) {
     const width = interiorWidth(decor);
     return {
       width,
+      groundY: GROUND_Y,
       background,
       spawnFor(opts = {}) {
         if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) return Math.max(80, Math.min(width - 80, opts.spawnX));
@@ -2196,10 +2251,13 @@ function homeScene(room, engine) {
       },
     };
   }
+  liftOldStreetSave(engine);
   const background = streetBackground(engine, style);
   const layout = homeStreetLayout(cult);
   return {
     width: layout.width,
+    // renderHomeScene sets the world's GROUND_Y (engine.groundY) from this.
+    groundY: STREET_GROUND_Y,
     background,
     spawnFor(opts = {}) {
       if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) {
@@ -2251,10 +2309,12 @@ export const homesFeature = {
 
   save() {
     // Tower floors share the house's furniture storage; it is saved once, with the house.
-    return { decor: houseDecor, cult, towerDecor: towerDecor.map(({ storage, ...rest }) => rest) };
+    return { decor: houseDecor, cult, towerDecor: towerDecor.map(({ storage, ...rest }) => rest), streetGround: savedStreetGround };
   },
 
   restore(slice) {
+    const ground = Number(slice?.streetGround);
+    savedStreetGround = !slice ? STREET_GROUND_Y : Number.isFinite(ground) ? ground : OLD_STREET_GROUND_Y;
     houseDecor = normalizeHomeDecorState(slice?.decor || {});
     decor = houseDecor;
     cult = normalizeCultivationState(slice?.cult || {});

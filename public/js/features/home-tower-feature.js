@@ -29,7 +29,8 @@
  *
  * QA (with ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home):
  *   &towerdemo=proto    a fresh Tower proto and every project item in the pack
- *   &towerdemo=built    a built Tower (&towerfloors=2..9, &towerstyle=<style>)
+ *   &towerdemo=built    a built Tower (&towerfloors=2..9, &towerstyle=<style>,
+ *                       &towerlook=-600 looks up the street like Camera Mode)
  *   &towerdemo=inside   built, standing on its ground floor
  *   &towerdemo=expand   built, expanding, on the construction floor with the floor items
  *   &towerdemo=quest    level 19, no Tower: the Magic Rock offers Build a Tower
@@ -38,7 +39,7 @@
  *                       floor project to the new floor); &towerfast=1 shortens work units
  *   ?streetdemo=GIF1Q3IQM7122SP&towerdemo=secrets  stands on TowerSpot_02
  * Canvas data: towerState, towerFloors, towerStyle, towerProject, towerFloor, towerMark,
- *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited.
+ *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-3';
@@ -67,6 +68,7 @@ import {
   cleanTowerName,
   composeTower,
   contributeItems,
+  towerBounds,
   createTowerState,
   elevatorMark,
   elevatorStops,
@@ -310,6 +312,8 @@ function spawnStreet(engine, { item, x, groundY, rockX }) {
     let subtitle = '';
     if (tower.built && item.endClass === TOWER_CHASSIS) {
       box.addChild(chassisContainer(PIXI, tower.style, extraFloors(tower)));
+      // QA: the world y of the Tower's top (the home street must show it; cameraY is on the canvas).
+      engine.setData('towerTopY', Math.round(box.y + towerBounds(composeTower(tower.style, extraFloors(tower))).t));
       if (tower.name) {
         const sign = nameSign(PIXI, tower.name);
         sign.x = 8;
@@ -1070,7 +1074,12 @@ function demoStreet(engine) {
     const go = kind === 'inside' || kind === 'expand'
       ? goToFloor(engine, kind === 'expand' ? tower.floors : 0, kind === 'expand' ? 'elevator' : 'door')
       : engine.refreshHomeScene?.();
-    Promise.resolve(go).then(() => startAutoplay(engine));
+    Promise.resolve(go).then(() => {
+      // QA &towerlook=<dy>: look up the street the way Camera Mode does (engine.setCameraLook).
+      const look = Number(engine.param('towerlook'));
+      if (kind !== 'inside' && kind !== 'expand' && Number.isFinite(look)) engine.setCameraLook?.(0, look);
+      startAutoplay(engine);
+    });
   }, 0);
 }
 

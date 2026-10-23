@@ -17886,7 +17886,7 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
   // The homes feature (js/features/homes-feature.js) builds the scene.
   const homeScene = features.query('homeScene', room, engine);
   WORLD_W = homeScene?.width || 1500;
-  GROUND_Y = 620;
+  GROUND_Y = Number(homeScene?.groundY) || 620;
   bgLayer = homeScene?.background || drawHomeBackground(homeState.style, room);
   world.addChildAt(bgLayer, 0);
   streetPlatforms = bgLayer.platformsScreen;

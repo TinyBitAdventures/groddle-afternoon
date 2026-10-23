@@ -3,9 +3,12 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
+  STREET_GROUND_Y,
+  STREET_WORLD_H,
   cultivationNodes,
   furnitureStoreProfile,
   homesFeature,
+  liftOldStreetRows,
   nodeKeyMap,
   rekeyNodes,
   rockClassFor,
@@ -15,6 +18,8 @@ import {
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js';
 import { canPlantBean } from '../public/js/patches.js';
+import { TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js';
+import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround } from '../public/js/movement.js';
 
 const root = join(import.meta.dirname, '..', 'public');
 
@@ -105,6 +110,58 @@ describe('homes feature helpers', () => {
     assert.match(game, /homeScene\?\.enter\?\.\(\)/);
     assert.match(game, /refreshHomeScene\(opts = \{\}\)/);
     assert.match(game, /'decorate', 'cultivate'\]\.includes\(homeDemo\)/);
+  });
+});
+
+describe('a home street tall enough for a nine-floor Tower', () => {
+  const VIEW = 408; // LOCATION_VIEW_H: the 540 px view less the 132 px pack
+  const worldH = cameraWorldHeightForGround(STREET_WORLD_H, STREET_GROUND_Y, VIEW);
+
+  it('sits the ground about 870 px under the street top, like the *_high templates', () => {
+    // Archived street renders (720 px wide): the 1,650 px start yard renders 720x436 and the
+    // 6,000 px full yard 720x120, both a 1,000 px street; a Tower's foot sits 104/120 down.
+    assert.equal(Math.round(1650 * 436 / 720), 999);
+    assert.equal(Math.round(6000 * 120 / 720), 1000);
+    assert.ok(Math.abs(STREET_GROUND_Y - 1000 * 104 / 120) < 10, 'within a render pixel (8 px) of the measured foot');
+    assert.ok(STREET_WORLD_H <= 1000);
+  });
+
+  it('shows the ninth floor of every style once the camera looks up, and frames the feet as before', () => {
+    // spawnStreet stands the chassis 6 px under the walk line.
+    for (const style of Object.keys(TOWER_STYLES)) {
+      const top = STREET_GROUND_Y + 6 + towerBounds(composeTower(style, 7)).t;
+      assert.ok(top >= 40, `${style}: ${top} px of sky over the top`);
+      const camY = cameraTargetY(STREET_GROUND_Y - 600, worldH, VIEW);
+      assert.equal(camY, 0);
+      assert.ok(top - camY < VIEW / 2, `${style} top in the upper half of the view`);
+    }
+    const camY = cameraTargetY(STREET_GROUND_Y, worldH, VIEW);
+    assert.ok(VIEW - (STREET_GROUND_Y - camY) >= MIN_GROUND_CLEARANCE);
+    assert.equal(VIEW - (STREET_GROUND_Y - camY), 102);
+  });
+
+  it('moves stacks saved on the old 620 walk line down to the new one, once', () => {
+    const rows = [{ y: 620 }, { y: 618 }, { y: STREET_GROUND_Y }, { y: 300 }, { y: 'x' }];
+    assert.equal(liftOldStreetRows(rows, 620, STREET_GROUND_Y), 2);
+    assert.deepEqual(rows.map((r) => r.y), [STREET_GROUND_Y, STREET_GROUND_Y - 2, STREET_GROUND_Y, 300, 'x']);
+    assert.equal(liftOldStreetRows(rows, STREET_GROUND_Y, STREET_GROUND_Y), 0);
+    assert.equal(liftOldStreetRows(null), 0);
+  });
+
+  it('remembers which walk line a save was made on', () => {
+    homesFeature.restore({ decor: {}, cult: {} });
+    assert.equal(homesFeature.save().streetGround, 620, 'an old save still needs its lift');
+    homesFeature.restore({ decor: {}, cult: {}, streetGround: STREET_GROUND_Y });
+    assert.equal(homesFeature.save().streetGround, STREET_GROUND_Y);
+    homesFeature.restore(undefined);
+    assert.equal(homesFeature.save().streetGround, STREET_GROUND_Y);
+  });
+
+  it('hands the walk line to game.js renderHomeScene', () => {
+    const game = readFileSync(join(root, 'game.js'), 'utf8');
+    assert.match(game, /GROUND_Y = Number\(homeScene\?\.groundY\) \|\| 620;/);
+    const feature = readFileSync(join(root, 'js/features/homes-feature.js'), 'utf8');
+    assert.match(feature, /groundY: STREET_GROUND_Y,/);
   });
 });
 
