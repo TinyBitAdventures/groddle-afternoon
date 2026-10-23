@@ -420,7 +420,6 @@ a.play-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2p
 .rm-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; }
 .room-cell { display: flex; flex-direction: column; gap: 8px; }
 .room-cell > button.room { flex: 1; }
-.room-cell > .room-play { align-self: flex-start; }
 .practice-note { margin: -4px 0 18px; font-size: 14px; color: var(--muted); }
 
 /* —— Designers' levels —— */

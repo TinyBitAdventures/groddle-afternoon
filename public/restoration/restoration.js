@@ -213,8 +213,8 @@ function renderRooms(data) {
         el('h3', {}, r.title),
         el('p', {}, r.note?.tagline || r.quests.join(' · ')),
         pill, r.note ? el('span', { class: 'room-more' }, 'Read more') : null));
-    const play = playLink(r.play, 'Play this room', 'room-play');
-    grid.append(el('div', { class: 'room-cell' }, card, play));
+    // The room's play link lives in its dialog only (the grid stayed too busy with one per card).
+    grid.append(el('div', { class: 'room-cell' }, card));
   });
 
   const modal = $('#room-modal');

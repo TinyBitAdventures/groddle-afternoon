@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 317,
+  "commits": 318,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Room 4 is the felt-craft meadow and Room 16 the bottletree cave from players' Snaps; the Stairs hang their EXIT plaque"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1924,11 +1929,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "An \"Every change\" page lists everything restored, day by day"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Yellow Crumb really does double your learning speed for a minute"
    }
   ]
  },
