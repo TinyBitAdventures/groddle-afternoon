@@ -18,7 +18,11 @@
  *                                           towers), 6 wall segments, 458 + 28 px floors,
  *                                           elevator signposts (label TOWER), the exit door,
  *                                           tower_start_expand / tower_end_expand,
- *                                           tower_get_expand_costs, tower_set_floor_name
+ *                                           tower_get_expand_costs, tower_set_floor_name,
+ *                                           tower_move_players (owner to the top row),
+ *                                           the 130-290 construction floor, y_cam_offset 220
+ * - research/wayback/raw/home-images/towers   64 archived cutaways (look only): the L, 1, 2 ...
+ *                                           marks on the elevator column
  * - players/inc_towers.js, location.js      getTower, has_visited_tower
  * - quests/build_a_tower.js                 offer / completion text, flags cultivate_tower
  *                                           and build_tower, 2,000 currants + 200 energy
@@ -72,7 +76,30 @@ export const TOWER_GEO = Object.freeze({
   arriveX: 145 + 7 * 150 - 17 - 150,
   /** expansion.job (the Workbench): 260 + 80. */
   workbenchX: 340,
+  /**
+   * tower_build_expansion: the floor under construction has a floor platform
+   * and walls only from 130 to 290 (the planked strip by the elevator).
+   */
+  expansionLeft: 130,
+  expansionRight: 290,
+  /** tower_reset_geometry: geo.physics.y_cam_offset for the whole tower. */
+  yCamOffset: 220,
 });
+
+/**
+ * The floor mark painted on the elevator column above its call buttons: L on
+ * the ground floor, then 1, 2, ... (every one of the 64 archived tower
+ * cutaways, research/wayback/raw/home-images/towers, the construction floor
+ * included). Measured on those renders (720 px for the 1,178 px tower): the
+ * mark is centred 75 px from the tower's left edge with its foot 171 px above
+ * the floor's bound, about 35 px tall, dark grey on the stone.
+ */
+export const ELEVATOR_MARK = Object.freeze({ x: 75, footAboveBound: 171, capH: 35 });
+
+export function elevatorMark(index) {
+  const i = Math.max(0, Math.floor(Number(index) || 0));
+  return i === 0 ? 'L' : String(i);
+}
 /** proto onContribution: setAndBroadcastState at these fractions. */
 export const PROTO_STATE_AT = Object.freeze([0.333, 0.666]);
 /** setJobData delay_seconds between phases (one phase here, kept for reference). */
@@ -524,18 +551,40 @@ export function setFloorLabel(state, idx, label) {
   return { ok: 1, label: clean };
 }
 
-/** Elevator rows (tower_build_elevator connects): floors, then the construction floor. */
+/**
+ * Elevator rows (tower_build_elevator connects): floors, then the construction
+ * floor. Default names follow the column's marks (L, 1, 2, ...), so the floor
+ * marked 1 is "Floor 1".
+ */
 export function elevatorStops(state) {
   if (!state?.built) return [];
   const rows = [];
   for (let i = 0; i < state.floors; i += 1) {
-    rows.push({ index: i, label: state.floorLabels[i] || (i === 0 ? 'Ground Floor' : `Floor ${i + 1}`), construction: false });
+    rows.push({ index: i, mark: elevatorMark(i), label: state.floorLabels[i] || (i === 0 ? 'Ground Floor' : `Floor ${i}`), construction: false });
   }
   if (state.expanding) {
     const i = state.floors;
-    rows.push({ index: i, label: state.floorLabels[i] || 'Under Construction', construction: true });
+    rows.push({ index: i, mark: elevatorMark(i), label: state.floorLabels[i] || 'Under Construction', construction: true });
   }
   return rows;
+}
+
+/**
+ * tower_move_players: where the owner lands after a rebuild. Starting a floor
+ * (tower_start_expand) or finishing one (tower_end_expand) reloads the owner
+ * on the top row (the construction floor while expanding) once the tower has
+ * more than two floors or is expanding; everyone else, and a two-floor tower,
+ * goes to the ground floor.
+ */
+export function ownerReloadFloor(state) {
+  if (!state?.built) return null;
+  if (state.floors > 2 || state.expanding) return state.floors - 1 + (state.expanding ? 1 : 0);
+  return 0;
+}
+
+/** tower_build_expansion: clamp an x to the construction floor's walls. */
+export function clampToExpansion(x, inset = 12) {
+  return Math.max(TOWER_GEO.expansionLeft + inset, Math.min(TOWER_GEO.expansionRight - inset, x));
 }
 
 export function towerLabel(state) {

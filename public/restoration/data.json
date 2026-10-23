@@ -671,7 +671,7 @@
    "group": "home",
    "name": "Your Tower",
    "status": "solo",
-   "blurb": "Cultivate a Tower on your home street, build it as a project, pick one of five styles and raise it to nine floors you can decorate. The Jethimadh Tower Base hides eleven secret spots.",
+   "blurb": "Cultivate a Tower on your home street, build it as a project, pick one of five styles and raise it to nine floors marked L to 8 on the elevator, each decorated on its own; every new floor goes up at a Workbench on a planked frame open to the stars. The Jethimadh Tower Base hides eleven secret spots.",
    "spot": null,
    "evidence": [
     "public/js/home-tower.js",
@@ -1410,9 +1410,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 267,
+  "commits": 268,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Juju Bandits no longer appear on ledges they can't walk down from"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1527,11 +1532,6 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Jumping into the Great Hole to Ix takes you to Groddle Ladder"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Click your name or level for the player menu"
    }
   ]
  },

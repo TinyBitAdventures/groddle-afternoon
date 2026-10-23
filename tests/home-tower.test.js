@@ -18,11 +18,14 @@ import {
   TOWER_PLACEMENT_WARNING,
   TOWER_PROTO,
   TOWER_STYLES,
+  ELEVATOR_MARK,
   applyWorkUnit,
+  clampToExpansion,
   cleanTowerName,
   composeTower,
   contributeItems,
   createTowerState,
+  elevatorMark,
   elevatorStops,
   endExpansion,
   expandCosts,
@@ -31,6 +34,7 @@ import {
   floorJobFor,
   inTowerSpot,
   normalizeTowerState,
+  ownerReloadFloor,
   projectComplete,
   projectPercent,
   projectRequirements,
@@ -215,6 +219,66 @@ describe('the Tower project', () => {
     assert.deepEqual(t.secrets, ['TowerSpot_01']);
     const p = normalizeTowerState({ project: { r1701: 999, r9999: 3 } });
     assert.deepEqual(p.project, { r1701: 20 });
+  });
+});
+
+describe('inside the Tower (locations/tower.js, the archived cutaways)', () => {
+  /** locations/tower.js run with a stand-in location: cfg, geo config and players. */
+  function towerJs(cfg) {
+    const ctx = { log: { info() {}, error() {} }, config: { towers: { START_FLOORS: 2, MAX_FLOORS: 9 } }, choose_one: (a) => a[0] };
+    vm.runInNewContext(readFileSync(join(GS, 'locations/tower.js'), 'utf8'), ctx);
+    const self = { cfg: { floor_labels: {}, ...cfg }, tower_init() {} };
+    for (const k of ['tower_get_geo_config', 'tower_get_bounds', 'tower_get_teleport_point', 'tower_get_reload_position', 'tower_move_players', 'tower_build_expansion']) self[k] = ctx[k];
+    return self;
+  }
+
+  it('marks the elevator L, 1, 2 ... and names floors after the marks', () => {
+    assert.deepEqual([0, 1, 2, 8].map(elevatorMark), ['L', '1', '2', '8']);
+    const tower = normalizeTowerState({ built: true, floors: 3, expanding: true });
+    const stops = elevatorStops(tower);
+    assert.deepEqual(stops.map((s) => [s.mark, s.label, s.construction]), [
+      ['L', 'Ground Floor', false], ['1', 'Floor 1', false], ['2', 'Floor 2', false], ['3', 'Under Construction', true],
+    ]);
+    // Measured on the cutaways: over the call buttons of signpost_asset_elevator_tower (180 x 514 at x 90).
+    assert.ok(ELEVATOR_MARK.x > 60 && ELEVATOR_MARK.x < 95);
+    assert.ok(ELEVATOR_MARK.footAboveBound > 157, 'above the call-button plate');
+  });
+
+  it('stacks 486 px floors under a 28 px roof frame, as the archived cutaways measure', () => {
+    // The 64 cutaways are 720 px renders of the location (tower_reset_geometry: 1,177 px wide);
+    // their heights are 612, 909, 1206, 1504, 1801, 2098 and 2693 px: 2 to 9 rows (7 = 6 + construction).
+    const px = (rows) => Math.round((rows * TOWER_GEO.floorHeight + TOWER_GEO.frameHeight) * (720 / (TOWER_GEO.width - 1)));
+    assert.deepEqual([2, 3, 4, 5, 6, 7, 9].map(px), [612, 909, 1206, 1504, 1801, 2098, 2693]);
+  });
+
+  it('walks the construction floor only from 130 to 290 and puts the Workbench at 340', { skip: !haveGs }, () => {
+    const self = towerJs({ floors: 3, is_expanding: true });
+    const bounds = self.tower_get_bounds();
+    const built = self.tower_build_expansion(bounds);
+    const floor = built.plats[0];
+    assert.deepEqual([floor.start.x, floor.end.x], [TOWER_GEO.expansionLeft, TOWER_GEO.expansionRight]);
+    assert.equal(bounds.expansion.job.x, TOWER_GEO.workbenchX);
+    assert.equal(clampToExpansion(900), TOWER_GEO.expansionRight - 12);
+    assert.equal(clampToExpansion(0), TOWER_GEO.expansionLeft + 12);
+    assert.equal(clampToExpansion(200), 200);
+    // tower_reset_geometry: geo.physics.y_cam_offset = 220.
+    assert.match(readFileSync(join(GS, 'locations/tower.js'), 'utf8'), new RegExp(`y_cam_offset = ${TOWER_GEO.yCamOffset};`));
+  });
+
+  it('reloads the owner on the top row after starting or finishing a floor (tower_move_players)', { skip: !haveGs }, () => {
+    for (const [floors, expanding] of [[2, false], [2, true], [3, false], [5, true], [9, false]]) {
+      const self = towerJs({ floors, is_expanding: expanding });
+      const bounds = self.tower_get_bounds();
+      let landed = null;
+      self.owner = { tsid: 'P1' };
+      self.players = { P1: { tsid: 'P1', reloadGeometry: (x, y) => { landed = { x, y }; } } };
+      self.tower_move_players('misc');
+      // Which row the source put the owner on: the ground floor's teleport point, or a row's elevator connect.
+      const rows = [...bounds.floors.map((f) => f.b - 70), ...(expanding ? [bounds.expansion.b - 70] : [])];
+      const row = landed.x === 200 ? rows.indexOf(landed.y) : 0;
+      const tower = normalizeTowerState({ built: true, floors, expanding });
+      assert.equal(ownerReloadFloor(tower), row, `${floors} floors${expanding ? ' + construction' : ''}`);
+    }
   });
 });
 

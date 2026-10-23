@@ -1425,7 +1425,8 @@ function renderTowerTab(engine, body) {
       onclick: () => {
         const res = towerApi.beginExpansion(engine);
         renderBar(engine);
-        if (res.ok) engine.toast('Take the elevator up to the Workbench.', 2600);
+        // tower_move_players: the feature takes the owner up to the floor under construction.
+        if (res.ok) engine.toast('Up to the new floor: the Workbench is there.', 2600);
       },
     }),
   ]));

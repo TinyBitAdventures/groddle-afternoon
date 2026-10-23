@@ -37,7 +37,7 @@
  *                       proto: contribute + work to the finished Tower; expand: the
  *                       floor project to the new floor); &towerfast=1 shortens work units
  *   ?streetdemo=GIF1Q3IQM7122SP&towerdemo=secrets  stands on TowerSpot_02
- * Canvas data: towerState, towerFloors, towerStyle, towerProject, towerFloor,
+ * Canvas data: towerState, towerFloors, towerStyle, towerProject, towerFloor, towerMark,
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited.
  */
 
@@ -48,6 +48,7 @@ import { getQuestCatalog } from '../content-catalogs.js';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import {
   BUILD_A_TOWER,
+  ELEVATOR_MARK,
   PROTO_ART,
   TOWER_ART_DIR,
   TOWER_CHASSIS,
@@ -62,10 +63,12 @@ import {
   TOWER_STYLES,
   activeProject,
   applyWorkUnit,
+  clampToExpansion,
   cleanTowerName,
   composeTower,
   contributeItems,
   createTowerState,
+  elevatorMark,
   elevatorStops,
   endExpansion,
   expandCosts,
@@ -74,6 +77,7 @@ import {
   floorJobFor,
   inTowerSpot,
   normalizeTowerState,
+  ownerReloadFloor,
   projectComplete,
   projectPercent,
   projectRequirements,
@@ -192,6 +196,7 @@ function publish(engine, force = false) {
   engine.setData('towerName', tower.name);
   engine.setData('towerProject', project && item ? `${project.jobId}:${projectPercent(project.jobId, project.got)}` : '');
   engine.setData('towerFloor', tower.floor == null ? '' : tower.floor);
+  engine.setData('towerMark', tower.floor == null ? '' : elevatorMark(tower.floor));
   engine.setData('towerWork', work ? `${work.rid}:${work.units}` : '');
   engine.setData('towerSecrets', tower.secrets.length);
   engine.setData('towerRock', streetView?.rock ? '1' : '0');
@@ -369,14 +374,23 @@ function spawnFloor(engine, { width, groundY, doorX }) {
   lift.y = groundY + 43 + 28;
   lift.zIndex = 5;
   engine.entityLayer.addChild(lift);
-  const plate = new PIXI.Text({ text: `${TOWER_GEO.elevatorLabel} · ${floor + 1}`, style: {
-    fontFamily: 'Trebuchet MS, sans-serif', fontSize: 13, fontWeight: '700', fill: 0xfff4d6, stroke: { color: 0x3b2a1f, width: 3 }, 
+  // The floor's mark painted on the column above the call buttons (L, 1, 2, ...; the cutaways).
+  const bound = groundY + 43 + 28;
+  const mark = new PIXI.Text({ text: elevatorMark(floor), style: {
+    fontFamily: 'Georgia, "Times New Roman", serif', fontSize: Math.round(ELEVATOR_MARK.capH / 0.7), fill: 0x2f2f2f,
   } });
-  plate.anchor.set(0, 1);
-  plate.x = lift.x + 84;
-  plate.y = groundY - 150;
-  plate.zIndex = 6;
-  engine.entityLayer.addChild(plate);
+  mark.anchor.set(0.5, 0);
+  mark.x = ELEVATOR_MARK.x;
+  // Place the glyph by its cap height: the text box's top sits above the caps by its ascent gap.
+  mark.y = bound - ELEVATOR_MARK.footAboveBound - ELEVATOR_MARK.capH - (mark.height - ELEVATOR_MARK.capH) * 0.42;
+  mark.alpha = 0.85;
+  mark.zIndex = 6;
+  engine.entityLayer.addChild(mark);
+  // tower_reset_geometry: the tower's camera sits 220 px above the avatar (streets default to 150).
+  if (engine.street) {
+    const physics = engine.street.physics || {};
+    engine.street.physics = { ...physics, setting: { ...(physics.setting || {}), y_cam_offset: TOWER_GEO.yCamOffset } };
+  }
   targets.elevator = engine.register({
     classId: 'tower_elevator',
     featureId: HOME_TOWER_FEATURE_ID,
@@ -408,7 +422,8 @@ function spawnFloor(engine, { width, groundY, doorX }) {
     const bench = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}tower_expander.png`));
     bench.anchor.set(0.5, 1);
     bench.scale.set(1.25);
-    bench.x = TOWER_GEO.workbenchX + 60;
+    // tower_get_bounds expansion.job: x 260 + 80, on the planks the floor is walkable to (290).
+    bench.x = TOWER_GEO.workbenchX;
     bench.y = groundY + 2;
     bench.zIndex = 20;
     engine.entityLayer.addChild(bench);
@@ -440,6 +455,17 @@ function spawnFloor(engine, { width, groundY, doorX }) {
   }, 0);
   publish(engine, true);
   return targets;
+}
+
+/** tower_build_expansion: the floor under construction is walkable only from 130 to 290. */
+function keepOnPlanks(engine) {
+  if (!floorView?.construction || tower.floor !== floorView.floor) return;
+  const p = engine.player;
+  if (!p || !Number.isFinite(p.x)) return;
+  const x = clampToExpansion(p.x);
+  if (x === p.x) return;
+  if ((x > p.x && p.vx < 0) || (x < p.x && p.vx > 0)) p.vx = 0;
+  p.x = x;
 }
 
 async function goToFloor(engine, floor, via = 'elevator') {
@@ -590,7 +616,8 @@ function completeProject(engine) {
   engine.prompt({ kicker: 'Tower Project', title: def.title, text: def.completion });
   // Rebuild the scene: the proto becomes the chassis, the construction floor a real floor.
   setTimeout(() => {
-    if (tower.floor != null) goToFloor(engine, Math.min(tower.floor, tower.floors - 1));
+    // tower_end_expand -> tower_move_players: the owner goes to the (new) top floor.
+    if (tower.floor != null) goToFloor(engine, ownerReloadFloor(tower));
     else engine.refreshHomeScene?.();
   }, 0);
   publish(engine, true);
@@ -603,9 +630,12 @@ function beginExpansion(engine) {
     engine.toast({ already_building: 'A new floor is already under construction.', max_size_already: 'Your Tower is as tall as it gets.' }[res.error] || 'You cannot build a new floor now.');
     return res;
   }
-  engine.pushActivity(`You started building floor ${tower.floors + 1} of your Tower. Take the elevator up to the Workbench.`);
+  engine.pushActivity(`You started building floor ${tower.floors + 1} of your Tower. The Workbench is up on the new floor.`);
   engine.save();
   publish(engine, true);
+  // tower_start_expand -> tower_rebuild -> tower_move_players: the owner, if inside, is
+  // reloaded on the top row, the floor under construction.
+  if (tower.floor != null) setTimeout(() => goToFloor(engine, ownerReloadFloor(tower), 'elevator'), 0);
   return res;
 }
 
@@ -623,6 +653,7 @@ const CSS = `
 .ht-list{list-style:none;margin:0;padding:0;display:grid;gap:.35rem;max-height:52vh;overflow:auto}
 .ht-row{display:grid;grid-template-columns:34px 1fr auto;gap:.5rem;align-items:center;background:rgba(255,255,255,.86);border:1px solid #e1d9c9;border-radius:8px;padding:.35rem .5rem}
 .ht-row img{width:32px;height:32px;object-fit:contain}
+.ht-mark{display:grid;place-items:center;width:32px;height:32px;border-radius:6px;background:linear-gradient(#c9c9c6,#a9a9a5);color:#2f2f2f;font:400 1.15rem/1 Georgia,"Times New Roman",serif}
 .ht-row b{display:block;font-size:.82rem;color:#3a352c}
 .ht-row small{display:block;font-size:.72rem;color:#7a7264}
 .ht-row.is-done{opacity:.6}
@@ -765,9 +796,11 @@ function renderElevator(engine, q, body) {
   const list = el('ul', { class: 'ht-list' });
   for (const stop of [...elevatorStops(tower)].reverse()) {
     const li = el('li', { class: 'ht-row', dataset: { htStop: stop.index } });
-    const icon = el('img', { src: `${TOWER_ART_DIR}elevator.png`, alt: '' });
+    // The mark the column shows on that floor (L, 1, 2, ...).
+    const icon = el('span', { class: 'ht-mark', 'aria-hidden': 'true' }, stop.mark);
     const text = el('div');
-    text.append(el('b', {}, stop.label), el('small', {}, stop.construction ? 'Under construction: the Workbench is here' : `Floor ${stop.index + 1}`));
+    text.append(el('b', {}, stop.label));
+    if (stop.construction) text.append(el('small', {}, 'Under construction: the Workbench is here'));
     const acts = el('div');
     const here = stop.index === tower.floor;
     const b = el('button', { type: 'button', class: here ? 'is-on' : 'primary', dataset: { htAct: 'go' } }, here ? 'You are here' : 'Go');
@@ -1145,6 +1178,7 @@ export const homeTowerFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    keepOnPlanks(engine);
     tickWork(engine, now);
     tickSecrets(engine);
     autoplayStep(engine, now);
