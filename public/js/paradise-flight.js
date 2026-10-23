@@ -213,7 +213,8 @@ export const PARADISE_COURSES = Object.freeze({
     pickupCount: 53,
     ringCount: 0,
     objective: 'Follow the spiral and find all 53 stars',
-    completion: 'You found every star. The exit is down below!',
+    // source: the street's completion sign (GHFQOLEIHN63P27.xml groddle_sign_blank sign_txt)
+    completion: "Good work, you've got all the stars!",
     rewards: Object.freeze([
       reward('xp', 12),
       reward('xp', 15),

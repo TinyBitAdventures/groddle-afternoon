@@ -1410,9 +1410,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 275,
+  "commits": 276,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Sky Plunge falls again, hides a Qurazy and sings when you get every quoin"
+   },
    {
     "date": "2026-10-23",
     "kind": "fix",
@@ -1527,11 +1532,6 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Grab 'Em Good, the quoin-grabbing race in a night-time Groddle Forest"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Poisoned trees die, and dead trees clear into Patches to replant"
    }
   ]
  },
