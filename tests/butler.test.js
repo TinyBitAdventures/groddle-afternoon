@@ -531,3 +531,13 @@ describe('Join the Club: Tell your Butler about the club (bag_butler.js doQuests
     }
   });
 });
+
+describe('long Butler lines (shared speech-bubble placement)', () => {
+  it('clear the street nameplate', () => {
+    const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
+    const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
+    assert.match(game, /getElementById\('street-nameplate'\)/);
+    assert.match(fn, /nameplateViewBox\(\)/);
+    assert.match(fn, /pill\.bottom \+ 8 \+ meta\.height \+ 11/);
+  });
+});

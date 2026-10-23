@@ -4302,6 +4302,30 @@ function clearSpeechBubbles() {
   speechBubbles = [];
 }
 
+/**
+ * The street nameplate (the pill over the location) in view pixels, so a
+ * speech bubble near the top stays out from under it. Re-measured at most
+ * every half second while bubbles are up (the clock and resizes move it).
+ */
+let nameplateBox = null;
+let nameplateBoxAt = 0;
+function nameplateViewBox() {
+  const now = performance.now();
+  if (now - nameplateBoxAt < 500) return nameplateBox;
+  nameplateBoxAt = now;
+  nameplateBox = null;
+  const pill = document.getElementById('street-nameplate');
+  const canvas = app?.canvas;
+  if (!pill || !canvas || pill.offsetParent === null) return null;
+  const c = canvas.getBoundingClientRect();
+  const r = pill.getBoundingClientRect();
+  if (!c.width || !c.height || !r.width || !r.height) return null;
+  const sx = VIEW_W / c.width;
+  const sy = VIEW_H / c.height;
+  nameplateBox = { left: (r.left - c.left) * sx, right: (r.right - c.left) * sx, bottom: (r.bottom - c.top) * sy };
+  return nameplateBox;
+}
+
 function positionSpeechBubble(bubble) {
   const meta = bubble?._speechFx;
   const spr = meta?.target?.sprite;
@@ -4310,12 +4334,17 @@ function positionSpeechBubble(bubble) {
   const cameraY = Number.isFinite(camY) ? camY : 0;
   const spriteHeight = clamp(Math.abs(spr.height || 60), 36, 170);
   bubble.x = clampWorldOverlayX(spr.x, meta.width, 12);
-  bubble.y = clamp(
-    spr.y - spriteHeight - 12,
-    cameraY + meta.height + 24,
-    cameraY + LOCATION_VIEW_H - 18
-  );
+  // The tail tip sits at bubble.y; the bubble's top is height + 11 above it.
+  let lowestTip = cameraY + meta.height + 24;
+  const pill = nameplateViewBox();
+  const left = bubble.x - cameraX - meta.width / 2;
+  const underPill = Boolean(pill && left < pill.right + 8 && left + meta.width > pill.left - 8);
+  if (underPill) lowestTip = Math.max(lowestTip, cameraY + pill.bottom + 8 + meta.height + 11);
+  const highestTip = cameraY + LOCATION_VIEW_H - 18;
+  bubble.y = clamp(spr.y - spriteHeight - 12, Math.min(lowestTip, highestTip), highestTip);
   if (app?.canvas) {
+    app.canvas.dataset.speechTop = String(Math.round(bubble.y - cameraY - meta.height - 11));
+    app.canvas.dataset.speechPillBottom = underPill ? String(Math.round(pill.bottom)) : '';
     app.canvas.dataset.speechTarget = `${Math.round(spr.x)},${Math.round(spr.y)}`;
     app.canvas.dataset.speechBubble = `${Math.round(bubble.x)},${Math.round(bubble.y)}`;
     app.canvas.dataset.speechScreen = `${Math.round(bubble.x - cameraX)},${Math.round(bubble.y - cameraY)}`;
