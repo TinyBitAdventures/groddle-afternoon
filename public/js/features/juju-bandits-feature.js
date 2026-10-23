@@ -53,13 +53,13 @@ import {
   jujuCurse,
   jujuLine,
   jujuSheetUrl,
-  jujuSpawnX,
+  jujuSpawnPoint,
   jujuWants,
   nearSignpost,
   redeclareDelay,
   stealChanceForSeconds,
   withinReach,
-} from '../juju-bandits.js?v=g39-2';
+} from '../juju-bandits.js?v=g39-3';
 
 export const JUJU_FEATURE_ID = 'juju-bandits';
 const Z = 30;
@@ -196,13 +196,23 @@ function spawn(engine, { mode, itemClass, now = Date.now() }) {
   const street = engine.street;
   const width = street.bounds.r - street.bounds.l;
   platforms = platformsScreen(street);
-  const x = jujuSpawnX(p.x, width, Math.random());
   // apiGetPointOnTheClosestPlatformLineBelow(x, pc.y - 800), then apiFindPath to
   // the player. The remake's Juju only walks and drops (no pathfinder), so it
-  // appears on the floor nearest your own level there, and falls back to the
-  // source point.
-  const ground = floorNear(platforms, x, p.y) || groundBeneath(platforms, x, p.y - JUJU_BANDIT.spawnSearchUp, 0);
-  if (!ground) return false;
+  // appears on the floor nearest your own level (falling back to the source
+  // point), and only where it can walk to you: jujuSpawnPoint skips ledges.
+  const feet = { x: p.x, y: groundBeneath(platforms, p.x, p.y, 6)?.y ?? p.y };
+  const spot = jujuSpawnPoint(feet, width, {
+    spawnFloor: (sx) => (floorNear(platforms, sx, feet.y) || groundBeneath(platforms, sx, feet.y - JUJU_BANDIT.spawnSearchUp, 0))?.y ?? null,
+    groundAhead: (gx, gy) => groundBeneath(platforms, gx, gy, STEP_UP)?.y ?? null,
+    stepUp: STEP_UP,
+  });
+  if (!spot) {
+    last = 'no-juju:no-reachable-spot';
+    publish(engine);
+    return false;
+  }
+  const { x } = spot;
+  const ground = { y: spot.y };
   const variant = JUJU_BANDIT.variants[Math.floor(Math.random() * 3)];
   const bandana = JUJU_BANDIT.bandanas[Math.floor(Math.random() * 3)];
   const sprite = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);

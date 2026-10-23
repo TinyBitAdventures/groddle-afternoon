@@ -1410,9 +1410,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 266,
+  "commits": 267,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Smugglers, Rube, the squids, the flamingos, Grandma and the Juju Bandits are sharp on Retina"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1527,11 +1532,6 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Click your name or level for the player menu"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Quoins float smoothly instead of shaking"
    }
   ]
  },

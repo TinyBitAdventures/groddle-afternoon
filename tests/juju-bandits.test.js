@@ -23,6 +23,8 @@ import {
   jujuLine,
   jujuSheetUrl,
   jujuSpawnX,
+  jujuSpawnPoint,
+  jujuCanReach,
   jujuWants,
   nearSignpost,
   redeclareDelay,
@@ -112,6 +114,31 @@ describe('juju bandit rules (npc_juju_bandit.js, juju_bandit_curse, dust_trap.js
     assert.equal(jujuSpawnX(1000, 3000, 0.9), 750);
     assert.equal(jujuSpawnX(2900, 3000, 0.1), 2650);
     assert.equal(jujuSpawnX(100, 3000, 0.9), 350);
+  });
+
+  it('never appear on a ledge they cannot walk down from', () => {
+    // Player's floor y 900 over x 0-1100; a ledge y 644 over 1150-1400 with a gap before it.
+    const floors = [{ l: 0, r: 1100, y: 900 }, { l: 1150, r: 1400, y: 644 }];
+    const at = (x) => floors.filter((f) => x >= f.l && x <= f.r);
+    const ground = (x, y, rise) => {
+      const here = at(x);
+      if (!here.length) return null;
+      const below = here.filter((f) => f.y >= y - rise).sort((a, b) => a.y - b.y)[0];
+      return (below || here.sort((a, b) => b.y - a.y)[0]).y;
+    };
+    const opts = {
+      sideRoll: 0.1, // the source picks the right side (the ledge)
+      spawnFloor: (x) => at(x).find((f) => Math.abs(f.y - 900) <= 160)?.y ?? ground(x, 100, 0),
+      groundAhead: (x, y) => ground(x, y, 30),
+      stepUp: 30,
+    };
+    const player = { x: 1000, y: 900 };
+    assert.equal(jujuCanReach({ x: 1250, y: 644 }, player, opts.groundAhead, 30), false);
+    assert.deepEqual(jujuSpawnPoint(player, 3000, opts), { x: 750, y: 900 });
+    // With the left side off the street too, it comes closer on the player's floor.
+    assert.deepEqual(jujuSpawnPoint({ x: 1000, y: 900 }, 3000, { ...opts, spawnFloor: (x) => (x < 1000 ? null : opts.spawnFloor(x)) }), { x: 1100, y: 900 });
+    // A walk that drops off an edge onto the player's floor is fine.
+    assert.equal(jujuCanReach({ x: 1250, y: 644 }, { x: 1300, y: 644 }, opts.groundAhead, 30), true);
   });
 
   it('fear signposts and reach 50 x 50', () => {

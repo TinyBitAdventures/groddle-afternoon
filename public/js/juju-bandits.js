@@ -273,6 +273,50 @@ export function jujuSpawnX(playerX, width, sideRoll = Math.random()) {
   return playerX + offset;
 }
 
+/** Spawn distances tried, nearest last: the source 250 px, then closer. */
+const SPAWN_DISTANCES = Object.freeze([250, 200, 150, 100, 60]);
+
+/**
+ * Whether a Juju that appears at `start` can walk to `player`: it walks
+ * without jumping, steps up at most `stepUp` px and drops off edges, as the
+ * feature's walk() does. `groundAhead(x, y)` is the feet y under x for a
+ * walker at y, or null.
+ */
+export function jujuCanReach(start, player, groundAhead, stepUp) {
+  let { x, y } = start;
+  const dir = Math.sign(player.x - x);
+  for (let guard = 0; guard < 1000 && Math.abs(player.x - x) >= 4; guard += 1) {
+    const nx = x + dir * Math.min(8, Math.abs(player.x - x));
+    const gy = groundAhead(nx, y);
+    if (gy == null || gy < y - stepUp) break;
+    x = nx;
+    y = gy;
+  }
+  return withinReach({ x, y }, player);
+}
+
+/**
+ * Where a Juju appears: the source spot (250 px to a random side, flipped at
+ * the street edge) when it can walk to you from there, else the other side,
+ * then closer spots on either side. The source pathfinds to the player
+ * (apiFindPath); the remake's Juju only walks and drops, so a spot on a ledge
+ * it can't leave is skipped. `spawnFloor(x)` is the feet y of the floor it
+ * would appear on, or null. Returns { x, y } or null.
+ */
+export function jujuSpawnPoint(player, width, { sideRoll = Math.random(), spawnFloor, groundAhead, stepUp }) {
+  const side = Math.sign(jujuSpawnX(player.x, width, sideRoll) - player.x) || 1;
+  for (const d of SPAWN_DISTANCES) {
+    for (const s of [side, -side]) {
+      const x = player.x + s * d;
+      if (x < 0 || x > width) continue;
+      const y = spawnFloor(x);
+      if (y == null) continue;
+      if (jujuCanReach({ x, y }, player, groundAhead, stepUp)) return { x, y };
+    }
+  }
+  return null;
+}
+
 /** isNearSignpost: the player within 200 x 200 px of any signpost (screen space). */
 export function nearSignpost(px, py, signposts = []) {
   const r = JUJU_BANDIT.signpostFear;
