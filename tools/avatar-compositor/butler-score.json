@@ -1,0 +1,404 @@
+[
+ {
+  "look": "v10",
+  "origin": {
+   "x": 48,
+   "y": 70
+  },
+  "idle0": 0.944,
+  "feet": {
+   "x": 1,
+   "y": 52
+  },
+  "clips": {
+   "idle0": {
+    "frames": 1,
+    "rigFrames": 1,
+    "mean": 0.944,
+    "min": 0.944
+   },
+   "idle1": {
+    "frames": 154,
+    "rigFrames": 154,
+    "mean": 0.94,
+    "min": 0.926
+   },
+   "idle2": {
+    "frames": 110,
+    "rigFrames": 110,
+    "mean": 0.938,
+    "min": 0.924
+   },
+   "idle3": {
+    "frames": 9,
+    "rigFrames": 9,
+    "mean": 0.944,
+    "min": 0.944
+   },
+   "idle4": {
+    "frames": 85,
+    "rigFrames": 85,
+    "mean": 0.94,
+    "min": 0.926
+   },
+   "talk": {
+    "frames": 102,
+    "rigFrames": 102,
+    "mean": 0.936,
+    "min": 0.922
+   },
+   "bow": {
+    "frames": 40,
+    "rigFrames": 40,
+    "mean": 0.941,
+    "min": 0.93
+   },
+   "acknowledge": {
+    "frames": 20,
+    "rigFrames": 20,
+    "mean": 0.941,
+    "min": 0.935
+   },
+   "wave": {
+    "frames": 52,
+    "rigFrames": 52,
+    "mean": 0.933,
+    "min": 0.926
+   },
+   "startle0": {
+    "frames": 11,
+    "rigFrames": 11,
+    "mean": 0.941,
+    "min": 0.933
+   },
+   "startle1": {
+    "frames": 15,
+    "rigFrames": 15,
+    "mean": 0.932,
+    "min": 0.916
+   },
+   "startle2": {
+    "frames": 27,
+    "rigFrames": 27,
+    "mean": 0.937,
+    "min": 0.928
+   },
+   "danceStart": {
+    "frames": 25,
+    "rigFrames": 25,
+    "mean": 0.93,
+    "min": 0.92
+   },
+   "dance": {
+    "frames": 34,
+    "rigFrames": 34,
+    "mean": 0.93,
+    "min": 0.921
+   },
+   "fastDance": {
+    "frames": 16,
+    "rigFrames": 16,
+    "mean": 0.93,
+    "min": 0.92
+   },
+   "fall": {
+    "frames": 169,
+    "rigFrames": 169,
+    "mean": 0.932,
+    "min": 0.917
+   },
+   "jump": {
+    "frames": 51,
+    "rigFrames": 51,
+    "mean": 0.941,
+    "min": 0.931
+   },
+   "walk4": {
+    "frames": 20,
+    "rigFrames": 20,
+    "mean": 0.934,
+    "min": 0.919
+   },
+   "walk3": {
+    "frames": 24,
+    "rigFrames": 24,
+    "mean": 0.937,
+    "min": 0.93
+   },
+   "stepBack": {
+    "frames": 16,
+    "rigFrames": 16,
+    "mean": 0.937,
+    "min": 0.93
+   }
+  }
+ },
+ {
+  "look": "v11",
+  "origin": {
+   "x": 48,
+   "y": 70
+  },
+  "idle0": 0.94,
+  "feet": {
+   "x": 1,
+   "y": 52
+  },
+  "clips": {
+   "idle0": {
+    "frames": 1,
+    "rigFrames": 1,
+    "mean": 0.94,
+    "min": 0.94
+   },
+   "idle1": {
+    "frames": 154,
+    "rigFrames": 154,
+    "mean": 0.94,
+    "min": 0.927
+   },
+   "idle2": {
+    "frames": 110,
+    "rigFrames": 110,
+    "mean": 0.939,
+    "min": 0.925
+   },
+   "idle3": {
+    "frames": 9,
+    "rigFrames": 9,
+    "mean": 0.94,
+    "min": 0.94
+   },
+   "idle4": {
+    "frames": 85,
+    "rigFrames": 85,
+    "mean": 0.939,
+    "min": 0.92
+   },
+   "talk": {
+    "frames": 102,
+    "rigFrames": 102,
+    "mean": 0.935,
+    "min": 0.923
+   },
+   "bow": {
+    "frames": 40,
+    "rigFrames": 40,
+    "mean": 0.94,
+    "min": 0.927
+   },
+   "acknowledge": {
+    "frames": 20,
+    "rigFrames": 20,
+    "mean": 0.937,
+    "min": 0.932
+   },
+   "wave": {
+    "frames": 52,
+    "rigFrames": 52,
+    "mean": 0.932,
+    "min": 0.926
+   },
+   "startle0": {
+    "frames": 11,
+    "rigFrames": 11,
+    "mean": 0.939,
+    "min": 0.93
+   },
+   "startle1": {
+    "frames": 15,
+    "rigFrames": 15,
+    "mean": 0.931,
+    "min": 0.913
+   },
+   "startle2": {
+    "frames": 27,
+    "rigFrames": 27,
+    "mean": 0.936,
+    "min": 0.926
+   },
+   "danceStart": {
+    "frames": 25,
+    "rigFrames": 25,
+    "mean": 0.93,
+    "min": 0.92
+   },
+   "dance": {
+    "frames": 34,
+    "rigFrames": 34,
+    "mean": 0.933,
+    "min": 0.92
+   },
+   "fastDance": {
+    "frames": 16,
+    "rigFrames": 16,
+    "mean": 0.932,
+    "min": 0.924
+   },
+   "fall": {
+    "frames": 169,
+    "rigFrames": 169,
+    "mean": 0.932,
+    "min": 0.919
+   },
+   "jump": {
+    "frames": 51,
+    "rigFrames": 51,
+    "mean": 0.942,
+    "min": 0.931
+   },
+   "walk4": {
+    "frames": 20,
+    "rigFrames": 20,
+    "mean": 0.934,
+    "min": 0.921
+   },
+   "walk3": {
+    "frames": 24,
+    "rigFrames": 24,
+    "mean": 0.938,
+    "min": 0.929
+   },
+   "stepBack": {
+    "frames": 16,
+    "rigFrames": 16,
+    "mean": 0.938,
+    "min": 0.932
+   }
+  }
+ },
+ {
+  "look": "v22",
+  "origin": {
+   "x": 68,
+   "y": 85
+  },
+  "idle0": 0.941,
+  "feet": {
+   "x": -2,
+   "y": 51
+  },
+  "clips": {
+   "idle0": {
+    "frames": 1,
+    "rigFrames": 1,
+    "mean": 0.941,
+    "min": 0.941
+   },
+   "idle1": {
+    "frames": 154,
+    "rigFrames": 154,
+    "mean": 0.944,
+    "min": 0.93
+   },
+   "idle2": {
+    "frames": 110,
+    "rigFrames": 110,
+    "mean": 0.942,
+    "min": 0.928
+   },
+   "idle3": {
+    "frames": 9,
+    "rigFrames": 9,
+    "mean": 0.941,
+    "min": 0.941
+   },
+   "idle4": {
+    "frames": 85,
+    "rigFrames": 85,
+    "mean": 0.941,
+    "min": 0.929
+   },
+   "talk": {
+    "frames": 102,
+    "rigFrames": 102,
+    "mean": 0.941,
+    "min": 0.928
+   },
+   "bow": {
+    "frames": 40,
+    "rigFrames": 40,
+    "mean": 0.942,
+    "min": 0.933
+   },
+   "acknowledge": {
+    "frames": 20,
+    "rigFrames": 20,
+    "mean": 0.94,
+    "min": 0.934
+   },
+   "wave": {
+    "frames": 52,
+    "rigFrames": 52,
+    "mean": 0.932,
+    "min": 0.924
+   },
+   "startle0": {
+    "frames": 11,
+    "rigFrames": 11,
+    "mean": 0.94,
+    "min": 0.933
+   },
+   "startle1": {
+    "frames": 15,
+    "rigFrames": 15,
+    "mean": 0.936,
+    "min": 0.931
+   },
+   "startle2": {
+    "frames": 27,
+    "rigFrames": 27,
+    "mean": 0.94,
+    "min": 0.932
+   },
+   "danceStart": {
+    "frames": 25,
+    "rigFrames": 25,
+    "mean": 0.937,
+    "min": 0.927
+   },
+   "dance": {
+    "frames": 34,
+    "rigFrames": 34,
+    "mean": 0.937,
+    "min": 0.926
+   },
+   "fastDance": {
+    "frames": 16,
+    "rigFrames": 16,
+    "mean": 0.934,
+    "min": 0.926
+   },
+   "fall": {
+    "frames": 169,
+    "rigFrames": 169,
+    "mean": 0.935,
+    "min": 0.918
+   },
+   "jump": {
+    "frames": 51,
+    "rigFrames": 51,
+    "mean": 0.945,
+    "min": 0.933
+   },
+   "walk4": {
+    "frames": 20,
+    "rigFrames": 20,
+    "mean": 0.939,
+    "min": 0.927
+   },
+   "walk3": {
+    "frames": 24,
+    "rigFrames": 24,
+    "mean": 0.944,
+    "min": 0.936
+   },
+   "stepBack": {
+    "frames": 16,
+    "rigFrames": 16,
+    "mean": 0.941,
+    "min": 0.931
+   }
+  }
+ }
+]

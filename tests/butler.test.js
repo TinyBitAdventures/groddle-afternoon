@@ -16,7 +16,11 @@ import {
   BUTLER_FRAMES,
   BUTLER_HINTS,
   BUTLER_JOKES,
+  BUTLER_LEGACY_LOOKS,
   BUTLER_LOOKS,
+  BUTLER_OPTIONS,
+  BUTLER_PART_NAMES,
+  BUTLER_PART_ORDER,
   BUTLER_SERVICE,
   BUTLER_STRINGS,
   afterGreetingForOwner,
@@ -36,7 +40,14 @@ import {
   hintDue,
   hintInterval,
   idleChatter,
+  lookIdForParts,
   nearLevel,
+  nearestButlerLook,
+  normalizeButlerParts,
+  partIndex,
+  randomButlerParts,
+  setButlerParts,
+  stepButlerPart,
   nextHandover,
   normalizeButlerState,
   ownerGreeting,
@@ -57,8 +68,13 @@ import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js';
 import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js';
 // The URL clubhouse.js imports, so these share its Butler.
-import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=butler-1';
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-2';
 import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js';
+import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js';
+import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
+import { npcQuestOffers, pendingQuestOffers } from '../public/js/quest-offers.js';
+import { createQuestState } from '../public/js/quests.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -96,10 +112,12 @@ describe('butler box and creation (inc_butler.js, butler_box.js)', () => {
     assert.equal(BUTLER.INTRO_DELAY_MS, 2000);
   });
 
-  it('makes one Butler with a random look, posted where the box stood', () => {
+  it('makes one Butler randomized part by part, posted where the box stood', () => {
     const s = createButlerState();
     assert.equal(createButler(s, { post: 287.4, now: NOW, rand: () => 0.99 }).ok, true);
-    assert.equal(s.look, BUTLER_LOOKS[2].id);
+    // inc_butler.js createButler -> randomize(): the last choice of every option.
+    assert.deepEqual(s.parts, { accessory: '12', bod: 'body16', skull: 'skull22', face: 'face13', closeArm: '12', farArm: '12', closeLeg: '13', farLeg: '11' });
+    assert.equal(s.look, 'custom');
     assert.equal(s.post, 287);
     assert.equal(s.introDone, false);
     assert.equal(createButler(s, { post: 0 }).reason, 'You already have a Butler.');
@@ -398,7 +416,7 @@ describe('Visiting Stone hand-off (street-furniture.js)', () => {
 
   it('wires the feature through one import line and the delivery hand-off', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /import \{ butlerFeature \} from '\.\/butler-feature\.js\?v=butler-1'; FEATURES\.push\(butlerFeature\);/);
+    assert.match(index, /import \{ butlerFeature \} from '\.\/butler-feature\.js\?v=butler-feature-2'; FEATURES\.push\(butlerFeature\);/);
     const sf = readFileSync(join(PUBLIC, 'js/features/street-furniture-feature.js'), 'utf8');
     assert.match(sf, /butlerApi\.receiveVisitor\(engine, letter\)\) engine\.deliverMail\?\.\(letter\)/);
     assert.match(sf, /optInDone\(butlerApi\.label\(\) \|\| STONE_BUTLER_STANDIN\)/);
@@ -539,5 +557,135 @@ describe('long Butler lines (shared speech-bubble placement)', () => {
     assert.match(game, /getElementById\('street-nameplate'\)/);
     assert.match(fn, /nameplateViewBox\(\)/);
     assert.match(fn, /pill\.bottom \+ 8 \+ meta\.height \+ 11/);
+  });
+});
+
+describe('part-by-part looks (bag_butler.as config_options, bag_butler.js instance props)', () => {
+  const RIG = join(PUBLIC, 'assets/butler-rig/butler.json');
+  const rig = JSON.parse(readFileSync(RIG, 'utf8'));
+
+  it('offers the source options with the client labels, in the source order', () => {
+    assert.deepEqual(Object.fromEntries(Object.entries(BUTLER_OPTIONS).map(([k, v]) => [k, v.length])), { accessory: 12, bod: 16, skull: 22, face: 13, closeArm: 12, farArm: 12, closeLeg: 13, farLeg: 11 });
+    assert.deepEqual(BUTLER_PART_ORDER, ['skull', 'face', 'accessory', 'bod', 'closeArm', 'farArm', 'closeLeg', 'farLeg']);
+    assert.deepEqual(BUTLER_PART_ORDER.map((k) => BUTLER_PART_NAMES[k]), ['Head', 'Face', 'Accessory', 'Body', 'Arm 1', 'Arm 2', 'Leg 1', 'Leg 2']);
+    const gsjs = join(ROOT, '../glitch-GameServerJS/items/bag_butler.js');
+    if (existsSync(gsjs)) {
+      const src = readFileSync(gsjs, 'utf8');
+      const choices = src.slice(src.indexOf('var instancePropsChoices'), src.indexOf('var verbs'));
+      for (const [k, list] of Object.entries(BUTLER_OPTIONS)) {
+        assert.ok(choices.includes(`${k} : [${list.map((v) => `"${v}"`).join(',')}]`), k);
+      }
+    }
+  });
+
+  it('keeps old saves: each OGA look id becomes its parts, and stays that look', () => {
+    for (const look of BUTLER_LOOKS) {
+      const s = normalizeButlerState({ owned: true, look: look.id });
+      assert.deepEqual(s.parts, look.parts, look.id);
+      assert.equal(s.look, look.id);
+    }
+    const v12 = normalizeButlerState({ owned: true, look: 'v12' });
+    assert.deepEqual(v12.parts, BUTLER_LEGACY_LOOKS.v12);
+    assert.equal(v12.look, 'custom');
+    assert.deepEqual(normalizeButlerState({ owned: true }).parts, BUTLER_LOOKS[0].parts);
+  });
+
+  it('saves and restores any combination, repairing bad values from the look', () => {
+    const s = normalizeButlerState({ owned: true, look: 'v22' });
+    setButlerParts(s, { ...s.parts, skull: 'skull3', face: 'face7', farLeg: '2' });
+    assert.equal(s.look, 'custom');
+    const back = normalizeButlerState(JSON.parse(JSON.stringify(serializeButlerState(s))));
+    assert.deepEqual(back.parts, s.parts);
+    const odd = normalizeButlerParts({ accessory: 'accessory4', bod: 'body99', skull: 'skull5', face: '<b>', closeArm: 7 }, 'v11');
+    assert.deepEqual(odd, { accessory: '4', bod: 'body11', skull: 'skull5', face: 'face11', closeArm: '7', farArm: '11', closeLeg: '11', farLeg: '11' });
+    assert.equal(lookIdForParts(BUTLER_LOOKS[1].parts), 'v11');
+    assert.equal(nearestButlerLook({ ...BUTLER_LOOKS[2].parts, face: 'face1' }).id, 'v22');
+  });
+
+  it('steps a part either way with wrap-around, and randomizes every option', () => {
+    const p = { ...BUTLER_LOOKS[0].parts, skull: 'skull22', farLeg: '1' };
+    assert.equal(stepButlerPart(p, 'skull', 1).skull, 'skull1');
+    assert.equal(stepButlerPart(p, 'farLeg', -1).farLeg, '11');
+    assert.equal(stepButlerPart(p, 'face', 1).face, 'face11');
+    assert.equal(partIndex('bod', 'body10'), 9);
+    assert.deepEqual(randomButlerParts(() => 0), { accessory: '1', bod: 'body1', skull: 'skull1', face: 'face1', closeArm: '1', farArm: '1', closeLeg: '1', farLeg: '1' });
+  });
+
+  it('ships a small rig with every part and the 24 doll animations', () => {
+    assert.ok(statSync(RIG).size < 4 * 1024 * 1024, 'rig under 4 MB');
+    assert.equal(rig.frames.length, 1082);
+    assert.equal(Object.keys(rig.labels).length, 24);
+    for (const [clip, n] of Object.entries(BUTLER_FRAMES)) assert.equal(clipRange(rig, clip)[1], n, clip);
+    for (const [k, list] of Object.entries(BUTLER_OPTIONS)) {
+      for (const v of list) {
+        const parts = { ...BUTLER_LOOKS[0].parts, [k]: v };
+        const items = drawList(rig, parts, 1);
+        assert.ok(items.length > 0, `${k} ${v}`);
+        for (const it of items) assert.ok(rig.shapes[it.s], `${k} ${v} shape ${it.s}`);
+      }
+    }
+    // face1-8 follow the doll's frames (animated_mcs); face9-13 are one frame.
+    assert.ok(!Array.isArray(rig.parts.face1) && rig.parts.face1.frames.length === 1082);
+    assert.ok(Array.isArray(rig.parts.face9));
+    const talk = clipRange(rig, 'talk');
+    assert.notDeepEqual(drawList(rig, BUTLER_LOOKS[0].parts, talk[0]), drawList(rig, BUTLER_LOOKS[0].parts, talk[0] + 5));
+  });
+
+  it('stands the painter on the feet the OGA sheets put on the ground', () => {
+    const score = JSON.parse(readFileSync(join(ROOT, 'tools/avatar-compositor/butler-score.json'), 'utf8'));
+    for (const row of score) {
+      assert.ok(Math.abs(row.feet.x - BUTLER_FEET.x) <= 2 && Math.abs(row.feet.y - BUTLER_FEET.y) <= 1, row.look);
+      for (const [clip, c] of Object.entries(row.clips)) assert.ok(c.mean >= 0.9, `${row.look} ${clip} ${c.mean}`);
+    }
+    const painter = new ButlerPainter(rig, BUTLER_LOOKS[0].parts);
+    const a = painter.anchor();
+    assert.ok(a.x > 0 && a.x < 1 && a.y > 0.5 && a.y < 1);
+    assert.equal(painter.frames('idle1'), 154);
+    assert.equal(painter.draw('idle0', 0), false, 'no canvas in node');
+  });
+});
+
+describe('Join the Club offer: the Butler, or the Magic Rock without one (inc_stats.js 313-322)', () => {
+  const content = join(PUBLIC, 'assets/content');
+  const engineAt = (xp) => ({
+    questState: createQuestState(),
+    pc: { xp, level: 10 },
+    learnedSkills: [],
+    unlockedAchievements: [],
+    inv: [],
+    questCustomPrereq: () => false,
+    save() {},
+    setData() {},
+    param: () => null,
+  });
+
+  it('gives join_club to bag_butler with a no_butler gate on the Magic Rock trigger', () => {
+    const o = OFFER_OVERRIDES.join_club;
+    assert.deepEqual(o.offerTriggers, [{ type: 'xp', xp: 30128 }, { type: 'npc', npc: 'bag_butler' }]);
+    assert.deepEqual(o.prerequisites, [{ condition: 'custom_code', value: 'no_butler' }]);
+    const q = JSON.parse(readFileSync(join(content, 'quests.json'), 'utf8')).join_club;
+    assert.deepEqual(q.offerTriggers.map((t) => t.type), ['xp', 'npc']);
+    assert.deepEqual(q.prerequisites, [{ condition: 'custom_code', value: 'no_butler' }]);
+  });
+
+  it('the Butler offers it from 30128 iMG; the Magic Rock does not while you have one', async () => {
+    await loadContentCatalogsFromDir(content);
+    butlerFeature._reset();
+    butlerFeature.restore({ owned: true, introDone: true });
+    const engine = engineAt(30127);
+    butlerFeature.init(engine);
+    assert.equal(butlerFeature._pendingOffer(engine), null, 'one short of the threshold');
+    engine.pc.xp = 30128;
+    assert.equal(butlerFeature._pendingOffer(engine)?.classTsid, 'join_club');
+    assert.equal(butlerFeature._pendingOffer(engine).beats[0].response, 'Club? Which club?');
+    const rockCtx = { xp: 30128, level: 10, customPrereq: (id, p) => engine.questCustomPrereq(id, p) === true };
+    assert.ok(!pendingQuestOffers(engine.questState, engine.pc, rockCtx).some((r) => r.classTsid === 'join_club'));
+    // No Butler: the gate opens and the Magic Rock has it; the Butler path has nothing.
+    butlerFeature.restore({});
+    assert.ok(pendingQuestOffers(engine.questState, engine.pc, rockCtx).some((r) => r.classTsid === 'join_club'));
+    assert.equal(butlerFeature._pendingOffer(engine), null);
+    // Other custom_code gates still reach whoever answered them before.
+    assert.equal(engine.questCustomPrereq('join_club_reminisce', { value: 'hour_after:join_club' }), false);
+    assert.ok(npcQuestOffers(engine.questState, 'bag_butler', engine.pc, { xp: 30128, customPrereq: () => true }).offered.some((c) => c.classTsid === 'join_club'));
   });
 });

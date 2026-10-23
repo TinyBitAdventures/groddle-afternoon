@@ -674,7 +674,7 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals. A Butler arrives in a box to greet you home, hold what neighbours leave and hear about the club.",
+   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it.",
    "spot": "mailbox",
    "evidence": [
     "public/js/homes.js",
@@ -1805,9 +1805,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 299,
+  "commits": 300,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Blueberry, Autumn, Midnight, Candy and Forest presets drawn sharp from the vector wardrobe"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1922,11 +1927,6 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Sky Plunge falls again, hides a Qurazy and sings when you get every quoin"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Camera Mode works on your home street and in your house and Tower"
    }
   ]
  },

@@ -27925,7 +27925,12 @@
   "familiarTurnin": false,
   "silentComplete": false,
   "showAlert": false,
-  "prerequisites": [],
+  "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "no_butler"
+   }
+  ],
   "endNpcs": [
    "bag_butler"
   ],
@@ -27941,10 +27946,15 @@
     "type": "xp",
     "xp": 30128,
     "override": true
+   },
+   {
+    "type": "npc",
+    "npc": "bag_butler",
+    "override": true
    }
   ],
   "instanceRoom": "clubhouse",
-  "offerNote": "bag_butler is not in the remake; same xp threshold through the Magic Rock",
+  "offerNote": "inc_stats.js gives it to the Butler at 30128 iMG, which offers it in its far hit box (features/butler-feature.js answers the no_butler gate for itself); without a Butler the Magic Rock offers it at the same xp",
   "solo": true
  },
  "join_club_reminisce": {

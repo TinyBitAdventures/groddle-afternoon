@@ -99,10 +99,11 @@ export const OFFER_OVERRIDES = Object.freeze({
     offerTriggers: [{ type: 'npc', npc: 'npc_juju_bandit' }],
     why: 'npc_juju_bandit offers it: a Dust Trap in Baqala, Zhambu, Xalanga or Choru brings one half the time while the quest is new (dust_trap.js, juju_bandit_curse)',
   },
-  // The Bag Butler handed out the invitation (xp 30128); there is no butler.
+  // The Bag Butler hands out the invitation (players/inc_stats.js 313-322, xp 30128).
   join_club: {
-    offerTriggers: [{ type: 'xp', xp: 30128 }],
-    why: 'bag_butler is not in the remake; same xp threshold through the Magic Rock',
+    offerTriggers: [{ type: 'xp', xp: 30128 }, { type: 'npc', npc: 'bag_butler' }],
+    prerequisites: [{ condition: 'custom_code', value: 'no_butler' }],
+    why: 'inc_stats.js gives it to the Butler at 30128 iMG, which offers it in its far hit box (features/butler-feature.js answers the no_butler gate for itself); without a Butler the Magic Rock offers it at the same xp',
   },
   join_club_reminisce: {
     prerequisites: [{ condition: 'custom_code', value: 'hour_after:join_club', not: 0 }],

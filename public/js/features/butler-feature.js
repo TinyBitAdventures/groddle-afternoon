@@ -7,7 +7,7 @@
  * What the solo Butler does:
  *  - Arrives as a "Special One-Time Delivery" box on the home street once you
  *    own a home and are level 3. Read label (four beats), Open: a puff, the
- *    Butler 750 ms later where the box stood (a random one of three looks),
+ *    Butler 750 ms later where the box stood (randomized part by part),
  *    and two seconds later "Thank you. I am very happy to be here with you".
  *  - Stands at its post right of the door, strolls up to 300 px either side,
  *    idles (idle1-4), steps back when you walk into it, waves when you come
@@ -21,26 +21,34 @@
  *  - Verbs: talk to (How can I be of service?: mailbox, messages, packages,
  *    a joke, teach a greeting or an idle line), chat (the click responses,
  *    annoyed when poked), mailbox, packages / messages, who visited?, give (a
- *    gift for visitors), name, customize (the three looks), set post, dance
+ *    gift for visitors), name, customize (the Customizer: eight parts), set post, dance
  *    (faster, then it falls over), jump, zombie, muffle / dispense butlerly
  *    wisdom (hints), zip it / chatter (idle chatter, with the Tower line).
+ *  - Offers Join the Club from 30128 iMG when you walk into its far hit box
+ *    (without a Butler the Magic Rock still does).
  *  - Hears about the club: back from Join the Club's painting, the quest
  *    turns in when you come within 550 px of the Butler at home (doQuests;
  *    quest-rooms/clubhouse.js world hook via butlerApi.questReady/hearQuest).
  *
  * QA (with ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home):
- *   &butlerdemo=1        a Butler at its post (&butlerlook=v10|v11|v22,
+ *   &butlerdemo=1        a Butler at its post (&butlerlook=v10|v11|v22|v12|random
+ *                        with &butlerseed=N, &butlerparts=skull:skull3,face:face5,...;
+ *                        &butlerart=oga keeps the recovered 1x sheets,
  *                        &butleraway=<game days> since your last visit)
  *   &butlerdemo=box      the delivery box (no level check)
  *   &butlerdemo=parcel   a Butler holding Dorrit's drop-by package and note
  *   &butlerdemo=owned    own a Butler without going home (Visiting Stone QA:
  *                        &homedemo=owned&stonedemo=1&stoneautoplay=optin)
- *   &butlerautoplay=greet|parcel|parceldone|rename|look|box|talk|joke|dance|
+ *   &butlerautoplay=greet|parcel|parceldone|rename|look|customize|discard|
+ *                   offer|offeraccept|box|talk|joke|dance|
  *                   hint|tower|gift|visitors|mailbox
  * Join the Club end to end: ?autostart=1&fresh=1&resetgame=1&questoffer=off&
  *   homedemo=owned&butlerdemo=owned&questdemo=join_club&questautoplay=1&questfx=0,
  *   then Home → Teleport home (canvas clubButler=heard, butlerLast=quest:join_club).
- * Canvas data: butlerState, butlerName, butlerLook, butlerX, butlerPost,
+ *   look = Customizer steps then Save, customize = holds it open, discard = closes
+ *   unsaved; offer / offeraccept lift xp to 30128 and wait for Join the Club.
+ * Canvas data: butlerState, butlerName, butlerLook, butlerParts, butlerArt
+ *   (rig@3x | oga:<look>), butlerOffer, butlerX, butlerPost,
  *   butlerAnim, butlerMode, butlerPackages, butlerMessages, butlerGift,
  *   butlerDialog, butlerLast, butlerVisitors, butlerAutoplay.
  */
@@ -51,6 +59,9 @@ import { homesFeature } from './homes-feature.js?v=homes-7';
 import { levelInfoForXp } from '../progression.js?v=progression-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { NEIGHBOURS, NEIGHBOUR_ITEMS, neighbourById } from '../neighbours.js?v=neighbours-1';
+import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig, paintPortrait, portraitUrl } from '../butler-rig.js?v=butler-rig-1';
+import { acceptOffer, declineOffer, npcQuestOffers, questStatus } from '../quest-offers.js';
+import { getQuestCatalog } from '../content-catalogs.js';
 import {
   BUTLER,
   BUTLER_BOX,
@@ -60,8 +71,9 @@ import {
   BUTLER_INTRO,
   BUTLER_INTRO_REPLY,
   BUTLER_JOKES,
-  BUTLER_LOOKS,
+  BUTLER_LEGACY_LOOKS,
   BUTLER_LOOPERS,
+  BUTLER_OPTIONS,
   BUTLER_PART_NAMES,
   BUTLER_PART_ORDER,
   BUTLER_SERVICE,
@@ -70,10 +82,10 @@ import {
   afterGreetingForOwner,
   boxDue,
   butlerCounts,
-  butlerLook,
   butlerName,
   butlerSheetUrl,
   butlerText,
+  clickAnim,
   clickResponse,
   createButler,
   createButlerState,
@@ -82,21 +94,26 @@ import {
   hintDue,
   idleChatter,
   nearLevel,
+  nearestButlerLook,
   nextHandover,
   normalizeButlerState,
   ownerGreeting,
   packagesAndMessagesForOwner,
   pickHint,
+  partIndex,
   pluralize,
+  randomButlerParts,
   recordVisitor,
   renameButler,
   retrieveVerbs,
   serializeButlerState,
+  setButlerParts,
   setGift,
+  stepButlerPart,
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=butler-1';
+} from '../butler.js?v=butler-2';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -203,8 +220,39 @@ function command() {
 // Art
 // ---------------------------------------------------------------------------
 
+/**
+ * The Butler is painted part by part from bag_butler.swf (js/butler-rig.js)
+ * into one 3x canvas, repainted when its frame changes. Until the rig has
+ * loaded (or if it fails) the nearest OGA whole-butler sheet stands in.
+ */
+let rigArt = null; // { painter, source, texture }
+let rigLoad = null;
+
+function ensureRigArt(engine) {
+  // QA: &butlerart=oga keeps the recovered 1x sheets (sharpness comparison).
+  if (String(engine.param?.('butlerart') || '') === 'oga') return null;
+  const rig = butlerRigNow();
+  if (!rig || typeof document === 'undefined') return null;
+  if (!rigArt) {
+    const { PIXI } = engine;
+    const painter = new ButlerPainter(rig, st.parts, BUTLER_RIG_SCALE);
+    const source = new PIXI.CanvasSource({ resource: painter.canvas, resolution: BUTLER_RIG_SCALE, scaleMode: 'linear' });
+    rigArt = { painter, source, texture: new PIXI.Texture({ source }) };
+  }
+  return rigArt;
+}
+
+/** Start loading the rig; respawn the stand-in Butler on the rig when it arrives. */
+function warmRig(engine) {
+  if (rigLoad || typeof fetch === 'undefined') return;
+  rigLoad = loadButlerRig().then(() => {
+    if (view?.butler && !view.butler.rig && !view.butler.container.destroyed) respawnButler(engine);
+    publish(engine, true);
+  }).catch(() => { rigLoad = 'failed'; });
+}
+
 function clipFrames(engine, clip) {
-  const look = butlerLook(st.look);
+  const look = nearestButlerLook(st.parts);
   const key = `${look.id}:${clip}`;
   if (frameCache.has(key)) return frameCache.get(key);
   const { PIXI } = engine;
@@ -218,22 +266,60 @@ function clipFrames(engine, clip) {
   return list;
 }
 
+/** Paint the rig Butler's current frame (no-op when it has not moved on). */
+function drawRig(v) {
+  if (!v?.rig || !rigArt) return;
+  if (rigArt.painter.draw(v.clip, Math.floor(v.rig.t))) rigArt.source.update();
+}
+
 function setClip(engine, clip, { loop = BUTLER_LOOPERS.includes(clip), then = null } = {}) {
   const v = view?.butler;
   if (!v || v.anim.destroyed) return;
-  v.anim.textures = clipFrames(engine, clip);
-  v.anim.loop = loop;
   v.clip = clip;
-  v.anim.onComplete = loop ? null : () => {
-    v.anim.onComplete = null;
+  const done = loop ? null : () => {
     if (then) then();
     else restClip(engine);
   };
-  if ((BUTLER_FRAMES[clip] || 1) > 1) v.anim.gotoAndPlay(0);
-  else v.anim.gotoAndStop(0);
+  if (v.rig) {
+    v.rig.t = 0;
+    v.rig.loop = loop;
+    v.rig.count = rigArt.painter.frames(clip);
+    v.rig.done = done;
+    drawRig(v);
+  } else {
+    v.anim.textures = clipFrames(engine, clip);
+    v.anim.loop = loop;
+    v.anim.onComplete = loop ? null : () => {
+      v.anim.onComplete = null;
+      done();
+    };
+    if ((BUTLER_FRAMES[clip] || 1) > 1) v.anim.gotoAndPlay(0);
+    else v.anim.gotoAndStop(0);
+  }
   if (clip === 'idle2') engine.playSound?.('BUTLER_DOLL_IDLE_2', { volume: 0.5 });
   if (clip === 'fall') engine.playSound?.('BUTLER_DOLL_FALL', { volume: 0.6 });
-  publish(engine);
+  publish(engine, true);
+}
+
+/** Step the rig Butler's clip at the SWF's 30 fps. */
+function stepRig(v, dtMs) {
+  const r = v?.rig;
+  if (!r) return;
+  if (r.count > 1) {
+    r.t += (dtMs / 1000) * BUTLER_FPS;
+    if (r.t >= r.count) {
+      if (r.loop) r.t %= r.count;
+      else {
+        r.t = r.count - 1;
+        const done = r.done;
+        r.done = null;
+        drawRig(v);
+        done?.();
+        return;
+      }
+    }
+  }
+  drawRig(v);
 }
 
 /** The clip for what the Butler is doing now (endAnim → idle0, or the walk). */
@@ -288,12 +374,25 @@ function subtitle() {
 
 function spawnButler(engine) {
   const { PIXI } = engine;
-  const look = butlerLook(st.look);
   const box = new PIXI.Container();
   box.zIndex = Z;
-  const anim = new PIXI.AnimatedSprite(clipFrames(engine, 'idle0'));
-  anim.anchor.set(look.anchor.x, look.anchor.y);
-  anim.animationSpeed = BUTLER_FPS / 60;
+  const art = ensureRigArt(engine);
+  let anim;
+  let rig = null;
+  if (art) {
+    art.painter.setParts(st.parts);
+    anim = new PIXI.Sprite(art.texture);
+    const a = art.painter.anchor();
+    anim.anchor.set(a.x, a.y);
+    rig = { t: 0, loop: false, count: 1, done: null };
+  } else {
+    if (rigLoad === 'failed') rigLoad = null;
+    if (String(engine.param?.('butlerart') || '') !== 'oga') warmRig(engine);
+    const look = nearestButlerLook(st.parts);
+    anim = new PIXI.AnimatedSprite(clipFrames(engine, 'idle0'));
+    anim.anchor.set(look.anchor.x, look.anchor.y);
+    anim.animationSpeed = BUTLER_FPS / 60;
+  }
   box.addChild(anim);
   box.x = rt.x;
   box.y = engine.groundY + 2;
@@ -306,16 +405,23 @@ function spawnButler(engine) {
     sprite: box,
     state: {},
   });
-  const v = { container: box, anim, target, clip: null, look: look.id };
-  return v;
+  return { container: box, anim, target, clip: null, rig };
 }
 
 function respawnButler(engine) {
   if (!view?.butler) return;
-  // unregister removes and destroys the container.
+  const clip = view.butler.clip || 'idle0';
+  // unregister removes and destroys the container (the shared rig texture stays).
   engine.unregister?.(view.butler.target);
   view.butler = spawnButler(engine);
-  setClip(engine, 'idle0');
+  setClip(engine, BUTLER_LOOPERS.includes(clip) ? clip : 'idle0');
+}
+
+/** The standing Butler as an image URL (dialog portraits, award icons). */
+function butlerPortrait(parts = st.parts) {
+  const rig = butlerRigNow();
+  if (rig && typeof document !== 'undefined') return portraitUrl(rig, parts);
+  return butlerSheetUrl(nearestButlerLook(parts).id, 'idle0');
 }
 
 function clearView() {
@@ -375,6 +481,27 @@ const CSS = `
 #butler-dialog .bd-parts { font-size: 0.7rem; opacity: 0.75; line-height: 1.3; text-align: center; }
 #butler-dialog .bd-count { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.5rem; }
 #butler-dialog .bd-count input { width: 5rem; }
+#butler-dialog .butler-card.bd-wide { width: min(560px, calc(100vw - 32px)); }
+#butler-dialog .bd-wide .bd-portrait, #butler-dialog .bd-wide .bd-text:empty { display: none; }
+#butler-dialog .bd-wide .bd-main { flex: 1 1 auto; min-width: 0; }
+#butler-dialog .bd-config { display: flex; gap: 0.9rem; align-items: center; }
+/* #game-root canvas is width 100% !important (style.css). */
+#game-root #butler-dialog .bd-config-preview, #butler-dialog .bd-config-preview { width: 150px !important; height: 180px !important; }
+#butler-dialog .bd-config-preview { flex: 0 0 auto; border-radius: 12px; background: radial-gradient(ellipse at 50% 92%, #e6dcc6 0 28%, transparent 29%), linear-gradient(#fbf7ee, #f1e8d6); }
+#butler-dialog .bd-config-rows { flex: 1 1 auto; display: grid; gap: 0.3rem; min-width: 0; }
+#butler-dialog .bd-config-row { display: grid; grid-template-columns: 2rem 1fr 2rem; align-items: center; gap: 0.35rem; border-bottom: 1px solid #efe6d4; padding-bottom: 0.25rem; }
+#butler-dialog .bd-arrow { font: inherit; font-size: 1.15rem; line-height: 1; width: 2rem; height: 2rem; border: 1px solid #e0d3bb; border-radius: 50%; background: #fffdf8; cursor: pointer; }
+#butler-dialog .bd-arrow:hover, #butler-dialog .bd-arrow:focus-visible { background: #f6efe1; }
+#butler-dialog .bd-config-label { display: grid; justify-items: center; gap: 0.12rem; font-size: 0.82rem; }
+#butler-dialog .bd-config-label span[data-bd-part-n] { font-size: 0.7rem; opacity: 0.7; }
+#butler-dialog .bd-dots { position: relative; width: 70%; height: 4px; border-radius: 2px; background: #ece2cf; }
+#butler-dialog .bd-dots::after { content: ''; position: absolute; top: -2px; width: 8px; height: 8px; border-radius: 50%; background: #8bb565; left: calc(var(--at, 0) * (100% - 8px)); }
+#butler-dialog .bd-random { justify-self: center; margin-top: 0.2rem; text-align: center; }
+@media (max-width: 480px) {
+  #butler-dialog .bd-config { flex-direction: column; }
+  #game-root #butler-dialog .bd-config-preview, #butler-dialog .bd-config-preview { width: 120px !important; height: 144px !important; }
+  #butler-dialog .bd-config-rows { width: 100%; }
+}
 `;
 
 function ensureDialog(engine) {
@@ -413,12 +540,14 @@ function ensureDialog(engine) {
  */
 function openDialog(engine, step) {
   if (!ensureDialog(engine)) return;
+  // A step replaced before it was answered (the Customizer discards its draft).
+  if (dialogState && dialogState !== step) dialogState.onAbandon?.();
   dialogState = step;
   rt.mode = 'interacting';
   command();
   dialog.querySelector('[data-bd-title]').textContent = step.title || butlerName(st);
   const portrait = dialog.querySelector('[data-bd-portrait]');
-  portrait.src = step.portrait || (st.owned ? butlerSheetUrl(st.look, 'idle0') : BUTLER_BOX_ART);
+  portrait.src = step.portrait || (st.owned ? butlerPortrait() : BUTLER_BOX_ART);
   dialog.querySelector('[data-bd-text]').textContent = step.text || '';
   const extra = dialog.querySelector('[data-bd-extra]');
   extra.innerHTML = '';
@@ -464,6 +593,7 @@ function openDialog(engine, step) {
     box.appendChild(b);
   }
   dialog.dataset.step = step.key || '';
+  dialog.querySelector('.butler-card')?.classList.toggle('bd-wide', Boolean(step.wide));
   dialog.hidden = false;
   if (input) requestAnimationFrame(() => input.focus());
   else requestAnimationFrame(() => box.querySelector('button')?.focus());
@@ -578,9 +708,9 @@ function puff(engine, x, y) {
 
 function finishOpen(engine) {
   pendingOpenAt = 0;
-  const forcedLook = BUTLER_LOOKS.find((l) => l.id === engine.param?.('butlerlook'));
   createButler(st, { post: pendingOpenX - houseX(), now: now() });
-  if (forcedLook) st.look = forcedLook.id;
+  const forced = paramParts(engine);
+  if (forced) setButlerParts(st, forced);
   rt.x = pendingOpenX;
   rt.mode = 'idle';
   engine.save?.();
@@ -742,6 +872,7 @@ function tickButler(engine, dtMs) {
   }
   v.container.x = Math.round(rt.x);
   v.anim.scale.x = rt.dir === 'right' ? -1 : 1;
+  stepRig(v, dtMs);
   if (v.target) {
     v.target.label = butlerName(st);
     v.target.subtitle = subtitle();
@@ -772,6 +903,16 @@ function secondTick(engine, t) {
   }
   rt.far = inFar;
   rt.near = inNear;
+  // doQuests on the far hit box: the Butler offers what it holds (Join the Club).
+  if (!inFar) rt.offerAsked = false;
+  else if (!rt.offerAsked && butlerApi.questReady(engine)) {
+    rt.offerAsked = true;
+    const card = pendingButlerOffer(engine);
+    if (card) {
+      offerQuest(engine, card);
+      return;
+    }
+  }
   if (busy || rt.mode === 'interacting' || rt.mode === 'dance' || rt.mode === 'step') return;
   if (p && d <= BUTLER.AT_DIST && t - rt.stepAt > 3000 && reactionAllowed()) {
     if (stepBack(engine, p.x) && Math.random() < 0.5 && t - rt.lastSpeakAt > 10_000) say(engine, butlerText('stepAwayList'));
@@ -797,6 +938,105 @@ function secondTick(engine, t) {
     if (t - rt.lastCommandAt > 5000 && reactionAllowed()) idleAnim(engine);
     if (t >= rt.idleUntil && reactionAllowed()) wander(engine);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Quests the Butler offers
+// ---------------------------------------------------------------------------
+
+/**
+ * players/inc_stats.js 313-322: at 30128 iMG, with a Butler, Join the Club
+ * goes to the Butler (setAvailableQuests) instead of quests_offer; its
+ * doQuests offers it when the owner walks into the far hit box (bag_butler.js
+ * 4047-4051, 2095-2110; npc_quests.js offerQuests: one quest, so straight to
+ * its offer). quest-rooms/catalog.js gives join_club an npc trigger for
+ * bag_butler and a `no_butler` gate on the Magic Rock's xp trigger, answered
+ * here: without a Butler the Magic Rock still offers it.
+ */
+export const BUTLER_QUESTS = Object.freeze(['join_club']);
+const NO_BUTLER_GATE = 'no_butler';
+
+/** The xp a quest's familiar trigger names (the inc_stats threshold, 30128 for join_club). */
+function questXp(id) {
+  const t = (getQuestCatalog()?.[id]?.offerTriggers || []).find((x) => x.type === 'xp');
+  return t ? Number(t.xp) || 0 : 0;
+}
+
+function butlerQuestCtx(engine) {
+  return {
+    level: engine.pc?.level,
+    xp: engine.pc?.xp,
+    skills: engine.learnedSkills,
+    achievements: engine.unlockedAchievements,
+    inv: engine.inv,
+    pc: engine.pc,
+    now: Date.now(),
+    managedOnly: true,
+    customPrereq: (id, p) => (String(p?.value) === NO_BUTLER_GATE ? true : engine.questCustomPrereq?.(id, p) === true),
+  };
+}
+
+/** The offer card the Butler holds now, or null. */
+function pendingButlerOffer(engine) {
+  if (!st.owned || !engine.questState) return null;
+  const xp = Number(engine.pc?.xp) || 0;
+  try {
+    return npcQuestOffers(engine.questState, BUTLER.CLASS, engine.pc, butlerQuestCtx(engine)).offered
+      .find((card) => BUTLER_QUESTS.includes(card.classTsid) && xp >= questXp(card.classTsid)) || null;
+  } catch {
+    return null;
+  }
+}
+
+function offerQuest(engine, card) {
+  command();
+  if (engine.player) faceX(engine.player.x);
+  if (reactionAllowedLoose() || reactionAllowed()) oneOff(engine, 'talk');
+  rt.mode = 'interacting';
+  lastMsg = `offer:${card.classTsid}`;
+  const finish = (result) => {
+    if (rt.mode === 'interacting') rt.mode = 'idle';
+    lastMsg = `offer:${card.classTsid}:${result}`;
+    engine.setData('butlerOffer', `${card.classTsid}:${result}`);
+    publish(engine, true);
+  };
+  engine.offerQuestDialogue?.({
+    title: card.title,
+    kicker: butlerName(st),
+    beats: card.beats,
+    acceptLabel: card.acceptLabel,
+    declineLabel: card.declineLabel,
+    onAccept: () => {
+      const result = acceptOffer(engine.questState, card.classTsid, butlerQuestCtx(engine));
+      if (result.ok) {
+        engine.pushActivity?.(`New quest: ${card.title}`);
+        engine.refreshPack?.();
+      }
+      engine.save?.();
+      finish(result.ok ? 'accepted' : result.reason || 'failed');
+    },
+    onDecline: () => {
+      // An NPC offer is simply dropped; the Butler asks again next time.
+      declineOffer(engine.questState, card.classTsid, Date.now(), { source: 'npc' });
+      engine.save?.();
+      finish('declined');
+    },
+  });
+  engine.setData('butlerOffer', `${card.classTsid}:open`);
+  publish(engine, true);
+}
+
+/**
+ * The Magic Rock asks engine.questCustomPrereq about join_club's `no_butler`
+ * gate (quest-offers-feature). Wrap whatever answers the other gates
+ * (quest-instances-feature sets it in its init, which runs before this one).
+ */
+function installQuestGate(engine) {
+  const inner = engine.questCustomPrereq;
+  if (inner?.butlerGate) return;
+  const gate = (id, p) => (String(p?.value) === NO_BUTLER_GATE ? !st.owned : (inner ? inner(id, p) : false));
+  gate.butlerGate = true;
+  engine.questCustomPrereq = gate;
 }
 
 // ---------------------------------------------------------------------------
@@ -1063,50 +1303,125 @@ function nameMenu(engine, preset = null) {
   });
 }
 
-/** customize: the client's look picker, here the three complete looks. */
+/**
+ * customize (bag_butler.js 546-580): the owner's verb sends
+ * itemstack_config_start and the client opens its Customizer
+ * (ItemstackConfigDialog + ConfiggerUI): one row per config option in
+ * config_option_names_sort order with the bag_butler.as labels (Head, Face,
+ * Accessory, Body, Arm 1, Arm 2, Leg 1, Leg 2), prev/next arrows, a
+ * Randomize button and Save. Changes show on the Butler as you make them;
+ * closing without saving puts the old look back. Free, like the original.
+ */
 function customize(engine) {
-  const render = (el) => {
-    const grid = document.createElement('div');
-    grid.className = 'bd-looks';
-    for (const look of BUTLER_LOOKS) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'bd-look';
-      b.dataset.butlerLook = look.id;
-      b.setAttribute('aria-pressed', look.id === st.look ? 'true' : 'false');
-      const img = document.createElement('img');
-      img.src = butlerSheetUrl(look.id, 'idle0');
-      img.alt = '';
-      const name = document.createElement('span');
-      name.textContent = look.name;
-      const parts = document.createElement('span');
-      parts.className = 'bd-parts';
-      parts.textContent = BUTLER_PART_ORDER.map((k) => `${BUTLER_PART_NAMES[k]} ${String(look.parts[k]).replace(/\D/g, '')}`).join(' · ');
-      b.append(img, name, parts);
-      b.addEventListener('click', () => {
-        if (st.look === look.id) return;
-        st.look = look.id;
-        engine.save?.();
-        respawnButler(engine);
-        if (view?.butler && reactionAllowed()) oneOff(engine, 'bow');
-        for (const other of grid.querySelectorAll('[data-butler-look]')) other.setAttribute('aria-pressed', other.dataset.butlerLook === st.look ? 'true' : 'false');
-        dialog.querySelector('[data-bd-portrait]').src = butlerSheetUrl(st.look, 'idle0');
-        lastMsg = `look:${st.look}`;
-        publish(engine, true);
-      });
-      grid.appendChild(b);
+  const was = { ...st.parts };
+  let draft = { ...st.parts };
+  let saved = false;
+  if (view?.butler && reactionAllowed()) oneOff(engine, clickAnim(Math.floor(Math.random() * 3)).anim);
+  let preview = null;
+  const showDraft = () => {
+    if (rigArt) {
+      rigArt.painter.setParts(draft);
+      drawRig(view?.butler);
     }
-    el.appendChild(grid);
+    const rig = butlerRigNow();
+    if (preview && rig) paintPortrait(rig, draft, preview, { pad: 8 * BUTLER_RIG_SCALE });
+    for (const row of dialog.querySelectorAll('[data-butler-part]')) {
+      const k = row.dataset.butlerPart;
+      const i = partIndex(k, draft[k]);
+      row.querySelector('[data-bd-part-n]').textContent = `${i + 1} of ${BUTLER_OPTIONS[k].length}`;
+      row.querySelector('[data-bd-part-dots]').style.setProperty('--at', String(i / Math.max(1, BUTLER_OPTIONS[k].length - 1)));
+    }
+    dialog.dataset.butlerDraft = BUTLER_PART_ORDER.map((k) => draft[k]).join(',');
+  };
+  const render = (el) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'bd-config';
+    preview = document.createElement('canvas');
+    preview.className = 'bd-config-preview';
+    preview.width = 150 * BUTLER_RIG_SCALE;
+    preview.height = 180 * BUTLER_RIG_SCALE;
+    preview.dataset.bdPreview = '1';
+    const rows = document.createElement('div');
+    rows.className = 'bd-config-rows';
+    for (const k of BUTLER_PART_ORDER) {
+      const row = document.createElement('div');
+      row.className = 'bd-config-row';
+      row.dataset.butlerPart = k;
+      const prev = document.createElement('button');
+      prev.type = 'button';
+      prev.className = 'bd-arrow';
+      prev.textContent = '‹';
+      prev.setAttribute('aria-label', `Previous ${BUTLER_PART_NAMES[k]}`);
+      prev.dataset.butlerStep = `${k}:-1`;
+      const label = document.createElement('div');
+      label.className = 'bd-config-label';
+      label.innerHTML = `<b>${BUTLER_PART_NAMES[k]}</b><span data-bd-part-n></span><span class="bd-dots" data-bd-part-dots></span>`;
+      const next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'bd-arrow';
+      next.textContent = '›';
+      next.setAttribute('aria-label', `Next ${BUTLER_PART_NAMES[k]}`);
+      next.dataset.butlerStep = `${k}:1`;
+      for (const [btn, dir] of [[prev, -1], [next, 1]]) {
+        btn.addEventListener('click', () => {
+          draft = stepButlerPart(draft, k, dir);
+          engine.playSound?.('CLICK_SUCCESS', { volume: 0.35 });
+          showDraft();
+        });
+      }
+      row.append(prev, label, next);
+      rows.appendChild(row);
+    }
+    const random = document.createElement('button');
+    random.type = 'button';
+    random.className = 'bd-btn bd-random';
+    random.textContent = 'Randomize';
+    random.dataset.butlerChoice = 'randomize';
+    random.addEventListener('click', () => {
+      draft = randomButlerParts();
+      engine.playSound?.('CLICK_SUCCESS', { volume: 0.35 });
+      showDraft();
+    });
+    rows.appendChild(random);
+    wrap.append(preview, rows);
+    el.appendChild(wrap);
+    if (!butlerRigNow()) loadButlerRig().then(showDraft).catch(() => {});
+    requestAnimationFrame(showDraft);
   };
   openDialog(engine, {
     key: 'customize',
-    title: `Customize ${butlerName(st)}`,
-    text: 'Pick a look.',
+    title: 'Customizer',
+    text: '',
     talk: false,
+    wide: true,
     extra: render,
-    choices: [{ value: 'done', txt: 'Done', primary: true }],
-    onChoice: () => closeDialog(engine),
+    choices: [{ value: 'save', txt: 'Save', primary: true }],
+    onChoice: () => {
+      saved = true;
+      const changed = BUTLER_PART_ORDER.some((k) => draft[k] !== was[k]);
+      setButlerParts(st, draft);
+      if (!rigArt) respawnButler(engine);
+      engine.save?.();
+      closeDialog(engine);
+      // onSave: showCheckmark over the stack.
+      if (changed) engine.toast?.('Saved');
+      lastMsg = `customize:${changed ? 'saved' : 'same'}:${BUTLER_PART_ORDER.map((k) => st.parts[k]).join(',')}`;
+      publish(engine, true);
+    },
+    onAbandon: () => discard(),
+    onClose: () => discard(),
   });
+  function discard() {
+    if (saved) return;
+    saved = true;
+    // closeAndDiscard: put the old config back.
+    if (rigArt) {
+      rigArt.painter.setParts(st.parts);
+      drawRig(view?.butler);
+    }
+    lastMsg = 'customize:discarded';
+    publish(engine, true);
+  }
 }
 
 function setPost(engine) {
@@ -1317,7 +1632,7 @@ export const butlerApi = {
     if (reactionAllowedLoose() || reactionAllowed()) oneOff(engine, 'talk');
     lastMsg = `quest:${questId}`;
     publish(engine, true);
-    return { name: butlerName(st), portrait: butlerSheetUrl(st.look, 'idle0') };
+    return { name: butlerName(st), portrait: butlerPortrait() };
   },
 };
 /** Let the arrival greeting's lines play before a quest turn-in covers them (greetNow's follow-up comes at 3.8 s). */
@@ -1335,6 +1650,8 @@ function publish(engine, force = false) {
   engine.setData('butlerState', st.owned ? 'butler' : view?.box ? 'box' : pendingOpenAt ? 'opening' : 'none');
   engine.setData('butlerName', butlerName(st));
   engine.setData('butlerLook', st.look);
+  engine.setData('butlerParts', BUTLER_PART_ORDER.map((k) => st.parts[k]).join(','));
+  engine.setData('butlerArt', view?.butler ? (view.butler.rig ? `rig@${BUTLER_RIG_SCALE}x` : `oga:${nearestButlerLook(st.parts).id}`) : '');
   const boxSprite = view?.box?.sprite;
   engine.setData('butlerX', st.owned && view?.butler ? String(Math.round(rt.x)) : boxSprite && !boxSprite.destroyed ? String(Math.round(boxSprite.x)) : '');
   engine.setData('butlerPost', st.owned ? String(Math.round(postX())) : '');
@@ -1360,6 +1677,32 @@ function ownedDemo(engine) {
   engine.save?.();
 }
 
+/**
+ * Part choices from QA params: &butlerlook=v10|v11|v22|v12 (the OGA
+ * combinations) or random (&butlerseed=N), &butlerparts=skull:skull3,face:face5,...
+ */
+function paramParts(engine) {
+  const look = String(engine.param?.('butlerlook') || '').toLowerCase();
+  let parts = null;
+  if (BUTLER_LEGACY_LOOKS[look]) parts = { ...BUTLER_LEGACY_LOOKS[look] };
+  else if (look === 'random') {
+    let a = Number(engine.param?.('butlerseed')) || Date.now();
+    parts = randomButlerParts(() => {
+      a = (a * 1103515245 + 12345) % 2147483648;
+      return a / 2147483648;
+    });
+  }
+  const raw = String(engine.param?.('butlerparts') || '');
+  if (raw) {
+    parts ||= { ...st.parts };
+    for (const pair of raw.split(',')) {
+      const [k, v] = pair.split(':');
+      if (BUTLER_OPTIONS[k]) parts[k] = v;
+    }
+  }
+  return parts;
+}
+
 function demoSetup(engine) {
   const kind = String(engine.param('butlerdemo') || '').toLowerCase();
   if (!kind || kind === 'owned' || demo) return;
@@ -1371,8 +1714,8 @@ function demoSetup(engine) {
     st.introDone = true;
     st.createdAt = now();
   }
-  const lookParam = BUTLER_LOOKS.find((l) => l.id === engine.param('butlerlook'));
-  if (lookParam && st.owned) st.look = lookParam.id;
+  const forced = paramParts(engine);
+  if (forced && st.owned) setButlerParts(st, forced);
   const away = Number(engine.param('butleraway'));
   if (Number.isFinite(away) && away > 0 && st.owned) st.lastOwnerVisit = now() - away * BUTLER.GAME_DAY_MS;
   if (kind === 'parcel' && st.owned && !st.packages.length) {
@@ -1413,7 +1756,7 @@ function autoplayStep(engine) {
       return later(700);
     }
     if (!view.butler) return later(300);
-    autoplay.phase = m === 'greet' || m === 'parcel' || m === 'parceldone' ? 'greeting' : 'go';
+    autoplay.phase = ['greet', 'parcel', 'parceldone', 'offer', 'offeraccept'].includes(m) ? 'greeting' : 'go';
     return later(500);
   }
   if (autoplay.phase === 'greeting') {
@@ -1469,13 +1812,43 @@ function autoplayStep(engine) {
         return later(600);
       }
       return done('named');
-    case 'look':
+    case 'offer':
+    case 'offeraccept':
+      // Join the Club from the Butler: lift the QA save to the inc_stats threshold, wait for doQuests.
       if (!autoplay.opened) {
         autoplay.opened = true;
-        customize(engine);
+        const need = questXp('join_club');
+        if (engine.pc && (Number(engine.pc.xp) || 0) < need) engine.pc.xp = need;
+        rt.offerAsked = false;
         return later(800);
       }
-      dialog?.querySelector(`[data-butler-look="${engine.param('butlerlookto') || 'v22'}"]`)?.click();
+      if (!String(lastMsg).startsWith('offer:join_club')) return later(500);
+      if (m === 'offeraccept' && lastMsg === 'offer:join_club') {
+        engine.acceptOpenOffer?.();
+        return later(1200);
+      }
+      return done(lastMsg);
+    case 'look':
+    case 'customize':
+    case 'discard':
+      // The Customizer: step Head and Face on, Body back, then Save (or close: discard).
+      // &butlerautoplay=customize holds the dialog open after the steps.
+      if (!autoplay.opened) {
+        autoplay.opened = true;
+        autoplay.steps = ['skull:1', 'skull:1', 'face:1', 'bod:-1', 'closeLeg:1'];
+        customize(engine);
+        return later(900);
+      }
+      if (autoplay.steps.length) {
+        dialog?.querySelector(`[data-butler-step="${autoplay.steps.shift()}"]`)?.click();
+        return later(350);
+      }
+      if (m === 'customize') return done('customize');
+      if (m === 'discard') {
+        closeDialog(engine, 'close');
+        return done('discard');
+      }
+      clickChoice('save');
       return done('look');
     case 'talk':
       talkTo(engine);
@@ -1533,6 +1906,7 @@ export const butlerFeature = {
   id: BUTLER_FEATURE_ID,
 
   init(engine) {
+    installQuestGate(engine);
     publish(engine, true);
   },
 
@@ -1551,6 +1925,7 @@ export const butlerFeature = {
 
   onTick(dtMs, t, engine) {
     if (!engine.started) return;
+    installQuestGate(engine);
     if (!demoOwnedDone) ownedDemo(engine);
     const tsid = engine.streetTsid;
     const room = currentRoom(engine);
@@ -1619,6 +1994,9 @@ export const butlerFeature = {
   },
   _receiveVisitor(engine, letter) {
     return receiveVisitor(engine, letter);
+  },
+  _pendingOffer(engine) {
+    return pendingButlerOffer(engine);
   },
 };
 

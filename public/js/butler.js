@@ -20,7 +20,7 @@
  *    set post moves it to where you stand), wanders up to 300 px either side
  *    while idle and walks back after wait_time 15 s without a command.
  *  - Owner verbs: name (19 characters, tags stripped, nameSuccess /
- *    nameShortened), customize (the client's look picker), set post, mailbox,
+ *    nameShortened), customize (the client's Customizer, eight parts), set post, mailbox,
  *    messages, packages, who visited?, give (a gift handed to each visitor
  *    once per class), muffle / dispense butlerly wisdom (hints), zip it /
  *    chatter (idle chatter), and the IM commands dance (faster, faster
@@ -236,12 +236,24 @@ export const BUTLER_JOKES = Object.freeze([
 ].map((joke) => Object.freeze(joke.map(([text, response]) => Object.freeze({ text, response })))));
 
 /**
- * The looks. bag_butler.swf composes eight parts (accessory 1-12, body 1-16,
- * head 1-22, face 1-13, arms 1-12, legs 1-13 / 1-11; bag_butler.as
- * config_options), but the CC0 OGA archive only has whole-butler sheets for
- * four part combinations, and the fourth (accessory 12 / body 12 / head 12)
- * has 8 of the 24 animations. The three complete ones are the looks on offer.
+ * The looks. bag_butler.swf composes eight parts (bag_butler.as
+ * config_options, the GSJS instance props of bag_butler.js 41-48 / 67-79);
+ * js/butler-rig.js paints any combination from the SWF's vectors
+ * (assets/butler-rig/butler.json, tools/avatar-compositor/butler.mjs).
+ * The CC0 OGA archive has whole-butler sheets for four combinations; the
+ * three complete ones (BUTLER_LOOKS) are the fallback art while the rig
+ * loads and the part choices of saves made before the rig.
  */
+export const BUTLER_OPTIONS = Object.freeze({
+  accessory: Object.freeze(Array.from({ length: 12 }, (_, i) => `${i + 1}`)),
+  bod: Object.freeze(Array.from({ length: 16 }, (_, i) => `body${i + 1}`)),
+  skull: Object.freeze(Array.from({ length: 22 }, (_, i) => `skull${i + 1}`)),
+  face: Object.freeze(Array.from({ length: 13 }, (_, i) => `face${i + 1}`)),
+  closeArm: Object.freeze(Array.from({ length: 12 }, (_, i) => `${i + 1}`)),
+  farArm: Object.freeze(Array.from({ length: 12 }, (_, i) => `${i + 1}`)),
+  closeLeg: Object.freeze(Array.from({ length: 13 }, (_, i) => `${i + 1}`)),
+  farLeg: Object.freeze(Array.from({ length: 11 }, (_, i) => `${i + 1}`)),
+});
 export const BUTLER_PART_NAMES = Object.freeze({
   accessory: 'Accessory', bod: 'Body', skull: 'Head', face: 'Face',
   closeArm: 'Arm 1', farArm: 'Arm 2', closeLeg: 'Leg 1', farLeg: 'Leg 2',
@@ -281,6 +293,66 @@ export function butlerSheetUrl(lookId, anim) {
   return `assets/sprites/butler/butler_${butlerLook(lookId).id}_${anim}.webp`;
 }
 export const BUTLER_BOX_ART = 'assets/sprites/butler/butler_box.png';
+
+/**
+ * Part choices of the OGA combinations (their file names): the three looks,
+ * and the fourth, partial one (accessory 12 / body 12 / head 12, farLeg 1).
+ */
+export const BUTLER_LEGACY_LOOKS = Object.freeze({
+  ...Object.fromEntries(BUTLER_LOOKS.map((l) => [l.id, l.parts])),
+  v12: Object.freeze({ accessory: '12', bod: 'body12', skull: 'skull12', face: 'face12', closeArm: '12', farArm: '12', closeLeg: '12', farLeg: '1' }),
+});
+
+/** Valid part choices: each option from `raw`, else from the look `fallback` (v10). */
+export function normalizeButlerParts(raw, fallback = 'v10') {
+  const base = BUTLER_LEGACY_LOOKS[fallback] || BUTLER_LOOKS[0].parts;
+  const src = raw && typeof raw === 'object' ? raw : {};
+  const out = {};
+  for (const [k, list] of Object.entries(BUTLER_OPTIONS)) {
+    const v = String(src[k] ?? '');
+    // The GSJS default instance prop is "accessory1" while the choices are "1".."12".
+    const fixed = k === 'accessory' ? v.replace(/^accessory/, '') : v;
+    out[k] = list.includes(fixed) ? fixed : base[k];
+  }
+  return out;
+}
+
+/** The OGA look these parts are, or 'custom'. */
+export function lookIdForParts(parts) {
+  const hit = BUTLER_LOOKS.find((l) => BUTLER_PART_ORDER.every((k) => l.parts[k] === parts?.[k]));
+  return hit ? hit.id : 'custom';
+}
+
+/** The OGA look sharing the most parts (fallback art while the rig loads). */
+export function nearestButlerLook(parts) {
+  let best = BUTLER_LOOKS[0];
+  let score = -1;
+  for (const l of BUTLER_LOOKS) {
+    const n = BUTLER_PART_ORDER.reduce((a, k) => a + (l.parts[k] === parts?.[k] ? (k === 'skull' || k === 'bod' ? 3 : 1) : 0), 0);
+    if (n > score) { best = l; score = n; }
+  }
+  return best;
+}
+
+/** randomize (bag_butler.js 5227-5270): one choice per option. */
+export function randomButlerParts(rand = Math.random) {
+  const out = {};
+  for (const [k, list] of Object.entries(BUTLER_OPTIONS)) out[k] = list[Math.min(list.length - 1, Math.floor(rand() * list.length))];
+  return out;
+}
+
+/** "Head 3 of 22": a part's 1-based index in its option list. */
+export function partIndex(option, value) {
+  return BUTLER_OPTIONS[option] ? BUTLER_OPTIONS[option].indexOf(String(value)) : -1;
+}
+
+/** Step one option to the previous (-1) or next (+1) choice, wrapping. */
+export function stepButlerPart(parts, option, dir = 1) {
+  const list = BUTLER_OPTIONS[option];
+  if (!list) return { ...parts };
+  const i = Math.max(0, list.indexOf(String(parts[option])));
+  return { ...parts, [option]: list[(i + (dir < 0 ? list.length - 1 : 1)) % list.length] };
+}
 
 // ---------------------------------------------------------------------------
 // State
@@ -341,13 +413,17 @@ export function normalizeButlerState(seed = {}) {
   }
   const owned = s.owned === true;
   const post = Number(s.post);
+  // Saves before the rig hold only a look id (v10 / v11 / v22): its parts.
+  const parts = normalizeButlerParts(s.parts, BUTLER_LEGACY_LOOKS[s.look] ? s.look : BUTLER_LOOKS[0].id);
   return {
     v: BUTLER_STATE_VERSION,
     owned,
     boxRead: s.boxRead === true || owned,
     name: cleanLine(s.name, BUTLER.NAME_MAX),
     namedAt: whole(s.namedAt),
-    look: BUTLER_LOOKS.some((l) => l.id === s.look) ? s.look : BUTLER_LOOKS[0].id,
+    /** The eight part choices (GSJS instance props); look is the OGA look they match, or 'custom'. */
+    parts,
+    look: lookIdForParts(parts),
     /** Post x relative to the house centre (homeStreetLayout().houseX). */
     post: Number.isFinite(post) ? Math.round(post) : null,
     createdAt: whole(s.createdAt),
@@ -380,12 +456,19 @@ export function boxDue(state, { homeOwned = false, level = 1 } = {}) {
   return !state.owned && homeOwned === true && whole(level) >= BUTLER.BOX_MIN_LEVEL;
 }
 
-/** createButler: one Butler, a random look (randomize), posted where the box stood. */
+/** Set the eight part choices (customize's Save, randomize); keeps `look` in step. */
+export function setButlerParts(state, parts) {
+  state.parts = normalizeButlerParts(parts, state.look in BUTLER_LEGACY_LOOKS ? state.look : 'v10');
+  state.look = lookIdForParts(state.parts);
+  return state.parts;
+}
+
+/** createButler (players/inc_butler.js 2-42): one Butler, randomized part by part, posted where the box stood. */
 export function createButler(state, { post = 0, now = Date.now(), rand = Math.random } = {}) {
   if (state.owned) return { ok: false, reason: 'You already have a Butler.' };
   state.owned = true;
   state.boxRead = true;
-  state.look = BUTLER_LOOKS[Math.min(BUTLER_LOOKS.length - 1, Math.floor(rand() * BUTLER_LOOKS.length))].id;
+  setButlerParts(state, randomButlerParts(rand));
   state.post = Math.round(Number(post) || 0);
   state.createdAt = whole(now);
   state.lastOwnerVisit = whole(now);

@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Butler rig harness</title></head>
+<body>
+<script type="module">
+  // Offline driver for tools/avatar-compositor/butler-score.mjs and butler-sheet.mjs.
+  import { loadButlerRig, drawList, paintFrame, paintPortrait, clipRange } from '/js/butler-rig.js';
+  import { paintItems } from '/js/avatar-compositor.js';
+  import { BUTLER_LOOKS, BUTLER_FRAMES, butlerSheetUrl } from '/js/butler.js';
+
+  const img = (url) => new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error(url)); i.src = url; });
+
+  function alphaOf(canvas) {
+    const d = canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, canvas.width, canvas.height).data;
+    const a = new Uint8Array(canvas.width * canvas.height);
+    for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3] > 127 ? 1 : 0;
+    return a;
+  }
+
+  /** OGA cell k of a look's clip sheet as an alpha mask. */
+  async function ogaCell(look, clip, k) {
+    const sheet = await img('/' + butlerSheetUrl(look.id, clip));
+    const c = document.createElement('canvas');
+    c.width = look.cell.w; c.height = look.cell.h;
+    const cols = look.cols[clip] || 1;
+    c.getContext('2d').drawImage(sheet, (k % cols) * look.cell.w, Math.floor(k / cols) * look.cell.h, look.cell.w, look.cell.h, 0, 0, look.cell.w, look.cell.h);
+    return alphaOf(c);
+  }
+
+  /** Rig frame painted at 1x with the doll origin at (ox, oy) on a w x h canvas. */
+  function rigCell(rig, parts, n, w, h, ox, oy) {
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    paintFrame(c.getContext('2d'), rig, parts, n, [1, 0, 0, 1, ox, oy]);
+    return alphaOf(c);
+  }
+
+  const iou = (a, b) => { let i = 0, u = 0; for (let k = 0; k < a.length; k++) { i += a[k] & b[k]; u += a[k] | b[k]; } return u ? i / u : 1; };
+
+  /** Where the doll origin sits in a look's OGA cells (best idle0 overlap), and per-clip agreement there. */
+  window.scoreLook = async (lookId) => {
+    const rig = await loadButlerRig('/assets/butler-rig/butler.json');
+    const look = BUTLER_LOOKS.find((l) => l.id === lookId);
+    const { w, h } = look.cell;
+    const target = await ogaCell(look, 'idle0', 0);
+    // Start from the bounding boxes' bottom centres, then search around it.
+    const bbox = (a) => { let x0 = w, y0 = h, x1 = -1, y1 = -1; for (let k = 0; k < a.length; k++) if (a[k]) { const x = k % w, y = Math.floor(k / w); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); } return [x0, y0, x1, y1]; };
+    const tb = bbox(target);
+    const rb = bbox(rigCell(rig, look.parts, 1, w, h, Math.round(w / 2), Math.round(h / 2)));
+    const sx = Math.round(w / 2 + (tb[0] + tb[2]) / 2 - (rb[0] + rb[2]) / 2);
+    const sy = Math.round(h / 2 + tb[3] - rb[3]);
+    let best = { iou: -1 };
+    for (let oy = sy - 6; oy <= sy + 6; oy++) for (let ox = sx - 6; ox <= sx + 6; ox++) {
+      const v = iou(target, rigCell(rig, look.parts, 1, w, h, ox, oy));
+      if (v > best.iou) best = { iou: v, ox, oy };
+    }
+    const clips = {};
+    for (const [clip, count] of Object.entries(BUTLER_FRAMES)) {
+      const [first, n] = clipRange(rig, clip);
+      let sum = 0, min = 1;
+      const m = Math.min(count, n);
+      for (let k = 0; k < m; k++) {
+        const v = iou(await ogaCell(look, clip, k), rigCell(rig, look.parts, first + k, w, h, best.ox, best.oy));
+        sum += v; min = Math.min(min, v);
+      }
+      clips[clip] = { frames: m, rigFrames: n, mean: Math.round((sum / m) * 1000) / 1000, min: Math.round(min * 1000) / 1000 };
+    }
+    // The game's anchor (look.anchor) in doll units.
+    const feet = { x: Math.round((look.anchor.x * w - best.ox) * 100) / 100, y: Math.round((look.anchor.y * h - best.oy) * 100) / 100 };
+    return { look: lookId, origin: { x: best.ox, y: best.oy }, idle0: Math.round(best.iou * 1000) / 1000, feet, clips };
+  };
+
+  /** One frame per combination (or each of `frames` per combination) on a grid, at `scale`: a PNG data URL. */
+  window.renderSheet = async (combos, { scale = 3, clip = 'idle0', frame = 0, frames = null, cell = [90, 120], bg = null } = {}) => {
+    const rig = await loadButlerRig('/assets/butler-rig/butler.json');
+    const cells = [];
+    for (const parts of combos) for (const f of frames || [frame]) cells.push([parts, f]);
+    const cols = Math.min(cells.length, frames ? frames.length : 6);
+    const rows = Math.ceil(cells.length / cols);
+    const c = document.createElement('canvas');
+    c.width = cols * cell[0] * scale; c.height = rows * cell[1] * scale;
+    const ctx = c.getContext('2d');
+    if (bg) { ctx.fillStyle = bg; ctx.fillRect(0, 0, c.width, c.height); }
+    // One box per sheet so an animation keeps its scale and ground line.
+    const box = rig.box[clip] || rig.box.idle0;
+    cells.forEach(([parts, f], k) => {
+      const sub = document.createElement('canvas');
+      sub.width = cell[0] * scale; sub.height = cell[1] * scale;
+      paintPortrait(rig, parts, sub, { clip, frame: f, pad: 6 * scale, box });
+      ctx.drawImage(sub, (k % cols) * cell[0] * scale, Math.floor(k / cols) * cell[1] * scale);
+    });
+    return c.toDataURL('image/png');
+  };
+
+  /** Time painting every frame of a clip at `scale` (ms per frame). */
+  window.timeClip = async (parts, clip = 'idle1', scale = 3) => {
+    const rig = await loadButlerRig('/assets/butler-rig/butler.json');
+    const [first, n] = clipRange(rig, clip);
+    const c = document.createElement('canvas');
+    c.width = 170 * scale; c.height = 140 * scale;
+    const ctx = c.getContext('2d');
+    const t = performance.now();
+    for (let k = 0; k < n; k++) { ctx.clearRect(0, 0, c.width, c.height); paintFrame(ctx, rig, parts, first + k, [scale, 0, 0, scale, 70 * scale, 65 * scale]); }
+    ctx.getImageData(0, 0, 1, 1);
+    return (performance.now() - t) / n;
+  };
+
+  window.harnessReady = true;
+</script>
+</body>
+</html>
