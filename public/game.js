@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-25';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-26';
 import {
   actionDurationFor,
   createTimedAction,
@@ -320,7 +320,14 @@ import {
   unlockAchievement,
   groupLabelCount,
 } from './js/achievements.js?v=full-browser-1';
-import { applyStreetVisit } from './js/exploration.js';
+import {
+  applyStreetVisit,
+  STREET_VISITS_SLOT,
+  loadingCardDetails,
+  loadingVisitLine,
+  recordStreetEntry,
+  streetLoadingVisit,
+} from './js/exploration.js';
 import { createCombobox } from './js/combobox.js';
 import {
   INCANTATION_LINES,
@@ -614,7 +621,7 @@ import {
   NEW_DAY_HOLD_MS,
   runStreetTransition,
   showAwardScreen,
-} from './js/screen-fx.js?v=award-text-1';
+} from './js/screen-fx.js?v=award-text-2';
 import {
   planTravel,
   listMapDestinations,
@@ -1890,6 +1897,11 @@ async function enterStreetWithTransition(tsid, opts = {}) {
   if (!useFx || !el) {
     return enterStreet(tsid, opts);
   }
+  // Loading card (G89): visits so far and the last one, read before this entry counts.
+  // Saves from before the history was kept: a street locations_visited already lists counts once.
+  const visitedBefore = achieveState.groups?.locations_visited?.includes(tsid) ? 1 : 0;
+  const visit = streetLoadingVisit(persistentWorldState.streets?.[tsid]?.features?.[STREET_VISITS_SLOT], { knownVisits: visitedBefore });
+  const fromColors = currentStreet?.hubId ? await resolveHubColors(currentStreet.hubId) : { top: null, bottom: null };
   let data = null;
   playSound(opts.teleport ? 'TELEPORT_AWAY' : 'SIGNPOST_TRAVEL', { volume: 0.5 });
   await runStreetTransition(el, {
@@ -1900,6 +1912,16 @@ async function enterStreetWithTransition(tsid, opts = {}) {
     loadingImg,
     topColor: colors.top,
     bottomColor: colors.bottom,
+    fromTopColor: fromColors.top,
+    fromBottomColor: fromColors.bottom,
+    visitHtml: loadingVisitLine(visit),
+    details: () => loadingCardDetails({
+      targets: interactables,
+      quoinTypes: quoins.map((q) => q.typeId),
+      visit,
+      ...(features.query('streetProjectInfo', currentStreetTsid, engine) || {}),
+      playerLabel: playerSpeechTarget?.label || 'Ur',
+    }),
     onMid: async () => {
       data = await enterStreet(tsid, { ...opts, quiet: true });
     },
@@ -18149,6 +18171,9 @@ async function enterStreet(tsid, opts = {}) {
   spawnIlmenskieJones();
   features.streetEnter(data, engine, opts);
   if (firstVisit) emitGameEvent(`street_first_visit:${data.tsid}`);
+  if (!engine.inScene()) {
+    recordStreetEntry(engine.streetSlot(STREET_VISITS_SLOT, data.tsid), Date.now(), achieveState.groups?.locations_visited?.includes(data.tsid) ? 1 : 0);
+  }
   recordStreetVisit(data.tsid);
   emitGameEvent(`street_entered:${String(data.label || '').toLowerCase().replace(/[^a-z0-9]+/g, '_')}`);
   if (app?.canvas) {
@@ -23345,6 +23370,10 @@ async function main() {
   // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
   if (new URLSearchParams(location.search).has('gardentalkdemo')) {
     import('./js/garden-talk-qa.js').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
+  }
+  // Loading card QA (js/loading-card-qa.js): ?loadcarddemo=<tsid>[,<tsid>].
+  if (new URLSearchParams(location.search).has('loadcarddemo')) {
+    import('./js/loading-card-qa.js').then((m) => m.runLoadingCardDemo({ engine, travel: (tsid) => enterStreetWithTransition(tsid), params: new URLSearchParams(location.search) }));
   }
   installMoreMenu();
   installPlayerMenu();

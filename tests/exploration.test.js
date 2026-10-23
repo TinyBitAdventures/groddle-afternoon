@@ -146,3 +146,100 @@ describe('street visit counters', () => {
     assert.ok(!state.unlocked.includes('groddle_forest_completist'));
   });
 });
+
+import {
+  STREET_VISITS_SLOT,
+  formatLoadingTime,
+  homeToFeatures,
+  loadingCardDetails,
+  loadingVisitLine,
+  ordinal,
+  recordStreetEntry,
+  streetFeaturesFromTargets,
+  streetLoadingVisit,
+} from '../public/js/exploration.js';
+
+describe('location loading card (LoadingLocationView.as, location.js getLoadingInfo)', () => {
+  it('formats time and ordinals like StringUtil', () => {
+    assert.equal(formatLoadingTime((270 * 1440 + 15 * 60 + 5) * 60), '270 days 15 hours 5 mins');
+    assert.equal(formatLoadingTime((7 * 1440 + 20 * 60 + 25) * 60), '7 days 20 hours 25 mins');
+    assert.equal(formatLoadingTime(61 * 60), '1 hour 1 min');
+    assert.equal(formatLoadingTime(1234 * 86400), '1,234 days');
+    assert.equal(formatLoadingTime((2 * 1440 + 3 * 60 + 4) * 60, { displaySec: false, maxToShow: 2 }), '~2 days 3 hours');
+    assert.deepEqual([1, 2, 3, 4, 11, 12, 13, 21, 22, 101, 111].map(ordinal),
+      ['1st', '2nd', '3rd', '4th', '11th', '12th', '13th', '21st', '22nd', '101st', '111th']);
+  });
+
+  it('counts visits before this entry and stamps the last one', () => {
+    const now = 10_000_000_000;
+    assert.deepEqual(streetLoadingVisit(null, { now }), { firstVisit: true, visitCount: 0, lastVisitMins: 0 });
+    // A street the save already knew counts as one visit with no time.
+    assert.deepEqual(streetLoadingVisit({}, { now, knownVisits: 1 }), { firstVisit: false, visitCount: 1, lastVisitMins: 0 });
+    const slot = {};
+    recordStreetEntry(slot, now - 90 * 60000);
+    recordStreetEntry(slot, now - 30 * 60000);
+    assert.deepEqual(streetLoadingVisit(slot, { now }), { firstVisit: false, visitCount: 2, lastVisitMins: 30 });
+    assert.equal(STREET_VISITS_SLOT, 'street-visits');
+  });
+
+  it('writes the visit line as the client does', () => {
+    assert.equal(loadingVisitLine({ firstVisit: true }), '<span class="st-hl">First time here!</span>');
+    assert.equal(loadingVisitLine({ firstVisit: true, qurazyHere: true }),
+      '<span class="st-hl">First time here!</span> <b>Find the Qurazy Quoin:</b>');
+    assert.equal(loadingVisitLine({ visitCount: 4, lastVisitMins: 270 * 1440 + 15 * 60 + 5 }),
+      'Last here <b>270 days 15 hours 5 mins ago</b> &#8212; this is your 5th visit');
+    // Back within half a minute: last_visit_mins rounds to 0, only the count shows.
+    assert.equal(loadingVisitLine({ visitCount: 1, lastVisitMins: 0 }), 'this is your 2nd visit');
+  });
+
+  it('builds Home to: vendor, shrine, then one Plus line in source order', () => {
+    assert.deepEqual(homeToFeatures({
+      vendor: 'Hardware Vendor',
+      shrineGiant: 'ti',
+      counts: { npc_chicken: 2, npc_piggy: 3, npc_butterfly: 1 },
+      trees: [['trant_bean', 3], ['trant_bubble', 1]],
+      rocks: [['metal_rock', 2]],
+      gardens: { herb: 6 },
+    }), [
+      'A <b>Hardware Vendor</b>.',
+      'A shrine dedicated to <b>Ti</b>.',
+      'Plus <b>3 Piggies</b>, <b>1 Butterfly</b>, <b>2 Chickens</b>, <b>3 Bean Trees</b>, <b>1 Bubble Tree</b>, <b>2 Metal Rocks for mining</b>, and <b>6 Herb Garden plots</b>.',
+    ]);
+    assert.deepEqual(homeToFeatures({ vendor: 'Alchemical Goods Vendor' }), ['An <b>Alchemical Goods Vendor</b>.']);
+    // No vendor or shrine: no "Plus" (the Jethimadh Herb Gardens card).
+    assert.deepEqual(homeToFeatures({ counts: { npc_piggy: 8, npc_butterfly: 7, npc_chicken: 9 }, gardens: { herb: 36 } }),
+      ['<b>8 Piggies</b>, <b>7 Butterflies</b>, <b>9 Chickens</b>, and <b>36 Herb Garden plots</b>.']);
+    assert.deepEqual(homeToFeatures({}), []);
+  });
+
+  it('counts the spawned targets', () => {
+    const street = streetFeaturesFromTargets([
+      { classId: 'npc_piggy' }, { classId: 'npc_piggy' }, { classId: 'apple' },
+      { classId: 'trant_fruit' }, { classId: 'wood_tree' }, { classId: 'trant_fruit' },
+      { classId: 'rock_beryl_1' }, { classId: 'rock_sparkly_1' },
+      { classId: 'street_spirit_groceries', state: { vendorLabel: 'Groceries Vendor' } },
+      { classId: 'npc_shrine_mab', state: { giantId: 'mab' } },
+      { classId: 'garden_new', state: { garden: { gardenType: 'herb', cols: 3, rows: 2 } } },
+      { classId: 'garden_new', state: { garden: { gardenType: 'default', cols: 4, rows: 2 } } },
+      { classId: 'peat_2' },
+    ]);
+    assert.deepEqual(homeToFeatures(street), [
+      'A <b>Groceries Vendor</b>.',
+      'A shrine dedicated to <b>Mab</b>.',
+      'Plus <b>2 Piggies</b>, <b>1 Peat Bog</b>, <b>2 Fruit Trees</b>, <b>1 Wood Tree</b>, <b>1 Beryl Rock for mining</b>, <b>1 Sparkly Rock for mining</b>, <b>6 Herb Garden plots</b>, and <b>8 Crop Garden plots</b>.',
+    ]);
+  });
+
+  it('adds the Qurazy note on first visits and the upgrade badge after an upgrade', () => {
+    const now = 50_000_000_000;
+    const first = loadingCardDetails({ quoinTypes: ['xp', 'qurazy'], visit: { firstVisit: true, visitCount: 0 }, now });
+    assert.equal(first.qurazyHere, true);
+    assert.match(first.visitHtml, /Find the Qurazy Quoin:/);
+    const again = loadingCardDetails({ quoinTypes: ['qurazy'], visit: { firstVisit: false, visitCount: 2, lastVisitMins: 600 }, upgradedAt: now - 60 * 60000, playerLabel: 'Ur', now });
+    assert.equal(again.qurazyHere, false);
+    assert.equal(again.upgradeBadge, true);
+    assert.match(again.upgradeHtml, /^<b>Upgraded 1 hour ago\.<\/b> Led by:/);
+    const before = loadingCardDetails({ visit: { visitCount: 2, lastVisitMins: 30 }, upgradedAt: now - 60 * 60000, now });
+    assert.equal(before.upgradeBadge, false);
+  });
+});

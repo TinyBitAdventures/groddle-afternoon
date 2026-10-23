@@ -128,8 +128,68 @@ export async function crossfadeElement(el, { show, durationSec }) {
   }
 }
 
+/** LocationRenderer / DecoByteLoader status labels on the card's bar. */
+export const LOAD_STATUS = Object.freeze({
+  loading: 'loading...',
+  preparing: 'preparing...',
+  splines: 'reticulating splines...',
+});
+
+/** The bar label with TimerBar show_perc_in_label: "reticulating splines... 39%". */
+export function loadStatusLabel(text, percent = 0) {
+  const p = Math.round(Number(percent) || 0);
+  return p ? `${text} ${p}%` : text;
+}
+
+/** 0xRRGGBB or '#rrggbb' to a CSS colour. */
+export function cssColor(value, fallback) {
+  if (typeof value === 'number' && Number.isFinite(value)) return `#${(value >>> 0).toString(16).padStart(6, '0').slice(-6)}`;
+  if (typeof value === 'string' && value.trim()) return value.trim();
+  return fallback;
+}
+
 /**
- * Full street-load sequence: fade in → work → fade out.
+ * LoadingLocationView.refresh: the split "Leaving / Welcome to" card shows
+ * only when the hub changes; "Leaving" needs the two hubs' colours to differ.
+ */
+export function loadingSplit({ fromHub = '', toHub = '', fromTop, fromBottom, toTop, toBottom } = {}) {
+  if (!fromHub || !toHub || fromHub === toHub) return { split: false, leaving: false, welcome: false };
+  const same = cssColor(fromTop, '') === cssColor(toTop, '') && cssColor(fromBottom, '') === cssColor(toBottom, '');
+  return { split: true, leaving: !same, welcome: Boolean(toHub) };
+}
+
+const CARD_HTML = `
+  <div class="st-split" data-st-split hidden></div>
+  <div class="st-hubs">
+    <p class="st-hub-leave" data-st-leaving hidden><span>Leaving</span><b data-st-leave-hub></b></p>
+    <p class="st-hub-welcome" data-st-welcoming hidden><span>Welcome to</span><b data-st-welcome-hub></b></p>
+  </div>
+  <div class="screen-transition-inner st-card">
+    <p class="st-last" data-st-last><span data-st-last-text></span><img class="st-qurazy" data-st-qurazy src="assets/sprites/loading/qurazy_quoin.png" alt="Qurazy Quoin" hidden /></p>
+    <div class="st-snap-wrap" data-st-snap-wrap hidden><img class="st-snap" data-st-snap alt="" /></div>
+    <div class="st-title">
+      <p class="st-entering">Entering</p>
+      <h2 class="st-enter" data-st-enter>…</h2>
+      <p class="st-enter-hub" data-st-enter-hub></p>
+    </div>
+    <div class="st-details">
+      <div class="st-home" data-st-home hidden></div>
+      <img class="st-upgrade-badge" data-st-upgrade-badge src="assets/sprites/loading/upgrade_badge.png" alt="Upgraded since your last visit" hidden />
+      <div class="st-upgrade" data-st-upgrade hidden></div>
+    </div>
+  </div>
+  <div class="st-progress" aria-hidden="true"><i data-st-bar></i><span class="st-status" data-st-status></span></div>`;
+
+/** Builds the card once over whatever placeholder markup the page shipped. */
+function ensureLoadingCard(el) {
+  if (el.dataset.stCard === '2' || !el.ownerDocument) return;
+  el.innerHTML = CARD_HTML;
+  el.dataset.stCard = '2';
+}
+
+/**
+ * Full street-load sequence: fade in → work → fade out
+ * (LoadingLocationView.as fadeIn / showRegular / refresh / fadeOut).
  * @param {HTMLElement} el  #screen-transition
  * @param {{
  *   fromLabel?: string,
@@ -137,8 +197,14 @@ export async function crossfadeElement(el, { show, durationSec }) {
  *   toLabel: string,
  *   toHub?: string,
  *   loadingImg?: string|null,
- *   topColor?: string|null,
- *   bottomColor?: string|null,
+ *   topColor?: string|number|null,
+ *   bottomColor?: string|number|null,
+ *   fromTopColor?: string|number|null,
+ *   fromBottomColor?: string|number|null,
+ *   visitHtml?: string,
+ *   details?: () => ({ visitHtml?: string, qurazyHere?: boolean, features?: string[], activeProject?: boolean,
+ *     upgradeHtml?: string, upgradeBadge?: boolean }|null|Promise<object|null>),
+ *   holdMs?: number,
  *   onMid?: () => Promise<void>|void,
  * }} opts
  */
@@ -147,77 +213,148 @@ export async function runStreetTransition(el, opts) {
     if (opts.onMid) await opts.onMid();
     return;
   }
-  const leave = el.querySelector('[data-st-leave]');
-  const leaveHub = el.querySelector('[data-st-leave-hub]');
-  const enter = el.querySelector('[data-st-enter]');
-  const enterHub = el.querySelector('[data-st-enter-hub]');
-  const bar = el.querySelector('[data-st-bar]');
-  const status = el.querySelector('[data-st-status]');
-  const snapWrap = el.querySelector('[data-st-snap-wrap]');
-  const snap = el.querySelector('[data-st-snap]');
+  ensureLoadingCard(el);
+  const q = (sel) => el.querySelector(sel);
+  const enter = q('[data-st-enter]');
+  const enterHub = q('[data-st-enter-hub]');
+  const bar = q('[data-st-bar]');
+  const status = q('[data-st-status]');
+  const snapWrap = q('[data-st-snap-wrap]');
+  const snap = q('[data-st-snap]');
+  const last = q('[data-st-last-text]') || q('[data-st-last]');
+  const qurazy = q('[data-st-qurazy]');
+  const home = q('[data-st-home]');
+  const upgrade = q('[data-st-upgrade]');
+  const badge = q('[data-st-upgrade-badge]');
+  const splitEl = q('[data-st-split]');
+  const leaving = q('[data-st-leaving]');
+  const welcoming = q('[data-st-welcoming]');
 
-  // Hub gradient (LoadingLocationView top_color / bottom_color)
-  const top = opts.topColor || '#1a2830';
-  const bot = opts.bottomColor || '#1e2a24';
-  el.style.background = `linear-gradient(180deg, ${top} 0%, ${bot} 55%, ${bot} 100%)`;
+  // Hub gradient (LoadingLocationView top_color / bottom_color).
+  const top = cssColor(opts.topColor, '#1a2830');
+  const bot = cssColor(opts.bottomColor, '#1e2a24');
+  const gradient = (a, b) => `linear-gradient(180deg, ${a} 0%, ${b} 100%)`;
+  const split = loadingSplit({
+    fromHub: opts.fromHub,
+    toHub: opts.toHub,
+    fromTop: opts.fromTopColor ?? opts.topColor,
+    fromBottom: opts.fromBottomColor ?? opts.bottomColor,
+    toTop: opts.topColor,
+    toBottom: opts.bottomColor,
+  });
+  if (split.split) {
+    // Left half keeps the old hub's colours; the scalloped right half has the new one.
+    el.style.background = gradient(cssColor(opts.fromTopColor, top), cssColor(opts.fromBottomColor, bot));
+    if (splitEl) {
+      splitEl.style.background = gradient(top, bot);
+      splitEl.classList.toggle('has-shadow', split.leaving);
+      splitEl.hidden = false;
+    }
+  } else {
+    el.style.background = gradient(top, bot);
+    if (splitEl) splitEl.hidden = true;
+  }
+  if (leaving) {
+    leaving.hidden = !split.leaving;
+    const hub = leaving.querySelector('[data-st-leave-hub]');
+    if (hub) hub.textContent = opts.fromHub || '';
+  }
+  if (welcoming) {
+    welcoming.hidden = !split.welcome;
+    const hub = welcoming.querySelector('[data-st-welcome-hub]');
+    if (hub) hub.textContent = opts.toHub || '';
+  }
+  el.dataset.stSplit = split.split ? (split.leaving ? 'leaving' : 'welcome') : '';
 
-  if (leave) {
-    const from = opts.fromLabel || '';
-    leave.textContent = from ? `Leaving ${from}` : '';
-    leave.hidden = !from;
-  }
-  if (leaveHub) {
-    leaveHub.textContent = opts.fromHub || '';
-    leaveHub.hidden = !opts.fromHub;
-  }
-  if (enter) enter.textContent = opts.toLabel || '…';
+  if (enter) enter.textContent = opts.toLabel || 'An Unknown Area';
   if (enterHub) {
-    enterHub.textContent = opts.toHub || '';
+    enterHub.textContent = opts.toHub ? `in ${opts.toHub}` : '';
     enterHub.hidden = !opts.toHub;
   }
+  const setVisit = (html, showQurazy = false) => {
+    if (last) last.innerHTML = html || '';
+    if (qurazy) qurazy.hidden = !showQurazy;
+    el.dataset.stVisit = String(html || '').replace(/<[^>]+>/g, '').replace(/&#8212;/g, '—');
+  };
+  setVisit(opts.visitHtml || '');
+  if (home) {
+    home.innerHTML = '';
+    home.hidden = true;
+  }
+  if (upgrade) {
+    upgrade.innerHTML = '';
+    upgrade.hidden = true;
+  }
+  if (badge) badge.hidden = true;
+  el.dataset.stHomeTo = '';
   if (snapWrap && snap) {
+    // refresh() always draws the rounded 0x666666 picture box; the image loads over it.
+    snapWrap.hidden = false;
     if (opts.loadingImg) {
       snap.alt = opts.toLabel || 'Street preview';
-      snap.src = opts.loadingImg;
-      snapWrap.hidden = false;
+      snap.hidden = false;
       snap.onerror = () => {
-        snapWrap.hidden = true;
+        snap.hidden = true;
       };
+      snap.src = opts.loadingImg;
     } else {
       snap.removeAttribute('src');
-      snapWrap.hidden = true;
+      snap.hidden = true;
     }
   }
-  if (status) status.textContent = 'loading…';
-  if (bar) {
-    bar.style.width = '8%';
-    bar.classList.add('is-busy');
-  }
+  const setStatus = (text, percent = 0) => {
+    const label = loadStatusLabel(text, percent);
+    if (status) status.textContent = label;
+    if (bar) bar.style.width = `${Math.max(0, Math.min(100, Math.round(percent)))}%`;
+    el.dataset.stStatus = label;
+  };
+  setStatus(LOAD_STATUS.loading);
 
   // Non-interactive during load (no click-to-skip)
   el.style.pointerEvents = 'auto';
   el.setAttribute('aria-busy', 'true');
 
   await crossfadeElement(el, { show: true, durationSec: LOAD_FADE_IN });
-  if (bar) bar.style.width = '55%';
 
   try {
+    setStatus(LOAD_STATUS.preparing);
     if (opts.onMid) await opts.onMid();
-    if (bar) bar.style.width = '100%';
-    if (status) status.textContent = 'ready';
-    const hold = opts.holdMs ?? LOAD_HOLD_MS;
-    await wait(hold);
-  } finally {
-    if (bar) {
-      bar.classList.remove('is-busy');
-      bar.style.width = '100%';
+    // What the street turned out to hold (location.js getLoadingInfo street_details).
+    const info = opts.details ? await opts.details() : null;
+    if (info) {
+      if (info.visitHtml != null || info.qurazyHere) setVisit(info.visitHtml ?? opts.visitHtml, Boolean(info.qurazyHere));
+      const features = Array.isArray(info.features) ? info.features : [];
+      if (home && (features.length || info.activeProject)) {
+        // LoadingLocationView.buildHomeTo
+        const proj = '<span class="st-hl">Active project!</span>';
+        const items = features.length
+          ? features.map((f, i) => `<li>${f}${i === 0 && info.activeProject ? `&nbsp;&nbsp;&nbsp;${proj}` : ''}</li>`)
+          : [`<li>${proj}</li>`];
+        home.innerHTML = `<b>Home to:</b><ul>${items.join('')}</ul>`;
+        home.hidden = Boolean(info.upgradeBadge);
+        el.dataset.stHomeTo = features.map((f) => f.replace(/<[^>]+>/g, '')).join(' | ');
+      }
+      if (upgrade && info.upgradeHtml) {
+        upgrade.innerHTML = info.upgradeHtml;
+        upgrade.hidden = false;
+      }
+      if (badge) badge.hidden = !info.upgradeBadge;
+      el.dataset.stUpgradeBadge = info.upgradeBadge ? '1' : '0';
     }
+    // LocationRenderer READYING_TEXT, counted up over the hold so travel is no slower.
+    // QA only (js/loading-card-qa.js): &loadcardhold=<ms> keeps the card up for screenshots.
+    const qaHold = Number(new URLSearchParams(globalThis.location?.search || '').get('loadcardhold')) || 0;
+    const hold = qaHold || (opts.holdMs ?? LOAD_HOLD_MS);
+    const steps = 6;
+    setStatus(LOAD_STATUS.splines);
+    for (let i = 1; i <= steps; i += 1) {
+      await wait(hold / steps);
+      setStatus(LOAD_STATUS.splines, (100 * i) / steps);
+    }
+  } finally {
     await crossfadeElement(el, { show: false, durationSec: LOAD_FADE_OUT });
     if (bar) bar.style.width = '0%';
-    if (snap) {
-      snap.removeAttribute('src');
-      if (snapWrap) snapWrap.hidden = true;
-    }
+    if (snap) snap.removeAttribute('src');
     el.setAttribute('aria-busy', 'false');
   }
 }

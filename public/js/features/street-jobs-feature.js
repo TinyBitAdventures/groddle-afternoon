@@ -1196,6 +1196,22 @@ export const streetJobsFeature = {
     }
   },
 
+  /**
+   * Loading card (location.js getLoadingInfo): the street's finished upgrade
+   * time (ts_done, ms) and whether one of its projects is under way.
+   */
+  streetProjectInfo(tsid) {
+    if (!catalog || !tsid) return null;
+    const ids = catalog.byStreet?.[String(tsid).replace(/^L/, 'G')] || [];
+    let upgradedAt = 0;
+    for (const jobId of ids) {
+      const job = catalog.jobs?.[jobId];
+      const doneAt = Number(state.jobs[jobId]?.doneAt) || 0;
+      if (job?.kind === 'upgrade' && doneAt > upgradedAt) upgradedAt = doneAt;
+    }
+    return { upgradedAt, activeProject: ids.some((jobId) => jobInProgress(state, jobId)) };
+  },
+
   /** Closed roads block their signposts only; the Map still goes anywhere. */
   travelGate(tsid, engine, meta = {}) {
     if (!catalog || meta?.via !== 'signpost') return null;

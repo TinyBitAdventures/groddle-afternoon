@@ -4855,91 +4855,172 @@ header.top-bar + .sub { display: none; }
 }
 .screen-transition[hidden] { display: none !important; }
 .screen-transition.is-visible[hidden] { display: grid !important; }
-.screen-transition-inner {
-  width: min(440px, 88%);
-  text-align: center;
-  padding: 1.2rem 1rem 1.4rem;
+/* LoadingLocationView: 10% side gutters, 160 px picture, "Entering" + street
+   over the picture's foot, "in <hub>", "Home to:", bar with its label inside. */
+.screen-transition-inner.st-card {
+  position: relative;
+  z-index: 2;
+  width: 80%;
+  max-width: 980px;
+  text-align: left;
+  padding: 0 0 3.2rem;
+  font-family: "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
 }
-.st-leave {
+.st-split {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: 0;
+  z-index: 1;
+  /* the client's 8 x 48 px scalloped seam */
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='48'%3E%3Cpath d='M8 0C8 5 4 12 4 12C0 19 0 24 0 24C0 29 4 36 4 36C8 43 8 48 8 48Z'/%3E%3C/svg%3E") 0 0 / 8px 48px repeat-y,
+    linear-gradient(#000, #000) 8px 0 / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='48'%3E%3Cpath d='M8 0C8 5 4 12 4 12C0 19 0 24 0 24C0 29 4 36 4 36C8 43 8 48 8 48Z'/%3E%3C/svg%3E") 0 0 / 8px 48px repeat-y,
+    linear-gradient(#000, #000) 8px 0 / 100% 100% no-repeat;
+}
+.st-split[hidden] { display: none !important; }
+.st-split.has-shadow { filter: drop-shadow(-6px 0 8px rgba(0, 0, 0, 0.25)); }
+.st-hubs {
+  position: absolute;
+  top: 6%;
+  left: 10%;
+  right: 10%;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.st-hub-leave,
+.st-hub-welcome {
   margin: 0;
-  font-size: 0.82rem;
-  opacity: 0.45;
-  letter-spacing: 0.02em;
+  display: grid;
+  line-height: 1.05;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
 }
-.st-leave-hub {
-  margin: 0.1rem 0 0.85rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  opacity: 0.55;
+.st-hub-welcome { margin-left: auto; text-align: right; }
+.st-hub-leave span,
+.st-hub-welcome span { font-size: clamp(0.9rem, 1.9vw, 1.2rem); font-weight: 700; opacity: 0.72; }
+.st-hub-leave b,
+.st-hub-welcome b { font-size: clamp(1.2rem, 2.6vw, 1.7rem); }
+.st-hub-leave[hidden],
+.st-hub-welcome[hidden] { display: none !important; }
+.st-last {
+  min-height: 1.3em;
+  margin: 0 0 0.6rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
+.st-last b { font-weight: 700; }
+.st-hl { color: #fff36b; font-weight: 700; }
+.st-qurazy { width: 31px; height: 33px; }
+.st-qurazy[hidden] { display: none !important; }
 .st-snap-wrap {
-  margin: 0.55rem auto 0.85rem;
-  max-width: min(520px, 100%);
+  height: 160px;
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
-  background: rgba(0,0,0,0.2);
+  background: rgba(40, 40, 40, 0.28);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.15), 0 0 15px rgba(255, 255, 255, 0.15);
 }
+.st-snap[hidden] { display: none !important; }
 .st-snap-wrap[hidden] { display: none !important; }
 .st-snap {
   display: block;
   width: 100%;
-  height: auto;
-  max-height: 140px;
+  height: 100%;
   object-fit: cover;
   object-position: center;
-  image-rendering: auto;
 }
-.st-welcome {
+.st-title {
+  position: relative;
+  margin-top: -42px;
+  padding: 0 10px;
+}
+.st-entering {
   margin: 0;
-  font-size: 0.9rem;
-  opacity: 0.55;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 .st-enter {
-  margin: 0.15rem 0 0;
-  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+  margin: -0.15rem 0 0;
+  font-size: clamp(1.6rem, 4.4vw, 2.6rem);
+  line-height: 1.05;
   font-weight: 800;
-  color: #fff8e8;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  color: #ffff8c;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.45);
+  overflow-wrap: anywhere;
 }
 .st-enter-hub {
-  margin: 0.2rem 0 1.1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #c5d8a8;
+  margin: 0.15rem 0 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.st-enter-hub[hidden] { display: none !important; }
+.st-details {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-top: 0.7rem;
+  padding: 0 10px;
+}
+.st-home {
+  flex: 1;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.82);
+  animation: stDetailsIn 0.25s ease-out;
+}
+.st-home[hidden],
+.st-upgrade[hidden],
+.st-upgrade-badge[hidden] { display: none !important; }
+.st-home ul { margin: 0.25rem 0 0; padding-left: 1.6rem; }
+.st-home li { margin: 0.1rem 0; }
+.st-upgrade-badge { width: 54px; height: 54px; }
+.st-upgrade { margin-left: auto; font-size: 0.74rem; color: rgba(255, 255, 255, 0.82); }
+@keyframes stDetailsIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .st-progress {
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.12);
+  position: absolute;
+  z-index: 3;
+  left: 10%;
+  right: 10%;
+  bottom: 20px;
+  height: 18px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.92);
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
 }
 .st-progress > i {
   display: block;
   height: 100%;
   width: 0%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #7dcea0, #e8f5a0);
-  transition: width 0.35s ease;
-  box-shadow: 0 0 12px rgba(125,206,160,0.45);
-}
-.st-progress > i.is-busy {
-  animation: stPulse 0.9s ease-in-out infinite alternate;
-}
-@keyframes stPulse {
-  from { filter: brightness(1); }
-  to { filter: brightness(1.15); }
+  background: #c3d98c;
+  transition: width 0.08s linear;
 }
 .st-status {
-  margin: 0.55rem 0 0;
-  font-size: 0.78rem;
-  opacity: 0.5;
-  letter-spacing: 0.06em;
-  text-transform: lowercase;
+  position: absolute;
+  left: 6px;
+  top: 0;
+  line-height: 18px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #4a4a4a;
+}
+@media (max-width: 640px) {
+  .screen-transition-inner.st-card { width: calc(100% - 32px); }
+  .st-hubs, .st-progress { left: 16px; right: 16px; }
+  .st-snap-wrap { height: 110px; }
 }
 
 /* —— Award / quest / level full-screen (AchievementView) —— */

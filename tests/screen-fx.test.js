@@ -174,3 +174,24 @@ describe('award card text', () => {
     assert.equal(normalizeAwardPages({ steps: [{ text: 'A <a href="event:item|apple">Apple</a>' }] })[0].text, 'A Apple');
   });
 });
+
+import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js';
+
+describe('loading card status and hub split (LoadingLocationView.as)', () => {
+  it('uses the client status labels with the TimerBar percent', () => {
+    assert.equal(LOAD_STATUS.loading, 'loading...');
+    assert.equal(LOAD_STATUS.preparing, 'preparing...');
+    assert.equal(LOAD_STATUS.splines, 'reticulating splines...');
+    assert.equal(loadStatusLabel(LOAD_STATUS.splines, 39), 'reticulating splines... 39%');
+    assert.equal(loadStatusLabel(LOAD_STATUS.splines, 0), 'reticulating splines...');
+  });
+
+  it('splits only when the hub changes; Leaving needs different colours', () => {
+    assert.deepEqual(loadingSplit({ fromHub: 'Kajuu', toHub: 'Kajuu' }).split, false);
+    assert.deepEqual(loadingSplit({ fromHub: 'Kajuu', toHub: 'The Seams', fromTop: 0x7b8c6d, toTop: 0x8aa0a0 }),
+      { split: true, leaving: true, welcome: true });
+    assert.equal(loadingSplit({ fromHub: 'A', toHub: 'B', fromTop: '#111', toTop: '#111', fromBottom: '#222', toBottom: '#222' }).leaving, false);
+    assert.equal(cssColor(0x0a0b0c), '#0a0b0c');
+    assert.equal(cssColor('', '#fff'), '#fff');
+  });
+});
