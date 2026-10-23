@@ -1409,9 +1409,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 261,
+  "commits": 262,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "new",
+    "text": "The Stairs and the Mezzanine in Jethimadh Tower, where the Greeterbot sends you into the Museum of the Rook"
+   },
    {
     "date": "2026-10-22",
     "kind": "fix",
@@ -1526,11 +1531,6 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "The Forest Community Machine Room building is whole again"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Sound is on by default and the game remembers if you muted it"
    }
   ]
  },

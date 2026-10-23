@@ -74,6 +74,9 @@ describe('race catalog and ticket store', () => {
   it('keeps the recovered quest descs', () => {
     assert.equal(RACES.space_race.desc, 'Race through space to be the first past the post.');
     assert.equal(RACES.amazing_race.desc, 'Be the first to get to the top!');
+    // quests/crystal_climb.js, word for word (the recording's ready card shows it too).
+    assert.equal(RACES.crystal_climb.desc, 'Climb fastest to the top of the crystal maze to win. WIN!');
+    for (const id of RACE_IDS) assert.equal(RACES[id].descSource, `quests/${id}.js`);
   });
 
   it('sells store 20 at 60 currants per ticket', () => {
@@ -301,9 +304,10 @@ describe('course reachability', () => {
         }
       });
 
-      it('paces the rival for a 30-120 s race', () => {
+      // The recordings run from ~24 s (Lava Leap) to ~50 s (Crystal Climb) GO to posts.
+      it('paces the rival for a 20-120 s race', () => {
         const ms = routeDurationMs(course.rivalRoute || course.route, { pace: course.rivalPace, gravity: course.gravity });
-        assert.ok(ms > 30_000 && ms < 120_000, `${id} rival ${Math.round(ms)} ms`);
+        assert.ok(ms > 20_000 && ms < 120_000, `${id} rival ${Math.round(ms)} ms`);
         const best = routeDurationMs(course.route, { pace: 1, gravity: course.gravity });
         assert.ok(best < ms * 0.88, 'a clean run beats the rival');
         if (course.rivalRoute) {
@@ -314,6 +318,73 @@ describe('course reachability', () => {
       });
     });
   }
+});
+
+// What the recordings, their loading-screen panoramas and minimaps, and the
+// config_prod.js start points pin down for each course (race-courses.js).
+describe('course shapes from the recordings', () => {
+  const dy = (id) => {
+    const { player, rival } = raceCourse(id).spawn;
+    return [Math.abs(player.x - rival.x), Math.abs(player.y - rival.y)];
+  };
+
+  it('starts the racers at the config start points: split heights where they differ', () => {
+    // multiplayer_quest_locations start_points: [|dx|, |dy|].
+    assert.deepEqual(dy('space_race'), [0, 145]);
+    assert.deepEqual(dy('time_warp'), [0, 148]);
+    assert.deepEqual(dy('star_sprint'), [160, 0]);
+    const lava = dy('lava_leap');
+    assert.ok(Math.abs(lava[0] - 81) <= 2 && Math.abs(lava[1] - 174) <= 6, String(lava));
+    const canyon = dy('canyon_run');
+    assert.ok(Math.abs(canyon[0] - 106) <= 2 && Math.abs(canyon[1] - 123) <= 6, String(canyon));
+    // Crystal Climb (±655) and The Amazing Race (-575 / 591) mirror about the centre.
+    for (const [id, off] of [['crystal_climb', 655], ['amazing_race', 575]]) {
+      const c = raceCourse(id);
+      assert.equal(c.spawn.player.x + c.rivalRoute[0].x, c.width, id);
+      assert.ok(Math.abs(c.width / 2 - c.spawn.player.x - off) <= 60, `${id} ${c.spawn.player.x}`);
+    }
+  });
+
+  it('builds Lava Leap from the loading-screen panorama: four mushroom pillars, the middle one short, a tall cliff', () => {
+    const c = raceCourse('lava_leap');
+    const pillars = c.platforms.filter((p) => p.style === 'pillar');
+    assert.equal(pillars.length, 4);
+    const tops = pillars.map((p) => p.y1);
+    assert.ok(tops[1] > tops[0] + 100 && tops[1] > tops[2] + 100, `short middle pillar ${tops}`);
+    const cliff = c.platforms.filter((p) => !p.floor).at(-1);
+    assert.ok(c.finish.x > cliff.x1 && c.finish.x - cliff.x1 < 200, 'posts near the cliff edge');
+    assert.ok(c.gravity < 0.8, 'leaps hang a third longer than a normal jump');
+  });
+
+  it('gives Crystal Climb the street map\'s shape: twice as tall as wide, posts top centre', () => {
+    const c = raceCourse('crystal_climb');
+    assert.ok(c.height / c.width > 1.8, `${c.width}x${c.height}`);
+    assert.equal(c.finish.x, c.width / 2);
+    assert.ok(c.finish.y < c.height * 0.12);
+    assert.ok(c.walls.some((w) => w.style === 'glassLadder'));
+  });
+
+  it("makes Star Sprint's planet a trap: its door floor leads only down the rainbow slide", () => {
+    const c = raceCourse('star_sprint');
+    const slide = c.platforms.find((p) => p.style === 'rainbow');
+    assert.ok(slide && slide.y2 - slide.y1 > 400, 'a long drop');
+    const onRoute = (p) => c.route.some((n) => n.mode !== 'climb' && platformUnder([p], n.x, n.y));
+    assert.ok(!onRoute(slide), 'the race line never takes the slide');
+    assert.ok(c.props.some((p) => p.kind === 'planet' && p.slide === false));
+  });
+
+  it('climbs The Amazing Race out of the cave to the shared central pillar', () => {
+    const c = raceCourse('amazing_race');
+    const centre = c.walls.filter((w) => w.x === c.width / 2);
+    assert.ok(centre.length >= 1, 'a climb up the central pillar');
+    assert.equal(c.finish.x, c.width / 2);
+    assert.equal(c.route.at(-1).mode, 'climb');
+  });
+
+  it('runs Time Warp through the statue pieces in the panorama order', () => {
+    const order = raceCourse('time_warp').decor.map((d) => d.name).filter((n) => /^statue_/.test(n));
+    assert.deepEqual(order, ['statue_foot_2', 'statue_head_1', 'statue_handpeace']);
+  });
 });
 
 describe("Grab 'Em Good (quoin_grab)", () => {

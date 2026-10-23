@@ -70,19 +70,19 @@ import {
   settleRace,
   startDelayMessage,
   tickRace,
-} from '../races.js?v=races-2';
-import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=races-2';
+} from '../races.js?v=races-3';
+import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=races-3';
 import {
   drawCheckpointFlag,
   drawFinishPosts,
   drawWinnerRainbow,
   raceLoadingColors,
   renderRaceCourse,
-} from '../race-render.js?v=races-2';
+} from '../race-render.js?v=races-3';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { runStreetTransition } from '../screen-fx.js';
 import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
-import { startCrowns } from './crowns-feature.js?v=crowns-3';
+import { startCrowns } from './crowns-feature.js?v=crowns-4';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=quoins-1';
 import { moodMax } from '../metabolics.js';

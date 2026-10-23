@@ -22,8 +22,8 @@
  *   recordings show): per-race quest desc + "(CLICK WHEN READY)", second
  *   place 25 currants + 5 xp, a ten-race cap; flags multiplayer_quest_win
  *   and race_leave. Only the flags are kept.
- * - quests/space_race.js, quests/amazing_race.js: the two recovered quest descs.
- *   The other five ready lines are read from the supplied race recordings.
+ * - quests/<race>.js: all seven quest descs (the ready lines the 2011-07
+ *   recordings show over each course).
  * - Grab 'Em Good (config_prod.js shared_instances.quoin_grab, race_type
  *   "most_quoins"): players/inc_games.js games_quoin_grab_splash ("Get the
  *   most quoins to win!"), games_end_quoin_grab (winner +50 xp +100 currants,
@@ -97,7 +97,7 @@ export const RACES = Object.freeze({
     locationIndex: 1,
     productionTsid: 'LIF1H6AFJ9P19UJ',
     desc: 'Be the first to get to the other side!',
-    descSource: 'recording Ox_Tdn8tdd0',
+    descSource: 'quests/canyon_run.js',
     video: 'Ox_Tdn8tdd0',
   }),
   lava_leap: Object.freeze({
@@ -109,7 +109,7 @@ export const RACES = Object.freeze({
     locationIndex: 2,
     productionTsid: 'LIF107M5ORP1DQ5',
     desc: 'Be the first to get to the other side!',
-    descSource: 'recording VxDEwOb5ehg',
+    descSource: 'quests/lava_leap.js',
     video: 'VxDEwOb5ehg',
   }),
   crystal_climb: Object.freeze({
@@ -120,8 +120,8 @@ export const RACES = Object.freeze({
     ticketDesc: 'Challenge another player to Crystal Climb.',
     locationIndex: 3,
     productionTsid: 'LHV1BEMOK14268R',
-    desc: 'Climb fastest to the top of the crystal maze to win.',
-    descSource: 'recording 8SaHD6H4-0w',
+    desc: 'Climb fastest to the top of the crystal maze to win. WIN!',
+    descSource: 'quests/crystal_climb.js',
     video: '8SaHD6H4-0w',
   }),
   space_race: Object.freeze({
@@ -145,7 +145,7 @@ export const RACES = Object.freeze({
     locationIndex: 5,
     productionTsid: 'LHV1BF1QK142P0V',
     desc: 'Want to touch the stars? You have to get there first. Race! To the top!',
-    descSource: 'recording w3kWmsESi8A',
+    descSource: 'quests/star_sprint.js',
     video: 'w3kWmsESi8A',
   }),
   time_warp: Object.freeze({
@@ -157,7 +157,7 @@ export const RACES = Object.freeze({
     locationIndex: 6,
     productionTsid: 'LHV1BDAMK142HAO',
     desc: 'Be the first to the end of the time warp to win the race.',
-    descSource: 'recording feBQ5kjPzfk',
+    descSource: 'quests/time_warp.js',
     video: 'feBQ5kjPzfk',
   }),
   grab_em_good: Object.freeze({

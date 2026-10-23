@@ -4,9 +4,13 @@
  * None of the production race streets (config_prod.js
  * shared_instances.race.locations) survive in the public locations archive,
  * so every course here is a clean reconstruction read from the supplied
- * recordings (reference-videos/raw/<id>.mp4): the same theme, direction,
- * landmarks, and finish posts, rebuilt as collision lines that the remake's
- * avatar physics can always clear. Courses are authored with a small cursor
+ * recordings (reference-videos/raw/<id>.mp4, research/video/raw/<id>/): the
+ * landmarks in the order the racers meet them, the "Entering" loading-screen
+ * panorama and the minimap / street map where a recording shows one, the
+ * config_prod.js multiplayer_quest_locations start points, and the finish
+ * posts, rebuilt as collision lines that the remake's avatar physics can
+ * always clear. Gaps are cut to the remake's jump reach, so a course runs
+ * shorter than its source street where the original leaps were longer. Courses are authored with a small cursor
  * builder so every jump is a measured hop from the previous ledge; the
  * builder also records the rival's route, the checkpoints, and the finish.
  *
@@ -130,6 +134,25 @@ class CourseBuilder {
     return this;
   }
 
+  /** A ledge off the race line (scenery, shortcuts, the way back up): the cursor stays put. */
+  side(xa, ya, xb, yb, style = 'ledge', extra = {}) {
+    const last = this.last;
+    const p = this.plat(xa, ya, xb, yb, style, extra);
+    this.last = last;
+    return p;
+  }
+
+  /** Walk off the ledge end onto a ledge `drop` px lower (no jump). */
+  step(drop, len, style = 'ledge', extra = {}) {
+    const ny = this.cursor.y + drop;
+    const x2 = this.cursor.x + this.dir * len;
+    this.plat(this.cursor.x, ny, x2, ny, style, extra);
+    this.node(this.cursor.x + this.dir * 24, ny, 'walk');
+    this.advance(x2, ny);
+    this.endWalk();
+    return this;
+  }
+
   /** Sloped run (stairs, ramps, slides): dy > 0 climbs. */
   stairs(dx, dy, style = 'stairs', extra = {}) {
     const x2 = this.cursor.x + this.dir * dx;
@@ -169,6 +192,28 @@ class CourseBuilder {
     this.finish = { x: Math.round(this.cursor.x - this.walkDir * 110), y: this.cursor.y };
     // The rival's last node is the finish posts, not the ledge end.
     this.route[this.route.length - 1] = { x: this.finish.x, y: this.finish.y, mode: 'walk' };
+    return this;
+  }
+
+  /**
+   * Finish posts at `x` on the ledge just landed on (the source posts often
+   * stand near a ledge's near edge, with the ledge running on past them).
+   */
+  finishAt(x) {
+    const y = surfaceYAt(this.last, x, 1) ?? this.cursor.y;
+    this.finish = { x: Math.round(x), y: Math.round(y) };
+    this.route[this.route.length - 1] = { x: this.finish.x, y: this.finish.y, mode: 'walk' };
+    return this;
+  }
+
+  /**
+   * The two config_prod.js start points when they differ in height: the
+   * player and the rival each get their own spot (the rival's route starts
+   * at its spot).
+   */
+  startPoints(player, rival) {
+    this.spawn = { player: { x: Math.round(player.x), y: Math.round(player.y) }, rival: { x: Math.round(rival.x), y: Math.round(rival.y) } };
+    this.route = [{ x: this.spawn.rival.x, y: this.spawn.rival.y, mode: 'start' }];
     return this;
   }
 
@@ -230,6 +275,9 @@ class CourseBuilder {
     for (const q of this.quoins.filter((row) => !row.shared && !row.mirrored)) {
       this.quoins.push({ ...q, x: mx(q.x), mirrored: true });
     }
+    // Twin starts are a mirrored pair (config start points), so the race
+    // line begins where the player stands.
+    this.route[0] = { ...this.route[0], x: this.spawn.player.x, y: this.spawn.player.y };
     this.rivalRoute = this.route.map((n) => ({ ...n, x: mx(n.x) }));
     this.spawn = { player: this.spawn.player, rival: { x: this.rivalRoute[0].x, y: this.rivalRoute[0].y } };
     return this;
@@ -259,198 +307,307 @@ class CourseBuilder {
 }
 
 /* ------------------------------------------------------------------ */
-/* Space Race (recording 6ruMDWrHNa0)                                  */
-/* Black starfield, frosted glass slabs and stairs, glass block towers, */
-/* pink and blue bubble domes, striped finish posts on a high slab.     */
-/* Floaty low gravity; falling into space returns you to a checkpoint.  */
+/* Space Race (recording 6ruMDWrHNa0; loading-screen panorama)         */
+/* "Race through space to be the first past the post." Black starfield, */
+/* frosted glass floors and stairs, glass block towers, pink, blue and  */
+/* yellow bubble domes. The racers start at the same x, 145 px apart    */
+/* (config start points): one on a small glass ledge, one on the floor  */
+/* below. In the recording's order: along the floor past the domes, up  */
+/* glass stairs to a long walkway, over a raised row of four glass      */
+/* blocks, down onto a domed block tower, down to the floor, up a small */
+/* block and a taller one, glass stairs up to the pink-domed tower, a   */
+/* long floaty leap to a floor slab, up the slabs beside a block tower  */
+/* to its blue dome, and slabs stepping up to the posts. Floaty (0.62   */
+/* gravity: leaps hang ~1.6 s); falling into space returns you to a     */
+/* checkpoint.                                                          */
 /* ------------------------------------------------------------------ */
 
 function buildSpaceRace() {
+  const Y = 1150;
   const b = new CourseBuilder({ gravity: 0.62 });
-  b.start(100, 1150, 760, 'glass');
-  b.prop('dome', 430, 1150, { color: 'pink', r: 92 });
-  b.stairs(300, 180, 'glassStairs');
-  b.run(240, 'glass');
-  b.propHere('dome', 120, 0, { color: 'blue', r: 70 });
-  b.hop(210, 0, 240, 'slab');
-  b.hop(190, 100, 220, 'slab');
-  b.checkpoint();
-  b.hop(200, -180, 560, 'glass');
-  b.propHere('dome', 320, 0, { color: 'yellow', r: 62 });
-  b.hop(40, 110, 140, 'cube', { depth: 110 });
-  b.hop(-10, 110, 140, 'cube', { depth: 220 });
-  b.hop(-10, 110, 190, 'cube', { depth: 330 });
-  b.propHere('dome', 95, 0, { color: 'blue', r: 56 });
-  b.hop(210, 60, 200, 'slab');
-  b.hop(230, 0, 200, 'slab');
-  b.checkpoint();
-  b.hop(220, -200, 620, 'glass');
-  b.propHere('dome', 470, 0, { color: 'pink', r: 88 });
-  b.propHere('cubeStack', -260, 0, { cols: 2, rows: 2 });
-  b.stairs(280, -150, 'glassStairs');
-  b.run(220, 'glass');
-  b.hop(180, 120, 180, 'slab');
-  b.hop(180, 120, 180, 'slab');
-  b.checkpoint();
-  b.hop(180, 110, 150, 'cube', { depth: 360 });
-  b.hop(-10, 110, 150, 'cube', { depth: 470 });
-  b.propHere('dome', 75, 0, { color: 'blue', r: 54 });
-  b.hop(220, 30, 200, 'slab');
-  b.hop(220, 0, 520, 'glass');
-  b.finishLine(260, 'glass');
+  const floor = b.plat(100, Y, 960, Y, 'glass');
+  b.plat(100, Y - 145, 300, Y - 145, 'slab');
+  b.startPoints({ x: 180, y: Y }, { x: 180, y: Y - 145 });
+  b.node(286, Y - 145, 'walk');
+  b.node(340, Y, 'fall');
+  b.last = floor;
+  b.advance(960, Y);
+  b.endWalk();
+  b.prop('dome', 470, Y, { color: 'pink', r: 92 });
+  b.side(560, Y - 320, 760, Y - 320, 'slab');
+  b.prop('dome', 820, Y, { color: 'blue', r: 64 });
+  // Glass stairs up to the long walkway and its raised row of four blocks.
+  b.stairs(320, 210, 'glassStairs');
+  b.run(560, 'glass');
+  b.hop(-10, 104, 416, 'cube', { depth: 104 });
+  b.side(b.cursor.x - 200, Y - 560, b.cursor.x + 20, Y - 560, 'slab');
+  b.checkpoint(60);
+  // Down onto the domed block tower, then to the floor.
+  b.hop(150, -70, 220, 'cube', { depth: 250 });
+  b.propHere('dome', -70, 0, { color: 'yellow', r: 52 });
+  b.propHere('dome', -160, 0, { color: 'blue', r: 44 });
+  b.hop(160, -250, 360, 'glass');
+  // A small block, a taller one, back down, and glass stairs to the pink-domed tower.
+  b.hop(-10, 104, 110, 'cube', { depth: 104 });
+  b.hop(120, 104, 110, 'cube', { depth: 208 });
+  b.hop(150, -208, 220, 'glass');
+  b.stairs(300, 220, 'glassStairs');
+  b.run(60, 'glass');
+  b.hop(-10, 40, 240, 'cube', { depth: 330 });
+  b.propHere('dome', -120, 0, { color: 'pink', r: 86 });
+  b.checkpoint(60);
+  // The long leap through space to a floor slab.
+  b.hop(240, -120, 420, 'glass');
+  b.side(b.cursor.x - 330, Y - 470, b.cursor.x - 150, Y - 470, 'slab');
+  // Up the slabs beside the block tower to its blue dome.
+  b.hop(60, 110, 160, 'slab');
+  b.turn();
+  b.hop(-70, 110, 160, 'slab');
+  b.turn();
+  b.hop(80, 110, 230, 'cube', { depth: 450 });
+  b.propHere('dome', -110, 0, { color: 'blue', r: 70 });
+  b.checkpoint(60);
+  // Slabs stepping up to the posts.
+  b.hop(170, 60, 180, 'slab');
+  b.hop(170, 80, 480, 'glass');
+  const top = b.last;
+  b.finishAt(top.x1 + 150);
   return b.build({
     id: 'space_race',
-    width: 8300,
+    width: Math.round(top.x2 + 200),
     height: 1500,
     theme: 'space',
     floor: { y: 1460, kind: 'void' },
     rivalPace: 0.76,
-    source: 'Reconstructed from recording 6ruMDWrHNa0 (production street LHV1BCTKK142N8F is not archived).',
+    source: 'Reconstructed from recording 6ruMDWrHNa0 and its loading-screen panorama (production street LHV1BCTKK142N8F is not archived).',
   });
 }
 
 /* ------------------------------------------------------------------ */
-/* Lava Leap (recording VxDEwOb5ehg)                                   */
-/* A dark red cavern: a stone ledge sloping down to a sea of lava, then */
-/* a long run of rock-pillar tops at varying heights, finish on a mesa. */
-/* Leaping is a little floaty (0.8 gravity); lava sends you back to the */
-/* last checkpoint.                                                     */
+/* Lava Leap (recordings VxDEwOb5ehg; loading screen and minimap)      */
+/* A dark red cavern over a sea of lava. The racers start apart (config */
+/* start points 174 px apart in height): one up on a rock slope, one on */
+/* the long flat ledge below it. Then, as the loading-screen panorama   */
+/* and minimap show, only nine landings: a tall square block, a low     */
+/* two-step block, three mushroom pillars (the middle one short), a     */
+/* long broken slab that tilts down to the right, a last pillar, and a  */
+/* tall cliff with the finish posts near its left edge. Leaps are       */
+/* floaty: the recording's hop onto the tall block hangs ~1.25 s, a     */
+/* third longer than a normal jump (0.7 gravity). The source street is  */
+/* ~6000 px wide (start x -2857 / -2938); the gaps are cut to the       */
+/* remake's jump reach, so the course runs ~4900 px. Lava sends you     */
+/* back to the last checkpoint.                                         */
 /* ------------------------------------------------------------------ */
 
 function buildLavaLeap() {
-  const b = new CourseBuilder({ gravity: 0.8 });
-  b.start(60, 1000, 560, 'rockLedge');
-  b.decoHere('rock_group_1', -380, 4, { scale: 0.5, tint: 0x7a4a36 });
-  b.stairs(240, -90, 'rockSlope');
-  b.run(150, 'rockLedge');
-  // Pillar tops hover 40-150 px over the lava (y 1050-1160); [gap, rise, width].
-  const pillars = [
-    [150, 30, 110], [160, -20, 100], [150, 50, 100], [140, -40, 110], 'cp',
-    [170, -20, 120], [140, 60, 90], [150, -50, 100], [160, 30, 110], [150, -40, 100], 'cp',
-    [140, 70, 100], [140, -30, 90], [170, -50, 110], [150, 60, 120], [150, -40, 100], [160, 30, 100], 'cp',
-    [170, -60, 110], [150, 50, 100], [160, 20, 100], [150, -40, 110], [160, 40, 100],
-  ];
-  for (const step of pillars) {
-    if (step === 'cp') b.checkpoint(50);
-    else b.hop(step[0], step[1], step[2], 'pillar');
-  }
-  b.hop(150, 50, 520, 'rockLedge');
-  b.finishLine(220, 'rockLedge');
+  const Y = 1040;
+  const b = new CourseBuilder({ gravity: 0.7 });
+  // The long start ledge and the rock slope above its left end.
+  const ledge = b.plat(40, Y, 900, Y, 'rockLedge');
+  const slope = b.plat(40, Y - 245, 460, Y, 'rockSlope');
+  b.startPoints({ x: 80, y: Y }, { x: 160, y: Math.round(surfaceYAt(slope, 160)) });
+  b.node(460, Y, 'walk');
+  b.last = ledge;
+  b.advance(900, Y);
+  b.endWalk();
+  // The tall square block, then the low block with its raised left step.
+  b.hop(110, 90, 240, 'rockLedge');
+  b.hop(170, -50, 110, 'rockLedge');
+  b.step(24, 310, 'rockLedge');
+  b.checkpoint(60);
+  // Three mushroom pillars: tall, short, tall.
+  b.hop(130, 90, 100, 'pillar');
+  b.hop(140, -130, 80, 'pillar');
+  b.hop(110, 120, 100, 'pillar');
+  b.checkpoint(50);
+  // The long broken slab, tilting down to the right, and its last block.
+  b.hop(150, -20, 80, 'rockLedge');
+  b.stairs(640, -50, 'rockSlope');
+  b.hop(-10, 36, 240, 'rockLedge');
+  b.checkpoint(60);
+  b.hop(140, 60, 100, 'pillar');
+  // The tall finish cliff at the street's end: the posts stand near its left edge.
+  b.hop(150, 30, 380, 'rockLedge');
+  const cliff = b.last;
+  b.finishAt(cliff.x1 + 130);
   return b.build({
     id: 'lava_leap',
-    width: 7200,
+    width: Math.round(cliff.x2 + 60),
     height: 1400,
     theme: 'lava',
     floor: { y: 1200, kind: 'lava' },
-    rivalPace: 0.74,
-    source: 'Reconstructed from recording VxDEwOb5ehg (production street LIF107M5ORP1DQ5 is not archived).',
+    rivalPace: 0.7,
+    source: 'Reconstructed from recording VxDEwOb5ehg, its loading-screen panorama and minimap (production street LIF107M5ORP1DQ5 is not archived).',
   });
 }
 
 /* ------------------------------------------------------------------ */
-/* Canyon Run (recording Ox_Tdn8tdd0)                                  */
-/* Bare-tree forest and a fallen log at the start, then floating rocks */
-/* over the canyon, mesas, a rock cave, stone spires, and a rocky      */
-/* finish. Falling into the canyon returns you to a checkpoint.        */
+/* Canyon Run (recording Ox_Tdn8tdd0; loading-screen panorama)         */
+/* "Ok, so you can race UP, that much is true. But can you race         */
+/* SIDEWAYS!?" The racers start apart (config start points: one 123 px  */
+/* higher and 106 px further left): one up on a fallen log in the       */
+/* bare-tree forest, one on the ground. In the recording's order: a     */
+/* tall spire, a flat table rock, a stemmed rock, a rounded mesa, a     */
+/* lower ledge under a bare tree holding a slab of rock in its branches, */
+/* a mossy outcrop, the big mesa, four floating mushroom rocks over a   */
+/* valley of mountains and thin spires, then the canyon wall: climb its */
+/* face, walk the ledge through the rock, pass the last spire, drop to  */
+/* a mossy ledge and the rocky flat with a boulder and the posts.       */
+/* Falling into the canyon returns you to a checkpoint.                 */
 /* ------------------------------------------------------------------ */
 
 function buildCanyonRun() {
+  const Y = 1100;
   const b = new CourseBuilder({ gravity: 1 });
-  b.start(40, 1100, 900, 'dirt');
-  for (const [dx, name, sc] of [[-860, 'tree_bare_tall_1', 0.42], [-640, 'heights_tree_bare_1', 0.38], [-420, 'tree_bare_thin_1', 0.46], [-180, 'heights_tree_bare_3', 0.62]]) {
-    b.decoHere(name, dx, 6, { scale: sc });
+  const ground = b.plat(40, Y, 1150, Y, 'dirt');
+  const log = b.plat(150, Y - 148, 450, Y, 'log');
+  b.startPoints({ x: 306, y: Y }, { x: 200, y: Math.round(surfaceYAt(log, 200)) });
+  b.node(450, Y, 'walk');
+  b.last = ground;
+  b.advance(1150, Y);
+  b.endWalk();
+  b.deco('rock_group_1', 120, Y + 6, { scale: 0.2, tint: 0x8a6a4c, back: true });
+  for (const [x, name, sc] of [[90, 'tree_bare_tall_1', 0.42], [330, 'heights_tree_bare_1', 0.34], [560, 'tree_bare_thin_1', 0.46], [760, 'heights_tree_bare_3', 0.62]]) {
+    b.deco(name, x, Y + 6, { scale: sc });
   }
-  b.stairs(220, 70, 'log');
-  b.run(110, 'log');
-  b.hop(70, -70, 380, 'dirt');
-  b.decoHere('heights_tree_bare_3', -120, 6, { scale: 0.55 });
+  b.deco('stalagmite_1', 960, Y + 8, { scale: 1.1 });
+  // Table rock, stemmed rock, the rounded mesa.
+  b.hop(100, 70, 220, 'dirtRock');
+  b.hop(120, 20, 100, 'spire');
+  b.hop(110, 30, 440, 'mesa');
+  b.decoHere('heights_mound_2', -90, 10, { scale: 0.32 });
   b.checkpoint();
-  b.hop(130, 20, 170, 'floatRock');
-  b.hop(120, 30, 150, 'floatRock');
-  b.hop(130, -20, 160, 'floatRock');
-  b.hop(110, 50, 170, 'floatRock');
-  b.hop(120, 10, 620, 'mesa');
-  b.decoHere('cave_large_rock_1', -420, 6, { scale: 0.42 });
+  // Down to the ledge under the bare tree with a rock slab in its branches.
+  b.hop(120, -90, 320, 'dirt');
+  const treeX = b.cursor.x - 160;
+  b.deco('heights_tree_bare_2', treeX, Y - 10, { scale: 0.5, back: true });
+  b.side(treeX - 30, b.cursor.y - 300, treeX + 190, b.cursor.y - 300, 'floatRock');
+  // The mossy outcrop and the big mesa.
+  b.hop(100, 60, 260, 'dirt');
+  b.hop(100, 70, 640, 'mesa');
+  b.decoHere('heights_mound_1', -150, 10, { scale: 0.36 });
   b.checkpoint();
-  b.stairs(220, 110, 'rockSlope');
-  b.run(320, 'mesa');
-  b.hop(90, -200, 520, 'mesa');
+  // Four floating mushroom rocks over the valley.
+  const valley = b.cursor.x;
+  b.hop(120, 10, 140, 'floatRock');
+  b.hop(110, 40, 140, 'floatRock');
+  b.hop(130, -30, 140, 'floatRock');
+  b.hop(120, 20, 150, 'floatRock');
+  b.deco('mountain_blue_1', valley + 500, 1290, { scale: 0.5, tint: 0xc9d8e6, back: true });
+  b.deco('stalagmite_2', valley + 230, 1330, { scale: 0.7, back: true });
+  b.deco('stalagmite_1', valley + 640, 1330, { scale: 0.6, back: true });
+  // The canyon wall: a ledge at its foot, climb the face, walk through the rock.
+  b.hop(110, -40, 260, 'mesa');
+  b.ladder(360, 200, 'rockFace', 'cave', { ceiling: 210 });
+  b.run(520, 'cave', { ceiling: 210 });
   b.checkpoint();
-  b.run(560, 'cave', { ceiling: 200 });
-  b.run(200, 'mesa');
-  b.hop(120, 0, 90, 'spire');
-  b.hop(110, 40, 90, 'spire');
-  b.hop(120, -30, 90, 'spire');
-  b.hop(110, 50, 100, 'spire');
-  b.hop(120, -40, 400, 'mesa');
-  b.checkpoint();
-  b.hop(120, 30, 160, 'floatRock');
-  b.hop(130, 0, 160, 'floatRock');
-  b.hop(120, 40, 160, 'floatRock');
-  b.hop(120, -60, 620, 'dirtRock');
-  b.decoHere('cave_large_rock_2', -500, 6, { scale: 0.4 });
-  b.finishLine(260, 'dirtRock');
-  b.decoHere('cave_large_rock_1', 40, 6, { scale: 0.36 });
+  b.run(220, 'mesa');
+  b.decoHere('stalagmite_2', -110, 8, { scale: 0.9 });
+  // Off the wall: down to a mossy ledge, then the rocky flat with the posts.
+  b.hop(120, -180, 300, 'dirt');
+  b.hop(120, -60, 820, 'dirtRock');
+  const flat = b.last;
+  b.deco('heights_mound_2', flat.x1 + 200, flat.y1 + 10, { scale: 0.34 });
+  b.finishAt(flat.x1 + 420);
   return b.build({
     id: 'canyon_run',
-    width: 9000,
+    width: Math.round(flat.x2 + 60),
     height: 1650,
     theme: 'canyon',
     floor: { y: 1580, kind: 'pit' },
     rivalPace: 0.74,
-    source: 'Reconstructed from recording Ox_Tdn8tdd0 (production street LIF1H6AFJ9P19UJ is not archived).',
+    source: 'Reconstructed from recording Ox_Tdn8tdd0 and its loading-screen panorama (production street LIF1H6AFJ9P19UJ is not archived).',
   });
 }
 
 /* ------------------------------------------------------------------ */
-/* Time Warp (recording feBQ5kjPzfk)                                   */
-/* The Arbito set: a giant stone foot, green hills under a purple sky, */
-/* pink floating islands, a checkered ribbon bridge, slime ladders, a  */
-/* stone column, pink stairs, a rainbow slide, standing stones and the */
-/* finish on the last hill. Slightly floaty (0.85 gravity).            */
+/* Time Warp (recording feBQ5kjPzfk; loading-screen panorama)          */
+/* "Be the first to the end of the time warp to win the race." The      */
+/* Arbito set under a purple sky. The racers start at the same x, 148   */
+/* px apart (config start points): one up on the giant stone foot, one  */
+/* on the green hill below. In the recording's order: pink islands, the */
+/* checkered ribbon to an island whose slime ladder hangs down to a     */
+/* broken column (the way back up after a fall), over the giant head to */
+/* the peace hand, pink stairs up an island, down the rainbow slide, a  */
+/* stone slab, the tall slime ladder beside the column, the pink-stair  */
+/* island, islands stepping down to one heaped with rubble, and the     */
+/* hills of standing stones with the posts on the last crest. Slightly  */
+/* floaty (0.85 gravity: the column-top leap hangs ~1.2 s).             */
 /* ------------------------------------------------------------------ */
 
 function buildTimeWarp() {
+  const Y = 1300;
   const b = new CourseBuilder({ gravity: 0.85 });
-  b.deco('statue_foot_2', 330, 1312, { scale: 0.42 });
-  b.start(40, 1300, 980, 'hill');
-  b.decoHere('arbito_tree_2', -160, 4, { scale: 0.42 });
-  b.hop(130, 60, 200, 'island', { art: 'cloud_rock_1' });
-  b.hop(150, 40, 190, 'island', { art: 'cloud_rock_3' });
-  b.hop(140, -20, 520, 'ribbon', { wave: 22 });
-  b.checkpoint();
-  b.hop(140, 40, 220, 'island', { art: 'cloud_rock_2' });
-  b.ladder(330, 200, 'slimeLadder', 'stoneSlab');
-  b.hop(140, 20, 180, 'stoneSlab');
-  b.hop(130, 50, 140, 'column', { depth: 900 });
-  b.hop(150, -40, 200, 'island', { art: 'cloud_rock_4' });
-  b.checkpoint();
-  b.stairs(260, 140, 'pinkStairs');
-  b.run(90, 'pinkStairs');
-  b.hop(140, -30, 200, 'island', { art: 'cloud_rock_1' });
-  b.decoHere('statue_handpeace', 140, 40, { scale: 0.45 });
-  b.hop(170, -40, 180, 'stoneSlab');
-  b.hop(150, 20, 220, 'island', { art: 'cloud_rock_3' });
-  b.checkpoint();
-  b.stairs(420, -260, 'rainbow');
-  b.run(60, 'rainbow');
-  b.hop(80, -40, 560, 'hill');
-  b.decoHere('rock_group_3', -420, 8, { scale: 0.3 });
-  b.hop(130, 50, 200, 'island', { art: 'cloud_rock_2' });
-  b.hop(140, 30, 200, 'stoneSlab');
-  b.hop(140, -90, 760, 'hill');
-  b.decoHere('rock_group_3', -600, 8, { scale: 0.34 });
-  b.decoHere('rock_group_2', -300, 8, { scale: 0.26 });
-  b.finishLine(260, 'hill');
-  b.decoHere('rock_group_4', 60, 8, { scale: 0.42 });
+  const hill = b.plat(40, Y, 1260, Y, 'hill');
+  // The giant foot: walkable along the top of its toes.
+  b.deco('statue_foot_2', 300, Y + 10, { scale: 0.3 });
+  const foot = b.plat(150, Y - 222, 470, Y - 90, 'none');
+  b.startPoints({ x: 330, y: Y }, { x: 330, y: Math.round(surfaceYAt(foot, 330)) });
+  b.node(456, Math.round(surfaceYAt(foot, 456)), 'walk');
+  b.node(510, Y, 'fall');
+  b.last = hill;
+  b.advance(1260, Y);
+  b.endWalk();
+  b.deco('arbito_tree_2', 920, Y + 4, { scale: 0.42 });
+  // Pink islands and the checkered ribbon.
+  b.hop(100, 70, 200, 'island', { art: 'cloud_rock_1' });
+  b.hop(120, 30, 180, 'island', { art: 'cloud_rock_3' });
+  const ribbonFrom = b.cursor.x;
+  b.hop(130, -10, 560, 'ribbon', { wave: 22 });
+  b.hop(130, 20, 220, 'island', { art: 'cloud_rock_2' });
+  const isle = b.last;
+  // Below: a stretch of hill, a broken column, and the slime ladder back up.
+  b.side(ribbonFrom - 160, Y, isle.x2 + 420, Y, 'hill');
+  b.deco('pillar_small_2a', isle.x1 + 40, Y + 6, { scale: 0.3 });
+  b.walls.push({ id: `w${(nextId += 1)}`, x: isle.x1 + 40, yTop: isle.y1, yBot: Y - 180, style: 'slimeLadder' });
+  b.checkpoint(60);
+  // Over the giant head to the peace hand.
+  b.hop(110, 50, 380, 'none');
+  const head = b.last;
+  b.deco('statue_head_1', (head.x1 + head.x2) / 2, Y + 8, { scale: 0.3 });
+  b.deco('heights_coniferous_2', head.x2 + 40, Y + 6, { scale: 0.17, tint: 0x2f5a9a });
+  b.hop(100, 80, 90, 'stoneSlab');
+  b.deco('statue_handpeace', b.cursor.x - 40, Y + 6, { scale: 0.34 });
+  // Pink stairs up the island, then down the rainbow slide.
+  b.hop(100, -10, 60, 'pinkStairs');
+  b.stairs(240, 120, 'pinkStairs');
+  b.run(200, 'island', { art: 'cloud_rock_4' });
+  b.checkpoint(60);
+  b.stairs(460, -300, 'rainbow');
+  const slideEnd = b.cursor.x;
+  b.step(Y - b.cursor.y, 280, 'hill');
+  b.deco('pillar_1', slideEnd + 60, Y - 4, { scale: 0.3, rotation: -Math.PI / 2, ay: 0.5, tint: 0x8a96a8 });
+  // The floating stone slab, then down to the tall slime ladder by the column.
+  b.hop(100, 80, 200, 'stoneSlab');
+  b.hop(100, -80, 240, 'hill');
+  b.ladder(420, 130, 'slimeLadder', 'column');
+  b.deco('arbito_tree_3', b.cursor.x + 120, Y + 6, { scale: 0.5, tint: 0xb04a4a, back: true });
+  b.checkpoint(60);
+  // The pink-stair island, islands stepping down, the rubble island.
+  b.hop(110, 20, 60, 'pinkStairs');
+  b.stairs(160, 60, 'pinkStairs');
+  b.run(180, 'island', { art: 'cloud_rock_1' });
+  b.hop(110, -60, 210, 'island', { art: 'cloud_rock_3' });
+  b.hop(110, -70, 210, 'island', { art: 'cloud_rock_2' });
+  b.hop(120, -40, 220, 'island', { art: 'cloud_rock_4' });
+  b.decoHere('rock_group_1', -110, 6, { scale: 0.18 });
+  // The hills of standing stones; the posts stand on the last crest.
+  b.hop(120, -60, 540, 'hill');
+  b.decoHere('rock_group_3', -420, 8, { scale: 0.3, tint: 0x5a5b45 });
+  b.decoHere('rock_group_2', -150, 8, { scale: 0.26, tint: 0x5a5b45 });
+  b.hop(110, 60, 560, 'hill');
+  const crest = b.last;
+  b.finishAt(crest.x1 + 260);
+  b.deco('rock_group_4', crest.x1 + 60, crest.y1 + 8, { scale: 0.34, tint: 0x5a5b45 });
+  b.deco('rock_group_3', crest.x2 - 60, crest.y1 + 8, { scale: 0.36, tint: 0x5a5b45 });
   return b.build({
     id: 'time_warp',
-    width: 8400,
+    width: Math.round(crest.x2 + 300),
     height: 1800,
     theme: 'warp',
     floor: { y: 1740, kind: 'void' },
     rivalPace: 0.74,
-    source: 'Reconstructed from recording feBQ5kjPzfk with recovered Arbito decos (production street LHV1BDAMK142HAO is not archived).',
+    source: 'Reconstructed from recording feBQ5kjPzfk and its loading-screen panorama, with recovered Arbito decos (production street LHV1BDAMK142HAO is not archived).',
   });
 }
 
@@ -467,51 +624,74 @@ function zig(b, steps, rise, len, style, extra = {}) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Crystal Climb (recording 8SaHD6H4-0w)                               */
-/* Two mirrored climbs (config start points x = ±655) through giant    */
-/* coloured crystals: frosted glass ledges and stairs, glass block     */
-/* columns, then white cloud blocks to a shared summit and the posts.  */
+/* Crystal Climb (recordings 8SaHD6H4-0w, E41OOKMklLU)                 */
+/* "Climb fastest to the top of the crystal maze to win. WIN!" The      */
+/* second recording opens the full street map: a tall street about     */
+/* twice as high as it is wide, the two start points low on either     */
+/* side (config x = ±655, mirrored), giant pastel crystals filling the  */
+/* lower two-thirds, white sky with floating white blocks above, and    */
+/* the posts at the top centre. Two mirrored climbs: frosted glass      */
+/* ledges and stairs, glass block columns, ladders of white glass rungs */
+/* (both recordings climb them), painted arrows on the crystals, then  */
+/* white blocks up to a shared summit. No hazards: a fall lands lower  */
+/* on the climb or on the floor (one recording loses a racer from the  */
+/* white blocks back into the crystals).                                */
 /* ------------------------------------------------------------------ */
 
 function buildCrystalClimb() {
-  const W = 2600;
-  const FY = 2900;
+  const W = 2000;
+  const FY = 3800;
   const b = new CourseBuilder({ gravity: 1 });
-  b.start(160, FY, 520, 'none');
-  b.hop(-60, 80, 300, 'glassDeco');
-  zig(b, 3, 82, 330, 'glassDeco');
+  b.start(275, FY, 360, 'none');
+  b.hop(-60, 80, 260, 'glassDeco');
+  zig(b, 3, 82, 280, 'glassDeco');
   b.checkpoint(60);
-  b.stairs(300, 220, 'glassStairs');
-  b.run(120, 'glassDeco');
-  zig(b, 3, 84, 300, 'glassDeco');
+  b.stairs(260, 200, 'glassStairs');
+  b.run(100, 'glassDeco');
+  zig(b, 2, 84, 260, 'glassDeco');
+  b.turn();
+  b.ladder(320, 200, 'glassLadder', 'glassDeco');
   b.hop(40, 80, 130, 'cube', { depth: 160 });
   b.hop(-20, 80, 130, 'cube', { depth: 240 });
-  b.hop(-20, 80, 200, 'cube', { depth: 320 });
+  b.hop(-20, 80, 140, 'cube', { depth: 320 });
   b.checkpoint(60);
-  zig(b, 2, 84, 320, 'glassDeco');
+  zig(b, 2, 84, 280, 'glassDeco');
+  // A landing above the ledge's end, so the stairs never share a foothold with it.
   b.turn();
-  b.stairs(300, 240, 'glassStairs');
-  b.run(120, 'glassDeco');
-  zig(b, 4, 84, 300, 'glassDeco');
-  b.checkpoint(60);
-  b.stairs(280, 220, 'glassStairs');
+  b.hop(-50, 70, 100, 'glassDeco');
+  b.stairs(240, 180, 'glassStairs');
   b.run(100, 'glassDeco');
-  zig(b, 3, 82, 300, 'whiteBlock');
-  b.hop(60, 80, 300, 'whiteBlock');
+  zig(b, 3, 84, 260, 'glassDeco');
+  b.turn();
+  b.ladder(340, 180, 'glassLadder', 'glassDeco');
   b.checkpoint(60);
-  zig(b, 2, 84, 300, 'whiteBlock');
-  b.hop(60, 70, 260, 'whiteBlock');
-  b.summit(W / 2, 380, 84, 'cloudTop');
+  b.stairs(240, 200, 'glassStairs');
+  b.run(100, 'glassDeco');
+  zig(b, 2, 84, 260, 'glassDeco');
+  // Out of the crystals into the white sky and its floating blocks.
+  zig(b, 2, 82, 240, 'whiteBlock');
+  b.turn();
+  b.ladder(300, 160, 'glassLadder', 'whiteBlock');
+  b.hop(60, 80, 220, 'whiteBlock');
+  b.checkpoint(60);
+  zig(b, 2, 84, 240, 'whiteBlock');
+  b.hop(60, 70, 200, 'whiteBlock');
+  b.summit(W / 2, 320, 84, 'cloudTop');
   b.mirror(W);
   const crystals = [
-    ['cave_crystal_7', 330, 0, 1.7, 0x8f6bff], ['cave_crystal_4', 860, 330, 2.2, 0x6a8dff],
-    ['cave_crystal_5', 520, 760, 2.4, 0xff9a5c], ['cave_crystal_7', 1020, 1150, 2.0, 0xff7fd1],
-    ['cave_crystal_4', 380, 1500, 2.0, 0x63e0a8], ['cave_crystal_5', 960, 1850, 2.3, 0xb48cff],
-    ['cave_crystal_7', 560, 2150, 1.8, 0xff9fd8],
+    ['cave_crystal_7', 300, 0, 1.7, 0x8f6bff], ['cave_crystal_4', 760, 360, 2.2, 0x6a8dff],
+    ['cave_crystal_5', 420, 820, 2.4, 0xff9a5c], ['cave_crystal_7', 860, 1250, 2.0, 0xff7fd1],
+    ['cave_crystal_4', 330, 1650, 2.0, 0x63e0a8], ['cave_crystal_5', 820, 2050, 2.3, 0xb48cff],
+    ['cave_crystal_7', 480, 2400, 1.8, 0xff9fd8],
   ];
   for (const [name, x, up, scale, tint] of crystals) {
     b.deco(name, x, FY - up + 20, { scale, tint, alpha: 0.9, back: true });
     b.deco(name, W - x, FY - up + 80, { scale, tint, alpha: 0.9, flip: true, back: true, mirrored: true });
+  }
+  // Arrows painted on the crystals, pointing the way up.
+  for (const [x, up, angle] of [[620, 420, -60], [260, 1150, -120], [700, 1900, -60], [300, 2500, -120]]) {
+    b.prop('arrow', x, FY - up, { angle, color: 0xffffff, alpha: 0.35, size: 90, shared: true });
+    b.prop('arrow', W - x, FY - up, { angle, flip: true, color: 0xffffff, alpha: 0.35, size: 90, shared: true });
   }
   return b.build({
     id: 'crystal_climb',
@@ -520,51 +700,71 @@ function buildCrystalClimb() {
     theme: 'crystal',
     floor: { y: FY, kind: 'ground' },
     rivalPace: 0.76,
-    source: 'Reconstructed from recording 8SaHD6H4-0w with recovered glass and crystal decos (production street LHV1BEMOK14268R is not archived).',
+    source: 'Reconstructed from recordings 8SaHD6H4-0w and E41OOKMklLU (its full street map) with recovered glass and crystal decos (production street LHV1BEMOK14268R is not archived).',
   });
 }
 
 /* ------------------------------------------------------------------ */
-/* The Amazing Race (recording EkI4G2qi-Z0)                            */
-/* Two mirrored climbs (config start points x = -575 / 591) out of a   */
-/* rock cave, up climbable stone pillars and floating rock islands     */
-/* into open sky, to a shared summit with the finish posts.            */
+/* The Amazing Race (recording EkI4G2qi-Z0; loading-screen panorama)   */
+/* "Be the first to get to the top!" Groddle Heights rock (glitchen:    */
+/* "set in Groddle Heights type terrain"). Two mirrored climbs from     */
+/* start points either side of the cave's centre (config x = -575 /     */
+/* 591): rock ledges and footholds marked with white up-arrows up out   */
+/* of the cave, floating rocks in open sky with white arrows pointing   */
+/* the way, then the tall central rock pillar the panorama shows        */
+/* between them: both routes meet on it, climb its face, and finish on  */
+/* its broad mushroom top. (The recording's winner goes on from the     */
+/* pillar top across more floating rocks to a mossy cliff top; with     */
+/* twin routes that last stretch is not placed, so the posts stand on   */
+/* the pillar top.) No hazards: a fall lands lower on the climb.        */
 /* ------------------------------------------------------------------ */
 
 function buildAmazingRace() {
   const W = 2800;
+  const C = W / 2;
   const FY = 3100;
   const b = new CourseBuilder({ gravity: 1 });
-  b.start(160, FY, 520, 'none');
-  b.ladder(340, 240, 'rockFace', 'rockLedge');
-  zig(b, 2, 84, 320, 'rockLedge');
+  // The start ledge faces the cave's centre; climb out of the cave.
+  b.turn();
+  b.start(900, FY, 420, 'none');
+  b.ladder(340, 260, 'rockFace', 'rockLedge');
+  zig(b, 2, 84, 300, 'rockLedge');
   b.checkpoint(60);
   b.turn();
-  b.ladder(360, 220, 'rockFace', 'rockLedge');
+  b.ladder(360, 240, 'rockFace', 'rockLedge');
   b.hop(110, 40, 170, 'floatRock');
-  b.hop(110, 60, 170, 'floatRock');
-  b.turn();
-  b.hop(100, 70, 180, 'floatRock');
-  b.hop(100, 60, 220, 'floatRock');
+  b.hop(110, 60, 200, 'floatRock');
   b.checkpoint(60);
-  zig(b, 2, 84, 300, 'floatRock');
+  // Out of the cave mouth: floating rocks in the open sky.
+  zig(b, 2, 84, 280, 'floatRock');
   b.turn();
-  b.ladder(380, 260, 'rockFace', 'rockLedge');
+  b.ladder(380, 240, 'rockFace', 'rockLedge');
   b.checkpoint(60);
-  b.turn();
   b.hop(110, 50, 170, 'floatRock');
   b.hop(100, 70, 170, 'floatRock');
   b.turn();
   b.hop(110, 60, 200, 'floatRock');
-  zig(b, 3, 84, 300, 'floatRock');
+  zig(b, 3, 84, 260, 'floatRock');
   b.checkpoint(60);
   b.turn();
-  b.ladder(360, 260, 'rockFace', 'rockLedge');
-  zig(b, 2, 84, 300, 'floatRock');
-  b.turn();
-  b.hop(100, 60, 260, 'floatRock');
-  b.hop(100, 40, 200, 'floatRock');
-  b.summit(W / 2, 420, 84, 'summit');
+  // Floating rocks toward the central pillar, the arrows pointing at it.
+  b.hop(110, 40, 170, 'floatRock');
+  b.prop('arrow', b.cursor.x + 70, b.cursor.y - 110, { angle: 0, color: 0xffffff, alpha: 0.85, size: 46 });
+  b.hop(110, 50, 170, 'floatRock');
+  b.prop('arrow', b.cursor.x + 70, b.cursor.y - 110, { angle: 0, color: 0xffffff, alpha: 0.85, size: 46 });
+  b.hop(100, 20, 170, 'floatRock');
+  // The pillar: a foothold ledge on its face, climb it, finish on its top.
+  const footY = b.cursor.y - 30;
+  b.plat(C - 130, footY, C + 130, footY, 'floatRock', { shared: true });
+  b.node(C - 104, footY, 'jump');
+  b.node(C, footY, 'walk');
+  const topY = footY - 520;
+  b.walls.push({ id: `w${(nextId += 1)}`, x: C, yTop: topY, yBot: footY, style: 'rockFace' });
+  b.node(C, topY, 'climb');
+  b.plat(C - 420, topY, C + 420, topY, 'summit', { shared: true });
+  b.finish = { x: C, y: topY };
+  // The pillar body: stacked Groddle Heights rock sections from below the clouds to the top.
+  for (let y = footY + 700; y - 590 >= topY - 40; y -= 560) b.deco('crosssection_heights_pillar_2', C, y, { scale: 0.95, shared: true, back: true });
   b.mirror(W);
   return b.build({
     id: 'amazing_race',
@@ -573,59 +773,93 @@ function buildAmazingRace() {
     theme: 'amazing',
     floor: { y: FY, kind: 'ground' },
     rivalPace: 0.76,
-    source: 'Reconstructed from recording EkI4G2qi-Z0 (production street LIF10A4HV3P17BU is not archived).',
+    source: 'Reconstructed from recording EkI4G2qi-Z0 and its loading-screen panorama (production street LIF10A4HV3P17BU is not archived).',
   });
 }
 
 /* ------------------------------------------------------------------ */
-/* Star Sprint (recording w3kWmsESi8A)                                 */
-/* "Race! To the top!" One shared climb from the green hills (config   */
-/* start points x = 60 / -100) through the Arbito purple sky into the  */
-/* stars: stone slabs, pink islands and stairs, slime ladders, the     */
-/* checkered ribbon, the striped planet, and the posts at the top.     */
+/* Star Sprint (recordings w3kWmsESi8A, mHC0T0xlVi0)                   */
+/* "Want to touch the stars? You have to get there first. Race! To the  */
+/* top!" Both recordings show the same climb. The racers start 160 px   */
+/* apart on a green hilltop (config start points x = 60 / -100), hop a  */
+/* leaning broken column and a taller one, and climb the slime ladder   */
+/* up the tall column. Then up through the Arbito purple sky: pink      */
+/* stairs, islands, the checkered ribbons, stone slabs, slime ladders,  */
+/* grey arrows painted on the sky, into the black of space where the    */
+/* slabs carry rock piles. The striped planet is a trap: walk into its  */
+/* door and its rainbow slide pours you back down (both recordings lose */
+/* a racer this way). A last slime ladder reaches the top slab; the     */
+/* posts stand a little way along it.                                   */
 /* ------------------------------------------------------------------ */
 
 function buildStarSprint() {
-  const FY = 2750;
+  const FY = 3100;
   const b = new CourseBuilder({ gravity: 0.85 });
-  b.start(1100, FY, 600, 'hill');
-  b.deco('pillar_1', 960, FY + 10, { scale: 0.3 });
-  b.deco('arbito_tree_2', 1500, FY + 6, { scale: 0.36 });
+  const hill = b.plat(1150, FY - 50, 1620, FY - 50, 'hill');
+  b.startPoints({ x: 1300, y: FY - 50 }, { x: 1460, y: FY - 50 });
+  b.last = hill;
+  b.advance(1620, FY - 50);
+  b.endWalk();
+  b.deco('pillar_1', 1000, FY + 10, { scale: 0.3 });
+  // A leaning broken column, a taller one, then the slime ladder up the tall column.
+  b.hop(100, 80, 110, 'none');
+  b.decoHere('pillar_small_1a', -55, 50 + 80, { scale: 0.34, rotation: -0.1 });
+  b.hop(90, 75, 110, 'none');
+  b.decoHere('pillar_small_2a', -55, 50 + 155, { scale: 0.36 });
+  b.ladder(380, 240, 'slimeLadder', 'stoneSlab');
+  b.side(b.cursor.x - 236, b.cursor.y, b.cursor.x - 110, b.cursor.y, 'column');
+  b.prop('arrow', b.cursor.x - 120, b.cursor.y - 220, { angle: -135 });
+  // Pink stairs up to an island and the ribbon, heading left.
+  b.turn();
   b.hop(-60, 90, 260, 'stoneSlab');
-  b.hop(120, 50, 220, 'island', { art: 'cloud_rock_2' });
+  b.stairs(260, 150, 'pinkStairs');
+  b.run(200, 'island', { art: 'cloud_rock_2' });
+  b.hop(110, -10, 420, 'ribbon', { wave: 18 });
+  b.hop(120, 40, 220, 'island', { art: 'cloud_rock_1' });
+  b.checkpoint(60);
+  // Back to the right: a slab, pink stairs, a slab and a slime ladder.
   b.turn();
   b.hop(-60, 90, 300, 'stoneSlab');
+  b.prop('arrow', b.cursor.x - 120, b.cursor.y - 180, { angle: -45 });
   b.stairs(260, 150, 'pinkStairs');
   b.run(80, 'pinkStairs');
   b.hop(130, 40, 220, 'stoneSlab');
-  b.checkpoint(60);
-  b.ladder(340, 220, 'slimeLadder', 'stoneSlab');
-  b.hop(140, 40, 220, 'island', { art: 'cloud_rock_1' });
-  b.hop(130, 60, 240, 'island', { art: 'cloud_rock_3' });
-  b.turn();
-  b.hop(-60, 90, 300, 'stoneSlab');
-  b.stairs(260, 150, 'pinkStairs');
-  b.run(80, 'pinkStairs');
-  b.checkpoint(40);
-  b.hop(120, 20, 480, 'ribbon', { wave: 18 });
-  b.hop(130, 60, 220, 'island', { art: 'cloud_rock_4' });
+  // Past the ladder, the striped planet: its door floor leads only down its slide.
+  const slab = b.last;
+  const R = 240;
+  const px = slab.x2 + R - 30;
+  b.prop('planet', px, slab.y1 - R * 0.08, { r: R, slide: false });
+  const door = b.side(slab.x2, slab.y1, px + R * 0.75, slab.y1, 'none');
+  const slide = b.side(door.x2, door.y1, door.x2 + 480, door.y1 + 620, 'rainbow');
+  b.side(slide.x2 - 20, slide.y2 + 10, slide.x2 + 200, slide.y2 + 10, 'island', { art: 'cloud_rock_3' });
   b.ladder(360, 240, 'slimeLadder', 'stoneSlab');
   b.checkpoint(60);
+  // Left again: islands, a ribbon, stairs up into space.
   b.turn();
   b.hop(-60, 90, 300, 'stoneSlab');
-  b.hop(130, 50, 220, 'island', { art: 'cloud_rock_1' });
-  b.prop('planet', b.cursor.x - 420, b.cursor.y - 40, { r: 210 });
+  b.hop(130, 50, 220, 'island', { art: 'cloud_rock_4' });
+  b.hop(120, 20, 420, 'ribbon', { wave: 18 });
+  b.hop(120, 50, 220, 'island', { art: 'cloud_rock_3' });
   b.turn();
   b.hop(-60, 90, 300, 'stoneSlab');
+  b.decoHere('rock_group_1', -60, 6, { scale: 0.16 });
+  b.prop('arrow', b.cursor.x - 240, b.cursor.y - 200, { angle: -45 });
   b.stairs(260, 150, 'pinkStairs');
   b.run(80, 'pinkStairs');
   b.checkpoint(40);
   b.ladder(360, 220, 'slimeLadder', 'stoneSlab');
+  b.decoHere('rock_group_1', -90, 6, { scale: 0.16 });
+  // The black of space: slabs with rock piles, an island, the last slime ladder.
   b.turn();
   b.hop(-60, 90, 260, 'stoneSlab');
+  b.prop('arrow', b.cursor.x + 120, b.cursor.y - 200, { angle: -135 });
   b.hop(130, 40, 220, 'island', { art: 'cloud_rock_2' });
-  b.hop(120, 60, 600, 'stoneSlab');
-  b.finishLine(200, 'stoneSlab');
+  b.hop(120, 50, 260, 'stoneSlab');
+  b.decoHere('rock_group_1', -70, 6, { scale: 0.16 });
+  b.turn();
+  b.ladder(340, 420, 'slimeLadder', 'stoneSlab');
+  const top = b.last;
+  b.finishAt(b.dir > 0 ? top.x1 + 240 : top.x2 - 240);
   return b.build({
     id: 'star_sprint',
     width: 2800,
@@ -633,7 +867,7 @@ function buildStarSprint() {
     theme: 'star',
     floor: { y: FY, kind: 'ground' },
     rivalPace: 0.74,
-    source: 'Reconstructed from recording w3kWmsESi8A with recovered Arbito decos (production street LHV1BF1QK142P0V is not archived).',
+    source: 'Reconstructed from recordings w3kWmsESi8A and mHC0T0xlVi0 with recovered Arbito decos (production street LHV1BF1QK142P0V is not archived).',
   });
 }
 

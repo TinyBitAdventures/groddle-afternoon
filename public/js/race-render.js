@@ -571,7 +571,16 @@ function drawSlimeLadder(g, w, ctx) {
   }
 }
 
+/** Crystal Climb's ladders: a column of white glass rungs. */
+function drawGlassLadder(g, w) {
+  for (let y = w.yBot - 8; y > w.yTop - 4; y -= 22) {
+    g.roundRect(w.x - 24, y - 7, 48, 10, 5).fill({ color: 0xffffff, alpha: 0.92 }).stroke({ width: 1, color: 0xc9d3e6, alpha: 0.9 });
+    g.roundRect(w.x - 18, y + 3, 36, 4, 2).fill({ color: 0xb8c4dc, alpha: 0.55 });
+  }
+}
+
 const WALL_STYLES = {
+  glassLadder: drawGlassLadder,
   rockFace: drawRockFace,
   slimeLadder: drawSlimeLadder,
 };
@@ -628,11 +637,14 @@ function drawPlanet(PIXI, prop) {
   const g = new PIXI.Graphics();
   const r = prop.r || 200;
   // Rainbow slide spilling out of the planet's door (Star Sprint landmark).
-  const colors = [0xff4b4b, 0xff9d3b, 0xffe35b];
-  colors.forEach((color, i) => {
-    g.moveTo(r * 0.1, r * 0.25 + i * 15).bezierCurveTo(r * 0.9, r * 0.5 + i * 15, r * 1.2, r * 1.1 + i * 15, r * 1.9, r * 1.5 + i * 15);
-    g.stroke({ width: 16, color: color });
-  });
+  // (slide: false when the course lays the slide as a walkable rainbow ledge.)
+  if (prop.slide !== false) {
+    const colors = [0xff4b4b, 0xff9d3b, 0xffe35b];
+    colors.forEach((color, i) => {
+      g.moveTo(r * 0.1, r * 0.25 + i * 15).bezierCurveTo(r * 0.9, r * 0.5 + i * 15, r * 1.2, r * 1.1 + i * 15, r * 1.9, r * 1.5 + i * 15);
+      g.stroke({ width: 16, color: color });
+    });
+  }
   g.circle(0, 0, r).fill(0x35c7e8).stroke({ width: 4, color: 0x1a1a1a });
   for (let i = -3; i <= 3; i += 1) {
     const y = (i * r) / 3.6;
@@ -660,7 +672,26 @@ function drawCrystalFacet(PIXI, prop) {
   return g;
 }
 
+/**
+ * A hint arrow painted on the sky or the rock (Star Sprint's grey arrows,
+ * Crystal Climb's arrows on the crystals, The Amazing Race's white ones).
+ * `angle` in degrees, 0 = right, -90 = up; flipped copies mirror it.
+ */
+function drawArrow(PIXI, prop) {
+  const g = new PIXI.Graphics();
+  const s = prop.size || 64;
+  g.poly([-s * 0.5, -s * 0.16, s * 0.12, -s * 0.16, s * 0.12, -s * 0.42, s * 0.62, 0, s * 0.12, s * 0.42, s * 0.12, s * 0.16, -s * 0.5, s * 0.16])
+    .fill({ color: prop.color ?? 0x8e8a9e, alpha: prop.alpha ?? 0.55 });
+  g.x = prop.x;
+  g.y = prop.y;
+  const angle = prop.angle ?? -90;
+  // A mirrored twin-route copy (prop.flip) points the mirrored way.
+  g.rotation = ((prop.flip ? 180 - angle : angle) * Math.PI) / 180;
+  return g;
+}
+
 const PROP_DRAWERS = {
+  arrow: drawArrow,
   dome: drawDome,
   cubeStack: drawCubeStack,
   planet: drawPlanet,
@@ -780,11 +811,13 @@ function paintStar(PIXI, root, course) {
 }
 
 function paintCrystal(PIXI, root, course) {
-  root.addChild(gradientSprite(PIXI, [[0, '#ffffff'], [0.12, '#f4f0ff'], [0.32, '#ffd9f0'], [0.55, '#5b3dc8'], [0.8, '#3a2a8c'], [1, '#e8e4f7']], course.width, course.height + 200));
+  // The street map (recording E41OOKMklLU): white sky with floating white
+  // blocks over the top quarter, the crystals below it.
+  root.addChild(gradientSprite(PIXI, [[0, '#ffffff'], [0.22, '#f4f0ff'], [0.38, '#ffd9f0'], [0.6, '#5b3dc8'], [0.82, '#3a2a8c'], [1, '#e8e4f7']], course.width, course.height + 200));
   const rand = seeded(hashString(`${course.id}:facets`));
   const colors = [0x6a4bd8, 0x4a6bff, 0xff8a3d, 0xff6fc8, 0x42d39a, 0x8f5bff, 0xffb84a];
   const facets = new PIXI.Container();
-  for (let y = course.height - 100; y > 500; y -= 260 + rand() * 160) {
+  for (let y = course.height - 100; y > course.height * 0.3 + 300; y -= 260 + rand() * 160) {
     for (const side of [0, 1]) {
       const x = side ? course.width - (rand() * course.width * 0.25) : rand() * course.width * 0.25;
       facets.addChild(drawCrystalFacet(PIXI, { x, y, w: 300 + rand() * 260, h: 700 + rand() * 500, color: colors[Math.floor(rand() * colors.length)], alpha: 0.95, flip: side === 1 }));
