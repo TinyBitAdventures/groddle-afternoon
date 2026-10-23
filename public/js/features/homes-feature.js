@@ -102,6 +102,7 @@ import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nod
 import { patchesFeature } from './patches-feature.js?v=patches-5';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import { textureFromUrl } from '../textures.js';
+import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -1864,6 +1865,11 @@ function bindPointer(engine) {
     }
     updateGhost(engine);
   }, true);
+  root.addEventListener('wheel', (e) => {
+    if (!isCanvas(e) || !panDecorCamera(engine, e.deltaY)) return;
+    e.preventDefault();
+    e.stopPropagation();
+  }, { capture: true, passive: false });
   root.addEventListener('pointerdown', (e) => {
     if (!mode || !scene || !isCanvas(e)) return;
     e.stopPropagation();
@@ -1915,18 +1921,78 @@ function bindPointer(engine) {
 }
 
 /**
- * The source room is 471 px from ceiling to floor front, taller than the remake's 408 px
- * location view with the avatar at 75%. Inside, the camera looks up a little (the most that
- * keeps the feet 40 px clear of the pack) so the whole wall shows, and in Decorate mode far
- * enough to show the ceiling band too. Camera Mode's own look always wins.
+ * Interior camera. The source room is 471 px from ceiling to floor front,
+ * taller than the remake's 408 px location view, and the Tower floors use the
+ * source y_cam_offset 220 (tower.js 487), which already frames the avatar
+ * lower than a house (anchor 0.867 vs 0.75).
+ *
+ * Walking: the camera looks up as far as the camera rules allow (feet
+ * MIN_GROUND_CLEARANCE above the pack), whatever the room's anchor, so the
+ * whole wall shows. (A fixed -62 px was right for a house but put Tower feet
+ * 8 px behind the pack; Decorate's fixed -105 px gave -3 / -51.)
+ *
+ * Decorate: the client's HandOfDecorator hides the avatars (start(): hidePCs)
+ * and drives the camera itself (CameraMan decorator_mode: camera_control_pt,
+ * panned by the mouse wheel and keys, bounded to the location). Here the avatar
+ * hides too, the camera starts on the walk framing, looks up to the ceiling
+ * band while a ceiling piece or ceiling swatch is in hand or selected, and the
+ * mouse wheel pans between the two. Camera Mode's own look always wins.
  */
-const WALK_LOOK_Y = -62;
-const DECORATE_LOOK_Y = -105;
+const LOOK_VIEW_H = 408;
+/** Ceiling band top (INTERIOR.ceilingTop) shows with this much room above it. */
+const CEILING_MARGIN = 14;
 let lastLookY = 0;
+let decorPan = null; // wheel-set look while decorating (null = automatic)
+let hidAvatar = false;
+let lastLookTag = '';
+
+/**
+ * The interior look offsets for an avatar at `playerY` with a camera anchor:
+ * walk = the most look-up that keeps the feet `clearance` above the view
+ * bottom; ceiling = the look that puts the ceiling band's top `margin` under
+ * the view top. Both negative (up) or 0.
+ */
+export function interiorLook({ playerY = INTERIOR.floorY, anchor = 0.75, view = LOOK_VIEW_H, clearance = MIN_GROUND_CLEARANCE, ceilingTop = INTERIOR.ceilingTop, margin = CEILING_MARGIN } = {}) {
+  const walk = Math.min(0, Math.round(view * anchor - (view - clearance)));
+  const ceiling = Math.min(walk, Math.round(ceilingTop - margin - playerY + view * anchor));
+  return { walk, ceiling };
+}
+
+function roomAnchor(engine) {
+  const offset = Number(engine?.street?.physics?.setting?.y_cam_offset);
+  return yCamOffsetAnchor(Number.isFinite(offset) ? offset : 150);
+}
+
+/** A ceiling piece or the ceiling swatch is in hand or selected. */
+function ceilingInHand() {
+  if (stamping?.kind === 'ceiling') return true;
+  if (placing?.kind === 'furniture' && FURNITURE_CATALOG[placing.classTsid]?.slot === 'ceiling') return true;
+  if (selected?.kind === 'furniture') return decor?.placed?.find((row) => row.id === selected.id)?.slot === 'ceiling';
+  return false;
+}
+
+function setAvatarHidden(engine, hide) {
+  const p = engine?.player;
+  if (!p) return;
+  if (hide && !hidAvatar) {
+    p.visible = false;
+    hidAvatar = true;
+  } else if (!hide && hidAvatar) {
+    p.visible = true;
+    hidAvatar = false;
+  }
+}
 
 function interiorCameraLook(engine) {
   if (typeof engine?.setCameraLook !== 'function') return;
-  const want = mode === 'decorate' ? DECORATE_LOOK_Y : WALK_LOOK_Y;
+  const decorating = mode === 'decorate';
+  setAvatarHidden(engine, decorating);
+  if (!decorating) decorPan = null;
+  const look = interiorLook({ playerY: engine.player?.y ?? INTERIOR.floorY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H });
+  const auto = decorating && ceilingInHand() ? look.ceiling : look.walk;
+  const want = decorating && decorPan != null ? Math.max(look.ceiling, Math.min(look.walk, decorPan)) : auto;
+  const tag = `${!decorating ? 'walk' : decorPan != null ? 'pan' : want === look.walk ? 'walk' : 'ceiling'}:${want}${hidAvatar ? ':hidden' : ''}`;
+  if (tag !== lastLookTag) engine.setData('homeCameraLook', (lastLookTag = tag));
   const now = engine.cameraLook || { x: 0, y: 0 };
   const ours = now.x === 0 && (now.y === 0 || now.y === lastLookY);
   if (!ours || now.y === want) return;
@@ -1934,7 +2000,18 @@ function interiorCameraLook(engine) {
   lastLookY = want;
 }
 
+/** HandOfDecorator onMouseWheel: pan the decorate camera up and down (10 px a notch). */
+function panDecorCamera(engine, deltaY) {
+  if (mode !== 'decorate' || scene?.room !== 'interior') return false;
+  const look = interiorLook({ playerY: engine.player?.y ?? INTERIOR.floorY, anchor: roomAnchor(engine), view: engine.camera?.h || LOOK_VIEW_H });
+  const from = decorPan ?? (ceilingInHand() ? look.ceiling : look.walk);
+  decorPan = Math.max(look.ceiling, Math.min(look.walk, Math.round(from + Math.sign(deltaY) * Math.min(60, Math.max(10, Math.abs(deltaY))))));
+  return true;
+}
+
 function releaseCameraLook(engine) {
+  setAvatarHidden(engine, false);
+  decorPan = null;
   const now = engine?.cameraLook;
   if (lastLookY && now && now.x === 0 && now.y === lastLookY) engine.setCameraLook(0, 0);
   lastLookY = 0;

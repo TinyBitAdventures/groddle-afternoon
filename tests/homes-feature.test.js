@@ -8,6 +8,7 @@ import {
   cultivationNodes,
   furnitureStoreProfile,
   homesFeature,
+  interiorLook,
   liftOldStreetRows,
   nodeKeyMap,
   rekeyNodes,
@@ -18,8 +19,9 @@ import {
 import { WALLPAPER_MAPS } from '../public/js/home-wallpaper-art.js';
 import { HOME_TEXTURE_CONFIGS } from '../public/js/homes-catalog.js';
 import { canPlantBean } from '../public/js/patches.js';
-import { TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js';
-import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround } from '../public/js/movement.js';
+import { TOWER_PART_CHOICES, TOWER_STYLES, composeTower, towerBounds } from '../public/js/home-tower.js';
+import { MIN_GROUND_CLEARANCE, cameraTargetY, cameraWorldHeightForGround, yCamOffsetAnchor } from '../public/js/movement.js';
+import { INTERIOR } from '../public/js/home-decor.js';
 
 const root = join(import.meta.dirname, '..', 'public');
 
@@ -134,6 +136,13 @@ describe('a home street tall enough for a nine-floor Tower', () => {
       const camY = cameraTargetY(STREET_GROUND_Y - 600, worldH, VIEW);
       assert.equal(camY, 0);
       assert.ok(top - camY < VIEW / 2, `${style} top in the upper half of the view`);
+      // Every top choice: only the Tree Tower's two big canopies (floor_top_7, _8) rise past the
+      // ~1,000 px street the renders measure, as they would have in the original; at most 30 px.
+      for (let n = 1; n <= TOWER_PART_CHOICES[style].floor_top; n += 1) {
+        const t = STREET_GROUND_Y + 6 + towerBounds(composeTower(style, 7, { floor_top: n })).t;
+        if (style === 'tree' && n >= 7) assert.ok(t >= -30, `tree top ${n}: ${t}`);
+        else assert.ok(t >= 40, `${style} top ${n}: ${t} px of sky`);
+      }
     }
     const camY = cameraTargetY(STREET_GROUND_Y, worldH, VIEW);
     assert.ok(VIEW - (STREET_GROUND_Y - camY) >= MIN_GROUND_CLEARANCE);
@@ -162,6 +171,35 @@ describe('a home street tall enough for a nine-floor Tower', () => {
     assert.match(game, /GROUND_Y = Number\(homeScene\?\.groundY\) \|\| 620;/);
     const feature = readFileSync(join(root, 'js/features/homes-feature.js'), 'utf8');
     assert.match(feature, /groundY: STREET_GROUND_Y,/);
+  });
+});
+
+describe('interior camera (walk and Decorate)', () => {
+  const VIEW = 408;
+  // Home interiors and Tower floors: 620 px ground, 660 px camera world (cameraWorldHeight)
+  const frame = (look, anchor) => {
+    const camY = cameraTargetY(INTERIOR.floorY + look, 660, VIEW, anchor);
+    return { clearance: VIEW - (INTERIOR.floorY - camY), camY };
+  };
+  for (const [room, offset] of [['house', 150], ['Tower floor', 220]]) {
+    it(`keeps the ${room}'s feet 40 px over the pack while walking and on entering Decorate`, () => {
+      // y_cam_offset 150 (default) / 220 (tower.js 487) as CameraMan anchors: 0.75 / 0.867
+      const anchor = yCamOffsetAnchor(offset);
+      const look = interiorLook({ anchor });
+      const walk = frame(look.walk, anchor);
+      assert.ok(walk.clearance >= MIN_GROUND_CLEARANCE, `${room} walk clearance ${walk.clearance}`);
+      assert.ok(walk.clearance < MIN_GROUND_CLEARANCE + 1, 'and looks up as far as that allows');
+      assert.ok(walk.camY <= INTERIOR.wallTop, 'the whole wall shows');
+      // the ceiling look (a ceiling piece in hand; the avatar is hidden, HandOfDecorator.start hidePCs)
+      const ceil = frame(look.ceiling, anchor);
+      assert.ok(ceil.camY <= INTERIOR.ceilingTop, `${room}: ceiling band top ${INTERIOR.ceilingTop} in view from ${ceil.camY}`);
+      assert.ok(ceil.camY + VIEW >= INTERIOR.floorY - 40, 'and the wall down to just over the floor');
+    });
+  }
+  it('was the fixed looks: -105 px in Decorate put feet behind the pack (-3 house, -51 Tower)', () => {
+    assert.equal(Math.round(frame(-105, 0.75).clearance), -3);
+    assert.equal(Math.round(frame(-105, yCamOffsetAnchor(220)).clearance), -51);
+    assert.ok(frame(-62, yCamOffsetAnchor(220)).clearance < 0, 'the old walk look in the Tower too');
   });
 });
 
