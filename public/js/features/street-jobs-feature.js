@@ -15,6 +15,11 @@
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&jobdemo=<job class or job id>
  *     (&jobautoplay=1, &jobphase=N)
+ *
+ * Other features run their own projects through `projectApi` (the same
+ * panel, contributions, work units, Hire a hand, phase settling and badges):
+ * homes-feature.js registers a depleted cultivation's restoration (kind
+ * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-3';
@@ -57,7 +62,10 @@ import {
   jobText,
   plainText,
   isJobBuilt,
-} from '../street-jobs.js?v=jobs-1';
+  jobInProgress,
+  cancelJob,
+  jobDivisor,
+} from '../street-jobs.js?v=jobs-2';
 import { energyMax, moodMax } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 
@@ -87,6 +95,10 @@ let panelJobId = null;
 let lastResult = '';
 let autoplay = { stage: '', timer: 0 };
 let demo = null; // { jobId, phase }
+/** Projects other features own (projectApi.register): jobId -> { onDone, kicker, place, target } */
+const external = new Map();
+/** QA autoplay of an external project (projectApi.autoplay). */
+let extAuto = null; // { jobId }
 
 /* ------------------------------------------------------------------ */
 /* Loading                                                              */
@@ -101,7 +113,7 @@ function load() {
   if (catalog) return Promise.resolve(catalog);
   if (!loading) {
     loading = Promise.all([
-      fetch('assets/content/street-jobs.json?v=jobs-1').then((r) => r.json()),
+      fetch('assets/content/street-jobs.json?v=jobs-2').then((r) => r.json()),
       fetch('assets/streets/index.json').then((r) => r.json()),
     ])
       .then(([cat, idx]) => {
@@ -427,7 +439,7 @@ function finishPhase(engine, jobId) {
   const job = jobDef(catalog, jobId);
   const out = settlePhase(state, catalog, jobId, Date.now());
   if (!out.ok) return;
-  if (demo && engine.param('jobautoplay')) {
+  if ((demo && engine.param('jobautoplay')) || extAuto?.jobId === jobId) {
     // QA autoplay runs straight through the source phase delays.
     const row = state.jobs[jobId];
     if (row) row.readyAt = 0;
@@ -437,7 +449,9 @@ function finishPhase(engine, jobId) {
   grantItems(engine, out.performance.items);
   engine.achievement(PHASE_WINNER_COUNTER, 1);
   const bits = [...rewardBits(out.rewards), ...rewardBits(out.performance)];
-  const solo = `Solo amounts are 1/${SOLO_DIVISOR} of the original multiplayer totals, and the phase rewards scale by the same 1/${SOLO_DIVISOR}. As the top contributor you also earned the full performance rewards.`;
+  const solo = job.kind === 'restore'
+    ? ''
+    : `Solo amounts are 1/${SOLO_DIVISOR} of the original multiplayer totals, and the phase rewards scale by the same 1/${SOLO_DIVISOR}. As the top contributor you also earned the full performance rewards.`;
   let title = `${job.title}: phase ${out.index + 1} of ${out.phaseCount}`;
   let steps;
   if (out.finalPhase) {
@@ -460,7 +474,7 @@ function finishPhase(engine, jobId) {
       response: 'OK',
     });
   }
-  engine.award({ kind: 'quest', title, body: '', subtitle: bits.join(' · '), iconUrl: BOARD_ART, steps, primaryLabel: 'OK' });
+  engine.award({ kind: 'quest', title, body: '', subtitle: bits.join(' · '), iconUrl: external.get(jobId)?.iconUrl || BOARD_ART, steps, primaryLabel: 'OK' });
   lastResult = `${jobId}:phase${out.index + 1}${out.finalPhase ? ':done' : ''}`;
   engine.pushActivity({ base: `Project phase complete: ${job.title}`, effects: { xp: out.rewards.xp + out.performance.xp } });
   engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
@@ -476,6 +490,7 @@ function finishJob(engine, jobId, out, solo) {
   const job = jobDef(catalog, jobId);
   const def = phaseClass(catalog, jobId, 0).def;
   if (out.participant) engine.achievement(PARTICIPANT_COUNTER, 1);
+  if (job.kind === 'restore') return finishRestore(engine, jobId, job, def, out);
   const contributions = job.phases
     .map((p, i) => {
       const mine = state.jobs[jobId]?.mine?.[p.classTsid];
@@ -508,6 +523,30 @@ function finishJob(engine, jobId, out, solo) {
   // locations/inc_upgrades.js upgrades_move_players: reload the street once the award closes.
   pendingReload = { tsid: engine.streetTsid, x: engine.player?.x, y: engine.player?.y };
   return { title: job.title, steps };
+}
+
+/**
+ * players/inc_jobs.js jobs_familiar_job_complete_do, type 5: no
+ * Teleportation Script; "The <b>title</b> restoration project on your home
+ * street has completed. Since you contributed, you got N imagination."
+ * The owner's hook (quest.js doJobEffects type 5) puts the item back.
+ */
+function finishRestore(engine, jobId, job, def, out) {
+  const hooks = external.get(jobId);
+  const where = hooks?.place || 'on your home street';
+  const name = phaseTitle(job, job.phases[0], def);
+  const text = `The ${name} restoration project ${where} has completed.${out.rewards.xp ? ` Since you contributed, you got ${out.rewards.xp.toLocaleString()} imagination.` : ''}`;
+  engine.pushActivity(text);
+  let after = '';
+  try {
+    after = hooks?.onDone?.(engine, { jobId, out, job }) || '';
+  } catch (err) {
+    console.warn('restore onDone', err);
+  }
+  const steps = [{ text, response: 'View Rewards' }];
+  const done = plainText(def.completion || '');
+  steps.push({ text: [done, after].filter(Boolean).join(' '), response: 'OK' });
+  return { title: `${name} restored`, steps };
 }
 
 function tickReload(engine) {
@@ -577,10 +616,11 @@ function stopWork(engine, reason) {
   if (w.toolSprite && !w.toolSprite.destroyed) w.toolSprite.destroy();
   const req = phaseRequirements(state, catalog, w.jobId).find((r) => r.id === w.rid);
   if (reason) engine.prompt({ kicker: 'Street Project', title: 'Work stopped', text: reason });
-  if (req && board?.target && w.units) {
+  const sayTo = external.get(w.jobId)?.target?.() || board?.target;
+  if (req && sayTo && w.units) {
     const remaining = req.need - req.got;
     engine.say(
-      board.target,
+      sayTo,
       `Thanks! You contributed ${w.units} units of the ${w.units + remaining} we need right now. It took ${(w.units * WORK_UNIT_MS) / 1000} seconds and used ${w.energy} energy.`,
       5000,
     );
@@ -728,6 +768,10 @@ function el(tag, attrs = {}, text = '') {
 
 function renderPanel(engine) {
   if (!panel || panel.hidden || !panelJobId || !catalog) return;
+  if (!jobDef(catalog, panelJobId)) {
+    panel.hidden = true;
+    return;
+  }
   const jobId = panelJobId;
   const job = jobDef(catalog, jobId);
   const status = jobStatus(state, catalog, jobId, Date.now(), { ...opts(), street: engine.streetTsid });
@@ -735,7 +779,8 @@ function renderPanel(engine) {
   const pcx = phaseClass(catalog, jobId, Math.min(status.phase, job.phases.length - 1));
   const def = pcx.def;
   const q = (s) => panel.querySelector(s);
-  q('[data-sj-kicker]').textContent = `${job.kind === 'upgrade' ? 'Street Upgrade' : 'Street Project'} · ${job.hub || streetLabel(engine.streetTsid)}`;
+  const kind = { upgrade: 'Street Upgrade', restore: 'Restoration Project' }[job.kind] || 'Street Project';
+  q('[data-sj-kicker]').textContent = `${kind} · ${external.get(jobId)?.kicker || job.hub || streetLabel(engine.streetTsid)}`;
   q('[data-sj-title]').textContent = job.title;
   const desc = job.kind === 'street'
     ? plainText(jobText(job.desc || def.desc, { location: job.label }))
@@ -843,13 +888,17 @@ function renderPanel(engine) {
   const statusLine = q('[data-sj-status]');
   const mins = (t) => Math.max(1, Math.ceil((t - Date.now()) / 60000));
   statusLine.textContent = {
-    done: `Finished. ${job.kind === 'street' ? `The road to ${job.label} is open.` : `${job.label} is upgraded.`}`,
+    done: `Finished. ${{ street: `The road to ${job.label} is open.`, restore: `${job.label} is restored.` }[job.kind] || `${job.label} is upgraded.`}`,
     built: `${job.label} is already built.`,
     delayed: `${pcx.phase.delayText || 'The next phase is getting ready.'} It opens in ${status.until ? mins(status.until) : 1} minutes.`,
     cooldown: `This street just finished a project. The next one opens in ${status.until ? mins(status.until) : 1} minutes.`,
     active: `Solo amounts: 1/${SOLO_DIVISOR} of the original multiplayer totals.${work ? ` Working: ${work.units} units so far.` : ''}`,
     open: `Solo amounts: 1/${SOLO_DIVISOR} of the original multiplayer totals. Every contribution counts toward this phase.`,
   }[status.status];
+  if (job.kind === 'restore' && (status.status === 'active' || status.status === 'open')) {
+    const reward = Math.round((def.rewards?.xp || 0) * (Number(job.rewardMultiplier) || 1));
+    statusLine.textContent = `${external.get(jobId)?.note || ''} Original amounts${jobDivisor(job) === 1 ? '' : ` / ${jobDivisor(job)}`}. Finishing it pays up to ${reward.toLocaleString()} iMG.${work ? ` Working: ${work.units} units so far.` : ''}`.trim();
+  }
 
   const others = q('[data-sj-others]');
   others.replaceChildren();
@@ -953,7 +1002,8 @@ function seedPhase(engine, jobId, { realWork }) {
 }
 
 function autoplayStep(engine, now) {
-  if (!demo || !engine.param('jobautoplay') || autoplay.stage === 'done') return;
+  const jobId = extAuto?.jobId || (demo && engine.param('jobautoplay') ? demo.jobId : null);
+  if (!jobId || autoplay.stage === 'done') return;
   if (now < autoplay.timer) return;
   if (engine.questDialogueOpen()) {
     engine.acceptOpenOffer();
@@ -962,7 +1012,7 @@ function autoplayStep(engine, now) {
   }
   if (document.querySelector('#award-screen:not([hidden])')) {
     // jobautoplay=hold leaves the first award open for a screenshot.
-    if (engine.param('jobautoplay') === 'hold') {
+    if (engine.param('jobautoplay') === 'hold' || extAuto?.hold) {
       autoplay.stage = 'award';
       publish(engine);
       return;
@@ -972,7 +1022,13 @@ function autoplayStep(engine, now) {
     return;
   }
   if (work) return;
-  const jobId = demo.jobId;
+  if (!jobDef(catalog, jobId)) {
+    // An external project finished and its owner dropped it.
+    autoplay.stage = 'done';
+    extAuto = null;
+    publish(engine);
+    return;
+  }
   const st = jobStatus(state, catalog, jobId, Date.now(), opts());
   if (st.status === 'done') {
     autoplay.stage = 'done';
@@ -1048,7 +1104,7 @@ function publish(engine) {
   engine.setData('streetJobLast', lastResult);
   engine.setData('streetJobUpgrade', appliedUpgrade(state, catalog, engine.streetTsid)?.name || '');
   engine.setData('streetJobPlayable', String(catalog.counts?.playableJobs || 0));
-  if (engine.param('jobautoplay')) engine.setData('streetJobAutoplay', autoplay.stage);
+  if (engine.param('jobautoplay') || extAuto) engine.setData('streetJobAutoplay', autoplay.stage);
 }
 
 /* ------------------------------------------------------------------ */
@@ -1187,3 +1243,62 @@ export const streetJobsFeature = {
 };
 
 export { isJobBuilt };
+
+/**
+ * Projects owned by other features (a depleted cultivation's restoration).
+ * The job joins the loaded catalog under its own id (never on a street's
+ * board) and keeps its row in this feature's saved state, so it counts for
+ * the contribution badges like any project.
+ */
+export const projectApi = {
+  ready: () => load(),
+  catalog: () => catalog,
+  /**
+   * job: { kind: 'restore', title, label, desc, phases: [{ classTsid, order, delaySeconds, label }],
+   *        divisor, rewardMultiplier }
+   * hooks: { onDone(engine, { jobId, out, job }) -> extra text, kicker, place, note, target() -> target }
+   */
+  register(jobId, job, hooks = {}) {
+    if (!catalog) return false;
+    if (!job?.phases?.every((p) => catalog.classes?.[p.classTsid])) return false;
+    catalog.jobs[jobId] = { street: '', label: job.label || job.title, hub: '', connecting: [], ...job };
+    external.set(jobId, hooks);
+    return true;
+  },
+  /** Forget a project (its saved row too when `dropRow`). */
+  unregister(jobId, { dropRow = false } = {}) {
+    if (catalog?.jobs?.[jobId] && external.has(jobId)) delete catalog.jobs[jobId];
+    if (work?.jobId === jobId && engineRef) stopWork(engineRef, '');
+    external.delete(jobId);
+    if (dropRow) delete state.jobs[jobId];
+    if (panelJobId === jobId && panel) panel.hidden = true;
+  },
+  registered: (jobId) => external.has(jobId),
+  status: (jobId) => (catalog && catalog.jobs[jobId] ? jobStatus(state, catalog, jobId, Date.now(), opts()) : null),
+  inProgress: (jobId) => jobInProgress(state, jobId),
+  percent(jobId) {
+    if (!catalog?.jobs?.[jobId]) return 0;
+    const reqs = phaseRequirements(state, catalog, jobId);
+    const need = reqs.reduce((sum, r) => sum + r.need, 0) || 1;
+    return reqs.reduce((sum, r) => sum + r.got, 0) / need;
+  },
+  requirements: (jobId) => (catalog?.jobs?.[jobId] ? phaseRequirements(state, catalog, jobId) : []),
+  open(engine, jobId) {
+    if (!catalog?.jobs?.[jobId]) return false;
+    openPanel(engine, jobId);
+    return true;
+  },
+  /** Wine of the Dead: cancel the project (everything put in is lost). */
+  cancel(engine, jobId) {
+    if (work?.jobId === jobId) stopWork(engine, '');
+    const ok = cancelJob(state, jobId);
+    if (ok && panelJobId === jobId) renderPanel(engine);
+    return ok;
+  },
+  /** QA: seed and run the project to completion like &jobautoplay=1 (`hold` stops on the award). */
+  autoplay(engine, jobId, { hold = false } = {}) {
+    extAuto = { jobId, hold };
+    autoplay = { stage: '', timer: Date.now() + 600 };
+  },
+  autoplayStage: () => autoplay.stage,
+};

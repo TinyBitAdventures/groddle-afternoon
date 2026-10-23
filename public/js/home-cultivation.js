@@ -7,7 +7,15 @@
  *                                 (choose_one end item, imagination spend),
  *                                 cultivation_start can_nudge (Nudgery 1)
  * - items/proto_*.js              label, base_cost, ghost width, item_class
- * - items/include/cultivation.js  cultivation_max_wear, addWear, depletion
+ * - items/include/cultivation.js  cultivation_max_wear, addWear, depletion,
+ *                                 replaceWithDepleted (the proto carries the
+ *                                 lifespan multiplier, wotd and restorer),
+ *                                 setMaxWearMultiplier (capped at 2.0)
+ * - quests/quest.js doJobEffects  type 5 "Proto item graduation" 1871-1915:
+ *                                 a finished restore picks a new end item,
+ *                                 multiplier + 0.05 (unchanged after Wine of
+ *                                 the Dead), times_restored = 1 + (m - 1) / .05
+ *                                 when the same player restored it before
  * - items/<end item>.js           max wear (rocks 40, peat 100, dirt 300,
  *                                 jellisac / barnacle 240, firefly hive 210,
  *                                 patch 2000, gardens 60 / 160 / 300)
@@ -20,7 +28,10 @@
  *   expansion never moves anything on the street.
  * - Removing a cultivation needed a bottle of Wine of the Dead in the source.
  *   The remake removes it directly from Cultivate mode, with no refund.
- * - Worn-out items vanish (the source swapped them back to an inert proto).
+ * - Worn-out items become their proto in place (`depleted`), which offers
+ *   the Restore project (features/street-jobs-feature.js projectApi). The
+ *   multiplier is kept as whole 0.05 steps (`lifeSteps`, 0..20) so it never
+ *   drifts the way repeated float + 0.05 can.
  */
 
 import { CULTIVATION_CLASSES, HOME_LIMITS } from './homes-catalog.js?v=homes-catalog-1';
@@ -42,6 +53,10 @@ export const NUDGE_SKILL = 'nudgery_1';
 const BASE = 0.15;
 const ADDITIONAL = 0.5;
 const MAX_ITEMS = 60;
+/** quest.js doJobEffects: setMaxWearMultiplier(multiplier + 0.05) per restore. */
+export const LIFESPAN_STEP = 0.05;
+/** include/cultivation.js setMaxWearMultiplier: capped at 2.0. */
+export const MAX_LIFE_STEPS = 20;
 
 /**
  * The Tower (inc_cultivation.js proto_furniture_tower_chassis, level 18). It
@@ -86,7 +101,7 @@ function normalizeItem(row) {
   const def = cultivationDef(row?.protoClass);
   if (!def) return null;
   const endClass = def.endItems.includes(row?.endClass) ? row.endClass : def.endItems[0];
-  return {
+  const out = {
     id: Math.max(1, Math.floor(finite(row?.id, 0))),
     protoClass: def.protoClass,
     endClass,
@@ -94,6 +109,15 @@ function normalizeItem(row) {
     placedAt: Math.max(0, Math.floor(finite(row?.placedAt, 0))),
     wear: Math.max(0, Math.floor(finite(row?.wear, 0))),
   };
+  // Restoration fields only when set, so old saves round-trip unchanged.
+  const steps = Math.max(0, Math.min(MAX_LIFE_STEPS, Math.floor(finite(row?.lifeSteps, 0))));
+  if (steps) out.lifeSteps = steps;
+  if (row?.depleted === true && def.kind !== 'tower') out.depleted = true;
+  if (row?.wotd === true) out.wotd = true;
+  if (row?.restorer === true) out.restorer = true;
+  const cycle = Math.max(0, Math.floor(finite(row?.cycle, 0)));
+  if (cycle) out.cycle = cycle;
+  return out;
 }
 
 export function normalizeCultivationState(seed = {}) {
@@ -117,6 +141,8 @@ export function normalizeCultivationState(seed = {}) {
     gardens: seed?.gardens && typeof seed.gardens === 'object' && !Array.isArray(seed.gardens)
       ? JSON.parse(JSON.stringify(seed.gardens))
       : {},
+    // achievements cultivation:times_restored is a set-to-max counter; the remake increments by the gain.
+    timesRestored: Math.max(0, Math.floor(finite(seed?.timesRestored, 0))),
   };
 }
 
@@ -302,24 +328,109 @@ export function nudgeCultivation(state, id, rx, learnedSkills = []) {
   return { ok: true, item };
 }
 
-export function maxWear(item) {
-  return cultivationDef(item?.protoClass)?.maxWear || 0;
+/** getMaxWearMultiplier: 1.0, + 0.05 a restore, at most 2.0. */
+export function lifespanMultiplier(item) {
+  return 1 + LIFESPAN_STEP * Math.max(0, Math.min(MAX_LIFE_STEPS, Math.floor(finite(item?.lifeSteps, 0))));
+}
+
+/**
+ * getMaxWear: cultivation_max_wear x the multiplier. `opts.maxWear` (QA
+ * &cultwear=N) replaces the base uses so an item wears out in N.
+ */
+export function maxWear(item, opts = {}) {
+  const base = finite(opts.maxWear, 0) > 0 ? Math.floor(opts.maxWear) : cultivationDef(item?.protoClass)?.maxWear || 0;
+  return base * lifespanMultiplier(item);
 }
 
 /** include/cultivation.js addWear: returns depleted once wear reaches max. */
-export function addWear(state, id, wear = 1) {
+export function addWear(state, id, wear = 1, opts = {}) {
   const item = state.items.find((row) => row.id === Number(id));
   if (!item) return { ok: false, reason: 'missing' };
-  const max = maxWear(item);
+  // addWear: an item that is already depleted takes no more wear.
+  if (item.depleted) return { ok: false, reason: 'depleted', item };
+  const max = maxWear(item, opts);
   if (!max) return { ok: true, item, depleted: false };
   item.wear += Math.max(0, Math.floor(finite(wear, 1)));
   return { ok: true, item, depleted: item.wear >= max, left: Math.max(0, 1 - item.wear / max) };
 }
 
 /** Lifespan left as a 0..1 fraction (buildConfig lifespan.percentage_left). */
-export function lifespanLeft(item) {
-  const max = maxWear(item);
+export function lifespanLeft(item, opts = {}) {
+  if (item?.depleted) return 0;
+  const max = maxWear(item, opts);
   return max ? Math.max(0, 1 - item.wear / max) : 1;
+}
+
+/** Uses until it wears out (for the Cultivate card), rounded up. */
+export function usesLeft(item, opts = {}) {
+  if (item?.depleted) return 0;
+  return Math.max(0, Math.ceil(maxWear(item, opts) - (item?.wear || 0)));
+}
+
+/** The live cultivations other systems draw and run (protos are inert). */
+export function liveItems(items) {
+  return (items || []).filter((row) => !row.depleted);
+}
+
+/**
+ * replaceWithDepleted: the item becomes its proto in place, keeping the
+ * multiplier, the restorer and (Wine of the Dead) wotd. Its garden plots are
+ * gone; a restore plants a fresh garden_new. Each depletion is a new proto
+ * (a new tsid in the source), so `cycle` names a fresh project.
+ */
+export function depleteCultivation(state, id, opts = {}) {
+  const item = state.items.find((row) => row.id === Number(id));
+  if (!item) return { ok: false, reason: 'missing' };
+  const def = cultivationDef(item.protoClass);
+  if (def.kind === 'tower') return { ok: false, reason: 'tower' };
+  if (item.depleted) return { ok: false, reason: 'depleted', item };
+  item.depleted = true;
+  item.cycle = (item.cycle || 0) + 1;
+  if (opts.wotd) item.wotd = true;
+  delete state.gardens[item.id];
+  return { ok: true, item, label: def.label, jobId: restoreJobId(item) };
+}
+
+/** The proto's project id (items/proto_*.js setJobData 'proto-'+tsid). */
+export function restoreJobId(item) {
+  return `home-proto-${item.id}-${item.cycle || 1}`;
+}
+
+/** Reward multiplier the restore pays (quest.js: spirit.getMaxWearMultiplier()). */
+export function restoreRewardMultiplier(item) {
+  return lifespanMultiplier(item);
+}
+
+/**
+ * quest.js doJobEffects type 5: a new end item (choose_one), wear 0, and the
+ * multiplier + 0.05 unless the proto was made by Wine of the Dead. A player
+ * who restored it last time sets times_restored = 1 + (multiplier - 1) / .05.
+ */
+export function restoreCultivation(state, id, opts = {}) {
+  const item = state.items.find((row) => row.id === Number(id));
+  if (!item) return { ok: false, reason: 'missing' };
+  if (!item.depleted) return { ok: false, reason: 'live', item };
+  const def = cultivationDef(item.protoClass);
+  const rng = typeof opts.rng === 'function' ? opts.rng : Math.random;
+  const before = lifespanMultiplier(item);
+  const steps = Math.max(0, Math.min(MAX_LIFE_STEPS, Math.floor(finite(item.lifeSteps, 0))));
+  let times = 0;
+  if (item.wotd) {
+    // The wotd branch keeps the multiplier and sets no restorer.
+    delete item.restorer;
+  } else {
+    if (item.restorer) times = 1 + steps;
+    item.lifeSteps = Math.min(MAX_LIFE_STEPS, steps + 1);
+    item.restorer = true;
+  }
+  delete item.wotd;
+  delete item.depleted;
+  item.endClass = def.endItems[Math.min(def.endItems.length - 1, Math.floor(rng() * def.endItems.length))];
+  item.wear = 0;
+  item.placedAt = Math.floor(finite(opts.now, Date.now()));
+  const gain = Math.max(0, times - (state.timesRestored || 0));
+  if (gain) state.timesRestored = times;
+  return { ok: true, item, label: def.label, before, after: lifespanMultiplier(item), times, timesGain: gain };
 }
 
 /**

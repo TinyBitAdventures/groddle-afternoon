@@ -16,6 +16,10 @@
  *    public dump
  *  - items/catalog_drop_tables.js: street_creation_rewards_a and
  *    street_creation_trophies (the performance reward drop tables)
+ *  - items/proto_*.js (the cultivation protos): classProps job_class_id is
+ *    the Restore project a depleted cultivation offers (setJobData: one phase
+ *    per class, delay_seconds 60) and item_class what it turns back into;
+ *    written to `restorations` with their job classes in `classes`
  *
  * Writes public/assets/content/street-jobs.json. tools/job-obtainable.mjs
  * decides which item requirements a solo player can meet in the remake.
@@ -348,6 +352,10 @@ for (const [jobId, rows] of byJobId) {
       phases,
     };
     offer(street, jobId);
+  } else if (first.type === 5) {
+    // An archived public street's depleted proto (adminRecultivateItems made street patches
+    // cultivations). The proto item and its spot are in the items dump, not the public XML.
+    excludedJobs[jobId] = { kind: 'type5', ...base, reason: 'public-street cultivation proto: its item and spot are not in the public dump (home restorations are playable)' };
   } else {
     excludedJobs[jobId] = { kind: `type${first.type}`, ...base, reason: first.excluded || 'not a street project' };
   }
@@ -357,6 +365,38 @@ for (const [jobId, rows] of byJobId) {
 for (const list of Object.values(byStreet)) list.sort((a, b) => num(a) - num(b));
 
 const usedClasses = new Set(Object.values(jobs).flatMap((j) => j.phases.map((p) => p.classTsid)));
+
+/* ------------------------------------------------------------------ */
+/* Cultivation restorations (items/proto_*.js)                          */
+/* ------------------------------------------------------------------ */
+
+/** locations/inc_cultivation.js cultivation_classes, minus the Tower (js/home-tower.js runs it). */
+const CULTIVATION_PROTOS = [
+  'proto_jellisac_mound', 'proto_barnacle_pod', 'proto_firefly_hive',
+  'proto_crop_garden_small', 'proto_crop_garden_medium', 'proto_crop_garden_large',
+  'proto_herb_garden_small', 'proto_herb_garden_medium', 'proto_herb_garden_large',
+  'proto_patch', 'proto_dullite_rock', 'proto_beryl_rock', 'proto_sparkly_rock', 'proto_metal_rock',
+  'proto_dirt_pile', 'proto_peat',
+];
+const restorations = {};
+const restoreClasses = new Set();
+for (const proto of CULTIVATION_PROTOS) {
+  const src = await readFile(join(gsjs, 'items', `${proto}.js`), 'utf8');
+  const prop = (key) => src.match(new RegExp(`"${key}"\\s*:\\s*"([^"]*)"`))?.[1] || '';
+  const ids = prop('job_class_id').split(',').map((id) => id.trim()).filter(Boolean);
+  if (!ids.length || ids.some((id) => !classes[id])) throw new Error(`${proto}: restore job ${ids.join(',')} missing`);
+  const label = src.match(/^var label = "([^"]*)";/m)?.[1] || proto;
+  for (const id of ids) restoreClasses.add(id);
+  const blockers = [...new Set(ids.flatMap((id) => classes[id].blockers))];
+  restorations[proto] = {
+    label,
+    endItems: prop('item_class').split(',').map((id) => id.trim()).filter(Boolean),
+    // setJobData: in_order 1..n, delay_seconds 60 for every class.
+    phases: ids.map((classTsid, i) => ({ classTsid, order: i + 1, delaySeconds: 60, label: classes[classTsid].title })),
+    removeDropTable: src.match(/runDropTable\('([a-z0-9_]+)'/)?.[1] || '',
+    ...(blockers.length ? { blockers } : {}),
+  };
+}
 const dropIds = [...new Set(Object.values(classes).flatMap((c) => c.performance.dropTables || []))];
 const drops = await loadDropTables(dropIds);
 
@@ -387,7 +427,7 @@ for (const row of Object.values(excludedJobs)) {
 }
 const classReasons = {};
 for (const [id, def] of Object.entries(classes)) {
-  if (usedClasses.has(id)) continue;
+  if (usedClasses.has(id) || restoreClasses.has(id)) continue;
   const key = def.excluded || (def.blockers.length ? 'needs items the remake cannot make yet' : 'not attached to an imported street project');
   classReasons[key] = (classReasons[key] || 0) + 1;
 }
@@ -404,8 +444,12 @@ const catalog = {
     upgradeJobs: Object.values(jobs).filter((j) => j.kind === 'upgrade').length,
     excludedJobs: reasonCounts,
     offeringStreets: Object.keys(byStreet).length,
+    restorationClasses: restoreClasses.size,
+    playableRestorations: Object.values(restorations).filter((r) => !r.blockers).length,
+    restorations: Object.keys(restorations).length,
   },
-  classes: Object.fromEntries(Object.entries(classes).filter(([id]) => usedClasses.has(id))),
+  classes: Object.fromEntries(Object.entries(classes).filter(([id]) => usedClasses.has(id) || restoreClasses.has(id))),
+  restorations,
   jobs,
   byStreet,
   upgrades,

@@ -41,6 +41,13 @@
  *  - Upgrades: the option you pick is the winning vote. The template
  *    geometry is not in the public dump, so the feature applies a clean
  *    ecology improvement read from the option's own description.
+ *  - Restorations (job type 5, kind 'restore'): a depleted cultivation's
+ *    proto offers its job_cult_* class (items/proto_*.js setJobData). These
+ *    were sized for a home owner and a few neighbours, so they run at the
+ *    source amounts (`divisor: 1`), and the reward is the class reward times
+ *    your share times the proto's lifespan multiplier (players/inc_jobs.js
+ *    jobs_familiar_job_complete_do: my_contribution / getTotalBasecost *
+ *    multiplier; quest.js passes spirit.getMaxWearMultiplier()).
  */
 
 export const SOLO_DIVISOR = 50;
@@ -127,8 +134,14 @@ const rowFor = (state, jobId) => (state.jobs[jobId] ||= cleanRow({}));
 /* Catalog helpers                                                      */
 /* ------------------------------------------------------------------ */
 
-export function soloNeed(num) {
-  return Math.max(1, Math.ceil(whole(num) / SOLO_DIVISOR));
+export function soloNeed(num, divisor = SOLO_DIVISOR) {
+  return Math.max(1, Math.ceil(whole(num) / (divisor > 0 ? divisor : SOLO_DIVISOR)));
+}
+
+/** A job's amount divisor: SOLO_DIVISOR, or the job's own (restorations run at 1). */
+export function jobDivisor(job) {
+  const d = Number(job?.divisor);
+  return d > 0 ? d : SOLO_DIVISOR;
 }
 
 export function jobDef(catalog, jobId) {
@@ -165,8 +178,8 @@ export function plainText(html) {
 }
 
 /** Total base cost of a phase at solo amounts (quest.js getTotalBasecost). */
-export function phaseBaseCost(def) {
-  return (def?.requirements || []).reduce((sum, r) => sum + soloNeed(r.num) * whole(r.baseCost), 0);
+export function phaseBaseCost(def, divisor = SOLO_DIVISOR) {
+  return (def?.requirements || []).reduce((sum, r) => sum + soloNeed(r.num, divisor) * whole(r.baseCost), 0);
 }
 
 /**
@@ -179,8 +192,9 @@ export function phaseRequirements(state, catalog, jobId, index = null) {
   const pc = phaseClass(catalog, jobId, at);
   if (!pc?.def) return [];
   const sameRow = at === row.phase;
+  const divisor = jobDivisor(jobDef(catalog, jobId));
   const reqs = pc.def.requirements.map((r) => {
-    const need = soloNeed(r.num);
+    const need = soloNeed(r.num, divisor);
     const got = sameRow ? Math.min(need, whole(row.got[r.id])) : at < row.phase || row.doneAt ? need : 0;
     return { ...r, need, got, done: got >= need };
   });
@@ -397,6 +411,25 @@ export function hireWork(state, catalog, jobId, rid, ctx = {}, now = Date.now())
   return { ok: true, units: quote.units, cost: quote.cost, req: check.req, ...rec, phaseReady: phaseIsComplete(state, catalog, jobId) };
 }
 
+/**
+ * Has anyone put anything into this job yet (items/include/jobs.js
+ * hasInProgressJob: started and not finished)?
+ */
+export function jobInProgress(state, jobId) {
+  const row = state.jobs[jobId];
+  return Boolean(row && row.startedAt && !row.doneAt);
+}
+
+/**
+ * Wine of the Dead on a proto (items/wine_of_the_dead.js pour: target.resetJob):
+ * the project is cancelled and everything put into it is gone.
+ */
+export function cancelJob(state, jobId) {
+  if (!jobInProgress(state, jobId)) return false;
+  delete state.jobs[jobId];
+  return true;
+}
+
 export function phaseIsComplete(state, catalog, jobId) {
   const reqs = phaseRequirements(state, catalog, jobId);
   return reqs.length > 0 && reqs.every((r) => r.done);
@@ -440,10 +473,13 @@ export function settlePhase(state, catalog, jobId, now = Date.now(), rng = Math.
   const row = rowFor(state, jobId);
   const index = row.phase;
   const { phase, def } = phaseClass(catalog, jobId, index);
-  const total = phaseBaseCost(def);
+  const divisor = jobDivisor(job);
+  const total = phaseBaseCost(def, divisor);
   const mine = row.mine[phase.classTsid] || 0;
   const share = total ? Math.min(1, mine / total) : 1;
-  const mult = share / SOLO_DIVISOR;
+  // Restorations: the proto's lifespan multiplier scales the reward (quest.js getMaxWearMultiplier).
+  const wearMultiplier = Number(job.rewardMultiplier) > 0 ? Number(job.rewardMultiplier) : 1;
+  const mult = (share / divisor) * wearMultiplier;
   const r = def.rewards || {};
   const rewards = {
     xp: Math.round((r.xp || 0) * mult),
@@ -481,7 +517,7 @@ export function settlePhase(state, catalog, jobId, now = Date.now(), rng = Math.
   if (finalPhase) {
     row.doneAt = now;
     if (job.kind === 'street') for (const tsid of job.connecting) state.streetDone[tsid] = now;
-    else state.streetDone[job.street] = now;
+    else if (job.street) state.streetDone[job.street] = now;
     out.jobDone = true;
     out.phasesContributed = job.phases.filter((p) => (row.mine[p.classTsid] || 0) > 0).length;
     out.participant = out.phasesContributed >= 4;

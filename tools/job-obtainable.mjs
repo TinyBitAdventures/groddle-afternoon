@@ -139,6 +139,9 @@ export async function obtainableItems() {
 
   for (const meta of Object.values(trants.TRANT_META)) add(meta.fruitClass, 'trant');
   for (const rock of Object.values(mining.ROCK_CATALOG)) add(rock.chunkId, 'mining');
+  // Truly Outrageous I-IV picks roll gem_small while mining (js/mining.js, imagination-effects.js).
+  const imagination = await import(js('imagination-effects.js'));
+  for (const [, id] of imagination.GEM_SMALL_DROPS) add(id, 'mining_gem');
   for (const rows of Object.values(mining.CRUSH_YIELDS)) for (const row of rows) add(row.classTsid, 'ore_grinder');
   add('plain_metal', 'smelter');
   add('plank', 'wood_tree');

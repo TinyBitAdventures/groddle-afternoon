@@ -26,6 +26,12 @@
  * like the client's HandOfDecorator: pick one, click a wall segment's middle
  * (that segment), elsewhere on the wall (the room), the floor or the ceiling.
  *
+ * Worn-out cultivations become their proto in place (items/include/cultivation.js
+ * replaceWithDepleted): the CC0 `depleted` frame of the proto SWF
+ * (js/home-proto-art.js) with Restore, which runs the proto's job_cult_*
+ * project through features/street-jobs-feature.js projectApi; finishing it
+ * puts a fresh item back with a longer lifespan (quest.js doJobEffects type 5).
+ *
  * QA: ?autostart=1&fresh=1&homedemo=decorate (furnished room, Decorate open)
  *     ?autostart=1&fresh=1&homedemo=cultivate (lived-in yard, Cultivate open)
  *     add &homeautoplay=1 to run the scripted place / move / flip / swatch /
@@ -33,10 +39,15 @@
  *     &homefurniture=furniture_rug,furniture_painting puts those in furniture storage
  *     (shared with Tower floors: &homedemo=home&towerdemo=inside, then Decorate).
  * Canvas data: homeDecorPlaced, homeDecorStorage, homeDecorWall/Walls/Floor/Ceiling, homeStamping,
- * homeDecorSegments, homeMode, homeCultivations, homeYard, homeAutoplay.
+ * homeDecorSegments, homeMode, homeCultivations, homeYard, homeAutoplay,
+ * homeProtos, homeRestore, homeLifespan.
+ *     &cultwear=N  every cultivation wears out after N uses (x its lifespan multiplier)
+ *     &homeautoplay=restore (with homedemo=cultivate): wears the Metal Rock out,
+ *       then seeds and runs its Restore project to the restored rock
+ *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { ensureItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-3';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-3';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
@@ -78,6 +89,13 @@ import {
   FIREFLY_HIVE,
   addWear,
   createCultivationState,
+  depleteCultivation,
+  lifespanMultiplier,
+  liveItems,
+  restoreCultivation,
+  restoreJobId,
+  restoreRewardMultiplier,
+  usesLeft,
   cultivate,
   cultivateDemoYard,
   cultivationChoices,
@@ -93,7 +111,9 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=home-cultivation-1';
+} from '../home-cultivation.js?v=home-cultivation-2';
+import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
+import { projectApi } from './street-jobs-feature.js?v=jobs-3';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-2';
 import { towerApi } from './home-tower-feature.js?v=home-tower-2';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-1';
@@ -144,7 +164,7 @@ export function rockClassFor(endClass) {
 /** Resource-node classes and offsets a cultivation contributes, in order. */
 export function cultivationNodes(item, now = Date.now()) {
   const def = cultivationDef(item?.protoClass);
-  if (!def) return [];
+  if (!def || item.depleted) return [];
   if (def.kind === 'node') {
     return def.nodes.map((node) => ({
       classTsid: node.classTsid === 'peat_1' ? item.endClass : node.classTsid,
@@ -189,7 +209,7 @@ export function soilKeyMap(items) {
   const counters = {};
   const out = new Map();
   for (const item of items) {
-    if (cultivationDef(item.protoClass)?.kind !== 'patch') continue;
+    if (cultivationDef(item.protoClass)?.kind !== 'patch' || item.depleted) continue;
     const idx = counters[item.endClass] || 0;
     counters[item.endClass] = idx + 1;
     out.set(item.id, [`${item.endClass}:${idx}`]);
@@ -210,7 +230,25 @@ export function rekeyNodes(nodes = {}, before, after) {
 }
 
 export function rockItems(items) {
-  return items.filter((row) => cultivationDef(row.protoClass)?.kind === 'rock');
+  return items.filter((row) => cultivationDef(row.protoClass)?.kind === 'rock' && !row.depleted);
+}
+
+/**
+ * The street's saved rock slots after the rock list changed (index = order
+ * among live rocks). A rock that is new here gets an empty slot (null), so
+ * spawnMineRock starts it fresh and the others keep their own state.
+ */
+export function rekeyRocks(oldRocks = [], beforeIds = [], afterIds = []) {
+  return afterIds.map((id) => {
+    const at = beforeIds.indexOf(id);
+    return at >= 0 ? oldRocks[at] ?? null : null;
+  });
+}
+
+/** QA &cultwear=N: every cultivation wears out after N uses. */
+export function qaWearOpts(raw) {
+  const n = Math.floor(Number(raw));
+  return Number.isFinite(n) && n > 0 ? { maxWear: n } : {};
 }
 
 /** The Furniture Store (store 23) as a vendor profile for engine.openShop. */
@@ -286,6 +324,9 @@ function publish(engine) {
   engine.setData('homeDecorSegments', decor.wallSegments);
   engine.setData('homeDecorClasses', [...new Set(decor.placed.map((p) => p.classTsid))].length);
   engine.setData('homeCultivations', cult.items.map((row) => `${row.protoClass.replace('proto_', '')}@${row.rx}`).join(','));
+  engine.setData('homeProtos', cult.items.filter((row) => row.depleted).map((row) => `${row.protoClass.replace('proto_', '')}:${restoreJobId(row)}`).join(','));
+  engine.setData('homeLifespan', cult.items.filter((row) => !row.depleted && cultivationDef(row.protoClass)?.kind !== 'tower')
+    .map((row) => `${row.protoClass.replace('proto_', '')}:${lifespanMultiplier(row).toFixed(2)}`).join(','));
   engine.setData('homeYard', `${cult.yardLeft},${cult.yardRight}`);
   engine.setData('homeSelected', selected ? `${selected.kind}:${selected.id}` : '');
   engine.setData('homePlacing', placing ? placing.classTsid || placing.protoClass || '' : '');
@@ -981,7 +1022,7 @@ function spawnCultivations(engine) {
   });
   if (world) world.rocks.length = rocks.length;
   // Gardens: their plots live with the cultivation.
-  for (const item of cult.items) {
+  for (const item of liveItems(cult.items)) {
     const def = cultivationDef(item.protoClass);
     if (def.kind !== 'garden' || !engine.spawnGarden) continue;
     const target = engine.spawnGarden({
@@ -997,7 +1038,7 @@ function spawnCultivations(engine) {
     if (target?.state?.garden) cult.gardens[item.id] = target.state.garden;
   }
   // Pods, mounds and hives: their recovered art, then the resource nodes.
-  for (const item of cult.items) {
+  for (const item of liveItems(cult.items)) {
     const def = cultivationDef(item.protoClass);
     if (!def.art) continue;
     const art = POD_ART[def.art];
@@ -1033,6 +1074,8 @@ function spawnCultivations(engine) {
   if (Object.keys(soilCounts).length) {
     patchesFeature.onStreetEnter({ tsid: HOME_STREET_TSID, soilCounts }, shimEngine(engine, engine.population, soilPoints));
   }
+  // Worn-out cultivations: their protos and Restore projects.
+  spawnProtos(engine);
   // The Tower (proto or built) and the Magic Rock that asks for one.
   const tower = towerItem(cult);
   const layout = homeStreetLayout(cult);
@@ -1063,8 +1106,16 @@ function drawCultivationMarkers(engine) {
       g.addChild(pad);
       continue;
     }
+    if (item.depleted) {
+      // A proto: its Restore project's progress instead of a lifespan.
+      const perc = projectApi.percent(restoreJobId(item));
+      pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
+      if (perc > 0) pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60 * perc, 6, 3).fill(0xe8b23d);
+      g.addChild(pad);
+      continue;
+    }
     // Lifespan bar (buildConfig lifespan.percentage_left)
-    const left = lifespanLeft(item);
+    const left = lifespanLeft(item, qaWear(engine));
     pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
     pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60 * left, 6, 3).fill(left > 0.3 ? 0x7cc35a : 0xe0a84a);
     g.addChild(pad);
@@ -1085,7 +1136,7 @@ function cultivationAt(x) {
 function nearestCultivation(engine, kinds) {
   const px = engine.player?.x ?? 0;
   let best = null;
-  for (const item of cult.items) {
+  for (const item of liveItems(cult.items)) {
     if (!kinds.includes(cultivationDef(item.protoClass)?.kind)) continue;
     const d = Math.abs(cultivationWorldX(item) - px);
     if (!best || d < best.d) best = { item, d };
@@ -1094,31 +1145,220 @@ function nearestCultivation(engine, kinds) {
 }
 
 /** Remove a cultivation and keep every other one's saved state on its own item. */
-function uncultivate(engine, id, reason = 'removed') {
+function uncultivate(engine, id) {
+  const gone = cult.items.find((row) => row.id === Number(id));
+  if (gone?.depleted) {
+    // items/proto_*.js remove: a running project needs Wine of the Dead first.
+    const jobId = restoreJobId(gone);
+    if (projectApi.inProgress(jobId)) {
+      const msg = 'Pour some Wine of the Dead to cancel the project first.';
+      engine.toast(msg, 3200);
+      return { ok: false, reason: 'project', msg };
+    }
+  }
+  const result = withRekey(engine, () => removeCultivation(cult, id));
+  if (!result?.ok) return result;
+  if (gone?.depleted) projectApi.unregister(restoreJobId(gone), { dropRow: true });
+  if (selected?.kind === 'cultivation' && selected.id === Number(id)) selected = null;
+  engine.pushActivity(`You removed the ${result.label} from your yard.`);
+  engine.save();
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Protos: depletion and restoration
+// ---------------------------------------------------------------------------
+
+const WOTD = 'wine_of_the_dead';
+/** Live proto targets by cultivation id (for the project's "Thanks!" bubble). */
+const protoTargets = new Map();
+
+function qaWear(engine) {
+  return qaWearOpts(engine?.param?.('cultwear'));
+}
+
+/** Carry every other cultivation's node / plot / rock state across a change to one item. */
+function withRekey(engine, mutate) {
   const world = engine.streetWorld ? engine.streetWorld(HOME_STREET_TSID) : null;
   const slot = engine.streetSlot('resource-nodes', HOME_STREET_TSID);
-  const now = Date.now();
   const soil = engine.streetSlot('patches', HOME_STREET_TSID);
+  const now = Date.now();
   const beforeKeys = nodeKeyMap(cult.items, now);
   const beforeSoil = soilKeyMap(cult.items);
   const beforeRocks = rockItems(cult.items).map((row) => row.id);
-  const result = removeCultivation(cult, id);
-  if (!result.ok) return result;
+  const result = mutate();
+  if (!result?.ok) return result;
   slot.nodes = rekeyNodes(slot.nodes || {}, beforeKeys, nodeKeyMap(cult.items, now));
   soil.plots = rekeyNodes(soil.plots || {}, beforeSoil, soilKeyMap(cult.items));
-  if (world) {
-    const oldRocks = world.rocks || [];
-    world.rocks = rockItems(cult.items).map((row) => oldRocks[beforeRocks.indexOf(row.id)]).filter(Boolean);
-  }
-  if (selected?.kind === 'cultivation' && selected.id === Number(id)) selected = null;
-  if (reason === 'worn') {
-    engine.pushActivity(`Your ${result.label} wore out and crumbled back into the yard.`);
-    engine.toast(`Your ${result.label} has worn out. Cultivate another any time.`, 3200);
-  } else {
-    engine.pushActivity(`You removed the ${result.label} from your yard.`);
-  }
-  engine.save();
+  if (world) world.rocks = rekeyRocks(world.rocks || [], beforeRocks, rockItems(cult.items).map((row) => row.id));
   return result;
+}
+
+/** The proto's Restore project (items/proto_*.js classProps job_class_id). */
+function restoreJob(item) {
+  const cat = projectApi.catalog();
+  const rest = cat?.restorations?.[item.protoClass];
+  if (!rest) return null;
+  const first = cat.classes[rest.phases[0].classTsid];
+  return {
+    kind: 'restore',
+    title: first?.title || rest.label,
+    label: cultivationDef(item.protoClass).label,
+    desc: first?.desc || '',
+    phases: rest.phases,
+    // Restorations were sized for a home owner: the source amounts.
+    divisor: 1,
+    rewardMultiplier: restoreRewardMultiplier(item),
+  };
+}
+
+function protoIcon(protoClass) {
+  return `assets/sprites/cultivation/proto/${PROTO_DEPLETED_ART[protoClass]?.[0] || `${protoClass}.webp`}`;
+}
+
+function registerRestore(engine, item) {
+  const jobId = restoreJobId(item);
+  const job = restoreJob(item);
+  if (!job) return false;
+  return projectApi.register(jobId, job, {
+    kicker: 'Your home street',
+    place: 'on your home street',
+    iconUrl: protoIcon(item.protoClass),
+    note: item.wotd ? 'Wine of the Dead wore this one out, so restoring it will not lengthen its life.' : `Restoring it brings it back with ${Math.round(Math.min(2, lifespanMultiplier(item) + 0.05) * 100)}% of its lifespan.`,
+    target: () => protoTargets.get(item.id) || null,
+    onDone: (eng) => finishRestore(eng, item.id, jobId),
+  });
+}
+
+/** Register every proto's project (the street-jobs catalog loads asynchronously). */
+function registerRestores(engine) {
+  return projectApi.ready().then(() => {
+    for (const item of cult.items) if (item.depleted && !projectApi.registered(restoreJobId(item))) registerRestore(engine, item);
+    if (scene?.room === 'street') {
+      for (const [id, target] of protoTargets) {
+        const item = cult.items.find((row) => row.id === id);
+        if (item && target) target.subtitle = protoSubtitle(item);
+      }
+      if (mode === 'cultivate') drawCultivationMarkers(engine);
+    }
+    publish(engine);
+  });
+}
+
+function protoSubtitle(item) {
+  const jobId = restoreJobId(item);
+  const perc = projectApi.percent(jobId);
+  if (projectApi.inProgress(jobId)) return `Restore project ${Math.round(perc * 100)}% done`;
+  return 'Worn out · start a project to restore it';
+}
+
+function spawnProtos(engine) {
+  const { PIXI } = engine;
+  protoTargets.clear();
+  for (const item of cult.items) {
+    if (!item.depleted) continue;
+    const def = cultivationDef(item.protoClass);
+    const art = PROTO_DEPLETED_ART[item.protoClass];
+    const box = new PIXI.Container();
+    box.x = cultivationWorldX(item);
+    box.y = STREET_GROUND_Y + 6;
+    box.zIndex = 14;
+    if (art) {
+      const [file, ox, oy, w, h] = art;
+      const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/proto/${file}`));
+      spr.anchor.set(ox / w, oy / h);
+      spr.width = w;
+      spr.height = h;
+      box.addChild(spr);
+    }
+    engine.entityLayer.addChild(box);
+    const target = engine.register({
+      classId: item.protoClass,
+      featureId: HOMES_FEATURE_ID,
+      label: def.label,
+      subtitle: protoSubtitle(item),
+      sprite: box,
+      state: { cultivationId: item.id },
+    });
+    protoTargets.set(item.id, target);
+  }
+  if (cult.items.some((row) => row.depleted)) registerRestores(engine);
+}
+
+/**
+ * include/cultivation.js addWear -> onDepleted -> replaceWithDepleted: the
+ * worn-out item becomes its proto in the same spot.
+ */
+function depleteItem(engine, id, { wotd = false } = {}) {
+  const result = withRekey(engine, () => depleteCultivation(cult, id, { wotd }));
+  if (!result?.ok) return result;
+  if (selected?.kind === 'cultivation' && selected.id === Number(id)) selected = null;
+  engine.pushActivity(wotd
+    ? `You poured Wine of the Dead on your ${result.label}. It wore out at once.`
+    : `Your ${result.label} wore out. Restore it with a project, or cultivate something new.`);
+  engine.toast(`Your ${result.label} has worn out. Click it to start a project to restore it.`, 3600);
+  engine.save();
+  registerRestores(engine);
+  return result;
+}
+
+/** quest.js doJobEffects type 5: the item comes back, a little longer-lived. */
+function finishRestore(engine, id, jobId) {
+  const result = withRekey(engine, () => restoreCultivation(cult, id, { now: Date.now() }));
+  if (!result?.ok) return '';
+  if (result.timesGain) engine.achievement('cultivation:times_restored', result.timesGain);
+  engine.save();
+  restoreLast = `${result.item.protoClass.replace('proto_', '')}:${result.after.toFixed(2)}`;
+  engine.setData('homeRestore', restoreLast);
+  // After the panel shows "Finished", drop the spent project and redraw the yard.
+  setTimeout(() => {
+    projectApi.unregister(jobId, { dropRow: true });
+    if (scene?.room === 'street') engine.refreshHomeScene?.();
+  }, 0);
+  const pct = Math.round(result.after * 100);
+  return result.after > result.before
+    ? `Your ${result.label} is back, and it will last ${pct}% as long as the first one did.`
+    : `Your ${result.label} is back with ${pct}% of the original lifespan.`;
+}
+let restoreLast = '';
+
+/** Wine of the Dead on a proto cancels its project; on a live cultivation it wears it out. */
+function pourWine(engine, id) {
+  const item = cult.items.find((row) => row.id === Number(id));
+  if (!item || countItem(engine.inv, WOTD) < 1) return false;
+  if (item.depleted) {
+    const jobId = restoreJobId(item);
+    if (!projectApi.inProgress(jobId)) return false;
+    removeItem(engine.inv, WOTD, 1);
+    projectApi.cancel(engine, jobId);
+    engine.pushActivity(`You poured Wine of the Dead on a ${cultivationDef(item.protoClass).label} and canceled the project.`);
+  } else {
+    if (cultivationDef(item.protoClass)?.kind === 'tower') return false;
+    removeItem(engine.inv, WOTD, 1);
+    depleteItem(engine, item.id, { wotd: true });
+  }
+  engine.achievement('wotd:poured_on_something', 1);
+  engine.updateHud();
+  engine.save();
+  engine.refreshHomeScene?.();
+  return true;
+}
+
+function protoVerbs(item, engine) {
+  const jobId = restoreJobId(item);
+  const running = projectApi.inProgress(jobId);
+  const wine = countItem(engine.inv, WOTD) > 0;
+  const ready = projectApi.registered(jobId);
+  return [
+    { id: 'restore', label: 'restore', enabled: ready, tooltip: ready ? 'Start a project to restore this item' : 'Loading the project…', durationMs: 0 },
+    {
+      id: 'pour_wotd',
+      label: 'pour Wine of the Dead',
+      enabled: running && wine,
+      tooltip: !running ? 'Nothing to cancel yet.' : wine ? 'Cancel the project (everything put in is lost)' : 'You need a Wine of the Dead.',
+      durationMs: 0,
+    },
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -1464,15 +1704,41 @@ function renderCultivateBody(engine, body) {
       const def = cultivationDef(item.protoClass);
       const nudge = engine.learnedSkills.includes('nudgery_1');
       const isTower = def.kind === 'tower';
+      const wine = countItem(engine.inv, WOTD) > 0;
+      const running = item.depleted && projectApi.inProgress(restoreJobId(item));
+      const life = Math.round(lifespanMultiplier(item) * 100);
+      const actions = [
+        el('button', { type: 'button', 'data-home-action': 'nudge', disabled: !nudge, title: nudge ? 'Move it along the yard' : 'Needs the Nudgery skill', text: 'Nudge', onclick: () => beginNudge(engine, item.id) }),
+        el('button', {
+          type: 'button',
+          'data-home-action': 'remove',
+          text: 'Remove',
+          disabled: item.endClass === TOWER_CHASSIS || running,
+          title: item.endClass === TOWER_CHASSIS ? 'A finished Tower stays.' : running ? 'Pour some Wine of the Dead to cancel the project first.' : '',
+          onclick: () => removeSelected(engine),
+        }),
+      ];
+      if (item.depleted) {
+        actions.unshift(el('button', { type: 'button', class: 'primary', 'data-home-action': 'restore', text: 'Restore', onclick: () => projectApi.open(engine, restoreJobId(item)) }));
+      }
+      if (!isTower && (running || !item.depleted)) {
+        actions.push(el('button', {
+          type: 'button',
+          'data-home-action': 'wotd',
+          text: 'Pour Wine of the Dead',
+          disabled: !wine,
+          title: wine ? (item.depleted ? 'Cancel the restore project' : 'Wear it out now (its restore will not lengthen its life)') : 'You need a Wine of the Dead.',
+          onclick: () => pourWine(engine, item.id),
+        }));
+      }
       body.append(el('div', { class: 'hb-sel' }, [
-        el('strong', { text: isTower ? towerApi.label() : def.label }),
+        el('strong', { text: isTower ? towerApi.label() : item.depleted ? `${def.label} (worn out)` : def.label }),
         el('p', { text: isTower
           ? (item.endClass === TOWER_CHASSIS ? 'Built. Step inside to decorate its floors.' : 'A Tower project. Click it in the yard to see what it needs.')
-          : `Lifespan ${Math.round(lifespanLeft(item) * 100)}% (wears out after ${def.maxWear} uses).` }),
-        el('div', { class: 'hb-actions' }, [
-          el('button', { type: 'button', 'data-home-action': 'nudge', disabled: !nudge, title: nudge ? 'Move it along the yard' : 'Needs the Nudgery skill', text: 'Nudge', onclick: () => beginNudge(engine, item.id) }),
-          el('button', { type: 'button', 'data-home-action': 'remove', text: 'Remove', disabled: item.endClass === TOWER_CHASSIS, title: item.endClass === TOWER_CHASSIS ? 'A finished Tower stays.' : '', onclick: () => removeSelected(engine) }),
-        ]),
+          : item.depleted
+            ? `Worn out. A Restore project brings it back${item.wotd ? '' : ` with ${Math.round(Math.min(2, lifespanMultiplier(item) + 0.05) * 100)}% of its lifespan`}.`
+            : `Lifespan ${Math.round(lifespanLeft(item, qaWear(engine)) * 100)}% (${usesLeft(item, qaWear(engine))} uses left; ${life}% of the original).` }),
+        el('div', { class: 'hb-actions' }, actions),
       ]));
     }
   }
@@ -2045,11 +2311,17 @@ function wearFromEvent(engine, counter) {
   if (!kinds) return;
   const item = nearestCultivation(engine, kinds);
   if (!item) return;
-  const result = addWear(cult, item.id, 1);
+  wearItem(engine, item.id, 1);
+}
+
+/** One use of a cultivation (addWear); a worn-out one becomes its proto. */
+function wearItem(engine, id, n = 1) {
+  const result = addWear(cult, id, n, qaWear(engine));
   if (result.depleted) {
-    uncultivate(engine, item.id, 'worn');
+    depleteItem(engine, id);
     engine.refreshHomeScene?.();
   }
+  return result;
 }
 
 function wearFromNodes(engine, now) {
@@ -2062,12 +2334,8 @@ function wearFromNodes(engine, now) {
     if (!nodeKeys.length) continue;
     const used = nodeKeys.reduce((sum, key) => sum + (slot.nodes?.[key]?.totalHarvests || 0), 0);
     if (used > item.wear) {
-      const result = addWear(cult, item.id, used - item.wear);
-      if (result.depleted) {
-        uncultivate(engine, item.id, 'worn');
-        engine.refreshHomeScene?.();
-        return;
-      }
+      const result = wearItem(engine, item.id, used - item.wear);
+      if (result.depleted) return;
     }
   }
 }
@@ -2125,12 +2393,14 @@ function demoSetup(engine) {
         engine.refreshHomeScene?.().then(() => {
           setMode(engine, 'cultivate');
           if (engine.param('homeautoplay') === '1') runCultivateAutoplay(engine);
+          else if (String(engine.param('homeautoplay') || '').startsWith('restore')) runRestoreAutoplay(engine);
         });
       }, 0);
       return;
     }
     setMode(engine, 'cultivate');
     if (engine.param('homeautoplay') === '1') runCultivateAutoplay(engine);
+    else if (String(engine.param('homeautoplay') || '').startsWith('restore')) runRestoreAutoplay(engine);
   }
 }
 
@@ -2207,6 +2477,64 @@ function runCultivateAutoplay(engine) {
       removeSelected(engine);
     }, 1500],
   ], engine);
+}
+
+/**
+ * QA &homeautoplay=restore: wear the Metal Rock out through addWear (the same
+ * path mining takes), show its proto, then seed and run its Restore project
+ * through the street-jobs panel (items, two real work units, Hire a hand) to
+ * the restored rock. =restorehold stops on the proto, =restoreaward on the award.
+ */
+function runRestoreAutoplay(engine) {
+  const how = String(engine.param('homeautoplay'));
+  let target = null;
+  let jobId = '';
+  let started = false;
+  const say = (label) => engine.setData('homeAutoplay', label);
+  const tick = () => {
+    if (!scene) {
+      autoplay = setTimeout(tick, 500);
+      return;
+    }
+    if (!target) {
+      target = cult.items.find((row) => row.protoClass === 'proto_metal_rock') || liveItems(cult.items).find((row) => cultivationDef(row.protoClass)?.kind === 'rock');
+      if (!target) return say('error:no rock');
+      setMode(engine, null);
+      say('wear');
+      autoplay = setTimeout(tick, 1200);
+      return;
+    }
+    if (started && !target.depleted) {
+      // Restored: the project's onDone put the rock back.
+      const award = Boolean(document.querySelector('#award-screen:not([hidden])'));
+      say(award ? 'award' : 'done');
+      if (award && how !== 'restoreaward') autoplay = setTimeout(tick, 500);
+      return;
+    }
+    if (!target.depleted) {
+      wearItem(engine, target.id, Math.max(1, usesLeft(target, qaWear(engine))));
+      say('proto');
+      autoplay = setTimeout(tick, how === 'restorehold' ? 0 : 3500);
+      return;
+    }
+    if (how === 'restorehold') return say('proto');
+    jobId = restoreJobId(target);
+    if (!projectApi.registered(jobId)) {
+      autoplay = setTimeout(tick, 500);
+      return;
+    }
+    if (!started) {
+      started = true;
+      projectApi.open(engine, jobId);
+      projectApi.autoplay(engine, jobId, { hold: how === 'restoreaward' });
+      say('project');
+      autoplay = setTimeout(tick, 800);
+      return;
+    }
+    say(`project:${projectApi.autoplayStage()}`);
+    autoplay = setTimeout(tick, 600);
+  };
+  autoplay = setTimeout(tick, 900);
 }
 
 // ---------------------------------------------------------------------------
@@ -2457,6 +2785,26 @@ export const homesFeature = {
 
   onEvent(counter, amount, engine) {
     wearFromEvent(engine, counter);
+  },
+
+  /** Protos on the home street (items/proto_*.js restore / remove verbs). */
+  verbsFor(target, engine) {
+    const id = target?.state?.cultivationId;
+    const item = id != null ? cult.items.find((row) => row.id === id) : null;
+    if (!item?.depleted) return [];
+    return protoVerbs(item, engine);
+  },
+
+  runVerb(target, verbId, engine) {
+    const id = target?.state?.cultivationId;
+    const item = id != null ? cult.items.find((row) => row.id === id) : null;
+    if (!item?.depleted) return false;
+    if (verbId === 'restore') return projectApi.open(engine, restoreJobId(item)) || true;
+    if (verbId === 'pour_wotd') {
+      if (!pourWine(engine, item.id)) engine.toast('Nothing to cancel.');
+      return true;
+    }
+    return false;
   },
 
   /** QA / tests. */
