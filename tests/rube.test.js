@@ -130,6 +130,21 @@ describe('rube offers', () => {
     assert.equal(rubeOfferText(v, CATALOG), "I'll give you a Pick for one of your Cherries. OK?");
   });
 
+  it('offers 4 and 5 end with the (4/5) and (5/5) counter (npc_rube.js 245, 469-471)', () => {
+    const v = createRubeVisit();
+    v.offerGive = 'pick';
+    v.offerReceive = 'cherry';
+    const base = "I'll give you a Pick for one of your Cherries. OK?";
+    v.offerCount = 3;
+    assert.equal(rubeOfferText(v, CATALOG, { redo: true }), base);
+    v.offerCount = 4;
+    assert.equal(rubeOfferText(v, CATALOG, { redo: true }), `${base}\n\nI only have so much patience! (4/5)`);
+    // talk_to on a standing offer keeps the counter but not the patience note.
+    assert.equal(rubeOfferText(v, CATALOG), `${base} (4/5)`);
+    v.offerCount = 5;
+    assert.equal(rubeOfferText(v, CATALOG, { redo: true }), `${base}\n\nLast chance! (5/5)`);
+  });
+
   it('accepting swaps one item and counts the trade; a missing item is "Brigand!"', () => {
     const state = createRubeState();
     const inv = { cherry: 2 };

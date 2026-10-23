@@ -29,6 +29,7 @@ import {
   RUBE_FADE_MS,
   RUBE_LEAVE_MS,
   RUBE_LURE_TICK_MS,
+  RUBE_MAX_OFFERS,
   RUBE_TEXT,
   createRubeState,
   createRubeVisit,
@@ -407,6 +408,12 @@ function autoplay(engine, now) {
     return;
   }
   if (step === 1) return talk(engine);
+  // &rubeoffers=4|5: press "What else do you have?" until that offer is up (the patience counter).
+  const want = Math.min(RUBE_MAX_OFFERS, Number(engine.param('rubeoffers')) || 0);
+  if (mode === 'offer' && want && rube.visit.offerCount < want && !rube.visit.done) {
+    autoplayAt = now + 700;
+    return choose(engine, 'redo');
+  }
   if (mode === 'offer') {
     autoplayAt = 0;
     engine.setData('rubeAutoplay', 'offer');
