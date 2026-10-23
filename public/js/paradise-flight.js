@@ -1,6 +1,7 @@
 /** Source-authored Ticket to Paradise economy and reusable flight-course state. */
 
 import { EXTRA_PARADISE_COURSES } from './paradise-courses.js';
+import { qrazyRewardForLevel } from './quoins.js';
 
 export const PARADISE_DURATION_MS = 4 * 60 * 1000;
 export const PARADISE_DAILY_LIMIT = 11;
@@ -423,7 +424,17 @@ function noteReward(run, rewardDef) {
   run.rewardTotals[key] = (run.rewardTotals[key] || 0) + rewardDef.amount;
 }
 
-export function collectParadisePickup(run, index, now = Date.now()) {
+/**
+ * A course reward as paid out. A Qurazy quoin pays the level-indexed iMG of
+ * GSJS items/quoin.js:207-209 (config.qurazy_rewards[level - 1], no quoin
+ * multiplier); it is paid as iMG and keeps `quoin: 'qurazy'` for its art.
+ */
+export function resolveParadiseReward(rewardDef, { level = 1 } = {}) {
+  if (rewardDef?.type !== 'qurazy') return rewardDef;
+  return Object.freeze({ type: 'xp', amount: qrazyRewardForLevel(level), giantId: null, quoin: 'qurazy' });
+}
+
+export function collectParadisePickup(run, index, now = Date.now(), { level = 1 } = {}) {
   const course = PARADISE_COURSES[run?.courseId];
   if (!run || !course) return { ok: false, reason: 'missing', run };
   if (paradiseRemainingMs(run, now) <= 0) {
@@ -437,7 +448,7 @@ export function collectParadisePickup(run, index, now = Date.now()) {
   if (run.collected.includes(pickupIndex)) {
     return { ok: false, reason: 'already_collected', run };
   }
-  const rewardDef = course.rewards[pickupIndex % course.rewards.length];
+  const rewardDef = resolveParadiseReward(course.rewards[pickupIndex % course.rewards.length], { level });
   run.collected.push(pickupIndex);
   run.collected.sort((a, b) => a - b);
   noteReward(run, rewardDef);

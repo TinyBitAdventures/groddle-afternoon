@@ -245,6 +245,12 @@
       "label": "Groddle Snappy Loop",
       "gsjsKeys": ["SNAPPY_LOOP"],
       "tracks": ["assets/audio/ambient/Groddle-Theme-Snappy-Mix_1291876544.mp3"]
+    },
+    "sky_plunge": {
+      "label": "Sky Plunge (Rainbow Run A Cappella)",
+      "gsjsKeys": ["CLOUD_DROP_2", "CLOUD_DROP_2_INTRO", "TICKET_TO_PARADISE1"],
+      "note": "Players name the Rainbow Run A Cappella theme as the Sky Plunge music. GSJS inc_data_sounds.js:203-206 cuts CLOUD_DROP_2 (8 s loop) and CLOUD_DROP_2_INTRO from it, named for the WIP street cloud_drop_2 (LDOQBF6DEO138FJ); no source binds a key to the template LHFO01RM7I238UN, and TICKET_TO_PARADISE1 (the full take) is unrecovered. The course plays the recovered loop; the intro is its every-quoin music.",
+      "tracks": ["assets/audio/sfx/CLOUD_DROP_2.mp3"]
     }
   },
   "streetMusic": {
@@ -261,7 +267,8 @@
     "AMBIENT_SAVANNA1": "savanna",
     "SNAPPY_LOOP": "snappy",
     "HOME_STREET_URALIA": "uralia",
-    "HOME_STREET_FIREBOGS": "firebog"
+    "HOME_STREET_FIREBOGS": "firebog",
+    "CLOUD_DROP_2": "sky_plunge"
   },
   "hubMap": {
     "49": "eesti",

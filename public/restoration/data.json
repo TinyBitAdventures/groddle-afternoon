@@ -531,7 +531,7 @@
    "group": "quests",
    "name": "Ticket to Paradise",
    "status": "rebuilt",
-   "blurb": "Thirteen private courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide, Aerial Boost, Mountain Scaling, Abysmal Thrill, Arbor Hollow, Bippity Bop, Cloud Flight, Updraft, Sky Plunge and Drafty Uplift.",
+   "blurb": "Thirteen private courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide, Aerial Boost, Mountain Scaling, Abysmal Thrill, Arbor Hollow, Bippity Bop, Cloud Flight, Updraft, Sky Plunge and Drafty Uplift. Tiny Speck built Updraft and Drafty Uplift, but they may never have reached players: only eleven Paradise courses are known to have gone live.",
    "spot": null,
    "evidence": [
     "public/js/paradise-flight.js",
@@ -1410,9 +1410,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 274,
+  "commits": 275,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Camera Mode works on your home street and in your house and Tower"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1527,11 +1532,6 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Poisoned trees die, and dead trees clear into Patches to replant"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "37 more imagination cards work: batch sizes, machines, meditation, mega rocks and more"
    }
   ]
  },

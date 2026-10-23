@@ -163,7 +163,7 @@ export const CHECKLIST = Object.freeze([
     blurb: 'Phantom Glitch, Rooks’ Woods, Museum of the Rook, Winter Walk, A Summer’s Day, Ilmenskie Jones, Legalize It and more.',
     evidence: ['public/js/ghost-quest.js', 'public/js/rook-woods.js', 'public/js/winter-walk.js', 'public/js/summers-day.js'] },
   { id: 'paradise', group: 'quests', name: 'Ticket to Paradise', status: 'rebuilt',
-    blurb: 'Thirteen private courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide, Aerial Boost, Mountain Scaling, Abysmal Thrill, Arbor Hollow, Bippity Bop, Cloud Flight, Updraft, Sky Plunge and Drafty Uplift.',
+    blurb: 'Thirteen private courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide, Aerial Boost, Mountain Scaling, Abysmal Thrill, Arbor Hollow, Bippity Bop, Cloud Flight, Updraft, Sky Plunge and Drafty Uplift. Tiny Speck built Updraft and Drafty Uplift, but they may never have reached players: only eleven Paradise courses are known to have gone live.',
     evidence: ['public/js/paradise-flight.js', 'public/js/paradise-courses.js', 'public/js/paradise-course-runtime.js'] },
   { id: 'races', group: 'quests', name: 'Races and Game of Crowns', status: 'solo',
     blurb: 'Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules.',

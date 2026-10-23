@@ -1615,7 +1615,7 @@ ensureItem('moon', {
 for (const course of Object.values(PARADISE_COURSES)) {
   ensureItem(course.ticketId, {
     label: `Ticket to ${course.name}`,
-    desc: course.ticketDesc ||
+    desc: course.releaseLine ? `${course.ticketDesc} ${course.releaseLine}` : course.ticketDesc ||
       (course.id === 'cloud_rings'
         ? "Activate this card to glide through soft cloud rings, collecting quoins as you go. Don't forget to enjoy the view!"
         : course.id === 'radial_heights'
@@ -3560,7 +3560,7 @@ let ambientThemeId = 'default';
 let ambientTrackUrl = null;
 
 async function loadAudio() {
-  await loadAmbientMusicConfig('assets/content/ambient-music.json?v=streetmusic-2');
+  await loadAmbientMusicConfig('assets/content/ambient-music.json?v=streetmusic-3');
   const files = {
     music: 'assets/audio/groddle.mp3', // legacy default / fallback
   };
@@ -15699,7 +15699,7 @@ function applyParadiseReward(rewardDef) {
   }
   const copy =
     rewardDef.type === 'xp'
-      ? `+${amount.toLocaleString()} iMG`
+      ? `${rewardDef.quoin === 'qurazy' ? 'Qurazy! ' : ''}+${amount.toLocaleString()} iMG`
       : rewardDef.type === 'currants'
         ? `+${amount.toLocaleString()} currants`
         : rewardDef.type === 'favor'
@@ -16411,10 +16411,12 @@ function setupParadiseCourse(course, sourcePoints) {
     tsid: currentStreetTsid,
     label: course.name,
     hubName: 'Ticket to Paradise',
+    musicFile: course.musicFile || null,
     bounds: { l: 0, r: course.width, t: 0, b: course.height },
     platforms: [],
     signposts: [],
   };
+  if (course.musicFile) setAmbientForStreet(currentStreet);
   WORLD_W = course.width;
   GROUND_Y = course.height - 80;
   streetPlatforms = [];
@@ -16622,7 +16624,7 @@ function confirmParadiseTicketActivation(courseId) {
 
 function collectParadiseEntry(entry) {
   if (!entry?.sprite?.parent || entry.collected || !paradiseRun) return false;
-  const result = collectParadisePickup(paradiseRun, entry.index, Date.now());
+  const result = collectParadisePickup(paradiseRun, entry.index, Date.now(), { level: pc.level });
   if (!result.ok) return false;
   entry.collected = true;
   const applied = applyParadiseReward(result.reward);
@@ -16677,6 +16679,7 @@ function unlockParadiseExit() {
   burst(paradiseExit.sprite.x, paradiseExit.sprite.y - 55, 0xd6f6ff, 25);
   const course = paradiseCourse();
   toast(course.completion, 4800);
+  if (course.completionSound) playSound(course.completionSound, { volume: 0.8 });
   pushActivity(course.completion);
   paradiseCompletionAnnounced = true;
   renderParadiseFlightHud();

@@ -574,10 +574,15 @@ function paintUpdraft(root, course, fg, art) {
   exitPlank(art, root, course.exit.x, course.exit.y - 158, { width: 96 });
 }
 
+/** Pulls the lavender shading of the newxp clouds toward the card's white-and-mint clouds. */
+const CARD_CLOUD_TINT = 0xf5fdf4;
+
 function paintSkyPlunge(root, course, fg, art) {
+  // Card art look (art_keepable_t2p_skyplunge): a mint-to-pale-yellow morning
+  // sky (course.palette) with soft white clouds; a pale morning sun up top.
   const sun = new PIXI.Graphics();
-  sun.circle(1120, 260, 170).fill({ color: 0xfff6d8, alpha: 0.35 });
-  sun.circle(1120, 260, 82).fill({ color: 0xfff8e4, alpha: 0.9 });
+  sun.circle(1120, 260, 170).fill({ color: 0xfffbe2, alpha: 0.4 });
+  sun.circle(1120, 260, 82).fill({ color: 0xfffdf0, alpha: 0.92 });
   sun.zIndex = -90;
   root.addChild(sun);
   for (let index = 0; index < 30; index += 1) {
@@ -585,22 +590,25 @@ function paintSkyPlunge(root, course, fg, art) {
     deco(art, front ? fg : root, index % 2 ? 'cloud_fluffy_1' : 'clouds_bg_middleplus_01b_newxp',
       (index * 311 + 80) % course.width, 700 + index * 120, {
         width: front ? 360 : 280 + (index % 4) * 90,
-        alpha: front ? 0.55 : 0.75,
-        tint: index % 3 ? 0xffffff : 0xfdf1e6,
+        alpha: front ? 0.55 : 0.8,
+        tint: index % 3 ? 0xffffff : CARD_CLOUD_TINT,
         z: front ? 54 : -40,
         flipX: index % 2 === 0,
       });
   }
-  course.platforms.forEach((plat, index) => {
+  course.platforms.forEach((plat) => {
     if (plat.id === 'start-cloud') {
-      cloudBand(art, root, { x1: plat.x1 + 40, x2: plat.x2 - 40, y: plat.y + 40, width: 380, z: -8 });
+      cloudBand(art, root, { x1: plat.x1 + 40, x2: plat.x2 - 40, y: plat.y + 40, width: 380, z: -8, tint: CARD_CLOUD_TINT });
     } else if (plat.id === 'exit-cloud') {
-      cloudBand(art, root, { x1: plat.x1 + 40, x2: plat.x2 - 40, y: plat.y + 40, width: 420, z: -8 });
+      cloudBand(art, root, { x1: plat.x1 + 40, x2: plat.x2 - 40, y: plat.y + 40, width: 420, z: -8, tint: CARD_CLOUD_TINT });
     }
   });
-  cloudBand(art, root, { x1: 0, x2: course.width, y: 4340, width: 760, z: -9 });
-  rect(fg, 0, 4340, course.width, 60, 0xfbf3ec, 1, 51);
-  cloudBand(art, fg, { x1: 0, x2: course.width, y: 4400, width: 700, z: 52, alpha: 0.96 });
+  // The cloud sea below: falling into it lifts you back to the start cloud
+  // (course.fallReturn), so it sits just under the exit cloud.
+  const seaY = (course.fallY || course.height) + 10;
+  cloudBand(art, root, { x1: 0, x2: course.width, y: seaY, width: 760, z: -9, tint: CARD_CLOUD_TINT });
+  rect(fg, 0, seaY, course.width, course.height - seaY, 0xf8faef, 1, 51);
+  cloudBand(art, fg, { x1: 0, x2: course.width, y: seaY + 60, width: 700, z: 52, alpha: 0.96, tint: CARD_CLOUD_TINT });
   deco(art, root, 'door_asset_heights', course.exit.x, course.exit.y + 6, { height: 140, z: -7 });
   exitPlank(art, root, course.exit.x, course.exit.y - 158, { width: 96 });
   motes(art, root, course, 50, { color: 0xffffff, alpha: 0.5, rise: -0.1, size: 2.4, z: -35 });
@@ -646,7 +654,30 @@ export function buildParadiseCourseArt(root, course, { foreground } = {}) {
   const painter = PAINTERS[course?.art];
   if (!painter) return art;
   painter(root, course, foreground || root, art);
+  if (course.releaseLine) releaseNoteSign(art, root, course);
   return art;
+}
+
+/**
+ * A small plain note by the spawn on courses whose release to players is
+ * unconfirmed (paradise-courses.js PARADISE_UNCONFIRMED_RELEASE_LINE).
+ */
+function releaseNoteSign(art, root, course) {
+  // Beside the avatar's head at the spawn: the top ~240 px of the view sits
+  // under the Paradise HUD card.
+  const x = Math.max(220, Math.min(course.width - 220, course.spawn.x + 330));
+  const y = course.spawn.y - 120;
+  const plate = new PIXI.Graphics();
+  plate.roundRect(x - 180, y - 30, 360, 60, 14).fill({ color: 0xffffff, alpha: 0.72 });
+  plate.zIndex = -4;
+  root.addChild(plate);
+  const label = textSign(art, root, x, y, course.releaseLine, {
+    size: 15, color: 0x3d4a66, stroke: 0xffffff, z: -3,
+  });
+  label.style.wordWrap = true;
+  label.style.wordWrapWidth = 330;
+  art.releaseNote = course.releaseNote || '';
+  return label;
 }
 
 // --- per-frame runtime -------------------------------------------------------
@@ -734,7 +765,7 @@ export const paradiseCourseRuntime = {
       } else if (event === 'land') host.playSfx('step', { volume: 0.2, rate: 1.1 });
       else if (event === 'respawn') {
         runtimeState.respawns += 1;
-        host.toast('Whoops! Back to the last rock.', 1800);
+        host.toast(course.respawnToast || 'Whoops! Back to the last rock.', 1800);
         host.burst(player.x, player.y - 30, 0xffffff, 14);
       }
     }
@@ -794,6 +825,8 @@ export const paradiseCourseRuntime = {
       paradiseGrounded: player?.onGround ? '1' : '0',
       paradiseSpeed: Math.abs(player?.vx || 0).toFixed(2),
       paradiseRespawns: String(runtimeState.respawns),
+      paradiseFallReturn: course.fallReturn || '',
+      paradiseReleaseNote: course.releaseNote || '',
       paradiseBounces: String(runtimeState.bounces),
       paradiseLastEvent: runtimeState.lastEvent,
     };

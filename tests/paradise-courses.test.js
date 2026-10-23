@@ -11,6 +11,9 @@ import {
   PARADISE_PICKUP_RADIUS,
   ARBOR_NEST,
   DRAFTY_UPLIFT_JOKES,
+  PARADISE_UNCONFIRMED_RELEASE_LINE,
+  SKY_PLUNGE_FALL_Y,
+  SKY_PLUNGE_QURAZY_INDEX,
   resolveParadiseCourseAlias,
   stepParadiseBody,
   usesParadiseBody,
@@ -25,7 +28,9 @@ import {
   createParadiseState,
   finishParadiseRun,
   paradiseTicketCost,
+  resolveParadiseReward,
 } from '../public/js/paradise-flight.js';
+import { QURAZY_REWARDS } from '../public/js/quoins.js';
 import { remakeStatus } from '../public/js/imagination-remake.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -102,6 +107,11 @@ test('rewards line up one-to-one with pickups and keep recorded amounts', () => 
     assert.equal(course.rewards.length, course.pickupCount, course.id);
     assert.ok(course.pickupCount >= 20, course.id);
     for (const entry of course.rewards) {
+      if (entry.type === 'qurazy') {
+        // Level-indexed when collected (resolveParadiseReward).
+        assert.equal(course.id, 'sky_plunge');
+        continue;
+      }
       assert.ok(types.has(entry.type), `${course.id} ${entry.type}`);
       assert.ok(entry.amount > 0);
       if (entry.type === 'favor') assert.ok(giants.has(entry.giantId), entry.giantId);
@@ -138,9 +148,10 @@ test('recorded on-screen text is kept verbatim; description-only courses are fla
     EXTRA_PARADISE_COURSES.mountain_scaling.completion,
     "Whether you're big or small, scaling mountains is some tough business! Congratulations! You made it!"
   );
-  for (const id of ['updraft', 'sky_plunge', 'drafty_uplift']) {
+  for (const id of ['updraft', 'drafty_uplift']) {
     assert.equal(EXTRA_PARADISE_COURSES[id].reference, 'description');
   }
+  assert.equal(EXTRA_PARADISE_COURSES.sky_plunge.reference, 'card-forum');
   for (const id of ['aerial_boost', 'mountain_scaling', 'abysmal_thrill', 'arbor_hollow', 'bippity_bop', 'cloud_flight']) {
     assert.equal(EXTRA_PARADISE_COURSES[id].reference, 'video');
   }
@@ -322,16 +333,17 @@ for (const id of ['mountain_scaling', 'aerial_boost', 'bippity_bop', 'arbor_holl
  * height, the source controls only) must finish free-movement courses well
  * inside the four-minute instance.
  */
-function pilot(course, maxFrames = 4 * 60 * 60) {
+function pilot(course, maxFrames = 4 * 60 * 60, skip = () => false) {
   const b = { x: course.spawn.x, y: course.spawn.y, vx: 0, vy: 0, onGround: true };
   const left = new Set(course.pickups.map((_, index) => index));
+  let falls = 0;
   let frame = 0;
   let strokeCooldown = 0;
   for (; frame < maxFrames; frame += 1) {
     let target = course.exit;
     let best = Infinity;
     const ordered = course.movement === 'plunge'
-      ? [...left].filter((index) => course.pickups[index].y + 30 >= b.y - 10).slice(0, 1)
+      ? [...left].filter((index) => !skip(index, falls) && course.pickups[index].y + 30 >= b.y - 10).slice(0, 1)
       : left;
     for (const index of ordered) {
       const pick = course.pickups[index];
@@ -339,6 +351,11 @@ function pilot(course, maxFrames = 4 * 60 * 60) {
       if (course.movement === 'glide' && pick.x < b.x - 60) continue;
       if (course.movement === 'plunge' && pick.y + 30 < b.y - 10) continue;
       if (score < best) { best = score; target = pick; }
+    }
+    if (course.movement === 'plunge' && left.size && target === course.exit) {
+      // Nothing left below: drop into the cloud sea, away from the exit
+      // cloud, to be lifted back up for another fall.
+      target = { x: 300, y: course.height };
     }
     const goalY = left.size ? target.y + 30 : target.y;
     const dx = target.x - b.x;
@@ -362,11 +379,15 @@ function pilot(course, maxFrames = 4 * 60 * 60) {
       input.up = dy < -150;
       input.down = dy > 20;
     }
-    stepParadiseBody(course, b, input, 1);
-    for (const index of [...left]) if (touches(course.pickups[index], b)) left.delete(index);
+    const { events } = stepParadiseBody(course, b, input, 1);
+    if (events.includes('respawn')) falls += 1;
+    for (const index of [...left]) {
+      if (skip(index, falls)) continue;
+      if (touches(course.pickups[index], b)) left.delete(index);
+    }
     if (!left.size && Math.hypot(course.exit.x - b.x, course.exit.y - b.y) < 74) break;
   }
-  return { frame, left: [...left], at: { x: Math.round(b.x), y: Math.round(b.y) } };
+  return { frame, falls, left: [...left], at: { x: Math.round(b.x), y: Math.round(b.y) } };
 }
 
 for (const id of ['abysmal_thrill', 'updraft', 'sky_plunge', 'drafty_uplift']) {
@@ -402,4 +423,117 @@ test('game.js wires the new courses in through small additive hooks', () => {
   const runtime = fs.readFileSync(path.join(publicDir, 'js', 'paradise-course-runtime.js'), 'utf8');
   has(runtime, /paradiseCourseArt/);
   assert.ok(!/reference-videos|\.mp4/.test(runtime), 'no footage paths in the runtime');
+});
+
+// --- Sky Plunge (card, card art and player reports) -------------------------
+
+test('Sky Plunge keeps the card copy and the card art palette', () => {
+  const course = EXTRA_PARADISE_COURSES.sky_plunge;
+  // source: inc_data_imagination.js:7407
+  assert.equal(course.cardDesc, 'Take the plunge! A fast drop through soft, morning clouds. Can you collect every quoin?');
+  // art_keepable_t2p_skyplunge.png: mint (#c7f1e2) at the top to pale yellow (#d9e4b8) low down.
+  const [top, , , bottom] = course.palette;
+  const rgb = (c) => [(c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff];
+  assert.ok(rgb(top)[1] > rgb(top)[0] && rgb(top)[2] > rgb(bottom)[2], 'mint top, yellower bottom');
+  assert.ok(rgb(bottom)[0] > rgb(top)[0] && rgb(bottom)[2] < rgb(bottom)[1], 'pale yellow bottom');
+  assert.match(course.objective, /every quoin/);
+  assert.match(course.completion, /every quoin/);
+});
+
+test('Sky Plunge: the cloud sea lifts you back to the top cloud to fall again', () => {
+  const course = EXTRA_PARADISE_COURSES.sky_plunge;
+  assert.equal(course.fallReturn, 'spawn');
+  assert.equal(course.fallY, SKY_PLUNGE_FALL_Y);
+  assert.ok(!course.platforms.some((plat) => plat.kind === 'cloud-floor'), 'no floor under the fall');
+  const exitCloud = course.platforms.find((plat) => plat.id === 'exit-cloud');
+  assert.ok(exitCloud.y < SKY_PLUNGE_FALL_Y && SKY_PLUNGE_FALL_Y < course.height);
+  // Land on the exit cloud, then walk off its edge into the sea.
+  const b = body(1000, 4200, { onGround: false, vy: 3 });
+  run(course, b, 40);
+  assert.equal(b.onGround, true);
+  assert.equal(b.y, exitCloud.y);
+  b.safe = { x: 1000, y: exitCloud.y }; // even after landing there, the sea returns you to the top
+  let lifted = false;
+  for (let index = 0; index < 200 && !lifted; index += 1) {
+    lifted = stepParadiseBody(course, b, { left: true }, 1).events.includes('respawn');
+  }
+  assert.ok(lifted);
+  assert.deepEqual([b.x, b.y, b.onGround], [course.spawn.x, course.spawn.y, true]);
+  // Mountain Scaling still returns you to the last rock.
+  assert.equal(EXTRA_PARADISE_COURSES.mountain_scaling.fallReturn, undefined);
+});
+
+test('Sky Plunge: a pilot who misses quoins on the first fall finishes on later falls inside four minutes', () => {
+  const course = EXTRA_PARADISE_COURSES.sky_plunge;
+  // Ignore every quoin on the right on the first fall.
+  const result = pilot(course, 4 * 60 * 60, (index, falls) => falls === 0 && course.pickups[index].x > 700);
+  assert.deepEqual(result.left, [], `missed ${JSON.stringify(result)}`);
+  assert.ok(result.falls >= 1, 'needed another fall');
+  assert.ok(result.frame < 4 * 60 * 60, `took ${result.frame} frames`);
+});
+
+test('Sky Plunge has one Qurazy quoin among the last two, paid by the level table', () => {
+  const course = EXTRA_PARADISE_COURSES.sky_plunge;
+  const qurazies = course.rewards.map((entry, index) => (entry.type === 'qurazy' ? index : -1)).filter((index) => index >= 0);
+  assert.deepEqual(qurazies, [SKY_PLUNGE_QURAZY_INDEX]);
+  assert.ok(SKY_PLUNGE_QURAZY_INDEX >= course.pickupCount - 2);
+  // Pickups are in fall order, so the Qurazy is one of the last two you reach.
+  const ys = course.pickups.map((pick) => pick.y);
+  assert.deepEqual(ys, [...ys].sort((a, b) => a - b));
+  // GSJS items/quoin.js:207-209: config.qurazy_rewards[level - 1] iMG, no multiplier.
+  assert.deepEqual(resolveParadiseReward(course.rewards[SKY_PLUNGE_QURAZY_INDEX], { level: 12 }),
+    { type: 'xp', amount: QURAZY_REWARDS[11], giantId: null, quoin: 'qurazy' });
+  const run1 = createParadiseRun('sky_plunge', { now: 0 });
+  const result = collectParadisePickup(run1, SKY_PLUNGE_QURAZY_INDEX, 1000, { level: 5 });
+  assert.equal(result.reward.type, 'xp');
+  assert.equal(result.reward.amount, 30);
+  assert.equal(result.reward.quoin, 'qurazy');
+  assert.equal(run1.rewardTotals.xp, 30);
+  // Other rewards pass through untouched.
+  assert.equal(resolveParadiseReward(course.rewards[0]), course.rewards[0]);
+});
+
+test('Sky Plunge plays the Rainbow Run A Cappella cuts: CLOUD_DROP_2 loop, intro on every quoin', () => {
+  const course = EXTRA_PARADISE_COURSES.sky_plunge;
+  assert.equal(course.musicFile, 'CLOUD_DROP_2');
+  assert.equal(course.completionSound, 'CLOUD_DROP_2_INTRO');
+  const music = JSON.parse(fs.readFileSync(path.join(publicDir, 'assets', 'content', 'ambient-music.json'), 'utf8'));
+  const theme = music.themes[music.streetMusic.CLOUD_DROP_2];
+  assert.ok(theme, 'CLOUD_DROP_2 maps to a theme');
+  assert.deepEqual(theme.tracks, ['assets/audio/sfx/CLOUD_DROP_2.mp3']);
+  assert.ok(theme.gsjsKeys.includes('TICKET_TO_PARADISE1'));
+  const keys = JSON.parse(fs.readFileSync(path.join(publicDir, 'assets', 'content', 'sound-keys.json'), 'utf8'));
+  for (const key of ['CLOUD_DROP_2', 'CLOUD_DROP_2_INTRO']) {
+    assert.match(keys.keys?.[key]?.url || keys[key]?.url || '', /Rainbow_Run_A_Capp?ella/, key);
+    assert.ok(fs.existsSync(path.join(publicDir, 'assets', 'audio', 'sfx', `${key}.mp3`)), key);
+  }
+  const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
+  assert.match(game, /musicFile: course\.musicFile/);
+  assert.match(game, /if \(course\.musicFile\) setAmbientForStreet\(currentStreet\)/);
+  assert.match(game, /if \(course\.completionSound\) playSound\(course\.completionSound/);
+  assert.match(game, /collectParadisePickup\(paradiseRun, entry\.index, Date\.now\(\), \{ level: pc\.level \}\)/);
+});
+
+test('Updraft and Drafty Uplift carry an unconfirmed-release note shown to players', () => {
+  assert.equal(PARADISE_UNCONFIRMED_RELEASE_LINE, 'Tiny Speck built this course, but it may never have reached players.');
+  assert.doesNotMatch(PARADISE_UNCONFIRMED_RELEASE_LINE, /—/);
+  for (const id of ['updraft', 'drafty_uplift']) {
+    assert.equal(EXTRA_PARADISE_COURSES[id].releaseNote, 'unconfirmed', id);
+    assert.equal(EXTRA_PARADISE_COURSES[id].releaseLine, PARADISE_UNCONFIRMED_RELEASE_LINE, id);
+  }
+  // The other eleven went live (forum general/9830 update log; one upgrade card each).
+  for (const id of EXTRA_PARADISE_COURSE_IDS.filter((entry) => !['updraft', 'drafty_uplift'].includes(entry))) {
+    assert.equal(EXTRA_PARADISE_COURSES[id].releaseNote, undefined, id);
+  }
+  // GSJS deals a card for 11 Paradise tickets only (skipped where the audit tree is absent).
+  const gsjs = path.join(here, '..', '..', 'glitch-GameServerJS', 'inc_data_imagination.js');
+  if (fs.existsSync(gsjs)) {
+    const cards = fs.readFileSync(gsjs, 'utf8').match(/function imagination_get_ticket_to_paradise_\w+/g) || [];
+    assert.equal(cards.length, 11);
+    assert.ok(!cards.some((name) => /updraft|drafty_uplift/.test(name)));
+  }
+  const runtime = fs.readFileSync(path.join(publicDir, 'js', 'paradise-course-runtime.js'), 'utf8');
+  assert.match(runtime, /if \(course\.releaseLine\) releaseNoteSign\(/);
+  const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
+  assert.match(game, /course\.releaseLine \? `\$\{course\.ticketDesc\} \$\{course\.releaseLine\}`/);
 });

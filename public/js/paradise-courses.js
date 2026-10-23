@@ -20,9 +20,11 @@
  *   JgWvGd7FcKA), Bippity Bop (rpZY_pooO_o, ySRo7sXl3OU) and Cloud Flight
  *   (nKzXwAraaO0, vI76UyqikgQ). On-screen text and the order of quoin
  *   rewards follow those recordings.
- * - Three from their ticket description and ticket art only (no recording
- *   was found): Updraft, Sky Plunge and Drafty Uplift. Their mechanics read
- *   the description literally and their copy is remake copy.
+ * - Two from their ticket description and ticket art only (no recording
+ *   was found): Updraft and Drafty Uplift. Their mechanics read the
+ *   description literally and their copy is remake copy.
+ * - Sky Plunge from its upgrade card, card art and player reports (no
+ *   recording, no geometry): see the Sky Plunge block below.
  *
  * Reward amounts use the same scale as the four shipped courses (the
  * recorded values at the recorders' quoin multipliers: 120 iMG, 100 of a
@@ -35,6 +37,12 @@ const mood = () => reward('mood', 100);
 const energy = () => reward('energy', 100);
 const currants = () => reward('currants', 100);
 const favor = (giantId = 'friendly') => reward('favor', 100, giantId);
+/**
+ * A Qurazy quoin. Its iMG is level-indexed when collected (GSJS items/quoin.js:
+ * 207-209 pays config.qurazy_rewards[level - 1], no quoin multiplier), so the
+ * amount here is resolved by paradise-flight.js collectParadisePickup.
+ */
+const qurazy = () => reward('qurazy', 0);
 
 const pt = (x, y) => Object.freeze({ x, y });
 const freezeList = (list) => Object.freeze(list.map((entry) => Object.freeze({ ...entry })));
@@ -221,18 +229,40 @@ const UPDRAFT_PICKUPS = Object.freeze(
 );
 
 // ---------------------------------------------------------------------------
-// Sky Plunge (description only): "Swiftly drop through morning clouds".
-// Step off the top cloud and fall; hold Space to float, Down to dive.
+// Sky Plunge. The production template LHFO01RM7I238UN was never archived
+// (no geometry, no recording), so the layout is a clean reconstruction from:
+// - the upgrade card, inc_data_imagination.js:7407: "Take the plunge! A fast
+//   drop through soft, morning clouds. Can you collect every quoin?"
+// - the CC0 card art (opengameart extracted_imagination
+//   art_keepable_t2p_skyplunge.png): a mint-to-pale-yellow sky (#c7f1e2 at
+//   the top to #d9e4b8 low down) with white clouds; used for the palette;
+// - player reports (glitch.com forum general/24841, 25493, bugs/27422;
+//   reference only): a freefall, every quoin often takes several falls, a
+//   Qurazy quoin is in the course, and collecting every quoin plays a
+//   special message and music (only Radial Heights and Sky Plunge had one).
+// - music: GSJS inc_data_sounds.js:203-206 cut CLOUD_DROP_2 (8 s) and
+//   CLOUD_DROP_2_INTRO from the Rainbow Run A Cappella theme players name as
+//   the Sky Plunge music, named for Ryan's WIP street cloud_drop_2
+//   (LDOQBF6DEO138FJ, inc_data_maps_prod.js:18592). No source binds a key to
+//   LHFO01RM7I238UN, and TICKET_TO_PARADISE1 (the full take) is unrecovered.
+// Remake choices: the 26-quoin layout, falling into the cloud sea below
+// lifting you back to the top cloud to plunge again (the source says only
+// that players fell again), the Qurazy as one of the last two quoins, the
+// message wording, and the exit opening once every quoin is in, as on every
+// remake course.
 const PLUNGE_PLATFORMS = freezeList([
   platform(160, 460, 320, { kind: 'cloud-shelf', id: 'start-cloud' }),
   platform(800, 1240, 4260, { kind: 'cloud-shelf', id: 'exit-cloud' }),
-  platform(0, 1400, 4300, { kind: 'cloud-floor', id: 'cloud-floor' }),
 ]);
+/** Below this the cloud sea lifts you back to the start cloud. */
+export const SKY_PLUNGE_FALL_Y = 4330;
 const PLUNGE_PICKUPS = Object.freeze(
   Array.from({ length: 26 }, (_, index) =>
     pt(Math.round(700 + Math.sin(index * 0.8) * 400), 600 + index * 140)
   )
 );
+/** Index of the Qurazy quoin: one of the last two in the fall. */
+export const SKY_PLUNGE_QURAZY_INDEX = 24;
 
 // ---------------------------------------------------------------------------
 // Drafty Uplift (description only): a gentle draught lifts you up a lavender
@@ -256,6 +286,25 @@ export const DRAFTY_UPLIFT_JOKES = Object.freeze([
 ]);
 
 // ---------------------------------------------------------------------------
+
+/**
+ * Updraft and Drafty Uplift may never have been released to players. Tiny
+ * Speck built both (config_prod.js paradise_locations, items/paradise_ticket_*),
+ * but GSJS inc_data_imagination.js deals an upgrade card for only 11 Paradise
+ * tickets and neither is one of them, their items have has_infopage = false
+ * (no encyclopedia page), no patch note mentions them, and the forum location
+ * list (glitch.com forum general/9830) logs exactly 11 Paradise levels going
+ * live: Update 25 (Arbor Hollow, Cloud Flight, Radial Heights, Sky Plunge,
+ * Starlit Night), Update 27 (Abysmal Thrill, Beam Me Down, Bippity Bop,
+ * Cloud Rings, Mountain Scaling) and Update 28 (Slip 'N Slide). Notes:
+ * research/video/README.md section 3b, research/wayback/raw/paradise-2026-10-23/.
+ */
+export const PARADISE_UNCONFIRMED_RELEASE_LINE =
+  'Tiny Speck built this course, but it may never have reached players.';
+const unreleased = Object.freeze({
+  releaseNote: 'unconfirmed',
+  releaseLine: PARADISE_UNCONFIRMED_RELEASE_LINE,
+});
 
 const course = (def) => Object.freeze({
   ringCount: 0,
@@ -486,6 +535,7 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     // source: items/paradise_ticket_updraft.js
     ticketDesc: 'Activate this card to ride the strong wind emanating from a mysterious cloud-hole in the sky. Glide right, and grab those quoins!',
     reference: 'description',
+    ...unreleased, // see PARADISE_UNCONFIRMED_RELEASE_LINE
     aliases: Object.freeze(['updraught', 'wind']),
     movement: 'glide',
     art: 'updraft',
@@ -521,7 +571,10 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     templateTsid: 'LHFO01RM7I238UN',
     // source: items/paradise_ticket_sky_plunge.js
     ticketDesc: 'Activate this card to take the Sky Plunge! Swiftly drop through morning clouds, collecting quoins as you fall.',
-    reference: 'description',
+    // source: inc_data_imagination.js:7407 (Ticket To Sky Plunge card)
+    cardDesc: 'Take the plunge! A fast drop through soft, morning clouds. Can you collect every quoin?',
+    // Card, card art and player reports; no recording or geometry survives.
+    reference: 'card-forum',
     aliases: Object.freeze(['plunge', 'skyplunge']),
     movement: 'plunge',
     art: 'sky_plunge',
@@ -532,18 +585,29 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     exit: pt(1120, 4260),
     platforms: PLUNGE_PLATFORMS,
     pickups: PLUNGE_PICKUPS,
+    // Falling into the cloud sea lifts you back to the start cloud.
+    fallY: SKY_PLUNGE_FALL_Y,
+    fallReturn: 'spawn',
+    respawnToast: 'The clouds lift you back up. Plunge again!',
     physics: Object.freeze({ gravity: 0.3, terminalVy: 5.6, floatVy: 1.8, diveVy: 9, maxVx: 4.2, airAccel: 0.32 }),
-    objective: 'Plunge through the morning clouds for 26 quoins',
-    completion: 'What a plunge! The way home is open!',
+    objective: 'Can you collect every quoin? 26 in the clouds',
+    // The special message for every quoin (remake copy after Radial Heights'
+    // source sign "Good work, you've got all the stars!", GHFQOLEIHN63P27).
+    completion: "Good work, you've got every quoin! The way home is open!",
+    // The every-quoin music: the Rainbow Run A Cappella intro, over the
+    // course's own CLOUD_DROP_2 loop (assets/content/ambient-music.json).
+    musicFile: 'CLOUD_DROP_2',
+    completionSound: 'CLOUD_DROP_2_INTRO',
     controls: 'Arrows steer · hold Spacebar to float · Down dives',
-    controlsHint: 'Step off the cloud and fall. Arrow keys steer, hold Spacebar to float, Down to dive.',
+    controlsHint: 'Step off the cloud and fall. Arrow keys steer, hold Spacebar to float, Down to dive. Missed a quoin? Fall into the clouds below to plunge again.',
     prompt: 'STEP OFF AND PLUNGE!',
-    palette: Object.freeze([0xb9e0d3, 0xe4eecf, 0xf5e2c6, 0xf1cbbb]),
-    transitionColors: Object.freeze([0xb9e0d3, 0xf1cbbb]),
+    // Card art sky: mint at the top to pale yellow low down.
+    palette: Object.freeze([0xc4f0e2, 0xcbedd6, 0xd3e8c6, 0xdde3b2]),
+    transitionColors: Object.freeze([0xc4f0e2, 0xdde3b2]),
     rewards: [
       xp(), mood(), currants(), xp(), energy(), xp(), favor(), xp(360),
       currants(), mood(), xp(), energy(), xp(), currants(), xp(480), mood(),
-      xp(), energy(), xp(), currants(), xp(360), mood(), xp(), energy(), xp(), xp(600),
+      xp(), energy(), xp(), currants(), xp(360), mood(), xp(), energy(), qurazy(), xp(600),
     ],
     completionReward: xp(954),
   }),
@@ -555,6 +619,7 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     // source: items/paradise_ticket_drafty_uplift.js
     ticketDesc: "Activate this card to chill out and enjoy a good joke. It's the little things that make life great, champ.",
     reference: 'description',
+    ...unreleased, // see PARADISE_UNCONFIRMED_RELEASE_LINE
     aliases: Object.freeze(['drafty', 'uplift']),
     movement: 'updraft',
     art: 'drafty_uplift',
@@ -742,7 +807,9 @@ function stepOnce(course, body, input, h, events) {
   }
 
   if (course.fallY && body.y > course.fallY) {
-    const safe = body.safe || course.spawn;
+    // Mountain Scaling returns you to the last rock; Sky Plunge's cloud sea
+    // lifts you back to the top cloud for another fall.
+    const safe = course.fallReturn === 'spawn' ? course.spawn : body.safe || course.spawn;
     body.x = safe.x;
     body.y = safe.y;
     body.vx = 0;
