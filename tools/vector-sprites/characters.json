@@ -20,8 +20,8 @@
    {"path": "assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png", "label": "talk", "fw": 97, "fh": 101, "cols": 9, "frames": 26}
   ] },
   {"name": "phantom", "swf": "quest_items/phantom_glitch/phantom_glitch.swf", "sprite": 65, "sheets": [
-   {"path": "assets/sprites/quests/phantom-appear.png", "label": "appear", "fw": 126, "fh": 214, "cols": 7, "frames": 54},
-   {"path": "assets/sprites/quests/phantom-give-heart.png", "label": "giveHeart", "fw": 126, "fh": 214, "cols": 7, "frames": 89}
+   {"path": "assets/sprites/quests/phantom-appear.png", "label": "appear", "fw": 147, "fh": 214, "cols": 6, "frames": 46},
+   {"path": "assets/sprites/quests/phantom-give-heart.png", "label": "giveHeart", "fw": 147, "fh": 214, "cols": 6, "frames": 76}
   ] },
   {"name": "letter-block-A", "character": "letter-blocks", "swf": "quest_items/letter_block/letter_block.swf", "sprite": 167, "sheets": [
    {"path": "assets/sprites/quests/four-letter/letter-block-A.png", "label": "idle_stand", "fw": 139, "fh": 197, "cols": 2, "frames": 2}

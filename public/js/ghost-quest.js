@@ -13,9 +13,27 @@ export const FADED_HEART_ID = 'faded_heart';
 export const PHANTOM_HAUNT_COUNT = 7;
 export const REMEMBER_HAUNT_COUNT = 13;
 export const HEART_MEMORY_COOLDOWN_MS = 15_000;
-export const PHANTOM_APPEAR_FRAME_COUNT = 54;
-export const PHANTOM_GIVE_HEART_FRAME_COUNT = 89;
-export const PHANTOM_GIVE_HEART_ANIMATION_SPEED = 0.32;
+/**
+ * phantom_glitch.swf sprite 65: `appear` is 46 frames (3-48) and `giveHeart`
+ * 76 frames (236-311), authored at 30 fps. The OGA sheets hold exactly those
+ * frames in 6 columns of 147x214 cells.
+ */
+export const PHANTOM_SWF_FPS = 30;
+export const PHANTOM_APPEAR_FRAME_COUNT = 46;
+export const PHANTOM_GIVE_HEART_FRAME_COUNT = 76;
+/**
+ * Pixi speed at a 60 fps ticker that plays the SWF's own 30 fps. The
+ * "Receiving the Faded Heart" recording agrees: the Phantom has faded about
+ * 1.2 s after the last response (frame 36 of the sheet), the heart lands at
+ * about 1.7 s (frame 52), and it is gone about 3.2 s in, which is the 2,533 ms
+ * animation plus the reveal hold. The final appear takes about 1.5 s in the
+ * GlitchAddict quest recording, also 30 fps.
+ */
+export const PHANTOM_GIVE_HEART_ANIMATION_SPEED = PHANTOM_SWF_FPS / 60;
+export const PHANTOM_APPEAR_ANIMATION_SPEED = PHANTOM_SWF_FPS / 60;
+/** Echoes and the Remember memory keep their slower, dreamier playback. */
+export const PHANTOM_ECHO_APPEAR_ANIMATION_SPEED = 0.136;
+export const PHANTOM_MEMORY_ANIMATION_SPEED = 0.128;
 export const PHANTOM_HEART_REVEAL_HOLD_MS = 700;
 
 export function phantomAnimationDurationMs(

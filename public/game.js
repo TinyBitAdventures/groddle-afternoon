@@ -29,6 +29,9 @@ import {
   PHANTOM_HAUNT_COUNT,
   PHANTOM_FINALE_BEATS,
   PHANTOM_APPEAR_FRAME_COUNT,
+  PHANTOM_APPEAR_ANIMATION_SPEED,
+  PHANTOM_ECHO_APPEAR_ANIMATION_SPEED,
+  PHANTOM_MEMORY_ANIMATION_SPEED,
   PHANTOM_GIVE_HEART_ANIMATION_SPEED,
   PHANTOM_GIVE_HEART_DURATION_MS,
   PHANTOM_GIVE_HEART_FRAME_COUNT,
@@ -38,7 +41,7 @@ import {
   noticePhantom,
   grantFadedHeart,
   rememberWithFadedHeart,
-} from './js/ghost-quest.js?v=phantom-3';
+} from './js/ghost-quest.js?v=phantom-4';
 import {
   HOG_HAUL_QUEST_ID,
   HOG_HAUL_STREET_ID,
@@ -980,11 +983,11 @@ const SHEETS = {
   },
   phantomAppear: {
     url: 'assets/sprites/quests/phantom-appear.png',
-    fw: 126, fh: 214, cols: 7, rows: 8, frameCount: PHANTOM_APPEAR_FRAME_COUNT,
+    fw: 147, fh: 214, cols: 6, rows: 8, frameCount: PHANTOM_APPEAR_FRAME_COUNT,
   },
   phantomGiveHeart: {
     url: 'assets/sprites/quests/phantom-give-heart.png',
-    fw: 126, fh: 214, cols: 7, rows: 13, frameCount: PHANTOM_GIVE_HEART_FRAME_COUNT,
+    fw: 147, fh: 214, cols: 6, rows: 13, frameCount: PHANTOM_GIVE_HEART_FRAME_COUNT,
   },
   pigBait: {
     url: 'assets/sprites/races/pig_bait__x1_1_x1_2_x1_3_x1_4_png_1354830335.png',
@@ -9730,7 +9733,7 @@ function spawnPhantomQuestEncounter() {
     y: player?.y || GROUND_Y,
   };
   const sprite = makeAnimated('phantomAppear', {
-    animationSpeed: encounter.kind === 'final' ? 0.3 : 0.16,
+    animationSpeed: encounter.kind === 'final' ? PHANTOM_APPEAR_ANIMATION_SPEED : PHANTOM_ECHO_APPEAR_ANIMATION_SPEED,
     scale: encounter.kind === 'final' ? 0.7 : 0.62,
   });
   sprite.x = point.x;
@@ -9905,7 +9908,7 @@ function rememberFadedHeartInWorld() {
   closePackPopover();
   const points = samplePlatformPoints(7);
   const point = points[5] || { x: player.x + 180, y: player.y };
-  const memory = makeAnimated('phantomAppear', { animationSpeed: 0.15, scale: 0.56 });
+  const memory = makeAnimated('phantomAppear', { animationSpeed: PHANTOM_MEMORY_ANIMATION_SPEED, scale: 0.56 });
   memory.x = point.x;
   memory.y = point.y + 2;
   memory.alpha = 0.42;

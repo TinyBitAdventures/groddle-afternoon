@@ -4,7 +4,7 @@ import { normalizeQuoinState } from './quoins.js?v=quoins-1';
 import { normalizeToolConditionState } from './tools.js?v=tools-2';
 import { normalizeSkillState } from './skills.js';
 import { normalizeFoodState } from './food.js?v=food-memory-2';
-import { createGhostQuestState } from './ghost-quest.js?v=phantom-1';
+import { createGhostQuestState } from './ghost-quest.js?v=phantom-4';
 import { normalizeParadiseState } from './paradise-flight.js?v=paradise-flight-2';
 import { normalizeFeatSnapshot } from './feats.js?v=incantations-2';
 import { normalizeEmotionalBearState } from './emotional-bear.js?v=emotional-bear-1';

@@ -9,6 +9,8 @@ import {
   REMEMBER_QUEST_ID,
   PHANTOM_HAUNT_COUNT,
   PHANTOM_FINALE_BEATS,
+  PHANTOM_APPEAR_ANIMATION_SPEED,
+  PHANTOM_APPEAR_FRAME_COUNT,
   PHANTOM_GIVE_HEART_ANIMATION_SPEED,
   PHANTOM_GIVE_HEART_DURATION_MS,
   PHANTOM_GIVE_HEART_FRAME_COUNT,
@@ -87,9 +89,10 @@ describe('Notice the Unnoticeable authored quest', () => {
   });
 
   it('plays the complete recovered heart handoff before opening completion pages', () => {
-    assert.equal(PHANTOM_GIVE_HEART_FRAME_COUNT, 89);
-    assert.equal(PHANTOM_GIVE_HEART_ANIMATION_SPEED, 0.32);
-    assert.equal(PHANTOM_GIVE_HEART_DURATION_MS, 4635);
+    // phantom_glitch.swf giveHeart is 76 frames at the SWF's 30 fps.
+    assert.equal(PHANTOM_GIVE_HEART_FRAME_COUNT, 76);
+    assert.equal(PHANTOM_GIVE_HEART_ANIMATION_SPEED, 0.5);
+    assert.equal(PHANTOM_GIVE_HEART_DURATION_MS, 2533);
     assert.equal(
       phantomAnimationDurationMs(
         PHANTOM_GIVE_HEART_FRAME_COUNT,
@@ -124,6 +127,49 @@ describe('Notice the Unnoticeable authored quest', () => {
     const encounter = game.slice(encounterStart, encounterEnd);
     assert.match(encounter, /sprite\.onFrameChange/);
     assert.doesNotMatch(encounter, /The original echo settles/);
+  });
+});
+
+describe('Phantom Glitch sheets', () => {
+  // The OGA sheets are 6 columns of 147x214 cells holding exactly the SWF's
+  // appear (46) and giveHeart (76) frames; a 7x126 grid cut through heads.
+  const pngSize = (file) => {
+    const buf = fs.readFileSync(path.join(root, 'public', file));
+    return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+  };
+  const sheets = [
+    ['phantomAppear', 'assets/sprites/quests/phantom-appear.png', PHANTOM_APPEAR_FRAME_COUNT, 46],
+    ['phantomGiveHeart', 'assets/sprites/quests/phantom-give-heart.png', PHANTOM_GIVE_HEART_FRAME_COUNT, 76],
+  ];
+
+  it('slices the sheets on the grid the SWF frame counts fill', () => {
+    const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
+    for (const [key, file, count, swfFrames] of sheets) {
+      assert.equal(count, swfFrames);
+      const def = new RegExp(`${key}: \\{\\s*url: '${file}',\\s*fw: (\\d+), fh: (\\d+), cols: (\\d+), rows: (\\d+), frameCount: (\\w+)`).exec(game);
+      assert.ok(def, `${key} descriptor`);
+      const [fw, fh, cols, rows] = def.slice(1, 5).map(Number);
+      assert.deepEqual([fw, fh, cols], [147, 214, 6]);
+      const { w, h } = pngSize(file);
+      assert.equal(w, fw * cols);
+      assert.equal(h, fh * rows);
+      assert.equal(Math.ceil(count / cols), rows);
+    }
+    assert.equal(PHANTOM_APPEAR_ANIMATION_SPEED, 0.5);
+  });
+
+  it('has sharp 3x sheets rebuilt from the SWF', () => {
+    const results = JSON.parse(fs.readFileSync(path.join(root, 'tools/vector-sprites/results.json'), 'utf8'));
+    for (const [, file, count] of sheets) {
+      const r = results[file];
+      assert.equal(r.status, 'ok', file);
+      assert.equal(r.cells, count);
+      assert.equal(r.swfLabelFrames, count);
+      assert.ok(r.score >= 0.9, `${file} score ${r.score}`);
+      for (const f of r.parts ? r.parts.map((p) => p.hires) : [r.hires]) {
+        assert.ok(fs.existsSync(path.join(root, 'public', f)), f);
+      }
+    }
   });
 });
 

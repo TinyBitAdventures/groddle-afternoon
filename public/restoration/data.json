@@ -1410,9 +1410,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 268,
+  "commits": 270,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Tower floors marked L, 1, 2 on the elevator, and new floors take you up to the Workbench"
+   },
    {
     "date": "2026-10-23",
     "kind": "fix",
@@ -1527,11 +1532,6 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "The other Glitches you meet are vector Glitches with their own looks and idles"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Jumping into the Great Hole to Ix takes you to Groddle Ladder"
    }
   ]
  },
