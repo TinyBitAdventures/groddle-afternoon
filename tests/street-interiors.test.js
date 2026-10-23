@@ -156,11 +156,11 @@ describe('spawners', () => {
     }
   });
 
-  it('a spawner on a living street still guesses one roaming animal', () => {
+  it('a spawner on a living street guesses no animal (G44b)', () => {
     const pop = populationForStreet('GX', { counts: { trant_bean: 2 }, spawners: 1 });
-    assert.equal(pop.piggies + pop.chickens + pop.butterflies, 1);
+    assert.equal(pop.piggies + pop.chickens + pop.butterflies, 0);
     const shrine = populationForStreet('GX', { counts: {}, giantId: 'cosma', spawners: 1 });
-    assert.equal(shrine.piggies + shrine.chickens + shrine.butterflies, 1);
+    assert.equal(shrine.piggies + shrine.chickens + shrine.butterflies, 0);
   });
 
   it('Autumn Lodge is indoors: its two spawners (the Fried Eggs) add nothing; seven archived quoins', () => {

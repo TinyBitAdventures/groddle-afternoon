@@ -90,8 +90,8 @@ describe('Jethimadh Tower Base is an interior hub', () => {
     assert.deepEqual([pop.piggies, pop.chickens, pop.butterflies, pop.rockClasses, pop.quoins], [2, 0, 0, ['rock_metal_1'], 2]);
   });
 
-  it('outdoor streets are unchanged: spawners still infer animals, eight quoins, four apples', () => {
-    const pop = populationForStreet('GIF15OTSM102353', { counts: { trant_fruit: 1 }, spawners: 1 });
+  it('outdoor streets are unchanged: eight quoins, four apples (spawners infer no animals, G44b)', () => {
+    const pop = populationForStreet('GIF15OTSM102353', { counts: { trant_fruit: 1, npc_piggy: 1 }, spawners: 1 });
     assert.equal(pop.interior, undefined);
     assert.equal(pop.piggies + pop.chickens + pop.butterflies, 1);
     assert.deepEqual([pop.apples, pop.musicblocks, pop.quoins], [4, 1, 8]);

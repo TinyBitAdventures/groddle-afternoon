@@ -37,7 +37,7 @@ describe('Tiny Speck street ecology catalog', () => {
     assert.match(catalog.sourceSnapshot, /2012-12/i);
     assert.ok(catalog.streetCount >= 1000, String(catalog.streetCount));
     assert.equal(catalog.streetCount, Object.keys(catalog.streets).length);
-    assert.equal(STREET_ECOLOGY_URL, 'assets/content/street-ecology.json?v=official-ecology-5');
+    assert.equal(STREET_ECOLOGY_URL, 'assets/content/street-ecology.json?v=official-ecology-6');
   });
 
   it('recovers Hechey Track exact static animals, trants, vendor, shrine, and spawner', () => {
@@ -49,6 +49,17 @@ describe('Tiny Speck street ecology catalog', () => {
     assert.equal(row.counts.street_spirit, 1);
     assert.equal(row.giantId, 'mab');
     assert.equal(row.spawners, 1);
+  });
+
+  it('adds no animals for archived spawners (G44b)', () => {
+    const pop = populationForStreet('GTESTSPAWNER01', {
+      sourceTsid: 'LTESTSPAWNER01',
+      counts: { trant_fruit: 2, npc_piggy: 1 },
+      spawners: 4,
+    });
+    assert.equal(pop.piggies, 1);
+    assert.equal(pop.chickens, 0);
+    assert.equal(pop.butterflies, 0);
   });
 
   it('recovers Groddle Forest Junction as a different source-derived ecology', () => {

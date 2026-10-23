@@ -3,7 +3,7 @@
  * placement on recovered locations-xml platforms.
  */
 
-export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-5';
+export const STREET_ECOLOGY_URL = 'assets/content/street-ecology.json?v=official-ecology-6';
 
 /**
  * Interior hubs: every street in them is indoors, and their archived item
@@ -208,9 +208,10 @@ function expandClasses(counts, classes, totalCap) {
 
 /**
  * Convert an archived item-reference row into bounded playable counts.
- * Static items stay exact (within rendering caps). Generic archived spawners
- * deterministically supply roaming animals because their species configuration
- * was not preserved in the location object itself.
+ * Static items stay exact (within rendering caps). Archived spawners add no
+ * animals: a spawner refills whenever a player enters, so its snapshot already
+ * holds what it spawns, and 409 of the 449 archived streets with spawners show
+ * no animal at all (register G44b).
  */
 export function populationForStreet(tsid, entry, { starter = false } = {}) {
   if (entry?.empty === true) {
@@ -265,24 +266,9 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     };
   }
   const seed = stableEcologyHash(tsid);
-  const spawners = whole(entry?.spawners, 0, 8);
   let piggies = Math.min(whole(counts.npc_piggy), 6);
   let chickens = Math.min(whole(counts.npc_chicken), 3);
   let butterflies = Math.min(whole(counts.npc_butterfly), 3);
-
-  // A spawner refills its class whenever a player enters (items/spawner.js
-  // onPlayerEnter -> onSpawnTimer), so the archived snapshot holds what it
-  // spawns. On a street whose snapshot has no animal, tree, rock, garden,
-  // resource or shrine at all (Abbasid Jail and Walkway, Volcano Villa), the
-  // spawner is not an animal spawner and guesses nothing. Living streets keep
-  // the roaming-animal guess.
-  const living = Object.keys(counts).length > 0 || !!entry?.giantId;
-  for (let i = 0; living && i < spawners; i += 1) {
-    const species = stableEcologyHash(`${tsid}:spawner:${i}`) % 3;
-    if (species === 0) piggies = Math.min(6, piggies + 1);
-    else if (species === 1) chickens = Math.min(3, chickens + 1);
-    else butterflies = Math.min(3, butterflies + 1);
-  }
 
   let treeClasses = expandClasses(counts, TREE_CLASSES, 8);
   let rockClasses = expandClasses(counts, ROCK_CLASSES, 10);

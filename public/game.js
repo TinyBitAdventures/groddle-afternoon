@@ -737,7 +737,7 @@ import {
   populationForStreet,
   planStreetPlacements,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=official-ecology-5';
+} from './js/street-ecology.js?v=official-ecology-6';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js';
 import {
   actionLoopFor,

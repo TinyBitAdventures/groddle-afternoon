@@ -1409,9 +1409,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 262,
+  "commits": 263,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "The seven races follow their recordings: Lava Leap's nine landings, Crystal Climb's tall map, Star Sprint's planet trap"
+   },
    {
     "date": "2026-10-22",
     "kind": "new",
@@ -1526,11 +1531,6 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "Sharp 3x quoins, hand-traced from the 1x sheet"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "The Forest Community Machine Room building is whole again"
    }
   ]
  },
