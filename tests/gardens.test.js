@@ -36,6 +36,10 @@ import {
   suggestedPlotAction,
   GARDEN_WATER_MS,
   gardenActionProfile,
+  GARDEN_TALKBACKS,
+  GARDEN_TALKBACK_MS,
+  gardenTalkbackKey,
+  gardenTalkback,
 } from '../public/js/garden.js';
 import {
   createInventory,
@@ -376,5 +380,93 @@ describe('UI wiring for garden', () => {
     assert.equal(r.ok, true, r.msgs?.join(' '));
     assert.equal(countItem(inv, 'seed_carrot'), 2);
     assert.ok(pc.currants < 100);
+  });
+});
+
+describe('garden talkbacks (garden_new.js responses, include/garden.js talkback_key)', () => {
+  it('carries all 31 source pools verbatim', () => {
+    assert.equal(Object.keys(GARDEN_TALKBACKS).length, 31);
+    assert.ok(GARDEN_TALKBACKS.herb_plant.includes('Hot seed action.'));
+    assert.ok(GARDEN_TALKBACKS.herb_plant.includes('I like it seedy.'));
+    assert.ok(GARDEN_TALKBACKS.herb_clear.includes('I feel like a new plot!'));
+    assert.ok(GARDEN_TALKBACKS.herb_harvest_3x.includes('High time for heavy herbal bonus? HELL YEAH.'));
+    assert.equal(GARDEN_TALKBACKS.crop_water.length, 10);
+    assert.equal(GARDEN_TALKBACK_MS, 3500);
+  });
+
+  it('keys follow the source rules', () => {
+    const herb = { learned: ['herbalism_1'] };
+    assert.equal(gardenTalkbackKey('herb', 'plant', herb), 'herb_plant');
+    assert.equal(gardenTalkbackKey('herb', 'water', herb), 'herb_water');
+    assert.equal(gardenTalkbackKey('herb', 'clear', {}), 'herb_clear');
+    assert.equal(gardenTalkbackKey('herb', 'harvest', {}), 'herb_harvest');
+    // Without Herbalism I / Croppery I, water and plant are silent; hoeing and picking still talk.
+    assert.equal(gardenTalkbackKey('herb', 'plant', {}), null);
+    assert.equal(gardenTalkbackKey('default', 'water', {}), null);
+    assert.equal(gardenTalkbackKey('default', 'clear', {}), 'crop_clear');
+    // Fertilizing nulls talkback_key.
+    assert.equal(gardenTalkbackKey('herb', 'fertilize', herb), null);
+    // Harvest suffix comes from upgrades / Croppery III, not the roll.
+    assert.equal(gardenTalkbackKey('herb', 'harvest', { upgrades: ['herbalism_super_harvest_2'] }), 'herb_harvest_3x');
+    assert.equal(gardenTalkbackKey('herb', 'harvest', { upgrades: ['herbalism_super_harvest_1'] }), 'herb_harvest_2x');
+    assert.equal(gardenTalkbackKey('default', 'harvest', { upgrades: ['croppery_super_harvest_2'] }), 'crop_harvest_4x');
+    assert.equal(gardenTalkbackKey('default', 'harvest', { upgrades: ['croppery_super_harvest_1'] }), 'crop_harvest_3x');
+    assert.equal(gardenTalkbackKey('default', 'harvest', { learned: ['croppery_1', 'croppery_3'] }), 'crop_harvest_2x');
+    assert.equal(gardenTalkbackKey('default', 'harvest', { gotDrop: true }), 'crop_harvest_drop');
+    assert.equal(gardenTalkbackKey('default', 'plant', { learned: ['croppery_1'], gotDrop: true }), 'crop_plant_drop_small');
+    assert.equal(gardenTalkbackKey('herb', 'water', { learned: ['herbalism_1'], gotDrop: true }), 'herb_water_drop');
+    assert.equal(gardenTalkbackKey('default', 'water', { learned: ['croppery_1'], failed: true }), 'crop_water_na_failed');
+    assert.equal(gardenTalkbackKey('herb', 'clear', { failed: true }), null);
+  });
+
+  it('picks one line at random and keeps iMG, mood and energy slugs', () => {
+    const t = gardenTalkback('herb_plant', { rng: () => 0.25, slugs: { energy: 2, mood: 3, xp: 0 } });
+    assert.equal(t.text, GARDEN_TALKBACKS.herb_plant[2]);
+    assert.deepEqual(t.slugs, { mood: 3, energy: 2 });
+    assert.equal(t.durationMs, 3500);
+    assert.equal(gardenTalkback(null), null);
+  });
+
+  it('every plot action answers with a bubble and its deltas', () => {
+    ensureGardenItems();
+    const t0 = 2_000_000;
+    const garden = createGarden({ cols: 1, rows: 1, now: t0, gardenType: 'herb' });
+    const key = plotKey(1, 1);
+    const inv = createInventory({ herb_seed_rookswort: 2, hoe: 1, watering_can: 1, butterfly_lotion: 0 });
+    const pc = { energy: 500, mood: 10, imagination: 0, xp: 0, moodMax: 100 };
+    const opts = { now: t0, inv, learned: ['herbalism_1'], upgrades: ['herbalism_super_harvest_2'], talkRng: () => 0 };
+    const plant = plantPlot(garden, key, inv, pc, 'herb_seed_rookswort', opts);
+    assert.equal(plant.ok, true, plant.msgs?.join(' '));
+    assert.equal(plant.speech.key, 'herb_plant');
+    assert.equal(plant.speech.text, 'Wahey!');
+    assert.ok(plant.speech.slugs.energy > 0);
+    const water = waterPlot(garden, key, pc, { ...opts, maxLuck: true });
+    assert.equal(water.speech.key, 'herb_water');
+    assert.equal(water.speech.text, 'Mmm... electrolytes.');
+    const plot = getPlot(garden, key);
+    plot.state = 'crop';
+    const pick = harvestPlot(garden, key, inv, pc, { ...opts, maxLuck: true });
+    assert.equal(pick.ok, true, pick.msgs?.join(' '));
+    assert.equal(pick.speech.key, 'herb_harvest_3x');
+    assert.equal(pick.speech.text, 'DAYAM!');
+    assert.ok(pick.speech.slugs.energy > 0);
+    const clear = clearPlot(garden, key, pc, opts);
+    assert.equal(clear.ok, true, clear.msgs?.join(' '));
+    assert.equal(clear.speech.key, 'herb_clear');
+    assert.equal(clear.speech.text, 'Smooth.');
+  });
+
+  it('a missed pick talks with the na_failed line and no slugs', () => {
+    const garden = createGarden({ cols: 1, rows: 1, gardenType: 'herb' });
+    const key = plotKey(1, 1);
+    const plot = getPlot(garden, key);
+    plot.state = 'crop';
+    plot.seed = 'herb_seed_rookswort';
+    const pc = { energy: 500, mood: 10 };
+    const r = harvestPlot(garden, key, createInventory({}), pc, { learned: [], rng: () => 0.999 });
+    assert.equal(r.ok, false);
+    assert.equal(r.speech.failed, true);
+    assert.ok(GARDEN_TALKBACKS.herb_harvest_na_failed.includes(r.speech.text));
+    assert.equal(r.speech.slugs, null);
   });
 });

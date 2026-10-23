@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-25';
 import {
@@ -499,7 +499,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=catalog-unified-2';
+} from './js/garden.js?v=catalog-unified-3';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -4356,8 +4356,10 @@ function showSpeechBubble(target, speech) {
     fontWeight: '700',
     letterSpacing: 0.4,
   } });
-  const width = clamp(Math.max(body.width, speaker.width) + 24, 156, 280);
-  const height = Math.ceil(12 + speaker.height + 4 + body.height + 12);
+  // Stat slugs under the line (garden talkbacks: iMG, mood, energy pills, as sendBubble showed them).
+  const slugRow = speechSlugRow(speech.slugs);
+  const width = clamp(Math.max(body.width, speaker.width, slugRow?.width || 0) + 24, 156, 280);
+  const height = Math.ceil(12 + speaker.height + 4 + body.height + (slugRow ? 6 + slugRow.height : 0) + 12);
   const bg = new PIXI.Graphics();
   bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
   // Tail: fill over the bubble's bottom border so the two read as one shape,
@@ -4371,6 +4373,11 @@ function showSpeechBubble(target, speech) {
 
   const bubble = new PIXI.Container();
   bubble.addChild(bg, speaker, body);
+  if (slugRow) {
+    slugRow.x = 12;
+    slugRow.y = body.y + body.height + 6;
+    bubble.addChild(slugRow);
+  }
   bubble.pivot.set(width / 2, height + 11);
   bubble.alpha = 0;
   bubble.zIndex = 99999;
@@ -4388,9 +4395,38 @@ function showSpeechBubble(target, speech) {
   if (app?.canvas) {
     app.canvas.dataset.speechSpeaker = String(speech.speaker || target.label || '');
     app.canvas.dataset.lastSpeech = text;
+    app.canvas.dataset.lastSpeechSlugs = speech.slugs ? Object.entries(speech.slugs).map(([k, v]) => `${k}=${v}`).join(',') : '';
     app.canvas.dataset.speechBubbles = String(speechBubbles.length);
   }
   return bubble;
+}
+
+/** { xp, mood, energy } -> "+7 iMG" "+4 mood" "-3 energy" pills (energy is spent, so negative). */
+function speechSlugRow(slugs) {
+  if (!slugs) return null;
+  const pills = [
+    ['xp', '+', 'iMG', 0xe9e1f7, 0x6a4c9c],
+    ['mood', '+', 'mood', 0xe2f1d6, 0x4c7a2c],
+    ['energy', '-', 'energy', 0xf8dcd8, 0xa2382c],
+  ].filter(([k]) => Number(slugs[k]) > 0);
+  if (!pills.length) return null;
+  const row = new PIXI.Container();
+  let x = 0;
+  for (const [k, sign, unit, bgColor, fg] of pills) {
+    const t = new PIXI.Text({ text: `${sign}${Math.round(slugs[k])} ${unit}`, style: {
+      fontFamily: 'Trebuchet MS, sans-serif', fontSize: 12, fontWeight: '700', fill: fg,
+    } });
+    const pill = new PIXI.Graphics();
+    pill.roundRect(0, 0, t.width + 14, t.height + 4, (t.height + 4) / 2).fill({ color: bgColor });
+    t.x = 7;
+    t.y = 2;
+    const c = new PIXI.Container();
+    c.addChild(pill, t);
+    c.x = x;
+    row.addChild(c);
+    x += t.width + 14 + 6;
+  }
+  return row;
 }
 
 function updateSpeechBubbles(dt) {
@@ -5222,7 +5258,7 @@ function executeVerb(target, verbId) {
     app.canvas.dataset.feedPickerResult = result.ok ? 'success' : 'failed';
   }
   let reactionText = null;
-  if (result.ok && result.speech?.text) {
+  if ((result.ok || result.speech?.failed) && result.speech?.text) {
     showSpeechBubble(target, result.speech);
   } else if (result.ok && SPEECH_REACTION_VERBS.has(baseVerb)) {
     reactionText = result.msgs?.[1] || result.msgs?.[0] || null;
@@ -23305,6 +23341,10 @@ async function main() {
       }
       applyMute();
     } }));
+  }
+  // Garden talkback QA (js/garden-talk-qa.js): ?gardentalkdemo=herb|crop.
+  if (new URLSearchParams(location.search).has('gardentalkdemo')) {
+    import('./js/garden-talk-qa.js').then((m) => m.runGardenTalkDemo({ engine, executeVerb, params: new URLSearchParams(location.search) }));
   }
   installMoreMenu();
   installPlayerMenu();

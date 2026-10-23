@@ -345,19 +345,323 @@ export const GARDEN_SKILL_PACKAGES = Object.freeze({
   }),
 });
 
-/** garden_new.js `*_harvest_na_failed` talkbacks (75% no-skill success roll). */
-export const GARDEN_HARVEST_FAILED_LINES = Object.freeze({
-  default: Object.freeze([
+/**
+ * garden_new.js `responses` (406-633): every plot talkback pool, verbatim.
+ * item.js chooseResponse picks one line at random (choose_one); sendResponse
+ * shows it in a 3,500 ms bubble over the plot with the action's slugs.
+ */
+export const GARDEN_TALKBACKS = Object.freeze({
+  broken_hoe: Object.freeze([
+    "That's one broken down hoe.",
+    "Woah! You've cracked your hoe.",
+    "Hoe no.",
+  ]),
+  broken_watering_can: Object.freeze([
+    "I think you've cracked your can.",
+    "Hey, your spout is futzed.",
+    "Watering can? Watering can't, more like.",
+  ]),
+  crop_clear: Object.freeze([
+    "Yeeaaah...",
+    "Always feels better when a friend does it.",
+    "Good scritchings.",
+    "Mmmm. Scratchy.",
+    "All clean!",
+    "Better.",
+    "Nice. And clean.",
+    "Feels nicererer.",
+  ]),
+  crop_clear_drop_large: Object.freeze([
+    "It's dangerous to go alone! Take this.",
+    "Hey, look what I found in my soil.",
+    "Hoe-ly gift unearthing, Glitchling!",
+    "Because you unurthed it.",
+  ]),
+  crop_clear_drop_small: Object.freeze([
+    "Hoe hoe hoe! You hoed up a thing!",
+    "You look like you could use this. What is it?",
+    "Ta dah! It is a THING! For YOU!",
+    "Little thing for you. For thanks.",
+  ]),
+  crop_fertilize: Object.freeze([
+    "Nutrientized!",
+    "Woo! Batstuff!",
+    "Smelly.",
+    "NNNNNGGGG! I am growing Very Hard!",
+    "Look at me! I'm GROWING!",
+    "Wheeeeee!",
+  ]),
+  crop_harvest: Object.freeze([
+    "Here! Fruits... no, um, cropses of your labour.",
+    "Those'll make your hair curly.",
+    "I made these! Just for you.",
+    "I made you eaty stuff.",
+    "Look! Foodstuffs!",
+    "Happy Cropday!",
+    "Look, seeds turned all into these!",
+    "These will put hair on your chest. Maybe. Maybe just upper arms.",
+    "Oh croppy day!",
+    "Noms.",
+  ]),
+  crop_harvest_2x: Object.freeze([
+    "A little extra…",
+    "You got lucky!",
+    "Oooh, big cropsies!",
+    "Dedicated crop-planters deserve happy croppy rewards.",
+  ]),
+  crop_harvest_3x: Object.freeze([
+    "I didn't think I had it in me!",
+    "Bumper cropsies!",
+    "Maxi-sized croppables!",
+    "Croppabanzai!",
+  ]),
+  crop_harvest_4x: Object.freeze([
+    "You gonna eat all those?",
+    "Super-ooper-doooper cropsies!",
+    "Supersized croppsicle joy!",
+    "Croppabonanza!",
+  ]),
+  crop_harvest_drop: Object.freeze([
+    "You'll never get me lucky charms.",
+    "Mmmm, tasty rainbows!",
+    "Pyew!  Rainbow!  Pyew pyew!",
+  ]),
+  crop_harvest_na_failed: Object.freeze([
     "No. I like these. You can't have them.",
-    'Say please.',
+    "Say please.",
     "You mis-picked. You picked nothin'. Try harder, picky-picker.",
   ]),
-  herb: Object.freeze([
-    'Nooooo. My precious! Cannot take my precious herbs. Mineses.',
-    'Hoe no. Hoe no no no.',
-    'The roots run deep on this one.',
+  crop_plant: Object.freeze([
+    "Consider me seeded.",
+    "Good planting!",
+    "That tickles!",
+    "I am super-seedy!",
+    "Yay!",
+    "Nom nom nom nom nom.",
+    "Mmm. Seedy.",
+    "Ohhhhh. I will GROW this!",
+    "Hee! Tickly in my seed-tumkin!",
+    "Ah. Planting the seeds of tomorrow, today.",
+  ]),
+  crop_plant_drop_large: Object.freeze([
+    "I don't have room for this too. You take this.",
+    "Hey, look what I found in my soil! Crazy!",
+    "Seeds need room to grow. This too big. You take.",
+    "You have this.",
+  ]),
+  crop_plant_drop_small: Object.freeze([
+    "I don't want this anymore. You have!",
+    "You look like Glitchling that could make use of this.",
+    "I found a thing!",
+    "Oooh, goodies. For you!",
+  ]),
+  crop_water: Object.freeze([
+    "Wet!",
+    "I'm Wet!",
+    "You wet me.",
+    "Oh I'm all wet.",
+    "Splosh.",
+    "Wetted.",
+    "Oh!",
+    "I am wet!",
+    "Ooh! Wet!",
+    "Jeepers, that's moist.",
+  ]),
+  crop_water_drop_large: Object.freeze([
+    "Oooh, have that special card, do you? Here, have this too.",
+    "Pizzazzy watering! I give you treat.",
+    "This washed to surface. Want it?",
+    "Water dislodged thing. Don't want it.",
+  ]),
+  crop_water_drop_small: Object.freeze([
+    "Good things come to those who water.",
+    "For your trouble, little cloud.",
+    "Look! I found you this!",
+    "Found thing for you! It is a bit damp.",
+  ]),
+  crop_water_na_failed: Object.freeze([
+    "Oh. Water everywhere. Everywhere but on me. Try again.",
+    "You missed.",
+    "Aim better! I am not wet!",
+  ]),
+  herb_clear: Object.freeze([
+    "Smooth.",
+    "Fresh.",
+    "I feel like a new plot!",
+    "Plant me up!",
+    "I'm ready.",
+    "Left a bit? Ahhh.",
+    "Nice work, hoe-meister.",
+    "Ahhh, all hoed up.",
+  ]),
+  herb_clear_drop: Object.freeze([
+    "Take this for your trouble. And get shucking.",
+    "You de-soiled this with your red hot hoeing!",
+    "*COUGH*. Woah! You dislodged this!",
+    "What the…?!? Oh, just take it.",
+  ]),
+  herb_fertilize: Object.freeze([
+    "Mmm, smells like nutrients.",
+    "Heady. Strong. POWER FILLED.",
+    "Stand back, I'm growing.",
+    "AlakaZAM.",
+    "I feel… mighty.",
+    "Guano? Oooh, I'm getting angry. You'll like me when I'm angry.",
+  ]),
+  herb_harvest: Object.freeze([
+    "Herbs!",
+    "Erbs!",
+    "Bitter to the tongue, sweet to the mind.",
+    "Be wise.",
+    "Be happy.",
+    "Just say yes.",
+    "Here's your herbs.",
+    "'Ere's your 'erbs.",
+    "That *ahem* stuff you wanted.",
+    "It's herb o'clock. Woo.",
+  ]),
+  herb_harvest_2x: Object.freeze([
+    "Herbal bonus.",
+    "More! More herbs!",
+    "POW! Herb it up!",
+    "Herb THIS.",
+  ]),
+  herb_harvest_3x: Object.freeze([
+    "DAYAM!",
+    "Are you ready? It's the Motherlode of herbs. The motherbalode!",
+    "Herbs! All the herbs!",
+    "High time for heavy herbal bonus? HELL YEAH.",
+  ]),
+  herb_harvest_na_failed: Object.freeze([
+    "Nooooo. My precious! Cannot take my precious herbs. Mineses.",
+    "Hoe no. Hoe no no no.",
+    "The roots run deep on this one.",
+  ]),
+  herb_plant: Object.freeze([
+    "Wahey!",
+    "Wow. Planty.",
+    "Hot seed action.",
+    "Ahhh.",
+    "*Gulp*",
+    "Yowzers.",
+    "Seedy.",
+    "I like it seedy.",
+    "Munch munch munch.",
+    "That's one big seed.",
+  ]),
+  herb_plant_drop: Object.freeze([
+    "Hey, look what I found in my soil.",
+    "Yowza! How'd THAT get there?",
+    "Take this. Might want to wipe it off first.",
+    "Shhh. Take this. Say nothing.",
+  ]),
+  herb_water: Object.freeze([
+    "Mmm... electrolytes.",
+    "Niiiiiiice.",
+    "Ahh.",
+    "Cool.",
+    "Good. Mmmm.",
+    "Spoosh.",
+    "Ahhhhhh.",
+    "I like it wet.",
+    "Blublublub.",
+    "Right on.",
+  ]),
+  herb_water_drop: Object.freeze([
+    "This bubbled up. Have it.",
+    "*Burrrrrrp*",
+    "*Cough* Oh! Will you look at that?",
+    "I don't want to get this wet. Take it.",
+  ]),
+  herb_water_na_failed: Object.freeze([
+    "Dry as a bone.",
+    "Dry, friend. Try again.",
+    "Somehow, you missed. I'm as mystified as you.",
   ]),
 });
+
+/** garden_new.js `*_harvest_na_failed` talkbacks (75% no-skill success roll). */
+export const GARDEN_HARVEST_FAILED_LINES = Object.freeze({
+  default: GARDEN_TALKBACKS.crop_harvest_na_failed,
+  herb: GARDEN_TALKBACKS.herb_harvest_na_failed,
+});
+
+/** item.js sendResponse: sendBubble(choice, 3500, pc, slugs). */
+export const GARDEN_TALKBACK_MS = 3500;
+
+/**
+ * include/garden.js talkback_key for a finished (or failed) plot action.
+ * The prefix is crop_/herb_ only with Croppery I / Herbalism I for water and
+ * plant; hoeing (args.action 'hoe', never 'clear') and picking always talk.
+ * Fertilizing sets talkback_key = null, so it never talks. The harvest suffix
+ * follows the player's upgrades and Croppery III, not the roll itself.
+ * @param {'default'|'herb'|string} gardenType
+ * @param {'plant'|'water'|'harvest'|'clear'|'fertilize'} action
+ * @param {{ learned?: string[], upgrades?: string[], gotDrop?: boolean, failed?: boolean }} [opts]
+ * @returns {string|null}
+ */
+export function gardenTalkbackKey(gardenType, action, opts = {}) {
+  const herb = gardenType === 'herb';
+  const learned = Array.isArray(opts.learned) ? opts.learned : [];
+  const upgrades = Array.isArray(opts.upgrades) ? opts.upgrades : [];
+  const has = (id) => upgrades.includes(id);
+  if (action === 'fertilize') return null;
+  const skilled = learned.includes(herb ? 'herbalism_1' : 'croppery_1');
+  if (!skilled && (action === 'water' || action === 'plant')) return null;
+  let key = `${herb ? 'herb' : 'crop'}_${action}`;
+  if (opts.failed) return action === 'water' || action === 'harvest' ? `${key}_na_failed` : null;
+  if (action === 'water' || action === 'clear') {
+    if (opts.gotDrop) {
+      if (herb) key += '_drop';
+      else if (has('croppery_growing_drop_1')) key += '_drop_small';
+      else if (has('croppery_growing_drop_2')) key += '_drop_large';
+    }
+  } else if (action === 'plant') {
+    if (opts.gotDrop) key += herb ? '_drop' : '_drop_small';
+  } else if (action === 'harvest') {
+    if (opts.gotDrop && !herb) key += '_drop';
+    else if (herb) {
+      if (has('herbalism_super_harvest_2')) key += '_3x';
+      else if (has('herbalism_super_harvest_1')) key += '_2x';
+    } else if (has('croppery_super_harvest_2')) key += '_4x';
+    else if (has('croppery_super_harvest_1')) key += '_3x';
+    else if (learned.includes('croppery_3')) key += '_2x';
+  }
+  return GARDEN_TALKBACKS[key] ? key : null;
+}
+
+/**
+ * The plot's speech for one action: a random line from the pool plus the
+ * skill package slugs (energy spent, mood and iMG gained). Failures carry no
+ * slugs (runSkillPackage returns before costs on a success-rate miss).
+ * @returns {{ key: string, text: string, durationMs: number, slugs: { xp?: number, mood?: number, energy?: number }|null, failed?: boolean }|null}
+ */
+export function gardenTalkback(key, { rng, slugs = null, failed = false } = {}) {
+  const pool = key ? GARDEN_TALKBACKS[key] : null;
+  if (!pool?.length) return null;
+  const text = pool[Math.floor((rng || Math.random)() * pool.length) % pool.length];
+  let clean = null;
+  if (slugs) {
+    clean = {};
+    for (const k of ['xp', 'mood', 'energy']) {
+      const n = Math.round(Math.abs(Number(slugs[k]) || 0));
+      if (n) clean[k] = n;
+    }
+    if (!Object.keys(clean).length) clean = null;
+  }
+  return { key, text, durationMs: GARDEN_TALKBACK_MS, slugs: clean, ...(failed ? { failed: true } : {}) };
+}
+
+function actionTalkback(garden, action, opts, slugs, extra = {}) {
+  const key = gardenTalkbackKey(garden?.gardenType, action, {
+    learned: opts.learned,
+    upgrades: opts.upgrades,
+    ...extra,
+  });
+  const talk = gardenTalkback(key, { rng: opts.talkRng, slugs, failed: !!extra.failed });
+  if (talk) talk.speaker = garden?.gardenType === 'herb' ? 'Herb Garden plot' : 'Crop Garden plot';
+  return talk;
+}
 
 /** include/garden.js water failure: package energy plus a flat 3 mood. */
 export const GARDEN_WATER_FAIL_MOOD = 3;
@@ -437,13 +741,21 @@ function rollSucceeds(profile, opts) {
   return (opts.rng || Math.random)() < rate / 100;
 }
 
+/** Applies the package's mood and iMG; returns what was actually added (the slugs). */
 function applyGardenRewards(pc, profile) {
-  if (profile.legacy) return;
-  if (profile.mood && pc.mood != null) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + profile.mood);
+  const got = { mood: 0, xp: 0 };
+  if (profile.legacy) return got;
+  if (profile.mood && pc.mood != null) {
+    const before = pc.mood || 0;
+    pc.mood = Math.min(moodMax(pc), before + profile.mood);
+    got.mood = Math.max(0, pc.mood - before);
+  }
   if (profile.xp) {
     if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + profile.xp;
     if (pc.xp != null) pc.xp = (pc.xp || 0) + profile.xp;
+    got.xp = profile.xp;
   }
+  return got;
 }
 
 /**
@@ -788,7 +1100,7 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
     pc.energy = (pc.energy || 0) + cost;
     return { ok: false, reason: 'seed', msgs: ['Not enough seeds.'] };
   }
-  applyGardenRewards(pc, profile);
+  const got = applyGardenRewards(pc, profile);
   const now = opts.now ?? Date.now();
   plot.state = 'seeds';
   plot.seed = seed.seedId;
@@ -808,6 +1120,7 @@ export function plantPlot(garden, key, inv, pc, seedId, opts = {}) {
     cropId: seed.cropId,
     profile,
     msgs: [`You planted ${seed.label} in plot ${key}.`],
+    speech: actionTalkback(garden, 'plant', opts, { energy: cost, ...got }),
     effects: profile.legacy
       ? { energy: -cost }
       : { energy: -cost, mood: profile.mood, xp: profile.xp },
@@ -837,6 +1150,7 @@ export function waterPlot(garden, key, pc, opts = {}) {
       ok: false,
       reason: 'tool',
       msgs: ['You need a Watering Can to water plots.'],
+      speech: gardenTalkback('broken_watering_can', { rng: opts.talkRng, failed: true }),
     };
   }
   const toolId = opts.inv
@@ -850,7 +1164,8 @@ export function waterPlot(garden, key, pc, opts = {}) {
   if (requireTool && toolId && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, toolId, profile.toolWear);
     if (!toolCheck.ok) {
-      return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck };
+      const speech = gardenTalkback(toolId === 'hoe' || toolId === 'hoe_highclass' ? 'broken_hoe' : 'broken_watering_can', { rng: opts.talkRng, failed: true });
+      return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck, speech };
     }
   }
   const cost = profile.energy;
@@ -866,10 +1181,11 @@ export function waterPlot(garden, key, pc, opts = {}) {
       plotKey: key,
       profile,
       msgs: [`${GARDEN_WATER_FAILED_LINE} (−${cost} energy, −${moodLost} mood)`],
+      speech: actionTalkback(garden, 'water', opts, null, { failed: true }),
       effects: { energy: -cost, mood: -moodLost },
     };
   }
-  applyGardenRewards(pc, profile);
+  const got = applyGardenRewards(pc, profile);
   const now = opts.now ?? Date.now();
   wetPlot(plot, now);
   const toolUse = requireTool && toolId && opts.toolState
@@ -881,6 +1197,7 @@ export function waterPlot(garden, key, pc, opts = {}) {
     plotKey: key,
     profile,
     msgs: ['You watered a plot.', ...(toolUse?.broke ? [toolUse.msg] : [])],
+    speech: actionTalkback(garden, 'water', opts, { energy: cost, ...got }),
     effects: profile.legacy
       ? { energy: -cost, mood: 1 }
       : { energy: -cost, mood: profile.mood, xp: profile.xp },
@@ -911,12 +1228,22 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   if (!rollSucceeds(profile, opts)) {
     // Source: a failed pick costs nothing and leaves the crop in the ground.
     const lines = GARDEN_HARVEST_FAILED_LINES[profile.gardenType];
+    const line = lines[Math.floor(rng() * lines.length) % lines.length];
     return {
       ok: false,
       reason: 'failed',
       plotKey: key,
       profile,
-      msgs: [lines[Math.floor(rng() * lines.length) % lines.length]],
+      msgs: [line],
+      // The pick always talks (talkback_key is set for 'pick' at every rank).
+      speech: {
+        key: `${profile.gardenType === 'herb' ? 'herb' : 'crop'}_harvest_na_failed`,
+        speaker: profile.gardenType === 'herb' ? 'Herb Garden plot' : 'Crop Garden plot',
+        text: line,
+        durationMs: GARDEN_TALKBACK_MS,
+        slugs: null,
+        failed: true,
+      },
     };
   }
   pc.energy = Math.max(0, (pc.energy || 0) - cost);
@@ -931,12 +1258,13 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
     bonus = n * (profile.bonusMultiplier - 1);
   }
   addItem(inv, seed.cropId, n + bonus);
+  let got = { mood: 2, xp: 2 };
   if (profile.legacy) {
     if (pc.mood != null) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + 2);
     if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + 2;
     if (pc.xp != null) pc.xp = (pc.xp || 0) + 2;
   } else {
-    applyGardenRewards(pc, profile);
+    got = applyGardenRewards(pc, profile);
   }
   const now = opts.now ?? Date.now();
   plot.state = 'dirty';
@@ -956,6 +1284,7 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
       `You harvested ${n}× ${seed.cropLabel}.`,
       ...(bonus ? [`Super Harvest! +${bonus}× ${seed.cropLabel}.`] : []),
     ],
+    speech: actionTalkback(garden, 'harvest', opts, { energy: cost, ...got }),
     effects: {
       energy: -cost,
       mood: profile.legacy ? 2 : profile.mood,
@@ -985,6 +1314,7 @@ export function clearPlot(garden, key, pc, opts = {}) {
       ok: false,
       reason: 'tool',
       msgs: ['You need a Hoe to clear dirty plots.'],
+      speech: gardenTalkback('broken_hoe', { rng: opts.talkRng, failed: true }),
     };
   }
   const toolId = opts.inv
@@ -998,13 +1328,14 @@ export function clearPlot(garden, key, pc, opts = {}) {
   if (requireTool && toolId && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, toolId, profile.toolWear);
     if (!toolCheck.ok) {
-      return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck };
+      const speech = gardenTalkback(toolId === 'hoe' || toolId === 'hoe_highclass' ? 'broken_hoe' : 'broken_watering_can', { rng: opts.talkRng, failed: true });
+      return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck, speech };
     }
   }
   const cost = profile.energy;
   const er = spendEnergy(pc, cost);
   if (!er.ok) return er;
-  applyGardenRewards(pc, profile);
+  const got = applyGardenRewards(pc, profile);
   const now = opts.now ?? Date.now();
   plot.state = 'clean';
   plot.seed = null;
@@ -1018,6 +1349,7 @@ export function clearPlot(garden, key, pc, opts = {}) {
     plotKey: key,
     profile,
     msgs: ['You cleared a plot. Ready to plant.', ...(toolUse?.broke ? [toolUse.msg] : [])],
+    speech: actionTalkback(garden, 'clear', opts, { energy: cost, ...got }),
     effects: profile.legacy
       ? { energy: -cost }
       : { energy: -cost, mood: profile.mood, xp: profile.xp },

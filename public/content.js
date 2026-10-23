@@ -27,7 +27,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=tool-condition-1';
+} from './js/garden.js?v=tool-condition-2';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -1469,7 +1469,7 @@ export function runVerb(target, verbId, ctx) {
     } else {
       return { ok: false, msgs: [`Cannot ${verbId} this plot.`], effects };
     }
-    if (!r.ok) return { ok: false, msgs: r.msgs || ['Cannot do that.'], effects };
+    if (!r.ok) return { ok: false, msgs: r.msgs || ['Cannot do that.'], effects, speech: r.speech || null };
     if (r.effects) {
       effects.energy += r.effects.energy || 0;
       effects.mood += r.effects.mood || 0;
@@ -1493,6 +1493,8 @@ export function runVerb(target, verbId, ctx) {
       anim: verbId,
       gardenChanged: true,
       gardenTarget: s.gardenEntity,
+      // garden_new.js talkback: the plot answers with a line and the slugs.
+      speech: r.speech || null,
     };
   }
 
