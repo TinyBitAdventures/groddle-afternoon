@@ -5,6 +5,10 @@
  *   item base cost × count → 20% iMG, 10% mood, 10% Giant favor.
  * Favor and donation iMG are capped per game day. Reaching a Giant's favor
  * target lets the player claim an emblem; each later emblem costs 100 more.
+ *
+ * Favor (and an emblem with nothing left to unlock) can be spent to speed up
+ * the skill being studied: players/inc_skills.js get_skill_info, shrines.js
+ * spend_points, emblem_base doSpend. See quoteFavorSpend / quoteEmblemSpend.
  */
 
 import { levelInfoForXp } from './progression.js?v=progression-1';
@@ -20,6 +24,9 @@ import {
   gameshowTicketChance,
 } from './spinning-wheel.js?v=spinning-wheel-1';
 import { moodMax } from './metabolics.js';
+import { getSkillCatalog } from './content-catalogs.js';
+import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js';
+import { emblemUnlockSkillFor } from './skill-tree.js';
 
 export const EMBLEM_FAVOR_COST = 1000;
 export const EMBLEM_FAVOR_INCREMENT = 100;
@@ -390,4 +397,236 @@ export function claimShrineEmblem(state, giantId, inv = {}, pc = null) {
   });
   inv[classTsid] = whole(inv[classTsid]) + 1;
   return { ok: true, giant, classTsid, cost, count: state.emblems[giantId], xp: pc ? xp : 0 };
+}
+
+/* ------------------------------------------------------------------ */
+/* Spending favor and emblems on skill study                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * get_skill_info (players/inc_skills.js:1852-1886): seconds of study bought
+ * per favor point by the Giant's place in the skill's `giants` list:
+ * primary 10, secondary 7, any other Giant 5.
+ */
+export const FAVOR_STUDY_SECONDS = Object.freeze({ p: 10, s: 7, u: 5 });
+/** emblem_base conditions/handler/doSpend: an emblem spends as 1,000 favor. */
+export const EMBLEM_SPEND_FAVOR = 1000;
+/** shrines.js:28/64, emblem_base:252/431: Crumb of Knowledge lengthens the speed-up. */
+export const YELLOW_CRUMB_BUFF = 'yellow_crumb_flower';
+export const YELLOW_CRUMB_MULTIPLIER = 1.05;
+/** shrines.js spend_points:55-60, the two Better Learning quest flags. */
+export const MAD_FAVOR_POINTS = 997;
+export const ENORMOUS_FAVOR_POINTS = 1511;
+export const FAVOR_SPENT_EVENTS = Object.freeze({
+  primaryLarge: 'favor_spent:primary_large', // quests: primary_giant_spend_mad_favor
+  huge: 'favor_spent:huge', // quests: spend_enormous_favor
+});
+
+/** Source copy (client ShrineDialog.as / EmblemSpendDialog.as, GSJS emblem_base). */
+export const FAVOR_SPEND_COPY = Object.freeze({
+  title: 'Learn Faster?',
+  confirm: 'Are you sure you want to spend those favor points?',
+  confirmYes: 'Yes, Spend!',
+  confirmNo: 'No, Cancel!',
+  spent: "You've done it! You spent that favor!",
+  cannot: "You can't spend points right now",
+  maxed: "You're already learning as fast as you can!",
+  notLearning: 'If you were learning a new skill, you could use your favor points to learn it faster.',
+  noFavor: 'No favor points?! Did you know that the giants will help you learn faster than normal if you donate to their shrines?',
+  checkFavorTooltip: 'View & spend favor points',
+  emblemMaxed: "Your learning is already accelerated to the max. More emblems won't help!",
+  emblemNotLearning: 'You are not learning a skill.',
+  emblemSillyGoose: 'Silly goose, you need to be learning a skill to be able to spend your emblem!',
+});
+
+/**
+ * The client's StringUtil.formatTime(sec) with its defaults, used for the
+ * speed-up figure in both spend dialogs: "5 mins", "2 hours 46 mins 40 secs".
+ */
+export function formatSpeedUpTime(seconds) {
+  const sec = Math.max(0, Math.trunc(Number(seconds) || 0));
+  let secTxt = `${sec % 60}${sec % 60 === 1 ? ' sec' : ' secs'}`;
+  const mins = Math.floor(sec / 60) % 60;
+  let minTxt = mins > 0 ? `${mins}${mins === 1 ? ' min' : ' mins'}` : '';
+  const hours = Math.floor(sec / 3600) % 24;
+  let hourTxt = hours > 0 ? `${hours}${hours === 1 ? ' hour' : ' hours'}` : '';
+  const days = Math.floor(sec / 86400);
+  let dayTxt = days > 0 ? `${days.toLocaleString('en-US')}${days === 1 ? ' day' : ' days'}` : '';
+  if (sec % 60 === 0) secTxt = '';
+  if (minTxt && secTxt) minTxt += ' ';
+  if (hourTxt && (minTxt || secTxt)) hourTxt += ' ';
+  if (dayTxt && (hourTxt || minTxt || secTxt)) dayTxt += ' ';
+  return dayTxt + hourTxt + minTxt + secTxt;
+}
+
+/** 'p' primary, 's' secondary, 'u' unassociated (get_skill_info giant_rel). */
+export function giantRelationFor(def, giantId) {
+  const row = def?.giants?.[giantId];
+  if (!row) return 'u';
+  return Math.trunc(Number(row.primary) || 0) ? 'p' : 's';
+}
+
+/** ShrineDialog.as update(): the Note! line for each relation. */
+export function favorRelationNote(giantName, rel) {
+  if (rel === 'p') return `${giantName} is the best giant for learning this skill!`;
+  if (rel === 's') return `${giantName} is the secondary giant for learning this skill.`;
+  const pronoun = giantPronounWill(giantName);
+  return `${giantName} is not associated with this skill, but ${pronoun} help you learn it anyway.`;
+}
+
+/** EmblemSpendDialog.as setBody(): the Note! line for each relation. */
+export function emblemRelationNote(giantName, rel) {
+  if (rel === 'p') return `${giantName} is the giant most closely affiliated with this skill, so spending their emblem here offers top-class speed-learning!`;
+  if (rel === 's') return `${giantName} is affiliated with this skill (but not as closely as another giant), so spending their emblem will speed up learning a substantial amount`;
+  return `${giantName} is not affiliated with this skill, so spending their Emblem won't speed up learning as much.`;
+}
+
+/** Giants.as getSex: the client's "he'll / she'll / they'll" for the Note! line. */
+const GIANT_SEX = Object.freeze({
+  alph: 'm', cosma: 'f', friendly: 'm', grendaline: 'f', humbaba: 'f',
+  lem: 'm', mab: 'f', pot: 'm', spriggan: 'm', ti: 'n', tii: 'n', zille: 'f',
+});
+function giantPronounWill(giantName) {
+  const sex = GIANT_SEX[String(giantName || '').toLowerCase()];
+  return sex === 'f' ? "she'll" : sex === 'n' ? "they'll" : "he'll";
+}
+
+/**
+ * get_skill_info for one Giant and a favor budget: points to spend (never
+ * more than the acceleration cap buys) and the seconds they buy.
+ * `rawSpendPoints` is the source's unrounded figure; `spendPoints` is the
+ * whole number the client shows and the server removes (uint in ShrineDialog).
+ */
+export function skillSpeedInfo(def, giantId, points, maxSeconds) {
+  const out = { giantRel: 'u', secondsPerPoint: FAVOR_STUDY_SECONDS.u, rawSpendPoints: 0, spendPoints: 0, speedUp: 0 };
+  if (!def || !def.giants) return out;
+  out.giantRel = giantRelationFor(def, giantId);
+  out.secondsPerPoint = FAVOR_STUDY_SECONDS[out.giantRel];
+  const maxPoints = Math.max(0, Number(maxSeconds) || 0) / out.secondsPerPoint;
+  const budget = Math.max(0, Number(points) || 0);
+  out.rawSpendPoints = maxPoints < budget ? maxPoints : budget;
+  out.spendPoints = Math.floor(out.rawSpendPoints + 1e-9);
+  out.speedUp = out.rawSpendPoints * out.secondsPerPoint;
+  return out;
+}
+
+function activeStudyDef(skillState, now) {
+  const active = skillState ? getActiveStudy(skillState, now) : null;
+  if (!active || active.remainingSeconds <= 0) return { active: null, def: null };
+  return { active, def: getSkillCatalog()[active.classTsid] || null };
+}
+
+/**
+ * check_favor (items/include/shrines.js:21-44) + the client's Learn Faster?
+ * states. `ok` only when favor can be spent right now.
+ * @param {{ now?: number, yellowCrumb?: boolean }} [opts]
+ */
+export function quoteFavorSpend(state, giantId, skillState, opts = {}) {
+  const giant = GIANTS[giantId];
+  if (!giant) return { ok: false, reason: 'unknown_giant' };
+  const now = opts.now ?? Date.now();
+  const favorPoints = whole(state?.favor?.[giantId]);
+  const { active, def } = activeStudyDef(skillState, now);
+  const maxSeconds = active ? maxStudyAcceleration(skillState, now) : 0;
+  const info = skillSpeedInfo(def, giantId, favorPoints, maxSeconds);
+  const multiplier = opts.yellowCrumb ? YELLOW_CRUMB_MULTIPLIER : 1;
+  const isLearning = Boolean(active && def);
+  const base = {
+    giant,
+    giantId,
+    favorPoints,
+    isLearning,
+    classTsid: active?.classTsid || null,
+    def,
+    maxSeconds,
+    multiplier,
+    ...info,
+    speedUp: Math.round(info.speedUp * multiplier),
+  };
+  if (!isLearning) return { ...base, ok: false, reason: 'not_learning', text: FAVOR_SPEND_COPY.notLearning };
+  if (favorPoints <= 0) return { ...base, ok: false, reason: 'no_favor', text: FAVOR_SPEND_COPY.noFavor };
+  if (info.spendPoints <= 0) return { ...base, ok: false, reason: 'max_acceleration', text: FAVOR_SPEND_COPY.maxed };
+  return { ...base, ok: true, reason: 'ok' };
+}
+
+/**
+ * spend_points (items/include/shrines.js:46-75): sets the Better Learning
+ * flags from the favor held before spending (997+ with the skill's primary
+ * Giant; 1,511+ with any Giant), accelerates the study by speed_up x Yellow
+ * Crumb (capped again by skills_start_acceleration) and removes the points.
+ * @param {{ now?: number, yellowCrumb?: boolean }} [opts]
+ */
+export function spendFavorOnStudy(state, giantId, skillState, opts = {}) {
+  const now = opts.now ?? Date.now();
+  const quote = quoteFavorSpend(state, giantId, skillState, { ...opts, now });
+  if (!quote.ok) return quote;
+  const events = [];
+  if (quote.favorPoints >= MAD_FAVOR_POINTS && quote.giantRel === 'p') events.push(FAVOR_SPENT_EVENTS.primaryLarge);
+  if (quote.favorPoints >= ENORMOUS_FAVOR_POINTS) events.push(FAVOR_SPENT_EVENTS.huge);
+  const accel = accelerateActiveStudy(skillState, quote.speedUp, now);
+  state.favor[giantId] = Math.max(0, whole(state.favor[giantId]) - quote.spendPoints);
+  return {
+    ...quote,
+    ok: true,
+    reason: 'spent',
+    spent: quote.spendPoints,
+    applied: accel.applied || 0,
+    completed: accel.completed || [],
+    events,
+    favorLeft: state.favor[giantId],
+  };
+}
+
+/**
+ * emblem_base `spend` conditions (emblem_*.js:197-216): an emblem first
+ * unlocks its Giant's skill (`emblem_skill_unlock_<giant>_1`); once that badge
+ * is held it buys get_skill_info(skill, giant, 1000).speed_up of study.
+ * @param {{ unlockedAchievements?: string[], now?: number, yellowCrumb?: boolean }} [opts]
+ */
+export function quoteEmblemSpend(giantId, skillState, opts = {}) {
+  const giant = GIANTS[giantId];
+  if (!giant) return { ok: false, reason: 'unknown_giant' };
+  const unlock = emblemUnlockSkillFor(giantId);
+  if (unlock && !(opts.unlockedAchievements || []).includes(unlock.achievement)) {
+    return { ok: true, mode: 'unlock', ...unlock, giant, giantId };
+  }
+  const now = opts.now ?? Date.now();
+  const { active, def } = activeStudyDef(skillState, now);
+  if (!active || !def) {
+    return { ok: false, mode: 'speed', reason: 'not_learning', giant, giantId, text: FAVOR_SPEND_COPY.emblemNotLearning };
+  }
+  const maxSeconds = maxStudyAcceleration(skillState, now);
+  const info = skillSpeedInfo(def, giantId, EMBLEM_SPEND_FAVOR, maxSeconds);
+  const multiplier = opts.yellowCrumb ? YELLOW_CRUMB_MULTIPLIER : 1;
+  const base = {
+    mode: 'speed',
+    giant,
+    giantId,
+    classTsid: active.classTsid,
+    def,
+    maxSeconds,
+    multiplier,
+    ...info,
+    speedUp: Math.round(info.speedUp * multiplier),
+    isPrimary: info.giantRel === 'p',
+    isSecondary: info.giantRel !== 'u',
+  };
+  if (!(info.speedUp > 0)) return { ...base, ok: false, reason: 'max_acceleration', text: FAVOR_SPEND_COPY.emblemMaxed };
+  return { ...base, ok: true, reason: 'ok' };
+}
+
+/**
+ * emblem_base doSpend (emblem_*.js:424-438): accelerate by the emblem's
+ * speed-up and destroy the emblem. Spending an emblem sets no quest flag and
+ * leaves the earned-emblem count (and so the favor target) unchanged.
+ */
+export function spendEmblemOnStudy(inv, giantId, skillState, opts = {}) {
+  const now = opts.now ?? Date.now();
+  const quote = quoteEmblemSpend(giantId, skillState, { ...opts, now });
+  if (!quote.ok) return quote;
+  if (quote.mode !== 'speed') return { ...quote, ok: false, reason: 'unlock_first' };
+  const classTsid = `emblem_${giantId}`;
+  if (!removeItem(inv, classTsid, 1)) return { ...quote, ok: false, reason: 'no_emblem', text: FAVOR_SPEND_COPY.emblemSillyGoose };
+  const accel = accelerateActiveStudy(skillState, quote.speedUp, now);
+  return { ...quote, ok: true, reason: 'spent', applied: accel.applied || 0, completed: accel.completed || [] };
 }

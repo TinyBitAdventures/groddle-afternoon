@@ -761,6 +761,8 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'making_tool:{a}' },
   { event: 'shrines_donated:{a}' },
   { event: 'emblems_acquired:{a}' },
+  { event: 'favor_spent:primary_large', note: 'game.js shrine Learn Faster? spend: 997+ favor with the skill\'s primary Giant (shrines.js spend_points)' },
+  { event: 'favor_spent:huge', note: 'game.js shrine Learn Faster? spend: 1,511+ favor with any Giant' },
   { event: 'in_inventory:{a}', note: 'every pack gain (quest-offers feature diff)' },
   { event: 'contraband_delivered', note: 'features/smuggling-feature.js sets it when the contact takes the box' },
   { event: 'cultivate_tower', note: 'features/home-tower-feature.js on cultivating the Tower' },

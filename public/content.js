@@ -797,9 +797,11 @@ export function getVerbsFor(target, ctx) {
       sort: 10,
       tooltip: 'Offer pack goods for iMG, mood, and Giant favor',
     });
+    // npc_shrine_base check_favor tooltip (npc_shrine_*.js:472): the panel's
+    // Learn Faster? block spends favor on the skill being studied.
     add('check_favor', 'check favor', {
       sort: 20,
-      tooltip: 'Review favor and claim a Giant emblem when ready',
+      tooltip: 'View & spend favor points',
     });
   }
 

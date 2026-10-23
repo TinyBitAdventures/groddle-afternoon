@@ -162,6 +162,23 @@ function actionButton(entry, ctx, actions) {
   return btn;
 }
 
+/**
+ * The skill's Giants from inc_data_skills.js `giants` (primary first): favor
+ * spent at a primary Giant's shrine buys 10 s of study a point, a secondary
+ * Giant 7 s, any other 5 s (get_skill_info).
+ */
+export function studyGiantsLine(def, ctx = {}) {
+  const rows = Object.entries(def?.giants || {});
+  if (!rows.length) return '';
+  const name = (id) => ctx.giantName?.(id) || id;
+  const primary = rows.filter(([, g]) => Math.trunc(Number(g?.primary) || 0)).map(([id]) => name(id));
+  const secondary = rows.filter(([, g]) => !Math.trunc(Number(g?.primary) || 0)).map(([id]) => name(id));
+  const parts = [];
+  if (primary.length) parts.push(`Primary Giant: ${primary.join(', ')}`);
+  if (secondary.length) parts.push(`also ${secondary.join(', ')}`);
+  return `${parts.join(' · ')}. Spend favor at a shrine to learn faster.`;
+}
+
 function prereqList(entry, rerender) {
   const list = el('ul', 'skill-prereqs');
   for (const row of entry.prerequisites) {
@@ -426,6 +443,15 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
     fill.style.width = `${Math.round(row.progress * 100)}%`;
     bar.appendChild(fill);
     card.appendChild(bar);
+    if (!row.isPaused) {
+      const giants = studyGiantsLine(def, ctx);
+      if (giants) {
+        const line = el('div', 'skill-study-time skill-study-giants', giants);
+        // items/include/shrines.js giant_tips[3]
+        line.title = 'Spending favor with any Giant speeds up skill learning — but spending favor with the Primary Giant of a given skill will speed it up the most.';
+        card.appendChild(line);
+      }
+    }
     const btn = el('button', 'content-action-btn', row.isPaused ? 'Resume study' : 'Pause study');
     btn.type = 'button';
     btn.addEventListener('click', () => (row.isPaused ? actions.resume(row.classTsid) : actions.pause(row.classTsid)));

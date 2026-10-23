@@ -5,7 +5,8 @@
  * - point_cost is study work (10 points per second), not spendable iMG
  * - one skill studies at a time; choosing another pauses the current skill
  * - paused progress and active completion timestamps persist across sessions
- * - time quoins accelerate the active study, up to half its remaining time
+ * - time quoins, shrine favor and emblems accelerate the active study, up to
+ *   half its remaining time
  */
 
 import { getSkillCatalog } from './content-catalogs.js';
@@ -235,19 +236,35 @@ export function tickSkillStudy(state, now = Date.now()) {
   return { ok: true, reason: completed.length ? 'completed' : 'ticked', completed };
 }
 
-/** Apply official double-speed acceleration for at most half the time remaining. */
+/**
+ * skills_get_max_acceleration (players/inc_skills.js:924-941): half the
+ * still-unaccelerated study time, rounded; 0 when nothing is studying or the
+ * acceleration already reaches the end (skills_at_max_acceleration). While
+ * accelerated, the official server measures the gap between the study end and
+ * the acceleration end, so repeated time quoins, favor or emblems never cut a
+ * study by more than half at once.
+ */
+export function maxStudyAcceleration(state, now = Date.now()) {
+  const active = getActiveStudy(state, now);
+  if (!active) return 0;
+  if (active.isAccelerated && active.acceleratedUntil >= active.endsAt) return 0;
+  const unacceleratedSeconds = active.isAccelerated
+    ? Math.max(0, (active.endsAt - active.acceleratedUntil) / 1000)
+    : active.remainingSeconds;
+  return Math.max(0, Math.round(unacceleratedSeconds / 2));
+}
+
+/**
+ * Apply official double-speed acceleration for at most half the time remaining
+ * (skills_start_acceleration, inc_skills.js:957-999). Time quoins, Giant favor
+ * spent at a shrine and spent emblems all come through here.
+ */
 export function accelerateActiveStudy(state, seconds, now = Date.now()) {
   tickSkillStudy(state, now);
   const active = getActiveStudy(state, now);
   if (!active) return { ok: false, reason: 'not_studying', requested: Math.max(0, Math.floor(finite(seconds, 0))) };
   const requested = Math.max(0, Math.floor(finite(seconds, 0)));
-  // While already accelerated, the official server measures the still-
-  // unaccelerated gap between the study end and acceleration end. This keeps
-  // repeated time quoins from reducing a study by more than half at once.
-  const unacceleratedSeconds = active.isAccelerated
-    ? Math.max(0, (active.endsAt - active.acceleratedUntil) / 1000)
-    : active.remainingSeconds;
-  const maximum = Math.max(0, Math.round(unacceleratedSeconds / 2));
+  const maximum = maxStudyAcceleration(state, now);
   const applied = Math.min(requested, maximum);
   if (!applied) return { ok: false, reason: 'max_acceleration', requested, maximum, classTsid: active.classTsid };
   const row = state.queue[active.classTsid];

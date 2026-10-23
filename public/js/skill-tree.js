@@ -11,6 +11,8 @@
  *   "Gathering skills", "Industrial skills", "Intellectual skills").
  * - items/emblem_base doSpend/modal_callback: spending a Giant emblem grants
  *   `emblem_skill_unlock_<giant>_1`, the prerequisite for one skill each.
+ *   Once that badge is held, the emblem's Spend speeds up the skill being
+ *   studied as 1,000 favor would (shrines.js quoteEmblemSpend).
  */
 
 import { getSkillCatalog } from './content-catalogs.js';
@@ -347,6 +349,17 @@ export function emblemUnlockFor(classTsid) {
     if (match) return { achievement: id, giant: match[1], emblem: `emblem_${match[1]}` };
   }
   return null;
+}
+
+/**
+ * The skill a Giant's emblem unlocks (emblem_base getUnlockSkill: the first
+ * skill whose prerequisite is `emblem_skill_unlock_<giant>_1`), or null.
+ * @param {string} giantId
+ */
+export function emblemUnlockSkillFor(giantId) {
+  const achievement = `emblem_skill_unlock_${giantId}_1`;
+  const def = Object.values(catalog()).find((row) => (row.reqAchievements || []).includes(achievement));
+  return def ? { achievement, giant: giantId, emblem: `emblem_${giantId}`, classTsid: def.classTsid, def } : null;
 }
 
 /**

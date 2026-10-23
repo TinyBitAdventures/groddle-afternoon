@@ -440,7 +440,7 @@
    "group": "economy",
    "name": "Giants and shrines",
    "status": "source",
-   "blurb": "Donate at the eleven Giants’ shrines for favor; a waiting emblem is handed over as you walk past, and the third shrine you pass says hello.",
+   "blurb": "Donate at the eleven Giants’ shrines for favor; a waiting emblem is handed over as you walk past, and the third shrine you pass says hello. Spend favor, or a spare emblem, to learn the skill you are studying faster.",
    "spot": "shrine",
    "evidence": [
     "public/js/shrines.js"
@@ -1805,9 +1805,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 281,
+  "commits": 283,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Play any restored system, quest room or designer level straight from the restoration page"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Sweaters, jerseys, kilts and coats keep their colours from behind instead of white patches"
+   },
    {
     "date": "2026-10-23",
     "kind": "fix",
@@ -1917,19 +1927,9 @@
     "date": "2026-10-22",
     "kind": "new",
     "text": "Craftybot, the crafting robot delivered to your home"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Rooms 4, 8 and 16 in Jethimadh Tower Base: spinach garden and drinks, two keys, a spinach jump"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "The home page shows this round's additions"
    }
   ]
  },
- "tests": 173,
+ "tests": 174,
  "generatedAt": "2026-10-23"
 }

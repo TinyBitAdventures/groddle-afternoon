@@ -689,6 +689,15 @@ import {
   emblemCostFor,
   inEmblemHitbox,
   resetShrineDay,
+  FAVOR_SPEND_COPY,
+  YELLOW_CRUMB_BUFF,
+  quoteFavorSpend,
+  spendFavorOnStudy,
+  quoteEmblemSpend,
+  spendEmblemOnStudy,
+  favorRelationNote,
+  emblemRelationNote,
+  formatSpeedUpTime,
 } from './js/shrines.js?v=shrine-walkby-1';
 import {
   GAMESHOW_TICKET_ID,
@@ -1521,6 +1530,8 @@ let activeShrineTarget = null;
 /** @type {string|null} selected pack good in the shrine donation panel */
 let shrineSelected = null;
 let shrineQty = 1;
+/** The shrine panel's "You've done it! You spent that favor!" line (ShrineDialog spend()). */
+let shrineFavorSpent = false;
 /** One transient owner-only prize wheel created by a Gameshow Ticket. */
 let spinningWheelTarget = null;
 let spinningWheelLastPhase = '';
@@ -2767,6 +2778,12 @@ function renderPackPopover(classTsid, anchor = null) {
       </div>`
     : '';
 
+  // emblem_base `spend` (sort_on 54, before Caress): unlock its skill or speed up study.
+  const emblemSpend = emblemSpendVerb(classTsid);
+  const emblemSpendMarkup = emblemSpend
+    ? `<button type="button" class="pack-bear-action" data-pack-emblem-spend ${emblemSpend.enabled ? '' : 'disabled'} title="${escapeHtml(emblemSpend.enabled ? emblemSpend.tooltip : emblemSpend.reason)}">Spend</button>`
+    : '';
+
   pop.hidden = false;
   pop.innerHTML = `
     <div class="pack-pop-head">
@@ -2793,6 +2810,7 @@ function renderPackPopover(classTsid, anchor = null) {
       ${bearUpgradeMarkup}
       ${bearAccessoryMarkup}
       ${toolCondition?.tracked && toolCondition.needsRepair && toolCondition.repairable ? `<button type="button" class="pack-pop-repair" data-pack-repair ${canRepair ? '' : 'disabled'} title="${canRepair ? 'Repair with your Tinkertool' : 'Needs Tinkering, energy, and a working Tinkertool'}">Repair · ${repairQuote?.ok ? `${repairQuote.energy} energy` : 'unavailable'}</button>` : ''}
+      ${emblemSpendMarkup}
       ${features.packVerbs(classTsid, engine).map((verb) => `<button type="button" class="pack-bear-action pack-feature-verb${verb.primary ? ' pack-pop-primary' : ''}" data-feature-pack-verb="${escapeHtml(verb.id)}" data-feature-id="${escapeHtml(verb.featureId)}" ${verb.enabled === false ? 'disabled' : ''} title="${escapeHtml(verb.enabled === false ? verb.reason || '' : verb.tooltip || '')}">${escapeHtml(verb.label)}</button>`).join('')}
       ${recipeTarget ? `<button type="button" data-pack-make>${escapeHtml(makeLabel)}</button>` : ''}
       <button type="button" data-pack-drop ${packDropBlockReason(classTsid) ? `disabled title="${escapeHtml(packDropBlockReason(classTsid))}"` : ''}>Drop</button>
@@ -2808,6 +2826,7 @@ function renderPackPopover(classTsid, anchor = null) {
   positionPackPopover(pop, sourceAnchor);
 
   pop.querySelector('[data-pack-close]')?.addEventListener('click', closePackPopover);
+  pop.querySelector('[data-pack-emblem-spend]')?.addEventListener('click', () => confirmEmblemSpend(classTsid));
   pop.querySelectorAll('[data-feature-pack-verb]').forEach((button) => {
     button.addEventListener('click', () => {
       closePackPopover();
@@ -20461,6 +20480,7 @@ function isShrineOpen() {
 function closeShrinePanel() {
   const panel = document.getElementById('shrine-panel');
   if (panel) panel.hidden = true;
+  shrineFavorSpent = false;
   shrineSelected = null;
   shrineQty = 1;
 }
@@ -20483,6 +20503,7 @@ function openShrinePanel(target) {
   activeShrineTarget = target;
   shrineSelected = null;
   shrineQty = 1;
+  shrineFavorSpent = false;
   const panel = document.getElementById('shrine-panel');
   if (!panel) return;
   panel.style.setProperty('--shrine-accent', giant.color);
@@ -20533,6 +20554,7 @@ function renderShrinePanel() {
       return `<span class="shrine-favor-chip${row.id === giantId ? ' active' : ''}" title="${escapeHtml(row.name)} favor">${escapeHtml(row.name)} ${points}${owned ? ` · ◉${owned}` : ''}</span>`;
     }).join('');
   }
+  renderShrineLearnFaster(giantId, giant);
 
   const options = listShrineDonationOptions(shrineState, giantId, inv, { xp: pc.xp });
   if (!options.some((row) => row.classTsid === shrineSelected)) {
@@ -20648,6 +20670,163 @@ function performShrineDonation() {
   );
   if (result.favor) applyQuestProgress(questState, 'favor_points', result.favor, pc);
   updateHud();
+}
+
+/** Yellow Crumb (Crumb of Knowledge) lengthens favor and emblem speed-ups x1.05. */
+function favorSpendOpts(now = Date.now()) {
+  return { now, yellowCrumb: hasBuff(buffState, YELLOW_CRUMB_BUFF, now) };
+}
+
+/**
+ * check_favor's Learn Faster? block (client ShrineDialog.as update(), GSJS
+ * items/include/shrines.js check_favor): what the shrine's favor would buy for
+ * the skill being studied, and the Spend button.
+ */
+function renderShrineLearnFaster(giantId, giant) {
+  let box = document.getElementById('shrine-learn');
+  if (!box) {
+    box = document.createElement('section');
+    box.id = 'shrine-learn';
+    box.className = 'shrine-favor-card shrine-learn';
+    box.setAttribute('aria-label', FAVOR_SPEND_COPY.title);
+    document.getElementById('shrine-all-favor')?.after(box);
+  }
+  const quote = quoteFavorSpend(shrineState, giantId, skillState, favorSpendOpts());
+  const skillName = quote.def ? skillTitle(quote.def) || quote.def.name : '';
+  const text = quote.ok
+    ? `Spend your ${quote.spendPoints} favor points with <b>${escapeHtml(giant.name)}</b> to speed up learning <b>${escapeHtml(skillName)}</b> by <b>${escapeHtml(formatSpeedUpTime(quote.speedUp))}.</b>`
+    : escapeHtml(quote.text || '');
+  const note = quote.ok ? `<b>Note!</b> ${escapeHtml(favorRelationNote(giant.name, quote.giantRel))}` : '';
+  box.innerHTML = `
+    <h3 class="shrine-section-title" style="margin-top:0">${escapeHtml(FAVOR_SPEND_COPY.title)}</h3>
+    ${shrineFavorSpent ? `<p class="shrine-daily" data-shrine-spent><b>${escapeHtml(FAVOR_SPEND_COPY.spent)}</b></p>` : ''}
+    <p class="shrine-daily" data-shrine-learn-text>${text}</p>
+    ${note ? `<p class="shrine-cap-note">${note}</p>` : ''}
+    <button type="button" class="btn-glitch-primary" data-shrine-learn-spend ${quote.ok ? '' : 'disabled'}>${escapeHtml(quote.ok ? `Spend ${quote.spendPoints} favor points` : FAVOR_SPEND_COPY.cannot)}</button>`;
+  box.querySelector('[data-shrine-learn-spend]')?.addEventListener('click', confirmShrineFavorSpend);
+  app.canvas.dataset.shrineLearn = quote.reason;
+  app.canvas.dataset.shrineLearnPoints = String(quote.spendPoints || 0);
+  app.canvas.dataset.shrineLearnSpeedUp = String(quote.ok ? quote.speedUp : 0);
+  app.canvas.dataset.shrineLearnGiant = quote.giantRel || '';
+}
+
+/** ShrineDialog confirmSpend: "Are you sure you want to spend those favor points?" */
+function confirmShrineFavorSpend() {
+  const target = activeShrineTarget;
+  const giantId = target?.state?.giantId;
+  if (!quoteFavorSpend(shrineState, giantId, skillState, favorSpendOpts()).ok) {
+    renderShrinePanel();
+    return;
+  }
+  closeShrinePanel();
+  openScriptedQuestDialogue({
+    title: FAVOR_SPEND_COPY.title,
+    kicker: `Shrine to ${GIANTS[giantId].name}`,
+    cancelable: true,
+    primaryLabel: FAVOR_SPEND_COPY.confirmYes,
+    cancelLabel: FAVOR_SPEND_COPY.confirmNo,
+    beats: [{ text: FAVOR_SPEND_COPY.confirm, response: FAVOR_SPEND_COPY.confirmYes }],
+    onComplete: () => performShrineFavorSpend(target),
+    onCancel: () => openShrinePanel(target),
+  });
+}
+
+/** shrines.js spend_points: accelerate study, remove the favor, set the Better Learning flags. */
+function performShrineFavorSpend(target) {
+  const giantId = target?.state?.giantId;
+  const giant = GIANTS[giantId];
+  if (!giant) return;
+  const result = spendFavorOnStudy(shrineState, giantId, skillState, favorSpendOpts());
+  if (!result.ok) {
+    toast(result.text || FAVOR_SPEND_COPY.cannot);
+    openShrinePanel(target);
+    return;
+  }
+  for (const event of result.events) emitGameEvent(event);
+  if (result.completed?.length) handleSkillCompletions(result.completed);
+  const name = skillTitle(result.def) || result.def?.name || result.classTsid;
+  const line = `You spent ${result.spent} ${giant.name} favor to speed up learning ${name} by ${formatSpeedUpTime(result.applied)}.`;
+  pushActivity(line);
+  toast(line, 4200);
+  floatText(target.sprite.x, target.sprite.y - 150, `-${result.spent} ${giant.name} favor`, 0xffe066);
+  app.canvas.dataset.shrineFavorSpent = String(result.spent);
+  app.canvas.dataset.shrineFavorApplied = String(result.applied);
+  app.canvas.dataset.shrineFavorEvents = result.events.join(',');
+  refreshShrineTarget(target);
+  updateHud();
+  savePlayerState();
+  openShrinePanel(target);
+  shrineFavorSpent = true;
+  renderShrinePanel();
+}
+
+/** emblem_base `spend` pack verb: the button state and its tooltip/reason. */
+function emblemSpendVerb(classTsid) {
+  const giantId = /^emblem_([a-z]+)$/.exec(String(classTsid || ''))?.[1];
+  if (!giantId || !GIANTS[giantId]) return null;
+  const quote = quoteEmblemSpend(giantId, skillState, { ...favorSpendOpts(), unlockedAchievements: achieveState.unlocked });
+  const skillName = quote.def ? skillTitle(quote.def) || quote.def.name : '';
+  const tooltip = quote.mode === 'unlock'
+    ? `Use this emblem to unlock the skill ${skillName} (the emblem will be destroyed)`
+    : quote.ok ? `Reduces the learning time of ${quote.def?.name || skillName}` : '';
+  return { giantId, quote, enabled: quote.ok, reason: quote.text || '', tooltip };
+}
+
+/** emblem_base spend handler: unlock its skill, or the EmblemSpendDialog confirm, then doSpend. */
+function confirmEmblemSpend(classTsid) {
+  const verb = emblemSpendVerb(classTsid);
+  if (!verb) return;
+  const { giantId, quote } = verb;
+  const giant = GIANTS[giantId];
+  closePackPopover();
+  if (!quote.ok) {
+    toast(quote.text || FAVOR_SPEND_COPY.emblemNotLearning);
+    return;
+  }
+  const skillName = skillTitle(quote.def) || quote.def?.name || quote.classTsid;
+  if (quote.mode === 'unlock') {
+    openScriptedQuestDialogue({
+      title: 'Please Confirm!',
+      kicker: `Emblem of ${giant.name}`,
+      cancelable: true,
+      primaryLabel: 'Yes',
+      cancelLabel: 'No',
+      beats: [{ text: `Are you sure you want to use this Emblem of ${giant.name} to unlock the skill ${skillName} (the emblem will be destroyed)?`, response: 'Yes' }],
+      onComplete: () => spendEmblemForSkillUnlock(quote.classTsid),
+    });
+    return;
+  }
+  openScriptedQuestDialogue({
+    title: 'Please Confirm!',
+    kicker: `Emblem of ${giant.name}`,
+    cancelable: true,
+    primaryLabel: 'Yes',
+    cancelLabel: 'No',
+    beats: [{
+      text: `Are you sure you want to spend this Emblem of ${giant.name} to reduce the learning time of ${quote.def?.name || skillName} by ${formatSpeedUpTime(quote.speedUp)}. Note! ${emblemRelationNote(giant.name, quote.giantRel)}`,
+      response: 'Yes',
+    }],
+    onComplete: () => performEmblemSpend(giantId),
+  });
+}
+
+function performEmblemSpend(giantId) {
+  const giant = GIANTS[giantId];
+  const result = spendEmblemOnStudy(inv, giantId, skillState, { ...favorSpendOpts(), unlockedAchievements: achieveState.unlocked });
+  if (!result.ok) {
+    toast(result.text || 'Hmm, something went funky. Try spending your emblem again.');
+    return;
+  }
+  if (result.completed?.length) handleSkillCompletions(result.completed);
+  const name = skillTitle(result.def) || result.def?.name || result.classTsid;
+  const line = `You spent an Emblem of ${giant.name}. ${name} learns ${formatSpeedUpTime(result.applied)} faster.`;
+  pushActivity(line);
+  toast(line, 4200);
+  app.canvas.dataset.emblemSpent = giantId;
+  app.canvas.dataset.emblemApplied = String(result.applied);
+  updateHud();
+  if (isSkillsOpen()) renderSkillsPanel();
+  savePlayerState();
 }
 
 function claimActiveShrineEmblem() {
@@ -22336,6 +22515,16 @@ async function main() {
       player.vy = 0;
       player.onGround = true;
       hoverTarget = shrine;
+      // Favor-spend QA (G53): `&shrinefavor=N` sets this Giant's favor,
+      // `&shrineemblems=N` its earned emblems (each raises the favor cap 100).
+      const demoGiant = shrine.state?.giantId;
+      if (demoGiant && bootParams.has('shrineemblems')) {
+        shrineState.emblems[demoGiant] = clamp(Math.floor(Number(bootParams.get('shrineemblems')) || 0), 0, 99);
+      }
+      if (demoGiant && bootParams.has('shrinefavor')) {
+        shrineState.favor[demoGiant] = clamp(Math.floor(Number(bootParams.get('shrinefavor')) || 0), 0, emblemCostFor(shrineState, demoGiant));
+        refreshShrineTarget(shrine);
+      }
       if (bootParams.get('shrinedemo') === 'emblem') {
         // Walk-by QA: favor at the emblem target, 320px left of the shrine; walk right to receive it.
         const giantId = shrine.state.giantId;
