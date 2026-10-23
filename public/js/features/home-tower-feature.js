@@ -32,7 +32,8 @@
  *   &towerdemo=proto    a fresh Tower proto and every project item in the pack
  *   &towerdemo=built    a built Tower (&towerfloors=2..9, &towerstyle=<style>,
  *                       &towerlook=-600 looks up the street like Camera Mode,
- *                       &towerconfig=floor_top:6,floor_1:10,... picks articles,
+ *                       &towerconfig=floor_top:6,floor_1:10,... picks articles
+ *                       (facing_right:0 flips it; or &towerfacing=left|right),
  *                       &towerpanel=customize opens the Customize panel)
  *   &towerdemo=inside   built, standing on its ground floor
  *   &towerdemo=expand   built, expanding, on the construction floor with the floor items
@@ -41,7 +42,7 @@
  *                       proto: contribute + work to the finished Tower; expand: the
  *                       floor project to the new floor); &towerfast=1 shortens work units
  *   ?streetdemo=GIF1Q3IQM7122SP&towerdemo=secrets  stands on TowerSpot_02
- * Canvas data: towerState, towerFloors, towerStyle, towerConfig, towerProject, towerFloor, towerMark,
+ * Canvas data: towerState, towerFloors, towerStyle, towerConfig, towerFacing, towerProject, towerFloor, towerMark,
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
@@ -57,6 +58,7 @@ import {
   TOWER_ART_DIR,
   TOWER_CHASSIS,
   TOWER_CONFIG,
+  TOWER_DOOR_DX,
   TOWER_EXPANDER,
   TOWER_GEO,
   TOWER_JOB,
@@ -64,6 +66,7 @@ import {
   TOWER_PROTO,
   TOWER_SECRETS_GROUP,
   TOWER_SECRET_CURRANTS,
+  TOWER_SIGN,
   TOWER_STYLES,
   activeProject,
   applyWorkUnit,
@@ -80,9 +83,11 @@ import {
   extraFloors,
   finishTower,
   floorJobFor,
+  flipTower,
   inTowerSpot,
   normalizeTowerState,
   ownerReloadFloor,
+  parseTowerFacing,
   projectComplete,
   projectPercent,
   projectRequirements,
@@ -90,11 +95,13 @@ import {
   randomTowerConfig,
   setFloorLabel,
   setTowerConfig,
+  setTowerFacing,
   setTowerStyle,
   startExpansion,
   stepConfig,
   towerArticle,
   towerConfigRows,
+  towerFacingX,
   towerLabel,
   towerSecretText,
   towerSpotsFor,
@@ -205,6 +212,7 @@ function publish(engine, force = false) {
   engine.setData('towerExpanding', tower.expanding ? '1' : '0');
   engine.setData('towerStyle', tower.style);
   engine.setData('towerConfig', configString(tower.config));
+  engine.setData('towerFacing', tower.facingRight === false ? 'left' : 'right');
   engine.setData('towerName', tower.name);
   engine.setData('towerProject', project && item ? `${project.jobId}:${projectPercent(project.jobId, project.got)}` : '');
   engine.setData('towerFloor', tower.floor == null ? '' : tower.floor);
@@ -219,9 +227,9 @@ function publish(engine, force = false) {
 /* Street views                                                         */
 /* ------------------------------------------------------------------ */
 
-function chassisContainer(PIXI, style, extra, config) {
+function chassisContainer(PIXI, style, extra, config, facingRight = true) {
   const box = new PIXI.Container();
-  for (const op of composeTower(style, extra, config)) {
+  for (const op of composeTower(style, extra, config, facingRight)) {
     const spr = new PIXI.Sprite(textureFromUrl(`${TOWER_ART_DIR}${op.file}`));
     spr.anchor.set(op.anchorX, op.anchorY);
     // Articles are rasterised at 2x.
@@ -308,14 +316,20 @@ function spawnRock(engine, x, groundY) {
 function drawExterior(engine, box) {
   const { PIXI } = engine;
   for (const child of box.removeChildren()) child.destroy({ children: true });
-  box.addChild(chassisContainer(PIXI, tower.style, extraFloors(tower), tower.config));
+  box.addChild(chassisContainer(PIXI, tower.style, extraFloors(tower), tower.config, tower.facingRight));
   // QA: the world y of the Tower's top (the home street must show it; cameraY is on the canvas).
-  engine.setData('towerTopY', Math.round(box.y + towerBounds(composeTower(tower.style, extraFloors(tower), tower.config)).t));
+  const bounds = towerBounds(composeTower(tower.style, extraFloors(tower), tower.config, tower.facingRight));
+  engine.setData('towerTopY', Math.round(box.y + bounds.t));
+  engine.setData('towerSpan', `${Math.round(box.x + bounds.l)},${Math.round(box.x + bounds.r)}`);
   if (tower.name) {
+    // sign_sd h_flipped with the chassis: mirrored to -delta_x, its text still reads normally.
     const sign = nameSign(PIXI, tower.name);
-    sign.x = 8;
-    sign.y = -150;
+    sign.x = towerFacingX(TOWER_SIGN.dx, tower.facingRight);
+    sign.y = TOWER_SIGN.dy;
     box.addChild(sign);
+    engine.setData('towerSignX', Math.round(box.x + sign.x));
+  } else {
+    engine.setData('towerSignX', '');
   }
 }
 
@@ -508,7 +522,8 @@ async function leaveTower(engine) {
   closePanel();
   const x = bridge?.towerWorldX?.();
   tower.floor = null;
-  arrivalX = Number.isFinite(x) ? x + 40 : null;
+  // FancyDoor: the door (and the spot you step out to) mirrors about the foot with the Tower.
+  arrivalX = Number.isFinite(x) ? x + towerFacingX(TOWER_DOOR_DX, tower.facingRight) : null;
   engine.save();
   await engine.enter(HOME_STREET_TSID, {});
   return true;
@@ -664,6 +679,18 @@ function beginExpansion(engine) {
 /* Panel                                                                */
 /* ------------------------------------------------------------------ */
 
+/**
+ * TSEngineAssets graphics chassis_flip(_hover).png and chassis_randomize(_hover).png
+ * (tinyspeck/glitch-client, CC0), metadata stripped, pixels unchanged: the
+ * icons ConfiggerChoiceElementUI puts left of the Flip and Randomize labels.
+ */
+const CHASSIS_ICONS = Object.freeze({
+  chassis_flip: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAMAAAAhxq8pAAABIFBMVEX///8Ya4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4AYa4D///////8Ya4AYa4D///8Ya4AYa4AYa4D///////////8Ya4AYa4D///+YvcYYa4AdboP///////////////////////////////////////////////////////////////////////8Ya4D///+gwsvU4+dDh5hXk6K20Nc2fpDh7O9hmqhBhZb8/f4gcITG2uBfmKdGiZlJipt9q7fv9fYmdIeCr7pZlaSSucO40tjR4ebO4OSav8hUkaEueYwdboPs8/VypLGNtsBcl6UjcoZMjJx0prOwzdTx9vj6/PzP8dTgAAAAOHRSTlMAABJyn0IJ8MAwS978kAwbq+FI1SFmz+3bdeQGk9Jp3sNpt9nSfY0hlpx+55AzNrTM+fPGmVcPBtkbn1sAAADPSURBVBjTY2BgYEQHDAwwQSZmFlY0QTZmdgsLCw5OZEEubgsw4OHlgwnyC1jAgaAQVFDYAhlwQgRFkMVYQSpBJiMLgs1kFBWztALxxCUQgpLWNhaWQI6UNKOMhYWtnaWlrByDvL0DWKUCI6OihYWdo4WFkyyDs4urkrKbu70KI6Oqu4enlzdIUM3HwtfPP8DB0tLSOSAwKNjCGyiormEXgmR5qE9YuCbQSVragRGR7u6hUe7RMbFxOrrxumB36mnpGxgYGhkYm5iaMTCYMwAAnLwtVjnNO/YAAAAASUVORK5CYII=',
+  chassis_flip_hover: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAMAAAAhxq8pAAABIFBMVEX////YgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwPYgwP////////YgwPYgwP////YgwPYgwPYgwP////////////YgwPYgwP////uyI7YgwPZhgn////////////////////////////////////////////////////////////////////////YgwP////vzJf46NDfmjLjpUfz2K/dkyT6797kqlPfmS///vzZhwz14MHkqVDgnDXgnTjpuXH89u3aihLqvHfjpkrtxYjz2bL35s335cruyZHio0TcjxvZhgn89erns2XswoLjp03aiQ/hnzvotWjy1an9+PD+/PmgaiSKAAAAOHRSTlMAABJyn0IJ8MAwS978kAwbq+FI1SFmz+3bdeQGk9Jp3sNpt9nSfY0hlpx+55AzNrTM+fPGmVcPBtkbn1sAAADQSURBVBjTY2BgYEQHDAwwQSZmFlY0QTZmdgsLCw5OZEEubgsw4OHlgwoy8AtYwIGgEFRQ2AIZcEIERZDFWEEqQSYjC4LNZBQVs7QC8cQlEIKS1jYWlkCOlDSjjIWFrZ2lpawcg7y9A1ilAiOjooWFnaOFhZMsg7OLq5Kym7u9CiOjqruHp5c3SFDNx8LXzz/AwdLS0jkgMCjYwhsoqK5hF4JkeahPWLgm0Ela2oERke7uoVHu0TGxcTq68bpgd+pp6RsYGBoZGJuYmjEwmDMAAJoQLVPoSJCnAAAAAElFTkSuQmCC',
+  chassis_randomize: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAMAAAAVBLyFAAABCFBMVEX4+vsYa4D///8Ya4D4+vv4+vv4+vv4+vv4+vsYa4AYa4AYa4D3+vvr8vQYa4AYa4AYa4D2+fr1+PrE2d8Ya4D0+Pn0+Pnx9viPt8Hz9/jz9/jz9/jz9/jz9/jz9/gYa4DZ5+vx9vjx9vgYa4DI3OHu9Pbu9Pbu9Pbu9Pbu9Pbu9Pbt8/Xt8/Xt8/Xs8/Xs8/X4+vvq8vQYa4Alc4dFiJlxpLHV5Ojp8fMicobP4ORhmqj1+Prw9ffJ3OJuoq9Rj6Dn8PIqd4obbYHe6u2zztVDh5hdl6bG2uDk7vHx9vhYlKNsoa6709ogcISKtL/r8vTT4+d7qrbi7e/u9PZNjZ3L3ePq8fSpyNBs6adXAAAAMHRSTlMAAABalvDMmTDwtxsPkofM+Q+W8kIGM+2L/EUPh7RLDOWND8CsIYrM/JYtA8BXA1FBtMkCAAAArElEQVQY012N1RLCQAxFm6LF3d1dglO0uBSX//8TdhfKDJyX5J6Z3HDcHwC/WcUUqGs1jVanB4pgMBJlqiM2mq222WK1IaKgAs7eQUq312eTKnCI4mA4wrHTpRzSCrdnglMvWXw0MQXgl3AWCIbm4YiiorEFLlfrTWPbjieIEkjrbi+zdpQPx49Kpk7nhUQWqXX5dAGkM9ncFW/3fOGrCMXHs1T+fnxTqQLw/AvSuxhTnDsg+wAAAABJRU5ErkJggg==',
+  chassis_randomize_hover: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAOCAMAAAAVBLyFAAABEVBMVEX4+vvYgwP////YgwP4+vv4+vv4+vv4+vv4+vvYgwPYgwPYgwP3+vv18+3YgwPYgwPYgwP2+fr1+Prv3sTYgwP0+Pn0+Pn09/bnwojz9/jz9/jz9/jz9/jz9/jz9/jYgwPu6d3x9vjx9vjYgwPr4Mru9Pbu9Pbu9Pbu9Pbu9Pbu9Pbt8/Xt8/Xt8/Xs8/Xs8/X4+vv18+zYgwPaihLemzXks2by6NX08uvZiQ/x5M7iqlT1+Pr09fTv4cnjsGPgoUPy8evajRfYhAbw7OHr1bDdmjTgqFHs38fw7+rx9vjZihHfpUvu59jhr2Lq2bvZhwzlv4Tv8vHs5tfjt3Lhsmfu7uju9Pbdnz/q4c7t8vLmz6j3RdUPAAAAMHRSTlMAAABalvDMmTDwtxsPkofM+Q+W8kIGM+2L/EUPh7RLDOWND8CsIYrM/JYtA8BXA1FBtMkCAAAArUlEQVQY012N1RLCUAwFG4oVd3d3Ce5QKA7F7f8/hHuLzMC+JGdncsIwfwD8ZlZSIC+VFEqVGiicRkuUroxYqdbqeoPRhIgcC4y5gZRmqy1NqsDS6XR7fRxYbZ9DWmF3DHHkJIuLJkkBuHkce7y+iT/wUcGQgNPZfLFcrcMRojjSutmKUjuKu/1bRWOHo8CThT+d310A8UQydcHrLZ35KkL2/sjlvx9fFIoAMtkT81EYwjycfQsAAAAASUVORK5CYII=',
+});
+
 const CSS = `
 .ht-card{width:min(600px,94vw);background:radial-gradient(circle at 92% 0%,rgba(242,193,78,.18),transparent 36%),#f7f4ed}
 .ht-kicker{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a6d2b;margin:0}
@@ -698,6 +725,13 @@ const CSS = `
 .ht-opt small{font-size:.7rem;color:#7a7264}
 .ht-opt button{padding:.15rem 0;font-size:1rem;line-height:1}
 .ht-name{display:flex;gap:.4rem;align-items:center;margin:.3rem 0 .2rem}
+.ht-special{display:flex;justify-content:center;gap:10px;margin:.3rem 0 .2rem}
+.ht-special button{display:inline-flex;align-items:center;gap:4px;padding:.3rem .6rem .3rem .45rem}
+.ht-special button>i{display:block;background:var(--ht-icon) center/contain no-repeat;opacity:.4}
+.ht-special button:hover>i,.ht-special button:focus-visible>i{background-image:var(--ht-icon-hover);opacity:1}
+.ht-special [data-ht-flip]>i{width:20px;height:16px}
+.ht-special [data-ht-random]>i{width:18px;height:14px}
+.ht-styles.is-left img{transform:scaleX(-1)}
 .ht-name input{flex:1;font:inherit;font-size:.85rem;padding:.3rem .45rem;border:1px solid #c9b48a;border-radius:7px}
 .ht-note{margin:.45rem 0 0;font-size:.76rem;color:#6d6555}
 @media (max-width:480px){.ht-styles{grid-template-columns:repeat(2,1fr)}.ht-row{grid-template-columns:28px 1fr}.ht-row>div:last-child{grid-column:1/-1}}
@@ -776,7 +810,7 @@ function lookAtTower(engine) {
   if (!box || box.destroyed || !p || typeof engine.setCameraLook !== 'function') return;
   const now = engine.cameraLook || { x: 0, y: 0 };
   if ((now.x || now.y) && !(towerLook && now.x === towerLook.x && now.y === towerLook.y)) return;
-  const b = towerBounds(composeTower(tower.style, extraFloors(tower), tower.config));
+  const b = towerBounds(composeTower(tower.style, extraFloors(tower), tower.config, tower.facingRight));
   const mid = box.y + (b.t + b.b) / 2;
   // cameraTargetY puts the target 75% down the 408 px view: centre `mid` instead.
   const dy = Math.round(mid - p.y + 408 * 0.25);
@@ -905,7 +939,7 @@ function parseConfigString(text) {
   const out = {};
   for (const pair of String(text || '').split(',')) {
     const [k, v] = pair.split(':');
-    if (k && v) out[k.trim()] = Number(v);
+    if (k && v) out[k.trim()] = Number.isFinite(Number(v)) ? Number(v) : v.trim();
   }
   return out;
 }
@@ -920,7 +954,7 @@ function applyCustomize(engine) {
   if (streetView?.container && !streetView.container.destroyed && tower.built) {
     drawExterior(engine, streetView.container);
     if (streetView.target) streetView.target.label = towerLabel(tower);
-    lookAtTower(engine);
+    if (panelMode === 'customize') lookAtTower(engine);
   } else {
     engine.refreshHomeScene?.();
   }
@@ -935,7 +969,8 @@ function applyCustomize(engine) {
 function renderCustomize(engine, q, body) {
   q('[data-ht-kicker]').textContent = towerLabel(tower);
   q('[data-ht-title]').textContent = 'Customize your Tower';
-  const grid = el('div', { class: 'ht-styles' });
+  // ChassisPickerUI.as 294: the style thumbnails face the way the Tower does.
+  const grid = el('div', { class: `ht-styles${tower.facingRight === false ? ' is-left' : ''}` });
   for (const style of Object.values(TOWER_STYLES)) {
     const b = el('button', { type: 'button', class: tower.style === style.id ? 'is-on' : '', dataset: { htStyle: style.id } });
     const thumb = towerArticle(style.id, 'floor_top', normalizeTowerState({ style: style.id }).config.floor_top);
@@ -970,13 +1005,28 @@ function renderCustomize(engine, q, body) {
     list.append(line);
   }
   body.append(list);
-  const tools = el('div', { class: 'ht-name' });
-  const random = el('button', { type: 'button', dataset: { htRandom: '1' } }, 'Randomize');
+  // ConfiggerUI "toss in the flip": after the rows, one centred row with Flip
+  // and Randomize (ConfiggerChoiceElementUI flip_bt / randomize_bt, 10 px apart).
+  const tools = el('div', { class: 'ht-special' });
+  const iconButton = (label, data, icon, hover, title) => {
+    const b = el('button', { type: 'button', dataset: data, title });
+    const i = el('i', { 'aria-hidden': 'true' });
+    i.style.setProperty('--ht-icon', `url("${icon}")`);
+    i.style.setProperty('--ht-icon-hover', `url("${hover}")`);
+    b.append(i, el('span', {}, label));
+    return b;
+  };
+  const flip = iconButton('Flip', { htFlip: tower.facingRight === false ? 'left' : 'right' }, CHASSIS_ICONS.chassis_flip, CHASSIS_ICONS.chassis_flip_hover, 'Turn it around');
+  flip.addEventListener('click', () => {
+    flipTower(tower);
+    applyCustomize(engine);
+  });
+  const random = iconButton('Randomize', { htRandom: '1' }, CHASSIS_ICONS.chassis_randomize, CHASSIS_ICONS.chassis_randomize_hover, '');
   random.addEventListener('click', () => {
     setTowerConfig(tower, randomTowerConfig(tower.style));
     applyCustomize(engine);
   });
-  tools.append(random);
+  tools.append(flip, random);
   body.append(tools);
   const row = el('div', { class: 'ht-name' });
   const input = el('input', { type: 'text', maxlength: '25', placeholder: 'Name your Tower (shown on its sign)', value: tower.name, 'aria-label': 'Tower name' });
@@ -1183,7 +1233,15 @@ function demoStreet(engine) {
     const floors = Number(engine.param('towerfloors'));
     tower.floors = Number.isFinite(floors) ? Math.max(2, Math.min(9, floors)) : tower.floors;
     if (TOWER_STYLES[engine.param('towerstyle')]) setTowerStyle(tower, engine.param('towerstyle'));
-    if (engine.param('towerconfig')) setTowerConfig(tower, { ...tower.config, ...parseConfigString(engine.param('towerconfig')) });
+    if (engine.param('towerconfig')) {
+      const qa = parseConfigString(engine.param('towerconfig'));
+      // facing_right rides along in the QA string, as it did beside user_config.
+      const facing = parseTowerFacing(qa.facing_right ?? qa.facing);
+      if (facing != null) setTowerFacing(tower, facing);
+      setTowerConfig(tower, { ...tower.config, ...qa });
+    }
+    const facing = parseTowerFacing(engine.param('towerfacing'));
+    if (facing != null) setTowerFacing(tower, facing);
     if (engine.param('towername')) tower.name = cleanTowerName(engine.param('towername'));
     tower.project = {};
   } else {
@@ -1335,6 +1393,8 @@ export const homeTowerFeature = {
       case TOWER_CHASSIS:
         return [
           { id: 'enter', label: 'enter', enabled: true, tooltip: `Go inside ${towerLabel(tower)}`, durationMs: 0 },
+          // furniture_base verbs.flip (sort_on 51, before customize's 54).
+          { id: 'flip', label: 'flip', enabled: true, tooltip: 'Turn it around', durationMs: 0 },
           { id: 'customize', label: 'customize', enabled: true, tooltip: 'Change it', durationMs: 0 },
         ];
       case 'magic_rock':
@@ -1361,7 +1421,10 @@ export const homeTowerFeature = {
         return true;
       case TOWER_CHASSIS:
         if (verbId === 'customize') openPanel(engine, 'customize');
-        else goToFloor(engine, 0, 'door');
+        else if (verbId === 'flip') {
+          flipTower(tower);
+          applyCustomize(engine);
+        } else goToFloor(engine, 0, 'door');
         return true;
       case 'magic_rock':
         return talkToRock(engine);

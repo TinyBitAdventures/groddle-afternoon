@@ -1805,9 +1805,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 286,
+  "commits": 287,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Rook attacks come about every two hours instead of every hour"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1922,11 +1927,6 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "The seven races follow their recordings: Lava Leap's nine landings, Crystal Climb's tall map, Star Sprint's planet trap"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "The Stairs and the Mezzanine in Jethimadh Tower, where the Greeterbot sends you into the Museum of the Rook"
    }
   ]
  },

@@ -19,7 +19,13 @@ import {
   TOWER_PROTO,
   TOWER_STYLES,
   ELEVATOR_MARK,
+  TOWER_DOOR_DX,
+  TOWER_SIGN,
   applyWorkUnit,
+  flipTower,
+  parseTowerFacing,
+  setTowerFacing,
+  towerFacingX,
   clampToExpansion,
   cleanTowerName,
   composeTower,
@@ -410,6 +416,103 @@ describe('exterior art', () => {
     assert.equal(file('door'), undefined);
     // base deco 1 is the empty "none" symbol
     assert.equal(composeTower('base', 2).some((op) => op.part.startsWith('deco_')), false);
+  });
+});
+
+describe('Flip (facing_right)', () => {
+  const CLIENT = join(import.meta.dirname, '..', '..', 'glitch-client', 'com', 'tinyspeck', 'engine');
+  const haveClient = existsSync(CLIENT);
+  const featureSrc = readFileSync(join(root, 'js/features/home-tower-feature.js'), 'utf8');
+
+  it('faces right by default and migrates saves from before Flip unflipped', () => {
+    assert.equal(createTowerState().facingRight, true);
+    // a save written before Flip existed has no facing at all
+    const old = normalizeTowerState({ built: true, floors: 4, style: 'tree', config: { floor_top: 3 } });
+    assert.equal(old.facingRight, true);
+    assert.equal(old.config.floor_top, 3);
+    assert.equal(normalizeTowerState({ built: true, facingRight: false }).facingRight, false);
+    assert.equal(normalizeTowerState({ built: true, facingRight: 'junk' }).facingRight, true);
+  });
+
+  it('flips, saves with the Tower and survives a style change and Randomize', () => {
+    const t = normalizeTowerState({ built: true, floors: 5, style: 'spaceship' });
+    assert.equal(flipTower(t), false);
+    const saved = normalizeTowerState(JSON.parse(JSON.stringify(t)));
+    assert.equal(saved.facingRight, false);
+    // FurnUpgradeController keeps dm.user_facing_right across a chassis change
+    setTowerStyle(saved, 'tree');
+    assert.equal(saved.facingRight, false);
+    setTowerConfig(saved, randomTowerConfig('tree', () => 0.5));
+    assert.equal(saved.facingRight, false);
+    assert.equal(flipTower(saved), true);
+    assert.equal(setTowerFacing(saved, false), false);
+  });
+
+  it('reads the QA and save forms of facing_right', () => {
+    for (const v of [true, 1, '1', 'right', 'RIGHT']) assert.equal(parseTowerFacing(v), true, String(v));
+    for (const v of [false, 0, '0', 'left']) assert.equal(parseTowerFacing(v), false, String(v));
+    for (const v of [undefined, null, '', 'up', 2, Number.NaN]) assert.equal(parseTowerFacing(v), null, String(v));
+  });
+
+  it('mirrors every article about the foot, and its bounds with it', () => {
+    for (const style of Object.keys(TOWER_STYLES)) {
+      const cfg = normalizeTowerConfig(style, { deco_ground: 2, deco_side: 2 });
+      const right = composeTower(style, 4, cfg);
+      const left = composeTower(style, 4, cfg, false);
+      assert.equal(left.length, right.length, style);
+      right.forEach((op, i) => {
+        assert.equal(left[i].file, op.file);
+        assert.equal(left[i].x, -op.x, `${style} ${op.part} x`);
+        assert.equal(left[i].scaleX, -op.scaleX, `${style} ${op.part} scaleX`);
+        assert.equal(left[i].y, op.y);
+        assert.equal(left[i].scaleY, op.scaleY);
+      });
+      const br = towerBounds(right);
+      const bl = towerBounds(left);
+      assert.ok(Math.abs(bl.l + br.r) < 1e-9 && Math.abs(bl.r + br.l) < 1e-9, `${style} bounds mirror`);
+      assert.equal(bl.t, br.t);
+    }
+    // the Tree Tower is lopsided: flipping moves its mass to the other side
+    const tree = towerBounds(composeTower('tree', 3));
+    assert.notEqual(Math.round(tree.l), Math.round(-tree.r));
+  });
+
+  it('mirrors the sign and the step-out spot, not the sign text', () => {
+    assert.deepEqual({ ...TOWER_SIGN }, { dx: 8, dy: -150 });
+    assert.equal(towerFacingX(TOWER_SIGN.dx, true), 8);
+    assert.equal(towerFacingX(TOWER_SIGN.dx, false), -8);
+    assert.equal(towerFacingX(TOWER_DOOR_DX, false), -TOWER_DOOR_DX);
+    // the sign is a sibling of the chassis container, so only its x changes
+    assert.match(featureSrc, /sign\.x = towerFacingX\(TOWER_SIGN\.dx, tower\.facingRight\)/);
+    assert.match(featureSrc, /arrivalX = Number\.isFinite\(x\) \? x \+ towerFacingX\(TOWER_DOOR_DX, tower\.facingRight\)/);
+  });
+
+  it('puts Flip before Randomize under the part rows, and a flip verb before customize', () => {
+    const flipAt = featureSrc.indexOf("iconButton('Flip'");
+    const randomAt = featureSrc.indexOf("iconButton('Randomize'");
+    const rowsAt = featureSrc.indexOf('towerConfigRows(tower.style, extraFloors(tower))');
+    const nameAt = featureSrc.indexOf("'Name your Tower");
+    assert.ok(rowsAt > 0 && rowsAt < flipAt && flipAt < randomAt && randomAt < nameAt);
+    const verbs = /case TOWER_CHASSIS:\s*return \[([\s\S]*?)\];/.exec(featureSrc)[1];
+    assert.deepEqual([...verbs.matchAll(/id: '(\w+)'/g)].map((m) => m[1]), ['enter', 'flip', 'customize']);
+    assert.match(verbs, /label: 'flip'[^}]*tooltip: 'Turn it around'/);
+  });
+
+  it('matches the client and GSJS sources', { skip: !haveClient || !haveGs }, () => {
+    const cfg = readFileSync(join(CLIENT, 'data/itemstack/FurnitureConfig.as'), 'utf8');
+    assert.match(cfg, /public var facing_right:Boolean = true;/);
+    const ui = readFileSync(join(CLIENT, 'view/ui/decorate/ConfiggerChoiceElementUI.as'), 'utf8');
+    assert.match(ui, /name: 'flip',\s*label: 'Flip'/);
+    assert.match(ui, /randomize_bt\.x = int\(flip_bt\.width \+ 10\)/);
+    const configger = readFileSync(join(CLIENT, 'view/ui/ConfiggerUI.as'), 'utf8');
+    assert.ok(configger.indexOf('//handle the options') < configger.indexOf('//toss in the flip'));
+    assert.ok(configger.indexOf('//toss in the flip') < configger.indexOf('//toss in the namer'));
+    const chassis = readFileSync(join(GS, 'items/furniture_tower_chassis.js'), 'utf8');
+    assert.match(chassis, /this\.instanceProps\.facing_right = "1";/);
+    assert.match(chassis, /"can_flip"\s*: "1"/);
+    assert.match(chassis, /verbs\.flip = \{[\s\S]*?"sort_on"\s*: 51,\s*"tooltip"\s*: "Turn it around"/);
+    assert.match(chassis, /delta_x: 8,\s*delta_y: -120/);
+    assert.match(chassis, /delta_y: scaffolding_sd\.delta_y-30/);
   });
 });
 

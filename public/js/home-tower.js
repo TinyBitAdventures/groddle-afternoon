@@ -359,13 +359,16 @@ export function towerArticle(styleId, part, choice = 1) {
  * floor_ground_<n> and door_<n> share the ground floor's choice;
  * floor_top_container.y = -(bottom_floor_h + floor_h * extra_floors);
  * deco_side shows only with extra floors; floors 1..7 hold extra_floor_<floor_N>.
+ * facingRight false mirrors the whole chassis about its foot, as
+ * LocationItemstackView._faceLeft (view_holder.scaleX = -1) did.
  */
-export function composeTower(styleId, extraFloors = 0, config = null) {
+export function composeTower(styleId, extraFloors = 0, config = null, facingRight = true) {
   const style = TOWER_ART[styleId] ? styleId : 'base';
   const art = TOWER_ART[style];
   const cfg = normalizeTowerConfig(style, config || {});
   const extra = Math.max(0, Math.min(7, Math.floor(Number(extraFloors) || 0)));
-  const [mx, my] = art.scale;
+  const [sx0, my] = art.scale;
+  const mx = facingRight === false ? -sx0 : sx0;
   const ops = [];
   const place = (part, containerKey, override = {}) => {
     const choice = part === 'door' ? cfg.floor_ground : part === 'extra_floor' ? cfg[containerKey] : cfg[part];
@@ -412,6 +415,55 @@ export function towerBounds(ops) {
     b = Math.max(b, y0, y1);
   }
   return Number.isFinite(l) ? { l, r, t, b, w: r - l, h: b - t } : { l: 0, r: 0, t: 0, b: 0, w: 0, h: 0 };
+}
+
+/* ------------------------------------------------------------------ */
+/* Facing (Flip)                                                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * furniture_tower_chassis instanceProps.facing_right "1" (furniture_base): a
+ * new Tower faces right, which is the art as drawn. Flip turns it around:
+ * the furniture_base `flip` verb ("Turn it around", sort_on 51) and the Flip
+ * button the Customize panel puts after the part rows (ConfiggerUI.as
+ * startWithConfigs "toss in the flip", ConfiggerChoiceElementUI.as flip_bt
+ * label 'Flip' beside Randomize). The sign and the scaffolding behind it are
+ * h_flipped with the chassis (ChassisManager.as
+ * changeDirectionOnLocalItemstackTowerSign, getExtraConfig sign_sd), so they
+ * sit mirrored at -delta_x but their text still reads left to right
+ * (InLocationAnnouncementOverlay scaleX -1 inside the flipped view).
+ */
+export const TOWER_SIGN = Object.freeze({ dx: 8, dy: -150 });
+/** The street spot the avatar steps out to beside the door (FancyDoor mirrors door_x about the foot). */
+export const TOWER_DOOR_DX = 40;
+
+/** Mirror a foot-relative x for the Tower's facing. */
+export function towerFacingX(dx, facingRight = true) {
+  return facingRight === false ? -dx : dx;
+}
+
+/** setFurnitureUserConfig facing_right: true faces right (the default). Returns the new facing. */
+export function setTowerFacing(state, facingRight) {
+  state.facingRight = facingRight !== false;
+  return state.facingRight;
+}
+
+/** ConfiggerUI onElementChange 'flip': facing = left <-> right. */
+export function flipTower(state) {
+  return setTowerFacing(state, state.facingRight === false);
+}
+
+/**
+ * QA / save forms of facing_right: true, 1, '1', 'right' face right;
+ * false, 0, '0', 'left' face left; anything else is null (keep).
+ */
+export function parseTowerFacing(value) {
+  if (value === true || value === 1) return true;
+  if (value === false || value === 0) return false;
+  const v = String(value ?? '').trim().toLowerCase();
+  if (v === '1' || v === 'right' || v === 'true') return true;
+  if (v === '0' || v === 'left' || v === 'false') return false;
+  return null;
 }
 
 /** proto_furniture_tower_chassis.swf: three scenes named 3, 2, 1 on one 344 x 204 stage. */
@@ -470,6 +522,8 @@ export function normalizeTowerState(seed = {}) {
     style: TOWER_STYLES[src.style] ? src.style : 'base',
     // furniture_tower_chassis user_config: the chosen article per part.
     config: normalizeTowerConfig(TOWER_STYLES[src.style] ? src.style : 'base', src.config),
+    // furn_config.facing_right (FurnitureConfig.as default true); saves from before Flip face right.
+    facingRight: parseTowerFacing(src.facingRight) !== false,
     name: cleanTowerName(src.name),
     floorLabels,
     visited: src.visited === true,
