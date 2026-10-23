@@ -249,7 +249,7 @@
    "group": "creatures",
    "name": "Piggies",
    "status": "source",
-   "blurb": "Pet, nibble for meat, feed, name, capture and incubate, with the exact Animal Kinship tables.",
+   "blurb": "Pet, nibble for meat, feed, name, capture and incubate, with the exact Animal Kinship tables; piggies keep a mood and hunger, sulk in gloomy places and wander over to eat dropped food.",
    "spot": "piggy",
    "evidence": [
     "public/js/animal-kinship.js",
@@ -1805,9 +1805,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 284,
+  "commits": 285,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Worn-out cultivations become protos you can restore with a project"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1922,14 +1927,9 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Apartment towers, basements, machine rooms and other indoor streets spawn only what was archived there"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "fix",
-    "text": "Jethimadh Tower corridors and rooms spawn only their own quoins, named Jethimadh Tower: Base"
    }
   ]
  },
- "tests": 175,
+ "tests": 176,
  "generatedAt": "2026-10-23"
 }

@@ -88,7 +88,7 @@ export const CHECKLIST = Object.freeze([
 
   // —— Creatures & trees ——
   { id: 'piggies', group: 'creatures', name: 'Piggies', status: 'source', spot: 'piggy',
-    blurb: 'Pet, nibble for meat, feed, name, capture and incubate, with the exact Animal Kinship tables.',
+    blurb: 'Pet, nibble for meat, feed, name, capture and incubate, with the exact Animal Kinship tables; piggies keep a mood and hunger, sulk in gloomy places and wander over to eat dropped food.',
     evidence: ['public/js/animal-kinship.js', 'public/js/animal-husbandry.js'] },
   { id: 'chickens', group: 'creatures', name: 'Chickens', status: 'source', spot: 'chicken',
     blurb: 'Squeeze for grain, incubate eggs, raise chicks.',

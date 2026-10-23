@@ -84,6 +84,8 @@ import {
 } from '../animal-husbandry.js';
 import { moodMax } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
+import { SAD_BABY, isSadIn } from '../animal-mood.js';
+import { animalPlaceIsDepressing } from './animal-mood-feature.js?v=g57-1';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -446,6 +448,15 @@ function stickFor(engine, classId) {
 function stepExtra(engine, entity, dtMs) {
   const spr = entity.sprite;
   if (!spr || spr.destroyed) return;
+  // The animal-mood feature walks a hungry piggy to food and holds a sad one.
+  if (spr._moodHold) {
+    entity.row.x = Math.round(spr.x);
+    return;
+  }
+  if (Number.isFinite(spr._moodRebase)) {
+    entity.baseX = spr._moodRebase;
+    delete spr._moodRebase;
+  }
   if (!spr.loop) return; // mid action
   const stick = stickFor(engine, entity.row.classId);
   const range = stick ? Number(stick.distance) || STICK_DISTANCE : 110;
@@ -578,6 +589,9 @@ function advanceYardNow(engine) {
       engine.toast(def.fullPrompt, 4200);
       engine.pushActivity(def.fullPrompt);
       lastAction = `full:${ev.classTsid}`;
+    } else if (ev.type === 'happy' && isYard(engine)) {
+      const cheered = extras.find((e) => e.row === ev.animal);
+      if (cheered) engine.say(cheered.target, ev.line, 3000);
     } else if (ev.type === 'ascend') {
       gainXp(engine, ev.xp);
       // The drops land where the butterfly was (yard ground piles would need
@@ -689,6 +703,8 @@ function capture(engine, target) {
     learned: engine.learnedSkills,
     streetTsid: engine.streetTsid,
     ownYard: isYard(engine),
+    // A sad piggy is happy to be captured, with no location cooldown.
+    sad: isSadIn('npc_piggy', animalPlaceIsDepressing(engine)),
     rng: rollFor(engine),
   });
   if (res.bubble) engine.say(target, res.bubble, 3500);
@@ -739,7 +755,8 @@ function releasePiggyHere(engine, { escaped = false } = {}) {
   const row = addExtraAnimal(engine, 'npc_piggy', x, res.name ? { userName: res.name, namer: PLAYER_ID } : {});
   row.state.mood = 0;
   const entity = extras.find((e) => e.row === row);
-  if (entity && !escaped) engine.say(entity.target, res.bubble, 3500);
+  // onReleased: somewhere depressing the piggy goes straight to sadness instead.
+  if (entity && !escaped && !animalPlaceIsDepressing(engine)) engine.say(entity.target, res.bubble, 3500);
   engine.pushActivity(escaped ? HERDKEEPING.escapeLine : 'You released the Piggy.');
   lastAction = escaped ? 'hogtie:escaped' : 'hogtie:released';
   engine.updateHud();
@@ -882,7 +899,7 @@ let engine_ref = null;
 function setupDemo(engine) {
   if (demoUsed) return;
   const mode = String(engine.param('animaldemo') || '');
-  if (!['batterfly', 'plop', 'incubate', 'name', 'herd', 'remote'].includes(mode)) return;
+  if (!['batterfly', 'plop', 'incubate', 'name', 'herd', 'remote', 'sad'].includes(mode)) return;
   if (mode === 'remote' && !isYard(engine)) return; // waits for the home street
   demoUsed = true;
   demoMode = mode;
@@ -981,6 +998,13 @@ function setupDemo(engine) {
       if (auto === 'capture') return;
       later(2500, () => releasePiggyHere(engine));
     });
+    return;
+  }
+
+  if (mode === 'sad') {
+    // A Hog-tied Piggy released here, and a Piglet in the pack (the animal-mood feature's QA).
+    grant(engine, [HERDKEEPING.skill, 'animalkinship_1', 'animalkinship_2', 'animalkinship_3', 'animalkinship_4', 'animalkinship_5'], { hogtied_piggy: 1, piglet: 1, potato: 3 });
+    later(1200, () => releasePiggyHere(engine));
     return;
   }
 
@@ -1435,11 +1459,13 @@ export const animalHusbandryFeature = {
       const baby = BABY_ANIMALS[classTsid];
       const foods = babyFoodOptions(classTsid, inv);
       const progress = babyProgress(classTsid, inv);
+      // isSad(): babies in your pack follow the place you stand (animal_sadness.js 10-16).
+      const sad = isSadIn(classTsid, animalPlaceIsDepressing(engine));
       const out = [{
         id: 'feed',
         label: `Feed (${progress?.fed || 0}/${progress?.need || 1})`,
-        enabled: foods.length > 0 && !engine.transientInstance(),
-        reason: foods.length ? '' : baby.emptyMsg,
+        enabled: !sad && foods.length > 0 && !engine.transientInstance(),
+        reason: sad ? SAD_BABY[classTsid].feedReason : foods.length ? '' : baby.emptyMsg,
         primary: true,
         tooltip: baby.tooltip,
       }];
@@ -1489,12 +1515,18 @@ export const animalHusbandryFeature = {
     }
     if (BABY_ANIMALS[classTsid]) {
       const baby = BABY_ANIMALS[classTsid];
+      const sad = isSadIn(classTsid, animalPlaceIsDepressing(engine));
       if (verbId === 'feed') {
+        if (sad) {
+          engine.toast(SAD_BABY[classTsid].feedReason, 2600);
+          return true;
+        }
         engine.openPicker(babyTarget(engine, classTsid), { id: 'feed', emptyMsg: baby.emptyMsg });
         return true;
       }
       if (baby.extraVerb && verbId === baby.extraVerb.id) {
-        const v = baby.extraVerb;
+        // chick.js smile_at / piglet.js hum_to have their own lines where the baby is sad.
+        const v = sad && SAD_BABY[classTsid]?.extraVerb ? { ...baby.extraVerb, ...SAD_BABY[classTsid].extraVerb } : baby.extraVerb;
         if (v.energy) engine.pc.energy = Math.max(0, (engine.pc.energy || 0) + v.energy);
         engine.pc.mood = Math.max(0, Math.min(moodMax(engine.pc), (engine.pc.mood || 0) + v.mood));
         engine.pushActivity({ base: v.msg, effects: { energy: v.energy, mood: v.mood } });

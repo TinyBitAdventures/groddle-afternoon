@@ -39,6 +39,7 @@ import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
 import { moodMax } from './metabolics.js';
 import { musicblockItemMeta } from './musicblocks.js';
 import { isEnchantedForest } from './enchanted-forests.js?v=g5-1';
+import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -294,7 +295,7 @@ export function feedPiggyStack(state, classTsid, requested = 1) {
   let xp = 0;
   const hungry = Number(s.hunger) !== 0;
   if (itemBaseCost(classTsid) >= PIGGY_FEED.minBaseCost && hungry) {
-    s.hunger = 0;
+    satePiggy(s);
     xp = PIGGY_FEED.xp;
   }
   const plops = [];
@@ -732,10 +733,11 @@ export const PIGGY_CAPTURE_RESPONSES = Object.freeze({
 });
 
 /** Capture verb state (conditions in source order). */
-export function captureVerbState({ inv = {}, learned = [], energy = 0, streetTsid = '', now = Date.now(), ownYard = false, packFull = false } = {}) {
+export function captureVerbState({ inv = {}, learned = [], energy = 0, streetTsid = '', now = Date.now(), ownYard = false, packFull = false, depressing = false } = {}) {
   if ((inv.hogtied_piggy || 0) > 0) return { enabled: false, reason: HERDKEEPING.handsFull };
   const last = packState.captures[streetTsid];
-  if (!ownYard && Number.isFinite(last) && now - last < HERDKEEPING.locationCooldownMs) {
+  // No location cooldown where animals are sad (npc_piggy.js 383-386).
+  if (!ownYard && !depressing && Number.isFinite(last) && now - last < HERDKEEPING.locationCooldownMs) {
     return { enabled: false, reason: HERDKEEPING.locationLimit };
   }
   if (now < packState.captureCooldownUntil) return { enabled: false, reason: HERDKEEPING.exhausted };
@@ -757,8 +759,8 @@ export function hogtieEscapeDelayMs(chance = HERDKEEPING.escapeChance, rng = Mat
  * Capture a Piggy. Mutates pc/inv/pack state. On success the caller removes
  * the piggy from the street (`removePiggy`).
  */
-export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', now = Date.now(), ownYard = false, rng = Math.random } = {}) {
-  const gate = captureVerbState({ inv, learned, energy: pc?.energy || 0, streetTsid, now, ownYard });
+export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', now = Date.now(), ownYard = false, sad = false, rng = Math.random } = {}) {
+  const gate = captureVerbState({ inv, learned, energy: pc?.energy || 0, streetTsid, now, ownYard, depressing: sad });
   if (!gate.enabled) return { ok: false, msg: gate.reason };
   const effects = { energy: 0, mood: 0, xp: 0, items: {} };
   if ((inv.pig_bait || 0) < 1) return { ok: false, msg: HERDKEEPING.noBait, effects };
@@ -767,7 +769,8 @@ export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', no
   const lost = Math.min(pc.energy || 0, HERDKEEPING.energy);
   pc.energy = (pc.energy || 0) - lost;
   effects.energy = -lost;
-  if (rng() < HERDKEEPING.chance) {
+  // A sad piggy is happy to be captured (npc_piggy.js 439-444).
+  if (rng() < HERDKEEPING.chance || sad) {
     inv.hogtied_piggy = (inv.hogtied_piggy || 0) + 1;
     effects.items.hogtied_piggy = 1;
     const before = pc.mood || 0;
@@ -926,12 +929,18 @@ function isLeftMost(machine, machines) {
   return !machines.some((m) => m !== machine && m.classTsid === machine.classTsid && m.x <= machine.x && (m.inside || 0) < def.capacity);
 }
 
-/** npc_animal onTwiceDaily hunger: +1 each half day below 2, then only on the daily tick. */
-function hungerTick(state) {
-  state.isDaily = state.isDaily ? 0 : 1;
-  const hunger = Number(state.hunger) || 0;
-  if (hunger < 2) state.hunger = hunger + 1;
-  else if (hunger < 10 && state.isDaily) state.hunger = hunger + 1;
+/**
+ * npc_animal onTwiceDaily (js/animal-mood.js): mood -1 each game day, the
+ * other yard piggies cheer up a mood-0 piggy, hunger +1 each half day below
+ * 2, then only on the daily tick, croaking at 10. The yard has no sad
+ * animals (it is not a depressing place) and its food comes from the Piggy
+ * Feeder pass below; dropped food is handled live on the street.
+ */
+function hungerTick(subject, animals) {
+  const neighbourMoods = animals
+    .filter((a) => a !== subject && a.classId === 'npc_piggy')
+    .map((a) => a.state.mood);
+  return piggyTwiceDailyTick(subject.state, { neighbourMoods });
 }
 
 /**
@@ -947,7 +956,10 @@ export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.
   const machines = (yard.machines ||= []);
   for (const a of animals) {
     a.state ||= {};
-    if (a.classId === 'npc_piggy' && !Number.isFinite(a.state.hungerAt)) a.state.hungerAt = now + HALF_DAY_MS;
+    if (a.classId === 'npc_piggy') {
+      if (!Number.isFinite(a.state.hungerAt)) a.state.hungerAt = now + HALF_DAY_MS;
+      ensurePiggyMood(a.state, now);
+    }
     if (a.classId === 'npc_butterfly' && !Number.isFinite(a.state.lifePoints)) a.state.lifePoints = BUTTERFLY_LIFE_POINTS;
   }
   for (const m of machines) if (!Number.isFinite(m.nextAt)) m.nextAt = now + machineIntervalMs(m.classTsid, upgrades);
@@ -973,7 +985,9 @@ export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.
     }
     if (!kind || at > now) break;
     if (kind === 'hunger') {
-      hungerTick(subject.state);
+      for (const ev of hungerTick(subject, animals)) {
+        if (ev.type === 'happy' || ev.type === 'croak') events.push({ type: ev.type, animal: subject, line: ev.line });
+      }
       subject.state.hungerAt += HALF_DAY_MS;
       continue;
     }
@@ -985,7 +999,7 @@ export function advanceYard(yard, now = Date.now(), { upgrades = [], rng = Math.
       for (const a of animals) {
         if (a.classId !== 'npc_piggy' || Number(a.state.hunger) === 0) continue;
         m.inside -= 1;
-        a.state.hunger = 0;
+        satePiggy(a.state);
         if (m.inside <= 0) break;
       }
       continue;

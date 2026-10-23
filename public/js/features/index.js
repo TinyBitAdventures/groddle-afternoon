@@ -85,3 +85,4 @@ import { enchantedForestFeature } from './enchanted-forest-feature.js?v=g5-1'; F
 import { jujuBanditsFeature } from './juju-bandits-feature.js?v=g39-3'; FEATURES.push(jujuBanditsFeature);
 import { craftybotFeature } from './craftybot-feature.js?v=craftybot-3'; FEATURES.push(craftybotFeature);
 import { moodDecayFeature } from './mood-decay-feature.js?v=mood-decay-1'; FEATURES.push(moodDecayFeature);
+import { animalMoodFeature } from './animal-mood-feature.js?v=g57-1'; FEATURES.push(animalMoodFeature);

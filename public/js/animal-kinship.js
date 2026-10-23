@@ -19,6 +19,7 @@ import {
 } from './tools.js?v=tools-2';
 import { SKILL_PACKAGES, skillPackageDetails } from './skill-packages.js';
 import { moodMax } from './metabolics.js';
+import { incPiggyMood, piggyNibbleRefusal } from './animal-mood.js';
 
 export const ANIMAL_KINSHIP_RANK_IDS = Object.freeze(
   Array.from({ length: 7 }, (_, index) => `animalkinship_${index + 1}`)
@@ -289,6 +290,22 @@ function awardMetabolics(pc, selected, moodBonus = selected.moodBonus) {
 export function performAnimalKinship(state, classId, verbId, ctx = {}) {
   const quote = quoteAnimalKinship(state, classId, verbId, ctx);
   if (!quote.ok) return { ...quote, attempted: false, effects: { energy: 0, mood: 0, xp: 0, items: {} } };
+  // npc_piggy.js nibble handler 875-880: petted (or AK VI) but mood 0 or
+  // hunger > 2 refuses before the package runs, so nothing is spent.
+  if (classId === 'npc_piggy' && verbId === 'nibble') {
+    const refusal = piggyNibbleRefusal(state || {});
+    if (refusal) {
+      return {
+        ...quote,
+        ok: false,
+        attempted: false,
+        reason: 'not_in_mood',
+        refusal,
+        msg: refusal.msg,
+        effects: { energy: 0, mood: 0, xp: 0, items: {} },
+      };
+    }
+  }
   const selected = quote.profile;
   const rng = typeof ctx.rng === 'function' ? ctx.rng : Math.random;
   if (selected.successRate < 100 && rng() >= selected.successRate / 100) {
@@ -352,6 +369,8 @@ export function performAnimalKinship(state, classId, verbId, ctx = {}) {
 
   s[actionState.daily] = integer(s[actionState.daily]) + 1;
   s[actionState.total] = integer(s[actionState.total]) + 1;
+  // onPetComplete: incMood(1), capped at 2 (npc_piggy.js 1717, 1352-1362).
+  if (classId === 'npc_piggy' && verbId === 'pet') incPiggyMood(s, 1);
   if (actionState.legacy === 'squeezedToday') s.squeezedToday = s[actionState.daily];
   else s[actionState.legacy] = true;
 

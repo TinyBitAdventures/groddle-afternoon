@@ -17,6 +17,7 @@ import {
   itemLabel,
   itemStackMax,
 } from './animal-husbandry.js';
+import { ensurePiggyMood, piggyMoodLabel } from './animal-mood.js';
 
 export const ANIMAL_CLASS_IDS = Object.freeze([
   'npc_piggy',
@@ -73,6 +74,8 @@ export function ensureAnimalState(classId, state = {}) {
     if (state[key] === undefined) state[key] = value;
   }
   ensureAnimalKinshipState(classId, state);
+  // Mood 0..2 and the twice-daily hunger clock (js/animal-mood.js).
+  if (classId === 'npc_piggy') ensurePiggyMood(state);
   return state;
 }
 
@@ -155,8 +158,8 @@ export function resetAnimalDay(classId, state) {
   const s = ensureAnimalState(classId, state || {});
   resetAnimalKinshipDay(classId, s);
   if (classId === 'npc_piggy') {
+    // Hunger and mood move on the piggy's own twice-daily tick (js/animal-mood.js).
     s.fed = false;
-    s.hunger = Math.min(3, (s.hunger || 0) + 1);
     delete s.lastFed;
   } else if (classId === 'npc_chicken') {
     s.buttered = false;
@@ -173,6 +176,8 @@ export function resetAnimalDay(classId, state) {
 export function animalStatusLabel(classId, state = {}) {
   const s = ensureAnimalState(classId, state);
   if (classId === 'npc_piggy') {
+    const mood = piggyMoodLabel(s);
+    if (mood) return mood;
     if (s.nibbleUsesToday) return `Nibbled ${s.nibbleUsesToday}× today · feeling philosophical`;
     if (s.petted && s.fed) return 'Fed and loved · ready for a nibble';
     if (s.petUsesToday) return `Petted ${s.petUsesToday}× today · ready for a nibble`;
