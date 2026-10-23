@@ -229,7 +229,7 @@ describe('vector presets', () => {
       assert.ok(!keys.has(key), `${p.id} looks like ${keys.get(key)}`);
       keys.set(key, p.id);
     }
-    assert.equal(keys.size, 11);
+    assert.equal(keys.size, 15);
     assert.equal(APPEARANCE_PRESETS.glitch.appearance.bodyStyle, 'glitch');
     assert.equal(APPEARANCE_PRESETS.classic.appearance.bodyStyle, 'classic');
     assert.equal(APPEARANCE_PRESETS.alt_base.appearance.bodyStyle, 'alt');

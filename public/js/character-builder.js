@@ -9,6 +9,7 @@
  */
 import { normalizeVectorFields, vectorFieldsFromColors } from './avatar-looks.js';
 import { installReimaginedTags } from './avatar-reimagined.js';
+import { starterRowFields } from './avatar-starter.js';
 
 // The builder's wardrobe chips (game.js) get a "Reimagined" tag on the
 // greyscale masters the remake coloured (js/avatar-reimagined.js, row G52).
@@ -176,7 +177,26 @@ function vectorPreset(fields) {
   return { ...createDefaultAppearance(), vector: normalizeVectorFields(fields) };
 }
 
-/** Named full looks for one-click presets. */
+/** The builder's preset chips, one group at a time (js/avatar-builder-ui.js). */
+export const PRESET_GROUPS = Object.freeze([
+  { id: 'looks', label: 'Looks' },
+  { id: 'starter', label: 'Starter' },
+]);
+
+/**
+ * Tiny Speck's four new-player looks: every "Start fresh" slot on one choice
+ * row (js/avatar-starter.js, GSJS inc_data_default_avatars.js).
+ */
+function starterPresets() {
+  return Object.fromEntries([0, 1, 2, 3].map((i) => [`starter${i + 1}`, {
+    id: `starter${i + 1}`,
+    label: `Starter ${i + 1}`,
+    group: 'starter',
+    appearance: vectorPreset(starterRowFields(i)),
+  }]));
+}
+
+/** Named full looks for one-click presets (group: PRESET_GROUPS id, 'looks' when unset). */
 export const APPEARANCE_PRESETS = {
   vector: {
     id: 'vector',
@@ -283,6 +303,7 @@ export const APPEARANCE_PRESETS = {
       hairColor: 9,
     }),
   },
+  ...starterPresets(),
   glitch: {
     id: 'glitch',
     label: 'Recovered',

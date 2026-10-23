@@ -636,10 +636,12 @@ import {
   recolorImageData,
   randomAppearance,
   APPEARANCE_PRESETS,
+  PRESET_GROUPS,
   COLOR_SWATCHES,
   resolveBodySheets,
   appearanceCacheKey,
 } from './js/character-builder.js';
+import { clearPresetActive, renderPresetGroups, renderStarterPicker } from './js/avatar-builder-ui.js';
 import {
   loadAmbientMusicConfig,
   resolveAmbientTheme,
@@ -6804,7 +6806,7 @@ function closeAvatarPanel() {
 
 /** Builder tabs: colour slots for the older looks, parts for the vector Glitch. */
 const CLASSIC_BUILDER_TABS = [['hair', 'Hair'], ['skin', 'Skin'], ['shirt', 'Shirt'], ['pants', 'Pants'], ['shoes', 'Shoes']];
-const VECTOR_BUILDER_TABS = [['hair', 'Hair'], ['face', 'Face'], ['skin', 'Skin'], ['top', 'Top'], ['coat', 'Coat'], ['bottom', 'Bottom'], ['shoes', 'Shoes'], ['hat', 'Hat']];
+const VECTOR_BUILDER_TABS = [['fresh', 'Start fresh'], ['hair', 'Hair'], ['face', 'Face'], ['skin', 'Skin'], ['top', 'Top'], ['coat', 'Coat'], ['bottom', 'Bottom'], ['shoes', 'Shoes'], ['hat', 'Hat']];
 /** Which article types each vector tab edits, with section titles. */
 const VECTOR_TAB_TYPES = {
   hair: [['hair', 'Hair style']],
@@ -6824,22 +6826,12 @@ function renderAvatarBuilder() {
   const presetsEl = document.getElementById('avatar-presets');
   if (presetsEl && !presetsEl.dataset.ready) {
     presetsEl.dataset.ready = '1';
-    for (const p of Object.values(APPEARANCE_PRESETS)) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'avatar-preset-chip';
-      btn.textContent = p.label;
-      btn.dataset.preset = p.id;
-      btn.addEventListener('click', () => {
-        playerAppearance = normalizeAppearance(p.appearance);
-        renderAvatarBuilder();
-        paintAvatarPreview();
-        presetsEl.querySelectorAll('.avatar-preset-chip').forEach((c) => {
-          c.classList.toggle('active', c.dataset.preset === p.id);
-        });
-      });
-      presetsEl.appendChild(btn);
-    }
+    // Grouped chips (Looks / Starter / Costumes), js/avatar-builder-ui.js.
+    renderPresetGroups(presetsEl, { presets: Object.values(APPEARANCE_PRESETS), groups: PRESET_GROUPS, onPick: (p) => {
+      playerAppearance = normalizeAppearance(p.appearance);
+      renderAvatarBuilder();
+      paintAvatarPreview();
+    } });
   }
   const tabsEl = document.getElementById('avatar-tabs');
   const tabs = isVectorLook() ? VECTOR_BUILDER_TABS : CLASSIC_BUILDER_TABS;
@@ -6921,7 +6913,7 @@ function setVectorFields(mutate) {
   const v = JSON.parse(JSON.stringify(playerAppearance.vector || {}));
   mutate(v);
   playerAppearance = normalizeAppearance({ ...playerAppearance, bodyStyle: 'vector', vector: v });
-  document.querySelectorAll('.avatar-preset-chip').forEach((c) => c.classList.remove('active'));
+  clearPresetActive(document.getElementById('avatar-presets'));
   renderAvatarSwatches();
   paintAvatarPreview();
 }
@@ -6951,6 +6943,14 @@ function renderVectorControls(box) {
     return;
   }
   const tab = avatarBuilderSlot;
+  if (tab === 'fresh') {
+    // Tiny Speck's new-player picker (js/avatar-starter.js): nine slots, four choices each.
+    renderStarterPicker(box, { fields: playerAppearance.vector, onChange: (next) => setVectorFields((v) => {
+      for (const k of Object.keys(v)) delete v[k];
+      Object.assign(v, next);
+    }) });
+    return;
+  }
   if (tab === 'skin' || tab === 'hair') {
     if (tab === 'hair') renderStyleChips(box, 'hair', 'Hair style');
     const slot = tab;
