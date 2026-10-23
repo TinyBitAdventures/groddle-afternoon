@@ -36,9 +36,9 @@
  *      panorama (spotlight per exhibit, window spacing).
  *   F  forum general/29729 (2012-11-21, Kukubee): opened "next to the Rook
  *      Museum in Jethimadh tower"; replies: "accessible from Tower St West".
- * The captions the buttons raised survive only in V (and fragments in S/F
- * captions), so they are not shipped: each button raises the exhibit's name
- * (its SWF's name). Recovered text: research/wayback/README.md section 6, G73.
+ * The captions the buttons raised are Tiny Speck's text, surviving only in V
+ * (transcribed in research/wayback/README.md section 6, G73); Austin approved
+ * shipping them 2026-10-23. Each exhibit keeps its name as `label`.
  *
  * Layout (world px, floor y 0): exhibit order from V; spacing from V and S
  * measured against the CC0 art's own size (a Snap is ~0.7 world scale, a
@@ -100,28 +100,29 @@ export const HALL = Object.freeze({
  * plinth front (floor exhibits: it hangs on the wall).
  */
 export const HALL_EXHIBITS = Object.freeze([
-  { id: 'rube', label: 'The Rube', x: 1060, pieces: [['museum_rube_1', 0]], plinth: 120 },
-  { id: 'fox', label: 'The Fox', x: 1310, pieces: [['museum_fox_1', 0]], plinth: 110 },
-  { id: 'craftybot', label: 'The Craftybot', x: 1560, pieces: [['museum_craftybot_1', 0]], plinth: 130 },
-  { id: 'butler', label: 'The Butler', x: 1815, pieces: [['museum_butler_1', 0]], plinth: 100 },
-  { id: 'deimaginators', label: 'The Deimaginators', x: 2085, pieces: [['museum_deimaginator_1', 0]], plinth: 230 },
+  { id: 'rube', label: 'The Rube', caption: 'The original idea for the Rube called for a Spongebobbian country rube character.', x: 1060, pieces: [['museum_rube_1', 0]], plinth: 120 },
+  { id: 'fox', label: 'The Fox', caption: 'The Fox, before being injected with a dose of Quagmirian creepyness', x: 1310, pieces: [['museum_fox_1', 0]], plinth: 110 },
+  { id: 'craftybot', label: 'The Craftybot', caption: 'The original Craftybot had a slightly more modern look. The style was later used for the Play Cube item', x: 1560, pieces: [['museum_craftybot_1', 0]], plinth: 130 },
+  { id: 'butler', label: 'The Butler', caption: 'The original idea for the Butler was to be a re-animated corpse of a dead Glitch', x: 1815, pieces: [['museum_butler_1', 0]], plinth: 100 },
+  { id: 'deimaginators', label: 'The Deimaginators', caption: 'Various concepts for the Deimaginators', x: 2085, pieces: [['museum_deimaginator_1', 0]], plinth: 230 },
   {
     id: 'street_spirits',
     label: 'The Street Spirits',
+    caption: 'Early concepts for the Groddle Street Spirits',
     x: 2470,
     pieces: [['museum_ssgroddle_1', -90], ['museum_ssgroddle_2', 95]],
     plinth: null,
     float: 46,
     button: { dx: -175, y: -24 },
   },
-  { id: 'bunny', label: 'A Bunny', x: 2790, pieces: [['museum_bunny_1', 0]], plinth: 110 },
-  { id: 'dragons', label: 'The Dragons', x: 3060, pieces: [['museum_dragon_1', 0]], plinth: 160 },
-  { id: 'vendors', label: 'The Food and Gardening Vendors', x: 3420, pieces: [['museum_foodvendor_1', -58], ['museum_gardeningvendor_1', 62]], plinth: 270 },
-  { id: 'wish_dolly', label: 'The Wish Dolly', x: 3715, pieces: [['museum_wishdolly_1', 0]], plinth: 100 },
-  { id: 'playerator', label: 'The Playerator', x: 3900, pieces: [['museum_playerator_1', 0]], plinth: 96 },
-  { id: 'tools', label: 'The Tools', x: 4205, pieces: [['museum_tools_1', 0]], plinth: null, button: { dx: -30, y: -80 } },
-  { id: 'stactus', label: 'The Stactus', x: 4560, pieces: [['museum_stactus_1', 0]], plinth: 130 },
-  { id: 'avatars', label: 'The Avatars', x: 4950, pieces: [['museum_avatars_1', 0]], plinth: null, button: { dx: -200, y: -72 } },
+  { id: 'bunny', label: 'A Bunny', caption: 'A bunny. Why? Because bunny.', x: 2790, pieces: [['museum_bunny_1', 0]], plinth: 110 },
+  { id: 'dragons', label: 'The Dragons', caption: 'An idea for evolving pet Dragons', x: 3060, pieces: [['museum_dragon_1', 0]], plinth: 160 },
+  { id: 'vendors', label: 'The Food and Gardening Vendors', caption: 'Original concepts for the Food and Gardening Vendors.', x: 3420, pieces: [['museum_foodvendor_1', -58], ['museum_gardeningvendor_1', 62]], plinth: 270 },
+  { id: 'wish_dolly', label: 'The Wish Dolly', caption: 'Bluto\'s Wish Dolly idea. The doll was to grant the owner a wish a day.', x: 3715, pieces: [['museum_wishdolly_1', 0]], plinth: 100 },
+  { id: 'playerator', label: 'The Playerator', caption: 'The Playerator was a precursor to the Play Cube', x: 3900, pieces: [['museum_playerator_1', 0]], plinth: 96 },
+  { id: 'tools', label: 'The Tools', caption: 'A multitude of additional premium tools were designed but yet to be implemented.', x: 4205, pieces: [['museum_tools_1', 0]], plinth: null, button: { dx: -30, y: -80 } },
+  { id: 'stactus', label: 'The Stactus', caption: 'The Stactus was a jenga-like building game where multiple players collect and stack balls to make structures.', x: 4560, pieces: [['museum_stactus_1', 0]], plinth: 130 },
+  { id: 'avatars', label: 'The Avatars', caption: 'Early concepts for the Avatar', x: 4950, pieces: [['museum_avatars_1', 0]], plinth: null, button: { dx: -200, y: -72 } },
 ]);
 
 /** World placement of every exhibit sprite, plinth and button (bottom-centre anchors, floor y 0). */
@@ -134,7 +135,7 @@ export function hallLayout() {
     const button = ex.button
       ? { x: ex.x + ex.button.dx, y: floor + ex.button.y }
       : { x: ex.x, y: floor - 8 };
-    return { id: ex.id, label: ex.label, x: ex.x, plinth, pieces, button };
+    return { id: ex.id, label: ex.label, caption: ex.caption, x: ex.x, plinth, pieces, button };
   });
 }
 

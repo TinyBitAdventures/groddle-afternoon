@@ -245,7 +245,7 @@ export function pressHallButton(engine, target) {
   engine.setData('hallPresses', hallPresses);
   engine.setData('hallSeen', hallSeen.size);
   engine.setData('midTowerLast', `hall:${b.ex.id}`);
-  announce(engine, b.ex.label);
+  announce(engine, b.ex.caption || b.ex.label);
   return true;
 }
 

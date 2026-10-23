@@ -129,12 +129,15 @@ describe('Hall of Rejected Concepts: the exhibits', () => {
     }
   });
 
-  it('name themselves; the recorded captions (player recordings only) are not shipped', () => {
-    const src = readFileSync(join(spike, 'public/js/hall-rejected-concepts.js'), 'utf8');
-    for (const line of ['Because bunny', 'jenga-like', 'Spongebobbian', 'Quagmirian', 'a wish a day', 'Play Cube']) {
-      assert.ok(!src.includes(line), line);
+  it('raise the recorded captions (V, approved 2026-10-23), one per exhibit, and keep short names', () => {
+    for (const ex of HALL_EXHIBITS) {
+      assert.ok(ex.label.length < 40, ex.id);
+      assert.ok(ex.caption && ex.caption.length > 20, ex.id);
     }
-    for (const ex of HALL_EXHIBITS) assert.ok(ex.label.length < 40, ex.id);
+    const byId = Object.fromEntries(HALL_EXHIBITS.map((ex) => [ex.id, ex.caption]));
+    assert.equal(byId.bunny, 'A bunny. Why? Because bunny.');
+    assert.match(byId.stactus, /^The Stactus was a jenga-like building game/);
+    assert.equal(new Set(Object.values(byId)).size, HALL_EXHIBITS.length);
   });
 });
 
@@ -212,7 +215,7 @@ describe('Hall of Rejected Concepts: the Wall Buttons', () => {
       feature.onStreetClear(engine);
     });
 
-    it('a press goes in, names its exhibit, and pops out after reset_timer', async () => {
+    it('a press goes in, raises its caption, and pops out after reset_timer', async () => {
       const engine = engineAt(4560);
       feature.onStreetEnter(engine.street, engine);
       const doc = globalThis.document;
@@ -221,7 +224,7 @@ describe('Hall of Rejected Concepts: the Wall Buttons', () => {
         const stactus = engine.calls.registered.find((t) => t.hallExhibit === 'stactus');
         assert.equal(feature.runVerb(stactus, 'press', engine), true);
         assert.equal(engine.calls.data.hallButton, 'stactus');
-        assert.deepEqual(engine.calls.activity, ['The Stactus']);
+        assert.deepEqual(engine.calls.activity, [HALL_EXHIBITS.find((ex) => ex.id === 'stactus').caption]);
         assert.equal(feature._state().hall.find((b) => b.id === 'stactus').pressed, true);
         await new Promise((r) => setTimeout(r, WALL_BUTTON.resetMs + 50));
         assert.equal(feature._state().hall.find((b) => b.id === 'stactus').pressed, false);
@@ -229,7 +232,7 @@ describe('Hall of Rejected Concepts: the Wall Buttons', () => {
         const rube = engine.calls.registered.find((t) => t.hallExhibit === 'rube');
         feature.runVerb(rube, 'press', engine);
         assert.equal(engine.calls.data.midTowerLast, 'hall_far:rube');
-        assert.deepEqual(engine.calls.activity, ['The Stactus']);
+        assert.deepEqual(engine.calls.activity, [HALL_EXHIBITS.find((ex) => ex.id === 'stactus').caption]);
       } finally {
         globalThis.document = doc;
         feature.onStreetClear(engine);

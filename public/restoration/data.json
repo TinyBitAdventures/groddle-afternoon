@@ -1807,9 +1807,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 308,
+  "commits": 310,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Sky Plunge lands on its Snap's cloud floor, with a Back to Top door and \"AHHHHH YEAHHHH!!!!!\""
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Mr. Block's playroom is the giant Kid's Room from players' Snaps"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1919,16 +1929,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Piggies get moody, hungry and sad, and walk over to eat dropped food"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Worn-out cultivations become protos you can restore with a project"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Spend Giant favor or a spare emblem to learn skills faster"
    }
   ]
  },
