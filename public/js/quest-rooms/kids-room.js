@@ -24,17 +24,19 @@
  * `spell_words`, completing the quest (500 iMG, 500 currants, 250 mood).
  *
  * Both rooms carry the tea party between friend Bear and friend Thing
- * (callback_teaParty, exact lines and delays); the plush stand-ins are the
- * recovered Emotional Bear and a Yeti cubimal.
+ * (callback_teaParty, exact lines and delays). The room is the Kid's Room the
+ * players' Snaps show (js/kids-room-scene.js, shared with Four Letter Words):
+ * friend Bear is its teddy and friend Thing the pink tall guy at the tea table.
  */
 
 import { applyRewards } from '../quests.js';
 import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=catalog-unified-3';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
+import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js';
 
-const W = 1150;
-const H = 760;
-const FLOOR = 620;
+const W = KIDS_ROOM_W;
+const H = KIDS_ROOM_H;
+const FLOOR = KIDS_ROOM_FLOOR;
 const BLOCK_ART = 'assets/sprites/quests/four-letter/letter-block-';
 const ROOM_ART = 'assets/sprites/quest-rooms/kids_room/';
 
@@ -161,62 +163,16 @@ const TEA_PARTY = {
   ],
 };
 
-const BLOCK_X = [430, 580, 730];
-const MR_BLOCK = { x: 905, y: 512 };
-const TEA_X = 205;
+// The Kid's Room puts the tea table at x 300 by the entrance and the puzzle right of the kids' table
+// (as Four Letter Words); the blocks keep the source's 150 px spacing.
+const BLOCK_X = [1100, 1250, 1400];
+const MR_BLOCK = { x: 1575, y: 512 };
+const TEA_X = 300;
+const BOARD_X = 1000;
+const SPAWN_X = 930;
 
-function drawPlayroom(PIXI, kit) {
-  const root = kit.sceneRoot(PIXI, W, H);
-  const room = new PIXI.Graphics();
-  room.rect(0, 0, W, FLOOR).fill(0xf7f0d9);
-  const colors = [0x72c8c8, 0xeba75f, 0xcf6179, 0x9bc761, 0x7aa9d1];
-  for (let x = -70, i = 0; x < 1220; x += 165, i += 1) {
-    room.roundRect(x, 40 + (i % 2) * 20, 96, 72, 30);
-    room.circle(x + 26, 35 + (i % 2) * 20, 23);
-    room.circle(x + 76, 35 + (i % 2) * 20, 23);
-    room.fill({ color: colors[i % colors.length], alpha: 0.9 });
-  }
-  for (const x of [40, 960]) {
-    room.roundRect(x, 155, 150, 300, 8).fill(0x9fe1e7).stroke({ width: 8, color: 0xffffff, alpha: 0.9 });
-    room.moveTo(x + 75, 160);
-    room.lineTo(x + 75, 450);
-    room.moveTo(x + 5, 305);
-    room.lineTo(x + 145, 305);
-    room.stroke({ width: 5, color: 0xffffff, alpha: 0.85 });
-  }
-  room.rect(0, FLOOR, W, H - FLOOR).fill(0x8b5f42);
-  room.rect(0, FLOOR - 16, W, 18).fill(0x6d4936);
-  for (let y = 646; y < H; y += 28) {
-    room.moveTo(0, y);
-    room.lineTo(W, y);
-  }
-  for (let x = 0; x < W; x += 145) {
-    room.moveTo(x, FLOOR);
-    room.lineTo(x + 35, H);
-  }
-  room.stroke({ width: 2, color: 0xb88962, alpha: 0.45 });
-  // Tea table, two little chairs and cups for friend Bear and friend Thing.
-  room.roundRect(TEA_X - 110, 520, 220, 24, 9);
-  room.rect(TEA_X - 80, 542, 20, 78);
-  room.rect(TEA_X + 60, 542, 20, 78);
-  room.roundRect(TEA_X - 190, 560, 64, 14, 5);
-  room.rect(TEA_X - 186, 572, 10, 48);
-  room.rect(TEA_X - 140, 572, 10, 48);
-  room.rect(TEA_X - 190, 500, 10, 62);
-  room.roundRect(TEA_X + 126, 560, 64, 14, 5);
-  room.rect(TEA_X + 130, 572, 10, 48);
-  room.rect(TEA_X + 176, 572, 10, 48);
-  room.rect(TEA_X + 180, 500, 10, 62);
-  room.fill(0x694b38);
-  room.ellipse(TEA_X - 45, 514, 18, 8);
-  room.ellipse(TEA_X + 45, 514, 18, 8);
-  room.roundRect(TEA_X - 16, 488, 32, 28, 10);
-  room.fill(0xf6f1df);
-  room.circle(TEA_X - 45, 500, 10).fill(0xcd4f68);
-  room.circle(TEA_X + 45, 500, 10).fill(0x79b8c7);
-  root.addChild(room);
-  root.addChild(kit.label(PIXI, "MR. BLOCK'S PLAYROOM", 580, 140, { size: 22, fill: 0x8d7357, alpha: 0.42, weight: '900' }));
-  return root;
+function drawPlayroom(PIXI) {
+  return buildKidsRoomScene(PIXI, { label: 'kids-room' });
 }
 
 function blockTexture(PIXI, letter, frame = 0) {
@@ -368,14 +324,14 @@ function drawBoard(ctx) {
   if (ctx.data.board && !ctx.data.board.destroyed) ctx.data.board.destroy({ children: true });
   const board = new PIXI.Container();
   const g = new PIXI.Graphics();
-  g.roundRect(330, 170, 500, 266, 12).fill(0x2f5a4a).stroke({ width: 10, color: 0x9b6b3f, alpha: 1 });
+  g.roundRect(BOARD_X, 170, 500, 266, 12).fill(0x2f5a4a).stroke({ width: 10, color: 0x9b6b3f, alpha: 1 });
   board.addChild(g);
-  board.addChild(kit.label(PIXI, `WORDS  ${ctx.data.spelled.length}/${WORD_UP_WORDS.length}`, 580, 194, { size: 17, fill: 0xf4f0d6, weight: '900' }));
+  board.addChild(kit.label(PIXI, `WORDS  ${ctx.data.spelled.length}/${WORD_UP_WORDS.length}`, BOARD_X + 250, 194, { size: 17, fill: 0xf4f0d6, weight: '900' }));
   WORD_UP_WORDS.forEach((word, i) => {
     const col = Math.floor(i / 6);
     const row = i % 6;
     const done = ctx.data.spelled.includes(word);
-    board.addChild(kit.label(PIXI, done ? word : '???', 395 + col * 124, 232 + row * 32, {
+    board.addChild(kit.label(PIXI, done ? word : '???', BOARD_X + 65 + col * 124, 232 + row * 32, {
       size: 19, fill: done ? 0xffe066 : 0x8fb3a3, weight: done ? '900' : '700', alpha: done ? 1 : 0.7,
     }));
   });
@@ -446,7 +402,8 @@ export const room = {
   stageLabel: () => "Mr. Block's Playroom",
 
   build(ctx) {
-    const background = drawPlayroom(ctx.PIXI, ctx.kit);
+    const background = drawPlayroom(ctx.PIXI);
+    ctx.data.scenePieces = background.pieces;
     return {
       label: "Mr. Block's Playroom",
       hubName: 'A very small room',
@@ -454,12 +411,11 @@ export const room = {
       height: H,
       background,
       platforms: [ctx.kit.plat(0, FLOOR, W, FLOOR, 'invisible', { id: 'kids_floor' })],
-      spawn: { x: 520, y: FLOOR },
+      spawn: { x: SPAWN_X, y: FLOOR },
     };
   },
 
   enter(ctx) {
-    const { PIXI, kit } = ctx;
     ctx.scalePlayer(0.42);
     ctx.data.talked = false;
     ctx.data.teaDone = false;
@@ -475,11 +431,9 @@ export const room = {
       subtitle: ctx.questId === 'letter_block_3' ? 'Has a game of utmost import' : `Collects things that start with ${ctx.data.letter}`,
       sprite: spr,
     });
-    const bear = kit.roomArt(PIXI, 'kids_room', 'bear', TEA_X - 158, 562, { scale: 1.1 });
-    const thing = kit.icon(PIXI, 'npc_cubimal_yeti', TEA_X + 158, 562, { scale: 0.9, flip: true });
-    ctx.add(bear, 30);
-    ctx.add(thing, 30);
-    ctx.data.tea = { bear: { sprite: bear, label: 'Bear' }, thing: { sprite: thing, label: 'Thing' } };
+    // Friend Bear and friend Thing are the room's own teddy and pink tall guy.
+    const pieces = ctx.data.scenePieces || {};
+    ctx.data.tea = { bear: { sprite: pieces.bear, label: 'Bear' }, thing: { sprite: pieces.thing, label: 'Thing' } };
     if (ctx.data.spelling) createBlocks(ctx);
     else if (ctx.questId === 'letter_block_3') drawBoard(ctx);
     ctx.activity('You shrink down and arrive in Mr. Block’s Playroom.');

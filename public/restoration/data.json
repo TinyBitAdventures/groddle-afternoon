@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 307,
+  "commits": 308,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Visit the Hall of Rejected Concepts behind the Mezzanine and press each exhibit's button"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1924,14 +1929,9 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Spend Giant favor or a spare emblem to learn skills faster"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Play any restored system, quest room or designer level straight from the restoration page"
    }
   ]
  },
- "tests": 183,
+ "tests": 184,
  "generatedAt": "2026-10-23"
 }

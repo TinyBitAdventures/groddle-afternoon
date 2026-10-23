@@ -35,6 +35,20 @@ export const FOUR_LETTER_RIDDLES = Object.freeze([
   }),
 ]);
 
+/**
+ * Where the puzzle sits in the Kid's Room (js/kids-room-scene.js, 1900 px wide). The source enters
+ * the instance at the far left (letter_block_2.js onStarted: x -1528) and makes the blocks 1,400+ px
+ * to the right (callback_createBlocks: x -150, 0, 150, 300) with Mr. Block to their right (the
+ * avatar is moved to x 471 facing right after each riddle). The remake keeps its own block spacing
+ * and spawn beside the blocks, and puts the room's furniture to the left (tea party, kids' table)
+ * and right (the bed) of the puzzle.
+ */
+export const FOUR_LETTER_LAYOUT = Object.freeze({
+  spawnX: 930,
+  blockXs: Object.freeze([1060, 1180, 1300, 1420]),
+  mrBlock: Object.freeze({ x: 1440, y: 500 }),
+});
+
 export const FOUR_LETTER_REWARD = Object.freeze({
   xp: 500,
   currants: 300,

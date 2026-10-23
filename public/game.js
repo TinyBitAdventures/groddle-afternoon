@@ -58,6 +58,7 @@ import {
 import {
   FOUR_LETTER_BASE_STREET_ID,
   FOUR_LETTER_BLOCKS,
+  FOUR_LETTER_LAYOUT,
   FOUR_LETTER_QUEST_ID,
   FOUR_LETTER_RIDDLES,
   FOUR_LETTER_ROOM_ID,
@@ -67,7 +68,8 @@ import {
   fourLetterWord,
   spinFourLetterBlock,
   startFourLetterPuzzle,
-} from './js/four-letter-quest.js?v=four-letter-1';
+} from './js/four-letter-quest.js?v=four-letter-2';
+import { KIDS_ROOM_W, buildKidsRoomScene } from './js/kids-room-scene.js';
 import {
   AXIS_DENYDE_STREET_ID,
   HOGTIED_JONES_ID,
@@ -10355,67 +10357,8 @@ function fourLetterTexture(letter) {
 }
 
 function drawPlayroomBackground() {
-  const layer = new PIXI.Container();
-  layer.label = 'four-letter-playroom';
-  layer.worldH = 760;
-  layer.platformsScreen = [{ id: 'playroom-floor', x1: 0, y1: 620, x2: 1150, y2: 620, pc_perm: 1 }];
-
-  const room = new PIXI.Graphics();
-  room.rect(0, 0, 1150, 620).fill(0xf7f0d9);
-
-  // Clean vector interpretation of the recorded playroom: patterned wall,
-  // tall cyan windows, oversized furniture, and warm wooden floor.
-  const colors = [0x72c8c8, 0xeba75f, 0xcf6179, 0x9bc761, 0x7aa9d1];
-  for (let x = -70, i = 0; x < 1220; x += 165, i += 1) {
-    const color = colors[i % colors.length];
-    room.roundRect(x, 40 + (i % 2) * 20, 96, 72, 30);
-    room.circle(x + 26, 35 + (i % 2) * 20, 23);
-    room.circle(x + 76, 35 + (i % 2) * 20, 23);
-    room.fill({ color: color, alpha: 0.9 });
-  }
-  for (const x of [95, 850]) {
-    room.roundRect(x, 155, 190, 340, 8).fill(0x9fe1e7).stroke({ width: 8, color: 0xffffff, alpha: 0.9 });
-    room.moveTo(x + 95, 160);
-    room.lineTo(x + 95, 490);
-    room.moveTo(x + 5, 325);
-    room.lineTo(x + 185, 325);
-    room.stroke({ width: 5, color: 0xffffff, alpha: 0.85 });
-  }
-  room.rect(0, 620, 1150, 140).fill(0x8b5f42);
-  room.rect(0, 604, 1150, 18).fill(0x6d4936);
-  for (let y = 646; y < 760; y += 28) {
-    room.moveTo(0, y);
-    room.lineTo(1150, y);
-  }
-  for (let x = 0; x < 1150; x += 145) {
-    room.moveTo(x, 620);
-    room.lineTo(x + 35, 760);
-  }
-  // Tea table and chairs echo the source scene without copying compression.
-  room.stroke({ width: 2, color: 0xb88962, alpha: 0.45 });
-  room.roundRect(785, 470, 310, 30, 10);
-  room.rect(830, 497, 26, 123);
-  room.rect(1035, 497, 26, 123);
-  room.fill(0x694b38);
-  room.ellipse(880, 463, 22, 10);
-  room.ellipse(1008, 463, 22, 10);
-  room.fill(0xf6f1df);
-  room.circle(882, 438, 13).fill(0xcd4f68);
-  room.circle(1010, 438, 13).fill(0x79b8c7);
-  layer.addChild(room);
-
-  const roomLabel = new PIXI.Text({ text: "MR. BLOCK'S PLAYROOM", style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 22,
-    fontWeight: '900',
-    fill: 0x8d7357,
-    letterSpacing: 3,
-  } });
-  roomLabel.anchor.set(0.5);
-  roomLabel.position.set(575, 165);
-  roomLabel.alpha = 0.42;
-  layer.addChild(roomLabel);
-  return layer;
+  // The Kid's Room, dressed from the CC0 k04 decos the players' Snaps show (js/kids-room-scene.js).
+  return buildKidsRoomScene(PIXI, { label: 'four-letter-playroom' });
 }
 
 function renderFourLetterHud(spinningIndex = -1) {
@@ -10457,7 +10400,7 @@ function renderFourLetterHud(spinningIndex = -1) {
 }
 
 function spawnFourLetterBlocks() {
-  const xs = [310, 430, 550, 670];
+  const xs = FOUR_LETTER_LAYOUT.blockXs;
   fourLetterTargets = FOUR_LETTER_BLOCKS.map((block, index) => {
     const letter = fourLetterState.letters[index];
     const spr = new PIXI.Sprite(fourLetterTexture(letter));
@@ -10488,8 +10431,8 @@ function spawnFourLetterMrBlock() {
   spr.label = 'mr-block';
   spr.anchor.set(0.5, 1);
   spr.scale.set(1.15);
-  spr.x = 690;
-  spr.y = 500;
+  spr.x = FOUR_LETTER_LAYOUT.mrBlock.x;
+  spr.y = FOUR_LETTER_LAYOUT.mrBlock.y;
   spr.zIndex = 44;
   entityLayer.addChild(spr);
   fourLetterMrBlock = register({
@@ -10617,12 +10560,12 @@ async function startFourLetterQuest(opts = {}) {
       tsid: FOUR_LETTER_ROOM_ID,
       label: "Mr. Block's Playroom",
       hubName: 'A very small room',
-      bounds: { l: 0, r: 1150, t: 0, b: 760 },
+      bounds: { l: 0, r: KIDS_ROOM_W, t: 0, b: 760 },
       platforms: bgLayer.platformsScreen,
       signposts: [],
     };
     currentStreetTsid = FOUR_LETTER_ROOM_ID;
-    WORLD_W = 1150;
+    WORLD_W = KIDS_ROOM_W;
     GROUND_Y = 620;
     streetPlatforms = bgLayer.platformsScreen;
     streetWalls = [];
@@ -10632,7 +10575,7 @@ async function startFourLetterQuest(opts = {}) {
 
     if (player) {
       player.baseScale = (fourLetterPlayerBaseScale || player.baseScale) * 0.42;
-      player.x = 180;
+      player.x = FOUR_LETTER_LAYOUT.spawnX;
       player.y = GROUND_Y;
       player.vx = 0;
       player.vy = 0;
