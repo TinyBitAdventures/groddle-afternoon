@@ -5,6 +5,9 @@
  * (solid, linear/radial gradient and bitmap fills, hairline strokes).
  *
  *   exportShapes(swf, dir) -> Map<shapeId, shape>, bitmaps: Map<bitmapId, pngBuffer>
+ *   exportMorphShapes(swf, dir) -> Map<morphId, paths>; morphShapeAt(paths, ratio, bounds) -> shape
+ *     (DefineMorphShape: FFDec's SVG animates each path start;end, interpolated
+ *     at the PlaceObject ratio like the Flash player does)
  *
  * shape = { b: [xmin, ymin, xmax, ymax], p: [path...] }
  * path  = { d, f?: fill, s?: stroke, r?: 'evenodd' }
@@ -171,4 +174,155 @@ export function exportShapes(swfFile, workDir, bounds) {
     shapes.set(id, { b: r ? [r.xmin, r.ymin, r.xmax, r.ymax] : null, p: parseShapeSvg(readFileSync(join(dir, name), 'utf8'), bitmaps) });
   }
   return { shapes, bitmaps };
+}
+
+// ---------------------------------------------------------------------------
+// Morph shapes (DefineMorphShape): shape tweens, often used as mask layers
+// ---------------------------------------------------------------------------
+
+const lerp = (a, b, t) => a + (b - a) * t;
+const lerpColor = (a, b, t) => [0, 1, 2].map((i) => Math.round(lerp(a[i], b[i], t))).concat(round(lerp(a[3], b[3], t)));
+
+/** animate values "start;end" for one attribute of an element's body. */
+function animated(body, attr) {
+  const m = new RegExp(`<animate[^>]*attributeName="${attr}"[^>]*values="([^"]*)"`).exec(body);
+  return m ? m[1].split(';') : null;
+}
+
+/** [start, end] of an attribute: its animate values, else the static value twice. */
+function pair(attrsOf, body, attr, fallback) {
+  const v = animated(body, attr);
+  if (v && v.length >= 2) return [v[0], v[v.length - 1]];
+  const s = attrsOf[attr] ?? fallback;
+  return [s, s];
+}
+
+/** 2D matrix product p * c ([a, b, c, d, e, f]). */
+function mat(p, c) {
+  return [p[0] * c[0] + p[2] * c[1], p[1] * c[0] + p[3] * c[1], p[0] * c[2] + p[2] * c[3], p[1] * c[2] + p[3] * c[3], p[0] * c[4] + p[2] * c[5] + p[4], p[1] * c[4] + p[3] * c[5] + p[5]];
+}
+
+/**
+ * A gradient's transform at t from FFDec's animateTransform list (a
+ * replacing scale, then additive translate, rotate, scale, skewX in order).
+ */
+function gradientMatrixAt(steps, t) {
+  let m = [1, 0, 0, 1, 0, 0];
+  for (const st of steps) {
+    const v = st.from.map((f, i) => lerp(f, st.to[i] ?? f, t));
+    let k;
+    if (st.type === 'translate') k = [1, 0, 0, 1, v[0], v[1] ?? 0];
+    else if (st.type === 'scale') k = [v[0], 0, 0, v[1] ?? v[0], 0, 0];
+    else if (st.type === 'rotate') { const r = (v[0] * Math.PI) / 180; k = [Math.cos(r), Math.sin(r), -Math.sin(r), Math.cos(r), 0, 0]; }
+    else if (st.type === 'skewX') k = [1, 0, Math.tan((v[0] * Math.PI) / 180), 1, 0, 0];
+    else if (st.type === 'skewY') k = [1, Math.tan((v[0] * Math.PI) / 180), 0, 1, 0, 0];
+    else throw new Error(`morph gradient: unsupported ${st.type}`);
+    m = st.additive === 'replace' ? k : mat(m, k);
+  }
+  return m.map((x) => round(x, 1e5));
+}
+
+/** Parse one FFDec morph shape SVG into start/end paths and fills. */
+export function parseMorphSvg(svg) {
+  const defs = new Map();
+  for (const m of svg.matchAll(/<(linearGradient|radialGradient)([^>]*)>([\s\S]*?)<\/\1>/g)) {
+    const a = attrs(m[2]);
+    const steps = [...m[3].matchAll(/<animateTransform([^>]*)\/?>/g)].map((s) => {
+      const sa = attrs(s[1]);
+      return { type: sa.type, additive: sa.additive || 'replace', from: sa.from.split(/[\s,]+/).map(num), to: sa.to.split(/[\s,]+/).map(num) };
+    });
+    const stops = [...m[3].matchAll(/<stop([^>]*?)(?:\/>|>([\s\S]*?)<\/stop>)/g)].map((s) => {
+      const sa = attrs(s[1]);
+      const body = s[2] || '';
+      return { off: pair(sa, body, 'offset', '0').map(num), color: pair(sa, body, 'stop-color', '#000000'), op: pair(sa, body, 'stop-opacity', '1').map(num) };
+    });
+    const g = { t: m[1] === 'linearGradient' ? 'l' : 'r', steps, static: matrixOf(a.gradientTransform), stops };
+    if (a.fx && Number(a.fx)) g.fx = num(a.fx);
+    if (a.spreadMethod && a.spreadMethod !== 'pad') g.sp = a.spreadMethod;
+    if (a['color-interpolation'] === 'linearRGB') g.lin = 1;
+    defs.set(a.id, g);
+  }
+  if (/<pattern/.test(svg)) throw new Error('morph shapes with bitmap fills are not supported');
+  const paths = [];
+  for (const m of svg.matchAll(/<path([^>]*?)(?:\/>|>([\s\S]*?)<\/path>)/g)) {
+    const a = attrs(m[1]);
+    const body = m[2] || '';
+    const [d0, d1] = pair(a, body, 'd', '');
+    const t0 = d0.match(/[A-Za-z]|-?\d*\.?\d+(?:e-?\d+)?/g) || [];
+    const t1 = d1.match(/[A-Za-z]|-?\d*\.?\d+(?:e-?\d+)?/g) || [];
+    if (t0.length !== t1.length || t0.some((tk, i) => /[A-Za-z]/.test(tk) !== /[A-Za-z]/.test(t1[i]) || (/[A-Za-z]/.test(tk) && tk !== t1[i]))) {
+      throw new Error('morph path start and end differ in structure');
+    }
+    const p = { t0, t1 };
+    const fillRef = /url\(#([^)]+)\)/.exec(a.fill || '');
+    if (fillRef) {
+      p.grad = defs.get(fillRef[1]);
+      if (!p.grad) throw new Error(`morph fill ${fillRef[1]} not found`);
+    } else if (a.fill && a.fill !== 'none') {
+      p.fill = pair(a, body, 'fill').map((c, i) => hexColor(c, pair(a, body, 'fill-opacity', '1')[i]));
+    }
+    if (a.stroke && a.stroke !== 'none') {
+      const op = Number(a['stroke-opacity'] ?? 1);
+      const w = pair(a, body, 'stroke-width', '1').map(num);
+      if (op > 0) p.stroke = { c: pair(a, body, 'stroke').map((c) => hexColor(c, op)), w, cap: a['stroke-linecap'] || 'round', join: a['stroke-linejoin'] || 'round' };
+    }
+    if (a['fill-rule'] === 'evenodd') p.r = 'evenodd';
+    if (p.fill || p.grad || p.stroke) paths.push(p);
+  }
+  return paths;
+}
+
+/**
+ * A morph shape at a PlaceObject ratio (0-65535) as a plain shape (the
+ * exportShapes format). bounds: [startRect, endRect] from swf.mjs.
+ */
+export function morphShapeAt(paths, ratio, bounds) {
+  const t = Math.max(0, Math.min(1, ratio / 65535));
+  const out = [];
+  for (const mp of paths) {
+    const d = mp.t0.map((tk, i) => (/[A-Za-z]/.test(tk) ? tk : String(lerp(Number(tk), Number(mp.t1[i]), t)))).join(' ');
+    const p = { d: compactD(d) };
+    if (mp.fill) p.f = lerpColor(mp.fill[0], mp.fill[1], t);
+    else if (mp.grad) {
+      const g = mp.grad;
+      p.f = {
+        t: g.t,
+        m: g.steps.length ? gradientMatrixAt(g.steps, t) : g.static,
+        st: g.stops.map((s) => {
+          const c = lerpColor(hexColor(s.color[0], s.op[0]), hexColor(s.color[1], s.op[1]), t);
+          return [round(lerp(s.off[0], s.off[1], t)), ...c];
+        }),
+      };
+      if (g.fx) p.f.fx = g.fx;
+      if (g.sp) p.f.sp = g.sp;
+      if (g.lin) p.f.lin = 1;
+    }
+    if (mp.stroke) p.s = { c: lerpColor(mp.stroke.c[0], mp.stroke.c[1], t), w: round(lerp(mp.stroke.w[0], mp.stroke.w[1], t)), cap: mp.stroke.cap, join: mp.stroke.join };
+    if (mp.r) p.r = mp.r;
+    out.push(p);
+  }
+  let b = null;
+  if (bounds) {
+    const [s, e] = bounds;
+    b = [lerp(s.xmin, e.xmin, t), lerp(s.ymin, e.ymin, t), lerp(s.xmax, e.xmax, t), lerp(s.ymax, e.ymax, t)].map((v) => round(v, 100));
+  }
+  return { b, p: out };
+}
+
+/** FFDec-export every DefineMorphShape of a SWF (cached in workDir): Map<id, paths>. */
+export function exportMorphShapes(swfFile, workDir) {
+  const dir = join(workDir, 'morphs');
+  const done = join(workDir, '.morphs-done');
+  if (!existsSync(done)) {
+    rmSync(dir, { recursive: true, force: true });
+    mkdirSync(dir, { recursive: true });
+    execFileSync(JAVA, ['-jar', FFDEC, '-format', 'morphshape:svg', '-export', 'morphshape', dir, swfFile], { stdio: 'ignore' });
+    writeFileSync(done, '');
+  }
+  const morphs = new Map();
+  for (const name of readdirSync(dir)) {
+    const m = /^(\d+)\.svg$/.exec(name);
+    if (m) morphs.set(Number(m[1]), parseMorphSvg(readFileSync(join(dir, name), 'utf8')));
+  }
+  return morphs;
 }

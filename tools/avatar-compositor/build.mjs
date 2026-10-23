@@ -8,6 +8,7 @@
  *   node tools/avatar-compositor/build.mjs render   # default look -> assets/sprites/avatar/vector/ (+ @3x)
  *   node tools/avatar-compositor/build.mjs score    # pose alignment vs the 62d8 sheets
  *   node tools/avatar-compositor/build.mjs all
+ *   node tools/avatar-compositor/build.mjs data --only hair/hair_20101116B,hat/tiara   # just those articles
  *
  * data: Avatar.swf's avatarContainer (sprite 409) is flattened at every swf
  * frame the game's sheets use (js/avatar-anims.js SHEET_FRAMES); each
@@ -34,8 +35,8 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import { readSwf } from './swf.mjs';
-import { exportShapes } from './shapes.mjs';
-import { buildRig, flattenPart, nodeContent, shapeIds } from './rig.mjs';
+import { exportMorphShapes, exportShapes, morphShapeAt } from './shapes.mjs';
+import { buildRig, flattenPart, morphOfShapeId, nodeContent, shapeIds } from './rig.mjs';
 import { mergeContainers, readAvatarFla, validateAgainstSwf } from './xfl.mjs';
 import { loadGsjsAvatarData, loadHatHairMap } from './gsjs.mjs';
 import { ARTICLE_CONTAINERS, SLOT_PARTS } from '../../public/js/avatar-rig.js';
@@ -70,8 +71,6 @@ const NC = CORE_FRAMES.length;
 
 const LEG_CONTAINERS = ['sideLegLowerCloseContainer_mc', 'sideLegLowerOffsideContainer_mc', 'backLegLowerLeftNakedContainer_mc', 'backLegLowerRightNakedContainer_mc'];
 
-const roundShape = (sh) => sh;
-
 function writeJson(file, data) {
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, `${JSON.stringify(data)}\n`);
@@ -96,6 +95,25 @@ function writeBitmaps(bitmaps, ids, prefix) {
     out[id] = file;
   }
   return out;
+}
+
+/**
+ * Outlines for the shape ids an op list uses: SWF shapes from FFDec's shape
+ * export, morph draw ids (rig.mjs morphShapeId) interpolated at their ratio
+ * from its morph export (run only for SWFs that place a morph).
+ */
+function outlinesFor(file, swf, ids, allShapes) {
+  const ordered = [...ids].sort((a, b) => a - b);
+  const morphs = ordered.some((id) => morphOfShapeId(id)) ? exportMorphShapes(file, workFor(file)) : null;
+  const shapes = {};
+  for (const id of ordered) {
+    const mo = morphOfShapeId(id);
+    if (!mo) { shapes[id] = allShapes.get(id); continue; }
+    const paths = morphs.get(mo.id);
+    if (!paths) throw new Error(`${basename(file)}: no FFDec export for morph shape ${mo.id}`);
+    shapes[id] = morphShapeAt(paths, mo.ratio, swf.morphBounds.get(mo.id));
+  }
+  return shapes;
 }
 
 function bitmapIdsOf(shapes) {
@@ -158,8 +176,7 @@ function buildBase() {
   const ids = new Set();
   for (const n of nodes) shapeIds(n.ops, ids);
   for (const rows of rig.table) for (const r of rows) if (r.s !== undefined) ids.add(r.s);
-  const shapes = {};
-  for (const id of [...ids].sort((a, b) => a - b)) shapes[id] = roundShape(allShapes.get(id));
+  const shapes = outlinesFor(file, swf, ids, allShapes);
   const bmp = writeBitmaps(bitmaps, bitmapIdsOf(shapes), 'base');
   const packed = packTable(rig);
   // Shapes the core frames draw (their rows' nodes) stay in base.json.
@@ -263,8 +280,11 @@ function packTable(rig) {
 }
 
 /** Article SWF for a catalog entry. */
+/** Face and hair types: SWFs under vanity/, coloured by the look's palettes, no colourways. */
+const FACE_DIRS = Object.freeze({ eyes: 'vanity/eyes', mouth: 'vanity/mouth', nose: 'vanity/nose', ears: 'vanity/ears', hair: 'vanity/hair' });
+
 function articleSwf(type, name, asset) {
-  const dirs = { eyes: 'vanity/eyes', mouth: 'vanity/mouth', nose: 'vanity/nose', ears: 'vanity/ears', hair: 'vanity/hair' };
+  const dirs = FACE_DIRS;
   const rel = asset ? (dirs[type] ? `vanity/${asset}` : `wardrobe/${asset}`) : `${dirs[type] || `wardrobe/${type}`}/${name}.swf`;
   const file = join(AVATARS, rel);
   if (!existsSync(file)) throw new Error(`no SWF for ${type}/${name} (${rel})`);
@@ -287,8 +307,7 @@ function buildArticle(type, name, gsjsEntry) {
     for (const v of flat.variants) shapeIds(v, ids);
   }
   const { shapes: allShapes, bitmaps } = exportShapes(file, workFor(file), swf.shapeBounds);
-  const shapes = {};
-  for (const id of [...ids].sort((a, b) => a - b)) shapes[id] = allShapes.get(id);
+  const shapes = outlinesFor(file, swf, ids, allShapes);
   const bmp = writeBitmaps(bitmaps, bitmapIdsOf(shapes), `${type}-${name}`);
   const groups = new Set();
   const collect = (ops) => { for (const o of ops) { if (o.g) o.g.forEach((g) => groups.add(g)); if (o.ops) { collect(o.ops); collect(o.clip); } } };
@@ -311,13 +330,21 @@ function buildArticle(type, name, gsjsEntry) {
   return { data: { ...data, parts }, bytes: bytes + idleBytes, coreBytes: bytes, idleBytes };
 }
 
-function buildData() {
+/**
+ * only: Set of 'type/name' to rebuild in place (base.json and every other
+ * article stay as they are; catalog.json is rewritten from the manifest,
+ * reading the untouched articles' parts and groups from their JSON).
+ */
+function buildData({ only = null } = {}) {
   const gs = loadGsjsAvatarData();
   const hatHair = loadHatHairMap(join(CLIENT, 'com/tinyspeck/core/data/AvatarSwfParticulars.as'));
   const manifest = JSON.parse(readFileSync(join(HERE, 'catalog.json'), 'utf8'));
-  rmSync(join(OUT, 'articles'), { recursive: true, force: true });
-  rmSync(join(OUT, 'textures'), { recursive: true, force: true });
-  buildBase();
+  if (!only) {
+    rmSync(join(OUT, 'articles'), { recursive: true, force: true });
+    rmSync(join(OUT, 'textures'), { recursive: true, force: true });
+    buildBase();
+  }
+  const pending = new Set(only || []);
   // GSJS articles by slot and class: one class name can be two articles
   // (chaulkywhite_coatshirtvest is a shirt and a coat, two SWFs).
   const byClass = new Map();
@@ -342,19 +369,41 @@ function buildData() {
       // `class`: the GSJS article_class_name when the catalog name differs (a class worn in two slots).
       const cls = (typeof e === 'object' && e.class) || name;
       const g = byClass.get(`${type}/${cls}`);
-      const { data, bytes, idleBytes } = buildArticle(type, name, g);
-      total += bytes;
-      idleTotal += idleBytes;
+      // Articles GSJS never listed (manifest `ownColours`): `asset` names the
+      // SWF under wardrobe/ or vanity/ when it sits in another type's folder;
+      // a wardrobe article's one colourway is the SWF's own fills (hair and
+      // face parts take the look's palette colours as usual). Appended to
+      // their type's list, so no GSJS article's colourway indices move.
+      const own = typeof e === 'object' && e.ownColours;
+      if (own && g) throw new Error(`${type}/${name}: ownColours, but GSJS lists it`);
+      const src = g || (own && e.asset ? { asset: e.asset } : undefined);
+      const key = `${type}/${name}`;
+      let data;
+      if (only && !only.has(key)) {
+        // Untouched: the catalog needs only its parts and groups.
+        data = JSON.parse(readFileSync(join(OUT, 'articles', type, `${name}.json`), 'utf8'));
+      } else {
+        pending.delete(key);
+        if (only) clearTextures(type, name);
+        let bytes;
+        let idleBytes;
+        ({ data, bytes, idleBytes } = buildArticle(type, name, src));
+        total += bytes;
+        idleTotal += idleBytes;
+        console.log(`  ${type}/${name}: ${Object.keys(data.parts).length} parts, groups ${data.groups.join(',') || '-'}, ${(bytes / 1024).toFixed(0)} KB`);
+      }
       const item = { name, label: e.label || labelOf(cls, type, index), parts: Object.keys(data.parts), groups: data.groups };
       if (g?.id) item.gsjsId = Number(g.id);
       // Every GSJS colourway of the article (data_clothing has one id per colourway).
       const variants = variantsOf.get(`${type}/${cls}`);
       if (variants?.length) item.variants = variants.sort((a, b) => a.id - b.id).map((v) => ({ id: v.id, colors: packColors(v.colors) }));
+      else if (own && !(type in FACE_DIRS)) item.variants = [{ colors: {} }];
+      if (own) item.swfOnly = true;
       catalog.types[type].push(item);
       if (type === 'hat' && hatHair[name]) catalog.hatHair[name] = hatHair[name];
-      console.log(`  ${type}/${name}: ${Object.keys(data.parts).length} parts, groups ${data.groups.join(',') || '-'}, ${(bytes / 1024).toFixed(0)} KB`);
     }
   }
+  if (pending.size) throw new Error(`--only: not in the manifest: ${[...pending].join(', ')}`);
   for (const slot of ['skin', 'hair']) {
     catalog.palettes[slot] = Object.entries(gs.colors)
       .filter(([, c]) => c.slot === slot)
@@ -363,6 +412,14 @@ function buildData() {
   catalog.defaults = gs.defaults;
   const bytes = writeJson(join(OUT, 'catalog.json'), catalog);
   console.log(`articles: ${(total / 1024).toFixed(0)} KB (idle files ${(idleTotal / 1024).toFixed(0)} KB); catalog.json ${(bytes / 1024).toFixed(0)} KB`);
+}
+
+/** An article's bitmap textures (writeBitmaps names them <type>-<name>-<id>.png). */
+function clearTextures(type, name) {
+  const dir = join(OUT, 'textures');
+  if (!existsSync(dir)) return;
+  const re = new RegExp(`^${type}-${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-\\d+\\.png$`);
+  for (const f of readdirSync(dir)) if (re.test(f)) rmSync(join(dir, f));
 }
 
 /**
@@ -537,7 +594,9 @@ export { buildData, render, withPage, RIG_FRAMES as FRAMES };
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const run = async () => {
-    if (cmd === 'data' || cmd === 'all') buildData();
+    // --only type/name[,type/name...]: rebuild just those articles (data).
+    const only = opt('only', null);
+    if (cmd === 'data' || cmd === 'all') buildData({ only: only ? new Set(only.split(',').map((s) => s.trim()).filter(Boolean)) : null });
     if (cmd === 'render' || cmd === 'all') await render();
     if (cmd === 'score') {
       const { score } = await import('./score.mjs');

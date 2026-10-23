@@ -1410,9 +1410,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 276,
+  "commits": 277,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Radial Heights cheers \"Good work, you've got all the stars!\" when you find them all"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1527,14 +1532,9 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "Browsers reload the feature registry with Grab 'Em Good in it"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Grab 'Em Good, the quoin-grabbing race in a night-time Groddle Forest"
    }
   ]
  },
- "tests": 170,
+ "tests": 171,
  "generatedAt": "2026-10-23"
 }

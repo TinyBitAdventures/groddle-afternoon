@@ -19,7 +19,8 @@ const data = read('public/restoration/data.json');
 const catalog = read('public/assets/avatar/catalog.json');
 const REGISTER = join(homedir(), 'Documents/glitch-audit/research/coverage/register.md');
 
-// GSJS wardrobe article SWFs (tinyspeck/glitch-avatars, 667) that the remake could show.
+// Article SWFs in tinyspeck/glitch-avatars (667) that the remake could show: the catalog
+// counts GSJS articles plus the few SWF-only ones (tools/avatar-compositor/catalog.json ownColours).
 const WARDROBE_SWFS = 667;
 const wardrobe = Object.values(catalog.types || {}).reduce((n, list) => n + list.length, 0);
 
@@ -49,7 +50,7 @@ const measures = [
   ['Sound keys with a real recording', data.sounds.playable, data.sounds.keys, 'the rest are synth stand-ins'],
   ['Item icons sharp (3x)', data.icons.sharp, data.icons.items, ''],
   ['Badges with official art', data.badges.officialArt, data.badges.total, ''],
-  ['Wardrobe articles wearable', wardrobe, WARDROBE_SWFS, 'GSJS articles; bracelets have no container'],
+  ['Wardrobe articles wearable', wardrobe, WARDROBE_SWFS, 'GSJS articles + SWF-only ones with their own colours; bracelets have no container'],
 ];
 
 const reg = registerCounts();

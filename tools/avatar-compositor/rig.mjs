@@ -49,6 +49,18 @@ function colorPart(cx) {
 }
 
 /**
+ * Draw-op shape id for a DefineMorphShape placed at `ratio` (0-65535, the
+ * PlaceObject ratio; 0 when absent). Ids from 65536 up never clash with SWF
+ * character ids, so ops keep a plain numeric `s`; build.mjs makes the
+ * outline at that ratio (shapes.mjs morphShapeAt). Shape tweens (hair locks,
+ * cloth) compile to morphs, often as mask layers.
+ */
+export const MORPH_ID_BASE = 65536;
+export const morphShapeId = (id, ratio = 0) => (ratio + 1) * MORPH_ID_BASE + id;
+/** { id, ratio } for a morph draw id, or null for a plain shape id. */
+export const morphOfShapeId = (s) => (s >= MORPH_ID_BASE ? { id: s % MORPH_ID_BASE, ratio: Math.floor(s / MORPH_ID_BASE) - 1 } : null);
+
+/**
  * Flatten one sprite instance at absolute frame n into draw ops (in the
  * instance's own coordinates): { s: shapeId, m, a?, g?: [colour groups,
  * innermost first], cx? } and clip groups { clip: ops, ops }. `stop(name,
@@ -71,7 +83,9 @@ export function flattenSprite(swf, id, n, opts = {}, m = IDENTITY, a = 1, groups
     let ops;
     if (p.clipDepth) {
       // A mask layer: its shapes clip the following depths up to clipDepth.
-      const clip = kind === 'shape' ? [{ s: p.id, m: roundMatrix(pm) }] : flattenSprite(swf, p.id, n, {}, pm, 1, [], childPath);
+      const clip = kind === 'shape' || kind === 'morph'
+        ? [{ s: kind === 'morph' ? morphShapeId(p.id, p.ratio || 0) : p.id, m: roundMatrix(pm) }]
+        : flattenSprite(swf, p.id, n, {}, pm, 1, [], childPath);
       clipGroup = { clip, ops: [] };
       clipUntil = p.clipDepth;
       continue;
@@ -80,8 +94,8 @@ export function flattenSprite(swf, id, n, opts = {}, m = IDENTITY, a = 1, groups
     const marker = p.name && opts.stop ? opts.stop(p.name, childPath, pm, pa, m, p.id) : null;
     if (marker) ops = [marker];
     else if (pa <= 0 && !opts.keepHidden) ops = [];
-    else if (kind === 'shape') {
-      const op = { s: p.id, m: roundMatrix(pm) };
+    else if (kind === 'shape' || kind === 'morph') {
+      const op = { s: kind === 'morph' ? morphShapeId(p.id, p.ratio || 0) : p.id, m: roundMatrix(pm) };
       if (pa < 1) op.a = r4(pa);
       if (g.length) op.g = g;
       const cp = colorPart(p.cxform);

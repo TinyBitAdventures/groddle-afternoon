@@ -166,7 +166,15 @@ function readTimeline(buf, start, end, swf) {
         }
         break;
       }
-      case 46: case 84: swf.kinds.set(buf.readUInt16LE(body), 'morph'); break;
+      case 46: case 84: {
+        // DefineMorphShape(2): id, StartBounds, EndBounds (outlines come from
+        // FFDec's SVG export, shapes.mjs exportMorphShapes).
+        const id = buf.readUInt16LE(body);
+        swf.kinds.set(id, 'morph');
+        const start = readRect(buf, body + 2);
+        swf.morphBounds.set(id, [start.rect, readRect(buf, start.end).rect]);
+        break;
+      }
       default: break;
     }
     p = next;
@@ -178,12 +186,13 @@ function readTimeline(buf, start, end, swf) {
 
 /**
  * Parse a SWF: { classes: Map<className, id>, sprites: Map<id, timeline>,
- * kinds: Map<id, 'shape'|'sprite'|'bitmap'|'morph'>, shapeBounds, root }.
+ * kinds: Map<id, 'shape'|'sprite'|'bitmap'|'morph'>, shapeBounds,
+ * morphBounds: Map<id, [startRect, endRect]>, root }.
  */
 export function readSwf(file) {
   const buf = inflateSwf(readFileSync(file));
   const { end: rectEnd, rect } = readRect(buf, 8);
-  const swf = { classes: new Map(), sprites: new Map(), kinds: new Map(), shapeBounds: new Map(), stage: rect, frameRate: buf[rectEnd + 1] + buf[rectEnd] / 256 };
+  const swf = { classes: new Map(), sprites: new Map(), kinds: new Map(), shapeBounds: new Map(), morphBounds: new Map(), stage: rect, frameRate: buf[rectEnd + 1] + buf[rectEnd] / 256 };
   swf.root = readTimeline(buf, rectEnd + 4, buf.length, swf);
   return swf;
 }

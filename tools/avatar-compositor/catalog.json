@@ -134,7 +134,11 @@
       "nevermore_hair_male",
       "straight_mop",
       "tiedHive",
-      "tracy_turnblad_hair"
+      "tracy_turnblad_hair",
+      {
+        "name": "BrowStache",
+        "ownColours": true
+      }
     ],
     "hat": [
       "cap",
@@ -438,7 +442,11 @@
       "train_03_coat",
       "train_04_coat",
       "train_05_coat",
-      "travolta_jacket"
+      "travolta_jacket",
+      {
+        "name": "RideRainbow",
+        "ownColours": true
+      }
     ],
     "pants": [
       "plain_trousers",

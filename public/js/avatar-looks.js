@@ -203,11 +203,12 @@ export function variantSwatch(colors) {
  * A random look from the catalog: every face part, a hair style (a hat one
  * time in four, only with hair it allows), a top (a dress one time in six),
  * a coat one time in four, a bottom, shoes, real colourways and palette
- * colours.
+ * colours. Draws from the GSJS wardrobe only: SWF-only articles (swfOnly)
+ * stay out, so adding one never reshuffles seeded looks (js/npc-glitch-looks.js).
  */
 export function randomVectorFields(catalog, rng = Math.random) {
   const pick = (list) => list[Math.floor(rng() * list.length) % list.length];
-  const items = (type) => catalog?.types?.[type] || [];
+  const items = (type) => (catalog?.types?.[type] || []).filter((i) => !i.swfOnly);
   const outfit = {};
   const variant = {};
   const choose = (type) => {
