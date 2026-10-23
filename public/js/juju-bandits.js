@@ -24,11 +24,25 @@
  *    for the Slippery Customer badges); it shrinks away 2.5 s later and is
  *    gone 1.5 s after that.
  *
- * The remake has no Ancestral Nostalgia buff (imagination-remake.js: the
- * ancestral_lands_time cards are 'later'), so only the quest-offer chance is
- * wired into play; JUJU_STEAL_CHANCE keeps the source curve for the decision
- * on that timer (features/juju-bandits-feature.js reaches the stealing Juju
- * with &jujudemo=steal).
+ *  - players/inc_special_locations.js baqala_times, the clock dust_trap.js
+ *    reads (get_baqala_buff_time = time_spent + now - entry_time), driven by
+ *    locations/inc_regions.js region_on_enter / region_login / region_logout
+ *    and locations/savanna.js:
+ *      enter the Savanna from another region, or log in there
+ *      (start_baqala_buff): if time_spent is set, take off half the time
+ *      since you left (not when you left by logging out), clamp 600+ s to
+ *      585 s (the "grace period"), floor at 0, then start counting again;
+ *      leave (leave_savanna): bank the visit, note the exit time and whether
+ *      it was a logout. Walking between Savanna streets changes nothing.
+ *      baqala_times lives on the player, so it survives a relog.
+ *
+ * G39 (Austin): the remake tracks that clock and uses the source theft curve,
+ * but has no Ancestral Nostalgia buff and no 10-minute kick
+ * (check_baqala_boot / do_baqala_boot, too_much_nostalgia), so the only resets
+ * are the source's own: entering with no banked time, and a reset game. The
+ * clock counts real play time (the game's ticker; a hidden or paused tab does
+ * not count). The ancestral_lands_time cards only lengthen the buff, not this
+ * clock, so they stay 'later' (imagination-remake.js).
  */
 
 export const JUJU_SOURCE = 'tinyspeck/glitch-GameServerJS CC0 items/npc_juju_bandit.js, players/inc_special_locations.js, items/dust_trap.js';
@@ -67,7 +81,7 @@ export const JUJU_BANDIT = Object.freeze({
 export const JUJU_VARIANTS = JUJU_BANDIT.variants;
 export const JUJU_BANDANAS = JUJU_BANDIT.bandanas;
 
-/** dust_trap.js: chance by minutes of Ancestral Nostalgia (not wired: the remake has no such timer). */
+/** dust_trap.js: chance by minutes on the Ancestral Lands clock (get_baqala_buff_time). */
 export const JUJU_STEAL_CHANCE = Object.freeze([
   Object.freeze({ underMinutes: 3, chance: 0 }),
   Object.freeze({ underMinutes: 4, chance: 0.1 }),
@@ -83,6 +97,61 @@ export function stealChanceForSeconds(seconds) {
   const min = Math.max(0, Number(seconds) || 0) / 60;
   return JUJU_STEAL_CHANCE.find((row) => min < row.underMinutes).chance;
 }
+
+/* ------------------------------------------------------------------ */
+/* Ancestral Lands clock (baqala_times, without the kick)               */
+/* ------------------------------------------------------------------ */
+
+export const ANCESTRAL_CLOCK = Object.freeze({
+  graceFrom: 600, // start_baqala_buff: time_spent >= 600 ...
+  graceTo: 585, // ... becomes 585
+  decay: 0.5, // time_spent -= (now - exit_time) / 2
+  maxTickMs: 1000, // one frame never counts more than this (a hidden tab pauses the ticker)
+});
+
+/** A clock from a save slice (or a fresh one): seconds banked, inside the Savanna, exit time (ms), left by logging out. */
+export function ancestralClock(slice = null) {
+  const spent = Number(slice?.spent);
+  const exitAt = Number(slice?.exitAt);
+  return {
+    spent: Number.isFinite(spent) ? spent : 0,
+    inside: Boolean(slice?.inside),
+    exitAt: Number.isFinite(exitAt) && exitAt > 0 ? exitAt : null,
+    loggedOut: Boolean(slice?.loggedOut),
+  };
+}
+
+/** start_baqala_buff: entering the Savanna from another region, or logging in there. */
+export function ancestralEnter(clock, nowMs) {
+  if (clock.spent) {
+    if (!clock.loggedOut && clock.exitAt) clock.spent -= ((nowMs - clock.exitAt) / 1000) * ANCESTRAL_CLOCK.decay;
+    if (clock.spent >= ANCESTRAL_CLOCK.graceFrom) clock.spent = ANCESTRAL_CLOCK.graceTo;
+    if (!clock.loggedOut && clock.spent < 0) clock.spent = 0;
+  } else {
+    clock.spent = 0;
+  }
+  clock.exitAt = null;
+  clock.inside = true;
+  return clock;
+}
+
+/** leave_savanna(logout): the visit is already banked by ancestralTick. */
+export function ancestralLeave(clock, nowMs, logout = false) {
+  if (!clock.inside) return clock;
+  clock.exitAt = nowMs;
+  clock.inside = false;
+  clock.loggedOut = Boolean(logout);
+  return clock;
+}
+
+/** Count real milliseconds while inside (capped per frame). */
+export function ancestralTick(clock, ms) {
+  if (clock.inside) clock.spent += Math.min(ANCESTRAL_CLOCK.maxTickMs, Math.max(0, Number(ms) || 0)) / 1000;
+  return clock;
+}
+
+/** get_baqala_buff_time, in seconds. */
+export const ancestralSeconds = (clock) => Math.max(0, Number(clock?.spent) || 0);
 
 /** npc_juju_bandit.js copy, verbatim ({pc} is the player's name). */
 export const JUJU_TEXT = Object.freeze({

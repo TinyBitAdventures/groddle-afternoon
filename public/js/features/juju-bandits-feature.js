@@ -12,16 +12,24 @@
  * Juju Bandits!", juju_bandits/escaped). Leaving the street mid-chase counts
  * as an escape too (onPlayerExit -> rageQuit).
  *
- * The thieving Juju (the same chase, then one item taken, or a rage quit when
- * you stand by a signpost) waits on the Ancestral Nostalgia timer its chance
- * comes from; &jujudemo=steal brings one for QA.
+ * Otherwise the Juju is a thief (the same chase, then one item taken, or a
+ * rage quit when you stand by a signpost), and its chance comes from the
+ * Ancestral Lands clock (baqala_times, js/juju-bandits.js): none under 3 min,
+ * 10% rising to 35% by 8 min, every payout from 9 min. The clock counts real
+ * play time in the Savanna hubs, loses half the time you spend away when you
+ * come back, clamps 600+ s to 585 s on entry, and survives a reload (the
+ * source kept it on the player; a reload in the Savanna is a relog, so no
+ * decay). G39: no Ancestral Nostalgia buff, no 10-minute kick, no HUD cue.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=<Savanna street>
  *   &jujudemo=offer|steal   a Juju appears 1 s after load (offer needs the quest new)
  *   &jujuroll=0..1          the dust_trap.js roll for real Dust Trap triggers
+ *   &jujutime=<seconds>     preset the Ancestral Lands clock on the first street
  *   &jujuitem=<class>       the item a stealing Juju wants (default: the first it finds)
  *   &jujuautoplay=accept|decline  answer the offer
- * Canvas data: jujuState, jujuMode, jujuItem, jujuLast, jujuEscaped, jujuX.
+ * Canvas data: jujuState, jujuMode, jujuItem, jujuLast, jujuEscaped, jujuX,
+ *   jujuAncestralSeconds, jujuAncestralInside, jujuStealChance (the curve now;
+ *   0 outside the Savanna).
  */
 
 import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-3';
@@ -35,6 +43,12 @@ import {
   JUJU_PLAYER_LABEL,
   JUJU_SHEET_COLS,
   JUJU_TEXT,
+  ancestralClock,
+  ancestralEnter,
+  ancestralLeave,
+  ancestralSeconds,
+  ancestralTick,
+  isSavannaHub,
   jujuAnchor,
   jujuCurse,
   jujuLine,
@@ -43,8 +57,9 @@ import {
   jujuWants,
   nearSignpost,
   redeclareDelay,
+  stealChanceForSeconds,
   withinReach,
-} from '../juju-bandits.js?v=g5-1';
+} from '../juju-bandits.js?v=g39-1';
 
 export const JUJU_FEATURE_ID = 'juju-bandits';
 const Z = 30;
@@ -59,6 +74,13 @@ let last = '';
 let demoDone = false;
 let platforms = [];
 let demoMode = null;
+/** baqala_times: the Ancestral Lands clock. */
+let clock = ancestralClock();
+/** The save said we were inside: the first street is a login (region_login), not a walk in. */
+let relog = false;
+let presetDone = false;
+let lastTickAt = 0;
+let publishedSecond = -1;
 
 const pcLabel = () => JUJU_PLAYER_LABEL;
 
@@ -83,6 +105,41 @@ function publish(engine) {
   engine.setData('jujuEscaped', escaped);
   engine.setData('jujuX', bandit ? Math.round(bandit.x) : '');
   engine.setData('jujuY', bandit ? Math.round(bandit.y) : '');
+  publishClock(engine);
+}
+
+/** The steal chance dust_trap.js would roll right now (0 outside the Savanna). */
+const stealChanceNow = () => (clock.inside ? stealChanceForSeconds(ancestralSeconds(clock)) : 0);
+
+function publishClock(engine) {
+  const sec = Math.floor(ancestralSeconds(clock));
+  publishedSecond = sec;
+  engine.setData('jujuAncestralSeconds', sec);
+  engine.setData('jujuAncestralInside', clock.inside ? 1 : 0);
+  engine.setData('jujuStealChance', stealChanceNow());
+}
+
+/** region_on_enter / region_login for the Savanna (locations/inc_regions.js, savanna.js). */
+function trackRegion(street, engine, now) {
+  const savanna = isSavannaHub(street?.hubId);
+  if (relog) {
+    relog = false;
+    // Logged out in the Savanna (leave_savanna(true)): logging back in there
+    // starts again without decay; landing anywhere else counts as walking out now.
+    if (savanna) ancestralEnter(clock, now);
+    else {
+      clock.loggedOut = false;
+      clock.exitAt = now;
+    }
+  } else if (savanna && !clock.inside) ancestralEnter(clock, now);
+  else if (!savanna && clock.inside) ancestralLeave(clock, now, false);
+  const preset = engine.param('jujutime');
+  if (!presetDone && preset !== null && Number.isFinite(Number(preset))) {
+    clock.spent = Math.max(0, Number(preset));
+    clock.exitAt = null;
+  }
+  presetDone = true;
+  lastTickAt = now;
 }
 
 /* ------------------------------------------------------------------ */
@@ -384,6 +441,7 @@ function curse(engine, mode = null) {
       questStatus: status,
       pursued: Boolean(bandit),
       roll: Number.isFinite(roll) && engine.param('jujuroll') !== null ? roll : Math.random(),
+      stealChance: stealChanceNow(),
     });
   // QA: a demo thief needs something to take.
   if (forced === 'steal' && countItem(engine.inv, result.itemClass) < 1) {
@@ -402,16 +460,22 @@ export const jujuBanditsFeature = {
   id: JUJU_FEATURE_ID,
 
   save() {
-    return { escaped };
+    return { escaped, ancestral: { ...clock } };
   },
 
   restore(slice) {
     escaped = Math.max(0, Math.floor(Number(slice?.escaped) || 0));
+    clock = ancestralClock(slice?.ancestral);
+    presetDone = false;
+    // A reload is a logout and login (region_logout -> leave_savanna(true)).
+    relog = clock.inside;
+    if (relog) ancestralLeave(clock, Date.now(), true);
   },
 
   onStreetEnter(street, engine) {
     bandit = null;
     pendingCurseAt = 0;
+    trackRegion(street, engine, Date.now());
     platforms = platformsScreen(street);
     const demo = engine.param('jujudemo');
     if (!demoDone && (demo === 'offer' || demo === 'steal')) {
@@ -441,6 +505,12 @@ export const jujuBanditsFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    // Real play time: wall-clock frame gaps, capped so a paused ticker adds nothing.
+    if (clock.inside) {
+      ancestralTick(clock, lastTickAt ? now - lastTickAt : 0);
+      if (Math.floor(ancestralSeconds(clock)) !== publishedSecond) publishClock(engine);
+    }
+    lastTickAt = now;
     if (pendingCurseAt && now >= pendingCurseAt) {
       pendingCurseAt = 0;
       const mode = demoMode;
@@ -498,7 +568,7 @@ export const jujuBanditsFeature = {
 
   /** QA / tests. */
   _state() {
-    return { bandit, escaped, last };
+    return { bandit, escaped, last, clock: { ...clock }, stealChance: stealChanceNow() };
   },
 };
 

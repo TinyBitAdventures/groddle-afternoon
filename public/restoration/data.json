@@ -1409,9 +1409,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 263,
+  "commits": 264,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-22",
+    "kind": "improve",
+    "text": "Streets only have the animals the archive recorded"
+   },
    {
     "date": "2026-10-22",
     "kind": "improve",
@@ -1526,11 +1531,6 @@
     "date": "2026-10-22",
     "kind": "fix",
     "text": "163 street decos show Tiny Speck's real art again"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Sharp 3x quoins, hand-traced from the 1x sheet"
    }
   ]
  },

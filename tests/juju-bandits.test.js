@@ -7,11 +7,17 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  ANCESTRAL_CLOCK,
   DUST_TRAP_LOOT,
   JUJU_BANDIT,
   JUJU_SHEETS,
   JUJU_TEXT,
   SAVANNA_HUBS,
+  ancestralClock,
+  ancestralEnter,
+  ancestralLeave,
+  ancestralSeconds,
+  ancestralTick,
   jujuAnchor,
   jujuCurse,
   jujuLine,
@@ -27,6 +33,7 @@ import { DROP_TABLES } from '../public/js/drop-tables.js';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
 import { FEATURES } from '../public/js/features/index.js';
+import { remakeStatus } from '../public/js/imagination-remake.js';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(spike, '../glitch-GameServerJS');
@@ -74,7 +81,7 @@ describe('juju bandit rules (npc_juju_bandit.js, juju_bandit_curse, dust_trap.js
     assert.equal(jujuCurse({ hubId: '86', inv, questStatus: 'none', roll: 0.5 }).reason, 'roll');
     const hit = jujuCurse({ hubId: '95', inv, questStatus: 'none', roll: 0.1 });
     assert.deepEqual([hit.mode, hit.itemClass], ['offer', 'paper']);
-    // Once the quest is taken the chance comes from the Nostalgia timer (not wired: 0).
+    // Once the quest is taken the chance comes from the Ancestral Lands clock (stealChance).
     assert.equal(jujuCurse({ hubId: '86', inv, questStatus: 'active', roll: 0 }).reason, 'roll');
     assert.equal(jujuCurse({ hubId: '86', inv, questStatus: 'active', roll: 0, stealChance: 1 }).mode, 'steal');
   });
@@ -129,5 +136,159 @@ describe('juju bandit rules (npc_juju_bandit.js, juju_bandit_curse, dust_trap.js
     assert.deepEqual(quests.help_juju_bandits.offerTriggers.map((t) => [t.type, t.npc]), [['npc', 'npc_juju_bandit']]);
     assert.equal(quests.help_juju_bandits.solo, true);
     assert.ok(FEATURES.some((f) => f.id === 'juju-bandits'));
+  });
+});
+
+describe('the Ancestral Lands clock (baqala_times, G39: no kick)', () => {
+  const MIN = 60 * 1000;
+
+  it('counts only inside, capped per frame, and starts fresh with nothing banked', () => {
+    const c = ancestralEnter(ancestralClock(), 0);
+    assert.deepEqual([c.spent, c.inside, c.exitAt], [0, true, null]);
+    ancestralTick(c, 500);
+    ancestralTick(c, 5 * MIN); // a hidden tab's gap counts one capped frame
+    assert.equal(ancestralSeconds(c), 0.5 + ANCESTRAL_CLOCK.maxTickMs / 1000);
+    ancestralLeave(c, 10_000);
+    ancestralTick(c, 1000);
+    assert.equal(ancestralSeconds(c), 1.5, 'nothing counts outside');
+  });
+
+  it('loses half the time away on re-entry, floored at 0', () => {
+    const c = ancestralClock({ spent: 300, inside: true });
+    ancestralLeave(c, 1 * MIN);
+    assert.deepEqual([c.inside, c.exitAt, c.loggedOut], [false, 1 * MIN, false]);
+    ancestralEnter(c, 3 * MIN); // 2 min away: -60 s
+    assert.equal(c.spent, 240);
+    assert.equal(c.exitAt, null);
+    ancestralLeave(c, 3 * MIN);
+    ancestralEnter(c, 30 * MIN);
+    assert.equal(c.spent, 0);
+  });
+
+  it('clamps 600 s or more to 585 s on entry (the grace period) and never kicks', () => {
+    const c = ancestralEnter(ancestralClock(), 0);
+    for (let i = 0; i < 1200; i++) ancestralTick(c, 1000);
+    assert.equal(ancestralSeconds(c), 1200, 'no 10-minute limit: still inside, still counting');
+    assert.equal(c.inside, true);
+    ancestralLeave(c, 0);
+    ancestralEnter(c, 2000); // -1 s, still over 600
+    assert.equal(c.spent, ANCESTRAL_CLOCK.graceTo);
+  });
+
+  it('survives a logout without decay', () => {
+    const c = ancestralClock({ spent: 400, inside: true });
+    ancestralLeave(c, 0, true);
+    ancestralEnter(c, 60 * MIN);
+    assert.equal(c.spent, 400);
+    assert.equal(c.loggedOut, true, 'logged_out stays until the next leave');
+    ancestralLeave(c, 60 * MIN, false);
+    assert.equal(c.loggedOut, false);
+  });
+
+  it('copies inc_special_locations.js and savanna.js', { skip: !existsSync(gsjs) && 'GSJS checkout not beside this worktree' }, () => {
+    const loc = readFileSync(join(gsjs, 'players/inc_special_locations.js'), 'utf8');
+    assert.match(loc, /time_spent -= \(time\(\) - this\.baqala_times\.exit_time\) \/ 2\.0;/);
+    assert.match(loc, /time_spent >= 600\) \{\s*this\.baqala_times\.time_spent = 585;/);
+    assert.match(loc, /return this\.baqala_times \? \(this\.baqala_times\.time_spent \+ time\(\) - this\.baqala_times\.entry_time\) : 0;/);
+    const trap = readFileSync(join(gsjs, 'items/dust_trap.js'), 'utf8');
+    assert.match(trap, /var buff_time = this\.pc\.get_baqala_buff_time\(\);/);
+    // The cards only lengthen the buff (players/inc_imagination.js), not the clock.
+    const img = readFileSync(join(gsjs, 'players/inc_imagination.js'), 'utf8');
+    assert.match(img, /ancestral_lands_time\/\.exec\(class_tsid\) && this\.buffs_has\("ancestral_nostalgia"\)\) \{\s*this\.buffs_extend_time\("ancestral_nostalgia", 60\);/);
+  });
+
+  it('leaves the Prepared For Ancestral Nostalgia cards for later (no 10-minute limit)', () => {
+    for (const id of ['ancestral_lands_time_1', 'ancestral_lands_time_2']) {
+      assert.equal(remakeStatus(id).status, 'later');
+      assert.match(remakeStatus(id).note, /no 10-minute limit by design \(G39\)/);
+    }
+  });
+});
+
+describe('the Juju feature on the clock', () => {
+  const feature = FEATURES.find((f) => f.id === 'juju-bandits');
+  const street = (hubId) => ({ hubId, platforms: [], bounds: { l: 0, r: 3000, t: -1000, b: 0 } });
+  const savanna = street('86');
+  const meadow = street('56');
+  const makeEngine = (params = {}) => {
+    const data = {};
+    return {
+      data,
+      street: savanna,
+      inv: {},
+      player: { x: 500, y: 0 },
+      questState: { active: { help_juju_bandits: {} }, completed: [] },
+      param: (k) => (k in params ? String(params[k]) : null),
+      setData: (k, v) => { data[k] = String(v); },
+      achievement() {},
+      save() {},
+      refreshPack() {},
+    };
+  };
+  const enter = (engine, street) => {
+    engine.street = street;
+    feature.onStreetClear(engine);
+    feature.onStreetEnter(street, engine);
+  };
+  /** A Dust Trap pays out; the curse runs 1 s later. */
+  const trap = (engine) => {
+    feature.onEvent('dust_trap:trigger', 1, engine);
+    feature.onTick(16, Date.now() + JUJU_BANDIT.curseDelayMs + 1, engine);
+    return feature._state().last;
+  };
+
+  it('rolls the source curve once the quest is taken, from the clock', () => {
+    feature.restore(undefined);
+    const engine = makeEngine({ jujuroll: 0.99 });
+    enter(engine, savanna);
+    assert.equal(engine.data.jujuAncestralSeconds, '0');
+    assert.equal(engine.data.jujuStealChance, '0');
+    assert.equal(trap(engine), 'no-juju:roll');
+    feature.restore({ ancestral: { spent: 9 * 60 } });
+    enter(engine, savanna);
+    assert.equal(feature._state().stealChance, 1);
+    // Past the roll: the empty pack is what stops it now (no 10-minute kick either).
+    assert.equal(trap(engine), 'no-juju:nothing_to_take');
+  });
+
+  it('keeps the 0.5 offer roll while Carry That Weight is new', () => {
+    feature.restore(undefined);
+    const engine = makeEngine({ jujuroll: 0.49 });
+    engine.questState = { completed: [] };
+    enter(engine, savanna);
+    assert.equal(trap(engine), 'no-juju:nothing_to_take');
+  });
+
+  it('presets with &jujutime, publishes data, and banks across streets and reloads', () => {
+    feature.restore(undefined);
+    const engine = makeEngine({ jujutime: 200 });
+    enter(engine, savanna);
+    assert.equal(engine.data.jujuAncestralSeconds, '200');
+    assert.equal(engine.data.jujuStealChance, '0.1');
+    assert.equal(engine.data.jujuAncestralInside, '1');
+    const t0 = Date.now();
+    feature.onTick(16, t0, engine);
+    for (let i = 1; i <= 60; i++) feature.onTick(16, t0 + i * 1000, engine);
+    assert.ok(Math.abs(feature._state().clock.spent - 260) < 2, String(feature._state().clock.spent));
+    assert.equal(engine.data.jujuStealChance, '0.15');
+    // Another Savanna street: the clock carries on.
+    enter(engine, street('95'));
+    assert.ok(feature._state().clock.spent > 250);
+    // A reload in the Savanna is a relog: no decay, preset only on the first load.
+    const saved = JSON.parse(JSON.stringify(feature.save()));
+    assert.equal(saved.ancestral.inside, true);
+    feature.restore(saved);
+    const reloaded = makeEngine();
+    enter(reloaded, savanna);
+    assert.ok(Math.abs(feature._state().clock.spent - saved.ancestral.spent) < 1e-6);
+    assert.equal(feature._state().clock.inside, true);
+    // Walking out stops the clock and the chance reads 0.
+    enter(reloaded, meadow);
+    assert.equal(reloaded.data.jujuAncestralInside, '0');
+    assert.equal(reloaded.data.jujuStealChance, '0');
+    const left = feature._state().clock.spent;
+    feature.onTick(16, Date.now() + 500, reloaded);
+    assert.equal(feature._state().clock.spent, left);
+    feature.restore(undefined);
   });
 });
