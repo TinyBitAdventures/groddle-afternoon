@@ -24,6 +24,9 @@
  *    gift for visitors), name, customize (the three looks), set post, dance
  *    (faster, then it falls over), jump, zombie, muffle / dispense butlerly
  *    wisdom (hints), zip it / chatter (idle chatter, with the Tower line).
+ *  - Hears about the club: back from Join the Club's painting, the quest
+ *    turns in when you come within 550 px of the Butler at home (doQuests;
+ *    quest-rooms/clubhouse.js world hook via butlerApi.questReady/hearQuest).
  *
  * QA (with ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home):
  *   &butlerdemo=1        a Butler at its post (&butlerlook=v10|v11|v22,
@@ -34,6 +37,9 @@
  *                        &homedemo=owned&stonedemo=1&stoneautoplay=optin)
  *   &butlerautoplay=greet|parcel|parceldone|rename|look|box|talk|joke|dance|
  *                   hint|tower|gift|visitors|mailbox
+ * Join the Club end to end: ?autostart=1&fresh=1&resetgame=1&questoffer=off&
+ *   homedemo=owned&butlerdemo=owned&questdemo=join_club&questautoplay=1&questfx=0,
+ *   then Home → Teleport home (canvas clubButler=heard, butlerLast=quest:join_club).
  * Canvas data: butlerState, butlerName, butlerLook, butlerX, butlerPost,
  *   butlerAnim, butlerMode, butlerPackages, butlerMessages, butlerGift,
  *   butlerDialog, butlerLast, butlerVisitors, butlerAutoplay.
@@ -1287,7 +1293,35 @@ export const butlerApi = {
     if (typeof allowed === 'function') visitsAllowed = allowed;
     if (typeof canOptIn === 'function') canOptInFn = canOptIn;
   },
+  /**
+   * For quest rooms whose end NPC is the Butler (quest-rooms/clubhouse.js):
+   * bag_butler.js doQuests runs when the owner comes home within 600 px or
+   * walks into the far hit box (550 px). Ready when the owner is on the home
+   * street within FAR_DIST, the intro and the arrival greeting are over, and
+   * nothing else is open.
+   */
+  questReady(engine) {
+    const v = view?.butler;
+    const p = engine.player;
+    if (!st.owned || !st.introDone || !v || v.container.destroyed || !p) return false;
+    if (currentRoom(engine) !== 'street' || rt.greeting || dialogOpen() || engine.busy?.({ ignoreHome: true })) return false;
+    if (rt.mode === 'dance' || rt.mode === 'interacting') return false;
+    if (rt.greetedAt && performance.now() - rt.greetedAt < QUEST_AFTER_GREETING_MS) return false;
+    return Math.abs(p.x - rt.x) <= BUTLER.FAR_DIST;
+  },
+  /** The Butler hears about it: faces you and talks while the quest completion shows. */
+  hearQuest(engine, questId) {
+    if (!view?.butler || !st.owned) return null;
+    command();
+    if (engine.player) faceX(engine.player.x);
+    if (reactionAllowedLoose() || reactionAllowed()) oneOff(engine, 'talk');
+    lastMsg = `quest:${questId}`;
+    publish(engine, true);
+    return { name: butlerName(st), portrait: butlerSheetUrl(st.look, 'idle0') };
+  },
 };
+/** Let the arrival greeting's lines play before a quest turn-in covers them (greetNow's follow-up comes at 3.8 s). */
+const QUEST_AFTER_GREETING_MS = 5000;
 
 // ---------------------------------------------------------------------------
 // QA

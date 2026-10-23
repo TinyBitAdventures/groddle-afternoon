@@ -56,6 +56,9 @@ import {
 import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js';
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js';
 import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js';
+// The URL clubhouse.js imports, so these share its Butler.
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=butler-1';
+import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -444,5 +447,87 @@ describe('butler feature: a neighbour drops by', () => {
     assert.equal(butlerApi.owned(), false);
     assert.equal(butlerApi.label(), '');
     assert.equal(butlerApi.receiveVisitor(fakeEngine(), { neighbourId: 'dorrit', sender: 'Dorrit Applewhistle', text: 'Hi' }), false);
+  });
+});
+
+describe('Join the Club: Tell your Butler about the club (bag_butler.js doQuests)', () => {
+  const leaveCtx = (questId) => {
+    const flags = [];
+    return { flags, questId, progress: (name) => flags.push(name) };
+  };
+  const worldCtx = (progress = {}) => {
+    const turnIns = [];
+    const data = {};
+    return {
+      progress,
+      turnIns,
+      data,
+      engine: { setData: (k, v) => { data[k] = v; }, player: { x: 0 }, homeContext: () => ({ inHome: false }) },
+      questActive: (id) => id === JOIN_CLUB,
+      questProgress: (id, name) => Number(progress[name]) || 0,
+      progressQuest: (id, name) => { progress[name] = 1; return true; },
+      turnInQuest: (id, opts) => { turnIns.push({ id, opts }); return Promise.resolve(true); },
+    };
+  };
+  const settle = () => new Promise((r) => setTimeout(r, 0));
+
+  it('keeps the source requirement and the Butler as the end NPC', () => {
+    const quests = JSON.parse(readFileSync(join(PUBLIC, 'assets/content/quests.json'), 'utf8'));
+    const list = Array.isArray(quests) ? quests : Object.values(quests.quests || quests);
+    const q = list.find((x) => (x.classTsid || x.id) === JOIN_CLUB);
+    const req = q.requirements.find((r) => r.name === 'talk_to_butler');
+    assert.equal(req.type, 'flag');
+    assert.match(readFileSync(join(PUBLIC, 'js/quest-rooms/clubhouse.js'), 'utf8'), /end_npcs: bag_butler/);
+  });
+
+  it('tells it on the way out when you have no Butler', () => {
+    clubButlerFeature._reset();
+    const ctx = leaveCtx(JOIN_CLUB);
+    assert.deepEqual(clubRoom.onLeave(ctx, 'complete'), { leaveFlag: 'instance_exit_via_signpost' });
+    assert.deepEqual(ctx.flags, ['talk_to_butler']);
+  });
+
+  it('leaves the step for your Butler at home when you have one', () => {
+    clubButlerFeature._reset();
+    clubButlerFeature.restore({ owned: true, introDone: true });
+    const ctx = leaveCtx(JOIN_CLUB);
+    clubRoom.onLeave(ctx, 'complete');
+    assert.deepEqual(ctx.flags, []);
+    const rem = leaveCtx(JOIN_CLUB_REMINISCE);
+    clubButlerFeature._reset();
+    clubRoom.onLeave(rem, 'complete');
+    assert.deepEqual(rem.flags, [], 'the reminisce has no talk_to_butler');
+  });
+
+  it('waits until you are home near the Butler, then it hears and the quest turns in', async () => {
+    clubButlerFeature._reset();
+    clubButlerFeature.restore({ owned: true, introDone: true, look: 'v22' });
+    const w = worldCtx({ solved_puzzle: 1 });
+    clubRoom.world.onTick(w);
+    assert.equal(w.turnIns.length, 0, 'not back from the painting yet');
+    w.progress.instance_exit_via_signpost = 1;
+    clubRoom.world.onTick(w);
+    assert.equal(clubButler.questReady(w.engine), false, 'away from the home street');
+    assert.equal(w.turnIns.length, 0);
+    assert.equal(w.progress.talk_to_butler, undefined);
+    const ready = clubButler.questReady;
+    const hear = clubButler.hearQuest;
+    const heard = [];
+    clubButler.questReady = () => true;
+    clubButler.hearQuest = (engine, id) => { heard.push(id); return { name: 'Butler', portrait: 'assets/sprites/butler/butler_v22_idle0.webp' }; };
+    try {
+      clubRoom.world.onTick(w);
+      clubRoom.world.onTick(w);
+      assert.deepEqual(heard, [JOIN_CLUB]);
+      assert.equal(w.progress.talk_to_butler, 1);
+      assert.equal(w.data.clubButler, 'heard');
+      assert.deepEqual(w.turnIns, [{ id: JOIN_CLUB, opts: { payload: { iconUrl: 'assets/sprites/butler/butler_v22_idle0.webp' } } }]);
+      await settle();
+      clubRoom.world.onTick(w);
+      assert.equal(w.turnIns.length, 1, 'talk_to_butler set: nothing more to do');
+    } finally {
+      clubButler.questReady = ready;
+      clubButler.hearQuest = hear;
+    }
   });
 });

@@ -29,6 +29,10 @@
  *  - Hints (items/include/butler_hints.js giveHint): from ten minutes after the
  *    intro, when the owner comes within near_dist 250, at most every 7 min
  *    (level 7 and under), 30 min (12 and under) or an hour.
+ *  - Quests (doQuests, bag_butler.js 2095-2110): players/inc_stats.js gives
+ *    the Butler Join the Club at 30128 iMG; once instance_exit_via_signpost is
+ *    set, the owner coming home within 600 px (onPlayerEnter 4180-4184) or
+ *    into the far hit box sets talk_to_butler and turns the quest in.
  *  - Idle chatter (onIdle): five minutes apart, two minutes after the last
  *    command; 20% of the time at level 18+ without a Tower it is
  *    buildTowerComment instead.

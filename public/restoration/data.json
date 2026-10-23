@@ -674,7 +674,7 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals. A Butler arrives in a box to greet you home and hold what neighbours leave.",
+   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals. A Butler arrives in a box to greet you home, hold what neighbours leave and hear about the club.",
    "spot": "mailbox",
    "evidence": [
     "public/js/homes.js",
@@ -1805,7 +1805,7 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 295,
+  "commits": 296,
   "since": "2026-10-19",
   "recent": [
    {

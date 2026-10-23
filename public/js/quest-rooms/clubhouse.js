@@ -16,6 +16,15 @@
  * way fails the quest (onExitLocation). Rewards: 750 currants and 100
  * Friendly favor; the reminisce pays 200 and 25 and says "Welcome back".
  *
+ * The Butler is the end NPC (end_npcs: bag_butler). bag_butler.js doQuests
+ * sets `talk_to_butler` once `instance_exit_via_signpost` is set and turns
+ * the quest in with its completion text, when the owner comes home within
+ * 600 px of the Butler (onPlayerEnter) or walks into its 550 px far hit box
+ * (onPlayerCollision). The source's out-of-range prompt (joinClubReturn)
+ * has no string in butler_strings.js, so it said nothing; the remake waits
+ * the same way. The `world` hook below does this while the quest is open;
+ * a player with no Butler (no home yet) tells it on the way out instead.
+ *
  * Lost: both location geometries and the clubhouse's location events (the
  * picture frames and the ENTER button were deco + items/wall_button.js
  * wired by events). Rebuilt from the supplied recording (ScgY1IJgzAo): a
@@ -42,6 +51,7 @@
  */
 
 import { textureFromUrl } from '../textures.js';
+import { butlerApi } from '../features/butler-feature.js?v=butler-1';
 
 export const ROOM_MS = 5 * 60 * 1000; // source: questInstanceLocation(..., 5*60)
 export const PICTURE_REACH = 175; // source: club_house_picture jump_in conditions
@@ -987,6 +997,9 @@ function takeRoomQuoins(ctx) {
   }
 }
 
+/** The Butler's turn-in while its award is up (one at a time). */
+let butlerTurnIn = null;
+
 export const room = {
   id: 'clubhouse',
   title: 'Join the Club',
@@ -1096,10 +1109,25 @@ export const room = {
   },
 
   onLeave(ctx, outcome) {
-    // The Bag Butler heard about the club at home (talk_to_butler); the remake has no butler,
-    // so coming back through the signpost tells it.
-    if (outcome === 'complete' && ctx.questId === PART_1) ctx.progress('talk_to_butler');
+    // Your Butler hears about the club at home (world.onTick); without one,
+    // coming back through the signpost tells it.
+    if (outcome === 'complete' && ctx.questId === PART_1 && !butlerApi.owned()) ctx.progress('talk_to_butler');
     return { leaveFlag: 'instance_exit_via_signpost' };
+  },
+
+  world: {
+    /** bag_butler.js doQuests: back from the painting, the Butler hears about it when you come near. */
+    onTick(w) {
+      if (butlerTurnIn || !w.questActive(PART_1)) return;
+      if (!w.questProgress(PART_1, 'instance_exit_via_signpost') || w.questProgress(PART_1, 'talk_to_butler')) return;
+      const owned = butlerApi.owned();
+      if (owned && !butlerApi.questReady(w.engine)) return;
+      const heard = owned ? butlerApi.hearQuest(w.engine, PART_1) : null;
+      w.progressQuest(PART_1, 'talk_to_butler');
+      w.engine.setData('clubButler', heard ? 'heard' : 'no-butler');
+      butlerTurnIn = w.turnInQuest(PART_1, heard ? { payload: { iconUrl: heard.portrait } } : {})
+        .finally(() => { butlerTurnIn = null; });
+    },
   },
 
   clear(ctx) {
