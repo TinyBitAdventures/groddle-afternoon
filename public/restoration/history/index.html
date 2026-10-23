@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Every player-visible addition and fix to the Groddle Afternoon Glitch remake, day by day, with what changed and where it came from." />
+  <title>Groddle Field Notes · Every change</title>
+  <link rel="stylesheet" href="../restoration.css" />
+  <link rel="stylesheet" href="../../site/site-nav.css" />
+  <link rel="icon" href="../../favicon.svg?v=quoin" type="image/svg+xml" />
+  <link rel="icon" href="../../favicon.ico?v=quoin" sizes="32x32" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png?v=quoin" />
+</head>
+<body>
+  <nav class="site-nav" aria-label="Site">
+    <div class="wrap site-nav-row">
+      <a class="wordmark" href="../../"><img src="../../favicon.svg?v=quoin" alt="" width="28" height="28" /><span>Groddle Afternoon</span></a>
+      <div class="site-nav-links">
+        <a href="../" aria-current="page">Restoration</a>
+        <a href="../../compare/">Compare</a>
+        <a class="site-nav-dev" href="../../#development">Development</a>
+        <a class="site-nav-play" href="../../play/">Play</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="masthead history-head">
+    <div class="wrap">
+      <p class="kicker"><a href="../">Groddle Field Notes · Restoration</a> · Every change</p>
+      <h1>Every change, day by day</h1>
+      <p class="lead">Each thing the remake gained or fixed since the project started keeping a history, newest first. Open any change to see what it did and which piece of Tiny Speck’s game it came from.</p>
+      <p class="history-stats" id="stats" aria-live="polite">Loading the history…</p>
+      <div class="history-tools">
+        <div class="chips" id="kind-filter" role="group" aria-label="Show"></div>
+        <label class="history-search" for="q">
+          <span class="visually-hidden">Search changes</span>
+          <input id="q" type="search" placeholder="Search, e.g. piggy, tower, Paradise" autocomplete="off" />
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main class="band">
+    <div class="wrap">
+      <div id="days"></div>
+      <p class="history-empty" id="empty" hidden>No changes match that search.</p>
+      <aside class="history-older">
+        <h2>Before the history began</h2>
+        <p>The first weeks of work, before 19 October 2026, are written up night by night in the <a href="../../changelog.html">Build archive</a>.</p>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p id="foot-meta">Generated from the repository.</p>
+      <p><a href="../">Restoration report</a> · <a href="../../play/">Play Groddle Afternoon</a> · <a href="../../changelog.html">Build archive</a></p>
+    </div>
+  </footer>
+
+  <script src="history.js" type="module"></script>
+</body>
+</html>

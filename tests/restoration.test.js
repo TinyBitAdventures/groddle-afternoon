@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CHECKLIST, GROUPS, STATUS } from '../tools/restoration/checklist.mjs';
 import { SHOTS } from '../tools/restoration/shots.mjs';
-import { buildRestorationData, comparable } from '../tools/build-restoration.mjs';
+import { buildRestorationData, comparable, historyLog } from '../tools/build-restoration.mjs';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js';
 import { ROOM_NOTES } from '../tools/restoration/rooms.mjs';
 import { DESIGNER_LEVELS, TEXT_LEVELS } from '../tools/restoration/designer-levels.mjs';
@@ -81,5 +81,26 @@ describe('restoration data', () => {
     const data = await buildRestorationData();
     assert.equal(data.rooms.total, new Set(Object.values(QUEST_ROOMS)).size);
     assert.ok(data.quests.playable > 100);
+  });
+});
+
+describe('every-change history', () => {
+  it('lists player-visible commits newest first, with their bullets', () => {
+    const { changes, since } = historyLog();
+    assert.ok(changes.length > 100, `only ${changes.length} changes`);
+    for (const c of changes) {
+      assert.ok(['new', 'improve', 'fix'].includes(c.kind), c.hash);
+      assert.match(c.date, /^\d{4}-\d{2}-\d{2}$/);
+      assert.ok(c.text.length > 0 && Array.isArray(c.details), c.hash);
+    }
+    assert.ok(changes[0].date >= changes[changes.length - 1].date);
+    assert.equal(since, changes[changes.length - 1].date);
+  });
+
+  it('has a page that reads history.json and is linked from the report', () => {
+    const page = readFileSync(join(root, 'public/restoration/history/index.html'), 'utf8');
+    assert.match(page, /history\.js/);
+    assert.match(readFileSync(join(root, 'public/restoration/history/history.js'), 'utf8'), /\.\.\/history\.json/);
+    assert.match(readFileSync(join(root, 'public/restoration/index.html'), 'utf8'), /href="history\/"/);
   });
 });

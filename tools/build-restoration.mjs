@@ -222,6 +222,29 @@ function gitStats() {
   }
 }
 
+/**
+ * Every player-visible change (📦 NEW, 👌 IMPROVE, 🐛 FIX commits), newest first, with each commit's
+ * "- " bullets, for /restoration/history/. Written to history.json beside data.json; it is all git
+ * metadata, so --check ignores it like the git block.
+ */
+export function historyLog() {
+  try {
+    const raw = execFileSync('git', ['log', '--format=%h%x1f%cs%x1f%s%x1f%b%x1e'], { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    const kinds = { '📦 NEW': 'new', '👌 IMPROVE': 'improve', '🐛 FIX': 'fix' };
+    const changes = [];
+    for (const rec of raw.split('\x1e')) {
+      const [hash, date, subject, body = ''] = rec.replace(/^\n+/, '').split('\x1f');
+      const m = /^(📦 NEW|👌 IMPROVE|🐛 FIX):\s*(.*)$/u.exec(subject || '');
+      if (!m) continue;
+      const details = body.split('\n').filter((l) => /^- /.test(l)).map((l) => l.slice(2).trim()).filter(Boolean);
+      changes.push({ hash, date, kind: kinds[m[1]], text: m[2].trim(), details });
+    }
+    return { since: changes.length ? changes[changes.length - 1].date : '', changes };
+  } catch {
+    return { since: '', changes: [] };
+  }
+}
+
 function testFileCount() {
   return readdirSync(join(root, 'tests')).filter((f) => f.endsWith('.test.js')).length;
 }
@@ -301,6 +324,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const now = new Date();
     data.generatedAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     writeFileSync(out, `${JSON.stringify(data, null, 1)}\n`);
+    const history = historyLog();
+    writeFileSync(join(pub, 'restoration', 'history.json'), `${JSON.stringify({ generatedAt: data.generatedAt, ...history })}\n`);
     console.log(`${data.back}/${data.possible} systems back · ${data.quests.playable} playable quests · ${data.rooms.built}/${data.rooms.total} rooms -> ${out}`);
   }
 }

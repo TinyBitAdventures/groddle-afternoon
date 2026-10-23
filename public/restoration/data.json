@@ -1805,9 +1805,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 288,
+  "commits": 291,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Yellow Crumb really does double your learning speed for a minute"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Buying Brain Capacity speeds up the skill you're studying"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Eat a Ticket to Paradise for 20 iMG, and no ascending from Hell"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1912,21 +1927,6 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Smugglers, Rube, the squids, the flamingos, Grandma and the Juju Bandits are sharp on Retina"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "new",
-    "text": "Mood slowly drifts down while you play, and the Steady On, Mood Loser cards slow it"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Juju Bandits steal on their own after time in the Ancestral Lands"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "Streets only have the animals the archive recorded"
    }
   ]
  },
