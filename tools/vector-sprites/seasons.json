@@ -1,0 +1,27 @@
+{
+ "about": "Seasonal world sprites js/features/seasons-feature.js draws, paired with their glitch-items SWF (CC0): the five lit Jack-O-Lanterns' 74-frame talk sheets (OGA pumpkin_lit_N__x1_talk, 19x4) and the world state (scene '1', root frame 2; frame 1 is 'iconic') of Chocolate Egg 4 and the Glitchmas Cracker, the two whose world art differs from their pack icon. Eggs 1, 2, 3 and 5 draw their pack icon (identical pixels, already 3x via js/icon-hires.js). Carved pumpkins placed in the world draw their pack icon too. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/seasons.json",
+ "webp": true,
+ "jobs": [
+  {"name": "pumpkin-lit-1", "swf": "carved_pumpkins/pumpkin_lit_1/pumpkin_lit_1.swf", "sprite": 6, "sheets": [
+   {"path": "assets/sprites/seasons/pumpkin_lit_1_talk.png", "label": "talk", "fw": 49, "fh": 47, "cols": 19, "frames": 74, "mirror": false}
+  ]},
+  {"name": "pumpkin-lit-2", "swf": "carved_pumpkins/pumpkin_lit_2/pumpkin_lit_2.swf", "sprite": 8, "sheets": [
+   {"path": "assets/sprites/seasons/pumpkin_lit_2_talk.png", "label": "talk", "fw": 49, "fh": 47, "cols": 19, "frames": 74, "mirror": false}
+  ]},
+  {"name": "pumpkin-lit-3", "swf": "carved_pumpkins/pumpkin_lit_3/pumpkin_lit_3.swf", "sprite": 9, "sheets": [
+   {"path": "assets/sprites/seasons/pumpkin_lit_3_talk.png", "label": "talk", "fw": 50, "fh": 47, "cols": 19, "frames": 74, "mirror": false}
+  ]},
+  {"name": "pumpkin-lit-4", "swf": "carved_pumpkins/pumpkin_lit_4/pumpkin_lit_4.swf", "sprite": 8, "sheets": [
+   {"path": "assets/sprites/seasons/pumpkin_lit_4_talk.png", "label": "talk", "fw": 48, "fh": 47, "cols": 19, "frames": 74, "mirror": false}
+  ]},
+  {"name": "pumpkin-lit-5", "swf": "carved_pumpkins/pumpkin_lit_5/pumpkin_lit_5.swf", "sprite": 8, "sheets": [
+   {"path": "assets/sprites/seasons/pumpkin_lit_5_talk.png", "label": "talk", "fw": 50, "fh": 55, "cols": 19, "frames": 74, "mirror": false}
+  ]},
+  {"name": "egghunt-egg-4", "swf": "food/egghunt_egg_4/egghunt_egg_4.swf", "sprite": 0, "sheets": [
+   {"path": "assets/sprites/seasons/egghunt_egg_4_world.png", "fw": 24, "fh": 19, "cols": 1, "frames": 1, "swfStart": 2, "swfCount": 1, "mirror": false}
+  ]},
+  {"name": "glitchmas-cracker", "swf": "misc/glitchmas_cracker/glitchmas_cracker.swf", "sprite": 0, "sheets": [
+   {"path": "assets/sprites/seasons/glitchmas_cracker_world.png", "fw": 52, "fh": 24, "cols": 1, "frames": 1, "swfStart": 2, "swfCount": 1, "mirror": false}
+  ]}
+ ]
+}

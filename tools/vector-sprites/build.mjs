@@ -25,6 +25,8 @@
  *    the 1x sheet is unchanged and js/sprite-hires.js points every frame at
  *    its part (SPLIT_SPRITES). Only a character with a cell too big for any
  *    part is rejected, before rendering.
+ *  - "webp": true (manifest) always writes lossless WebP, even when it saves
+ *    less than a fifth over PNG (seasons.json: one format per folder).
  *  - "firstDraw": true (manifest or job) keeps the sheet out of the eager
  *    URL route: it swaps to 3x when the renderer first draws it.
  *  - job "character": sheets sharing one are all-or-nothing (a character
@@ -104,6 +106,8 @@ const DRY = args.includes('--dry');
 let sheetMin = SHEET_MIN;
 /** The manifest "budget" (each 3x file), set in main. */
 let budget = null;
+/** The manifest "webp": always lossless WebP, set in main. */
+let alwaysWebp = false;
 
 // ---------------------------------------------------------------------------
 // Pixels (ImageMagick for codecs, plain typed arrays for the maths)
@@ -481,7 +485,7 @@ function buildSheet(job, sheet, labels, frameDir) {
     const tmpWebp = join(WORK, `${basename(name)}.tmp.webp`);
     execFileSync('cwebp', ['-quiet', '-lossless', '-exact', '-z', '9', tmpPng, '-o', tmpWebp]);
     // Lossless WebP keeps the exact pixels; use it when it saves a fifth.
-    const useWebp = extname(oga) === '.webp' || statSync(tmpWebp).size < statSync(tmpPng).size * 0.8;
+    const useWebp = alwaysWebp || extname(oga) === '.webp' || statSync(tmpWebp).size < statSync(tmpPng).size * 0.8;
     const file = `${name}.${useWebp ? 'webp' : 'png'}`;
     if (useWebp) { renameSync(tmpWebp, file); unlinkSync(tmpPng); } else { renameSync(tmpPng, file); unlinkSync(tmpWebp); }
     written.push({ hires: relative(PUBLIC, file), bytes: statSync(file).size, ...(split ? { from: layout.from, count: layout.count, cols: layout.cols, w: W, h: H } : {}) });
@@ -790,6 +794,7 @@ async function main() {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
   sheetMin = Math.max(SHEET_MIN, manifest.minScore ?? 0);
   budget = manifest.budget || null;
+  alwaysWebp = manifest.webp === true;
   const results = existsSync(RESULTS) ? JSON.parse(readFileSync(RESULTS, 'utf8')) : {};
   mkdirSync(WORK, { recursive: true });
   const record = (job, sheet, r) => {

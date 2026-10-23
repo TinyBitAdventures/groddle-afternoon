@@ -102,6 +102,11 @@ const HOME_TSIDS = new Set(['RH_HOME_EXT', 'RH_HOME_INT']);
 const TALK_SIZE = { 1: [49, 47], 2: [49, 47], 3: [50, 47], 4: [48, 47], 5: [50, 55] };
 const TALK_COLS = 19;
 const TALK_FRAMES = 74;
+// The talk sheets, egg 4 and the cracker have 3x renders from their SWFs
+// (tools/vector-sprites/seasons.json, routed by js/sprite-hires.js). Eggs 1,
+// 2, 3 and 5 look in the world exactly like their pack icon (same OGA pixels),
+// so they draw the icon and get its 3x file from js/icon-hires.js.
+const eggWorldUrl = (n) => (n === 4 ? 'assets/sprites/seasons/egghunt_egg_4_world.png' : `assets/sprites/icons/egghunt_egg_${n}.png`);
 const GIVE_RANGE = 260;
 const HELPER_NAMES = { npc_piggy: 'Piggy', npc_chicken: 'Chicken', npc_butterfly: 'Butterfly' };
 const RECIPIENT_LINES = Object.freeze({
@@ -548,7 +553,7 @@ function spawnEgg(engine, cls, pt) {
   const { PIXI } = engine;
   const n = EGG_CLASSES.indexOf(cls) + 1;
   const y = groundAt(engine, pt.x, pt.y);
-  const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/seasons/egghunt_egg_${n}_world.png`));
+  const spr = new PIXI.Sprite(textureFromUrl(eggWorldUrl(n)));
   spr.anchor.set(0.5, 1);
   spr.x = pt.x;
   spr.y = y + 2;

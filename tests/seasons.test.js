@@ -8,6 +8,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { HIRES_SPRITES } from '../public/js/sprite-hires.js';
+import { HIRES_ICONS } from '../public/js/icon-hires.js';
 import {
   CANDY_DAILY_MAX,
   CARVED_CLASSES,
@@ -92,6 +94,31 @@ describe('seasonal calendar', () => {
     for (const s of Object.values(SEASONS)) assert.ok(existsSync(join(root, 'assets/sprites/icons', `${s.icon}.png`)), s.icon);
     for (const id of Object.keys(SEASON_DATA.items)) assert.ok(existsSync(join(root, 'assets/sprites/icons', `${id}.png`)), id);
     for (const n of [1, 2, 3, 4, 5]) assert.ok(existsSync(join(root, `assets/sprites/seasons/pumpkin_lit_${n}_talk.png`)));
+  });
+
+  it('draws every street sprite from a sheet or icon with a 3x render', () => {
+    const src = readFileSync(join(root, 'js/features/seasons-feature.js'), 'utf8');
+    const manifest = JSON.parse(readFileSync(join(root, '../tools/vector-sprites/seasons.json'), 'utf8'));
+    const sheets = new Map(manifest.jobs.flatMap((j) => j.sheets.map((s) => [s.path, s])));
+    // The talk sheets keep the feature's cell size and 19 x 74 frame order.
+    const size = Function(`return ${/const TALK_SIZE = (\{[^;]+\});/.exec(src)[1]}`)();
+    assert.match(src, /const TALK_COLS = 19;/);
+    assert.match(src, /const TALK_FRAMES = 74;/);
+    for (const n of [1, 2, 3, 4, 5]) {
+      const path = `assets/sprites/seasons/pumpkin_lit_${n}_talk.png`;
+      const s = sheets.get(path);
+      assert.deepEqual([s.fw, s.fh, s.cols, s.frames, s.label], [...size[n], 19, 74, 'talk'], path);
+      assert.match(HIRES_SPRITES.get(path) || '', /@3x\.webp$/, path);
+    }
+    for (const path of ['assets/sprites/seasons/egghunt_egg_4_world.png', 'assets/sprites/seasons/glitchmas_cracker_world.png']) {
+      assert.ok(src.includes(`'${path}'`), path);
+      assert.match(HIRES_SPRITES.get(path) || '', /@3x\.webp$/, path);
+    }
+    // Eggs 1, 2, 3 and 5 look like their icon in the world, so they draw it (3x via icon-hires).
+    assert.match(src, /assets\/sprites\/icons\/egghunt_egg_\$\{n\}\.png/);
+    for (const n of [1, 2, 3, 5]) assert.ok(HIRES_ICONS.has(`egghunt_egg_${n}`), n);
+    // Placed carved pumpkins draw their pack icon.
+    for (const cls of CARVED_CLASSES) assert.ok(HIRES_ICONS.has(cls), cls);
   });
 });
 

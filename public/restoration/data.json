@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 305,
+  "commits": 306,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Say hi to your Butler with the 5 key: daily hi signs, its hi back and the matching-sign bonus"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1924,11 +1929,6 @@
     "date": "2026-10-23",
     "kind": "fix",
     "text": "Sweaters, jerseys, kilts and coats keep their colours from behind instead of white patches"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Decorating your house and Tower keeps the view above the pack and still reaches the ceiling"
    }
   ]
  },
