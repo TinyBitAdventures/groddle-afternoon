@@ -1805,9 +1805,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 298,
+  "commits": 299,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Crowded streets make animals sulk, leave or puff away, and Happy Animals cards raise your yard's limit"
+   },
    {
     "date": "2026-10-23",
     "kind": "fix",
@@ -1922,11 +1927,6 @@
     "date": "2026-10-23",
     "kind": "fix",
     "text": "Camera Mode works on your home street and in your house and Tower"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Your home street is tall enough to see a nine-floor Tower"
    }
   ]
  },

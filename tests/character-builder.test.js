@@ -26,6 +26,7 @@ import {
   resolveBodySheets,
   STORAGE_KEY,
 } from '../public/js/character-builder.js';
+import { expandCatalog, lookKey, resolveLook } from '../public/js/avatar-looks.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -179,5 +180,58 @@ describe('UI wiring', () => {
     for (const s of ['addChipFinder', 'VECTOR_CHIP_PAGE', 'vectorChipState', 'avatar-search', 'avatar-more-chip']) assert.ok(game.includes(s), s);
     const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
     assert.ok(css.includes('.avatar-search') && css.includes('.avatar-style-chip[hidden]'));
+  });
+});
+
+describe('vector presets', () => {
+  const catalog = expandCatalog(JSON.parse(readFileSync(join(__dirname, '../public/assets/avatar/catalog.json'), 'utf8')));
+  const hue = (hex) => {
+    const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+    const mx = Math.max(r, g, b);
+    const d = mx - Math.min(r, g, b);
+    if (!d) return { h: 0, l: mx };
+    let h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h *= 60;
+    return { h: h < 0 ? h + 360 : h, l: (mx + Math.min(r, g, b)) / 2 };
+  };
+  // Each colour theme the classic portrait used to recolour: its hair hue range (degrees).
+  const THEMES = { blueberry: [190, 250], autumn: [10, 40], midnight: [220, 300], candy: [300, 350], forest: [80, 160] };
+
+  it('rebuilds the five colour themes as vector looks in real GSJS articles, colourways and palettes', () => {
+    for (const [id, [h0, h1]] of Object.entries(THEMES)) {
+      const app = APPEARANCE_PRESETS[id].appearance;
+      assert.equal(app.bodyStyle, 'vector', id);
+      const v = app.vector;
+      for (const [type, name] of Object.entries(v.outfit)) {
+        if (name === 'none') continue;
+        const it = catalog.types[type]?.find((i) => i.name === name);
+        assert.ok(it, `${id} ${type}/${name} is in the catalog`);
+        assert.ok(!it.reimagined && !it.swfOnly, `${id} ${type}/${name} is a GSJS article`);
+        if (v.variant[type] !== undefined) assert.ok(v.variant[type] < (it.variants || []).length, `${id} ${type} colourway`);
+      }
+      // No recolouring: colourways and palette ids only.
+      assert.deepEqual(v.tint, {}, id);
+      assert.ok(!v.skinTint && !v.hairTint, id);
+      assert.ok(catalog.palettes.skin.some((p) => p.id === v.skinColor), `${id} skin ${v.skinColor}`);
+      const hair = catalog.palettes.hair.find((p) => p.id === v.hairColor);
+      assert.ok(hair, `${id} hair ${v.hairColor}`);
+      const { h, l } = hue(hair.color);
+      assert.ok(h >= h0 && h <= h1, `${id} hair hue ${Math.round(h)}`);
+      if (id === 'midnight') assert.ok(l < 0.25, 'midnight hair is dark');
+    }
+  });
+
+  it('gives every vector preset its own look, and keeps the bitmap presets', () => {
+    const keys = new Map();
+    for (const p of Object.values(APPEARANCE_PRESETS)) {
+      if (p.appearance.bodyStyle !== 'vector') continue;
+      const key = lookKey(resolveLook(p.appearance.vector, catalog));
+      assert.ok(!keys.has(key), `${p.id} looks like ${keys.get(key)}`);
+      keys.set(key, p.id);
+    }
+    assert.equal(keys.size, 11);
+    assert.equal(APPEARANCE_PRESETS.glitch.appearance.bodyStyle, 'glitch');
+    assert.equal(APPEARANCE_PRESETS.classic.appearance.bodyStyle, 'classic');
+    assert.equal(APPEARANCE_PRESETS.alt_base.appearance.bodyStyle, 'alt');
   });
 });

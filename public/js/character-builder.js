@@ -230,6 +230,59 @@ export const APPEARANCE_PRESETS = {
       hairColor: 80,
     }),
   },
+  // The five colour themes the classic portrait used to recolour, rebuilt as
+  // vector looks: real GSJS articles in their own colourways (no recolouring)
+  // and real skin/hair palette ids, chosen to keep each name's colours.
+  blueberry: {
+    id: 'blueberry',
+    label: 'Blueberry',
+    appearance: vectorPreset({
+      outfit: { hair: 'MopHair', hat: 'striped_tuque', eyes: 'eyes_01', mouth: 'mouth_B0013', nose: 'nose_0017', ears: 'ears_0003', shirt: 'freddy_shirt', pants: 'regular_jeans', shoes: 'rain_boots' },
+      variant: { hat: 2, shirt: 6, pants: 1, shoes: 6 },
+      skinColor: 52,
+      hairColor: 14,
+    }),
+  },
+  autumn: {
+    id: 'autumn',
+    label: 'Autumn',
+    appearance: vectorPreset({
+      outfit: { hair: 'hair_10', hat: 'none', eyes: 'eyes_20101109F', mouth: 'mouth_02', nose: 'nose_0009', ears: 'ears_0009', shirt: 'turtle_neck', coat: 'pea_coat', pants: 'wide_belt_regular_jeans', shoes: 'campers' },
+      variant: { shirt: 2, coat: 3, pants: 2, shoes: 0 },
+      skinColor: 56,
+      hairColor: 108,
+    }),
+  },
+  midnight: {
+    id: 'midnight',
+    label: 'Midnight',
+    appearance: vectorPreset({
+      outfit: { hair: 'electro_longbangs', hat: 'none', eyes: 'eyes_20101109A', mouth: 'mouth_20101109E', nose: 'nose_20101109C', ears: 'ears_0002', shirt: 'tied_shoulder_top', coat: 'star_hoodie', pants: 'japajeans', shoes: 'clogs' },
+      variant: { shirt: 2, coat: 0, pants: 1, shoes: 1 },
+      skinColor: 17,
+      hairColor: 123,
+    }),
+  },
+  candy: {
+    id: 'candy',
+    label: 'Candy',
+    appearance: vectorPreset({
+      outfit: { hair: 'loopy_bun', hat: 'capcake_hat', eyes: 'eyes_girly_2', mouth: 'mouth_little_lady', nose: 'nose_curl', ears: 'ears_0001', shirt: 'flower_print_baby_tee_light', pants: 'striped_legwarmers_pants', shoes: 'crocs_with_socks' },
+      variant: { hat: 0, shirt: 0, pants: 0, shoes: 0 },
+      skinColor: 1,
+      hairColor: 87,
+    }),
+  },
+  forest: {
+    id: 'forest',
+    label: 'Forest',
+    appearance: vectorPreset({
+      outfit: { hair: 'hair_B0018', hat: 'elven_boy_hat', eyes: 'eyes_12', mouth: 'mouth_20101109F', nose: 'nose_oblong_1', ears: 'ears_0005', shirt: 'plain_tee_dark', coat: 'elven_boy_top', pants: 'lightweight_shorts', shoes: 'rain_boots' },
+      variant: { hat: 0, shirt: 4, coat: 0, pants: 2, shoes: 3 },
+      skinColor: 33,
+      hairColor: 9,
+    }),
+  },
   glitch: {
     id: 'glitch',
     label: 'Recovered',
@@ -239,76 +292,6 @@ export const APPEARANCE_PRESETS = {
     id: 'classic',
     label: 'Classic',
     appearance: createClassicAppearance(),
-  },
-  blueberry: {
-    id: 'blueberry',
-    label: 'Blueberry',
-    appearance: {
-      bodyStyle: 'classic',
-      hair: { r: 70, g: 100, b: 200 },
-      skin: { r: 200, g: 185, b: 175 },
-      shirt: { r: 40, g: 90, b: 180 },
-      shirtDark: { r: 25, g: 40, b: 90 },
-      pants: { r: 40, g: 50, b: 80 },
-      shoes: { r: 40, g: 70, b: 140 },
-      sole: { r: 200, g: 200, b: 210 },
-    },
-  },
-  autumn: {
-    id: 'autumn',
-    label: 'Autumn',
-    appearance: {
-      bodyStyle: 'classic',
-      hair: { r: 200, g: 100, b: 40 },
-      skin: { r: 210, g: 170, b: 130 },
-      shirt: { r: 180, g: 90, b: 40 },
-      shirtDark: { r: 80, g: 40, b: 20 },
-      pants: { r: 100, g: 70, b: 45 },
-      shoes: { r: 100, g: 60, b: 35 },
-      sole: { r: 220, g: 200, b: 160 },
-    },
-  },
-  midnight: {
-    id: 'midnight',
-    label: 'Midnight',
-    appearance: {
-      bodyStyle: 'classic',
-      hair: { r: 50, g: 45, b: 70 },
-      skin: { r: 150, g: 145, b: 160 },
-      shirt: { r: 90, g: 40, b: 140 },
-      shirtDark: { r: 30, g: 20, b: 45 },
-      pants: { r: 35, g: 35, b: 50 },
-      shoes: { r: 40, g: 35, b: 55 },
-      sole: { r: 180, g: 175, b: 190 },
-    },
-  },
-  candy: {
-    id: 'candy',
-    label: 'Candy',
-    appearance: {
-      bodyStyle: 'classic',
-      hair: { r: 230, g: 100, b: 160 },
-      skin: { r: 240, g: 200, b: 190 },
-      shirt: { r: 230, g: 80, b: 140 },
-      shirtDark: { r: 80, g: 30, b: 55 },
-      pants: { r: 100, g: 60, b: 140 },
-      shoes: { r: 230, g: 90, b: 150 },
-      sole: { r: 255, g: 230, b: 240 },
-    },
-  },
-  forest: {
-    id: 'forest',
-    label: 'Forest',
-    appearance: {
-      bodyStyle: 'classic',
-      hair: { r: 50, g: 110, b: 55 },
-      skin: { r: 160, g: 175, b: 140 },
-      shirt: { r: 50, g: 120, b: 70 },
-      shirtDark: { r: 25, g: 55, b: 35 },
-      pants: { r: 55, g: 80, b: 50 },
-      shoes: { r: 60, g: 100, b: 45 },
-      sole: { r: 200, g: 195, b: 150 },
-    },
   },
   alt_base: {
     id: 'alt_base',
