@@ -1805,9 +1805,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 294,
+  "commits": 295,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "17 greyscale wardrobe pieces join the wardrobe, reimagined with borrowed colours"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1922,11 +1927,6 @@
     "date": "2026-10-23",
     "kind": "fix",
     "text": "Ix mountains, mesas, cacti and vines keep the base art the original drew"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "The Phantom Glitch appears and gives its heart frame for frame, sharp on Retina"
    }
   ]
  },

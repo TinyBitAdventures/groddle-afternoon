@@ -9,6 +9,7 @@
   --play: #e58b3f;
   --play-ink: #fff;
   --play-hover: #d27a30;
+  --re-original: #ecece6;
   color-scheme: light;
 }
 
@@ -27,6 +28,7 @@
     --play: #eea05c;
     --play-ink: #1a1408;
     --play-hover: #f4b274;
+    --re-original: #2b322b;
     color-scheme: dark;
   }
 }
@@ -43,6 +45,7 @@
   --shadow: rgba(0, 0, 0, 0.6);
   --play: #eea05c;
   --play-ink: #1a1408;
+  --re-original: #2b322b;
   --play-hover: #f4b274;
   color-scheme: dark;
 }
@@ -157,3 +160,18 @@ a.dev-card:hover { border-color: var(--accent); transform: translateY(-2px); }
   .hero-shot, .hero-shot:hover, .btn-play:hover, a.dev-card:hover { transform: none; }
 }
 
+
+/* Restored, and reimagined: greyscale wardrobe files beside their reimagined colours. */
+.reimagined .section-lead { max-width: 62ch; }
+.re-grid { list-style: none; margin: 22px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.re-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.re-pair { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.re-pair div { display: flex; flex-direction: column; align-items: center; border-radius: var(--radius); background: var(--bg); padding: 6px 4px 4px; min-width: 0; }
+.re-pair div:first-child { background: var(--re-original); }
+.re-pair img { width: 100%; max-width: 180px; height: auto; aspect-ratio: auto; }
+.re-pair figcaption { font-size: 12px; color: var(--muted); padding-top: 2px; }
+.re-pair div:last-child figcaption { color: var(--fg); font-weight: 700; }
+.re-card h3 { margin: 4px 0 0; font-size: 18px; }
+.re-card p { margin: 0; font-size: 14px; color: var(--muted); }
+.re-more { margin: 18px 0 0; color: var(--muted); }
+.re-more a { font-weight: 700; }

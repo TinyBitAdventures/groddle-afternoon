@@ -8,6 +8,7 @@
  *
  *   node tools/avatar-compositor/showcase.mjs --out <dir>              # <dir>/g52-before-after.png + .webp, <dir>/pairs/<item>.png
  *   node tools/avatar-compositor/showcase.mjs --out <dir> --scale 2    # figure scale (default 3)
+ *   node tools/avatar-compositor/showcase.mjs --out <dir> --figures    # also <dir>/figures/<item>-<n>.png, bare transparent figures (0 = original)
  *   node tools/avatar-compositor/showcase.mjs --out <dir> --diag       # slot map: each colour_N a flat hue, beside its sibling
  *
  * Nothing is written into public/: placement is decided after review.
@@ -198,7 +199,18 @@ async function paintInPage({ cards: list, scale, frame, band }) {
     drawCard(cx, card, gap, gap, w);
     pairs[card.name] = c.toDataURL('image/png');
   }
-  return { sheet: sheet.toDataURL("image/png"), pairs, size: [sheet.width, sheet.height], fig: [figW, figH], union: u };
+  // Each figure alone on a transparent canvas, for pages that draw their own frames (--figures).
+  const figures = {};
+  for (const card of list) {
+    figures[card.name] = card.figures.map((fig) => {
+      const c = document.createElement('canvas');
+      c.width = figW;
+      c.height = figH;
+      paintItems(c.getContext('2d'), fig.items, fig.prep.sources, [scale, 0, 0, scale, pad - u[0] * scale, pad - u[1] * scale]);
+      return c.toDataURL('image/png');
+    });
+  }
+  return { sheet: sheet.toDataURL("image/png"), pairs, figures, size: [sheet.width, sheet.height], fig: [figW, figH], union: u };
 }
 
 async function main() {
@@ -221,6 +233,14 @@ async function main() {
   if (DIAG) return;
   for (const [name, url] of Object.entries(result.pairs)) writeFileSync(join(OUT, 'pairs', `${name}.png`), Buffer.from(url.split(',')[1], 'base64'));
   console.log(`${Object.keys(result.pairs).length} pairs in ${join(OUT, 'pairs')}`);
+  if (args.includes('--figures')) {
+    // <dir>/figures/<item>-0.png is the original file, -1.. the reimagined colourways.
+    mkdirSync(join(OUT, 'figures'), { recursive: true });
+    for (const [name, urls] of Object.entries(result.figures)) {
+      urls.forEach((url, i) => writeFileSync(join(OUT, 'figures', `${name}-${i}.png`), Buffer.from(url.split(',')[1], 'base64')));
+    }
+    console.log(`figures in ${join(OUT, 'figures')}`);
+  }
   // Web copy: about 1600 px wide, lossy WebP under 400 KB.
   const webp = `${stem}.webp`;
   for (const q of [82, 74, 66, 58, 50]) {
