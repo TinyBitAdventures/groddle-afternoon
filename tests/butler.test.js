@@ -68,7 +68,7 @@ import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js';
 import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js';
 // The URL clubhouse.js imports, so these share its Butler.
-import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-2';
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-3';
 import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js';
 import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
@@ -398,6 +398,14 @@ describe('state and save', () => {
     assert.equal(odd.messages.length, 0);
     assert.equal(odd.boxRead, true);
   });
+
+  it('saves its hi sign with it (butler_emotes.js props) and drops a bad one', () => {
+    const s = owned({ hi: { variant: 'hearts', gtDay: 4100, pcs: { pc: NOW }, pcsYesterday: { pc: NOW - 1 }, responseDay: 4100 } });
+    const back = normalizeButlerState(JSON.parse(JSON.stringify(serializeButlerState(s))));
+    assert.deepEqual(back.hi, { variant: 'hearts', gtDay: 4100, pcs: { pc: NOW }, pcsYesterday: { pc: NOW - 1 }, responseDay: 4100 });
+    assert.deepEqual(normalizeButlerState({ owned: true }).hi, { variant: '', gtDay: -1, pcs: {}, pcsYesterday: {}, responseDay: -1 });
+    assert.equal(normalizeButlerState({ owned: true, hi: { variant: 'dongs', gtDay: 9 } }).hi.variant, '');
+  });
 });
 
 describe('Visiting Stone hand-off (street-furniture.js)', () => {
@@ -416,7 +424,7 @@ describe('Visiting Stone hand-off (street-furniture.js)', () => {
 
   it('wires the feature through one import line and the delivery hand-off', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /import \{ butlerFeature \} from '\.\/butler-feature\.js\?v=butler-feature-2'; FEATURES\.push\(butlerFeature\);/);
+    assert.match(index, /import \{ butlerFeature \} from '\.\/butler-feature\.js\?v=butler-feature-3'; FEATURES\.push\(butlerFeature\);/);
     const sf = readFileSync(join(PUBLIC, 'js/features/street-furniture-feature.js'), 'utf8');
     assert.match(sf, /butlerApi\.receiveVisitor\(engine, letter\)\) engine\.deliverMail\?\.\(letter\)/);
     assert.match(sf, /optInDone\(butlerApi\.label\(\) \|\| STONE_BUTLER_STANDIN\)/);

@@ -675,13 +675,14 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it.",
+   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).",
    "spot": "mailbox",
    "evidence": [
     "public/js/homes.js",
     "public/js/home-decor.js",
     "public/js/home-wallpaper.js",
-    "public/js/home-cultivation.js"
+    "public/js/home-cultivation.js",
+    "public/js/hi-signs.js"
    ],
    "shot": "shots/homes.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=decorate&practice=1"
@@ -1806,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 304,
+  "commits": 305,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Buy an Elemental Pouch and shake it once a day for bonus elements"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1923,14 +1929,9 @@
     "date": "2026-10-23",
     "kind": "fix",
     "text": "Decorating your house and Tower keeps the view above the pack and still reaches the ceiling"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Pick every Tower floor, roof and decoration the original offered"
    }
   ]
  },
- "tests": 181,
+ "tests": 182,
  "generatedAt": "2026-10-23"
 }

@@ -29,6 +29,9 @@
  *  - Hears about the club: back from Join the Club's painting, the quest
  *    turns in when you come within 550 px of the Butler at home (doQuests;
  *    quest-rooms/clubhouse.js world hook via butlerApi.questReady/hearQuest).
+ *  - Hi signs (butler_emotes.js): its sign is saved here (st.hi); the far
+ *    hit box calls hiHooks.far and butlerApi.hi* serve
+ *    js/features/hi-signs-feature.js, which runs the flow.
  *
  * QA (with ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home):
  *   &butlerdemo=1        a Butler at its post (&butlerlook=v10|v11|v22|v12|random
@@ -113,7 +116,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=butler-2';
+} from '../butler.js?v=butler-3';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -445,6 +448,8 @@ function spawnView(engine) {
   if (st.owned) {
     if (!rt.x || rt.lastStreet !== engine.streetTsid) rt.x = postX();
     rt.lastStreet = engine.streetTsid;
+    // stats_get_last_street_visit: when you came onto this street (the hi needs 10 s).
+    rt.enteredAt = performance.now();
     rt.mode = 'idle';
     rt.walkTo = null;
     rt.idleUntil = performance.now() + 3000;
@@ -886,6 +891,8 @@ function secondTick(engine, t) {
   // Hit boxes: far 550, near 250, at 50.
   const inFar = d <= BUTLER.FAR_DIST;
   const inNear = d <= BUTLER.NEAR_DIST;
+  // onPlayerCollision "far" (bag_butler.js 4053-4057): sayHi after 10 s on the street (js/features/hi-signs-feature.js).
+  if (inFar && !rt.far && p) hiHooks.far?.(engine);
   if (inFar && !rt.far && !busy && reactionAllowed()) {
     // onPlayerFar: wave if facing the player.
     const facing = (p.x < rt.x && rt.dir === 'left') || (p.x >= rt.x && rt.dir === 'right');
@@ -1624,6 +1631,30 @@ export const butlerApi = {
     if (rt.greetedAt && performance.now() - rt.greetedAt < QUEST_AFTER_GREETING_MS) return false;
     return Math.abs(p.x - rt.x) <= BUTLER.FAR_DIST;
   },
+  /**
+   * Hi signs (js/features/hi-signs-feature.js): the Butler's half of the
+   * state (butler_emotes.js props, saved with the Butler), where it stands,
+   * its bubble, and the far-hit-box hook that makes it say hi.
+   */
+  hiState: () => (st.owned ? st.hi : null),
+  hiSpot(engine) {
+    const v = view?.butler;
+    if (!st.owned || !v || v.container.destroyed || currentRoom(engine) !== 'street') return null;
+    return { x: v.container.x, y: v.container.y, top: v.container.y - BUTLER_HI_TOP, target: v.target };
+  },
+  /** Seconds since you came onto the home street (stats_get_last_street_visit). */
+  hiStreetSecs: () => (rt.enteredAt ? (performance.now() - rt.enteredAt) / 1000 : 0),
+  /** sayHiHint waits while the Butler is in a conversation (convo_text / interacting). */
+  hiBusy: () => dialogOpen() || rt.mode === 'interacting' || Boolean(rt.greeting),
+  /** sendBubbleAndChat: a bubble over the Butler and a line in your log. */
+  hiSay(engine, text, ms = 5000) {
+    if (!view?.butler) return;
+    command();
+    say(engine, text, ms, { activity: true });
+  },
+  setHiHooks(hooks) {
+    hiHooks = hooks && typeof hooks === 'object' ? hooks : {};
+  },
   /** The Butler hears about it: faces you and talks while the quest completion shows. */
   hearQuest(engine, questId) {
     if (!view?.butler || !st.owned) return null;
@@ -1637,6 +1668,9 @@ export const butlerApi = {
 };
 /** Let the arrival greeting's lines play before a quest turn-in covers them (greetNow's follow-up comes at 3.8 s). */
 const QUEST_AFTER_GREETING_MS = 5000;
+/** The top of the Butler's head above its feet (the 1x looks' anchor: 122 of 141 px). */
+const BUTLER_HI_TOP = 122;
+let hiHooks = {};
 
 // ---------------------------------------------------------------------------
 // QA

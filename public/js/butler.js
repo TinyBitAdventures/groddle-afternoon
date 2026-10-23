@@ -44,6 +44,7 @@
  */
 
 import { getGameDayKey } from './game-day.js?v=dametime-1';
+import { normalizeButlerHi } from './hi-signs.js?v=hi-signs-1';
 
 /** classProps and onCreate numbers. */
 export const BUTLER = Object.freeze({
@@ -444,6 +445,8 @@ export function normalizeButlerState(seed = {}) {
     givenHints: (Array.isArray(s.givenHints) ? s.givenHints : []).map(cleanId).filter(Boolean).slice(-40),
     lastHintAt: whole(s.lastHintAt),
     lastSpokeAt: whole(s.lastSpokeAt),
+    /** Its hi sign (items/include/butler_emotes.js; rules in js/hi-signs.js). */
+    hi: normalizeButlerHi(s.hi),
   };
 }
 
