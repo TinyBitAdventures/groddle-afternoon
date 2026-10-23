@@ -742,26 +742,19 @@ function pickUp(engine, row) {
 function spawnGuest(engine, guest, point, index) {
   const { PIXI } = engine;
   // Each guest is a vector Glitch with its name's look (engine.npcGlitch), dancing to
-  // its walk cycle at its own tempo; the tinted portrait strip is the fallback.
+  // its walk cycle at its own tempo.
   const npc = point ? engine.npcGlitch?.(guest.name, { salt: index, speed: 0.8 + index * 0.1 }) || null : null;
-  const frames = npc ? null : engine.textures?.avatarStyledWalk?.frames || [];
-  if ((!npc && !frames.length) || !point) return;
-  const sprite = npc ? npc.sprite : new PIXI.AnimatedSprite(frames);
+  if (!npc) return;
+  const sprite = npc.sprite;
   sprite.npc = npc;
-  if (!npc) {
-    sprite.anchor.set(0.5, 1);
-    sprite.animationSpeed = 0.16 + index * 0.02;
-    sprite.tint = guest.tint;
-  }
-  sprite.crowdScale = npc ? npc.scale : GUEST_SCALE;
+  sprite.crowdScale = npc.scale;
   sprite.scale.set(sprite.crowdScale);
   sprite.x = point.x;
   sprite.y = point.y + 2;
   sprite.zIndex = 30;
   sprite.eventMode = 'static';
   sprite.cursor = 'pointer';
-  if (npc) npc.setMode('dance');
-  else sprite.play();
+  npc.setMode('dance');
   engine.entityLayer.addChild(sprite);
   const name = new PIXI.Text({ text: guest.name, style: { fontFamily: 'Arial', fontSize: 12, fontWeight: '700', fill: 0xffffff, stroke: { color: 0x2a1d14, width: 3 } } });
   name.anchor.set(0.5, 1);

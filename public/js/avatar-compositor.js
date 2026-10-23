@@ -2,7 +2,7 @@
  * Browser compositor for the vector Glitch avatar: paints js/avatar-rig.js
  * draw lists with Canvas2D (Path2D fills, gradient and bitmap fills, masks)
  * and bakes a look into the same one-sheet-per-animation layout the game
- * reads from js/avatar-anims.js (GLITCH_AVATAR), at 1x or 3x.
+ * reads from js/avatar-anims.js (SHEET_FRAMES), at 1x or 3x.
  *
  * The same code renders the shipped default sheets offline (tools/
  * avatar-compositor/build.mjs drives it in Chromium), so a look baked at
@@ -346,7 +346,7 @@ export function sheetLayout(prep, name) {
   const stand = drawListBounds(drawListFor(prep, 801), prep.shapeOf) || [0, 0, 0, 0];
   // The feet line is the painted sole, not the shape bounds (their curve
   // control points and strokes reach ~2 px lower): the row under the stand's
-  // lowest opaque row, as on the recovered sheets.
+  // lowest opaque row (the reference sheets in score.mjs anchor the same way).
   const feetY = oy + standSoleRow(prep, stand) + 1;
   const midX = ox + Math.round((stand[0] + stand[2]) / 2);
   return { name, frames, cells: frames.length, fw, fh, ox, oy, cols, rows, feetY, midX };
@@ -444,7 +444,7 @@ export async function bakeIdleSheet(prep, name, scale, { budgetMs = 4 } = {}) {
   return { canvas, def: sheetDef(layout, `${name}.png`), stats };
 }
 
-/** GLITCH_AVATAR-style sheet def for a layout (anchored on the standing feet). */
+/** VECTOR_AVATAR-style sheet def for a layout (anchored on the standing feet). */
 export function sheetDef(layout, file) {
   return { file, cells: layout.cells, fw: layout.fw, fh: layout.fh, cols: layout.cols, rows: layout.rows, feetY: layout.feetY, midX: layout.midX };
 }

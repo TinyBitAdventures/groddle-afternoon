@@ -390,7 +390,7 @@ describe('prerendered default sheets', () => {
     const bits = b.readUInt32LE(21);
     return [(bits & 0x3fff) + 1, ((bits >> 14) & 0x3fff) + 1];
   };
-  it('hold SHEET_FRAMES in the GLITCH_AVATAR layout, with exact 3x files listed for first draw', () => {
+  it('hold SHEET_FRAMES one sheet per group, with exact 3x files listed for first draw', () => {
     for (const [name, frames] of Object.entries(SHEET_FRAMES)) {
       const d = VECTOR_AVATAR.sheets[name];
       assert.equal(d.cells, frames.length, name);
@@ -406,7 +406,7 @@ describe('prerendered default sheets', () => {
     }
   });
 
-  it('match the recovered 62d8 sheets pose for pose', () => {
+  it('match the 62d8dab1 reference poses (research only, score.mjs) pose for pose', () => {
     const score = json(join(root, 'tools/avatar-compositor/score.json'));
     assert.equal(score.pass, true);
     for (const [name, s] of Object.entries(score.sheets)) {
@@ -419,9 +419,9 @@ describe('prerendered default sheets', () => {
 });
 
 describe('game wiring', () => {
-  it('game.js loads the default sheets, bakes custom looks and keeps the older styles', () => {
+  it('game.js loads the default sheets and bakes custom looks', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
-    for (const s of ['vectorAvatarBase', 'animPackFromSheets', 'bakeLook', 'vectorBakeScale', 'renderVectorControls', 'loadAvatarCatalog', 'glitchAnimPack']) assert.ok(game.includes(s), s);
+    for (const s of ['vectorAvatarBase', 'animPackFromSheets', 'bakeLook', 'vectorBakeScale', 'renderVectorControls', 'loadAvatarCatalog']) assert.ok(game.includes(s), s);
     assert.ok(existsSync(join(pub, 'js/avatar-compositor.js')));
   });
 
@@ -430,7 +430,7 @@ describe('game wiring', () => {
     const sheetsBlock = game.slice(game.indexOf('const SHEETS = {'), game.indexOf('const keys = new Set();'));
     assert.ok(sheetsBlock.includes('vectorAvatarBase'));
     assert.ok(!/(vector|glitch)Avatar(Idle|idle)|SheetDef\('idle/.test(sheetsBlock), 'no avatar idle sheet in the boot SHEETS');
-    for (const s of ['ensureIdleSheet', 'bakeIdleSheet', 'loadVectorIdleSheet', 'loadGlitchIdleSheet', 'createIdleClock', 'noteAvatarInput', 'tickAvatarAfk', "You've gone AFK", "You've returned from AFK"]) assert.ok(game.includes(s), s);
+    for (const s of ['ensureIdleSheet', 'bakeIdleSheet', 'loadVectorIdleSheet', 'createIdleClock', 'noteAvatarInput', 'tickAvatarAfk', "You've gone AFK", "You've returned from AFK"]) assert.ok(game.includes(s), s);
     // Every idle sheet ships 1x + 3x for the default look and has its idle frames split out.
     for (const n of IDLE_SHEETS) assert.ok(VECTOR_AVATAR.sheets[n] && existsSync(join(pub, VECTOR_AVATAR.dir, VECTOR_AVATAR.sheets[n].file)), n);
     assert.ok(existsSync(join(A, 'base.idle.json')));

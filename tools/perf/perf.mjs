@@ -316,7 +316,7 @@ function rendererStats() {
       n++;
       const label = String(t.label || '');
       if (/avatar\/(npc|crowd)\//.test(label)) npcBytes += w * h * 4;
-      else if (/avatar\/(vector|glitch-62d8)\//.test(label)) playerBytes += w * h * 4;
+      else if (/avatar\/vector\//.test(label)) playerBytes += w * h * 4;
     }
     out.rendererTextures = n;
     out.rendererTextureMB = +(bytes / 1048576).toFixed(1);

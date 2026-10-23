@@ -172,11 +172,28 @@ h3 { font-size: 22px; margin: 0 0 10px; }
 /* Sprite sheets (the game's own art) */
 .sheet { display: block; background-repeat: no-repeat; image-rendering: auto; }
 .sheet-glitch {
-  width: 102px; height: 135px;
-  background-image: url('../assets/sprites/avatar/glitch-62d8/base.png');
-  animation: sheet-glitch 0.4s steps(12) infinite;
+  /* The vector Glitch's default look (assets/sprites/avatar/vector/base, 8 x 2 cells of
+     106 x 142, drawn at 3x): walk2x, swf frames 103-114, cells 0-11 at 30 fps. */
+  width: 106px; height: 142px;
+  margin: 0 0 -4px -13px;
+  background-image: url('../assets/sprites/avatar/vector/base@3x.webp');
+  background-size: 848px 284px;
+  animation: sheet-glitch 0.4s steps(1, end) infinite;
 }
-@keyframes sheet-glitch { to { background-position-x: -1224px; } }
+@keyframes sheet-glitch {
+  0% { background-position: 0px 0px; }
+  8.333% { background-position: -106px 0px; }
+  16.667% { background-position: -212px 0px; }
+  25% { background-position: -318px 0px; }
+  33.333% { background-position: -424px 0px; }
+  41.667% { background-position: -530px 0px; }
+  50% { background-position: -636px 0px; }
+  58.333% { background-position: -742px 0px; }
+  66.667% { background-position: 0px -142px; }
+  75% { background-position: -106px -142px; }
+  83.333% { background-position: -212px -142px; }
+  91.667% { background-position: -318px -142px; }
+}
 .sheet-piggy {
   width: 88px; height: 62px;
   background-image: url('../assets/sprites/npc_piggy__x1_walk_png_1354829432.png');

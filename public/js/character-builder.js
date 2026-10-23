@@ -1,11 +1,16 @@
 /**
- * Character builder — appearance model + pure recolor of styled Glitch avatars.
+ * Character builder: the saved appearance and its presets.
  *
- * The default look ('vector') is Tiny Speck's avatar rebuilt from its vector
- * parts (js/avatar-rig.js, js/avatar-looks.js): real hair, eyes, mouth, nose,
- * ears and wardrobe articles in their GSJS colourways. The older looks remain
- * as presets: the recovered 62d8 sheets ('glitch', recoloured by region) and
- * the classic/alt portraits.
+ * Every look is Tiny Speck's avatar rebuilt from its vector parts
+ * (js/avatar-rig.js, js/avatar-looks.js): real hair, eyes, mouth, nose, ears
+ * and wardrobe articles in their GSJS colourways. Presets come in three
+ * groups: the remake's own looks, Tiny Speck's four new-player starters
+ * (js/avatar-starter.js) and costume sets from the GSJS wardrobe.
+ *
+ * The bitmap avatars are retired: the classic and alt portraits and the
+ * recovered 62d8 sheets were real players' pixels captured by Wayback
+ * (reference only). Saves that used them move to the nearest vector look
+ * (migrateAppearance).
  */
 import { normalizeVectorFields, vectorFieldsFromColors } from './avatar-looks.js';
 import { installReimaginedTags } from './avatar-reimagined.js';
@@ -19,7 +24,7 @@ if (typeof document !== 'undefined') installReimaginedTags(document);
 
 /**
  * @typedef {{
- *   bodyStyle: 'vector'|'glitch'|'classic'|'alt',
+ *   bodyStyle: 'vector',
  *   vector?: object,
  *   hair: Rgb,
  *   skin: Rgb,
@@ -29,11 +34,16 @@ if (typeof document !== 'undefined') installReimaginedTags(document);
  *   shoes: Rgb,
  *   sole: Rgb,
  * }} Appearance
+ * The colour fields are the older recolour looks' (kept so an old save's
+ * colours can carry over); vector looks draw only from `vector`.
  */
 
 export const STORAGE_KEY = 'groddle.avatar.appearance.v1';
-/** Saved appearance format; 1 had no `v` (colour-only looks). */
-export const APPEARANCE_VERSION = 2;
+/**
+ * Saved appearance format: 1 had no `v` (colour-only looks), 2 added vector
+ * looks, 3 retired the bitmap body styles.
+ */
+export const APPEARANCE_VERSION = 3;
 
 export const BODY_STYLES = {
   // Tiny Speck's vector avatar: rig + articles composited per look
@@ -44,132 +54,54 @@ export const BODY_STYLES = {
     sheets: true,
     vector: true,
   },
-  // Real Glitch animation sheets (base walk, climb, jump) recovered from the
-  // Wayback CDX; js/avatar-anims.js maps their frames.
-  glitch: {
-    id: 'glitch',
-    label: 'Recovered',
-    sheets: true,
-  },
-  classic: {
-    id: 'classic',
-    label: 'Classic Glitch',
-    idleUrl: 'assets/sprites/avatar_styled_idle.png',
-    walkUrl: 'assets/sprites/avatar_styled_walk.png',
-    walkFw: 172,
-    walkFh: 248,
-    walkCols: 8,
-  },
-  alt: {
-    id: 'alt',
-    label: 'Purple Alt',
-    idleUrl: 'assets/sprites/avatar_styled_alt.png',
-    // Alt has no dedicated walk strip yet — recolor idle for both until one exists
-    walkUrl: 'assets/sprites/avatar_styled_alt.png',
-    walkFw: 0, // whole image
-    walkFh: 0,
-    walkCols: 1,
-  },
 };
 
-/** Named swatches for the builder UI. */
-export const COLOR_SWATCHES = {
-  hair: [
-    { id: 'green', label: 'Moss', rgb: { r: 72, g: 140, b: 72 } },
-    { id: 'blue', label: 'Sky', rgb: { r: 70, g: 130, b: 200 } },
-    { id: 'pink', label: 'Rose', rgb: { r: 220, g: 100, b: 150 } },
-    { id: 'purple', label: 'Violet', rgb: { r: 140, g: 80, b: 180 } },
-    { id: 'orange', label: 'Ember', rgb: { r: 220, g: 120, b: 50 } },
-    { id: 'blonde', label: 'Wheat', rgb: { r: 220, g: 190, b: 90 } },
-    { id: 'black', label: 'Night', rgb: { r: 40, g: 40, b: 48 } },
-    { id: 'white', label: 'Frost', rgb: { r: 230, g: 235, b: 240 } },
-  ],
-  skin: [
-    { id: 'stone', label: 'Stone', rgb: { r: 190, g: 180, b: 165 } },
-    { id: 'peach', label: 'Peach', rgb: { r: 230, g: 180, b: 150 } },
-    { id: 'tan', label: 'Tan', rgb: { r: 200, g: 150, b: 110 } },
-    { id: 'brown', label: 'Earth', rgb: { r: 140, g: 95, b: 70 } },
-    { id: 'deep', label: 'Deep', rgb: { r: 90, g: 60, b: 45 } },
-    { id: 'green', label: 'Leaf', rgb: { r: 140, g: 170, b: 130 } },
-    { id: 'blue', label: 'Pond', rgb: { r: 140, g: 170, b: 200 } },
-    { id: 'purple', label: 'Plum', rgb: { r: 170, g: 140, b: 190 } },
-  ],
-  shirt: [
-    { id: 'red', label: 'Crimson', rgb: { r: 180, g: 30, b: 40 } },
-    { id: 'blue', label: 'Cobalt', rgb: { r: 40, g: 90, b: 180 } },
-    { id: 'green', label: 'Forest', rgb: { r: 40, g: 130, b: 70 } },
-    { id: 'yellow', label: 'Sun', rgb: { r: 220, g: 180, b: 40 } },
-    { id: 'purple', label: 'Grape', rgb: { r: 120, g: 50, b: 160 } },
-    { id: 'orange', label: 'Pumpkin', rgb: { r: 220, g: 110, b: 40 } },
-    { id: 'teal', label: 'Teal', rgb: { r: 30, g: 140, b: 150 } },
-    { id: 'pink', label: 'Pink', rgb: { r: 220, g: 90, b: 140 } },
-  ],
-  pants: [
-    { id: 'blue', label: 'Denim', rgb: { r: 50, g: 90, b: 140 } },
-    { id: 'brown', label: 'Cord', rgb: { r: 110, g: 75, b: 50 } },
-    { id: 'black', label: 'Ink', rgb: { r: 40, g: 40, b: 50 } },
-    { id: 'green', label: 'Moss', rgb: { r: 50, g: 100, b: 60 } },
-    { id: 'purple', label: 'Eggplant', rgb: { r: 80, g: 50, b: 110 } },
-    { id: 'gray', label: 'Slate', rgb: { r: 110, g: 115, b: 125 } },
-    { id: 'red', label: 'Brick', rgb: { r: 140, g: 50, b: 50 } },
-    { id: 'teal', label: 'Sea', rgb: { r: 40, g: 110, b: 120 } },
-  ],
-  shoes: [
-    { id: 'green', label: 'Frog', rgb: { r: 50, g: 130, b: 50 } },
-    { id: 'red', label: 'Cherry', rgb: { r: 180, g: 40, b: 50 } },
-    { id: 'blue', label: 'Navy', rgb: { r: 40, g: 70, b: 140 } },
-    { id: 'brown', label: 'Boot', rgb: { r: 100, g: 65, b: 40 } },
-    { id: 'black', label: 'Patent', rgb: { r: 35, g: 35, b: 40 } },
-    { id: 'yellow', label: 'Duck', rgb: { r: 220, g: 190, b: 50 } },
-    { id: 'purple', label: 'Grape', rgb: { r: 110, g: 50, b: 150 } },
-    { id: 'white', label: 'Cloud', rgb: { r: 230, g: 230, b: 235 } },
-  ],
-};
+/** Body styles older saves may hold; all drew players' Wayback pixels. */
+export const RETIRED_BODY_STYLES = Object.freeze(['glitch', 'classic', 'alt']);
+
+const COLOUR_FIELDS = ['hair', 'skin', 'shirt', 'shirtDark', 'pants', 'shoes', 'sole'];
+
+/** The colour fields every appearance carries (the old default's: lavender hair, grey skin, lime top). */
+const DEFAULT_COLOURS = Object.freeze({
+  hair: { r: 205, g: 205, b: 232 },
+  skin: { r: 190, g: 190, b: 196 },
+  shirt: { r: 214, g: 240, b: 40 },
+  shirtDark: { r: 150, g: 170, b: 30 },
+  pants: { r: 100, g: 40, b: 110 },
+  shoes: { r: 120, g: 210, b: 40 },
+  sole: { r: 170, g: 60, b: 200 },
+});
 
 /**
- * The old default classic look (matches avatar_styled_idle). Saves still on it
- * move to the Glitch sheets (loadAppearance).
- * @returns {Appearance}
+ * The retired bitmap presets, as saved (style + colours), and the vector look
+ * each moves to: the untouched defaults to the vector default, the five
+ * colour themes to their vector rebuilds (10c415cb), the purple Alt body to
+ * Midnight. Any other retired look keeps its colours as tints.
  */
-export function createClassicAppearance() {
-  return {
-    bodyStyle: 'classic',
-    hair: { r: 72, g: 140, b: 72 },
-    skin: { r: 190, g: 180, b: 165 },
-    shirt: { r: 180, g: 30, b: 40 },
-    shirtDark: { r: 40, g: 32, b: 40 },
-    pants: { r: 50, g: 90, b: 140 },
-    shoes: { r: 50, g: 130, b: 50 },
-    sole: { r: 210, g: 195, b: 160 },
-  };
-}
+const LEGACY_LOOKS = [
+  ['glitch', DEFAULT_COLOURS, 'vector'],
+  ['classic', { hair: [72, 140, 72], skin: [190, 180, 165], shirt: [180, 30, 40], shirtDark: [40, 32, 40], pants: [50, 90, 140], shoes: [50, 130, 50], sole: [210, 195, 160] }, 'vector'],
+  ['classic', { hair: [70, 100, 200], skin: [200, 185, 175], shirt: [40, 90, 180], shirtDark: [25, 40, 90], pants: [40, 50, 80], shoes: [40, 70, 140], sole: [200, 200, 210] }, 'blueberry'],
+  ['classic', { hair: [200, 100, 40], skin: [210, 170, 130], shirt: [180, 90, 40], shirtDark: [80, 40, 20], pants: [100, 70, 45], shoes: [100, 60, 35], sole: [220, 200, 160] }, 'autumn'],
+  ['classic', { hair: [50, 45, 70], skin: [150, 145, 160], shirt: [90, 40, 140], shirtDark: [30, 20, 45], pants: [35, 35, 50], shoes: [40, 35, 55], sole: [180, 175, 190] }, 'midnight'],
+  ['classic', { hair: [230, 100, 160], skin: [240, 200, 190], shirt: [230, 80, 140], shirtDark: [80, 30, 55], pants: [100, 60, 140], shoes: [230, 90, 150], sole: [255, 230, 240] }, 'candy'],
+  ['classic', { hair: [50, 110, 55], skin: [160, 175, 140], shirt: [50, 120, 70], shirtDark: [25, 55, 35], pants: [55, 80, 50], shoes: [60, 100, 45], sole: [200, 195, 150] }, 'forest'],
+  ['alt', { hair: [150, 80, 160], skin: [170, 120, 180], shirt: [50, 90, 140], shirtDark: [30, 50, 80], pants: [60, 140, 90], shoes: [200, 100, 60], sole: [220, 180, 140] }, 'midnight'],
+];
+
+const rgbOf = (c) => (Array.isArray(c) ? { r: c[0], g: c[1], b: c[2] } : c);
+const colourKey = (style, colours) => [style, ...COLOUR_FIELDS.map((k) => {
+  const c = rgbOf(colours[k]);
+  return `${clampByte(c?.r)},${clampByte(c?.g)},${clampByte(c?.b)}`;
+})].join('|');
 
 /**
- * The recovered Glitch sheets in their own colours (62d8dab1: lavender hair,
- * grey skin, lime top, purple trousers, green shoes).
- * @returns {Appearance}
- */
-export function createGlitchSheetsAppearance() {
-  return {
-    bodyStyle: 'glitch',
-    hair: { r: 205, g: 205, b: 232 },
-    skin: { r: 190, g: 190, b: 196 },
-    shirt: { r: 214, g: 240, b: 40 },
-    shirtDark: { r: 150, g: 170, b: 30 },
-    pants: { r: 100, g: 40, b: 110 },
-    shoes: { r: 120, g: 210, b: 40 },
-    sole: { r: 170, g: 60, b: 200 },
-  };
-}
-
-/**
- * Default look: the vector Glitch in the catalog's default outfit (styled on
- * 62d8dab1, so the colour fields match the recovered sheets for the classic
- * swatches).
+ * Default look: the vector Glitch in the catalog's default outfit.
  * @returns {Appearance}
  */
 export function createDefaultAppearance() {
-  return { ...createGlitchSheetsAppearance(), bodyStyle: 'vector', vector: normalizeVectorFields({}) };
+  const colours = Object.fromEntries(COLOUR_FIELDS.map((k) => [k, { ...DEFAULT_COLOURS[k] }]));
+  return { ...colours, bodyStyle: 'vector', vector: normalizeVectorFields({}) };
 }
 
 /** A vector preset: catalog default plus these fields. */
@@ -351,30 +283,6 @@ export const APPEARANCE_PRESETS = {
   },
   ...starterPresets(),
   ...costumePresets(),
-  glitch: {
-    id: 'glitch',
-    label: 'Recovered',
-    appearance: createGlitchSheetsAppearance(),
-  },
-  classic: {
-    id: 'classic',
-    label: 'Classic',
-    appearance: createClassicAppearance(),
-  },
-  alt_base: {
-    id: 'alt_base',
-    label: 'Alt body',
-    appearance: {
-      bodyStyle: 'alt',
-      hair: { r: 150, g: 80, b: 160 },
-      skin: { r: 170, g: 120, b: 180 },
-      shirt: { r: 50, g: 90, b: 140 },
-      shirtDark: { r: 30, g: 50, b: 80 },
-      pants: { r: 60, g: 140, b: 90 },
-      shoes: { r: 200, g: 100, b: 60 },
-      sole: { r: 220, g: 180, b: 140 },
-    },
-  },
 };
 
 /**
@@ -384,7 +292,7 @@ export const APPEARANCE_PRESETS = {
 export function normalizeAppearance(partial = {}) {
   const d = createDefaultAppearance();
   const out = { ...d, ...partial };
-  for (const k of ['hair', 'skin', 'shirt', 'shirtDark', 'pants', 'shoes', 'sole']) {
+  for (const k of COLOUR_FIELDS) {
     const c = partial[k] || d[k];
     out[k] = {
       r: clampByte(c.r),
@@ -392,7 +300,7 @@ export function normalizeAppearance(partial = {}) {
       b: clampByte(c.b),
     };
   }
-  out.bodyStyle = BODY_STYLES[partial.bodyStyle] ? partial.bodyStyle : d.bodyStyle;
+  out.bodyStyle = 'vector';
   out.vector = normalizeVectorFields(partial.vector || {});
   out.v = APPEARANCE_VERSION;
   return out;
@@ -416,7 +324,7 @@ export function appearanceToJson(appearance) {
  */
 export function appearanceFromJson(json) {
   try {
-    return normalizeAppearance(JSON.parse(json));
+    return migrateAppearance(JSON.parse(json));
   } catch {
     return createDefaultAppearance();
   }
@@ -448,191 +356,22 @@ export function loadAppearance(opts = {}) {
 }
 
 /**
- * Saved looks from before the vector avatar (no `v`): an untouched default
- * (classic portrait or recovered sheets) becomes the vector default; a
- * recoloured recovered-sheets look keeps its colours on the vector default
- * outfit (skin, hair, top, trousers, shoes tints); classic and alt looks stay.
+ * Saved looks on a retired bitmap body style ('glitch', 'classic', 'alt',
+ * any save version) move to the nearest vector look: an untouched bitmap
+ * preset becomes its vector rebuild (LEGACY_LOOKS); a recoloured one keeps
+ * its colours as tints on the vector default outfit (skin, hair, top,
+ * trousers, shoes). Vector saves load as they are.
  * @param {object} parsed
  * @returns {Appearance}
  */
 export function migrateAppearance(parsed) {
-  const saved = normalizeAppearance(parsed || {});
-  if (parsed && Number(parsed.v) >= APPEARANCE_VERSION) return saved;
-  const key = appearanceCacheKey(saved);
-  if (key === appearanceCacheKey(createClassicAppearance()) || key === appearanceCacheKey(createGlitchSheetsAppearance())) return createDefaultAppearance();
-  if (saved.bodyStyle === 'glitch') return { ...saved, bodyStyle: 'vector', vector: vectorFieldsFromColors(saved) };
-  return saved;
-}
-
-/**
- * Classify a pixel into an appearance region.
- * Green hair vs shoes uses vertical position (yNorm 0=top, 1=bottom).
- * @param {number} r
- * @param {number} g
- * @param {number} b
- * @param {number} a
- * @param {number} yNorm
- * @returns {null|'hair'|'skin'|'shirt'|'shirtDark'|'pants'|'shoes'|'sole'}
- */
-export function classifyAvatarPixel(r, g, b, a, yNorm = 0.5) {
-  if (a < 30) return null;
-
-  // Cream / tan shoe sole (before skin — similar lightness)
-  if (
-    r > 150 &&
-    g > 125 &&
-    b > 70 &&
-    b < 200 &&
-    r - b > 20 &&
-    Math.abs(r - g) < 55 &&
-    g > b - 5 &&
-    yNorm > 0.55
-  ) {
-    return 'sole';
-  }
-
-  // Red sweater stripe
-  if (r > 90 && r > g + 35 && r > b + 35 && g < 120 && b < 120) {
-    return 'shirt';
-  }
-
-  // Black sweater stripe / outline-ish dark
-  if (r < 70 && g < 65 && b < 75 && Math.max(r, g, b) - Math.min(r, g, b) < 40) {
-    // Eyes/mouth darker details — keep if very small and mid-face? treat as shirtDark for body
-    if (yNorm > 0.35 && yNorm < 0.75) return 'shirtDark';
-    // shoes can be dark outlines near bottom
-    if (yNorm > 0.75) return 'shoes';
-    return 'shirtDark';
-  }
-
-  // Blue jeans
-  if (b > 70 && b > r + 12 && b >= g - 5 && r < 140 && g < 160) {
-    return 'pants';
-  }
-
-  // Green: hair (upper) vs shoes (lower)
-  if (g > 70 && g >= r + 12 && g >= b + 3 && r < 145 && b < 150) {
-    if (yNorm < 0.42) return 'hair';
-    if (yNorm > 0.68) return 'shoes';
-    // mid green rare — hair fringe / shoe top
-    return yNorm < 0.55 ? 'hair' : 'shoes';
-  }
-
-  // Skin (low saturation mid-high lightness)
-  const maxc = Math.max(r, g, b);
-  const minc = Math.min(r, g, b);
-  if (maxc > 100 && maxc < 240 && maxc - minc < 55 && Math.abs(r - g) < 45) {
-    // exclude pure green already handled
-    if (!(g > r + 20 && g > b + 10)) return 'skin';
-  }
-
-  return null;
-}
-
-/**
- * Regions of the Glitch sheet avatar (62d8dab1, js/avatar-anims.js): lavender
- * hair, grey skin, lime top, purple trousers and soles, green shoes. The
- * yellow eyes and the dark headband are left as drawn. yNorm is the height in
- * the sheet row (each sheet is one row of frames).
- * @returns {null|'hair'|'skin'|'shirt'|'shirtDark'|'pants'|'shoes'|'sole'}
- */
-export function classifyGlitchPixel(r, g, b, a, yNorm = 0.5) {
-  if (a < 30) return null;
-  const maxc = Math.max(r, g, b);
-  const minc = Math.min(r, g, b);
-  const sat = maxc - minc;
-  // Lime top (and its darker folds); yellow eyes sit high and are less green.
-  if (g > 120 && r > 0.6 * g && b < 0.55 * g && g >= r - 10) {
-    if (yNorm < 0.42 && r > g - 15) return null;
-    // Lime-green near the bottom is the shoes (the climb's tucked feet).
-    if (yNorm > 0.82) return 'shoes';
-    return g > 170 ? 'shirt' : 'shirtDark';
-  }
-  // Green shoes.
-  if (g > r + 25 && g > b + 25 && yNorm > 0.6) return 'shoes';
-  // Purple trousers; the same purple on the soles at the very bottom.
-  if (r > g + 25 && b > g + 25) return yNorm > 0.9 ? 'sole' : 'pants';
-  // Lavender hair: light with a blue cast, high on the figure.
-  if (yNorm < 0.55 && maxc > 150 && b > r + 6 && b >= g && sat < 80) return 'hair';
-  // Grey skin: neutral mid-to-light greys (the headband is darker, kept).
-  if (sat < 22 && maxc > 120 && maxc < 235) return 'skin';
-  return null;
-}
-
-/**
- * Blend source luminance with target hue for natural shading.
- * @param {number} sr
- * @param {number} sg
- * @param {number} sb
- * @param {Rgb} target
- */
-export function applyTargetColor(sr, sg, sb, target) {
-  const srcLum = (sr * 0.35 + sg * 0.45 + sb * 0.2) / 255;
-  // Preserve relative shading around mid-gray
-  const factor = 0.45 + srcLum * 1.1;
-  return {
-    r: clampByte(target.r * factor),
-    g: clampByte(target.g * factor),
-    b: clampByte(target.b * factor),
-  };
-}
-
-/**
- * Recolor RGBA buffer in place.
- * @param {Uint8ClampedArray|Uint8Array} data
- * @param {number} width
- * @param {number} height
- * @param {Appearance} appearance
- * @returns {number} pixels changed
- */
-export function recolorImageData(data, width, height, appearance, classify = classifyAvatarPixel) {
-  const app = normalizeAppearance(appearance);
-  let changed = 0;
-  const n = width * height;
-  for (let i = 0; i < n; i++) {
-    const o = i * 4;
-    const r = data[o];
-    const g = data[o + 1];
-    const b = data[o + 2];
-    const a = data[o + 3];
-    const yNorm = Math.floor(i / width) / Math.max(1, height - 1);
-    const region = classify(r, g, b, a, yNorm);
-    if (!region) continue;
-    const target = app[region] || app.skin;
-    const c = applyTargetColor(r, g, b, target);
-    if (c.r !== r || c.g !== g || c.b !== b) {
-      data[o] = c.r;
-      data[o + 1] = c.g;
-      data[o + 2] = c.b;
-      changed += 1;
-    }
-  }
-  return changed;
-}
-
-/**
- * Pick random swatches for a fun look.
- * @param {{ rng?: () => number }} [opts]
- * @returns {Appearance}
- */
-export function randomAppearance(opts = {}) {
-  const rng = opts.rng || Math.random;
-  const pick = (arr) => arr[Math.floor(rng() * arr.length)].rgb;
-  const shirt = pick(COLOR_SWATCHES.shirt);
-  return normalizeAppearance({
-    bodyStyle: rng() < 0.15 ? 'alt' : 'classic',
-    hair: pick(COLOR_SWATCHES.hair),
-    skin: pick(COLOR_SWATCHES.skin),
-    shirt,
-    shirtDark: {
-      r: Math.round(shirt.r * 0.25),
-      g: Math.round(shirt.g * 0.25),
-      b: Math.round(shirt.b * 0.3),
-    },
-    pants: pick(COLOR_SWATCHES.pants),
-    shoes: pick(COLOR_SWATCHES.shoes),
-    sole: { r: 210, g: 195, b: 160 },
-  });
+  const raw = parsed && typeof parsed === 'object' ? parsed : {};
+  const saved = normalizeAppearance(raw);
+  if (!RETIRED_BODY_STYLES.includes(raw.bodyStyle)) return saved;
+  const key = colourKey(raw.bodyStyle, saved);
+  const legacy = LEGACY_LOOKS.find(([style, colours]) => colourKey(style, colours) === key);
+  if (legacy) return normalizeAppearance(APPEARANCE_PRESETS[legacy[2]].appearance);
+  return normalizeAppearance({ ...saved, vector: vectorFieldsFromColors(saved) });
 }
 
 /**
@@ -642,19 +381,10 @@ export function randomAppearance(opts = {}) {
 export function appearanceCacheKey(appearance) {
   const a = normalizeAppearance(appearance);
   const parts = [a.bodyStyle];
-  for (const k of ['hair', 'skin', 'shirt', 'shirtDark', 'pants', 'shoes', 'sole']) {
+  for (const k of COLOUR_FIELDS) {
     const c = a[k];
     parts.push(`${c.r},${c.g},${c.b}`);
   }
-  if (a.bodyStyle === 'vector') parts.push(JSON.stringify(a.vector));
+  parts.push(JSON.stringify(a.vector));
   return parts.join('|');
-}
-
-/**
- * Resolve sheet URLs for an appearance.
- * @param {Appearance} appearance
- */
-export function resolveBodySheets(appearance) {
-  const a = normalizeAppearance(appearance);
-  return BODY_STYLES[a.bodyStyle] || BODY_STYLES.classic;
 }

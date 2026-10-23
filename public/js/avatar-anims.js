@@ -7,11 +7,11 @@
  *  - com/tinyspeck/engine/view/renderer/util/AvatarAnimationState.as: which
  *    animation the avatar shows for its physics state.
  *
- * The sheets are a real player's renders recovered from the Wayback CDX
- * (c2.glitch.bz/avatars/2012-10-19/62d8dab1..._1350661246_{base,climb,jump}.png).
- * Each PNG is cropped to its content: base 15 cells of 102 x 135, jump 33
- * of 108 x 138, climb 19 of 92 x 128 (one row); the idle sheets wrap into
- * two rows (idle1 is one).
+ * The sheets are Tiny Speck's vector avatar composited at these swf frames
+ * (js/avatar-compositor.js; the default look prerendered as VECTOR_AVATAR in
+ * js/avatar-vector-sheets.js). The layout was first read off a player's
+ * 2012 sheets from Wayback (62d8dab1), which stay research reference only:
+ * tools/avatar-compositor/score.mjs checks poses against them offline.
  */
 
 const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
@@ -58,38 +58,6 @@ const framesOf = (names) => [...new Set(names.flatMap((n) => SHEET_FRAMES[n]))].
 /** Swf frames of the core sheets, then the idle sheets' own: the compositor data's frame order. */
 export const CORE_FRAMES = Object.freeze(framesOf(CORE_SHEETS));
 export const IDLE_FRAMES = Object.freeze(framesOf(IDLE_SHEETS).filter((fn) => !CORE_FRAMES.includes(fn)));
-
-/**
- * The avatar art and where each sheet's feet sit. Anchors put the feet line
- * (the lowest content row across a sheet's frames) and the middle of its
- * content box on the avatar's x/y; the crops differ per sheet.
- */
-export const GLITCH_AVATAR = Object.freeze({
-  id: '62d8dab1',
-  dir: 'assets/sprites/avatar/glitch-62d8/',
-  sheets: Object.freeze({
-    // midX over the walk frames (the leaning hit frames widen the full box).
-    base: { file: 'base.png', cells: 15, fw: 102, fh: 135, feetY: 133, midX: 52 },
-    jump: { file: 'jump.png', cells: 33, fw: 108, fh: 138, feetY: 135, midX: 60 },
-    climb: { file: 'climb.png', cells: 19, fw: 92, fh: 128, feetY: 123, midX: 57 },
-    angry: { file: 'angry.png', cells: 20, fw: 92, fh: 133, feetY: 130, midX: 51 },
-    happy: { file: 'happy.png', cells: 21, fw: 78, fh: 134, feetY: 131, midX: 40 },
-    surprise: { file: 'surprise.png', cells: 21, fw: 78, fh: 136, feetY: 133, midX: 40 },
-    // Idle sheets (same recovery, _idle1.._idleSleepy.png): wrapped into
-    // rows like the client's (cols = ceil(n / ceil(n / 39))). Anchored so the
-    // standing pose lands where base frame 801 does (its feet centre - 4.6 px,
-    // its bottom row + 1).
-    idle1: { file: 'idle1.png', cells: 16, cols: 16, rows: 1, fw: 70, fh: 133, feetY: 131, midX: 36 },
-    idle2: { file: 'idle2.png', cells: 57, cols: 29, rows: 2, fw: 72, fh: 136, feetY: 134, midX: 37 },
-    idle3: { file: 'idle3.png', cells: 50, cols: 25, rows: 2, fw: 100, fh: 134, feetY: 132, midX: 51 },
-    idle4: { file: 'idle4.png', cells: 51, cols: 26, rows: 2, fw: 72, fh: 133, feetY: 131, midX: 37 },
-    idleSleepy: { file: 'idleSleepy.png', cells: 42, cols: 21, rows: 2, fw: 102, fh: 133, feetY: 131, midX: 52 },
-  }),
-  // Glitch renders avatars at the world's own scale.
-  scale: 1,
-  // The sheets are drawn facing right (the portrait styles face left).
-  facesRight: true,
-});
 
 /** Animation frame lists (AvatarAnimationDefinitions defs). */
 export const ANIMS = Object.freeze({
@@ -194,8 +162,8 @@ export function createIdleClock({ waitMs = RANDOM_IDLE_WAIT_MS, idleMs = RANDOM_
 /**
  * AvatarView.getStandInForStand for a standing avatar: a hit, then idle4
  * while a choices dialog has focus, then an emotion, AFK, the random idle,
- * else the stand. `idles`: the look has idle frames (vector looks and the
- * recovered sheets); without them the stand stays the still idle0 frame.
+ * else the stand. `idles`: the look has idle frames (every vector look);
+ * without them the stand stays the still idle0 frame.
  */
 export function standInState(s) {
   if (s.hit === 'hit1' || s.hit === 'hit2') return s.hit;
@@ -272,9 +240,9 @@ export function animForState(state, { idles = false } = {}) {
 }
 
 /**
- * scale.x for a Glitch-sheet sprite (drawn facing right: the vector NPC
- * Glitches, js/npc-glitch.js) or a portrait one (drawn facing left) moving
- * in `facing` (negative = left).
+ * scale.x for a Glitch sprite drawn facing right (the vector NPC Glitches,
+ * js/npc-glitch.js) or one drawn facing left, moving in `facing`
+ * (negative = left).
  */
 export function crowdScaleX(scale, facing, facesRight) {
   const left = facing < 0;

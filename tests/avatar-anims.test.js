@@ -4,32 +4,24 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  AFK_SEQUENCE, ANIMS, FALL_LOOP, GLITCH_AVATAR, IDLES_TO_RANDOM, IDLE_SHEETS, SHEET_FRAMES, animForState, avatarAnimState,
+  AFK_SEQUENCE, ANIMS, FALL_LOOP, IDLES_TO_RANDOM, IDLE_SHEETS, SHEET_FRAMES, animForState, avatarAnimState,
   createIdleClock, frameRef, idleSheetFor, standInState,
 } from '../public/js/avatar-anims.js';
+import { VECTOR_AVATAR } from '../public/js/avatar-vector-sheets.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const pngSize = (file) => {
-  const b = readFileSync(file);
-  return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
-};
 
 describe('Glitch avatar sheets', () => {
-  it('ship one PNG per sheet whose width is its cell count times the cell width', () => {
-    for (const [name, sheet] of Object.entries(GLITCH_AVATAR.sheets)) {
-      const file = join(root, 'public', GLITCH_AVATAR.dir, sheet.file);
-      assert.ok(existsSync(file), file);
-      const { w, h } = pngSize(file);
-      // The idle sheets wrap into rows like the client's (cols = ceil(n / ceil(n / 39))).
-      const cols = sheet.cols ?? sheet.cells;
-      assert.equal(cols, Math.ceil(sheet.cells / Math.ceil(sheet.cells / 39)), name);
-      assert.equal(w, cols * sheet.fw, name);
-      assert.equal(h, (sheet.rows ?? 1) * sheet.fh, name);
+  it('ship one sheet per group holding exactly its swf frames (the vector default look)', () => {
+    assert.deepEqual(Object.keys(VECTOR_AVATAR.sheets).sort(), Object.keys(SHEET_FRAMES).sort());
+    for (const [name, sheet] of Object.entries(VECTOR_AVATAR.sheets)) {
+      assert.ok(existsSync(join(root, 'public', VECTOR_AVATAR.dir, sheet.file)), name);
       assert.equal(SHEET_FRAMES[name].length, sheet.cells, name);
+      assert.ok(sheet.cols * sheet.rows >= sheet.cells, name);
       assert.ok(sheet.feetY <= sheet.fh && sheet.midX < sheet.fw, name);
     }
   });
@@ -78,7 +70,7 @@ describe('emotions and hits replace the stand', () => {
     for (const em of ['angry', 'happy', 'surprise']) {
       assert.ok(ANIMS[em].length > 90, em);
       for (const fn of ANIMS[em]) assert.ok(frameRef(fn), `${em} ${fn}`);
-      assert.equal(SHEET_FRAMES[em].length, GLITCH_AVATAR.sheets[em].cells, em);
+      assert.equal(SHEET_FRAMES[em].length, VECTOR_AVATAR.sheets[em].cells, em);
     }
   });
 });
@@ -86,7 +78,7 @@ describe('emotions and hits replace the stand', () => {
 describe('standing idles and the AFK doze (AvatarView, AvatarAnimationState)', () => {
   it('holds the client idle lists, base frames left on the base sheet', () => {
     assert.deepEqual(IDLE_SHEETS.map((n) => SHEET_FRAMES[n].length), [16, 57, 50, 51, 42]);
-    for (const n of IDLE_SHEETS) assert.equal(SHEET_FRAMES[n].length, GLITCH_AVATAR.sheets[n].cells, n);
+    for (const n of IDLE_SHEETS) assert.equal(SHEET_FRAMES[n].length, VECTOR_AVATAR.sheets[n].cells, n);
     assert.deepEqual([ANIMS.idle1.length, ANIMS.idle2.length, ANIMS.idle3.length, ANIMS.idle4.length], [45, 94, 104, 96]);
     assert.deepEqual([ANIMS.idleSleepyStart.length, ANIMS.idleSleepyLoop.length, ANIMS.idleSleepyEnd.length], [41, 105, 41]);
     assert.equal(ANIMS.idle4[0], 1049);

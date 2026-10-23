@@ -618,8 +618,8 @@ import {
   listMapDestinations,
   planSignpostTravel,
 } from './js/travel.js';
-import { AVATAR_SHEETS, facingScaleX, facingFromVelocity } from './js/avatar.js';
-import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, GLITCH_AVATAR, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js';
+import { facingScaleX, facingFromVelocity } from './js/avatar.js';
+import { AFK_SEQUENCE, AFK_TIMEOUT_MS, ANIMS, ANIM_FPS, EMOTIONS, EMOTION_MS, FALL_LOOP, IDLE_SHEETS, RANDOM_IDLE_MS, RANDOM_IDLE_WAIT_MS, animForState, avatarAnimState, createIdleClock, crowdScaleX, frameRef, idleSheetFor } from './js/avatar-anims.js';
 import { landingY } from './js/walk-surface.js';
 import { VECTOR_AVATAR } from './js/avatar-vector-sheets.js';
 import { createNpcGlitchKit } from './js/npc-glitch.js?v=npc-glitch-1';
@@ -627,18 +627,11 @@ import { bakeIdleSheet, bakeLook, loadCatalog as loadAvatarCatalog, paintPreview
 import { catalogItem, lookKey, randomVectorFields, resolveLook, variantSwatch } from './js/avatar-looks.js';
 import {
   createDefaultAppearance,
-  createGlitchSheetsAppearance,
-  createClassicAppearance,
-  classifyGlitchPixel,
   loadAppearance,
   saveAppearance,
   normalizeAppearance,
-  recolorImageData,
-  randomAppearance,
   APPEARANCE_PRESETS,
   PRESET_GROUPS,
-  COLOR_SWATCHES,
-  resolveBodySheets,
   appearanceCacheKey,
 } from './js/character-builder.js';
 import { clearPresetActive, renderPresetGroups, renderStarterPicker } from './js/avatar-builder-ui.js';
@@ -840,7 +833,7 @@ const LOCATION_VIEW_H = VIEW_H - PACK_VIEW_RESERVE;
 let WORLD_W = 2400;
 let GROUND_Y = 420;
 const SCALE = 1.35;
-/** Quoins keep their source size, like the avatar (GLITCH_AVATAR.scale). */
+/** Quoins keep their source size, like the avatar (VECTOR_AVATAR.scale). */
 const QUOIN_SCALE = 1;
 /**
  * Per-entity display scales relative to global SCALE.
@@ -860,9 +853,9 @@ const ENTITY_SCALE = {
   trant: SCALE * 0.28,
 };
 
-function glitchSheetDef(name, av = GLITCH_AVATAR) {
+function glitchSheetDef(name, av = VECTOR_AVATAR) {
   const sheet = av.sheets[name];
-  // The recovered sheets are one row; the vector sheets wrap into cols x rows.
+  // The vector sheets wrap into cols x rows.
   const cols = sheet.cols ?? sheet.cells;
   return { url: `${av.dir}${sheet.file}`, fw: sheet.fw, fh: sheet.fh, cols, rows: sheet.rows ?? Math.ceil(sheet.cells / cols), frameCount: sheet.cells };
 }
@@ -1056,23 +1049,6 @@ const SHEETS = {
     url: 'assets/sprites/quests/ilmenskie/jones-walk.png',
     fw: 87, fh: 64, cols: 8, rows: 3,
   },
-  // Styled clothed Glitch avatar (Wayback full-body portrait + bob walk strip).
-  // Default play path — not the nude greyscale mannequin sheets.
-  avatarStyledWalk: {
-    url: AVATAR_SHEETS.walk.url,
-    fw: AVATAR_SHEETS.walk.fw,
-    fh: AVATAR_SHEETS.walk.fh,
-    cols: AVATAR_SHEETS.walk.cols,
-    rows: AVATAR_SHEETS.walk.rows,
-  },
-  avatarStyledIdle: { url: AVATAR_SHEETS.idle.url, whole: true },
-  // Real Glitch avatar sheets (js/avatar-anims.js): walk, climb, jump.
-  glitchAvatarBase: glitchSheetDef('base'),
-  glitchAvatarJump: glitchSheetDef('jump'),
-  glitchAvatarClimb: glitchSheetDef('climb'),
-  glitchAvatarAngry: glitchSheetDef('angry'),
-  glitchAvatarHappy: glitchSheetDef('happy'),
-  glitchAvatarSurprise: glitchSheetDef('surprise'),
   // The vector Glitch's default look (js/avatar-vector-sheets.js, 3x on first draw).
   vectorAvatarBase: glitchSheetDef('base', VECTOR_AVATAR),
   vectorAvatarJump: glitchSheetDef('jump', VECTOR_AVATAR),
@@ -1080,7 +1056,6 @@ const SHEETS = {
   vectorAvatarAngry: glitchSheetDef('angry', VECTOR_AVATAR),
   vectorAvatarHappy: glitchSheetDef('happy', VECTOR_AVATAR),
   vectorAvatarSurprise: glitchSheetDef('surprise', VECTOR_AVATAR),
-  avatarStyledAlt: { url: 'assets/sprites/avatar_styled_alt.png', whole: true },
 };
 
 const keys = new Set();
@@ -5985,7 +5960,7 @@ function updateSpinningWheel() {
 }
 
 function makePlayer() {
-  // Clothed Glitch avatar — optionally recolored by character builder.
+  // The vector Glitch in the character builder's look.
   const pack = getAppearanceTextures(playerAppearance);
   const walkFrames = pack.walkFrames;
   const idleFrame = pack.idleFrame;
@@ -6000,8 +5975,7 @@ function makePlayer() {
   body.anims = pack.anims || null;
   body.pack = pack;
   body.updateAnchor = Boolean(pack.anims);
-  // Portrait ~172×248; keep a bit under entity scale so pigs/chickens read correctly.
-  body.baseScale = pack.anims ? GLITCH_AVATAR.scale : SCALE * 0.42;
+  body.baseScale = VECTOR_AVATAR.scale;
   // Pixi AnimatedSprite advances by animationSpeed * delta each tick
   body.autoUpdate = true;
   // Art faces left; start facing right via flip so first movement looks correct
@@ -6028,7 +6002,7 @@ function companionScaleX(body) {
 function makeLocalCompanion(profile) {
   const appearance =
     APPEARANCE_PRESETS[profile.preset]?.appearance ||
-    APPEARANCE_PRESETS.classic.appearance;
+    APPEARANCE_PRESETS.vector.appearance;
   // A vector Glitch with this name's look, the same one it has in races and parties.
   const npc = engine.npcGlitch(profile.name);
   const pack = npc ? null : getAppearanceTextures(appearance);
@@ -6038,15 +6012,16 @@ function makeLocalCompanion(profile) {
   if (!npc) {
     body.texturesIdle = [pack.idleFrame];
     body.texturesWalk = pack.walkFrames;
-    body.anchor.set(0.5, 1);
+    // Vector frames carry their sheet's feet anchor.
+    body.updateAnchor = true;
     body.textures = body.texturesIdle;
     body.animationSpeed = 0.16;
     body.loop = true;
     body.autoUpdate = false;
     body.gotoAndStop(0);
   }
-  body.facesRight = Boolean(npc);
-  body.baseScale = npc ? npc.scale : SCALE * 0.39;
+  body.facesRight = true;
+  body.baseScale = npc ? npc.scale : VECTOR_AVATAR.scale;
   body.facing = profile.gatherOffset < 0 ? 'right' : 'left';
   body.scale.set(companionScaleX(body), body.baseScale);
   body.animState = 'idle';
@@ -6350,53 +6325,6 @@ function updateLocalCompanions(dt) {
 /** @type {Map<string, { idleFrame: PIXI.Texture, walkFrames: PIXI.Texture[], key: string }>} */
 const appearanceTexCache = new Map();
 
-/**
- * Build (or fetch cached) idle + walk textures for an appearance via canvas recolor.
- * @param {import('./js/character-builder.js').Appearance} appearance
- */
-/**
- * The Glitch sheets as an animation pack: every source animation as textures,
- * each frame anchored on its sheet's feet line (GLITCH_AVATAR).
- */
-function glitchAnimPack(key, app) {
-  const loaded = {
-    base: textures.glitchAvatarBase,
-    jump: textures.glitchAvatarJump,
-    climb: textures.glitchAvatarClimb,
-    angry: textures.glitchAvatarAngry,
-    happy: textures.glitchAvatarHappy,
-    surprise: textures.glitchAvatarSurprise,
-  };
-  if (!loaded.base?.frames?.length) return null;
-  // The sheets in their own colours, or recoloured once per look (classifyGlitchPixel regions).
-  const native = key === appearanceCacheKey(createGlitchSheetsAppearance());
-  const sheets = {};
-  for (const [name, sheet] of Object.entries(loaded)) sheets[name] = native ? sheet : recolorGlitchSheet(sheet, app);
-  // The player's idle sheets (also recovered) load when first needed.
-  const idleLoader = async (name) => {
-    const sheet = await loadGlitchIdleSheet(name);
-    if (native) return sheet;
-    const tinted = recolorGlitchSheet(sheet, app);
-    return { ...tinted, release: () => tinted.frames[0]?.source?.destroy() };
-  };
-  return animPackFromSheets(key, sheets, GLITCH_AVATAR, idleLoader);
-}
-
-/** A recovered sheet recoloured for a Glitch-style look (classifyGlitchPixel regions). */
-function recolorGlitchSheet(sheet, app) {
-  const img = sheet?.frames?.[0]?.source?.resource;
-  if (!img) return sheet;
-  const canvas = document.createElement('canvas');
-  canvas.width = img.width;
-  canvas.height = img.height;
-  const g = canvas.getContext('2d');
-  g.drawImage(img, 0, 0);
-  const data = g.getImageData(0, 0, canvas.width, canvas.height);
-  recolorImageData(data.data, canvas.width, canvas.height, app, classifyGlitchPixel);
-  g.putImageData(data, 0, 0);
-  return { def: sheet.def, frames: sliceSheet(new PIXI.CanvasSource({ resource: canvas }), sheet.def, sheet.def.frameCount ?? null) };
-}
-
 /** Idle sheets loaded on demand (never at boot): url -> Promise<{ def, frames }>. */
 const idleSheetTextures = new Map();
 function loadIdleSheetTexture(def) {
@@ -6418,11 +6346,10 @@ function loadIdleSheetTexture(def) {
   }
   return idleSheetTextures.get(def.url);
 }
-const loadGlitchIdleSheet = (name) => loadIdleSheetTexture(glitchSheetDef(name, GLITCH_AVATAR));
 const loadVectorIdleSheet = (name) => loadIdleSheetTexture(glitchSheetDef(name, VECTOR_AVATAR));
 
 /**
- * Sheets laid out like GLITCH_AVATAR (one per animation group, cells in
+ * Sheets laid out like VECTOR_AVATAR (one per animation group, cells in
  * SHEET_FRAMES order) as an animation pack, each frame anchored on its
  * sheet's feet.
  */
@@ -6597,154 +6524,19 @@ function getAppearanceTextures(appearance) {
   const app = normalizeAppearance(appearance);
   const key = appearanceCacheKey(app);
   if (appearanceTexCache.has(key)) return appearanceTexCache.get(key);
-  if (app.bodyStyle === 'vector') {
-    const pack = vectorAnimPack(key, app);
-    if (pack) {
-      if (!pack.pending) appearanceTexCache.set(key, pack);
-      return pack;
-    }
-  }
-  if (app.bodyStyle === 'glitch' || app.bodyStyle === 'vector') {
-    const pack = glitchAnimPack(key, app);
-    if (pack) {
-      appearanceTexCache.set(key, pack);
-      return pack;
-    }
-  }
-
-  const sheets = resolveBodySheets(app);
-  const isDefaultClassic =
-    key === appearanceCacheKey(createClassicAppearance()) && app.bodyStyle === 'classic';
-
-  // Default classic look uses preloaded sheets (no recolor cost)
-  if (isDefaultClassic && textures.avatarStyledWalk?.frames?.length) {
-    const pack = {
-      key,
-      idleFrame: textures.avatarStyledIdle.frames[0],
-      walkFrames: textures.avatarStyledWalk.frames,
-    };
-    appearanceTexCache.set(key, pack);
+  const pack = vectorAnimPack(key, app);
+  if (pack) {
+    if (!pack.pending) appearanceTexCache.set(key, pack);
     return pack;
   }
-
-  // Recolor base bitmaps (must already be in PIXI loader / Image cache)
-  const idleBase = textures.avatarStyledIdle?.frames?.[0];
-  const walkBase = textures.avatarStyledWalk;
-  if (!idleBase) {
-    // Fallback if sheets not loaded
-    const blank = PIXI.Texture.WHITE;
-    const pack = { key, idleFrame: blank, walkFrames: [blank] };
-    appearanceTexCache.set(key, pack);
-    return pack;
-  }
-
-  // Use HTMLImageElement sources when possible
-  const idleImg = idleBase.source?.resource;
-  let idleFrame = recolorTextureFromImage(idleImg || idleBase, app, {
-    whole: true,
-  });
-
-  let walkFrames;
-  if (app.bodyStyle === 'alt') {
-    // Single-frame alt body for walk until a walk strip exists
-    const altTex = textures.avatarStyledAlt?.frames?.[0] || idleFrame;
-    const altImg = altTex.source?.resource;
-    const recolored = recolorTextureFromImage(altImg || altTex, app, { whole: true });
-    idleFrame = recolored;
-    walkFrames = [recolored, recolored, recolored, recolored, recolored, recolored, recolored, recolored];
-  } else {
-    const walkImg =
-      walkBase?.frames?.[0]?.source?.resource ||
-      walkBase?.source?.resource;
-    // Full strip recolor then slice frames
-    const stripTex = recolorTextureFromImage(walkImg || idleImg, app, {
-      whole: true,
-      forceSize: walkImg
-        ? { w: walkImg.width || walkImg.naturalWidth, h: walkImg.height || walkImg.naturalHeight }
-        : null,
-    });
-    const fw = AVATAR_SHEETS.walk.fw;
-    const fh = AVATAR_SHEETS.walk.fh;
-    const cols = AVATAR_SHEETS.walk.cols;
-    walkFrames = [];
-    const base = stripTex.source;
-    for (let i = 0; i < cols; i++) {
-      walkFrames.push(
-        frameTexture(base, new PIXI.Rectangle(i * fw, 0, fw, fh))
-      );
-    }
-    // Also recolor idle from idle image specifically
-    idleFrame = recolorTextureFromImage(idleImg, app, { whole: true });
-  }
-
-  const pack = { key, idleFrame, walkFrames };
-  appearanceTexCache.set(key, pack);
-  return pack;
-}
-
-/**
- * @param {CanvasImageSource|PIXI.Texture} source
- * @param {import('./js/character-builder.js').Appearance} appearance
- * @param {{ whole?: boolean, forceSize?: { w: number, h: number }|null }} [opts]
- */
-function recolorTextureFromImage(source, appearance, opts = {}) {
-  let img = source;
-  if (source && source.source) {
-    img = source.source.resource || source;
-  }
-  const w =
-    opts.forceSize?.w ||
-    img.naturalWidth ||
-    img.width ||
-    source?.width ||
-    172;
-  const h =
-    opts.forceSize?.h ||
-    img.naturalHeight ||
-    img.height ||
-    source?.height ||
-    248;
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  try {
-    ctx.drawImage(img, 0, 0, w, h);
-  } catch {
-    // CORS or bad source — return original if Texture
-    if (source?.source) return source;
-    return PIXI.Texture.from(canvas);
-  }
-  const imageData = ctx.getImageData(0, 0, w, h);
-  recolorImageData(imageData.data, w, h, appearance);
-  ctx.putImageData(imageData, 0, 0);
-  return PIXI.Texture.from(canvas);
+  // The default sheets failed to load: a blank stand-in, never cached.
+  return { key: `${key}#blank`, idleFrame: PIXI.Texture.WHITE, walkFrames: [PIXI.Texture.WHITE] };
 }
 
 /** Apply current playerAppearance to the live player sprite. */
 function applyPlayerAppearance() {
   if (!player) return;
-  player.climbBorrow = null;
   swapPlayerPack(getAppearanceTextures(playerAppearance));
-}
-
-/**
- * The Classic and Alt looks have only idle and walk sheets. On a ladder they
- * borrow the Glitch look's real climb frames in the same colours (a climber
- * faces away, so the swap reads naturally) and switch back on stepping off.
- */
-function syncClimbBorrow(state) {
-  const climbing = state === 'climb';
-  if (climbing === Boolean(player.climbBorrow)) return;
-  if (climbing) {
-    if (getAppearanceTextures(playerAppearance).anims) return;
-    const pack = getAppearanceTextures({ ...playerAppearance, bodyStyle: 'glitch' });
-    if (!pack.anims) return;
-    player.climbBorrow = true;
-    swapPlayerPack(pack);
-  } else {
-    applyPlayerAppearance();
-  }
 }
 
 function swapPlayerPack(pack) {
@@ -6754,12 +6546,6 @@ function swapPlayerPack(pack) {
   player.texturesIdle = [pack.idleFrame];
   player.texturesWalk = pack.walkFrames;
   player.appearanceKey = pack.key;
-  // Switching between the Glitch sheets and the portrait styles keeps any
-  // street or room scaling (ratio of the current to the style's own scale).
-  const styleScale = (anims) => (anims ? GLITCH_AVATAR.scale : SCALE * 0.42);
-  if (Boolean(pack.anims) !== Boolean(player.anims)) {
-    player.baseScale = (player.baseScale / styleScale(player.anims)) * styleScale(pack.anims);
-  }
   player.anims = pack.anims || null;
   player.updateAnchor = Boolean(pack.anims);
   if (!pack.anims) player.anchor.set(0.5, 1);
@@ -6804,8 +6590,7 @@ function closeAvatarPanel() {
   stopAvatarPreviewLoop();
 }
 
-/** Builder tabs: colour slots for the older looks, parts for the vector Glitch. */
-const CLASSIC_BUILDER_TABS = [['hair', 'Hair'], ['skin', 'Skin'], ['shirt', 'Shirt'], ['pants', 'Pants'], ['shoes', 'Shoes']];
+/** Builder tabs: Tiny Speck's starter picker, then the vector Glitch's parts. */
 const VECTOR_BUILDER_TABS = [['fresh', 'Start fresh'], ['hair', 'Hair'], ['face', 'Face'], ['skin', 'Skin'], ['top', 'Top'], ['coat', 'Coat'], ['bottom', 'Bottom'], ['shoes', 'Shoes'], ['hat', 'Hat']];
 /** Which article types each vector tab edits, with section titles. */
 const VECTOR_TAB_TYPES = {
@@ -6817,10 +6602,6 @@ const VECTOR_TAB_TYPES = {
   shoes: [['shoes', 'Shoes']],
   hat: [['hat', 'Hat']],
 };
-
-function isVectorLook(app = playerAppearance) {
-  return app.bodyStyle === 'vector';
-}
 
 function renderAvatarBuilder() {
   const presetsEl = document.getElementById('avatar-presets');
@@ -6834,10 +6615,10 @@ function renderAvatarBuilder() {
     } });
   }
   const tabsEl = document.getElementById('avatar-tabs');
-  const tabs = isVectorLook() ? VECTOR_BUILDER_TABS : CLASSIC_BUILDER_TABS;
-  if (!tabs.some(([slot]) => slot === avatarBuilderSlot)) avatarBuilderSlot = tabs[0][0];
-  if (tabsEl && tabsEl.dataset.set !== (isVectorLook() ? 'vector' : 'classic')) {
-    tabsEl.dataset.set = isVectorLook() ? 'vector' : 'classic';
+  const tabs = VECTOR_BUILDER_TABS;
+  if (!tabs.some(([slot]) => slot === avatarBuilderSlot)) avatarBuilderSlot = 'hair';
+  if (tabsEl && tabsEl.dataset.set !== 'vector') {
+    tabsEl.dataset.set = 'vector';
     tabsEl.innerHTML = '';
     for (const [slot, label] of tabs) {
       const tab = document.createElement('button');
@@ -6855,57 +6636,13 @@ function renderAvatarBuilder() {
     tab.setAttribute('aria-selected', active ? 'true' : 'false');
   });
   const meta = document.querySelector('#avatar-panel .panel-meta');
-  if (meta) {
-    meta.textContent = isVectorLook()
-      ? 'Pick hair, face, clothes and colours from the original Glitch wardrobe. Saved on this device.'
-      : 'Pick colors for hair, skin, shirt, pants, and shoes. Saved on this device.';
-  }
+  if (meta) meta.textContent = 'Pick hair, face, clothes and colours from the original Glitch wardrobe. Saved on this device.';
   renderAvatarSwatches();
 }
 
 function renderAvatarSwatches() {
   const box = document.getElementById('avatar-swatches');
-  if (!box) return;
-  if (isVectorLook()) {
-    renderVectorControls(box);
-    return;
-  }
-  box.dataset.mode = 'colors';
-  const slot = avatarBuilderSlot;
-  const list = COLOR_SWATCHES[slot] || COLOR_SWATCHES.hair;
-  const current = playerAppearance[slot] || playerAppearance.hair;
-  box.innerHTML = '';
-  for (const s of list) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'avatar-swatch';
-    btn.style.background = `rgb(${s.rgb.r},${s.rgb.g},${s.rgb.b})`;
-    btn.title = s.label;
-    btn.setAttribute('aria-label', s.label);
-    const match =
-      current.r === s.rgb.r && current.g === s.rgb.g && current.b === s.rgb.b;
-    if (match) btn.classList.add('active');
-    const lab = document.createElement('span');
-    lab.className = 'sw-label';
-    lab.textContent = s.label;
-    btn.appendChild(lab);
-    btn.addEventListener('click', () => {
-      playerAppearance = normalizeAppearance({
-        ...playerAppearance,
-        [slot]: { ...s.rgb },
-      });
-      if (slot === 'shirt') {
-        playerAppearance.shirtDark = {
-          r: Math.round(s.rgb.r * 0.25),
-          g: Math.round(s.rgb.g * 0.25),
-          b: Math.round(s.rgb.b * 0.3),
-        };
-      }
-      renderAvatarSwatches();
-      paintAvatarPreview();
-    });
-    box.appendChild(btn);
-  }
+  if (box) renderVectorControls(box);
 }
 
 /** Update the vector look's saved fields and refresh the builder. */
@@ -7138,60 +6875,7 @@ const avatarPreviewWalking = !(window.matchMedia && window.matchMedia('(prefers-
 
 function paintAvatarPreview() {
   const canvas = document.getElementById('avatar-preview');
-  if (!canvas) return;
-  if (isVectorLook()) {
-    paintVectorAvatarPreview(canvas);
-    return;
-  }
-  stopAvatarPreviewLoop();
-  const ctx = canvas.getContext('2d');
-  const sheets = resolveBodySheets(playerAppearance);
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  if (sheets.sheets) {
-    // The Glitch sheets: their idle frame (base cell 14), recoloured.
-    const base = GLITCH_AVATAR.sheets.base;
-    img.onload = () => {
-      canvas.width = 172;
-      canvas.height = 248;
-      ctx.clearRect(0, 0, 172, 248);
-      // Recolour the cell at its own size (the regions read its height), then scale.
-      const cell = document.createElement('canvas');
-      cell.width = base.fw;
-      cell.height = base.fh;
-      const cg = cell.getContext('2d');
-      cg.drawImage(img, base.fw * 14, 0, base.fw, base.fh, 0, 0, base.fw, base.fh);
-      if (appearanceCacheKey(playerAppearance) !== appearanceCacheKey(createGlitchSheetsAppearance())) {
-        const id = cg.getImageData(0, 0, base.fw, base.fh);
-        recolorImageData(id.data, base.fw, base.fh, playerAppearance, classifyGlitchPixel);
-        cg.putImageData(id, 0, 0);
-      }
-      const scale = Math.min(172 / base.fw, 248 / base.fh);
-      const dw = base.fw * scale;
-      const dh = base.fh * scale;
-      ctx.drawImage(cell, (172 - dw) / 2, (248 - dh) / 2, dw, dh);
-    };
-    img.src = `${GLITCH_AVATAR.dir}${base.file}`;
-    return;
-  }
-  img.onload = () => {
-    canvas.width = 172;
-    canvas.height = 248;
-    ctx.clearRect(0, 0, 172, 248);
-    // Draw centered, cover height
-    const scale = Math.min(172 / img.width, 248 / img.height);
-    const dw = img.width * scale;
-    const dh = img.height * scale;
-    ctx.drawImage(img, (172 - dw) / 2, (248 - dh) / 2, dw, dh);
-    const id = ctx.getImageData(0, 0, 172, 248);
-    recolorImageData(id.data, 172, 248, playerAppearance);
-    ctx.putImageData(id, 0, 0);
-  };
-  img.onerror = () => {
-    ctx.fillStyle = '#ccc';
-    ctx.fillRect(0, 0, 172, 248);
-  };
-  img.src = sheets.idleUrl + '?v=1';
+  if (canvas) paintVectorAvatarPreview(canvas);
 }
 
 function commitAvatarAppearance() {
@@ -7376,7 +7060,6 @@ function tickAvatarAfk() {
 
 function setPlayerAnim(state) {
   if (!player) return;
-  syncClimbBorrow(state);
   if (player.anims) {
     applyGlitchState(glitchAnimState(state));
     return;
@@ -7449,7 +7132,7 @@ function stopClimb({ jumpOff = false, side = 0, jumpVelocity = -9.6, maxSpeed = 
 function applyPlayerFacing() {
   if (!player) return;
   player.facing = facingFromVelocity(player.vx, player.facing || 'right');
-  const flip = player.anims && GLITCH_AVATAR.facesRight ? -1 : 1;
+  const flip = player.anims && VECTOR_AVATAR.facesRight ? -1 : 1;
   const sx = flip * facingScaleX(player.baseScale, player.facing);
   player.scale.set(sx, Math.abs(player.baseScale));
 }
@@ -7900,7 +7583,7 @@ const engine = {
     return npcGlitches?.actor(String(name || ''), opts) || null;
   },
   crowdScaleX,
-  /** Loaded texture sheets (e.g. avatarStyledWalk for stand-in racers). */
+  /** Loaded texture sheets (e.g. vectorAvatarBase, the default look). */
   get textures() {
     return textures;
   },
@@ -10187,25 +9870,17 @@ function spawnHogHaulPen(point) {
 function spawnHogHaulRival(point) {
   // The rival is a vector Glitch with its own look (js/npc-glitch.js).
   const npc = engine.npcGlitch(hogHaulState?.rivalLabel || 'Gomez Addams');
-  const frames = npc ? null : textures.avatarStyledWalk?.frames || [];
-  if (!npc && !frames.length) return null;
-  const rival = npc ? npc.sprite : new PIXI.AnimatedSprite(frames);
+  if (!npc) return null;
+  const rival = npc.sprite;
   rival.npc = npc;
-  if (!npc) {
-    rival.anchor.set(0.5, 1);
-    rival.animationSpeed = 0.18;
-    rival.loop = true;
-    rival.tint = 0xd8b5ff;
-  }
-  rival.crowdScale = npc ? npc.scale : SCALE * 0.4;
-  rival.facesRight = Boolean(npc);
+  rival.crowdScale = npc.scale;
+  rival.facesRight = true;
   rival.scale.set(rival.crowdScale);
   rival.alpha = 0.88;
   rival.x = point.x + 82;
   rival.y = point.y;
   rival.zIndex = 46;
-  if (npc) npc.setMode('walk');
-  else rival.play();
+  npc.setMode('walk');
   entityLayer.addChild(rival);
   hogHaulRivalSprite = rival;
   return rival;
@@ -23561,10 +23236,9 @@ async function main() {
     if (e.target?.id === 'avatar-panel') closeAvatarPanel();
   });
   document.getElementById('avatar-random')?.addEventListener('click', () => {
-    // A vector look draws from the wardrobe; the older looks pick random colours.
-    playerAppearance = isVectorLook() && avatarCatalog
-      ? normalizeAppearance({ ...playerAppearance, vector: randomVectorFields(avatarCatalog) })
-      : randomAppearance();
+    // A random look from the wardrobe (once the catalog is in).
+    if (!avatarCatalog) return;
+    playerAppearance = normalizeAppearance({ ...playerAppearance, vector: randomVectorFields(avatarCatalog) });
     renderAvatarBuilder();
     paintAvatarPreview();
   });

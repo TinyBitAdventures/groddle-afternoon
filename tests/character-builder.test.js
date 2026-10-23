@@ -4,79 +4,98 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   createDefaultAppearance,
-  createGlitchSheetsAppearance,
-  createClassicAppearance,
   normalizeAppearance,
-  classifyAvatarPixel,
-  recolorImageData,
-  applyTargetColor,
-  randomAppearance,
   appearanceToJson,
   appearanceFromJson,
   saveAppearance,
   loadAppearance,
+  migrateAppearance,
   APPEARANCE_PRESETS,
+  APPEARANCE_VERSION,
+  BODY_STYLES,
   PRESET_GROUPS,
-  COLOR_SWATCHES,
+  RETIRED_BODY_STYLES,
   appearanceCacheKey,
-  resolveBodySheets,
   STORAGE_KEY,
 } from '../public/js/character-builder.js';
 import { expandCatalog, lookKey, resolveLook } from '../public/js/avatar-looks.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// The retired bitmap presets as saved before (style + colours).
+const OLD = {
+  glitch: { bodyStyle: 'glitch', hair: { r: 205, g: 205, b: 232 }, skin: { r: 190, g: 190, b: 196 }, shirt: { r: 214, g: 240, b: 40 }, shirtDark: { r: 150, g: 170, b: 30 }, pants: { r: 100, g: 40, b: 110 }, shoes: { r: 120, g: 210, b: 40 }, sole: { r: 170, g: 60, b: 200 } },
+  classic: { bodyStyle: 'classic', hair: { r: 72, g: 140, b: 72 }, skin: { r: 190, g: 180, b: 165 }, shirt: { r: 180, g: 30, b: 40 }, shirtDark: { r: 40, g: 32, b: 40 }, pants: { r: 50, g: 90, b: 140 }, shoes: { r: 50, g: 130, b: 50 }, sole: { r: 210, g: 195, b: 160 } },
+  blueberry: { bodyStyle: 'classic', hair: { r: 70, g: 100, b: 200 }, skin: { r: 200, g: 185, b: 175 }, shirt: { r: 40, g: 90, b: 180 }, shirtDark: { r: 25, g: 40, b: 90 }, pants: { r: 40, g: 50, b: 80 }, shoes: { r: 40, g: 70, b: 140 }, sole: { r: 200, g: 200, b: 210 } },
+  alt_base: { bodyStyle: 'alt', hair: { r: 150, g: 80, b: 160 }, skin: { r: 170, g: 120, b: 180 }, shirt: { r: 50, g: 90, b: 140 }, shirtDark: { r: 30, g: 50, b: 80 }, pants: { r: 60, g: 140, b: 90 }, shoes: { r: 200, g: 100, b: 60 }, sole: { r: 220, g: 180, b: 140 } },
+};
+
 describe('appearance model', () => {
-  it('default + normalize clamps and fills slots', () => {
+  it('default + normalize clamps and fills slots; every look is vector', () => {
     const d = createDefaultAppearance();
     assert.equal(d.bodyStyle, 'vector');
-    assert.equal(createGlitchSheetsAppearance().bodyStyle, 'glitch');
-    const classic = createClassicAppearance();
-    assert.equal(classic.bodyStyle, 'classic');
-    assert.ok(classic.hair.g > classic.hair.r);
+    assert.deepEqual(Object.keys(BODY_STYLES), ['vector']);
     const n = normalizeAppearance({ hair: { r: 300, g: -5, b: 10 } });
     assert.equal(n.hair.r, 255);
     assert.equal(n.hair.g, 0);
     assert.equal(n.hair.b, 10);
     assert.ok(n.pants);
+    for (const style of RETIRED_BODY_STYLES) assert.equal(normalizeAppearance({ bodyStyle: style }).bodyStyle, 'vector', style);
+    assert.equal(d.v ?? normalizeAppearance(d).v, APPEARANCE_VERSION);
   });
 
-  it('moves an untouched old default to the vector Glitch, keeps a customised look', () => {
+  it('moves saves on the retired bitmap bodies to the nearest vector look', () => {
     const store = new Map();
     const storage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) };
-    // v1 saves had no `v`.
-    const v1 = (a) => { const { v, vector, ...rest } = normalizeAppearance(a); return JSON.stringify(rest); };
-    store.set(STORAGE_KEY, v1(createClassicAppearance()));
-    assert.equal(loadAppearance({ storage }).bodyStyle, 'vector');
-    store.set(STORAGE_KEY, v1(createGlitchSheetsAppearance()));
-    assert.equal(loadAppearance({ storage }).bodyStyle, 'vector');
-    store.set(STORAGE_KEY, v1({ ...createClassicAppearance(), hair: { r: 200, g: 50, b: 50 } }));
-    assert.equal(loadAppearance({ storage }).bodyStyle, 'classic');
-    // A recoloured recovered-sheets look keeps its colours on the vector outfit.
-    store.set(STORAGE_KEY, v1({ ...createGlitchSheetsAppearance(), shirt: { r: 200, g: 20, b: 30 }, skin: { r: 120, g: 90, b: 60 } }));
-    const moved = loadAppearance({ storage });
-    assert.equal(moved.bodyStyle, 'vector');
-    assert.equal(moved.vector.tint.shirt, 'c8141e');
-    assert.equal(moved.vector.skinTint, '785a3c');
-    // v2 saves load as they are, including a chosen recovered-sheets look.
-    saveAppearance(createGlitchSheetsAppearance(), { storage });
-    assert.equal(loadAppearance({ storage }).bodyStyle, 'glitch');
+    const vec = (id) => normalizeAppearance(APPEARANCE_PRESETS[id].appearance).vector;
+    // v1 (no `v`) and v2 saves alike.
+    for (const v of [undefined, 2]) {
+      const save = (a) => store.set(STORAGE_KEY, JSON.stringify(v ? { ...a, v } : a));
+      // Untouched defaults: the vector default.
+      save(OLD.classic);
+      assert.deepEqual(loadAppearance({ storage }).vector, createDefaultAppearance().vector);
+      save(OLD.glitch);
+      assert.deepEqual(loadAppearance({ storage }).vector, createDefaultAppearance().vector);
+      // The old colour themes: their vector rebuilds; the purple Alt body: Midnight.
+      save(OLD.blueberry);
+      assert.deepEqual(loadAppearance({ storage }).vector, vec('blueberry'));
+      save(OLD.alt_base);
+      const alt = loadAppearance({ storage });
+      assert.equal(alt.bodyStyle, 'vector');
+      assert.deepEqual(alt.vector, vec('midnight'));
+      // A recoloured classic or alt look keeps its colours on the vector outfit.
+      for (const style of ['classic', 'alt', 'glitch']) {
+        save({ ...OLD.classic, bodyStyle: style, shirt: { r: 200, g: 20, b: 30 }, skin: { r: 120, g: 90, b: 60 } });
+        const moved = loadAppearance({ storage });
+        assert.equal(moved.bodyStyle, 'vector', style);
+        assert.equal(moved.vector.tint.shirt, 'c8141e', style);
+        assert.equal(moved.vector.skinTint, '785a3c', style);
+        assert.equal(moved.v, APPEARANCE_VERSION);
+      }
+    }
+    // Vector saves load as they are.
+    saveAppearance(APPEARANCE_PRESETS.costume_rook.appearance, { storage });
+    assert.deepEqual(loadAppearance({ storage }).vector, vec('costume_rook'));
+    assert.equal(appearanceFromJson(JSON.stringify(OLD.alt_base)).bodyStyle, 'vector');
+    assert.equal(migrateAppearance(null).bodyStyle, 'vector');
   });
 
   it('json round-trip and storage mock', () => {
     const a = normalizeAppearance({
       hair: { r: 200, g: 50, b: 50 },
       shirt: { r: 10, g: 20, b: 200 },
+      vector: APPEARANCE_PRESETS.costume_mab.appearance.vector,
     });
     const json = appearanceToJson(a);
     const b = appearanceFromJson(json);
     assert.equal(b.hair.r, 200);
     assert.equal(b.shirt.b, 200);
+    assert.deepEqual(b.vector, a.vector);
     const store = {
       _m: {},
       setItem(k, v) {
@@ -93,68 +112,14 @@ describe('appearance model', () => {
     assert.equal(appearanceCacheKey(a), appearanceCacheKey(loaded));
   });
 
-  it('presets and random produce valid looks', () => {
+  it('every preset is a vector look in a known group', () => {
     assert.ok(Object.keys(APPEARANCE_PRESETS).length >= 5);
+    const groups = new Set(PRESET_GROUPS.map((g) => g.id));
     for (const p of Object.values(APPEARANCE_PRESETS)) {
-      const a = normalizeAppearance(p.appearance);
-      assert.ok(a.hair && a.skin && a.shirt && a.pants && a.shoes);
+      assert.equal(p.appearance.bodyStyle, 'vector', p.id);
+      assert.ok(groups.has(p.group || 'looks'), p.id);
     }
-    let i = 0;
-    const a = randomAppearance({ rng: () => (i++ % 10) / 10 });
-    assert.ok(COLOR_SWATCHES.hair.some((s) => s.rgb.r === a.hair.r) || a.hair);
-  });
-
-  it('resolveBodySheets picks classic or alt paths that exist', () => {
-    const c = resolveBodySheets({ bodyStyle: 'classic' });
-    assert.match(c.idleUrl, /avatar_styled_idle/);
-    const a = resolveBodySheets({ bodyStyle: 'alt' });
-    assert.match(a.idleUrl, /avatar_styled_alt/);
-    const sprites = join(__dirname, '../public/assets/sprites');
-    assert.ok(existsSync(join(sprites, 'avatar_styled_idle.png')));
-    assert.ok(existsSync(join(sprites, 'avatar_styled_walk.png')));
-    assert.ok(existsSync(join(sprites, 'avatar_styled_alt.png')));
-  });
-});
-
-describe('pixel classify + recolor', () => {
-  it('classifies green hair, red shirt, blue pants, cream sole', () => {
-    assert.equal(classifyAvatarPixel(72, 140, 72, 255, 0.15), 'hair');
-    assert.equal(classifyAvatarPixel(180, 30, 40, 255, 0.5), 'shirt');
-    assert.equal(classifyAvatarPixel(40, 32, 40, 255, 0.5), 'shirtDark');
-    assert.equal(classifyAvatarPixel(50, 90, 140, 255, 0.7), 'pants');
-    assert.equal(classifyAvatarPixel(50, 130, 50, 255, 0.9), 'shoes');
-    assert.equal(classifyAvatarPixel(210, 195, 160, 255, 0.9), 'sole');
-    assert.equal(classifyAvatarPixel(190, 180, 165, 255, 0.4), 'skin');
-    assert.equal(classifyAvatarPixel(0, 0, 0, 0, 0.5), null);
-  });
-
-  it('recolorImageData changes green hair pixels toward blue target', () => {
-    // 2×2 image: green hair top, red shirt bottom
-    const w = 2;
-    const h = 2;
-    const data = new Uint8ClampedArray([
-      // y0 hair
-      72, 140, 72, 255, 80, 150, 80, 255,
-      // y1 shirt
-      180, 30, 40, 255, 40, 32, 40, 255,
-    ]);
-    const app = normalizeAppearance({
-      hair: { r: 40, g: 80, b: 220 },
-      shirt: { r: 20, g: 180, b: 60 },
-      shirtDark: { r: 10, g: 40, b: 20 },
-    });
-    const n = recolorImageData(data, w, h, app);
-    assert.ok(n >= 2);
-    // Hair pixel shifted toward blue (b higher relative)
-    assert.ok(data[2] > 100, `hair blue channel ${data[2]}`);
-    // Shirt red reduced / green increased toward forest
-    assert.ok(data[9] > data[8] || data[9] > 50);
-  });
-
-  it('applyTargetColor preserves relative lightness', () => {
-    const dark = applyTargetColor(40, 40, 40, { r: 200, g: 50, b: 50 });
-    const light = applyTargetColor(220, 220, 220, { r: 200, g: 50, b: 50 });
-    assert.ok(light.r > dark.r);
+    for (const id of ['glitch', 'classic', 'alt_base']) assert.equal(APPEARANCE_PRESETS[id], undefined, id);
   });
 });
 
@@ -169,7 +134,7 @@ describe('UI wiring', () => {
     assert.ok(game.includes('openAvatarPanel'));
     assert.ok(game.includes('character-builder'));
     assert.ok(game.includes('applyPlayerAppearance'));
-    assert.ok(game.includes('recolorImageData'));
+    assert.ok(!game.includes('recolorImageData'));
     assert.ok(game.includes('renderVectorControls'));
     assert.ok(game.includes('bakeLook'));
     const css = readFileSync(join(__dirname, '../public/style.css'), 'utf8');
@@ -254,7 +219,7 @@ describe('vector presets', () => {
     }
   });
 
-  it('gives every vector preset its own look, and keeps the bitmap presets', () => {
+  it('gives every vector preset its own look', () => {
     const keys = new Map();
     for (const p of Object.values(APPEARANCE_PRESETS)) {
       if (p.appearance.bodyStyle !== 'vector') continue;
@@ -263,8 +228,5 @@ describe('vector presets', () => {
       keys.set(key, p.id);
     }
     assert.equal(keys.size, 28);
-    assert.equal(APPEARANCE_PRESETS.glitch.appearance.bodyStyle, 'glitch');
-    assert.equal(APPEARANCE_PRESETS.classic.appearance.bodyStyle, 'classic');
-    assert.equal(APPEARANCE_PRESETS.alt_base.appearance.bodyStyle, 'alt');
   });
 });

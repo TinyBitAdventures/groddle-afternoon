@@ -1,9 +1,10 @@
 /**
- * Pose check: the composed default look against the recovered 62d8dab1
- * player sheets (assets/sprites/avatar/glitch-62d8/), frame for frame. The
- * same player's idle1-4 and idleSleepy sheets are recovered too (Wayback
- * c2.glitch.bz/avatars/2012-10-19/62d8dab1..._1350661246_idle*.png), so the
- * idle sheets are checked the same way.
+ * Pose check: the composed default look against a player's 2012 Glitch
+ * sheets recovered from Wayback (c2.glitch.bz/avatars/2012-10-19/
+ * 62d8dab1..._1350661246_{base,jump,climb,angry,happy,surprise,idle*}.png),
+ * frame for frame. Those sheets are a player's pixels, so they are research
+ * reference only: they live outside the game, in the audit workspace
+ * (POSE_REFERENCE_DIR, or GLITCH_POSE_REF=<dir>), and never ship.
  *
  * The outfits differ (62d8's exact articles are unknown), so the comparison
  * is on silhouettes: alpha agreement 1 - sum|a - b| / sum max(a, b) at one
@@ -13,13 +14,38 @@
  * Writes tools/avatar-compositor/score.json.
  */
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GLITCH_AVATAR, SHEET_FRAMES } from '../../public/js/avatar-anims.js';
+import { SHEET_FRAMES } from '../../public/js/avatar-anims.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = resolve(HERE, '../../public');
+
+/** Where the reference sheets live: ~/Documents/glitch-audit/research/avatars/reference/glitch-62d8/. */
+export const POSE_REFERENCE_DIR = process.env.GLITCH_POSE_REF || resolve(HERE, '../../../research/avatars/reference/glitch-62d8');
+
+/**
+ * The reference sheets' layout: each PNG cropped to its content, one row
+ * (the idle sheets wrap like the client's, cols = ceil(n / ceil(n / 39))),
+ * anchored on its feet line and content middle.
+ */
+export const POSE_REFERENCE = Object.freeze({
+  id: '62d8dab1',
+  sheets: Object.freeze({
+    base: { file: 'base.png', cells: 15, fw: 102, fh: 135, feetY: 133, midX: 52 },
+    jump: { file: 'jump.png', cells: 33, fw: 108, fh: 138, feetY: 135, midX: 60 },
+    climb: { file: 'climb.png', cells: 19, fw: 92, fh: 128, feetY: 123, midX: 57 },
+    angry: { file: 'angry.png', cells: 20, fw: 92, fh: 133, feetY: 130, midX: 51 },
+    happy: { file: 'happy.png', cells: 21, fw: 78, fh: 134, feetY: 131, midX: 40 },
+    surprise: { file: 'surprise.png', cells: 21, fw: 78, fh: 136, feetY: 133, midX: 40 },
+    idle1: { file: 'idle1.png', cells: 16, cols: 16, rows: 1, fw: 70, fh: 133, feetY: 131, midX: 36 },
+    idle2: { file: 'idle2.png', cells: 57, cols: 29, rows: 2, fw: 72, fh: 136, feetY: 134, midX: 37 },
+    idle3: { file: 'idle3.png', cells: 50, cols: 25, rows: 2, fw: 100, fh: 134, feetY: 132, midX: 51 },
+    idle4: { file: 'idle4.png', cells: 51, cols: 26, rows: 2, fw: 72, fh: 133, feetY: 131, midX: 37 },
+    idleSleepy: { file: 'idleSleepy.png', cells: 42, cols: 21, rows: 2, fw: 102, fh: 133, feetY: 131, midX: 52 },
+  }),
+});
 
 /** A sheet passes when its mean frame score reaches this. */
 export const POSE_SHEET_MIN = 0.7;
@@ -73,12 +99,15 @@ function agree(ref, mine, dx, dy) {
 
 export async function score({ write = true } = {}) {
   const { VECTOR_AVATAR } = await import(`../../public/js/avatar-vector-sheets.js?t=${Date.now()}`);
-  const report = { reference: GLITCH_AVATAR.id, sheets: {} };
+  if (!existsSync(join(POSE_REFERENCE_DIR, POSE_REFERENCE.sheets.base.file))) {
+    throw new Error(`pose reference sheets not found in ${POSE_REFERENCE_DIR} (research only; set GLITCH_POSE_REF)`);
+  }
+  const report = { reference: POSE_REFERENCE.id, sheets: {} };
   let ok = true;
   for (const [name, frames] of Object.entries(SHEET_FRAMES)) {
-    const rd = GLITCH_AVATAR.sheets[name];
+    const rd = POSE_REFERENCE.sheets[name];
     const md = VECTOR_AVATAR.sheets[name];
-    const refImg = readAlpha(join(PUBLIC, GLITCH_AVATAR.dir, rd.file));
+    const refImg = readAlpha(join(POSE_REFERENCE_DIR, rd.file));
     const mineImg = readAlpha(join(PUBLIC, VECTOR_AVATAR.dir, md.file));
     const rc = rd.cols ?? rd.cells;
     const refs = frames.map((_, k) => cell(refImg, (k % rc) * rd.fw, Math.floor(k / rc) * rd.fh, rd.fw, rd.fh));

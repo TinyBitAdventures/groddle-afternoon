@@ -206,19 +206,13 @@ function setupArena(street, engine) {
     const start = START_POINTS[i + 1];
     let sprite = null;
     let label = null;
-    // Each rival is a vector Glitch with its name's look (engine.npcGlitch); the tinted portrait strip is the fallback.
+    // Each rival is a vector Glitch with its name's look (engine.npcGlitch).
     const npc = engine.npcGlitch?.(r.name) || null;
-    const frames = npc ? null : engine.textures?.avatarStyledWalk?.frames || [];
-    if (npc || frames.length) {
-      sprite = npc ? npc.sprite : new PIXI.AnimatedSprite(frames);
+    if (npc) {
+      sprite = npc.sprite;
       sprite.npc = npc;
-      if (!npc) {
-        sprite.anchor.set(0.5, 1);
-        sprite.animationSpeed = 0.2;
-        sprite.tint = r.tint;
-      }
-      sprite.crowdScale = npc ? npc.scale : RIVAL_SCALE;
-      sprite.facesRight = Boolean(npc);
+      sprite.crowdScale = npc.scale;
+      sprite.facesRight = true;
       sprite.scale.set(sprite.crowdScale);
       sprite.zIndex = 46;
       sprite.eventMode = 'none';

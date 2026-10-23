@@ -573,19 +573,13 @@ function spawnRaceEntities(engine) {
     engine.entityLayer.addChild(finishSprite);
   }
   if (course.kind === 'quoins') spawnQuoins(engine);
-  // The rival is a vector Glitch with its name's look (engine.npcGlitch); the tinted portrait strip is the fallback.
+  // The rival is a vector Glitch with its name's look (engine.npcGlitch).
   const npc = engine.npcGlitch?.(run.rivalName || run.raceId) || null;
-  const frames = npc ? null : engine.textures?.avatarStyledWalk?.frames || [];
-  if (npc || frames.length) {
-    rivalSprite = npc ? npc.sprite : new PIXI.AnimatedSprite(frames);
+  if (npc) {
+    rivalSprite = npc.sprite;
     rivalSprite.npc = npc;
-    if (!npc) {
-      rivalSprite.anchor.set(0.5, 1);
-      rivalSprite.animationSpeed = 0.18;
-      rivalSprite.tint = run.rivalTint;
-    }
-    rivalSprite.crowdScale = npc ? npc.scale : RIVAL_SCALE;
-    rivalSprite.facesRight = Boolean(npc);
+    rivalSprite.crowdScale = npc.scale;
+    rivalSprite.facesRight = true;
     rivalSprite.scale.set(rivalSprite.crowdScale);
     rivalSprite.x = course.spawn.rival.x;
     rivalSprite.y = course.spawn.rival.y;
