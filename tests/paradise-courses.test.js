@@ -12,7 +12,9 @@ import {
   ARBOR_NEST,
   DRAFTY_UPLIFT_JOKES,
   PARADISE_UNCONFIRMED_RELEASE_LINE,
-  SKY_PLUNGE_FALL_Y,
+  SKY_PLUNGE_BACK_TO_TOP,
+  SKY_PLUNGE_LANDING_SIGNS,
+  SKY_PLUNGE_LANDING_Y,
   SKY_PLUNGE_QURAZY_INDEX,
   resolveParadiseCourseAlias,
   stepParadiseBody,
@@ -353,11 +355,11 @@ function pilot(course, maxFrames = 4 * 60 * 60, skip = () => false) {
       if (score < best) { best = score; target = pick; }
     }
     if (course.movement === 'plunge' && left.size && target === course.exit) {
-      // Nothing left below: drop into the cloud sea, away from the exit
-      // cloud, to be lifted back up for another fall.
-      target = { x: 300, y: course.height };
+      // Nothing left below: walk to the landing's Back to Top door to go up
+      // for another fall.
+      target = course.backToTop;
     }
-    const goalY = left.size ? target.y + 30 : target.y;
+    const goalY = left.size && target !== course.backToTop ? target.y + 30 : target.y;
     const dx = target.x - b.x;
     const dy = goalY - b.y;
     const input = { left: dx < -10, right: dx > 10 };
@@ -380,7 +382,7 @@ function pilot(course, maxFrames = 4 * 60 * 60, skip = () => false) {
       input.down = dy > 20;
     }
     const { events } = stepParadiseBody(course, b, input, 1);
-    if (events.includes('respawn')) falls += 1;
+    if (events.includes('respawn') || events.includes('back_to_top')) falls += 1;
     for (const index of [...left]) {
       if (skip(index, falls)) continue;
       if (touches(course.pickups[index], b)) left.delete(index);
@@ -440,27 +442,45 @@ test('Sky Plunge keeps the card copy and the card art palette', () => {
   assert.match(course.completion, /every quoin/);
 });
 
-test('Sky Plunge: the cloud sea lifts you back to the top cloud to fall again', () => {
+test('Sky Plunge lands on the Snap\'s cloud floor, with Back to Top on the left and EXIT on the right', () => {
   const course = EXTRA_PARADISE_COURSES.sky_plunge;
-  assert.equal(course.fallReturn, 'spawn');
-  assert.equal(course.fallY, SKY_PLUNGE_FALL_Y);
-  assert.ok(!course.platforms.some((plat) => plat.kind === 'cloud-floor'), 'no floor under the fall');
-  const exitCloud = course.platforms.find((plat) => plat.id === 'exit-cloud');
-  assert.ok(exitCloud.y < SKY_PLUNGE_FALL_Y && SKY_PLUNGE_FALL_Y < course.height);
-  // Land on the exit cloud, then walk off its edge into the sea.
-  const b = body(1000, 4200, { onGround: false, vy: 3 });
+  // research/wayback/raw/snaps/paradise_sky_plunge/ (Festeus, 2012-10-01): the only image of the course.
+  const landing = course.platforms.find((plat) => plat.id === 'landing');
+  assert.deepEqual([landing.x1, landing.x2, landing.y], [0, course.width, SKY_PLUNGE_LANDING_Y]);
+  assert.equal(course.fallY, undefined, 'no cloud sea: the floor catches every fall');
+  assert.equal(course.backToTop, SKY_PLUNGE_BACK_TO_TOP);
+  assert.equal(course.backToTop.label, 'Back to Top');
+  assert.ok(course.backToTop.x < course.width * 0.25 && course.exit.x > course.width * 0.75, 'Back to Top left, EXIT right');
+  assert.equal(course.exit.y, SKY_PLUNGE_LANDING_Y);
+  assert.deepEqual(SKY_PLUNGE_LANDING_SIGNS.map((sign) => sign.text), ['AHHHHH YEAHHHH!!!!!', 'Back to Top', 'EXIT']);
+  const [lettering, back, exit] = SKY_PLUNGE_LANDING_SIGNS;
+  assert.ok(lettering.y < back.y && back.y < SKY_PLUNGE_LANDING_Y, 'the lettering is high in the sky, the signs over the doors');
+  assert.ok(back.x <= course.backToTop.x && exit.x >= course.exit.x, 'signs lean outward over their doors, as in the Snap');
+  // No quoin is in reach of the door, so a fall never sends you up by accident.
+  for (const pick of course.pickups) assert.ok(Math.abs(pick.x - course.backToTop.x) > course.backToTop.reach + 30);
+  // Land, walk left into the door: back up to the start cloud.
+  const b = body(500, SKY_PLUNGE_LANDING_Y - 60, { onGround: false, vy: 3 });
   run(course, b, 40);
   assert.equal(b.onGround, true);
-  assert.equal(b.y, exitCloud.y);
-  b.safe = { x: 1000, y: exitCloud.y }; // even after landing there, the sea returns you to the top
-  let lifted = false;
-  for (let index = 0; index < 200 && !lifted; index += 1) {
-    lifted = stepParadiseBody(course, b, { left: true }, 1).events.includes('respawn');
+  assert.equal(b.y, SKY_PLUNGE_LANDING_Y);
+  let up = false;
+  for (let index = 0; index < 400 && !up; index += 1) {
+    up = stepParadiseBody(course, b, { left: true }, 1).events.includes('back_to_top');
   }
-  assert.ok(lifted);
+  assert.ok(up);
   assert.deepEqual([b.x, b.y, b.onGround], [course.spawn.x, course.spawn.y, true]);
+  // Walking right along the landing never passes the door: EXIT is the other way.
+  const c = body(700, SKY_PLUNGE_LANDING_Y);
+  assert.ok(!run(course, c, 300, { right: true }).includes('back_to_top'));
+  // The Snap's landing sky is cream-gold (#eee0b6); the card's mint stays at the top.
+  const bottom = course.palette[3];
+  assert.ok(Math.abs(((bottom >> 16) & 0xff) - 0xee) < 8 && Math.abs(((bottom >> 8) & 0xff) - 0xe0) < 8 && Math.abs((bottom & 0xff) - 0xb6) < 8);
+  // The doors are CC0 location art rendered by tools/room-art.
+  const art = fs.readFileSync(path.join(publicDir, 'js', 'sky-plunge-art.js'), 'utf8');
+  const file = /door_asset_heights_interior: \['([^']+)'/.exec(art)[1];
+  assert.ok(fs.existsSync(path.join(publicDir, 'assets', 'sprites', 'paradise', 'sky_plunge', file)));
   // Mountain Scaling still returns you to the last rock.
-  assert.equal(EXTRA_PARADISE_COURSES.mountain_scaling.fallReturn, undefined);
+  assert.ok(EXTRA_PARADISE_COURSES.mountain_scaling.fallY);
 });
 
 test('Sky Plunge: a pilot who misses quoins on the first fall finishes on later falls inside four minutes', () => {

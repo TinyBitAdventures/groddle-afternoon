@@ -23,8 +23,9 @@
  * - Two from their ticket description and ticket art only (no recording
  *   was found): Updraft and Drafty Uplift. Their mechanics read the
  *   description literally and their copy is remake copy.
- * - Sky Plunge from its upgrade card, card art and player reports (no
- *   recording, no geometry): see the Sky Plunge block below.
+ * - Sky Plunge from its upgrade card, card art, player reports and one
+ *   player Snap of its landing (no recording, no geometry): see the Sky
+ *   Plunge block below.
  *
  * Reward amounts use the same scale as the four shipped courses (the
  * recorded values at the recorders' quoin multipliers: 120 iMG, 100 of a
@@ -235,7 +236,19 @@ const UPDRAFT_PICKUPS = Object.freeze(
 //   drop through soft, morning clouds. Can you collect every quoin?"
 // - the CC0 card art (opengameart extracted_imagination
 //   art_keepable_t2p_skyplunge.png): a mint-to-pale-yellow sky (#c7f1e2 at
-//   the top to #d9e4b8 low down) with white clouds; used for the palette;
+//   the top to #d9e4b8 low down) with white clouds; the top of the palette;
+// - the only image of the course, a player Snap of its landing (Festeus,
+//   2012-10-01; glitchthegame.com snap PHF6RRQFSTC2DA8, its location link is
+//   LHFO01RM7I238UN; research/wayback/raw/snaps/paradise_sky_plunge/,
+//   reference only): a cream-gold sky (#eee0b6) with sun rays over a white
+//   cloud floor, the sky lettering "AHHHHH YEAHHHH!!!!!", and two wooden
+//   doors on the floor in front of the cloud banks at either side, signed
+//   "Back to Top" (left) and "EXIT" (right). The lettering and the two signs
+//   are transcribed from it (drawn as remake text, as other rooms took text
+//   from recordings); the doors are the CC0 door_asset_heights_interior.
+//   No source says what "Back to Top" did; doors in Glitch locations were
+//   location geometry, and the name says it: it takes you back up to the top
+//   cloud for another fall (players needed several falls for every quoin).
 // - player reports (glitch.com forum general/24841, 25493, bugs/27422;
 //   reference only): a freefall, every quoin often takes several falls, a
 //   Qurazy quoin is in the course, and collecting every quoin plays a
@@ -245,17 +258,23 @@ const UPDRAFT_PICKUPS = Object.freeze(
 //   the Sky Plunge music, named for Ryan's WIP street cloud_drop_2
 //   (LDOQBF6DEO138FJ, inc_data_maps_prod.js:18592). No source binds a key to
 //   LHFO01RM7I238UN, and TICKET_TO_PARADISE1 (the full take) is unrecovered.
-// Remake choices: the 26-quoin layout, falling into the cloud sea below
-// lifting you back to the top cloud to plunge again (the source says only
-// that players fell again), the Qurazy as one of the last two quoins, the
-// message wording, and the exit opening once every quoin is in, as on every
-// remake course.
+// Remake choices: the 26-quoin layout, the Qurazy as one of the last two
+// quoins, the message wording, the door positions read off the Snap, and the
+// exit opening once every quoin is in, as on every remake course.
+/** The landing's cloud floor (the Snap's), across the whole course. */
+export const SKY_PLUNGE_LANDING_Y = 4260;
 const PLUNGE_PLATFORMS = freezeList([
   platform(160, 460, 320, { kind: 'cloud-shelf', id: 'start-cloud' }),
-  platform(800, 1240, 4260, { kind: 'cloud-shelf', id: 'exit-cloud' }),
+  platform(0, 1400, SKY_PLUNGE_LANDING_Y, { kind: 'cloud-floor', id: 'landing' }),
 ]);
-/** Below this the cloud sea lifts you back to the start cloud. */
-export const SKY_PLUNGE_FALL_Y = 4330;
+/** The "Back to Top" door (left on the landing): stand at it to go back up to the start cloud. */
+export const SKY_PLUNGE_BACK_TO_TOP = Object.freeze({ x: 225, y: SKY_PLUNGE_LANDING_Y, reach: 36, label: 'Back to Top' });
+/** Text on the landing, transcribed from the Snap (positions read off it). */
+export const SKY_PLUNGE_LANDING_SIGNS = Object.freeze([
+  Object.freeze({ id: 'lettering', text: 'AHHHHH YEAHHHH!!!!!', x: 640, y: SKY_PLUNGE_LANDING_Y - 340, size: 62 }),
+  Object.freeze({ id: 'back-to-top', text: 'Back to Top', x: 205, y: SKY_PLUNGE_LANDING_Y - 240, size: 40 }),
+  Object.freeze({ id: 'exit', text: 'EXIT', x: 1185, y: SKY_PLUNGE_LANDING_Y - 240, size: 40 }),
+]);
 const PLUNGE_PICKUPS = Object.freeze(
   Array.from({ length: 26 }, (_, index) =>
     pt(Math.round(700 + Math.sin(index * 0.8) * 400), 600 + index * 140)
@@ -582,13 +601,13 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     height: 4400,
     ceilingY: 80,
     spawn: pt(300, 320),
-    exit: pt(1120, 4260),
+    exit: pt(1150, SKY_PLUNGE_LANDING_Y),
     platforms: PLUNGE_PLATFORMS,
     pickups: PLUNGE_PICKUPS,
-    // Falling into the cloud sea lifts you back to the start cloud.
-    fallY: SKY_PLUNGE_FALL_Y,
-    fallReturn: 'spawn',
-    respawnToast: 'The clouds lift you back up. Plunge again!',
+    // The landing's left door takes you back up to the start cloud (the Snap).
+    backToTop: SKY_PLUNGE_BACK_TO_TOP,
+    backToTopToast: 'Back to the top. Plunge again!',
+    landingSigns: SKY_PLUNGE_LANDING_SIGNS,
     physics: Object.freeze({ gravity: 0.3, terminalVy: 5.6, floatVy: 1.8, diveVy: 9, maxVx: 4.2, airAccel: 0.32 }),
     objective: 'Can you collect every quoin? 26 in the clouds',
     // The special message for every quoin (remake copy after Radial Heights'
@@ -599,11 +618,11 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     musicFile: 'CLOUD_DROP_2',
     completionSound: 'CLOUD_DROP_2_INTRO',
     controls: 'Arrows steer · hold Spacebar to float · Down dives',
-    controlsHint: 'Step off the cloud and fall. Arrow keys steer, hold Spacebar to float, Down to dive. Missed a quoin? Fall into the clouds below to plunge again.',
+    controlsHint: 'Step off the cloud and fall. Arrow keys steer, hold Spacebar to float, Down to dive. Missed a quoin? The Back to Top door on the landing takes you up for another plunge.',
     prompt: 'STEP OFF AND PLUNGE!',
-    // Card art sky: mint at the top to pale yellow low down.
-    palette: Object.freeze([0xc4f0e2, 0xcbedd6, 0xd3e8c6, 0xdde3b2]),
-    transitionColors: Object.freeze([0xc4f0e2, 0xdde3b2]),
+    // Card art sky (mint) at the top to the Snap's cream-gold landing sky.
+    palette: Object.freeze([0xc4f0e2, 0xd4ecc9, 0xe7e3ba, 0xefe0b5]),
+    transitionColors: Object.freeze([0xc4f0e2, 0xefe0b5]),
     rewards: [
       xp(), mood(), currants(), xp(), energy(), xp(), favor(), xp(360),
       currants(), mood(), xp(), energy(), xp(), currants(), xp(480), mood(),
@@ -806,10 +825,21 @@ function stepOnce(course, body, input, h, events) {
     body.onGround = false;
   }
 
+  // Sky Plunge's "Back to Top" door: standing at it on the landing takes you
+  // back up to the start cloud for another fall.
+  const door = course.backToTop;
+  if (door && body.onGround && Math.abs(body.y - door.y) < 1 && Math.abs(body.x - door.x) <= door.reach) {
+    body.x = course.spawn.x;
+    body.y = course.spawn.y;
+    body.vx = 0;
+    body.vy = 0;
+    body.onGround = true;
+    events.push('back_to_top');
+  }
+
   if (course.fallY && body.y > course.fallY) {
-    // Mountain Scaling returns you to the last rock; Sky Plunge's cloud sea
-    // lifts you back to the top cloud for another fall.
-    const safe = course.fallReturn === 'spawn' ? course.spawn : body.safe || course.spawn;
+    // Mountain Scaling returns you to the last rock.
+    const safe = body.safe || course.spawn;
     body.x = safe.x;
     body.y = safe.y;
     body.vx = 0;

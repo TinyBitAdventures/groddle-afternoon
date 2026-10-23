@@ -17,6 +17,7 @@
  */
 
 import { stepParadiseBody, usesParadiseBody } from './paradise-courses.js';
+import { SKY_PLUNGE_FILES } from './sky-plunge-art.js';
 import { isLoaded, onLoaded, textureFromUrl } from './textures.js';
 
 const DECO_ROOT = 'assets/decos/groddle';
@@ -54,12 +55,19 @@ export const PARADISE_COURSE_DECOS = Object.freeze({
     'heights_coniferous_4', 'tree_coniferous_1', 'platform_branch_a04', 'platform_branch_a02', 'door_asset_alakol_door',
   ],
   updraft: ['clouds_bg_middleplus_01a_newxp', 'clouds_bg_middleplus_01b_newxp', 'cloud_fluffy_1', 'cloud_fluffy_2', 'door_asset_heights', 'firebog_sign_blank_plank'],
-  sky_plunge: ['clouds_bg_middleplus_01a_newxp', 'clouds_bg_middleplus_01b_newxp', 'cloud_fluffy_1', 'cloud_fluffy_2', 'door_asset_heights', 'firebog_sign_blank_plank'],
+  sky_plunge: ['clouds_bg_middleplus_01a_newxp', 'clouds_bg_middleplus_01b_newxp', 'cloud_fluffy_1', 'cloud_fluffy_2'],
   drafty_uplift: ['clouds_bg_middleplus_01a_newxp', 'clouds_bg_middleplus_01b_newxp', 'cloud_fluffy_1', 'freeny_cloud_2', 'door_asset_heights', 'firebog_sign_blank_plank'],
 });
 
+/** Art rendered for one course by tools/room-art (file names carry their world size). */
+const SKY_PLUNGE_ART_DIR = 'assets/sprites/paradise/sky_plunge/';
+const skyPlungeUrl = (name) => `${SKY_PLUNGE_ART_DIR}${SKY_PLUNGE_FILES[name][0]}`;
+const COURSE_ART_URLS = Object.freeze({
+  sky_plunge: [skyPlungeUrl('door_asset_heights_interior')],
+});
+
 export function paradiseCoursePreloadUrls(course) {
-  return (PARADISE_COURSE_DECOS[course?.art] || []).map(decoUrl);
+  return [...(PARADISE_COURSE_DECOS[course?.art] || []).map(decoUrl), ...(COURSE_ART_URLS[course?.art] || [])];
 }
 
 // --- small drawing helpers ---------------------------------------------------
@@ -578,17 +586,41 @@ function paintUpdraft(root, course, fg, art) {
 const CARD_CLOUD_TINT = 0xf5fdf4;
 
 function paintSkyPlunge(root, course, fg, art) {
-  // Card art look (art_keepable_t2p_skyplunge): a mint-to-pale-yellow morning
-  // sky (course.palette) with soft white clouds; a pale morning sun up top.
+  // Card art look (art_keepable_t2p_skyplunge) up top: a mint morning sky
+  // (course.palette) with soft white clouds and a pale sun. Low down, the
+  // landing as its player Snap shows it: a cream-gold sky with sun rays, a
+  // white cloud floor with cloud banks at either side, the sky lettering and
+  // two wooden doors signed "Back to Top" and "EXIT".
   const sun = new PIXI.Graphics();
   sun.circle(1120, 260, 170).fill({ color: 0xfffbe2, alpha: 0.4 });
   sun.circle(1120, 260, 82).fill({ color: 0xfffdf0, alpha: 0.92 });
   sun.zIndex = -90;
   root.addChild(sun);
+  const landingY = course.backToTop?.y ?? course.exit.y;
+  // Sun rays fanning down over the landing from a sun above the view.
+  const rayOrigin = { x: course.width * 0.46, y: landingY - 1150 };
+  for (let index = 0; index < 9; index += 1) {
+    const angle = Math.PI / 2 + (index - 4) * 0.13 + (index % 2 ? 0.03 : -0.02);
+    const spread = 0.035 + (index % 3) * 0.012;
+    const reach = 1250;
+    const ray = new PIXI.Graphics();
+    ray.poly([
+      rayOrigin.x, rayOrigin.y,
+      rayOrigin.x + Math.cos(angle - spread) * reach, rayOrigin.y + Math.sin(angle - spread) * reach,
+      rayOrigin.x + Math.cos(angle + spread) * reach, rayOrigin.y + Math.sin(angle + spread) * reach,
+    ]).fill({ color: 0xfffaea, alpha: 1 });
+    ray.alpha = 0.16 + (index % 3) * 0.05;
+    ray.zIndex = -85;
+    ray._phase = index * 0.9;
+    root.addChild(ray);
+    art.rays.push(ray);
+  }
   for (let index = 0; index < 30; index += 1) {
     const front = index % 6 === 0;
+    const y = 700 + index * 120;
+    if (y > landingY - 260) continue; // the landing's sky is open, as in the Snap
     deco(art, front ? fg : root, index % 2 ? 'cloud_fluffy_1' : 'clouds_bg_middleplus_01b_newxp',
-      (index * 311 + 80) % course.width, 700 + index * 120, {
+      (index * 311 + 80) % course.width, y, {
         width: front ? 360 : 280 + (index % 4) * 90,
         alpha: front ? 0.55 : 0.8,
         tint: index % 3 ? 0xffffff : CARD_CLOUD_TINT,
@@ -596,21 +628,65 @@ function paintSkyPlunge(root, course, fg, art) {
         flipX: index % 2 === 0,
       });
   }
-  course.platforms.forEach((plat) => {
-    if (plat.id === 'start-cloud') {
-      cloudBand(art, root, { x1: plat.x1 + 40, x2: plat.x2 - 40, y: plat.y + 40, width: 380, z: -8, tint: CARD_CLOUD_TINT });
-    } else if (plat.id === 'exit-cloud') {
-      cloudBand(art, root, { x1: plat.x1 + 40, x2: plat.x2 - 40, y: plat.y + 40, width: 420, z: -8, tint: CARD_CLOUD_TINT });
+  const start = course.platforms.find((plat) => plat.id === 'start-cloud');
+  if (start) cloudBand(art, root, { x1: start.x1 + 40, x2: start.x2 - 40, y: start.y + 40, width: 380, z: -8, tint: CARD_CLOUD_TINT });
+  // The landing, as soft white mist (the Snap's clouds are plain white, not
+  // the shaded newxp cumulus): banks rising at both sides behind the doors
+  // and a cloud floor, drawn as vector mounds with feathered edges (stacked
+  // translucent rings; a BlurFilter on these wide shapes drew nothing).
+  const softEllipse = (g, x, y, w, h, feather = 40, steps = 6) => {
+    for (let k = steps; k >= 1; k -= 1) {
+      const grow = (feather * k) / steps;
+      g.ellipse(x, y, w + grow, h + grow).fill({ color: 0xffffff, alpha: 0.16 });
     }
-  });
-  // The cloud sea below: falling into it lifts you back to the start cloud
-  // (course.fallReturn), so it sits just under the exit cloud.
-  const seaY = (course.fallY || course.height) + 10;
-  cloudBand(art, root, { x1: 0, x2: course.width, y: seaY, width: 760, z: -9, tint: CARD_CLOUD_TINT });
-  rect(fg, 0, seaY, course.width, course.height - seaY, 0xf8faef, 1, 51);
-  cloudBand(art, fg, { x1: 0, x2: course.width, y: seaY + 60, width: 700, z: 52, alpha: 0.96, tint: CARD_CLOUD_TINT });
-  deco(art, root, 'door_asset_heights', course.exit.x, course.exit.y + 6, { height: 140, z: -7 });
-  exitPlank(art, root, course.exit.x, course.exit.y - 158, { width: 96 });
+    g.ellipse(x, y, w, h).fill({ color: 0xffffff, alpha: 0.97 });
+  };
+  const banks = new PIXI.Graphics();
+  const leftX = course.backToTop?.x ?? 200;
+  const rightX = course.exit.x;
+  // [x, half width, half height]: a mound whose top meets the door's top,
+  // sloping down toward the middle of the landing.
+  for (const [x, w, h] of [
+    [leftX - 90, 250, 215], [leftX + 110, 190, 150], [leftX + 260, 150, 80],
+    [rightX + 90, 250, 215], [rightX - 110, 190, 150], [rightX - 260, 150, 80],
+  ]) {
+    softEllipse(banks, x, landingY - 10, w - 30, h - 30);
+  }
+  banks.zIndex = -12;
+  root.addChild(banks);
+  const floor = new PIXI.Graphics();
+  for (let x = -80; x < course.width + 160; x += 150) {
+    softEllipse(floor, x, landingY + 20, 110, 30 + ((x / 150) % 3) * 8, 30, 5);
+  }
+  floor.rect(0, landingY + 20, course.width, course.height - landingY).fill({ color: 0xffffff, alpha: 1 });
+  floor.zIndex = -9;
+  root.addChild(floor);
+  rect(fg, 0, landingY + 40, course.width, course.height - landingY - 40, 0xffffff, 1, 51);
+  const mist = new PIXI.Graphics();
+  for (let index = 0; index < 8; index += 1) {
+    mist.rect(0, landingY - 30 + index * 9, course.width, 10).fill({ color: 0xffffff, alpha: 0.05 + index * 0.1 });
+  }
+  mist.zIndex = 50;
+  fg.addChild(mist);
+  // The two doors (CC0 door_asset_heights_interior), their feet in the mist.
+  for (const x of [course.backToTop?.x, course.exit.x].filter((v) => v != null)) {
+    const door = new PIXI.Sprite(textureFromUrl(skyPlungeUrl('door_asset_heights_interior')));
+    door.anchor.set(0.5, 1);
+    door.position.set(x, landingY + 14);
+    door.zIndex = -7;
+    root.addChild(door);
+    art.decos += 1;
+  }
+  // The lettering and door signs, transcribed from the Snap, drawn as text.
+  for (const sign of course.landingSigns || []) {
+    const lettering = sign.id === 'lettering';
+    textSign(art, root, sign.x, sign.y, sign.text, {
+      size: sign.size,
+      color: 0xffffff,
+      stroke: lettering ? 0xe9d6a2 : 0x3f3a2c,
+      z: lettering ? -30 : -5,
+    });
+  }
   motes(art, root, course, 50, { color: 0xffffff, alpha: 0.5, rise: -0.1, size: 2.4, z: -35 });
 }
 
@@ -692,7 +768,7 @@ function readInput(keys) {
   };
 }
 
-const runtimeState = { respawns: 0, bounces: 0, lastEvent: '', previewHeld: false };
+const runtimeState = { respawns: 0, backToTop: 0, bounces: 0, lastEvent: '', previewHeld: false };
 
 export const paradiseCourseRuntime = {
   /** Whether this course's avatar is stepped here rather than by game.js. */
@@ -703,6 +779,7 @@ export const paradiseCourseRuntime = {
   /** After the course is built and the avatar placed at the spawn. */
   enter(host, course) {
     runtimeState.respawns = 0;
+    runtimeState.backToTop = 0;
     runtimeState.bounces = 0;
     runtimeState.lastEvent = '';
     const player = host.player;
@@ -713,7 +790,19 @@ export const paradiseCourseRuntime = {
     );
     const preview = host.preview;
     runtimeState.previewHeld = false;
-    if (preview === 'exit' || preview === 'mid') {
+    if (['landing', 'backdoor', 'lettering'].includes(preview) && course.backToTop) {
+      // Sky Plunge's landing as its Snap shows it: `landing` stands on the
+      // cloud floor between the two doors, `backdoor` beside Back to Top;
+      // `lettering` holds the last of the fall, where the sky lettering
+      // passes under the room card.
+      const floor = preview !== 'lettering';
+      player.x = preview === 'backdoor' ? course.backToTop.x + 260 : course.width / 2;
+      player.y = course.backToTop.y - (floor ? 0 : 430);
+      player.vx = 0;
+      player.vy = 0;
+      player.onGround = floor;
+      runtimeState.previewHeld = true;
+    } else if (preview === 'exit' || preview === 'mid') {
       const target = preview === 'exit'
         ? { x: course.exit.x - 150, y: course.exit.y }
         : course.pickups[Math.floor(course.pickups.length / 2)];
@@ -763,7 +852,12 @@ export const paradiseCourseRuntime = {
         const cloud = host.bgLayer?.paradiseCourseArt?.bouncers?.get(player.lastBounce);
         if (cloud) cloud._squashAt = host.now();
       } else if (event === 'land') host.playSfx('step', { volume: 0.2, rate: 1.1 });
-      else if (event === 'respawn') {
+      else if (event === 'back_to_top') {
+        runtimeState.backToTop += 1;
+        host.playSfx('jump', { volume: 0.4, rate: 0.8 });
+        host.toast(course.backToTopToast || 'Back to the top!', 1800);
+        host.burst(player.x, player.y - 30, 0xffffff, 14);
+      } else if (event === 'respawn') {
         runtimeState.respawns += 1;
         host.toast(course.respawnToast || 'Whoops! Back to the last rock.', 1800);
         host.burst(player.x, player.y - 30, 0xffffff, 14);
@@ -825,7 +919,7 @@ export const paradiseCourseRuntime = {
       paradiseGrounded: player?.onGround ? '1' : '0',
       paradiseSpeed: Math.abs(player?.vx || 0).toFixed(2),
       paradiseRespawns: String(runtimeState.respawns),
-      paradiseFallReturn: course.fallReturn || '',
+      paradiseBackToTop: course.backToTop ? String(runtimeState.backToTop) : '',
       paradiseReleaseNote: course.releaseNote || '',
       paradiseBounces: String(runtimeState.bounces),
       paradiseLastEvent: runtimeState.lastEvent,
