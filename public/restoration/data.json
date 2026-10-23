@@ -1805,9 +1805,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 287,
+  "commits": 288,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Flip your Tower to face the other way"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1922,11 +1927,6 @@
     "date": "2026-10-22",
     "kind": "improve",
     "text": "Streets only have the animals the archive recorded"
-   },
-   {
-    "date": "2026-10-22",
-    "kind": "improve",
-    "text": "The seven races follow their recordings: Lava Leap's nine landings, Crystal Climb's tall map, Star Sprint's planet trap"
    }
   ]
  },

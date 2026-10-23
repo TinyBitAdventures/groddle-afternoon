@@ -8,6 +8,8 @@ import {
   PARADISE_COURSES,
   PARADISE_DAILY_LIMIT,
   PARADISE_DURATION_MS,
+  PARADISE_HELL_BLOCK,
+  PARADISE_TICKET_EAT,
   CLOUD_RING_PROFILES,
   RADIAL_HEIGHTS_MOON,
   STARLIT_NIGHT_MOON,
@@ -21,12 +23,14 @@ import {
   collectParadisePickup,
   createParadiseRun,
   createParadiseState,
+  eatParadiseTicket,
   finishParadiseRun,
   paradiseObjective,
   paradiseRemainingMs,
   paradiseRunProgress,
   paradiseTicketCost,
   passParadiseRing,
+  quoteParadiseTicket,
   slipTerrainSlope,
   slipTerrainY,
   starlitMoonPlainAlpha,
@@ -263,4 +267,56 @@ test('client ships real ticket art, a flight HUD, and deterministic QA entry', (
   assert.match(html, /id="paradise-flight-hud"/);
   assert.match(html, /data-paradise-controls/);
   assert.match(css, /\.paradise-flight-hud/);
+});
+
+test('eating a ticket gives 20 iMG and 1 energy with one of the eight source quips (paradise_ticket.js verbs.eat)', () => {
+  assert.equal(PARADISE_TICKET_EAT.imagination, 20);
+  assert.equal(PARADISE_TICKET_EAT.energy, 1);
+  assert.equal(PARADISE_TICKET_EAT.tooltip, 'Eat this to gain 20 iMG and 1 energy');
+  assert.deepEqual([...PARADISE_TICKET_EAT.quips], [
+    'Yum!',
+    'Hmm, slightly stale.',
+    'Tastes like chicken!',
+    'The paper got stuck in your teeth.',
+    'Yum!',
+    'You got a papercut on your tongue. Ouch!',
+    'Mmm, not bad.',
+    'Mmm, tasty.',
+  ]);
+  const eaten = eatParadiseTicket({ rng: () => 0 });
+  assert.deepEqual(eaten, { count: 1, imagination: 20, energy: 1, quip: 'Yum!' });
+  assert.equal(eatParadiseTicket({ rng: () => 0.999 }).quip, 'Mmm, tasty.');
+  assert.equal(eatParadiseTicket({ rng: () => 0.5 }).quip, 'Yum!');
+  assert.equal(eatParadiseTicket({ count: 3, rng: () => 0.3 }).imagination, 60);
+  // metabolics_add_energy: the dead (and super pooped) gain no energy, the iMG still lands.
+  assert.deepEqual(
+    eatParadiseTicket({ rng: () => 0.3, energyAllowed: false }),
+    { count: 1, imagination: 20, energy: 0, quip: 'Tastes like chicken!' }
+  );
+});
+
+test("the dead can't activate a ticket, checked before the daily limit", () => {
+  assert.equal(PARADISE_HELL_BLOCK, "You can't just magically ascend from Hell!");
+  const now = Date.UTC(2026, 9, 23);
+  const state = createParadiseState({}, now);
+  const dead = quoteParadiseTicket(state, 'cloud_rings', { imagination: 999999, now, dead: true });
+  assert.equal(dead.ok, false);
+  assert.equal(dead.reason, 'dead');
+  const refused = activateParadiseTicket(state, 'cloud_rings', { imagination: 999999, now, dead: true });
+  assert.equal(refused.reason, 'dead');
+  assert.equal(state.ticketsToday, 0);
+  state.ticketsToday = PARADISE_DAILY_LIMIT;
+  assert.equal(quoteParadiseTicket(state, 'cloud_rings', { imagination: 999999, now, dead: true }).reason, 'dead');
+  assert.equal(quoteParadiseTicket(state, 'cloud_rings', { imagination: 999999, now }).reason, 'daily_limit');
+});
+
+test('the pack popover offers Eat beside Activate and asks Hell before activating', () => {
+  const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
+  assert.match(game, /data-pack-eat-ticket title="\$\{escapeHtml\(PARADISE_TICKET_EAT\.tooltip\)\}">Eat one</);
+  assert.match(game, /function eatPackedParadiseTicket\(classTsid\)/);
+  assert.match(game, /features\.query\('isDead', engine\) === true/);
+  assert.match(game, /quote\.reason === 'dead'\s*\? PARADISE_HELL_BLOCK/);
+  assert.match(game, /Ticket to Paradise cards per day\./);
+  // Both the quote and the confirmed activation pass the Hell state.
+  assert.equal((game.match(/dead: playerIsDead\(\)/g) || []).length >= 3, true);
 });

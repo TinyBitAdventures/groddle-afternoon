@@ -282,6 +282,7 @@ import {
   collectParadisePickup,
   createParadiseRun,
   createParadiseState,
+  eatParadiseTicket,
   expireParadiseRun,
   finishParadiseRun,
   paradiseObjective,
@@ -290,12 +291,14 @@ import {
   paradiseTicketCost,
   paradiseObjectiveComplete,
   passParadiseRing,
+  PARADISE_HELL_BLOCK,
+  PARADISE_TICKET_EAT,
   quoteParadiseTicket,
   slipTerrainSlope,
   slipTerrainY,
   starlitMoonPlainAlpha,
   starlitRevealAlpha,
-} from './js/paradise-flight.js?v=paradise-flight-8';
+} from './js/paradise-flight.js?v=paradise-flight-9';
 import { resolveParadiseCourseAlias } from './js/paradise-courses.js';
 import {
   buildParadiseCourseArt,
@@ -2415,17 +2418,22 @@ function getPackUseInfo(classTsid) {
     const quote = quoteParadiseTicket(paradiseState, paradiseCourse.id, {
       imagination: pc.imagination,
       quoinMultiplier: quoinState.multiplier,
+      dead: playerIsDead(),
     });
     const tickets = paradiseState.ticketsToday;
     const ticketCopy = tickets === 1 ? 'ticket' : 'tickets';
+    // Source order: activate conditions (dead, daily limit), then the handler
+    // (already in Paradise, not enough iMG).
     const reason =
-      paradiseRun
-        ? 'You already activated a ticket!'
+      quote.reason === 'dead'
+        ? PARADISE_HELL_BLOCK
         : quote.reason === 'daily_limit'
-          ? `You have already activated the maximum ${PARADISE_DAILY_LIMIT} Ticket to Paradise cards today.`
-          : quote.reason === 'not_enough_imagination'
-            ? `You need at least ${quote.cost.toLocaleString()} iMG to do that!`
-            : '';
+          ? `You have already activated the maximum ${PARADISE_DAILY_LIMIT} Ticket to Paradise cards per day.`
+          : paradiseRun
+            ? 'You already activated a ticket!'
+            : quote.reason === 'not_enough_imagination'
+              ? `You need at least ${quote.cost.toLocaleString()} iMG to do that!`
+              : '';
     return {
       usable: !reason,
       verb: 'Activate',
@@ -2802,9 +2810,12 @@ function renderPackPopover(classTsid, anchor = null) {
     ${buffNote ? `<p class="pack-pop-recipes">${escapeHtml(buffNote)}</p>` : ''}
     ${collectionNote ? `<p class="pack-pop-recipes" data-musicblock-collection>${escapeHtml(collectionNote)}</p>` : ''}
     ${recipeNote ? `<p class="pack-pop-recipes">${escapeHtml(recipeNote)}</p>` : ''}
+    ${useInfo.paradise && useInfo.reason ? `<p class="pack-pop-recipes" data-paradise-block>${escapeHtml(useInfo.reason)}</p>` : ''}
     <div class="pack-pop-actions">
       ${musicblockDef ? `<button type="button" class="pack-pop-primary" data-pack-play>Play tune</button>` : ''}
       ${useInfo.usable ? `<button type="button" class="pack-pop-primary" data-pack-use ${useInfo.food && !useInfo.food.gate.ok ? 'disabled' : ''}>${escapeHtml(useInfo.verb)}${useInfo.singleAction ? '' : ' one'}</button>` : ''}
+      ${useInfo.paradise && !useInfo.usable ? `<button type="button" class="pack-pop-primary" data-pack-use disabled title="${escapeHtml(useInfo.reason)}">${escapeHtml(useInfo.verb)}</button>` : ''}
+      ${useInfo.paradise ? `<button type="button" class="pack-bear-action" data-pack-eat-ticket title="${escapeHtml(PARADISE_TICKET_EAT.tooltip)}">Eat one</button>` : ''}
       ${bearActionMarkup}
       ${bearReminisceMarkup}
       ${bearUpgradeMarkup}
@@ -2836,6 +2847,10 @@ function renderPackPopover(classTsid, anchor = null) {
   pop.querySelector('[data-pack-use]')?.addEventListener('click', () => {
     closePackPopover();
     usePackItem(classTsid);
+  });
+  pop.querySelector('[data-pack-eat-ticket]')?.addEventListener('click', () => {
+    closePackPopover();
+    eatPackedParadiseTicket(classTsid);
   });
   pop.querySelectorAll('[data-bear-action]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -16595,12 +16610,45 @@ async function startParadiseFlight(courseId, opts = {}) {
   }
 }
 
+/** Hell's own state (hell-feature isDead): the source's pc.is_dead. */
+function playerIsDead() {
+  return features.query('isDead', engine) === true;
+}
+
+/** paradise_ticket.js verbs.eat: one ticket for 20 iMG + 1 energy and a quip. */
+function eatPackedParadiseTicket(classTsid) {
+  if (!state.started || !paradiseCourseForTicket(classTsid)) return false;
+  const label = listPackSlots(inv).find((entry) => entry.classTsid === classTsid)?.label || 'Ticket to Paradise';
+  if (!removeItem(inv, classTsid, 1)) {
+    toast('That ticket is no longer in your pack.');
+    return false;
+  }
+  const energyGate = features.metabolicGate('energy', 'gain', engine);
+  const eaten = eatParadiseTicket({ count: 1, energyAllowed: energyGate.ok !== false });
+  pc.imagination = (pc.imagination || 0) + eaten.imagination;
+  if (eaten.energy > 0) pc.energy = Math.min(energyCap(), (pc.energy || 0) + eaten.energy);
+  emitGameEvent(`${classTsid}:eat`);
+  playSound(soundForConsume(classTsid, { drink: false }), { volume: 0.6, jitter: 0.05 });
+  toast(eaten.quip, 3200);
+  pushActivity({
+    base: `You ate a ${label}. ${eaten.quip}`,
+    effects: eaten.energy > 0 ? { xp: eaten.imagination, energy: eaten.energy } : { xp: eaten.imagination },
+  });
+  if (energyGate.ok === false && energyGate.msg) pushActivity(energyGate.msg);
+  if (player) floatText(player.x, player.y - 70, `+${eaten.imagination} iMG`, 0xf0c85a);
+  if (app?.canvas) app.canvas.dataset.paradiseTicketEaten = `${classTsid}:${eaten.imagination}:${eaten.energy}`;
+  updateHud();
+  savePlayerState();
+  return true;
+}
+
 function confirmParadiseTicketActivation(courseId) {
   const course = PARADISE_COURSES[courseId];
   if (!course) return false;
   const quote = quoteParadiseTicket(paradiseState, courseId, {
     imagination: pc.imagination,
     quoinMultiplier: quoinState.multiplier,
+    dead: playerIsDead(),
   });
   if (!quote.ok) {
     const info = getPackUseInfo(course.ticketId);
@@ -16625,6 +16673,7 @@ function confirmParadiseTicketActivation(courseId) {
       const activated = activateParadiseTicket(paradiseState, courseId, {
         imagination: pc.imagination,
         quoinMultiplier: quoinState.multiplier,
+        dead: playerIsDead(),
       });
       if (!activated.ok) {
         toast(getPackUseInfo(course.ticketId).reason || 'The ticket fizzled.');

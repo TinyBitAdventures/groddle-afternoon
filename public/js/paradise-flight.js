@@ -347,15 +347,57 @@ export function paradiseTicketCost(quoinMultiplier = 1) {
   return Math.round(base * original);
 }
 
+/** paradise_ticket.js verbs.activate conditions: the dead are refused first. */
+export const PARADISE_HELL_BLOCK = "You can't just magically ascend from Hell!";
+
+/**
+ * paradise_ticket.js verbs.eat (every course ticket inherits it): 20 iMG
+ * (stats_add_imagination, so spendable iMG only, never level XP) and 1 energy
+ * per ticket eaten, plus one quip ("Yum!" listed twice so it is more common).
+ */
+export const PARADISE_TICKET_EAT = Object.freeze({
+  imagination: 20,
+  energy: 1,
+  tooltip: 'Eat this to gain 20 iMG and 1 energy',
+  quips: Object.freeze([
+    'Yum!',
+    'Hmm, slightly stale.',
+    'Tastes like chicken!',
+    'The paper got stuck in your teeth.',
+    'Yum!',
+    'You got a papercut on your tongue. Ouch!',
+    'Mmm, not bad.',
+    'Mmm, tasty.',
+  ]),
+});
+
+/**
+ * Eating has no conditions in the source (always enabled, Hell included).
+ * metabolics_add_energy gives nothing to the dead or super pooped, so the
+ * caller passes `energyAllowed: false` then; the iMG still lands.
+ */
+export function eatParadiseTicket({ count = 1, rng = Math.random, energyAllowed = true } = {}) {
+  const n = Math.max(1, Math.floor(finite(count, 1)));
+  const quips = PARADISE_TICKET_EAT.quips;
+  const roll = Math.min(0.999999, Math.max(0, finite(rng(), 0)));
+  return {
+    count: n,
+    imagination: PARADISE_TICKET_EAT.imagination * n,
+    energy: energyAllowed ? PARADISE_TICKET_EAT.energy * n : 0,
+    quip: quips[Math.floor(roll * quips.length)],
+  };
+}
+
 export function quoteParadiseTicket(
   state,
   courseId,
-  { imagination = 0, quoinMultiplier = 1, now = Date.now() } = {}
+  { imagination = 0, quoinMultiplier = 1, now = Date.now(), dead = false } = {}
 ) {
   const course = PARADISE_COURSES[courseId];
   if (!course) return { ok: false, reason: 'unknown_course', cost: 0, course: null };
   resetParadiseDay(state, now);
   const cost = paradiseTicketCost(quoinMultiplier);
+  if (dead) return { ok: false, reason: 'dead', cost, course };
   if (state.ticketsToday >= PARADISE_DAILY_LIMIT) {
     return { ok: false, reason: 'daily_limit', cost, course };
   }
