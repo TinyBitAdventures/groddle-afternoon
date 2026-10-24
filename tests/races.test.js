@@ -370,7 +370,16 @@ describe('course shapes from the recordings', () => {
     assert.ok(slide && slide.y2 - slide.y1 > 400, 'a long drop');
     const onRoute = (p) => c.route.some((n) => n.mode !== 'climb' && platformUnder([p], n.x, n.y));
     assert.ok(!onRoute(slide), 'the race line never takes the slide');
-    assert.ok(c.props.some((p) => p.kind === 'planet' && p.slide === false));
+    // The real planet (arbito1.swf planet_1, the Star Sprint Snap) sits over the door floor.
+    const door = c.platforms[c.platforms.indexOf(slide) - 1];
+    const pieces = c.decor.filter((d) => /^planet_1_(back|front)$/.test(d.name));
+    assert.equal(pieces.length, 2);
+    for (const d of pieces) {
+      assert.ok(existsSync(join(root, d.src)), d.src);
+      const floorY = d.y + 279 * d.scale;
+      assert.ok(Math.abs(floorY - door.y1) <= 1, `cut-face floor ${floorY} on the door floor ${door.y1}`);
+      assert.ok(d.x < door.x1 + 40 && d.x + 571 * d.scale > door.x2, 'the planet spans the door floor');
+    }
   });
 
   it('climbs The Amazing Race out of the cave to the shared central pillar', () => {

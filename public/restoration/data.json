@@ -1849,9 +1849,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 354,
+  "commits": 355,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "The missing floor, a running Triple Jump into the top of Ilmenskie's cave mouth"
+   },
    {
     "date": "2026-10-24",
     "kind": "improve",
@@ -1966,11 +1971,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Street animals crowded off a street come back the next game day"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Symphonious Maximus behind Cebarkul's wooden door, with Star-Jinglers to play and craters that throw you into the sky"
    }
   ]
  },

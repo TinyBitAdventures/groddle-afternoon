@@ -2,7 +2,8 @@
  * Pixi drawing for the reconstructed race courses (js/race-courses.js).
  *
  * Everything here is clean vector work or recovered CC0 decos from
- * assets/decos/groddle; nothing is traced from the reference recordings.
+ * assets/decos/groddle (and tools/room-art pieces a decor entry names by
+ * `src`); nothing is traced from the reference recordings.
  * renderRaceCourse returns the scene background container that
  * engine.enterScene installs as the street layer: worldH for the camera and
  * updateParallax(camX, camY) for the far layers.
@@ -633,32 +634,6 @@ function drawCubeStack(PIXI, prop) {
   return g;
 }
 
-function drawPlanet(PIXI, prop) {
-  const g = new PIXI.Graphics();
-  const r = prop.r || 200;
-  // Rainbow slide spilling out of the planet's door (Star Sprint landmark).
-  // (slide: false when the course lays the slide as a walkable rainbow ledge.)
-  if (prop.slide !== false) {
-    const colors = [0xff4b4b, 0xff9d3b, 0xffe35b];
-    colors.forEach((color, i) => {
-      g.moveTo(r * 0.1, r * 0.25 + i * 15).bezierCurveTo(r * 0.9, r * 0.5 + i * 15, r * 1.2, r * 1.1 + i * 15, r * 1.9, r * 1.5 + i * 15);
-      g.stroke({ width: 16, color: color });
-    });
-  }
-  g.circle(0, 0, r).fill(0x35c7e8).stroke({ width: 4, color: 0x1a1a1a });
-  for (let i = -3; i <= 3; i += 1) {
-    const y = (i * r) / 3.6;
-    const half = Math.sqrt(Math.max(0, r * r - y * y)) - 4;
-    g.poly([-half, y - 14, -half / 2, y - 26, 0, y - 12, half / 2, y - 26, half, y - 14, half, y + 4, half / 2, y - 8, 0, y + 6, -half / 2, y - 8, -half, y + 4]).fill(0xff3fa8);
-  }
-  g.poly([0, -r * 0.1, r * 0.75, -r * 0.62, r * 0.75, r * 0.28, 0, r * 0.3]).fill(0xff4f86).stroke({ width: 4, color: 0x1a1a1a });
-  g.roundRect(r * 0.18, -r * 0.42, r * 0.22, r * 0.5, r * 0.1).fill(0xc8164f).stroke({ width: 3, color: 0x1a1a1a });
-  g.x = prop.x;
-  g.y = prop.y;
-  if (prop.flip) g.scale.x = -1;
-  return g;
-}
-
 function drawCrystalFacet(PIXI, prop) {
   const g = new PIXI.Graphics();
   const w = prop.w || 400;
@@ -694,7 +669,6 @@ const PROP_DRAWERS = {
   arrow: drawArrow,
   dome: drawDome,
   cubeStack: drawCubeStack,
-  planet: drawPlanet,
   crystal: drawCrystalFacet,
 };
 
@@ -910,7 +884,8 @@ export function renderRaceCourse(PIXI, course) {
   const back = new PIXI.Container();
   const front = new PIXI.Container();
   for (const deco of course.decor || []) {
-    const sprite = new PIXI.Sprite(textureFromUrl(`${DECO_DIR}${deco.name}.png`));
+    // `src`: a CC0 piece that is not a street deco (Star Sprint's planet from tools/room-art).
+    const sprite = new PIXI.Sprite(textureFromUrl(deco.src || `${DECO_DIR}${deco.name}.png`));
     sprite.anchor.set(deco.ax ?? 0.5, deco.ay ?? 1);
     sprite.x = deco.x;
     sprite.y = deco.y;

@@ -17,6 +17,11 @@
  * Coordinates are world pixels, y down, platform y = walking surface.
  */
 
+import { RAINBOW_RUN_FILES } from './quest-rooms/rainbow-run-art.js';
+
+/** arbito1.swf pieces that are not street decos (tools/room-art rainbow_run set, CC0). */
+const ARBITO_ROOM_ART = 'assets/sprites/quest-rooms/rainbow_run/';
+
 let nextId = 0;
 
 class CourseBuilder {
@@ -786,7 +791,7 @@ function buildAmazingRace() {
 /* up the tall column. Then up through the Arbito purple sky: pink      */
 /* stairs, islands, the checkered ribbons, stone slabs, slime ladders,  */
 /* grey arrows painted on the sky, into the black of space where the    */
-/* slabs carry rock piles. The striped planet is a trap: walk into its  */
+/* slabs carry rock piles. The sliced planet is a trap: walk into its   */
 /* door and its rainbow slide pours you back down (both recordings lose */
 /* a racer this way). A last slime ladder reaches the top slab; the     */
 /* posts stand a little way along it.                                   */
@@ -824,11 +829,22 @@ function buildStarSprint() {
   b.stairs(260, 150, 'pinkStairs');
   b.run(80, 'pinkStairs');
   b.hop(130, 40, 220, 'stoneSlab');
-  // Past the ladder, the striped planet: its door floor leads only down its slide.
+  // Past the ladder, the sliced planet: its door floor leads only down its slide. The Star Sprint
+  // Snap (research/wayback/raw/snaps/race_star_sprint/, reference only) shows arbito1.swf's
+  // planet_1 (CC0): planet_1_back under planet_1_front, 2R wide, its cut-face floor on the door
+  // floor (279 of its 573 px down, as in Rainbow Run).
   const slab = b.last;
   const R = 240;
   const px = slab.x2 + R - 30;
-  b.prop('planet', px, slab.y1 - R * 0.08, { r: R, slide: false });
+  const planetScale = (2 * R) / RAINBOW_RUN_FILES.planet_1_back[1];
+  for (const piece of ['planet_1_back', 'planet_1_front']) {
+    b.deco(piece, px - R, slab.y1 - 279 * planetScale, {
+      src: ARBITO_ROOM_ART + RAINBOW_RUN_FILES[piece][0],
+      ax: 0,
+      ay: 0,
+      scale: planetScale,
+    });
+  }
   const door = b.side(slab.x2, slab.y1, px + R * 0.75, slab.y1, 'none');
   const slide = b.side(door.x2, door.y1, door.x2 + 480, door.y1 + 620, 'rainbow');
   b.side(slide.x2 - 20, slide.y2 + 10, slide.x2 + 200, slide.y2 + 10, 'island', { art: 'cloud_rock_3' });
