@@ -112,10 +112,10 @@ describe('classifyQuests', () => {
     assert.equal(c.byReason.job.length, 200);
     assert.equal(c.byReason.multiplayer.length, 11);
     // Gwendolyn's Task and Smuggle the Smuggler were feature_unbuilt, not among the 32.
-    // +1: firefly_whistle (the Fireflex 3000 Lab, once counted as tutorial).
+    // +1: firefly_whistle (the Fireflex 3000 Lab, once counted as tutorial), built in quest-rooms/firefly-whistle.js.
     const onceInstance = builtInstanceQuests().filter((id) => !/^(tower_quest|smuggle_the_smuggler)/.test(id)).length;
     assert.equal((c.byReason.instance_unbuilt || []).length, 33 - onceInstance);
-    assert.ok(c.byReason.instance_unbuilt.includes('firefly_whistle'));
+    assert.ok(!(c.byReason.instance_unbuilt || []).includes('firefly_whistle'));
     // No tutorial leftovers: the 2011 Magic Rock chain is retired; Gentle Island's quests are custom.
     assert.equal((c.byReason.newxp_tutorial || []).length, 0);
     for (const id of ['learn_first_skill', 'tutorial_reinforcement']) assert.ok(c.byReason.removed_feature.includes(id), id);

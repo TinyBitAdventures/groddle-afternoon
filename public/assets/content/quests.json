@@ -4652,7 +4652,8 @@
     "name": "firefly_whistle_obtained",
     "num": 1,
     "classId": "firefly_whistle",
-    "desc": "Get the Whistle"
+    "desc": "Get the Whistle",
+    "route": "quest-instances"
    }
   ],
   "rewards": {
@@ -4680,9 +4681,16 @@
   "instanced": false,
   "needsStart": true,
   "hasCanOffer": false,
-  "offerTriggers": [],
-  "solo": false,
-  "soloReason": "instance_unbuilt"
+  "offerTriggers": [
+   {
+    "type": "npc",
+    "npc": "npc_firefly",
+    "override": true
+   }
+  ],
+  "instanceRoom": "firefly_whistle",
+  "offerNote": "npc_firefly.js offers it on collision while the quest is new; the familiar delivers it (features/resource-nodes-feature.js)",
+  "solo": true
  },
  "fly_paradise": {
   "classTsid": "fly_paradise",

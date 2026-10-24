@@ -872,13 +872,13 @@
  "quests": {
   "total": 445,
   "story": 245,
-  "playable": 194,
+  "playable": 195,
   "buckets": [
    {
     "id": "playable",
     "label": "Playable",
     "note": "Offered and finishable in the remake.",
-    "count": 194
+    "count": 195
    },
    {
     "id": "job",
@@ -890,7 +890,7 @@
     "id": "building",
     "label": "Still being rebuilt",
     "note": "Their rooms or systems are on the workbench.",
-    "count": 1
+    "count": 0
    },
    {
     "id": "players",
@@ -913,8 +913,8 @@
   ]
  },
  "rooms": {
-  "total": 21,
-  "built": 21,
+  "total": 22,
+  "built": 22,
   "rooms": [
    {
     "id": "an_autumn_day",
@@ -1034,6 +1034,26 @@
        "label": "Colour Unblocking (SnygystFS)"
       }
      ]
+    }
+   },
+   {
+    "id": "firefly_whistle",
+    "title": "firefly_whistle",
+    "quests": [
+     "Firefly Whistle"
+    ],
+    "built": true,
+    "shot": "shots/room-firefly_whistle.webp",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=firefly_whistle&practice=1",
+    "hd": "shots/hd/room-firefly_whistle.webp",
+    "offer": "In the future of one of our pasts, the last days of the Alphite Age, some radical technologists had developed advanced techniques for the charming of fireflies.",
+    "note": {
+     "tagline": "A whistle behind a force field, and no way home.",
+     "about": "Firefly Whistle sent you back to a past future, the last days of the Alphite Age, to learn how its radical technologists charmed Fireflies. Bump into a Firefly and the Magic Rock offers it, with a warning: you must find your own way back.",
+     "play": "Walk the Fireflex 3000 Lab to the Precious Equipment Protection Unit, push its button to drop the force field and take the whistle, which you promptly swallow. Then talk the Teleporter Control Unit into switching on (it will drop hints) and step onto the pad to go home. From then on a Firefly Jar opened near Fireflies sets your whistling instinct off.",
+     "source": "The offer, the Firefly's \"What ho! ... Fireflies!\", every line from the stand, the whistle and the control unit with its six hints and activation code, the swallow (hit, hit, surprise, \"Gah. I've swallowed it!\", the Firefly Whistling badge), the walk back at the midpoint, the pad's push-back, the arrival point, the teleporter's position, the three-minute \"Are you stuck?\" prompt, the reward and the jar's badge gate.",
+     "rebuilt": "The lab's geometry was never archived. It is rebuilt from three players' Snaps of it: a white corridor with security orbs, egg-shaped phone pods, a pillar and a \"Church of Alph\" poster, dressed with Tiny Speck's own stand, control unit, teleporter, egg pod and orb art. Where the stand and control unit stand along it is inferred.",
+     "footage": []
     }
    },
    {
@@ -1808,9 +1828,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 341,
+  "commits": 343,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "The Butler turns round to look at you instead of flipping, and its loading art shrinks from 5.1 MB to 49 KB"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "The widget by the Hall's first window says \"I have nothing for you!\", and the Hall's wall turns olive-gold like the Snaps"
+   },
    {
     "date": "2026-10-24",
     "kind": "improve",
@@ -1920,19 +1950,9 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "The loading card says when you were last here, what the street is home to, and welcomes you to a new hub"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Garden plots answer every plant, water, hoe and pick with their own lines"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "The Rube's yard and Operation Grow look as players' Snaps show them"
    }
   ]
  },
- "tests": 195,
+ "tests": 196,
  "generatedAt": "2026-10-24"
 }

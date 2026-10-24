@@ -20,9 +20,14 @@
  * raster, so it is drawn as SVG (rasterized at 2x) hanging from a branch.
  *
  * Firefly Whistling: GSJS grants `firefly_whistling` at the end of the
- * instanced Alphite-age lab quest `firefly_whistle` (players/player.js
- * fireflyWhistleSwallowed). That lab is not recoverable here, so the first
- * attempt to open a Firefly Jar near Fireflies grants it with the source text.
+ * instanced lab quest `firefly_whistle` (players/player.js
+ * fireflyWhistleSwallowed; js/quest-rooms/firefly-whistle.js). Until then the
+ * jar refuses ("You need the Firefly Whisperer achievement.", firefly_jar.js
+ * verbs.open), and bumping into a Firefly while that quest is new shows
+ * "What ho! ..." / "... Fireflies!" and offers it (npc_firefly.js
+ * wandering_onMsg, once a session like its '!firefly_collision' flag). The
+ * ?resdemo Firefly skips the badge gate, like the QA Sloth's skill gate;
+ * &fireflyoffer=1 lets QA routes see the offer.
  *
  * QA: ?autostart=1&fresh=1&resdemo=<classTsid> places that node beside the
  * player on the first street entered (and grants any tool, rods, or skill it
@@ -38,7 +43,6 @@ import { rollResourceNodeDrop } from './drops-feature.js?v=drops-1';
 import { rollSlothBonusSnails } from '../imagination-effects.js';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,
-  FIREFLY_WHISTLE_ACHIEVEMENT,
   RESOURCE_ITEM_DEFS,
   RESOURCE_NODE_CATALOG,
   createFireflyJarState,
@@ -57,6 +61,8 @@ import {
   tickResourceNode,
 } from '../resource-nodes.js';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
+import { acceptOffer, declineOffer, npcQuestOffers, questStatus } from '../quest-offers.js';
+import { vpSequence } from '../quest-rooms/vp-overlay.js?v=ffw-1';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
 export const RESOURCE_GROUP_PREFIX = 'resource:';
@@ -93,6 +99,13 @@ const TICK_MS = 500;
 const SLOTH_SCALE = 0.8;
 const SVG_SCALE = 2;
 const WHISTLE_RADIUS = 500;
+/** quests/firefly_whistle.js: the lab quest a Firefly offers (npc_firefly.js). */
+export const FIREFLY_WHISTLE_QUEST = 'firefly_whistle';
+/** npc_firefly.js wandering_onMsg collision announcements, then quests_offer. */
+export const FIREFLY_OFFER_LINES = Object.freeze([
+  { lines: ['What ho! ...'], clickToAdvance: true },
+  { lines: ['... Fireflies!'], durationMs: 2500 },
+]);
 const Z = Object.freeze({ tree: 14, paper: 16, ground: 21, trap: 19, salmon: 24, firefly: 60 });
 
 // ---------------------------------------------------------------------------
@@ -427,6 +440,8 @@ function svgDataUrl(svg) {
 // ---------------------------------------------------------------------------
 
 let jar = createFireflyJarState();
+/** The Firefly's quest offer: once a session (npc_firefly.js '!firefly_collision'); QA routes opt in. */
+const fireflyOffer = { shown: false, allowed: true };
 /** Last Friend of Metal spit (ms), and the sloth the player is standing under. */
 let bonusSnailsAt = 0;
 let underSloth = null;
@@ -979,10 +994,6 @@ function spitSnail(engine, entity) {
 // Verbs
 // ---------------------------------------------------------------------------
 
-function whistleUnlocked(engine) {
-  return engine.unlockedAchievements.includes(FIREFLY_WHISTLE_ACHIEVEMENT);
-}
-
 function nearbyFireflies(engine, entity) {
   const px = engine.player.x;
   const py = engine.player.y;
@@ -1007,21 +1018,71 @@ function verbContext(engine, entity, verbId) {
     nearby: entity.classTsid === 'npc_firefly' ? nearbyFireflies(engine, entity) : [],
     // The QA Sloth skips the Animal Kinship 3 gate; real Sloths keep it.
     requireSkill: entity !== demoEntity,
-    // First Firefly attempt grants Firefly Whistling (see header).
-    requireAchievement: entity.classTsid === 'npc_firefly' ? whistleUnlocked(engine) : true,
+    // Firefly Whistling gates the jar (firefly_jar.js); the QA Firefly skips it.
+    requireAchievement: entity !== demoEntity,
+  };
+}
+
+/** Firefly collision: the player's box against a Firefly's (its glow, not its spawn point). */
+export function fireflyTouches(player, fly) {
+  if (!player || !fly) return false;
+  return Math.abs(fly.x - player.x) <= 56 && fly.y <= player.y + 8 && fly.y >= player.y - 150;
+}
+
+function fireflyQuestCtx(engine) {
+  return {
+    level: engine.pc.level,
+    xp: engine.pc.xp,
+    skills: engine.learnedSkills,
+    achievements: engine.unlockedAchievements,
+    inv: engine.inv,
+    pc: engine.pc,
+    hub: engine.street?.hubId || '',
+    now: Date.now(),
   };
 }
 
 /**
- * Stand-in for the firefly_whistle lab: the source announcement, the swallow
- * line, then the real badge (its rewards come from the achievement catalog).
+ * npc_firefly.js wandering_onMsg: a collision while firefly_whistle is 'none'
+ * shows the two lines, then the familiar offers the quest (main.js done_payload).
  */
-function grantWhistle(engine) {
-  if (whistleUnlocked(engine)) return;
-  engine.toast('What ho! ... Fireflies!', 2200);
-  if (engine.grantAchievement(FIREFLY_WHISTLE_ACHIEVEMENT)) {
-    engine.pushActivity('Oops, you swallowed the whistle! I guess that still counts?');
-  }
+function checkFireflyOffer(engine) {
+  if (fireflyOffer.shown || !fireflyOffer.allowed) return;
+  if (engine.busy() || engine.questOffersHeld?.()) return;
+  if (questStatus(engine.questState, FIREFLY_WHISTLE_QUEST) !== 'none') return;
+  const p = engine.player;
+  const touched = entities.find((e) => e.view?.kind === 'firefly' && fireflyTouches(p, { x: e.view.sprite.x, y: e.view.sprite.y + e.view.fly.y }));
+  if (!touched) return;
+  const card = npcQuestOffers(engine.questState, 'npc_firefly', engine.pc, fireflyQuestCtx(engine)).offered
+    .find((c) => c.classTsid === FIREFLY_WHISTLE_QUEST);
+  if (!card) return;
+  fireflyOffer.shown = true;
+  engine.setData('fireflyOffer', 'lines');
+  vpSequence(engine, FIREFLY_OFFER_LINES).then(() => {
+    engine.setData('fireflyOffer', 'offered');
+    engine.playSound('QUEST_OFFER', { volume: 0.55 });
+    engine.offerQuestDialogue({
+      title: card.def.title,
+      kicker: 'Magic Rock',
+      beats: card.beats,
+      acceptLabel: card.acceptLabel,
+      declineLabel: card.declineLabel,
+      onAccept: () => {
+        const result = acceptOffer(engine.questState, FIREFLY_WHISTLE_QUEST, fireflyQuestCtx(engine));
+        engine.setData('fireflyOffer', result.ok ? 'accepted' : result.reason || 'failed');
+        if (result.ok) engine.pushActivity(`New quest: ${card.def.title}`);
+        engine.save();
+      },
+      onDecline: () => {
+        // A familiar offer: it waits in the quest log (declineOffer, source 'familiar').
+        declineOffer(engine.questState, FIREFLY_WHISTLE_QUEST, Date.now());
+        engine.setData('fireflyOffer', 'declined');
+        engine.pushActivity(`You can accept “${card.def.title}” from your quest log later.`);
+        engine.save();
+      },
+    });
+    if (engine.param('fireflyofferautoplay') === 'accept') setTimeout(() => engine.acceptOpenOffer(), 400);
+  });
 }
 
 function itemLabel(classTsid, qty) {
@@ -1099,7 +1160,6 @@ function applyResult(engine, entity, result) {
 }
 
 function performVerb(engine, entity, verbId) {
-  if (entity.classTsid === 'npc_firefly' && verbId === 'open') grantWhistle(engine);
   const result = harvestResourceNode(entity.node, engine.inv, engine.pc, verbContext(engine, entity, verbId));
   applyResult(engine, entity, result);
   return result;
@@ -1240,6 +1300,9 @@ export const resourceNodesFeature = {
 
   init(engine) {
     ensureResourceItems();
+    // QA routes (any *demo / *autoplay param) stay quiet unless they ask (&fireflyoffer=1), like the Magic Rock.
+    const params = [...new URLSearchParams(globalThis.location?.search || '').keys()];
+    fireflyOffer.allowed = engine.param('fireflyoffer') === '1' || !params.some((key) => /demo$|autoplay$/.test(key));
     migrateResourceStarterKit(engine.inv, kit);
     publish(engine);
   },
@@ -1296,6 +1359,7 @@ export const resourceNodesFeature = {
     if (engine.started && !engine.transientInstance()) {
       checkTraps(engine);
       checkSloths(engine);
+      checkFireflyOffer(engine);
     }
     if (now - lastTickAt < TICK_MS) return;
     lastTickAt = now;
@@ -1314,9 +1378,7 @@ export const resourceNodesFeature = {
       id: menuVerbId(verb.id),
       label: verb.label,
       enabled: verb.enabled,
-      tooltip: entity.classTsid === 'npc_firefly' && !whistleUnlocked(engine)
-        ? `${verbTooltip(verb)}. Your first try teaches you Firefly Whistling.`
-        : verbTooltip(verb),
+      tooltip: verbTooltip(verb),
       reason: verb.enabled ? '' : verb.message,
       durationMs: verb.enabled ? verb.durationMs : 0,
       energy: verb.costs?.energy || 0,

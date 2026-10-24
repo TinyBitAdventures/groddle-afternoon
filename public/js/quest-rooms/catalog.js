@@ -58,6 +58,9 @@ export const QUEST_ROOMS = Object.freeze({
   smuggle_the_smuggler_part1: 'penalty',
   smuggle_the_smuggler_part2: 'penalty',
   smuggle_the_smuggler_part3: 'penalty',
+  // Firefly Whistle (onStarted instances_create_delayed firefly_whistle from
+  // LM113UBSS8P18ET, the Fireflex 3000 Lab; not in the dump).
+  firefly_whistle: 'firefly_whistle',
 });
 
 /** Rooms that exist and pass QA. A quest is solo-offerable once its room is here. */
@@ -83,6 +86,7 @@ export const BUILT_ROOMS = Object.freeze([
   'mental_block',
   'penalty',
   'esquibeth',
+  'firefly_whistle',
 ]);
 
 /**
@@ -198,6 +202,13 @@ export const OFFER_OVERRIDES = Object.freeze({
     prerequisites: [],
     replacePrerequisites: true,
     why: 'quests_offer ignores prerequisites: any of the four Firebog completist badges offers it',
+  },
+  // npc_firefly.js wandering_onMsg: bumping into a Firefly while the quest is new shows "What ho! ..."
+  // "... Fireflies!" and its done_payload makes the familiar offer it (main.js quests_offer(.., true)).
+  // The remake's Fireflies do that (features/resource-nodes-feature.js); questGiver stays the Magic Rock.
+  firefly_whistle: {
+    offerTriggers: [{ type: 'npc', npc: 'npc_firefly' }],
+    why: 'npc_firefly.js offers it on collision while the quest is new; the familiar delivers it (features/resource-nodes-feature.js)',
   },
   radiant_glare: {
     prerequisites: [{ condition: 'custom_code', value: 'upgrades:walk_speed_3,jump_2', not: 0 }],

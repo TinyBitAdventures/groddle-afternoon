@@ -179,4 +179,12 @@ export const ROOM_NOTES = Object.freeze({
     rebuilt: "The cell's layout is lost; it is built from the recovered penalty-box decos.",
     footage: [{ id: 'Spfk2xfVyXA', label: 'Smuggler Quest' }],
   },
+  firefly_whistle: {
+    tagline: 'A whistle behind a force field, and no way home.',
+    about: 'Firefly Whistle sent you back to a past future, the last days of the Alphite Age, to learn how its radical technologists charmed Fireflies. Bump into a Firefly and the Magic Rock offers it, with a warning: you must find your own way back.',
+    play: "Walk the Fireflex 3000 Lab to the Precious Equipment Protection Unit, push its button to drop the force field and take the whistle, which you promptly swallow. Then talk the Teleporter Control Unit into switching on (it will drop hints) and step onto the pad to go home. From then on a Firefly Jar opened near Fireflies sets your whistling instinct off.",
+    source: "The offer, the Firefly's \"What ho! ... Fireflies!\", every line from the stand, the whistle and the control unit with its six hints and activation code, the swallow (hit, hit, surprise, \"Gah. I've swallowed it!\", the Firefly Whistling badge), the walk back at the midpoint, the pad's push-back, the arrival point, the teleporter's position, the three-minute \"Are you stuck?\" prompt, the reward and the jar's badge gate.",
+    rebuilt: "The lab's geometry was never archived. It is rebuilt from three players' Snaps of it: a white corridor with security orbs, egg-shaped phone pods, a pillar and a \"Church of Alph\" poster, dressed with Tiny Speck's own stand, control unit, teleporter, egg pod and orb art. Where the stand and control unit stand along it is inferred.",
+    footage: [],
+  },
 });

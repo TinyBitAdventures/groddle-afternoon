@@ -161,6 +161,8 @@ export const REMAKE_QUEST_NPCS = Object.freeze([
   'magic_rock',
   // A Savanna Dust Trap's Juju Bandit offers Carry That Weight (features/juju-bandits-feature.js).
   'npc_juju_bandit',
+  // Bumping into a Firefly offers Firefly Whistle (features/resource-nodes-feature.js, npc_firefly.js).
+  'npc_firefly',
 ]);
 const GSJS_STREET_SPIRITS = new Set([
   'street_spirit', 'street_spirit_groddle', 'street_spirit_firebog', 'street_spirit_zutto', 'street_spirit_ix',

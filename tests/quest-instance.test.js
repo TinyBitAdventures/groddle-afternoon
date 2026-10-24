@@ -119,8 +119,8 @@ describe('quest instance runtime', () => {
 describe('quest room catalog', () => {
   before(() => loadContentCatalogsFromDir(join(root, 'public/assets/content')));
 
-  it('maps the 32 once-excluded instance quests, Gwendolyn\'s Task and Smuggle the Smuggler to rooms', () => {
-    assert.equal(Object.keys(QUEST_ROOMS).length, 39);
+  it('maps the 32 once-excluded instance quests, Gwendolyn\'s Task, Smuggle the Smuggler and Firefly Whistle to rooms', () => {
+    assert.equal(Object.keys(QUEST_ROOMS).length, 40);
     const catalog = getQuestCatalog();
     for (const id of Object.keys(QUEST_ROOMS)) assert.ok(catalog[id], id);
   });
