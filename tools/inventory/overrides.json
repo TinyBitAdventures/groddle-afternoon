@@ -806,5 +806,70 @@
   "status": "unbuilt_original",
   "reason": "only locations/mountains.js looks for it on a mountain street; no archived street places one and no mountain party space was configured",
   "register": "G123"
+ },
+ "buff:charades": {
+  "status": "lost",
+  "reason": "potion_charades.js:526 / catalog_buffs.js charades: other players in the street guess the word and win; nobody can guess in a solo street",
+  "register": "G124"
+ },
+ "buff:glitch_train": {
+  "status": "lost",
+  "reason": "player.js:3146-3147: applied only with at least 19 other glitches in the street",
+  "register": "G124"
+ },
+ "buff:party_time": {
+  "status": "lost",
+  "reason": "include/loneliness.js:246: given to the visitors of someone else's home party",
+  "register": "G124"
+ },
+ "buff:play_musicblocks": {
+  "status": "lost",
+  "reason": "quests/play_musicblocks.js:225: Blocks That Rock times playing musicblocks for 25 other players",
+  "register": "G124"
+ },
+ "buff:sneezing": {
+  "status": "lost",
+  "reason": "sneezing_powder.js:316-322: scatter applies it to every other player in the street (pcx != pc)",
+  "register": "G124"
+ },
+ "buff:tickle_me_emo": {
+  "status": "lost",
+  "reason": "quests/zero_mood.js:76: Tickle Me Emo times hugging 33 different players",
+  "register": "G124"
+ },
+ "buff:beta_item_cooldown": {
+  "status": "excluded",
+  "reason": "only special_item_that_only_beta_testers_get.js:352 applies it, and that item is a beta-tester give-away (excluded)",
+  "register": "G124"
+ },
+ "buff:comedian": {
+  "status": "excluded",
+  "reason": "only special_item_that_only_beta_testers_get.js:346 applies it (excluded beta-tester item); its on_remove only cheers other players",
+  "register": "G124"
+ },
+ "buff:sneezing_fit": {
+  "status": "excluded",
+  "reason": "only special_item_that_only_beta_testers_get.js:472 applies it (excluded beta-tester item)",
+  "register": "G124"
+ },
+ "buff:turn_off_quests": {
+  "status": "excluded",
+  "reason": "main.js:2691-2692: the /turn_off_quests chat command, past doChatCommand's is_god gate (main.js:1968): staff only",
+  "register": "G124"
+ },
+ "buff:zen": {
+  "status": "excluded",
+  "reason": "retired: inc_stats.js:788 applies it when stats_add_meditation_today reaches the daily top, but the only caller is player.js:1011's reset to 0; the daily limit was removed 2012-10-31 (@glitchlog, js/meditation.js)",
+  "register": "G124"
+ },
+ "buff:arbito_bonus": {
+  "status": "unbuilt_original",
+  "reason": "only its own on_tick re-applies it (catalog_buffs.js:83); nothing in GSJS or eleven-gsjs starts the Arbito Bonus Round (LM411CNV2FNBN)",
+  "register": "G124"
+ },
+ "buff:rooked": {
+  "status": "unbuilt_original",
+  "reason": "include/rook.js:49 applies it to a player only under rook_wrath (never applied) or force; inc_rook.js:269 calls pc.rookAttack(false), and the forced attacks (rook.js:353, npc_cactus.js:219) rook items",
+  "register": "G124"
  }
 }

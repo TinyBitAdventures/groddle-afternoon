@@ -18,7 +18,7 @@ import {
   registerItemUse,
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
-import { highestSkillLevel, skillPackageDetails } from './skill-packages.js';
+import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js';
 import {
   adjustedTaskLimit,
   blockmakerFuel,
@@ -436,7 +436,9 @@ export function makingSkillAdjustments(recipe, learned, upgrades = []) {
     const smelting = skillPackageDetails('smelting', learned, upgrades);
     const cards = smeltingOverrides(upgrades);
     if (smelting) {
-      out.energyCost = cards.energyCost ?? smelting.energy_cost;
+      // A running Smelt It, Dealt It sets the package's energy_cost override,
+      // which getSkillPackageDetails writes last (over the cards' figure).
+      out.energyCost = getSkillPackageOverride('smelting')?.energy_cost ?? cards.energyCost ?? smelting.energy_cost;
       out.toolWear = cards.toolWear ?? smelting.tool_wear;
     }
   }
@@ -576,7 +578,7 @@ export async function loadRecipeCatalog(fetchImpl = globalThis.fetch) {
     const [res, itemsRes] = await Promise.all([
       fetchImpl('assets/content/recipes.json?v=fruit-machine-2&catalog=recipes-full-1'),
       Promise.resolve()
-        .then(() => fetchImpl('assets/content/making-items.json?v=recipes-full-1'))
+        .then(() => fetchImpl('assets/content/making-items.json?v=recipes-full-2'))
         .catch(() => null),
     ]);
     if (itemsRes?.ok) {

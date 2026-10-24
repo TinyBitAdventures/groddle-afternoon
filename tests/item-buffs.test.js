@@ -49,6 +49,8 @@ describe('official item buff mappings', () => {
       'yellow_crumb_flower',
       'essence_of_yellow_crumb',
       'essence_of_hairball',
+      'essence_of_gandlevery',
+      'essence_of_silvertongue',
     ]);
     for (const classTsid of Object.keys(BUFF_ITEM_CATALOG)) {
       const info = getBuffItemInfo(classTsid);

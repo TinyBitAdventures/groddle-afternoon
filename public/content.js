@@ -43,7 +43,7 @@ import {
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=husbandry-1';
+} from './js/animals.js?v=husbandry-2';
 import {
   quoteAnimalKinship,
   performAnimalKinship,

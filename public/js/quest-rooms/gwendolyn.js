@@ -614,6 +614,20 @@ function stepSwoons(ctx, dtMs, now) {
 function setHeat(ctx, id) {
   ctx.data.heat = id || null;
   ctx.data.heatNextAt = id ? Date.now() + HEAT[id].tickMs : 0;
+  heatBuff(ctx, id);
+}
+
+/**
+ * The heat is the source buff the player sees (buffs_apply('its_so_hot') /
+ * 'its_so_hot2', buffs_remove on cooling or leaving); stepHeat keeps its tick.
+ */
+function heatBuff(ctx, id) {
+  const engine = ctx.engine;
+  if (!engine?.applyBuff) return;
+  for (const other of Object.keys(HEAT)) {
+    if (other !== id && engine.hasBuff?.(other)) engine.removeBuff(other);
+  }
+  if (id && !engine.hasBuff?.(id)) engine.applyBuff(id);
 }
 
 /** on_tick: the red flash, metabolics_lose_mood(3), "So hot! -N mood!", never below 3. */
@@ -1635,6 +1649,7 @@ export const room = {
   onLeave(ctx, outcome) {
     stopMusic(ctx);
     clearScreen();
+    heatBuff(ctx, null);
     if (ctx.player) ctx.player.pivot.y = 0;
     if (outcome === 'complete' || chainFinished(ctx.engine.questState)) return { leaveFlag: false, noTurnIn: true };
     // location.js onPlayerEnter: leaving before part 3 is done fails the whole chain.
@@ -1647,6 +1662,7 @@ export const room = {
   clear(ctx) {
     stopMusic(ctx);
     clearScreen();
+    heatBuff(ctx, null);
     if (ctx.player) ctx.player.pivot.y = 0;
   },
 

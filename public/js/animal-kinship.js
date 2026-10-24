@@ -17,7 +17,7 @@ import {
   setToolRemaining,
   useToolCondition,
 } from './tools.js?v=tools-2';
-import { SKILL_PACKAGES, skillPackageDetails } from './skill-packages.js';
+import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js';
 import { moodMax } from './metabolics.js';
 import { petPiggy, piggyNibbleRefusal } from './animal-mood.js';
 
@@ -148,16 +148,20 @@ export function resolveAnimalKinshipPackage(classId, verbId, learned = [], upgra
   // Super Animal Harvest I-III and Grain Attraction overlay the package's
   // bonus fields (getSkillPackageDetails img_upgrades).
   const pkgId = AK_SOURCE_PACKAGES[key];
+  // addSkillPackageOverride energy_cost (Easy Animalia: 0 for these five).
+  const override = pkgId ? getSkillPackageOverride(pkgId) : null;
+  const energy = Number.isFinite(override?.energy_cost) ? { energyCost: override.energy_cost } : null;
   const owned = new Set(Array.isArray(upgrades) ? upgrades : []);
   const img = pkgId ? SKILL_PACKAGES[pkgId]?.img_upgrades || {} : {};
-  if (!Object.keys(img).some((id) => owned.has(id))) return row;
+  if (!Object.keys(img).some((id) => owned.has(id))) return energy ? { ...row, ...energy } : row;
   const details = skillPackageDetails(pkgId, learned, [...owned]);
-  if (!details) return row;
+  if (!details) return energy ? { ...row, ...energy } : row;
   return {
     ...row,
     bonusMultiplier: Number(details.bonus_multiplier) || row.bonusMultiplier,
     bonusChance: Number(details.bonus_chance) || row.bonusChance,
     bonusAmount: Number(details.bonus_amount) || row.bonusAmount,
+    ...energy,
   };
 }
 

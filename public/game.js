@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-3';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-4';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-49';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-50';
 import {
   actionDurationFor,
   createTimedAction,
@@ -377,7 +377,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=item-buffs-3';
+} from './js/buffs.js?v=item-buffs-4';
 import {
   loadContentCatalogs,
   getContentMeta,
@@ -404,8 +404,8 @@ import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=husbandry-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=husbandry-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=husbandry-2';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=husbandry-2';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -485,7 +485,7 @@ import {
   hasTool,
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
-} from './js/making.js?v=making-g14-1';
+} from './js/making.js?v=making-g14-2';
 import {
   createGarden,
   tickGarden,
@@ -685,7 +685,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=husbandry-1';
+} from './js/animals.js?v=husbandry-2';
 import {
   ensureWoodTreeState,
   resetWoodTreeDay,
@@ -3428,6 +3428,8 @@ function usePackItem(classTsid) {
       upgrades: pc.imaginationUpgrades || [],
       now: Date.now(),
     });
+    // include/food.js:157-164: over the daily limit, Stuffed until the next game day.
+    if (foodResult.fullness?.stuffed) engine.applyBuff('stuffed', { durationSec: Math.max(1, Math.ceil(msUntilNewDay(Date.now()) / 1000)) });
     if (foodResult.bonus > 0) {
       pc.imagination = (pc.imagination || 0) + foodResult.bonus;
       pc.xp = (pc.xp || 0) + foodResult.bonus;
@@ -7253,7 +7255,9 @@ function applyPlayerFacing() {
   if (!player) return;
   player.facing = facingFromVelocity(player.vx, player.facing || 'right');
   const flip = player.anims && VECTOR_AVATAR.facesRight ? -1 : 1;
-  const sx = flip * facingScaleX(player.baseScale, player.facing);
+  // Moonwalk on_apply: avatar_orientation reversed (you face away from where you go).
+  const moon = hasBuff(buffState, 'moonwalk', Date.now()) ? -1 : 1;
+  const sx = flip * moon * facingScaleX(player.baseScale, player.facing);
   player.scale.set(sx, Math.abs(player.baseScale));
 }
 
@@ -7435,6 +7439,17 @@ const engine = {
   },
   /** The running row of a buff (args, expiresAt), or null. */
   buffRow: (classTsid) => (hasBuff(buffState, classTsid, Date.now()) ? buffState.active[classTsid] : null),
+  /** skills_start_acceleration(seconds, ignore_max) on the current study (Small Enlightenment). */
+  accelerateStudy(seconds, { ignoreMax = false } = {}) {
+    const sped = accelerateActiveStudy(skillState, seconds, Date.now(), { ignoreMax });
+    if (sped.completed?.length) handleSkillCompletions(sped.completed);
+    updateSkillChrome();
+    return sped;
+  },
+  /** The article name the avatar wears for a type ('none' when empty). */
+  wornArticle: (type) => vectorPartName(type),
+  /** The pack's Eat / Drink / Use, as if clicked (QA autoplay). */
+  usePackItem: (classTsid) => usePackItem(classTsid),
   award: (payload) => enqueueAward(payload),
   /** `{ ignoreHome: true }` lets a feature (Camera Mode) run at home while panels and verbs still block it. */
   busy({ ignoreHome = false } = {}) {
@@ -19959,6 +19974,8 @@ function runMakeCraft(key, qty) {
   const opts = craftOpts();
   const check = canCraft(inv, recipe, opts);
   const n = Math.max(1, Math.floor(qty || 1));
+  // The grinder's and smelter's verbs price free units from a running buff first (buff-triggers).
+  features.event(`making_batch:${recipe.tool}`, n, engine);
   // inc_making.js refuses the whole batch when its energy >= the player's.
   const batchEnergy = makingSkillAdjustments(recipe, opts.learned, opts.upgrades).energyCost * n;
   if (check.ok && batchEnergy && pc.energy <= batchEnergy) {

@@ -78,8 +78,8 @@ import { nearestSurfaceY } from '../walk-surface.js';
 import { isInHell } from '../hell.js';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-1';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
-import { animalStatusLabel } from '../animals.js?v=husbandry-1';
-import { quoteAnimalKinship } from '../animal-kinship.js?v=butterfly-care-1';
+import { animalStatusLabel } from '../animals.js?v=husbandry-2';
+import { quoteAnimalKinship } from '../animal-kinship.js?v=butterfly-care-2';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js';
 import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=rooks-2';
 import {

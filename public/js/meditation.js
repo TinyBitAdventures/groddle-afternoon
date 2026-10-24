@@ -24,7 +24,7 @@
  */
 
 import { MEDITATION_IMAGINATION_CHANCE, levitationCards, meditationCards } from './imagination-effects.js';
-import { skillPackageDetails } from './skill-packages.js';
+import { getSkillPackageOverride, skillPackageDetails } from './skill-packages.js';
 
 /** No daily cap on meditation energy (see above); dailyEnergyLimit is the pre-2012-10-31 top. */
 export const MEDITATION_DAILY_LIMIT = false;
@@ -171,9 +171,13 @@ export function sessionPackage(kind, learned = [], upgrades = []) {
   const table = kind === 'standing' ? MEDITATIVE_ARTS_PACKAGE : FOCUSED_MEDITATION_PACKAGE;
   const pkg = packageFor(table, learned);
   if (!pkg) return null;
-  const row = skillPackageDetails(kind === 'standing' ? 'meditative_arts' : 'focused_meditation', learned, upgrades);
-  if (!row || !Number.isFinite(row.duration) || !Number.isFinite(row.duration_max)) return pkg;
-  return { ...pkg, duration: row.duration, durationMax: row.duration_max };
+  const packageId = kind === 'standing' ? 'meditative_arts' : 'focused_meditation';
+  // Bubble-Enhanced Meditation's override doubles bonus_amount (catalog_buffs.js).
+  const override = getSkillPackageOverride(packageId);
+  const bonus = Number.isFinite(override?.bonus_amount) ? { bonusAmount: override.bonus_amount } : null;
+  const row = skillPackageDetails(packageId, learned, upgrades);
+  if (!row || !Number.isFinite(row.duration) || !Number.isFinite(row.duration_max)) return bonus ? { ...pkg, ...bonus } : pkg;
+  return { ...pkg, duration: row.duration, durationMax: row.duration_max, ...bonus };
 }
 
 /** common.js randInt(lo, hi) = lo + floor(random * (1 + hi - lo)), also for fractional bounds. */

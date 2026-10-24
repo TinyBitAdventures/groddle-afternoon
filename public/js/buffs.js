@@ -93,6 +93,28 @@ export const BUFF_ITEM_CATALOG = Object.freeze({
     activeReason: 'You are already under the effects of Essence of Hairball.',
     deadReason: 'You are too dead for that now.',
   },
+  // items/essence_of_gandlevery.js verbs.imbibe + catalog_buffs.js
+  // gandlevery_charge (120 s): on_apply and every 15 s, -10 mood, +30 energy.
+  essence_of_gandlevery: {
+    buffId: 'gandlevery_charge',
+    verb: 'Imbibe',
+    itemName: 'Essence of Gandlevery',
+    message: "You feel totally pumped and ready for anything, but you've also got a major case of Gandlevery stomach.",
+    effectHint: 'Drink to receive a sustained boost of energy, at the cost of some mood',
+    activeReason: 'You are already under the effects of Essence of Gandlevery.',
+    deadReason: 'You are too dead for that now.',
+  },
+  // items/essence_of_silvertongue.js verbs.imbibe + catalog_buffs.js
+  // gift_of_gab: +20% on the next quest or badge reward; on_apply ends Silvertongue.
+  essence_of_silvertongue: {
+    buffId: 'gift_of_gab',
+    verb: 'Imbibe',
+    itemName: 'Essence of Silvertongue',
+    message: 'You are suddenly possessed of the grandest grandiloquence, able to charm even the most cantankerous of curmudgeons, leaving friends flummoxed and the victims of your versiform vituperations verily vanquished. Also, you could probably wrangle some extra rewards from your next accomplishment.',
+    effectHint: 'Drink to greatly increase the benefits of your next quest or achievement',
+    activeReason: 'You are already under the effects of Essence of Silvertongue.',
+    deadReason: 'You are too dead for that now.',
+  },
 });
 
 /**
@@ -209,6 +231,11 @@ function applyStartEffects(classTsid, pc) {
     // catalog_buffs.js no_no_powder on_apply: both tanks to the top.
     pc.energy = energyCap(pc);
     pc.mood = moodMax(pc);
+  } else if (START_EFFECTS[classTsid]) {
+    // catalog_buffs.js on_apply metabolics (Gandlevery, Gandlevery Charge).
+    const start = START_EFFECTS[classTsid];
+    if (start.energy) pc.energy = clamp(beforeEnergy + start.energy, 0, energyCap(pc));
+    if (start.mood) pc.mood = clamp(beforeMood + start.mood, 0, moodMax(pc));
   }
   if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
   if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
@@ -237,6 +264,8 @@ export function applyBuff(state, classTsid, pc = null, now = Date.now(), opts = 
     args: opts.args && typeof opts.args === 'object' ? { ...opts.args } : {},
     def,
   };
+  // gift_of_gab on_apply: buffs_remove('silvertongue').
+  if (classTsid === 'gift_of_gab') delete state.active.silvertongue;
   state.active[classTsid] = row;
   state.totalActivated = Math.max(0, Number(state.totalActivated) || 0) + 1;
   const effects = row.activated ? applyStartEffects(classTsid, pc) : {};
@@ -248,8 +277,28 @@ export function removeBuff(state, classTsid, pc = null, now = Date.now()) {
   if (!activeRows(state)[classTsid]) return { ok: false, reason: 'not_active' };
   const buff = state.active[classTsid];
   delete state.active[classTsid];
+  const effects = buff.activated !== false ? applyRemoveEffects(classTsid, pc) : {};
   syncPcBuffFlags(state, pc, now);
-  return { ok: true, reason: 'removed', buff };
+  return { ok: true, reason: 'removed', buff, effects };
+}
+
+/** catalog_buffs.js on_remove metabolics and iMG (Hungover, Garlic Breath). */
+function applyRemoveEffects(classTsid, pc) {
+  const effects = {};
+  const end = REMOVE_EFFECTS[classTsid];
+  if (!pc || !end) return effects;
+  const beforeEnergy = Number(pc.energy) || 0;
+  const beforeMood = Number(pc.mood) || 0;
+  if (end.energy) pc.energy = clamp(beforeEnergy + end.energy, 0, energyCap(pc));
+  if (end.mood) pc.mood = clamp(beforeMood + end.mood, 0, moodMax(pc));
+  if (end.xp) {
+    pc.imagination = (Number(pc.imagination) || 0) + end.xp;
+    pc.xp = (Number(pc.xp) || 0) + end.xp;
+    effects.xp = end.xp;
+  }
+  if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
+  if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
+  return effects;
 }
 
 /**
@@ -336,6 +385,25 @@ function applyTickEffect(row, pc) {
     const before = Number(pc.energy) || 0;
     pc.energy = clamp(before - 5, 0, energyCap(pc));
     if (pc.energy !== before) effects.energy = pc.energy - before;
+  } else if (row.classTsid === 'savoring_experience') {
+    // on_tick (every 10 s): metabolics_add_mood(0.05 * mood).
+    const before = Number(pc.mood) || 0;
+    pc.mood = clamp(before + Math.round(0.05 * before), 0, moodMax(pc));
+    if (pc.mood !== before) effects.mood = pc.mood - before;
+  } else if (DRINK_TICKS[row.classTsid]) {
+    // catalog_buffs.js on_tick for the drink, food and herb buffs (DRINK_TICKS).
+    const tick = DRINK_TICKS[row.classTsid];
+    const beforeEnergy = Number(pc.energy) || 0;
+    const beforeMood = Number(pc.mood) || 0;
+    if (tick.energy) pc.energy = clamp(beforeEnergy + tick.energy, 0, energyCap(pc));
+    if (tick.mood) pc.mood = clamp(beforeMood + tick.mood, 0, moodMax(pc));
+    if (tick.xp) {
+      pc.imagination = (Number(pc.imagination) || 0) + tick.xp;
+      pc.xp = (Number(pc.xp) || 0) + tick.xp;
+      effects.xp = tick.xp;
+    }
+    if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
+    if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
   } else if (HOLIDAY_TICKS[row.classTsid]) {
     // catalog_buffs.js on_tick for the seasonal treats (js/seasons.js).
     const tick = HOLIDAY_TICKS[row.classTsid];
@@ -367,8 +435,46 @@ const HOLIDAY_TICKS = Object.freeze({
   sugar_crash: { mood: -20, energy: -10 },
 });
 
-/** Chocolate High's on_remove applies Sugar Crash. */
-const ON_EXPIRE = Object.freeze({ chocolate_high: 'sugar_crash' });
+/**
+ * catalog_buffs.js on_tick metabolics (stats_add_xp is iMG + XP here):
+ * Caffeine Buzz +2 mood / 10 s; Carrot Zing +7 mood +7 energy / 4 s;
+ * Emberried Hiccups +5 +5 / 10 s; Floating on a Cloud +3 mood +1 iMG / 5 s;
+ * Sky Cruisin' and Slow Gin +5 mood / 10 s; Sophisticated Feeling +20 mood
+ * a minute; Smashed +3 mood -3 energy a minute; Hungover -2 mood +3 iMG a
+ * minute; Garlic Breath +3 mood a minute; Gandlevery +3 energy / 15 s;
+ * Gandlevery Charge -10 mood +30 energy / 15 s; A Cold Place -1 energy a
+ * second (the buff feature removes it off the three winter streets).
+ */
+export const DRINK_TICKS = Object.freeze({
+  caffeine_buzz: { mood: 2 },
+  carrot_zing: { mood: 7, energy: 7 },
+  emberried_hiccups: { mood: 5, energy: 5 },
+  floating_on_a_cloud: { mood: 3, xp: 1 },
+  sky_cruisin: { mood: 5 },
+  slow_gin: { mood: 5 },
+  sophisticated_feeling: { mood: 20 },
+  buff_smashed: { mood: 3, energy: -3 },
+  buff_hungover: { mood: -2, xp: 3 },
+  buff_garlic_breath: { mood: 3 },
+  gandlevery: { energy: 3 },
+  gandlevery_charge: { mood: -10, energy: 30 },
+  kukubee_winter_negative: { energy: -1 },
+});
+
+/** catalog_buffs.js on_apply metabolics: Gandlevery -5 mood; Gandlevery Charge -10 mood, +30 energy. */
+const START_EFFECTS = Object.freeze({
+  gandlevery: { mood: -5 },
+  gandlevery_charge: { mood: -10, energy: 30 },
+});
+
+/** catalog_buffs.js on_remove: Hungover +10 mood +10 energy; Garlic Breath +5 iMG. */
+const REMOVE_EFFECTS = Object.freeze({
+  buff_hungover: { mood: 10, energy: 10 },
+  buff_garlic_breath: { xp: 5 },
+});
+
+/** on_remove follow-ups: Chocolate High -> Sugar Crash; Smashed -> Hungover. */
+const ON_EXPIRE = Object.freeze({ chocolate_high: 'sugar_crash', buff_smashed: 'buff_hungover' });
 
 /** Lengthen an active buff (buffs_extend_time), e.g. Sugar Rush per extra candy. */
 export function extendBuff(state, classTsid, ms, now = Date.now()) {
@@ -411,9 +517,11 @@ export function tickBuffs(state, pc, now = Date.now()) {
     }
     if (row.expiresAt != null && row.expiresAt <= now) {
       delete state.active[classTsid];
-      events.push({ type: 'expired', classTsid, buff: row, effects: {} });
+      events.push({ type: 'expired', classTsid, buff: row, effects: row.activated !== false ? applyRemoveEffects(classTsid, pc) : {} });
       const follow = ON_EXPIRE[classTsid];
       if (follow) {
+        // buffs_apply restarts a running buff (no on_remove).
+        delete state.active[follow];
         const applied = applyBuff(state, follow, pc, now);
         if (applied.ok) events.push({ type: 'activated', classTsid: follow, buff: applied.buff, effects: applied.effects || {} });
       }
@@ -434,6 +542,11 @@ export function buffPhysics(state, now = Date.now()) {
   if (hasBuff(state, 'full_of_pie', now)) {
     result.speed *= 0.6;
     result.jump *= 0.7;
+  }
+  // Moonwalk: addBuffPhysics({ vx_max: 0.7, gravity: 0.5 }).
+  if (hasBuff(state, 'moonwalk', now)) {
+    result.speed *= 0.7;
+    result.gravity *= 0.5;
   }
   if (hasBuff(state, 'high_jumper', now)) {
     result.speed *= 1.7;

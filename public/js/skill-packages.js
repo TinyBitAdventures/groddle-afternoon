@@ -20,6 +20,36 @@ function asSet(list) {
 }
 
 /**
+ * players/inc_skill_packages.js addSkillPackageOverride /
+ * removeSkillPackageOverride: per-player field overrides that
+ * getSkillPackageDetails writes over the chosen row last (lines 671-675).
+ * Buffs set them (Impervious Miner, Easy Animalia, Bubble-Enhanced
+ * Meditation, Flaming Grinder, Smelt It, Dealt It); the remake has one
+ * player, so the table is module-wide and the buff feature rebuilds it
+ * from the running buffs after a reload.
+ */
+const PACKAGE_OVERRIDES = {};
+
+export function addSkillPackageOverride(packageId, fields = {}) {
+  if (!packageId || !fields || typeof fields !== 'object') return;
+  PACKAGE_OVERRIDES[packageId] = { ...(PACKAGE_OVERRIDES[packageId] || {}), ...fields };
+}
+
+export function removeSkillPackageOverride(packageId) {
+  delete PACKAGE_OVERRIDES[packageId];
+}
+
+/** The override fields for a package (a copy), or null. */
+export function getSkillPackageOverride(packageId) {
+  const o = PACKAGE_OVERRIDES[packageId];
+  return o ? { ...o } : null;
+}
+
+export function clearSkillPackageOverrides() {
+  for (const id of Object.keys(PACKAGE_OVERRIDES)) delete PACKAGE_OVERRIDES[id];
+}
+
+/**
  * Exact port of getSkillPackageDetails. Returns a fresh copy (callers may
  * adjust it) with `skill` naming the row that applied, or null when the
  * player qualifies for no row (for example Mining without Mining I).
@@ -66,6 +96,9 @@ export function skillPackageDetails(packageId, learned = [], upgrades = []) {
         : out[key] * Math.abs(durationMultiplier);
     }
   }
+  // Overrides last (inc_skill_packages.js:671-675).
+  const override = PACKAGE_OVERRIDES[packageId];
+  if (override) Object.assign(out, override);
   return out;
 }
 

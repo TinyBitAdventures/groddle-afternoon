@@ -298,12 +298,15 @@ export function maxStudyAcceleration(state, now = Date.now()) {
  * (skills_start_acceleration, inc_skills.js:957-999). Time quoins, Giant favor
  * spent at a shrine and spent emblems all come through here.
  */
-export function accelerateActiveStudy(state, seconds, now = Date.now()) {
+export function accelerateActiveStudy(state, seconds, now = Date.now(), opts = {}) {
   tickSkillStudy(state, now);
   const active = getActiveStudy(state, now);
   if (!active) return { ok: false, reason: 'not_studying', requested: Math.max(0, Math.floor(finite(seconds, 0))) };
   const requested = Math.max(0, Math.floor(finite(seconds, 0)));
-  const maximum = maxStudyAcceleration(state, now);
+  // skills_start_acceleration(duration, ignore_max): capped by the time left, not half of it.
+  const maximum = opts.ignoreMax
+    ? Math.max(0, Math.floor(active.remainingSeconds))
+    : maxStudyAcceleration(state, now);
   const applied = Math.min(requested, maximum);
   if (!applied) return { ok: false, reason: 'max_acceleration', requested, maximum, classTsid: active.classTsid };
   const row = state.queue[active.classTsid];
