@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 318,
+  "commits": 319,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "The restoration page's room grid drops its Play buttons; each room's dialog keeps one"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1924,14 +1929,9 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Petting a piggy keeps it happy that day, and piggies you own can starve"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "An \"Every change\" page lists everything restored, day by day"
    }
   ]
  },
- "tests": 186,
+ "tests": 187,
  "generatedAt": "2026-10-23"
 }

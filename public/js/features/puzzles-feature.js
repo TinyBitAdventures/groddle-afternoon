@@ -32,6 +32,7 @@ import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import {
   PUZZLE_DATA_URL,
   SOURCE_PHYSICS,
+  autoplaySteps,
   completionReward,
   normalizePuzzleData,
   normalizePuzzleSave,
@@ -57,7 +58,7 @@ let demo = { stage: 'idle', at: 0, queue: [], target: '' };
 function load() {
   if (data) return Promise.resolve(data);
   if (!loading) {
-    loading = fetch(`${PUZZLE_DATA_URL}?v=puzzles-1`)
+    loading = fetch(`${PUZZLE_DATA_URL}?v=puzzles-2`)
       .then((r) => r.json())
       .then((raw) => {
         data = normalizePuzzleData(raw);
@@ -119,6 +120,8 @@ function spawnQuoins(engine, def) {
     spr.scale.set(0.55);
     spr.zIndex = 40;
     spr.puzzleQuoin = q;
+    // Flagged quoins wait for the street's script (Penumbra's covered windows).
+    if (q.flag) spr.visible = false;
     engine.entityLayer.addChild(spr);
     run.sprites.push(spr);
     run.quoinViews.set(q.id, { spr, baseY: q.y, phase: (q.x % 97) / 15 });
@@ -127,7 +130,7 @@ function spawnQuoins(engine, def) {
 
 function takeQuoins(engine) {
   const p = engine.player;
-  for (const q of quoinsInReach(run.def.quoins, run.taken, p.x, p.y)) {
+  for (const q of quoinsInReach(run.def.quoins, run.taken, p.x, p.y, 34, locationEventsApi.flag)) {
     run.taken.add(q.id);
     const view = run.quoinViews.get(q.id);
     if (view?.spr && !view.spr.destroyed) view.spr.visible = false;
@@ -434,6 +437,7 @@ function stepRun(engine) {
     }
   }
   for (const view of run.artViews) {
+    if (view.a.steady) continue; // solid set pieces (Umbra's return ledge) do not pulse
     view.phase += 0.05;
     if (view.spr && !view.spr.destroyed) view.spr.alpha = (view.a.alpha ?? 0.6) * (0.85 + Math.sin(view.phase) * 0.15);
   }
@@ -446,9 +450,12 @@ function stepRun(engine) {
   if (exit && !exit.door && !exit.flag && !run.complete && Math.abs(p.x - exit.x) <= (exit.w || 60) / 2 && p.y <= exit.y + 4 && p.y >= exit.y - (exit.h || 80)) {
     complete(engine);
   }
-  for (const view of run.quoinViews.values()) {
+  for (const [id, view] of run.quoinViews) {
     view.phase += 0.08;
-    if (view.spr && !view.spr.destroyed) view.spr.y = view.baseY + Math.sin(view.phase) * 4;
+    if (!view.spr || view.spr.destroyed) continue;
+    view.spr.y = view.baseY + Math.sin(view.phase) * 4;
+    const flag = view.spr.puzzleQuoin?.flag;
+    if (flag && !view.spr.visible && !run.taken.has(id) && locationEventsApi.flag(flag)) view.spr.visible = true;
   }
   run.prevY = engine.player?.y ?? null;
 }
@@ -609,13 +616,13 @@ function demoStep(engine, now) {
       demo.stage = 'done';
       return;
     }
-    const steps = (def.autoplay || def.triggers.filter((t) => !t.respawn).map((t) => t.id)).map((id) => ({ kind: 'trigger', id }));
+    const steps = autoplaySteps(def);
     const stopAt = auto !== '1' ? auto : '';
     if (stopAt) {
-      const at = steps.findIndex((s) => s.id === stopAt);
-      demo.queue = at >= 0 ? steps.slice(0, at + 1) : steps;
+      const at = steps.findIndex((s) => s.kind === 'trigger' && s.id === stopAt);
+      demo.queue = at >= 0 ? steps.slice(0, at + 1) : steps.filter((s) => s.kind === 'trigger');
     } else {
-      demo.queue = [...steps, ...def.quoins.map((q) => ({ kind: 'quoin', q })), { kind: 'exit' }];
+      demo.queue = steps;
     }
     demo.stage = 'run';
     demo.at = now + 800;

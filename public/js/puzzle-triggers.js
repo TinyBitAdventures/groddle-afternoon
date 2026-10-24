@@ -77,7 +77,9 @@ export function normalizePuzzleStreet(raw) {
         }
       : null,
     triggers: (raw.triggers || []).map(normalizeTrigger),
-    quoins: (raw.quoins || []).map((q, i) => ({ id: `q${i + 1}`, x: num(q.x), y: num(q.y), type: String(q.type || 'xp'), amount: num(q.amount, 0) || null })),
+    // `flag`: the quoin stays hidden and out of reach until the street's
+    // scripts set that flag (Penumbra's orbs behind covered windows).
+    quoins: (raw.quoins || []).map((q, i) => ({ id: `q${i + 1}`, x: num(q.x), y: num(q.y), type: String(q.type || 'xp'), amount: num(q.amount, 0) || null, ...(q.flag ? { flag: String(q.flag) } : {}) })),
   };
 }
 
@@ -130,9 +132,26 @@ export function respawnPoint(def, bestX) {
   return at;
 }
 
-/** Quoins in reach of the avatar this frame (not yet taken). */
-export function quoinsInReach(quoins, taken, x, y, reach = 34) {
-  return quoins.filter((q) => !taken.has(q.id) && Math.abs(q.x - x) <= reach && y >= q.y - reach * 1.2 && y - 50 <= q.y + reach * 0.4);
+/**
+ * Quoins in reach of the avatar this frame (not yet taken). `hasFlag(name)`
+ * answers for flagged quoins; without it they stay out of reach.
+ */
+export function quoinsInReach(quoins, taken, x, y, reach = 34, hasFlag = null) {
+  return quoins.filter((q) => !taken.has(q.id) && (!q.flag || (hasFlag && hasFlag(q.flag))) && Math.abs(q.x - x) <= reach && y >= q.y - reach * 1.2 && y - 50 <= q.y + reach * 0.4);
+}
+
+/**
+ * Autoplay order for a street: trigger ids, with `*quoins` standing for every
+ * quoin at that point (so a street whose last trigger leaves it, like
+ * Penumbra's way back to Umbra, still collects first).
+ * @returns {{ kind: 'trigger', id: string } | { kind: 'quoin', q: object } | { kind: 'exit' }}[]
+ */
+export function autoplaySteps(def) {
+  const order = def?.autoplay || (def?.triggers || []).filter((t) => !t.respawn).map((t) => t.id);
+  const steps = order.flatMap((id) => (id === '*quoins' ? (def.quoins || []).map((q) => ({ kind: 'quoin', q })) : [{ kind: 'trigger', id }]));
+  if (!order.includes('*quoins')) steps.push(...(def?.quoins || []).map((q) => ({ kind: 'quoin', q })), { kind: 'exit' });
+  else if (def?.exit) steps.push({ kind: 'exit' });
+  return steps;
 }
 
 /** Completion reward: the first finish only; later runs are for fun. */

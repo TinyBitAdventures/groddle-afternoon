@@ -12944,6 +12944,15 @@
       "platforms": 2,
       "decos": 63,
       "reconstructed": true
+    },
+    "GIFM2QAIQ1C31JV": {
+      "label": "Penumbra",
+      "file": "assets/streets/GIFM2QAIQ1C31JV.json",
+      "hubId": "135",
+      "hubName": "Puzzles",
+      "platforms": 9,
+      "decos": 253,
+      "reconstructed": true
     }
   }
 }
