@@ -17,10 +17,12 @@ import {
   isMusicblock,
   listMusicblockCollection,
   MUSICBLOCK_ENDGAME_DROP,
+  MUSICBLOCK_PLAYBACK,
   MUSICBLOCK_SERIES,
   MUSICBLOCK_STREET_POOL,
   musicblockCollectionNote,
   musicblockItemMeta,
+  musicblockPlaySeconds,
   musicblockSeriesProgress,
   planMusicblockDrop,
   playMusicblock,
@@ -319,5 +321,66 @@ describe('Musicblock collection badges from any source', () => {
     assert.deepEqual(events, [['in_inventory:musicblock_x_shiny_03', 1]]);
     const index = readFileSync(join(publicRoot, 'js/features/index.js'), 'utf8');
     assert.match(index, /FEATURES\.push\(musicblocksFeature\)/);
+  });
+});
+
+// G102: how the client played a block, checked against the AS3 client and GSJS.
+// Footage (research/audio-hunt/README.md, G102) agrees: the street music drops out
+// under the block and every well-matched block plays past its music_duration.
+const CLIENT_SOUND = join(here, '../../glitch-client/com/tinyspeck/engine/sound');
+describe('Musicblock playback (G102)', () => {
+  it('pauses the street music, plays the whole recording and gives way to a new block', () => {
+    assert.deepEqual({ ...MUSICBLOCK_PLAYBACK }, {
+      gain: 0.72,
+      streetMusicLevel: 0,
+      streetFadeOutSec: 1,
+      streetFadeInSec: 1,
+      previousBlockFadeOutSec: 0.5,
+    });
+    // BB-3: 15.01 s recording, 8 s music_duration; footage hears it to 14.5 s.
+    const bb3 = getMusicblock('musicblock_b_brown_03');
+    assert.equal(bb3.durationMs, 8000);
+    assert.equal(musicblockPlaySeconds(bb3, 15.01), 15.01);
+    // A recording shorter than music_duration still plays to its own end.
+    assert.equal(musicblockPlaySeconds(getMusicblock('musicblock_d_green_03'), 7.6), 7.6);
+    // No decoded buffer length: fall back to music_duration.
+    assert.equal(musicblockPlaySeconds(bb3, 0), 8);
+    assert.equal(musicblockPlaySeconds(bb3, Number.NaN), 8);
+  });
+
+  it('matches the GSJS play verb: an exclusive sound, music_duration only times the overlays', { skip: !existsSync(GSJS) && 'GSJS not present' }, () => {
+    for (const def of Object.values(MUSICBLOCK_CATALOG)) {
+      const src = readFileSync(join(GSJS, `items/${def.classTsid}.js`), 'utf8');
+      const play = src.slice(src.indexOf('verbs.play = {'));
+      // announce_sound(name, loop_count, fade_in, is_exclusive)
+      assert.match(play, /pc\.announce_sound\(this\.class_tsid\.toUpperCase\(\), 0, 0, true\);/, def.classTsid);
+      const uses = [...play.matchAll(/\bduration\b/g)].length;
+      const overlayUses = [...play.matchAll(/duration: duration,/g)].length;
+      // var duration = getClassProp('music_duration'), then only pc_overlay announcements read it.
+      assert.equal(uses, 1 + overlayUses * 2, def.classTsid);
+    }
+  });
+
+  it('matches the client mixer for exclusive sounds', { skip: !existsSync(CLIENT_SOUND) && 'glitch-client not present' }, () => {
+    const master = readFileSync(join(CLIENT_SOUND, 'SoundMaster.as'), 'utf8');
+    const manager = readFileSync(join(CLIENT_SOUND, 'SoundManager.as'), 'utf8');
+    assert.match(master, /private static const AMBIENT_FADE_MS:int = 1000;/);
+    assert.match(master, /if\(is_exclusive \|\| is_music\)\{\s*if\(is_ambient_playing\) ambientStop\(\);\s*\/\/this guy gets to play over everything\s*stopAllSoundEffects\(\.5\);/);
+    assert.match(master, /private function pauseMusic\(sound_id:String, fade_secs:Number = 1\)/);
+    assert.match(master, /SoundManager\.instance\.resumeSound\(ambient_tracks\[ambient_track_index\], _music_volume, AMBIENT_FADE_MS\/1000\);/);
+    // Played again while playing: stopped and started from the top.
+    assert.match(manager, /if\(\$isExclusive && snd\.paused === false\)\{\s*stopSound\(\$name\);/);
+    // Both sliders start equal, and the block plays at the SFX volume.
+    assert.match(manager, /DEFAULT_SFX_VOLUME:Number = \.6;/);
+    assert.match(manager, /DEFAULT_MUSIC_VOLUME:Number = \.6;/);
+    assert.match(master, /var volume:Number = sfx_volume;\s*var can_play:Boolean;\s*if\(is_music\) volume = music_volume;/);
+  });
+
+  it('is wired into game.js', () => {
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    const fn = game.slice(game.indexOf('async function playMusicblockAudio'), game.indexOf('function startMusic'));
+    assert.match(fn, /src\.stop\(t \+ musicblockPlaySeconds\(def, src\.buffer\.duration\)\)/);
+    assert.doesNotMatch(fn, /def\.durationMs \/ 1000/);
+    assert.match(game, /blockPause \? MUSICBLOCK_PLAYBACK\.streetMusicLevel/);
   });
 });

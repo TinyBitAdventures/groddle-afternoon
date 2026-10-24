@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-2';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-37';
 import {
@@ -654,16 +654,18 @@ import {
 } from './js/ambient-music.js';
 import {
   MUSICBLOCK_CATALOG,
+  MUSICBLOCK_PLAYBACK,
   createMusicblockState,
   ensureMusicblockItems,
   getMusicblock,
   isMusicblock,
   listMusicblockCollection,
   musicblockCollectionNote,
+  musicblockPlaySeconds,
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=musicblocks-note-2';
+} from './js/musicblocks.js?v=musicblocks-playback-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -3746,8 +3748,11 @@ function stopCraftSoundLoop() {
 }
 
 /**
- * The block's class sound (musicblock_base play: announce_sound(CLASS_TSID)),
- * loaded on first play, cut at music_duration with a short fade, ducking BGM.
+ * The block's class sound (musicblock_base play: announce_sound(CLASS_TSID, 0, 0, true)),
+ * loaded on first play. Exclusive, as in the client (MUSICBLOCK_PLAYBACK): the whole
+ * recording plays (music_duration only times the overlays), the street music fades
+ * out and back in around it, a block already playing fades out over 0.5 s, and the
+ * same block played again restarts from the top.
  */
 let musicblockPlayToken = 0;
 async function playMusicblockAudio(def) {
@@ -3760,10 +3765,20 @@ async function playMusicblockAudio(def) {
     return;
   }
   if (token !== musicblockPlayToken || state.muted) return;
+  const t = audio.ctx.currentTime;
   if (audio.musicblock) {
     const previous = audio.musicblock;
+    const previousGain = audio.musicblockGain;
+    const fade = audio.musicblockClass === def.classTsid ? 0 : MUSICBLOCK_PLAYBACK.previousBlockFadeOutSec;
     audio.musicblock = null;
-    try { previous.stop(); } catch { /* already ended */ }
+    try {
+      if (fade && previousGain) {
+        previousGain.gain.cancelScheduledValues(t);
+        previousGain.gain.setValueAtTime(previousGain.gain.value, t);
+        previousGain.gain.linearRampToValueAtTime(0.0001, t + fade);
+      }
+      previous.stop(t + fade);
+    } catch { /* already ended */ }
   }
   const src = audio.ctx.createBufferSource();
   const gain = audio.ctx.createGain();
@@ -3771,18 +3786,20 @@ async function playMusicblockAudio(def) {
   src.connect(gain);
   gain.connect(audio.sfxGain);
   audio.musicblock = src;
+  audio.musicblockGain = gain;
+  audio.musicblockClass = def.classTsid;
+  audio.musicblockPausesStreet = true;
   src.onended = () => {
     if (audio.musicblock !== src) return;
     audio.musicblock = null;
+    audio.musicblockGain = null;
+    audio.musicblockClass = null;
+    audio.musicblockPausesStreet = false;
     applyMute();
   };
-  const durationSec = Math.min(src.buffer.duration, Math.max(0.5, def.durationMs / 1000));
-  const t = audio.ctx.currentTime;
-  gain.gain.setValueAtTime(0.72, t);
-  gain.gain.setValueAtTime(0.72, t + Math.max(0, durationSec - 0.6));
-  gain.gain.linearRampToValueAtTime(0.0001, t + durationSec);
+  gain.gain.setValueAtTime(MUSICBLOCK_PLAYBACK.gain, t);
   src.start(0);
-  src.stop(t + durationSec);
+  src.stop(t + musicblockPlaySeconds(def, src.buffer.duration));
   if (app?.canvas) app.canvas.dataset.lastSound = `${def.soundKey}:file`;
   applyMute();
 }
@@ -3874,9 +3891,24 @@ function syncMuteButton() {
 function applyMute() {
   syncMuteButton();
   if (!audio.musicGain) return;
-  const vol = state.muted || ambientThemeId === SILENT_THEME ? 0 : audio.musicblock ? 0.055 : 0.26;
+  const blockPause = Boolean(audio.musicblock && audio.musicblockPausesStreet);
+  const vol = state.muted || ambientThemeId === SILENT_THEME
+    ? 0
+    : blockPause ? MUSICBLOCK_PLAYBACK.streetMusicLevel : audio.musicblock ? 0.055 : 0.26;
+  // The client fades the street music out (1 s) for a Musicblock and back in (1 s) after it.
+  const fadeSec = blockPause === Boolean(audio.streetPausedForBlock)
+    ? 0
+    : blockPause ? MUSICBLOCK_PLAYBACK.streetFadeOutSec : MUSICBLOCK_PLAYBACK.streetFadeInSec;
+  audio.streetPausedForBlock = blockPause;
   try {
-    audio.musicGain.gain.setTargetAtTime(vol, audio.ctx.currentTime, 0.05);
+    const t = audio.ctx.currentTime;
+    if (fadeSec) {
+      audio.musicGain.gain.cancelScheduledValues(t);
+      audio.musicGain.gain.setValueAtTime(audio.musicGain.gain.value, t);
+      audio.musicGain.gain.linearRampToValueAtTime(vol, t + fadeSec);
+    } else {
+      audio.musicGain.gain.setTargetAtTime(vol, t, 0.05);
+    }
   } catch {
     audio.musicGain.gain.value = vol;
   }
@@ -7633,6 +7665,10 @@ const engine = {
     src.connect(gain);
     gain.connect(audio.sfxGain);
     audio.musicblock = src;
+    // Cues keep the soft duck; only a Musicblock pauses the street music.
+    audio.musicblockGain = null;
+    audio.musicblockClass = null;
+    audio.musicblockPausesStreet = false;
     src.onended = () => {
       if (audio.musicblock === src) audio.musicblock = null;
       applyMute();

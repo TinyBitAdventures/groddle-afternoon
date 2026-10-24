@@ -1828,9 +1828,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 343,
+  "commits": 344,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Firefly Whistle: swallow the Fireflex 3000 whistle and find your own way home"
+   },
    {
     "date": "2026-10-24",
     "kind": "improve",
@@ -1945,11 +1950,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Notes, a blog of build write-ups that replaces the old build archive page"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "The loading card says when you were last here, what the street is home to, and welcomes you to a new hub"
    }
   ]
  },

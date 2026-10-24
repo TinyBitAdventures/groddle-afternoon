@@ -107,6 +107,41 @@ export const MUSICBLOCK_CATALOG = Object.freeze({
     "This is the rare original recording of the song the Giants were humming when they were imagining the world."),
 });
 
+/**
+ * How the original client played a block (G102). musicblock_base play sends
+ * announce_sound(CLASS_TSID, 0, 0, true): an exclusive play_sound. In the
+ * client (SoundMaster.playSound / SoundManager, glitch-client) an exclusive sound:
+ * - pauses the street music, fading it out over 1 s (ambientStop -> pauseMusic, fade 1);
+ *   it is not ducked under the block;
+ * - fades every other sound effect out over 0.5 s (stopAllSoundEffects(.5)), so a
+ *   block already playing gives way to the new one instead of overlapping it;
+ * - restarts from the top when the same block is played again mid-tune
+ *   (SoundManager.playSound stops an exclusive sound that is still playing);
+ * - plays at the SFX volume like any other effect (both sliders default to 0.6);
+ * - runs to the end of the recording: music_duration only times the pc_overlay
+ *   bubbles, nothing stops the sound;
+ * - then lets the street music resume where it paused, fading in over 1 s
+ *   (onSoundComplete -> ambientPlay -> resumeSound(..., AMBIENT_FADE_MS / 1000)).
+ * Player footage agrees (research/audio-hunt/README.md, G102): no street music under
+ * the tail of BB-2/BB-3, DR-3 or DG-5, and every well-matched block plays past
+ * its music_duration (BB-3 to 14.5 s of 15.0 against 8 s).
+ * gain sits the block level with the rest of the SFX board (bus 0.7).
+ */
+export const MUSICBLOCK_PLAYBACK = Object.freeze({
+  gain: 0.72,
+  streetMusicLevel: 0,
+  streetFadeOutSec: 1,
+  streetFadeInSec: 1,
+  previousBlockFadeOutSec: 0.5,
+});
+
+/** Seconds of a block's recording to play: all of it (durationMs only times the overlays). */
+export function musicblockPlaySeconds(def, bufferSeconds) {
+  const whole = Number(bufferSeconds);
+  if (Number.isFinite(whole) && whole > 0) return whole;
+  return Math.max(0.5, (def?.durationMs || 0) / 1000);
+}
+
 /** Item catalog meta for one block (other modules that drop blocks register through this). */
 export function musicblockItemMeta(classTsid) {
   const def = MUSICBLOCK_CATALOG[classTsid];
