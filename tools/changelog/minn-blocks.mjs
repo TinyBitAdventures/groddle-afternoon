@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
- * The Groddle theme's note blocks (minn/groddle/blocks/<name>/block.json) and
- * the card icons they draw (minn/groddle/marks/<name>.svg), written from
- * tools/changelog/posts.json. Each card's icon is named after the first card
- * that used it; the feature block's icon attribute lists every name.
+ * The Groddle theme's blocks (minn/groddle/blocks/<name>/block.json) and the
+ * card icons they draw (minn/groddle/marks/<name>.svg). The note blocks are
+ * written from tools/changelog/posts.json: each card's icon is named after the
+ * first card that used it, and the feature block's icon attribute lists every
+ * name. The restoration blocks are the restoration report's data sections,
+ * drawn from public/restoration/data.json (minn/groddle/src/Restoration.php).
  *
  *   node tools/changelog/minn-blocks.mjs [--check]
  *
@@ -76,6 +78,29 @@ export function blockTypes(icons) {
     quest: leaf('quest', 'Quest', 'One quest card.', { n: text('1'), kind: text('Quest'), short: text(), title: text('A quest'), text: text('What it asks.'), source: text(), play: text(), finish: text() }, 'quests'),
     signpost: { ...leaf('signpost', 'Signpost', 'A signpost drawing with arms pointing left and right, and a caption.', { label: text(), caption: text() }), allowedBlocks: ['groddle/sign'], example: example('sign', [{ side: 'left', text: 'Somewhere' }]) },
     sign: leaf('sign', 'Sign arm', 'One arm of a signpost.', { side: { type: 'string', enum: ['left', 'right'], default: 'left' }, text: text('Somewhere') }, 'signpost'),
+    ...restorationTypes(leaf),
+  };
+}
+
+/**
+ * The restoration report's data sections: each draws its part of the page from
+ * data.json (build-restoration.mjs), so its figures are never typed in. The
+ * words around them are ordinary blocks.
+ */
+function restorationTypes(leaf) {
+  const data = (name, title, description, attributes = {}) => ({ ...leaf(`restoration-${name}`, title, description, attributes), category: 'widgets', keywords: ['restoration', 'report'] });
+  return {
+    'restoration-score': data('score', 'Restoration score', 'How many of the game\'s systems are playable again, with a bar and legend by status.'),
+    'restoration-street': data('street', 'Restoration street', 'The street diorama: click anything on it to see what has been restored behind it.', { prompt: text('Pick something on the street: a piggy, the tree, a quoin, the shrine…') }),
+    'restoration-systems': data('systems', 'Restoration systems', 'Every system of the game by group, with status filters.'),
+    'restoration-numbers': data('numbers', 'Restoration numbers', 'Figures counted from the repository, and where the original quests stand. {total} in the heading is the number of original quests.', { questsHeading: text('Where the {total} original quests stand') }),
+    'restoration-rooms': data('rooms', 'Restoration quest rooms', 'The quest rooms as cards, each opening its story.'),
+    'restoration-designers': data('designers', 'Restoration designers\' levels', 'The levels Tiny Speck\'s designers recorded, grouped by designer.'),
+    'restoration-levels': data('levels', 'Restoration levels from words', 'Levels rebuilt from text alone, with no recording.'),
+    'restoration-recent': data('recent', 'Restoration recent changes', 'The latest additions and fixes from the project\'s history.'),
+    'restoration-lost': data('lost', 'Restoration lost systems', 'The systems that cannot come back, with why.'),
+    'restoration-legend': data('legend', 'Restoration tag legend', 'What each status tag means.'),
+    'restoration-stamp': data('stamp', 'Restoration stamp', 'When data.json was generated, from how many commits and test files.'),
   };
 }
 

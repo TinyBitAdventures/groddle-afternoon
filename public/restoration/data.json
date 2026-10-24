@@ -1975,9 +1975,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 375,
+  "commits": 376,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "The Groddle theme on Minn, and the Notes blog moves into Minn as editable posts"
+   },
    {
     "date": "2026-10-24",
     "kind": "new",
@@ -2092,11 +2097,6 @@
     "date": "2026-10-24",
     "kind": "improve",
     "text": "Operation Grow's bog field sits over a root tunnel, as in the Snaps"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "The Fireflex 3000 Lab is dressed in Tiny Speck's own lab art, and its graffiti reads \"Tii Saves\""
    }
   ]
  },

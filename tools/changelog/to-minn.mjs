@@ -28,11 +28,11 @@ const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/
 const SITE = String(args.site || 'https://groddle.localhost').replace(/\/$/, '');
 const DRY = !!args.dry;
 
-const json = (v) => JSON.stringify(v);
+export const json = (v) => JSON.stringify(v);
 // Attributes as the block editor writes them into the comment.
-const attrJson = (attrs) => json(attrs).replace(/--/g, '\\u002d\\u002d').replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026').replace(/\\"/g, '\\u0022');
+export const attrJson = (attrs) => json(attrs).replace(/--/g, '\\u002d\\u002d').replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026').replace(/\\"/g, '\\u0022');
 const opened = (name, attrs) => `<!-- wp:${name}${attrs && Object.keys(attrs).length ? ' ' + attrJson(attrs) : ''}`;
-const block = (name, attrs, inner) => `${opened(name, attrs)} -->\n${inner}\n<!-- /wp:${name} -->`;
+export const block = (name, attrs, inner) => `${opened(name, attrs)} -->\n${inner}\n<!-- /wp:${name} -->`;
 // The theme's blocks: empty attributes left out (the block.json defaults are empty or a placeholder only a new block shows).
 const given = (attrs) => Object.fromEntries(Object.entries(attrs).filter(([, v]) => v !== undefined && v !== null && v !== ''));
 const leaf = (name, attrs) => `${opened(`groddle/${name}`, given(attrs))} /-->`;
@@ -100,7 +100,7 @@ export function noteContent(post) {
   return out.join('\n\n');
 }
 
-class Minn {
+export class Minn {
   constructor(site) { this.site = site; this.cookies = new Map(); this.nonce = ''; }
   jar(res) {
     for (const c of res.headers.getSetCookie?.() || []) {

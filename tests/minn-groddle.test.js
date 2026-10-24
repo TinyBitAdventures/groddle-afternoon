@@ -63,21 +63,48 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     }
   });
 
-  it('registers one block per block.json, each drawn by Blocks.php, with the icons the cards name', () => {
+  it('registers one block per block.json, each drawn by Blocks.php or Restoration.php, with the icons the cards name', () => {
     const declared = JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8')).blocks;
     const dirs = readdirSync(join(ext, 'blocks'));
     const blocks = readFileSync(join(ext, 'src/Blocks.php'), 'utf8');
+    const restoration = readFileSync(join(ext, 'src/Restoration.php'), 'utf8');
     assert.deepEqual(dirs.map((d) => `groddle/${d}`).sort(), [...declared].sort());
     for (const d of dirs) {
       const type = JSON.parse(readFileSync(join(ext, 'blocks', d, 'block.json'), 'utf8'));
       assert.equal(type.name, `groddle/${d}`);
-      assert.match(blocks, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
+      if (d.startsWith('restoration-')) assert.match(restoration, new RegExp(`\\$section\\('${d.slice('restoration-'.length)}'`), d);
+      else assert.match(blocks, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
       if (type.parent) assert.ok(declared.includes(type.parent[0]), `${d}'s parent is a declared block`);
       if (type.allowedBlocks) assert.deepEqual(type.example.innerBlocks.map((b) => b.name), type.allowedBlocks, `${d} inserts with a child to edit`);
     }
     const icons = JSON.parse(readFileSync(join(ext, 'blocks/feature/block.json'), 'utf8')).attributes.icon.enum;
     assert.deepEqual(icons.map((i) => `${i}.svg`).sort(), readdirSync(join(ext, 'marks')).sort());
     execFileSync('node', [join(root, 'tools/changelog/minn-blocks.mjs'), '--check'], { stdio: 'ignore' });
+  });
+
+  it('makes the restoration report a page of blocks: core blocks for the words, one data block per section (tools/restoration/to-minn.mjs)', async () => {
+    const { restorationContent } = await import('../tools/restoration/to-minn.mjs');
+    const content = restorationContent();
+    assert.doesNotMatch(content, /wp:html/);
+    const sections = readdirSync(join(ext, 'blocks')).filter((d) => d.startsWith('restoration-'));
+    for (const d of sections) assert.equal(content.split(`<!-- wp:groddle/${d}`).length - 1, 1, `${d} is on the page once`);
+    // Every jump link lands on a band, each band's heading carries the id its section is labelled by.
+    const bands = [...content.matchAll(/<section class="wp-block-group band[^"]*" id="([a-z]+)">/g)].map((m) => m[1]);
+    assert.deepEqual(bands, ['street', 'systems', 'numbers', 'rooms', 'designers', 'recent', 'honest']);
+    for (const [, id] of content.matchAll(/<a href="#([a-z]+)">/g)) assert.ok(bands.includes(id), id);
+    for (const id of bands) assert.match(content, new RegExp(`<h2 class="wp-block-heading" id="${id}-h">`));
+    // The page is published at /restoration/ and wins over the built file there; its template is declared.
+    assert.match(readFileSync(join(ext, 'src/StaticPages.php'), 'utf8'), /pageByPath\(explode\('\/', \$folder\)\) !== null/);
+    assert.deepEqual(JSON.parse(readFileSync(join(ext, 'theme.json'), 'utf8')).customTemplates.map((t) => t.name), ['page-wide']);
+    assert.match(readFileSync(join(ext, 'templates/page-wide.html'), 'utf8'), /wp:post-content/);
+  });
+
+  it('draws what restoration.js fills: every container id the script looks for', () => {
+    const script = readFileSync(join(root, 'public/restoration/restoration.js'), 'utf8');
+    const drawn = readFileSync(join(ext, 'src/Restoration.php'), 'utf8');
+    const ids = new Set([...script.matchAll(/\$\('#([a-z-]+)'/g)].map((m) => m[1]));
+    assert.ok(ids.size > 15);
+    for (const id of ids) assert.match(drawn, new RegExp(`id="${id}"`), id);
   });
 
   it('is plain PHP the engine can load', (t) => {

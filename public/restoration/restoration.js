@@ -2,6 +2,10 @@
  * Groddle Field Notes · Restoration. Renders public/restoration/data.json,
  * which tools/build-restoration.mjs computes from the repo and
  * tools/restoration/checklist.mjs.
+ *
+ * On the Minn site the page is made of blocks (minn/groddle/src/Restoration.php)
+ * that draw these containers, some already filled: each part replaces what is
+ * there, and a part whose block is not on the page is skipped.
  */
 
 import { dametimeParts } from '../js/game-day.js';
@@ -34,6 +38,9 @@ function renderScore(data) {
   for (const node of document.querySelectorAll('[data-bind]')) node.textContent = fmt(data[node.dataset.bind]);
   const bar = $('#score-bar');
   const legend = $('#score-legend');
+  if (!bar || !legend) return;
+  bar.replaceChildren();
+  legend.replaceChildren();
   const total = data.items.length;
   for (const status of STATUS_ORDER) {
     const n = data.tally[status] || 0;
@@ -75,6 +82,7 @@ function setupDiorama(data) {
   const frame = $('#diorama-frame');
   const stage = $('#diorama');
   const card = $('#spot-card');
+  if (!frame || !stage || !card) return;
   const fit = () => {
     const s = frame.clientWidth / 1200;
     stage.style.transform = `scale(${s})`;
@@ -110,6 +118,9 @@ function setupDiorama(data) {
 function setupBoard(data) {
   const filters = $('#filters');
   const groupsEl = $('#groups');
+  if (!filters || !groupsEl) return;
+  filters.replaceChildren();
+  groupsEl.replaceChildren();
   let active = 'all';
   const chips = [];
   const addChip = (id, label, count) => {
@@ -167,6 +178,8 @@ function setupBoard(data) {
 /* —— Numbers ———————————————————————————— */
 function renderNumbers(data) {
   const tiles = $('#tiles');
+  if (!tiles) return;
+  tiles.replaceChildren();
   const tile = (num, of, label, note, ratio) => el('div', { class: 'tile' },
     el('div', { class: 'tile-num' }, fmt(num), of != null ? el('small', {}, ` / ${fmt(of)}`) : null),
     el('p', { class: 'tile-label' }, label),
@@ -189,6 +202,8 @@ function renderNumbers(data) {
 
   const bar = $('#quest-bar');
   const legend = $('#quest-legend');
+  bar.replaceChildren();
+  legend.replaceChildren();
   const colors = { playable: 'var(--moss)', job: 'var(--sun)', building: 'var(--sand)', tutorial: 'var(--sky)', players: 'var(--dusk)', retired: 'var(--stone)' };
   bar.setAttribute('aria-label', q.buckets.map((b) => `${b.label}: ${b.count}`).join(', '));
   for (const b of q.buckets) {
@@ -201,6 +216,9 @@ function renderNumbers(data) {
 /* —— Rooms ———————————————————————————— */
 function renderRooms(data) {
   const grid = $('#room-grid');
+  const modal = $('#room-modal');
+  if (!grid || !modal) return;
+  grid.replaceChildren();
   const rooms = data.rooms.rooms;
   rooms.forEach((r, index) => {
     const shot = r.shot
@@ -217,7 +235,6 @@ function renderRooms(data) {
     grid.append(el('div', { class: 'room-cell' }, card));
   });
 
-  const modal = $('#room-modal');
   let current = 0;
   const fill = (sel, text) => { $(sel, modal).textContent = text || ''; };
   function openRoom(index) {
@@ -291,6 +308,10 @@ function renderDesigners(data) {
     l.video ? el('a', { class: 'level-watch', href: `https://www.youtube.com/watch?v=${l.video}`, target: '_blank', rel: 'noopener' }, 'Watch the designer’s recording') : null,
     l.extra ? el('a', { class: 'level-watch', href: `https://www.youtube.com/watch?v=${l.extra.video}`, target: '_blank', rel: 'noopener' }, l.extra.label) : null);
   const groups = $('#designer-groups');
+  const text = $('#text-levels');
+  if (groups) groups.replaceChildren();
+  if (text) text.replaceChildren(...d.text.map(card));
+  if (!groups) return;
   for (const who of d.designers) {
     const levels = d.levels.filter((l) => l.designer === who.id);
     if (!levels.length) continue;
@@ -299,27 +320,23 @@ function renderDesigners(data) {
       el('p', { class: 'designer-about' }, who.about),
       el('div', { class: 'levels' }, levels.map(card))));
   }
-  $('#text-levels').append(...d.text.map(card));
 }
 
 /* —— Recent + honest + footer ———————————————————————————— */
 function renderRest(data) {
-  const list = $('#recent-list');
   const kinds = { new: 'New', improve: 'Better', fix: 'Fixed' };
-  for (const r of data.git.recent) {
-    list.append(el('li', {}, el('time', { datetime: r.date }, r.date), el('span', { class: `kind kind-${r.kind}` }, kinds[r.kind]), el('span', {}, r.text)));
-  }
-  const lost = $('#lost-list');
-  for (const it of data.items.filter((i) => i.status === 'lost')) lost.append(el('li', {}, el('b', {}, it.name), ': ', it.blurb));
-  const dl = $('#legend-list');
-  for (const s of STATUS_ORDER) {
+  $('#recent-list')?.replaceChildren(...data.git.recent.map((r) => el('li', {}, el('time', { datetime: r.date }, r.date), el('span', { class: `kind kind-${r.kind}` }, kinds[r.kind]), el('span', {}, r.text))));
+  $('#lost-list')?.replaceChildren(...data.items.filter((i) => i.status === 'lost').map((it) => el('li', {}, el('b', {}, it.name), ': ', it.blurb)));
+  $('#legend-list')?.replaceChildren(...STATUS_ORDER.map((s) => {
     const st = data.status[s];
-    dl.append(el('div', {}, el('dt', {}, el('span', { class: 'pill', style: `--tone:${tone(s, data)}` }, st.label)), el('dd', {}, st.desc)));
-  }
-  $('#foot-meta').textContent = `Generated from the repository on ${data.generatedAt || 'build'}: ${fmt(data.git.commits)} commits since ${data.git.since}, ${data.tests} test files.`;
+    return el('div', {}, el('dt', {}, el('span', { class: 'pill', style: `--tone:${tone(s, data)}` }, st.label)), el('dd', {}, st.desc));
+  }));
+  const stamp = $('#foot-meta');
+  if (stamp) stamp.textContent = `Generated from the repository on ${data.generatedAt || 'build'}: ${fmt(data.git.commits)} commits since ${data.git.since}, ${data.tests} test files.`;
 }
 
-const data = await (await fetch('data.json', { cache: 'no-cache' })).json();
+// Beside this script, wherever the page that loads it lives.
+const data = await (await fetch(new URL('data.json', import.meta.url), { cache: 'no-cache' })).json();
 renderScore(data);
 setupDiorama(data);
 setupBoard(data);
