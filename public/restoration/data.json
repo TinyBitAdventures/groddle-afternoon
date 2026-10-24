@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 324,
+  "commits": 325,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Vendor names and garden bed labels are readable over dark forests"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1924,11 +1929,6 @@
     "date": "2026-10-23",
     "kind": "fix",
     "text": "Long speech bubbles stay below the street name"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Your Butler hears about the club and finishes Join the Club at home"
    }
   ]
  },
