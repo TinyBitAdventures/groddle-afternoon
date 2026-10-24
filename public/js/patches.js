@@ -480,6 +480,8 @@ export function normalizePlot(saved) {
         growLevel: whole(s.growLevel, 0, 0, 10),
         thirdPetAt: time(s.thirdPetAt),
       };
+      // Trantsformation Fluid's replacement keeps its health 4 (trantsformPlotTree).
+      if (s.health) plot.seedling.health = whole(s.health, 0, 1, 10);
     }
   }
   if (plot.stage === 'tree') {
@@ -535,7 +537,7 @@ export function growTree(plot, now = Date.now()) {
   const maturity = seedling.growLevel || GROWN_TRANT_START.maturity;
   const state = classId === 'wood_tree'
     ? ensureWoodTreeState({ maturity: Math.min(6, maturity) })
-    : createTrantState(classId, { maturity, health: GROWN_TRANT_START.health });
+    : createTrantState(classId, { maturity, health: seedling.health || GROWN_TRANT_START.health });
   plot.stage = 'tree';
   plot.since = now;
   plot.dueAt = 0;
@@ -614,6 +616,33 @@ export function reviveDeadTree(plot, now = Date.now()) {
     resetAt: now,
   };
   return plot.tree;
+}
+
+/**
+ * potion_trantsformation_fluid.js onPour: replaceWithPoofIfOnGround(choice),
+ * then health 4 and maturity max(4, maturity - 3). The plot passes through a
+ * seedling that is ready now, so the patches feature's next tick grows it
+ * into the new tree (and redraws it, as for any seedling that grows).
+ * Returns the plot, or null for a plot with no tree.
+ */
+export function trantsformPlotTree(plot, { classId, maturity, health } = {}, now = Date.now()) {
+  if (!plot || !GROWN_TREE_LABELS[classId]) return null;
+  plot.stage = 'seedling';
+  plot.since = now;
+  plot.dueAt = 0;
+  plot.tree = null;
+  plot.deadClass = null;
+  plot.classTsid = plot.kind;
+  plot.seedling = {
+    ...newSeedling(classId, '', now, []),
+    minAt: now,
+    petted: SOIL_TIMERS.seedlingPets,
+    thirdPetAt: now,
+    growLevel: whole(maturity, 4, 1, 10),
+    health: whole(health, 4, 1, 10),
+    trantsform: true,
+  };
+  return plot;
 }
 
 /** trants.js recalcCycles: minutes between maturity rolls. */
@@ -719,8 +748,10 @@ export function tickPlot(plot, now = Date.now(), ctx = {}) {
     const s = plot.seedling;
     const readyAt = Math.max(s.minAt, s.thirdPetAt || Infinity);
     if (s.petted >= SOIL_TIMERS.seedlingPets && readyAt <= now && readyAt <= s.maxAt) {
+      const trantsformed = Boolean(s.trantsform);
       growTree(plot, readyAt);
-      events.push('grew');
+      // Trantsformation Fluid's swap is a poof, not a Seedling growing up.
+      events.push(trantsformed ? 'trantsformed' : 'grew');
     } else if (now >= s.maxAt) {
       // patch_seedling.js onMaxTimePassed -> replaceWithPatch (dark for egg plants)
       plot.kind = s.trantClass === 'trant_egg' ? 'patch_dark' : plot.kind;

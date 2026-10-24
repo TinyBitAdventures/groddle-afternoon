@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-52';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-53';
 import {
   actionDurationFor,
   createTimedAction,
@@ -11835,7 +11835,11 @@ function updateLegalizeIt() {
     legalizeRun.handoffs === 0 &&
     player.x >= 250
   ) {
-    if (!legalizeWaitStartedAt) legalizeWaitStartedAt = now;
+    if (!legalizeWaitStartedAt) {
+      legalizeWaitStartedAt = now;
+      // location.js:1123 waiting_area: buffs_apply('please_wait') (10 s), shown in the buff tray.
+      if (!hasBuff(buffState, 'please_wait', now)) engine.applyBuff('please_wait');
+    }
     if (now - legalizeWaitStartedAt >= 10_000) callNextLegalizeClerk();
   } else if (
     legalizeRun.stage === 'hall_waiting' &&
@@ -11843,6 +11847,7 @@ function updateLegalizeIt() {
     player.x < 250
   ) {
     legalizeWaitStartedAt = 0;
+    if (hasBuff(buffState, 'please_wait', now)) engine.removeBuff('please_wait');
   }
   const autoplayMode =
     new URLSearchParams(location.search).get('legalizeautoplay') || '';

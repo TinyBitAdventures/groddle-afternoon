@@ -1161,5 +1161,10 @@
   "status": "unbuilt_original",
   "reason": "only spawner_moving_quoin.js names it (spawn_class), and that spawner is is_hidden with no archived placement on any street; no file in GSJS or eleven-gsjs creates a Moving Coin otherwise",
   "register": "G125"
+ },
+ "item:purple_apparition": {
+  "status": "source",
+  "reason": "purple_emperor.js manifestStrangeness creates it in the purple_journey instance; js/features/purple-journey-feature.js manifestScion draws the Scion of Purple (glitch-items purple_apparition.swf, CC0) with its fade, talk and idle states and getMysteriousWords",
+  "register": "G150"
  }
 }

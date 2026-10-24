@@ -103,3 +103,5 @@ import { doorDrinkFeature } from './door-drink-feature.js?v=g123-1'; FEATURES.pu
 import { buffTriggersFeature } from './buff-triggers-feature.js?v=g148-1'; FEATURES.push(buffTriggersFeature);
 import { snoConesFeature } from './sno-cones-feature.js?v=g148-1'; FEATURES.push(snoConesFeature);
 import { bureaucraticHallsFeature } from './bureaucratic-halls-feature.js?v=g139-1'; FEATURES.push(bureaucraticHallsFeature);
+import { potionsFeature } from './potions-feature.js?v=g149-1'; FEATURES.push(potionsFeature);
+import { purpleJourneyFeature } from './purple-journey-feature.js?v=g150-1'; FEATURES.push(purpleJourneyFeature);

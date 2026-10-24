@@ -449,6 +449,20 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&powderdemo=1&practice=1"
   },
   {
+   "id": "potions",
+   "group": "making",
+   "name": "Potions",
+   "status": "source",
+   "blurb": "Every Cauldron potion can be quaffed or poured again: the Amorous Philtre’s Feeling Called Love, the Elixir of Avarice’s fifty extra quoins, favor from a Draught of Giant Amicability (shake it for another Giant), the Keycutter Tonic, Potions of Animal Youth, clouds that embiggen or shrink you, Rainbow Juice that sends you up, and Trantsformation Fluid that turns one tree into another. You can munch a Rug, too.",
+   "spot": null,
+   "evidence": [
+    "public/js/potions.js",
+    "public/js/features/potions-feature.js"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&potiondemo=1&practice=1"
+  },
+  {
    "id": "machines",
    "group": "making",
    "name": "Machines and the Still",
@@ -643,6 +657,21 @@
    ],
    "shot": "shots/story-quests.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=winter&practice=1"
+  },
+  {
+   "id": "purple-journey",
+   "group": "quests",
+   "name": "The Purple Journey",
+   "status": "rebuilt",
+   "blurb": "Imbibe an Essence of Purple and wait: the minute of HURRY UP PLEASE ITS TIME, then Le Voyage Violet, where Scions of Purple say strange things and quoins appear. Purpled Out follows, and three journeys earn Elementary Penguin. The room was never archived, so it is rebuilt from the players’ Snaps.",
+   "spot": null,
+   "evidence": [
+    "public/js/purple-journey.js",
+    "public/js/features/purple-journey-feature.js",
+    "public/js/purple-journey-scene.js"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&purpledemo=1&practice=1"
   },
   {
    "id": "paradise",
@@ -973,15 +1002,15 @@
   }
  ],
  "tally": {
-  "source": 41,
-  "rebuilt": 9,
+  "source": 42,
+  "rebuilt": 10,
   "lost": 3,
   "solo": 8,
   "reimagined": 1,
   "progress": 1
  },
- "back": 59,
- "possible": 60,
+ "back": 61,
+ "possible": 62,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2071,6 +2100,6 @@
    }
   ]
  },
- "tests": 213,
+ "tests": 215,
  "generatedAt": "2026-10-24"
 }
