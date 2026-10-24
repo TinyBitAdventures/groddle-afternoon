@@ -13,7 +13,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
-import { ENTRY, FALL_HUB, INSTANCE_ID, INSTANCE_LABEL, PHYSICS, STAGE, TEMPLATE, falling, goToFallingLevel, onTeleporter, teleporterBox, withFallingRoom } from '../public/js/quest-rooms/falling-room.js';
+import { ENTRY, FALL_HUB, INSTANCE_ID, INSTANCE_LABEL, LOADING_LABEL, PHYSICS, STAGE, TEMPLATE, falling, goToFallingLevel, onTeleporter, teleporterBox, withFallingRoom } from '../public/js/quest-rooms/falling-room.js';
 import {
   ARRIVAL, BURSTS, COLUMNS, DRESSING, FALL, FALL_SPEED, FLOOR, FLOOR_Y, H, NUMBERS, TELEPORTER, TONGUE, TONGUE_MID, TONGUE_TOP, VY_MAX, W,
   fallPlatforms, numberAt, numberMarks, sx, sy, tonguePoint,
@@ -180,6 +180,10 @@ describe('falling room stage', () => {
     assert.equal(room.firstStage(), 'main');
     assert.equal(room.stageLabel(STAGE), INSTANCE_LABEL);
     assert.equal(room.stageLabel('main'), '');
+    // The loading card into the fall carries its own line (video 2Z76dO4DlJ4 t120).
+    assert.equal(room.loadingLabel(STAGE), LOADING_LABEL);
+    assert.equal(LOADING_LABEL, 'Back to life, back to the present time');
+    assert.equal(room.loadingLabel('main'), '');
     const main = fakeCtx('main');
     room.tick(main, 16);
     assert.deepEqual(seen, ['lab-tick']);

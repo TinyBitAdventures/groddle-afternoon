@@ -19,7 +19,7 @@
  *
  * Room module contract (all optional except id/title/build or street):
  *   { id, title, kicker, icon, theme, durationMs | durationFor(questId),
- *     firstStage, stageLabel(stage),
+ *     firstStage, stageLabel(stage), loadingLabel(stage) (the loading card's line, else stageLabel),
  *     build(ctx, stage) -> { width, height, background, platforms, walls,
  *                            barriers, spawn: {x,y}, label, hubName }
  *     street(ctx, stage) -> { tsid, x, y }      (an imported street instead)
@@ -766,7 +766,7 @@ async function startInstance(engine, questId, opts = {}) {
     engine.stopFollowing?.();
     engine.closeMap?.();
     room.start?.(ctx);
-    const label = room.stageLabel?.(run.stage, ctx) || room.title;
+    const label = room.loadingLabel?.(run.stage, ctx) || room.stageLabel?.(run.stage, ctx) || room.title;
     await withTransition(engine, label, room.hubName || 'A quiet place beyond Ur', room.theme, () => buildStage(engine, run.stage));
     engine.setData('qiStatus', run.status);
     publish(engine, true);
@@ -780,7 +780,7 @@ async function startInstance(engine, questId, opts = {}) {
 async function gotoStage(engine, stage, opts = {}) {
   if (!run || !room) return false;
   if (!changeInstanceStage(run, stage)) return false;
-  const label = room.stageLabel?.(stage, ctx) || room.title;
+  const label = room.loadingLabel?.(stage, ctx) || room.stageLabel?.(stage, ctx) || room.title;
   const work = () => buildStage(engine, stage);
   if (opts.transition === false) await work();
   else await withTransition(engine, label, room.hubName || 'A quiet place beyond Ur', room.theme, work);

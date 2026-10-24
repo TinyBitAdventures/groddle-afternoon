@@ -60,7 +60,7 @@
 import { advanceVpOverlay, vpOverlay, vpSequence } from './vp-overlay.js?v=ffw-1';
 import { ENTRY, FLOOR, H, W, buildFront, buildLab, labPlatforms, sx, sy } from './firefly-whistle-scene.js?v=ffw-3';
 import { onLoaded, textureFromUrl } from '../textures.js';
-import { goToFallingLevel, withFallingRoom } from './falling-room.js?v=fall-1';
+import { goToFallingLevel, withFallingRoom } from './falling-room.js?v=fall-2';
 
 export const QUEST = 'firefly_whistle';
 export const TEMPLATE = Object.freeze({ prod: 'LM113UBSS8P18ET', dev: 'LHH11C4QUBP1DQD' });

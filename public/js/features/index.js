@@ -31,7 +31,7 @@ import { unlearningFeature } from './unlearning-feature.js?v=unlearn-1';
 import { dropsFeature } from './drops-feature.js?v=drops-1';
 import { masterGardenFeature } from './master-garden-feature.js?v=mastergarden-1';
 import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=husbandry-1';
-import { questInstancesFeature } from './quest-instances-feature.js?v=qi-2';
+import { questInstancesFeature } from './quest-instances-feature.js?v=qi-3';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-2';
 import { seasonsFeature } from './seasons-feature.js?v=seasons-3';
 import { cameraModeFeature } from './camera-mode-feature.js';
@@ -73,7 +73,7 @@ export const FEATURES = [
   cameraModeFeature,
   newxpFeature,
 ];
-import { smugglingFeature } from './smuggling-feature.js?v=smuggling-1'; FEATURES.push(smugglingFeature);
+import { smugglingFeature } from './smuggling-feature.js?v=smuggling-2'; FEATURES.push(smugglingFeature);
 import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-2'; FEATURES.push(homeTowerFeature);
 import { secretSpotsFeature } from './secret-spots-feature.js?v=secrets-1'; FEATURES.push(secretSpotsFeature);
 import { musicblocksFeature } from './musicblocks-feature.js?v=musicblocks-1'; FEATURES.push(musicblocksFeature);

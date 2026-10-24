@@ -34,6 +34,8 @@ export const STAGE = 'falling';
 export const TEMPLATE = Object.freeze({ prod: 'LLI12DVTLA01HT5', dev: 'LHH12F9DO801RUL' });
 export const INSTANCE_ID = 'falling';
 export const INSTANCE_LABEL = 'You Feel Woooooozy...';
+/** The loading card into the fall, read off video 2Z76dO4DlJ4 t120 (not in GSJS; Austin 2026-10-24). */
+export const LOADING_LABEL = 'Back to life, back to the present time';
 export const ENTRY = ARRIVAL;
 export const PHYSICS = Object.freeze({ vyMax: VY_MAX });
 /** The location bar's hub line in the fall (the quest-room runtime's default). */
@@ -188,6 +190,7 @@ export function withFallingRoom(lab) {
   }
   out.firstStage = () => (qaParam('ffwstart') === STAGE ? STAGE : 'main');
   out.stageLabel = (stage) => (stage === STAGE ? INSTANCE_LABEL : '');
+  out.loadingLabel = (stage, ctx) => (stage === STAGE ? LOADING_LABEL : lab.loadingLabel?.(stage, ctx) || '');
   out.physics = (ctx) => {
     live = ctx;
     return ctx?.stage === STAGE ? falling.physics(ctx) : lab.physics?.(ctx) ?? null;
