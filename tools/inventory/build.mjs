@@ -36,8 +36,13 @@
  *   system       every config_prod.js top-level var, locations/inc_*.js, players/inc_*.js and
  *                items/include/*.js: mapped to a checklist.mjs item by overrides.json, else missing.
  *   location     every street TSID in inc_data_maps_prod.js maps_get_streets() (3,295): imported or
- *                rebuilt (assets/streets/index.json), else research/streets-hunt/categories.json decides
- *                (excluded with the category as reason; unreleased/other rows are unknown).
+ *                rebuilt (assets/streets/index.json); else rebuilt as a scene: the GSJS quest that names
+ *                the TSID (locations block or template literal) has a built quest room, the instance id
+ *                it is created under is a built room, a live module declares the TSID (const, property,
+ *                array; `available: false` objects count as missing), or a live module builds its
+ *                config_prod.js key as an `id`; a quest room whose quest the remake plays elsewhere is
+ *                partial; else research/streets-hunt/categories.json decides (excluded with the category
+ *                as reason; unreleased/other rows are unknown).
  *   item / npc   GSJS items/*.js (npc_* separately): obtainable (tools/job-obtainable.mjs: vendors,
  *                starter kit, harvests, recipe and conversion fixpoint; plus solo quest rewards and
  *                addItem() grants outside QA paths), in the world (street-ecology.json), or placed by
@@ -45,7 +50,9 @@
  *                anywhere in GSJS = unbuilt_original. Source verbs are listed in the evidence.
  *   quest        GSJS quests/*.js against quests.json solo flags and soloReason, quest rooms built.
  *   skill        inc_data_skills.js: skill-tree.js audit status, prereqs (skills, badges, quests, cards)
- *                reachable, GSJS unlock sites (files that name the skill id) on items the remake has.
+ *                reachable, GSJS unlock sites (files that name the skill id) listed as evidence;
+ *                partial only when something the remake has loses its gate (the audit says so, or a
+ *                recipes.json row lacks the skill its catalog_recipes.js row needs).
  *   imagination  imagination-remake.js statuses (none = GSJS never applied it = unbuilt_original).
  *   buff         items/catalog_buffs.js: applied by the remake (applyBuff, buffId catalog) or not;
  *                not applied by GSJS buffs_apply either = unbuilt_original.
@@ -62,7 +69,7 @@ import { homedir } from 'node:os';
 import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildIndex, contextLiterals, listJsFiles, literalIndex, matchPattern, patternString, scanEmissions, spawnTemplates, templatePatterns } from './scan.mjs';
+import { buildIndex, contextLiterals, listJsFiles, literalIndex, liveFiles, matchPattern, patternString, scanEmissions, spawnTemplates, templatePatterns } from './scan.mjs';
 import * as G from './gsjs-data.mjs';
 import * as D from './detectors.mjs';
 
@@ -108,6 +115,30 @@ export function emissionsByTag(index, emitters, opts) {
   const by = {};
   for (const e of emissions) (by[e.tag] ||= []).push(e);
   return { by, unresolved };
+}
+
+/**
+ * Remake declarations that rebuild places with no street file, from contextLiterals():
+ *   builders     L-tsid -> [ctx]: a TSID (L or G form) declared as a const, property or array
+ *                element in a live, non-catalog module
+ *   declaredOff  the same inside an object marked `available: false`
+ *   remakeIds    id -> [ctx]: `id: '<id>'` in a live module, for config_prod.js keys (ids in
+ *                `otherIds`, which name a skill, quest, item or badge, are left out)
+ */
+export function locationBuilders({ ctx, live, otherIds = new Set() }) {
+  const builders = new Map();
+  const declaredOff = new Map();
+  const remakeIds = new Map();
+  const push = (m, k, c) => { if (!m.has(k)) m.set(k, []); m.get(k).push(c); };
+  for (const [v, ctxs] of ctx) {
+    const tsidLike = /^[LG][A-Z0-9]{12,16}$/.test(v);
+    for (const c of ctxs) {
+      if (!live.has(c.file) || D.CATALOG_FILE.test(c.file)) continue;
+      if (tsidLike && D.DECLARING_CTX.test(c.ctx)) push(c.off ? declaredOff : builders, `L${v.slice(1)}`, c);
+      else if (c.ctx === 'prop:id' && /^[a-z][a-z0-9_]{3,}$/.test(v) && !otherIds.has(v)) push(remakeIds, v, c);
+    }
+  }
+  return { builders, declaredOff, remakeIds };
 }
 
 /* ------------------------------------------------------------------ */
@@ -332,7 +363,7 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   const itemStatus = new Map(itemRows.map((r) => [r.id, r.status]));
 
   // Quests.
-  const { QUEST_ROOMS, BUILT_ROOMS } = await import(join(pub, 'js/quest-rooms/catalog.js'));
+  const { QUEST_ROOMS, BUILT_ROOMS, roomModulePath } = await import(join(pub, 'js/quest-rooms/catalog.js'));
   const questRefs = new Map(questIds.map((id) => [id, new Set([...(gsjsLits.get(id) || [])].filter((f) => !f.endsWith(`quests/${id}.js`)))]));
   const questRows = D.judgeQuests({ questIds, quests, questRooms: QUEST_ROOMS, builtRooms: BUILT_ROOMS, gsjsRefs: questRefs });
 
@@ -361,11 +392,25 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
     }
   }
   const remakeMentions = new Map([...skillIds].map((id) => [id, remakeLits.get(id)?.size || 0]));
+  // Gates on things the remake has: every recipes.json row must keep the skills its GSJS recipe needs.
+  const gateGaps = new Map();
+  const remakeRecipes = new Map(Object.values(recipes).map((r) => [String(r.id), r]));
+  for (const [rid, r] of G.readRecipes(gsjs)) {
+    const mine = remakeRecipes.get(rid);
+    if (!mine) continue;
+    const have = new Set([...(mine.skills || []), ...(mine.skill ? [mine.skill] : [])]);
+    for (const sk of r.skills) {
+      if (have.has(sk)) continue;
+      if (!gateGaps.has(sk)) gateGaps.set(sk, []);
+      gateGaps.get(sk).push(`recipe ${rid} ${r.name}`);
+    }
+  }
   const skillRows = D.judgeSkills({
     skills, audit,
     statusOf: (kind, id) => statusIndex.get(`${kind}:${id}`) || 'unknown',
     unlocks, itemReachable: (id) => !['missing', 'unknown'].includes(itemStatus.get(id) || 'excluded'), remakeMentions,
     retired: [...retiredMap].map(([id, files]) => ({ id, files: [...files] })),
+    gateGaps,
   });
 
   // Buffs.
@@ -442,7 +487,22 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
     const real = [...files].filter((f) => !D.CATALOG_FILE.test(f));
     if (real.length) codeRefs.set(v, real);
   }
-  const locRows = D.judgeLocations({ mapStreets, index: streetIndex, categories, codeRefs });
+  // What rebuilds a place with no street file: built quest rooms (by the GSJS quest that names the
+  // TSID, or the instance id it is created under), TSID constants in live modules, and config_prod.js
+  // keys a live module builds as an `id`. Live = reachable from game.js or a built room module
+  // (quest rooms load through roomModulePath, a dynamic import the import graph cannot see).
+  const roomRoots = BUILT_ROOMS.map((r) => `js/quest-rooms/${roomModulePath(r).replace(/^\.\//, '')}`);
+  const live = liveFiles(remakeIndex, ['game.js', ...roomRoots]);
+  // A config key that is also a skill, quest, item or badge id (newxp_locations.ezcooking_1) is
+  // ambiguous: `id: 'ezcooking_1'` in the remake names the skill, not the room.
+  const otherIds = new Set([...skills.map((x) => x.id), ...questIds, ...items.map((x) => x.id), ...achievements.map((x) => x.id)]);
+  const { builders, declaredOff, remakeIds } = locationBuilders({ ctx: remakeCtx, live, otherIds });
+  const gsjsTsidRefs = G.readTsidRefs(gsjsIndex.files);
+  const locRows = D.judgeLocations({
+    mapStreets, index: streetIndex, categories, codeRefs,
+    gsjsRefs: gsjsTsidRefs, rooms: { questRooms: QUEST_ROOMS, builtRooms: BUILT_ROOMS, modulePath: roomModulePath },
+    builders, declaredOff, remakeIds, questStatus: new Map(questRows.map((r) => [r.id, r.status])),
+  });
 
   let entities = [...achRows, ...sysRows, ...locRows, ...itemRows, ...questRows, ...skillRows, ...imgRows, ...buffRows, ...jobRows, ...soundRows, ...wardrobeRows, ...badgeRows];
 

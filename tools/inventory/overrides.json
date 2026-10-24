@@ -755,5 +755,25 @@
   "status": "lost",
   "reason": "home.js:35-37 and 250-252: five other players' homes as neighbours on your home street's signpost",
   "register": "G134"
+ },
+ "location:LTJ102ANR9O1LQL": {
+  "status": "excluded",
+  "reason": "unused station template: it sits in The Seams (hub 66) beside the Subway Train template LTJ101M7R9O1HTT and Train Clone LTJ13P3UQPO13HN; no transit_instances station, GSJS or eleven-gsjs file, location XML, street image or Snap names it, and the twelve real stations each sit in their own hub (subway-line.js)",
+  "register": "G127"
+ },
+ "location:LHF8PTQ7RFB3PRB": {
+  "status": "excluded",
+  "reason": "running copy imported: GHFRK14DDU53RQQ \"A L'il Animal Kinship\" (index.json) is the practice street js/newxp.js FIRST_SKILLS plays for animalkinship_1 (config newxp_locations.animalkinship_1); same case as Lift Your Light Green Thumb LHVMSAEVLFB39K2 -> GUVCT29PSU53G9V",
+  "register": "G127"
+ },
+ "location:LA938MQUKHE3522": {
+  "status": "excluded",
+  "reason": "earlier copy in hub 77 (inc_data_maps_prod.js:16614) of the Hall of Rejected Concepts LA9L33D5CNE3I0J in hub 96, which the remake builds (js/hall-rejected-concepts.js, index.json GA9L33D5CNE3I0J); nothing in GSJS names this copy",
+  "register": "G127"
+ },
+ "location:LIFH35R0HR72BHV": {
+  "status": "excluded",
+  "reason": "the hub 96 map entry for the Museum of the Rook; players entered the instance template LA91BDTNHS82D36 (items/npc_quest_giver_widget.js:215 enterHall), which js/rook-museum.js rebuilds; nothing in GSJS names this TSID",
+  "register": "G127"
  }
 }

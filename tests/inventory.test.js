@@ -10,9 +10,10 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { buildIndex, matchPattern, scanEmissions } from '../tools/inventory/scan.mjs';
-import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, conditionReach } from '../tools/inventory/detectors.mjs';
-import { REMAKE_EMITTERS, GSJS_EMITTERS, emissionsByTag, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
+import { buildIndex, contextLiterals, liveFiles, matchPattern, scanEmissions } from '../tools/inventory/scan.mjs';
+import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills, conditionReach } from '../tools/inventory/detectors.mjs';
+import { readTsidRefs, tsidRefsFromText } from '../tools/inventory/gsjs-data.mjs';
+import { REMAKE_EMITTERS, GSJS_EMITTERS, emissionsByTag, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 
 const SUBWAY_JS = `export const RIDE_COUNTER = 'transit:subways_entered';\nexport const OTHER = 'x';\n`;
@@ -75,6 +76,126 @@ describe('inventory scanner', () => {
     ]);
     assert.deepEqual(by.grant.map((e) => e.text), ['emblem_skill_unlock_alph_1']);
     assert.deepEqual(by.buff.map((e) => e.text), ['rookswort']);
+  });
+});
+
+describe('inventory scanner: unresolved arguments', () => {
+  const scan = (files) => {
+    const index = buildIndex(files.map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' });
+    return scanEmissions(index, REMAKE_EMITTERS);
+  };
+
+  it('skips a wrapper emitter that forwards its own parameter (its callers count)', () => {
+    const r = scan([['game.js', `
+      function applyAchievementProgressRaw(state, counter, amount) { return [counter, amount]; }
+      function applyAchievementProgress(state, counter, amount = 1) { return applyAchievementProgressRaw(state, counter, amount); }
+      const engine = { achievement(counter, amount = 1) { applyAchievementProgress(null, counter, amount); } };
+      export function pet() { engine.achievement('npc_piggy:pet', 1); }
+    `]]);
+    assert.deepEqual(r.emissions.filter((e) => e.tag === 'counter').map((e) => `${e.callee} ${e.text}`), ['achievement npc_piggy:pet']);
+    assert.equal(r.unresolved.length, 0);
+    assert.deepEqual(r.passThrough.map((p) => p.callee).sort(), ['applyAchievementProgress', 'applyAchievementProgressRaw']);
+  });
+
+  it('does not report a literal empty counter as unresolved', () => {
+    const r = scan([['js/a.js', "export function f(engine, row) { engine.achievement(row.label || '', 1); }"]]);
+    assert.equal(r.unresolved.filter((u) => u.text === '').length, 0);
+  });
+});
+
+describe('location detector: places rebuilt as scenes', () => {
+  const street = (tsid, name) => ({ tsid, name, hubId: '61', hubName: 'Simple Level Quests' });
+  const cats = (...ids) => new Map(ids.map((id) => [id, 'instance-template-no-geometry']));
+  const rooms = { questRooms: { mental_block: 'mental_block', fall_quest: 'falling' }, builtRooms: ['mental_block', 'rainbow_run'], modulePath: (r) => `./${r.replace(/_/g, '-')}.js` };
+
+  it('reads quest locations blocks, template literals, instance ids and config keys from GSJS text', () => {
+    const quest = tsidRefsFromText('quests/mental_block.js', `var locations = {\n\t"mental_block"\t: {\n\t\t"dev_tsid"\t: "LDEV00000000001",\n\t\t"prod_tsid"\t: "LIF3NLRNBBA3HD2"\n\t}\n};\n`);
+    assert.deepEqual(quest.map((r) => [r.tsid, r.quest, r.key, r.env]), [['LDEV00000000001', 'mental_block', 'mental_block', 'dev'], ['LIF3NLRNBBA3HD2', 'mental_block', 'mental_block', 'prod']]);
+    const main = tsidRefsFromText('main.js', "function f(pc){\n\tif (x) {\n\t\tpc.events_add({ callback: 'instances_create_delayed', tsid: 'LIF9NRCLF273JBA', instance_id: 'rainbow_run', x: 816 }, 0.1);\n\t}\n}\n");
+    assert.equal(main[0].instanceId, 'rainbow_run');
+    const config = tsidRefsFromText('config_prod.js', "var paradise_locations = {\n\tsky_plunge: {template_tsid: 'LHFO01RM7I238UN', name: 'Sky Plunge'},\n};\n");
+    assert.deepEqual([config[0].configVar, config[0].configKey], ['paradise_locations', 'sky_plunge']);
+  });
+
+  it('counts a built quest room, its instance id, a live TSID constant and a built config id as rebuilt', () => {
+    const gsjsRefs = new Map([
+      ['LIF3NLRNBBA3HD2', [{ tsid: 'LIF3NLRNBBA3HD2', file: 'quests/mental_block.js', line: 23, quest: 'mental_block', key: 'mental_block', env: 'prod' }]],
+      ['LIF9NRCLF273JBA', [{ tsid: 'LIF9NRCLF273JBA', file: 'main.js', line: 1867, instanceId: 'rainbow_run' }]],
+      ['LHF12N7BER53E0U', [{ tsid: 'LHF12N7BER53E0U', file: 'config_prod.js', line: 1314, configVar: 'paradise_locations', configKey: 'beam_me_down' }]],
+    ]);
+    const builders = new Map([['LLI1AD8LUCH109E', [{ file: 'js/rook-woods.js', line: 18, ctx: 'VariableDeclarator' }]]]);
+    const remakeIds = new Map([['beam_me_down', [{ file: 'js/puzzle-scenes.js', line: 130, ctx: 'prop:id' }]]]);
+    const ids = ['LIF3NLRNBBA3HD2', 'LIF9NRCLF273JBA', 'LLI1AD8LUCH109E', 'LHF12N7BER53E0U', 'LZZZ000000000001'];
+    const rows = judgeLocations({ mapStreets: ids.map((t) => street(t, t)), index: {}, categories: cats(...ids), gsjsRefs, rooms, builders, remakeIds });
+    assert.deepEqual(rows.map((r) => [r.status, r.detector]), [
+      ['rebuilt', 'location-quest-room'], ['rebuilt', 'location-instance'], ['rebuilt', 'location-builder'], ['rebuilt', 'location-config-id'], ['missing', 'location-category'],
+    ]);
+    assert.match(rows[0].evidence, /js\/quest-rooms\/mental-block\.js/);
+  });
+
+  it('keeps a room missing when its quest room is not built, its builder is switched off or its category is excluded', () => {
+    const gsjsRefs = new Map([['LFALL0000000001', [{ tsid: 'LFALL0000000001', file: 'quests/fall_quest.js', line: 9, quest: 'fall_quest', key: 'falling' }]]]);
+    const declaredOff = new Map([['LA5FPUNAI7P2NVF', [{ file: 'js/hell.js', line: 256, ctx: 'prop:sourceTsid', off: true }]]]);
+    const builders = new Map([['LSANDBOX0000001', [{ file: 'js/x.js', line: 1, ctx: 'VariableDeclarator' }]]]);
+    const categories = new Map([['LFALL0000000001', 'instance-template-no-geometry'], ['LA5FPUNAI7P2NVF', 'live-region-other'], ['LSANDBOX0000001', 'wip-dev-hub']]);
+    const rows = judgeLocations({ mapStreets: [street('LFALL0000000001', 'Fall'), street('LA5FPUNAI7P2NVF', 'Hell Bar'), street('LSANDBOX0000001', 'Sandbox')], index: {}, categories, gsjsRefs, rooms, builders, declaredOff, codeRefs: new Map([['LA5FPUNAI7P2NVF', ['js/hell.js']]]) });
+    assert.deepEqual(rows.map((r) => r.status), ['missing', 'missing', 'excluded']);
+    assert.match(rows[1].evidence, /switched off at js\/hell\.js:256/);
+  });
+
+  it('calls a quest room the remake plays on a stand-in street partial', () => {
+    const gsjsRefs = new Map([['LIFH2AKJ5I735SV', [{ tsid: 'LIFH2AKJ5I735SV', file: 'quests/winter_walk.js', line: 28, quest: 'winter_walk', key: 'level_quest_winter_walk' }]]]);
+    const [r] = judgeLocations({ mapStreets: [street('LIFH2AKJ5I735SV', 'Winter Walk')], index: {}, categories: cats('LIFH2AKJ5I735SV'), gsjsRefs, rooms, questStatus: new Map([['winter_walk', 'source']]) });
+    assert.equal(r.status, 'partial');
+    assert.equal(r.detector, 'location-quest-standin');
+  });
+
+  it('links a config_prod.js room to the quest that looks its key up', () => {
+    const refs = readTsidRefs([
+      { rel: 'config_prod.js', text: "var newxp_locations = {\n\tezcooking_1: 'LIFII3UBRFB3KBE',\n};\n" },
+      { rel: 'quests/ezcooking_1.js', text: "function onStarted(pc){ pc.teleportToLocationDelayed(config.newxp_locations['ezcooking_1'], 123, -958); }\n" },
+    ]);
+    assert.deepEqual(refs.get('LIFII3UBRFB3KBE')[0].configQuests, ['ezcooking_1']);
+    const [r] = judgeLocations({ mapStreets: [street('LIFII3UBRFB3KBE', "Breezy, EZ Cookin'")], index: {}, categories: cats('LIFII3UBRFB3KBE'), gsjsRefs: refs, rooms, questStatus: new Map([['ezcooking_1', 'source']]) });
+    assert.equal(r.status, 'partial');
+    assert.match(r.evidence, /quest ezcooking_1 looks up/);
+  });
+
+  it('takes builders only from live modules, leaves catalogs and comparisons out, and skips ambiguous config ids', () => {
+    const index = buildIndex([
+      ['game.js', "import { ROOK } from './js/rook-woods.js?v=2';\nexport { N } from './js/features/f.js';\nimport('./js/later.js');\nexport const x = ROOK;\n"],
+      ['js/rook-woods.js', "export const ROOK = 'LLI1AD8LUCH109E';\nexport const SCENES = { beam: { id: 'beam_me_down' }, skill: { id: 'ezcooking_1' } };\n"],
+      ['js/later.js', "export const HELL_BAR = Object.freeze({ sourceTsid: 'LA5FPUNAI7P2NVF', available: false });\nexport function here(t) { return t === 'LCHECK000000001'; }\n"],
+      ['js/dead.js', "export const OLD = 'LDEAD0000000001';\n"],
+      ['js/hub-maps-data.js', "export const M = { a: 'LMAPS0000000001' };\n"],
+      ['js/features/f.js', "import { M } from '../hub-maps-data.js';\nexport const N = M;\n"],
+    ].map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' });
+    const live = liveFiles(index, ['game.js']);
+    assert.deepEqual([...live].sort(), ['game.js', 'js/features/f.js', 'js/hub-maps-data.js', 'js/later.js', 'js/rook-woods.js']);
+    const { builders, declaredOff, remakeIds } = locationBuilders({ ctx: contextLiterals(index), live, otherIds: new Set(['ezcooking_1']) });
+    assert.deepEqual([...builders.keys()], ['LLI1AD8LUCH109E']);
+    assert.deepEqual([...declaredOff.keys()], ['LA5FPUNAI7P2NVF']);
+    assert.deepEqual([...remakeIds.keys()], ['beam_me_down']);
+  });
+});
+
+describe('skill detector: partial', () => {
+  const skill = { id: 'botany_1', name: 'Botany', level: 1, reqSkills: [], reqAchievements: [], reqQuests: [], reqUpgrades: [] };
+  const base = {
+    skills: [skill], audit: new Map([['botany_1', { status: 'live' }]]), statusOf: () => 'source',
+    unlocks: new Map([['botany_1', [{ file: 'items/tree_poison.js', item: 'tree_poison' }, { file: 'items/bean_seasoner.js', item: 'bean_seasoner' }]]]),
+    itemReachable: (id) => id !== 'tree_poison', remakeMentions: new Map([['botany_1', 3]]),
+  };
+
+  it('does not call a skill partial because it gates an item the remake lacks', () => {
+    const [r] = judgeSkills(base);
+    assert.equal(r.status, 'source');
+    assert.match(r.evidence, /gates items the remake lacks \(judged as items\): tree_poison/);
+  });
+
+  it('calls it partial when a recipe the remake has drops the skill gate, or the audit says so', () => {
+    assert.equal(judgeSkills({ ...base, gateGaps: new Map([['botany_1', ['recipe 99 Tree Poison']]]) })[0].status, 'partial');
+    assert.equal(judgeSkills({ ...base, audit: new Map([['botany_1', { status: 'partial' }]]) })[0].status, 'partial');
   });
 });
 

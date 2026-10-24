@@ -156,6 +156,7 @@ function indexFile({ path, rel, text, ast }) {
     props: new Map(), // key -> [value nodes] (object literal properties)
     imports: new Map(), // local name -> { source, imported }
     literals: [], // { start, value } string literals
+    deps: [], // module specifiers: static imports, re-exports, import('literal')
     regexes: [], // { start, re }
     itemId: /\/(items|quests|achievements)\/[^/]+\.js$/.test(path) && !/\/include\//.test(path) ? basename(path, '.js') : null,
   };
@@ -202,6 +203,8 @@ function indexFile({ path, rel, text, ast }) {
       }
     }
     if (n.type === 'CallExpression') file.calls.push(n);
+    if ((n.type === 'ImportDeclaration' || n.type === 'ExportNamedDeclaration' || n.type === 'ExportAllDeclaration') && n.source?.value) file.deps.push(n.source.value);
+    if (n.type === 'ImportExpression' && n.source?.type === 'Literal' && typeof n.source.value === 'string') file.deps.push(n.source.value);
     if (n.type === 'ImportDeclaration') {
       for (const s of n.specifiers) {
         file.imports.set(s.local.name, { source: n.source.value, imported: s.type === 'ImportSpecifier' ? (s.imported.name ?? s.imported.value) : s.type === 'ImportDefaultSpecifier' ? 'default' : '*' });
@@ -826,6 +829,7 @@ export function scanEmissions(index, emitters, { keyTableKeys, qaRe = /engine\.p
   const resolver = createResolver(index, { keyTableKeys });
   const emissions = [];
   const unresolved = [];
+  const passThrough = [];
   for (const file of index.files) {
     for (const call of file.calls) {
       const c = call.callee;
@@ -840,24 +844,49 @@ export function scanEmissions(index, emitters, { keyTableKeys, qaRe = /engine\.p
         if (em.object && !(isMember && c.object.type === 'Identifier' && em.object.test(c.object.name))) continue;
         const argNodes = em.args.map((i) => call.arguments[i]);
         if (argNodes.some((a) => !a || a.type === 'SpreadElement')) continue;
+        const fns = file.enclosing(call.start);
+        const line = call.loc?.start.line || 0;
+        // A wrapper that is itself an emitter forwarding its own parameter (applyAchievementProgress
+        // -> applyAchievementProgressRaw(state, counter), engine.achievement(counter) ->
+        // applyAchievementProgress): every caller of the wrapper is scanned as an emitter, so the
+        // forwarded parameter is counted there, not here.
+        if (fns.length && isPassThrough(file, fns[0], argNodes, em.tag, emitters)) {
+          passThrough.push({ tag: em.tag, file: file.rel, line, callee: name });
+          continue;
+        }
         let patterns = resolver.strings(file, argNodes[0]);
         for (let k = 1; k < argNodes.length; k += 1) {
           patterns = concat(concat(patterns, [[em.join ?? ':']]), resolver.strings(file, argNodes[k]));
         }
         patterns = dedupe(patterns);
-        const fns = file.enclosing(call.start);
         const fnText = fns.length ? file.text.slice(fns[0].start, fns[0].end) : '';
         const qa = qaRe ? qaRe.test(fnText) : false;
-        const line = call.loc?.start.line || 0;
+        const informative = patterns.some((p) => !isUninformative(p));
         for (const pattern of patterns) {
           const row = { tag: em.tag, pattern, text: patternString(pattern), file: file.rel, line, callee: name, qa };
-          if (isUninformative(pattern)) unresolved.push(row);
-          else emissions.push(row);
+          if (!isUninformative(pattern)) { emissions.push(row); continue; }
+          // A literal '' (an `x || ''` fallback, an empty `counter:` row) emits nothing.
+          if (pattern.every((p) => typeof p === 'string')) continue;
+          // The memo's cycle placeholder next to resolved values is recursion, not a lost argument.
+          if (informative && pattern.some((p) => isWild(p) && p.why === 'cycle')) continue;
+          unresolved.push(row);
         }
       }
     }
   }
-  return { emissions, unresolved, failures: index.failures };
+  return { emissions, unresolved, passThrough, failures: index.failures };
+}
+
+/** The emitter call forwards parameters of `fn`, and `fn` is an emitter of the same tag taking them at the same positions. */
+function isPassThrough(file, fn, argNodes, tag, emitters) {
+  const names = file.fnNameOf.get(fn) || [];
+  for (const em of emitters) {
+    if (em.tag !== tag || !names.includes(em.name) || em.args.length !== argNodes.length) continue;
+    const ok = argNodes.every((a, k) => a.type === 'Identifier'
+      && file.decls.some((d) => d.kind === 'param' && d.fn === fn && d.name === a.name && !d.path.length && d.index === em.args[k]));
+    if (ok) return true;
+  }
+  return false;
 }
 
 /** Every string literal in the indexed files: Map value -> Set of file rel paths. */
@@ -874,20 +903,53 @@ export function literalIndex(index, { exclude = () => false } = {}) {
   return out;
 }
 
-/** String literals by the property key or call they sit in: Map value -> [{ file, ctx }]. */
+/**
+ * Files reachable from `roots` (rel paths) through static imports, re-exports and import('literal'):
+ * Set of rel paths. Query strings (`./x.js?v=2`) are ignored.
+ */
+export function liveFiles(index, roots) {
+  const byRel = new Map(index.files.map((f) => [f.rel, f]));
+  const live = new Set();
+  const queue = roots.filter((r) => byRel.has(r));
+  while (queue.length) {
+    const rel = queue.pop();
+    if (live.has(rel)) continue;
+    live.add(rel);
+    const file = byRel.get(rel);
+    for (const spec of file.deps) {
+      if (!spec.startsWith('.')) continue;
+      const target = resolvePath(dirname(file.path), spec.replace(/[?#].*$/, ''));
+      const dep = index.byPath.get(target) || index.byPath.get(`${target}.js`) || index.byPath.get(`${target}.mjs`);
+      if (dep && !live.has(dep.rel)) queue.push(dep.rel);
+    }
+  }
+  return live;
+}
+
+const OFF_KEYS = new Set(['available', 'built', 'playable', 'enabled']);
+
+/** String literals by the property key or call they sit in: Map value -> [{ file, ctx, line, off? }]. */
 export function contextLiterals(index) {
   const out = new Map();
-  const add = (v, file, ctx, line) => {
+  const add = (v, file, ctx, line, off = false) => {
     if (typeof v !== 'string' || !v) return;
     if (!out.has(v)) out.set(v, []);
-    out.get(v).push({ file: file.rel, ctx, line });
+    out.get(v).push(off ? { file: file.rel, ctx, line, off: true } : { file: file.rel, ctx, line });
   };
   for (const file of index.files) {
+    // Property values of an object that says it is switched off (`available: false`, `built: false`):
+    // a declaration of something the remake does not have yet.
+    const offValues = new Set();
+    walk(file.ast, (n) => {
+      if (n.type !== 'ObjectExpression') return;
+      const off = n.properties.some((p) => p.type === 'Property' && OFF_KEYS.has(propName(p)) && p.value?.type === 'Literal' && p.value.value === false);
+      if (off) for (const p of n.properties) if (p.type === 'Property' && p.value?.type === 'Literal') offValues.add(p.value);
+    });
     walk(file.ast, (n, parent) => {
       if (n.type !== 'Literal' || typeof n.value !== 'string') return;
       if (!parent) return;
       const line = n.loc?.start.line || 0;
-      if (parent.type === 'Property' && parent.value === n) add(n.value, file, `prop:${propName(parent)}`, line);
+      if (parent.type === 'Property' && parent.value === n) add(n.value, file, `prop:${propName(parent)}`, line, offValues.has(n));
       else if (parent.type === 'Property' && parent.key === n) add(n.value, file, 'key', line);
       else if (parent.type === 'CallExpression' && parent.arguments.includes(n)) {
         const c = parent.callee;

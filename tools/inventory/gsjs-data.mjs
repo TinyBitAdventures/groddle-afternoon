@@ -184,3 +184,113 @@ export function listNames(gsjs, folder, re = /\.js$/) {
   if (!existsSync(dir)) return [];
   return readdirSync(dir).filter((f) => re.test(f)).map((f) => f.replace(/\.js$/, '')).sort();
 }
+
+const TSID_LIT = /['"](L[A-Z0-9]{12,16})['"]/g;
+
+/**
+ * Every location TSID literal in one GSJS file, with what binds it:
+ * [{ tsid, file, line, text, quest, key, env, instanceId, configVar, configKey }].
+ *   quest/key/env  quests/<id>.js `var locations = { key: { dev_tsid, prod_tsid } }` (env prod|dev),
+ *                  or another literal in a quest file (a template_tsid for instances_create_delayed)
+ *   instanceId     the instance_id (or instances_create first argument) of the statement that uses
+ *                  it, looked for on its own line and up to eight lines after (`var tsid = ...;
+ *                  pc.events_add({ callback: 'instances_create_delayed', tsid: tsid, instance_id: 'x' })`)
+ *   configVar/Key  config_prod.js: the top-level var and the key that holds it
+ *                  (`paradise_locations` / `sky_plunge: {template_tsid: 'L...'}`)
+ * The map catalogs (inc_data_maps*, inc_data_mapextras*) are skipped by readTsidRefs.
+ */
+export function tsidRefsFromText(rel, text) {
+  const out = [];
+  if (!text.includes("'L") && !text.includes('"L')) return out;
+  const lines = text.split('\n');
+  const quest = /(^|\/)quests\/([a-z_0-9]+)\.js$/.exec(rel)?.[2] || null;
+  const isConfig = /(^|\/)config_[a-z]+\.js$/.test(rel);
+  // Quest locations block.
+  const locKeys = new Map();
+  if (quest) {
+    const at = text.search(/^var locations\s*=/m);
+    const lit = at >= 0 ? literalFrom(text, at) : null;
+    let obj = null;
+    if (lit) { try { obj = literalToJson(lit); } catch { obj = null; } }
+    for (const [key, v] of Object.entries(obj || {})) {
+      if (v?.prod_tsid) locKeys.set(v.prod_tsid, { key, env: 'prod' });
+      if (v?.dev_tsid && !locKeys.has(v.dev_tsid)) locKeys.set(v.dev_tsid, { key, env: 'dev' });
+    }
+  }
+  let configVar = null;
+  lines.forEach((line, i) => {
+    if (isConfig) { const v = /^var ([A-Za-z_0-9]+)\s*=/.exec(line); if (v) configVar = v[1]; }
+    if (/^\s*(\/\/|\*)/.test(line)) return;
+    for (const m of line.matchAll(TSID_LIT)) {
+      const tsid = m[1];
+      const ref = { tsid, file: rel, line: i + 1, text: line.trim().slice(0, 200), quest, key: null, env: null, instanceId: null, configVar: null, configKey: null };
+      const lk = locKeys.get(tsid);
+      if (lk) Object.assign(ref, lk);
+      for (let j = i; j < Math.min(lines.length, i + 9); j += 1) {
+        if (j > i && /\bfunction\b/.test(lines[j])) break;
+        const im = /instance_id\s*:\s*['"]([a-z_0-9]+)['"]/.exec(lines[j]) || /instances_create(?:_delayed)?\(\s*['"]([a-z_0-9]+)['"]/.exec(lines[j]);
+        if (im) { ref.instanceId = im[1]; break; }
+      }
+      if (isConfig) {
+        ref.configVar = configVar;
+        const before = line.slice(0, m.index);
+        const keys = [...before.matchAll(/['"]?([A-Za-z_0-9]+)['"]?\s*:/g)].map((k) => k[1]).filter((k) => !/^(template_tsid|tsid|locations|prod_tsid|dev_tsid)$/.test(k));
+        if (keys.length) ref.configKey = keys[0];
+        else {
+          // A nested `tsid: 'L...'` line: the nearest less-indented `key: {` above it.
+          const indent = /^\s*/.exec(line)[0].length;
+          for (let j = i - 1; j >= 0 && j > i - 40; j -= 1) {
+            const km = /^(\s*)['"]?([A-Za-z_0-9]+)['"]?\s*:\s*\{\s*$/.exec(lines[j]);
+            if (km && km[1].length < indent) { ref.configKey = km[2]; break; }
+            if (/^var /.test(lines[j])) break;
+          }
+        }
+      }
+      out.push(ref);
+    }
+  });
+  return out;
+}
+
+/**
+ * tsidRefsFromText over indexed GSJS files ([{ rel, text }]): Map tsid -> [ref]. A config ref also
+ * carries `configQuests`: the quests/*.js files that look its key up (`config.newxp_locations['ezcooking_1']`).
+ */
+export function readTsidRefs(files) {
+  const out = new Map();
+  const lookups = new Map();
+  for (const f of files) {
+    const quest = /(^|\/)quests\/([a-z_0-9]+)\.js$/.exec(f.rel)?.[2];
+    if (!quest) continue;
+    for (const m of f.text.matchAll(/config\.([A-Za-z_0-9]+)(?:\[\s*['"]([A-Za-z_0-9]+)['"]\s*\]|\.([A-Za-z_0-9]+))/g)) {
+      const k = `${m[1]}.${m[2] || m[3]}`;
+      if (!lookups.has(k)) lookups.set(k, new Set());
+      lookups.get(k).add(quest);
+    }
+  }
+  for (const f of files) {
+    if (/(^|\/)inc_data_map(s|extras)_/.test(f.rel)) continue;
+    for (const r of tsidRefsFromText(f.rel, f.text)) {
+      const q = r.configVar && r.configKey ? lookups.get(`${r.configVar}.${r.configKey}`) : null;
+      if (q) r.configQuests = [...q].sort();
+      if (!out.has(r.tsid)) out.set(r.tsid, []);
+      out.get(r.tsid).push(r);
+    }
+  }
+  return out;
+}
+
+/** items/catalog_recipes.js `this.recipes["<id>"] = {...}`: Map id -> { name, skills, tool }. */
+export function readRecipes(gsjs) {
+  const p = join(gsjs, 'items', 'catalog_recipes.js');
+  const out = new Map();
+  if (!existsSync(p)) return out;
+  const text = read(p);
+  for (const m of text.matchAll(/this\.recipes\["([^"]+)"\]\s*=\s*\{/g)) {
+    const lit = literalFrom(text, m.index);
+    let r = null;
+    try { r = lit && literalToJson(lit); } catch { r = null; }
+    if (r) out.set(m[1], { name: r.name || '', skills: [...(r.skills || []), ...(r.skill && !(r.skills || []).includes(r.skill) ? [r.skill] : [])], tool: r.tool || null });
+  }
+  return out;
+}

@@ -1900,9 +1900,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 366,
+  "commits": 367,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Powders work again, and 18 more badges can be earned"
+   },
    {
     "date": "2026-10-24",
     "kind": "new",
@@ -2017,11 +2022,6 @@
     "date": "2026-10-24",
     "kind": "new",
     "text": "The widget by the Hall's first window says \"I have nothing for you!\", and the Hall's wall turns olive-gold like the Snaps"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "Sounds the final game never played no longer count as missing"
    }
   ]
  },

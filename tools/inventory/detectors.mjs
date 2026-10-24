@@ -224,11 +224,51 @@ const LOCATION_CATEGORY = {
 
 /**
  * mapStreets: [{ tsid, name, hubId, hubName }], index: { G-tsid: meta }, categories: Map tsid -> category,
- * codeRefs: Map tsid -> [files]
+ * codeRefs: Map tsid -> [files] (literal mentions in remake code), and what rebuilds a place with no
+ * street file (quest rooms and feature scenes have no TSID of their own):
+ *   gsjsRefs     Map L-tsid -> [ref] (gsjs-data.mjs tsidRefsFromText: quest locations, instance ids, config keys)
+ *   rooms        { questRooms, builtRooms, modulePath(room) } (js/quest-rooms/catalog.js)
+ *   builders     Map L-tsid -> [{ file, line, ctx }]: declared (const, property, array) in a live module
+ *   declaredOff  the same, in an object marked `available: false` (declared, not built yet): missing
+ *   remakeIds    Map id -> [{ file, line }]: `id: '<id>'` in a live module (a config_prod.js key rebuilt)
+ *   questStatus  Map quest id -> inventory status
+ * A rebuilt place is `rebuilt`; a room whose quest the remake plays somewhere else is `partial`.
  */
-export function judgeLocations({ mapStreets, index, categories, codeRefs = new Map() }) {
+export function judgeLocations({ mapStreets, index, categories, codeRefs = new Map(), gsjsRefs = new Map(), rooms = null, builders = new Map(), declaredOff = new Map(), remakeIds = new Map(), questStatus = new Map() }) {
   const rows = [];
   const seen = new Set();
+  const built = new Set(rooms?.builtRooms || []);
+  const roomFile = (room) => (rooms?.modulePath ? `js/quest-rooms/${rooms.modulePath(room).replace(/^\.\//, '')}` : room);
+  const at = (r) => `${r.file}:${r.line}`;
+  /** [status, detector, evidence] from what rebuilds the place, or null. */
+  const rebuiltBy = (tsid) => {
+    const refs = gsjsRefs.get(tsid) || [];
+    for (const r of refs) {
+      const room = r.quest && rooms?.questRooms?.[r.quest];
+      if (room && built.has(room)) return ['rebuilt', 'location-quest-room', `quest room ${room} (${roomFile(room)}) rebuilds ${r.quest} ${r.key ? `location ${r.key}${r.env === 'dev' ? ' (dev tsid)' : ''}` : 'template'} (${at(r)})`];
+    }
+    for (const r of refs) {
+      if (r.instanceId && built.has(r.instanceId)) return ['rebuilt', 'location-instance', `instance ${r.instanceId} (${at(r)}) is quest room ${r.instanceId} (${roomFile(r.instanceId)})`];
+    }
+    const b = builders.get(tsid);
+    if (b?.length) return ['rebuilt', 'location-builder', `built by ${b.slice(0, 2).map((x) => `${x.file}:${x.line} (${x.ctx})`).join(', ')}`];
+    for (const r of refs) {
+      const ids = r.configKey && remakeIds.get(r.configKey);
+      if (ids?.length) return ['rebuilt', 'location-config-id', `config_prod.js ${r.configVar}.${r.configKey} (${at(r)}) is built as id '${r.configKey}' at ${ids[0].file}:${ids[0].line}`];
+    }
+    for (const r of refs) {
+      const st = r.quest && questStatus.get(r.quest);
+      if (r.key && REACHABLE.has(st)) return ['partial', 'location-quest-standin', `location ${r.key} of quest ${r.quest} (${at(r)}), which the remake plays (${st}) without rebuilding this room`];
+      const q = (r.configQuests || []).find((x) => REACHABLE.has(questStatus.get(x)));
+      if (q) return ['partial', 'location-quest-standin', `config_prod.js ${r.configVar}.${r.configKey} (${at(r)}), which quest ${q} looks up; the remake plays it (${questStatus.get(q)}) without rebuilding this room`];
+    }
+    return null;
+  };
+  const usedBy = (tsid) => {
+    const refs = gsjsRefs.get(tsid) || [];
+    const parts = [...new Set(refs.slice(0, 4).map((r) => (r.quest ? `quest ${r.quest}${r.key ? ` (${r.key})` : ''}` : r.configVar ? `config ${r.configVar}${r.configKey ? `.${r.configKey}` : ''}` : r.instanceId ? `instance ${r.instanceId} at ${at(r)}` : at(r))))];
+    return parts.length ? `; GSJS: ${parts.join(', ')}${refs.length > 4 ? ` +${refs.length - 4}` : ''}` : '';
+  };
   for (const s of mapStreets) {
     const g = `G${s.tsid.slice(1)}`;
     seen.add(g);
@@ -239,11 +279,21 @@ export function judgeLocations({ mapStreets, index, categories, codeRefs = new M
       continue;
     }
     const cat = categories.get(s.tsid);
-    const refs = codeRefs.get(s.tsid) || codeRefs.get(g) || [];
     const [status, why] = LOCATION_CATEGORY[cat] || ['missing', 'not imported and not categorised'];
+    if (status !== 'excluded') {
+      const hit = rebuiltBy(s.tsid);
+      if (hit) {
+        const off = declaredOff.get(s.tsid);
+        const note = off?.length ? `; declared but switched off at ${off[0].file}:${off[0].line} (available: false)` : '';
+        rows.push(row('location', s.tsid, { ...base, status: hit[0], detector: hit[1], evidence: `${hit[2]}${note}; category ${cat || '(none)'}` }));
+        continue;
+      }
+    }
+    const refs = codeRefs.get(s.tsid) || codeRefs.get(g) || [];
+    const off = declaredOff.get(s.tsid);
     let st = status;
-    let ev = `category ${cat || '(none)'}: ${why}`;
-    if (refs.length && st !== 'excluded') { st = 'unknown'; ev += `; referenced in remake code ${refs.slice(0, 3).join(', ')}`; }
+    let ev = `category ${cat || '(none)'}: ${why}${usedBy(s.tsid)}`;
+    if (off?.length && st !== 'excluded') { st = 'missing'; ev = `declared but switched off at ${off[0].file}:${off[0].line} (${off[0].ctx}, available: false); ${ev}`; } else if (refs.length && st !== 'excluded') { st = 'unknown'; ev += `; referenced in remake code ${refs.slice(0, 3).join(', ')}`; }
     rows.push(row('location', s.tsid, { ...base, status: st, detector: 'location-category', evidence: ev }));
   }
   for (const [g, meta] of Object.entries(index)) {
@@ -252,6 +302,9 @@ export function judgeLocations({ mapStreets, index, categories, codeRefs = new M
   }
   return rows;
 }
+
+/** Context kinds that declare a value (a builder's TSID constant), not merely compare or pass it. */
+export const DECLARING_CTX = /^(VariableDeclarator|prop:.+|array)$/;
 
 /* ------------------------------------------------------------------ */
 /* Items and NPCs                                                       */
@@ -364,9 +417,13 @@ const SKILL_AUDIT = { live: 'source', partial: 'partial', later: 'missing', mult
 /**
  * skills: GSJS readSkills() rows; audit: Map id -> { status, note };
  * statusOf(kind, id) -> status (for prereqs); unlocks: Map skill -> [{ file, item }];
- * itemReachable(id) -> bool; retired: [{ id, files }] (skills_has ids not in the catalog)
+ * itemReachable(id) -> bool; retired: [{ id, files }] (skills_has ids not in the catalog);
+ * gateGaps: Map skill -> [text]: things the remake has whose GSJS gate on the skill the remake drops
+ * (a recipe in recipes.json without the skill its catalog_recipes.js row requires).
+ * `partial` means a skill-gated thing the remake has is missing its gate or effect (the skill-tree.js
+ * audit says so, or a gate gap); gated items the remake lacks are judged as items, and only listed here.
  */
-export function judgeSkills({ skills, audit, statusOf, unlocks, itemReachable, remakeMentions, retired = [] }) {
+export function judgeSkills({ skills, audit, statusOf, unlocks, itemReachable, remakeMentions, retired = [], gateGaps = new Map() }) {
   const byId = new Map(skills.map((s) => [s.id, s]));
   const memo = new Map();
   const learnable = (id, stack = []) => {
@@ -390,7 +447,9 @@ export function judgeSkills({ skills, audit, statusOf, unlocks, itemReachable, r
     const unbuiltUnlocks = u.filter((x) => x.item && !itemReachable(x.item));
     const uniq = [...new Set(unbuiltUnlocks.map((x) => x.item))];
     const ev = [`audit: ${a ? `${a.status}${a.note ? ` (${a.note})` : ''}` : 'not in skill-tree.js'}`, `GSJS unlock sites: ${u.length}`];
-    if (uniq.length) ev.push(`unlocks on items the remake lacks: ${uniq.slice(0, 8).join(', ')}${uniq.length > 8 ? ` +${uniq.length - 8}` : ''}`);
+    const gaps = gateGaps.get(s.id) || [];
+    if (gaps.length) ev.push(`gates the remake drops: ${gaps.slice(0, 6).join(', ')}${gaps.length > 6 ? ` +${gaps.length - 6}` : ''}`);
+    if (uniq.length) ev.push(`also gates items the remake lacks (judged as items): ${uniq.slice(0, 8).join(', ')}${uniq.length > 8 ? ` +${uniq.length - 8}` : ''}`);
     if (!u.length) ev.push('nothing in GSJS checks for it outside the skill catalog');
     ev.push(`remake code mentions: ${remakeMentions.get(s.id) || 0}`);
     const l = learnable(s.id);
@@ -399,7 +458,7 @@ export function judgeSkills({ skills, audit, statusOf, unlocks, itemReachable, r
       return row('skill', s.id, { ...base, status: l.original ? 'unbuilt_original' : 'missing', evidence: ev.join(' | ') });
     }
     let st = a ? SKILL_AUDIT[a.status] || 'unknown' : 'unknown';
-    if (st === 'source' && unbuiltUnlocks.length) st = 'partial';
+    if (st === 'source' && gaps.length) st = 'partial';
     if (!u.length && st !== 'lost') return row('skill', s.id, { ...base, status: st === 'source' ? 'source' : 'unbuilt_original', evidence: ev.join(' | ') });
     return row('skill', s.id, { ...base, status: st, evidence: ev.join(' | ') });
   });
