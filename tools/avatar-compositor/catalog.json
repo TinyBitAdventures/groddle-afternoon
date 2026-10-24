@@ -734,7 +734,6 @@
       {
         "name": "teaport",
         "reimagined": true,
-        "label": "Teapot",
         "colourways": [
           {
             "color_1": "2B4FA0 0 0 0 100 100",
@@ -819,7 +818,11 @@
       {
         "name": "slouch_boots",
         "reimagined": true,
-        "borrowedColours": "shoes/top_fur_boots"
+        "borrowedColours": "shoes/top_fur_boots",
+        "pick": [
+          460,
+          1312
+        ]
       },
       {
         "name": "sweet_heart_shoes",

@@ -221,3 +221,50 @@ describe('reimagined greyscale masters (row G52)', () => {
     }
   });
 });
+
+describe('builder labels (WARD, tools/avatar-compositor/labels.mjs)', () => {
+  const all = Object.entries(catalog.types).flatMap(([type, list]) => list.map((it) => ({ type, ...it })));
+
+  it('no builder label is a raw id, a numbered placeholder or a file-name spelling', () => {
+    for (const it of all) {
+      const where = `${it.type}/${it.name}: "${it.label}"`;
+      assert.ok(it.label?.trim(), `${it.type}/${it.name} has no label`);
+      // A class name may stand as its own label only when it is a plain word ("Mullet", "Tutu").
+      assert.ok(it.label !== it.name || /^[A-Z][a-z]+$/.test(it.name), `${where} is the raw id`);
+      assert.doesNotMatch(it.label, /_/, where);
+      assert.doesNotMatch(it.label, /^(Eyes|Mouth|Nose|Ears|Hair) \d+$/, where);
+      assert.doesNotMatch(it.label, /\b0\d/, `${where}: zero-padded number`);
+      assert.doesNotMatch(it.label, /[a-z][A-Z]/, `${where}: CamelCase`);
+      assert.doesNotMatch(it.label, /^(wo)?m[ae]ns?\b|^(fe)?male\b|^lady\b|^girl\b|^guy\b(?! fawkes)|^boy\b/i, `${where}: gendered file prefix`);
+    }
+  });
+
+  it('labels are unique within each type', () => {
+    for (const [type, list] of Object.entries(catalog.types)) {
+      const seen = new Map();
+      for (const it of list) {
+        assert.ok(!seen.has(it.label), `${type}: "${it.label}" is both ${seen.get(it.label)} and ${it.name}`);
+        seen.set(it.label, it.name);
+      }
+    }
+  });
+
+  it('every labels.mjs row reaches the catalog, marked source or ours', async () => {
+    const { ARTICLE_LABELS } = await import('../tools/avatar-compositor/labels.mjs');
+    assert.ok(ARTICLE_LABELS.size > 200);
+    for (const [key, { label, origin }] of ARTICLE_LABELS) {
+      const [type, name] = key.split('/');
+      assert.equal(item(type, name)?.label, label, key);
+      assert.ok(origin === 'source' || origin === 'ours', key);
+    }
+    assert.equal(item('hat', 'Women_Plain_Hat').label, 'Plain lace hat');
+    assert.equal(item('hat', 'Women_Plain_Hat').borrowedLabel, 'Plain lace dress');
+    assert.equal(item('eyes', 'eyes_20101109E').label, 'Cat eyes');
+  });
+
+  it('slouch boots drop Fur-topped boots colourway 462 (nearly white on them)', () => {
+    const slouch = item('shoes', 'slouch_boots');
+    assert.deepEqual(slouch.variants.map((v) => v.from), [460, 1312]);
+    assert.ok(ids('shoes', 'top_fur_boots').includes(462), 'the Fur-topped boots keep their own 462');
+  });
+});

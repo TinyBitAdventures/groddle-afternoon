@@ -1807,9 +1807,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 330,
+  "commits": 333,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Say \"I love you <Giant>\" at their shrine and the Giant says it back"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Saying \"hi\" in chat waves your hi sign without a speech bubble"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Street animals crowded off a street come back the next game day"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1914,21 +1929,6 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Every Glitch is drawn from Tiny Speck's vector parts; the bitmap avatars are retired"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Dress up as a giant, the Rook, a chicken or a garden gnome from the Costumes presets"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Start fresh with Tiny Speck's new-player avatar picker, four choices for each part"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Customize your Butler part by part, drawn sharp from Tiny Speck's own pieces, and it invites you to join the club"
    }
   ]
  },

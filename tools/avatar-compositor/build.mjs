@@ -39,6 +39,7 @@ import { exportMorphShapes, exportShapes, morphShapeAt } from './shapes.mjs';
 import { buildRig, flattenPart, morphOfShapeId, nodeContent, shapeIds } from './rig.mjs';
 import { mergeContainers, readAvatarFla, validateAgainstSwf } from './xfl.mjs';
 import { loadGsjsAvatarData, loadHatHairMap } from './gsjs.mjs';
+import { ARTICLE_LABELS } from './labels.mjs';
 import { ARTICLE_CONTAINERS, SLOT_PARTS } from '../../public/js/avatar-rig.js';
 import { CORE_FRAMES, IDLE_FRAMES } from '../../public/js/avatar-anims.js';
 import { COLOR_FIELDS, expandCatalog, resolveLook } from '../../public/js/avatar-looks.js';
@@ -345,6 +346,7 @@ function buildData({ only = null } = {}) {
     buildBase();
   }
   const pending = new Set(only || []);
+  const labelled = new Set();
   // GSJS articles by slot and class: one class name can be two articles
   // (chaulkywhite_coatshirtvest is a shirt and a coat, two SWFs).
   const byClass = new Map();
@@ -400,7 +402,10 @@ function buildData({ only = null } = {}) {
         idleTotal += idleBytes;
         console.log(`  ${type}/${name}: ${Object.keys(data.parts).length} parts, groups ${data.groups.join(',') || '-'}, ${(bytes / 1024).toFixed(0)} KB`);
       }
-      const item = { name, label: e.label || labelOf(cls, type, index), parts: Object.keys(data.parts), groups: data.groups };
+      // Builder label: the manifest's, else labels.mjs (friendly names, source vs ours), else words from the class name.
+      const named = ARTICLE_LABELS.get(key);
+      if (named) labelled.add(key);
+      const item = { name, label: e.label || named?.label || labelOf(cls, type, index), parts: Object.keys(data.parts), groups: data.groups };
       if (g?.id) item.gsjsId = Number(g.id);
       // Every GSJS colourway of the article (data_clothing has one id per colourway).
       const variants = variantsOf.get(`${type}/${cls}`);
@@ -413,6 +418,8 @@ function buildData({ only = null } = {}) {
     }
   }
   if (pending.size) throw new Error(`--only: not in the manifest: ${[...pending].join(', ')}`);
+  const unused = [...ARTICLE_LABELS.keys()].filter((k) => !labelled.has(k));
+  if (unused.length) throw new Error(`labels.mjs: not in the manifest: ${unused.join(', ')}`);
   // A reimagined article names its colour source in the builder's words.
   for (const list of Object.values(catalog.types)) {
     for (const item of list) {
