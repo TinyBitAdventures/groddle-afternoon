@@ -783,6 +783,7 @@ import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
+import { hidesChatBubble } from './js/hi-signs.js?v=hi-chat-1';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -19033,7 +19034,9 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   // The Local chat dock keeps the whole chain. In-world, keep only the current
   // speaker readable instead of stacking three large bubbles over the actors.
   if (result.matched) clearSpeechBubbles();
-  if (participant === 'Ur') {
+  if (hidesChatBubble(text)) {
+    // A plain "hi" says hi (the hi sign) with no bubble (RightSideManager.as 233).
+  } else if (participant === 'Ur') {
     showSpeechBubble(playerSpeechTarget, {
       speaker: participant,
       text,

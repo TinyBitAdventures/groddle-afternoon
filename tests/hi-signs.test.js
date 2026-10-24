@@ -31,6 +31,7 @@ import {
   hiColor,
   hiDay,
   hiHintDue,
+  hidesChatBubble,
   maybeSetEvasionRecord,
   missileMaxSpeed,
   missileSeconds,
@@ -387,5 +388,31 @@ describe('hi-signs feature', () => {
     const src = readFileSync(join(PUBLIC, 'js/features/hi-signs-feature.js'), 'utf8');
     assert.match(src, /e\.code === 'Digit5' \|\| e\.code === 'Numpad5'/);
     assert.match(src, /butler-feature\.js\?v=butler-feature-3/);
+  });
+});
+
+describe('a chat line that is just "hi" (RightSideManager.as 232-235, Emotes.as 53-54)', () => {
+  const CLIENT = join(ROOT, '..', 'glitch-client', 'com', 'tinyspeck', 'engine', 'port');
+
+  it('hides the bubble for "hi" in any case, trimmed like the server echo', () => {
+    for (const line of ['hi', 'Hi', 'HI', 'hI', ' hi ', '\thi']) assert.equal(hidesChatBubble(line), true, JSON.stringify(line));
+    for (const line of ['hi!', 'hi.', 'hii', 'hi there', 'h i', 'hey', 'hello', '', null]) assert.equal(hidesChatBubble(line), false, JSON.stringify(line));
+  });
+
+  it('keeps the hi sign and only drops the bubble over the speaker in game.js', () => {
+    const game = readFileSync(join(PUBLIC, 'game.js'), 'utf8');
+    assert.match(game, /import \{ hidesChatBubble \} from '\.\/js\/hi-signs\.js\?v=hi-chat-1';/);
+    const say = game.slice(game.indexOf('function sayLocalChat('), game.indexOf('function finishAssistedFeatChain('));
+    assert.ok(say.indexOf('showLocalChatBubble(') < say.indexOf('hidesChatBubble(text)'), 'the Local chat dock (the pane) keeps the line');
+    assert.match(say, /if \(hidesChatBubble\(text\)\) \{[^}]*\} else if \(participant === 'Ur'\) \{\s*showSpeechBubble/);
+    const feature = readFileSync(join(PUBLIC, 'js/features/hi-signs-feature.js'), 'utf8');
+    assert.match(feature, /String\(input\?\.value \|\| ''\)\.toLowerCase\(\) === 'hi'\) sayHi\(eng\)/, 'the hi itself still goes');
+  });
+
+  it('matches the client source', { skip: !existsSync(CLIENT) && 'glitch-client not present' }, () => {
+    const rsm = readFileSync(join(CLIENT, 'RightSideManager.as'), 'utf8');
+    assert.match(rsm, /if \(txt\.toLowerCase\(\) != 'hi'\) \{\s*avatar\.chatBubbleManager\.showBubble/);
+    const emotes = readFileSync(join(CLIENT, 'Emotes.as'), 'utf8');
+    assert.match(emotes, /txt\.toLowerCase\(\) == EMOTE_TYPE_HI/);
   });
 });

@@ -130,6 +130,17 @@ export const HI_TEXT = Object.freeze({
   hint: "Do you like saying 'Hi'? It's as easy as pressing '5' (when the focus is on the game, not in chat). Every day you get a new sign --- hands, bats, flowers, birds, cubes, etc. --- if you find someone with the same sign, you both get a bonus and you get honest mood out of it, once per day.",
 });
 
+/**
+ * RightSideManager.as 232-235 (chatUpdate): a local chat line that is "hi",
+ * in any case, gets no bubble over the speaker; the chat pane still shows
+ * it. The line the server echoes back is trimmed (main.js 1702 utils.trim),
+ * so " Hi " hides too, while "hi!", "hii" or "hi there" bubble as usual.
+ * Saying the hi itself is Emotes.as 53-54 (hi-signs-feature.js onSubmit).
+ */
+export function hidesChatBubble(text) {
+  return String(text ?? '').trim().toLowerCase() === 'hi';
+}
+
 /** Ids for the one player and the one Butler (the source keys by tsid). */
 export const HI_PLAYER_ID = 'pc';
 export const HI_BUTLER_ID = 'butler';
