@@ -41,20 +41,22 @@
  * One reading: teleporter_button.js's collision lines ("A teleporter. Aha!" /
  * "It is off. You need to turn it on.") test `whistle_taken &&
  * teleporter_button_activated` and then set the flag, so as written they can
- * never show; the comment above them describes the intended first-visit
- * lines, which is what the remake shows (TELEPORTER_HINT_AS_COMMENTED).
+ * never show, though the comment above them describes first-visit lines. The
+ * live game played it as written: in video 2Z76dO4DlJ4 the player stands at
+ * the control unit with the whistle swallowed for two seconds (t90-93) and
+ * no lines appear, so the remake keeps them off (TELEPORTER_HINT_AS_COMMENTED).
  *
  * The lab's template is lost: js/quest-rooms/firefly-whistle-scene.js rebuilds
- * it from three player Snaps; only the arrival point and the teleporter's x and
- * foot come from the code. The stand, whistle and control unit positions
- * between them are inferred (LAYOUT). Art: the recovered whistle_stand_button
+ * it from three player Snaps and video 2Z76dO4DlJ4 (reference only); the
+ * arrival point and the teleporter's x and foot come from the code, the stand,
+ * the midpoint and the control unit from the video (LAYOUT). Art: the recovered whistle_stand_button
  * (button_on, every third of its 48 frames, and button_off) and
  * teleporter_button sheets, and the firefly_whistle item exported from its
  * Tiny Speck SWF (glitch-items/quest_items/firefly_whistle) at 2x.
  */
 
 import { advanceVpOverlay, vpOverlay, vpSequence } from './vp-overlay.js?v=ffw-1';
-import { FLOOR, H, W, buildLab, sx, sy } from './firefly-whistle-scene.js?v=ffw-1';
+import { ENTRY, FLOOR, H, W, buildFront, buildLab, labPlatforms, sx, sy } from './firefly-whistle-scene.js?v=ffw-2';
 import { onLoaded, textureFromUrl } from '../textures.js';
 
 export const QUEST = 'firefly_whistle';
@@ -79,9 +81,15 @@ export const MIDPOINT_PUSH = 500;
 export const PAD_PUSH = 300;
 /** players/player.js fireflyWhistleSwallowed: event delays (s) after the take. */
 export const SWALLOW_STEPS = Object.freeze([0.25, 0.25, 0.25, 0.25, 2, 2]);
-export const TELEPORTER_HINT_AS_COMMENTED = true;
-/** Source x of the pieces the code does not place (inferred; see header). */
-export const LAYOUT = Object.freeze({ stand: -1470, midpoint: -800, control: 818, pad: BEAM.x });
+export const TELEPORTER_HINT_AS_COMMENTED = false;
+/**
+ * Source x of the pieces the code does not place, read off video 2Z76dO4DlJ4
+ * at 2.21 world px per video px (see the scene's LAB): the stand just past
+ * the egg pod and a pillar (t31-36); the midpoint just past the next pillar,
+ * where the player is walked back to ~140 px short of the stand (t40.9-43);
+ * the control unit beside the pad (t91-103, as Snap PIFISEG38S535GC_56214).
+ */
+export const LAYOUT = Object.freeze({ stand: -273, midpoint: 80, control: 818, pad: BEAM.x });
 
 export const TEXT = Object.freeze({
   desc: 'Explore the lab and learn what you can about how to charm Fireflies.',
@@ -491,8 +499,9 @@ export const room = {
       width: W,
       height: H,
       background: root,
-      platforms: [kit.plat(0, FLOOR, W, FLOOR, 'invisible', { id: 'fireflex_floor' })],
-      spawn: { x: P(at), y: FLOOR },
+      platforms: labPlatforms(kit),
+      // The arrival point is over the entry ledge (ENTRY): you start on it.
+      spawn: { x: P(at), y: at === ARRIVAL.x ? sy(ENTRY.y) : FLOOR },
     };
   },
 
@@ -514,6 +523,8 @@ export const room = {
     d.promptAt = Date.now() + EXIT_PROMPT_MS;
     addStand(ctx);
     addControl(ctx);
+    // The pillars stand in front of the avatar (video t20, t30, t41, t89).
+    ctx.add(buildFront(ctx.PIXI), 60);
     const qa = ctx.param('ffwstart');
     if (qa === 'control') {
       // QA: the stand pushed and the whistle swallowed already (no badge, no flag).

@@ -28,13 +28,15 @@ import {
   STAND_HIT,
   STUCK_TEXT,
   SWALLOW_STEPS,
+  TELEPORTER_HINT_AS_COMMENTED,
   TEMPLATE,
   TEXT,
   codeMatches,
   hintFor,
   room,
 } from '../public/js/quest-rooms/firefly-whistle.js';
-import { DRESSING, FLOOR, FLOOR_Y, LAB, W, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js';
+import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js';
+import * as kit from '../public/js/quest-rooms/kit.js';
 import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js';
 import { FIREFLY_OFFER_LINES, FIREFLY_WHISTLE_QUEST, fireflyTouches } from '../public/js/features/resource-nodes-feature.js';
@@ -135,14 +137,48 @@ describe('Fireflex 3000 Lab layout', () => {
     assert.ok(sx(ARRIVAL.x) > 0 && sx(LAB.r) === W);
   });
 
-  it('runs arrival -> stand -> midpoint -> control unit -> pad left to right', () => {
+  it('runs arrival -> poster -> egg pod -> pillar -> stand -> pillar -> midpoint -> control unit -> pad (video 2Z76dO4DlJ4)', () => {
+    const [, , p3, p4] = DRESSING.pillars;
     assert.ok(ARRIVAL.x < DRESSING.poster.x);
-    assert.ok(DRESSING.poster.x < DRESSING.eggs[0] && DRESSING.eggs[0] < DRESSING.pillars[0] && DRESSING.pillars[0] < LAYOUT.stand);
+    assert.ok(DRESSING.poster.x < DRESSING.eggs[0] && DRESSING.eggs[0] < p3 && p3 < LAYOUT.stand, 't29-36');
+    assert.ok(LAYOUT.stand < p4 && p4 < LAYOUT.midpoint, 't40.9: walked back just past the pillar right of the stand');
     assert.ok(LAYOUT.stand + STAND_HIT.w / 2 < LAYOUT.midpoint, 'the stand box ends before the midpoint');
-    assert.ok(LAYOUT.midpoint - MIDPOINT_PUSH > LAYOUT.stand, 'the walk back lands short of the stand, not behind the arrival');
+    const landed = LAYOUT.midpoint - MIDPOINT_PUSH;
+    assert.ok(landed < LAYOUT.stand && landed > DRESSING.eggs[0], 't43: the walk back lands just short of the stand');
     assert.ok(LAYOUT.midpoint < LAYOUT.control && LAYOUT.control < LAYOUT.pad);
     assert.ok(LAYOUT.pad - PAD_PUSH > LAYOUT.midpoint, 'the pad sends you back on the near side of the midpoint');
     assert.ok(LAYOUT.pad < LAB.r - 100);
+    assert.ok(DRESSING.windows.at(-1).x > LAYOUT.pad, 'a window past the pad (t103)');
+  });
+
+  it('ends where the video camera stops: arrival 33 px from the left edge, the last window at the right', () => {
+    assert.equal(LAB.l, -3000);
+    assert.equal(LAB.r, 1270);
+    assert.equal(ARRIVAL.x - LAB.l, 33);
+    assert.equal(DRESSING.eggs.length, 1);
+    assert.equal(DRESSING.pillars.length, 4);
+    assert.deepEqual(DRESSING.signs.map((s) => s.text), ['G2', 'G2', 'G2']);
+    assert.ok(DRESSING.windows.at(-1).x + DRESSING.windows.at(-1).w / 2 < LAB.r);
+  });
+
+  it('enters on a ledge in the doorway and walks down a ramp to the corridor floor', () => {
+    assert.equal(ENTRY.x1, LAB.l);
+    assert.ok(ENTRY.ledgeEnd > ARRIVAL.x, 'the arrival point is over the ledge');
+    assert.ok(ENTRY.y < FLOOR_Y && ENTRY.y > ARRIVAL.y, 'the ledge is between the floor and the arrival y');
+    assert.ok(ENTRY.rampEnd < DRESSING.pillars[0]);
+    const plats = labPlatforms(kit);
+    for (let i = 1; i < plats.length; i += 1) {
+      assert.equal(plats[i].x1, plats[i - 1].x2, `segment ${i} starts where ${i - 1} ends`);
+      assert.equal(plats[i].y1, plats[i - 1].y2);
+      assert.ok(plats[i].y2 >= plats[i].y1, 'never climbs going right');
+    }
+    assert.deepEqual([plats[0].x1, plats[0].y1], entryPath()[0]);
+    assert.deepEqual([plats.at(-1).x2, plats.at(-1).y2], [W, FLOOR]);
+    for (const p of plats) assert.ok(Math.abs(p.y2 - p.y1) <= (p.x2 - p.x1) * 0.8, 'walkable slope');
+  });
+
+  it('never shows the control unit\'s collision lines (as written; video t90-93)', () => {
+    assert.equal(TELEPORTER_HINT_AS_COMMENTED, false);
   });
 });
 
