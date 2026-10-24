@@ -1152,11 +1152,21 @@ function applyResult(engine, entity, result) {
     if ((result.achievementCounters || []).some((c) => c.counter === 'sloth:fed_until_full')) {
       engine.toast('Metal forever!', 2000);
     }
+    if (slothsChewing(entities, Date.now()) >= 3) engine.grantAchievement?.('circle_crunch');
   }
   refreshEntity(engine, entity);
   engine.refreshPack();
   engine.save();
   publish(engine);
+}
+
+/**
+ * npc_sloth.js:290-301 Circle Crunch: Sloths on this street still chewing a
+ * Metal Rod you fed them (the source keeps `feeder` until metalizeComplete;
+ * solo, every chewing Sloth was fed by you).
+ */
+export function slothsChewing(list, now = Date.now()) {
+  return (list || []).filter((e) => e?.classTsid === 'npc_sloth' && Number(e.node?.busyUntil) > now).length;
 }
 
 function performVerb(engine, entity, verbId) {

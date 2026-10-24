@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-44';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-46';
 import {
   actionDurationFor,
   createTimedAction,
@@ -319,7 +319,11 @@ import {
   seedAchievementNearCompletion,
   unlockAchievement,
   groupLabelCount,
-} from './js/achievements.js?v=full-browser-1';
+  makingOutputAchievementCounters,
+  consumeAchievementCounters,
+  resetAchievementCounter,
+  purchaseAchievementUpdates,
+} from './js/achievements.js?v=badge-counters-1';
 import {
   applyStreetVisit,
   STREET_VISITS_SLOT,
@@ -3407,6 +3411,13 @@ function usePackItem(classTsid) {
     updateSkillChrome();
   }
   emitGameEvent(`${classTsid}:${String(ordinaryInfo?.verb || 'use').toLowerCase()}`);
+  // food.js / drink.js: items_eaten, meals_eaten, items_drank (+ alcohol).
+  if (ordinaryInfo?.usable) {
+    const meta = ITEM_CATALOG[classTsid] || {};
+    for (const row of consumeAchievementCounters(classTsid, { kind: ordinaryInfo.kind, tags: meta.tags, baseCost: meta.baseCost })) {
+      announceAchievementUpdates(applyAchievementProgress(achieveState, row.counter, row.amount, pc));
+    }
+  }
   let foodResult = null;
   if (isFood && r.effects?.energy > 0) {
     foodResult = recordFoodEat(foodState, classTsid, {
@@ -8789,6 +8800,12 @@ async function maybeNewDay(opts = {}) {
   const trantN = resetAllTrantsForNewDay();
   const animalN = resetAllAnimalsForNewDay();
   resetShrineDay(shrineState);
+  // player.js:987-991 doNewDay: a day of 100+ quoins extends the Numismatizer streak; any other day ends it.
+  if ((Number(quoinState.collectedToday) || 0) >= 100) {
+    announceAchievementUpdates(applyAchievementProgress(achieveState, 'coin_count:days_maxed', 1, pc));
+  } else {
+    resetAchievementCounter(achieveState, 'coin_count:days_maxed');
+  }
   const quoinReset = resetQuoinDay(quoinState, pc.imaginationUpgrades);
   resetFoodDay(foodState);
   resetStreetCollectiblesForNewDay();
@@ -8895,11 +8912,17 @@ function publishJumpState(result = null) {
   if (result?.multiplier) app.canvas.dataset.jumpMultiplier = result.multiplier.toFixed(3);
 }
 
+/** main.js:1612-1628: every jump the client reports counts (Bounder, Leapist). */
+function countPlayerJump() {
+  announceAchievementUpdates(applyAchievementProgress(achieveState, 'movement:jumped', 1, pc));
+}
+
 function performPlayerJump(result, baseVelocity, now) {
   player.vy = baseVelocity * result.multiplier;
   player.onGround = false;
   noteGrounded(jumpState, false, now);
   pc.energy = clamp(pc.energy - 1.2, 0, energyCap());
+  countPlayerJump();
   if (result.triple) {
     playSfx('jump', { volume: 0.58, rate: 1 });
     const boost = result.multiplier.toFixed(2).replace(/0$/, '');
@@ -9039,6 +9062,7 @@ function handleInput() {
       if (!side) {
         noteJumped(jumpState);
         pc.energy = clamp(pc.energy - 1.2, 0, energyCap());
+        countPlayerJump();
         updateHud();
       }
       return;
@@ -19052,6 +19076,8 @@ function handleFeatResult(result, participant) {
     toast(result.activityLine, 3200);
   } else if (result.ok) {
     playSfx(result.chainCompleted ? 'quest' : 'alert', { volume: 0.5 });
+    // inc_feats.js:104-106: every contribution of yours grants Down to the Wire (once).
+    if (result.participant === 'Ur') engine.grantAchievement('down_to_the_wire');
     if (result.firstContribution) {
       const updates = applyAchievementProgress(
         achieveState,
@@ -19477,6 +19503,8 @@ function handleSkillCompletions(completed, { offline = false } = {}) {
       subtitle: offline ? 'Your brain kept studying while you were away.' : 'Knowledge: acquired.',
     });
   }
+  // inc_skills.js:1513 (on learning) and player.js:217 (on login): eleven skills known.
+  if (skillState.learned.length >= 11) engine.grantAchievement('first_eleven_skills');
 }
 
 function updateSkillChrome(now = Date.now()) {
@@ -19886,6 +19914,10 @@ function updateMakeCraft(deltaMs) {
       for (const output of record.recipe.outputs || []) {
         achievementUpdates.push(...applyAchievementProgress(achieveState, `making_food:${output.classTsid}`, 1, pc));
       }
+    }
+    // Refined elements, ingots, crystals, furniture (js/achievements.js).
+    for (const row of makingOutputAchievementCounters(record.recipe.tool, record.recipe.outputs)) {
+      achievementUpdates.push(...applyAchievementProgress(achieveState, row.counter, row.amount, pc));
     }
     announceAchievementUpdates(achievementUpdates);
     if (achievementCounter) app.canvas.dataset.achievementCounter = achievementCounter;
@@ -20847,6 +20879,7 @@ function renderVendorList() {
       playSound(r.ok ? (isBuy ? 'PURCHASE_ITEM' : 'VENDOR_SELL') : 'CLICK_FAILURE', { volume: 0.55 });
       if (r.ok) {
         emitGameEvent(`vendor_${isBuy ? 'bought' : 'sold'}:${vendorSelected}`, r.qty || vendorQty);
+        if (isBuy) announceAchievementUpdates(purchaseAchievementUpdates(achieveState, r.cost, pc));
       }
       if (r.ok && !isBuy) {
         vendorSellReceipt = { label, qty: r.qty, gain: r.gain };

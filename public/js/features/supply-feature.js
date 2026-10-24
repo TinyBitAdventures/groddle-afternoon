@@ -299,6 +299,8 @@ function runMachineVerb(classTsid, verbId, engine) {
         ? collectHooch(still, inv, learned(engine))
         : null;
     if (!res) return false;
+    // still.js:454-455 giveHooch: only Hooch collected in your own home (POL) counts.
+    if (res.ok && verb === 'collect' && engine.homeContext?.().inHome) engine.achievement?.('still:collected_in_pol', res.got);
     say(engine, res.msg, res.ok);
     engine.save?.();
     return true;
@@ -315,6 +317,8 @@ function runTransformVerb(classTsid, verbId, engine) {
   if (!ITEM_TRANSFORMS[classTsid] && !HERB_SEEDS[classTsid]) return false;
   const [verb, count] = String(verbId).split(':');
   const res = runTransform(classTsid, verb, count === 'all' ? 'all' : 1, engine.inv, engine.pc, learned(engine));
+  // butterfly_butter.js:211: compressing Butterfly Butter into Cheese grants Cheesemongerer.
+  if (res.ok && classTsid === 'butterfly_butter' && verb === 'compress') engine.grantAchievement?.('cheesemongerer');
   engine.updateHud?.();
   say(engine, res.msg, res.ok);
   return true;

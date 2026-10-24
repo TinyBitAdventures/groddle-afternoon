@@ -1355,6 +1355,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
     }
     case 'mortar_barnacle': {
       outputs.push({ classTsid: 'barnacle', qty: pkg.bonus_amount || 1 });
+      // items/item.js:738 notifyVerb: <class>:<verb> once per successful verb (Decrustifier badges).
+      achievementCounters.push({ counter: 'mortar_barnacle:scrape', amount: 1 });
       break;
     }
     case 'ice_knob': {
@@ -1377,6 +1379,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
         outputs.push({ classTsid: 'jellisac_clump', qty: bonus, superHarvest: true });
         extra.superHarvest = { classTsid: 'jellisac_clump', qty: bonus };
       }
+      // item.js:738 notifyVerb (Goo Getter, Gloopmeister and the rest).
+      achievementCounters.push({ counter: 'jellisac:scoop', amount: 1 });
       break;
     }
     case 'dirt_pile': {
@@ -1400,6 +1404,8 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
       if (verb.id === 'harvest') {
         const want = asList(ctx.upgrades).includes('gardening_harvest_paper') ? 8 : 5;
         outputs.push({ classTsid: 'paper', qty: Math.min(want, node.units) });
+        // item.js:738 notifyVerb (Paper Plucker, Pad Pincher and the rest).
+        achievementCounters.push({ counter: 'paper_tree:harvest', amount: 1 });
       } else if (verb.id === 'water') {
         achievementCounters.push({ counter: 'trants_watered:paper_tree', amount: 1 });
       }

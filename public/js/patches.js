@@ -692,6 +692,8 @@ export function tickPlot(plot, now = Date.now(), ctx = {}) {
     if (tree.classId === 'wood_tree') {
       const care = noteWoodTreeCare(tree);
       if (care === 'grew') events.push('matured');
+      // wood_tree.js:1009-1012: care that brings a tree to maturity 6 counts wood_tree:maxed.
+      if (care === 'grew' && tree.state.maturity === 6) events.push('maxed');
       else if (care) events.push('cared');
       const state = tree.state;
       if (state.maturity <= 0) {

@@ -612,6 +612,26 @@
   "status": "lost",
   "reason": "counts guests at a party you host"
  },
+ "counter:daily_img": {
+  "status": "lost",
+  "reason": "magic_rock.js:427-441 pays the day's home cultivation iMG, which only visitors earn: inc_cultivation.js:171 skips the owner",
+  "register": "G119"
+ },
+ "achievement:social_butterfly": {
+  "status": "lost",
+  "reason": "inc_emotes.js:204-208: say hi to 53 different players in one game day",
+  "register": "G117"
+ },
+ "achievement:hi_and_mighty": {
+  "status": "lost",
+  "reason": "inc_emotes.js:355-362: a matching-sign Hi jackpot with 17 different players in one game day (the Butler jackpot is its own counter)",
+  "register": "G117"
+ },
+ "achievement:philanthropic_member_of_the_social_construct": {
+  "status": "lost",
+  "reason": "inc_jobs.js:459-463: pay over half of a project on another player's home street or yard",
+  "register": "G117"
+ },
  "item:quoin": {
   "status": "source",
   "reason": "js/quoins.js spawns the eight quoin types on every street (game.js spawnQuoins); the scan sees no class literal for the base quoin"

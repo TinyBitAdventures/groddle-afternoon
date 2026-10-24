@@ -735,7 +735,7 @@ export const patchesFeature = {
     // Catch up on time spent away (seedlings, regrowth, tree maturity).
     for (const item of items) {
       resetPlotDayIfStale(item.plot, lastNewDayAt, Math.random, now);
-      tickPlot(item.plot, now);
+      if (tickPlot(item.plot, now).events.includes('maxed')) engine.achievement('wood_tree:maxed', 1);
     }
     if (!items.length) {
       entities = [];
@@ -785,6 +785,7 @@ export const patchesFeature = {
     for (const entity of entities) {
       const before = entity.plot.stage;
       const { changed, events } = tickPlot(entity.plot, now);
+      if (events.includes('maxed')) engine.achievement('wood_tree:maxed', 1);
       if (before !== entity.plot.stage) {
         dirty = true;
         const grew = events.includes('grew');

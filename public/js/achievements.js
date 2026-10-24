@@ -101,9 +101,16 @@ export function worldVerbAchievementCounters(classTsid, verbId, result = null) {
   const verb = String(verbId || '').split(':')[0].trim();
   if (/^npc_(?:piggy|chicken|butterfly)$/.test(classId)) {
     if (['pet', 'nibble', 'squeeze', 'massage', 'milk'].includes(verb)) {
-      return [{ counter: achievementCounter(classId, verb), amount: 1 }];
+      const rows = [{ counter: achievementCounter(classId, verb), amount: 1 }];
+      // npc_chicken.js:1557: a successful squeeze also counts chicken:squoze (Hen Hugger).
+      if (classId === 'npc_chicken' && verb === 'squeeze') rows.push({ counter: 'chicken:squoze', amount: 1 });
+      return rows;
     }
     return [];
+  }
+  // wood_tree.js:794 (and wood_tree_enchanted.js:825): every finished harvest.
+  if (classId === 'wood_tree' && verb === 'harvest') {
+    return [{ counter: 'completed_harvest:wood_tree', amount: 1 }];
   }
   if (/^trant_(?:fruit|egg|bean|bubble|spice|gas)$/.test(classId)) {
     if (verb === 'pet') {
@@ -133,6 +140,112 @@ export function worldVerbAchievementCounter(classTsid, verbId, result = null) {
 /** Canonical counter for one successfully completed Making tool cycle. */
 export function makingToolAchievementCounter(toolClassTsid) {
   return achievementCounter('making_tool', toolClassTsid);
+}
+
+const FURNITURE_DECOS = Object.freeze(['furniture_roomdeco', 'furniture_ceilingdeco', 'furniture_walldeco', 'furniture_tabledeco']);
+const FURNITURE_CABINETS = Object.freeze(['bag_furniture_cabinet', 'bag_furniture_smallcabinet', 'bag_furniture_wallcabinet']);
+const FURNITURE_LAMPS = Object.freeze(['furniture_floorlamp', 'furniture_ceilinglamp', 'furniture_tablelamp', 'furniture_walllamp']);
+const FURNITURE_SEATS = Object.freeze(['furniture_stool', 'furniture_bench', 'furniture_sofa', 'furniture_armchair', 'furniture_chair', 'furniture_loveseat']);
+
+/**
+ * Counters one finished Making unit adds beyond making_tool / making_known_*,
+ * by tool, for the unit's recipe outputs ([{ classTsid, qty }]):
+ * - ore_grinder.js / grand_ol_grinder.js:612 onCrushComplete: every output
+ *   counts elements_refined:<output> by the amount made (Refiner badges).
+ * - smelter.js:565, 583 onSmeltComplete: smelter:ingots_created by the ingots
+ *   made, smelter:metal_smelted by the Metal Rocks used (5 per ingot).
+ * - crystallizer.js crystalmalize: items/item.js:738 notifyVerb counts
+ *   crystallizer:crystalmalize once per successful verb (one Plain Crystal).
+ * - construction_tool.js:314-328 onMakingComplete: furniture_items:made for
+ *   every piece (its note_pole / wall_segment guard is always true), plus
+ *   furniture_decos / furniture_cabinets / furniture_lamps / furniture_seats.
+ */
+export function makingOutputAchievementCounters(toolClassTsid, outputs = []) {
+  const tool = String(toolClassTsid || '');
+  const rows = [];
+  for (const out of outputs || []) {
+    const classTsid = String(out?.classTsid || '');
+    const qty = Math.max(0, Math.floor(Number(out?.qty) || 0));
+    if (!classTsid || !qty) continue;
+    if (tool === 'ore_grinder' || tool === 'grand_ol_grinder') {
+      rows.push({ counter: achievementCounter('elements_refined', classTsid), amount: qty });
+    } else if (tool === 'smelter' && classTsid === 'plain_metal') {
+      rows.push({ counter: 'smelter:ingots_created', amount: qty });
+      rows.push({ counter: 'smelter:metal_smelted', amount: qty * 5 });
+    } else if (tool === 'crystallizer') {
+      rows.push({ counter: 'crystallizer:crystalmalize', amount: 1 });
+    } else if (tool === 'construction_tool') {
+      rows.push({ counter: 'furniture_items:made', amount: qty });
+      if (FURNITURE_DECOS.includes(classTsid)) rows.push({ counter: 'furniture_decos:made', amount: qty });
+      else if (FURNITURE_CABINETS.includes(classTsid)) rows.push({ counter: 'furniture_cabinets:made', amount: qty });
+      else if (FURNITURE_LAMPS.includes(classTsid)) rows.push({ counter: 'furniture_lamps:made', amount: qty });
+      else if (FURNITURE_SEATS.includes(classTsid)) rows.push({ counter: 'furniture_seats:made', amount: qty });
+    }
+  }
+  return rows;
+}
+
+/**
+ * Counters for eating or drinking `count` of an item with its own Eat / Drink
+ * verb (buff herbs' Munch / Activate verbs are not food_eat):
+ * - include/food.js:194-201 food_eat: meals_eaten:<class> once per eat when
+ *   base_cost x count > 10 ("Do not count small things like single cherries"),
+ *   and items_eaten:<class> by count.
+ * - include/drink.js:123-125 drink: items_drank:<class> by count, and
+ *   items_drank:alcohol when the item carries the alcohol tag.
+ */
+export function consumeAchievementCounters(classTsid, { kind = 'food', tags = [], baseCost = 0, count = 1 } = {}) {
+  const id = String(classTsid || '').trim();
+  const n = Math.max(1, Math.floor(Number(count) || 1));
+  if (!id) return [];
+  if (kind === 'drink') {
+    const rows = [{ counter: achievementCounter('items_drank', id), amount: n }];
+    if ((tags || []).includes('alcohol')) rows.push({ counter: 'items_drank:alcohol', amount: n });
+    return rows;
+  }
+  const rows = [];
+  if ((Number(baseCost) || 0) * n > 10) rows.push({ counter: achievementCounter('meals_eaten', id), amount: 1 });
+  rows.push({ counter: achievementCounter('items_eaten', id), amount: n });
+  return rows;
+}
+
+/**
+ * GSJS achievements_set(group, label, 0): a streak counter starting over
+ * (player.js:991, coin_count:days_maxed after a day under 100 quoins). Every
+ * locked badge with that exact condition loses its progress on it.
+ */
+export function resetAchievementCounter(state, counterName) {
+  const cat = getAchievementCatalog();
+  let reset = 0;
+  for (const [id, def] of Object.entries(cat)) {
+    if (state.unlocked.includes(id)) continue;
+    const prog = state.progress?.[id]?.progress;
+    if (!prog) continue;
+    for (const c of def.conditions || []) {
+      if (`${c.group}:${c.name}` === counterName && prog[c.name]) {
+        prog[c.name] = 0;
+        reset += 1;
+      }
+    }
+  }
+  return reset;
+}
+
+/**
+ * players/inc_stores.js:225-235 stores_buy: one vendor purchase whose total
+ * cost reaches 1,009 / 2,003 / 5,003 currants grants Big Spender,
+ * El Big Spenderino and Moneybags Magoo.
+ */
+export function purchaseAchievementUpdates(state, totalCost, pc = null) {
+  const cost = Math.max(0, Number(totalCost) || 0);
+  const updates = [];
+  const note = (classTsid, r) => {
+    if (r.ok) updates.push({ classTsid, unlocked: true, rewards: r.rewards, def: r.def });
+  };
+  if (cost >= 1009) note('big_spender', unlockAchievement(state, 'big_spender', pc));
+  if (cost >= 2003) note('el_big_spenderino', unlockAchievement(state, 'el_big_spenderino', pc));
+  if (cost >= 5003) note('moneybags_magoo', unlockAchievement(state, 'moneybags_magoo', pc));
+  return updates;
 }
 
 /**

@@ -283,6 +283,8 @@ export const enchantedForestFeature = {
         // wood_tree.js care growth (pet + water counts against maturityMap).
         const grew = noteWoodTreeCare(tree);
         if (grew === 'grew') last = `matured:${entity.index}:${tree.state.maturity}`;
+        // wood_tree_enchanted.js:999-1002: tended up to maturity 6.
+        if (grew === 'grew' && tree.state.maturity === 6) engine.achievement('wood_tree:maxed', 1);
         if (entity.target && entity.maturity !== tree.state.maturity && tree.state.maturity > 0) {
           entity.maturity = tree.state.maturity;
           entity.sprite.texture = treeTexture(engine, tree.variant, tree.state.maturity);
