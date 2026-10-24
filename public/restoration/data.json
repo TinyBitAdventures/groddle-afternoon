@@ -1050,9 +1050,9 @@
     "note": {
      "tagline": "A whistle behind a force field, and no way home.",
      "about": "Firefly Whistle sent you back to a past future, the last days of the Alphite Age, to learn how its radical technologists charmed Fireflies. Bump into a Firefly and the Magic Rock offers it, with a warning: you must find your own way back.",
-     "play": "Walk the Fireflex 3000 Lab to the Precious Equipment Protection Unit, push its button to drop the force field and take the whistle, which you promptly swallow. Then talk the Teleporter Control Unit into switching on (it will drop hints) and step onto the pad to go home. From then on a Firefly Jar opened near Fireflies sets your whistling instinct off.",
-     "source": "The offer, the Firefly's \"What ho! ... Fireflies!\", every line from the stand, the whistle and the control unit with its six hints and activation code, the swallow (hit, hit, surprise, \"Gah. I've swallowed it!\", the Firefly Whistling badge), the walk back at the midpoint, the pad's push-back, the arrival point, the teleporter's position, the three-minute \"Are you stuck?\" prompt, the reward and the jar's badge gate.",
-     "rebuilt": "The lab's geometry was never archived. It is rebuilt from three players' Snaps of it and a player's recording of the whole quest, which fixes the room's ends, where the stand, the walk-back point and the control unit stand, and the order along the corridor: an entry doorway with a ramp, windows, G2 signs, four pillars you walk behind, the \"Church of Alph\" poster, one egg-shaped phone pod and hanging security orbs. It is dressed with Tiny Speck's own stand, control unit, teleporter, egg pod and orb art; the recording is reference only.",
+     "play": "Walk the Fireflex 3000 Lab to the Precious Equipment Protection Unit, push its button to drop the force field and take the whistle, which you promptly swallow. Then talk the Teleporter Control Unit into switching on (it will drop hints) and step onto the pad. You feel woozy and fall a long way, past giant numbers counting down to 29, until you land and are beamed home. From then on a Firefly Jar opened near Fireflies sets your whistling instinct off.",
+     "source": "The offer, the Firefly's \"What ho! ... Fireflies!\", every line from the stand, the whistle and the control unit with its six hints and activation code, the swallow (hit, hit, surprise, \"Gah. I've swallowed it!\", the Firefly Whistling badge), the walk back at the midpoint, the pad's push-back, the arrival point, the teleporter's position, the three-minute \"Are you stuck?\" prompt, the reward and the jar's badge gate. The pad sends you to the falling room (\"You Feel Woooooozy...\"), whose hidden teleporter takes you back to where you started.",
+     "rebuilt": "The lab's geometry was never archived. It is rebuilt from three players' Snaps of it and a player's recording of the whole quest, which fixes the room's ends, where the stand, the walk-back point and the control unit stand, and the order along the corridor: an entry doorway with a ramp, windows, G2 signs, four pillars you walk behind, the \"Church of Alph\" poster, one egg-shaped phone pod and hanging security orbs. It is dressed with Tiny Speck's own stand, control unit, teleporter, egg pod and orb art. The falling room is lost too; the same recording and three Snaps show it built from Tiny Speck's Headroom decos, so it uses those: the two number columns, ray bursts, bubbles, the tongue you land on, coral, flowers and glyphs. The recording is reference only.",
      "footage": [
       {
        "id": "2Z76dO4DlJ4",
@@ -1833,9 +1833,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 345,
+  "commits": 346,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "The Fireflex 3000 Lab is laid out like the player's recording, from the entry ramp to the window past the teleporter"
+   },
    {
     "date": "2026-10-24",
     "kind": "fix",
@@ -1950,14 +1955,9 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "The restoration page's room grid drops its Play buttons; each room's dialog keeps one"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Room 4 is the felt-craft meadow and Room 16 the bottletree cave from players' Snaps; the Stairs hang their EXIT plaque"
    }
   ]
  },
- "tests": 196,
+ "tests": 197,
  "generatedAt": "2026-10-24"
 }

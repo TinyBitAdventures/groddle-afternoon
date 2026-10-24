@@ -298,6 +298,40 @@ SETS = {
             'firebog_up_arrows': (2.0, 1.5, 0),
         },
     },
+    # G112: the falling room (template LLI12DVTLA01HT5, "The falling room", hub 45), where
+    # players/player.js goToFallingLevel drops you after the Fireflex 3000 Lab's teleporter. Its geometry
+    # is lost, but video 2Z76dO4DlJ4 (t124-163) and three Snaps (research/wayback/raw/snaps/falling_room/,
+    # reference only) show arbito1.swf's tower_quest decos: the two numberjumble columns (997 ... 587 and
+    # 439 ... 29, in the order the fall passes them), the headroom_optic ray bursts, headroom_optic_eye
+    # bubbles, the ramp_3_headroom tongue, arbito_tree_2, arbito_flower_2 (the stained-glass wheel),
+    # arbito_flower_4, flower_6, flower_8, eye_1 and the black symbol glyphs. World scales read off the
+    # video at 2.2 world px per video px: "811" ~440 x 290 world px (x12), bubbles ~220, the tongue ~1300
+    # wide, the arrows ~300. js/quest-rooms/falling-room-scene.js lays the room out.
+    'falling_room': {
+        'bundle': 'arbito1.swf',
+        'out': 'assets/sprites/quest-rooms/falling_room',
+        'js': 'js/quest-rooms/falling-room-art.js',
+        'export': 'FALLING_ROOM_FILES',
+        'pieces': {
+            'numberjumble': (12, 0.75, 0),
+            'numberjumble2': (12, 0.75, 0),
+            'headroom_optic_1': (2.0, 0.5, 0),
+            'headroom_optic2': (2.0, 0.5, 0),
+            'headroom_optic_eye': (1.5, 1.5, 0),
+            'ramp_3_headroom': (1.25, 1, 0),
+            'arbito_tree_2': (1.4, 1.5, 0),
+            'arbito_flower_2': (2.4, 1.5, 0),
+            'arbito_flower_4': (1.6, 1.5, 0),
+            'flower_6': (1.4, 1.5, 0),
+            'flower_8': (1.5, 1.5, 0),
+            'eye_1': (1.8, 1.5, 0),
+            'symbol3': (3.2, 1, 0),
+            'symbol5': (3.2, 1, 0),
+            'symbol7': (3.2, 1, 0),
+            'symbol8': (3.2, 1, 0),
+            'symbol9': (3.2, 1, 0),
+        },
+    },
 }
 
 

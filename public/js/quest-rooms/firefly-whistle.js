@@ -33,9 +33,11 @@
  *    200): "This machine is not yet active." until the whistle is taken. Push
  *    asks TELEPORTER SECURITY V2000 "What is the activation code?"; FFW turns
  *    the beam on ("Code accepted. You may proceed."); a wrong code offers six
- *    escalating hints. location.js 'teleporter': stepping on the pad falls you
- *    back to where you came from once it is on; before that you are put
- *    300 px to its left.
+ *    escalating hints. location.js 'teleporter': once it is on, stepping on
+ *    the pad sends you to the falling room (players/player.js
+ *    goToFallingLevel, js/quest-rooms/falling-room.js), whose teleporter
+ *    takes you back to where you came from; before that you are put 300 px
+ *    to its left.
  *  - Leaving before the quest is done fails it (location.js onExit).
  *
  * One reading: teleporter_button.js's collision lines ("A teleporter. Aha!" /
@@ -58,6 +60,7 @@
 import { advanceVpOverlay, vpOverlay, vpSequence } from './vp-overlay.js?v=ffw-1';
 import { ENTRY, FLOOR, H, W, buildFront, buildLab, labPlatforms, sx, sy } from './firefly-whistle-scene.js?v=ffw-2';
 import { onLoaded, textureFromUrl } from '../textures.js';
+import { goToFallingLevel, withFallingRoom } from './falling-room.js?v=fall-1';
 
 export const QUEST = 'firefly_whistle';
 export const TEMPLATE = Object.freeze({ prod: 'LM113UBSS8P18ET', dev: 'LHH11C4QUBP1DQD' });
@@ -398,8 +401,8 @@ async function exitByTeleporter(ctx) {
   const d = ctx.data;
   if (d.exiting) return;
   d.exiting = true;
-  // goToFallingLevel(instances_get_exit): back where you came from.
-  ctx.leave({ transition: ctx.fx() });
+  // goToFallingLevel(instances_get_exit): the falling room, whose teleporter leads back where you came from.
+  goToFallingLevel(ctx);
 }
 
 /* ------------------------------------------------------------------ */
@@ -474,7 +477,7 @@ function maybePromptStuck(ctx, now) {
 /* Room                                                                 */
 /* ------------------------------------------------------------------ */
 
-export const room = {
+const lab = {
   id: 'firefly_whistle',
   title: 'Firefly Whistle',
   kicker: 'The Fireflex 3000 Lab',
@@ -716,3 +719,6 @@ export const room = {
     return ctx.run ? 'stuck' : 'complete';
   },
 };
+
+/** The lab, with the falling room as its second stage (falling-room.js). */
+export const room = withFallingRoom(lab);
