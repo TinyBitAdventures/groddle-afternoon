@@ -54,7 +54,7 @@
     "og-vid-look": { "title": "Video: \"Learn how to change your look!\" Odd Giants #2 (yorkcommatyler)", "url": "https://www.youtube.com/watch?v=XdXqAiPk3nY", "checked": "2026-10-22" },
     "wikipedia": { "title": "Wikipedia: Glitch (video game)", "url": "https://en.wikipedia.org/wiki/Glitch_(video_game)", "checked": "2026-10-22" },
     "ts-gsjs": { "title": "tinyspeck/glitch-GameServerJS README (CC0 1.0, logo and trademark excluded)", "url": "https://github.com/tinyspeck/glitch-GameServerJS", "checked": "2026-10-22" },
-    "ga-restoration": { "title": "Groddle Field Notes: restoration report (built from this repository)", "url": "../restoration/", "checked": "2026-10-22" }
+    "ga-restoration": { "title": "Groddle Field Notes: restoration report (built from this repository)", "url": "../restoration/", "checked": "2026-10-23" }
   },
   "projects": [
     {
@@ -118,10 +118,10 @@
       "approach": "Fresh take",
       "ours": true,
       "badge": { "label": "In development · not yet public", "tone": "sun" },
-      "summary": "This project. A single-player web game that rebuilds Glitch rule by rule from Tiny Speck's released code and art, and fills the gaps from players' recordings.",
+      "summary": "This project. A single-player web game that rebuilds Glitch rule by rule from Tiny Speck's released code and art, and fills the gaps from players' Snaps and recordings.",
       "link": { "label": "Restoration report", "url": "../restoration/" },
       "facts": [
-        { "label": "Client", "text": "PixiJS 7 in the browser. No Flash, nothing to install.", "sources": ["ga-restoration"] },
+        { "label": "Client", "text": "PixiJS 8 in the browser, with sharp 3x art on high-resolution screens. No Flash, nothing to install.", "sources": ["ga-restoration"] },
         { "label": "Server and rules", "text": "No server: the original server code (GSJS) is mined as the design reference and its rules are rewritten in modern JavaScript. Saves stay on your device.", "sources": ["ga-restoration"] },
         { "label": "Platform", "text": "Web browser.", "sources": ["ga-restoration"] },
         { "label": "Licence and code", "text": "Uses Tiny Speck's CC0 art and code plus recovered audio; no Glitch logo or trademark. Repository is local only for now.", "sources": ["ts-gsjs", "ga-restoration"] },

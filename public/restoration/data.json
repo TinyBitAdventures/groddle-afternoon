@@ -522,7 +522,7 @@
    "group": "quests",
    "name": "Story and skill quests",
    "status": "source",
-   "blurb": "Hundreds of original quests with their dialogue, offered by the Magic Rock.",
+   "blurb": "Hundreds of original quests with their dialogue, offered by the Magic Rock or, where the original had one, their own giver: your Butler, the Ghost of Gwendolyn, the Greeterbot.",
    "spot": "rock-magic",
    "evidence": [
     "public/js/quests.js",
@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 322,
+  "commits": 323,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Gwendolyn's Task starts in Room 23, where Greeterbot Sentry G-42 sends you up to her ghost"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1924,11 +1929,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Your Butler hears about the club and finishes Join the Club at home"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "17 greyscale wardrobe pieces join the wardrobe, reimagined with borrowed colours"
    }
   ]
  },

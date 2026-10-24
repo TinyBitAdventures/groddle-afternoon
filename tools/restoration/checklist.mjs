@@ -154,7 +154,7 @@ export const CHECKLIST = Object.freeze([
 
   // —— Quests & adventures ——
   { id: 'quests', group: 'quests', name: 'Story and skill quests', status: 'source', spot: 'rock-magic',
-    blurb: 'Hundreds of original quests with their dialogue, offered by the Magic Rock.',
+    blurb: 'Hundreds of original quests with their dialogue, offered by the Magic Rock or, where the original had one, their own giver: your Butler, the Ghost of Gwendolyn, the Greeterbot.',
     evidence: ['public/js/quests.js', 'public/js/quest-offers.js'] },
   { id: 'quest-rooms', group: 'quests', name: 'Quest rooms', status: 'rebuilt',
     blurb: 'Private quest instances: almost none survive, so each is rebuilt from the quest code and gameplay footage.',
