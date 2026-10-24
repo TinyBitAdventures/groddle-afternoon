@@ -173,6 +173,25 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&practice=1"
   },
   {
+   "id": "subway",
+   "group": "world",
+   "name": "The Ur subway",
+   "status": "rebuilt",
+   "blurb": "Twelve stations under Ur on one loop, the Red Line one way and the Blue Line the other. Go down the station stairs on Gregarious Grange, Groddle Forest Junction or any of the other ten, push A Red Button for a 50-currant ticket (Your Papers must be in order), ride, and get off at any stop or stay on for the next. Ride counts earn Subwayfarer, Ground Hogger, Commuter Mug and Chute Jockey. The fares, lines, announcements, gate and badges come from the source; the stations and the train were never archived, so they are rebuilt from players’ footage with Tiny Speck’s own subway art. With nobody else to wait for, the train leaves ten seconds after you board.",
+   "spot": null,
+   "evidence": [
+    "public/js/subway.js",
+    "public/js/subway-line.js",
+    "public/js/features/subway-feature.js",
+    "tools/build-subway.mjs",
+    "tools/build-subway-art.py",
+    "public/assets/streets/GCR177QO65T1EON.json",
+    "public/assets/streets/GTJ101M7R9O1HTT.json"
+   ],
+   "shot": "shots/subway.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&subwaydemo=somewhat_sump&subwaypapers=1&practice=1"
+  },
+  {
    "id": "music",
    "group": "world",
    "name": "Music and sounds",
@@ -894,13 +913,13 @@
  ],
  "tally": {
   "source": 40,
-  "rebuilt": 7,
+  "rebuilt": 8,
   "lost": 3,
   "solo": 7,
   "reimagined": 1
  },
- "back": 55,
- "possible": 55,
+ "back": 56,
+ "possible": 56,
  "quests": {
   "total": 445,
   "story": 245,
@@ -1865,9 +1884,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 360,
+  "commits": 361,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Vicar's Peak, the Groddle Heights cliff of vined ladders behind Thornfad Layers' locked door"
+   },
    {
     "date": "2026-10-24",
     "kind": "improve",
@@ -1982,14 +2006,9 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Symphonious Maximus shows its deep navy night sky over smaller pale peaks, framed like the video"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "The lost floor above Goorsh Gam's treetops, and the way into the forgotten floor from Odena Odes"
    }
   ]
  },
- "tests": 199,
+ "tests": 200,
  "generatedAt": "2026-10-24"
 }

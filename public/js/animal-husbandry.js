@@ -41,6 +41,7 @@ import { musicblockItemMeta } from './musicblocks.js';
 import { isEnchantedForest } from './enchanted-forests.js?v=g5-1';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=g90-1';
 import { isMissingFloorTsid } from './hidden-floors.js?v=g105-1';
+import { stationByTsid } from './subway.js?v=g115-1';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js';
 import { isCrowdSad } from './animal-crowding.js';
 
@@ -262,6 +263,8 @@ export function isBatterflyHabitat(street = {}) {
   if (isSymphoniousTsid(street.tsid)) return false;
   // Nor the missing floor, Uralia's hidden hall (js/hidden-floors.js): its Snaps show no Batterflies.
   if (isMissingFloorTsid(street.tsid)) return false;
+  // Nor the subway stations (js/subway.js): Eastern Approach's sits in Uralia.
+  if (stationByTsid(street.tsid)) return false;
   if (BATTERFLY_CAVE_HUBS.includes(String(street.hubName || ''))) return true;
   return CAVE_WORDS.test(String(street.label || '')) || CAVE_WORDS.test(String(street.internalLabel || ''));
 }

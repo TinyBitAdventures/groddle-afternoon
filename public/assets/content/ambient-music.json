@@ -268,7 +268,9 @@
     "SNAPPY_LOOP": "snappy",
     "HOME_STREET_URALIA": "uralia",
     "HOME_STREET_FIREBOGS": "firebog",
-    "CLOUD_DROP_2": "sky_plunge"
+    "CLOUD_DROP_2": "sky_plunge",
+    "SUBWAY_STATION_HUM": "subway",
+    "SUBWAY_CAR_HUM": "subway"
   },
   "hubMap": {
     "49": "eesti",

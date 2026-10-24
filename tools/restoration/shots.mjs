@@ -12,6 +12,8 @@ const Q = '?autostart=1&fresh=1&resetgame=1&questoffer=off&questfx=0&timedemo=da
 export const SHOTS = Object.freeze({
   streets: { route: `${Q}`, wait: 9000 },
   navigation: { route: `${Q}&doordemo=GLI32G3NUTD100I`, wait: 11000 },
+  // The Ur subway (G115): buy a Red Line ticket at Somewhat Sump and stop in the moving train.
+  subway: { route: `${Q}&subwaydemo=somewhat_sump&subwaypapers=1&subwayautoplay=ride&subwayfast=1&subwayhold=1`, wait: 26000 },
   physics: { route: `${Q}&streetdemo=GUVUMTSQ2FC34ES`, wait: 11000 },
   // Vicar's Peak's top ledge: the arched door, a vined ladder and the tier below (G93).
   'vicars-peak': { route: `${Q}&streetdemo=GCR1516SFHM122V&streetx=1000&streety=215`, wait: 12000 },

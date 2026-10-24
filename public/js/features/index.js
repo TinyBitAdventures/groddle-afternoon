@@ -94,3 +94,4 @@ import { cubimalRaceFeature } from './cubimal-race-feature.js?v=g95-2'; FEATURES
 import { symphoniousMaximusFeature } from './symphonious-maximus-feature.js?v=g104-1'; FEATURES.push(symphoniousMaximusFeature);
 import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=g105-1'; FEATURES.push(hiddenFloorsFeature);
 import { vicarsPeakFeature } from './vicars-peak-feature.js?v=g93-1'; FEATURES.push(vicarsPeakFeature);
+import { subwayFeature } from './subway-feature.js?v=g115-1'; FEATURES.push(subwayFeature);

@@ -1,0 +1,1171 @@
+{
+ "source": "tinyspeck/glitch-locations subway1.swf, tinyspeck/glitch-items (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "back_platform_1": {
+   "scale": 1,
+   "density": 1.5,
+   "stage": [
+    958.65,
+    111.0
+   ],
+   "px": [
+    1438,
+    166
+   ],
+   "file": "back_platform_1@1.5x.webp",
+   "swf": "bundle:subway1.swf#back_platform_1",
+   "swf_sha": "c7aca9655bfb3e52",
+   "key": "c7aca9655bfb3e52:1:1.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    1438,
+    166
+   ],
+   "world": [
+    959,
+    111
+   ],
+   "bytes": 4898,
+   "lossless": false,
+   "err": 1.51,
+   "sha": "93d4df200b9f0be1"
+  },
+  "ceiling_1": {
+   "scale": 1,
+   "density": 1.5,
+   "stage": [
+    958.6,
+    150.8
+   ],
+   "px": [
+    1438,
+    226
+   ],
+   "file": "ceiling_1@1.5x.webp",
+   "swf": "bundle:subway1.swf#ceiling_1",
+   "swf_sha": "03fe3053ca5722b3",
+   "key": "03fe3053ca5722b3:1:1.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    1438,
+    226
+   ],
+   "world": [
+    959,
+    151
+   ],
+   "bytes": 22514,
+   "lossless": false,
+   "err": 1.21,
+   "sha": "8f807cf3144ac9ae"
+  },
+  "column_1": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    114.5,
+    542.5
+   ],
+   "px": [
+    229,
+    1085
+   ],
+   "file": "column_1@2x.webp",
+   "swf": "bundle:subway1.swf#column_1",
+   "swf_sha": "bb122a9b1c5cc421",
+   "key": "bb122a9b1c5cc421:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    229,
+    1085
+   ],
+   "world": [
+    115,
+    543
+   ],
+   "bytes": 25324,
+   "lossless": false,
+   "err": 1.62,
+   "sha": "9e3524f55f7085da"
+  },
+  "door_asset_stairs": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    131.9,
+    148.55
+   ],
+   "px": [
+    264,
+    297
+   ],
+   "file": "door_asset_stairs@2x.webp",
+   "swf": "bundle:subway1.swf#door_asset_stairs",
+   "swf_sha": "afe0549924ec68dc",
+   "key": "afe0549924ec68dc:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    264,
+    297
+   ],
+   "world": [
+    132,
+    149
+   ],
+   "bytes": 5820,
+   "lossless": false,
+   "err": 1.42,
+   "sha": "878f3f9f71bd3332"
+  },
+  "light_1": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    132.75,
+    65.55
+   ],
+   "px": [
+    266,
+    131
+   ],
+   "file": "light_1@2x.webp",
+   "swf": "bundle:subway1.swf#light_1",
+   "swf_sha": "88466a215679e996",
+   "key": "88466a215679e996:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    266,
+    131
+   ],
+   "world": [
+    133,
+    66
+   ],
+   "bytes": 6856,
+   "lossless": false,
+   "err": 0.95,
+   "sha": "682120e39a794b7b"
+  },
+  "platform_crack_1": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    172.9,
+    43.95
+   ],
+   "px": [
+    346,
+    88
+   ],
+   "file": "platform_crack_1@2x.webp",
+   "swf": "bundle:subway1.swf#platform_crack_1",
+   "swf_sha": "fed099c2eeda5475",
+   "key": "fed099c2eeda5475:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    346,
+    88
+   ],
+   "world": [
+    173,
+    44
+   ],
+   "bytes": 10574,
+   "lossless": false,
+   "err": 2.76,
+   "sha": "df37387ac53aab19"
+  },
+  "sub_sign_eastern_approach": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    169.0,
+    70.05
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_eastern_approach@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_eastern_approach",
+   "swf_sha": "411102457ba73a68",
+   "key": "411102457ba73a68:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 12484,
+   "lossless": false,
+   "err": 2.83,
+   "sha": "5e61f2692fee6e98"
+  },
+  "sub_sign_gregarious_grange": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    169.0,
+    70.05
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_gregarious_grange@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_gregarious_grange",
+   "swf_sha": "8d8375ebc45f78c1",
+   "key": "8d8375ebc45f78c1:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 12714,
+   "lossless": false,
+   "err": 2.89,
+   "sha": "72445c3e044d91c3"
+  },
+  "sub_sign_groddle_forest_junction": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    168.95,
+    70.05
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_groddle_forest_junction@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_groddle_forest_junction",
+   "swf_sha": "40c7b3c1063a371d",
+   "key": "40c7b3c1063a371d:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 13752,
+   "lossless": false,
+   "err": 2.92,
+   "sha": "b7a9f21920a65749"
+  },
+  "sub_sign_jutuan_central": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    169.0,
+    70.05
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_jutuan_central@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_jutuan_central",
+   "swf_sha": "ba267c24450887c4",
+   "key": "ba267c24450887c4:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 11652,
+   "lossless": false,
+   "err": 2.79,
+   "sha": "7d304683a5c5de62"
+  },
+  "sub_sign_kongu_hop": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    168.95,
+    70.0
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_kongu_hop@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_kongu_hop",
+   "swf_sha": "3b08568f54bc37ca",
+   "key": "3b08568f54bc37ca:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 9904,
+   "lossless": false,
+   "err": 2.7,
+   "sha": "6208746afc14e320"
+  },
+  "sub_sign_mallos_means": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    168.95,
+    70.05
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_mallos_means@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_mallos_means",
+   "swf_sha": "dca8a300c731373e",
+   "key": "dca8a300c731373e:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 12254,
+   "lossless": false,
+   "err": 2.75,
+   "sha": "fbc686b1aa511604"
+  },
+  "sub_sign_onto_parada": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    168.95,
+    70.05
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_onto_parada@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_onto_parada",
+   "swf_sha": "f8450348fcf8414b",
+   "key": "f8450348fcf8414b:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 11996,
+   "lossless": false,
+   "err": 2.75,
+   "sha": "c68c06b81093a2bd"
+  },
+  "sub_sign_pitika_parse": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    168.95,
+    70.0
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_pitika_parse@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_pitika_parse",
+   "swf_sha": "b097fff715a67551",
+   "key": "b097fff715a67551:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 9916,
+   "lossless": false,
+   "err": 2.72,
+   "sha": "18d6f9e095a5fe78"
+  },
+  "sub_sign_somewhat_sump": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    168.95,
+    70.05
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_somewhat_sump@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_somewhat_sump",
+   "swf_sha": "23b4011207aa65e4",
+   "key": "23b4011207aa65e4:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 13014,
+   "lossless": false,
+   "err": 2.85,
+   "sha": "77cd85b1769c0e66"
+  },
+  "sub_sign_tallish_crest": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    169.0,
+    70.05
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_tallish_crest@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_tallish_crest",
+   "swf_sha": "4ca8f371595bfb08",
+   "key": "4ca8f371595bfb08:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 11292,
+   "lossless": false,
+   "err": 2.72,
+   "sha": "9797e962525999a8"
+  },
+  "sub_sign_thiruvan_thrive": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    169.0,
+    70.0
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_thiruvan_thrive@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_thiruvan_thrive",
+   "swf_sha": "5aa7cb6c31185f28",
+   "key": "5aa7cb6c31185f28:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 8992,
+   "lossless": false,
+   "err": 2.71,
+   "sha": "4a7b7564d6d16c1a"
+  },
+  "sub_sign_torpan_cleft": {
+   "scale": 0.8,
+   "density": 2.5,
+   "stage": [
+    168.95,
+    70.05
+   ],
+   "px": [
+    338,
+    140
+   ],
+   "file": "sub_sign_torpan_cleft@2.5x.webp",
+   "swf": "bundle:subway1.swf#sub_sign_torpan_cleft",
+   "swf_sha": "c521edca7d2aac75",
+   "key": "c521edca7d2aac75:0.8:2.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    338,
+    140
+   ],
+   "world": [
+    135,
+    56
+   ],
+   "bytes": 11954,
+   "lossless": false,
+   "err": 2.77,
+   "sha": "b8ff20f8bd484f1c"
+  },
+  "subway_ad_1": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    290.3,
+    80.75
+   ],
+   "px": [
+    581,
+    162
+   ],
+   "file": "subway_ad_1@2x.webp",
+   "swf": "bundle:subway1.swf#subway_ad_1",
+   "swf_sha": "e008093b8e05a1ef",
+   "key": "e008093b8e05a1ef:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    581,
+    162
+   ],
+   "world": [
+    291,
+    81
+   ],
+   "bytes": 14702,
+   "lossless": false,
+   "err": 2.67,
+   "sha": "b7808ac1cb6c35ce"
+  },
+  "subway_ad_2": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    290.25,
+    80.75
+   ],
+   "px": [
+    580,
+    162
+   ],
+   "file": "subway_ad_2@2x.webp",
+   "swf": "bundle:subway1.swf#subway_ad_2",
+   "swf_sha": "ee6ed3fa8256f9e0",
+   "key": "ee6ed3fa8256f9e0:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    580,
+    162
+   ],
+   "world": [
+    290,
+    81
+   ],
+   "bytes": 24106,
+   "lossless": false,
+   "err": 3.77,
+   "sha": "257565648bdd2989"
+  },
+  "subway_ad_3": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    291.0,
+    80.75
+   ],
+   "px": [
+    582,
+    162
+   ],
+   "file": "subway_ad_3@2x.webp",
+   "swf": "bundle:subway1.swf#subway_ad_3",
+   "swf_sha": "609b1d535feeafb3",
+   "key": "609b1d535feeafb3:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    582,
+    162
+   ],
+   "world": [
+    291,
+    81
+   ],
+   "bytes": 26140,
+   "lossless": false,
+   "err": 3.36,
+   "sha": "0ff6f4be7c299f92"
+  },
+  "subway_ad_4": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    290.25,
+    80.75
+   ],
+   "px": [
+    580,
+    162
+   ],
+   "file": "subway_ad_4@2x.webp",
+   "swf": "bundle:subway1.swf#subway_ad_4",
+   "swf_sha": "cfd735b2a5a78b2d",
+   "key": "cfd735b2a5a78b2d:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    580,
+    162
+   ],
+   "world": [
+    290,
+    81
+   ],
+   "bytes": 29406,
+   "lossless": false,
+   "err": 4.47,
+   "sha": "21b8682fc55c2aff"
+  },
+  "subway_ad_5": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    290.3,
+    80.75
+   ],
+   "px": [
+    581,
+    162
+   ],
+   "file": "subway_ad_5@2x.webp",
+   "swf": "bundle:subway1.swf#subway_ad_5",
+   "swf_sha": "da0ba5bdbf1b5fa6",
+   "key": "da0ba5bdbf1b5fa6:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    581,
+    162
+   ],
+   "world": [
+    291,
+    81
+   ],
+   "bytes": 22170,
+   "lossless": false,
+   "err": 3.14,
+   "sha": "5eca029e74e00484"
+  },
+  "subway_ad_6": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    96.0,
+    141.05
+   ],
+   "px": [
+    192,
+    282
+   ],
+   "file": "subway_ad_6@2x.webp",
+   "swf": "bundle:subway1.swf#subway_ad_6",
+   "swf_sha": "c2472216933332f0",
+   "key": "c2472216933332f0:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    192,
+    282
+   ],
+   "world": [
+    96,
+    141
+   ],
+   "bytes": 22706,
+   "lossless": false,
+   "err": 4.26,
+   "sha": "f81e78964f4bf545"
+  },
+  "subway_gate": {
+   "scale": 1,
+   "density": 3,
+   "stage": [
+    27.5,
+    46.55
+   ],
+   "px": [
+    82,
+    140
+   ],
+   "file": "subway_gate@3x.webp",
+   "swf": "glitch-items:misc/subway_gate/subway_gate.swf",
+   "swf_sha": "ffba7a594b577e87",
+   "key": "ffba7a594b577e87:1:3:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    82,
+    140
+   ],
+   "world": [
+    27,
+    47
+   ],
+   "bytes": 5300,
+   "lossless": false,
+   "err": 3.74,
+   "sha": "649bb3709ad2e58b"
+  },
+  "subway_gate_static": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    146.3,
+    202.55
+   ],
+   "px": [
+    293,
+    405
+   ],
+   "file": "subway_gate_static@2x.webp",
+   "swf": "bundle:subway1.swf#subway_gate_static",
+   "swf_sha": "cb51b6ffb208692f",
+   "key": "cb51b6ffb208692f:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    293,
+    405
+   ],
+   "world": [
+    147,
+    203
+   ],
+   "bytes": 29884,
+   "lossless": false,
+   "err": 1.76,
+   "sha": "ec7a4e209f7e6bec"
+  },
+  "subway_interior_1": {
+   "scale": 1,
+   "density": 1.5,
+   "stage": [
+    1200.0,
+    700.0
+   ],
+   "px": [
+    1800,
+    1050
+   ],
+   "file": "subway_interior_1@1.5x.webp",
+   "swf": "bundle:subway1.swf#subway_interior_1",
+   "swf_sha": "7c3f1be1e515372b",
+   "key": "7c3f1be1e515372b:1:1.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    1800,
+    1050
+   ],
+   "world": [
+    1200,
+    700
+   ],
+   "bytes": 104906,
+   "lossless": false,
+   "err": 1.45,
+   "sha": "74db039d815059d7"
+  },
+  "subway_interior_floor_light": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    605.0,
+    87.0
+   ],
+   "px": [
+    1210,
+    174
+   ],
+   "file": "subway_interior_floor_light@2x.webp",
+   "swf": "bundle:subway1.swf#subway_interior_floor_light",
+   "swf_sha": "9b648b31a583e57e",
+   "key": "9b648b31a583e57e:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    1210,
+    174
+   ],
+   "world": [
+    605,
+    87
+   ],
+   "bytes": 4986,
+   "lossless": false,
+   "err": 0.13,
+   "sha": "c6e13bb726dda8d0"
+  },
+  "subway_interior_pole_1": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    25.25,
+    549.7
+   ],
+   "px": [
+    50,
+    1099
+   ],
+   "file": "subway_interior_pole_1@2x.webp",
+   "swf": "bundle:subway1.swf#subway_interior_pole_1",
+   "swf_sha": "628bec60f4081d9d",
+   "key": "628bec60f4081d9d:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    50,
+    1099
+   ],
+   "world": [
+    25,
+    550
+   ],
+   "bytes": 3296,
+   "lossless": false,
+   "err": 2.31,
+   "sha": "2cbc0f8a7596fc62"
+  },
+  "subway_map": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    95.0,
+    159.35
+   ],
+   "px": [
+    190,
+    319
+   ],
+   "file": "subway_map@2x.webp",
+   "swf": "glitch-items:misc/subway_map/subway_map.swf",
+   "swf_sha": "2e154286b91f956d",
+   "key": "2e154286b91f956d:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    190,
+    319
+   ],
+   "world": [
+    95,
+    160
+   ],
+   "bytes": 11712,
+   "lossless": false,
+   "err": 3.42,
+   "sha": "6451b6aa396b022b"
+  },
+  "subway_map_current_station_blue": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    29.8,
+    27.05
+   ],
+   "px": [
+    60,
+    54
+   ],
+   "file": "subway_map_current_station_blue@2x.webp",
+   "swf": "bundle:subway1.swf#subway_map_current_station_blue",
+   "swf_sha": "c6d0baef657f4830",
+   "key": "c6d0baef657f4830:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    60,
+    54
+   ],
+   "world": [
+    30,
+    27
+   ],
+   "bytes": 4034,
+   "lossless": true,
+   "err": 7.77,
+   "sha": "3d9c19b64e161eb2"
+  },
+  "subway_map_current_station_red": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    30.0,
+    27.05
+   ],
+   "px": [
+    60,
+    54
+   ],
+   "file": "subway_map_current_station_red@2x.webp",
+   "swf": "bundle:subway1.swf#subway_map_current_station_red",
+   "swf_sha": "16eb2932276520d7",
+   "key": "16eb2932276520d7:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    60,
+    54
+   ],
+   "world": [
+    30,
+    27
+   ],
+   "bytes": 2926,
+   "lossless": true,
+   "err": 8.08,
+   "sha": "e648cafcca330e94"
+  },
+  "subway_map_next_stop_blue": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    24.05,
+    22.4
+   ],
+   "px": [
+    48,
+    45
+   ],
+   "file": "subway_map_next_stop_blue@2x.webp",
+   "swf": "bundle:subway1.swf#subway_map_next_stop_blue",
+   "swf_sha": "087f742ab8d913f3",
+   "key": "087f742ab8d913f3:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    48,
+    45
+   ],
+   "world": [
+    24,
+    23
+   ],
+   "bytes": 3750,
+   "lossless": true,
+   "err": 9.37,
+   "sha": "bfc9c7a3d13e47f6"
+  },
+  "subway_map_next_stop_red": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    24.05,
+    22.45
+   ],
+   "px": [
+    48,
+    45
+   ],
+   "file": "subway_map_next_stop_red@2x.webp",
+   "swf": "bundle:subway1.swf#subway_map_next_stop_red",
+   "swf_sha": "b91bac447f4157bb",
+   "key": "b91bac447f4157bb:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    48,
+    45
+   ],
+   "world": [
+    24,
+    23
+   ],
+   "bytes": 3512,
+   "lossless": true,
+   "err": 9.79,
+   "sha": "8d556cc693cfe2bf"
+  },
+  "subway_window_static": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    275.0,
+    161.0
+   ],
+   "px": [
+    550,
+    322
+   ],
+   "file": "subway_window_static@2x.webp",
+   "swf": "bundle:subway1.swf#subway_window_static",
+   "swf_sha": "c45c8925288e1c51",
+   "key": "c45c8925288e1c51:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    550,
+    322
+   ],
+   "world": [
+    275,
+    161
+   ],
+   "bytes": 14856,
+   "lossless": false,
+   "err": 1.81,
+   "sha": "cef63ac2baca33f7"
+  },
+  "ticket_post_back": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    158.35,
+    152.65
+   ],
+   "px": [
+    317,
+    305
+   ],
+   "file": "ticket_post_back@2x.webp",
+   "swf": "bundle:subway1.swf#ticket_post_back",
+   "swf_sha": "89699fdb44c55cea",
+   "key": "89699fdb44c55cea:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    317,
+    305
+   ],
+   "world": [
+    159,
+    153
+   ],
+   "bytes": 27694,
+   "lossless": false,
+   "err": 2.68,
+   "sha": "7be91b4289c8ca77"
+  },
+  "train_1": {
+   "scale": 1.15,
+   "density": 2,
+   "stage": [
+    598.0,
+    282.0
+   ],
+   "px": [
+    1375,
+    649
+   ],
+   "file": "train_1@2x.webp",
+   "swf": "bundle:subway1.swf#train_1",
+   "swf_sha": "17f21e952b4e652b",
+   "key": "17f21e952b4e652b:1.15:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    1375,
+    649
+   ],
+   "world": [
+    688,
+    325
+   ],
+   "bytes": 53034,
+   "lossless": false,
+   "err": 1.22,
+   "sha": "678f0baddd8abbbb"
+  },
+  "wall_1": {
+   "scale": 1,
+   "density": 1.5,
+   "stage": [
+    958.65,
+    263.8
+   ],
+   "px": [
+    1438,
+    396
+   ],
+   "file": "wall_1@1.5x.webp",
+   "swf": "bundle:subway1.swf#wall_1",
+   "swf_sha": "3a5965cc1dc1f074",
+   "key": "3a5965cc1dc1f074:1:1.5:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    1438,
+    396
+   ],
+   "world": [
+    959,
+    264
+   ],
+   "bytes": 63084,
+   "lossless": false,
+   "err": 1.31,
+   "sha": "7101c4fde9982c67"
+  },
+  "wall_crack_1": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    205.75,
+    102.0
+   ],
+   "px": [
+    412,
+    204
+   ],
+   "file": "wall_crack_1@2x.webp",
+   "swf": "bundle:subway1.swf#wall_crack_1",
+   "swf_sha": "178ed8bd1057f2b5",
+   "key": "178ed8bd1057f2b5:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    412,
+    204
+   ],
+   "world": [
+    206,
+    102
+   ],
+   "bytes": 16902,
+   "lossless": false,
+   "err": 2.59,
+   "sha": "1cf29c983c324581"
+  },
+  "wall_crack_2": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    74.05,
+    148.15
+   ],
+   "px": [
+    148,
+    296
+   ],
+   "file": "wall_crack_2@2x.webp",
+   "swf": "bundle:subway1.swf#wall_crack_2",
+   "swf_sha": "8e04242e5f261e7b",
+   "key": "8e04242e5f261e7b:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    148,
+    296
+   ],
+   "world": [
+    74,
+    148
+   ],
+   "bytes": 12336,
+   "lossless": false,
+   "err": 2.64,
+   "sha": "e65f5c266b9c10fd"
+  },
+  "wallpipe_1": {
+   "scale": 1,
+   "density": 2,
+   "stage": [
+    75.0,
+    151.9
+   ],
+   "px": [
+    150,
+    304
+   ],
+   "file": "wallpipe_1@2x.webp",
+   "swf": "bundle:subway1.swf#wallpipe_1",
+   "swf_sha": "e1044c7f84c4d201",
+   "key": "e1044c7f84c4d201:1:2:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    150,
+    304
+   ],
+   "world": [
+    75,
+    152
+   ],
+   "bytes": 9464,
+   "lossless": false,
+   "err": 2.53,
+   "sha": "ccb1f4baa885274c"
+  }
+ }
+}
