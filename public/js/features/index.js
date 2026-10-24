@@ -98,3 +98,5 @@ import { subwayFeature } from './subway-feature.js?v=g115-1'; FEATURES.push(subw
 import { vendorNpcsFeature } from './vendor-npcs-feature.js?v=g121-1'; FEATURES.push(vendorNpcsFeature);
 import { powdersFeature } from './powders-feature.js?v=g134-1'; FEATURES.push(powdersFeature);
 import { itemVerbsFeature } from './item-verbs-feature.js?v=g134-1'; FEATURES.push(itemVerbsFeature);
+import { artifactsFeature } from './artifacts-feature.js?v=g122-1'; FEATURES.push(artifactsFeature);
+import { doorDrinkFeature } from './door-drink-feature.js?v=g123-1'; FEATURES.push(doorDrinkFeature);

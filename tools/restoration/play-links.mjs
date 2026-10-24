@@ -40,6 +40,8 @@ export const PLAY_ROUTES = Object.freeze({
   mail: `${BASE}&homedemo=mail`,
   tower: `${BASE}&homedemo=home&towerdemo=built&towerfloors=5`,
   craftybot: `${BASE}&homedemo=home&craftybotdemo=bot`,
+  artifacts: `${BASE}&artifactdemo=rocks`,
+  'door-drink': `${BASE}&doordrinkdemo=1`,
 });
 
 /** Nothing to open: lost systems, and the quest-rooms row (the rooms section links each room). */

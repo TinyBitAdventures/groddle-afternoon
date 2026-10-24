@@ -183,8 +183,9 @@
   "checklist": "cooking"
  },
  "system:config/portal_group": {
-  "status": "unknown",
-  "reason": "group object for portals; use not traced"
+  "checklist": "door-drink",
+  "reason": "the world-wide chain of Door Drink portals (groups/portal.js), used by items/potion_chris.js and items/portal.js; solo: the chain is the player's own",
+  "register": "G123"
  },
  "system:config/teleportation_ok_streets": {
   "checklist": "meditation"
@@ -775,5 +776,35 @@
   "status": "excluded",
   "reason": "the hub 96 map entry for the Museum of the Rook; players entered the instance template LA91BDTNHS82D36 (items/npc_quest_giver_widget.js:215 enterHall), which js/rook-museum.js rebuilds; nothing in GSJS names this TSID",
   "register": "G127"
+ },
+ "system:players/inc_artifacts": {
+  "checklist": "artifacts",
+  "reason": "assembly, necklaces, petrified-rock cracking and the four badges are built; the rocks were Feat rewards (web side), not handed out yet",
+  "register": "G122"
+ },
+ "system:locations/inc_quarters": {
+  "status": "lost",
+  "reason": "apartment quarters, the 2010-2011 POL model: a quarter group (groups/quarter.js, made only by admin.js from config.quarter_templates) holds floors built from templates in hub 55 'June 2010 POLs' (inc_data_pols_prod.js 861), none archived. Five archived streets keep an elevator signpost into a quarter (geo.signposts[].quarter: Abandoned Gregarious Grange, Hakusan Heaps, Egret Taun and Sabudana Drama Towers, Abandoned Hauki Seeks Manor; groups RIF12A8IEUK1V1B, RA9K2TTVD5D2S26, RA9M20EOK3H2AAO, RA5ENLT7GMB2R2H, RHVMQ7S8TA32UQK), but neither the groups nor the floors survive. Home streets (inc_homes, checklist homes, G6/G7) replaced it; quarters_get_pols otherwise only feeds the loading card's 'N Houses (N for sale)' line",
+  "register": "G123"
+ },
+ "system:players/inc_mountaineering": {
+  "status": "unbuilt_original",
+  "reason": "party mountaineering (freeze rungs, lanterns, wind and cold zones; locations/mountains.js) needs a party space with a 'rungs' prop that no config.party_spaces entry has, a Mountaineering Permit nothing grants (items/mountaineering_permit.js: a party of at least 5) and a mountain street; all 18 Mountaineering locations are WIP sandboxes. The Mountain Scaling Paradise course is separate (checklist paradise)",
+  "register": "G123"
+ },
+ "system:items/include/upgradeable": {
+  "status": "unbuilt_original",
+  "reason": "only garden_new.js lists it in an #include line, and the compiled garden_new.js carries none of its functions (no setJobData, its onPlayerEnter is garden's); garden_new has no job_class_id class prop, so is_upgradeable is never set and the 'upgrade' verb never enables",
+  "register": "G123"
+ },
+ "item:mountaineering_permit": {
+  "status": "unbuilt_original",
+  "reason": "nothing in GSJS grants it (only its own file and catalog_craftytasking.js name it); activating needs a party of 5+ (multiplayer) and a mountain party space that config never defined",
+  "register": "G123"
+ },
+ "item:mountain_lantern": {
+  "status": "unbuilt_original",
+  "reason": "only locations/mountains.js looks for it on a mountain street; no archived street places one and no mountain party space was configured",
+  "register": "G123"
  }
 }
