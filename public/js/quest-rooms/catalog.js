@@ -288,6 +288,46 @@ export const REMINISCE_ITEMS = Object.freeze({
   conch: 'conch',
 });
 
+/**
+ * Labels of the NPCs and pack items that hand out quest-room quests (GSJS items/<class>.js
+ * `var label`), so a retry names whoever offered the quest (G99).
+ */
+export const GIVER_LABELS = Object.freeze({
+  bag_butler: 'Butler',
+  npc_gwendolyn: 'Ghost of Gwendolyn',
+  npc_squid: 'Zzybzfrx',
+  npc_widget: 'Greeterbot Sentry G-42',
+  npc_juju_bandit: 'Juju Bandit',
+  npc_juju_grandma: 'Juju Grandma',
+  npc_smuggler: 'Smuggler',
+  npc_rare_item_vendor: 'Extremely Rare Items Vendor',
+  npc_maintenance_bot: 'MaintenanceBot M-64',
+  play_cube: 'Play Cube',
+  conch: 'Conch',
+});
+export const MAGIC_ROCK_GIVER = Object.freeze({ npc: 'magic_rock', label: 'Magic Rock' });
+
+/**
+ * custom_code gates that, when they pass, mean the Magic Rock offered the quest instead of its
+ * NPC (OFFER_OVERRIDES: join_club comes from the Magic Rock only when there is no Butler).
+ */
+export const FAMILIAR_GATES = Object.freeze({ join_club: 'no_butler' });
+
+/**
+ * Who offers a quest: its first NPC or pack-item offer trigger with a known giver, else the
+ * Magic Rock (quests offered on level, xp, quest or other familiar triggers).
+ * @param {object} def quest catalog row (offerTriggers)
+ * @param {{ familiar?: boolean }} opts familiar: the FAMILIAR_GATES gate passed
+ * @returns {{ npc: string, label: string }}
+ */
+export function questGiver(def, { familiar = false } = {}) {
+  const triggers = def?.offerTriggers || [];
+  const npc = triggers.find((t) => t.npc && GIVER_LABELS[t.npc]);
+  if (!npc) return MAGIC_ROCK_GIVER;
+  if (familiar && triggers.some((t) => !t.npc && t.type !== 'npc')) return MAGIC_ROCK_GIVER;
+  return { npc: npc.npc, label: GIVER_LABELS[npc.npc] };
+}
+
 export function roomForQuest(questId) {
   return QUEST_ROOMS[questId] || null;
 }

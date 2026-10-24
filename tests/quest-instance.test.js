@@ -4,7 +4,7 @@
  */
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -332,5 +332,33 @@ describe('Le Misérable (le_miserable)', () => {
     want[0].forEach((s, i) => step(1, i + 1, s));
     assert.ok(['p1_win_check', 'p2_win_check', 'p3_win_check'].every((f) => rt.flags.has(f)));
     assert.ok(effects.some((fx) => fx.type === 'quest_flag' && fx.flag === 'turn_on_machine'));
+  });
+});
+
+describe('G99: the retry prompt names whoever offered the quest', () => {
+  it('questGiver: NPC and pack-item givers, the Magic Rock for familiar offers', async () => {
+    const { questGiver, FAMILIAR_GATES, GIVER_LABELS } = await import('../public/js/quest-rooms/catalog.js');
+    const quests = JSON.parse(readFileSync(new URL('../public/assets/content/quests.json', import.meta.url), 'utf8'));
+    const def = (id) => (Array.isArray(quests) ? quests : quests.quests || Object.values(quests)).find((q) => (q.classTsid || q.id) === id);
+    assert.deepEqual(questGiver(def('join_club')), { npc: 'bag_butler', label: 'Butler' });
+    // Without a Butler the no_butler gate passes and the Magic Rock offered it.
+    assert.equal(FAMILIAR_GATES.join_club, 'no_butler');
+    assert.equal(questGiver(def('join_club'), { familiar: true }).label, 'Magic Rock');
+    assert.equal(questGiver(def('tower_quest')).label, 'Ghost of Gwendolyn');
+    assert.equal(questGiver(def('tower_quest_part2')).label, 'Zzybzfrx');
+    assert.equal(questGiver(def('tower_quest_part3')).label, 'Ghost of Gwendolyn');
+    assert.equal(questGiver(def('help_juju_bandits')).label, 'Juju Bandit');
+    assert.equal(questGiver(def('puzzle_level_color_blockage_rem')).label, 'Play Cube');
+    assert.equal(questGiver(def('puzzle_level_color_blockage')).label, 'Magic Rock');
+    assert.equal(questGiver(def('high_jump')).label, 'Magic Rock');
+    assert.equal(GIVER_LABELS.npc_widget, 'Greeterbot Sentry G-42');
+  });
+
+  it('the prompt and the time-out note use the giver, not a fixed Magic Rock', () => {
+    const src = readFileSync(new URL('../public/js/features/quest-instances-feature.js', import.meta.url), 'utf8');
+    const retry = src.slice(src.indexOf('function maybeOfferRetry('), src.indexOf('function maybeOfferRetry(') + 1200);
+    assert.match(retry, /kicker: giver\.label/);
+    assert.doesNotMatch(retry, /kicker: 'Magic Rock'/);
+    assert.match(src, /time ran out\. Ask the \$\{giverFor\(engine, questId\)\.label\} to try again\./);
   });
 });

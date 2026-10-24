@@ -47,3 +47,17 @@ test('the finale page and the purple door are CC0 room-art renders matching thei
   }
   assert.ok(mod.FINALE_MS >= 2000 && mod.FINALE_MS <= 5000);
 });
+
+test('G98: the finale drawing fills the view down to the floor the avatar stands on, as in the Snaps', () => {
+  const [, w, h] = COLOR_UNBLOCKING_FILES[mod.FINALE_ART];
+  // The room view is 960 x 408 with the avatar's feet ~306 px down.
+  const p = mod.finaleArtPlacement(960, 408, 306, h);
+  const top = p.bottom - h * p.scale;
+  assert.ok(top >= 0 && top <= 408 * 0.06, `top ${top}: just under the view's top edge`);
+  assert.ok(p.bottom >= 306 && p.bottom <= 312, 'resting on the felt floor');
+  assert.ok((w * p.scale) / 960 >= 0.44, 'spans close to half the wide view (the Snaps: ~68% of 640)');
+  assert.ok(p.x / 960 > 0.5 && p.x / 960 < 0.65, 'a little right of centre');
+  // The room card steps aside and the avatar stays in front of the page.
+  assert.match(src, /ctx\.coverHud\?\.\(true\)/);
+  assert.match(src, /player\.zIndex = 901/);
+});

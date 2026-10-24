@@ -188,7 +188,9 @@ test('client integration uses recovered clean decos, HUD, buoyancy, and determin
   assert.match(game, /recovered-firebog-ladder/);
   assert.match(game, /summerDayAnnexDotReward/);
   assert.match(game, /summerDayGuide/);
-  assert.match(game, /The Giants’ memory keeps its own light/);
+  // G99: the memory opts out of the Dametime tint through the general ownLight flag.
+  assert.match(game, /The memory's blue-and-white light is its own: no Dametime tint\.\n\s*ownLight: true/);
+  assert.match(game, /const preserveAuthoredLight = Boolean\(currentStreet\?\.ownLight\)/);
   assert.match(game, /SUMMERS_DAY_COMPLETION\.replace\('\{pc_label\}', 'friend'\)/);
   assert.match(game, /dataset\.summerDayMainTsid/);
   assert.match(html, /id="summers-day-hud"/);

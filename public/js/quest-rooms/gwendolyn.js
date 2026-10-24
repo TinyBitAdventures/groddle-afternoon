@@ -1522,7 +1522,8 @@ export const room = {
 
   build(ctx, stage) {
     if (stage === 'outer_mind') return buildOuter(ctx);
-    if (stage === 'inner_mind') return buildInner(ctx);
+    // The Inner Mind's white void keeps its own light (no Dametime tint, G99).
+    if (stage === 'inner_mind') return { ...buildInner(ctx), ownLight: true };
     return buildChamber(ctx);
   },
 

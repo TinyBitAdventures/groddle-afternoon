@@ -216,6 +216,8 @@ function drawBlocks(ctx) {
 
 export const room = {
   id: 'color_unblocking',
+  /** Keeps its own white void: the world-only Dametime tint stays off (G99). */
+  ownLight: true,
   title: 'Color Unblocking',
   kicker: 'Unblock your way to the exit',
   icon: 'assets/sprites/icons/play_cube.png',
@@ -444,6 +446,19 @@ async function exit(ctx) {
 }
 
 /**
+ * Where Keita's drawing sits on the finale page. The Snaps (PHVE3663QE222O9_120458,
+ * PCRDMHR3NDO1FVT_118277, 640x354) show it from ~5% under the top of the view down to the felt
+ * floor the avatar stands on, its centre at ~60% of the width.
+ * @param {number} floorTop view y of the felt floor's top edge (the avatar's feet)
+ * @returns {{ scale: number, x: number, bottom: number }} view px (anchor bottom-centre)
+ */
+export function finaleArtPlacement(viewW, viewH, floorTop, artH) {
+  const top = Math.round(viewH * 0.04);
+  const scale = (floorTop - top) / artH;
+  return { scale, x: Math.round(viewW * 0.58), bottom: floorTop + Math.round(4 * scale) };
+}
+
+/**
  * The finale page (Snaps PHVE3663QE222O9_120458, PCRDMHR3NDO1FVT_118277): the white void, the
  * charcoal felt floor and Keita's drawing, shown over the view for FINALE_MS once the door opens.
  */
@@ -455,20 +470,25 @@ async function finale(ctx) {
   const bg = new PIXI.Graphics();
   bg.rect(-40, -40, cam.w + 80, cam.h + 80).fill(0xffffff);
   page.addChild(bg);
-  const floorH = 48;
-  const fl = feltRect(PIXI, cam.w + 80, floorH + 40, FELT_FLOOR);
+  // The felt floor's top is the avatar's feet, so it stands on the page as in the Snaps.
+  const player = ctx.engine.player;
+  const feet = player ? player.y - cam.y : NaN;
+  const floorTop = Number.isFinite(feet) ? Math.max(cam.h * 0.6, Math.min(cam.h - 48, Math.round(feet))) : cam.h - 48;
+  const fl = feltRect(PIXI, cam.w + 80, cam.h - floorTop + 80, FELT_FLOOR);
   fl.x = -40;
-  fl.y = cam.h - floorH;
+  fl.y = floorTop;
   page.addChild(fl);
   const [file, w, h] = COLOR_UNBLOCKING_FILES[FINALE_ART];
   const art = new PIXI.Sprite(textureFromUrl(`${ART}${file}`));
-  // Below the room card (the top ~140 px of the view), resting on the floor.
-  const scale = Math.min(1, (cam.h - floorH - 140) / h);
+  // As in the Snaps: the drawing fills the view from just under its top edge down to the
+  // floor, a little right of centre; the room card steps aside while the page is up.
+  const { scale, x, bottom } = finaleArtPlacement(cam.w, cam.h, floorTop, h);
   art.anchor.set(0.5, 1);
   art.scale.set(scale);
-  art.x = cam.w / 2;
-  art.y = cam.h - floorH + 14 * scale;
+  art.x = x;
+  art.y = bottom;
   page.addChild(art);
+  ctx.coverHud?.(true);
   page.alpha = 0;
   const follow = () => {
     const c = ctx.engine.camera;
@@ -477,13 +497,20 @@ async function finale(ctx) {
   };
   follow();
   ctx.add(page, 900);
-  // The crab steps out of the picture (and any line it was saying goes with its sprite).
+  // The crab steps out of the picture (and any line it was saying goes with its sprite); the
+  // door's Enter prompt goes too, and the avatar stays in front of the page.
   const crab = ctx.data.crab;
   if (crab) {
     ctx.unregister(crab);
     if (crab.sprite && !crab.sprite.destroyed) crab.sprite.destroy();
     ctx.data.crab = null;
   }
+  if (ctx.data.door) {
+    ctx.unregister(ctx.data.door);
+    ctx.data.door = null;
+  }
+  const playerZ = player ? player.zIndex : null;
+  if (player) player.zIndex = 901;
   ctx.setData('cuFinale', `${FINALE_ART}:${Math.round(w * scale)}x${Math.round(h * scale)}`);
   const t0 = Date.now();
   while (Date.now() - t0 < FINALE_MS && !page.destroyed) {
@@ -491,6 +518,7 @@ async function finale(ctx) {
     page.alpha = Math.min(1, (Date.now() - t0) / 500);
     await ctx.wait(50);
   }
+  if (player && !player.destroyed) player.zIndex = playerZ;
 }
 
 export const COLOR_ROOM_FACTS = Object.freeze({ W, H, FLOOR, CELL, PIT, JUMP_RISE });

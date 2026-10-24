@@ -149,6 +149,8 @@ function drawTrunk(PIXI, kit) {
 
 export const room = {
   id: 'top_of_tree',
+  /** Keeps its own white memory-place light: the world-only Dametime tint stays off (G99). */
+  ownLight: true,
   title: 'The High Jumper',
   kicker: 'The Magic Rock’s memory-place',
   icon: 'assets/sprites/icons/spinach.png',

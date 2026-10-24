@@ -13,8 +13,9 @@
  *    solved room sets the `leave` flag and returns home, where a complete
  *    quest turns in with its source completion text and rewards.
  *  - Leaving early, running out of time or reloading inside fails the run:
- *    progress resets and the Magic Rock asks "Want another go?" later (the
- *    source failQuest left it restartable from the quest log).
+ *    progress resets and the quest's giver (catalog.js questGiver: the Magic
+ *    Rock, the Butler, Gwendolyn, the Play Cube …) asks "Want another go?"
+ *    later (the source failQuest left it restartable from the quest log).
  *
  * Room module contract (all optional except id/title/build or street):
  *   { id, title, kicker, icon, theme, durationMs | durationFor(questId),
@@ -40,7 +41,7 @@
  * &questdemoflow=accept only accepts it, so the ordinary start hook enters the
  * room (the path a Magic Rock offer takes). Canvas data:
  * qiQuest, qiRoom, qiStage, qiStatus, qiRemaining, qiObjective, qiOutcome,
- * qiTurnedIn, qiRetry, qiAutoplay, plus each room's own keys.
+ * qiTurnedIn, qiRetry, qiRetryGiver, qiAutoplay, plus each room's own keys.
  */
 
 import {
@@ -60,7 +61,7 @@ import {
   solveQuestInstance,
   stepQuestInstance,
 } from '../quest-instance.js?v=qi-1';
-import { QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, roomModulePath } from '../quest-rooms/catalog.js?v=qi-2';
+import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=qi-2';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { locationEventsApi } from './location-events-feature.js?v=location-events-1';
 import {
@@ -141,6 +142,13 @@ function loadRoom(roomId) {
 }
 
 const questDef = (id) => getQuestCatalog()?.[id] || null;
+
+/** Who offered a room's quest (the Butler, Gwendolyn, the Play Cube … or the Magic Rock). */
+function giverFor(engine, id) {
+  const gate = FAMILIAR_GATES[id];
+  const familiar = Boolean(gate) && engine?.questCustomPrereq?.(id, { condition: 'custom_code', value: gate }) === true;
+  return questGiver(questDef(id), { familiar });
+}
 const roomQuests = () => Object.keys(QUEST_ROOMS).filter((id) => isBuiltRoom(QUEST_ROOMS[id]) || demo.quest === id);
 
 /* ------------------------------------------------------------------ */
@@ -223,7 +231,7 @@ async function turnIn(engine, questId, opts = {}) {
   return true;
 }
 
-/** GSJS failQuest: progress resets; the Magic Rock offers a retry later. */
+/** GSJS failQuest: progress resets; the quest's giver offers a retry later. */
 function failQuest(engine, questId) {
   resetProgress(engine, questId);
   const mem = (save.memory[questId] ||= {});
@@ -608,6 +616,11 @@ function makeContext(engine) {
       engine.updateHud();
       return result;
     },
+    /** Step the room card aside (a full-view page such as a finale); cleared with the run. */
+    coverHud(on = true) {
+      c.data._hudCovered = Boolean(on);
+      renderHud(engine);
+    },
     /** A ready/result card (the race cards' look). Resolves when clicked. */
     card: (opts) => showCard(engine, opts),
     /** Big countdown beats, e.g. ['3', '2', '1', 'GO!']. */
@@ -713,6 +726,8 @@ async function buildStage(engine, stage) {
     walls: scene.walls || [],
     spawn: scene.spawn,
     returnTo: run.returnTo,
+    // A room (or one stage) with its own authored light: the Dametime tint stays off.
+    ownLight: Boolean(scene.ownLight ?? room.ownLight),
   });
   if (engine.street) engine.street.barriers = scene.barriers || [];
   room.enter?.(ctx, stage);
@@ -804,7 +819,7 @@ async function leaveInstance(engine, opts = {}) {
     failQuest(engine, questId);
     engine.pushActivity(
       result.outcome === 'expired'
-        ? `${room?.title || 'The quest'}: time ran out. Ask the Magic Rock to try again.`
+        ? `${room?.title || 'The quest'}: time ran out. Ask the ${giverFor(engine, questId).label} to try again.`
         : `You left ${room?.title || 'the quest'} early. You can try again later.`
     );
   } else if (save.memory[questId]) {
@@ -852,6 +867,7 @@ function renderHud(engine, force = false) {
   // The bar sits in the game root's stacking context, above the dialogue host:
   // step aside while a conversation or award is up.
   const covered = (dialog && !dialog.modal.hidden)
+    || Boolean(ctx?.data?._hudCovered)
     || (typeof document !== 'undefined' && Boolean(document.querySelector('#award-screen.is-visible:not([hidden])')));
   hud.bar.className = `qi-hud${room.theme ? ` theme-${room.theme}` : ''}${covered ? ' is-covered' : ''}`;
   if (force || hud.icon.dataset.src !== room.icon) {
@@ -1050,9 +1066,11 @@ function maybeOfferRetry(engine, now) {
   for (const q of Object.keys(save.retry)) if (!activeQuest(engine, q)) delete save.retry[q];
   if (!id || now - save.retry[id] < 20_000) return;
   const def = questDef(id);
+  const giver = giverFor(engine, id);
+  engine.setData('qiRetryGiver', giver.npc);
   converse(engine, {
     title: def?.title || 'Try again?',
-    kicker: 'Magic Rock',
+    kicker: giver.label,
     text: `Want another go at ${def?.title || 'that'}? I can take you back whenever you like.`,
     choices: [
       { label: 'Take me there', value: 'go' },

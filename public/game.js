@@ -1683,13 +1683,14 @@ function updateDametimeChrome(now = dametimeDisplayNow()) {
   const light = daylightState(now);
   const overlay = document.getElementById('daylight-overlay');
   if (overlay) {
-    const preserveAuthoredLight =
-      typeof summersDayIsInstanced === 'function' && summersDayIsInstanced();
+    // A place with its own authored light (street JSON or scene `ownLight: true`: Giants'
+    // memories, white voids) is never tinted. The original client had no world tint at all.
+    const preserveAuthoredLight = Boolean(currentStreet?.ownLight);
     overlay.dataset.phase = light.phase;
     overlay.style.backgroundColor = light.cssColor;
     overlay.style.opacity = preserveAuthoredLight ? '0' : light.opacity.toFixed(3);
     overlay.title = preserveAuthoredLight
-      ? 'The Giants’ memory keeps its own light'
+      ? 'This place keeps its own light'
       : `${light.phase} in Ur`;
   }
   return light;
@@ -7672,7 +7673,8 @@ const engine = {
    * collision lines and climb walls, with no street load. `returnTo` is
    * written as the resumable location; leave with engine.enter(tsid, …).
    * scene = { tsid, label, hubName, width, height, background, platforms,
-   *           walls, spawn: { x, y }, returnTo: { tsid, x, y } }
+   *           walls, spawn: { x, y }, returnTo: { tsid, x, y }, ownLight }
+   * (ownLight: true keeps the Dametime tint off, as on a street JSON.)
    */
   enterScene(scene) {
     clearWorldEntities();
@@ -7698,6 +7700,7 @@ const engine = {
       bounds: { l: 0, r: scene.width, t: 0, b: scene.height },
       platforms: streetPlatforms,
       signposts: [],
+      ownLight: Boolean(scene.ownLight),
     };
     if (player && scene.spawn) {
       player.x = scene.spawn.x;
@@ -13264,6 +13267,8 @@ function setupSummersDayStage(stage) {
     bounds: { l: 0, r: bgLayer.worldW, t: 0, b: bgLayer.worldH },
     platforms: [],
     signposts: [],
+    // The memory's blue-and-white light is its own: no Dametime tint.
+    ownLight: true,
   };
   WORLD_W = bgLayer.worldW;
   GROUND_Y = stage === 'bonus' ? 1430 : 820;

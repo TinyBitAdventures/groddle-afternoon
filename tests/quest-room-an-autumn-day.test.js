@@ -240,6 +240,12 @@ describe('An Autumn Day: the look of the Snaps (G75)', () => {
     assert.equal(mod.FEELING_SAPLINGS.length, 2);
     for (const [x] of [...mod.MAIN_SAPLINGS, ...mod.MAIN_BUSHES]) assert.ok(x >= 0 && x <= mod.MAIN.W);
     for (const [x] of [...mod.FEELING_SAPLINGS, ...mod.FEELING_BUSHES]) assert.ok(x >= 0 && x <= mod.ROOM.W);
+    // G98: the Snaps frame each feeling room with a sapling at ~15% and ~85% of the view (camera x 320),
+    // tall enough to rise past the view's top (feet 306 px down).
+    const [left, right] = [...mod.FEELING_SAPLINGS].sort((a, b) => a[0] - b[0]).map(([x]) => (x - 320) / 960);
+    assert.ok(left > 0.1 && left < 0.22, `left sapling at ${left}`);
+    assert.ok(right > 0.78 && right < 0.92, `right sapling at ${right}`);
+    for (const [, h] of [...mod.MAIN_SAPLINGS, ...mod.FEELING_SAPLINGS]) assert.ok(h > 306 + 200, 'rises past the top of the view');
     const src = readFileSync(join(spike, 'public/js/quest-rooms/an-autumn-day.js'), 'utf8');
     // The only fences are small ones at each place's far right.
     const fences = [...src.matchAll(/drawFence\(g, (\d+), (\d+), FLOOR\)/g)].map((m) => [+m[1], +m[2]]);

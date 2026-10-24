@@ -263,9 +263,13 @@ export const HAZE = Object.freeze([
   Object.freeze({ f: 0.55, tint: 0x6a3a34, alpha: 0.62, puff: 0.66 }),
   Object.freeze({ f: 0.75, tint: 0x2e1816, alpha: 0.82, puff: 0.86 }),
 ]);
-/** Foreground saplings [x, height, seed]: about two to a view. */
-export const MAIN_SAPLINGS = Object.freeze([[120, 470, 1], [760, 520, 2], [1430, 460, 3], [2060, 530, 4], [2620, 450, 5], [3700, 500, 6], [4290, 470, 7]]);
-export const FEELING_SAPLINGS = Object.freeze([[230, 480, 8], [1010, 450, 9]]);
+/**
+ * Foreground saplings [x, height, seed]: about two to a view, rising past its top. In the
+ * feeling rooms they stand where the Snaps frame them with the usual camera (x ~325): one at
+ * ~15% of the view's width, one at ~85%.
+ */
+export const MAIN_SAPLINGS = Object.freeze([[120, 560, 1], [760, 600, 2], [1430, 560, 3], [2060, 610, 4], [2620, 560, 5], [3700, 590, 6], [4290, 570, 7]]);
+export const FEELING_SAPLINGS = Object.freeze([[470, 600, 8], [1140, 580, 9]]);
 /** Red bushes [x, scale, with a cattail sprig] on the ground (were vector flower clumps). */
 export const MAIN_BUSHES = Object.freeze([[460, 0.45, false], [820, 0.35, false], [1530, 0.5, false], [2240, 0.4, false], [2470, 0.35, false], [3260, 0.6, true], [3900, 0.5, true], [4340, 0.35, false]]);
 export const FEELING_BUSHES = Object.freeze([[420, 0.45, false], [880, 0.55, true], [1150, 0.4, false]]);
@@ -282,32 +286,86 @@ function wordText(PIXI, text, opts = {}) {
   return t;
 }
 
-/** A thin bare sapling, forking twice into curled twigs (the Snaps' two foreground saplings). */
+/** The saplings' few hanging leaves (the Snaps: dark red-brown against the sky). */
+const SAPLING_LEAF = 0x4a1610;
+
+/**
+ * A black foreground sapling as the Snaps frame every view with (G98): a tall,
+ * slightly leaning trunk tapering from ~11 px at the ground to a hair, rising past
+ * the top of the view, with long thin side branches that sweep upward in turn left
+ * and right, fork once and end in curled tips, a few hanging small leaves.
+ */
 function drawSapling(g, x, floor, h, seed) {
   const r = (k) => {
     const v = Math.sin(seed * 12.9898 + k * 78.233) * 43758.5453;
     return v - Math.floor(v);
   };
-  const branch = (x0, y0, ang, len, width, depth, k) => {
-    const x1 = x0 + Math.cos(ang) * len;
-    const y1 = y0 + Math.sin(ang) * len;
-    const bend = (r(k) - 0.5) * len * 0.25;
-    g.moveTo(x0, y0);
-    g.quadraticCurveTo((x0 + x1) / 2 + bend, (y0 + y1) / 2, x1, y1);
-    g.stroke({ width, color: INK, cap: 'round' });
-    if (depth <= 0) {
-      // A small curled tip.
-      g.moveTo(x1, y1);
-      g.quadraticCurveTo(x1 + 6, y1 - 6, x1 + 2, y1 - 11);
-      g.stroke({ width: 1.5, color: INK, cap: 'round' });
-      return;
-    }
-    const spread = 0.35 + r(k + 1) * 0.3;
-    branch(x1, y1, ang - spread, len * (0.62 + r(k + 2) * 0.15), width * 0.62, depth - 1, k * 3 + 1);
-    branch(x1, y1, ang + spread * 0.8, len * (0.55 + r(k + 3) * 0.2), width * 0.62, depth - 1, k * 3 + 2);
-    if (depth === 2 && r(k + 4) > 0.5) branch(x1, y1 - len * 0.2, ang + (r(k + 5) > 0.5 ? 1 : -1) * 0.9, len * 0.35, width * 0.5, 0, k * 3 + 3);
+  const lean = (r(1) - 0.5) * 90;
+  const sway = (r(2) - 0.5) * 80;
+  // Trunk: a quadratic from the ground to the top, drawn in short tapering strokes.
+  const trunkAt = (t) => {
+    const u = 1 - t;
+    const cx = x + sway;
+    const x2 = x + lean;
+    return [u * u * x + 2 * u * t * cx + t * t * x2, floor + 6 - h * t];
   };
-  branch(x, floor + 4, -Math.PI / 2 + (r(9) - 0.5) * 0.12, h * 0.34, 5, 3, seed + 1);
+  const STEPS = 16;
+  for (let i = 0; i < STEPS; i++) {
+    const [x0, y0] = trunkAt(i / STEPS);
+    const [x1, y1] = trunkAt((i + 1) / STEPS);
+    g.moveTo(x0, y0);
+    g.lineTo(x1, y1);
+    g.stroke({ width: 11 - 9.5 * (i / STEPS), color: INK, cap: 'round' });
+  }
+  const leaf = (lx, ly, ang, size) => {
+    const c = Math.cos(ang);
+    const sn = Math.sin(ang);
+    const p = (a, b) => [lx + a * c - b * sn, ly + a * sn + b * c];
+    const [ax, ay] = p(0, 0);
+    const [bx, by] = p(size, 0);
+    const [c1x, c1y] = p(size / 2, -size * 0.38);
+    const [c2x, c2y] = p(size / 2, size * 0.38);
+    g.moveTo(ax, ay);
+    g.quadraticCurveTo(c1x, c1y, bx, by);
+    g.quadraticCurveTo(c2x, c2y, ax, ay);
+    g.fill(SAPLING_LEAF);
+  };
+  // A thin branch: bows out and up at 25-50 degrees from the trunk, curls at the tip, maybe
+  // carries a leaf, and may fork once into a V (the Snaps' Y-shaped forks).
+  const branch = (x0, y0, side, len, width, k, out, twig) => {
+    const x1 = x0 + side * Math.sin(out) * len;
+    const y1 = y0 - Math.cos(out) * len;
+    const mx = x0 + side * Math.sin(out) * len * 0.62;
+    const my = y0 - Math.cos(out) * len * 0.28;
+    g.moveTo(x0, y0);
+    g.quadraticCurveTo(mx, my, x1, y1);
+    g.stroke({ width, color: INK, cap: 'round' });
+    g.moveTo(x1, y1);
+    g.quadraticCurveTo(x1 + side * 8, y1 - 5, x1 + side * 4, y1 - 13);
+    g.stroke({ width: Math.max(1.8, width * 0.55), color: INK, cap: 'round' });
+    if (r(k + 2) > 0.4) leaf(x1 + side * 2, y1 + 2, Math.PI / 2 + side * (0.3 + r(k + 3) * 0.5), 13 + r(k + 4) * 7);
+    if (twig) {
+      const f = 0.45 + r(k + 5) * 0.2;
+      const u = 1 - f;
+      const fx = u * u * x0 + 2 * u * f * mx + f * f * x1;
+      const fy = u * u * y0 + 2 * u * f * my + f * f * y1;
+      branch(fx, fy, side, len * 0.5, width * 0.6, k + 7, Math.max(0.12, out - 0.45), false);
+    }
+  };
+  const forks = 4 + Math.floor(r(3) * 2);
+  for (let i = 0; i < forks; i++) {
+    // Branches from ~an eighth of the way up, all within the view above the floor.
+    const t = 0.12 + (i / forks) * 0.46 + (r(10 + i) - 0.5) * 0.03;
+    const [bx, by] = trunkAt(t);
+    const side = (i + seed) % 2 ? 1 : -1;
+    const len = (170 - 60 * (i / forks)) * (0.75 + r(20 + i) * 0.4);
+    branch(bx, by, side, len, 5.2 - 2 * (i / forks), 30 + i * 11, 0.45 + r(50 + i) * 0.4, r(40 + i) > 0.3);
+  }
+  // The leader ends in a curl too.
+  const [tx, ty] = trunkAt(1);
+  g.moveTo(tx, ty);
+  g.quadraticCurveTo(tx + 10, ty - 10, tx + 4, ty - 20);
+  g.stroke({ width: 1.5, color: INK, cap: 'round' });
 }
 
 function drawBench(g, x, seatY) {
@@ -910,6 +968,8 @@ function silhouette(ctx, on) {
 export const room = {
   id: ROOM_ID,
   title: MAIN_LABEL,
+  /** Keeps its own sunset light, like A Summer's Day: the world-only Dametime tint stays off (G99). */
+  ownLight: true,
   kicker: 'A shared memory',
   icon: `${ART}bird_icon.png`,
   theme: 'warm',
