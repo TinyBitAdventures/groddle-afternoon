@@ -1,0 +1,458 @@
+{
+ "source": "tinyspeck/glitch-locations arbito1.swf (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "object_1": {
+   "scale": 0.8,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    326.55,
+    461.4
+   ],
+   "px": [
+    392,
+    554
+   ],
+   "file": "object_1@1.5x.webp",
+   "swf": "bundle:arbito1.swf#object_1",
+   "swf_sha": "32fa47a68f0696f5",
+   "key": "32fa47a68f0696f5:0.8:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    392,
+    554
+   ],
+   "world": [
+    261,
+    369
+   ],
+   "bytes": 13762,
+   "lossless": false,
+   "err": 1.66,
+   "sha": "0b017ed08be037fa"
+  },
+  "object_10": {
+   "scale": 0.32,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    941.75,
+    294.6
+   ],
+   "px": [
+    603,
+    189
+   ],
+   "file": "object_10@2x.webp",
+   "swf": "bundle:arbito1.swf#object_10",
+   "swf_sha": "cb1d3bbab61e86ab",
+   "key": "cb1d3bbab61e86ab:0.32:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    603,
+    189
+   ],
+   "world": [
+    302,
+    95
+   ],
+   "bytes": 9838,
+   "lossless": false,
+   "err": 3.3,
+   "sha": "c10ef834846c1b8e"
+  },
+  "object_10b": {
+   "scale": 0.32,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    981.0,
+    256.8
+   ],
+   "px": [
+    628,
+    164
+   ],
+   "file": "object_10b@2x.webp",
+   "swf": "bundle:arbito1.swf#object_10b",
+   "swf_sha": "34a4e540dab656b5",
+   "key": "34a4e540dab656b5:0.32:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    628,
+    164
+   ],
+   "world": [
+    314,
+    82
+   ],
+   "bytes": 4404,
+   "lossless": false,
+   "err": 0.19,
+   "sha": "a9bf329d5665f3cb"
+  },
+  "object_2": {
+   "scale": 0.8,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    249.8,
+    615.85
+   ],
+   "px": [
+    300,
+    739
+   ],
+   "file": "object_2@1.5x.webp",
+   "swf": "bundle:arbito1.swf#object_2",
+   "swf_sha": "3432f8a6a208ef30",
+   "key": "3432f8a6a208ef30:0.8:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    300,
+    739
+   ],
+   "world": [
+    200,
+    493
+   ],
+   "bytes": 14144,
+   "lossless": false,
+   "err": 1.7,
+   "sha": "2826fe6bb04d7acc"
+  },
+  "object_3": {
+   "scale": 0.6,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    223.8,
+    190.75
+   ],
+   "px": [
+    269,
+    229
+   ],
+   "file": "object_3@2x.webp",
+   "swf": "bundle:arbito1.swf#object_3",
+   "swf_sha": "58c7c655ce5978ad",
+   "key": "58c7c655ce5978ad:0.6:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    269,
+    229
+   ],
+   "world": [
+    135,
+    115
+   ],
+   "bytes": 14298,
+   "lossless": false,
+   "err": 3.1,
+   "sha": "15d638826c475667"
+  },
+  "object_3b": {
+   "scale": 0.6,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    223.8,
+    190.75
+   ],
+   "px": [
+    269,
+    229
+   ],
+   "file": "object_3b@2x.webp",
+   "swf": "bundle:arbito1.swf#object_3b",
+   "swf_sha": "0b31956948c987b8",
+   "key": "0b31956948c987b8:0.6:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    269,
+    229
+   ],
+   "world": [
+    135,
+    115
+   ],
+   "bytes": 15002,
+   "lossless": false,
+   "err": 2.77,
+   "sha": "8a1a8f90ff3d989a"
+  },
+  "object_3c": {
+   "scale": 0.6,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    223.8,
+    190.75
+   ],
+   "px": [
+    269,
+    229
+   ],
+   "file": "object_3c@2x.webp",
+   "swf": "bundle:arbito1.swf#object_3c",
+   "swf_sha": "baa0d8a64a326e03",
+   "key": "baa0d8a64a326e03:0.6:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    269,
+    229
+   ],
+   "world": [
+    135,
+    115
+   ],
+   "bytes": 15142,
+   "lossless": false,
+   "err": 2.71,
+   "sha": "e4f648a28c1f3a64"
+  },
+  "object_4": {
+   "scale": 1.0,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    195.5,
+    375.6
+   ],
+   "px": [
+    391,
+    751
+   ],
+   "file": "object_4@2x.webp",
+   "swf": "bundle:arbito1.swf#object_4",
+   "swf_sha": "b3c1159b57f39105",
+   "key": "b3c1159b57f39105:1.0:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    391,
+    751
+   ],
+   "world": [
+    196,
+    376
+   ],
+   "bytes": 13362,
+   "lossless": false,
+   "err": 1.7,
+   "sha": "bbc61f346f796dad"
+  },
+  "object_4b": {
+   "scale": 1.5,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    195.5,
+    375.6
+   ],
+   "px": [
+    440,
+    845
+   ],
+   "file": "object_4b@1.5x.webp",
+   "swf": "bundle:arbito1.swf#object_4b",
+   "swf_sha": "fe3b9d80e7ab638e",
+   "key": "fe3b9d80e7ab638e:1.5:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    440,
+    845
+   ],
+   "world": [
+    293,
+    563
+   ],
+   "bytes": 23132,
+   "lossless": false,
+   "err": 1.78,
+   "sha": "a96662eaaf1398fd"
+  },
+  "object_5": {
+   "scale": 0.8,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    219.8,
+    696.7
+   ],
+   "px": [
+    264,
+    836
+   ],
+   "file": "object_5@1.5x.webp",
+   "swf": "bundle:arbito1.swf#object_5",
+   "swf_sha": "91a0c9a72681a56c",
+   "key": "91a0c9a72681a56c:0.8:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    264,
+    836
+   ],
+   "world": [
+    176,
+    557
+   ],
+   "bytes": 13922,
+   "lossless": false,
+   "err": 1.85,
+   "sha": "a0f97b7749d6b955"
+  },
+  "object_6": {
+   "scale": 0.85,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    365.55,
+    659.0
+   ],
+   "px": [
+    466,
+    840
+   ],
+   "file": "object_6@1.5x.webp",
+   "swf": "bundle:arbito1.swf#object_6",
+   "swf_sha": "2f14d2343a5a580c",
+   "key": "2f14d2343a5a580c:0.85:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    466,
+    840
+   ],
+   "world": [
+    311,
+    560
+   ],
+   "bytes": 22222,
+   "lossless": false,
+   "err": 1.71,
+   "sha": "889eeb0e45d5dde9"
+  },
+  "object_7": {
+   "scale": 0.9,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    415.75,
+    620.9
+   ],
+   "px": [
+    561,
+    838
+   ],
+   "file": "object_7@1.5x.webp",
+   "swf": "bundle:arbito1.swf#object_7",
+   "swf_sha": "d18205d519961440",
+   "key": "d18205d519961440:0.9:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    561,
+    838
+   ],
+   "world": [
+    374,
+    559
+   ],
+   "bytes": 19920,
+   "lossless": false,
+   "err": 1.56,
+   "sha": "6d1d5c682c3d3860"
+  },
+  "object_8": {
+   "scale": 0.8,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    472.85,
+    775.45
+   ],
+   "px": [
+    567,
+    931
+   ],
+   "file": "object_8@1.5x.webp",
+   "swf": "bundle:arbito1.swf#object_8",
+   "swf_sha": "727c99443e07ee11",
+   "key": "727c99443e07ee11:0.8:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    567,
+    931
+   ],
+   "world": [
+    378,
+    621
+   ],
+   "bytes": 26632,
+   "lossless": false,
+   "err": 1.8,
+   "sha": "d58b148f1b20d6be"
+  },
+  "object_9": {
+   "scale": 0.7,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    635.85,
+    906.55
+   ],
+   "px": [
+    668,
+    952
+   ],
+   "file": "object_9@1.5x.webp",
+   "swf": "bundle:arbito1.swf#object_9",
+   "swf_sha": "7c1cf726443d2ef9",
+   "key": "7c1cf726443d2ef9:0.7:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    668,
+    952
+   ],
+   "world": [
+    445,
+    635
+   ],
+   "bytes": 31192,
+   "lossless": false,
+   "err": 1.65,
+   "sha": "03b69db684005540"
+  },
+  "platform_2b": {
+   "scale": 1.0,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    181.7,
+    42.0
+   ],
+   "px": [
+    363,
+    84
+   ],
+   "file": "platform_2b@2x.webp",
+   "swf": "bundle:arbito1.swf#platform_2b",
+   "swf_sha": "641649871247881f",
+   "key": "641649871247881f:1.0:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    363,
+    84
+   ],
+   "world": [
+    182,
+    42
+   ],
+   "bytes": 720,
+   "lossless": false,
+   "err": 0.75,
+   "sha": "9fc82a5c7b1a04cf"
+  }
+ }
+}

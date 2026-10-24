@@ -34667,13 +34667,13 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "street",
-    "street": "GTJ10M515812V0C",
+    "type": "npc",
+    "npc": "npc_gwendolyn",
     "override": true
    }
   ],
   "instanceRoom": "gwendolyn",
-  "offerNote": "Room 23's Greeterbot Sentry G-42 (level 12 gate) and Ghost of Gwendolyn are not rebuilt; the Magic Rock offers it in Corridor Five, by Room 23's door, at level 12",
+  "offerNote": "The Ghost of Gwendolyn offers it in Room 23 (behind Corridor Five's key 5 door); Greeterbot Sentry G-42's level 12 gate stands before her",
   "solo": true
  },
  "tower_quest_part2": {

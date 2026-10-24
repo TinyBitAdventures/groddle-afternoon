@@ -252,6 +252,52 @@ SETS = {
                 'ramp': [[0, '#1e2b30'], [70, '#3e555a'], [130, '#5f7c80'], [200, '#86a4a6'], [255, '#b4cccc']]}),
         },
     },
+    # G71: The Inner Mind (template LCR8MRAKJI12UOP, lost). Its five Snaps (research/wayback/raw/snaps/
+    # gwendolyn_inner_mind/, reference only) show glossy shards standing in a white void with their
+    # reflections, faded ones behind, separate magenta and orange jelly "beehives", glass domes of
+    # treats, glass ledges and purple lightning cracks: every one an arbito1.swf deco (the tower_quest
+    # set): object_1/2/5-9 shards, object_4/4b jellies, object_3/3b/3c domes, object_10/10b cracks
+    # (the far wall and the near lip, a sliver of purple between), platform_2b glass. World scales
+    # from the Snaps against the avatar (~130 world px tall): the jellies ~200 px wide, the big indigo
+    # block ~370, the domes ~135. js/quest-rooms/gwendolyn.js lays them out.
+    'gwendolyn_inner_mind': {
+        'bundle': 'arbito1.swf',
+        'out': 'assets/sprites/quest-rooms/gwendolyn/inner_mind',
+        'js': 'js/quest-rooms/gwendolyn-inner-art.js',
+        'export': 'GWENDOLYN_INNER_FILES',
+        'pieces': {
+            'object_1': (0.8, 1.5, 0),
+            'object_2': (0.8, 1.5, 0),
+            'object_3': (0.6, 2, 0),
+            'object_3b': (0.6, 2, 0),
+            'object_3c': (0.6, 2, 0),
+            'object_4': (1.0, 2, 0),
+            'object_4b': (1.5, 1.5, 0),
+            'object_5': (0.8, 1.5, 0),
+            'object_6': (0.85, 1.5, 0),
+            'object_7': (0.9, 1.5, 0),
+            'object_8': (0.8, 1.5, 0),
+            'object_9': (0.7, 1.5, 0),
+            'object_10': (0.32, 2, 0),
+            'object_10b': (0.32, 2, 0),
+            'platform_2b': (1.0, 2, 0),
+        },
+    },
+    # G71: Room 23 (template LCR8MORFJI12IR4, the tower_quest instance behind Corridor Five's Red-Green
+    # Triangle Key door) is lost; Corridor Five's archived door into it carries firebog/1305051759.swf
+    # (GTJ10M515812V0C.xml), though that is also Corridor Five's own SWF. Its two Snaps (research/wayback/
+    # raw/snaps/gwendolyn_room_23/, reference only) show firebog.swf street decos, already in the street
+    # deco set, and a faint up arrow, which is not: firebog_up_arrows (one arrow ~50 world px wide in the Snap).
+    # js/gwendolyn-room-23.js lays the room out; features/gwendolyn-room-23-feature.js draws the arrow.
+    'gwendolyn_room_23': {
+        'bundle': 'firebog.swf',
+        'out': 'assets/sprites/quest-rooms/gwendolyn/room_23',
+        'js': 'js/gwendolyn-room-23-art.js',
+        'export': 'ROOM_23_FILES',
+        'pieces': {
+            'firebog_up_arrows': (2.0, 1.5, 0),
+        },
+    },
 }
 
 

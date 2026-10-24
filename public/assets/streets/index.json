@@ -12953,6 +12953,15 @@
       "platforms": 9,
       "decos": 253,
       "reconstructed": true
+    },
+    "GCR8MORFJI12IR4": {
+      "label": "Room 23",
+      "file": "assets/streets/GCR8MORFJI12IR4.json",
+      "hubId": "79",
+      "hubName": "Jethimadh Tower",
+      "platforms": 5,
+      "decos": 123,
+      "reconstructed": true
     }
   }
 }

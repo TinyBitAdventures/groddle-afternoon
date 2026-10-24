@@ -19,12 +19,14 @@ import { arrivalInTarget, streetAliases } from '../public/js/location-navigation
 import { TOWER_ROOM_DOOR_LINKS } from '../public/js/tower-rooms.js';
 import { ALL_TOWER_ROOMS, CHALLENGE_ROOM_DOOR_LINKS, anyTowerRoomIndexEntry, anyTowerRoomStreet } from '../public/js/tower-challenge-rooms.js';
 import { MID_TOWER_DOOR_LINKS, MID_TOWER_ROOMS, midTowerIndexEntry, midTowerRoomStreet } from '../public/js/tower-mid-rooms.js';
+import { GWENDOLYN_DOOR_LINKS, GWENDOLYN_ROOMS, room23IndexEntry, room23Street } from '../public/js/gwendolyn-room-23.js';
 
-const ROOMS = [...ALL_TOWER_ROOMS, ...MID_TOWER_ROOMS];
-const LINKS = [...TOWER_ROOM_DOOR_LINKS, ...CHALLENGE_ROOM_DOOR_LINKS, ...MID_TOWER_DOOR_LINKS];
+const ROOMS = [...ALL_TOWER_ROOMS, ...MID_TOWER_ROOMS, ...GWENDOLYN_ROOMS];
+const LINKS = [...TOWER_ROOM_DOOR_LINKS, ...CHALLENGE_ROOM_DOOR_LINKS, ...MID_TOWER_DOOR_LINKS, ...GWENDOLYN_DOOR_LINKS];
 const MID = new Set(MID_TOWER_ROOMS.map((room) => room.tsid));
-const indexEntry = (room) => (MID.has(room.tsid) ? midTowerIndexEntry(room) : anyTowerRoomIndexEntry(room));
-const roomStreet = (room) => (MID.has(room.tsid) ? midTowerRoomStreet(room) : anyTowerRoomStreet(room));
+const GWEN = new Set(GWENDOLYN_ROOMS.map((room) => room.tsid));
+const indexEntry = (room) => (GWEN.has(room.tsid) ? room23IndexEntry(room) : MID.has(room.tsid) ? midTowerIndexEntry(room) : anyTowerRoomIndexEntry(room));
+const roomStreet = (room) => (GWEN.has(room.tsid) ? room23Street(room) : MID.has(room.tsid) ? midTowerRoomStreet(room) : anyTowerRoomStreet(room));
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');

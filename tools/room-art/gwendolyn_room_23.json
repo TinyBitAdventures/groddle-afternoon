@@ -1,0 +1,52 @@
+{
+ "source": "tinyspeck/glitch-locations firebog.swf (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "firebog_up_arrows": {
+   "scale": 2.0,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    70.0,
+    95.0
+   ],
+   "px": [
+    210,
+    285
+   ],
+   "file": "firebog_up_arrows@1.5x.webp",
+   "swf": "bundle:firebog.swf#firebog_up_arrows",
+   "swf_sha": "2d05efc71208384c",
+   "key": "2d05efc71208384c:2.0:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    210,
+    285
+   ],
+   "world": [
+    140,
+    190
+   ],
+   "bytes": 7694,
+   "lossless": false,
+   "err": 1.75,
+   "sha": "febe49f2d607bacf"
+  }
+ }
+}

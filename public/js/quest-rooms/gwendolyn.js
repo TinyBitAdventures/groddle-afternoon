@@ -38,19 +38,27 @@
  * is lost (its objref carries no x/y); it stands by the trailer, where the
  * three reference recordings (V51lCz1q0qI, 01_XPTF2lZ0, 89tShFGl3uc) show
  * it. The Outer Mind, The Inner Mind and the Chamber are lost and rebuilt
- * from those recordings as clean vector scenes: a head floating in space with
- * a sunburst brain, eyeballs and pink tube paths over a checkered floor; a
- * white void of pastel crystals and glass stairs with mood and energy quoins,
- * a Gurly Drink and the EXIT arrow; a dark grove of round grey trees.
+ * from those recordings: a head floating in space with a sunburst brain,
+ * eyeballs and pink tube paths over a checkered floor (clean vector); a white
+ * void of glossy shards, jellies, glass domes and glass stairs with mood and
+ * energy quoins, a Gurly Drink and the EXIT arrow, matched to its five player
+ * Snaps and drawn with the tower_quest set's own CC0 arbito1.swf decos
+ * (G71, tools/room-art set gwendolyn_inner_mind); a dark grove of round grey
+ * trees (clean vector).
  *
  * Meditation: the step into your own head reuses the Focusing Orb's
  * recovered tool animation and the meditation halo palette
  * (js/meditation.js), and the two mind scenes play the recovered meditation
  * tracks (MEDITATION_MUSIC) over the ducked street music.
  *
- * Remake notes: Room 23 (the tower_quest instance with Greeterbot Sentry
- * G-42 and Gwendolyn's offer) is not rebuilt, so the Magic Rock delivers her
- * offer (catalog OFFER_OVERRIDES). The buffs are drawn by the room (red
+ * Room 23 (the tower_quest instance behind Corridor Five's key 5 door) is
+ * where the chain starts: Greeterbot Sentry G-42 greets you and the Ghost of
+ * Gwendolyn offers tower_quest there (js/gwendolyn-room-23.js,
+ * features/gwendolyn-room-23-feature.js; catalog OFFER_OVERRIDES routes the
+ * offer to npc_gwendolyn). After a failed run the quest stays in the log and
+ * quest-instances' retry prompt takes you back to Area 42.
+ *
+ * Remake notes: the buffs are drawn by the room (red
  * flashes, "So hot! -3 mood!") rather than added to the buff bar, since
  * they end with the room.
  */
@@ -59,6 +67,7 @@ import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
 import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js';
 import { moodMax } from '../metabolics.js';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { GWENDOLYN_INNER_FILES } from './gwendolyn-inner-art.js';
 
 export const ROOM_ID = 'gwendolyn';
 const ART = `assets/sprites/quest-rooms/${ROOM_ID}/`;
@@ -246,32 +255,39 @@ export function outerLayout(kit) {
 }
 
 /**
- * The Inner Mind: a white void. Three crystals stand across the floor, each
- * a wall too tall to jump, climbed by glass stairs; glass ledges above carry
- * quoins, the last one a Gurly Drink by the EXIT arrow (crystine_across).
+ * The Inner Mind: a white void. Three shards stand across the floor, each a
+ * wall too tall to jump, climbed by glass stairs to a glass shelf on its face;
+ * glass ledges above carry quoins, the last one a Gurly Drink by the EXIT
+ * arrow (crystine_across). Its five Snaps (research/wayback/raw/snaps/
+ * gwendolyn_inner_mind/, reference only) set the look: glossy shards with
+ * their reflections, faded ones behind, a magenta and a separate orange jelly
+ * "beehive", glass domes of treats, glass shelves and purple lightning
+ * cracks, all arbito1.swf decos (tools/room-art set gwendolyn_inner_mind).
  */
 export function innerLayout(kit) {
   const W = 4400;
   const H = 1100;
   const FLOOR = H - 80;
+  // `art` is each wall's shard (S PIF3L2MLDT53HEF: the orange jelly with glass
+  // stairs at its side; PIFI2ITVSR53NBP: a glass shelf across a jelly's face).
   const crystals = [
-    { id: 'beehive', x1: 1000, x2: 1250, top: 800, color: 'orange', shape: 'hive' },
-    { id: 'indigo', x1: 2000, x2: 2300, top: 760, color: 'indigo', shape: 'block' },
-    { id: 'jade', x1: 2900, x2: 3150, top: 780, color: 'green', shape: 'block' },
+    { id: 'beehive', x1: 1000, x2: 1250, top: 800, color: 'orange', shape: 'hive', art: 'object_4b' },
+    { id: 'indigo', x1: 2000, x2: 2300, top: 760, color: 'indigo', shape: 'block', art: 'object_7' },
+    { id: 'jade', x1: 2900, x2: 3150, top: 780, color: 'green', shape: 'block', art: 'object_8' },
   ];
   const glass = (id, x1, x2, y) => kit.plat(x1, y, x2, y, 'glass', { id });
   const platforms = [
     kit.plat(0, FLOOR, W, FLOOR, 'invisible', { id: 'im_floor' }),
     glass('im_s1', 860, 940, 935),
     glass('im_s2', 920, 1000, 850),
-    kit.plat(1000, 800, 1250, 800, 'invisible', { id: 'im_beehive_top' }),
+    glass('im_beehive_top', 1000, 1250, 800),
     glass('im_g1', 1790, 1900, 932),
     glass('im_g2', 1880, 2000, 845),
-    kit.plat(2000, 760, 2300, 760, 'invisible', { id: 'im_indigo_top' }),
+    glass('im_indigo_top', 2000, 2300, 760),
     glass('im_high', 2110, 2270, 668),
     glass('im_s3', 2730, 2820, 935),
     glass('im_s4', 2800, 2900, 855),
-    kit.plat(2900, 780, 3150, 780, 'invisible', { id: 'im_jade_top' }),
+    glass('im_jade_top', 2900, 3150, 780),
     glass('im_d1', 3480, 3600, 935),
     glass('im_d2', 3590, 3770, 852),
   ];
@@ -283,6 +299,8 @@ export function innerLayout(kit) {
     q('mood', 2240, 628), q('currants', 2560, FLOOR - 40), q('energy', 2850, 815), q('mood', 3020, 740),
     q('xp', 3330, FLOOR - 40), q('energy', 3540, 895), q('currants', 3880, FLOOR - 40),
   ];
+  // Decor (no collision). x is the art's centre; layers scroll at their factor.
+  const s = (art, x, scale = 1, extra = {}) => ({ art, x, scale, ...extra });
   return {
     W,
     H,
@@ -294,8 +312,16 @@ export function innerLayout(kit) {
     quoins,
     drink: { x: 3700, y: 852 },
     exit: { x: 4150, y: FLOOR, w: 140, h: 220 },
-    cracks: [560, 1560, 2470, 3330, 3960],
-    domes: [{ x: 1420, tint: 0xf7b4e4 }, { x: 2600, tint: 0xbfe7ff }, { x: 3240, tint: 0xfff3a6 }],
+    /** Purple lightning cracks in the floor: x centre, width scale. */
+    cracks: [{ x: 470, w: 1 }, { x: 1560, w: 1.4 }, { x: 2470, w: 1.2 }, { x: 3330, w: 1.5 }, { x: 3960, w: 1.2 }],
+    domes: [{ x: 1420, art: 'object_3b' }, { x: 2600, art: 'object_3c' }, { x: 3240, art: 'object_3' }],
+    // S PHVGULDS9I820D3 28118 / PIF3L2MLDT53HEF: the magenta jelly stands on its own, apart from the orange one.
+    jellies: [s('object_4', 745, 0.8), s('object_4b', 1125, 1, { wall: 'beehive' })],
+    /** The dark blue shard behind the last ledges, before the EXIT. */
+    front: [s('object_6', 3635, 1.15), s('object_9', 4380, 0.8, { flip: true })],
+    /** Faded shards far behind (factor 0.35) and nearer ones (0.65): S 28118, 28120, PHFVB7UGK2D283T. */
+    far: { factor: 0.35, base: 760, alpha: 0.4, shards: [s('object_1', 120, 0.6), s('object_8', 430, 0.55), s('object_5', 700, 0.6), s('object_7', 980, 0.55), s('object_2', 1260, 0.6), s('object_9', 1560, 0.5), s('object_6', 1850, 0.55), s('object_1', 2120, 0.5, { flip: true })] },
+    mid: { factor: 0.65, base: 880, alpha: 0.82, shards: [s('object_9', 180, 0.75), s('object_2', 600, 0.8), s('object_7', 1000, 0.75, { flip: true }), s('object_5', 1420, 0.85), s('object_1', 1800, 0.8), s('object_8', 2250, 0.7, { flip: true }), s('object_2', 2650, 0.7, { flip: true }), s('object_6', 3000, 0.7)] },
   };
 }
 
@@ -1190,80 +1216,36 @@ function tickOuter(ctx, dtMs, now) {
 /* The Inner Mind                                                       */
 /* ------------------------------------------------------------------ */
 
-const CRYSTAL = {
-  orange: [0xffb04a, 0xf07a2a, 0xffd59a],
-  indigo: [0x3a2a8f, 0x24186a, 0x6a5ad0],
-  green: [0x7fd36a, 0x3f9f55, 0xc8f5a8],
-  pink: [0xf7b3dc, 0xe48cc2, 0xffe0f2],
-  cyan: [0x67d6ec, 0x2f9fbf, 0xc9f4fb],
-  peach: [0xffd3a8, 0xf0a878, 0xfff0dc],
-  violet: [0xb68cf0, 0x8059c9, 0xe2d2ff],
-};
+/** Where each arbito1.swf shard meets its own reflection: a fraction of the art's height, measured off the renders. */
+export const INNER_BASE = Object.freeze({
+  object_1: 0.684, object_2: 0.698, object_3: 0.57, object_3b: 0.57, object_3c: 0.57, object_4: 0.721, object_4b: 0.721,
+  object_5: 0.769, object_6: 0.771, object_7: 0.72, object_8: 0.785, object_9: 0.751, object_10: 0.06, object_10b: 0.06, platform_2b: 0.12,
+});
+const INNER_ART = `${ART}inner_mind/`;
 
-function drawPrism(PIXI, x1, x2, top, bottom, palette, { tip = 0, alpha = 1 } = {}) {
-  const [front, side, light] = palette;
-  const g = new PIXI.Graphics();
-  const w = x2 - x1;
-  const depth = Math.min(46, w * 0.22);
-  g.ellipse((x1 + x2) / 2 + 20, bottom + 6, w * 0.7, 14).fill({ color: 0x8a7aa8, alpha: 0.12 * alpha });
-  if (tip) {
-    // a spire
-    g.moveTo(x1, bottom).lineTo((x1 + x2) / 2, top).lineTo(x2, bottom).closePath().fill({ color: front, alpha: alpha });
-    g.moveTo((x1 + x2) / 2, top).lineTo(x2, bottom).lineTo(x2 + depth * 0.6, bottom - 10).closePath().fill({ color: side, alpha: alpha * 0.9 });
-    g.moveTo(x1 + w * 0.22, bottom).lineTo((x1 + x2) / 2 - 4, top + 30).lineTo(x1 + w * 0.32, bottom).closePath().fill({ color: light, alpha: 0.55 * alpha });
-    return g;
-  }
-  g.moveTo(x2, top + 8).lineTo(x2 + depth, top - 6).lineTo(x2 + depth, bottom - 16).lineTo(x2, bottom).closePath().fill({ color: side, alpha: alpha });
-  g.moveTo(x1, top + 8).lineTo(x1 + depth, top - 6).lineTo(x2 + depth, top - 6).lineTo(x2, top + 8).closePath().fill({ color: light, alpha: alpha });
-  g.rect(x1, top + 8, w, bottom - top - 8).fill({ color: front, alpha: alpha });
-  g.rect(x1 + w * 0.12, top + 12, w * 0.07, bottom - top - 16).fill({ color: 0xffffff, alpha: 0.22 * alpha });
-  g.rect(x1, bottom - (bottom - top) * 0.35, w, (bottom - top) * 0.35).fill({ color: light, alpha: 0.35 * alpha });
-  return g;
+/** An arbito1.swf piece standing at (x, baseY): its base on the line, its reflection below it. */
+function innerArt(PIXI, name, x, baseY, { scale = 1, sy = scale, alpha = 1, flip = false } = {}) {
+  const [file] = GWENDOLYN_INNER_FILES[name];
+  const spr = new PIXI.Sprite(textureFromUrl(`${INNER_ART}${file}`));
+  spr.anchor.set(0.5, INNER_BASE[name] ?? 1);
+  spr.scale.set(flip ? -scale : scale, sy);
+  spr.x = x;
+  spr.y = baseY;
+  spr.alpha = alpha;
+  spr.eventMode = 'none';
+  return spr;
 }
 
-function drawHive(PIXI, x1, x2, top, bottom, palette) {
-  const [front, side, light] = palette;
-  const g = new PIXI.Graphics();
-  const cx = (x1 + x2) / 2;
-  const w = x2 - x1;
-  g.ellipse(cx + 16, bottom + 6, w * 0.7, 14).fill({ color: 0x8a7aa8, alpha: 0.14 });
-  const tiers = 4;
-  for (let i = 0; i < tiers; i++) {
-    const t = i / tiers;
-    const y = bottom - (bottom - top) * t;
-    const rw = (w / 2) * (1 - t * 0.55) + 18;
-    g.ellipse(cx, y - (bottom - top) / (tiers * 2), rw, (bottom - top) / (tiers * 1.5)).fill(i % 2 ? side : front);
-  }
-  g.ellipse(cx, top + 18, w * 0.2, 34).fill(front);
-  g.ellipse(cx - w * 0.18, top + (bottom - top) * 0.45, w * 0.06, (bottom - top) * 0.3).fill({ color: light, alpha: 0.4 });
-  return g;
-}
-
-function drawGlass(g, x1, x2, y) {
-  g.moveTo(x1, y).lineTo(x2, y).lineTo(x2 - 8, y + 16).lineTo(x1 - 8, y + 16).closePath().fill({ color: 0xe8f6ff, alpha: 0.55 });
-  g.rect(x1, y - 1, x2 - x1, 3).fill({ color: 0xffffff, alpha: 0.75 });
-  g.moveTo(x1, y).lineTo(x2, y).lineTo(x2 - 8, y + 16).lineTo(x1 - 8, y + 16).closePath().stroke({ width: 1.5, color: 0x9fd6f0, alpha: 0.8 });
-}
-
-function drawCrack(g, x, y) {
-  const pts = [[-130, 4], [-90, -4], [-60, 6], [-20, -6], [10, 5], [50, -5], [90, 4], [130, -2]];
-  g.moveTo(x + pts[0][0], y + pts[0][1]);
-  for (const [px, py] of pts) g.lineTo(x + px, y + py - 3);
-  for (const [px, py] of [...pts].reverse()) g.lineTo(x + px + 6, y + py + 5);
-  g.closePath().fill(0x3b1a86);
-}
-
-function drawDome(PIXI, x, y, tint) {
-  const g = new PIXI.Graphics();
-  g.ellipse(x + 6, y + 4, 70, 12).fill({ color: 0x9aa3c8, alpha: 0.18 });
-  g.rect(x - 26, y - 42, 18, 42).fill(0x8890b8);
-  g.rect(x + 2, y - 56, 22, 56).fill(0x9ba3c8);
-  g.ellipse(x - 30, y - 18, 14, 9).fill(0xff6fa0);
-  g.ellipse(x + 32, y - 20, 14, 10).fill(0x7ddc6a);
-  g.moveTo(x - 64, y).arc(x, y, 64, Math.PI, 0).closePath().fill({ color: tint, alpha: 0.45 });
-  g.ellipse(x - 26, y - 44, 16, 7).fill({ color: 0xffffff, alpha: 0.5 });
-  g.arc(x, y, 64, Math.PI, 0).stroke({ width: 2, color: 0xb9c3e6, alpha: 0.8 });
-  return g;
+/** A glass shelf (platform_2b) stretched along a glass platform. */
+function glassShelf(PIXI, x1, x2, y) {
+  const [file, w, h] = GWENDOLYN_INNER_FILES.platform_2b;
+  const spr = new PIXI.Sprite(textureFromUrl(`${INNER_ART}${file}`));
+  spr.anchor.set(0.5, INNER_BASE.platform_2b);
+  spr.scale.set((x2 - x1 + 18) / w, 30 / h);
+  spr.x = (x1 + x2) / 2;
+  spr.y = y;
+  spr.eventMode = 'none';
+  return spr;
 }
 
 function drawExitArrow(PIXI, kit, x, y) {
@@ -1284,32 +1266,31 @@ function buildInner(ctx) {
   const L = innerLayout(kit);
   const root = kit.sceneRoot(PIXI, L.W, L.H);
   const sky = root.layer(0, 0);
-  sky.addChild(kit.gradient(PIXI, [[0, '#ffffff'], [0.7, '#f7f4ff'], [1, '#eef0fb']], 960, 640));
-  // Far crystals.
-  const far = root.layer(0.35, 1);
-  const farSet = [['peach', 0, 260, 220], ['pink', 380, 120, 260], ['cyan', 700, 300, 140, 1], ['violet', 1050, 180, 220], ['green', 1400, 260, 160, 1], ['peach', 1700, 140, 240]];
-  for (const [pal, x, top, w, spire] of farSet) far.addChild(drawPrism(PIXI, x, x + w, top + 120, 700, CRYSTAL[pal], { tip: spire ? 1 : 0, alpha: 0.5 }));
-  const mid = root.layer(0.65, 2);
-  const midSet = [['green', 120, 280, 260], ['orange', 760, 200, 120, 1], ['pink', 1180, 260, 300], ['cyan', 1900, 160, 180, 1], ['violet', 2300, 300, 200], ['green', 2700, 220, 130, 1]];
-  for (const [pal, x, top, w, spire] of midSet) mid.addChild(drawPrism(PIXI, x, x + w, top + 60, 860, CRYSTAL[pal], { tip: spire ? 1 : 0, alpha: 0.75 }));
+  sky.addChild(kit.gradient(PIXI, [[0, '#ffffff'], [0.7, '#fbfaff'], [1, '#f1f0f8']], 960, 640));
+  // Faded shards far behind, nearer ones in between.
+  for (const band of [L.far, L.mid]) {
+    const layer = root.layer(band.factor, band === L.far ? 1 : 2);
+    for (const sh of band.shards) layer.addChild(innerArt(PIXI, sh.art, sh.x, band.base, { scale: sh.scale, alpha: band.alpha, flip: sh.flip }));
+  }
   const world = root.layer(1, 3);
   // A glossy white floor with soft reflections.
   const floor = new PIXI.Graphics();
-  floor.rect(0, L.FLOOR, L.W, 120).fill(0xf4f1fb);
-  floor.rect(0, L.FLOOR, L.W, 4).fill({ color: 0xe7e2f6, alpha: 0.7 });
-  for (const x of L.cracks) drawCrack(floor, x, L.FLOOR + 12);
+  floor.rect(0, L.FLOOR, L.W, 120).fill(0xffffff);
+  floor.rect(0, L.FLOOR, L.W, 3).fill({ color: 0xe9e5f6, alpha: 0.8 });
   world.addChild(floor);
-  for (const dome of L.domes) world.addChild(drawDome(PIXI, dome.x, L.FLOOR, dome.tint));
-  // The three crystals you climb.
-  for (const c of L.crystals) {
-    const art = c.shape === 'hive' ? drawHive(PIXI, c.x1, c.x2, c.top, L.FLOOR, CRYSTAL[c.color]) : drawPrism(PIXI, c.x1, c.x2, c.top - 8, L.FLOOR, CRYSTAL[c.color]);
-    world.addChild(art);
-  }
-  // The dark blue crystal behind the last ledges (decor, before the EXIT).
-  world.addChild(drawPrism(PIXI, 3450, 3820, 700, L.FLOOR, CRYSTAL.indigo, { alpha: 0.92 }));
-  const glass = new PIXI.Graphics();
-  for (const p of L.platforms.filter((q) => q.style === 'glass')) drawGlass(glass, p.x1, p.x2, p.y1);
-  world.addChild(glass);
+  // Purple lightning cracks across the floor: the fissure's far wall (object_10) with the floor's
+  // near lip (object_10b) over it, so a jagged purple sliver shows, as in the Snaps.
+  L.cracks.forEach((c, i) => {
+    world.addChild(innerArt(PIXI, 'object_10', c.x, L.FLOOR, { scale: c.w, sy: 1, flip: i % 2 === 1 }));
+    world.addChild(innerArt(PIXI, 'object_10b', c.x, L.FLOOR + 16, { scale: c.w * 1.04, sy: 1, flip: i % 2 === 1 }));
+  });
+  // The two jellies (the orange one is the first wall), the other walls' shards, the decor shards.
+  for (const j of L.jellies) world.addChild(innerArt(PIXI, j.art, j.x, L.FLOOR, { scale: j.scale }));
+  for (const c of L.crystals.filter((w) => w.art !== 'object_4b')) world.addChild(innerArt(PIXI, c.art, (c.x1 + c.x2) / 2, L.FLOOR));
+  for (const f of L.front) world.addChild(innerArt(PIXI, f.art, f.x, L.FLOOR, { scale: f.scale, flip: f.flip }));
+  for (const dome of L.domes) world.addChild(innerArt(PIXI, dome.art, dome.x, L.FLOOR + 4));
+  // Glass stairs, shelves and ledges.
+  for (const p of L.platforms.filter((q) => q.style === 'glass')) world.addChild(glassShelf(PIXI, p.x1, p.x2, p.y1));
   world.addChild(drawExitArrow(PIXI, kit, L.exit.x, L.FLOOR - 120));
   return {
     label: INSTANCES.inner_mind.label,

@@ -173,13 +173,15 @@ export const OFFER_OVERRIDES = Object.freeze({
     ],
     why: 'canOffer: walk_speed_3 and jump_2; an hour after part 1, after the last repeat and after a fail',
   },
-  // Room 23 (the tower_quest instance behind Corridor Five's locked Red-Green
-  // Triangle Key door, with Greeterbot Sentry G-42 and the Ghost of Gwendolyn)
-  // is not rebuilt.
+  // npc_gwendolyn.js offers it (setAvailableQuests + offerQuests on collision)
+  // in Room 23, the tower_quest instance behind Corridor Five's locked
+  // Red-Green Triangle Key door (js/gwendolyn-room-23.js,
+  // features/gwendolyn-room-23-feature.js). Greeterbot Sentry G-42 turns
+  // anyone under level 12 away before they reach her (npc_widget.js).
   tower_quest: {
-    offerTriggers: [{ type: 'street', street: 'GTJ10M515812V0C' }],
+    offerTriggers: [{ type: 'npc', npc: 'npc_gwendolyn' }],
     prerequisites: [{ condition: 'over_level', value: 12, not: 0 }],
-    why: "Room 23's Greeterbot Sentry G-42 (level 12 gate) and Ghost of Gwendolyn are not rebuilt; the Magic Rock offers it in Corridor Five, by Room 23's door, at level 12",
+    why: "The Ghost of Gwendolyn offers it in Room 23 (behind Corridor Five's key 5 door); Greeterbot Sentry G-42's level 12 gate stands before her",
   },
   smuggle_the_smuggler_part1: {
     offerTriggers: [{ type: 'npc', npc: 'npc_smuggler' }],
