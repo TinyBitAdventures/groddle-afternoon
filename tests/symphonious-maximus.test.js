@@ -16,7 +16,15 @@ import {
   CEBARKUL_DOOR,
   CEBARKUL_TSID,
   CRATERS,
+  CRATER_BOUNCE,
+  FLOOR_BOTTOM_Y,
+  GLOW_ORBS,
   GROUND_Y,
+  ORB_SHAPE,
+  SOIL_CATERPILLARS,
+  SOIL_NOTES,
+  SOIL_NOTE_ART,
+  SOIL_TOP_Y,
   ISLANDS,
   STARS,
   STAR_JINGLER,
@@ -223,4 +231,71 @@ describe('Star-Jinglers (items/toy_star_1.js)', () => {
     }
     assert.deepEqual(sym.gradient, { top: '163460', bottom: '215A76' });
   });
+
+  it('G104 second pass: white haloed glow orbs from the Snaps, clear of the stars and islands', () => {
+    // Snap 248953's big orb: disc ~16 Snap px, dark gap to ~19, pale ring to ~23.5.
+    assert.ok(Math.abs(ORB_SHAPE.disc - 16 / 23.5) < 0.02 && Math.abs(ORB_SHAPE.gap - 19 / 23.5) < 0.02);
+    assert.ok(GLOW_ORBS.length >= 12, 'orbs across the street');
+    const radii = GLOW_ORBS.map((o) => o.r);
+    assert.ok(Math.min(...radii) >= 18 && Math.max(...radii) <= 56, 'Snap ring diameters ~15-47 px at ~2.4 world px each');
+    assert.ok(new Set(radii).size >= 8, 'several sizes');
+    for (const o of GLOW_ORBS) {
+      assert.ok(o.y < GROUND_Y - o.r - 150, 'in the sky, above the treetops and craters');
+      for (const st of STARS) assert.ok(Math.hypot(st.x - o.x, st.y - o.y) > o.r + 40, `orb at ${o.x} clear of ${st.id}`);
+    }
+    // Islands: an orb never sits inside an island deco's box (it would be hidden behind it).
+    const mid = sym.layers.find((l) => l.id === 'middleground');
+    const islandBoxes = mid.decos.filter((d) => String(d.id || '').startsWith('island_'));
+    assert.equal(islandBoxes.length, ISLANDS.length);
+    for (const o of GLOW_ORBS) {
+      for (const d of islandBoxes) {
+        const inside = Math.abs(o.x - d.x) < d.w / 2 + o.r && o.y + o.r > d.y - d.h && o.y - o.r < d.y;
+        assert.ok(!inside, `orb at ${o.x},${o.y} behind ${d.id}`);
+      }
+    }
+    // Written into the street for the feature (screen space, same order).
+    assert.equal(sym.glowOrbs.orbs.length, GLOW_ORBS.length);
+    assert.deepEqual(sym.glowOrbs.orbs[0], { id: 'orb_1', x: GLOW_ORBS[0].x - L, y: GLOW_ORBS[0].y - T, r: GLOW_ORBS[0].r });
+    assert.deepEqual(sym.glowOrbs.shape, { ...ORB_SHAPE });
+  });
+
+  it('G104 second pass: a purple soil band under the floor with a music note and striped caterpillars', () => {
+    const order = sym.layers.map((l) => l.id);
+    const soil = sym.layers.find((l) => l.id === 'T_sym_soil');
+    assert.ok(soil, 'soil layer');
+    assert.ok(order.indexOf('T_sym_floorbase') < order.indexOf('T_sym_soil') && order.indexOf('T_sym_soil') < order.indexOf('T_sym_floor'), 'between the floor base and the pale floor');
+    assert.ok(sym.layers.find((l) => l.id === 'T_sym_floorbase').z < soil.z && soil.z < sym.layers.find((l) => l.id === 'T_sym_floor').z);
+    // The floor surfaces end under the crater bowls, over the band's mint cap, inside the 408 px view
+    // (the avatar's feet sit ~306 px down it, so ~100 px of floor and soil show below them).
+    assert.ok(FLOOR_BOTTOM_Y > GROUND_Y + 76);
+    assert.ok(FLOOR_BOTTOM_Y - GROUND_Y < 140, 'soil shows in the bottom of the view');
+    assert.ok(SOIL_TOP_Y < FLOOR_BOTTOM_Y, 'the cap tucks under the floor');
+    for (const d of sym.layers.find((l) => l.id === 'T_sym_floor').decos.filter((x) => /surface/.test(x.sprite))) {
+      assert.equal(d.y, FLOOR_BOTTOM_Y - T);
+    }
+    // Seamless: ground_2 end to end (overlapping 6 px), mirrored every other piece, covering the street.
+    const pieces = soil.decos.filter((d) => d.sprite === 'ground_2');
+    pieces.forEach((d, i) => {
+      assert.equal(Boolean(d.flip), i % 2 === 1);
+      if (i) assert.equal(d.x - pieces[i - 1].x, d.w - 6);
+    });
+    assert.ok(pieces[0].x - pieces[0].w / 2 <= 0 && pieces.at(-1).x + pieces.at(-1).w / 2 >= sym.bounds.r - sym.bounds.l);
+    const cats = soil.decos.filter((d) => d.sprite === 'ground_caterpillar');
+    assert.equal(cats.length, SOIL_CATERPILLARS.length);
+    for (const c of cats) assert.ok(c.y - c.h > FLOOR_BOTTOM_Y - T - 10, 'caterpillars in the soil, under the floor');
+    // The note burrow: zutto1 ground_large_2's top, rendered by tools/symphonious-maximus-art.py --soil.
+    assert.ok(existsSync(join(pub, SOIL_NOTE_ART.file)));
+    assert.equal(sym.soilArt.length, SOIL_NOTES.length);
+    for (const a of sym.soilArt) assert.equal(a.y, SOIL_TOP_Y + SOIL_NOTE_ART.dy - T);
+    // Hooked vines under the islands.
+    assert.ok(sym.layers.find((l) => l.id === 'middleground').decos.filter((d) => d.sprite === 'liana_2').length >= 2);
+  });
+
+  it('G104: the crater bounce stays the fungal recipe (no source for the craters themselves)', () => {
+    // The street's location is lost, so the craters are inferred from the video; the only source recipe
+    // is the fungal shroom gravity -7.5. The video's two bounces disagree (t0094 peaks ~290 video px,
+    // ~680 world, over its crater; t0038 carries the camera past the star grid), so the hold is unchanged.
+    assert.deepEqual({ ...CRATER_BOUNCE }, { param: 'gravity', value: -7.5, duration: 1400 });
+  });
 });
+

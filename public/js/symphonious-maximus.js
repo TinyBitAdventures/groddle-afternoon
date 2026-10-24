@@ -42,8 +42,17 @@
  *   one under it, yellow, yellow) hung with vines, rows of stars over each,
  *   three big stars in the gaps, a teal ladder from the floor up to the
  *   fourth island, and the Cebarkul signpost on the last one (t0128).
- * Not rebuilt: the drifting white glow orbs (no CC0 art matches), the music
- * (none is listed for the street in inc_data_sounds.js).
+ * Four player Snaps (G104: research/wayback/raw/snaps/symphonious_maximus/,
+ * Dec 2012, reference only) add: big white glow orbs, each a disc in a thin
+ * dark gap and a pale ring, at several sizes, in the sky among the trees and
+ * under the islands (GLOW_ORBS; no CC0 art has them, so they are clean
+ * vectors, drawn and slowly drifted by the feature as in the video); a
+ * purple-brown hexagon-patterned soil band under the mint floor with a
+ * music-note burrow (zutto1.swf ground_large_2, SOIL_NOTES) and a striped
+ * caterpillar (ground_caterpillar); vines with a hook under the islands
+ * (liana_2).
+ * Not rebuilt: the music (none is listed for the street in
+ * inc_data_sounds.js).
  *
  * Art: CC0 Uralia (zutto1.swf street bundle) decos already in assets/decos,
  * and the Star-Jingler frames rendered from toy_star_1.swf
@@ -319,8 +328,10 @@ const PROPS = [
   ['purple_mushroom_2', 3000, -316, 42, 96, 1.2, 47],
 ];
 
-/** Vines hung under the islands (the islands' own art has some). */
+/** Vines hung under the islands (the islands' own art has some); liana_2 ends in the Snaps' hook. */
 const VINES = [
+  ['liana_2', 1180, -900, 102, 316, 0.7, 8],
+  ['liana_2', 2330, -1010, 102, 316, 0.6, 8, true],
   ['liana_1', -360, -1210, 332, 436, 0.5, 8],
   ['liana_5', 300, -1160, 298, 272, 0.6, 8],
   ['liana_6', 560, -1180, 342, 230, 0.5, 8, true],
@@ -356,7 +367,6 @@ function middlegroundDecos() {
     const [lw, lh, mid] = TILES[sprite];
     out.push(deco(sprite, lad.x + (lw / 2 - mid) * k, lad.y - i * step + 6, lw * k, lh * k, 70 + i));
   }
-  out.push(...soilDecos());
   return out;
 }
 
@@ -428,8 +438,9 @@ function floorDecos() {
   for (let x = L - 200; x < R + 400; x += 900) {
     const sprite = surfaces[k % surfaces.length];
     const [lw, lh] = sizes[sprite];
-    const p = screen(x, -60);
-    out.push(deco(sprite, p.x, p.y, lw * 1.15, lh * 1.5, 1 + (k % 3), k % 2 ? { flip: true } : {}));
+    // Bottom edge just over the soil band's frost fringe (G104); the top stays where it was.
+    const p = screen(x, FLOOR_BOTTOM_Y);
+    out.push(deco(sprite, p.x, p.y, lw * 1.15, FLOOR_BOTTOM_Y + 366, 1 + (k % 3), k % 2 ? { flip: true } : {}));
     k += 1;
   }
   for (const c of CRATERS) {
@@ -456,17 +467,73 @@ function floorDecos() {
   return out;
 }
 
-/** The dark soil edge with its frost fringe along the bottom (middleground, world: the ground skirt extends it). */
+/**
+ * Top of the purple soil band under the mint floor (G104). The Snaps and the
+ * video put it ~190 world px under the walk line, below the remake's 408 px
+ * view, so the band (squashed to 210 px) is raised to show in the bottom of
+ * the view from ~115 px down, as the peaks were scaled down. It is its own
+ * layer between the floor base and the pale floor surfaces: the surfaces end
+ * at FLOOR_BOTTOM_Y over its mint cap, so only the frost fringe and the
+ * purple soil show under them (the cap's unfiltered teal would not match the
+ * filtered floor).
+ */
+export const SOIL_TOP_Y = GROUND_Y + 55;
+const SOIL_H = 210;
+/** Bottom edge of the floor surfaces (world y), a little under a crater's bowl (GROUND_Y + 76). */
+export const FLOOR_BOTTOM_Y = GROUND_Y + 105;
+
+/** Music-note burrows: zutto1.swf ground_large_2's top (tools/symphonious-maximus-art.py --soil), world centre x. */
+export const SOIL_NOTES = Object.freeze([
+  Object.freeze({ x: -420, why: 'between the two left craters (Snap 248938: under the floor near a crater)' }),
+  Object.freeze({ x: 2760, why: 'right of the ladder' }),
+]);
+export const SOIL_NOTE_ART = Object.freeze({ file: 'assets/sprites/symphonious/ground_large_2_top@2x.webp', w: 420, h: 128, dy: 12 });
+/** Striped caterpillars in the soil (ground_caterpillar), world x: one beside each note as in the Snap, one more. */
+export const SOIL_CATERPILLARS = Object.freeze([-250, 1300, 2930]);
+
+/**
+ * The soil band with its frost fringe (layer T_sym_soil, screen space):
+ * ground_2 end to end, every other one flipped, so each join meets its own
+ * mirror image and shows no seam.
+ */
 function soilDecos() {
   const out = [];
-  const soils = ['ground_2', 'ground_4', 'ground_3'];
+  const SOIL_W = 984;
   let k = 0;
-  for (let x = L + 300; x < R + 500; x += 920) {
-    out.push(deco(soils[k % 3], x, 170, 984, 280, 1 + (k % 2), k % 2 ? { flip: true } : {}));
+  // 6 px overlap so no hairline shows between neighbours (their end columns are half transparent).
+  for (let x = L - SOIL_W / 2; x < R + SOIL_W; x += SOIL_W - 6) {
+    const p = screen(x, SOIL_TOP_Y + SOIL_H);
+    out.push(deco('ground_2', p.x, p.y, SOIL_W, SOIL_H, 1, { id: `sym_soil_${k + 1}`, ...(k % 2 ? { flip: true } : {}) }));
     k += 1;
   }
+  SOIL_CATERPILLARS.forEach((x, i) => {
+    const p = screen(x, SOIL_TOP_Y + 66 + 68);
+    out.push(deco('ground_caterpillar', p.x, p.y, 76, 68, 4, i % 2 ? { flip: true } : {}));
+  });
   return out;
 }
+
+/* ------------------------------------------------------------------ */
+/* Glow orbs (G104)                                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The Snaps' orb, measured on the biggest (Snap 248953): a white disc of
+ * 0.68 R, a dark navy gap to 0.81 R, then a pale ring to R (~40% white).
+ */
+export const ORB_SHAPE = Object.freeze({ disc: 0.68, gap: 0.81, ringAlpha: 0.4, gapColor: 0x0d2b4c, gapAlpha: 0.85 });
+/** A slow drift (the video's orbs float; the Snaps freeze them): px and period. */
+export const ORB_DRIFT = Object.freeze({ amp: 10, periodMs: 7000 });
+/**
+ * Orbs: world x, height above the floor, outer radius R. Ring diameters in
+ * the Snaps run ~15-47 Snap px (~36-113 world px at ~2.4 world px per Snap
+ * px); they sit among the treetops and under the islands, clear of the stars.
+ */
+export const GLOW_ORBS = Object.freeze([
+  [-2150, 520, 34], [-1900, 230, 22], [-1660, 470, 46], [-860, 640, 28], [-560, 740, 40], [-250, 680, 52],
+  [150, 640, 24], [480, 250, 44], [800, 560, 30], [1150, 260, 26], [1600, 380, 48], [2000, 520, 36],
+  [2440, 250, 24], [2800, 600, 50], [3150, 240, 30], [3300, 760, 20],
+].map(([x, up, r]) => Object.freeze({ x, y: GROUND_Y - up, r })));
 
 /** Floor base: one opaque white block tinted the video's floor mint, so no sky shows between the surface shapes. */
 function floorBaseDecos() {
@@ -511,6 +578,7 @@ function layers() {
     parallaxLayer('bg_peaks', 'peaks', -6, nearW, nearH, near, { brightness: -8 }),
     parallaxLayer('T_sym_shafts', 'light shafts', -4, W, H, shaftDecos()),
     parallaxLayer('T_sym_floorbase', 'floor base', -3, W, H, floorBaseDecos(), { tintColor: 0x8dc3cb, tintAmount: 100 }),
+    parallaxLayer('T_sym_soil', 'soil', -2.5, W, H, soilDecos(), { brightness: 12, saturation: -15 }),
     parallaxLayer('T_sym_floor', 'floor', -2, W, H, floorDecos(), { saturation: -40, brightness: 50 }),
     { id: 'middleground', name: 'middleground', z: 0, w: W, h: H, decos: middlegroundDecos() },
   ];
@@ -594,11 +662,15 @@ export function symphoniousStreet({ cebarkulArrive = null } = {}) {
     events: symphoniousEvents(),
     eventBoxes: craterEventBoxes(),
     starJinglers: { classTsid: STAR_JINGLER.classTsid, sound: STAR_JINGLER.sound, stars, bigStars },
+    glowOrbs: { shape: { ...ORB_SHAPE }, drift: { ...ORB_DRIFT }, orbs: GLOW_ORBS.map((o, i) => ({ id: `orb_${i + 1}`, ...screen(o.x, o.y), r: o.r })) },
+    soilArt: SOIL_NOTES.map((n) => ({ file: SOIL_NOTE_ART.file, ...screen(n.x, SOIL_TOP_Y + SOIL_NOTE_ART.dy), w: SOIL_NOTE_ART.w, h: SOIL_NOTE_ART.h })),
     why: {
       street: 'inc_data_maps_prod.js 16034 (hub 51); no location XML. Cebarkul door_1354232290656 (2012-11-30) arrives at -1925,-312.',
       layout: 'Video 7SzDOzodeDQ t0012-t0175 at 2.36 world px per video px, with its minimap and loading card for the whole street.',
       stars: 'items/toy_star_1.js Star-Jingler-mid: touch plays BIG_STAR_3 and sets state glow (the SWF\'s 29-frame cycle); placements from the video.',
       craters: 'Inferred from the video: walking into a crater throws the avatar into the sky. Rebuilt as event boxes with the fungal bounce recipe.',
+      orbs: 'Snaps 248938/248947/248953 (Dec 2012): white discs with a pale ring halo; clean vectors (no CC0 art), drawn by the feature.',
+      soil: 'Snap 248938: purple hexagon soil under the mint floor with a music-note burrow (zutto1 ground_large_2) and a striped caterpillar (ground_caterpillar).',
       ladder: LADDER.why,
       signpost: SIGNPOST.why,
     },
