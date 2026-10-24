@@ -28,7 +28,17 @@
  * 915 x 1.2), and a small "exit" at its left edge. Stillness and Comfort are
  * built in the same style from their names. Words are one-way platforms;
  * the climbs cross two rock walls so every word is remembered on the way.
+ *
+ * Look (G75): 24 players' Snaps (research/wayback/raw/snaps/an_autumn_day/,
+ * reference only) show the backdrop every room shares: three hazy layers of
+ * gnarled branching trees with flat red leaf puffs, two thin bare saplings
+ * framing the view, red bushes, a cattail sprig, a small fence at the far
+ * right and a heavy vignette. The trees, puffs and sprigs are limbo1.swf's
+ * CC0 decos (tools/room-art an_autumn_day); saplings and vignette are vectors.
  */
+
+import { AN_AUTUMN_DAY_FILES } from '../an-autumn-day-art.js';
+import { textureFromUrl } from '../textures.js';
 
 export const ROOM_ID = 'an_autumn_day';
 export const QUEST_ID = 'an_autumn_day';
@@ -230,8 +240,35 @@ const INK = 0x0c0707;
 const PAD = 640;
 /** Screen-fixed caption spot (the footage's bottom caption), left of the side panel. */
 const CAPTION_AT = Object.freeze({ x: 400, y: 306 + 62 });
-const RED = 0xc3161d;
-const RED_DARK = 0x86101a;
+
+/** A limbo1 room-art piece at its world size times `scale` (bottom-centre anchored). */
+function art(PIXI, name, x, y, opts = {}) {
+  const [file] = AN_AUTUMN_DAY_FILES[name];
+  const spr = new PIXI.Sprite(textureFromUrl(`${ART}${file}`));
+  spr.anchor.set(opts.ax ?? 0.5, opts.ay ?? 1);
+  const s = opts.scale ?? 1;
+  spr.scale.set(opts.flip ? -s : s, s);
+  spr.x = x;
+  spr.y = y;
+  if (opts.tint != null) spr.tint = opts.tint;
+  if (opts.alpha != null) spr.alpha = opts.alpha;
+  return spr;
+}
+
+/** Branch tips on blur_tree_03 (x from its centre by width, y from its top by height): where the red puffs sit. */
+export const PUFF_TIPS = Object.freeze([[-0.32, 0.43], [0.3, 0.38], [0.45, 0.53], [-0.5, 0.5], [-0.06, 0.3], [0.38, 0.73], [-0.32, 0.7]]);
+/** The haze layers, far to near: parallax, tree tint and alpha, puff alpha. */
+export const HAZE = Object.freeze([
+  Object.freeze({ f: 0.3, tint: 0xa8645a, alpha: 0.42, puff: 0.42 }),
+  Object.freeze({ f: 0.55, tint: 0x6a3a34, alpha: 0.62, puff: 0.66 }),
+  Object.freeze({ f: 0.75, tint: 0x2e1816, alpha: 0.82, puff: 0.86 }),
+]);
+/** Foreground saplings [x, height, seed]: about two to a view. */
+export const MAIN_SAPLINGS = Object.freeze([[120, 470, 1], [760, 520, 2], [1430, 460, 3], [2060, 530, 4], [2620, 450, 5], [3700, 500, 6], [4290, 470, 7]]);
+export const FEELING_SAPLINGS = Object.freeze([[230, 480, 8], [1010, 450, 9]]);
+/** Red bushes [x, scale, with a cattail sprig] on the ground (were vector flower clumps). */
+export const MAIN_BUSHES = Object.freeze([[460, 0.45, false], [820, 0.35, false], [1530, 0.5, false], [2240, 0.4, false], [2470, 0.35, false], [3260, 0.6, true], [3900, 0.5, true], [4340, 0.35, false]]);
+export const FEELING_BUSHES = Object.freeze([[420, 0.45, false], [880, 0.55, true], [1150, 0.4, false]]);
 
 function wordText(PIXI, text, opts = {}) {
   const t = new PIXI.Text({ text: text, style: {
@@ -245,34 +282,32 @@ function wordText(PIXI, text, opts = {}) {
   return t;
 }
 
-/** A tapering bonsai-like tree with flat leaf clumps (the footage's backdrop trees). */
-function drawWoodTree(g, x, base, h, trunk, leaf, leafAlpha, seed) {
+/** A thin bare sapling, forking twice into curled twigs (the Snaps' two foreground saplings). */
+function drawSapling(g, x, floor, h, seed) {
   const r = (k) => {
     const v = Math.sin(seed * 12.9898 + k * 78.233) * 43758.5453;
     return v - Math.floor(v);
   };
-  const w = 16 + r(1) * 18;
-  g.moveTo(x - w, base);
-  g.bezierCurveTo(x - w * 0.6, base - h * 0.4, x - w * 0.25 + (r(2) - 0.5) * 30, base - h * 0.75, x - 3, base - h);
-  g.lineTo(x + 3, base - h);
-  g.bezierCurveTo(x + w * 0.25 + (r(3) - 0.5) * 30, base - h * 0.75, x + w * 0.6, base - h * 0.4, x + w, base);
-  g.closePath();
-  g.fill({ color: trunk.color, alpha: trunk.alpha ?? 1 });
-  const branches = 3 + Math.floor(r(4) * 3);
-  for (let b = 0; b < branches; b++) {
-    const at = 0.35 + (b / branches) * 0.55;
-    const side = b % 2 ? 1 : -1;
-    const bx = x + side * w * (1 - at) * 0.4;
-    const by = base - h * at;
-    const len = 40 + r(10 + b) * 70;
-    const ex = bx + side * len;
-    const ey = by - 20 - r(20 + b) * 40;
-    g.moveTo(bx, by);
-    g.quadraticCurveTo(bx + side * len * 0.5, by - 4, ex, ey);
-    g.stroke({ width: 5 - at * 3, color: trunk.color, alpha: trunk.alpha ?? 1 });
-    g.ellipse(ex, ey - 3, 26 + r(30 + b) * 22, 7 + r(40 + b) * 4).fill({ color: leaf, alpha: leafAlpha ?? 1 });
-  }
-  g.ellipse(x, base - h - 4, 30 + r(5) * 20, 8).fill({ color: leaf, alpha: leafAlpha ?? 1 });
+  const branch = (x0, y0, ang, len, width, depth, k) => {
+    const x1 = x0 + Math.cos(ang) * len;
+    const y1 = y0 + Math.sin(ang) * len;
+    const bend = (r(k) - 0.5) * len * 0.25;
+    g.moveTo(x0, y0);
+    g.quadraticCurveTo((x0 + x1) / 2 + bend, (y0 + y1) / 2, x1, y1);
+    g.stroke({ width, color: INK, cap: 'round' });
+    if (depth <= 0) {
+      // A small curled tip.
+      g.moveTo(x1, y1);
+      g.quadraticCurveTo(x1 + 6, y1 - 6, x1 + 2, y1 - 11);
+      g.stroke({ width: 1.5, color: INK, cap: 'round' });
+      return;
+    }
+    const spread = 0.35 + r(k + 1) * 0.3;
+    branch(x1, y1, ang - spread, len * (0.62 + r(k + 2) * 0.15), width * 0.62, depth - 1, k * 3 + 1);
+    branch(x1, y1, ang + spread * 0.8, len * (0.55 + r(k + 3) * 0.2), width * 0.62, depth - 1, k * 3 + 2);
+    if (depth === 2 && r(k + 4) > 0.5) branch(x1, y1 - len * 0.2, ang + (r(k + 5) > 0.5 ? 1 : -1) * 0.9, len * 0.35, width * 0.5, 0, k * 3 + 3);
+  };
+  branch(x, floor + 4, -Math.PI / 2 + (r(9) - 0.5) * 0.12, h * 0.34, 5, 3, seed + 1);
 }
 
 function drawBench(g, x, seatY) {
@@ -295,15 +330,16 @@ function drawLamp(g, x, floor) {
   g.fill({ color: 0xffe7b0, alpha: 0.85 });
 }
 
+/** A small picket fence (the Snaps keep it low, at the far right). */
 function drawFence(g, x1, x2, floor) {
-  g.rect(x1, floor - 46, x2 - x1, 5);
-  g.rect(x1, floor - 24, x2 - x1, 5);
-  for (let x = x1; x <= x2; x += 22) {
+  g.rect(x1, floor - 30, x2 - x1, 4);
+  g.rect(x1, floor - 15, x2 - x1, 4);
+  for (let x = x1; x <= x2; x += 16) {
     g.moveTo(x, floor);
-    g.lineTo(x, floor - 58);
-    g.lineTo(x + 4, floor - 66);
-    g.lineTo(x + 8, floor - 58);
-    g.lineTo(x + 8, floor);
+    g.lineTo(x, floor - 38);
+    g.lineTo(x + 3, floor - 44);
+    g.lineTo(x + 6, floor - 38);
+    g.lineTo(x + 6, floor);
     g.closePath();
   }
   g.fill(INK);
@@ -334,14 +370,6 @@ function tufts(g, x1, x2, y, step = 14) {
     g.lineTo(x + 5, y + 1);
   }
   g.fill(INK);
-}
-
-function flowers(g, x, y, n, seed = 1) {
-  for (let i = 0; i < n; i++) {
-    const a = Math.sin(seed * 31 + i * 7.3);
-    const b = Math.cos(seed * 17 + i * 3.1);
-    g.ellipse(x + a * n * 9, y - 6 - Math.abs(b) * 14, 13 + Math.abs(a) * 9, 8 + Math.abs(b) * 5).fill({ color: i % 3 ? RED : RED_DARK, alpha: 0.95 });
-  }
 }
 
 function drawGround(g, W, H, floor) {
@@ -381,24 +409,68 @@ function lightRays(PIXI) {
   return g;
 }
 
-/** Backdrop wood on a parallax layer: factor f, viewed from ground camY0. */
-function woodLayer(PIXI, root, f, z, { W, floor, count, trunk, leaf, leafAlpha, minH, maxH, seed }) {
+/**
+ * One haze layer of the backdrop wood on a parallax layer (factor f, viewed from ground camY0):
+ * limbo1's blurred gnarled trees, tinted to the layer, with red leaf puffs on their branch tips.
+ */
+function woodLayer(PIXI, root, haze, z, { W, floor, count, minH, maxH, seed }) {
+  const { f } = haze;
   const layer = root.layer(f, z);
   const camY0 = floor - 306;
   const base = floor - camY0 * (1 - f) - (1 - f) * 24;
   const span = f * (W - 960) + 1100;
-  const g = new PIXI.Graphics();
+  const puffs = ['tree_foliage_red_big', 'tree_foliage_red_small', 'tree_foliage_red_small2'];
   for (let i = 0; i < count; i++) {
     const x = (i + 0.5) * (span / count) + Math.sin(seed + i * 2.7) * 40;
     const h = minH + (Math.sin(seed * 3 + i * 1.9) * 0.5 + 0.5) * (maxH - minH);
-    drawWoodTree(g, x, base, h, trunk, leaf, leafAlpha, seed + i);
+    const plain = i % 5 === 3;
+    const name = plain ? 'blur_tree_01_white' : 'blur_tree_03_white';
+    const [, tw, th] = AN_AUTUMN_DAY_FILES[name];
+    const scale = h / th;
+    const flip = (i + seed) % 2 === 1;
+    layer.addChild(art(PIXI, name, x, base + 8, { scale, flip, tint: haze.tint, alpha: haze.alpha }));
+    if (plain) continue;
+    for (let k = 0; k < 3; k++) {
+      const [fx, fy] = PUFF_TIPS[(i * 3 + k + seed) % PUFF_TIPS.length];
+      const px = x + (flip ? -fx : fx) * tw * scale;
+      const py = base + 8 - h * (1 - fy);
+      const puff = puffs[(i + k) % puffs.length];
+      const ps = (h / 900) * (puff === 'tree_foliage_red_big' ? 0.75 : 1.1);
+      layer.addChild(art(PIXI, puff, px, py + 10 * ps, { scale: ps, alpha: haze.puff, flip: k % 2 === 1 }));
+    }
   }
-  layer.addChild(g);
   return layer;
 }
 
-function bareTree(PIXI, kit, name, x, floor, scale, flip = false) {
-  return kit.deco(PIXI, name, x, floor + 6, { scale, flip, tint: INK });
+/** A red bush on the ground, sometimes with a cattail sprig beside it. */
+function bush(PIXI, layer, x, floor, scale, sprig = false) {
+  layer.addChild(art(PIXI, 'tree_foliage_red_big', x, floor + 10, { scale }));
+  if (sprig) {
+    layer.addChild(art(PIXI, 'willow_01', x - 70 * scale, floor + 4, { scale: 0.9 }));
+    layer.addChild(art(PIXI, 'willow_02', x - 58 * scale, floor + 4, { scale: 0.75, flip: true }));
+  }
+}
+
+/** The Snaps' heavy vignette: dark corners and edges, fixed to the screen. */
+let vignetteCanvas = null;
+function vignette(PIXI) {
+  if (!vignetteCanvas && typeof document !== 'undefined') {
+    const cv = document.createElement('canvas');
+    cv.width = 480;
+    cv.height = 270;
+    const g = cv.getContext('2d');
+    const grad = g.createRadialGradient(240, 125, 70, 240, 135, 290);
+    grad.addColorStop(0, 'rgba(20,6,4,0)');
+    grad.addColorStop(0.55, 'rgba(20,6,4,0.12)');
+    grad.addColorStop(1, 'rgba(20,6,4,0.62)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 480, 270);
+    vignetteCanvas = cv;
+  }
+  const spr = new PIXI.Sprite(vignetteCanvas ? PIXI.Texture.from(vignetteCanvas) : PIXI.Texture.EMPTY);
+  spr.width = 960;
+  spr.height = 540;
+  return spr;
 }
 
 function ghost(PIXI, kit, x, y, scale, alpha = 0.55) {
@@ -413,25 +485,20 @@ function drawMain(ctx) {
   sky.addChild(skyGradient(PIXI, kit, W + PAD, H, FLOOR));
   const screen = root.layer(0, 1);
   screen.addChild(lightRays(PIXI));
-  woodLayer(PIXI, root, 0.3, 2, {
-    W: W + PAD, floor: FLOOR, count: 15, trunk: { color: 0x6e4a48, alpha: 0.5 }, leaf: 0xb4503a, leafAlpha: 0.45, minH: 420, maxH: 720, seed: 3,
-  });
-  const mid = woodLayer(PIXI, root, 0.55, 3, {
-    W: W + PAD, floor: FLOOR, count: 13, trunk: { color: 0x3a2524, alpha: 0.78 }, leaf: 0x9a3222, leafAlpha: 0.7, minH: 480, maxH: 820, seed: 11,
-  });
+  woodLayer(PIXI, root, HAZE[0], 2, { W: W + PAD, floor: FLOOR, count: 15, minH: 380, maxH: 520, seed: 3 });
+  const mid = woodLayer(PIXI, root, HAZE[1], 3, { W: W + PAD, floor: FLOOR, count: 12, minH: 430, maxH: 590, seed: 11 });
   // The pink spirits that stand among the trees (footage), on the middle layer.
   const camY0 = FLOOR - 306;
   const midBase = FLOOR - camY0 * 0.45 - 10;
   for (const [x, s] of [[560, 0.36], [1230, 0.42], [1720, 0.34], [2160, 0.4]]) mid.addChild(ghost(PIXI, kit, x, midBase, s));
+  woodLayer(PIXI, root, HAZE[2], 3.5, { W: W + PAD, floor: FLOOR, count: 9, minH: 480, maxH: 660, seed: 17 });
+  root.layer(0, 8).addChild(vignette(PIXI));
   const world = root.layer(1, 4);
   const g = new PIXI.Graphics();
   const props = mainProps();
-  // Tall bare trees in front of the wood.
-  for (const [name, x, s, flip] of [
-    ['heights_tree_bare_1', 120, 0.42, false], ['heights_tree_bare_3', 760, 0.6, true], ['tree_bare_tall_1', 1430, 0.45, false],
-    ['heights_tree_bare_2', 2060, 0.62, false], ['heights_tree_bare_1', 2620, 0.4, true], ['heights_tree_bare_4', 3700, 0.55, false],
-    ['tree_bare_thin_1', 4290, 0.5, true],
-  ]) world.addChild(bareTree(PIXI, kit, name, x, FLOOR, s, flip));
+  // Thin bare saplings in front of the wood.
+  for (const [x, h, seed] of MAIN_SAPLINGS) drawSapling(g, x, FLOOR, h, seed);
+  for (const [x, s, sprig] of MAIN_BUSHES) bush(PIXI, world, x, FLOOR, s, sprig);
   // A huge black trunk frames the clearing (the footage's dark left edge).
   g.moveTo(2975, FLOOR + 6);
   g.bezierCurveTo(3010, FLOOR - 300, 2990, FLOOR - 700, 3030, 0);
@@ -441,8 +508,7 @@ function drawMain(ctx) {
   g.fill(INK);
   drawGround(g, W + PAD, H, FLOOR);
   drawBench(g, props.bench.x, props.bench.y);
-  drawFence(g, 560, 700, FLOOR);
-  drawFence(g, 4230, 4390, FLOOR);
+  drawFence(g, 4250, 4380, FLOOR);
   for (const x of props.lamps) drawLamp(g, x, FLOOR);
   for (const s of props.stones) drawStone(g, s, FLOOR);
   for (const w of props.walls) drawRockWall(g, w, FLOOR);
@@ -454,9 +520,6 @@ function drawMain(ctx) {
   g.lineTo(props.trunk.x2 + 6, props.trunk.top + 24);
   g.fill(INK);
   tufts(g, props.trunk.x1 + 10, props.trunk.x2 - 10, props.trunk.top, 12);
-  for (const [x, n, s] of [[460, 5, 1], [820, 4, 2], [1530, 6, 3], [2240, 5, 4], [2470, 4, 5], [3260, 7, 6], [3900, 6, 7], [4340, 4, 8]]) {
-    flowers(g, x, FLOOR + 2, n, s);
-  }
   world.addChild(g);
   const caption = wordText(PIXI, CAPTION, { size: 19, weight: '700', fill: 0xf4e6d6 });
   caption.x = CAPTION_AT.x;
@@ -507,27 +570,24 @@ function drawFeelingRoom(ctx, feeling) {
     sky.addChild(sun);
   }
   screen.addChild(lightRays(PIXI));
-  woodLayer(PIXI, root, 0.35, 2, {
-    W: W + PAD, floor: FLOOR, count: 10, trunk: { color: 0x6e4a48, alpha: 0.5 }, leaf: 0xb4503a, leafAlpha: 0.5, minH: 380, maxH: 560, seed: 21,
-  });
-  woodLayer(PIXI, root, 0.6, 3, {
-    W: W + PAD, floor: FLOOR, count: 9, trunk: { color: 0x3a2524, alpha: 0.8 }, leaf: 0x9a3222, leafAlpha: 0.7, minH: 420, maxH: 620, seed: 29,
-  });
+  woodLayer(PIXI, root, HAZE[0], 2, { W: W + PAD, floor: FLOOR, count: 9, minH: 380, maxH: 500, seed: 21 });
+  woodLayer(PIXI, root, HAZE[1], 3, { W: W + PAD, floor: FLOOR, count: 7, minH: 420, maxH: 560, seed: 29 });
+  woodLayer(PIXI, root, HAZE[2], 3.5, { W: W + PAD, floor: FLOOR, count: 5, minH: 470, maxH: 620, seed: 33 });
+  root.layer(0, 8).addChild(vignette(PIXI));
   const world = root.layer(1, 4);
-  for (const [name, x, s, flip] of [['heights_tree_bare_3', 230, 0.5, false], ['heights_tree_bare_1', 1010, 0.36, true], ['tree_bare_tall_1', 1330, 0.36, false]]) {
-    world.addChild(bareTree(PIXI, kit, name, x, FLOOR, s, flip));
-  }
+  for (const [x, s, sprig] of FEELING_BUSHES) bush(PIXI, world, x, FLOOR, s, sprig);
   if (warm) {
     world.addChild(kit.glow(PIXI, 780, FLOOR - 166, 0xffc56a, 90)).alpha = 0.32;
     world.addChild(ghost(PIXI, kit, 560, FLOOR + 2, 0.24, 0.8));
     world.addChild(ghost(PIXI, kit, 700, FLOOR + 2, 0.2, 0.8));
   }
   const g = new PIXI.Graphics();
+  // The two saplings that frame the view.
+  for (const [x, h, seed] of FEELING_SAPLINGS) drawSapling(g, x, FLOOR, h, seed);
   drawGround(g, W + PAD, H, FLOOR);
   drawBench(g, lay.bench.x, lay.bench.y);
   if (warm) drawLamp(g, 780, FLOOR);
-  drawFence(g, 1210, 1390, FLOOR);
-  for (const [x, n, s] of [[420, 5, 2], [880, 6, 3], [1150, 4, 4]]) flowers(g, x, FLOOR + 2, n, s);
+  drawFence(g, 1260, 1390, FLOOR);
   world.addChild(g);
   const exit = wordText(PIXI, 'exit', { size: 16, weight: '800', fill: 0x2a1a14 });
   exit.x = lay.exit.x;

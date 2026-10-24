@@ -1,0 +1,81 @@
+{
+ "source": "tinyspeck/glitch-locations arbito1.swf, quest01.swf (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "door_asset_purple": {
+   "scale": 0.93,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    107.0,
+    193.95
+   ],
+   "px": [
+    199,
+    361
+   ],
+   "file": "door_asset_purple@2x.webp",
+   "swf": "bundle:arbito1.swf#door_asset_purple",
+   "swf_sha": "578aabb7e90d9b7c",
+   "key": "578aabb7e90d9b7c:0.93:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    199,
+    361
+   ],
+   "world": [
+    100,
+    181
+   ],
+   "bytes": 25144,
+   "lossless": true,
+   "err": 6.58,
+   "sha": "e90299e6c2cabcc9"
+  },
+  "unclutter_your_mind_keita_pic": {
+   "scale": 0.5,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    900.0,
+    600.0
+   ],
+   "px": [
+    900,
+    600
+   ],
+   "file": "unclutter_your_mind_keita_pic@2x.webp",
+   "swf": "bundle:quest01.swf#unclutter_your_mind_keita_pic",
+   "swf_sha": "38fbc5ee8ac5fca1",
+   "key": "38fbc5ee8ac5fca1:0.5:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    900,
+    600
+   ],
+   "world": [
+    450,
+    300
+   ],
+   "bytes": 48376,
+   "lossless": false,
+   "err": 3.98,
+   "sha": "594a7503481ee09b"
+  }
+ }
+}

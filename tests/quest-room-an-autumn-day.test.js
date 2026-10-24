@@ -209,3 +209,41 @@ describe('An Autumn Day: the feeling rooms', () => {
     }
   });
 });
+
+describe('An Autumn Day: the look of the Snaps (G75)', () => {
+  it('draws three haze layers of CC0 limbo1 trees with red puffs, saplings, bushes and a far-right fence', async () => {
+    const { createHash } = await import('node:crypto');
+    const { readFileSync } = await import('node:fs');
+    const { join, dirname } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
+    const { AN_AUTUMN_DAY_FILES } = await import('../public/js/an-autumn-day-art.js');
+    const mod = await import('../public/js/quest-rooms/an-autumn-day.js');
+    const plan = JSON.parse(readFileSync(join(spike, 'tools/room-art/an_autumn_day.json'), 'utf8'));
+    assert.match(plan.source, /glitch-locations limbo1\.swf \(CC0\)/);
+    assert.deepEqual(Object.keys(plan.pieces).sort(), Object.keys(AN_AUTUMN_DAY_FILES).sort());
+    for (const [name, row] of Object.entries(plan.pieces)) {
+      const [file, w, h] = AN_AUTUMN_DAY_FILES[name];
+      assert.deepEqual([file, w, h], [row.file, ...row.world]);
+      const bytes = readFileSync(join(spike, 'public/assets/sprites/quest-rooms/an_autumn_day', file));
+      assert.equal(createHash('sha256').update(bytes).digest('hex').slice(0, 16), row.sha, `${file} changed since the build`);
+    }
+    assert.equal(plan.pieces.blur_tree_03_white.swf, 'bundle:limbo1.swf#blur_tree_03');
+    // Three haze layers, far to near: slower parallax first, each darker and more opaque.
+    assert.equal(mod.HAZE.length, 3);
+    for (let i = 1; i < 3; i++) {
+      assert.ok(mod.HAZE[i].f > mod.HAZE[i - 1].f);
+      assert.ok(mod.HAZE[i].alpha > mod.HAZE[i - 1].alpha);
+    }
+    // About two saplings to a view, two in each feeling room; bushes on the ground.
+    assert.ok(mod.MAIN_SAPLINGS.length >= Math.floor(mod.MAIN.W / 960));
+    assert.equal(mod.FEELING_SAPLINGS.length, 2);
+    for (const [x] of [...mod.MAIN_SAPLINGS, ...mod.MAIN_BUSHES]) assert.ok(x >= 0 && x <= mod.MAIN.W);
+    for (const [x] of [...mod.FEELING_SAPLINGS, ...mod.FEELING_BUSHES]) assert.ok(x >= 0 && x <= mod.ROOM.W);
+    const src = readFileSync(join(spike, 'public/js/quest-rooms/an-autumn-day.js'), 'utf8');
+    // The only fences are small ones at each place's far right.
+    const fences = [...src.matchAll(/drawFence\(g, (\d+), (\d+), FLOOR\)/g)].map((m) => [+m[1], +m[2]]);
+    assert.deepEqual(fences, [[4250, 4380], [1260, 1390]]);
+    assert.doesNotMatch(src, /drawWoodTree|heights_tree_bare/);
+  });
+});

@@ -260,3 +260,20 @@ describe('Walk Toward the Light (light_perspective)', () => {
     for (const p of layout.panels) assert.ok(p.surface - p.bulbY <= 160);
   });
 });
+
+describe('Walk Toward the Light: the look of the Snaps (G78)', () => {
+  it('draws lamp shades, wired bulbs, wooden dishes, striped poles and a plank EXIT', async () => {
+    const { readFileSync, existsSync } = await import('node:fs');
+    const { join, dirname } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
+    const src = readFileSync(join(spike, 'public/js/quest-rooms/light-perspective.js'), 'utf8');
+    for (const fn of ['function drawShade(', 'function drawPole(', 'Bare bulbs hang on long wires', "'firebog_sign_blank_plank'", "'EXIT'"]) {
+      assert.ok(src.includes(fn), fn);
+    }
+    assert.ok(!src.includes("'sign_exit_starter_01a'"), 'the lit EXIT box is gone');
+    for (const d of ['firebog_sign_blank_plank', 'hanging_lightbulb', 'door_asset_gray']) {
+      assert.ok(existsSync(join(spike, 'public/assets/decos/groddle', `${d}.webp`)), d);
+    }
+  });
+});

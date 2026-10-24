@@ -557,3 +557,13 @@ test('Updraft and Drafty Uplift carry an unconfirmed-release note shown to playe
   const game = fs.readFileSync(path.join(publicDir, 'game.js'), 'utf8');
   assert.match(game, /course\.releaseLine \? `\$\{course\.ticketDesc\} \$\{course\.releaseLine\}`/);
 });
+
+test('Abysmal Thrill water is the clearer teal-blue of its Snap, never near-black (G79)', () => {
+  const course = EXTRA_PARADISE_COURSES.abysmal_thrill;
+  const lum = (c) => 0.299 * ((c >> 16) & 0xff) + 0.587 * ((c >> 8) & 0xff) + 0.114 * (c & 0xff);
+  // The Snap's mid-depth water samples #0c2134 (luminance ~29); the old bottom stop was #03060c (~5).
+  for (const c of course.palette) {
+    assert.ok(lum(c) >= 25, `0x${c.toString(16)} too dark`);
+    assert.ok((c & 0xff) > ((c >> 16) & 0xff), `0x${c.toString(16)} is blue over red`);
+  }
+});

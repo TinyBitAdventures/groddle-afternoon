@@ -317,10 +317,10 @@ function paintMountainScaling(root, course, fg, art) {
 }
 
 function paintAbysmalThrill(root, course, fg, art) {
-  // Light from the surface: soft rays fading out with depth.
+  // Light from the surface: soft rays fading out with depth (the Snap's shafts are plain to see).
   for (let index = 0; index < 7; index += 1) {
     const ray = deco(art, root, 'bureaucratic_hall_light_ray_1', 300 + index * 150, -60 + (index % 2) * 80, {
-      width: 520, height: 1700, ay: 0, alpha: 0.12, tint: 0x9fd4ff, z: -60,
+      width: 520, height: 1700, ay: 0, alpha: 0.2, tint: 0xb4e2ff, z: -60,
       rotation: -0.18 + index * 0.06, blend: 'add',
     });
     ray._phase = index * 0.9;

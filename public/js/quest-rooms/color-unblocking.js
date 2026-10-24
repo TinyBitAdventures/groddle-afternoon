@@ -11,10 +11,19 @@
  * quest's own description ("Unblock your way to the exit, collecting rewards
  * along the way") with the source's mechanism: wall switches (items/
  * wall_switch.js, toggle mode) broadcast events that switch coloured blocks
- * on and off. Art: the recovered wooden toy blocks (block_red, block_deepblue,
- * block_deepgreen, block_orange, block_purple 360x350), wall_switch lockUp /
- * lockDown, door_asset_yellowPurple, sign_exit_starter_01a and the
- * npc_crab idle/talk sheets (131x129 frames).
+ * on and off. Art: wall_switch lockUp / lockDown, the arbito1 purple door
+ * and the npc_crab idle/talk sheets (131x129 frames).
+ *
+ * Look (G69): players' Snaps (research/wayback/raw/snaps/
+ * puzzle_level_color_blockage and _rem, reference only) show a white void,
+ * square felt blocks in red, yellow and charcoal on a charcoal felt floor, a
+ * purple door (arbito1.swf door_asset_purple), and a finale page: Keita Takahashi's four doodled block
+ * characters under "Thank you for playing with us! See you !!", which is the
+ * CC0 quest01.swf deco unclutter_your_mind_keita_pic (tools/room-art
+ * color_unblocking). The felt is drawn here (a seeded fibre texture, tinted to
+ * the colours sampled from the Snaps and that drawing); the five switch
+ * groups keep their mechanics and wear the source palette: red, blue, yellow
+ * (the remake's green group), charcoal (purple) and an orange bridge.
  *
  * Layout (one switch press per colour reaches the door):
  *  1. A red tower blocks the floor; its switch is right before it.
@@ -28,6 +37,8 @@
  */
 
 import { COLORS, JUMP_RISE, lastCheckpoint, makeSwitch, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=cu-1';
+import { COLOR_UNBLOCKING_FILES } from '../color-unblocking-art.js';
+import { textureFromUrl } from '../textures.js';
 
 const W = 3700;
 const H = 1040;
@@ -36,6 +47,69 @@ const CELL = 80;
 const PIT = { x1: 2180, x2: 2740 };
 const FALL_Y = 990;
 const ART = 'assets/sprites/quest-rooms/color_unblocking/';
+
+/**
+ * Felt per switch group: the colour its blocks and switch plate wear and the name the switch
+ * goes by. Sampled from the Snaps (red #db2d2b, yellow #dad716, charcoal #4a4a45) and the finale
+ * drawing (blue #336edd); the bridge keeps an orange felt of the same weight.
+ */
+export const FELT = Object.freeze({
+  red: Object.freeze({ hex: 0xdb2d2b, css: '#db2d2b', label: 'Red' }),
+  blue: Object.freeze({ hex: 0x336edd, css: '#336edd', label: 'Blue' }),
+  green: Object.freeze({ hex: 0xdad716, css: '#c9c512', label: 'Yellow' }),
+  purple: Object.freeze({ hex: 0x4a4a45, css: '#4a4a45', label: 'Charcoal' }),
+  orange: Object.freeze({ hex: 0xe58a24, css: '#e58a24', label: 'Orange' }),
+});
+export const FELT_FLOOR = 0x4a4a45;
+export const FINALE_ART = 'unclutter_your_mind_keita_pic';
+/** How long the finale page stays up before the room closes. */
+export const FINALE_MS = 3600;
+
+/** A seeded felt texture (greyscale fibres on near-white), tinted per block. */
+let feltCanvas = null;
+function feltTexture(PIXI) {
+  if (!feltCanvas && typeof document !== 'undefined') {
+    const n = 128;
+    const cv = document.createElement('canvas');
+    cv.width = n;
+    cv.height = n;
+    const g = cv.getContext('2d');
+    g.fillStyle = '#efefef';
+    g.fillRect(0, 0, n, n);
+    let seed = 7;
+    const rnd = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 2 ** 32);
+    // Short fibres in every direction, drawn wrapped so the tile repeats cleanly.
+    for (let i = 0; i < 2600; i++) {
+      const x = rnd() * n;
+      const y = rnd() * n;
+      const a = rnd() * Math.PI;
+      const len = 2 + rnd() * 5;
+      const v = Math.round(214 + rnd() * 41);
+      g.strokeStyle = `rgba(${v},${v},${v},${(0.35 + rnd() * 0.4).toFixed(2)})`;
+      g.lineWidth = 0.8 + rnd() * 0.8;
+      for (const [ox, oy] of [[0, 0], [-n, 0], [0, -n], [-n, -n]]) {
+        g.beginPath();
+        g.moveTo(x + ox, y + oy);
+        g.lineTo(x + ox + Math.cos(a) * len, y + oy + Math.sin(a) * len);
+        g.stroke();
+      }
+    }
+    feltCanvas = cv;
+  }
+  return feltCanvas ? PIXI.Texture.from(feltCanvas) : PIXI.Texture.WHITE;
+}
+
+/** A felt rectangle: the fibre texture tinted to a colour, with a faint darker edge. */
+function feltRect(PIXI, w, h, color) {
+  const c = new PIXI.Container();
+  const t = new PIXI.TilingSprite({ texture: feltTexture(PIXI), width: w, height: h });
+  t.tint = color;
+  c.addChild(t);
+  const edge = new PIXI.Graphics();
+  edge.rect(0.5, 0.5, w - 1, h - 1).stroke({ width: 1.5, color: 0x000000, alpha: 0.12 });
+  c.addChild(edge);
+  return c;
+}
 
 /** Every block: a column of `rows` cells standing on `base` (default the floor). */
 export function colorLayout() {
@@ -158,36 +232,39 @@ export const room = {
     ctx.data.on = new Set(Object.keys(COLORS));
     const root = kit.sceneRoot(PIXI, W, H);
     const sky = root.layer(0, 0);
-    sky.addChild(kit.gradient(PIXI, [[0, '#ffe9c2'], [0.6, '#fff7e6'], [1, '#ffffff']], 960, 640));
-    const far = root.layer(0.25, 1);
-    for (let i = 0; i < 9; i++) far.addChild(kit.deco(PIXI, 'block_cloud01', 200 + i * 520, 260 + (i % 3) * 50, { scale: 0.32, alpha: 0.75 }));
-    for (let i = 0; i < 6; i++) far.addChild(kit.deco(PIXI, i % 2 ? 'block_tree01' : 'block_mushroom01', 300 + i * 700, 720, { scale: 0.32, alpha: 0.5 }));
+    // A pure white void (the Snaps).
+    sky.addChild(kit.gradient(PIXI, [[0, '#ffffff'], [1, '#ffffff']], 960, 640));
     const world = root.layer(1, 3);
-    const g = new PIXI.Graphics();
-    // Toy-box floor: a warm wooden band with a lighter top, broken by the pit.
+    // Charcoal felt floor, broken by the pit (which shows the white void).
     for (const f of layout.floors) {
-      g.rect(f.x1, f.y, f.x2 - f.x1, H - f.y).fill(0xc98b4f);
-      g.rect(f.x1, f.y, f.x2 - f.x1, 10).fill(0xe9b77a);
-      for (let x = f.x1 + 40; x < f.x2; x += 120) {
-        g.rect(x, f.y + 22, 70, 6).fill({ color: 0xb5773f, alpha: 0.5 });
-      }
+      const fl = feltRect(PIXI, f.x2 - f.x1, H - f.y + 240, FELT_FLOOR);
+      fl.x = f.x1;
+      fl.y = f.y;
+      world.addChild(fl);
     }
-    g.rect(PIT.x1, FLOOR + 40, PIT.x2 - PIT.x1, H - FLOOR).fill({ color: 0x3c2a1c, alpha: 0.55 });
-    // The blue switch ledge, a grass toy block shelf.
-    world.addChild(g);
-    world.addChild(kit.deco(PIXI, 'block_grass01', (layout.ledge.x1 + layout.ledge.x2) / 2, layout.ledge.y - 8, { ay: 0, scale: (layout.ledge.x2 - layout.ledge.x1 + 20) / 384 }));
+    // The blue switch ledge: a charcoal felt shelf.
+    const ledge = feltRect(PIXI, layout.ledge.x2 - layout.ledge.x1, 34, FELT_FLOOR);
+    ledge.x = layout.ledge.x1;
+    ledge.y = layout.ledge.y;
+    world.addChild(ledge);
+    // Square felt blocks with a hairline of white between neighbours.
     ctx.data.blockSprites = {};
     for (const b of layout.blocks) {
-      const spr = kit.deco(PIXI, COLORS[b.color].block, b.x, b.top + CELL, { scale: CELL / 350, sy: CELL / 350 });
-      spr.width = CELL + 4;
-      spr.height = CELL + 2;
+      const spr = feltRect(PIXI, CELL - 2, CELL - 2, FELT[b.color].hex);
+      spr.x = b.x - CELL / 2 + 1;
+      spr.y = b.top + 1;
       spr.targetAlpha = 1;
       world.addChild(spr);
       ctx.data.blockSprites[b.id] = spr;
     }
-    world.addChild(kit.deco(PIXI, 'door_asset_yellowPurple', layout.door.x, layout.door.y + 4, { scale: 0.62 }));
-    world.addChild(kit.deco(PIXI, 'sign_exit_starter_01a', layout.door.x, layout.door.y - 196, { scale: 0.7 }));
-    world.addChild(kit.label(PIXI, 'START', 160, FLOOR - 120, { size: 22, fill: 0xffffff, stroke: { color: 0xb8742f, width: 5 } }));
+    // The Snaps' purple door (arbito1.swf door_asset_purple), with no sign over it.
+    const [doorFile] = COLOR_UNBLOCKING_FILES.door_asset_purple;
+    const door = new PIXI.Sprite(textureFromUrl(`${ART}${doorFile}`));
+    door.anchor.set(0.5, 1);
+    door.x = layout.door.x;
+    door.y = layout.door.y + 2;
+    world.addChild(door);
+    world.addChild(kit.label(PIXI, 'START', 160, FLOOR - 120, { size: 22, fill: 0xffffff, stroke: { color: FELT_FLOOR, width: 5 } }));
     return {
       label: 'Color Unblocking',
       width: W,
@@ -200,7 +277,15 @@ export const room = {
 
   enter(ctx) {
     const layout = ctx.data.layout;
-    ctx.data.switches = layout.switches.map((s) => makeSwitch(ctx, { ...s, on: !ctx.data.on.has(s.color) }));
+    ctx.data.switches = layout.switches.map((s) => {
+      const sw = makeSwitch(ctx, { ...s, on: !ctx.data.on.has(s.color), label: `${FELT[s.color].label} Switch` });
+      // The plate wears its group's felt colour (puzzle-kit draws it in the shared palette).
+      const plate = sw.container.children[0];
+      plate.clear();
+      plate.roundRect(-27, -64, 54, 62, 12).fill({ color: 0x3b3f45, alpha: 0.35 });
+      plate.roundRect(-24, -66, 48, 58, 11).fill(FELT[s.color].hex).stroke({ width: 3, color: 0xffffff, alpha: 0.9 });
+      return sw;
+    });
     ctx.data.quoins = spawnQuoins(ctx, layout.quoins);
     ctx.data.reached = layout.spawn.x;
     ctx.data.prevX = layout.spawn.x;
@@ -338,7 +423,7 @@ function press(ctx, id) {
   ctx.data.presses.push(id);
   for (const s of ctx.data.switches) if (s.color === sw.color) s.set(!on.has(sw.color));
   ctx.sound('CLICK_SUCCESS', { volume: 0.5 });
-  ctx.floatText(sw.x, sw.y - 90, `${COLORS[sw.color].label} blocks ${on.has(sw.color) ? 'back' : 'gone'}!`, COLORS[sw.color].css);
+  ctx.floatText(sw.x, sw.y - 90, `${FELT[sw.color].label} blocks ${on.has(sw.color) ? 'back' : 'gone'}!`, FELT[sw.color].css);
   syncPlatforms(ctx);
   drawBlocks(ctx);
 }
@@ -354,7 +439,58 @@ async function exit(ctx) {
   ctx.solve();
   ctx.sound('DOOR_OPEN', { volume: 0.6 });
   await ctx.wait(400);
+  await finale(ctx);
   ctx.leave({ transition: ctx.fx() });
+}
+
+/**
+ * The finale page (Snaps PHVE3663QE222O9_120458, PCRDMHR3NDO1FVT_118277): the white void, the
+ * charcoal felt floor and Keita's drawing, shown over the view for FINALE_MS once the door opens.
+ */
+async function finale(ctx) {
+  const { PIXI } = ctx;
+  const cam = ctx.engine.camera;
+  if (!cam || !PIXI) return;
+  const page = new PIXI.Container();
+  const bg = new PIXI.Graphics();
+  bg.rect(-40, -40, cam.w + 80, cam.h + 80).fill(0xffffff);
+  page.addChild(bg);
+  const floorH = 48;
+  const fl = feltRect(PIXI, cam.w + 80, floorH + 40, FELT_FLOOR);
+  fl.x = -40;
+  fl.y = cam.h - floorH;
+  page.addChild(fl);
+  const [file, w, h] = COLOR_UNBLOCKING_FILES[FINALE_ART];
+  const art = new PIXI.Sprite(textureFromUrl(`${ART}${file}`));
+  // Below the room card (the top ~140 px of the view), resting on the floor.
+  const scale = Math.min(1, (cam.h - floorH - 140) / h);
+  art.anchor.set(0.5, 1);
+  art.scale.set(scale);
+  art.x = cam.w / 2;
+  art.y = cam.h - floorH + 14 * scale;
+  page.addChild(art);
+  page.alpha = 0;
+  const follow = () => {
+    const c = ctx.engine.camera;
+    page.x = c.x;
+    page.y = c.y;
+  };
+  follow();
+  ctx.add(page, 900);
+  // The crab steps out of the picture (and any line it was saying goes with its sprite).
+  const crab = ctx.data.crab;
+  if (crab) {
+    ctx.unregister(crab);
+    if (crab.sprite && !crab.sprite.destroyed) crab.sprite.destroy();
+    ctx.data.crab = null;
+  }
+  ctx.setData('cuFinale', `${FINALE_ART}:${Math.round(w * scale)}x${Math.round(h * scale)}`);
+  const t0 = Date.now();
+  while (Date.now() - t0 < FINALE_MS && !page.destroyed) {
+    follow();
+    page.alpha = Math.min(1, (Date.now() - t0) / 500);
+    await ctx.wait(50);
+  }
 }
 
 export const COLOR_ROOM_FACTS = Object.freeze({ W, H, FLOOR, CELL, PIT, JUMP_RISE });

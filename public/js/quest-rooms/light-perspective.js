@@ -36,9 +36,16 @@
  * (slab pillars keep you from walking past a section underneath). Timings
  * are read off the footage (bulbs ~6-10 s); the floor's red light stays on.
  *
- * Art: CoU hanging_lightbulb (bulbs), door_asset_gray (tinted) and
- * sign_exit_starter_01a; spotlight dishes, clouds, light cones, switch
- * panels and rock slabs are drawn as vectors.
+ * Art: the CC0 hanging_lightbulb (bulbs), door_asset_gray (tinted) and
+ * firebog_sign_blank_plank (the EXIT plank); lamp shades, dish platforms,
+ * light cones, striped poles, switch panels and rock slabs are vectors.
+ *
+ * Look (G78): five players' Snaps (research/wayback/raw/snaps/
+ * puzzle_level_light_perspective and _rem, reference only) show ceiling lamp
+ * shades (grey domes, dotted crowns) throwing soft cones, bare bulbs on long
+ * wires from the ceiling, platforms that are shallow wooden dishes tinted by
+ * the light they stand in, tall red-and-pink striped poles and a dark plank
+ * EXIT sign; the sign texts already matched.
  */
 
 import { BODY_H, JUMP_GAP, JUMP_RISE, pushOutOfSolids, spawnQuoins, takeQuoins } from './puzzle-kit.js?v=cu-1';
@@ -393,18 +400,34 @@ function drawSlab(g, s) {
   }
 }
 
+/** Mix two 0xrrggbb colours (t of b). */
+function mixHex(a, b, t) {
+  const m = (sh) => Math.round(((a >> sh) & 0xff) * (1 - t) + ((b >> sh) & 0xff) * t) << sh;
+  return m(16) | m(8) | m(0);
+}
+
+/** A shallow wooden dish platform, tinted by the light it appears in (the Snaps). */
 function drawCloud(PIXI, c) {
   const col = LIGHT_COLORS[c.color];
   const w = c.x2 - c.x1;
+  const wood = 0xa86a34;
+  const top = mixHex(wood, col.hex, 0.55);
+  const rim = mixHex(top, 0xffffff, 0.3);
+  const under = mixHex(wood, col.dim, 0.35);
   const g = new PIXI.Graphics();
-  // Soft glow under the cloud.
-  g.ellipse(0, 6, w / 2 + 18, 22).fill({ color: col.hex, alpha: 0.18 });
-  // Lumpy underside, then a flat bright top.
-  g.ellipse(0, 9, w / 2, 12);
-  for (let i = 0; i < 4; i++) g.circle(-w * 0.3 + i * w * 0.2, 12 + (i % 2) * 2, w * 0.085);
-  g.fill(col.dim);
-  g.ellipse(0, 2, w / 2 + 2, 8).fill(col.hex);
-  g.ellipse(-w * 0.12, 0, w * 0.26, 3).fill({ color: 0xffffff, alpha: 0.28 });
+  // Soft glow under the dish.
+  g.ellipse(0, 10, w / 2 + 18, 22).fill({ color: col.hex, alpha: 0.18 });
+  // The bowl underneath, then the flat top and its rim.
+  g.moveTo(-w / 2, 2);
+  g.bezierCurveTo(-w * 0.42, 15, -w * 0.18, 19, 0, 19);
+  g.bezierCurveTo(w * 0.18, 19, w * 0.42, 15, w / 2, 2);
+  g.closePath();
+  g.fill(under);
+  g.moveTo(-w * 0.3, 12);
+  g.quadraticCurveTo(0, 16, w * 0.3, 12);
+  g.stroke({ width: 2, color: mixHex(under, 0x000000, 0.25), alpha: 0.7 });
+  g.ellipse(0, 2, w / 2, 7).fill(rim);
+  g.ellipse(0, 3, w / 2 - 5, 4.5).fill(top);
   g.x = (c.x1 + c.x2) / 2;
   g.y = c.y;
   return g;
@@ -415,24 +438,50 @@ function drawWall(PIXI, w) {
   const h = w.yBot - w.yTop;
   const width = w.x2 - w.x1;
   g.roundRect(-width, 0, width * 2, h, width).fill({ color: LIGHT_COLORS.red.hex, alpha: 0.16 });
-  for (let y = 0, i = 0; y < h; y += 30, i++) {
-    g.rect(-width / 2 + 3, y, width - 6, Math.min(30, h - y)).fill({ color: i % 2 ? 0xf0786b : 0xc9473d, alpha: 0.95 });
-  }
+  drawPole(g, width - 6, h);
   g.x = (w.x1 + w.x2) / 2;
   g.y = w.yTop;
   return g;
 }
 
-function drawDish(PIXI, x, y) {
+/** A ceiling lamp shade on its wire (the Snaps' grey domes with a dotted crown). */
+function drawShade(PIXI, x, y, color) {
   const g = new PIXI.Graphics();
   g.moveTo(0, -y);
-  g.lineTo(0, -12);
+  g.lineTo(0, -22);
   g.stroke({ width: 2, color: 0x111114, alpha: 1 });
-  g.ellipse(0, -6, 26, 8).fill(0x8a8a90);
-  g.ellipse(0, -2, 22, 5).fill(0x5c5c63);
+  // The lit bulb under the rim.
+  g.ellipse(0, -2, 14, 6).fill({ color: LIGHT_COLORS[color]?.hex ?? 0xfff2c8, alpha: 0.9 });
+  g.ellipse(0, -2, 7, 3).fill({ color: 0xffffff, alpha: 0.9 });
+  // Dome, rim and crown.
+  g.moveTo(-34, -4);
+  g.bezierCurveTo(-30, -20, -14, -26, 0, -26);
+  g.bezierCurveTo(14, -26, 30, -20, 34, -4);
+  g.closePath();
+  g.fill(0x8e8c90);
+  g.ellipse(0, -4, 34, 5).fill(0xb9b7bb);
+  g.ellipse(0, -25, 9, 4).fill(0x6c6a6e);
+  for (let i = 0; i < 9; i++) {
+    const a = Math.PI * (0.12 + (0.76 * i) / 8);
+    g.circle(-Math.cos(a) * 22, -18 - Math.sin(a) * 4, 1.8).fill(0x4a484c);
+  }
   g.x = x;
   g.y = y;
   return g;
+}
+
+/** A tall striped pole (the Snaps' red-and-pink columns), centred on (0, 0) at its top. */
+function drawPole(g, width, h) {
+  const band = 34;
+  for (let y = 0, i = 0; y < h; y += band, i++) {
+    const bh = Math.min(band, h - y);
+    g.rect(-width / 2, y, width, bh).fill(i % 2 ? 0xf3a3a0 : 0xdc4f4c);
+  }
+  // Round shading: darker flanks, a soft highlight left of centre.
+  g.rect(-width / 2, 0, width * 0.18, h).fill({ color: 0x5a1010, alpha: 0.22 });
+  g.rect(width / 2 - width * 0.18, 0, width * 0.18, h).fill({ color: 0x5a1010, alpha: 0.3 });
+  g.rect(-width * 0.22, 0, width * 0.12, h).fill({ color: 0xffffff, alpha: 0.18 });
+  g.ellipse(0, 0, width / 2, 4).fill(0xf6b8b4);
 }
 
 function drawSign(PIXI, kit, s) {
@@ -573,9 +622,17 @@ export const room = {
     for (const l of layout.lights) {
       const c = new PIXI.Container();
       if (l.kind === 'dish') {
-        c.addChild(drawDish(PIXI, l.x, l.y));
+        c.addChild(drawShade(PIXI, l.x, l.y, l.color));
       } else {
         const offs = l.kind === 'double' ? [-14, 14] : [0];
+        // Bare bulbs hang on long wires from the ceiling.
+        const wire = new PIXI.Graphics();
+        for (const dx of offs) {
+          wire.moveTo(l.x + dx, 0);
+          wire.lineTo(l.x + dx, l.y - 80);
+        }
+        wire.stroke({ width: 1.5, color: 0x111114, alpha: 0.9 });
+        c.addChild(wire);
         for (const dx of offs) {
           const b = kit.deco(PIXI, 'hanging_lightbulb', l.x + dx, l.y + 40, { ay: 1, scale: 0.85 });
           c.addChild(b);
@@ -609,7 +666,11 @@ export const room = {
     }
     for (const s of layout.signs) world.addChild(drawSign(PIXI, kit, s));
     world.addChild(kit.deco(PIXI, 'door_asset_gray', layout.door.x, layout.door.y + 2, { scale: 0.52, tint: 0x9a96a6 }));
-    world.addChild(kit.deco(PIXI, 'sign_exit_starter_01a', layout.door.x, layout.door.y - 118, { scale: 0.5 }));
+    // The Snaps' dark plank EXIT sign, tilted, on the floor beside the door.
+    world.addChild(kit.deco(PIXI, 'firebog_sign_blank_plank', layout.door.x - 96, layout.door.y - 26, { ay: 0.5, scale: 0.24, rotation: -0.08, tint: 0x4a474e }));
+    const exitText = kit.label(PIXI, 'EXIT', layout.door.x - 96, layout.door.y - 27, { size: 15, fill: 0xf4f1ea, stroke: { color: 0x1d1b22, width: 2 }, weight: '800' });
+    exitText.rotation = -0.08;
+    world.addChild(exitText);
     return {
       label: 'Walk Toward the Light',
       width: W,

@@ -251,3 +251,22 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
     assert.equal(pc.energy, 48);
   });
 });
+
+describe('Esquibeth: grotto skies from the Snaps (G79)', () => {
+  const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  it('gives the Western Grotto a pale lemon sky with a pink flush, not khaki', () => {
+    const gold = mod.SKY_STOPS.gold.map(([, c]) => c);
+    // A pink flush at the top (red over green), then bright lemon (high red and green, low blue).
+    const [r0, g0] = rgb(gold[0]);
+    assert.ok(r0 > g0, 'pink flush first');
+    const lemon = gold.filter((c) => { const [r, g, b] = rgb(c); return r > 235 && g > 215 && b < 165; });
+    assert.ok(lemon.length >= 2, `lemon stops ${lemon}`);
+    assert.ok(!gold.includes('#d9c6b0') && !gold.includes('#e9d39a'), 'the old khaki stops are gone');
+  });
+  it('keeps the sampled peach-pink and magenta-pink tops for the other grottos', () => {
+    assert.equal(mod.SKY_STOPS.dusk[0][1], '#f9bcb6');
+    assert.equal(mod.SKY_STOPS.rose[0][1], '#eba2e8');
+    assert.equal(mod.SKY_STOPS.rose[1][1], '#f5bfee');
+    for (const stage of ['waterfall_01', 'waterfall_02', 'waterfall_03']) assert.ok(mod.SKY_STOPS[mod.stageLayout(stage).sky], stage);
+  });
+});

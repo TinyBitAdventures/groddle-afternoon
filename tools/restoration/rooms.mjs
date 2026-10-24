@@ -24,15 +24,15 @@ export const ROOM_NOTES = Object.freeze({
     about: "The High Jumper sent you into the Magic Rock's memory-place: a white void with one enormous tree whose branches are too far apart to jump.",
     play: 'Pick up Spinach, activate it from your pack for its jump boost, and climb the alternating branches to the top. The Rock nags if you forget the Spinach.',
     source: "The two-minute visit, the Rock's lines (\"Trial and error, baby. Just get started…\") and its 30 and 45 second nags, the free energy, and the top_of_tree flag.",
-    rebuilt: 'The tree is rebuilt from the GlitchAddict recording with recovered branch decos; each gap needs the Spinach jump.',
+    rebuilt: "The tree is rebuilt from the GlitchAddict recording with recovered branch and trunk decos; each gap needs the Spinach jump. A player's Snap gives the look (pure white, a flared root base) and the place's own name, The Gold Hatted, Bouncing, High Jumping Memory Place.",
     footage: [{ id: 'cY1G2GIoJ94', label: 'The High Jumper (GlitchAddict)' }],
   },
   color_unblocking: {
     tagline: 'Wall switches that make coloured blocks vanish.',
-    about: 'Color Unblocking was the first of the colour puzzle levels: switches on the wall turn coloured toy blocks on and off, and you have to clear a path to the exit.',
-    play: 'Press switches to remove red, green, blue and purple towers in the right order; one switch also drops a bridge, so order matters. The first finish earns the Play Cube, which lets you replay every puzzle level.',
+    about: 'Color Unblocking was the first of the colour puzzle levels: switches on the wall turn coloured felt blocks on and off, and you have to clear a path to the exit.',
+    play: 'Press switches to remove red, yellow, blue and charcoal towers in the right order; one switch also drops a bridge, so order matters. Through the door, a thank-you page from the level designer. The first finish earns the Play Cube, which lets you replay every puzzle level.',
     source: 'The five-minute limit, the exit flag, the crab at the end, the 250 iMG / 100 energy / 50 Ti favor reward and the Play Cube.',
-    rebuilt: "The level's layout and switch scripts were lost; it is rebuilt from the level designer's run-throughs using the original toy-block and switch art.",
+    rebuilt: "The level's layout and switch scripts were lost; it is rebuilt from the level designer's run-throughs with the original switch art. Players' Snaps give the look: a white void, felt blocks, a charcoal felt floor, the purple door and Keita Takahashi's finale drawing, which survives as Tiny Speck's own art.",
     footage: [{ id: 'b_oNR5Qzf_I', label: 'Colour Unblocking (level designer)' }, { id: 'mpDOdmZbXA4', label: 'Colour Unblocking (SnygystFS)' }],
   },
   vision_quest: {
@@ -72,7 +72,7 @@ export const ROOM_NOTES = Object.freeze({
     about: "Carry That Weight sent you to the Juju Bandits' hideout, where Grandma sets you hunting for her lost Ancestral Paperweight with secret clues.",
     play: "Hear Grandma's briefing, take the trowel and the first hint, then read each riddle to find the right street in Kajuu and dig there. Three clues lead to the Paperweight; bring it back to her for Part II.",
     source: "Grandma's conversations, the clue table (four hubs × five streets), the grandson's scene and its lines, the 20 archived dig spots and the rewards.",
-    rebuilt: "The hideout's geometry was lost; it is built from the camp's own tent, campfire and paper decos.",
+    rebuilt: "The hideout's geometry was lost. Four players' Snaps show it at dusk, so it is built from the camp's own decos under a mauve sky: two teepees, Grandma's tall wooden chair, stacks of paper, the campfire and a dirt mound.",
     footage: [],
   },
   picto_pattern: {
@@ -80,7 +80,7 @@ export const ROOM_NOTES = Object.freeze({
     about: 'Picto-Pattern was a number puzzle: turn a starting number into 11 in a set number of steps, using tally-mark clouds.',
     play: "At each of three stations, press the coloured step buttons to fill a chain of clouds. A wrong total flashes red and empties; the right one turns the chain into walkable clouds that lead on.",
     source: 'The five-minute limit, the target of 11, the solved and leave flags, and the reward of 11 Cloud 11 Smoothies.',
-    rebuilt: "The three puzzles (14 in three steps, 8 in four, 1 in six) are taken from the level designer's run-through; clouds and tally marks are drawn fresh.",
+    rebuilt: "The three puzzles (14 in three steps, 8 in four, 1 in six) are taken from the level designer's run-through; tally marks are drawn fresh. Two players' Snaps show it is felt craft, so the clouds are Tiny Speck's own stitched felt clouds and the ground their felt grass, recoloured to the Snaps' pale green.",
     footage: [{ id: 'UryaMaICZFg', label: 'Picto Pattern (level designer)' }],
   },
   radiant_glare: {
@@ -96,7 +96,7 @@ export const ROOM_NOTES = Object.freeze({
     about: 'Walk Toward the Light taught colour mixing step by step: each lesson adds a new way light can help or hinder you.',
     play: 'Seven lessons: timed bulbs, red walls that orbs put out, a "fall" section, and switches that mix red, yellow and blue into the colour that crosses, ending at "Astounding! You truly are a Champ!"',
     source: 'The five-minute limit, the solved flag at the exit door and both reward sets.',
-    rebuilt: "Rebuilt from the level designer's run-through, using his sign text for each lesson.",
+    rebuilt: "Rebuilt from the level designer's run-through, using his sign text for each lesson. Players' Snaps give the look: lamp shades throwing soft cones, bare bulbs on long wires, wooden dishes tinted by their light, red-and-pink striped poles and a plank EXIT sign.",
     footage: [{ id: 'Et0RkY43A5Q', label: 'Walk Toward the Light (level designer)' }],
   },
   mental_block: {
@@ -112,7 +112,7 @@ export const ROOM_NOTES = Object.freeze({
     about: "An Autumn Day, the sequel to A Summer's Day, was a short shared memory of the Giants: a black-on-sunset wood and a feeling to recall.",
     play: 'Follow the crow, climb the floating words, and jump into the scrambled sentence to put "Almost forgot this feeling of …" back together. The last word picks a feeling room with a hidden Qurazy quoin.',
     source: 'The four linked places, the five-minute limit, the leave flag and the hourly repeat; the original AUTUMN_DAY music.',
-    rebuilt: "Layout and puzzle rebuilt from Lily Linguistic's recording; the feeling rooms beyond Wonder are drawn from their names.",
+    rebuilt: "Layout and puzzle rebuilt from Lily Linguistic's recording; the feeling rooms beyond Wonder are drawn from their names. Players' Snaps give the backdrop every room shares: three hazy layers of gnarled trees with red leaf puffs (Tiny Speck's own limbo trees), two bare saplings, red bushes and a heavy vignette.",
     footage: [{ id: 'OuO_TtcfAyI', label: 'An Autumn Day (Lily Linguistic)' }],
   },
   esquibeth: {
@@ -120,7 +120,7 @@ export const ROOM_NOTES = Object.freeze({
     about: "The Last Pilgrimage of Esquibeth retold a Glitch legend: follow her ghost through grottos and up a waterfall, collecting notes and replaying her song at each Giant stone.",
     play: 'Find the notes, then play back the ghost\'s melody (click or keys 1 to 5). At the top, Esquibeth dances, Grendaline appears, and you keep the Conch as a memento.',
     source: "The quest rules and rewards, the Conch's Play and Blow, the Hollow's own background painting, and the melody Esquibeth's ghost plays at each stone, all from Tiny Speck's overlay files.",
-    rebuilt: 'Narration was read from two full recordings, and her song (E G D, E C, A D) was matched from their audio against the recovered bell sounds.',
+    rebuilt: "Narration was read from two full recordings, and her song (E G D, E C, A D) was matched from their audio against the recovered bell sounds. Each grotto's sky colour is sampled from players' Snaps and a recording: peach-pink, pale lemon with a pink flush, magenta-pink.",
     footage: [{ id: 'BgRgIaeaj9Q', label: 'The Last Pilgrimage of Esquibeth' }, { id: 'fvin5awPESI', label: 'The Last Pilgrimage of Esquibeth (SnygystFS)' }],
   },
   being_watched: {

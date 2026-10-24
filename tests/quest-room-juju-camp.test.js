@@ -197,3 +197,30 @@ describe('Juju Hideout room', () => {
     assert.deepEqual(mod.room.onLeave(ctx(false, 'help_juju_bandits_2'), 'complete'), { leaveFlag: false });
   });
 });
+
+describe('Juju Hideout look (G70, players Snaps)', () => {
+  it('is dusk, with two teepees, the papers, the campfire, the chair and a dirt mound', async () => {
+    const { JUJU_CAMP_FILES } = await import('../public/js/juju-camp-art.js');
+    const { createHash } = await import('node:crypto');
+    const plan = JSON.parse(readFileSync(join(ROOT, '..', 'tools/room-art/juju_camp.json'), 'utf8'));
+    // A mauve to pink-brown sky, no daytime blue anywhere in it.
+    for (const [, hex] of mod.JUJU_DUSK.sky) {
+      const [r, , b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+      assert.ok(r > b, `${hex} is warm`);
+    }
+    const names = mod.CAMP_PIECES.map(([n]) => n);
+    assert.equal(names.filter((n) => n === 'juju_grandma_tent_01a_al1').length, 2);
+    const tents = mod.CAMP_PIECES.filter(([n]) => n.includes('tent')).map(([, x]) => x);
+    assert.ok(Math.min(...tents) < mod.GRANDMA_X && Math.max(...tents) > mod.GRANDMA_X, 'teepees either side of Grandma');
+    for (const n of ['juju_grandma_papers_01a_al1', 'juju_grandma_campfire_01a_al1']) assert.ok(names.includes(n), n);
+    for (const n of new Set([...names, 'mound_dirt_2', 'rock_rubble_01a_al1'])) {
+      assert.ok(existsSync(join(ROOT, 'assets/decos/groddle', `${n}.webp`)), n);
+    }
+    // The chair is a room-art render of the CC0 alpine_landscape deco, matching its plan.
+    assert.match(plan.source, /glitch-locations alpine_landscape\.swf \(CC0\)/);
+    const [file, w, h] = JUJU_CAMP_FILES.juju_grandma_chair_01a_al1;
+    assert.deepEqual([file, w, h], [plan.pieces.juju_grandma_chair_01a_al1.file, ...plan.pieces.juju_grandma_chair_01a_al1.world]);
+    const bytes = readFileSync(join(ROOT, 'assets/sprites/quest-rooms/juju_camp', file));
+    assert.equal(createHash('sha256').update(bytes).digest('hex').slice(0, 16), plan.pieces.juju_grandma_chair_01a_al1.sha);
+  });
+});

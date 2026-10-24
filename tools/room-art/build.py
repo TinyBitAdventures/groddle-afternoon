@@ -30,6 +30,14 @@ Sets (each: decos, world scale per deco, output folder, a plan and a generated J
   its soil cross-section, wooden shelves and the stitched blue arrow, every one a deco in the CC0
   wardrobia.swf bundle. js/tower-challenge-rooms.js lays them out; features/tower-rooms-feature.js
   draws them.
+- juju_camp (G70): Grandma's tall wooden chair (alpine_landscape.swf), the one hideout deco the street
+  set lacked; the Juju Hideout's four Snaps show her knitting in it. js/quest-rooms/juju-camp.js.
+- picto_pattern (G76): the felt clouds (wardrobia.swf) and meomi2.swf's feltgrass tiles recoloured to
+  the Picto Pattern Snaps' pale green and brown felt. js/quest-rooms/picto-pattern.js.
+- color_unblocking (G69): Keita Takahashi's finale drawing (quest01.swf unclutter_your_mind_keita_pic)
+  and the purple exit door (arbito1.swf) from the Colour Unblocking Snaps. js/quest-rooms/color-unblocking.js.
+- an_autumn_day (G75): limbo1.swf's blurred gnarled trees (rendered white for tinting), red leaf
+  puffs and cattail sprigs, the backdrop of every An Autumn Day Snap. js/quest-rooms/an-autumn-day.js.
 
 A piece spec may carry a fifth element, an options dict: 'deco' renders another deco under this piece's
 name (a recoloured copy), 'ramp' maps each pixel's luminance (0.299 R + 0.587 G + 0.114 B) through
@@ -123,6 +131,72 @@ SETS = {
             'wardrobia_shelf_long': (1, 2, 0),
             'wardrobia_shelf_short': (1, 2, 0),
             'wardrobia_arrow_1': (1.05, 2, 0),
+        },
+    },
+    # Juju Hideout (G70): Grandma's tall wooden rocking chair, the hideout's own deco beside the tent,
+    # campfire and papers (alpine_landscape.swf). In the four Snaps (research/wayback/raw/snaps/
+    # help_juju_bandits/) the chair stands ~1.6 avatars tall: ~210 world px, its stage size.
+    'juju_camp': {
+        'bundle': 'alpine_landscape.swf',
+        'out': 'assets/sprites/quest-rooms/juju_camp',
+        'js': 'js/juju-camp-art.js',
+        'export': 'JUJU_CAMP_FILES',
+        'pieces': {
+            'juju_grandma_chair_01a_al1': (1, 2, 0),
+        },
+    },
+    # Picto Pattern (G76): its two Snaps (research/wayback/raw/snaps/picto_pattern/) show felt craft:
+    # clouds of white felt with a dashed blue stitch (the wardrobia.swf fabric clouds; the question
+    # cloud ~280 world px wide, the chain clouds ~120) and a stitched pale-green felt band over brown
+    # felt, which is meomi2.swf's feltgrassTall platform tile recoloured through a luminance ramp
+    # read off the Snaps (green #d7e5b2 with a #bfc98d fringe, brown #917c51 with #ae9d72 stitching).
+    'picto_pattern': {
+        'bundle': 'wardrobia.swf',
+        'out': 'assets/sprites/quest-rooms/picto_pattern',
+        'js': 'js/picto-pattern-art.js',
+        'export': 'PICTO_PATTERN_FILES',
+        'pieces': {
+            'fabric_cloud_1': (1.15, 2, 0),
+            'fabric_cloud_2': (0.75, 2, 0),
+            **{f'feltgrass_{i}': (1, 2, 0, 'meomi2.swf', {
+                'deco': f'plat_tile_center_0{i}_feltgrassTall',
+                'ramp': [[0, '#4e4430'], [51, '#6c5f3f'], [60, '#917c51'], [74, '#ae9d72'], [100, '#a9ad7c'],
+                         [109, '#bfc98d'], [132, '#d7e5b2'], [150, '#e6f0c8'], [255, '#ffffff']]}) for i in (1, 2, 3)},
+        },
+    },
+    # Colour Unblocking (G69): the level's finale page, Keita Takahashi's drawing of four felt block
+    # characters under "Thank you for playing with us! See you !!", is the CC0 quest01.swf deco
+    # unclutter_your_mind_keita_pic (900 x 600 stage; two Snaps in research/wayback/raw/snaps/
+    # puzzle_level_color_blockage*/ show it at the end of the level). Drawn at half its stage size.
+    # Its purple exit door is arbito1.swf's door_asset_purple.
+    'color_unblocking': {
+        'bundle': 'quest01.swf',
+        'out': 'assets/sprites/quest-rooms/color_unblocking',
+        'js': 'js/color-unblocking-art.js',
+        'export': 'COLOR_UNBLOCKING_FILES',
+        'pieces': {
+            'unclutter_your_mind_keita_pic': (0.5, 2, 0),
+            # The Snaps' exit door: lavender-purple panels in a cyan frame (arbito1.swf), ~1.4 avatars tall.
+            'door_asset_purple': (0.93, 2, 0, 'arbito1.swf'),
+        },
+    },
+    # An Autumn Day (G75): 24 Snaps (research/wayback/raw/snaps/an_autumn_day/) show every room's
+    # backdrop: hazy gnarled trees in three layers with flat red leaf puffs, red bushes and cattail
+    # sprigs, which are limbo1.swf's blurred trees, tree_foliage_red puffs and willows. The blurred
+    # trees render white (a flat ramp, alpha kept) so each haze layer can tint them; soft art at 1x.
+    'an_autumn_day': {
+        'bundle': 'limbo1.swf',
+        'out': 'assets/sprites/quest-rooms/an_autumn_day',
+        'js': 'js/an-autumn-day-art.js',
+        'export': 'AN_AUTUMN_DAY_FILES',
+        'pieces': {
+            'blur_tree_03_white': (1, 1, 0, 'limbo1.swf', {'deco': 'blur_tree_03', 'ramp': [[0, '#ffffff'], [255, '#ffffff']]}),
+            'blur_tree_01_white': (1, 1, 0, 'limbo1.swf', {'deco': 'blur_tree_01', 'ramp': [[0, '#ffffff'], [255, '#ffffff']]}),
+            'tree_foliage_red_big': (1, 1.5, 0),
+            'tree_foliage_red_small': (1, 1.5, 0),
+            'tree_foliage_red_small2': (1, 1.5, 0),
+            'willow_01': (1, 2, 0),
+            'willow_02': (1, 2, 0),
         },
     },
     'sky_plunge': {

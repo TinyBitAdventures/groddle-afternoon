@@ -16,6 +16,9 @@
  * alternate sides, too far apart for an ordinary jump: Spinach (buffs.js
  * high_jumper, 1.5x jump) closes each gap. Branch art is the recovered
  * platform_branch_* deco family; the walking line sits on the needle tops.
+ * The look follows a player's Snap (research/wayback/raw/snaps/top_of_tree/,
+ * reference only): pure white with no floor band, a straight bark trunk on a
+ * flared root base, and the place's own name.
  */
 
 export const TREE_W = 1400;
@@ -28,6 +31,7 @@ export const NAG = Object.freeze([
   { atMs: 30_000, text: 'Sigh. Activate a spinach then jump.' },
   { atMs: 45_000, text: 'Oy! Activate a spinach. Then jump. It’s easy!!' },
 ]);
+export const PLACE_NAME = 'The Gold Hatted, Bouncing, High Jumping Memory Place';
 export const ROCK_LINE = 'Trial and error, baby. Just get started…';
 export const JUMP_OFF_LINE = 'Just jump off the tree to go back to where you were…';
 
@@ -76,28 +80,71 @@ export function crownQuoins() {
   });
 }
 
-function drawTrunk(PIXI) {
-  const g = new PIXI.Graphics();
+/**
+ * The trunk as players' Snap PIF3L2MLDT53HEF_52894 shows it: a straight bark trunk (the CC0
+ * tree_stack_trunk deco, 88 x 700 stage, stacked) about 0.7 of an avatar wide, on a flared root
+ * base with claw-like roots (vector, in the deco's own bark tones), standing on nothing:
+ * the memory is pure white.
+ */
+export const TRUNK_W = 90;
+// Bark tones sampled from the tree_stack_trunk render (left lit edge, middle, shaded right).
+const BARK = Object.freeze({ left: 0x563b15, mid: 0x49320e, right: 0x3d2a0a, light: 0x76552a });
+
+function drawTrunk(PIXI, kit) {
+  const c = new PIXI.Container();
   const top = CROWN_Y - 30;
-  g.moveTo(TRUNK_X - 34, GROUND + 4);
-  g.lineTo(TRUNK_X - 18, top);
-  g.lineTo(TRUNK_X + 18, top);
-  g.lineTo(TRUNK_X + 34, GROUND + 4);
-  g.closePath();
-  g.fill(0x5b3b22);
-  g.moveTo(TRUNK_X - 6, GROUND);
-  g.lineTo(TRUNK_X - 2, top);
-  g.lineTo(TRUNK_X + 12, top);
-  g.lineTo(TRUNK_X + 22, GROUND);
-  g.closePath();
-  g.fill({ color: 0x7a5132, alpha: 0.9 });
-  for (let y = GROUND - 60; y > top + 40; y -= 95) {
-    const w = 22 - ((GROUND - y) / (GROUND - top)) * 10;
-    g.moveTo(TRUNK_X - w, y);
-    g.quadraticCurveTo(TRUNK_X - 4, y - 18, TRUNK_X + w * 0.6, y - 34);
+  const seg = TRUNK_W * (700 / 88);
+  for (let y = GROUND + 10; y > top; y -= seg * 0.97) {
+    const spr = kit.deco(PIXI, 'tree_stack_trunk', TRUNK_X, y, {});
+    spr.width = TRUNK_W;
+    spr.height = seg;
+    c.addChild(spr);
   }
-  g.stroke({ width: 2, color: 0x3f2716, alpha: 0.55 });
-  return g;
+  // The tip tapers into the crown fans.
+  const tip = new PIXI.Graphics();
+  tip.moveTo(TRUNK_X - TRUNK_W / 2, top + 30);
+  tip.quadraticCurveTo(TRUNK_X - 20, top - 30, TRUNK_X - 4, top - 70);
+  tip.lineTo(TRUNK_X + 6, top - 70);
+  tip.quadraticCurveTo(TRUNK_X + 22, top - 30, TRUNK_X + TRUNK_W / 2, top + 30);
+  tip.closePath();
+  tip.fill(BARK.mid);
+  c.addChild(tip);
+  // The flared base: two wings widen off the trunk's edges over its last ~130 px into root
+  // claws, with smaller claws in front; the bark texture stays visible down the middle.
+  const half = TRUNK_W / 2;
+  const L = TRUNK_X - half;
+  const R = TRUNK_X + half;
+  const base = new PIXI.Graphics();
+  base.moveTo(L + 6, GROUND - 140);
+  base.bezierCurveTo(L + 2, GROUND - 60, L - 34, GROUND - 16, L - 76, GROUND + 6);
+  base.lineTo(L - 40, GROUND + 4);
+  base.lineTo(L - 22, GROUND + 14);
+  base.bezierCurveTo(L - 4, GROUND - 4, L + 14, GROUND - 40, L + 22, GROUND - 90);
+  base.closePath();
+  base.fill(BARK.left);
+  base.moveTo(R - 6, GROUND - 140);
+  base.bezierCurveTo(R - 2, GROUND - 60, R + 34, GROUND - 16, R + 72, GROUND + 6);
+  base.lineTo(R + 36, GROUND + 10);
+  base.lineTo(R + 14, GROUND + 4);
+  base.bezierCurveTo(R - 2, GROUND - 6, R - 14, GROUND - 40, R - 22, GROUND - 90);
+  base.closePath();
+  base.fill(BARK.right);
+  // Front claws.
+  for (const [x, dx, col] of [[TRUNK_X - 18, -26, BARK.left], [TRUNK_X + 4, 6, BARK.mid], [TRUNK_X + 24, 30, BARK.right]]) {
+    base.moveTo(x - 14, GROUND - 40);
+    base.quadraticCurveTo(x - 10, GROUND - 6, x + dx, GROUND + 14);
+    base.quadraticCurveTo(x + 6, GROUND - 4, x + 14, GROUND - 40);
+    base.closePath();
+    base.fill(col);
+  }
+  // Ridges running into each claw.
+  for (const [x0, x1] of [[L + 10, L - 60], [L + 30, L - 26], [TRUNK_X + 4, TRUNK_X + 10], [R - 26, R + 30], [R - 10, R + 58]]) {
+    base.moveTo(x0, GROUND - 120);
+    base.quadraticCurveTo(x0 + (x1 - x0) * 0.15, GROUND - 30, x1, GROUND + 4);
+  }
+  base.stroke({ width: 2.5, color: BARK.light, alpha: 0.45 });
+  c.addChild(base);
+  return c;
 }
 
 export const room = {
@@ -115,19 +162,14 @@ export const room = {
     const { PIXI, kit } = ctx;
     const root = kit.sceneRoot(PIXI, TREE_W, TREE_H);
     const sky = root.layer(0, 0);
-    sky.addChild(kit.gradient(PIXI, [[0, '#ffffff'], [0.7, '#fbfcfe'], [1, '#eef3f8']], 960, 640));
-    const far = root.layer(0.35, 1);
-    for (let i = 0; i < 7; i++) {
-      far.addChild(kit.deco(PIXI, 'cloud_fluffy_1', 120 + (i % 3) * 420, 500 + i * 300, { scale: 0.7, alpha: 0.35 }));
-    }
+    // Pure white, as in the Snap: no clouds, no floor band.
+    sky.addChild(kit.gradient(PIXI, [[0, '#ffffff'], [1, '#ffffff']], 960, 640));
     const world = root.layer(1, 2);
-    // The ground is just a soft shadow in the white memory.
+    // Only a faint contact shadow where the roots meet the white.
     const shade = new PIXI.Graphics();
-    shade.ellipse(TRUNK_X, GROUND + 6, 520, 20).fill({ color: 0xdfe6ee, alpha: 0.6 });
-    shade.rect(0, GROUND + 6, TREE_W, TREE_H - GROUND).fill({ color: 0xeef2f6, alpha: 1 });
+    shade.ellipse(TRUNK_X + 4, GROUND + 10, 150, 9).fill({ color: 0xe6e8ec, alpha: 0.7 });
     world.addChild(shade);
-    world.addChild(drawTrunk(PIXI));
-    world.addChild(kit.deco(PIXI, 'tree_base_root_1', TRUNK_X + 8, GROUND + 14, { scale: 0.62 }));
+    world.addChild(drawTrunk(PIXI, kit));
     // Branches: the needle tops sit on the walking line (about 26% down each sprite).
     treeBranches().forEach((b, i) => {
       if (b.side === 'L') {
@@ -145,7 +187,9 @@ export const room = {
     world.addChild(kit.deco(PIXI, 'platform_branch_a01', TRUNK_X - 18, CROWN_Y - 40, { ax: 0, ay: 0, scale: 0.42 }));
     world.addChild(kit.deco(PIXI, 'bling_branch_pinecone_1', TRUNK_X + 40, CROWN_Y - 20, { ax: 0.15, ay: 1, scale: 0.22, rotation: -1.15 }));
     return {
-      label: 'The High Jumper',
+      // The place's own name (GSJS inc_data_maps_prod.js, template LLI19Q27KMF175V, the one
+      // quests/high_jump.js instances); the Snap's Location block prints it too.
+      label: PLACE_NAME,
       width: TREE_W,
       height: TREE_H,
       background: root,

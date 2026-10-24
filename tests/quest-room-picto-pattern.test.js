@@ -141,3 +141,34 @@ describe('Picto-Pattern geometry', () => {
     assert.ok(layout.width > layout.island.x2 + 100);
   });
 });
+
+describe('Picto Pattern felt look (G76, players Snaps)', () => {
+  it('draws its clouds and ground from the CC0 felt room-art set', async () => {
+    const { readFileSync, existsSync } = await import('node:fs');
+    const { createHash } = await import('node:crypto');
+    const { join, dirname } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
+    const { PICTO_PATTERN_FILES } = await import('../public/js/picto-pattern-art.js');
+    const mod = await import('../public/js/quest-rooms/picto-pattern.js');
+    const plan = JSON.parse(readFileSync(join(spike, 'tools/room-art/picto_pattern.json'), 'utf8'));
+    assert.match(plan.source, /glitch-locations meomi2\.swf, wardrobia\.swf \(CC0\)/);
+    const names = [mod.FELT.question, mod.FELT.cloud, ...mod.FELT.ground];
+    assert.deepEqual(Object.keys(PICTO_PATTERN_FILES).sort(), [...names].sort());
+    for (const name of names) {
+      const row = plan.pieces[name];
+      const [file, w, h] = PICTO_PATTERN_FILES[name];
+      assert.deepEqual([file, w, h], [row.file, ...row.world]);
+      const path = join(spike, 'public', mod.PICTO_ART_DIR, file);
+      assert.ok(existsSync(path), file);
+      assert.equal(createHash('sha256').update(readFileSync(path)).digest('hex').slice(0, 16), row.sha, `${file} changed since the build`);
+    }
+    // The ground is meomi2's feltgrassTall tile, recoloured to the Snaps' pale green and brown.
+    for (const name of mod.FELT.ground) {
+      assert.match(plan.pieces[name].swf, /^bundle:meomi2\.swf#plat_tile_center_0\d_feltgrassTall$/);
+      const ramp = Object.fromEntries(plan.pieces[name].ramp);
+      assert.equal(ramp[132], '#d7e5b2');
+      assert.equal(ramp[60], '#917c51');
+    }
+  });
+});

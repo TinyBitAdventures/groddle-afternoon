@@ -26,13 +26,18 @@
  * into solid cloud you can walk along and puts an iMG quoin over every cloud.
  * Puzzles and button sets are the footage's: 14 in three (+1 -2 +3), 8 in
  * four (-1 -2 +3), 1 in six (+4 -2 +3). After the third, an EXIT door on a
- * floating island. Clouds and tally marks are clean vectors; the buttons are
- * the recovered wall_button (lockOut / lockIn), the island, door, signs and
- * arrow are recovered decos.
+ * floating island. Tally marks are clean vectors; the buttons are the
+ * recovered wall_button (lockOut / lockIn), the island, door, signs and arrow
+ * are recovered decos. The look is felt craft, as two players' Snaps show it
+ * (research/wayback/raw/snaps/picto_pattern/, reference only): clouds of white
+ * felt with a dashed blue stitch (the CC0 wardrobia fabric clouds, tinted for
+ * a filled step) and a stitched pale-green felt band over brown felt (the CC0
+ * meomi2 feltgrass tile, recoloured from the Snaps): tools/room-art picto_pattern.
  */
 
 import { pushOutOfSolids, spawnQuoins, takeQuoins, JUMP_RISE, JUMP_GAP } from './puzzle-kit.js?v=pp-1';
 import { textureFromUrl } from '../textures.js';
+import { PICTO_PATTERN_FILES } from '../picto-pattern-art.js';
 
 const ROOM_ID = 'picto_pattern';
 const ART = `assets/sprites/quest-rooms/${ROOM_ID}/`;
@@ -181,35 +186,20 @@ export function gateSolids(layout, solved) {
 /* Drawing                                                             */
 /* ------------------------------------------------------------------ */
 
-// Puffs of a cloud, relative to its size: [x, y, r] (x, r by width; y by height).
-const PUFFS = [
-  [-0.3, 0.12, 0.25], [-0.1, -0.12, 0.27], [0.14, -0.18, 0.25], [0.33, 0.04, 0.22], [-0.38, 0.28, 0.16], [0.4, 0.3, 0.15],
-];
+export const PICTO_ART_DIR = ART;
+/** Felt pieces by role (js/picto-pattern-art.js, tools/room-art/build.py picto_pattern). */
+export const FELT = Object.freeze({ question: 'fabric_cloud_1', cloud: 'fabric_cloud_2', ground: ['feltgrass_1', 'feltgrass_2', 'feltgrass_3'] });
+/** The felt grass band's top edge sits this far down its tile (the tile's transparent head). */
+const FELT_GRASS_TOP = 128;
 
-function cloudShape(g, w, h, dy = 0) {
-  g.roundRect(-w * 0.46, -h * 0.05 + dy, w * 0.92, h * 0.55, h * 0.27);
-  for (const [px, py, pr] of PUFFS) g.circle(px * w, py * h + dy, pr * w);
-}
-
-/** A puffy vector cloud centred on (0, 0): shade, outline, fill. */
-function drawCloud(g, w, h, { fill = 0xf7f8fc, shade = 0xc9d1e1, line = 0xffffff, lineAlpha = 0.85, alpha = 1, stitch = false } = {}) {
-  g.clear();
-  cloudShape(g, w, h, 5);
-  g.fill({ color: shade, alpha: alpha });
-  cloudShape(g, w, h);
-  g.fill({ color: fill, alpha: alpha }).stroke({ width: 4, color: line, alpha: lineAlpha * alpha });
-  cloudShape(g, w, h);
-  g.fill({ color: fill, alpha: alpha });
-  if (stitch) {
-    // The question cloud's stitched edge: a dashed ring inside the outline.
-    const rx = w * 0.44;
-    const ry = h * 0.36;
-    for (let a = 0; a < Math.PI * 2; a += 0.16) {
-      g.moveTo(Math.cos(a) * rx, h * 0.08 + Math.sin(a) * ry);
-      g.lineTo(Math.cos(a + 0.08) * rx, h * 0.08 + Math.sin(a + 0.08) * ry);
-    }
-    g.stroke({ width: 2, color: 0xffffff, alpha: 0.95 });
-  }
+/** A felt room-art piece, centred, scaled to a world width. */
+function felt(PIXI, name, width, opts = {}) {
+  const [file, w] = PICTO_PATTERN_FILES[name];
+  const spr = new PIXI.Sprite(textureFromUrl(`${ART}${file}`));
+  spr.anchor.set(0.5, opts.ay ?? 0.5);
+  spr.scale.set(width / w);
+  if (opts.tint != null) spr.tint = opts.tint;
+  return spr;
 }
 
 /** Tally marks for n, centred on (0, 0). */
@@ -298,9 +288,10 @@ export const room = {
       far.addChild(kit.deco(PIXI, i % 2 ? 'cloud_5' : 'cloud_3', 120 + i * 420, 250 + (i % 3) * 70, { scale: 0.7, alpha: 0.18, tint: 0xc8d2ec }));
     }
     const world = root.layer(1, 3);
+    world.addChild(drawGround(PIXI, W));
+    // The question clouds rest on the felt grass, in front of it.
     const behind = new PIXI.Container();
     world.addChild(behind);
-    world.addChild(drawGround(PIXI, W));
     // The title plank, tilted, at the start (footage: "Picto Pattern").
     world.addChild(kit.deco(PIXI, 'firebog_sign_blank_plank', 100, FLOOR - 112, { ay: 0.5, scale: 0.36, rotation: -0.1 }));
     const title = kit.label(PIXI, 'Picto Pattern', 100, FLOOR - 114, { size: 17, fill: 0xffffff, stroke: { color: 0x5a3a1c, width: 4 } });
@@ -316,8 +307,8 @@ export const room = {
       const q = new PIXI.Container();
       q.x = s.question.x;
       q.y = s.question.surf + 56;
-      const qg = new PIXI.Graphics();
-      drawCloud(qg, s.question.w, s.question.h, { stitch: true });
+      const qg = felt(PIXI, FELT.question, s.question.w + 40);
+      qg.y = 2;
       q.addChild(qg);
       q.addChild(kit.label(PIXI, questionText(s.puzzle), 0, -8, { size: 16, fill: 0x3a3f4c, wrap: 170, weight: '800' }));
       behind.addChild(q);
@@ -333,7 +324,8 @@ export const room = {
         cont.x = c.x;
         cont.y = c.surf + CLOUD_DY;
         const glowG = new PIXI.Graphics();
-        const body = new PIXI.Graphics();
+        const body = felt(PIXI, FELT.cloud, CLOUD_W + 14);
+        body.y = 6;
         const glyph = new PIXI.Graphics();
         glyph.y = 4;
         cont.addChild(glowG, body, glyph);
@@ -539,24 +531,20 @@ export const room = {
 };
 
 function drawGround(PIXI, W) {
+  const c = new PIXI.Container();
+  // Brown felt under the tiles (their stitch holes show through to it).
   const g = new PIXI.Graphics();
-  // Dirt under the meadow.
-  g.rect(0, FLOOR + 26, W, H - FLOOR).fill(0x7a5a3a);
-  g.rect(0, FLOOR + 70, W, H - FLOOR).fill(0x5f4630);
-  // Pale rolling meadow: the walk line is flat, the hills roll just under it.
-  g.moveTo(0, FLOOR + 40);
-  for (let x = 0; x <= W; x += 40) g.lineTo(x, FLOOR - 4 + Math.sin(x / 210) * 5 + Math.sin(x / 67) * 2);
-  g.lineTo(W, FLOOR + 40);
-  g.closePath();
-  g.fill(0xc9df93);
-  for (let x = 60; x < W; x += 380) g.ellipse(x, FLOOR + 6, 120, 7);
-  g.fill({ color: 0xe3efb8, alpha: 0.8 });
-  g.rect(0, FLOOR + 30, W, 10).fill(0xa9c66e);
-  // Pebbles in the dirt.
-  for (let x = 90; x < W; x += 170) {
-    g.ellipse(x + ((x * 7) % 60), FLOOR + 52 + ((x * 3) % 22), 14, 5).fill({ color: 0xa89880, alpha: 0.9 });
+  g.rect(0, FLOOR + 50, W, H - FLOOR + 200).fill(0x8f7c51);
+  c.addChild(g);
+  // The stitched pale-green felt band over brown felt: the recoloured feltgrass tiles, edge to edge.
+  const [, tw] = PICTO_PATTERN_FILES.feltgrass_1;
+  for (let x = 0, k = 0; x < W + tw; x += tw - 1, k++) {
+    const t = felt(PIXI, FELT.ground[(k * 7) % 3], tw, { ay: 0 });
+    t.x = x + tw / 2;
+    t.y = FLOOR - 8 - FELT_GRASS_TOP;
+    c.addChild(t);
   }
-  return g;
+  return c;
 }
 
 function makeButton(ctx, def) {
@@ -567,8 +555,8 @@ function makeButton(ctx, def) {
   } else {
     const sign = new PIXI.Container();
     sign.y = -52;
-    const g = new PIXI.Graphics();
-    drawCloud(g, 66, 34, { fill: OP_COLORS[def.op] ?? 0xffffff, shade: 0x8f99b3, line: 0xffffff, lineAlpha: 0.7 });
+    const g = felt(PIXI, FELT.cloud, 74, { tint: OP_COLORS[def.op] ?? 0xffffff });
+    g.y = 3;
     const glyph = new PIXI.Graphics();
     glyph.y = 3;
     drawOp(glyph, def.op, 0x15161a, 0.62);
@@ -691,7 +679,9 @@ function redrawSection(ctx, i) {
         alpha = 0.9;
       }
     }
-    drawCloud(cv.body, CLOUD_W, CLOUD_H, { fill, alpha, shade: solved ? 0xd7dfb8 : 0xc9d1e1 });
+    // White felt, dyed by the step it holds (the sprite's tint).
+    cv.body.tint = solved && c.kind !== 'end' ? 0xf4f9e4 : fill;
+    cv.body.alpha = alpha;
     drawGlow(cv.glowG, CLOUD_W, CLOUD_H, c.kind === 'slot' && !glow ? 0xffffff : glowColor, 1);
     cv.glowG.baseAlpha = glow;
     cv.glowG.alpha = glow;

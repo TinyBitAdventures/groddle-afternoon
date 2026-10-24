@@ -513,10 +513,21 @@ export function drawGlyph(g, symbol, color, width = 5, alpha = 1) {
   g.stroke({ width, color, alpha, cap: 'round', join: 'round' });
 }
 
+/**
+ * Sky stops per stage, sampled from players' Snaps (research/wayback/raw/snaps/
+ * last_pilgrimage_of_esquibeth/) and the NelLACFkrVg recording (research/video, G79):
+ * Eastern Grotto peach-pink at the top (#f9bcb6), Western Grotto a bright pale lemon
+ * (#fae093 to #feff99) under a pink flush with a lavender haze low down, the Climb
+ * magenta-pink (#eba2e8 to #f5bfee).
+ */
+export const SKY_STOPS = Object.freeze({
+  gold: [[0, '#f6cdb4'], [0.22, '#f0dc9e'], [0.5, '#fae093'], [0.72, '#fbf59a'], [0.88, '#f4f28c'], [1, '#d6c2c8']],
+  rose: [[0, '#eba2e8'], [0.5, '#f5bfee'], [0.8, '#f6d7bf'], [1, '#f2e2c0']],
+  dusk: [[0, '#f9bcb6'], [0.4, '#f6cdb4'], [0.75, '#ecd6c4'], [1, '#bba9c4']],
+});
+
 function skyStops(kind) {
-  if (kind === 'gold') return [[0, '#d9c6b0'], [0.45, '#efe3a6'], [0.75, '#e9d39a'], [1, '#b9a8b8']];
-  if (kind === 'rose') return [[0, '#f3a9e0'], [0.5, '#f2bfd8'], [0.8, '#f6d7bf'], [1, '#f2e2c0']];
-  return [[0, '#d8a8b8'], [0.4, '#f0c9b4'], [0.75, '#e8d2c4'], [1, '#bba9c4']];
+  return SKY_STOPS[kind] || SKY_STOPS.dusk;
 }
 
 /** Far cliffs: recovered Alakol cliffside decos, tinted to the grottos' lavender basalt. */

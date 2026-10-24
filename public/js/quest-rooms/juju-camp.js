@@ -35,12 +35,14 @@
  * Lost: the Juju Hideout geometry (LNVDIG7F7DO2CM5 was never archived) and
  * the overworld npc_juju_bandit who offered the quest (catalog.js offers it
  * in the four Kajuu hubs). The camp is rebuilt from the hideout's own CC0
- * decos (juju_grandma_tent / campfire / papers) on a savanna floor at the
- * source spawn height; Grandma sits left of the kid's -2304 stop. The twenty
+ * decos (juju_grandma_tent / campfire / papers / chair) on a savanna floor at
+ * the source spawn height; Grandma sits left of the kid's -2304 stop. Its
+ * look (dusk, two teepees, the chair, the mound) follows four players' Snaps. The twenty
  * clue streets are the archived streets with their `juju_dig` boxes.
  */
 
-import { onLoaded } from '../textures.js';
+import { onLoaded, textureFromUrl } from '../textures.js';
+import { JUJU_CAMP_FILES } from '../juju-camp-art.js';
 
 const Q1 = 'help_juju_bandits';
 const Q2 = 'help_juju_bandits_2';
@@ -591,45 +593,90 @@ function nearGrandma(ctx) {
 /* Scene art                                                           */
 /* ------------------------------------------------------------------ */
 
+/**
+ * The hideout at dusk, as all four players' Snaps show it (research/wayback/raw/snaps/
+ * help_juju_bandits/, reference only; colours sampled from them): a mauve to pink-brown sky
+ * with a peach glow low down, dark acacias and scrub, olive dirt, two canvas teepees either
+ * side of Grandma, her tall wooden chair beside stacks of paper, the campfire on her right and
+ * a dirt mound with stones in front.
+ */
+export const JUJU_DUSK = Object.freeze({
+  sky: [[0, '#6e5048'], [0.3, '#866252'], [0.55, '#a87c66'], [0.78, '#c28e69'], [1, '#8a6a48']],
+  cloud: 0xb48a74,
+  farTree: 0x3a3418,
+  bush: 0x4c5226,
+  ground: 0x685a29,
+  groundTop: 0x4a4a1e,
+  groundSpot: 0x564a20,
+  tree: 0x7e7a5a,
+  tent: 0xcabca4,
+  grass: 0x8a8460,
+});
+/** Camp pieces at hideout x: [deco, x, dy, scale, flip]. Grandma sits at GRANDMA_X. */
+export const CAMP_PIECES = Object.freeze([
+  ['juju_grandma_tent_01a_al1', -2700, 10, 0.55, true],
+  ['juju_grandma_tent_01a_al1', -1960, 10, 0.56, false],
+  ['juju_grandma_papers_01a_al1', -2585, 6, 0.5, false],
+  ['juju_grandma_papers_01b_al1', -2630, 5, 0.55, false],
+  ['juju_grandma_papers_01c_al1', -2380, 3, 0.6, false],
+  ['juju_grandma_campfire_01a_al1', -2215, 18, 0.62, false],
+  ['juju_grandma_papers_01c_al1', -1180, 3, 0.6, true],
+]);
+/** The dirt mound in front of the fire, with stones round its foot. */
+/** In front of the walkway, low in the frame as in the Snaps. */
+export const CAMP_MOUND = Object.freeze({ x: -2060, dy: 112, scale: 0.62 });
+
 function buildBackground(ctx) {
   const { PIXI, kit } = ctx;
+  const P = JUJU_DUSK;
   const root = kit.sceneRoot(PIXI, W, H);
   const floor = sy(FLOOR_Y);
   const sky = root.layer(0, 0);
-  // Baqala's street gradient (7395BF -> FFD859).
-  sky.addChild(kit.gradient(PIXI, [[0, '#7395bf'], [0.7, '#e8d48a'], [1, '#ffd859']], 960, 640));
+  sky.addChild(kit.gradient(PIXI, P.sky, 960, 640));
   const far = root.layer(0.25, 1);
-  for (let i = 0; i < 5; i++) far.addChild(kit.deco(PIXI, i % 2 ? 'cloud_fluffy_2' : 'cloud_fluffy_1', 120 + i * 420, 170 + (i % 3) * 40, { scale: 0.5, alpha: 0.7 }));
+  // Long thin dusk clouds (the Snaps' pale streaks).
+  for (let i = 0; i < 5; i++) far.addChild(kit.deco(PIXI, i % 2 ? 'cloud_fluffy_2' : 'cloud_fluffy_1', 120 + i * 420, 150 + (i % 3) * 40, { scale: 0.5, sy: 0.22, tint: P.cloud, alpha: 0.55 }));
   for (let i = 0; i < 6; i++) {
-    far.addChild(kit.deco(PIXI, `tree_acacia_${(i % 4) + 1}`, 80 + i * 380, floor - 40, { scale: 0.32 + (i % 3) * 0.05, tint: 0xc9c8a8, alpha: 0.75 }));
+    far.addChild(kit.deco(PIXI, `tree_acacia_${(i % 4) + 1}`, 80 + i * 380, floor - 40, { scale: 0.32 + (i % 3) * 0.05, tint: P.farTree, alpha: 0.9 }));
   }
   const mid = root.layer(0.6, 2);
   for (let i = 0; i < 9; i++) {
-    mid.addChild(kit.deco(PIXI, i % 3 ? 'heights_bush_4' : 'heights_bush_2', 60 + i * 330, floor - 6, { scale: 0.42, tint: 0x9aa070, alpha: 0.9, flip: i % 2 === 1 }));
+    mid.addChild(kit.deco(PIXI, i % 3 ? 'heights_bush_4' : 'heights_bush_2', 60 + i * 330, floor - 6, { scale: 0.42, tint: P.bush, alpha: 0.95, flip: i % 2 === 1 }));
   }
   const world = root.layer(1, 3);
   const g = new PIXI.Graphics();
-  g.rect(0, floor, W, H - floor).fill(0xb98d4f);
-  g.rect(0, floor - 4, W, 12).fill(0x8f9a46);
+  g.rect(0, floor, W, H - floor + 400).fill(P.ground);
+  g.rect(0, floor - 4, W, 12).fill(P.groundTop);
   for (let x = 40; x < W; x += 170) g.ellipse(x + (x % 7) * 9, floor + 34 + (x % 3) * 12, 46, 6);
-  g.fill({ color: 0xa77b40, alpha: 0.6 });
+  g.fill({ color: P.groundSpot, alpha: 0.7 });
   world.addChild(g);
-  // Big trees first, behind the camp.
-  world.addChild(kit.deco(PIXI, 'tree_acacia_2', sx(-2860), floor + 6, { scale: 0.62 }));
-  world.addChild(kit.deco(PIXI, 'tree_acacia_3', sx(-1520), floor + 6, { scale: 0.55, flip: true }));
-  world.addChild(kit.deco(PIXI, 'tree_acacia_1', sx(-420), floor + 6, { scale: 0.58 }));
-  world.addChild(kit.deco(PIXI, 'heights_bush_4', sx(-2960), floor + 4, { scale: 0.5 }));
-  // The hideout's own decos.
-  world.addChild(kit.deco(PIXI, 'juju_grandma_tent_01a_al1', sx(-2700), floor + 10, { scale: 0.62 }));
-  world.addChild(kit.deco(PIXI, 'juju_grandma_papers_01a_al1', sx(-2600), floor + 6, { scale: 0.7 }));
-  world.addChild(kit.deco(PIXI, 'juju_grandma_campfire_01a_al1', sx(-2215), floor + 18, { scale: 0.62 }));
-  world.addChild(kit.deco(PIXI, 'juju_grandma_papers_01b_al1', sx(-2050), floor + 4, { scale: 0.8 }));
-  world.addChild(kit.deco(PIXI, 'juju_grandma_papers_01c_al1', sx(-1930), floor + 3, { scale: 0.9 }));
-  world.addChild(kit.deco(PIXI, 'juju_grandma_papers_01c_al1', sx(-1180), floor + 3, { scale: 0.8, flip: true }));
+  // Big acacias first, behind the camp, darkened for dusk.
+  world.addChild(kit.deco(PIXI, 'tree_acacia_2', sx(-2860), floor + 6, { scale: 0.62, tint: P.tree }));
+  world.addChild(kit.deco(PIXI, 'tree_acacia_3', sx(-1520), floor + 6, { scale: 0.55, flip: true, tint: P.tree }));
+  world.addChild(kit.deco(PIXI, 'tree_acacia_1', sx(-420), floor + 6, { scale: 0.58, tint: P.tree }));
+  world.addChild(kit.deco(PIXI, 'heights_bush_4', sx(-2960), floor + 4, { scale: 0.5, tint: P.bush }));
+  // Low scrub and pampas behind the camp (the Snaps show tufts, not a wall of grass).
   for (let i = 0; i < 18; i++) {
     const x = 70 + i * 165 + (i % 4) * 23;
-    world.addChild(kit.deco(PIXI, i % 3 ? 'lens_grass_1' : 'pampas_1', x, floor + 8, { scale: i % 3 ? 0.55 : 0.45, flip: i % 2 === 0 }));
+    world.addChild(kit.deco(PIXI, i % 3 ? 'lens_grass_1' : 'pampas_1', x, floor + 8, { scale: i % 3 ? 0.22 : 0.3, flip: i % 2 === 0, tint: P.grass }));
   }
+  // The hideout's own decos: two teepees, the papers, the campfire and Grandma's chair.
+  for (const [name, x, dy, scale, flip] of CAMP_PIECES) {
+    const tint = name.includes('tent') ? P.tent : name.includes('papers') ? 0xe0d8cc : undefined;
+    world.addChild(kit.deco(PIXI, name, sx(x), floor + dy, { scale, flip, tint }));
+  }
+  const [chairFile] = JUJU_CAMP_FILES.juju_grandma_chair_01a_al1;
+  const chair = new PIXI.Sprite(textureFromUrl(`${ART}${chairFile}`));
+  chair.anchor.set(0.5, 1);
+  chair.x = sx(GRANDMA_X) - 14;
+  chair.y = floor + 8;
+  chair.tint = 0xd8ccb8;
+  world.addChild(chair);
+  // The dirt mound and its stones.
+  const my = floor + CAMP_MOUND.dy;
+  world.addChild(kit.deco(PIXI, 'rock_rubble_01a_al1', sx(CAMP_MOUND.x) - 100, my - 2, { scale: 0.14, tint: 0x7a7266 }));
+  world.addChild(kit.deco(PIXI, 'mound_dirt_2', sx(CAMP_MOUND.x), my, { scale: CAMP_MOUND.scale, tint: 0x6a5844 }));
+  world.addChild(kit.deco(PIXI, 'rock_rubble_01a_al1', sx(CAMP_MOUND.x) + 110, my + 2, { scale: 0.13, tint: 0x7a7266, flip: true }));
   return root;
 }
 

@@ -1,0 +1,52 @@
+{
+ "source": "tinyspeck/glitch-locations alpine_landscape.swf (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "juju_grandma_chair_01a_al1": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    161.7,
+    208.0
+   ],
+   "px": [
+    323,
+    416
+   ],
+   "file": "juju_grandma_chair_01a_al1@2x.webp",
+   "swf": "bundle:alpine_landscape.swf#juju_grandma_chair_01a_al1",
+   "swf_sha": "7546da09d18089ee",
+   "key": "7546da09d18089ee:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    323,
+    416
+   ],
+   "world": [
+    162,
+    208
+   ],
+   "bytes": 42454,
+   "lossless": false,
+   "err": 2.51,
+   "sha": "445c69b6b958ba22"
+  }
+ }
+}

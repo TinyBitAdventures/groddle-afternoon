@@ -433,8 +433,10 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     controls: 'Spacebar swims up · arrows steer',
     controlsHint: 'Jump to float up: each Spacebar press is a swim stroke. Arrow keys steer.',
     prompt: 'JUMP TO FLOAT UP!',
-    palette: Object.freeze([0x1f5379, 0x0f2c47, 0x07162a, 0x03060c]),
-    transitionColors: Object.freeze([0x07162a, 0x1f5379]),
+    // Clearer teal-blue water, sampled from a player's Snap (research/wayback/raw/snaps/
+    // paradise_abysmal_thrill/, G79: #0c2134 to #233849 mid-depth, never black).
+    palette: Object.freeze([0x2b6684, 0x17405a, 0x0d2a40, 0x062034]),
+    transitionColors: Object.freeze([0x0d2a40, 0x2b6684]),
     rewards: [
       // recorded: +120, +100 mood, +120, +600, +100 favor (Ti), +600, +100 currants, +480, +120, exit +954
       xp(), mood(), xp(), xp(600), favor('ti'), xp(600), currants(), xp(480),
