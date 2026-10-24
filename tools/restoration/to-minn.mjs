@@ -18,9 +18,9 @@ import { attrJson, block, Minn } from '../changelog/to-minn.mjs';
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
 const SITE = String(args.site || 'https://groddle.localhost').replace(/\/$/, '');
 
-const p = (cls, words) => block('paragraph', cls ? { className: cls } : null, `<p${cls ? ` class="${cls}"` : ''}>${words}</p>`);
-const h = (level, words, { id, cls } = {}) => block('heading', { ...(level === 2 ? {} : { level }), ...(id ? { anchor: id } : {}), ...(cls ? { className: cls } : {}) }, `<h${level} class="wp-block-heading${cls ? ` ${cls}` : ''}"${id ? ` id="${id}"` : ''}>${words}</h${level}>`);
-const group = (tag, cls, id, inner) => block('group', { ...(tag === 'div' ? {} : { tagName: tag }), ...(id ? { anchor: id } : {}), ...(cls ? { className: cls } : {}) }, `<${tag} class="wp-block-group${cls ? ` ${cls}` : ''}"${id ? ` id="${id}"` : ''}>${inner.join('\n\n')}</${tag}>`);
+export const p = (cls, words) => block('paragraph', cls ? { className: cls } : null, `<p${cls ? ` class="${cls}"` : ''}>${words}</p>`);
+export const h = (level, words, { id, cls } = {}) => block('heading', { ...(level === 2 ? {} : { level }), ...(id ? { anchor: id } : {}), ...(cls ? { className: cls } : {}) }, `<h${level} class="wp-block-heading${cls ? ` ${cls}` : ''}"${id ? ` id="${id}"` : ''}>${words}</h${level}>`);
+export const group = (tag, cls, id, inner) => block('group', { ...(tag === 'div' ? {} : { tagName: tag }), ...(id ? { anchor: id } : {}), ...(cls ? { className: cls } : {}) }, `<${tag} class="wp-block-group${cls ? ` ${cls}` : ''}"${id ? ` id="${id}"` : ''}>${inner.join('\n\n')}</${tag}>`);
 const data = (name, attrs) => `<!-- wp:groddle/restoration-${name}${attrs ? ' ' + attrJson(attrs) : ''} /-->`;
 const band = (id, alt, title, inner) => group('section', `band${alt ? ' band-alt' : ''}`, id, [group('div', 'wrap', null, [h(2, title, { id: `${id}-h` }), ...inner])]);
 

@@ -16,6 +16,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadPosts } from './build.mjs';
 import { plain } from './html.mjs';
+import { MUSICBLOCK_SERIES } from '../../public/js/musicblocks.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const THEME = join(ROOT, 'minn/groddle');
@@ -79,6 +80,20 @@ export function blockTypes(icons) {
     signpost: { ...leaf('signpost', 'Signpost', 'A signpost drawing with arms pointing left and right, and a caption.', { label: text(), caption: text() }), allowedBlocks: ['groddle/sign'], example: example('sign', [{ side: 'left', text: 'Somewhere' }]) },
     sign: leaf('sign', 'Sign arm', 'One arm of a signpost.', { side: { type: 'string', enum: ['left', 'right'], default: 'left' }, text: text('Somewhere') }, 'signpost'),
     ...restorationTypes(leaf),
+    ...musicblockTypes(leaf),
+  };
+}
+
+/**
+ * The Musicblocks page's data blocks, drawn from public/musicblocks/data.json
+ * (tools/musicblocks/build-data.mjs, minn/groddle/src/Musicblocks.php): one
+ * series (or the rare blocks) per block, and what a play pays.
+ */
+function musicblockTypes(leaf) {
+  const data = (name, title, description, attributes = {}) => ({ ...leaf(name, title, description, attributes), category: 'widgets', keywords: ['musicblock', 'music'] });
+  return {
+    musicblocks: data('musicblocks', 'Musicblocks', 'One musicblock series, or the rare blocks, as cards to play, with the series\' collector trophy.', { set: { type: 'string', enum: [...Object.keys(MUSICBLOCK_SERIES), 'rare'], default: 'DG' } }),
+    'musicblocks-rules': data('musicblocks-rules', 'Musicblock rules', 'What playing a musicblock costs and pays, read from the game itself.'),
   };
 }
 

@@ -63,16 +63,18 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     }
   });
 
-  it('registers one block per block.json, each drawn by Blocks.php or Restoration.php, with the icons the cards name', () => {
+  it('registers one block per block.json, each drawn by Blocks.php, Restoration.php or Musicblocks.php, with the icons the cards name', () => {
     const declared = JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8')).blocks;
     const dirs = readdirSync(join(ext, 'blocks'));
     const blocks = readFileSync(join(ext, 'src/Blocks.php'), 'utf8');
     const restoration = readFileSync(join(ext, 'src/Restoration.php'), 'utf8');
+    const musicblocks = readFileSync(join(ext, 'src/Musicblocks.php'), 'utf8');
     assert.deepEqual(dirs.map((d) => `groddle/${d}`).sort(), [...declared].sort());
     for (const d of dirs) {
       const type = JSON.parse(readFileSync(join(ext, 'blocks', d, 'block.json'), 'utf8'));
       assert.equal(type.name, `groddle/${d}`);
       if (d.startsWith('restoration-')) assert.match(restoration, new RegExp(`\\$section\\('${d.slice('restoration-'.length)}'`), d);
+      else if (d.startsWith('musicblocks')) assert.match(musicblocks, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
       else assert.match(blocks, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
       if (type.parent) assert.ok(declared.includes(type.parent[0]), `${d}'s parent is a declared block`);
       if (type.allowedBlocks) assert.deepEqual(type.example.innerBlocks.map((b) => b.name), type.allowedBlocks, `${d} inserts with a child to edit`);
@@ -97,6 +99,32 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     assert.match(readFileSync(join(ext, 'src/StaticPages.php'), 'utf8'), /pageByPath\(explode\('\/', \$folder\)\) !== null/);
     assert.deepEqual(JSON.parse(readFileSync(join(ext, 'theme.json'), 'utf8')).customTemplates.map((t) => t.name), ['page-wide']);
     assert.match(readFileSync(join(ext, 'templates/page-wide.html'), 'utf8'), /wp:post-content/);
+  });
+
+  it('makes the Musicblocks page from the game: every recovered tune in data.json, one block per set (tools/musicblocks)', async () => {
+    execFileSync('node', [join(root, 'tools/musicblocks/build-data.mjs'), '--check'], { stdio: 'ignore' });
+    const data = JSON.parse(readFileSync(join(root, 'public/musicblocks/data.json'), 'utf8'));
+    const { MUSICBLOCK_CATALOG } = await import('../public/js/musicblocks.js');
+    const listed = data.sets.flatMap((s) => s.blocks.map((b) => b.id));
+    assert.deepEqual(listed.sort(), Object.keys(MUSICBLOCK_CATALOG).sort());
+    for (const b of data.sets.flatMap((s) => s.blocks)) {
+      for (const file of [b.audio, b.icon]) assert.ok(file && readFileSync(join(root, 'public', file)).length > 0, `${b.id} ${file}`);
+    }
+    for (const s of data.sets.filter((x) => x.id !== 'rare')) assert.ok(s.trophy?.name && s.trophy.badge, `${s.id} has its collector trophy`);
+    // What a play pays is read off the game, so it matches Tiny Speck's musicblock_base.
+    assert.deepEqual([data.rules.energy, data.rules.mood, data.rules.fresh, data.rules.secret, data.rules.returning, data.rules.dailyFirst, data.rules.dailyNew, data.rules.stale], [2, 2, 50, 1000, 100, 10, 5, 0]);
+    const { musicblocksContent, SETS } = await import('../tools/musicblocks/to-minn.mjs');
+    const content = musicblocksContent();
+    assert.doesNotMatch(content, /wp:html/);
+    assert.deepEqual(SETS.map(([, set]) => set), data.sets.map((s) => s.id));
+    for (const [, set] of SETS) assert.equal(content.split(`<!-- wp:groddle/musicblocks {"set":"${set}"} /-->`).length - 1, 1, set);
+    assert.equal(content.split('<!-- wp:groddle/musicblocks-rules /-->').length - 1, 1);
+    const bands = [...content.matchAll(/<section class="wp-block-group band[^"]*" id="([a-z]+)">/g)].map((m) => m[1]);
+    for (const [, id] of content.matchAll(/<a href="#([a-z]+)">/g)) assert.ok(bands.includes(id), id);
+    assert.doesNotMatch(content, /\u2014/, 'no em dashes');
+    // The player script finds the markup the drawer prints.
+    const drawn = readFileSync(join(ext, 'src/Musicblocks.php'), 'utf8');
+    for (const cls of ['mb-set', 'mb-card', 'mb-face', 'mb-name']) assert.match(drawn, new RegExp(`class="${cls}`), cls);
   });
 
   it('draws what restoration.js fills: every container id the script looks for', () => {
