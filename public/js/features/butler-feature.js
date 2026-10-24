@@ -9,10 +9,14 @@
  *    own a home and are level 3. Read label (four beats), Open: a puff, the
  *    Butler 750 ms later where the box stood (randomized part by part),
  *    and two seconds later "Thank you. I am very happy to be here with you".
- *  - Stands at its post right of the door, strolls up to 300 px either side,
- *    idles (idle1-4), steps back when you walk into it, waves when you come
- *    within 550 px, acknowledges you at 250 px, and walks back to its post 15 s
- *    after your last command.
+ *  - Stands at its post right of the door, strolls up to 300 px either side
+ *    (walk4, the walk chooseWalk always picks), idles (idle1-4), steps back
+ *    when you walk into it, waves when you come within 550 px, acknowledges
+ *    you at 250 px, and walks back to its post 15 s after your last command.
+ *  - Turns round instead of flipping when it looks at you with its back to
+ *    you (lookAtPlayer: turnBack, held; 1.5 s later facePlayer: turnFront):
+ *    while you stand near it, when you leave its near hit box, and after it
+ *    steps back.
  *  - Greets you when you come home (bow, "Welcome home." and how long you were
  *    away), then says what it holds and whether you have mail.
  *  - Holds what neighbours leave when they drop by (Visiting Stone opt-in):
@@ -44,7 +48,9 @@
  *                        &homedemo=owned&stonedemo=1&stoneautoplay=optin)
  *   &butlerautoplay=greet|parcel|parceldone|rename|look|customize|discard|
  *                   offer|offeraccept|box|talk|joke|dance|
- *                   hint|tower|gift|visitors|mailbox
+ *                   hint|tower|gift|visitors|mailbox|
+ *                   turn (back to you, then lookAtPlayer: turnBack, turnFront)|
+ *                   walk (220 px right on walk4 and back)
  * Join the Club end to end: ?autostart=1&fresh=1&resetgame=1&questoffer=off&
  *   homedemo=owned&butlerdemo=owned&questdemo=join_club&questautoplay=1&questfx=0,
  *   then Home → Teleport home (canvas clubButler=heard, butlerLast=quest:join_club).
@@ -52,7 +58,7 @@
  *   unsaved; offer / offeraccept lift xp to 30128 and wait for Join the Club.
  * Canvas data: butlerState, butlerName, butlerLook, butlerParts, butlerArt
  *   (rig@3x | oga:<look>), butlerOffer, butlerX, butlerPost,
- *   butlerAnim, butlerMode, butlerPackages, butlerMessages, butlerGift,
+ *   butlerAnim, butlerMode, butlerDir (left | right; the art faces left), butlerPackages, butlerMessages, butlerGift,
  *   butlerDialog, butlerLast, butlerVisitors, butlerAutoplay.
  */
 
@@ -69,6 +75,7 @@ import {
   BUTLER,
   BUTLER_BOX,
   BUTLER_BOX_ART,
+  BUTLER_FALLBACK,
   BUTLER_FPS,
   BUTLER_FRAMES,
   BUTLER_INTRO,
@@ -77,6 +84,7 @@ import {
   BUTLER_LEGACY_LOOKS,
   BUTLER_LOOPERS,
   BUTLER_OPTIONS,
+  BUTLER_RIG_FRAMES,
   BUTLER_PART_NAMES,
   BUTLER_PART_ORDER,
   BUTLER_SERVICE,
@@ -91,13 +99,14 @@ import {
   clickAnim,
   clickResponse,
   createButler,
+  fallbackClip,
+  butlerLook,
   createButlerState,
   giftOffer,
   giveGiftTo,
   hintDue,
   idleChatter,
   nearLevel,
-  nearestButlerLook,
   nextHandover,
   normalizeButlerState,
   ownerGreeting,
@@ -116,7 +125,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=butler-3';
+} from '../butler.js?v=butler-4';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -156,6 +165,7 @@ const rt = {
   far: false,
   stepAt: 0,
   danceFaster: 0,
+  faceAt: 0, // facePlayer timer after a turnBack (lookAtPlayer)
 };
 
 // ---------------------------------------------------------------------------
@@ -254,8 +264,10 @@ function warmRig(engine) {
   }).catch(() => { rigLoad = 'failed'; });
 }
 
-function clipFrames(engine, clip) {
-  const look = nearestButlerLook(st.parts);
+function clipFrames(engine, want) {
+  // The fallback sheets: Look 1's idle0 and walk4 stand in for every clip (BUTLER_FALLBACK).
+  const look = butlerLook(BUTLER_FALLBACK.look);
+  const clip = fallbackClip(want);
   const key = `${look.id}:${clip}`;
   if (frameCache.has(key)) return frameCache.get(key);
   const { PIXI } = engine;
@@ -290,13 +302,17 @@ function setClip(engine, clip, { loop = BUTLER_LOOPERS.includes(clip), then = nu
     v.rig.done = done;
     drawRig(v);
   } else {
-    v.anim.textures = clipFrames(engine, clip);
+    const frames = clipFrames(engine, clip);
+    const length = BUTLER_FRAMES[clip] || BUTLER_RIG_FRAMES[clip] || 1;
+    v.anim.textures = frames;
     v.anim.loop = loop;
+    // A stand-in shorter than the clip holds for the clip's own length (one-offs end on time).
+    v.anim.animationSpeed = (BUTLER_FPS / 60) * (loop ? 1 : frames.length / length);
     v.anim.onComplete = loop ? null : () => {
       v.anim.onComplete = null;
       done();
     };
-    if ((BUTLER_FRAMES[clip] || 1) > 1) v.anim.gotoAndPlay(0);
+    if (length > 1) v.anim.gotoAndPlay(0);
     else v.anim.gotoAndStop(0);
   }
   if (clip === 'idle2') engine.playSound?.('BUTLER_DOLL_IDLE_2', { volume: 0.5 });
@@ -348,6 +364,27 @@ function faceX(x) {
   rt.dir = x < rt.x ? 'left' : 'right';
 }
 
+/**
+ * lookAtPlayer (bag_butler.js 2971-3020): with its back to the player it plays
+ * turnBack and keeps it (playAnim sets no endAnim for turnBack, 2337), then
+ * facePlayer 1.5 s later. Facing the player already, nothing. The art faces left.
+ */
+function lookAtPlayer(engine, p) {
+  if (!p || !reactionAllowed()) return false;
+  const away = p.x < rt.x ? rt.dir === 'right' : rt.dir === 'left';
+  if (!away) return false;
+  oneOff(engine, 'turnBack', () => {});
+  rt.faceAt = performance.now() + BUTLER.FACE_DELAY_MS;
+  rt.faceX = p.x;
+  return true;
+}
+
+/** facePlayer (2183-2193): face the player; out of a held turnBack, turnFront (then idle0). */
+function facePlayer(engine, x) {
+  faceX(x);
+  if (view?.butler?.clip === 'turnBack') oneOff(engine, 'turnFront');
+}
+
 function spawnBox(engine) {
   const { PIXI } = engine;
   const spr = new PIXI.Sprite(textureFromUrl(BUTLER_BOX_ART));
@@ -391,7 +428,7 @@ function spawnButler(engine) {
   } else {
     if (rigLoad === 'failed') rigLoad = null;
     if (String(engine.param?.('butlerart') || '') !== 'oga') warmRig(engine);
-    const look = nearestButlerLook(st.parts);
+    const look = butlerLook(BUTLER_FALLBACK.look);
     anim = new PIXI.AnimatedSprite(clipFrames(engine, 'idle0'));
     anim.anchor.set(look.anchor.x, look.anchor.y);
     anim.animationSpeed = BUTLER_FPS / 60;
@@ -424,7 +461,7 @@ function respawnButler(engine) {
 function butlerPortrait(parts = st.parts) {
   const rig = butlerRigNow();
   if (rig && typeof document !== 'undefined') return portraitUrl(rig, parts);
-  return butlerSheetUrl(nearestButlerLook(parts).id, 'idle0');
+  return butlerSheetUrl(BUTLER_FALLBACK.look, 'idle0');
 }
 
 function clearView() {
@@ -746,6 +783,7 @@ function startWalk(engine, x, { clip = 'walk4', mode = 'walk' } = {}) {
   const l = layout();
   rt.walkTo = Math.max(40, Math.min(l.width - 40, Math.round(x)));
   rt.walkClip = clip;
+  rt.faceAt = 0; // walking cancels a pending facePlayer (the walk sets the facing)
   rt.mode = mode;
   faceX(rt.walkTo);
   if (mode === 'step') faceX(engine.player?.x ?? rt.x);
@@ -857,10 +895,13 @@ function tickButler(engine, dtMs) {
       rt.x = rt.walkTo;
       rt.walkTo = null;
       rt.returning = false;
+      const stepped = rt.mode === 'step';
       rt.mode = 'idle';
       rt.idleUntil = t + BUTLER.IDLE_MIN_MS + Math.random() * (BUTLER.IDLE_MAX_MS - BUTLER.IDLE_MIN_MS);
-      if (p) faceX(p.x);
       setClip(engine, 'idle0');
+      // onPathing done keeps the walk's facing (stateChange idle); onStepping done looks at
+      // a player within 300 px (4549-4559): a turn, never a flip.
+      if (stepped && p && Math.abs(p.x - rt.x) <= BUTLER.STEP_LOOK_DIST) lookAtPlayer(engine, p);
       if (rt.greeting) greetNow(engine);
     } else {
       rt.x += Math.sign(dx) * stepPx;
@@ -869,6 +910,11 @@ function tickButler(engine, dtMs) {
     rt.mode = 'idle';
     rt.idleUntil = t + 4000;
     setClip(engine, 'idle0');
+  }
+  // facePlayer's timer (lookAtPlayer).
+  if (rt.faceAt && t >= rt.faceAt) {
+    rt.faceAt = 0;
+    facePlayer(engine, p ? p.x : rt.faceX);
   }
   // Once a second, like onUpdate.
   if (t - rt.lastTickSec >= 1000) {
@@ -908,6 +954,13 @@ function secondTick(engine, t) {
     // Not while greeting (onPlayerCollision skips hints in the greeting state).
     if (!st.hintsOff && st.introDone && !rt.greeting && t - (rt.greetedAt || 0) > 12_000) maybeHint(engine);
   }
+  // onPlayerLeavingCollisionArea (4382-4430): leaving "near", look at the player; leaving
+  // "far" with nobody left, a held turnBack turns to the front.
+  if (rt.near && !inNear && inFar && p && !busy) lookAtPlayer(engine, p);
+  if (rt.far && !inFar && view?.butler?.clip === 'turnBack') {
+    rt.faceAt = 0;
+    oneOff(engine, 'turnFront');
+  }
   rt.far = inFar;
   rt.near = inNear;
   // doQuests on the far hit box: the Butler offers what it holds (Join the Club).
@@ -934,10 +987,10 @@ function secondTick(engine, t) {
   if (rt.mode === 'walk') return;
   if (attending) {
     rt.mode = 'attending';
+    // onAttending (3277-3300): a third of the time a blink (idle3 or idle4), else lookAtPlayer.
     if (reactionAllowed() && Math.random() < 0.34) {
-      if (Math.random() < 0.5) {
-        faceX(p.x);
-      } else oneOff(engine, Math.random() < 0.5 ? 'idle3' : 'idle4');
+      if (Math.random() < 1 / 3) oneOff(engine, Math.random() < 0.5 ? 'idle3' : 'idle4');
+      else lookAtPlayer(engine, p);
     }
   } else {
     if (rt.mode === 'attending') rt.mode = 'idle';
@@ -1685,12 +1738,13 @@ function publish(engine, force = false) {
   engine.setData('butlerName', butlerName(st));
   engine.setData('butlerLook', st.look);
   engine.setData('butlerParts', BUTLER_PART_ORDER.map((k) => st.parts[k]).join(','));
-  engine.setData('butlerArt', view?.butler ? (view.butler.rig ? `rig@${BUTLER_RIG_SCALE}x` : `oga:${nearestButlerLook(st.parts).id}`) : '');
+  engine.setData('butlerArt', view?.butler ? (view.butler.rig ? `rig@${BUTLER_RIG_SCALE}x` : `oga:${BUTLER_FALLBACK.look}`) : '');
   const boxSprite = view?.box?.sprite;
   engine.setData('butlerX', st.owned && view?.butler ? String(Math.round(rt.x)) : boxSprite && !boxSprite.destroyed ? String(Math.round(boxSprite.x)) : '');
   engine.setData('butlerPost', st.owned ? String(Math.round(postX())) : '');
   engine.setData('butlerAnim', view?.butler?.clip || '');
   engine.setData('butlerMode', rt.mode);
+  engine.setData('butlerDir', st.owned && view?.butler ? rt.dir : '');
   engine.setData('butlerPackages', String(c.packages));
   engine.setData('butlerMessages', String(c.messages));
   engine.setData('butlerGift', st.gift ? `${st.gift.classTsid}:${st.gift.count}` : '');
@@ -1899,6 +1953,39 @@ function autoplayStep(engine) {
     case 'tower':
       maybeChatter(engine, { force: true, towerLevel: true });
       return done('tower');
+    case 'turn': {
+      // lookAtPlayer with its back to you: turnBack (held), facePlayer 1.5 s later: turnFront.
+      const p = engine.player;
+      const toward = () => (p && p.x < rt.x ? 'left' : 'right');
+      if (!autoplay.opened) {
+        autoplay.opened = true;
+        rt.mode = 'attending';
+        rt.dir = toward() === 'left' ? 'right' : 'left';
+        setClip(engine, 'idle0');
+        say2(lookAtPlayer(engine, p) ? 'turning' : 'noturn');
+        return later(2800);
+      }
+      return done(rt.dir === toward() ? 'turned' : 'notturned');
+    }
+    case 'walk':
+      // A stroll 220 px right on its own walk cycle (walk4), and back.
+      if (!autoplay.opened) {
+        autoplay.opened = true;
+        autoplay.back = rt.x;
+        command();
+        startWalk(engine, rt.x + 220);
+        say2('walking');
+        return later(400);
+      }
+      if (rt.mode === 'walk') return later(250);
+      if (autoplay.back != null) {
+        const x = autoplay.back;
+        autoplay.back = null;
+        command();
+        startWalk(engine, x);
+        return later(400);
+      }
+      return done('walked');
     case 'visitors':
       whoVisited(engine);
       return done('visitors');
@@ -2025,6 +2112,7 @@ export const butlerFeature = {
     lastTsid = null;
     demoOwnedDone = false;
     frameCache = new Map();
+    rt.faceAt = 0;
   },
   _receiveVisitor(engine, letter) {
     return receiveVisitor(engine, letter);

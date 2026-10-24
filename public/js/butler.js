@@ -62,6 +62,16 @@ export const BUTLER = Object.freeze({
   WALK_SPEED: 75,
   /** startMoving: never more than 300 px from the post. */
   WANDER_RANGE: 300,
+  /**
+   * lookAtPlayer (bag_butler.js 2971-3020): facing away from the player, it plays turnBack
+   * (playAnim 633 ms, held: playAnim sets no endAnim for turnBack, 2337) and 1500 ms later
+   * facePlayer (2183-2193) turns it round and plays turnFront (667 ms).
+   */
+  TURN_BACK_MS: 633,
+  TURN_FRONT_MS: 667,
+  FACE_DELAY_MS: 1500,
+  /** onStepping done (4549-4559): look at a player within 300 px. */
+  STEP_LOOK_DIST: 300,
   /** stateChange('idle'): 2-30 s before the next stroll. */
   IDLE_MIN_MS: 2000,
   IDLE_MAX_MS: 30_000,
@@ -242,8 +252,9 @@ export const BUTLER_JOKES = Object.freeze([
  * js/butler-rig.js paints any combination from the SWF's vectors
  * (assets/butler-rig/butler.json, tools/avatar-compositor/butler.mjs).
  * The CC0 OGA archive has whole-butler sheets for four combinations; the
- * three complete ones (BUTLER_LOOKS) are the fallback art while the rig
- * loads and the part choices of saves made before the rig.
+ * three complete ones (BUTLER_LOOKS) are the part choices of saves made
+ * before the rig, and Look 1's idle0 / walk4 sheets the fallback art while
+ * the rig loads (BUTLER_FALLBACK).
  */
 export const BUTLER_OPTIONS = Object.freeze({
   accessory: Object.freeze(Array.from({ length: 12 }, (_, i) => `${i + 1}`)),
@@ -282,6 +293,13 @@ export const BUTLER_FRAMES = Object.freeze({
   startle0: 11, startle1: 15, startle2: 27, danceStart: 25, dance: 34, fastDance: 16, fall: 169, jump: 51,
   walk4: 20, walk3: 24, stepBack: 16,
 });
+/**
+ * Doll clips with no OGA sheet, painted by the rig only (butler.json labels). The game plays
+ * turnBack / turnFront where bag_butler.js does (lookAtPlayer, facePlayer). walk1 and walk2 stay
+ * unused: chooseWalk (bag_butler.js 1971-1984) always picks walk4 (walk3 is the zombie walk) and
+ * has the walk1 / walk2 picks commented out.
+ */
+export const BUTLER_RIG_FRAMES = Object.freeze({ walk1: 21, walk2: 41, turnBack: 19, turnFront: 20 });
 /** bag_butler.as loopers (of the shipped clips). */
 export const BUTLER_LOOPERS = Object.freeze(['dance', 'walk3', 'walk4', 'talk', 'stepBack', 'fastDance']);
 export const BUTLER_FPS = 30;
@@ -290,8 +308,23 @@ export function butlerLook(id) {
   return BUTLER_LOOKS.find((l) => l.id === id) || BUTLER_LOOKS[0];
 }
 
-export function butlerSheetUrl(lookId, anim) {
-  return `assets/sprites/butler/butler_${butlerLook(lookId).id}_${anim}.webp`;
+/**
+ * The loading fallback (and &butlerart=oga): only Look 1's standing pose and walk ship as
+ * sheets. Every Butler shows them until the rig has loaded, whatever its parts; other clips
+ * stand in as the walk (walk3, stepBack) or the standing pose, for the clip's own length.
+ * The OGA archive keeps all four combinations (opengameart/extracted_butler).
+ */
+export const BUTLER_FALLBACK = Object.freeze({ look: 'v10', clips: Object.freeze(['idle0', 'walk4']) });
+
+/** The shipped fallback clip that stands in for `clip`. */
+export function fallbackClip(clip) {
+  if (BUTLER_FALLBACK.clips.includes(clip)) return clip;
+  return clip === 'walk3' || clip === 'stepBack' ? 'walk4' : 'idle0';
+}
+
+/** The fallback sheet for a clip (the look argument is kept for callers; one look ships). */
+export function butlerSheetUrl(_lookId, anim) {
+  return `assets/sprites/butler/butler_${BUTLER_FALLBACK.look}_${fallbackClip(anim)}.webp`;
 }
 export const BUTLER_BOX_ART = 'assets/sprites/butler/butler_box.png';
 

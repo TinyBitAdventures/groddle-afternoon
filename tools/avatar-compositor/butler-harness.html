@@ -6,7 +6,7 @@
   // Offline driver for tools/avatar-compositor/butler-score.mjs and butler-sheet.mjs.
   import { loadButlerRig, drawList, paintFrame, paintPortrait, clipRange } from '/js/butler-rig.js';
   import { paintItems } from '/js/avatar-compositor.js';
-  import { BUTLER_LOOKS, BUTLER_FRAMES, butlerSheetUrl } from '/js/butler.js';
+  import { BUTLER_LOOKS, BUTLER_FRAMES } from '/js/butler.js';
 
   const img = (url) => new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error(url)); i.src = url; });
 
@@ -19,7 +19,8 @@
 
   /** OGA cell k of a look's clip sheet as an alpha mask. */
   async function ogaCell(look, clip, k) {
-    const sheet = await img('/' + butlerSheetUrl(look.id, clip));
+    // The OGA archive sheet (butler-score.mjs serves it): the game ships only its loading fallback.
+    const sheet = await img(`/oga-butler/${look.id}/${clip}.png`);
     const c = document.createElement('canvas');
     c.width = look.cell.w; c.height = look.cell.h;
     const cols = look.cols[clip] || 1;

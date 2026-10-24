@@ -7,13 +7,16 @@
  *   node tools/avatar-compositor/butler-score.mjs --time      ms per 3x frame paint
  *
  * Scoring: for each OGA look (js/butler.js BUTLER_LOOKS: the whole-butler
- * sheets in assets/sprites/butler/), finds where the doll origin sits in the
+ * sheets in the OGA archive, ~/Documents/glitch-audit/opengameart/extracted_butler,
+ * served as /oga-butler/<look>/<clip>.png; the game ships only Look 1's idle0
+ * and walk4 as its loading fallback), finds where the doll origin sits in the
  * cells (best idle0 silhouette overlap), then the silhouette IoU of every
  * frame of every shipped clip at that spot, and the game anchor in doll
  * units (js/butler-rig.js BUTLER_FEET).
  */
 import { createServer } from 'node:http';
-import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BUTLER_LOOKS } from '../../public/js/butler.js';
@@ -22,14 +25,26 @@ import { BUTLER_OPTIONS } from './butler.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
 const PUBLIC = join(ROOT, 'public');
+const OGA_BUTLER = join(homedir(), 'Documents/glitch-audit/opengameart/extracted_butler/glitch-assets/butler');
+
+/** The OGA archive sheet of a look's clip (file names list the parts alphabetically, then _x1_<clip>_png_<stamp>). */
+function ogaButlerFile(lookId, clip) {
+  const look = BUTLER_LOOKS.find((l) => l.id === lookId);
+  if (!look || !existsSync(OGA_BUTLER)) return null;
+  const head = `bag_butler_${Object.keys(look.parts).sort().map((k) => `${k}_${look.parts[k]}`).join('_')}_x1_${clip}_png_`;
+  const hit = readdirSync(OGA_BUTLER).find((f) => f.startsWith(head) && f.endsWith('.png'));
+  return hit ? join(OGA_BUTLER, hit) : null;
+}
+
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.webp': 'image/webp' };
 
 function serve() {
   return new Promise((ok) => {
     const server = createServer((req, res) => {
       const url = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-      const file = url.startsWith('/tools/') ? join(ROOT, url) : join(PUBLIC, url);
-      if (!file.startsWith(ROOT) || !existsSync(file) || statSync(file).isDirectory()) { res.writeHead(404); res.end(); return; }
+      const oga = url.match(/^\/oga-butler\/(\w+)\/(\w+)\.png$/);
+      const file = oga ? ogaButlerFile(oga[1], oga[2]) : url.startsWith('/tools/') ? join(ROOT, url) : join(PUBLIC, url);
+      if (!file || (!oga && !file.startsWith(ROOT)) || !existsSync(file) || statSync(file).isDirectory()) { res.writeHead(404); res.end(); return; }
       res.writeHead(200, { 'content-type': MIME[extname(file)] || 'application/octet-stream' });
       res.end(readFileSync(file));
     });

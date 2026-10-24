@@ -5,14 +5,15 @@
  * players/inc_butler.js.
  * Run: node --test tests/butler.test.js
  */
-import { describe, it } from 'node:test';
+import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   BUTLER,
   BUTLER_BOX,
+  BUTLER_FALLBACK,
   BUTLER_FRAMES,
   BUTLER_HINTS,
   BUTLER_JOKES,
@@ -21,6 +22,7 @@ import {
   BUTLER_OPTIONS,
   BUTLER_PART_NAMES,
   BUTLER_PART_ORDER,
+  BUTLER_RIG_FRAMES,
   BUTLER_SERVICE,
   BUTLER_STRINGS,
   afterGreetingForOwner,
@@ -35,6 +37,7 @@ import {
   clickResponse,
   createButler,
   createButlerState,
+  fallbackClip,
   giftOffer,
   giveGiftTo,
   hintDue,
@@ -68,7 +71,7 @@ import { canOptIn, stoneVog, STONE_TEXT } from '../public/js/street-furniture.js
 import { NEIGHBOURS, neighbourById, normalizeNeighbourState, visitorLetter } from '../public/js/neighbours.js';
 import { butlerApi, butlerFeature } from '../public/js/features/butler-feature.js';
 // The URL clubhouse.js imports, so these share its Butler.
-import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-3';
+import { butlerApi as clubButler, butlerFeature as clubButlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-4';
 import { PART_1 as JOIN_CLUB, REMINISCE as JOIN_CLUB_REMINISCE, room as clubRoom } from '../public/js/quest-rooms/clubhouse.js';
 import { BUTLER_FEET, ButlerPainter, clipRange, drawList } from '../public/js/butler-rig.js';
 import { OFFER_OVERRIDES } from '../public/js/quest-rooms/catalog.js';
@@ -356,22 +359,31 @@ describe('copy and source numbers', () => {
     assert.equal(BUTLER_JOKES[1][1].text, 'To get to the chicken stick! HA HA HA!');
   });
 
-  it('ships every sheet the looks use, at the measured grid', () => {
+  it('ships only the loading fallback (Look 1 idle0 + walk4), every clip standing in on it, at the measured grid', () => {
+    const dir = join(PUBLIC, 'assets/sprites/butler');
+    const sheets = readdirSync(dir).filter((f) => f.endsWith('.webp')).sort();
+    assert.deepEqual(sheets, BUTLER_FALLBACK.clips.map((c) => `butler_${BUTLER_FALLBACK.look}_${c}.webp`).sort());
+    assert.deepEqual([fallbackClip('walk3'), fallbackClip('stepBack'), fallbackClip('wave'), fallbackClip('turnBack'), fallbackClip('walk4')], ['walk4', 'walk4', 'idle0', 'idle0', 'walk4']);
     for (const look of BUTLER_LOOKS) {
-      for (const [clip, frames] of Object.entries(BUTLER_FRAMES)) {
-        const file = join(PUBLIC, butlerSheetUrl(look.id, clip));
-        assert.ok(existsSync(file), file);
-        const cols = look.cols[clip];
-        assert.ok(cols >= 1 && Math.ceil(frames / cols) >= 1, `${look.id} ${clip}`);
-        // WebP VP8X canvas size: 24-bit width-1 / height-1 at bytes 24 and 27.
-        const b = readFileSync(file);
-        const w = 1 + b.readUIntLE(24, 3);
-        const h = 1 + b.readUIntLE(27, 3);
-        assert.equal(w % look.cell.w, 0, `${file} width ${w}`);
-        assert.equal(h % look.cell.h, 0, `${file} height ${h}`);
-        assert.ok(Math.floor(w / look.cell.w) === cols, `${file} cols`);
-        assert.ok((h / look.cell.h) * cols >= frames, `${file} rows`);
+      for (const clip of [...Object.keys(BUTLER_FRAMES), ...Object.keys(BUTLER_RIG_FRAMES)]) {
+        assert.equal(butlerSheetUrl(look.id, clip), `assets/sprites/butler/butler_v10_${fallbackClip(clip)}.webp`);
       }
+    }
+    const look = BUTLER_LOOKS.find((l) => l.id === BUTLER_FALLBACK.look);
+    for (const clip of BUTLER_FALLBACK.clips) {
+      const frames = BUTLER_FRAMES[clip];
+      const file = join(PUBLIC, butlerSheetUrl(look.id, clip));
+      assert.ok(existsSync(file), file);
+      const cols = look.cols[clip];
+      assert.ok(cols >= 1 && Math.ceil(frames / cols) >= 1, `${look.id} ${clip}`);
+      // WebP VP8X canvas size: 24-bit width-1 / height-1 at bytes 24 and 27.
+      const b = readFileSync(file);
+      const w = 1 + b.readUIntLE(24, 3);
+      const h = 1 + b.readUIntLE(27, 3);
+      assert.equal(w % look.cell.w, 0, `${file} width ${w}`);
+      assert.equal(h % look.cell.h, 0, `${file} height ${h}`);
+      assert.ok(Math.floor(w / look.cell.w) === cols, `${file} cols`);
+      assert.ok((h / look.cell.h) * cols >= frames, `${file} rows`);
     }
     assert.ok(statSync(join(PUBLIC, 'assets/sprites/butler/butler_box.png')).size > 1000);
   });
@@ -424,7 +436,7 @@ describe('Visiting Stone hand-off (street-furniture.js)', () => {
 
   it('wires the feature through one import line and the delivery hand-off', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /import \{ butlerFeature \} from '\.\/butler-feature\.js\?v=butler-feature-3'; FEATURES\.push\(butlerFeature\);/);
+    assert.match(index, /import \{ butlerFeature \} from '\.\/butler-feature\.js\?v=butler-feature-4'; FEATURES\.push\(butlerFeature\);/);
     const sf = readFileSync(join(PUBLIC, 'js/features/street-furniture-feature.js'), 'utf8');
     assert.match(sf, /butlerApi\.receiveVisitor\(engine, letter\)\) engine\.deliverMail\?\.\(letter\)/);
     assert.match(sf, /optInDone\(butlerApi\.label\(\) \|\| STONE_BUTLER_STANDIN\)/);
@@ -695,5 +707,151 @@ describe('Join the Club offer: the Butler, or the Magic Rock without one (inc_st
     // Other custom_code gates still reach whoever answered them before.
     assert.equal(engine.questCustomPrereq('join_club_reminisce', { value: 'hour_after:join_club' }), false);
     assert.ok(npcQuestOffers(engine.questState, 'bag_butler', engine.pc, { xp: 30128, customPrereq: () => true }).offered.some((c) => c.classTsid === 'join_club'));
+  });
+});
+
+describe('turning and walking (bag_butler.js lookAtPlayer, facePlayer, chooseWalk)', () => {
+  const gsjs = join(ROOT, '../glitch-GameServerJS/items/bag_butler.js');
+  const rigJson = JSON.parse(readFileSync(join(PUBLIC, 'assets/butler-rig/butler.json'), 'utf8'));
+
+  it('paints the rig-only clips at their doll lengths; the turns last what playAnim gives them', () => {
+    for (const [clip, n] of Object.entries(BUTLER_RIG_FRAMES)) assert.equal(clipRange(rigJson, clip)[1], n, clip);
+    // 30 fps: turnBack 19 frames = 633 ms, turnFront 20 = 667 ms.
+    assert.equal(Math.round((BUTLER_RIG_FRAMES.turnBack / 30) * 1000), BUTLER.TURN_BACK_MS);
+    assert.equal(Math.round((BUTLER_RIG_FRAMES.turnFront / 30) * 1000), BUTLER.TURN_FRONT_MS);
+  });
+
+  it('follows the source timings and its one walk', { skip: !existsSync(gsjs) && 'GSJS checkout not beside this worktree' }, () => {
+    const js = readFileSync(gsjs, 'utf8');
+    assert.match(js, /this\.playAnim\("turnBack", false, 633\);\s*this\.apiSetTimerX\("facePlayer", 1500, target\);/);
+    assert.match(js, /this\.playAnim\("turnFront", false, 667\);/);
+    assert.match(js, /else if \(new_anim\.state === "turnBack"\) \{\s*\/\/ do nothing - keep the head turned/);
+    // chooseWalk: walk4 always; walk1 / walk2 only in a comment.
+    const choose = js.slice(js.indexOf('function chooseWalk()'), js.indexOf('function confirmMessageReceipt'));
+    assert.match(choose, /this\['!walk_anim'\] = "walk4";\s*\/\/ walk3 is the zombie walk\s*\/\*/);
+    assert.equal(BUTLER.FACE_DELAY_MS, 1500);
+  });
+
+  describe('in the feature', () => {
+    const realNow = performance.now;
+    const realRandom = Math.random;
+    let clock = 0;
+    let rolls = [];
+    before(() => {
+      performance.now = () => clock;
+      Math.random = () => (rolls.length ? rolls.shift() : 0.99);
+    });
+    after(() => {
+      performance.now = realNow;
+      Math.random = realRandom;
+    });
+
+    class Obj {
+      constructor(textures) {
+        this.anchor = { set() {} };
+        this.scale = { x: 1, y: 1, set() {} };
+        this.children = [];
+        this.textures = textures;
+        this.destroyed = false;
+      }
+      addChild(c) { this.children.push(c); return c; }
+      removeChild() {}
+      destroy() { this.destroyed = true; }
+      gotoAndPlay() {}
+      gotoAndStop() {}
+    }
+    const PIXI = { Container: Obj, Sprite: Obj, AnimatedSprite: Obj, Rectangle: class { constructor(x, y, w, h) { Object.assign(this, { x, y, w, h }); } }, ImageSource: class { on() {} emit() {} }, Texture: class { constructor(o) { Object.assign(this, o); } } };
+
+    function homeEngine(px) {
+      const data = {};
+      const engine = {
+        started: true,
+        inHome: false,
+        streetTsid: 'RH_HOME_EXT',
+        homeContext: () => ({ inHome: engine.inHome, owned: true }),
+        param: () => null,
+        PIXI,
+        entityLayer: new Obj(),
+        groundY: 500,
+        player: { x: px, y: 500 },
+        pc: { level: 5, xp: 0 },
+        questState: createQuestState(),
+        busy: () => false,
+        register: (t) => t,
+        unregister() {},
+        setData: (k, v) => { data[k] = v; },
+        save() {},
+        say() {},
+        pushActivity() {},
+        playSound() {},
+        mailUnread: () => 0,
+        data,
+      };
+      return engine;
+    }
+
+    function atHome(px) {
+      const prev = globalThis.PIXI;
+      globalThis.PIXI = PIXI;
+      butlerFeature._reset();
+      butlerFeature.restore({ owned: true, introDone: true, createdAt: NOW });
+      const engine = homeEngine(px);
+      clock = 10_000;
+      // A command just now: no idle one-offs (idleAnim) or walk back to the post during the test.
+      butlerFeature._state().rt.lastCommandAt = 1e12;
+      rolls = [];
+      butlerFeature.onTick(16, clock, engine); // on the home street, not home yet: no greeting walk
+      engine.inHome = true;
+      butlerFeature.onTick(16, clock, engine);
+      globalThis.PIXI = prev;
+      return engine;
+    }
+
+    const tick = (engine, ms) => {
+      clock += ms;
+      butlerFeature.onTick(ms, clock, engine);
+    };
+
+    it('turns round (turnBack, held; facePlayer 1.5 s later: turnFront) when it looks at you with its back to you', () => {
+      const engine = atHome(0);
+      const s = butlerFeature._state();
+      s.rt.x = 400;
+      engine.player.x = 400 - 260; // inside "far" and attending range, outside "near"
+      s.rt.dir = 'right'; // its back to you (the art faces left)
+      tick(engine, 1100); // enters far: attending, no wave (facing away)
+      assert.equal(s.rt.mode, 'attending');
+      rolls = [0.1, 0.9]; // onAttending: act (0.34), not a blink (1/3) -> lookAtPlayer
+      tick(engine, 1100);
+      assert.equal(s.view.butler.clip, 'turnBack');
+      assert.equal(s.rt.dir, 'right', 'no flip yet');
+      tick(engine, 1000);
+      assert.equal(s.view.butler.clip, 'turnBack', 'held, not back to idle0');
+      tick(engine, 600); // 1.5 s after the turnBack: facePlayer
+      assert.equal(s.rt.dir, 'left');
+      assert.equal(s.view.butler.clip, 'turnFront');
+      s.view.butler.anim.onComplete(); // turnFront ends: idle0
+      assert.equal(s.view.butler.clip, 'idle0');
+    });
+
+    it('facing you already, it does not turn; a walk keeps its own facing at the end', () => {
+      const engine = atHome(0);
+      const s = butlerFeature._state();
+      s.rt.x = 400;
+      engine.player.x = 140;
+      s.rt.dir = 'left';
+      tick(engine, 1100);
+      rolls = [0.1, 0.9];
+      tick(engine, 1100);
+      assert.equal(s.view.butler.clip, 'idle0');
+      assert.equal(s.rt.faceAt, 0);
+      // A stroll right ends facing right (onPathing done: stateChange idle), not flipped to you.
+      engine.player.x = -2000;
+      s.rt.mode = 'walk';
+      s.rt.walkTo = 450;
+      s.rt.dir = 'right';
+      for (let i = 0; i < 40; i += 1) tick(engine, 50);
+      assert.equal(s.rt.mode, 'idle');
+      assert.equal(s.rt.dir, 'right');
+    });
   });
 });
