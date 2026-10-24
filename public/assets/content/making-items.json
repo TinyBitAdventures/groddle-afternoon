@@ -5709,13 +5709,7 @@
         "food"
       ],
       "isTool": false,
-      "source": "items/sno_cone_blue.js",
-      "use": {
-        "kind": "food",
-        "verb": "Eat",
-        "energy": 75,
-        "source": "items/sno_cone_blue.js base_cost 75 × energy_factor 1 (include/food.js food_eat)"
-      }
+      "source": "items/sno_cone_blue.js"
     },
     "sno_cone_green": {
       "label": "Green Sno Cone",
@@ -5729,13 +5723,7 @@
         "food"
       ],
       "isTool": false,
-      "source": "items/sno_cone_green.js",
-      "use": {
-        "kind": "food",
-        "verb": "Eat",
-        "energy": 150,
-        "source": "items/sno_cone_green.js base_cost 150 × energy_factor 1 (include/food.js food_eat)"
-      }
+      "source": "items/sno_cone_green.js"
     },
     "sno_cone_orange": {
       "label": "Orange Sno Cone",
@@ -5749,13 +5737,7 @@
         "food"
       ],
       "isTool": false,
-      "source": "items/sno_cone_orange.js",
-      "use": {
-        "kind": "food",
-        "verb": "Eat",
-        "energy": 300,
-        "source": "items/sno_cone_orange.js base_cost 300 × energy_factor 1 (include/food.js food_eat)"
-      }
+      "source": "items/sno_cone_orange.js"
     },
     "sno_cone_purple": {
       "label": "Purple Sno Cone",
@@ -5769,13 +5751,7 @@
         "food"
       ],
       "isTool": false,
-      "source": "items/sno_cone_purple.js",
-      "use": {
-        "kind": "food",
-        "verb": "Eat",
-        "energy": 1100,
-        "source": "items/sno_cone_purple.js base_cost 1100 × energy_factor 1 (include/food.js food_eat)"
-      }
+      "source": "items/sno_cone_purple.js"
     },
     "sno_cone_rainbow": {
       "label": "Rainbo Sno Cone",
@@ -5789,13 +5765,7 @@
         "food"
       ],
       "isTool": false,
-      "source": "items/sno_cone_rainbow.js",
-      "use": {
-        "kind": "food",
-        "verb": "Eat",
-        "energy": 2200,
-        "source": "items/sno_cone_rainbow.js base_cost 2200 × energy_factor 1 (include/food.js food_eat)"
-      }
+      "source": "items/sno_cone_rainbow.js"
     },
     "sno_cone_red": {
       "label": "Red Sno Cone",
@@ -5809,13 +5779,7 @@
         "food"
       ],
       "isTool": false,
-      "source": "items/sno_cone_red.js",
-      "use": {
-        "kind": "food",
-        "verb": "Eat",
-        "energy": 600,
-        "source": "items/sno_cone_red.js base_cost 600 × energy_factor 1 (include/food.js food_eat)"
-      }
+      "source": "items/sno_cone_red.js"
     },
     "sparkle_powder": {
       "label": "Sparkle Powder",

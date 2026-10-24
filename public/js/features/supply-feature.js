@@ -9,11 +9,12 @@
  *    Collect the Hooch it makes, one every 140 seconds, offline too.
  *  - Butterfly Milk, Butter, the four Cheeses and every herb: Shake,
  *    Compress, Age, Poke and Shuck (js/item-transforms.js).
- *  - A Bureaucrat outside the Bureaucratic Halls (Gregarious Grange, Baeli
- *    Bray, Chego Chase) sells Your Papers and General Building Permits to
- *    those with Bureaucratic Arts, and a Card-Carrying Qualification to
- *    anyone without its badge (js/bureaucracy.js); Complete Your Papers
- *    in the pack for the You Have Papers badge.
+ *  - The Bureaucrats inside the Bureaucratic Halls (bureaucratic-halls-feature.js,
+ *    behind the doors on Gregarious Grange, Baeli Bray and Chego Chase)
+ *    sell Your Papers and General Building Permits to those with
+ *    Bureaucratic Arts, and a Card-Carrying Qualification to anyone without
+ *    its badge (js/bureaucracy.js): their verbs live here. Complete Your
+ *    Papers in the pack for the You Have Papers badge.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&supplydemo=1 grants a Machine Stand,
  *     every part, Fuel Cells, a Still with Grain, Butterfly Milk, herbs and
@@ -22,6 +23,7 @@
  *     compresses, ages and shucks. Canvas: data-supply-machines,
  *     data-supply-fuel, data-supply-still, data-supply-last, data-supply-autoplay.
  *     Clerk: ?autostart=1&fresh=1&resetgame=1&streetdemo=GLI32G3NUTD100I&supplydemo=clerk
+ *     puts a Bureaucrat beside you on the street, for QA only
  *     (&supplyautoplay=1 buys Your Papers, completes them, buys a permit;
  *     data-supply-permits).
  */
@@ -418,10 +420,9 @@ export const supplyFeature = {
   },
 
   onStreetEnter(street, engine) {
-    if (HALL_STREETS[engine.streetTsid]) {
-      const near = { x: (engine.player?.x || 0) + 90, y: engine.player?.y || engine.groundY };
-      const point = engine.param?.('supplydemo') === 'clerk' ? near : engine.placement('supply-clerk')[0] || near;
-      spawnClerk(engine, point);
+    // The Bureaucrats stand inside the halls now; this one is the clerk QA route's.
+    if (HALL_STREETS[engine.streetTsid] && engine.param?.('supplydemo') === 'clerk') {
+      spawnClerk(engine, { x: (engine.player?.x || 0) + 90, y: engine.player?.y || engine.groundY });
     }
     demoSetup(engine);
     publish(engine);
@@ -450,10 +451,6 @@ export const supplyFeature = {
     }
     if (runMachineVerb(classTsid, verbId, engine)) return true;
     return runTransformVerb(classTsid, verbId, engine);
-  },
-
-  placementGroups(population, street) {
-    return HALL_STREETS[street?.tsid] ? [{ key: 'supply-clerk', count: 1, clearance: 90 }] : [];
   },
 
   onStreetClear() {

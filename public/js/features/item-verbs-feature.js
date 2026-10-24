@@ -16,6 +16,9 @@
  * - Metalmaker with Making Metal (metalmaking_music): metalmaker.js:925-934
  *   onMakingComplete counts sloths:played_music_for for every Sloth within
  *   250 px (Noise-Bringer). The remake counts on each unit made.
+ * - Games (location.is_game: race scenes, Grab 'Em Good, Game of Crowns, the
+ *   Great Hog Haul): Essence of Hairball, Hairball Flower and Spinach refuse
+ *   with their own lines (js/item-verbs.js GAME_CHEAT_BLOCKS, packUseGate).
  * - Your home: home.js:40 and inc_cultivation.js:152 set
  *   cultivation_items:has to the cultivated items on your home street
  *   (Self-sufficientiser); home.js:46-52 and trophy_base drop set
@@ -35,12 +38,16 @@ import {
   GARLIC_EAT_COUNTER,
   ITEM_VERBS,
   crunchIce,
+  gameCheatBlock,
   iceCrunchButton,
   itemVerbButton,
   itemVerbsFor,
   runItemVerb,
-} from '../item-verbs.js?v=item-verbs-1';
+} from '../item-verbs.js?v=g137-1';
 import { homesFeature } from './homes-feature.js?v=homes-7';
+import { CROWNS_STREET } from '../game-of-crowns.js?v=crowns-1';
+import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-1';
+import { isRaceSceneTsid } from '../races.js?v=races-3';
 
 export const ITEM_VERBS_FEATURE_ID = 'item-verbs';
 
@@ -128,6 +135,12 @@ export function runItemVerbFor(engine, classTsid, verbId) {
   engine.save?.();
   publish(engine);
   return last;
+}
+
+/** location.is_game: a race scene (races and Grab 'Em Good), the Game of Crowns arena or the Great Hog Haul. */
+export function inGameLocation(tsid) {
+  const key = String(tsid || '');
+  return isRaceSceneTsid(key) || key === CROWNS_STREET || key === HOG_HAUL_STREET_ID;
 }
 
 function checkHome(engine, now) {
@@ -221,6 +234,11 @@ export const itemVerbsFeature = {
       return;
     }
     publish(engine);
+  },
+
+  /** essence_of_hairball / hairball_flower / spinach: no cheating in a game. */
+  packUseGate(classTsid, engine) {
+    return gameCheatBlock(classTsid, inGameLocation(engine?.streetTsid));
   },
 
   packVerbs(classTsid, engine) {

@@ -171,3 +171,27 @@ export function runItemVerb(def, pc, ctx = {}) {
     achievementCounters: [{ counter: def.counter, amount: 1 }, ...itemVerbAchievementCounters(def.classTsid, def.verb).slice(1)],
   };
 }
+
+// ---------------------------------------------------------------------------
+// No cheating in games (location.is_game)
+// ---------------------------------------------------------------------------
+
+/**
+ * Items whose verb is refused inside a game location: essence_of_hairball.js:110
+ * (imbibe), hairball_flower.js:317 canMunch, spinach.js:220-221 (is_game and
+ * is_race). The games are the shared instances (config_prod.js
+ * shared_instances: the races, Grab 'Em Good, the Great Hog Haul, Game of
+ * Crowns), all created with is_game (shared_instance_manager.js:544).
+ */
+export const GAME_CHEAT_BLOCKS = Object.freeze({
+  essence_of_hairball: "You're playing a game. No cheating!",
+  hairball_flower: 'That would be cheating!',
+  spinach: 'Nice try, cheater!',
+});
+
+/** The refusal for `classTsid` while `inGame`, or null. */
+export function gameCheatBlock(classTsid, inGame = false) {
+  if (!inGame) return null;
+  const msg = GAME_CHEAT_BLOCKS[String(classTsid || '')];
+  return msg ? { ok: false, msg } : null;
+}

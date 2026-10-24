@@ -505,7 +505,7 @@ describe('wiring', () => {
     for (const m of src.matchAll(/from '\.\/([a-z-]+-feature\.js\?v=[^']+)'/g)) {
       assert.ok(index.includes(`'./${m[1]}'`), m[1]);
     }
-    assert.match(index, /buff-triggers-feature\.js\?v=g124-1'; FEATURES\.push\(buffTriggersFeature\)/);
+    assert.match(index, /buff-triggers-feature\.js\?v=g124-2'; FEATURES\.push\(buffTriggersFeature\)/);
   });
 
   it('game.js applies Stuffed at the daily limit and announces each making batch', () => {

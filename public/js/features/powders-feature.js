@@ -17,7 +17,9 @@
  *   more animals earns Critter Catalyzer.
  * - Fertilidust: Disperse. Three seconds later every tree on the street grows
  *   one stage (trants to full health too); four or more trees earn Fertilivert.
- *   Fertilidust Lite: Sprinkle, the closest tree only.
+ *   Every dead trant on the street (a patches-feature plot) comes back at
+ *   maturity 4, health 5, for 25 iMG each. Fertilidust Lite: Sprinkle, the
+ *   closest living tree only.
  * - Fairly / Extremely Hallowed Shrine Powder: Sprinkle. Doubles / triples
  *   your next shrine donation (js/shrines.js); an Extremely Hallowed donation
  *   worth 1,000 or more earns Hallowed Be Shrine Name (game.js).
@@ -27,9 +29,11 @@
  * jar's charges are saved per class, and the jar goes at zero.
  *
  * Not built: the sneezing and sparkle effects on other players (Sneeze-O-Rama
- * needs 5 of them, Sparkle Buddy 7: lost), Fertilidust bringing dead trees
- * back (dead street trees live in the patches feature), the rooked-tree
- * relief (trants.js reduceRookedness) and the Feat commit points.
+ * needs 5 of them, Sparkle Buddy 7: lost). Nothing to build for the rest:
+ * include/trants.js:1244 onFertilidust calls this.reduceRookedness(60) on a
+ * rooked trant, but no GSJS file defines reduceRookedness, and
+ * players/inc_feats.js:321 feats_increment_for_commit returns on its first
+ * line, so the Feat points were switched off.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&powderdemo=1 packs one of
  *   every powder (a Fecundity cooldown is cleared); &powderautoplay=<class>
@@ -57,7 +61,8 @@ import {
   sprinkleHallowed,
   usePowderCharge,
 } from '../powders.js?v=powders-1';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-1';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=g137-1';
+import { DEAD_TRANT_CLASSES } from '../patches.js';
 import { hellFeature } from './hell-feature.js?v=hell-1';
 
 export const POWDERS_FEATURE_ID = 'powders';
@@ -101,6 +106,29 @@ function streetTargets(engine, test) {
 
 function treeTargets(engine) {
   return streetTargets(engine, (t) => isFertileTree(t.classId) && t.state && !/_dead$/.test(t.classId));
+}
+
+/** Dead trants on the street: patches-feature plots (tree-death-feature adopts dead street trees there). */
+function deadTreeTargets(engine) {
+  return streetTargets(engine, (t) => t.featureId === 'patches' && DEAD_TRANT_CLASSES.includes(t.classId) && t.patchKey);
+}
+
+/**
+ * fertilidust.js onUse replaceWith: mark each dead trant's plot; the patches
+ * feature's next tick (500 ms) revives it (js/patches.js tickPlot, reviveDeadTree)
+ * and redraws it as a living tree.
+ */
+function reviveDeadTrees(engine, targets, now = Date.now()) {
+  const plots = engine.streetSlot?.('patches')?.plots || {};
+  const revived = [];
+  for (const target of targets) {
+    const plot = plots[target.patchKey];
+    if (plot?.stage !== 'dead') continue;
+    plot.fertilidustAt = now;
+    revived.push(`${target.classId}:${target.patchKey}`);
+  }
+  engine.setData?.('powderTreesRevived', revived.join(','));
+  return revived.length;
 }
 
 function notify(engine, classTsid, verb) {
@@ -202,15 +230,24 @@ const RUNNERS = {
 
   fertilidust(engine, classTsid) {
     const trees = treeTargets(engine);
+    const deadTargets = deadTreeTargets(engine);
     const paper = streetTargets(engine, (t) => t.classId === 'paper_tree').length;
-    const out = fertilidustOutcome({ trants: trees.length, dead: 0, paper });
+    const out = fertilidustOutcome({ trants: trees.length, dead: deadTargets.length, paper });
     for (const msg of out.msgs) say(engine, msg, out.ok);
     if (!out.ok) return 'no-trees';
-    later(3000, () => fertilize(engine, trees));
+    const dead = reviveDeadTrees(engine, deadTargets);
+    if (out.xp) {
+      // 25 iMG for every dead trant brought back (stats_add_xp).
+      engine.pc.imagination = (Number(engine.pc.imagination) || 0) + out.xp;
+      engine.pc.xp = (Number(engine.pc.xp) || 0) + out.xp;
+      if (engine.player) engine.floatText?.(engine.player.x, engine.player.y - 90, `+${out.xp} iMG`, 0xb388ff);
+      engine.updateHud?.();
+    }
+    if (trees.length) later(3000, () => fertilize(engine, trees));
     if (out.sound) later(2000, () => engine.playSound?.(out.sound, { volume: 0.6 }));
     for (const row of out.achievementCounters) engine.achievement(row.counter, row.amount);
     finishUse(engine, classTsid);
-    return `trees:${trees.length}`;
+    return `trees:${trees.length}${dead ? `:revived:${dead}` : ''}`;
   },
 
   fertilidust_lite(engine, classTsid) {

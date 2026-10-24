@@ -439,7 +439,7 @@
    "group": "making",
    "name": "Powders",
    "status": "source",
-   "blurb": "Every Beaker powder does its own thing again: No-No Powder’s rush and crash, Sneezing and Sparkle Powder, the Fecundity powders that make the animals drop their edibles, Fertilidust for the trees, and hallowed powder that doubles or triples your next shrine donation.",
+   "blurb": "Every Beaker powder does its own thing again: No-No Powder’s rush and crash, Sneezing and Sparkle Powder, the Fecundity powders that make the animals drop their edibles, Fertilidust for the trees (it brings dead ones back to life), and hallowed powder that doubles or triples your next shrine donation.",
    "spot": null,
    "evidence": [
     "public/js/powders.js",
@@ -515,17 +515,33 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&shrinedemo=1&practice=1"
   },
   {
+   "id": "bureaucratic-halls",
+   "group": "economy",
+   "name": "Bureaucratic Halls",
+   "status": "rebuilt",
+   "blurb": "The hall doors on Gregarious Grange, Chego Chase and Baeli Bray open again: the Bureaucratic Hall, the Andra and the Muufo halls, where the bureaucrats behind the counter sell the Card-Carrying Qualification, Your Papers and General Building Permits. The halls themselves were never archived, so all three use the one hall rebuilt for Legalize It.",
+   "spot": null,
+   "evidence": [
+    "public/js/features/bureaucratic-halls-feature.js",
+    "public/js/bureaucracy.js"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&doordemo=GA5I10NJDL52TKD&practice=1"
+  },
+  {
    "id": "vendors",
    "group": "economy",
    "name": "Street spirits and vendors",
    "status": "source",
-   "blurb": "The original stores, stock and prices, buying and selling. The scarecrow Gardening Tools Vendor, the Meal Vendor, the Tool Vendor, Uncle Friendly, Helga and the Sno Cone Vending Machine stand on the eleven streets the archive puts them on, each with its own store, and the scarecrow sends you on his Meet the Merchants errands.",
+   "blurb": "The original stores, stock and prices, buying and selling. The scarecrow Gardening Tools Vendor, the Meal Vendor, the Tool Vendor, Uncle Friendly, Helga and the Sno Cone Vending Machine stand on the eleven streets the archive puts them on, each with its own store, and the scarecrow sends you on his Meet the Merchants errands. Sno Cones give iMG, not energy: each colour needs its level, the fourth of the day may freeze your brain, and a dropped cone melts.",
    "spot": "vendor",
    "evidence": [
     "public/js/vendor.js",
     "public/js/store-catalog.js",
     "public/js/vendor-npcs.js",
-    "public/js/features/vendor-npcs-feature.js"
+    "public/js/features/vendor-npcs-feature.js",
+    "public/js/sno-cones.js",
+    "public/js/features/sno-cones-feature.js"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&vendor=toys&practice=1"
@@ -958,14 +974,14 @@
  ],
  "tally": {
   "source": 41,
-  "rebuilt": 8,
+  "rebuilt": 9,
   "lost": 3,
   "solo": 8,
   "reimagined": 1,
   "progress": 1
  },
- "back": 58,
- "possible": 59,
+ "back": 59,
+ "possible": 60,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2055,6 +2071,6 @@
    }
   ]
  },
- "tests": 207,
+ "tests": 210,
  "generatedAt": "2026-10-24"
 }

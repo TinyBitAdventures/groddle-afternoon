@@ -580,6 +580,41 @@ export function killPlotTree(plot, now = Date.now()) {
   return { classId, soilClass: deadClass };
 }
 
+/** fertilidust.js onUse: a dead trant comes back at health 4 + 1 and maturity 3 + 1. */
+export const REVIVED_TRANT = Object.freeze({ maturity: 4, health: 5 });
+
+/**
+ * fertilidust.js onUse: replaceWith('trant_*') on a dead trant, then
+ * health 4 + plusHealth and maturity 3 + plusMaturity. The plot becomes a
+ * grown tree on its soil. Returns the tree, or null for anything not dead.
+ */
+export function reviveDeadTree(plot, now = Date.now()) {
+  if (plot?.stage !== 'dead' || !DEAD_TRANT_CLASSES.includes(plot.deadClass)) return null;
+  const classId = plot.deadClass.replace(/_dead$/, '');
+  if (!GROWN_TREE_LABELS[classId]) return null;
+  plot.kind = patchKindFor(plot.deadClass);
+  plot.classTsid = plot.kind;
+  plot.stage = 'tree';
+  plot.since = now;
+  plot.dueAt = 0;
+  plot.seedling = null;
+  plot.deadClass = null;
+  plot.tree = {
+    classId,
+    state: createTrantState(classId, { ...REVIVED_TRANT }),
+    grownAt: now,
+    lastCycleAt: now,
+    woodPetted: 0,
+    woodWatered: 0,
+    seenPetted: false,
+    seenWatered: false,
+    seenHarvests: 0,
+    clearedAt: 0,
+    resetAt: now,
+  };
+  return plot.tree;
+}
+
 /** trants.js recalcCycles: minutes between maturity rolls. */
 export function maturityCycleMs(maturity) {
   return (whole(maturity, 1, 0, 10) <= 1 ? 10 : 20) * SOIL_TIMERS.maturityIntervalMs;
@@ -670,6 +705,11 @@ export function tickPlot(plot, now = Date.now(), ctx = {}) {
   const rng = ctx.rng || Math.random;
   const events = [];
   if (!plot) return { changed: false, events };
+  // Fertilidust (features/powders-feature.js) marks a dead trant; it comes back here.
+  if (plot.stage === 'dead' && plot.fertilidustAt && now >= plot.fertilidustAt) {
+    delete plot.fertilidustAt;
+    if (reviveDeadTree(plot, now)) events.push('revived');
+  }
   if ((plot.stage === 'clean' || plot.stage === 'dug') && plot.dueAt && now >= plot.dueAt) {
     events.push(plot.stage === 'clean' ? 'regrew' : 'filled');
     setDirty(plot, plot.dueAt);

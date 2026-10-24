@@ -355,7 +355,8 @@ export function itemUse(row) {
   if (!row) return null;
   const parents = row.parentClasses;
   // Herbs (herb_base is_herb) suppress the plain eat verb in include/food.js.
-  if (parents.includes('food') && row.verbs.includes('eat') && !intval(row.classProps.is_herb)) {
+  // Sno cones: sno_cone_base overrides eat (iMG, a level gate, brain freeze; js/sno-cones.js), no energy.
+  if (parents.includes('food') && row.verbs.includes('eat') && !intval(row.classProps.is_herb) && !parents.includes('sno_cone_base')) {
     const factor = parseFloat(row.classProps.energy_factor ?? '1');
     const energy = Math.round(row.baseCost * (Number.isFinite(factor) ? factor : 1));
     return {

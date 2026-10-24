@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-4';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-50';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-51';
 import {
   actionDurationFor,
   createTimedAction,
@@ -2526,7 +2526,9 @@ function getPackUseInfo(classTsid) {
   const buff = getBuffItemInfo(classTsid);
   if (buff?.def) {
     // Yellow Crumb: only while studying and below maximum acceleration.
-    const reason = studyBuffBlockReason(buff, studyBuffContext());
+    // A feature's packUseGate refuses first (no Essence of Hairball, Hairball Flower or Spinach in a game).
+    const useGate = features.query('packUseGate', classTsid, engine);
+    const reason = (useGate?.ok === false && useGate.msg) || studyBuffBlockReason(buff, studyBuffContext());
     return {
       usable: !reason,
       verb: buff.verb,
@@ -7755,6 +7757,12 @@ const engine = {
   inScene() {
     return Boolean(engine.sceneTsid && currentStreetTsid === engine.sceneTsid);
   },
+  /** Legalize It's Bureaucratic Hall room and clerk art, for the hall doors (features/bureaucratic-halls-feature.js). */
+  bureaucraticHall: () => ({
+    layer: drawBureaucraticHall(),
+    clerk: (index, x, y, scale) => makeLegalizeBureaucrat(index, x, y, scale),
+    sprite: (url) => new PIXI.Sprite(textureFromUrl(url)),
+  }),
   /**
    * A feature-built transient scene (races): swaps the street for the
    * feature's own Pixi background (optional worldH / updateParallax) and its

@@ -807,6 +807,11 @@
   "reason": "only locations/mountains.js looks for it on a mountain street; no archived street places one and no mountain party space was configured",
   "register": "G123"
  },
+ "item:juju_shoo_shoo_powder": {
+  "status": "excluded",
+  "reason": "retired: its only recipe (catalog_recipes.js 170) is learnt 3, which main.js:781 leaves out of the client catalog and makingFindBestMatch never discovers, and catalog_tags.js puts it in no Craftybot category (only no_rube and no_trade); its onUse only answers an npc_juju_boss, and nothing creates the Juju Boss",
+  "register": "G137"
+ },
  "buff:charades": {
   "status": "lost",
   "reason": "potion_charades.js:526 / catalog_buffs.js charades: other players in the street guess the word and win; nobody can guess in a solo street",

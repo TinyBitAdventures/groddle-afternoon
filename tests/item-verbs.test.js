@@ -294,8 +294,9 @@ describe('game.js wiring for G134', () => {
     assert.match(game, /resetAchievementCounter: \(counter\) => resetAchievementCounter\(achieveState, counter\)/);
     assert.match(game, /refreshTreeVisual\(target\) \{/);
     const registry = readFileSync(join(publicRoot, 'js/features/index.js'), 'utf8');
-    assert.match(registry, /powders-feature\.js\?v=g134-1'; FEATURES\.push\(powdersFeature\)/);
-    assert.match(registry, /item-verbs-feature\.js\?v=g134-1'; FEATURES\.push\(itemVerbsFeature\)/);
+    // Later lanes (G137) bump these.
+    assert.match(registry, /powders-feature\.js\?v=g1\d\d-\d+'; FEATURES\.push\(powdersFeature\)/);
+    assert.match(registry, /item-verbs-feature\.js\?v=g1\d\d-\d+'; FEATURES\.push\(itemVerbsFeature\)/);
     // Lanes after this one bump the registry further.
     assert.match(game, /features\/index\.js\?v=registry-(?:4[89]|[5-9]\d)'/);
   });
