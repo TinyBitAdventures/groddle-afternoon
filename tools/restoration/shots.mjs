@@ -57,7 +57,7 @@ export const SHOTS = Object.freeze({
   'room:radiant_glare': { route: `${Q}&questdemo=radiant_glare&questautoplay=mixer`, wait: 18000 },
   'room:an_autumn_day': { route: `${Q}&questdemo=an_autumn_day`, wait: 12000 },
   'room:being_watched': { route: `${Q}&questdemo=stale_but_necessary&questautoplay=veil`, wait: 18000 },
-  'room:back_alley': { route: `${Q}&questdemo=fuelmaking_refuel_robot&backalleystage=station`, wait: 14000 },
+  'room:back_alley': { route: `${Q}&questdemo=fuelmaking_refuel_robot`, wait: 14000 },
   'room:clubhouse': { route: `${Q}&questdemo=join_club`, wait: 14000 },
   'room:light_perspective': { route: `${Q}&questdemo=puzzle_level_light_perspective&questautoplay=mix`, wait: 18000 },
   'room:tile_puzzle': { route: `${Q}&questdemo=btc_room_3`, wait: 12000, steps: [{ eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }] },

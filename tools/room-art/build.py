@@ -238,6 +238,20 @@ SETS = {
             'arbito_bush3': (0.9, 2, 0),
         },
     },
+    # The Back Alley (G111): the alley (template LIF177DTS6T1KFG) is lost. Its one Snap (research/wayback/
+    # raw/snaps/fuelmaking_refuel_robot/, reference only) shows a Groddle forest with a fallen reddish log
+    # behind the avatar; corey3.swf, the bundle that also holds the grey stone hut (house_back_small01,
+    # already a street deco), has it as corey3_fallenTree_log. ~1.45 world px per Snap px (the avatar is
+    # ~90 of 640 Snap px): the log is ~170 Snap px long, so ~0.8 of its 316 px stage.
+    'back_alley': {
+        'bundle': 'corey3.swf',
+        'out': 'assets/sprites/quest-rooms/back_alley',
+        'js': 'js/quest-rooms/back-alley-art.js',
+        'export': 'BACK_ALLEY_FILES',
+        'pieces': {
+            'corey3_fallenTree_log': (0.8, 2, 0),
+        },
+    },
     'sky_plunge': {
         'bundle': 'groddle1.swf',
         'out': 'assets/sprites/paradise/sky_plunge',

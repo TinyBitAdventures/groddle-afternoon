@@ -136,7 +136,7 @@ export const ROOM_NOTES = Object.freeze({
     about: "We're Off to See the Lizard: a Shady Bureaucrat in the back alley asks you to refuel a maintenance robot stuck in a subway station.",
     play: "Hear the proposition, make a Fuel Cell in a Fuelmaker, take any subway door, find the robot on the platform and refuel it.",
     source: "The Bureaucrat's four lines, the three-minute alley clock, the robot's lines and the rewards.",
-    rebuilt: 'The subway platform is rebuilt from two subway recordings; the remake has no subway network, so any subway door opens it.',
+    rebuilt: "The alley is laid out from a player's Snap of the meeting: a dark forest, a tall pale brick wall, a shaft of light, the Bureaucrat before a small grey hut and a fallen red log on the path, all from Tiny Speck's own forest pieces. The subway platform is rebuilt from two subway recordings; the remake has no subway network, so any subway door opens it.",
     footage: [],
   },
   clubhouse: {

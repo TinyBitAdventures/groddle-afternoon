@@ -25,9 +25,11 @@
  *    bot rolls off at 300 px/s via 46,-349 and -850,-349.
  *  - Rewards (familiar turn-in): 1000 xp, 600 currants, 100 mood, 100 Alph
  *    favor.
- * Lost / reconstructed: both locations' geometry. The alley reuses the
- * Legalize It forest staging and recovered art (decos, the Shady Bureaucrat
- * sheets); the remake has no subway network, so while the bot waits a
+ * Lost / reconstructed: both locations' geometry. The alley is staged from
+ * its one player Snap (G111, research/wayback/raw/snaps/fuelmaking_refuel_robot/,
+ * reference only; ALLEY_SET) with recovered CC0 art: Groddle forest decos, the
+ * white brick back wall, corey3's grey stone hut and fallen log, and the Shady
+ * Bureaucrat sheets. The remake has no subway network, so while the bot waits a
  * street's subway door (twelve imported streets have one) opens a rebuilt
  * station platform (pillars, map stand and train from the Lily Linguistic
  * subway recordings) instead of "This door is not working!". The bot's
@@ -37,6 +39,7 @@
  */
 
 import { onLoaded, textureFromUrl } from '../textures.js';
+import { BACK_ALLEY_FILES } from './back-alley-art.js';
 
 export const QUEST = 'fuelmaking_refuel_robot';
 const ART = 'assets/sprites/quest-rooms/back_alley/';
@@ -203,56 +206,97 @@ function wantedStage() {
 /* Drawing                                                              */
 /* ------------------------------------------------------------------ */
 
+/**
+ * The alley's set, laid out from its one Snap (G111: research/wayback/raw/snaps/
+ * fuelmaking_refuel_robot/, Jul 2012, reference only) at ~1.45 world px per
+ * Snap px, measured from the Bureaucrat (Snap x 320): left to right a dark
+ * trunk, a tall pale brick wall under the canopy, the light shaft, the small
+ * grey hut behind the Bureaucrat, bushes, the fallen reddish log behind the
+ * avatar, on a dirt path through a dark green forest. World x of each piece
+ * (centre, or [left, right] for the wall and log).
+ */
+export const ALLEY_SET = Object.freeze({
+  trunkX: 632,
+  wall: Object.freeze({ left: 656, right: 812, height: 380 }),
+  shaft: Object.freeze({ top: [850, 1000], bottom: [900, 1080] }),
+  hutX: 880,
+  log: Object.freeze({ left: 1060, right: 1312 }),
+  bushes: Object.freeze([960, 1120, 1290, 1440]),
+});
+/** Recovered CC0 pieces the set uses (assets/decos/groddle, or the room-art set). */
+export const ALLEY_ART = Object.freeze({
+  wall: 'backwall_bricks_white_ghtest',
+  hut: 'house_back_small01',
+  log: 'corey3_fallenTree_log',
+  canopy: 'platform_branch_a04',
+  forest: 'wallpaper_tree_short_1',
+});
+
 function drawAlley(ctx) {
   const { PIXI, kit } = ctx;
   const { W, FLOOR } = ALLEY;
+  const S = ALLEY_SET;
   const H = FLOOR + 140;
   const root = kit.sceneRoot(PIXI, W, H);
   const sky = root.layer(0, 0);
-  sky.addChild(kit.gradient(PIXI, [[0, '#0f2418'], [0.6, '#21452f'], [1, '#2f5a3b']], 960, 640));
+  sky.addChild(kit.gradient(PIXI, [[0, '#08150e'], [0.6, '#11271a'], [1, '#1a3523']], 960, 640));
+  // Far forest: rows of dark pines behind everything.
   const far = root.layer(0.45, 1);
-  [['tree_background_01', 80], ['tree_background_02', 330], ['tree_background_03', 560], ['tree_background_02', 820],
-    ['tree_background_01', 1080], ['tree_background_03', 1330]].forEach(([n, x], i) => {
-    far.addChild(kit.deco(PIXI, n, x, FLOOR - 60, { scale: 1.6 + (i % 3) * 0.1, alpha: 0.6 }));
+  for (let i = 0; i < 6; i++) {
+    far.addChild(kit.deco(PIXI, i % 2 ? 'wallpaper_tree_short_2' : ALLEY_ART.forest, -200 + i * 360, FLOOR - 40, { scale: 0.42, tint: 0x5f7a62, alpha: 0.9 }));
+  }
+  const mid = root.layer(0.75, 1.5);
+  [['tree_coniferous_2', 140], ['tree_coniferous_4', 620], ['tree_coniferous_1', 1060], ['tree_coniferous_3', 1420]].forEach(([n, x], i) => {
+    mid.addChild(kit.deco(PIXI, n, x, FLOOR + 10, { scale: 0.42 + (i % 2) * 0.05, tint: 0x46604a }));
   });
   const world = root.layer(1, 2);
-  // Light through the canopy (the recording's soft beams).
+  // The pale brick wall, moved to the left of the Bureaucrat as in the Snap: a crop of the CC0
+  // white brick back wall, shaded down for the dark forest.
+  const wallSpr = kit.deco(PIXI, ALLEY_ART.wall, S.wall.left, FLOOR + 6, { ax: 0, ay: 1, scale: (S.wall.height + 6) / 594, tint: 0xa9aea2 });
+  const wallMask = new PIXI.Graphics().rect(S.wall.left, FLOOR - S.wall.height, S.wall.right - S.wall.left, S.wall.height + 6).fill(0xffffff);
+  wallSpr.mask = wallMask;
+  world.addChild(wallMask, wallSpr);
+  const wallEdge = new PIXI.Graphics();
+  wallEdge.rect(S.wall.right - 10, FLOOR - S.wall.height, 10, S.wall.height).fill({ color: 0x1b2a1f, alpha: 0.35 });
+  world.addChild(wallEdge);
+  // The dark trunk at the left edge and the canopy hanging over the wall top.
+  world.addChild(kit.deco(PIXI, 'tree_coniferous_fg_2', S.trunkX, FLOOR + 30, { scale: 0.34, tint: 0x3a4a3c }));
+  world.addChild(kit.deco(PIXI, ALLEY_ART.canopy, S.wall.left + 110, FLOOR - 170, { scale: 0.6, tint: 0x5f8a4a, rotation: 0.16 }));
+  world.addChild(kit.deco(PIXI, 'platform_branch_a02', S.wall.right + 40, FLOOR - 225, { scale: 0.5, tint: 0x4e7a40, flip: true, rotation: -0.08 }));
+  // The light shaft through the canopy, above the hut.
   const beams = new PIXI.Graphics();
-  beams.poly([520, 0, 700, 0, 980, FLOOR, 760, FLOOR]).fill({ color: 0xc9f0c0, alpha: 0.09 });
-  beams.poly([900, 0, 1010, 0, 1240, FLOOR, 1090, FLOOR]).fill({ color: 0xc9f0c0, alpha: 0.06 });
+  beams.poly([S.shaft.top[0], -40, S.shaft.top[1], -40, S.shaft.bottom[1], FLOOR, S.shaft.bottom[0], FLOOR]).fill({ color: 0xd8f5cf, alpha: 0.1 });
+  beams.poly([S.shaft.top[0] + 40, -40, S.shaft.top[1] - 40, -40, S.shaft.bottom[1] - 50, FLOOR, S.shaft.bottom[0] + 40, FLOOR]).fill({ color: 0xeefbe6, alpha: 0.07 });
   world.addChild(beams);
-  // The ruined stone wall behind the Bureaucrat.
-  const wall = new PIXI.Graphics();
-  wall.roundRect(560, FLOOR - 300, 300, 300, 10).fill(0x6d7166);
-  for (let row = 0; row < 7; row++) {
-    const y = FLOOR - 300 + row * 43;
-    wall.moveTo(562, y).lineTo(858, y);
-    for (let x = 560 + (row % 2) * 40; x < 860; x += 80) wall.moveTo(x, y).lineTo(x, y + 43);
-  }
-  wall.stroke({ width: 2, color: 0x51554c, alpha: 0.8 });
-  wall.rect(760, FLOOR - 82, 120, 82).fill(0x4a4d45);
-  wall.rect(780, FLOOR - 64, 18, 26).rect(842, FLOOR - 64, 18, 26).fill(0x8d9186);
-  world.addChild(wall);
-  world.addChild(kit.deco(PIXI, 'forest_hole_back', 285, FLOOR, { scale: 1.05 }));
-  // Forest floor: a mossy edge on dark earth, the recovered terrain mound behind the hole.
-  const mound = kit.deco(PIXI, 'ground_forest_terrain_plat_01', 300, FLOOR + 30, { scale: 0.55, alpha: 0.9 });
-  world.addChild(mound);
-  const floor = new PIXI.Graphics();
-  floor.rect(-600, FLOOR, W + 1200, H - FLOOR + 200).fill(0x2e2116);
-  floor.rect(-600, FLOOR - 4, W + 1200, 12).fill(0x4f6b2c);
-  for (let x = -600; x < W + 600; x += 46) floor.ellipse(x + (x % 3) * 7, FLOOR - 3, 30, 7);
-  floor.fill(0x6d8a3c);
-  for (let i = 0; i < 26; i++) floor.ellipse((i * 131) % W, FLOOR + 30 + ((i * 47) % 90), 10 + (i % 4) * 4, 5 + (i % 3) * 2);
-  floor.fill(0x45331f);
-  world.addChild(floor);
-  // A fallen log on the path.
-  const log = new PIXI.Graphics();
-  log.roundRect(1120, FLOOR - 34, 260, 30, 14).fill(0x5b3b22);
-  log.ellipse(1380, FLOOR - 19, 12, 15).fill(0x7a5332);
-  world.addChild(log);
-  [['tree_front_02', 70, 0.68], ['tree_front_01', 1500, 0.9]].forEach(([n, x, s]) => {
-    world.addChild(kit.deco(PIXI, n, x, FLOOR + 30, { scale: s }));
+  world.addChild(kit.deco(PIXI, 'forest_hole_back', 285, FLOOR, { scale: 1.05, tint: 0x8a8a7a }));
+  // The small grey hut behind the Bureaucrat (CC0 corey3 stone hut).
+  world.addChild(kit.deco(PIXI, ALLEY_ART.hut, S.hutX, FLOOR + 6, { scale: 0.38, tint: 0x9a9f98 }));
+  // Bushes behind the log.
+  S.bushes.forEach((x, i) => {
+    world.addChild(kit.deco(PIXI, ['bush_2', 'groddle_bush1', 'bush_3', 'bush_2'][i], x, FLOOR + 4, { scale: 0.42 + (i % 2) * 0.06, tint: 0x6f9a62, flip: i % 2 === 1 }));
   });
+  // The dirt path: orange-brown earth with a mossy back edge and a dark leafy fringe in front.
+  const floor = new PIXI.Graphics();
+  floor.rect(-600, FLOOR, W + 1200, H - FLOOR + 200).fill(0x5b3c22);
+  floor.rect(-600, FLOOR - 4, W + 1200, 10).fill(0x3f5a26);
+  for (let x = -600; x < W + 600; x += 46) floor.ellipse(x + (x % 3) * 7, FLOOR - 3, 30, 6);
+  floor.fill(0x4f6e2f);
+  for (let i = 0; i < 40; i++) floor.ellipse((i * 131) % W, FLOOR + 18 + ((i * 47) % 70), 6 + (i % 4) * 3, 3 + (i % 3));
+  floor.fill(0x7a5634);
+  floor.rect(-600, FLOOR + 96, W + 1200, H).fill(0x1d2a17);
+  for (let x = -600; x < W + 600; x += 38) floor.ellipse(x, FLOOR + 96 + (x % 5) * 2, 26, 12 + (x % 3) * 3);
+  floor.fill(0x1d2a17);
+  world.addChild(floor);
+  // The fallen log (CC0 corey3_fallenTree_log), its cut end to the left, lying on the path behind the avatar.
+  const [logFile] = BACK_ALLEY_FILES[ALLEY_ART.log];
+  const log = new PIXI.Sprite(textureFromUrl(`${ART}${logFile}`));
+  log.anchor.set(0, 1);
+  log.x = S.log.left;
+  log.y = FLOOR + 4;
+  log.rotation = -0.05;
+  log.tint = 0xd08070;
+  world.addChild(log);
+  world.addChild(kit.deco(PIXI, 'tree_coniferous_fg_1', 1560, FLOOR + 40, { scale: 0.3, tint: 0x33433a }));
   return root;
 }
 

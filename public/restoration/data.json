@@ -1446,7 +1446,7 @@
     ],
     "built": true,
     "shot": "shots/room-back_alley.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=fuelmaking_refuel_robot&backalleystage=station&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=fuelmaking_refuel_robot&practice=1",
     "hd": "shots/hd/room-back_alley.webp",
     "offer": "psst, kid. hey. hey, kid. psst. hey. fuelmaking.",
     "note": {
@@ -1454,7 +1454,7 @@
      "about": "We're Off to See the Lizard: a Shady Bureaucrat in the back alley asks you to refuel a maintenance robot stuck in a subway station.",
      "play": "Hear the proposition, make a Fuel Cell in a Fuelmaker, take any subway door, find the robot on the platform and refuel it.",
      "source": "The Bureaucrat's four lines, the three-minute alley clock, the robot's lines and the rewards.",
-     "rebuilt": "The subway platform is rebuilt from two subway recordings; the remake has no subway network, so any subway door opens it.",
+     "rebuilt": "The alley is laid out from a player's Snap of the meeting: a dark forest, a tall pale brick wall, a shaft of light, the Bureaucrat before a small grey hut and a fallen red log on the path, all from Tiny Speck's own forest pieces. The subway platform is rebuilt from two subway recordings; the remake has no subway network, so any subway door opens it.",
      "footage": []
     }
    }
@@ -1833,9 +1833,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 350,
+  "commits": 351,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "Operation Grow's bog field sits over a root tunnel, as in the Snaps"
+   },
    {
     "date": "2026-10-24",
     "kind": "improve",
@@ -1950,11 +1955,6 @@
     "date": "2026-10-23",
     "kind": "fix",
     "text": "Remove new_day_fanfare.mp3, a copy of licensed stock audio"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Vendor names and garden bed labels are readable over dark forests"
    }
   ]
  },

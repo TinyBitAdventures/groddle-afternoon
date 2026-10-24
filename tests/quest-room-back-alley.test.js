@@ -14,7 +14,9 @@ import { homedir } from 'node:os';
 import * as kit from '../public/js/quest-rooms/kit.js';
 import {
   ALLEY,
+  ALLEY_ART,
   ALLEY_MS,
+  ALLEY_SET,
   ALLEY_SPAWN_SOURCE,
   BOT_EXIT_PATH,
   BOT_HITBOX,
@@ -41,6 +43,7 @@ import {
   stationForDoor,
   stationPlatforms,
 } from '../public/js/quest-rooms/back-alley.js';
+import { BACK_ALLEY_FILES } from '../public/js/quest-rooms/back-alley-art.js';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -173,6 +176,24 @@ describe('Back Alley and station geometry', () => {
     assert.equal(floor.y1, ALLEY.FLOOR);
     assert.ok(ALLEY.spawnX > ALLEY.triggerX && ALLEY.triggerX > ALLEY.bureaucratX);
     assert.ok(ALLEY.spawnX - ALLEY.triggerX < 400, 'a short walk to the meeting');
+  });
+
+  it('lays the alley out in the Snap order: trunk, wall, hut behind the Bureaucrat, log behind the avatar (G111)', () => {
+    const S = ALLEY_SET;
+    assert.ok(S.trunkX < S.wall.left && S.wall.left < S.wall.right, 'the dark trunk left of the wall');
+    assert.ok(S.wall.right < ALLEY.bureaucratX, 'the wall stands left of the Bureaucrat, not behind him');
+    assert.ok(Math.abs(S.hutX - ALLEY.bureaucratX) <= 20, 'the hut sits right behind the Bureaucrat');
+    assert.ok(S.wall.height >= 300, 'a tall wall (~260 Snap px at ~1.45 world px each)');
+    assert.ok(S.shaft.top[0] > S.wall.right - 40 && S.shaft.bottom[1] < S.log.left + 60, 'the light shaft falls between the wall and the log');
+    assert.ok(S.log.left > ALLEY.bureaucratX + 100 && S.log.right < ALLEY.spawnX + 40, 'the log lies between the Bureaucrat and the arrival');
+    assert.ok(S.log.left <= ALLEY.triggerX + 20, 'the meeting starts as the avatar reaches the log');
+    // The art is recovered CC0: street decos and the room-art set (corey3.swf).
+    for (const name of [ALLEY_ART.wall, ALLEY_ART.hut, ALLEY_ART.canopy, ALLEY_ART.forest]) {
+      assert.ok(existsSync(join(root, `public/assets/decos/groddle/${name}.webp`)), name);
+    }
+    const [file, w] = BACK_ALLEY_FILES[ALLEY_ART.log];
+    assert.ok(existsSync(join(root, 'public/assets/sprites/quest-rooms/back_alley', file)));
+    assert.ok(Math.abs(S.log.left + w - S.log.right) <= 2, 'the log span is the art width');
   });
 
   it('keeps the bot the source 778 px from the arrival and everything in reach', () => {
