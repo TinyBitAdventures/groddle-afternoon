@@ -20969,12 +20969,7 @@ function spawnVendorNpc(placement = null) {
   badge.x = 35;
   badge.y = -84;
   g.addChild(badge);
-  const label = new PIXI.Text({ text: activeVendor.label, style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 12,
-    fill: 0x2a1a40,
-    fontWeight: '700',
-  } });
+  const label = new PIXI.Text({ text: activeVendor.label, style: WORLD_LABEL_STYLE(12) });
   label.anchor.set(0.5, 1);
   label.y = -124;
   g.addChild(label);
@@ -20989,6 +20984,21 @@ function spawnVendorNpc(placement = null) {
     sprite: g,
     state: { vendorKey: activeVendor.key, vendorLabel: activeVendor.label },
   });
+}
+
+/**
+ * Name labels drawn in the world (vendors, garden beds): light text with a dark
+ * outline and a soft shadow, so they read over dark forests and pale skies alike.
+ */
+function WORLD_LABEL_STYLE(fontSize) {
+  return {
+    fontFamily: 'Trebuchet MS, sans-serif',
+    fontSize,
+    fontWeight: '700',
+    fill: 0xfffaf0,
+    stroke: { color: 0x2b2418, width: 3, join: 'round' },
+    dropShadow: { color: 0x000000, alpha: 0.35, blur: 2, distance: 1, angle: Math.PI / 2 },
+  };
 }
 
 /** Plot spacing — tall enough for raised 3D soil mounds (128×96 art). */
@@ -21052,12 +21062,7 @@ function spawnGarden(opts = {}) {
   root.bedFrame = wood;
 
   const tag = new PIXI.Text(
-    { text: opts.label || (gardenType === 'herb' ? 'Herbs' : 'Garden'), style: {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: 11,
-      fill: 0x3d4a28,
-      fontWeight: '700',
-    } }
+    { text: opts.label || (gardenType === 'herb' ? 'Herbs' : 'Garden'), style: WORLD_LABEL_STYLE(11) }
   );
   tag.anchor.set(0.5, 1);
   tag.y = -bedH - 4;
