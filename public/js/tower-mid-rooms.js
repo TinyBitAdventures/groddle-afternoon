@@ -263,11 +263,22 @@ export const MEZZ = Object.freeze({
   ceiling: -665,
   shaftL: 400,
   stairsDoorX: -380,
-  greeterX: -130,
+  // G88 footage: the Greeterbot stands in front of the museum door, a little left of its middle.
+  greeterX: 70,
   museumDoorX: 90,
   hallDoorX: 300,
   ladderX: 434,
 });
+
+/**
+ * The Mezzanine's sign words (G88, footage i11hPtqFN8E t0000-t0004): the EXIT
+ * arrow right of the Stairs door, pointing back to it, and the "Rook Museum"
+ * plaque left of the museum door. x world; lift = sign bottom over the floor.
+ */
+export const MEZZ_SIGNS = Object.freeze([
+  Object.freeze({ id: 'exit', text: 'EXIT', arrow: true, x: -220, lift: 128 }),
+  Object.freeze({ id: 'rook_museum', text: 'Rook\nMuseum', arrow: false, x: -85, lift: 86 }),
+]);
 
 /** unnnn's two archived layers (layer-local, street-sized: world = local + (l, t) = local - (500, 700)). */
 const UNNNN_SPOTLIGHTS = Object.freeze([
@@ -303,6 +314,25 @@ function buildMezzanine() {
   c.decos.push(lantern(-260, -330), lantern(200, -330));
   // V: the Hall door's plaque (the recordings show it beside the door; here over it, the lobby being narrower).
   plaque(c, hallDoorX, floor - DOOR.h + 4, 'Hall of Rejected\nConcepts');
+  // G88 (Austin approved shipping this sign text, 2026-10-23): read off player
+  // footage, Lily Linguistic's "Rook Museum" (YouTube i11hPtqFN8E, t0000-t0004)
+  // and "Hall of Rejected Concepts" (-03T3bLY7a0, t0000); notes in
+  // research/video/README.md section 3c. Left to right the lobby shows the
+  // Stairs door, a carved arrow sign pointing left reading "EXIT", a wooden
+  // pillar, a "Rook Museum" plaque, the museum door with the Greeterbot in
+  // front, then the Hall plaque and door. Remake text on the set's CC0 art
+  // (sign_arrow_1 mirrored, the corridors' plaque), both at the footage's
+  // height beside the doors. The footage lobby is wider (about 1,700 px against
+  // unnnn's 1,000-px clone), so here they sit closer and the plaque is
+  // three-quarter size; the pillar is left out (no room between the signs).
+  for (const sign of MEZZ_SIGNS) {
+    if (sign.arrow) {
+      c.decos.push({ sprite: 'sign_arrow_1', x: sign.x, y: floor - sign.lift, w: 116, h: 77, z: 30, r: 0, flip: true, layer: 'mg', signText: sign.text });
+    } else {
+      c.decos.push({ sprite: 'jethimadh_int_door_sign', x: sign.x, y: floor - sign.lift, w: 140, h: 82, z: 11, r: 0, layer: 'mg' });
+      c.decos.push({ sprite: 'firebog_sign_blank', x: sign.x, y: floor - sign.lift - 13, w: 103, h: 60, z: 16, r: 0, layer: 'mg', signText: sign.text });
+    }
+  }
 
   // Floors: the lobby floor (the clone's platform height) and the
   // floorboards under it, solid from below except over the ladder shaft in
@@ -329,7 +359,7 @@ function buildMezzanine() {
   const ladders = [ladder(c, 'mz', ladderX, crawl, floor, crawlWhy)];
 
 
-  const greeterWhy = 'Maps / quests: rook_hall_start sends you to "the Mezzanine in Jethimadh Tower" to "speak to Greeterbot Sentry G-42" (end_npcs npc_quest_giver_widget). Placed between the stairs door and the museum door (remake).';
+  const greeterWhy = 'Maps / quests: rook_hall_start sends you to "the Mezzanine in Jethimadh Tower" to "speak to Greeterbot Sentry G-42" (end_npcs npc_quest_giver_widget). V (G88, i11hPtqFN8E t0000-t0004, -03T3bLY7a0 t0000): it stands in front of the museum door, a little left of its middle.';
   const museumWhy = 'B "enter the door to the Rook museum"; N "If you have been chosen, you will be invited to enter the Rook Museum". The door goes the Greeterbot\'s way: npc_quest_giver_widget.enterHall (LA91BDTNHS82D36, arrive -2270,-136), the remake\'s transient museum.';
   const hallWhy = 'B "the locked door to the Hall of Records (next door)" (2011); forum 29729: the Hall of Rejected Concepts (LA9L33D5CNE3I0J) opened behind it "next to the Rook Museum" in 2012-11. V: the door wears a "Hall of Rejected Concepts" plaque and leads to the Hall\'s left end (js/hall-rejected-concepts.js).';
   const stootWhy = 'unnnn\'s objrefs include two Collision-triggered Teleporters (positions lost); H "Left + Up + Space", F 13777 "Head left (when you\'re in the floor space)", "just keep jumping, pressing left". A jump at the crawlspace\'s left end (box 60 px over its floor: a plain jump, spinach not needed) takes you to the Stoot Shrine.';
@@ -386,7 +416,7 @@ function buildMezzanine() {
     why: {
       room: 'Maps: LIFGJ2246R72LJL "Mezzanine" in hub 96. B/N: the lobby of the Rook Museum, reached up the Stairs, with the museum door, the Greeterbot and the locked Hall of Records next door; H/F: a hidden space under its floorboards that leads on to unnnn.',
       size: 'unnnn was cloned from the Mezzanine (sources LIFGJ2246R72LJL): its bounds -500..500 x -700..0, floor y -12 and street-sized deco layers are kept. The crawlspace runs below (to y 290) with 400 px of world under it (b 700), so the view never shows past the bottom.',
-      decor: 'Source-exact positions: unnnn layers T_1311832165202 (11 rookhall_spotlight) and T_1311832941302 (the two upright firebog_linear_gradient_shadow; a third lies along the floor and a fourth duplicates the first, left out so the lobby floor stays lit), deco ids of 2011-07-28, street-sized so world = local - (500, 700). Left out: rook_hall_placeholder_painting (no art recovered) and unnnn\'s middleground flash_crasher_demon / water_ripple (the shrine room\'s scene, replaced in 2012). The shell, lanterns, crawlspace and ladder are the corridors\' art (remake).',
+      decor: 'Source-exact positions: unnnn layers T_1311832165202 (11 rookhall_spotlight) and T_1311832941302 (the two upright firebog_linear_gradient_shadow; a third lies along the floor and a fourth duplicates the first, left out so the lobby floor stays lit), deco ids of 2011-07-28, street-sized so world = local - (500, 700). Left out: rook_hall_placeholder_painting (no art recovered) and unnnn\'s middleground flash_crasher_demon / water_ripple (the shrine room\'s scene, replaced in 2012). The shell, lanterns, crawlspace and ladder are the corridors\' art (remake). G88: the EXIT arrow and Rook Museum plaque are footage text on the set\'s CC0 sign art (MEZZ_SIGNS).',
     },
   };
 }

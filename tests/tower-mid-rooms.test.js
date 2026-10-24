@@ -40,6 +40,7 @@ const index = JSON.parse(readFileSync(join(streets, 'index.json'), 'utf8')).stre
 const mapsFile = join(spike, '../glitch-GameServerJS/inc_data_maps_prod.js');
 const stairs = midTowerRoomByTsid(STAIRS_TSID);
 const mezz = midTowerRoomByTsid(MEZZANINE_TSID);
+const DOOR_H = mezz.doors[0].h;
 
 /** Plain jump in remake units (game.js): vy -9.6 px/frame, gravity 0.42, walk 4.4 (as tests/tower-rooms.test.js). */
 const JUMP = { vy: 9.6, g: 0.42, vx: 4.4 };
@@ -120,6 +121,30 @@ describe('Jethimadh Tower: Mid rooms: street data', () => {
     const rebuilt = mezz.decos.filter((d) => d.sprite === 'rookhall_spotlight').map((d) => `${d.x},${d.y},${d.w},${d.h},${d.r}`).sort();
     assert.equal(archived.length, 11);
     assert.deepEqual(rebuilt, archived);
+  });
+
+  it('G88: the footage order, left to right: Stairs door, EXIT arrow pointing left, Rook Museum plaque, museum door with the Greeterbot, Hall plaque and door', () => {
+    const signs = mezz.decos.filter((d) => d.signText);
+    assert.deepEqual(signs.map((d) => d.signText).sort(), ['EXIT', 'Hall of Rejected\nConcepts', 'Rook\nMuseum'].sort());
+    const exit = signs.find((d) => d.signText === 'EXIT');
+    const museumSign = signs.find((d) => d.signText === 'Rook\nMuseum');
+    assert.equal(exit.sprite, 'sign_arrow_1');
+    assert.equal(exit.flip, true, 'the arrow points left, back at the Stairs door');
+    const door = (label) => mezz.doors.find((d) => d.connect.label === label);
+    const stairsDoor = door('Stairs');
+    const museumDoor = door('Museum of the Rook');
+    const xs = [stairsDoor.x, exit.x, museumSign.x, museumDoor.x, door('Hall of Rejected Concepts').x];
+    assert.deepEqual(xs, [...xs].sort((a, b) => a - b));
+    // Beside the doors, not over them: clear of both door frames, and hung within the doors' height.
+    const clear = (sign, d) => Math.abs(sign.x - d.x) >= (sign.w + d.w) / 2;
+    assert.ok(clear(exit, stairsDoor) && clear(museumSign, museumDoor) && exit.x + exit.w / 2 <= museumSign.x - museumSign.w / 2);
+    for (const s of [exit, museumSign]) assert.ok(s.y > MEZZ.floor - DOOR_H && s.y - s.h < MEZZ.floor - 60, s.signText);
+    // The Greeterbot stands in front of the museum door, a little left of its middle.
+    assert.ok(mezz.greeterbot.x < museumDoor.x && museumDoor.x - mezz.greeterbot.x < museumDoor.w / 4);
+    assert.match(readFileSync(join(spike, 'public/js/tower-mid-rooms.js'), 'utf8'), /i11hPtqFN8E/);
+    // The street JSON carries the text (tower-rooms-feature paints it).
+    const mg = street(MEZZANINE_TSID).layers.find((l) => l.id === 'middleground');
+    assert.deepEqual(mg.decos.filter((d) => d.signText).map((d) => d.signText).sort(), signs.map((d) => d.signText).sort());
   });
 });
 
