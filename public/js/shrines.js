@@ -245,9 +245,13 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, o
   const qty = Math.max(1, Math.min(have || 1, whole(count, 1, 9999)));
   if (have < qty) return { ok: false, reason: 'missing', have, qty };
   const baseCost = donationValueFor(classTsid) * qty;
-  const rawXp = Math.round(baseCost * 0.2);
-  const rawMood = Math.round(baseCost * 0.1);
-  const rawFavor = Math.round(baseCost * 0.1);
+  // shrines.js:445-457: a hallowed powder multiplies XP, mood and favor
+  // (opts.powderBonus 2 or 3); No-No Powder's rush keeps a fifth of the XP.
+  const powderBonus = [2, 3].includes(Number(opts.powderBonus)) ? Number(opts.powderBonus) : 1;
+  let rawXp = Math.round(baseCost * 0.2 * powderBonus);
+  if (opts.noNo) rawXp = Math.round(rawXp * 0.2);
+  const rawMood = Math.round(baseCost * 0.1 * powderBonus);
+  const rawFavor = Math.round(baseCost * 0.1 * powderBonus);
   const emblemCost = emblemCostFor(state, giantId);
   const favorRoom = Math.max(0, emblemCost - whole(state?.favor?.[giantId]));
   const dailyFavorRoom = Math.max(0, emblemCost - whole(state?.dailyFavor?.[giantId]));
@@ -272,6 +276,7 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, o
     rawXp,
     rawMood,
     rawFavor,
+    powderBonus,
     emblemCost,
     atFavorCap: favorRoom <= 0,
     atDailyFavorCap: dailyFavorRoom <= 0,
@@ -293,7 +298,7 @@ export function listShrineDonationOptions(state, giantId, inv = {}, opts = {}) {
 }
 
 export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, opts = {}) {
-  const quote = quoteShrineDonation(state, giantId, inv, classTsid, count, { xp: pc?.xp });
+  const quote = quoteShrineDonation(state, giantId, inv, classTsid, count, { xp: pc?.xp, powderBonus: opts.powderBonus, noNo: opts.noNo });
   if (!quote.ok) return quote;
   if (!removeItem(inv, classTsid, quote.qty)) return { ok: false, reason: 'missing' };
 
@@ -353,6 +358,8 @@ export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, op
     tip,
     gameshowTicket,
     ticketChance,
+    // The hallowed buff the donation used up (the caller removes it).
+    powderConsumed: quote.powderBonus > 1 && opts.consume ? opts.consume : null,
   };
 }
 

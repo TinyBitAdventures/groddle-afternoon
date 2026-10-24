@@ -435,6 +435,20 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&practice=1"
   },
   {
+   "id": "powders",
+   "group": "making",
+   "name": "Powders",
+   "status": "source",
+   "blurb": "Every Beaker powder does its own thing again: No-No Powder’s rush and crash, Sneezing and Sparkle Powder, the Fecundity powders that make the animals drop their edibles, Fertilidust for the trees, and hallowed powder that doubles or triples your next shrine donation.",
+   "spot": null,
+   "evidence": [
+    "public/js/powders.js",
+    "public/js/features/powders-feature.js"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&powderdemo=1&practice=1"
+  },
+  {
    "id": "machines",
    "group": "making",
    "name": "Machines and the Still",
@@ -914,14 +928,14 @@
   }
  ],
  "tally": {
-  "source": 40,
+  "source": 41,
   "rebuilt": 8,
   "lost": 3,
   "solo": 7,
   "reimagined": 1
  },
- "back": 56,
- "possible": 56,
+ "back": 57,
+ "possible": 57,
  "quests": {
   "total": 445,
   "story": 245,
@@ -1886,9 +1900,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 365,
+  "commits": 366,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "The scarecrow, Tool Vendor, Meal Vendor, Uncle Friendly, Helga and the Sno Cone machine at their own stalls"
+   },
    {
     "date": "2026-10-24",
     "kind": "fix",
@@ -2003,14 +2022,9 @@
     "date": "2026-10-24",
     "kind": "improve",
     "text": "Sounds the final game never played no longer count as missing"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "A named Cubimal goes by its name in the pack and on the ground, and races sharp on Retina"
    }
   ]
  },
- "tests": 202,
+ "tests": 204,
  "generatedAt": "2026-10-24"
 }

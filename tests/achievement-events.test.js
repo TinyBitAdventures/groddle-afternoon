@@ -390,10 +390,10 @@ describe('G117 badges GSJS grants outright', () => {
     assert.match(game, /skillState\.learned\.length >= 11\) engine\.grantAchievement\('first_eleven_skills'\)/);
     assert.match(game, /result\.participant === 'Ur'\) engine\.grantAchievement\('down_to_the_wire'\)/);
     assert.match(game, /purchaseAchievementUpdates\(achieveState, r\.cost, pc\)/);
-    assert.match(game, /makingOutputAchievementCounters\(record\.recipe\.tool, record\.recipe\.outputs\)/);
+    assert.match(game, /makingOutputAchievementCounters\(record\.recipe\.tool, record\.recipe\.outputs, spin\)/);
     assert.match(game, /consumeAchievementCounters\(classTsid, \{ kind: ordinaryInfo\.kind/);
     assert.match(game, /'coin_count:days_maxed', 1, pc[\s\S]{0,80}resetAchievementCounter\(achieveState, 'coin_count:days_maxed'\)/);
     assert.equal((game.match(/countPlayerJump\(\);/g) || []).length, 2);
-    assert.match(game, /achievements\.js\?v=badge-counters-1/);
+    assert.match(game, /achievements\.js\?v=badge-counters-2/);
   });
 });

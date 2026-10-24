@@ -104,6 +104,8 @@ export function worldVerbAchievementCounters(classTsid, verbId, result = null) {
       const rows = [{ counter: achievementCounter(classId, verb), amount: 1 }];
       // npc_chicken.js:1557: a successful squeeze also counts chicken:squoze (Hen Hugger).
       if (classId === 'npc_chicken' && verb === 'squeeze') rows.push({ counter: 'chicken:squoze', amount: 1 });
+      // npc_butterfly.js:1124 onMassageComplete: butterflies:massaged (Butterfly Whisperer).
+      if (classId === 'npc_butterfly' && verb === 'massage') rows.push({ counter: 'butterflies:massaged', amount: 1 });
       return rows;
     }
     return [];
@@ -159,10 +161,20 @@ const FURNITURE_SEATS = Object.freeze(['furniture_stool', 'furniture_bench', 'fu
  * - construction_tool.js:314-328 onMakingComplete: furniture_items:made for
  *   every piece (its note_pole / wall_segment guard is always true), plus
  *   furniture_decos / furniture_cabinets / furniture_lamps / furniture_seats.
+ * - spindle.js / splendid_spindle.js:431-438 onSpinComplete, once per spin
+ *   (`spin` = { unitIndex, batchQty, string }): spun:straight_to_string when
+ *   the Giants turned the thread to String, spun:two_thousand_fiber when the
+ *   spin used 2,051 Fiber or more (seven per Thread).
  */
-export function makingOutputAchievementCounters(toolClassTsid, outputs = []) {
+export function makingOutputAchievementCounters(toolClassTsid, outputs = [], spin = null) {
   const tool = String(toolClassTsid || '');
   const rows = [];
+  if ((tool === 'spindle' || tool === 'splendid_spindle') && spin) {
+    const unit = Math.floor(Number(spin.unitIndex) || 0);
+    const qty = Math.floor(Number(spin.batchQty) || 0);
+    if (unit === 1 && spin.string) rows.push({ counter: 'spun:straight_to_string', amount: 1 });
+    if (unit === qty && qty * 7 >= 2051) rows.push({ counter: 'spun:two_thousand_fiber', amount: 1 });
+  }
   for (const out of outputs || []) {
     const classTsid = String(out?.classTsid || '');
     const qty = Math.max(0, Math.floor(Number(out?.qty) || 0));

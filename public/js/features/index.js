@@ -96,3 +96,5 @@ import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=g105-1'; FEATU
 import { vicarsPeakFeature } from './vicars-peak-feature.js?v=g93-1'; FEATURES.push(vicarsPeakFeature);
 import { subwayFeature } from './subway-feature.js?v=g115-1'; FEATURES.push(subwayFeature);
 import { vendorNpcsFeature } from './vendor-npcs-feature.js?v=g121-1'; FEATURES.push(vendorNpcsFeature);
+import { powdersFeature } from './powders-feature.js?v=g134-1'; FEATURES.push(powdersFeature);
+import { itemVerbsFeature } from './item-verbs-feature.js?v=g134-1'; FEATURES.push(itemVerbsFeature);

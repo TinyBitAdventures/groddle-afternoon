@@ -82,6 +82,17 @@ export const BUFF_ITEM_CATALOG = Object.freeze({
     requiresStudy: true,
     studyAccelerationSeconds: 600,
   },
+  // items/essence_of_hairball.js verbs.imbibe + catalog_buffs.js hairball_dash
+  // (60 s, vx_max 1.25, -5 energy every 15 s). The source line's dash is a comma here.
+  essence_of_hairball: {
+    buffId: 'hairball_dash',
+    verb: 'Imbibe',
+    itemName: 'Essence of Hairball',
+    message: 'You feel exceptionally speedy, and ready to run with alacrity. Also, weird aftertaste.',
+    effectHint: 'Drink to run dangerously fast',
+    activeReason: 'You are already under the effects of Essence of Hairball.',
+    deadReason: 'You are too dead for that now.',
+  },
 });
 
 /**
@@ -194,6 +205,10 @@ function applyStartEffects(classTsid, pc) {
   } else if (classTsid === 'silvertongue') {
     pc.energy = clamp(beforeEnergy - 5, 0, energyCap(pc));
     pc.mood = clamp(beforeMood + 5, 0, moodMax(pc));
+  } else if (classTsid === 'no_no_powder') {
+    // catalog_buffs.js no_no_powder on_apply: both tanks to the top.
+    pc.energy = energyCap(pc);
+    pc.mood = moodMax(pc);
   }
   if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
   if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
@@ -287,6 +302,40 @@ function applyTickEffect(row, pc) {
     const before = Number(pc.energy) || 0;
     pc.energy = clamp(before + (Number(row.args?.energy) || 5), 0, energyCap(pc));
     if (pc.energy !== before) effects.energy = pc.energy - before;
+  } else if (row.classTsid === 'no_no_powder') {
+    // on_tick (every second): energy and mood held at the top.
+    const beforeEnergy = Number(pc.energy) || 0;
+    const beforeMood = Number(pc.mood) || 0;
+    pc.energy = energyCap(pc);
+    pc.mood = moodMax(pc);
+    if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
+    if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
+  } else if (row.classTsid === 'no_no_powder_crash') {
+    // on_tick every second, acting every 60th: 3% of max energy off both tanks.
+    row.args ||= {};
+    row.args.ticks = (Number(row.args.ticks) || 0) + 1;
+    if (row.args.ticks % 60 === 0) {
+      const loss = Math.round(energyCap(pc) * 0.03);
+      const beforeEnergy = Number(pc.energy) || 0;
+      const beforeMood = Number(pc.mood) || 0;
+      pc.energy = clamp(beforeEnergy - loss, 0, energyCap(pc));
+      pc.mood = clamp(beforeMood - loss, 0, moodMax(pc));
+      if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
+      if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
+    }
+  } else if (row.classTsid === 'buff_buzzed') {
+    // on_tick (every minute): +3 mood, -7 energy.
+    const beforeEnergy = Number(pc.energy) || 0;
+    const beforeMood = Number(pc.mood) || 0;
+    pc.mood = clamp(beforeMood + 3, 0, moodMax(pc));
+    pc.energy = clamp(beforeEnergy - 7, 0, energyCap(pc));
+    if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
+    if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
+  } else if (row.classTsid === 'hairball_dash') {
+    // on_tick (every 15 s): -5 energy.
+    const before = Number(pc.energy) || 0;
+    pc.energy = clamp(before - 5, 0, energyCap(pc));
+    if (pc.energy !== before) effects.energy = pc.energy - before;
   } else if (HOLIDAY_TICKS[row.classTsid]) {
     // catalog_buffs.js on_tick for the seasonal treats (js/seasons.js).
     const tick = HOLIDAY_TICKS[row.classTsid];
@@ -378,6 +427,8 @@ export function tickBuffs(state, pc, now = Date.now()) {
 export function buffPhysics(state, now = Date.now()) {
   const result = { speed: 1, jump: 1, gravity: 1 };
   if (hasBuff(state, 'hairball_flower', now)) result.speed *= 1.1;
+  // Hairball Dash: addBuffPhysics({ vx_max: 1.25 }).
+  if (hasBuff(state, 'hairball_dash', now)) result.speed *= 1.25;
   // Sugar Rush vx_max 1.05; Full of Pie vx_max 0.6, vy_jump 0.7.
   if (hasBuff(state, 'sugar_rush', now)) result.speed *= 1.05;
   if (hasBuff(state, 'full_of_pie', now)) {

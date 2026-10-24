@@ -730,5 +730,30 @@
   "status": "excluded",
   "reason": "retired: only npc_juju_boss.js creates it, and nothing creates the Juju Boss",
   "register": "G121"
+ },
+ "achievement:sneezeorama": {
+  "status": "lost",
+  "reason": "sneezing_powder.js:316-329: counts only when 5 or more other players on the street catch the sneezes",
+  "register": "G134"
+ },
+ "achievement:sparkle_buddy": {
+  "status": "lost",
+  "reason": "sparkle_powder.js:310-341: counts only when 7 or more other players on the street are sprinkled",
+  "register": "G134"
+ },
+ "achievement:bowser": {
+  "status": "lost",
+  "reason": "woodworker.js:548-550 (metalmaker.js:608-610, fuelmaker.js, blockmaker.js): refuel a machine away from your own home, i.e. on another player's",
+  "register": "G134"
+ },
+ "achievement:fox_flurrier": {
+  "status": "lost",
+  "reason": "inc_npcs.js:130-154 spawn_fox: a fourth fox spawns only with 9+ active players on the preserve (max_foxes = players / 3)",
+  "register": "G134"
+ },
+ "achievement:good_neighbour": {
+  "status": "lost",
+  "reason": "home.js:35-37 and 250-252: five other players' homes as neighbours on your home street's signpost",
+  "register": "G134"
  }
 }

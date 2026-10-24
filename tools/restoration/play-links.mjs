@@ -30,6 +30,7 @@ export const PLAY_ROUTES = Object.freeze({
   chickens: `${BASE}&animaldemo=chicken&animalrank=7`,
   ecology: `${BASE}&streetdemo=GCR10K3BPJK1U6F`,
   machines: `${BASE}&supplydemo=1`,
+  powders: `${BASE}&powderdemo=1`,
   resources: `${BASE}&resdemo=peat_1`,
   tools: `${BASE}&tooldemo=pick&toolremaining=94`,
   vendors: `${BASE}&vendor=toys`,

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-47';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-48';
 import {
   actionDurationFor,
   createTimedAction,
@@ -323,7 +323,7 @@ import {
   consumeAchievementCounters,
   resetAchievementCounter,
   purchaseAchievementUpdates,
-} from './js/achievements.js?v=badge-counters-1';
+} from './js/achievements.js?v=badge-counters-2';
 import {
   applyStreetVisit,
   STREET_VISITS_SLOT,
@@ -377,7 +377,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=item-buffs-2';
+} from './js/buffs.js?v=item-buffs-3';
 import {
   loadContentCatalogs,
   getContentMeta,
@@ -712,7 +712,8 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=shrine-walkby-1';
+} from './js/shrines.js?v=shrine-powders-1';
+import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=powders-1';
 import {
   GAMESHOW_TICKET_ID,
   applySpinningWheelReward,
@@ -7555,6 +7556,21 @@ const engine = {
   },
   achievement(counter, amount = 1) {
     announceAchievementUpdates(applyAchievementProgress(achieveState, counter, amount, pc));
+  },
+  /** achievements_set(group, label, 0): the counter starts over; set to n = reset, then achievement(counter, n). */
+  resetAchievementCounter: (counter) => resetAchievementCounter(achieveState, counter),
+  /** Re-draw a street tree after its maturity changed (Fertilidust); patch trees redraw themselves. */
+  refreshTreeVisual(target) {
+    if (target?.classId === 'wood_tree' && !target.grownFromBean) return refreshWoodTreeVisual(target);
+    const meta = TRANT_META[target?.classId];
+    if (!meta || !target.sprite || !target.state || target.grownFromBean) return;
+    const tex = textureForTrant(target.classId, target.state.maturity);
+    if (tex) {
+      target.sprite.texture = tex;
+      const s = trantDisplayScale(tex, { targetH: 210, maxScale: 1 });
+      target.sprite.scale.set((target.sprite._woodDirection || 1) * s, s);
+    }
+    target.subtitle = trantStatusLabel(target.state, meta);
   },
   /** Grant a condition-less badge outright (rewards from the catalog). */
   grantAchievement(classTsid) {
@@ -19671,6 +19687,8 @@ function pulsePurpleJunk() {
 function handleBuffEvents(events = []) {
   if (!events.length) return;
   for (const event of events) {
+    // Features see each buff event as `buff_<type>:<id>` (No-No Powder's crash, Buzzed minutes, Hairball Dash).
+    features.event(`buff_${event.type}:${event.classTsid}`, 1, engine);
     const name = event.buff?.def?.name || event.classTsid;
     if (event.type === 'activated') {
       toast(`${name} kicks in!`, 3000);
@@ -19868,6 +19886,7 @@ function updateMakeCraft(deltaMs) {
   const advanced = advanceCraftSession(record.timer, deltaMs);
   record.timer = advanced.session;
   for (let i = 0; i < advanced.unitsReady; i++) {
+    const stringBefore = inv.string || 0;
     const result = craftRecipe(inv, pc, record.key, { ...record.opts, unitIndex: record.made + 1, batchQty: record.qty });
     if (!result.ok) {
       record.timer = cancelCraftSession(record.timer);
@@ -19916,7 +19935,8 @@ function updateMakeCraft(deltaMs) {
       }
     }
     // Refined elements, ingots, crystals, furniture (js/achievements.js).
-    for (const row of makingOutputAchievementCounters(record.recipe.tool, record.recipe.outputs)) {
+    const spin = { unitIndex: record.made, batchQty: record.qty, string: (inv.string || 0) > stringBefore };
+    for (const row of makingOutputAchievementCounters(record.recipe.tool, record.recipe.outputs, spin)) {
       achievementUpdates.push(...applyAchievementProgress(achieveState, row.counter, row.amount, pc));
     }
     announceAchievementUpdates(achievementUpdates);
@@ -20464,7 +20484,7 @@ function renderShrinePanel() {
   }
   const have = Math.max(1, inv[shrineSelected] || 1);
   shrineQty = clamp(Math.floor(shrineQty || 1), 1, have);
-  const quote = quoteShrineDonation(shrineState, giantId, inv, shrineSelected, shrineQty, { xp: pc.xp });
+  const quote = quoteShrineDonation(shrineState, giantId, inv, shrineSelected, shrineQty, { xp: pc.xp, ...shrinePowderOpts() });
   if (!quote.ok) {
     shrineSelected = null;
     renderShrinePanel();
@@ -20512,11 +20532,16 @@ function performShrineDonation() {
   const giantId = target?.state?.giantId;
   const giant = GIANTS[giantId];
   if (!target || !giant || !shrineSelected) return;
-  const result = donateToShrine(shrineState, giantId, inv, pc, shrineSelected, shrineQty);
+  const result = donateToShrine(shrineState, giantId, inv, pc, shrineSelected, shrineQty, shrinePowderOpts());
   if (!result.ok) {
     toast('That donation could not be completed.');
     renderShrinePanel();
     return;
+  }
+  // shrines.js:445-457: the hallowed powder is used up; Hallowed Be Shrine Name.
+  if (result.powderConsumed) removeBuff(buffState, result.powderConsumed, pc, Date.now());
+  for (const row of shrinePowderAchievementCounters(result.powderConsumed, result.baseCost)) {
+    announceAchievementUpdates(applyAchievementProgress(achieveState, row.counter, row.amount, pc));
   }
   const bonus = result.bonus === 'super'
     ? ' A super super huge bonus!'
@@ -20538,6 +20563,11 @@ function performShrineDonation() {
   );
   if (result.favor) applyQuestProgress(questState, 'favor_points', result.favor, pc);
   updateHud();
+}
+
+/** Hallowed shrine powders and No-No Powder on the next donation (js/powders.js). */
+function shrinePowderOpts(now = Date.now()) {
+  return shrinePowderOptions((id) => hasBuff(buffState, id, now));
 }
 
 /** Yellow Crumb (Crumb of Knowledge) lengthens favor and emblem speed-ups x1.05. */
