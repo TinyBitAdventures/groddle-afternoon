@@ -289,6 +289,55 @@ SETS = {
             'stone_moss_2_slate': (0.45, 2, 0, 'firebog.swf', {
                 'deco': 'stone_moss_2',
                 'ramp': [[0, '#1e2b30'], [70, '#3e555a'], [130, '#5f7c80'], [200, '#86a4a6'], [255, '#b4cccc']]}),
+            # G109, the layout: two whole-room Snaps (PHFEBGS0MAD2KGT_202464, PUVJ77PGD9F21JM_110491) show a
+            # surface field between Firebog bottletree huts over a root tunnel. Colours sampled off them (the
+            # dusk desaturates everything to greys); world sizes ~0.85 of the Snaps' against the avatar
+            # (40 Snap px ~ 110 world px). The big hut is the burb-window body (slit eyes, round windows and
+            # door) under treetop_noflowers_3 (~350 and ~620 world px wide), the far huts on root legs the
+            # bottletree hut in blue-grey.
+            'hut_dusk': (0.5, 2, 0, 'firebog.swf', {
+                'deco': 'bottletree_burb_wndw_1',
+                'ramp': [[0, '#24201d'], [60, '#3a342f'], [120, '#524a42'], [180, '#655c53'], [255, '#8c8276']]}),
+            'hut_crown_dusk': (0.68, 2, 0, 'firebog.swf', {
+                'deco': 'treetop_noflowers_3',
+                'ramp': [[0, '#22211e'], [90, '#3a3934'], [170, '#4f4e47'], [255, '#706e66']]}),
+            'hut_far_blue': (1.0, 2, 0, 'firebog.swf', {
+                'deco': 'background_bottletree_hut',
+                'ramp': [[0, '#2a3337'], [90, '#3e474a'], [160, '#4c5658'], [255, '#7a8c92']]}),
+            # White dry-grass tufts along both tiers (grass_transparent_4, ~60 world px wide).
+            'tuft_white': (0.55, 2, 0, 'firebog.swf', {
+                'deco': 'grass_transparent_4',
+                'ramp': [[0, '#6e6e6a'], [110, '#a8a8a4'], [200, '#dcdcd8'], [255, '#f6f6f2']]}),
+            # The tunnel: three teal pots hang from its ceiling (the woven pod, hung upside down,
+            # #50938f..#68aaa6 under a #3e5f5d rim), a mat of tangled grey roots (the bottletree leg sets, #212121..#555555), the
+            # striated earth wall (underground_background, made seamless) and the narrow door by the EXIT.
+            'pot_teal': (0.8, 2, 0, 'firebog.swf', {
+                'deco': 'pod2',
+                'ramp': [[0, '#1f3b3a'], [30, '#2f504e'], [55, '#3e5f5d'], [75, '#4f8f8b'], [95, '#5aa5a1'],
+                         [109, '#6cb4b0'], [255, '#a8dcd8']]}),
+            'roots_back_grey': (0.55, 2, 0, 'firebog.swf', {
+                'deco': 'legs_back_set2',
+                'ramp': [[0, '#141414'], [26, '#1e1e1e'], [33, '#2c2c2c'], [38, '#3c3c3c'], [43, '#555555'], [255, '#6a6a6a']]}),
+            'roots_back3_grey': (0.55, 2, 0, 'firebog.swf', {
+                'deco': 'legs_back_set3',
+                'ramp': [[0, '#141414'], [26, '#1e1e1e'], [33, '#2c2c2c'], [38, '#3c3c3c'], [43, '#555555'], [255, '#6a6a6a']]}),
+            'roots_front_grey': (0.36, 2, 0, 'firebog.swf', {
+                'deco': 'legs_front_set3',
+                'ramp': [[0, '#141414'], [30, '#222222'], [50, '#363636'], [65, '#4a4a4a'], [76, '#5e5e5e'], [255, '#707070']]}),
+            'earth_strata': (1.0, 1.5, 0.1, 'firebog.swf', {
+                'deco': 'underground_background',
+                'ramp': [[0, '#101010'], [35, '#1a1a1a'], [45, '#222222'], [55, '#2c2c2c'], [62, '#363636'], [255, '#404040']]}),
+            'exit_door_dusk': (0.7, 2, 0, 'firebog.swf', {
+                'deco': 'door_asset_bottletree_interior_side',
+                'ramp': [[0, '#0e0d0c'], [25, '#1a1715'], [40, '#24201d'], [70, '#36312d'], [113, '#57514c'], [255, '#6a645e']]}),
+            # The way down: a Firebog ladder through the surface (~300 world px).
+            'ladder_dusk': (1.3, 2, 0, 'firebog.swf', {
+                'deco': 'firebog_ladder',
+                'ramp': [[0, '#1c1a18'], [110, '#38332e'], [190, '#564f47'], [255, '#7a7066']]}),
+            # By the big hut: the basket of sticks with its tag (decor_plants5) in grey.
+            'basket_sticks_grey': (0.4, 2, 0, 'firebog.swf', {
+                'deco': 'decor_plants5',
+                'ramp': [[0, '#1e1e1e'], [110, '#454545'], [190, '#6a6a6a'], [255, '#a0a0a0']]}),
         },
     },
     # G71: The Inner Mind (template LCR8MRAKJI12UOP, lost). Its five Snaps (research/wayback/raw/snaps/

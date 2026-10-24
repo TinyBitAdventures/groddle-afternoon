@@ -19,35 +19,45 @@
  * bloom (a lights-out row, the kind of toggle the source's
  * clickable_broadcaster + deco_show/hide events built). Mab's hint is her
  * card on a plank up on the banks left of the start: a row of seven dots with
- * the first, middle and last picked out. Solving locks the field in bloom;
- * the way back sits at the far end (or Leave).
+ * the first, middle and last picked out. Solving locks the field in bloom.
  *
- * The look comes from the room's one player Snap (research/wayback/raw/snaps/
- * where_the_blue_grew/, reference only): a dusky blue field of Firebog decos,
- * its rows of `plants1` stalks one green and the rest teal with glowing cyan
- * orbs. js/operation-grow-scene.js builds it; a gloomy patch is the green
- * stalk and tending blooms it blue. Mab's card keeps her icon and the
- * Firebog plank sign.
+ * The look and layout come from four player Snaps (research/wayback/raw/
+ * snaps/where_the_blue_grew/, reference only; G67 palette, G109 layout):
+ * two tiers. The surface field of Firebog `plants1` stalks (gloomy patches
+ * are the green stalk, tending blooms them teal with glowing cyan orbs)
+ * runs between bottletree huts; Mab's card is the small sign by the big hut
+ * on the right. Under it a root tunnel, reached by a Firebog ladder through
+ * the field's left end, has a pot hanging under each patch (teal once it
+ * blooms), tangled grey roots, and the way out: the narrow door at its right
+ * end beside the painted EXIT (or Leave). js/operation-grow-scene.js builds it.
  */
 
 import { JUMP_GAP, JUMP_RISE } from './puzzle-kit.js?v=cu-1';
 import { textureFromUrl } from '../textures.js';
-import { buildGrowBackground, makeStalk } from '../operation-grow-scene.js?v=g67-1';
+import { buildGrowBackground, makeStalk } from '../operation-grow-scene.js?v=g109-1';
 
 export const W = 2500;
 export const H = 960;
-export const FLOOR = 820;
+/** The surface field. */
+export const FLOOR = 590;
+/** The root tunnel under it: ceiling (the slab's underside) and floor. */
+export const CEILING = 650;
+export const TUNNEL = 880;
+export const TUNNEL_X1 = 120;
+export const TUNNEL_X2 = 2420;
 export const EXIT_MS = 5 * 60 * 1000; // source: questInstanceLocation(..., 5*60)
 export const PATCHES = 7;
-export const PATCH_X0 = 700;
-export const PATCH_DX = 220;
-export const SPAWN = { x: 520, y: FLOOR };
-export const BANKS = Object.freeze([
-  { id: 'og_bank1', x1: 300, x2: 420, y: FLOOR - 95 },
-  { id: 'og_bank2', x1: 140, x2: 300, y: FLOOR - 190 },
-]);
-export const HINT = { x: 180, y: FLOOR - 190 };
-export const EXIT = { x: 2330, y: FLOOR };
+export const PATCH_X0 = 660;
+export const PATCH_DX = 185;
+/** Source arrival -957,-138 is near the street's left end: the remake starts on the field's left. */
+export const SPAWN = { x: 420, y: FLOOR };
+/** The way down: a ladder through the slab at the field's left end. */
+export const LADDER = Object.freeze({ x: 250, top: FLOOR - 24, bottom: TUNNEL });
+/** The big hut on the right of the field; Mab's card is the small sign beside it. */
+export const HUT_X = 2060;
+export const HINT = { x: 2310, y: FLOOR };
+/** The door at the tunnel's right end, beside the painted EXIT. */
+export const EXIT = { x: 2370, y: TUNNEL };
 /** The patches Mab's card picks out (tests: the unique answer from all gloom). */
 export const HINT_PATCHES = Object.freeze([0, 3, 6]);
 export const HINT_TEXT = 'Seven patches in a row, and every one you tend stirs the two beside it. '
@@ -84,20 +94,31 @@ export function fewestTends(state = startState()) {
   return best;
 }
 
+export const PATCH_XS = Object.freeze(Array.from({ length: PATCHES }, (_, i) => patchX(i)));
+
 export function growPlatforms() {
-  const p = [{ id: 'og_floor', x1: 0, y1: FLOOR, x2: W, y2: FLOOR, style: 'invisible' }];
-  for (const b of BANKS) p.push({ id: b.id, x1: b.x1, y1: b.y, x2: b.x2, y2: b.y, style: 'invisible' });
-  return p;
+  return [
+    { id: 'og_floor', x1: 0, y1: FLOOR, x2: W, y2: FLOOR, style: 'invisible' },
+    { id: 'og_tunnel', x1: TUNNEL_X1, y1: TUNNEL, x2: TUNNEL_X2, y2: TUNNEL, style: 'invisible' },
+  ];
+}
+
+/** enterScene `walls`: the ladder (climbable through the field's one-way floor). */
+export function growWalls() {
+  return [{ x: LADDER.x, yTop: LADDER.top, yBot: LADDER.bottom }];
+}
+
+/** The tunnel's end walls (the surface walk is unaffected: they span ceiling to floor). */
+export function growBarriers() {
+  return [
+    { id: 'og_tunnel_l', x: TUNNEL_X1, y: CEILING, h: TUNNEL - CEILING, pc_perm: null },
+    { id: 'og_tunnel_r', x: TUNNEL_X2, y: CEILING, h: TUNNEL - CEILING, pc_perm: null },
+  ];
 }
 
 /* ------------------------------------------------------------------ */
 /* Drawing                                                              */
 /* ------------------------------------------------------------------ */
-
-function drawBank(g, b) {
-  g.roundRect(b.x1, b.y, b.x2 - b.x1, FLOOR - b.y, 10).fill(0x3b4248);
-  g.roundRect(b.x1 - 4, b.y - 4, b.x2 - b.x1 + 8, 14, 7).fill(0x5d6f74);
-}
 
 /** Mab's card: her icon on a plank with seven dots, three of them lit. */
 function drawHint(PIXI, kit) {
@@ -143,21 +164,17 @@ export const room = {
   hubName: 'The forgotten bog fields',
   durationMs: EXIT_MS,
   leaveText: 'Leave the bog fields still gloomy? The quest will fail.',
-  travelText: 'Brighten the field, then take the way back.',
+  travelText: 'Brighten the field, then climb down to the root tunnel and its EXIT.',
 
   build(ctx) {
     const { PIXI, kit } = ctx;
     ctx.data.state = startState();
-    const root = buildGrowBackground(PIXI, kit, { W, H, FLOOR, BANKS, EXIT });
-    const world = root.layer(1, 3);
-    const g = new PIXI.Graphics();
-    for (const b of BANKS) drawBank(g, b);
-    world.addChild(g);
-    // The way back: a blue light shaft over a plank.
-    ctx.data.exitBeam = kit.deco(PIXI, 'light_shafts_blue', EXIT.x, FLOOR + 10, { scale: 0.22, alpha: 0.15 });
-    world.addChild(ctx.data.exitBeam);
-    world.addChild(kit.deco(PIXI, 'firebog_sign_blank_plank', EXIT.x + 70, FLOOR - 60, { scale: 0.3 }));
-    world.addChild(kit.label(PIXI, 'Back to Ur', EXIT.x + 70, FLOOR - 82, { size: 15, fill: 0xf7e7c4 }));
+    const root = buildGrowBackground(PIXI, kit, {
+      W, H, FLOOR, CEILING, TUNNEL, TUNNEL_X1, TUNNEL_X2, LADDER, EXIT, HUT_X, HINT, PATCH_XS,
+    });
+    // The way out lights up once the field blooms.
+    ctx.data.exitBeam = root.exitBeam;
+    ctx.data.pots = root.pots;
     // The gloom: a dusk wash over everything, lifted as the patches bloom.
     const gloom = new PIXI.Graphics();
     gloom.rect(-200, -200, W + 400, H + 400).fill(0x12101c);
@@ -179,6 +196,8 @@ export const room = {
       height: H,
       background: root,
       platforms: growPlatforms(),
+      walls: growWalls(),
+      barriers: growBarriers(),
       spawn: SPAWN,
     };
   },
@@ -196,14 +215,19 @@ export const room = {
     exitHit.rect(-60, -180, 120, 180).fill({ color: 0xffffff, alpha: 0.001 });
     exitHit.x = EXIT.x;
     exitHit.y = EXIT.y;
-    ctx.data.exit = ctx.register({ classId: 'bog_way_back', label: 'Back to Ur', subtitle: 'Complete the journey', sprite: exitHit });
+    ctx.data.exit = ctx.register({ classId: 'bog_way_back', label: 'Exit', subtitle: 'Complete the journey', sprite: exitHit });
     ctx.data.tends = [];
     ctx.data.phase = 'play';
-    // QA framing: &growstate=0101010 previews bloom states (no progress), &growx=<world x> places the avatar.
+    // QA framing: &growstate=0101010 previews bloom states (no progress), &growx=<world x> places the
+    // avatar on the field (&growtier=tunnel: in the tunnel).
     const qs = String(ctx.engine.param?.('growstate') || '');
     if (/^[01]{7}$/.test(qs)) ctx.data.state = [...qs].map((ch) => ch === '1');
     const qx = Number(ctx.engine.param?.('growx'));
-    if (qx > 0) setTimeout(() => ctx.place(Math.min(W - 40, qx), FLOOR), 400);
+    const tunnel = ctx.engine.param?.('growtier') === 'tunnel';
+    if (qx > 0) {
+      const x = tunnel ? Math.max(TUNNEL_X1 + 30, Math.min(TUNNEL_X2 - 30, qx)) : Math.min(W - 40, qx);
+      setTimeout(() => ctx.place(x, tunnel ? TUNNEL : FLOOR), 400);
+    }
   },
 
   tick(ctx, dtMs = 16) {
@@ -226,6 +250,8 @@ export const room = {
       const want = ctx.data.state[p.i] ? 1 : 0;
       p.shown += (want - p.shown) * Math.min(1, k * 1.6);
       p.stalk.setBloom(p.shown, t);
+      const pot = ctx.data.pots?.[p.i];
+      if (pot && !pot.sprite.destroyed) pot.setBloom(p.shown, t);
     }
   },
 
@@ -235,7 +261,7 @@ export const room = {
       return [{ id: 'tend', label: 'Tend', enabled: !locked, reason: locked ? 'The field is in bloom.' : '', tooltip: 'Tend this patch (its neighbours stir too)' }];
     }
     if (target === ctx.data.hint) return [{ id: 'read', label: 'Read', enabled: true, tooltip: "Read Mab's note" }];
-    if (target === ctx.data.exit) return [{ id: 'leave', label: 'Leave', enabled: true, tooltip: 'Back to Ur' }];
+    if (target === ctx.data.exit) return [{ id: 'leave', label: 'Leave', enabled: true, tooltip: 'Out through the EXIT, back to Ur' }];
     return [];
   },
 
@@ -282,7 +308,7 @@ export const room = {
       await ctx.wait(350);
     };
     await ctx.wait(500);
-    await go(HINT.x + 20, HINT.y);
+    await go(HINT.x - 30, HINT.y);
     room.runVerb(ctx, ctx.data.hint, 'read');
     await ctx.wait(400);
     ctx.advanceDialog();
@@ -295,7 +321,7 @@ export const room = {
     }
     if (mode === 'wrong' || mode === 'solved') return ctx.data.phase;
     await ctx.wait(900);
-    await go(EXIT.x - 20);
+    await go(EXIT.x - 20, TUNNEL);
     room.runVerb(ctx, ctx.data.exit, 'leave');
     return 'left';
   },
@@ -338,4 +364,4 @@ async function wayBack(ctx) {
   ctx.leave({ transition: ctx.fx() });
 }
 
-export const GROW_FACTS = Object.freeze({ W, H, FLOOR, JUMP_RISE, JUMP_GAP });
+export const GROW_FACTS = Object.freeze({ W, H, FLOOR, CEILING, TUNNEL, JUMP_RISE, JUMP_GAP });

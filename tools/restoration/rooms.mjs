@@ -158,9 +158,9 @@ export const ROOM_NOTES = Object.freeze({
   operation_grow: {
     tagline: 'Bring a gloomy bog back to bloom.',
     about: "Operation: Grow sent you to Mab's forgotten bog fields to make the blue grow again.",
-    play: "Tend the seven gloomy patches; each tends its neighbours too. Mab's note on the bank shows the only answer.",
+    play: "Tend the seven gloomy patches; each tends its neighbours too. Mab's note by the big hut shows the only answer. Then climb down the ladder into the root tunnel, where a pot under each patch glows once it blooms, and walk out past the EXIT.",
     source: 'The spawn point, five-minute limit, flags and rewards.',
-    rebuilt: "The puzzle is designed from the quest text; the field is dressed from a player's Snap with Firebog's own stalks, which turn blue as they bloom.",
+    rebuilt: "The room was never archived and its puzzle is designed from the quest text. Four players' Snaps show the place: a dusky field of stalks between Firebog bottletree huts over a root tunnel with teal pots hanging from its ceiling, tangled roots and an EXIT. It is built from Tiny Speck's own Firebog pieces, and the stalks turn blue as they bloom.",
     footage: [],
   },
   gwendolyn: {
