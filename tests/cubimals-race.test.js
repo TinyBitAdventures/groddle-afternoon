@@ -39,6 +39,7 @@ import { applyAchievementProgress, createAchievementState } from '../public/js/a
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import { FEATURES } from '../public/js/features/index.js';
 import { cubimalRaceFeature, CUBIMAL_RACE_FEATURE_ID } from '../public/js/features/cubimal-race-feature.js';
+import { FIRST_DRAW_SPRITES, HIRES_SPRITES } from '../public/js/sprite-hires.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');
@@ -211,6 +212,28 @@ describe('race art (OGA npc_cubimal_*__x1_race)', () => {
     }
     assert.equal(cubimalRaceSheet('npc_piggy'), null);
   });
+
+  it('has a 3x render of each sheet from its vector SWF, same frames, same order (tools/vector-sprites/cubimals.json)', () => {
+    const manifest = JSON.parse(readFileSync(join(here, '../tools/vector-sprites/cubimals.json'), 'utf8'));
+    const results = JSON.parse(readFileSync(join(here, '../tools/vector-sprites/results.json'), 'utf8'));
+    const sheets = manifest.jobs.flatMap((job) => job.sheets.map((sheet) => ({ job, sheet })));
+    assert.equal(manifest.firstDraw, true);
+    assert.deepEqual(sheets.map(({ sheet }) => sheet.path).sort(), ALL.map((id) => cubimalRaceSheet(id).path).sort());
+    for (const classTsid of ALL) {
+      const def = cubimalRaceSheet(classTsid);
+      const { job, sheet } = sheets.find((row) => row.sheet.path === def.path);
+      assert.equal(job.swf, `cubimals/${classTsid}/${classTsid}.swf`);
+      assert.deepEqual([sheet.label, sheet.fw, sheet.fh, sheet.cols, sheet.frames], ['race', def.fw, def.fh, 20, 60], def.path);
+      const r = results[def.path];
+      assert.equal(r?.status, 'ok', def.path);
+      // The race label is SWF frames 2-61: cell k is frame k + 2, unmirrored, unshifted.
+      assert.deepEqual([r.swfFrames, r.shift, r.mirror, r.cells], [[2, 61], 0, false, 60], def.path);
+      const hires = def.path.replace(/\.webp$/, '@3x.webp');
+      assert.equal(HIRES_SPRITES.get(def.path), hires);
+      assert.ok(FIRST_DRAW_SPRITES.has(def.path), def.path);
+      assert.deepEqual(webpSize(join(publicRoot, hires)), { width: def.fw * 60, height: def.fh * 9 }, hires);
+    }
+  });
 });
 
 describe('Name / Rename (animal_naming.js)', () => {
@@ -331,6 +354,22 @@ describe('cubimal-race feature', () => {
     cubimalRaceFeature.restore({ names: { npc_cubimal_chick: 'Sprocket' } }, engine);
     assert.deepEqual(cubimalRaceFeature.packVerbs('npc_cubimal_chick', engine).map((v) => v.label), ['Rename', 'Race']);
     assert.deepEqual(cubimalRaceFeature.packVerbs('apple', engine), []);
+  });
+
+  it('a named figure goes by its name in the pack and on the ground, its type beside it', () => {
+    const { engine } = fakeEngine();
+    cubimalRaceFeature.restore({}, engine);
+    assert.equal(cubimalRaceFeature.itemDisplayName('npc_cubimal_chick'), null);
+    cubimalRaceFeature.restore({ names: { npc_cubimal_chick: 'Sprocket', npc_cubimal_emobear: 'Teddy' } }, engine);
+    assert.deepEqual(cubimalRaceFeature.itemDisplayName('npc_cubimal_chick'), { label: 'Sprocket', kind: 'Chick Cubimal' });
+    assert.deepEqual(cubimalRaceFeature.itemDisplayName('npc_cubimal_emobear'), { label: 'Teddy', kind: 'Emo-Bear Cubimal' });
+    assert.equal(cubimalRaceFeature.itemDisplayName('npc_cubimal_fox'), null);
+    assert.equal(cubimalRaceFeature.itemDisplayName('apple'), null);
+    // game.js asks for it on the pack card, the pack slot tooltip and the dropped stack.
+    const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
+    assert.equal(game.match(/features\.query\('itemDisplayName'/g)?.length, 3);
+    assert.match(game, /pack-pop-kind">\$\{named \? escapeHtml\(named\.kind\) : kind\}/);
+    assert.match(game, /label: named\?\.label \|\| item\.label \|\| stack\.classTsid/);
   });
 
   it('races out of the pack: wind up, run right, stop, message, then back in the pack', () => {

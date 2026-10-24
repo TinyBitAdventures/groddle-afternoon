@@ -9,7 +9,10 @@
  * right (the key is on the figure's back, at the left), the way it races.
  *
  * Output: public/assets/sprites/cubimals/<class>_race.webp (lossless WebP,
- * about a third of the PNG).
+ * about a third of the PNG). The sharp <class>_race@3x.webp beside each comes
+ * from the figure's vector SWF, matched against this sheet:
+ * node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/cubimals.json
+ * (rerun it after rewriting these sheets).
  *
  *   node tools/cubimal-race-art.mjs           # extract + write
  *   node tools/cubimal-race-art.mjs --check   # verify the shipped sheets

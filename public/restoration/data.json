@@ -1807,9 +1807,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 336,
+  "commits": 339,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Memory places keep their own light at night, Colour Unblocking's thank-you fills the view, An Autumn Day gets its saplings, and a retry names who gave the quest"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Hopping along the Stairs' second flight on a slow frame no longer drops you to the flight below"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Symphonious Maximus shows its deep navy night sky over smaller pale peaks, framed like the video"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1914,24 +1929,9 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Sky Plunge lands on its Snap's cloud floor, with a Back to Top door and \"AHHHHH YEAHHHH!!!!!\""
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Mr. Block's playroom is the giant Kid's Room from players' Snaps"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Visit the Hall of Rejected Concepts behind the Mezzanine and press each exhibit's button"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Sharp Jack-O-Lanterns, Chocolate Eggs and Glitchmas Crackers drawn from Tiny Speck's vectors"
    }
   ]
  },
  "tests": 195,
- "generatedAt": "2026-10-23"
+ "generatedAt": "2026-10-24"
 }

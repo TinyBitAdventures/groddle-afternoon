@@ -15,8 +15,9 @@
  * or reloading puts racing figures straight back in the pack.
  *
  * Name / Rename (animal_naming.js) keep one name per figure class; the bubble
- * reads 'And they shall call me "Sprocket"'. A racing figure shows its name
- * on hover. Set free (game.js setPackedCubimalFree asks this feature through
+ * reads 'And they shall call me "Sprocket"'. A named figure goes by its name
+ * on hover while racing, on its pack card and slot tooltip, and as a dropped
+ * stack (itemDisplayName), its figure type beside the name. Set free (game.js setPackedCubimalFree asks this feature through
  * query('confirmCubimalFree')) opens the source conversation; on yes the
  * figure leaves the pack, poofs in 80 px ahead of the player and 60 px up,
  * says one of the five farewells at 300 ms, and at 2.5 s flies 1000 px up in
@@ -31,7 +32,9 @@
  *
  * Art: the client's CC0 race recordings, assets/sprites/cubimals/*_race.webp
  * (tools/cubimal-race-art.mjs), 60 frames at 30 fps, frame 0 for the wound-down
- * state.
+ * state. Each has a 3x render from its vector SWF beside it (*_race@3x.webp,
+ * tools/vector-sprites/cubimals.json) that sprite-sheets.js swaps in when the
+ * racer is first drawn on a dense screen.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&cubimaldemo=race
  *   (&cubimalitem=npc_cubimal_<slug>, default the Chick) puts the figure in the
@@ -328,6 +331,8 @@ function applyName(engine, classTsid, value) {
   else engine.toast?.(res.bubble, res.bubbleMs);
   engine.achievement?.(res.counter, 1);
   for (const racer of racers) if (racer.classTsid === classTsid && racer.target) racer.target.label = res.name;
+  // The pack card and slot tooltip read the name (itemDisplayName).
+  engine.refreshPack?.();
   engine.save?.();
   publish(engine);
   return true;
@@ -719,6 +724,19 @@ export const cubimalRaceFeature = {
       return true;
     }
     return false;
+  },
+
+  /**
+   * game.js pack card, pack slot tooltip and dropped-stack label: a named
+   * figure goes by its name, the figure type beside it. The server sent
+   * getLabel() as the stack label (common.js make_item_simple 546; cubimal
+   * getLabel 580 is user_name, plus a battle level the remake leaves out) and
+   * the client showed that label in place of the item's (Itemstack.as
+   * getLabel 445, PackItemstackView.as 102).
+   */
+  itemDisplayName(classTsid) {
+    const name = isCubimal(classTsid) ? names[classTsid] : '';
+    return name ? { label: name, kind: cubimalInfo(classTsid)?.label || 'Cubimal' } : null;
   },
 
   /** game.js setPackedCubimalFree: the source conversation instead of window.confirm. */

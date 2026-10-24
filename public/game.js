@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-34';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-35';
 import {
   actionDurationFor,
   createTimedAction,
@@ -2799,13 +2799,15 @@ function renderPackPopover(classTsid, anchor = null) {
     ? `<button type="button" class="pack-bear-action" data-pack-emblem-spend ${emblemSpend.enabled ? '' : 'disabled'} title="${escapeHtml(emblemSpend.enabled ? emblemSpend.tooltip : emblemSpend.reason)}">Spend</button>`
     : '';
 
+  // A named Cubimal goes by its name, its figure type on the kind line (features/cubimal-race-feature.js).
+  const named = features.query('itemDisplayName', classTsid);
   pop.hidden = false;
   pop.innerHTML = `
     <div class="pack-pop-head">
       <div class="pack-pop-icon"><img src="${slot.icon}" alt="" /></div>
       <div class="pack-pop-title">
-        <span class="pack-pop-kind">${kind}</span>
-        <h3 id="pack-popover-title">${escapeHtml(slot.label)} <b>×${slot.count}</b></h3>
+        <span class="pack-pop-kind">${named ? escapeHtml(named.kind) : kind}</span>
+        <h3 id="pack-popover-title">${escapeHtml(named?.label || slot.label)} <b>×${slot.count}</b></h3>
       </div>
       <button type="button" class="pack-pop-close" data-pack-close aria-label="Close item actions">×</button>
     </div>
@@ -2952,6 +2954,8 @@ function renderPackRow(box, slots, opts = {}) {
       : s.isTool || opts.toolRow
         ? trackedCondition
         : null;
+    const named = features.query('itemDisplayName', s.classTsid);
+    const shownLabel = named ? `${named.label} (${named.kind})` : s.label;
     const slot = document.createElement('button');
     slot.type = 'button';
     slot.className = 'pack-slot' + (s.isTool || opts.toolRow ? ' pack-tool' : '');
@@ -2960,12 +2964,12 @@ function renderPackRow(box, slots, opts = {}) {
     slot.setAttribute('aria-expanded', packSelected === s.classTsid ? 'true' : 'false');
     slot.setAttribute(
       'aria-label',
-      `${s.label} × ${s.count}${toolCondition?.tracked ? `, ${toolCondition.broken ? 'broken' : `${Math.round(toolCondition.percent * 100)} percent condition`}` : ''}`
+      `${shownLabel} × ${s.count}${toolCondition?.tracked ? `, ${toolCondition.broken ? 'broken' : `${Math.round(toolCondition.percent * 100)} percent condition`}` : ''}`
     );
     if (toolCondition?.broken) slot.classList.add('is-broken');
     slot.title = s.isTool || opts.toolRow
       ? `${s.label} (tool)${toolCondition?.tracked ? ` · ${toolCondition.remaining}/${toolCondition.capacity} condition` : ''} · click for actions`
-      : `${s.label} × ${s.count} · click for actions`;
+      : `${shownLabel} × ${s.count} · click for actions`;
     slot.dataset.tsid = s.classTsid;
     const canDragToVendor = !(s.isTool || opts.toolRow);
     slot.draggable = canDragToVendor;
@@ -8282,16 +8286,17 @@ function spawnDroppedItemStack(stack) {
 
   entityLayer.addChild(spr);
   droppedItemSprites.push(spr);
+  const named = features.query('itemDisplayName', stack.classTsid);
   register({
     classId: 'dropped_item',
-    label: item.label || stack.classTsid,
-    subtitle: `Dropped stack · ${stack.count} in this pile`,
+    label: named?.label || item.label || stack.classTsid,
+    subtitle: `${named ? `${named.kind} · ` : ''}Dropped stack · ${stack.count} in this pile`,
     sprite: spr,
     state: {
       id: stack.id,
       classTsid: stack.classTsid,
       count: stack.count,
-      label: item.label || stack.classTsid,
+      label: named?.label || item.label || stack.classTsid,
     },
     worldItemId: stack.id,
   });
