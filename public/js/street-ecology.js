@@ -124,7 +124,7 @@ export const RESOURCE_NODE_CAPS = Object.freeze({
   jellisac: 6,
   dirt_pile: 3,
   peat_1: 3,
-  npc_sloth: 2,
+  npc_sloth: 4, // 16 source streets hold 3-4 (Gomed Essoni, Tamar Garna, Heera Amond); Circle Crunch needs 3
   paper_tree: 1,
 });
 

@@ -1884,9 +1884,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 363,
+  "commits": 364,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "89 more badges can be earned: refining, eating and drinking, smelting, furniture, jumps and more"
+   },
    {
     "date": "2026-10-24",
     "kind": "new",
@@ -2001,11 +2006,6 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Memory places keep their own light at night, Colour Unblocking's thank-you fills the view, An Autumn Day gets its saplings, and a retry names who gave the quest"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Hopping along the Stairs' second flight on a slow frame no longer drops you to the flight below"
    }
   ]
  },
