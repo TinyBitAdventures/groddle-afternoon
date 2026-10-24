@@ -1807,9 +1807,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 333,
+  "commits": 335,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "The Mezzanine's EXIT arrow and Rook Museum plaque, read off player footage"
+   },
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "The character builder names every wardrobe item in plain words"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1919,19 +1929,9 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Say hi to your Butler with the 5 key: daily hi signs, its hi back and the matching-sign bonus"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Buy an Elemental Pouch and shake it once a day for bonus elements"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Every Glitch is drawn from Tiny Speck's vector parts; the bitmap avatars are retired"
    }
   ]
  },
- "tests": 193,
+ "tests": 194,
  "generatedAt": "2026-10-23"
 }

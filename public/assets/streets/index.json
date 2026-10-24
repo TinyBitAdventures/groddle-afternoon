@@ -12971,6 +12971,15 @@
       "platforms": 151,
       "decos": 134,
       "reconstructed": true
+    },
+    "GA9QUBPI49J2MOB": {
+      "label": "The lost floor",
+      "file": "assets/streets/GA9QUBPI49J2MOB.json",
+      "hubId": "92",
+      "hubName": "Tamila",
+      "platforms": 2,
+      "decos": 109,
+      "reconstructed": true
     }
   }
 }

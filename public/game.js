@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-33';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-34';
 import {
   actionDurationFor,
   createTimedAction,
