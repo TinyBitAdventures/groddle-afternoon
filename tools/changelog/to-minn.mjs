@@ -14,20 +14,55 @@
  * `wp option update permalink_structure` on the site (see the skill).
  * Mapping: title (plain), slug, date, draft -> status; summary -> excerpt;
  * label -> category, tags -> tags; subtitle/lead/stat -> a note-intro group;
- * image -> an image block; every structured block (cards, ledgers, tables,
- * quests ...) -> an HTML block with the markup build.mjs drew, so the
- * site's stylesheets style it as before; sections -> section groups.
+ * image -> an image block; stat, cards, milestones, ledgers, quests and signs ->
+ * the theme's note blocks (minn/groddle/blocks, words in attributes, so Minn
+ * Admin edits them with a form); sub-intros, checklists and tables -> core
+ * blocks; sections -> section groups. The blocks draw the markup build.mjs
+ * drew, so the site's stylesheets style them as before.
  */
-import { loadPosts, blockHtml, cardsHtml } from './build.mjs';
+import { loadPosts } from './build.mjs';
 import { plain } from './html.mjs';
+import { markNames } from './minn-blocks.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
 const SITE = String(args.site || 'https://groddle.localhost').replace(/\/$/, '');
 const DRY = !!args.dry;
 
 const json = (v) => JSON.stringify(v);
-const block = (name, attrs, inner) => `<!-- wp:${name}${attrs && Object.keys(attrs).length ? ' ' + json(attrs) : ''} -->\n${inner}\n<!-- /wp:${name} -->`;
-const html = (markup) => block('html', null, markup.trim());
+// Attributes as the block editor writes them into the comment.
+const attrJson = (attrs) => json(attrs).replace(/--/g, '\\u002d\\u002d').replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026').replace(/\\"/g, '\\u0022');
+const opened = (name, attrs) => `<!-- wp:${name}${attrs && Object.keys(attrs).length ? ' ' + attrJson(attrs) : ''}`;
+const block = (name, attrs, inner) => `${opened(name, attrs)} -->\n${inner}\n<!-- /wp:${name} -->`;
+// The theme's blocks: empty attributes left out (the block.json defaults are empty or a placeholder only a new block shows).
+const given = (attrs) => Object.fromEntries(Object.entries(attrs).filter(([, v]) => v !== undefined && v !== null && v !== ''));
+const leaf = (name, attrs) => `${opened(`groddle/${name}`, given(attrs))} /-->`;
+const parent = (name, attrs, kids) => `${opened(`groddle/${name}`, given(attrs))} -->\n${kids.join('\n')}\n<!-- /wp:groddle/${name} -->`;
+const MARKS = markNames();
+const p = (cls, words) => block('paragraph', cls ? { className: cls } : null, `<p${cls ? ` class="${cls}"` : ''}>${words}</p>`);
+const h = (level, cls, words) => block('heading', { ...(level === 2 ? {} : { level }), ...(cls ? { className: cls } : {}) }, `<h${level} class="wp-block-heading${cls ? ` ${cls}` : ''}">${words}</h${level}>`);
+const group = (cls, inner) => block('group', { className: cls }, `<div class="wp-block-group ${cls}">${inner.join('\n\n')}</div>`);
+
+const cards = (list, variant) => parent('features', { variant }, list.map((c) => leaf('feature', { icon: MARKS.get(c.mark), title: c.title, text: c.text })));
+
+/** A structured block of posts.json as blocks. */
+const STRUCTURED = {
+  cards: (b) => cards(b.cards, b.variant),
+  milestones: (b) => parent('milestones', { label: b.label }, b.items.map((m) => leaf('milestone', { step: m.button === m.kind ? '' : m.button, kind: m.kind, title: m.title, text: m.text }))),
+  ledger: (b) => parent('ledger', { label: b.label }, b.items.map((i) => leaf('figure', { value: i.num, caption: i.caption }))),
+  stats: (b) => parent('ledger', { variant: 'stats', id: b.id }, b.items.map((i) => leaf('figure', { value: i.num, unit: i.unit, caption: i.caption }))),
+  quests: (b) => parent('quests', {}, b.items.map((q) => leaf('quest', { n: String(q.n), kind: q.kind, short: q.short, title: q.title, text: q.text, source: q.source, play: q.play, finish: q.finish }))),
+  signs: (b) => parent('signpost', { label: b.label, caption: b.caption }, b.arms.map((a) => leaf('sign', { side: a.side, text: a.text }))),
+  intro: (b) => group('note-subintro', [p('note-eyebrow', b.eyebrow), h(3, 'note-subhead', b.heading), p('note-text', b.lead)]),
+  lists: (b) => group('note-lists', b.cards.map((c) => group('note-list-card', [
+    h(3, '', c.title),
+    ...(c.text ? [p('', c.text)] : []),
+    block('list', { className: 'note-checks' }, `<ul class="wp-block-list note-checks">${c.items.map((i) => block('list-item', null, `<li>${i}</li>`)).join('')}</ul>`),
+  ]))),
+  table: (b) => {
+    const cell = (tag, i, words) => (i === b.numCol ? `<${tag} class="has-text-align-right" data-align="right">${words}</${tag}>` : `<${tag}>${words}</${tag}>`);
+    return block('table', { hasFixedLayout: false, className: 'note-table-wrap' }, `<figure class="wp-block-table note-table-wrap"><table><thead><tr>${b.head.map((c, i) => cell('th', i, c)).join('')}</tr></thead><tbody>${b.rows.map((r) => `<tr>${r.map((c, i) => cell('td', i, c)).join('')}</tr>`).join('')}</tbody></table>${b.label ? `<figcaption class="wp-element-caption">${b.label}</figcaption>` : ''}</figure>`);
+  },
+};
 const titleCase = (s) => plain(s).toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
 
 /** One note as block markup. */
@@ -39,7 +74,7 @@ export function noteContent(post) {
     if (post.subtitle) words.push(block('heading', null, `<h2 class="wp-block-heading">${post.subtitle}</h2>`));
     if (post.lead) words.push(block('paragraph', { className: 'note-text' }, `<p class="note-text">${post.lead}</p>`));
     inner.push(block('group', null, `<div class="wp-block-group">${words.join('\n\n')}</div>`));
-    if (post.stat) inner.push(html(`<aside class="note-stamp">\n  <strong>${post.stat.num}</strong>\n  <span>${post.stat.caption}</span>\n</aside>`));
+    if (post.stat) inner.push(leaf('stamp', { value: post.stat.num, caption: post.stat.caption }));
     const cls = `note-intro${post.stat ? '' : ' note-intro-solo'}`;
     out.push(block('group', { className: cls }, `<div class="wp-block-group ${cls}">${inner.join('\n\n')}</div>`));
   }
@@ -52,12 +87,15 @@ export function noteContent(post) {
   const blocks = post.blocks || [];
   const at = post.cardsAt || 0;
   const one = (b) => {
-    if (b.type !== 'section') return html(blockHtml(b));
+    if (b.type !== 'section') {
+      if (!STRUCTURED[b.type]) throw new Error(`${post.slug}: no block for ${b.type}`);
+      return STRUCTURED[b.type](b);
+    }
     const inner = [block('heading', { anchor: `${b.id}-h` }, `<h2 class="wp-block-heading" id="${b.id}-h">${b.title}</h2>`), ...b.blocks.map(one)];
     return block('group', { tagName: 'section', anchor: b.id, className: 'note-section' }, `<section id="${b.id}" class="wp-block-group note-section">${inner.join('\n\n')}</section>`);
   };
   out.push(...blocks.slice(0, at).map(one));
-  if (post.cards?.length) out.push(html(cardsHtml(post.cards)));
+  if (post.cards?.length) out.push(cards(post.cards));
   out.push(...blocks.slice(at).map(one));
   return out.join('\n\n');
 }
