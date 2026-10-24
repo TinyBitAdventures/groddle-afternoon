@@ -5,7 +5,7 @@
  * shot.mjs-style steps. frame: 'world' crops to the street view above the
  * pack; 'panel' keeps the whole game area so an open panel shows.
  */
-const Q = '?autostart=1&fresh=1&resetgame=1&questoffer=off&questfx=0';
+const Q = '?autostart=1&fresh=1&resetgame=1&questoffer=off&questfx=0&timedemo=day';
 // Clicks the first visible dialogue button (OK / Click anywhere / Next).
 
 

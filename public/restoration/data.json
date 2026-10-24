@@ -101,7 +101,7 @@
     "public/assets/streets/index.json"
    ],
    "shot": "shots/streets.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&practice=1"
   },
   {
    "id": "navigation",
@@ -115,7 +115,7 @@
     "public/js/features/doors-feature.js"
    ],
    "shot": "shots/navigation.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&doordemo=GLI32G3NUTD100I&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&doordemo=GLI32G3NUTD100I&practice=1"
   },
   {
    "id": "physics",
@@ -129,7 +129,7 @@
     "public/js/location-events.js"
    ],
    "shot": "shots/physics.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GUVUMTSQ2FC34ES&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&streetdemo=GUVUMTSQ2FC34ES&practice=1"
   },
   {
    "id": "street-events",
@@ -143,7 +143,7 @@
     "public/js/features/puzzles-feature.js"
    ],
    "shot": "shots/street-events.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&puzzledemo=GHVOD0F3T403694&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&puzzledemo=GHVOD0F3T403694&practice=1"
   },
   {
    "id": "dametime",
@@ -215,7 +215,7 @@
     "public/js/features/camera-mode-feature.js"
    ],
    "shot": "shots/camera.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&camerademo=1&cameraskill=1&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&camerademo=1&cameraskill=1&practice=1"
   },
   {
    "id": "newxp",
@@ -257,7 +257,7 @@
     "public/js/animal-husbandry.js"
    ],
    "shot": "shots/piggies.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=piggy&animalrank=2&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&animaldemo=piggy&animalrank=2&practice=1"
   },
   {
    "id": "chickens",
@@ -284,7 +284,7 @@
     "public/js/tools.js"
    ],
    "shot": "shots/butterflies.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&animaldemo=butterfly&animalrank=2&tooldemo=butterfly_lotion&toolremaining=5&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&animaldemo=butterfly&animalrank=2&tooldemo=butterfly_lotion&toolremaining=5&practice=1"
   },
   {
    "id": "trants",
@@ -300,7 +300,7 @@
     "public/js/tree-poison.js"
    ],
    "shot": "shots/trants.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&harvestdemo=fruit&harvestrank=2&harvestreset=1&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&harvestdemo=fruit&harvestrank=2&harvestreset=1&practice=1"
   },
   {
    "id": "batterflies",
@@ -313,7 +313,7 @@
     "public/js/animal-husbandry.js"
    ],
    "shot": "shots/batterflies.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GA9114MS8B32FB2&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&streetdemo=GA9114MS8B32FB2&practice=1"
   },
   {
    "id": "foxes",
@@ -326,7 +326,7 @@
     "public/js/foxes.js"
    ],
    "shot": "shots/foxes.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&foxdemo=1&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&foxdemo=1&practice=1"
   },
   {
    "id": "ecology",
@@ -354,7 +354,7 @@
     "public/js/master-garden.js"
    ],
    "shot": "shots/gardens.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&mastergardendemo=1&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&mastergardendemo=1&practice=1"
   },
   {
    "id": "mining",
@@ -367,7 +367,7 @@
     "public/js/mining.js"
    ],
    "shot": "shots/mining.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&rockdemo=sparkly&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&rockdemo=sparkly&practice=1"
   },
   {
    "id": "cooking",
@@ -381,7 +381,7 @@
     "public/assets/content/recipes.json"
    ],
    "shot": "shots/cooking.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&practice=1"
   },
   {
    "id": "machines",
@@ -434,7 +434,7 @@
     "public/js/quoins.js"
    ],
    "shot": "shots/quoins.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&quoindemo=qurazy&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&quoindemo=qurazy&practice=1"
   },
   {
    "id": "shrines",
@@ -447,7 +447,7 @@
     "public/js/shrines.js"
    ],
    "shot": "shots/shrines.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&shrinedemo=1&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&shrinedemo=1&practice=1"
   },
   {
    "id": "vendors",
@@ -474,7 +474,7 @@
     "public/js/imagination.js"
    ],
    "shot": "shots/imagination.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&imgdemo=1&imglevel=12&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&imgdemo=1&imglevel=12&practice=1"
   },
   {
    "id": "levels",
@@ -504,7 +504,7 @@
     "public/js/exploration.js"
    ],
    "shot": "shots/badges.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&badgeqa=1&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&badgeqa=1&practice=1"
   },
   {
    "id": "auctions",
@@ -559,7 +559,7 @@
     "public/js/summers-day.js"
    ],
    "shot": "shots/story-quests.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=winter&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=winter&practice=1"
   },
   {
    "id": "paradise",
@@ -574,7 +574,7 @@
     "public/js/paradise-course-runtime.js"
    ],
    "shot": "shots/paradise.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&paradise=cloud_rings&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&paradise=cloud_rings&practice=1"
   },
   {
    "id": "races",
@@ -588,7 +588,7 @@
     "public/js/game-of-crowns.js"
    ],
    "shot": "shots/races.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&racedemo=space_race&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&racedemo=space_race&practice=1"
   },
   {
    "id": "hog-haul",
@@ -601,7 +601,7 @@
     "public/js/hog-haul.js"
    ],
    "shot": "shots/hog-haul.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=hoghaul&racedemo=1&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=hoghaul&racedemo=1&practice=1"
   },
   {
    "id": "street-jobs",
@@ -614,7 +614,7 @@
     "public/js/street-jobs.js"
    ],
    "shot": "shots/street-jobs.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&jobdemo=351&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&jobdemo=351&practice=1"
   },
   {
    "id": "feats",
@@ -640,7 +640,7 @@
     "public/js/party-spaces.js"
    ],
    "shot": "shots/parties.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&partydemo=moon&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&partydemo=moon&practice=1"
   },
   {
    "id": "smuggling",
@@ -655,7 +655,7 @@
     "public/js/quest-rooms/penalty.js"
    ],
    "shot": "shots/smuggling.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&smugglingdemo=give&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&smugglingdemo=give&practice=1"
   },
   {
    "id": "seasons",
@@ -685,7 +685,7 @@
     "public/js/hi-signs.js"
    ],
    "shot": "shots/homes.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=decorate&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&homedemo=decorate&practice=1"
   },
   {
    "id": "mail",
@@ -711,7 +711,7 @@
     "public/js/neighbours.js"
    ],
    "shot": "shots/neighbours.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&stonedemo=1&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&stonedemo=1&practice=1"
   },
   {
    "id": "tower",
@@ -764,7 +764,7 @@
     "public/js/rook-attack.js"
    ],
    "shot": "shots/rooks.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&rookdemo=attack&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&rookdemo=attack&practice=1"
   },
   {
    "id": "skills",
@@ -778,7 +778,7 @@
     "public/js/skills.js"
    ],
    "shot": "shots/skills.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&skilltree=mining_3&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&skilltree=mining_3&practice=1"
   },
   {
    "id": "meditation",
@@ -792,7 +792,7 @@
     "public/js/teleportation.js"
    ],
    "shot": "shots/meditation.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&meditatedemo=all&meditateroll=0.99&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&meditatedemo=all&meditateroll=0.99&practice=1"
   },
   {
    "id": "icons",
@@ -805,7 +805,7 @@
     "public/js/giant-icons.js"
    ],
    "shot": "shots/icons.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&icondemo=1&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&icondemo=1&practice=1"
   },
   {
    "id": "rube",
@@ -818,7 +818,7 @@
     "public/js/rube.js"
    ],
    "shot": "shots/rube.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&rubedemo=1&rubeseed=3&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&rubedemo=1&rubeseed=3&practice=1"
   },
   {
    "id": "hell",
@@ -831,7 +831,7 @@
     "public/js/hell.js"
    ],
    "shot": "shots/hell.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&helldemo=croak&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&helldemo=croak&practice=1"
   },
   {
    "id": "collectibles",
@@ -846,7 +846,7 @@
     "public/js/stoot-doll.js"
    ],
    "shot": "shots/collectibles.webp",
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&stootdemo=1&stootquote=38&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&stootdemo=1&stootquote=38&practice=1"
   },
   {
    "id": "snaps",
@@ -924,7 +924,7 @@
     ],
     "built": true,
     "shot": "shots/room-an_autumn_day.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=an_autumn_day&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=an_autumn_day&practice=1",
     "hd": "shots/hd/room-an_autumn_day.webp",
     "offer": "As you may or may not know, many choices lack a right or wrong answer.",
     "note": {
@@ -949,7 +949,7 @@
     ],
     "built": true,
     "shot": "shots/room-tile_puzzle.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=btc_room_3&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=btc_room_3&practice=1",
     "hd": "shots/hd/room-tile_puzzle.webp",
     "offer": "Psst … I figured out how to get in.",
     "note": {
@@ -974,7 +974,7 @@
     ],
     "built": true,
     "shot": "shots/room-being_watched.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=stale_but_necessary&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=stale_but_necessary&practice=1",
     "hd": "shots/hd/room-being_watched.webp",
     "offer": "Umm, You don't look so good.",
     "note": {
@@ -995,7 +995,7 @@
     ],
     "built": true,
     "shot": "shots/room-juju_camp.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=help_juju_bandits&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=help_juju_bandits&practice=1",
     "hd": "shots/hd/room-juju_camp.webp",
     "offer": "friend! You're going to help us whether you like it or not!",
     "note": {
@@ -1015,7 +1015,7 @@
     ],
     "built": true,
     "shot": "shots/room-color_unblocking.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=puzzle_level_color_blockage&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=puzzle_level_color_blockage&practice=1",
     "hd": "shots/hd/room-color_unblocking.webp",
     "offer": "You look like a fashionable young glitch. \"On trend\", \"in-the-know\", so to speak.",
     "note": {
@@ -1046,7 +1046,7 @@
     ],
     "built": true,
     "shot": "shots/room-gwendolyn.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=tower_quest&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=tower_quest&practice=1",
     "hd": "shots/hd/room-gwendolyn.webp",
     "offer": "Hear me. I am Gwendolyn, disciple of Cosma, daughter of Egeria, drowned as I lived in the waters of Grendaline’s Rising.",
     "note": {
@@ -1079,7 +1079,7 @@
     ],
     "built": true,
     "shot": "shots/room-clubhouse.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=join_club&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=join_club&practice=1",
     "hd": "shots/hd/room-clubhouse.webp",
     "offer": "Welcome home friend.  While you were away, you received an intriguing invitation. It appears you've been invited to join the club.",
     "note": {
@@ -1105,7 +1105,7 @@
     ],
     "built": true,
     "shot": "shots/room-le_miserable.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=le_miserable&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=le_miserable&practice=1",
     "hd": "shots/hd/room-le_miserable.webp",
     "offer": "Do you remember the future of one of our pasts? Or was it the past of one of our futures?",
     "note": {
@@ -1135,7 +1135,7 @@
     ],
     "built": true,
     "shot": "shots/room-mental_block.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=mental_block&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=mental_block&practice=1",
     "hd": "shots/hd/room-mental_block.webp",
     "offer": "Everything ok? You seem somewhat puzzled.",
     "note": {
@@ -1165,7 +1165,7 @@
     ],
     "built": true,
     "shot": "shots/room-kids_room.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=letter_block_1&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=letter_block_1&practice=1",
     "hd": "shots/hd/room-kids_room.webp",
     "offer": "Hey, kid. How do you feel about getting small?",
     "note": {
@@ -1185,7 +1185,7 @@
     ],
     "built": true,
     "shot": "shots/room-operation_grow.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=where_the_blue_grew&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=where_the_blue_grew&practice=1",
     "hd": "shots/hd/room-operation_grow.webp",
     "offer": "So dark.",
     "note": {
@@ -1205,7 +1205,7 @@
     ],
     "built": true,
     "shot": "shots/room-picto_pattern.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=picto_pattern&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=picto_pattern&practice=1",
     "hd": "shots/hd/room-picto_pattern.webp",
     "offer": "Pop Quiz! How many Giants are there?",
     "note": {
@@ -1230,7 +1230,7 @@
     ],
     "built": true,
     "shot": "shots/room-radiant_glare.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=radiant_glare&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=radiant_glare&practice=1",
     "hd": "shots/hd/room-radiant_glare.webp",
     "offer": "Young Glitch, you once walked toward the light, proving your eyes are sharp. But, without practice, your skills may become dull.",
     "note": {
@@ -1255,7 +1255,7 @@
     ],
     "built": true,
     "shot": "shots/room-rainbow_run.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=numismatic_hustle&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=numismatic_hustle&practice=1",
     "hd": "shots/hd/room-rainbow_run.webp",
     "offer": "Psst.",
     "note": {
@@ -1277,7 +1277,7 @@
     ],
     "built": true,
     "shot": "shots/room-penalty.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=smuggle_the_smuggler_part1&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=smuggle_the_smuggler_part1&practice=1",
     "hd": "shots/hd/room-penalty.webp",
     "offer": "I've got a job that needs doing. A dangerous job that needs doing.",
     "note": {
@@ -1302,7 +1302,7 @@
     ],
     "built": true,
     "shot": "shots/room-top_of_tree.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=high_jump&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=high_jump&practice=1",
     "hd": "shots/hd/room-top_of_tree.webp",
     "offer": "You know that poem in the beginning of The Great Gatsby?",
     "note": {
@@ -1327,7 +1327,7 @@
     ],
     "built": true,
     "shot": "shots/room-esquibeth.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=last_pilgrimage_of_esquibeth&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=last_pilgrimage_of_esquibeth&practice=1",
     "hd": "shots/hd/room-esquibeth.webp",
     "offer": "Kid, you now know a little something about the Giants. You’ve matured. I think you are ready to contribute to a Feat.",
     "note": {
@@ -1356,7 +1356,7 @@
     ],
     "built": true,
     "shot": "shots/room-rube_yard.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=rube_spy&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=rube_spy&practice=1",
     "hd": "shots/hd/room-rube_yard.webp",
     "offer": "Hey friend! Wanna make a tra … I mean, do you wanna help me out?",
     "note": {
@@ -1376,7 +1376,7 @@
     ],
     "built": true,
     "shot": "shots/room-vision_quest.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=eyeballery_identify_object&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=eyeballery_identify_object&practice=1",
     "hd": "shots/hd/room-vision_quest.webp",
     "offer": "So you like looking at things, right? And I hear with your mastery of Eyeballery, you’re pretty good at it too.",
     "note": {
@@ -1396,7 +1396,7 @@
     ],
     "built": true,
     "shot": "shots/room-light_perspective.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=puzzle_level_light_perspective&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=puzzle_level_light_perspective&practice=1",
     "hd": "shots/hd/room-light_perspective.webp",
     "offer": "Pssst. You there. How are your eyes?",
     "note": {
@@ -1421,7 +1421,7 @@
     ],
     "built": true,
     "shot": "shots/room-back_alley.webp",
-    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&questdemo=fuelmaking_refuel_robot&backalleystage=station&practice=1",
+    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&questdemo=fuelmaking_refuel_robot&backalleystage=station&practice=1",
     "hd": "shots/hd/room-back_alley.webp",
     "offer": "psst, kid. hey. hey, kid. psst. hey. fuelmaking.",
     "note": {
@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 320,
+  "commits": 321,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "improve",
+    "text": "Seven rooms re-dressed from players' Snaps: felt, dusk, white and lamplight"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1924,11 +1929,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "17 greyscale wardrobe pieces join the wardrobe, reimagined with borrowed colours"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "A Butler box arrives at home, and your Butler greets you and holds neighbours' parcels"
    }
   ]
  },
