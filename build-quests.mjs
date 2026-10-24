@@ -184,7 +184,13 @@ const INFERRED_GATES = {
   doody_inspector: { quests: ['animalkinship_pet_piggies'], why: 'piggy plops follow piggy care' },
   buy_bag: { level: 2, why: 'early pack-space quest (source: emergency, newxp era)' },
   spice_must_flow: { npc: 'street_spirit_groddle', why: 'end_npcs: street_spirit_groddle' },
-  vendor_ping_pong_part1: { npc: 'street_spirit_gardening', why: '"Visit the Gardening Vendor"' },
+  // Meet the Merchants (G121): part 1's offer is the pet rock talking ("I'm your pet rock"), so the
+  // Magic Rock gives it; its end NPC, the Gardening Tools Vendor, then offers parts 2-4 (their offer text
+  // is the scarecrow: "buy these items from me"), each once the last one is turned in.
+  vendor_ping_pong_part1: { level: 2, why: 'offer is the pet rock speaking; end_npcs npc_gardening_vendor' },
+  vendor_ping_pong_part2: { npc: 'npc_gardening_vendor', quests: ['vendor_ping_pong_part1'], why: 'offer is the Gardening Tools Vendor speaking' },
+  vendor_ping_pong_part3: { npc: 'npc_gardening_vendor', quests: ['vendor_ping_pong_part2'], why: 'offer is the Gardening Tools Vendor speaking' },
+  vendor_ping_pong_part4: { npc: 'npc_gardening_vendor', quests: ['vendor_ping_pong_part3'], why: 'offer is the Gardening Tools Vendor speaking' },
   manor_mystery: { street: 'Hauki Seeks', why: '"the Manor on Hauki Seeks"' },
   jump_in_hole: { level: 5, why: 'exploration quest; no gate in source' },
   ultimate_smoothie_1: { skills: ['blending_1'], why: 'smoothie ingredients; Blending' },

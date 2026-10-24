@@ -262,7 +262,7 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   };
   fix();
   const present = new Map();
-  for (const sec of ['streets', 'soil', 'wildlife', 'furniture']) {
+  for (const sec of ['streets', 'soil', 'wildlife', 'furniture', 'vendors']) {
     for (const [tsid, r] of Object.entries(ecology[sec] || {})) {
       const counts = r.counts || r;
       for (const k of Object.keys(counts)) if (!present.has(k)) present.set(k, `street-ecology.json ${sec} (${tsid})`);
@@ -316,12 +316,14 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
     if (f) families.push({ prefix: v, file: f });
   }
   families.sort((a, b) => b.prefix.length - a.prefix.length);
-  // Items placed on streets in the original location dump (objrefs carry only labels).
+  // Items placed on streets in the original location dump (objrefs carry only labels). Only item
+  // objrefs (I-prefixed tsids): players (P-) share the list, and a player called "Kitty" or
+  // "Esquibeth" is not an npc_kitty or npc_esquibeth_playback.
   const placed = new Map();
   if (existsSync(xmlDir)) {
     for (const f of readdirSync(xmlDir)) {
       if (!f.startsWith('L') || !f.endsWith('.xml')) continue;
-      for (const m of readFileSync(join(xmlDir, f), 'utf8').matchAll(/<objref [^>]*label="([^"]+)"/g)) if (!placed.has(m[1])) placed.set(m[1], f.slice(0, -4));
+      for (const m of readFileSync(join(xmlDir, f), 'utf8').matchAll(/<objref [^>]*tsid="I[^"]*"[^>]*label="([^"]+)"/g)) if (!placed.has(m[1])) placed.set(m[1], f.slice(0, -4));
     }
   }
   for (const it of items) if (placed.has(it.label)) gsjsRefs.get(it.id).add(`location dump ${placed.get(it.label)} (label "${it.label}")`);

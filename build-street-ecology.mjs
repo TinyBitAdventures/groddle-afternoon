@@ -11,6 +11,7 @@ import { readFile, writeFile, access } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { interiorReason } from './public/js/street-ecology.js';
+import { VENDOR_NPC_LABELS } from './public/js/vendor-npcs.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const streetIndexPath = join(root, 'public/assets/streets/index.json');
@@ -152,6 +153,23 @@ function furnitureFromLabels(labels) {
 }
 
 /**
+ * Vendor NPCs (js/vendor-npcs.js, features/vendor-npcs-feature.js): the
+ * Gardening Tools Vendor, Meal Vendor, Tool Vendor, Uncle Friendly, Helga and
+ * the Sno Cone Vending Machine, each with its own catalog_stores.js store. Written to a separate top-level
+ * `vendors` map, like `soil`, and read from the `items` objrefs only (the
+ * AFLC Frogs listed under __MISSING_ITEMS__ were deleted mail couriers).
+ * 11, one per street, in the archived snapshot.
+ */
+function vendorsFromLabels(labels) {
+  const counts = {};
+  for (const label of labels) {
+    const classTsid = VENDOR_NPC_LABELS[label];
+    if (classTsid) counts[classTsid] = (counts[classTsid] || 0) + 1;
+  }
+  return counts;
+}
+
+/**
  * Curated source-empty streets. Their archived XML holds only scenery-style
  * objects, and the remake deliberately keeps them uncluttered (for example the
  * private Stoot memorial), so the row is emitted with `empty: true` even when
@@ -222,6 +240,7 @@ const streets = {};
 const soil = {};
 const wildlife = {};
 const furniture = {};
+const vendors = {};
 for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const candidates = locationAliases(tsid).map((alias) => join(locationRoot, `${alias}.xml`));
   const sourcePath = await firstReadable(candidates);
@@ -238,6 +257,8 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
   if (Object.keys(wildlifeCounts).length) wildlife[tsid] = wildlifeCounts;
   const furnitureCounts = furnitureFromLabels(labels);
   if (Object.keys(furnitureCounts).length) furniture[tsid] = furnitureCounts;
+  const vendorCounts = vendorsFromLabels(labels);
+  if (Object.keys(vendorCounts).length) vendors[tsid] = vendorCounts;
   const ecology = ecologyFromLabels(labels);
   const geometry = JSON.parse(await readFile(join(root, 'public', meta.file), 'utf8'));
   const interiorWhy = interiorReason({ ...geometry, tsid, hubId: meta.hubId ?? geometry.hubId }, lists);
@@ -276,6 +297,8 @@ const catalog = {
   wildlife,
   furnitureStreetCount: Object.keys(furniture).length,
   furniture,
+  vendorStreetCount: Object.keys(vendors).length,
+  vendors,
 };
 
 await writeFile(outputPath, `${JSON.stringify(catalog, null, 2)}\n`);

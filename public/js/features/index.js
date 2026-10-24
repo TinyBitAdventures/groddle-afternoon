@@ -7,7 +7,7 @@
 import { questFlagsFeature } from './quest-flags-feature.js?v=flags-1';
 import { hellFeature } from './hell-feature.js?v=hell-1';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-3';
-import { questOffersFeature } from './quest-offers-feature.js?v=offers-1';
+import { questOffersFeature } from './quest-offers-feature.js?v=offers-2';
 import { meditationFeature } from './meditation-feature.js?v=meditation-2';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-1';
 import { racesFeature } from './races-feature.js?v=races-5';
@@ -95,3 +95,4 @@ import { symphoniousMaximusFeature } from './symphonious-maximus-feature.js?v=g1
 import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=g105-1'; FEATURES.push(hiddenFloorsFeature);
 import { vicarsPeakFeature } from './vicars-peak-feature.js?v=g93-1'; FEATURES.push(vicarsPeakFeature);
 import { subwayFeature } from './subway-feature.js?v=g115-1'; FEATURES.push(subwayFeature);
+import { vendorNpcsFeature } from './vendor-npcs-feature.js?v=g121-1'; FEATURES.push(vendorNpcsFeature);

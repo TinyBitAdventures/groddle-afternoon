@@ -55,6 +55,7 @@
  *   customPrereq(id, prereq) }
  */
 
+import { VENDOR_NPCS, VENDOR_NPC_CLASSES } from './vendor-npcs.js';
 import { getQuestCatalog } from './content-catalogs.js';
 import { levelInfoForXp } from './progression.js';
 import {
@@ -163,20 +164,30 @@ export const REMAKE_QUEST_NPCS = Object.freeze([
   'npc_juju_bandit',
   // Bumping into a Firefly offers Firefly Whistle (features/resource-nodes-feature.js, npc_firefly.js).
   'npc_firefly',
+  // The vendor NPCs with a quest verb (features/vendor-npcs-feature.js): Meet the Merchants, and
+  // Uncle Friendly's A Purple Journey North (make_eye_contact; npc_jabba1.js hides it on Helga).
+  ...VENDOR_NPC_CLASSES.filter((npc) => VENDOR_NPCS[npc].questVerb),
 ]);
 const GSJS_STREET_SPIRITS = new Set([
   'street_spirit', 'street_spirit_groddle', 'street_spirit_firebog', 'street_spirit_zutto', 'street_spirit_ix',
 ]);
 
 /**
- * Original vendor NPC classes named in end_npcs, mapped to the remake's
- * street spirit vendors (vendor.js profiles). The tool vendor sold hoes and
- * watering cans, which the remake's gardening spirit stocks.
+ * Original NPC classes the remake answers with another class. Empty since
+ * the vendor NPCs stand on their own streets (G121); the gardening street
+ * spirit used to stand in for the Gardening Tools and Tool Vendors.
  */
-export const NPC_ALIASES = Object.freeze({
-  npc_gardening_vendor: 'street_spirit_gardening',
-  npc_tool_vendor: 'street_spirit_gardening',
-});
+export const NPC_ALIASES = Object.freeze({});
+
+/**
+ * Quests whose end NPC the remake spawns as a talkable NPC wait for that
+ * talk (npc_quests.js offerQuests turn-in) instead of turning in the moment
+ * the pack holds the goods. Other end_npcs quests keep the auto turn-in.
+ */
+export const TALK_TURNIN_NPCS = Object.freeze(new Set(VENDOR_NPC_CLASSES));
+export function heldForNpcTurnIn(def) {
+  return Boolean(def && !def.familiarTurnin && (def.endNpcs || []).some((npc) => TALK_TURNIN_NPCS.has(npc)));
+}
 
 /** Does an NPC the player is talking to satisfy a trigger's giver class? */
 export function npcMatches(triggerNpc, npcClass) {

@@ -309,6 +309,18 @@ export function judgeItems({ items, reach, present, codeCtx, gsjsRefs, families 
     if (ctx.length) { add('missing', `${it.takeable ? 'no way to obtain it' : 'not placed or spawned'}; named in ${ctx.slice(0, 2).map((c) => `${c.file}:${c.line}`).join(', ')}; ${where}`); continue; }
     add('missing', `${it.takeable ? 'no way to obtain it' : 'not placed or spawned'}; ${where}`);
   }
+  // A proxy_item NPC variant (npc_shrine_firebog_alph -> npc_shrine_alph) runs as its base class: when
+  // the base is reachable, the variant's rules are too; only its own art may be missing. (Item proxies
+  // such as rock_metal_2 are depletion states of one rock, judged with it.)
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  for (const it of items) {
+    if (!it.id.startsWith('npc_')) continue;
+    const r = byId.get(it.id);
+    const baseRow = it.proxy && byId.get(it.proxy);
+    if (!r || !baseRow || !['missing', 'unknown'].includes(r.status) || !REACHABLE.has(baseRow.status)) continue;
+    r.status = 'partial';
+    r.evidence = `proxy_item ${it.proxy} (${baseRow.status}): the remake runs it as ${it.proxy}; this variant's own art is not used`;
+  }
   return rows;
 }
 

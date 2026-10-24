@@ -14855,5 +14855,41 @@
     "GUVTLIP0SIJ2DQG": {
       "npc_mailbox": 1
     }
+  },
+  "vendorStreetCount": 11,
+  "vendors": {
+    "GCR101NQ4BU1SKS": {
+      "npc_gardening_vendor": 1
+    },
+    "GCR101UN0NJ1QPQ": {
+      "npc_gardening_vendor": 1
+    },
+    "GCR202JSVIN1STL": {
+      "npc_gardening_vendor": 1
+    },
+    "GIF12PMQ5121D68": {
+      "npc_tool_vendor": 1
+    },
+    "GIFCNFNEJRG2ON4": {
+      "npc_gardening_vendor": 1
+    },
+    "GIFGR46M8RE2RC7": {
+      "npc_gardening_vendor": 1
+    },
+    "GLI101QQRA211SM": {
+      "npc_cooking_vendor": 1
+    },
+    "GLI1D2QFT571VQT": {
+      "npc_tool_vendor": 1
+    },
+    "GM11E7ODKHO1QJE": {
+      "npc_sno_cone_vending_machine": 1
+    },
+    "GM4118MEHFDMM": {
+      "npc_jabba1": 1
+    },
+    "GM413RQ6LRG9N": {
+      "npc_jabba2": 1
+    }
   }
 }

@@ -136,7 +136,8 @@ describe('classifyQuests', () => {
   it('marks NPC-only quests whose giver the remake lacks as unreachable', () => {
     const { solo } = classifyQuests();
     const unreachable = solo.filter((row) => !row.reachable).map((row) => row.classTsid);
-    assert.deepEqual(unreachable, ['purple_journey_north']);
+    // purple_journey_north came back with Uncle Friendly (G121, features/vendor-npcs-feature.js).
+    assert.deepEqual(unreachable, []);
   });
 });
 
@@ -242,11 +243,12 @@ describe('familiar delivery, decline and accept', () => {
 
   it('declined NPC offers are asked again next talk (npc_conversation.js)', () => {
     const state = createQuestState();
-    const talk = () => ids(npcQuestOffers(state, 'street_spirit_gardening', freshPc(), {}).offered);
-    assert.ok(talk().includes('vendor_ping_pong_part1'));
-    declineOffer(state, 'vendor_ping_pong_part1', 1, { source: 'npc' });
-    assert.ok(talk().includes('vendor_ping_pong_part1'));
-    assert.ok(!ids(npcQuestOffers(state, 'street_spirit_groceries', freshPc(), {}).offered).includes('vendor_ping_pong_part1'));
+    state.completed.push('vendor_ping_pong_part1');
+    const talk = () => ids(npcQuestOffers(state, 'npc_gardening_vendor', freshPc(), {}).offered);
+    assert.ok(talk().includes('vendor_ping_pong_part2'));
+    declineOffer(state, 'vendor_ping_pong_part2', 1, { source: 'npc' });
+    assert.ok(talk().includes('vendor_ping_pong_part2'));
+    assert.ok(!ids(npcQuestOffers(state, 'street_spirit_gardening', freshPc(), {}).offered).includes('vendor_ping_pong_part2'));
   });
 
   it('accept gives provided items, pre-fills held items and starts quest timers', () => {
@@ -272,7 +274,7 @@ describe('familiar delivery, decline and accept', () => {
     const r = acceptOffer(state, 'vendor_ping_pong_part1', {});
     assert.deepEqual(ids(r.completable), ['vendor_ping_pong_part1']);
     assert.equal(r.completable[0].turnIn, 'npc');
-    const talk = npcQuestOffers(state, 'street_spirit_gardening', freshPc(), {});
+    const talk = npcQuestOffers(state, 'npc_gardening_vendor', freshPc(), {});
     assert.deepEqual(ids(talk.completable), ['vendor_ping_pong_part1']);
   });
 

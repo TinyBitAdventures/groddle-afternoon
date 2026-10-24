@@ -78,7 +78,7 @@ export function readAchievements(gsjs) {
   return out;
 }
 
-/** GSJS items/*.js: [{ id, label, tags, parents, takeable, hidden, verbs, include }]. */
+/** GSJS items/*.js: [{ id, label, tags, parents, takeable, hidden, proxy, verbs, include }]. */
 export function readItems(gsjs, tagIndex = null) {
   const dir = join(gsjs, 'items');
   const out = [];
@@ -96,6 +96,8 @@ export function readItems(gsjs, tagIndex = null) {
       parents,
       takeable: parents.includes('takeable') || include.some((i) => /takeable/.test(i)),
       hidden: scalarVar(text, 'is_hidden') === 'true',
+      // `var proxy_item = "npc_shrine_alph"`: a variant that runs as another class (regional shrines).
+      proxy: scalarVar(text, 'proxy_item') || null,
       verbs,
       include,
     });

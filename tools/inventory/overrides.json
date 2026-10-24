@@ -635,5 +635,100 @@
  "item:quoin": {
   "status": "source",
   "reason": "js/quoins.js spawns the eight quoin types on every street (game.js spawnQuoins); the scan sees no class literal for the base quoin"
+ },
+ "npc:npc_esquibeth_playback": {
+  "status": "rebuilt",
+  "reason": "Esquibeth's ghost in the Last Pilgrimage room plays its npc_esquibeth_playback sheets (js/quest-rooms/esquibeth.js); the scanner cannot see the room's sheet loader",
+  "register": "G121"
+ },
+ "npc:npc_swoonerfly": {
+  "status": "partial",
+  "reason": "Gwendolyn's room drops one at your side as npc_squid.js does (js/quest-rooms/gwendolyn.js swoonerfly()); the 7 archived world Swoonerflies (Area 42 x4, Parsin's Trail SW, Tower St West, Pandhal Pegs) are not placed yet",
+  "register": "G121"
+ },
+ "npc:npc_combat_cubimal": {
+  "status": "excluded",
+  "reason": "test class: its description is \"testing cubimal combat idea\"; only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one",
+  "register": "G121"
+ },
+ "npc:npc_quest_hidden": {
+  "status": "excluded",
+  "reason": "dev class: \"a secret, hidden NPC to use for doing secret stuff\"; only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one",
+  "register": "G121"
+ },
+ "npc:npc_blimp": {
+  "status": "unbuilt_original",
+  "reason": "only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one",
+  "register": "G121"
+ },
+ "npc:npc_catch_me_ghost": {
+  "status": "unbuilt_original",
+  "reason": "only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one",
+  "register": "G121"
+ },
+ "npc:npc_dumbbot": {
+  "status": "unbuilt_original",
+  "reason": "only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one",
+  "register": "G121"
+ },
+ "npc:npc_obelisk": {
+  "status": "unbuilt_original",
+  "reason": "only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one",
+  "register": "G121"
+ },
+ "npc:npc_kitty": {
+  "status": "unbuilt_original",
+  "reason": "an npc_animal (feed, pet, nibble) only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one (the location dump's \"Kitty\" is a player, P-tsid)",
+  "register": "G121"
+ },
+ "npc:npc_juju_boss": {
+  "status": "excluded",
+  "reason": "retired before the 2012 snapshot: nothing in GSJS creates it and no archived street holds one (shrines.js and juju_shoo_shoo_powder.js only answer one that is already there)",
+  "register": "G121"
+ },
+ "npc:npc_letterblock_a": {
+  "status": "unbuilt_original",
+  "reason": "a takeable letter with no source: only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one; Four Letter Words uses letter_block",
+  "register": "G121"
+ },
+ "npc:npc_letterblock_b": {
+  "status": "unbuilt_original",
+  "reason": "a takeable letter with no source: only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one; Four Letter Words uses letter_block",
+  "register": "G121"
+ },
+ "npc:npc_letterblock_e": {
+  "status": "unbuilt_original",
+  "reason": "a takeable letter with no source: only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one; Four Letter Words uses letter_block",
+  "register": "G121"
+ },
+ "npc:npc_letterblock_m": {
+  "status": "unbuilt_original",
+  "reason": "a takeable letter with no source: only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one; Four Letter Words uses letter_block",
+  "register": "G121"
+ },
+ "npc:npc_letterblock_s": {
+  "status": "unbuilt_original",
+  "reason": "a takeable letter with no source: only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one; Four Letter Words uses letter_block",
+  "register": "G121"
+ },
+ "npc:npc_letterblock_t": {
+  "status": "unbuilt_original",
+  "reason": "a takeable letter with no source: only its own file and the Craftybot catalog (catalog_craftytasking.js) name it: nothing in GSJS spawns it and no archived street holds one; Four Letter Words uses letter_block",
+  "register": "G121"
+ },
+ "npc:npc_juju_red": {
+  "status": "excluded",
+  "reason": "retired: only npc_juju_boss.js creates it, and nothing creates the Juju Boss",
+  "register": "G121"
+ },
+ "npc:npc_juju_green": {
+  "status": "excluded",
+  "reason": "retired: only npc_juju_boss.js creates it, and nothing creates the Juju Boss",
+  "register": "G121"
+ },
+ "npc:npc_juju_yellow": {
+  "status": "excluded",
+  "reason": "retired: only npc_juju_boss.js creates it, and nothing creates the Juju Boss",
+  "register": "G121"
  }
 }

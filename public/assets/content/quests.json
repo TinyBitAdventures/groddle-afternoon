@@ -35289,8 +35289,8 @@
    {
     "type": "inferred",
     "inferred": true,
-    "npc": "street_spirit_gardening",
-    "why": "\"Visit the Gardening Vendor\""
+    "level": 2,
+    "why": "offer is the pet rock speaking; end_npcs npc_gardening_vendor"
    }
   ],
   "solo": true
@@ -35379,9 +35379,13 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "quest",
-    "quest": "vendor_ping_pong_part1",
-    "inferred": true
+    "type": "inferred",
+    "inferred": true,
+    "npc": "npc_gardening_vendor",
+    "quests": [
+     "vendor_ping_pong_part1"
+    ],
+    "why": "offer is the Gardening Tools Vendor speaking"
    }
   ],
   "solo": true
@@ -35431,9 +35435,13 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "quest",
-    "quest": "vendor_ping_pong_part2",
-    "inferred": true
+    "type": "inferred",
+    "inferred": true,
+    "npc": "npc_gardening_vendor",
+    "quests": [
+     "vendor_ping_pong_part2"
+    ],
+    "why": "offer is the Gardening Tools Vendor speaking"
    }
   ],
   "solo": true
@@ -35499,9 +35507,13 @@
   "hasCanOffer": false,
   "offerTriggers": [
    {
-    "type": "quest",
-    "quest": "vendor_ping_pong_part3",
-    "inferred": true
+    "type": "inferred",
+    "inferred": true,
+    "npc": "npc_gardening_vendor",
+    "quests": [
+     "vendor_ping_pong_part3"
+    ],
+    "why": "offer is the Gardening Tools Vendor speaking"
    }
   ],
   "solo": true

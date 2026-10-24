@@ -5,7 +5,8 @@
  * after a street loads and every 30 seconds, never while a dialogue, award,
  * timed action, or private instance is in progress. Accepted quests advance
  * from every badge counter the game emits (onEvent) and from the pack (item
- * and currant requirements), and turn in automatically when complete. Story
+ * and currant requirements), and turn in automatically when complete (unless
+ * their end NPC is one the world spawns: vendor-npcs-feature.js). Story
  * and starter quests keep their own progress path (managedOnly routing).
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=now offers the first
@@ -18,6 +19,7 @@ import {
   acceptOffer,
   declineOffer,
   ensureQuestOfferState,
+  heldForNpcTurnIn,
   markOffered,
   nextQuestOffer,
   questAwardPayload,
@@ -69,6 +71,8 @@ function questContext(engine, now = Date.now()) {
 
 function finish(rows, engine) {
   for (const row of rows || []) {
+    // A quest whose end NPC stands in the world waits for a talk with it (vendor-npcs-feature).
+    if (heldForNpcTurnIn(row.def)) continue;
     const done = turnInQuest(engine.questState, row.classTsid, engine.pc, questContext(engine));
     if (!done.ok) continue;
     engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
