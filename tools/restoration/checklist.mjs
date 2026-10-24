@@ -88,6 +88,9 @@ export const CHECKLIST = Object.freeze([
   { id: 'hidden-floors', group: 'world', name: 'The hidden floors', status: 'rebuilt',
     blurb: 'Three rooms no signpost leads to, each behind its street’s own hidden teleporter: the lost floor off Goorsh Gam’s treetops, the forgotten floor up in Odena Odes’ ceiling, and the missing floor at the top of Ilmenskie’s cave mouth, a running Triple Jump off the mushroom caps. The lost and missing floors are rebuilt from players’ footage and Snaps with Tiny Speck’s own apartment-hall art: ripped posters, dripping pipes, a climbable vine.',
     evidence: ['public/js/hidden-floors.js', 'public/js/features/hidden-floors-feature.js', 'public/assets/streets/GA9QUBPI49J2MOB.json', 'public/assets/streets/GUV1CSSE49J2P2C.json'] },
+  { id: 'vicars-peak', group: 'world', name: 'Vicar’s Peak', status: 'rebuilt',
+    blurb: 'The Groddle Heights cliff behind Thornfad Layers’ locked door (Door Key 1): seven tiers of pebbly ledges, wooden ladders twined with vines, and a stone-arched door at the top that leads on to Mossystep. Home to 11 Piggies, 7 Chickens and a Metal Rock, as its loading card said. Its layout was never archived, so it is a reconstruction from a 2011 party recording and two players’ 2012 Snaps, built with Tiny Speck’s own Heights art.',
+    evidence: ['public/js/vicars-peak.js', 'public/js/features/vicars-peak-feature.js', 'public/assets/streets/GCR1516SFHM122V.json', 'tools/build-vicars-peak.mjs'] },
 
   // —— Creatures & trees ——
   { id: 'piggies', group: 'creatures', name: 'Piggies', status: 'source', spot: 'piggy',

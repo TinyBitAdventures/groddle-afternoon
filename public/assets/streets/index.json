@@ -12989,6 +12989,15 @@
       "platforms": 3,
       "decos": 103,
       "reconstructed": true
+    },
+    "GCR1516SFHM122V": {
+      "label": "Vicar's Peak",
+      "file": "assets/streets/GCR1516SFHM122V.json",
+      "hubId": "64",
+      "hubName": "Groddle Heights",
+      "platforms": 11,
+      "decos": 226,
+      "reconstructed": true
     }
   }
 }

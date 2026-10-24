@@ -262,6 +262,22 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GIF102FDNU11314&streetx=4800&streety=810&jumpdemo=big&practice=1"
   },
   {
+   "id": "vicars-peak",
+   "group": "world",
+   "name": "Vicar’s Peak",
+   "status": "rebuilt",
+   "blurb": "The Groddle Heights cliff behind Thornfad Layers’ locked door (Door Key 1): seven tiers of pebbly ledges, wooden ladders twined with vines, and a stone-arched door at the top that leads on to Mossystep. Home to 11 Piggies, 7 Chickens and a Metal Rock, as its loading card said. Its layout was never archived, so it is a reconstruction from a 2011 party recording and two players’ 2012 Snaps, built with Tiny Speck’s own Heights art.",
+   "spot": null,
+   "evidence": [
+    "public/js/vicars-peak.js",
+    "public/js/features/vicars-peak-feature.js",
+    "public/assets/streets/GCR1516SFHM122V.json",
+    "tools/build-vicars-peak.mjs"
+   ],
+   "shot": "shots/vicars-peak.webp",
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&streetdemo=GCR1516SFHM122V&streetx=1000&streety=215&practice=1"
+  },
+  {
    "id": "piggies",
    "group": "creatures",
    "name": "Piggies",
@@ -878,13 +894,13 @@
  ],
  "tally": {
   "source": 40,
-  "rebuilt": 6,
+  "rebuilt": 7,
   "lost": 3,
   "solo": 7,
   "reimagined": 1
  },
- "back": 54,
- "possible": 54,
+ "back": 55,
+ "possible": 55,
  "quests": {
   "total": 445,
   "story": 245,
@@ -1849,9 +1865,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 357,
+  "commits": 360,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "The fall from the Fireflex lab opens on \"Back to life, back to the present time\""
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "Le Misérable is offered a day after Firefly Whistle"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "The \"Gypsy\" skirt and shirt are now the Boho skirt and shirt"
+   },
    {
     "date": "2026-10-24",
     "kind": "improve",
@@ -1956,24 +1987,9 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "The lost floor above Goorsh Gam's treetops, and the way into the forgotten floor from Odena Odes"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "The Mezzanine's EXIT arrow and Rook Museum plaque, read off player footage"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "The character builder names every wardrobe item in plain words"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Say \"I love you <Giant>\" at their shrine and the Giant says it back"
    }
   ]
  },
- "tests": 198,
+ "tests": 199,
  "generatedAt": "2026-10-24"
 }

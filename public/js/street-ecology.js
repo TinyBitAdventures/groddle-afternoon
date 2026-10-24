@@ -266,8 +266,12 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
     };
   }
   const seed = stableEcologyHash(tsid);
-  let piggies = Math.min(whole(counts.npc_piggy), 6);
-  let chickens = Math.min(whole(counts.npc_chicken), 3);
+  // A feature-built row for a rebuilt street may lift the rendering caps to its
+  // source's own count (Vicar's Peak's loading card: 11 Piggies, 7 Chickens);
+  // archived rows never carry `caps`.
+  const caps = entry?.caps || {};
+  let piggies = Math.min(whole(counts.npc_piggy), whole(caps.piggies, 6, 12));
+  let chickens = Math.min(whole(counts.npc_chicken), whole(caps.chickens, 3, 8));
   let butterflies = Math.min(whole(counts.npc_butterfly), 3);
 
   let treeClasses = expandClasses(counts, TREE_CLASSES, 8);

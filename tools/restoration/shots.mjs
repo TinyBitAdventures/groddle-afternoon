@@ -13,6 +13,8 @@ export const SHOTS = Object.freeze({
   streets: { route: `${Q}`, wait: 9000 },
   navigation: { route: `${Q}&doordemo=GLI32G3NUTD100I`, wait: 11000 },
   physics: { route: `${Q}&streetdemo=GUVUMTSQ2FC34ES`, wait: 11000 },
+  // Vicar's Peak's top ledge: the arched door, a vined ladder and the tier below (G93).
+  'vicars-peak': { route: `${Q}&streetdemo=GCR1516SFHM122V&streetx=1000&streety=215`, wait: 12000 },
   'street-events': { route: `${Q}&puzzledemo=GHVOD0F3T403694`, wait: 12000 },
   camera: { route: `${Q}&camerademo=1&cameraskill=1&cameralook=-1100,-60`, wait: 12000 },
   piggies: { route: `${Q}&animaldemo=piggy&animalrank=2`, wait: 9000 },

@@ -93,3 +93,4 @@ import { gwendolynRoom23Feature } from './gwendolyn-room-23-feature.js?v=g71-2';
 import { cubimalRaceFeature } from './cubimal-race-feature.js?v=g95-2'; FEATURES.push(cubimalRaceFeature);
 import { symphoniousMaximusFeature } from './symphonious-maximus-feature.js?v=g104-1'; FEATURES.push(symphoniousMaximusFeature);
 import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=g105-1'; FEATURES.push(hiddenFloorsFeature);
+import { vicarsPeakFeature } from './vicars-peak-feature.js?v=g93-1'; FEATURES.push(vicarsPeakFeature);
