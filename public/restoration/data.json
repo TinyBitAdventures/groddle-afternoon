@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 335,
+  "commits": 336,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "The lost floor above Goorsh Gam's treetops, and the way into the forgotten floor from Odena Odes"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1924,11 +1929,6 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Sharp Jack-O-Lanterns, Chocolate Eggs and Glitchmas Crackers drawn from Tiny Speck's vectors"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Say hi to your Butler with the 5 key: daily hi signs, its hi back and the matching-sign bonus"
    }
   ]
  },

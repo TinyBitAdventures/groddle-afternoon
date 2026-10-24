@@ -360,18 +360,59 @@ function middlegroundDecos() {
   return out;
 }
 
-/** Big pale peaks behind the floor (parallax). [sprite, layer x, w, h] bottoms on the horizon. */
+/**
+ * Pale peaks behind the floor, on two parallax layers (G104). The video's
+ * client view is ~1,500 x 1,000 world px, so at floor level its peaks fill
+ * the lower two thirds and leave navy sky above and between them; the
+ * remake's 408 px view would show only their pale feet at full size. So the
+ * peaks are drawn small enough for the same framing in 408 px: at the floor
+ * the near peaks rise ~150-250 px and the far ones ~200-270 px above the
+ * floor's back edge, with navy above and between them. They sink at half
+ * to 0.7 of the climb (feet always hidden behind the floor while it is in
+ * view), so the star grid has the far peaks in its lower half and the
+ * island row has none, as in t0039-t0046 and t0105-t0129.
+ * [sprite, height] in order; each deco keeps its art's aspect.
+ */
+const HILL_ASPECT = Object.freeze({
+  bck_hill_1: 598 / 610, bck_hill_2: 1108 / 742, bck_hill_4: 330 / 458, bck_hill_5: 336 / 476,
+  bck_hill_8: 656 / 640, bck_hill_12: 342 / 438, bck_hill_14: 412 / 368, bck_hill_15: 428 / 470,
+  bck_hill_16: 452 / 506, bck_hill_17: 410 / 576,
+});
 const PEAKS_NEAR = [
-  ['bck_hill_17', 120, 520, 730], ['bck_hill_14', 520, 640, 570], ['bck_hill_12', 900, 470, 600],
-  ['bck_hill_15', 1300, 600, 660], ['bck_hill_16', 1750, 600, 670], ['bck_hill_17', 2150, 480, 680],
-  ['bck_hill_5', 2500, 420, 600], ['bck_hill_14', 2900, 620, 560], ['bck_hill_15', 3350, 560, 620],
-  ['bck_hill_12', 3750, 450, 580], ['bck_hill_16', 4150, 560, 630], ['bck_hill_4', 4550, 420, 580],
-  ['bck_hill_17', 4900, 480, 680],
+  ['bck_hill_14', 200], ['bck_hill_12', 275], ['bck_hill_15', 230], ['bck_hill_2', 190], ['bck_hill_17', 290],
+  ['bck_hill_16', 235], ['bck_hill_5', 255], ['bck_hill_14', 215], ['bck_hill_4', 270], ['bck_hill_15', 205],
+  ['bck_hill_12', 250], ['bck_hill_2', 200], ['bck_hill_16', 280], ['bck_hill_17', 225],
 ];
 const PEAKS_FAR = [
-  ['bck_hill_17', 300, 700, 1000], ['bck_hill_2', 1100, 1300, 870], ['bck_hill_8', 1900, 900, 880],
-  ['bck_hill_1', 2600, 820, 840], ['bck_hill_16', 3300, 820, 920], ['bck_hill_2', 4000, 1200, 800],
+  ['bck_hill_2', 300], ['bck_hill_17', 355], ['bck_hill_8', 310], ['bck_hill_1', 335],
+  ['bck_hill_16', 360], ['bck_hill_2', 290], ['bck_hill_15', 345], ['bck_hill_17', 325],
 ];
+/** Vertical parallax rate of the near and far peak layers (1 = moves with the floor). */
+export const PEAK_RATE = Object.freeze({ near: 0.7, far: 0.5 });
+/** Screen y of the peaks' feet with the avatar on the floor (the floor's back edge is ~288). */
+const PEAK_FEET = Object.freeze({ near: 330, far: 390 });
+/** percY with the avatar on the floor (camera y 1582 of 1792 in a 408 px view). */
+const FLOOR_PERC_Y = 1582 / (H - 408);
+
+/** A parallax layer height for a vertical rate (the client's percY rule over a 408 px view). */
+const layerHeightFor = (rate) => Math.round(408 + rate * (H - 408));
+/** Layer y of the peaks' feet, so they stand at `feet` on screen with the avatar on the floor. */
+const peakBase = (rate, feet) => Math.round(feet + FLOOR_PERC_Y * (layerHeightFor(rate) - 408));
+
+/** Peaks laid out left to right in groups of three with a sky gap after each group. */
+function peakDecos(list, { start, step, gap, base, width }) {
+  const out = [];
+  let x = start;
+  let i = 0;
+  while (x < width + step) {
+    const [sprite, h] = list[i % list.length];
+    const w = h * HILL_ASPECT[sprite];
+    out.push(deco(sprite, x, base, w, h, i, i % 3 === 1 ? { flip: true } : {}));
+    i += 1;
+    x += step + (i % 3 === 0 ? gap : 0);
+  }
+  return out;
+}
 const SKY = [
   ['zutto_stars_1', 600, 500, 1777, 455], ['stars_2', 1700, 820, 1374, 383], ['zutto_stars_1', 2600, 380, 1777, 455],
   ['stars_3', 3200, 700, 396, 260], ['stars_2', 3600, 300, 1374, 383], ['stars_3', 900, 1000, 396, 260],
@@ -459,13 +500,15 @@ function layers() {
   const nearW = Math.round(W * 0.88);
   const farW = Math.round(W * 0.72);
   const skyW = Math.round(W * 0.62);
-  const horizonNear = H - 280; // peaks stand on the floor's back edge
-  const horizonFar = Math.round(H * 0.92) - 300;
+  const nearH = layerHeightFor(PEAK_RATE.near);
+  const farH = layerHeightFor(PEAK_RATE.far);
+  const near = peakDecos(PEAKS_NEAR, { start: 80, step: 250, gap: 260, base: peakBase(PEAK_RATE.near, PEAK_FEET.near), width: nearW });
+  const far = peakDecos(PEAKS_FAR, { start: 220, step: 340, gap: 300, base: peakBase(PEAK_RATE.far, PEAK_FEET.far), width: farW });
   return [
     parallaxLayer('T_sym_skyfade', 'sky fade', -9, W, H, skyFadeDecos(), { tintColor: 0x1b0d33, tintAmount: 100 }),
     parallaxLayer('sky', 'sky', -8, skyW, Math.round(H * 0.8), SKY.map(([s, x, y, w, h], i) => deco(s, x, y, w, h, i))),
-    parallaxLayer('bg_peaks_far', 'far peaks', -7, farW, Math.round(H * 0.92), PEAKS_FAR.map(([s, x, w, h], i) => deco(s, x, horizonFar, w, h, i, i % 2 ? { flip: true } : {})), { brightness: -25, saturation: -15 }),
-    parallaxLayer('bg_peaks', 'peaks', -6, nearW, H, PEAKS_NEAR.map(([s, x, w, h], i) => deco(s, x, horizonNear, w, h, i, i % 3 === 1 ? { flip: true } : {})), { brightness: -8 }),
+    parallaxLayer('bg_peaks_far', 'far peaks', -7, farW, farH, far, { brightness: -25, saturation: -15 }),
+    parallaxLayer('bg_peaks', 'peaks', -6, nearW, nearH, near, { brightness: -8 }),
     parallaxLayer('T_sym_shafts', 'light shafts', -4, W, H, shaftDecos()),
     parallaxLayer('T_sym_floorbase', 'floor base', -3, W, H, floorBaseDecos(), { tintColor: 0x8dc3cb, tintAmount: 100 }),
     parallaxLayer('T_sym_floor', 'floor', -2, W, H, floorDecos(), { saturation: -40, brightness: 50 }),
@@ -546,7 +589,7 @@ export function symphoniousStreet({ cebarkulArrive = null } = {}) {
       ladderCount: 1,
       barrierCount: 0,
     },
-    gradient: { top: '102F5E', bottom: '0D426F' },
+    gradient: { top: '163460', bottom: '215A76' },
     ladders: [{ id: lad.id, x: lad.x, y: lad.y, w: lad.w, h: lad.h }],
     events: symphoniousEvents(),
     eventBoxes: craterEventBoxes(),

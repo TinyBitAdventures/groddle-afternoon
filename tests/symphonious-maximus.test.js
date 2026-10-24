@@ -29,6 +29,7 @@ import {
 } from '../public/js/symphonious-maximus.js';
 import { symphoniousMaximusFeature, isSymphonious } from '../public/js/features/symphonious-maximus-feature.js';
 import { FEATURES } from '../public/js/features/index.js';
+import { parallaxLayerOffset } from '../public/js/street-render.js';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -195,5 +196,31 @@ describe('Star-Jinglers (items/toy_star_1.js)', () => {
     const eco = symphoniousMaximusFeature.ecologyOverride({ tsid: SYMPHONIOUS_TSID });
     assert.equal(eco.empty, true);
     assert.equal(symphoniousMaximusFeature.ecologyOverride({ tsid: CEBARKUL_TSID }), null);
+  });
+
+  it('G104: the peaks leave navy sky above them at the floor and sink out of view as you climb', () => {
+    const W = sym.bounds.r - sym.bounds.l;
+    const H = sym.bounds.b - sym.bounds.t;
+    const VIEW_H = 408;
+    const floorCamY = 1582; // camera y with the avatar on the floor (feet at screen 306)
+    const floorEdge = 288; // the floor base's top edge on screen at floorCamY
+    const view = (layer, camY) => {
+      const at = parallaxLayerOffset(layer, 0, camY, 960, VIEW_H, W, H);
+      return layer.decos.map((d) => ({ top: d.y - d.h + at.y - camY, feet: d.y + at.y - camY }));
+    };
+    for (const id of ['bg_peaks', 'bg_peaks_far']) {
+      const layer = sym.layers.find((l) => l.id === id);
+      assert.ok(layer.decos.length >= 8, id);
+      const atFloor = view(layer, floorCamY);
+      assert.ok(Math.min(...atFloor.map((p) => p.top)) >= 20, `${id}: sky shows above every peak at the floor`);
+      assert.ok(Math.max(...atFloor.map((p) => p.top)) < floorEdge - 120, `${id}: peaks still rise well above the floor`);
+      // While the floor's back edge is in view, the peaks' cut-off feet stay behind it.
+      for (let up = 0; floorEdge + up < VIEW_H; up += 10) {
+        for (const p of view(layer, floorCamY - up)) assert.ok(p.feet >= floorEdge + up, `${id}: feet hidden ${up} px up`);
+      }
+      // Standing on the island row (camera ~494) no peak is in view.
+      assert.ok(view(layer, 494).every((p) => p.top > VIEW_H), `${id}: none behind the island row`);
+    }
+    assert.deepEqual(sym.gradient, { top: '163460', bottom: '215A76' });
   });
 });
