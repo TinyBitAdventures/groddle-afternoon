@@ -267,9 +267,16 @@ export function groundBeneath(platforms, x, feetY, maxRise = 6) {
   return below || lowest;
 }
 
+/** game.js caps a frame's delta at 2.5 frames (slow or throttled frames). */
+export const FRAME_DT_CAP = 2.5;
+
 /**
  * Resolve ground under a feet position (screen coords).
  * Returns the highest platform top the player is standing on / falling onto.
+ * A falling avatar moves vy * dt in one frame, up to vy * FRAME_DT_CAP on a slow
+ * frame, so a platform it crossed that far above its feet (plus 8 px of slope)
+ * still catches it (G97: at ~9 fps a hop on the Stairs' flight 2 fell 21-23 px
+ * past the step, beyond the snap, and dropped to flight 1 below).
  * @param {{ x1:number,y1:number,x2:number,y2:number }[]} platforms  screen-space
  * @param {number} feetX
  * @param {number} feetY  current feet y
@@ -279,11 +286,13 @@ export function groundBeneath(platforms, x, feetY, maxRise = 6) {
 export function resolveGround(platforms, feetX, feetY, vy = 0, snap = 12) {
   let best = null;
   let bestY = Infinity;
+  // Plus a little for the surface's own slope between last frame's x and this one.
+  const reach = vy > 0 ? Math.max(snap, vy * FRAME_DT_CAP + 8) : snap;
   for (const p of platforms) {
     const y = platformYAt(p, feetX);
     if (y == null) continue;
     // Only consider platforms at or below feet when falling / standing
-    if (vy >= 0 && feetY <= y + snap && feetY >= y - 40) {
+    if (vy >= 0 && feetY <= y + reach && feetY >= y - 40) {
       if (y < bestY) {
         bestY = y;
         best = p;

@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { assertStreetGeometry } from '../public/js/street-model.js';
+import { FRAME_DT_CAP, assertStreetGeometry, platformYAt, resolveGround } from '../public/js/street-model.js';
 import { insideBottomRect } from '../public/js/doors.js';
 import {
   GREETERBOT,
@@ -363,5 +363,51 @@ describe('mid-tower feature: the Greeterbot', () => {
       assert.deepEqual(json.ladders, built.ladders);
       assert.deepEqual(json.doors.map((d) => d.id), built.doors.map((d) => d.id));
     }
+  });
+});
+
+describe('G97: hopping along the Stairs\' flight 2 on slow frames', () => {
+  const st = street(STAIRS_TSID);
+  const L = st.bounds.l;
+  const T = st.bounds.t;
+  const plats = st.platforms.map((p) => ({ ...p, x1: p.x1 - L, y1: p.y1 - T, x2: p.x2 - L, y2: p.y2 - T }));
+  const f2 = plats.filter((p) => /^plat_st_f2_/.test(p.id) && p.pc_perm === -1);
+  const f2FloorAt = (x) => {
+    for (const p of f2) {
+      const y = platformYAt(p, x);
+      if (y != null) return y;
+    }
+    return null;
+  };
+
+  it('the frame that dropped the avatar (QA log, ~9 fps): 20.7 px past the step still lands on it', () => {
+    // x 1738.7 feet 634.1 (0.5 px above the floor), then dt 2.5, vy 8.25: feet 654.8 at x 1727.7.
+    const hit = resolveGround(plats, 1727.7, 654.8, 8.25, 16);
+    assert.ok(hit, 'caught');
+    assert.ok(/^plat_st_f2_/.test(hit.platform.id), `on flight 2, not ${hit.platform.id}`);
+    assert.ok(Math.abs(hit.y - f2FloorAt(1727.7)) < 0.01);
+  });
+
+  it('every hop from screen x 1380 to 2560, either way, lands back on flight 2 at the dt cap', () => {
+    const misses = [];
+    for (let x0 = 1380; x0 <= 2560; x0 += 7) {
+      for (const vx of [-4.4, 4.4]) {
+        // game.js physics(): vy += 0.42 * dt; x += vx * dt; y += vy * dt; land when y >= ground.
+        let x = x0;
+        let y = f2FloorAt(x0);
+        if (y == null) continue;
+        let vy = -8.3; // a hop
+        let landed = null;
+        for (let i = 0; i < 40 && !landed; i++) {
+          vy += 0.42 * FRAME_DT_CAP;
+          x += vx * FRAME_DT_CAP;
+          y += vy * FRAME_DT_CAP;
+          const hit = resolveGround(plats, x, y, vy, 16);
+          if (hit && y >= hit.y && vy >= 0) landed = hit;
+        }
+        if (!landed || !/^plat_st_f2_/.test(landed.platform.id)) misses.push(`${x0}${vx > 0 ? '>' : '<'}${landed?.platform.id || 'none'}`);
+      }
+    }
+    assert.deepEqual(misses, []);
   });
 });
