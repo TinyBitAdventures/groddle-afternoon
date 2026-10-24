@@ -317,6 +317,17 @@ const SPAWN_CTX = /^(prop:(classId|classTsid|cls|class_tsid|class_id|itemClass|n
 export const CATALOG_FILE = /(store-catalog|icon-hires|sound-keys|deco-hires|-data|dialogue|npc-glitch-looks|sprite-sheets|vector-sprites|stat-text|sound-moments|synth-sfx|inventory|achievements|quest-offers|content-catalogs)\.js$/;
 
 /**
+ * GSJS files whose mention of an item id is no evidence that the original used it: the item's own
+ * file, the item list (items/catalog.js), the tag table, and the Craftybot catalog
+ * (catalog_craftytasking.js), which was generated with a spec for every item class, even ones nothing
+ * makes (beachball's spec needs one beachball). Same files in eleven-gsjs.
+ */
+export const GSJS_LIST_FILE = /items\/catalog(_tags|_craftytasking)?\.js$/;
+export function gsjsItemRefs(id, files) {
+  return new Set([...(files || [])].filter((f) => !f.endsWith(`items/${id}.js`) && !GSJS_LIST_FILE.test(f)));
+}
+
+/**
  * items: GSJS readItems() rows; reach: Map id -> source text (remake obtainable);
  * present: Map id -> evidence (placed/spawned world objects); codeCtx: contextLiterals(remake);
  * gsjsRefs: Map id -> Set(files) of GSJS literal references (own file and catalog_tags excluded);
@@ -332,7 +343,8 @@ export function judgeItems({ items, reach, present, codeCtx, gsjsRefs, families 
     const base = { name: it.label, source_ref: `items/${it.id}.js`, detector: kind === 'npc' ? 'npc-spawn' : 'item-obtainable' };
     const verbs = it.verbs.length ? `source verbs: ${it.verbs.join(',')}` : '';
     const add = (status, ...ev) => rows.push(row(kind, it.id, { ...base, status, evidence: [...ev, verbs].filter(Boolean).join(' | ') }));
-    if (it.id.startsWith('catalog_')) { add('excluded', 'data catalog, not an item'); continue; }
+    if (it.id === 'catalog' || it.id.startsWith('catalog_')) { add('excluded', 'data catalog, not an item'); continue; }
+    if (it.id.startsWith('quest_req_icon_')) { add('excluded', 'quest requirement icon: the class_id of a quests/*.js requirement row, drawn in the quest log, never held'); continue; }
     const tag = it.tags.find((t) => EXCLUDE_TAGS.includes(t));
     if (tag) { add('excluded', `catalog_tags/tags: ${tag}`); continue; }
     if (EXCLUDE_ID.test(it.id)) { add('excluded', 'test/admin id'); continue; }
@@ -354,20 +366,20 @@ export function judgeItems({ items, reach, present, codeCtx, gsjsRefs, families 
     }
     if (!it.takeable && constant) { add('source', `named by a constant in ${constant.file}:${constant.line} (spawn not traced)`); continue; }
     if (!reach.has(it.id) && !present.has(it.id) && subclasses.get(it.id) >= 2) { add('excluded', `base class of ${subclasses.get(it.id)} item files (judged through them)`); continue; }
+    if (it.retiredTo) { add('excluded', `retired: items/${it.id}.js onLoad swaps every stack for ${it.retiredTo} (apiSetTimerX replaceWith)`); continue; }
     if (it.hidden) { add('excluded', `is_hidden in GSJS; ${refs.size} GSJS files name it`); continue; }
-    if (!refs.size) { add('unbuilt_original', 'nothing in GSJS or eleven-gsjs names it outside its own file and catalog_tags'); continue; }
+    if (!refs.size) { add('unbuilt_original', 'nothing in GSJS or eleven-gsjs names it outside its own file, the item list, catalog_tags and the Craftybot catalog'); continue; }
     const fam = families.find((f) => it.id.startsWith(f.prefix) && it.id.length > f.prefix.length);
     if (!it.takeable && fam) { add('unknown', `id family ${fam.prefix}* is handled in ${fam.file}; whether this variant spawns is not traced`); continue; }
     const where = `${refs.size} GSJS files use it (${[...refs].slice(0, 3).join(', ')})`;
     if (ctx.length) { add('missing', `${it.takeable ? 'no way to obtain it' : 'not placed or spawned'}; named in ${ctx.slice(0, 2).map((c) => `${c.file}:${c.line}`).join(', ')}; ${where}`); continue; }
     add('missing', `${it.takeable ? 'no way to obtain it' : 'not placed or spawned'}; ${where}`);
   }
-  // A proxy_item NPC variant (npc_shrine_firebog_alph -> npc_shrine_alph) runs as its base class: when
-  // the base is reachable, the variant's rules are too; only its own art may be missing. (Item proxies
-  // such as rock_metal_2 are depletion states of one rock, judged with it.)
+  // A proxy_item variant runs as its base class (npc_shrine_firebog_alph -> npc_shrine_alph; the
+  // art variants rock_metal_2/3 -> rock_metal_1, peat_2/3 -> peat_1): when the base is reachable, the
+  // variant's rules are too; only its own art may be missing.
   const byId = new Map(rows.map((r) => [r.id, r]));
   for (const it of items) {
-    if (!it.id.startsWith('npc_')) continue;
     const r = byId.get(it.id);
     const baseRow = it.proxy && byId.get(it.proxy);
     if (!r || !baseRow || !['missing', 'unknown'].includes(r.status) || !REACHABLE.has(baseRow.status)) continue;

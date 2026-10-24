@@ -27,6 +27,7 @@
 import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { onLoaded, textureFromUrl } from '../textures.js';
+import { ensureItem } from '../inventory.js?v=catalog-unified-3';
 
 export const PART_1 = 'smuggle_the_smuggler_part1';
 export const PART_2 = 'smuggle_the_smuggler_part2';
@@ -53,6 +54,59 @@ export const PACE = Object.freeze({ x1: 520, x2: 920, speed: 40 });
 /** Bars close the cell on the right; the cave wall on the left. */
 export const BARS_X = 1290;
 const VENDOR = { cell: { w: 187, h: 91 }, anchor: { x: 153 / 187, y: 90 / 91 } };
+
+/**
+ * npc_rare_item_vendor.js verbs.buy ("Buy extremely rare items", store_id 25, no
+ * conditions): store 25 "Extremely Rare Items Vendor" in catalog_stores.js
+ * 1603-1631, buy_multiplier 0 (he buys nothing back). `stock` is each row's
+ * total_quantity when the servers stopped (a shared, world-wide count; one
+ * player cannot plausibly empty it, so it is not counted down here). The
+ * Million Currant Trophy row had total_quantity 0, sold out, and is left off.
+ */
+export const RARE_STORE = Object.freeze({
+  storeId: 25,
+  label: 'Extremely Rare Items Vendor',
+  desc: 'This vendor... shhhh!... sells items that are extremely rare!',
+  buyMultiplier: 0,
+  offers: Object.freeze([
+    Object.freeze({ classTsid: 'antique_spigot', cost: 250000, stock: 331 }),
+    Object.freeze({ classTsid: 'rube_potato', cost: 500000, stock: 247 }),
+    Object.freeze({ classTsid: 'npc_cubimal_factorydefect_chick', cost: 1500000, stock: 171 }),
+    Object.freeze({ classTsid: 'limited_edition_imitation_grichmas_yeti', cost: 3000000, stock: 99 }),
+  ]),
+});
+
+/** items/<class>.js label, name_plural, description, base_cost (stackmax 1 for all four). */
+export const RARE_ITEMS = Object.freeze({
+  antique_spigot: Object.freeze({ label: 'Antique Spigot', namePlural: 'Antique Spigots', desc: 'Water once flowed freely through this residual, rusting spigot. Old water, from times long by. Surely, you must have it!', baseCost: 251000 }),
+  rube_potato: Object.freeze({ label: 'Rube Shaped Potato', namePlural: 'Rube Shaped Potato', desc: "A spud that's a dud, with the self-evolved claim to resemble a rubbed-on Rube. Miraculous! Fries not included.", baseCost: 503000 }),
+  npc_cubimal_factorydefect_chick: Object.freeze({ label: 'Factory Defect Chick Cubimal', namePlural: 'Factory Defect Chick Cubimals', desc: 'This Factory Defect Chick Cubimal was hand-picked straight out of the garbage bin by an assembly line worker.', baseCost: 1511000 }),
+  limited_edition_imitation_grichmas_yeti: Object.freeze({ label: 'Highest Quality #1 "Imported" Glitchmas Yeti', namePlural: 'Highest Quality #1 "Imported" Glitchmas Yetis', desc: 'A genuine, imitation Glitchmas Yeti. It is qualities without peer and it is always ensuring you are satisfy.', baseCost: 3001000 }),
+});
+
+/** The chick's art (OGA npc_cubimal_factorydefect_chick__x1_1) is not one of the 43 series figures in icons/. */
+export const RARE_ICONS = Object.freeze({
+  npc_cubimal_factorydefect_chick: 'assets/sprites/quest-rooms/penalty/npc_cubimal_factorydefect_chick.png',
+});
+
+export function ensureRareItems() {
+  for (const [id, meta] of Object.entries(RARE_ITEMS)) ensureItem(id, { ...meta, stackMax: 1, ...(RARE_ICONS[id] ? { icon: RARE_ICONS[id] } : {}) });
+}
+
+/** Store 25 as a profile for engine.openShop. */
+export function rareStoreProfile() {
+  return {
+    key: 'rare_items',
+    id: 'npc_rare_item_vendor',
+    storeId: RARE_STORE.storeId,
+    label: RARE_STORE.label,
+    desc: RARE_STORE.desc,
+    badge: 'R',
+    color: 0x6b4f8a,
+    buyMultiplier: RARE_STORE.buyMultiplier,
+    offers: RARE_STORE.offers.map((o) => ({ classTsid: o.classTsid, label: RARE_ITEMS[o.classTsid].label, buyPrice: o.cost, sellPrice: 0 })),
+  };
+}
 const VENDOR_CLIPS = { idle: [5, 110], talk: [5, 72], walk: [4, 16] };
 
 const questName = (id) => getQuestCatalog()?.[id]?.title || id;
@@ -315,7 +369,10 @@ export const room = {
   verbs(ctx, target) {
     if (target === ctx.data.vendorTarget) {
       const step = cellStep(questState(ctx));
-      return [{ id: 'talk_to', label: 'Talk to', enabled: !ctx.data.talking && !ctx.data.crawling && step !== 'free', reason: 'He is busy', tooltip: 'He says he is innocent' }];
+      return [
+        { id: 'talk_to', label: 'Talk to', enabled: !ctx.data.talking && !ctx.data.crawling && step !== 'free', reason: 'He is busy', tooltip: 'He says he is innocent' },
+        { id: 'buy', label: 'Buy', enabled: !ctx.data.talking && !ctx.data.crawling, reason: 'He is busy', tooltip: 'Buy extremely rare items' },
+      ];
     }
     if (target === ctx.data.patchTarget) {
       const q = questState(ctx);
@@ -336,6 +393,12 @@ export const room = {
       talk(ctx);
       return true;
     }
+    if (target === ctx.data.vendorTarget && verbId === 'buy') {
+      ensureRareItems();
+      ctx.engine.openShop?.(rareStoreProfile());
+      ctx.engine.setData?.('penaltyRareStore', 'open');
+      return true;
+    }
     if (target === ctx.data.patchTarget && verbId === 'dig') {
       dig(ctx);
       return true;
@@ -348,6 +411,11 @@ export const room = {
   },
 
   tick(ctx, dtMs) {
+    // QA: &penaltystore=1 runs the Smuggler's Buy verb once the room is up.
+    if (!ctx.data.qaStore && ctx.param?.('penaltystore') === '1' && ctx.data.vendorTarget && Date.now() - (ctx.data.enteredAt || 0) > 1500) {
+      ctx.data.qaStore = true;
+      this.runVerb(ctx, ctx.data.vendorTarget, 'buy');
+    }
     const v = ctx.data.vendor;
     const p = ctx.player;
     // npc_walkable pace: walk the 400 px between his marks, pausing while anyone talks.

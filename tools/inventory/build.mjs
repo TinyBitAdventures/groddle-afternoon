@@ -93,6 +93,8 @@ export const REMAKE_EMITTERS = [
   { name: 'applyBuff', args: [1], member: false, tag: 'buff' },
   { name: 'applyBuff', args: [0], member: true, tag: 'buff' },
   { name: 'addItem', args: [1], tag: 'item' },
+  // Quest rooms hand items over through their runtime: ctx.give('juju_trowel', 1).
+  { name: 'give', args: [0], member: true, tag: 'item', files: /quest-rooms\// },
 ];
 
 export const GSJS_EMITTERS = [
@@ -270,6 +272,8 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   for (const q of Object.values(quests)) {
     if (!q.solo) continue;
     for (const r of Object.values(q.rewards?.items || {})) addReach(r.class_tsid || r.class_id, `reward of quest ${q.classTsid}`);
+    // doProvided: items the familiar hands over on accept (js/quest-offers.js acceptOffer giveItems).
+    for (const r of q.giveItems || []) addReach(r.classTsid, `given on accepting quest ${q.classTsid}`);
   }
   // Street-project performance drops (street-jobs.json drops: street_creation_rewards_a, street_creation_trophies).
   const sjEarly = json('assets/content/street-jobs.json');
@@ -280,6 +284,9 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   };
   for (const [name, t] of Object.entries(sjEarly.drops || {})) walkIds(t, `street-project drop table ${t.name || name}`);
   const conversions = await supplyConversions();
+  // emblem_base iconize (js/giant-icons.js iconize): eleven Emblems of a Giant become its Icon.
+  const { GIANT_ICON_DATA } = await import(join(pub, 'js/giant-icons-data.js'));
+  for (const g of Object.values(GIANT_ICON_DATA)) conversions.push({ inputs: [g.emblemClass], tool: null, outputs: [g.iconClass], source: 'iconize (js/giant-icons.js)' });
   const fix = () => {
     let grew = true;
     while (grew) {
@@ -298,6 +305,13 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
       const counts = r.counts || r;
       for (const k of Object.keys(counts)) if (!present.has(k)) present.set(k, `street-ecology.json ${sec} (${tsid})`);
     }
+  }
+  // Home cultivation (js/home-cultivation.js): every proto a player places in the yard, and every end item
+  // it grows into (the Tower's built furniture_tower_chassis included), drawn by features/homes-feature.js.
+  const { listCultivationClasses } = await import(join(pub, 'js/home-cultivation.js'));
+  for (const def of listCultivationClasses()) {
+    const via = `home cultivation ${def.protoClass} (js/home-cultivation.js, features/homes-feature.js)`;
+    for (const id of [def.protoClass, ...(def.endItems || [])]) if (!present.has(id)) present.set(id, via);
   }
 
   // Achievements.
@@ -332,13 +346,30 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
     if (!D.REACHABLE.has(r.status)) continue;
     for (const it of Object.values(achContent[r.id]?.rewards?.items || {})) addReach(it.class_id || it.class_tsid, `reward of badge ${r.id}`);
   }
+  // Race Ticket Dispensers (store 20, features/races-feature.js buyTicket) sell a ticket for every race
+  // the remake runs: the built courses and Game of Crowns.
+  const races = await import(join(pub, 'js/races.js'));
+  const { RACE_COURSE_IDS } = await import(join(pub, 'js/race-courses.js'));
+  const runs = new Set([...RACE_COURSE_IDS, 'it_game']);
+  const raceOf = (cls) => (cls === 'race_ticket_it_game' ? 'it_game' : Object.values(races.RACES).find((r) => r.ticket === cls)?.id);
+  for (const row of races.RACE_STORE_ITEMS) if (runs.has(raceOf(row.classTsid))) addReach(row.classTsid, 'vendor:race_ticket_dispenser (store 20)');
+  // The Extremely Rare Items Vendor (store 25): the imprisoned Smuggler's Buy verb in the Penalty Box.
+  const { RARE_STORE } = await import(join(pub, 'js/quest-rooms/penalty.js'));
+  for (const o of RARE_STORE.offers) addReach(o.classTsid, 'vendor:rare_item_vendor (store 25, js/quest-rooms/penalty.js)');
+  // Imagination cards that give an item (reward type 8, keepable cards such as the Paradise tickets):
+  // features/imagination-feature.js adds it to the pack when the card is bought. Live cards only.
+  const imgData = await import(join(pub, 'js/imagination-data.js'));
+  const imgRemake = await import(join(pub, 'js/imagination-remake.js'));
+  for (const [id, u] of Object.entries(imgData.IMAGINATION_UPGRADES)) {
+    if (imgRemake.remakeStatus(id).status !== 'live') continue;
+    for (const r of u.rewards || []) if (r.type === 8 && r.data?.class_id) addReach(r.data.class_id, `imagination card ${id}`);
+  }
   fix();
 
   // Items and NPCs.
   const gsjsRefs = new Map();
   for (const it of items) {
-    const files = new Set([...(gsjsLits.get(it.id) || [])].filter((f) => !f.endsWith(`items/${it.id}.js`) && !/items\/catalog(_tags)?\.js$/.test(f)));
-    gsjsRefs.set(it.id, files);
+    gsjsRefs.set(it.id, D.gsjsItemRefs(it.id, gsjsLits.get(it.id)));
   }
   const families = [];
   for (const [v, files] of remakeLits) {

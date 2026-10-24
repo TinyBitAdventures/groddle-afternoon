@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { buildIndex, contextLiterals, liveFiles, matchPattern, scanEmissions } from '../tools/inventory/scan.mjs';
-import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills, conditionReach } from '../tools/inventory/detectors.mjs';
+import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills, conditionReach, gsjsItemRefs } from '../tools/inventory/detectors.mjs';
 import { readTsidRefs, tsidRefsFromText } from '../tools/inventory/gsjs-data.mjs';
 import { REMAKE_EMITTERS, GSJS_EMITTERS, emissionsByTag, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
@@ -266,6 +266,45 @@ describe('other detectors', () => {
       if (!k.startsWith('system:')) continue;
       assert.ok(v.status || [].concat(v.checklist).every((id) => ids.has(id)), `${k} -> ${v.checklist}`);
     }
+  });
+});
+
+describe('item detector: items nobody can get (G125)', () => {
+  const item = (id, extra = {}) => ({ id, label: id, tags: [], parents: [id, 'takeable'], takeable: true, hidden: false, verbs: [], ...extra });
+  const judge = (items, { reach = new Map(), present = new Map(), refs = {} } = {}) => judgeItems({
+    items, reach, present, codeCtx: new Map(),
+    gsjsRefs: new Map(items.map((it) => [it.id, gsjsItemRefs(it.id, refs[it.id] || [])])),
+  });
+
+  it('does not count the Craftybot catalog or the item list as a use', () => {
+    const refs = { beachball: ['items/beachball.js', 'items/catalog.js', 'items/catalog_craftytasking.js', 'eleven-gsjs/items/catalog_craftytasking.js'] };
+    assert.equal(judge([item('beachball')], { refs })[0].status, 'unbuilt_original');
+    refs.beachball.push('items/catalog_stores.js');
+    assert.equal(judge([item('beachball')], { refs })[0].status, 'missing');
+  });
+
+  it('judges an item proxy variant with its base', () => {
+    const rows = judge([item('rock_x_1'), item('rock_x_2', { proxy: 'rock_x_1' })], {
+      present: new Map([['rock_x_1', 'street-ecology.json']]),
+      refs: { rock_x_2: ['items/proto_rock.js'] },
+    });
+    assert.deepEqual(rows.map((r) => r.status), ['source', 'partial']);
+  });
+
+  it('excludes retired items, requirement icons and the item list itself', () => {
+    const rows = judge([item('brick', { retiredTo: 'grade_aa_earth_block' }), item('quest_req_icon_x', { takeable: false, parents: [] }), item('catalog', { takeable: false, parents: [] })], {
+      refs: { brick: ['quests/job_x.js'], quest_req_icon_x: ['quests/q.js'], catalog: ['items/a.js'] },
+    });
+    assert.deepEqual(rows.map((r) => r.status), ['excluded', 'excluded', 'excluded']);
+    assert.match(rows[0].evidence, /grade_aa_earth_block/);
+  });
+
+  it('counts a quest room handing an item over (ctx.give) as a grant', () => {
+    const by = remakeScan([
+      ['js/quest-rooms/camp.js', "export function start(ctx) { ctx.give('juju_trowel', 1); }\n"],
+      ['js/other.js', "export function f(ctx) { ctx.give('not_a_grant', 1); }\n"],
+    ]);
+    assert.deepEqual((by.item || []).map((e) => e.text), ['juju_trowel']);
   });
 });
 

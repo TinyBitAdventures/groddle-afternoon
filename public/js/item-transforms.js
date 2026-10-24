@@ -10,6 +10,9 @@
  * - cheese_very_stinky.js age: 20 energy + 20 mood each -> cheese_very_very_stinky
  * - cheese_very_stinky.js poke: 10 energy, small_worthless out and the cheese
  *   falls back to cheese_stinky
+ * - grain.js bundle: 250 Grain -> 1 grain_bushel for 20 energy, hidden below
+ *   250 Grain, refused at 20 energy or less; grain_bushel.js unbundle: 1 bushel
+ *   -> 250 Grain, 5 energy and +10 mood each, refused below 5 energy
  * - herb_base extract_seeds ("shuck"): skill package herbalism_extract_seeds,
  *   2 seeds per herb (seed_failure per herb class), success_rate roll,
  *   bonus_chance x bonus_multiplier
@@ -17,10 +20,16 @@
  * Every verb works on one item or the whole stack, like the source's count.
  */
 
-import { addItem, countItem, removeItem } from './inventory.js?v=catalog-unified-3';
+import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=catalog-unified-3';
 import { skillPackageDetails } from './skill-packages.js';
 
-/** Plain transforms: { verb, label, out, energy, mood, keep } per input class. */
+/**
+ * Plain transforms: { verb, label, out, energy, mood, keep } per input class.
+ * Optional: `per` inputs make one output, `outQty` outputs come from one input,
+ * `moodGain` is mood given per use, `strict` refuses at exactly the energy cost
+ * (source `<=`), `single` offers no "all" button, `tired` replaces the energy
+ * refusal, and `line` may be a function of the count.
+ */
 export const ITEM_TRANSFORMS = Object.freeze({
   milk_butterfly: Object.freeze([
     { id: 'shake', label: 'Shake', out: 'butterfly_butter', energy: 2, tooltip: 'Make butter.', line: 'You shake the butterfly milk vigorously. Butterfly butter!', source: 'milk_butterfly.js shake' },
@@ -33,6 +42,12 @@ export const ITEM_TRANSFORMS = Object.freeze({
   ]),
   cheese_stinky: Object.freeze([
     { id: 'age', label: 'Age', out: 'cheese_very_stinky', energy: 10, tooltip: 'Increase the stink.', line: 'If you concentrate really hard on it, the cheese does indeed age.', source: 'cheese_stinky.js age' },
+  ]),
+  grain: Object.freeze([
+    { id: 'bundle', label: 'Bundle', out: 'grain_bushel', per: 250, energy: 20, strict: true, single: true, tooltip: 'Bundle this grain into a nifty Bushel.', tired: "You're far too tired to bundle grain.", line: 'You bundled 250 Grains.', source: 'grain.js bundle' },
+  ]),
+  grain_bushel: Object.freeze([
+    { id: 'unbundle', label: 'Unbundle', out: 'grain', outQty: 250, energy: 5, moodGain: 10, strict: true, tooltip: 'Unpack this bundle into 250 sheaves of Grain.', tired: 'You are too tired to unbundle things!', line: (n) => (n > 1 ? `You unbundled ${n} Bushels of Grain.` : 'You unbundled a Bushel of Grain.'), source: 'grain_bushel.js unbundle' },
   ]),
   cheese_very_stinky: Object.freeze([
     { id: 'age', label: 'Age', out: 'cheese_very_very_stinky', energy: 20, mood: 20, tooltip: 'Increase the stink.', line: 'Wow, is that ever draining. But the cheese is visibly aged.', source: 'cheese_very_stinky.js age' },
@@ -48,6 +63,12 @@ export const ITEM_TRANSFORMS = Object.freeze({
     },
   ]),
 });
+
+/** Transform outputs the shared catalog lacks (items/grain_bushel.js label, description, cost, stack). */
+export const TRANSFORM_ITEMS = Object.freeze({
+  grain_bushel: Object.freeze({ label: 'Bushel of Grain', namePlural: 'Bushels of Grain', desc: '250 stalks of grain all tied up nice and neat.', baseCost: 250, stackMax: 5 }),
+});
+for (const [id, meta] of Object.entries(TRANSFORM_ITEMS)) ensureItem(id, meta);
 
 /** herb_base seed_type and seed_failure for every herb with a seed. */
 export const HERB_SEEDS = Object.freeze({
@@ -78,9 +99,12 @@ export function listTransformVerbs(classTsid, inv, pc, learned = []) {
   if (have < 1) return [];
   const out = [];
   for (const t of ITEM_TRANSFORMS[classTsid] || []) {
+    const per = t.per || 1;
+    // grain.js bundle conditions: state null (hidden) below a full 250.
+    if (have < per) continue;
     const one = transformCheck(classTsid, t.id, 1, inv, pc, learned);
     out.push({ id: `${t.id}:1`, label: t.label, enabled: one.ok, reason: one.msg || '', tooltip: costTip(t, 1) });
-    if (have > 1) {
+    if (have > 1 && !t.single) {
       const all = transformCheck(classTsid, t.id, have, inv, pc, learned);
       out.push({ id: `${t.id}:all`, label: `${t.label} all ${have}`, enabled: all.ok, reason: all.msg || '', tooltip: costTip(t, have) });
     }
@@ -129,7 +153,10 @@ export function transformCheck(classTsid, verb, count, inv, pc, learned = []) {
   }
   const t = (ITEM_TRANSFORMS[classTsid] || []).find((row) => row.id === verb);
   if (!t) return { ok: false, reason: 'unknown', msg: 'You cannot do that.' };
-  if ((pc?.energy || 0) < t.energy * n) return { ok: false, reason: 'energy', msg: "You don't have enough energy to do that." };
+  const per = t.per || 1;
+  if (countItem(inv, classTsid) < n * per) return { ok: false, reason: 'missing', msg: 'You do not have that many.' };
+  const energy = pc?.energy || 0;
+  if (t.strict ? energy <= t.energy * n : energy < t.energy * n) return { ok: false, reason: 'energy', msg: t.tired || "You don't have enough energy to do that." };
   if (t.mood && (pc?.mood || 0) < t.mood * n) return { ok: false, reason: 'mood', msg: 'You need more mood to do that.' };
   return { ok: true, energy: t.energy * n, mood: (t.mood || 0) * n, count: n, transform: t };
 }
@@ -144,13 +171,17 @@ export function runTransform(classTsid, verb, count, inv, pc, learned = [], rng 
   if (!check.ok) return check;
   if (verb === 'shuck') return shuck(classTsid, n, inv, pc, learned, rng);
   const t = check.transform;
-  removeItem(inv, classTsid, n);
+  const got = n * (t.outQty || 1);
+  removeItem(inv, classTsid, n * (t.per || 1));
   pc.energy -= check.energy;
   if (check.mood) pc.mood = (pc.mood || 0) - check.mood;
-  addItem(inv, t.out, n);
+  const moodGain = (t.moodGain || 0) * n;
+  if (moodGain) pc.mood = Math.min(Number.isFinite(pc.moodMax) ? pc.moodMax : 100, (pc.mood || 0) + moodGain);
+  addItem(inv, t.out, got);
   if (t.becomes) addItem(inv, t.becomes, n);
-  const cost = [`-${check.energy} energy`, ...(check.mood ? [`-${check.mood} mood`] : [])].join(', ');
-  return { ok: true, out: t.out, got: n, energy: check.energy, mood: check.mood, msg: `${t.line} (${cost})` };
+  const cost = [`-${check.energy} energy`, ...(check.mood ? [`-${check.mood} mood`] : []), ...(moodGain ? [`+${moodGain} mood`] : [])].join(', ');
+  const line = typeof t.line === 'function' ? t.line(n) : t.line;
+  return { ok: true, out: t.out, got, energy: check.energy, mood: check.mood, moodGain, msg: `${line} (${cost})` };
 }
 
 function shuck(classTsid, n, inv, pc, learned, rng) {

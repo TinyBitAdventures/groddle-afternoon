@@ -876,5 +876,290 @@
   "status": "unbuilt_original",
   "reason": "include/rook.js:49 applies it to a player only under rook_wrath (never applied) or force; inc_rook.js:269 calls pc.rookAttack(false), and the forced attacks (rook.js:353, npc_cactus.js:219) rook items",
   "register": "G124"
+ },
+ "item:teleportation_script_imbued": {
+  "status": "source",
+  "reason": "players/inc_jobs.js:378-400 jobs_familiar_job_complete_do gives every contributor of a finished street project an imbued script to the project street; js/features/street-jobs-feature.js:500 calls teleportationFeature.grantScript, which keeps it as a teleportation_script stack flagged imbued (no skill or energy)",
+  "register": "G125"
+ },
+ "item:furniture_chassis": {
+  "status": "source",
+  "reason": "the house itself: locations/inc_homes.js:2459-2466 places furniture_chassis (Groddle Cottage) at the home street's door when the home is made; the remake's home street draws the house (js/homes.js HOME_STYLES, features/homes-feature.js)",
+  "register": "G125"
+ },
+ "item:stoot_barfield_pullstring_doll": {
+  "status": "source",
+  "reason": "game.js spawnStootMemorial registers the doll on the Stoot memorial street GIFPV9EMLT72DP4 with its pull_string verb and exact 43 quotes (js/stoot-doll.js); GSJS has no source, the original's only placed copy sits on the location dump street LDOU1UON87E3K2T",
+  "register": "G125"
+ },
+ "item:faded_heart": {
+  "status": "source",
+  "reason": "quests/phantom_glitch.js:333-337 gives it at the end of the Phantom hunt; js/ghost-quest.js grantFadedHeart (inv[FADED_HEART_ID] += 1, called from game.js) does the same; the scanner only sees addItem calls",
+  "register": "G125"
+ },
+ "item:trant_bubble_dead": {
+  "status": "source",
+  "reason": "items/include/trants.js:760 die(); js/tree-poison.js:59-64 maps every trant to its dead class and features/tree-death-feature.js swaps the tree for it",
+  "register": "G125"
+ },
+ "item:trant_egg_dead": {
+  "status": "source",
+  "reason": "items/include/trants.js:753 die(); js/tree-poison.js:59-64 maps every trant to its dead class and features/tree-death-feature.js swaps the tree for it",
+  "register": "G125"
+ },
+ "item:trant_fruit_dead": {
+  "status": "source",
+  "reason": "items/include/trants.js:763 die(); js/tree-poison.js:59-64 maps every trant to its dead class and features/tree-death-feature.js swaps the tree for it",
+  "register": "G125"
+ },
+ "item:game_box": {
+  "status": "source",
+  "reason": "Glitchmas only: catalog_drop_tables.js glitchmas_cracker drop 46 is a game_box; js/features/seasons-feature.js:944 pullCracker rolls that table with a nearby critter helping",
+  "register": "G125"
+ },
+ "item:rook_hall_focusing_orb": {
+  "status": "source",
+  "reason": "Museum of the Rook exhibit (instance template LA91BDTNHS82D36): game.js draws it from rook_hall_focusing_orb__x1_1 art in the rebuilt museum (js/rook-museum.js)",
+  "register": "G125"
+ },
+ "item:rook_hall_shrine_holofilm": {
+  "status": "source",
+  "reason": "Museum of the Rook exhibit that rook_hall_speaker.js:365-398 plays: game.js draws it from rook_hall_shrine_holofilm__x1_stop art in the rebuilt museum (js/rook-museum.js)",
+  "register": "G125"
+ },
+ "item:butler_box": {
+  "status": "source",
+  "reason": "players/inc_butler.js:88-93 drops the Special One-Time Delivery on the home street; js/features/butler-feature.js:397 places it (classId BUTLER_BOX.CLASS from js/butler.js)",
+  "register": "G125"
+ },
+ "item:crown_game_lock": {
+  "status": "source",
+  "reason": "Game of Crowns: js/features/crowns-feature.js:201 placeCrownLocks puts the locks on the arena (js/game-of-crowns.js, crown_game_lock.js onPlayerCollision)",
+  "register": "G125"
+ },
+ "item:game_crown": {
+  "status": "source",
+  "reason": "not an item a player holds: players/inc_games.js:774-831 shows it as the Game of Crowns indicator; js/features/crowns-feature.js:134 draws the crown clock from game_crown art",
+  "register": "G125"
+ },
+ "item:hi_overlay": {
+  "status": "excluded",
+  "reason": "client overlay class (config_base.js:434: variants must match hi_overlay.as), not an item; js/hi-signs.js draws the hi emote from its CC0 sheets",
+  "register": "G125"
+ },
+ "item:money_bag": {
+  "status": "excluded",
+  "reason": "quest reward icon: quests/quest.js:813 and 1201 show currant rewards as money_bag; never created",
+  "register": "G125"
+ },
+ "item:home_sign": {
+  "status": "excluded",
+  "reason": "retired: locations/inc_homes.js:2459-2471 deletes home_sign and places the Magic Rock in its spot when a home is made",
+  "register": "G125"
+ },
+ "item:bag": {
+  "status": "excluded",
+  "reason": "base container class that every bag_* item inherits (common.js make_bag); judged through its subclasses",
+  "register": "G125"
+ },
+ "item:bag_furniture": {
+  "status": "excluded",
+  "reason": "internal container: players/inc_furniture.js:46 makes one per player to store furniture; the remake keeps furniture storage in features/homes-feature.js",
+  "register": "G125"
+ },
+ "item:bag_escrow": {
+  "status": "lost",
+  "reason": "trade escrow: players/inc_trading.js:23 and the gift boxes (bag_gift_box.js:270, bag_gift_box_wrapped.js:436) hold items while two players trade",
+  "register": "G125"
+ },
+ "item:bag_greeter_badge": {
+  "status": "lost",
+  "reason": "players/player.js:2777: worn by members of config.greeter_group, the volunteer greeters who met new players",
+  "register": "G125"
+ },
+ "item:bag_moving_box": {
+  "status": "lost",
+  "reason": "locations/inc_pols.js:1213-1258 packs a player's things when they move out of an apartment POL; the quarters were never archived (system inc_quarters lost, G144)",
+  "register": "G125"
+ },
+ "item:bag_gift_box": {
+  "status": "lost",
+  "reason": "Toy Vendor sells it (catalog_stores.js:1431) to wrap a present for another player (bag_gift_box.js:283 wraps, bag_gift_box_wrapped.js is opened by the receiver)",
+  "register": "G125"
+ },
+ "item:bag_gift_box_wrapped": {
+  "status": "lost",
+  "reason": "a present wrapped for another player (bag_gift_box.js:283); bag_butler.js:1013 lets a Butler accept one from a visitor",
+  "register": "G125"
+ },
+ "item:pile_of_currants": {
+  "status": "lost",
+  "reason": "furniture_base sellItem (e.g. furniture_bed.js:609) drops the pile at your house when another player buys furniture you put up for sale",
+  "register": "G125"
+ },
+ "item:gameserver": {
+  "status": "excluded",
+  "reason": "a 2010 collectible (players/player.js:1652 collectible_item_classes beside the 2010 Glitchmas Yeti) with no source anywhere in GSJS",
+  "register": "G125"
+ },
+ "item:million_currant_trophy": {
+  "status": "excluded",
+  "reason": "sold out: total_quantity 0 at both the Toy Vendor (catalog_stores.js:1459) and the Extremely Rare Items Vendor (1618)",
+  "register": "G125"
+ },
+ "item:tree_poison": {
+  "status": "excluded",
+  "reason": "retired: the 2011-02 powder (tree_poison.js asset 2011-02) that the Cauldron's potion_tree_poison replaced (2012-04, recipe 237); no recipe, store or drop makes the powder, and the 40 powder files only inherit a class check for it. potion_tree_poison is obtainable",
+  "register": "G125"
+ },
+ "item:tree_poison_antidote": {
+  "status": "excluded",
+  "reason": "retired: the powder version that the Cauldron's potion_tree_poison_antidote (recipe 236) replaced; nothing makes the powder, the powder files only inherit a class check for it. potion_tree_poison_antidote is obtainable",
+  "register": "G125"
+ },
+ "item:spigot": {
+  "status": "excluded",
+  "reason": "retired: its only recipe (catalog_recipes.js 251, Metalmaker) is learnt 3, which main.js:781 leaves out of the client catalog; it is only an input of the Still recipe 254, also learnt 3",
+  "register": "G125"
+ },
+ "item:potion_xp": {
+  "status": "excluded",
+  "reason": "retired: Draught of Wisdom's only recipe (catalog_recipes.js 248, Cauldron) is learnt 3, left out of the client catalog (main.js:781) and the Cauldron has can_discover false (cauldron.js:290)",
+  "register": "G125"
+ },
+ "item:potion_rocky_regeneration_solution": {
+  "status": "excluded",
+  "reason": "retired: its only recipe (catalog_recipes.js 249, Cauldron) is learnt 3, left out of the client catalog (main.js:781); the rock files only check for it",
+  "register": "G125"
+ },
+ "item:potion_avatar_mixup": {
+  "status": "excluded",
+  "reason": "retired: Phreaky Philter's only recipe (catalog_recipes.js 307, Cauldron) is learnt 3, left out of the client catalog (main.js:781)",
+  "register": "G125"
+ },
+ "item:potion_alphabet_sauce": {
+  "status": "excluded",
+  "reason": "retired: its only recipe (catalog_recipes.js 320, Cauldron) is learnt 3, left out of the client catalog (main.js:781)",
+  "register": "G125"
+ },
+ "item:alphabet_sauce": {
+  "status": "excluded",
+  "reason": "only potion_alphabet_sauce.js:554 pours it, and that potion is retired (recipe 320 is learnt 3)",
+  "register": "G125"
+ },
+ "item:fox_permit": {
+  "status": "unbuilt_original",
+  "reason": "never created: the Fox Ranger sells the licence as a badge (npc_fox_ranger.js:305-310 takes 500 currants tagged type 'fox_permit' and grants fox_brushing_license); nothing makes the item",
+  "register": "G125"
+ },
+ "item:petrified_rock_large": {
+  "status": "missing",
+  "reason": "a Feat reward from the web side (G143): the 2012-10-12 'Epic of Feats' post gives top contributors larger petrified rocks; main.js:7692 doBreakIt shows the reward packet. Cracking works (js/artifacts.js)",
+  "register": "G125"
+ },
+ "item:doll_ayn_rand": {
+  "status": "excluded",
+  "reason": "no source in GSJS or eleven-gsjs; the only copy sits on LDOU1UON87E3K2T 'uutiif', a staff WIP street in Fernando's hub beside other one-off staff items (Dusty Stick, icons, the Stoot doll): a staff or web-side handout",
+  "register": "G125"
+ },
+ "item:dusty_stick": {
+  "status": "excluded",
+  "reason": "staff gift: its description is 'A special gift to commemorate the Great Item Loss of early 2012'; nothing in GSJS creates it, the only copy sits on the staff WIP street LDOU1UON87E3K2T",
+  "register": "G125"
+ },
+ "item:broken_sign": {
+  "status": "excluded",
+  "reason": "staff notice: 'We are aware of the issue and are working on it!', placed only on Jiji Preserve LHVBSCOFMDT2VE0 as 'Bug Acknowledgment'",
+  "register": "G125"
+ },
+ "item:game_teleporter": {
+  "status": "excluded",
+  "reason": "admin tool: locations/inc_admin.js:664 lists it among things to clean up; the one placed copy is on 'The forgotten floor' LDOOSA8V29J24I3 (WIP)",
+  "register": "G125"
+ },
+ "item:swf_1": {
+  "status": "unbuilt_original",
+  "reason": "an easter egg nothing hands out: drop tables swfs_1/2/3 (catalog_drop_tables.js 2342-2362) are run by no file in GSJS or eleven-gsjs; holding all three would make a game_box (players/inc_items.js 652-805)",
+  "register": "G125"
+ },
+ "item:swf_2": {
+  "status": "unbuilt_original",
+  "reason": "an easter egg nothing hands out: drop table swfs_2 (catalog_drop_tables.js 2350) is run by no file; see swf_1",
+  "register": "G125"
+ },
+ "item:swf_3": {
+  "status": "unbuilt_original",
+  "reason": "an easter egg nothing hands out: drop table swfs_3 (catalog_drop_tables.js 2358) is run by no file; see swf_1",
+  "register": "G125"
+ },
+ "item:note_pole": {
+  "status": "lost",
+  "reason": "a public notice pole for the home street (recipe 303, Furnituremaking I + Construction Tool): visitors read and pin notes; build-recipes.mjs skips it (no note-board system)",
+  "register": "G125"
+ },
+ "item:furniture_snap_frame": {
+  "status": "lost",
+  "reason": "frames one of your Snaps (player photographs on the web site) on your wall (catalog_furniture.js:7430, userdeco set 'wall'); Snaps are lost",
+  "register": "G125"
+ },
+ "item:camera": {
+  "status": "lost",
+  "reason": "Toy Vendor sells it (catalog_stores.js:1455, 1100c), but take_picture (camera.js:93-119) only opens the client's snap_travel_screen, which loads a random player Snap from the web API (SnapTravelView.as:167 snapsRandomForCamera) and offers travel to it; there are no player Snaps",
+  "register": "G125"
+ },
+ "item:mental_feeling": {
+  "status": "unbuilt_original",
+  "reason": "an unfinished idea: drop table mental_items_basic (catalog_drop_tables.js 1752-1770) lists it, but no file in GSJS or eleven-gsjs runs that table, and the other 21 mental_* items are named nowhere at all",
+  "register": "G125"
+ },
+ "item:mental_figment": {
+  "status": "unbuilt_original",
+  "reason": "an unfinished idea: drop table mental_items_basic (catalog_drop_tables.js 1752-1770) lists it, but no file in GSJS or eleven-gsjs runs that table, and the other 21 mental_* items are named nowhere at all",
+  "register": "G125"
+ },
+ "item:mental_inkling": {
+  "status": "unbuilt_original",
+  "reason": "an unfinished idea: drop table mental_items_basic (catalog_drop_tables.js 1752-1770) lists it, but no file in GSJS or eleven-gsjs runs that table, and the other 21 mental_* items are named nowhere at all",
+  "register": "G125"
+ },
+ "item:mental_musing": {
+  "status": "unbuilt_original",
+  "reason": "an unfinished idea: drop table mental_items_basic (catalog_drop_tables.js 1752-1770) lists it, but no file in GSJS or eleven-gsjs runs that table, and the other 21 mental_* items are named nowhere at all",
+  "register": "G125"
+ },
+ "item:mental_notion": {
+  "status": "unbuilt_original",
+  "reason": "an unfinished idea: drop table mental_items_basic (catalog_drop_tables.js 1752-1770) lists it, but no file in GSJS or eleven-gsjs runs that table, and the other 21 mental_* items are named nowhere at all",
+  "register": "G125"
+ },
+ "item:crusher": {
+  "status": "unbuilt_original",
+  "reason": "only catalog_buffs.js:551 names it, as the item_class of the crusher_invincibility buff; nothing places a Crusher or applies the buff",
+  "register": "G125"
+ },
+ "item:homestreet_ticket_dispenser": {
+  "status": "unbuilt_original",
+  "reason": "homestreet_ticket.js:51 looks for one within 100 px, but nothing in GSJS places it and no archived street holds one; the Home Street Ticket itself works without it in the remake (features/newxp-feature.js)",
+  "register": "G125"
+ },
+ "item:clickable_broadcaster": {
+  "status": "excluded",
+  "reason": "placed only on LA512IH5226256P 'Supply the Job', the Gaare Grims street-project template; a staff tool (click_broadcast)",
+  "register": "G125"
+ },
+ "item:sloth_knocker": {
+  "status": "excluded",
+  "reason": "placed only on LA512IH5226256P 'Supply the Job', the Gaare Grims street-project template, beside the Clickable Broadcaster; nothing in GSJS names it",
+  "register": "G125"
+ },
+ "item:newxp_door": {
+  "status": "source",
+  "reason": "locations/inc_newxp.js:82 finds the tutorial door; the rebuilt tutorial draws its door into the scene and walks you to it (js/features/newxp-feature.js 1107-1168 to_door)",
+  "register": "G125"
+ },
+ "item:moving_quoin": {
+  "status": "unbuilt_original",
+  "reason": "only spawner_moving_quoin.js names it (spawn_class), and that spawner is is_hidden with no archived placement on any street; no file in GSJS or eleven-gsjs creates a Moving Coin otherwise",
+  "register": "G125"
  }
 }

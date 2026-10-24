@@ -78,7 +78,7 @@ export function readAchievements(gsjs) {
   return out;
 }
 
-/** GSJS items/*.js: [{ id, label, tags, parents, takeable, hidden, proxy, verbs, include }]. */
+/** GSJS items/*.js: [{ id, label, tags, parents, takeable, hidden, proxy, retiredTo, verbs, include }]. */
 export function readItems(gsjs, tagIndex = null) {
   const dir = join(gsjs, 'items');
   const out = [];
@@ -98,6 +98,8 @@ export function readItems(gsjs, tagIndex = null) {
       hidden: scalarVar(text, 'is_hidden') === 'true',
       // `var proxy_item = "npc_shrine_alph"`: a variant that runs as another class (regional shrines).
       proxy: scalarVar(text, 'proxy_item') || null,
+      // onLoad apiSetTimerX('replaceWith', 0, 'grade_aa_earth_block', ...): retired, swapped on load (Bricks, 2012-03-26).
+      retiredTo: /apiSetTimerX\('replaceWith',\s*\d+,\s*'([a-z0-9_]+)'/.exec(text)?.[1] || null,
       verbs,
       include,
     });
