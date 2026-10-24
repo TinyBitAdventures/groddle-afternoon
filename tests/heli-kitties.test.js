@@ -79,8 +79,9 @@ describe('petting', () => {
     kitty.state = 'move';
     const pc = { energy: 50, mood: 95, xp: 10, imagination: 10 };
     const r = petKitty(kitty, pc);
-    assert.deepEqual([r.energy, r.mood, r.xp], [-4, 5, 4]);
-    assert.deepEqual([pc.energy, pc.mood, pc.xp], [46, 100, 14]);
+    // stats_add_xp(4) after the mood gain: a full tank pays x1.2, 5 iMG (G148).
+    assert.deepEqual([r.energy, r.mood, r.xp], [-4, 5, 5]);
+    assert.deepEqual([pc.energy, pc.mood, pc.xp], [46, 100, 15]);
     assert.equal(kitty.state, 'sleepStart');
     stepKitty(kitty, 867, flat());
     assert.equal(kitty.state, 'sleep');

@@ -106,7 +106,7 @@ describe('Mining I to IV and Refining II', () => {
   it('mineRock spends the rank row and wears the pick by it', () => {
     const inv = createInventory({ pick: 1 });
     const tools = createToolConditionState();
-    const pc = fresh();
+    const pc = fresh({ mood: 75 }); // the x1 mood band (G148)
     const rock = createMineRock('rock_metal_1');
     const r = mineRock(rock, inv, pc, {
       learned: ['mining_1', 'mining_2', 'mining_3', 'mining_4'],
@@ -185,7 +185,8 @@ describe('Croppery and Herbalism garden packages', () => {
     assert.equal(r.bonusCount, n);
     assert.equal(r.superHarvest, true);
     assert.equal(pc.mood, 53);
-    assert.equal(pc.xp, 7);
+    // 7 iMG after the mood gain, at 53%: x0.9 rounds to 6 (G148).
+    assert.equal(pc.xp, 6);
     const plain = harvestPlot(ripe(), '1-1', createInventory(), fresh(), { learned, rng: () => 0.5 });
     assert.equal(plain.bonusCount, 0);
   });

@@ -34,7 +34,7 @@ import {
 import { moodMax } from '../metabolics.js';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
 import { homesFeature } from './homes-feature.js?v=homes-7';
-import { newxpFeature } from './newxp-feature.js?v=newxp-2';
+import { newxpFeature } from './newxp-feature.js?v=g148-1';
 
 export const MOOD_DECAY_FEATURE_ID = 'mood-decay';
 const BEAM_ME_DOWN_TSID = 'PUZZLESCENE_BEAM_ME_DOWN';

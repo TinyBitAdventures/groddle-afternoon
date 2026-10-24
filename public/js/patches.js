@@ -37,6 +37,7 @@ import { createTrantState, fruitCapacityAt, refillFruit, resetTrantDay } from '.
 import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=woodcutting-2';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { musicblockItemMeta } from './musicblocks.js';
+import { grantMoodXp } from './mood-xp.js';
 
 export const PATCH_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 export const SOIL_SPRITE_ROOT = 'assets/sprites/soil';
@@ -887,10 +888,9 @@ function applyCosts(pc, costs) {
     const cap = Number.isFinite(pc.maxMood) ? pc.maxMood : 100;
     pc.mood = Math.min(cap, (Number(pc.mood) || 0) + costs.mood);
   }
-  if (costs.xp) {
-    if (pc.imagination != null) pc.imagination = (Number(pc.imagination) || 0) + costs.xp;
-    if (pc.xp != null) pc.xp = (Number(pc.xp) || 0) + costs.xp;
-  }
+  // inc_skill_packages.js 532, patch_seedling.js 210: stats_add_xp(n, false)
+  // takes the mood bonus; costs.xp becomes what landed.
+  if (costs.xp) costs.xp = grantMoodXp(pc, costs.xp);
   if (costs.currants) pc.currants = (Number(pc.currants) || 0) + costs.currants;
 }
 

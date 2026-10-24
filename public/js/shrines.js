@@ -24,6 +24,7 @@ import {
   gameshowTicketChance,
 } from './spinning-wheel.js?v=spinning-wheel-1';
 import { moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 import { getSkillCatalog } from './content-catalogs.js';
 import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js';
 import { emblemUnlockSkillFor } from './skill-tree.js';
@@ -247,8 +248,11 @@ export function quoteShrineDonation(state, giantId, inv, classTsid, count = 1, o
   const baseCost = donationValueFor(classTsid) * qty;
   // shrines.js:445-457: a hallowed powder multiplies XP, mood and favor
   // (opts.powderBonus 2 or 3); No-No Powder's rush keeps a fifth of the XP.
+  // shrines.js 450 folds in the mood bonus here (opts.moodMultiplier, from
+  // js/mood-xp.js) and then awards with no_bonus, so the cap sees scaled iMG.
   const powderBonus = [2, 3].includes(Number(opts.powderBonus)) ? Number(opts.powderBonus) : 1;
-  let rawXp = Math.round(baseCost * 0.2 * powderBonus);
+  const moodMultiplier = opts.moodMultiplier != null && Number.isFinite(Number(opts.moodMultiplier)) ? Number(opts.moodMultiplier) : 1;
+  let rawXp = Math.round(Math.round(baseCost * 0.2 * powderBonus) * moodMultiplier);
   if (opts.noNo) rawXp = Math.round(rawXp * 0.2);
   const rawMood = Math.round(baseCost * 0.1 * powderBonus);
   const rawFavor = Math.round(baseCost * 0.1 * powderBonus);
@@ -298,7 +302,7 @@ export function listShrineDonationOptions(state, giantId, inv = {}, opts = {}) {
 }
 
 export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, opts = {}) {
-  const quote = quoteShrineDonation(state, giantId, inv, classTsid, count, { xp: pc?.xp, powderBonus: opts.powderBonus, noNo: opts.noNo });
+  const quote = quoteShrineDonation(state, giantId, inv, classTsid, count, { xp: pc?.xp, powderBonus: opts.powderBonus, noNo: opts.noNo, moodMultiplier: opts.moodMultiplier });
   if (!quote.ok) return quote;
   if (!removeItem(inv, classTsid, quote.qty)) return { ok: false, reason: 'missing' };
 
@@ -392,18 +396,15 @@ export function claimShrineEmblem(state, giantId, inv = {}, pc = null) {
   state.favor[giantId] = whole(state.favor[giantId]) - cost;
   const first = whole(state.emblems[giantId]) === 0;
   state.emblems[giantId] = whole(state.emblems[giantId]) + 1;
-  const xp = first ? 0 : EMBLEM_XP;
-  if (xp && pc) {
-    pc.xp = (Number(pc.xp) || 0) + xp;
-    pc.imagination = (Number(pc.imagination) || 0) + xp;
-  }
+  // shrines.js 111: stats_add_xp(50, false) takes the mood bonus.
+  const xp = !first && pc ? grantMoodXp(pc, EMBLEM_XP) : 0;
   const classTsid = `emblem_${giantId}`;
   ensureItem(classTsid, {
     label: `Emblem of ${giant.name}`,
     desc: `A mark of devotion to ${giant.name}.`,
   });
   inv[classTsid] = whole(inv[classTsid]) + 1;
-  return { ok: true, giant, classTsid, cost, count: state.emblems[giantId], xp: pc ? xp : 0 };
+  return { ok: true, giant, classTsid, cost, count: state.emblems[giantId], xp };
 }
 
 /* ------------------------------------------------------------------ */

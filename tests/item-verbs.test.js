@@ -101,7 +101,8 @@ describe('Spice Examiner and Mad Gasser: the items\' own verbs (notifyVerb)', ()
     const pc = { energy: 10, mood: 10, imagination: 0, xp: 0 };
     const out = runItemVerb(pepper, pc);
     assert.equal(out.ok, true);
-    assert.deepEqual([pc.energy, pc.imagination, out.consume], [8, 3, true]);
+    // +3 iMG at 10% mood: the mood bonus is x0.5, rounding to 2 (G148).
+    assert.deepEqual([pc.energy, pc.imagination, out.consume], [8, 2, true]);
     assert.deepEqual(out.achievementCounters, [{ counter: 'black_pepper:sniff', amount: 1 }, { counter: 'VERB:sniff:black_pepper', amount: 1 }]);
     const mustard = ITEM_VERBS.find((v) => v.classTsid === 'mustard');
     const pc2 = { energy: 10, mood: 10 };
@@ -136,7 +137,8 @@ describe('Ice: Holy Zamboni and The Walking Frozed (ice.js:30-100)', () => {
   it('crunching counts cubes, costs 3 energy and pays 3 iMG; 10% freeze the brain', () => {
     const pc = { energy: 50, mood: 20, imagination: 0, xp: 0 };
     const out = crunchIce(pc, 1, { rng: () => 0.5 });
-    assert.deepEqual([pc.energy, pc.mood, pc.imagination], [47, 26, 3]);
+    // ice.js pays the iMG before the mood: 3 at 20% mood is x0.75, 2 (G148).
+    assert.deepEqual([pc.energy, pc.mood, pc.imagination], [47, 26, 2]);
     assert.deepEqual(out.achievementCounters.map((r) => r.counter), ['ice:cubes_crunched', 'ice:crunch', 'VERB:crunch:ice']);
     const cold = { energy: 50, mood: 20, imagination: 0, xp: 0 };
     const frozen = crunchIce(cold, 1, { rng: () => 0.05 });

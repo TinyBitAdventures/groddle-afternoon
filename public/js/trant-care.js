@@ -12,6 +12,7 @@ import { canUseTool, useToolCondition } from './tools.js';
 import { fruitCapacityAt } from './trants.js?v=trant-harvest-2';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
 import { moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 
 const freezeRanks = (ranks) => Object.freeze(
   Object.fromEntries(Object.entries(ranks).map(([id, row]) => [id, Object.freeze(row)]))
@@ -158,15 +159,15 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
   const moodBefore = Number(pc.mood) || 0;
   pc.mood = Math.min(moodMax(pc), moodBefore + profile.moodBonus);
   const mood = pc.mood - moodBefore;
-  pc.imagination = (Number(pc.imagination) || 0) + profile.xpBonus;
-  pc.xp = (Number(pc.xp) || 0) + profile.xpBonus;
+  // inc_skill_packages.js 532: xp_bonus takes the mood bonus (after the mood gain).
+  const xp = grantMoodXp(pc, profile.xpBonus);
   return {
     ok: true,
     attempted: true,
     success: true,
     profile,
     toolUse,
-    effects: { energy: -profile.energyCost, mood, xp: profile.xpBonus },
+    effects: { energy: -profile.energyCost, mood, xp },
     msg: `Thanks for ${kind === 'water' ? 'watering' : 'petting'}!`,
   };
 }

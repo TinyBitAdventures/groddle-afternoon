@@ -50,7 +50,7 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
-import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=husbandry-2';
+import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=g148-1';
 import {
   BABY_ANIMALS,
   BATTERFLY,
@@ -99,7 +99,8 @@ import {
 import { moodMax } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g57-1';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g148-1';
+import { grantMoodXp } from '../mood-xp.js';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
 export const BATTERFLY_GROUP = 'batterfly';
@@ -199,10 +200,14 @@ function surfaceAt(engine, x, refY) {
   return nearestSurfaceY(engine.platforms, x, refY ?? engine.player?.y ?? engine.groundY) ?? engine.player?.y ?? engine.groundY;
 }
 
+/**
+ * npc_butterfly.js 1547, chick/piglet/caterpillar feed, plop.js 190 and the
+ * hog_tie buff (catalog_buffs.js 1058) award with stats_add_xp(n, false):
+ * the mood bonus applies. Returns what landed.
+ */
 function gainXp(engine, n) {
-  if (!n) return;
-  engine.pc.xp = (engine.pc.xp || 0) + n;
-  engine.pc.imagination = (engine.pc.imagination || 0) + n;
+  if (!n) return 0;
+  return grantMoodXp(engine.pc, n);
 }
 
 function emit(engine, counter, amount = 1) {
@@ -973,7 +978,7 @@ function feedPackBaby(engine, babyClass, foodClass) {
     engine.toast(res.msg, 2400);
     return;
   }
-  gainXp(engine, res.xp);
+  const xp = gainXp(engine, res.xp);
   emit(engine, `${babyClass}:feed`);
   if (res.grew) {
     const x = (engine.player?.x || 200) + 50;
@@ -981,12 +986,12 @@ function feedPackBaby(engine, babyClass, foodClass) {
     // onContainerItemAdded: the others of its class here check the crowd (G64).
     animalCrowdChanged(engine, res.grew, { exclude: extras.find((e) => e.row === grown)?.target });
     emit(engine, res.counter);
-    engine.pushActivity({ base: `You fed the ${itemLabel(babyClass)}`, effects: { xp: res.xp } });
+    engine.pushActivity({ base: `You fed the ${itemLabel(babyClass)}`, effects: { xp } });
     engine.pushActivity(res.msg);
     engine.toast(res.msg, 2600);
     lastAction = `grew:${res.grew}`;
   } else {
-    engine.pushActivity({ base: `${res.msg.replace(/\.$/, '')} (${res.fed}/${res.need})`, effects: { xp: res.xp } });
+    engine.pushActivity({ base: `${res.msg.replace(/\.$/, '')} (${res.fed}/${res.need})`, effects: { xp } });
     lastAction = `fed:${babyClass}:${res.fed}/${res.need}`;
   }
   engine.updateHud();
@@ -1353,8 +1358,8 @@ function examine(engine, pile) {
 function sniff(engine, where) {
   const lost = Math.min(engine.pc.energy || 0, PLOP.sniffEnergy);
   engine.pc.energy -= lost;
-  gainXp(engine, PLOP.sniffXp);
-  engine.pushActivity({ base: PLOP.sniffMsg, effects: { energy: -lost, xp: PLOP.sniffXp } });
+  const xp = gainXp(engine, PLOP.sniffXp);
+  engine.pushActivity({ base: PLOP.sniffMsg, effects: { energy: -lost, xp } });
   emit(engine, 'plop:sniff');
   lastAction = `sniff:${where}`;
   engine.updateHud();
@@ -1537,8 +1542,8 @@ export const animalHusbandryFeature = {
       hogtieAt = nowMs + 1000;
       const step = stepHogtie(engine.inv, nowMs);
       if (step.xp) {
-        gainXp(engine, step.xp);
-        engine.pushActivity({ base: HERDKEEPING.hogtieTickLine.replace(/!$/, ''), effects: { xp: step.xp } });
+        const xp = gainXp(engine, step.xp);
+        engine.pushActivity({ base: HERDKEEPING.hogtieTickLine.replace(/!$/, ''), effects: { xp } });
         engine.updateHud();
       }
       if (step.escaped && !engine.transientInstance()) releasePiggyHere(engine, { escaped: true });

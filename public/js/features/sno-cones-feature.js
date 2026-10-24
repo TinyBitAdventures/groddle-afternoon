@@ -31,7 +31,7 @@ import {
   isSnoCone,
   snoConeEatButton,
   snoConeMelted,
-} from '../sno-cones.js?v=g136-1';
+} from '../sno-cones.js?v=g148-1';
 
 export const SNO_CONES_FEATURE_ID = 'sno-cones';
 export const BEMOAN_VERB = 'sno_cone_bemoan';

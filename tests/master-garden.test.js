@@ -47,7 +47,9 @@ describe('whole-garden actions', () => {
     const pc = { energy: 100, mood: 10, xp: 0, imagination: 0 };
     const hoe = potionTendGarden(g, 'hoe', inv, pc, { learned: MG, rng: () => 0.99, now: 1000 });
     assert.equal(hoe.count, 8);
-    assert.equal(hoe.msg, 'You cleaned a garden. (-24 energy, +24 mood, +24 iMG)');
+    // Eight plots, each +3 mood then +3 iMG scaled by the mood so far: 13-34%
+    // mood pays x0.5 or x0.75, 2 iMG a plot (G148).
+    assert.equal(hoe.msg, 'You cleaned a garden. (-24 energy, +24 mood, +16 iMG)');
     assert.equal(hoe.drop.table, 'croppery_mastergardener');
     assert.equal(hoe.drop.chance, 0.36);
     const plant = potionTendGarden(g, 'plant', inv, pc, { learned: MG, seedId: 'seed_spinach', rng: () => 0.99, now: 2000 });

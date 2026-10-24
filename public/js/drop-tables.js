@@ -16,6 +16,7 @@
 
 import { DROP_ITEMS, DROP_TABLES } from './drop-tables-data.js';
 import { skillPackageDetails } from './skill-packages.js';
+import { grantMoodXp } from './mood-xp.js';
 
 export { DROP_ITEMS, DROP_TABLES };
 
@@ -149,10 +150,10 @@ export function applyDropResult(result, target = {}) {
     lines.push(`You got ${landed.energy} energy!`);
   }
   if (result.xp && pc) {
-    pc.xp = (Number(pc.xp) || 0) + result.xp;
-    if (pc.imagination != null) pc.imagination = (Number(pc.imagination) || 0) + result.xp;
-    landed.xp = result.xp;
-    lines.push(`You got ${result.xp} iMG!`);
+    // runDropTable (inc_skill_packages.js 106): stats_add_xp(it.xp, false), and
+    // "You got N iMG!" names what landed.
+    landed.xp = grantMoodXp(pc, result.xp);
+    lines.push(`You got ${landed.xp} iMG!`);
   }
   return { lines, landed };
 }

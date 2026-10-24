@@ -40,6 +40,7 @@ import {
 } from '../puzzle-scenes.js';
 import { moodMax } from '../metabolics.js';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { grantMoodXp } from '../mood-xp.js';
 
 export const PUZZLE_SCENES_FEATURE_ID = 'puzzle-scenes';
 const TICKET = 'paradise_ticket_beam_me_down';
@@ -424,13 +425,13 @@ function stepBeam(engine) {
     if (spr) spr.visible = false;
     // Paradise pickups skip the daily quoin limit (the shipped courses do too).
     const pc = engine.pc;
-    if (q.type === 'xp') {
-      pc.xp = (pc.xp || 0) + q.amount;
-      pc.imagination = (pc.imagination || 0) + q.amount;
-    } else if (q.type === 'currants') pc.currants = (pc.currants || 0) + q.amount;
+    let amount = q.amount;
+    // items/quoin.js 184: an iMG quoin takes the mood bonus.
+    if (q.type === 'xp') amount = grantMoodXp(pc, q.amount);
+    else if (q.type === 'currants') pc.currants = (pc.currants || 0) + q.amount;
     else pc[q.type] = Math.min(100, (pc[q.type] || 0) + q.amount);
     const label = QUOIN_TYPES[q.type]?.label || 'iMG';
-    engine.floatText(q.x, q.y - 14, `+${q.amount} ${label}`, '#ffffff');
+    engine.floatText(q.x, q.y - 14, `+${amount} ${label}`, '#ffffff');
     engine.playSound(`QUOIN_${q.type.toUpperCase()}`, { volume: 0.45 });
     engine.updateHud();
   }

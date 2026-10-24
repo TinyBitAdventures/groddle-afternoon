@@ -179,7 +179,8 @@ describe('atomic package execution and daily limits', () => {
     assert.equal(inv.meat, 9);
     assert.equal(player.energy, 98);
     assert.equal(player.mood, 42);
-    assert.equal(player.xp, 5);
+    // 5 iMG at 42% mood: the mood bonus is x0.75 (G148).
+    assert.equal(player.xp, 4);
     assert.equal(state.nibbleUsesToday, 1);
   });
 
@@ -272,7 +273,8 @@ describe('atomic package execution and daily limits', () => {
     assert.equal(inv.milk_butterfly, 15);
     assert.equal(player.energy, 95);
     assert.equal(player.mood, 45);
-    assert.equal(player.xp, 10);
+    // 10 iMG at 45% mood: x0.75 (G148).
+    assert.equal(player.xp, 8);
   });
 
   it('migrates old boolean/count saves without losing care history', () => {

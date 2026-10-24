@@ -90,13 +90,14 @@ describe('paying drops', () => {
     const favor = { alph: 995 };
     const result = { table: 't', items: [{ classTsid: 'plank', qty: 3 }, { classTsid: 'gem_amber', qty: 1 }], currants: 11, favor: [{ giant: 'all', points: 5 }], mood: 20, energy: 0, xp: 7 };
     const { lines, landed } = applyDropResult(result, { inv, pc, favor, favorCap: () => 1000 });
-    assert.deepEqual(lines, ['You got 3 Planks!', 'You got 1 Pleasing Amber!', 'You got 11 currants!', 'You got 5 favor with all the Giants!', 'You got 5 mood!', 'You got 7 iMG!']);
+    assert.deepEqual(lines, ['You got 3 Planks!', 'You got 1 Pleasing Amber!', 'You got 11 currants!', 'You got 5 favor with all the Giants!', 'You got 5 mood!', 'You got 8 iMG!']);
     assert.deepEqual(inv, { plank: 3, gem_amber: 1 });
     assert.equal(pc.currants, 21);
     assert.equal(favor.alph, 1000);
     assert.equal(favor.zille, 5);
     assert.equal(landed.mood, 5);
-    assert.equal(pc.imagination, 7);
+    // 7 iMG at a full mood tank: the mood bonus is x1.2 (G148), and the line names what landed.
+    assert.equal(pc.imagination, 8);
   });
 });
 

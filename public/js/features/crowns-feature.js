@@ -52,6 +52,7 @@ import { RACE_RIVALS } from '../races.js?v=races-3';
 import { wallsScreen } from '../street-model.js';
 import { addItem } from '../inventory.js?v=catalog-unified-3';
 import { textureFromUrl } from '../textures.js';
+import { grantMoodXp } from '../mood-xp.js';
 
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';
@@ -484,13 +485,13 @@ function finish(engine) {
   resultApplied = true;
   const res = crownsResult(game, 'you');
   const pc = engine.pc;
+  // inc_games.js 672: stats_add_xp(200, false) takes the mood bonus.
+  const xp = res.won ? grantMoodXp(pc, res.reward.xp) : 0;
   if (res.won) {
     pc.currants = (pc.currants || 0) + res.reward.currants;
-    pc.imagination = (pc.imagination || 0) + res.reward.xp;
-    pc.xp = (pc.xp || 0) + res.reward.xp;
     record.wins += 1;
     engine.achievement('it_game:won', 1);
-    engine.pushActivity(`You won the Game of Crowns! +${res.reward.xp} iMG · +${res.reward.currants} currants.`);
+    engine.pushActivity(`You won the Game of Crowns! +${xp} iMG · +${res.reward.currants} currants.`);
     engine.playSound('YOU_WIN', { volume: 0.7 });
   } else {
     record.losses += 1;
@@ -502,7 +503,7 @@ function finish(engine) {
   card.classList.toggle('is-loss', !res.won);
   hud.result.querySelector('[data-crowns-result-title]').textContent = res.won ? 'YOU WON!' : `${res.winnerName} IS THE WINNER!`;
   hud.result.querySelector('[data-crowns-result-detail]').textContent = res.won
-    ? `(You got ${res.reward.currants} currants and ${res.reward.xp} xp.)`
+    ? `(You got ${res.reward.currants} currants and ${xp} xp.)`
     : `You held the crown for ${res.secondsWithCrown} seconds.`;
   hud.result.hidden = false;
   hud.countdown.hidden = true;

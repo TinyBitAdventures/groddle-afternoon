@@ -17,6 +17,7 @@
  * Source: items/catalog_skill_packages.js (energy_cost, mood_bonus, xp_bonus).
  */
 import { moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 export const VERB_REWARDS = {
   'npc_piggy:pet': {
     energyCost: 4,
@@ -124,11 +125,9 @@ export function applyVerbReward(pc, reward) {
   const mood = reward.moodGain || 0;
   const xp = reward.xpGain || 0;
   if (mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
-  if (xp) {
-    pc.imagination = (pc.imagination || 0) + xp;
-    pc.xp = (pc.xp || 0) + xp;
-  }
-  return { energy: -cost, mood, xp, ok: true };
+  // inc_skill_packages.js 532: the package's xp_bonus takes the mood bonus.
+  const landed = xp ? grantMoodXp(pc, xp) : 0;
+  return { energy: -cost, mood, xp: landed, ok: true };
 }
 
 /**

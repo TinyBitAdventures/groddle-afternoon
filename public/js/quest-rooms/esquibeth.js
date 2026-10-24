@@ -66,6 +66,7 @@
  */
 
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js';
+import { grantMoodXp } from '../mood-xp.js';
 
 export const ROOM_ID = 'esquibeth';
 export const MAIN = 'last_pilgrimage_of_esquibeth';
@@ -1670,12 +1671,11 @@ export const room = {
       mem.conchHeard = now;
       pc.mood = Math.min(Number(pc.moodMax) || 100, (Number(pc.mood) || 0) + 2);
       pc.energy = Math.max(0, (Number(pc.energy) || 0) - 2);
-      if (reward.xp) {
-        pc.xp = (Number(pc.xp) || 0) + reward.xp;
-        pc.imagination = (Number(pc.imagination) || 0) + reward.xp;
-      }
+      // conch.js 364-382: stats_add_xp(n, false) takes the mood bonus (the
+      // blow's Esquibeth reward above is no_bonus, conch.js 507).
+      const xp = reward.xp ? grantMoodXp(pc, reward.xp) : 0;
       engine.playCue?.(`${SFX}CONCH.mp3`, { volume: 0.6 });
-      engine.pushActivity(`You played the Conch.${reward.msg ? ` ${reward.msg}` : ''}${reward.xp ? ` +${reward.xp} iMG` : ''} +2 mood`);
+      engine.pushActivity(`You played the Conch.${reward.msg ? ` ${reward.msg}` : ''}${xp ? ` +${xp} iMG` : ''} +2 mood`);
       engine.updateHud();
       wctx.save();
       return true;

@@ -85,6 +85,7 @@ import {
 } from '../rook-attack.js';
 import { verticalTextGradient } from '../text-gradient.js';
 import { shrinePrimeBonus } from '../imagination-effects.js';
+import { grantMoodXp } from '../mood-xp.js';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
@@ -200,16 +201,18 @@ function clampStat(v) {
   return Math.max(0, Math.min(100, Math.round(v)));
 }
 
-/** Pay or charge metabolics and iMG the way other features do (pc mutation + activity). */
+/**
+ * Pay or charge metabolics and iMG the way other features do (pc mutation + activity).
+ * inc_rook.js 198-201, 741-792 and include/rook.js 185, 198 award with
+ * stats_add_xp(n) / (n, false), so iMG takes the mood bonus; returns what landed.
+ */
 function grant(engine, { xp = 0, energy = 0, mood = 0 } = {}) {
   const pc = engine.pc;
-  if (xp) {
-    pc.xp = (pc.xp || 0) + xp;
-    if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + xp;
-  }
+  const landed = xp ? grantMoodXp(pc, xp) : 0;
   if (energy) pc.energy = clampStat((pc.energy || 0) + energy);
   if (mood) pc.mood = clampStat((pc.mood || 0) + mood);
   engine.updateHud();
+  return landed;
 }
 
 function setFeed(text, ms = 5500) {
@@ -1035,8 +1038,7 @@ function onDefeat(engine, a) {
   const r = ui?.rook;
   if (r && !r.destroyed) departing = { at: now(), ms: 2600, x: r.x, y: r.y, scale: r.scale.x };
   spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y, 22);
-  const xp = defeatXpFor(a);
-  grant(engine, { xp });
+  const xp = grant(engine, { xp: defeatXpFor(a) });
   engine.pushActivity({ base: a.damageDealt > 0 ? ROOK_TEXT.defeatHelp(xp) : ROOK_TEXT.defeatWitness(xp), effects: { xp } });
   spawnRainbow(engine, engine.player.x, engine.player.y - 150, 'YOU DID IT!', 1.15);
   engine.playSound('RAINBOW_YOUDIDIT', { volume: 0.7 });
@@ -1272,8 +1274,8 @@ function releaseOrb(engine) {
   const armor = armored();
   if (r.failed) {
     const mood = armor ? 0 : soloCost(ROOK_SOURCE.failMood);
-    grant(engine, { xp: r.xp, mood: -mood });
-    engine.pushActivity({ base: ROOK_TEXT.stunFailed(r.xp, mood), effects: { xp: r.xp, mood: -mood } });
+    const xp = grant(engine, { xp: r.xp, mood: -mood });
+    engine.pushActivity({ base: ROOK_TEXT.stunFailed(xp, mood), effects: { xp, mood: -mood } });
     setFeed(r.text);
     lastAction = 'stun_failed';
     engine.save();
@@ -1287,10 +1289,10 @@ function releaseOrb(engine) {
     ui.badge.stamp.text = `STUN! ${r.damage}`;
     ui.badge.stampUntil = now() + 1400;
   }
-  const xp = r.xp + r.assistXp;
-  grant(engine, { xp });
-  engine.pushActivity({ base: ROOK_TEXT.stunInitiatorXp(r.xp), effects: { xp: r.xp } });
-  engine.pushActivity(ROOK_TEXT.stunStruck(r.damage, r.assistXp));
+  const xp = grant(engine, { xp: r.xp });
+  const assistXp = grant(engine, { xp: r.assistXp });
+  engine.pushActivity({ base: ROOK_TEXT.stunInitiatorXp(xp), effects: { xp } });
+  engine.pushActivity(ROOK_TEXT.stunStruck(r.damage, assistXp));
   engine.floatText(engine.player.x, engine.player.y - 190, `STUN ${r.damage}`, 0xfff27a);
   setFeed(r.text);
   save.stats.stuns += 1;
@@ -1335,8 +1337,7 @@ function endPrime(engine, announce = true) {
   primed = null;
   closeOfferPanel();
   if (!announce) return;
-  const xp = total ? Math.round(total / 2) : 0;
-  if (xp) grant(engine, { xp });
+  const xp = total ? grant(engine, { xp: Math.round(total / 2) }) : 0;
   engine.pushActivity(ROOK_TEXT.primeDone(xp, total));
 }
 
@@ -1398,8 +1399,8 @@ function strike(engine, target, classTsid, count) {
   spawnBeam(engine, { x: spr.x - cam.x, y: spr.y - 120 - cam.y }, rookScreenPos(), strikeBeamFor(r.damage, emblem));
   spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y);
   setHeadClip('stunnedHit', { once: true, lockMs: 1100 });
-  grant(engine, { xp: r.damage });
-  engine.pushActivity({ base: ROOK_TEXT.strikeHit(r.damage, r.damage), effects: { xp: r.damage } });
+  const xp = grant(engine, { xp: r.damage });
+  engine.pushActivity({ base: ROOK_TEXT.strikeHit(r.damage, xp), effects: { xp } });
   engine.floatText(spr.x, spr.y - 170, `-${r.damage}`, 0xff5a6e);
   setFeed(r.text);
   save.stats.strikes += 1;
@@ -1544,7 +1545,7 @@ function revive(engine, target, { balm = false } = {}) {
   const mood = soloCost(ROOK_SOURCE.reviveMood);
   const r = applyReviveDose(s, key, { balm });
   if (!r.ok) return false;
-  grant(engine, { xp: r.xp, energy: -energy, mood: -mood });
+  const xp = grant(engine, { xp: r.xp, energy: -energy, mood: -mood });
   const label = rookLabel(target);
   const line = rookResponse(target.classId, r.response, Math.random, PLAYER_LABEL);
   if (line) engine.say(target, line, 4000);
@@ -1556,10 +1557,10 @@ function revive(engine, target, { balm = false } = {}) {
     spawnRainbow(engine, target.sprite.x, target.sprite.y - 120, 'revived', 0.8);
     engine.playSound('RAINBOW_FULLYREVIVED', { volume: 0.5 });
     save.stats.fullRevives += 1;
-    engine.pushActivity({ base: `You revived a ${label}! +${r.favor} favor with every Giant`, effects: { xp: r.xp, energy: -energy, mood: -mood } });
+    engine.pushActivity({ base: `You revived a ${label}! +${r.favor} favor with every Giant`, effects: { xp, energy: -energy, mood: -mood } });
     lastAction = `revived:${key}`;
   } else {
-    engine.pushActivity({ base: `You helped revive a ${label} (${r.doses}/${ROOK_SOURCE.reviveHealers})`, effects: { xp: r.xp, energy: -energy, mood: -mood } });
+    engine.pushActivity({ base: `You helped revive a ${label} (${r.doses}/${ROOK_SOURCE.reviveHealers})`, effects: { xp, energy: -energy, mood: -mood } });
     lastAction = `revive_dose:${key}:${r.doses}`;
   }
   engine.save();

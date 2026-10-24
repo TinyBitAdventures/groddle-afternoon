@@ -78,6 +78,7 @@ import {
   sparedBySignpost,
 } from '../smuggling.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { grantMoodXp } from '../mood-xp.js';
 
 export const SMUGGLING_FEATURE_ID = 'smuggling';
 const ART = 'assets/sprites/smuggling/';
@@ -341,13 +342,13 @@ function startRun(engine, from) {
 
 function giveRewards(engine) {
   const pc = engine.pc;
-  pc.xp = (pc.xp || 0) + RECEIVE_REWARDS.xp;
-  pc.imagination = (pc.imagination || 0) + RECEIVE_REWARDS.xp;
+  // npc_smuggler.js 515: stats_add_xp(100, false) takes the mood bonus.
+  const xp = grantMoodXp(pc, RECEIVE_REWARDS.xp);
   pc.currants = (pc.currants || 0) + RECEIVE_REWARDS.currants;
   addItem(engine.inv, RECEIVE_REWARDS.item, RECEIVE_REWARDS.count);
   engine.pushActivity?.({
     base: `The Smuggler slipped you ${RECEIVE_REWARDS.currants} currants`,
-    effects: { xp: RECEIVE_REWARDS.xp, items: { [RECEIVE_REWARDS.item]: RECEIVE_REWARDS.count } },
+    effects: { xp, items: { [RECEIVE_REWARDS.item]: RECEIVE_REWARDS.count } },
   });
   engine.playSound?.('QUOIN_CURRANTS', { volume: 0.5 });
   engine.refreshPack?.();

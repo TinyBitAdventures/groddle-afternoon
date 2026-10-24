@@ -76,6 +76,7 @@ import {
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { getGameDayKey } from './game-day.js?v=dametime-1';
+import { grantMoodXp } from './mood-xp.js';
 
 export const RESOURCE_NODES_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 export const RESOURCE_SPRITE_ROOT = 'assets/sprites/resources';
@@ -1285,9 +1286,15 @@ function bumpDaily(node, verbId, dayKey) {
 function applyMetabolics(pc, costs) {
   if (costs.energy) pc.energy = Math.max(0, (pc.energy || 0) - costs.energy);
   if (costs.mood) pc.mood = (pc.mood || 0) + costs.mood;
-  if (costs.xp) {
+  if (costs.xp && costs.xpNoBonus) {
+    // firefly_jar.js 383: the full jar's iMG is a cultivation reward, paid
+    // with no_bonus (magic_rock.js 429).
     if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + costs.xp;
     if (pc.xp != null) pc.xp = (pc.xp || 0) + costs.xp;
+  } else if (costs.xp) {
+    // inc_skill_packages.js 532 and the items' own verbs (stats_add_xp(n,
+    // false)) take the mood bonus; the activity line shows what landed.
+    costs.xp = grantMoodXp(pc, costs.xp);
   }
 }
 
@@ -1341,7 +1348,7 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
         if (ticks >= 12) break;
       }
       const full = flies >= FIREFLY_JAR_MAX;
-      costs = { energy: (pc.energy || 0) - energy, mood: 0, xp: full ? 25 : 0, toolWear: 0 };
+      costs = { energy: (pc.energy || 0) - energy, mood: 0, xp: full ? 25 : 0, xpNoBonus: true, toolWear: 0 };
       durationMs = 1000 * (ticks + 1);
       plan = { jar, startFlies, flies, captured, full };
       break;

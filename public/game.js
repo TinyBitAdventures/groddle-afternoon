@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-4';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-51';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-52';
 import {
   actionDurationFor,
   createTimedAction,
@@ -377,7 +377,8 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=item-buffs-4';
+} from './js/buffs.js?v=g148-1';
+import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js';
 import {
   loadContentCatalogs,
   getContentMeta,
@@ -404,8 +405,8 @@ import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=husbandry-2';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=husbandry-2';
+import { listAnimalFeedOptions } from './js/animals.js?v=g148-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g148-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -420,7 +421,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=features-2';
+} from './js/player-save.js?v=g148-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_PURCHASE_COST,
@@ -485,7 +486,7 @@ import {
   hasTool,
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
-} from './js/making.js?v=making-g14-2';
+} from './js/making.js?v=g148-1';
 import {
   createGarden,
   tickGarden,
@@ -510,7 +511,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=catalog-unified-3';
+} from './js/garden.js?v=g148-2';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -522,7 +523,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=rock-cells-2';
+} from './js/mining.js?v=g148-1';
 import {
   createActivityLog,
   appendActivity,
@@ -530,7 +531,7 @@ import {
   formatActivityHtml,
   buildActivitySegments,
   activitySegmentsToHtml,
-} from './js/verb-rewards.js?v=woodcutting-1';
+} from './js/verb-rewards.js?v=g148-1';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -669,7 +670,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=musicblocks-playback-1';
+} from './js/musicblocks.js?v=g148-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -680,12 +681,12 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=stores-1';
+} from './js/vendor.js?v=g148-1';
 import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=husbandry-2';
+} from './js/animals.js?v=g148-1';
 import {
   ensureWoodTreeState,
   resetWoodTreeDay,
@@ -748,7 +749,7 @@ import {
   planStreetQuoins,
   collectQuoin,
   resetQuoinDay,
-} from './js/quoins.js?v=quoins-1';
+} from './js/quoins.js?v=g148-1';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -1335,6 +1336,18 @@ let featState = createFeatState();
 let skillState = createSkillState();
 /** @type {ReturnType<typeof createBuffState>} */
 let buffState = createBuffState();
+// G148: stats_add_xp's mood bonus reads the live buffs and skips the dead
+// (players/inc_stats.js 270), so js/mood-xp.js gets both from here.
+setMoodXpEnv({
+  isDead: () => {
+    try {
+      return playerIsDead();
+    } catch {
+      return false; // features not built yet
+    }
+  },
+  hasBuff: (classTsid) => hasBuff(buffState, classTsid, Date.now()),
+});
 /** Persistent per-class condition for the remake's unstackable tool row. */
 const toolState = createToolConditionState();
 
@@ -9483,6 +9496,9 @@ function physics(dt) {
         quoins.splice(i, 1);
         const rewardDef = QUOIN_TYPES[result.resolvedTypeId] || q.def;
         const copy = quoinResultCopy(result);
+        // QA (G148): base amount > what landed after the mood bonus.
+        app.canvas.dataset.quoinLast = `${result.typeId}:${result.amount}>${result.actual}`;
+        app.canvas.dataset.moodXpMultiplier = String(moodXpMultiplierFor(pc));
         playSound(soundForQuoin(result.typeId), {
           volume: result.typeId === 'qurazy' ? 0.82 : 0.6,
           rate: result.typeId === 'qurazy' ? 1.2 : 1,
@@ -10315,13 +10331,12 @@ function finishHogHaulRace() {
   if (!hogHaulResultApplied) {
     const reward = hogHaulResultReward(hogHaulState);
     if (reward.currants) pc.currants += reward.currants;
-    if (reward.xp) {
-      pc.imagination += reward.xp;
-      pc.xp += reward.xp;
-    }
+    // inc_race.js 368, 400: stats_add_xp(n, false) takes the mood bonus, and
+    // the result splash names what landed.
+    hogHaulState.xpLanded = reward.xp ? grantMoodXp(pc, reward.xp) : 0;
     if (hogHaulState.status === 'won') {
       applyQuestProgress(questState, 'multiplayer_quest_win', 1, pc);
-      pushActivity(`You won The Great Hog Haul! +${reward.currants} currants · +${reward.xp} iMG.`);
+      pushActivity(`You won The Great Hog Haul! +${reward.currants} currants · +${hogHaulState.xpLanded} iMG.`);
     } else {
       pushActivity(`${hogHaulState.rivalLabel} won The Great Hog Haul.`);
     }
@@ -10340,7 +10355,7 @@ function finishHogHaulRace() {
   if (title) title.textContent = won ? 'YOU WON!' : `${hogHaulState.rivalLabel} is the winner!`;
   if (reward) {
     reward.textContent = won
-      ? '(You got 100 currants and 50 xp.)'
+      ? `(You got 100 currants and ${hogHaulState.xpLanded ?? 50} xp.)`
       : 'Better luck next time — the Piggies are still loose.';
   }
   if (resultScreen) resultScreen.hidden = false;
@@ -12756,15 +12771,16 @@ function collectWinterWalkMote(entry) {
   );
   if (!result.ok) return false;
   entry.collected = true;
-  pc.imagination = (pc.imagination || 0) + result.amount;
-  pc.xp = (pc.xp || 0) + result.amount;
+  // The motes are iMG quoins (items/quoin.js 184): the mood bonus applies.
+  const amount = grantMoodXp(pc, result.amount);
+  winterWalkState.imgEarned += amount - result.amount;
   const { x, y } = entry.sprite;
   if (entry.sprite.parent) entry.sprite.parent.removeChild(entry.sprite);
   if (!entry.sprite.destroyed) entry.sprite.destroy({ children: true });
   playSfx('quoin', { volume: result.amount >= 1000 ? 0.8 : 0.56, rate: result.amount >= 1000 ? 1.18 : 1.04 });
-  floatText(x, y - 18, `+${result.amount.toLocaleString()} iMG`, 0xc98dff);
+  floatText(x, y - 18, `+${amount.toLocaleString()} iMG`, 0xc98dff);
   burst(x, y, 0xb873ed, result.amount >= 1000 ? 26 : 13);
-  pushActivity(`A winter mote sparkles into imagination. +${result.amount.toLocaleString()} iMG.`);
+  pushActivity(`A winter mote sparkles into imagination. +${amount.toLocaleString()} iMG.`);
   renderWinterWalkHud();
   updateHud();
   return true;
@@ -13715,14 +13731,15 @@ function updateSummersDay(dt) {
         );
         if (result.ok) {
           entry.collected = true;
-          pc.imagination = (pc.imagination || 0) + result.amount;
-          pc.xp = (pc.xp || 0) + result.amount;
+          // An iMG quoin in the Annex (items/quoin.js 184): the mood bonus applies.
+          const amount = grantMoodXp(pc, result.amount);
+          summersDayRun.bonusImgEarned += amount - result.amount;
           const { x, y } = entry.sprite;
           entityLayer.removeChild(entry.sprite);
           playSfx('quoin', { volume: 0.48, rate: 1.08 });
-          floatText(x, y - 18, `+${result.amount} iMG`, 0xeafcff);
+          floatText(x, y - 18, `+${amount} iMG`, 0xeafcff);
           burst(x, y, 0xdff8ff, 11);
-          pushActivity(`A pale memory dot becomes +${result.amount} iMG.`);
+          pushActivity(`A pale memory dot becomes +${amount} iMG.`);
           updateHud();
         }
       }
@@ -15555,8 +15572,10 @@ function applyParadiseReward(rewardDef) {
   const amount = Math.max(0, Math.floor(Number(rewardDef.amount) || 0));
   let actual = amount;
   if (rewardDef.type === 'xp') {
-    pc.imagination = Math.max(0, pc.imagination || 0) + amount;
-    pc.xp = Math.max(0, pc.xp || 0) + amount;
+    pc.imagination = Math.max(0, pc.imagination || 0);
+    pc.xp = Math.max(0, pc.xp || 0);
+    // Paradise iMG quoins and Qurazies (items/quoin.js 184, 209) take the mood bonus.
+    actual = grantMoodXp(pc, amount);
   } else if (rewardDef.type === 'currants') {
     pc.currants = Math.max(0, pc.currants || 0) + amount;
   } else if (rewardDef.type === 'energy' || rewardDef.type === 'mood') {
@@ -15569,7 +15588,7 @@ function applyParadiseReward(rewardDef) {
   }
   const copy =
     rewardDef.type === 'xp'
-      ? `${rewardDef.quoin === 'qurazy' ? 'Qurazy! ' : ''}+${amount.toLocaleString()} iMG`
+      ? `${rewardDef.quoin === 'qurazy' ? 'Qurazy! ' : ''}+${actual.toLocaleString()} iMG`
       : rewardDef.type === 'currants'
         ? `+${amount.toLocaleString()} currants`
         : rewardDef.type === 'favor'
@@ -20592,7 +20611,8 @@ function performShrineDonation() {
 
 /** Hallowed shrine powders and No-No Powder on the next donation (js/powders.js). */
 function shrinePowderOpts(now = Date.now()) {
-  return shrinePowderOptions((id) => hasBuff(buffState, id, now));
+  // include/shrines.js 450: the donation's iMG folds in the mood bonus.
+  return { ...shrinePowderOptions((id) => hasBuff(buffState, id, now)), moodMultiplier: moodXpMultiplierFor(pc) };
 }
 
 /** Yellow Crumb (Crumb of Knowledge) lengthens favor and emblem speed-ups x1.05. */

@@ -35,6 +35,7 @@ import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js';
 import { gardenGrowModifier } from './imagination-effects.js';
 import { skillPackageDetails } from './skill-packages.js';
 import { moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 
 export const MASTER_GARDENER = 'mastergardener_1';
 export const POTION_USES = 5;
@@ -208,8 +209,12 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
     }
     pc.energy = Math.max(0, (pc.energy || 0) - cost);
     energy += cost;
-    mood += Number(details.mood_bonus) || 0;
-    xp += Number(details.xp_bonus) || 0;
+    // master_garden.js runs the package once per plot: its mood first, then
+    // its xp_bonus, which inc_skill_packages.js 532 scales by the mood so far.
+    const plotMood = Number(details.mood_bonus) || 0;
+    mood += plotMood;
+    pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + plotMood);
+    xp += grantMoodXp(pc, Number(details.xp_bonus) || 0);
     return true;
   };
   for (const [, plot] of plotsOf(garden)) {
@@ -282,9 +287,6 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
   const items = {};
   for (const [cropId, r] of Object.entries(results)) items[cropId] = r.num;
   for (const [id, n] of Object.entries(items)) inv[id] = (Number(inv[id]) || 0) + n;
-  pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
-  pc.xp = (pc.xp || 0) + xp;
-  if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + xp;
   const base = { water: 'You watered a garden.', hoe: 'You cleaned a garden.', plant: 'You planted a garden.', pick: pickedMessage(results, ctx.pluralOf), fertilize: 'You fertilized a garden.' }[action];
   let drop = null;
   if (action === 'water' || action === 'plant' || action === 'hoe') {

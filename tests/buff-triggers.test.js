@@ -24,11 +24,11 @@ import {
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=g124-1';
 import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=meditation-2';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=g148-1';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=teleport-1';
-import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=rooks-2';
+import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=g148-1';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=rube-1';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=smuggling-2';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g148-1';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js';
 import {
   activateBuffItem,
@@ -38,11 +38,11 @@ import {
   hasBuff,
   removeBuff,
   tickBuffs,
-} from '../public/js/buffs.js?v=item-buffs-4';
+} from '../public/js/buffs.js?v=g148-1';
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js';
-import { miningProfile } from '../public/js/mining.js?v=rock-cells-2';
-import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=butterfly-care-2';
-import { makingSkillAdjustments } from '../public/js/making.js?v=making-g14-2';
+import { miningProfile } from '../public/js/mining.js?v=g148-1';
+import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=g148-2';
+import { makingSkillAdjustments } from '../public/js/making.js?v=g148-1';
 import { sessionPackage } from '../public/js/meditation.js';
 import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
@@ -197,7 +197,8 @@ describe('drinks and foods apply their buff (catalog_buffs.js numbers)', () => {
     const moodBefore = engine.pc.mood;
     engine.advance(60_000);
     assert.equal(engine.pc.mood, moodBefore - 2);
-    assert.equal(engine.pc.imagination, 3);
+    // +3 iMG under 50% mood: x0.75 rounds to 2 (G148, stats_xp_apply_bonus).
+    assert.equal(engine.pc.imagination, 2);
     engine.advance(240_000);
     assert.equal(engine.hasBuff('buff_hungover'), false);
     assert.ok(engine.log.activity.includes('That hangover is gone! You feel so much better.'));
@@ -213,7 +214,8 @@ describe('drinks and foods apply their buff (catalog_buffs.js numbers)', () => {
     assert.equal(engine.pc.mood, 13);
     engine.advance(240_001);
     assert.equal(engine.hasBuff('buff_garlic_breath'), false);
-    assert.equal(engine.pc.imagination, 5 + 0);
+    // +5 iMG under 50% mood: x0.75 rounds to 4 (G148).
+    assert.equal(engine.pc.imagination, 4);
     assert.ok(engine.log.activity.includes('You no longer have the taste of garlic in your mouth.'));
   });
 
@@ -505,7 +507,7 @@ describe('wiring', () => {
     for (const m of src.matchAll(/from '\.\/([a-z-]+-feature\.js\?v=[^']+)'/g)) {
       assert.ok(index.includes(`'./${m[1]}'`), m[1]);
     }
-    assert.match(index, /buff-triggers-feature\.js\?v=g124-2'; FEATURES\.push\(buffTriggersFeature\)/);
+    assert.match(index, /buff-triggers-feature\.js\?v=g148-1'; FEATURES\.push\(buffTriggersFeature\)/);
   });
 
   it('game.js applies Stuffed at the daily limit and announces each making batch', () => {

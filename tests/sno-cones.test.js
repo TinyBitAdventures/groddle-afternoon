@@ -17,7 +17,7 @@ import {
   eatSnoCone,
   snoConeEatButton,
   snoConeMelted,
-} from '../public/js/sno-cones.js?v=g136-1';
+} from '../public/js/sno-cones.js?v=g148-1';
 import { BEMOAN_VERB, snoConesFeature } from '../public/js/features/sno-cones-feature.js';
 import {
   applyAchievementProgress,
@@ -43,7 +43,7 @@ function fakeEngine(over = {}) {
   const calls = { achievements: [], toasts: [], activity: [], changed: 0, saved: 0 };
   const engine = {
     inv: {},
-    pc: { level: 20, xp: 0, imagination: 0, mood: 80, energy: 50 },
+    pc: { level: 20, xp: 0, imagination: 0, mood: 75, energy: 50 }, // the x1 mood band (G148)
     player: { x: 300, y: 500 },
     streetTsid: 'GTEST',
     droppedItems: { version: 1, nextId: 1, streets: {} },
@@ -81,7 +81,7 @@ describe('sno cone rules (items/sno_cone_*.js)', () => {
   });
 
   it('gives iMG and no energy; the Rainbo cone has no gate (eat_min_level 0)', () => {
-    const pc = { level: 1, xp: 0, imagination: 0, mood: 50, energy: 10 };
+    const pc = { level: 1, xp: 0, imagination: 0, mood: 75, energy: 10 }; // the x1 mood band (G148)
     const out = eatSnoCone('sno_cone_rainbow', pc, { eatenToday: 0 });
     assert.equal(out.ok, true);
     assert.equal(pc.xp, 1100);
@@ -95,12 +95,13 @@ describe('sno cone rules (items/sno_cone_*.js)', () => {
     const lucky = eatSnoCone('sno_cone_blue', pc, { eatenToday: 3, rng: () => 0.9 });
     assert.deepEqual(lucky.msgs, [SNO_CONE_TEXT.lucky]);
     assert.equal(lucky.froze, false);
-    assert.equal(pc.xp, 74);
+    // Two Blue cones at 90% mood: 37 iMG x1.2 is 44 each (G148).
+    assert.equal(pc.xp, 88);
     const froze = eatSnoCone('sno_cone_blue', pc, { eatenToday: 4, rng: () => 0.1 });
     assert.equal(froze.ok, true);
     assert.equal(froze.froze, true);
     assert.equal(pc.mood, 0);
-    assert.equal(pc.xp, 74, 'no iMG on a brain freeze');
+    assert.equal(pc.xp, 88, 'no iMG on a brain freeze');
     assert.deepEqual(froze.achievementCounters, [{ counter: 'brain:frozen', amount: 1 }]);
   });
 

@@ -418,7 +418,9 @@ export function meditationChatter(tick, rng = Math.random) {
  * @param {object} session  from startMeditation
  * @param {{ now?: number, learned?: string[], tank?: number, dayKey?: string,
  *   streetTsid?: string, rng?: () => number, energy?: number, mood?: number,
- *   moodMax?: number }} ctx
+ *   moodMax?: number, scaleXp?: (xp: number, mood: number) => number }} ctx
+ *   scaleXp: the mood bonus (js/mood-xp.js). focusing_orb.js 808-813 pays the
+ *   card bonus before the metabolics and 824/965 the meditation iMG after them.
  */
 export function finishMeditation(state, session, ctx = {}) {
   let s = rollMeditationDay(state, ctx.dayKey);
@@ -488,8 +490,9 @@ export function finishMeditation(state, session, ctx = {}) {
   const dailyRoom = MEDITATION_DAILY_LIMIT ? Math.max(0, dailyEnergyLimit(tank) - s.energyToday) : Infinity;
   const energyGained = Math.min(Math.round(energy), energyRoom, Math.floor(dailyRoom));
   const moodGained = Math.min(Math.round(mood), Math.max(0, (ctx.moodMax || 100) - (ctx.mood ?? 0)));
-  const imgGained = Math.round(img);
-  const imgBonusGained = Math.round(imgBonus);
+  const scaleXp = typeof ctx.scaleXp === 'function' ? ctx.scaleXp : (n) => n;
+  const imgBonusGained = imgBonus ? scaleXp(Math.round(imgBonus), ctx.mood ?? 0) : 0;
+  const imgGained = img ? scaleXp(Math.round(img), (ctx.mood ?? 0) + moodGained) : 0;
 
   const prevSeconds = s.totalSeconds;
   s = {

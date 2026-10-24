@@ -82,10 +82,11 @@ import {
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { runStreetTransition } from '../screen-fx.js';
 import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
-import { startCrowns } from './crowns-feature.js?v=crowns-4';
+import { startCrowns } from './crowns-feature.js?v=g148-1';
 import { textureFromUrl } from '../textures.js';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=quoins-1';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g148-1';
 import { moodMax } from '../metabolics.js';
+import { grantMoodXp } from '../mood-xp.js';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
 const RIVAL_SCALE = 1.35 * 0.4;
@@ -853,13 +854,11 @@ function showResult(engine) {
   hud.countdown.classList.remove('race-soon');
   const settled = settleRace(run, record);
   record = { ...settled.record, returnTo: record.returnTo, pendingTicket: null };
-  const reward = settled.reward;
   const pc = engine.pc;
+  // inc_race.js 368, 400 / inc_games.js 1373, 1573: stats_add_xp(n, false)
+  // takes the mood bonus, and the splash names what landed.
+  const reward = { ...settled.reward, xp: settled.reward.xp ? grantMoodXp(pc, settled.reward.xp) : 0 };
   if (reward.currants) pc.currants = (pc.currants || 0) + reward.currants;
-  if (reward.xp) {
-    pc.imagination = (pc.imagination || 0) + reward.xp;
-    pc.xp = (pc.xp || 0) + reward.xp;
-  }
   const race = RACES[run.raceId];
   // inc_race.js: the winner plays happy and the loser angry, 2 s on.
   if (run.status === 'won' || run.status === 'lost') {

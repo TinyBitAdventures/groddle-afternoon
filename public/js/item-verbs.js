@@ -11,6 +11,8 @@
  * `<class>:<verb>` and `VERB:<verb>:<class>` (itemVerbAchievementCounters).
  */
 
+import { grantMoodXp } from './mood-xp.js';
+
 const ENERGY = "You don't have enough energy to do this.";
 const DEPRESSED = 'You are too depressed to do this.';
 
@@ -116,11 +118,12 @@ export function crunchIce(pc, count = 1, ctx = {}) {
   const rows = [{ counter: 'ice:cubes_crunched', amount: n }];
   if ((Number(pc.energy) || 0) <= n) return { ok: false, consumed: 0, msgs: [ICE_TEXT.notEnough], achievementCounters: rows };
   const msgs = [];
+  let xp = 0;
   if ((ctx.unlocked || []).includes('ice_cruncher')) {
     msgs.push(ICE_TEXT.chronic);
   } else {
-    pc.imagination = (Number(pc.imagination) || 0) + 3 * n;
-    pc.xp = (Number(pc.xp) || 0) + 3 * n;
+    // ice.js 72: stats_add_xp(3 * count, false) takes the mood bonus.
+    xp = grantMoodXp(pc, 3 * n);
     if (rng() < 0.1) {
       pc.mood = 0;
       rows.push({ counter: 'brain:frozen', amount: 1 });
@@ -132,7 +135,7 @@ export function crunchIce(pc, count = 1, ctx = {}) {
     }
   }
   pc.energy = Math.max(0, (Number(pc.energy) || 0) - 3 * n);
-  return { ok: true, consumed: n, msgs, achievementCounters: [...rows, ...itemVerbAchievementCounters('ice', 'crunch', n)] };
+  return { ok: true, consumed: n, msgs, xp, achievementCounters: [...rows, ...itemVerbAchievementCounters('ice', 'crunch', n)] };
 }
 
 /**
@@ -156,11 +159,8 @@ export function runItemVerb(def, pc, ctx = {}) {
     pc.mood = Math.max(0, Math.min(moodCap, before + def.mood));
     effects.mood = pc.mood - before;
   }
-  if (def.xp) {
-    pc.imagination = (Number(pc.imagination) || 0) + def.xp;
-    pc.xp = (Number(pc.xp) || 0) + def.xp;
-    effects.xp = def.xp;
-  }
+  // items/<spice|gas>.js: stats_add_xp(n, false, context) after the mood change.
+  if (def.xp) effects.xp = grantMoodXp(pc, def.xp);
   return {
     ok: true,
     msgs: [def.message],

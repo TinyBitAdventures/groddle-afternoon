@@ -89,8 +89,8 @@ describe('progression client wiring', () => {
     assert.match(game, /reconcilePlayerProgression\(pc\)/);
     assert.match(game, /kind: 'level'/);
     assert.match(game, /collectQuoin\(quoinState/);
-    assert.match(quoins, /pc\.xp = .* \+ amount/);
+    assert.match(quoins, /actual = grantMoodXp\(pc, amount\)/);
     assert.match(game, /makingToolAchievementCounter/);
-    assert.match(content, /pc\.xp = \(pc\.xp \|\| 0\) \+ result\.xpBonus/);
+    assert.match(content, /grantMoodXp\(pc, result\.xpBonus\)/);
   });
 });

@@ -19,6 +19,8 @@
  * level may eat one.
  */
 
+import { grantMoodXp } from './mood-xp.js';
+
 /** classProps eat_min_level / eat_xp and the bemoan verb's iMG and line, per cone. */
 export const SNO_CONES = Object.freeze({
   sno_cone_blue: Object.freeze({ minLevel: 2, xp: 37, bemoanXp: 19, bemoan: 'Sigh. You should have known not to drop a cone.' }),
@@ -102,11 +104,8 @@ export function eatSnoCone(classTsid, pc, { eatenToday = 0, rng = Math.random } 
     }
   }
   let xp = 0;
-  if (!froze) {
-    xp = def.xp;
-    pc.imagination = (Number(pc.imagination) || 0) + xp;
-    pc.xp = (Number(pc.xp) || 0) + xp;
-  }
+  // sno_cone_*.js 305 eat, 81 bemoan: stats_add_xp(n, false) takes the mood bonus.
+  if (!froze) xp = grantMoodXp(pc, def.xp);
   return { ok: true, msgs, eatenToday: eaten, froze, xp, achievementCounters: rows };
 }
 
@@ -115,9 +114,7 @@ export function bemoanSnoCone(classTsid, pc, count = 1) {
   const def = SNO_CONES[classTsid];
   if (!def) return null;
   const n = Math.max(1, Math.floor(Number(count) || 1));
-  const xp = def.bemoanXp * n;
-  pc.imagination = (Number(pc.imagination) || 0) + xp;
-  pc.xp = (Number(pc.xp) || 0) + xp;
+  const xp = grantMoodXp(pc, def.bemoanXp * n);
   return { ok: true, xp, count: n, msgs: [def.bemoan] };
 }
 

@@ -18,6 +18,7 @@
 import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js';
 import { foxBrushingCard, scaledToolWear } from './imagination-effects.js';
+import { grantMoodXp } from './mood-xp.js';
 
 export const FOX_ID = 'npc_fox';
 export const FOX_RANGER_ID = 'npc_fox_ranger';
@@ -494,8 +495,8 @@ export function brushFox(ctx) {
   const wearPoints = scaledToolWear(toolState, FOX_BRUSH_ID, pkg.toolWear, wearMultiplier);
   const wear = wearPoints > 0 ? useToolCondition(toolState, FOX_BRUSH_ID, wearPoints) : { wear: 0 };
   pc.energy = Math.max(0, (pc.energy || 0) - pkg.energyCost);
-  pc.xp = (pc.xp || 0) + pkg.xpBonus;
-  if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + pkg.xpBonus;
+  // inc_skill_packages.js 532 (fox_brushing): xp_bonus takes the mood bonus.
+  const xp = grantMoodXp(pc, pkg.xpBonus);
   const [lo, hi] = foxFiberRange(ctx.learned, upgrades);
   const fibers = randInt(lo, hi, rng);
   addItem(inv, FIBER_ID, fibers);
@@ -524,7 +525,7 @@ export function brushFox(ctx) {
     reason: 'brushed',
     fibers,
     energy: -pkg.energyCost,
-    xp: pkg.xpBonus,
+    xp,
     wear: wear.wear ?? wearPoints,
     broke: wear.broke === true,
     brokeMsg: wear.msg || '',

@@ -1,6 +1,7 @@
 /** Official Glitch quoin types and their persistent daily economy. */
 
 import { energyMax, moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 
 export const DEFAULT_DAILY_QUOIN_LIMIT = 100;
 export const QUOIN_SHEET = Object.freeze({
@@ -142,8 +143,10 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
   let acceleration = null;
 
   if (resolvedType === 'xp' || resolvedType === 'qurazy') {
-    pc.imagination = Math.max(0, Math.floor(finite(pc.imagination, 0))) + amount;
-    pc.xp = Math.max(0, Math.floor(finite(pc.xp, 0))) + amount;
+    pc.imagination = Math.max(0, Math.floor(finite(pc.imagination, 0)));
+    pc.xp = Math.max(0, Math.floor(finite(pc.xp, 0)));
+    // items/quoin.js 184, 209: stats_add_xp(amount, false) takes the mood bonus.
+    actual = grantMoodXp(pc, amount);
   } else if (resolvedType === 'energy' || resolvedType === 'mood') {
     // metabolics_add_energy / _mood cap at the tank, never lowering a tank above 100.
     const top = resolvedType === 'mood' ? moodMax(pc) : energyMax(pc);

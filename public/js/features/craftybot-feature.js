@@ -39,7 +39,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=tools-2';
-import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=making-g14-2';
+import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g148-1';
 import { listDroppedStacks } from '../world-items.js?v=catalog-unified-2';
 import { homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-1';
 import { homesFeature } from './homes-feature.js?v=homes-7';
@@ -79,6 +79,7 @@ import {
   setPaused,
 } from '../craftybot.js?v=craftybot-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { grantMoodXp } from '../mood-xp.js';
 
 export const CRAFTYBOT_FEATURE_ID = 'craftybot';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -310,8 +311,8 @@ function makeWorld(engine) {
     imagination(n) {
       const k = Math.floor(n);
       if (k <= 0) return;
-      engine.pc.xp = (Number(engine.pc.xp) || 0) + k;
-      engine.pc.imagination = (Number(engine.pc.imagination) || 0) + k;
+      // npc_crafty_bot.js 1132: stats_add_xp(count / 20, false) takes the mood bonus.
+      grantMoodXp(engine.pc, k);
       engine.updateHud?.();
     },
     fuelCell() {

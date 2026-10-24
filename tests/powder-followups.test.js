@@ -63,7 +63,7 @@ describe('Fertilidust revives dead trants', () => {
     const said = [];
     const engine = {
       inv: { fertilidust: 1 },
-      pc: { xp: 0, imagination: 0, energy: 50, mood: 50 },
+      pc: { xp: 0, imagination: 0, energy: 50, mood: 75 }, // the x1 mood band (G148)
       player: { x: 100, y: 400 },
       interactables: [
         { classId: 'trant_bean_dead', featureId: 'patches', patchKey: 'trant_bean_dead:0', sprite: { x: 50, destroyed: false } },

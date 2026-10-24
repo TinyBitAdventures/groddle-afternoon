@@ -30,6 +30,7 @@ import {
   toolWearMultiplier,
   wondrousWeave,
 } from './imagination-effects.js';
+import { grantMoodXp } from './mood-xp.js';
 
 /**
  * @typedef {{
@@ -974,19 +975,18 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   }
 
   pc.energy = Math.max(0, (pc.energy || 0) - cost);
-  if (recipe.xpReward) {
-    pc.imagination = (pc.imagination || 0) + recipe.xpReward;
-    pc.xp = (pc.xp || 0) + recipe.xpReward;
-  }
+  // inc_making.js 1546: stats_add_xp(actual, false) takes the mood bonus.
+  const recipeXp = recipe.xpReward ? grantMoodXp(pc, recipe.xpReward) : 0;
   const rng = opts.rng || Math.random;
   if (unitIndex === 1 || batchExtras?.recipeKey !== recipeKey) {
-    batchExtras = { recipeKey, swap: null, items: [], lines: [] };
+    batchExtras = { recipeKey, swap: null, items: [], lines: [], xp: 0 };
     // spindle.js:425: one 4% roll per spin (Max Luck deliberately left out).
     if (SPINDLE_TOOLS.includes(recipe.tool) && spellboundSpindle(upgrades, rng)) {
       batchExtras.swap = { from: 'thread', to: 'string' };
       batchExtras.lines.push('The Giants have favored you and instead of spinning thread you spun String!');
     }
   }
+  batchExtras.xp = (Number(batchExtras.xp) || 0) + recipeXp;
   const swap = batchExtras.swap;
   for (const out of recipe.outputs || []) {
     addItem(inv, swap && out.classTsid === swap.from ? swap.to : out.classTsid, out.qty);
@@ -1016,11 +1016,9 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     (sum, out) => sum + (Number(ITEM_CATALOG[out.classTsid]?.baseCost) || 0) * (Number(out.qty) || 0),
     0
   );
-  const bonusImagination = rollMakingBonusImagination(recipe.tool, upgrades, outputValue, opts.rng || Math.random, Boolean(opts.maxLuck));
-  if (bonusImagination) {
-    pc.imagination = (pc.imagination || 0) + bonusImagination;
-    pc.xp = (pc.xp || 0) + bonusImagination;
-  }
+  // tool_base rollCraftingBonusImagination: stats_add_xp(change, false), and
+  // "Hey, you got N bonus imagination" names what landed.
+  const bonusImagination = grantMoodXp(pc, rollMakingBonusImagination(recipe.tool, upgrades, outputValue, opts.rng || Math.random, Boolean(opts.maxLuck)));
 
   const unitWear = batchWearUnits(recipe, unitIndex) - batchWearUnits(recipe, unitIndex - 1);
   const wearPoints = recipe.tool && opts.toolState && unitWear > 0 ? wearFor(baseWear * unitWear) : 0;
@@ -1036,12 +1034,13 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     recipe,
     recipeKey,
     msgs: [
-      `You made ${recipe.name} with ${toolLabel} (${outLabels}). −${cost} energy, +${recipe.xpReward || 0} iMG.`,
+      `You made ${recipe.name} with ${toolLabel} (${outLabels}). −${cost} energy, +${recipeXp} iMG.`,
       ...(bonusImagination ? [`Bonus imagination! +${bonusImagination} iMG.`] : []),
       ...(unitIndex === 1 && swap ? [batchExtras.lines[0]] : []),
       ...(toolUse?.broke ? [toolUse.msg] : []),
     ],
     toolUse,
+    xp: recipeXp,
     bonusImagination,
     // for tests / rollback inspection
     _before: { energy: beforeE, imagination: beforeImg, xp: beforeXp },
@@ -1222,14 +1221,15 @@ export function buildCraftBatchResult(inv, pc, recipeKey, made, qtyRequested = m
   if (!recipe || count < 1) return null;
 
   const energy = -recipeEnergyCost(recipe, opts.learned) * count;
-  const xp = (recipe.xpReward || 0) * count;
+  const extras = batchExtras?.recipeKey === recipeKey ? batchExtras : null;
+  // What landed after the mood bonus (craftRecipe sums it per unit).
+  const xp = Number.isFinite(extras?.xp) ? extras.xp : (recipe.xpReward || 0) * count;
   const used = (recipe.inputs || []).map((input) => ({
     classTsid: input.classTsid,
     qty: input.qty * count,
     remain: countItem(inv, input.classTsid),
     label: ITEM_CATALOG[input.classTsid]?.label || input.classTsid,
   }));
-  const extras = batchExtras?.recipeKey === recipeKey ? batchExtras : null;
   const swapped = (id) => (extras?.swap && id === extras.swap.from ? extras.swap.to : id);
   const outputs = (recipe.outputs || []).map((output) => ({
     classTsid: swapped(output.classTsid),
@@ -1332,7 +1332,7 @@ export function craftRecipeBatch(inv, pc, recipeKey, qty = 1, opts = {}) {
     }
     made += 1;
     const eCost = recipeEnergyCost(recipe, opts.learned, opts.upgrades || pc?.imaginationUpgrades || []);
-    const xpGain = recipe.xpReward || 0;
+    const xpGain = Number.isFinite(r.xp) ? r.xp : recipe.xpReward || 0;
     progress.push({
       i,
       of: n,

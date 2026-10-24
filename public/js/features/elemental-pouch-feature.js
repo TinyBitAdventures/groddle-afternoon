@@ -29,7 +29,7 @@
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
-import { VENDOR_PROFILES } from '../vendor.js?v=stores-1';
+import { VENDOR_PROFILES } from '../vendor.js?v=g148-1';
 import {
   ELEMENT_STACKMAX,
   POUCH_CLASS,

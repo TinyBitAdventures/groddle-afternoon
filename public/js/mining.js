@@ -21,6 +21,7 @@ import {
 } from './inventory.js?v=catalog-unified-3';
 import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { skillPackageDetails } from './skill-packages.js';
+import { grantMoodXp } from './mood-xp.js';
 import { GEM_ITEMS, MEGA_ROCK_CHUNKS, megaRockChance, miningExpertBonus, rollGemSmall, smeltingOverrides } from './imagination-effects.js';
 
 /**
@@ -352,8 +353,8 @@ export function mineRock(rock, inv, pc, opts = {}) {
   const got = toGet;
 
   pc.energy = (pc.energy || 0) - profile.energy;
-  if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + profile.xp;
-  if (pc.xp != null) pc.xp = (pc.xp || 0) + profile.xp;
+  // inc_skill_packages.js 532 (mining): xp_bonus takes the mood bonus.
+  const minedXp = grantMoodXp(pc, profile.xp);
 
   addItem(inv, rock.chunkId, got);
   rock.chunksRemaining -= got;
@@ -399,8 +400,8 @@ export function mineRock(rock, inv, pc, opts = {}) {
     msgs,
     effects: {
       energy: -profile.energy,
-      xp: profile.xp,
-      img: profile.xp,
+      xp: minedXp,
+      img: minedXp,
       activityLine: msgs[0],
     },
     got,
@@ -484,9 +485,8 @@ export function smeltMetalRocks(inv, pc, opts = {}) {
     return { ok: false, reason: 'pack', msgs: ['Not enough metal rock.'] };
   }
   pc.energy = (pc.energy || 0) - energy;
-  const xp = SMELT_COSTS.xpPerIngot * ingots;
-  if (pc.imagination != null) pc.imagination += xp;
-  if (pc.xp != null) pc.xp += xp;
+  // smelter.js 577: stats_add_xp(n, false) takes the mood bonus.
+  const xp = grantMoodXp(pc, SMELT_COSTS.xpPerIngot * ingots);
   addItem(inv, 'plain_metal', ingots);
   const toolUse = opts.requireTool !== false && opts.toolState
     ? useToolCondition(opts.toolState, SMELT_COSTS.tool, toolWear)
@@ -557,9 +557,8 @@ export function crushOre(inv, pc, oreId, opts = {}) {
     return { ok: false, reason: 'pack', msgs: ['Not enough ore.'] };
   }
   pc.energy = (pc.energy || 0) - energy;
-  const xp = refining.xp * qty;
-  if (pc.imagination != null) pc.imagination += xp;
-  if (pc.xp != null) pc.xp += xp;
+  // ore_grinder.js 590: stats_add_xp(n, false) takes the mood bonus.
+  const xp = grantMoodXp(pc, refining.xp * qty);
 
   const got = [];
   for (const y of yields) {

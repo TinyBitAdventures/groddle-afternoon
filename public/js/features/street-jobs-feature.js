@@ -67,6 +67,7 @@ import {
   jobDivisor,
 } from '../street-jobs.js?v=jobs-2';
 import { energyMax, moodMax } from '../metabolics.js';
+import { grantMoodXp } from '../mood-xp.js';
 import { textureFromUrl } from '../textures.js';
 
 export const STREET_JOBS_FEATURE_ID = 'street-jobs';
@@ -351,12 +352,15 @@ function clampMetabolic(v, max) {
   return Math.max(0, Math.min(max, Math.round(v)));
 }
 
-function payout(engine, { xp = 0, currants = 0, mood = 0, energy = 0, favor = [] } = {}) {
+/**
+ * quests/job_*.js job_complete and job_complete_performance award with
+ * stats_add_xp(n, false), so the iMG takes the mood bonus. Returns the
+ * rewards with the iMG that landed.
+ */
+function payout(engine, rewards = {}) {
+  const { xp = 0, currants = 0, mood = 0, energy = 0, favor = [] } = rewards || {};
   const pc = engine.pc;
-  if (xp) {
-    pc.xp = (pc.xp || 0) + xp;
-    pc.imagination = (pc.imagination || 0) + xp;
-  }
+  const landed = xp ? grantMoodXp(pc, xp) : 0;
   if (currants) pc.currants = (pc.currants || 0) + currants;
   if (mood) pc.mood = clampMetabolic((pc.mood || 0) + mood, moodMax(pc));
   if (energy) pc.energy = clampMetabolic((pc.energy || 0) + energy, energyMax(pc));
@@ -366,6 +370,7 @@ function payout(engine, { xp = 0, currants = 0, mood = 0, energy = 0, favor = []
     const giants = f.giant === 'all' ? Object.keys(GIANTS) : [f.giant === 'tii' ? 'ti' : f.giant];
     for (const g of giants) ledger[g] = Math.max(0, Number(ledger[g]) || 0) + f.points;
   }
+  return { ...(rewards || {}), xp: landed };
 }
 
 function rewardBits(r) {
@@ -444,11 +449,11 @@ function finishPhase(engine, jobId) {
     const row = state.jobs[jobId];
     if (row) row.readyAt = 0;
   }
-  payout(engine, out.rewards);
-  payout(engine, out.performance);
+  const paid = payout(engine, out.rewards);
+  const paidPerformance = payout(engine, out.performance);
   grantItems(engine, out.performance.items);
   engine.achievement(PHASE_WINNER_COUNTER, 1);
-  const bits = [...rewardBits(out.rewards), ...rewardBits(out.performance)];
+  const bits = [...rewardBits(paid), ...rewardBits(paidPerformance)];
   const solo = job.kind === 'restore'
     ? ''
     : `Solo amounts are 1/${SOLO_DIVISOR} of the original multiplayer totals, and the phase rewards scale by the same 1/${SOLO_DIVISOR}. As the top contributor you also earned the full performance rewards.`;
@@ -476,7 +481,7 @@ function finishPhase(engine, jobId) {
   }
   engine.award({ kind: 'quest', title, body: '', subtitle: bits.join(' · '), iconUrl: external.get(jobId)?.iconUrl || BOARD_ART, steps, primaryLabel: 'OK' });
   lastResult = `${jobId}:phase${out.index + 1}${out.finalPhase ? ':done' : ''}`;
-  engine.pushActivity({ base: `Project phase complete: ${job.title}`, effects: { xp: out.rewards.xp + out.performance.xp } });
+  engine.pushActivity({ base: `Project phase complete: ${job.title}`, effects: { xp: paid.xp + paidPerformance.xp } });
   engine.playSound('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
   engine.updateHud();
   engine.save();

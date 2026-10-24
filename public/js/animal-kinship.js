@@ -19,6 +19,7 @@ import {
 } from './tools.js?v=tools-2';
 import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js';
 import { moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 import { petPiggy, piggyNibbleRefusal } from './animal-mood.js';
 
 export const ANIMAL_KINSHIP_RANK_IDS = Object.freeze(
@@ -278,11 +279,8 @@ function awardMetabolics(pc, selected, moodBonus = selected.moodBonus) {
     pc.mood = Math.min(moodMax(pc), before + moodBonus);
     effects.mood = pc.mood - before;
   }
-  if (selected.xpBonus) {
-    pc.imagination = (Number(pc.imagination) || 0) + selected.xpBonus;
-    pc.xp = (Number(pc.xp) || 0) + selected.xpBonus;
-    effects.xp = selected.xpBonus;
-  }
+  // inc_skill_packages.js 532: xp_bonus takes the mood bonus (after the mood gain).
+  if (selected.xpBonus) effects.xp = grantMoodXp(pc, selected.xpBonus);
   return effects;
 }
 

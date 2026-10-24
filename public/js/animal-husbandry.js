@@ -37,6 +37,7 @@
 import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-3';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
 import { moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 import { musicblockItemMeta } from './musicblocks.js';
 import { isEnchantedForest } from './enchanted-forests.js?v=g5-1';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=g90-1';
@@ -790,9 +791,8 @@ export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', no
     pc.mood = Math.min(moodMax(pc), before + HERDKEEPING.successMood);
     effects.mood = pc.mood - before;
     if (!ownYard) {
-      pc.xp = (pc.xp || 0) + HERDKEEPING.successXp;
-      pc.imagination = (pc.imagination || 0) + HERDKEEPING.successXp;
-      effects.xp = HERDKEEPING.successXp;
+      // npc_piggy.js 460: stats_add_xp(50, false) takes the mood bonus.
+      effects.xp = grantMoodXp(pc, HERDKEEPING.successXp);
     }
     packState.captures[streetTsid] = now;
     if (!ownYard) packState.captureCooldownUntil = now + HERDKEEPING.cooldownMs;

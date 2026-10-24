@@ -11,6 +11,7 @@
  */
 
 import { moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 export const KITTY_ID = 'npc_kitty_chicken';
 export const KITTY_LABEL = 'Heli Kitty';
 export const KITTY_PLURAL = 'Heli Kitties';
@@ -169,15 +170,15 @@ export function petKitty(kitty, pc) {
   const before = pc.mood || 0;
   pc.mood = Math.min(moodMax(pc), before + KITTY_PET.mood);
   const mood = pc.mood - before;
-  pc.xp = (pc.xp || 0) + KITTY_PET.xp;
-  if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + KITTY_PET.xp;
+  // npc_kitty_chicken.js 757: stats_add_xp(4) takes the mood bonus.
+  const xp = grantMoodXp(pc, KITTY_PET.xp);
   kitty.pets = (kitty.pets || 0) + 1;
   startSleep(kitty);
   return {
     ok: true,
     energy: -energy,
     mood,
-    xp: KITTY_PET.xp,
+    xp,
     bubble: KITTY_PET.bubble,
     feat: kitty.pets <= KITTY_PET.featCapPerKitty,
   };

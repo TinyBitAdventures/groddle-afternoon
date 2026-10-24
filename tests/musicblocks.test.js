@@ -136,11 +136,12 @@ describe('Musicblock play rewards', () => {
     const result = playMusicblock(state, player, 'musicblock_d_green_02', 1000);
     assert.equal(result.ok, true);
     assert.equal(result.freshness, 'fresh');
-    assert.deepEqual(result.effects, { energy: -2, mood: 1, xp: 50 });
+    // 50 iMG at 99% mood: the mood bonus is x1.2, 60 (G148).
+    assert.deepEqual(result.effects, { energy: -2, mood: 1, xp: 60 });
     assert.equal(player.energy, 18);
     assert.equal(player.mood, 100);
-    assert.equal(player.xp, 150);
-    assert.equal(player.imagination, 550);
+    assert.equal(player.xp, 160);
+    assert.equal(player.imagination, 560);
     assert.equal(state.heardAt.musicblock_d_green_02, 1000);
     assert.equal(state.plays, 1);
   });
@@ -158,7 +159,7 @@ describe('Musicblock play rewards', () => {
 
   it('restores the official long-absence 100 XP reward', () => {
     const state = createMusicblockState({ heardAt: { musicblock_d_green_02: 1 } });
-    const player = pc();
+    const player = pc({ mood: 75 }); // the x1 mood band (G148)
     const result = playMusicblock(
       state,
       player,
@@ -178,7 +179,7 @@ describe('Musicblock play rewards', () => {
         musicblock_d_red_01: now - GAME_DAY_MS - 20,
       },
     });
-    const player = pc();
+    const player = pc({ mood: 75 }); // the x1 mood band (G148)
     const first = playMusicblock(state, player, 'musicblock_d_green_02', now);
     assert.equal(first.freshness, 'daily-first');
     assert.equal(first.effects.xp, 10);
@@ -257,7 +258,7 @@ describe('Musicblock street collection', () => {
 
   it('pays SB-1 its own first hearing (1000 XP)', () => {
     const state = createMusicblockState();
-    const player = pc();
+    const player = pc({ mood: 75 }); // the x1 mood band (G148)
     const result = playMusicblock(state, player, 'musicblock_sb_secret_01', 1000);
     assert.equal(result.effects.xp, 1000);
     assert.match(result.msg, /oneness with the Giants/);

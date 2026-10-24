@@ -110,6 +110,7 @@ import { getQuestCatalog } from '../content-catalogs.js';
 import { locationEventsApi } from './location-events-feature.js?v=location-events-1';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { grantMoodXp } from '../mood-xp.js';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 const ART = 'assets/sprites/newxp/';
@@ -783,10 +784,9 @@ function takeQuoin(engine, q) {
   if (q.taken) return;
   q.taken = true;
   q.spr.visible = false;
-  const n = q.amount ?? QUOIN_BENEFITS[q.id] ?? 1;
   const pc = engine.pc;
-  pc.xp = (Number(pc.xp) || 0) + n;
-  pc.imagination = (Number(pc.imagination) || 0) + n;
+  // items/quoin.js 184, 209: stats_add_xp(amount, false) takes the mood bonus.
+  const n = grantMoodXp(pc, q.amount ?? QUOIN_BENEFITS[q.id] ?? 1);
   engine.floatText(q.x, q.y - 14, q.type === 'qurazy' ? `Qurazy! +${n} iMG` : `+${n} iMG`, '#ffffff');
   engine.playSound(soundForQuoin(q.type || 'xp'), { volume: q.type === 'qurazy' ? 0.82 : 0.5, rate: q.type === 'qurazy' ? 1.2 : 1 });
   engine.updateHud();

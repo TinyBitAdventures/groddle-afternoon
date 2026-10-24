@@ -3,7 +3,8 @@
  * Simplified conditions/handlers for the Groddle spike.
  */
 
-import { getVerbReward, applyVerbReward, formatActivityLine } from './js/verb-rewards.js?v=woodcutting-1';
+import { getVerbReward, applyVerbReward, formatActivityLine } from './js/verb-rewards.js?v=g148-1';
+import { grantMoodXp } from './js/mood-xp.js';
 import {
   TRANT_META,
   resolveArborologyPackage,
@@ -14,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=trant-care-2';
+} from './js/trant-care.js?v=g148-1';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -27,7 +28,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=tool-condition-2';
+} from './js/garden.js?v=g148-4';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -37,22 +38,22 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=rock-cells-2';
+} from './js/mining.js?v=g148-1';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=husbandry-2';
+} from './js/animals.js?v=g148-1';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
-} from './js/animal-kinship.js?v=butterfly-care-1';
+} from './js/animal-kinship.js?v=g148-1';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=musicblocks-playback-1';
+} from './js/musicblocks.js?v=g148-1';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-1';
 import {
   ensureWoodTreeState,
@@ -1008,10 +1009,10 @@ export function runVerb(target, verbId, ctx) {
     if (!fed.ok) return { ok: false, msgs: [fed.msg], effects };
     effects.items[fed.classTsid] = -fed.count;
     if (fed.xp) {
-      pc.imagination = (pc.imagination || 0) + fed.xp;
-      pc.xp = (pc.xp || 0) + fed.xp;
-      effects.img = fed.xp;
-      effects.xp = fed.xp;
+      // npc_piggy.js 673: stats_add_xp(2, false) takes the mood bonus.
+      const xp = grantMoodXp(pc, fed.xp);
+      effects.img = xp;
+      effects.xp = xp;
     }
     if (fed.plops.length) queuePlops(target, fed.plops);
     effects._activityBase = fed.msg;
@@ -1292,10 +1293,10 @@ export function runVerb(target, verbId, ctx) {
       effects.mood += result.moodBonus;
     }
     if (result.xpBonus) {
-      pc.imagination = (pc.imagination || 0) + result.xpBonus;
-      pc.xp = (pc.xp || 0) + result.xpBonus;
-      effects.img += result.xpBonus;
-      effects.xp = (effects.xp || 0) + result.xpBonus;
+      // inc_skill_packages.js 532 (gardening_harvest): xp_bonus takes the mood bonus.
+      const xp = grantMoodXp(pc, result.xpBonus);
+      effects.img += xp;
+      effects.xp = (effects.xp || 0) + xp;
     }
     give(result.fruitClass, result.amount);
     const label = result.fruitLabel || result.fruitClass;

@@ -15,6 +15,7 @@ import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
 import { skillPackageDetails } from './skill-packages.js';
 import { gardenGrowModifier } from './imagination-effects.js';
 import { moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 
 /** @typedef {'clean'|'seeds'|'shoots'|'crop'|'dirty'} PlotState */
 
@@ -750,11 +751,8 @@ function applyGardenRewards(pc, profile) {
     pc.mood = Math.min(moodMax(pc), before + profile.mood);
     got.mood = Math.max(0, pc.mood - before);
   }
-  if (profile.xp) {
-    if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + profile.xp;
-    if (pc.xp != null) pc.xp = (pc.xp || 0) + profile.xp;
-    got.xp = profile.xp;
-  }
+  // inc_skill_packages.js 532: xp_bonus takes the mood bonus (after the mood gain).
+  if (profile.xp) got.xp = grantMoodXp(pc, profile.xp);
   return got;
 }
 
@@ -1261,8 +1259,7 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   let got = { mood: 2, xp: 2 };
   if (profile.legacy) {
     if (pc.mood != null) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + 2);
-    if (pc.imagination != null) pc.imagination = (pc.imagination || 0) + 2;
-    if (pc.xp != null) pc.xp = (pc.xp || 0) + 2;
+    got.xp = grantMoodXp(pc, 2);
   } else {
     got = applyGardenRewards(pc, profile);
   }

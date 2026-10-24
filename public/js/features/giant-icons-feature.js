@@ -60,6 +60,7 @@ import {
 } from '../giant-icons.js';
 import { textureFromUrl } from '../textures.js';
 import { verticalTextGradient } from '../text-gradient.js';
+import { grantMoodXp } from '../mood-xp.js';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
 const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.png`;
@@ -105,10 +106,10 @@ function say(engine, msg, ok = true, effects = null) {
 function grant(engine, stat, amount) {
   const pc = engine.pc;
   if (stat === 'xp') {
-    pc.xp = (pc.xp || 0) + amount;
-    pc.imagination = (pc.imagination || 0) + amount;
+    // include/icon.js 230, 455 and emblem_*.js: stats_add_xp(n, false) takes the mood bonus.
+    const landed = grantMoodXp(pc, amount);
     engine.updateHud?.();
-    return amount;
+    return landed;
   }
   const cap = stat === 'energy' ? Math.max(100, Number(pc.energyMax) || 100) : 100;
   const before = Math.max(0, Number(pc[stat]) || 0);

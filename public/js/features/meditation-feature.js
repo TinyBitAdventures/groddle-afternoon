@@ -58,6 +58,7 @@ import { energyMax, moodMax } from '../metabolics.js';
 import { levitationCards } from '../imagination-effects.js';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js';
 import { sourceFromUrl } from '../textures.js';
+import { moodScaledXp } from '../mood-xp.js';
 
 export const MEDITATION_FEATURE_ID = 'meditation';
 /** metabolics_get_max_energy: the energy tank (100 plus Energy Tank cards). */
@@ -372,6 +373,8 @@ function end(engine, reason = 'timer', at = Date.now()) {
     mood: pc.mood,
     moodMax: moodMax(pc),
     rng: rng(engine),
+    // focusing_orb.js: stats_add_xp(n, false) takes the mood bonus.
+    scaleXp: (xp, mood) => moodScaledXp({ ...pc, mood }, xp),
   });
   let { energy, mood } = out;
   if (energy && engine.metabolicGate('energy', 'gain').ok === false) energy = 0;

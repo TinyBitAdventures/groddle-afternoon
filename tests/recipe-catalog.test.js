@@ -288,7 +288,7 @@ describe('new kitchen tools end to end', () => {
     const key = keyFor('334');
     assert.equal(RECIPE_CATALOG[key].tool, 'saucepan');
     const inv = createInventory({ saucepan: 1, butterfly_butter: 1, flour: 1, pinch_of_salt: 0 });
-    const pc = { energy: 50, mood: 50, imagination: 0, xp: 0 };
+    const pc = { energy: 50, mood: 75, imagination: 0, xp: 0 }; // the x1 mood band (G148)
     const toolState = createToolConditionState();
     const r = craftRecipe(inv, pc, key, { learned: ['saucery_1'], toolState });
     assert.equal(r.ok, true, r.msgs.join(' '));
@@ -303,7 +303,7 @@ describe('new kitchen tools end to end', () => {
   it('Famous Pugilist Grill makes Grilled Cheese, then it is eaten for source energy', () => {
     const key = keyFor('21');
     const inv = createInventory({ mike_tyson_grill: 1, bun: 2, cheese: 2 });
-    const pc = { energy: 20, mood: 50, imagination: 0, xp: 0 };
+    const pc = { energy: 20, mood: 75, imagination: 0, xp: 0 }; // the x1 mood band (G148)
     const r = craftRecipe(inv, pc, key, { learned: ['grilling_1'] });
     assert.equal(r.ok, true, r.msgs.join(' '));
     assert.equal(countItem(inv, 'grilled_cheese'), 1);
@@ -325,7 +325,7 @@ describe('new kitchen tools end to end', () => {
       hot_pepper: 1,
       mustard: 1,
     });
-    const pc = { energy: 30, mood: 40, imagination: 0, xp: 0 };
+    const pc = { energy: 30, mood: 75, imagination: 0, xp: 0 }; // the x1 mood band (G148)
     const r = craftRecipe(inv, pc, key, { learned: ['cocktailcrafting_1'] });
     assert.equal(r.ok, true, r.msgs.join(' '));
     assert.equal(countItem(inv, 'spicy_grog'), 1);

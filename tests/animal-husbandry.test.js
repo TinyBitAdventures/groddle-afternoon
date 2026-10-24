@@ -252,7 +252,8 @@ describe('Herdkeeping (npc_piggy capture, hogtied_piggy.js)', () => {
     assert.equal(inv.hogtied_piggy, 1);
     assert.equal(pc.energy, 40);
     assert.equal(pc.mood, 40);
-    assert.equal(pc.xp, 50);
+    // 50 iMG at 40% mood: stats_xp_apply_bonus x0.75 (G148, js/mood-xp.js).
+    assert.equal(pc.xp, 38);
     assert.equal(res.questCounter, 'pigs_hogtied');
     assert.equal(captureVerbState({ inv: {}, learned, energy: 50, streetTsid: 'S1', now: 2000 }).reason, HERDKEEPING.locationLimit);
     assert.equal(captureVerbState({ inv: {}, learned, energy: 50, streetTsid: 'S2', now: 2000 }).reason, HERDKEEPING.exhausted);

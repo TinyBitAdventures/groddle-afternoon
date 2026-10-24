@@ -64,6 +64,7 @@ import {
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=g137-1';
 import { DEAD_TRANT_CLASSES } from '../patches.js';
 import { hellFeature } from './hell-feature.js?v=hell-1';
+import { grantMoodXp } from '../mood-xp.js';
 
 export const POWDERS_FEATURE_ID = 'powders';
 
@@ -237,10 +238,10 @@ const RUNNERS = {
     if (!out.ok) return 'no-trees';
     const dead = reviveDeadTrees(engine, deadTargets);
     if (out.xp) {
-      // 25 iMG for every dead trant brought back (stats_add_xp).
-      engine.pc.imagination = (Number(engine.pc.imagination) || 0) + out.xp;
-      engine.pc.xp = (Number(engine.pc.xp) || 0) + out.xp;
-      if (engine.player) engine.floatText?.(engine.player.x, engine.player.y - 90, `+${out.xp} iMG`, 0xb388ff);
+      // 25 iMG for every dead trant brought back (fertilidust.js 371,
+      // stats_add_xp(n, false): the mood bonus applies).
+      const xp = grantMoodXp(engine.pc, out.xp);
+      if (engine.player) engine.floatText?.(engine.player.x, engine.player.y - 90, `+${xp} iMG`, 0xb388ff);
       engine.updateHud?.();
     }
     if (trees.length) later(3000, () => fertilize(engine, trees));

@@ -9,6 +9,7 @@
 
 import { getBuffCatalog } from './content-catalogs.js';
 import { moodMax } from './metabolics.js';
+import { grantMoodXp } from './mood-xp.js';
 
 const SECOND = 1000;
 
@@ -292,9 +293,9 @@ function applyRemoveEffects(classTsid, pc) {
   if (end.energy) pc.energy = clamp(beforeEnergy + end.energy, 0, energyCap(pc));
   if (end.mood) pc.mood = clamp(beforeMood + end.mood, 0, moodMax(pc));
   if (end.xp) {
-    pc.imagination = (Number(pc.imagination) || 0) + end.xp;
-    pc.xp = (Number(pc.xp) || 0) + end.xp;
-    effects.xp = end.xp;
+    // catalog_buffs.js 244, 270: stats_add_xp(n, false) takes the mood bonus.
+    const got = grantMoodXp(pc, end.xp);
+    if (got) effects.xp = got;
   }
   if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
   if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
@@ -343,10 +344,12 @@ function applyTickEffect(row, pc) {
     pc.energy = clamp(before - 5, 0, energyCap(pc));
     if (pc.energy !== before) effects.energy = pc.energy - before;
   } else if (row.classTsid === 'purple_flower') {
-    pc.imagination = (Number(pc.imagination) || 0) + 1;
-    pc.xp = (Number(pc.xp) || 0) + 1;
-    effects.img = 1;
-    effects.xp = 1;
+    // catalog_buffs.js 1960: stats_add_xp(1, false).
+    const got = grantMoodXp(pc, 1);
+    if (got) {
+      effects.img = got;
+      effects.xp = got;
+    }
   } else if (row.classTsid === 'well_fed_energy') {
     const before = Number(pc.energy) || 0;
     pc.energy = clamp(before + (Number(row.args?.energy) || 5), 0, energyCap(pc));
@@ -398,9 +401,9 @@ function applyTickEffect(row, pc) {
     if (tick.energy) pc.energy = clamp(beforeEnergy + tick.energy, 0, energyCap(pc));
     if (tick.mood) pc.mood = clamp(beforeMood + tick.mood, 0, moodMax(pc));
     if (tick.xp) {
-      pc.imagination = (Number(pc.imagination) || 0) + tick.xp;
-      pc.xp = (Number(pc.xp) || 0) + tick.xp;
-      effects.xp = tick.xp;
+      // catalog_buffs.js 449, 780: stats_add_xp(n, false).
+      const got = grantMoodXp(pc, tick.xp);
+      if (got) effects.xp = got;
     }
     if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
     if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
@@ -412,9 +415,8 @@ function applyTickEffect(row, pc) {
     if (tick.energy) pc.energy = clamp(beforeEnergy + tick.energy, 0, energyCap(pc));
     if (tick.mood) pc.mood = clamp(beforeMood + tick.mood, 0, moodMax(pc));
     if (tick.xp) {
-      pc.imagination = (Number(pc.imagination) || 0) + tick.xp;
-      pc.xp = (Number(pc.xp) || 0) + tick.xp;
-      effects.xp = tick.xp;
+      const got = grantMoodXp(pc, tick.xp);
+      if (got) effects.xp = got;
     }
     if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
     if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
