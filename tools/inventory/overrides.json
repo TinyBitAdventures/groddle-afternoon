@@ -1,0 +1,619 @@
+{
+ "_doc": "Manual judgements for tools/inventory/build.mjs, keyed kind:id. Detectors come first; keep this small. system:<src>/<name> maps a GSJS system to a checklist.mjs item (checklist) or gives it a status with a reason. counter:<group> or counter:<group>:<label> judges every badge that counter blocks (multiplayer counters). Other kinds take {status, reason, register}.",
+ "system:config/familiar_tsid": {
+  "status": "excluded",
+  "reason": "server plumbing, not a game system"
+ },
+ "system:config/web_api_url": {
+  "status": "excluded",
+  "reason": "server plumbing, not a game system"
+ },
+ "system:config/world_api_url": {
+  "status": "excluded",
+  "reason": "server plumbing, not a game system"
+ },
+ "system:config/web_root": {
+  "status": "excluded",
+  "reason": "server plumbing, not a game system"
+ },
+ "system:config/is_dev": {
+  "status": "excluded",
+  "reason": "server plumbing, not a game system"
+ },
+ "system:config/is_prod": {
+  "status": "excluded",
+  "reason": "server plumbing, not a game system"
+ },
+ "system:config/all_players": {
+  "status": "excluded",
+  "reason": "server plumbing, not a game system"
+ },
+ "system:config/shared_instance_manager": {
+  "status": "excluded",
+  "reason": "server plumbing, not a game system"
+ },
+ "system:config/sequence_object": {
+  "status": "excluded",
+  "reason": "server plumbing, not a game system"
+ },
+ "system:config/trant_growth_enabled": {
+  "checklist": "trants"
+ },
+ "system:config/trant_growth_multiplier": {
+  "checklist": "trants"
+ },
+ "system:config/greeting_enabled": {
+  "status": "lost",
+  "reason": "greeters were volunteer players meeting newcomers"
+ },
+ "system:config/greeting_locations": {
+  "status": "lost",
+  "reason": "greeters were volunteer players meeting newcomers"
+ },
+ "system:config/greeter_group": {
+  "status": "lost",
+  "reason": "greeters were volunteer players meeting newcomers"
+ },
+ "system:config/hell": {
+  "checklist": "hell"
+ },
+ "system:config/default_location": {
+  "checklist": "streets"
+ },
+ "system:config/verb_radius": {
+  "checklist": "streets"
+ },
+ "system:config/force_intro": {
+  "checklist": "newxp"
+ },
+ "system:config/newxp_exits": {
+  "checklist": "newxp"
+ },
+ "system:config/newxp_locations": {
+  "checklist": "newxp"
+ },
+ "system:config/max_groups": {
+  "checklist": "chat"
+ },
+ "system:config/max_party_size": {
+  "checklist": "chat"
+ },
+ "system:config/buddy_limit": {
+  "checklist": "chat"
+ },
+ "system:config/live_help_groups": {
+  "checklist": "chat"
+ },
+ "system:config/newbie_live_help_groups": {
+  "checklist": "chat"
+ },
+ "system:config/global_chat_groups": {
+  "checklist": "chat"
+ },
+ "system:config/trade_chat_groups": {
+  "checklist": "chat"
+ },
+ "system:config/garden_water_threshold": {
+  "checklist": "gardens"
+ },
+ "system:config/garden_grow_multiplier": {
+  "checklist": "gardens"
+ },
+ "system:config/auction_delivery_time": {
+  "checklist": "auctions"
+ },
+ "system:config/mail_delivery_time": {
+  "checklist": "mail"
+ },
+ "system:config/mail_delivery_time_with_attachment": {
+  "checklist": "mail"
+ },
+ "system:config/acl_keys_per_house_limit": {
+  "status": "lost",
+  "reason": "house keys handed to other players"
+ },
+ "system:config/acl_keys_per_player_limit": {
+  "status": "lost",
+  "reason": "house keys handed to other players"
+ },
+ "system:config/skill_points_per_second": {
+  "checklist": "skills"
+ },
+ "system:config/skill_learning_modifier_step": {
+  "checklist": "skills"
+ },
+ "system:config/level_limit": {
+  "checklist": "skills"
+ },
+ "system:config/emblem_favor_cost": {
+  "checklist": "shrines"
+ },
+ "system:config/emblem_favor_increment": {
+  "checklist": "shrines"
+ },
+ "system:config/daily_quoin_limit": {
+  "checklist": "quoins"
+ },
+ "system:config/rook_attack_strength": {
+  "checklist": "rooks"
+ },
+ "system:config/rook_attack_tracker": {
+  "checklist": "rooks"
+ },
+ "system:config/food_energy_limit": {
+  "checklist": "levels"
+ },
+ "system:config/transit_instances": {
+  "checklist": "subway"
+ },
+ "system:config/multiplayer_quest_locations": {
+  "checklist": "races"
+ },
+ "system:config/secret_spots": {
+  "checklist": "secrets"
+ },
+ "system:config/public_hubs": {
+  "checklist": "map"
+ },
+ "system:config/hubs": {
+  "checklist": "map"
+ },
+ "system:config/regions": {
+  "checklist": "map"
+ },
+ "system:config/population_controls": {
+  "checklist": "ecology"
+ },
+ "system:config/shared_instances": {
+  "checklist": "quest-rooms"
+ },
+ "system:config/public_machine_rooms": {
+  "checklist": "machines"
+ },
+ "system:config/machine_rooms": {
+  "checklist": "machines"
+ },
+ "system:config/party_spaces": {
+  "checklist": "parties"
+ },
+ "system:config/paradise_locations": {
+  "checklist": "paradise"
+ },
+ "system:config/recipe_xp_caps": {
+  "checklist": "cooking"
+ },
+ "system:config/portal_group": {
+  "status": "unknown",
+  "reason": "group object for portals; use not traced"
+ },
+ "system:config/teleportation_ok_streets": {
+  "checklist": "meditation"
+ },
+ "system:config/enable_all_the_feats": {
+  "checklist": "feats"
+ },
+ "system:config/hi_variants_tracker": {
+  "status": "lost",
+  "reason": "the viral Hi emote spread between players"
+ },
+ "system:config/feature_hi_viral": {
+  "status": "lost",
+  "reason": "the viral Hi emote spread between players"
+ },
+ "system:config/feature_hi_records": {
+  "checklist": "homes"
+ },
+ "system:config/feature_report_hi_records": {
+  "checklist": "homes"
+ },
+ "system:locations/inc_acl_keys": {
+  "status": "lost",
+  "reason": "house keys for other players"
+ },
+ "system:locations/inc_admin": {
+  "status": "excluded",
+  "reason": "admin/demo/editor tooling"
+ },
+ "system:locations/inc_demo": {
+  "status": "excluded",
+  "reason": "admin/demo/editor tooling"
+ },
+ "system:locations/inc_geo_edit": {
+  "status": "excluded",
+  "reason": "admin/demo/editor tooling"
+ },
+ "system:locations/inc_cultivation": {
+  "checklist": "homes"
+ },
+ "system:locations/inc_homes": {
+  "checklist": "homes"
+ },
+ "system:locations/inc_pols": {
+  "checklist": "homes"
+ },
+ "system:locations/inc_pols_write": {
+  "checklist": "homes"
+ },
+ "system:locations/inc_geo_builder": {
+  "checklist": "homes"
+ },
+ "system:locations/inc_events": {
+  "checklist": "street-events"
+ },
+ "system:locations/inc_eventscript": {
+  "checklist": "street-events"
+ },
+ "system:locations/inc_geo": {
+  "checklist": "streets"
+ },
+ "system:locations/inc_geo_textures": {
+  "checklist": "streets"
+ },
+ "system:locations/inc_geo_links": {
+  "checklist": "navigation"
+ },
+ "system:locations/inc_locked_doors": {
+  "checklist": "navigation"
+ },
+ "system:locations/inc_instances": {
+  "checklist": "quest-rooms"
+ },
+ "system:locations/inc_jobs": {
+  "checklist": "street-jobs"
+ },
+ "system:locations/inc_upgrades": {
+  "checklist": "street-jobs"
+ },
+ "system:locations/inc_newxp": {
+  "checklist": "newxp"
+ },
+ "system:locations/inc_npcs": {
+  "checklist": "ecology"
+ },
+ "system:locations/inc_quests": {
+  "checklist": "quests"
+ },
+ "system:locations/inc_skillquest": {
+  "checklist": "quests"
+ },
+ "system:locations/inc_race": {
+  "checklist": "races"
+ },
+ "system:locations/inc_regions": {
+  "checklist": "map"
+ },
+ "system:locations/inc_routing": {
+  "checklist": "map"
+ },
+ "system:locations/inc_rook": {
+  "checklist": "rooks"
+ },
+ "system:locations/inc_smuggling": {
+  "checklist": "smuggling"
+ },
+ "system:locations/inc_transit": {
+  "checklist": "subway"
+ },
+ "system:players/inc_achievements": {
+  "checklist": "badges"
+ },
+ "system:players/inc_counters": {
+  "checklist": "badges"
+ },
+ "system:players/inc_acl_keys": {
+  "status": "lost",
+  "reason": "house keys for other players"
+ },
+ "system:players/inc_houses_keys": {
+  "status": "lost",
+  "reason": "house keys for other players"
+ },
+ "system:players/inc_admin": {
+  "status": "excluded",
+  "reason": "admin, demo, tests or web profile"
+ },
+ "system:players/inc_demo": {
+  "status": "excluded",
+  "reason": "admin, demo, tests or web profile"
+ },
+ "system:players/inc_tests": {
+  "status": "excluded",
+  "reason": "admin, demo, tests or web profile"
+ },
+ "system:players/inc_profile": {
+  "status": "excluded",
+  "reason": "admin, demo, tests or web profile"
+ },
+ "system:players/inc_announcements": {
+  "status": "excluded",
+  "reason": "client message plumbing (the remake has its own toasts and activity feed)"
+ },
+ "system:players/inc_prompts": {
+  "status": "excluded",
+  "reason": "client message plumbing (the remake has its own toasts and activity feed)"
+ },
+ "system:players/inc_activity": {
+  "status": "excluded",
+  "reason": "client message plumbing (the remake has its own toasts and activity feed)"
+ },
+ "system:players/inc_auctions": {
+  "checklist": "auctions"
+ },
+ "system:players/inc_trading": {
+  "checklist": "auctions"
+ },
+ "system:players/inc_avatar": {
+  "checklist": "avatar"
+ },
+ "system:players/inc_buddies": {
+  "checklist": "chat"
+ },
+ "system:players/inc_groups": {
+  "checklist": "chat"
+ },
+ "system:players/inc_organizations": {
+  "checklist": "chat"
+ },
+ "system:players/inc_party": {
+  "checklist": "chat"
+ },
+ "system:players/inc_buffs": {
+  "status": "source",
+  "reason": "js/buffs.js applies the official buff catalog (no checklist row: add one)"
+ },
+ "system:players/inc_butler": {
+  "status": "source",
+  "reason": "js/butler.js + features/butler-feature.js (no checklist row: add one)"
+ },
+ "system:players/inc_items": {
+  "status": "source",
+  "reason": "js/inventory.js pack, js/world-items.js (no checklist row: add one)"
+ },
+ "system:players/inc_conversations": {
+  "checklist": "quests"
+ },
+ "system:players/inc_daily_history": {
+  "checklist": "levels"
+ },
+ "system:players/inc_metabolics": {
+  "checklist": "levels"
+ },
+ "system:players/inc_rewards": {
+  "checklist": "levels"
+ },
+ "system:players/inc_stats": {
+  "checklist": "levels"
+ },
+ "system:players/inc_eleven_secrets": {
+  "checklist": "secrets"
+ },
+ "system:players/inc_emotes": {
+  "status": "solo",
+  "reason": "hug/high-five/kiss/moon on rival Glitches (game.js players_hugged etc.); no checklist row"
+ },
+ "system:players/inc_familiar": {
+  "checklist": "newxp"
+ },
+ "system:players/inc_feats": {
+  "checklist": "feats"
+ },
+ "system:players/inc_furniture": {
+  "checklist": "homes"
+ },
+ "system:players/inc_houses": {
+  "checklist": "homes"
+ },
+ "system:players/inc_games": {
+  "checklist": "races"
+ },
+ "system:players/inc_imagination": {
+  "checklist": "imagination"
+ },
+ "system:players/inc_instances": {
+  "checklist": "quest-rooms"
+ },
+ "system:players/inc_jobs": {
+  "checklist": "street-jobs"
+ },
+ "system:players/inc_mail": {
+  "checklist": "mail"
+ },
+ "system:players/inc_making": {
+  "checklist": "cooking"
+ },
+ "system:players/inc_newxp": {
+  "checklist": "newxp"
+ },
+ "system:players/inc_physics": {
+  "checklist": "physics"
+ },
+ "system:players/inc_quests": {
+  "checklist": "quests"
+ },
+ "system:players/inc_skill_packages": {
+  "checklist": "skills"
+ },
+ "system:players/inc_skills": {
+  "checklist": "skills"
+ },
+ "system:players/inc_stores": {
+  "checklist": "vendors"
+ },
+ "system:players/inc_teleportation": {
+  "checklist": "meditation"
+ },
+ "system:players/inc_towers": {
+  "checklist": "tower"
+ },
+ "system:players/inc_trophies": {
+  "checklist": "collectibles"
+ },
+ "system:players/inc_visiting": {
+  "checklist": "neighbours"
+ },
+ "system:players/inc_world_events": {
+  "checklist": "seasons"
+ },
+ "system:players/inc_requests": {
+  "status": "lost",
+  "reason": "requests between players (trade, invites)"
+ },
+ "system:players/inc_special_locations": {
+  "status": "partial",
+  "reason": "Baqala/Savanna Ancestral Lands timer: the remake has no 10-minute limit by design (G39)"
+ },
+ "system:items/include/animal_naming": {
+  "checklist": "piggies"
+ },
+ "system:items/include/animal_sadness": {
+  "checklist": "piggies"
+ },
+ "system:items/include/loneliness": {
+  "checklist": "piggies"
+ },
+ "system:items/include/butler_convos": {
+  "status": "source",
+  "reason": "js/butler.js (no checklist row)"
+ },
+ "system:items/include/butler_data": {
+  "status": "source",
+  "reason": "js/butler.js (no checklist row)"
+ },
+ "system:items/include/butler_emotes": {
+  "status": "source",
+  "reason": "js/butler.js (no checklist row)"
+ },
+ "system:items/include/butler_hints": {
+  "status": "source",
+  "reason": "js/butler.js (no checklist row)"
+ },
+ "system:items/include/butler_responses": {
+  "status": "source",
+  "reason": "js/butler.js (no checklist row)"
+ },
+ "system:items/include/butler_strings": {
+  "status": "source",
+  "reason": "js/butler.js (no checklist row)"
+ },
+ "system:items/include/eliza": {
+  "status": "source",
+  "reason": "js/butler.js (no checklist row)"
+ },
+ "system:items/include/elizadata": {
+  "status": "source",
+  "reason": "js/butler.js (no checklist row)"
+ },
+ "system:items/include/cultivation": {
+  "checklist": "homes"
+ },
+ "system:items/include/furniture": {
+  "checklist": "homes"
+ },
+ "system:items/include/drink": {
+  "checklist": "cooking"
+ },
+ "system:items/include/food": {
+  "checklist": "cooking"
+ },
+ "system:items/include/events": {
+  "checklist": "street-events"
+ },
+ "system:items/include/garden": {
+  "checklist": "gardens"
+ },
+ "system:items/include/master_garden": {
+  "checklist": "gardens"
+ },
+ "system:items/include/glitchmas_2011": {
+  "checklist": "seasons"
+ },
+ "system:items/include/icon": {
+  "checklist": "icons"
+ },
+ "system:items/include/jobs": {
+  "checklist": "street-jobs"
+ },
+ "system:items/include/mining": {
+  "checklist": "mining"
+ },
+ "system:items/include/npc_ai": {
+  "checklist": "ecology"
+ },
+ "system:items/include/npc_conversation": {
+  "checklist": "quests"
+ },
+ "system:items/include/npc_quests": {
+  "checklist": "quests"
+ },
+ "system:items/include/rook": {
+  "checklist": "rooks"
+ },
+ "system:items/include/scraping": {
+  "checklist": "resources"
+ },
+ "system:items/include/shrines": {
+  "checklist": "shrines"
+ },
+ "system:items/include/street_spirits": {
+  "checklist": "vendors"
+ },
+ "system:items/include/takeable": {
+  "status": "source",
+  "reason": "js/inventory.js pick up / drop / give (give is to NPCs only)"
+ },
+ "system:items/include/trants": {
+  "checklist": "trants"
+ },
+ "counter:players_traded": {
+  "status": "lost",
+  "reason": "trading needs other players"
+ },
+ "counter:items_given": {
+  "status": "lost",
+  "reason": "giving items to other players"
+ },
+ "counter:hi_variants": {
+  "status": "lost",
+  "reason": "the viral Hi emote spread between players"
+ },
+ "counter:players_splanked": {
+  "status": "lost",
+  "reason": "splanking other players"
+ },
+ "counter:glitch_train": {
+  "status": "lost",
+  "reason": "the Glitch train needs other players"
+ },
+ "counter:player_streets_visited": {
+  "status": "lost",
+  "reason": "visiting other players' home streets"
+ },
+ "counter:teleportation_self_withfollowers": {
+  "status": "lost",
+  "reason": "teleporting with followers (other players)"
+ },
+ "counter:teleportation_self_withfollowers_5": {
+  "status": "lost",
+  "reason": "teleporting with followers (other players)"
+ },
+ "counter:teleportation_self_withfollowers_11": {
+  "status": "lost",
+  "reason": "teleporting with followers (other players)"
+ },
+ "counter:attended_party": {
+  "status": "lost",
+  "reason": "attending another player's party"
+ },
+ "counter:player:buddies_count": {
+  "status": "lost",
+  "reason": "buddies are other players"
+ },
+ "counter:hosted_party": {
+  "status": "lost",
+  "reason": "counts guests at a party you host"
+ },
+ "item:quoin": {
+  "status": "source",
+  "reason": "js/quoins.js spawns the eight quoin types on every street (game.js spawnQuoins); the scan sees no class literal for the base quoin"
+ }
+}

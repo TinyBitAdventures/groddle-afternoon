@@ -7,6 +7,9 @@
  *
  *   node tools/coverage.mjs          table
  *   node tools/coverage.mjs --json   machine-readable (for round logs)
+ *
+ * When the inventory DB exists (node tools/inventory/build.mjs), it also prints one
+ * reachable / total line per inventory kind.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -55,14 +58,49 @@ const measures = [
   ['Wardrobe articles wearable', wardrobe, WARDROBE_SWFS, `${wardrobe - reimaginedWardrobe} + ${reimaginedWardrobe} reimagined (greyscale masters, borrowed colours); bracelets have no container`],
 ];
 
+/**
+ * Per-kind lines from the restoration inventory (tools/inventory/build.mjs), when its DB exists:
+ * reachable / total, with the missing, unknown and unbuilt-in-the-original counts.
+ */
+async function inventoryLines() {
+  const path = process.env.INVENTORY_DB || join(homedir(), 'Documents/glitch-audit/research/coverage/inventory.sqlite');
+  if (!existsSync(path)) return null;
+  try {
+    const { DatabaseSync } = await import('node:sqlite');
+    const db = new DatabaseSync(path, { readOnly: true });
+    const rows = db.prepare('SELECT kind, status, COUNT(*) AS n FROM entities GROUP BY kind, status').all();
+    const built = db.prepare('SELECT at, "commit" FROM builds ORDER BY at DESC LIMIT 1').get();
+    db.close();
+    const by = {};
+    for (const r of rows) {
+      const k = (by[r.kind] ||= { kind: r.kind, total: 0, reachable: 0, missing: 0, unknown: 0, unbuilt: 0 });
+      k.total += r.n;
+      if (['source', 'rebuilt', 'solo', 'reimagined'].includes(r.status)) k.reachable += r.n;
+      if (r.status === 'missing') k.missing += r.n;
+      if (r.status === 'unknown') k.unknown += r.n;
+      if (r.status === 'unbuilt_original') k.unbuilt += r.n;
+    }
+    return { builtAt: built?.at || '', commit: built?.commit || '', kinds: Object.values(by) };
+  } catch {
+    return null;
+  }
+}
+
+const inventory = await inventoryLines();
 const reg = registerCounts();
 if (process.argv.includes('--json')) {
-  console.log(JSON.stringify({ generatedAt: data.generatedAt, measures: measures.map(([name, have, of, note]) => ({ name, have, of, note })), register: reg }, null, 2));
+  console.log(JSON.stringify({ generatedAt: data.generatedAt, measures: measures.map(([name, have, of, note]) => ({ name, have, of, note })), register: reg, inventory }, null, 2));
 } else {
   const pct = (a, b) => (b ? `${((a / b) * 100).toFixed(1)}%` : '');
   console.log(`Restoration scorecard (data.json ${data.generatedAt || '?'})\n`);
   for (const [name, have, of, note] of measures) {
     console.log(`${name.padEnd(36)} ${String(have).padStart(5)} / ${String(of).padEnd(5)} ${pct(have, of).padStart(6)}  ${note}`);
+  }
+  if (inventory) {
+    console.log(`\nInventory (tools/inventory/build.mjs, built ${inventory.builtAt.slice(0, 16)} at ${inventory.commit || '?'}): reachable / total`);
+    for (const k of inventory.kinds.sort((a, b) => a.kind.localeCompare(b.kind))) {
+      console.log(`  ${k.kind.padEnd(34)} ${String(k.reachable).padStart(5)} / ${String(k.total).padEnd(5)} ${pct(k.reachable, k.total).padStart(6)}  ${k.missing} missing, ${k.unknown} unknown, ${k.unbuilt} unbuilt in the original`);
+    }
   }
   if (reg) console.log(`\nGap register: ${reg.total} gaps (${Object.entries(reg.by).map(([k, v]) => `${v} ${k}`).join(', ')})`);
   else console.log(`\nGap register not found at ${REGISTER}`);
