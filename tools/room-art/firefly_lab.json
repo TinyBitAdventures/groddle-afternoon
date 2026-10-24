@@ -1,0 +1,719 @@
+{
+ "source": "tinyspeck/glitch-locations starter.swf (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "arrow_ground": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    113.4,
+    22.85
+   ],
+   "px": [
+    227,
+    46
+   ],
+   "file": "arrow_ground@2x.webp",
+   "swf": "bundle:starter.swf#arrow_ground",
+   "swf_sha": "9f4417753a941d92",
+   "key": "9f4417753a941d92:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    227,
+    46
+   ],
+   "world": [
+    114,
+    23
+   ],
+   "bytes": 3712,
+   "lossless": false,
+   "err": 2.48,
+   "sha": "f9968f4b592d3e6d"
+  },
+  "arrow_ground2": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    121.0,
+    29.0
+   ],
+   "px": [
+    242,
+    58
+   ],
+   "file": "arrow_ground2@2x.webp",
+   "swf": "bundle:starter.swf#arrow_ground2",
+   "swf_sha": "bc1421b7b75e297e",
+   "key": "bc1421b7b75e297e:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    242,
+    58
+   ],
+   "world": [
+    121,
+    29
+   ],
+   "bytes": 3962,
+   "lossless": true,
+   "err": 6.16,
+   "sha": "e96466b60f27c3cc"
+  },
+  "cloud_close": {
+   "scale": 1,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    329.0,
+    165.6
+   ],
+   "px": [
+    494,
+    248
+   ],
+   "file": "cloud_close@1.5x.webp",
+   "swf": "bundle:starter.swf#cloud_close",
+   "swf_sha": "7b37db4320821aad",
+   "key": "7b37db4320821aad:1:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    494,
+    248
+   ],
+   "world": [
+    329,
+    165
+   ],
+   "bytes": 8408,
+   "lossless": false,
+   "err": 1.33,
+   "sha": "e0d84d58ddefad4a"
+  },
+  "cloud_distant": {
+   "scale": 1,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    270.5,
+    176.0
+   ],
+   "px": [
+    406,
+    264
+   ],
+   "file": "cloud_distant@1.5x.webp",
+   "swf": "bundle:starter.swf#cloud_distant",
+   "swf_sha": "0425838676ceffd0",
+   "key": "0425838676ceffd0:1:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    406,
+    264
+   ],
+   "world": [
+    271,
+    176
+   ],
+   "bytes": 7556,
+   "lossless": false,
+   "err": 1.78,
+   "sha": "1c2d786d1732916f"
+  },
+  "cloud_small1": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    46.55,
+    24.9
+   ],
+   "px": [
+    93,
+    50
+   ],
+   "file": "cloud_small1@2x.webp",
+   "swf": "bundle:starter.swf#cloud_small1",
+   "swf_sha": "ca927958ff7353f3",
+   "key": "ca927958ff7353f3:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    93,
+    50
+   ],
+   "world": [
+    47,
+    25
+   ],
+   "bytes": 1168,
+   "lossless": false,
+   "err": 2.37,
+   "sha": "c31f4dad35e47948"
+  },
+  "cloud_small2": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    39.05,
+    25.75
+   ],
+   "px": [
+    78,
+    52
+   ],
+   "file": "cloud_small2@2x.webp",
+   "swf": "bundle:starter.swf#cloud_small2",
+   "swf_sha": "ed80ddc16cfc23ac",
+   "key": "ed80ddc16cfc23ac:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    78,
+    52
+   ],
+   "world": [
+    39,
+    26
+   ],
+   "bytes": 1134,
+   "lossless": false,
+   "err": 2.49,
+   "sha": "4de80a01a026c0a9"
+  },
+  "crack": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    39.0,
+    154.7
+   ],
+   "px": [
+    78,
+    309
+   ],
+   "file": "crack@2x.webp",
+   "swf": "bundle:starter.swf#crack",
+   "swf_sha": "d5933c002af13d78",
+   "key": "d5933c002af13d78:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    78,
+    309
+   ],
+   "world": [
+    39,
+    155
+   ],
+   "bytes": 4758,
+   "lossless": false,
+   "err": 3.4,
+   "sha": "d821ba44b13819e2"
+  },
+  "doorway1": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    238.65,
+    301.2
+   ],
+   "px": [
+    477,
+    602
+   ],
+   "file": "doorway1@2x.webp",
+   "swf": "bundle:starter.swf#doorway1",
+   "swf_sha": "7beb6898f9664f2b",
+   "key": "7beb6898f9664f2b:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    477,
+    602
+   ],
+   "world": [
+    239,
+    301
+   ],
+   "bytes": 12620,
+   "lossless": false,
+   "err": 1.27,
+   "sha": "989aa8c7c8b771d8"
+  },
+  "flyer": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    53.85,
+    69.65
+   ],
+   "px": [
+    108,
+    139
+   ],
+   "file": "flyer@2x.webp",
+   "swf": "bundle:starter.swf#flyer",
+   "swf_sha": "a273fca1edbce212",
+   "key": "a273fca1edbce212:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    108,
+    139
+   ],
+   "world": [
+    54,
+    70
+   ],
+   "bytes": 3002,
+   "lossless": false,
+   "err": 3.89,
+   "sha": "851d65a50be257a3"
+  },
+  "frame_cutout": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    438.9,
+    295.3
+   ],
+   "px": [
+    878,
+    591
+   ],
+   "file": "frame_cutout@2x.webp",
+   "swf": "bundle:starter.swf#frame_cutout",
+   "swf_sha": "5f1b97752f840f95",
+   "key": "5f1b97752f840f95:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    878,
+    591
+   ],
+   "world": [
+    439,
+    296
+   ],
+   "bytes": 13796,
+   "lossless": false,
+   "err": 2.03,
+   "sha": "96d0aa78f8948ab7"
+  },
+  "graffiti_hell": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    33.75,
+    40.0
+   ],
+   "px": [
+    68,
+    80
+   ],
+   "file": "graffiti_hell@2x.webp",
+   "swf": "bundle:starter.swf#graffiti_hell",
+   "swf_sha": "40518896575cb8e3",
+   "key": "40518896575cb8e3:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    68,
+    80
+   ],
+   "world": [
+    34,
+    40
+   ],
+   "bytes": 4718,
+   "lossless": true,
+   "err": 5.26,
+   "sha": "e7626728d51a443b"
+  },
+  "graffiti_tii_saves": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    144.8,
+    106.6
+   ],
+   "px": [
+    290,
+    213
+   ],
+   "file": "graffiti_tii_saves@2x.webp",
+   "swf": "bundle:starter.swf#graffiti_tii_saves",
+   "swf_sha": "0d394b7f74035ece",
+   "key": "0d394b7f74035ece:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    290,
+    213
+   ],
+   "world": [
+    145,
+    107
+   ],
+   "bytes": 13320,
+   "lossless": false,
+   "err": 2.08,
+   "sha": "bda9c3a5e16ee3a2"
+  },
+  "ground_slice": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    795.0,
+    135.5
+   ],
+   "px": [
+    1590,
+    271
+   ],
+   "file": "ground_slice@2x.webp",
+   "swf": "bundle:starter.swf#ground_slice",
+   "swf_sha": "385d8d8ed42d6b9f",
+   "key": "385d8d8ed42d6b9f:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    1590,
+    271
+   ],
+   "world": [
+    795,
+    136
+   ],
+   "bytes": 12254,
+   "lossless": false,
+   "err": 2.34,
+   "sha": "d6e2595411857422"
+  },
+  "pillar": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    175.55,
+    503.65
+   ],
+   "px": [
+    351,
+    1007
+   ],
+   "file": "pillar@2x.webp",
+   "swf": "bundle:starter.swf#pillar",
+   "swf_sha": "91d9eeace876a8ec",
+   "key": "91d9eeace876a8ec:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    351,
+    1007
+   ],
+   "world": [
+    176,
+    504
+   ],
+   "bytes": 6788,
+   "lossless": false,
+   "err": 1.38,
+   "sha": "d27ed6fdc021b60e"
+  },
+  "platform": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    775.5,
+    84.0
+   ],
+   "px": [
+    1551,
+    168
+   ],
+   "file": "platform@2x.webp",
+   "swf": "bundle:starter.swf#platform",
+   "swf_sha": "4c642e9385d156fe",
+   "key": "4c642e9385d156fe:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    1551,
+    168
+   ],
+   "world": [
+    776,
+    84
+   ],
+   "bytes": 15136,
+   "lossless": false,
+   "err": 2.27,
+   "sha": "dfae5f0eca48fc94"
+  },
+  "poster_alph": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    422.75,
+    248.3
+   ],
+   "px": [
+    846,
+    497
+   ],
+   "file": "poster_alph@2x.webp",
+   "swf": "bundle:starter.swf#poster_alph",
+   "swf_sha": "5a4975394fc349df",
+   "key": "5a4975394fc349df:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    846,
+    497
+   ],
+   "world": [
+    423,
+    249
+   ],
+   "bytes": 74002,
+   "lossless": false,
+   "err": 3.77,
+   "sha": "b57d0028018c20df"
+  },
+  "silhouette1": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    205.15,
+    128.0
+   ],
+   "px": [
+    410,
+    256
+   ],
+   "file": "silhouette1@2x.webp",
+   "swf": "bundle:starter.swf#silhouette1",
+   "swf_sha": "fd400028162a5fe6",
+   "key": "fd400028162a5fe6:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    410,
+    256
+   ],
+   "world": [
+    205,
+    128
+   ],
+   "bytes": 2830,
+   "lossless": false,
+   "err": 1.35,
+   "sha": "72eff11da92cf0d4"
+  },
+  "silhouette2": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    112.35,
+    155.65
+   ],
+   "px": [
+    225,
+    311
+   ],
+   "file": "silhouette2@2x.webp",
+   "swf": "bundle:starter.swf#silhouette2",
+   "swf_sha": "d858beeee540a7ed",
+   "key": "d858beeee540a7ed:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    225,
+    311
+   ],
+   "world": [
+    113,
+    156
+   ],
+   "bytes": 7594,
+   "lossless": false,
+   "err": 2.02,
+   "sha": "cfe3f3e078f2a568"
+  },
+  "silhouette3": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    59.05,
+    65.1
+   ],
+   "px": [
+    118,
+    130
+   ],
+   "file": "silhouette3@2x.webp",
+   "swf": "bundle:starter.swf#silhouette3",
+   "swf_sha": "020cbbd9d70b3829",
+   "key": "020cbbd9d70b3829:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    118,
+    130
+   ],
+   "world": [
+    59,
+    65
+   ],
+   "bytes": 1994,
+   "lossless": false,
+   "err": 2.12,
+   "sha": "f7a98db00d344855"
+  },
+  "torn_poster_1": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    122.95,
+    172.0
+   ],
+   "px": [
+    246,
+    344
+   ],
+   "file": "torn_poster_1@2x.webp",
+   "swf": "bundle:starter.swf#torn_poster_1",
+   "swf_sha": "d6c3054893c19cb4",
+   "key": "d6c3054893c19cb4:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    246,
+    344
+   ],
+   "world": [
+    123,
+    172
+   ],
+   "bytes": 41112,
+   "lossless": true,
+   "err": 4.71,
+   "sha": "d2aeceabd1e68530"
+  },
+  "wall": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    686.8,
+    346.0
+   ],
+   "px": [
+    1374,
+    692
+   ],
+   "file": "wall@2x.webp",
+   "swf": "bundle:starter.swf#wall",
+   "swf_sha": "865dd1281770fb30",
+   "key": "865dd1281770fb30:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    1374,
+    692
+   ],
+   "world": [
+    687,
+    346
+   ],
+   "bytes": 5146,
+   "lossless": false,
+   "err": 1.06,
+   "sha": "a8940aae460bb086"
+  },
+  "wall_seam_separated_01a_starter": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    180.0,
+    373.2
+   ],
+   "px": [
+    360,
+    746
+   ],
+   "file": "wall_seam_separated_01a_starter@2x.webp",
+   "swf": "bundle:starter.swf#wall_seam_separated_01a_starter",
+   "swf_sha": "af6ee4a7359dcb21",
+   "key": "af6ee4a7359dcb21:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    360,
+    746
+   ],
+   "world": [
+    180,
+    373
+   ],
+   "bytes": 4696,
+   "lossless": false,
+   "err": 1.63,
+   "sha": "a8e67f50d385098d"
+  },
+  "wall_small": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    109.8,
+    346.0
+   ],
+   "px": [
+    220,
+    692
+   ],
+   "file": "wall_small@2x.webp",
+   "swf": "bundle:starter.swf#wall_small",
+   "swf_sha": "8f6c5b3e6e284dcf",
+   "key": "8f6c5b3e6e284dcf:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    220,
+    692
+   ],
+   "world": [
+    110,
+    346
+   ],
+   "bytes": 850,
+   "lossless": false,
+   "err": 0.97,
+   "sha": "5cf338358114742a"
+  },
+  "window_cutout": {
+   "scale": 1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    156.8,
+    346.0
+   ],
+   "px": [
+    314,
+    692
+   ],
+   "file": "window_cutout@2x.webp",
+   "swf": "bundle:starter.swf#window_cutout",
+   "swf_sha": "939c1dd9547baa43",
+   "key": "939c1dd9547baa43:1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    314,
+    692
+   ],
+   "world": [
+    157,
+    346
+   ],
+   "bytes": 7072,
+   "lossless": false,
+   "err": 0.91,
+   "sha": "cbdfc671107a032a"
+  }
+ }
+}

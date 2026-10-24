@@ -371,6 +371,48 @@ SETS = {
             'symbol9': (3.2, 1, 0),
         },
     },
+    # G113: the Fireflex 3000 Lab (template LM113UBSS8P18ET, lost) is dressed from starter.swf, the street
+    # bundle that holds the lab's own pieces: the wall run (wall with its "G2" and cyan seam, plain
+    # wall_small, window_cutout with the sky decos behind its glass), the deck (platform) over its lit
+    # front edge (ground_slice), the entry doorway (doorway1), the white pillar, the Church of Alph poster
+    # (poster_alph in frame_cutout), the graffiti (graffiti_tii_saves: it reads "Tii Saves"; graffiti_hell, the
+    # red scrawl low on the wall by the first G2), the peeled
+    # poster (torn_poster_1), hanging cables (crack), pinned notes (flyer) and the floor arrows. Video
+    # 2Z76dO4DlJ4 (reference only) shows them at their stage size against the layout's 2.21 world px per
+    # video px (the graffiti ~148 world px wide, the poster frame ~427, the pillar shaft ~90), so all are
+    # drawn at world scale 1. js/quest-rooms/firefly-whistle-scene.js lays them out.
+    'firefly_lab': {
+        'bundle': 'starter.swf',
+        'out': 'assets/sprites/quest-rooms/firefly_lab',
+        'js': 'js/quest-rooms/firefly-lab-art.js',
+        'export': 'FIREFLY_LAB_FILES',
+        'pieces': {
+            'wall': (1, 2, 0),
+            'wall_small': (1, 2, 0),
+            'window_cutout': (1, 2, 0),
+            'wall_seam_separated_01a_starter': (1, 2, 0),
+            'platform': (1, 2, 0),
+            'ground_slice': (1, 2, 0),
+            'doorway1': (1, 2, 0),
+            'pillar': (1, 2, 0),
+            'frame_cutout': (1, 2, 0),
+            'poster_alph': (1, 2, 0),
+            'graffiti_tii_saves': (1, 2, 0),
+            'graffiti_hell': (1, 2, 0),
+            'torn_poster_1': (1, 2, 0),
+            'crack': (1, 2, 0),
+            'flyer': (1, 2, 0),
+            'arrow_ground': (1, 2, 0),
+            'arrow_ground2': (1, 2, 0),
+            'silhouette1': (1, 2, 0),
+            'silhouette2': (1, 2, 0),
+            'silhouette3': (1, 2, 0),
+            'cloud_close': (1, 1.5, 0),
+            'cloud_distant': (1, 1.5, 0),
+            'cloud_small1': (1, 2, 0),
+            'cloud_small2': (1, 2, 0),
+        },
+    },
 }
 
 

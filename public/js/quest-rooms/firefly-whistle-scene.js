@@ -4,44 +4,48 @@
  * Source: the quest's instance comes from template LM113UBSS8P18ET ("Fireflex
  * 3000 Lab", hub 61 Simple Level Quests in inc_data_maps_prod.js; dev copy
  * LHH11C4QUBP1DQD). Neither is in the public locations dump, so the geometry
- * and deco list are lost. What the code fixes: you arrive at -2967, -283, and
- * the teleporter's beam overlay (items/teleporter_button.js) stands at x 990
- * with its foot at y -130 (location_overlay registration is centre_bottom),
- * 275 x 530: exactly Teleporter_Base / Teleporter_Beam at half scale, as Le
- * Misérable places them. In Snap PIFISEG38S535GC_56214 the pad's foot sits
+ * and the placements are lost. What the code fixes: you arrive at -2967, -283,
+ * and the teleporter's beam overlay (items/teleporter_button.js) stands at x
+ * 990 with its foot at y -130 (location_overlay registration is centre_bottom),
+ * 275 x 530: exactly Teleporter_Base / Teleporter_Beam at their stage size, as
+ * Le Misérable places them. In Snap PIFISEG38S535GC_56214 the pad's foot sits
  * about 8 Snap px (12 world px) below the avatar's feet, so the floor here is
- * taken as y -142. Heights of everything else are read off the Snaps the same
- * way, against the avatar's feet and the deck's back edge.
+ * taken as y -142.
  *
  * Look, from three player Snaps of this very street (research/wayback/raw/
- * snaps/fireflex_lab/, reference only, never shipped): a bright off-white
- * corridor with a blue-grey band along the wall, a pale deck, a hazard-striped
- * front edge over a row of cyan floor lights and a dark underside lit by white
- * tubes; hanging security orbs; egg-shaped phone pods; a framed "Church of
- * Alph" poster ("A Home for Everyone") by a "G2" wall sign, a cloud window and
- * a cyan floor arrow (PIF3L2MLDT53HEF_51819); an egg pod, a white pillar and the
- * whistle stand (PIFISEG38S535GC_56237); a hanging cable, a pinned note, a tall
- * window and the Teleporter Control Unit wired to its pad
- * (PIFISEG38S535GC_56214).
+ * snaps/fireflex_lab/, reference only, never shipped) and video 2Z76dO4DlJ4:
+ * a pale corridor wall with a blue-grey band, a pale deck over a hazard stripe,
+ * a row of cyan lights and a dark underside lit by white tubes; hanging
+ * security orbs; an egg-shaped phone pod; the framed "Church of Alph" poster;
+ * "G2" on the wall; windows; the white pillars; the whistle stand; hanging
+ * cables, pinned notes; the Teleporter Control Unit wired to its pad.
+ *
+ * Art (G113): every piece is a CC0 deco from starter.swf, the street bundle
+ * the lab's pieces live in (tinyspeck/glitch-locations), rendered at its stage
+ * size by tools/room-art/build.py (set firefly_lab, js/quest-rooms/
+ * firefly-lab-art.js): the wall run (wall, which carries the "G2" and a cyan
+ * seam, plain wall_small, window_cutout with silhouette and cloud decos behind
+ * its glass, wall_seam_separated_01a_starter), the deck (platform) over its lit
+ * front edge (ground_slice), the entry (doorway1), pillar, poster_alph inside
+ * frame_cutout, graffiti_tii_saves (it reads "Tii Saves"), graffiti_hell, torn_poster_1,
+ * crack (the hanging cables), flyer (the pinned notes) and the floor arrows
+ * (arrow_ground, arrow_ground2). eggbooth, security_orb and Teleporter_Base
+ * come from the street deco set (assets/decos/groddle). Only the ceiling above
+ * the wall run, which the camera never shows, is a flat fill.
  *
  * Layout, from the whole run on video 2Z76dO4DlJ4 ("Glitch - Getting the
  * firefly whistle", 2012; reference only, its pixels never ship): left to
- * right, the dark entry doorway and its ramp, a pine window, G2, pillar,
- * note, a peeled poster, pillar, a snowy-slope window, G2, the Church of Alph
- * poster, the egg pod, pillar, the stand, pillar, G2, "Tri Saves", cable,
- * note, the control unit, the pad and a last window. One egg pod, four
- * pillars, all in front of the avatar. DRESSING notes each piece's timestamp.
- *
- * CC0 art: eggbooth, security_orb, Teleporter_Base (decos), the
- * Alph emblem (item icon, sepia-tinted for the poster: the Snap's statue art
- * is not CC0). Drawn as clean vectors: the walls, deck, edge, lights, entry,
- * pillars, windows, poster frame, wall signs, graffiti, peeled poster, floor
- * arrow, cables and notes. Short sign words ("G2", "Church of Alph", "A Home
- * for Everyone") are read off Snap PIF3L2MLDT53HEF_51819, "Tri Saves" off the
- * video at t41 (rule: text from player footage).
+ * right, the entry doorway and its ramp, a window, G2, pillar, note, the
+ * peeled poster, pillar, a window, G2, the Church of Alph poster, the egg pod,
+ * pillar, the stand, pillar, G2, the graffiti, cable, note, the control unit,
+ * the pad and a last window. One egg pod, four pillars, all in front of the
+ * avatar. DRESSING notes each piece's timestamp. The wall decos fall into
+ * place on their own: each window sits flush against the next G2 wall, and two
+ * of the G2 walls' own cyan seams land on seams the video shows (-2203, 484).
  */
 
 import { textureFromUrl } from '../textures.js';
+import { FIREFLY_LAB_FILES } from './firefly-lab-art.js';
 
 /**
  * Source bounds. Video 2Z76dO4DlJ4 (reference only) fixes l and r: the camera
@@ -49,7 +53,8 @@ import { textureFromUrl } from '../textures.js';
  * with the window past the pad at the right edge (t103-107). Distances along
  * the corridor are read off its frames at 2.21 world px per video px, the scale
  * that puts the arrival point (-2967) and the beam (990) where the video shows
- * them; that scale also fits the stand, egg pod and orb art at their sizes.
+ * them; at that scale the decos show at their stage size (graffiti ~148 world
+ * px wide, poster frame ~427, pillar shaft ~90).
  */
 export const LAB = Object.freeze({ l: -3000, r: 1270, t: -760, b: 0 });
 export const sx = (x) => x - LAB.l;
@@ -60,41 +65,57 @@ export const H = LAB.b - LAB.t;
 export const FLOOR_Y = -142;
 export const FLOOR = sy(FLOOR_Y);
 /**
- * The entry: you arrive in a dark doorway at the left end, on a ledge about
- * 70 px above the corridor floor, and walk down a curved ramp (video t15-21:
- * the avatar's feet drop ~32 video px while the camera follows it down). The
+ * The entry: you arrive in the doorway at the left end, on a ledge about 70 px
+ * above the corridor floor, and walk down a curved ramp (video t15-21: the
+ * avatar's feet drop ~32 video px while the camera follows it down). The
  * source's arrival y -283 is above the ledge; the remake sets you on it.
  */
 export const ENTRY = Object.freeze({ x1: -3000, ledgeEnd: -2935, rampEnd: -2800, y: FLOOR_Y - 70 });
 
 const DECO = 'assets/decos/groddle/';
-const ICON = 'assets/sprites/icons/';
+const ART = 'assets/sprites/quest-rooms/firefly_lab/';
 
-// Bands, in world px relative to the walking line (from the Snaps, x1.5).
+// Bands, in world px relative to the walking line (from the Snaps and the video).
 const DECK_BACK = FLOOR - 115;
 const DECK_FRONT = FLOOR + 35;
 const STRIPE_B = DECK_FRONT + 18;
-const LIGHTS_B = STRIPE_B + 22;
 const BAND = FLOOR - 192;
 const CEIL = FLOOR - 560;
+/**
+ * The wall run's top: every wall deco (wall, wall_small, window_cutout) is 346
+ * tall with its blue-grey band at rows 246-266, which sits on the band the
+ * video shows (BAND, 3 px of highlight above it). Its foot runs 20 px under
+ * the deck's back edge.
+ */
+const WALL_TOP = BAND - 3 - 246;
+/** window_cutout's glass, in its own px (alpha > 200 rim): x 13-138, y 60-260. */
+const GLASS = Object.freeze({ x0: 13, x1: 138, y0: 60, y1: 260 });
+/** wall: its "G2" spans x 7-63 (centre 35), its own cyan seam runs at x 343. */
+const WALL_G2_X = 35;
+const WALL_SEAM_X = 343;
+/** wall_seam_separated_01a_starter: the seam line at x ~131 of 180. */
+const SEAM_DECO_X = 131;
+/** pillar: the shaft's foot at row 488 of 504 (the rest is soft shadow). */
+const PILLAR_FOOT = 488;
+/** Floor arrows lie on the deck ~25 px behind the walking line (video t26, t41: just behind the avatar's feet). */
+const ARROW_Y = FLOOR - 25;
+/** frame_cutout: its opening spans x 13-418, y 47-280; poster_alph fills it from behind. */
+const FRAME_OPENING = Object.freeze({ x: (13 + 418) / 2, y: (47 + 280) / 2 });
+/**
+ * doorway1: its left edge (room px) and its foot above the walking line. Video t17 puts its lamp
+ * ~157 px in and its foot ~22 px under the avatar's on the ledge; the left edge is pulled to -15 so
+ * the arrival point (33) stands inside the doorway, not on the wall left of it.
+ */
+const DOORWAY = Object.freeze({ left: -15, lift: 48 });
 
 const C = Object.freeze({
-  wall: 0xe8e5df,
-  wallLow: 0xdcd8d0,
-  seam: 0xd2cdc4,
-  band: 0xb4bfc9,
-  bandHi: 0xf6f5f2,
-  deck: 0xeeece7,
-  deckSeam: 0xdfdbd3,
+  wallTop: 0xd9d4c9, // wall/wall_small row 0 (217, 212, 201)
+  deck: 0xe0dbcf, // platform's top (224, 219, 207)
   ceiling: 0xf2f0ec,
   ceilingEdge: 0xcbc6bd,
   cyan: 0x8af1ff,
-  stripe: 0xf0bf4c,
-  stripeDark: 0xb8742a,
-  lightsBand: 0x57534d,
   under: 0x3b3936,
-  tube: 0xf4f7f5,
-  frame: 0xd6d2ca,
+  sky: 0xd8eef8,
 });
 
 /**
@@ -103,16 +124,21 @@ const C = Object.freeze({
  * they are placed where they show with the avatar beside them.
  */
 export const DRESSING = Object.freeze({
-  // t17 a pine-and-hills view, t22 a snowy slope, t93-103 plain glass past the pad.
-  windows: [{ x: -2625, w: 145, view: 'pine' }, { x: -1708, w: 135, view: 'peak' }, { x: 1175, w: 155, view: 'plain' }],
-  // "G2" three times along the wall (t17, t24, t41).
+  // t17 a pine-and-hills view, t22 a big cloud, t93-103 plain glass past the pad (window_cutout, 157 wide).
+  windows: [{ x: -2625, w: 157, view: 'pine' }, { x: -1708, w: 157, view: 'cloud' }, { x: 1175, w: 157, view: 'plain' }],
+  // "G2" three times along the wall (t17, t24, t41): each is the G2 painted on a `wall` deco.
   signs: [{ x: -2512, text: 'G2' }, { x: -1596, text: 'G2' }, { x: 162, text: 'G2' }],
-  // Graffiti between the third G2 and the teleporter (t41, t89-91); short sign words from footage.
-  graffiti: { x: 345, lines: ['Tri', 'Saves'] },
-  // A peeled poster with red-brown streaks between the first two pillars (t21-23).
+  // graffiti_tii_saves between the third G2 and the teleporter (t41, t89-91); it reads "Tii Saves".
+  graffiti: { x: 345, text: 'Tii Saves' },
+  // graffiti_hell, a small red scrawl low on the wall just right of the first G2 (t17, t21).
+  scrawl: { x: -2463, y: FLOOR - 135 },
+  // torn_poster_1, peeled, between the first two pillars (t21-23).
   torn: { x: -2062 },
-  // The cyan floor light left of the poster (t22-26; the arrow of Snap PIF3L2MLDT53HEF_51819).
+  // The cyan floor arrow (arrow_ground2) left of the poster (t22-26; the arrow of Snap PIF3L2MLDT53HEF_51819).
   arrow: { x: -1700 },
+  // More floor arrows on the deck: a cyan one past the entry (t17-21), grey ones (arrow_ground) past
+  // the first pillars (t21) and between the last pillar and the control unit (t41, t89-100).
+  floorArrows: [{ x: -2652, kind: 'cyan' }, { x: -1986, kind: 'grey' }, { x: 265, kind: 'grey' }],
   poster: { x: -1254 },
   eggs: [-847],
   // Four pillars, all in front of the avatar: it walks behind them (t20, t30, t41, t89).
@@ -124,9 +150,12 @@ export const DRESSING = Object.freeze({
     { x: -922, h: 280, s: 0.5 }, { x: -470, h: 275, s: 0.5 }, { x: -145, h: 280, s: 0.5 },
     { x: 197, h: 300, s: 0.7 }, { x: 742, h: 280, s: 0.5 }, { x: 1213, h: 265, s: 0.36 },
   ],
-  // Broken cables hanging from the ceiling, a plug at the end (t17, t36, t91; the "crack" of Snap PIFISEG38S535GC_56214).
+  // Broken cables (crack) hanging from above, a plug at the end (t17, t36, t91); `bottom` is the plug's
+  // height above the walking line.
   cables: [{ x: -2744, bottom: 330 }, { x: -538, bottom: 235 }, { x: 614, bottom: 300 }],
   notes: [{ x: -2298 }, { x: 723 }],
+  // Cyan wall seams. Those on a G2 wall's own seam (-2203, 484) come with that deco; -1660 falls on
+  // the second window's glass (the video's seam there is the window's edge) and is not drawn.
   cyanSeams: [-2203, -1660, -980, -150, 484],
 });
 
@@ -141,53 +170,39 @@ function deco(PIXI, name, x, y, scale = 1, opts = {}) {
   return spr;
 }
 
+/** A deco from the firefly_lab set (world size from its art table). */
+export function piece(PIXI, name, x, y, opts = {}) {
+  const [file] = FIREFLY_LAB_FILES[name];
+  const spr = new PIXI.Sprite(textureFromUrl(`${ART}${file}`));
+  spr.anchor.set(opts.ax ?? 0.5, opts.ay ?? 1);
+  const s = opts.scale ?? 1;
+  spr.scale.set(opts.flip ? -s : s, opts.scaleY ?? s);
+  spr.x = x;
+  spr.y = y;
+  if (opts.alpha != null) spr.alpha = opts.alpha;
+  spr.eventMode = 'none';
+  return spr;
+}
+
+const size = (name) => FIREFLY_LAB_FILES[name].slice(1);
+
+/** Lay `name` side by side from x 0 to W (1 px overlap so no seam shows). */
+function tileRow(PIXI, name, y, opts = {}) {
+  const c = new PIXI.Container();
+  const [w] = size(name);
+  for (let x = 0; x < W; x += w - 1) c.addChild(piece(PIXI, name, x, y, { ax: 0, ay: 0, ...opts }));
+  return c;
+}
+
 function drawShell(PIXI) {
   const g = new PIXI.Graphics();
-  // Ceiling and wall.
+  // Ceiling, the strip of wall above the wall run (the camera never reaches it), and a dark
+  // underside under the deck's lit edge.
   g.rect(0, 0, W, CEIL + 22).fill(C.ceiling);
   g.rect(0, CEIL + 22, W, 3).fill(C.ceilingEdge);
-  g.rect(0, CEIL + 25, W, DECK_BACK - CEIL - 25).fill(C.wall);
-  // Lower wall and the blue-grey band.
-  g.rect(0, BAND + 12, W, DECK_BACK - (BAND + 12)).fill(C.wallLow);
-  g.rect(0, BAND, W, 12).fill(C.band);
-  g.rect(0, BAND - 3, W, 3).fill(C.bandHi);
-  // Panel seams every 320 px.
-  for (let x = 160; x < W; x += 320) {
-    g.rect(x, CEIL + 25, 2, DECK_BACK - CEIL - 25).fill({ color: C.seam, alpha: 0.9 });
-  }
-  // Deck: pale, a soft back edge, perspective seams.
-  g.rect(0, DECK_BACK, W, DECK_FRONT - DECK_BACK).fill(C.deck);
-  g.rect(0, DECK_BACK, W, 3).fill({ color: 0xcfcac1, alpha: 0.9 });
-  for (let x = 0; x < W + 200; x += 300) {
-    g.moveTo(x, DECK_BACK + 3);
-    g.lineTo(x - 60, DECK_FRONT);
-    g.stroke({ width: 2, color: C.deckSeam, alpha: 0.8 });
-  }
-  // Hazard stripe.
-  g.rect(0, DECK_FRONT, W, STRIPE_B - DECK_FRONT).fill(C.stripe);
-  for (let x = -20; x < W + 20; x += 16) {
-    g.moveTo(x, STRIPE_B);
-    g.lineTo(x + 8, STRIPE_B);
-    g.lineTo(x + 16, DECK_FRONT);
-    g.lineTo(x + 8, DECK_FRONT);
-    g.closePath();
-    g.fill({ color: C.stripeDark, alpha: 0.85 });
-  }
-  g.rect(0, DECK_FRONT, W, 2).fill({ color: 0xfff2c6, alpha: 0.9 });
-  // Light row and dark underside.
-  g.rect(0, STRIPE_B, W, LIGHTS_B - STRIPE_B).fill(C.lightsBand);
-  g.rect(0, LIGHTS_B, W, H - LIGHTS_B).fill(C.under);
-  for (let x = 30; x < W; x += 52) g.roundRect(x, STRIPE_B + 7, 34, 8, 4).fill(C.cyan);
-  for (let x = 90; x < W; x += 230) {
-    g.moveTo(x, LIGHTS_B + 34);
-    g.lineTo(x + 50, LIGHTS_B + 22);
-    g.stroke({ width: 7, color: C.tube, alpha: 0.95, cap: 'round' });
-  }
-  // Ceiling lamps.
+  g.rect(0, CEIL + 25, W, WALL_TOP - CEIL - 24).fill(C.wallTop);
   for (let x = 140; x < W; x += 380) g.roundRect(x, CEIL + 10, 60, 9, 4).fill(C.cyan);
-  // Right-hand bulkhead (the left end is the entry, drawEntry).
-  g.rect(W - 70, CEIL + 25, 70, DECK_FRONT - CEIL - 25).fill(0xd5d1c9);
-  g.rect(W - 70, CEIL + 25, 4, DECK_FRONT - CEIL - 25).fill(0xbfbab1);
+  g.rect(0, STRIPE_B, W, H - STRIPE_B).fill(C.under);
   return g;
 }
 
@@ -207,237 +222,90 @@ export function entryPath() {
   ];
 }
 
-function drawEntry(PIXI) {
-  // The dark doorway you arrive in (video t15-21): a grey bulkhead, a deep
-  // recess with a rail, a lamp over it, and its floor curving down to the deck.
-  const g = new PIXI.Graphics();
-  const ledge = sy(ENTRY.y);
-  const right = sx(-2817);
-  const top = ledge - 236;
-  g.rect(0, top - 18, right + 14, FLOOR - top + 18).fill(0x8f8a81);
-  g.rect(0, top, right, FLOOR - top).fill(0x5c5953);
-  g.rect(0, top, right, 10).fill({ color: 0x3f3d39, alpha: 0.8 });
-  g.rect(0, top + 120, right - 6, 5).fill({ color: 0x767069, alpha: 0.9 });
-  g.rect(right, top - 18, 5, FLOOR - top + 18).fill(0xa9a49a);
-  const [p0, p1, , , p4] = entryPath();
-  g.moveTo(0, p0[1]);
-  g.lineTo(p1[0], p1[1]);
-  g.bezierCurveTo(p1[0] + 50, p1[1], p4[0] - 50, p4[1], p4[0], p4[1]);
-  g.lineTo(p4[0], DECK_FRONT);
-  g.lineTo(0, DECK_FRONT);
-  g.closePath();
-  g.fill(C.deck);
-  g.moveTo(0, p0[1]);
-  g.lineTo(p1[0], p1[1]);
-  g.bezierCurveTo(p1[0] + 50, p1[1], p4[0] - 50, p4[1], p4[0], p4[1]);
-  g.stroke({ width: 3, color: 0xcfcac1, alpha: 0.9 });
-  g.roundRect(18, top - 40, right - 36, 14, 7).fill(0xdfe6ea);
-  g.roundRect(26, top - 32, right - 52, 6, 3).fill(C.cyan);
-  return g;
-}
-
-function drawGlow(PIXI) {
-  // Additive glow over the cyan lights, seams and tubes.
-  const g = new PIXI.Graphics();
-  for (let x = 30; x < W; x += 52) g.roundRect(x - 6, STRIPE_B + 3, 46, 16, 8).fill({ color: C.cyan, alpha: 0.35 });
-  for (let x = 90; x < W; x += 230) {
-    g.moveTo(x, LIGHTS_B + 34);
-    g.lineTo(x + 50, LIGHTS_B + 22);
-    g.stroke({ width: 18, color: 0xffffff, alpha: 0.18, cap: 'round' });
-  }
-  for (const x of DRESSING.cyanSeams) {
-    const wx = sx(x);
-    g.rect(wx - 1, CEIL + 60, 3, BAND - 8 - CEIL - 60).fill({ color: C.cyan, alpha: 0.9 });
-    g.rect(wx - 5, CEIL + 60, 11, BAND - 8 - CEIL - 60).fill({ color: C.cyan, alpha: 0.2 });
-  }
-  g.blendMode = 'add';
-  return g;
-}
-
-function drawWindow(PIXI, { x, w, view }) {
+/** The window's view: sky, then the silhouette and cloud decos behind the glass (video t17, t22, t103). */
+function drawView(PIXI, { x, view }) {
+  const [ww] = size('window_cutout');
+  const left = sx(x) - ww / 2;
+  const gx0 = left + GLASS.x0;
+  const gy0 = WALL_TOP + GLASS.y0;
+  const gw = GLASS.x1 - GLASS.x0;
+  const gh = GLASS.y1 - GLASS.y0;
   const c = new PIXI.Container();
-  const h = 205;
-  const top = FLOOR - 165 - h;
-  const g = new PIXI.Graphics();
-  g.roundRect(-w / 2 - 10, top - 10, w + 20, h + 20, 22).fill(C.frame);
-  g.roundRect(-w / 2, top, w, h, 16).fill(0xd8eef8);
-  const pane = new PIXI.Graphics();
+  const sky = new PIXI.Graphics();
+  sky.rect(gx0, gy0, gw, gh).fill(C.sky);
+  c.addChild(sky);
+  const cx = gx0 + gw / 2;
   if (view === 'pine') {
-    // Clouds, two green hills and a pine (video t17).
-    for (const [cx, cy, r] of [[-w * 0.2, 0.3, 24], [w * 0.02, 0.26, 30], [w * 0.26, 0.34, 20]]) {
-      pane.circle(cx, top + h * cy, r).fill({ color: 0xffffff, alpha: 0.95 });
-    }
-    pane.poly([-w / 2, top + h * 0.62, -w * 0.15, top + h * 0.5, w * 0.2, top + h * 0.66, w / 2, top + h * 0.58, w / 2, top + h, -w / 2, top + h]).fill(0x9fbf98);
-    pane.poly([-w / 2, top + h * 0.8, 0, top + h * 0.7, w / 2, top + h * 0.82, w / 2, top + h, -w / 2, top + h]).fill(0x7fa57f);
-    const px = w * 0.22;
-    for (const [y0, hw] of [[0.36, 12], [0.46, 18], [0.56, 24], [0.66, 30]]) {
-      pane.poly([px, top + h * (y0 - 0.1), px + hw, top + h * y0, px - hw, top + h * y0]).fill(0x5f8a68);
-    }
-    pane.rect(px - 3, top + h * 0.66, 6, h * 0.1).fill(0x5d6a52);
-  } else if (view === 'peak') {
-    // A snowy slope under a pale sky (video t22-24).
-    pane.poly([-w / 2, top + h * 0.95, -w * 0.05, top + h * 0.35, w * 0.12, top + h * 0.5, w / 2, top + h * 0.8, w / 2, top + h, -w / 2, top + h]).fill(0xf6fafc);
-    pane.poly([-w * 0.05, top + h * 0.35, w * 0.02, top + h * 0.6, -w * 0.12, top + h * 0.75]).stroke({ width: 2, color: 0xb9c3c9, alpha: 0.8 });
+    // A cloud, a green hill and a pine (t17).
+    c.addChild(piece(PIXI, 'cloud_small1', cx - 30, gy0 + 60, { scale: 1.2 }));
+    c.addChild(piece(PIXI, 'cloud_small2', cx + 34, gy0 + 46));
+    c.addChild(piece(PIXI, 'silhouette1', cx - 20, gy0 + gh + 4));
+    c.addChild(piece(PIXI, 'silhouette2', cx + 30, gy0 + gh + 2));
+  } else if (view === 'cloud') {
+    // A big white cloud filling the lower glass (t22-26).
+    c.addChild(piece(PIXI, 'silhouette3', cx - 34, gy0 + gh));
+    c.addChild(piece(PIXI, 'cloud_close', cx + 10, gy0 + gh + 30));
   } else {
-    pane.roundRect(-w / 2, top + h * 0.55, w, h * 0.45, 16).fill({ color: 0xeef8fc, alpha: 0.8 });
+    c.addChild(piece(PIXI, 'cloud_distant', cx + 20, gy0 + gh + 60, { alpha: 0.7 }));
   }
   const mask = new PIXI.Graphics();
-  mask.roundRect(-w / 2, top, w, h, 16).fill(0xffffff);
-  pane.mask = mask;
-  const glint = new PIXI.Graphics();
-  glint.roundRect(-w / 2 + 10, top + 10, 8, h - 20, 4).fill({ color: 0xffffff, alpha: 0.55 });
-  c.addChild(g, pane, mask, glint);
-  c.x = sx(x);
+  mask.rect(gx0, gy0, gw, gh).fill(0xffffff);
+  c.addChild(mask);
+  c.mask = mask;
   return c;
 }
 
-function drawPillar(PIXI, x) {
-  // In front of the avatar (video t20, t30, t41, t89): its foot a little in front of the walking line.
-  const g = new PIXI.Graphics();
-  const w = 90;
-  const wx = sx(x);
-  const foot = FLOOR + 14;
-  g.rect(wx - w / 2, CEIL + 25, w, foot - CEIL - 25).fill(0xf3f2ef);
-  g.rect(wx - w / 2, CEIL + 25, 14, foot - CEIL - 25).fill({ color: 0xffffff, alpha: 0.9 });
-  g.rect(wx + w / 2 - 12, CEIL + 25, 12, foot - CEIL - 25).fill({ color: 0xd9d6cf, alpha: 1 });
-  g.roundRect(wx - w / 2 - 8, foot - 38, w + 16, 38, 6).fill(0xe9e7e2);
-  g.roundRect(wx - w / 2 - 8, BAND - 6, w + 16, 22, 6).fill(0xe9e7e2);
-  g.ellipse(wx, foot + 2, w / 2 + 14, 6).fill({ color: 0x000000, alpha: 0.1 });
-  return g;
+/** The wall run: wall_small all along, the G2 walls, the windows, and the loose cyan seams. */
+function drawWalls(PIXI) {
+  const c = new PIXI.Container();
+  c.addChild(tileRow(PIXI, 'wall_small', WALL_TOP));
+  for (const win of DRESSING.windows) c.addChild(drawView(PIXI, win));
+  for (const s of DRESSING.signs) c.addChild(piece(PIXI, 'wall', sx(s.x) - WALL_G2_X, WALL_TOP, { ax: 0, ay: 0 }));
+  for (const win of DRESSING.windows) c.addChild(piece(PIXI, 'window_cutout', sx(win.x), WALL_TOP, { ay: 0 }));
+  for (const x of seamsToDraw()) {
+    c.addChild(piece(PIXI, 'wall_seam_separated_01a_starter', sx(x) - SEAM_DECO_X, WALL_TOP, { ax: 0, ay: 0 }));
+  }
+  return c;
 }
 
-function drawSign(PIXI, { x, text }) {
-  const t = new PIXI.Text({ text, style: {
-    fontFamily: 'Nunito, Trebuchet MS, sans-serif', fontSize: 44, fontWeight: '900', fill: C.wall,
-    stroke: { color: 0xbab5ab, width: 4 }, letterSpacing: 2,
-  } });
-  t.anchor.set(0.5, 1);
-  t.x = sx(x);
-  t.y = FLOOR - 235;
-  return t;
+/** The cyan seams no G2 wall or window already accounts for. */
+export function seamsToDraw() {
+  const [ww] = size('window_cutout');
+  return DRESSING.cyanSeams.filter((x) => {
+    if (DRESSING.signs.some((s) => Math.abs(s.x - WALL_G2_X + WALL_SEAM_X - x) < 30)) return false;
+    return !DRESSING.windows.some((w) => Math.abs(w.x - x) < ww / 2);
+  });
 }
 
-function drawArrow(PIXI, { x }) {
+/**
+ * The deck and its lit front edge: platform (84 tall, its hazard stripe in rows 71-84) drawn 1.4x
+ * tall so the stripe is the video's ~18 px, its bottom on STRIPE_B, its own pale colour carried back
+ * to the wall's foot, and ground_slice (the cyan lights, the deck's edge and the tube-lit underside).
+ */
+const PLATFORM_Y = 1.4;
+function drawDeck(PIXI) {
+  const c = new PIXI.Container();
+  const [, ph] = size('platform');
+  const top = STRIPE_B - ph * PLATFORM_Y;
   const g = new PIXI.Graphics();
-  const ax = sx(x);
-  const ay = FLOOR + 22;
-  g.poly([ax - 46, ay - 7, ax + 6, ay - 7, ax + 6, ay - 16, ax + 34, ay, ax + 6, ay + 16, ax + 6, ay + 7, ax - 46, ay + 7]).fill({ color: 0x8af1ff, alpha: 0.9 });
-  g.poly([ax - 52, ay - 11, ax + 2, ay - 11, ax + 2, ay - 22, ax + 42, ay, ax + 2, ay + 22, ax + 2, ay + 11, ax - 52, ay + 11]).fill({ color: 0x8af1ff, alpha: 0.25 });
-  return g;
+  g.rect(0, DECK_BACK, W, top - DECK_BACK + 1).fill(C.deck);
+  c.addChild(g);
+  c.addChild(tileRow(PIXI, 'ground_slice', STRIPE_B));
+  c.addChild(tileRow(PIXI, 'platform', top, { scaleY: PLATFORM_Y }));
+  return c;
 }
 
 function drawPoster(PIXI, { x }) {
+  // Video t26: the frame runs ~148 to ~380 px above the walking line, ~427 wide (frame_cutout: 439 x 296,
+  // its lamps included). poster_alph sits behind the frame's opening.
   const c = new PIXI.Container();
-  // Video t26: the frame runs ~148 to ~380 px above the walking line, ~427 wide.
-  const w = 400;
-  const h = 204;
-  const bottom = FLOOR - 162;
-  const top = bottom - h;
-  const g = new PIXI.Graphics();
-  g.roundRect(-w / 2 - 14, top - 14, w + 28, h + 28, 18).fill(0xd3cfc7);
-  g.roundRect(-w / 2 - 14, top - 14, w + 28, h + 28, 18).stroke({ width: 3, color: 0xbdb8ae });
-  g.roundRect(-w / 2, top, w, h, 6).fill(0x8f897e);
-  // Sunburst.
-  const cx = 0;
-  const cy = top + h * 0.42;
-  for (let i = 0; i < 24; i += 1) {
-    const a0 = (i / 24) * Math.PI * 2;
-    const a1 = a0 + Math.PI / 24;
-    g.poly([cx, cy, cx + Math.cos(a0) * 420, cy + Math.sin(a0) * 420, cx + Math.cos(a1) * 420, cy + Math.sin(a1) * 420]).fill({ color: 0xb5ae9f, alpha: 0.55 });
-  }
-  c.addChild(g);
-  const mask = new PIXI.Graphics();
-  mask.roundRect(-w / 2, top, w, h, 6).fill(0xffffff);
-  c.addChild(mask);
-  g.mask = mask;
-  // emblem_alph@3x is ~47 logical px; the Snap's figure fills about 60% of the frame's height.
-  const emblem = deco(PIXI, 'emblem_alph@3x', 0, top + h * 0.66, 2.45, { dir: ICON });
-  // The Snap's poster is sepia: greyscale the gold emblem, then warm it a touch.
-  if (PIXI.ColorMatrixFilter) {
-    const cm = new PIXI.ColorMatrixFilter();
-    cm.desaturate();
-    emblem.filters = [cm];
-  }
-  emblem.tint = 0xd9cfbd;
-  emblem.alpha = 0.9;
-  c.addChild(emblem);
-  const title = new PIXI.Text({ text: 'Church of Alph', style: {
-    fontFamily: 'Georgia, Times New Roman, serif', fontSize: 32, fontWeight: '900', fill: 0xf3eee3,
-    stroke: { color: 0x3f3a33, width: 5 },
-  } });
-  title.anchor.set(0.5, 0.5);
-  title.y = top + h * 0.76;
-  const sub = new PIXI.Text({ text: '“A Home for Everyone”', style: {
-    fontFamily: 'Georgia, Times New Roman, serif', fontSize: 14, fontStyle: 'italic', fontWeight: '700', fill: 0xf3eee3,
-    stroke: { color: 0x3f3a33, width: 3 },
-  } });
-  sub.anchor.set(0.5, 0.5);
-  sub.y = top + h * 0.9;
-  c.addChild(title, sub);
-  // Two ceiling lamps over the frame (the Snap's cyan lights).
-  const lamps = new PIXI.Graphics();
-  for (const lx of [-w * 0.27, w * 0.2]) lamps.roundRect(lx - 30, top - 52, 60, 12, 6).fill(0xdfe6ea).roundRect(lx - 24, top - 44, 48, 6, 3).fill(C.cyan);
-  c.addChild(lamps);
+  const [fw, fh] = size('frame_cutout');
+  const bottom = FLOOR - 148;
+  const top = bottom - fh;
+  c.addChild(piece(PIXI, 'poster_alph', FRAME_OPENING.x - fw / 2, top + FRAME_OPENING.y, { ay: 0.5 }));
+  c.addChild(piece(PIXI, 'frame_cutout', 0, bottom));
   c.x = sx(x);
   return c;
-}
-
-function drawCable(PIXI, { x, bottom }) {
-  // A broken cable hanging from the ceiling with a small plug at its end.
-  const g = new PIXI.Graphics();
-  const wx = sx(x);
-  const end = FLOOR - bottom;
-  const top = CEIL + 25;
-  const len = end - top;
-  g.moveTo(wx, top);
-  g.bezierCurveTo(wx - 14, top + len * 0.35, wx + 22, top + len * 0.55, wx + 4, top + len * 0.78);
-  g.bezierCurveTo(wx - 8, top + len * 0.9, wx + 6, end - 14, wx + 2, end - 12);
-  g.stroke({ width: 2.5, color: 0x4b4741, alpha: 0.9, join: 'round', cap: 'round' });
-  g.roundRect(wx - 5, end - 13, 14, 15, 3).fill(0xf1efea).roundRect(wx - 5, end - 13, 14, 15, 3).stroke({ width: 1.5, color: 0x8a857c });
-  g.rect(wx - 2, end + 2, 2, 5).fill(0x8a857c).rect(wx + 4, end + 2, 2, 5).fill(0x8a857c);
-  return g;
-}
-
-function drawGraffiti(PIXI, { x, lines }) {
-  // "Tri Saves", scrawled on the wall (video 2Z76dO4DlJ4 t41, t89-91).
-  const t = new PIXI.Text({ text: lines.join('\n'), style: {
-    fontFamily: 'Comic Sans MS, Chalkboard SE, Marker Felt, sans-serif', fontSize: 40, fontWeight: '700',
-    fill: 0x9a8f86, align: 'center', lineHeight: 38,
-  } });
-  t.anchor.set(0.5, 1);
-  t.rotation = -0.2;
-  t.alpha = 0.7;
-  t.x = sx(x);
-  t.y = FLOOR - 160;
-  return t;
-}
-
-function drawTorn(PIXI, { x }) {
-  // A peeled poster: torn paper scraps with red-brown streaks (video t21-23), drawn, not traced.
-  const g = new PIXI.Graphics();
-  const wx = sx(x);
-  const top = FLOOR - 342;
-  const bot = FLOOR - 177;
-  g.poly([wx - 50, top, wx + 58, top + 6, wx + 40, top + 40, wx + 62, top + 70, wx + 30, bot - 10, wx + 48, bot, wx - 6, bot - 18, wx - 44, bot - 4, wx - 30, top + 90, wx - 60, top + 50]).fill({ color: 0xf2ece0, alpha: 0.9 });
-  for (const [x0, y0, x1, y1, w] of [[-34, 30, -16, 120, 7], [-4, 22, 14, 90, 5], [20, 70, 36, 150, 8], [-28, 120, -10, 160, 6]]) {
-    g.moveTo(wx + x0, top + y0);
-    g.lineTo(wx + x1, top + y1);
-    g.stroke({ width: w, color: 0xa4532f, alpha: 0.75, cap: 'round' });
-  }
-  g.rect(wx - 30, top + 8, 56, 14).fill({ color: 0xb06a46, alpha: 0.55 });
-  return g;
-}
-
-function drawNote(PIXI, { x }) {
-  // The pinned note in Snap PIFISEG38S535GC_56214: a blank page, no copy.
-  const g = new PIXI.Graphics();
-  const wx = sx(x);
-  const top = FLOOR - 305;
-  g.poly([wx - 24, top, wx + 30, top + 4, wx + 26, top + 78, wx - 28, top + 72]).fill(0xf7f1df);
-  g.circle(wx - 6, top + 34, 13).fill({ color: 0xe7c86a, alpha: 0.9 });
-  g.circle(wx + 10, top + 46, 10).fill({ color: 0xf0a85a, alpha: 0.85 });
-  g.circle(wx + 2, top + 6, 3).fill(0xc94b3b);
-  return g;
 }
 
 /**
@@ -448,18 +316,23 @@ export function buildLab(PIXI, kit) {
   const root = kit.sceneRoot(PIXI, W, H);
   const world = root.layer(1, 2);
   world.addChild(drawShell(PIXI));
-  for (const win of DRESSING.windows) world.addChild(drawWindow(PIXI, win));
-  for (const s of DRESSING.signs) world.addChild(drawSign(PIXI, s));
-  world.addChild(drawGraffiti(PIXI, DRESSING.graffiti));
-  world.addChild(drawTorn(PIXI, DRESSING.torn));
+  world.addChild(drawWalls(PIXI));
+  // On the wall: graffiti (faded, as the video shows it), the peeled poster, the notes, the poster.
+  world.addChild(piece(PIXI, 'graffiti_tii_saves', sx(DRESSING.graffiti.x), BAND - 3, { alpha: 0.75 }));
+  world.addChild(piece(PIXI, 'graffiti_hell', sx(DRESSING.scrawl.x), DRESSING.scrawl.y, { ay: 0.5 }));
+  world.addChild(piece(PIXI, 'torn_poster_1', sx(DRESSING.torn.x), FLOOR - 177));
+  for (const n of DRESSING.notes) world.addChild(piece(PIXI, 'flyer', sx(n.x), FLOOR - 305, { ay: 0 }));
   world.addChild(drawPoster(PIXI, DRESSING.poster));
-  for (const c of DRESSING.cables) world.addChild(drawCable(PIXI, c));
-  for (const n of DRESSING.notes) world.addChild(drawNote(PIXI, n));
+  for (const cbl of DRESSING.cables) world.addChild(piece(PIXI, 'crack', sx(cbl.x), FLOOR - cbl.bottom));
+  world.addChild(drawDeck(PIXI));
+  const [dw] = size('doorway1');
+  world.addChild(piece(PIXI, 'doorway1', DOORWAY.left + dw / 2, FLOOR - DOORWAY.lift));
   for (const x of DRESSING.eggs) world.addChild(deco(PIXI, 'eggbooth', sx(x), FLOOR - 70, 0.5));
-  world.addChild(drawEntry(PIXI));
-  world.addChild(drawArrow(PIXI, DRESSING.arrow));
-  world.addChild(drawGlow(PIXI));
-  // The teleporter's ceiling cap and floor pad (Teleporter_Base, half scale, foot at the beam's).
+  world.addChild(piece(PIXI, 'arrow_ground2', sx(DRESSING.arrow.x), ARROW_Y, { ay: 0.5 }));
+  for (const a of DRESSING.floorArrows) {
+    world.addChild(piece(PIXI, a.kind === 'cyan' ? 'arrow_ground2' : 'arrow_ground', sx(a.x), ARROW_Y, { ay: 0.5 }));
+  }
+  // The teleporter's ceiling cap and floor pad (Teleporter_Base, foot at the beam's).
   const pad = { x: sx(990), y: sy(-130) };
   world.addChild(deco(PIXI, 'Teleporter_Base', pad.x, pad.y, 0.5));
   for (const o of DRESSING.orbs) world.addChild(deco(PIXI, 'security_orb', sx(o.x), FLOOR - o.h, o.s ?? 0.5, { flip: o.x > 0 }));
@@ -469,7 +342,9 @@ export function buildLab(PIXI, kit) {
 /** The pillars, drawn over the avatar (the room adds this to the entity layer in front). */
 export function buildFront(PIXI) {
   const c = new PIXI.Container();
-  for (const x of DRESSING.pillars) c.addChild(drawPillar(PIXI, x));
+  const [, ph] = size('pillar');
+  // In front of the avatar (video t20, t30, t41, t89): the shaft's foot a little in front of the walking line.
+  for (const x of DRESSING.pillars) c.addChild(piece(PIXI, 'pillar', sx(x), FLOOR + 14, { ay: PILLAR_FOOT / ph }));
   return c;
 }
 

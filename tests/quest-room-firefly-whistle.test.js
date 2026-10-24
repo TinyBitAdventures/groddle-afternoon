@@ -11,6 +11,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
+import { createHash } from 'node:crypto';
 
 import {
   ACTIVATION_CODE,
@@ -35,7 +36,8 @@ import {
   hintFor,
   room,
 } from '../public/js/quest-rooms/firefly-whistle.js';
-import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js';
+import { DRESSING, ENTRY, FLOOR, FLOOR_Y, LAB, W, entryPath, labPlatforms, seamsToDraw, sx, sy } from '../public/js/quest-rooms/firefly-whistle-scene.js';
+import { FIREFLY_LAB_FILES } from '../public/js/quest-rooms/firefly-lab-art.js';
 import * as kit from '../public/js/quest-rooms/kit.js';
 import { BUILT_ROOMS, OFFER_OVERRIDES, QUEST_ROOMS, questGiver } from '../public/js/quest-rooms/catalog.js';
 import { REMAKE_QUEST_NPCS } from '../public/js/quest-offers.js';
@@ -236,5 +238,41 @@ describe('Firefly Whistle offer and room wiring', () => {
     for (const d of ['eggbooth', 'security_orb', 'Teleporter_Base', 'Teleporter_Beam']) {
       assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${d}.webp`)), d);
     }
+  });
+});
+
+describe('Fireflex 3000 Lab art (G113)', () => {
+  const plan = JSON.parse(readFileSync(join(root, 'tools/room-art/firefly_lab.json'), 'utf8'));
+  const scene = readFileSync(join(root, 'public/js/quest-rooms/firefly-whistle-scene.js'), 'utf8');
+
+  it('matches its room-art plan: starter.swf decos at their stage size (tools/room-art/build.py firefly_lab)', () => {
+    assert.match(plan.source, /glitch-locations starter\.swf \(CC0\)/);
+    assert.deepEqual(Object.keys(plan.pieces).sort(), Object.keys(FIREFLY_LAB_FILES).sort());
+    for (const [name, row] of Object.entries(plan.pieces)) {
+      const [file, w, h] = FIREFLY_LAB_FILES[name];
+      assert.equal(file, row.file);
+      assert.deepEqual([w, h], row.world);
+      assert.equal(row.swf, `bundle:starter.swf#${name}`);
+      assert.equal(row.scale, 1, `${name} drawn at world scale 1, as video 2Z76dO4DlJ4 shows it`);
+      const bytes = readFileSync(join(root, 'public/assets/sprites/quest-rooms/firefly_lab', file));
+      assert.equal(createHash('sha256').update(bytes).digest('hex').slice(0, 16), row.sha, `${file} changed since the build`);
+    }
+  });
+
+  it('draws the lab from its own decos, not vectors', () => {
+    for (const n of ['wall', 'wall_small', 'window_cutout', 'platform', 'ground_slice', 'doorway1', 'pillar', 'frame_cutout',
+      'poster_alph', 'graffiti_tii_saves', 'graffiti_hell', 'torn_poster_1', 'crack', 'flyer', 'arrow_ground', 'arrow_ground2']) {
+      assert.ok(FIREFLY_LAB_FILES[n], n);
+      assert.ok(scene.includes(`'${n}'`), `${n} placed by the scene`);
+    }
+    // The graffiti deco reads "Tii Saves" (the earlier "Tri Saves" was misread off the video).
+    assert.equal(DRESSING.graffiti.text, 'Tii Saves');
+    assert.ok(!/Tri Saves|Church of Alph'|new PIXI\.Text/.test(scene), 'no drawn text: the poster and G2 are the decos');
+    // The G2 walls' own seams stand for two of the video's seams; the one on the window glass is skipped.
+    assert.deepEqual(seamsToDraw(), [-980, -150]);
+  });
+
+  it('keeps the stand and control unit as their recovered item art (the whistle_stand / teleporter_controller decos are button-less stand-ins)', () => {
+    assert.ok(!FIREFLY_LAB_FILES.whistle_stand && !FIREFLY_LAB_FILES.teleporter_controller);
   });
 });

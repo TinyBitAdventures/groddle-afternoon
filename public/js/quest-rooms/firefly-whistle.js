@@ -58,7 +58,7 @@
  */
 
 import { advanceVpOverlay, vpOverlay, vpSequence } from './vp-overlay.js?v=ffw-1';
-import { ENTRY, FLOOR, H, W, buildFront, buildLab, labPlatforms, sx, sy } from './firefly-whistle-scene.js?v=ffw-2';
+import { ENTRY, FLOOR, H, W, buildFront, buildLab, labPlatforms, sx, sy } from './firefly-whistle-scene.js?v=ffw-3';
 import { onLoaded, textureFromUrl } from '../textures.js';
 import { goToFallingLevel, withFallingRoom } from './falling-room.js?v=fall-1';
 

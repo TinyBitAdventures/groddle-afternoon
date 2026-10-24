@@ -1052,7 +1052,7 @@
      "about": "Firefly Whistle sent you back to a past future, the last days of the Alphite Age, to learn how its radical technologists charmed Fireflies. Bump into a Firefly and the Magic Rock offers it, with a warning: you must find your own way back.",
      "play": "Walk the Fireflex 3000 Lab to the Precious Equipment Protection Unit, push its button to drop the force field and take the whistle, which you promptly swallow. Then talk the Teleporter Control Unit into switching on (it will drop hints) and step onto the pad. You feel woozy and fall a long way, past giant numbers counting down to 29, until you land and are beamed home. From then on a Firefly Jar opened near Fireflies sets your whistling instinct off.",
      "source": "The offer, the Firefly's \"What ho! ... Fireflies!\", every line from the stand, the whistle and the control unit with its six hints and activation code, the swallow (hit, hit, surprise, \"Gah. I've swallowed it!\", the Firefly Whistling badge), the walk back at the midpoint, the pad's push-back, the arrival point, the teleporter's position, the three-minute \"Are you stuck?\" prompt, the reward and the jar's badge gate. The pad sends you to the falling room (\"You Feel Woooooozy...\"), whose hidden teleporter takes you back to where you started.",
-     "rebuilt": "The lab's geometry was never archived. It is rebuilt from three players' Snaps of it and a player's recording of the whole quest, which fixes the room's ends, where the stand, the walk-back point and the control unit stand, and the order along the corridor: an entry doorway with a ramp, windows, G2 signs, four pillars you walk behind, the \"Church of Alph\" poster, one egg-shaped phone pod and hanging security orbs. It is dressed with Tiny Speck's own stand, control unit, teleporter, egg pod and orb art. The falling room is lost too; the same recording and three Snaps show it built from Tiny Speck's Headroom decos, so it uses those: the two number columns, ray bursts, bubbles, the tongue you land on, coral, flowers and glyphs. The recording is reference only.",
+     "rebuilt": "The lab's geometry was never archived. It is rebuilt from three players' Snaps of it and a player's recording of the whole quest, which fixes the room's ends, where the stand, the walk-back point and the control unit stand, and the order along the corridor: an entry doorway with a ramp, windows, G2 signs, four pillars you walk behind, the \"Church of Alph\" poster, one egg-shaped phone pod and hanging security orbs. It is dressed entirely in Tiny Speck's own lab art from the starter set: walls with their G2 signs, windows, deck, doorway, pillars, posters, cables, notes, the \"Tii Saves\" graffiti, and the stand, control unit, teleporter, egg pod and orbs. The falling room is lost too; the same recording and three Snaps show it built from Tiny Speck's Headroom decos, so it uses those: the two number columns, ray bursts, bubbles, the tongue you land on, coral, flowers and glyphs. The recording is reference only.",
      "footage": [
       {
        "id": "2Z76dO4DlJ4",
@@ -1833,9 +1833,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 348,
+  "commits": 349,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "Room 8 is an unstable bridge over a dark void, and the Ventilation Room gets its rope-hung Way Out signs, lanterns and glowing bushes"
+   },
    {
     "date": "2026-10-24",
     "kind": "improve",
@@ -1950,11 +1955,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Gwendolyn's Task starts in Room 23, where Greeterbot Sentry G-42 sends you up to her ghost"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Seven rooms re-dressed from players' Snaps: felt, dusk, white and lamplight"
    }
   ]
  },
