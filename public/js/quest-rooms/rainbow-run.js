@@ -10,55 +10,19 @@
  * `quoins_collected` counter (items/quoin.js). At the end: "Success! You got
  * them coins but good." or "Failure! How embarrassing.", then the exit.
  * Leaving short of 30 fails the quest with "My Grandma has more Hustle than
- * that." The template geometry is lost, so the course is a bright rainbow
- * reconstruction sized so 30 of its 44 coins take a brisk, clean run.
+ * that." The course (a night meadow of statues, slimy columns, pink islands,
+ * a rainbow slide and a sliced planet, from the players' Snaps) lives in
+ * rainbow-run-scene.js; it holds well over 30 coins on the meadow alone,
+ * with more up the slide and in the planet.
  */
 
-const W = 3600;
-const H = 980;
-const FLOOR = 840;
+import { FLOOR, H, W, buildRainbowScene, rainbowCoins, rainbowPlatforms } from './rainbow-run-scene.js';
+
+export { rainbowCoins, rainbowPlatforms };
 export const RUN_MS = 30_000;
 export const COINS_NEEDED = 30;
-
-const BANDS = [0xff6b6b, 0xffa94d, 0xffe066, 0x8ce99a, 0x74c0fc, 0x9775fa];
-
-/** Walkable lines: the floor and three tiers of rainbow clouds. */
-export function rainbowPlatforms(kit) {
-  const p = [kit.plat(0, FLOOR, W, FLOOR, 'invisible', { id: 'rr_floor' })];
-  // A rolling staircase of clouds: every ledge is one hop (<= 100 px) above
-  // the floor or the ledge beside it.
-  const tiers = [
-    [380, 740, 600], [660, 640, 860], [920, 740, 1120], [1200, 650, 1420], [1480, 560, 1680],
-    [1760, 660, 1960], [2040, 750, 2260], [2340, 650, 2540], [2620, 560, 2820], [2900, 660, 3100],
-    [3180, 750, 3380],
-  ];
-  tiers.forEach(([x1, y, x2], i) => p.push(kit.plat(x1, y, x2, y, 'cloud', { id: `rr_c${i}` })));
-  return p;
-}
-
-/** Coin spots: low arcs over the floor, rows on every cloud. */
-export function rainbowCoins() {
-  const out = [];
-  const add = (x, y) => out.push({ id: `c${out.length}`, x: Math.round(x), y: Math.round(y) });
-  for (let i = 0; i < 12; i++) add(260 + i * 270, FLOOR - 46 - (i % 3) * 18);
-  const rows = [[420, 560, 2, 740], [690, 830, 3, 640], [960, 1080, 2, 740], [1240, 1380, 3, 650],
-    [1520, 1640, 3, 560], [1800, 1920, 2, 660], [2080, 2220, 2, 750], [2380, 2500, 3, 650],
-    [2660, 2780, 3, 560], [2940, 3060, 2, 660], [3220, 3340, 2, 750]];
-  for (const [x1, x2, n, y] of rows) {
-    for (let k = 0; k < n; k++) add(x1 + ((x2 - x1) * k) / Math.max(1, n - 1), y - 44);
-  }
-  // A last sweep along the far end.
-  for (let i = 0; i < 4; i++) add(3420 + i * 45, FLOOR - 50 - (i % 2) * 40);
-  return out;
-}
-
-function drawRainbow(PIXI, cx, cy, r, alpha = 0.55) {
-  const g = new PIXI.Graphics();
-  BANDS.forEach((c, i) => {
-    g.arc(cx, cy, r - i * 24, Math.PI, 0).stroke({ width: 26, color: c, alpha: alpha });
-  });
-  return g;
-}
+/** Where the run starts: on the meadow by the slide's flower. */
+export const SPAWN_X = 110;
 
 export const room = {
   id: 'rainbow_run',
@@ -74,44 +38,13 @@ export const room = {
 
   build(ctx) {
     const { PIXI, kit } = ctx;
-    const root = kit.sceneRoot(PIXI, W, H);
-    const sky = root.layer(0, 0);
-    sky.addChild(kit.gradient(PIXI, [[0, '#7fd3ff'], [0.55, '#c8f0ff'], [1, '#fff6d8']], 960, 640));
-    const far = root.layer(0.2, 1);
-    for (let i = 0; i < 3; i++) far.addChild(drawRainbow(PIXI, 520 + i * 1100, 760, 470, 0.32));
-    for (let i = 0; i < 8; i++) {
-      far.addChild(kit.deco(PIXI, 'cloud_fluffy_1', 160 + i * 420, 300 + (i % 3) * 60, { scale: 0.6, alpha: 0.85 }));
-    }
-    const mid = root.layer(0.55, 2);
-    for (let i = 0; i < 8; i++) {
-      mid.addChild(kit.deco(PIXI, i % 2 ? 'cloud_3' : 'cloud_5', 260 + i * 470, 560 + (i % 3) * 50, { scale: 1.1, alpha: 0.75, tint: 0xffffff }));
-    }
-    const world = root.layer(1, 3);
-    const g = new PIXI.Graphics();
-    // Striped rainbow floor.
-    BANDS.forEach((c, i) => {
-      g.rect(0, FLOOR + i * 24, W, 24).fill(c);
-    });
-    g.rect(0, FLOOR, W, 6).fill({ color: 0xffffff, alpha: 0.35 });
-    const platforms = rainbowPlatforms(kit);
-    world.addChild(g);
-    // Each cloud ledge is a recovered puffy block_cloud01 (850x416), its flat
-    // top on the walking line.
-    platforms.filter((p) => p.style === 'cloud').forEach((p, i) => {
-      const w = p.x2 - p.x1 + 60;
-      const c = kit.deco(PIXI, 'block_cloud01', (p.x1 + p.x2) / 2, p.y1 - 18, { ay: 0, scale: w / 850, sy: (w / 850) * 0.62 });
-      c.tint = [0xfff5f5, 0xfffbe8, 0xf3fff2, 0xf0f8ff, 0xf8f2ff][i % 5];
-      world.addChild(c);
-    });
-    // Start and finish flags.
-    world.addChild(kit.label(PIXI, 'START', 120, FLOOR - 70, { size: 26, fill: 0xffffff, stroke: { color: 0x5a7894, width: 5 } }));
     return {
       label: 'Rainbow Run',
       width: W,
       height: H,
-      background: root,
-      platforms,
-      spawn: { x: 120, y: FLOOR },
+      background: buildRainbowScene(PIXI, kit),
+      platforms: rainbowPlatforms(kit),
+      spawn: { x: SPAWN_X, y: FLOOR },
     };
   },
 

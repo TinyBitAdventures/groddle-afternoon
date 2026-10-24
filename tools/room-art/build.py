@@ -38,6 +38,8 @@ Sets (each: decos, world scale per deco, output folder, a plan and a generated J
   and the purple exit door (arbito1.swf) from the Colour Unblocking Snaps. js/quest-rooms/color-unblocking.js.
 - an_autumn_day (G75): limbo1.swf's blurred gnarled trees (rendered white for tinting), red leaf
   puffs and cattail sprigs, the backdrop of every An Autumn Day Snap. js/quest-rooms/an-autumn-day.js.
+- rainbow_run (G108): arbito1.swf's sliced planet, profile head, rainbow slide, chequered ribbon, pink
+  stairs and the meadow pieces the street set lacks, from the Rainbow Run Snaps. js/quest-rooms/rainbow-run.js.
 
 A piece spec may carry a fifth element, an options dict: 'deco' renders another deco under this piece's
 name (a recoloured copy), 'ramp' maps each pixel's luminance (0.299 R + 0.587 G + 0.114 B) through
@@ -197,6 +199,43 @@ SETS = {
             'tree_foliage_red_small2': (1, 1.5, 0),
             'willow_01': (1, 2, 0),
             'willow_02': (1, 2, 0),
+        },
+    },
+    # Rainbow Run (G108): the course (template LIF9NRCLF273JBA) is lost, but four Snaps (research/wayback/
+    # raw/snaps/rainbow_run/, reference only) and the glitchen wiki image show it is built from arbito1.swf:
+    # the starry sky and purple hill band, lime hills, the slimy broken columns, the statues, the pink
+    # cloud_rock islands and the rest are already street decos; these are the pieces the street set lacks:
+    # the profile head the columns stand before (statue_head_2), the sliced planet with its door
+    # (planet_1_back under planet_1_front), the rainbow slide (ramp_1), the blue-white chequered ribbon
+    # (ramp_2), the pink staircase (step1_four), the big flower at the slide's foot (arbito_flower_3 on
+    # flower_stem_1), flower_8 and flower_10, the slime-face column (pillar_small_3a), the fallen column
+    # (pillar_4), the pink and orange rug patches (puddle_3/3b/3c) and three bushes. World scales from the
+    # Snaps against the avatar (~125 world px tall): the head and the foot ~5 avatars wide, the planet
+    # ~4.5, a column ~1 wide; the slide and stairs are fitted to the remake's 110 px jump.
+    'rainbow_run': {
+        'bundle': 'arbito1.swf',
+        'out': 'assets/sprites/quest-rooms/rainbow_run',
+        'js': 'js/quest-rooms/rainbow-run-art.js',
+        'export': 'RAINBOW_RUN_FILES',
+        'pieces': {
+            'statue_head_2': (1.0, 1.5, 0),
+            'planet_1_back': (0.9, 1.5, 0),
+            'planet_1_front': (0.9, 1.5, 0),
+            'ramp_1': (0.6, 1.5, 0),
+            'ramp_2': (0.6, 1.5, 0),
+            'step1_four': (0.6, 2, 0),
+            'arbito_flower_3': (0.9, 2, 0),
+            'flower_stem_1': (1.0, 2, 0),
+            'flower_8': (0.9, 2, 0),
+            'flower_10': (0.9, 2, 0),
+            'pillar_small_3a': (0.9, 2, 0),
+            'pillar_4': (0.6, 1.5, 0),
+            'puddle_3': (1.0, 2, 0),
+            'puddle_3b': (1.0, 2, 0),
+            'puddle_3c': (1.0, 2, 0),
+            'bush15': (0.8, 2, 0),
+            'arbito_bush7': (0.8, 2, 0),
+            'arbito_bush3': (0.9, 2, 0),
         },
     },
     'sky_plunge': {

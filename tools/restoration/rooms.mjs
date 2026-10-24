@@ -12,11 +12,11 @@
  */
 export const ROOM_NOTES = Object.freeze({
   rainbow_run: {
-    tagline: '30 coins in 30 seconds on a rainbow.',
+    tagline: '30 coins in 30 seconds in a psychedelic night meadow.',
     about: 'The Numismatic Hustle dropped you into a private Rainbow Run: grab thirty coins before a thirty-second clock runs out.',
-    play: 'Click Ready, sit through the 3-2-1, then sprint and hop across rainbow clouds collecting coins. Thirty or more and the rainbow is yours; fewer and the quest fails so you can try again.',
+    play: 'Click Ready, sit through the 3-2-1, then sprint across the meadow and hop the broken columns for coins. Up the rainbow slide, pink islands and stairs lead into a sliced planet for more. Thirty or more and the rainbow is yours; fewer and the quest fails so you can try again.',
     source: 'The ready screen, countdown, 30-second clock, coin counter, success and failure lines, and the FUTURE_SWING_30 cue.',
-    rebuilt: 'The course itself was never archived. It is a bright rainbow reconstruction with 44 coins, sized so 30 of them take a brisk, clean run.',
+    rebuilt: "The course's layout was never archived. Four players' Snaps show the look, so it is built from Tiny Speck's own pieces: a black starry sky over a purple band, lime hills, a giant stone head on its side and a giant foot, a peace-sign hand, slimy broken columns to stand on, pink floating islands and stairs, a rainbow slide and a sliced planet with a door. The route is fitted to the remake's jump, with 56 coins, 38 of them on the meadow.",
     footage: [],
   },
   top_of_tree: {
