@@ -1849,9 +1849,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 355,
+  "commits": 357,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "Room 4's drinks stand on its felt shelves and Room 16's way out is a sharp bottletree mouth"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "Star Sprint's trap planet is Tiny Speck's own sliced planet from its Snap"
+   },
    {
     "date": "2026-10-24",
     "kind": "new",
@@ -1961,16 +1971,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Say \"I love you <Giant>\" at their shrine and the Giant says it back"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Saying \"hi\" in chat waves your hi sign without a speech bubble"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Street animals crowded off a street come back the next game day"
    }
   ]
  },

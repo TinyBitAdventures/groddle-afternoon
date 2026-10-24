@@ -164,6 +164,7 @@ const ROWS = [
   ['shirt/chaulkywhite_shirtvest', 'Chaulkywhite shirt and vest', S],
   ['shirt/female_steampunk_blouse', 'Steampunk blouse', S],
   ['shirt/glitchfashionShirt', 'Glitchfashion shirt', S],
+  ['shirt/gypsy_shirt', 'Boho shirt', O],
   ['shirt/japnese_school_girl_sexy_top', 'Japanese school top', S],
   ['shirt/kendo_tor', 'Kendo top', S],
   ['shirt/Lederhosen_Shirt', 'Lederhosen shirt', S],
@@ -228,7 +229,8 @@ const ROWS = [
   // Skirts
   ['skirt/female_steampunk_skirt', 'Steampunk skirt', S],
   ['skirt/Flower_Skirt', 'Flower skirt', S],
-  ['skirt/gyscy_skirt', 'Gypsy skirt', S],
+  // Not "Gypsy" (the class names' word, a slur for Romani people): Austin 2026-10-24.
+  ['skirt/gyscy_skirt', 'Boho skirt', O],
   ['skirt/Hawaii_long', 'Long Hawaiian skirt', S],
   ['skirt/japnese_school_girl_sexy_skirt', 'Japanese school skirt', S],
   ['skirt/Leather_Skirt', 'Leather skirt', S],
