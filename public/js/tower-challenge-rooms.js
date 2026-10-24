@@ -21,8 +21,9 @@
  *      half, left of the C6E door.
  *   F  Forum thread 3343 (tower test day, 2011-05): Room 4 "I drank the
  *      drinks, harvested the plots and replanted"; "my was it purty".
- * Art: Room 8 is the corridors' own CC0 set (firebog.swf jethimadh_int_*,
- * jethimadh_frame_*, the corridors' ladder, door_asset_jethimadh_int). Rooms
+ * Art: Room 8 (G110) is a dark void crossed by a rope-and-plank bridge, read
+ * off its one Snap (research/wayback/raw/snaps/jtower_room_8/, reference only)
+ * and dressed in firebog.swf street decos (see buildRoom8). Rooms
  * 4 and 16 are not tower interiors (G72): players' Snaps
  * (research/wayback/raw/snaps/jtower_room_4/, jtower_room_16/, reference
  * only) show a felt-craft meadow and a black cave round a wooden bottletree
@@ -40,7 +41,7 @@
  * ladder, plaque, lantern and wall helpers are exported for js/tower-mid-rooms.js.
  */
 
-import { stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=tower-rooms-1';
+import { decoPoint, hangingSign, stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=tower-rooms-1';
 import { TOWER_ROOM_4_FILES } from './tower-room-4-art.js';
 
 export const ROOM_4_TSID = 'GIF1Q6PMN7123NQ';
@@ -340,52 +341,133 @@ function buildRoom4() {
 /* Room 8 (LIF1FHA10312KLV)                                             */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Room 8 is the "unstable bridge" of its one Snap (research/wayback/raw/snaps/jtower_room_8/,
+ * PUVTECCNR7S22RU, Xeloalex 2012-06-22 "Ahh..! Unstable Bridge!", Ancient filter; reference only):
+ * a dark void crossed left to right. You arrive on a ring-step ledge with roots and beads hanging
+ * under it; a rope-and-plank bridge hung from thorny vines, bead tassels under its planks, drops
+ * across the void; on the right a curved plank deck rings a tree trunk, with branches growing on it,
+ * a lantern, the key on the planks and a "Way Out" plank hung on ropes. The trunk's dark hollow is
+ * the way out (the Snap's arched opening, at its right edge). Every piece is a firebog.swf street
+ * deco: jethimadh_int_steps_1, bridge, vine_rope, hanging_eggs_decor, hanging_braches1,
+ * walkway_1, bottletree_body2, sprout, ground_cutaway_hollow3, firebog_sign_blank_plank,
+ * jethimadh_int_lantern_1, legs_moss_*, the vine ladder tiles. Snap scale ~3.2 world px a Snap px
+ * (its avatar ~45 px tall): about the whole 2000-wide room. The gaps are closed to plain jumps
+ * (the Snap's ~250 px hop to the deck is past the remake's ~150 px running jump); the bridge does
+ * not sway (its instability is not recorded beyond the caption).
+ */
+const ROOM_8_BRIDGE = Object.freeze({
+  // bridge.webp's walking line (fractions of the unflipped art): ~45% down each plank's face.
+  line: Object.freeze([[0.03, 0.58], [0.25, 0.67], [0.42, 0.65], [0.52, 0.61], [0.62, 0.54], [0.75, 0.41], [0.87, 0.31], [0.97, 0.25]]),
+});
+/** walkway_1's walking line (fractions): ~40% down its plank face, left tip to past the middle. */
+const WALKWAY_LINE = Object.freeze([[0.01, 0.28], [0.05, 0.23], [0.1, 0.25], [0.15, 0.26], [0.2, 0.35], [0.25, 0.42], [0.3, 0.48], [0.35, 0.52], [0.4, 0.55], [0.5, 0.56], [0.7, 0.53]]);
+
 function buildRoom8() {
   const c = collector();
-  const bounds = { l: -1000, r: 1000, t: -1000, b: BELOW_FLOOR };
-  c.decos.push(...shell(bounds));
-  floor(c, 'r8', bounds, { top: -160, w: 900, h: 140 });
+  const bounds = { l: -1000, r: 1000, t: -1150, b: 500 };
+  const mg = (sprite, x, y, w, h, z, extra = {}) => ({ sprite, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h), z, r: 0, ...extra, layer: 'mg' });
+  const lineOn = (d, line, id, why, maxX = Infinity) => {
+    const pts = line.map(([fx, fy]) => decoPoint(d, fx, fy).map(Math.round)).sort((p, q) => p[0] - q[0]);
+    while (pts.length > 2 && pts[pts.length - 2][0] >= maxX) pts.pop();
+    const last = pts[pts.length - 1];
+    if (last[0] > maxX) {
+      const prev = pts[pts.length - 2];
+      pts[pts.length - 1] = [maxX, Math.round(prev[1] + ((maxX - prev[0]) / (last[0] - prev[0])) * (last[1] - prev[1]))];
+    }
+    for (let i = 1; i < pts.length; i += 1) {
+      const [[x1, y1], [x2, y2]] = [pts[i - 1], pts[i]];
+      c.platforms.push({ id: `plat_${id}_${i}`, x1, y1, x2, y2, pc_perm: -1, why });
+    }
+    return { left: pts[0][0], right: pts[pts.length - 1][0], top: Math.min(...pts.map((p) => p[1])), low: Math.max(...pts.map((p) => p[1])) };
+  };
 
-  const doorWhy = 'Arrival -736,-630 from Corridor Four door_1304677515848 (archived, key 3). T: Room 8\'s door is one way, into Corridor Four\'s east half (left of the C6E door), so it stands where you arrive and leads on, not back.';
-  const out = wayOut(c, 'r8', bounds, -736, -630, 560, 80, doorWhy);
+  // The void: the corridor shell, dimmed to a faint wooden dark behind everything (BG layer).
+  c.decos.push(...shell(bounds).map((d) => ({ ...d, layer: 'bg' })));
 
-  const climbWhy = 'Remake route: ledges from the floor back up to the way out, 75 px apart (one plain jump each), low ends facing.';
-  const route = climb(c, 'r8_climb', [
-    [-420, -190, 200, false],
-    [-170, -265, 200, true],
-    [-420, -340, 200, false],
-    [-170, -415, 200, true],
-    [-420, -490, 200, false],
-    [-170, -565, 200, true],
-  ], climbWhy);
-  route.push(out);
+  // Arrival: the archived arrival point stands on a ring-step ledge (the Snap's upper-left slabs).
+  const arriveWhy = 'Arrival -736,-630 from Corridor Four door_1304677515848 (archived, key 3). Snap PUVTECCNR7S22RU: you start on the left, on a two-step ring ledge over the void.';
+  // The steps piece's high block (0.067-0.334 of its width) stands under the arrival, a lip runs back to the wall.
+  const arrive = c.add(stepsPiece('r8_arrive', Math.round(-736 + (0.5 - 0.2005) * 560), -630, 560, 80, { why: arriveWhy, z: 7 }));
+  c.platforms.push(flat('r8_arrive_lip', bounds.l + 20, arrive.left + 15, -630, arriveWhy));
+  // The lip runs on to the wall under a second slab's high block (art only, behind the first).
+  c.decos.push(mg('jethimadh_int_steps_1', -767, -550, 560, 80, 6));
 
-  // The key course: "Contains a Teal-Red Hexagon Key" (W rooms table; W Key: once per instance).
-  const keyWhy = 'W rooms table: Room 8 "Contains a Teal-Red Hexagon Key" (door_key_4, opens Room 15 in C4E); W Key spawn table "Challenge Room 8, once per instance". Remake: one a game day on a shelf at the top of a climb up the right side.';
-  const keyRoute = climb(c, 'r8_key', [
-    [430, -205, 200, false],
-    [680, -280, 200, true],
-    [430, -355, 200, false],
-    [680, -430, 200, true],
-    [430, -505, 200, false],
-    [680, -580, 200, true],
-  ], keyWhy);
-  const shelf = c.add(stepsPiece('r8_key_shelf', 430, -655, 260, 50, { why: keyWhy }));
-  keyRoute.push(shelf);
-  const shelfX = Math.round(shelf.left + 0.2 * (shelf.right - shelf.left));
+  // The bridge: bridge.webp mirrored (its high end on the left) and turned 10 degrees down to the right.
+  const bridgeWhy = 'Snap PUVTECCNR7S22RU: a rope-and-plank bridge drops left to right across the void, ~16 degrees, hung from thorny vines. Remake: its high end a short step under the ledge\'s low end; platforms follow the planks (bridge.webp, ~45% down each plank face).';
+  const bridgeDeco = mg('bridge', -54, -411, 640, 136, 8, { flip: true, r: 10 });
+  c.decos.push(bridgeDeco);
+  const bridge = lineOn(bridgeDeco, ROOM_8_BRIDGE.line, 'r8_bridge', bridgeWhy);
+
+  // The deck round the trunk: walkway_1's left half (its right half runs on behind the end wall).
+  const deckWhy = 'Snap PUVTECCNR7S22RU: a curved plank deck round a tree trunk on the right, a little over the bridge\'s low end. Remake: its tip a plain running jump (~95 px, ~50 px up) from the bridge\'s end.';
+  const deckDeco = mg('walkway_1', 840, -378, 1000, 120, 9);
+  c.decos.push(deckDeco);
+  const deck = lineOn(deckDeco, WALKWAY_LINE, 'r8_deck', deckWhy, bounds.r - 20);
+  /** The deck's surface under x (world). */
+  const deckY = (x) => floorY(c.platforms.filter((p) => p.id.startsWith('plat_r8_deck_')), x);
+
+  // A fall into the void lands on its dark floor; a vine climbs back to the arrival ledge.
+  const pitWhy = 'Remake: the Snap shows only dark under the bridge (~400 px of it); a fall lands on a floor ~700 px down, out of the bridge\'s view, in the dimmed corridor floor art.';
+  const pitStart = c.decos.length;
+  floor(c, 'r8_pit', bounds, { top: 130, w: 900, h: 140 });
+  for (const d of c.decos.slice(pitStart)) d.layer = 'bg';
+  const ladderWhy = 'Remake route back from the void: a vine (firebog_ladder_tile_*_vine) from the pit floor to the arrival ledge\'s lip by the end wall; Up at its foot climbs, the ledge mounts at its top.';
+  const vineX = -900;
+  const vineBottom = floorY(c.platforms, vineX);
+  const vineTop = -630;
+  const ladders = [{ id: 'ladder_r8_vine', x: vineX, y: vineBottom, w: LADDER_W, h: vineBottom - vineTop, why: ladderWhy }];
+  // Tiles up to the ledge's underside; the leafy cap tucks under its lip (the ledge art hides the rest).
+  const tiles = Math.floor((vineBottom - vineTop - 100) / 120);
+  for (let i = 0; i < tiles; i += 1) c.decos.push(mg('firebog_ladder_tile_center_01_vine', vineX, vineBottom - i * 120, 44, 122, 4));
+  c.decos.push(mg('firebog_ladder_tile_cap_1_vine', vineX, vineTop + 122, 44, 122, 4));
+
+  // The key: "Contains a Teal-Red Hexagon Key" (W rooms table; W Key: once per instance). The Snap has it on the deck.
+  const keyWhy = 'W rooms table: Room 8 "Contains a Teal-Red Hexagon Key" (door_key_4, opens Room 15 in C4E); W Key spawn table "Challenge Room 8, once per instance". Snap PUVTECCNR7S22RU: the key lies on the deck\'s planks under the Way Out sign. Remake: one a game day.';
+  const keyX = 690;
+  const keyFloor = deckY(keyX);
+
+  // The way out: the trunk's hollow at the deck's far end.
+  const doorWhy = 'T: Room 8\'s door is one way, into Corridor Four\'s east half (left of the C6E door). Snap PUVTECCNR7S22RU: the "Way Out" plank hangs over the deck on the right, by an arched hollow in the trunk; you cross the bridge to leave.';
+  const doorX = 915;
+  const doorY = deckY(doorX);
 
   c.platforms.push(flat('r8_ceiling', bounds.l + 40, bounds.r - 40, bounds.t + 35, 'Chamber roof (solid from below).', 1));
 
+  // Dressing, back to front.
   c.decos.push(
-    lantern(-300, -330, true),
-    lantern(300, -330, true),
-    lantern(-760, -560),
-    lantern(820, -760),
-    { sprite: 'jethimadh_int_pillar_1_mod', x: 0, y: -96, w: 230, h: 860, z: 5, r: 0, flip: true, layer: 'fg' },
-    { sprite: 'blotch_outer', x: -520, y: -720, w: 272, h: 130, z: 4, r: 0, layer: 'mg' },
-    { sprite: 'blotch_inner', x: 560, y: -860, w: 240, h: 120, z: 4, r: 0, layer: 'mg' },
+    // Ringed trunks hold up the ledge and the deck (the Snap's pipes under both).
+    mg('legs_moss_noBase', -830, 150, 370, 690, 2, { flip: true }),
+    mg('legs_moss_2', 600, 170, 480, 560, 2),
+    // The tree trunk on the right, rising out of the void past the deck; its hollow is the door.
+    mg('bottletree_body2', 1050, 260, 600, 1340, 3),
+    // Roots and beads hanging under the arrival ledge.
+    mg('hanging_braches1', -610, -560 + 330, 390, 330, 5),
+    mg('hanging_braches2', -420, -585 + 230, 226, 230, 5),
+    // Branches growing on the deck, their pot behind the planks.
+    mg('sprout', 560, -404, 170, 180, 6),
+    mg('sprout', 975, -390, 170, 180, 6, { flip: true }),
   );
-  plaque(c, -560, -662, 'Way Out');
+  // Thorny vines: two from the ceiling to each end of the bridge (leaning in, as in the Snap), one
+  // from the middle up to the right.
+  const vine = (fx, fy, lean) => {
+    const [x, y] = decoPoint(bridgeDeco, fx, fy);
+    const len = Math.round((y - bounds.t) / Math.cos((lean * Math.PI) / 180)) + 40;
+    c.decos.push(mg('vine_rope', x, y, 30, len, 7, { r: lean }));
+  };
+  vine(0.97, 0.3, -12);
+  vine(0.86, 0.36, -10);
+  vine(0.13, 0.62, 20);
+  vine(0.03, 0.6, 18);
+  vine(0.55, 0.62, 34);
+  // Bead tassels under the planks (hanging_eggs_decor: strings of charms), their tops at the planks' undersides.
+  for (const [fx, w] of [[0.9, 150], [0.76, 130], [0.12, 140]]) {
+    const [x, y] = decoPoint(bridgeDeco, fx, 0.9);
+    c.decos.push(mg('hanging_eggs_decor', x, y + Math.round((w * 420) / 324) - 6, w, Math.round((w * 420) / 324), 7));
+  }
+  // The rope-hung "Way Out" plank and the lantern over the deck.
+  c.decos.push(...hangingSign(760, deckY(760) - 112, 'Way Out', { w: 200, rope: 640 }));
+  c.decos.push(lantern(750, -440));
 
   return {
     tsid: ROOM_8_TSID,
@@ -395,24 +477,30 @@ function buildRoom8() {
     platforms: c.platforms,
     barriers: barriersFor(bounds, 'r8'),
     decos: c.decos,
-    ladders: [],
+    // The void's backdrop: the corridor wood at a fifth of its light (the Snap's faint shapes in the dark).
+    bgFilters: { tintColor: 0, tintAmount: 82 },
+    ladders,
     doors: [
       {
         id: 'door_r8_wayout',
-        x: -736,
-        y: -630,
+        x: doorX,
+        y: doorY,
         ...DOOR,
+        w: 140,
+        h: 196,
+        sprite: 'ground_cutaway_hollow3',
         connect: { tsid: 'LTJ10K7P3812R8F', label: 'Corridor Four', x: 290, y: -565, hub_id: '77' },
-        why: 'T: one way into Corridor Four\'s east half, left of the C6E door (world 492); remake arrival on its first floor plank (183..393).',
+        why: `${doorWhy} Remake arrival on C4E's first floor plank (183..393), left of the C6E door (world 492).`,
       },
     ],
     spots: [],
-    keyDrop: { id: 'r8_key', key: 4, x: shelfX, y: shelf.top + 30, w: 120, h: 120, why: keyWhy },
-    route: route.map((p) => ({ left: p.left, right: p.right, top: p.top, low: p.low })),
-    keyRoute: keyRoute.map((p) => ({ left: p.left, right: p.right, top: p.top, low: p.low })),
+    keyDrop: { id: 'r8_key', key: 4, x: keyX, y: keyFloor + 30, w: 120, h: 120, why: keyWhy },
+    route: [arrive, bridge, deck].map((p) => ({ left: p.left, right: p.right, top: p.top, low: p.low })),
+    keyRoute: [arrive, bridge, deck].map((p) => ({ left: p.left, right: p.right, top: p.top, low: p.low })),
     why: {
       room: 'W: "Room 8 || Orange-Blue Square Key || Located in C4W. Contains a Teal-Red Hexagon Key." G (2011-07): "a Teal-Red Hexagon Key to enter, which spawns in Room 8".',
-      size: 'Remake: a 2000 wide chamber like Room 15, 1000 above y 0; the arrival x -736 sits inside -1000..1000.',
+      size: 'Remake: a 2000 wide chamber like Room 15 (the Snap shows about that much at ~3.2 world px a Snap px); 1150 above y 0 for the vines, 500 below for the void\'s floor (300+ under it, as BELOW_FLOOR).',
+      decor: 'G110: the only Snap (PUVTECCNR7S22RU, 2012-06-22, "Ahh..! Unstable Bridge!", jtower_room_8/, reference only): arrival ledge left, bridge over a dark void, deck, trunk, key, lantern and the "Way Out" plank on the right. No deco list or geometry survives: laid out from the Snap round the archived arrival, firebog.swf street decos only.',
     },
   };
 }

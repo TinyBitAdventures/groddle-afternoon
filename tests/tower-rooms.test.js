@@ -99,19 +99,45 @@ describe('rebuilt tower rooms: street data', () => {
     assert.equal(vent.sourceTsid, 'LIF102JCHL027DO');
   });
 
-  it('use only the corridors\' own art, all of it on disk', () => {
+  it('use only the corridors\' own art (and, in the Ventilation Room, the firebog.swf pieces of its Snap), all of it on disk', () => {
     const manifest = new Set(JSON.parse(readFileSync(join(spike, 'public/assets/decos/manifest.json'), 'utf8')));
     const corridorArt = new Set(['jethimadh_int_bg_left', 'jethimadh_int_bg_center', 'jethimadh_int_bg_right', 'jethimadh_int_bg_shadow_50percent', 'jethimadh_int_steps_1', 'jethimadh_int_lantern_1', 'jethimadh_int_pillar_1', 'jethimadh_int_pillar_1_mod', 'jethimadh_int_door_sign', 'firebog_sign_blank', 'jethimadh_frame_cap', 'jethimadh_frame_wall']);
+    // G110: the Ventilation Room Snap's hanging plank, thorny ropes, glowing bushes and beaded roots.
+    const ventSnapArt = new Set(['firebog_sign_blank_plank', 'vine_rope', 'underground_bogwillow', 'underground_bogwillow_1', 'hanging_braches1', 'hanging_braches2']);
     for (const room of TOWER_ROOMS) {
       const s = street(room.tsid);
       for (const layer of s.layers) {
         for (const d of layer.decos) {
-          assert.ok(corridorArt.has(d.sprite), `${room.label}: ${d.sprite}`);
+          assert.ok(corridorArt.has(d.sprite) || (room.tsid === VENT_ROOM_TSID && ventSnapArt.has(d.sprite)), `${room.label}: ${d.sprite}`);
           assert.ok(manifest.has(d.sprite), d.sprite);
         }
       }
       for (const door of s.doors) assert.ok(existsSync(join(spike, 'public/assets/decos/groddle', `${door.sprite}.webp`)), door.sprite);
     }
+  });
+
+  it('dresses the Ventilation Room like its Snap: dark plank walls, a lantern over each door, the rope-hung Way Out planks, bushes and roots (G110)', () => {
+    const s = street(VENT_ROOM_TSID);
+    const bg = s.layers.find((l) => l.name === 'BG');
+    assert.equal(bg.z, -1);
+    assert.deepEqual(bg.filters, { tintColor: 0, tintAmount: 62 });
+    assert.ok(bg.decos.every((d) => /^jethimadh_int_bg_/.test(d.sprite)), 'only the wood backdrops are dimmed');
+    const mg = s.layers.find((l) => l.id === 'middleground').decos;
+    const fg = s.layers.find((l) => l.name === 'FG').decos;
+    // The plaques are gone: each door has a plank on two ropes, its text, to its left and over your head.
+    assert.ok(!mg.some((d) => d.sprite === 'jethimadh_int_door_sign'));
+    const planks = mg.filter((d) => d.sprite === 'firebog_sign_blank_plank');
+    assert.deepEqual(planks.map((d) => d.signText), ['Way Out', 'Way Out', 'Tower St South']);
+    for (const [i, door] of vent.doors.entries()) {
+      const p = planks[i];
+      assert.ok(p.x < door.x && door.x - p.x < 250, `${door.id} plank to the left`);
+      assert.ok(door.y - p.y >= 140, `${door.id} plank clear over the head`);
+      assert.equal(mg.filter((d) => d.sprite === 'vine_rope' && Math.abs(d.x - p.x) < p.w / 2 && p.y - d.y > 0 && p.y - d.y < p.h && d.r === 0).length, 2, `${door.id} plank ropes`);
+      // A lantern (screen space in FG) right over the door.
+      assert.ok(fg.some((d) => d.sprite === 'jethimadh_int_lantern_1' && Math.abs(d.x + s.bounds.l - door.x) < 2 && Math.abs(d.y + s.bounds.t - door.y) < 80), `${door.id} lantern`);
+    }
+    assert.ok(mg.filter((d) => d.sprite === 'underground_bogwillow').length >= 3);
+    assert.ok(mg.filter((d) => /^hanging_braches/.test(d.sprite)).length >= 6);
   });
 
   it('turns decos about their bottom-centre anchor so they stay centred', () => {
@@ -402,7 +428,7 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
     }
   });
 
-  it('use only art on disk: Room 8 the corridors\' set, Room 4 wardrobia felt (G72), Room 16 firebog bottletree (G72)', () => {
+  it('use only art on disk: Room 8 firebog.swf street decos (G110), Room 4 wardrobia felt (G72), Room 16 firebog bottletree (G72)', () => {
     const corridorArt = new Set();
     for (const tsid of ['GIF1QBNPP7123J0', 'GIF1Q3IQM7122SP', 'GIF1Q48RM712F87', 'GTJ10K7P3812R8F', 'GTJ10M515812V0C', 'GTJ110817812KO4']) {
       for (const layer of street(tsid).layers) for (const d of layer.decos) corridorArt.add(d.sprite);
@@ -415,7 +441,7 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
       const s = street(room.tsid);
       for (const layer of s.layers) {
         for (const d of layer.decos) {
-          if (room.tsid === ROOM_8_TSID) assert.ok(corridorArt.has(d.sprite), `${room.label}: ${d.sprite}`);
+          if (room.tsid === ROOM_8_TSID && firebog) assert.ok(firebog.has(d.sprite) || corridorArt.has(d.sprite), `${room.label}: ${d.sprite} is not a firebog.swf deco`);
           else if (room.tsid === ROOM_16_TSID && firebog) assert.ok(firebog.has(d.sprite), `${room.label}: ${d.sprite} is not a firebog.swf deco`);
           assert.ok(manifest.has(d.sprite), d.sprite);
         }
@@ -482,9 +508,10 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
       const floor = floorAt(target.platforms, w.x, w.y);
       assert.ok(Math.abs(floor - w.y) <= 6, `${link.door} floor ${floor}`);
       assert.deepEqual(door.connect.arrive, { x: w.x - target.bounds.l, y: Math.round(floor - target.bounds.t) });
-      // The room's way out stands where you arrive.
+      // Rooms 4 and 16: the way out stands where you arrive. Room 8 (G110): you cross the bridge to it.
       const out = anyTowerRoomByTsid(w.room).doors[0];
-      assert.deepEqual([out.x, out.y], [w.x, w.y]);
+      if (w.room === ROOM_8_TSID) assert.ok(out.x - w.x > 1400, 'Room 8\'s way out is across the void');
+      else assert.deepEqual([out.x, out.y], [w.x, w.y]);
     }
   });
 
@@ -539,15 +566,47 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
     for (const item of room4.items) assert.equal(item.y, Math.round(floorAt(room4.platforms, item.x, -100)));
   });
 
-  it('room 8: plain-jump ledges up to the way out and to the Teal-Red Hexagon Key\'s shelf', () => {
-    walkChain(room8, ['r8_floor_l', 'r8_climb_00', 'r8_climb_01', 'r8_climb_02', 'r8_climb_03', 'r8_climb_04', 'r8_climb_05', 'r8_wayout']);
-    walkChain(room8, ['r8_floor_r', 'r8_key_00', 'r8_key_01', 'r8_key_02', 'r8_key_03', 'r8_key_04', 'r8_key_05', 'r8_key_shelf']);
+  it('room 8 (G110): arrive on a ledge, cross the bridge over the void to the deck with the key and the way out', () => {
+    walkChain(room8, ['r8_arrive', 'r8_bridge', 'r8_deck']);
+    // No short cut: the deck is out of a plain jump from the arrival ledge.
+    assert.equal(canReach(piece(room8, 'r8_arrive'), piece(room8, 'r8_deck')), false);
+    // The bridge drops left to right like the Snap's, and hangs over a void at least 500 px deep.
+    const bridge = piece(room8, 'r8_bridge');
+    const [first, last] = [bridge[0], bridge[bridge.length - 1]];
+    assert.ok(last.y2 - first.y1 > 100 && last.x2 - first.x1 > 500, 'a long bridge dropping to the right');
+    const pit = room8.platforms.filter((p) => /^plat_r8_pit_/.test(p.id));
+    for (const p of bridge) {
+      for (const x of [p.x1, p.x2]) {
+        const under = room8.platforms.filter((q) => q.pc_perm === -1 && !bridge.includes(q) && Math.min(q.x1, q.x2) <= x && x <= Math.max(q.x1, q.x2) && Math.min(q.y1, q.y2) > p.y1);
+        assert.ok(under.every((q) => pit.includes(q) && Math.min(q.y1, q.y2) - Math.max(p.y1, p.y2) > 500), `nothing under the bridge at x ${x} but the void floor`);
+      }
+    }
+    // A fall is not the end: a vine climbs from the void floor to the arrival ledge.
+    assert.equal(room8.ladders.length, 1);
+    const l = room8.ladders[0];
+    assert.ok(pit.includes(room8.platforms.find((p) => p.pc_perm === -1 && Math.min(p.x1, p.x2) <= l.x && l.x <= Math.max(p.x1, p.x2) && Math.abs(floorAt([p], l.x, l.y) - l.y) <= 2)));
+    assert.equal(ladderTopDeck(room8.platforms, l.x, l.y - l.h, l.y), -630);
     const s = street(ROOM_8_TSID);
+    assert.deepEqual(s.ladders.map((x) => x.id), ['ladder_r8_vine']);
+    // Key 4 lies on the deck, the way out is the trunk's hollow at its far end, the rope-hung plank over it.
     const key = s.boxes.find((b) => b.key);
     assert.equal(key.key, 4);
-    const shelf = floorAt(room8.platforms, key.x + s.bounds.l, key.y + s.bounds.t - 30);
-    assert.ok(key.y + s.bounds.t - shelf >= 0 && key.y + s.bounds.t - shelf <= key.h);
-    assert.ok(Math.min(...piece(room8, 'r8_key_shelf').map((p) => Math.min(p.y1, p.y2))) < -600, 'the key sits high in the room');
+    const deck = piece(room8, 'r8_deck');
+    const kx = key.x + s.bounds.l;
+    const ky = floorAt(deck, kx, key.y + s.bounds.t - 30);
+    assert.ok(ky != null && key.y + s.bounds.t - ky === 30);
+    const door = room8.doors[0];
+    assert.equal(door.sprite, 'ground_cutaway_hollow3');
+    assert.ok(Math.abs(floorAt(deck, door.x, door.y) - door.y) <= 1 && door.x > kx);
+    const mg = s.layers.find((x) => x.id === 'middleground').decos;
+    const plank = mg.find((d) => d.sprite === 'firebog_sign_blank_plank');
+    assert.equal(plank.signText, 'Way Out');
+    assert.ok(plank.x > deck[0].x1 && plank.x < door.x);
+    for (const sprite of ['bridge', 'walkway_1', 'vine_rope', 'hanging_eggs_decor', 'hanging_braches1', 'bottletree_body2', 'sprout']) assert.ok(mg.some((d) => d.sprite === sprite), sprite);
+    // The void: the corridor shell dimmed behind it.
+    const bg = s.layers.find((x) => x.name === 'BG');
+    assert.deepEqual(bg.filters, { tintColor: 0, tintAmount: 82 });
+    assert.ok(bg.decos.some((d) => d.sprite === 'jethimadh_int_bg_center'));
   });
 
   it('room 16: Spinach on the floor and a Red-Green Triangle Key only a spinach jump reaches', () => {

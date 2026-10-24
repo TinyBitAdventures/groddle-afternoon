@@ -16,8 +16,14 @@
  *   G  Glitch Strategy "How to get the 11 Secrets of Jethimadh Tower Base
  *      Achievement" (2011-07).
  *   F  Glitch forum threads 8885 and 9061 (players who found 9-11).
- * Art is only the corridors' own CC0 set (firebog.swf: jethimadh_int_*,
+ * Art is the corridors' own CC0 set (firebog.swf: jethimadh_int_*,
  * jethimadh_frame_*, door_asset_jethimadh_int); no pixels from screenshots.
+ * G110: the Ventilation Room's one Snap (research/wayback/raw/snaps/
+ * jtower_ventilation_room/, PUVFMPJUESM2R57, 2012-12-09, reference only) adds
+ * more firebog.swf street decos round each door: the rope-hung "Way Out" plank
+ * (firebog_sign_blank_plank on vine_ropes), a lantern over the door, glowing
+ * bushes (underground_bogwillow*) and beaded roots (hanging_braches*) under the
+ * ledges, and dark plank walls (the backdrops in a dimmed BG layer).
  *
  * tools/build-tower-rooms.mjs writes the two street JSON files from
  * TOWER_ROOMS, adds them to assets/streets/index.json and links the corridor
@@ -82,6 +88,36 @@ export function turned(sprite, cx, cy, length, thickness, r = 90, extra = {}) {
 }
 
 const flat = (id, x1, x2, y, why, pc = -1) => ({ id: `plat_${id}`, x1, y1: y, x2, y2: y, pc_perm: pc, why });
+
+/**
+ * A deco's point at art fractions (fx, fy from its top-left, before any flip)
+ * in world space: decos are anchored bottom-centre, mirrored by flip, then
+ * turned r degrees (clockwise) about that anchor.
+ */
+export function decoPoint(d, fx, fy) {
+  const lx = ((d.flip ? 1 - fx : fx) - 0.5) * d.w;
+  const ly = -(1 - fy) * d.h;
+  const t = ((d.r || 0) * Math.PI) / 180;
+  return [d.x + lx * Math.cos(t) - ly * Math.sin(t), d.y + lx * Math.sin(t) + ly * Math.cos(t)];
+}
+
+/**
+ * The rope-hung "Way Out" plank of the Room 8 and Ventilation Room Snaps
+ * (research/wayback/raw/snaps/jtower_room_8/ PUVTECCNR7S22RU,
+ * jtower_ventilation_room/ PUVFMPJUESM2R57; the sign words are read off them):
+ * firebog.swf's firebog_sign_blank_plank, turned 7 degrees level (the art
+ * slants), on two thorny vine_ropes running up out of sight. (x, y) is the
+ * plank's bottom-centre; the text is painted by features/tower-rooms-feature.js.
+ */
+export function hangingSign(x, y, text, { w = 190, rope = 520, z = 16 } = {}) {
+  const h = Math.round((w * 176) / 480);
+  const plank = { sprite: 'firebog_sign_blank_plank', x: Math.round(x), y: Math.round(y), w, h, z, r: 7, layer: 'mg', signText: text };
+  const ropes = [0.14, 0.86].map((fx) => {
+    const [rx, ry] = decoPoint(plank, fx, 0.45);
+    return { sprite: 'vine_rope', x: Math.round(rx), y: Math.round(ry), w: 30, h: rope, z: z - 1, r: 0, layer: 'mg' };
+  });
+  return [...ropes, plank];
+}
 
 /**
  * World kept under each room's lowest floor (as tower-challenge-rooms.js
@@ -236,15 +272,15 @@ function buildVent() {
     decos.push(turned('jethimadh_frame_wall', -630, y, 1000, 42, 90, { z: 8, layer: 'fg' }));
     decos.push(turned('jethimadh_frame_wall', 630, y, 1000, 42, 90, { z: 8, layer: 'fg' }));
   }
-  decos.push(turned('jethimadh_int_bg_left', 0, -2380, 1000, 1250, 90, { z: 1, layer: 'mg' }));
+  decos.push(turned('jethimadh_int_bg_left', 0, -2380, 1000, 1250, 90, { z: 1, layer: 'bg' }));
   let n = 0;
   // The backdrop's ends are slanted, so the tiles overlap by a third.
   for (let y = -1760; y <= 1800; y += 560) {
-    decos.push(turned('jethimadh_int_bg_center', 0, y, 900, 1300, n % 2 ? -90 : 90, { z: 2 + (n % 2), layer: 'mg' }));
+    decos.push(turned('jethimadh_int_bg_center', 0, y, 900, 1300, n % 2 ? -90 : 90, { z: 2 + (n % 2), layer: 'bg' }));
     n += 1;
   }
-  decos.push(turned('jethimadh_int_bg_right', 0, 2200 + sink, 1000 + sink, 1250, 90, { z: 1, layer: 'mg' }));
-  decos.push(turned('jethimadh_int_bg_shadow_50percent', 0, sink / 2, 5500 + sink, 1240, 90, { z: 5, layer: 'mg' }));
+  decos.push(turned('jethimadh_int_bg_right', 0, 2200 + sink, 1000 + sink, 1250, 90, { z: 1, layer: 'bg' }));
+  decos.push(turned('jethimadh_int_bg_shadow_50percent', 0, sink / 2, 5500 + sink, 1240, 90, { z: 5, layer: 'bg' }));
 
   // Doors: two "Way Out" doors on right-hand ledges and Tower St South at the bottom.
   const c6Why = 'Arrival 400,-2540 from Corridor Six door_1304678594671 (archived). W: "Exits to C6W (labeled \'Way Out\')"; F 8885 "nothing in the dark space above the uppermost exit door".';
@@ -302,17 +338,53 @@ function buildVent() {
     { id: 'wall_vent_right', x: inner, y: bounds.t, h: bounds.b - bounds.t, pc_perm: null, why: 'Shaft side.' },
   ];
 
-  // Lanterns down the shaft and the door plaques.
-  for (const [x, y] of [[-420, -2300], [430, -1900], [-420, -1150], [430, -500], [-420, 120], [430, 900], [-420, 1700], [430, 2300]]) {
+  // Lanterns down the shaft.
+  for (const [x, y] of [[-420, -2300], [430, -1900], [-420, -1150], [430, -500], [-420, 120], [430, 900], [-420, 1700]]) {
     decos.push({ sprite: 'jethimadh_int_lantern_1', x, y, w: 300, h: 450, z: 3, r: 0, layer: 'fg' });
   }
-  const plaque = (x, y, text) => {
-    decos.push({ sprite: 'jethimadh_int_door_sign', x, y, w: 188, h: 110, z: 11, r: 0, layer: 'mg' });
-    decos.push({ sprite: 'firebog_sign_blank', x, y: y - 17, w: 138, h: 80, z: 16, r: 0, layer: 'mg', signText: text });
+
+  // G110: the Ventilation Room Snap (research/wayback/raw/snaps/jtower_ventilation_room/,
+  // PUVFMPJUESM2R57, 2012-12-09 "Way out~", reference only) at the mid door: dark horizontal plank
+  // walls (the BG layer's tint), a lantern hanging over the door, the "Way Out" plank on two thorny
+  // ropes to its left, glowing yellow bushes on the ring steps, root tendrils with beads under them,
+  // a thorny vine across the wall. Every piece is a firebog.swf street deco.
+  const ledgeOf = { [c6Floor]: c6Ledge, [c4Floor]: c4Ledge };
+  const groundAt = (x, near) => {
+    let best = null;
+    for (const p of platforms) {
+      if (p.pc_perm !== -1 || x < Math.min(p.x1, p.x2) || x > Math.max(p.x1, p.x2)) continue;
+      const y = p.x2 === p.x1 ? p.y1 : p.y1 + ((x - p.x1) / (p.x2 - p.x1)) * (p.y2 - p.y1);
+      if (y >= near - 30 && (best == null || y < best)) best = y;
+    }
+    return Math.round(best ?? near);
   };
-  plaque(230, c6Floor - 40, 'Way Out');
-  plaque(190, c4Floor - 40, 'Way Out');
-  plaque(270, floor - 70, 'Tower St South');
+  const doorDressing = (doorX, doorY, text) => {
+    // Snap scale ~1.2 world px a Snap px (the avatar ~120 px there): the lantern ~220 over the door,
+    // the plank ~180 left of the door and clear over your head, the big bush ~330 left on the lower step.
+    decos.push({ sprite: 'jethimadh_int_lantern_1', x: doorX, y: doorY + 61, w: 300, h: 450, z: 4, r: 0, layer: 'fg' });
+    decos.push(...hangingSign(doorX - 178, doorY - 150, text, { rope: 460 }));
+    const big = doorX - 330;
+    decos.push({ sprite: 'underground_bogwillow', x: big, y: groundAt(big, doorY) + 6, w: 170, h: 171, z: 9, r: 0, layer: 'mg' });
+    const small = doorX - 115;
+    decos.push({ sprite: 'underground_bogwillow_1', x: small, y: groundAt(small, doorY) + 4, w: 58, h: 100, z: 9, r: 0, layer: 'mg' });
+    decos.push({ sprite: 'vine_rope', x: doorX - 620, y: doorY - 230, w: 36, h: 360, z: 2, r: 52, layer: 'mg' });
+    const ledge = ledgeOf[doorY];
+    if (ledge) {
+      // Roots hang from under the ledge art (its top + 80); behind the steps (z 6-7).
+      const cx = (ledge.left + ledge.right) / 2;
+      decos.push({ sprite: 'hanging_braches1', x: Math.round(cx - 70), y: doorY + 60 + 254, w: 300, h: 254, z: 5, r: 0, layer: 'mg' });
+      decos.push({ sprite: 'hanging_braches2', x: Math.round(cx + 120), y: doorY + 60 + 230, w: 226, h: 230, z: 5, r: 0, layer: 'mg' });
+    }
+  };
+  doorDressing(400, c6Floor, 'Way Out');
+  doorDressing(360, c4Floor, 'Way Out');
+  // The street exit's sign hangs the same way (remake: no Snap of the bottom door).
+  doorDressing(500, floor - 58, 'Tower St South');
+  // Bushes and roots on the secret-spot ledges.
+  for (const y of [spot10Y, spot11Y]) {
+    decos.push({ sprite: 'underground_bogwillow_1', x: -470, y: groundAt(-470, y) + 4, w: 58, h: 100, z: 9, r: 0, layer: 'mg' });
+    decos.push({ sprite: 'hanging_braches2', x: -400, y: y + 40 + 200, w: 196, h: 200, z: 5, r: 0, layer: 'mg' });
+  }
 
   return {
     tsid: VENT_ROOM_TSID,
@@ -335,6 +407,8 @@ function buildVent() {
       { id: 'TowerSpot_11', x: -415, y: spot11Y + 30, why: s11 },
     ],
     route: route.map((p) => ({ left: p.left, right: p.right, top: p.top, low: p.low })),
+    // The walls' wood darkened to the Snap's (~#26190c against the backdrop art's ~#69431c).
+    bgFilters: { tintColor: 0, tintAmount: 62 },
     why: {
       room: 'W: three hidden locations ([9]-[11]), "Exits to C6W (labeled \'Way Out\'), C4 (also labeled \'Way Out\'), and Tower St South. BRING SPINACH." G: "a high vertical shaft".',
       size: 'The archived arrivals put C6\'s door at y -2540 and C4\'s at +240 (2780 px apart); F calls C4 "the mid-height Way Out", so the shaft runs as far again below it to the street exit (t -2900, floor 2600; the world runs to b 3000 so the view never shows past the bottom). 1500 wide like the archived vertical streets (l -750, r 750).',
@@ -374,9 +448,11 @@ export function towerRoomStreet(room) {
   const toScreen = (x, y) => ({ x: x - l, y: y - t });
   const mg = [];
   const fg = [];
+  const bg = [];
   for (const d of room.decos) {
     const { layer, ...deco } = d;
     if (layer === 'fg') fg.push({ ...deco, ...toScreen(deco.x, deco.y) });
+    else if (layer === 'bg') bg.push({ ...deco, ...toScreen(deco.x, deco.y) });
     else mg.push(deco);
   }
   const doors = room.doors.map((d) => {
@@ -406,6 +482,9 @@ export function towerRoomStreet(room) {
     { id: 'middleground', name: 'middleground', z: 0, decos: mg, w: W, h: H },
     { id: `T_${room.sourceTsid}_fg`, name: 'FG', z: 2, decos: fg, w: W, h: H },
   ];
+  // A dimmed backdrop behind the middleground (the Ventilation Room's dark plank walls, Room 8's
+  // void): layer filters the way the archived corridors darken theirs (C4's T_ layer, brightness -100).
+  if (bg.length) layers.push({ id: `T_${room.sourceTsid}_bg`, name: 'BG', z: -1, decos: bg, w: W, h: H, filters: { ...room.bgFilters } });
   return {
     source: TOWER_ROOM_SOURCE,
     reconstructed: true,
@@ -419,7 +498,7 @@ export function towerRoomStreet(room) {
     stats: {
       platformCount: platforms.length,
       layerCount: layers.length,
-      decoCount: mg.length + fg.length,
+      decoCount: mg.length + fg.length + bg.length,
       signpostCount: 0,
       doorCount: doors.length,
       ladderCount: 0,
