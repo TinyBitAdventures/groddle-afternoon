@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 326,
+  "commits": 327,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Cubimals race, take names and fly off when set free"
+   },
    {
     "date": "2026-10-23",
     "kind": "fix",
@@ -1924,11 +1929,6 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "Blueberry, Autumn, Midnight, Candy and Forest presets drawn sharp from the vector wardrobe"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Crowded streets make animals sulk, leave or puff away, and Happy Animals cards raise your yard's limit"
    }
   ]
  },
