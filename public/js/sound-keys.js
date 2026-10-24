@@ -4,7 +4,7 @@
  * 284 with a recovered file. Full catalog: assets/content/sound-keys.json.
  */
 
-export const SOUND_KEY_COUNTS = Object.freeze({"keys":641,"original":606,"music":208,"remake":32,"recoveredWayback":38,"downloadsBestFit":27,"archiveorgSfx":216,"overlayFla":3,"withFile":284,"aliases":83,"playable":367});
+export const SOUND_KEY_COUNTS = Object.freeze({"keys":641,"original":606,"music":208,"remake":32,"recoveredWayback":38,"downloadsBestFit":27,"archiveorgSfx":216,"overlayFla":3,"withFile":284,"aliases":83,"playable":367,"dead":3,"live":638});
 
 /** Key → recovered audio file (relative to public/). */
 export const SOUND_FILES = Object.freeze({

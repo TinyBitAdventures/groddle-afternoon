@@ -123,7 +123,8 @@ const DOWNLOADS = {
   PIGGY_PLOP: { file: 'assets/audio/piggy_plop.mp3', name: 'piggy_plop.mp3', fit: 'Piggy Plop' },
   SPINNING_WHEEL: { file: 'assets/audio/ambient/Spinning-Wheel_1292034939.mp3', name: 'Spinning-Wheel_1292034939.mp3', fit: 'Spinning Wheel' },
   METALMAKER: { file: 'assets/audio/ambient/metalmaker_1344997841.mp3', name: 'metalmaker_1344997841.mp3', fit: 'metalmaker (music_map METALMAKER)' },
-  NEWDAY: { file: 'assets/audio/new_day_fanfare.mp3', name: 'new_day_fanfare.mp3', fit: 'stand-in fanfare until the rooster is recovered' },
+  // NEWDAY's old stand-in, new_day_fanfare.mp3, was the client's licensed trumpet.mp3 and is gone (2244251f);
+  // NEWDAY plays Tiny Speck's own "new day" recording from archive.org.
 };
 
 /**
@@ -272,6 +273,37 @@ function walk(dir, ext, out = []) {
   return out;
 }
 
+/**
+ * The source with every comment blanked to spaces (same length, newlines kept),
+ * so a match can be told apart from a call that was commented out. Strings
+ * ('...', "...", `...`) are skipped so a // inside a url does not count.
+ */
+export function blankComments(text) {
+  const out = text.split('');
+  let i = 0;
+  while (i < text.length) {
+    const c = text[i];
+    const d = text[i + 1];
+    if (c === '/' && d === '/') {
+      while (i < text.length && text[i] !== '\n') out[i++] = ' ';
+    } else if (c === '/' && d === '*') {
+      const end = text.indexOf('*/', i + 2);
+      const stop = end < 0 ? text.length : end + 2;
+      for (; i < stop; i += 1) if (text[i] !== '\n') out[i] = ' ';
+    } else if (c === '"' || c === "'" || c === '`') {
+      i += 1;
+      while (i < text.length && text[i] !== c && (c === '`' || text[i] !== '\n')) i += text[i] === '\\' ? 2 : 1;
+      i += 1;
+    } else {
+      i += 1;
+    }
+  }
+  return out.join('');
+}
+
+/** Whether the match at column `at` of line i sits in a comment (blankComments). */
+const inComment = (lines, code, i, at) => lines[i][at] !== ' ' && code[i]?.[at] === ' ';
+
 function contextName(lines, index) {
   for (let i = index; i >= 0 && i > index - 400; i -= 1) {
     const line = lines[i];
@@ -284,11 +316,21 @@ function contextName(lines, index) {
 }
 
 const keys = new Map();
-function note(key, { category = '', where, context = '', via }) {
+function note(key, { category = '', where, context = '', via, commented = false }) {
   // Keys may start with a number word prefix (11_SECRET_LOCATIONS_BEACON_LOOP, inc_eleven_secrets.js).
   if (!key || !/^(?:[A-Za-z]|\d+_[A-Za-z])[A-Za-z0-9_]*$/.test(key)) return;
-  const row = keys.get(key) || { key, category, uses: 0, sources: [], via: new Set() };
+  const row = keys.get(key) || { key, category, uses: 0, plays: 0, sources: [], via: new Set(), commentedOut: [] };
+  // A call that was commented out is not a use: kept apart, it decides whether
+  // the key is dead in the final client (no live call left).
+  if (commented) {
+    if (category && !row.category) row.category = category;
+    row.commentedOut.push(context ? `${where} (${context})` : where);
+    keys.set(key, row);
+    return;
+  }
   row.uses += 1;
+  // An embedded asset (Assets.as) is not a play; only a call site keeps a key alive.
+  if (via !== 'embedded') row.plays += 1;
   row.via.add(via);
   if (category && !row.category) row.category = category;
   if (row.sources.length < 6) row.sources.push(context ? `${where} (${context})` : where);
@@ -308,6 +350,7 @@ for (const file of gsjsFiles) {
   const text = readFileSync(file, 'utf8');
   if (!/sound/i.test(text)) continue;
   const lines = text.split('\n');
+  const code = blankComments(text).split('\n');
   lines.forEach((line, i) => {
     for (const { re, via } of PATTERNS) {
       re.lastIndex = 0;
@@ -315,7 +358,7 @@ for (const file of gsjsFiles) {
       while ((m = re.exec(line))) {
         let key = m[1];
         if (/_$/.test(key)) continue; // concatenated families are expanded below
-        note(key, { where: `gsjs:${rel}:${i + 1}`, context: contextName(lines, i), via });
+        note(key, { where: `gsjs:${rel}:${i + 1}`, context: contextName(lines, i), via, commented: inComment(lines, code, i, m.index) });
       }
     }
   });
@@ -364,6 +407,7 @@ for (const file of walk(CLIENT, '.as')) {
   if (!/playSound|sound_id|onStartParams/.test(text)) continue;
   const rel = relative(CLIENT, file);
   const lines = text.split('\n');
+  const code = blankComments(text).split('\n');
   lines.forEach((line, i) => {
     for (const re of CLIENT_PATTERNS) {
       re.lastIndex = 0;
@@ -371,7 +415,7 @@ for (const file of walk(CLIENT, '.as')) {
       while ((m = re.exec(line))) {
         if (line.slice(m.index + m[0].length).startsWith('+')) continue; // CARD_DEAL'+n family
         for (const key of m.slice(1).filter(Boolean)) {
-          note(key, { category: 'ui', where: `client:${rel}:${i + 1}`, context: contextName(lines, i), via: 'client' });
+          note(key, { category: 'ui', where: `client:${rel}:${i + 1}`, context: contextName(lines, i), via: 'client', commented: inComment(lines, code, i, m.index) });
         }
       }
     }
@@ -500,7 +544,11 @@ const catalog = {};
 for (const key of [...keys.keys()].sort((a, b) => a.localeCompare(b))) {
   const row = keys.get(key);
   const category = categorize(key, row);
-  const fallbackMoment = row.sources[0]?.replace(/^(gsjs|client):/, '') || '';
+  // Dead in the final client: every call site that plays the key is commented
+  // out (trumpet: TSFrontController.as 2784/2792, the shutdown plays
+  // GOODNIGHT_GRODDLE instead). Catalogued, but never counted as missing.
+  const dead = !row.plays && row.commentedOut.length > 0 && !row.file;
+  const fallbackMoment = (dead ? row.commentedOut[0] : row.sources[0])?.replace(/^(gsjs|client):/, '') || '';
   catalog[key] = {
     category,
     moment: row.moment || MOMENTS[key] || (key.startsWith('STEWARTDOLL') ? `Stoot pull-string doll voice line ${key.slice(11)}` : fallbackMoment),
@@ -516,6 +564,7 @@ for (const key of [...keys.keys()].sort((a, b) => a.localeCompare(b))) {
     ...(row.doubt ? { doubt: row.doubt } : {}),
     ...(row.fit && !row.source ? { fit: row.fit } : {}),
     ...(ALIASES[key] ? { alias: ALIASES[key] } : {}),
+    ...(dead ? { dead: 'commented out in the final client', commentedOut: row.commentedOut } : {}),
   };
 }
 for (const [alias, target] of Object.entries(ALIASES)) {
@@ -538,7 +587,11 @@ const counts = {
   withFile: Object.keys(files).length,
   aliases: Object.keys(ALIASES).length,
   playable: Object.keys(catalog).filter((k) => files[k] || files[ALIASES[k]]).length,
+  /** Keys no live call plays in the final client (every call site commented out). */
+  dead: Object.values(catalog).filter((r) => r.dead).length,
 };
+/** Keys the final game could play: the scorecard's "Sound keys with a real recording" denominator. */
+counts.live = counts.keys - counts.dead;
 
 writeFileSync(
   OUT_JSON,

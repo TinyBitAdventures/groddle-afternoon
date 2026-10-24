@@ -165,7 +165,10 @@ function soundStats() {
   const archiveMusic = Object.values(keys).filter((r) => r.origin === 'archiveorg-sfx' && r.category === 'music'
     && r.archiveItem === 'esquebeth-quest').length;
   return {
-    keys: counts.keys,
+    // Keys the final client could play: those whose every call site is commented
+    // out (trumpet, TALK_FROG, CRAFTYBOT_IDLE_1) are not counted (build-sound-keys.mjs).
+    keys: counts.live ?? counts.keys,
+    deadKeys: counts.dead || 0,
     withFile: counts.withFile,
     playable: counts.playable,
     recoveredWayback: counts.recoveredWayback,

@@ -1774,7 +1774,8 @@
   "hubs": 60
  },
  "sounds": {
-  "keys": 641,
+  "keys": 638,
+  "deadKeys": 3,
   "withFile": 284,
   "playable": 367,
   "recoveredWayback": 38,

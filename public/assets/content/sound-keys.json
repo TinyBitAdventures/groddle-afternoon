@@ -12,7 +12,9 @@
   "overlayFla": 3,
   "withFile": 284,
   "aliases": 83,
-  "playable": 367
+  "playable": 367,
+  "dead": 3,
+  "live": 638
  },
  "keys": {
   "11_SECRET_LOCATIONS_BEACON_LOOP": {
@@ -2042,7 +2044,7 @@
   "CLICK_FAILURE": {
    "category": "ui",
    "moment": "A disabled button, or a verb that cannot run (garden, trants)",
-   "uses": 179,
+   "uses": 175,
    "via": [
     "announce_sound",
     "client"
@@ -2066,7 +2068,7 @@
   "CLICK_SUCCESS": {
    "category": "ui",
    "moment": "Any enabled button in a dialog (client UI)",
-   "uses": 164,
+   "uses": 158,
    "via": [
     "client"
    ],
@@ -2482,11 +2484,11 @@
   "CRAFTYBOT_IDLE_1": {
    "category": "making",
    "moment": "items/npc_crafty_bot.js:3024 (setState)",
-   "uses": 1,
-   "via": [
-    "sound field"
-   ],
-   "sources": [
+   "uses": 0,
+   "via": [],
+   "sources": [],
+   "dead": "commented out in the final client",
+   "commentedOut": [
     "gsjs:items/npc_crafty_bot.js:3024 (setState)"
    ]
   },
@@ -4221,14 +4223,13 @@
   "HORRIBLE_SOUND": {
    "category": "event",
    "moment": "items/focusing_orb.js:842 (endFocusedMeditation)",
-   "uses": 6,
+   "uses": 5,
    "via": [
     "announce_sound"
    ],
    "sources": [
     "gsjs:items/focusing_orb.js:842 (endFocusedMeditation)",
     "gsjs:items/focusing_orb.js:971 (endStandingMeditation)",
-    "gsjs:items/focusing_orb.js:1132 (endTranscendentalMeditation)",
     "gsjs:items/focusing_orb.js:1292 (endTranscendentalRadiationNew)",
     "gsjs:items/include/shrines.js:301 (evalDonate)",
     "gsjs:items/sneezing_powder.js:256 (is_antidote)"
@@ -4660,12 +4661,11 @@
   "LEVEL_UP": {
    "category": "reward",
    "moment": "Level up overlay",
-   "uses": 2,
+   "uses": 1,
    "via": [
     "sound field"
    ],
    "sources": [
-    "gsjs:players/inc_newxp.js:67 (newxpComplete)",
     "gsjs:players/inc_stats.js:409 (stats_add_xp)"
    ],
    "file": "assets/audio/level_up_kazoo.mp3",
@@ -5034,14 +5034,10 @@
   },
   "MAKING_WAITING_COOKING": {
    "category": "making",
-   "moment": "players/inc_making.js:677 (tryToMake)",
-   "uses": 1,
-   "via": [
-    "announce_sound"
-   ],
-   "sources": [
-    "gsjs:players/inc_making.js:677 (tryToMake)"
-   ],
+   "moment": "",
+   "uses": 0,
+   "via": [],
+   "sources": [],
    "file": "assets/audio/sfx/MAKING_WAITING_COOKING.mp3",
    "origin": "archiveorg-sfx",
    "source": "https://archive.org/download/glitch-mmo-tiny-speck-unused-sfx/process.mp3",
@@ -5119,14 +5115,13 @@
   "MEDITATION_SUCCESS": {
    "category": "event",
    "moment": "items/focusing_orb.js:843 (endFocusedMeditation)",
-   "uses": 4,
+   "uses": 3,
    "via": [
     "announce_sound"
    ],
    "sources": [
     "gsjs:items/focusing_orb.js:843 (endFocusedMeditation)",
     "gsjs:items/focusing_orb.js:972 (endStandingMeditation)",
-    "gsjs:items/focusing_orb.js:1133 (endTranscendentalMeditation)",
     "gsjs:items/focusing_orb.js:1293 (endTranscendentalRadiationNew)"
    ],
    "file": "assets/audio/sfx/MEDITATION_SUCCESS.mp3",
@@ -8182,14 +8177,11 @@
   "STREET_LOADED": {
    "category": "ui",
    "moment": "A street finishes loading",
-   "uses": 3,
+   "uses": 1,
    "via": [
-    "announce_sound",
     "client"
    ],
    "sources": [
-    "gsjs:main.js:1017 (doLoginEnd)",
-    "gsjs:main.js:1466 (doEndMove)",
     "client:com/tinyspeck/engine/view/gameoverlay/LoadingLocationView.as:408 (done)"
    ],
    "file": "assets/audio/sfx/STREET_LOADED.mp3",
@@ -8296,11 +8288,11 @@
   "TALK_FROG": {
    "category": "animal",
    "moment": "items/npc_yoga_frog.js:221 (dialog_onMsg)",
-   "uses": 1,
-   "via": [
-    "announce_sound"
-   ],
-   "sources": [
+   "uses": 0,
+   "via": [],
+   "sources": [],
+   "dead": "commented out in the final client",
+   "commentedOut": [
     "gsjs:items/npc_yoga_frog.js:221 (dialog_onMsg)"
    ]
   },
@@ -8574,14 +8566,13 @@
   "TRAIN_ARRIVES": {
    "category": "music",
    "moment": "locations/inc_transit.js:342 (transit_brakes)",
-   "uses": 3,
+   "uses": 2,
    "via": [
     "announce_sound",
     "music_map"
    ],
    "sources": [
     "gsjs:locations/inc_transit.js:342 (transit_brakes)",
-    "gsjs:locations/inc_transit.js:367 (transit_arrive)",
     "gsjs:inc_data_sounds.js (music_map)"
    ],
    "url": "http://c2.glitch.bz/sounds/2011-01/1295655628-train_arrives2.mp3",
@@ -8695,15 +8686,17 @@
   "trumpet": {
    "category": "ui",
    "moment": "com/tinyspeck/engine/control/TSFrontController.as:2784 (initiateShutDownSequence)",
-   "uses": 3,
+   "uses": 1,
    "via": [
-    "client",
     "embedded"
    ],
    "sources": [
-    "client:com/tinyspeck/engine/control/TSFrontController.as:2784 (initiateShutDownSequence)",
-    "client:com/tinyspeck/engine/control/TSFrontController.as:2792 (initiateShutDownSequence)",
     "client:TSEngineAssets/src/Assets.as:10 (embedded)"
+   ],
+   "dead": "commented out in the final client",
+   "commentedOut": [
+    "client:com/tinyspeck/engine/control/TSFrontController.as:2784 (initiateShutDownSequence)",
+    "client:com/tinyspeck/engine/control/TSFrontController.as:2792 (initiateShutDownSequence)"
    ]
   },
   "TUBAMAPHONE_DARK": {

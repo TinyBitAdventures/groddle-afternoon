@@ -49,7 +49,7 @@ const measures = [
   ['Skills live', data.skills.counts.live, data.skills.total, `${data.skills.counts.partial} partial`],
   ['Imagination cards live', data.imagination.counts.live + data.imagination.counts.starter, data.imagination.total, `${data.imagination.counts.later} later`],
   ['Street projects playable', data.jobs.playableJobs, data.jobs.sourceJobs, ''],
-  ['Sound keys with a real recording', data.sounds.playable, data.sounds.keys, 'the rest are synth stand-ins'],
+  ['Sound keys with a real recording', data.sounds.playable, data.sounds.keys, `the rest are synth stand-ins${data.sounds.deadKeys ? `; ${data.sounds.deadKeys} dead in the final client not counted` : ''}`],
   ['Item icons sharp (3x)', data.icons.sharp, data.icons.items, ''],
   ['Badges with official art', data.badges.officialArt, data.badges.total, ''],
   ['Wardrobe articles wearable', wardrobe, WARDROBE_SWFS, `${wardrobe - reimaginedWardrobe} + ${reimaginedWardrobe} reimagined (greyscale masters, borrowed colours); bracelets have no container`],

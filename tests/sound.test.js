@@ -78,6 +78,24 @@ describe('sound-key catalog', () => {
     assert.match(catalog.keys.ITEM_PICKUP.sources[0], /takeable\.js/);
   });
 
+  test('keys whose every call is commented out are dead in the final client, not missing', () => {
+    const dead = Object.entries(catalog.keys).filter(([, r]) => r.dead).map(([k]) => k).sort();
+    // trumpet: TSFrontController.as 2784/2792 (the shutdown plays GOODNIGHT_GRODDLE);
+    // TALK_FROG "Removed per Danny" (npc_yoga_frog.js 221); CRAFTYBOT_IDLE_1 (npc_crafty_bot.js 3024).
+    assert.deepEqual(dead, ['CRAFTYBOT_IDLE_1', 'TALK_FROG', 'trumpet']);
+    assert.deepEqual(catalog.keys.trumpet.commentedOut.map((s) => s.match(/:(\d+) /)[1]), ['2784', '2792']);
+    assert.equal(SOUND_KEY_COUNTS.dead, 3);
+    assert.equal(SOUND_KEY_COUNTS.live, SOUND_KEY_COUNTS.keys - 3);
+    for (const key of dead) {
+      assert.equal(catalog.keys[key].file, undefined, key);
+      assert.equal(catalog.keys[key].alias, undefined, key);
+    }
+    // A live call keeps a key alive: the chat easter egg (RightSideManager.as 203).
+    assert.equal(catalog.keys.Prisencolinensinainciusol.dead, undefined);
+    // Commented-out calls are not uses of a live key either.
+    assert.ok(!catalog.keys.CLICK_FAILURE.sources.some((s) => /TSFrontController\.as:551 /.test(s)));
+  });
+
   test('every recovered file exists, is MPEG audio, and keeps its CDN url', () => {
     assert.equal(SOUND_KEY_COUNTS.recoveredWayback, 38);
     for (const [key, file] of Object.entries(SOUND_FILES)) {
