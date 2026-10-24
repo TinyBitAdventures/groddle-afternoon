@@ -1,8 +1,9 @@
 /**
  * The Hall of Rejected Concepts (G73): js/hall-rejected-concepts.js (layout
  * and room), its street JSON (tools/build-tower-rooms.mjs), the exhibit art
- * (tools/hall-concepts-art/build.py -> js/hall-concepts-art.js) and the Wall
- * Buttons in features/mid-tower-feature.js.
+ * (tools/hall-concepts-art/build.py -> js/hall-concepts-art.js), the Wall
+ * Buttons in features/mid-tower-feature.js, and (G86) the widget by the first
+ * window (tools/hall-concepts-art/widget.py) and the wall tint.
  * Run: node --test tests/hall-rejected-concepts.test.js
  */
 import { describe, it, before, after } from 'node:test';
@@ -19,6 +20,7 @@ import {
   HALL_BUTTON_CLASS,
   HALL_EXHIBITS,
   HALL_TSID,
+  HALL_WIDGET,
   STAND,
   WALL_BUTTON,
   hallLayout,
@@ -31,6 +33,7 @@ const streets = join(spike, 'public/assets/streets');
 const street = (tsid) => JSON.parse(readFileSync(join(streets, `${tsid}.json`), 'utf8'));
 const index = JSON.parse(readFileSync(join(streets, 'index.json'), 'utf8')).streets;
 const hall = midTowerRoomByTsid(HALL_TSID);
+const client = join(spike, '../glitch-client');
 
 /** WebP canvas size from its RIFF header (VP8 / VP8L / VP8X). */
 function webpSize(file) {
@@ -141,6 +144,58 @@ describe('Hall of Rejected Concepts: the exhibits', () => {
   });
 });
 
+describe('Hall of Rejected Concepts: the widget by the first window (G86)', () => {
+  it('is npc_widget.swf widgetWood, its idle loop as rendered by widget.py', () => {
+    const plan = JSON.parse(readFileSync(join(spike, 'tools/hall-concepts-art/widget.json'), 'utf8'));
+    assert.equal(plan.variant, HALL_WIDGET.variant);
+    assert.equal(`${HALL_ART_ROOT}${plan.file}`, HALL_WIDGET.sheet);
+    for (const k of ['frames', 'fps', 'cols', 'frameW', 'frameH']) assert.equal(HALL_WIDGET[k], plan[k], k);
+    // npc_widget.swf: idle 1-24 (24 repeats 1), 24 fps.
+    assert.deepEqual([HALL_WIDGET.frames, HALL_WIDGET.fps], [23, 24]);
+    const rows = Math.ceil(HALL_WIDGET.frames / HALL_WIDGET.cols);
+    assert.deepEqual(webpSize(join(spike, 'public', HALL_WIDGET.sheet)), [HALL_WIDGET.frameW * HALL_WIDGET.cols * 3, HALL_WIDGET.frameH * rows * 3]);
+  });
+
+  it('hovers just right of the first window, clear of the arrow and the Rube', () => {
+    const first = HALL.windows[0];
+    assert.ok(HALL_WIDGET.x > first + 30 && HALL_WIDGET.x < first + 90);
+    assert.ok(HALL_WIDGET.x - HALL_WIDGET.frameW / 2 > HALL.arrowX + 70);
+    assert.ok(HALL_WIDGET.x + HALL_WIDGET.frameW / 2 < HALL_EXHIBITS[0].x - 100);
+    assert.ok(HALL_WIDGET.y < HALL.floor && HALL_WIDGET.y > HALL.windowSize.bottom);
+    assert.equal(hall.widget, HALL_WIDGET);
+  });
+
+  it('follows items/npc_widget.js: its label, the variant list, and no player verbs outside tower_quest', { skip: !existsSync(gsjs) && 'GSJS checkout not beside this worktree' }, () => {
+    const js = readFileSync(join(gsjs, 'items/npc_widget.js'), 'utf8');
+    assert.match(js, new RegExp(`var label = "${HALL_WIDGET.label}";`));
+    assert.match(js, /variant : \["widgetGreen","widgetWhite","widgetPink","widgetTin","widgetWood"\]/);
+    assert.match(js, /verbs\.talk_to = [\s\S]*?if \(!config\.is_dev\) return \{state:null\};/);
+  });
+
+  it('growls the client\'s empty-menu line', { skip: !existsSync(client) && 'glitch-client not beside this worktree' }, () => {
+    const as = readFileSync(join(client, 'com/tinyspeck/engine/view/ui/InteractionMenu.as'), 'utf8');
+    assert.ok(as.includes(`if (imm.choices.length == 0) {\n\t\t\t\tmodel.activityModel.growl_message = '${HALL_WIDGET.growl}';`));
+  });
+
+  it('game.js turns an empty menu with emptyMenuGrowl into that growl', () => {
+    const game = readFileSync(join(spike, 'public/game.js'), 'utf8');
+    assert.match(game, /if \(!verbs\.length && target\.emptyMenuGrowl\) \{\s*menuTarget = null;\s*toast\(target\.emptyMenuGrowl\);\s*return;/);
+  });
+});
+
+describe('Hall of Rejected Concepts: the wall (G86)', () => {
+  it('names its wall tiles so the feature can tint them olive-gold', () => {
+    const tiles = hall.decos.filter((d) => d.sprite === 'jethimadh_int_bg_center');
+    assert.ok(tiles.length >= 7);
+    assert.deepEqual(tiles.map((d) => d.id), tiles.map((_, i) => `hall_wall_${i}`));
+    const mg = street(HALL_TSID).layers.find((l) => l.id === 'middleground');
+    assert.equal(mg.decos.filter((d) => /^hall_wall_\d+$/.test(d.id || '')).length, tiles.length);
+    // Less red than green and blue (orange -> olive-gold), a little darker overall.
+    const [r, g, b] = [HALL.wallTint >> 16, (HALL.wallTint >> 8) & 0xff, HALL.wallTint & 0xff];
+    assert.ok(r < b && b < g && g < 0xff);
+  });
+});
+
 describe('Hall of Rejected Concepts: the Wall Buttons', () => {
   it('follow items/wall_button.js', { skip: !existsSync(gsjs) && 'GSJS checkout not beside this worktree' }, () => {
     const js = readFileSync(join(gsjs, 'items/wall_button.js'), 'utf8');
@@ -177,7 +232,9 @@ describe('Hall of Rejected Concepts: the Wall Buttons', () => {
         destroy() { this.destroyed = true; }
       }
       class Source { constructor() { this.width = 1; this.height = 1; } on() {} emit() {} resize() { return true; } update() {} }
-      globalThis.PIXI = { Sprite: Obj, Container: Obj, ImageSource: Source, Texture: class { constructor(o) { Object.assign(this, o); } } };
+      class Anim extends Obj { constructor(frames) { super(); this.textures = frames; this.playing = false; } play() { this.playing = true; } }
+      class Rectangle { constructor(x, y, w, h) { Object.assign(this, { x, y, width: w, height: h }); } }
+      globalThis.PIXI = { Sprite: Obj, Container: Obj, AnimatedSprite: Anim, Rectangle, ImageSource: Source, Texture: class { constructor(o) { Object.assign(this, o); } } };
       globalThis.Image = class { set src(_u) {} decode() { return new Promise(() => {}); } };
       globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }) };
       ({ midTowerFeature: feature } = await import('../public/js/features/mid-tower-feature.js'));
@@ -190,9 +247,11 @@ describe('Hall of Rejected Concepts: the Wall Buttons', () => {
       const layer = new globalThis.PIXI.Container();
       const calls = { data: {}, activity: [], registered: [] };
       const s = street(HALL_TSID);
+      const decoViews = new Map(s.layers.flatMap((l) => l.decos).filter((d) => d.id).map((d) => [d.id, { tint: 0xffffff, destroyed: false }]));
       return {
         calls,
         street: s,
+        decoViews,
         PIXI: globalThis.PIXI,
         entityLayer: layer,
         player: { x: x - s.bounds.l, y: HALL.floor - s.bounds.t },
@@ -213,6 +272,28 @@ describe('Hall of Rejected Concepts: the Wall Buttons', () => {
       assert.equal(engine.calls.data.hallExhibits, HALL_EXHIBITS.length);
       assert.deepEqual(feature.verbsFor(buttons[0]).map((v) => [v.id, v.label, v.tooltip]), [['press', 'Press', 'Press']]);
       feature.onStreetClear(engine);
+    });
+
+    it('draws the widget playing its idle loop, with no verbs and the growl, and tints the wall', () => {
+      const engine = engineAt(700);
+      feature.onStreetEnter(engine.street, engine);
+      const widget = engine.calls.registered.find((t) => t.classId === HALL_WIDGET.classId);
+      assert.ok(widget);
+      assert.equal(widget.label, 'Greeterbot Sentry G-42');
+      assert.equal(widget.emptyMenuGrowl, 'I have nothing for you!');
+      assert.equal(widget.sprite.textures.length, HALL_WIDGET.frames);
+      assert.equal(widget.sprite.playing, true);
+      assert.deepEqual([widget.sprite.x, widget.sprite.y], [HALL_WIDGET.x - engine.street.bounds.l, HALL_WIDGET.y - engine.street.bounds.t]);
+      const last = widget.sprite.textures.at(-1).frame;
+      assert.deepEqual([last.x, last.y], [((HALL_WIDGET.frames - 1) % HALL_WIDGET.cols) * HALL_WIDGET.frameW, Math.floor((HALL_WIDGET.frames - 1) / HALL_WIDGET.cols) * HALL_WIDGET.frameH]);
+      assert.deepEqual(feature.verbsFor(widget), []);
+      assert.equal(feature.runVerb(widget, 'talk_to', engine), true);
+      assert.equal(engine.calls.data.hallWidget, 'widgetWood');
+      const walls = [...engine.decoViews].filter(([id]) => id.startsWith('hall_wall_'));
+      assert.ok(walls.length && walls.every(([, v]) => v.tint === HALL.wallTint));
+      assert.equal(engine.calls.data.hallWallTint, HALL.wallTint.toString(16));
+      feature.onStreetClear(engine);
+      assert.equal(feature._state().widget, null);
     });
 
     it('a press goes in, raises its caption, and pops out after reset_timer', async () => {

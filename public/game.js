@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-35';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-36';
 import {
   actionDurationFor,
   createTimedAction,
@@ -4623,6 +4623,12 @@ function openVerbMenu(target) {
     imaginationUpgrades: pc.imaginationUpgrades || [],
     streetTsid: currentStreetTsid,
   }), engine);
+  // InteractionMenu.as present(): no choices -> a growl, no menu (the Hall's widget: "I have nothing for you!").
+  if (!verbs.length && target.emptyMenuGrowl) {
+    menuTarget = null;
+    toast(target.emptyMenuGrowl);
+    return;
+  }
   const menu = document.getElementById('verb-menu');
   const list = document.getElementById('verb-menu-list');
   const title = document.getElementById('verb-menu-title');

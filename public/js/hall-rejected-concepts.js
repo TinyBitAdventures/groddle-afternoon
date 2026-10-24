@@ -71,6 +71,34 @@ export const WALL_BUTTON = Object.freeze({
   h: 35,
 });
 
+/**
+ * The widget hovering by the first window (V: -03T3bLY7a0 t0016-t0024, E6BIN3OfEkI 0:09; both show it
+ * in the same spot, just right of the window and below its sill, so it does not pace here). Its
+ * yellow knob, pale face and tan body are npc_widget.swf's widgetWood variant (the variants are
+ * widgetGreen, widgetWhite, widgetPink, widgetTin and widgetWood: npc_widget.js instancePropsChoices),
+ * the Greeterbot's art. Outside a tower_quest instance npc_widget offers no verbs to players (talk_to,
+ * give_cubimal and debug all return state null), so a click gets the client's empty-menu growl
+ * (InteractionMenu.as present(): "I have nothing for you!"), as V shows after its "working..." menu.
+ * Idle loop: frames 1-23 of the SWF's "idle" label at 24 fps, rendered by
+ * tools/hall-concepts-art/widget.py (sheet geometry here, checked against widget.json by the tests).
+ */
+export const HALL_WIDGET = Object.freeze({
+  classId: 'npc_widget',
+  label: 'Greeterbot Sentry G-42', // npc_widget.js label (every widget's class label)
+  variant: 'widgetWood',
+  growl: 'I have nothing for you!',
+  sheet: `${HALL_ART_ROOT}npc_widget_widgetWood_idle@3x.webp`,
+  frames: 23,
+  fps: 24,
+  cols: 6,
+  frameW: 74,
+  frameH: 85,
+  // Bottom-centre, world px (V): ~55 px right of the first window's centre, its knob level with the
+  // sill (the recordings put it 65-95 px over the floor; the sill lines it up as they show it).
+  x: 705,
+  y: -70,
+});
+
 /** The client's in-window announcement advance label (InWindowAnnouncementOverlay.as). */
 export const CLICK_ANYWHERE = 'Click anywhere...';
 
@@ -91,6 +119,10 @@ export const HALL = Object.freeze({
   arrowX: 450,
   windows: Object.freeze([650, 1490, 2390, 3330, 3690, 4505]),
   windowSize: Object.freeze({ w: 80, h: 178, bottom: -140 }),
+  // Multiply tint on the wall tiles (ids hall_wall_<n>): jethimadh_int_bg_center reads orange here
+  // (wall pixels g/r 0.62, b/r 0.25, hue 29 deg at midday) against the Snaps' olive-gold (8 unfiltered
+  // Snaps: median g/r 0.67, b/r 0.26, hue 33-36 deg). Red x0.876, green x0.95, blue x0.914.
+  wallTint: 0xdff2e9,
 });
 
 /**
@@ -151,7 +183,7 @@ export function buildHall({ hub, mezzanine }) {
   // (remake; S: a warm wooden hall, darker overhead).
   const tile = 760;
   for (let x = bounds.l + tile / 2 - 60, i = 0; x < bounds.r + tile / 2; x += tile, i += 1) {
-    decos.push({ sprite: 'jethimadh_int_bg_center', x, y: bounds.b + 60, w: tile + 120, h: bounds.b - bounds.t + 120, z: i % 2, r: 0, layer: 'mg' });
+    decos.push({ id: `hall_wall_${i}`, sprite: 'jethimadh_int_bg_center', x, y: bounds.b + 60, w: tile + 120, h: bounds.b - bounds.t + 120, z: i % 2, r: 0, layer: 'mg' });
   }
   // firebog_linear_gradient_shadow is black, opaque over its left 55 % and fading out to the right;
   // turned 90 degrees it darkens the ceiling (opaque side up), turned -90 the floor (opaque side down).
@@ -204,6 +236,7 @@ export function buildHall({ hub, mezzanine }) {
     ],
     spots: [],
     exhibits: hallLayout(),
+    widget: HALL_WIDGET,
     why: {
       room: 'Maps: LA9L33D5CNE3I0J "Hall of Rejected Concepts" in hub 96. F 29729 (Kukubee, 2012-11-21): "old art, original concepts and lame ideas that never made it into the game", "next to the Rook Museum". S/V: the exhibits on low plinths, a red wall_button each.',
       size: 'V/S: about six screens long (fourteen exhibits at 250-400 px, the arrival door and sign before them, a short run of wall after the Avatars); one screen tall.',

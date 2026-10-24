@@ -1,0 +1,23 @@
+{
+ "swf": "15a1c1dc89d854d8",
+ "variant": "widgetWood",
+ "sprite": 40,
+ "frames": 23,
+ "fps": 24,
+ "cols": 6,
+ "frameW": 74,
+ "frameH": 85,
+ "trim": [
+  4,
+  2
+ ],
+ "canvas": [
+  82,
+  91
+ ],
+ "file": "npc_widget_widgetWood_idle@3x.webp",
+ "bytes": 219654,
+ "lossless": false,
+ "error": 4.32,
+ "webp": "746fd23b14cc44c8"
+}

@@ -24,6 +24,11 @@
  *   Press, in for reset_timer 1000 ms, nothing past `distance` 1000 px). A
  *   press raises the client's in-window announcement ("Click anywhere...",
  *   Enter / Space / Escape too) naming the exhibit, as the recordings show.
+ *   By the first window a widget hovers (widgetWood, its idle loop at 3x):
+ *   npc_widget has no player verbs outside its tower_quest, so a click gets
+ *   the client's empty-menu growl "I have nothing for you!" (game.js
+ *   openVerbMenu: a target's emptyMenuGrowl). The wall tiles take
+ *   HALL.wallTint (olive-gold, sampled from the Snaps).
  *
  * QA (real input): ?autostart=1&questoffer=off&doordemo=GIF5UU8FO3029OK&doorautoplay=1
  *   enters the tower from Tower St West; or &streetdemo=GIFGJ2246R72LJL for the
@@ -34,12 +39,14 @@
  * Canvas data: midTowerRoom, greeterbot (waiting | museum | repeat |
  * declined | refused), midTowerLast, midTowerTeleports, hallExhibits,
  * hallButton (last exhibit pressed), hallPresses, hallSeen, hallOverlay
- * (the announcement's text while it is up).
+ * (the announcement's text while it is up), hallWidget (its variant),
+ * hallWallTint (hex, once the wall tiles are tinted).
  */
 
 import { insideBottomRect } from '../doors.js';
 import { assignQuest } from '../quests.js';
-import { textureFromUrl } from '../textures.js';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { pixiSpeed } from '../sprite-sheets.js';
 import {
   GREETERBOT,
   MEZZANINE_TSID,
@@ -48,7 +55,7 @@ import {
   boxToScreen,
   midTowerRoomByTsid,
 } from '../tower-mid-rooms.js?v=mid-tower-4';
-import { CLICK_ANYWHERE, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, WALL_BUTTON } from '../hall-rejected-concepts.js';
+import { CLICK_ANYWHERE, HALL, HALL_ART, HALL_ART_ROOT, HALL_BUTTON_CLASS, HALL_WIDGET, WALL_BUTTON } from '../hall-rejected-concepts.js';
 
 export const MID_TOWER_FEATURE_ID = 'mid-tower';
 export const ROOK_HALL_START = 'rook_hall_start';
@@ -67,6 +74,7 @@ let teleports = 0;
 let hallButtons = [];
 let hallStreet = null;
 let hallPresses = 0;
+let hallWidget = null;
 const hallSeen = new Set();
 let overlayEl = null;
 let overlayDone = null;
@@ -83,6 +91,8 @@ function clear(engine) {
   for (const b of hallButtons) if (b.timer) clearTimeout(b.timer);
   hallButtons = [];
   hallStreet = null;
+  if (hallWidget && engine) engine.unregister(hallWidget);
+  hallWidget = null;
   closeOverlay();
 }
 
@@ -209,9 +219,53 @@ function drawHall(engine, room, street) {
     });
     hallButtons.push({ ex, target, out, inn, timer: 0 });
   }
+  if (room.widget) drawHallWidget(engine, room.widget, street);
+  tintHallWall(engine);
   engine.setData('hallExhibits', room.exhibits.length);
   engine.setData('hallPresses', hallPresses);
   engine.setData('hallSeen', hallSeen.size);
+}
+
+/** The widget by the first window: widgetWood's idle loop (npc_widget.swf frames 1-23, 24 fps). */
+function drawHallWidget(engine, w, street) {
+  const { PIXI } = engine;
+  const source = sourceFromUrl(w.sheet);
+  const frames = [];
+  for (let i = 0; i < w.frames; i += 1) {
+    frames.push(frameTexture(source, new PIXI.Rectangle((i % w.cols) * w.frameW, Math.floor(i / w.cols) * w.frameH, w.frameW, w.frameH)));
+  }
+  const sprite = new PIXI.AnimatedSprite(frames);
+  sprite.anchor.set(0.5, 1);
+  sprite.x = w.x - street.bounds.l;
+  sprite.y = w.y - street.bounds.t;
+  sprite.zIndex = -9;
+  sprite.animationSpeed = pixiSpeed(w.fps);
+  sprite.loop = true;
+  sprite.play();
+  engine.entityLayer.addChild(sprite);
+  views.push(sprite);
+  hallWidget = engine.register({
+    classId: w.classId,
+    featureId: MID_TOWER_FEATURE_ID,
+    label: w.label,
+    sprite,
+    // game.js openVerbMenu: no verbs -> this growl instead of a menu (InteractionMenu.as present()).
+    emptyMenuGrowl: w.growl,
+  });
+  engine.setData('hallWidget', w.variant);
+}
+
+/** Multiply HALL.wallTint into the wall tiles (street decos hall_wall_<n>). */
+function tintHallWall(engine) {
+  const decos = engine.decoViews;
+  if (!decos) return;
+  let n = 0;
+  for (const [id, spr] of decos) {
+    if (!id.startsWith('hall_wall_') || spr.destroyed) continue;
+    spr.tint = HALL.wallTint;
+    n += 1;
+  }
+  if (n) engine.setData('hallWallTint', HALL.wallTint.toString(16));
 }
 
 function setPressed(b, pressed) {
@@ -368,6 +422,7 @@ export const midTowerFeature = {
   },
 
   verbsFor(target) {
+    if (target && target === hallWidget) return [];
     if (target?.classId === HALL_BUTTON_CLASS && hallButtons.some((b) => b.target === target)) {
       return [{ id: WALL_BUTTON.verb, label: WALL_BUTTON.verbLabel, sort: 50, tooltip: WALL_BUTTON.tooltip, enabled: true, reason: '', durationMs: 0 }];
     }
@@ -376,6 +431,7 @@ export const midTowerFeature = {
   },
 
   runVerb(target, verbId, engine) {
+    if (target && target === hallWidget) return true;
     if (target?.classId === HALL_BUTTON_CLASS) {
       if (verbId === WALL_BUTTON.verb) pressHallButton(engine, target);
       return true;
@@ -414,6 +470,7 @@ export const midTowerFeature = {
       hall: hallButtons.map((b) => ({ id: b.ex.id, target: b.target, pressed: b.inn.visible === true })),
       hallPresses,
       hallSeen: [...hallSeen],
+      widget: hallWidget,
     };
   },
 };

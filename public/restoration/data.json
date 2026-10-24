@@ -1808,9 +1808,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 339,
+  "commits": 341,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "Sounds the final game never played no longer count as missing"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "A named Cubimal goes by its name in the pack and on the ground, and races sharp on Retina"
+   },
    {
     "date": "2026-10-23",
     "kind": "improve",
@@ -1920,16 +1930,6 @@
     "date": "2026-10-23",
     "kind": "improve",
     "text": "The Rube's yard and Operation Grow look as players' Snaps show them"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "The Hall's buttons raise Tiny Speck's own exhibit captions"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Sky Plunge lands on its Snap's cloud floor, with a Back to Top door and \"AHHHHH YEAHHHH!!!!!\""
    }
   ]
  },
