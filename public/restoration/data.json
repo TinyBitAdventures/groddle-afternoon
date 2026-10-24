@@ -1975,9 +1975,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 372,
+  "commits": 375,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Potions can be quaffed and poured, a Rug can be munched, and Essence of Purple takes you on the Purple Journey"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "Mood shapes iMG again: a glum Glitchen earns less, a cheerful one more"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Groddle on Minn: a Minn-native extension serves the site's folder pages through the route seam"
+   },
    {
     "date": "2026-10-24",
     "kind": "new",
@@ -2082,21 +2097,6 @@
     "date": "2026-10-24",
     "kind": "improve",
     "text": "The Fireflex 3000 Lab is dressed in Tiny Speck's own lab art, and its graffiti reads \"Tii Saves\""
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "Room 8 is an unstable bridge over a dark void, and the Ventilation Room gets its rope-hung Way Out signs, lanterns and glowing bushes"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "Rainbow Run is the Snaps' psychedelic night meadow"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Firefly Whistle's teleporter drops you through the falling room (\"You Feel Woooooozy...\") before you get home"
    }
   ]
  },

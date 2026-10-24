@@ -99,7 +99,7 @@ ${body}
 
 const ariaLabel = (label) => (label ? ` aria-label="${attr(label)}"` : '');
 
-function cardsHtml(cards, variant) {
+export function cardsHtml(cards, variant) {
   return `<div class="note-features${variant ? ` note-features-${variant}` : ''}">
 ${cards.map((c) => `          <article class="note-feature">
             <div class="note-mark" aria-hidden="true">${c.mark}</div>
@@ -172,7 +172,7 @@ ${b.rows.map((r) => `              <tr>${r.map((c, i) => `<td${i === b.numCol ? 
       </section>`,
 };
 
-function blockHtml(b) {
+export function blockHtml(b) {
   const render = BLOCKS[b.type];
   if (!render) throw new Error(`unknown block type ${b.type}`);
   return render(b);
