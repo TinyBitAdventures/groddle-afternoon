@@ -85,6 +85,9 @@ export const CHECKLIST = Object.freeze([
   { id: 'secrets', group: 'world', name: 'Eleven Secret Locations', status: 'source',
     blurb: 'Twenty DNAja-vu beacons across Ur, a Giant’s message at each, and Lem’s at the eleventh.',
     evidence: ['public/js/secret-spots.js', 'public/js/features/secret-spots-feature.js'] },
+  { id: 'hidden-floors', group: 'world', name: 'The hidden floors', status: 'rebuilt',
+    blurb: 'Three rooms no signpost leads to, each behind its street’s own hidden teleporter: the lost floor off Goorsh Gam’s treetops, the forgotten floor up in Odena Odes’ ceiling, and the missing floor at the top of Ilmenskie’s cave mouth, a running Triple Jump off the mushroom caps. The lost and missing floors are rebuilt from players’ footage and Snaps with Tiny Speck’s own apartment-hall art: ripped posters, dripping pipes, a climbable vine.',
+    evidence: ['public/js/hidden-floors.js', 'public/js/features/hidden-floors-feature.js', 'public/assets/streets/GA9QUBPI49J2MOB.json', 'public/assets/streets/GUV1CSSE49J2P2C.json'] },
 
   // —— Creatures & trees ——
   { id: 'piggies', group: 'creatures', name: 'Piggies', status: 'source', spot: 'piggy',

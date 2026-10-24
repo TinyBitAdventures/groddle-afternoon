@@ -12980,6 +12980,15 @@
       "platforms": 2,
       "decos": 109,
       "reconstructed": true
+    },
+    "GUV1CSSE49J2P2C": {
+      "label": "The missing floor",
+      "file": "assets/streets/GUV1CSSE49J2P2C.json",
+      "hubId": "51",
+      "hubName": "Uralia",
+      "platforms": 3,
+      "decos": 103,
+      "reconstructed": true
     }
   }
 }

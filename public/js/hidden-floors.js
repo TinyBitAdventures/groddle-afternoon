@@ -1,8 +1,9 @@
 /**
- * The hidden floors (register row G92): the lost floor rebuilt, the way into
- * the forgotten floor, and what is known of the missing floor. Pure data and
- * a street builder (no Pixi, no DOM); features/hidden-floors-feature.js runs
- * the teleporters and paints the EXIT words.
+ * The hidden floors (register rows G92, G105): the lost floor rebuilt from
+ * footage, the way into the forgotten floor, and the missing floor rebuilt
+ * from two player Snaps with its way in from Ilmenskie. Pure data and street
+ * builders (no Pixi, no DOM); features/hidden-floors-feature.js runs the
+ * teleporters, Ilmenskie's ceilings and paints the EXIT words.
  *
  * What survives in source:
  * - GSJS inc_data_maps_prod.js names three floors: hub 92 Tamila
@@ -68,7 +69,7 @@ export const ODENA_ODES_TSID = 'GA9KL9UE1D82RFO';
 export const LOST_FLOOR_SOURCE =
   'reconstruction: The lost floor (LA9QUBPI49J2MOB, not in tinyspeck/glitch-locations); layout from video r1CBeOmnaFg, CC0 apartment hall decos as on the forgotten floor';
 
-/** The missing floor: guide text and source only; not rebuilt (no footage). */
+/** The missing floor (register row G105): what the source and the guide say; the room is built below. */
 export const MISSING_FLOOR = Object.freeze({
   tsid: 'LUV1CSSE49J2P2C',
   label: 'The missing floor',
@@ -78,9 +79,18 @@ export const MISSING_FLOOR = Object.freeze({
   entryGeometry: 'plat_1323982673207-210, wall_1323982673211-212: ceiling steps rising to a ledge at x 2668, y -890 in the top-right corner (bounds -3000..3000, -1000..0)',
   guide: '"Somewhere in the overground area of Uralia... with a running jump so powerful... a wormhole exists which might just woosh you into The Missing Floor. Creepy place, this, with climbable vines, ripped posters and dripping faucets a plenty." Also the Sandbox Group\'s secret lair.',
 });
+export const MISSING_FLOOR_TSID = 'GUV1CSSE49J2P2C';
+export const MISSING_FLOOR_SOURCE_TSID = MISSING_FLOOR.tsid;
+export const MISSING_FLOOR_LABEL = MISSING_FLOOR.label;
+export const MISSING_FLOOR_HUB = Object.freeze({ hubId: '51', hubName: 'Uralia' });
+export const ILMENSKIE_TSID = 'GIF102FDNU11314';
+export const MISSING_FLOOR_SOURCE =
+  'reconstruction: The missing floor (LUV1CSSE49J2P2C, not in tinyspeck/glitch-locations); dressed from two player Snaps with CC0 apartment hall decos, shell as the forgotten floor';
 
 const isTsid = (tsid, g) => String(tsid || '').slice(1) === g.slice(1);
 export const isLostFloorTsid = (tsid) => isTsid(tsid, LOST_FLOOR_TSID);
+export const isMissingFloorTsid = (tsid) => isTsid(tsid, MISSING_FLOOR_TSID);
+export const isIlmenskieTsid = (tsid) => isTsid(tsid, ILMENSKIE_TSID);
 
 /* ------------------------------------------------------------------ */
 /* The lost floor: geometry                                            */
@@ -342,6 +352,280 @@ export function lostFloorIndexEntry(street = lostFloorStreet()) {
 }
 
 /* ------------------------------------------------------------------ */
+/* The missing floor                                                   */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Two player Snaps (reference only, no pixels), both of one stretch of the
+ * hall: research/wayback/raw/snaps/missing_floor/
+ *   PHVSGKDV7SA2FK8_97961 (Osiris χ, 2012-09-26), the wider one;
+ *   PA92KIPN12E27D0_179173 (Alcie, 2012-11-17), the same wall a little
+ *     to the right, crowded with the snapper's pets.
+ * Scale ~1.24 world px per Snap px (Osiris χ's avatar is ~105 Snap px
+ * against the remake's 130; the wall panels then stand ~335 world px, close
+ * to the forgotten floor's 370, and the poster ~210 wide): world
+ * x = (Snap x - 300) x 1.24, world y = -202 + (Snap y - 390) x 1.24 (the
+ * wall foot at Snap y 390).
+ * Left to right: a cracked TV on the wall over a segmented drain pipe; the
+ * "Discover Ix" poster, ripped across; a low dark cabinet behind a round
+ * wooden table (vase, a can and a plate of snacks) between two stools; a
+ * wooden post; an arched window with a lattice behind two crossed planks; a
+ * post; a broken ceiling pipe dripping black over a ripped wall decal; a
+ * dark crack low in the wall; a stone column; a red rug; a crate. Bare bulbs
+ * hang along a pipe under the ceiling. The blue-faced figure on the wall in
+ * Osiris χ's Snap is the snapper's avatar, not a deco: it turns up at three
+ * heights in all three of their Snaps on two floors and in nobody else's.
+ * The can and the plate are items, left out; the cabinet is the k04 kitchen
+ * counter, lighter wood than the Snap's dark one (no dark cabinet deco).
+ * The remake's camera shows ~320 px over the feet where the client showed
+ * ~440, so the bulbs hang a little lower than the Snaps' to stay in view.
+ * Inferred from the guide, not on any Snap: the climbable vine to a shelf,
+ * the second dripping pipe and the sink (its "dripping faucets"), the other
+ * ripped posters, both ends of the hall, and the way out at the right end
+ * (as on both sibling floors), marked with their painted arrow but no word.
+ */
+
+const ML = -1000;
+const MR = 1000;
+const MT = -750;
+const MB = 0;
+export const MISSING_FLOOR_BOUNDS = Object.freeze({ l: ML, r: MR, t: MT, b: MB });
+const MW = MR - ML;
+const MH = MB - MT;
+const mScreen = (x, y) => ({ x: Math.round(x - ML), y: Math.round(y - MT) });
+
+/** Walk line and ceiling (the forgotten floor's, its template sibling: LDOKP2FHL8J25AQ beside LDO49MOHI8J221M). */
+export const MISSING_FLOOR_Y = -150;
+export const MISSING_CEILING_Y = -610;
+/** Wall panels: foot and height (Snap 97961: foot at y 390, tops at 120). */
+const M_WALL_BASE = -202;
+const M_WALL_H = 335;
+const M_PLAIN_W = 316; // 300 apart: the pieces' rounded feet overlap instead of leaving notches
+const M_WINDOW_W = 176;
+
+/**
+ * Wall bays, world centre x. C, D and E are the Snaps' stretch: the window
+ * fills the gap between the two wooden posts (97961 x 200 and 327).
+ */
+export const MISSING_BAYS = Object.freeze([
+  Object.freeze({ id: 'A', x: -875, kind: 'plain', why: 'inferred: ripped posters and a dripping pipe (guide)' }),
+  Object.freeze({ id: 'B', x: -575, kind: 'plain', why: 'inferred: the climbable vine (guide)' }),
+  Object.freeze({ id: 'C', x: -275, kind: 'plain', why: 'TV, drain pipe, Discover Ix poster, cabinet, table and stools (97961 x 0-200)' }),
+  Object.freeze({ id: 'D', x: -41, kind: 'window', why: 'lattice behind crossed planks (97961 x 200-327; 179173 x 280-380)' }),
+  Object.freeze({ id: 'E', x: 193, kind: 'plain', why: 'broken dripping pipe, ripped decal, crack (97961 x 327-600; 179173 x 470-630)' }),
+  Object.freeze({ id: 'F', x: 493, kind: 'plain', why: 'inferred: a sink and dripping faucet (guide)' }),
+  Object.freeze({ id: 'G', x: 727, kind: 'window', why: 'inferred: a boarded window' }),
+  Object.freeze({ id: 'H', x: 961, kind: 'plain', why: 'inferred: the way out, right end' }),
+]);
+const bay = (id) => MISSING_BAYS.find((b) => b.id === id);
+
+/** The stone column in front of the hall (97961 x 595-625). */
+export const MISSING_COLUMN_X = 372;
+/** The climbable vine (a ladder, as the forgotten floor's ladder_vine_1 over ladder_1324050033528) and the shelf at its top. */
+export const MISSING_VINE = Object.freeze({ x: -620, bottom: MISSING_FLOOR_Y, top: -426, shelf: Object.freeze({ x1: -632, x2: -480, y: -420 }) });
+/** The painted arrow at the right end (both sibling floors mark their way out with it; no word is on record here). */
+export const MISSING_EXIT_ARROW = Object.freeze({ x: 915, y: -300 });
+
+/** Back wall: the lattice behind the Snaps' window, then the bays' wall pieces. */
+function missingWallDecos() {
+  const out = [];
+  let z = 8;
+  out.push(deco('ladder_trellis_1', bay('D').x, -280, 104, 220, z++, { id: 'lattice' }));
+  for (const [i, b] of MISSING_BAYS.entries()) {
+    if (b.kind === 'window') out.push(deco('apartment_hall_wall_piece_window', b.x, M_WALL_BASE, M_WINDOW_W, M_WALL_H, z++, { id: `bay_${b.id}` }));
+    else out.push(deco('apartment_hall_wall_piece_2', b.x, M_WALL_BASE, M_PLAIN_W, M_WALL_H, z++, { id: `bay_${b.id}`, ...(i % 2 ? { flip: true } : {}) }));
+  }
+  return out;
+}
+
+/** Ceiling band over the squat walls, floor boards, end walls (the forgotten floor's shell pieces). */
+function missingShellDecos() {
+  const out = [];
+  for (const x of [-480, 520]) out.push(deco('apartment_filler', x, -600, 1100, 160, 2));
+  // Behind the wall feet, so no gap between the bays shows the sky.
+  for (const x of [-500, 500]) out.push(deco('apartment_filler', x, -170, 1060, 90, 3));
+  for (const x of [-561, 484]) out.push(deco('ceiling_tan_ghtest', x, M_WALL_BASE - M_WALL_H + 8, 1304, 80, 40));
+  for (const [i, x] of [-760, 0, 760].entries()) out.push(deco('apartment_hall_floor_piece_1', x, -60, 1100, 146, 30 + i, i === 1 ? { flip: true } : {}));
+  for (const x of [-500, 500]) out.push(deco('apartment_filler', x, -1, 1060, 64, 34));
+  out.push(deco('apartment_xsection_top_1', 0, -23, MW + 80, 39, 35));
+  out.push(deco('apartment_hall_wall_side', ML + 70, -55, 190, 600, 36));
+  out.push(deco('apartment_hall_wall_side', MR - 70, -55, 190, 600, 36, { flip: true }));
+  return out;
+}
+
+/**
+ * The pipe along the ceiling (97961 y 55-70: world ~-600; 179173 top
+ * left), the broken drop dripping black over bay E, and the bulbs hanging
+ * along it at uneven lengths (twelve over 97961 x 75-575).
+ */
+function missingCeilingDecos() {
+  const out = [];
+  const PIPE_Y = -596;
+  let z = 44;
+  for (const [x0, x1] of [[-1010, 150], [215, 1010]]) {
+    for (let x = x0; x < x1; x += 180) out.push(deco('ladder_pipe_2', x + 95, PIPE_Y + 17, 34, 190, z++, { r: 90 }));
+  }
+  // The broken drop and its torn stub (97961 x 420-480, y 95-210).
+  out.push(deco('platform_pipe_2', 232, -566, 110, 40, z++, { r: 24 }));
+  out.push(deco('wallpipe_1', 186, -425, 76, 150, z++, { id: 'drip_pipe_E' }));
+  out.push(deco('cave_drip_03', 190, -340, 16, 74, z++));
+  // A second dripping drop at the far left (inferred: "dripping faucets a plenty").
+  out.push(deco('wallpipe_1', -950, -440, 74, 150, z++, { flip: true, id: 'drip_pipe_A' }));
+  out.push(deco('cave_drip_03', -956, -356, 16, 70, z++));
+  // Bare bulbs: the wire and the drops (97961: shorter at the left, longer to the right).
+  out.push(deco('apartment_hall_lightbulb', -330, -330, 981, 286, z++));
+  out.push(deco('apartment_hall_lightbulb', 640, -330, 981, 286, z++, { flip: true }));
+  const drops = [-280, -228, -176, -124, -70, -18, 34, 86, 138, 190, 242, 294, 560, 690, -520, -700, -860];
+  for (const [i, x] of drops.entries()) {
+    const h = 130 + ((i * 37) % 5) * 12; // 130-178 px of cord, tips at world -430..-478
+    out.push(deco('hanging_lightbulb', x, PIPE_Y + h, 18, h, z++));
+  }
+  return out;
+}
+
+/** Wall things: the TV and drain pipe, posters ripped and whole, the window's planks, cracks, the vine. */
+function missingWallPropDecos() {
+  const out = [];
+  let z = 70;
+  // Bay C (97961 x 0-185): drain pipe up the wall with the cracked TV over it.
+  out.push(deco('ladder_pipe_2', -341, M_WALL_BASE, 32, 190, z++));
+  out.push(deco('ladder_pipe_2', -341, M_WALL_BASE - 186, 32, 190, z++, { flip: true }));
+  out.push(deco('bureaucratic_hall_tv_1', -352, -446, 96, 100, z++, { r: -8 }));
+  out.push(deco('apartment_poster_discover_ix', -248, -316, 212, 124, z++, { r: 3, id: 'poster_discover_ix' }));
+  out.push(deco('shredded_poster_1', -214, -262, 94, 132, z++, { id: 'poster_ripped_C' }));
+  // Bay D: the crossed planks over the lattice window (97961 x 215-320, y 222-290).
+  out.push(deco('door_barricade_wood_1', bay('D').x, -316, 132, 86, z++, { id: 'window_planks' }));
+  // Bay E: the ripped decal under the broken pipe, the dark crack low on the wall.
+  out.push(deco('torn_poster_1', 207, -276, 96, 140, z++, { id: 'poster_ripped_E' }));
+  out.push(deco('apartment_crack', 325, -212, 40, 100, z++));
+  out.push(deco('crack_building_3', 110, -470, 110, 44, z++));
+  // Bay A: more ripped posters (inferred), cracks and roots.
+  out.push(deco('abandoned_apt_poster_hoe_2', -858, -306, 84, 108, z++, { r: -6, id: 'poster_ripped_A' }));
+  out.push(deco('abandoned_apt_poster_debris_1', -800, -232, 90, 70, z++));
+  out.push(deco('crack_building_2', -730, -440, 110, 140, z++));
+  out.push(deco('roots_ug_4', -712, -430, 40, 130, z++));
+  // Bay B: the climbable vine to a wall shelf (inferred from the guide).
+  out.push(deco('ladder_vine_1', MISSING_VINE.x, MISSING_VINE.bottom - 40, 62, MISSING_VINE.bottom - 40 - MISSING_VINE.top + 30, z++, { id: 'vine' }));
+  out.push(deco('wall_shelf1', (MISSING_VINE.shelf.x1 + MISSING_VINE.shelf.x2) / 2 + 6, MISSING_VINE.shelf.y + 6, MISSING_VINE.shelf.x2 - MISSING_VINE.shelf.x1 + 30, 30, z++, { id: 'vine_shelf' }));
+  out.push(deco('vase_broken_2', -520, MISSING_VINE.shelf.y - 2, 50, 36, z++));
+  out.push(deco('pipe_vines_02', -560, -480, 46, 110, z++));
+  // Bay F: a ripped poster over the sink (below).
+  out.push(deco('abandoned_apt_poster_slothknocker_3', 560, -330, 72, 94, z++, { r: 5, id: 'poster_ripped_F' }));
+  // Bay G: two planks across the window, as on the lost floor.
+  out.push(deco('abandoned_apt_windowboard_2', bay('G').x - 4, -410, 150, 44, z++, { r: 22 }));
+  out.push(deco('abandoned_apt_windowboard_4', bay('G').x + 2, -340, 150, 44, z++, { r: -16 }));
+  out.push(deco('wall_crack_2', 835, -228, 56, 112, z++));
+  // Bay H: the painted arrow pointing right.
+  out.push(deco('crown_game_play_line_arrow1', MISSING_EXIT_ARROW.x, MISSING_EXIT_ARROW.y, 74, 170, z++, { r: -90, id: 'exit_arrow' }));
+  return out;
+}
+
+/** Furniture behind the avatar: cabinet, table, stools, the sink, rugs, debris. */
+function missingFloorBackDecos() {
+  const out = [];
+  let z = 100;
+  // The red rug (97961 x 430-640 and on).
+  out.push(deco('apartment_rug_red', 420, -128, 540, 56, z++));
+  out.push(deco('apartment_rug_red', -820, -132, 300, 44, z++, { flip: true }));
+  // Bay C (97961 x 0-250, y 330-425): the low cabinet, the table with its vase, two stools.
+  out.push(deco('k04_counter_far', -254, -196, 136, 74, z++, { id: 'cabinet' }));
+  out.push(deco('deco_stool_wooden_ghtest', -357, -160, 56, 42, z++));
+  out.push(deco('deco_table_wooden_ghtest', -217, -164, 164, 60, z++, { id: 'table' }));
+  out.push(deco('vase_1', -190, -214, 34, 62, z++));
+  out.push(deco('deco_stool_wooden_ghtest', -87, -162, 58, 44, z++));
+  // Bay D: fallen boards in the middle of the floor (97961 x 320-390).
+  out.push(deco('abandoned_apt_rubble_09', 40, -180, 40, 24, z++));
+  out.push(deco('abandoned_apt_rubble_05', 90, -176, 50, 32, z++));
+  // Bay F: the sink on its cabinet, dripping (the guide's faucets).
+  out.push(deco('k04_counter_far', 500, -194, 140, 72, z++, { id: 'sink_cabinet' }));
+  out.push(deco('k04_sink_01', 500, -260, 132, 44, z++, { id: 'sink' }));
+  out.push(deco('cave_drip_03', 488, -226, 10, 40, z++));
+  // Bay H and A: a crate, rubble.
+  out.push(deco('crate_1', 790, -176, 96, 82, z++));
+  out.push(deco('abandoned_apt_rubble_01', 925, -168, 110, 60, z++));
+  out.push(deco('abandoned_apt_rubble_03', -960, -168, 110, 60, z++));
+  out.push(deco('platform_crack_1', -540, -150, 150, 34, z++));
+  return out;
+}
+
+/** In front of the avatar (screen space, the near plane): the stone column, a crate, the framing shadows. */
+function missingForegroundDecos() {
+  const out = [];
+  let z = 300;
+  // The crate in the bottom-right corner of 97961 (x 565-640).
+  const crate = mScreen(352, -84);
+  out.push(deco('crate_1', crate.x, crate.y, 96, 80, z++));
+  const col = mScreen(MISSING_COLUMN_X + 40, -40);
+  out.push(deco('column_1', col.x, col.y, 96, 640, z++, { id: 'column' }));
+  out.push(deco('box_blur_1', MW / 2, 71, MW + 1200, 192, z++));
+  out.push(deco('box_blur_1', MW / 2, 886, MW + 1200, 187, z++));
+  out.push(deco('tree_int_vertical_shadow', 248, 435, 988, 254, z++, { r: -90 }));
+  out.push(deco('tree_int_vertical_shadow', MW - 248, 443, 988, 254, z++, { r: 90 }));
+  return out;
+}
+
+function missingLayers() {
+  // The Snaps read darker than the lost floor's footage, the plaster a cold green-grey (0x4F6058 read off 97961's walls).
+  const tint = { tintColor: 0x4f6058, tintAmount: 30 };
+  return [
+    { id: 'middleground', name: 'middleground', z: 0, w: MW, h: MH, decos: [...missingShellDecos(), ...missingWallDecos(), ...missingCeilingDecos(), ...missingWallPropDecos(), ...missingFloorBackDecos()], filters: { ...tint, contrast: -4, brightness: -60, saturation: -36 } },
+    { id: 'T_missingfloor_front', name: 'middleplus', z: 1, w: MW, h: MH, decos: missingForegroundDecos(), filters: { ...tint, contrast: -8, brightness: -66, saturation: -36 } },
+  ];
+}
+
+/**
+ * The missing floor's street JSON. No signposts or doors: the teleporters
+ * are the only ways in and out. The vine is a ladder up to the shelf.
+ */
+export function missingFloorStreet() {
+  const platforms = [
+    { id: 'plat_missing_floor', x1: ML, y1: MISSING_FLOOR_Y, x2: MR, y2: MISSING_FLOOR_Y, pc_perm: -1 },
+    { id: 'plat_missing_shelf', x1: MISSING_VINE.shelf.x1, y1: MISSING_VINE.shelf.y, x2: MISSING_VINE.shelf.x2, y2: MISSING_VINE.shelf.y, pc_perm: -1 },
+    { id: 'plat_missing_ceiling', x1: ML, y1: MISSING_CEILING_Y, x2: MR, y2: MISSING_CEILING_Y, pc_perm: 1 },
+  ];
+  const ladders = [{ id: 'ladder_missing_vine', x: MISSING_VINE.x, y: MISSING_VINE.bottom, w: 50, h: MISSING_VINE.bottom - MISSING_VINE.top }];
+  const ls = missingLayers();
+  const decoCount = ls.reduce((n, l) => n + l.decos.length, 0);
+  return {
+    source: MISSING_FLOOR_SOURCE,
+    reconstructed: true,
+    tsid: MISSING_FLOOR_TSID,
+    label: MISSING_FLOOR_LABEL,
+    hubId: MISSING_FLOOR_HUB.hubId,
+    hubName: MISSING_FLOOR_HUB.hubName,
+    swf_file: 'bldg_int_apt.swf',
+    bounds: { ...MISSING_FLOOR_BOUNDS },
+    platforms,
+    layers: ls,
+    signposts: [],
+    stats: { platformCount: platforms.length, layerCount: ls.length, decoCount, signpostCount: 0, doorCount: 0, ladderCount: ladders.length, barrierCount: 0 },
+    // Pale daylight behind the lattice (97961).
+    gradient: { top: 'C4C8CF', bottom: 'E6E8EC' },
+    ladders,
+    why: {
+      street: 'inc_data_maps_prod.js 16033 (hub 51 Uralia), template LDOKP2FHL8J25AQ (18461) beside the lost and forgotten floors\' (18459-18460); no location XML. config_prod.js 1331 teleportation_ok_streets.',
+      look: 'Snaps PHVSGKDV7SA2FK8_97961 and PA92KIPN12E27D0_179173 (research/wayback/raw/snaps/missing_floor/): TV and drain pipe, Discover Ix poster ripped across, dark cabinet, round table and stools, lattice window behind crossed planks, broken dripping pipe over a ripped decal, crack, stone column, rug, crate, bare bulbs along the ceiling pipe.',
+      guide: 'glitch-strategy 2011-12 guide to hidden locations: "climbable vines, ripped posters and dripping faucets a plenty" (the vine ladder, more posters, a second drip and the sink are from here).',
+      shell: 'The forgotten floor\'s apartment hall pieces and sizes (GDOOSA8V29J24I3.xml).',
+      ways: 'In from the 2011-12-15 ledge in Ilmenskie\'s top-right corner; out at the right end, as on both sibling floors. Teleporter boxes and landings are inferred.',
+    },
+  };
+}
+
+/** The index.json row. */
+export function missingFloorIndexEntry(street = missingFloorStreet()) {
+  return {
+    label: MISSING_FLOOR_LABEL,
+    file: `assets/streets/${MISSING_FLOOR_TSID}.json`,
+    hubId: MISSING_FLOOR_HUB.hubId,
+    hubName: MISSING_FLOOR_HUB.hubName,
+    platforms: street.platforms.length,
+    decos: street.stats.decoCount,
+    reconstructed: true,
+  };
+}
+
+/* ------------------------------------------------------------------ */
 /* Goorsh Gam's canopy                                                 */
 /* ------------------------------------------------------------------ */
 
@@ -358,6 +642,81 @@ export const CANOPY_PHYSICS = Object.freeze({ speed: 335 / 264, jump: 1, gravity
 /** Feet above this world y (the forest floor is -20..-85, the lowest canopy -466) count as in the canopy. */
 export const CANOPY_Y = -300;
 export const isGoorshGamTsid = (tsid) => isTsid(tsid, GOORSH_GAM_TSID);
+
+/* ------------------------------------------------------------------ */
+/* Ilmenskie's top-right corner                                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The 2011-12-15 pass in Ilmenskie (GIF102FDNU11314.xml): a ledge
+ * (plat_1323982673210, x 2668..2739, y -890, solid from the top) closed on
+ * its right by wall_1323982673212 (x 2739, y -999..-891) and under its left
+ * end by wall_1323982673211 (x 2688, y -887..-823), both solid only to an
+ * avatar moving right (pc_perm -1, Wall.as pc_solid_from_left), over three
+ * ceilings (plat_1323982673207-209, platform_pc_perm 1: PlatformLine.as
+ * pc_solid_from_bottom only) stepping down from the wall's foot to the
+ * street's right edge at y -688. The ceilings shut the corner off from the
+ * cave mouth under it (the Entrance ledge, pl1271412363973 at y -438), so the
+ * only way up is from the left: a running jump off the mushroom caps
+ * (pl1271412334381, x 2434..2541, y -469) that carries the avatar 300+ px up
+ * into the corner. In the client that is a quick Triple Jump at full speed
+ * (calcTripleJumpMultiplier 1.5 + 0.3 x vx_perc: up to 1.8 x vy_jump, ~430
+ * px with the client's gravity); a standing one tops out near 300 px.
+ */
+export const ILMENSKIE_CEILINGS = Object.freeze(['plat_1323982673207', 'plat_1323982673208', 'plat_1323982673209']);
+/** The mushroom cap the running jump leaves from (pl1271412334381, world y). */
+export const ILMENSKIE_LAUNCH_Y = -469;
+/** Feet this many px over the cap reach the teleporter (head level with the ledge, as the item's hit box would be). */
+export const ILMENSKIE_RISE = 310;
+/**
+ * World x from which Ilmenskie's right end moves as the client did: the
+ * ground under the cave mouth, the slope up to the mushroom caps
+ * (pl1271412282623 starts 130 px over the ground: a client jump, 133 px,
+ * not the remake's 105), the caps and the Entrance ledge.
+ */
+export const ILMENSKIE_ZONE = Object.freeze({ x: 1900, y: 0 });
+/** The avatar's height for ceiling bumps (street-model.js blockBarrierCrossing bodyH). */
+export const AVATAR_BODY_H = 80;
+
+/** Ceilings as screen-space segments for a street whose platforms list them (the source's pc_perm 1 lines). */
+export function ceilingsScreen(street, ids = ILMENSKIE_CEILINGS) {
+  if (!street?.bounds) return [];
+  const { l, t } = street.bounds;
+  return (street.platforms || []).concat(street._hiddenFloorCeilings || [])
+    .filter((p) => ids.includes(p.id) && Number(p.pc_perm) === 1)
+    .filter((p, i, all) => all.findIndex((q) => q.id === p.id) === i)
+    .map((p) => {
+      const a = { x: p.x1 - l, y: p.y1 - t };
+      const b = { x: p.x2 - l, y: p.y2 - t };
+      return a.x <= b.x ? { id: p.id, x1: a.x, y1: a.y, x2: b.x, y2: b.y } : { id: p.id, x1: b.x, y1: b.y, x2: a.x, y2: a.y };
+    });
+}
+
+/** Ceiling y over screen x, or null. */
+export function ceilingAt(ceilings, x) {
+  let best = null;
+  for (const c of ceilings) {
+    if (x < c.x1 || x > c.x2) continue;
+    const y = c.x2 === c.x1 ? Math.max(c.y1, c.y2) : c.y1 + ((x - c.x1) / (c.x2 - c.x1)) * (c.y2 - c.y1);
+    if (best === null || y > best) best = y;
+  }
+  return best;
+}
+
+/**
+ * A head moving from (px, py - body) to (x, y - body) that crosses a ceiling
+ * from below stops under it: returns the clamped feet y, or null when clear.
+ */
+export function bumpCeiling(ceilings, px, py, x, y, body = AVATAR_BODY_H) {
+  const c = ceilingAt(ceilings, x);
+  if (c === null) return null;
+  const head = y - body;
+  if (head >= c) return null;
+  const before = ceilingAt(ceilings, px);
+  const prevHead = py - body;
+  if (prevHead < (before ?? c) - 1) return null; // already over it
+  return c + body;
+}
 
 /* ------------------------------------------------------------------ */
 /* Teleporters (items/teleporter.js)                                   */
@@ -440,6 +799,30 @@ export const TELEPORTERS = Object.freeze([
     arrive: Object.freeze({ x: 2560, y: 1438 }),
     why: 'The forgotten floor\'s own teleporter (LDOOSA8V29J24I3.xml 136); she walks right past EXIT into the corner and Odena Odes loads (twOBlmVrRyI t0093-t0096). Landing inferred.',
   }),
+  Object.freeze({
+    id: 'ilmenskie_to_missing',
+    objref: 'IUVKH29S4BJ2IS6',
+    from: ILMENSKIE_TSID,
+    to: MISSING_FLOOR_TSID,
+    label: MISSING_FLOOR_LABEL,
+    // World x 2600..2740: the ledge (2668..2739) and the air left of it, up from feet 310 px over the mushroom cap (y -779) to the street's top.
+    box: Object.freeze({ x: 5670, y: 1000 + ILMENSKIE_LAUNCH_Y - ILMENSKIE_RISE, w: 140, h: 1000 + ILMENSKIE_LAUNCH_Y - ILMENSKIE_RISE }),
+    // World (-800, -150): the left of the hall, the Snaps' stretch ahead.
+    arrive: Object.freeze({ x: 200, y: 600 }),
+    why: 'Ilmenskie\'s one teleporter (LIF102FDNU11314.xml 4093), UV like the floor\'s LUV1CSSE49J2P2C, over the ledge of the 2011-12-15 corner. The guide: "a running jump so powerful... a wormhole". Box and landing inferred.',
+  }),
+  Object.freeze({
+    id: 'missing_to_ilmenskie',
+    objref: null,
+    from: MISSING_FLOOR_TSID,
+    to: ILMENSKIE_TSID,
+    label: 'Ilmenskie',
+    // World x 930..1000: the corner past the painted arrow.
+    box: Object.freeze({ x: 1965, y: 650, w: 70, h: 160 }),
+    // World (2600, -100): the ground under the corner, by the mushroom caps.
+    arrive: Object.freeze({ x: 5600, y: 900 }),
+    why: 'Inferred: both sibling floors let you out at their right end (twOBlmVrRyI t0093-t0096; r1CBeOmnaFg t0057). No Snap shows this end.',
+  }),
 ]);
 
 /** Teleporters on a street (either TSID prefix). */
@@ -465,6 +848,15 @@ export const EXIT_SIGNS = Object.freeze({
   // White over the pale arrow (r1CBeOmnaFg t0057).
   [LOST_FLOOR_TSID]: Object.freeze({ text: LOST_EXIT_SIGN.text, ...screen(LOST_EXIT_SIGN.x, LOST_EXIT_SIGN.y), alpha: 0.8, source: `footage ${LOST_EXIT_SIGN.footage}` }),
 });
+
+/** Streets whose avatar moves as the client did in part of the street (CANOPY_PHYSICS), as screen-space zones. */
+export function clientPhysicsZone(street) {
+  if (!street?.bounds) return null;
+  const { l, t } = street.bounds;
+  if (isGoorshGamTsid(street.tsid)) return { minX: -Infinity, maxY: CANOPY_Y - t };
+  if (isIlmenskieTsid(street.tsid)) return { minX: ILMENSKIE_ZONE.x - l, maxY: ILMENSKIE_ZONE.y - t };
+  return null;
+}
 
 export function exitSignOn(tsid) {
   const key = Object.keys(EXIT_SIGNS).find((k) => isTsid(tsid, k));

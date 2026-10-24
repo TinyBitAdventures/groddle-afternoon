@@ -25,6 +25,8 @@ export const PLAY_ROUTES = Object.freeze({
   avatar: `${BASE}`,
   newxp: '?autostart=1&resetgame=1&questoffer=off&newxp=1',
   secrets: `${BASE}&secretdemo=1`,
+  // West of Ilmenskie's cave mouth with Big 'Un Triple Jump: run right, hop onto the slope, the mushroom cap, and Triple Jump off it.
+  'hidden-floors': `${BASE}&streetdemo=GIF102FDNU11314&streetx=4800&streety=810&jumpdemo=big`,
   chickens: `${BASE}&animaldemo=chicken&animalrank=7`,
   ecology: `${BASE}&streetdemo=GCR10K3BPJK1U6F`,
   machines: `${BASE}&supplydemo=1`,

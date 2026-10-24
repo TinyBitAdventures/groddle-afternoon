@@ -92,4 +92,4 @@ import { hiSignsFeature } from './hi-signs-feature.js?v=hi-signs-1'; FEATURES.pu
 import { gwendolynRoom23Feature } from './gwendolyn-room-23-feature.js?v=g71-2'; FEATURES.push(gwendolynRoom23Feature);
 import { cubimalRaceFeature } from './cubimal-race-feature.js?v=g95-2'; FEATURES.push(cubimalRaceFeature);
 import { symphoniousMaximusFeature } from './symphonious-maximus-feature.js?v=g104-1'; FEATURES.push(symphoniousMaximusFeature);
-import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=g92-1'; FEATURES.push(hiddenFloorsFeature);
+import { hiddenFloorsFeature } from './hidden-floors-feature.js?v=g105-1'; FEATURES.push(hiddenFloorsFeature);

@@ -246,6 +246,22 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&secretdemo=1&practice=1"
   },
   {
+   "id": "hidden-floors",
+   "group": "world",
+   "name": "The hidden floors",
+   "status": "rebuilt",
+   "blurb": "Three rooms no signpost leads to, each behind its street’s own hidden teleporter: the lost floor off Goorsh Gam’s treetops, the forgotten floor up in Odena Odes’ ceiling, and the missing floor at the top of Ilmenskie’s cave mouth, a running Triple Jump off the mushroom caps. The lost and missing floors are rebuilt from players’ footage and Snaps with Tiny Speck’s own apartment-hall art: ripped posters, dripping pipes, a climbable vine.",
+   "spot": null,
+   "evidence": [
+    "public/js/hidden-floors.js",
+    "public/js/features/hidden-floors-feature.js",
+    "public/assets/streets/GA9QUBPI49J2MOB.json",
+    "public/assets/streets/GUV1CSSE49J2P2C.json"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&streetdemo=GIF102FDNU11314&streetx=4800&streety=810&jumpdemo=big&practice=1"
+  },
+  {
    "id": "piggies",
    "group": "creatures",
    "name": "Piggies",
@@ -862,13 +878,13 @@
  ],
  "tally": {
   "source": 40,
-  "rebuilt": 5,
+  "rebuilt": 6,
   "lost": 3,
   "solo": 7,
   "reimagined": 1
  },
- "back": 53,
- "possible": 53,
+ "back": 54,
+ "possible": 54,
  "quests": {
   "total": 445,
   "story": 245,
@@ -1833,7 +1849,7 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 353,
+  "commits": 354,
   "since": "2026-10-19",
   "recent": [
    {
