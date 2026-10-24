@@ -15,7 +15,7 @@ import { SHOTS } from './shots.mjs';
 const BASE = '?autostart=1&fresh=1&resetgame=1&questoffer=off';
 
 /** Query keys that only make sense for a screenshot. */
-const CAMERA_ONLY = /^(?:.*autoplay|.*preview|.*hold|.*fx|cameralook|esqstage|raceassist|racerivalseconds)$/;
+const CAMERA_ONLY = /^(?:.*autoplay|.*preview|.*hold|.*fx|cameralook|esqstage|raceassist|racerivalseconds|growx|growstate|growtier)$/;
 
 /** Systems without a screenshot route, by checklist id. */
 export const PLAY_ROUTES = Object.freeze({

@@ -1833,9 +1833,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 351,
+  "commits": 353,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "Symphonious Maximus gets its haloed glow orbs, the purple soil band with a music note and caterpillars, and hooked vines"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "The Back Alley matches its Snap: a pale brick wall to the left, the Bureaucrat's grey hut and a fallen red log"
+   },
    {
     "date": "2026-10-24",
     "kind": "improve",
@@ -1945,16 +1955,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Symphonious Maximus behind Cebarkul's wooden door, with Star-Jinglers to play and craters that throw you into the sky"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "new",
-    "text": "Cubimals race, take names and fly off when set free"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Remove new_day_fanfare.mp3, a copy of licensed stock audio"
    }
   ]
  },

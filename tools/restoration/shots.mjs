@@ -61,7 +61,7 @@ export const SHOTS = Object.freeze({
   'room:clubhouse': { route: `${Q}&questdemo=join_club`, wait: 14000 },
   'room:light_perspective': { route: `${Q}&questdemo=puzzle_level_light_perspective&questautoplay=mix`, wait: 18000 },
   'room:tile_puzzle': { route: `${Q}&questdemo=btc_room_3`, wait: 12000, steps: [{ eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }, { eval: "[...document.querySelectorAll('button')].find((b) => b.offsetParent && /^(OK|Ok|Click anywhere|Next|Continue)/i.test(b.textContent.trim()))?.click()" }, { wait: 900 }] },
-  'room:operation_grow': { route: `${Q}&questdemo=where_the_blue_grew`, wait: 12000 },
+  'room:operation_grow': { route: `${Q}&questdemo=where_the_blue_grew&growx=1480&growstate=1110111`, wait: 12000 },
   'room:gwendolyn': { route: `${Q}&questdemo=tower_quest&questautoplay=desert`, wait: 40000 },
   'room:mental_block': { route: `${Q}&questdemo=mental_block`, wait: 14000 },
   'room:esquibeth': { route: `${Q}&questdemo=last_pilgrimage_of_esquibeth&esqstage=waterfall_04_wider`, wait: 22000 },
