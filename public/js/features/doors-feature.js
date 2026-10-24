@@ -130,8 +130,9 @@ function addExtra(engine, view, child) {
 
 function buildView(engine, door, available) {
   const { PIXI } = engine;
-  const hasArt = door.sprite && available.has(door.sprite);
-  const tex = hasArt ? textureFromUrl(`${DECO_BASE}${door.sprite}.png`) : drawnDoorTexture(PIXI, door);
+  // `src`: art rendered at the door's own size (Jethimadh Room 16's mouth, tools/room-art), over the deco.
+  const hasArt = Boolean(door.src) || (door.sprite && available.has(door.sprite));
+  const tex = door.src ? textureFromUrl(door.src) : hasArt ? textureFromUrl(`${DECO_BASE}${door.sprite}.png`) : drawnDoorTexture(PIXI, door);
   const sprite = new PIXI.Sprite(tex);
   sprite.anchor.set(0.5, 1);
   sprite.x = door.x;

@@ -1,0 +1,56 @@
+{
+ "source": "tinyspeck/glitch-locations firebog.swf (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "ground_cutaway_hollow1": {
+   "scale": 0,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    27.95,
+    57.45
+   ],
+   "px": [
+    392,
+    428
+   ],
+   "file": "ground_cutaway_hollow1@2x.webp",
+   "swf": "bundle:firebog.swf#ground_cutaway_hollow1",
+   "swf_sha": "0128c8bf8c22c404",
+   "key": "0128c8bf8c22c404:0:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:size=[196, 214]",
+   "size": [
+    196,
+    214
+   ],
+   "out_px": [
+    392,
+    428
+   ],
+   "world": [
+    196,
+    214
+   ],
+   "bytes": 10760,
+   "lossless": false,
+   "err": 1.71,
+   "sha": "27d2c2dc9ee9a218"
+  }
+ }
+}

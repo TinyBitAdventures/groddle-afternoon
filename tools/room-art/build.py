@@ -40,10 +40,16 @@ Sets (each: decos, world scale per deco, output folder, a plan and a generated J
   puffs and cattail sprigs, the backdrop of every An Autumn Day Snap. js/quest-rooms/an-autumn-day.js.
 - rainbow_run (G108): arbito1.swf's sliced planet, profile head, rainbow slide, chequered ribbon, pink
   stairs and the meadow pieces the street set lacks, from the Rainbow Run Snaps. js/quest-rooms/rainbow-run.js.
+- tower_room_16 (G97): Room 16's way out, firebog.swf's ground_cutaway_hollow1 rendered at the door's own
+  size, so the pod's mouth is sharp (the street deco is a 27 x 57 px stage stretched to 196 x 214).
+  js/tower-challenge-rooms.js gives the door this file as its `src`.
 
 A piece spec may carry a fifth element, an options dict: 'deco' renders another deco under this piece's
 name (a recoloured copy), 'ramp' maps each pixel's luminance (0.299 R + 0.587 G + 0.114 B) through
-[[luma, '#rrggbb'], ...] stops, keeping alpha. Pieces without options build exactly as before.
+[[luma, '#rrggbb'], ...] stops, keeping alpha, and 'size': [w, h] draws the piece at that world size
+(stretched to it the way the game shows it: FFDec renders at the larger axis's zoom, then Lanczos
+resamples to w x h at the density; the spec's scale is then unused, 0 by convention). Pieces without
+options build exactly as before.
 
 This reuses the street deco pipeline (tools/deco-pipeline/build.py): the deco SWF a bundle embeds is
 rendered once by FFDec (render_batch), its stage is resampled with Lanczos onto the output size
@@ -133,6 +139,18 @@ SETS = {
             'wardrobia_shelf_long': (1, 2, 0),
             'wardrobia_shelf_short': (1, 2, 0),
             'wardrobia_arrow_1': (1.05, 2, 0),
+        },
+    },
+    # Room 16 (G97): the way out is the bottletree pod's mouth, ground_cutaway_hollow1 drawn at the
+    # door's 196 x 214 (tower-challenge-rooms.js DOOR). The street deco's 2x file stretched that far
+    # (about 7 x 4) is soft; this renders the vector at the size it is shown.
+    'tower_room_16': {
+        'bundle': 'firebog.swf',
+        'out': 'assets/sprites/tower-rooms/room_16',
+        'js': 'js/tower-room-16-art.js',
+        'export': 'TOWER_ROOM_16_FILES',
+        'pieces': {
+            'ground_cutaway_hollow1': (0, 2, 0, 'firebog.swf', {'size': [196, 214]}),
         },
     },
     # Juju Hideout (G70): Grandma's tall wooden rocking chair, the hideout's own deco beside the tent,
@@ -563,18 +581,26 @@ def build_set(args, set_name, index):
         swf = audit.bundled_swf(args.work, bundle, src_name, index)
         swf_sha = deco.sha(swf)[:16]
         stage = swfinfo.read(swf)['stage']
-        px = [max(1, round(stage[0] * scale * density)), max(1, round(stage[1] * scale * density))]
+        size = opts.get('size')
+        if size:
+            px = [max(1, round(size[0] * density)), max(1, round(size[1] * density))]
+        else:
+            px = [max(1, round(stage[0] * scale * density)), max(1, round(stage[1] * scale * density))]
         row = {'scale': scale, 'density': density, 'band': band, 'stage': stage, 'px': px,
                'file': file_name(name, density), 'swf': f'bundle:{bundle}#{src_name}', 'swf_sha': swf_sha}
         row['key'] = key(name, scale, density, band, swf_sha)
         if opts.get('ramp'):
             row['ramp'] = opts['ramp']
             row['key'] += ':ramp=' + json.dumps(opts['ramp'])
+        if size:
+            row['size'] = list(size)
+            row['key'] += ':size=' + json.dumps(list(size))
         old = rows.get(name) or {}
         if not args.force and old.get('key') == row['key'] and os.path.exists(os.path.join(OUT, row['file'])):
             continue
         row['_swf'] = swf
-        row['zoom'] = max(1, math.ceil(scale * density - 0.02))
+        row['zoom'] = max(1, math.ceil(max(px[0] / stage[0], px[1] / stage[1]) - 0.02)) if size \
+            else max(1, math.ceil(scale * density - 0.02))
         todo.append((name, row))
     print(f'{set_name}: {len(PIECES)} pieces; to do: {len(todo)}', flush=True)
     by_zoom = {}
@@ -634,7 +660,8 @@ def cmd_check():
             row = rows.get(name)
             if not row or row['scale'] != scale or row['density'] != density or row.get('band') != band \
                     or row['swf'] != f'bundle:{bundle}#{opts.get("deco", name)}' \
-                    or row.get('ramp') != opts.get('ramp'):
+                    or row.get('ramp') != opts.get('ramp') \
+                    or row.get('size') != (list(opts['size']) if opts.get('size') else None):
                 print(f'{set_name}/{name}: not built as {spec}'); bad += 1; continue
             path = os.path.join(OUT, row['file'])
             if not os.path.exists(path) or deco.sha(path)[:16] != row['sha']:

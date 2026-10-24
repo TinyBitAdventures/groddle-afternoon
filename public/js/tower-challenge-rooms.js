@@ -34,8 +34,10 @@
  * tower_room_4, drawn by features/tower-rooms-feature.js from `art`), Room 16
  * from firebog.swf's bottletree pieces already among the street decos. No
  * deco lists survive for either, so the layouts are read off the Snaps; the
- * platforms, ladder, doors, keys and items are unchanged. No pixels from
- * screenshots or video.
+ * platforms, ladder, doors, keys and items are unchanged, except (G97) Room
+ * 4's two shelves, one-way ledges the Snaps' drinks stand on, and Room 16's
+ * mouth, drawn from a render at the door's size (tools/room-art set
+ * tower_room_16). No pixels from screenshots or video.
  *
  * tools/build-tower-rooms.mjs writes all five rooms' street JSON. The shell,
  * ladder, plaque, lantern and wall helpers are exported for js/tower-mid-rooms.js.
@@ -43,6 +45,7 @@
 
 import { decoPoint, hangingSign, stepsPiece, TOWER_ROOMS, towerRoomIndexEntry, towerRoomStreet } from './tower-rooms.js?v=tower-rooms-1';
 import { TOWER_ROOM_4_FILES } from './tower-room-4-art.js';
+import { TOWER_ROOM_16_FILES } from './tower-room-16-art.js';
 
 export const ROOM_4_TSID = 'GIF1Q6PMN7123NQ';
 export const ROOM_8_TSID = 'GIF1FHA10312KLV';
@@ -176,6 +179,7 @@ export function flats(platforms) {
 }
 
 export const TOWER_ROOM_4_ART_ROOT = 'assets/sprites/tower-rooms/room_4/';
+export const TOWER_ROOM_16_ART_ROOT = 'assets/sprites/tower-rooms/room_16/';
 const DECO_ROOT = 'assets/decos/groddle/';
 
 export const barriersFor = (bounds, id) => [
@@ -196,6 +200,19 @@ export const ROOM_4_DRINKS = Object.freeze([
   { cls: 'tooberry_shake', label: 'Too-Berry Shake' },
   { cls: 'slow_gin_fizz', label: 'Slow Gin Fizz' },
 ]);
+
+/**
+ * The two wooden shelves the drinks stand on (Snaps PHVM2S0SCF92Q3L, PIFILOB3DN63656 and
+ * PHVIVNEBDA92RK5, reference only: drinks on wardrobia shelves at about head height). `y` is the
+ * plank's top face, a one-way ledge 80-93 px over the floor steps under it, so a plain jump (apex
+ * ~110 px) lands on it and a drink there is also in reach from the floor below.
+ */
+export const ROOM_4_SHELVES = Object.freeze([
+  Object.freeze({ name: 'wardrobia_shelf_long', x: -490, y: -210, drinks: Object.freeze([-90, 0, 90]) }),
+  Object.freeze({ name: 'wardrobia_shelf_short', x: 480, y: -210, drinks: Object.freeze([-55, 0, 55]) }),
+]);
+/** The plank's top face sits 3 px under the shelf art's top (52 px tall, bottom-centre anchor). */
+const SHELF_TOP = 3;
 
 /** sky_large_1's linen blue (the CC0 render's mid-tone), the room's sky gradient behind the felt. */
 export const ROOM_4_SKY = 'cbe5f8';
@@ -232,11 +249,11 @@ function room4Art(c, bounds, fl) {
   // Hills behind the meadow, the pines and the shelves (Snaps: pines a screen apart, shelves at head height).
   felt('platform_mound_1', -980, ground(-980) + 50, { z: -80 });
   felt('platform_mound_1', 1000, ground(1000) + 50, { z: -80, flip: true });
-  for (const [name, x] of [['fabric_tree_mid_1', -1090], ['fabric_tree_mid_1', -590], ['fabric_tree_flat_1', 240], ['fabric_tree_mid_1', 860], ['fabric_tree_flat_1', 1130]]) {
+  // (G97: the second pine stands at -720, clear of the long shelf, as the Snaps keep shelves and pines apart.)
+  for (const [name, x] of [['fabric_tree_mid_1', -1090], ['fabric_tree_mid_1', -720], ['fabric_tree_flat_1', 240], ['fabric_tree_mid_1', 860], ['fabric_tree_flat_1', 1130]]) {
     felt(name, x, ground(x) - 14, { z: -76 });
   }
-  felt('wardrobia_shelf_long', -470, ground(-470) - 64, { z: -74 });
-  felt('wardrobia_shelf_short', 470, ground(470) - 64, { z: -74 });
+  for (const shelf of ROOM_4_SHELVES) felt(shelf.name, shelf.x, shelf.y - SHELF_TOP + TOWER_ROOM_4_FILES[shelf.name][2], { z: -74 });
 
   // Soil under the meadow, then felt ground along every floor run (deepest runs in front).
   art.push({ name: 'soil', fill: ROOM_4_SOIL, x1: bounds.l, x2: bounds.r, y1: -40, y2: bounds.b + 700, z: -70 });
@@ -292,10 +309,16 @@ function buildRoom4() {
   const gardenWhy = 'W rooms table: "Bring a Hoe & 4 packets of Seeds. *Optional. Within are 4 plots with spinach"; F 3343 "harvested the plots and replanted". A 4 x 1 crop garden on the floor\'s middle flat, its empty plots replanted with spinach once a game day.';
   const garden = { x: 0, y: fl.mid, cols: 4, rows: 1, seed: 'seed_spinach', why: gardenWhy };
 
-  // Six drinks on the floor either side of the garden.
-  const drinkWhy = 'W rooms table: "six different drinks: Cosma-politan, Gurly Drink, Pungent Sunrise, Savory Smoothie, Too-Berry Shake, and Slow Gin Fizz"; F 3343 "I drank the drinks". One of each on the floor, back once a game day after you take it.';
-  const drinkX = [-640, -470, -300, 300, 470, 640];
-  const items = ROOM_4_DRINKS.map((d, i) => ({ id: `r4_${d.cls}`, cls: d.cls, label: d.label, count: 1, x: drinkX[i], y: floorY(c.platforms, drinkX[i]), why: drinkWhy }));
+  // Six drinks on the two shelves either side of the garden (G97: the Snaps' drinks stand on shelves).
+  const drinkWhy = 'W rooms table: "six different drinks: Cosma-politan, Gurly Drink, Pungent Sunrise, Savory Smoothie, Too-Berry Shake, and Slow Gin Fizz"; F 3343 "I drank the drinks". Snaps PHVM2S0SCF92Q3L, PIFILOB3DN63656, PHVIVNEBDA92RK5 (reference only): the drinks stand on wooden shelves at head height. One of each, three to a shelf, back once a game day after you take it.';
+  const shelfWhy = 'Snaps PHVM2S0SCF92Q3L, PIFILOB3DN63656, PHVIVNEBDA92RK5 (reference only): wardrobia shelves at head height holding the drinks. Remake: the plank\'s top face, one way, a plain jump over the floor steps under it.';
+  const spots = [];
+  for (const shelf of ROOM_4_SHELVES) {
+    const half = TOWER_ROOM_4_FILES[shelf.name][1] / 2;
+    c.platforms.push(flat(`r4_${shelf.name.replace('wardrobia_', '')}`, shelf.x - half + 10, shelf.x + half - 10, shelf.y, shelfWhy));
+    for (const dx of shelf.drinks) spots.push({ x: shelf.x + dx, y: shelf.y });
+  }
+  const items = ROOM_4_DRINKS.map((d, i) => ({ id: `r4_${d.cls}`, cls: d.cls, label: d.label, count: 1, x: spots[i].x, y: spots[i].y, why: drinkWhy }));
 
   c.platforms.push(flat('r4_ceiling', bounds.l + 40, bounds.r - 40, bounds.t + 35, 'Chamber roof (solid from below).', 1));
 
@@ -602,7 +625,10 @@ function buildRoom16() {
         y: -407,
         ...DOOR,
         // G72: the Snap shows the way out as the pod's mouth, a dark hollow (firebog ground_cutaway_hollow1).
+        // G97: drawn from tools/room-art's render at the door's own size (`src`), so it is sharp; `sprite`
+        // stays the street deco (the doors feature's fallback and the deco checks).
         sprite: 'ground_cutaway_hollow1',
+        src: `${TOWER_ROOM_16_ART_ROOT}${TOWER_ROOM_16_FILES.ground_cutaway_hollow1[0]}`,
         connect: { tsid: 'LTJ110817812KO4', label: 'Corridor Six', x: 984, y: -467, hub_id: '77' },
         why: 'Back through C6W\'s Room 16 door (world 984,-467), the way you came in.',
       },
@@ -646,6 +672,10 @@ export function anyTowerRoomStreet(room) {
     street.ladders = room.ladders.map(strip);
     street.stats.ladderCount = street.ladders.length;
   }
+  // A door drawn from its own render (Room 16's mouth, G97) carries the file as `src`.
+  room.doors.forEach((d, i) => {
+    if (d.src) street.doors[i].src = d.src;
+  });
   return street;
 }
 

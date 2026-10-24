@@ -29,8 +29,10 @@ import {
   CHALLENGE_ROOM_DOOR_LINKS,
   ROOM_16_TSID,
   ROOM_4_DRINKS,
+  ROOM_4_SHELVES,
   ROOM_4_TSID,
   ROOM_8_TSID,
+  TOWER_ROOM_16_ART_ROOT,
   TOWER_ROOM_4_ART_ROOT,
   anyTowerRoomByTsid,
   anyTowerRoomStreet,
@@ -476,7 +478,7 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
       const ty = g.y - g.h * Math.cos(t);
       return { left: tx - (g.w / 2) * Math.cos(t), right: tx + (g.w / 2) * Math.cos(t), top: (x) => ty + Math.tan(t) * (x - tx) };
     });
-    for (const f of flats(room4.platforms).filter((r) => r.y > -600 && !/_lip_/.test(r.id))) {
+    for (const f of flats(room4.platforms).filter((r) => r.y > -600 && !/_lip_|_shelf_/.test(r.id))) {
       const xc = (f.x1 + f.x2) / 2;
       assert.ok(grounds.some((g) => g.left <= f.x1 && f.x2 <= g.right && Math.abs(g.top(xc) - (f.y - 28)) <= 12), `${f.id} has felt ground`);
     }
@@ -491,6 +493,13 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
     const door = room16.doors[0];
     assert.equal(door.sprite, 'ground_cutaway_hollow1');
     assert.ok(Math.abs(pod.x - door.x) <= 2 && pod.y > door.y && pod.y - pod.h < door.y - door.h);
+    // G97: the mouth is drawn from tools/room-art's render at the door's own size (2x), not the stretched deco.
+    const plan = JSON.parse(readFileSync(join(spike, 'tools/room-art/tower_room_16.json'), 'utf8')).pieces.ground_cutaway_hollow1;
+    assert.equal(door.src, `${TOWER_ROOM_16_ART_ROOT}${plan.file}`);
+    assert.equal(street(ROOM_16_TSID).doors[0].src, door.src);
+    assert.ok(existsSync(join(spike, 'public', door.src)), door.src);
+    assert.match(plan.swf, /^bundle:firebog\.swf#ground_cutaway_hollow1$/);
+    assert.deepEqual(plan.out_px, [door.w * plan.density, door.h * plan.density]);
   });
 
   it('the archived corridor doors lead in at their archived arrivals, still locked by their keys', () => {
@@ -545,7 +554,7 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
     }
   });
 
-  it('room 4: a ladder from the floor to the way out, four spinach plots and six drinks on the floor', () => {
+  it('room 4: a ladder from the floor to the way out, four spinach plots and six drinks on two shelves', () => {
     const s = street(ROOM_4_TSID);
     assert.equal(s.ladders.length, 1);
     const l = room4.ladders[0];
@@ -561,9 +570,28 @@ describe('rebuilt tower rooms: Rooms 4, 8 and 16', () => {
     const bedHalf = (4 * 52 + 20) / 2; // game.js GARDEN_CELL_W 52, pads 10
     const mid = room4.platforms.find((p) => p.id === 'plat_r4_floor_mid');
     assert.ok(mid.x1 <= room4.garden.x - bedHalf && room4.garden.x + bedHalf <= mid.x2 && mid.y1 === room4.garden.y);
-    // Six different drinks, each on the floor.
+    // Six different drinks, three on each shelf (G97: the Snaps' drinks stand on shelves).
     assert.deepEqual(room4.items.map((i) => i.cls), ROOM_4_DRINKS.map((d) => d.cls));
-    for (const item of room4.items) assert.equal(item.y, Math.round(floorAt(room4.platforms, item.x, -100)));
+    const floorOnly = room4.platforms.filter((p) => /_floor_/.test(p.id));
+    for (const shelf of ROOM_4_SHELVES) {
+      const id = `r4_${shelf.name.replace('wardrobia_', '')}`;
+      const plat = piece(room4, id);
+      assert.equal(plat.length, 1, id);
+      assert.equal(plat[0].pc_perm, -1, `${id} is one way`);
+      // A plain jump from the floor lands on it; nothing else (no key, no spinach) is needed.
+      assert.ok(canReach(floorOnly, plat), `${id} is a plain jump from the floor`);
+      const mine = room4.items.filter((i) => i.x >= plat[0].x1 && i.x <= plat[0].x2 && i.y === plat[0].y1);
+      assert.equal(mine.length, 3, `${id} holds three drinks`);
+      // Each drink is also in reach from the floor under it (game.js nearestInteractable(100)).
+      for (const i of mine) assert.ok(floorAt(floorOnly, i.x, -100) - i.y < 100, `${i.id} within reach of the floor`);
+      // The shelf art's plank top is the platform.
+      const art = room4.art.find((a) => a.name === shelf.name);
+      assert.ok(Math.abs(art.y - art.h + 3 - plat[0].y1) <= 1 && art.x === shelf.x);
+      // Clear of the ladder and the garden.
+      assert.ok(plat[0].x2 < room4.ladders[0].x - 40 || plat[0].x1 > room4.ladders[0].x + 40);
+      assert.ok(plat[0].x2 < room4.garden.x - bedHalf || plat[0].x1 > room4.garden.x + bedHalf);
+    }
+    assert.equal(new Set(room4.items.map((i) => `${i.x},${i.y}`)).size, 6);
   });
 
   it('room 8 (G110): arrive on a ledge, cross the bridge over the void to the deck with the key and the way out', () => {
