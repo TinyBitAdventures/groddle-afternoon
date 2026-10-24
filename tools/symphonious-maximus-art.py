@@ -1,0 +1,94 @@
+#!/usr/bin/env python3.11
+"""Star-Jingler art for Symphonious Maximus (register row G90), and the island top profiles.
+
+Stars: glitch-items misc/toy_star_1/toy_star_1.swf (CC0, "Star-Jingler-mid"). Its sprite 3 has
+the label "1" (frame 1: the yellow star at rest) and "glow" (frames 2-30: a colour matrix from
+near white back to yellow, 24 fps). FFDec renders the sprite's frames at zoom 3; frame 1 becomes
+toy_star_1@3x.webp and frame 2 (the palest) toy_star_1_glow@3x.webp, each padded to 3x the item's
+46x42 stage (getAssetInfo in items/toy_star_1.js). js/features/symphonious-maximus-feature.js
+fades the glow frame over the rest frame to play the glow cycle.
+
+Profiles (--profiles): the top edge of each floating island deco, as a fraction of its height at
+x = 0.05 .. 0.95 of its width (first row with alpha over 140), for ISLAND_PROFILES in
+public/js/symphonious-maximus.js.
+
+Usage (python3.11 has numpy + Pillow; FFDec needs Java 21; cwebp):
+  python3.11 -I tools/symphonious-maximus-art.py --work <scratch dir>
+  python3.11 -I tools/symphonious-maximus-art.py --profiles
+The SWF is data only: FFDec reads it, nothing runs it.
+"""
+import argparse, os, shutil, subprocess, sys
+
+import numpy as np
+from PIL import Image
+
+sys.dont_write_bytecode = True
+HERE = os.path.dirname(os.path.abspath(__file__))
+SPIKE = os.path.dirname(HERE)
+AUDIT = os.path.dirname(SPIKE)
+SWF = os.path.join(AUDIT, 'glitch-items', 'misc', 'toy_star_1', 'toy_star_1.swf')
+FFDEC = os.path.join(AUDIT, 'tools', 'ffdec', 'ffdec.jar')
+JAVA = '/opt/homebrew/opt/openjdk@21/bin/java'
+OUT = os.path.join(SPIKE, 'public', 'assets', 'sprites', 'symphonious')
+DECOS = os.path.join(SPIKE, 'public', 'assets', 'decos', 'groddle')
+ZOOM = 3
+STAGE = (46, 42)
+ISLANDS = ['flying_platform_1', 'flying_platform_2', 'flying_platform_3', 'flying_platform_4', 'flying_platform_5', 'flying_platform_6']
+
+
+def profiles():
+    for name in ISLANDS:
+        a = np.asarray(Image.open(os.path.join(DECOS, name + '.webp')).convert('RGBA'))[..., 3] > 140
+        h, w = a.shape
+        row = []
+        for i in range(1, 20):
+            ys = np.nonzero(a[:, min(w - 1, int(i * 0.05 * (w - 1)))])[0]
+            row.append(round(ys[0] / h, 2) if len(ys) else None)
+        print(f'{name}: {row}')
+
+
+def render(work):
+    src = os.path.join(work, 'in')
+    out = os.path.join(work, 'out')
+    shutil.rmtree(work, ignore_errors=True)
+    os.makedirs(src)
+    os.symlink(SWF, os.path.join(src, 'toy_star_1.swf'))
+    subprocess.run([JAVA, '-Djava.awt.headless=true', '-jar', FFDEC, '-zoom', str(ZOOM), '-format', 'sprite:png',
+                    '-export', 'sprite', out, os.path.join(src, 'toy_star_1.swf')], check=True, stdout=subprocess.DEVNULL)
+    frames = [d for d in os.listdir(out) if d.startswith('DefineSprite_3')]
+    if len(frames) != 1:
+        raise SystemExit(f'expected one DefineSprite_3 folder, got {frames}')
+    return os.path.join(out, frames[0])
+
+
+def place(png, dest, work):
+    im = Image.open(png).convert('RGBA')
+    cw, ch = STAGE[0] * ZOOM, STAGE[1] * ZOOM
+    if im.width > cw or im.height > ch:
+        raise SystemExit(f'{png}: {im.size} larger than the {cw}x{ch} stage')
+    canvas = Image.new('RGBA', (cw, ch))
+    canvas.paste(im, ((cw - im.width) // 2, (ch - im.height) // 2))
+    tmp = os.path.join(work, os.path.basename(dest) + '.png')
+    canvas.save(tmp)
+    subprocess.run(['cwebp', '-quiet', '-lossless', '-exact', tmp, '-o', dest], check=True)
+    print(dest, os.path.getsize(dest), 'bytes')
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--work')
+    ap.add_argument('--profiles', action='store_true')
+    args = ap.parse_args()
+    if args.profiles:
+        profiles()
+        return
+    if not args.work:
+        ap.error('--work <scratch dir> is required to render')
+    frames = render(os.path.abspath(args.work))
+    os.makedirs(OUT, exist_ok=True)
+    place(os.path.join(frames, '1.png'), os.path.join(OUT, 'toy_star_1@3x.webp'), args.work)
+    place(os.path.join(frames, '2.png'), os.path.join(OUT, 'toy_star_1_glow@3x.webp'), args.work)
+
+
+if __name__ == '__main__':
+    main()

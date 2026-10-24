@@ -12962,6 +12962,15 @@
       "platforms": 5,
       "decos": 123,
       "reconstructed": true
+    },
+    "GUVR3SGQ6EF3400": {
+      "label": "Symphonious Maximus",
+      "file": "assets/streets/GUVR3SGQ6EF3400.json",
+      "hubId": "51",
+      "hubName": "Uralia",
+      "platforms": 151,
+      "decos": 134,
+      "reconstructed": true
     }
   }
 }

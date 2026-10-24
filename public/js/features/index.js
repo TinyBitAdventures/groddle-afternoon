@@ -91,3 +91,4 @@ import { pouchFeature } from './elemental-pouch-feature.js?v=g83-1'; FEATURES.pu
 import { hiSignsFeature } from './hi-signs-feature.js?v=hi-signs-1'; FEATURES.push(hiSignsFeature);
 import { gwendolynRoom23Feature } from './gwendolyn-room-23-feature.js?v=g71-1'; FEATURES.push(gwendolynRoom23Feature);
 import { cubimalRaceFeature } from './cubimal-race-feature.js?v=g95-1'; FEATURES.push(cubimalRaceFeature);
+import { symphoniousMaximusFeature } from './symphonious-maximus-feature.js?v=g90-1'; FEATURES.push(symphoniousMaximusFeature);

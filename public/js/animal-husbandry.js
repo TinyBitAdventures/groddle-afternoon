@@ -39,6 +39,7 @@ import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
 import { moodMax } from './metabolics.js';
 import { musicblockItemMeta } from './musicblocks.js';
 import { isEnchantedForest } from './enchanted-forests.js?v=g5-1';
+import { isSymphoniousTsid } from './symphonious-maximus.js?v=g90-1';
 import { ensurePiggyMood, piggyTwiceDailyTick, satePiggy } from './animal-mood.js';
 import { isCrowdSad } from './animal-crowding.js';
 
@@ -256,6 +257,8 @@ export function isBatterflyHabitat(street = {}) {
   if (!street) return false;
   // The Enchanted Forest wood tree hollows (js/enchanted-forests.js) are no caves.
   if (isEnchantedForest(street.tsid)) return false;
+  // Nor is Symphonious Maximus, Uralia's open star street (js/symphonious-maximus.js).
+  if (isSymphoniousTsid(street.tsid)) return false;
   if (BATTERFLY_CAVE_HUBS.includes(String(street.hubName || ''))) return true;
   return CAVE_WORDS.test(String(street.label || '')) || CAVE_WORDS.test(String(street.internalLabel || ''));
 }

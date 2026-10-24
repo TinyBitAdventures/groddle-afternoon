@@ -1,0 +1,129 @@
+/**
+ * Symphonious Maximus (register row G90): the rebuilt street behind
+ * Cebarkul's wooden door (data and layout in js/symphonious-maximus.js,
+ * street JSON from tools/build-symphonious-maximus.mjs).
+ *
+ * - Ecology: the video shows no animals, trees, vendor or shrine, so the
+ *   street gets an empty population (no fallback piggies).
+ * - Star-Jinglers (items/toy_star_1.js): touching one plays BIG_STAR_3 for
+ *   everyone on the street (announce_sound_to_all) and sets its state to
+ *   "glow", which nothing resets, so a touched star keeps cycling its
+ *   29-frame glow. Glowing stars are remembered in the street's slot. The
+ *   three big stars in the island gaps are decoration.
+ * - The craters' bounce is street event data (location-events feature).
+ *
+ * QA: ?autostart=1&questoffer=off&streetdemo=GUVR3SGQ6EF3400 (or through
+ * Cebarkul's door: doordemo=GIF12PMQ5121D68&doorautoplay=1). Add
+ * &symphoniousreset=1 to clear the glowing stars. Data: symphoniousStars,
+ * symphoniousGlowing, symphoniousTouches, symphoniousLast.
+ */
+
+import { textureFromUrl } from '../textures.js';
+import { STAR_JINGLER, SYMPHONIOUS_LABEL, SYMPHONIOUS_SOURCE_TSID, glowAlpha, isSymphoniousTsid, touchesStar } from '../symphonious-maximus.js?v=g90-1';
+
+export const SYMPHONIOUS_FEATURE_ID = 'symphonious-maximus';
+const STAR_Z = 12;
+const DATA_MS = 250;
+
+let views = []; // { star, base, glow, touching }
+let slot = null;
+let active = false;
+let touches = 0;
+let last = '';
+let lastData = 0;
+
+export const isSymphonious = isSymphoniousTsid;
+
+function clear() {
+  for (const v of views) {
+    for (const s of [v.base, v.glow]) if (s && !s.destroyed) s.destroy();
+  }
+  views = [];
+  slot = null;
+  active = false;
+}
+
+function publish(engine, now = Date.now(), force = false) {
+  if (!force && now - lastData < DATA_MS) return;
+  lastData = now;
+  engine.setData('symphoniousStars', active ? views.filter((v) => !v.big).length : 0);
+  engine.setData('symphoniousGlowing', active ? Object.keys(slot?.glowing || {}).length : 0);
+  engine.setData('symphoniousTouches', touches);
+  engine.setData('symphoniousLast', last);
+}
+
+function starSprite(engine, url, x, y, scale) {
+  const sprite = new engine.PIXI.Sprite(textureFromUrl(url));
+  sprite.anchor.set(0.5, 0.5);
+  sprite.width = STAR_JINGLER.w * scale;
+  sprite.height = STAR_JINGLER.h * scale;
+  sprite.x = x;
+  sprite.y = y;
+  sprite.zIndex = STAR_Z;
+  engine.entityLayer.addChild(sprite);
+  return sprite;
+}
+
+export const symphoniousMaximusFeature = {
+  id: SYMPHONIOUS_FEATURE_ID,
+
+  /** No animals, trees, rocks, vendor, shrine or quoins in the recording. */
+  ecologyOverride(street) {
+    if (!isSymphonious(street?.tsid)) return null;
+    return { label: SYMPHONIOUS_LABEL, sourceTsid: SYMPHONIOUS_SOURCE_TSID, counts: {}, empty: true };
+  },
+
+  onStreetEnter(street, engine) {
+    clear();
+    const data = street?.starJinglers;
+    if (!isSymphonious(street?.tsid) || !data || engine.transientInstance?.() || engine.homeContext?.().inHome) {
+      publish(engine, Date.now(), true);
+      return;
+    }
+    active = true;
+    slot = engine.streetSlot(SYMPHONIOUS_FEATURE_ID);
+    if (engine.param('symphoniousreset') === '1' || !slot.glowing || typeof slot.glowing !== 'object') slot.glowing = {};
+    const p = engine.player;
+    for (const star of data.stars || []) {
+      const base = starSprite(engine, STAR_JINGLER.art, star.x, star.y, 1);
+      const glow = starSprite(engine, STAR_JINGLER.glowArt, star.x, star.y, 1);
+      glow.zIndex = STAR_Z + 1;
+      glow.visible = Boolean(slot.glowing[star.id]);
+      // Arriving inside a star is not a touch.
+      views.push({ star, base, glow, touching: Boolean(p && touchesStar(star, p.x, p.y)) });
+    }
+    for (const big of data.bigStars || []) {
+      views.push({ star: big, big: true, base: starSprite(engine, STAR_JINGLER.art, big.x, big.y, big.scale || 2), glow: null });
+    }
+    publish(engine, Date.now(), true);
+  },
+
+  onStreetClear() {
+    clear();
+  },
+
+  onTick(dtMs, now, engine) {
+    if (!active || !slot) return;
+    const p = engine.player;
+    const t = Date.now();
+    for (const v of views) {
+      if (v.big) continue;
+      const inside = Boolean(p && touchesStar(v.star, p.x, p.y));
+      if (inside && !v.touching) {
+        // onPlayerCollision: announce_sound_to_all(BIG_STAR_3), setAndBroadcastState('glow').
+        engine.playSound(STAR_JINGLER.sound, { volume: 0.6, allowMultiple: true });
+        // Setting the state again restarts the glow from its first frame.
+        slot.glowing[v.star.id] = t;
+        touches += 1;
+        last = v.star.id;
+      }
+      v.touching = inside;
+      const since = slot.glowing[v.star.id];
+      if (v.glow && !v.glow.destroyed) {
+        v.glow.visible = Boolean(since);
+        if (since) v.glow.alpha = glowAlpha(t - since);
+      }
+    }
+    publish(engine, t);
+  },
+};
