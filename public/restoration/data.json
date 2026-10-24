@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 329,
+  "commits": 330,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "new",
+    "text": "Symphonious Maximus behind Cebarkul's wooden door, with Star-Jinglers to play and craters that throw you into the sky"
+   },
    {
     "date": "2026-10-23",
     "kind": "new",
@@ -1924,11 +1929,6 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Customize your Butler part by part, drawn sharp from Tiny Speck's own pieces, and it invites you to join the club"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "improve",
-    "text": "Blueberry, Autumn, Midnight, Candy and Forest presets drawn sharp from the vector wardrobe"
    }
   ]
  },

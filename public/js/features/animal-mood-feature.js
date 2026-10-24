@@ -35,8 +35,11 @@
  *   (stops, crowding lines every 30 s, sulk clips, sad verbs refused), say
  *   it is OUT of here and leave in a puff 7 s later, or, at the limit,
  *   puff away at once. A sad spell checks again 5 minutes after it ends.
- *   Ecology animals that leave stay gone (state.crowdGone); released and
- *   raised ones leave their husbandry slot (target.husbandryVanish).
+ *   Ecology animals that leave are marked state.crowdGone and come back
+ *   from the street's archived population at the next game-day rollover
+ *   (G82): live on the street you stand on (onNewDay), and on any other
+ *   street when you next arrive (crowdRespawnBoundary). Released and raised
+ *   ones leave their husbandry slot for good (target.husbandryVanish).
  *   Chickens and Butterflies somewhere depressing leave or vanish on load
  *   (npc_chicken.js / npc_butterfly.js onLoad).
  *
@@ -63,6 +66,11 @@
  *   Animals first. Canvas: animalCrowd (class:population/limit),
  *   animalCrowdSad, animalCrowdPending, animalCrowdLeaving, animalCrowdGone,
  *   animalCrowdChecks, animalCrowdCard, animalCrowdLast.
+ *   Respawn (G82): add &animalcrowdrespawn=1 and, once the street animals
+ *   that left are gone, the saved game day is set back one day so the
+ *   game's own new-day poll rolls the day (new-day screen, onNewDay) and
+ *   they walk back. Canvas: animalCrowdLeft (ecology animals off this
+ *   street), animalCrowdReturned, animalCrowdRespawn (armed|rolled).
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
@@ -83,6 +91,8 @@ import {
   canStartSadness,
   crowdCard,
   crowdSadClip,
+  crowdGoneReturns,
+  crowdRespawnBoundary,
   crowdSadLinePool,
   gloomOnLoad,
   isCrowdSad,
@@ -91,7 +101,8 @@ import {
   sadnessMax,
   sadnessStart,
   streetWidth,
-} from '../animal-crowding.js';
+} from '../animal-crowding.js?v=g82-1';
+import { GAME_DAY_MS, setLastNewDayTs } from '../game-day.js?v=dametime-1';
 import {
   CROAK_INTERVAL_MS,
   EAT_PAUSE_MS,
@@ -450,8 +461,12 @@ function sadInterval(engine, r) {
 
 let crowd = new Map(); // target -> { mode: 'pending'|'sad'|'leaving', startAt, until, lineAt, puffAt, goneAt, saved, finish }
 let crowdSeen = new Set(); // crowd-class targets already adopted on this street
-let crowdStats = { checks: 0, gone: 0 };
+let crowdStats = { checks: 0, gone: 0, returned: 0 };
 let crowdLast = '';
+let crowdLeft = new Set(); // ecology animals that left this street (hidden until the day rolls, G82)
+let crowdRolledAt = 0; // the last game-day rollover this feature saw (saved; a forced roll counts)
+let crowdRespawnQa = ''; // &animalcrowdrespawn=1: '' → 'armed' → 'rolled'
+let crowdRespawnAt = 0;
 
 /** A smoke_puff overlay (also the starvation puff, animal-husbandry-feature.js). `hold` keeps it up for screenshots. */
 export function smokePuff(engine, x, y, { hold = false } = {}) {
@@ -637,6 +652,7 @@ function removeGone(engine, target, rec, { cascade = true } = {}) {
   crowdStats.gone += 1;
   if (typeof rec?.finish === 'function') rec.finish();
   else {
+    if (!isExtra(target)) crowdLeft.add(target);
     if (target.sprite && !target.sprite.destroyed) target.sprite.visible = false;
     const list = engine.interactables || [];
     const at = list.indexOf(target);
@@ -762,22 +778,31 @@ function endCrowdSad(engine, target, rec) {
 }
 
 /**
- * New crowd-class animals on this street: hide ecology animals that already
- * left, resume a saved sulk or a due check, and apply the gloomy onLoad
- * (chickens leave in 1 s, butterflies vanish). Nothing else checks on load.
+ * New crowd-class animals on this street: hide ecology animals that left
+ * since the last game-day rollover (earlier leavers are back, G82), resume a
+ * saved sulk or a due check, and apply the gloomy onLoad (chickens leave in
+ * 1 s, butterflies vanish). Nothing else checks on load.
  */
 function adoptCrowd(engine) {
   if (!crowdActive(engine)) return;
   const depressing = animalPlaceIsDepressing(engine);
   const t = now();
+  const boundary = crowdRespawnBoundary(t, crowdRolledAt);
   for (const classId of CROWD_CLASSES) {
     for (const target of crowdAnimals(engine, classId)) {
       if (crowdSeen.has(target)) continue;
       crowdSeen.add(target);
       const s = target.state;
       if (Number(s.crowdGone) > 0 && !isExtra(target)) {
-        removeGone(engine, target, null, { cascade: false });
-        continue;
+        if (!crowdGoneReturns(s.crowdGone, boundary)) {
+          removeGone(engine, target, null, { cascade: false });
+          continue;
+        }
+        // G82: it left before the day rolled, so it is back on the street.
+        delete s.crowdGone;
+        crowdStats.returned += 1;
+        crowdLast = `returned:${classId}`;
+        engine.save?.();
       }
       const gloom = gloomOnLoad(classId, depressing);
       if (gloom) {
@@ -832,6 +857,48 @@ function stepCrowd(engine, { scan = false } = {}) {
   }
 }
 
+/**
+ * G82 onNewDay: the ecology animals that left the street you stand on walk
+ * back (no check: arrivals from the archived population are a load, and
+ * nothing checks on load). A gloomy street sends them off again (adoptCrowd).
+ */
+function returnCrowd(engine) {
+  const boundary = crowdRespawnBoundary(now(), crowdRolledAt);
+  const list = engine?.interactables;
+  let n = 0;
+  for (const target of [...crowdLeft]) {
+    const s = target.state;
+    if (!target.sprite || target.sprite.destroyed || !s || !crowdGoneReturns(s.crowdGone, boundary)) continue;
+    crowdLeft.delete(target);
+    delete s.crowdGone;
+    target._crowdGone = false;
+    target.sprite.visible = true;
+    if (Array.isArray(list) && !list.includes(target)) list.push(target);
+    crowdSeen.delete(target);
+    n += 1;
+  }
+  if (n) {
+    crowdStats.returned += n;
+    crowdLast = `returned:${n}`;
+    engine.save?.();
+  }
+  return n;
+}
+
+/** &animalcrowdrespawn=1: once the street animals that left are gone, set the saved day back so the game rolls it. */
+function crowdRespawnDemo(engine) {
+  if (crowdRespawnQa === 'rolled' || engine.param('animalcrowdrespawn') !== '1') return;
+  if (crowdRespawnQa === 'armed') {
+    if (now() < crowdRespawnAt) return;
+    setLastNewDayTs(now() - GAME_DAY_MS);
+    crowdRespawnQa = 'rolled';
+    return;
+  }
+  if (!crowdLeft.size || [...crowd.values()].some((r) => r.mode === 'leaving')) return;
+  crowdRespawnQa = 'armed';
+  crowdRespawnAt = now() + 1500;
+}
+
 function publishCrowd(engine) {
   const parts = CROWD_CLASSES.map((c) => `${c}:${crowdAnimals(engine, c).length}/${crowdLimit(engine, c)}`);
   const modes = [...crowd.values()];
@@ -843,6 +910,9 @@ function publishCrowd(engine) {
   engine.setData('animalCrowdChecks', String(crowdStats.checks));
   engine.setData('animalCrowdCard', engine.streetTsid === YARD_TSID ? crowdCard(engine.pc?.imaginationUpgrades || [])?.id || 'none' : '');
   engine.setData('animalCrowdLast', crowdLast);
+  engine.setData('animalCrowdLeft', String(crowdLeft.size));
+  engine.setData('animalCrowdReturned', String(crowdStats.returned));
+  engine.setData('animalCrowdRespawn', crowdRespawnQa);
 }
 
 function resetCrowd() {
@@ -852,7 +922,8 @@ function resetCrowd() {
   }
   crowd = new Map();
   crowdSeen = new Set();
-  crowdStats = { checks: 0, gone: 0 };
+  crowdLeft = new Set();
+  crowdStats = { checks: 0, gone: 0, returned: 0 };
 }
 
 // —— Ticks ——————————————————————————————————————————————————————————————
@@ -1081,6 +1152,7 @@ export const animalMoodFeature = {
       }
       adoptNew(engine);
       adoptCrowd(engine);
+      crowdRespawnDemo(engine);
       liveTicks(engine);
       runFoodDemo(engine);
       // Keep the world labels honest (game.js rewrites them after verbs).
@@ -1115,6 +1187,23 @@ export const animalMoodFeature = {
       } else if (target.state.croaking) target.state.croaking = false;
     }
     publish(engine);
+  },
+
+  /** G82: the game day rolled; street animals that left come back. */
+  onNewDay(t, engine) {
+    crowdRolledAt = Math.max(crowdRolledAt, Number(t) || now());
+    const n = returnCrowd(engine);
+    if (engine?.started) publish(engine, true);
+    return n;
+  },
+
+  save() {
+    return crowdRolledAt > 0 ? { crowdRolledAt } : undefined;
+  },
+
+  restore(slice) {
+    const at = Number(slice?.crowdRolledAt);
+    crowdRolledAt = Number.isFinite(at) && at > 0 ? at : 0;
   },
 
   /** onContainerItemStateChanged: a trant you just worked, with fruit on it. */
@@ -1199,6 +1288,8 @@ export const animalMoodFeature = {
       crowd: [...crowd].map(([target, rec]) => ({ target, mode: rec.mode, startAt: rec.startAt, until: rec.until, goneAt: rec.goneAt })),
       crowdStats: { ...crowdStats },
       crowdLast,
+      crowdLeft: crowdLeft.size,
+      crowdRolledAt,
     };
   },
 };

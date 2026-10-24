@@ -47,7 +47,15 @@
  * - npc_chicken.js onLoad 1156-1160 / leave 943-945: a chicken somewhere
  *   depressing leaves (apiDelete) a second after loading; npc_butterfly.js
  *   onLoad 1070-1076 deletes a butterfly there at once. Neither has a puff.
+ *
+ * Respawn (G82, Austin's call 2026-10-23, no source equivalent): the source
+ * apiDelete is for good. In the remake a street (ecology) animal that left
+ * (an OUT of here leaver, a puff at the limit, a gloomy-place leaver) comes
+ * back from the street's archived population at the next game-day rollover
+ * (game-day.js, the boundary every daily reset uses). Released and raised
+ * animals (husbandry slots) stay gone, as in the source.
  */
+import { getGameDayStartMs } from './game-day.js?v=dametime-1';
 
 /** config_prod.js population_controls 1205-1221. */
 export const POPULATION_CONTROLS = Object.freeze({
@@ -284,4 +292,19 @@ export function gloomOnLoad(classId, depressing) {
   if (classId === 'npc_chicken') return { outcome: 'leave', delayMs: CROWD_TIMING.gloomChickenMs };
   if (classId === 'npc_butterfly') return { outcome: 'vanish', delayMs: 0 };
   return null;
+}
+
+/**
+ * G82: the moment before which a departed ecology animal is back: the start
+ * of the current game day, or a later rollover the game ran (a forced roll,
+ * QA's &animalcrowdrespawn=1), whichever is later.
+ */
+export function crowdRespawnBoundary(now = Date.now(), rolledAt = 0) {
+  return Math.max(num(rolledAt, 0), getGameDayStartMs(now));
+}
+
+/** G82: did an ecology animal that left at `goneAt` come back by `boundary`? */
+export function crowdGoneReturns(goneAt, boundary) {
+  const g = num(goneAt, 0);
+  return g > 0 && g < num(boundary, 0);
 }

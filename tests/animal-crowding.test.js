@@ -14,6 +14,8 @@ import {
   NO_LIMIT,
   canStartSadness,
   crowdChance,
+  crowdGoneReturns,
+  crowdRespawnBoundary,
   crowdSadClip,
   crowdSadLinePool,
   gloomOnLoad,
@@ -27,6 +29,7 @@ import {
 } from '../public/js/animal-crowding.js';
 import { SAD_PIGGY_LINES, ensurePiggyMood } from '../public/js/animal-mood.js';
 import { createAnimalState } from '../public/js/animals.js';
+import { GAME_DAY_MS, getGameDayStartMs } from '../public/js/game-day.js';
 import { advanceYard, capturePiggy, createMachine, normalizeHusbandryPack } from '../public/js/animal-husbandry.js';
 import { getVerbsFor } from '../public/content.js';
 import { animalCrowdChanged, animalMoodFeature, crowdLimit } from '../public/js/features/animal-mood-feature.js';
@@ -270,13 +273,102 @@ describe('Crowding on the street (animal-mood feature)', () => {
   it('keeps ecology animals that left gone on the next visit, without a check', () => {
     Date.now = () => clock;
     const gone = animal('npc_piggy');
-    gone.state.crowdGone = clock - HOUR;
+    // Left earlier the same game day (G82: it is back only after the day rolls).
+    gone.state.crowdGone = Math.max(getGameDayStartMs(clock) + 1, clock - HOUR);
     const stay = animal('npc_piggy');
     const engine = street([gone, stay]);
     tick(engine);
     assert.deepEqual(engine.interactables, [stay]);
     assert.equal(gone.sprite.visible, false);
     assert.equal(animalMoodFeature._state().crowdStats.checks, 0);
+  });
+
+  it('brings an ecology animal that left before today back on the next visit, without a check (G82)', () => {
+    Date.now = () => clock;
+    animalMoodFeature.restore(undefined);
+    const back = animal('npc_chicken');
+    back.state.crowdGone = getGameDayStartMs(clock) - 1;
+    const stay = animal('npc_chicken');
+    const engine = street([back, stay]);
+    tick(engine);
+    assert.deepEqual(engine.interactables, [back, stay]);
+    assert.equal(back.sprite.visible, true);
+    assert.equal(back.state.crowdGone, undefined, 'the saved flag is cleared');
+    assert.equal(animalMoodFeature._state().crowdStats.returned, 1);
+    assert.equal(animalMoodFeature._state().crowdStats.checks, 0, 'arrivals from the archive are a load: nothing checks');
+    tick(engine, 600);
+    assert.equal(engine.data.animalCrowdReturned, '1');
+  });
+
+  it('walks street animals that left back at the day roll; released ones stay gone (G82)', () => {
+    Date.now = () => clock;
+    animalMoodFeature.restore(undefined);
+    const ecology = herd('npc_piggy', 6);
+    const released = herd('npc_piggy', 14);
+    const engine = street([...ecology, ...released], { animalcrowdroll: '0.03' });
+    const finished = [];
+    released.forEach((p, i) => Object.assign(p, {
+      husbandryAnimal: `a${i}`,
+      husbandryVanish: () => () => {
+        finished.push(i);
+        engine.interactables.splice(engine.interactables.indexOf(p), 1);
+      },
+    }));
+    tick(engine);
+    animalCrowdChanged(engine, 'npc_piggy');
+    tick(engine, 7001);
+    assert.equal(engine.interactables.length, 0, 'all 20 said they were OUT of here and left');
+    assert.equal(finished.length, 14);
+    assert.ok(ecology.every((p) => p.state.crowdGone > 0 && p.sprite.visible === false));
+    assert.equal(engine.data.animalCrowdLeft, '6');
+    // The day rolls mid-day (a forced roll counts as much as midnight).
+    tick(engine, 60000);
+    assert.equal(animalMoodFeature.onNewDay(clock, engine), 6);
+    assert.deepEqual(engine.interactables, ecology, 'the six street piggies are back; the released fourteen are not');
+    assert.ok(ecology.every((p) => p.sprite.visible === true && p.state.crowdGone === undefined && !p._crowdGone));
+    assert.equal(engine.data.animalCrowdReturned, '6');
+    assert.equal(engine.data.animalCrowdLeft, '0');
+    assert.deepEqual(animalMoodFeature.save(), { crowdRolledAt: clock }, 'the roll is saved');
+    // A later leaver stays gone until the next roll; the saved roll survives a reload.
+    const later = animal('npc_piggy');
+    later.state.crowdGone = clock + 1000;
+    animalMoodFeature.restore({ crowdRolledAt: clock });
+    tick(engine, 2000);
+    animalMoodFeature.onStreetEnter(engine.street, engine);
+    const engine2 = street([later]);
+    tick(engine2);
+    assert.deepEqual(engine2.interactables, [], 'left after the roll: still gone');
+    animalMoodFeature.restore(undefined);
+    assert.equal(animalMoodFeature.save(), undefined);
+  });
+
+  it('arms the &animalcrowdrespawn=1 day roll only once the leavers are gone (G82)', () => {
+    Date.now = () => clock;
+    const piggies = herd('npc_piggy', 20);
+    const engine = street(piggies, { animalcrowdroll: '0.03', animalcrowdrespawn: '1' });
+    tick(engine);
+    animalCrowdChanged(engine, 'npc_piggy');
+    tick(engine, 1001);
+    assert.equal(engine.data.animalCrowdRespawn, '', 'still saying goodbye');
+    tick(engine, 6000);
+    tick(engine, 1001);
+    assert.equal(engine.data.animalCrowdRespawn, 'armed');
+    // 1.5 s later it sets the saved game day back one day; the game's own poll rolls it.
+    const store = new Map();
+    const had = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, String(v)), removeItem: (k) => store.delete(k) },
+    });
+    try {
+      tick(engine, 1600);
+      tick(engine, 600);
+      assert.equal(engine.data.animalCrowdRespawn, 'rolled');
+      assert.equal(Number(store.get('groddle_last_new_day_ts')), clock - 600 - GAME_DAY_MS);
+    } finally {
+      if (had) Object.defineProperty(globalThis, 'localStorage', had);
+      else delete globalThis.localStorage;
+    }
   });
 
   it('resumes a saved sulk and runs a check that fell due while you were away', () => {
@@ -384,5 +476,22 @@ describe('Crowding source copy (GSJS)', { skip: !existsSync(GSJS) }, () => {
     const cards = readFileSync(join(GSJS, 'inc_data_imagination.js'), 'utf8');
     assert.ok(cards.includes('name: "Happy Animals"'));
     assert.ok(cards.includes('name: "Super Happy Animals"'));
+  });
+});
+
+describe('Street animals respawn at the day roll (G82)', () => {
+  it('uses the later of the game-day start and the last roll as the boundary', () => {
+    const t = 1_800_000_000_000;
+    const start = getGameDayStartMs(t);
+    assert.equal(crowdRespawnBoundary(t), start);
+    assert.equal(crowdRespawnBoundary(t, start - GAME_DAY_MS), start);
+    assert.equal(crowdRespawnBoundary(t, t - 5), t - 5, 'a forced roll today counts');
+  });
+
+  it('brings back only animals that left before the boundary', () => {
+    assert.equal(crowdGoneReturns(99, 100), true);
+    assert.equal(crowdGoneReturns(100, 100), false);
+    assert.equal(crowdGoneReturns(0, 100), false, 'never left');
+    assert.equal(crowdGoneReturns(undefined, 100), false);
   });
 });
