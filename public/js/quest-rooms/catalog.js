@@ -123,12 +123,15 @@ export const OFFER_OVERRIDES = Object.freeze({
     prerequisites: [{ condition: 'custom_code', value: 'hour_after:an_autumn_day', not: 0 }],
     why: 'street spirit giver; canOffer: an hour after part 1 and after the last repeat',
   },
-  // firefly_whistle (the Alphite-age newxp lab) +10 days; the remake has no newxp lab.
+  // Source: firefly_whistle done 10+ days earlier (le_miserable.js 17-23). Austin 2026-10-24: one day.
   le_miserable: {
-    offerTriggers: [{ type: 'level', level: 10 }],
-    prereqQuests: [],
-    prerequisites: [{ condition: 'custom_code', value: 'hour_after:le_miserable', not: 0 }],
-    why: 'firefly_whistle newxp prereq replaced by level 10; canOffer: an hour after a fail',
+    offerTriggers: [{ type: 'quest', quest: 'firefly_whistle' }],
+    prereqQuests: ['firefly_whistle'],
+    prerequisites: [
+      { condition: 'custom_code', value: 'hours_after:24:firefly_whistle', not: 0 },
+      { condition: 'custom_code', value: 'hour_after:le_miserable', not: 0 },
+    ],
+    why: 'a day after Firefly Whistle (source: ten days); canOffer: an hour after a fail',
   },
   le_miserable_reminisce: {
     prerequisites: [{ condition: 'custom_code', value: 'hour_after:le_miserable_part_2', not: 0 }],

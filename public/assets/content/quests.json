@@ -28316,7 +28316,9 @@
   "completion": "Oh, little Glitch. What are you doing down here? <split butt_txt=\"Not really sure …\" />",
   "requirements": [],
   "rewards": {},
-  "prereqQuests": [],
+  "prereqQuests": [
+   "firefly_whistle"
+  ],
   "isJob": false,
   "autoComplete": false,
   "isRepeatable": false,
@@ -28327,6 +28329,11 @@
   "silentComplete": false,
   "showAlert": false,
   "prerequisites": [
+   {
+    "condition": "custom_code",
+    "value": "hours_after:24:firefly_whistle",
+    "not": 0
+   },
    {
     "condition": "custom_code",
     "value": "hour_after:le_miserable",
@@ -28344,13 +28351,13 @@
   "hasCanOffer": true,
   "offerTriggers": [
    {
-    "type": "level",
-    "level": 10,
+    "type": "quest",
+    "quest": "firefly_whistle",
     "override": true
    }
   ],
   "instanceRoom": "le_miserable",
-  "offerNote": "firefly_whistle newxp prereq replaced by level 10; canOffer: an hour after a fail",
+  "offerNote": "a day after Firefly Whistle (source: ten days); canOffer: an hour after a fail",
   "solo": true
  },
  "le_miserable_part_2": {

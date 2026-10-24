@@ -78,6 +78,13 @@ describe('rebuilt quest catalog', () => {
     for (const id of ['le_miserable', 'orld_ugs_esara', 'build_a_tower', 'get_first_tool']) assert.ok(cat[id], id);
   });
 
+  it('offers Le Misérable a day after Firefly Whistle (source: ten days)', () => {
+    const q = getQuestCatalog().le_miserable;
+    assert.deepEqual(q.prereqQuests, ['firefly_whistle']);
+    assert.deepEqual(q.offerTriggers.map((t) => [t.type, t.quest]), [['quest', 'firefly_whistle']]);
+    assert.ok(q.prerequisites.some((p) => p.condition === 'custom_code' && p.value === 'hours_after:24:firefly_whistle'));
+  });
+
   it('enriches make requirements with recipe ids, outputs and remake keys', () => {
     const req = getQuestCatalog().ezcooking_make_level1_recipes.requirements[0];
     assert.equal(req.name, 'r22');
