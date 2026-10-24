@@ -8,8 +8,22 @@
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&shrinedemo=1&shrinehint=2 counts two
  * other shrines as passed, so the street's own shrine is the third.
+ *
+ * "I love you <Giant>" (G94, rules in js/giant-love.js): said in the Local
+ * chat box within 200 px of that Giant's shrine (the closest shrine there),
+ * the Giant's screen opens: "<Giant> says..." / "I love you too, friend",
+ * on the Giant's colour, with GONG_GIANTS as the fade-in ends. Click
+ * anywhere (or Enter / Esc / Space) once the line is up to close it. The
+ * chat line itself still shows, as in the source. No favor, no daily cap.
+ * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&shrinedemo=1
+ *   &giantloveautoplay=1 types "I love you <this shrine's Giant>" into the
+ *   chat box and sends it 2.5 s in (&giantlovesay=<line> sends that line
+ *   instead). Canvas: giantLove (screen:<giant> | no-shrine:<giant> |
+ *   wrong-shrine:<giant>), giantLoveScreen (open | ready | closed),
+ *   giantLoveLine, giantLoveSound.
  */
 import { questStatus } from '../quest-offers.js';
+import { GIANT_SCREEN_FADE_MS, giantLoveResponse } from '../giant-love.js?v=g94-1';
 import { GIANTS, inEmblemHitbox } from '../shrines.js?v=shrine-walkby-1';
 import { vogPages } from '../newxp.js';
 
@@ -19,6 +33,8 @@ export const SHRINES_TO_PASS = 3;
 let state = { passed: {}, announced: false };
 let inside = false;
 let ui = null;
+let eng = null;
+let love = { ui: null, open: false, ready: false, autoAt: 0, autoDone: false, timers: [] };
 
 export function shrineHintText(giantName) {
   return `Lo, a shrine to ${giantName}//Try donating something.`;
@@ -80,8 +96,152 @@ async function showVog(engine, text) {
   engine.setData('shrineHint', '');
 }
 
+// —— "I love you <Giant>" (G94) ———————————————————————————————————————————
+
+/** The live shrines as { giant, x, y } (sprite anchor at the base, like the player's feet). */
+function liveShrines(engine) {
+  return (engine?.interactables || [])
+    .filter((t) => t?.classId?.startsWith('npc_shrine_') && t.sprite && !t.sprite.destroyed && t.sprite.visible !== false)
+    .map((t) => ({ giant: t.state?.giantId || t.classId.slice('npc_shrine_'.length), x: t.sprite.x, y: t.sprite.y }));
+}
+
+/** doLocalChat's love check for one line you said. Returns the giantLoveResponse result. */
+export function sayLoveLine(engine, text) {
+  const p = engine?.player;
+  const res = giantLoveResponse(text, { shrines: liveShrines(engine), x: Number(p?.x), y: Number(p?.y) });
+  if (res.reason === 'not-love') return res;
+  engine.setData?.('giantLove', res.ok ? `screen:${res.giant}` : `${res.reason}:${res.giant}`);
+  if (res.ok && !love.open) showGiantScreen(engine, res.screen, res.giant);
+  return res;
+}
+
+function ensureLoveUi() {
+  if (love.ui) return love.ui;
+  const style = document.createElement('style');
+  style.textContent = `.giant-screen{position:fixed;z-index:62;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-sizing:border-box;padding:20px;cursor:default;opacity:0;transition:opacity .8s linear;color:#fff;overflow:hidden}
+.giant-screen.on{opacity:1}
+.giant-screen.out{opacity:0;transition-duration:.4s}
+.giant-screen[hidden]{display:none!important}
+.giant-screen.ready{cursor:pointer}
+.gs-stage{display:flex;align-items:center;justify-content:center;gap:28px;max-width:100%}
+.gs-art{width:190px;height:auto;flex:none;transform:scale(.2);opacity:0;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45))}
+.giant-screen.on .gs-art{transform:scale(1);opacity:1;transition:transform 1.6s cubic-bezier(.34,1.56,.64,1) 1.2s,opacity 1.6s ease-in 1.2s}
+.gs-text{max-width:350px;clip-path:inset(0 0 100% 0)}
+.giant-screen.on .gs-text{clip-path:inset(0 0 0 0);transition:clip-path 1s linear 2.8s}
+.gs-name{margin:0;font:800 34px/1.1 Nunito,"Trebuchet MS",sans-serif;text-shadow:0 3px 3px rgba(0,0,0,.35)}
+.gs-tip{margin:.35em 0 0;font:700 22px/1.3 Nunito,"Trebuchet MS",sans-serif;opacity:.9;text-shadow:0 3px 3px rgba(0,0,0,.35)}
+.gs-ok{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;
+  padding:6px 16px 6px 12px;border-radius:15px;background:linear-gradient(#f4f4f4,#d6d6d6);color:#444;
+  font:700 14px/18px Nunito,"Trebuchet MS",sans-serif;box-shadow:0 2px 0 rgba(0,0,0,.25);opacity:0;transition:opacity .5s linear;pointer-events:none}
+.gs-ok::before{content:"";border-left:8px solid #777;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.giant-screen.ready .gs-ok{opacity:1}
+@media (max-width:560px){.gs-stage{flex-direction:column;gap:14px;text-align:center}.gs-art{width:120px}.gs-name{font-size:26px}.gs-tip{font-size:18px}}`;
+  document.head.appendChild(style);
+  const el = document.createElement('div');
+  // An id ending in -panel holds engine.busy() (quest offers, autoplay) while it is up.
+  el.id = 'giant-screen-panel';
+  el.className = 'giant-screen';
+  el.hidden = true;
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-live', 'polite');
+  el.innerHTML = '<div class="gs-stage"><img class="gs-art" alt=""><div class="gs-text"><p class="gs-name"></p><p class="gs-tip"></p></div></div><div class="gs-ok">Click anywhere...</div>';
+  el.addEventListener('click', () => closeGiantScreen());
+  window.addEventListener('keydown', (e) => {
+    if (!love.open || !['Enter', 'Escape', ' '].includes(e.key)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    closeGiantScreen();
+  }, true);
+  document.body.appendChild(el);
+  love.ui = el;
+  return el;
+}
+
+function hexToRgba(hex, alpha) {
+  const n = parseInt(String(hex).replace('#', ''), 16) || 0;
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+}
+
+/** GiantView.show with start_with_tip: the Giant's colour, its art, "<Giant> says...", the line, then Click anywhere. */
+function showGiantScreen(engine, screen, giantId) {
+  if (typeof document === 'undefined') return;
+  const el = ensureLoveUi();
+  const r = engine.app?.canvas?.getBoundingClientRect?.() || document.querySelector('canvas')?.getBoundingClientRect();
+  if (r) Object.assign(el.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+  el.style.background = hexToRgba(screen.bg, screen.alpha);
+  el.querySelector('.gs-art').src = `assets/sprites/icons/emblem_${giantId}@3x.png`;
+  el.querySelector('.gs-name').textContent = screen.title;
+  el.querySelector('.gs-tip').textContent = screen.tipBody;
+  el.setAttribute('aria-label', `${screen.title} ${screen.tipBody}`);
+  el.classList.remove('on', 'out', 'ready');
+  el.hidden = false;
+  love.open = true;
+  love.ready = false;
+  for (const t of love.timers) clearTimeout(t);
+  love.timers = [];
+  engine.setData('giantLoveScreen', 'open');
+  engine.setData('giantLoveLine', `${screen.title} ${screen.tipBody}`);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
+  // BaseScreenView.as 76: the sound plays as the fade-in ends.
+  love.timers.push(setTimeout(() => {
+    engine.playSound?.(screen.sound, { volume: 0.7 });
+    engine.setData('giantLoveSound', screen.sound);
+  }, GIANT_SCREEN_FADE_MS));
+  // GiantView: input waits for the text to finish (onAnimateTextComplete).
+  love.timers.push(setTimeout(() => {
+    love.ready = true;
+    el.classList.add('ready');
+    engine.setData('giantLoveScreen', 'ready');
+  }, 3800));
+}
+
+function closeGiantScreen() {
+  const el = love.ui;
+  if (!el || !love.open || !love.ready) return;
+  love.open = false;
+  love.ready = false;
+  el.classList.add('out');
+  el.classList.remove('on');
+  eng?.setData?.('giantLoveScreen', 'closed');
+  love.timers.push(setTimeout(() => {
+    if (!love.open) el.hidden = true;
+  }, 400));
+}
+
+/** The Local chat box (read in the capture phase, before the form clears it). */
+function onChatSubmit(e) {
+  if (!eng?.started || e.target?.id !== 'local-chat-form') return;
+  const input = document.getElementById('local-chat-input');
+  sayLoveLine(eng, String(input?.value || ''));
+}
+
+/** &giantloveautoplay=1: type the line into the real chat box and send it. */
+function loveAutoplay(engine) {
+  if (love.autoDone || typeof engine?.param !== 'function' || engine.param('giantloveautoplay') !== '1' || !engine.started) return;
+  const t = Date.now();
+  if (!love.autoAt) {
+    love.autoAt = t + 2500;
+    return;
+  }
+  if (t < love.autoAt) return;
+  love.autoDone = true;
+  const form = document.getElementById('local-chat-form');
+  const input = document.getElementById('local-chat-input');
+  const near = liveShrines(engine)[0];
+  const said = engine.param('giantlovesay') || `I love you ${near?.giant === 'ti' ? 'Tii' : near?.giant || 'Mab'}`;
+  if (!form || !input) return;
+  input.value = said;
+  form.requestSubmit();
+}
+
 export const shrineHintFeature = {
   id: SHRINE_HINT_FEATURE_ID,
+
+  init(engine) {
+    eng = engine;
+    if (typeof document !== 'undefined') document.addEventListener('submit', onChatSubmit, true);
+  },
 
   onStreetEnter(street, engine) {
     inside = false;
@@ -92,6 +252,7 @@ export const shrineHintFeature = {
   },
 
   onTick(dtMs, now, engine) {
+    loveAutoplay(engine);
     const target = shrineTarget(engine);
     const player = engine.player;
     const now_inside = Boolean(target && player) && inEmblemHitbox(target.sprite, player.x, player.y);
@@ -117,5 +278,10 @@ export const shrineHintFeature = {
   _reset() {
     state = { passed: {}, announced: false };
     inside = false;
+  },
+
+  /** Tests: the Giant screen state. */
+  _love() {
+    return { open: love.open, ready: love.ready };
   },
 };
