@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { servedByMinn } from './minn-served.js';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const PAGES = [
@@ -41,7 +42,7 @@ describe('shared site header', () => {
       const current = p.current === 'home' ? /class="wordmark"[^>]*aria-current/ : new RegExp(`href="\\.\\./${p.current}/" aria-current="page"`);
       assert.match(p.nav, current, p.file);
       for (const [, ref] of p.nav.matchAll(/(?:href|src)="([^"#?]*)/g)) {
-        if (!ref) continue;
+        if (!ref || servedByMinn(ref)) continue;
         const target = resolve(pub, p.file, '..', ref);
         assert.ok(existsSync(ref.endsWith('/') ? join(target, 'index.html') : target), `${p.file}: ${ref}`);
       }

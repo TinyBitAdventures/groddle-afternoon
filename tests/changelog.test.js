@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { ARCHIVE_COMMIT, archiveHtml, extractPosts } from '../tools/changelog/extract.mjs';
 import { buildPages, loadPosts, staleFiles, historySince } from '../tools/changelog/build.mjs';
 import { parse, findAll, hasClass, plain, textRuns } from '../tools/changelog/html.mjs';
+import { servedByMinn } from './minn-served.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
@@ -145,7 +146,7 @@ describe('notes: the pages', () => {
       for (const [, ref] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
         if (/^(https?:|mailto:|#)/.test(ref)) continue;
         const clean = ref.replace(/[?#].*$/, '');
-        if (!clean) continue;
+        if (!clean || servedByMinn(clean)) continue;
         const target = resolve(pub, path, '..', clean);
         const file = clean.endsWith('/') ? join(target, 'index.html') : target;
         assert.ok(existsSync(file) || files[file.slice(pub.length + 1)], `${path}: ${ref}`);
@@ -198,8 +199,8 @@ describe('notes: the site header', () => {
     ...data.posts.map((p) => ({ file: `changelog/${p.slug}/index.html`, prefix: '../../', current: 'changelog' })),
   ];
 
-  it('is the same on every page, with Notes between Compare and Development', () => {
-    assert.match(home, /Compare<\/a>\n\s*<a href="changelog\/">Notes<\/a>\n\s*<a class="site-nav-dev"/);
+  it('is the same on every page, with Wiki and Notes between Compare and Development', () => {
+    assert.match(home, /Compare<\/a>\n\s*<a href="wiki\/">Wiki<\/a>\n\s*<a href="changelog\/">Notes<\/a>\n\s*<a class="site-nav-dev"/);
     for (const p of pages) {
       const html = read(p.file);
       assert.match(html, new RegExp(`<link rel="stylesheet" href="${p.prefix}site/site-nav\\.css" />`), p.file);

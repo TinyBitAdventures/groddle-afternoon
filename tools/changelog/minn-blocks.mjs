@@ -81,11 +81,12 @@ export function blockTypes(icons) {
     sign: leaf('sign', 'Sign arm', 'One arm of a signpost.', { side: { type: 'string', enum: ['left', 'right'], default: 'left' }, text: text('Somewhere') }, 'signpost'),
     ...restorationTypes(leaf),
     ...musicblockTypes(leaf),
+    'wiki-topics': { ...leaf('wiki-topics', 'Wiki topics', 'The wiki\'s topics as links, each with how many entries it holds; the one being read is marked.', { allLabel: text('All') }), category: 'widgets', keywords: ['wiki', 'topics'] },
   };
 }
 
 /**
- * The Musicblocks page's data blocks, drawn from public/musicblocks/data.json
+ * The Musicblocks wiki entry's data blocks, drawn from public/musicblocks/data.json
  * (tools/musicblocks/build-data.mjs, minn/groddle/src/Musicblocks.php): one
  * series (or the rare blocks) per block, and what a play pays.
  */

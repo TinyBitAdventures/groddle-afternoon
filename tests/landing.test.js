@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { servedByMinn } from './minn-served.js';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (p) => readFileSync(join(pub, p), 'utf8');
@@ -23,7 +24,7 @@ describe('home page and /play/', () => {
     for (const want of ['play/', 'restoration/', 'compare/', 'landing/landing.css', 'landing/landing.js', 'landing/hero.webp']) {
       assert.ok(list.includes(want), want);
     }
-    for (const ref of list) {
+    for (const ref of list.filter((r) => !servedByMinn(r))) {
       const target = resolve(pub, ref);
       assert.ok(existsSync(ref.endsWith('/') ? join(target, 'index.html') : target), ref);
     }

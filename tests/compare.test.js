@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 import { STATUS_KEYS, FROM_RESTORATION, oursCell, oursNumbers } from '../public/compare/compare-data.js';
 import { STATUS as RESTORATION_STATUS } from '../tools/restoration/checklist.mjs';
+import { servedByMinn } from './minn-served.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dir = join(root, 'public/compare');
@@ -123,7 +124,7 @@ describe('compare page', () => {
     const refs = localRefs(html);
     assert.ok(refs.includes('../restoration/'), 'links to the restoration report');
     assert.ok(refs.includes('compare.js') && refs.includes('compare.css') && refs.includes('../restoration/restoration.css'));
-    for (const ref of refs) {
+    for (const ref of refs.filter((r) => !servedByMinn(r))) {
       const target = resolve(dir, ref);
       const file = ref.endsWith('/') ? join(target, 'index.html') : target;
       assert.ok(existsSync(file), `${ref} -> ${file}`);

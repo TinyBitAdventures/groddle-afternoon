@@ -42,4 +42,20 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   .site-nav-links .site-nav-dev { display: none; }
 }
 
+/* Narrow phones: tighter, and the links scroll inside the bar rather than widen the page. */
+@media (max-width: 440px) {
+  .site-nav-row { gap: 10px; }
+  .site-nav-links { gap: 11px; min-width: 0; overflow-x: auto; scrollbar-width: none; padding: 6px 4px; margin: -6px -4px; }
+  .site-nav-links::-webkit-scrollbar { display: none; }
+  .site-nav-links a:not(.site-nav-play) { font-size: 14px; white-space: nowrap; }
+  .site-nav-play { padding: 0 12px; font-size: 14px; flex-shrink: 0; }
+}
+
+/* The narrowest phones (320 px): smaller still, so Play stays in view. */
+@media (max-width: 350px) {
+  .site-nav-links { gap: 8px; }
+  .site-nav-links a:not(.site-nav-play) { font-size: 13px; }
+  .site-nav-play { padding: 0 10px; font-size: 13px; }
+}
+
 @media (prefers-reduced-motion: reduce) { .site-nav-play { transition: none; } }
