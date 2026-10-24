@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
  * Moves the Notes blog into Minn, which is its source from then on: each note in
- * tools/changelog/posts.json becomes a post on a Minn site (groddle-minn), written
+ * tools/changelog/posts.json becomes a post on the Minn site (groddle.localhost), written
  * through Minn's own REST API, so it can be edited in Minn Admin. The Groddle theme
  * draws it (minn/groddle/templates/single.html, home.html).
  *
- *   MINN_USER=admin MINN_PASS=... node tools/changelog/to-minn.mjs [--site=https://groddle-minn.localhost] [--dry]
+ *   MINN_USER=admin MINN_PASS=... node tools/changelog/to-minn.mjs [--site=https://groddle.localhost] [--dry]
  *
  * Idempotent by slug: a note already on the site is updated, not duplicated.
  * It also sets the site up for the blog, once: the Notes page (/changelog/) as
@@ -22,7 +22,7 @@ import { loadPosts, blockHtml, cardsHtml } from './build.mjs';
 import { plain } from './html.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
-const SITE = String(args.site || 'https://groddle-minn.localhost').replace(/\/$/, '');
+const SITE = String(args.site || 'https://groddle.localhost').replace(/\/$/, '');
 const DRY = !!args.dry;
 
 const json = (v) => JSON.stringify(v);
