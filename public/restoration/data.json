@@ -1807,9 +1807,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 325,
+  "commits": 326,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-23",
+    "kind": "fix",
+    "text": "Remove new_day_fanfare.mp3, a copy of licensed stock audio"
+   },
    {
     "date": "2026-10-23",
     "kind": "fix",
@@ -1924,14 +1929,9 @@
     "date": "2026-10-23",
     "kind": "new",
     "text": "Crowded streets make animals sulk, leave or puff away, and Happy Animals cards raise your yard's limit"
-   },
-   {
-    "date": "2026-10-23",
-    "kind": "fix",
-    "text": "Long speech bubbles stay below the street name"
    }
   ]
  },
- "tests": 190,
+ "tests": 191,
  "generatedAt": "2026-10-23"
 }

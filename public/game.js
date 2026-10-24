@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=enchanted-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-29';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-30';
 import {
   actionDurationFor,
   createTimedAction,
@@ -725,7 +725,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=cubimals-1';
+} from './js/cubimals.js?v=cubimals-2';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -3503,6 +3503,10 @@ function setPackedCubimalFree(classTsid, opts = {}) {
     toast(info ? 'This rare Cubimal cannot be set free for Imagination.' : 'That is not a Cubimal.');
     return false;
   }
+  // The source conversation and farewell flight (features/cubimal-race-feature.js).
+  if (opts.confirm !== false && features.query('confirmCubimalFree', classTsid, engine, (extra = {}) => setPackedCubimalFree(classTsid, { ...opts, ...extra, confirm: false })) === true) {
+    return false;
+  }
   if (
     opts.confirm !== false &&
     !window.confirm(`Really, you want to set ${info.label} free? It will give you ${info.setFreeImg.toLocaleString()} Imagination.`)
@@ -3511,7 +3515,7 @@ function setPackedCubimalFree(classTsid, opts = {}) {
   }
   const params = new URLSearchParams(location.search);
   const requestedRoll = Number(params.get('cubimalfreeroll'));
-  const responseRoll = params.has('cubimalfreeroll') && Number.isFinite(requestedRoll)
+  const responseRoll = Number.isFinite(opts.responseRoll) ? opts.responseRoll : params.has('cubimalfreeroll') && Number.isFinite(requestedRoll)
     ? requestedRoll
     : Math.random();
   const result = setCubimalFree(inv, pc, classTsid, responseRoll);
@@ -3550,7 +3554,7 @@ function setPackedCubimalFree(classTsid, opts = {}) {
     holdMs: 1_800,
   });
   updateHud();
-  return true;
+  return result;
 }
 
 function playPackMusicblock(classTsid) {
