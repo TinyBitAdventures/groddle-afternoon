@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-5';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-108';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-109';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -1691,7 +1691,8 @@ let state = {
   toastTimer: 0,
   /** performance.now() when a loading card started holding the toast (G198). */
   toastHeldAt: 0,
-  energyTick: 0,
+  /** G258: frames since the last HUD heartbeat (physics); energy no longer drifts here. */
+  hudTick: 0,
   // Sound is on unless the player muted it last time (js/audio-pref.js).
   muted: loadMutedPreference(),
 };
@@ -9555,7 +9556,7 @@ function performPlayerJump(result, baseVelocity, now) {
   player.vy = baseVelocity * result.multiplier;
   player.onGround = false;
   noteGrounded(jumpState, false, now);
-  pc.energy = clamp(pc.energy - 1.2, 0, energyCap());
+  // G258: jumping costs no energy (no source; players/player.js onPeriodicEnergyLoss is the only drift).
   countPlayerJump();
   if (result.triple) {
     playSfx('jump', { volume: 0.58, rate: 1 });
@@ -9604,7 +9605,6 @@ function streetPhysicsJetpackStroke(buff, jumpVelocity, now) {
   if (!buff.jetpack || player.onGround || !hasQueuedJump(jumpState, now)) return false;
   clearJumpQueue(jumpState);
   player.vy = player.vy < 0 ? jumpVelocity / 2 : jumpVelocity;
-  pc.energy = clamp(pc.energy - 0.4, 0, energyCap());
   return true;
 }
 
@@ -9695,7 +9695,6 @@ function handleInput() {
       stopClimb({ jumpOff: true, side, jumpVelocity: -9.6 * movementBuff.jump, maxSpeed: 4.4 * movementBuff.speed });
       if (!side) {
         noteJumped(jumpState);
-        pc.energy = clamp(pc.energy - 1.2, 0, energyCap());
         countPlayerJump();
         updateHud();
       }
@@ -9819,10 +9818,6 @@ function physics(dt) {
     // Climb bob
     player.walkPhase += dt * 0.35;
     player.pivot.y = Math.sin(player.walkPhase) * 1.5;
-    // Small energy drain while actively climbing
-    if (Math.abs(player.vy) > 0.1) {
-      pc.energy = clamp(pc.energy - 0.012 * dt, 0, energyCap());
-    }
   } else {
     const movementBuff = combinedPhysics();
     player.vy += 0.42 * movementBuff.gravity * dt;
@@ -9864,16 +9859,11 @@ function physics(dt) {
   player.airFrames = player.onGround || climb.active ? 0 : (player.airFrames || 0) + dt;
   publishJumpState();
 
-  state.energyTick += dt;
-  if (state.energyTick > 40 && !paradiseIsInstanced()) {
-    state.energyTick = 0;
-    if (Math.abs(player.vx) > 0.5) {
-      if (features.metabolicGate('energy', 'loss', engine).ok) {
-        pc.energy = clamp(pc.energy - 0.6, 0, energyCap());
-      }
-    } else if (features.metabolicGate('energy', 'gain', engine).ok) {
-      pc.energy = clamp(pc.energy + 0.5, 0, energyCap());
-    }
+  // G258: no walking drain or standing top-up (the source had neither); energy drifts only by
+  // onPeriodicEnergyLoss (features/energy-decay-feature.js). This beat just refreshes the HUD.
+  state.hudTick += dt;
+  if (state.hudTick > 40 && !paradiseIsInstanced()) {
+    state.hudTick = 0;
     updateHud();
   }
 
@@ -17062,7 +17052,7 @@ async function startParadiseFlight(courseId, opts = {}) {
       now: Date.now(),
       sourceLocation: paradiseSourceLocation,
     });
-    state.energyTick = 0;
+    state.hudTick = 0;
     paradiseAutoNextAt = 0;
     paradiseCompletionAnnounced = false;
     savePlayerLocation(paradiseSourceLocation);

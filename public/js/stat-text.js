@@ -1,8 +1,9 @@
 /**
- * Energy and mood drift by fractions here (walking, jumping, climbing), while
- * GSJS keeps every stat a whole number. Messages built from a before/after
- * difference can therefore read "+2.299999999999983 energy"; this rounds any
- * signed stat amount in a message to a whole number.
+ * Energy and mood can carry fractions here (saves from before G258, when
+ * walking, jumping and climbing cost bits of energy, and a few fractional
+ * rewards), while GSJS keeps every stat a whole number. Messages built from a
+ * before/after difference can therefore read "+2.299999999999983 energy";
+ * this rounds any signed stat amount in a message to a whole number.
  */
 
 const STAT_AMOUNT = /([+−-])(\d+\.\d+)(\s*(?:energy|mood|iMG|xp)\b)/gi;

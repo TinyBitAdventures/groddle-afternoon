@@ -828,16 +828,14 @@ const SCENARIOS = {
       visit(save);
       localStorage.setItem(key, JSON.stringify(save));
     });
-    await t.goto('?autostart=1&questoffer=off', 4000);
+    // G258: walking costs nothing (as in the source); the periodic loss (1 a tick on a 100 tank) runs it out,
+    // sped up to a tick every 500 ms.
+    await t.goto('?autostart=1&questoffer=off&energytick=500', 4000);
     let s = await t.snap();
     t.note(`tired player energy=${s?.player.energy} on ${s?.street?.label}`);
-    // Walking costs energy (0.6 every 40 frames); keep walking until it runs out.
     for (let i = 0; i < 40 && (await t.data()).hellDead !== '1'; i++) {
       await t.declineOffer();
-      const key = i % 2 ? 'a' : 'd';
-      await t.page.keyboard.down(key);
-      await t.wait(1500);
-      await t.page.keyboard.up(key);
+      await t.wait(1000);
     }
     await t.wait(4000);
     const dead = await t.data();

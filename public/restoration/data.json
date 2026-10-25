@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 468,
+  "commits": 469,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Visiting a neighbour shows their home card, Firebog and Uralia homes get the original tutorial streets, and the house sign has Tiny Speck's icons"
+   },
    {
     "date": "2026-10-25",
     "kind": "improve",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Lonely Street Spirits call you over, cry on their street, and thank you when you come"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Hell and Pooped prompts show only their words, and the unlearning bar is the client's teal filling from the right"
    }
   ]
  },
- "tests": 276,
+ "tests": 277,
  "generatedAt": "2026-10-25"
 }

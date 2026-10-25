@@ -447,6 +447,11 @@ export const hellFeature = {
     if (lastEnergy != null && energy > lastEnergy) {
       const gained = onEnergyGained(state, engine.pc, now);
       state = gained.state;
+      // G258: eating over 5% ends Pooped; drop its HUD buff and refresh data-hell-pooped.
+      if (gained.removed) {
+        applyEffects(gained.effects, engine);
+        publish(engine);
+      }
     }
     if (lastEnergy != null && energy < lastEnergy) {
       // metabolics_lose_energy 134: the loss counts toward today's energy_consumed (G200: Super Pooped).

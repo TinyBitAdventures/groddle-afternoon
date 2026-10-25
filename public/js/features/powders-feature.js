@@ -71,7 +71,7 @@ import {
 } from '../powders.js?v=powders-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-2';
 import { DEAD_TRANT_CLASSES } from '../patches.js';
-import { hellFeature } from './hell-feature.js?v=hell-10';
+import { hellFeature } from './hell-feature.js?v=hell-11';
 import { grantMoodXp } from '../mood-xp.js';
 
 export const POWDERS_FEATURE_ID = 'powders';
