@@ -1054,7 +1054,7 @@
  },
  "item:petrified_rock_large": {
   "status": "missing",
-  "reason": "a Feat reward from the web side (G143): the 2012-10-12 'Epic of Feats' post gives top contributors larger petrified rocks; main.js:7692 doBreakIt shows the reward packet. Cracking works (js/artifacts.js)",
+  "reason": "a top-contributor Feat reward from the web side (2012-10-12 'Epic of Feats'; main.js:7692 doBreakIt); ranking against other contributors stays multiplayer (G120). Solo Feats give Small rocks only (G143)",
   "register": "G125"
  },
  "item:doll_ayn_rand": {
@@ -1169,13 +1169,13 @@
  },
  "achievement:student_of_artifactology": {
   "status": "missing",
-  "reason": "needs petrified rocks, which nothing a solo player does grants until Feat rewards (G143); assembly itself works (9aae153a). The auto match is a loose counter pattern (G147)",
-  "register": "G143"
+  "reason": "needs whole artifacts, and solo Feats give at most 10 Small Petrified Rocks a save (G143): about a 1.6% chance of one artifact from all ten (rollCrack). Assembly works (9aae153a); more rocks wait on G171",
+  "register": "G171"
  },
  "achievement:qualified_artifactologist": {
   "status": "missing",
-  "reason": "needs petrified rocks, which nothing a solo player does grants until Feat rewards (G143); assembly itself works (9aae153a). The auto match is a loose counter pattern (G147)",
-  "register": "G143"
+  "reason": "needs whole artifacts, and solo Feats give at most 10 Small Petrified Rocks a save (G143): about a 1.6% chance of one artifact from all ten (rollCrack). Assembly works (9aae153a); more rocks wait on G171",
+  "register": "G171"
  },
  "item:portal": {
   "status": "unbuilt_original",

@@ -181,6 +181,8 @@ function pet(engine, entity) {
   setClip(entity, '3sleepStart');
   engine.say(entity.target, result.bubble, KITTY_PET.bubbleMs);
   engine.playSound('FLYING_KITTY_PURR', { volume: 0.6 });
+  // npc_kitty_chicken.js 283-287: animal_love +1 for the first 3 pets of each kitty (G143).
+  engine.featsIncrement?.('animal_love', 1, { cap: { key: `kitty:${engine.streetTsid}:${entity.kitty.key}`, max: 3 } });
   engine.pushActivity({
     base: `You petted ${entity.kitty.name ? entity.kitty.name : 'a Heli Kitty'}`,
     effects: { energy: result.energy, mood: result.mood, xp: result.xp },

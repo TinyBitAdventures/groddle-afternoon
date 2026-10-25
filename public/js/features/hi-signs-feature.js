@@ -393,7 +393,12 @@ function sayHi(engine, { force = false } = {}) {
         return s ? { x: s.x, y: s.y + HI.MISSILE_TARGET_DY } : null;
       },
       // An itemstack target: no mood text, no evasion (doMissilehit only handles avatars).
-      onHit: () => { lastMsg = `hit:butler:${variant}`; publish(engine, true); },
+      onHit: () => {
+        lastMsg = `hit:butler:${variant}`;
+        // A Fine How-Do-You-Do: a hi sign received (inc_data_feats_prod.js 66-73, G143).
+        engine.featsIncrement?.('hi_signs_1', 1);
+        publish(engine, true);
+      },
     }), 'butler');
   }
   if (out.bonus) {
@@ -463,7 +468,11 @@ function butlerSayHi(engine) {
       return s ? { x: s.x, y: s.top + HI.MISSILE_START_DY } : null;
     },
     target: () => (engine.player && engine.started ? { x: engine.player.x, y: engine.player.y + HI.MISSILE_TARGET_DY } : null),
-    onHit: (m) => missileHitYou(engine, m, granted),
+    onHit: (m) => {
+      // A Fine How-Do-You-Do: the Butler's sign received by you (G143).
+      engine.featsIncrement?.('hi_signs_1', 1);
+      missileHitYou(engine, m, granted);
+    },
   }), 'butler');
   if (out.bonus) {
     later(HI.BONUS_DELAY_MS, () => {

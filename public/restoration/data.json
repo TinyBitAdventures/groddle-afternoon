@@ -733,10 +733,11 @@
    "group": "quests",
    "name": "Feats",
    "status": "solo",
-   "blurb": "The Last Feat’s incantation chain, with local companions taking the other parts.",
+   "blurb": "The Last Feat’s incantation chain, with local companions taking the other parts, and ten of the old Feats as goals of your own, each worth a Small Petrified Rock.",
    "spot": null,
    "evidence": [
-    "public/js/feats.js"
+    "public/js/feats.js",
+    "public/js/solo-feats.js"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&companiondemo=feat&practice=1"
@@ -967,7 +968,7 @@
    "group": "late",
    "name": "Artifacts and petrified rocks",
    "status": "progress",
-   "blurb": "Crack a petrified rock with a pick, hoe, hatchet, shovel or grinder for artifact pieces, necklace beads, a gem and currants; a whole set rebuilds one of the ten artifacts or five necklaces. The rocks were Feat rewards, which the remake does not hand out yet.",
+   "blurb": "Crack a petrified rock with a pick, hoe, hatchet, shovel or grinder for artifact pieces, necklace beads, a gem and currants; a whole set rebuilds one of the ten artifacts or five necklaces. The rocks were Feat rewards: each of your own Feats gives a Small one, too few yet to finish many sets.",
    "spot": null,
    "evidence": [
     "public/js/artifacts.js",
@@ -2102,6 +2103,6 @@
    }
   ]
  },
- "tests": 223,
+ "tests": 224,
  "generatedAt": "2026-10-24"
 }

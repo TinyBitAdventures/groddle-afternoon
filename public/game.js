@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-55';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-56';
 import {
   actionDurationFor,
   createTimedAction,
@@ -7477,6 +7477,8 @@ const engine = {
   /** The pack's Eat / Drink / Use, as if clicked (QA autoplay). */
   usePackItem: (classTsid) => usePackItem(classTsid),
   award: (payload) => enqueueAward(payload),
+  /** pc.feats_increment (players/inc_feats.js:37): a solo Feat contribution, counted by features/solo-feats-feature.js (G143). */
+  featsIncrement: (featId, amount = 1, opts = {}) => features.query('featsIncrement', featId, amount, opts, engine) || 0,
   /** `{ ignoreHome: true }` lets a feature (Camera Mode) run at home while panels and verbs still block it. */
   busy({ ignoreHome = false } = {}) {
     return Boolean(
@@ -19171,6 +19173,8 @@ function handleFeatResult(result, participant) {
     playSfx(result.chainCompleted ? 'quest' : 'alert', { volume: 0.5 });
     // inc_feats.js:104-106: every contribution of yours grants Down to the Wire (once).
     if (result.participant === 'Ur') engine.grantAchievement('down_to_the_wire');
+    // location.js 4529-4553: your line's 1, 2 or 3 points toward the personal Feat (G143).
+    if (result.participant === 'Ur') engine.featsIncrement('makeup_feat_redux', result.points);
     if (result.firstContribution) {
       const updates = applyAchievementProgress(
         achieveState,
@@ -20641,6 +20645,8 @@ function performShrineDonation() {
     applyAchievementProgress(achieveState, `shrines_donated:${giantId}`, 1, pc)
   );
   if (result.favor) applyQuestProgress(questState, 'favor_points', result.favor, pc);
+  // Sparkla's Shine on the Giants (inc_data_feats_prod.js 42-49): chunks of Sparkly donated (G143).
+  if (result.classTsid === 'sparkly') engine.featsIncrement('donate_sparkly', result.qty);
   updateHud();
 }
 

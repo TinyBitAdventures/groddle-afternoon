@@ -250,6 +250,8 @@ function raceEnd(engine, racer) {
   const planks = cubimalRacePlanks(racer.startX, racer.x);
   const message = cubimalRaceEndMessage(racer.classTsid, planks);
   const outcome = cubimalRaceOutcome(planks);
+  // npc_cubimal_*.js onRaceEnd 941-942: Tottly's Toys +2 at 5 planks or more (G143).
+  if (planks >= 5) engine.featsIncrement?.('tottlys_toys', 2);
   racer.returnAt = now() + CUBIMAL_RACE.returnMs;
   racedTotal += 1;
   lastRace = {

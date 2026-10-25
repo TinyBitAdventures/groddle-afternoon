@@ -384,7 +384,7 @@ describe('hi-signs feature', () => {
 
   it('is registered with one import line and binds the 5 key', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /import \{ hiSignsFeature \} from '\.\/hi-signs-feature\.js\?v=hi-signs-1'; FEATURES\.push\(hiSignsFeature\);/);
+    assert.match(index, /import \{ hiSignsFeature \} from '\.\/hi-signs-feature\.js\?v=hi-signs-2'; FEATURES\.push\(hiSignsFeature\);/);
     const src = readFileSync(join(PUBLIC, 'js/features/hi-signs-feature.js'), 'utf8');
     assert.match(src, /e\.code === 'Digit5' \|\| e\.code === 'Numpad5'/);
     assert.match(src, /butler-feature\.js\?v=butler-feature-4/);

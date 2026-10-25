@@ -1,0 +1,396 @@
+/**
+ * Solo Feats as a feature module (register G143; rules in js/solo-feats.js).
+ *
+ * Ten of the fifteen production Feats (inc_data_feats_prod.js) run as
+ * personal goals: nine new ones plus the Last Feat chain's own Feat. Each
+ * one completed gives one Small Petrified Rock (main.js 7692 doBreakIt
+ * reward item), which the artifacts feature cracks.
+ *
+ * Where the increments come from:
+ *  - pc.feats_increment(id, amount) call sites the remake owns elsewhere call
+ *    engine.featsIncrement(id, amount, { cap }) (game.js engine), which asks
+ *    this feature's featsIncrement hook: the Last Feat chain (game.js
+ *    handleFeatResult), Sparkly shrine donations (game.js
+ *    performShrineDonation), crab hugs / flattery / pinches / insults /
+ *    tunes (crabs-feature), hi signs that land (hi-signs-feature), Heli
+ *    Kitty pets (heli-kitties-feature), Cubimal races of 5 planks or more
+ *    (cubimal-race-feature).
+ *  - Game events the remake already emits (onEvent, EVENT_RULES): animal
+ *    verbs, tree care, harvests, meditation minutes, Emotional Bear actions,
+ *    Cubimals set free.
+ *  - Counts this feature watches (onTick): completed quests
+ *    (questState.completed) and qurazy quoins (quoinState.qurazyFound).
+ *  - Streaking (location.js 1041-1055) and "… And Ask Nothing in Return"
+ *    (feats_get_for_commit on leaving the location) run on street enter /
+ *    clear here.
+ *
+ * UI: a "Your Feats" list inside the Feat panel (H, or Menu > Feat), under
+ * the Last Feat chain.
+ *
+ * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&featdemo=<feat id>
+ *     sets that Feat one short of its goal (&featprogress=<n> for another
+ *     value; pet_only also takes &featpending=<n>). One real action then
+ *     completes it, e.g. &featdemo=animal_love&animaldemo=piggy&animalreset=1
+ *     and E > Pet. &featautoplay=1 sends one increment through the
+ *     featsIncrement hook 1.5 s in (for screenshots). &featopen=1 opens the
+ *     Feat panel. &featreset=1 clears solo Feat progress.
+ * Canvas: soloFeats (id:value/goal,...), soloFeatLast, soloFeatRocks,
+ *   soloFeatCompleted, soloFeatPending, soloFeatStreak, soloFeatDemo,
+ *   soloFeatWired, soloFeatUnwired.
+ */
+
+import { addItem } from '../inventory.js?v=catalog-unified-3';
+import { getGameDayKey } from '../game-day.js?v=dametime-1';
+import {
+  COMPLETE_BUTTON,
+  COMPLETE_TITLE,
+  FEAT_BY_ID,
+  LOST_COMMIT_TEXT,
+  REWARD_ITEM,
+  REWARD_LABEL,
+  SOLO_FEATS_ID,
+  UNWIRED_FEATS,
+  WIRED_FEATS,
+  addPending,
+  completionText,
+  createSoloFeatState,
+  eventIncrements,
+  featRows,
+  featSummary,
+  incrementFeat,
+  isFeatComplete,
+  normalizeSoloFeatState,
+  resetPending,
+  streakCheck,
+  takePending,
+} from '../solo-feats.js?v=g143-1';
+
+const POLL_MS = 500;
+const ROCK_ICON = 'assets/sprites/icons/petrified_rock_small@3x.png';
+/** Archived street TSIDs (assets/streets/index.json): homes, neighbours and instances use other ids. */
+const REAL_STREET = /^G[A-Z0-9]{12,14}$/;
+
+let state = createSoloFeatState();
+let last = '';
+let pollAt = 0;
+let streetTsid = '';
+let entry = null;
+let demo = null;
+let demoDone = false;
+let autoplayAt = 0;
+let panelObserver = null;
+
+function nekkid(engine) {
+  return typeof engine.hasBuff === 'function' && engine.hasBuff('nekkid') === true;
+}
+
+function playerPoint(engine) {
+  const p = engine.player;
+  return p ? { x: Number(p.x) || 0, y: Number(p.y) || 0 } : null;
+}
+
+function realStreet(engine, tsid) {
+  return REAL_STREET.test(String(tsid || '')) && !(typeof engine.inScene === 'function' && engine.inScene());
+}
+
+function publish(engine) {
+  if (!engine?.setData) return;
+  engine.setData('soloFeats', featSummary(state));
+  engine.setData('soloFeatLast', last || 'none');
+  engine.setData('soloFeatRocks', state.rocks);
+  engine.setData('soloFeatCompleted', WIRED_FEATS.filter((f) => isFeatComplete(state, f.id)).map((f) => f.id).join(',') || 'none');
+  engine.setData('soloFeatPending', state.pending);
+  engine.setData('soloFeatStreak', entry ? `${Math.round(entry.x)},${Math.round(entry.y)}` : 'none');
+  engine.setData('soloFeatDemo', demo ? demo.featId : 'none');
+  engine.setData('soloFeatWired', WIRED_FEATS.length);
+  engine.setData('soloFeatUnwired', UNWIRED_FEATS.map((f) => f.id).join(','));
+}
+
+// —— Increments ———————————————————————————————————————————————————————————
+
+/** Announce one incrementFeat result: badges, vog_text, the rock. */
+function settle(engine, res) {
+  if (!res.counted) return 0;
+  const f = FEAT_BY_ID[res.featId];
+  last = `${res.featId}:+${res.amount}:${res.value}/${res.goal}${res.completed ? ':complete' : ''}`;
+  if (res.vogText) {
+    engine.pushActivity?.(res.vogText);
+    // The Last Feat chain already toasts its own first contribution (game.js handleFeatResult).
+    if (!res.completed && !f.contributionCountedElsewhere) engine.toast?.(res.vogText, 5200);
+  }
+  if (res.completed) {
+    // main.js 7714: the reward item, delivered with the completion conversation.
+    addItem(engine.inv, REWARD_ITEM, 1);
+    engine.refreshPack?.();
+    engine.playSound?.('PETRIFIED_ROCK', { volume: 0.6 });
+    const body = completionText(f.title);
+    engine.pushActivity?.(`${body} 1 ${REWARD_LABEL}.`);
+    engine.award?.({
+      kind: 'feat',
+      title: COMPLETE_TITLE,
+      body,
+      subtitle: `+1 ${REWARD_LABEL}`,
+      iconUrl: ROCK_ICON,
+      primaryLabel: COMPLETE_BUTTON,
+    });
+  }
+  // Badges after the Feat's own screen, so the award queue shows it first.
+  for (const { counter, amount } of res.counters) engine.achievement?.(counter, amount);
+  for (const id of res.grants) engine.grantAchievement?.(id);
+  render();
+  engine.save?.();
+  publish(engine);
+  return res.amount;
+}
+
+function increment(engine, featId, amount, opts = {}) {
+  return settle(engine, incrementFeat(state, featId, amount, opts, Date.now()));
+}
+
+function onFeatEvent(engine, counter, amount) {
+  for (const row of eventIncrements(counter, amount)) {
+    if (row.mode === 'direct') {
+      increment(engine, row.featId, row.amount);
+    } else if (row.mode === 'commit') {
+      if (addPending(state, row.amount)) {
+        last = `pending:+${row.amount}:${state.pending}`;
+        render();
+        publish(engine);
+      }
+    } else if (row.mode === 'reset' && state.pending > 0) {
+      resetPending(state);
+      last = 'pending:lost';
+      engine.pushActivity?.(LOST_COMMIT_TEXT);
+      engine.toast?.(LOST_COMMIT_TEXT, 4200);
+      render();
+      publish(engine);
+    }
+  }
+}
+
+/** questState.completed and quoinState.qurazyFound only grow; count the growth. */
+function poll(engine) {
+  const quests = engine.questState?.completed;
+  if (Array.isArray(quests)) {
+    const n = quests.length;
+    if (state.questBase == null || n < state.questBase) state.questBase = n;
+    else if (n > state.questBase) {
+      const d = n - state.questBase;
+      state.questBase = n;
+      increment(engine, 'reminscequests', d);
+    }
+  }
+  const qurazy = Number(engine.quoinState?.qurazyFound);
+  if (Number.isFinite(qurazy)) {
+    if (state.qurazyBase == null || qurazy < state.qurazyBase) state.qurazyBase = qurazy;
+    else if (qurazy > state.qurazyBase) {
+      const d = qurazy - state.qurazyBase;
+      state.qurazyBase = qurazy;
+      increment(engine, 'qurazy_quoin_collecting', d);
+    }
+  }
+}
+
+// —— Panel ———————————————————————————————————————————————————————————————
+
+const STYLE = `
+.solo-feats { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(80, 60, 30, 0.18); }
+.solo-feats-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.solo-feats-head h4 { margin: 0; font-size: 14px; }
+.solo-feats-head small { opacity: 0.75; font-size: 11px; }
+.solo-feats-copy { margin: 4px 0 8px; font-size: 11.5px; opacity: 0.8; }
+.solo-feats-list { display: grid; gap: 6px; }
+.solo-feat { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255, 255, 255, 0.55); }
+.solo-feat b { font-size: 12.5px; }
+.solo-feat span { font-size: 11px; opacity: 0.78; grid-column: 1 / -1; }
+.solo-feat em { font-style: normal; font-size: 11.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.solo-feat i { grid-column: 1 / -1; height: 5px; border-radius: 3px; background: rgba(80, 60, 30, 0.14); overflow: hidden; }
+.solo-feat i::after { content: ''; display: block; height: 100%; width: var(--p, 0%); background: #e0a53b; }
+.solo-feat.done { background: rgba(214, 236, 196, 0.75); }
+.solo-feat.done i::after { background: #6aa84f; }
+.solo-feat small { grid-column: 1 / -1; font-size: 10.5px; color: #8a5a12; }
+`;
+
+function ensurePanel() {
+  if (typeof document === 'undefined') return null;
+  const card = document.querySelector('#feat-panel .feat-card');
+  if (!card) return null;
+  let box = card.querySelector('.solo-feats');
+  if (box) return box;
+  if (!document.getElementById('solo-feats-style')) {
+    const style = document.createElement('style');
+    style.id = 'solo-feats-style';
+    style.textContent = STYLE;
+    document.head.appendChild(style);
+  }
+  box = document.createElement('section');
+  box.className = 'solo-feats';
+  box.id = 'solo-feats';
+  box.setAttribute('aria-label', 'Your Feats');
+  box.innerHTML = '<div class="solo-feats-head"><h4>Your Feats</h4><small data-solo-feat-rocks></small></div>'
+    + '<p class="solo-feats-copy">The old Feats, as goals of your own. Finish one for a Small Petrified Rock.</p>'
+    + '<div class="solo-feats-list" data-solo-feat-list></div>';
+  card.appendChild(box);
+  const panel = document.getElementById('feat-panel');
+  if (panel && typeof MutationObserver === 'function' && !panelObserver) {
+    panelObserver = new MutationObserver(() => {
+      if (!panel.hidden) render();
+    });
+    panelObserver.observe(panel, { attributes: true, attributeFilter: ['hidden'] });
+  }
+  return box;
+}
+
+function render() {
+  const box = ensurePanel();
+  if (!box) return;
+  const done = WIRED_FEATS.filter((f) => isFeatComplete(state, f.id)).length;
+  const rocks = box.querySelector('[data-solo-feat-rocks]');
+  if (rocks) rocks.textContent = `${done} of ${WIRED_FEATS.length} done`;
+  const list = box.querySelector('[data-solo-feat-list]');
+  if (!list) return;
+  list.textContent = '';
+  for (const row of featRows(state)) {
+    const el = document.createElement('div');
+    el.className = `solo-feat${row.complete ? ' done' : ''}`;
+    el.dataset.feat = row.id;
+    const title = document.createElement('b');
+    title.textContent = row.title;
+    const count = document.createElement('em');
+    count.textContent = row.complete ? 'Done' : `${row.value} / ${row.goal}`;
+    const what = document.createElement('span');
+    what.textContent = row.what;
+    const bar = document.createElement('i');
+    bar.style.setProperty('--p', `${Math.round((row.value / row.goal) * 100)}%`);
+    el.append(title, count, what, bar);
+    if (row.pending && !row.complete) {
+      const note = document.createElement('small');
+      note.textContent = `${row.pending} waiting: leave the street to count them.`;
+      el.append(note);
+    }
+    list.appendChild(el);
+  }
+}
+
+// —— QA ——————————————————————————————————————————————————————————————————
+
+function readDemo(engine) {
+  const featId = String(engine.param?.('featdemo') || '').trim();
+  const f = FEAT_BY_ID[featId];
+  if (!f?.wired) return null;
+  const raw = engine.param?.('featprogress');
+  const value = raw == null || raw === '' ? f.goal - 1 : Math.max(0, Math.min(f.goal - 1, Math.floor(Number(raw) || 0)));
+  const pending = Math.max(0, Math.floor(Number(engine.param?.('featpending')) || 0));
+  return { featId, value, pending, autoplay: engine.param?.('featautoplay') === '1' };
+}
+
+function applyDemo(engine) {
+  if (demoDone) return;
+  demoDone = true;
+  if (!state.openedAt) state.openedAt = Date.now();
+  if (engine.param?.('featreset') === '1') state = normalizeSoloFeatState({ openedAt: Date.now() });
+  demo = readDemo(engine);
+  if (demo) {
+    const now = Date.now();
+    state.progress[demo.featId] = { value: demo.value, contributedAt: demo.value ? now : 0, completedAt: 0 };
+    if (demo.featId === 'pet_only') state.pending = demo.pending;
+    if (demo.autoplay) autoplayAt = now + 1500;
+    last = `demo:${demo.featId}:${demo.value}`;
+  }
+  if (engine.param?.('featopen') === '1' && typeof document !== 'undefined') {
+    setTimeout(() => {
+      const panel = document.getElementById('feat-panel');
+      if (panel) {
+        panel.hidden = false;
+        render();
+        document.getElementById('solo-feats')?.scrollIntoView({ block: 'nearest' });
+      }
+    }, 600);
+  }
+  render();
+  publish(engine);
+}
+
+// —— Feature ————————————————————————————————————————————————————————————
+
+export const soloFeatsFeature = {
+  id: SOLO_FEATS_ID,
+
+  init(engine) {
+    render();
+    publish(engine);
+  },
+
+  /** engine.featsIncrement(featId, amount, opts): pc.feats_increment. */
+  featsIncrement(featId, amount, opts, engine) {
+    if (!engine || !FEAT_BY_ID[featId]) return null;
+    return increment(engine, featId, amount, opts || {});
+  },
+
+  onEvent(counter, amount, engine) {
+    onFeatEvent(engine, counter, amount);
+  },
+
+  onStreetEnter(street, engine) {
+    applyDemo(engine);
+    streetTsid = String(street?.tsid || engine.streetTsid || '');
+    // location.js:723 onPlayerEnter: a nekkid arrival marks where you came in.
+    entry = nekkid(engine) ? playerPoint(engine) : null;
+    publish(engine);
+  },
+
+  onStreetClear(engine) {
+    // location.js 1041-1055 onPlayerExit.
+    const res = streakCheck(state, {
+      tsid: streetTsid,
+      dayKey: getGameDayKey(Date.now()),
+      entry,
+      exit: playerPoint(engine),
+      nekkid: nekkid(engine),
+      realStreet: realStreet(engine, streetTsid),
+    });
+    if (res.ok) increment(engine, 'streaking', 1);
+    entry = null;
+    // feats_get_for_commit: the kindnesses on the street you just left.
+    const pending = takePending(state);
+    if (pending) {
+      const counted = increment(engine, 'pet_only', pending);
+      if (counted && !last.includes('complete')) engine.pushActivity?.(`${counted} more toward "… And Ask Nothing in Return".`);
+    }
+    publish(engine);
+  },
+
+  onTick(dtMs, now, engine) {
+    if (!engine.started) return;
+    // catalog_buffs.js nekkid on_apply / on_remove: the streak starts where you strip.
+    const bare = nekkid(engine);
+    if (bare && !entry) entry = playerPoint(engine);
+    else if (!bare && entry) entry = null;
+    if (autoplayAt && now >= autoplayAt && demo) {
+      autoplayAt = 0;
+      if (demo.featId === 'pet_only') {
+        addPending(state, 1);
+        last = `pending:+1:${state.pending}`;
+      } else {
+        increment(engine, demo.featId, 1);
+      }
+      publish(engine);
+    }
+    if (now < pollAt) return;
+    pollAt = now + POLL_MS;
+    poll(engine);
+  },
+
+  save() {
+    return state;
+  },
+
+  restore(slice) {
+    state = normalizeSoloFeatState(slice || {});
+    // When the Feats first opened to this save (quick_on_your_feat).
+    if (!state.openedAt) state.openedAt = Date.now();
+    demoDone = false;
+    entry = null;
+    render();
+  },
+};

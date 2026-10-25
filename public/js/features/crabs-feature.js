@@ -364,6 +364,10 @@ function onListen(engine, row) {
   const heard = crabHearBlock(row.memory, row.block, now());
   lastOutcome = heard.outcome;
   if (heard.achievement) engine.grantAchievement(heard.achievement);
+  // npc_crab.js blockListenCallback 465 / 482+495 / 495 / 509: animal_love
+  // +1 a repeat, +8 Make a Crab Happy, +3 a known tune, +5 a new one (G143).
+  const featPoints = { repeat: 1, happy: 8, liked: 3, fresh: 5 }[heard.outcome] || 0;
+  if (featPoints) engine.featsIncrement?.('animal_love', featPoints);
   if (live(row)) setClip(row.crab, heard.state);
   pending.push({ ...row, at: now() + heard.delaySec * 1000, kind: 'settle', heard });
   engine.save();
@@ -451,6 +455,9 @@ function runCrabVerb(engine, crab, verb) {
   stopMoving(crab, CRAB_WALK.menuWaitMs);
   if (result.state) setClip(crab, result.state);
   engine.pushActivity({ base: crabVerbMessage(result), effects });
+  // npc_crab.js 227-231 hug, 309-313 flatter, 353-357 pinch, 395-399 insult:
+  // animal_love +1, once per crab (one crab per street) per player (G143).
+  if (!result.failed) engine.featsIncrement?.('animal_love', 1, { cap: { key: `crab:${engine.streetTsid}:${verb}`, max: 1 } });
   engine.updateHud();
   engine.refreshPack();
   engine.save();
