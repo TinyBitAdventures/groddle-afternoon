@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-88';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-89';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -811,7 +811,7 @@ import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromU
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
 import { hidesChatBubble } from './js/hi-signs.js?v=hi-chat-1';
-import { giveArtHeight, placeSpeechTip, speechOffsetFor } from './js/speech-placement.js?v=g214-1';
+import { giveArtHeight, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g233-1';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -4455,6 +4455,13 @@ function positionSpeechBubble(bubble) {
   // The class's conversation_offset_x/y (G214, js/speech-placement.js): street spirits point 60 px into their art.
   const offset = speechOffsetFor(meta.target);
   bubble.x = clampWorldOverlayX(spr.x + offset.x, meta.width, 12);
+  // Clamped at the edge, the tail still points at the speaker (G233, ChatBubble.as 179-193).
+  const tail = placeSpeechTail({ bubbleX: bubble.x, width: meta.width, speakerX: spr.x + offset.x });
+  if (meta.tailAt !== `${tail.tip},${tail.base}`) {
+    meta.tailAt = `${tail.tip},${tail.base}`;
+    drawSpeechTail(meta.tailDown, meta.height, tail, false);
+    drawSpeechTail(meta.tailUp, meta.height, tail, true);
+  }
   // The tail tip sits at bubble.y; the bubble's top is height + 11 above it.
   let lowestTip = cameraY + meta.height + 24;
   const pill = nameplateViewBox();
@@ -4493,8 +4500,18 @@ function positionSpeechBubble(bubble) {
     app.canvas.dataset.speechArt = `${Math.round(spriteHeight)}${artHeight > 0 ? '' : ':bounds'}`;
     app.canvas.dataset.speechOffset = `${offset.x},${offset.y}`;
     app.canvas.dataset.speechWidth = Number(meta.width).toFixed(2);
+    app.canvas.dataset.speechTail = meta.tailAt;
   }
   return true;
+}
+
+/** One bubble tail, filled over the bubble's border, its two slanted sides outlined (js/speech-placement.js). */
+function drawSpeechTail(g, height, tail, up) {
+  if (!g || g.destroyed) return;
+  const p = speechTailPoints({ height, tip: tail.tip, base: tail.base, up });
+  g.clear();
+  g.poly(p.fill).fill({ color: 0xfffdf5, alpha: 0.97 });
+  g.moveTo(p.edge[0], p.edge[1]).lineTo(p.edge[2], p.edge[3]).lineTo(p.edge[4], p.edge[5]).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
 }
 
 function showSpeechBubble(target, speech) {
@@ -4526,15 +4543,10 @@ function showSpeechBubble(target, speech) {
   const height = Math.ceil(12 + speaker.height + 4 + body.height + (slugRow ? 6 + slugRow.height : 0) + 12);
   const bg = new PIXI.Graphics();
   bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
-  // Tail: fill over the bubble's bottom border so the two read as one shape,
-  // then outline only its two slanted sides at the bubble's border weight.
-  // The up tail is for a bubble hung under its speaker (positionSpeechBubble).
+  // Tails (drawn by positionSpeechBubble, which aims them at the speaker).
+  // The up tail is for a bubble hung under its speaker.
   const tailDown = new PIXI.Graphics();
-  tailDown.poly([width / 2 - 9, height - 2, width / 2, height + 11, width / 2 + 9, height - 2]).fill({ color: 0xfffdf5, alpha: 0.97 });
-  tailDown.moveTo(width / 2 - 9, height).lineTo(width / 2, height + 11).lineTo(width / 2 + 9, height).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
   const tailUp = new PIXI.Graphics();
-  tailUp.poly([width / 2 - 9, 2, width / 2, -11, width / 2 + 9, 2]).fill({ color: 0xfffdf5, alpha: 0.97 });
-  tailUp.moveTo(width / 2 - 9, 0).lineTo(width / 2, -11).lineTo(width / 2 + 9, 0).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
   tailUp.visible = false;
   speaker.x = 12;
   speaker.y = 10;

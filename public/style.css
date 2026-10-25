@@ -3422,8 +3422,8 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
 .skill-study-title span { color: #286479; font-weight: 700; font-size: 0.72rem; }
 .skill-study-card.paused .skill-study-title span { color: #8a6420; }
 .skill-study-card .skill-study-time { font-size: 0.74rem; color: #4c5b60; }
-.skill-study-card.unlearning { border-color: #c9908a; background: #fff1ef; }
-.skill-study-card.unlearning .skill-study-title span { color: #9a3d33; }
+/* G235 (Austin, 2026-10-25): an unlearning card looks like a learning one; the
+   client's desk had no red tint, so the teal bar and the word carry it. */
 .skill-study-card.unlearning .skill-study-bar i {
   /* G230: the client's unlearning bar (ImaginationSkillsUI.as 208-211, 449-450):
      teal, filling from the right with its tip on the left (ProgressBar.as 142,
@@ -3432,6 +3432,14 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
   background:
     linear-gradient(180deg, #4d9899, #4e989a) left / 2px 100% no-repeat,
     linear-gradient(180deg, #75c1c2, #42a5a8);
+}
+.quest-log-body .skill-study-card.unlearning .q-bar.skill-study-bar {
+  /* G236: the client's skills bar frame and glow (ImaginationSkillsUI.as
+     122-125): setFrameColors(0xcfd0d0, 0xb6b7b7), a light grey frame under a
+     2 px top edge (ProgressBar.as drawFrame 91-100, setFrameColors 270-277), and a white
+     GlowFilter (blur 8, strength 20, alpha 0.2; StaticFilters.as 264-272). */
+  background: #cfd0d0;
+  box-shadow: inset 0 2px 0 #b6b7b7, 0 0 1px 3px rgba(255, 255, 255, 0.2);
 }
 .skill-unlearn-btn { margin-top: 0.35rem; color: #8a3a31; border-color: #e0b3ad; background: #fff7f5; }
 .skill-unlearn-btn.is-confirm { color: #fff; background: #b8564a; border-color: #9a3d33; }

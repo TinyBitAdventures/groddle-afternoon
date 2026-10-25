@@ -179,3 +179,60 @@ export function giveArtHeight(target, read = readFrameAlpha) {
   });
   return target;
 }
+
+/**
+ * The tail of a bubble clamped at the edge of the view (register G233).
+ *
+ * The client (glitch-client ChatBubble.as keepInBounds 170-200, reference
+ * only): when it slid a bubble in from the edge by adj_x it slid the pointer
+ * back by the same amount, so the tip stayed over the speaker (179-183), kept
+ * it at least 10 px in from the bubble's left end (175, 186) and, past the
+ * right end (176, 189-193), flipped the 25 px pointer so its tip sat 10 px in
+ * from the right end and leant out toward the speaker. The remake's tail is a
+ * symmetric 18 px wedge, so the same idea is: the tip follows the speaker
+ * inside the bubble's ends, and the wedge's base stops short of the rounded
+ * corners, which tilts the tail toward a speaker past the bubble's end.
+ */
+
+/** ChatBubble.as 175-176: the pointer stays 10 px in from either end. */
+export const SPEECH_TAIL_TIP_INSET = 10;
+/** The remake's wedge: 9 px each side of its base centre, 11 px tall (game.js showSpeechBubble). */
+export const SPEECH_TAIL_HALF = 9;
+export const SPEECH_TAIL_HEIGHT = 11;
+/** The bubble's corner radius (game.js showSpeechBubble roundRect). */
+export const SPEECH_BUBBLE_RADIUS = 12;
+
+/**
+ * Where the tail goes along a bubble `width` wide whose centre is at
+ * `bubbleX` (world or view x) for a speaker at `speakerX` (its x plus the
+ * class's offset_x, the point the bubble was meant to be centred on).
+ * Returns { tip, base } in the bubble's own x (0 = its left end).
+ */
+export function placeSpeechTail({ bubbleX, width, speakerX }) {
+  const w = Number(width) || 0;
+  const mid = w / 2;
+  const off = Number(speakerX) - Number(bubbleX);
+  const want = mid + (Number.isFinite(off) ? off : 0);
+  const clampTo = (v, lo, hi) => (lo > hi ? mid : Math.min(hi, Math.max(lo, v)));
+  const tip = clampTo(want, SPEECH_TAIL_TIP_INSET, w - SPEECH_TAIL_TIP_INSET);
+  const edge = SPEECH_BUBBLE_RADIUS + SPEECH_TAIL_HALF;
+  const base = clampTo(tip, edge, w - edge);
+  return { tip: Math.round(tip * 2) / 2, base: Math.round(base * 2) / 2 };
+}
+
+/**
+ * The wedge's points for a bubble `height` tall: `fill` is the closed shape
+ * (overlapping the bubble's border by 2 px so the two read as one), `edge`
+ * the two slanted sides to outline. `up` is the tail of a bubble hung under
+ * its speaker (G185), drawn from the bubble's top.
+ */
+export function speechTailPoints({ height, tip, base, up = false }) {
+  const h = SPEECH_TAIL_HALF;
+  const y0 = up ? 0 : height;
+  const yIn = up ? 2 : height - 2;
+  const yTip = up ? -SPEECH_TAIL_HEIGHT : height + SPEECH_TAIL_HEIGHT;
+  return {
+    fill: [base - h, yIn, tip, yTip, base + h, yIn],
+    edge: [base - h, y0, tip, yTip, base + h, y0],
+  };
+}

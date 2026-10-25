@@ -550,4 +550,34 @@ test.describe('conversations against GameServerJS (G185)', () => {
     assert.match(feature, /const h = box\.crop\.h;[\s\S]*?target\.artHeight = h - 2;/);
     assert.equal(spiritCell('firebog', 'large').crop.h, 244);
   });
+
+  test('&spiritautoplay=far keeps the spirit in view on a short deck (G239, Somewhat Sump)', async () => {
+    const { spiritFarSpot } = await import('../public/js/features/street-spirits-feature.js?v=lonely-2');
+    // A flat street: 330 px to the right on the spirit's own floor, camera untouched.
+    const flat = [{ x1: 0, y1: 900, x2: 3000, y2: 900 }];
+    assert.deepEqual(spiritFarSpot(flat, 1000, 900), { x: 1330, y: 900, lookY: 0 });
+    // A wall of nothing to the right: the left side.
+    assert.deepEqual(spiritFarSpot([{ x1: 0, y1: 900, x2: 1100, y2: 900 }], 1000, 900), { x: 670, y: 900, lookY: 0 });
+    // Somewhat Sump (GLI57DI72HI153U): the spirit stands on a deck x 4601-4933
+    // near y 660 with the ground at y 902-920 on both sides; no floor at its
+    // height 280-430 px away, so 330 px off on the ground with the camera lifted.
+    const street = JSON.parse(readFileSync(join(ROOT, 'public/assets/streets/GLI57DI72HI153U.json'), 'utf8'));
+    const { platformsScreen } = await import('../public/js/street-model.js');
+    const sump = platformsScreen(street);
+    const spot = spiritFarSpot(sump, 4797, 650, { artHeight: 140, viewH: 408 });
+    assert.equal(spot.x, 5127);
+    assert.ok(spot.y > 900 && spot.y < 920, `ground ${spot.y}`);
+    assert.ok(spot.y - 650 >= 250, 'outside the Uralia wake box (street_spirit_zutto.js 377)');
+    assert.ok(spot.lookY < 0, 'camera lifted');
+    // The view (top = feet + lookY - 0.75 * 408) reaches the spirit's head, or keeps the feet at its bottom edge.
+    const top = spot.y + spot.lookY - 0.75 * 408;
+    assert.ok(Math.abs(top - Math.max(650 - 140 - 12, spot.y - 408)) <= 1);
+    assert.ok(spot.y <= top + 408 + 1, 'feet still in the view');
+    // A short spirit fits whole.
+    const small = spiritFarSpot(sump, 4797, 650, { artHeight: 60, viewH: 408 });
+    assert.ok(small.y + small.lookY - 0.75 * 408 <= 650 - 60 - 12 + 1);
+    const feature = readFileSync(join(ROOT, 'public/js/features/street-spirits-feature.js'), 'utf8');
+    assert.match(feature, /engine\.setCameraLook\?\.\(0, spot\.lookY\);/);
+    assert.match(feature, /if \(farLook\) \{\n      farLook = false;\n      engine\?\.setCameraLook\?\.\(0, 0\);/);
+  });
 });

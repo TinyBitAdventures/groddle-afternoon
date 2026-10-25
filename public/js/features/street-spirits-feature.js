@@ -55,7 +55,8 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
-import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=g214-1';
+import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';
+import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=g233-1';
 import {
   STREET_SPIRIT_ART,
   STREET_SPIRIT_VARIANTS,
@@ -399,15 +400,55 @@ function startTalk(engine, now) {
   setClip(s, STREET_SPIRIT_VARIANTS[s.variant].talk);
 }
 
+/** The QA &spiritautoplay=far offsets tried, nearest 330 first (all past the 250 px wake box). */
+const FAR_DX = [330, -330, 300, -300, 380, -380, 430, -430, 280, -280];
+
+/**
+ * Where &spiritautoplay=far stands the player (G239): outside the Uralia
+ * spirit's wake box (|dx| and |dy| under 250, street_spirit_zutto.js
+ * checkForPlayers 377) and with the spirit still on screen. A floor at the
+ * spirit's own height 280-430 px to either side wins. A spirit on a short
+ * deck (Somewhat Sump's sits on a 330 px deck above the ground) has none,
+ * so the player stands 330 px off on the floor nearest that height and the
+ * camera is lifted (lookY, negative is up) until the spirit's head is in
+ * the view (the point of this QA), but never past the player's feet at the
+ * view's bottom edge. The camera follows its target at `anchor` of the
+ * view's height (movement.js cameraTargetY).
+ */
+export function spiritFarSpot(platforms, x, y, { artHeight = 120, viewH = 408, anchor = 0.75 } = {}) {
+  for (const dx of FAR_DX) {
+    const sy = walkSurfaceY(platforms, x + dx, y, { up: 60, down: 60 });
+    if (sy != null) return { x: x + dx, y: sy, lookY: 0 };
+  }
+  for (const dx of [330, -330]) {
+    const sy = nearestSurfaceY(platforms, x + dx, y);
+    if (sy == null) continue;
+    const top = Math.max(y - artHeight - 12, sy - viewH);
+    const lookY = Math.min(0, Math.round(top + anchor * viewH - sy));
+    return { x: x + dx, y: sy, lookY };
+  }
+  return { x: x + 330, y, lookY: 0 };
+}
+
+let farLook = false;
+
 function autoplay(engine) {
   const mode = engine.param('spiritautoplay');
   if (!mode || !spirit || !engine.player) return;
   const g = spirit.target.sprite;
   // far: beyond the Uralia spirit's 250 px wake radius, still on screen.
-  engine.player.x = g.x + (mode === 'far' ? 330 : 80);
-  engine.player.y = g.y - 4;
+  const spot = mode === 'far'
+    ? spiritFarSpot(engine.platforms, g.x, g.y, { artHeight: Number(spirit.target.artHeight) || 120, viewH: engine.camera?.h || 408 })
+    : { x: g.x + 80, y: g.y, lookY: 0 };
+  engine.player.x = spot.x;
+  engine.player.y = spot.y - 4;
   engine.player.vx = 0;
   engine.player.vy = 0;
+  if (spot.lookY) {
+    farLook = true;
+    engine.setCameraLook?.(0, spot.lookY);
+  }
+  engine.setData('spiritAutoplaySpot', `${Math.round(spot.x)},${Math.round(spot.y)},${spot.lookY}`);
   // QA for speech bubbles near the top of the view: lift the spirit by N px.
   const lift = Number(engine.param('spiritlift')) || 0;
   if (lift > 0) g.y -= lift;
@@ -464,9 +505,13 @@ export const streetSpiritsFeature = {
     });
   },
 
-  onStreetClear() {
+  onStreetClear(engine) {
     generation += 1;
     spirit = null;
+    if (farLook) {
+      farLook = false;
+      engine?.setCameraLook?.(0, 0);
+    }
     talkTarget = null;
     talkVariant = '';
   },

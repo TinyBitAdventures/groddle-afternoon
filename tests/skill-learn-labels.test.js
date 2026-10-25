@@ -93,6 +93,23 @@ describe('the study bar', () => {
     assert.doesNotMatch(rule, /#c96a5e/);
   });
 
+  it('unlearning: the client\'s light frame and white glow (G236)', () => {
+    if (existsSync(imagination)) {
+      const src = readFileSync(join(imagination, 'ImaginationSkillsUI.as'), 'utf8');
+      assert.match(src, /progress_bar\.setFrameColors\(0xcfd0d0, 0xb6b7b7\);/);
+      assert.match(src, /progress_bar\.filters = StaticFilters\.copyFilterArrayFromObject\(\{blurX:8, blurY:8, strength:20, alpha:\.2\}, StaticFilters\.white4px40AlphaGlowA\);/);
+    }
+    const css = read('style.css');
+    const at = css.indexOf('.quest-log-body .skill-study-card.unlearning .q-bar.skill-study-bar {');
+    assert.ok(at > 0);
+    const rule = css.slice(at, css.indexOf('}', at));
+    assert.match(rule, /background: #cfd0d0;/);
+    assert.match(rule, /box-shadow: inset 0 2px 0 #b6b7b7, 0 0 1px 3px rgba\(255, 255, 255, 0\.2\);/);
+    // G235 (Austin): the card is neutral, the learning card's look; no red border, pink or red label.
+    assert.doesNotMatch(css, /\.skill-study-card\.unlearning \{/);
+    assert.doesNotMatch(css, /\.skill-study-card\.unlearning \.skill-study-title span/);
+  });
+
   it('style.css draws them in those colours, with the arrows scrolling one step every 0.4 s', () => {
     const css = read('style.css');
     const block = css.slice(css.indexOf('/* G222: study bars'), css.indexOf('.skill-study-card .skill-study-time.is-fast'));

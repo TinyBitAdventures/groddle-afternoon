@@ -12,14 +12,19 @@ import {
   ART_HEIGHT_CLASS,
   SPEECH_OFFSETS,
   SPEECH_PUSH_LIMIT,
+  SPEECH_BUBBLE_RADIUS,
+  SPEECH_TAIL_HALF,
+  SPEECH_TAIL_TIP_INSET,
   STREET_SPIRIT_SPEECH_OFFSET,
   artHeightOf,
   firstOpaqueRow,
   giveArtHeight,
   opaqueTopOf,
+  placeSpeechTail,
   placeSpeechTip,
   speechOffsetFor,
-} from '../public/js/speech-placement.js?v=g214-1';
+  speechTailPoints,
+} from '../public/js/speech-placement.js?v=g233-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');
@@ -105,6 +110,56 @@ describe('placeSpeechTip', () => {
   });
 });
 
+describe('placeSpeechTail (G233)', () => {
+  it('unclamped: the tail sits in the middle', () => {
+    assert.deepEqual(placeSpeechTail({ bubbleX: 500, width: 200, speakerX: 500 }), { tip: 100, base: 100 });
+  });
+
+  it('slid in from the right edge: the tip stays over the speaker', () => {
+    // A chicken 40 px right of the clamped bubble's centre.
+    assert.deepEqual(placeSpeechTail({ bubbleX: 600, width: 200, speakerX: 640 }), { tip: 140, base: 140 });
+    // From the left edge too.
+    assert.deepEqual(placeSpeechTail({ bubbleX: 112, width: 200, speakerX: 60 }), { tip: 48, base: 48 });
+  });
+
+  it('near an end the base stops short of the rounded corner and the tail leans out toward the speaker', () => {
+    const edge = SPEECH_BUBBLE_RADIUS + SPEECH_TAIL_HALF;
+    const right = placeSpeechTail({ bubbleX: 600, width: 200, speakerX: 690 });
+    assert.deepEqual(right, { tip: 190, base: 200 - edge });
+    assert.ok(right.tip > right.base, 'leans right');
+    const left = placeSpeechTail({ bubbleX: 112, width: 200, speakerX: 15 });
+    assert.deepEqual(left, { tip: SPEECH_TAIL_TIP_INSET, base: edge });
+  });
+
+  it('a speaker past the bubble\'s end: the tip stops 10 px in (ChatBubble.as 175-176, 189-191)', () => {
+    assert.deepEqual(placeSpeechTail({ bubbleX: 600, width: 200, speakerX: 900 }), { tip: 200 - SPEECH_TAIL_TIP_INSET, base: 200 - SPEECH_BUBBLE_RADIUS - SPEECH_TAIL_HALF });
+    assert.deepEqual(placeSpeechTail({ bubbleX: 600, width: 200, speakerX: -900 }), { tip: SPEECH_TAIL_TIP_INSET, base: SPEECH_BUBBLE_RADIUS + SPEECH_TAIL_HALF });
+  });
+
+  it('bad input keeps the middle', () => {
+    assert.deepEqual(placeSpeechTail({ bubbleX: 600, width: 156, speakerX: NaN }), { tip: 78, base: 78 });
+  });
+
+  it('the client slid the pointer back by the bubble\'s shift and flipped it at the right end', { skip: !existsSync(CLIENT) && 'no client checkout' }, () => {
+    const bubble = readFileSync(join(CLIENT, 'port/ChatBubble.as'), 'utf8');
+    assert.match(bubble, /var min_x_pointer:int = -\(\(reusable_rect\.width\/2\)-10\);/);
+    assert.match(bubble, /_talk_bubble_pointer\.x\+= adj_x;/);
+    assert.match(bubble, /_talk_bubble_pointer\.scaleX = -1;\n\s*_talk_bubble_pointer\.x = max_x_pointer\+_talk_bubble_pointer_w;/);
+    assert.equal(SPEECH_TAIL_TIP_INSET, 10);
+  });
+
+  it('speechTailPoints: the down wedge under the bubble, the up wedge over it, both over the border', () => {
+    assert.deepEqual(speechTailPoints({ height: 60, tip: 140, base: 130 }), {
+      fill: [121, 58, 140, 71, 139, 58],
+      edge: [121, 60, 140, 71, 139, 60],
+    });
+    assert.deepEqual(speechTailPoints({ height: 60, tip: 78, base: 78, up: true }), {
+      fill: [69, 2, 78, -11, 87, 2],
+      edge: [69, 0, 78, -11, 87, 0],
+    });
+  });
+});
+
 describe('art heights', () => {
   it('firstOpaqueRow skips faint pixels and reads RGBA strides', () => {
     const f = frame(4, 6, 2);
@@ -150,12 +205,15 @@ describe('art heights', () => {
 describe('wiring', () => {
   it('game.js places every bubble through the module and gives registered targets art heights', () => {
     const game = read('public/game.js');
-    assert.match(game, /import \{ giveArtHeight, placeSpeechTip, speechOffsetFor \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
+    assert.match(game, /import \{ giveArtHeight, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
     assert.match(game, /function register\(target\) \{\n[^\n]*\n  giveArtHeight\(target\);\n  interactables\.push\(target\);/);
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
     assert.match(fn, /const offset = speechOffsetFor\(meta\.target\);\n  bubble\.x = clampWorldOverlayX\(spr\.x \+ offset\.x, meta\.width, 12\);/);
     assert.match(fn, /want: spr\.y - spriteHeight - 12 \+ offset\.y,/);
     assert.match(fn, /dataset\.speechArt = /);
+    // G233: the tail is aimed at the speaker the bubble was meant to centre on.
+    assert.match(fn, /placeSpeechTail\(\{ bubbleX: bubble\.x, width: meta\.width, speakerX: spr\.x \+ offset\.x \}\)/);
+    assert.match(fn, /drawSpeechTail\(meta\.tailDown, meta\.height, tail, false\);\n\s*drawSpeechTail\(meta\.tailUp, meta\.height, tail, true\);/);
   });
 
   it('a dressed Street Spirit takes the spirits\' 0 / 60 under the same module key', () => {

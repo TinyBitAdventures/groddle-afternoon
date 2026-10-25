@@ -2029,9 +2029,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 443,
+  "commits": 446,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Lonely Street Spirits call you over, cry on their street, and thank you when you come"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Hell and Pooped prompts show only their words, and the unlearning bar is the client's teal filling from the right"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Speech bubbles sit where the original put them, and an Icon telling its story skips that walk-in's gift"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2136,21 +2151,6 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "A crab that hears its last tune again sulks but lets you keep the block"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The restoration history lists today's work again"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Three SWFs make a Game, and you can wrangle or play them"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Room 23 sits in Tower Quest, as the map data says"
    }
   ]
  },
