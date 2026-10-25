@@ -10,6 +10,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   ART_HEIGHT_CLASS,
+  SPEECH_HUD_MARGIN,
+  SPEECH_TAIL_HEIGHT,
   SPEECH_OFFSETS,
   SPEECH_PUSH_LIMIT,
   SPEECH_BUBBLE_RADIUS,
@@ -17,14 +19,16 @@ import {
   SPEECH_TAIL_TIP_INSET,
   STREET_SPIRIT_SPEECH_OFFSET,
   artHeightOf,
+  clearSpeechOfBox,
   firstOpaqueRow,
   giveArtHeight,
   opaqueTopOf,
   placeSpeechTail,
   placeSpeechTip,
+  speechBubbleRect,
   speechOffsetFor,
   speechTailPoints,
-} from '../public/js/speech-placement.js?v=g233-1';
+} from '../public/js/speech-placement.js?v=g269-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GSJS = join(ROOT, '../glitch-GameServerJS');
@@ -205,7 +209,7 @@ describe('art heights', () => {
 describe('wiring', () => {
   it('game.js places every bubble through the module and gives registered targets art heights', () => {
     const game = read('public/game.js');
-    assert.match(game, /import \{ giveArtHeight, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
+    assert.match(game, /import \{ clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints \} from '\.\/js\/speech-placement\.js\?v=[\w-]+';/);
     assert.match(game, /function register\(target\) \{\n[^\n]*\n  giveArtHeight\(target\);\n  interactables\.push\(target\);/);
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
     assert.match(fn, /const offset = speechOffsetFor\(meta\.target\);\n  bubble\.x = clampWorldOverlayX\(spr\.x \+ offset\.x, meta\.width, 12\);/);
@@ -222,5 +226,73 @@ describe('wiring', () => {
     const key = (src) => src.match(/speech-placement\.js\?v=([\w-]+)'/)?.[1];
     assert.equal(key(feature), key(read('public/game.js')));
     assert.equal(key(read('tests/speech-placement.test.js')), key(read('public/game.js')));
+  });
+});
+
+describe('bubbles keep clear of the activity feed column (G269)', () => {
+  // The 700 px case from lane G256: feed popups 427 view px wide from x 14, two lines down to y 210.
+  const feed = { left: 14, right: 441, top: 48, bottom: 210 };
+  const base = { width: 220, height: 80, viewWidth: 948, viewBottom: 390 };
+  const clearOf = (rect, box) => rect.right + SPEECH_HUD_MARGIN <= box.left || rect.left - SPEECH_HUD_MARGIN >= box.right
+    || rect.bottom + SPEECH_HUD_MARGIN <= box.top || rect.top - SPEECH_HUD_MARGIN >= box.bottom;
+
+  it('leaves a bubble that is already clear alone', () => {
+    assert.equal(clearSpeechOfBox({ ...base, left: 500, tip: 200, speakerX: 600, feet: 300, box: feed }), null);
+    assert.equal(clearSpeechOfBox({ ...base, left: 100, tip: 200, speakerX: 200, feet: 300, box: null }), null);
+  });
+
+  it('slides beside the column when the tail can still reach the speaker', () => {
+    const out = clearSpeechOfBox({ ...base, left: 300, tip: 200, speakerX: 470, feet: 280, box: feed });
+    assert.equal(out.how, 'beside');
+    const rect = speechBubbleRect({ ...base, left: 300 + out.dx, tip: out.tip, flip: out.flip });
+    assert.ok(clearOf(rect, feed));
+    assert.ok(470 >= rect.left + 10 && 470 <= rect.right - 10);
+  });
+
+  it('drops below the column for a speaker under it, tip still above the feet', () => {
+    const out = clearSpeechOfBox({ ...base, left: 100, tip: 200, speakerX: 200, feet: 340, box: feed });
+    assert.equal(out.how, 'below');
+    assert.equal(out.dx, 0);
+    assert.equal(out.tip, feed.bottom + SPEECH_HUD_MARGIN + base.height + SPEECH_TAIL_HEIGHT);
+    assert.ok(out.tip <= 340);
+    assert.ok(clearOf(speechBubbleRect({ ...base, left: 100, tip: out.tip }), feed));
+  });
+
+  it('hangs under the feet when the tip would have to point below them', () => {
+    const out = clearSpeechOfBox({ ...base, left: 100, tip: 200, speakerX: 200, feet: 240, box: feed });
+    assert.equal(out.how, 'under');
+    assert.equal(out.flip, true);
+    assert.ok(clearOf(speechBubbleRect({ ...base, left: 100, tip: out.tip, flip: true }), feed));
+  });
+
+  it('stays put, marked over, when nothing fits (a phone view the column fills)', () => {
+    const phone = { left: 10, right: 700, top: 36, bottom: 360 };
+    const out = clearSpeechOfBox({ ...base, left: 300, tip: 300, speakerX: 400, feet: 330, box: phone });
+    assert.deepEqual(out, { dx: 0, tip: 300, flip: false, how: 'over' });
+  });
+
+  it('clears at 700, 1280 and 1600 px wide (feed popups up to two wrapped lines)', () => {
+    for (const viewWidth of [948, 960]) {
+      for (const box of [{ left: 10, right: 690, top: 36, bottom: 160 }, feed, { left: 14, right: 334, top: 48, bottom: 150 }]) {
+        for (let speakerX = 20; speakerX < viewWidth - 20; speakerX += 37) {
+          const left = Math.min(Math.max(12, speakerX - base.width / 2), viewWidth - 12 - base.width);
+          const out = clearSpeechOfBox({ ...base, viewWidth, left, tip: 150, speakerX, feet: 330, box });
+          const rect = speechBubbleRect({ ...base, left: left + (out?.dx || 0), tip: out ? out.tip : 150, flip: out?.flip });
+          assert.notEqual(out?.how, 'over', `${viewWidth} ${box.right} ${speakerX}`);
+          assert.ok(clearOf(rect, box), `${viewWidth} ${box.right} ${speakerX}`);
+          assert.ok(rect.bottom <= base.viewBottom + 11);
+        }
+      }
+    }
+  });
+
+  it('game.js asks it with the feed and buff strip every placement', () => {
+    const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');
+    assert.match(game, /hudColumnBox\(\[\.\.\.\(feed\?\.children \|\| \[\]\), document\.getElementById\('buff-strip'\)\]/);
+    assert.match(game, /const clear = clearSpeechOfBox\(\{/);
+    assert.match(game, /meta\.overHud = clear\?\.how === 'over';/);
+    assert.match(game, /el\.toggleAttribute\('data-under-speech', over\)/);
+    const css = readFileSync(join(ROOT, 'public/style.css'), 'utf8');
+    assert.match(css, /\.activity-feed\[data-under-speech\], \.buff-strip\[data-under-speech\] \{ opacity: 0\.18; \}/);
   });
 });

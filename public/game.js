@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-6';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-111';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-112';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -816,7 +816,7 @@ import { playPoofIn } from './js/overlay-art.js?v=g273-1';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
 import { hidesChatBubble } from './js/hi-signs.js?v=hi-chat-1';
-import { giveArtHeight, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g233-1';
+import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g269-1';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -4468,6 +4468,18 @@ function nameplateViewBox() {
   return nameplateBox;
 }
 
+/** G269: the top-left HUD column (feed popups, buff strip) in view pixels, re-measured every 100 ms. */
+let hudBoxCache = null;
+let hudBoxCacheAt = -Infinity;
+function hudColumnViewBox() {
+  const now = performance.now();
+  if (now - hudBoxCacheAt < 100) return hudBoxCache;
+  hudBoxCacheAt = now;
+  const feed = document.getElementById('activity-feed');
+  hudBoxCache = hudColumnBox([...(feed?.children || []), document.getElementById('buff-strip')], app?.canvas, VIEW_W, VIEW_H);
+  return hudBoxCache;
+}
+
 function positionSpeechBubble(bubble) {
   const meta = bubble?._speechFx;
   const spr = meta?.target?.sprite;
@@ -4483,13 +4495,6 @@ function positionSpeechBubble(bubble) {
   // The class's conversation_offset_x/y (G214, js/speech-placement.js): street spirits point 60 px into their art.
   const offset = speechOffsetFor(meta.target);
   bubble.x = clampWorldOverlayX(spr.x + offset.x, meta.width, 12);
-  // Clamped at the edge, the tail still points at the speaker (G233, ChatBubble.as 179-193).
-  const tail = placeSpeechTail({ bubbleX: bubble.x, width: meta.width, speakerX: spr.x + offset.x });
-  if (meta.tailAt !== `${tail.tip},${tail.base}`) {
-    meta.tailAt = `${tail.tip},${tail.base}`;
-    drawSpeechTail(meta.tailDown, meta.height, tail, false);
-    drawSpeechTail(meta.tailUp, meta.height, tail, true);
-  }
   // The tail tip sits at bubble.y; the bubble's top is height + 11 above it.
   let lowestTip = cameraY + meta.height + 24;
   const pill = nameplateViewBox();
@@ -4500,7 +4505,7 @@ function positionSpeechBubble(bubble) {
   // Pushed down over the speaker as the client did (at most 120 px), else hung
   // under the feet of a short one near the top of the view, tail up (G185).
   const below = spr.y + 6;
-  const place = placeSpeechTip({
+  let place = placeSpeechTip({
     want: spr.y - spriteHeight - 12 + offset.y,
     minTip: lowestTip,
     maxTip: highestTip,
@@ -4509,6 +4514,24 @@ function positionSpeechBubble(bubble) {
     below,
     belowFits: below + 11 + meta.height <= cameraY + LOCATION_VIEW_H - 8,
   });
+  // G269: clear of the activity feed and buff strip (js/speech-placement.js clearSpeechOfBox).
+  const clear = clearSpeechOfBox({
+    left: bubble.x - cameraX - meta.width / 2, width: meta.width, height: meta.height,
+    tip: place.tip - cameraY, flip: place.flip, speakerX: spr.x + offset.x - cameraX, feet: spr.y - cameraY,
+    box: hudColumnViewBox(), viewWidth: horizontalLocationViewWidth(), viewBottom: LOCATION_VIEW_H - 18,
+  });
+  if (clear) {
+    bubble.x += clear.dx;
+    place = { tip: clear.tip + cameraY, flip: clear.flip };
+  }
+  meta.overHud = clear?.how === 'over';
+  // Clamped at the edge, the tail still points at the speaker (G233, ChatBubble.as 179-193).
+  const tail = placeSpeechTail({ bubbleX: bubble.x, width: meta.width, speakerX: spr.x + offset.x });
+  if (meta.tailAt !== `${tail.tip},${tail.base}`) {
+    meta.tailAt = `${tail.tip},${tail.base}`;
+    drawSpeechTail(meta.tailDown, meta.height, tail, false);
+    drawSpeechTail(meta.tailUp, meta.height, tail, true);
+  }
   const flip = place.flip;
   bubble.y = place.tip;
   if (meta.flipped !== flip) {
@@ -4529,6 +4552,7 @@ function positionSpeechBubble(bubble) {
     app.canvas.dataset.speechOffset = `${offset.x},${offset.y}`;
     app.canvas.dataset.speechWidth = Number(meta.width).toFixed(2);
     app.canvas.dataset.speechTail = meta.tailAt;
+    app.canvas.dataset.speechClear = clear?.how || '';
   }
   return true;
 }
@@ -4656,6 +4680,12 @@ function updateSpeechBubbles(dt) {
     if (meta.life >= meta.max) removeSpeechBubble(bubble);
   }
   if (app?.canvas) app.canvas.dataset.speechBubbles = String(speechBubbles.length);
+  // G269: where no spot clears the feed column (phone widths), the column fades under the bubble.
+  const over = speechBubbles.some((b) => b._speechFx?.overHud);
+  for (const id of ['activity-feed', 'buff-strip']) {
+    const el = document.getElementById(id);
+    if (el && el.hasAttribute('data-under-speech') !== over) el.toggleAttribute('data-under-speech', over);
+  }
 }
 
 function floatText(x, y, text, color = 0xfff4d6) {
@@ -5734,9 +5764,6 @@ function executeVerb(target, verbId) {
     if (result.remove) {
       if (target.classId === 'apple') {
         collectNaturalIndex('apple', target.state?.naturalIndex);
-      }
-      if (target.sprite._worldGlow?.parent) {
-        target.sprite._worldGlow.parent.removeChild(target.sprite._worldGlow);
       }
       entityLayer.removeChild(target.sprite);
       apples = apples.filter((a) => a !== target.sprite);
@@ -8837,14 +8864,10 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
   spr.y = spr.baseY;
   spr.bob = 0;
   spr.zIndex = 27;
-  const glow = new PIXI.Graphics();
-  glow.circle(0, 0, 34).fill({ color: def.glow ?? 0x9ee4ac, alpha: 0.2 });
-  glow.x = spr.x;
-  glow.y = spr.baseY - 30;
-  glow.zIndex = 26;
-  glow.eventMode = 'none';
-  spr._worldGlow = glow;
-  entityLayer.addChild(glow);
+  // G286: no drawn glow behind it. musicblock_*.js and musicblock_base set no
+  // glow or highlight state, and the client only glows an itemstack under the
+  // pointer or a drag (LocationItemstackView.as 408-424, AbstractItemstackView.as 457-486),
+  // as with the pumpkins (G248) and Senor Funpickle (G265).
   entityLayer.addChild(spr);
   register({
     classId: def.classTsid,
@@ -9916,12 +9939,6 @@ function physics(dt) {
     block.y = block.baseY + Math.sin(block.bob) * 5;
     const pulse = 1 + Math.sin(block.bob * 1.4) * 0.055;
     block.scale.set(block.baseScale * pulse);
-    if (block._worldGlow) {
-      block._worldGlow.x = block.x;
-      block._worldGlow.y = block.y - 30;
-      block._worldGlow.scale.set(0.92 + Math.sin(block.bob * 1.4) * 0.08);
-      block._worldGlow.alpha = 0.72 + Math.sin(block.bob) * 0.15;
-    }
   }
 
   for (const stack of droppedItemSprites) {

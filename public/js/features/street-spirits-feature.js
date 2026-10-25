@@ -56,7 +56,7 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';
-import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=g233-1';
+import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=g269-1';
 import {
   STREET_SPIRIT_ART,
   STREET_SPIRIT_VARIANTS,

@@ -26,7 +26,7 @@
 
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
 import { qurazyMarkersFor } from '../qurazy-markers.js?v=g260-1';
-import { OVERLAY_FADE, playVectorOverlay } from '../overlay-art.js?v=g273-1';
+import { OVERLAY_FADE, loadOverlayManifest, playVectorOverlay } from '../overlay-art.js?v=g273-1';
 import {
   QURAZY_SPAWN_LINE,
   createQurazyState,
@@ -105,7 +105,32 @@ function placeQurazy(engine, spot) {
  */
 export const QURAZY_OVERLAY = Object.freeze({ key: 'o_qurazy_quoin_overlay', durationMs: 10000, x: 0.5, topY: -0.05, fadeOutMs: 3000 });
 
-function showSpawnOverlay(engine) {
+/** Space between the street-name pill and the banner's drawn top, in screen px. */
+export const QURAZY_PILL_GAP = 6;
+
+/**
+ * G274: the banner's top_y, moved down only as far as the street-name pill
+ * needs. The client had no pill there (its location name sat in the HUD
+ * above the viewport), so at the source's -5% the banner's drawn top (the
+ * stage top plus the art box's top, overlayPlacement in overlay-art.js) lands
+ * right on the remake's own chrome. Size, timing, fades and x stay the source's.
+ * `pillBottom` is in px from the viewport's top; null (no pill) keeps -5%.
+ */
+export function qurazyBannerTopY({ height, scale = 1, boxTop = 0, pillBottom = null, gap = QURAZY_PILL_GAP, topY = QURAZY_OVERLAY.topY }) {
+  if (!(height > 0) || !Number.isFinite(pillBottom)) return topY;
+  const drawnTop = height * topY + boxTop * scale;
+  const want = pillBottom + gap;
+  return drawnTop >= want ? topY : (want - boxTop * scale) / height;
+}
+
+/** The street-name pill's bottom edge in px from the viewport canvas's top, or null when it is not shown. */
+function pillBottomIn(c) {
+  const pill = document.getElementById('street-nameplate')?.getBoundingClientRect();
+  if (!pill?.width || !pill.height) return null;
+  return pill.bottom - c.top;
+}
+
+async function showSpawnOverlay(engine) {
   const root = typeof document === 'undefined' ? null : document.getElementById('game-root');
   const c = root?.querySelector('canvas:not(.overlay-art):not(.lonely-fireworks):not(.lonely-portrait)')?.getBoundingClientRect();
   if (!c?.width) {
@@ -114,12 +139,17 @@ function showSpawnOverlay(engine) {
   }
   const r = root.getBoundingClientRect();
   const rect = { left: c.left - r.left, top: c.top - r.top, width: c.width, height: c.height };
+  const scale = c.width / 960;
+  // The art box's top (overlays.json); playVectorOverlay reads the same cached manifest.
+  const boxTop = await loadOverlayManifest().then((m) => m?.[QURAZY_OVERLAY.key]?.box?.[1] ?? 0, () => 0);
+  const topY = qurazyBannerTopY({ height: c.height, scale, boxTop, pillBottom: pillBottomIn(c) });
   engine.setData?.('qurazyOverlay', 'playing');
+  engine.setData?.('qurazyOverlayTopY', String(Math.round(topY * 1000) / 1000));
   playVectorOverlay(root, QURAZY_OVERLAY.key, {
     rect,
     x: QURAZY_OVERLAY.x,
-    topY: QURAZY_OVERLAY.topY,
-    scale: c.width / 960,
+    topY,
+    scale,
     durationMs: QURAZY_OVERLAY.durationMs,
     fade: { inMs: OVERLAY_FADE.inMs, outMs: QURAZY_OVERLAY.fadeOutMs },
     loop: false,

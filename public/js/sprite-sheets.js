@@ -16,6 +16,11 @@ export function cellRect(def, index) {
   return { x: col * def.fw, y: row * def.fh, w: def.fw, h: def.fh };
 }
 
+/** The texture cache key of one cell: its file and pixel rect (1x units). */
+export function textureKey(path, rect) {
+  return `${path}#${rect.x},${rect.y},${rect.w},${rect.h}`;
+}
+
 /** Frames per Pixi tick (60 Hz) for a clip authored at `fps`. */
 export function pixiSpeed(fps = 30) {
   return fps / 60;
@@ -23,7 +28,8 @@ export function pixiSpeed(fps = 30) {
 
 /**
  * A small loader bound to one PIXI namespace. Sheets load once; textures are
- * cached per (path, frame).
+ * cached per (path, cell rectangle), so two clips cutting one file from
+ * different start cells (`first`) or grids never share frames (G281).
  */
 export function createSheetLoader(PIXI) {
   const bases = new Map();
@@ -58,9 +64,9 @@ export function createSheetLoader(PIXI) {
       upgradeSource(base, def.path, whenLoaded);
       const out = [];
       for (let i = 0; i < def.frames; i += 1) {
-        const key = `${def.path}#${i}`;
+        const r = cellRect(def, i);
+        const key = textureKey(def.path, r);
         if (!textures.has(key)) {
-          const r = cellRect(def, i);
           textures.set(key, frameTexture(base, new PIXI.Rectangle(r.x, r.y, r.w, r.h)));
         }
         out.push(textures.get(key));

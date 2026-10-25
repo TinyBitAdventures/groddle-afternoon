@@ -236,3 +236,90 @@ export function speechTailPoints({ height, tip, base, up = false }) {
     edge: [base - h, y0, tip, yTip, base + h, y0],
   };
 }
+
+/*
+ * G269: a bubble never sits under the top-left HUD column (the activity
+ * feed's popups and the buff strip over it). The client had no such column:
+ * its activity went to the Local chat pane and growls (GrowlQueue.as), so
+ * this is the remake's own rule, the same kind as keeping clear of the
+ * street-name pill. Everything here is in view px, y down from the top of
+ * the location view.
+ */
+
+/** Gap kept between a bubble (body and tail) and the column, in view px. */
+export const SPEECH_HUD_MARGIN = 6;
+
+/**
+ * The bubble's box on screen, tail included: a bubble tip-down has its
+ * body height + 11 above `tip`; one hung under the feet (`flip`) has its
+ * tail from `tip` down, then the body.
+ */
+export function speechBubbleRect({ left, width, height, tip, flip = false }) {
+  const top = flip ? tip : tip - height - SPEECH_TAIL_HEIGHT;
+  return { left, right: left + width, top, bottom: top + height + SPEECH_TAIL_HEIGHT };
+}
+
+function overlaps(a, b, margin) {
+  return a.left < b.right + margin && a.right > b.left - margin && a.top < b.bottom + margin && a.bottom > b.top - margin;
+}
+
+/**
+ * Where a placed bubble goes so it clears `box` (the HUD column), or null
+ * when it already does. Tries, keeping the smallest move:
+ * - beside the column, while the tail can still point at the speaker
+ *   (`speakerX`, inside the tip inset of either end);
+ * - below the column, tip down, while the tip stays at or above the feet;
+ * - hung under the feet (G185), when the feet are already below the column.
+ * With none fitting (a phone-width view the column fills) it stays put,
+ * `how: 'over'`, and game.js fades the column under it instead.
+ * Returns { dx, tip, flip, how } (dx moves the bubble's x).
+ */
+export function clearSpeechOfBox({ left, width, height, tip, flip = false, speakerX, feet, box, viewWidth, viewBottom, margin = SPEECH_HUD_MARGIN, edge = 12 }) {
+  if (!box || !(box.right > box.left) || !(box.bottom > box.top)) return null;
+  const now = speechBubbleRect({ left, width, height, tip, flip });
+  if (!overlaps(now, box, margin)) return null;
+  const reaches = (l) => !Number.isFinite(speakerX) || (speakerX >= l + SPEECH_TAIL_TIP_INSET && speakerX <= l + width - SPEECH_TAIL_TIP_INSET);
+  const options = [];
+  for (const l of [box.right + margin, box.left - margin - width]) {
+    if (l >= edge && l + width <= viewWidth - edge && reaches(l)) {
+      options.push({ dx: l - left, tip, flip, how: 'beside', cost: Math.abs(l - left) });
+    }
+  }
+  const downTip = box.bottom + margin + height + SPEECH_TAIL_HEIGHT;
+  if (downTip <= viewBottom && (!Number.isFinite(feet) || downTip <= feet)) {
+    options.push({ dx: 0, tip: downTip, flip: false, how: 'below', cost: Math.abs(downTip - height - SPEECH_TAIL_HEIGHT - now.top) });
+  }
+  const underTip = Number.isFinite(feet) ? feet + 6 : NaN;
+  if (underTip >= box.bottom + margin && underTip + SPEECH_TAIL_HEIGHT + height <= viewBottom) {
+    options.push({ dx: 0, tip: underTip, flip: true, how: 'under', cost: Math.abs(underTip - now.top) });
+  }
+  if (!options.length) return { dx: 0, tip, flip, how: 'over' };
+  options.sort((a, b) => a.cost - b.cost);
+  const { cost, ...best } = options[0];
+  return best;
+}
+
+/**
+ * One box round the visible elements (the feed's popup lines, the buff
+ * strip), in view px of a canvas drawn at viewW x viewH; null when none is
+ * showing. Browser only.
+ */
+export function hudColumnBox(elements, canvas, viewW, viewH) {
+  if (!canvas || typeof canvas.getBoundingClientRect !== 'function') return null;
+  const c = canvas.getBoundingClientRect();
+  if (!c.width || !c.height) return null;
+  const sx = viewW / c.width;
+  const sy = viewH / c.height;
+  let box = null;
+  for (const el of elements) {
+    if (!el || el.hidden) continue;
+    if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ visibilityProperty: true, opacityProperty: true })) continue;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    const b = { left: (r.left - c.left) * sx, right: (r.right - c.left) * sx, top: (r.top - c.top) * sy, bottom: (r.bottom - c.top) * sy };
+    box = box
+      ? { left: Math.min(box.left, b.left), right: Math.max(box.right, b.right), top: Math.min(box.top, b.top), bottom: Math.max(box.bottom, b.bottom) }
+      : b;
+  }
+  return box;
+}

@@ -3735,6 +3735,9 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
 .buff-strip[hidden] { display: none !important; }
 /* One 38 px row of chips (renderBuffStrip shows six at most), then a 6 px gap. */
 .buff-strip:not([hidden]) ~ .activity-feed { margin-top: 44px; }
+/* G269: a speech bubble with no spot clear of the column (phone widths) shows through it. */
+.activity-feed, .buff-strip { transition: opacity 0.2s ease; }
+.activity-feed[data-under-speech], .buff-strip[data-under-speech] { opacity: 0.18; }
 @media (max-width: 760px) {
   .buff-strip { top: 36px; }
 }

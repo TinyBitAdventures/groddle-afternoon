@@ -3,28 +3,24 @@
 // The first test reads game.js's SHEETS table; the second every sheet the js/ modules slice (G276).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const game = readFileSync(join(root, 'public/game.js'), 'utf8');
 // The wheel's disappear clip ends blank: the wheel is gone (its sprite is removed after it).
 const ENDS_EMPTY = new Set(['wheelDisappear']);
 // The Phantom's appear clip (played once) starts from nothing as it fades in.
 const ALLOWED = new Set(['phantomAppear cell 0']);
 
-test('every game.js sheet plays only cells with art', () => {
-  const rows = [];
-  const re = /(\w+): \{\n\s+url: '([^']+)',\n\s+fw: (\d+), fh: (\d+), cols: (\d+), rows: (\d+)(?:, frameCount: (\w+))?/g;
-  const jsDir = join(root, 'public/js');
-  const sources = [game, ...readdirSync(jsDir).filter((f) => f.endsWith('.js')).map((f) => readFileSync(join(jsDir, f), 'utf8'))];
-  const constant = (name) => Number(sources.map((s) => s.match(new RegExp(`const ${name} = (\\d+);`))?.[1]).find(Boolean));
-  for (const m of game.matchAll(re)) {
-    if (ENDS_EMPTY.has(m[1])) continue;
-    rows.push({ name: m[1], path: join(root, 'public', m[2].split('?')[0]), fw: +m[3], fh: +m[4], cols: +m[5], rows: +m[6], n: m[7] ? (/^\d+$/.test(m[7]) ? +m[7] : constant(m[7])) : +m[5] * +m[6] });
-  }
+test('every game.js sheet plays only cells with art', async () => {
+  // G281: read from game.js's syntax tree (tests/sheet-sources.js gameSheetTable), as the module test is.
+  const { gameSheetTable } = await import('./sheet-sources.js');
+  const table = gameSheetTable();
+  for (const name of ENDS_EMPTY) assert.ok(table.some((r) => r.name === name), `unused allowance ${name}`);
+  const rows = table
+    .filter((r) => !ENDS_EMPTY.has(r.name))
+    .map((r) => ({ ...r, path: join(root, 'public', r.path) }));
   assert.ok(rows.length > 40, `found ${rows.length} sheets`);
   // Pillow does the pixel work (python3.11 has it); the test skips if it is missing.
   const py = `import json,sys
@@ -63,7 +59,6 @@ const MODULE_ALLOWED = [
 ];
 const TAIL_ALLOWED = [
   [/^juju camp grandma angry:/, 'cell 126 repeats cell 0; the loop stops before it'],
-  [/^features\/rook-attack-feature\.js ROOK_SHEETS\.fore:/, 'cell 47 is an opaque black filler, not a frame'],
 ];
 
 test('every js/ module sheet plays only cells with art, and no count cuts off its art', async () => {

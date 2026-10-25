@@ -24,7 +24,10 @@ import {
 } from '../public/js/qurazy.js';
 import { planStreetQuoins } from '../public/js/quoins.js';
 import {
+  QURAZY_OVERLAY,
+  QURAZY_PILL_GAP,
   QURAZY_PLACEMENT_GROUP,
+  qurazyBannerTopY,
   qurazyFeature,
   qurazyFeatureState,
   qurazyStreetEligible,
@@ -329,5 +332,28 @@ describe('wiring', () => {
     const feature = readFileSync(join(PUBLIC, 'js/features/qurazy-feature.js'), 'utf8');
     assert.match(feature, /qurazy\.js\?v=g260-\d+/);
     assert.match(feature, /qurazy-markers\.js\?v=g260-\d+/);
+  });
+});
+
+describe('the spawn banner and the street-name pill (G274)', () => {
+  const manifest = JSON.parse(readFileSync(join(PUBLIC, 'assets/sprites/overlays/overlays.json'), 'utf8'));
+  const boxTop = manifest[QURAZY_OVERLAY.key].box[1];
+  // Drawn top of the art in px, as overlayPlacement puts it.
+  const drawnTop = (height, scale, topY) => height * topY + boxTop * scale;
+
+  it('keeps the source top_y -5% when there is no pill', () => {
+    assert.equal(qurazyBannerTopY({ height: 540, scale: 1, boxTop, pillBottom: null }), -0.05);
+  });
+
+  it('moves the drawn top just below the pill, at any width', () => {
+    for (const [height, scale, pillBottom] of [[540, 1, 38], [420, 700 / 960, 30], [620, 1220 / 960, 46]]) {
+      const topY = qurazyBannerTopY({ height, scale, boxTop, pillBottom });
+      assert.ok(topY > QURAZY_OVERLAY.topY);
+      assert.ok(Math.abs(drawnTop(height, scale, topY) - (pillBottom + QURAZY_PILL_GAP)) < 1e-9);
+    }
+  });
+
+  it('never moves it up: a pill already clear of the banner keeps -5%', () => {
+    assert.equal(qurazyBannerTopY({ height: 540, scale: 1, boxTop, pillBottom: -40 }), -0.05);
   });
 });

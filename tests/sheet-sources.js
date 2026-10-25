@@ -106,6 +106,57 @@ export function moduleConsts(rel, scope = {}) {
 }
 
 /**
+ * moduleConsts for `rel`, with the names it imports resolved to the exporting module's own
+ * top-level const (followed through that module's imports in turn). Import paths drop their ?v=.
+ */
+export function moduleConstsWithImports(rel, seen = new Map()) {
+  if (seen.has(rel)) return seen.get(rel);
+  let mod = null;
+  const imports = new Map(); // local name -> [module rel, exported name]
+  const scope = new Proxy({}, {
+    has: (_, name) => imports.has(name),
+    get: (_, name) => {
+      const [from, exported] = imports.get(name);
+      return moduleConstsWithImports(from, seen).get(exported);
+    },
+  });
+  mod = moduleConsts(rel, scope);
+  seen.set(rel, mod);
+  const dir = rel.includes('/') ? rel.slice(0, rel.lastIndexOf('/')) : '';
+  for (const node of mod.ast.body) {
+    if (node.type !== 'ImportDeclaration' || !node.source.value.startsWith('.')) continue;
+    const from = join(dir, clean(node.source.value));
+    for (const sp of node.specifiers) {
+      if (sp.type === 'ImportSpecifier') imports.set(sp.local.name, [from, sp.imported.name ?? sp.imported.value]);
+    }
+  }
+  return mod;
+}
+
+/**
+ * game.js's SHEETS table as loadSheets / sliceSheet cut it: cells left to right, top to bottom,
+ * the first frameCount (else cols * rows) of the cols x rows grid. Whole images are skipped.
+ * Read from the syntax tree; imported counts (PHANTOM_APPEAR_FRAME_COUNT) come from their module.
+ */
+export function gameSheetTable() {
+  const game = moduleConstsWithImports('game.js');
+  const decl = game.ast.body
+    .flatMap((n) => (n.type === 'VariableDeclaration' ? n.declarations : []))
+    .find((d) => d.id.name === 'SHEETS');
+  const out = [];
+  for (const prop of decl.init.properties) {
+    const name = prop.key.name ?? prop.key.value;
+    // The vector Glitch's sheets come from VECTOR_AVATAR (collectSheets reads them there).
+    if (prop.value.type === 'CallExpression' && prop.value.callee.name === 'glitchSheetDef') continue;
+    const def = game.evaluate(prop.value);
+    if (def.whole || !def.fw) continue;
+    const grid = def.cols * def.rows;
+    out.push({ name, path: clean(def.url), fw: def.fw, fh: def.fh, cols: def.cols, rows: def.rows, n: Math.min(grid, def.frameCount ?? grid) });
+  }
+  return out;
+}
+
+/**
  * Every kit sheet cut under public/js: `kit.sheetFrames(PIXI, url, cols, rows, count)` and
  * `kit.animated(PIXI, url, cols, rows, { count })` (js/quest-rooms/kit.js; count defaults to
  * cols * rows). args is null when the call's numbers live in a table (read separately).
