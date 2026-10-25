@@ -113,8 +113,24 @@ import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from 
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g273-1';
 import { HOME_MACHINE } from '../home-ticket.js?v=g288-1';
+import { createAnimalState } from '../animals.js?v=g290-1';
+import {
+  AK_ANIMALS,
+  AK_BUBBLE,
+  AK_EVENT_BOXES,
+  AK_POOF_OUT,
+  AK_SIGNS,
+  AK_WALL_OFF_MS,
+  SKILLQUEST_AK_SOURCE,
+  SKILLQUEST_AK_TSID,
+  akAnimalForEvent,
+  akVerbReaction,
+  createAkState,
+} from '../skillquest-ak.js?v=g290-1';
 
 export const NEWXP_FEATURE_ID = 'newxp';
+/** newxp_training1.js 705-706 slothRemove: deleteWithPoof, then hideTree 0.5 s later. */
+const SLOTH_TREE_HIDE_MS = 500;
 const ART = 'assets/sprites/newxp/';
 const CARD_ART = 'assets/imagination/cards/';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -1149,6 +1165,7 @@ async function runTraining1(t) {
   addQuoin(engine, 'img_pickup_ladder', L.ladderCoin.x, L.ladderCoin.y, () => { ladderCoin = true; });
   let slothShownAt = 0;
   let treeGone = false;
+  let treeHidden = false;
   const hideTree = () => {
     if (treeGone) return;
     treeGone = true;
@@ -1156,12 +1173,17 @@ async function runTraining1(t) {
     if (sloth.alpha > 0 && sloth.visible) deleteWithPoof(engine, sloth, -50, 250);
     sloth.visible = false;
     engine.playSound('SLOTH_ARRIVES', { volume: 0.3 });
-    if (run?.views) {
-      run.views.tree.alpha = 0.25;
-      run.views.branches.alpha = 1;
-    }
-    addPlatforms(engine, L.platforms.filter((p) => p.tree));
-    engine.setData('newxpLast', 'treeplats_on');
+    // apiSetTimer('hideTree', 0.5*1000): treehide and plat1 half a second after the poof (G290).
+    setTimeout(() => {
+      if (t !== token) return;
+      treeHidden = true;
+      if (run?.views) {
+        run.views.tree.alpha = 0.25;
+        run.views.branches.alpha = 1;
+      }
+      addPlatforms(engine, L.platforms.filter((p) => p.tree));
+      engine.setData('newxpLast', 'treeplats_on');
+    }, SLOTH_TREE_HIDE_MS);
   };
   await until(t, () => {
     const p = P();
@@ -1179,7 +1201,7 @@ async function runTraining1(t) {
     }
     const shown = slothShownAt ? Date.now() - slothShownAt : 0;
     if (slothShownAt && !treeGone && (shown > 7500 || (shown > 3500 && p.y < 1290))) hideTree();
-    if (treeGone && inBox(L.boxes.upDownForLadders, p.x, p.y) && !run.data.climb) {
+    if (treeHidden && inBox(L.boxes.upDownForLadders, p.x, p.y) && !run.data.climb) {
       run.data.climb = true;
       instruction(LINES.climbInstructions);
     }
@@ -1189,7 +1211,7 @@ async function runTraining1(t) {
       place(2300, 1350);
       slothShownAt = Date.now() - 8000;
       hideTree();
-      await new Promise((r) => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, SLOTH_TREE_HIDE_MS + 150));
       place(L.ladderCoin.x, L.ladderCoin.y + 30);
     },
   });
@@ -1655,7 +1677,16 @@ async function runSkill(t) {
     const actions = street?.events?.[ev];
     if (Array.isArray(actions) && actions.every((a) => SAFE.has(a.type))) locationEventsApi.fire(engine, ev);
   };
-  for (const ev of ['wall_off', 'sign1', 'sign2', 'sign3', 'sign4', 'lotion', 'wateringcan_on', 'bottom1', 'bottom2', 'bottom3']) fireSafe(ev);
+  const ak = skill.id === 'animalkinship_1' && engine.streetTsid === SKILLQUEST_AK_TSID;
+  if (ak) {
+    // skillquest_ak.js: wall_off after 1 s; the signs and animals come from the event boxes (G290).
+    run.data.ak = { ...createAkState(), animals: {}, inBox: new Set() };
+    const mine = run.data.ak;
+    setTimeout(() => { if (run?.data?.ak === mine) fireSafe('wall_off'); }, AK_WALL_OFF_MS);
+    islandSigns(engine, AK_SIGNS, { follow: true });
+  } else {
+    for (const ev of ['wall_off', 'sign1', 'sign2', 'sign3', 'sign4', 'lotion', 'wateringcan_on', 'bottom1', 'bottom2', 'bottom3']) fireSafe(ev);
+  }
   // The practice tool waiting on the street (createItemStack in reset()).
   const tool = skill.id === 'animalkinship_1'
     ? { id: 'butterfly_lotion', classTsid: 'butterfly_lotion', x: 1823, y: 810, off: 'lotion_off' }
@@ -1674,8 +1705,232 @@ async function runSkill(t) {
   setStep('practice');
   const finish = box(skill.finishBox) || { x: (street?.bounds ? street.bounds.r - street.bounds.l : 3400) - 300, y: 900, w: 200, h: 800 };
   engine.toast(`Practise ${skill.name}, then head right to the EXIT.`, 4000);
-  await until(t, () => inBox(finish, P().x, P().y), { help: () => place(finish.x, finish.y - 20) });
+  if (ak && auto) await akAutoplay(t, engine, fireSafe);
+  await until(t, () => {
+    if (ak) akTick(engine, fireSafe);
+    return inBox(finish, P().x, P().y);
+  }, { help: () => place(finish.x, finish.y - 20) });
   return 'island';
+}
+
+/* ------------------------------------------------------------------ */
+/* skillquest_ak: the practice animals (js/skillquest-ak.js, G290)      */
+/* ------------------------------------------------------------------ */
+
+/** QA trail on the canvas (data-newxp-ak): what the practice street did, in order. */
+function akLog(engine, what) {
+  const ak = run?.data?.ak;
+  if (ak) (ak.log ||= []).push(what);
+  engine.setData('newxpAk', (ak?.log || [what]).slice(-16).join(','));
+}
+
+/** The rebuilt Collision-triggered Event Boxes (enter edge), then the signs. */
+function akTick(engine, fireSafe) {
+  const ak = run?.data?.ak;
+  const p = P();
+  if (!ak || !p) return;
+  for (const box of AK_EVENT_BOXES) {
+    if (!inHitBox(box, p.x, p.y)) {
+      ak.inBox.delete(box.id);
+      continue;
+    }
+    if (ak.inBox.has(box.id)) continue;
+    ak.inBox.add(box.id);
+    for (const ev of box.events) {
+      const classId = akAnimalForEvent(ev);
+      if (classId) akSpawn(engine, classId);
+      else fireSafe(ev);
+    }
+  }
+  syncSigns(engine);
+}
+
+function akFrames(engine, classId) {
+  const t = engine.textures || {};
+  if (classId === 'npc_piggy') return (t.piggyWalk?.frames || []).slice(0, 8);
+  if (classId === 'npc_chicken') return (t.chickenWalk?.frames || []).slice(0, 6);
+  return (t.butterfly?.frames || []).slice(0, 12);
+}
+
+/**
+ * spawnChicken / spawnPiggy / spawnButterfly (skillquest_ak.js 227-250):
+ * once per visit, createItemStackWithPoof at the location target (proto_puff,
+ * PROTO_PUFF, the stack fading in), a fresh animal (reset() made new ones),
+ * and its bubble 2 s later for 5 s.
+ */
+function akSpawn(engine, classId) {
+  const ak = run?.data?.ak;
+  const def = AK_ANIMALS[classId];
+  if (!ak || !def || ak.spawned[classId]) return null;
+  ak.spawned[classId] = true;
+  const { PIXI } = engine;
+  const at = sourceToStreet(engine.street?.bounds, def.x, def.y);
+  const frames = akFrames(engine, classId);
+  const spr = new PIXI.AnimatedSprite(frames.length ? frames : [PIXI.Texture.EMPTY]);
+  const scale = classId === 'npc_piggy' ? 0.97 : 0.7;
+  spr.anchor.set(0.5, def.airborne ? 0.5 : 1);
+  spr.baseScale = scale;
+  spr.scale.set(scale);
+  spr.animationSpeed = def.airborne ? 0.25 : 0.13;
+  spr.zIndex = def.airborne ? 40 : 20;
+  spr.x = at.x;
+  spr.y = def.airborne ? at.y : groundBelow(engine, at.x, at.y - 20) + 2;
+  spr.alpha = 0;
+  spr.play();
+  engine.entityLayer.addChild(spr);
+  const textures = engine.textures || {};
+  const playOnce = (key, n, walkKey, walkN, speed) => (durationMs = 0) => {
+    const actionFrames = (textures[key]?.frames || []).slice(0, n);
+    if (!actionFrames.length || spr.destroyed) return;
+    spr.textures = actionFrames;
+    spr.loop = false;
+    spr.animationSpeed = durationMs > 0 ? Math.min(0.3, Math.max(0.025, actionFrames.length / (60 * (durationMs / 1000)))) : 0.18;
+    spr.gotoAndPlay(0);
+    spr.onComplete = () => {
+      if (spr.destroyed) return;
+      spr.loop = true;
+      spr.textures = (textures[walkKey]?.frames || []).slice(0, walkN);
+      spr.animationSpeed = speed;
+      spr.gotoAndPlay(0);
+      spr.onComplete = null;
+    };
+  };
+  if (classId === 'npc_piggy') {
+    spr.playPet = playOnce('piggyNibble', 10, 'piggyWalk', 8, 0.13);
+    spr.playNibble = spr.playPet;
+  } else if (classId === 'npc_chicken') {
+    spr.playSqueeze = playOnce('chickenPeck', 6, 'chickenWalk', 6, 0.12);
+  }
+  const target = engine.register({
+    classId,
+    label: def.label,
+    sprite: spr,
+    airborne: Boolean(def.airborne),
+    state: createAnimalState(classId),
+    akAnimal: true,
+  });
+  const h = spr.height || 0;
+  const row = { classId, sprite: spr, target, baseX: at.x, baseY: spr.y, vx: classId === 'npc_piggy' ? 0.45 : -0.5, phase: 0, poofAt: Date.now(), gone: false };
+  ak.animals[classId] = row;
+  engine.playSound('PROTO_PUFF', { volume: 0.5 });
+  playPoofIn(PIXI, { layer: engine.entityLayer, x: spr.x, bottom: def.airborne ? spr.y + h / 2 : spr.y, itemH: h });
+  setTimeout(() => {
+    if (run?.data?.ak !== ak || row.gone || spr.destroyed) return;
+    engine.say(target, def.bubble, AK_BUBBLE.durationMs);
+  }, AK_BUBBLE.delayMs);
+  akLog(engine, `spawn:${classId}`);
+  return row;
+}
+
+/** Each frame: the poof-in fade, a short wander (the source animals walk about), the butterfly's flutter. */
+function akStep(dtMs) {
+  const ak = run?.data?.ak;
+  if (!ak) return;
+  for (const row of Object.values(ak.animals)) {
+    const spr = row.sprite;
+    if (row.gone || !spr || spr.destroyed) continue;
+    spr.alpha = poofInAlpha(Date.now() - row.poofAt);
+    row.phase += dtMs / 1000;
+    if (row.classId === 'npc_butterfly') {
+      spr.x = row.baseX + Math.sin(row.phase * 0.6) * 24;
+      spr.y = row.baseY + Math.sin(row.phase * 1.3) * 10;
+      continue;
+    }
+    if (!spr.loop) continue; // mid squeeze / pet / nibble
+    spr.x += row.vx * (dtMs / 16.7);
+    if (spr.x > row.baseX + 70) row.vx = -Math.abs(row.vx);
+    if (spr.x < row.baseX - 70) row.vx = Math.abs(row.vx);
+    spr.scale.x = (row.vx < 0 ? -1 : 1) * Math.abs(spr.baseScale || spr.scale.x);
+  }
+}
+
+/** eventScriptEventFired (skillquest_ak.js 103-143): what a successful verb sets off, 2.5 s later. */
+function akVerb(engine, cls, verb) {
+  const ak = run?.data?.ak;
+  if (!ak || !AK_ANIMALS[cls]) return;
+  akLog(engine, `verb:${cls}:${verb}`);
+  const alive = (classId) => Boolean(ak.animals[classId] && !ak.animals[classId].gone);
+  const r = akVerbReaction(ak, verb, alive);
+  if (!r) return;
+  akLog(engine, `${verb}:${r.poof || ''}:${r.event || ''}`);
+  setTimeout(() => {
+    if (run?.data?.ak !== ak) return;
+    if (r.poof) akPoofOut(engine, r.poof);
+    if (r.event) fireStreetEvent(engine, r.event);
+  }, AK_POOF_OUT.delayMs);
+}
+
+/** deleteWithPoof(20, 100) (items/item.js 490-510): the puff, PROTO_PUFF, and gone 200 ms later. */
+function akPoofOut(engine, classId) {
+  const ak = run?.data?.ak;
+  const row = ak?.animals[classId];
+  if (!row || row.gone) return;
+  row.gone = true;
+  deleteWithPoof(engine, row.sprite, AK_POOF_OUT.dx, AK_POOF_OUT.dy);
+  setTimeout(() => {
+    if (run?.data?.ak !== ak) return;
+    engine.unregister(row.target);
+    akLog(engine, `gone:${classId}`);
+  }, AK_POOF_OUT.deleteMs);
+}
+
+/** &newxpautoplay=1: walk the boxes and do each verb the signs ask for. */
+async function akAutoplay(t, engine, fireSafe) {
+  const ak = run?.data?.ak;
+  if (!ak) return;
+  const tick = () => akTick(engine, fireSafe);
+  // Real time (sleep() caps at 300 ms in autoplay), so the poofs and bubbles play out on screen.
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)).then(() => alive(t));
+  const visit = async (box) => {
+    place(box.x, box.y - 20);
+    await until(t, () => { tick(); return ak.inBox.has(box.id); });
+    await wait(2600);
+  };
+  // game.js isScreenFxBlocking stops a verb under these screens.
+  const awardUp = () => typeof document !== 'undefined' && ['award-screen', 'new-day-screen', 'screen-transition'].some((id) => {
+    const el = document.getElementById(id);
+    return Boolean(el && !el.hidden && el.classList.contains('is-visible'));
+  });
+  const heard = (classId, verbId) => (ak.log || []).filter((x) => x === `verb:${classId}:${verbId}`).length;
+  // An award screen popping up can stop a verb, so each one is tried until its success event comes.
+  const doVerb = async (classId, verbId) => {
+    const before = heard(classId, verbId);
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const row = ak.animals[classId];
+      if (!row || row.gone) return false;
+      await until(t, () => !awardUp() && !engine.currentAction);
+      place(row.sprite.x - 60, AK_ANIMALS[classId].airborne ? row.sprite.y + 60 : row.sprite.y - 10);
+      await wait(300);
+      const verb = (engine.targetVerbs(row.target) || []).find((v) => v.id === verbId && v.enabled !== false);
+      if (!verb) {
+        akLog(engine, `autoplay:no-${verbId}`);
+        await wait(700);
+        continue;
+      }
+      akLog(engine, `do:${verbId}:${engine.beginVerb(row.target, verb) ? 'ok' : 'busy'}`);
+      await until(t, () => { tick(); return !engine.currentAction; });
+      await wait(500);
+      if (heard(classId, verbId) > before) return true;
+    }
+    return false;
+  };
+  const [chicken, pig, lotion, butterfly] = AK_EVENT_BOXES;
+  await visit(chicken);
+  await doVerb('npc_chicken', 'squeeze');
+  await doVerb('npc_chicken', 'squeeze');
+  await wait(3200);
+  await visit(pig);
+  await doVerb('npc_piggy', 'pet');
+  await doVerb('npc_piggy', 'nibble');
+  await wait(3200);
+  await visit(lotion);
+  const bottle = run.pickups.find((row) => row.classTsid === 'butterfly_lotion' && !row.picked);
+  if (bottle) pickUp(engine, bottle);
+  await wait(1500);
+  await visit(butterfly);
+  await doVerb('npc_butterfly', 'massage');
+  await doVerb('npc_butterfly', 'milk');
+  await wait(3200);
 }
 
 /* ------------------------------------------------------------------ */
@@ -2193,14 +2448,14 @@ async function revealMappery(engine, t) {
 }
 
 /** The hint signs' text (the client printed sign_txt over the invisible groddle_sign_blank decos). */
-function islandSigns(engine) {
+function islandSigns(engine, table = ISLAND_SIGNS, { follow = false } = {}) {
   const street = engine.street;
   if (!street || !run) return;
   run.data.signs = [];
   for (const layer of street.layers || []) {
     const raw = layer.id !== 'middleground' && layer.w > 0 && layer.h > 0;
     for (const deco of layer.decos || []) {
-      const sign = ISLAND_SIGNS[deco.id];
+      const sign = table[deco.id];
       if (!sign?.face) continue;
       const pos = raw || /^T_/.test(String(layer.id || '')) ? { x: deco.x, y: deco.y } : sourceToStreet(street.bounds, deco.x, deco.y);
       const h = deco.h || 248;
@@ -2209,7 +2464,7 @@ function islandSigns(engine) {
         style: {
           fontFamily: 'Nunito, "Trebuchet MS", sans-serif',
           fontWeight: '800',
-          fontSize: 22,
+          fontSize: sign.plaque ? 20 : 22,
           fill: 0xffffff,
           align: 'center',
           wordWrap: true,
@@ -2224,7 +2479,7 @@ function islandSigns(engine) {
       label.visible = false;
       engine.entityLayer.addChild(label);
       run.fixtures.push(label);
-      run.data.signs.push({ id: deco.id, label });
+      run.data.signs.push({ id: deco.id, label, follow: follow ? h / 2 : 0 });
     }
   }
 }
@@ -2237,6 +2492,12 @@ function syncSigns(engine) {
     const view = views?.get(row.id);
     row.label.visible = Boolean(view && !view.destroyed && view.visible);
     row.label.alpha = view ? view.alpha : 0;
+    // `follow`: ride the deco through its own (parallax) layer, centred on it.
+    if (row.follow && row.label.visible && view.parent && engine.entityLayer) {
+      const at = engine.entityLayer.toLocal(view.parent.toGlobal({ x: view.x, y: view.y - row.follow }));
+      row.label.x = at.x;
+      row.label.y = at.y;
+    }
   }
 }
 
@@ -2534,6 +2795,8 @@ async function skipTutorial(engine) {
 function startTutorial(engine, stage = 'clouds') {
   save = startNewxp(save, stage);
   if (stage !== 'clouds' && !save.skill && STAGES.indexOf(stage) > STAGES.indexOf('house')) save.skill = firstSkill(engine.param('newxpskill'))?.id || 'animalkinship_1';
+  // The rock grants the chosen skill before the practice street (runHouse); a forced later stage does too (G290).
+  if (STAGES.indexOf(stage) > STAGES.indexOf('house') && save.skill && !(engine.learnedSkills || []).includes(save.skill)) engine.grantSkill(save.skill);
   if (stage !== 'clouds' && !save.name) save.name = 'Tester';
   // A forced later stage still has the home street the house stage imagines.
   if (STAGES.indexOf(stage) > STAGES.indexOf('house') && !engine.homeOwned?.()) {
@@ -2648,6 +2911,7 @@ export const newxpFeature = {
       run.data.spinachSeen = null;
       run.data.lotionSeen = null;
       run.data.singAt = 0;
+      run.data.ak = null;
     }
     if (ui) {
       ui.bubbleFor = null;
@@ -2656,9 +2920,10 @@ export const newxpFeature = {
   },
 
   ecologyOverride(street) {
-    // skillquest_ak_v2.js spawns a chicken, a piggy and a butterfly to practise on.
-    if (street?.tsid === 'GHFRK14DDU53RQQ') {
-      return { label: 'A L\'il Animal Kinship', sourceTsid: 'LHFRK14DDU53RQQ', counts: { npc_chicken: 1, npc_piggy: 1, npc_butterfly: 1 } };
+    // skillquest_ak.js reset() removes every npc_chicken, npc_piggy and npc_butterfly; the
+    // event boxes poof one of each in (akSpawn, G290), so the street itself has none.
+    if (street?.tsid === SKILLQUEST_AK_TSID) {
+      return { label: 'A L\'il Animal Kinship', sourceTsid: SKILLQUEST_AK_SOURCE, counts: {} };
     }
     return null;
   },
@@ -2691,6 +2956,7 @@ export const newxpFeature = {
       if (next && !next.closest('[hidden]')) next.click();
     }
     stepNpcs(dtMs);
+    akStep(dtMs);
     stepQuoins(engine);
     // Three jumps (countJumps): a take-off from the ground.
     const p = P();
@@ -2712,6 +2978,8 @@ export const newxpFeature = {
       setFlag('butterfly_msg_off_called');
       fireStreetEvent(engine, 'butterfly_msg_off');
     }
+    // skillquest_ak eventScriptEventFired: verb_<x>_success from the practice animals.
+    if (run.data?.ak && verb) akVerb(engine, cls, verb);
     if (run.stage === 'training2') {
       if (TRAINING2_FOOD.some((f) => f.classTsid === cls) && verb && verb !== 'pickup') run.data.eaten = true;
       if (TRAINING2_DRINKS.some((d) => d.classTsid === cls) && verb && verb !== 'pickup') run.data.drank = true;

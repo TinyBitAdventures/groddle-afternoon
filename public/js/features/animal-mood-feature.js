@@ -79,7 +79,7 @@ import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overla
 import { isInHell } from '../hell.js';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
-import { animalStatusLabel } from '../animals.js?v=g268-1';
+import { animalStatusLabel } from '../animals.js?v=g290-1';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=g268-1';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js';
 import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=g289-1';

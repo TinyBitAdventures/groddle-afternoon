@@ -139,6 +139,7 @@ import {
   towerItem,
 } from '../home-cultivation.js?v=home-cultivation-4';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
+import { playPoofIn } from '../overlay-art.js?v=g273-1';
 import { projectApi } from './street-jobs-feature.js?v=g289-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
 import { towerApi } from './home-tower-feature.js?v=home-tower-11';
@@ -1713,6 +1714,41 @@ function cultivationWorldX(item, state = activeCult()) {
   return homeStreetLayout(state).houseX + item.rx;
 }
 
+/**
+ * createItemStackWithPoof (locations/location.js 2054-2070) for a yard
+ * cultivation: quests/quest.js 1880 (a finished restore poofs its new end
+ * item in where the proto stood) and items/include/cultivation.js 75
+ * replaceWithDepleted -> item.js 478-488 replaceWithPoofIfOnGround (a worn
+ * out item poofs into its proto). proto_puff and PROTO_PUFF, centred on the
+ * new stack (js/overlay-art.js playPoofIn). Queued here and played once the
+ * yard is redrawn (spawnCultivations), dropped if no redraw comes within 2 s.
+ */
+const pendingPoofs = [];
+const POOF_ITEM_H = { rock: 60, garden: 50, patch: 40, node: 90, hive: 107 };
+
+function queueCultivationPoof(item, st, { proto = false } = {}) {
+  const def = cultivationDef(item?.protoClass);
+  if (!def || def.kind === 'tower') return;
+  const art = proto ? PROTO_DEPLETED_ART[item.protoClass] : null;
+  const itemH = art ? art[4] : (def.art && POD_ART[def.art]?.h) || POOF_ITEM_H[def.kind] || 60;
+  pendingPoofs.push({ id: item.id, st, itemH, at: Date.now() });
+}
+
+function playPendingPoofs(engine, st) {
+  const now = Date.now();
+  for (let i = pendingPoofs.length - 1; i >= 0; i -= 1) {
+    const row = pendingPoofs[i];
+    if (now - row.at > 2000) { pendingPoofs.splice(i, 1); continue; }
+    if (row.st !== st) continue;
+    pendingPoofs.splice(i, 1);
+    const item = st.items.find((r) => r.id === row.id);
+    if (!item) continue;
+    engine.playSound?.('PROTO_PUFF', { volume: 0.5 });
+    playPoofIn(engine.PIXI, { layer: engine.entityLayer, x: cultivationWorldX(item, st), bottom: yardGroundY(st) + 6, itemH: row.itemH });
+  }
+  if (engine.setData) engine.setData('homePoof', String(now));
+}
+
 function shimEngine(engine, population, points) {
   return Object.create(engine, {
     population: { value: population },
@@ -1791,6 +1827,7 @@ function spawnCultivations(engine, st = activeCult()) {
   }
   // Worn-out cultivations: their protos and Restore projects.
   spawnProtos(engine, st);
+  if (pendingPoofs.length) playPendingPoofs(engine, st);
   if (mode === 'cultivate') drawCultivationMarkers(engine);
   // The back yard has no Tower (cultivation_get_available: street only).
   if (isBackYard(st)) return;
@@ -2021,6 +2058,7 @@ function depleteItem(engine, id, { wotd = false } = {}, st = activeCult()) {
   const result = withRekey(engine, () => depleteCultivation(st, id, { wotd }), st);
   if (!result?.ok) return result;
   if (selected?.kind === 'cultivation' && selected.id === Number(id)) selected = null;
+  queueCultivationPoof(result.item || st.items.find((r) => r.id === Number(id)), st, { proto: true });
   engine.pushActivity(wotd
     ? `You poured Wine of the Dead on your ${result.label}. It wore out at once.`
     : `Your ${result.label} wore out. Restore it with a project, or cultivate something new.`);
@@ -2037,6 +2075,7 @@ function finishRestore(engine, id, jobId, st = cult) {
   if (result.timesGain) engine.achievement('cultivation:times_restored', result.timesGain);
   engine.save();
   restoreLast = `${result.item.protoClass.replace('proto_', '')}:${result.after.toFixed(2)}`;
+  queueCultivationPoof(result.item, st);
   engine.setData('homeRestore', restoreLast);
   // After the panel shows "Finished", drop the spent project and redraw the yard.
   setTimeout(() => {

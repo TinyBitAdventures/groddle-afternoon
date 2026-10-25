@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-7';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-8';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-113';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-114';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -409,8 +409,8 @@ import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=g268-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g268-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=g290-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g290-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -701,7 +701,7 @@ import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=g268-1';
+} from './js/animals.js?v=g290-1';
 import {
   ensureWoodTreeState,
   pickWoodTool,
