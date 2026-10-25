@@ -119,3 +119,4 @@ import { swfFeature } from './swf-feature.js?v=g190-1'; FEATURES.push(swfFeature
 import { machineArtFeature } from './machine-art-feature.js?v=g193-1'; FEATURES.push(machineArtFeature);
 import { conversationsFeature } from './conversations-feature.js?v=g202-1'; FEATURES.push(conversationsFeature);
 import { quoinShardsFeature } from './quoin-shards-feature.js?v=g212-1'; FEATURES.push(quoinShardsFeature);
+import { helpMineFeature } from './help-mine-feature.js?v=g207-1'; FEATURES.push(helpMineFeature);

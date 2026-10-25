@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-77';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-78';
 import { buildEnterChoices, planEnter, createEnterChooser, trimmedIconUrl } from './js/enter-chooser.js?v=g206-1';
 import {
   actionDurationFor,
@@ -5258,6 +5258,8 @@ function beginVerbAction(target, verb) {
   playVerbStartAnimation(target, verb.id, durationMs);
   startActionSoundLoop(target.classId, verb.id, durationMs);
   renderCurrentAction();
+  // G207 help mine: a mine swing joins the rock's crew (features/help-mine-feature.js).
+  features.query('verbStarted', target, verb, engine);
   return true;
 }
 
@@ -5546,6 +5548,8 @@ function executeVerb(target, verbId) {
       updateHud();
     }
     if (result.miningChanged) {
+      // G207: the help bonus lands with your swing, before the rock is redrawn.
+      features.query('rockMined', target, result, engine);
       refreshMineRockVisual(target);
       updateHud();
     }
@@ -6485,7 +6489,7 @@ function localCompanionsEnabled() {
     try { localStorage.setItem(COMPANIONS_STORAGE_KEY, requested); } catch { /* storage unavailable */ }
     return requested === '1';
   }
-  if (params.has('companiondemo') || params.has('followdemo') || params.has('beardemo') || params.has('quoinshard')) return true;
+  if (params.has('companiondemo') || params.has('followdemo') || params.has('beardemo') || params.has('helpminedemo') || params.has('quoinshard')) return true;
   try {
     return localStorage.getItem(COMPANIONS_STORAGE_KEY) === '1';
   } catch {
@@ -7952,6 +7956,12 @@ const engine = {
   refreshGarden: (target) => refreshGardenVisual(target),
   /** One mineable rock that keeps its state in the street's rock slot `index`. */
   spawnMineRock: (classTsid, x, y, index) => spawnMineRock(classTsid, x, y, index),
+  /** Redraw a rock after a feature changed its chunks (G207 companions mining). */
+  refreshMineRock: (target) => refreshMineRockVisual(target),
+  /** The timed verb running now ({ target, verbId }) or null (G207 help mine). */
+  get currentAction() {
+    return currentAction ? { target: currentAction.target, verbId: currentAction.verbId } : null;
+  },
   streetExists(tsid) {
     if (tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID) return homeState.owned === true;
     return Boolean(resolveIndexTsid(tsid));
@@ -22083,7 +22093,7 @@ function tickAllMineRocks(now = Date.now()) {
     if (!rock) continue;
     if (tickMineRock(rock, now)) {
       refreshMineRockVisual(t);
-      pushActivity(`${t.label} reforms — ready to mine.`);
+      pushActivity(`${t.label} reforms and is ready to mine.`);
     } else if (rock.depleted) {
       // Keep subtitle countdown fresh occasionally
       t.subtitle = rockStatusLabel(rock);

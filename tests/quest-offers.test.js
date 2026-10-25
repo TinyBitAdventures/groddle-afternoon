@@ -112,7 +112,8 @@ describe('classifyQuests', () => {
     const built = builtInstanceQuests().length;
     // Overworld features that brought once-excluded quests back (not rooms).
     // soilappreciation_1: its newxp practice street is lost; tend + dig anywhere, as its text says.
-    const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station', 'soilappreciation_1'].length;
+    // help_mine: the local companions work rocks you can help (G207, features/help-mine-feature.js).
+    const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station', 'soilappreciation_1', 'help_mine'].length;
     assert.equal(c.solo.length, 129 + built + featureQuests);
     assert.equal(c.custom.length, 22); // + 5 Gentle Island tutorial quests (newxp-feature.js)
     assert.equal(c.excluded.length, 294 - built - featureQuests);

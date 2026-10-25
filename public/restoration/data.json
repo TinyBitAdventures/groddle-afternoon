@@ -442,10 +442,12 @@
    "group": "making",
    "name": "Mining and metal",
    "status": "source",
-   "blurb": "Mine four rock types, smelt, grind and make metal with the original tools.",
+   "blurb": "Mine four rock types, smelt, grind and make metal with the original tools. Other Glitches sometimes work a rock near you: Help mine it for I Me Mine, and when they join your rock each one adds to what you get.",
    "spot": "rock",
    "evidence": [
-    "public/js/mining.js"
+    "public/js/mining.js",
+    "public/js/help-mine.js",
+    "public/js/features/help-mine-feature.js"
    ],
    "shot": "shots/mining.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&rockdemo=sparkly&practice=1"
@@ -1064,13 +1066,13 @@
  "quests": {
   "total": 445,
   "story": 245,
-  "playable": 195,
+  "playable": 196,
   "buckets": [
    {
     "id": "playable",
     "label": "Playable",
     "note": "Offered and finishable in the remake.",
-    "count": 195
+    "count": 196
    },
    {
     "id": "job",
@@ -1088,7 +1090,7 @@
     "id": "players",
     "label": "Needed other players",
     "note": "Multiplayer races and favours between players.",
-    "count": 27
+    "count": 26
    },
    {
     "id": "retired",
@@ -2150,6 +2152,6 @@
    }
   ]
  },
- "tests": 245,
+ "tests": 246,
  "generatedAt": "2026-10-25"
 }

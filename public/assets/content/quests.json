@@ -6591,8 +6591,7 @@
     "quest": "mining_mine_rocks"
    }
   ],
-  "solo": false,
-  "soloReason": "needs_other_players"
+  "solo": true
  },
  "herbalism_get_super_harvest": {
   "classTsid": "herbalism_get_super_harvest",

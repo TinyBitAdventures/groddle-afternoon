@@ -257,7 +257,9 @@ const EXCLUDE = {
   pied_pepper: 'unreachable_in_source', zero_mood: 'unreachable_in_source', you_croaked: 'unreachable_in_source',
   // needs real other players (no local-companion stand-in exists)
   kindly_randomness: 'needs_other_players', grub_giver: 'needs_other_players', neighbor_gifts: 'needs_other_players',
-  butler_zombies: 'needs_other_players', good_neighbor: 'needs_other_players', help_mine: 'needs_other_players',
+  // help_mine (I Me Mine) left this list with G207: the local companions work rocks you can help
+  // (features/help-mine-feature.js).
+  butler_zombies: 'needs_other_players', good_neighbor: 'needs_other_players',
   water_neighbor_garden: 'needs_other_players', herbalism_plant_seeds_in_someones_garden: 'needs_other_players',
   transcendentalradiation_radiate_to_five_people: 'needs_other_players', teleportation_teleport_with_followers: 'needs_other_players',
   teleportation_make_and_hand_out_tp_scripts: 'needs_other_players', distilling_make_and_distribute_hooch: 'needs_other_players',

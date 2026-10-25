@@ -662,6 +662,7 @@ export const COUNTER_ROUTES = Object.freeze([
   { system: 'mining', counter: 'ore_crushed', event: 'ore_crushed' },
   { system: 'mining', counter: 'refined_{a}', event: 'ore_refined:{a}' },
   { system: 'mining', counter: '100_metal_smelted', event: 'metal_smelted', minAmount: 100 },
+  { system: 'help-mine', counter: 'help_mine', event: 'help_mine', note: 'mining a rock a companion is working (include/mining.js 501-505)' },
   // gardens + herbs (garden.js)
   { system: 'garden', counter: 'garden_harvest_{a}', event: 'garden_harvest:{a}' },
   { system: 'garden', counter: 'onions_harvested', event: 'garden_harvest:onion' },
@@ -783,6 +784,7 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'meditation_station_days', note: 'js/meditation-station.js, one per counted game day' },
   { event: 'hell_hole_jumped', note: 'features/hell-feature.js on arriving in Mahatam Audarika (G163)' },
   { event: 'map_destination_reached', note: 'features/map-routes-feature.js on entering a route destination (locations/location.js 310-313 map_dest_reached; G177, G192)' },
+  { event: 'help_mine', note: 'features/help-mine-feature.js when your swing lands on a rock a companion was already mining (G207)' },
   // game.js emitGameEvent (2026-10-19)
   { event: '{a}:{b}', note: 'every successful world verb and pack use' },
   { event: 'rocks_depleted:{a}' },
