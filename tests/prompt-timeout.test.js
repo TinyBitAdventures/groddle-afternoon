@@ -3,15 +3,19 @@
  * js/prompt-timeout.js, screen-fx cardPausedTimeout, the prompts that pass a
  * source timeout, toasts and activity lines under the loading card, and the
  * one-shot hell demos (helldemo=croak, helldemo=pooped).
+ * G200: the Magic Rock check held by the card, keys kept from a prompt the
+ * card hides (screen-fx cardHidesKey), and Super Pooped from the energy lost
+ * today (helldemo=superpooped).
  */
 import { describe, it, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PROMPT_ROLL_OUT_MS, armPromptTimeout, promptTimeoutMs, timeoutChoice } from '../public/js/prompt-timeout.js?v=g198-1';
-import { STREET_CARD_GONE, STREET_CARD_UP, cardPausedTimeout, streetCardUp } from '../public/js/screen-fx.js?v=g198-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-6';
+import { PROMPT_ROLL_OUT_MS, armPromptTimeout, promptTimeoutMs, timeoutChoice } from '../public/js/prompt-timeout.js?v=g200-1';
+import { STREET_CARD_GONE, STREET_CARD_UP, cardHidesKey, cardPausedTimeout, installStreetCardKeyGuard, streetCardUp } from '../public/js/screen-fx.js?v=g200-1';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-7';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-3';
 import { HELL_ENTRY_PROMPT_TIMEOUT_MS, HELL_TEXT } from '../public/js/hell.js';
 import { createQuestState } from '../public/js/quests.js';
 
@@ -315,5 +319,183 @@ describe('the hell demos run once (helldemo=croak, helldemo=pooped)', () => {
     hellFeature.onStreetEnter(engine.street, engine);
     assert.equal(engine.pc.energy, 5, 'once');
     hellFeature.restore({});
+  });
+
+  it('G200 superpooped: 20x the tank used today, so the next loss brings Super Pooped and its 10 s', (t) => {
+    t.mock.timers.enable({ apis: ['setTimeout'] });
+    hellFeature.restore({});
+    const engine = hellEngine('superpooped');
+    hellFeature.init(engine);
+    hellFeature.onStreetEnter(engine.street, engine);
+    assert.equal(engine.pc.energy, 5);
+    assert.equal(hellFeature._state().energyConsumedToday, 1999);
+    hellFeature.onTick(16, Date.now(), engine);
+    t.mock.timers.tick(0);
+    assert.equal(hellFeature._state().energyConsumedToday, 2000, 'the 1 lost counted (inc_metabolics.js 134)');
+    assert.equal(hellFeature._state().pooped?.kind, 'super_pooped');
+    assert.deepEqual(engine.log.prompts, [{ kicker: 'Energy', title: 'Super Pooped', text: HELL_TEXT.superPooped, timeoutMs: 10000 }]);
+    assert.equal(hellFeature.metabolicGate('energy', 'gain')?.msg, HELL_TEXT.superPoopedEnergyGain);
+    hellFeature.restore({});
+  });
+
+  it('G200: every loss the feature sees adds to today\'s count (20 x 99 = 1,980), gains do not', () => {
+    hellFeature.restore({});
+    const engine = hellEngine(null);
+    hellFeature.init(engine);
+    hellFeature.onStreetEnter(engine.street, engine);
+    const now = Date.now();
+    engine.pc.energy = 100;
+    hellFeature.onTick(16, now, engine);
+    // A long day of work: eat to full, spend down to 1, twenty times.
+    for (let i = 0; i < 20; i += 1) {
+      engine.pc.energy = 100;
+      hellFeature.onTick(16, now + i * 10 + 1, engine);
+      engine.pc.energy = 1; // not zero: no croak in this loop
+      hellFeature.onTick(16, now + i * 10 + 2, engine);
+    }
+    assert.equal(Math.round(hellFeature._state().energyConsumedToday), 1980);
+    assert.equal(hellFeature._state().pooped, null, 'no croak today: never Pooped (deaths_today)');
+    hellFeature.restore({});
+  });
+});
+
+describe('G200 the Magic Rock waits out the loading card, not 30 s', () => {
+  function offerEngine() {
+    const log = { busy: 0 };
+    const engine = {
+      started: true,
+      log,
+      cardUp: false,
+      pc: { level: 5, xp: 0, energy: 50, energyMax: 100 },
+      inv: {},
+      learnedSkills: [],
+      unlockedAchievements: [],
+      shrineState: {},
+      questState: createQuestState(),
+      street: { tsid: HECHEY, hubId: '56', label: 'Hechey Track' },
+      streetTsid: HECHEY,
+      param: () => null,
+      activeBuffIds: () => [],
+      streetCardUp() {
+        return this.cardUp;
+      },
+      // presentOffer's first gate: count the checks that reach it.
+      busy() {
+        log.busy += 1;
+        return true;
+      },
+      questOffersHeld: () => false,
+      questDialogueOpen: () => false,
+      setData() {},
+      updateHud() {},
+      save() {},
+      pushActivity() {},
+    };
+    return engine;
+  }
+
+  it('a check that falls under the card runs as soon as the card has gone, then every 30 s', () => {
+    const engine = offerEngine();
+    questOffersFeature.init(engine);
+    const t0 = Date.now();
+    questOffersFeature.onStreetEnter(engine.street, engine); // due 4 s after arrival
+    engine.cardUp = true;
+    questOffersFeature.onTick(16, t0 + 5000, engine);
+    assert.equal(engine.log.busy, 0, 'held, not spent under the card');
+    questOffersFeature.onTick(16, t0 + 9000, engine);
+    assert.equal(engine.log.busy, 0);
+    engine.cardUp = false;
+    questOffersFeature.onTick(16, t0 + 9100, engine);
+    assert.equal(engine.log.busy, 1, 'runs the frame the card goes');
+    questOffersFeature.onTick(16, t0 + 9200, engine);
+    questOffersFeature.onTick(16, t0 + 39000, engine);
+    assert.equal(engine.log.busy, 1, 'busy then: the source cadence again');
+    questOffersFeature.onTick(16, t0 + 39100, engine);
+    assert.equal(engine.log.busy, 2);
+  });
+
+  it('a card that comes and goes between checks changes nothing', () => {
+    const engine = offerEngine();
+    questOffersFeature.init(engine);
+    const t0 = Date.now();
+    questOffersFeature.onTick(16, t0 + 12500, engine);
+    assert.equal(engine.log.busy, 1);
+    engine.cardUp = true;
+    questOffersFeature.onTick(16, t0 + 14000, engine);
+    engine.cardUp = false;
+    questOffersFeature.onTick(16, t0 + 20000, engine);
+    assert.equal(engine.log.busy, 1, 'no check fell under it');
+    questOffersFeature.onTick(16, t0 + 42600, engine);
+    assert.equal(engine.log.busy, 2);
+  });
+
+  it('the feature reads the card through the engine', () => {
+    const feature = read(join(PUBLIC, 'js/features/quest-offers-feature.js'));
+    assert.match(feature, /const cardUp = engine\.streetCardUp\?\.\(\) === true;/);
+    assert.match(read(join(PUBLIC, 'game.js')), /streetCardUp: \(\) => streetCardUp\(\),/);
+  });
+});
+
+describe('G200 a prompt the card hides takes no keys', () => {
+  let saved = null;
+  function page({ card = true, dialogOpen = true } = {}) {
+    const root = new EventTarget();
+    root.dataset = card ? { streetCards: '1' } : {};
+    saved = { document: globalThis.document };
+    globalThis.document = {
+      documentElement: root,
+      querySelector: (sel) => (sel === '.quest-dialogue:not([hidden])' && dialogOpen ? {} : null),
+    };
+    return root;
+  }
+  afterEach(() => {
+    if (!saved) return;
+    if (saved.document === undefined) delete globalThis.document;
+    else globalThis.document = saved.document;
+    saved = null;
+  });
+  const inside = { closest: (sel) => (sel === '.quest-dialogue' ? {} : null) };
+  const outside = { closest: () => null };
+
+  it('Enter, Space and Escape stop at a hidden dialog; other keys and other times pass', () => {
+    page();
+    assert.equal(cardHidesKey({ key: 'Escape', target: outside }), true, 'Escape would close it unseen');
+    assert.equal(cardHidesKey({ key: 'Enter', target: outside }), true);
+    assert.equal(cardHidesKey({ key: ' ', target: outside }), true);
+    assert.equal(cardHidesKey({ key: 'a', target: inside }), true, 'any key from inside it');
+    assert.equal(cardHidesKey({ key: 'a', target: outside }), false);
+    page({ dialogOpen: false });
+    assert.equal(cardHidesKey({ key: 'Escape', target: outside }), false, 'no dialog: Escape is the game\'s');
+    page({ card: false });
+    assert.equal(cardHidesKey({ key: 'Enter', target: inside }), false, 'no card: the dialog answers');
+  });
+
+  it('the guard stops the key before later handlers and prevents the button press', () => {
+    page();
+    const win = new EventTarget();
+    assert.equal(installStreetCardKeyGuard(win), true);
+    assert.equal(installStreetCardKeyGuard(win), false, 'once per page');
+    let reached = 0;
+    win.addEventListener('keydown', () => reached++);
+    win.addEventListener('keyup', () => reached++);
+    const key = (type, k) => {
+      const e = new Event(type, { cancelable: true });
+      Object.defineProperty(e, 'key', { value: k });
+      win.dispatchEvent(e);
+      return e;
+    };
+    assert.equal(key('keydown', 'Escape').defaultPrevented, true);
+    assert.equal(key('keyup', ' ').defaultPrevented, true);
+    assert.equal(reached, 0);
+    assert.equal(key('keydown', 'd').defaultPrevented, false);
+    assert.equal(reached, 1, 'walking keys pass');
+    delete globalThis.document.documentElement.dataset.streetCards;
+    assert.equal(key('keydown', 'Escape').defaultPrevented, false);
+    assert.equal(reached, 2, 'after the card the dialog keys work again');
+  });
+
+  it('the game hides the same dialogs the guard covers', () => {
+    assert.match(read(join(PUBLIC, 'style.css')), /html\[data-street-cards\] \.quest-dialogue \{ visibility: hidden; \}/);
+    assert.match(read(join(PUBLIC, 'js/screen-fx.js')), /\n\/\/ game\.js imports this module before any feature registers a key handler\.\ninstallStreetCardKeyGuard\(\);/);
   });
 });

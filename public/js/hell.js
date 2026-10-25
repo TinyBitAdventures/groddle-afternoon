@@ -40,6 +40,7 @@
  *   visitId, hellVisits, grapesSquished, squishedGrapeIds[], resurrectLocation,
  *   previousMapPath, graveMarker, deathRecognized, lastLowEnergyWarningAt,
  *   pooped: null | { kind, appliedAt, expiresAt }, dontGetPooped,
+ *   energyConsumedToday, energyConsumedDayKey,
  *   narakaStreetsVisited[], hellWarningShown
  * }
  */
@@ -541,6 +542,9 @@ export function normalizeHellState(saved = {}) {
     lastLowEnergyWarningAt: num(s.lastLowEnergyWarningAt),
     pooped,
     dontGetPooped: s.dontGetPooped === true,
+    // daily_history 'energy_consumed' (inc_metabolics.js 134), for Super Pooped (G200).
+    energyConsumedToday: Math.max(0, num(s.energyConsumedToday)),
+    energyConsumedDayKey: typeof s.energyConsumedDayKey === 'string' ? s.energyConsumedDayKey : '',
     narakaStreetsVisited: Array.isArray(s.narakaStreetsVisited)
       ? [...new Set(s.narakaStreetsVisited.map(streetKey).filter((k) => NARAKA_KEYS.has(k)))]
       : [],
@@ -1017,9 +1021,35 @@ export function isPooped(state, now = Date.now()) {
 }
 
 /**
+ * Energy lost today (G200). inc_metabolics.js metabolics_lose_energy 124-134:
+ * every loss adds what apiDec took to the day's `energy_consumed`
+ * (daily_history_increment('energy_consumed', change * -1); apiDec returns the
+ * negative change, so the count is positive, and inc_stats.js 658 and
+ * player.js 914 flip it back for energy_spent_today). A dead player loses
+ * nothing (the is_dead return at 118-123 comes before the increment). The
+ * count is per game day (current_day_key()), so it starts again at 0.
+ */
+export function noteEnergyConsumed(state, amount, now = Date.now()) {
+  const s = normalizeHellState(state);
+  const lost = num(amount);
+  if (!(lost > 0) || s.isDead) return s;
+  const today = dayKey(now);
+  const before = s.energyConsumedDayKey === today ? s.energyConsumedToday : 0;
+  return { ...s, energyConsumedToday: before + lost, energyConsumedDayKey: today };
+}
+
+/** daily_history_get(current_day_key(), 'energy_consumed'): today's count, 0 on a new game day. */
+export function energyConsumedTodayFor(state, now = Date.now()) {
+  const s = normalizeHellState(state);
+  return s.energyConsumedDayKey && s.energyConsumedDayKey === dayKey(now) ? s.energyConsumedToday : 0;
+}
+
+/**
  * inc_metabolics.js after an energy loss: alive, already croaked today,
  * energy <= 5% and not protected by Wine of the Dead. Super Pooped when
- * today's consumed energy reaches 20x max.
+ * today's consumed energy reaches 20x max (inc_metabolics.js 149-152).
+ * `opts.energyConsumedToday` overrides the count kept in the state
+ * (noteEnergyConsumed); without it the state's own count for today is used.
  * @param {{ energyConsumedToday?: number }} [opts]
  */
 export function checkPooped(state, pc = {}, now = Date.now(), opts = {}) {
@@ -1029,7 +1059,7 @@ export function checkPooped(state, pc = {}, now = Date.now(), opts = {}) {
   if (energyPercent(pc) > POOPED_ENERGY_PERCENT) return none;
   const current = isPooped(s, now);
   const expiresAt = nextGameDayStart(now);
-  const consumed = num(opts.energyConsumedToday);
+  const consumed = opts.energyConsumedToday != null ? num(opts.energyConsumedToday) : energyConsumedTodayFor(s, now);
   if (consumed >= energyMaxOf(pc) * SUPER_POOPED_CONSUMED_MULTIPLIER && current !== 'super_pooped') {
     return {
       state: { ...s, pooped: { kind: 'super_pooped', appliedAt: now, expiresAt } },

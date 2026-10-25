@@ -18,7 +18,7 @@ import {
   slashWords,
   unknownLine,
 } from '../public/js/slash-commands.js?v=g160-1';
-import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=g160-1';
+import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=g200-1';
 import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=g155-1';
 import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-4';
 import { BUTLER_STRINGS } from '../public/js/butler.js?v=butler-5';

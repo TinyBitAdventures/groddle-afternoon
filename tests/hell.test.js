@@ -33,6 +33,7 @@ import {
   croak,
   deathsTodayFor,
   drinkWineOfTheDead,
+  energyConsumedTodayFor,
   enforceHellOnEnter,
   ensureHellItems,
   graveMarkerPhase,
@@ -46,6 +47,7 @@ import {
   isInHellOne,
   metabolicGate,
   normalizeHellState,
+  noteEnergyConsumed,
   noteNarakaVisit,
   onEnergyGained,
   planHellGrapes,
@@ -59,7 +61,7 @@ import {
   wineDrinkConditions,
 } from '../public/js/hell.js';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-4';
-import { GAME_DAY_MS, getGameDayStartMs } from '../public/js/game-day.js?v=dametime-1';
+import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../public/js/game-day.js?v=dametime-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import {
   applyAchievementProgress,
@@ -343,6 +345,45 @@ describe('croak to resurrect lifecycle', () => {
     const tomorrow = hellNewDay(superPoop.state, pc(0), DAY1);
     assert.equal(tomorrow.state.pooped, null);
     assert.equal(shouldCroak(pc(0), tomorrow.state, { streetTsid: STREET.streetTsid, now: DAY1 }), true);
+  });
+
+  it('G200: energy lost today counts toward Super Pooped (inc_metabolics.js 134, 149)', () => {
+    const gsjs = join(here, '../../glitch-GameServerJS/players/inc_metabolics.js');
+    if (existsSync(gsjs)) {
+      const src = readFileSync(gsjs, 'utf8');
+      assert.match(src, /var change = this\.metabolics\.energy\.apiDec\(x\);[\s\S]{0,200}this\.daily_history_increment\('energy_consumed', change \* -1\);/);
+      assert.match(src, /if \(this\.daily_history_get\(current_day_key\(\), 'energy_consumed'\) >= this\.metabolics\.energy\.top \* 20 && !this\.buffs_has\('super_pooped'\)\)\{\s*if \(this\.buffs_has\('pooped'\)\) this\.buffs_remove\('pooped'\);\s*this\.buffs_apply\('super_pooped'/);
+    }
+    // The count: per game day, only real losses, never while dead, kept through a save.
+    let s = createHellState();
+    assert.equal(energyConsumedTodayFor(s, DAY0), 0);
+    s = noteEnergyConsumed(s, 120, DAY0);
+    s = noteEnergyConsumed(s, 0.5, DAY0 + 1000);
+    s = noteEnergyConsumed(s, -40, DAY0 + 2000);
+    s = noteEnergyConsumed(s, 'x', DAY0 + 2000);
+    assert.equal(energyConsumedTodayFor(s, DAY0 + 3000), 120.5);
+    assert.equal(energyConsumedTodayFor(normalizeHellState(JSON.parse(JSON.stringify(s))), DAY0), 120.5, 'saved');
+    assert.equal(energyConsumedTodayFor(s, DAY1), 0, 'a new game day starts at 0');
+    assert.equal(energyConsumedTodayFor(noteEnergyConsumed(s, 30, DAY1), DAY1), 30);
+    assert.equal(noteEnergyConsumed(croaked().state, 50, DAY0).energyConsumedToday, 0, 'the dead lose nothing');
+
+    // Croaked today and at 5%: Pooped below 20x the tank, Super Pooped at it.
+    const alive = resurrect(squishMany(croaked().state, 11), pc(), DAY0).state;
+    const under = noteEnergyConsumed(alive, 1999, DAY0);
+    assert.equal(checkPooped(under, pc(5), DAY0 + 1000).applied, 'pooped');
+    const at = noteEnergyConsumed(under, 1, DAY0);
+    const sup = checkPooped(at, pc(5), DAY0 + 1000);
+    assert.equal(sup.applied, 'super_pooped', 'the state count is used when no override is given');
+    assert.deepEqual(sup.effects.find((e) => e.type === 'prompt'), { type: 'prompt', text: HELL_TEXT.superPooped, timeoutMs: 10000, choices: [{ value: 'ok', label: 'OK' }] });
+    // Already Pooped: it upgrades and Pooped goes (buffs_remove('pooped')).
+    const pooped = checkPooped(under, pc(5), DAY0 + 1000).state;
+    const upgrade = checkPooped(noteEnergyConsumed(pooped, 1, DAY0), pc(4), DAY0 + 2000);
+    assert.equal(upgrade.applied, 'super_pooped');
+    assert.deepEqual(upgrade.effects[0], { type: 'remove_buff', buff: 'pooped' });
+    // A bigger tank needs more: 20x energyMax.
+    assert.equal(checkPooped(at, { ...pc(5), energyMax: 150 }, DAY0 + 1000).applied, 'pooped');
+    // Yesterday's count does not carry over.
+    assert.equal(checkPooped({ ...at, deathsToday: 1, deathsDayKey: getGameDayKey(DAY1) }, pc(5), DAY1).applied, 'pooped');
   });
 
   it('resurrects at 5% energy when Pooped, and caps mood at half', () => {

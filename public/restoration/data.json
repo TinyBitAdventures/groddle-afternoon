@@ -2006,9 +2006,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 427,
+  "commits": 428,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Chickens, piggies, trees, rocks, patches and shrines tell their stories, and the spirits' first talks wait on the shrines for real"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2123,11 +2128,6 @@
     "date": "2026-10-24",
     "kind": "new",
     "text": "A companion mourning your grave brings a Diabolical Drink Ticket and the Beelzebooze chain"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "Icons for 236 more catalog items, from Tiny Speck's own art"
    }
   ]
  },

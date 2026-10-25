@@ -12,7 +12,10 @@
  * street's doors and the Hell Bar can be walked as the dead walk them;
  * &helldemo=pooped counts a croak for today and leaves you at 5% energy, so
  * the next energy loss brings the Pooped prompt (catalog_buffs.js 1689-1713)
- * without a trip to Naraka. Each demo runs once per page load, on the first
+ * without a trip to Naraka; &helldemo=superpooped does the same with today's
+ * energy consumed one short of 20x your tank, so that loss brings Super
+ * Pooped instead (inc_metabolics.js 149-152, catalog_buffs.js 2619-2647).
+ * Each demo runs once per page load, on the first
  * street (G198: croak used to zero your energy on every street, so a
  * resurrected avatar arrived at 0 and went Pooped at once).
  */
@@ -27,6 +30,8 @@ import {
   checkLowEnergyWarning,
   checkPooped,
   createHellState,
+  energyConsumedTodayFor,
+  noteEnergyConsumed,
   croak,
   drinkWineOfTheDead,
   enforceHellOnEnter,
@@ -53,6 +58,7 @@ import {
   squishGrape,
   wineDrinkConditions,
   POOPED_ENERGY_PERCENT,
+  SUPER_POOPED_CONSUMED_MULTIPLIER,
 } from '../hell.js';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
@@ -91,6 +97,7 @@ function publish(engine) {
   engine.setData('hellGrapesOnGround', String(grapeTargets.length));
   engine.setData('hellDeaths', String(state.totalDeaths));
   engine.setData('hellPooped', state.pooped?.kind || '');
+  engine.setData('hellEnergyConsumed', String(Math.round(energyConsumedTodayFor(state, Date.now()))));
 }
 
 /**
@@ -302,11 +309,13 @@ function demoSetup(engine) {
   demoRan = true;
   if (demo === 'croak') {
     engine.pc.energy = 0;
-  } else if (demo === 'pooped' && !state.isDead) {
+  } else if ((demo === 'pooped' || demo === 'superpooped') && !state.isDead) {
     // checkPooped (inc_metabolics.js): alive, croaked today, energy at or under 5%, then a loss.
     const now = Date.now();
-    state = normalizeHellState({ ...state, deathsToday: Math.max(1, Number(state.deathsToday) || 0), deathsDayKey: getGameDayKey(now), pooped: null, dontGetPooped: false });
     const max = Math.max(1, Number(engine.pc.energyMax) || 100);
+    // superpooped: today's energy_consumed one short of top * 20 (inc_metabolics.js 149), so the 1 lost next reaches it.
+    const consumed = demo === 'superpooped' ? max * SUPER_POOPED_CONSUMED_MULTIPLIER - 1 : energyConsumedTodayFor(state, now);
+    state = normalizeHellState({ ...state, deathsToday: Math.max(1, Number(state.deathsToday) || 0), deathsDayKey: getGameDayKey(now), pooped: null, dontGetPooped: false, energyConsumedToday: consumed, energyConsumedDayKey: getGameDayKey(now) });
     engine.pc.energy = Math.max(1, Math.floor((max * POOPED_ENERGY_PERCENT) / 100));
     lastEnergy = engine.pc.energy + 1;
     engine.updateHud?.();
@@ -454,10 +463,12 @@ export const hellFeature = {
       state = gained.state;
     }
     if (lastEnergy != null && energy < lastEnergy) {
+      // metabolics_lose_energy 134: the loss counts toward today's energy_consumed (G200: Super Pooped).
+      state = noteEnergyConsumed(state, lastEnergy - energy, now);
       const warning = checkLowEnergyWarning(state, engine.pc, now);
       state = warning.state;
       applyEffects(warning.effects, engine);
-      const pooped = checkPooped(state, engine.pc, now);
+      const pooped = checkPooped(state, engine.pc, now, { energyConsumedToday: energyConsumedTodayFor(state, now) });
       if (pooped.applied) {
         state = pooped.state;
         applyEffects(pooped.effects, engine);

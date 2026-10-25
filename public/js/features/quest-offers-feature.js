@@ -9,6 +9,13 @@
  * their end NPC is one the world spawns: vendor-npcs-feature.js). Story
  * and starter quests keep their own progress path (managedOnly routing).
  *
+ * A check that falls while a street loading card is up does not count: it
+ * waits and runs again as soon as the card has gone (G200). Before, busy()
+ * (the card is a blocking screen) spent it and the next check came 30 s
+ * later, so an offer due on arrival waited up to a full 30 s after the card
+ * (QA 23.6 s). The client held quest conversations under the card and showed
+ * them once it had gone (QuestsDialog.as onEmergencyTick 338, G192).
+ *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=now offers the first
  * pending quest immediately; &questofferautoplay=accept accepts it. Other QA
  * routes (any *demo or *autoplay param) get no offers; ?questoffer=off
@@ -37,6 +44,8 @@ const SYNC_MS = 1_000;
 let nextOfferCheckAt = 0;
 let nextSyncAt = 0;
 let offerOpen = false;
+/** A check fell while a street loading card was up: run it once the card has gone (G200). */
+let heldByCard = false;
 /** Offers are suppressed on QA routes and with ?questoffer=off. */
 let quiet = false;
 /** Pack counts at the last sync, for `in_inventory:<item>` gain events. */
@@ -141,6 +150,7 @@ export const questOffersFeature = {
     const mode = engine.param('questoffer');
     quiet = mode === 'off' || (qaRoute && mode !== 'now');
     nextOfferCheckAt = Date.now() + (engine.param('questoffer') === 'now' ? 1_500 : 12_000);
+    heldByCard = false;
   },
 
   onStreetEnter(street, engine) {
@@ -182,9 +192,16 @@ export const questOffersFeature = {
       if (sync.advanced?.length) engine.updateHud();
       finish(sync.completable, engine);
     }
-    if (!quiet && now >= nextOfferCheckAt) {
+    if (quiet) return;
+    const cardUp = engine.streetCardUp?.() === true;
+    if (heldByCard && !cardUp) {
+      heldByCard = false;
+      nextOfferCheckAt = Math.min(nextOfferCheckAt, now);
+    }
+    if (now >= nextOfferCheckAt) {
       nextOfferCheckAt = now + OFFER_CHECK_MS;
-      presentOffer(engine, now);
+      if (cardUp) heldByCard = true;
+      else presentOffer(engine, now);
     }
   },
 };

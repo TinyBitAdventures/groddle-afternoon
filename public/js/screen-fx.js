@@ -131,6 +131,55 @@ export function cardPausedTimeout(fn, ms) {
 }
 
 /**
+ * Prompts and dialogs the card gate hides (style.css `html[data-street-cards]
+ * .quest-dialogue`): the main quest dialogue and the feature modals that
+ * share its class (qi-dialogue, party, Rube, drops).
+ */
+export const CARD_GATED_DIALOGS = '.quest-dialogue';
+/** Keys a dialog answers: Enter/Space press its button, Escape closes it. */
+const CARD_DIALOG_KEYS = new Set(['Enter', ' ', 'Spacebar', 'Escape']);
+
+/**
+ * G200: should this key event be kept from a prompt the card hides? The
+ * client hid prompts while you moved (PromptView.as refresh 420) and they
+ * took no input; here the card only makes them invisible (visibility:
+ * hidden), so Escape still closed one unseen (game.js closeQuestDialogue,
+ * an offer read as "Not right now") and Enter/Space on a button left focused
+ * inside one would answer it. True while a card is up and either the event
+ * comes from inside a gated dialog, or it is a dialog key and one is open.
+ */
+export function cardHidesKey(event, doc = globalThis.document) {
+  if (!streetCardUp()) return false;
+  if (event?.target?.closest?.(CARD_GATED_DIALOGS)) return true;
+  if (!CARD_DIALOG_KEYS.has(event?.key)) return false;
+  return Boolean(doc?.querySelector?.(`${CARD_GATED_DIALOGS}:not([hidden])`));
+}
+
+const KEY_GUARD = Symbol.for('groddle.streetCardKeyGuard');
+
+/**
+ * Installs cardHidesKey on `target` (window) once, in the capture phase,
+ * ahead of the game's and the features' key handlers: keydown, keypress and
+ * keyup (Space presses a button on keyup) are stopped and their default
+ * (the button press) prevented. Once per page, whichever ?v= copy of this
+ * module loads first. Returns true when it installed.
+ */
+export function installStreetCardKeyGuard(target = globalThis.window) {
+  if (!target?.addEventListener || target[KEY_GUARD]) return false;
+  const guard = (event) => {
+    if (!cardHidesKey(event)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  };
+  for (const type of ['keydown', 'keypress', 'keyup']) target.addEventListener(type, guard, true);
+  target[KEY_GUARD] = guard;
+  return true;
+}
+
+// game.js imports this module before any feature registers a key handler.
+installStreetCardKeyGuard();
+
+/**
  * @param {number} ms
  * @returns {Promise<void>}
  */

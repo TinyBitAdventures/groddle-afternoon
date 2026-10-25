@@ -28,9 +28,9 @@ import {
   routeStep,
   signpostToward,
 } from '../public/js/map-routes.js?v=g198-1';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=g198-1';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g177-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-6';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=g200-1';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g200-1';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-7';
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { applyStreetIndex } from '../public/js/street-loader.js';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
@@ -40,7 +40,7 @@ import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js';
 import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=g198-1';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g198-1';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g200-1';
 import { addItem } from '../public/js/inventory.js?v=catalog-unified-4';
 import { resurrect } from '../public/js/hell.js';
 
@@ -337,7 +337,7 @@ describe('the feature', () => {
 
   it('is registered in features/index.js under its cache key', () => {
     const index = read(join(PUBLIC, 'js/features/index.js'));
-    assert.match(index, /map-routes-feature\.js\?v=g198-1'; FEATURES\.push\(mapRoutesFeature\);$/m);
+    assert.match(index, /map-routes-feature\.js\?v=g200-1'; FEATURES\.push\(mapRoutesFeature\);$/m);
   });
 
   it('Beelzebooze accepted: the ticket, the prompt and the route to Panka Surazu', () => {
@@ -1015,6 +1015,78 @@ describe('G198 the door glow follows the door art', () => {
     assert.deepEqual(glow.rect, { x: -178, y: -301, w: 356, h: 304 });
     assert.equal(glow.filled, undefined, 'no fill');
     assert.equal(glow.stroked.color, ROUTE_COLOR);
+    mapRoutesFeature._reset();
+  });
+
+  /** A world with real child order: bgLayer, then entityLayer (game.js world.addChild(bgLayer, entityLayer, fxLayer)). */
+  class FakeWorld extends FakeContainer {
+    addChildAt(c, i) {
+      c.parent?.removeChild?.(c);
+      this.children.splice(i, 0, c);
+      c.parent = this;
+      return c;
+    }
+    getChildIndex(c) {
+      return this.children.indexOf(c);
+    }
+  }
+
+  function tintedPanka() {
+    const world = new FakeWorld();
+    const bgLayer = world.addChild(new FakeContainer());
+    const PIXI = { ...FAKE_PIXI, Sprite: FakeSprite, ColorMatrixFilter: FakeColorMatrix };
+    const engine = fakeEngine();
+    engine.PIXI = PIXI;
+    engine.entityLayer = world.addChild(new FakeContainer());
+    // Naraka's middleground matrix on the entity plane (game.js enterStreet).
+    engine.entityLayer.filters = [new FakeColorMatrix()];
+    const fx = world.addChild(new FakeContainer());
+    engine.streetTsid = PANKA;
+    engine.street = { tsid: PANKA, hubId: '40', label: 'Panka Surazu', bounds: { l: 0, t: 0 } };
+    const door = streetJson(PANKA).doors[0];
+    const sprite = new FakeSprite({ id: 'door_asset_hell_bar_entrance_01a' });
+    engine.entityLayer.addChild(sprite);
+    Object.assign(sprite, { x: door.x, y: door.y, zIndex: 3, width: door.w, height: door.h });
+    sprite.anchor.set(0.5, 1);
+    engine.interactables = [{ classId: 'street_door', featureId: 'doors', door, sprite }];
+    mapRoutesFeature._reset();
+    mapRoutesFeature._setGraph(GRAPH_JSON);
+    mapRoutesFeature.mapRoute('set', { to: HELL_BAR, source: 'player' }, engine);
+    mapRoutesFeature.onStreetEnter(engine.street, engine);
+    return { world, bgLayer, fx, engine, door, sprite, glow: mapRoutesFeature._highlight()?.glow };
+  }
+
+  it('G200: the door glow sits out of the street tint, under the entity plane, so it reads 0xf0f258 on Naraka', () => {
+    const { world, bgLayer, fx, engine, door, glow } = tintedPanka();
+    const layer = mapRoutesFeature._glowLayer();
+    assert.equal(glow.parent, layer);
+    assert.equal(layer.parent, world);
+    assert.equal(layer.filters, undefined, 'no colour matrix on its way to the screen');
+    assert.deepEqual(world.children, [bgLayer, layer, engine.entityLayer, fx], 'above the street, below the door art');
+    assert.equal(engine.data.routeGlowLayer, 'untinted');
+    // Same place as before, in the same space as the door art.
+    assert.equal(glow.x, door.x);
+    assert.ok(Math.abs(glow.y - (door.y + 7 * 0.25)) < 0.01);
+    // The halo's alpha is lifted after the blur, its colour left alone.
+    const [flat, blur, gain] = glow.filters;
+    assert.ok(flat instanceof FakeColorMatrix && blur && gain instanceof FakeColorMatrix);
+    assert.deepEqual(gain.matrix, [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1.75, 0]);
+    // A new street: the old glow leaves the layer, and the layer stays under the entity plane.
+    mapRoutesFeature.onStreetClear(engine);
+    assert.equal(layer.children.length, 0);
+    assert.equal(glow.destroyed, true);
+    world.addChildAt(bgLayer, 0);
+    assert.equal(world.getChildIndex(layer) + 1, world.getChildIndex(engine.entityLayer));
+    mapRoutesFeature._reset();
+  });
+
+  it('G200: a world rebuilt around a new entity plane takes the layer with it', () => {
+    tintedPanka();
+    const first = mapRoutesFeature._glowLayer();
+    const again = tintedPanka();
+    assert.equal(mapRoutesFeature._glowLayer(), first, 'one layer, moved');
+    assert.equal(first.parent, again.world);
+    assert.deepEqual(again.world.children, [again.bgLayer, first, again.engine.entityLayer, again.fx]);
     mapRoutesFeature._reset();
   });
 });

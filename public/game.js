@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-73';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-74';
 import {
   actionDurationFor,
   createTimedAction,
@@ -634,8 +634,8 @@ import {
   afterStreetCard,
   streetCardUp,
   cardPausedTimeout,
-} from './js/screen-fx.js?v=g198-1';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g198-1';
+} from './js/screen-fx.js?v=g200-1';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g200-1';
 import {
   planTravel,
   listMapDestinations,

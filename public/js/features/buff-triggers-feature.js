@@ -60,8 +60,8 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=g137-1';
 import { meditationFeature } from './meditation-feature.js?v=g148-1';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-2';
 import { rookAttackFeature } from './rook-attack-feature.js?v=g148-1';
-import { rubeFeature } from './rube-feature.js?v=rube-1';
-import { smugglingFeature } from './smuggling-feature.js?v=g198-1';
+import { rubeFeature } from './rube-feature.js?v=rube-2';
+import { smugglingFeature } from './smuggling-feature.js?v=g200-1';
 
 export const BUFF_TRIGGERS_FEATURE_ID = 'buff-triggers';
 

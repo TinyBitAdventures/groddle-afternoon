@@ -41,11 +41,12 @@
  * routeWalk, routeReached, routeCleared, routeMapLines, routeMapExit,
  * routeMapPin, routeMode, routeRooms (the rooms behind doors listed for the
  * Map's hub while "Set a destination" is on, G198), routeDoorGlow
- * (edge|outline:<w>x<h>, G198).
+ * (edge|outline:<w>x<h>, G198), routeGlowLayer (untinted|with-door: where
+ * the door glow sits, G200).
  */
 
 import { STREET_INDEX } from '../street-loader.js';
-import { hellFeature } from './hell-feature.js?v=hell-6';
+import { hellFeature } from './hell-feature.js?v=hell-7';
 import {
   ROUTE_COLOR,
   ROUTE_COLOR_CSS,
@@ -211,9 +212,50 @@ function placeHighlight(engine, next) {
   placeDoorGlow(engine, next, key);
 }
 
+/** The unfiltered container the door glow sits in (G200, routeGlowLayer). */
+let glowLayer = null;
+
+/**
+ * G200: entityLayer carries the street's middleground colour matrix (game.js
+ * enterStreet sets bgLayer.middlegroundMatrix on it, street-render.js
+ * glitchLayerMatrix), so a glow drawn there took the street's colour: on
+ * Naraka's red the 0xf0f258 halo round the Hell Bar door read orange. The
+ * glow goes in its own unfiltered container in the world instead, directly
+ * under entityLayer: above every street layer, below the door art and the
+ * rest of the entity plane, so the art still covers its middle and only the
+ * halo shows. Signpost glows need nothing: signposts sit in the street root,
+ * outside the tinted layers. Null when entityLayer has no parent (tests):
+ * the glow then goes beside the door art, as before.
+ */
+function routeGlowLayer(engine) {
+  const ents = engine.entityLayer;
+  const world = ents?.parent;
+  const { PIXI } = engine;
+  if (!world || !PIXI?.Container || typeof world.getChildIndex !== 'function') return null;
+  if (!glowLayer || glowLayer.destroyed) {
+    glowLayer = new PIXI.Container();
+    glowLayer.label = 'route-glow-layer';
+    glowLayer.eventMode = 'none';
+  }
+  if (glowLayer.parent !== world || world.getChildIndex(glowLayer) !== world.getChildIndex(ents) - 1) {
+    glowLayer.parent?.removeChild(glowLayer);
+    world.addChildAt(glowLayer, world.getChildIndex(ents));
+  }
+  // Same space as the door art: entityLayer sits at the world origin, but follow it if it moves.
+  glowLayer.x = Number(ents.x) || 0;
+  glowLayer.y = Number(ents.y) || 0;
+  return glowLayer;
+}
+
 /** The door glow's reach past the art's edge, in world px (G198). */
 const DOOR_GLOW_PAD = 7;
 const DOOR_GLOW_BLUR = 6;
+/**
+ * G200: alpha gain after the blur. Out of the tint, the blurred halo's own
+ * alpha (about 0.3 a few px out) over Naraka's dark red read olive, not the
+ * route colour; the street tint had been brightening it. Colour unchanged.
+ */
+const DOOR_GLOW_GAIN = 1.75;
 
 /**
  * G198: the door glows along its own edges. Before, a filled 0xf0f258 box the
@@ -232,7 +274,9 @@ function doorEdgeGlow(PIXI, sprite, w, h) {
     const c = [(ROUTE_COLOR >> 16) & 255, (ROUTE_COLOR >> 8) & 255, ROUTE_COLOR & 255].map((v) => v / 255);
     // Every pixel the route colour, alpha kept (Pixi's offsets are 0-1, street-render.js 401).
     flat.matrix = [0, 0, 0, 0, c[0], 0, 0, 0, 0, c[1], 0, 0, 0, 0, c[2], 0, 0, 0, 1, 0];
-    glow.filters = [flat, new PIXI.BlurFilter({ strength: DOOR_GLOW_BLUR, quality: 3 })];
+    const gain = new PIXI.ColorMatrixFilter();
+    gain.matrix = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, DOOR_GLOW_GAIN, 0];
+    glow.filters = [flat, new PIXI.BlurFilter({ strength: DOOR_GLOW_BLUR, quality: 3 }), gain];
     return glow;
   }
   const glow = new PIXI.Graphics();
@@ -269,9 +313,12 @@ function placeDoorGlow(engine, next, key) {
   const glow = doorEdgeGlow(PIXI, sprite, w, h);
   glow.x = sprite.x;
   glow.y = sprite.y;
-  // Just behind the door art (doors-feature DOOR_Z 3).
+  // Just behind the door art (doors-feature DOOR_Z 3): under the whole entity plane, untinted (G200),
+  // or beside the art when there is no world to hold the layer.
   glow.zIndex = (Number(sprite.zIndex) || 3) - 0.5;
-  (sprite.parent || engine.entityLayer).addChild(glow);
+  const layer = sprite.parent === engine.entityLayer ? routeGlowLayer(engine) : null;
+  (layer || sprite.parent || engine.entityLayer).addChild(glow);
+  engine.setData?.('routeGlowLayer', layer ? 'untinted' : 'with-door');
   highlight = { kind: 'door', view: sprite, glow, key, target, door, x: sprite.x, y: sprite.y - h / 2, w, h };
   syncDoorGlow(highlight);
   engine.setData?.('routeDoorGlow', `${glow.texture ? 'edge' : 'outline'}:${Math.round(w)}x${Math.round(h)}`);
@@ -884,7 +931,8 @@ export const mapRoutesFeature = {
 
   onStreetEnter(_street, engine) {
     stopWalk(engine);
-    highlight = null;
+    // The glow layer outlives the street (G200): a glow left there goes now.
+    clearHighlight();
     auto = { at: 0, key: '' };
     demoSetup(engine);
     const apply = () => {
@@ -906,7 +954,8 @@ export const mapRoutesFeature = {
 
   onStreetClear(engine) {
     stopWalk(engine);
-    highlight = null;
+    // The glow layer outlives the street (G200): take the glow out of it.
+    clearHighlight();
   },
 
   onTick(_dtMs, now, engine) {
@@ -950,7 +999,7 @@ export const mapRoutesFeature = {
   _reset() {
     state = createRouteState();
     walk = null;
-    highlight = null;
+    clearHighlight();
     gps = null;
     lastDead = null;
     pickMode = false;
@@ -989,6 +1038,9 @@ export const mapRoutesFeature = {
   },
   _highlight() {
     return highlight;
+  },
+  _glowLayer() {
+    return glowLayer;
   },
   _walk() {
     return walk;
