@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-66';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-67';
 import {
   actionDurationFor,
   createTimedAction,
@@ -8558,6 +8558,9 @@ function refreshDroppedWorldItems() {
  * tag.
  */
 function packDropBlockReason(classTsid) {
+  // A feature's own drop conditions (game_box.js verbs.drop while it plays).
+  const featureReason = features.query('packDropBlockReason', classTsid, engine);
+  if (featureReason) return featureReason;
   const tags = ITEM_CATALOG[classTsid]?.tags || [];
   if (tags.includes('quest-item')) return "This item is needed for a quest and can't be dropped.";
   if (tags.includes('no_drop')) return "This item can't be dropped.";

@@ -115,3 +115,4 @@ import { hellTicketsFeature } from './hell-tickets-feature.js?v=g177-1'; FEATURE
 import { packTreeVerbsFeature } from './pack-tree-verbs-feature.js?v=g165-1'; FEATURES.push(packTreeVerbsFeature);
 import { streetSpiritsFeature } from './street-spirits-feature.js?v=g185-1'; FEATURES.push(streetSpiritsFeature);
 import { mapRoutesFeature } from './map-routes-feature.js?v=g177-1'; FEATURES.push(mapRoutesFeature);
+import { swfFeature } from './swf-feature.js?v=g190-1'; FEATURES.push(swfFeature);

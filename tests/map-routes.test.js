@@ -328,9 +328,9 @@ describe('the feature', () => {
     hellFeature.restore({});
   });
 
-  it('is registered last in features/index.js under its cache key', () => {
+  it('is registered in features/index.js under its cache key', () => {
     const index = read(join(PUBLIC, 'js/features/index.js'));
-    assert.match(index.trim().split('\n').at(-1), /map-routes-feature\.js\?v=g177-1'; FEATURES\.push\(mapRoutesFeature\);$/);
+    assert.match(index, /map-routes-feature\.js\?v=g177-1'; FEATURES\.push\(mapRoutesFeature\);$/m);
   });
 
   it('Beelzebooze accepted: the ticket, the prompt and the route to Panka Surazu', () => {
