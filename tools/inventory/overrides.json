@@ -1221,5 +1221,30 @@
   "status": "source",
   "reason": "Sold by the race ticket dispenser and rolled by the generic Race Ticket (races.js HOG_HAUL_TICKET) (G155)",
   "register": "G155"
+ },
+ "item:artifact_butterlfy_hair_clip_piece1": {
+  "status": "excluded",
+  "reason": "typo duplicate of artifact_butterfly_hair_clip_piece1: referenced only by its own file (2012-09-20); drop tables, inc_artifacts.js:5-8 and catalog_tags.js use the real class (G174)",
+  "register": "G174"
+ },
+ "item:artifact_butterlfy_hair_clip_piece2": {
+  "status": "excluded",
+  "reason": "typo duplicate of artifact_butterfly_hair_clip_piece2: referenced only by its own file (2012-09-20); drop tables, inc_artifacts.js:5-8 and catalog_tags.js use the real class (G174)",
+  "register": "G174"
+ },
+ "item:artifact_butterlfy_hair_clip_piece3": {
+  "status": "excluded",
+  "reason": "typo duplicate of artifact_butterfly_hair_clip_piece3: referenced only by its own file (2012-09-20); drop tables, inc_artifacts.js:5-8 and catalog_tags.js use the real class (G174)",
+  "register": "G174"
+ },
+ "item:artifact_butterlfy_hair_clip_piece4": {
+  "status": "excluded",
+  "reason": "typo duplicate of artifact_butterfly_hair_clip_piece4: referenced only by its own file (2012-09-20); drop tables, inc_artifacts.js:5-8 and catalog_tags.js use the real class (G174)",
+  "register": "G174"
+ },
+ "item:million_craant_trophy": {
+  "status": "excluded",
+  "reason": "typo duplicate of million_currant_trophy (2012-08-02), referenced nowhere; the real class is used across catalog_tags.js (G174)",
+  "register": "G174"
  }
 }

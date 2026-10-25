@@ -1958,8 +1958,8 @@
   "skipped": 22
  },
  "icons": {
-  "items": 792,
-  "sharp": 781
+  "items": 1028,
+  "sharp": 1017
  },
  "imagination": {
   "total": 275,
@@ -2103,6 +2103,6 @@
    }
   ]
  },
- "tests": 225,
+ "tests": 226,
  "generatedAt": "2026-10-24"
 }
