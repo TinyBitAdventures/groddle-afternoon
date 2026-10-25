@@ -165,13 +165,29 @@ import {
   yardStyleChoices,
   yardStyleFor,
 } from '../home-styles.js?v=g135-1';
-import { textureFromUrl } from '../textures.js';
+import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import {
+  cultivateLandCheck,
+  cultivationModeEnded,
+  normalizeRockFlags,
+  readHowto,
+  rockVerbs,
+  ROCK_VERB_IDS,
+} from '../magic-rock-home.js?v=g226-1';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
 /** The house (and its back yard); js/homes.js HOME_INTERIOR_TSID. */
 const HOME_INTERIOR_TSID = 'RH_HOME_INT';
+/**
+ * G226: stacks dropped on a Tower floor keep their own key per floor. They
+ * used to share the house's RH_HOME_INT, so they showed in the house and on
+ * every floor and moved with the house when the back yard grew. In the source
+ * the Tower is its own location (home.js 44-46 counts trophies on the street
+ * and in the house only).
+ */
+const TOWER_DROP_PREFIX = 'RH_HOME_TOWER_';
 const VIEW_W = 960;
 const VIEW_H = 540;
 const DECO = 'assets/decos/groddle/';
@@ -324,6 +340,23 @@ export function shiftInteriorRows(rows, dx) {
   return moved;
 }
 
+/** G226: the dropped-stack key of Tower floor `floor` (0 is the ground floor). */
+export function towerDropTsid(floor) {
+  return `${TOWER_DROP_PREFIX}${Math.max(0, Math.floor(Number(floor) || 0))}`;
+}
+
+/**
+ * G226: the x-bearing rows Animal Husbandry keeps for one street (Guano and
+ * Plop piles, yard animals, Magic Sticks, collectors, starved-piggy drops)
+ * moved by `dx`. Pure; returns how many rows moved.
+ */
+export function shiftHusbandryRows(slot, dx) {
+  if (!slot || !dx) return 0;
+  let moved = 0;
+  for (const key of ['guano', 'plops', 'animals', 'sticks', 'machines', 'starved']) moved += shiftInteriorRows(slot[key], dx);
+  return moved;
+}
+
 /** The Furniture Store (store 23) as a vendor profile for engine.openShop. */
 export function furnitureStoreProfile() {
   return {
@@ -400,6 +433,12 @@ let yardStyle = null;
 let yardPreview = null; // a picked yard style shown behind the dialog
 let yardStyleDemoDone = false;
 let yardDemoDone = false;
+// G226: the Magic Rock's pc.magic_rock flags (js/magic-rock-home.js) and its yard target.
+let rockFlags = {};
+let rockTarget = null;
+let rockDemoDone = false;
+// G226: the home street's house x the street's stacks and piles were saved against.
+let savedStreetHouseX = null;
 
 /** The house itself (not a Tower floor): its back yard is left of it. */
 function inHouse() {
@@ -461,6 +500,9 @@ function publish(engine) {
   engine.setData('homeStreetStyle', currentStreetStyle(engine));
   engine.setData('homeStylePick', ui?.styles && !ui.styles.hidden ? stylePick || '' : '');
   engine.setData('homeStyleShown', stylePreview || '');
+  engine.setData('homeRock', Object.entries(rockFlags).map(([k, v]) => `${k}:${v}`).join(','));
+  engine.setData('homeRockX', rockTarget?.sprite && !rockTarget.sprite.destroyed ? Math.round(rockTarget.sprite.x) : '');
+  engine.setData('homeStreetHouseX', savedStreetHouseX ?? '');
 }
 
 // ---------------------------------------------------------------------------
@@ -722,7 +764,43 @@ function syncHouseShift(engine) {
   if (savedHouseX === now) return;
   const dx = now - savedHouseX;
   savedHouseX = now;
-  if (shiftInteriorRows(engine.droppedItems?.streets?.[HOME_INTERIOR_TSID], dx)) engine.save?.();
+  shiftShownRoom(engine, 'interior', dx);
+}
+
+/**
+ * G226: everything kept in a home room's world x moves by `dx`: the stacks
+ * dropped there, Animal Husbandry's piles and animals on the home street, and
+ * (through the `homeRoomShifted` query) a Craftybot standing there. In the
+ * source the house sits at x 0 of both locations and a yard expansion only
+ * moves the left edge (inc_homes.js homes_yard_rebuild 2309-2335 sets
+ * new_dims.l, homes_resize_main_layer 2210 keeps middleground items where they
+ * are), so things keep their place beside the house.
+ */
+function shiftShownRoom(engine, room, dx) {
+  if (!dx) return 0;
+  const tsid = room === 'interior' ? HOME_INTERIOR_TSID : HOME_STREET_TSID;
+  let moved = shiftInteriorRows(engine.droppedItems?.streets?.[tsid], dx);
+  if (room === 'street') moved += shiftHusbandryRows(engine.streetSlot?.('animal-husbandry', HOME_STREET_TSID), dx);
+  // Features answer null so every one of them hears it.
+  engine.query?.('homeRoomShifted', room, dx, engine);
+  engine.save?.();
+  return moved;
+}
+
+/**
+ * Once per change of the house's x on the home street (an expansion to the
+ * left): the street's stacks, piles and Craftybot move with it. A save from
+ * before G226 starts from the house where it is now.
+ */
+function syncStreetShift(engine) {
+  const now = homeStreetLayout(cult).houseX;
+  if (savedStreetHouseX == null || savedStreetHouseX === now) {
+    savedStreetHouseX = now;
+    return;
+  }
+  const dx = now - savedStreetHouseX;
+  savedStreetHouseX = now;
+  shiftShownRoom(engine, 'street', dx);
 }
 
 /** inc_homes.js door_pos: 84 px in from the right end, on the end wall. */
@@ -749,7 +827,154 @@ function spawnInteriorTargets(engine) {
     sprite: door,
     state: { room: 'interior' },
   });
+  rockTarget = roomX0() > 0 ? spawnRock(engine, roomX0() + YARD_ROCK.dx, BACK_YARD_GROUND_Y, 'yard') : null;
   return { door: target };
+}
+
+// ---------------------------------------------------------------------------
+// The Magic Rock in the back yard (G226, items/magic_rock.js)
+// ---------------------------------------------------------------------------
+
+/**
+ * inc_homes.js homes_demo_backyard 2349-2358: apiPutItemIntoPosition(rock,
+ * -29, -155), only_visible_to the owner. x is beside the house's open left
+ * end (the house starts at x 0, the ramp's foot is at -20). The home street's
+ * rock (homes_demo_frontyard 2470) and the new player's (newxp_house_exterior.js
+ * 45) are put at y -144, and the remake stands both on the ground
+ * (home-tower-feature spawnRock, newxp-feature makeNpc), so this one stands
+ * on the yard ground too (its -155 is 11 px higher than theirs).
+ * Art: the item's own CC0 frames (magic_rock make_config book 'orangeBook':
+ * magic_rock_book_orangeBook read, OGA extracted_newxp), as the street's rock.
+ */
+const YARD_ROCK = Object.freeze({ dx: -29 });
+const ROCK_SHEET = Object.freeze({ file: 'assets/sprites/newxp/rock_read.png', cols: 9, rows: 2, count: 18, cellW: 75, cropY: 262, cropH: 74, footX: 27, footY: 329 });
+
+function spawnRock(engine, x, groundY, room) {
+  const { PIXI } = engine;
+  const anim = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
+  // The read frames are 75 x 348 cells; every frame's rock lies in x 6-48, y 275-329.
+  // Only that band is cut out, so the hover box and its label hug the rock.
+  anim.anchor.set(ROCK_SHEET.footX / ROCK_SHEET.cellW, (ROCK_SHEET.footY - ROCK_SHEET.cropY) / ROCK_SHEET.cropH);
+  anim.animationSpeed = 0.18;
+  const base = sourceFromUrl(ROCK_SHEET.file);
+  const apply = () => {
+    if (anim.destroyed) return;
+    const fw = base.width / ROCK_SHEET.cols;
+    const fh = base.height / ROCK_SHEET.rows;
+    const frames = [];
+    for (let i = 0; i < ROCK_SHEET.count; i += 1) {
+      const k = fw / ROCK_SHEET.cellW;
+      frames.push(frameTexture(base, new PIXI.Rectangle((i % ROCK_SHEET.cols) * fw, Math.floor(i / ROCK_SHEET.cols) * fh + ROCK_SHEET.cropY * k, fw, ROCK_SHEET.cropH * k)));
+    }
+    anim.textures = frames;
+    anim.play();
+  };
+  if (isLoaded(base)) apply();
+  else onLoaded(base, apply);
+  const box = new PIXI.Container();
+  box.addChild(anim);
+  box.x = Math.round(x);
+  box.y = groundY + 4;
+  box.zIndex = 28;
+  engine.entityLayer.addChild(box);
+  return engine.register({
+    classId: 'magic_rock',
+    featureId: HOMES_FEATURE_ID,
+    label: 'Magic Rock',
+    subtitle: room === 'yard' ? 'Your yard' : 'Your home street',
+    sprite: box,
+    state: { room },
+  });
+}
+
+/** QA &homerock=new (no lesson read yet) | done (every lesson read): the rock's flags, once. */
+function qaRockFlags(engine) {
+  if (rockDemoDone) return;
+  rockDemoDone = true;
+  const raw = String(engine.param?.('homerock') || '');
+  if (raw === 'new') rockFlags = {};
+  else if (raw === 'done') rockFlags = normalizeRockFlags({ cultivate: 'cultivate_complete', changestyle: 'howto_shown', expand: 'howto_shown' });
+}
+
+function rockRoom(target) {
+  return target?.state?.room === 'street' ? 'street' : 'yard';
+}
+
+/** The rock's verb rows (magic_rock.js conditions). */
+function magicRockVerbs(target, engine) {
+  return rockVerbs(rockFlags, { level: engine.pc?.level || 1, room: rockRoom(target) });
+}
+
+/** conversation_start: the rock's pages on the familiar card. */
+function rockSays(engine, lines, onComplete) {
+  engine.scriptedDialogue?.({
+    title: 'Magic Rock',
+    kicker: 'Magic Rock',
+    beats: lines.map((row) => ({ ...row })),
+    onComplete,
+  });
+}
+
+/** houses_expand_start -> HouseExpandYardDialog: one expansion a click, the dialog stays. */
+function openExpandDialog(engine) {
+  const st = activeCult();
+  const back = isBackYard(st);
+  const where = back ? 'yard' : 'street';
+  const quote = back ? quoteYardExpansion(st, engine.pc) : quoteYardExpansion(st, engine.pc, 'left');
+  const count = back ? quote.count : (quote.countLeft || 0) + (quote.countRight || 0);
+  // HouseExpandYardDialog.as 137-170.
+  const text = count
+    ? `This ${where} can be expanded ${count} more ${count === 1 ? 'time' : 'times'}.`
+    : `This ${where} can’t be expanded anymore.`;
+  if (!back) {
+    // The street grows left or right: the Cultivate bar has both buttons.
+    setMode(engine, 'cultivate');
+    return true;
+  }
+  const can = Boolean(count && quote.ok);
+  engine.scriptedDialogue?.({
+    title: `Expand your ${where}`,
+    kicker: null,
+    // Without the iMG the dialog's Expand button stays disabled; here the reason shows instead.
+    beats: [{ text: can || !count ? text : `${text} ${quote.msg || ''}`.trim(), response: 'OK' }],
+    cancelable: can,
+    primaryLabel: can ? `Expand for ${quote.cost.toLocaleString()}i` : 'OK',
+    cancelLabel: 'Cancel',
+    onComplete: () => {
+      if (!can) return;
+      const res = growYard(engine, 'left');
+      if (res?.ok && res.maxed !== true) setTimeout(() => openExpandDialog(engine), 450);
+    },
+  });
+  return true;
+}
+
+function runRockVerb(target, verbId, engine) {
+  const room = rockRoom(target);
+  if (!magicRockVerbs(target, engine).some((v) => v.id === verbId)) return true;
+  if (verbId.startsWith('howto_')) {
+    const pages = readHowto(rockFlags, verbId);
+    engine.save?.();
+    publish(engine);
+    // announce_vog_fade: a VOG, no speaker, one page a click.
+    if (pages) engine.scriptedDialogue?.({ title: 'Magic Rock', kicker: null, beats: pages.map((text) => ({ text, response: 'OK' })) });
+    engine.setData('homeRockLast', verbId);
+    return true;
+  }
+  if (verbId === 'change_style') return openStyleDialog(engine) || true;
+  if (verbId === 'expand') return openExpandDialog(engine);
+  if (verbId === 'cultivate_land') {
+    const check = cultivateLandCheck(rockFlags, room);
+    if (!check.ok) {
+      rockSays(engine, check.lines);
+      engine.setData('homeRockLast', 'yard_first');
+      return true;
+    }
+    setMode(engine, 'cultivate');
+    engine.setData('homeRockLast', 'cultivate_land');
+    return true;
+  }
+  return false;
 }
 
 // ---------------------------------------------------------------------------
@@ -2340,6 +2565,7 @@ function cultivationIcon(protoClass) {
 
 function setMode(engine, next) {
   if (next && !scene) return;
+  const endsCultivation = mode === 'cultivate' && next !== 'cultivate';
   mode = next;
   placing = null;
   selected = null;
@@ -2354,6 +2580,28 @@ function setMode(engine, next) {
   if (scene?.room === 'interior') renderFurniture(engine);
   renderBar(engine);
   publish(engine);
+  if (endsCultivation) endCultivationMode(engine);
+}
+
+/**
+ * cultivation_mode_ended (main.js 6062-6068): the location's Magic Rock hears
+ * it (doCultivationModeEnded 564-572). Both home rooms have one in the source.
+ */
+function endCultivationMode(engine) {
+  const lines = cultivationModeEnded(rockFlags);
+  if (!lines) return;
+  engine.save?.();
+  engine.setData('homeRockLast', 'good_work');
+  publish(engine);
+  rockSays(engine, lines);
+}
+
+/** TSMainView.as shiftCKeyHandler: shift+C starts (or ends) cultivation mode at home. */
+function toggleCultivateKey(engine) {
+  const ctx = engine.homeContext?.() || {};
+  if (!ctx.inHome || !scene || scene.construction || (scene.room !== 'street' && !inHouse())) return false;
+  setMode(engine, mode === 'cultivate' ? null : 'cultivate');
+  return true;
 }
 
 function beginPlacing(engine, classTsid, from = null) {
@@ -3299,6 +3547,7 @@ function homeScene(room, engine) {
     // The back yard left of the house (G135): the room starts at its width.
     syncHouseShift(engine);
     qaYardStyle(engine);
+    qaRockFlags(engine);
     const background = interiorBackground(engine, { yard: true });
     const x0 = background.houseX;
     const roomW = interiorWidth(decor);
@@ -3338,6 +3587,7 @@ function homeScene(room, engine) {
     };
   }
   liftOldStreetSave(engine);
+  syncStreetShift(engine);
   qaStreetStyle(engine);
   const background = streetBackground(engine, shownStreetStyle(engine), style);
   const layout = homeStreetLayout(cult);
@@ -3408,6 +3658,14 @@ export const homesFeature = {
         publish(engine);
         return true;
       };
+      // QA: window.groddleHomeRock() lists the yard rock's verbs; (verbId) runs one.
+      window.groddleHomeRock = (verbId) => {
+        if (!rockTarget || rockTarget.sprite?.destroyed) return null;
+        if (!verbId) return magicRockVerbs(rockTarget, engine).map((v) => v.id);
+        const out = runRockVerb(rockTarget, verbId, engine);
+        publish(engine);
+        return out;
+      };
     }
     publish(engine);
   },
@@ -3425,6 +3683,9 @@ export const homesFeature = {
       backYard: backCult,
       yardStyle,
       houseX: savedHouseX ?? houseX0(),
+      // G226: pc.magic_rock, and the street's house x (left expansions move what stands there).
+      magicRock: rockFlags,
+      streetHouseX: savedStreetHouseX ?? homeStreetLayout(cult).houseX,
     };
   },
 
@@ -3444,6 +3705,11 @@ export const homesFeature = {
     yardPreview = null;
     const hx = Number(slice?.houseX);
     savedHouseX = !slice ? null : Number.isFinite(hx) ? hx : 0;
+    rockFlags = normalizeRockFlags(slice?.magicRock);
+    rockTarget = null;
+    // Saves from before G226: nothing to move until the street grows again.
+    const sx = Number(slice?.streetHouseX);
+    savedStreetHouseX = slice?.streetHouseX != null && Number.isFinite(sx) ? sx : null;
     towerDecor = (Array.isArray(slice?.towerDecor) ? slice.towerDecor : [])
       .slice(0, TOWER_CONFIG.MAX_FLOORS)
       .map((row) => normalizeHomeDecorState({ ...row, wallSegments: TOWER_GEO.wallSegments, layout: 'tower', starterKit: true }));
@@ -3458,6 +3724,7 @@ export const homesFeature = {
     releaseCameraLook(engine);
     destroyGhost();
     scene = null;
+    rockTarget = null;
     if (ui) {
       ui.bar.hidden = true;
       ui.modes.hidden = true;
@@ -3527,6 +3794,7 @@ export const homesFeature = {
 
   /** Protos on the home street (items/proto_*.js restore / remove verbs). */
   verbsFor(target, engine) {
+    if (target?.classId === 'magic_rock') return magicRockVerbs(target, engine);
     const id = target?.state?.cultivationId;
     const item = id != null ? activeCult().items.find((row) => row.id === id) : null;
     if (!item?.depleted) return [];
@@ -3534,6 +3802,7 @@ export const homesFeature = {
   },
 
   runVerb(target, verbId, engine) {
+    if (target?.classId === 'magic_rock' && ROCK_VERB_IDS.includes(verbId)) return runRockVerb(target, verbId, engine);
     const id = target?.state?.cultivationId;
     const item = id != null ? activeCult().items.find((row) => row.id === id) : null;
     if (!item?.depleted) return false;
@@ -3547,7 +3816,27 @@ export const homesFeature = {
 
   /** QA / tests. */
   _state() {
-    return { decor, houseDecor, towerDecor, cult, backCult, yardStyle, savedHouseX, mode, placing, selected, scene, houseVisits };
+    return { decor, houseDecor, towerDecor, cult, backCult, yardStyle, savedHouseX, savedStreetHouseX, rockFlags, rockTarget, mode, placing, selected, scene, houseVisits };
+  },
+
+  /**
+   * G226: the world x of the house's left end that the stacks dropped indoors
+   * (and a Craftybot set down there) are kept against; room x + this = world x.
+   */
+  roomWorldX() {
+    return savedHouseX ?? houseX0();
+  },
+
+  /** G226: game.js dropped-stack key; each Tower floor has its own. */
+  dropTsid(tsid) {
+    if (tsid !== HOME_INTERIOR_TSID) return null;
+    const floor = towerApi.currentFloor();
+    return floor != null ? towerDropTsid(floor) : null;
+  },
+
+  /** G226: shift+C at home (game.js keydown asks before C opens Making). */
+  cultivateKey(engine) {
+    return toggleCultivateKey(engine) ? true : null;
   },
 
   /** butler_hints.js:383: how many times you have gone into your house. */

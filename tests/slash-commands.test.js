@@ -18,11 +18,11 @@ import {
   slashWords,
   unknownLine,
 } from '../public/js/slash-commands.js?v=g160-1';
-import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=g200-2';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=g155-1';
+import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=g200-3';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=g155-2';
 import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-5';
 import { BUTLER_STRINGS } from '../public/js/butler.js?v=butler-5';
-import { butlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-7';
+import { butlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-8';
 import { FEATURES } from '../public/js/features/index.js';
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { countItem } from '../public/js/inventory.js?v=catalog-unified-4';

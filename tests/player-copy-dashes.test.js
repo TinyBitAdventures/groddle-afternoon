@@ -39,6 +39,8 @@ const SOURCE_VERBATIM = [
   ['js/imagination-data.js', 'merest beginner jump — however', 'glitch-GameServerJS/inc_data_imagination.js'],
   ['js/imagination-data.js', 'This is the tin standard — the most common', 'glitch-GameServerJS/inc_data_imagination.js'],
   ['js/juju-bandits.js', 'I have a riddle for you—what', 'glitch-GameServerJS/items/npc_juju_bandit.js'],
+  // The yard rule (magic_rock.js 351, G226).
+  ['js/magic-rock-home.js', 'Sorry kid — your first cultivation', 'glitch-GameServerJS/items/magic_rock.js'],
   ['js/newxp.js', 'Well, well — welcome.<br><br>', 'glitch-GameServerJS/locations/newxp_training1.js'],
   ['js/newxp.js', ' — enjoy your new home!', 'glitch-GameServerJS/locations/newxp_training2.js'],
   ['js/newxp.js', 'your house and your land — but to do much more', 'glitch-GameServerJS/items/magic_rock.js'],

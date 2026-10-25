@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-83';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-82';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -8055,6 +8055,10 @@ const engine = {
   get droppedItems() {
     return droppedItemState;
   },
+  /** The key of this place's dropped stacks (a Tower floor has its own, G226). */
+  get dropTsid() {
+    return droppedStacksTsid();
+  },
   /** Save and redraw dropped stacks after a feature changed droppedItems. */
   droppedItemsChanged() {
     saveDroppedItems();
@@ -8813,6 +8817,11 @@ function spawnDroppedItemStack(stack) {
     worldItemId: stack.id,
   });
   return spr;
+}
+
+/** G226: where this place's dropped stacks are kept (homes-feature dropTsid: a Tower floor's own key). */
+function droppedStacksTsid() {
+  return features.query('dropTsid', currentStreetTsid, engine) || currentStreetTsid;
 }
 
 /** Reconcile only player-dropped stacks, leaving natural street entities intact. */
@@ -18357,6 +18366,8 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
   world.x = -Math.round(camTarget);
   world.y = -Math.round(camY);
   homeScene?.enter?.();
+  // G226: the room's dropped stacks (clearWorldEntities took their sprites).
+  refreshDroppedWorldItems();
   const name = document.getElementById('street-name');
   if (name) {
     name.textContent = `${currentStreet.label} · ${HOME_STYLES[homeState.style]?.label || 'Meadow'} Home`;
@@ -23839,6 +23850,8 @@ async function main() {
     if (e.key === 'h' || e.key === 'H') openFeatPanel();
     if (e.key === 'k' || e.key === 'K') openSkillsPanel();
     if (e.key === 'u' || e.key === 'U') openBuffsPanel();
+    // G226: shift+C toggles cultivation mode at home (TSMainView.as shiftCKeyHandler).
+    if (e.shiftKey && (e.key === 'c' || e.key === 'C') && features.query('cultivateKey', engine)) return;
     if (e.key === 'c' || e.key === 'C') openMakePanel();
     if (e.key === 'v' || e.key === 'V') openVendor();
     if (e.key === 'l' || e.key === 'L') openAvatarPanel();

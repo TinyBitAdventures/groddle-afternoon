@@ -100,7 +100,9 @@ function attach(engine) {
   const down = (e) => {
     if (e.target?.matches?.('input, textarea, select, [contenteditable="true"]')) return;
     const k = String(e.key || '').toLowerCase();
-    if (k === 'c' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    // KeyBeacon.as 288-295: with shift held the client fires SHIFT_PLUS_ C, which is
+    // cultivation (TSMainView.as 647, 816), not Camera Mode's plain C (G226).
+    if (k === 'c' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
       if (!active && blocked(engine)) return;
       e.preventDefault();
       e.stopImmediatePropagation();

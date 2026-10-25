@@ -49,7 +49,10 @@ import {
 } from '../public/js/home-styles.js';
 import { WALLPAPER_MAPS, WALLPAPER_PIECES } from '../public/js/home-wallpaper-art.js';
 import { roomPieces } from '../public/js/home-wallpaper.js';
-import { BACK_YARD_GROUND_Y, homesFeature, shiftInteriorRows } from '../public/js/features/homes-feature.js';
+import { BACK_YARD_GROUND_Y, homesFeature, shiftHusbandryRows, shiftInteriorRows, towerDropTsid } from '../public/js/features/homes-feature.js';
+import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-5';
+import { shiftBotX } from '../public/js/features/craftybot-feature.js';
+import { normalizeDroppedItemState } from '../public/js/world-items.js';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 
@@ -306,5 +309,96 @@ describe('Landgrabber (achievements/landgrabber.js)', () => {
     const yard = applyAchievementProgress(state, 'max_expansions:yard', 1);
     assert.equal(yard.find((u) => u.classTsid === 'landgrabber')?.unlocked, true);
     assert.ok(state.unlocked.includes('landgrabber'));
+  });
+});
+
+describe('G226 follow-ups', () => {
+  it('gives each Tower floor its own dropped-stack key', () => {
+    assert.equal(towerDropTsid(0), 'RH_HOME_TOWER_0');
+    assert.equal(towerDropTsid(3), 'RH_HOME_TOWER_3');
+    const tower = towerApi.state();
+    const was = { built: tower.built, floor: tower.floor };
+    try {
+      tower.built = true;
+      tower.floor = 2;
+      assert.equal(homesFeature.dropTsid('RH_HOME_INT'), 'RH_HOME_TOWER_2');
+      assert.equal(homesFeature.dropTsid('RH_HOME_EXT'), null, 'the street keeps its own');
+      tower.floor = null;
+      assert.equal(homesFeature.dropTsid('RH_HOME_INT'), null, 'the house keeps RH_HOME_INT');
+    } finally {
+      Object.assign(tower, was);
+    }
+    // world-items keeps the key through a save (its cleaner allows it), and the house's
+    // old stacks stay where they were: a shared key cannot say which floor they were on.
+    const state = normalizeDroppedItemState({ streets: {
+      RH_HOME_INT: [{ id: 'world-item-1', classTsid: 'apple', count: 2, x: 900, y: 546 }],
+      RH_HOME_TOWER_1: [{ id: 'world-item-2', classTsid: 'apple', count: 1, x: 300, y: 546 }],
+    } });
+    assert.deepEqual(Object.keys(state.streets).sort(), ['RH_HOME_INT', 'RH_HOME_TOWER_1']);
+  });
+
+  it('moves only the house’s stacks when the house x changes, never a Tower floor’s', () => {
+    const feature = readFileSync(join(pub, 'js/features/homes-feature.js'), 'utf8');
+    const shift = feature.slice(feature.indexOf('function shiftShownRoom'), feature.indexOf('function syncStreetShift'));
+    assert.match(shift, /room === 'interior' \? HOME_INTERIOR_TSID : HOME_STREET_TSID/);
+    assert.doesNotMatch(shift, /TOWER/);
+  });
+
+  it('moves the home street’s Guano, Plop and the rest with a left expansion', () => {
+    const slot = {
+      guano: [{ x: 100, count: 2 }], plops: [{ x: 200, seedClass: 'seed_carrot' }], animals: [{ x: 300 }],
+      sticks: [{ x: 400 }], machines: [{ x: 500 }], starved: [{ x: 600 }], batterflies: {},
+    };
+    assert.equal(shiftHusbandryRows(slot, 150), 6);
+    assert.deepEqual(['guano', 'plops', 'animals', 'sticks', 'machines', 'starved'].map((k) => slot[k][0].x), [250, 350, 450, 550, 650, 750]);
+    assert.equal(shiftHusbandryRows(null, 150), 0);
+    assert.equal(shiftHusbandryRows(slot, 0), 0);
+  });
+
+  it('moves a Craftybot standing in the shifted room, and its walk', () => {
+    const bot = { owned: true, where: 'interior', x: 900, xNow: 905, move: { fromX: 900, toX: 1100, startAt: 0, endAt: 1 } };
+    assert.equal(shiftBotX(bot, 'street', 150), false, 'not in that room');
+    assert.equal(shiftBotX(bot, 'interior', 150), true);
+    assert.deepEqual([bot.x, bot.xNow, bot.move.fromX, bot.move.toX], [1050, 1055, 1050, 1250]);
+    assert.equal(shiftBotX({ owned: true, where: 'pack', x: 1 }, 'interior', 150), false);
+    assert.equal(shiftBotX({ owned: false, where: 'interior', x: 1 }, 'interior', 150), false);
+  });
+
+  it('measures Storage Display Boxes in world x, as the bot and the stacks', () => {
+    const src = readFileSync(join(pub, 'js/features/craftybot-feature.js'), 'utf8');
+    assert.match(src, /const x0 = homesFeature\.roomWorldX\?\.\(\) \|\| 0;[\s\S]{0,400}x: x0 \+ p\.x, sdb: true/);
+    homesFeature.restore({ decor: {}, cult: {}, backYard: { yardLeft: 2 }, houseX: 1050 });
+    assert.equal(homesFeature.roomWorldX(), 1050, 'the x the indoor stacks were saved against');
+    homesFeature.restore(undefined);
+    assert.equal(homesFeature.roomWorldX(), 750, 'a new game: the 5-segment yard');
+  });
+
+  it('saves the Magic Rock flags and the street’s house x; old saves start fresh', () => {
+    homesFeature.restore({ decor: {}, cult: {}, magicRock: { cultivate: 'howto_shown', keys: 'x' }, streetHouseX: 1200 });
+    let st = homesFeature._state();
+    assert.deepEqual(st.rockFlags, { cultivate: 'howto_shown' });
+    assert.equal(st.savedStreetHouseX, 1200);
+    assert.deepEqual(homesFeature.save().magicRock, { cultivate: 'howto_shown' });
+    homesFeature.restore({ decor: {}, cult: { yardLeft: 2 } });
+    st = homesFeature._state();
+    assert.deepEqual(st.rockFlags, {});
+    assert.equal(st.savedStreetHouseX, null, 'nothing to move until the street grows again');
+    assert.ok(Number.isFinite(homesFeature.save().streetHouseX));
+  });
+
+  it('offers the yard rock’s verbs only for the rock, and runs only its own', () => {
+    homesFeature.restore({ decor: {}, cult: {}, magicRock: {} });
+    const engine = { pc: { level: 3 } };
+    const rows = homesFeature.verbsFor({ classId: 'magic_rock', state: { room: 'yard' } }, engine);
+    assert.deepEqual(rows.map((r) => r.id), ['howto_changestyle', 'howto_expand', 'howto_cultivate']);
+    assert.equal(homesFeature.runVerb({ classId: 'magic_rock', state: { room: 'yard' } }, 'talk_to', engine), false);
+  });
+
+  it('draws dropped stacks when a home room is built, and every drop path uses the room’s key', () => {
+    const game = readFileSync(join(pub, 'game.js'), 'utf8');
+    const render = game.slice(game.indexOf('async function renderHomeScene('), game.indexOf('async function showLocationTransition('));
+    assert.match(render, /homeScene\?\.enter\?\.\(\);\s*\/\/[^\n]*\n\s*refreshDroppedWorldItems\(\);/);
+    assert.doesNotMatch(game, /(dropInventoryStack|pickupDroppedStack|listDroppedStacks)\(droppedItemState,[^)]*currentStreetTsid/);
+    assert.match(game, /dropInventoryStack\(\s*droppedItemState,\s*inv,\s*droppedStacksTsid\(\),/);
   });
 });

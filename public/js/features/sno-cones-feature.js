@@ -94,11 +94,12 @@ export function eatPackedSnoCone(engine, classTsid, rng = Math.random) {
 
 function stackOf(engine, target) {
   const id = target?.state?.id || target?.worldItemId;
-  const rows = engine.droppedItems?.streets?.[engine.streetTsid] || [];
+  // G226: a Tower floor's stacks have their own key (engine.dropTsid).
+  const rows = engine.droppedItems?.streets?.[engine.dropTsid ?? engine.streetTsid] || [];
   return rows.find((row) => row.id === id) || null;
 }
 
-function removeStack(engine, stackId, tsid = engine.streetTsid) {
+function removeStack(engine, stackId, tsid = engine.dropTsid ?? engine.streetTsid) {
   const streets = engine.droppedItems?.streets;
   const rows = streets?.[tsid];
   if (!Array.isArray(rows)) return false;
@@ -136,7 +137,7 @@ export function meltSnoCones(engine, now = Date.now()) {
       if (!snoConeMelted(stack, now)) continue;
       removeStack(engine, stack.id, tsid);
       any = true;
-      if (tsid === engine.streetTsid) here = true;
+      if (tsid === (engine.dropTsid ?? engine.streetTsid)) here = true;
     }
   }
   if (here) engine.droppedItemsChanged?.();

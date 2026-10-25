@@ -42,7 +42,7 @@ import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=to
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g215-1';
 import { listDroppedStacks } from '../world-items.js?v=catalog-unified-2';
 import { homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-3';
-import { homesFeature } from './homes-feature.js?v=homes-10';
+import { homesFeature } from './homes-feature.js?v=homes-11';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -188,6 +188,18 @@ function loadSpecs() {
 /* The ingredient source (world adapter for js/craftybot.js)            */
 /* ------------------------------------------------------------------ */
 
+/** G226: move a bot standing in `room` (and its walk) by dx. Pure; true when it moved. */
+export function shiftBotX(state, room, dx) {
+  if (!state?.owned || state.where !== room || !Number.isFinite(dx) || !dx) return false;
+  state.x = Math.round((Number(state.x) || 0) + dx);
+  if (Number.isFinite(state.xNow)) state.xNow += dx;
+  if (state.move) {
+    state.move.fromX += dx;
+    state.move.toX += dx;
+  }
+  return true;
+}
+
 function homeTsid(where) {
   return where === 'interior' ? HOME_INTERIOR_TSID : HOME_STREET_TSID;
 }
@@ -200,9 +212,11 @@ function locationRows(engine, where) {
   const tsid = homeTsid(where);
   const rows = listDroppedStacks(engine.droppedItems, tsid).map((s) => ({ id: s.id, cls: s.classTsid, count: s.count, x: s.x, sdb: false }));
   if (where === 'interior') {
+    // G226: furniture sits in room x; the bot and the dropped stacks in world x.
+    const x0 = homesFeature.roomWorldX?.() || 0;
     for (const p of interiorDecor()?.placed || []) {
       if (p.classTsid === 'bag_furniture_sdb' && p.display?.count > 0) {
-        rows.push({ id: `sdb:${p.id}`, cls: p.display.classTsid, count: p.display.count, x: p.x, sdb: true });
+        rows.push({ id: `sdb:${p.id}`, cls: p.display.classTsid, count: p.display.count, x: x0 + p.x, sdb: true });
       }
     }
   }
@@ -1707,6 +1721,19 @@ export const craftybotFeature = {
 
   onStreetClear() {
     clearView();
+  },
+
+  /**
+   * G226 (homes-feature shiftShownRoom): the house moved `dx` in that room's
+   * world x (a back-yard or left street expansion), so a bot standing there
+   * moves with it, as items keep their place beside the house in the source.
+   */
+  homeRoomShifted(room, dx, engine) {
+    if (shiftBotX(bot, room, dx)) {
+      lastSig = null;
+      publish(engine);
+    }
+    return null;
   },
 
   onTick(dtMs, t, engine) {

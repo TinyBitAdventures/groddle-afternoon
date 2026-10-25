@@ -2027,9 +2027,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 439,
+  "commits": 441,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Ordinary quest offers wait in the quest log, the Magic Rock's other lines use its panel, and street announcements speak over the street"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Skill learn buttons use the original words, and accelerated study gets the yellow bar with arrows"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2139,19 +2149,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Quests draw their route on the Map, and a GPS points at the next signpost"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Every making tool works with its own animation in the Make panel"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "The coverage inventory counts artifacts and necklaces assembled from reachable pieces"
    }
   ]
  },
- "tests": 255,
+ "tests": 256,
  "generatedAt": "2026-10-25"
 }
