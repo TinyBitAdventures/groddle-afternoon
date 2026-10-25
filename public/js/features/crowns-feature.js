@@ -54,7 +54,7 @@ import { wallsScreen } from '../street-model.js';
 import { addItem } from '../inventory.js?v=catalog-unified-7';
 import { textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g304-1';
+import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g309-1';
 
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';

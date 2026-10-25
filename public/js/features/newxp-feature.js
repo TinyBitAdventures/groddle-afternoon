@@ -114,7 +114,7 @@ import { locationEventsApi } from './location-events-feature.js?v=location-event
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g304-1';
+import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g309-1';
 import { HOME_MACHINE } from '../home-ticket.js?v=g300-1';
 import { createAnimalState } from '../animals.js?v=g296-1';
 import {
@@ -137,6 +137,13 @@ import {
 export const NEWXP_FEATURE_ID = 'newxp';
 /** newxp_training1.js 705-706 slothRemove: deleteWithPoof, then hideTree 0.5 s later. */
 const SLOTH_TREE_HIDE_MS = 500;
+/**
+ * Every 1x sheet here is CC0 Tiny Speck art (G308, research/coverage/g308-provenance.md): the
+ * flamingo_*, dustbunny_* and rock_* sheets are byte copies of the OGA dump's extracted_newxp
+ * npc_flamingo, npc_newxp_dustbunny and magic_rock_book_orangeBook x1 sheets; sloth.png is frame 1
+ * of glitch-items inhabitants/sloth/npc_sloth.swf sprite 123. The levels, not the art, were rebuilt
+ * from the playthrough.
+ */
 const ART = 'assets/sprites/newxp/';
 const CARD_ART = 'assets/imagination/cards/';
 const HOME_STREET_TSID = 'RH_HOME_EXT';

@@ -67,7 +67,7 @@ import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
 import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js';
 import { gainMetabolic, loseMood } from '../metabolics.js';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g304-1';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g309-1';
 import { GWENDOLYN_INNER_FILES } from './gwendolyn-inner-art.js';
 
 export const ROOM_ID = 'gwendolyn';

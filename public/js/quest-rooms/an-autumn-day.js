@@ -667,6 +667,11 @@ function drawFeelingRoom(ctx, feeling) {
 /* Birds, leaves, the Qurazy quoin                                      */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Bird art is CC0 glitch-overlays, flattened to one colour (G308): crow.png is rook_fly_side.swf
+ * sprite 53 (its 18 frames in order, at 1/4 size), bird_red.png and bird_icon.png are
+ * rook_fly_forward.swf sprite 17 (rookFlyForward_1) in red.
+ */
 function crowSprite(ctx, opts = {}) {
   const spr = ctx.kit.animated(ctx.PIXI, `${ART}crow.png`, 6, 3, { count: 18, speed: 0.32, ay: 0.55, ...opts });
   spr.scale.set(0.42);

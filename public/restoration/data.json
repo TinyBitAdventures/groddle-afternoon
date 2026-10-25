@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 481,
+  "commits": 482,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Game of Crowns ends on Tiny Speck's winner splash with its rays, and the loneliness invite and stuck prompts join the prompt stack"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Going home shows your own loading card: Entering Your Home Street, House or Tower, with you by the door"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "A timed quest that runs out shows Try again in the quest log, Hell's quest offers have one button, and party spaces stop new quests from starting"
    }
   ]
  },
- "tests": 287,
+ "tests": 288,
  "generatedAt": "2026-10-25"
 }

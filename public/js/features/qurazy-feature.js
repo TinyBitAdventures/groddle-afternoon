@@ -26,7 +26,7 @@
 
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
 import { qurazyMarkersFor } from '../qurazy-markers.js?v=g260-1';
-import { OVERLAY_FADE, loadOverlayManifest, overlayPlacement, playVectorOverlay } from '../overlay-art.js?v=g304-1';
+import { OVERLAY_FADE, loadOverlayManifest, overlayPlacement, playVectorOverlay } from '../overlay-art.js?v=g309-1';
 import {
   QURAZY_SPAWN_LINE,
   createQurazyState,
@@ -203,6 +203,8 @@ export function stopQurazyBanner(root = typeof document === 'undefined' ? null :
 
 /** Bumped when a banner starts or is stopped, so a stopped one does not report "done". */
 let bannerRun = 0;
+/** A banner is playing or loading (G309: overlay-art may cancel it before onStreetClear runs). */
+let bannerLive = false;
 
 async function showSpawnOverlay(engine) {
   const run = ++bannerRun;
@@ -232,6 +234,7 @@ async function showSpawnOverlay(engine) {
     else requestAnimationFrame(watch);
   };
   requestAnimationFrame(watch);
+  bannerLive = true;
   playVectorOverlay(root, QURAZY_OVERLAY.key, {
     rect,
     x: QURAZY_OVERLAY.x,
@@ -243,6 +246,12 @@ async function showSpawnOverlay(engine) {
     className: 'overlay-art qurazy-overlay',
   }).then((ok) => {
     if (run !== bannerRun) return;
+    bannerLive = false;
+    // null: a street change cancelled it (overlay-art cancelAllOverlays, G309).
+    if (ok === null) {
+      engine.setData?.('qurazyOverlay', 'stopped');
+      return;
+    }
     engine.setData?.('qurazyOverlay', ok ? 'done' : 'missing');
     if (!ok) engine.toast?.(QURAZY_SPAWN_LINE);
   });
@@ -322,7 +331,9 @@ export const qurazyFeature = {
     liveQuoin = null;
     // G303: the banner goes with the street (cancelAllOverlaysWeCan).
     bannerRun += 1;
-    if (stopQurazyBanner()) engine?.setData?.('qurazyOverlay', 'stopped');
+    const wasLive = bannerLive;
+    bannerLive = false;
+    if (stopQurazyBanner() || wasLive) engine?.setData?.('qurazyOverlay', 'stopped');
   },
 
   onTick(dtMs, now, engine) {

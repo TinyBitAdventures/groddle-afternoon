@@ -235,16 +235,19 @@ export function loadVectorFrames(key) {
  * client's fades (`fade`: { inMs, outMs }, fade_in_sec / fade_out_sec). Each frame is
  * drawn into one canvas the size of the rect (drawing a decoded SVG costs a
  * few ms; swapping an <img> between SVG frames fell behind). Resolves with
- * true once it has played, false when the art could not load.
+ * true once it has played, false when the art could not load, null when a
+ * street change cancelled it (cancelAllOverlays), loading or playing.
  */
 export async function playVectorOverlay(root, key, { rect, x = 0.5, y = 0.5, topY = null, scale = 1, durationMs = 2000, fade = OVERLAY_FADE, loop = true, className = 'overlay-art' } = {}) {
   if (!root || !rect || typeof document === 'undefined') return false;
+  const epoch = overlayEpoch;
   let art;
   try {
     art = await loadVectorFrames(key);
   } catch {
     return false;
   }
+  if (epoch !== overlayEpoch) return null;
   const { meta, imgs } = art;
   const dpr = Math.min(2, globalThis.devicePixelRatio || 1);
   const canvas = document.createElement('canvas');
@@ -260,6 +263,9 @@ export async function playVectorOverlay(root, key, { rect, x = 0.5, y = 0.5, top
   canvas.style.setProperty('height', `${rect.height}px`, 'important');
   canvas.style.setProperty('display', 'block', 'important');
   root.appendChild(canvas);
+  let cancelled = false;
+  const live = { cancel() { cancelled = true; canvas.remove(); } };
+  liveOverlays.add(live);
   const ctx = canvas.getContext('2d');
   // top_y (InWindowAnnouncementOverlay.as 286-295): the stage's top edge at that fraction, not its centre.
   const cy = topY == null ? rect.height * y : rect.height * topY + (meta.stage[1] * scale) / 2;
@@ -286,8 +292,9 @@ export async function playVectorOverlay(root, key, { rect, x = 0.5, y = 0.5, top
     };
     requestAnimationFrame(step);
   });
+  liveOverlays.delete(live);
   canvas.remove();
-  return true;
+  return cancelled ? null : true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -318,17 +325,23 @@ export function sheetTexture(PIXI, key, meta, cell) {
  * ends). `state` plays one of the overlay's states (G273), and
  * handle.setState(name) switches to another, from its start, the way a new
  * annc.state restarts the clip on its label. Returns { sprite, stop(),
- * setState(), done } (done resolves true once played, false when the art is
- * missing or it was stopped).
+ * setState(), done, cancelled } (done resolves true once played, false when
+ * the art is missing, it was stopped, or a street change cancelled it:
+ * cancelled true, see cancelAllOverlays).
  */
 export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, durationMs = 2000, loop = true, delayMs = 0, holdMs = null, zIndex = 60, state = null } = {}) {
   const handle = {
     sprite: null,
     stopped: false,
+    cancelled: false,
     done: null,
     state,
     stateAt: null,
     stop() { handle.stopped = true; },
+    cancel() {
+      handle.cancelled = true;
+      if (handle.sprite && !handle.sprite.destroyed) handle.sprite.visible = false;
+    },
     setState(name) {
       if (name === handle.state) return;
       handle.state = name;
@@ -340,11 +353,12 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
     handle.done = Promise.resolve(false);
     return handle;
   }
+  liveOverlays.add(handle);
   const clock = () => globalThis.performance?.now?.() ?? Date.now();
   const startAt = clock() + Math.max(0, Number(delayMs) || 0);
   handle.done = loadOverlayManifest().then((manifest) => new Promise((resolve) => {
     const meta = manifest?.[key];
-    if (!meta || meta.kind !== 'sheet' || handle.stopped || layer.destroyed) {
+    if (!meta || meta.kind !== 'sheet' || handle.stopped || handle.cancelled || layer.destroyed) {
       resolve(false);
       return;
     }
@@ -362,7 +376,7 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
       resolve(ok);
     };
     const step = () => {
-      if (sprite.destroyed || handle.stopped) {
+      if (sprite.destroyed || handle.stopped || handle.cancelled) {
         finish(false);
         return;
       }
@@ -390,6 +404,7 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
     };
     raf(step);
   })).catch(() => false);
+  handle.done.then(() => liveOverlays.delete(handle));
   return handle;
 }
 

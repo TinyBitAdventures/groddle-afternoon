@@ -10,7 +10,7 @@
  */
 
 import { textureFromUrl } from './textures.js';
-import { playSheetOverlay } from './overlay-art.js?v=g304-1';
+import { playSheetOverlay } from './overlay-art.js?v=g309-1';
 
 const DECO_DIR = 'assets/decos/groddle/';
 
@@ -999,7 +999,8 @@ export function drawWinnerRainbow(PIXI, { lift = 30 } = {}) {
   h.done.then((ok) => {
     if (c.destroyed) return;
     if (ok) c.destroy({ children: true });
-    else if (!h.stopped) c.addChild(drawWinnerArc(PIXI));
+    // A street change cancels it (G309, cancelAllOverlaysWeCan): no stand-in arc then either.
+    else if (!h.stopped && !h.cancelled) c.addChild(drawWinnerArc(PIXI));
   });
   return c;
 }
