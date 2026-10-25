@@ -45,7 +45,7 @@ import { FRESH_FUEL, MAX_FUEL, refuelMachine } from '../public/js/machines.js';
 import { DROP_TABLES, applyDropResult, rollDropTable } from '../public/js/drop-tables.js';
 import { countItem, removeItem } from '../public/js/inventory.js?v=catalog-unified-4';
 import { canUseTool } from '../public/js/tools.js?v=tools-5';
-import { MACHINE_EXTRA_WAIT_MS as MAKING_EXTRA_WAIT_MS, MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g179-1';
+import { MACHINE_EXTRA_WAIT_MS as MAKING_EXTRA_WAIT_MS, MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g215-1';
 import { fixedFurniturePoints, furniturePlacementGroups } from '../public/js/street-furniture.js?v=furniture-g175';
 import { worldToScreen } from '../public/js/street-model.js';
 import { nearestSurfaceY } from '../public/js/walk-surface.js';

@@ -150,7 +150,8 @@ export function hogHaulObjective(state) {
   if (state.status === 'won') return 'You won The Great Hog Haul!';
   if (state.status === 'lost') return `${state.rivalLabel} won the race.`;
   if (state.carryingPig) return 'Got a pig! Back to the pen!';
-  if (state.hasBait) return 'You have bait — now go get a piggy!';
+  // players/inc_games.js 1934 (the Hog Haul's own line).
+  if (state.hasBait) return 'You have bait, now go get a piggy!';
   return 'Find a Pig Bait sack.';
 }
 

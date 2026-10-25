@@ -42,7 +42,7 @@ import {
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js';
 import { miningProfile } from '../public/js/mining.js?v=g179-1';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=g148-2';
-import { makingSkillAdjustments } from '../public/js/making.js?v=g179-1';
+import { makingSkillAdjustments } from '../public/js/making.js?v=g215-1';
 import { sessionPackage } from '../public/js/meditation.js';
 import { accelerateActiveStudy, createSkillState, startSkillStudy } from '../public/js/skills.js';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';

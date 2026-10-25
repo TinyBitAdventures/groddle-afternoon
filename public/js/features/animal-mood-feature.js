@@ -76,7 +76,7 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { isInHell } from '../hell.js';
-import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-1';
+import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
 import { animalStatusLabel } from '../animals.js?v=g148-1';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=g148-2';

@@ -275,7 +275,7 @@ describe('making (GSJS recipes + tools)', () => {
     assert.equal(batch.progress.length, 3);
     assert.match(batch.progress[0].label, /Making 1 of 3/i);
     assert.match(batch.progress[2].label, /Making 3 of 3/i);
-    assert.equal(formatCraftProgress(2, 5, 'Flour'), 'Making 2 of 5 — Flour');
+    assert.equal(formatCraftProgress(2, 5, 'Flour'), 'Making 2 of 5: Flour');
     assert.ok(batch.result);
     assert.equal(batch.result.made, 3);
     assert.equal(batch.result.energy, -3 * (RECIPE_CATALOG.flour.energyCost || 0));

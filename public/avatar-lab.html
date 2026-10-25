@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Avatar vector lab — Groddle</title>
+  <title>Avatar vector lab · Groddle</title>
   <style>
     :root {
       --bg: #1a1a22;
@@ -113,13 +113,13 @@
 
   <div class="note">
     <span class="ok">Working:</span>
-    Base body from <code>Avatar.swf</code> <code>avatarContainer</code> (chid 409) —
+    Base body from <code>Avatar.swf</code> <code>avatarContainer</code> (chid 409):
     full <strong>walk1x</strong> (frames 1–24) and <strong>idle0</strong> as real vector timelines.
     Placement matrices for every wardrobe slot extracted from SWF XML.<br /><br />
     <span class="ok">In game:</span> skinned walk sheet
     <code>assets/sprites/avatar_walk_vector.png</code> (24×196×258).<br /><br />
     <strong>Still open:</strong> wardrobe pieces drop into named containers
-    (<code>sideShirtContainer_mc</code>, …) at runtime in Flash — we have the slot transforms
+    (<code>sideShirtContainer_mc</code>, …) at runtime in Flash. We have the slot transforms
     but have not yet injected clothes into the composed avatar SVG. Pattern-fill bitmaps in
     the raw SVG export are empty; we replace them with solid skin for browser vectors.
   </div>

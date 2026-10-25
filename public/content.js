@@ -889,7 +889,7 @@ export function getVerbsFor(target, ctx) {
     if ((st === 'seeds' || st === 'shoots') && plot?.wet) {
       add('talk_to', 'check', {
         sort: 40,
-        tooltip: 'Growing — come back when ripe',
+        tooltip: 'Growing, come back when ripe',
       });
     }
   }

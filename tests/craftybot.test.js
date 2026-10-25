@@ -362,7 +362,7 @@ describe('delivery and wiring', () => {
 
   it('registers the feature and ships its art and sounds', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /craftybot-feature\.js\?v=g148-2'; FEATURES\.push\(craftybotFeature\)/);
+    assert.match(index, /craftybot-feature\.js\?v=g148-3'; FEATURES\.push\(craftybotFeature\)/);
     for (const f of ['idle0', 'walk', 'collapse', 'craftStart', 'craftEnd', 'expand', 'sleepMode', 'peek']) {
       assert.ok(existsSync(join(PUBLIC, `assets/sprites/craftybot/craftybot_${f}.webp`)), f);
     }
@@ -380,7 +380,7 @@ describe('craftybot feature: the ingredient source and the job menu', async () =
   const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js');
   const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-9');
   const cbMod = await import('../public/js/craftybot.js?v=craftybot-1');
-  const making = await import('../public/js/making.js?v=g179-1');
+  const making = await import('../public/js/making.js?v=g215-1');
 
   function fakeEngine(extra = {}) {
     return {

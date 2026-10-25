@@ -1108,7 +1108,8 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
  * @param {string} [recipeName]
  */
 export function formatCraftProgress(i, of, recipeName = '') {
-  const name = recipeName ? ` — ${recipeName}` : '';
+  // MakingToolAnimator.as 115 shows "Making i of N"; the recipe name after a colon is the remake's.
+  const name = recipeName ? `: ${recipeName}` : '';
   return `Making ${i} of ${of}${name}`;
 }
 
@@ -1256,15 +1257,13 @@ export function formatCraftResultLine(result) {
   if (!result || !result.made) return '';
   const n = result.made;
   const name = result.recipeName || 'item';
-  const qtyBit = n > 1 ? ` (x${n})` : '';
   const e = result.energy || 0;
   const xp = result.xp || 0;
-  const bits = [`You made ${name}${qtyBit}`];
+  // players/inc_making.js 896-909: "You made <name> (x<count>) -3 energy, +2 iMG."
   const meta = [];
   if (e) meta.push(`${e < 0 ? e : `+${e}`} energy`);
   if (xp) meta.push(`${xp > 0 ? `+${xp}` : xp} iMG`);
-  if (meta.length) bits.push(meta.join(', '));
-  return bits.join(' — ') + '.';
+  return `You made ${name} (x${n})${meta.length ? ` ${meta.join(', ')}` : ''}.`;
 }
 
 /** Build the shared result payload after one or more units have been crafted. */

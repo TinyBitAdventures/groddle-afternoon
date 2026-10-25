@@ -115,7 +115,7 @@ describe('Fruit Changing conversion loop', () => {
     assert.equal(result.made, 3);
     assert.equal(countItem(inv, 'cherry'), 0);
     assert.equal(countItem(inv, 'cloudberry'), 3);
-    assert.equal(result.progress.at(-1).label, 'Making 3 of 3 — Cloudberry');
+    assert.equal(result.progress.at(-1).label, 'Making 3 of 3: Cloudberry');
     assert.equal(result.result.energy, -6);
     assert.equal(result.result.xp, 3);
   });

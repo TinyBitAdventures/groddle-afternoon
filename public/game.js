@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-78';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-79';
 import { buildEnterChoices, planEnter, createEnterChooser, trimmedIconUrl } from './js/enter-chooser.js?v=g206-1';
 import {
   actionDurationFor,
@@ -55,7 +55,7 @@ import {
   hogHaulResultReward,
   pickupHogHaulBait,
   tickHogHaul,
-} from './js/hog-haul.js?v=hog-haul-1';
+} from './js/hog-haul.js?v=hog-haul-2';
 import {
   FOUR_LETTER_BASE_STREET_ID,
   FOUR_LETTER_BLOCKS,
@@ -490,7 +490,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=g179-1';
+} from './js/making.js?v=g215-1';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g188-1';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g193-1';
 import {
@@ -3663,7 +3663,7 @@ function checkQuest() {
     enqueueAward({
       kind: 'quest',
       title: 'Starter quests complete',
-      body: 'Browse Badges, Skills, and Buffs — or open the Map to explore Ur.',
+      body: 'Browse Badges, Skills, and Buffs, or open the Map to explore Ur.',
     });
   }
 }
@@ -9139,7 +9139,7 @@ async function maybeNewDay(opts = {}) {
   features.newDay(Date.now(), engine);
   updateHud();
   pushActivity(
-    `A new day — energy refilled (+${Math.round(refill.energyGained)}) · mood restored` +
+    `A new day: energy refilled (+${Math.round(refill.energyGained)}) · mood restored` +
       (trantN ? ` · ${trantN} tree${trantN === 1 ? '' : 's'} regrew` : '') +
       (animalN ? ` · ${animalN} animal${animalN === 1 ? '' : 's'} ready for care` : '') +
       (quoinReset.hitLimit ? ` · quoin-limit streak ${quoinReset.limitStreak}` : '')
@@ -9154,7 +9154,7 @@ async function maybeNewDay(opts = {}) {
       statsEl.textContent =
         refill.energyGained > 0 || refill.moodGained > 0
           ? `Energy ${Math.round(refill.energyBefore)} → ${energyCap()} · Mood restored`
-          : 'You were already full. Still — a new day!';
+          : 'You were already full. Still, a new day!';
     }
     // Decorative button only — cannot skip
     if (okBtn) {
@@ -9181,7 +9181,7 @@ async function maybeNewDay(opts = {}) {
       okBtn.textContent = 'Onwards and upwards!';
     }
   } else {
-    toast('A new day — energy refilled!', 4000);
+    toast('A new day: energy refilled!', 4000);
     playSfx('newDay', { volume: 0.75 });
   }
   newDayBusy = false;
@@ -10651,7 +10651,7 @@ function finishHogHaulRace() {
   if (reward) {
     reward.textContent = won
       ? `(You got 100 currants and ${hogHaulState.xpLanded ?? 50} xp.)`
-      : 'Better luck next time — the Piggies are still loose.';
+      : 'Better luck next time. The Piggies are still loose.';
   }
   if (resultScreen) resultScreen.hidden = false;
   const countdown = document.getElementById('hog-haul-countdown');
@@ -13102,7 +13102,7 @@ async function enterWinterHavenStage() {
     savePlayerLocation(winterWalkSourceLocation);
     setupWinterWalkStage('haven');
     pushActivity('You descend into Winter Haven. The exit ladder waits above.');
-    toast('Winter Haven — climb to the EXIT sign.', 2800);
+    toast('Winter Haven: climb to the EXIT sign.', 2800);
     return true;
   } finally {
     winterWalkTransitionBusy = false;
@@ -13122,7 +13122,7 @@ async function reenterWinterWalkStage() {
     savePlayerLocation(winterWalkSourceLocation);
     setupWinterWalkStage('return');
     pushActivity('You climb back into Winter Walk. Three bright motes mark the way home.');
-    toast('Winter Walk — gather the last motes and follow the light.', 3200);
+    toast('Winter Walk: gather the last motes and follow the light.', 3200);
     return true;
   } finally {
     winterWalkTransitionBusy = false;
@@ -18785,7 +18785,7 @@ function doTeleport() {
   );
   if (!plan.ok) {
     if (plan.reason === 'no_signpost') {
-      toast('No signpost nearby — open Map (G) to teleport, or walk closer to a wooden post.');
+      toast('No signpost nearby. Open the Map (G) to teleport, or walk closer to a wooden post.');
     } else if (plan.reason === 'not_loaded') {
       const labels = (plan.labels || []).join(', ');
       toast(labels
@@ -18987,7 +18987,7 @@ async function openMap(hubId) {
         openMap(nextHub);
         toast(`Viewing ${label.replace(/^To:\s*/i, '')} map (explore only).`);
       } else {
-        toast(`${label} — no map data for that hub.`);
+        toast(`${label}: no map data for that hub.`);
       }
     });
   });
@@ -18996,7 +18996,7 @@ async function openMap(hubId) {
     line.style.cursor = 'default';
     line.addEventListener('click', () => {
       const name = line.getAttribute('data-name') || 'Street';
-      toast(`${name} — map only (street not loaded in this demo).`);
+      toast(`${name}: map only (street not loaded in this demo).`);
     });
   });
 
@@ -22167,7 +22167,7 @@ function renderGardenPanel() {
       const empty = document.createElement('span');
       empty.className = 'garden-seed-chip';
       empty.textContent =
-        gType === 'herb' ? 'No herb seeds — buy from vendor' : 'No crop seeds — buy from vendor';
+        gType === 'herb' ? 'No herb seeds, buy some from a vendor' : 'No crop seeds, buy some from a vendor';
       empty.disabled = true;
       seedBar.appendChild(empty);
     } else {
@@ -22808,7 +22808,7 @@ async function main() {
       if (app?.canvas) app.canvas.dataset.stootDemo = '1';
     }
     if (savedLoc) {
-      pushActivity(`Welcome back — ${currentStreet?.label || startTsid}`);
+      pushActivity(`Welcome back to ${currentStreet?.label || startTsid}`);
     }
   } catch (err) {
     console.warn('saved location failed, using default', err);
