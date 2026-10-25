@@ -3,11 +3,13 @@
 // route across streets without loading 1,400 street files (the Contraband's
 // "check the address" path, js/smuggling.js routeTo).
 //
-// Usage: node tools/build-signpost-graph.mjs
-import { readFileSync, writeFileSync } from 'node:fs';
+// Usage: node tools/build-signpost-graph.mjs           write it
+//        node tools/build-signpost-graph.mjs --check   exit 1 if the file is stale (tests/map-routes.test.js)
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+const check = process.argv.includes('--check');
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(root, 'public');
 const index = JSON.parse(readFileSync(join(pub, 'assets/streets/index.json'), 'utf8'));
@@ -60,6 +62,37 @@ for (const [key, meta] of Object.entries(index.streets)) {
     for (const [to, keyId] of through) if (keyId) doorKeys[`${key}>${to}`] = keyId;
   }
 }
+
+// Streets no hub map draws (G198): the Map's "Set a destination" can only pick
+// a drawn street (InteractionMenuController.startLocationMenu 133-160 is the
+// hub map's street menu), so js/map-routes.js doorRooms() lists the rooms
+// behind doors from these. Hub maps: assets/maps/index.json -> hubs/*.json streets.
+const drawn = new Set();
+const mapIndexFile = join(pub, 'assets/maps/index.json');
+if (existsSync(mapIndexFile)) {
+  const mapIndex = JSON.parse(readFileSync(mapIndexFile, 'utf8'));
+  for (const hub of Object.values(mapIndex.hubs || {})) {
+    if (!hub?.file || !existsSync(join(pub, hub.file))) continue;
+    const data = JSON.parse(readFileSync(join(pub, hub.file), 'utf8'));
+    for (const s of data.streets || []) {
+      const k = resolve(s?.tsid);
+      if (k) drawn.add(k);
+    }
+  }
+}
+const offMap = [...keys].filter((k) => !drawn.has(k)).sort();
+
 const file = join(pub, 'assets/content/signpost-graph.json');
-writeFileSync(file, `${JSON.stringify({ source: 'tools/build-signpost-graph.mjs from assets/streets/*.json visible signposts and doors', streets: graph, doors, doorKeys })}\n`);
-console.log(`signpost graph: ${Object.keys(graph).length} streets, ${edges} links, ${doorEdges} door links (${Object.keys(doorKeys).length} locked) -> ${file}`);
+const text = `${JSON.stringify({ source: 'tools/build-signpost-graph.mjs from assets/streets/*.json visible signposts and doors, assets/maps/hubs/*.json drawn streets', streets: graph, doors, doorKeys, offMap })}\n`;
+const summary = `${Object.keys(graph).length} streets, ${edges} links, ${doorEdges} door links (${Object.keys(doorKeys).length} locked), ${offMap.length} off the hub maps`;
+if (check) {
+  const current = existsSync(file) ? readFileSync(file, 'utf8') : '';
+  if (current !== text) {
+    console.error(`stale: ${file} (rebuild with node tools/build-signpost-graph.mjs; would be ${summary})`);
+    process.exit(1);
+  }
+  console.log(`signpost graph current: ${summary}`);
+} else {
+  writeFileSync(file, text);
+  console.log(`signpost graph: ${summary} -> ${file}`);
+}

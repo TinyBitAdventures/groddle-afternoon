@@ -65,13 +65,69 @@ export function afterStreetCard() {
 function holdStreetCard(delta) {
   const root = streetCardRoot();
   if (!root?.dataset) return;
-  const n = Math.max(0, Number(root.dataset[STREET_CARD_ATTR] || 0) + delta);
+  const was = Number(root.dataset[STREET_CARD_ATTR] || 0);
+  const n = Math.max(0, was + delta);
   if (n) {
     root.dataset[STREET_CARD_ATTR] = String(n);
+    if (!was) root.dispatchEvent?.(new Event(STREET_CARD_UP));
     return;
   }
   delete root.dataset[STREET_CARD_ATTR];
   root.dispatchEvent?.(new Event(STREET_CARD_GONE));
+}
+
+/** Sent on <html> when the first street loading card goes up (G198). */
+export const STREET_CARD_UP = 'groddle:street-card-up';
+
+/**
+ * setTimeout whose clock stops while a street loading card is up (G198).
+ * glitch-client GrowlQueue.as moveMoveStarted 243-247 pauses a growl's fade
+ * (TSTweener.pauseTweens) and hides it while you move, and moveMoveEnded
+ * 249-253 resumes it; new growls wait in the queue (showNextMessage 86-92).
+ * Toasts, activity lines and prompt timeouts use this so they are not spent
+ * under the card. Armed while a card is up, the clock starts once it has gone.
+ * Returns cancel().
+ */
+export function cardPausedTimeout(fn, ms) {
+  const root = streetCardRoot();
+  let left = Math.max(0, Number(ms) || 0);
+  let startedAt = 0;
+  let id = 0;
+  let done = false;
+  const cleanup = () => {
+    root?.removeEventListener?.(STREET_CARD_UP, pause);
+    root?.removeEventListener?.(STREET_CARD_GONE, resume);
+  };
+  const fire = () => {
+    id = 0;
+    if (done) return;
+    done = true;
+    cleanup();
+    fn();
+  };
+  const run = () => {
+    startedAt = Date.now();
+    id = setTimeout(fire, left);
+  };
+  function pause() {
+    if (!id) return;
+    clearTimeout(id);
+    id = 0;
+    left = Math.max(0, left - (Date.now() - startedAt));
+  }
+  function resume() {
+    if (done || id || streetCardUp()) return;
+    run();
+  }
+  root?.addEventListener?.(STREET_CARD_UP, pause);
+  root?.addEventListener?.(STREET_CARD_GONE, resume);
+  if (!streetCardUp()) run();
+  return () => {
+    done = true;
+    if (id) clearTimeout(id);
+    id = 0;
+    cleanup();
+  };
 }
 
 /**

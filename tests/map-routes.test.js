@@ -6,6 +6,7 @@
 import { describe, it, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -26,20 +27,20 @@ import {
   resurrectRoute,
   routeStep,
   signpostToward,
-} from '../public/js/map-routes.js?v=g192-1';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=g192-1';
+} from '../public/js/map-routes.js?v=g198-1';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=g198-1';
 import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g177-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-5';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-6';
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { applyStreetIndex } from '../public/js/street-loader.js';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
 import { createQuestState } from '../public/js/quests.js';
 import { HELL_QUESTS, createHellState, croak } from '../public/js/hell.js';
 import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js';
-import { doorToward, routeGraph } from '../public/js/map-routes.js?v=g192-1';
+import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=g198-1';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g192-1';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g198-1';
 import { addItem } from '../public/js/inventory.js?v=catalog-unified-4';
 import { resurrect } from '../public/js/hell.js';
 
@@ -336,7 +337,7 @@ describe('the feature', () => {
 
   it('is registered in features/index.js under its cache key', () => {
     const index = read(join(PUBLIC, 'js/features/index.js'));
-    assert.match(index, /map-routes-feature\.js\?v=g192-1'; FEATURES\.push\(mapRoutesFeature\);$/m);
+    assert.match(index, /map-routes-feature\.js\?v=g198-1'; FEATURES\.push\(mapRoutesFeature\);$/m);
   });
 
   it('Beelzebooze accepted: the ticket, the prompt and the route to Panka Surazu', () => {
@@ -457,10 +458,16 @@ class FakeContainer {
   }
 }
 class FakeGraphics extends FakeContainer {
-  roundRect() {
+  roundRect(x, y, w, h) {
+    this.rect = { x, y, w, h };
     return this;
   }
-  fill() {
+  fill(style) {
+    this.filled = style;
+    return this;
+  }
+  stroke(style) {
+    this.stroked = style;
     return this;
   }
 }
@@ -790,7 +797,7 @@ describe('G192 the loading card first', () => {
     assert.equal(engine.log.prompts.length, 0);
     t.mock.timers.tick(1);
     assert.equal(engine.log.prompts.length, 1);
-    assert.deepEqual({ ...engine.log.prompts[0], text: '' }, { kicker: 'Naraka', title: 'You croaked!', text: '' });
+    assert.deepEqual({ ...engine.log.prompts[0], text: '' }, { kicker: 'Naraka', title: 'You croaked!', text: '', timeoutMs: 10000 });
     assert.match(engine.log.prompts[0].text, /^Uh oh\. You croaked! Bummer!/);
     hellFeature.restore({});
   });
@@ -857,5 +864,157 @@ describe('G192 the Map keeps the map in view', () => {
     smugglingFeature._reset();
     const feature = read(join(PUBLIC, 'js/features/map-routes-feature.js'));
     assert.match(feature, /engine\.query\?\.\('mapRouteCard', engine\)/);
+  });
+});
+
+/* ------------------------------------------------------------------ G198 */
+
+describe('G198 rooms behind doors as destinations', () => {
+  const rooms = doorRooms(GRAPH_JSON);
+  const off = new Set(GRAPH_JSON.offMap);
+  const roomOf = (tsid) => rooms.find((r) => r.room === tsid);
+
+  it('signpost-graph.json is current (tools/build-signpost-graph.mjs --check)', () => {
+    const out = execFileSync(process.execPath, [join(spike, 'tools/build-signpost-graph.mjs'), '--check'], { encoding: 'utf8', stdio: 'pipe' });
+    assert.match(out, /signpost graph current: \d+ streets, \d+ links, \d+ door links \(\d+ locked\), \d+ off the hub maps/);
+  });
+
+  it('offMap lists the streets no hub map draws', () => {
+    assert.match(GRAPH_JSON.source, /hubs/);
+    assert.ok(off.has(HELL_BAR) && off.has(VICARS), 'the Hell Bar and Vicar\'s Peak are not on a hub map');
+    assert.ok(!off.has(PANKA) && !off.has(THORNFAD), 'the streets their doors are on are');
+    const maps = JSON.parse(read(join(PUBLIC, 'assets/maps/index.json')));
+    const drawn = new Set();
+    for (const hub of Object.values(maps.hubs)) {
+      for (const st of JSON.parse(read(join(PUBLIC, hub.file))).streets || []) for (const a of [st.tsid, `G${st.tsid.slice(1)}`, `L${st.tsid.slice(1)}`]) drawn.add(a);
+    }
+    for (const key of Object.keys(INDEX.streets)) assert.equal(off.has(key), !drawn.has(key), key);
+  });
+
+  it('the client offered destinations from the hub maps only (street menu and search)', { skip: !existsSync(client) && 'no client checkout' }, () => {
+    const menu = read(join(client, 'control/InteractionMenuController.as'));
+    assert.match(menu, /public function startLocationMenu\(street:Street, hub_tsid:String[\s\S]{0,400}label: 'Set as Destination'/);
+    assert.match(read(join(client, 'model/WorldModel.as')), /public function searchLocations\(str:String\)[\s\S]{0,300}for\(k in search_locations\)/);
+    assert.match(read(join(client, 'data/location/Hub.as')), /if\(add_to_search\) TSModelLocator\.instance\.worldModel\.search_locations\[k\] = location\.label;/);
+  });
+
+  it('doorRooms: every room off the maps behind a door, hung off the drawn street its first door is on', () => {
+    assert.deepEqual(roomOf(HELL_BAR), { room: HELL_BAR, street: PANKA, via: PANKA, locked: false });
+    assert.deepEqual(roomOf(VICARS), { room: VICARS, street: THORNFAD, via: THORNFAD, locked: true }, 'Door Key 1');
+    assert.equal(new Set(rooms.map((r) => r.room)).size, rooms.length, 'each room once');
+    for (const r of rooms) {
+      assert.ok(off.has(r.room), `${r.room} is off the maps`);
+      assert.ok(!off.has(r.street), `${r.street} is drawn`);
+      assert.ok((GRAPH_JSON.doors[r.via] || []).includes(r.room), `a door from ${r.via} leads in`);
+    }
+    // Rooms behind rooms: Tower St West -> Stairs -> Mezzanine -> Hall of Rejected Concepts.
+    const byLabel = (l) => rooms.find((r) => INDEX.streets[r.room].label === l);
+    const stairs = byLabel('Stairs');
+    const mezz = byLabel('Mezzanine');
+    assert.equal(INDEX.streets[stairs.street].label, 'Tower St West');
+    assert.equal(mezz.street, stairs.street);
+    assert.equal(mezz.via, stairs.room);
+    assert.ok(rooms.length >= 20, `${rooms.length} rooms`);
+    assert.deepEqual(doorRooms({}), []);
+  });
+
+  it('the Map lists a hub\'s rooms in pick mode, and picking one sets a player route through its door', () => {
+    resetContentCatalogs();
+    applyStreetIndex(INDEX);
+    mapRoutesFeature._reset();
+    mapRoutesFeature._setGraph(GRAPH_JSON);
+    const naraka = mapRoutesFeature._roomsInHub('40');
+    const bar = naraka.find((r) => r.room === HELL_BAR);
+    assert.ok(bar, 'the Hell Bar is listed on the Naraka map');
+    assert.equal(bar.label, 'Hell Bar');
+    assert.equal(bar.streetLabel, 'Panka Surazu');
+    assert.ok(naraka.every((r) => INDEX.streets[r.street].hubId === '40'));
+    assert.deepEqual(mapRoutesFeature._roomsInHub(''), []);
+    const heights = mapRoutesFeature._roomsInHub('64');
+    assert.ok(heights.some((r) => r.room === VICARS && r.locked && r.streetLabel === 'Thornfad Layers'));
+    const engine = fakeEngine();
+    mapRoutesFeature._setPickMode(true);
+    const res = mapRoutesFeature._pickRoom(engine, HELL_BAR);
+    assert.equal(res.ok, true);
+    assert.equal(res.route.destination, HELL_BAR);
+    assert.equal(res.route.source, 'player');
+    assert.deepEqual(res.route.path.slice(-2), [PANKA, HELL_BAR], 'the last hop is the Panka Surazu door');
+    assert.equal(engine.data.routeMode, '', 'pick mode ends');
+    assert.deepEqual(engine.log.activity, ['Destination set: Hell Bar.']);
+    mapRoutesFeature._reset();
+  });
+
+  it('the room list is in the route card while "Set a destination" is on', () => {
+    const feature = read(join(PUBLIC, 'js/features/map-routes-feature.js'));
+    assert.match(feature, /if \(pickMode\) roomPicker\(engine, card, shownHub\);/);
+    assert.match(feature, /head\.textContent = 'Behind doors:';/);
+    assert.match(feature, /const GRAPH_URL = 'assets\/content\/signpost-graph\.json\?v=g198-1';/, 'the graph gained offMap: a new cache key');
+  });
+});
+
+describe('G198 the door glow follows the door art', () => {
+  class FakeSprite extends FakeContainer {
+    constructor(texture) {
+      super();
+      this.texture = texture;
+      this.anchor = { x: 0, y: 0, set: (x, y) => { this.anchor.x = x; this.anchor.y = y; } };
+      this.scale = { x: 1, y: 1, set: (x, y) => { this.scale.x = x; this.scale.y = y ?? x; } };
+      this.rotation = 0;
+    }
+  }
+  class FakeColorMatrix {}
+
+  function pankaDoor(PIXI, withTexture) {
+    const engine = fakeEngine();
+    engine.PIXI = PIXI;
+    engine.entityLayer = new FakeContainer();
+    engine.streetTsid = PANKA;
+    engine.street = { tsid: PANKA, hubId: '40', label: 'Panka Surazu', bounds: { l: 0, t: 0 } };
+    const door = streetJson(PANKA).doors[0];
+    const sprite = withTexture ? new FakeSprite({ id: 'door_asset_hell_bar_entrance_01a' }) : new FakeContainer();
+    engine.entityLayer.addChild(sprite);
+    Object.assign(sprite, { x: door.x, y: door.y, zIndex: 3, width: door.w, height: door.h });
+    if (withTexture) sprite.anchor.set(0.5, 1);
+    engine.interactables = [{ classId: 'street_door', featureId: 'doors', door, sprite }];
+    mapRoutesFeature._reset();
+    mapRoutesFeature._setGraph(GRAPH_JSON);
+    mapRoutesFeature.mapRoute('set', { to: HELL_BAR, source: 'player' }, engine);
+    mapRoutesFeature.onStreetEnter(engine.street, engine);
+    return { engine, door, sprite, glow: mapRoutesFeature._highlight()?.glow };
+  }
+
+  it('the Hell Bar door (350x298) gets an art-shaped edge glow, not a filled box', () => {
+    const { engine, door, sprite, glow } = pankaDoor({ ...FAKE_PIXI, Sprite: FakeSprite, ColorMatrixFilter: FakeColorMatrix }, true);
+    assert.deepEqual([door.w, door.h, door.sprite], [350, 298, 'door_asset_hell_bar_entrance_01a']);
+    assert.ok(glow instanceof FakeSprite, 'a copy of the door art');
+    assert.equal(glow.texture, sprite.texture);
+    assert.deepEqual([glow.anchor.x, glow.anchor.y], [0.5, 1]);
+    const [flat, blur] = glow.filters;
+    assert.ok(flat instanceof FakeColorMatrix);
+    const c = [(ROUTE_COLOR >> 16) & 255, (ROUTE_COLOR >> 8) & 255, ROUTE_COLOR & 255].map((v) => v / 255);
+    assert.deepEqual(flat.matrix, [0, 0, 0, 0, c[0], 0, 0, 0, 0, c[1], 0, 0, 0, 0, c[2], 0, 0, 0, 1, 0], 'every pixel the route colour, alpha kept');
+    assert.ok(blur);
+    // A few px past the art on each side, no more.
+    assert.ok(Math.abs(glow.scale.x * 350 - 364) < 0.01, `${glow.scale.x * 350}`);
+    assert.ok(Math.abs(glow.scale.y * 298 - 305) < 0.01, `${glow.scale.y * 298}`);
+    assert.ok(glow.zIndex < sprite.zIndex, 'behind the door');
+    assert.equal(glow.parent, sprite.parent);
+    assert.equal(engine.data.routeDoorGlow, 'edge:350x298');
+    // The art resized after its texture loaded (doors-feature applyRect): the glow follows on the next tick.
+    sprite.scale.set(2, 2);
+    sprite.width = 700;
+    sprite.height = 596;
+    mapRoutesFeature.onTick(16, Date.now(), engine);
+    assert.ok(Math.abs(glow.scale.x * 350 - 714) < 0.01);
+    mapRoutesFeature._reset();
+  });
+
+  it('without the art (a drawn door still loading) it is a thin outline the size of the door', () => {
+    const { glow } = pankaDoor(FAKE_PIXI, false);
+    assert.ok(glow instanceof FakeGraphics);
+    assert.deepEqual(glow.rect, { x: -178, y: -301, w: 356, h: 304 });
+    assert.equal(glow.filled, undefined, 'no fill');
+    assert.equal(glow.stroked.color, ROUTE_COLOR);
+    mapRoutesFeature._reset();
   });
 });

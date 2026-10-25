@@ -39,11 +39,13 @@
  * Canvas data: routeActive, routeTo, routeDest, routeNext, routeStatus,
  * routePath, routeSource, routeQuest, routeSign, routeDoor, routeVia,
  * routeWalk, routeReached, routeCleared, routeMapLines, routeMapExit,
- * routeMapPin, routeMode.
+ * routeMapPin, routeMode, routeRooms (the rooms behind doors listed for the
+ * Map's hub while "Set a destination" is on, G198), routeDoorGlow
+ * (edge|outline:<w>x<h>, G198).
  */
 
 import { STREET_INDEX } from '../street-loader.js';
-import { hellFeature } from './hell-feature.js?v=hell-5';
+import { hellFeature } from './hell-feature.js?v=hell-6';
 import {
   ROUTE_COLOR,
   ROUTE_COLOR_CSS,
@@ -51,6 +53,7 @@ import {
   clearRoute,
   createRouteState,
   croakRoute,
+  doorRooms,
   doorToward,
   enterStreet,
   gpsText,
@@ -62,15 +65,17 @@ import {
   routeStep,
   sameStreet,
   tsidAliases,
-} from '../map-routes.js?v=g192-1';
+} from '../map-routes.js?v=g198-1';
 
 export const MAP_ROUTES_FEATURE_ID = 'map-routes';
-const GRAPH_URL = 'assets/content/signpost-graph.json?v=g192-1';
+const GRAPH_URL = 'assets/content/signpost-graph.json?v=g198-1';
 
 let state = createRouteState();
 let graph = null;
 /** Locked door edges ("from>to"): a route takes one only when it must (G192). */
 let lockedDoors = null;
+/** Rooms behind doors that no hub map draws (map-routes.js doorRooms, G198). */
+let rooms = [];
 let graphPromise = null;
 /**
  * What leads on from this street: a signpost board or a door, glowing.
@@ -99,6 +104,7 @@ function loadGraph() {
       const built = routeGraph(json);
       graph = built.graph;
       lockedDoors = built.locked;
+      rooms = doorRooms(json);
       return graph;
     })
     .catch(() => {
@@ -205,6 +211,50 @@ function placeHighlight(engine, next) {
   placeDoorGlow(engine, next, key);
 }
 
+/** The door glow's reach past the art's edge, in world px (G198). */
+const DOOR_GLOW_PAD = 7;
+const DOOR_GLOW_BLUR = 6;
+
+/**
+ * G198: the door glows along its own edges. Before, a filled 0xf0f258 box the
+ * size of the door rect sat behind it, and the Hell Bar's storefront door
+ * (door_asset_hell_bar_entrance_01a, 350x298) turned into a yellow block.
+ * Now a copy of the door art, flat 0xf0f258 (ColorMatrixFilter) and blurred,
+ * sits just behind it a few px larger, so only a halo round the art shows.
+ * Without a texture (a fake in tests) it is a thin outline the size of the art.
+ */
+function doorEdgeGlow(PIXI, sprite, w, h) {
+  if (PIXI.Sprite && PIXI.ColorMatrixFilter && sprite.texture) {
+    const glow = new PIXI.Sprite(sprite.texture);
+    glow.label = 'route-door-glow';
+    glow.anchor?.set?.(sprite.anchor?.x ?? 0.5, sprite.anchor?.y ?? 1);
+    const flat = new PIXI.ColorMatrixFilter();
+    const c = [(ROUTE_COLOR >> 16) & 255, (ROUTE_COLOR >> 8) & 255, ROUTE_COLOR & 255].map((v) => v / 255);
+    // Every pixel the route colour, alpha kept (Pixi's offsets are 0-1, street-render.js 401).
+    flat.matrix = [0, 0, 0, 0, c[0], 0, 0, 0, 0, c[1], 0, 0, 0, 0, c[2], 0, 0, 0, 1, 0];
+    glow.filters = [flat, new PIXI.BlurFilter({ strength: DOOR_GLOW_BLUR, quality: 3 })];
+    return glow;
+  }
+  const glow = new PIXI.Graphics();
+  glow.label = 'route-door-glow';
+  glow.roundRect(-w / 2 - 3, -h - 3, w + 6, h + 6, 8).stroke({ color: ROUTE_COLOR, width: 4, alpha: 0.9 });
+  return glow;
+}
+
+/** Keep the art-shaped glow on the door: doors-feature sizes the art once its texture loads (applyRect). */
+function syncDoorGlow(hl) {
+  const { glow, view } = hl || {};
+  if (!glow || glow.destroyed || !view || view.destroyed || !glow.texture) return;
+  const w = Math.abs(Number(view.width)) || 1;
+  const h = Math.abs(Number(view.height)) || 1;
+  const sx = Number(view.scale?.x) || 1;
+  const sy = Number(view.scale?.y) || 1;
+  glow.scale?.set?.(sx * (1 + (2 * DOOR_GLOW_PAD) / w), sy * (1 + DOOR_GLOW_PAD / h));
+  glow.rotation = view.rotation || 0;
+  glow.x = view.x;
+  glow.y = view.y + DOOR_GLOW_PAD * 0.25;
+}
+
 function placeDoorGlow(engine, next, key) {
   const targets = doorTargets(engine);
   const at = doorToward(targets.map((t) => t.door), next);
@@ -213,18 +263,18 @@ function placeDoorGlow(engine, next, key) {
   const { PIXI } = engine;
   const sprite = target.sprite;
   const door = target.door;
-  const w = Math.max(40, Number(door.w) || sprite.width || 60);
-  const h = Math.max(60, Number(door.h) || sprite.height || 110);
-  const glow = new PIXI.Graphics();
-  glow.label = 'route-door-glow';
-  glow.roundRect(-w / 2 - 10, -h - 10, w + 20, h + 14, 14).fill({ color: ROUTE_COLOR, alpha: 0.85 });
-  glow.filters = [new PIXI.BlurFilter({ strength: 10, quality: 3 })];
+  // The door's art as drawn (doors-feature applyRect: door.w x door.h).
+  const w = Math.max(24, Number(door.w) || Math.abs(Number(sprite.width)) || 60);
+  const h = Math.max(40, Number(door.h) || Math.abs(Number(sprite.height)) || 110);
+  const glow = doorEdgeGlow(PIXI, sprite, w, h);
   glow.x = sprite.x;
   glow.y = sprite.y;
   // Just behind the door art (doors-feature DOOR_Z 3).
   glow.zIndex = (Number(sprite.zIndex) || 3) - 0.5;
   (sprite.parent || engine.entityLayer).addChild(glow);
-  highlight = { kind: 'door', view: sprite, glow, key, target, door, x: sprite.x, y: sprite.y - h / 2 };
+  highlight = { kind: 'door', view: sprite, glow, key, target, door, x: sprite.x, y: sprite.y - h / 2, w, h };
+  syncDoorGlow(highlight);
+  engine.setData?.('routeDoorGlow', `${glow.texture ? 'edge' : 'outline'}:${Math.round(w)}x${Math.round(h)}`);
   return true;
 }
 
@@ -286,6 +336,10 @@ function ensureStyle() {
 .map-route-card .map-route-body{flex:1 1 220px;min-width:0}
 .map-route-card button{font:700 .74rem "Trebuchet MS",sans-serif;padding:3px 8px;border-radius:8px;border:1px solid #b9ae8e;background:#fff;color:#3d5a32;cursor:pointer}
 .map-route-card button[aria-pressed="true"]{background:${ROUTE_COLOR_CSS};border-color:#8a7a2a}
+.map-route-rooms{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;padding-top:4px;border-top:1px dashed #d8cc9a}
+.map-route-rooms-head{font-weight:700;color:#5c5444;margin-right:2px}
+.map-route-rooms button{font-weight:400}
+.map-route-rooms button.locked::after{content:" (key)";color:#8a8068}
 .map-route-line{fill:none;stroke:${MAP_ROUTE_CSS};stroke-width:8;stroke-linecap:round;pointer-events:none}
 .map-route-under{fill:none;stroke:#4a2408;stroke-width:13;stroke-linecap:round;stroke-opacity:.7;pointer-events:none}
 .map-route-ants{fill:none;stroke:#fffbe0;stroke-width:2;stroke-dasharray:6 9;stroke-linecap:round;pointer-events:none;animation:mapRouteAnts 1.1s linear infinite}
@@ -678,9 +732,64 @@ function mapCard(engine) {
   if (r) {
     button('Clear route', () => dropRoute(engine, { reason: 'closed' }));
   }
+  if (pickMode) roomPicker(engine, card, shownHub);
   // openMap renders the SVG before it asks for cards, so the route can go on now.
   decorateMap(engine);
   return card;
+}
+
+/**
+ * G198: "Set a destination" can only pick a street the hub map draws, so the
+ * rooms behind doors on this hub's streets (the Hell Bar, Vicar's Peak, the
+ * subway stations, Jethimadh Tower's rooms) are listed under the route card
+ * to pick from. The client had no such list (map-routes.js doorRooms): this
+ * is the remake's way in to rooms the hub maps leave out.
+ */
+function roomsInHub(hubId) {
+  if (!hubId) return [];
+  return rooms
+    .filter((row) => hubOf(row.street) === String(hubId))
+    .map((row) => ({ ...row, label: label(row.room), streetLabel: label(row.street), viaLabel: label(row.via) }))
+    .sort((a, b) => a.streetLabel.localeCompare(b.streetLabel) || a.label.localeCompare(b.label));
+}
+
+function roomPicker(engine, card, hubId) {
+  const list = roomsInHub(hubId);
+  engine.setData?.('routeRooms', list.map((row) => row.label).join('|'));
+  if (!list.length) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'map-route-rooms';
+  wrap.dataset.mapRouteRooms = String(list.length);
+  const head = document.createElement('span');
+  head.className = 'map-route-rooms-head';
+  head.textContent = 'Behind doors:';
+  wrap.appendChild(head);
+  for (const row of list) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.room = row.room;
+    b.textContent = row.label;
+    const through = row.via === row.street ? `a door on ${row.streetLabel}` : `${row.viaLabel}, off ${row.streetLabel}`;
+    b.title = `Through ${through}${row.locked ? ' (it needs a key)' : ''}`;
+    b.setAttribute('aria-label', `Set ${row.label} as your destination, through ${through}`);
+    if (row.locked) b.classList.add('locked');
+    b.addEventListener('click', () => loadGraph().then(() => pickRoom(engine, row.room)));
+    wrap.appendChild(b);
+  }
+  card.appendChild(wrap);
+}
+
+/** A room from the list: a player route to it, as a street click in pick mode sets one. */
+function pickRoom(engine, room) {
+  pickMode = false;
+  const res = setRoute(engine, { to: room, source: 'player' });
+  if (!res.ok) {
+    engine.toast?.(res.error, 2600);
+    redrawOpenMap(engine);
+    return res;
+  }
+  engine.pushActivity?.(`Destination set: ${label(res.route.destination)}.`);
+  return res;
 }
 
 /* ------------------------------------------------------------ QA */
@@ -812,7 +921,10 @@ export const mapRoutesFeature = {
     if (state.route?.quest && engine.questState && !questActive(engine, state.route.quest)) {
       dropRoute(engine, { reason: 'quest-done' });
     }
-    if (highlight?.glow && !highlight.glow.destroyed) highlight.glow.alpha = 0.8 + 0.2 * Math.sin(now / 260);
+    if (highlight?.glow && !highlight.glow.destroyed) {
+      highlight.glow.alpha = 0.8 + 0.2 * Math.sin(now / 260);
+      if (highlight.kind === 'door') syncDoorGlow(highlight);
+    }
     stepWalk(engine, now);
     if (now - lastPublish > 120) {
       lastPublish = now;
@@ -851,10 +963,22 @@ export const mapRoutesFeature = {
       const built = routeGraph(g);
       graph = built.graph;
       lockedDoors = built.locked;
+      rooms = doorRooms(g);
     } else {
       graph = g;
       lockedDoors = null;
+      rooms = [];
     }
+  },
+  /** Tests (G198): the rooms behind doors listed for a hub, and picking one. */
+  _roomsInHub(hubId) {
+    return roomsInHub(hubId);
+  },
+  _pickRoom(engine, room) {
+    return pickRoom(engine, room);
+  },
+  _setPickMode(on) {
+    pickMode = Boolean(on);
   },
   /** QA / tests: the GPS arrow click, and one walk step. */
   _arrowClick(engine) {

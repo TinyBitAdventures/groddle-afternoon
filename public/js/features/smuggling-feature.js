@@ -29,6 +29,9 @@
  *     plays give -> receive on one street, =caught walks into the
  *     Deimaginator, =drop drops the package, =sts accepts Smuggle the Smuggler,
  *     =route keeps the run and its map route (add &routeautoplay=1 to walk it).
+ *     smugglingdemo=carry&smugglingautoplay=lostcard takes the signpost on,
+ *     and the package goes missing while the loading card is up: the lost
+ *     package prompt must wait for the card (G198; add &loadcardhold=6000).
  *     Canvas: smugState, smugRun, smugDest, smugNext, smugGiver, smugReceiver,
  *     smugDeim, smugLast, smugCounts, smugAutoplay.
  */
@@ -41,8 +44,8 @@ import { getQuestCatalog } from '../content-catalogs.js';
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js';
 import { worldToScreen } from '../street-model.js';
 import { landingY, walkSurfaceY } from '../walk-surface.js';
-import { hellFeature } from './hell-feature.js?v=hell-5';
-import { questRoomConverse } from './quest-instances-feature.js?v=qi-3';
+import { hellFeature } from './hell-feature.js?v=hell-6';
+import { questRoomConverse } from './quest-instances-feature.js?v=qi-4';
 import {
   CONTRABAND,
   CONTRABAND_ITEM,
@@ -1031,6 +1034,21 @@ async function autoplay(engine, demo, mode) {
       talkReceiver(engine);
       await drainDialog();
       engine.setData('smugAutoplay', state.run ? 'stuck' : 'delivered');
+      return;
+    }
+    if (demo === 'carry' && mode === 'lostcard') {
+      // G198 QA: the run fails while a street loading card is up (reconcile or onTick),
+      // and its prompt must wait for the card (screen-fx streetCardUp, G192).
+      await waitFor(() => graph && state.run);
+      const next = (graph[indexKey(engine.streetTsid)] || [])[0];
+      if (!next) return engine.setData('smugAutoplay', 'no-signpost');
+      engine.travel?.(next, { label: streetLabel(next) });
+      await waitFor(() => engine.streetCardUp?.(), 4000);
+      const n = countItem(engine.inv, CONTRABAND);
+      if (n > 0) removeItem(engine.inv, CONTRABAND, n);
+      engine.refreshPack?.();
+      await waitFor(() => !state.run, 8000);
+      engine.setData('smugAutoplay', `lost:${engine.streetCardUp?.() ? 'under-card' : 'after-card'}`);
       return;
     }
     if (demo === 'deim' && mode === 'caught') {

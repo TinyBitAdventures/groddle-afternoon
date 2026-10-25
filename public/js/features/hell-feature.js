@@ -9,7 +9,12 @@
  * the next frame croaks; &helldemo=squish arrives dead with 10 grapes already
  * squished; &hellautoplay=1 squishes the nearest grapes until resurrection;
  * &helldemo=dead makes you dead where you stand (no teleport), so a Naraka
- * street's doors and the Hell Bar can be walked as the dead walk them.
+ * street's doors and the Hell Bar can be walked as the dead walk them;
+ * &helldemo=pooped counts a croak for today and leaves you at 5% energy, so
+ * the next energy loss brings the Pooped prompt (catalog_buffs.js 1689-1713)
+ * without a trip to Naraka. Each demo runs once per page load, on the first
+ * street (G198: croak used to zero your energy on every street, so a
+ * resurrected avatar arrived at 0 and went Pooped at once).
  */
 
 import {
@@ -47,7 +52,9 @@ import {
   shouldCroak,
   squishGrape,
   wineDrinkConditions,
+  POOPED_ENERGY_PERCENT,
 } from '../hell.js';
+import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 
@@ -61,6 +68,8 @@ let lastEnergy = null;
 let promptTimers = [];
 let autoplayAt = 0;
 let holeDropping = false;
+/** &helldemo ran this page load (G198: one-shot). */
+let demoRan = false;
 
 function clearPromptTimers() {
   for (const id of promptTimers) clearTimeout(id);
@@ -155,8 +164,11 @@ function applyEffects(effects, engine, { prompts = true } = {}) {
         if (!prompts) break;
         const delay = Math.max(0, effect.delayMs || 0);
         const heading = promptHeading(effect, buff);
+        // The source prompts' timeout: 10 (location.js 321-325, catalog_buffs.js 1706/2629);
+        // timeout_value '' or none, so it just goes (G198, js/prompt-timeout.js).
+        const timed = effect.timeoutMs > 0 ? { timeoutMs: effect.timeoutMs } : {};
         promptTimers.push(
-          setTimeout(() => engine.prompt({ ...heading, text: effect.text }), delay)
+          setTimeout(() => engine.prompt({ ...heading, text: effect.text, ...timed }), delay)
         );
         break;
       }
@@ -286,8 +298,18 @@ function spawnGrave(street, engine) {
 
 function demoSetup(engine) {
   const demo = engine.param('helldemo');
+  if (!demo || demoRan) return;
+  demoRan = true;
   if (demo === 'croak') {
     engine.pc.energy = 0;
+  } else if (demo === 'pooped' && !state.isDead) {
+    // checkPooped (inc_metabolics.js): alive, croaked today, energy at or under 5%, then a loss.
+    const now = Date.now();
+    state = normalizeHellState({ ...state, deathsToday: Math.max(1, Number(state.deathsToday) || 0), deathsDayKey: getGameDayKey(now), pooped: null, dontGetPooped: false });
+    const max = Math.max(1, Number(engine.pc.energyMax) || 100);
+    engine.pc.energy = Math.max(1, Math.floor((max * POOPED_ENERGY_PERCENT) / 100));
+    lastEnergy = engine.pc.energy + 1;
+    engine.updateHud?.();
   } else if (demo === 'dead' && !state.isDead) {
     // QA: dead where you stand (no croak teleport), e.g. on a Naraka street for the Hell Bar door.
     state = normalizeHellState({ ...state, isDead: true, croakedAt: Date.now(), visitId: state.visitId + 1 });
@@ -307,6 +329,7 @@ export const hellFeature = {
 
   init(engine) {
     ensureHellItems();
+    demoRan = false;
     publish(engine);
   },
 

@@ -147,6 +147,46 @@ export function routeGraph(json = {}) {
 }
 
 /**
+ * The rooms behind doors (G198): streets no hub map draws (signpost-graph
+ * `offMap`) that a door leads into, so the Map can offer them as
+ * destinations. The client offered destinations only from a hub map's street
+ * menu (InteractionMenuController.startLocationMenu 133-160 "Set as
+ * Destination") and its search (WorldModel.searchLocations 349-373 over the
+ * hub maps' streets, Hub.as 51-53), plus GetInfoDialog's "nearest ... Set as
+ * destination" (1088-1104); a room that is only behind a door was reached by
+ * a quest's route or not at all. Rooms behind rooms (Jethimadh Tower's rooms)
+ * hang off the drawn street their first door is on.
+ * @param {{ doors?: Record<string, string[]>, doorKeys?: Record<string, number>, offMap?: string[] }} json
+ * @returns {{ room: string, street: string, via: string, locked: boolean }[]}
+ *   room: the room's key; street: the drawn street whose door leads in;
+ *   via: the street or room right before it; locked: that door needs a key.
+ */
+export function doorRooms(json = {}) {
+  const off = new Set(json?.offMap || []);
+  const doors = json?.doors || {};
+  const keyed = json?.doorKeys || {};
+  const out = new Map();
+  const queue = [];
+  for (const [from, list] of Object.entries(doors)) {
+    if (off.has(from)) continue;
+    for (const to of list || []) {
+      if (!off.has(to) || out.has(to)) continue;
+      out.set(to, { room: to, street: from, via: from, locked: Boolean(keyed[`${from}>${to}`]) });
+      queue.push(to);
+    }
+  }
+  for (let i = 0; i < queue.length; i++) {
+    const at = queue[i];
+    for (const to of doors[at] || []) {
+      if (!off.has(to) || out.has(to)) continue;
+      out.set(to, { room: to, street: out.get(at).street, via: at, locked: Boolean(keyed[`${at}>${to}`]) });
+      queue.push(to);
+    }
+  }
+  return [...out.values()];
+}
+
+/**
  * Shortest route over visible signposts (apiFindGlobalPathX, or
  * apiFindShortestGlobalPath when `to` lists several streets). Returns the
  * street keys from `from` to the destination inclusive, [from] when you are

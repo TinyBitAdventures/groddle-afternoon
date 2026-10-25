@@ -5,11 +5,11 @@
  */
 
 import { questFlagsFeature } from './quest-flags-feature.js?v=flags-1';
-import { hellFeature } from './hell-feature.js?v=hell-5';
+import { hellFeature } from './hell-feature.js?v=hell-6';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-5';
 import { questOffersFeature } from './quest-offers-feature.js?v=offers-2';
 import { meditationFeature } from './meditation-feature.js?v=g148-1';
-import { teleportationFeature } from './teleportation-feature.js?v=teleport-1';
+import { teleportationFeature } from './teleportation-feature.js?v=teleport-2';
 import { racesFeature } from './races-feature.js?v=g155-1';
 import { crownsFeature } from './crowns-feature.js?v=g148-1';
 import { patchesFeature } from './patches-feature.js?v=patches-7';
@@ -31,7 +31,7 @@ import { unlearningFeature } from './unlearning-feature.js?v=unlearn-1';
 import { dropsFeature } from './drops-feature.js?v=drops-1';
 import { masterGardenFeature } from './master-garden-feature.js?v=mastergarden-1';
 import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=g178-1';
-import { questInstancesFeature } from './quest-instances-feature.js?v=qi-3';
+import { questInstancesFeature } from './quest-instances-feature.js?v=qi-4';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-2';
 import { seasonsFeature } from './seasons-feature.js?v=g148-1';
 import { cameraModeFeature } from './camera-mode-feature.js';
@@ -73,7 +73,7 @@ export const FEATURES = [
   cameraModeFeature,
   newxpFeature,
 ];
-import { smugglingFeature } from './smuggling-feature.js?v=g192-1'; FEATURES.push(smugglingFeature);
+import { smugglingFeature } from './smuggling-feature.js?v=g198-1'; FEATURES.push(smugglingFeature);
 import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-4'; FEATURES.push(homeTowerFeature);
 import { secretSpotsFeature } from './secret-spots-feature.js?v=secrets-1'; FEATURES.push(secretSpotsFeature);
 import { musicblocksFeature } from './musicblocks-feature.js?v=musicblocks-1'; FEATURES.push(musicblocksFeature);
@@ -114,5 +114,5 @@ import { slashCommandsFeature } from './slash-commands-feature.js?v=g160-1'; FEA
 import { hellTicketsFeature } from './hell-tickets-feature.js?v=g177-1'; FEATURES.push(hellTicketsFeature);
 import { packTreeVerbsFeature } from './pack-tree-verbs-feature.js?v=g165-1'; FEATURES.push(packTreeVerbsFeature);
 import { streetSpiritsFeature } from './street-spirits-feature.js?v=g185-1'; FEATURES.push(streetSpiritsFeature);
-import { mapRoutesFeature } from './map-routes-feature.js?v=g192-1'; FEATURES.push(mapRoutesFeature);
+import { mapRoutesFeature } from './map-routes-feature.js?v=g198-1'; FEATURES.push(mapRoutesFeature);
 import { swfFeature } from './swf-feature.js?v=g190-1'; FEATURES.push(swfFeature);

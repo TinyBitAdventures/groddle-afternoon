@@ -2860,6 +2860,9 @@ button.play-context-head:focus-visible {
 .quest-dialogue[hidden] { display: none; }
 /* G192: prompts and conversations wait for the street loading card (PromptView.as 420/440). */
 html[data-street-cards] .quest-dialogue { visibility: hidden; }
+/* G198: toasts and activity lines too, as GrowlQueue.as moveMoveStarted 243-247 hid growls; their clocks stop (screen-fx cardPausedTimeout). */
+html[data-street-cards] .toast,
+html[data-street-cards] .activity-feed { visibility: hidden; }
 .quest-dialogue-shade {
   position: absolute;
   inset: 0;

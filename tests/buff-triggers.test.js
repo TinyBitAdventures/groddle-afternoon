@@ -25,10 +25,10 @@ import {
 } from '../public/js/buff-triggers.js?v=g124-1';
 import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js';
 import { meditationFeature } from '../public/js/features/meditation-feature.js?v=g148-1';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=teleport-1';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=teleport-2';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=g148-1';
 import { rubeFeature } from '../public/js/features/rube-feature.js?v=rube-1';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g192-1';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g198-1';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js';
 import {
   activateBuffItem,

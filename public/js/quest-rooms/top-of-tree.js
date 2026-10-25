@@ -281,7 +281,8 @@ export const room = {
       ctx.sound('ACHIEVEMENT_UNLOCKED', { volume: 0.5 });
       ctx.turnIn().then(() => {
         ctx.data.jumpOff = true;
-        return ctx.converse({ title: 'The High Jumper', kicker: 'Magic Rock', text: JUMP_OFF_LINE, choices: [{ label: 'Ok', value: 'ok' }] });
+        // locations/location.js 366-374: prompts_add_delayed timeout 10, timeout_value '' (G198).
+        return ctx.converse({ title: 'The High Jumper', kicker: 'Magic Rock', text: JUMP_OFF_LINE, choices: [{ label: 'Ok', value: 'ok' }], timeout: 10 });
       });
     }
     // Jumping off the tree (landing on the ground once you have topped it) goes back.

@@ -258,7 +258,8 @@ function writeScript(engine) {
   for (const event of out.events) engine.achievement(event.counter, event.amount);
   engine.pushActivity(`${out.script.title}. ${out.message} -1 energy`);
   if (wear?.msg) engine.pushActivity(wear.msg);
-  engine.prompt({ kicker: 'Teleportation Script', title: out.script.title, text: out.message });
+  // items/teleportation_script.js 434-441: prompts_add timeout 15, no timeout_value (G198).
+  engine.prompt({ kicker: 'Teleportation Script', title: out.script.title, text: out.message, timeout: 15 });
   engine.updateHud();
   engine.save();
   publish(engine);

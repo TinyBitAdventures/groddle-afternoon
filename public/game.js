@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-70';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-71';
 import {
   actionDurationFor,
   createTimedAction,
@@ -632,7 +632,9 @@ import {
   showAwardScreen,
   afterStreetCard,
   streetCardUp,
-} from './js/screen-fx.js?v=g192-1';
+  cardPausedTimeout,
+} from './js/screen-fx.js?v=g198-1';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g198-1';
 import {
   planTravel,
   listMapDestinations,
@@ -1670,6 +1672,8 @@ let state = {
   started: false,
   questDone: false,
   toastTimer: 0,
+  /** performance.now() when a loading card started holding the toast (G198). */
+  toastHeldAt: 0,
   energyTick: 0,
   // Sound is on unless the player muted it last time (js/audio-pref.js).
   muted: loadMutedPreference(),
@@ -1737,6 +1741,8 @@ function toast(msg, ms = 3000) {
   el.textContent = wholeStatAmounts(msg);
   // Wall-clock deadline: frame-counted timers linger on slow or throttled frames.
   state.toastTimer = performance.now() + ms;
+  // Shown during a loading card: its time starts once the card has gone (G198).
+  state.toastHeldAt = streetCardUp() ? state.toastTimer - ms : 0;
 }
 
 /** @type {Promise<void>} */
@@ -2022,7 +2028,8 @@ function pushActivity(msg) {
   feed.prepend(el);
   // The newest one or two lines float briefly; Local activity keeps the rest.
   while (feed.children.length > ACTIVITY_POPUPS) feed.removeChild(feed.lastChild);
-  setTimeout(() => {
+  // Its time stops under a street loading card (G198, GrowlQueue.as 243-253).
+  cardPausedTimeout(() => {
     el.classList.add('is-leaving');
     setTimeout(() => el.remove(), 400);
   }, ACTIVITY_POPUP_MS);
@@ -7752,12 +7759,21 @@ const engine = {
   questFlag(flag) {
     questFlagsFeature.set(flag);
   },
-  prompt({ title = '', kicker = '', text = '' } = {}) {
+  /**
+   * A source prompt. `timeout` (seconds, as GSJS prompts_add passes it) or
+   * `timeoutMs` closes it on its own; `onTimeout(choice)` gets `timeoutValue`
+   * or null (G198, js/prompt-timeout.js).
+   */
+  prompt({ title = '', kicker = '', text = '', timeout = 0, timeoutMs = 0, timeoutValue = null, onTimeout = null } = {}) {
     openScriptedQuestDialogue({
       title,
       kicker,
       beats: [{ text, response: 'OK' }],
       cancelable: true,
+      timeout,
+      timeoutMs,
+      timeoutValue,
+      onTimeout,
     });
   },
   /** Enter the Museum of the Rook instance (as ?questdemo=rookmuseum does): the Mezzanine Greeterbot (mid-tower-feature). */
@@ -9688,7 +9704,17 @@ function physics(dt) {
       (LOCATION_VIEW_H - (player.y - camY)).toFixed(2);
   }
 
-  if (state.toastTimer > 0 && performance.now() >= state.toastTimer) {
+  // GrowlQueue.as moveMoveStarted 243-247 / moveMoveEnded 249-253: a toast's clock
+  // stops while a street loading card is up (style.css hides it) and runs on after (G198).
+  if (state.toastTimer > 0) {
+    const t = performance.now();
+    if (streetCardUp()) state.toastHeldAt ||= t;
+    else if (state.toastHeldAt) {
+      state.toastTimer += t - state.toastHeldAt;
+      state.toastHeldAt = 0;
+    }
+  }
+  if (!state.toastHeldAt && state.toastTimer > 0 && performance.now() >= state.toastTimer) {
     state.toastTimer = 0;
     document.getElementById('toast').hidden = true;
   }
@@ -11702,6 +11728,8 @@ function finishLegalizePurchase() {
       text: 'Thank you for your business. To conduct another transaction, you must exit and re-enter the Hall.',
       response: 'OK',
     }],
+    // items/npc_bureaucrat.js 909-917: prompts_add timeout 10 (G198).
+    timeout: 10,
   });
 }
 
@@ -19120,6 +19148,42 @@ function openQuestDialogue(classTsid) {
   renderQuestDialogueBeat();
 }
 
+/** The open prompt's timeout (G198, js/prompt-timeout.js): { state, handle }. */
+let questDialogueTimeout = null;
+
+function cancelQuestDialogueTimeout() {
+  questDialogueTimeout?.handle.cancel();
+  questDialogueTimeout = null;
+  if (app?.canvas) app.canvas.dataset.promptTimeout = '';
+}
+
+/**
+ * A source prompt's `timeout` (seconds; `timeoutMs` for remake rows) closes
+ * the card on its own once it has been shown that long (PromptView.as
+ * addPrompt 350-354), with `timeoutValue` as the choice (sendChoice 174-185:
+ * none when unset, so onTimeout gets null). The clock waits for the loading
+ * card and holds while the pointer is over the card (removePromptIfNotOver).
+ */
+function armQuestDialogueTimeout(opts) {
+  const ms = promptTimeoutMs(opts);
+  if (!ms || !questDialogueState) return;
+  const mine = questDialogueState;
+  const handle = armPromptTimeout({
+    ms,
+    timeoutValue: opts.timeoutValue,
+    hoverEl: document.querySelector('#quest-dialogue .quest-dialogue-card'),
+    onExpire: (choice) => {
+      if (questDialogueTimeout?.state === mine) questDialogueTimeout = null;
+      if (questDialogueState !== mine) return;
+      closeQuestDialogue({ force: true });
+      if (app?.canvas) app.canvas.dataset.promptTimeout = `expired:${choice ?? ''}`;
+      opts.onTimeout?.(choice);
+    },
+  });
+  questDialogueTimeout = { state: mine, handle };
+  if (app?.canvas) app.canvas.dataset.promptTimeout = `armed:${ms}`;
+}
+
 function openScriptedQuestDialogue({
   title,
   kicker = 'Mr. Block',
@@ -19129,9 +19193,14 @@ function openScriptedQuestDialogue({
   cancelable = false,
   primaryLabel = '',
   cancelLabel = '',
+  timeout = 0,
+  timeoutMs = 0,
+  timeoutValue = null,
+  onTimeout = null,
 }) {
   closeQuestPanel();
   closePackPopover();
+  cancelQuestDialogueTimeout();
   questDialogueState = {
     mode: 'script',
     title,
@@ -19147,6 +19216,7 @@ function openScriptedQuestDialogue({
     cancelLabel,
   };
   renderQuestDialogueBeat();
+  armQuestDialogueTimeout({ timeout, timeoutMs, timeoutValue, onTimeout });
 }
 
 function closeQuestDialogue(opts = {}) {
@@ -19163,6 +19233,7 @@ function closeQuestDialogue(opts = {}) {
       : null;
   const modal = document.getElementById('quest-dialogue');
   if (modal) modal.hidden = true;
+  if (questDialogueTimeout?.state === questDialogueState) cancelQuestDialogueTimeout();
   questDialogueState = null;
   if (onCancel) onCancel();
   return true;

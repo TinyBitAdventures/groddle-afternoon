@@ -75,6 +75,7 @@ import { parseQuestConversation } from '../quests.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { runStreetTransition } from '../screen-fx.js';
+import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=g198-1';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import { sourceFromUrl } from '../textures.js';
 
@@ -377,14 +378,19 @@ function buildChrome(engine) {
  * A conversation in the quest dialogue card. `text` may carry the source
  * `<split butt_txt="..."/>` beats; `choices` replaces the last beat's button
  * with several ([{ label, value }]). Resolves with the chosen value.
+ * `timeout` (source seconds) closes it on its own and resolves with
+ * `timeoutValue` or null (G198, js/prompt-timeout.js).
  */
-function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null } = {}) {
+function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null } = {}) {
   buildChrome(engine);
   const pages = beats || parseQuestConversation(text);
   if (!pages.length) pages.push({ text, response: 'OK' });
   let index = 0;
   return new Promise((resolve) => {
+    let timer = null;
     const finish = (value) => {
+      timer?.cancel();
+      timer = null;
       dialog.modal.hidden = true;
       dialog.resolve = null;
       engine.setData('qiDialog', '');
@@ -415,6 +421,19 @@ function converse(engine, { title = '', kicker = '', text = '', beats = null, ch
       dialog.choices.querySelector('button')?.focus?.();
     };
     render();
+    const ms = promptTimeoutMs({ timeout });
+    if (ms) {
+      timer = armPromptTimeout({
+        ms,
+        timeoutValue,
+        hoverEl: dialog.modal.querySelector?.('.quest-dialogue-card') || null,
+        onExpire: (choice) => {
+          if (dialog.resolve !== finish) return;
+          engine.setData('qiDialogTimeout', `expired:${choice ?? ''}`);
+          finish(choice);
+        },
+      });
+    }
   });
 }
 
