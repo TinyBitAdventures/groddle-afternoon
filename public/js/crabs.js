@@ -289,11 +289,30 @@ export function crabHearBlock(memory, blockClass, now) {
 }
 
 /**
- * blockPlayCallback: the CrabPod Headphones go back; a disliked tune costs the
- * block itself (items_destroy(block, 1)) and, in a Crab State of Mind, 20
- * mood; a liked one pays double in a Crab State of Mind.
+ * SOLO ADAPTATION (register G154, decision desk CRAB, Austin 2026-10-25).
+ *
+ * Source: npc_crab.js:461 a crab that hears the tune it heard last says
+ * "Damn! I just heard this one! Argh!!!", plays dislike_on (462), and
+ * blockPlayCallback destroys that Musicblock (530 pc.items_destroy(
+ * details.block, 1)). With other players, another DJ's tune in between made
+ * the crab's "last tune" move on; alone, playing the one block you carry
+ * twice in a row costs it for good.
+ *
+ * Decision: refuse, but keep the block. Same line, same dislike reaction, no
+ * reward, and in a Crab State of Mind the disliked tune still costs 20 mood
+ * (526-528); only the items_destroy is skipped. Austin: "Should revisit once
+ * multiplayer becomes real." Set this to false to restore the source.
  */
-export function crabSettle(heard, { crabStateOfMind = false } = {}) {
+export const SOLO_KEEP_REPEATED_BLOCK = true;
+
+/**
+ * blockPlayCallback: the CrabPod Headphones go back; a disliked tune costs, in
+ * a Crab State of Mind, 20 mood, and in the source the block itself
+ * (items_destroy(block, 1)), which SOLO_KEEP_REPEATED_BLOCK skips; a liked one
+ * pays double in a Crab State of Mind. `keepRepeatedBlock` overrides the flag
+ * (tests).
+ */
+export function crabSettle(heard, { crabStateOfMind = false, keepRepeatedBlock = SOLO_KEEP_REPEATED_BLOCK } = {}) {
   const rewards = { ...(heard?.rewards || {}) };
   const dislike = heard?.settleState === 'dislike_off';
   if (!dislike && crabStateOfMind) {
@@ -302,7 +321,7 @@ export function crabSettle(heard, { crabStateOfMind = false } = {}) {
   return {
     rewards,
     moodLoss: dislike && crabStateOfMind ? CRAB_STATE_MOOD_LOSS : 0,
-    destroyBlock: dislike ? heard.block : null,
+    destroyBlock: dislike && !keepRepeatedBlock ? heard.block : null,
     removeCrabphones: 1,
   };
 }

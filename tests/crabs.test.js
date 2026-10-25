@@ -33,6 +33,7 @@ import {
   crabPlacementGroups,
   crabRoamTarget,
   crabSettle,
+  SOLO_KEEP_REPEATED_BLOCK,
   crabVerb,
   crabVerbMessage,
   crabVerbs,
@@ -164,10 +165,19 @@ describe('blockListenCallback', () => {
 });
 
 describe('blockPlayCallback', () => {
-  it('takes the CrabPod Headphones back and the disliked block, with 20 mood in a Crab State of Mind', () => {
+  it('solo: refuses a repeat with the source line but keeps the block, still 20 mood in a Crab State of Mind', () => {
+    assert.equal(SOLO_KEEP_REPEATED_BLOCK, true);
     const repeat = crabHearBlock(seeded(2), BLOCKS[1], 9_999_999);
-    assert.deepEqual(crabSettle(repeat), { rewards: {}, moodLoss: 0, destroyBlock: BLOCKS[1], removeCrabphones: 1 });
-    assert.equal(crabSettle(repeat, { crabStateOfMind: true }).moodLoss, 20);
+    assert.equal(repeat.reply, 'Damn! I just heard this one! Argh!!!');
+    assert.equal(repeat.state, 'dislike_on');
+    assert.deepEqual(crabSettle(repeat), { rewards: {}, moodLoss: 0, destroyBlock: null, removeCrabphones: 1 });
+    assert.deepEqual(crabSettle(repeat, { crabStateOfMind: true }), { rewards: {}, moodLoss: 20, destroyBlock: null, removeCrabphones: 1 });
+  });
+
+  it('with the flag off, takes the disliked block as the source does (npc_crab.js:530)', () => {
+    const repeat = crabHearBlock(seeded(2), BLOCKS[1], 9_999_999);
+    assert.deepEqual(crabSettle(repeat, { keepRepeatedBlock: false }), { rewards: {}, moodLoss: 0, destroyBlock: BLOCKS[1], removeCrabphones: 1 });
+    assert.equal(crabSettle(repeat, { crabStateOfMind: true, keepRepeatedBlock: false }).moodLoss, 20);
   });
 
   it('doubles every liked reward in a Crab State of Mind', () => {

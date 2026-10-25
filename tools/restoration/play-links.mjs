@@ -45,6 +45,7 @@ export const PLAY_ROUTES = Object.freeze({
   craftybot: `${BASE}&homedemo=home&craftybotdemo=bot`,
   artifacts: `${BASE}&artifactdemo=rocks`,
   'door-drink': `${BASE}&doordrinkdemo=1`,
+  crabs: `${BASE}&crabdemo=1&crabblocks=3`,
 });
 
 /** Nothing to open: lost systems, and the quest-rooms row (the rooms section links each room). */
