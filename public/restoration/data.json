@@ -977,6 +977,21 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&stootdemo=1&stootquote=38&practice=1"
   },
   {
+   "id": "small-items",
+   "group": "late",
+   "name": "Fortune Cookies, Plates of Beans and other small things",
+   "status": "source",
+   "blurb": "Put a written note in a Fortune Cookie and break it for a Fortune to read, type /beans in Local chat for a Plate of Beans to overthink (again and again, each time with one more \"really\"), turn a Great Hog Haul Ticket into the Hog Haul, chop Wood Trees with the Class Axe, and hit the Balls on Plexus and Nandu Pitha. Their verbs, words, numbers and art come from the source. Only the three numbers behind the Ball’s hit survive, not what the game did with them, so the way it flies and bounces is reimagined.",
+   "spot": null,
+   "evidence": [
+    "public/js/small-items.js",
+    "public/js/features/small-items-feature.js",
+    "public/assets/sprites/small-items/ball.webp"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&smallitemdemo=ball&practice=1"
+  },
+  {
    "id": "artifacts",
    "group": "late",
    "name": "Artifacts and petrified rocks",
@@ -1018,15 +1033,15 @@
   }
  ],
  "tally": {
-  "source": 42,
+  "source": 43,
   "rebuilt": 10,
   "solo": 9,
   "lost": 3,
   "reimagined": 1,
   "progress": 1
  },
- "back": 62,
- "possible": 63,
+ "back": 63,
+ "possible": 64,
  "quests": {
   "total": 445,
   "story": 245,

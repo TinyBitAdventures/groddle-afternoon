@@ -46,6 +46,8 @@ export const PLAY_ROUTES = Object.freeze({
   artifacts: `${BASE}&artifactdemo=rocks`,
   'door-drink': `${BASE}&doordrinkdemo=1`,
   crabs: `${BASE}&crabdemo=1&crabblocks=3`,
+  // A Ball beside you to hit (the real ones are on Plexus and Nandu Pitha).
+  'small-items': `${BASE}&smallitemdemo=ball`,
 });
 
 /** Nothing to open: lost systems, and the quest-rooms row (the rooms section links each room). */
