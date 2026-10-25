@@ -2858,6 +2858,8 @@ button.play-context-head:focus-visible {
   padding: 1.5rem;
 }
 .quest-dialogue[hidden] { display: none; }
+/* G192: prompts and conversations wait for the street loading card (PromptView.as 420/440). */
+html[data-street-cards] .quest-dialogue { visibility: hidden; }
 .quest-dialogue-shade {
   position: absolute;
   inset: 0;
@@ -4476,6 +4478,63 @@ body.buff-purple-pulse::after {
 }
 .map-card.map-hub .map-head h2 { color: #3a3420; }
 .map-card.map-hub .map-sub { color: #4a4030; }
+/* G192: the Map canvas takes the room the cards leave, so it stays in view at
+   1280x860; the extra cards fold into one Shortcuts line (game.js arrangeMapCards). */
+.map-card.map-hub {
+  display: flex;
+  flex-direction: column;
+}
+.map-card.map-hub > * { flex: none; }
+.map-card.map-hub > .map-canvas {
+  flex: 1 1 420px;
+  height: auto;
+  min-height: 230px;
+  max-height: min(420px, 56vh);
+}
+.map-card.map-hub .map-sub { margin: 0.2rem 0 0.5rem; }
+.map-card.map-hub .map-hint { margin-top: 0.5rem; }
+.map-extras {
+  margin: 0 0 8px;
+  border-radius: 10px;
+  background: rgba(255, 253, 247, 0.72);
+  border: 1px solid rgba(138, 122, 88, 0.45);
+  font-size: 0.82rem;
+}
+.map-extras > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  cursor: pointer;
+  list-style: none;
+  color: #4a4030;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.map-extras > summary::-webkit-details-marker { display: none; }
+.map-extras > summary::before {
+  content: '';
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 6px solid #6a5a38;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  transition: transform 0.15s ease;
+}
+.map-extras[open] > summary::before { transform: rotate(90deg); }
+.map-extras > summary strong { flex: none; color: #3a3420; }
+.map-extras > summary span { min-width: 0; overflow: hidden; text-overflow: ellipsis; opacity: 0.85; }
+.map-extras-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 8px;
+  padding: 0 8px 8px;
+  max-height: 150px;
+  overflow: auto;
+}
+.map-extras-grid > * { margin: 0 !important; min-width: 0; }
+.map-extras-grid > .map-home-card { padding: 8px 10px; }
 .map-hub-picker {
   margin-left: auto;
   margin-right: 0.35rem;

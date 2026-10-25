@@ -41,7 +41,7 @@ import { getQuestCatalog } from '../content-catalogs.js';
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js';
 import { worldToScreen } from '../street-model.js';
 import { landingY, walkSurfaceY } from '../walk-surface.js';
-import { hellFeature } from './hell-feature.js?v=hell-4';
+import { hellFeature } from './hell-feature.js?v=hell-5';
 import { questRoomConverse } from './quest-instances-feature.js?v=qi-3';
 import {
   CONTRABAND,
@@ -419,24 +419,29 @@ function renderHud(engine) {
     <div><strong style="display:block;font-size:.8rem">${TEXT.buffName}</strong><span style="font-size:.74rem;line-height:1.25;display:block">${text}</span></div>`;
 }
 
-function mapCard(engine) {
-  if (!carrying(engine) || typeof document === 'undefined') return null;
+/**
+ * What the Map's route card shows for a run (G192: the Smuggling card merged
+ * into the route card, since the run and the Map share one route).
+ * features/map-routes-feature.js asks with engine.query('mapRouteCard', engine).
+ */
+function mapRouteCard(engine) {
+  if (!carrying(engine)) return null;
   const dest = state.run.destination;
   const hub = streetHub(dest);
   const path = route(engine);
-  const card = document.createElement('div');
-  card.className = 'map-feature-card smuggling-map-card';
-  card.style.cssText = 'padding:8px 10px;border-radius:10px;background:#fff8ec;box-shadow:0 2px 8px rgba(0,0,0,.12);margin:0 0 8px;display:grid;grid-template-columns:34px 1fr;gap:8px;align-items:center';
   let routeText = TEXT.offPath;
   if (path) {
     routeText = path.length > 1
       ? `Route: ${path.slice(1).map(streetLabel).join(' → ')} (${path.length - 1} signpost${path.length === 2 ? '' : 's'})`
       : 'You are here. Look around for your contact.';
   }
-  card.innerHTML = `<img src="assets/sprites/icons/contraband.png" alt="" style="width:34px" />
-    <div><strong style="display:block;font-size:.85rem">Contraband destination: ${streetLabel(dest)}${hub.hubName ? ` (${hub.hubName})` : ''}</strong>
-    <span style="font-size:.76rem;line-height:1.3">${routeText}</span></div>`;
-  return card;
+  return {
+    source: 'smuggling',
+    icon: 'assets/sprites/icons/contraband.png',
+    title: `Contraband destination: ${streetLabel(dest)}${hub.hubName ? ` (${hub.hubName})` : ''}`,
+    text: routeText,
+    destination: dest,
+  };
 }
 
 /** The familiar's overlay, then the map opens on the destination (get_path_to_location). */
@@ -1187,9 +1192,9 @@ export const smugglingFeature = {
     return false;
   },
 
-  mapCards(engine) {
-    const card = mapCard(engine);
-    return card ? [card] : [];
+  /** The Map's route card (features/map-routes-feature.js) shows the run (G192). */
+  mapRouteCard(engine) {
+    return mapRouteCard(engine);
   },
 
   save() {

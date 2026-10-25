@@ -14,6 +14,7 @@
 
 import {
   GRAPES_REQUIRED,
+  HELL_BUFFS,
   HELL_LOCATION,
   HELL_ONE_GRAPES,
   HELL_SPRITES,
@@ -83,10 +84,31 @@ function publish(engine) {
   engine.setData('hellPooped', state.pooped?.kind || '');
 }
 
-/** Apply a hell.js effects list in order. */
-function applyEffects(effects, engine) {
+/**
+ * The prompt's heading. The source prompts have no title (pc.prompts_add txt
+ * only), so the card names what it is about: Hell One's entry prompt
+ * (location.js 315-330, is_grape_squish) or the Pooped buff that sent it
+ * (catalog_buffs.js 1689-1713 on_apply). Before G192 every prompt here said
+ * "You croaked!", the Pooped one too.
+ */
+function promptHeading(effect, buff) {
+  if (effect.isGrapeSquish) return { kicker: 'Naraka', title: HELL_TEXT.croaked };
+  const name = buff && HELL_BUFFS[buff]?.name;
+  if (name) return { kicker: 'Energy', title: name };
+  return { kicker: 'Naraka', title: HELL_TEXT.croaked };
+}
+
+/**
+ * Apply a hell.js effects list in order. `prompts: false` skips the prompts,
+ * for a caller that shows them once the loading card has gone (G192).
+ */
+function applyEffects(effects, engine, { prompts = true } = {}) {
+  let buff = '';
   for (const effect of effects || []) {
     switch (effect.type) {
+      case 'buff':
+        buff = effect.buff || '';
+        break;
       case 'sound':
         engine.playSound(effect.key === 'SQUISH_GRAPES' ? 'SQUISH_GRAPES' : 'CROAK', { volume: 1 });
         break;
@@ -130,9 +152,11 @@ function applyEffects(effects, engine) {
         }
         break;
       case 'prompt': {
+        if (!prompts) break;
         const delay = Math.max(0, effect.delayMs || 0);
+        const heading = promptHeading(effect, buff);
         promptTimers.push(
-          setTimeout(() => engine.prompt({ kicker: 'Naraka', title: 'You croaked!', text: effect.text }), delay)
+          setTimeout(() => engine.prompt({ ...heading, text: effect.text }), delay)
         );
         break;
       }
@@ -147,6 +171,21 @@ function applyEffects(effects, engine) {
 
 function teleportFrom(effects) {
   return (effects || []).find((effect) => effect.type === 'teleport') || null;
+}
+
+/**
+ * Travel, then the prompts. location.js 315-330 queues Hell One's entry
+ * prompt (1 s on the first visit, 30 s after) when you arrive, so the delay
+ * starts once the loading card has gone, not when you croak (G192).
+ */
+function enterThenPrompt(engine, to, effects, after) {
+  const arrived = () => {
+    applyEffects((effects || []).filter((effect) => effect.type === 'prompt'), engine);
+    after?.();
+  };
+  Promise.resolve(engine.enter(to.tsid, { spawnX: to.x, spawnY: to.y, bypassFeatureGates: true }))
+    .then(() => engine.afterStreetCard?.())
+    .then(arrived, arrived);
 }
 
 function croakContext(engine) {
@@ -169,10 +208,9 @@ function doCroak(engine) {
   if (!result.ok) return false;
   state = result.state;
   clearPromptTimers();
-  applyEffects(result.effects, engine);
+  applyEffects(result.effects, engine, { prompts: false });
   engine.save();
-  const to = result.teleport;
-  engine.enter(to.tsid, { spawnX: to.x, spawnY: to.y, bypassFeatureGates: true });
+  enterThenPrompt(engine, result.teleport, result.effects);
   publish(engine);
   return true;
 }
@@ -475,16 +513,16 @@ export const hellFeature = {
     }
     state = result.state;
     clearPromptTimers();
-    applyEffects(result.effects, engine);
+    const to = result.teleport;
+    applyEffects(result.effects, engine, { prompts: !to });
     engine.save();
     // The quest event behind hell_quest's drink_wotd flag (wine_of_the_dead.js:96 sets it on every drink; G163).
     // Drinking while alive croaks you into Hell One: send it once that loading card has gone,
     // so Beelzebooze's completion card follows the card instead of covering it (G177).
     const drank = () => engine.achievement('wine_of_the_dead:drink', 1);
-    const to = result.teleport;
     if (to) {
       lastEnergy = null;
-      Promise.resolve(engine.enter(to.tsid, { spawnX: to.x, spawnY: to.y, bypassFeatureGates: true })).then(drank, drank);
+      enterThenPrompt(engine, to, result.effects, drank);
     } else {
       drank();
     }

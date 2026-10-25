@@ -61,7 +61,7 @@ import { meditationFeature } from './meditation-feature.js?v=g148-1';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-1';
 import { rookAttackFeature } from './rook-attack-feature.js?v=g148-1';
 import { rubeFeature } from './rube-feature.js?v=rube-1';
-import { smugglingFeature } from './smuggling-feature.js?v=g177-1';
+import { smugglingFeature } from './smuggling-feature.js?v=g192-1';
 
 export const BUFF_TRIGGERS_FEATURE_ID = 'buff-triggers';
 

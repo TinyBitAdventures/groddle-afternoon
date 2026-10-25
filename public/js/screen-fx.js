@@ -24,6 +24,57 @@ export const AWARD_HOLD_MS = 3800;
 export const NEW_DAY_HOLD_MS = 4500;
 
 /**
+ * Street loading cards in flight (G192). The client holds prompts, quest
+ * conversations and award screens while you move between locations
+ * (model.moveModel.moving): glitch-client PromptView.as refresh 420 hides the
+ * prompts and checkForNewPrompts 440 holds modal ones, QuestsDialog.as
+ * onEmergencyTick 338 waits to show a quest conversation, and
+ * TSFrontController.as tryShowScreenViewFromQ 3399-3400 keeps award screens
+ * queued. So the card shows first and they follow once it has faded.
+ *
+ * The count lives on <html data-street-cards>, so every copy of this module
+ * shares it (game.js imports it under a ?v= key, some features without one);
+ * style.css hides .quest-dialogue modals while it is set.
+ */
+const STREET_CARD_ATTR = 'streetCards';
+export const STREET_CARD_GONE = 'groddle:street-card-gone';
+
+function streetCardRoot() {
+  return globalThis.document?.documentElement || null;
+}
+
+/** True while a street loading card is up (fading in, holding or fading out). */
+export function streetCardUp() {
+  return Number(streetCardRoot()?.dataset?.[STREET_CARD_ATTR] || 0) > 0;
+}
+
+/** Resolves once no street loading card is up (at once when none is). */
+export function afterStreetCard() {
+  const root = streetCardRoot();
+  if (!root || !streetCardUp()) return Promise.resolve();
+  return new Promise((resolve) => {
+    const gone = () => {
+      if (streetCardUp()) return;
+      root.removeEventListener(STREET_CARD_GONE, gone);
+      resolve();
+    };
+    root.addEventListener(STREET_CARD_GONE, gone);
+  });
+}
+
+function holdStreetCard(delta) {
+  const root = streetCardRoot();
+  if (!root?.dataset) return;
+  const n = Math.max(0, Number(root.dataset[STREET_CARD_ATTR] || 0) + delta);
+  if (n) {
+    root.dataset[STREET_CARD_ATTR] = String(n);
+    return;
+  }
+  delete root.dataset[STREET_CARD_ATTR];
+  root.dispatchEvent?.(new Event(STREET_CARD_GONE));
+}
+
+/**
  * @param {number} ms
  * @returns {Promise<void>}
  */
@@ -209,6 +260,17 @@ function ensureLoadingCard(el) {
  * }} opts
  */
 export async function runStreetTransition(el, opts) {
+  if (!el) return streetTransition(el, opts);
+  // Prompts, conversations and awards wait for the card (G192, see streetCardUp).
+  holdStreetCard(1);
+  try {
+    return await streetTransition(el, opts);
+  } finally {
+    holdStreetCard(-1);
+  }
+}
+
+async function streetTransition(el, opts) {
   if (!el) {
     if (opts.onMid) await opts.onMid();
     return;

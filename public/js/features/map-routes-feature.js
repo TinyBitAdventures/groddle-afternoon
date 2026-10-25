@@ -9,7 +9,12 @@
  *   "You Have Arrived!" on the destination, "Return to world for directions"
  *   off the graph, and a close button (clear_location_path).
  * - On the street you are on, the signpost board that leads to the next
- *   street glows in the map path colour (0xf0f258, MapHub.as 72).
+ *   street glows in the map path colour (0xf0f258, MapHub.as 72), or, when
+ *   no signpost leads there, the door that does (loc_path_door, G192).
+ * - Clicking the GPS arrow walks you to that signpost or door and takes it
+ *   (GpsUI.as onArrowClick 96-112: startUserInitiatedPath, and the signpost
+ *   board it set as interaction_sign goes on arrival, SignpostView.tryFocus
+ *   404-412). At the destination it closes the route, as the close button does.
  * - The Map draws the rest of the route over the hub, pins the destination
  *   and lights the GO exit when the route leaves the hub (MapHub.updateLocPath).
  *   Its card names the destination and the route, clears it, and switches
@@ -29,14 +34,16 @@
  * QA (see tests/map-routes.test.js):
  *   &routedemo=<tsid>        set a player route from the street you load on
  *   &routeautoplay=1         walk the route: stand at each highlighted signpost
- *                            (&routestepms=N, default 2500), then travel on
+ *                            or door (&routestepms=N, default 2500), then travel on
+ *   &routeautoplay=arrow     walk the route by clicking the GPS arrow on each street
  * Canvas data: routeActive, routeTo, routeDest, routeNext, routeStatus,
- * routePath, routeSource, routeQuest, routeSign, routeReached, routeCleared,
- * routeMapLines, routeMapExit, routeMode.
+ * routePath, routeSource, routeQuest, routeSign, routeDoor, routeVia,
+ * routeWalk, routeReached, routeCleared, routeMapLines, routeMapExit,
+ * routeMapPin, routeMode.
  */
 
 import { STREET_INDEX } from '../street-loader.js';
-import { hellFeature } from './hell-feature.js?v=hell-4';
+import { hellFeature } from './hell-feature.js?v=hell-5';
 import {
   ROUTE_COLOR,
   ROUTE_COLOR_CSS,
@@ -44,29 +51,39 @@ import {
   clearRoute,
   createRouteState,
   croakRoute,
+  doorToward,
   enterStreet,
   gpsText,
   hubRouteDrawing,
   normalizeRouteState,
   planRoute,
   resurrectRoute,
+  routeGraph,
   routeStep,
   sameStreet,
   tsidAliases,
-} from '../map-routes.js?v=g177-1';
+} from '../map-routes.js?v=g192-1';
 
 export const MAP_ROUTES_FEATURE_ID = 'map-routes';
-const GRAPH_URL = 'assets/content/signpost-graph.json?v=smuggling-1';
+const GRAPH_URL = 'assets/content/signpost-graph.json?v=g192-1';
 
 let state = createRouteState();
 let graph = null;
+/** Locked door edges ("from>to"): a route takes one only when it must (G192). */
+let lockedDoors = null;
 let graphPromise = null;
-/** The glowing board on this street: { view, glow, key }. */
+/**
+ * What leads on from this street: a signpost board or a door, glowing.
+ * { kind: 'sign'|'door', view, glow, key, board?, target?, x, y }
+ */
 let highlight = null;
+/** The GPS arrow's walk (onArrowClick): { x, kind, key, startedAt, lastX, lastMoveAt, dir }. */
+let walk = null;
 let gps = null;
 let lastDead = null;
 let pickMode = false;
 let lastPublish = 0;
+let lastLook = 0;
 let lastHudKey = '';
 let auto = { at: 0, key: '' };
 let demoDone = false;
@@ -79,7 +96,9 @@ function loadGraph() {
   graphPromise ||= fetch(GRAPH_URL)
     .then((r) => r.json())
     .then((json) => {
-      graph = json.streets || {};
+      const built = routeGraph(json);
+      graph = built.graph;
+      lockedDoors = built.locked;
       return graph;
     })
     .catch(() => {
@@ -88,6 +107,8 @@ function loadGraph() {
     });
   return graphPromise;
 }
+
+const esc = (v) => String(v ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 function indexMeta(tsid) {
   const streets = STREET_INDEX.streets || {};
@@ -128,6 +149,7 @@ function setRoute(engine, opts = {}) {
     quest: opts.quest || '',
     inHome: !opts.from && Boolean(engine.homeContext?.().inHome),
     blocked: closedRoads(engine),
+    locked: lockedDoors,
   });
   engine.setData?.('routeLast', res.ok ? `set:${res.route.source}` : res.error);
   if (!res.ok) return res;
@@ -165,12 +187,48 @@ function clearHighlight() {
   highlight = null;
 }
 
-/** Glow the board that leads to `next` (TSFrontController.startLocationPath loc_path_signpost). */
+/** The door targets on this street (features/doors-feature.js registers them as street_door). */
+function doorTargets(engine) {
+  return (engine.interactables || []).filter((t) => t?.classId === 'street_door' && t.door && t.sprite && !t.sprite.destroyed);
+}
+
+/**
+ * Glow what leads to `next`: a signpost board first, a door second
+ * (TSFrontController.startLocationPath 1789-1799: loc_path_signpost, else loc_path_door).
+ */
 function placeHighlight(engine, next) {
   const key = next ? `${engine.streetTsid}>${next}` : '';
   if (highlight && highlight.key === key && highlight.glow && !highlight.glow.destroyed) return;
   clearHighlight();
   if (!next) return;
+  if (placeSignGlow(engine, next, key)) return;
+  placeDoorGlow(engine, next, key);
+}
+
+function placeDoorGlow(engine, next, key) {
+  const targets = doorTargets(engine);
+  const at = doorToward(targets.map((t) => t.door), next);
+  if (at < 0) return false;
+  const target = targets[at];
+  const { PIXI } = engine;
+  const sprite = target.sprite;
+  const door = target.door;
+  const w = Math.max(40, Number(door.w) || sprite.width || 60);
+  const h = Math.max(60, Number(door.h) || sprite.height || 110);
+  const glow = new PIXI.Graphics();
+  glow.label = 'route-door-glow';
+  glow.roundRect(-w / 2 - 10, -h - 10, w + 20, h + 14, 14).fill({ color: ROUTE_COLOR, alpha: 0.85 });
+  glow.filters = [new PIXI.BlurFilter({ strength: 10, quality: 3 })];
+  glow.x = sprite.x;
+  glow.y = sprite.y;
+  // Just behind the door art (doors-feature DOOR_Z 3).
+  glow.zIndex = (Number(sprite.zIndex) || 3) - 0.5;
+  (sprite.parent || engine.entityLayer).addChild(glow);
+  highlight = { kind: 'door', view: sprite, glow, key, target, door, x: sprite.x, y: sprite.y - h / 2 };
+  return true;
+}
+
+function placeSignGlow(engine, next, key) {
   const views = engine.signViews || [];
   const { PIXI } = engine;
   for (const view of views) {
@@ -191,9 +249,10 @@ function placeHighlight(engine, next) {
     glow.addChild(arm);
     // Behind the post and arms: the post's own art stays on top.
     view.addChildAt(glow, 0);
-    highlight = { view, glow, key, board: board.index };
-    return;
+    highlight = { kind: 'sign', view, glow, key, board: board.index, connection: board.connection, x: view.x, y: view.y - 60 };
+    return true;
   }
+  return false;
 }
 
 /* ------------------------------------------------------------ GPS */
@@ -208,7 +267,9 @@ function ensureStyle() {
   box-shadow:0 2px 8px rgba(0,0,0,.14);color:#3d5a32;font:700 .8rem/1.25 "Trebuchet MS",sans-serif;pointer-events:auto}
 .route-gps[hidden]{display:none}
 @media (max-width:700px){.route-gps{top:46px;max-width:calc(100% - 20px)}}
-.route-gps-arrow{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:${ROUTE_COLOR_CSS};box-shadow:inset 0 0 0 2px #8a7a2a}
+.route-gps-arrow{width:28px;height:28px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:${ROUTE_COLOR_CSS};box-shadow:inset 0 0 0 2px #8a7a2a;cursor:pointer}
+.route-gps-arrow:hover,.route-gps-arrow:focus-visible{box-shadow:inset 0 0 0 2px #8a7a2a,0 0 0 3px rgba(240,242,88,.55);outline:none}
+.route-gps-arrow.walking{box-shadow:inset 0 0 0 2px #3d5a32,0 0 0 3px rgba(61,90,50,.35)}
 .route-gps-arrow svg{transition:transform .15s linear}
 .route-gps-arrow.arrived{background:#cfe8b0;box-shadow:inset 0 0 0 2px #5f8a3a}
 .route-gps-text{min-width:0}
@@ -220,6 +281,7 @@ function ensureStyle() {
 .route-gps-x:hover{opacity:1}
 .map-route-card{padding:6px 10px;border-radius:10px;background:#fffbe0;box-shadow:0 2px 8px rgba(0,0,0,.12);margin:0 0 8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.8rem}
 .map-route-card strong{font-size:.85rem}
+.map-route-card .map-route-icon{width:30px;height:30px;object-fit:contain;flex:none}
 .map-route-card .map-route-swatch{width:22px;height:8px;border-radius:4px;background:${MAP_ROUTE_CSS};box-shadow:0 0 0 1.5px #4a2408;flex:none}
 .map-route-card .map-route-body{flex:1 1 220px;min-width:0}
 .map-route-card button{font:700 .74rem "Trebuchet MS",sans-serif;padding:3px 8px;border-radius:8px;border:1px solid #b9ae8e;background:#fff;color:#3d5a32;cursor:pointer}
@@ -258,7 +320,7 @@ function ensureGps(engine) {
   el.hidden = true;
   el.setAttribute('role', 'status');
   el.setAttribute('aria-label', 'Map route');
-  el.innerHTML = `<span class="route-gps-arrow">${ARROW_SVG}</span>
+  el.innerHTML = `<button type="button" class="route-gps-arrow" aria-label="Walk to the next signpost" title="Walk to the next signpost">${ARROW_SVG}</button>
     <span class="route-gps-text"><button type="button" class="route-gps-to" title="Open the Map"></button><span class="route-gps-next"></span></span>
     <button type="button" class="route-gps-x" aria-label="Clear this route" title="Clear this route">×</button>`;
   host.appendChild(el);
@@ -269,6 +331,7 @@ function ensureGps(engine) {
     if (!state.route) return;
     engine.openMap?.(hubOf(state.route.destination) || undefined);
   });
+  el.querySelector('.route-gps-arrow').addEventListener('click', () => arrowClick(engine));
   gps = { el, arrow: el.querySelector('.route-gps-arrow'), to: el.querySelector('.route-gps-to'), next: el.querySelector('.route-gps-next'), angle: null };
   return gps;
 }
@@ -293,21 +356,152 @@ function renderGps(engine, step) {
   g.arrow.classList.toggle('arrived', text.arrived);
   g.arrow.innerHTML = text.arrived ? TICK_SVG : ARROW_SVG;
   g.arrow.style.visibility = text.offPath ? 'hidden' : '';
+  const tip = text.arrived ? 'Close the route' : 'Walk to the next signpost';
+  g.arrow.title = tip;
+  g.arrow.setAttribute('aria-label', tip);
   g.angle = null;
 }
 
-/** GpsUI.updateArrow: rotate toward the next signpost. */
+/** GpsUI.updateArrow: rotate toward the next signpost (or door). */
 function pointArrow(engine) {
   if (!gps || gps.el.hidden || !highlight?.view || highlight.view.destroyed || !engine.player) return;
   const svg = gps.arrow.querySelector('svg');
   if (!svg) return;
-  const view = highlight.view;
   const p = engine.player;
-  const deg = (Math.atan2(view.y - 60 - (p.y - 40), view.x - p.x) * 180) / Math.PI;
+  const deg = (Math.atan2(highlight.y - (p.y - 40), highlight.x - p.x) * 180) / Math.PI;
   const rounded = Math.round(deg / 3) * 3;
   if (rounded === gps.angle) return;
   gps.angle = rounded;
   svg.style.transform = `rotate(${rounded}deg)`;
+}
+
+/* ------------------------------------------------------------ the GPS arrow walk */
+
+/**
+ * GpsUI.as onArrowClick 96-112: with a next street, walk to the signpost (or
+ * door) that leads there and take it (startUserInitiatedPath; on arrival
+ * SignpostView.tryFocus 404-412 goes through the board set as
+ * interaction_sign, and a door path ends by entering the door). At the
+ * destination the arrow closes the route (onCloseClick).
+ *
+ * The walk holds the arrow key toward the post, as you would, so the avatar
+ * walks with its own speed, animation, walls and energy. Any key or click of
+ * yours takes over and ends it; so does a wall or a ledge in the way.
+ */
+const WALK_KEY = { [-1]: 'ArrowLeft', 1: 'ArrowRight' };
+/** Close enough to use the post or the door (world px). */
+const WALK_REACH = 26;
+/** No headway for this long (a wall, a ledge): stop and leave you there. */
+const WALK_STALL_MS = 1500;
+const WALK_MAX_MS = 45000;
+let walkInputBound = false;
+
+function sendWalkKey(type, key) {
+  if (typeof window === 'undefined' || typeof KeyboardEvent === 'undefined') return;
+  window.dispatchEvent(new KeyboardEvent(type, { key, code: key, bubbles: true }));
+}
+
+function bindWalkInput() {
+  if (walkInputBound || typeof window === 'undefined') return;
+  walkInputBound = true;
+  const takeOver = (e) => {
+    if (!walk || !e.isTrusted) return;
+    if (e.target?.closest?.('.route-gps-arrow')) return;
+    stopWalk(walk.engine, 'input');
+  };
+  window.addEventListener('keydown', takeOver, true);
+  window.addEventListener('pointerdown', takeOver, true);
+}
+
+function stopWalk(engine, reason = '') {
+  if (!walk) return;
+  const held = walk.dir ? WALK_KEY[walk.dir] : '';
+  walk = null;
+  if (held) sendWalkKey('keyup', held);
+  gps?.arrow?.classList.remove('walking');
+  if (reason) engine?.setData?.('routeWalkEnd', reason);
+}
+
+function startWalk(engine, now) {
+  stopWalk(engine);
+  if (!highlight || !engine.player) return false;
+  bindWalkInput();
+  const x = highlight.kind === 'door' ? highlight.x : highlight.view.x;
+  walk = { engine, kind: highlight.kind, key: highlight.key, x, startedAt: now, lastX: engine.player.x, lastMoveAt: now, dir: 0 };
+  gps?.arrow?.classList.add('walking');
+  engine.setData?.('routeWalkEnd', '');
+  return true;
+}
+
+/** Take the highlighted signpost board or door (the end of the walk, or QA autoplay). */
+function takeHop(engine) {
+  if (!highlight || !state.route) return;
+  const step = currentStep(engine);
+  if (highlight.kind === 'door') {
+    engine.setData?.('routeHop', `door:${step.next}`);
+    // The door's own Enter verb, as a menu click would run it (doors-feature: key, level and gate checks).
+    const verbs = engine.targetVerbs?.(highlight.target) || [];
+    const enter = verbs.find((v) => v.id === 'enter') || { id: 'enter', label: 'Enter', durationMs: 0 };
+    if (enter.enabled === false) {
+      if (enter.reason) engine.toast?.(enter.reason, 2400);
+      return;
+    }
+    engine.beginVerb?.(highlight.target, enter);
+    return;
+  }
+  if (!step.next) return;
+  engine.setData?.('routeHop', `sign:${step.next}`);
+  const c = highlight.connection || {};
+  if (engine.travel) engine.travel(step.next, { label: c.label || label(step.next), arrive: c.arrive });
+  else engine.enter(step.next);
+}
+
+function stepWalk(engine, now) {
+  if (!walk) return;
+  const p = engine.player;
+  if (!p || !highlight || highlight.key !== walk.key || offWorld(engine) || engine.busy?.() || engine.acting?.()) {
+    stopWalk(engine, 'lost');
+    return;
+  }
+  const dx = walk.x - p.x;
+  if (Math.abs(dx) <= WALK_REACH) {
+    stopWalk(engine, 'arrived');
+    takeHop(engine);
+    return;
+  }
+  const dir = dx > 0 ? 1 : -1;
+  if (dir !== walk.dir) {
+    if (walk.dir) sendWalkKey('keyup', WALK_KEY[walk.dir]);
+    walk.dir = dir;
+    sendWalkKey('keydown', WALK_KEY[dir]);
+  }
+  if (Math.abs(p.x - walk.lastX) > 2) {
+    walk.lastX = p.x;
+    walk.lastMoveAt = now;
+  } else if (now - walk.lastMoveAt > WALK_STALL_MS) {
+    stopWalk(engine, 'stalled');
+    return;
+  }
+  if (now - walk.startedAt > WALK_MAX_MS) stopWalk(engine, 'timeout');
+}
+
+/** GpsUI.onArrowClick. */
+function arrowClick(engine) {
+  if (!state.route) return;
+  const step = currentStep(engine);
+  if (step.status === 'arrived') {
+    dropRoute(engine, { reason: 'closed' });
+    return;
+  }
+  if (walk) {
+    stopWalk(engine, 'again');
+    return;
+  }
+  if (step.status !== 'on' || !highlight || offWorld(engine)) return;
+  if (engine.busy?.() || engine.acting?.()) return;
+  // onTick's clock (game.js features.tick passes Date.now()).
+  startWalk(engine, Date.now());
+  publish(engine);
 }
 
 /* ------------------------------------------------------------ refresh + data */
@@ -323,7 +517,10 @@ function publish(engine, step = currentStep(engine)) {
   engine.setData('routePath', r?.path ? r.path.map(label).join('>') : '');
   engine.setData('routeSource', r ? r.source : '');
   engine.setData('routeQuest', r ? r.quest : '');
-  engine.setData('routeSign', highlight ? `${Math.round(highlight.view.x)}:${highlight.board}` : '');
+  engine.setData('routeSign', highlight?.kind === 'sign' ? `${Math.round(highlight.view.x)}:${highlight.board}` : '');
+  engine.setData('routeDoor', highlight?.kind === 'door' ? `${Math.round(highlight.x)}:${label(highlight.door?.connect?.street || highlight.door?.connect?.tsid)}` : '');
+  engine.setData('routeVia', highlight?.kind || '');
+  engine.setData('routeWalk', walk ? `${walk.kind}:${Math.round(walk.x)}` : '');
   engine.setData('routeReached', String(state.reached));
   engine.setData('routeCleared', state.lastCleared || '');
   engine.setData('routeMode', pickMode ? 'pick' : '');
@@ -348,6 +545,7 @@ function decorateMap(engine) {
   svg.querySelectorAll('.map-route').forEach((el) => el.remove());
   engine.setData?.('routeMapLines', '0');
   engine.setData?.('routeMapExit', '');
+  engine.setData?.('routeMapPin', '');
   if (!state.route) return;
   const step = currentStep(engine);
   const remaining = step.status === 'arrived' ? [state.route.destination] : step.remaining.length ? step.remaining : state.route.path || [state.route.destination];
@@ -394,6 +592,7 @@ function decorateMap(engine) {
   if (pinGroup.childNodes.length) svg.insertBefore(pinGroup, svg.querySelector('g.map-hub-go'));
   engine.setData?.('routeMapLines', String(draw.lines.length));
   engine.setData?.('routeMapExit', draw.exitHub);
+  engine.setData?.('routeMapPin', draw.pin ? draw.pinVia || 'street' : '');
 }
 
 /** Clicks on the Map while "Set a destination" is on: route instead of travel. */
@@ -431,16 +630,29 @@ function mapCard(engine) {
   card.dataset.mapRoute = '';
   const r = state.route;
   const step = currentStep(engine);
-  let body;
+  // A quest run that shares this route (Warm and Smuggly's Contraband, G192: its Map card merged in here).
+  const quest = engine.query?.('mapRouteCard', engine) || null;
+  const shared = Boolean(quest && r && r.source === quest.source);
+  const lead = quest?.icon
+    ? `<img class="map-route-icon" src="${esc(quest.icon)}" alt="" aria-hidden="true">`
+    : '<span class="map-route-swatch" aria-hidden="true"></span>';
+  const lines = [];
+  let head = '';
   if (r) {
     const dest = `${label(r.destination)}${hubName(r.destination) ? ` (${hubName(r.destination)})` : ''}`;
     const text = gpsText(r, step, label);
     const rest = step.status === 'on' ? step.remaining.slice(1) : [];
-    const via = rest.length > 1 ? `<span>Route: ${rest.map(label).join(' → ')}</span>` : `<span>${text.arrived ? ROUTE_TEXT.arrived : text.next}</span>`;
-    body = `<span class="map-route-swatch" aria-hidden="true"></span><div class="map-route-body"><strong>${ROUTE_TEXT.to}${dest}</strong><br>${via}</div>`;
+    head = shared ? quest.title : `${ROUTE_TEXT.to}${dest}`;
+    lines.push(rest.length > 1 ? `Route: ${rest.map(label).join(' → ')}` : text.arrived ? ROUTE_TEXT.arrived : text.next);
+    if (quest && !shared) lines.push(`${quest.title}. ${quest.text}`);
+  } else if (quest) {
+    head = quest.title;
+    lines.push(quest.text);
   } else {
-    body = `<span class="map-route-swatch" aria-hidden="true"></span><div class="map-route-body"><span>${pickMode ? 'Click a street to set it as your destination.' : 'No destination set.'}</span></div>`;
+    lines.push(pickMode ? 'Click a street to set it as your destination.' : 'No destination set.');
   }
+  card.dataset.mapRouteQuest = quest ? quest.source : '';
+  const body = `${lead}<div class="map-route-body">${head ? `<strong>${esc(head)}</strong><br>` : ''}${lines.map((l) => `<span>${esc(l)}</span>`).join('<br>')}</div>`;
   card.innerHTML = `${body}<span class="map-route-actions"></span>`;
   const actions = card.querySelector('.map-route-actions');
   const button = (text, fn, pressed) => {
@@ -452,7 +664,9 @@ function mapCard(engine) {
     actions.appendChild(b);
     return b;
   };
-  if (r && hubOf(r.destination) && document.querySelector('#map-canvas svg') && !document.querySelector(`#map-canvas g.map-street[data-tsid="${r.destination}"]`)) {
+  // Another hub's destination: a button to its map (a door-only room in this hub is pinned on its street, G192).
+  const shownHub = hubOf(document.querySelector('#map-canvas g.map-street[data-tsid]')?.getAttribute('data-tsid') || '');
+  if (r && hubOf(r.destination) && document.querySelector('#map-canvas svg') && hubOf(r.destination) !== shownHub) {
     button('Show destination', () => engine.openMap?.(hubOf(r.destination)));
   }
   button('Set a destination', () => {
@@ -479,9 +693,13 @@ function demoSetup(engine) {
   loadGraph().then(() => setRoute(engine, { to, source: 'player' }));
 }
 
-/** &routeautoplay=1: stand at each highlighted signpost, then travel on. */
+/**
+ * &routeautoplay=1: stand at each highlighted signpost or door, then travel on.
+ * &routeautoplay=arrow: click the GPS arrow on each street and let it walk you.
+ */
 function autoplay(engine, now) {
-  if (engine.param?.('routeautoplay') !== '1' || !state.route) return;
+  const mode = engine.param?.('routeautoplay');
+  if ((mode !== '1' && mode !== 'arrow') || !state.route) return;
   if (engine.busy?.() || engine.questDialogueOpen?.()) return;
   // Quest-room conversations and award cards are not part of busy(): hold for them too.
   if (typeof document !== 'undefined' && document.querySelector('#qi-dialogue:not([hidden]), #award-screen:not([hidden])')) {
@@ -492,16 +710,29 @@ function autoplay(engine, now) {
   if (step.status !== 'on' || !highlight?.view) return;
   const key = `${engine.streetTsid}>${step.next}`;
   const stepMs = Number(engine.param('routestepms')) || 2500;
+  if (mode === 'arrow') {
+    // One click per street, after a beat to see the GPS.
+    if (auto.key !== key) {
+      auto = { key, at: now };
+      return;
+    }
+    if (auto.at && !walk && now - auto.at > Math.min(stepMs, 1200)) {
+      auto.at = 0;
+      if (typeof document !== 'undefined') document.querySelector('#route-gps .route-gps-arrow')?.click();
+      else arrowClick(engine);
+    }
+    return;
+  }
   if (auto.key !== key) {
     auto = { key, at: now };
-    engine.player.x = highlight.view.x - 40;
+    engine.player.x = highlight.x - (highlight.kind === 'door' ? 0 : 40);
     engine.player.vx = 0;
     engine.snapCamera?.();
     return;
   }
   if (auto.at && now - auto.at > stepMs) {
     auto.at = 0;
-    engine.enter(step.next);
+    takeHop(engine);
   }
 }
 
@@ -543,12 +774,13 @@ export const mapRoutesFeature = {
   },
 
   onStreetEnter(_street, engine) {
+    stopWalk(engine);
     highlight = null;
     auto = { at: 0, key: '' };
     demoSetup(engine);
     const apply = () => {
       if (state.route) {
-        const res = enterStreet(state, graph || {}, engine.streetTsid, { offWorld: offWorld(engine), blocked: closedRoads(engine) });
+        const res = enterStreet(state, graph || {}, engine.streetTsid, { offWorld: offWorld(engine), blocked: closedRoads(engine), locked: lockedDoors });
         state = res.state;
         if (res.events.includes('arrived')) {
           // locations/location.js 310-313: pc.quests_inc_counter('map_dest_reached', 1).
@@ -563,7 +795,8 @@ export const mapRoutesFeature = {
     else loadGraph().then(apply);
   },
 
-  onStreetClear() {
+  onStreetClear(engine) {
+    stopWalk(engine);
     highlight = null;
   },
 
@@ -580,8 +813,14 @@ export const mapRoutesFeature = {
       dropRoute(engine, { reason: 'quest-done' });
     }
     if (highlight?.glow && !highlight.glow.destroyed) highlight.glow.alpha = 0.8 + 0.2 * Math.sin(now / 260);
+    stepWalk(engine, now);
     if (now - lastPublish > 120) {
       lastPublish = now;
+      // Doors (doors-feature) and signposts can register after the street is entered: look again.
+      if (state.route && !highlight && graph && engine.streetTsid && now - lastLook > 400) {
+        lastLook = now;
+        refresh(engine);
+      }
       pointArrow(engine);
     }
     autoplay(engine, now);
@@ -598,6 +837,7 @@ export const mapRoutesFeature = {
   },
   _reset() {
     state = createRouteState();
+    walk = null;
     highlight = null;
     gps = null;
     lastDead = null;
@@ -605,8 +845,29 @@ export const mapRoutesFeature = {
     demoDone = false;
     lastHudKey = '';
   },
+  /** Tests: a plain adjacency map, or signpost-graph.json as fetched ({ streets, doors, doorKeys }). */
   _setGraph(g) {
-    graph = g;
+    if (g && g.streets && typeof g.streets === 'object' && !Array.isArray(g.streets)) {
+      const built = routeGraph(g);
+      graph = built.graph;
+      lockedDoors = built.locked;
+    } else {
+      graph = g;
+      lockedDoors = null;
+    }
+  },
+  /** QA / tests: the GPS arrow click, and one walk step. */
+  _arrowClick(engine) {
+    arrowClick(engine);
+  },
+  _stepWalk(engine, now) {
+    stepWalk(engine, now);
+  },
+  _highlight() {
+    return highlight;
+  },
+  _walk() {
+    return walk;
   },
 };
 

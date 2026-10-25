@@ -1991,9 +1991,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 419,
+  "commits": 423,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Feats open again a game week after you finish them, for another rock"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "A crab that hears its last tune again sulks but lets you keep the block"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "The restoration history lists today's work again"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2098,21 +2113,6 @@
     "date": "2026-10-24",
     "kind": "new",
     "text": "An item catalog with every Glitch item and whether the remake has it"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Slash commands in Local chat: /who, /home, /house, /tower, /leave, /butler, /makegod, /xyzzy"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "The Forest Community Machine Room behind Middle Valley Clearing's door"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "fix",
-    "text": "Activity lines that end in \"!\" no longer get a stray period"
    }
   ]
  },

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-69';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-70';
 import {
   actionDurationFor,
   createTimedAction,
@@ -630,7 +630,9 @@ import {
   NEW_DAY_HOLD_MS,
   runStreetTransition,
   showAwardScreen,
-} from './js/screen-fx.js?v=award-text-2';
+  afterStreetCard,
+  streetCardUp,
+} from './js/screen-fx.js?v=g192-1';
 import {
   planTravel,
   listMapDestinations,
@@ -1858,6 +1860,8 @@ function enqueueAward(payload) {
     payload.iconUrl = badgeIconFor(payload.classTsid);
   }
   awardQueue = awardQueue
+    // TSFrontController.tryShowScreenViewFromQ 3399-3400: award screens wait for the loading card (G192).
+    .then(() => afterStreetCard())
     .then(async () => {
       const el = document.getElementById('award-screen');
       playSound(payload.sound || soundForAward(payload.kind), { volume: 0.7 });
@@ -7620,6 +7624,12 @@ const engine = {
   get decoViews() {
     return bgLayer?.decoViews || null;
   },
+  /** A street loading card is up (G192): prompts, conversations and awards wait for it. */
+  streetCardUp: () => streetCardUp(),
+  /** Resolves once no street loading card is up (G192). */
+  afterStreetCard: () => afterStreetCard(),
+  /** Travel by a signpost board as a click on it would (G192, the GPS arrow): { label, arrive }. */
+  travel: (tsid, meta = {}) => travelTo(tsid, { via: 'signpost', ...meta }),
   /** Street signpost views (street-render signViews: signBoards per arm), for the map route glow (G177). */
   get signViews() {
     return bgLayer?.signViews || [];
@@ -18838,7 +18848,44 @@ async function openMap(hubId) {
     el.classList.add('map-feature-card');
     panel.querySelector('.map-card')?.insertBefore(el, panel.querySelector('.map-canvas'));
   }
+  arrangeMapCards(panel);
   panel.hidden = false;
+}
+
+/**
+ * G192: the Map's shortcut cards (home, puzzle streets, projects, ...) fold
+ * into one Shortcuts line above the route card, so the map itself stays in
+ * view; quest cards and the route card stay out. Open or shut is kept while
+ * the game runs.
+ */
+let mapExtrasOpen = false;
+function arrangeMapCards(panel) {
+  const card = panel?.querySelector('.map-card');
+  const canvas = panel?.querySelector('.map-canvas');
+  if (!card || !canvas) return;
+  card.querySelectorAll(':scope > .map-extras').forEach((el) => el.remove());
+  const extras = [...card.children].filter((el) =>
+    (el.classList.contains('map-home-card') || el.classList.contains('map-feature-card')) &&
+    !el.matches('[data-map-route], .nx-map-card'));
+  if (!extras.length) return;
+  const titleOf = (el) => (el.dataset.mapTitle || el.querySelector('strong, h3, h4')?.textContent || el.firstElementChild?.textContent || '').trim().replace(/\s+/g, ' ');
+  const details = document.createElement('details');
+  details.className = 'map-extras';
+  details.open = mapExtrasOpen;
+  const summary = document.createElement('summary');
+  const head = document.createElement('strong');
+  head.textContent = 'Shortcuts';
+  const list = document.createElement('span');
+  list.textContent = extras.map(titleOf).filter(Boolean).join(' · ');
+  summary.append(head, list);
+  const grid = document.createElement('div');
+  grid.className = 'map-extras-grid';
+  grid.append(...extras);
+  details.append(summary, grid);
+  details.addEventListener('toggle', () => {
+    mapExtrasOpen = details.open;
+  });
+  card.insertBefore(details, card.querySelector(':scope > [data-map-route]') || canvas);
 }
 
 function closeMap() {

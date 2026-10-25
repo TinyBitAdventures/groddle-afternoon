@@ -42,12 +42,18 @@
  *   view/gameoverlay/maps/MapHub.as 70-72 draws the path in hub_map_path_color,
  *   default 0xf0f258.
  *
- * Remake: routes run over public/assets/content/signpost-graph.json (visible
- * signposts only, tools/build-signpost-graph.mjs). Doors are not in the graph,
- * so a route never needs one (the source's door branch, loc_path_door, has no
- * route to wire here yet). Unlike player.js, resurrecting forgets the stored
- * route once it is restored (the source kept previous_map_path for ever and
- * could restore a stale one after a later croak).
+ * Remake: routes run over public/assets/content/signpost-graph.json
+ * (tools/build-signpost-graph.mjs): visible signposts under `streets`, and
+ * since G192 the doors under `doors` (fixed-destination, visible doors; key
+ * locked ones listed in `doorKeys`). routeGraph() joins them, so a route can
+ * end inside a door-only room (the Hell Bar behind Panka Surazu, Vicar's
+ * Peak). On a street the client looks for a signpost to the next street first
+ * and a door second (TSFrontController.startLocationPath 1791-1799,
+ * loc_path_door; Location.getDoorThatLinksToLocTsid), and so do
+ * signpostToward() / doorToward() here. A locked door is taken only when no
+ * other way exists. Unlike player.js, resurrecting forgets the stored route
+ * once it is restored (the source kept previous_map_path for ever and could
+ * restore a stale one after a later croak).
  */
 
 /** Player-facing copy, verbatim from the source. */
@@ -120,18 +126,41 @@ export function graphKey(graph, tsid) {
 export const sameStreet = (a, b) => Boolean(a && b) && String(a).slice(1) === String(b).slice(1);
 
 /**
+ * The route graph from signpost-graph.json: signpost and door neighbours in
+ * one adjacency map, plus the locked door edges ("from>to" keys) that a route
+ * avoids while it can (G192).
+ * @param {{ streets?: Record<string, string[]>, doors?: Record<string, string[]>, doorKeys?: Record<string, number> }} json
+ * @returns {{ graph: Record<string, string[]>, doors: Record<string, string[]>, locked: Set<string> }}
+ */
+export function routeGraph(json = {}) {
+  const graph = {};
+  for (const [k, v] of Object.entries(json?.streets || {})) graph[k] = [...(v || [])];
+  const doors = {};
+  for (const [k, v] of Object.entries(json?.doors || {})) {
+    doors[k] = [...(v || [])];
+    const out = new Set(graph[k] || []);
+    for (const to of v || []) out.add(to);
+    graph[k] = [...out];
+    for (const to of v || []) graph[to] ||= [];
+  }
+  return { graph, doors, locked: new Set(Object.keys(json?.doorKeys || {})) };
+}
+
+/**
  * Shortest route over visible signposts (apiFindGlobalPathX, or
  * apiFindShortestGlobalPath when `to` lists several streets). Returns the
  * street keys from `from` to the destination inclusive, [from] when you are
  * already there, or null. `blocked` lists streets whose road is closed
  * (street projects, js/street-jobs.js closedStreets): the route goes round
  * them when it can, and through them only when there is no other way.
+ * `locked` lists door edges ("from>to", routeGraph) that need a key: the
+ * route takes one only when nothing else gets there (G192).
  * @param {Record<string, string[]>} graph
  * @param {string} from
  * @param {string|string[]} to
- * @param {{ blocked?: Iterable<string> }} [opts]
+ * @param {{ blocked?: Iterable<string>, locked?: Set<string>|null }} [opts]
  */
-export function findRoute(graph, from, to, { blocked = null } = {}) {
+export function findRoute(graph, from, to, { blocked = null, locked = null } = {}) {
   const start = graphKey(graph, from);
   if (!start) return null;
   const targets = new Set((Array.isArray(to) ? to : [to]).map((t) => graphKey(graph, t)).filter(Boolean));
@@ -139,16 +168,24 @@ export function findRoute(graph, from, to, { blocked = null } = {}) {
   if (targets.has(start)) return [start];
   const closed = new Set();
   for (const t of blocked || []) for (const a of tsidAliases(t)) closed.add(a);
-  return bfs(graph, start, targets, closed) || (closed.size ? bfs(graph, start, targets, new Set()) : null);
+  const keyed = locked && locked.size ? locked : null;
+  const none = new Set();
+  return (
+    bfs(graph, start, targets, closed, keyed) ||
+    (keyed ? bfs(graph, start, targets, closed, null) : null) ||
+    (closed.size ? bfs(graph, start, targets, none, keyed) : null) ||
+    (closed.size && keyed ? bfs(graph, start, targets, none, null) : null)
+  );
 }
 
-function bfs(graph, start, targets, closed) {
+function bfs(graph, start, targets, closed, locked) {
   const prev = new Map([[start, null]]);
   const queue = [start];
   for (let i = 0; i < queue.length; i++) {
     const cur = queue[i];
     for (const next of graph[cur] || []) {
       if (prev.has(next)) continue;
+      if (locked && locked.has(`${cur}>${next}`)) continue;
       if (closed.has(next) && !targets.has(next)) continue;
       prev.set(next, cur);
       if (targets.has(next)) {
@@ -198,13 +235,13 @@ export function normalizeRouteState(seed = {}) {
  * several destinations: the closest one wins.
  * @returns {{ ok: boolean, state: object, route?: object, error?: string }}
  */
-export function planRoute(state, graph, { from, to, source = 'player', quest = '', inHome = false, blocked = null, now = Date.now() } = {}) {
+export function planRoute(state, graph, { from, to, source = 'player', quest = '', inHome = false, blocked = null, locked = null, now = Date.now() } = {}) {
   const s = normalizeRouteState(state);
   if (inHome) return { ok: false, state: s, error: ROUTE_TEXT.fromHome };
   const list = (Array.isArray(to) ? to : [to]).filter(Boolean);
   if (!list.length) return { ok: false, state: s, error: ROUTE_TEXT.notFound };
   if (from && list.some((t) => sameStreet(t, from))) return { ok: false, state: s, error: ROUTE_TEXT.alreadyThere };
-  const path = from ? findRoute(graph, from, list, { blocked }) : null;
+  const path = from ? findRoute(graph, from, list, { blocked, locked }) : null;
   // A route from somewhere off the graph (an instance, Hell One) still keeps its
   // destination: the GPS says "Return to world for directions" until a street on
   // the graph finds the way (GpsUI moveMoveEnded asks again on every arrival).
@@ -252,7 +289,7 @@ export function routeStep(route, graph, currentTsid) {
  * know (homes, instances, Hell One).
  * @returns {{ state: object, events: string[] }}
  */
-export function enterStreet(state, graph, currentTsid, { now = Date.now(), offWorld = false, blocked = null } = {}) {
+export function enterStreet(state, graph, currentTsid, { now = Date.now(), offWorld = false, blocked = null, locked = null } = {}) {
   let s = normalizeRouteState(state);
   const events = [];
   const r = s.route;
@@ -271,7 +308,7 @@ export function enterStreet(state, graph, currentTsid, { now = Date.now(), offWo
   }
   const step = routeStep(r, graph, currentTsid);
   if (step.status === 'off' && !offWorld && graphKey(graph, currentTsid)) {
-    const path = findRoute(graph, currentTsid, r.destination, { blocked });
+    const path = findRoute(graph, currentTsid, r.destination, { blocked, locked });
     if (path && path.length > 1) {
       s = { ...s, route: { ...r, path } };
       events.push('rerouted');
@@ -329,6 +366,28 @@ export function signpostToward(signposts, nextTsid) {
 }
 
 /**
+ * Which door on this street leads to `nextTsid` (Location.getDoorThatLinksToLocTsid,
+ * the loc_path_door branch of TSFrontController.startLocationPath). doors:
+ * street JSON doors. Hidden doors are not drawn (client DoorView) and doors
+ * with random destinations lead nowhere fixed. Returns the door index or -1.
+ */
+export function doorToward(doors, nextTsid) {
+  if (!nextTsid) return -1;
+  const list = doors || [];
+  // Two doors to one room (build-signpost-graph keeps the unlocked one): an unlocked door first.
+  let found = -1;
+  for (let i = 0; i < list.length; i++) {
+    const d = list[i];
+    if (!d || d.hidden || d.destinations?.length) continue;
+    const to = d.connect?.street || d.connect?.tsid;
+    if (!sameStreet(to, nextTsid)) continue;
+    if (!Number(d.key_id)) return i;
+    if (found < 0) found = i;
+  }
+  return found;
+}
+
+/**
  * The path lines for one hub map (MapHub.updateLocPath): every remaining route
  * street drawn on this hub, in route order, joined end to end; the hub exit
  * (GO) to light when the route leaves this hub; the destination pin.
@@ -368,7 +427,20 @@ export function hubRouteDrawing(remaining, segments, hubOf, hubId) {
     }
     prev = seg;
   }
+  const mid = (seg) => ({ x: (seg.x1 + seg.x2) / 2, y: (seg.y1 + seg.y2) / 2 });
   const last = list.length ? byKey.get(list[list.length - 1]) : null;
-  const pin = last ? { x: (last.x1 + last.x2) / 2, y: (last.y1 + last.y2) / 2 } : null;
-  return { lines, joins, exitHub, pin };
+  let pin = last ? mid(last) : null;
+  let pinVia = '';
+  // A door-only room in this hub (the Hell Bar, G192) is not drawn: pin the street its door is on.
+  if (!pin && list.length > 1 && hubId && String(hubOf(list[list.length - 1]) || '') === String(hubId)) {
+    for (let i = list.length - 2; i >= 0; i--) {
+      const seg = byKey.get(list[i]);
+      if (seg) {
+        pin = mid(seg);
+        pinVia = 'door';
+        break;
+      }
+    }
+  }
+  return { lines, joins, exitHub, pin, pinVia };
 }
