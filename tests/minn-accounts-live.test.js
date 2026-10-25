@@ -7,6 +7,8 @@
  *
  * GRODDLE_URL and GRODDLE_ROOT (the Minn webroot, for WP-CLI) default to the
  * local Cove site. Requests go through curl, which keeps the sign-in cookies.
+ * The realtime test also opens /ws (Cove's route to realtime/, the Go server:
+ * realtime/run.sh) and skips that part when nothing answers there.
  */
 import assert from 'node:assert/strict';
 import { describe, it, before, after } from 'node:test';
@@ -159,6 +161,52 @@ describe('groddle/v1 on the live site', { skip: !LIVE && 'set GRODDLE_LIVE=1 to 
     assert.deepEqual(call(a.jar, 'DELETE', '/wp-json/groddle/v1/backups/2', { nonce: a.nonce }).json, { deleted: true, slot: 2 });
     assert.equal(call(a.jar, 'GET', '/wp-json/groddle/v1/backups/2', { nonce: a.nonce }).json.code, 'groddle_backup_missing');
     assert.equal(call(a.jar, 'DELETE', '/wp-json/groddle/v1/backups/2', { nonce: a.nonce }).status, 404);
+  });
+
+  it('a realtime ticket: signed-in only, signed for a minute, good for one socket', async () => {
+    assert.equal(call(join(dir, 'anon.jar'), 'POST', '/wp-json/groddle/v1/realtime').status, 401);
+    const r = call(a.jar, 'POST', '/wp-json/groddle/v1/realtime', { nonce: a.nonce });
+    assert.equal(r.status, 200, r.text);
+    assert.equal(r.json.expiresIn, 60);
+    assert.equal(r.json.path, '/ws');
+    const [body, sig] = r.json.ticket.split('.');
+    assert.match(sig, /^[\w-]{43}$/, 'an HMAC-SHA256, base64url');
+    const claims = JSON.parse(Buffer.from(body, 'base64url').toString());
+    assert.equal(claims.sub, a.id);
+    assert.equal(claims.name, a.login);
+    assert.equal(claims.exp - claims.iat, 60);
+    assert.match(claims.jti, /^[0-9a-f]{16}$/);
+
+    const health = call(join(dir, 'anon.jar'), 'GET', '/ws');
+    if (health.status === 502 || health.status === 404) return; // the realtime server is not running
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    const open = (ticket) => new Promise((resolve, reject) => {
+      const ws = new WebSocket(`${SITE.replace(/^http/, 'ws')}/ws`);
+      const seen = [];
+      ws.onopen = () => ws.send(JSON.stringify({ t: 'auth', ticket }));
+      ws.onmessage = (e) => { seen.push(JSON.parse(e.data)); if (seen[0].t === 'hello') resolve({ ws, seen }); };
+      ws.onclose = (e) => reject(Object.assign(new Error(`closed ${e.code} ${e.reason}`), { code: e.code }));
+      ws.onerror = () => {};
+    });
+    const until = (peer, t) => new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`no ${t}`)), 3000);
+      const look = () => { const m = peer.seen.find((x) => x.t === t); if (m) { clearTimeout(timer); resolve(m); } else setTimeout(look, 20); };
+      look();
+    });
+    const pa = await open(r.json.ticket);
+    assert.equal(pa.seen[0].you.id, a.id);
+    await assert.rejects(open(r.json.ticket), (e) => e.code === 4003, 'the same ticket twice is refused');
+    const pb = await open(call(b.jar, 'POST', '/wp-json/groddle/v1/realtime', { nonce: b.nonce }).json.ticket);
+    const street = `LIVETEST${process.pid}`;
+    pa.ws.send(JSON.stringify({ t: 'join', street, x: 10, y: 20 }));
+    await until(pa, 'street');
+    pb.ws.send(JSON.stringify({ t: 'join', street, x: 30, y: 20 }));
+    assert.equal((await until(pb, 'street')).players[0].id, a.id);
+    assert.equal((await until(pa, 'joined')).player.id, b.id);
+    pb.ws.send(JSON.stringify({ t: 'chat', text: 'hello from the live test' }));
+    assert.equal((await until(pa, 'said')).text, 'hello from the live test');
+    pa.ws.close();
+    pb.ws.close();
   });
 
   it('the REST index lists the groddle/v1 namespace', () => {

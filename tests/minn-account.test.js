@@ -215,10 +215,10 @@ describe('Groddle extension: accounts (minn/groddle)', () => {
     assert.deepEqual(entries, [...SAVE_ENTRY_NAMES]);
   });
 
-  it('registers groddle/v1 REST routes: me open to anyone, every save and backup route signed-in', () => {
-    assert.match(src('Extension.php'), /\$minn->rest\(new Player\(\$minn\), new MultiplayerSave\(\$minn\), new SoloBackups\(\$minn\)\);/);
+  it('registers groddle/v1 REST routes: me open to anyone, every save, backup and realtime route signed-in', () => {
+    assert.match(src('Extension.php'), /\$minn->rest\(new Player\(\$minn\), new MultiplayerSave\(\$minn\), new SoloBackups\(\$minn\), new RealtimeTicket\(\$minn\)\);/);
     const routes = [];
-    for (const f of ['Player.php', 'MultiplayerSave.php', 'SoloBackups.php']) {
+    for (const f of ['Player.php', 'MultiplayerSave.php', 'SoloBackups.php', 'RealtimeTicket.php']) {
       for (const m of src(f).matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]/g)) routes.push(`${m[1]} ${m[2]} ${m[3]}`);
     }
     assert.deepEqual(routes.sort(), [
@@ -227,9 +227,23 @@ describe('Groddle extension: accounts (minn/groddle)', () => {
       'Get /groddle/v1/backups/{slot:\\d+} SignedIn',
       'Get /groddle/v1/me Public',
       'Get /groddle/v1/save SignedIn',
+      'Post /groddle/v1/realtime SignedIn',
       'Put /groddle/v1/backups/{slot:\\d+} SignedIn',
       'Put /groddle/v1/save SignedIn',
     ]);
+  });
+
+  it('signs realtime tickets the way realtime/ticket.go checks them, for a minute, with the secret outside the webroot', () => {
+    const ticket = src('RealtimeTicket.php');
+    assert.match(ticket, /public const TTL = 60;/);
+    assert.match(ticket, /hash_hmac\('sha256', \$body, \$secret, true\)/);
+    assert.match(ticket, /strtr\(base64_encode\(\$bytes\), '\+\/', '-_'\), '='/, 'base64url without padding');
+    assert.match(ticket, /'jti' => bin2hex\(random_bytes\(8\)\)/, 'a ticket works once');
+    assert.match(ticket, /dirname\(rtrim\(ABSPATH, '\/'\)\) \. '\/realtime\.secret'/, 'beside the webroot, never in it');
+    const go = readFileSync(join(ext, '..', '..', 'realtime', 'ticket.go'), 'utf8');
+    for (const field of ['sub', 'name', 'iat', 'exp', 'jti']) assert.match(go, new RegExp(`json:"${field}"`), field);
+    assert.match(go, /hmac\.New\(sha256\.New, t\.secret\)/);
+    assert.match(go, /base64\.RawURLEncoding/);
   });
 
   it('reads and writes only the signed-in caller\'s rows, with the version check in the write itself', () => {

@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 489,
+  "commits": 490,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "The Giant Icons load the same day clock as the rest of the game"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "The stun orb, secret markers, poisoned trees and Giant Love play Tiny Speck's own animations, and race winners get the real rainbow"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Buttering up a chicken and singing to a butterfly follow the source, and resource-node mood bonuses take the metabolic gate"
    }
   ]
  },
