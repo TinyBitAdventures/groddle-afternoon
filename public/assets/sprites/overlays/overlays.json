@@ -98,6 +98,32 @@
   "cols": 22,
   "order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
  },
+ "grabemgood_winner": {
+  "kind": "sheet",
+  "src": "glitch-overlays/grabemgood_winner.fla",
+  "fla": "a99c57fcef022ac99bbe7544970dd239f4d682ab",
+  "fps": 24,
+  "frames": 21,
+  "stage": [265, 323],
+  "box": [-26, 0, 315, 313],
+  "states": {
+   "other_winner": {
+    "from": 0,
+    "frames": 11,
+    "loop": false
+   },
+   "you_winner": {
+    "from": 11,
+    "frames": 10,
+    "loop": false
+   }
+  },
+  "file": "grabemgood_winner@1.5x.webp",
+  "scale": 1.5,
+  "cell": [473, 470],
+  "cols": 8,
+  "order": [0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 5, 6, 7, 8, 9, 9, 9, 9, 9, 9]
+ },
  "icon_giant_love": {
   "kind": "sheet",
   "src": "glitch-overlays/icon_giant_love.fla",
@@ -177,6 +203,32 @@
   "cell": [307, 188],
   "cols": 13,
   "order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 0, 0]
+ },
+ "race_winner": {
+  "kind": "sheet",
+  "src": "glitch-overlays/race_winner.fla",
+  "fla": "e21563736a44fa262b4f437b3a377ce01414dc3b",
+  "fps": 24,
+  "frames": 21,
+  "stage": [433.2, 275.6],
+  "box": [-1, -1, 436, 265],
+  "states": {
+   "other_winner": {
+    "from": 0,
+    "frames": 11,
+    "loop": false
+   },
+   "you_winner": {
+    "from": 11,
+    "frames": 10,
+    "loop": false
+   }
+  },
+  "file": "race_winner@1.5x.webp",
+  "scale": 1.5,
+  "cell": [654, 398],
+  "cols": 6,
+  "order": [0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 5, 6, 7, 8, 9, 9, 9, 9, 9, 9]
  },
  "rainbow_fullyrevived": {
   "kind": "sheet",
@@ -329,5 +381,31 @@
   "cell": [150, 154],
   "cols": 21,
   "order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+ },
+ "thegreathoghaul_winner": {
+  "kind": "sheet",
+  "src": "glitch-overlays/thegreathoghaul_winner.fla",
+  "fla": "0cce5e2a9a2496a50d65c6e482388daaef1ded3b",
+  "fps": 24,
+  "frames": 21,
+  "stage": [410, 339],
+  "box": [43, -1, 365, 328],
+  "states": {
+   "other_winner": {
+    "from": 0,
+    "frames": 11,
+    "loop": false
+   },
+   "you_winner": {
+    "from": 11,
+    "frames": 10,
+    "loop": false
+   }
+  },
+  "file": "thegreathoghaul_winner@1.5x.webp",
+  "scale": 1.5,
+  "cell": [548, 492],
+  "cols": 7,
+  "order": [0, 1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 5, 6, 7, 8, 9, 9, 9, 9, 9, 9]
  }
 }

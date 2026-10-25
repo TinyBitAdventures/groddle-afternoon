@@ -331,7 +331,8 @@ function failRun(engine, text) {
   engine.updateHud?.();
   engine.save?.();
   renderHud(engine);
-  engine.prompt?.({ title: 'Warm and Smuggly', kicker: 'Magic Rock', text });
+  // G294: the Magic Rock's quests_familiar_fail_and_remove line keeps the quest card, not the prompt stack.
+  engine.scriptedDialogue?.({ title: 'Warm and Smuggly', kicker: 'Magic Rock', beats: [{ text, response: 'OK' }] });
   publish(engine);
 }
 

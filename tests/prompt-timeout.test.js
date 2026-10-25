@@ -220,9 +220,12 @@ describe('the game wires them', () => {
   const game = read(join(PUBLIC, 'game.js'));
   const css = read(join(PUBLIC, 'style.css'));
 
-  it('engine.prompt passes timeout, timeoutMs, timeoutValue and onTimeout to the prompt card', () => {
+  it('engine.prompt passes timeout, timeoutMs, timeoutValue and onTimeout to the prompt stack, or the card when modal', () => {
+    // G294: a normal prompt joins the bottom-right stack (js/prompt-stack.js); only modal: true takes the card.
+    assert.match(game, /prompt\(\{ title = '', kicker = '', text = '', choices = null, timeout = 0, timeoutMs = 0, timeoutValue = null, onTimeout = null, onChoice = null, modal = false, iconButtons = false, sound = '' \} = \{\}\) \{/);
+    assert.match(game, /if \(modal !== true\) return promptStackUi\(\)\.add\(\{ text, choices, timeout, timeoutMs, timeoutValue, onTimeout, onChoice, iconButtons, sound \}\);/);
     // G213: `choices` sets the buttons (one choice: no Close), between the signature and the call.
-    assert.match(game, /prompt\(\{ title = '', kicker = '', text = '', choices = null, timeout = 0, timeoutMs = 0, timeoutValue = null, onTimeout = null \} = \{\}\) \{[\s\S]{0,500}?openScriptedQuestDialogue\(\{[\s\S]{0,400}timeout,\s*timeoutMs,\s*timeoutValue,\s*onTimeout,/);
+    assert.match(game, /modal = false, iconButtons = false, sound = '' \} = \{\}\) \{[\s\S]{0,800}?openScriptedQuestDialogue\(\{[\s\S]{0,600}timeout,\s*timeoutMs,\s*timeoutValue,\s*onTimeout,/);
     assert.match(game, /renderQuestDialogueBeat\(\);\n  armQuestDialogueTimeout\(\{ timeout, timeoutMs, timeoutValue, onTimeout \}\);/);
     assert.match(game, /hoverEl: document\.querySelector\('#quest-dialogue \.quest-dialogue-card'\)/);
     assert.match(game, /if \(questDialogueState !== mine\) return;\s*closeQuestDialogue\(\{ force: true \}\);/, 'only the prompt that armed it');
@@ -235,7 +238,8 @@ describe('the game wires them', () => {
     assert.equal((hell.match(/text: HELL_TEXT\.(super)?[pP]ooped, timeoutMs: 10000/g) || []).length, 2, 'Pooped and Super Pooped');
     assert.match(read(join(PUBLIC, 'js/features/hell-feature.js')), /const timed = effect\.timeoutMs > 0 \? \{ timeoutMs: effect\.timeoutMs \} : \{\};/);
     assert.match(read(join(PUBLIC, 'js/features/teleportation-feature.js')), /title: out\.script\.title, text: out\.message, timeout: 15 \}/);
-    assert.match(game, /you must exit and re-enter the Hall\.',\s*response: 'OK',\s*\}\],\s*\/\/ items\/npc_bureaucrat\.js 909-917[^\n]*\n\s*timeout: 10,/);
+    // items/npc_bureaucrat.js showEndPrompt 909-917 (G294: the stack, no heading).
+    assert.match(game, /engine\.prompt\(\{\s*text: 'Thank you for your business\. To conduct another transaction, you must exit and re-enter the Hall\.',\s*choices: \[\{ label: 'OK', value: 'ok' \}\],\s*timeout: 10,\s*\}\);/);
     assert.match(read(join(PUBLIC, 'js/quest-rooms/top-of-tree.js')), /text: JUMP_OFF_LINE, choices: \[\{ label: 'Ok', value: 'ok' \}\], timeout: 10 \}/);
     assert.match(read(join(PUBLIC, 'js/features/quest-instances-feature.js')), /const ms = promptTimeoutMs\(\{ timeout \}\);/);
     // The subway's stop prompt already ran its own (inc_transit.js 378-382, timeout_value 'timeout').

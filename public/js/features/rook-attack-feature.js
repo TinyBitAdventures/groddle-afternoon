@@ -87,7 +87,7 @@ import {
 import { shrinePrimeBonus } from '../imagination-effects.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
-import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g273-1';
+import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g294-1';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;

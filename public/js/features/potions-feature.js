@@ -57,7 +57,7 @@ import { isPoisoned } from '../tree-poison.js';
 import { furnitureSize } from '../home-decor.js?v=home-decor-4';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
-import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g273-1';
+import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g294-1';
 import {
   ANIMAL_BABIES,
   KEY_NAMES,
@@ -98,8 +98,8 @@ import {
 } from '../potions.js?v=g149-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-3';
 import { patchesFeature } from './patches-feature.js?v=patches-13';
-import { homesFeature } from './homes-feature.js?v=homes-25';
-import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-11';
+import { homesFeature } from './homes-feature.js?v=homes-26';
+import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-12';
 import { questRoomConverse } from './quest-instances-feature.js?v=qi-10';
 
 export const POTIONS_FEATURE_ID = 'potions';

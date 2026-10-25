@@ -126,6 +126,16 @@ export const OVERLAYS = Object.freeze({
   // announce_add_indicator('feeling_called_love', 'amorous_philtre_heart'), one
   // frame (G272; js/features/potions-feature.js draws its own heart for now).
   amorous_philtre_heart: { fla: 'glitch-overlays/amorous_philtre_heart.fla', kind: 'sheet', scale: 2, step: 1, webp: 0.9 },
+  // G299: the ticket races' and the Hog Haul's end splash (players/inc_games.js
+  // games_end_race 1330-1390, games_end_quoin_grab 1529-1600,
+  // games_end_hogtie_piggy 2088-2183): a
+  // game_splash_screen whose graphic waits on the first frame of its label,
+  // you_winner or other_winner, and plays it once the splash has faded in
+  // (GameSplashScreenView.as 263-269, 303-309); both labels stop on their last frame.
+  race_winner: { fla: 'glitch-overlays/race_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
+  // games_end_quoin_grab 1529-1600: Grab 'Em Good's own (text_delta_y 0).
+  grabemgood_winner: { fla: 'glitch-overlays/grabemgood_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
+  thegreathoghaul_winner: { fla: 'glitch-overlays/thegreathoghaul_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
   play_glitch: {
     fla: 'glitch-overlays/play_glitch.fla',
     kind: 'sheet',

@@ -4,9 +4,11 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-9';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-116';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-117';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
+import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
+import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g294-1';
 import {
   actionDurationFor,
   createTimedAction,
@@ -812,7 +814,7 @@ import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
-import { playPoofIn } from './js/overlay-art.js?v=g273-1';
+import { playPoofIn } from './js/overlay-art.js?v=g294-1';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
 import { hidesChatBubble } from './js/hi-signs.js?v=hi-chat-1';
@@ -5875,28 +5877,67 @@ function vogOverlayUi() {
   vogOverlay ||= createVogOverlay({
     document,
     mount: () => document.getElementById('game-root'),
-    // The location viewport: the canvas above the pack (loc_vp_h = VIEW_H - MIN_PACK_HEIGHT).
-    rect: () => {
-      const root = document.getElementById('game-root');
-      const canvas = app?.canvas;
-      if (!root || !canvas) return null;
-      const r = root.getBoundingClientRect();
-      const c = canvas.getBoundingClientRect();
-      // The pack bar overlays the canvas: the view ends at its top edge when it is shown.
-      const pack = document.getElementById('pack-bar')?.getBoundingClientRect();
-      const bottom = pack && pack.height > 0 && pack.top > c.top && pack.top < c.bottom
-        ? pack.top
-        : c.top + (c.height * LOCATION_VIEW_H) / VIEW_H;
-      return {
-        left: c.left - r.left - root.clientLeft,
-        top: c.top - r.top - root.clientTop,
-        width: c.width,
-        height: bottom - c.top,
-      };
-    },
+    rect: () => locationViewRect(),
     setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
   });
   return vogOverlay;
+}
+
+/** The location viewport in #game-root: the canvas above the pack (loc_vp_h = VIEW_H - MIN_PACK_HEIGHT). */
+function locationViewRect() {
+  const root = document.getElementById('game-root');
+  const canvas = app?.canvas;
+  if (!root || !canvas) return null;
+  const r = root.getBoundingClientRect();
+  const c = canvas.getBoundingClientRect();
+  // The pack bar overlays the canvas: the view ends at its top edge when it is shown.
+  const pack = document.getElementById('pack-bar')?.getBoundingClientRect();
+  const bottom = pack && pack.height > 0 && pack.top > c.top && pack.top < c.bottom
+    ? pack.top
+    : c.top + (c.height * LOCATION_VIEW_H) / VIEW_H;
+  return {
+    left: c.left - r.left - root.clientLeft,
+    top: c.top - r.top - root.clientTop,
+    width: c.width,
+    height: bottom - c.top,
+  };
+}
+
+/**
+ * G294: the source's non-modal prompts (js/prompt-stack.js, PromptView.as):
+ * docked bottom right of the location view, stacked, newest on top, up to
+ * half the view's height, each with its own buttons and timeout.
+ */
+let promptStack = null;
+
+/**
+ * G299: the multiplayer games' end splash (js/game-splash.js,
+ * GameSplashScreenView.as): the winner frame art over the street, one
+ * "Leave the Game" button; the races (races-feature) and the Hog Haul share it.
+ */
+let gameSplash = null;
+
+function gameSplashUi() {
+  gameSplash ||= createGameSplash({
+    document,
+    mount: () => document.getElementById('game-root'),
+    rect: () => locationViewRect(),
+    viewWidth: VIEW_W,
+    playSound: (key) => playSound(key, { volume: 0.45 }),
+    setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
+  });
+  return gameSplash;
+}
+
+function promptStackUi() {
+  promptStack ||= createPromptStack({
+    document,
+    mount: () => document.getElementById('game-root'),
+    viewHeight: () => locationViewRect()?.height || 0,
+    playSound: (key) => playSound(key, { volume: 0.45 }),
+    setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
+  });
+  return promptStack;
 }
 
 function isVogOpen() {
@@ -8092,13 +8133,18 @@ const engine = {
     questFlagsFeature.set(flag);
   },
   /**
-   * A source prompt. `timeout` (seconds, as GSJS prompts_add passes it) or
+   * A source prompt (prompts_add). `timeout` (seconds, as GSJS prompts_add passes it) or
    * `timeoutMs` closes it on its own; `onTimeout(choice)` gets `timeoutValue`
-   * or null (G198, js/prompt-timeout.js).
+   * or null (G198, js/prompt-timeout.js); `onChoice(value)` gets the button's value.
+   * G294: a normal prompt joins the non-modal stack in the bottom right
+   * (js/prompt-stack.js, PromptView.as) and returns its uid for removePrompt;
+   * only `modal: true` (is_modal: ConfirmationDialog, PromptView.as 438-470) takes the centre card.
    */
-  prompt({ title = '', kicker = '', text = '', choices = null, timeout = 0, timeoutMs = 0, timeoutValue = null, onTimeout = null } = {}) {
+  prompt({ title = '', kicker = '', text = '', choices = null, timeout = 0, timeoutMs = 0, timeoutValue = null, onTimeout = null, onChoice = null, modal = false, iconButtons = false, sound = '' } = {}) {
+    // Prompt.as 8: a title is only drawn on a modal prompt; the stack shows the text alone (PromptView.as 210-237).
+    if (modal !== true) return promptStackUi().add({ text, choices, timeout, timeoutMs, timeoutValue, onTimeout, onChoice, iconButtons, sound });
     // G213: one button per source choice and nothing else (PromptView.as 286-322): a one-choice
-    // prompt (Pooped, Super Pooped) has no Close, and Escape does not answer it. No choices: one OK.
+    // prompt has no Close, and Escape does not answer it. No choices: one OK.
     const list = (Array.isArray(choices) ? choices : []).filter((c) => c && c.label);
     // G228: no kicker or heading unless passed (PromptView.as 210-237 text only, 462 title).
     openScriptedQuestDialogue({
@@ -8108,12 +8154,22 @@ const engine = {
       cancelable: list.length > 1,
       primaryLabel: list[0]?.label || '',
       cancelLabel: list[1]?.label || '',
+      onComplete: onChoice ? () => onChoice(list[0]?.value ?? 'ok') : undefined,
+      onCancel: onChoice && list[1] ? () => onChoice(list[1].value) : undefined,
       timeout,
       timeoutMs,
       timeoutValue,
       onTimeout,
     });
+    return '';
   },
+  /** G299: a game_splash_screen (js/game-splash.js show opts); hideGameSplash() takes it down. */
+  gameSplash: (opts) => gameSplashUi().show(opts),
+  hideGameSplash: () => gameSplash?.hide(),
+  /** prompts_remove (inc_prompts.js 97-108): take a stacked prompt away unanswered. */
+  removePrompt: (uid) => promptStackUi().remove(uid),
+  /** The prompts in the stack (QA and features): { shown: [{ uid, text }], queued }. */
+  prompts: () => ({ shown: promptStack?.shown() || [], queued: promptStack?.queued() || [] }),
   /** Enter the Museum of the Rook instance (as ?questdemo=rookmuseum does): the Mezzanine Greeterbot (mid-tower-feature). */
   startRookMuseum: (opts = {}) => startRookMuseum(opts),
   /** Enter The Great Hog Haul (as the quest does); races-feature passes { ticket, rivalLabel } for a Hog Haul Ticket. */
@@ -10541,10 +10597,9 @@ function hogHaulRivalTimesFromUrl() {
 function hideHogHaulScreens() {
   const ready = document.getElementById('hog-haul-ready');
   const countdown = document.getElementById('hog-haul-countdown');
-  const result = document.getElementById('hog-haul-result');
   if (ready) ready.hidden = true;
   if (countdown) countdown.hidden = true;
-  if (result) result.hidden = true;
+  gameSplash?.hide(); // G299: the end splash
 }
 
 function renderHogHaulHud() {
@@ -10970,19 +11025,16 @@ function finishHogHaulRace() {
   player.vx = 0;
   player.vy = 0;
   if (hogHaulCarrySprite) hogHaulCarrySprite.visible = false;
-  const resultScreen = document.getElementById('hog-haul-result');
-  const card = resultScreen?.querySelector('.hog-haul-result-card');
+  // G299: players/inc_games.js games_end_hogtie_piggy 2088-2160: the game_splash_screen with
+  // thegreathoghaul_winner at you_winner (rays) or other_winner (the winner's name, text_delta_y
+  // -10) and one "Leave the Game" (games_leave_instance_overlay 'leave'); js/game-splash.js.
   const won = hogHaulState.status === 'won';
-  card?.classList.toggle('is-loss', !won);
-  const title = resultScreen?.querySelector('[data-hog-result-title]');
-  const reward = resultScreen?.querySelector('[data-hog-result-reward]');
-  if (title) title.textContent = won ? 'YOU WON!' : `${hogHaulState.rivalLabel} is the winner!`;
-  if (reward) {
-    reward.textContent = won
-      ? `(You got 100 currants and ${hogHaulState.xpLanded ?? 50} xp.)`
-      : 'Better luck next time. The Piggies are still loose.';
-  }
-  if (resultScreen) resultScreen.hidden = false;
+  gameSplashUi().show({
+    key: HOG_HAUL_SPLASH.key,
+    ...splashFor(won, hogHaulState.rivalLabel),
+    textDeltaY: HOG_HAUL_SPLASH.textDeltaY,
+    buttons: [{ label: HOG_HAUL_SPLASH.leaveLabel, value: 'leave', onClick: () => leaveHogHaulRace() }],
+  });
   const countdown = document.getElementById('hog-haul-countdown');
   if (countdown) countdown.hidden = true;
   if (app?.canvas) app.canvas.dataset.hogHaulOutcome = hogHaulState.status;
@@ -12187,14 +12239,11 @@ function finishLegalizePurchase() {
   burst(player.x, player.y - 50, 0xffe066, 15);
   renderLegalizeHud();
   updateHud();
-  openScriptedQuestDialogue({
-    title: LEGALIZE_CLERKS[legalizeRun.clerkIndex].name,
-    kicker: 'Transaction complete',
-    beats: [{
-      text: 'Thank you for your business. To conduct another transaction, you must exit and re-enter the Hall.',
-      response: 'OK',
-    }],
-    // items/npc_bureaucrat.js 909-917: prompts_add timeout 10 (G198).
+  // items/npc_bureaucrat.js showEndPrompt 909-917: prompts_add, text and one OK, timeout 10 (G198);
+  // G294: a normal prompt, so the bottom-right stack, with no heading.
+  engine.prompt({
+    text: 'Thank you for your business. To conduct another transaction, you must exit and re-enter the Hall.',
+    choices: [{ label: 'OK', value: 'ok' }],
     timeout: 10,
   });
 }
@@ -23842,7 +23891,6 @@ async function main() {
     closeQuestDialogue({ cancel: questDialogueState?.inLog !== true, force: questDialogueState?.inLog === true })
   );
   document.getElementById('hog-haul-ready-btn')?.addEventListener('click', beginHogHaulCountdown);
-  document.getElementById('hog-haul-leave-btn')?.addEventListener('click', leaveHogHaulRace);
   document.getElementById('four-letter-leave-btn')?.addEventListener('click', confirmLeaveFourLetterQuest);
   document.getElementById('legalize-leave-btn')?.addEventListener('click', confirmLeaveLegalizeIt);
   document.getElementById('winter-walk-leave-btn')?.addEventListener('click', confirmLeaveWinterWalk);

@@ -174,11 +174,11 @@ describe('G285: the last overlay stand-ins', () => {
     assert.doesNotMatch(f, /bezierCurveTo/);
   });
 
-  it('the race rainbow follows you; G291: the YOU WON! overlay shows at once, the leave prompt at 1 s', () => {
+  it('the race rainbow follows you; G299: the end splash shows at once (tests/game-splash.test.js)', () => {
     const f = read('js/features/races-feature.js');
     assert.match(f, /followWinnerRainbow\(engine, drawWinnerRainbow\(engine\.PIXI\)\);/);
-    assert.doesNotMatch(f, /resultRevealTimer/);
-    assert.match(f, /hud\.result\.hidden = false;\s*armLeavePrompt\(engine, LEAVE_PROMPT_DELAY_MS\);/);
+    assert.doesNotMatch(f, /resultRevealTimer|armLeavePrompt/);
+    assert.match(f, /splashShown = true;\s*engine\.gameSplash\?\.\(\{/);
   });
 
   it('letter blocks poof in (letter_block_2.js, letter_block_3.js createItemStackWithPoof)', { skip: !haveGsjs }, () => {

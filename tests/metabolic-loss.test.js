@@ -259,18 +259,14 @@ describe('G291: the orb count', () => {
   });
 });
 
-describe('G291: the race result', () => {
+describe('G291/G299: the race result', () => {
   const f = read('js/features/races-feature.js');
-  it('is two overlay lines near the top, shown at once, not a dimming card', () => {
-    assert.match(f, /class: 'race-results-vog', hidden: true, role: 'status'/);
-    assert.match(f, /\.race-results-vog \{ position: absolute; z-index: 86; left: 50%; top: 20%;/);
-    assert.doesNotMatch(f, /hog-haul-result-card|data-race-leave[^-]|resultRevealTimer/);
-  });
-  it("asks 'Ready to leave?' 1 s on, in a non-modal bottom-right prompt (PromptView.as)", () => {
-    assert.match(f, /const LEAVE_PROMPT_TEXT = 'Ready to leave\?';/);
-    assert.match(f, /const LEAVE_PROMPT_DELAY_MS = 1000;/);
-    assert.match(f, /\.race-prompt \{ position: absolute; z-index: 87; right: 30px; bottom: calc\(var\(--pack-live-height, 112px\) \+ 30px\);/);
-    assert.match(f, /leavePrompt\.querySelector\('\[data-race-leave-ok\]'\)\.addEventListener\('click', \(\) => leaveRace\(engine\)\);/);
+  // G299 replaced G291's inc_race.js vp_overlay and 'Ready to leave?' prompt: ticket races end
+  // through inc_games.js games_end_race (tests/game-splash.test.js).
+  it('is the shared game splash with one Leave the Game, not an overlay, a prompt or a card', () => {
+    assert.match(f, /engine\.gameSplash\?\.\(\{\s*key: splash\.key,\s*\.\.\.splashFor\(run\.status === 'won', run\.rivalName\),/);
+    assert.match(f, /const splash = quoins \? QUOIN_GRAB_SPLASH : RACE_SPLASH;/);
+    assert.doesNotMatch(f, /race-results-vog|race-prompt|LEAVE_PROMPT|hog-haul-result-card|data-race-leave|resultRevealTimer/);
     assert.doesNotMatch(f, /scriptedDialogue\(\{\s*title: null/);
   });
 });

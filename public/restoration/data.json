@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 477,
+  "commits": 478,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "The Animal Kinship practice street carries only its 3 quoins and Side Table, its hint signs show, and home cultivations fade in under their poof"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Your home street is free again: the Magic Rock hands you a Home Street Ticket and the Selection Machine takes it"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Each quoin gives what its class gives, a new day leaves waiting quoins alone, and buffs, drops and crabs respect Super Pooped"
    }
   ]
  },
- "tests": 282,
+ "tests": 284,
  "generatedAt": "2026-10-25"
 }

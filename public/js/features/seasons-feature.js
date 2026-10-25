@@ -32,7 +32,7 @@ import { dametimeParts, getGameDayKey } from '../game-day.js?v=dametime-1';
 import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g296-1';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js';
 import { setSeasonalRecipeCheck } from '../making.js?v=g296-1';
-import { getToolCondition } from '../tools.js';
+import { getToolCondition } from '../tools.js?v=woodcutting-test-3';
 import { landingY, nearestSurfaceY } from '../walk-surface.js';
 import { isBatterflyHabitat } from '../animal-husbandry.js';
 import { emblemCostFor } from '../shrines.js';
@@ -1026,7 +1026,8 @@ function completeHolidayQuest(engine) {
   const mood = grant(engine, 'mood', q.rewards.mood);
   addItem(engine.inv, 'glitchmas_present', 1);
   engine.playSound?.('QUEST_COMPLETE', { volume: 0.6 });
-  engine.prompt?.({ title: q.title, kicker: 'Quest complete', text: q.completion });
+  // G294: a quest's completion text is not a prompt: it keeps the quest card (engine.prompt is the bottom-right stack).
+  engine.scriptedDialogue?.({ title: q.title, kicker: 'Quest complete', beats: [{ text: q.completion, response: 'OK' }] });
   say(engine, `${q.title} complete`, true, { mood });
   engine.save?.();
   return true;

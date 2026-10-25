@@ -614,7 +614,8 @@ function completeProject(engine) {
   engine.playSound?.('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
   closePanel();
   engine.save();
-  engine.prompt({ kicker: 'Tower Project', title: def.title, text: def.completion });
+  // G294: the job's completion text (quests/build_a_tower.js completion) keeps the quest card, not the prompt stack.
+  engine.scriptedDialogue?.({ kicker: 'Tower Project', title: def.title, beats: [{ text: def.completion, response: 'OK' }] });
   // Rebuild the scene: the proto becomes the chassis, the construction floor a real floor.
   setTimeout(() => {
     // tower_end_expand -> tower_move_players: the owner goes to the (new) top floor.
@@ -1193,7 +1194,8 @@ function tickSecrets(engine) {
       engine.updateHud();
     }
     const text = towerSecretText(count);
-    if (text) engine.prompt({ kicker: 'Jethimadh Tower Base', title: 'A secret spot!', text });
+    // G294: location.js handleTowerSecrets 4160-4175 sends a vp_overlay (click to advance, no shade), not a prompt.
+    if (text) engine.vog?.({ lines: [text], fadeAlpha: 0 });
     engine.playSound?.('ACHIEVEMENT_UNLOCKED', { volume: 0.4 });
     engine.save();
     publish(engine, true);

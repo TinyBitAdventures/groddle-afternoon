@@ -40,7 +40,7 @@
 import { frameTexture, sourceFromUrl } from './textures.js';
 
 export const OVERLAY_BASE = 'assets/sprites/overlays/';
-export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g273-1`;
+export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g299-1`;
 /** Announcement.as 149-150. */
 export const OVERLAY_FADE = Object.freeze({ inMs: 200, outMs: 400 });
 
