@@ -85,7 +85,7 @@ import {
 } from '../craftybot.js?v=craftybot-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g251-1';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g273-1';
 
 export const CRAFTYBOT_FEATURE_ID = 'craftybot';
 const HOME_STREET_TSID = 'RH_HOME_EXT';

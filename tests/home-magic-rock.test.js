@@ -156,7 +156,7 @@ describe('source wording', { skip: !existsSync(ROCK_JS) }, () => {
 describe('the home street rock (G231)', async () => {
   const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-19');
   const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=home-tower-10');
-  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=butler-feature-17');
+  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=butler-feature-18');
   const { homeEditing } = await import('../public/js/features/camera-mode-feature.js?v=g231-1');
   const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=g276-1');
   const street = { classId: 'magic_rock', state: { room: 'street' } };

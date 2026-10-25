@@ -10,6 +10,7 @@
  */
 
 import { textureFromUrl } from './textures.js';
+import { playSheetOverlay } from './overlay-art.js?v=g273-1';
 
 const DECO_DIR = 'assets/decos/groddle/';
 
@@ -973,8 +974,38 @@ export function drawCheckpointFlag(PIXI, cp) {
   return g;
 }
 
-/** The rainbow_winner arc over the champion. */
-export function drawWinnerRainbow(PIXI) {
+/**
+ * The rainbow_winner arc over the champion (G272): locations/inc_race.js 384
+ * winner.show_rainbow('rainbow_winner'), players/player.js 3014-3029 a
+ * pc_overlay 400 x 400 standing on the avatar for 4 s; Tiny Speck's own
+ * rainbow_winner.fla (tools/overlay-art), held on its last frame (the SWF
+ * stop()s). The container goes where the caller puts it (the avatar's feet
+ * less `lift`, 30 px in races-feature) and removes itself when the overlay
+ * ends. Without the art it draws the old arc instead.
+ */
+export const WINNER_RAINBOW = Object.freeze({ key: 'rainbow_winner', wh: 400, durationMs: 4000 });
+
+export function drawWinnerRainbow(PIXI, { lift = 30 } = {}) {
+  const c = new PIXI.Container();
+  c.sortableChildren = true;
+  const h = playSheetOverlay(PIXI, WINNER_RAINBOW.key, {
+    layer: c,
+    at: () => ({ x: 0, y: lift }),
+    wh: WINNER_RAINBOW.wh,
+    durationMs: WINNER_RAINBOW.durationMs,
+    loop: false,
+  });
+  c.overlay = h;
+  h.done.then((ok) => {
+    if (c.destroyed) return;
+    if (ok) c.destroy({ children: true });
+    else if (!h.stopped) c.addChild(drawWinnerArc(PIXI));
+  });
+  return c;
+}
+
+/** The hand-drawn arc, for when the art cannot load. */
+function drawWinnerArc(PIXI) {
   const c = new PIXI.Container();
   const g = new PIXI.Graphics();
   const colors = [0xff4b4b, 0xff9d3b, 0xffe35b, 0x7fd44a, 0x4fb5ff, 0x9a6bff];

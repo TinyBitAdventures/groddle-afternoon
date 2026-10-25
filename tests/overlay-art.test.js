@@ -17,7 +17,7 @@ import {
   overlayLifeMs,
   overlayPlacement,
   sheetCell,
-} from '../public/js/overlay-art.js?v=g251-1';
+} from '../public/js/overlay-art.js?v=g273-1';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
 import { DRINK_TICKS, applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=item-buffs-6';
 import { MOOD_XP_SOURCES } from '../public/js/mood-xp.js';
@@ -29,6 +29,18 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
 const gsjs = (p) => readFileSync(join(here, '../../glitch-GameServerJS', p), 'utf8');
 const overlaysDir = join(here, '../../glitch-overlays');
+/** A WebP's canvas size (VP8X, VP8L or VP8). */
+function webpSize(b) {
+  assert.equal(b.toString('latin1', 0, 4), 'RIFF');
+  assert.equal(b.toString('latin1', 8, 12), 'WEBP');
+  const kind = b.toString('latin1', 12, 16);
+  if (kind === 'VP8X') return [1 + b.readUIntLE(24, 3), 1 + b.readUIntLE(27, 3)];
+  if (kind === 'VP8L') {
+    const v = b.readUInt32LE(21);
+    return [1 + (v & 0x3fff), 1 + ((v >> 14) & 0x3fff)];
+  }
+  return [b.readUInt16LE(26) & 0x3fff, b.readUInt16LE(28) & 0x3fff];
+}
 const manifest = JSON.parse(readFileSync(join(pub, 'assets/sprites/overlays/overlays.json'), 'utf8'));
 
 before(async () => {
@@ -70,12 +82,11 @@ describe('the built overlays', () => {
     }
     const play = manifest.play_glitch;
     assert.equal(play.kind, 'sheet');
-    assert.equal(play.file, 'play_glitch@2x.png');
+    assert.equal(play.file, 'play_glitch@2x.webp');
     assert.equal(play.frames, 372);
     assert.equal(play.order.length, 372);
-    // The PNG holds every cell the order names (IHDR width and height).
-    const png = readFileSync(join(pub, 'assets/sprites/overlays', play.file));
-    const [w, h] = [png.readUInt32BE(16), png.readUInt32BE(20)];
+    // The WebP holds every cell the order names (G272: a WebP now, not a 1.37 MB PNG).
+    const [w, h] = webpSize(readFileSync(join(pub, 'assets/sprites/overlays', play.file)));
     assert.equal(w, play.cell[0] * play.cols);
     assert.ok(h >= play.cell[1] * Math.ceil((Math.max(...play.order) + 1) / play.cols));
     assert.deepEqual(OVERLAYS.play_glitch.scrub.map((r) => r.layer), ['Layer 21', 'Layer 4']);

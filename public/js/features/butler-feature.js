@@ -76,7 +76,7 @@ import { NEIGHBOURS, NEIGHBOUR_ITEMS, neighbourById } from '../neighbours.js?v=n
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig, paintPortrait, portraitUrl } from '../butler-rig.js?v=butler-rig-1';
 import { acceptOffer, declineOffer, npcQuestOffers, questStatus } from '../quest-offers.js';
 import { getQuestCatalog } from '../content-catalogs.js';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g251-1';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g273-1';
 import {
   BUTLER,
   BUTLER_BOX,

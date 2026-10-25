@@ -67,7 +67,7 @@ import {
   useEmblem,
 } from '../giant-icons.js';
 import { textureFromUrl } from '../textures.js';
-import { verticalTextGradient } from '../text-gradient.js';
+import { playSheetOverlay } from '../overlay-art.js?v=g273-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=g202-1';
 import { TELLERS } from '../conversations-data.js?v=g202-1';
@@ -80,7 +80,7 @@ const COLLIDE_H = 250;
 let state = createIconState();
 let last = '';
 let views = [];
-let fx = [];
+let fx = []; // playSheetOverlay handles (icon_giant_love)
 let demoDone = false;
 let autoplayAt = 0;
 let autoplayStep = 0;
@@ -277,41 +277,27 @@ function removeView(engine, id) {
   views = views.filter((x) => x !== v);
 }
 
-/** The icon_giant_love overlay (an XFL timeline of rays, a heart and GIANT LOVE letters), drawn in Pixi. */
-function giantLoveFx(engine, giant) {
-  const { PIXI } = engine;
+/**
+ * showBonus (items/include/icon.js 585-600): pc_overlay icon_giant_love,
+ * 300 x 300 (the 233 x 233 stage fitted), delta_y -30, 3.25 s: Tiny Speck's
+ * own art (tools/overlay-art, G272), the "giant love" letters arcing over a
+ * golden heart in a sunburst, following the avatar.
+ */
+const GIANT_LOVE_OVERLAY = Object.freeze({ key: 'icon_giant_love', wh: 300, dy: -30 });
+
+function giantLoveFx(engine) {
   const p = engine.player;
-  if (!PIXI || !p || !engine.fxLayer) return;
-  for (const old of fx) if (!old.root.destroyed) old.root.destroy({ children: true });
-  fx = [];
-  const root = new PIXI.Container();
-  root.x = p.x;
-  root.y = (p.y || engine.groundY) - 185;
-  const rays = new PIXI.Graphics();
-  for (let i = 0; i < 12; i += 1) {
-    const a = (i / 12) * Math.PI * 2;
-    rays.moveTo(0, 0);
-    rays.lineTo(Math.cos(a - 0.12) * 120, Math.sin(a - 0.12) * 120);
-    rays.lineTo(Math.cos(a + 0.12) * 120, Math.sin(a + 0.12) * 120);
-    rays.fill({ color: i % 2 ? 0xffe27a : 0xffb3d4, alpha: 0.32 });
-  }
-  const heart = new PIXI.Graphics();
-  heart.moveTo(0, 26);
-  heart.bezierCurveTo(-48, -6, -30, -46, 0, -22);
-  heart.bezierCurveTo(30, -46, 48, -6, 0, 26);
-  heart.fill(0xff4d7d).stroke({ width: 4, color: 0xffffff, alpha: 0.9 });
-  const text = new PIXI.Text({ text: 'GIANT LOVE!', style: {
-    fontFamily: 'Arial Black, Arial, sans-serif',
-    fontSize: 26,
-    fontWeight: '900',
-    fill: verticalTextGradient([0xfff27a, 0xff8fc0]),
-    stroke: { color: 0x5a2a7a, width: 6 },
-  } });
-  text.anchor.set(0.5);
-  text.y = 52;
-  root.addChild(rays, heart, text);
-  engine.fxLayer.addChild(root);
-  fx.push({ root, rays, heart, text, age: 0, ttl: GIANT_LOVE_MS });
+  if (!engine.PIXI || !p || !engine.fxLayer) return;
+  for (const old of fx) old.stop();
+  const h = playSheetOverlay(engine.PIXI, GIANT_LOVE_OVERLAY.key, {
+    layer: engine.fxLayer,
+    at: () => ({ x: p.x, y: (p.y || engine.groundY) + GIANT_LOVE_OVERLAY.dy }),
+    wh: GIANT_LOVE_OVERLAY.wh,
+    durationMs: GIANT_LOVE_MS,
+    loop: false,
+  });
+  fx = [h];
+  h.done.then(() => { fx = fx.filter((x) => x !== h); });
 }
 
 function bestowFor(engine, view, now) {
@@ -335,7 +321,7 @@ function bestowFor(engine, view, now) {
   engine.setData?.('iconRoll', `${res.roll}/${10 * res.chance}`);
   if (res.kind !== 'bestow') return;
   engine.playSound?.('ICON_GIANT_LOVE', { volume: 0.7 });
-  giantLoveFx(engine, giant);
+  giantLoveFx(engine);
   const actual = res.type === 'favor' ? grantFavor(engine, res.favorGiant, res.amount) : grant(engine, res.type, res.amount);
   say(engine, bestowMessage(giant, res.type, actual));
   engine.save?.();
@@ -487,7 +473,7 @@ export const giantIconsFeature = {
 
   onStreetClear() {
     views = [];
-    for (const f of fx) if (!f.root.destroyed) f.root.destroy({ children: true });
+    for (const f of fx) f.stop();
     fx = [];
   },
 
@@ -516,17 +502,6 @@ export const giantIconsFeature = {
       if (!inside || v.offered || engine.busy?.()) continue;
       bestowFor(engine, v, now);
     }
-    for (const f of fx) {
-      f.age += dtMs;
-      const k = Math.min(1, f.age / f.ttl);
-      f.rays.rotation += dtMs * 0.0012;
-      const pop = k < 0.15 ? k / 0.15 : 1;
-      f.heart.scale.set(1.35 * pop * (1 + Math.sin(f.age / 120) * 0.08));
-      f.root.alpha = k > 0.8 ? (1 - k) / 0.2 : 1;
-      f.root.y -= dtMs * 0.01;
-      if (k >= 1 && !f.root.destroyed) f.root.destroy({ children: true });
-    }
-    fx = fx.filter((f) => !f.root.destroyed);
   },
 
   packVerbs(classTsid, engine) {

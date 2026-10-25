@@ -84,7 +84,7 @@ import {
   drawWinnerRainbow,
   raceLoadingColors,
   renderRaceCourse,
-} from '../race-render.js?v=races-5';
+} from '../race-render.js?v=races-6';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { runStreetTransition } from '../screen-fx.js?v=card-2';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';

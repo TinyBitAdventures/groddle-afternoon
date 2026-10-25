@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 465,
+  "commits": 466,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Buttering up a chicken and singing to a butterfly follow the source, and resource-node mood bonuses take the metabolic gate"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "The Magic Rock stands on your home street too, Camera Mode leaves C alone while you cultivate, and Shift+C away from home just clicks"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "The Magic Rock in your back yard teaches cultivating, expanding and styles, and things keep their place when your yard grows"
    }
   ]
  },
- "tests": 275,
+ "tests": 276,
  "generatedAt": "2026-10-25"
 }

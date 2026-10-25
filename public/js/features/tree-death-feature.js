@@ -11,8 +11,9 @@
  *
  * Poison: the tree says "Help! I've been poisoned and will die in N
  * seconds." at 3 s and every 30 s after (alternating with "I need
- * antidote!"), shows the poisoned overlay (a recreation of the hazard sign
- * and skulls in glitch-overlays/poisoned.fla), and dies three minutes later,
+ * antidote!"), shows the poisoned overlay (Tiny Speck's own poisoned.fla:
+ * skulls, hazard signs and a cloud circling over the tree, G273), and dies
+ * three minutes later,
  * on or off the street. Off your own home, poisoning costs 10/25/60% of max
  * mood and stacks Poisoner's Guilt (90 s, then 420 s), then A too-guilty
  * mind (900 s); planting a bean eases the guilt (patch.js plantBean).
@@ -43,6 +44,7 @@ import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-6';
 import { moodMax } from '../metabolics.js';
 import { plantChoices } from '../patches.js';
 import { textureFromUrl } from '../textures.js';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g273-1';
 import {
   GUILT_BUFF,
   POISON_COPY,
@@ -98,7 +100,7 @@ let pouring = null;
 let lastScanAt = 0;
 let demo = null;
 let autoplay = null;
-const overlays = new Map();
+const overlays = new Map(); // tree target -> playSheetOverlay handle (poisoned)
 
 // ---------------------------------------------------------------------------
 // Pure helpers (tested in tests/tree-death.test.js)
@@ -218,61 +220,32 @@ function publish(engine) {
 // Overlay + pour FX
 // ---------------------------------------------------------------------------
 
-function skull(PIXI, bone, ink, r) {
-  const g = new PIXI.Graphics();
-  g.circle(0, 0, r).fill({ color: bone });
-  g.roundRect(-r * 0.65, r * 0.55, r * 1.3, r * 0.8, r * 0.2).fill({ color: bone });
-  g.circle(-r * 0.37, -r * 0.1, r * 0.28).fill({ color: ink });
-  g.circle(r * 0.37, -r * 0.1, r * 0.28).fill({ color: ink });
-  return g;
-}
+/**
+ * applyPoison / onPlayerEnter (items/include/trants.js 1252-1260, 1272-1284;
+ * wood_tree.js 578-586): itemstack_overlay poisoned on the tree, delta_y 20
+ * from its top, no width (the 150 x 50 stage at 1:1), for what is left of
+ * the poison, following the tree. The SWF loops at 24 fps.
+ */
+const POISON_OVERLAY = Object.freeze({ key: 'poisoned', dy: 20 });
 
-/** glitch-overlays/poisoned.fla: a yellow hazard sign with skulls (#FFE980 / #DBB700 / #2B2500). */
-function makeOverlay(engine) {
-  const { PIXI } = engine;
-  if (!PIXI || !engine.fxLayer) return null;
-  const root = new PIXI.Container();
-  root.zIndex = 8800;
-  root.eventMode = 'none';
-  const sign = new PIXI.Container();
-  const tri = new PIXI.Graphics();
-  tri.poly([0, -24, 22, 13, -22, 13]).fill({ color: 0xffe980 }).stroke({ width: 3.5, color: 0x2b2500, join: 'round' });
-  tri.poly([0, -16, 15, 9, -15, 9]).stroke({ width: 1.5, color: 0xdbb700, join: 'round' });
-  sign.addChild(tri);
-  const mark = skull(PIXI, 0x2b2500, 0xffe980, 6.2);
-  mark.y = -1;
-  sign.addChild(mark);
-  root.addChild(sign);
-  const skulls = [0, 1, 2].map(() => {
-    const s = skull(PIXI, 0xf4f0dc, 0x5e5110, 4.6);
-    root.addChild(s);
-    return s;
+function makeOverlay(engine, target) {
+  if (!engine.PIXI || !engine.fxLayer) return null;
+  const spr = target.sprite;
+  let last = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dy: POISON_OVERLAY.dy });
+  return playSheetOverlay(engine.PIXI, POISON_OVERLAY.key, {
+    layer: engine.fxLayer,
+    at: () => {
+      if (spr && !spr.destroyed) last = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dy: POISON_OVERLAY.dy });
+      return last;
+    },
+    durationMs: Math.max(1000, poisonRemainingMs(target.state)),
+    zIndex: 8800,
   });
-  engine.fxLayer.addChild(root);
-  return { root, sign, skulls, t: Math.random() * 1000 };
 }
 
 function dropOverlay(target) {
-  const fx = overlays.get(target);
-  if (fx?.root && !fx.root.destroyed) fx.root.destroy({ children: true });
+  overlays.get(target)?.stop();
   overlays.delete(target);
-}
-
-function tickOverlay(fx, target, dtMs) {
-  fx.t += dtMs;
-  const spr = target.sprite;
-  const h = Math.min(220, Math.abs(spr.height || 160));
-  fx.root.x = spr.x;
-  fx.root.y = spr.y - h * 0.55;
-  fx.sign.y = Math.sin(fx.t / 420) * 3;
-  fx.sign.rotation = Math.sin(fx.t / 650) * 0.06;
-  fx.skulls.forEach((s, i) => {
-    const a = fx.t / 900 + (i * Math.PI * 2) / 3;
-    s.x = Math.cos(a) * 34;
-    s.y = Math.sin(a) * 12 - 4;
-    s.alpha = 0.55 + 0.45 * (Math.sin(a) + 1) / 2;
-    s.zIndex = Math.sin(a) > 0 ? 1 : -1;
-  });
 }
 
 function pourFx(engine, potionClass, target) {
@@ -604,9 +577,8 @@ export const treeDeathFeature = {
         if (timed) completePour(engine, kind, target);
       }
     }
-    for (const [target, fx] of overlays) {
+    for (const target of [...overlays.keys()]) {
       if (!target.sprite || target.sprite.destroyed || !isPoisoned(target.state)) dropOverlay(target);
-      else tickOverlay(fx, target, dtMs);
     }
     if (demo && !demo.done) tickDemo(engine, now);
     if (autoplay) tickAutoplay(engine, now);
@@ -621,7 +593,7 @@ export const treeDeathFeature = {
         continue;
       }
       if (!overlays.has(target)) {
-        const fx = makeOverlay(engine);
+        const fx = makeOverlay(engine, target);
         if (fx) overlays.set(target, fx);
       }
       const bubble = poisonBubbleDue(target.state, now);
@@ -709,6 +681,7 @@ export const treeDeathFeature = {
     pouring = null;
     demo = null;
     autoplay = null;
+    for (const h of overlays.values()) h.stop();
     overlays.clear();
   },
   _killTree: killTree,

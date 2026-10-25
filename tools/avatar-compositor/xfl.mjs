@@ -64,16 +64,26 @@ export function readZip(file) {
 
 const ENTITIES = { quot: '"', lt: '<', gt: '>', apos: "'", amp: '&' };
 
+/**
+ * Attributes may be single-quoted (a DOMTimeline's `guides='<guidelines>..'`
+ * in poisoned.fla / rooked.fla, G273). A CDATA section's text is kept on the
+ * open node as `text` (frame scripts: <Actionscript><script><![CDATA[stop();]]>).
+ */
 export function parseXml(src) {
   const root = { tag: '#root', attrs: {}, children: [] };
   const stack = [root];
-  const re = /<(\/?)([A-Za-z_][\w:.-]*)((?:\s+[\w:.-]+\s*=\s*"[^"]*")*)\s*(\/?)>|<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<!\[CDATA\[[\s\S]*?\]\]>/g;
+  const re = /<(\/?)([A-Za-z_][\w:.-]*)((?:\s+[\w:.-]+\s*=\s*(?:"[^"]*"|'[^']*'))*)\s*(\/?)>|<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<!\[CDATA\[([\s\S]*?)\]\]>/g;
   let m;
   while ((m = re.exec(src))) {
+    if (m[5] !== undefined) {
+      const open = stack[stack.length - 1];
+      open.text = (open.text || '') + m[5];
+      continue;
+    }
     if (!m[2]) continue;
     if (m[1]) { if (stack.length > 1) stack.pop(); continue; }
     const attrs = {};
-    for (const a of m[3].matchAll(/([\w:.-]+)\s*=\s*"([^"]*)"/g)) attrs[a[1]] = a[2].replace(/&(quot|lt|gt|apos|amp);/g, (_, e) => ENTITIES[e]);
+    for (const a of m[3].matchAll(/([\w:.-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)) attrs[a[1]] = (a[2] ?? a[3]).replace(/&(quot|lt|gt|apos|amp);/g, (_, e) => ENTITIES[e]);
     const node = { tag: m[2], attrs, children: [] };
     stack[stack.length - 1].children.push(node);
     if (!m[4]) stack.push(node);

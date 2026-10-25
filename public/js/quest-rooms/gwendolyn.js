@@ -67,6 +67,7 @@ import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
 import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js';
 import { moodMax } from '../metabolics.js';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g273-1';
 import { GWENDOLYN_INNER_FILES } from './gwendolyn-inner-art.js';
 
 export const ROOM_ID = 'gwendolyn';
@@ -589,19 +590,12 @@ function stepSwoons(ctx, dtMs, now) {
         s.landed = true;
         s.spr.stop();
         s.spr.texture = textureFromUrl(`${ART}swoonerfly_rest.png`);
-        s.starsUntil = now + 3000; // the 'rooked' overlay, 3000 ms
-        s.stars = ctx.add(new ctx.PIXI.Graphics(), 47);
-      }
-    } else if (s.stars && !s.stars.destroyed) {
-      const g = s.stars;
-      g.clear();
-      if (now < s.starsUntil) {
-        for (let i = 0; i < 3; i++) {
-          const a = now / 300 + (i * Math.PI * 2) / 3;
-          const sx = s.spr.x + Math.cos(a) * 18;
-          const sy = s.spr.y - 40 + Math.sin(a) * 5;
-          g.poly([sx, sy - 5, sx + 2, sy - 1, sx + 5, sy, sx + 2, sy + 1, sx, sy + 5, sx - 2, sy + 1, sx - 5, sy, sx - 2, sy - 1]).fill({ color: 0xfff3a0, alpha: 0.95 });
-        }
+        // npc_swoonerfly.js 45-62 land(): itemstack_overlay rooked, delta_y
+        // 20 from its top, 3000 ms (Tiny Speck's rooked.fla: little rooks,
+        // a skull and a cloud circling, G273).
+        const spr = s.spr;
+        const at = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dy: 20 });
+        s.stars = playSheetOverlay(ctx.PIXI, 'rooked', { layer: ctx.add(new ctx.PIXI.Container(), 47), at: () => at, durationMs: 3000 });
       }
     }
   }

@@ -37,6 +37,7 @@ import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=
 import { moodMax } from '../metabolics.js';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
+import { playPoofIn } from '../overlay-art.js?v=g273-1';
 import { STREET_INDEX } from '../street-loader.js';
 import { getAchievementCatalog } from '../content-catalogs.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
@@ -436,6 +437,10 @@ function manifestQuoin(engine) {
   spr.eventMode = 'none';
   spr.play();
   engine.entityLayer.addChild(spr);
+  // createItemStackWithPoof (location.js 2054-2071): it appears in a
+  // proto_puff centred on it (G272).
+  const h = Math.abs(spr.height) || 40;
+  playPoofIn(PIXI, { layer: engine.entityLayer, x: pos.x, bottom: pos.y + h / 2, itemH: h, zIndex: 41 });
   quoins.push({ sprite: spr, x: pos.x, y: pos.y, ...q });
 }
 

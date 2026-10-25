@@ -14,7 +14,10 @@
  *
  * overlays.json: { <key>: { kind, src, fla (sha1), fps, frames, stage: [w, h],
  *   box: [x, y, w, h] (stage px the art covers), file,
- *   sheet only: scale, cell: [w, h], cols, order: [cell per frame] } }
+ *   sheet only: scale, cell: [w, h], cols, order: [cell per frame],
+ *   states: { <label>: { from, frames, loop } } (G273: an overlay whose
+ *   client state, annc.state, puts a clip on a frame label; each state's
+ *   frames run from `from` in `order`, looping or held on the last) } }
  * The game places the stage the way the client did (ArbitrarySWFView at 1:1
  * when no size is given, else fitted to the width x height box): centred on
  * the point for a window overlay (vp_overlay), standing on it (registration
@@ -27,7 +30,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { frameCount, frameSvg, loadFla } from './xfl-svg.mjs';
+import { frameCount, frameSvg, loadFla, stateFrames } from './xfl-svg.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const spike = join(here, '../..');
@@ -50,7 +53,8 @@ export const OVERLAYS = Object.freeze({
   fireworks_3: { fla: 'glitch-overlays/fireworks_3.fla', kind: 'svg', step: 1 },
   // catalog_buffs.js 2446-2510 sneezing_fit on_tick: pc_overlay
   // overlay_sneezing_powder, 300 x 300 at delta_y -110, 2 s (Señor Funpickle, G209).
-  overlay_sneezing_powder: { fla: 'glitch-overlays/overlay_sneezing_powder.fla', kind: 'sheet', scale: 1, step: 1 },
+  // G272: a WebP sheet (the PNG was 0.84 MB).
+  overlay_sneezing_powder: { fla: 'glitch-overlays/overlay_sneezing_powder.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
   // locations/location.js 730-760 spawnQurazy: announce_vp_overlay
   // o_qurazy_quoin_overlay for 10 s (x 50%, top_y -5%, fade_out_sec 3). Its
   // one main frame holds clips (the rays turn every 60 frames, the quoin
@@ -80,11 +84,54 @@ export const OVERLAYS = Object.freeze({
   // items/butler_box.js 114-121 (and item.js 499, location.js 2056 poof_in):
   // itemstack_overlay proto_puff, delta_y 125, 2 s; stop() on frame 46.
   proto_puff: { fla: 'glitch-overlays/proto_puff.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  // locations/inc_race.js 384 winner.show_rainbow('rainbow_winner'):
+  // players/player.js 3014-3029, 3056-3058 the same 400 x 400 pc_overlay, 4 s,
+  // sound RAINBOW_WINNER (G272).
+  rainbow_winner: { fla: 'glitch-overlays/rainbow_winner.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
+  // G273, drawn now that the reader follows motion guides, strokes and frame
+  // scripts.
+  // items/include/trants.js 1252-1260, 1272-1284 (and wood_tree.js 578-586)
+  // applyPoison / onPlayerEnter: itemstack_overlay poisoned, delta_y 20, no
+  // width (1:1, the 150 x 50 stage), for the 3-minute poison; 24 fps loop.
+  poisoned: { fla: 'glitch-overlays/poisoned.fla', kind: 'sheet', scale: 2, step: 1, webp: 0.85 },
+  // items/npc_swoonerfly.js 45-62 land(): itemstack_overlay rooked, delta_y
+  // 20, 3 s (a swoonerfly that has fallen); 24 fps loop.
+  rooked: { fla: 'glitch-overlays/rooked.fla', kind: 'sheet', scale: 2, step: 1, webp: 0.85 },
+  // locations/location.js 4180-4190 triggerSecretLocationMarker and the
+  // marker's overlay_cancel 600 ms later: the clip secretLocationMarker loops
+  // 'active' (frame 89 gotoAndPlay('active')) and plays 'off' to its stop()
+  // on frame 117 when the spot is found.
+  secret_location_marker: { fla: 'glitch-overlays/secret_location_marker.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85, states: { symbol: 'secretLocationMarker', labels: ['active', 'off'] } },
+  // locations/inc_rook.js 455-500 orbAttackAnnc: pc_overlay focusing_orb_attack,
+  // delta_y -163, no width (1:1), state orb1 (no one joined), orb2 (1-2),
+  // orb3 (3-5), orb4 (6-9) or orbBreak (10+, the orb overloads); each orb
+  // state loops (gotoAndPlay at its end), orbBreak stop()s.
+  focusing_orb_attack: {
+    fla: 'glitch-overlays/focusing_orb_attack.fla',
+    kind: 'sheet',
+    scale: 1,
+    step: 1,
+    webp: 0.85,
+    states: { symbol: 'focusingOrb', labels: ['orb1', 'orb2', 'orb3', 'orb4', 'orbBreak'] },
+    // A near-white (#FCFCFC) hand-drawn outline sits on the main stage beside
+    // the orb clip, in its layer: an authoring sketch, left out (follow-up:
+    // confirm against the rook-attack videos).
+    scrub: [{ symbol: 'main', layer: 'focusingOrb', shapes: true }],
+  },
+  // items/include/icon.js 585-600 showBonus: pc_overlay icon_giant_love, 300 x
+  // 300 (the 233 x 233 stage at 1.29), delta_y -30, 3.25 s, sound
+  // ICON_GIANT_LOVE (G272).
+  icon_giant_love: { fla: 'glitch-overlays/icon_giant_love.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
+  // items/catalog_buffs.js 710-722 feeling_called_love on_apply:
+  // announce_add_indicator('feeling_called_love', 'amorous_philtre_heart'), one
+  // frame (G272; js/features/potions-feature.js draws its own heart for now).
+  amorous_philtre_heart: { fla: 'glitch-overlays/amorous_philtre_heart.fla', kind: 'sheet', scale: 2, step: 1, webp: 0.9 },
   play_glitch: {
     fla: 'glitch-overlays/play_glitch.fla',
     kind: 'sheet',
     scale: 2,
     step: 2,
+    webp: 0.85, // G272: the PNG was 1.37 MB
     // The Glitch wordmark is a trademark, not part of the CC0 release: the
     // title card's logo (symbol "all", Layer 21) and the small one in the
     // mock client's top bar (Layer 4, top left) are left out.
@@ -95,12 +142,17 @@ export const OVERLAYS = Object.freeze({
   },
 });
 
-/** Drop a layer, or the outlines of a layer's shapes that sit inside a region (symbol px). */
+/** Drop a layer, its shapes only (`shapes`), or the outlines of its shapes that sit inside a region (symbol px; symbol 'main' is the main timeline). */
 export function scrub(fla, rules = []) {
   for (const r of rules) {
-    const tl = fla.symbols.get(r.symbol);
+    const tl = r.symbol === 'main' ? fla.main : fla.symbols.get(r.symbol);
     const layer = tl?.layers.find((l) => l.name === r.layer);
     if (!layer) throw new Error(`scrub: no ${r.symbol}/${r.layer}`);
+    if (r.shapes) {
+      // The layer's own shapes go; its symbol instances stay.
+      layer.frames = layer.frames.map((f) => ({ ...f, els: f.els.filter((e) => e.k === 'inst') }));
+      continue;
+    }
     if (!r.region) {
       layer.frames = layer.frames.map((f) => ({ ...f, els: [] }));
       continue;
@@ -130,6 +182,29 @@ export function scrub(fla, rules = []) {
 
 const sha1 = (file) => createHash('sha1').update(readFileSync(file)).digest('hex');
 
+/**
+ * The frames an overlay is drawn at: [{ n, start }] (main tick, clip
+ * starts), every `step`th, and for a stateful overlay each state in turn
+ * with its { from, frames, loop } (G273).
+ */
+export function framePlan(cfg, fla) {
+  if (!cfg.states) {
+    const total = cfg.frames || frameCount(fla);
+    const picks = [];
+    for (let n = 0; n < total; n += cfg.step) picks.push({ n, start: null });
+    return { picks, states: null };
+  }
+  const picks = [];
+  const states = {};
+  for (const label of cfg.states.labels) {
+    const st = stateFrames(fla, cfg.states.symbol, label);
+    const from = picks.length;
+    for (let n = 0; n < st.frames; n += cfg.step) picks.push({ n, start: { [cfg.states.symbol]: label } });
+    states[label] = { from, frames: picks.length - from, loop: st.loop };
+  }
+  return { picks, states };
+}
+
 export function checkOverlays() {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
   const bad = [];
@@ -141,7 +216,9 @@ export function checkOverlays() {
     if (!existsSync(file)) continue;
     if (m.fla !== sha1(file)) bad.push(`${key}: FLA changed`);
     if (m.kind !== cfg.kind) bad.push(`${key}: kind`);
-    if (m.frames !== Math.ceil((cfg.frames || frameCount(loadFla(file))) / cfg.step)) bad.push(`${key}: frame count`);
+    if (m.frames !== framePlan(cfg, scrub(loadFla(file), cfg.scrub)).picks.length) bad.push(`${key}: frame count`);
+    if (Boolean(m.states) !== Boolean(cfg.states)) bad.push(`${key}: states`);
+    if (cfg.webp && !m.file.endsWith('.webp')) bad.push(`${key}: not WebP`);
   }
   return bad;
 }
@@ -284,33 +361,32 @@ async function build(keys) {
       const cfg = OVERLAYS[key];
       const file = join(audit, cfg.fla);
       const fla = scrub(loadFla(file), cfg.scrub);
-      const total = cfg.frames || frameCount(fla);
-      const picks = [];
-      for (let n = 0; n < total; n += cfg.step) picks.push(n);
+      const plan = framePlan(cfg, fla);
+      const picks = plan.picks;
       // Union of the drawn area over every frame, at 1:1 with a margin round the stage.
       const pad = 300;
       const W = fla.doc.width;
       const H = fla.doc.height;
       const wide = [-pad, -pad, W + pad * 2, H + pad * 2];
       let u = null;
-      for (const n of picks) {
-        const b = await page.evaluate((src) => window.bbox(src), frameSvg(fla, n, { box: wide }));
+      for (const { n, start } of picks) {
+        const b = await page.evaluate((src) => window.bbox(src), frameSvg(fla, n, { box: wide, start }));
         if (!b) continue;
         u = u ? [Math.min(u[0], b[0]), Math.min(u[1], b[1]), Math.max(u[2], b[2]), Math.max(u[3], b[3])] : b;
       }
       if (!u) throw new Error(`${key}: nothing drawn`);
       const box = [u[0] - pad - 1, u[1] - pad - 1, u[2] - u[0] + 2, u[3] - u[1] + 2];
-      const base = { kind: cfg.kind, src: cfg.fla, fla: sha1(file), fps: fla.doc.frameRate / cfg.step, frames: picks.length, stage: [W, H], box };
+      const base = { kind: cfg.kind, src: cfg.fla, fla: sha1(file), fps: fla.doc.frameRate / cfg.step, frames: picks.length, stage: [W, H], box, ...(plan.states ? { states: plan.states } : {}) };
       if (cfg.kind === 'svg') {
         const out = `${key}.frames.json`;
-        const { defs, frames } = shareFrames(picks.map((n) => frameSvg(fla, n, { box })));
+        const { defs, frames } = shareFrames(picks.map(({ n, start }) => frameSvg(fla, n, { box, start })));
         writeFileSync(join(outDir, out), `{"defs":${JSON.stringify(defs)},\n"frames":[\n${frames.map((f) => JSON.stringify(f)).join(',\n')}\n]}\n`);
         manifest[key] = { ...base, file: out };
         console.log(`${key}: ${picks.length} SVG frames, box ${box.join(',')}`);
         continue;
       }
       const order = [];
-      for (const n of picks) order.push(await page.evaluate((src) => window.addFrame(src), frameSvg(fla, n, { box, scale: cfg.scale })));
+      for (const { n, start } of picks) order.push(await page.evaluate((src) => window.addFrame(src), frameSvg(fla, n, { box, scale: cfg.scale, start })));
       const unique = Math.max(...order) + 1;
       const cellW = Math.ceil(box[2] * cfg.scale);
       const cellH = Math.ceil(box[3] * cfg.scale);

@@ -240,7 +240,7 @@ export function orbLookFor(joiners) {
   if (n === 0) state = 'orb1';
   else if (n < 3) state = 'orb2';
   else if (n < 6) state = 'orb3';
-  else if (n < 9) state = 'orb4';
+  else if (n <= 9) state = 'orb4';
   return { state, scale: Math.min(1 + n / 6, 2) };
 }
 

@@ -56,6 +56,7 @@
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { landingY, walkSurfaceY } from '../walk-surface.js';
+import { playPoofIn, poofInAlpha } from '../overlay-art.js?v=g273-1';
 import {
   CUBIMAL_FREE,
   CUBIMAL_FREE_RESPONSES,
@@ -165,19 +166,14 @@ function destroySprite(sprite) {
   if (!sprite.destroyed) sprite.destroy({ children: true });
 }
 
+/**
+ * cubimals.js onConversation 855: createItemStackWithPoof, so the figure
+ * appears in Tiny Speck's proto_puff (js/overlay-art.js playPoofIn, G272),
+ * centred on it. (x, y) is the figure's feet.
+ */
 function poof(engine, x, y) {
-  const g = new engine.PIXI.Graphics();
-  for (let i = 0; i < 7; i += 1) {
-    const a = (i / 7) * Math.PI * 2;
-    g.circle(Math.cos(a) * 12, Math.sin(a) * 8, 9).fill({ color: 0xffffff, alpha: 0.85 });
-  }
-  g.circle(0, 0, 13).fill({ color: 0xf6f1e4, alpha: 0.9 });
-  g.x = x;
-  g.y = y;
-  g.zIndex = RACER_Z + 1;
-  g.eventMode = 'none';
-  engine.entityLayer?.addChild(g);
-  poofs.push({ g, at: now() });
+  const h = playPoofIn(engine.PIXI, { layer: engine.entityLayer, x, bottom: y, itemH: 40, zIndex: RACER_Z + 1 });
+  poofs.push({ h, at: now() });
 }
 
 // —— Race ———————————————————————————————————————————————————————————————
@@ -402,7 +398,7 @@ function startFlight(engine, classTsid, response, { done = null, roll = 0 } = {}
   if (!player) return;
   const x = Math.round(player.x + CUBIMAL_FREE.offsetX);
   const y = Math.round(player.y + CUBIMAL_FREE.offsetY);
-  poof(engine, x, y - 14);
+  poof(engine, x, y);
   const sprite = makeFigure(engine, classTsid, x, y);
   flights.push({
     classTsid,
@@ -423,6 +419,8 @@ function tickFlights(engine) {
   const t = now();
   for (const f of flights) {
     const age = t - f.at;
+    // poofItIn: the stack fades in over 1 s, 0.2 s after the puff starts.
+    if (f.sprite && !f.sprite.destroyed) f.sprite.alpha = poofInAlpha(age);
     if (f.phase === 'poof' && age >= CUBIMAL_FREE.responseMs) {
       f.phase = 'farewell';
       if (f.response) engine.say?.(f.target, f.response, CUBIMAL_FREE.flyAtMs + CUBIMAL_FREE.riseMs - CUBIMAL_FREE.responseMs);
@@ -448,16 +446,7 @@ function tickFlights(engine) {
     }
   }
   flights = flights.filter((f) => f.phase !== 'gone');
-  poofs = poofs.filter((p) => {
-    const k = (t - p.at) / 450;
-    if (k >= 1 || p.g.destroyed) {
-      destroySprite(p.g);
-      return false;
-    }
-    p.g.alpha = 1 - k;
-    p.g.scale.set(1 + k * 0.8);
-    return true;
-  });
+  poofs = poofs.filter((p) => t - p.at < 2400);
 }
 
 /**
@@ -683,7 +672,7 @@ export const cubimalRaceFeature = {
       destroySprite(f.sprite);
     }
     flights = [];
-    for (const p of poofs) destroySprite(p.g);
+    for (const p of poofs) p.h?.stop();
     poofs = [];
     raceLoop?.stop?.();
     raceLoop = null;

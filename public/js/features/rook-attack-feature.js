@@ -13,7 +13,8 @@
  *    crimson health arc, the seven stun stars and the event feed. The
  *    recovered Rooks' Woods track plays as the attack cue.
  * 3. Stun: Focusing Orb -> Stun attack (or click the Rook). The orb rises
- *    over the avatar and the street joins it one at a time (un-rooked
+ *    over the avatar (Tiny Speck's focusing_orb_attack, its orb1-4 states
+ *    as the count grows, G272) and the street joins it one at a time (un-rooked
  *    critters and trees, nearest first, then the shrine); release it by
  *    clicking the orb or Unleash, or it fires at 15 s. A beam strikes the
  *    Rook for the source 25..200 stun. The first attempt starts the 2-minute
@@ -85,7 +86,7 @@ import {
 } from '../rook-attack.js';
 import { shrinePrimeBonus } from '../imagination-effects.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g251-1';
+import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g273-1';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
@@ -1139,20 +1140,26 @@ function startStun(engine, source = 'verb') {
   );
   const root = new PIXI.Container();
   root.zIndex = 40;
-  const glow = new PIXI.Graphics();
-  const ring = new PIXI.Graphics();
-  const count = new PIXI.Text({ text: '0', style: textStyle(20, { fill: 0x3a2b52, dropShadow: false }) });
-  count.anchor.set(0.5);
-  root.addChild(glow, ring, count);
+  // orbCountMessage (locations/inc_rook.js 502-520): the joined count as a
+  // second pc_overlay at delta_y -175, right aligned.
+  const count = new PIXI.Text({ text: '0', style: textStyle(20, { fill: 0xffffff }) });
+  count.anchor.set(1, 1);
+  root.addChild(count);
   root.eventMode = 'static';
   root.cursor = 'pointer';
   root.hitArea = new PIXI.Circle(0, 0, 40);
   root.on('pointertap', () => releaseOrb(engine));
   engine.fxLayer.addChild(root);
+  // The orb itself: Tiny Speck's focusing_orb_attack (G272), state by joiners.
+  const art = playArt(engine, 'focusing_orb_attack', {
+    at: () => ({ x: p.x, y: p.y + ORB_ART.dy }),
+    durationMs: ROOK_SOURCE.orbWindowMs / timeScale + 1000,
+    state: orbLookFor(0).state,
+    zIndex: 39,
+  });
   orb = {
     root,
-    glow,
-    ring,
+    art,
     count,
     startedAt: now(),
     joiners: 0,
@@ -1181,9 +1188,18 @@ function spawnMote(engine, from) {
   orb.motes.push(m);
 }
 
+/**
+ * orbAttackAnnc (locations/inc_rook.js 455-500): pc_overlay
+ * focusing_orb_attack, delta_y -163, no width (the 295.7 x 294.75 stage at
+ * 1:1), state orb1 (nobody joined), orb2 (1-2), orb3 (3-5), orb4 (6-9),
+ * orbBreak (10+). The orb clip sits at (148.25, 145.4) on that stage, so it
+ * shows about 312 px above your feet; orbCountMessage's count is at -175.
+ */
+const ORB_ART = Object.freeze({ dy: -163, orbAbove: 163 + (294.75 - 145.4), countDy: -175 });
+
 function orbCenter(engine) {
   const p = engine.player;
-  return { x: p.x, y: p.y - 150 };
+  return { x: p.x, y: p.y - ORB_ART.orbAbove };
 }
 
 function updateOrb(engine, dtMs) {
@@ -1217,30 +1233,12 @@ function updateOrb(engine, dtMs) {
     }
     return true;
   });
-  const look = orbLookFor(orb.joiners);
-  const colors = { orb1: 0xcfe6ff, orb2: 0xe8ffd2, orb3: 0xf1ff8c, orb4: 0xffd447, orbBreak: 0xff8080 };
-  const col = colors[look.state];
-  const r = 17 * look.scale;
-  const pulse = 1 + Math.sin(t / 160) * 0.05;
+  orb.art?.setState?.(orbLookFor(orb.joiners).state);
+  const left = Math.max(0, 1 - (t - orb.startedAt) / (ROOK_SOURCE.orbWindowMs / timeScale));
   orb.root.x = c.x;
   orb.root.y = c.y;
-  orb.glow.clear();
-  orb.glow.circle(0, 0, r * 2.1 * pulse).fill({ color: col, alpha: 0.18 });
-  orb.glow.circle(0, 0, r * 1.45 * pulse).fill({ color: col, alpha: 0.35 });
-  if (orb.joiners >= 3) {
-    for (let i = 0; i < 10; i += 1) {
-      const ang = t / 700 + (i * Math.PI) / 5;
-      orb.glow.moveTo(Math.cos(ang) * r * 1.3, Math.sin(ang) * r * 1.3).lineTo(Math.cos(ang) * r * 2.4, Math.sin(ang) * r * 2.4);
-    }
-    orb.glow.stroke({ width: 2, color: col, alpha: 0.55 });
-  }
-  orb.glow.circle(0, 0, r).fill({ color: 0xffffff, alpha: 0.9 });
-  orb.glow.circle(-r * 0.25, -r * 0.25, r * 0.55).fill({ color: col, alpha: 0.55 });
-  const left = Math.max(0, 1 - (t - orb.startedAt) / (ROOK_SOURCE.orbWindowMs / timeScale));
-  orb.ring.clear();
-  orb.ring.arc(0, 0, r * 2.3, 0, Math.PI * 2);
-  orb.ring.stroke({ width: 4, color: 0x2b1b33, alpha: 0.35 }).arc(0, 0, r * 2.3, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left);
-  orb.ring.stroke({ width: 4, color: 0x6ad35e, alpha: 0.95 });
+  orb.count.x = 42;
+  orb.count.y = ORB_ART.countDy + ORB_ART.orbAbove;
   orb.count.text = String(orb.joiners);
   // The window ends at 15 s, or a moment after the last joiner arrives.
   const allIn = orb.joiners >= orb.order.length && !orb.motes.length && t >= orb.nextJoinAt - (ROOK_SOLO.joinIntervalMs / timeScale) * 0.4;
@@ -1249,6 +1247,7 @@ function updateOrb(engine, dtMs) {
 
 function cancelOrb(engine, why = '') {
   if (!orb) return;
+  orb.art?.stop();
   for (const m of orb.motes) if (!m.destroyed) m.destroy();
   if (!orb.root.destroyed) orb.root.destroy({ children: true });
   orb = null;

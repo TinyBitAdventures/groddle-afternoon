@@ -7,9 +7,10 @@
  * - From level 5 (checked on every street and every few seconds) the hunt
  *   picks its 20 spots and shuffles the Giants, unless the badge is held.
  * - Each pending spot on the current street gets the secret_location_marker
- *   beacon, redrawn in Pixi from the XFL's numbers (16 rising cyan-white
- *   blobs with red and green ghosts, a base glow and flame licks), and the
- *   11_SECRET_LOCATIONS_BEACON_LOOP shimmer, softer the farther away you are.
+ *   beacon, Tiny Speck's own art (tools/overlay-art, G273): the clip's
+ *   'active' loop standing on the floor, fitted to the 110 x 110
+ *   location_overlay, and the 11_SECRET_LOCATIONS_BEACON_LOOP shimmer,
+ *   softer the farther away you are.
  * - Walking into the spot's box (avatar body vs the street box): the
  *   collision jolt, the marker's "off" burst, the marker cancelled and the
  *   "Secret Spot!" rainbow over the avatar 600 ms later, then 3.5 s later the
@@ -31,14 +32,10 @@
 import { emblemCostFor } from '../shrines.js';
 import {
   ELEVEN_BADGE,
-  MARKER_BLOBS,
-  MARKER_FPS,
-  MARKER_LOOP_FRAMES,
-  MARKER_OFF_FRAMES,
+  SECRET_MARKER_SIZE,
   SECRET_SOUNDS,
   SECRET_TIMING,
   announcementPages,
-  blobPose,
   bodyHitsBox,
   createSecretState,
   growlText,
@@ -52,23 +49,21 @@ import {
   streetKeyFor,
   triggerSecretSpot,
 } from '../secret-spots.js?v=secrets-1';
-import { playSheetOverlay } from '../overlay-art.js?v=g251-1';
+import { playSheetOverlay } from '../overlay-art.js?v=g273-1';
 
 export const SECRET_SPOTS_FEATURE_ID = 'secret-spots';
 const MARKER_Z = 4;
-const MARKER_SCALE = 1.1; // the 30 x 100 stage fitted into the 110 x 110 overlay
 const BEACON_EVERY_MS = 2600;
 const BEACON_RANGE = 900; // px: past this the shimmer is silent
 const CHECK_MS = 80;
 const LEVEL_CHECK_MS = 3000;
 
 let state = createSecretState();
-let markers = []; // { spot, box, root, blobs: [{ main, red, green }], glow, flames, flash, off: 0|startMs }
+let markers = []; // { spot, box, art (playSheetOverlay handle), off: 0|startMs }
 let inside = new Set();
 let queue = []; // { at, fn }
 let running = null; // { id, count, giant, msgIndex }
 let rainbow = null; // playSheetOverlay handle
-let blobTex = null;
 let lastCheck = 0;
 let lastLevelCheck = 0;
 let lastBeacon = 0;
@@ -103,35 +98,6 @@ function maybeStart(engine, opts = {}) {
 /* Marker (secret_location_marker)                                     */
 /* ------------------------------------------------------------------ */
 
-/** One soft radial blob: #EFFEFD at the centre (ratio 0.5) to transparent #A7F6FE at 0.965. */
-function blobTexture(PIXI) {
-  if (blobTex && !blobTex.source?.destroyed) return blobTex;
-  const size = 64;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const g = canvas.getContext('2d');
-  const grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  grad.addColorStop(0, 'rgba(255,255,255,1)');
-  grad.addColorStop(0.5, 'rgba(239,254,253,1)');
-  grad.addColorStop(0.965, 'rgba(167,246,254,0)');
-  grad.addColorStop(1, 'rgba(167,246,254,0)');
-  g.fillStyle = grad;
-  g.fillRect(0, 0, size, size);
-  blobTex = PIXI.Texture.from(canvas);
-  return blobTex;
-}
-
-function blobSprite(PIXI, w, h, tint = 0xffffff, alpha = 1) {
-  const s = new PIXI.Sprite(blobTexture(PIXI));
-  s.anchor.set(0.5);
-  s.width = w;
-  s.height = h;
-  s.tint = tint;
-  s.alpha = alpha;
-  return s;
-}
-
 /** Highest floor at x between y0 and y1 (screen platforms), or null. */
 function floorAt(engine, x, y0, y1) {
   let best = null;
@@ -161,98 +127,31 @@ function besideBox(engine, box) {
   return { x: box.x - 90, y: floor };
 }
 
+/**
+ * The marker (location.js 4180-4190, showSecretLocationMarker): a
+ * location_overlay of secret_location_marker, 110 x 110 (the 30 x 100
+ * stage at 1.1), standing on the floor under the spot. Its clip loops
+ * 'active' until the spot is found, then plays 'off' (frames 90-117, a
+ * flash and the glow rising away) until the overlay is cancelled 600 ms
+ * later. It shows until then (no fade out).
+ */
 function buildMarker(engine, spot) {
-  const { PIXI } = engine;
   const box = spotBox(engine.street, spot);
   if (!box) return null;
-  const root = new PIXI.Container();
-  root.zIndex = MARKER_Z;
-  root.eventMode = 'none';
-  const floor = groundUnder(engine, box);
-  // Symbol origin is the column's middle; its base glow sits at +41.
-  root.x = box.x;
-  root.y = (floor ?? box.y + 20) - 43 * MARKER_SCALE;
-  root.scale.set(MARKER_SCALE);
-
-  // Layer order from the XFL (bottom first): red ghost, green ghost, base glow, flames, blobs.
-  const ghosts = new PIXI.Container();
-  const glow = blobSprite(PIXI, 22, 52, 0xffffff, 0.55);
-  glow.y = 41 - 18;
-  const flames = new PIXI.Container();
-  const flameShapes = [];
-  for (const [dx, w, h, a] of [[-0.5, 11, 24, 0.9], [-0.7, 8, 19, 0.8], [1.2, 7, 15, 0.8], [-1.8, 6, 13, 0.75]]) {
-    const f = blobSprite(PIXI, w, h, 0xeffefd, a);
-    f.x = dx;
-    f.y = 42 - h / 2;
-    flames.addChild(f);
-    flameShapes.push(f);
-  }
-  const front = new PIXI.Container();
-  const blobs = MARKER_BLOBS.map((b) => {
-    const red = blobSprite(PIXI, 7.5, 9.5, 0xff1e28, 0.66);
-    const green = blobSprite(PIXI, 7.5, 9.5, 0x00ff88, 0.5);
-    const main = blobSprite(PIXI, 7.5, 9.5);
-    ghosts.addChild(red, green);
-    front.addChild(main);
-    return { b, main, red, green };
+  const at = { x: box.x, y: groundUnder(engine, box) ?? box.y + 20 };
+  const art = playSheetOverlay(engine.PIXI, 'secret_location_marker', {
+    layer: engine.entityLayer,
+    at: () => at,
+    wh: SECRET_MARKER_SIZE,
+    durationMs: 1e9,
+    state: 'active',
+    zIndex: MARKER_Z,
   });
-  const flash = blobSprite(PIXI, 22, 12, 0xeffefd, 0);
-  flash.y = 40;
-  root.addChild(ghosts, glow, flames, front, flash);
-  engine.entityLayer.addChild(root);
-  const marker = { spot, box, root, blobs, glow, flames: flameShapes, flash, off: 0, born: performance.now() - Math.random() * 1000 };
-  poseMarker(marker, performance.now());
-  return marker;
-}
-
-function poseMarker(m, now) {
-  if (m.off) {
-    // 'off': blobs shoot up and fade, glow2 flashes flat then tall, the glow rises away.
-    const f = Math.min(MARKER_OFF_FRAMES, ((now - m.off) / 1000) * MARKER_FPS);
-    const k = Math.min(1, f / 10);
-    for (const { b, main, red, green } of m.blobs) {
-      const start = blobPose(b, m.offFrame);
-      const y = start.y - 120 * k * k;
-      const a = start.alpha * (1 - k);
-      main.position.set(b.x, y);
-      red.position.set(b.x, y + 2);
-      green.position.set(b.x, y + 1);
-      main.alpha = a;
-      red.alpha = a * 0.66;
-      green.alpha = a * 0.5;
-    }
-    m.glow.y = 23 - 140 * k;
-    m.glow.alpha = 0.55 * (1 - k);
-    for (const fl of m.flames) fl.alpha = Math.max(0, fl.alpha - 0.08);
-    const pulse = [[2.9, 0.55], [1.7, 1.8], [4.9, 0.8], [3.2, 3.4], [10.4, 2.2], [6.2, 6.1]][Math.min(5, Math.floor(f / 2))];
-    m.flash.width = 8 * pulse[0];
-    m.flash.height = 8 * pulse[1];
-    m.flash.alpha = f < 21 ? 0.7 * (1 - f / 21) : 0;
-    return;
-  }
-  const frame = (((now - m.born) / 1000) * MARKER_FPS) % MARKER_LOOP_FRAMES;
-  for (const { b, main, red, green } of m.blobs) {
-    const pose = blobPose(b, frame);
-    const sway = Math.sin((frame + b.born) * 0.21) * 0.8;
-    main.position.set(b.x + sway, pose.y);
-    red.position.set(b.x + sway, pose.y + 2);
-    green.position.set(b.x + sway, pose.y + 1);
-    main.alpha = pose.alpha;
-    red.alpha = pose.alpha * 0.66;
-    green.alpha = pose.alpha * 0.5;
-  }
-  // f1-f4 flip and lean (a: 1.24 to -1.24, b skew) through the loop.
-  m.flames.forEach((fl, i) => {
-    const t = (frame / MARKER_LOOP_FRAMES) * Math.PI * 2 + i * 1.3;
-    fl.skew.x = Math.sin(t) * 0.35;
-    fl.scale.x = Math.abs(fl.scale.x) * (0.85 + 0.15 * Math.cos(t * 2));
-  });
-  m.glow.alpha = 0.5 + 0.08 * Math.sin((frame / MARKER_LOOP_FRAMES) * Math.PI * 4);
+  return { spot, box, art, off: 0 };
 }
 
 function destroyMarker(m) {
-  if (m.root.parent) m.root.parent.removeChild(m.root);
-  if (!m.root.destroyed) m.root.destroy({ children: true });
+  m.art?.stop();
 }
 
 function clearMarkers() {
@@ -402,7 +301,7 @@ function find(engine, marker, now) {
   engine.setData('secretGiant', hit.giant);
   // triggerSecretLocationMarker: jolt, stop the beacon, marker 'off'.
   engine.playSound(SECRET_SOUNDS.collision, { volume: 0.7 });
-  marker.offFrame = (((now - marker.born) / 1000) * MARKER_FPS) % MARKER_LOOP_FRAMES;
+  marker.art?.setState('off');
   marker.off = now;
   const others = hit.last ? markers.filter((m) => m !== marker) : [];
   later(now, SECRET_TIMING.markerCancel, () => {
@@ -605,7 +504,6 @@ export const secretSpotsFeature = {
       lastLevelCheck = t;
       if (!engine.param('secretdemo')) maybeStart(engine);
     }
-    for (const m of markers) poseMarker(m, t);
     placeUi();
     checkSpots(engine, t);
     beacon(engine, t);

@@ -9,13 +9,19 @@
  *   each is 1500-2200 px across at 1:1, too big for a bitmap sheet, and the
  *   browser draws them sharp at any scale.
  * - play_glitch (the Game's Play verb, items/game_box.js 137-149) is a
- *   bitmap sheet (play_glitch@2x.png), 15 fps.
+ *   bitmap sheet (play_glitch@2x.webp), 15 fps.
  * - overlay_sneezing_powder (Sneezing Fit's tick, catalog_buffs.js 2446-2510,
  *   from Señor Funpickle, G209) is a bitmap sheet, 30 fps.
  * - G251, WebP sheets played in the world by playSheetOverlay: the Rook
  *   fight's focusing_orb_laser_beam and shrine_laser_beam_1/2/3, the
  *   rainbow_youdidit / rainbow_fullyrevived / rainbow_secretspot arcs, the
  *   smoke_puff a critter vanishes in and proto_puff (a box opening).
+ * - G272/G273: rainbow_winner (a race win), poisoned (a poisoned tree),
+ *   rooked (a fallen swoonerfly), and two overlays with states (the
+ *   client's annc.state, a frame label the SWF's start() jumps to):
+ *   secret_location_marker (active, off) and the stun orb
+ *   focusing_orb_attack (orb1-4, orbBreak). play_glitch and the sneeze are
+ *   WebP sheets now.
  *
  * Placement follows the client (ArbitrarySWFView.as 312-343 scale()): with no
  * width or height the Flash stage shows at 1:1, else it is fitted into a
@@ -34,7 +40,7 @@
 import { frameTexture, sourceFromUrl } from './textures.js';
 
 export const OVERLAY_BASE = 'assets/sprites/overlays/';
-export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g251-1`;
+export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g273-1`;
 /** Announcement.as 149-150. */
 export const OVERLAY_FADE = Object.freeze({ inMs: 200, outMs: 400 });
 
@@ -131,6 +137,17 @@ export function cellRect(meta, cell) {
   const w = meta.cell[0] / meta.scale;
   const h = meta.cell[1] / meta.scale;
   return { x: (cell % meta.cols) * w, y: Math.floor(cell / meta.cols) * h, w, h };
+}
+
+/**
+ * The timeline frame a state shows `ms` after it began (G273): its frames
+ * run from meta.states[state].from, looping or held on the last. Without
+ * states (or an unknown state) the whole timeline, `loop` as given.
+ */
+export function stateFrameAt(meta, state, ms, { loop = true } = {}) {
+  const st = state ? meta?.states?.[state] : null;
+  if (!st) return overlayFrameAt(meta, ms, { loop });
+  return st.from + overlayFrameAt({ frames: st.frames, fps: meta.fps }, ms, { loop: st.loop });
 }
 
 /** The cell a timeline frame shows (identical frames share one). */
@@ -266,11 +283,26 @@ export function sheetTexture(PIXI, key, meta, cell) {
  * `zoomAt(ms)`, its timeline looping (or held on the last frame when the SWF
  * stop()s: `loop: false`) for `durationMs` with the client's fades, after
  * `delayMs`. `holdMs` freezes it at that moment for screenshots (it never
- * ends). Returns { sprite, stop(), done } (done resolves true once played,
- * false when the art is missing or it was stopped).
+ * ends). `state` plays one of the overlay's states (G273), and
+ * handle.setState(name) switches to another, from its start, the way a new
+ * annc.state restarts the clip on its label. Returns { sprite, stop(),
+ * setState(), done } (done resolves true once played, false when the art is
+ * missing or it was stopped).
  */
-export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, durationMs = 2000, loop = true, delayMs = 0, holdMs = null, zIndex = 60 } = {}) {
-  const handle = { sprite: null, stopped: false, done: null, stop() { handle.stopped = true; } };
+export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, durationMs = 2000, loop = true, delayMs = 0, holdMs = null, zIndex = 60, state = null } = {}) {
+  const handle = {
+    sprite: null,
+    stopped: false,
+    done: null,
+    state,
+    stateAt: null,
+    stop() { handle.stopped = true; },
+    setState(name) {
+      if (name === handle.state) return;
+      handle.state = name;
+      handle.stateAt = null;
+    },
+  };
   const raf = globalThis.requestAnimationFrame;
   if (!PIXI?.Sprite || !layer || typeof at !== 'function' || typeof raf !== 'function') {
     handle.done = Promise.resolve(false);
@@ -310,7 +342,9 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
       }
       if (ms >= 0) {
         const p = at();
-        const cell = meta.order[Math.min(meta.order.length - 1, overlayFrameAt(meta, ms, { loop }))];
+        if (handle.stateAt == null) handle.stateAt = ms;
+        const frame = handle.state ? stateFrameAt(meta, handle.state, holdMs != null ? holdMs : ms - handle.stateAt) : overlayFrameAt(meta, ms, { loop });
+        const cell = meta.order[Math.min(meta.order.length - 1, frame)];
         sprite.texture = sheetTexture(PIXI, key, meta, cell);
         const place = standPlacement(meta, p.x, p.y, wh, zoomAt ? zoomAt(ms) : 1);
         sprite.x = place.left;
@@ -325,4 +359,27 @@ export function playSheetOverlay(PIXI, key, { layer, at, wh = 0, zoomAt = null, 
     raf(step);
   })).catch(() => false);
   return handle;
+}
+
+/**
+ * poof_in (locations/location.js 2054-2071 createItemStackWithPoof; the
+ * client's LocationItemstackView.as 738-769 poofItIn): proto_puff (or the
+ * given overlay) as an itemstack_overlay for 2 s, place_at_bottom with
+ * delta_y = stage height / 2 - item height / 2, so the puff is centred on the
+ * new stack, while the stack fades in over 1 s after 0.2 s. `bottom` is the
+ * stack's bottom in world px. Returns the playSheetOverlay handle.
+ */
+export const POOF_IN = Object.freeze({ key: 'proto_puff', durationMs: 2000, fadeInDelayMs: 200, fadeInMs: 1000 });
+
+export function playPoofIn(PIXI, { layer, x, bottom, itemH = 0, key = POOF_IN.key, zIndex = 70 } = {}) {
+  let dy = 0;
+  loadOverlayManifest()
+    .then((m) => { dy = (m?.[key]?.stage?.[1] || 0) / 2 - itemH / 2; })
+    .catch(() => {});
+  return playSheetOverlay(PIXI, key, { layer, at: () => ({ x, y: bottom + dy }), durationMs: POOF_IN.durationMs, loop: false, zIndex });
+}
+
+/** The new stack's alpha `ms` after it poofs in (0 for 0.2 s, then up over 1 s). */
+export function poofInAlpha(ms) {
+  return Math.max(0, Math.min(1, (ms - POOF_IN.fadeInDelayMs) / POOF_IN.fadeInMs));
 }
