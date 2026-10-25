@@ -2164,6 +2164,9 @@ function findPackSlotElement(classTsid) {
     .find((el) => el.dataset.tsid === classTsid) || null;
 }
 
+/** The open pack popover's markup, so an unchanged redraw keeps its buttons (renderPackPopover). */
+let packPopoverMarkup = '';
+
 function closePackPopover() {
   packSelected = null;
   packDropMode = false;
@@ -2172,7 +2175,9 @@ function closePackPopover() {
   if (pop) {
     pop.hidden = true;
     pop.innerHTML = '';
+    delete pop.dataset.packFor;
   }
+  packPopoverMarkup = '';
   document.querySelectorAll('.pack-slot[data-tsid]').forEach((slot) => {
     slot.classList.remove('active');
     slot.setAttribute('aria-expanded', 'false');
@@ -2741,7 +2746,8 @@ function renderPackPopover(classTsid, anchor = null) {
   }
   packSelected = classTsid;
   packDropQty = normalizeStackQuantity(packDropQty, slot.count);
-  const sourceAnchor = anchor || findPackSlotElement(classTsid);
+  // A pack redraw replaces the slot buttons: an anchor from before it falls back to the slot.
+  const sourceAnchor = (anchor?.isConnected ? anchor : null) || findPackSlotElement(classTsid);
   const useInfo = getPackUseInfo(classTsid);
   const isEmotionalBear = classTsid === EMOTIONAL_BEAR_ID;
   const bearActions = isEmotionalBear
@@ -2889,7 +2895,7 @@ function renderPackPopover(classTsid, anchor = null) {
   // A named Cubimal goes by its name, its figure type on the kind line (features/cubimal-race-feature.js).
   const named = features.query('itemDisplayName', classTsid);
   pop.hidden = false;
-  pop.innerHTML = `
+  const markup = `
     <div class="pack-pop-head">
       <div class="pack-pop-icon"><img src="${slot.icon}" alt="" /></div>
       <div class="pack-pop-title">
@@ -2924,6 +2930,15 @@ function renderPackPopover(classTsid, anchor = null) {
       ${canSellHere ? `<button type="button" class="pack-pop-sell" data-pack-sell>Sell for ◎ ${sellPrice}</button>` : ''}
     </div>
     ${dropPrompt}`;
+  // updateHud redraws an open popover on every HUD change (buff timers, energy): rebuilding
+  // the same markup swaps the buttons under the pointer and their hover blinks. Same content,
+  // same buttons and listeners.
+  const unchanged = pop.dataset.packFor === classTsid && pop.innerHTML !== '' && packPopoverMarkup === markup;
+  if (!unchanged) {
+    pop.innerHTML = markup;
+    pop.dataset.packFor = classTsid;
+    packPopoverMarkup = markup;
+  }
 
   document.querySelectorAll('.pack-slot[data-tsid]').forEach((el) => {
     const selected = el.dataset.tsid === classTsid;
@@ -2931,6 +2946,7 @@ function renderPackPopover(classTsid, anchor = null) {
     el.setAttribute('aria-expanded', selected ? 'true' : 'false');
   });
   positionPackPopover(pop, sourceAnchor);
+  if (unchanged) return;
 
   pop.querySelector('[data-pack-close]')?.addEventListener('click', closePackPopover);
   pop.querySelector('[data-pack-emblem-spend]')?.addEventListener('click', () => confirmEmblemSpend(classTsid));

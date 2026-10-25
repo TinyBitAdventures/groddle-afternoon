@@ -159,6 +159,19 @@ describe('pack / inventory', () => {
     assert.match(css, /\.qty-row \.btn-glitch-primary\s*\{[\s\S]*?width:\s*auto[\s\S]*?background:\s*#4a90c8/);
   });
 
+  it('an open pack card keeps its buttons through HUD redraws, and its green button stays green on hover', () => {
+    const css = readFileSync(join(__dirnameUi, '../public/style.css'), 'utf8');
+    const game = readFileSync(join(__dirnameUi, '../public/game.js'), 'utf8');
+    // updateHud redraws the open card on every HUD change; the same markup keeps the same buttons (no hover blink).
+    assert.match(game, /if \(packSelected\) renderPackPopover\(packSelected\);/);
+    assert.match(game, /const unchanged = pop\.dataset\.packFor === classTsid && pop\.innerHTML !== '' && packPopoverMarkup === markup;\n\s*if \(!unchanged\) \{\n\s*pop\.innerHTML = markup;/);
+    assert.match(game, /positionPackPopover\(pop, sourceAnchor\);\n\s*if \(unchanged\) return;/);
+    assert.match(game, /packPopoverMarkup = '';/, 'closing forgets the markup');
+    assert.match(game, /const sourceAnchor = \(anchor\?\.isConnected \? anchor : null\) \|\| findPackSlotElement\(classTsid\);/);
+    // .pack-pop-actions button:hover (0,2,1) outranks .pack-pop-primary (0,2,0): the primary needs its own hover.
+    assert.match(css, /\.pack-pop-actions \.pack-pop-primary:hover:not\(:disabled\) \{ background: #5c9a2f;/);
+  });
+
   it('uses one shared inventory module instance so runtime-registered tools reach the HUD', () => {
     const files = [
       '../public/game.js',

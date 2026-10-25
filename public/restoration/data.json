@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 499,
+  "commits": 500,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "A Multiplayer item in the Menu, and folder links work without their slash"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Machines, making, mining, repairs, Animal Kinship, piggy capture, chores and the conch cost no energy while dead"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "The Animal Kinship practice animals poof in with their bubbles and poof away after milking, nibbling and the second squeeze"
    }
   ]
  },

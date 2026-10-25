@@ -1978,11 +1978,15 @@ button.play-context-head:focus-visible {
   background: #6aaa3a;
   color: #fff;
 }
+/* The plain button hover above outranks this class: keep the green, a shade deeper. */
+.pack-pop-actions .pack-pop-primary:hover:not(:disabled) { background: #5c9a2f; border-color: #4d8a33; }
+.pack-pop-actions .pack-pop-primary:disabled { background: #6aaa3a; }
 .pack-pop-actions .pack-pop-repair {
   color: #fff;
   border-color: #8a6536;
   background: linear-gradient(#d99b45, #b8742f);
 }
+.pack-pop-actions .pack-pop-repair:hover:not(:disabled) { background: linear-gradient(#cf8f39, #a96826); }
 .pack-pop-actions .pack-pop-repair:disabled {
   color: rgba(255, 255, 255, 0.78);
   opacity: 0.55;
