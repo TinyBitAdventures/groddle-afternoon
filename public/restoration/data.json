@@ -822,7 +822,7 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), restyle the street as any of 36 of the original 37 street styles (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).",
+   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the street and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of 36 of the original 37 street styles and the back yard as any of 34 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street of its template family), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).",
    "spot": "mailbox",
    "evidence": [
     "public/js/homes.js",
@@ -2027,9 +2027,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 436,
+  "commits": 437,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "The Scion's quotes keep Tiny Speck's own em-dashes"
+   },
    {
     "date": "2026-10-25",
     "kind": "improve",
@@ -2144,14 +2149,9 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "The coverage inventory counts items from the drop tables the game rolls"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "The Irrigator 9000 wears out and pours first, and the Grand Ol' Grinder grinds with its own animation"
    }
   ]
  },
- "tests": 247,
+ "tests": 248,
  "generatedAt": "2026-10-25"
 }

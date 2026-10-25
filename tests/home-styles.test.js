@@ -160,10 +160,14 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
     assert.deepEqual(missing.map((row) => row.label), ['Coral Caves']);
     assert.match(missing[0].reason, /CC0/);
     assert.equal(choices.filter((row) => row.isCurrent).length, 1);
-    for (const row of INTERIOR_STYLES) {
-      assert.equal(row.built, false);
-      assert.match(row.reason, /back yard/);
-    }
+  });
+
+  it('draws 34 of the 37 back yards with the look of their street pair (G135)', () => {
+    const built = INTERIOR_STYLES.filter((row) => row.built);
+    assert.equal(built.length, 34);
+    for (const row of built) assert.equal(EXTERIOR_STYLES.find((ext) => ext.key === row.lookOf)?.built, true, row.key);
+    assert.deepEqual(INTERIOR_STYLES.filter((row) => !row.built).map((row) => row.label), ['Anemone Alley', 'More Door', 'Bewitched Backwoods']);
+    for (const row of INTERIOR_STYLES.filter((r) => !r.built)) assert.ok(row.reason);
   });
 
   it('draws only shipped CC0 decos', () => {
@@ -196,7 +200,7 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
 
   it('the homes feature saves the chosen style with the yard and imports one module key', () => {
     const src = readFileSync(join(spike, 'public/js/features/homes-feature.js'), 'utf8');
-    assert.match(src, /houseVisits, streetStyle \};/);
+    assert.match(src, /houseVisits,\n\s+streetStyle,\n\s+\/\/ G135[^\n]*\n\s+backYard: backCult,\n\s+yardStyle,/);
     const keys = new Set([...src.matchAll(/home-styles\.js\?v=([\w-]+)/g)].map((m) => m[1]));
     assert.equal(keys.size, 1);
   });

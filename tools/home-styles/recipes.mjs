@@ -845,3 +845,61 @@ export const PURCHASE_STREET_STYLE = {
   firebog: 'firebog_1_high',
   uralia: 'uralia_1_high',
 };
+
+/**
+ * Back-yard (interior) styles (register G135 / G223). GSJS homes_interior_configs
+ * (inc_data_homes_prod.js 1-816) name 37 templates, all layout "house-right" with
+ * the groddle frame (home_groddle.swf, frame groddle): the house is the same in
+ * every one, only the yard landscape left of it changes. No interior template's
+ * geometry or main image was archived, so each yard is drawn with the CC0
+ * composition of the street style from the same template family: the keys pair
+ * up by region and number (forest_2__high / forest_2_high, firebog_int_3_hor_high
+ * / firebog_3_high, ...), the default yard pairs with the default street
+ * (config_base.js START_INT_TEMPLATE meadows_int_default__high / START_EXT_TEMPLATE
+ * meadow_ext_default_high), and the September 2012 batch added five yards and
+ * five streets together (Engadget 2012-09-14 "5 interior and 5 exterior"; their
+ * templates end IJ83 and their main images are dated 2012-09-05): Tjorn Trample /
+ * Vatn Road, Nightfall Surprise / Eventide Essence, Ruddy Skies / Sunset Strip,
+ * Grasslands Graze / Llano Lane, Anemone Alley / Coral Caves
+ * (research/web-hunt-2026-10-24/REVIEW.md finding 2). A string is the street style whose look the yard
+ * uses; `missing` keeps a yard out of the choices.
+ */
+export const YARD_LOOKS = {
+  aranna_int_1_hor_high: 'aranna_ext_1_high',
+  basic: 'basic',
+  firebog_1_hor_high: 'firebog_1_high',
+  firebog_int_1b_hor_high: 'firebog_1b_high',
+  firebog_int_1b__high: 'firebog_1b_high',
+  firebog_int_2__high: 'firebog_2_high',
+  firebog_int_3_hor_high: 'firebog_3_high',
+  firebog_int_4_hor_high: 'firebog_4_high',
+  firebog_int_4__high: 'firebog_4a_high',
+  forest_1_hor_high: 'forest_1_high',
+  forest_2__high: 'forest_2_high',
+  forest_3__high: 'forest_3_high',
+  forest_4__high: 'forest_4_high',
+  forest_5__high: 'forest_5_high',
+  forest_6__high: 'forest_6_high',
+  forest_dusk_int_1_hor_high: 'forest_dusk_ext_1_high',
+  forest_sunset_int_1_hor_high: 'forest_sunset_ext_1_high',
+  heights_1__high: 'heights_1_high',
+  highlands_1_hor_high: 'highlands_1_high',
+  kajuu_1__high: 'kajuu_1_high',
+  kajuu_2__high: 'kajuu_2_high',
+  kajuu_int_3_hor_high: 'kajuu_3_high',
+  meadows_1__high: 'meadows_1_high',
+  meadows_2__high: 'meadows_2_high',
+  meadows_3__high: 'meadows_3_high',
+  meadows_int_default__high: 'meadow_ext_default_high',
+  pol_int_coral_hor_high: { missing: 'Its pair, the Coral Caves street, needs a coral seabed set (pol_ext_coral) that is in none of the CC0 street bundles.' },
+  pol_int_crimson_hor_high: '_crimson_forest_high',
+  pol_int_mordor_high: { missing: 'No street style shares its template family (mordor), and its own template was never archived.' },
+  savannah_int_1__high: 'savannah_ext_1_high',
+  uralia_1_hor_high: 'uralia_1_high',
+  uralia_int_2_hor_high: 'uralia_2_high',
+  uralia_int_3__high: 'uralia_3_high',
+  _moon__high: '_moon_high',
+  _rook__high: '_rook_high',
+  _ruin__high: '_ruin_high',
+  _triney__high: { missing: 'No street style shares its template family (triney), and its own template was never archived.' },
+};

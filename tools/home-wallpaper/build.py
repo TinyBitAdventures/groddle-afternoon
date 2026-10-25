@@ -61,6 +61,9 @@ WALL_FIELDS = {
     'wall': (150, 300), 'wall_2': (150, 300), 'wall_3': (150, 300), 'wall_4': (150, 300),
     'wall_5': (150, 300), 'wall_6': (150, 300), 'wall_left': (150, 300), 'wall_right': (150, 300),
     'wall_single': (150, 300), 'left': (150, 458), 'right': (150, 458), 'swatch': (50, 50),
+    # The ground floor's open left end of a house-right home (inc_homes.js homes_rebuild_floor
+    # 'left-open': the wallpaper's left_open piece, 150 x 393, where the back yard comes in).
+    'left_open': (150, 393),
 }
 FLOOR_FIELDS = {'main': (150, 108), 'left': (150, 108), 'right': (150, 108), 'swatch': (50, 50),
                 **{f'main_{i}': (150, 108) for i in range(2, 7)}}
@@ -77,6 +80,10 @@ SHELL = {
         'wallpaper_end_shadow': (133, 458),
         'ceiling_shadow_left': (300, 50),
         'floor_shadow_left_open': (300, 108),
+        # the left-open end (homes_rebuild_floor): divider shadow and the frame_open post
+        # (homes_interior_frames.groddle frame_open_deco 17 x 245)
+        'wallpaper_divider_shadow': (133, 393),
+        'crosssection_divider_end_groddle1': (17, 245),
         'floor_shadow_right': (300, 108),
         'crosssection_horizontal_1500px_groddle1': (1500, 17),
         'crosssection_endwall_groddle1': (17, 492),
@@ -172,7 +179,7 @@ def wanted_pieces(cfg):
                     continue
                 piece = val.split(',')[0].lower()
                 # Pieces laid edge to edge: walls, floor and ceiling runs (not end caps or swatches).
-                want('home_wallpaper', piece, size, tiles=field not in ('left', 'right', 'swatch') or kind != 'walls' and field != 'swatch')
+                want('home_wallpaper', piece, size, tiles=field not in ('left', 'right', 'left_open', 'swatch') or kind != 'walls' and field != 'swatch')
                 row[field] = piece + (',FLIP' if ',FLIP' in val else '')
             maps[kind][key] = row
     for bundle, rows in SHELL.items():

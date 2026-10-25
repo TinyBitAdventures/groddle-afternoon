@@ -20,8 +20,24 @@
  *                                 jellisac / barnacle 240, firefly hive 210,
  *                                 patch 2000, gardens 60 / 160 / 300)
  * - locations/inc_homes.js        home_get_yard_expansion_costs / home_add_expansion
+ *                                 (2663-2796), home_get_yard_size (2648)
  * - config_base.js                START/MAX_FRONTYARD_LEFT/RIGHT_SEGMENTS,
- *                                 FRONTYARD_EXPAND_COSTS (150 px per segment)
+ *                                 FRONTYARD_EXPAND_COSTS (150 px per segment),
+ *                                 START/MAX_BACKYARD_SEGMENTS 5 / 20 and
+ *                                 BACKYARD_EXPAND_COSTS (215-246)
+ *
+ * The back yard (register G135). The house interior is a "house-right"
+ * location (inc_homes.js homes_rebuild_rooms 472-541): the house stands at
+ * x 0..house_w and the yard runs left of it to x = -yard_expansions x 150.
+ * It starts at 5 segments and grows only leftwards, one segment per paid
+ * expansion, to 20 (15 expansions, 200 to 3,281 iMG); the last one counts
+ * max_expansions:yard (home_add_expansion 2726-2745). The same cultivation
+ * rules run there (cultivation_can_cultivate: any home location of the
+ * owner), priced from the yard's own items (cultivation_count_items counts
+ * this location), but never the Tower (cultivation_get_available 38:
+ * !is_public). A back-yard state carries `yard: 'back'`; its `yardLeft`
+ * counts the expansions and its `rx` is the source x (negative, left of
+ * the house).
  *
  * Remake decisions:
  * - Items are stored relative to the house (`rx`), so a left-hand yard
@@ -53,6 +69,10 @@ export const NUDGE_SKILL = 'nudgery_1';
 const BASE = 0.15;
 const ADDITIONAL = 0.5;
 const MAX_ITEMS = 60;
+/** The back yard kind (a state with yard: 'back'); the home street has none. */
+export const BACK_YARD = 'back';
+/** inc_homes.js homes_rebuild_floor left-open: the ramp in through the house's open end (x -20..56). */
+export const BACK_YARD_OPENING = 150;
 /** quest.js doJobEffects: setMaxWearMultiplier(multiplier + 0.05) per restore. */
 export const LIFESPAN_STEP = 0.05;
 /** include/cultivation.js setMaxWearMultiplier: capped at 2.0. */
@@ -120,7 +140,12 @@ function normalizeItem(row) {
   return out;
 }
 
+export function isBackYard(state) {
+  return state?.yard === BACK_YARD;
+}
+
 export function normalizeCultivationState(seed = {}) {
+  const back = seed?.yard === BACK_YARD;
   const items = [];
   const seen = new Set();
   for (const row of Array.isArray(seed?.items) ? seed.items : []) {
@@ -130,9 +155,12 @@ export function normalizeCultivationState(seed = {}) {
     items.push(item);
     if (items.length >= MAX_ITEMS) break;
   }
-  const maxLeft = HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;
-  const maxRight = HOME_LIMITS.MAX_FRONTYARD_RIGHT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_RIGHT_SEGMENTS;
+  const maxLeft = back
+    ? HOME_LIMITS.MAX_BACKYARD_SEGMENTS - HOME_LIMITS.START_BACKYARD_SEGMENTS
+    : HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS;
+  const maxRight = back ? 0 : HOME_LIMITS.MAX_FRONTYARD_RIGHT_SEGMENTS - HOME_LIMITS.START_FRONTYARD_RIGHT_SEGMENTS;
   return {
+    ...(back ? { yard: BACK_YARD } : {}),
     items,
     nextId: Math.max(items.reduce((m, r) => Math.max(m, r.id), 0) + 1, Math.floor(finite(seed?.nextId, 1))),
     yardLeft: Math.max(0, Math.min(maxLeft, Math.floor(finite(seed?.yardLeft, 0)))),
@@ -150,17 +178,31 @@ export function createCultivationState(seed = {}) {
   return normalizeCultivationState(seed);
 }
 
-/** Yard segments on each side of the house lot. */
+/** A house's back yard (homes_init_config: yard_expansions = START_BACKYARD_SEGMENTS). */
+export function createBackYardState(seed = {}) {
+  return normalizeCultivationState({ ...(seed || {}), yard: BACK_YARD });
+}
+
+/** Yard segments on each side of the house lot (the back yard: all on the left). */
 export function yardSegments(state) {
+  if (isBackYard(state)) return { left: HOME_LIMITS.START_BACKYARD_SEGMENTS + (state.yardLeft || 0), right: 0 };
   return {
     left: HOME_LIMITS.START_FRONTYARD_LEFT_SEGMENTS + (state?.yardLeft || 0),
     right: HOME_LIMITS.START_FRONTYARD_RIGHT_SEGMENTS + (state?.yardRight || 0),
   };
 }
 
-/** World layout of the home street: width, house center, and the yard edges. */
+/**
+ * World layout of the home street: width, house center, and the yard edges.
+ * The back yard: `width` is the yard (home_get_yard_size), `houseX` the house's
+ * left end (source x 0), so `rx` is the source x and every spot is left of it.
+ */
 export function homeStreetLayout(state) {
   const seg = yardSegments(state);
+  if (isBackYard(state)) {
+    const width = seg.left * YARD_SEGMENT_W;
+    return { width, houseX: width, lotLeft: width, lotRight: width, minRx: -width + 60, maxRx: 0 };
+  }
   const leftW = seg.left * YARD_SEGMENT_W;
   const rightW = seg.right * YARD_SEGMENT_W;
   const width = leftW + HOUSE_LOT_W + rightW;
@@ -204,8 +246,8 @@ export function cultivationCost(state, protoClass) {
 
 /** cultivation_get_available + level/imagination gates for the Cultivate menu. */
 export function cultivationChoices(state, pc = {}) {
-  // cultivation_get_available: no Tower choice once one is cultivated or built.
-  return listCultivationClasses().filter((def) => def.kind !== 'tower' || !towerItem(state)).map((def) => {
+  // cultivation_get_available: no Tower choice once one is cultivated or built, and none off the street (38: !is_public).
+  return listCultivationClasses().filter((def) => def.kind !== 'tower' || (!towerItem(state) && !isBackYard(state))).map((def) => {
     const cost = cultivationCost(state, def.protoClass);
     const level = Math.floor(finite(pc.level, 1));
     const img = Math.floor(finite(pc.imagination, 0));
@@ -242,11 +284,12 @@ export function placementCheck(state, protoClass, rx, excludeId = null) {
   const layout = homeStreetLayout(state);
   const half = footprint(protoClass);
   const x = Math.round(finite(rx, 0));
+  const back = isBackYard(state);
   if (x - half < layout.minRx || x + half > layout.maxRx) {
-    return { ok: false, reason: 'edge', msg: 'Not enough yard there. Expand the street for more room.' };
+    return { ok: false, reason: 'edge', msg: back ? 'Not enough yard there. Expand the yard for more room.' : 'Not enough yard there. Expand the street for more room.' };
   }
-  if (Math.abs(x) < half + DOOR_CLEARANCE / 2) {
-    return { ok: false, reason: 'door', msg: 'Keep the path to your front door clear.' };
+  if (Math.abs(x) < half + (back ? BACK_YARD_OPENING : DOOR_CLEARANCE) / 2) {
+    return { ok: false, reason: 'door', msg: back ? 'Keep the way into your house clear.' : 'Keep the path to your front door clear.' };
   }
   for (const other of state.items) {
     if (other.id === excludeId) continue;
@@ -284,7 +327,7 @@ export function cultivate(state, pc, protoClass, rx, opts = {}) {
     return { ok: false, reason: 'img', msg: "You don't have enough imagination." };
   }
   if (countCultivations(state) >= MAX_ITEMS) return { ok: false, reason: 'full', msg: "You can't place any more of those." };
-  if (def.kind === 'tower' && towerItem(state)) return { ok: false, reason: 'full', msg: "You can't place any more of those." };
+  if (def.kind === 'tower' && (towerItem(state) || isBackYard(state))) return { ok: false, reason: 'full', msg: "You can't place any more of those." };
   const fit = placementCheck(state, protoClass, rx);
   if (!fit.ok) return fit;
   const rng = typeof opts.rng === 'function' ? opts.rng : Math.random;
@@ -391,9 +434,9 @@ export function depleteCultivation(state, id, opts = {}) {
   return { ok: true, item, label: def.label, jobId: restoreJobId(item) };
 }
 
-/** The proto's project id (items/proto_*.js setJobData 'proto-'+tsid). */
-export function restoreJobId(item) {
-  return `home-proto-${item.id}-${item.cycle || 1}`;
+/** The proto's project id (items/proto_*.js setJobData 'proto-'+tsid); the back yard's have their own. */
+export function restoreJobId(item, state = null) {
+  return `home-proto-${isBackYard(state) ? 'back-' : ''}${item.id}-${item.cycle || 1}`;
 }
 
 /** Reward multiplier the restore pays (quest.js: spirit.getMaxWearMultiplier()). */
@@ -436,9 +479,23 @@ export function restoreCultivation(state, id, opts = {}) {
 /**
  * home_get_yard_expansion_costs (exterior): the next expansion costs
  * FRONTYARD_EXPAND_COSTS[expansions so far] iMG; each side stops at its max.
+ * The back yard (interior): BACKYARD_EXPAND_COSTS[expansions so far], one
+ * way only (to the left), `count` expansions left (houses_expand_yard).
  */
 export function quoteYardExpansion(state, pc = {}, side = 'right') {
   const seg = yardSegments(state);
+  if (isBackYard(state)) {
+    const costs = HOME_LIMITS.BACKYARD_EXPAND_COSTS;
+    const done = state.yardLeft || 0;
+    const count = Math.max(0, HOME_LIMITS.MAX_BACKYARD_SEGMENTS - seg.left);
+    const cost = costs[Math.min(done, costs.length - 1)];
+    const base = { side: 'left', cost, count, countLeft: count, countRight: 0 };
+    if (count <= 0) return { ...base, ok: false, reason: 'already_max_size', msg: "This yard can't be expanded anymore." };
+    if (Math.floor(finite(pc.imagination, 0)) < cost) {
+      return { ...base, ok: false, reason: 'img', msg: 'You need more imagination' };
+    }
+    return { ...base, ok: true };
+  }
   const remainLeft = HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS - seg.left;
   const remainRight = HOME_LIMITS.MAX_FRONTYARD_RIGHT_SEGMENTS - seg.right;
   const done = (state.yardLeft || 0) + (state.yardRight || 0);
@@ -458,11 +515,15 @@ export function expandYard(state, pc, side = 'right') {
   const quote = quoteYardExpansion(state, pc, side);
   if (!quote.ok) return quote;
   pc.imagination = Math.floor(finite(pc.imagination, 0)) - quote.cost;
-  if (side === 'left') state.yardLeft += 1;
+  const back = isBackYard(state);
+  if (back || side === 'left') state.yardLeft += 1;
   else state.yardRight += 1;
   const seg = yardSegments(state);
-  const maxed = seg.left >= HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS && seg.right >= HOME_LIMITS.MAX_FRONTYARD_RIGHT_SEGMENTS;
-  return { ok: true, cost: quote.cost, side, segments: seg, maxed, layout: homeStreetLayout(state) };
+  // home_add_expansion: max_expansions:yard (back) / :street (front) once the last one is bought.
+  const maxed = back
+    ? seg.left >= HOME_LIMITS.MAX_BACKYARD_SEGMENTS
+    : seg.left >= HOME_LIMITS.MAX_FRONTYARD_LEFT_SEGMENTS && seg.right >= HOME_LIMITS.MAX_FRONTYARD_RIGHT_SEGMENTS;
+  return { ok: true, cost: quote.cost, side: back ? 'left' : side, segments: seg, maxed, layout: homeStreetLayout(state) };
 }
 
 /**
@@ -478,6 +539,16 @@ export function hiveFireflyCount(item, now = Date.now()) {
 
 /** Seed a lived-in demo yard (QA routes). Ignores cost and level. */
 export function cultivateDemoYard(state, now = Date.now()) {
+  if (isBackYard(state)) {
+    // The back yard: two more segments, a garden, a patch and a rock left of the house.
+    state.yardLeft = Math.max(state.yardLeft, 2);
+    const rich = { level: 60, imagination: 1e9 };
+    for (const [protoClass, rx] of [['proto_herb_garden_small', -260], ['proto_patch', -560], ['proto_beryl_rock', -820]]) {
+      const at = nearestFreeRx(state, protoClass, rx);
+      if (at != null) cultivate(state, rich, protoClass, at, { now, rng: () => 0 });
+    }
+    return state;
+  }
   const plan = [
     ['proto_crop_garden_medium', -520],
     ['proto_patch', 470],

@@ -33,7 +33,7 @@ import {
 } from '../mood-decay.js?v=mood-decay-1';
 import { moodMax } from '../metabolics.js';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
-import { homesFeature } from './homes-feature.js?v=homes-9';
+import { homesFeature } from './homes-feature.js?v=homes-10';
 import { newxpFeature } from './newxp-feature.js?v=g148-1';
 
 export const MOOD_DECAY_FEATURE_ID = 'mood-decay';

@@ -17,7 +17,7 @@
  * floor platform at `floorY`.
  */
 
-import { WALLPAPER_MAPS, WALLPAPER_PIECES } from './home-wallpaper-art.js?v=home-wallpaper-art-1';
+import { WALLPAPER_MAPS, WALLPAPER_PIECES } from './home-wallpaper-art.js?v=home-wallpaper-art-2';
 
 export const PIECE_DIR = 'assets/homes/wallpaper/';
 export const SEG = 150;
@@ -40,6 +40,11 @@ export const GRODDLE_FRAME = Object.freeze({
   door: 'door_asset_entry_basic',
   doorW: 75,
   doorH: 236,
+  // homes_interior_frames.groddle frame_open_*: the post over a "left-open" end (17 x 245, 230 up).
+  openEnd: 'crosssection_divider_end_groddle1',
+  openEndW: 17,
+  openEndH: 245,
+  openEndY: 230,
 });
 /** tower.js tower_get_geo_config. */
 export const TOWER_FRAME = Object.freeze({
@@ -144,17 +149,19 @@ function add(out, layer, piece, x, bottom, w, h, extra = {}) {
 /**
  * Every piece of one room, back to front.
  * @param {{ layout?: 'house'|'tower', wallSegments?: number, walls: string[], floor: string, ceiling: string }} state
- * @param {{ floorY?: number, construction?: boolean }} [opts]
+ * @param {{ floorY?: number, construction?: boolean, leftOpen?: boolean }} [opts]
+ *   leftOpen: the ground floor of a "house-right" home (inc_homes.js homes_get_floor_config 446),
+ *   whose left end opens onto the back yard.
  * @returns {{ width: number, pieces: object[], walls: object[], floor: object, ceiling: object,
  *             door: object|null, elevator: object|null, top: number, bottom: number }}
  */
-export function roomPieces(state, { floorY = 620, construction = false } = {}) {
+export function roomPieces(state, { floorY = 620, construction = false, leftOpen = false } = {}) {
   return state?.layout === 'tower'
     ? towerPieces(state, floorY, construction)
-    : housePieces(state, floorY);
+    : housePieces(state, floorY, leftOpen);
 }
 
-function housePieces(state, W) {
+function housePieces(state, W, leftOpen = false) {
   const F = GRODDLE_FRAME;
   const walls = state.walls?.length ? state.walls : Array(state.wallSegments || 7).fill(state.wall);
   const n = walls.length;
@@ -181,6 +188,17 @@ function housePieces(state, W) {
     const x = SEG * i;
     const field = houseWallField(walls, i);
     const hash = textureHash('wall', walls[i]);
+    if (leftOpen && field === 'left' && hash.left_open) {
+      // homes_rebuild_floor 'left-open' (1369-1431): the wallpaper's left_open piece and the
+      // divider shadow 82 px over the frame bottom, and the frame_open post over the way out.
+      const open = split(hash.left_open);
+      const bottom = B - 82;
+      add(out, 'wall', open.piece, x, bottom, SEG, 393, { flip: open.flip, segment: i });
+      wallTargets.push({ segment: i, x, y: bottom - 393, w: SEG, h: 393 });
+      add(out, 'shadow', 'wallpaper_divider_shadow', x + 18, bottom, 133, 393);
+      add(out, 'frame_v', F.openEnd, x + 1, B - (F.frameHeight + F.openEndY), F.openEndW, F.openEndH);
+      continue;
+    }
     const { piece, flip } = split(hash[field]);
     if (field === 'left' || field === 'right') {
       add(out, 'wall', piece, x, floorBottom, SEG, 458, { flip, segment: i });
@@ -226,6 +244,9 @@ function housePieces(state, W) {
     bottom: B + F.basementH,
     innerLeft: SEG - 74,
     innerRight: width - 76,
+    // homes_rebuild_floor left-open: the floor starts at 56 and a ramp runs down to the yard
+    // (x -20 at the frame bottom); the post's foot, which the way out passes under.
+    ...(leftOpen ? { leftOpen: true, floorStart: 56, rampX: -20, groundY: B, openTop: B - (F.frameHeight + F.openEndY) } : {}),
   };
 }
 

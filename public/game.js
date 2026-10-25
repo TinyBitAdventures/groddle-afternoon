@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-80';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-81';
 import { buildEnterChoices, planEnter, createEnterChooser, trimmedIconUrl } from './js/enter-chooser.js?v=g206-1';
 import {
   actionDurationFor,

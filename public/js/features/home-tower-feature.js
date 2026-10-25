@@ -108,7 +108,7 @@ import {
   workCheck,
 } from '../home-tower.js?v=home-tower-2';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { pieceUrl } from '../home-wallpaper.js?v=home-wallpaper-1';
+import { pieceUrl } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { WOTD_TEXT } from '../wine-pour.js?v=g165-1';
 

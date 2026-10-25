@@ -26,6 +26,22 @@
  * like the client's HandOfDecorator: pick one, click a wall segment's middle
  * (that segment), elsewhere on the wall (the room), the floor or the ceiling.
  *
+ * The back yard (register G135): the house interior is a "house-right"
+ * location (inc_homes.js homes_rebuild_rooms 472-541), so the scene puts the
+ * yard left of the house: world x 0 .. the yard's width is the yard, the room
+ * (furniture and swatches in room x) starts there. The ground floor's left end
+ * is open (homes_get_floor_config 446, homes_rebuild_floor 'left-open'): a
+ * ramp runs from the yard ground (the frame bottom, 60 px under the floor) up
+ * into the house, under the frame_open post. Cultivate works there on the
+ * back yard's own state (js/home-cultivation.js yard 'back'), with its own
+ * world slots (rocks, nodes, plots on RH_HOME_INT); Expand grows it leftwards
+ * (the house moves right, and so do the stacks dropped indoors); Change Style
+ * picks the yard's look (js/home-styles.js yard styles). QA:
+ *     ?autostart=1&fresh=1&homedemo=interior&homeyarddemo=cultivate (a lived-in
+ *     back yard, Cultivate open; &homeautoplay=1 cultivates, expands and
+ *     removes; =max buys every expansion left for Landgrabber)
+ *     &homeyardstyle=<GSJS interior key> sets the yard style once, free.
+ *
  * Worn-out cultivations become their proto in place (items/include/cultivation.js
  * replaceWithDepleted): the CC0 `depleted` frame of the proto SWF
  * (js/home-proto-art.js) with Restore, which runs the proto's job_cult_*
@@ -46,7 +62,9 @@
  * the same "Please Confirm!". QA: &homedemo=cultivate&wotddemo=3.
  * Canvas data: homeDecorPlaced, homeDecorStorage, homeDecorWall/Walls/Floor/Ceiling, homeStamping,
  * homeDecorSegments, homeMode, homeCultivations, homeYard, homeAutoplay,
- * homeProtos, homeRestore, homeLifespan, homePour (confirm|pouring|depleted|canceled:<id>).
+ * homeProtos, homeRestore, homeLifespan, homePour (confirm|pouring|depleted|canceled:<id>),
+ * homeBackCultivations, homeBackYard (back-yard expansions bought), homeBackYardWidth,
+ * homeHouseX (the house's left end in interior world x), homeYardStyle, homeYardShown.
  *     &cultwear=N  every cultivation wears out after N uses (x its lifespan multiplier)
  *     &homeautoplay=restore (with homedemo=cultivate): wears the Metal Rock out,
  *       then seeds and runs its Restore project to the restored rock
@@ -91,6 +109,8 @@ import {
   UNEXPAND_TEXT,
 } from '../home-decor.js?v=home-decor-4';
 import {
+  createBackYardState,
+  isBackYard,
   nearestFreeRx,
   FIREFLY_HIVE,
   addWear,
@@ -117,12 +137,12 @@ import {
   quoteYardExpansion,
   removeCultivation,
   towerItem,
-} from '../home-cultivation.js?v=home-cultivation-2';
+} from '../home-cultivation.js?v=home-cultivation-3';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { projectApi } from './street-jobs-feature.js?v=g177-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-2';
-import { towerApi } from './home-tower-feature.js?v=home-tower-4';
-import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-1';
+import { towerApi } from './home-tower-feature.js?v=home-tower-5';
+import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-5';
 import { patchesFeature } from './patches-feature.js?v=patches-7';
@@ -132,18 +152,26 @@ import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import {
   STREET_STYLE_BY_KEY,
   STYLE_TEXT,
+  YARD_STYLE_BY_KEY,
+  YARD_STYLE_TEXT,
   changeForLabel,
   confirmText,
   streetLook,
   streetStyleFor,
   styleChoices,
   switchStreetStyle,
-} from '../home-styles.js?v=g204-1';
+  switchYardStyle,
+  yardLook,
+  yardStyleChoices,
+  yardStyleFor,
+} from '../home-styles.js?v=g135-1';
 import { textureFromUrl } from '../textures.js';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
+/** The house (and its back yard); js/homes.js HOME_INTERIOR_TSID. */
+const HOME_INTERIOR_TSID = 'RH_HOME_INT';
 const VIEW_W = 960;
 const VIEW_H = 540;
 const DECO = 'assets/decos/groddle/';
@@ -168,6 +196,16 @@ const OLD_STREET_GROUND_Y = 620;
 const STREET_LIFT = STREET_GROUND_Y - OLD_STREET_GROUND_Y;
 /** The street's world height: the soil band under the walk line (bgLayer.worldH). */
 export const STREET_WORLD_H = STREET_GROUND_Y + 102;
+/**
+ * The back yard's ground: the house's frame bottom, 43 + 17 px under the
+ * floor (inc_homes.js homes_rebuild_floor: floor plat at -(43 + frame_height),
+ * the left-open ramp down to y 0).
+ */
+export const BACK_YARD_GROUND_Y = GROUND_Y + 43 + 17;
+/** The look items are placed for the old 620 px street (tools/home-styles/recipes.mjs). */
+const YARD_LIFT = BACK_YARD_GROUND_Y - OLD_STREET_GROUND_Y;
+/** Above this much of the avatar the house's left end is a wall (the post over the way in). */
+const AVATAR_HEAD = 90;
 const FURNITURE_Z = 12;
 
 // ---------------------------------------------------------------------------
@@ -269,6 +307,23 @@ export function qaWearOpts(raw) {
   return Number.isFinite(n) && n > 0 ? { maxWear: n } : {};
 }
 
+/**
+ * Move stacks dropped in the house by `dx` when the house's world x changes
+ * (a back-yard expansion, or a save from before the back yard). Pure; returns
+ * how many rows moved.
+ */
+export function shiftInteriorRows(rows, dx) {
+  if (!Array.isArray(rows) || !dx) return 0;
+  let moved = 0;
+  for (const row of rows) {
+    const x = Number(row?.x);
+    if (!Number.isFinite(x)) continue;
+    row.x = Math.round(x + dx);
+    moved += 1;
+  }
+  return moved;
+}
+
 /** The Furniture Store (store 23) as a vendor profile for engine.openShop. */
 export function furnitureStoreProfile() {
   return {
@@ -316,6 +371,10 @@ let savedStreetGround = STREET_GROUND_Y;
 /** The decor being shown and edited: the house, or the Tower floor you stand on. */
 let decor = houseDecor;
 let cult = createCultivationState();
+/** The house's back yard (inc_homes.js cfg.yard_expansions, its cultivations). */
+let backCult = createBackYardState();
+/** The house's left end (interior world x) the stacks dropped indoors were saved against; null: not yet known. */
+let savedHouseX = null;
 let mode = null; // 'decorate' | 'cultivate' | null
 let tab = 'furniture';
 let placing = null; // { kind: 'furniture'|'cultivation', classTsid|protoClass, moveId? }
@@ -336,6 +395,43 @@ let stylePick = null; // the style highlighted in the Change Style dialog
 let stylePreview = null; // a picked style shown on the street before you pay for it
 let styleDemoDone = false;
 let styleDialogDemoDone = false;
+/** The chosen back-yard style (cfg.style on the interior); null: START_INT_TEMPLATE. */
+let yardStyle = null;
+let yardPreview = null; // a picked yard style shown behind the dialog
+let yardStyleDemoDone = false;
+let yardDemoDone = false;
+
+/** The house itself (not a Tower floor): its back yard is left of it. */
+function inHouse() {
+  return scene?.room === 'interior' && scene.tower == null;
+}
+
+/** The yard Cultivate works on here: the back yard in the house, else the home street. */
+function activeCult() {
+  return inHouse() ? backCult : cult;
+}
+
+function yardTsid(state = activeCult()) {
+  return isBackYard(state) ? HOME_INTERIOR_TSID : HOME_STREET_TSID;
+}
+
+function yardGroundY(state = activeCult()) {
+  return isBackYard(state) ? BACK_YARD_GROUND_Y : STREET_GROUND_Y;
+}
+
+/** The house's left end in interior world x: the back yard's width (home_get_yard_size). */
+function houseX0() {
+  return homeStreetLayout(backCult).houseX;
+}
+
+/** Where the room starts in this scene's world x (0 on Tower floors and the street). */
+function roomX0() {
+  return scene?.background?.houseX || 0;
+}
+
+function toRoom(p) {
+  return { x: p.x - roomX0(), y: p.y };
+}
 
 function publish(engine) {
   if (!engine) return;
@@ -354,6 +450,12 @@ function publish(engine) {
   engine.setData('homeLifespan', cult.items.filter((row) => !row.depleted && cultivationDef(row.protoClass)?.kind !== 'tower')
     .map((row) => `${row.protoClass.replace('proto_', '')}:${lifespanMultiplier(row).toFixed(2)}`).join(','));
   engine.setData('homeYard', `${cult.yardLeft},${cult.yardRight}`);
+  engine.setData('homeBackCultivations', backCult.items.map((row) => `${row.protoClass.replace('proto_', '')}@${row.rx}`).join(','));
+  engine.setData('homeBackYard', backCult.yardLeft);
+  engine.setData('homeBackYardWidth', houseX0());
+  engine.setData('homeHouseX', roomX0());
+  engine.setData('homeYardStyle', yardStyleFor(yardStyle));
+  engine.setData('homeYardShown', yardPreview || '');
   engine.setData('homeSelected', selected ? `${selected.kind}:${selected.id}` : '');
   engine.setData('homePlacing', placing ? placing.classTsid || placing.protoClass || '' : '');
   engine.setData('homeStreetStyle', currentStreetStyle(engine));
@@ -481,13 +583,14 @@ function pieceSprite(engine, row, hires) {
 function drawRoomShell(engine, container, opts = {}) {
   const { PIXI } = engine;
   container.removeChildren().forEach((child) => child.destroy({ children: true }));
-  const room = roomPieces(decor, { floorY: INTERIOR.floorY, construction: Boolean(opts.construction) });
+  const room = roomPieces(decor, { floorY: INTERIOR.floorY, construction: Boolean(opts.construction), leftOpen: Boolean(opts.yard) });
   const width = room.width;
   const top = room.top - 200;
   const bottom = room.bottom + 200;
   const outside = new PIXI.Graphics();
   const OUTSIDE_W = 640;
-  for (const [x0, x1] of [[-OUTSIDE_W, 0], [width, width + OUTSIDE_W]]) {
+  // With the back yard, the left side is the yard itself (interiorBackground draws it).
+  for (const [x0, x1] of opts.yard ? [[width, width + OUTSIDE_W]] : [[-OUTSIDE_W, 0], [width, width + OUTSIDE_W]]) {
     outside.rect(x0, top, x1 - x0, bottom - top).fill(0x2a2019);
     for (let x = x0; x < x1; x += 46) outside.rect(x, top, 4, bottom - top).fill(0x221a14);
   }
@@ -544,23 +647,82 @@ function glowTexture(PIXI) {
   return glowTex;
 }
 
+/**
+ * The house room. With `opts.yard` (the house, not a Tower floor) the back
+ * yard comes first: the room starts at x0 = the yard's width, and the yard's
+ * landscape (its style's look) fills x 0..x0 behind it.
+ */
 function interiorBackground(engine, opts = {}) {
   const { PIXI } = engine;
-  const width = interiorWidth(decor);
+  const x0 = opts.yard ? houseX0() : 0;
+  const width = x0 + interiorWidth(decor);
   const root = new PIXI.Container();
+  const house = new PIXI.Container();
   const shell = new PIXI.Container();
   const marks = new PIXI.Graphics();
-  root.addChild(shell, marks);
+  house.x = x0;
+  house.addChild(shell, marks);
+  if (opts.yard) {
+    root.sortableChildren = true;
+    house.zIndex = 0;
+    const land = drawLandscape(engine, root, yardLook(shownYardStyle()), `yard:${shownYardStyle()}`, {
+      width,
+      groundY: BACK_YARD_GROUND_Y,
+      lift: YARD_LIFT,
+      // grass and plants stop short of the way into the house
+      skipNear: (x) => x > x0 - 90,
+    });
+    root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => land.update(camX, camY, vpW, skyH);
+  }
+  root.addChild(house);
   root.room = drawRoomShell(engine, shell, opts);
   root.shell = shell;
   root.marks = marks;
+  root.house = house;
+  root.houseX = x0;
+  root.yardStyle = opts.yard ? shownYardStyle() : null;
   root.worldH = root.room.bottom;
-  root.platformsScreen = [{ id: 'home-floor', x1: 0, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: 1 }];
+  const { room } = root;
+  root.platformsScreen = room.leftOpen
+    ? [
+      // homes_rebuild_floor left-open: the yard, the ramp (x -20 at y 0 to x 56 on the floor), the floor.
+      { id: 'home-yard', x1: 0, y1: room.groundY, x2: x0 + room.rampX, y2: room.groundY, pc_perm: 1 },
+      { id: 'home-yard-ramp', x1: x0 + room.rampX, y1: room.groundY, x2: x0 + room.floorStart, y2: GROUND_Y, pc_perm: 1 },
+      { id: 'home-floor', x1: x0 + room.floorStart, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: 1 },
+    ]
+    : [{ id: 'home-floor', x1: 0, y1: GROUND_Y, x2: width, y2: GROUND_Y, pc_perm: 1 }];
   root.redraw = () => {
     root.room = drawRoomShell(engine, shell, opts);
     drawStampMarks(engine);
   };
   return root;
+}
+
+/**
+ * QA once: &homeyardstyle=<GSJS interior key> sets the yard style, free.
+ */
+function qaYardStyle(engine) {
+  if (yardStyleDemoDone) return;
+  const key = String(engine.param?.('homeyardstyle') || '');
+  if (!key) return;
+  yardStyleDemoDone = true;
+  if (YARD_STYLE_BY_KEY[key]?.built) yardStyle = key;
+}
+
+/**
+ * Once per change of the house's world x (a back-yard expansion, or a save
+ * from before the back yard): the stacks dropped indoors move with the room.
+ */
+function syncHouseShift(engine) {
+  const now = houseX0();
+  if (savedHouseX == null) {
+    savedHouseX = now;
+    return;
+  }
+  if (savedHouseX === now) return;
+  const dx = now - savedHouseX;
+  savedHouseX = now;
+  if (shiftInteriorRows(engine.droppedItems?.streets?.[HOME_INTERIOR_TSID], dx)) engine.save?.();
 }
 
 /** inc_homes.js door_pos: 84 px in from the right end, on the end wall. */
@@ -576,7 +738,7 @@ function spawnInteriorTargets(engine) {
   door.anchor.set(0.5, 1);
   door.width = spec.w;
   door.height = spec.h;
-  door.x = spec.x;
+  door.x = roomX0() + spec.x;
   door.y = spec.y;
   door.zIndex = 8;
   engine.entityLayer.addChild(door);
@@ -652,14 +814,14 @@ function gradientTexture(PIXI, ...colors) {
   return PIXI.Texture.from(canvas);
 }
 
-function streetBackground(engine, styleKey, houseStyle = 'meadow') {
+/**
+ * A style's landscape (js/home-styles.js looks): the sky, parallax layers, the
+ * walkable field with its soil, and grass and plants along it. Item y values
+ * are on the old 620 px street, moved down by `lift`. Returns the parallax
+ * update for bgLayer.updateParallax.
+ */
+function drawLandscape(engine, root, style, seed, { width, groundY, lift, skipNear = () => false }) {
   const { PIXI } = engine;
-  const style = streetLook(styleKey);
-  const seed = style.seed || styleKey;
-  const layout = homeStreetLayout(cult);
-  const width = layout.width;
-  const root = new PIXI.Container();
-  root.sortableChildren = true;
   const sky = new PIXI.Sprite(gradientTexture(PIXI, ...style.sky));
   sky.zIndex = -100;
   root.addChild(sky);
@@ -676,7 +838,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
     const count = Math.round((style.stars.count * span) / 1000);
     for (let i = 0; i < count; i += 1) {
       const x = hash01(`${seed}:star:x:${i}`) * span - 200;
-      const y = -120 + hash01(`${seed}:star:y:${i}`) * (style.stars.maxY + 120) + STREET_LIFT;
+      const y = -120 + hash01(`${seed}:star:y:${i}`) * (style.stars.maxY + 120) + lift;
       const r = 0.8 + hash01(`${seed}:star:r:${i}`) * 1.6;
       dots.circle(x, y, r).fill({ color: style.stars.color ?? 0xffffff, alpha: 0.5 + hash01(`${seed}:star:a:${i}`) * 0.5 });
     }
@@ -692,7 +854,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
     const span = spanFor(layer.f);
     if (layer.band) {
       const band = new PIXI.Graphics();
-      band.rect(-200, layer.band.y + STREET_LIFT, span + 200, layer.band.h).fill({ color: layer.band.color, alpha: layer.band.alpha ?? 1 });
+      band.rect(-200, layer.band.y + lift, span + 200, layer.band.h).fill({ color: layer.band.color, alpha: layer.band.alpha ?? 1 });
       lc.addChild(band);
     }
     for (const item of layer.items || []) {
@@ -701,7 +863,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
         const jx = item.jitter ? (hash01(`${seed}:${li}:${item.s}:${i}`) - 0.5) * item.jitter * 2 : 0;
         const row = pickAlt(item, `${seed}:${li}:${item.s}:${i}:alt`);
         if (row.tint == null && layer.tint != null) row.tint = layer.tint;
-        lc.addChild(decoSprite(PIXI, row, x + jx, item.y + STREET_LIFT, hash01(`${item.s}:${i}:flip`) > 0.5));
+        lc.addChild(decoSprite(PIXI, row, x + jx, item.y + lift, hash01(`${item.s}:${i}:flip`) > 0.5));
         i += 1;
       }
     }
@@ -714,19 +876,19 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   // The walkable field and the soil cross-section below it.
   const field = new PIXI.Graphics();
   field.zIndex = -40;
-  field.rect(-50, 586 + STREET_LIFT, width + 100, OLD_STREET_GROUND_Y - 586 + 40).fill(style.field);
-  field.rect(-50, STREET_GROUND_Y + 10, width + 100, 30).fill({ color: style.fieldDark, alpha: 0.5 });
+  field.rect(-50, 586 + lift, width + 100, OLD_STREET_GROUND_Y - 586 + 40).fill(style.field);
+  field.rect(-50, groundY + 10, width + 100, 30).fill({ color: style.fieldDark, alpha: 0.5 });
   root.addChild(field);
   const soilFill = new PIXI.Graphics();
   soilFill.zIndex = -39.5;
-  soilFill.rect(-50, STREET_GROUND_Y + 30, width + 100, 240).fill(style.soilColor || 0x5c3b25);
+  soilFill.rect(-50, groundY + 30, width + 100, 240).fill(style.soilColor || 0x5c3b25);
   root.addChild(soilFill);
   const soilW = 1038 * 0.6;
   if (!style.soil) {
-    soilFill.rect(-50, STREET_GROUND_Y + 30, width + 100, 6).fill({ color: 0x000000, alpha: 0.22 });
+    soilFill.rect(-50, groundY + 30, width + 100, 6).fill({ color: 0x000000, alpha: 0.22 });
     for (let x = 30; x < width; x += 140) {
       const r = 6 + hash01(`pebble:${x}`) * 10;
-      soilFill.ellipse(x + hash01(`p2:${x}`) * 60, STREET_GROUND_Y + 70 + hash01(`p3:${x}`) * 50, r * 1.6, r).fill({ color: 0x000000, alpha: 0.14 });
+      soilFill.ellipse(x + hash01(`p2:${x}`) * 60, groundY + 70 + hash01(`p3:${x}`) * 50, r * 1.6, r).fill({ color: 0x000000, alpha: 0.14 });
     }
   }
   for (let x = -40; style.soil && x < width + soilW; x += soilW - 2) {
@@ -735,7 +897,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
     soil.width = soilW;
     soil.height = 150;
     soil.x = x;
-    soil.y = STREET_GROUND_Y + 26;
+    soil.y = groundY + 26;
     soil.zIndex = -39;
     root.addChild(soil);
   }
@@ -748,13 +910,40 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
       const jx = (hash01(`${seed}:near:${item.s}:${i}`) - 0.5) * item.jitter * 2;
       const px = x + jx;
       i += 1;
-      if (px > layout.lotLeft + 40 && px < layout.lotRight - 40) continue;
+      if (skipNear(px)) continue;
       const row = pickAlt(item, `${seed}:near:${item.s}:${i}:alt`);
       if (row.tint == null && style.nearTint != null) row.tint = style.nearTint;
-      near.addChild(decoSprite(PIXI, row, px, STREET_GROUND_Y + 22 + (item.below || 0), hash01(`${item.s}:${i}`) > 0.5));
+      near.addChild(decoSprite(PIXI, row, px, groundY + 22 + (item.below || 0), hash01(`${item.s}:${i}`) > 0.5));
     }
   }
   root.addChild(near);
+
+  return {
+    update(camX, camY, vpW, skyH) {
+      sky.x = camX;
+      sky.y = camY;
+      sky.width = vpW;
+      sky.height = skyH;
+      for (const lc of parallax) lc.x = camX * (1 - lc.parallaxF);
+    },
+  };
+}
+
+function streetBackground(engine, styleKey, houseStyle = 'meadow') {
+  const { PIXI } = engine;
+  const style = streetLook(styleKey);
+  const seed = style.seed || styleKey;
+  const layout = homeStreetLayout(cult);
+  const width = layout.width;
+  const root = new PIXI.Container();
+  root.sortableChildren = true;
+  const land = drawLandscape(engine, root, style, seed, {
+    width,
+    groundY: STREET_GROUND_Y,
+    lift: STREET_LIFT,
+    // Grass, flowers and plants along the yard, kept off the house lot.
+    skipNear: (px) => px > layout.lotLeft + 40 && px < layout.lotRight - 40,
+  });
 
   // The house, centred on its lot
   const h = HOUSES[houseStyle] || HOUSES.meadow;
@@ -777,13 +966,7 @@ function streetBackground(engine, styleKey, houseStyle = 'meadow') {
 
   root.worldH = STREET_WORLD_H;
   root.platformsScreen = [{ id: 'home-ground', x1: 0, y1: STREET_GROUND_Y, x2: width, y2: STREET_GROUND_Y, pc_perm: 1 }];
-  root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => {
-    sky.x = camX;
-    sky.y = camY;
-    sky.width = vpW;
-    sky.height = skyH;
-    for (const lc of parallax) lc.x = camX * (1 - lc.parallaxF);
-  };
+  root.updateParallax = (camX, camY, vpW, vpH, skyH = vpH) => land.update(camX, camY, vpW, skyH);
   root.houseDoorX = layout.houseX + (h.doorX - 0.5) * h.w * h.scale;
   root.houseSignX = left + h.w * h.scale * (h.signX + 0.02);
   root.streetStyle = styleKey;
@@ -967,8 +1150,8 @@ const POD_ART = {
   jellisac_mound: { w: 228, h: 145 },
 };
 
-function cultivationWorldX(item) {
-  return homeStreetLayout(cult).houseX + item.rx;
+function cultivationWorldX(item, state = activeCult()) {
+  return homeStreetLayout(state).houseX + item.rx;
 }
 
 function shimEngine(engine, population, points) {
@@ -978,41 +1161,47 @@ function shimEngine(engine, population, points) {
   });
 }
 
-function spawnCultivations(engine) {
+/**
+ * The yard's cultivations (the home street's, or the back yard's in the
+ * house), each kind through its own system, with this yard's world slots.
+ */
+function spawnCultivations(engine, st = activeCult()) {
   const { PIXI } = engine;
   const now = Date.now();
-  const world = engine.streetWorld ? engine.streetWorld(HOME_STREET_TSID) : null;
-  // Rocks: the street's own rock slots, in cultivation order.
-  const rocks = rockItems(cult.items);
+  const tsid = yardTsid(st);
+  const groundY = yardGroundY(st);
+  const world = engine.streetWorld ? engine.streetWorld(tsid) : null;
+  // Rocks: the yard's own rock slots, in cultivation order.
+  const rocks = rockItems(st.items);
   rocks.forEach((item, index) => {
-    engine.spawnMineRock?.(rockClassFor(item.endClass), cultivationWorldX(item), STREET_GROUND_Y, index);
+    engine.spawnMineRock?.(rockClassFor(item.endClass), cultivationWorldX(item, st), groundY, index);
   });
   if (world) world.rocks.length = rocks.length;
   // Gardens: their plots live with the cultivation.
-  for (const item of liveItems(cult.items)) {
+  for (const item of liveItems(st.items)) {
     const def = cultivationDef(item.protoClass);
     if (def.kind !== 'garden' || !engine.spawnGarden) continue;
     const target = engine.spawnGarden({
-      x: cultivationWorldX(item),
-      y: STREET_GROUND_Y + 2,
+      x: cultivationWorldX(item, st),
+      y: groundY + 2,
       gardenType: def.gardenType,
       cols: def.cols,
       rows: def.rows,
       label: def.label.replace(/^S\. |^M\. |^L\. /, ''),
-      garden: cult.gardens[item.id] || null,
+      garden: st.gardens[item.id] || null,
       detached: true,
     });
-    if (target?.state?.garden) cult.gardens[item.id] = target.state.garden;
+    if (target?.state?.garden) st.gardens[item.id] = target.state.garden;
   }
   // Pods, mounds and hives: their recovered art, then the resource nodes.
-  for (const item of liveItems(cult.items)) {
+  for (const item of liveItems(st.items)) {
     const def = cultivationDef(item.protoClass);
     if (!def.art) continue;
     const art = POD_ART[def.art];
     const spr = new PIXI.Sprite(textureFromUrl(`assets/sprites/cultivation/${def.art}.png`));
     spr.anchor.set(0.5, 1);
-    spr.x = cultivationWorldX(item);
-    spr.y = STREET_GROUND_Y + 6;
+    spr.x = cultivationWorldX(item, st);
+    spr.y = groundY + 6;
     spr.zIndex = 14;
     spr.width = art.w;
     spr.height = art.h;
@@ -1020,29 +1209,32 @@ function spawnCultivations(engine) {
   }
   const population = { resourceNodeClasses: [] };
   const points = {};
-  for (const item of cult.items) {
+  for (const item of st.items) {
     for (const node of cultivationNodes(item, now)) {
       const cls = node.classTsid.startsWith('peat_') ? 'peat_1' : node.classTsid;
       population.resourceNodeClasses.push(node.classTsid);
-      (points[`resource:${cls}`] ||= []).push({ x: cultivationWorldX(item) + node.dx, y: STREET_GROUND_Y + node.dy });
+      (points[`resource:${cls}`] ||= []).push({ x: cultivationWorldX(item, st) + node.dx, y: groundY + node.dy });
     }
   }
   if (population.resourceNodeClasses.length) {
-    resourceNodesFeature.onStreetEnter({ tsid: HOME_STREET_TSID }, shimEngine(engine, population, points));
+    resourceNodesFeature.onStreetEnter({ tsid }, shimEngine(engine, population, points));
   }
   // Patches: the patches feature runs dig / tend / plant / seedling / tree.
   const soilCounts = {};
   const soilPoints = {};
-  for (const item of cult.items) {
+  for (const item of st.items) {
     if (cultivationDef(item.protoClass).kind !== 'patch') continue;
     soilCounts[item.endClass] = (soilCounts[item.endClass] || 0) + 1;
-    (soilPoints[`soil:${item.endClass}`] ||= []).push({ x: cultivationWorldX(item), y: STREET_GROUND_Y });
+    (soilPoints[`soil:${item.endClass}`] ||= []).push({ x: cultivationWorldX(item, st), y: groundY });
   }
   if (Object.keys(soilCounts).length) {
-    patchesFeature.onStreetEnter({ tsid: HOME_STREET_TSID, soilCounts }, shimEngine(engine, engine.population, soilPoints));
+    patchesFeature.onStreetEnter({ tsid, soilCounts }, shimEngine(engine, engine.population, soilPoints));
   }
   // Worn-out cultivations: their protos and Restore projects.
-  spawnProtos(engine);
+  spawnProtos(engine, st);
+  if (mode === 'cultivate') drawCultivationMarkers(engine);
+  // The back yard has no Tower (cultivation_get_available: street only).
+  if (isBackYard(st)) return;
   // The Tower (proto or built) and the Magic Rock that asks for one.
   const tower = towerItem(cult);
   const layout = homeStreetLayout(cult);
@@ -1052,39 +1244,41 @@ function spawnCultivations(engine) {
     groundY: STREET_GROUND_Y,
     rockX: layout.houseX + 200,
   });
-  // Lifespan rings while cultivating.
-  if (mode === 'cultivate') drawCultivationMarkers(engine);
 }
 
 function drawCultivationMarkers(engine) {
   const { PIXI } = engine;
   if (!scene) return;
   scene.markers?.destroy({ children: true });
+  scene.markers = null;
+  if (scene.room !== 'street' && !inHouse()) return;
+  const st = activeCult();
+  const Y = yardGroundY(st);
   const g = new PIXI.Container();
   g.zIndex = 45;
-  for (const item of cult.items) {
-    const x = cultivationWorldX(item);
+  for (const item of st.items) {
+    const x = cultivationWorldX(item, st);
     const half = footprint(item.protoClass);
     const sel = selected?.kind === 'cultivation' && selected.id === item.id;
     const pad = new PIXI.Graphics();
-    pad.roundRect(x - half, STREET_GROUND_Y - 4, half * 2, 14, 7).fill({ color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.28 : 0.14 });
-    pad.roundRect(x - half, STREET_GROUND_Y - 4, half * 2, 14, 7).stroke({ width: 2, color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.95 : 0.4 });
+    pad.roundRect(x - half, Y - 4, half * 2, 14, 7).fill({ color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.28 : 0.14 });
+    pad.roundRect(x - half, Y - 4, half * 2, 14, 7).stroke({ width: 2, color: sel ? 0xffd76a : 0xffffff, alpha: sel ? 0.95 : 0.4 });
     if (cultivationDef(item.protoClass)?.kind === 'tower') {
       g.addChild(pad);
       continue;
     }
     if (item.depleted) {
       // A proto: its Restore project's progress instead of a lifespan.
-      const perc = projectApi.percent(restoreJobId(item));
-      pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
-      if (perc > 0) pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60 * perc, 6, 3).fill(0xe8b23d);
+      const perc = projectApi.percent(restoreJobId(item, st));
+      pad.roundRect(x - 30, Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
+      if (perc > 0) pad.roundRect(x - 30, Y + 16, 60 * perc, 6, 3).fill(0xe8b23d);
       g.addChild(pad);
       continue;
     }
     // Lifespan bar (buildConfig lifespan.percentage_left)
     const left = lifespanLeft(item, qaWear(engine));
-    pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
-    pad.roundRect(x - 30, STREET_GROUND_Y + 16, 60 * left, 6, 3).fill(left > 0.3 ? 0x7cc35a : 0xe0a84a);
+    pad.roundRect(x - 30, Y + 16, 60, 6, 3).fill({ color: 0x2b2a33, alpha: 0.55 });
+    pad.roundRect(x - 30, Y + 16, 60 * left, 6, 3).fill(left > 0.3 ? 0x7cc35a : 0xe0a84a);
     g.addChild(pad);
   }
   engine.entityLayer.addChild(g);
@@ -1093,8 +1287,9 @@ function drawCultivationMarkers(engine) {
 
 function cultivationAt(x) {
   let best = null;
-  for (const item of cult.items) {
-    const d = Math.abs(cultivationWorldX(item) - x);
+  const st = activeCult();
+  for (const item of st.items) {
+    const d = Math.abs(cultivationWorldX(item, st) - x);
     if (d <= footprint(item.protoClass) && (!best || d < best.d)) best = { item, d };
   }
   return best?.item || null;
@@ -1103,9 +1298,10 @@ function cultivationAt(x) {
 function nearestCultivation(engine, kinds) {
   const px = engine.player?.x ?? 0;
   let best = null;
-  for (const item of liveItems(cult.items)) {
+  const st = activeCult();
+  for (const item of liveItems(st.items)) {
     if (!kinds.includes(cultivationDef(item.protoClass)?.kind)) continue;
-    const d = Math.abs(cultivationWorldX(item) - px);
+    const d = Math.abs(cultivationWorldX(item, st) - px);
     if (!best || d < best.d) best = { item, d };
   }
   return best && best.d < 360 ? best.item : null;
@@ -1113,19 +1309,20 @@ function nearestCultivation(engine, kinds) {
 
 /** Remove a cultivation and keep every other one's saved state on its own item. */
 function uncultivate(engine, id) {
-  const gone = cult.items.find((row) => row.id === Number(id));
+  const st = activeCult();
+  const gone = st.items.find((row) => row.id === Number(id));
   if (gone?.depleted) {
     // items/proto_*.js remove: a running project needs Wine of the Dead first.
-    const jobId = restoreJobId(gone);
+    const jobId = restoreJobId(gone, st);
     if (projectApi.inProgress(jobId)) {
       const msg = 'Pour some Wine of the Dead to cancel the project first.';
       engine.toast(msg, 3200);
       return { ok: false, reason: 'project', msg };
     }
   }
-  const result = withRekey(engine, () => removeCultivation(cult, id));
+  const result = withRekey(engine, () => removeCultivation(st, id), st);
   if (!result?.ok) return result;
-  if (gone?.depleted) projectApi.unregister(restoreJobId(gone), { dropRow: true });
+  if (gone?.depleted) projectApi.unregister(restoreJobId(gone, st), { dropRow: true });
   if (selected?.kind === 'cultivation' && selected.id === Number(id)) selected = null;
   engine.pushActivity(`You removed the ${result.label} from your yard.`);
   engine.save();
@@ -1137,7 +1334,7 @@ function uncultivate(engine, id) {
 // ---------------------------------------------------------------------------
 
 const WOTD = 'wine_of_the_dead';
-/** Live proto targets by cultivation id (for the project's "Thanks!" bubble). */
+/** Live proto targets by restore job id (for the project's "Thanks!" bubble). */
 const protoTargets = new Map();
 
 function qaWear(engine) {
@@ -1145,19 +1342,20 @@ function qaWear(engine) {
 }
 
 /** Carry every other cultivation's node / plot / rock state across a change to one item. */
-function withRekey(engine, mutate) {
-  const world = engine.streetWorld ? engine.streetWorld(HOME_STREET_TSID) : null;
-  const slot = engine.streetSlot('resource-nodes', HOME_STREET_TSID);
-  const soil = engine.streetSlot('patches', HOME_STREET_TSID);
+function withRekey(engine, mutate, st = activeCult()) {
+  const tsid = yardTsid(st);
+  const world = engine.streetWorld ? engine.streetWorld(tsid) : null;
+  const slot = engine.streetSlot('resource-nodes', tsid);
+  const soil = engine.streetSlot('patches', tsid);
   const now = Date.now();
-  const beforeKeys = nodeKeyMap(cult.items, now);
-  const beforeSoil = soilKeyMap(cult.items);
-  const beforeRocks = rockItems(cult.items).map((row) => row.id);
+  const beforeKeys = nodeKeyMap(st.items, now);
+  const beforeSoil = soilKeyMap(st.items);
+  const beforeRocks = rockItems(st.items).map((row) => row.id);
   const result = mutate();
   if (!result?.ok) return result;
-  slot.nodes = rekeyNodes(slot.nodes || {}, beforeKeys, nodeKeyMap(cult.items, now));
-  soil.plots = rekeyNodes(soil.plots || {}, beforeSoil, soilKeyMap(cult.items));
-  if (world) world.rocks = rekeyRocks(world.rocks || [], beforeRocks, rockItems(cult.items).map((row) => row.id));
+  slot.nodes = rekeyNodes(slot.nodes || {}, beforeKeys, nodeKeyMap(st.items, now));
+  soil.plots = rekeyNodes(soil.plots || {}, beforeSoil, soilKeyMap(st.items));
+  if (world) world.rocks = rekeyRocks(world.rocks || [], beforeRocks, rockItems(st.items).map((row) => row.id));
   return result;
 }
 
@@ -1183,28 +1381,32 @@ function protoIcon(protoClass) {
   return `assets/sprites/cultivation/proto/${PROTO_DEPLETED_ART[protoClass]?.[0] || `${protoClass}.webp`}`;
 }
 
-function registerRestore(engine, item) {
-  const jobId = restoreJobId(item);
+function registerRestore(engine, item, st = cult) {
+  const jobId = restoreJobId(item, st);
   const job = restoreJob(item);
   if (!job) return false;
+  const back = isBackYard(st);
   return projectApi.register(jobId, job, {
-    kicker: 'Your home street',
-    place: 'on your home street',
+    kicker: back ? 'Your yard' : 'Your home street',
+    place: back ? 'in your yard' : 'on your home street',
     iconUrl: protoIcon(item.protoClass),
     note: item.wotd ? 'Wine of the Dead wore this one out, so restoring it will not lengthen its life.' : `Restoring it brings it back with ${Math.round(Math.min(2, lifespanMultiplier(item) + 0.05) * 100)}% of its lifespan.`,
-    target: () => protoTargets.get(item.id) || null,
-    onDone: (eng) => finishRestore(eng, item.id, jobId),
+    target: () => protoTargets.get(jobId) || null,
+    onDone: (eng) => finishRestore(eng, item.id, jobId, st),
   });
 }
 
-/** Register every proto's project (the street-jobs catalog loads asynchronously). */
+/** Register every proto's project, in both yards (the street-jobs catalog loads asynchronously). */
 function registerRestores(engine) {
   return projectApi.ready().then(() => {
-    for (const item of cult.items) if (item.depleted && !projectApi.registered(restoreJobId(item))) registerRestore(engine, item);
-    if (scene?.room === 'street') {
-      for (const [id, target] of protoTargets) {
-        const item = cult.items.find((row) => row.id === id);
-        if (item && target) target.subtitle = protoSubtitle(item);
+    for (const st of [cult, backCult]) {
+      for (const item of st.items) if (item.depleted && !projectApi.registered(restoreJobId(item, st))) registerRestore(engine, item, st);
+    }
+    if (scene?.room === 'street' || inHouse()) {
+      const st = activeCult();
+      for (const item of st.items) {
+        const target = item.depleted ? protoTargets.get(restoreJobId(item, st)) : null;
+        if (target) target.subtitle = protoSubtitle(item, st);
       }
       if (mode === 'cultivate') drawCultivationMarkers(engine);
     }
@@ -1212,23 +1414,23 @@ function registerRestores(engine) {
   });
 }
 
-function protoSubtitle(item) {
-  const jobId = restoreJobId(item);
+function protoSubtitle(item, st = activeCult()) {
+  const jobId = restoreJobId(item, st);
   const perc = projectApi.percent(jobId);
   if (projectApi.inProgress(jobId)) return `Restore project ${Math.round(perc * 100)}% done`;
   return 'Worn out · start a project to restore it';
 }
 
-function spawnProtos(engine) {
+function spawnProtos(engine, st = activeCult()) {
   const { PIXI } = engine;
   protoTargets.clear();
-  for (const item of cult.items) {
+  for (const item of st.items) {
     if (!item.depleted) continue;
     const def = cultivationDef(item.protoClass);
     const art = PROTO_DEPLETED_ART[item.protoClass];
     const box = new PIXI.Container();
-    box.x = cultivationWorldX(item);
-    box.y = STREET_GROUND_Y + 6;
+    box.x = cultivationWorldX(item, st);
+    box.y = yardGroundY(st) + 6;
     box.zIndex = 14;
     if (art) {
       const [file, ox, oy, w, h] = art;
@@ -1243,21 +1445,21 @@ function spawnProtos(engine) {
       classId: item.protoClass,
       featureId: HOMES_FEATURE_ID,
       label: def.label,
-      subtitle: protoSubtitle(item),
+      subtitle: protoSubtitle(item, st),
       sprite: box,
       state: { cultivationId: item.id },
     });
-    protoTargets.set(item.id, target);
+    protoTargets.set(restoreJobId(item, st), target);
   }
-  if (cult.items.some((row) => row.depleted)) registerRestores(engine);
+  if (st.items.some((row) => row.depleted)) registerRestores(engine);
 }
 
 /**
  * include/cultivation.js addWear -> onDepleted -> replaceWithDepleted: the
  * worn-out item becomes its proto in the same spot.
  */
-function depleteItem(engine, id, { wotd = false } = {}) {
-  const result = withRekey(engine, () => depleteCultivation(cult, id, { wotd }));
+function depleteItem(engine, id, { wotd = false } = {}, st = activeCult()) {
+  const result = withRekey(engine, () => depleteCultivation(st, id, { wotd }), st);
   if (!result?.ok) return result;
   if (selected?.kind === 'cultivation' && selected.id === Number(id)) selected = null;
   engine.pushActivity(wotd
@@ -1270,8 +1472,8 @@ function depleteItem(engine, id, { wotd = false } = {}) {
 }
 
 /** quest.js doJobEffects type 5: the item comes back, a little longer-lived. */
-function finishRestore(engine, id, jobId) {
-  const result = withRekey(engine, () => restoreCultivation(cult, id, { now: Date.now() }));
+function finishRestore(engine, id, jobId, st = cult) {
+  const result = withRekey(engine, () => restoreCultivation(st, id, { now: Date.now() }), st);
   if (!result?.ok) return '';
   if (result.timesGain) engine.achievement('cultivation:times_restored', result.timesGain);
   engine.save();
@@ -1280,7 +1482,7 @@ function finishRestore(engine, id, jobId) {
   // After the panel shows "Finished", drop the spent project and redraw the yard.
   setTimeout(() => {
     projectApi.unregister(jobId, { dropRow: true });
-    if (scene?.room === 'street') engine.refreshHomeScene?.();
+    if ((scene?.room === 'street' || inHouse()) && activeCult() === st) engine.refreshHomeScene?.();
   }, 0);
   const pct = Math.round(result.after * 100);
   return result.after > result.before
@@ -1296,21 +1498,22 @@ let restoreLast = '';
  */
 function pourTargets(engine) {
   const home = engine.homeContext?.() || {};
-  if (!home.inHome || !home.owned || scene?.room !== 'street') return [];
-  const soil = engine.streetSlot?.('patches', HOME_STREET_TSID)?.plots || {};
-  const soilKeys = soilKeyMap(cult.items);
+  if (!home.inHome || !home.owned || (scene?.room !== 'street' && !inHouse())) return [];
+  const st = activeCult();
+  const soil = engine.streetSlot?.('patches', yardTsid(st))?.plots || {};
+  const soilKeys = soilKeyMap(st.items);
   const rows = [];
-  for (const item of cult.items) {
+  for (const item of st.items) {
     const def = cultivationDef(item.protoClass);
     if (!def) continue;
-    const base = { id: item.id, x: cultivationWorldX(item), y: STREET_GROUND_Y };
+    const base = { id: item.id, x: cultivationWorldX(item, st), y: yardGroundY(st) };
     if (def.kind === 'tower') {
       // proto_furniture_tower_chassis (name_single "Tower") with its job started.
       if (item.endClass !== TOWER_CHASSIS && towerApi.projectStarted?.()) rows.push({ ...base, kind: 'proto', tower: true, name: 'Tower' });
       continue;
     }
     if (item.depleted) {
-      if (projectApi.inProgress(restoreJobId(item))) rows.push({ ...base, kind: 'proto', name: def.label });
+      if (projectApi.inProgress(restoreJobId(item, st))) rows.push({ ...base, kind: 'proto', name: def.label });
       continue;
     }
     // A Patch's tree, seedling or dead tree keeps its proto_class (patch.js:751, trants.js:774).
@@ -1328,13 +1531,14 @@ function pourTargetHere(engine) {
 
 /** Pour on one row after the confirm (items/wine_of_the_dead.js modal_callback). */
 function applyPour(engine, row) {
-  const item = cult.items.find((r) => r.id === Number(row?.id));
+  const st = activeCult();
+  const item = st.items.find((r) => r.id === Number(row?.id));
   if (!item || countItem(engine.inv, WOTD) < 1) return false;
   if (row.tower) {
     if (item.endClass === TOWER_CHASSIS || !towerApi.cancelProject?.(engine)) return false;
     engine.pushActivity(WOTD_TEXT.canceled('Tower'));
   } else if (item.depleted) {
-    const jobId = restoreJobId(item);
+    const jobId = restoreJobId(item, st);
     if (!projectApi.inProgress(jobId)) return false;
     projectApi.cancel(engine, jobId);
     engine.pushActivity(WOTD_TEXT.canceled(cultivationDef(item.protoClass).label));
@@ -1346,9 +1550,9 @@ function applyPour(engine, row) {
     pourLast = `pouring:${id}`;
     engine.setData('homePour', pourLast);
     setTimeout(() => {
-      const now = cult.items.find((r) => r.id === id);
+      const now = st.items.find((r) => r.id === id);
       if (!now || now.depleted || (now.cycle || 0) !== cycle) return;
-      depleteItem(engine, id, { wotd: true });
+      depleteItem(engine, id, { wotd: true }, st);
       pourLast = `depleted:${id}`;
       engine.setData('homePour', pourLast);
       engine.refreshHomeScene?.();
@@ -1393,7 +1597,7 @@ function pourWine(engine, id) {
 }
 
 function protoVerbs(item, engine) {
-  const jobId = restoreJobId(item);
+  const jobId = restoreJobId(item, activeCult());
   const running = projectApi.inProgress(jobId);
   const wine = countItem(engine.inv, WOTD) > 0;
   const ready = projectApi.registered(jobId);
@@ -1579,6 +1783,30 @@ function shownStreetStyle(engine) {
   return stylePreview || currentStreetStyle(engine);
 }
 
+/** The yard style drawn behind the house: the one being looked at in the dialog, else yours. */
+function shownYardStyle() {
+  return yardPreview || yardStyleFor(yardStyle);
+}
+
+/** Change Style here: the yard's inside the house, the street's outside. */
+function styleRoom() {
+  return inHouse() ? 'yard' : 'street';
+}
+
+function currentStyleHere(engine) {
+  return styleRoom() === 'yard' ? yardStyleFor(yardStyle) : currentStreetStyle(engine);
+}
+
+function styleText() {
+  return styleRoom() === 'yard' ? YARD_STYLE_TEXT : STYLE_TEXT;
+}
+
+function styleChoicesHere(engine) {
+  return styleRoom() === 'yard'
+    ? yardStyleChoices(yardStyleFor(yardStyle), engine.pc.level)
+    : styleChoices(currentStreetStyle(engine), engine.pc.level);
+}
+
 /** QA: &homestreetstyle=<GSJS exterior key> sets the street style once, free. */
 function qaStreetStyle(engine) {
   if (styleDemoDone) return;
@@ -1643,12 +1871,12 @@ function ensureStylesUi(engine) {
 
 function openStyleDialog(engine) {
   const ctx = engine.homeContext?.() || {};
-  if (!ctx.inHome || scene?.room !== 'street' || scene.construction) {
+  if (!ctx.inHome || (scene?.room !== 'street' && !inHouse()) || scene.construction) {
     engine.toast(STYLE_TEXT.notAtHome, 2200);
     return false;
   }
   if (mode) setMode(engine, null);
-  stylePick = currentStreetStyle(engine);
+  stylePick = currentStyleHere(engine);
   const box = ensureStylesUi(engine);
   if (!box) return false;
   box.hidden = false;
@@ -1660,19 +1888,23 @@ function openStyleDialog(engine) {
 function closeStyleDialog(engine) {
   if (ui?.styles) ui.styles.hidden = true;
   stylePick = null;
-  const had = stylePreview;
+  const had = stylePreview || yardPreview;
+  const redraw = (stylePreview && stylePreview !== currentStreetStyle(engine)) || (yardPreview && yardPreview !== yardStyleFor(yardStyle));
   stylePreview = null;
-  if (had && had !== currentStreetStyle(engine)) engine.refreshHomeScene?.();
+  yardPreview = null;
+  if (had && redraw) engine.refreshHomeScene?.();
   publish(engine);
 }
 
-/** Click a style: it goes up on the street behind the dialog. */
+/** Click a style: it goes up on the street (or the yard) behind the dialog. */
 function pickStyle(engine, key) {
-  if (!STREET_STYLE_BY_KEY[key]?.built) return false;
+  const yard = styleRoom() === 'yard';
+  if (!(yard ? YARD_STYLE_BY_KEY : STREET_STYLE_BY_KEY)[key]?.built) return false;
   stylePick = key;
-  const show = key === currentStreetStyle(engine) ? null : key;
-  if (show !== stylePreview) {
-    stylePreview = show;
+  const show = key === currentStyleHere(engine) ? null : key;
+  if (show !== (yard ? yardPreview : stylePreview)) {
+    if (yard) yardPreview = show;
+    else stylePreview = show;
     engine.refreshHomeScene?.();
   }
   renderStyleDialog(engine);
@@ -1681,15 +1913,39 @@ function pickStyle(engine, key) {
 }
 
 function confirmStyle(engine, key) {
-  const { cost } = styleChoices(currentStreetStyle(engine), engine.pc.level);
+  const { cost } = styleChoicesHere(engine);
+  const text = styleText();
+  const yard = styleRoom() === 'yard';
   engine.offerQuestDialogue({
-    title: STYLE_TEXT.confirmTitle,
-    kicker: STYLE_TEXT.button,
-    beats: [{ text: confirmText(cost), response: STYLE_TEXT.yes }],
-    acceptLabel: STYLE_TEXT.yes,
-    declineLabel: STYLE_TEXT.no,
-    onAccept: () => applyStreetStyle(engine, key),
+    title: text.confirmTitle,
+    kicker: text.button,
+    beats: [{ text: confirmText(cost, styleRoom()), response: text.yes }],
+    acceptLabel: text.yes,
+    declineLabel: text.no,
+    onAccept: () => (yard ? applyYardStyle(engine, key) : applyStreetStyle(engine, key)),
   });
+}
+
+/** houses_style_set inside the house: take the iMG, keep the rooms, furniture and yard, redraw the yard. */
+function applyYardStyle(engine, key) {
+  const ctx = engine.homeContext?.() || {};
+  const state = { yardStyle: yardStyleFor(yardStyle) };
+  const result = switchYardStyle(state, engine.pc, key, { atHome: Boolean(ctx.inHome && inHouse()) });
+  if (!result.ok) {
+    engine.toast(result.msg, 2400);
+    renderStyleDialog(engine);
+    return result;
+  }
+  yardStyle = key;
+  yardPreview = null;
+  if (ui?.styles) ui.styles.hidden = true;
+  stylePick = null;
+  engine.pushActivity(`Your yard is now ${result.label}. That took ${result.cost.toLocaleString()} iMG.`);
+  engine.updateHud();
+  engine.save();
+  engine.refreshHomeScene?.();
+  publish(engine);
+  return result;
 }
 
 /** houses_style_set: take the iMG, keep the house, yard, furniture and cultivations, redraw the street. */
@@ -1717,20 +1973,21 @@ function applyStreetStyle(engine, key) {
 function renderStyleDialog(engine) {
   const box = ui?.styles;
   if (!box || box.hidden) return;
-  const current = currentStreetStyle(engine);
-  const { cost, choices } = styleChoices(current, engine.pc.level);
+  const STYLE = styleText();
+  const { cost, choices } = styleChoicesHere(engine);
   const img = Math.floor(engine.pc.imagination || 0);
   const pick = choices.find((row) => row.key === stylePick) || choices.find((row) => row.isCurrent);
   const short = img < cost;
+  box.setAttribute('aria-label', STYLE.title);
   const header = el('header', {}, [
-    el('h3', { text: STYLE_TEXT.title }),
+    el('h3', { text: STYLE.title }),
     el('small', { text: `◉ ${img.toLocaleString()} iMG` }),
     el('button', { class: 'hb-close', type: 'button', 'aria-label': 'Close', text: '×', onclick: () => closeStyleDialog(engine) }),
   ]);
   const sel = el('div', { class: 'hs-sel' }, [
     el('div', { class: 'hs-name' }, [
       el('strong', { text: pick?.label || '' }),
-      el('small', { text: pick?.isCurrent ? 'Your street now' : 'Shown behind this window' }),
+      el('small', { text: pick?.isCurrent ? `Your ${styleRoom()} now` : 'Shown behind this window' }),
     ]),
     el('div', { class: 'hs-actions' }, [
       el('button', {
@@ -1764,14 +2021,19 @@ function renderModes(engine) {
   const atHome = Boolean(ctx.inHome && scene);
   ui.modes.hidden = !atHome || Boolean(mode) || Boolean(scene.construction);
   if (!atHome || scene.construction) return;
+  const yardButtons = [
+    el('button', { type: 'button', id: 'homes-cultivate-btn', text: 'Cultivate', onclick: () => setMode(engine, 'cultivate') }),
+    // HouseSignDialog.as: the street sign's (in the yard, the Magic Rock's) "Change Style" button.
+    el('button', { type: 'button', id: 'homes-style-btn', text: STYLE_TEXT.button, onclick: () => openStyleDialog(engine) }),
+  ];
   ui.modes.replaceChildren(
     ...(scene.room === 'interior'
-      ? [el('button', { type: 'button', id: 'homes-decorate-btn', text: 'Decorate', onclick: () => setMode(engine, 'decorate') })]
-      : [
-        el('button', { type: 'button', id: 'homes-cultivate-btn', text: 'Cultivate', onclick: () => setMode(engine, 'cultivate') }),
-        // HouseSignDialog.as: the street sign's "Change Style" button.
-        el('button', { type: 'button', id: 'homes-style-btn', text: STYLE_TEXT.button, onclick: () => openStyleDialog(engine) }),
-      ])
+      ? [
+        el('button', { type: 'button', id: 'homes-decorate-btn', text: 'Decorate', onclick: () => setMode(engine, 'decorate') }),
+        // The house's back yard: cultivate it and change its style from inside (not on Tower floors).
+        ...(inHouse() ? yardButtons : []),
+      ]
+      : yardButtons)
   );
 }
 
@@ -1967,14 +2229,16 @@ function renderTowerTab(engine, body) {
 }
 
 function renderCultivateBody(engine, body) {
+  const st = activeCult();
+  const back = isBackYard(st);
   if (selected?.kind === 'cultivation') {
-    const item = cult.items.find((row) => row.id === selected.id);
+    const item = st.items.find((row) => row.id === selected.id);
     if (item) {
       const def = cultivationDef(item.protoClass);
       const nudge = engine.learnedSkills.includes('nudgery_1');
       const isTower = def.kind === 'tower';
       const wine = countItem(engine.inv, WOTD) > 0;
-      const running = item.depleted && projectApi.inProgress(restoreJobId(item));
+      const running = item.depleted && projectApi.inProgress(restoreJobId(item, st));
       const life = Math.round(lifespanMultiplier(item) * 100);
       const actions = [
         el('button', { type: 'button', 'data-home-action': 'nudge', disabled: !nudge, title: nudge ? 'Move it along the yard' : 'Needs the Nudgery skill', text: 'Nudge', onclick: () => beginNudge(engine, item.id) }),
@@ -1988,7 +2252,7 @@ function renderCultivateBody(engine, body) {
         }),
       ];
       if (item.depleted) {
-        actions.unshift(el('button', { type: 'button', class: 'primary', 'data-home-action': 'restore', text: 'Restore', onclick: () => projectApi.open(engine, restoreJobId(item)) }));
+        actions.unshift(el('button', { type: 'button', class: 'primary', 'data-home-action': 'restore', text: 'Restore', onclick: () => projectApi.open(engine, restoreJobId(item, st)) }));
       }
       if (!isTower && (running || !item.depleted)) {
         actions.push(el('button', {
@@ -2011,8 +2275,13 @@ function renderCultivateBody(engine, body) {
       ]));
     }
   }
-  body.append(el('p', { class: 'hb-note', text: placing ? 'Click your yard to place it. Esc cancels.' : 'Spend imagination to grow gardens, rocks and patches on your street. Each one costs a little more than the last.' }));
-  const choices = cultivationChoices(cult, engine.pc);
+  // magic_rock.js howto_cultivate: "anything you cultivate on your home street will be usable by visitors; anything in your yard is private."
+  body.append(el('p', { class: 'hb-note', text: placing
+    ? 'Click your yard to place it. Esc cancels.'
+    : back
+      ? 'Spend imagination to grow gardens, rocks and patches in your yard. Anything in your yard is private. Each one costs a little more than the last.'
+      : 'Spend imagination to grow gardens, rocks and patches on your street. Each one costs a little more than the last.' }));
+  const choices = cultivationChoices(st, engine.pc);
   body.append(el('div', { class: 'hb-grid' }, choices.map((row) => el('button', {
     type: 'button',
     class: `hb-tile${placing?.protoClass === row.protoClass ? ' on' : ''}`,
@@ -2025,6 +2294,25 @@ function renderCultivateBody(engine, body) {
     el('span', { text: row.label }),
     el('span', { class: 'hb-cost', text: row.canPlace || row.reason.startsWith('Needs') ? `◉ ${row.cost.toLocaleString()}` : `Lv ${row.minLevel}` }),
   ]))));
+  if (back) {
+    // HouseExpandYardDialog inside the house: "Expand your yard", one way (left), "Expand for Ni".
+    const quote = quoteYardExpansion(st, engine.pc);
+    body.append(el('h4', { text: 'Expand your yard' }));
+    body.append(el('div', { class: 'hb-row' }, [
+      el('button', {
+        type: 'button',
+        'data-home-expand': 'yard',
+        disabled: !quote.ok,
+        text: quote.count ? `← Expand for ${quote.cost.toLocaleString()}i` : 'Expand',
+        title: quote.msg || '',
+        onclick: () => growYard(engine, 'left'),
+      }),
+    ]));
+    body.append(el('p', { class: 'hb-note', text: quote.count
+      ? `This yard can be expanded ${quote.count} more ${quote.count === 1 ? 'time' : 'times'}.`
+      : "This yard can't be expanded anymore." }));
+    return;
+  }
   const left = quoteYardExpansion(cult, engine.pc, 'left');
   const right = quoteYardExpansion(cult, engine.pc, 'right');
   body.append(el('h4', { text: 'Expand your street' }));
@@ -2058,15 +2346,12 @@ function setMode(engine, next) {
   stopStamping(engine);
   tab = tab || 'furniture';
   destroyGhost();
-  if (scene?.room === 'street') {
-    if (mode === 'cultivate') drawCultivationMarkers(engine);
-    else {
-      scene.markers?.destroy({ children: true });
-      scene.markers = null;
-    }
-  } else {
-    renderFurniture(engine);
+  if (mode === 'cultivate') drawCultivationMarkers(engine);
+  else if (scene) {
+    scene.markers?.destroy({ children: true });
+    scene.markers = null;
   }
+  if (scene?.room === 'interior') renderFurniture(engine);
   renderBar(engine);
   publish(engine);
 }
@@ -2109,7 +2394,7 @@ function beginCultivate(engine, protoClass, opts = {}) {
 }
 
 function beginNudge(engine, id) {
-  const item = cult.items.find((row) => row.id === id);
+  const item = activeCult().items.find((row) => row.id === id);
   if (!item) return;
   placing = { kind: 'cultivation', protoClass: item.protoClass, moveId: id };
   makeGhost(engine);
@@ -2217,7 +2502,7 @@ function unexpandHouse(engine) {
   }
   // homes_unexpand moves players standing in the last 300 px over too.
   const p = engine.player;
-  if (p && scene?.room === 'interior' && !scene.tower && p.x >= result.edge) p.x -= 150;
+  if (p && scene?.room === 'interior' && !scene.tower && p.x - roomX0() >= result.edge) p.x -= 150;
   engine.pushActivity(`You un-expanded your house. Refunded: ${refundList(result.items)}.`);
   engine.refreshPack();
   engine.save();
@@ -2228,23 +2513,29 @@ function unexpandHouse(engine) {
 }
 
 function growYard(engine, side) {
-  const result = expandYard(cult, engine.pc, side);
+  const st = activeCult();
+  const back = isBackYard(st);
+  const result = expandYard(st, engine.pc, side);
   if (!result.ok) {
     engine.toast(result.msg || 'You cannot expand right now.');
     return result;
   }
-  engine.pushActivity(`You expanded your street to the ${side} for ${result.cost.toLocaleString()} iMG.`);
-  if (result.maxed) engine.achievement('max_expansions:street', 1);
+  engine.pushActivity(back
+    ? `You expanded your yard for ${result.cost.toLocaleString()} iMG.`
+    : `You expanded your street to the ${side} for ${result.cost.toLocaleString()} iMG.`);
+  // home_add_expansion 2742-2744 / 2784-2787: the last one bought counts toward Landgrabber.
+  if (result.maxed) engine.achievement(back ? 'max_expansions:yard' : 'max_expansions:street', 1);
   engine.updateHud();
   engine.save();
-  const shift = side === 'left' ? 150 : 0;
+  // The yard grows on the left, so everything right of it moves over a segment.
+  const shift = back || side === 'left' ? 150 : 0;
   engine.refreshHomeScene?.({ shift });
   return result;
 }
 
 function removeSelected(engine) {
   if (selected?.kind !== 'cultivation') return null;
-  if (towerItem(cult)?.id === selected.id) return towerBridge.removeTower(engine);
+  if (!inHouse() && towerItem(cult)?.id === selected.id) return towerBridge.removeTower(engine);
   const result = uncultivate(engine, selected.id);
   engine.refreshHomeScene?.();
   return result;
@@ -2274,16 +2565,17 @@ function placeAtPointer(engine, at) {
     engine.save();
     return result;
   }
-  const rx = Math.round(at.x - homeStreetLayout(cult).houseX);
+  const st = activeCult();
+  const rx = Math.round(at.x - homeStreetLayout(st).houseX);
   let result;
   if (placing.moveId) {
-    result = nudgeCultivation(cult, placing.moveId, rx, engine.learnedSkills);
+    result = nudgeCultivation(st, placing.moveId, rx, engine.learnedSkills);
   } else {
-    result = cultivate(cult, engine.pc, placing.protoClass, rx);
+    result = cultivate(st, engine.pc, placing.protoClass, rx);
     if (result.ok) {
       engine.pushActivity(`You imagined a ${result.label} into your yard for ${result.cost.toLocaleString()} iMG.`);
       if (cultivationDef(result.item.protoClass)?.kind === 'tower') towerApi.onCultivated(engine, result.item);
-      engine.floatText?.(at.x, STREET_GROUND_Y - 120, `-${result.cost} iMG`, 0xb38cff);
+      engine.floatText?.(at.x, yardGroundY(st) - 120, `-${result.cost} iMG`, 0xb38cff);
       selected = { kind: 'cultivation', id: result.item.id };
     }
   }
@@ -2348,15 +2640,17 @@ function updateGhost(engine) {
   if (!g || !placing) return;
   const at = pointer.inside ? pointer : { x: engine.player?.x ?? 400, y: GROUND_Y - 120 };
   if (placing.kind === 'furniture') {
-    const snap = snapPlacement(decor, placing.classTsid, at, placing.moveId || null);
-    g.x = snap.x;
+    // Furniture lives in room x; the room starts at the back yard's edge.
+    const snap = snapPlacement(decor, placing.classTsid, toRoom(at), placing.moveId || null);
+    g.x = snap.x + roomX0();
     g.y = snap.y;
     return;
   }
-  const rx = Math.round(at.x - homeStreetLayout(cult).houseX);
-  const ok = placementCheck(cult, placing.protoClass, rx, placing.moveId || null).ok;
+  const st = activeCult();
+  const rx = Math.round(at.x - homeStreetLayout(st).houseX);
+  const ok = placementCheck(st, placing.protoClass, rx, placing.moveId || null).ok;
   g.x = at.x;
-  g.y = STREET_GROUND_Y;
+  g.y = yardGroundY(st);
   g.pad.clear();
   g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).fill({ color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.35 });
   g.pad.roundRect(-g.half, -10, g.half * 2, 20, 10).stroke({ width: 2, color: ok ? 0x7cc35a : 0xe0574a, alpha: 0.95 });
@@ -2391,7 +2685,7 @@ function bindPointer(engine) {
     const p = worldPoint(engine, e);
     pointer = { ...p, inside: true };
     if (stamping) {
-      const hit = stampTargetAt(p);
+      const hit = stampTargetAt(toRoom(p));
       if (JSON.stringify(hit) !== JSON.stringify(stampHover)) {
         stampHover = hit;
         drawStampMarks(engine);
@@ -2412,15 +2706,16 @@ function bindPointer(engine) {
     const p = worldPoint(engine, e);
     pointer = { ...p, inside: true };
     if (placing) {
-      placeAtPointer(engine, p);
+      // Furniture takes room x; cultivations take world x.
+      placeAtPointer(engine, placing.kind === 'furniture' ? toRoom(p) : p);
       return;
     }
     if (stamping) {
-      stampAt(engine, p);
+      stampAt(engine, toRoom(p));
       return;
     }
     if (mode === 'decorate') {
-      const item = furnitureAt(p);
+      const item = furnitureAt(toRoom(p));
       selected = item ? { kind: 'furniture', id: item.id } : null;
       renderFurniture(engine);
       renderBar(engine);
@@ -2445,7 +2740,7 @@ function bindPointer(engine) {
       renderBar(engine);
     } else if (selected) {
       selected = null;
-      if (scene?.room === 'interior') renderFurniture(engine);
+      if (mode === 'decorate') renderFurniture(engine);
       else drawCultivationMarkers(engine);
       renderBar(engine);
     } else {
@@ -2552,13 +2847,30 @@ function releaseCameraLook(engine) {
   lastLookY = 0;
 }
 
-/** The house's side walls (inc_homes.js walls 76 px inside each end; tower.js floor_start 130). */
+/**
+ * The house's side walls (inc_homes.js walls 76 px inside each end; tower.js
+ * floor_start 130). A house with its back yard is open on the left
+ * (homes_rebuild_floor left-open): the yard's far end is the bound, and the
+ * house's left end is a wall only above the way in (the outer wall over the
+ * frame_open post, homes_rebuild_rooms 619-633), so a jump cannot carry you
+ * through it.
+ */
+let lastWallX = null;
 function keepInsideWalls(engine) {
   const room = scene?.background?.room;
   const p = engine.player;
   if (!room || !p || !Number.isFinite(p.x)) return;
-  const lo = room.innerLeft + 12;
-  const hi = room.innerRight - 12;
+  const x0 = roomX0();
+  if (room.leftOpen) {
+    const wallX = x0 + 8;
+    const was = lastWallX;
+    if (was != null && (was < wallX) !== (p.x < wallX) && p.y - AVATAR_HEAD < room.openTop) {
+      p.x = was < wallX ? wallX - 1 : wallX + 1;
+      p.vx = 0;
+    }
+  }
+  const lo = room.leftOpen ? 12 : x0 + room.innerLeft + 12;
+  const hi = x0 + room.innerRight - 12;
   if (p.x < lo) {
     p.x = lo;
     if (p.vx < 0) p.vx = 0;
@@ -2566,6 +2878,7 @@ function keepInsideWalls(engine) {
     p.x = hi;
     if (p.vx > 0) p.vx = 0;
   }
+  lastWallX = p.x;
 }
 
 // ---------------------------------------------------------------------------
@@ -2573,7 +2886,7 @@ function keepInsideWalls(engine) {
 // ---------------------------------------------------------------------------
 
 function wearFromEvent(engine, counter) {
-  if (!scene || scene.room !== 'street') return;
+  if (!scene || (scene.room !== 'street' && !inHouse())) return;
   let kinds = null;
   if (/^rock_[a-z]+_\d+:mine$/.test(counter)) kinds = ['rock'];
   else if (/^(garden_harvest|herb_harvest):/.test(counter)) kinds = ['garden'];
@@ -2584,26 +2897,27 @@ function wearFromEvent(engine, counter) {
 }
 
 /** One use of a cultivation (addWear); a worn-out one becomes its proto. */
-function wearItem(engine, id, n = 1) {
-  const result = addWear(cult, id, n, qaWear(engine));
+function wearItem(engine, id, n = 1, st = activeCult()) {
+  const result = addWear(st, id, n, qaWear(engine));
   if (result.depleted) {
-    depleteItem(engine, id);
+    depleteItem(engine, id, {}, st);
     engine.refreshHomeScene?.();
   }
   return result;
 }
 
 function wearFromNodes(engine, now) {
-  if (!scene || scene.room !== 'street' || now - lastNodeCheck < 2000) return;
+  if (!scene || (scene.room !== 'street' && !inHouse()) || now - lastNodeCheck < 2000) return;
   lastNodeCheck = now;
-  const slot = engine.streetSlot('resource-nodes', HOME_STREET_TSID);
-  const keys = nodeKeyMap(cult.items, now);
-  for (const item of [...cult.items]) {
+  const st = activeCult();
+  const slot = engine.streetSlot('resource-nodes', yardTsid(st));
+  const keys = nodeKeyMap(st.items, now);
+  for (const item of [...st.items]) {
     const nodeKeys = keys.get(item.id) || [];
     if (!nodeKeys.length) continue;
     const used = nodeKeys.reduce((sum, key) => sum + (slot.nodes?.[key]?.totalHarvests || 0), 0);
     if (used > item.wear) {
-      const result = wearItem(engine, item.id, used - item.wear);
+      const result = wearItem(engine, item.id, used - item.wear, st);
       if (result.depleted) return;
     }
   }
@@ -2651,6 +2965,31 @@ function demoSetup(engine) {
         engine.setData('homePourDemo', `${item.id}:${cultivationDef(item.protoClass).label}`);
       }, 800);
     }
+  }
+  // QA: &homeyarddemo=cultivate (with homedemo=interior): a lived-in back yard, Cultivate open.
+  if (!yardDemoDone && inHouse() && engine.param('homeyarddemo') === 'cultivate') {
+    yardDemoDone = true;
+    if ((engine.pc.level || 1) < 12) {
+      engine.pc.xp = Math.max(engine.pc.xp || 0, XP_FOR_LEVEL[10]);
+      engine.pc.level = 12;
+    }
+    const auto = String(engine.param('homeautoplay') || '');
+    // =max: enough iMG for every expansion left (Landgrabber's yard half).
+    engine.pc.imagination = Math.max(engine.pc.imagination || 0, auto === 'max' ? 40_000 : 20_000);
+    engine.updateHud();
+    const go = () => {
+      setMode(engine, 'cultivate');
+      if (auto === '1') runCultivateAutoplay(engine);
+      else if (auto === 'max') runYardMaxAutoplay(engine);
+    };
+    if (!backCult.items.length) {
+      cultivateDemoYard(backCult, Date.now() - 5 * 60_000);
+      engine.save();
+      setTimeout(() => engine.refreshHomeScene?.().then(go), 0);
+      return;
+    }
+    go();
+    return;
   }
   if (demoDone || !scene) return;
   const demo = String(engine.param('homedemo') || '').toLowerCase();
@@ -2757,21 +3096,33 @@ function runDecorateAutoplay(engine) {
 }
 
 function runCultivateAutoplay(engine) {
-  step([
-    ['cultivate', () => {
-      beginCultivate(engine, 'proto_dirt_pile');
-      const layout = homeStreetLayout(cult);
-      const rx = [-420, -260, 1500, 640, 900].find((x) => placementCheck(cult, 'proto_dirt_pile', x).ok) ?? 600;
-      placeAtPointer(engine, { x: layout.houseX + rx, y: STREET_GROUND_Y });
-    }, 1500],
-    ['expand', () => growYard(engine, 'right'), 1500],
-    ['remove', () => {
-      const last = cult.items[cult.items.length - 1];
-      if (!last) return;
-      selected = { kind: 'cultivation', id: last.id };
-      removeSelected(engine);
-    }, 1500],
-  ], engine);
+  const cultivateStep = ['cultivate', () => {
+    const st = activeCult();
+    beginCultivate(engine, 'proto_dirt_pile');
+    const layout = homeStreetLayout(st);
+    const tries = isBackYard(st) ? [-1050, -1250, -900, -1400] : [-420, -260, 1500, 640, 900];
+    const rx = tries.find((x) => placementCheck(st, 'proto_dirt_pile', x).ok) ?? (isBackYard(st) ? nearestFreeRx(st, 'proto_dirt_pile', tries[0]) : null) ?? 600;
+    placeAtPointer(engine, { x: layout.houseX + rx, y: yardGroundY(st) });
+  }, 1500];
+  const removeStep = ['remove', () => {
+    const st = activeCult();
+    const last = st.items[st.items.length - 1];
+    if (!last) return;
+    selected = { kind: 'cultivation', id: last.id };
+    removeSelected(engine);
+  }, 1500];
+  // The demo back yard is full: expand it first, then cultivate the new ground.
+  if (isBackYard(activeCult())) {
+    step([['expand', () => growYard(engine, 'left'), 1500], cultivateStep, removeStep], engine);
+    return;
+  }
+  step([cultivateStep, ['expand', () => growYard(engine, 'right'), 1500], removeStep], engine);
+}
+
+/** QA &homeyarddemo=cultivate&homeautoplay=max: buy every back-yard expansion left, one a step. */
+function runYardMaxAutoplay(engine) {
+  const left = Math.max(0, quoteYardExpansion(backCult, engine.pc).count || 0);
+  step(Array.from({ length: left }, (_, i) => [`expand:${i + 1}`, () => growYard(engine, 'left'), 900]), engine);
 }
 
 /**
@@ -2945,20 +3296,30 @@ function homeScene(room, engine) {
       arrangeStarterRoom(decor);
       engine.save();
     }
-    const background = interiorBackground(engine);
-    const width = interiorWidth(decor);
+    // The back yard left of the house (G135): the room starts at its width.
+    syncHouseShift(engine);
+    qaYardStyle(engine);
+    const background = interiorBackground(engine, { yard: true });
+    const x0 = background.houseX;
+    const roomW = interiorWidth(decor);
+    const width = x0 + roomW;
     return {
       width,
       groundY: GROUND_Y,
       background,
       spawnFor(opts = {}) {
-        if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) return Math.max(80, Math.min(width - 80, opts.spawnX));
-        if (opts.arrive !== 'door' && homeX(engine) != null) return homeX(engine);
-        if (opts.arrive !== 'door' && engine.param('homedemo') === 'decorate') return Math.round(width * 0.48);
-        return interiorDoorX() - 80;
+        if (opts.arrive === 'exact' && Number.isFinite(opts.spawnX)) {
+          return Math.max(60, Math.min(width - 80, opts.spawnX + (opts.shift || 0)));
+        }
+        // &homex= is room x (negative: in the back yard).
+        if (opts.arrive !== 'door' && homeX(engine) != null) return x0 + homeX(engine);
+        if (opts.arrive !== 'door' && engine.param('homeyarddemo')) return Math.max(60, x0 - 330);
+        if (opts.arrive !== 'door' && engine.param('homedemo') === 'decorate') return x0 + Math.round(roomW * 0.48);
+        return x0 + interiorDoorX() - 80;
       },
       spawnTargets() {
         scene = { room, background, furnitureLayer: null, ghost: null, markers: null };
+        lastWallX = null;
         return spawnInteriorTargets(engine);
       },
       enter() {
@@ -2966,9 +3327,12 @@ function homeScene(room, engine) {
         const layer = new PIXI.Container();
         layer.sortableChildren = true;
         layer.zIndex = FURNITURE_Z;
+        // Furniture is placed in room x.
+        layer.x = x0;
         engine.entityLayer.addChild(layer);
         scene.furnitureLayer = layer;
         renderFurniture(engine);
+        spawnCultivations(engine, backCult);
         afterEnter(engine);
       },
     };
@@ -3006,7 +3370,7 @@ function homeScene(room, engine) {
 
 function afterEnter(engine) {
   bindPointer(engine);
-  if ((mode === 'decorate' && scene.room !== 'interior') || (mode === 'cultivate' && scene.room !== 'street')) {
+  if ((mode === 'decorate' && scene.room !== 'interior') || (mode === 'cultivate' && scene.room !== 'street' && !inHouse())) {
     mode = null;
     placing = null;
     selected = null;
@@ -3031,10 +3395,15 @@ export const homesFeature = {
     houseVisits = qaHouseVisits(engine) ?? houseVisits;
     // QA (home demos only): window.groddleHomeStyle(key) redraws the street in that style, free.
     if (engine.param?.('homedemo') && typeof window !== 'undefined') {
+      // Inside the house a GSJS interior key redraws the back yard instead.
       window.groddleHomeStyle = (key) => {
-        if (!STREET_STYLE_BY_KEY[key]?.built) return false;
-        streetStyle = key;
-        stylePreview = null;
+        if (inHouse() && YARD_STYLE_BY_KEY[key]?.built) {
+          yardStyle = key;
+          yardPreview = null;
+        } else if (STREET_STYLE_BY_KEY[key]?.built) {
+          streetStyle = key;
+          stylePreview = null;
+        } else return false;
         engine.refreshHomeScene?.();
         publish(engine);
         return true;
@@ -3045,7 +3414,18 @@ export const homesFeature = {
 
   save() {
     // Tower floors share the house's furniture storage; it is saved once, with the house.
-    return { decor: houseDecor, cult, towerDecor: towerDecor.map(({ storage, ...rest }) => rest), streetGround: savedStreetGround, houseVisits, streetStyle };
+    return {
+      decor: houseDecor,
+      cult,
+      towerDecor: towerDecor.map(({ storage, ...rest }) => rest),
+      streetGround: savedStreetGround,
+      houseVisits,
+      streetStyle,
+      // G135: the back yard, its style, and the house x the indoor stacks were saved against.
+      backYard: backCult,
+      yardStyle,
+      houseX: savedHouseX ?? houseX0(),
+    };
   },
 
   restore(slice, engine) {
@@ -3058,6 +3438,12 @@ export const homesFeature = {
     decor = houseDecor;
     cult = normalizeCultivationState(slice?.cult || {});
     streetStyle = STREET_STYLE_BY_KEY[slice?.streetStyle]?.built ? slice.streetStyle : null;
+    // Saves from before the back yard: a 5-segment yard, the starting style, and indoor stacks at house x 0.
+    backCult = createBackYardState(slice?.backYard || {});
+    yardStyle = YARD_STYLE_BY_KEY[slice?.yardStyle]?.built ? slice.yardStyle : null;
+    yardPreview = null;
+    const hx = Number(slice?.houseX);
+    savedHouseX = !slice ? null : Number.isFinite(hx) ? hx : 0;
     towerDecor = (Array.isArray(slice?.towerDecor) ? slice.towerDecor : [])
       .slice(0, TOWER_CONFIG.MAX_FLOORS)
       .map((row) => normalizeHomeDecorState({ ...row, wallSegments: TOWER_GEO.wallSegments, layout: 'tower', starterKit: true }));
@@ -3129,6 +3515,7 @@ export const homesFeature = {
     if (!scene) return;
     if (scene.room === 'street') wearFromNodes(engine, now);
     else {
+      if (inHouse()) wearFromNodes(engine, now);
       keepInsideWalls(engine);
       interiorCameraLook(engine);
     }
@@ -3141,16 +3528,16 @@ export const homesFeature = {
   /** Protos on the home street (items/proto_*.js restore / remove verbs). */
   verbsFor(target, engine) {
     const id = target?.state?.cultivationId;
-    const item = id != null ? cult.items.find((row) => row.id === id) : null;
+    const item = id != null ? activeCult().items.find((row) => row.id === id) : null;
     if (!item?.depleted) return [];
     return protoVerbs(item, engine);
   },
 
   runVerb(target, verbId, engine) {
     const id = target?.state?.cultivationId;
-    const item = id != null ? cult.items.find((row) => row.id === id) : null;
+    const item = id != null ? activeCult().items.find((row) => row.id === id) : null;
     if (!item?.depleted) return false;
-    if (verbId === 'restore') return projectApi.open(engine, restoreJobId(item)) || true;
+    if (verbId === 'restore') return projectApi.open(engine, restoreJobId(item, activeCult())) || true;
     if (verbId === 'pour_wotd') {
       if (!pourWine(engine, item.id)) engine.toast('Nothing to cancel.');
       return true;
@@ -3160,7 +3547,7 @@ export const homesFeature = {
 
   /** QA / tests. */
   _state() {
-    return { decor, houseDecor, towerDecor, cult, mode, placing, selected, scene, houseVisits };
+    return { decor, houseDecor, towerDecor, cult, backCult, yardStyle, savedHouseX, mode, placing, selected, scene, houseVisits };
   },
 
   /** butler_hints.js:383: how many times you have gone into your house. */

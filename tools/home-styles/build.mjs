@@ -12,7 +12,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PURCHASE_STREET_STYLE, RECIPES } from './recipes.mjs';
+import { PURCHASE_STREET_STYLE, RECIPES, YARD_LOOKS } from './recipes.mjs';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const GSJS = join(spike, '../glitch-GameServerJS/inc_data_homes_prod.js');
@@ -118,11 +118,19 @@ export function buildData() {
   for (const key of Object.keys(RECIPES)) {
     if (!exterior.some((row) => row.key === key)) throw new Error(`recipe ${key} is not a GSJS exterior style`);
   }
-  const intRows = interior.map((row) => ({
-    ...row,
-    built: false,
-    reason: 'A yard style: the back yard left of the house (inc_homes.js homes_rebuild_rooms, layout house-right). The remake house has no back yard yet.',
-  }));
+  const intRows = interior.map((row) => {
+    const pair = YARD_LOOKS[row.key];
+    if (pair == null) throw new Error(`no back-yard look for interior style ${row.key}`);
+    if (typeof pair !== 'string') return { ...row, built: false, reason: pair.missing };
+    const ext = extRows.find((r) => r.key === pair);
+    if (!ext) throw new Error(`back-yard look ${row.key}: ${pair} is not a GSJS exterior style`);
+    if (!ext.built) return { ...row, built: false, reason: `Drawn like the ${ext.label} street, which is not built: ${ext.reason}` };
+    // The look is the street style's (js/home-styles.js yardLook), kept once in EXTERIOR_STYLES.
+    return { ...row, built: true, lookOf: pair };
+  });
+  for (const key of Object.keys(YARD_LOOKS)) {
+    if (!interior.some((row) => row.key === key)) throw new Error(`back-yard look ${key} is not a GSJS interior style`);
+  }
   return { exterior: extRows, interior: intRows };
 }
 
@@ -138,7 +146,7 @@ function render(data) {
     ...data.exterior.map((row) => `  ${json(row)},`),
     ']);',
     '',
-    '/** homes_interior_configs (inc_data_homes_prod.js 1-816), source order. */',
+    '/** homes_interior_configs (inc_data_homes_prod.js 1-816), source order. `lookOf`: the street style whose look the yard uses. */',
     'export const INTERIOR_STYLES = Object.freeze([',
     ...data.interior.map((row) => `  ${json(row)},`),
     ']);',
@@ -162,7 +170,9 @@ if (isMain) {
     console.log('home-styles-data.js is up to date');
   } else {
     writeFileSync(OUT, text);
-    const built = buildData().exterior.filter((row) => row.built).length;
-    console.log(`wrote ${OUT} (${built} of 37 exterior styles composed)`);
+    const data = buildData();
+    const built = data.exterior.filter((row) => row.built).length;
+    const yards = data.interior.filter((row) => row.built).length;
+    console.log(`wrote ${OUT} (${built} of 37 exterior styles composed, ${yards} of 37 back yards)`);
   }
 }
