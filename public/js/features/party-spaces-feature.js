@@ -1297,6 +1297,16 @@ export const partySpacesFeature = {
     return card ? [card] : [];
   },
 
+  /**
+   * G255: location.js 2673-2676 sets no_starting_quests in a party space, so
+   * the quest log's Try buttons and an offer's accept_and_start are disabled
+   * there (QuestElementUI.as 230, ConversationManager.as 582-585). null elsewhere,
+   * so another feature (a race or game) can answer.
+   */
+  noStartingQuests(engine) {
+    return onPartyStreet(engine) ? true : null;
+  },
+
   /** QA / tests. */
   _state() {
     return { record, demo, stacks: stacks.length, guests: guests.length, atm: Boolean(atm), booster: Boolean(booster) };

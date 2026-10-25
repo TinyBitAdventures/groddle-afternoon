@@ -1006,14 +1006,13 @@ function offerHolidayQuest(engine) {
     kicker: 'Magic Rock',
     beats: [{ text: beat1, response }, { text: beat2, response: 'Yay?' }],
     acceptLabel: 'Yay?',
-    declineLabel: 'Not right now',
+    // G255: glitchmas2010 has no onStarted, so its offer has only accept (quest.js get_status
+    // 1119-1124). Closed unanswered, it is asked again at the next check (questOfferAt, 10 min).
+    declinable: false,
     onAccept: () => {
       state.holidayQuest[key] = 'offered';
       say(engine, `${q.title}: ${q.desc}`);
       engine.save?.();
-    },
-    onDecline: () => {
-      questOfferAt = Date.now() + 10 * 60 * 1000;
     },
   });
   return true;

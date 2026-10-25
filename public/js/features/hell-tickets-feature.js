@@ -39,7 +39,7 @@
  */
 
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-5';
-import { acceptOffer, declineOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js';
+import { acceptOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { parseQuestConversation } from '../quests.js';
 import { HELL_LOCATION, HELL_QUESTS, isInHell, isInHellOne } from '../hell.js';
@@ -66,8 +66,10 @@ import { doorsFeature } from './doors-feature.js?v=doors-3';
 export const HELL_TICKETS_FEATURE_ID = 'hell-tickets';
 
 let state = createHellTicketsState();
-/** The quest offer this feature has open: { id } or null. */
+/** The quest offer this feature has open: { id, text } or null. */
 let offerOpen = null;
+/** G255: an emergency offer closed unanswered, to show again (onEmergencyTick 335-360). */
+let unanswered = null;
 /** A prompt waiting for the screen to clear: { title, text }. */
 let pendingPrompts = [];
 /** The QA force applies to one croak per page load. */
@@ -95,14 +97,23 @@ function publish(engine) {
   engine.setData('hellTicketWine', String(countItem(engine.inv, WINE_CLASS)));
 }
 
-/** quests_offer(id, true) from the familiar: the source text, accept or "Not right now". */
+/**
+ * quests_offer(id, true) from the familiar: the source text and one button.
+ * G255: hell_hole and hell_quest have no onStarted, so quest.js get_status
+ * 1119-1124 gives them only accept (button_accept); "Not right now" is the
+ * accept-without-start of startable quests (G229). Both are is_emergency
+ * (hell_hole.js 12, hell_quest.js 13): the card has the rays, no close X and
+ * ignores Escape (QuestConversationUI.as 147-155, escKeyHandler 410-414); one
+ * closed by force (another dialog taking the screen) shows again once the
+ * screen is clear (QuestsDialog.as onEmergencyTick 335-360).
+ */
 function presentOffer(engine, id, text) {
   const qs = engine.questState;
   const def = getQuestCatalog()[id] || HELL_QUESTS[id];
   if (!qs || !def) return false;
   ensureQuestOfferState(qs);
   markOffered(qs, id, Date.now());
-  offerOpen = { id };
+  offerOpen = { id, text };
   engine.setData('hellTicketOffer', id);
   engine.playSound?.('QUEST_OFFER', { volume: 0.55 });
   engine.offerQuestDialogue({
@@ -110,7 +121,8 @@ function presentOffer(engine, id, text) {
     kicker: 'Magic Rock',
     beats: parseQuestConversation(text || def.offer || def.desc),
     acceptLabel: def.acceptLabel || HELL_QUESTS[id]?.buttonAccept || "Ok, I'll do it!",
-    declineLabel: 'Not right now',
+    declinable: false,
+    urgent: true,
     onAccept: () => {
       offerOpen = null;
       const result = acceptOffer(qs, id, questContext(engine));
@@ -119,13 +131,6 @@ function presentOffer(engine, id, text) {
       engine.refreshPack();
       engine.save();
       publish(engine);
-    },
-    onDecline: () => {
-      offerOpen = null;
-      declineOffer(qs, id, Date.now());
-      engine.setData('hellTicketOfferResult', 'declined');
-      engine.pushActivity(`You can accept “${def.title}” from your quest log later.`);
-      engine.save();
     },
   });
   return true;
@@ -297,6 +302,7 @@ export const hellTicketsFeature = {
     const params = [...new URLSearchParams(globalThis.location?.search || '').keys()];
     quiet = params.some((key) => /demo$|autoplay$/.test(key));
     offerOpen = null;
+    unanswered = null;
     pendingPrompts = [];
     forceUsed = false;
     auto = { stage: '', at: 0, dialogAt: 0 };
@@ -327,9 +333,10 @@ export const hellTicketsFeature = {
     const hs = hellFeature._state();
     // A fresh croak: roll its grave visit once.
     if (hs.isDead && hs.visitId !== state.plannedVisitId) planVisit(engine, hs, now);
-    // Escape on our offer: "Not right now", as quest-offers-feature does.
+    // G255: our emergency offer closed unanswered (another dialog took the screen): show it again.
     if (offerOpen && !engine.questDialogueOpen()) {
-      declineOffer(qs, offerOpen.id, now);
+      engine.setData('hellTicketOfferResult', 'waiting');
+      unanswered = offerOpen;
       offerOpen = null;
       engine.save();
     }
@@ -341,6 +348,14 @@ export const hellTicketsFeature = {
       // send it (prompts_add with txt and choices, no title); no invented "Naraka" kicker.
       engine.prompt({ text: next.text });
       return;
+    }
+    if (unanswered) {
+      const { id, text } = unanswered;
+      unanswered = null;
+      if (hellQuestStatus(qs, id) === 'none' && qs.offers?.offered?.[id]) {
+        presentOffer(engine, id, text);
+        return;
+      }
     }
     const due = graveVisitDue(state.visit, hs, now, { inHell: isInHell(engine.streetTsid, engine.street?.hubId || '') });
     if (due === 'drop') {
@@ -382,6 +397,7 @@ export const hellTicketsFeature = {
   _reset() {
     state = createHellTicketsState();
     offerOpen = null;
+    unanswered = null;
     pendingPrompts = [];
     forceUsed = false;
     quiet = false;

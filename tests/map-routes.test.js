@@ -29,7 +29,7 @@ import {
   signpostToward,
 } from '../public/js/map-routes.js?v=lonely-1';
 import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=lonely-2';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g259-1';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g255-1';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-9';
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { applyStreetIndex } from '../public/js/street-loader.js';

@@ -27,10 +27,10 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../public/js/hell-tickets.js';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g259-1';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g255-1';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-9';
 import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g259-1';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-8';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-9';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=flags-1';
 import { FEATURES } from '../public/js/features/index.js';
 
@@ -355,17 +355,32 @@ describe('the chain in play (features, fake engine)', () => {
     assert.deepEqual(Object.keys(engine.log.prompts.at(-1)), ['text']);
   });
 
-  it('declining leaves the quest in the log, and the next croak in Hell One asks again', () => {
+  it('G255: the offer has one button (no onStarted), is an emergency, and shows again if closed unanswered', () => {
     const engine = fakeEngine({ gravedemo: 'mourn', gravevisitms: 0 });
     hellTicketsFeature.init(engine);
     hellFeature.restore(deadIn(HELL_ONE));
     const now = Date.now();
     hellTicketsFeature.onTick(16, now, engine);
     hellTicketsFeature.onTick(16, now + 10, engine);
+    const card = engine.log.offers.at(-1);
+    // quest.js get_status 1119-1124: a quest with no onStarted gets only accept.
+    assert.equal(card.declinable, false);
+    assert.equal(card.onDecline, undefined);
+    assert.equal(card.declineLabel, undefined);
+    // hell_hole.js 12 is_emergency: rays, no X, Escape does nothing (game.js closeQuestDialogue).
+    assert.equal(card.urgent, true);
+    // Closed by force (another dialog took the screen): QuestsDialog.as onEmergencyTick 335-360.
     engine.log.open = false;
-    engine.log.offers.at(-1).onDecline();
-    assert.ok(engine.questState.offers.declined.hell_hole);
-    assert.equal(engine.questState.active.hell_hole, undefined);
+    hellTicketsFeature.onTick(16, now + 20, engine);
+    assert.equal(engine.data.hellTicketOfferResult, 'waiting');
+    assert.ok(engine.questState.offers.offered.hell_hole);
+    assert.equal(engine.questState.offers.declined?.hell_hole, undefined);
+    hellTicketsFeature.onTick(16, now + 30, engine);
+    assert.equal(engine.log.offers.length, 2, 'shown again');
+    assert.equal(engine.log.offers.at(-1).title, card.title);
+    assert.deepEqual(engine.log.offers.at(-1).beats, card.beats, 'with the mourner\'s own text');
+    accept(engine);
+    assert.ok(engine.questState.active.hell_hole);
   });
 });
 

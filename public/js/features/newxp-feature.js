@@ -1883,7 +1883,9 @@ function offerLeave(engine, t) {
     kicker: 'Magic Rock',
     beats: pages.map((p) => ({ text: p.text.replace(/<[^>]+>/g, ''), response: p.button })),
     acceptLabel: 'I’ll find it',
-    declineLabel: 'Not right now',
+    // G255: leave_gentle_island has no onStarted: one button (quest.js get_status 1119-1124).
+    // Closed unanswered, talking to the rock offers it again.
+    declinable: false,
     onAccept: () => {
       acceptOffer(engine.questState, 'leave_gentle_island', questCtx(engine));
       save.island = 'leaving';
@@ -1892,7 +1894,6 @@ function offerLeave(engine, t) {
       engine.toast('Find the way off Gentle Island: Progress Way, then Gentle Island Exit.', 4000);
       if (auto) autoLeave(engine, t);
     },
-    onDecline: () => { run.data.leaveDeclined = Date.now(); },
   });
   if (auto) setTimeout(() => engine.acceptOpenOffer(), 300);
 }

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-98';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-99';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -3123,6 +3123,9 @@ function renderPackRow(box, slots, opts = {}) {
   refreshPackPager(box);
 }
 
+/** G255: the quest log markup last drawn (updateHud redraws only when it changes). */
+let questLogDrawn = '';
+
 function updateHud() {
   const spentRewardBuff = consumeRewardBuff(buffState, pc, Date.now());
   if (spentRewardBuff && state.started) {
@@ -3174,10 +3177,12 @@ function updateHud() {
   }
   updateDametimeChrome();
 
-  // Quest log: active + completed from runner
-  const qBox = document.getElementById('quest');
-  if (qBox) {
-    qBox.innerHTML = '';
+  // Quest log: active + completed from runner. G255: drawn only while the Quests panel is
+  // open, into a detached box that replaces the shown one only when its markup changed, so
+  // a HUD update no longer swaps the buttons out from under the pointer.
+  const qShown = document.getElementById('quest');
+  if (qShown && isQuestOpen()) {
+    const qBox = document.createElement('div');
     const log = listQuestLog(questState);
     // G229: quests put off with "Not right now" wait in the log to be started (quest-offers-feature).
     const putOff = features.collect('questLogCards', engine);
@@ -3319,11 +3324,18 @@ function updateHud() {
           card.appendChild(escapeButton);
         }
       }
+      // G255: a startable quest's Try button (quest-offers-feature, QuestElementUI.as 224-264).
+      if (p.active) for (const el of features.collect('questLogActions', p.def.classTsid, engine)) card.appendChild(el);
       qBox.appendChild(card);
     }
     const firstDone = qBox.querySelector('.q-card.done');
     for (const el of putOff) qBox.insertBefore(el, firstDone);
     appendStoryQuestOffers(qBox);
+    const drawn = qBox.innerHTML;
+    if (drawn !== questLogDrawn) {
+      qShown.replaceChildren(...qBox.childNodes);
+      questLogDrawn = drawn;
+    }
   }
   renderQuestTracker();
   renderActivityHistory();
@@ -7853,7 +7865,8 @@ const engine = {
   /** A quest offer: the recovered beats, then accept / decline. `inLog` opens it inside the Quests dialog (G225). */
   // G229: declinable false is an offer with only its accept button (quest.js 1119-1124: a quest that
   // cannot be started later has one choice); the X and Escape still close it where they would.
-  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false, inLog = false, declinable = true }) {
+  // G255: acceptBlocked (a reason) disables the accept, as no_starting_quests does accept_and_start (ConversationManager.as 582-585).
+  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false, inLog = false, declinable = true, acceptBlocked = '' }) {
     openScriptedQuestDialogue({
       title,
       kicker,
@@ -7869,6 +7882,7 @@ const engine = {
       onCancel: declinable === false ? null : onDecline,
       cancelable: true,
       noDecline: declinable === false,
+      primaryBlocked: acceptBlocked || '',
       primaryLabel: acceptLabel || 'OK',
       cancelLabel: declineLabel || 'Not right now',
     });
@@ -19318,8 +19332,9 @@ function openQuestPanel() {
   closeVendor();
   const panel = document.getElementById('quest-panel');
   if (panel) {
-    updateHud();
+    // G255: the log draws only while its panel is open, so show it first.
     panel.hidden = false;
+    updateHud();
   }
 }
 
@@ -19500,6 +19515,9 @@ function renderQuestDialogueBeat() {
           ? STORY_ACCEPT_LABELS[def.classTsid] || 'Accept quest'
           : beat.response || 'Continue';
     next.dataset.accept = mode === 'offer' && finalBeat ? '1' : '0';
+    const blocked = finalBeat ? questDialogueState.primaryBlocked || '' : '';
+    next.disabled = Boolean(blocked);
+    next.title = blocked;
   }
   if (cancel) {
     cancel.hidden = (mode === 'script' && questDialogueState.cancelable !== true) || questDialogueState.noDecline === true;
@@ -19610,6 +19628,7 @@ function openScriptedQuestDialogue({
   urgent = false,
   inLog = false,
   noDecline = false,
+  primaryBlocked = '',
 }) {
   // G217: an offer or prompt that arrives over the Enter chooser or a verb menu waits until they close.
   if (holdScriptedDialog(arguments[0])) return;
@@ -19635,6 +19654,7 @@ function openScriptedQuestDialogue({
     primaryLabel,
     cancelLabel,
     noDecline: noDecline === true,
+    primaryBlocked: String(primaryBlocked || ''),
   };
   renderQuestDialogueBeat();
   armQuestDialogueTimeout({ timeout, timeoutMs, timeoutValue, onTimeout });
@@ -19702,8 +19722,14 @@ function isQuestDialogueOpen() {
   return Boolean(modal && !modal.hidden);
 }
 
+/** G255: the open dialog's final answer is blocked (no_starting_quests on accept_and_start): it does nothing. */
+function questAcceptBlocked() {
+  const st = questDialogueState;
+  return Boolean(st?.primaryBlocked && st.index >= (st.beats?.length || 0) - 1);
+}
+
 function advanceQuestDialogue() {
-  if (!questDialogueState) return;
+  if (!questDialogueState || questAcceptBlocked()) return;
   const { def, beats, mode } = questDialogueState;
   // A scripted beat may act on its answer (G189: a conversation's reward on that step).
   beats[questDialogueState.index]?.onAnswer?.();

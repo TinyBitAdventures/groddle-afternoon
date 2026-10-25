@@ -729,6 +729,8 @@ function askOptOut(engine) {
     kicker: 'Visiting Stone',
     beats: [{ text: STONE_TEXT.optOut, response: 'OK' }],
     acceptLabel: 'OK',
+    // G255: visiting_stone.js 84-87 gives the opt-out one choice, OK.
+    declinable: false,
     onAccept: () => {
       nb.allowVisits = false;
       engine.pushActivity(STONE_TEXT.optedOut);

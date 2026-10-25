@@ -54,6 +54,26 @@
  * &questofferdemo=putoff[:<quest>] puts a startable offer in the log, put off,
  * and opens the Quests dialog; =card:<quest> opens any quest's offer card in
  * the log (one button or two). Canvas questOffersPutOff (the count).
+ *
+ * G255: a startable quest's log card carries the Try button the client drew
+ * for every startable, unfinished quest (QuestElementUI.as setTryButton
+ * 224-264): "Try it", disabled with "You're already doing this quest!" while
+ * started, and "Try again" once a timed quest has failed (its timer buff's
+ * on_remove calls failQuest, items/catalog_buffs.js 1397-1402; inc_quests.js
+ * failQuest 420-471 keeps a startable quest in the log, quest.js onFail
+ * 145-157 resets its progress and marks it failed, not started). Try again is
+ * quest_begin (main.js doQuestBegin 6019-6031, restartQuest 291-309,
+ * quest.js onRestart 79-100): a fresh timer and the Quests dialog closes
+ * (QuestManager.as questBeginHandler 302-312). Dead, it fails with "You are
+ * dead!" (onRestart 81-89, shown as "Error starting quest: ..." by
+ * questBeginHandler 325-328). Where the location sets no_starting_quests
+ * (location.js 2666-2676: races, games, party spaces) the Try button is
+ * disabled with "Starting new quests is not allowed right now!" (setTryButton
+ * 230, 253-258) and an offer's accept_and_start choice is too
+ * (ConversationManager.as 582-585); features answer noStartingQuests(engine).
+ * QA: &questofferdemo=timed[:<quest>] starts a timed quest (default
+ * mining_mine_in_time_period) with one second left, so it fails and shows
+ * Try again in the log.
  */
 
 import {
@@ -66,6 +86,7 @@ import {
   pendingQuestOffers,
   putOffOffer,
   questAwardPayload,
+  restartTimedQuest,
   questOfferCard,
   routeQuestEvent,
   syncItemRequirements,
@@ -74,8 +95,12 @@ import {
   waitingOffers,
 } from '../quest-offers.js';
 import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-5';
+import { getQuestCatalog } from '../content-catalogs.js';
 
 const OFFER_CHECK_MS = 30_000;
+/** QuestElementUI.as setTryButton 247-258 and ConversationManager.as 584. */
+export const NO_STARTING_QUESTS_TIP = 'Starting new quests is not allowed right now!';
+export const ALREADY_DOING_TIP = 'You\'re already doing this quest!';
 const STREET_ENTER_DELAY_MS = 4_000;
 const SYNC_MS = 1_000;
 /** G213: how soon a check spent by an award or new-day screen looks again. */
@@ -129,6 +154,16 @@ function questContext(engine, now = Date.now()) {
   };
 }
 
+/** G255: why starting a quest is refused here, or ''. no_starting_quests (location.js 2666-2676). */
+export function startBlockedReason(engine) {
+  return engine.query?.('noStartingQuests', engine) === true ? NO_STARTING_QUESTS_TIP : '';
+}
+
+/** onRestart 81-89: the dead cannot start a quest (no startable quest has canStartInHell). */
+function deadStartError(engine) {
+  return engine.query?.('isDead', engine) === true ? 'Error starting quest: You are dead!' : '';
+}
+
 function finish(rows, engine) {
   for (const row of rows || []) {
     // A quest whose end NPC stands in the world waits for a talk with it (vendor-npcs-feature).
@@ -172,6 +207,18 @@ function presentOffer(engine, now = Date.now()) {
 
 /** Accept an offer (the card's accept, or a put-off quest's Try it): in the log and started. */
 function acceptCard(engine, classTsid, def) {
+  // main.js doQuestConversationChoice 6040-6046 / doQuestBegin: starting while dead fails
+  // ("You are dead!"); the quest stays in the log, accepted, not started (G255).
+  const dead = def.needsStart ? deadStartError(engine) : '';
+  if (dead) {
+    putOffOffer(engine.questState, classTsid, Date.now());
+    engine.setData('questOfferResult', 'dead');
+    engine.toast?.(dead, 5000);
+    engine.save();
+    engine.updateHud?.();
+    syncWaiting(engine);
+    return { ok: false, reason: 'dead' };
+  }
   const result = acceptOffer(engine.questState, classTsid, questContext(engine));
   engine.setData('questOfferResult', result.ok ? 'accepted' : result.reason || 'failed');
   if (result.ok) {
@@ -220,15 +267,74 @@ export function putOffCards(engine) {
     go.type = 'button';
     go.className = 'content-action-btn';
     go.textContent = def.needsStart ? 'Try it' : def.acceptLabel || "Ok, I'll do it!";
-    go.disabled = offerOpen;
+    const blocked = def.needsStart ? startBlockedReason(engine) : '';
+    go.disabled = offerOpen || Boolean(blocked);
+    if (blocked) go.title = blocked;
     go.addEventListener('click', () => {
-      if (offerOpen || engine.questDialogueOpen?.()) return;
+      if (offerOpen || engine.questDialogueOpen?.() || (def.needsStart && startBlockedReason(engine))) return;
       acceptCard(engine, classTsid, def);
       engine.updateHud?.();
     });
     card.appendChild(go);
     return card;
   });
+}
+
+/**
+ * G255: the Try button on an accepted quest's log card (QuestElementUI.as
+ * setTryButton 224-264): only startable quests this module handed out
+ * (offers.managed; story quests draw their own Enter buttons). Started: "Try
+ * it", disabled. Failed (a timed quest that ran out): "Try again", which
+ * restarts it with a fresh timer.
+ */
+export function questLogActions(engine, classTsid) {
+  if (typeof document === 'undefined') return [];
+  const qs = engine.questState;
+  const offers = ensureQuestOfferState(qs);
+  const def = getQuestCatalog()[classTsid];
+  if (!def?.needsStart || !qs.active?.[classTsid] || !offers.managed?.[classTsid]) return [];
+  const failed = Boolean(offers.failed?.[classTsid]);
+  const blocked = failed ? startBlockedReason(engine) : '';
+  const go = document.createElement('button');
+  go.type = 'button';
+  go.className = 'content-action-btn q-try';
+  go.dataset.questTry = classTsid;
+  go.textContent = failed ? 'Try again' : 'Try it';
+  go.disabled = !failed || Boolean(blocked) || offerOpen;
+  const tip = !failed ? ALREADY_DOING_TIP : blocked;
+  if (tip) go.title = tip;
+  go.addEventListener('click', () => {
+    if (go.disabled || engine.questDialogueOpen?.()) return;
+    retryTimedQuest(engine, classTsid);
+  });
+  return [go];
+}
+
+/** "Try again" on a failed timed quest (quest_begin -> restartQuest -> onRestart). */
+export function retryTimedQuest(engine, classTsid, now = Date.now()) {
+  const qs = engine.questState;
+  const def = getQuestCatalog()[classTsid];
+  if (!def || !ensureQuestOfferState(qs).failed?.[classTsid]) return { ok: false, reason: 'not_failed' };
+  const blocked = startBlockedReason(engine);
+  if (blocked) return { ok: false, reason: 'no_starting_quests' };
+  const dead = deadStartError(engine);
+  if (dead) {
+    engine.setData('questOfferResult', 'dead');
+    engine.toast?.(dead, 5000);
+    return { ok: false, reason: 'dead' };
+  }
+  const result = restartTimedQuest(qs, classTsid, now);
+  engine.setData('questOfferResult', result.ok ? 'restarted' : result.reason || 'failed');
+  if (result.ok) {
+    engine.pushActivity(`Started again: ${def.title}`);
+    // questBeginHandler 307-312: a successful start closes the Quests dialog.
+    if (typeof document !== 'undefined' && !document.getElementById('quest-panel')?.hidden) {
+      document.getElementById('quest-close')?.click();
+    }
+  }
+  engine.save();
+  engine.updateHud?.();
+  return result;
 }
 
 /** Show an offer's card: on the street, or inside the Quests dialog (`inLog`). */
@@ -270,6 +376,8 @@ function openOffer(engine, card, { inLog = false } = {}) {
     acceptLabel: card.acceptLabel,
     declineLabel: card.declineLabel,
     declinable: card.startable === true,
+    // ConversationManager.as 582-585: accept_and_start is disabled under no_starting_quests.
+    acceptBlocked: card.startable === true ? startBlockedReason(engine) : '',
     onAccept: accept,
     onDecline: card.startable === true ? putOff : null,
     // G211: is_emergency offers pop with the rays behind the rock (QuestConversationUI.as 147-153);
@@ -384,6 +492,20 @@ function runDemo(engine, mode) {
     }
     return;
   }
+  if (kind === 'timed') {
+    // G255 QA: a timed quest accepted with one second left, so it fails and shows Try again.
+    const id = named || 'mining_mine_in_time_period';
+    if (!qs.active?.[id] && acceptOffer(qs, id, questContext(engine)).ok) {
+      const timer = ensureQuestOfferState(qs).timers[id];
+      if (timer) timer.endsAt = Date.now() + 1000;
+    }
+    engine.save();
+    engine.updateHud?.();
+    if (typeof document !== 'undefined' && document.getElementById('quest-panel')?.hidden) {
+      setTimeout(() => document.getElementById('quest-btn')?.click(), 600);
+    }
+    return;
+  }
   const want = Math.max(1, Number(engine.param('questoffercount')) || 3);
   const rows = pendingQuestOffers(qs, engine.pc, questContext(engine)).filter((row) => !row.emergency).slice(0, want);
   rows.forEach((row, i) => markOffered(qs, row.classTsid, Date.now() - (rows.length - i)));
@@ -398,6 +520,11 @@ export const questOffersFeature = {
   /** G229: game.js quest log asks for the put-off quests' cards. */
   questLogCards(engine) {
     return putOffCards(engine);
+  },
+
+  /** G255: game.js asks for each active quest card's extra buttons (the Try button). */
+  questLogActions(classTsid, engine) {
+    return questLogActions(engine, classTsid);
   },
 
   init(engine) {
@@ -451,7 +578,11 @@ export const questOffersFeature = {
       syncWaiting(engine);
       const qs = engine.questState;
       const failed = tickQuestTimers(qs, now);
-      for (const id of failed) engine.pushActivity('A timed quest ran out of time. You can restart it from the quest log.');
+      for (const id of failed) {
+        const title = getQuestCatalog()[id]?.title || 'A timed quest';
+        engine.pushActivity(`“${title}” ran out of time. Choose Try again in your quest log to start it over.`);
+      }
+      if (failed.length) engine.updateHud();
       const pack = { ...engine.inv };
       if (lastPack) {
         for (const [id, count] of Object.entries(pack)) {
