@@ -3653,6 +3653,45 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
   background: linear-gradient(90deg, #58a6bd, #86d6df);
 }
 .skill-study-time { font-variant-numeric: tabular-nums; }
+/* G222: study bars in the client's look (js/skills-panel.js studyBar):
+   ProgressBar.as 20-33 + drawBar 113-150 (grey frame with a dark top edge, a
+   vertical gradient fill and a 2 px tip), ImaginationSkillsUI.as 200-211 (learn
+   and fast colours), buildArrows 241-263 and animateArrows 508-517 (gold 17x25
+   arrows every 24 px over the filled part, one step every 0.4 s). */
+.quest-log-body .q-bar.skill-study-bar {
+  height: 10px;
+  border-radius: 6px;
+  background: #9ca3a3;
+  box-shadow: inset 0 2px 0 #656b6b;
+}
+.quest-log-body .skill-study-bar > i { position: relative; overflow: hidden; }
+.quest-log-body .skill-study-bar.is-learn > i,
+.quest-log-body .skill-study-bar.is-paused > i {
+  background:
+    linear-gradient(180deg, #9db52e, #879f08) right / 2px 100% no-repeat,
+    linear-gradient(180deg, #afca2f, #95b101);
+}
+.quest-log-body .skill-study-bar.is-paused > i { opacity: 0.55; }
+.quest-log-body .skill-study-bar.is-fast > i {
+  background:
+    linear-gradient(180deg, #b38b00, #9a7802) right / 2px 100% no-repeat,
+    linear-gradient(180deg, #f5e242, #d79305);
+}
+.skill-study-bar .skill-study-arrows {
+  position: absolute;
+  inset: 0 2px 0 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='25'%3E%3ClinearGradient id='a' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23f6e571'/%3E%3Cstop offset='1' stop-color='%23edcb35'/%3E%3C/linearGradient%3E%3Cpath d='M0 0v25l17-12.5z' fill='url(%23a)'/%3E%3C/svg%3E") 0 0 / 9.6px 10px repeat-x;
+  animation: skill-study-arrows 0.4s linear infinite;
+}
+@keyframes skill-study-arrows {
+  from { background-position: -9.6px 0; }
+  to { background-position: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skill-study-bar .skill-study-arrows { animation: none; }
+}
+/* imagination_skills_time_fast (ImaginationSkillsUI.as 440-441); its CSS is lost, so gold from the fast bar. */
+.skill-study-card .skill-study-time.is-fast { color: #8a6a00; font-weight: 700; }
 .side-panel.buffs-panel { left: auto; right: 10px; top: 44px; }
 
 .buff-strip {

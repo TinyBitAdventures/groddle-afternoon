@@ -145,6 +145,54 @@ export function switchStudyNote(entry, active) {
   return { kind: 'paused', lines: [`Your progress on ${name} will be paused`] };
 }
 
+/**
+ * G222: the learn button's own words (ImaginationSkillDetailsUI.as
+ * setLearnButton 203-246): "Start learning this skill" (210); with another
+ * skill studying, "Switch to start/resume learning this instead" (225) and
+ * the switch note above; a paused skill with nothing else studying,
+ * "Resume learning this skill" with the tip "You've got this skill on pause
+ * at the moment" (234-236).
+ */
+export function learnButtonText(entry, active) {
+  const paused = entry?.status === 'paused';
+  const other = active && active.classTsid !== entry?.classTsid ? active : null;
+  if (other) {
+    return {
+      label: `Switch to ${paused ? 'resume' : 'start'} learning this instead`,
+      note: switchStudyNote(entry, other),
+    };
+  }
+  if (paused) {
+    return { label: 'Resume learning this skill', note: { kind: 'on-pause', lines: ["You've got this skill on pause at the moment"] } };
+  }
+  return { label: 'Start learning this skill', note: null };
+}
+
+/**
+ * G222: the study bar's look (ImaginationSkillsUI.as updateSkillTraining
+ * 401-460, colours 200-211, buildArrows 241-263, drawArrowsMask 501-506,
+ * animateArrows 508-517). Learning is the green bar; accelerated learning is the yellow bar with the gold arrows
+ * scrolling across its filled part (a 17x25 arrow every 24 px, one step in
+ * 0.4 s, masked to the bar); paused studies (never drawn by the client, which
+ * showed only the one in training) keep the green, dimmed; unlearning keeps
+ * the remake's red.
+ */
+export function studyBarKind(study) {
+  if (!study) return 'learn';
+  if (study.isPaused) return 'paused';
+  return study.isAccelerated ? 'fast' : 'learn';
+}
+
+function studyBar(progress, kind) {
+  const bar = el('div', `q-bar skill-study-bar is-${kind}`);
+  bar.dataset.barKind = kind;
+  const fill = el('i');
+  fill.style.width = `${Math.round((Number(progress) || 0) * 100)}%`;
+  if (kind === 'fast') fill.appendChild(el('span', 'skill-study-arrows'));
+  bar.appendChild(fill);
+  return bar;
+}
+
 function switchNoteNode(note) {
   const node = el('div', `skill-switch-note is-${note.kind}`);
   node.dataset.switchNote = note.kind;
@@ -155,7 +203,7 @@ function switchNoteNode(note) {
   return node;
 }
 
-function actionButton(entry, ctx, actions) {
+function actionButton(entry, ctx, actions, active = null) {
   const btn = el('button', 'content-action-btn skill-action');
   btn.type = 'button';
   if (entry.status === 'learned') return null;
@@ -165,13 +213,13 @@ function actionButton(entry, ctx, actions) {
     return btn;
   }
   if (entry.status === 'paused') {
-    btn.textContent = `Resume · ${formatStudyTime(entry.study.remainingSeconds)} left`;
+    btn.textContent = learnButtonText(entry, active).label;
     btn.classList.add('btn-glitch-primary');
     btn.addEventListener('click', () => actions.resume(entry.classTsid));
     return btn;
   }
   if (entry.status === 'available') {
-    btn.textContent = `Start studying · ${formatStudyTime(entry.seconds)}`;
+    btn.textContent = learnButtonText(entry, active).label;
     btn.classList.add('btn-glitch-primary');
     btn.addEventListener('click', () => actions.start(entry.classTsid));
     return btn;
@@ -304,11 +352,7 @@ function skillRow(entry, ctx, actions, rerender, active = null) {
   row.appendChild(head);
 
   if (entry.status === 'studying' || entry.status === 'paused') {
-    const bar = el('div', 'q-bar skill-study-bar');
-    const fill = el('i');
-    fill.style.width = `${Math.round((entry.study.progress || 0) * 100)}%`;
-    bar.appendChild(fill);
-    row.appendChild(bar);
+    row.appendChild(studyBar(entry.study.progress, studyBarKind(entry.study)));
   }
 
   if (!open) return row;
@@ -352,8 +396,10 @@ function skillRow(entry, ctx, actions, rerender, active = null) {
     .map(([id, g]) => `${ctx.giantName?.(id) || id}${g?.primary ? ' (primary)' : ''}`);
   if (giants.length) meta.push(giants.join(', '));
   body.appendChild(el('div', 'skill-meta', meta.join(' · ')));
-  const btn = actionButton(entry, ctx, actions);
-  const note = btn && !btn.disabled ? switchStudyNote(entry, active) : null;
+  const btn = actionButton(entry, ctx, actions, active);
+  const note = btn && !btn.disabled && (entry.status === 'available' || entry.status === 'paused')
+    ? learnButtonText(entry, active).note
+    : null;
   if (note) {
     body.appendChild(switchNoteNode(note));
     btn.title = note.lines.join('\n');
@@ -451,11 +497,7 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
     title.appendChild(el('span', '', 'Unlearning'));
     card.appendChild(title);
     card.appendChild(el('div', 'skill-study-time', `${formatStudyTime(unlearning.remainingSeconds)} remaining · ${Math.round(unlearning.progress * 100)}%`));
-    const bar = el('div', 'q-bar skill-study-bar');
-    const fill = el('i');
-    fill.style.width = `${Math.round(unlearning.progress * 100)}%`;
-    bar.appendChild(fill);
-    card.appendChild(bar);
+    card.appendChild(studyBar(unlearning.progress, 'unlearn'));
     if (typeof actions.cancelUnlearn === 'function') {
       const stop = el('button', 'content-action-btn', 'Stop unlearning');
       stop.type = 'button';
@@ -474,12 +516,9 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
     title.appendChild(el('b', '', skillTitle(def)));
     title.appendChild(el('span', '', row.isPaused ? 'Paused' : row.isAccelerated ? 'Accelerated!' : 'Studying'));
     card.appendChild(title);
-    card.appendChild(el('div', 'skill-study-time', `${formatStudyTime(row.remainingSeconds)} remaining · ${Math.round(row.progress * 100)}%`));
-    const bar = el('div', 'q-bar skill-study-bar');
-    const fill = el('i');
-    fill.style.width = `${Math.round(row.progress * 100)}%`;
-    bar.appendChild(fill);
-    card.appendChild(bar);
+    // imagination_skills_time_fast: the accelerated time has its own style (ImaginationSkillsUI.as 440-441).
+    card.appendChild(el('div', `skill-study-time${row.isAccelerated ? ' is-fast' : ''}`, `${formatStudyTime(row.remainingSeconds)} remaining · ${Math.round(row.progress * 100)}%`));
+    card.appendChild(studyBar(row.progress, studyBarKind(row)));
     if (!row.isPaused) {
       const giants = studyGiantsLine(def, ctx);
       if (giants) {
@@ -489,7 +528,8 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
         card.appendChild(line);
       }
     }
-    const btn = el('button', 'content-action-btn', row.isPaused ? 'Resume study' : 'Pause study');
+    // G222: a paused card's button uses the learn button's words (setLearnButton 225, 236).
+    const btn = el('button', 'content-action-btn', row.isPaused ? learnButtonText({ classTsid: row.classTsid, status: 'paused' }, active).label : 'Pause study');
     btn.type = 'button';
     btn.addEventListener('click', () => (row.isPaused ? actions.resume(row.classTsid) : actions.pause(row.classTsid)));
     card.appendChild(btn);
