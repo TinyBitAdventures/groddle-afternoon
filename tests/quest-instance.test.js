@@ -399,9 +399,11 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
     const offers = ensureQuestOfferState(engine.questState);
     assert.ok(offers.failed.mental_block, 'the log shows Try again');
     assert.equal(questInstancesFeature._state().save.retry.mental_block, undefined);
-    // Not startable from the log: the source removed it (failQuest 466-469); the remake keeps its giver prompt.
-    assert.ok(questInstancesFeature._state().save.retry.help_juju_bandits);
+    // G313: not startable from the log: the source removes it (failQuest 466-469, quests_remove), so the bandit offers it again.
+    assert.equal(questInstancesFeature._state().save.retry.help_juju_bandits, undefined);
     assert.equal(offers.failed.help_juju_bandits, undefined);
+    assert.equal(engine.questState.active.help_juju_bandits, undefined);
+    assert.equal(offers.managed.help_juju_bandits, undefined);
   });
 
   it('a failed quest is not re-entered until Try again clears the mark; leaving says where to look', () => {
@@ -414,5 +416,73 @@ describe('G311: a failed room quest is Try again in the quest log', () => {
     assert.match(restart, /delete offers\.failed\[classTsid\];/);
     const client = readFileSync(join(root, '../glitch-client/com/tinyspeck/engine/view/ui/quest/QuestElementUI.as'), 'utf8');
     assert.match(client, /try_bt\.label = current_quest\.failed \? 'Try again' : 'Try it';/);
+  });
+});
+
+/*
+ * G313: a failed room quest with no onStarted leaves the log (inc_quests.js failQuest 457-469,
+ * quests_remove 544-575) and its giver offers it again; three with no way back to their giver
+ * keep the remake's prompt; the map's "Unfinished quest places" card had no source.
+ */
+describe('G313: failed room quests the source removes', () => {
+  before(async () => {
+    await loadContentCatalogsFromDir(join(root, 'public/assets/content'));
+  });
+
+  const fakeEngine = (active, managed, extra = {}) => {
+    const data = {};
+    return {
+      data,
+      started: true,
+      questState: { active, completed: [], offers: { managed, ...extra } },
+      setData: (k, v) => { data[k] = v; },
+      param: () => '',
+      save() {},
+      busy: () => true,
+      updateHud() {},
+    };
+  };
+
+  it('the eight are the room quests with no onStarted', () => {
+    const none = Object.keys(QUEST_ROOMS).filter((id) => getQuestCatalog()[id] && !getQuestCatalog()[id].needsStart).sort();
+    assert.deepEqual(none, [
+      'help_juju_bandits', 'le_miserable_part_2', 'smuggle_the_smuggler_part2', 'smuggle_the_smuggler_part3',
+      'tower_quest', 'tower_quest_part2', 'tower_quest_part3', 'tower_quest_part3repeat',
+    ]);
+  });
+
+  it('a reload removes a source-removed quest and its offers, and keeps the prompt for the three', async () => {
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js');
+    const { questStatus } = await import('../public/js/quest-offers.js');
+    const t = Date.now() - 60_000;
+    questInstancesFeature.restore({ memory: {}, retry: { tower_quest: t, le_miserable_part_2: t, smuggle_the_smuggler_part2: t } });
+    const active = { tower_quest: { progress: {} }, le_miserable_part_2: { progress: {} }, smuggle_the_smuggler_part2: { progress: {} } };
+    const engine = fakeEngine(active, { tower_quest: 1, le_miserable_part_2: 1, smuggle_the_smuggler_part2: 1 }, { offered: { tower_quest: 5 }, declined: {}, failed: {}, repeats: {}, timers: {}, distinct: {}, queue: ['tower_quest'] });
+    questInstancesFeature.onTick(16, Date.now(), engine);
+    const retry = questInstancesFeature._state().save.retry;
+    assert.equal(retry.tower_quest, undefined);
+    assert.equal(questStatus(engine.questState, 'tower_quest'), 'none', 'Gwendolyn can offer it again');
+    assert.deepEqual(engine.questState.offers.queue, []);
+    assert.ok(retry.le_miserable_part_2, 'MaintenanceBot M-64 is only inside the finished le_miserable');
+    assert.ok(retry.smuggle_the_smuggler_part2, 'the source never fails it');
+    assert.ok(engine.questState.active.smuggle_the_smuggler_part2);
+  });
+
+  it('leaving early says the quest is gone; le_miserable_part_2 fails le_miserable too', () => {
+    const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
+    assert.match(src, /so the quest is gone from your log\./);
+    const fail = src.slice(src.indexOf('function failQuest('), src.indexOf('/** custom_code prerequisites'));
+    assert.match(fail, /questId === 'le_miserable_part_2'\) failQuest\(engine, 'le_miserable'\)/);
+    const gsjs = readFileSync(join(root, '../glitch-GameServerJS/quests/le_miserable_part_2.js'), 'utf8');
+    assert.match(gsjs, /pc\.failQuest\('le_miserable'\);\s*pc\.quests_fail_and_remove\(this\.class_tsid\);/);
+    const inc = readFileSync(join(root, '../glitch-GameServerJS/players/inc_quests.js'), 'utf8');
+    assert.match(inc, /else if \(!qi\.onStarted\)\{\s*this\.quests_remove\(quest_class\);/);
+  });
+
+  it('has no map card', async () => {
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js');
+    assert.equal(questInstancesFeature.mapCards, undefined);
+    const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
+    assert.doesNotMatch(src, /Unfinished quest places/);
   });
 });

@@ -380,7 +380,10 @@ function handleEvents(events, engine) {
       engine.save();
       tip(engine, game.itId === 'you' ? CROWNS_TEXT.youreItAbove : `${game.players[game.itId].name} has the crown! Tag them to steal it.`);
     }
-    if (e.type === 'entered_play' && e.id === 'you' && e.isIt) tip(engine, CROWNS_TEXT.youreIt(crownRemainingSeconds(game, 'you')));
+    // G313: games_it_game_gate 557-579: the holder going down through the play line gets "Stay it for
+    // 60 seconds, and you win!" with a new 60 s apiSetTimer. it_game_tick (groups/global_game.js 228-249)
+    // still ends the game when crown_time plus this stretch reaches 60, so the clock keeps its total.
+    if (e.type === 'entered_play' && e.id === 'you' && e.isIt) tip(engine, CROWNS_TEXT.stayIt);
     if (e.type === 'exited_play' && e.id === 'you' && e.isIt) tip(engine, CROWNS_TEXT.exited);
     if (e.type === 'won') finish(engine);
   }

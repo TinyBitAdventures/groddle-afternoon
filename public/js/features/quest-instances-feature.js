@@ -21,9 +21,13 @@
  *    291-309 -> quest.js onRestart 79-100 -> onStarted enters the instance
  *    again). The source asks nothing. quest-offers-feature draws the button
  *    (questLogActions); this module re-enters the room once the failed mark
- *    clears. The few that are not startable (no onStarted: the source's
- *    failQuest removes them, 466-469) still get the giver's remake prompt
- *    (catalog.js questGiver, maybeOfferRetry); see register G311.
+ *    clears. G313: one that is not startable (no onStarted) leaves the log
+ *    (failQuest 457-469: a repeatable one goes to fail_repeat, the rest to
+ *    quests_remove 544-575, which also drops its pending offers), so its giver
+ *    offers it again: the Juju Bandit (help_juju_bandits), Gwendolyn in Room 23
+ *    (the tower chain, location.js 443-456). Three have no source fail that
+ *    leaves a way back, so they keep the remake's giver prompt
+ *    (RETRY_PROMPT_QUESTS, maybeOfferRetry); see register G313.
  *
  * Room module contract (all optional except id/title/build or street):
  *   { id, title, kicker, icon, theme, durationMs | durationFor(questId),
@@ -251,32 +255,83 @@ function logRestartable(engine, questId) {
   return Boolean(ensureQuestOfferState(engine.questState).managed?.[questId]);
 }
 
-/** Move retries a reload or an old save left for a log-restartable quest to the log's failed mark. */
+/**
+ * G313: failed room quests that are not startable but keep the remake's giver
+ * prompt, because the source leaves no way back to their giver:
+ *  - le_miserable_part_2: removed on fail (le_miserable_part_2.js 64-74,
+ *    quests_fail_and_remove), but MaintenanceBot M-64 offers it only inside
+ *    the le_miserable instance (npc_maintenance_bot.js 386-393), which part 1,
+ *    already turned in to him, never opens again.
+ *  - smuggle_the_smuggler_part2 / _part3: the source never fails them (no
+ *    failQuest in their files, npc_rare_item_vendor.js or location.js); the
+ *    remake's penalty room fails them on an early exit, and their giver, the
+ *    imprisoned Smuggler, is only in the cell that part 1 opened.
+ */
+const RETRY_PROMPT_QUESTS = new Set(['le_miserable_part_2', 'smuggle_the_smuggler_part2', 'smuggle_the_smuggler_part3']);
+
+/** G313: a failed quest the source takes out of the log (failQuest 457-469: no onStarted). */
+function sourceRemoves(questId) {
+  return !getQuestCatalog()[questId]?.needsStart && !RETRY_PROMPT_QUESTS.has(questId);
+}
+
+/** quests_remove (inc_quests.js 544-575): out of the log, its offers dropped, so the giver offers it fresh. */
+function removeQuest(engine, questId) {
+  const qs = engine.questState;
+  delete save.retry[questId];
+  if (!qs) return false;
+  const offers = ensureQuestOfferState(qs);
+  const had = Boolean(qs.active?.[questId]);
+  if (qs.active) delete qs.active[questId];
+  for (const key of ['managed', 'offered', 'declined', 'failed', 'timers', 'distinct']) delete offers[key]?.[questId];
+  offers.queue = offers.queue.filter((id) => id !== questId);
+  engine.updateHud?.();
+  return had;
+}
+
+/** Move retries a reload or an old save left: a log-restartable quest gets the log's failed mark, a source-removed one leaves the log. */
 function settleRetries(engine) {
   const ids = Object.keys(save.retry);
   if (!ids.length || !engine.questState) return;
   const offers = ensureQuestOfferState(engine.questState);
   let moved = false;
   for (const id of ids) {
-    if (!logRestartable(engine, id)) continue;
-    offers.failed[id] ||= Number(save.retry[id]) || Date.now();
-    delete save.retry[id];
-    moved = true;
+    if (logRestartable(engine, id)) {
+      offers.failed[id] ||= Number(save.retry[id]) || Date.now();
+      delete save.retry[id];
+      moved = true;
+    } else if (activeQuest(engine, id) && sourceRemoves(id)) {
+      removeQuest(engine, id);
+      moved = true;
+    }
   }
   if (moved) engine.save?.();
 }
 
-/** GSJS failQuest (inc_quests.js 420-471): progress resets; the log offers Try again (else the giver asks later). */
+/**
+ * GSJS failQuest (inc_quests.js 420-471): progress resets; a startable quest
+ * waits in the log for Try again, one without onStarted leaves the log (G313),
+ * and the few in RETRY_PROMPT_QUESTS get the giver's prompt later.
+ * Returns 'log', 'removed', 'retry' or '' (not active).
+ */
 function failQuest(engine, questId) {
   resetProgress(engine, questId);
   const mem = (save.memory[questId] ||= {});
   mem.failedAt = Date.now();
   delete mem.started;
-  if (!activeQuest(engine, questId)) return;
+  // le_miserable_part_2.js onExitLocation 64-74: failQuest('le_miserable') too (a no-op once it is done).
+  if (questId === 'le_miserable_part_2') failQuest(engine, 'le_miserable');
+  if (!activeQuest(engine, questId)) return '';
   if (logRestartable(engine, questId)) {
     ensureQuestOfferState(engine.questState).failed[questId] = Date.now();
     delete save.retry[questId];
-  } else save.retry[questId] = Date.now();
+    return 'log';
+  }
+  if (sourceRemoves(questId)) {
+    removeQuest(engine, questId);
+    return 'removed';
+  }
+  save.retry[questId] = Date.now();
+  return 'retry';
 }
 
 /** custom_code prerequisites from catalog.js OFFER_OVERRIDES. */
@@ -911,13 +966,17 @@ async function leaveInstance(engine, opts = {}) {
   if (result.outcome === 'complete') {
     if (hook.leaveFlag !== false) progress(engine, questId, hook.leaveFlag || 'leave');
   } else if (!hook.keepQuest) {
-    failQuest(engine, questId);
-    // G311: the quest log's Try again, as a timed quest's (quest-offers-feature); the rest keep the giver's line.
+    const failed = failQuest(engine, questId);
+    // G311: the quest log's Try again, as a timed quest's (quest-offers-feature); G313: a removed
+    // quest is gone from the log; the rest keep the giver's line.
     const inLog = Boolean(ensureQuestOfferState(engine.questState).failed?.[questId]);
+    const ended = result.outcome === 'expired' ? `${room?.title || 'The quest'}: time ran out` : `You left ${room?.title || 'the quest'} early`;
     engine.pushActivity(
       inLog
-        ? `${result.outcome === 'expired' ? `${room?.title || 'The quest'}: time ran out.` : `You left ${room?.title || 'the quest'} early.`} Choose Try again in your quest log to start it over.`
-        : result.outcome === 'expired'
+        ? `${ended}. Choose Try again in your quest log to start it over.`
+        : failed === 'removed'
+          ? `${ended}, so the quest is gone from your log.`
+          : result.outcome === 'expired'
           ? `${room?.title || 'The quest'}: time ran out. Ask the ${giverFor(engine, questId).label} to try again.`
           : `You left ${room?.title || 'the quest'} early. You can try again later.`
     );
@@ -1398,23 +1457,8 @@ export const questInstancesFeature = {
     return false;
   },
 
-  mapCards(engine) {
-    if (run || typeof document === 'undefined') return [];
-    const ids = Object.keys(save.retry).filter((id) => activeQuest(engine, id));
-    if (!ids.length) return [];
-    const card = el('div', { class: 'map-feature-card qi-map-card', style: 'padding:8px 10px;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.12);margin:0 0 8px' });
-    card.innerHTML = `<strong style="display:block;font-size:.85rem">Unfinished quest places</strong>`;
-    for (const id of ids) {
-      const b = el('button', { type: 'button', class: 'btn-glitch-primary', style: 'margin:6px 6px 0 0;font-size:.75rem' });
-      b.textContent = `Go back: ${questDef(id)?.title || id}`;
-      b.addEventListener('click', () => {
-        engine.closeMap?.();
-        startInstance(engine, id);
-      });
-      card.appendChild(b);
-    }
-    return [card];
-  },
+  // G313: no map card. The source's map (HubMapDialog) has no list of quest places to go back to;
+  // a failed room is restarted from the quest log (Try again) or offered again by its giver.
 
   /** Tests / QA. */
   _state() {

@@ -46,6 +46,7 @@ import {
   MIN_LEVEL,
   PART2,
   PART3,
+  PART3_REPEAT,
   REPEAT_COST,
   REPEAT_DECLINE,
   ROOM_23,
@@ -384,11 +385,21 @@ function stepGreeter(engine, dtMs, now) {
 /* Gwendolyn                                                            */
 /* ------------------------------------------------------------------ */
 
+/**
+ * G313: pc.repeatingTower (npc_widget.js 376) lasts until part3repeat is done
+ * (tower_quest_part3repeat.js onComplete_custom 54), so a repeat that fails
+ * (location.js 443-456 removes the chain) is offered again without paying twice.
+ */
+function repeatPaid(qs) {
+  if (save.repeatPaid && (qs?.completed || []).includes(PART3_REPEAT)) save.repeatPaid = false;
+  return save.repeatPaid;
+}
+
 /** npc_gwendolyn onPlayerCollision -> offerQuests (tower_quest), unless part 3 is done. */
 export function offerTask(engine) {
   if (!gwen || gwen.offering) return false;
   const qs = engine.questState;
-  if (!gwendolynOffers(qs, { repeatPaid: save.repeatPaid })) {
+  if (!gwendolynOffers(qs, { repeatPaid: repeatPaid(qs) })) {
     gwen.state = 'quiet';
     setData(engine);
     return false;
@@ -422,7 +433,6 @@ export function offerTask(engine) {
     onAccept: () => {
       const res = acceptOffer(engine.questState, TASK, questCtx(engine));
       if (res.ok) {
-        save.repeatPaid = false;
         exitAt = 0;
         // tower_quest.js onAccepted 38-39: instances_cancel_exit_prompt('tower_quest').
         cancelExitPrompt(engine);
@@ -611,7 +621,7 @@ export const gwendolynRoom23Feature = {
       return [{ id: 'talk_to', label: 'Talk to', sort: 50, tooltip: 'Listen to what they have to say', enabled: greeter.state === 'waiting', reason: greeter.state === 'waiting' ? '' : 'It has said its piece', durationMs: 0 }];
     }
     if (gwen && target === gwen.target) {
-      const can = !gwen.offering && gwendolynOffers(engine?.questState, { repeatPaid: save.repeatPaid });
+      const can = !gwen.offering && gwendolynOffers(engine?.questState, { repeatPaid: repeatPaid(engine?.questState) });
       return [{ id: 'talk_to', label: 'Talk to', sort: 50, tooltip: 'Speak. With words', enabled: can, reason: can ? '' : 'She has nothing to offer you now', durationMs: 0 }];
     }
     return null;

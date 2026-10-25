@@ -63,7 +63,7 @@
  * they end with the room.
  */
 
-import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
+import { ensureQuestOfferState } from '../quest-offers.js';
 import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js';
 import { gainMetabolic, loseMood } from '../metabolics.js';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
@@ -181,26 +181,29 @@ export function chainBroken(questState) {
 
 /**
  * location.js onPlayerEnter outside the tower instances before part 3 is
- * done: failQuest part3repeat, part3, part2 (and its done copy), tower_quest
- * (and its done copy). The chain restarts at tower_quest (failed, so the
- * Magic Rock offers a retry). Returns true when anything changed.
+ * done (443-456): failQuest part3repeat, part3, part2 (and its done copy),
+ * tower_quest (and its done copy). None has onStarted, so failQuest
+ * (inc_quests.js 466-469) quests_removes each: the chain leaves the log and
+ * Gwendolyn offers tower_quest again in Room 23 (G313; npc_gwendolyn.js
+ * onPlayerCollision 215-233). A finished part 3 stays done (failQuest skips a
+ * done quest unless fail_completed). Returns true when anything changed.
  */
 export function resetChain(questState) {
   if (!questState) return false;
   const offers = ensureQuestOfferState(questState);
   questState.active ||= {};
   let changed = false;
-  for (const id of [PART3_REPEAT, PART3, PART2]) {
+  for (const id of [PART3_REPEAT, PART3, PART2, TASK]) {
     if (questState.active[id]) {
       delete questState.active[id];
-      delete offers.managed[id];
       changed = true;
     }
+    for (const key of ['managed', 'offered', 'declined', 'failed', 'timers', 'distinct']) delete offers[key]?.[id];
+    offers.queue = (offers.queue || []).filter((q) => q !== id);
   }
   const before = (questState.completed || []).length;
   questState.completed = (questState.completed || []).filter((id) => id !== PART2 && id !== TASK);
   if (questState.completed.length !== before) changed = true;
-  if (!questState.active[TASK] && changed) acceptOffer(questState, TASK, {});
   return changed;
 }
 
@@ -1646,10 +1649,11 @@ export const room = {
     heatBuff(ctx, null);
     if (ctx.player) ctx.player.pivot.y = 0;
     if (outcome === 'complete' || chainFinished(ctx.engine.questState)) return { leaveFlag: false, noTurnIn: true };
-    // location.js onPlayerEnter: leaving before part 3 is done fails the whole chain.
-    resetChain(ctx.engine.questState);
+    // location.js onPlayerEnter 443-456: leaving before part 3 is done fails the whole chain, and
+    // failQuest removes each part (G313): Gwendolyn offers it again in Room 23.
     ctx.quest(TASK).fail();
-    ctx.activity("You left the vision quest. Gwendolyn's Task starts over; the Magic Rock can take you back.");
+    resetChain(ctx.engine.questState);
+    ctx.activity("You left the vision quest, so Gwendolyn's Task is gone from your log. Gwendolyn can give it to you again in Room 23.");
     return { keepQuest: true, leaveFlag: false, noTurnIn: true };
   },
 

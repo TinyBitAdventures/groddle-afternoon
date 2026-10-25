@@ -339,11 +339,22 @@ function openInvite(engine, e, now) {
     hold: engine.param('lonelyhold') === 'invite',
   };
   rt.last = `invite:${e.tsid}:${e.option}`;
+  // G313: the porthole and its bubble are overlays (announce_remote_item_speech: a vp_overlay pair,
+  // inc_announcements.js 708-742, from inc_world_events.js 67): a move takes them down at its start.
+  inviteRelease ||= trackOverlay(() => {
+    inviteRelease = null;
+    closeInvite();
+  });
   drawInvite(now);
 }
 
+let inviteRelease = null;
+let streetRelease = null;
+
 function closeInvite() {
   rt.invite = null;
+  inviteRelease?.();
+  inviteRelease = null;
   const node = typeof document === 'undefined' ? null : document.getElementById('lonely-invite');
   if (node) node.hidden = true;
 }
@@ -424,12 +435,19 @@ function showStreetOverlay(lines, widthPx) {
   node.style.opacity = '1';
   node.hidden = false;
   node.dataset.text = lines.join(' ');
+  // G313: lonelinessShowRaceOverlay 498-520 and the party lines are vp_overlays: gone at move start.
+  streetRelease ||= trackOverlay(() => {
+    streetRelease = null;
+    hideStreetOverlay();
+  });
   clearTimeout(node._dim);
   // opacity 1, then 0.5 after 3 s over 300 ms (lonelinessShowRaceOverlay 497-507).
   node._dim = setTimeout(() => { node.style.opacity = String(LONELY_RULES.overlayDim); }, LONELY_RULES.overlayDimAfterMs);
 }
 
 function hideStreetOverlay() {
+  streetRelease?.();
+  streetRelease = null;
   const node = typeof document === 'undefined' ? null : document.getElementById('lonely-street');
   if (node) {
     node.hidden = true;

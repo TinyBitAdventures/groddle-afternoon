@@ -13,7 +13,8 @@ import { fileURLToPath } from 'node:url';
 import * as kit from '../public/js/quest-rooms/kit.js';
 import { QUEST_ROOMS, roomModulePath } from '../public/js/quest-rooms/catalog.js';
 import { loadContentCatalogsFromDir, getQuestCatalog } from '../public/js/content-catalogs.js';
-import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../public/js/quest-offers.js';
+import { acceptOffer, ensureQuestOfferState, questStatus, turnInQuest } from '../public/js/quest-offers.js';
+import { gwendolynOffers } from '../public/js/gwendolyn-room-23.js';
 import {
   CACTUS,
   CACTUS_LINES,
@@ -373,7 +374,9 @@ describe("Gwendolyn's Task: the chain", () => {
     assert.ok(!chainBroken(qs));
   });
 
-  it('fails the whole chain back to tower_quest when you leave early', () => {
+  // G313: location.js 443-456 fails every part; none has onStarted, so failQuest
+  // (inc_quests.js 466-469) removes them and Gwendolyn offers tower_quest again.
+  it('takes the whole chain out of the log when you leave early', () => {
     const qs = fresh();
     acceptOffer(qs, TASK, {});
     turnInQuest(qs, TASK, null, {});
@@ -381,11 +384,23 @@ describe("Gwendolyn's Task: the chain", () => {
     turnInQuest(qs, PART2, null, {});
     acceptOffer(qs, PART3, {});
     assert.equal(resetChain(qs), true);
-    assert.deepEqual(Object.keys(qs.active), [TASK]);
+    assert.deepEqual(Object.keys(qs.active), []);
     assert.ok(!qs.completed.includes(TASK) && !qs.completed.includes(PART2));
+    for (const id of [TASK, PART2, PART3]) {
+      assert.equal(qs.offers.managed[id], undefined);
+      assert.equal(questStatus(qs, id), 'none');
+    }
     assert.equal(chainBroken(qs), false);
-    // Nothing to undo on a run still in Area 42.
+    // Nothing left to undo.
     assert.equal(resetChain(qs), false);
+  });
+
+  it('removes tower_quest itself when you leave before part 2', () => {
+    const qs = fresh();
+    acceptOffer(qs, TASK, {});
+    assert.equal(resetChain(qs), true);
+    assert.equal(questStatus(qs, TASK), 'none');
+    assert.ok(gwendolynOffers(qs), 'Gwendolyn offers it again');
   });
 
   it('keeps a finished first run when a repeat is abandoned', () => {
@@ -395,6 +410,6 @@ describe("Gwendolyn's Task: the chain", () => {
     resetChain(qs);
     assert.ok(qs.completed.includes(PART3));
     assert.ok(!qs.active[PART3_REPEAT]);
-    assert.ok(qs.active[TASK]);
+    assert.ok(!qs.active[TASK]);
   });
 });

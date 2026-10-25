@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 484,
+  "commits": 485,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Tutorial and quest-room copy comes from Tiny Speck's own files, not footage"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "The Spinning Wheel, pecking chickens and the Hatchet no longer blink out once a loop"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Tiny Speck's own lasers, rainbows and puffs replace the hand-drawn ones, the Qurazy banner plays, and the fireworks load a tenth as heavy"
    }
   ]
  },
- "tests": 288,
+ "tests": 289,
  "generatedAt": "2026-10-25"
 }

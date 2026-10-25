@@ -84,7 +84,7 @@ import {
 } from '../resource-nodes.js';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
 import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js';
-import { vpSequence } from '../quest-rooms/vp-overlay.js?v=ffw-1';
+import { vpSequence } from '../quest-rooms/vp-overlay.js?v=ffw-2';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
 export const RESOURCE_GROUP_PREFIX = 'resource:';
@@ -1084,7 +1084,9 @@ function checkFireflyOffer(engine) {
   if (!card) return;
   fireflyOffer.shown = true;
   engine.setData('fireflyOffer', 'lines');
-  vpSequence(engine, FIREFLY_OFFER_LINES).then(() => {
+  // G313: a street change cancels the lines, but the second one's done_payload is still sent
+  // (AbstractAnnouncementOverlay.as 645-663), so the familiar offers it once the new street is up.
+  vpSequence(engine, FIREFLY_OFFER_LINES).then((ran) => (ran === false ? engine.afterStreetCard?.() : null)).then(() => {
     engine.setData('fireflyOffer', 'offered');
     engine.playSound('QUEST_OFFER', { volume: 0.55 });
     // G267: firefly_whistle has onStarted (firefly_whistle.js 52), so quest.js get_status

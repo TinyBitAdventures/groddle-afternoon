@@ -72,6 +72,16 @@ describe('Game of Crowns rules', () => {
     assert.equal(CROWNS_TEXT.youreIt(50), "You're it! Keep it for 50 seconds, and win!");
   });
 
+  // G313: games_it_game_gate 557-579 sends "Stay it for 60 seconds, and you win!" to the holder
+  // going down through the play line; the remaining-seconds line is games_tag_player's (400-421).
+  it('the entering-play tip is the gate line, not the tag line', () => {
+    const inc = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../../glitch-GameServerJS/players/inc_games.js'), 'utf8');
+    const gate = inc.slice(inc.indexOf('function games_it_game_gate('), inc.indexOf('function games_end_it_game('));
+    assert.ok(gate.includes(CROWNS_TEXT.stayIt));
+    const feature = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../public/js/features/crowns-feature.js'), 'utf8');
+    assert.match(feature, /e\.type === 'entered_play' && e\.id === 'you' && e\.isIt\) tip\(engine, CROWNS_TEXT\.stayIt\)/);
+  });
+
   it('wins at 60 seconds with the source reward', () => {
     const game = running({ players: players.map((p) => (p.id === 'you' ? { ...p, crownMs: 55_000 } : p)) });
     tickCrowns(game, 5000, { you: true });

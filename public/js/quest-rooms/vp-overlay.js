@@ -6,9 +6,25 @@
  * Whistle lab (quest-rooms/firefly-whistle.js) and the Firefly that offers it
  * (features/resource-nodes-feature.js: npc_firefly.js "What ho! ... Fireflies!").
  *
- * The source's `locking` (the avatar stands still while it shows) is not
- * reproduced; the line simply sits above the world.
+ * The source's `locking` (the avatar stands still while it shows) is left to
+ * the caller (features/swf-feature.js holds the avatar for createGlitchGame's
+ * line and lets go when the line ends or is cancelled).
+ *
+ * G313: a move cancels it. TSMainView.moveMoveStarted (1612) and
+ * LocationView.dispose (50) run AnnouncementController.cancelAllOverlaysWeCan
+ * (193-215), which cancels every running InWindowAnnouncementOverlay; cancel()
+ * is finish() (AbstractAnnouncementOverlay.as 148-150), and overlayIsDone
+ * (AnnouncementController.as 448-457) drops the locking count, so a locking
+ * line lets the avatar go. A cancelled line's done_anncs are parsed at its
+ * fade-out start (AbstractAnnouncementOverlay.as 645-676), but the second
+ * cancel at LocationView.dispose takes the next one down before the new street
+ * shows, so a sequence ends there: vpSequence stops at a cancelled line. Its
+ * done_payload is still sent (645-663), so a caller's follow-up still runs.
+ * Each line (and one still waiting out its delay_ms) registers with
+ * overlay-art's trackOverlay; the promise resolves false when cancelled.
  */
+
+import { trackOverlay } from '../overlay-art.js?v=g311-1';
 
 let el = null;
 let current = null;
@@ -32,16 +48,32 @@ function ensure() {
 }
 
 /**
- * Show one announcement. Resolves when it is clicked through or has timed out.
+ * Show one announcement. Resolves true when it is clicked through, has timed
+ * out or another line replaced it, false when a street change cancelled it.
  * @param {{ setData?: (k: string, v: string) => void }} sink QA data (engine or room ctx)
  * @param {{ lines: string[], clickToAdvance?: boolean, durationMs?: number, delayMs?: number, topY?: string }} annc
  */
 export function vpOverlay(sink, { lines = [], clickToAdvance = false, durationMs = 3000, delayMs = 0, topY = '15%' } = {}) {
   const text = lines.join('\n');
   const node = ensure();
-  if (!node) return Promise.resolve();
+  if (!node) return Promise.resolve(true);
   return new Promise((resolve) => {
+    let finishLine = null;
+    let delayTimer = 0;
+    let settled = false;
+    const release = trackOverlay(() => {
+      if (finishLine) finishLine(false);
+      else settle(false);
+    });
+    const settle = (shown) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(delayTimer);
+      release();
+      resolve(shown);
+    };
     const show = () => {
+      if (settled) return;
       current?.finish?.();
       // Inside a quest room the room card holds the top of the view: sit just under it.
       const card = document.getElementById('quest-instance-hud');
@@ -57,7 +89,7 @@ export function vpOverlay(sink, { lines = [], clickToAdvance = false, durationMs
       sink?.setData?.('vpOverlay', text.replace(/\n/g, ' '));
       let done = false;
       let timer = 0;
-      const finish = () => {
+      const finish = (shown = true) => {
         if (done) return;
         done = true;
         clearTimeout(timer);
@@ -65,20 +97,27 @@ export function vpOverlay(sink, { lines = [], clickToAdvance = false, durationMs
         node.style.opacity = '0';
         node.hidden = true;
         sink?.setData?.('vpOverlay', '');
-        resolve();
+        settle(shown !== false);
       };
+      finishLine = finish;
       current = { finish, text };
-      if (clickToAdvance) node.querySelector('button')?.addEventListener('click', finish, { once: true });
-      else timer = setTimeout(finish, Math.max(300, durationMs));
+      if (clickToAdvance) node.querySelector('button')?.addEventListener('click', () => finish(true), { once: true });
+      else timer = setTimeout(() => finish(true), Math.max(300, durationMs));
     };
-    if (delayMs > 0) setTimeout(show, delayMs);
+    if (delayMs > 0) delayTimer = setTimeout(show, delayMs);
     else show();
   });
 }
 
-/** An announcement and its done_anncs, one after another. */
+/**
+ * An announcement and its done_anncs, one after another. Resolves true when
+ * every line ran, false when a street change cancelled one (the rest never show).
+ */
 export async function vpSequence(sink, anncs) {
-  for (const annc of anncs) await vpOverlay(sink, annc);
+  for (const annc of anncs) {
+    if ((await vpOverlay(sink, annc)) === false) return false;
+  }
+  return true;
 }
 
 /** QA: click through (or skip) the line on screen. */

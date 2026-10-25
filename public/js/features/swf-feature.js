@@ -35,7 +35,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { grantMoodXp } from '../mood-xp.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=g311-1';
-import { vpOverlay } from '../quest-rooms/vp-overlay.js?v=ffw-1';
+import { vpOverlay } from '../quest-rooms/vp-overlay.js?v=ffw-2';
 import {
   GAME_BOX,
   GAME_STAGES,
@@ -176,8 +176,17 @@ function runStage(now, engine) {
   const stage = game.stage;
   if (stage === 'announce') {
     // createGlitchGame: the locking overlay, then swf_1 at your feet.
-    vpOverlay(engine, { lines: [GLITCH_GAME.overlay.text], durationMs: GLITCH_GAME.overlay.durationMs, topY: GLITCH_GAME.overlay.topY });
-    lockUntil = Date.now() + GLITCH_GAME.overlay.durationMs;
+    const lock = Date.now() + GLITCH_GAME.overlay.durationMs;
+    lockUntil = lock;
+    // G313: a street change cancels the line, and with it the lock (overlayIsDone drops
+    // overlay_locker_count, AnnouncementController.as 448-457).
+    vpOverlay(engine, { lines: [GLITCH_GAME.overlay.text], durationMs: GLITCH_GAME.overlay.durationMs, topY: GLITCH_GAME.overlay.topY })
+      .then((shown) => {
+        if (shown === false && lockUntil === lock) {
+          lockUntil = 0;
+          publish(engine);
+        }
+      });
     dropSwf(engine, 'swf_1', 0);
   } else if (stage === 'drop2') {
     dropSwf(engine, 'swf_2', 1);
