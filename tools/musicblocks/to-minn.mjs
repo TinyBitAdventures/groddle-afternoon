@@ -55,7 +55,7 @@ export function musicblocksContent() {
       p('', '<a href="/play/">Play Groddle Afternoon</a> to start collecting.'),
     ]),
     band('missing', false, 'The one still missing', [
-      p('section-lead', 'Musicblock T-1 is in Tiny Speck’s item files, with a price and no description, but its tune has never been found in the archives. If it turns up, it joins this entry. The <a href="/restoration/">restoration report</a> tracks the search.'),
+      p('section-lead', 'Musicblock T-1 is in Tiny Speck’s item files, with a price and no description. Its tune was tracked down in 2026: a bugle call from a commercial sound library, which Glitch also played when the world shut down for maintenance during its beta. It is not Tiny Speck’s own music and was never released with the game, so it stays off this page.'),
     ]),
     group('div', 'wrap report-foot', null, [
       p('', 'The tunes are Tiny Speck’s own recordings and the icons its own art, both released into the public domain. The descriptions are from the game’s item files.'),
