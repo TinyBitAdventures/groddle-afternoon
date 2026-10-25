@@ -46,10 +46,10 @@
  *   rookNextAttack, rookArmor, rookBalmPoints, rookDemo, rookArt, rookStats.
  */
 
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-6';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
-import { donationValueFor } from '../shrines.js?v=spinning-wheel-test-3';
+import { donationValueFor } from '../shrines.js?v=spinning-wheel-test-4';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
 import {
   FOREHORSEMAN_LINES,

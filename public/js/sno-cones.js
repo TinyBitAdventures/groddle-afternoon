@@ -20,6 +20,7 @@
  */
 
 import { grantMoodXp } from './mood-xp.js';
+import { loseMood } from './metabolics.js';
 
 /** classProps eat_min_level / eat_xp and the bemoan verb's iMG and line, per cone. */
 export const SNO_CONES = Object.freeze({
@@ -98,7 +99,8 @@ export function eatSnoCone(classTsid, pc, { eatenToday = 0, rng = Math.random } 
       froze = true;
       msgs.push(SNO_CONE_TEXT.froze);
       rows.push({ counter: 'brain:frozen', amount: 1 });
-      pc.mood = 0;
+      // sno_cone_orange.js 289: metabolics_set_mood(0), a metabolics_lose_mood (G300).
+      loseMood(pc, Number(pc.mood) || 0);
     } else {
       msgs.push(SNO_CONE_TEXT.lucky);
     }

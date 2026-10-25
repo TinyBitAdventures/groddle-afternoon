@@ -31,13 +31,13 @@ import {
   resourceItemIds,
   sheetFrameRect,
 } from '../public/js/resource-nodes.js';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-6';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import {
   TOOL_CONDITION_CATALOG,
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js';
+} from '../public/js/tools.js?v=woodcutting-test-3';
 import {
   setStreetEcologyCatalog,
   ecologyForStreet,

@@ -21,8 +21,8 @@
  * (capacity 200, not repairable, refuelled here).
  */
 
-import { addItem, countItem, removeItem } from './inventory.js?v=catalog-unified-6';
-import { ensureToolCondition, getToolCondition } from './tools.js';
+import { addItem, countItem, removeItem } from './inventory.js?v=catalog-unified-7';
+import { ensureToolCondition, getToolCondition } from './tools.js?v=woodcutting-test-3';
 import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js';
 import { loseEnergy } from './metabolics.js';
 

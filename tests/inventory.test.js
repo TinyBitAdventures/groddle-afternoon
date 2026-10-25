@@ -343,8 +343,8 @@ describe('item detector: taking an item is not a way to get it (G176)', () => {
         export function buyWine(state) {
           return { ok: true, effects: [{ type: 'consume_item', classTsid: 'drink_ticket', count: 1 }, { type: 'grant_item', classTsid: 'wine_of_the_dead', count: 1 }, { type: 'quest_flag', flag: 'buy_wotd' }] };
         }`],
-      ['js/features/hell-bar-feature.js', `import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
-        import { buyWine, TICKET_CLASS } from '../hell.js?v=g268-1';
+      ['js/features/hell-bar-feature.js', `import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
+        import { buyWine, TICKET_CLASS } from '../hell.js?v=g300-1';
         const TICKET = 'drink_ticket';
         function applyGrant(engine, result) {
           for (const e of result.effects) {
@@ -485,7 +485,7 @@ describe('item detector: artifact and necklace assembly (G187)', () => {
     cube: { artifact: 'artifact_cube', pieces: ['cube_piece1', 'cube_piece2'] },
   };
   const NECK = { bead_x: { required: 17, produces: 'necklace_x' }, bead_y: { required: 19, produces: 'necklace_y' } };
-  const GAME = "import { artifactsFeature } from './js/features/artifacts-feature.js?v=g296-1';\n";
+  const GAME = "import { artifactsFeature } from './js/features/artifacts-feature.js?v=g300-1';\n";
   const FEATURE = "import { addItem } from '../inventory.js';\nimport { assemblyFor, consumeForAssembly } from '../artifacts.js';\n"
     + "function assemble(engine, plan) {\n  if (!consumeForAssembly(engine.inv, plan)) return false;\n  addItem(engine.inv, plan.artifact, 1);\n}\nexport const artifactsFeature = { assemble };\n";
   const sitesOf = (files) => assemblySites(buildIndex(files.map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' }));

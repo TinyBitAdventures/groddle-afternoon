@@ -25,10 +25,10 @@ import {
   hasBuff,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from '../public/js/buffs.js?v=item-buffs-6';
+} from '../public/js/buffs.js?v=item-buffs-7';
 import { accelerateActiveStudy, createSkillState, getStudyStatus, startSkillStudy } from '../public/js/skills.js';
 import { applyRewards } from '../public/js/quests.js?v=item-buffs-2';
-import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=player-save-16';
+import { normalizeBuffSnapshot } from '../public/js/player-save.js?v=player-save-17';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../public');
 

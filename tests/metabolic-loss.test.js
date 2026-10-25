@@ -3,7 +3,7 @@
 // scenes), verb energy costs spent through it, rook and street-job rewards
 // through the gain door, and G291's race result (the YOU WON! vp_overlay at
 // once, 'Ready to leave?' at 1 s).
-import { afterEach, describe, it } from 'node:test';
+import { afterEach, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -16,14 +16,17 @@ import {
   metabolicLoss,
   setMetabolicGainGate,
   setMetabolicLossGate,
+  shiftMetabolic,
 } from '../public/js/metabolics.js';
+import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=item-buffs-7';
+import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js';
 import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js';
 import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js';
 import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js';
 import { createInventory, countItem } from '../public/js/inventory.js';
 import { startAssembly, startDisassembly } from '../public/js/machines.js';
-import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js';
+import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-3';
 import { smeltMetalRocks } from '../public/js/mining.js';
 import { craftRecipe } from '../public/js/making.js';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js';
@@ -44,6 +47,10 @@ function gateFor(hell, direction) {
 }
 const dead = () => normalizeHellState({ isDead: true });
 const superPooped = () => normalizeHellState({ pooped: { kind: 'super_pooped', appliedAt: Date.now() - 1000, expiresAt: Date.now() + 3_600_000 } });
+
+before(async () => {
+  await loadContentCatalogsFromDir(join(pub, 'assets/content'));
+});
 
 afterEach(() => {
   setMetabolicGainGate(null);
@@ -117,6 +124,20 @@ describe('the loss door (js/metabolics.js)', () => {
     assert.equal(gainMetabolic(pc, 'mood', 10), 10);
   });
 
+  it('G300: shiftMetabolic sends a rise through the gain door and a fall through the loss door', () => {
+    const pc = { energy: 10, mood: 10 };
+    assert.equal(shiftMetabolic(pc, 'mood', -4), -4);
+    assert.equal(shiftMetabolic(pc, 'energy', -40), -10);
+    assert.equal(shiftMetabolic(pc, 'mood', 5), 5);
+    assert.equal(shiftMetabolic(pc, 'currants', 5), 0);
+    assert.deepEqual(pc, { energy: 0, mood: 11 });
+    setMetabolicLossGate(gateFor(dead(), 'loss'));
+    setMetabolicGainGate(gateFor(dead(), 'gain'));
+    assert.equal(shiftMetabolic(pc, 'mood', -4), 0);
+    assert.equal(shiftMetabolic(pc, 'mood', 4), 0);
+    assert.deepEqual(pc, { energy: 0, mood: 11 });
+  });
+
   it('gains cap at the tank, not 100', () => {
     const pc = { energy: 290, mood: 95, energyMax: 300 };
     assert.equal(gainMetabolic(pc, 'energy', 50), 10);
@@ -156,22 +177,88 @@ describe('verb costs spend through the door', () => {
     assert.equal(pc.energy, before - SET_FREE.energy);
   });
 
-  it('no module left subtracting energy by hand outside the door (ratchet)', () => {
-    const dirs = ['js', 'js/features', 'js/quest-rooms'];
-    // G296: any `-=` or an assignment with a subtraction in it (the G289 pattern missed `(pc.energy || 0) - x`).
-    const raw = /\b(?:pc|player|ctx\.pc|engine\.pc)\.energy\s*(?:-=|=(?!=)[^;\n]*\s-\s)/;
+  /** Every module under js/, js/features and js/quest-rooms (plus game.js) whose source matches `re`. */
+  function modulesMatching(re, skip = []) {
     const left = [];
-    for (const d of dirs) {
+    for (const d of ['js', 'js/features', 'js/quest-rooms']) {
       for (const f of readdirSync(join(pub, d))) {
         if (!f.endsWith('.js')) continue;
         const rel = `${d}/${f}`;
-        if (rel === 'js/metabolics.js' || rel === 'js/features/energy-decay-feature.js') continue;
-        if (raw.test(read(rel))) left.push(rel);
+        if (rel === 'js/metabolics.js' || skip.includes(rel)) continue;
+        if (re.test(read(rel))) left.push(rel);
       }
     }
+    if (re.test(read('game.js'))) left.push('game.js');
+    return left.sort();
+  }
+
+  it('no module left subtracting energy by hand outside the door (ratchet)', () => {
+    // G296: any `-=` or an assignment with a subtraction in it (the G289 pattern missed `(pc.energy || 0) - x`).
+    const raw = /\b(?:pc|player|ctx\.pc|engine\.pc)\.energy\s*(?:-=|=(?!=)[^;\n]*\s-\s)/;
     // G296 routed animal-kinship, machines, making, tools, mining, animal-husbandry, neighbours and
-    // the Esquibeth conch. Left: buffs.js's catalog_buffs ticks (clamped, energy and mood), a follow-up row.
-    assert.deepEqual(left.sort(), ['js/buffs.js']);
+    // the Esquibeth conch; G300 the catalog_buffs ticks in buffs.js. energy-decay-feature spends
+    // through its own gate check (player.js onPeriodicEnergyLoss).
+    assert.deepEqual(modulesMatching(raw, ['js/features/energy-decay-feature.js']), []);
+  });
+
+  it('G300: no module left subtracting mood by hand outside the door (ratchet)', () => {
+    const raw = /\b(?:pc|player|ctx\.pc|engine\.pc)\.mood\s*(?:-=|=(?!=)[^;\n]*\s-\s)/;
+    // Routed: piggy capture (npc_piggy.js 515), garden water fail (include/garden.js 215), trant
+    // pet fail (include/trants.js 97), tree poison (tree_poison.js 321), periodic mood loss
+    // (player.js 829), sneezing powder and krazy salts, the crab's dislike, It's So Hot!, the
+    // Juju paperweight, and buffs.js.
+    assert.deepEqual(modulesMatching(raw), []);
+  });
+
+  it('G300: no signed energy or mood change floors at zero by hand (ratchet)', () => {
+    // `Math.max(0, Math.min(cap, before + delta))`, `clamp(...)` or `= 0;` lets a negative delta
+    // through without metabolics_lose_*: drinks (drink.js 75-98), spices and gases, the crab's
+    // verbs, the purple journey, Funpickle, baby animal verbs and brain freezes were routed.
+    const signed = /\b(?:pc|player|ctx\.pc|engine\.pc)\.(?:energy|mood)\s*=\s*(?:Math\.max\(0,\s*Math\.min\(|clamp\(|0;)/;
+    // Left on purpose: dying empties the tank (hell-feature, player.js croak) and the No-No crash
+    // ends in pc.croak() (catalog_buffs.js 1502-1507). races-feature's game-quoin mood is a gain
+    // (not scanned here; a follow-up row asks whether it should ask the gain gate).
+    assert.deepEqual(modulesMatching(signed, ['js/features/races-feature.js']), [
+      'js/features/hell-feature.js',
+      'js/features/powders-feature.js',
+    ]);
+  });
+
+  it('G300: the buff catalog spends through the doors and costs nothing while dead', () => {
+    setMetabolicLossGate(gateFor(dead(), 'loss'));
+    setMetabolicGainGate(gateFor(dead(), 'gain'));
+    const state = createBuffState();
+    const pc = { energy: 50, mood: 50 };
+    // silvertongue on_apply: +5 mood, -5 energy (catalog_buffs.js 2297-2298).
+    assert.deepEqual(applyBuff(state, 'silvertongue', pc, 0).effects, {});
+    assert.deepEqual(pc, { energy: 50, mood: 50, activeBuffs: ['silvertongue'], rewardMultiplier: 1.05 });
+    // hairball_flower on_tick -5 energy (1013), buzzed +3 mood -7 energy (224-225).
+    applyBuff(state, 'hairball_flower', pc, 0);
+    applyBuff(state, 'buff_buzzed', pc, 0);
+    tickBuffs(state, pc, 60_000);
+    assert.equal(pc.energy, 50);
+    assert.equal(pc.mood, 50);
+  });
+
+  it('G300: alive, the same buffs cost what the source says', () => {
+    const state = createBuffState();
+    const pc = { energy: 50, mood: 50 };
+    assert.deepEqual(applyBuff(state, 'silvertongue', pc, 0).effects, { energy: -5, mood: 5 });
+    applyBuff(state, 'rookswort', pc, 0);
+    assert.equal(pc.mood, 53); // 2144: metabolics_lose_mood(2)
+    assert.equal(pc.energy, 48); // 2145: metabolics_add_energy(3)
+  });
+
+  it('G300: buffs.js names the source line for each loss', { skip: !haveGsjs && 'no GSJS checkout' }, () => {
+    const cat = src('items/catalog_buffs.js');
+    for (const [line, call] of [[225, 'metabolics_lose_energy(7)'], [993, 'metabolics_lose_energy(5)'], [1013, 'metabolics_lose_energy(5)'],
+      [1521, 'metabolics_lose_energy(Math.round(max_energy*0.03))'], [1522, 'metabolics_lose_mood(Math.round(max_energy*0.03))'],
+      [2144, 'metabolics_lose_mood(2)'], [2298, 'metabolics_lose_energy(5)']]) {
+      assert.ok(cat.split('\n')[line - 1].includes(call), `catalog_buffs.js ${line}: ${call}`);
+    }
+    const buffs = read('js/buffs.js');
+    assert.doesNotMatch(buffs, /\bclamp\(|function gain\(/);
+    assert.match(buffs, /import \{[^}]*\bloseEnergy\b[^}]*\bloseMood\b[^}]*\bshiftMetabolic\b[^}]*\} from '\.\/metabolics\.js';/);
   });
 
   it('rook attacks and street jobs pay and charge through the doors', () => {

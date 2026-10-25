@@ -31,10 +31,10 @@ import {
   moodWarningFor,
   periodicMoodLoss,
 } from '../mood-decay.js?v=mood-decay-1';
-import { moodMax } from '../metabolics.js';
+import { loseMood, moodMax } from '../metabolics.js';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
-import { homesFeature } from './homes-feature.js?v=homes-26';
-import { newxpFeature } from './newxp-feature.js?v=g294-1';
+import { homesFeature } from './homes-feature.js?v=homes-27';
+import { newxpFeature } from './newxp-feature.js?v=g300-1';
 
 export const MOOD_DECAY_FEATURE_ID = 'mood-decay';
 const BEAM_ME_DOWN_TSID = 'PUZZLESCENE_BEAM_ME_DOWN';
@@ -81,7 +81,8 @@ export function runMoodDecayMinute(engine) {
     introDone: !introActive(),
   });
   if (res.loss > 0) {
-    pc.mood = Math.max(0, before - res.loss);
+    // player.js 829: metabolics_lose_mood(mood_loss, 1), quiet (G300).
+    loseMood(pc, res.loss, { quiet: true });
     const warning = moodWarningFor(res.percent, (pc.mood / top) * 100);
     if (warning) engine.pushActivity?.(warning);
     engine.updateHud?.();

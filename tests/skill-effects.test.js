@@ -45,7 +45,7 @@ import {
   craftUnitDurations,
   MACHINE_EXTRA_WAIT_MS,
 } from '../public/js/making.js';
-import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-6';
+import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-3';
 
 const root = join(import.meta.dirname, '..', 'public');

@@ -28,8 +28,8 @@
  *     data-supply-permits).
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-6';
-import { getToolCondition } from '../tools.js';
+import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-7';
+import { getToolCondition } from '../tools.js?v=woodcutting-test-3';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_IDS,

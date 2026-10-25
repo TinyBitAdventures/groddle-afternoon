@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-9';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-10';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-117';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-118';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -383,7 +383,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=item-buffs-6';
+} from './js/buffs.js?v=item-buffs-7';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js';
 import {
   loadContentCatalogs,
@@ -406,7 +406,7 @@ import {
   ensureItem,
   addItem,
   removeItem,
-} from './js/inventory.js?v=catalog-unified-6';
+} from './js/inventory.js?v=catalog-unified-7';
 import {
   packPagerState,
   packPageTarget,
@@ -421,13 +421,13 @@ import {
   normalizeStackQuantity,
   dropInventoryStack,
   pickupDroppedStack,
-} from './js/world-items.js?v=world-items-3';
+} from './js/world-items.js?v=world-items-4';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-16';
+} from './js/player-save.js?v=player-save-17';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -439,7 +439,7 @@ import {
   leaveHomeInterior,
   imagineHome,
 } from './js/homes.js?v=homes-mail-4';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g288-1';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g300-1';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -494,7 +494,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=g296-1';
+} from './js/making.js?v=g300-1';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g191-1';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g193-1';
 import {
@@ -521,7 +521,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=g296-1';
+} from './js/garden.js?v=g300-1';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -533,7 +533,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=g296-1';
+} from './js/mining.js?v=g300-1';
 import {
   createActivityLog,
   appendActivity,
@@ -594,7 +594,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=food-memory-4';
+} from './js/food.js?v=food-memory-5';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -687,7 +687,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=g289-1';
+} from './js/musicblocks.js?v=g300-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -698,7 +698,7 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=vendor-profiles-5';
+} from './js/vendor.js?v=vendor-profiles-6';
 import {
   createAnimalState,
   resetAnimalDay,
@@ -732,7 +732,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=spinning-wheel-test-3';
+} from './js/shrines.js?v=spinning-wheel-test-4';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=powders-1';
 import {
   GAMESHOW_TICKET_ID,
@@ -743,7 +743,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=spinning-wheel-3';
+} from './js/spinning-wheel.js?v=spinning-wheel-4';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -752,7 +752,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=cubimals-4';
+} from './js/cubimals.js?v=cubimals-5';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,
@@ -22962,6 +22962,15 @@ async function main() {
     state.questDone = mainQuests.every((id) => questState.completed.includes(id));
     handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });
     backfillStreetVisits();
+  } else if (bootParams.has('resetgame')) {
+    // G301 QA: a reset game already knows 11+ starter skills; mark the badge quietly
+    // (as skillknown does) so no route opens on its card.
+    if (skillState.learned.length >= 11 && !achieveState.unlocked.includes('first_eleven_skills')) achieveState.unlocked.push('first_eleven_skills');
+  } else {
+    // G301: main.js 1011-1014 runs pc.onLoggedin() on every login_end, a new player's
+    // first included, so its eleven-skills check (player.js 217) runs on a fresh boot
+    // too: the starter skills above earn the badge now, not on the second load.
+    handleSkillCompletions([]);
   }
   const homeDemo = String(bootParams.get('homedemo') || '').toLowerCase();
   if (homeDemo) {

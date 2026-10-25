@@ -23,8 +23,8 @@ import {
   relabelWeeHarvest,
   woodTreeSide,
 } from '../public/js/pack-tree-verbs.js?v=g165-1';
-import { packTreeVerbsFeature, runPackTreeVerb } from '../public/js/features/pack-tree-verbs-feature.js?v=g296-1';
-import { getVerbsFor } from '../public/content.js?v=woodcutting-test-9';
+import { packTreeVerbsFeature, runPackTreeVerb } from '../public/js/features/pack-tree-verbs-feature.js?v=g300-1';
+import { getVerbsFor } from '../public/content.js?v=woodcutting-test-10';
 import { plotVerbs } from '../public/js/patches.js';
 import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-3';
 import { FEATURES } from '../public/js/features/index.js';

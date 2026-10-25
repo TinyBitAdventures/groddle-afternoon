@@ -42,7 +42,7 @@ import { studyGiantsLine } from '../public/js/skills-panel.js';
 import { EMITTED_EVENTS, routeQuestEvent, acceptOffer, requirementRoute } from '../public/js/quest-offers.js';
 import { createQuestState } from '../public/js/quests.js';
 import { getQuestCatalog } from '../public/js/content-catalogs.js';
-import { normalizeShrineState } from '../public/js/shrines.js?v=spinning-wheel-test-3';
+import { normalizeShrineState } from '../public/js/shrines.js?v=spinning-wheel-test-4';
 
 const root = join(import.meta.dirname, '..', 'public');
 

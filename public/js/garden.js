@@ -10,11 +10,11 @@
  * Produce counts are the GSJS seed classProps produces_count.
  */
 
-import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-6';
+import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-7';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
 import { skillPackageDetails } from './skill-packages.js';
 import { gardenGrowModifier } from './imagination-effects.js';
-import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
+import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 /** @typedef {'clean'|'seeds'|'shoots'|'crop'|'dirty'} PlotState */
@@ -1168,9 +1168,9 @@ export function waterPlot(garden, key, pc, opts = {}) {
   const er = spendEnergy(pc, cost);
   if (!er.ok) return er;
   if (!rollSucceeds(profile, opts)) {
-    // Source: a failed water still costs the package energy plus 3 mood.
-    const moodLost = Math.min(GARDEN_WATER_FAIL_MOOD, Math.max(0, pc.mood || 0));
-    if (pc.mood != null) pc.mood = (pc.mood || 0) - moodLost;
+    // Source: a failed water still costs the package energy plus 3 mood
+    // (include/garden.js 215 metabolics_lose_mood(3); G300: nothing while dead).
+    const moodLost = pc.mood != null ? loseMood(pc, GARDEN_WATER_FAIL_MOOD) : 0;
     return {
       ok: false,
       reason: 'failed',

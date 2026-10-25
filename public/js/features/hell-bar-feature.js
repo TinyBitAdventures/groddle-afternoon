@@ -28,7 +28,7 @@
  * hellBarTickets, hellBarWine, hellBarLast.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { pixiSpeed } from '../sprite-sheets.js';
 import { ensureHellItems, HELL_BARTENDER, HELL_SPRITES } from '../hell.js';

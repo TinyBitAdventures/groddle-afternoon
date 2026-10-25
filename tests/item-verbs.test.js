@@ -15,14 +15,14 @@ import {
   crunchIce,
   itemVerbButton,
   runItemVerb,
-} from '../public/js/item-verbs.js?v=item-verbs-3';
+} from '../public/js/item-verbs.js?v=item-verbs-4';
 import {
   HAIRBALL_DASH_MIN,
   homeTrophyCount,
   isTrophyClass,
   itemVerbsFeature,
 } from '../public/js/features/item-verbs-feature.js';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=homes-26';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=homes-27';
 import {
   applyAchievementProgress,
   createAchievementState,
@@ -32,7 +32,7 @@ import {
   seedAchievementNearCompletion,
   worldVerbAchievementCounters,
 } from '../public/js/achievements.js?v=badge-events-1';
-import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=item-buffs-6';
+import { applyBuff, buffPhysics, createBuffState, getBuffItemInfo, tickBuffs } from '../public/js/buffs.js?v=item-buffs-7';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 
 const publicRoot = join(dirname(fileURLToPath(import.meta.url)), '../public');

@@ -273,8 +273,9 @@ describe('other energy and mood gains ask the gate', () => {
     const crabs = read('js/features/crabs-feature.js');
     assert.match(crabs, /if \(r\.mood > 0 && metabolicGain\('mood'\)\.ok\) \{/);
     assert.match(crabs, /if \(r\.energy > 0 && metabolicGain\('energy'\)\.ok\) \{/);
-    assert.match(crabs, /if \(result\.mood && \(result\.mood < 0 \|\| metabolicGain\('mood'\)\.ok\)\) \{/);
-    assert.match(crabs, /if \(result\.energy && \(result\.energy < 0 \|\| metabolicGain\('energy'\)\.ok\)\) \{/);
+    // G300: verb changes go through both doors (shiftMetabolic: gains ask the gain gate).
+    assert.match(crabs, /const mood = shiftMetabolic\(pc, 'mood', result\.mood\);/);
+    assert.match(crabs, /const energy = shiftMetabolic\(pc, 'energy', result\.energy\);/);
   });
 
   it('tickBuffs still runs with the gate open', () => {

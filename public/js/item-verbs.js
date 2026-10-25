@@ -12,7 +12,7 @@
  */
 
 import { grantMoodXp } from './mood-xp.js';
-import { metabolicGain, loseEnergy } from './metabolics.js';
+import { metabolicGain, loseEnergy, loseMood } from './metabolics.js';
 
 const ENERGY = "You don't have enough energy to do this.";
 const DEPRESSED = 'You are too depressed to do this.';
@@ -126,7 +126,8 @@ export function crunchIce(pc, count = 1, ctx = {}) {
     // ice.js 72: stats_add_xp(3 * count, false) takes the mood bonus.
     xp = grantMoodXp(pc, 3 * n);
     if (rng() < 0.1) {
-      pc.mood = 0;
+      // ice.js 82: metabolics_set_mood(0) is metabolics_lose_mood (inc_metabolics.js 249-260; G300).
+      loseMood(pc, Number(pc.mood) || 0);
       rows.push({ counter: 'brain:frozen', amount: 1 });
       msgs.push(ICE_TEXT.freeze);
     } else {
@@ -154,14 +155,18 @@ export function runItemVerb(def, pc, ctx = {}) {
   const moodCap = Math.max(1, Number(ctx.moodMax) || 100);
   // G259: a rise goes through metabolics_add_energy / _mood (laughing_gas.js 129,
   // inc_metabolics.js 40-53, 79-86): nothing while dead or (energy) Super Pooped.
-  if (def.energy && (def.energy < 0 || metabolicGain('energy').ok)) {
+  // G300: a fall is metabolics_lose_energy / _mood (black_pepper.js 255, crying_gas.js 123,
+  // heavy_gas.js 133-141), nothing lost while dead.
+  if (def.energy < 0) effects.energy = 0 - loseEnergy(pc, -def.energy);
+  else if (def.energy && metabolicGain('energy').ok) {
     const before = Number(pc.energy) || 0;
-    pc.energy = Math.max(0, Math.min(energyCap, before + def.energy));
+    pc.energy = Math.min(energyCap, before + def.energy);
     effects.energy = pc.energy - before;
   }
-  if (def.mood && (def.mood < 0 || metabolicGain('mood').ok)) {
+  if (def.mood < 0) effects.mood = 0 - loseMood(pc, -def.mood);
+  else if (def.mood && metabolicGain('mood').ok) {
     const before = Number(pc.mood) || 0;
-    pc.mood = Math.max(0, Math.min(moodCap, before + def.mood));
+    pc.mood = Math.min(moodCap, before + def.mood);
     effects.mood = pc.mood - before;
   }
   // items/<spice|gas>.js: stats_add_xp(n, false, context) after the mood change.

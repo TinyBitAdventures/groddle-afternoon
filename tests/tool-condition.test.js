@@ -13,7 +13,7 @@ import {
   quoteToolRepair,
   repairToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js';
+} from '../public/js/tools.js?v=woodcutting-test-3';
 import { createInventory } from '../public/js/inventory.js';
 import {
   createGarden,

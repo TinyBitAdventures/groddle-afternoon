@@ -11,7 +11,7 @@ import { metabolicGain, setMetabolicGainGate } from '../public/js/metabolics.js'
 import { applyRewards, createQuestState } from '../public/js/quests.js';
 import { collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js';
 import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-10';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-11';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -148,8 +148,8 @@ describe('prompts, VOGs and the buffs tray', () => {
 
   it('buff-triggers mirrors Pooped and Super Pooped from the hell state, quietly', () => {
     const src = read('js/features/buff-triggers-feature.js');
-    assert.match(src, /import \{ hellFeature \} from '\.\/hell-feature\.js\?v=hell-12';/);
-    assert.match(read('js/features/index.js'), /hell-feature\.js\?v=hell-12/);
+    assert.match(src, /import \{ hellFeature \} from '\.\/hell-feature\.js\?v=hell-13';/);
+    assert.match(read('js/features/index.js'), /hell-feature\.js\?v=hell-13/);
     assert.match(src, /'pooped',\s*'super_pooped',\s*\]\);/);
     assert.match(src, /const QUIET_MIRRORS = new Set\(\['pooped', 'super_pooped'\]\);/);
     assert.match(src, /mirror\(engine, kind, poopedKind === kind \? Number\(hell\.pooped\?\.expiresAt\) \|\| 0 : 0\);/);

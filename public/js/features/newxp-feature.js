@@ -103,7 +103,7 @@ import {
   tutorialPhysics,
   vogPages,
 } from '../newxp.js?v=newxp-2';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-6';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js';
 import { soundForQuoin } from '../sound-moments.js';
 import { IMAGINATION_UPGRADES } from '../imagination.js';
@@ -115,7 +115,7 @@ import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g294-1';
-import { HOME_MACHINE } from '../home-ticket.js?v=g288-1';
+import { HOME_MACHINE } from '../home-ticket.js?v=g300-1';
 import { createAnimalState } from '../animals.js?v=g296-1';
 import {
   AK_ANIMALS,

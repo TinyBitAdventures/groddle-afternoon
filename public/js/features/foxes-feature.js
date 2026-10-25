@@ -33,8 +33,8 @@
  * foxRangerTalk.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
-import { getToolCondition } from '../tools.js';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
+import { getToolCondition } from '../tools.js?v=woodcutting-test-3';
 import { worldToScreen } from '../street-model.js';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY, walkSurfaceY } from '../walk-surface.js';

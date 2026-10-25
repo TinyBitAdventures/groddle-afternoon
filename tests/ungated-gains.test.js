@@ -18,7 +18,7 @@ import { performAnimalKinship } from '../public/js/animal-kinship.js';
 import { createAnimalState } from '../public/js/animals.js';
 import { performTrantCare } from '../public/js/trant-care.js';
 import { createTrantState, setTrantTables } from '../public/js/trants.js';
-import { createToolConditionState } from '../public/js/tools.js';
+import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-3';
 import { createGarden, plantPlot, plotKey } from '../public/js/garden.js';
 import { potionTendGarden } from '../public/js/master-garden.js';
 

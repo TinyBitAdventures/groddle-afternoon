@@ -8,7 +8,7 @@
  */
 
 import { getBuffCatalog } from './content-catalogs.js';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { energyMax, gainMetabolic, loseEnergy, loseMood, moodMax, shiftMetabolic } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 const SECOND = 1000;
@@ -135,18 +135,30 @@ export function studyBuffBlockReason(info, study = {}) {
   return '';
 }
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, Number(value) || 0));
-}
+/**
+ * G227 / G300: catalog_buffs.js changes energy and mood only through
+ * metabolics_add_* and metabolics_lose_* (js/metabolics.js shiftMetabolic):
+ * a rise gives nothing while dead or (energy) Super Pooped (inc_metabolics.js
+ * 40-53, 79-86), a loss nothing while dead or in the two intro scenes
+ * (108-122, 180-194).
+ */
+const shift = (pc, stat, delta) => shiftMetabolic(pc, stat, delta);
 
 /**
- * G227: catalog_buffs.js adds through metabolics_add_energy / _mood
- * (inc_metabolics.js 40-53, 79-86), which give nothing while dead or (energy)
- * Super Pooped; a rise asks the gate (js/metabolics.js), a loss never does.
+ * No-No Powder's metabolics_set_energy / _set_mood to the top
+ * (catalog_buffs.js 1466-1467, 1483-1484) is an add (inc_metabolics.js 230-263).
  */
-function gain(stat, delta) {
-  const x = Number(delta) || 0;
-  return x > 0 && !metabolicGain(stat).ok ? 0 : x;
+function toTop(pc) {
+  gainMetabolic(pc, 'energy', energyMax(pc));
+  gainMetabolic(pc, 'mood', moodMax(pc));
+}
+
+/** What changed on pc since `before`, into `effects` (an unset tank reads as 0). */
+function settle(effects, pc, beforeEnergy, beforeMood) {
+  const energy = Number(pc.energy) || 0;
+  const mood = Number(pc.mood) || 0;
+  if (energy !== beforeEnergy) effects.energy = energy - beforeEnergy;
+  if (mood !== beforeMood) effects.mood = mood - beforeMood;
 }
 
 function activeRows(state) {
@@ -236,23 +248,23 @@ function applyStartEffects(classTsid, pc) {
   const beforeEnergy = Number(pc.energy) || 0;
   const beforeMood = Number(pc.mood) || 0;
   if (classTsid === 'rookswort') {
-    pc.energy = clamp(beforeEnergy + gain('energy', 3), 0, energyCap(pc));
-    pc.mood = clamp(beforeMood - 2, 0, moodMax(pc));
+    // catalog_buffs.js 2144-2145: metabolics_lose_mood(2), metabolics_add_energy(3).
+    loseMood(pc, 2);
+    shift(pc, 'energy', 3);
   } else if (classTsid === 'silvertongue') {
-    pc.energy = clamp(beforeEnergy - 5, 0, energyCap(pc));
-    pc.mood = clamp(beforeMood + gain('mood', 5), 0, moodMax(pc));
+    // catalog_buffs.js 2297-2298: metabolics_add_mood(5), metabolics_lose_energy(5).
+    shift(pc, 'mood', 5);
+    loseEnergy(pc, 5);
   } else if (classTsid === 'no_no_powder') {
-    // catalog_buffs.js no_no_powder on_apply: both tanks to the top.
-    pc.energy = clamp(beforeEnergy + gain('energy', energyCap(pc) - beforeEnergy), 0, energyCap(pc));
-    pc.mood = clamp(beforeMood + gain('mood', moodMax(pc) - beforeMood), 0, moodMax(pc));
+    // catalog_buffs.js 1466-1467 no_no_powder on_apply: both tanks to the top.
+    toTop(pc);
   } else if (START_EFFECTS[classTsid]) {
-    // catalog_buffs.js on_apply metabolics (Gandlevery, Gandlevery Charge).
+    // catalog_buffs.js on_apply metabolics (Gandlevery 832, Gandlevery Charge 851-852): mood first.
     const start = START_EFFECTS[classTsid];
-    if (start.energy) pc.energy = clamp(beforeEnergy + gain('energy', start.energy), 0, energyCap(pc));
-    if (start.mood) pc.mood = clamp(beforeMood + gain('mood', start.mood), 0, moodMax(pc));
+    shift(pc, 'mood', start.mood);
+    shift(pc, 'energy', start.energy);
   }
-  if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
-  if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
+  settle(effects, pc, beforeEnergy, beforeMood);
   return effects;
 }
 
@@ -303,15 +315,15 @@ function applyRemoveEffects(classTsid, pc) {
   if (!pc || !end) return effects;
   const beforeEnergy = Number(pc.energy) || 0;
   const beforeMood = Number(pc.mood) || 0;
-  if (end.energy) pc.energy = clamp(beforeEnergy + gain('energy', end.energy), 0, energyCap(pc));
-  if (end.mood) pc.mood = clamp(beforeMood + gain('mood', end.mood), 0, moodMax(pc));
+  // catalog_buffs.js 265-266: Hungover adds mood, then energy.
+  shift(pc, 'mood', end.mood);
+  shift(pc, 'energy', end.energy);
   if (end.xp) {
     // catalog_buffs.js 244, 270: stats_add_xp(n, false) takes the mood bonus.
     const got = grantMoodXp(pc, end.xp);
     if (got) effects.xp = got;
   }
-  if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
-  if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
+  settle(effects, pc, beforeEnergy, beforeMood);
   return effects;
 }
 
@@ -352,10 +364,11 @@ export function activateBuffItem(state, inv, pc, classTsid, now = Date.now(), ct
 function applyTickEffect(row, pc) {
   const effects = {};
   if (!pc) return effects;
+  const beforeEnergy = Number(pc.energy) || 0;
+  const beforeMood = Number(pc.mood) || 0;
   if (row.classTsid === 'hairball_flower') {
-    const before = Number(pc.energy) || 0;
-    pc.energy = clamp(before - 5, 0, energyCap(pc));
-    if (pc.energy !== before) effects.energy = pc.energy - before;
+    // catalog_buffs.js 1013: metabolics_lose_energy(5).
+    loseEnergy(pc, 5);
   } else if (row.classTsid === 'purple_flower') {
     // catalog_buffs.js 1960: stats_add_xp(1, false).
     const got = grantMoodXp(pc, 1);
@@ -364,76 +377,50 @@ function applyTickEffect(row, pc) {
       effects.xp = got;
     }
   } else if (row.classTsid === 'well_fed_energy') {
-    const before = Number(pc.energy) || 0;
-    pc.energy = clamp(before + gain('energy', Number(row.args?.energy) || 5), 0, energyCap(pc));
-    if (pc.energy !== before) effects.energy = pc.energy - before;
+    // catalog_buffs.js 2832: metabolics_add_energy(args.energy || 5).
+    shift(pc, 'energy', Number(row.args?.energy) || 5);
   } else if (row.classTsid === 'no_no_powder') {
-    // on_tick (every second): energy and mood held at the top.
-    const beforeEnergy = Number(pc.energy) || 0;
-    const beforeMood = Number(pc.mood) || 0;
-    pc.energy = clamp(beforeEnergy + gain('energy', energyCap(pc) - beforeEnergy), 0, energyCap(pc));
-    pc.mood = clamp(beforeMood + gain('mood', moodMax(pc) - beforeMood), 0, moodMax(pc));
-    if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
-    if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
+    // on_tick (every second, 1483-1484): energy and mood held at the top.
+    toTop(pc);
   } else if (row.classTsid === 'no_no_powder_crash') {
-    // on_tick every second, acting every 60th: 3% of max energy off both tanks.
+    // on_tick every second, acting every 60th: 3% of max energy off both tanks
+    // (catalog_buffs.js 1518-1522, metabolics_lose_energy then _lose_mood).
     row.args ||= {};
     row.args.ticks = (Number(row.args.ticks) || 0) + 1;
     if (row.args.ticks % 60 === 0) {
       const loss = Math.round(energyCap(pc) * 0.03);
-      const beforeEnergy = Number(pc.energy) || 0;
-      const beforeMood = Number(pc.mood) || 0;
-      pc.energy = clamp(beforeEnergy - loss, 0, energyCap(pc));
-      pc.mood = clamp(beforeMood - loss, 0, moodMax(pc));
-      if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
-      if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
+      loseEnergy(pc, loss);
+      loseMood(pc, loss);
     }
   } else if (row.classTsid === 'buff_buzzed') {
-    // on_tick (every minute): +3 mood, -7 energy.
-    const beforeEnergy = Number(pc.energy) || 0;
-    const beforeMood = Number(pc.mood) || 0;
-    pc.mood = clamp(beforeMood + gain('mood', 3), 0, moodMax(pc));
-    pc.energy = clamp(beforeEnergy - 7, 0, energyCap(pc));
-    if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
-    if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
+    // on_tick (every minute, catalog_buffs.js 224-225): metabolics_add_mood(3), metabolics_lose_energy(7).
+    shift(pc, 'mood', 3);
+    loseEnergy(pc, 7);
   } else if (row.classTsid === 'hairball_dash') {
-    // on_tick (every 15 s): -5 energy.
-    const before = Number(pc.energy) || 0;
-    pc.energy = clamp(before - 5, 0, energyCap(pc));
-    if (pc.energy !== before) effects.energy = pc.energy - before;
+    // on_tick (every 15 s, catalog_buffs.js 993): metabolics_lose_energy(5).
+    loseEnergy(pc, 5);
   } else if (row.classTsid === 'savoring_experience') {
-    // on_tick (every 10 s): metabolics_add_mood(0.05 * mood).
-    const before = Number(pc.mood) || 0;
-    pc.mood = clamp(before + gain('mood', Math.round(0.05 * before)), 0, moodMax(pc));
-    if (pc.mood !== before) effects.mood = pc.mood - before;
-  } else if (DRINK_TICKS[row.classTsid]) {
-    // catalog_buffs.js on_tick for the drink, food and herb buffs (DRINK_TICKS).
-    const tick = DRINK_TICKS[row.classTsid];
-    const beforeEnergy = Number(pc.energy) || 0;
-    const beforeMood = Number(pc.mood) || 0;
-    if (tick.energy) pc.energy = clamp(beforeEnergy + gain('energy', tick.energy), 0, energyCap(pc));
-    if (tick.mood) pc.mood = clamp(beforeMood + gain('mood', tick.mood), 0, moodMax(pc));
+    // on_tick (every 10 s, catalog_buffs.js 2284): metabolics_add_mood(0.05 * mood).
+    shift(pc, 'mood', Math.round(0.05 * beforeMood));
+  } else if (DRINK_TICKS[row.classTsid] || HOLIDAY_TICKS[row.classTsid]) {
+    // catalog_buffs.js on_tick for the drink, food and herb buffs (DRINK_TICKS)
+    // and the seasonal treats (HOLIDAY_TICKS, js/seasons.js): mood first, then
+    // energy, as every one of them is written except Full of Pie (818-819).
+    const tick = DRINK_TICKS[row.classTsid] || HOLIDAY_TICKS[row.classTsid];
+    if (row.classTsid === 'full_of_pie') {
+      shift(pc, 'energy', tick.energy);
+      shift(pc, 'mood', tick.mood);
+    } else {
+      shift(pc, 'mood', tick.mood);
+      shift(pc, 'energy', tick.energy);
+    }
     if (tick.xp) {
       // catalog_buffs.js 449, 780: stats_add_xp(n, false).
       const got = grantMoodXp(pc, tick.xp);
       if (got) effects.xp = got;
     }
-    if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
-    if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
-  } else if (HOLIDAY_TICKS[row.classTsid]) {
-    // catalog_buffs.js on_tick for the seasonal treats (js/seasons.js).
-    const tick = HOLIDAY_TICKS[row.classTsid];
-    const beforeEnergy = Number(pc.energy) || 0;
-    const beforeMood = Number(pc.mood) || 0;
-    if (tick.energy) pc.energy = clamp(beforeEnergy + gain('energy', tick.energy), 0, energyCap(pc));
-    if (tick.mood) pc.mood = clamp(beforeMood + gain('mood', tick.mood), 0, moodMax(pc));
-    if (tick.xp) {
-      const got = grantMoodXp(pc, tick.xp);
-      if (got) effects.xp = got;
-    }
-    if (pc.energy !== beforeEnergy) effects.energy = pc.energy - beforeEnergy;
-    if (pc.mood !== beforeMood) effects.mood = pc.mood - beforeMood;
   }
+  settle(effects, pc, beforeEnergy, beforeMood);
   return effects;
 }
 

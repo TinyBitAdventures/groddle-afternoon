@@ -6,7 +6,7 @@
  * - items/include/shrines.js
  */
 
-import { addItem, ensureItem } from './inventory.js?v=catalog-unified-6';
+import { addItem, ensureItem } from './inventory.js?v=catalog-unified-7';
 import { musicblockItemMeta } from './musicblocks.js';
 
 export const GAMESHOW_TICKET_ID = 'gameshow_ticket';

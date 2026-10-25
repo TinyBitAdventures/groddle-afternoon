@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { setMetabolicGainGate } from '../public/js/metabolics.js';
 import { createInventory, useItem } from '../public/js/inventory.js';
 import { createShrineState, donateToShrine } from '../public/js/shrines.js';
-import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js';
+import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-3';
 import { HERDKEEPING, capturePiggy, normalizeHusbandryPack } from '../public/js/animal-husbandry.js';
 import { KITTY_PET, createKitty, petKitty } from '../public/js/heli-kitties.js';
 import { createMusicblockState, playMusicblock } from '../public/js/musicblocks.js';

@@ -40,7 +40,7 @@
  * treeGuilt, treeDeaths, treePoisonAutoplay.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-6';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-7';
 import { moodMax } from '../metabolics.js';
 import { plantChoices } from '../patches.js';
 import { textureFromUrl } from '../textures.js';
@@ -71,7 +71,7 @@ import {
   quotePoisonVerb,
   treeDeathOutcome,
 } from '../tree-poison.js';
-import { patchesFeature } from './patches-feature.js?v=patches-13';
+import { patchesFeature } from './patches-feature.js?v=patches-14';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';

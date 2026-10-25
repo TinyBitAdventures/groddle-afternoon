@@ -30,8 +30,8 @@ import {
   splitConversation,
   stepFox,
 } from '../public/js/foxes.js';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-6';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-3';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import {
   inReach,

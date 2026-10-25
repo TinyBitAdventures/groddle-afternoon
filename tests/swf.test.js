@@ -24,9 +24,9 @@ import {
   swfVerbs,
   wrangleMessage,
 } from '../public/js/swf.js?v=g190-1';
-import { swfFeature } from '../public/js/features/swf-feature.js?v=g294-1';
+import { swfFeature } from '../public/js/features/swf-feature.js?v=g300-1';
 import { FEATURES } from '../public/js/features/index.js';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-6';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import { DROP_ITEMS, DROP_TABLES } from '../public/js/drop-tables-data.js';
 
 const here = dirname(fileURLToPath(import.meta.url));

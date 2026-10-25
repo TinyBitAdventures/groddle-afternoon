@@ -31,9 +31,9 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
-import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=catalog-unified-6';
+import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js';
-import { energyMax, metabolicGain, moodMax } from '../metabolics.js';
+import { energyMax, loseMood, metabolicGain, moodMax, shiftMetabolic } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { getGameDayKey } from '../game-day.js';
 import { cleanQuestMarkup } from '../quests.js';
@@ -385,8 +385,9 @@ function onSettle(engine, row) {
   }
   if (settled.moodLoss) {
     const before = pc.mood || 0;
-    pc.mood = Math.max(0, before - settled.moodLoss);
-    effects.mood = pc.mood - before;
+    // npc_crab.js 527: metabolics_lose_mood(20) (G300: nothing while dead).
+    loseMood(pc, settled.moodLoss);
+    effects.mood = (pc.mood || 0) - before;
   }
   if (settled.destroyBlock && countItem(inv, settled.destroyBlock) > 0) {
     removeItem(inv, settled.destroyBlock, 1);
@@ -439,17 +440,13 @@ function runCrabVerb(engine, crab, verb) {
   if (!result) return;
   const pc = engine.pc;
   const effects = { items: {} };
-  // G227: a rise asks the metabolic gate (dead, Super Pooped); a loss never does.
-  if (result.mood && (result.mood < 0 || metabolicGain('mood').ok)) {
-    const before = pc.mood || 0;
-    pc.mood = Math.max(0, Math.min(moodMax(pc), before + result.mood));
-    if (pc.mood !== before) effects.mood = pc.mood - before;
-  }
-  if (result.energy && (result.energy < 0 || metabolicGain('energy').ok)) {
-    const before = pc.energy || 0;
-    pc.energy = Math.max(0, Math.min(energyMax(pc), before + result.energy));
-    if (pc.energy !== before) effects.energy = pc.energy - before;
-  }
+  // G227: a rise asks the metabolic gate (dead, Super Pooped).
+  // G300: and a fall goes through metabolics_lose_* (npc_crab.js 237, 250, 296
+  // lose_energy; 340, 384 the pinch's lose_mood).
+  const mood = shiftMetabolic(pc, 'mood', result.mood);
+  if (mood) effects.mood = mood;
+  const energy = shiftMetabolic(pc, 'energy', result.energy);
+  if (energy) effects.energy = energy;
   for (const [id, n] of Object.entries(result.items)) {
     addItem(engine.inv, id, n);
     effects.items[CRAB_ITEMS[id]?.label || id] = n;

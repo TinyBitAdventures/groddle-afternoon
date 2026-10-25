@@ -31,7 +31,7 @@ import {
   countItem,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=catalog-unified-6';
+} from '../public/js/inventory.js?v=catalog-unified-7';
 import {
   loadRecipeCatalogFromFile,
   listRecipesForTool,
@@ -293,7 +293,7 @@ describe('game wiring', () => {
     assert.match(src, /spawnMineRocks/);
     assert.match(src, /starterMiningTools/);
     assert.match(src, /STARTER_MINING_SKILLS/);
-    assert.match(src, /from '\.\/js\/mining\.js\?v=g296-1'/);
+    assert.match(src, /from '\.\/js\/mining\.js\?v=g300-1'/);
     const preloadedSheets = {
       mineRockMetal: [137, 100],
       mineRockDullite: [131, 114],

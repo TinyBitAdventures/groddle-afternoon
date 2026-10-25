@@ -47,7 +47,7 @@ import {
   listPackItemSlots,
   listPackToolSlots,
   listPackRows,
-} from '../public/js/inventory.js?v=catalog-unified-6';
+} from '../public/js/inventory.js?v=catalog-unified-7';
 import {
   buildActivitySegments,
   activitySegmentsToHtml,

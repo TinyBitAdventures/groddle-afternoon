@@ -22,8 +22,8 @@ import {
   rollSlothBonusSnails,
   taskLimitMultiplier,
 } from '../public/js/imagination-effects.js';
-import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-6';
-import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js';
+import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
+import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-3';
 import {
   DEFAULT_TASK_LIMIT,
   RECIPE_CATALOG,

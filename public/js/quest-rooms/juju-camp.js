@@ -42,6 +42,7 @@
  */
 
 import { onLoaded, textureFromUrl } from '../textures.js';
+import { loseMood } from '../metabolics.js';
 import { JUJU_CAMP_FILES } from '../juju-camp-art.js';
 
 const Q1 = 'help_juju_bandits';
@@ -972,11 +973,11 @@ function celebrate(w) {
   if (h.celebrated) return;
   h.celebrated = true;
   const pc = w.engine.pc;
-  const before = Number(pc?.mood) || 0;
-  if (pc) pc.mood = Math.max(0, before - 2);
+  // juju_paperweight.js 58: metabolics_lose_mood(2) (G300: nothing while dead).
+  const lost = pc ? loseMood(pc, 2) : 0;
   w.activity(`You celebrated. ${TEXT.celebrate}`);
   const p = w.engine.player;
-  if (p && before > 0) w.floatText(p.x, p.y - 90, `-${Math.min(2, before)} mood`, '#ffd0c4');
+  if (p && lost > 0) w.floatText(p.x, p.y - 90, `-${lost} mood`, '#ffd0c4');
   w.engine.updateHud?.();
   w.save();
 }

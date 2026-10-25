@@ -6,7 +6,7 @@
  * was last heard. The tunes are Tiny Speck's CC0 recordings (sound-key catalog).
  */
 
-import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-6';
+import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-7';
 import { GAME_DAY_MS } from './game-day.js';
 import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';

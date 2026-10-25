@@ -101,10 +101,10 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js';
-import { moodMax, loseEnergy } from '../metabolics.js';
+import { loseEnergy, shiftMetabolic } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g294-1';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g300-1';
 import { grantMoodXp } from '../mood-xp.js';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
@@ -1908,9 +1908,11 @@ export const animalHusbandryFeature = {
       if (baby.extraVerb && verbId === baby.extraVerb.id) {
         // chick.js smile_at / piglet.js hum_to have their own lines where the baby is sad.
         const v = sad && SAD_BABY[classTsid]?.extraVerb ? { ...baby.extraVerb, ...SAD_BABY[classTsid].extraVerb } : baby.extraVerb;
-        if (v.energy) engine.pc.energy = Math.max(0, (engine.pc.energy || 0) + v.energy);
-        engine.pc.mood = Math.max(0, Math.min(moodMax(engine.pc), (engine.pc.mood || 0) + v.mood));
-        engine.pushActivity({ base: v.msg, effects: { energy: v.energy, mood: v.mood } });
+        // G300: piglet.js 108-134 and chick.js 104-114 change mood, then energy, through
+        // metabolics_add_* / metabolics_lose_* (nothing lost or gained while dead).
+        const mood = shiftMetabolic(engine.pc, 'mood', v.mood);
+        const energy = shiftMetabolic(engine.pc, 'energy', v.energy);
+        engine.pushActivity({ base: v.msg, effects: { energy, mood } });
         emit(engine, `${classTsid}:${v.id}`);
         engine.updateHud();
         return true;

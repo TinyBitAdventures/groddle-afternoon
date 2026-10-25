@@ -38,7 +38,7 @@
  * `killTree` are the hooks; trees grown here die through `killPlotTree`.
  */
 
-import { ensureItem } from '../inventory.js?v=catalog-unified-6';
+import { ensureItem } from '../inventory.js?v=catalog-unified-7';
 import { platformYAt } from '../street-model.js';
 import { getStreetEcologyCatalog, streetEcologyAliases } from '../street-ecology.js?v=official-ecology-6';
 import { trantStatusLabel } from '../trants.js?v=trant-harvest-2';

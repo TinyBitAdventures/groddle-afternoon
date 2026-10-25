@@ -8,8 +8,8 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-6';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js';
+import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-7';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-3';
 import {
   MACHINE_ASSEMBLIES,
   MACHINE_PART_ITEMS,

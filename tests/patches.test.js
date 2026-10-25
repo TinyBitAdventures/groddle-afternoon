@@ -24,7 +24,7 @@ import {
   tickPlot,
   archivedSeedlingTrant,
 } from '../public/js/patches.js';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-3';
 
 const seq = (...values) => {
   let i = 0;

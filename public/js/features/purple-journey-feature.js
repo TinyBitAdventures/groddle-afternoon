@@ -33,15 +33,15 @@
  *   purpleRoom, purpleScions, purpleQuoins, purpleLast, purpleVog.
  */
 
-import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-6';
-import { moodMax } from '../metabolics.js';
+import { addItem, countItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-7';
+import { shiftMetabolic } from '../metabolics.js';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 import { playPoofIn } from '../overlay-art.js?v=g294-1';
 import { STREET_INDEX } from '../street-loader.js';
 import { getAchievementCatalog } from '../content-catalogs.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-3';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import {
   EMPEROR,
   ESSENCE,
@@ -61,7 +61,7 @@ import {
   scionWords,
 } from '../purple-journey.js?v=g150-2';
 import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=g150-1';
-import { homesFeature } from './homes-feature.js?v=homes-26';
+import { homesFeature } from './homes-feature.js?v=homes-27';
 
 export const PURPLE_FEATURE_ID = 'purple-journey';
 /** The scene's own TSID (the template is LNVV4OTMAUG2PQV). */
@@ -104,8 +104,9 @@ function isDead(engine) {
 
 function addMood(engine, delta) {
   const pc = engine.pc;
-  const before = Number(pc.mood) || 0;
-  pc.mood = Math.max(0, Math.min(moodMax(pc), before + delta));
+  // inc_special_locations.js 331-356: metabolics_add_mood(5 / 10), then
+  // metabolics_lose_mood(5 / 10), both through the doors (G300).
+  shiftMetabolic(pc, 'mood', delta);
   engine.refreshPack?.();
 }
 

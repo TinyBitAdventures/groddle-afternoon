@@ -49,10 +49,10 @@
  *   powderCharges, powderNoNo, powderTreesGrown.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { getGameDayKey } from '../game-day.js';
 import { isPooped } from '../hell.js';
-import { metabolicGain, moodMax, loseEnergy } from '../metabolics.js';
+import { metabolicGain, moodMax, loseEnergy, loseMood } from '../metabolics.js';
 import {
   POWDERS,
   POWDER_TEXT,
@@ -69,9 +69,9 @@ import {
   sprinkleHallowed,
   usePowderCharge,
 } from '../powders.js?v=powders-1';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-3';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { DEAD_TRANT_CLASSES } from '../patches.js';
-import { hellFeature } from './hell-feature.js?v=hell-12';
+import { hellFeature } from './hell-feature.js?v=hell-13';
 import { grantMoodXp } from '../mood-xp.js';
 
 export const POWDERS_FEATURE_ID = 'powders';
@@ -197,7 +197,7 @@ const RUNNERS = {
 
   sneezing_powder(engine, classTsid) {
     const pc = engine.pc;
-    pc.mood = Math.max(0, (Number(pc.mood) || 0) - 2);
+    loseMood(pc, 2); // sneezing_powder.js 297 metabolics_lose_mood(2) (G300)
     say(engine, POWDER_TEXT.sneezing);
     const x = nearestPlayerX(engine);
     const y = Number(engine.player?.y) || 0;
@@ -291,7 +291,7 @@ const RUNNERS = {
 
   krazy_salts(engine, classTsid) {
     const pc = engine.pc;
-    pc.mood = Math.max(0, (Number(pc.mood) || 0) - 2);
+    loseMood(pc, 2); // krazy_salts.js 111 metabolics_lose_mood(2) (G300)
     say(engine, POWDER_TEXT.krazy);
     notify(engine, classTsid, 'push');
     engine.updateHud?.();

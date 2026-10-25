@@ -33,9 +33,9 @@
  * funpicklePowers, funpickleAward, funpickleSneezes, funpickleOverlay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-6';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { ITEM_BASE_COSTS } from '../store-catalog.js';
-import { moodMax } from '../metabolics.js';
+import { shiftMetabolic } from '../metabolics.js';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { landingY, nearestSurfaceY } from '../walk-surface.js';
@@ -164,11 +164,10 @@ function eligible(engine, tsid) {
 function changeMood(engine, delta) {
   const pc = engine.pc;
   if (!pc) return 0;
-  if (delta < 0 && engine.metabolicGate?.('mood', 'loss')?.ok === false) return 0;
-  const before = Number(pc.mood) || 0;
-  pc.mood = Math.max(0, Math.min(moodMax(pc), before + delta));
+  // G300: through the doors (js/metabolics.js shiftMetabolic).
+  const changed = shiftMetabolic(pc, 'mood', delta);
   engine.updateHud?.();
-  return pc.mood - before;
+  return changed;
 }
 
 /** The mood the source gave every other player on the street, over your companions. */

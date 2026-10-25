@@ -29,7 +29,7 @@
  * is not wired here (see the header of js/patches.js).
  */
 
-import { metabolicGain } from './metabolics.js';
+import { loseMood, metabolicGain } from './metabolics.js';
 
 export const TREE_POISON = 'potion_tree_poison';
 export const TREE_ANTIDOTE = 'potion_tree_poison_antidote';
@@ -313,9 +313,8 @@ export function performPoisonPour(state, ctx = {}) {
   let moodLost = 0;
   if (guiltChange.moodCost && ctx.pc) {
     const cost = poisonMoodCost(ctx.guilt, ctx.maxMood);
-    const before = Number(ctx.pc.mood) || 0;
-    ctx.pc.mood = Math.max(0, before - cost);
-    moodLost = before - ctx.pc.mood;
+    // tree_poison.js 321: metabolics_lose_mood(getMoodCost) (G300: nothing while dead).
+    moodLost = loseMood(ctx.pc, cost);
   }
   applyTreePoison(state, now, ctx.durationMs);
   const bottle = ctx.bottles ? useBottle(ctx.bottles, TREE_POISON, ctx.inv) : { ok: true, emptied: false };

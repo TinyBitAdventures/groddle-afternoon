@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=trant-care-test-3';
+} from './js/trant-care.js?v=trant-care-test-4';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -28,7 +28,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=g296-1';
+} from './js/garden.js?v=g300-1';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -38,7 +38,7 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=g296-1';
+} from './js/mining.js?v=g300-1';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
@@ -54,7 +54,7 @@ import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=g289-1';
+} from './js/musicblocks.js?v=g300-1';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-2';
 import {
   ensureWoodTreeState,
@@ -78,7 +78,7 @@ import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js';
 import { levelInfoForXp } from './js/progression.js?v=progression-1';
 import { getGameDayKey } from './js/game-day.js?v=dametime-1';
-import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-6';
+import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-7';
 
 /** Naming / capture context for an animal target (the back yard counts as yours). */
 function husbandryCtx(ctx) {

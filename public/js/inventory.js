@@ -6,7 +6,7 @@
 /** @typedef {Record<string, number>} Inventory */
 
 /** Canonical icon path for a class_tsid (OGA iconic extract). */
-import { metabolicGain, moodMax } from './metabolics.js';
+import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js';
 export function itemIcon(classTsid) {
   if (!classTsid) return 'assets/sprites/icons/apple.png';
   return `assets/sprites/icons/${classTsid}.png`;
@@ -393,18 +393,21 @@ export function useItem(inv, pc, classTsid) {
   // G259: drink_drink and food_eat add through metabolics_add_energy / _mood
   // (items/include/drink.js 66, 88; food.js 123), which give nothing while
   // dead or (energy) Super Pooped and say so (inc_metabolics.js 40-53, 79-86).
-  // The drink is still drunk; a loss never asks.
+  // The drink is still drunk either way.
+  // G300: a fall is metabolics_lose_energy / _mood (drink.js 75-76, 97-98), nothing while dead.
   const addEnergy = () => {
     if (!info.effects.energy || (info.effects.energy > 0 && !metabolicGain('energy').ok)) return;
     const before = pc.energy || 0;
-    pc.energy = Math.max(0, Math.min(Math.max(100, Number(pc.energyMax) || 100), before + info.effects.energy));
-    if (pc.energy !== before) effects.energy = pc.energy - before;
+    if (info.effects.energy < 0) loseEnergy(pc, -info.effects.energy);
+    else pc.energy = Math.min(Math.max(100, Number(pc.energyMax) || 100), before + info.effects.energy);
+    if ((pc.energy || 0) !== before) effects.energy = (pc.energy || 0) - before;
   };
   const addMood = () => {
     if (!info.effects.mood || (info.effects.mood > 0 && !metabolicGain('mood').ok)) return;
     const before = pc.mood || 0;
-    pc.mood = Math.max(0, Math.min(moodMax(pc), before + info.effects.mood));
-    if (pc.mood !== before) effects.mood = pc.mood - before;
+    if (info.effects.mood < 0) loseMood(pc, -info.effects.mood);
+    else pc.mood = Math.min(moodMax(pc), before + info.effects.mood);
+    if ((pc.mood || 0) !== before) effects.mood = (pc.mood || 0) - before;
   };
   // G268: drink_drink adds mood first, then energy (drink.js 66, then 88), so
   // a dead drinker hears the mood line before the energy line; food_eat

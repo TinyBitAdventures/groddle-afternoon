@@ -52,10 +52,10 @@
  * last release: released:respawned|new:<key>, or failed:<reason>).
  */
 
-import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=catalog-unified-6';
+import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=catalog-unified-7';
 import { platformYAt } from '../street-model.js';
 import { hiresSpriteUrl } from '../sprite-hires.js';
-import { rollResourceNodeDrop } from './drops-feature.js?v=drops-3';
+import { rollResourceNodeDrop } from './drops-feature.js?v=drops-4';
 import { rollSlothBonusSnails } from '../imagination-effects.js';
 import {
   DUST_TRAP_DROP_ITEM_DEFS,

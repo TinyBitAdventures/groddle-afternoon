@@ -30,7 +30,7 @@
  * partyAmbience, partyMusic, partyLast, partyDemo, partyTeleporter.
  */
 
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=catalog-unified-6';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG, itemIcon } from '../inventory.js?v=catalog-unified-7';
 import { teleportEnergyCost } from '../teleportation.js';
 import {
   PARTY_GUESTS,

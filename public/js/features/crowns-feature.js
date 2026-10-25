@@ -50,7 +50,7 @@ import {
 } from '../game-of-crowns.js?v=crowns-1';
 import { RACE_RIVALS } from '../races.js?v=races-4';
 import { wallsScreen } from '../street-model.js';
-import { addItem } from '../inventory.js?v=catalog-unified-6';
+import { addItem } from '../inventory.js?v=catalog-unified-7';
 import { textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 

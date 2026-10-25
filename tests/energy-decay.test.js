@@ -17,9 +17,9 @@ import {
   periodicEnergyLoss,
 } from '../public/js/energy-decay.js?v=g258-1';
 // The feature imports these with their browser cache tags; load the same module instances.
-import { energyDecayContext, energyDecayFeature, runEnergyLossTick } from '../public/js/features/energy-decay-feature.js?v=g294-1';
-import { __newxpTest } from '../public/js/features/newxp-feature.js?v=g294-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-12';
+import { energyDecayContext, energyDecayFeature, runEnergyLossTick } from '../public/js/features/energy-decay-feature.js?v=g300-1';
+import { __newxpTest } from '../public/js/features/newxp-feature.js?v=g300-1';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-13';
 import { HELL_TEXT } from '../public/js/hell.js';
 import { SCENE_TSIDS } from '../public/js/newxp.js?v=newxp-2';
 import { createQuestState } from '../public/js/quests.js';
@@ -169,7 +169,7 @@ describe('energy decay feature', () => {
   });
 
   it('is registered with the feature host', () => {
-    assert.match(read('public/js/features/index.js'), /energy-decay-feature\.js\?v=g294-1'; FEATURES\.push\(energyDecayFeature\);/);
+    assert.match(read('public/js/features/index.js'), /energy-decay-feature\.js\?v=g300-1'; FEATURES\.push\(energyDecayFeature\);/);
   });
 });
 

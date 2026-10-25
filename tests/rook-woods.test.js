@@ -33,7 +33,7 @@ import {
 import {
   createToolConditionState,
   setToolRemaining,
-} from '../public/js/tools.js';
+} from '../public/js/tools.js?v=woodcutting-test-3';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

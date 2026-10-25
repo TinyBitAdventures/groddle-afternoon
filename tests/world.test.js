@@ -29,7 +29,7 @@ import {
   useItem,
   countItem,
   ITEM_CATALOG,
-} from '../public/js/inventory.js?v=catalog-unified-6';
+} from '../public/js/inventory.js?v=catalog-unified-7';
 import { getVerbsFor, runVerb } from '../public/content.js';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 

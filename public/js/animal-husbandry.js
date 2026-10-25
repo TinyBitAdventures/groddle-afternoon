@@ -34,9 +34,9 @@
  *   (rolled with the shared js/drop-tables.js runDropTable).
  */
 
-import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-6';
+import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-7';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
-import { loseEnergy, metabolicGain, moodMax } from './metabolics.js';
+import { loseEnergy, loseMood, metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { musicblockItemMeta } from './musicblocks.js';
 import { isEnchantedForest } from './enchanted-forests.js?v=g289-1';
@@ -812,8 +812,9 @@ export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', no
     };
   }
   const before = pc.mood || 0;
-  pc.mood = Math.max(0, before - HERDKEEPING.failMood);
-  effects.mood = pc.mood - before;
+  // npc_piggy.js 515: a failed capture is metabolics_lose_mood(30) (G300: nothing while dead).
+  loseMood(pc, HERDKEEPING.failMood);
+  effects.mood = (pc.mood || 0) - before;
   return { ok: false, attempted: true, effects, bubble: pick(PIGGY_CAPTURE_RESPONSES.capture_failed, rng), msg: 'You failed to capture the Piggy.' };
 }
 

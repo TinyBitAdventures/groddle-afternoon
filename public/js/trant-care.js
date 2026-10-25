@@ -9,10 +9,10 @@
  * - items/wood_tree.js: Wood Tree tending gates
  */
 
-import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js';
+import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
 import { fruitCapacityAt } from './trants.js?v=trant-harvest-2';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
-import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
+import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 const freezeRanks = (ranks) => Object.freeze(
@@ -126,7 +126,8 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
   if (!success) {
     const moodBefore = Number(pc.mood) || 0;
     if (kind === 'pet' && classId !== 'wood_tree' && profile.moodBonus) {
-      pc.mood = Math.max(0, moodBefore - profile.moodBonus);
+      // include/trants.js 97: metabolics_lose_mood(mood_bonus) (G300: nothing while dead).
+      loseMood(pc, profile.moodBonus);
     }
     return {
       ok: false,

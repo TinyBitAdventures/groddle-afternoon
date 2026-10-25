@@ -65,7 +65,7 @@
 
 import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
 import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js';
-import { moodMax } from '../metabolics.js';
+import { gainMetabolic, loseMood } from '../metabolics.js';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g294-1';
 import { GWENDOLYN_INNER_FILES } from './gwendolyn-inner-art.js';
@@ -627,10 +627,10 @@ function heatBuff(ctx, id) {
 /** on_tick: the red flash, metabolics_lose_mood(3), "So hot! -N mood!", never below 3. */
 export function heatTick(pc, buffId) {
   const def = HEAT[buffId];
-  const before = Math.max(0, Number(pc.mood) || 0);
-  pc.mood = Math.max(0, before - def.mood);
-  const actual = before - pc.mood;
-  if (pc.mood === 0) pc.mood = Math.min(moodMax(pc), 3);
+  // catalog_buffs.js 1114, 1132: metabolics_lose_mood(3), then metabolics_add_mood(3, true)
+  // at zero; both through the doors (G300), so the dead lose nothing.
+  const actual = loseMood(pc, def.mood);
+  if ((Number(pc.mood) || 0) === 0) gainMetabolic(pc, 'mood', 3, { quiet: true });
   return actual;
 }
 

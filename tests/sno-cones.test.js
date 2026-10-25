@@ -17,7 +17,7 @@ import {
   eatSnoCone,
   snoConeEatButton,
   snoConeMelted,
-} from '../public/js/sno-cones.js?v=g148-1';
+} from '../public/js/sno-cones.js?v=g300-1';
 import { BEMOAN_VERB, snoConesFeature } from '../public/js/features/sno-cones-feature.js';
 import {
   applyAchievementProgress,

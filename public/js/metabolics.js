@@ -95,3 +95,17 @@ export function gainMetabolic(pc, stat, amount, opts = {}) {
   pc[stat] = Math.max(before, Math.min(top, before + x));
   return pc[stat] - before;
 }
+
+/**
+ * G300: a signed catalog delta (buff ticks, drinks, spices, gases): a rise
+ * goes through gainMetabolic (metabolics_add_*), a fall through
+ * loseEnergy / loseMood (metabolics_lose_*), as the source branches on the
+ * sign (items/include/drink.js 65-106). Returns the signed change that landed.
+ */
+export function shiftMetabolic(pc, stat, delta, opts = {}) {
+  const x = Number(delta) || 0;
+  if (stat !== 'energy' && stat !== 'mood') return 0;
+  if (x > 0) return gainMetabolic(pc, stat, x, opts);
+  if (x < 0) return 0 - spend(pc, stat, -x, opts);
+  return 0;
+}
