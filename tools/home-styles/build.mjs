@@ -12,7 +12,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PURCHASE_STREET_STYLE, RECIPES, YARD_LOOKS } from './recipes.mjs';
+import { PURCHASE_STREET_STYLE, PURCHASE_YARD_STYLE, RECIPES, YARD_LOOKS } from './recipes.mjs';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const GSJS = join(spike, '../glitch-GameServerJS/inc_data_homes_prod.js');
@@ -153,6 +153,9 @@ function render(data) {
     '',
     '/** The street style each purchase look (js/homes.js HOME_STYLES) starts on. */',
     `export const PURCHASE_STREET_STYLE = Object.freeze(${JSON.stringify(PURCHASE_STREET_STYLE)});`,
+    '',
+    '/** The yard style each purchase look starts on (items/magic_rock.js 594-605). */',
+    `export const PURCHASE_YARD_STYLE = Object.freeze(${JSON.stringify(PURCHASE_YARD_STYLE)});`,
     '',
   ];
   return lines.join('\n');

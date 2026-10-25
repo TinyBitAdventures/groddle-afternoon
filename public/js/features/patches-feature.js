@@ -193,6 +193,8 @@ function surfaceNear(platforms, x, refY) {
 // ---------------------------------------------------------------------------
 
 let entities = [];
+// G270: this street's plots from onStreetEnter, before their views (and targets) exist.
+let plannedItems = [];
 let generation = 0;
 let lastTickAt = 0;
 let lastVerb = '';
@@ -290,6 +292,29 @@ function publish(engine) {
 // Views
 // ---------------------------------------------------------------------------
 
+/** The class a plot's target carries: the grown tree, a seedling, the dead trant, or the soil. */
+function plotClassId(plot) {
+  if (plot.stage === 'tree') return plot.tree.classId;
+  if (plot.stage === 'seedling') return 'patch_seedling';
+  return plot.stage === 'dead' ? plot.deadClass : plot.kind;
+}
+
+/**
+ * G270: { classId } rows for the plots planned on this street (or adopted
+ * since) that have no target yet. Pure.
+ */
+export function pendingPlotRows(planned = [], live = []) {
+  const shown = new Set(live.filter((e) => e?.target).map((e) => e.key));
+  const rows = [];
+  const seen = new Set();
+  for (const item of [...planned, ...live]) {
+    if (!item?.plot || seen.has(item.key)) continue;
+    seen.add(item.key);
+    if (!shown.has(item.key)) rows.push({ classId: plotClassId(item.plot) });
+  }
+  return rows;
+}
+
 function dropView(engine, entity) {
   if (entity.target) engine.unregister(entity.target);
   entity.target = null;
@@ -351,7 +376,7 @@ async function buildView(engine, entity, myGeneration, { grow = false } = {}) {
   engine.entityLayer.addChild(sprite);
   entity.sprite = sprite;
   entity.target = engine.register({
-    classId: plot.stage === 'seedling' ? 'patch_seedling' : dead ? plot.deadClass : plot.kind,
+    classId: plotClassId(plot),
     featureId: PATCHES_FEATURE_ID,
     label: plotLabel(plot),
     subtitle: plotStatusLabel(plot, Date.now()),
@@ -747,6 +772,7 @@ export const patchesFeature = {
     let planned = [...soilSpawnPlan(counts, (key) => engine.placement(key)), ...adoptedPlan(slot)];
     planned = setupDemo(engine, slot, planned);
     const items = prepareStreetPlots(slot, planned, { tsid: engine.streetTsid, hubId: hubIdOf(engine), now });
+    plannedItems = items;
     // Catch up on time spent away (seedlings, regrowth, tree maturity).
     for (const item of items) {
       resetPlotDayIfStale(item.plot, lastNewDayAt, Math.random, now);
@@ -768,7 +794,18 @@ export const patchesFeature = {
     stopToolFx();
     effects.length = 0;
     entities = [];
+    plannedItems = [];
     demoEntity = null;
+  },
+
+  /**
+   * G270: the plots whose art is still loading, as { classId } rows, so the
+   * loading card counts them (location.js getLoadingInfo counts every patch,
+   * patch_dark and trant in this.items, drawn or not). game.js adds these to
+   * its interactables for loadingCardDetails.
+   */
+  pendingTargets() {
+    return pendingPlotRows(plannedItems, entities);
   },
 
   onTick(dtMs, now, engine) {

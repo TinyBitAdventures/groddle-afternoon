@@ -92,7 +92,7 @@ test.describe('integration playtest regressions', () => {
     assert.equal((game.match(/via: 'signpost' \}\)/g) || []).length, 2, 'T and signpost-board clicks both say signpost');
   });
 
-  test('clicking a street mailbox goes through its feature, not the home deed gate', () => {
+  test('clicking a street mailbox goes through its feature, not the home mailbox gate', () => {
     assert.match(game, /if \(best\.classId === 'npc_mailbox'\) \{[\s\S]{0,200}?executeVerb\(best, 'view_inbox'\);/);
   });
 

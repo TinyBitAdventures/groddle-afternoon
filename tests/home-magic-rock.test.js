@@ -25,13 +25,15 @@ import {
 import {
   CULTIVATION_REWARDS_CAP,
   HOUSE_SIGN,
+  HOUSE_SIGN_ART_DIR,
   dailyImgCounters,
+  houseSignArt,
   houseSignCanExpand,
   imgBubbleText,
   imgRewardLine,
   imgRewards,
   rewardsCap,
-} from '../public/js/magic-rock-home.js?v=g232-1';
+} from '../public/js/magic-rock-home.js?v=g253-1';
 import { getGameDayKey } from '../public/js/game-day.js?v=dametime-1';
 
 const spike = join(import.meta.dirname, '..');
@@ -154,9 +156,9 @@ describe('source wording', { skip: !existsSync(ROCK_JS) }, () => {
  * shiftCKeyHandler 816-828; HouseManager.as startCultivation 102-118).
  */
 describe('the home street rock (G231)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-19');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-20');
   const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=home-tower-10');
-  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=butler-feature-18');
+  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=butler-feature-19');
   const { homeEditing } = await import('../public/js/features/camera-mode-feature.js?v=g231-1');
   const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=g276-1');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
@@ -259,7 +261,7 @@ describe('the home street rock (G231)', async () => {
  * (NCMsgHandler.as 3093-3096). Solo: no visitors, so only the stipend.
  */
 describe('the rock’s daily iMG and the house sign (G232)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-19');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-20');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const quiet = { active: {}, completed: [], offers: {} };
@@ -355,6 +357,38 @@ describe('the rock’s daily iMG and the house sign (G232)', async () => {
       assert.match(as, /buildButton\('Expand', onExpandClick\)[\s\S]*buildButton\('Change Style', onChangeStyleClick\)[\s\S]*buildButton\('Cultivate Land', onCutivateClick\)/);
       assert.ok(as.includes("{txt:'Your street is already sooo big!'"));
     }
+  });
+
+  it('G253: the house sign buttons carry the client’s street_* icons (buildButton 146-193)', () => {
+    assert.deepEqual(HOUSE_SIGN.buttons.map((b) => b.art), ['expand', 'style', 'cultivate']);
+    assert.equal(houseSignArt('expand'), 'assets/ui/house-sign/street_expand.png');
+    assert.equal(houseSignArt('style', 'hover'), 'assets/ui/house-sign/street_style_hover.png');
+    assert.equal(houseSignArt('cultivate', 'disabled'), 'assets/ui/house-sign/street_cultivate_disabled.png');
+    for (const b of HOUSE_SIGN.buttons) {
+      for (const state of ['', 'hover', 'disabled']) {
+        const file = join(spike, 'public', houseSignArt(b.art, state));
+        assert.ok(existsSync(file), file);
+        const client = join(spike, '../glitch-client/TSEngineAssets/src', HOUSE_SIGN_ART_DIR.replace('assets/ui/house-sign/', 'assets/graphics/'), houseSignArt(b.art, state).split('/').pop());
+        if (existsSync(client)) assert.ok(readFileSync(client).equals(readFileSync(file)), `${b.art} ${state} is Tiny Speck's own PNG`);
+      }
+    }
+    const dlg = join(spike, '../glitch-client/com/tinyspeck/engine/port/HouseSignDialog.as');
+    if (existsSync(dlg)) {
+      const as = readFileSync(dlg, 'utf8');
+      assert.match(as, /case onExpandClick:\s*image_name = 'expand';[\s\S]*case onChangeStyleClick:\s*image_name = 'style';[\s\S]*case onCutivateClick:\s*image_name = 'cultivate';/);
+      assert.match(as, /graphic = new AssetManager\.instance\.assets\['street_'\+image_name\];/);
+    }
+    const feature = readFileSync(join(spike, 'public/js/features/homes-feature.js'), 'utf8');
+    assert.match(feature, /--hsd-ic:url\(\$\{houseSignArt\(row\.art\)\}\)/);
+  });
+
+  it('G253: the rock closes its bubble through engine.closeSay, not game.js internals', () => {
+    const feature = readFileSync(join(spike, 'public/js/features/homes-feature.js'), 'utf8');
+    assert.match(feature, /engine\.closeSay\?\.\(rockBubble\)/);
+    assert.ok(!feature.includes('_speechFx'), 'no feature reaches into a bubble');
+    const game = readFileSync(join(spike, 'public/game.js'), 'utf8');
+    const api = game.slice(game.indexOf('  closeSay(targetOrBubble'), game.indexOf('  closeSay(targetOrBubble') + 600);
+    assert.match(api, /if \(now\) removeSpeechBubble\(bubble\);\s*else meta\.max = Math\.min\(meta\.max, meta\.life \+ 24\);/);
   });
 
   it('the street rock’s subtitle follows the Tower offer while you stand there', () => {

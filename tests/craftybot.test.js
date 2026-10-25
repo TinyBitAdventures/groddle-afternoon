@@ -373,9 +373,21 @@ describe('delivery and wiring', () => {
     assert.match(feature, /if \(room === 'interior' && x < houseLeftX\(\)\) return BACK_YARD_GROUND_Y;/);
   });
 
+  it('G253: the bot, pack and fuel demos start where the box opens the bot, in the house', () => {
+    const feature = readFileSync(join(PUBLIC, 'js/features/craftybot-feature.js'), 'utf8');
+    const demo = feature.slice(feature.indexOf('function demoSetup('), feature.indexOf('function autoplayStep('));
+    assert.match(demo, /createBot\(bot, boxX\(engine\), kind === 'pack' \? 'pack' : 'interior', t\);/);
+    assert.match(demo, /state\.streets\[HOME_INTERIOR_TSID\]/);
+    assert.match(demo, /y: groundYAt\(engine, x, 'interior'\)/);
+    assert.ok(!demo.includes('HOME_STREET_TSID'), 'nothing is dropped on the home street');
+    assert.ok(!feature.includes('streetDemoX'));
+    const links = readFileSync(join(PUBLIC, '../tools/restoration/play-links.mjs'), 'utf8');
+    assert.match(links, /craftybot: `\$\{BASE\}&homedemo=interior&homex=-200&craftybotdemo=bot`/);
+  });
+
   it('registers the feature and ships its art and sounds', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /craftybot-feature\.js\?v=g273-1'; FEATURES\.push\(craftybotFeature\)/);
+    assert.match(index, /craftybot-feature\.js\?v=g253-1'; FEATURES\.push\(craftybotFeature\)/);
     for (const f of ['idle0', 'walk', 'collapse', 'craftStart', 'craftEnd', 'expand', 'sleepMode', 'peek']) {
       assert.ok(existsSync(join(PUBLIC, `assets/sprites/craftybot/craftybot_${f}.webp`)), f);
     }
@@ -391,7 +403,7 @@ describe('delivery and wiring', () => {
 describe('craftybot feature: the ingredient source and the job menu', async () => {
   // The feature imports these with their browser cache tags; load the same module instances.
   const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js');
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-19');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-20');
   const cbMod = await import('../public/js/craftybot.js?v=craftybot-1');
   const making = await import('../public/js/making.js?v=g268-1');
 

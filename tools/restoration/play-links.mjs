@@ -42,7 +42,7 @@ export const PLAY_ROUTES = Object.freeze({
   seasons: `${BASE}&season=zilloween&seasondemo=1`,
   mail: `${BASE}&homedemo=mail`,
   tower: `${BASE}&homedemo=home&towerdemo=built&towerfloors=5`,
-  craftybot: `${BASE}&homedemo=home&craftybotdemo=bot`,
+  craftybot: `${BASE}&homedemo=interior&homex=-200&craftybotdemo=bot`,
   artifacts: `${BASE}&artifactdemo=rocks`,
   'door-drink': `${BASE}&doordrinkdemo=1`,
   crabs: `${BASE}&crabdemo=1&crabblocks=3`,

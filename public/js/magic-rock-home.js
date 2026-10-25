@@ -241,16 +241,29 @@ export function imgBubbleText(name = 'friend') {
  * Expand tip. Change House (the exterior's chassis changer) and House Keys
  * (the key ACL, for other players) are not built here; Change Tower is
  * always hidden in the client (147).
+ *
+ * G253: each button's icon (buildButton 146-193): AssetManager
+ * 'street_' + image_name, with _hover and _disabled, drawn left of the label
+ * (graphic_padd_l 12, graphic_padd_r 5). Tiny Speck's own PNGs (glitch-client
+ * TSEngineAssets/src/assets/graphics, Assets.as 713-730, CC0) are in
+ * assets/ui/house-sign/.
  */
+export const HOUSE_SIGN_ART_DIR = 'assets/ui/house-sign/';
 export const HOUSE_SIGN = Object.freeze({
   title: 'Your street',
   buttons: Object.freeze([
-    Object.freeze({ id: 'expand', label: 'Expand' }),
-    Object.freeze({ id: 'change_style', label: 'Change Style' }),
-    Object.freeze({ id: 'cultivate', label: 'Cultivate Land' }),
+    Object.freeze({ id: 'expand', label: 'Expand', art: 'expand' }),
+    Object.freeze({ id: 'change_style', label: 'Change Style', art: 'style' }),
+    Object.freeze({ id: 'cultivate', label: 'Cultivate Land', art: 'cultivate' }),
   ]),
   expandTip: 'Your street is already sooo big!',
 });
+
+/** A sign button's icon: 'street_<art>' plus '' | '_hover' | '_disabled'. */
+export function houseSignArt(art, state = '') {
+  const suffix = state === 'hover' || state === 'disabled' ? `_${state}` : '';
+  return art ? `${HOUSE_SIGN_ART_DIR}street_${art}${suffix}.png` : '';
+}
 
 /**
  * showButtons 99-104: on the home street Expand is open while either side

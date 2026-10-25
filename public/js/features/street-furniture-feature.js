@@ -6,7 +6,7 @@
  * - Street Mailboxes (265 archived) open the same mail as the home Mailbox (1)
  *   through engine.openMailbox(), with the per-player npc_mailbox.js states:
  *   has_mail (73-frame wobble) while you have unread mail, interact while the
- *   mail is open, all_done for two seconds after, then idle. No deed needed.
+ *   mail is open, all_done for two seconds after, then idle. No home needed.
  * - Notes (135 archived; 63 sit on the curated-empty Stoot memorial and stay
  *   unspawned) can be read, written on (Penpersonship + a working Quill, one
  *   Quill use) and picked up. Paper becomes a Note through the pack ("Write
@@ -41,6 +41,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inv
 import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-2';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { runStreetTransition } from '../screen-fx.js?v=card-2';
+import { STREET_VISITS_SLOT, loadingCardDetails, recordStreetEntry, streetLoadingVisit } from '../exploration.js';
 import {
   BOARD_ART,
   BOARD_CAPACITY,
@@ -115,7 +116,7 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-3';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from './butler-feature.js?v=butler-feature-18';
+import { butlerApi } from './butler-feature.js?v=butler-feature-19';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';
@@ -782,6 +783,7 @@ async function goVisit(engine, opts = {}) {
   };
   const fx = typeof document !== 'undefined' ? document.getElementById('screen-transition') : null;
   const [top, bottom] = neighbourLoadingColors(neighbour);
+  const visit = neighbourVisit(engine, neighbour);
   if (opts.useTransition === false || !fx) setup();
   else {
     await runStreetTransition(fx, {
@@ -791,6 +793,12 @@ async function goVisit(engine, opts = {}) {
       toHub: 'Neighbourhood',
       topColor: top,
       bottomColor: bottom,
+      // G270: a home street is a POL (location.js getLoadingInfo 3391-3410:
+      // pol_type exterior, owner_info): the owner's card, "Entering /
+      // <Name>’s / Home Street", with this neighbour's own last visit. The
+      // neighbours have no avatar art, so no owner picture or Neighbors faces.
+      pol: { type: 'exterior', ownerName: neighbour.name, visit },
+      details: () => loadingCardDetails({ targets: engine.interactables || [], visit }),
       onMid: setup,
     });
   }
@@ -811,6 +819,20 @@ async function goVisit(engine, opts = {}) {
   engine.save();
   publish(engine, true);
   return true;
+}
+
+/**
+ * G270: the visit as the card reads it (location.js 3157-3159: pols_visited
+ * before this entry counts), then counted, in the neighbour scene's own
+ * street-visits slot. Saves from before the slot credit their visit count
+ * (no time: "just moments ago", as the street card reads an unstamped slot).
+ */
+function neighbourVisit(engine, neighbour, now = Date.now()) {
+  const slot = engine.streetSlot?.(STREET_VISITS_SLOT, neighbourSceneTsid(neighbour.id));
+  const known = Math.max(0, Math.floor(Number(nb.visits?.[neighbour.id]) || 0));
+  const visit = streetLoadingVisit(slot, { now, knownVisits: known });
+  if (slot) recordStreetEntry(slot, now, known);
+  return visit;
 }
 
 async function goBack(engine) {
@@ -1442,6 +1464,12 @@ export const streetFurnitureFeature = {
     seenStone = s.seenStone === true;
     welcomed = s.welcomed === true;
     nb = normalizeNeighbourState(s.neighbours || {});
+  },
+
+  /** Tests: G270 the neighbour card's visit (read, then counted). */
+  _neighbourVisit(engine, neighbourId, now = Date.now()) {
+    const neighbour = neighbourById(neighbourId);
+    return neighbour ? neighbourVisit(engine, neighbour, now) : null;
   },
 
   /** QA / tests. */

@@ -297,6 +297,24 @@ describe('feature wiring', () => {
     assert.equal(streetFurnitureFeature.save().carried.length, 0);
   });
 
+  it('G270: a neighbour’s home street loads behind the home card with its own last visit', () => {
+    streetFurnitureFeature.restore({ neighbours: { visits: { dorrit: 2 } } });
+    const slots = {};
+    const engine = { streetSlot: (id, tsid) => ((slots[`${tsid}|${id}`] ||= {})) };
+    const t0 = Date.UTC(2026, 9, 25, 12);
+    // A save from before the card: its two visits count, with no time ("just moments ago").
+    assert.deepEqual(streetFurnitureFeature._neighbourVisit(engine, 'dorrit', t0), { firstVisit: false, visitCount: 2, lastVisitMins: 0 });
+    assert.deepEqual(slots['NB_dorrit|street-visits'], { visits: 3, lastAt: t0 });
+    assert.deepEqual(streetFurnitureFeature._neighbourVisit(engine, 'dorrit', t0 + 95 * 60000), { firstVisit: false, visitCount: 3, lastVisitMins: 95 });
+    // Each neighbour keeps its own.
+    assert.deepEqual(streetFurnitureFeature._neighbourVisit(engine, 'juniper', t0), { firstVisit: true, visitCount: 0, lastVisitMins: 0 });
+    streetFurnitureFeature.restore(undefined);
+    const feature = readFileSync(join(root, 'js/features/street-furniture-feature.js'), 'utf8');
+    assert.match(feature, /pol: \{ type: 'exterior', ownerName: neighbour\.name, visit \},/);
+    assert.match(feature, /details: \(\) => loadingCardDetails\(\{ targets: engine\.interactables \|\| \[\], visit \}\),/);
+    assert.ok(!/No deed needed/.test(feature));
+  });
+
   it('blocks map travel out of a neighbour street and reloads to the way home', () => {
     streetFurnitureFeature.restore({ neighbours: { returnTo: { tsid: 'GLI2V0UN7RD1T2J', x: 10, y: 20 } } });
     const gate = streetFurnitureFeature.travelGate('GLI2V0UN7RD1T2J', { streetTsid: 'NB_dorrit' });

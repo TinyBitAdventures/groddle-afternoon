@@ -85,4 +85,7 @@ export const INTERIOR_STYLES = Object.freeze([
 ]);
 
 /** The street style each purchase look (js/homes.js HOME_STYLES) starts on. */
-export const PURCHASE_STREET_STYLE = Object.freeze({"meadow":"meadow_ext_default_high","firebog":"firebog_1_high","uralia":"uralia_1_high"});
+export const PURCHASE_STREET_STYLE = Object.freeze({"meadow":"meadow_ext_default_high","firebog":"firebog_4_high","uralia":"uralia_2_high"});
+
+/** The yard style each purchase look starts on (items/magic_rock.js 594-605). */
+export const PURCHASE_YARD_STYLE = Object.freeze({"meadow":"meadows_int_default__high","firebog":"firebog_int_4__high","uralia":"uralia_int_2_hor_high"});

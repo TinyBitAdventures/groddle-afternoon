@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-5';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-107';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-108';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -1984,7 +1984,7 @@ async function enterStreetWithTransition(tsid, opts = {}) {
     fromBottomColor: fromColors.bottom,
     visitHtml: loadingVisitLine(visit),
     details: () => loadingCardDetails({
-      targets: interactables,
+      targets: [...interactables, ...features.collect('pendingTargets', engine)],
       quoinTypes: quoins.map((q) => q.typeId),
       visit,
       ...(features.query('streetProjectInfo', currentStreetTsid, engine) || {}),
@@ -8339,6 +8339,22 @@ const engine = {
   /** A cream speech bubble that follows a registered target. */
   say(target, text, durationMs = 4000) {
     return showSpeechBubble(target, { text, durationMs });
+  },
+  /**
+   * G253: close a target's speech bubble (or the bubble say() returned): it
+   * fades over its usual last 24 frames, or goes at once with { now: true }.
+   * Returns how many bubbles it closed.
+   */
+  closeSay(targetOrBubble, { now = false } = {}) {
+    let closed = 0;
+    for (const bubble of [...speechBubbles]) {
+      const meta = bubble._speechFx;
+      if (!meta || (bubble !== targetOrBubble && meta.target !== targetOrBubble)) continue;
+      if (now) removeSpeechBubble(bubble);
+      else meta.max = Math.min(meta.max, meta.life + 24);
+      closed += 1;
+    }
+    return closed;
   },
   /**
    * Open the shared vendor panel on a feature's store profile
@@ -18509,7 +18525,8 @@ async function showLocationTransition({
     toLabel,
     toHub,
     pol: card,
-    details: card ? () => loadingCardDetails({ targets: interactables, quoinTypes: quoins.map((q) => q.typeId), visit: card.visit }) : undefined,
+    // G270: targets still loading their art (patches-feature) count too, as location.js counts items.
+    details: card ? () => loadingCardDetails({ targets: [...interactables, ...features.collect('pendingTargets', engine)], quoinTypes: quoins.map((q) => q.typeId), visit: card.visit }) : undefined,
     onMid: async () => {
       result = await load?.();
     },

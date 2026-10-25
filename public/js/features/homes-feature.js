@@ -145,7 +145,7 @@ import { towerApi } from './home-tower-feature.js?v=home-tower-10';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-8';
-import { patchesFeature } from './patches-feature.js?v=patches-10';
+import { patchesFeature } from './patches-feature.js?v=patches-11';
 import { plotLabel } from '../patches.js';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
@@ -164,11 +164,12 @@ import {
   yardLook,
   yardStyleChoices,
   yardStyleFor,
-} from '../home-styles.js?v=g135-1';
+} from '../home-styles.js?v=g253-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import {
   HOUSE_SIGN,
   IMG_BUBBLE_MS,
+  houseSignArt,
   cultivateLandCheck,
   cultivationModeEnded,
   dailyImgCounters,
@@ -180,7 +181,7 @@ import {
   readHowto,
   rockVerbs,
   ROCK_VERB_IDS,
-} from '../magic-rock-home.js?v=g232-1';
+} from '../magic-rock-home.js?v=g253-1';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g268-1';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
@@ -531,7 +532,7 @@ function publish(engine) {
   engine.setData('homeBackYard', backCult.yardLeft);
   engine.setData('homeBackYardWidth', houseX0());
   engine.setData('homeHouseX', roomX0());
-  engine.setData('homeYardStyle', yardStyleFor(yardStyle));
+  engine.setData('homeYardStyle', currentYardStyle(engine));
   engine.setData('homeYardShown', yardPreview || '');
   engine.setData('homeSelected', selected ? `${selected.kind}:${selected.id}` : '');
   engine.setData('homePlacing', placing ? placing.classTsid || placing.protoClass || '' : '');
@@ -750,7 +751,7 @@ function interiorBackground(engine, opts = {}) {
   if (opts.yard) {
     root.sortableChildren = true;
     house.zIndex = 0;
-    const land = drawLandscape(engine, root, yardLook(shownYardStyle()), `yard:${shownYardStyle()}`, {
+    const land = drawLandscape(engine, root, yardLook(shownYardStyle(engine)), `yard:${shownYardStyle(engine)}`, {
       width,
       groundY: BACK_YARD_GROUND_Y,
       lift: YARD_LIFT,
@@ -765,7 +766,7 @@ function interiorBackground(engine, opts = {}) {
   root.marks = marks;
   root.house = house;
   root.houseX = x0;
-  root.yardStyle = opts.yard ? shownYardStyle() : null;
+  root.yardStyle = opts.yard ? shownYardStyle(engine) : null;
   root.worldH = root.room.bottom;
   const { room } = root;
   root.platformsScreen = room.leftOpen
@@ -1012,12 +1013,11 @@ function rockImgBubble(engine) {
 
 /**
  * The rock's conversation takes over from its bubble (the client draws both
- * on the rock): fade the bubble out (game.js speech bubbles fade over their
- * last 24 frames; the engine has no call to close one).
+ * on the rock): the bubble fades out (G253: engine.closeSay, the speech
+ * bubble's own 24-frame fade).
  */
-function fadeRockBubble() {
-  const fx = rockBubble?.destroyed ? null : rockBubble?._speechFx;
-  if (fx && Number.isFinite(fx.life)) fx.max = Math.min(fx.max, fx.life + 24);
+function fadeRockBubble(engine) {
+  if (rockBubble && !rockBubble.destroyed) engine.closeSay?.(rockBubble);
   rockBubble = null;
 }
 
@@ -1112,7 +1112,7 @@ function handOverImg(engine, img) {
     pc.xp = (pc.xp || 0) + img;
   }
   rockImgDay = getGameDayKey(Date.now());
-  fadeRockBubble();
+  fadeRockBubble(engine);
   for (const counter of dailyImgCounters(img)) engine.achievement?.(counter, 1);
   const p = engine.player;
   if (p) engine.floatText?.(p.x, p.y - 120, `+${img.toLocaleString()} iMG`, 0xf0e6d0);
@@ -1198,7 +1198,9 @@ function openHouseSign(engine) {
       'data-house-sign': row.id,
       'aria-disabled': off ? 'true' : false,
       title: off ? HOUSE_SIGN.expandTip : false,
-      text: row.label,
+      // G253: the client's street_* icon left of the label (buildButton 146-193).
+      style: `--hsd-ic:url(${houseSignArt(row.art)});--hsd-ic-h:url(${houseSignArt(row.art, 'hover')});--hsd-ic-d:url(${houseSignArt(row.art, 'disabled')})`,
+      'data-house-sign-art': row.art,
       onclick: () => {
         if (off) {
           engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
@@ -1209,7 +1211,7 @@ function openHouseSign(engine) {
         act[row.id]();
         publish(engine);
       },
-    });
+    }, [el('span', { class: 'hsd-ic', 'aria-hidden': 'true' }), el('span', { class: 'hsd-label', text: row.label })]);
   });
   box.replaceChildren(
     el('header', {}, [
@@ -1314,9 +1316,19 @@ const HOUSES = {
   uralia: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
 };
 
-/** The street style shown: the one you chose, else the purchase look's (js/home-styles.js). */
+/**
+ * The street style shown: the one you chose, else the purchase look's
+ * (js/home-styles.js). G263: the purchase looks start on the source's
+ * tutorial styles (magic_rock.js 594-605); a home that never changed style
+ * saves none, so a saved Firebog or Uralia home moves to them on load.
+ */
 function currentStreetStyle(engine) {
   return streetStyleFor(streetStyle, engine?.homeContext?.().style || 'meadow');
+}
+
+/** G263: the yard style: the one you chose, else the purchase look's (magic_rock.js 594-605). */
+function currentYardStyle(engine) {
+  return yardStyleFor(yardStyle, engine?.homeContext?.().style || 'meadow');
 }
 
 function hash01(seed) {
@@ -2250,9 +2262,13 @@ const CSS = `
 .homes-sign header h3{margin:0;font-size:15px;flex:1}
 .homes-sign .hb-close{border:none;background:transparent;font-size:18px;cursor:pointer;color:#6a5a45;line-height:1}
 .homes-sign .hsd-body{display:flex;flex-direction:column;gap:7px;padding:18px 20px 20px}
-.homes-sign .hsd-bt{border:1px solid rgba(90,70,40,.2);background:#fff;border-radius:8px;padding:8px 12px;font:inherit;font-size:13px;font-weight:700;color:#4a3a28;cursor:pointer;text-align:left}
-.homes-sign .hsd-bt:hover,.homes-sign .hsd-bt:focus-visible{border-color:#e0a84a;background:#fff6e2;outline:none}
-.homes-sign .hsd-bt.off{opacity:.45;cursor:not-allowed}
+.homes-sign .hsd-bt{display:flex;align-items:center;gap:5px;border:1px solid rgba(90,70,40,.2);background:#fff;border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;font-weight:700;color:#4a3a28;cursor:pointer;text-align:left}
+.homes-sign .hsd-ic{flex:0 0 25px;height:25px;background:var(--hsd-ic) center/contain no-repeat}
+.homes-sign .hsd-bt:hover,.homes-sign .hsd-bt:focus-visible{border-color:#e0a84a;background:#fff6e2;outline:none;color:#b8671b}
+.homes-sign .hsd-bt:hover .hsd-ic,.homes-sign .hsd-bt:focus-visible .hsd-ic{background-image:var(--hsd-ic-h)}
+.homes-sign .hsd-bt.off{color:#9a9a9a;cursor:not-allowed}
+.homes-sign .hsd-bt.off,.homes-sign .hsd-bt.off:hover,.homes-sign .hsd-bt.off:focus-visible{border-color:rgba(90,70,40,.12);background:#f6f4f0;color:#9a9a9a}
+.homes-sign .hsd-bt.off .hsd-ic,.homes-sign .hsd-bt.off:hover .hsd-ic,.homes-sign .hsd-bt.off:focus-visible .hsd-ic{background-image:var(--hsd-ic-d)}
 @media (max-width:640px){.homes-styles{top:auto;bottom:106px;max-height:56%}.homes-styles .hs-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;padding:8px}.homes-styles .hs-prev{height:52px}.homes-styles .hs-sel{padding:7px 10px}}
 `;
 
@@ -2361,8 +2377,8 @@ function shownStreetStyle(engine) {
 }
 
 /** The yard style drawn behind the house: the one being looked at in the dialog, else yours. */
-function shownYardStyle() {
-  return yardPreview || yardStyleFor(yardStyle);
+function shownYardStyle(engine) {
+  return yardPreview || currentYardStyle(engine);
 }
 
 /** Change Style here: the yard's inside the house, the street's outside. */
@@ -2371,7 +2387,7 @@ function styleRoom() {
 }
 
 function currentStyleHere(engine) {
-  return styleRoom() === 'yard' ? yardStyleFor(yardStyle) : currentStreetStyle(engine);
+  return styleRoom() === 'yard' ? currentYardStyle(engine) : currentStreetStyle(engine);
 }
 
 function styleText() {
@@ -2380,7 +2396,7 @@ function styleText() {
 
 function styleChoicesHere(engine) {
   return styleRoom() === 'yard'
-    ? yardStyleChoices(yardStyleFor(yardStyle), engine.pc.level)
+    ? yardStyleChoices(currentYardStyle(engine), engine.pc.level)
     : styleChoices(currentStreetStyle(engine), engine.pc.level);
 }
 
@@ -2466,7 +2482,7 @@ function closeStyleDialog(engine) {
   if (ui?.styles) ui.styles.hidden = true;
   stylePick = null;
   const had = stylePreview || yardPreview;
-  const redraw = (stylePreview && stylePreview !== currentStreetStyle(engine)) || (yardPreview && yardPreview !== yardStyleFor(yardStyle));
+  const redraw = (stylePreview && stylePreview !== currentStreetStyle(engine)) || (yardPreview && yardPreview !== currentYardStyle(engine));
   stylePreview = null;
   yardPreview = null;
   if (had && redraw) engine.refreshHomeScene?.();
@@ -2506,7 +2522,7 @@ function confirmStyle(engine, key) {
 /** houses_style_set inside the house: take the iMG, keep the rooms, furniture and yard, redraw the yard. */
 function applyYardStyle(engine, key) {
   const ctx = engine.homeContext?.() || {};
-  const state = { yardStyle: yardStyleFor(yardStyle) };
+  const state = { yardStyle: currentYardStyle(engine) };
   const result = switchYardStyle(state, engine.pc, key, { atHome: Boolean(ctx.inHome && inHouse()) });
   if (!result.ok) {
     engine.toast(result.msg, 2400);

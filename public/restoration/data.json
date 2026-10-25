@@ -891,7 +891,7 @@
     "public/assets/content/craftybot-specs.json"
    ],
    "shot": null,
-   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home&craftybotdemo=bot&practice=1"
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=interior&homex=-200&craftybotdemo=bot&practice=1"
   },
   {
    "id": "chat",
@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 467,
+  "commits": 468,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Street quoins are mostly small again, as the Purple Emperor placed them, and Señor Funpickle lies on the ground without a drawn glow"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Hell and Pooped prompts show only their words, and the unlearning bar is the client's teal filling from the right"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Speech bubbles sit where the original put them, and an Icon telling its story skips that walk-in's gift"
    }
   ]
  },

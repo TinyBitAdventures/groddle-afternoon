@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import {
   demoPlotClass,
   patchDemoKit,
+  pendingPlotRows,
   prepareStreetPlots,
   soilCountsForStreet,
   soilPlacementGroups,
@@ -52,6 +53,30 @@ describe('soil populations from the archived streets', () => {
     const [again] = prepareStreetPlots(saved, plan, { now: 6 });
     assert.equal(again.plot.stage, 'clean');
     assert.equal(again.plot.dueAt, 99);
+  });
+});
+
+describe('G270: plots still loading count on the loading card', () => {
+  it('lists planned plots without a target by the class their target will carry', () => {
+    const planned = [
+      { key: 'patch:0', plot: { stage: 'dirty', kind: 'patch' } },
+      { key: 'patch_dark:0', plot: { stage: 'clean', kind: 'patch_dark' } },
+      { key: 'patch:1', plot: { stage: 'tree', kind: 'patch', tree: { classId: 'trant_bean' } } },
+      { key: 'patch:2', plot: { stage: 'seedling', kind: 'patch' } },
+    ];
+    assert.deepEqual(pendingPlotRows(planned, []).map((r) => r.classId), ['patch', 'patch_dark', 'trant_bean', 'patch_seedling']);
+    // Once a plot's view has registered its target it counts through the interactables instead.
+    const live = [{ ...planned[0], target: {} }, { key: 'adopted:0', plot: { stage: 'dead', kind: 'patch', deadClass: 'trant_fruit_dead' }, target: null }];
+    assert.deepEqual(pendingPlotRows(planned, live).map((r) => r.classId), ['patch_dark', 'trant_bean', 'patch_seedling', 'trant_fruit_dead']);
+    assert.deepEqual(pendingPlotRows([], []), []);
+  });
+
+  it('game.js adds them to both loading cards, and the feature answers the hook', async () => {
+    const game = await readFile(new URL('../public/game.js', import.meta.url), 'utf8');
+    assert.equal((game.match(/targets: \[\.\.\.interactables, \.\.\.features\.collect\('pendingTargets', engine\)\]/g) || []).length, 2);
+    assert.equal(typeof patchesFeature.pendingTargets, 'function');
+    patchesFeature.onStreetClear();
+    assert.deepEqual(patchesFeature.pendingTargets(), []);
   });
 });
 

@@ -27,15 +27,17 @@
  * Every interior template is "house-right" with the groddle frame, so only the
  * landscape differs; each yard draws the look of the street style from its
  * template family (tools/home-styles/recipes.mjs YARD_LOOKS). New houses start
- * on START_INT_TEMPLATE (config_base.js 235, Plush Pasture). HouseStylesDialog
+ * on the tutorial choice's yard (G263, magic_rock.js 594-605: Plush Pasture,
+ * Easy Ash or Turquoise Florana), else START_INT_TEMPLATE (config_base.js 235,
+ * Plush Pasture). HouseStylesDialog
  * titles it "Change your yard style"; its confirm line always said "street
  * style" (it computed is_external_street and never used it), so the yard
  * confirm says "yard".
  */
 
-import { EXTERIOR_STYLES, INTERIOR_STYLES, PURCHASE_STREET_STYLE } from './home-styles-data.js?v=g135-1';
+import { EXTERIOR_STYLES, INTERIOR_STYLES, PURCHASE_STREET_STYLE, PURCHASE_YARD_STYLE } from './home-styles-data.js?v=g253-1';
 
-export { EXTERIOR_STYLES, INTERIOR_STYLES, PURCHASE_STREET_STYLE };
+export { EXTERIOR_STYLES, INTERIOR_STYLES, PURCHASE_STREET_STYLE, PURCHASE_YARD_STYLE };
 
 /** config_base.js home_limits.START_EXT_TEMPLATE. */
 export const START_STREET_STYLE = 'meadow_ext_default_high';
@@ -128,9 +130,15 @@ export function switchStreetStyle(state, pc, key, opts = {}) {
   return { ...quote, from };
 }
 
-/** A saved yard style, or the one a new house starts on. */
-export function yardStyleFor(saved) {
-  return YARD_STYLE_BY_KEY[saved]?.built ? saved : START_YARD_STYLE;
+/**
+ * A saved yard style, or the one the purchase look starts on (G263:
+ * magic_rock.js 594-605). A home whose yard was never changed saves none,
+ * so it follows the purchase look; without one, START_YARD_STYLE.
+ */
+export function yardStyleFor(saved, purchaseStyle = null) {
+  if (YARD_STYLE_BY_KEY[saved]?.built) return saved;
+  const start = (purchaseStyle && PURCHASE_YARD_STYLE[purchaseStyle]) || START_YARD_STYLE;
+  return YARD_STYLE_BY_KEY[start]?.built ? start : START_YARD_STYLE;
 }
 
 /** The yard's look: the street style it pairs with (its `lookOf`). */

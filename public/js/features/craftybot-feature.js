@@ -26,11 +26,11 @@
  *    need to..."), Pause / Edit / Remove / Collect, and the footer with
  *    crystals, Queue Size and the fuel gauge (Add More walks to a Fuel Cell).
  *
- * QA (with ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home):
- *   &craftybotdemo=box     the delivery box by the yard's Magic Rock (with
- *                          homedemo=interior; &homex=-200 stands beside it)
- *   &craftybotdemo=bot     the bot already out, Cherries and a Fruit Changing
- *                          Machine dropped on the home street
+ * QA (with ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=interior;
+ * &homex=-200 stands beside the yard rock, the box and the bot):
+ *   &craftybotdemo=box     the delivery box by the yard's Magic Rock
+ *   &craftybotdemo=bot     the bot already out where the box opens it, Cherries
+ *                          and a Fruit Changing Machine dropped right of it
  *   &craftybotdemo=pack    the bot in the pack with Cherries and the machine
  *   &craftybotdemo=fuel    the bot out with 6 fuel left (halts mid-job)
  *   &craftybotautoplay=1   box: read, open, drop the ingredients, queue 3 Apples,
@@ -46,8 +46,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } fr
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-2';
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g268-1';
 import { listDroppedStacks } from '../world-items.js?v=world-items-3';
-import { homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-3';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=homes-19';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=homes-20';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -482,16 +481,6 @@ function yardRockX(engine) {
 /** location.js 147-148: the box at the rock's x - 124. */
 function boxX(engine) {
   return Math.round(yardRockX(engine) + CRAFTYBOT.BOX_OFFSET_X);
-}
-
-/**
- * QA demos that start with the bot already out keep it on the home street,
- * where the remake used to deliver it: 124 px left of the street rock
- * (G231, houseX + 221).
- */
-function streetDemoX() {
-  const cult = homesFeature._state?.()?.cult;
-  return Math.round((cult ? homeStreetLayout(cult).houseX + 221 : 600) + CRAFTYBOT.BOX_OFFSET_X);
 }
 
 /**
@@ -1571,14 +1560,16 @@ function demoSetup(engine) {
   } else {
     bot = createCraftybotState();
     const t = now(engine);
-    createBot(bot, streetDemoX(), kind === 'pack' ? 'pack' : 'street', t);
+    // G253: the bot starts where the box opens it (location.js 128-156, player.js
+    // createCraftybot): in the house, 124 px left of the yard rock.
+    createBot(bot, boxX(engine), kind === 'pack' ? 'pack' : 'interior', t);
     bot.boxRead = true;
     if (kind === 'pack') addItem(inv, BOT, 1);
     else {
-      // Cherries and the machine on the floor to the right of the bot.
+      // Cherries and the machine on the ground to the right of the bot (the yard, then the floor).
       const state = engine.droppedItems;
-      state.streets[HOME_STREET_TSID] = (state.streets[HOME_STREET_TSID] || []).filter((r) => !['cherry', 'fruit_changing_machine'].includes(r.classTsid));
-      const drop = (cls, n, x) => state.streets[HOME_STREET_TSID].push({ id: `world-item-${state.nextId++}`, streetTsid: HOME_STREET_TSID, classTsid: cls, count: n, x, y: engine.groundY, droppedAt: Date.now() });
+      state.streets[HOME_INTERIOR_TSID] = (state.streets[HOME_INTERIOR_TSID] || []).filter((r) => !['cherry', 'fruit_changing_machine'].includes(r.classTsid));
+      const drop = (cls, n, x) => state.streets[HOME_INTERIOR_TSID].push({ id: `world-item-${state.nextId++}`, streetTsid: HOME_INTERIOR_TSID, classTsid: cls, count: n, x, y: groundYAt(engine, x, 'interior'), droppedAt: Date.now() });
       drop('cherry', 12, bot.x + 260);
       drop('fruit_changing_machine', 1, bot.x + 420);
     }

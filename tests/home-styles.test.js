@@ -14,6 +14,10 @@ import {
   EXTERIOR_STYLES,
   INTERIOR_STYLES,
   PURCHASE_STREET_STYLE,
+  PURCHASE_YARD_STYLE,
+  START_YARD_STYLE,
+  YARD_STYLE_BY_KEY,
+  yardStyleFor,
   START_STREET_STYLE,
   STYLE_TEXT,
   changeForLabel,
@@ -85,6 +89,38 @@ describe('home styles list (inc_data_homes_prod.js)', () => {
     assert.deepEqual(Object.keys(PURCHASE_STREET_STYLE).sort(), Object.keys(HOME_STYLES).sort());
     assert.equal(PURCHASE_STREET_STYLE.meadow, START_STREET_STYLE);
     for (const key of Object.values(PURCHASE_STREET_STYLE)) assert.ok(EXTERIOR_STYLES.find((row) => row.key === key)?.built, key);
+  });
+
+  it('G263: each purchase look starts on the source tutorial’s street and yard (magic_rock.js 594-605)', () => {
+    assert.deepEqual(PURCHASE_STREET_STYLE, { meadow: 'meadow_ext_default_high', firebog: 'firebog_4_high', uralia: 'uralia_2_high' });
+    assert.deepEqual(PURCHASE_YARD_STYLE, { meadow: 'meadows_int_default__high', firebog: 'firebog_int_4__high', uralia: 'uralia_int_2_hor_high' });
+    assert.deepEqual(Object.keys(PURCHASE_YARD_STYLE).sort(), Object.keys(HOME_STYLES).sort());
+    for (const key of Object.values(PURCHASE_YARD_STYLE)) assert.ok(YARD_STYLE_BY_KEY[key]?.built, key);
+    assert.equal(PURCHASE_YARD_STYLE.meadow, START_YARD_STYLE);
+    const rock = join(GS, 'items/magic_rock.js');
+    if (existsSync(rock)) {
+      const src = readFileSync(rock, 'utf8');
+      for (const look of Object.keys(PURCHASE_STREET_STYLE)) {
+        const ext = PURCHASE_STREET_STYLE[look];
+        const int = PURCHASE_YARD_STYLE[look];
+        assert.match(src, new RegExp(`instance_id == '${ext}_newxp'\\)\\{\\s*ext_style = '${ext}';\\s*int_style = '${int}';`), look);
+      }
+    }
+    const training = join(GS, 'locations/newxp_training2.js');
+    if (existsSync(training)) {
+      const src = readFileSync(training, 'utf8');
+      for (const ext of Object.values(PURCHASE_STREET_STYLE)) assert.ok(src.includes(`house_style == '${ext}'`), ext);
+    }
+    // A home that never changed style saves none: saved Firebog and Uralia homes follow on load.
+    assert.equal(streetStyleFor(null, 'firebog'), 'firebog_4_high');
+    assert.equal(yardStyleFor(null, 'firebog'), 'firebog_int_4__high');
+    assert.equal(yardStyleFor(null, 'uralia'), 'uralia_int_2_hor_high');
+    assert.equal(yardStyleFor(null, 'meadow'), 'meadows_int_default__high');
+    assert.equal(yardStyleFor(null), START_YARD_STYLE);
+    assert.equal(yardStyleFor('forest_dusk_int_1_hor_high', 'firebog'), 'forest_dusk_int_1_hor_high', 'a chosen yard stays');
+    const feature = readFileSync(join(spike, 'public/js/features/homes-feature.js'), 'utf8');
+    assert.match(feature, /return yardStyleFor\(yardStyle, engine\?\.homeContext\?\.\(\)\.style \|\| 'meadow'\);/);
+    assert.ok(!/yardStyleFor\(yardStyle\)/.test(feature), 'every yard read goes through the purchase look');
   });
 });
 
@@ -189,8 +225,8 @@ describe('composed styles (tools/home-styles/build.mjs)', () => {
 
   it('keeps a saved style, else the purchase look’s', () => {
     assert.equal(streetStyleFor('basic', 'firebog'), 'basic');
-    assert.equal(streetStyleFor(null, 'firebog'), 'firebog_1_high');
-    assert.equal(streetStyleFor('pol_ext_coral_high', 'uralia'), 'uralia_1_high');
+    assert.equal(streetStyleFor(null, 'firebog'), 'firebog_4_high');
+    assert.equal(streetStyleFor('pol_ext_coral_high', 'uralia'), 'uralia_2_high');
     assert.equal(streetStyleFor('nonsense', 'nonsense'), START_STREET_STYLE);
   });
 

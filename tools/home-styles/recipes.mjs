@@ -839,11 +839,24 @@ export const RECIPES = {
   },
 };
 
-/** The purchase looks (js/homes.js HOME_STYLES) start on these source styles. */
+/**
+ * The purchase looks (js/homes.js HOME_STYLES, picked in the tutorial or at the
+ * Home Street Selection Machine) start on the source's tutorial styles (G263):
+ * items/magic_rock.js onConversation 'chassis-picker' 594-605 sets the street
+ * and yard by the newxp choice street (firebog_4_high, meadow_ext_default_high,
+ * uralia_2_high; locations/newxp_training2.js hitBox 170-177 names the same three).
+ */
 export const PURCHASE_STREET_STYLE = {
   meadow: 'meadow_ext_default_high',
-  firebog: 'firebog_1_high',
-  uralia: 'uralia_1_high',
+  firebog: 'firebog_4_high',
+  uralia: 'uralia_2_high',
+};
+
+/** magic_rock.js 594-605: the yard (interior) style each choice starts on. */
+export const PURCHASE_YARD_STYLE = {
+  meadow: 'meadows_int_default__high',
+  firebog: 'firebog_int_4__high',
+  uralia: 'uralia_int_2_hor_high',
 };
 
 /**
