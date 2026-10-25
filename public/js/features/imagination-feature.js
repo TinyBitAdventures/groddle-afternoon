@@ -41,6 +41,7 @@ import {
   createImaginationState,
   dealHand,
   grantStarterUpgrades,
+  grantUpgrade,
   learnTimeReductions,
   normalizeImaginationState,
   ownedUpgradeList,
@@ -774,7 +775,10 @@ export const imaginationFeature = {
     ensureKeepableItems();
     installChrome();
     // Fresh games never call restore(): grant the tutorial cards here too.
-    grantStarterUpgrades(state, owned(engine));
+    // A new multiplayer player (js/new-player.js) buys them in the tutorial
+    // instead (grantTutorialUpgrade), so they are marked as handled, not granted.
+    if (engine.newPlayer) state.starterGranted = true;
+    else grantStarterUpgrades(state, owned(engine));
     syncEnergyTank(engine);
     publish(engine);
   },
@@ -802,6 +806,19 @@ export const imaginationFeature = {
   onNewDay(now, engine) {
     publish(engine);
     if (panel && !panel.hidden) render();
+  },
+
+  /**
+   * A card bought in the tutorial (newxp-feature gotCard) becomes owned
+   * (imagination_grant). Solo already owns every tutorial card, so this only
+   * adds cards for a new multiplayer player.
+   */
+  grantTutorialUpgrade(id, engine) {
+    const list = owned(engine || engineRef);
+    if (!IMAGINATION_UPGRADES[id] || list.includes(id)) return null;
+    grantUpgrade(state, list, id, { history: false });
+    publish(engine || engineRef);
+    return true;
   },
 
   physics(engine) {

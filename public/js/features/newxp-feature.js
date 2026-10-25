@@ -36,6 +36,8 @@
  *
  * Opt-in: a brand-new save's start card offers "Start with the tutorial" or
  * "Skip to Ur"; existing saves and autostart routes are never redirected.
+ * Multiplayer: a new character (js/new-player.js) has only "Start", which
+ * starts the tutorial, as every new player in the original did.
  * On a plain /play/ (no query) the card first asks Solo or Multiplayer
  * (js/game-mode.js): Solo leads to that choice, Multiplayer to /play/online/.
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&newxp=1 (or
@@ -569,6 +571,8 @@ async function gotCard(t, buy) {
   const pc = engineRef.pc;
   pc.imagination = Math.max(0, (Number(pc.imagination) || 0) - cost);
   if (!save.upgrades.includes(buy)) save.upgrades.push(buy);
+  // The card is owned from now on (a no-op in solo, which starts owning every tutorial card).
+  engineRef.query?.('grantTutorialUpgrade', buy, engineRef);
   engineRef.updateHud();
   engineRef.save();
   engineRef.setData('newxpUpgrades', save.upgrades.join(','));
@@ -2962,6 +2966,22 @@ function showStartCard(engine) {
   startBtn.parentNode.insertBefore(box, startBtn);
   const tutorialChoice = () => {
     box.dataset.step = 'tutorial';
+    // Multiplayer: every new player went through the tutorial (players/player.js onCreate
+    // 1238-1239 goToNewNewStartingLevel; skipping was only a testing flag), so there is no Skip to Ur.
+    if (engine.mode === 'multiplayer') {
+      box.innerHTML = `
+    <p><strong>Welcome to Ur.</strong> Every new Glitch starts in the clouds: meet the Welcoming Flamingo,
+      the Dustbunny and your Magic Rock, then find your way off Gentle Island.</p>
+    <div class="nx-start-row">
+      <button type="button" data-nx-start>Start</button>
+    </div>`;
+      box.querySelector('[data-nx-start]').addEventListener('click', () => {
+        pendingStage = 'clouds';
+        startBtn.click();
+      });
+      engine.setData('newxpStartCard', 'tutorial-only');
+      return;
+    }
     box.innerHTML = `
     <p><strong>New to Ur?</strong> Fall out of the clouds and meet the Welcoming Flamingo,
       the Dustbunny and your Magic Rock, then find your way off Gentle Island.</p>
@@ -3035,6 +3055,9 @@ export const newxpFeature = {
     if (want) {
       pendingStage = STAGES.includes(want) && want !== 'done' ? want : 'clouds';
       engine.setData('newxpAutoplay', auto ? 'running' : 'off');
+    } else if (engine.newPlayer) {
+      // A new multiplayer character starts in the tutorial however the game is started.
+      pendingStage = 'clouds';
     }
   },
 

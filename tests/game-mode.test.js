@@ -52,7 +52,7 @@ describe('mode flag', () => {
 
   it('is engine.mode and the canvas data-mode in game.js', () => {
     const game = read('game.js');
-    assert.match(game, /import \{ GAME_MODE \} from '\.\/js\/game-mode\.js\?v=mp2-1';/);
+    assert.match(game, /import \{ GAME_MODE(?:, isSolo)? \} from '\.\/js\/game-mode\.js\?v=mp2-1';/);
     assert.match(game, /const engine = \{\n\s*PIXI,\n(?:\s*\/\*\*[^\n]*\*\/\n)?\s*mode: GAME_MODE,/);
     assert.match(game, /app\.canvas\.dataset\.mode = GAME_MODE;/);
   });

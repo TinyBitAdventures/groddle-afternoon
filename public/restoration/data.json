@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 501,
+  "commits": 502,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Rocks no longer carry a name tag over them"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Prompts dock bottom right in their own stack, and races and the Hog Haul end on Tiny Speck's winner splash"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The Animal Kinship practice street carries only its 3 quoins and Side Table, its hint signs show, and home cultivations fade in under their poof"
    }
   ]
  },
- "tests": 298,
+ "tests": 299,
  "generatedAt": "2026-10-25"
 }

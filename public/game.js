@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-14';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-135';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-136';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -821,8 +821,9 @@ import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
 import { hidesChatBubble } from './js/hi-signs.js?v=hi-signs-3';
 // Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.
-import { GAME_MODE } from './js/game-mode.js?v=mp2-1';
+import { GAME_MODE, isSolo } from './js/game-mode.js?v=mp2-1';
 import { saveStore } from './js/save-store.js?v=mp2-1';
+import { isNewMultiplayerPlayer, newPlayerInventory, newPlayerStats } from './js/new-player.js?v=mp5-1';
 import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g269-1';
 
 /** @type {object|null} assets/maps/index.json */
@@ -1391,7 +1392,13 @@ setMoodXpEnv({
 /** Persistent per-class condition for the remake's unstackable tool row. */
 const toolState = createToolConditionState();
 
-const pc = { energy: 80, mood: 70, imagination: 5000, currants: 200, xp: 5000, level: 5, rewardMultiplier: 1 };
+/**
+ * A multiplayer character with no saved state starts as the source's new
+ * player and plays the tutorial (js/new-player.js); solo keeps the demo kit
+ * below (level 5, 5,000 iMG, a full pack and tool row, starter skills).
+ */
+const NEW_PLAYER = isNewMultiplayerPlayer(GAME_MODE, saveStore);
+const pc = NEW_PLAYER ? newPlayerStats() : { energy: 80, mood: 70, imagination: 5000, currants: 200, xp: 5000, level: 5, rewardMultiplier: 1 };
 ensureMusicblockItems();
 const musicblockState = createMusicblockState();
 const shrineState = createShrineState();
@@ -1407,7 +1414,7 @@ const emotionalBearState = createEmotionalBearState();
 const homeState = createHomeState();
 const mailboxState = createMailboxState();
 const jumpState = createJumpState();
-const inv = createInventory({
+const inv = createInventory(NEW_PLAYER ? newPlayerInventory(createInventory(), PARADISE_TICKET_IDS) : {
   butterfly_lotion: 3,
   apple: 2,
   hatchet: 1,
@@ -7812,6 +7819,8 @@ const engine = {
   PIXI,
   /** 'solo' | 'multiplayer' (js/game-mode.js); solo everywhere until multiplayer opens. */
   mode: GAME_MODE,
+  /** A multiplayer character with no saved state, started as the source's new player (js/new-player.js); never in solo. */
+  newPlayer: NEW_PLAYER,
   get started() {
     return state.started === true;
   },
@@ -23042,22 +23051,26 @@ async function main() {
   await loadRecipeCatalog();
   ensureMakingItems();
   await loadTransitionAssets();
-  // Starter quests from mined catalog (ignore prereqs for onboarding)
-  assignQuest(questState, 'animalkinship_pet_piggies', { ignorePrereq: true });
-  // G267: Go Moloko Loco, Butterfly Style is Animal Kinship IV's offer, timed and startable
-  // (inc_data_skills.js 235, animalkinship_milk_butterflies.js 69): the familiar offers it.
-  // Free starter skill with no skill prereqs if present
-  // Starter skills arrive with their whole prerequisite chain (Alchemy II
-  // brings Alchemy I, Element Handling, and so on), never as orphans.
-  grantSkillWithPrereqs(skillState, 'animalkinship_1');
-  // Cooking / blending so GSJS recipes with skill tags are craftable in the demo
-  grantSkillWithPrereqs(skillState, 'ezcooking_1');
-  grantSkillWithPrereqs(skillState, 'cheffery_1');
-  grantSkillWithPrereqs(skillState, 'blending_1');
-  grantSkillWithPrereqs(skillState, 'blending_2');
-  // Mining / smelting / refining / alchemy II / metalworking chain
-  for (const sk of STARTER_MINING_SKILLS) {
-    grantSkillWithPrereqs(skillState, sk);
+  // The demo kit's starter quest and skills (solo). A new multiplayer player starts with
+  // none (players/inc_skills.js skills_init) and learns a first skill in the tutorial.
+  if (!NEW_PLAYER) {
+    // Starter quests from mined catalog (ignore prereqs for onboarding)
+    assignQuest(questState, 'animalkinship_pet_piggies', { ignorePrereq: true });
+    // G267: Go Moloko Loco, Butterfly Style is Animal Kinship IV's offer, timed and startable
+    // (inc_data_skills.js 235, animalkinship_milk_butterflies.js 69): the familiar offers it.
+    // Free starter skill with no skill prereqs if present
+    // Starter skills arrive with their whole prerequisite chain (Alchemy II
+    // brings Alchemy I, Element Handling, and so on), never as orphans.
+    grantSkillWithPrereqs(skillState, 'animalkinship_1');
+    // Cooking / blending so GSJS recipes with skill tags are craftable in the demo
+    grantSkillWithPrereqs(skillState, 'ezcooking_1');
+    grantSkillWithPrereqs(skillState, 'cheffery_1');
+    grantSkillWithPrereqs(skillState, 'blending_1');
+    grantSkillWithPrereqs(skillState, 'blending_2');
+    // Mining / smelting / refining / alchemy II / metalworking chain
+    for (const sk of STARTER_MINING_SKILLS) {
+      grantSkillWithPrereqs(skillState, sk);
+    }
   }
 
   // Full locations-xml street catalog (index.json), then last saved street (or default)
@@ -23146,7 +23159,8 @@ async function main() {
     inv.moon = upgrades.includes('moon') ? 0 : 1;
   }
   // This slice ships with a Tinkertool, so existing saves also receive the entry repair skill.
-  grantSkill(skillState, 'tinkering_1', true);
+  // A solo migration: every multiplayer save postdates it, and a new multiplayer player has no Tinkertool.
+  if (isSolo()) grantSkill(skillState, 'tinkering_1', true);
   // Food variety and Triple Jump are imagination upgrade cards bought in the
   // Upgrades shop (features/imagination-feature.js). Saves from before the
   // shop keep the copies the old demo grant gave them.

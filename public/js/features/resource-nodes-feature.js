@@ -1431,7 +1431,9 @@ export const resourceNodesFeature = {
     // QA routes (any *demo / *autoplay param) stay quiet unless they ask (&fireflyoffer=1), like the Magic Rock.
     const params = [...new URLSearchParams(globalThis.location?.search || '').keys()];
     fireflyOffer.allowed = engine.param('fireflyoffer') === '1' || !params.some((key) => /demo$|autoplay$/.test(key));
-    migrateResourceStarterKit(engine.inv, kit);
+    // A new multiplayer player (js/new-player.js) starts with an empty pack: no kit, now or later.
+    if (engine.newPlayer) kit.starterKit = true;
+    else migrateResourceStarterKit(engine.inv, kit);
     publish(engine);
   },
 
