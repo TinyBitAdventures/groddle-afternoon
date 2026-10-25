@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 482,
+  "commits": 483,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Every overlay ends when you leave the street, as in the original, and the tutorial's art is traced to Tiny Speck's own files"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Qurazy quoins follow the original rule: one roll a day on each street's Qurazy marker, always on a first visit, likelier on streets you haven't seen in a while"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Going home shows your own loading card: Entering Your Home Street, House or Tower, with you by the door"
    }
   ]
  },

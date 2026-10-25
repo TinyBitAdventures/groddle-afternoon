@@ -24,7 +24,7 @@ import {
   swfVerbs,
   wrangleMessage,
 } from '../public/js/swf.js?v=g190-1';
-import { swfFeature } from '../public/js/features/swf-feature.js?v=g309-1';
+import { swfFeature } from '../public/js/features/swf-feature.js?v=g311-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
 import { DROP_ITEMS, DROP_TABLES } from '../public/js/drop-tables-data.js';
@@ -247,6 +247,31 @@ describe('Game (items/game_box.js)', () => {
     assert.ok(normalizeSwfState(saved).playUntil > Date.now());
     swfFeature.onTick(100, saved.playUntil + 1, engine);
     assert.equal(engine.inv[GAME_BOX], 0);
+  });
+});
+
+describe('G311: a move takes play_glitch down (cancelAllOverlaysWeCan 193-215)', () => {
+  it('the pc_overlay goes with the street and is not sent again; the play still pays', async () => {
+    const { cancelAllOverlays, liveOverlayCount } = await import('../public/js/overlay-art.js?v=g311-1');
+    cancelAllOverlays();
+    swfFeature._reset();
+    const engine = fakeEngine(); // no Pixi layer: the announcement is tracked all the same
+    engine.inv[GAME_BOX] = 1;
+    const t0 = Date.now();
+    assert.ok(swfFeature.runPackVerb(GAME_BOX, 'play', engine));
+    assert.equal(engine.data.swfPlayOverlay, 'playing');
+    assert.ok(liveOverlayCount() >= 1, 'tracked while it plays, art loaded or not');
+    assert.ok(cancelAllOverlays() >= 1);
+    assert.equal(engine.data.swfPlayOverlay, 'cancelled');
+    assert.equal(swfFeature._state().badge, null);
+    swfFeature.onStreetClear(engine);
+    swfFeature.onStreetEnter({ tsid: 'GNEXT' }, engine);
+    await new Promise((r) => setTimeout(r, 20)); // a manifest load in flight does not bring it back
+    assert.equal(swfFeature._state().badge, null, 'GSJS does not send it again');
+    swfFeature.onTick(100, t0 + PLAY.durationMs + 50, engine);
+    assert.equal(engine.inv[GAME_BOX], 0);
+    assert.equal(engine.pc.imagination, 300);
+    assert.equal(liveOverlayCount(), 0);
   });
 });
 

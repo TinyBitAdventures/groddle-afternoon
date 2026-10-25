@@ -34,7 +34,7 @@
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { grantMoodXp } from '../mood-xp.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement } from '../overlay-art.js?v=g309-1';
+import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=g311-1';
 import { vpOverlay } from '../quest-rooms/vp-overlay.js?v=ffw-1';
 import {
   GAME_BOX,
@@ -64,6 +64,9 @@ let lockUntil = 0;
 let lastCounts = null;
 let last = '';
 let badge = null; // the play_glitch overlay sprite (or the icon stand-in)
+let releaseBadge = null; // G311: overlay-art's cancel for the badge
+/** G311: the play's overlay was taken down by a move; it is not sent again (the play still runs). */
+let badgeGone = false;
 let playArt = null; // overlays.json play_glitch, once loaded
 let playArtFailed = false;
 const playFrames = new Map(); // sheet cell -> Texture
@@ -240,6 +243,7 @@ export function playGame(engine, now = Date.now()) {
   }
   state.playUntil = now + playMs();
   last = 'game_box:play';
+  badgeGone = false;
   showBadge(engine);
   changed(engine);
   return true;
@@ -249,6 +253,7 @@ export function playGame(engine, now = Date.now()) {
 export function finishPlay(engine) {
   state.playUntil = 0;
   clearBadge();
+  badgeGone = false;
   const xp = grantMoodXp(engine.pc, PLAY.xp);
   if (countItem(engine.inv, GAME_BOX) > 0) removeItem(engine.inv, GAME_BOX, 1);
   state.played += 1;
@@ -261,8 +266,26 @@ export function finishPlay(engine) {
 }
 
 function clearBadge() {
+  releaseBadge?.();
+  releaseBadge = null;
   if (badge && !badge.destroyed) badge.destroy();
   badge = null;
+}
+
+/*
+ * G311: play_glitch is a pc_overlay (game_box.js 137-149), so a move takes it down
+ * (TSMainView.moveMoveStarted 1612, AnnouncementController.cancelAllOverlaysWeCan 193-215),
+ * even while its art is still loading. Nothing sends it again: the play goes on (the item's
+ * onFinishPlayGame event, 24.5 s) and pays out wherever you are, with no overlay.
+ */
+function trackBadge(engine) {
+  releaseBadge?.();
+  releaseBadge = trackOverlay(() => {
+    releaseBadge = null;
+    badgeGone = true;
+    clearBadge();
+    engine.setData?.('swfPlayOverlay', 'cancelled');
+  });
 }
 
 /** game_box.js 137-149: pc_overlay play_glitch, 110 x 110 box, delta_y -140. */
@@ -280,6 +303,10 @@ function playTexture(cellIndex) {
 
 function showBadge(engine) {
   clearBadge();
+  if (badgeGone) return;
+  // The announcement is live from here, drawn or not (no layer yet, art still loading).
+  trackBadge(engine);
+  engine.setData?.('swfPlayOverlay', 'playing');
   const { PIXI } = engine;
   const layer = engine.fxLayer || engine.entityLayer;
   if (!PIXI || !layer) return;
@@ -293,7 +320,7 @@ function showBadge(engine) {
         playArtFailed = true;
       })
       .finally(() => {
-        if (playing()) showBadge(engine);
+        if (playing() && !badgeGone) showBadge(engine);
       });
   }
   if (playArt) {
@@ -380,7 +407,8 @@ export const swfFeature = {
   onStreetEnter(street, engine) {
     ensureItems();
     settleCutGame(engine);
-    if (playing()) showBadge(engine);
+    // G311: a move cancelled the overlay and nothing re-sends it; a reload (badgeGone false) draws it again.
+    if (playing() && !badgeGone) showBadge(engine);
     setupDemo(engine);
     publish(engine);
   },
@@ -451,6 +479,7 @@ export const swfFeature = {
     lastCounts = null;
     last = '';
     clearBadge();
+    badgeGone = false;
     demoDone = false;
     fast = false;
   },

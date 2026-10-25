@@ -50,7 +50,7 @@
  * strength), which is what the remake draws.
  */
 
-import { OVERLAY_BASE, loadOverlayManifest, sheetCell, stateFrameAt } from './overlay-art.js?v=g309-1';
+import { OVERLAY_BASE, loadOverlayManifest, sheetCell, stateFrameAt } from './overlay-art.js?v=g311-1';
 
 /** GameSplashScreenView.as 37 RAYS_SCENE, drawn as overlays.json level_up_rays. */
 export const SPLASH_RAYS_KEY = 'level_up_rays';

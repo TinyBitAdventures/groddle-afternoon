@@ -13,9 +13,17 @@
  *    solved room sets the `leave` flag and returns home, where a complete
  *    quest turns in with its source completion text and rewards.
  *  - Leaving early, running out of time or reloading inside fails the run:
- *    progress resets and the quest's giver (catalog.js questGiver: the Magic
- *    Rock, the Butler, Gwendolyn, the Play Cube …) asks "Want another go?"
- *    later (the source failQuest left it restartable from the quest log).
+ *    progress resets. G311: a startable quest (onStarted, catalog needsStart)
+ *    stays in the log marked failed, and its card's "Try again" starts it over
+ *    (inc_quests.js failQuest 420-471 keeps it; the client's quest_failed,
+ *    QuestManager.as questFailedHandler 272-292, sets failed; QuestElementUI.as
+ *    setTryButton 224-231 labels the button; quest_begin -> restartQuest
+ *    291-309 -> quest.js onRestart 79-100 -> onStarted enters the instance
+ *    again). The source asks nothing. quest-offers-feature draws the button
+ *    (questLogActions); this module re-enters the room once the failed mark
+ *    clears. The few that are not startable (no onStarted: the source's
+ *    failQuest removes them, 466-469) still get the giver's remake prompt
+ *    (catalog.js questGiver, maybeOfferRetry); see register G311.
  *
  * Room module contract (all optional except id/title/build or street):
  *   { id, title, kicker, icon, theme, durationMs | durationFor(questId),
@@ -233,13 +241,42 @@ async function turnIn(engine, questId, opts = {}) {
   return true;
 }
 
-/** GSJS failQuest: progress resets; the quest's giver offers a retry later. */
+/**
+ * G311: a quest the log can start again (quest-offers-feature questLogActions:
+ * catalog needsStart, handed out by the offer engine). Its failure is the log's
+ * failed mark (Try again), not a retry prompt.
+ */
+function logRestartable(engine, questId) {
+  if (!activeQuest(engine, questId) || !getQuestCatalog()[questId]?.needsStart) return false;
+  return Boolean(ensureQuestOfferState(engine.questState).managed?.[questId]);
+}
+
+/** Move retries a reload or an old save left for a log-restartable quest to the log's failed mark. */
+function settleRetries(engine) {
+  const ids = Object.keys(save.retry);
+  if (!ids.length || !engine.questState) return;
+  const offers = ensureQuestOfferState(engine.questState);
+  let moved = false;
+  for (const id of ids) {
+    if (!logRestartable(engine, id)) continue;
+    offers.failed[id] ||= Number(save.retry[id]) || Date.now();
+    delete save.retry[id];
+    moved = true;
+  }
+  if (moved) engine.save?.();
+}
+
+/** GSJS failQuest (inc_quests.js 420-471): progress resets; the log offers Try again (else the giver asks later). */
 function failQuest(engine, questId) {
   resetProgress(engine, questId);
   const mem = (save.memory[questId] ||= {});
   mem.failedAt = Date.now();
   delete mem.started;
-  if (activeQuest(engine, questId)) save.retry[questId] = Date.now();
+  if (!activeQuest(engine, questId)) return;
+  if (logRestartable(engine, questId)) {
+    ensureQuestOfferState(engine.questState).failed[questId] = Date.now();
+    delete save.retry[questId];
+  } else save.retry[questId] = Date.now();
 }
 
 /** custom_code prerequisites from catalog.js OFFER_OVERRIDES. */
@@ -815,6 +852,8 @@ async function startInstance(engine, questId, opts = {}) {
     save.questId = questId;
     save.roomId = roomId;
     delete save.retry[questId];
+    // G311: started again by any road (the map card, a demo): no longer failed in the log.
+    if (engine.questState) delete ensureQuestOfferState(engine.questState).failed[questId];
     (save.memory[questId] ||= {}).started = Date.now();
     engine.save();
     ctx = makeContext(engine);
@@ -873,10 +912,14 @@ async function leaveInstance(engine, opts = {}) {
     if (hook.leaveFlag !== false) progress(engine, questId, hook.leaveFlag || 'leave');
   } else if (!hook.keepQuest) {
     failQuest(engine, questId);
+    // G311: the quest log's Try again, as a timed quest's (quest-offers-feature); the rest keep the giver's line.
+    const inLog = Boolean(ensureQuestOfferState(engine.questState).failed?.[questId]);
     engine.pushActivity(
-      result.outcome === 'expired'
-        ? `${room?.title || 'The quest'}: time ran out. Ask the ${giverFor(engine, questId).label} to try again.`
-        : `You left ${room?.title || 'the quest'} early. You can try again later.`
+      inLog
+        ? `${result.outcome === 'expired' ? `${room?.title || 'The quest'}: time ran out.` : `You left ${room?.title || 'the quest'} early.`} Choose Try again in your quest log to start it over.`
+        : result.outcome === 'expired'
+          ? `${room?.title || 'The quest'}: time ran out. Ask the ${giverFor(engine, questId).label} to try again.`
+          : `You left ${room?.title || 'the quest'} early. You can try again later.`
     );
   } else if (save.memory[questId]) {
     delete save.memory[questId].started;
@@ -1079,7 +1122,8 @@ function questsWaitingToStart(engine) {
   const offers = ensureQuestOfferState(engine.questState);
   for (const id of roomQuests()) {
     if (!activeQuest(engine, id) || !offers.managed[id]) continue;
-    if (save.retry[id] || save.memory[id]?.started) continue;
+    // G311: failed waits for the log's Try again (restartTimedQuest clears the mark).
+    if (save.retry[id] || save.memory[id]?.started || offers.failed?.[id]) continue;
     out.push(id);
   }
   return out;
@@ -1276,6 +1320,7 @@ export const questInstancesFeature = {
     }
     if (!run && !entering) {
       for (const def of activeWorldRooms(engine)) def.world.onTick?.(worldContext(engine), dtMs, now);
+      settleRetries(engine);
       maybeStartAccepted(engine, now);
       maybeOfferRetry(engine, now);
     }

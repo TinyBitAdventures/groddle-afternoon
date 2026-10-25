@@ -41,7 +41,7 @@ import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { landingY, nearestSurfaceY } from '../walk-surface.js';
 import { STREET_INDEX } from '../street-loader.js';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
-import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement } from '../overlay-art.js?v=g309-1';
+import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement, trackOverlay } from '../overlay-art.js?v=g311-1';
 import {
   AWARD_ITEM,
   AWARD_LINE,
@@ -103,7 +103,7 @@ let engineRef = null;
 let loader = null;
 let findView = null; // { sprite, glow, target }
 let deployment = null; // { tsid, at, x, y, bounced, sprite, target }
-let overlay = null; // { sprite, at }
+let overlay = null; // { sprite, at, release }
 let sneezeArt = null;
 let sneezeArtFailed = false;
 const sneezeFrames = new Map();
@@ -517,6 +517,7 @@ function sneezeTexture(cellIndex) {
 }
 
 function clearOverlay() {
+  overlay?.release?.();
   if (overlay?.sprite && !overlay.sprite.destroyed) overlay.sprite.destroy();
   overlay = null;
 }
@@ -541,7 +542,15 @@ function showSneezeOverlay(engine) {
   sprite.zIndex = 60;
   sprite.eventMode = 'none';
   layer.addChild(sprite);
-  overlay = { sprite, at: now() };
+  overlay = { sprite, at: now(), release: null };
+  // G311: a pc_overlay, so a move takes it down (cancelAllOverlaysWeCan 193-215); the fit's
+  // own timer goes on (the buff's on_tick), and the next sneeze shows on the new street.
+  const mine = overlay;
+  mine.release = trackOverlay(() => {
+    mine.release = null;
+    if (overlay === mine) clearOverlay();
+    engine.setData?.('funpickleOverlay', 'cancelled');
+  });
   engine.setData?.('funpickleOverlay', SNEEZE_OVERLAY.key);
 }
 

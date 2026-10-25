@@ -59,7 +59,7 @@ after(() => {
   }
 });
 
-const art = () => import('../public/js/overlay-art.js?v=g309-1');
+const art = () => import('../public/js/overlay-art.js?v=g311-1');
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 describe('G309 cancelAllOverlays', () => {
@@ -132,5 +132,89 @@ describe('G309 cancelAllOverlays', () => {
   it('the race win rainbow draws no stand-in arc once cancelled', () => {
     const src = readFileSync(join(root, 'public/js/race-render.js'), 'utf8');
     assert.match(src, /!h\.stopped && !h\.cancelled\) c\.addChild\(drawWinnerArc/);
+  });
+});
+
+/*
+ * G311: players with their own loops join the same cancel (overlay-art trackOverlay): the
+ * loneliness fireworks (vp_overlay, loneliness.js 355-430), Señor Funpickle's sneeze and the
+ * Game's play_glitch (pc_overlay). The game splash is not an overlay and the source keeps it.
+ */
+const GS = join(root, '..', 'glitch-GameServerJS');
+const CLIENT = join(root, '..', 'glitch-client');
+
+describe('G311 players outside overlay-art', () => {
+  it('trackOverlay: cancel runs once at the street change; release() leaves the set', async () => {
+    const { cancelAllOverlays, liveOverlayCount, trackOverlay } = await art();
+    cancelAllOverlays();
+    let calls = 0;
+    const release = trackOverlay(() => { calls += 1; });
+    const kept = trackOverlay(() => { calls += 10; });
+    assert.equal(liveOverlayCount(), 2);
+    release();
+    assert.equal(liveOverlayCount(), 1);
+    assert.equal(cancelAllOverlays(), 1);
+    assert.equal(calls, 10);
+    kept(); // releasing after the cancel is harmless
+    assert.equal(cancelAllOverlays(), 0);
+    assert.equal(calls, 10);
+  });
+
+  it('a firework under the fx layer stops when the street changes and resolves null', async () => {
+    const { cancelAllOverlays, liveOverlayCount } = await art();
+    const { fireworksUnder } = await import('../public/js/features/spirit-loneliness-feature.js?v=lonely-10');
+    cancelAllOverlays();
+    const sprites = [];
+    const PIXI = {
+      Texture: { from: () => ({ destroy() {}, source: { update() {} } }) },
+      Sprite: class {
+        constructor() { this.visible = true; this.destroyed = false; sprites.push(this); }
+        destroy() { this.destroyed = true; }
+      },
+    };
+    const engine = { PIXI, fxLayer: { destroyed: false, addChildAt() {} }, camera: { x: 0, y: 0 } };
+    const vp = { width: 960, height: 540, scale: 1 };
+    const p = fireworksUnder(engine, { key: 'test_vector', x: 0.5, y: 0.75 }, vp, 60000);
+    for (let i = 0; i < 50 && !sprites.length; i += 1) await wait(5);
+    assert.equal(sprites.length, 1, 'playing');
+    assert.equal(liveOverlayCount(), 1);
+    assert.equal(cancelAllOverlays(), 1);
+    assert.equal(sprites[0].visible, false);
+    assert.equal(await p, null);
+    assert.equal(sprites[0].destroyed, true);
+    assert.equal(liveOverlayCount(), 0);
+    // GSJS: each firework is a vp_overlay sent to the street.
+    const lonely = readFileSync(join(GS, 'items/include/loneliness.js'), 'utf8');
+    assert.match(lonely, /function lonelinessEndPartyOverlay\(stage\) \{\s*switch\(stage\) \{\s*case 0:\s*this\.container\.apiSendAnnouncement\(\{\s*type: 'vp_overlay',/);
+  });
+
+  it('funpickle and swf register their own loops; the splash stays out (a view, not an overlay)', () => {
+    const funpickle = readFileSync(join(root, 'public/js/features/funpickle-feature.js'), 'utf8');
+    assert.match(funpickle, /mine\.release = trackOverlay\(/);
+    assert.match(funpickle, /function clearOverlay\(\) \{\s*overlay\?\.release\?\.\(\);/);
+    const swf = readFileSync(join(root, 'public/js/features/swf-feature.js'), 'utf8');
+    assert.match(swf, /releaseBadge = trackOverlay\(/);
+    assert.match(readFileSync(join(GS, 'items/game_box.js'), 'utf8'), /type: 'pc_overlay',\s*swf_url: overlay_key_to_url\('play_glitch'\),/);
+    // GameSplashScreenView is a BaseSplashScreenView (an AbstractTSView), not one of the pools
+    // cancelAllOverlaysWeCan empties; it closes only from its own buttons (onButtonClick, onDoneClick).
+    const base = readFileSync(join(CLIENT, 'com/tinyspeck/engine/view/gameoverlay/BaseSplashScreenView.as'), 'utf8');
+    assert.match(base, /class BaseSplashScreenView extends AbstractTSView/);
+    const ac = readFileSync(join(CLIENT, 'com/tinyspeck/engine/control/engine/AnnouncementController.as'), 'utf8');
+    const cancelAll = ac.slice(ac.indexOf('public function cancelAllOverlaysWeCan'), ac.indexOf('public function hideOverlaysForUserSnap'));
+    assert.doesNotMatch(cancelAll, /Splash/);
+    assert.doesNotMatch(readFileSync(join(root, 'public/js/game-splash.js'), 'utf8'), /trackOverlay/);
+  });
+
+  it('the Game of Crowns tip is a 3 s vp_overlay and the HUD goes before the splash', async () => {
+    const games = readFileSync(join(GS, 'players/inc_games.js'), 'utf8');
+    const tips = [...games.matchAll(/uid: "it_game_tip",\s*type: "vp_overlay",\s*duration: (\d+),/g)].map((m) => Number(m[1]));
+    assert.ok(tips.length >= 4);
+    const { CROWNS_TIP_MS } = await import('../public/js/features/crowns-feature.js?v=g311-1');
+    assert.ok(tips.every((ms) => ms === CROWNS_TIP_MS));
+    assert.match(games, /function games_end_it_game\(\)\{[\s\S]*?this\.games_it_dismiss_overlays\(\);/);
+    const crowns = readFileSync(join(root, 'public/js/features/crowns-feature.js'), 'utf8');
+    const finish = crowns.slice(crowns.indexOf('function finish('), crowns.indexOf('async function leave('));
+    assert.match(finish, /clearTip\(\);\s*hud\.bar\.hidden = true;/);
+    assert.match(crowns, /tipTimer = setTimeout\(clearTip, CROWNS_TIP_MS\);/);
   });
 });

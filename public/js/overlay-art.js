@@ -74,6 +74,17 @@ export function cancelAllOverlays() {
   return live.length;
 }
 
+/**
+ * G311: a player that runs its own loop (the loneliness fireworks drawn under the fx layer, Señor
+ * Funpickle's sneeze and the Game's play_glitch standing on the avatar) joins the same cancel:
+ * `cancel()` runs once, at the next street change. Returns release(), to call when it ends.
+ */
+export function trackOverlay(cancel) {
+  const h = { cancel };
+  liveOverlays.add(h);
+  return () => liveOverlays.delete(h);
+}
+
 /** How many overlays are playing (QA and tests). */
 export function liveOverlayCount() {
   return liveOverlays.size;

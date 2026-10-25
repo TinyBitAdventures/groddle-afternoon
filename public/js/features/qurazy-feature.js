@@ -26,7 +26,7 @@
 
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
 import { qurazyMarkersFor } from '../qurazy-markers.js?v=g260-1';
-import { OVERLAY_FADE, loadOverlayManifest, overlayPlacement, playVectorOverlay } from '../overlay-art.js?v=g309-1';
+import { OVERLAY_FADE, loadOverlayManifest, overlayPlacement, playVectorOverlay } from '../overlay-art.js?v=g311-1';
 import {
   QURAZY_SPAWN_LINE,
   createQurazyState,
@@ -158,11 +158,6 @@ export function boxesOverlap(a, b) {
  */
 export const QURAZY_FEED_ATTR = 'data-under-banner';
 
-function clearFeedFade() {
-  if (typeof document === 'undefined') return;
-  document.getElementById('activity-feed')?.removeAttribute(QURAZY_FEED_ATTR);
-}
-
 function fadeFeedUnderBanner(root, canvas, box) {
   const feed = document.getElementById('activity-feed');
   if (!feed || !box) return;
@@ -186,19 +181,6 @@ function fadeFeedUnderBanner(root, canvas, box) {
     requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
-}
-
-/**
- * G303: AnnouncementController.cancelAllOverlaysWeCan (193-215), run from
- * LocationView.as 50 as the old street is taken down, removes every
- * in-window overlay, so the banner never plays over the next street.
- * Returns how many it stopped.
- */
-export function stopQurazyBanner(root = typeof document === 'undefined' ? null : document.getElementById('game-root')) {
-  const live = root?.querySelectorAll?.('canvas.qurazy-overlay') || [];
-  for (const c of live) c.remove();
-  clearFeedFade();
-  return live.length;
 }
 
 /** Bumped when a banner starts or is stopped, so a stopped one does not report "done". */
@@ -329,11 +311,14 @@ export const qurazyFeature = {
     // comes before the reconnect check, so it keeps the saved one.
     if (!reconnecting) st.live = null;
     liveQuoin = null;
-    // G303: the banner goes with the street (cancelAllOverlaysWeCan).
+    // G303, G311: the banner goes with the street (cancelAllOverlaysWeCan 193-215). It is a
+    // playVectorOverlay, so game.js endStreetOverlays has already taken its canvas down, and the
+    // feed fade ends with the canvas (fadeFeedUnderBanner). One still waiting on the manifest
+    // has not started its player yet: the run bump keeps it off the next street.
     bannerRun += 1;
     const wasLive = bannerLive;
     bannerLive = false;
-    if (stopQurazyBanner() || wasLive) engine?.setData?.('qurazyOverlay', 'stopped');
+    if (wasLive) engine?.setData?.('qurazyOverlay', 'stopped');
   },
 
   onTick(dtMs, now, engine) {

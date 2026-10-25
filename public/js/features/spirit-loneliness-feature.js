@@ -58,7 +58,7 @@ import { getStreetEcologyCatalog } from '../street-ecology.js?v=official-ecology
 import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=lonely-1';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement } from '../overlay-art.js?v=g309-1';
+import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement, trackOverlay } from '../overlay-art.js?v=g311-1';
 import {
   INVITE_ART,
   LONELY_RULES,
@@ -454,23 +454,43 @@ function fireworks(engine, at) {
   ensureCss();
   rt.fireworks = (rt.fireworks || 0) + 1;
   fireworksUnder(engine, at, vp, LONELY_RULES.fireworkMs).then((ok) => {
+    if (ok === null) {
+      rt.fireworksArt = 'cancelled'; // a street change took it down (G311)
+      return;
+    }
     if (!ok) burst(at);
     rt.fireworksArt = ok ? 'under' : 'dots';
   });
 }
 
-/** One firework under the fx layer (see fireworks). Resolves true once played, false without art. */
+/**
+ * One firework under the fx layer (see fireworks). Resolves true once played, false without art,
+ * null when a street change cancelled it, loading or playing: each is a vp_overlay
+ * (loneliness.js lonelinessEndPartyOverlay 355-430), and cancelAllOverlaysWeCan (193-215)
+ * takes every one down on a move, so it joins overlay-art's cancel (G311).
+ */
 export async function fireworksUnder(engine, at, vp, durationMs) {
   const PIXI = engine?.PIXI;
   const layer = engine?.fxLayer;
   if (!PIXI?.Sprite || !PIXI.Texture?.from || !layer || typeof document === 'undefined') return false;
+  let cancelled = false;
+  let sprite = null;
+  const release = trackOverlay(() => {
+    cancelled = true;
+    if (sprite && !sprite.destroyed) sprite.visible = false;
+  });
   let art;
   try {
     art = await loadVectorFrames(at.key);
   } catch {
+    release();
     return false;
   }
-  if (layer.destroyed) return false;
+  if (cancelled) return null;
+  if (layer.destroyed) {
+    release();
+    return false;
+  }
   const { meta, imgs } = art;
   // The viewport in logical px (960 wide), drawn at the screen's resolution.
   const w = Math.max(1, Math.round(vp.width / vp.scale));
@@ -480,9 +500,12 @@ export async function fireworksUnder(engine, at, vp, durationMs) {
   canvas.width = Math.round(w * res);
   canvas.height = Math.round(h * res);
   const ctx = canvas.getContext('2d');
-  if (!ctx) return false;
+  if (!ctx) {
+    release();
+    return false;
+  }
   const texture = PIXI.Texture.from(canvas);
-  const sprite = new PIXI.Sprite(texture);
+  sprite = new PIXI.Sprite(texture);
   sprite.eventMode = 'none';
   sprite.label = `overlay:${at.key}`;
   sprite.alpha = 0;
@@ -496,7 +519,7 @@ export async function fireworksUnder(engine, at, vp, durationMs) {
   await new Promise((resolve) => {
     const step = (t) => {
       const ms = t - t0;
-      if (ms >= life || sprite.destroyed) {
+      if (ms >= life || sprite.destroyed || cancelled) {
         resolve();
         return;
       }
@@ -516,9 +539,10 @@ export async function fireworksUnder(engine, at, vp, durationMs) {
     };
     requestAnimationFrame(step);
   });
+  release();
   if (!sprite.destroyed) sprite.destroy();
   texture.destroy(true);
-  return true;
+  return cancelled ? null : true;
 }
 
 /** Load the three fireworks before the party ends (the client loaded each SWF on announce). */
@@ -541,6 +565,12 @@ function burst(at) {
   c.style.setProperty('--lw', `${w}px`);
   c.style.setProperty('--lh', `${h}px`);
   root.appendChild(c);
+  // The stand-in goes with the street too (G311).
+  let cancelled = false;
+  const release = trackOverlay(() => {
+    cancelled = true;
+    c.remove();
+  });
   const ctx = c.getContext('2d');
   const cx = w * at.x;
   const cy = h * at.y;
@@ -548,6 +578,7 @@ function burst(at) {
   const dots = Array.from({ length: 48 }, (_, i) => ({ a: (i / 48) * Math.PI * 2, v: 0.6 + (i % 5) * 0.12, c: colors[i % colors.length] }));
   const t0 = performance.now();
   const step = (t) => {
+    if (cancelled) return;
     const p = Math.min(1, (t - t0) / LONELY_RULES.fireworkMs);
     ctx.clearRect(0, 0, w, h);
     const r = 150 * vp.scale * Math.sqrt(p);
@@ -559,7 +590,10 @@ function burst(at) {
       ctx.fill();
     }
     if (p < 1) requestAnimationFrame(step);
-    else c.remove();
+    else {
+      release();
+      c.remove();
+    }
   };
   requestAnimationFrame(step);
 }

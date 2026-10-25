@@ -156,11 +156,11 @@ describe('source wording', { skip: !existsSync(ROCK_JS) }, () => {
  * shiftCKeyHandler 816-828; HouseManager.as startCultivation 102-118).
  */
 describe('the home street rock (G231)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-29');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-30');
   const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=home-tower-14');
-  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=butler-feature-28');
+  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=butler-feature-29');
   const { homeEditing } = await import('../public/js/features/camera-mode-feature.js?v=g231-1');
-  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=g309-1');
+  const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=g311-1');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const towerQuest = { active: { build_a_tower: { started: 1 } }, completed: [], offers: {} };
@@ -206,6 +206,30 @@ describe('the home street rock (G231)', async () => {
     assert.equal(homesFeature.runVerb(street, 'cultivate_land', engine), true);
     assert.equal(beats.length, 1);
     assert.equal(beats[0].beats[0].text, ROCK_LINES.yardFirst[0].text);
+  });
+
+  it('a how-to is a VOG (announce_vog_fade, width 600), not the quest card (G311)', () => {
+    homesFeature.restore({ decor: {}, cult: {}, magicRock: {} });
+    const vogs = [];
+    const beats = [];
+    const data = {};
+    const engine = {
+      pc: { level: 3 },
+      questState: { active: {}, completed: [], offers: {} },
+      vog: (opts) => vogs.push(opts),
+      scriptedDialogue: (d) => beats.push(d),
+      setData: (k, v) => { data[k] = v; },
+    };
+    assert.equal(homesFeature.runVerb(yard, 'howto_cultivate', engine), true);
+    assert.equal(beats.length, 0, 'no card');
+    assert.equal(vogs.length, 1);
+    assert.equal(vogs[0].width, 600);
+    const rock = readFileSync(join(GS, 'items/magic_rock.js'), 'utf8');
+    const said = rock.match(/announce_vog_fade\('(Cultivation allows[^']*(?:\\'[^']*)*)', \{width: '600'\}\)/);
+    assert.ok(said, 'magic_rock.js howto_cultivate');
+    assert.deepEqual(vogs[0].lines, said[1].replace(/\\'/g, "'").split('//'));
+    assert.equal(data.homeRockLast, 'howto_cultivate');
+    assert.equal(homesFeature.save().magicRock.cultivate, 'howto_shown');
   });
 
   it('hides while the tutorial’s own rock has the home street (newxp homeRockHeld)', () => {
@@ -261,7 +285,7 @@ describe('the home street rock (G231)', async () => {
  * (NCMsgHandler.as 3093-3096). Solo: no visitors, so only the stipend.
  */
 describe('the rock’s daily iMG and the house sign (G232)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-29');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-30');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const quiet = { active: {}, completed: [], offers: {} };

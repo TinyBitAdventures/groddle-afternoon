@@ -46,7 +46,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, removeItem } fr
 import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=woodcutting-test-3';
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g300-1';
 import { listDroppedStacks } from '../world-items.js?v=world-items-4';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=homes-29';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=homes-30';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -84,7 +84,7 @@ import {
 } from '../craftybot.js?v=craftybot-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g309-1';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g311-1';
 
 export const CRAFTYBOT_FEATURE_ID = 'craftybot';
 const HOME_STREET_TSID = 'RH_HOME_EXT';

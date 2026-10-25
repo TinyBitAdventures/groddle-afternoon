@@ -362,3 +362,57 @@ describe('G99: the retry prompt names whoever offered the quest', () => {
     assert.match(src, /time ran out\. Ask the \$\{giverFor\(engine, questId\)\.label\} to try again\./);
   });
 });
+
+/*
+ * G311: a failed startable instance quest waits in the quest log for "Try again", as in the
+ * source (inc_quests.js failQuest 420-471, QuestElementUI.as setTryButton 224-231, main.js
+ * doQuestBegin 6019-6031 -> restartQuest 291-309 -> quest.js onRestart 79-100); no giver prompt.
+ */
+describe('G311: a failed room quest is Try again in the quest log', () => {
+  before(async () => {
+    await loadContentCatalogsFromDir(join(root, 'public/assets/content'));
+  });
+
+  const fakeEngine = (active, managed) => {
+    const data = {};
+    return {
+      data,
+      started: true,
+      questState: { active, completed: [], offers: { managed } },
+      setData: (k, v) => { data[k] = v; },
+      param: () => '',
+      save() {},
+      busy: () => true, // nothing starts during the test
+      updateHud() {},
+    };
+  };
+
+  it('a run lost to a reload marks a startable quest failed, not a retry prompt', async () => {
+    const { questInstancesFeature } = await import('../public/js/features/quest-instances-feature.js');
+    const { ensureQuestOfferState } = await import('../public/js/quest-offers.js');
+    assert.equal(getQuestCatalog().mental_block?.needsStart, true);
+    assert.notEqual(getQuestCatalog().help_juju_bandits?.needsStart, true, 'no onStarted in GSJS');
+    questInstancesFeature.restore({ questId: 'mental_block', roomId: 'mental_block', memory: {}, retry: { help_juju_bandits: Date.now() - 60_000 } });
+    assert.ok(questInstancesFeature._state().save.retry.mental_block, 'restore keeps the old retry stamp');
+    const engine = fakeEngine({ mental_block: { progress: {} }, help_juju_bandits: { progress: {} } }, { mental_block: 1, help_juju_bandits: 1 });
+    questInstancesFeature.onTick(16, Date.now(), engine);
+    const offers = ensureQuestOfferState(engine.questState);
+    assert.ok(offers.failed.mental_block, 'the log shows Try again');
+    assert.equal(questInstancesFeature._state().save.retry.mental_block, undefined);
+    // Not startable from the log: the source removed it (failQuest 466-469); the remake keeps its giver prompt.
+    assert.ok(questInstancesFeature._state().save.retry.help_juju_bandits);
+    assert.equal(offers.failed.help_juju_bandits, undefined);
+  });
+
+  it('a failed quest is not re-entered until Try again clears the mark; leaving says where to look', () => {
+    const src = readFileSync(join(root, 'public/js/features/quest-instances-feature.js'), 'utf8');
+    const waiting = src.slice(src.indexOf('function questsWaitingToStart('), src.indexOf('function maybeStartAccepted('));
+    assert.match(waiting, /offers\.failed\?\.\[id\]\) continue;/);
+    assert.match(src, /Choose Try again in your quest log to start it over\./);
+    const offersSrc = readFileSync(join(root, 'public/js/quest-offers.js'), 'utf8');
+    const restart = offersSrc.slice(offersSrc.indexOf('export function restartTimedQuest('), offersSrc.indexOf('export function questTimerStatus('));
+    assert.match(restart, /delete offers\.failed\[classTsid\];/);
+    const client = readFileSync(join(root, '../glitch-client/com/tinyspeck/engine/view/ui/quest/QuestElementUI.as'), 'utf8');
+    assert.match(client, /try_bt\.label = current_quest\.failed \? 'Try again' : 'Try it';/);
+  });
+});

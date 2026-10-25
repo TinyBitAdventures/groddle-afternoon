@@ -54,7 +54,7 @@ import { wallsScreen } from '../street-model.js';
 import { addItem } from '../inventory.js?v=catalog-unified-7';
 import { textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g309-1';
+import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
 
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';
@@ -114,6 +114,7 @@ const STYLE = `
 .crowns-board span.is-you b { text-decoration: underline; }
 .crowns-tip { margin: 8px auto 0; max-width: 520px; font-size: clamp(.9rem, 2.4vw, 1.2rem); font-weight: 900;
   text-shadow: 0 2px 0 #472b13, 0 4px 12px rgba(0,0,0,.7); }
+.crowns-tip:empty { display: none; }
 .crowns-clock { position: absolute; left: 50%; top: 76px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px;
   padding: 2px 12px 2px 4px; border-radius: 999px; color: #3a240c; font-weight: 900; background: rgba(255,247,211,.94); }
 .crowns-clock[hidden] { display: none; }
@@ -190,7 +191,7 @@ function setupArena(street, engine) {
   });
   placeCrownLocks(game, LOCK_POINTS);
   resultApplied = false;
-  lastTip = '';
+  clearTip();
   autoPath = null;
   actors = {};
   rivals().forEach((r, i) => {
@@ -341,10 +342,29 @@ function stepActor(a, dtMs, engine, now) {
   placeActor(a);
 }
 
+/*
+ * G311: it_game_tip is a vp_overlay with duration 3000 (inc_games.js 409-421, 425-438, 566-579,
+ * 594-607): each tip shows for 3 s, a new one replaces it (overlay_dismiss, then send), and none
+ * outlasts the game. games_end_it_game (613-623) runs games_it_dismiss_overlays (739-747), which
+ * takes the crown indicator and the score and king overlays down before the splash.
+ */
+export const CROWNS_TIP_MS = 3000;
+let tipTimer = 0;
+
+function clearTip() {
+  clearTimeout(tipTimer);
+  tipTimer = 0;
+  lastTip = '';
+  const node = hud?.bar.querySelector('[data-crowns-tip]');
+  if (node) node.textContent = '';
+}
+
 function tip(engine, text) {
-  if (!text || text === lastTip) return;
+  if (!text || !hud) return;
   lastTip = text;
   hud.bar.querySelector('[data-crowns-tip]').textContent = text;
+  clearTimeout(tipTimer);
+  tipTimer = setTimeout(clearTip, CROWNS_TIP_MS);
 }
 
 function handleEvents(events, engine) {
@@ -507,6 +527,9 @@ function finish(engine) {
     ],
   });
   hud.countdown.hidden = true;
+  // G311: the tip, the board and the clock go before the splash (games_it_dismiss_overlays 739-747).
+  clearTip();
+  hud.bar.hidden = true;
   if (crownSprite) crownSprite.visible = false;
   engine.updateHud();
   engine.save();
@@ -555,6 +578,7 @@ function publish(engine) {
   engine.setData('crownsIt', game ? game.itId || '' : '');
   engine.setData('crownsYouSeconds', game ? String(Math.floor(game.players.you.crownMs / 1000)) : '0');
   engine.setData('crownsWinner', game?.winner || '');
+  engine.setData('crownsTip', lastTip);
   engine.setData('crownsPlayers', game ? String(Object.keys(game.players).length) : '0');
   engine.setData('crownsLadders', String(CROWNS_LADDERS.length));
   engine.setData('crownsNavNodes', nav ? String(nav.nodes.length) : '0');

@@ -139,8 +139,8 @@ import {
   towerItem,
 } from '../home-cultivation.js?v=home-cultivation-4';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
-import { playPoofIn } from '../overlay-art.js?v=g309-1';
-import { fadeInNewNear } from '../poof-fade.js?v=g309-1';
+import { playPoofIn } from '../overlay-art.js?v=g311-1';
+import { fadeInNewNear } from '../poof-fade.js?v=g311-1';
 import { projectApi } from './street-jobs-feature.js?v=g300-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
 import { towerApi } from './home-tower-feature.js?v=home-tower-14';
@@ -1273,6 +1273,9 @@ function openExpandDialog(engine) {
   return true;
 }
 
+/** magic_rock.js howto_* verbs: announce_vog_fade(..., {width: '600'}). */
+export const ROCK_HOWTO_VOG_WIDTH = 600;
+
 function runRockVerb(target, verbId, engine) {
   const room = rockRoom(target);
   if (!magicRockVerbs(target, engine).some((v) => v.id === verbId)) return true;
@@ -1281,8 +1284,10 @@ function runRockVerb(target, verbId, engine) {
     const pages = readHowto(rockFlags, verbId);
     engine.save?.();
     publish(engine);
-    // announce_vog_fade: a VOG, no speaker, one page a click.
-    if (pages) engine.scriptedDialogue?.({ title: 'Magic Rock', kicker: null, beats: pages.map((text) => ({ text, response: 'OK' })) });
+    // G311: announce_vog_fade (players/inc_announcements.js 222-262; magic_rock.js 151, 180, 209
+    // pass width 600): a VOG over the street, one '//' page a click, the 0.3 black wash, no
+    // speaker and no card. engine.vog is that overlay (js/vog-overlay.js, G228).
+    if (pages) engine.vog?.({ lines: pages, width: ROCK_HOWTO_VOG_WIDTH });
     engine.setData('homeRockLast', verbId);
     return true;
   }

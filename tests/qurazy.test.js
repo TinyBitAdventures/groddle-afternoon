@@ -35,8 +35,8 @@ import {
   qurazyFeatureState,
   qurazyStreetEligible,
   resetQurazyFeatureForTests,
-  stopQurazyBanner,
 } from '../public/js/features/qurazy-feature.js';
+import * as qurazyModule from '../public/js/features/qurazy-feature.js';
 import { GENTLE_ISLAND } from '../public/js/newxp.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -365,18 +365,13 @@ describe('the spawn banner and the street-name pill (G274)', () => {
 describe('the banner on a street change (G303) and over the feed (G297)', () => {
   const manifest = JSON.parse(readFileSync(join(PUBLIC, 'assets/sprites/overlays/overlays.json'), 'utf8'));
   const meta = manifest[QURAZY_OVERLAY.key];
-  /** A #game-root stand-in holding `n` banner canvases. */
-  const fakeRoot = (n) => {
-    const kids = Array.from({ length: n }, () => ({ removed: false, remove() { this.removed = true; } }));
-    return { kids, querySelectorAll: (sel) => (sel === 'canvas.qurazy-overlay' ? kids.filter((k) => !k.removed) : []) };
-  };
-
-  it('stops every banner still playing (cancelAllOverlaysWeCan)', () => {
-    const root = fakeRoot(2);
-    assert.equal(stopQurazyBanner(root), 2);
-    assert.ok(root.kids.every((k) => k.removed));
-    assert.equal(stopQurazyBanner(root), 0);
-    assert.equal(stopQurazyBanner(null), 0);
+  it('the banner is an overlay-art player, so the street-change cancel stops it (G311)', () => {
+    // G309 cancelAllOverlays (game.js endStreetOverlays) takes the canvas down; the old stopper is gone.
+    assert.equal('stopQurazyBanner' in qurazyModule, false);
+    const src = readFileSync(join(PUBLIC, 'js/features/qurazy-feature.js'), 'utf8');
+    assert.match(src, /playVectorOverlay\(root, QURAZY_OVERLAY\.key/);
+    // The feed fade ends with the canvas.
+    assert.match(src, /if \(!canvas\.isConnected\) \{\s*feed\.removeAttribute\(QURAZY_FEED_ATTR\)/);
   });
 
   it('leaving the street clears it without a banner to stop', () => {
