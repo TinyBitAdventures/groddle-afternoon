@@ -1,5 +1,5 @@
 /**
- * Community machine rooms (register rows G156, G169, G175), as a feature
+ * Community machine rooms (register rows G156, G169, G175, G193), as a feature
  * module (see js/feature-host.js).
  *
  * - Indoors: the Meadow and Besara rooms are archived, so street-ecology.json
@@ -23,8 +23,14 @@
  *   counters count), READY plays, the machine calls you, and the output waits
  *   in it until you Collect it (6 game days at most). While it runs, Use says
  *   "The machine is still running. N remaining." The machine hums (ACTIVE, or
- *   Metal Music) while you are in the room, wobbles, shows a progress bar,
- *   and blinks a ready light while your output waits.
+ *   Metal Music) while you are in the room and shows a progress bar.
+ * - Art states (G193, js/machine-art.js): each machine plays its own SWF
+ *   states from Tiny Speck's sheets: assembled when idle; loadOpen, loadClose
+ *   and active through a job; ready (its own blinking light) while your stuff
+ *   waits; collectOpen and collectClose when you Collect.
+ * - Low fuel (G193): when a job leaves the tank at 10 or less the machine says
+ *   "I am low on fuel!" for 10 s, and again every 30 s while you are in the
+ *   room and the tank stays that low (machine_base use, lowFuelAlert).
  * - Each finished job rolls the source's "Altar bonus!" drop table once
  *   (onMakingComplete), with the preface on every activity line.
  * - Metal Music (G175): a room's Metal Machine has Turn Music Off / On with
@@ -44,10 +50,13 @@
  *   (randInt(0, 100)); &machineroommusic=1 gives the Making Metal card;
  *   &machineroomseed=<class>:<seconds> puts a job you started earlier on
  *   that class's first machine, N seconds from done (0: done, output waiting).
+ *   &machineartstate=<state> (machine-art-feature) shows every machine in one
+ *   art state, for screenshots.
  * Canvas data: machineRoom (the room's tsid, or ''), machineRoomMachines,
  *   machineRoomFuel (id=fuel,...), machineRoomJobs (id=seconds left,...),
  *   machineRoomWaiting (ids with output waiting), machineRoomBonus (bonus
- *   rolls paid), machineRoomLast (the last line or verb result).
+ *   rolls paid), machineRoomLast (the last line or verb result), machineRoomArt
+ *   (id=state,... as drawn).
  */
 
 import { forestMachineRoomEcology, isForestMachineRoomTsid } from '../forest-machine-room.js';
@@ -84,6 +93,17 @@ import { getSkillCatalog } from '../content-catalogs.js';
 import { worldToScreen } from '../street-model.js';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { textureFromUrl } from '../textures.js';
+import { createSheetLoader } from '../sprite-sheets.js';
+import {
+  LOW_FUEL_BUBBLE_MS,
+  LOW_FUEL_LINE,
+  LOW_FUEL_REPEAT_MS,
+  MACHINE_ART_SHEETS,
+  isLowFuel,
+  machineFrame,
+  machineSheetDef,
+  roomMachineState,
+} from '../machine-art.js?v=g193-1';
 
 export const MACHINE_ROOMS_FEATURE_ID = 'machine-rooms';
 const MUSIC_CARD = 'metalmaking_music';
@@ -111,7 +131,11 @@ let contents = {};
 let musicOff = {};
 let loops = new Map();
 let tickMs = 0;
-let fxClock = 0;
+/** Machine id -> when you last collected from it (the collectOpen / collectClose states). */
+let collectedAt = {};
+/** Machine id -> when it next says it is low on fuel (lowFuelAlert's 30 s timer). */
+let lowFuelNext = {};
+let sheetLoader = null;
 
 const later = (fn, ms) => timers.push(setTimeout(fn, ms));
 const now = () => Date.now();
@@ -131,6 +155,7 @@ function publish(engine) {
   engine.setData?.('machineRoomWaiting', machines.filter((m) => hasContents(contents[m.def.id])).map((m) => m.def.id).join(','));
   engine.setData?.('machineRoomBonus', String(bonusPaid));
   engine.setData?.('machineRoomLast', last);
+  engine.setData?.('machineRoomArt', machines.map((m) => `${m.def.id}=${m.art || 'icon'}`).join(','));
 }
 
 function subtitle(m, t = now()) {
@@ -157,11 +182,26 @@ function spawnFx(engine, m) {
   const fx = new PIXI.Container();
   fx.zIndex = 9;
   const bar = new PIXI.Graphics();
-  const light = new PIXI.Graphics();
   fx.addChild(bar);
-  fx.addChild(light);
   engine.entityLayer.addChild(fx);
-  m.fx = { root: fx, bar, light, drawn: '' };
+  m.fx = { root: fx, bar, drawn: '' };
+}
+
+/** Swap the icon for the machine's state sheet once it loads (G193). */
+function loadArt(engine, m) {
+  const def = machineSheetDef(m.def.classTsid);
+  if (!def || !engine.PIXI?.Rectangle) return;
+  sheetLoader ||= createSheetLoader(engine.PIXI);
+  sheetLoader.load(def).then(() => {
+    if (!machines.includes(m) || m.sprite.destroyed) return;
+    const frames = sheetLoader.frames(def);
+    if (!frames.length) return;
+    const s = MACHINE_ART_SHEETS[m.def.classTsid];
+    m.frames = frames;
+    // The registration x (getAssetInfo) and the idle art's bottom on the floor.
+    m.sprite.anchor.set(s.ax / s.fw, s.ay / s.fh);
+    m.frame = -1;
+  });
 }
 
 function spawnMachines(engine, street, layout) {
@@ -178,7 +218,7 @@ function spawnMachines(engine, street, layout) {
     sprite.y = y + 4;
     sprite.zIndex = 8;
     engine.entityLayer.addChild(sprite);
-    const m = { def, sprite, baseY: sprite.y, tank: slot.tanks[def.id], target: null, near: false, fx: null };
+    const m = { def, sprite, baseY: sprite.y, tank: slot.tanks[def.id], target: null, near: false, fx: null, frames: null, frame: -1, art: '' };
     m.target = engine.register({
       classId: def.classTsid,
       featureId: MACHINE_ROOMS_FEATURE_ID,
@@ -189,6 +229,9 @@ function spawnMachines(engine, street, layout) {
     });
     spawnFx(engine, m);
     machines.push(m);
+    loadArt(engine, m);
+    // A tank left at 10 or less is still on lowFuelAlert's 30 s timer when you come back.
+    if (isLowFuel(tankFuel(m.tank, def.classTsid)) && !lowFuelNext[def.id]) lowFuelNext[def.id] = now() + LOW_FUEL_REPEAT_MS;
   }
 }
 
@@ -292,6 +335,11 @@ function finishJob(engine, id) {
     last = res.msgs[0] || 'failed';
   }
   for (const msg of res.msgs) if (msg && res.made > 0) engine.pushActivity?.(msg);
+  // use() -> lowFuelAlert (fuelmaker.js:1553-1566, :1228-1233): the bubble only reaches the room.
+  if (res.made > 0 && isLowFuel(tankFuel(tank, job.classTsid))) {
+    lowFuelNext[id] = now() + LOW_FUEL_REPEAT_MS;
+    if (m) engine.say?.(m.target, LOW_FUEL_LINE, LOW_FUEL_BUBBLE_MS);
+  }
   altarBonus(engine, job.classTsid, job.recipeId, res.made);
   if (m) m.target.subtitle = subtitle(m);
   syncSounds(engine);
@@ -362,6 +410,7 @@ function collect(engine, m) {
   const row = contents[id];
   if (!hasContents(row)) return;
   delete contents[id];
+  collectedAt[id] = now();
   for (const [cls, n] of Object.entries(row.items)) addItem(engine.inv, cls, n);
   engine.playSound?.('COLLECT', { volume: 0.6 });
   const line = collectLine(m.def.classTsid);
@@ -375,6 +424,7 @@ function collect(engine, m) {
 function refuel(engine, m, all) {
   const res = refuelMachine(engine.inv, m.tank, m.def.classTsid, { all });
   if (res.ok) {
+    if (!isLowFuel(tankFuel(m.tank, m.def.classTsid))) delete lowFuelNext[m.def.id];
     // machine_base refuel handler: refueled, and refueled_for_others away from home (Bowser).
     engine.achievement?.('machines:refueled', 1);
     engine.achievement?.('machines:refueled_for_others', 1);
@@ -407,14 +457,21 @@ function drawFx(m, t) {
   const job = jobs[m.def.id];
   const running = jobRunning(job, t);
   const waiting = !running && hasContents(contents[m.def.id]);
+  // G193: the machine's own state (js/machine-art.js) replaces the old wobble and drawn ready light.
+  const { state, since } = roomMachineState({ job, waiting, collectedAt: collectedAt[m.def.id] }, t);
+  m.art = m.frames ? state : '';
+  if (m.frames) {
+    const k = machineFrame(m.def.classTsid, state, t - since);
+    if (k >= 0 && k !== m.frame && m.frames[k]) {
+      m.frame = k;
+      m.sprite.texture = m.frames[k];
+    }
+  }
   // On the floor in front of the machine, clear of the verb prompt above it.
   const top = m.baseY + 10;
-  const { bar, light } = m.fx;
-  // A gentle wobble while it works (the SWF's "active" loop is not drawn yet).
-  m.sprite.rotation = running ? Math.sin(fxClock / 90) * 0.035 : 0;
-  m.sprite.y = running ? m.baseY - Math.abs(Math.sin(fxClock / 140)) * 2 : m.baseY;
+  const { bar } = m.fx;
   const pct = running ? Math.max(0, Math.min(1, (t - job.startedAt) / Math.max(1, job.readyAt - job.startedAt))) : 0;
-  const key = running ? `run:${Math.round(pct * 60)}` : waiting ? 'wait' : 'idle';
+  const key = running ? `run:${Math.round(pct * 60)}` : 'idle';
   if (key !== m.fx.drawn) {
     m.fx.drawn = key;
     bar.clear();
@@ -423,11 +480,7 @@ function drawFx(m, t) {
       bar.roundRect(m.sprite.x - w / 2, top, w, 8, 4).fill({ color: 0x2a2320, alpha: 0.72 });
       bar.roundRect(m.sprite.x - w / 2 + 1.5, top + 1.5, Math.max(2, (w - 3) * pct), 5, 2.5).fill({ color: 0x9ed36a, alpha: 0.98 });
     }
-    light.clear();
-    if (waiting) light.circle(m.sprite.x, top + 4, 6).fill({ color: 0x8cff6a }).stroke({ width: 2, color: 0x2a4a1a, alpha: 0.8 });
   }
-  // blinkReadyLight: the ready state blinks while your output waits.
-  light.alpha = waiting ? (Math.floor(fxClock / 450) % 2 ? 0.35 : 1) : 1;
 }
 
 function nearMachine(engine, m) {
@@ -444,6 +497,14 @@ function tickRoom(engine, t) {
     const near = nearMachine(engine, m);
     if (near && !m.near && hasContents(contents[m.def.id]) && !jobRunning(jobs[m.def.id], t)) callPlayer(engine, m);
     m.near = near;
+    // lowFuelAlert repeats every 30 s while the tank stays at 10 or less.
+    const next = lowFuelNext[m.def.id];
+    if (next && t >= next) {
+      if (isLowFuel(tankFuel(m.tank, m.def.classTsid))) {
+        engine.say?.(m.target, LOW_FUEL_LINE, LOW_FUEL_BUBBLE_MS);
+        lowFuelNext[m.def.id] = t + LOW_FUEL_REPEAT_MS;
+      } else delete lowFuelNext[m.def.id];
+    }
   }
 }
 
@@ -552,10 +613,10 @@ export const machineRoomsFeature = {
     stopSounds();
     machines = [];
     roomTsid = '';
+    collectedAt = {};
   },
 
   onTick(dtMs, t, engine) {
-    fxClock += dtMs;
     tickMs += dtMs;
     if (machines.length) {
       for (const m of machines) if (m.fx && !m.sprite.destroyed) drawFx(m, t);
@@ -631,7 +692,8 @@ export const machineRoomsFeature = {
       contents: JSON.parse(JSON.stringify(contents)),
       musicOff: { ...musicOff },
       loops: [...loops.keys()],
-      machines: machines.map((m) => ({ id: m.def.id, classTsid: m.def.classTsid, x: m.sprite.x, fuel: tankFuel(m.tank, m.def.classTsid), subtitle: m.target.subtitle })),
+      machines: machines.map((m) => ({ id: m.def.id, classTsid: m.def.classTsid, x: m.sprite.x, fuel: tankFuel(m.tank, m.def.classTsid), subtitle: m.target.subtitle, art: m.art })),
+      lowFuelNext: { ...lowFuelNext },
     };
   },
   _reset() {
@@ -640,6 +702,8 @@ export const machineRoomsFeature = {
     musicOff = {};
     bonusPaid = 0;
     last = '';
+    collectedAt = {};
+    lowFuelNext = {};
     demoDone = false;
     seedDone = false;
     stopSounds();

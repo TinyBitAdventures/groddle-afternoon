@@ -24,7 +24,7 @@ const auditCandidates = [process.env.GLITCH_AUDIT, dirname(spike), join(homedir(
 const audit = auditCandidates.find((d) => d && existsSync(join(d, 'glitch-items')));
 
 // The four machines (machine_stand assemblies) have no tool_animation scene in glitch-items or the
-// OGA dump; they draw their own `active` states instead, so the Make panel keeps their icon.
+// OGA dump; they play their own SWF states instead (G193, js/machine-art.js, tests/machine-art.test.js).
 const NO_SHEET = ['blockmaker', 'fuelmaker', 'metalmaker', 'woodworker'];
 
 /** Width and height of a lossless (VP8L) or extended (VP8X) WebP. */
@@ -138,7 +138,7 @@ describe('G188 Make panel tool animations', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     const css = readFileSync(join(pub, 'style.css'), 'utf8');
     assert.match(game, /import \{ MAKE_TOOL_SHEETS \} from '\.\/js\/make-tool-sheets\.js\?v=g188-\d+'/);
-    assert.match(game, /const toolVisual = makeToolSheetVisual\(toolInUse\) \|\| makeToolSheetVisual\(recipe\.tool\)\n\s+\|\| `<img class="mp-tool"/);
+    assert.match(game, /const toolVisual = makeToolSheetVisual\(toolInUse\) \|\| makeToolSheetVisual\(recipe\.tool\)\n\s+\|\| machineArtHtml\(recipe\.tool, [^\n]+\n\s+\|\| `<img class="mp-tool"/);
     assert.match(game, /--mp-steps:\$\{sheet\.frames\}/);
     assert.match(game, /sheet\.durationMs \|\| Math\.round\(\(sheet\.frames \/ sheet\.fps\) \* 1000\)/);
     assert.match(css, /\.make-progress \.mp-tool-sheet \{[\s\S]*?animation: make-tool-sheet var\(--mp-dur\) steps\(var\(--mp-steps\), end\) infinite;/);

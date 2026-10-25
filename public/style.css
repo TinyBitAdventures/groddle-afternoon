@@ -2609,6 +2609,50 @@ button.play-context-head:focus-visible {
   transform-origin: 50% 50%;
   animation: make-tool-sheet var(--mp-dur) steps(var(--mp-steps), end) infinite;
 }
+.make-progress .mp-tool-machine,
+.make-result .mr-machine {
+  /* G193: a machine's own SWF states (js/machine-art.js picks the frame; the span is one cell of
+     its sheet from tools/build-machine-art.py, scaled to fit). No wobble: the art moves itself. */
+  display: block;
+  object-fit: none;
+  animation: none;
+  /* The cell keeps headroom for the active effects above the machine: stand it on the box floor. */
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%) scale(var(--mp-scale));
+  transform-origin: 50% 100%;
+}
+.make-result .mr-machine-stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 0 auto 0.4rem;
+}
+.make-result .mr-machine-stage > .make-detail-icon { margin: 0; }
+.make-result .mr-machine-box {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+}
+/* lowFuelAlert's bubble (fuelmaker.js:1228-1233), over the machine that said it. */
+.make-result .mr-machine-say {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 0.22rem 0.55rem;
+  border-radius: 9px;
+  background: #fffdf6;
+  color: #4a4136;
+  font-size: 0.72rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(67, 49, 24, 0.22);
+}
 .make-progress .mp-spark {
   position: absolute;
   color: #f3b61f;

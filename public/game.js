@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-71';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-72';
 import {
   actionDurationFor,
   createTimedAction,
@@ -491,6 +491,7 @@ import {
   recipeToolInUse,
 } from './js/making.js?v=g179-1';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g188-1';
+import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g193-1';
 import {
   createGarden,
   tickGarden,
@@ -20120,6 +20121,7 @@ function renderMakeProgressStage(record) {
   // The stand-in doing the work (dullite.js:124-133): a Grand Ol' Grinder swings its own tool_animation.
   const toolInUse = recipeToolInUse(inv, recipe.tool, record.opts?.toolState || toolState, recipe.toolWear || 1);
   const toolVisual = makeToolSheetVisual(toolInUse) || makeToolSheetVisual(recipe.tool)
+    || machineArtHtml(recipe.tool, { label: `${TOOL_CATALOG[recipe.tool]?.label || recipe.tool} working` })
     || `<img class="mp-tool" data-tool="${escapeHtml(recipe.tool || '')}" src="${toolIcon}" alt="" />`;
   prog.hidden = false;
   prog.innerHTML = `
@@ -20167,6 +20169,13 @@ function updateMakeProgressUi(record) {
   if (total) total.textContent = `${totalPct}%`;
   if (totalBar) totalBar.style.width = `${totalPct}%`;
   totalBar?.parentElement?.setAttribute('aria-valuenow', String(totalPct));
+  // G193: a pack machine plays loadOpen, loadClose, then active (js/machine-art.js).
+  const machineArt = prog.querySelector('[data-machine-art]');
+  if (machineArt) {
+    const ms = craftSessionElapsedMs(timer);
+    const { state, since } = packMakeState(ms);
+    setMachineArtFrame(machineArt, state, ms - since);
+  }
 }
 
 function finishMakeCraft(record, { close = false, cancelled = false, quiet = false } = {}) {
@@ -20188,7 +20197,7 @@ function finishMakeCraft(record, { close = false, cancelled = false, quiet = fal
       record.opts?.station?.onComplete?.({ recipe: record.recipe, key: record.key, made: record.made });
       playSound('CRAFT_DONE', { volume: 0.6 });
       if (player) floatText(player.x, player.y - 80, record.recipe.name, 0xffe066);
-      if (!close) showMakeResult(result, record.key);
+      if (!close) showMakeResult(record.lowFuel ? { ...result, lowFuel: true } : result, record.key);
     }
   } else if (!close) {
     if (cancelled && !quiet) toast('Making cancelled. Nothing was used.');
@@ -20230,6 +20239,9 @@ function updateMakeCraft(deltaMs) {
       toast(result.toolUse.msg, 3600);
       pushActivity(result.toolUse.msg);
       playSfx('alert', { volume: 0.35, rate: 0.72 });
+    } else if (isMachineArt(record.recipe.tool) && isLowFuel(result.toolUse?.remaining)) {
+      // machine_base use -> lowFuelAlert (fuelmaker.js:1553-1566, :1228-1233): the machine says so in the result.
+      record.lowFuel = true;
     }
     record.made += 1;
     noteMadeUnit(record, inv, stringBefore);
@@ -20371,9 +20383,12 @@ function showMakeResult(result, key) {
     )
     .join('');
 
+  // G193: a pack machine hands its output over: ready, collectOpen, collectClose (js/machine-art.js).
+  const machineArt = machineArtHtml(RECIPE_CATALOG[key]?.tool, { className: 'mr-machine' });
+  const outIcon = `<div class="make-detail-icon"><img src="${itemIconUrl(outId)}" alt=""/></div>`;
   resEl.hidden = false;
   resEl.innerHTML = `
-    <div class="make-detail-icon"><img src="${itemIconUrl(outId)}" alt=""/></div>
+    ${machineArt ? `<div class="mr-machine-stage"><span class="mr-machine-box">${machineArt}${result.lowFuel ? `<span class="mr-machine-say" role="status">${LOW_FUEL_LINE}</span>` : ''}</span>${outIcon}</div>` : outIcon}
     <p class="mr-kicker">${result.made < result.qtyRequested ? 'Stopped' : 'Nice'}</p>
     <p class="mr-headline">${escapeHtml(result.headline)}</p>
     <div class="mr-deltas">
@@ -20390,6 +20405,7 @@ function showMakeResult(result, key) {
       <button type="button" class="btn-glitch-primary" data-mr-done>Done</button>
     </div>`;
 
+  playMachineHandOver(resEl.querySelector('[data-machine-art]'));
   resEl.querySelector('[data-mr-back]')?.addEventListener('click', () => {
     makeSelected = null;
     clearMakeFeedback();
