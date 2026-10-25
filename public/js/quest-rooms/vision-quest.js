@@ -280,7 +280,7 @@ export const room = {
     crab.scale.set(-0.42, 0.42);
     ctx.add(crab, 14);
     const frogIdle = kit.sheetFrames(PIXI, `${ART}frog_idle.png`, 16, 3, 48);
-    const frogTalk = kit.sheetFrames(PIXI, `${ART}frog_talk.png`, 16, 4, 61);
+    const frogTalk = kit.sheetFrames(PIXI, `${ART}frog_talk.png`, 16, 4, 62); // OGA npc_myopic_frog talk: 62 cells (G276)
     const frogMove = kit.sheetFrames(PIXI, `${ART}frog_move.png`, 12, 2, 24);
     const frog = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
     frog.anchor.set(0.5, 1);

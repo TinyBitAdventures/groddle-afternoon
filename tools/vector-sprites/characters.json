@@ -234,7 +234,7 @@
   ] },
   {"name": "myopic-frog", "swf": "inhabitants/myopic_frog/npc_myopic_frog.swf", "sprite": 116, "sheets": [
    {"path": "assets/sprites/quest-rooms/vision_quest/frog_idle.png", "label": "idle", "fw": 55, "fh": 61, "cols": 16, "frames": 48},
-   {"path": "assets/sprites/quest-rooms/vision_quest/frog_talk.png", "label": "talk", "fw": 55, "fh": 61, "cols": 16, "frames": 61},
+   {"path": "assets/sprites/quest-rooms/vision_quest/frog_talk.png", "label": "talk", "fw": 55, "fh": 61, "cols": 16, "frames": 62},
    {"path": "assets/sprites/quest-rooms/vision_quest/frog_move.png", "label": "move", "fw": 55, "fh": 61, "cols": 12, "frames": 24}
   ] },
   {"name": "maintenance-bot", "swf": "inhabitants/maintenance_bot/npc_maintenance_bot.swf", "sprite": 16, "sheets": [
@@ -359,7 +359,7 @@
    {"path": "assets/sprites/rube/rube_offer_trade.png", "label": "offer_trade", "shift": 96, "fw": 108, "fh": 154, "cols": 34, "frames": 340},
    {"path": "assets/sprites/rube/rube_offer_accept.webp", "label": "offer_accept", "fw": 108, "fh": 154, "cols": 9, "frames": 70},
    {"path": "assets/sprites/rube/rube_offer_reject.webp", "label": "offer_reject", "fw": 108, "fh": 154, "cols": 9, "frames": 130},
-   {"path": "assets/sprites/rube/rube_fade_out.webp", "label": "fade_out", "fw": 108, "fh": 154, "cols": 9, "frames": 97}
+   {"path": "assets/sprites/rube/rube_fade_out.webp", "label": "fade_out", "fw": 108, "fh": 154, "cols": 9, "frames": 98}
   ] },
   {"name": "flamingo", "swf": "inhabitants/flamingo/npc_flamingo.swf", "sprite": 933, "record": {"clips": [], "place": true}, "sheets": [
    {"path": "assets/sprites/newxp/flamingo_idle.png", "label": "idle0", "fw": 290, "fh": 249, "cols": 1, "frames": 1},

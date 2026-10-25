@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 463,
+  "commits": 464,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Shrines, pets, musicblocks, potions, powders, puzzles and the Conch give no mood while dead, and drinks give mood before energy"
+   },
    {
     "date": "2026-10-25",
     "kind": "improve",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Ordinary quest offers wait in the quest log, the Magic Rock's other lines use its panel, and street announcements speak over the street"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Skill learn buttons use the original words, and accelerated study gets the yellow bar with arrows"
    }
   ]
  },

@@ -648,7 +648,7 @@ const SHEETS = {
   },
   rock: {
     name: 'Magic Rock', scale: 1, anchor: [0.5, 0.95], headY: 80,
-    modes: { idle: ['rock_read', 9, 2, 18], talk: ['rock_talk', 13, 7, 91], appear: ['rock_appear', 10, 2, 20] },
+    modes: { idle: ['rock_read', 9, 2, 18], talk: ['rock_talk', 13, 7, 90], appear: ['rock_appear', 10, 2, 19] }, // G276: talk cell 90 and appear cell 19 are blank
   },
 };
 

@@ -7405,10 +7405,10 @@
   "label": "talk",
   "swfFrames": [
    83,
-   143
+   144
   ],
   "swfLabelFrames": 62,
-  "cells": 61,
+  "cells": 62,
   "fw": 55,
   "fh": 61,
   "mirror": false,
@@ -7417,14 +7417,14 @@
    -1,
    -5
   ],
-  "score": 0.9589,
+  "score": 0.9588,
   "minFrame": 0.9552,
   "faintFrames": 0,
   "faintMin": 1,
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/quest-rooms/vision_quest/frog_talk@3x.webp",
-  "bytes": 407314,
+  "bytes": 408324,
   "firstDraw": true,
   "frameScores": [
    0.9574,
@@ -7487,7 +7487,8 @@
    0.9606,
    0.9573,
    0.9556,
-   0.9571
+   0.9571,
+   0.9562
   ]
  },
  "assets/sprites/quest-rooms/vision_quest/frog_move.png": {
@@ -14505,10 +14506,10 @@
   "label": "fade_out",
   "swfFrames": [
    901,
-   997
+   998
   ],
   "swfLabelFrames": 101,
-  "cells": 97,
+  "cells": 98,
   "fw": 108,
   "fh": 154,
   "mirror": false,
@@ -14517,15 +14518,15 @@
    -2,
    -8
   ],
-  "score": 0.9716,
+  "score": 0.9683,
   "minFrame": 0.9523,
-  "faintFrames": 10,
-  "emptyFrames": 1,
+  "faintFrames": 11,
+  "emptyFrames": 2,
   "faintMin": 0.8809,
   "drift": [],
   "status": "ok",
   "hires": "assets/sprites/rube/rube_fade_out@3x.webp",
-  "bytes": 3130932,
+  "bytes": 3130310,
   "firstDraw": true,
   "frameScores": [
    0.9851,
@@ -14624,7 +14625,8 @@
    0.929,
    0.9221,
    0.8809,
-   0.7867
+   0.7867,
+   0.6547
   ]
  },
  "assets/sprites/newxp/flamingo_idle.png": {

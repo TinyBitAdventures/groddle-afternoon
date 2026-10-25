@@ -59,7 +59,7 @@ const CLIPS = {
   offer_trade: { file: 'rube_offer_trade.png', cols: 34, frames: 340, fps: 30, loop: true },
   offer_accept: { file: 'rube_offer_accept.webp', cols: 9, frames: 70, fps: 30, loop: false },
   offer_reject: { file: 'rube_offer_reject.webp', cols: 9, frames: 130, fps: 30, loop: false },
-  fade_out: { file: 'rube_fade_out.webp', cols: 9, frames: 97, fps: 30, loop: false },
+  fade_out: { file: 'rube_fade_out.webp', cols: 9, frames: 98, fps: 30, loop: false }, // OGA npc_rube fade_out: 98 cells (G276)
 };
 const WALK_SPEED = 60; // npc_walk_speed px/s
 const NEAR_PX = 100;

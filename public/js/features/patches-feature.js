@@ -83,7 +83,7 @@ const TOOL_SHEETS = Object.freeze({
   // high_class_hoe.swf tool_animation (OGA high_class_hoe__x1_tool_animation, CC0): 890x165, 10x3.
   high_class_hoe: Object.freeze({ url: 'assets/sprites/soil/high-class-hoe-tool.png', fw: 89, fh: 55, cols: 10, count: 30 }),
   shovel: Object.freeze({ url: 'assets/sprites/soil/shovel-tool.png', fw: 65, fh: 82, cols: 14, count: 53 }),
-  hatchet: Object.freeze({ url: 'assets/sprites/tools/hatchet-tool.png', fw: 110, fh: 64, cols: 8, count: 40 }),
+  hatchet: Object.freeze({ url: 'assets/sprites/tools/hatchet-tool.png', fw: 110, fh: 64, cols: 8, count: 38 }), // 38 of 40 cells hold art (G276, as game.js 41d3d76e)
 });
 const VERB_TOOL = Object.freeze({ tend: 'hoe', dig: 'shovel', clear: 'hatchet' });
 const PLACEMENT_CLEARANCE = Object.freeze({ patch: 150, patch_dark: 150, patch_seedling: 150 });

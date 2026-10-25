@@ -107,7 +107,7 @@ export function rareStoreProfile() {
     offers: RARE_STORE.offers.map((o) => ({ classTsid: o.classTsid, label: RARE_ITEMS[o.classTsid].label, buyPrice: o.cost, sellPrice: 0 })),
   };
 }
-const VENDOR_CLIPS = { idle: [5, 110], talk: [5, 72], walk: [4, 16] };
+const VENDOR_CLIPS = { idle: [5, 109], talk: [5, 72], walk: [4, 16] }; // G276: idle's 110th cell is blank
 
 const questName = (id) => getQuestCatalog()?.[id]?.title || id;
 
