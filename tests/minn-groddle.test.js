@@ -63,23 +63,17 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     }
   });
 
-  it('registers one block per block.json, each drawn by Blocks.php, Restoration.php, Musicblocks.php, StreetMusic.php or Wiki.php, with the icons the cards name', () => {
+  it('registers one block per block.json, each drawn by a class in src/ (the report sections by Restoration.php), with the icons the cards name', () => {
     const declared = JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8')).blocks;
     const dirs = readdirSync(join(ext, 'blocks'));
-    const blocks = readFileSync(join(ext, 'src/Blocks.php'), 'utf8');
     const restoration = readFileSync(join(ext, 'src/Restoration.php'), 'utf8');
-    const musicblocks = readFileSync(join(ext, 'src/Musicblocks.php'), 'utf8');
-    const wiki = readFileSync(join(ext, 'src/Wiki.php'), 'utf8');
-    const streetMusic = readFileSync(join(ext, 'src/StreetMusic.php'), 'utf8');
+    const sources = readdirSync(join(ext, 'src')).filter((f) => f.endsWith('.php')).map((f) => readFileSync(join(ext, 'src', f), 'utf8')).join('\n');
     assert.deepEqual(dirs.map((d) => `groddle/${d}`).sort(), [...declared].sort());
     for (const d of dirs) {
       const type = JSON.parse(readFileSync(join(ext, 'blocks', d, 'block.json'), 'utf8'));
       assert.equal(type.name, `groddle/${d}`);
       if (d.startsWith('restoration-')) assert.match(restoration, new RegExp(`\\$section\\('${d.slice('restoration-'.length)}'`), d);
-      else if (d === 'street-music') assert.match(streetMusic, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
-      else if (d.startsWith('wiki-')) assert.match(wiki, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
-      else if (d.startsWith('musicblocks')) assert.match(musicblocks, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
-      else assert.match(blocks, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
+      else assert.match(sources, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
       if (type.parent) assert.ok(declared.includes(type.parent[0]), `${d}'s parent is a declared block`);
       if (type.allowedBlocks) assert.deepEqual(type.example.innerBlocks.map((b) => b.name), type.allowedBlocks, `${d} inserts with a child to edit`);
     }
