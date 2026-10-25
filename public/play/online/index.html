@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="multiplayer">
+<head>
+  <meta charset="UTF-8" />
+  <!-- The multiplayer entry lives at /play/online/; every path stays relative to the site root. -->
+  <base href="../../" />
+  <!--
+    Multiplayer entry (js/game-mode.js). This must stay the FIRST script on the page, ahead of
+    Pixi and game.js, and the page never loads js/practice-mode.js (practice copies are solo only).
+    It declares the mode from <html data-mode> and, in multiplayer, strips location.search so the
+    game's query reads (game.js URLSearchParams, engine.param in features) see no demo or QA params.
+  -->
+  <script id="mode-entry">
+    (function multiplayerEntry(w, d) {
+      var mode = d.documentElement.getAttribute('data-mode') === 'multiplayer' ? 'multiplayer' : 'solo';
+      w.GRODDLE_MODE = mode;
+      if (mode !== 'multiplayer') return;
+      var loc = w.location;
+      if (!loc.search) return;
+      var clean = loc.pathname + loc.hash;
+      try {
+        w.history.replaceState(w.history.state, '', clean);
+      } catch (e) {
+        loc.replace(clean);
+        return;
+      }
+      // Never boot with params still in place.
+      if (loc.search) loc.replace(clean);
+    })(window, document);
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Groddle Afternoon · Multiplayer</title>
+  <link rel="stylesheet" href="style.css?v=feed-picker-1" />
+  <link rel="icon" href="favicon.svg?v=quoin" type="image/svg+xml" />
+  <link rel="icon" href="favicon.ico?v=quoin" sizes="32x32" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=quoin" />
+  <style>
+    body { background-attachment: fixed; }
+    .online-gate { min-height: 100vh; display: grid; place-items: center; padding: 1rem; }
+    .online-gate .card { line-height: 1.4; text-align: left; }
+    .online-gate .card img { display: block; width: 44px; height: 44px; margin: 0 auto 0.5rem; }
+    .online-gate .online-play {
+      display: block; margin-top: 0.85rem; text-align: center; text-decoration: none;
+      border-radius: 10px; padding: 0.7rem 1rem; font-size: 1rem; font-weight: 700; color: white;
+      background: linear-gradient(180deg, #f09a55, var(--accent)); box-shadow: 0 3px 0 #b85a24;
+    }
+    .online-gate .online-play:hover { filter: brightness(1.05); }
+    .online-gate .online-play:active { transform: translateY(2px); box-shadow: 0 1px 0 #b85a24; }
+    .online-gate .online-home { display: block; margin-top: 0.6rem; text-align: center; color: #2e5a20; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <!--
+    Phase 1: multiplayer is not open, so this page does not boot the game.
+    Phase 2 boots it here in multiplayer mode: sign in with Minn, then load the same shell as
+    play/index.html (its #wrap markup, Pixi and game.js) below the mode-entry script, without
+    practice-mode.js. js/save-store.js then picks the Minn store from GAME_MODE.
+  -->
+  <main id="online-gate" class="online-gate" data-online="closed">
+    <div class="card" role="status">
+      <img src="favicon.svg?v=quoin" alt="" width="44" height="44" />
+      <h2>Multiplayer is not open yet</h2>
+      <p>Playing in Ur with other Glitches will need an account, and sign-up isn't open yet.</p>
+      <p>Your solo game is still right here. It saves in this browser and needs no account.</p>
+      <a class="online-play" href="play/">Play solo</a>
+      <a class="online-home" href="./">Back to Groddle Afternoon</a>
+    </div>
+  </main>
+</body>
+</html>

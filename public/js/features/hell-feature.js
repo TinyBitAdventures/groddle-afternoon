@@ -59,7 +59,7 @@ import {
   POOPED_ENERGY_PERCENT,
   SUPER_POOPED_CONSUMED_MULTIPLIER,
 } from '../hell.js';
-import { getGameDayKey } from '../game-day.js?v=dametime-1';
+import { getGameDayKey } from '../game-day.js?v=dametime-2';
 import { countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 

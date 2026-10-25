@@ -61,7 +61,7 @@ import {
   wineDrinkConditions,
 } from '../public/js/hell.js';
 import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-7';
-import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../public/js/game-day.js?v=dametime-1';
+import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../public/js/game-day.js?v=dametime-2';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import {
   applyAchievementProgress,

@@ -28,7 +28,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-7';
-import { dametimeParts, getGameDayKey } from '../game-day.js?v=dametime-1';
+import { dametimeParts, getGameDayKey } from '../game-day.js?v=dametime-2';
 import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g300-1';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js';
 import { setSeasonalRecipeCheck } from '../making.js?v=g300-1';

@@ -35,7 +35,7 @@
  */
 
 import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-7';
-import { getGameDayKey } from '../game-day.js?v=dametime-1';
+import { getGameDayKey } from '../game-day.js?v=dametime-2';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import { emblemCostFor } from '../shrines.js';
 import { landingY } from '../walk-surface.js';

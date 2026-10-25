@@ -71,7 +71,7 @@
  */
 
 import { addItem } from '../inventory.js?v=catalog-unified-7';
-import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=dametime-1';
+import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=dametime-2';
 import {
   COMPLETE_BUTTON,
   COMPLETE_TITLE,
@@ -98,7 +98,7 @@ import {
   resetPending,
   streakCheck,
   takePending,
-} from '../solo-feats.js?v=g171-1';
+} from '../solo-feats.js?v=g319-1';
 
 const POLL_MS = 500;
 /** How often an open panel redraws its "Opens again in" lines. */

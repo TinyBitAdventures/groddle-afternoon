@@ -15,6 +15,7 @@
 import { normalizeVectorFields, vectorFieldsFromColors } from './avatar-looks.js';
 import { installReimaginedTags } from './avatar-reimagined.js';
 import { starterRowFields } from './avatar-starter.js';
+import { saveStore } from './save-store.js?v=mp1-1';
 
 // The builder's wardrobe chips (game.js) get a "Reimagined" tag on the
 // greyscale masters the remake coloured (js/avatar-reimagined.js, row G52).
@@ -335,9 +336,13 @@ export function appearanceFromJson(json) {
  * @param {{ storage?: Storage }} [opts]
  */
 export function saveAppearance(appearance, opts = {}) {
-  const storage = opts.storage || (typeof localStorage !== 'undefined' ? localStorage : null);
-  if (!storage) return false;
-  storage.setItem(STORAGE_KEY, appearanceToJson(appearance));
+  // The look is part of the character: it saves through js/save-store.js (key STORAGE_KEY in solo)
+  // unless a caller hands in its own Storage.
+  if (opts.storage) {
+    opts.storage.setItem(STORAGE_KEY, appearanceToJson(appearance));
+    return true;
+  }
+  saveStore.set('appearance', appearanceToJson(appearance));
   return true;
 }
 
@@ -346,9 +351,12 @@ export function saveAppearance(appearance, opts = {}) {
  * @returns {Appearance}
  */
 export function loadAppearance(opts = {}) {
-  const storage = opts.storage || (typeof localStorage !== 'undefined' ? localStorage : null);
-  if (!storage) return createDefaultAppearance();
-  const raw = storage.getItem(STORAGE_KEY);
+  let raw = null;
+  try {
+    raw = opts.storage ? opts.storage.getItem(STORAGE_KEY) : saveStore.get('appearance');
+  } catch {
+    return createDefaultAppearance();
+  }
   if (!raw) return createDefaultAppearance();
   let parsed = null;
   try { parsed = JSON.parse(raw); } catch { return createDefaultAppearance(); }

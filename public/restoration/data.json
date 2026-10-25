@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 486,
+  "commits": 487,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "The cloud level's words show, the upgrade hand hides the Enter tip, and quest rooms name their real hubs"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Shrines, pets, musicblocks, potions, powders, puzzles and the Conch give no mood while dead, and drinks give mood before energy"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Home questions are plain yes/no prompts, races and games stop new quests from starting, and Go Moloko Loco waits for Animal Kinship IV"
    }
   ]
  },
- "tests": 289,
+ "tests": 291,
  "generatedAt": "2026-10-25"
 }

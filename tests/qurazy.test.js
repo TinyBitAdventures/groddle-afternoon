@@ -334,8 +334,8 @@ describe('wiring', () => {
     }
     // The feature and its modules agree on one key per module.
     const feature = readFileSync(join(PUBLIC, 'js/features/qurazy-feature.js'), 'utf8');
-    assert.match(feature, /qurazy\.js\?v=g260-\d+/);
-    assert.match(feature, /qurazy-markers\.js\?v=g260-\d+/);
+    assert.match(feature, /qurazy\.js\?v=g\d+-\d+/);
+    assert.match(feature, /qurazy-markers\.js\?v=g\d+-\d+/);
   });
 });
 

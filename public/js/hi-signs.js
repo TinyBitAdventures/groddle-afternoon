@@ -35,7 +35,7 @@
  * day are left out (there are no other players).
  */
 
-import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=dametime-1';
+import { GAME_DAY_MS, GAME_EPOCH_MS } from './game-day.js?v=dametime-2';
 
 /** config_base.js hi_emote_variants (in hi_overlay.as order). */
 export const HI_VARIANTS = Object.freeze(['bats', 'birds', 'butterflies', 'cubes', 'flowers', 'hands', 'hearts', 'hi', 'pigs', 'rocketships', 'stars']);

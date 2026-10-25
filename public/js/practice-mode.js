@@ -9,6 +9,11 @@
  * are read through from the real save so the practice copy still looks like
  * you: the avatar look and the mute setting. Writes never reach the real save.
  *
+ * This is the storage layer under the solo save store (js/save-store.js reads
+ * window.localStorage on every call, so it sees this per-tab store), which is
+ * why it stays a plain Storage swap rather than a save-store client. The two
+ * read-through keys are save-store's 'appearance' key and audio-pref's mute key.
+ *
  * Classic script, loaded in play/index.html before the game modules so no
  * module sees the real localStorage first. If a shared multiplayer world is
  * ever added, practice links stay solo and nothing done in them counts there.
@@ -21,6 +26,8 @@
     return;
   }
   if (params.get('practice') !== '1') return;
+  // Practice copies are solo only (js/game-mode.js): a multiplayer entry page never practises.
+  if (window.GRODDLE_MODE === 'multiplayer') return;
 
   const PREFIX = 'groddle-practice:';
   const READ_THROUGH = new Set(['groddle.avatar.appearance.v1', 'groddle.audio.muted']);

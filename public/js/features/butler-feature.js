@@ -68,7 +68,7 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=home-cultivation-4';
-import { homesFeature } from './homes-feature.js?v=homes-32';
+import { homesFeature } from './homes-feature.js?v=homes-33';
 import { towerApi } from './home-tower-feature.js?v=home-tower-14';
 import { levelInfoForXp } from '../progression.js?v=progression-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
@@ -131,7 +131,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=butler-5';
+} from '../butler.js?v=butler-6';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';

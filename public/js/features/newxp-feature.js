@@ -36,6 +36,8 @@
  *
  * Opt-in: a brand-new save's start card offers "Start with the tutorial" or
  * "Skip to Ur"; existing saves and autostart routes are never redirected.
+ * On a plain /play/ (no query) the card first asks Solo or Multiplayer
+ * (js/game-mode.js): Solo leads to that choice, Multiplayer to /play/online/.
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&newxp=1 (or
  * =training1|training2|house|skill|island) forces it; &newxpautoplay=1 runs
  * it end to end (&newxphold=<stage> stops on reaching that stage, =sloth at
@@ -117,6 +119,7 @@ import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g311-1';
 import { HOME_MACHINE } from '../home-ticket.js?v=g310-1';
 import { createAnimalState } from '../animals.js?v=g296-1';
+import { mountModeChoice, multiplayerEntryUrl, offersModeChoice } from '../game-mode.js?v=mp1-1';
 import {
   AK_ANIMALS,
   AK_BUBBLE,
@@ -2954,24 +2957,48 @@ function showStartCard(engine) {
   if (!card || !startBtn) return;
   ensureUi();
   startCardShown = true;
-  const box = el('div', { class: 'nx-start', id: 'newxp-start' }, `
+  const box = el('div', { class: 'nx-start', id: 'newxp-start' }, '');
+  startBtn.hidden = true;
+  startBtn.parentNode.insertBefore(box, startBtn);
+  const tutorialChoice = () => {
+    box.dataset.step = 'tutorial';
+    box.innerHTML = `
     <p><strong>New to Ur?</strong> Fall out of the clouds and meet the Welcoming Flamingo,
       the Dustbunny and your Magic Rock, then find your way off Gentle Island.</p>
     <div class="nx-start-row">
       <button type="button" data-nx-start>Start with the tutorial</button>
       <button type="button" class="alt" data-nx-skipstart>Skip to Ur</button>
-    </div>`);
-  startBtn.hidden = true;
-  startBtn.parentNode.insertBefore(box, startBtn);
-  box.querySelector('[data-nx-start]').addEventListener('click', () => {
-    pendingStage = 'clouds';
-    startBtn.click();
+    </div>`;
+    box.querySelector('[data-nx-start]').addEventListener('click', () => {
+      pendingStage = 'clouds';
+      startBtn.click();
+    });
+    box.querySelector('[data-nx-skipstart]').addEventListener('click', () => {
+      save.status = 'skipped';
+      startBtn.click();
+    });
+    engine.setData('newxpStartCard', 'shown');
+  };
+  // Multiplayer phase 1 (js/game-mode.js): a plain /play/ asks Solo or Multiplayer first;
+  // any query route (autostart, fresh, resetgame, QA params) goes straight to the tutorial choice, solo.
+  if (!offersModeChoice({ mode: engine.mode, search: location.search })) {
+    tutorialChoice();
+    return;
+  }
+  const customize = document.getElementById('start-customize-btn');
+  if (customize) customize.hidden = true;
+  mountModeChoice(box, {
+    onSolo: () => {
+      engine.setData('startMode', 'solo');
+      if (customize) customize.hidden = false;
+      tutorialChoice();
+    },
+    onMultiplayer: () => {
+      engine.setData('startMode', 'multiplayer');
+      location.assign(multiplayerEntryUrl(document.baseURI));
+    },
   });
-  box.querySelector('[data-nx-skipstart]').addEventListener('click', () => {
-    save.status = 'skipped';
-    startBtn.click();
-  });
-  engine.setData('newxpStartCard', 'shown');
+  engine.setData('newxpStartCard', 'mode');
 }
 
 /* ------------------------------------------------------------------ */

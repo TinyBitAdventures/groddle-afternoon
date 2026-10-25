@@ -77,7 +77,7 @@ import { metabolicGain, moodMax } from './js/metabolics.js';
 import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js';
 import { levelInfoForXp } from './js/progression.js?v=progression-1';
-import { getGameDayKey } from './js/game-day.js?v=dametime-1';
+import { getGameDayKey } from './js/game-day.js?v=dametime-2';
 import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-7';
 
 /** Naming / capture context for an animal target (the back yard counts as yours). */

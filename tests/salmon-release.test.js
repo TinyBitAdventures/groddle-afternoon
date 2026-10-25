@@ -22,7 +22,7 @@ import {
 } from '../public/js/resource-nodes.js';
 import { MOOD_XP_SOURCES } from '../public/js/mood-xp.js';
 import { resourceNodesFeature } from '../public/js/features/resource-nodes-feature.js';
-import { eventIncrements } from '../public/js/solo-feats.js?v=g171-1';
+import { eventIncrements } from '../public/js/solo-feats.js?v=g319-1';
 
 const ROOT = join(import.meta.dirname, '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-11';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-12';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-125';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-126';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -427,7 +427,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-17';
+} from './js/player-save.js?v=player-save-18';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -584,7 +584,7 @@ import {
   getGameDayKey,
   timestampForGameHour,
   msUntilNewDay,
-} from './js/game-day.js?v=dametime-1';
+} from './js/game-day.js?v=dametime-2';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,
@@ -594,7 +594,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=food-memory-5';
+} from './js/food.js?v=food-memory-6';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -817,7 +817,10 @@ import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromU
 import { cancelAllOverlays, playPoofIn } from './js/overlay-art.js?v=g311-1';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
-import { hidesChatBubble } from './js/hi-signs.js?v=hi-chat-1';
+import { hidesChatBubble } from './js/hi-signs.js?v=hi-signs-2';
+// Multiplayer phase 1: the mode flag and the save interface every save read/write goes through.
+import { GAME_MODE } from './js/game-mode.js?v=mp1-1';
+import { saveStore } from './js/save-store.js?v=mp1-1';
 import { clearSpeechOfBox, giveArtHeight, hudColumnBox, placeSpeechTail, placeSpeechTip, speechOffsetFor, speechTailPoints } from './js/speech-placement.js?v=g269-1';
 
 /** @type {object|null} assets/maps/index.json */
@@ -6698,7 +6701,8 @@ function stopCompanionFollowForInstance() {
   publishCompanionFollowState();
 }
 
-const COMPANIONS_STORAGE_KEY = 'groddle:companions';
+/** Save entry 'companions' (localStorage 'groddle:companions' in solo, js/save-store.js). */
+const COMPANIONS_STORAGE_KEY = 'companions';
 
 /**
  * The named stand-in Glitches (Amp, Bumbishfish, Lily Linguistic) are opt-in.
@@ -6710,12 +6714,12 @@ function localCompanionsEnabled() {
   const params = new URLSearchParams(location.search);
   const requested = params.get('companions');
   if (requested === '1' || requested === '0') {
-    try { localStorage.setItem(COMPANIONS_STORAGE_KEY, requested); } catch { /* storage unavailable */ }
+    try { saveStore.set(COMPANIONS_STORAGE_KEY, requested); } catch { /* storage unavailable */ }
     return requested === '1';
   }
   if (params.has('companiondemo') || params.has('followdemo') || params.has('beardemo') || params.has('helpminedemo') || params.has('quoinshard')) return true;
   try {
-    return localStorage.getItem(COMPANIONS_STORAGE_KEY) === '1';
+    return saveStore.get(COMPANIONS_STORAGE_KEY) === '1';
   } catch {
     return false;
   }
@@ -7765,6 +7769,8 @@ function anyTransientInstance() {
 /** The engine API features use instead of reaching into game.js state. */
 const engine = {
   PIXI,
+  /** 'solo' | 'multiplayer' (js/game-mode.js); solo everywhere until multiplayer opens. */
+  mode: GAME_MODE,
   get started() {
     return state.started === true;
   },
@@ -9333,12 +9339,13 @@ function isScreenFxBlocking() {
 /** @type {boolean} */
 let newDayBusy = false;
 
-/** localStorage key for last street + xy (auto save/load). */
-const LOCATION_STORAGE_KEY = 'groddle_player_location';
-/** Persistent Tiny Speck-style item stacks placed on streets by the player. */
-const DROPPED_ITEMS_STORAGE_KEY = 'groddle_dropped_items_v1';
-/** Pack and metabolics must persist with street stacks to keep moves atomic across reloads. */
-const PLAYER_STATE_STORAGE_KEY = 'groddle_player_state_v1';
+// Save entry names (js/save-store.js); in solo they are the same localStorage keys as always.
+/** Last street + xy (auto save/load): 'groddle_player_location'. */
+const LOCATION_STORAGE_KEY = 'location';
+/** Persistent Tiny Speck-style item stacks placed on streets by the player: 'groddle_dropped_items_v1'. */
+const DROPPED_ITEMS_STORAGE_KEY = 'droppedItems';
+/** Pack and metabolics must persist with street stacks to keep moves atomic across reloads: 'groddle_player_state_v1'. */
+const PLAYER_STATE_STORAGE_KEY = 'playerState';
 let lastSerializedPlayerState = '';
 
 function persistentSystems() {
@@ -9388,7 +9395,7 @@ function rehydrateSavedBuffs() {
 
 function loadPlayerState() {
   try {
-    return parsePlayerSave(localStorage.getItem(PLAYER_STATE_STORAGE_KEY), {
+    return parsePlayerSave(saveStore.get(PLAYER_STATE_STORAGE_KEY), {
       inventory: inv,
       player: pc,
       systems: persistentSystems(),
@@ -9413,7 +9420,7 @@ function savePlayerState() {
     // savedAt changes each capture; compare gameplay payloads before writing.
     const comparable = serialized.replace(/"savedAt":\d+/, '"savedAt":0');
     if (comparable === lastSerializedPlayerState) return true;
-    localStorage.setItem(PLAYER_STATE_STORAGE_KEY, serialized);
+    saveStore.set(PLAYER_STATE_STORAGE_KEY, serialized);
     lastSerializedPlayerState = comparable;
     return true;
   } catch {
@@ -9423,7 +9430,7 @@ function savePlayerState() {
 
 function loadDroppedItems() {
   try {
-    return parseDroppedItemState(localStorage.getItem(DROPPED_ITEMS_STORAGE_KEY));
+    return parseDroppedItemState(saveStore.get(DROPPED_ITEMS_STORAGE_KEY));
   } catch {
     return createDroppedItemState();
   }
@@ -9431,7 +9438,7 @@ function loadDroppedItems() {
 
 function saveDroppedItems() {
   try {
-    localStorage.setItem(
+    saveStore.set(
       DROPPED_ITEMS_STORAGE_KEY,
       serializeDroppedItemState(droppedItemState)
     );
@@ -9451,7 +9458,7 @@ function savePlayerLocation(override = {}) {
   const y = override.y ?? player?.y;
   if (!tsid || !Number.isFinite(x) || !Number.isFinite(y)) return false;
   try {
-    localStorage.setItem(
+    saveStore.set(
       LOCATION_STORAGE_KEY,
       JSON.stringify({
         tsid,
@@ -9471,7 +9478,7 @@ function savePlayerLocation(override = {}) {
  */
 function loadPlayerLocation() {
   try {
-    const raw = localStorage.getItem(LOCATION_STORAGE_KEY);
+    const raw = saveStore.get(LOCATION_STORAGE_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw);
     if (!data || typeof data.tsid !== 'string') return null;
@@ -22853,6 +22860,7 @@ async function main() {
   npcGlitches = createNpcGlitchKit({ PIXI, ticker: app.ticker, stage: app.stage, hires: vectorBakeScale() === 3, canvas: app.canvas, idleWaitMs: IDLE_TIMING.waitMs });
   app.canvas.setAttribute('role', 'application');
   app.canvas.setAttribute('aria-label', 'Groddle game world');
+  app.canvas.dataset.mode = GAME_MODE;
   app.canvas.tabIndex = 0;
   root.insertBefore(app.canvas, document.getElementById('overlay'));
   syncRenderResolution();
@@ -22942,14 +22950,14 @@ async function main() {
   const bootParams = new URLSearchParams(location.search);
   if (bootParams.has('resetgame')) {
     try {
-      localStorage.removeItem(PLAYER_STATE_STORAGE_KEY);
-      localStorage.removeItem(DROPPED_ITEMS_STORAGE_KEY);
-      localStorage.removeItem(LOCATION_STORAGE_KEY);
+      saveStore.remove(PLAYER_STATE_STORAGE_KEY);
+      saveStore.remove(DROPPED_ITEMS_STORAGE_KEY);
+      saveStore.remove(LOCATION_STORAGE_KEY);
       resetGameDayClock();
     } catch { /* storage unavailable */ }
   }
   if (bootParams.has('resetdrops')) {
-    try { localStorage.removeItem(DROPPED_ITEMS_STORAGE_KEY); } catch { /* storage unavailable */ }
+    try { saveStore.remove(DROPPED_ITEMS_STORAGE_KEY); } catch { /* storage unavailable */ }
   }
   droppedItemState = loadDroppedItems();
   const savedPlayerState = loadPlayerState();

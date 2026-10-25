@@ -6,6 +6,8 @@
  * one game hour is 10 real minutes, and one game day is four real hours.
  */
 
+import { saveStore } from './save-store.js?v=mp1-1';
+
 export const SPEED_MULTIPLIER = 6;
 export const GAME_EPOCH_MS = 1_238_562_000 * 1000;
 export const GAME_MINUTE_MS = 10 * 1000;
@@ -25,8 +27,10 @@ export const MONTH_NAMES = [
 
 export const MONTH_LENGTHS = [29, 3, 53, 17, 73, 19, 13, 37, 5, 47, 11, 1];
 
-const STORAGE_KEY = 'groddle_last_new_day_ts';
-const DAY_KEY_STORAGE_KEY = 'groddle_last_new_day_key';
+// Saved through the save interface (js/save-store.js): 'groddle_last_new_day_ts' and
+// 'groddle_last_new_day_key' in solo, the same keys as always.
+const STORAGE_KEY = 'lastNewDayTs';
+const DAY_KEY_STORAGE_KEY = 'lastNewDayKey';
 
 function mod(value, divisor) {
   return ((value % divisor) + divisor) % divisor;
@@ -171,7 +175,7 @@ export function daylightState(now = Date.now()) {
 
 export function getLastNewDayTs() {
   try {
-    const value = Number(localStorage.getItem(STORAGE_KEY) || 0);
+    const value = Number(saveStore.get(STORAGE_KEY) || 0);
     return Number.isFinite(value) ? value : 0;
   } catch {
     return 0;
@@ -180,7 +184,7 @@ export function getLastNewDayTs() {
 
 export function getLastNewDayKey() {
   try {
-    return localStorage.getItem(DAY_KEY_STORAGE_KEY) || '';
+    return saveStore.get(DAY_KEY_STORAGE_KEY) || '';
   } catch {
     return '';
   }
@@ -189,8 +193,8 @@ export function getLastNewDayKey() {
 /** Seed/acknowledge the official game day containing `ts`. */
 export function setLastNewDayTs(ts = Date.now()) {
   try {
-    localStorage.setItem(STORAGE_KEY, String(ts));
-    localStorage.setItem(DAY_KEY_STORAGE_KEY, getGameDayKey(ts));
+    saveStore.set(STORAGE_KEY, String(ts));
+    saveStore.set(DAY_KEY_STORAGE_KEY, getGameDayKey(ts));
   } catch {
     /* private mode */
   }
@@ -198,8 +202,8 @@ export function setLastNewDayTs(ts = Date.now()) {
 
 export function resetGameDayClock() {
   try {
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(DAY_KEY_STORAGE_KEY);
+    saveStore.remove(STORAGE_KEY);
+    saveStore.remove(DAY_KEY_STORAGE_KEY);
   } catch {
     /* private mode */
   }
@@ -226,7 +230,7 @@ export function shouldFireNewDay(now = Date.now(), dayMs = GAME_DAY_MS) {
       return false;
     }
     lastKey = getGameDayKey(legacyTs);
-    try { localStorage.setItem(DAY_KEY_STORAGE_KEY, lastKey); } catch { /* private mode */ }
+    try { saveStore.set(DAY_KEY_STORAGE_KEY, lastKey); } catch { /* private mode */ }
   }
   return lastKey !== getGameDayKey(now);
 }

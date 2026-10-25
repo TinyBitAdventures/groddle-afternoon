@@ -41,11 +41,11 @@ import {
   reopenDueFeats,
   reopenText,
   reopensAt,
-} from '../public/js/solo-feats.js?v=g171-1';
-import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=dametime-1';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g300-1';
+} from '../public/js/solo-feats.js?v=g319-1';
+import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=dametime-2';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g319-1';
 import { FEATURES } from '../public/js/features/index.js';
-import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=player-save-17';
+import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=player-save-18';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
 
 const ROOT = join(import.meta.dirname, '..');
