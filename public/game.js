@@ -1696,6 +1696,8 @@ let state = {
   started: false,
   questDone: false,
   toastTimer: 0,
+  /** Whether a panel was already open when the showing toast was raised. */
+  toastOverModal: false,
   /** performance.now() when a loading card started holding the toast (G198). */
   toastHeldAt: 0,
   /** G258: frames since the last HUD heartbeat (physics); energy no longer drifts here. */
@@ -1768,6 +1770,12 @@ function toast(msg, ms = 3000) {
   state.toastTimer = performance.now() + ms;
   // Shown during a loading card: its time starts once the card has gone (G198).
   state.toastHeldAt = streetCardUp() ? state.toastTimer - ms : 0;
+  state.toastOverModal = Boolean(openGlitchModal());
+}
+
+/** The open panel (.glitch-modal: shrine, vendor, Feat, ...), if any. */
+function openGlitchModal() {
+  return document.querySelector('.glitch-modal:not([hidden])');
 }
 
 /** @type {Promise<void>} */
@@ -10262,8 +10270,12 @@ function physics(dt) {
       state.toastHeldAt = 0;
     }
   }
-  if (!state.toastHeldAt && state.toastTimer > 0 && performance.now() >= state.toastTimer) {
+  // A panel opened after the toast was raised (the shrine again, right after a donation)
+  // would sit under it: the toast goes early, its line is still in the activity log.
+  const staleUnderPanel = state.toastTimer > 0 && !state.toastOverModal && openGlitchModal();
+  if (staleUnderPanel || (!state.toastHeldAt && state.toastTimer > 0 && performance.now() >= state.toastTimer)) {
     state.toastTimer = 0;
+    state.toastHeldAt = 0;
     document.getElementById('toast').hidden = true;
   }
 }

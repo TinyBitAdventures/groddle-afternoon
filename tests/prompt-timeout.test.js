@@ -252,6 +252,13 @@ describe('the game wires them', () => {
     assert.match(game, /state\.toastHeldAt = streetCardUp\(\) \? state\.toastTimer - ms : 0;/);
     assert.match(game, /cardPausedTimeout\(\(\) => \{\n\s*el\.classList\.add\('is-leaving'\);/);
   });
+
+  it('a toast raised before a panel opens goes when the panel opens (shrine reopened after a donation)', () => {
+    assert.match(game, /state\.toastOverModal = Boolean\(openGlitchModal\(\)\);/);
+    assert.match(game, /const staleUnderPanel = state\.toastTimer > 0 && !state\.toastOverModal && openGlitchModal\(\);/);
+    assert.match(game, /if \(staleUnderPanel \|\| \(!state\.toastHeldAt && state\.toastTimer > 0 && performance\.now\(\) >= state\.toastTimer\)\)/);
+    assert.match(game, /closeShrinePanel\(\);\n\s*playShrineDonation\(target\);\n\s*refreshShrineTarget\(target\);\n\s*toast\(line, 4200\);/, 'the donation toast is raised after the panel closes');
+  });
 });
 
 describe('the hell demos run once (helldemo=croak, helldemo=pooped)', () => {

@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 495,
+  "commits": 496,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Trees and other street things are never placed on a cave ceiling or a ledge's underside"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "The Home panel names your home style without made-up blurbs"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Sharp making-tool and machine animations, and the Fruit Changing Machine plays all 90 frames"
    }
   ]
  },
