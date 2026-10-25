@@ -2705,6 +2705,19 @@ export const newxpFeature = {
     return active() ? true : null;
   },
 
+  /**
+   * G231: true while the tutorial's own Magic Rock has your home street (the
+   * house stage, runHouse; the wrap-up, homeWrapUp, until the street is left),
+   * so homes-feature keeps its street rock away: one rock a street. In the
+   * source both are the one magic_rock item (newxp_house_exterior.js createRock
+   * 43-50, home.js 101-136; inc_homes.js homes_demo_frontyard 2469-2471).
+   */
+  homeRockHeld(engine) {
+    if (!active() || engine?.streetTsid !== HOME_STREET_TSID) return null;
+    if (run?.stage === 'house' || save.island === 'go_home') return true;
+    return run?.npcs?.some((npc) => npc.kind === 'rock' && npc.sprite && !npc.sprite.destroyed) ? true : null;
+  },
+
   travelGate(tsid, engine) {
     if (!active()) return null;
     if (inTutorialScene(engine)) return { ok: false, msg: 'Follow the tutorial (or skip it from the Tutorial card).' };

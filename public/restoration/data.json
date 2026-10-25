@@ -2027,9 +2027,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 441,
+  "commits": 442,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "The Magic Rock in your back yard teaches cultivating, expanding and styles, and things keep their place when your yard grows"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2144,11 +2149,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Room machines work while you wait, then hold your stuff until you collect it"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Quests draw their route on the Map, and a GPS points at the next signpost"
    }
   ]
  },

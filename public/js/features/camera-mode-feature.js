@@ -53,6 +53,11 @@ function blocked(engine) {
   return engine.busy({ ignoreHome: true }) || engine.acting() || engine.inScene() || Boolean(engine.instanceHold) || engine.transientInstance?.();
 }
 
+/** G231: a house edit mode is open (homes-feature homeEditMode: cultivate or decorate). */
+export function homeEditing(engine) {
+  return Boolean(engine?.query?.('homeEditMode', engine));
+}
+
 function showOverlay(on, range) {
   if (typeof document === 'undefined') return;
   if (!overlay) {
@@ -103,6 +108,13 @@ function attach(engine) {
     // KeyBeacon.as 288-295: with shift held the client fires SHIFT_PLUS_ C, which is
     // cultivation (TSMainView.as 647, 816), not Camera Mode's plain C (G226).
     if (k === 'c' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+      // TSMainView.as cKeyHandler 790-800: in decorator, chassis or cult mode
+      // plain C does nothing at all (G231), so it opens neither Camera Mode nor Making.
+      if (!active && homeEditing(engine)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
       if (!active && blocked(engine)) return;
       e.preventDefault();
       e.stopImmediatePropagation();

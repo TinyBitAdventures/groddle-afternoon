@@ -15,10 +15,12 @@
  *    stop per floor plus the construction floor, renamable floors), the exit
  *    door on the ground floor, and the Workbench (tower_expander) that runs
  *    the job_tower_floor_N project while the tower is expanding;
- *  - the Magic Rock on the home street (magic_rock.js setAvailableQuests:
- *    build_a_tower): offers the quest when its gates pass (level over 18, no
- *    tower) and stays while it runs; the flags cultivate_tower / build_tower
- *    advance it through the quest event stream;
+ *  - the Magic Rock's talk to on the home street (magic_rock.js
+ *    setAvailableQuests: build_a_tower): offers the quest when its gates pass
+ *    (level over 18, no tower) and stays while it runs; the flags
+ *    cultivate_tower / build_tower advance it through the quest event stream.
+ *    G231: homes-feature owns the street's one rock (inc_homes.js 2469-2471)
+ *    and adds this talk to (towerApi.rockTalk / talkToRock) to its home verbs;
  *  - the Jethimadh Tower Base secret spots (location.js handleTowerSecrets):
  *    the archived TowerSpot boxes plus four reconstructed ones, the
  *    "nth of eleven" overlay, 50 currants at TowerSpot_03, and the
@@ -107,7 +109,7 @@ import {
   towerSpotsFor,
   workCheck,
 } from '../home-tower.js?v=home-tower-2';
-import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { textureFromUrl } from '../textures.js';
 import { pieceUrl } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { WOTD_TEXT } from '../wine-pour.js?v=g165-1';
@@ -123,7 +125,6 @@ const HOME_INTERIOR_TSID = 'RH_HOME_INT';
 /** items/include/jobs.js startJobWork unit_duration. */
 const WORK_UNIT_MS = 1500;
 const WALK_AWAY_PX = 260;
-const ROCK_SHEET = { file: 'assets/sprites/newxp/rock_read.png', cols: 9, rows: 2, count: 18 };
 
 let tower = createTowerState();
 let bridge = null;
@@ -131,7 +132,7 @@ let engineRef = null;
 let work = null;
 let arrivalX = null;
 let floorArrival = null; // 'door' (from the street) | 'elevator'
-let streetView = null; // { container, target, rock, sign }
+let streetView = null; // { container, target, sign }
 let floorView = null; // { floor, construction, targets }
 let spots = [];
 let panel = null;
@@ -220,7 +221,7 @@ function publish(engine, force = false) {
   engine.setData('towerMark', tower.floor == null ? '' : elevatorMark(tower.floor));
   engine.setData('towerWork', work ? `${work.rid}:${work.units}` : '');
   engine.setData('towerSecrets', tower.secrets.length);
-  engine.setData('towerRock', streetView?.rock ? '1' : '0');
+  engine.setData('towerRock', streetRock() && rockHasTalk(engine) ? '1' : '0');
   engine.setData('towerVisited', tower.visited ? '1' : '0');
 }
 
@@ -269,50 +270,6 @@ function protoSprite(PIXI, state) {
   return spr;
 }
 
-function rockFrames(PIXI) {
-  const base = sourceFromUrl(ROCK_SHEET.file);
-  const frames = [];
-  const make = () => {
-    const fw = base.width / ROCK_SHEET.cols;
-    const fh = base.height / ROCK_SHEET.rows;
-    for (let i = 0; i < ROCK_SHEET.count; i += 1) {
-      frames.push(frameTexture(base, new PIXI.Rectangle((i % ROCK_SHEET.cols) * fw, Math.floor(i / ROCK_SHEET.cols) * fh, fw, fh)));
-    }
-  };
-  return { base, frames, make };
-}
-
-function spawnRock(engine, x, groundY) {
-  const { PIXI } = engine;
-  const anim = new PIXI.AnimatedSprite([PIXI.Texture.EMPTY]);
-  anim.anchor.set(0.5, 0.95);
-  anim.animationSpeed = 0.18;
-  const sheet = rockFrames(PIXI);
-  const apply = () => {
-    if (anim.destroyed) return;
-    sheet.make();
-    anim.textures = sheet.frames;
-    anim.play();
-  };
-  if (isLoaded(sheet.base)) apply();
-  else onLoaded(sheet.base, apply);
-  const box = new PIXI.Container();
-  box.addChild(anim);
-  box.x = x;
-  box.y = groundY + 4;
-  box.zIndex = 28;
-  engine.entityLayer.addChild(box);
-  const active = questActive(engine);
-  return engine.register({
-    classId: 'magic_rock',
-    featureId: HOME_TOWER_FEATURE_ID,
-    label: 'Magic Rock',
-    subtitle: active ? 'Build a Tower' : 'Has an idea for you',
-    sprite: box,
-    state: {},
-  });
-}
-
 /** The built Tower's chassis and name sign into its street container. */
 function drawExterior(engine, box) {
   const { PIXI } = engine;
@@ -336,11 +293,11 @@ function drawExterior(engine, box) {
 
 /**
  * homes-feature spawnCultivations: draw the Tower (proto or built) at its
- * cultivation spot and the Magic Rock when it has the quest to give.
+ * cultivation spot. The Magic Rock is homes-feature's (G231).
  */
-function spawnStreet(engine, { item, x, groundY, rockX }) {
+function spawnStreet(engine, { item, x, groundY }) {
   engineRef = engine;
-  streetView = { container: null, target: null, rock: null };
+  streetView = { container: null, target: null };
   tower.floor = null;
   const { PIXI } = engine;
   if (item) {
@@ -370,8 +327,6 @@ function spawnStreet(engine, { item, x, groundY, rockX }) {
       state: { itemId: item.id },
     });
   }
-  const offers = rockOffers(engine);
-  if ((offers.length || questActive(engine)) && Number.isFinite(rockX)) streetView.rock = spawnRock(engine, rockX, groundY);
   demoStreet(engine);
   publish(engine, true);
 }
@@ -1051,6 +1006,16 @@ function renderCustomize(engine, q, body) {
 /* Magic Rock                                                           */
 /* ------------------------------------------------------------------ */
 
+/** G231: the home street's rock (homes-feature, through the bridge), or null. */
+function streetRock() {
+  return bridge?.rock?.() || null;
+}
+
+/** The rock has the Tower quest to give, or it is running. */
+function rockHasTalk(engine) {
+  return rockOffers(engine).length > 0 || questActive(engine);
+}
+
 function talkToRock(engine) {
   const offers = rockOffers(engine);
   if (offers.length) {
@@ -1070,7 +1035,7 @@ function talkToRock(engine) {
     : bridge?.towerItem?.()
       ? 'Gather the requirements and finish the project. Bigger, bigger!'
       : 'Go to your home street and Cultivate a Tower to get started.';
-  engine.say?.(streetView?.rock, text, 4200);
+  engine.say?.(streetRock(), text, 4200);
   return true;
 }
 
@@ -1080,7 +1045,8 @@ function acceptTowerQuest(engine) {
   engine.pushActivity(`New quest: ${questDef()?.title || 'Build a Tower'}`);
   // build_a_tower.onCreate: a Tower already cultivated counts at once.
   if (bridge?.towerItem?.()) setFlag(engine, BUILD_A_TOWER.cultivateFlag);
-  if (streetView?.rock) streetView.rock.subtitle = 'Build a Tower';
+  const rock = streetRock();
+  if (rock) rock.subtitle = 'Build a Tower';
   engine.save();
   publish(engine, true);
   return true;
@@ -1183,6 +1149,16 @@ export const towerApi = {
   },
   onCultivated,
   requestRemove,
+  /**
+   * G231: the talk to row homes-feature adds to the street rock while the
+   * rock has Build a Tower to give or it is running (magic_rock.js talk_to
+   * 360-386, sort_on 61), with the rock's subtitle; null otherwise.
+   */
+  rockTalk(engine) {
+    if (!rockHasTalk(engine)) return null;
+    return { tooltip: 'Talk to the Magic Rock!', subtitle: questActive(engine) ? 'Build a Tower' : 'Has an idea for you' };
+  },
+  talkToRock: (engine) => talkToRock(engine),
   projectStarted,
   cancelProject: (engine) => cancelProject(engine),
   /** butler_hints.js:393: how many times you have gone into your Tower. */
@@ -1439,8 +1415,6 @@ export const homeTowerFeature = {
           { id: 'flip', label: 'flip', enabled: true, tooltip: 'Turn it around', durationMs: 0 },
           { id: 'customize', label: 'customize', enabled: true, tooltip: 'Change it', durationMs: 0 },
         ];
-      case 'magic_rock':
-        return [{ id: 'talk_to', label: 'talk to', enabled: true, tooltip: 'Talk to the Magic Rock', durationMs: 0 }];
       case 'tower_elevator':
         return [{ id: 'ride', label: 'ride', enabled: true, tooltip: 'Go to another floor', durationMs: 0 }];
       case 'tower_exit':
@@ -1468,8 +1442,6 @@ export const homeTowerFeature = {
           applyCustomize(engine);
         } else goToFloor(engine, 0, 'door');
         return true;
-      case 'magic_rock':
-        return talkToRock(engine);
       case 'tower_elevator':
         openPanel(engine, 'elevator');
         return true;

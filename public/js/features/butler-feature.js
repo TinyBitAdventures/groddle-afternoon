@@ -68,8 +68,8 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=home-cultivation-3';
-import { homesFeature } from './homes-feature.js?v=homes-11';
-import { towerApi } from './home-tower-feature.js?v=home-tower-5';
+import { homesFeature } from './homes-feature.js?v=homes-12';
+import { towerApi } from './home-tower-feature.js?v=home-tower-6';
 import { levelInfoForXp } from '../progression.js?v=progression-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { NEIGHBOURS, NEIGHBOUR_ITEMS, neighbourById } from '../neighbours.js?v=neighbours-1';
@@ -179,6 +179,19 @@ const rt = {
 
 function now() {
   return Date.now();
+}
+
+/**
+ * G231: the Butler's world-x runtime (x, walkTo, faceX) moved `dx` after a
+ * left street expansion. x 0 means "not placed yet" (spawnView puts him at
+ * his post). Pure; true when it applied.
+ */
+export function shiftButlerRuntime(r, room, dx) {
+  if (!r || room !== 'street' || !dx) return false;
+  if (r.x) r.x += dx;
+  if (r.walkTo != null) r.walkTo += dx;
+  if (r.faceX) r.faceX += dx;
+  return true;
 }
 
 function currentRoom(engine) {
@@ -2052,6 +2065,20 @@ export const butlerFeature = {
 
   onStreetClear() {
     clearView();
+  },
+
+  /**
+   * G231 (homes-feature shiftShownRoom): a left street expansion moved the
+   * house `dx` in world x. The post is kept against the house (st.post is
+   * house x relative), but the live x, a walk in progress and a box about to
+   * open are world x, so they move with the street's stacks, piles and
+   * Craftybot (inc_homes.js homes_yard_rebuild 2309-2335 only moves the left
+   * edge; everything keeps its place beside the house). Null so every feature
+   * hears it.
+   */
+  homeRoomShifted(room, dx) {
+    if (shiftButlerRuntime(rt, room, dx) && pendingOpenAt) pendingOpenX += dx;
+    return null;
   },
 
   onTick(dtMs, t, engine) {

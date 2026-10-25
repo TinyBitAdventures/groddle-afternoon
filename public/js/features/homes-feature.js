@@ -141,7 +141,7 @@ import {
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { projectApi } from './street-jobs-feature.js?v=g177-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-2';
-import { towerApi } from './home-tower-feature.js?v=home-tower-5';
+import { towerApi } from './home-tower-feature.js?v=home-tower-6';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-5';
@@ -186,6 +186,11 @@ const HOME_INTERIOR_TSID = 'RH_HOME_INT';
  * every floor and moved with the house when the back yard grew. In the source
  * the Tower is its own location (home.js 44-46 counts trophies on the street
  * and in the house only).
+ * G231: stacks a save dropped on a floor before that stay in the house. A
+ * row keeps no floor (world-items.js cleanRecord: id, class, count, x, y,
+ * droppedAt), so a one-off move would carry the house's own stacks up to the
+ * Tower too; in the house they are still in sight, where they also showed
+ * before, and pick up and drop again on any floor.
  */
 const TOWER_DROP_PREFIX = 'RH_HOME_TOWER_';
 const VIEW_W = 960;
@@ -540,6 +545,8 @@ function inTower() {
 /** Bridge the Tower feature uses onto the cultivation state (it never imports this file). */
 const towerBridge = {
   towerItem: () => towerItem(cult),
+  /** G231: the home street's Magic Rock (the Tower quest's bubbles and subtitle), or null. */
+  rock: () => (liveRock()?.state?.room === 'street' ? liveRock() : null),
   towerWorldX() {
     const item = towerItem(cult);
     return item ? cultivationWorldX(item) : null;
@@ -847,6 +854,18 @@ function spawnInteriorTargets(engine) {
  * magic_rock_book_orangeBook read, OGA extracted_newxp), as the street's rock.
  */
 const YARD_ROCK = Object.freeze({ dx: -29 });
+/**
+ * G231: inc_homes.js homes_demo_frontyard 2469-2471 puts the home street's
+ * rock at (221, -144), only_visible_to the owner, right of the door (the
+ * house at x 0, as in the yard). It is the street's one Magic Rock: the same
+ * item offers build_a_tower (magic_rock.js onCreate setAvailableQuests 773-781)
+ * through its talk to, so the Tower's talk to (home-tower-feature rockTalk)
+ * joins its home verbs here. During the new player's tour the tutorial's own
+ * rock stands in for it (newxp-feature homeRockHeld): in the source the
+ * newxp home's rock is that same item with every home verb hidden
+ * (magic_rock.js `if (this.container.is_newxp) return {state: null}`).
+ */
+const STREET_ROCK = Object.freeze({ dx: 221 });
 const ROCK_SHEET = Object.freeze({ file: 'assets/sprites/newxp/rock_read.png', cols: 9, rows: 2, count: 18, cellW: 75, cropY: 262, cropH: 74, footX: 27, footY: 329 });
 
 function spawnRock(engine, x, groundY, room) {
@@ -881,10 +900,36 @@ function spawnRock(engine, x, groundY, room) {
     classId: 'magic_rock',
     featureId: HOMES_FEATURE_ID,
     label: 'Magic Rock',
-    subtitle: room === 'yard' ? 'Your yard' : 'Your home street',
+    subtitle: room === 'yard' ? 'Your yard' : towerApi.rockTalk?.(engine)?.subtitle || 'Your home street',
     sprite: box,
     state: { room },
   });
+}
+
+/** The live rock target of the room being shown (yard or street), or null. */
+function liveRock() {
+  return rockTarget?.sprite && !rockTarget.sprite.destroyed ? rockTarget : null;
+}
+
+/**
+ * G231: the home street's rock, owner only, unless the tutorial's own rock
+ * has the street (newxp-feature homeRockHeld). Called when the street is built
+ * and every tick after, so it comes back when the tutorial's rock leaves.
+ */
+function syncStreetRock(engine) {
+  if (scene?.room !== 'street') return;
+  const owner = engine.homeContext?.().owned === true;
+  const held = engine.query?.('homeRockHeld', engine) === true;
+  const want = owner && !held;
+  const have = liveRock();
+  if (want && !have) {
+    rockTarget = spawnRock(engine, homeStreetLayout(cult).houseX + STREET_ROCK.dx, STREET_GROUND_Y, 'street');
+    publish(engine);
+  } else if (!want && have) {
+    engine.unregister?.(have);
+    rockTarget = null;
+    publish(engine);
+  }
 }
 
 /** QA &homerock=new (no lesson read yet) | done (every lesson read): the rock's flags, once. */
@@ -900,9 +945,16 @@ function rockRoom(target) {
   return target?.state?.room === 'street' ? 'street' : 'yard';
 }
 
-/** The rock's verb rows (magic_rock.js conditions). */
+/**
+ * The rock's verb rows (magic_rock.js conditions). On the home street the
+ * Tower quest's talk to (sort_on 61) follows the home verbs (53-60).
+ */
 function magicRockVerbs(target, engine) {
-  return rockVerbs(rockFlags, { level: engine.pc?.level || 1, room: rockRoom(target) });
+  const room = rockRoom(target);
+  const rows = rockVerbs(rockFlags, { level: engine.pc?.level || 1, room });
+  const talk = room === 'street' ? towerApi.rockTalk?.(engine) : null;
+  if (talk) rows.push({ id: 'talk_to', label: 'talk to', enabled: true, tooltip: talk.tooltip, durationMs: 0 });
+  return rows;
 }
 
 /** conversation_start: the rock's pages on the familiar card. */
@@ -952,6 +1004,7 @@ function openExpandDialog(engine) {
 function runRockVerb(target, verbId, engine) {
   const room = rockRoom(target);
   if (!magicRockVerbs(target, engine).some((v) => v.id === verbId)) return true;
+  if (verbId === 'talk_to') return towerApi.talkToRock(engine) || true;
   if (verbId.startsWith('howto_')) {
     const pages = readHowto(rockFlags, verbId);
     engine.save?.();
@@ -1460,14 +1513,14 @@ function spawnCultivations(engine, st = activeCult()) {
   if (mode === 'cultivate') drawCultivationMarkers(engine);
   // The back yard has no Tower (cultivation_get_available: street only).
   if (isBackYard(st)) return;
-  // The Tower (proto or built) and the Magic Rock that asks for one.
+  // The street's Magic Rock (G231), then the Tower (proto or built); the
+  // Tower's quest talk goes through that rock (towerBridge.rock).
+  syncStreetRock(engine);
   const tower = towerItem(cult);
-  const layout = homeStreetLayout(cult);
   towerApi.spawnStreet(engine, {
     item: tower,
     x: tower ? cultivationWorldX(tower) : null,
     groundY: STREET_GROUND_Y,
-    rockX: layout.houseX + 200,
   });
 }
 
@@ -2596,12 +2649,29 @@ function endCultivationMode(engine) {
   rockSays(engine, lines);
 }
 
-/** TSMainView.as shiftCKeyHandler: shift+C starts (or ends) cultivation mode at home. */
+/**
+ * TSMainView.as shiftCKeyHandler 816-828: shift+C ends cultivation mode with
+ * CLICK_SUCCESS, or asks the server to start it (HouseManager.as
+ * startCultivation 102-118): CLICK_SUCCESS and the mode when the location
+ * offers cultivation choices, CLICK_FAILURE otherwise. Away from home the
+ * location has no cultivation_start (main.js doCultivationStart 7496), so the
+ * request fails and only the click is heard (G231); a Tower floor offers no
+ * choices. Returns 'on' | 'off' | 'failed'.
+ */
 function toggleCultivateKey(engine) {
+  if (mode === 'cultivate') {
+    engine.playSound?.('CLICK_SUCCESS', { volume: 0.32 });
+    setMode(engine, null);
+    return 'off';
+  }
   const ctx = engine.homeContext?.() || {};
-  if (!ctx.inHome || !scene || scene.construction || (scene.room !== 'street' && !inHouse())) return false;
-  setMode(engine, mode === 'cultivate' ? null : 'cultivate');
-  return true;
+  if (!ctx.inHome || !ctx.owned || !scene || scene.construction || (scene.room !== 'street' && !inHouse())) {
+    engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
+    return 'failed';
+  }
+  engine.playSound?.('CLICK_SUCCESS', { volume: 0.32 });
+  setMode(engine, 'cultivate');
+  return 'on';
 }
 
 function beginPlacing(engine, classTsid, from = null) {
@@ -3589,6 +3659,7 @@ function homeScene(room, engine) {
   liftOldStreetSave(engine);
   syncStreetShift(engine);
   qaStreetStyle(engine);
+  qaRockFlags(engine);
   const background = streetBackground(engine, shownStreetStyle(engine), style);
   const layout = homeStreetLayout(cult);
   return {
@@ -3780,8 +3851,10 @@ export const homesFeature = {
 
   onTick(dtMs, now, engine) {
     if (!scene) return;
-    if (scene.room === 'street') wearFromNodes(engine, now);
-    else {
+    if (scene.room === 'street') {
+      syncStreetRock(engine);
+      wearFromNodes(engine, now);
+    } else {
       if (inHouse()) wearFromNodes(engine, now);
       keepInsideWalls(engine);
       interiorCameraLook(engine);
@@ -3802,7 +3875,9 @@ export const homesFeature = {
   },
 
   runVerb(target, verbId, engine) {
-    if (target?.classId === 'magic_rock' && ROCK_VERB_IDS.includes(verbId)) return runRockVerb(target, verbId, engine);
+    if (target?.classId === 'magic_rock' && (ROCK_VERB_IDS.includes(verbId) || (verbId === 'talk_to' && rockRoom(target) === 'street'))) {
+      return runRockVerb(target, verbId, engine);
+    }
     const id = target?.state?.cultivationId;
     const item = id != null ? activeCult().items.find((row) => row.id === id) : null;
     if (!item?.depleted) return false;
@@ -3834,9 +3909,23 @@ export const homesFeature = {
     return floor != null ? towerDropTsid(floor) : null;
   },
 
-  /** G226: shift+C at home (game.js keydown asks before C opens Making). */
+  /**
+   * G226: shift+C (game.js keydown asks before C opens Making). G231: handled
+   * everywhere, as the client's SHIFT_PLUS_C was: away from home it only clicks.
+   */
   cultivateKey(engine) {
-    return toggleCultivateKey(engine) ? true : null;
+    const out = toggleCultivateKey(engine);
+    engine.setData?.('homeCultivateKey', out);
+    return true;
+  },
+
+  /**
+   * G231: the house edit mode open now ('cultivate' | 'decorate'), or null.
+   * Camera Mode's plain C does nothing while one is (TSMainView.as cKeyHandler
+   * 790-800: decorator_mode, chassis_mode, cult_mode).
+   */
+  homeEditMode() {
+    return scene && mode ? mode : null;
   },
 
   /** butler_hints.js:383: how many times you have gone into your house. */

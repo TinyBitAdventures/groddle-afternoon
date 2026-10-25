@@ -50,7 +50,7 @@ import {
 import { WALLPAPER_MAPS, WALLPAPER_PIECES } from '../public/js/home-wallpaper-art.js';
 import { roomPieces } from '../public/js/home-wallpaper.js';
 import { BACK_YARD_GROUND_Y, homesFeature, shiftHusbandryRows, shiftInteriorRows, towerDropTsid } from '../public/js/features/homes-feature.js';
-import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-5';
+import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-6';
 import { shiftBotX } from '../public/js/features/craftybot-feature.js';
 import { normalizeDroppedItemState } from '../public/js/world-items.js';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js';

@@ -42,7 +42,7 @@ import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=to
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g215-1';
 import { listDroppedStacks } from '../world-items.js?v=catalog-unified-2';
 import { homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-3';
-import { homesFeature } from './homes-feature.js?v=homes-11';
+import { homesFeature } from './homes-feature.js?v=homes-12';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -462,9 +462,10 @@ function currentRoom(engine) {
 function rockX(engine) {
   const rock = engine.interactables?.find((t) => t.classId === 'magic_rock' && t.sprite && !t.sprite.destroyed);
   if (rock) return rock.sprite.x;
-  // home-tower-feature spawnStreet: the Magic Rock stands at houseX + 200.
+  // G231: the street's Magic Rock stands at houseX + 221 (inc_homes.js 2470,
+  // homes-feature STREET_ROCK); it is away only while the tutorial's rock has the street.
   const cult = homesFeature._state?.()?.cult;
-  return cult ? homeStreetLayout(cult).houseX + 200 : 600;
+  return cult ? homeStreetLayout(cult).houseX + 221 : 600;
 }
 
 function boxX(engine) {
