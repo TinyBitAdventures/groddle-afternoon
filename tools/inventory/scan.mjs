@@ -145,6 +145,26 @@ export function buildIndex(files, { sourceType = 'module', root = '' } = {}) {
   return index;
 }
 
+/**
+ * The arguments of every `name.push(...)` call on the binding an array literal initialises, inside the
+ * function that declares it (the whole file for a module-level one): what the array holds beyond its literal.
+ */
+function pushedOnto(file, arrayNode) {
+  const out = [];
+  for (const d of file.decls) {
+    if (d.node !== arrayNode || d.kind === 'param' || d.path?.length) continue;
+    const from = d.owner ? d.owner.start : 0;
+    const to = d.owner ? d.owner.end : Infinity;
+    for (const c of file.calls) {
+      const callee = c.callee;
+      if (c.start < from || c.end > to || callee?.type !== 'MemberExpression' || callee.computed) continue;
+      if (callee.property.name !== 'push' || callee.object.type !== 'Identifier' || callee.object.name !== d.name) continue;
+      out.push(...c.arguments);
+    }
+  }
+  return out;
+}
+
 function indexFile({ path, rel, text, ast }) {
   const file = {
     path, rel, text, ast,
@@ -359,7 +379,17 @@ export function prefixLabels(pattern, prefix) {
       if (s.length > rest.length) go(i + 1, '', acc + s.slice(n));
       else go(i + 1, rest.slice(n), acc);
     }
-    if (p.cons.regexes.length) open = true;
+    // A regex-constrained wildcard takes part only where one of its regexes matches a piece of the prefix
+    // (a guard like /^(pet|feed)$/ never spells "artifacts_made"); one that can take all of it stays open.
+    for (const re of p.cons.regexes) {
+      for (let end = 1; end <= rest.length; end += 1) {
+        re.lastIndex = 0;
+        const m = re.exec(rest.slice(0, end));
+        if (!m || m.index !== 0 || m[0].length !== end) continue;
+        if (end === rest.length) open = true;
+        else go(i + 1, rest.slice(end), acc);
+      }
+    }
   };
   go(0, prefix, '');
   return open ? true : labels;
@@ -603,6 +633,12 @@ export function createResolver(index, opts = {}) {
     for (const o of objectsOf(file, node, env, depth + 1)) {
       if (o.node.type === 'ArrayExpression') {
         for (const e of o.node.elements) if (e && e.type !== 'SpreadElement') out.push({ file: o.file, node: e, env: o.env, depth });
+        // An array built up after its declaration (`const rows = []; rows.push({ counter: 'x' })`) also holds
+        // what is pushed onto it in the same function (resource-nodes.js achievementCounters).
+        for (const p of pushedOnto(o.file, o.node)) {
+          if (p.type === 'SpreadElement') out.push(...elementsOf(o.file, p.argument, o.env, depth + 1));
+          else out.push({ file: o.file, node: p, env: o.env, depth });
+        }
       } else if (o.node.type === 'ObjectExpression' && forIn) {
         for (const p of o.node.properties) if (p.type === 'Property') out.push({ literal: propName(p) });
       }
@@ -965,12 +1001,19 @@ export function contextLiterals(index) {
   return out;
 }
 
+/** Whether a node sits in a function that reads URL params: QA and demo seeding, never evidence (as scanEmissions' `qa`). */
+const QA_RE = /engine\.param\(|searchParams|URLSearchParams/;
+function inQaFunction(file, node) {
+  const fn = file.enclosing(node.start)[0];
+  return Boolean(fn) && QA_RE.test(file.text.slice(fn.start, fn.end));
+}
+
 /** Patterns of every template literal with substitutions in one indexed file (prize tables built from slugs). */
 export function templatePatterns(index, file, opts = {}) {
   const resolver = createResolver(index, opts);
   const out = [];
   walk(file.ast, (n) => {
-    if (n.type !== 'TemplateLiteral' || !n.expressions.length) return;
+    if (n.type !== 'TemplateLiteral' || !n.expressions.length || inQaFunction(file, n)) return;
     for (const p of resolver.strings(file, n)) if (!isUninformative(p)) out.push({ pattern: p, line: n.loc?.start.line || 0 });
   });
   return out;
@@ -987,6 +1030,7 @@ export function spawnTemplates(index, { skipFile = () => false } = {}) {
     walk(file.ast, (n, parent) => {
       if (n.type !== 'TemplateLiteral' || !n.expressions.length) return;
       if (!(parent?.type === 'Property' && parent.value === n && SPAWN_KEYS.has(propName(parent)))) return;
+      if (inQaFunction(file, n)) return;
       for (const p of resolver.strings(file, n)) if (!isUninformative(p)) out.push({ pattern: p, file: file.rel, line: n.loc?.start.line || 0, text: patternString(p) });
     });
   }

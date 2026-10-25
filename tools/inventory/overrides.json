@@ -1166,5 +1166,20 @@
   "status": "source",
   "reason": "purple_emperor.js manifestStrangeness creates it in the purple_journey instance; js/features/purple-journey-feature.js manifestScion draws the Scion of Purple (glitch-items purple_apparition.swf, CC0) with its fade, talk and idle states and getMysteriousWords",
   "register": "G150"
+ },
+ "achievement:student_of_artifactology": {
+  "status": "missing",
+  "reason": "needs petrified rocks, which nothing a solo player does grants until Feat rewards (G143); assembly itself works (9aae153a). The auto match is a loose counter pattern (G147)",
+  "register": "G143"
+ },
+ "achievement:qualified_artifactologist": {
+  "status": "missing",
+  "reason": "needs petrified rocks, which nothing a solo player does grants until Feat rewards (G143); assembly itself works (9aae153a). The auto match is a loose counter pattern (G147)",
+  "register": "G143"
+ },
+ "item:portal": {
+  "status": "unbuilt_original",
+  "reason": "Hyperspacetime Portal Door: none of the 2,846 archived street files places one and no GSJS code creates one (only catalog.js lists it). The auto match was the party teleporter's 'portal' phase name in party-spaces-feature.js, a different thing (G147)",
+  "register": "G147"
  }
 }

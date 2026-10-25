@@ -10,7 +10,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { buildIndex, contextLiterals, liveFiles, matchPattern, scanEmissions } from '../tools/inventory/scan.mjs';
+import { buildIndex, contextLiterals, liveFiles, matchPattern, prefixLabels, scanEmissions } from '../tools/inventory/scan.mjs';
 import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills, conditionReach, gsjsItemRefs } from '../tools/inventory/detectors.mjs';
 import { readTsidRefs, tsidRefsFromText } from '../tools/inventory/gsjs-data.mjs';
 import { REMAKE_EMITTERS, GSJS_EMITTERS, emissionsByTag, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
@@ -39,6 +39,23 @@ describe('inventory scanner', () => {
     const by = remakeScan([['js/subway.js', SUBWAY_JS], ['js/features/subway-feature.js', FEATURE_JS]]);
     assert.deepEqual(by.counter.map((e) => e.text), ['transit:subways_entered']);
     assert.equal(by.counter[0].file, 'js/features/subway-feature.js');
+  });
+
+  it('reads counters pushed onto an array after its declaration (G147: resource-node counters)', () => {
+    const by = remakeScan([
+      ['js/nodes.js', `export function harvest(node) {\n  const achievementCounters = [];\n  if (node.kind === 'jellisac') achievementCounters.push({ counter: 'jellisac:scoop', amount: 1 });\n  achievementCounters.push(...[{ counter: 'dust_trap:trigger', amount: 1 }]);\n  return { ok: true, achievementCounters };\n}\n`],
+      ['js/features/nodes-feature.js', `import { harvest } from '../nodes.js';\nfunction perform(engine, entity) {\n  const result = harvest(entity.node);\n  for (const c of result.achievementCounters || []) engine.achievement(c.counter, c.amount);\n}\n`],
+    ]);
+    const texts = by.counter.map((e) => e.text);
+    assert.ok(texts.includes('jellisac:scoop'), texts.join(', '));
+    assert.ok(texts.includes('dust_trap:trigger'), texts.join(', '));
+  });
+
+  it('lets a regex-guarded wildcard claim only a group its regexes can spell (G147: artifact badges)', () => {
+    const wild = { wild: true, cons: { strings: new Set(), regexes: [/^(pet|feed)$/] } };
+    assert.equal(prefixLabels([wild, ':feed'], 'artifacts_made:') instanceof Set, true);
+    assert.equal(prefixLabels([wild, ':feed'], 'artifacts_made:').size, 0);
+    assert.deepEqual([...prefixLabels([wild, ':x'], 'pet:')], ['x']);
   });
 
   it('binds wrapper params to their callers and templates to their parts', () => {

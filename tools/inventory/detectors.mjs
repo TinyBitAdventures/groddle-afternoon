@@ -217,6 +217,8 @@ const LOCATION_CATEGORY = {
   'apartment-tower-template': ['excluded', 'apartment/tower template'],
   'instance-template-copy-in-dump': ['excluded', 'running instance copy imported under another TSID'],
   'instance-template-no-geometry': ['missing', 'quest/instance room with no geometry anywhere'],
+  // G142: hub mains, dev-map copies, backups, tests and prototypes nothing names (rooms-triage.md "exclude" rows).
+  'unused-template': ['excluded', 'hub main, dev copy, backup, test or prototype: no GSJS file, config or door names it'],
   'jethimadh-tower-room': ['missing', 'Jethimadh Tower room with no geometry'],
   'live-region-other': ['unknown', 'other name in a live region: needs a judgement'],
   'subway-unreleased': ['unknown', 'filed as unreleased: needs evidence (the subway was mis-filed this way)'],
