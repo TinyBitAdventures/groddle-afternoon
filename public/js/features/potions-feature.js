@@ -99,7 +99,7 @@ import { itemVerbAchievementCounters } from '../item-verbs.js?v=g137-1';
 import { patchesFeature } from './patches-feature.js?v=patches-7';
 import { homesFeature } from './homes-feature.js?v=homes-10';
 import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-4';
-import { questRoomConverse } from './quest-instances-feature.js?v=qi-4';
+import { questRoomConverse } from './quest-instances-feature.js?v=qi-5';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';

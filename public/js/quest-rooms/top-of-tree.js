@@ -217,7 +217,9 @@ export const room = {
     });
     ctx.data.quoins = crownQuoins().map((q) => ({ ...q, spr: ctx.add(ctx.quoinSprite(q.type, q.x, q.y, 0.75), 32), taken: false }));
     ctx.engine.updateHud();
-    ctx.converse({ title: 'The High Jumper', kicker: 'Magic Rock', text: ROCK_LINE, choices: [{ label: 'OK', value: 'ok' }] });
+    // inc_announcements.js 378-416 overlay_script_top_of_tree: the pet_rock_rays
+    // overlay and a 500 px bubble_familiar under it (G220), not a prompt.
+    ctx.converse({ title: 'The High Jumper', kicker: 'Magic Rock', text: ROCK_LINE, choices: [{ label: 'OK', value: 'ok' }], look: 'vog', width: 500 });
   },
 
   onEvent(ctx, counter) {

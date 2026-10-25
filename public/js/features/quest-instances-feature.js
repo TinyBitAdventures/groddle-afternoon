@@ -63,7 +63,7 @@ import {
 } from '../quest-instance.js?v=qi-1';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=qi-2';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
-import { locationEventsApi } from './location-events-feature.js?v=location-events-1';
+import { locationEventsApi } from './location-events-feature.js?v=location-events-2';
 import {
   acceptOffer,
   ensureQuestOfferState,
@@ -75,7 +75,8 @@ import { parseQuestConversation } from '../quests.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { runStreetTransition } from '../screen-fx.js';
-import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=g200-1';
+import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=g211-1';
+import { applyFamiliarLook } from '../familiar.js?v=g211-1';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import { sourceFromUrl } from '../textures.js';
 
@@ -381,7 +382,7 @@ function buildChrome(engine) {
  * `timeout` (source seconds) closes it on its own and resolves with
  * `timeoutValue` or null (G198, js/prompt-timeout.js).
  */
-function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null } = {}) {
+function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null, look = 'plain', width = 0 } = {}) {
   buildChrome(engine);
   const pages = beats || parseQuestConversation(text);
   if (!pages.length) pages.push({ text, response: 'OK' });
@@ -418,6 +419,10 @@ function converse(engine, { title = '', kicker = '', text = '', beats = null, ch
       });
       engine.setData('qiDialog', `${title}:${index + 1}/${pages.length}`);
       dialog.modal.hidden = false;
+      // G220: `look: 'vog'` is the source's voice-of-rock overlay (bubble_familiar,
+      // inc_announcements.js 375-482): the rock with rays at the top, the bubble under it.
+      applyFamiliarLook(dialog.modal, { look, width });
+      engine.setData('qiDialogLook', look);
       dialog.choices.querySelector('button')?.focus?.();
     };
     render();

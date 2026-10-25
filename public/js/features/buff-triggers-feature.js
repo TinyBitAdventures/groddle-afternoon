@@ -19,6 +19,7 @@
  *   quests' timer buffs. The systems keep the effect; this only mirrors it.
  * - A Cold Place / A Hearty Feeling on the three Kukubee winter streets.
  * - Nekkid! while no coat, shirt, pants, dress or skirt is worn.
+ * - Pooped and Super Pooped while js/hell.js holds them (G213).
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&buffdemo=1 puts one of each
  * consumable in the pack (&buffautoplay=<class> drinks or eats it;
@@ -61,7 +62,9 @@ import { meditationFeature } from './meditation-feature.js?v=g148-1';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-2';
 import { rookAttackFeature } from './rook-attack-feature.js?v=g148-1';
 import { rubeFeature } from './rube-feature.js?v=rube-2';
-import { smugglingFeature } from './smuggling-feature.js?v=g200-1';
+import { smugglingFeature } from './smuggling-feature.js?v=g211-1';
+import { hellFeature } from './hell-feature.js?v=hell-7';
+import { isPooped } from '../hell.js';
 
 export const BUFF_TRIGGERS_FEATURE_ID = 'buff-triggers';
 
@@ -80,7 +83,12 @@ export const MIRRORED_BUFFS = Object.freeze([
   'hog_tie',
   'piggy_capture_cooldown',
   'nekkid',
+  'pooped',
+  'super_pooped',
 ]);
+
+/** Mirrors whose system already spoke (Pooped's own prompt): no "kicks in" line. */
+const QUIET_MIRRORS = new Set(['pooped', 'super_pooped']);
 
 let engineRef = null;
 let lastSync = 0;
@@ -270,11 +278,14 @@ function mirror(engine, buff, until) {
   const on = until === true || (Number(until) || 0) > t;
   if (on) {
     if (!engine.hasBuff(buff)) {
-      const res = engine.applyBuff(buff, until === true ? {} : { durationSec: Math.max(1, Math.ceil((until - t) / 1000)) });
+      const quiet = QUIET_MIRRORS.has(buff);
+      const res = engine.applyBuff(buff, until === true ? { quiet } : { quiet, durationSec: Math.max(1, Math.ceil((until - t) / 1000)) });
       if (!res?.ok) return;
     }
     mirrored.add(buff);
     const row = engine.buffRow?.(buff);
+    // The system owns it: the buffs panel offers no "End effect" (G213).
+    if (row) row.heldBy = BUFF_TRIGGERS_FEATURE_ID;
     if (row && until !== true) row.expiresAt = Number(until);
   } else if (mirrored.has(buff)) {
     if (engine.hasBuff(buff)) engine.removeBuff(buff);
@@ -312,6 +323,14 @@ function syncMirrors(engine) {
   mirror(engine, 'hog_tie', countItem(engine.inv, HOGTIED_PIGGY) > 0);
   mirror(engine, 'piggy_capture_cooldown', husbandryPack()?.captureCooldownUntil);
   mirror(engine, 'nekkid', typeof engine.wornArticle === 'function' && isNekkid((type) => engine.wornArticle(type)));
+  // G213: Pooped / Super Pooped are timed buffs to the next game day (inc_metabolics.js
+  // 141-155 buffs_apply(..., { duration: remaining }), catalog_buffs.js 1689-1713,
+  // 2619-2647); js/hell.js keeps them in the hell state, so show that here.
+  const hell = sliceOf(hellFeature);
+  const poopedKind = isPooped(hell, now());
+  for (const kind of ['pooped', 'super_pooped']) {
+    mirror(engine, kind, poopedKind === kind ? Number(hell.pooped?.expiresAt) || 0 : 0);
+  }
   // Timed quests: one timer buff per open timer.
   const timers = questTimerBuffs(engine.questState?.offers?.timers || {}, now());
   for (const [buff, endsAt] of Object.entries(timers)) mirror(engine, buff, endsAt);

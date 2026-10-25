@@ -25,6 +25,9 @@
  *                                          race_ticket_hogtie_piggy opens The Great Hog Haul)
  *   ?autostart=1&racedemo=grab_em_good     Grab 'Em Good; raceassist freezes the rival,
  *                                          racerivalseconds=N times its own tree to N s
+ *     &racerival=close                     the rival keeps 90 px ahead of you and takes what
+ *                                          it touches, so race shards (G212) can be seen both
+ *                                          ways (G216); canvas quoinShardLast / quoinShardYou
  */
 
 import { crowdScaleX } from '../avatar-anims.js';
@@ -87,7 +90,7 @@ import { runStreetTransition } from '../screen-fx.js';
 import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
 import { startCrowns } from './crowns-feature.js?v=g148-1';
 import { textureFromUrl } from '../textures.js';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g212-1';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g216-1';
 import { moodMax } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
 
@@ -121,6 +124,10 @@ let pinX = 0;
 // Grab 'Em Good: live quoin sprites and when each scripted racer reaches them.
 let quoinSprites = [];
 let rivalFrozen = false;
+/** QA (G216): &racerival=close keeps the Grab 'Em Good rival beside you. */
+let rivalClose = false;
+let rivalCloseDir = 1;
+const RIVAL_CLOSE_DX = 90;
 let autoTimeline = null;
 let hogTicketRuns = 0; // Hog Haul instances opened from a ticket this session (QA data)
 
@@ -527,6 +534,8 @@ async function startRace(raceId, engine, opts = {}) {
   if (rivalSeconds > 0) rivalOpts = { ...rivalOpts, pace: course.rivalPace * (natural / (rivalSeconds * 1000)) };
   rivalTimeline = routeTimeline(rivalRoute(), rivalOpts);
   rivalFrozen = course.kind === 'quoins' && params.get('raceassist') === '1';
+  rivalClose = course.kind === 'quoins' && params.get('racerival') === 'close';
+  rivalCloseDir = 1;
   autoTimeline = routeTimeline(course.route, { pace: 1.25, gravity: course.gravity });
   resultApplied = false;
   progressHint = 0;
@@ -607,7 +616,7 @@ function spawnQuoins(engine) {
       index,
       sprite,
       live: true,
-      rivalMs: rivalFrozen ? Infinity : timeAtIndex(rivalTimeline, q.rivalAt),
+      rivalMs: rivalFrozen || rivalClose ? Infinity : timeAtIndex(rivalTimeline, q.rivalAt),
       autoMs: timeAtIndex(autoTimeline, q.at),
     };
   });
@@ -859,11 +868,22 @@ function raceTick(engine, now) {
  */
 function quoinTick(engine, now) {
   const elapsed = now - run.startAt;
-  if (!rivalFrozen) {
+  const player = engine.player;
+  if (rivalClose && player) {
+    // QA: stand 90 px from the avatar on its feet line, on the side of the
+    // nearest quoin left at that height, so it reaches some first.
+    let best = null;
+    for (const q of quoinSprites) {
+      if (!q.live || q.y < player.y - 118 || q.y > player.y + 18) continue;
+      if (!best || Math.abs(q.x - player.x) < Math.abs(best.x - player.x)) best = q;
+    }
+    if (best && Math.abs(best.x - player.x) > 4) rivalCloseDir = Math.sign(best.x - player.x);
+    else if (Math.abs(player.vx) > 0.2) rivalCloseDir = Math.sign(player.vx);
+    placeRival(player.x + RIVAL_CLOSE_DX * rivalCloseDir, player.y, Math.abs(player.vx) > 0.2 ? 'walk' : 'idle', rivalCloseDir);
+  } else if (!rivalFrozen) {
     const pose = routePoseAt(rivalRoute(), elapsed, rivalOpts, rivalTimeline);
     placeRival(pose.x, pose.y, pose.mode, pose.facing);
   }
-  const player = engine.player;
   const auto = engine.param('raceautoplay') === '1';
   if (auto) {
     const pose = routePoseAt(course.route, now - autoplayStartAt, { pace: 1.25, gravity: course.gravity }, autoTimeline);
@@ -880,7 +900,9 @@ function quoinTick(engine, now) {
     const touched = auto
       ? now - autoplayStartAt >= q.autoMs
       : Math.abs(player.x - q.x) <= 40 && q.y >= player.y - 118 && q.y <= player.y + 18;
-    const rival = !touched && elapsed >= q.rivalMs;
+    const rival = !touched && (rivalClose
+      ? Boolean(rivalSprite && !rivalSprite.destroyed && Math.abs(rivalSprite.x - q.x) <= 40 && q.y >= rivalSprite.y - 118 && q.y <= rivalSprite.y + 18)
+      : elapsed >= q.rivalMs);
     if (!touched && !rival) continue;
     takeQuoin(q);
     const result = grabRaceQuoin(run, touched ? 'you' : 'rival', now);

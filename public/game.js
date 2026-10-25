@@ -4,8 +4,8 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-81';
-import { buildEnterChoices, planEnter, createEnterChooser, trimmedIconUrl } from './js/enter-chooser.js?v=g206-1';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-82';
+import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import {
   actionDurationFor,
   createTimedAction,
@@ -422,7 +422,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=g212-1';
+} from './js/player-save.js?v=g216-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_PURCHASE_COST,
@@ -635,8 +635,9 @@ import {
   afterStreetCard,
   streetCardUp,
   cardPausedTimeout,
-} from './js/screen-fx.js?v=g200-1';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g200-1';
+} from './js/screen-fx.js?v=g211-1';
+import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g211-1';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g211-1';
 import {
   planTravel,
   listMapDestinations,
@@ -761,7 +762,11 @@ import {
   planStreetQuoins,
   collectQuoin,
   resetQuoinDay,
-} from './js/quoins.js?v=g212-1';
+  streetQuoinClass,
+  quoinRespawnMs,
+  noteQuoinRespawn,
+  releaseQuoinRespawns,
+} from './js/quoins.js?v=g216-1';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -792,7 +797,7 @@ import {
   soundForQuoin,
   soundForVerb,
 } from './js/sound-moments.js';
-import { moodMax } from './js/metabolics.js';
+import { moodMax, setMetabolicGainGate } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js';
 import { installHiresDecos } from './js/deco-hires.js';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
@@ -1863,10 +1868,15 @@ function achievementBadgeFallback(def = {}) {
  * Queue a full-screen award (crossfade). Serial so multiple unlocks don't stack.
  * @param {Parameters<typeof showAwardScreen>[1]} payload
  */
+/** Award screens queued or showing (G213). */
+let awardsPending = 0;
+
 function enqueueAward(payload) {
   if (payload.kind === 'achievement' && payload.classTsid && !payload.iconUrl) {
     payload.iconUrl = badgeIconFor(payload.classTsid);
   }
+  // G213: queued screens count as up, so a quest offer check does not slip in before one shows.
+  awardsPending += 1;
   awardQueue = awardQueue
     // TSFrontController.tryShowScreenViewFromQ 3399-3400: award screens wait for the loading card (G192).
     .then(() => afterStreetCard())
@@ -1875,7 +1885,10 @@ function enqueueAward(payload) {
       playSound(payload.sound || soundForAward(payload.kind), { volume: 0.7 });
       await showAwardScreen(el, payload);
     })
-    .catch((e) => console.warn('award screen', e));
+    .catch((e) => console.warn('award screen', e))
+    .finally(() => {
+      awardsPending = Math.max(0, awardsPending - 1);
+    });
   return awardQueue;
 }
 
@@ -5745,6 +5758,13 @@ function openEnterChoice(choice) {
   if (t?.sprite && !t.sprite.destroyed) openVerbMenu(t);
 }
 
+/** planEnter for the hint chip, at most every 150 ms (G217). */
+let enterPromptPlan = { at: 0, plan: { mode: 'none', choices: [] } };
+function enterPlanForPrompt(now = performance.now()) {
+  if (now - enterPromptPlan.at > 150) enterPromptPlan = { at: now, plan: planEnter(enterChoicesHere()) };
+  return enterPromptPlan.plan;
+}
+
 function enterChooserUi() {
   enterChooser ||= createEnterChooser({
     document,
@@ -7626,7 +7646,7 @@ const engine = {
    * Apply a catalog buff from a feature (seasonal treats); with `extendMs`
    * an already-running buff is lengthened instead (buffs_extend_time).
    */
-  applyBuff(classTsid, { extendMs = 0, durationSec = 0, args = null } = {}) {
+  applyBuff(classTsid, { extendMs = 0, durationSec = 0, args = null, quiet = false } = {}) {
     const now = Date.now();
     if (extendMs > 0 && hasBuff(buffState, classTsid, now)) {
       const res = extendBuff(buffState, classTsid, extendMs, now);
@@ -7636,7 +7656,9 @@ const engine = {
     // buffs_apply(id, { duration, ...args }): a duration override and the buff's args.
     const res = applyBuff(buffState, classTsid, pc, now, args ? { args } : {});
     if (res.ok && durationSec > 0) res.buff.expiresAt = res.buff.appliedAt + durationSec * 1000;
-    if (res.ok) handleBuffEvents([{ type: 'activated', classTsid, buff: res.buff, effects: res.effects || {} }]);
+    // `quiet`: a buff a system already announced (Pooped's own prompt) shows in the tray without "kicks in".
+    if (res.ok && quiet) updateHud();
+    else if (res.ok) handleBuffEvents([{ type: 'activated', classTsid, buff: res.buff, effects: res.effects || {} }]);
     return res;
   },
   /** buffs_remove: end a running buff now. */
@@ -7717,10 +7739,13 @@ const engine = {
   /** True while a feature holds the Magic Rock quiet (rook attack, Naraka, meditation). */
   questOffersHeld: () => features.query('holdQuestOffers', engine) === true,
   /** A quest offer: the recovered beats, then accept / decline. */
-  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline }) {
+  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false }) {
     openScriptedQuestDialogue({
       title,
       kicker,
+      // G211: an offer card ("New Quest"); is_emergency offers get the rays.
+      offer: true,
+      urgent: urgent === true,
       beats: beats?.length ? beats : [{ text: title, response: acceptLabel || 'OK' }],
       onComplete: (...args) => {
         playSound('QUEST_ADDED', { volume: 0.6 });
@@ -7749,6 +7774,8 @@ const engine = {
   },
   /** A street loading card is up (G192): prompts, conversations and awards wait for it. */
   streetCardUp: () => streetCardUp(),
+  /** An award or new-day screen is showing (G213: a quest offer check retries shortly instead of waiting 30 s). */
+  screenFxScreenUp: () => isAwardScreenUp(),
   /** Resolves once no street loading card is up (G192). */
   afterStreetCard: () => afterStreetCard(),
   /** Travel by a signpost board as a click on it would (G192, the GPS arrow): { label, arrive }. */
@@ -7880,12 +7907,17 @@ const engine = {
    * `timeoutMs` closes it on its own; `onTimeout(choice)` gets `timeoutValue`
    * or null (G198, js/prompt-timeout.js).
    */
-  prompt({ title = '', kicker = '', text = '', timeout = 0, timeoutMs = 0, timeoutValue = null, onTimeout = null } = {}) {
+  prompt({ title = '', kicker = '', text = '', choices = null, timeout = 0, timeoutMs = 0, timeoutValue = null, onTimeout = null } = {}) {
+    // G213: one button per source choice and nothing else (PromptView.as 286-322): a one-choice
+    // prompt (Pooped, Super Pooped) has no Close, and Escape does not answer it. No choices: one OK.
+    const list = (Array.isArray(choices) ? choices : []).filter((c) => c && c.label);
     openScriptedQuestDialogue({
       title,
       kicker,
-      beats: [{ text, response: 'OK' }],
-      cancelable: true,
+      beats: [{ text, response: list[0]?.label || 'OK' }],
+      cancelable: list.length > 1,
+      primaryLabel: list[0]?.label || '',
+      cancelLabel: list[1]?.label || '',
       timeout,
       timeoutMs,
       timeoutValue,
@@ -7974,6 +8006,21 @@ const engine = {
   closeMap: () => closeMap(),
   /** QA routes: learn a skill outright (prerequisites skipped). */
   grantSkill: (classTsid) => grantSkill(skillState, classTsid, true),
+  /** G218: a learned skill for the familiar panel, with the skills the player can start next. */
+  skillLearnedInfo(classTsid) {
+    const def = getSkillCatalog()[classTsid];
+    if (!def) return null;
+    const ctx = skillStudyContext();
+    const next = listSkills()
+      .filter((row) => canLearnSkill(skillState, row.classTsid, ctx).ok)
+      .map((row) => ({ classTsid: row.classTsid, name: skillTitle(row) || row.name }));
+    return { classTsid, name: skillTitle(def) || def.name || classTsid, learned: def.learned || '', next };
+  },
+  /** Open the Skills panel, focused on one skill when given (G218). */
+  openSkillTree(classTsid = '') {
+    if (classTsid && getSkillCatalog()[classTsid]) focusSkillInPanel(classTsid);
+    openSkillsPanel();
+  },
   /** A music cue over the ducked street BGM (the Musicblock duck); resolves to stop(). loop repeats it until stop(). */
   async playCue(url, { volume = 0.6, loop = false } = {}) {
     const key = `cue:${url}`;
@@ -8157,6 +8204,14 @@ const engine = {
     await enterStreetWithTransition(resolved, opts);
   },
 };
+
+// G213: every energy/mood gain asks the features first (inc_metabolics.js metabolics_add_energy 40-53,
+// metabolics_add_mood 79-86), and a refused one sends the source's line unless quiet.
+setMetabolicGainGate((stat, { quiet = false } = {}) => {
+  const gate = features.metabolicGate(stat, 'gain', engine);
+  if (gate?.ok === false && !quiet && gate.msg) pushActivity(gate.msg);
+  return gate;
+});
 
 function streetWorldState(tsid = currentStreetTsid) {
   const key = String(tsid || currentStreetTsid);
@@ -8546,6 +8601,7 @@ function resetStreetCollectiblesForNewDay() {
     n += (street.collectedApples?.length || 0) + (street.collectedQuoins?.length || 0);
     street.collectedApples = [];
     street.collectedQuoins = [];
+    street.quoinRespawn = {};
   }
   return n;
 }
@@ -8823,26 +8879,70 @@ function spawnWorldQuoin(spot, typeId = 'xp', opts = {}) {
   return q;
 }
 
+/**
+ * G216: this street's natural quoin spots, their types and classes, so a
+ * grabbed quoin can come back while you stay (items/quoin.js 305, onRespawn 664).
+ */
+let naturalQuoins = { tsid: '', points: [], plan: [] };
+
+function naturalQuoinPlan(count) {
+  const plan = planStreetQuoins(currentStreetTsid, count);
+  const params = new URLSearchParams(location.search);
+  const demoType = params.get('quoindemo');
+  if (demoType !== null) plan[0] = QUOIN_TYPES[demoType] ? demoType : 'currants';
+  return plan;
+}
+
+/** The class a natural quoin spot is (QA: &quoinclass=<class_name> for spot 0, e.g. "fast tiny currants"). */
+function naturalQuoinClass(index, typeId) {
+  const forced = new URLSearchParams(location.search).get('quoinclass');
+  if (index === 0 && forced) return forced;
+  return streetQuoinClass(currentStreetTsid, index, typeId);
+}
+
+function spawnNaturalQuoin(i) {
+  const spot = naturalQuoins.points[i];
+  if (!spot) return null;
+  const typeId = naturalQuoins.plan[i] || 'xp';
+  const q = spawnWorldQuoin(spot, typeId, { naturalQuoinIndex: i, phaseIndex: i });
+  q.quoinClass = naturalQuoinClass(i, typeId);
+  return q;
+}
+
 function spawnQuoins(points = samplePlatformPoints(8)) {
   const list = [];
-  const collected = new Set(streetWorldState().collectedQuoins);
-  const plan = planStreetQuoins(currentStreetTsid, points.length);
-  const demoType = new URLSearchParams(location.search).get('quoindemo');
-  if (demoType !== null) plan[0] = QUOIN_TYPES[demoType] ? demoType : 'currants';
+  naturalQuoins = { tsid: currentStreetTsid, points, plan: naturalQuoinPlan(points.length) };
+  const world = streetWorldState();
+  // Respawn timers that ran out while you were away.
+  releaseQuoinRespawns(world, Date.now());
+  const collected = new Set(world.collectedQuoins);
   points.forEach((spot, i) => {
     if (collected.has(i)) return;
-    const typeId = plan[i] || 'xp';
-    const q = spawnWorldQuoin(spot, typeId, {
-      naturalQuoinIndex: i,
-      phaseIndex: i,
-    });
-    list.push(q);
+    const q = spawnNaturalQuoin(i);
+    if (q) list.push(q);
   });
   return list;
 }
 
+/** G216: bring back this street's natural quoins whose respawn_time has run (checked about once a second). */
+let nextQuoinRespawnCheck = 0;
+function tickQuoinRespawns(now = Date.now()) {
+  if (now < nextQuoinRespawnCheck || !currentStreetTsid || naturalQuoins.tsid !== currentStreetTsid || !entityLayer) return;
+  nextQuoinRespawnCheck = now + 1000;
+  const due = releaseQuoinRespawns(streetWorldState(), now);
+  for (const i of due) {
+    if (quoins.some((q) => q.naturalQuoinIndex === i)) continue;
+    const q = spawnNaturalQuoin(i);
+    if (!q) continue;
+    quoins.push(q);
+    if (app?.canvas) app.canvas.dataset.quoinRespawned = `${i}:${q.typeId}:${q.quoinClass}`;
+  }
+}
+
 function quoinResultCopy(result) {
   const amount = result.actual ?? result.amount;
+  // G213: refused (Super Pooped, dead): the gate already sent the source's line.
+  if (result.blocked) return `+0 ${result.resolvedTypeId}`;
   if (result.resolvedTypeId === 'xp') return `+${amount} iMG`;
   if (result.resolvedTypeId === 'qurazy') return `Qurazy! +${amount} iMG`;
   if (result.resolvedTypeId === 'energy') return amount ? `+${amount} energy` : 'Energy already full';
@@ -8908,6 +9008,15 @@ function samplePlatformPoints(n) {
     pts.push({ x, y });
   }
   return pts;
+}
+
+/** The award and new-day screens (js/screen-fx.js showAwardScreen), up or fading. */
+function isAwardScreenUp() {
+  if (awardsPending > 0) return true;
+  return ['award-screen', 'new-day-screen'].some((id) => {
+    const el = document.getElementById(id);
+    return Boolean(el && !el.hidden);
+  });
 }
 
 function isScreenFxBlocking() {
@@ -9733,6 +9842,7 @@ function physics(dt) {
 
   // auto-pickup apples on walk-over still? Keep click/menu only for apples to showcase verbs
   // quoin auto collect
+  tickQuoinRespawns();
   if (!menuTarget) {
     for (let i = quoins.length - 1; i >= 0; i--) {
       const q = quoins[i];
@@ -9753,6 +9863,10 @@ function physics(dt) {
         }
         if (Number.isInteger(q.naturalQuoinIndex)) {
           collectNaturalIndex('quoin', q.naturalQuoinIndex);
+          // G216: it comes back after its class's respawn_time (items/quoin.js 305, 320-662).
+          const respawnMs = quoinRespawnMs(q.quoinClass);
+          noteQuoinRespawn(streetWorldState(), q.naturalQuoinIndex, respawnMs, Date.now());
+          app.canvas.dataset.quoinRespawn = `${q.naturalQuoinIndex}:${q.quoinClass || 'none'}:${Number.isFinite(respawnMs) ? respawnMs / 1000 : 'never'}`;
         }
         if (Number.isInteger(q.summersDayBonusIndex) && summersDayRun?.stage === 'bonus') {
           collectSummersDayBonusQuoin(
@@ -19240,7 +19354,11 @@ function renderQuestDialogueBeat() {
   const copy = document.getElementById('quest-dialogue-copy');
   const next = document.getElementById('quest-dialogue-next');
   const cancel = document.getElementById('quest-dialogue-cancel');
-  if (kicker) kicker.textContent = questDialogueState.kicker || (mode === 'script' ? 'Conversation' : 'New quest');
+  if (kicker) {
+    // kicker: null is a line with no speaker (G213: a location event's VOG overlay).
+    kicker.hidden = questDialogueState.kicker === null;
+    kicker.textContent = questDialogueState.kicker || (mode === 'script' ? 'Conversation' : 'New quest');
+  }
   if (title) title.textContent = def?.title || questDialogueState.title || 'Quest';
   if (copy) copy.textContent = beat.text;
   if (next) {
@@ -19262,7 +19380,20 @@ function renderQuestDialogueBeat() {
         ? questDialogueState.cancelLabel || 'Close'
         : 'Maybe later';
   }
+  // G211: the Magic Rock's lines take QuestConversationUI's look (js/familiar.js).
+  const look = familiarLook({ look: questDialogueState.look, kicker: questDialogueState.kicker, mode });
+  const offer = mode === 'offer' || questDialogueState.offer === true;
+  const urgent = look === 'familiar' && questDialogueState.urgent === true;
+  const head = modal.querySelector('#quest-dialogue-head span');
+  if (head) head.textContent = familiarCardHeading({ offer, kicker: questDialogueState.kicker });
+  const closeX = document.getElementById('quest-dialogue-close');
+  // The card's close X declines like "Not right now"; emergencies have none (QuestConversationUI.as 154-155).
+  if (closeX) closeX.hidden = look !== 'familiar' || !cancel || cancel.hidden || urgent;
+  // Split steps show one button; the decline joins the last one (QuestConversationUI.as 207-252).
+  if (cancel && look === 'familiar' && offer && closeX && !closeX.hidden && index < beats.length - 1) cancel.hidden = true;
   modal.hidden = false;
+  applyFamiliarLook(modal, { look, urgent });
+  if (app?.canvas) app.canvas.dataset.questCardLook = `${look}${urgent ? ':urgent' : ''}`;
 }
 
 function openQuestDialogue(classTsid) {
@@ -19275,6 +19406,7 @@ function openQuestDialogue(classTsid) {
     def,
     beats: parseQuestConversation(def.offer),
     index: 0,
+    kicker: 'Magic Rock',
   };
   renderQuestDialogueBeat();
 }
@@ -19328,7 +19460,12 @@ function openScriptedQuestDialogue({
   timeoutMs = 0,
   timeoutValue = null,
   onTimeout = null,
+  look = '',
+  offer = false,
+  urgent = false,
 }) {
+  // G217: an offer or prompt that arrives over the Enter chooser or a verb menu waits until they close.
+  if (holdScriptedDialog(arguments[0])) return;
   closeQuestPanel();
   closePackPopover();
   cancelQuestDialogueTimeout();
@@ -19336,6 +19473,9 @@ function openScriptedQuestDialogue({
     mode: 'script',
     title,
     kicker,
+    look,
+    offer,
+    urgent,
     beats: (beats || []).map((beat) =>
       typeof beat === 'string' ? { text: beat, response: 'Continue' } : beat
     ),
@@ -19348,6 +19488,27 @@ function openScriptedQuestDialogue({
   };
   renderQuestDialogueBeat();
   armQuestDialogueTimeout({ timeout, timeoutMs, timeoutValue, onTimeout });
+}
+
+/**
+ * G217: scripted dialogs (offers, prompts, conversations) that arrived while
+ * the Enter chooser or a verb menu was open. Features that pop one on a timer
+ * (Pooped, a finished job, a location event) used to cover the menu you were
+ * choosing from; they now show once it has closed, oldest first.
+ */
+const heldScriptedDialogs = [];
+
+function holdScriptedDialog(opts) {
+  if (!opts || !(menuTarget || enterChooser?.isOpen())) return false;
+  heldScriptedDialogs.push(opts);
+  if (app?.canvas) app.canvas.dataset.dialogHeld = String(heldScriptedDialogs.length);
+  return true;
+}
+
+function releaseHeldScriptedDialog() {
+  if (!heldScriptedDialogs.length || menuTarget || enterChooser?.isOpen() || isQuestDialogueOpen()) return;
+  openScriptedQuestDialogue(heldScriptedDialogs.shift());
+  if (app?.canvas) app.canvas.dataset.dialogHeld = String(heldScriptedDialogs.length);
 }
 
 function closeQuestDialogue(opts = {}) {
@@ -19985,16 +20146,11 @@ function skillStudyContext() {
 function handleSkillCompletions(completed, { offline = false } = {}) {
   for (const row of completed || []) {
     const name = row.def?.name || row.classTsid;
+    // G218: the familiar's "Woohoo! New skill learned..." panel
+    // (features/familiar-dialog-feature.js) hears this event and replaces the
+    // old toast and award screen (FamiliarDialog SKILL_LEARNED; inc_skills.js 1442-1444 activity).
     emitGameEvent(`skill_learned:${row.classTsid}`);
-    toast(`You learned ${name}!`, 4200);
-    pushActivity(`${offline ? 'While you were away, you learned' : 'You learned'} ${name}.`);
-    enqueueAward({
-      kind: 'achievement',
-      sound: 'SKILL_ACHIEVED',
-      title: `${name} learned!`,
-      body: row.def?.learned || row.def?.description || 'A fresh branch of knowledge has unfurled.',
-      subtitle: offline ? 'Your brain kept studying while you were away.' : 'Knowledge: acquired.',
-    });
+    pushActivity(skillLearnedActivity(skillTitle(row.def) || name, row.def?.learned || '', { offline }));
   }
   // inc_skills.js:1513 (on learning) and player.js:217 (on login): eleven skills known.
   if (skillState.learned.length >= 11) engine.grantAchievement('first_eleven_skills');
@@ -20078,20 +20234,23 @@ function renderBuffsPanel() {
     const card = document.createElement('div');
     card.className = `q-card done buff-card${waiting ? ' pending' : ''}`;
     card.innerHTML = `<div class="buff-card-head">
-        <img src="assets/sprites/icons/${escapeHtml(b.sourceItem || b.def.itemClass || 'apple')}.png" alt="" />
+        <img src="${escapeHtml(buffIconUrl(b))}" alt="" />
         <div><div class="q-title">${escapeHtml(b.def.name)}</div><div class="buff-time">${waiting ? 'Begins' : 'Remaining'} ${escapeHtml(formatBuffRemaining(b, now))}</div></div>
       </div><div class="q-req">${escapeHtml(b.def.desc || '')}</div>`;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'content-action-btn';
-    btn.textContent = waiting ? 'Cancel' : 'End effect';
-    btn.addEventListener('click', () => {
-      removeBuff(buffState, b.classTsid, pc, Date.now());
-      toast(`${waiting ? 'Cancelled' : 'Ended'} ${b.def.name}`);
-      renderBuffsPanel();
-      updateHud();
-    });
-    card.appendChild(btn);
+    // G213: a buff another system holds (Pooped, cooldowns) cannot be ended here; it would come straight back.
+    if (!b.heldBy) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'content-action-btn';
+      btn.textContent = waiting ? 'Cancel' : 'End effect';
+      btn.addEventListener('click', () => {
+        removeBuff(buffState, b.classTsid, pc, Date.now());
+        toast(`${waiting ? 'Cancelled' : 'Ended'} ${b.def.name}`);
+        renderBuffsPanel();
+        updateHud();
+      });
+      card.appendChild(btn);
+    }
     box.appendChild(card);
   }
   const head2 = document.createElement('div');
@@ -20128,6 +20287,16 @@ function renderBuffsPanel() {
   }
 }
 
+/**
+ * A buff's tray icon: its item, else the client's white bang for a debuff
+ * with no item_class (BuffUI.as setIcon 156-171: Pooped, Super Pooped), else an apple.
+ */
+function buffIconUrl(row) {
+  const item = row?.sourceItem || row?.def?.itemClass;
+  if (item) return `assets/sprites/icons/${item}.png`;
+  return row?.def?.isDebuff ? 'assets/ui/buff-debuff.svg' : 'assets/sprites/icons/apple.png';
+}
+
 function renderBuffStrip() {
   const strip = document.getElementById('buff-strip');
   const button = document.getElementById('buffs-btn');
@@ -20146,7 +20315,7 @@ function renderBuffStrip() {
     chip.className = `buff-chip${row.activated === false || row.appliedAt > now ? ' pending' : ''}`;
     chip.title = `${row.def.name}: ${row.def.desc || ''}`;
     chip.setAttribute('aria-label', `${row.def.name}, ${formatBuffRemaining(row, now)}`);
-    chip.innerHTML = `<img src="assets/sprites/icons/${escapeHtml(row.sourceItem || row.def.itemClass || 'apple')}.png" alt="" /><span>${escapeHtml(formatBuffRemaining(row, now))}</span>`;
+    chip.innerHTML = `<img src="${escapeHtml(buffIconUrl(row))}" alt="" /><span>${escapeHtml(formatBuffRemaining(row, now))}</span>`;
     chip.addEventListener('click', openBuffsPanel);
     strip.appendChild(chip);
   }
@@ -23355,6 +23524,9 @@ async function main() {
   document.getElementById('quest-dialogue-cancel')?.addEventListener('click', () =>
     closeQuestDialogue({ cancel: true })
   );
+  document.getElementById('quest-dialogue-close')?.addEventListener('click', () =>
+    closeQuestDialogue({ cancel: true })
+  );
   document.getElementById('hog-haul-ready-btn')?.addEventListener('click', beginHogHaulCountdown);
   document.getElementById('hog-haul-leave-btn')?.addEventListener('click', leaveHogHaulRace);
   document.getElementById('four-letter-leave-btn')?.addEventListener('click', confirmLeaveFourLetterQuest);
@@ -24088,6 +24260,7 @@ async function main() {
     updateIlmenskieAutoplay();
     updateSpinningWheel();
     features.tick((1000 / 60) * dt, Date.now(), engine);
+    releaseHeldScriptedDialog();
     bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H);
     bgLayer?.cullDecos?.(-world.x, -world.y, VIEW_W, VIEW_H);
 
@@ -24168,9 +24341,15 @@ async function main() {
         want = { key: '↑', label: 'climb', x: nearClimb.x, y: Math.min(player.y, nearClimb.yBot) - 70 };
       } else if (near) {
         const box = spriteWorldHitBox(near.sprite, 0);
+        let label = near.label || near.classId || 'interact';
+        // G217: with several things in reach Enter asks which (tryOpenNearestMenu), so the chip says so.
+        if (near !== recent && near !== nearHover && !ENTER_CHOOSER_OFF) {
+          const plan = enterPlanForPrompt();
+          if (plan.mode === 'chooser') label = enterPromptLabel(plan, label);
+        }
         want = {
           key: 'Enter',
-          label: near.label || near.classId || 'interact',
+          label,
           x: near.sprite.x,
           y: (box ? box.top : near.sprite.y - 74) - 12,
         };

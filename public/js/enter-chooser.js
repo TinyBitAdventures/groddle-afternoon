@@ -149,6 +149,18 @@ export function planEnter(choices) {
   return { mode: 'chooser', choices };
 }
 
+/**
+ * G217: the Enter hint chip's words. The client drew no words here: every
+ * thing in reach glows (MiddleGroundRenderer.as _findInteractionSprites
+ * 1091-1130) and Enter asks which. So with several in reach the chip says
+ * Enter will ask, instead of naming only the nearest; one names that thing.
+ */
+export function enterPromptLabel(plan, fallback = 'interact') {
+  if (plan?.mode === 'chooser') return `choose from ${plan.choices.length}`;
+  if (plan?.mode === 'single') return plan.choice?.label || fallback;
+  return fallback;
+}
+
 /** The line under the title (InteractionMenu.updateAfterCUIFocus, TYPE_LOC_DISAMBIGUATOR). */
 export function describeChoice(choice) {
   if (!choice) return '';

@@ -19,7 +19,10 @@
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=now offers the first
  * pending quest immediately; &questofferautoplay=accept accepts it. Other QA
  * routes (any *demo or *autoplay param) get no offers; ?questoffer=off
- * silences them anywhere.
+ * silences them anywhere. &questofferaward=1 queues an award screen when a
+ * check first falls under a loading card (G213: the screen shows as the card
+ * goes and the check looks again every second while it is up); canvas
+ * questOfferAfterCardMs is the wait from the card going to the offer.
  */
 
 import {
@@ -40,12 +43,17 @@ import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unifie
 const OFFER_CHECK_MS = 30_000;
 const STREET_ENTER_DELAY_MS = 4_000;
 const SYNC_MS = 1_000;
+/** G213: how soon a check spent by an award or new-day screen looks again. */
+const SCREEN_RETRY_MS = 1_000;
 
 let nextOfferCheckAt = 0;
 let nextSyncAt = 0;
 let offerOpen = false;
 /** A check fell while a street loading card was up: run it once the card has gone (G200). */
 let heldByCard = false;
+/** When the card that held a check went (QA: questOfferAfterCardMs). */
+let cardGoneAt = 0;
+let qaAwardQueued = false;
 /** Offers are suppressed on QA routes and with ?questoffer=off. */
 let quiet = false;
 /** Pack counts at the last sync, for `in_inventory:<item>` gain events. */
@@ -133,6 +141,8 @@ function presentOffer(engine, now = Date.now()) {
     declineLabel: card.declineLabel,
     onAccept: accept,
     onDecline: decline,
+    // G211: is_emergency offers pop with the rays behind the rock (QuestConversationUI.as 147-153).
+    urgent: card.emergency === true,
   });
   if (engine.param('questofferautoplay') === 'accept') setTimeout(() => engine.acceptOpenOffer(), 400);
   return true;
@@ -151,6 +161,7 @@ export const questOffersFeature = {
     quiet = mode === 'off' || (qaRoute && mode !== 'now');
     nextOfferCheckAt = Date.now() + (engine.param('questoffer') === 'now' ? 1_500 : 12_000);
     heldByCard = false;
+    cardGoneAt = 0;
   },
 
   onStreetEnter(street, engine) {
@@ -196,12 +207,29 @@ export const questOffersFeature = {
     const cardUp = engine.streetCardUp?.() === true;
     if (heldByCard && !cardUp) {
       heldByCard = false;
+      cardGoneAt = now;
       nextOfferCheckAt = Math.min(nextOfferCheckAt, now);
     }
     if (now >= nextOfferCheckAt) {
       nextOfferCheckAt = now + OFFER_CHECK_MS;
-      if (cardUp) heldByCard = true;
-      else presentOffer(engine, now);
+      if (cardUp) {
+        // QA (G213): &questofferaward=1 queues an award screen under the card, as a badge earned on arrival would.
+        if (!heldByCard && engine.param('questofferaward') === '1' && !qaAwardQueued) {
+          qaAwardQueued = true;
+          engine.award({ kind: 'quest', title: 'Award held by the card', subtitle: 'QA', primaryLabel: 'OK' });
+        }
+        heldByCard = true;
+      } else if (!offerOpen && engine.screenFxScreenUp?.() === true) {
+        // G213: an award screen the card held shows as the card goes; this check
+        // used to open the offer over it, or be spent by busy() and wait a full
+        // 30 s more. While a screen is queued or up, look again shortly (the
+        // client queues screens and quest conversations alike: TSFrontController.as
+        // tryShowScreenViewFromQ 3399-3400, QuestsDialog.as onEmergencyTick 338).
+        nextOfferCheckAt = Math.min(nextOfferCheckAt, now + SCREEN_RETRY_MS);
+      } else if (presentOffer(engine, now)) {
+        if (cardGoneAt) engine.setData('questOfferAfterCardMs', String(now - cardGoneAt));
+        cardGoneAt = 0;
+      }
     }
   },
 };

@@ -45,7 +45,7 @@ import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js';
 import { worldToScreen } from '../street-model.js';
 import { landingY, walkSurfaceY } from '../walk-surface.js';
 import { hellFeature } from './hell-feature.js?v=hell-7';
-import { questRoomConverse } from './quest-instances-feature.js?v=qi-4';
+import { questRoomConverse } from './quest-instances-feature.js?v=qi-5';
 import {
   CONTRABAND,
   CONTRABAND_ITEM,
@@ -453,7 +453,10 @@ async function revealDestination(engine, kind) {
   const beats = kind === 'explain'
     ? EXPLAIN_RESTRICTIONS.map((text, i, all) => ({ text, response: i === all.length - 1 ? 'OK' : 'Next' }))
     : [{ text: REVEAL_DESTINATION[Math.floor(rng() * REVEAL_DESTINATION.length)], response: 'OK' }];
-  await questRoomConverse(engine, { title: 'Warm and Smuggly', kicker: 'Magic Rock', beats });
+  // inc_announcements.js 420-482: vp_overlay text with bubble_familiar, 500 px wide (G220).
+  // The source sends no rock art with these two; the remake shows it so the
+  // bubble's pointer has the familiar to point at (the 2012 header had no rock).
+  await questRoomConverse(engine, { title: 'Warm and Smuggly', kicker: 'Magic Rock', beats, look: 'vog', width: 500 });
   await loadGraph();
   renderHud(engine);
   if (!state.run) return;

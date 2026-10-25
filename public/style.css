@@ -612,6 +612,12 @@ footer a { color: inherit; }
   background: rgba(18, 24, 32, 0.42);
 }
 
+/* G217: the Enter chooser sits over the local chat dock (z 26), which covered
+   its hint line on a 390 px phone; the shade dims the dock while you choose. */
+.enter-chooser {
+  z-index: 27;
+}
+
 .feed-picker-card {
   width: min(430px, 92%);
 }
@@ -7078,4 +7084,202 @@ header.top-bar + .sub { display: none; }
 .make-search:focus {
   outline: 2px solid #8fbf5a;
   outline-offset: 1px;
+}
+
+/* —— The Magic Rock familiar, final 2012 form (G211, G218, G219, G220; js/familiar.js) —— */
+.pet-rock { display: block; background-repeat: no-repeat; }
+.fam-rock { position: relative; width: var(--fam-rock-size, 80px); height: var(--fam-rock-size, 80px); }
+.fam-rock-art { position: relative; z-index: 1; }
+.fam-rays { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; display: none; }
+.fam-rays svg { display: block; width: 100%; height: 100%; animation: famRaySpin var(--fam-ray-spin, 6s) linear infinite; }
+@keyframes famRaySpin { to { transform: rotate(60deg); } }
+@media (prefers-reduced-motion: reduce) { .fam-rays svg { animation: none; } }
+.fam-close {
+  width: 22px; height: 22px; padding: 0; border: 0; border-radius: 4px; cursor: pointer;
+  background: #0a181d url('assets/ui/familiar/close_x_small_gray.png') center / 20px 20px no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(204, 204, 204, 0.25);
+}
+.fam-close:hover, .fam-close:focus-visible { box-shadow: inset 0 0 0 1px #ccc; }
+
+/* The shared quest card keeps its plain look for everyone else. */
+.quest-dialogue-bubble { display: contents; }
+.quest-dialogue .fam-rock, .quest-dialogue .fam-head, .quest-dialogue .fam-close { display: none; }
+
+/* QuestConversationUI.as: rock 80 px with a white glow, a 462 px bubble in
+   0x0a181d at 0.9 pointing at it, centred 80 px under the header, no shade. */
+.quest-dialogue[data-look="familiar"] { place-items: start center; padding: 80px 8px 8px; }
+.quest-dialogue[data-look="familiar"] .quest-dialogue-shade,
+.quest-dialogue[data-look="familiar"] #quest-dialogue-kicker { display: none; }
+.quest-dialogue[data-look="familiar"] .quest-dialogue-card {
+  display: grid; grid-template-columns: 80px minmax(0, 462px); column-gap: 10px; align-items: center;
+  width: auto; max-width: calc(100% - 8px); max-height: calc(100% - 8px); overflow: visible;
+  padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+  text-align: left; color: #fff;
+}
+.quest-dialogue[data-look="familiar"] .fam-rock { display: block; }
+.quest-dialogue[data-look="familiar"] .fam-rock-art {
+  /* glow 0xececec, alpha 0.8, strength 20 (QuestConversationUI.as 76) */
+  filter: drop-shadow(0 0 1.5px rgba(236, 236, 236, 1)) drop-shadow(0 0 4px rgba(236, 236, 236, 0.8));
+}
+.quest-dialogue[data-look="familiar"][data-urgent="true"] .fam-rays { display: block; }
+.quest-dialogue[data-look="familiar"] .quest-dialogue-bubble {
+  display: block; position: relative; box-sizing: border-box; width: 462px; max-width: 100%;
+  max-height: calc(100vh - 120px); overflow: visible;
+  padding: 0 20px 20px; border-radius: 5px; background: rgba(10, 24, 29, 0.9);
+  font-size: 13px; line-height: 1.38;
+}
+.quest-dialogue[data-look="familiar"] .quest-dialogue-bubble::before {
+  content: ''; position: absolute; left: -9px; top: 50%; margin-top: -8px;
+  border-style: solid; border-width: 8px 9px 8px 0;
+  border-color: transparent rgba(10, 24, 29, 0.9) transparent transparent;
+}
+.quest-dialogue[data-look="familiar"] .fam-head {
+  display: flex; align-items: center; gap: 10px; margin: 0 -20px; padding: 7px 40px 7px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4); font-size: 13px; font-weight: 700; line-height: 22px; color: #fff;
+}
+.quest-dialogue[data-look="familiar"] .fam-head img { display: block; width: 32px; height: 22px; }
+.quest-dialogue[data-look="familiar"] .fam-close:not([hidden]) { display: block; position: absolute; top: 7px; right: 7px; }
+.quest-dialogue[data-look="familiar"] .quest-dialogue-card h2 {
+  margin: 12px 0 2px; color: #f3e46a; font-size: 17px; line-height: 1.25; font-weight: 800;
+}
+.quest-dialogue[data-look="familiar"] .quest-dialogue-copy { min-height: 0; margin: 0; font-size: 13px; line-height: 1.4; color: #eef2f2; }
+.quest-dialogue[data-look="familiar"] .quest-dialogue-actions,
+.quest-dialogue[data-look="vog"] .quest-dialogue-actions,
+.quest-dialogue[data-look="vog"] [data-qi-choices] {
+  display: flex !important; flex-direction: row !important; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 12px;
+}
+.quest-dialogue[data-look="familiar"] .quest-dialogue-actions button,
+.quest-dialogue[data-look="vog"] .quest-dialogue-actions button,
+.quest-dialogue[data-look="vog"] [data-qi-choices] button {
+  /* Button TYPE_DARK, SIZE_CONVERSATION */
+  min-width: 0; margin: 0; padding: 5px 14px; font: inherit; font-size: 13px; font-weight: 700; line-height: 1.2;
+  color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.55); cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 4px;
+  background: linear-gradient(#66737a, #3d494f); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.quest-dialogue[data-look="familiar"] .quest-dialogue-actions button:hover,
+.quest-dialogue[data-look="familiar"] .quest-dialogue-actions button:focus-visible,
+.quest-dialogue[data-look="vog"] .quest-dialogue-actions button:hover,
+.quest-dialogue[data-look="vog"] [data-qi-choices] button:hover,
+.quest-dialogue[data-look="vog"] [data-qi-choices] button:focus-visible {
+  background: linear-gradient(#78868d, #4a575d); outline: none; box-shadow: 0 0 0 2px rgba(215, 144, 53, 0.75);
+}
+.quest-dialogue[data-look="familiar"] .quest-dialogue-actions button[hidden],
+.quest-dialogue[data-look="vog"] .quest-dialogue-actions button[hidden] { display: none; }
+@media (max-width: 560px) {
+  .quest-dialogue[data-look="familiar"] { padding-top: 56px; }
+  .quest-dialogue[data-look="familiar"] .quest-dialogue-card { grid-template-columns: 52px minmax(0, 1fr); column-gap: 8px; }
+  .quest-dialogue[data-look="familiar"] .fam-rock { transform: scale(0.65); margin-left: -14px; }
+}
+
+/* Voice of rock (inc_announcements.js bubble_familiar; InWindowAnnouncementOverlay.as
+   494-515): the rock with rays at x 50% y 15%, a black 0.7 bubble (radius 15,
+   padding 15) at top_y 25% with an 18 x 12 px pointer up at it. */
+.quest-dialogue[data-look="vog"] { display: block; padding: 0; }
+.quest-dialogue[data-look="vog"] .quest-dialogue-shade,
+.quest-dialogue[data-look="vog"] .quest-dialogue-orb,
+.quest-dialogue[data-look="vog"] .mr-kicker,
+.quest-dialogue[data-look="vog"] .quest-dialogue-card h2 { display: none; }
+.quest-dialogue[data-look="vog"] .quest-dialogue-card {
+  position: absolute; left: 50%; top: calc(25% + 12px); transform: translateX(-50%);
+  box-sizing: border-box; width: min(calc(var(--vog-w, 500px) + 30px), calc(100% - 24px)); max-height: none; overflow: visible;
+  padding: 15px; border: 0; border-radius: 7.5px; background: rgba(0, 0, 0, 0.7); box-shadow: none;
+  color: #fff; text-align: center;
+}
+.quest-dialogue[data-look="vog"] .quest-dialogue-card::before {
+  content: ''; position: absolute; left: 50%; top: -12px; margin-left: -9px;
+  border-style: solid; border-width: 0 9px 12px; border-color: transparent transparent rgba(0, 0, 0, 0.7);
+}
+.quest-dialogue[data-look="vog"] .fam-rock {
+  display: block; position: absolute; left: 50%; top: var(--vog-dy, -80px); transform: translate(-50%, -50%);
+}
+.quest-dialogue[data-look="vog"] .fam-rays { display: block; }
+.quest-dialogue[data-look="vog"] .quest-dialogue-copy {
+  min-height: 0; margin: 0; font-size: 17px; line-height: 1.35; font-weight: 600; color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* FamiliarDialog SKILL_LEARNED: grows out of the header centre (scale 0.02 to 1,
+   0.3 s easeInCubic), centred 30 px under the header, 0x0a181d at 0.9, radius 10. */
+.familiar-dialog {
+  position: absolute; z-index: 505; top: 30px; left: 50%;
+  box-sizing: border-box; width: min(510px, calc(100% - 16px)); min-height: 220px;
+  max-height: calc(100% - 40px); overflow: auto;
+  padding: 20px; border-radius: 10px; background: rgba(10, 24, 29, 0.9); color: #fff;
+  transform: translateX(-50%); transform-origin: 50% -30px;
+  font-size: 13px; line-height: 1.4; text-align: left;
+}
+.familiar-dialog[hidden] { display: none; }
+.familiar-dialog.is-grown { animation: famGrow 0.3s cubic-bezier(0.32, 0, 0.67, 0) both; }
+.familiar-dialog.is-shrinking { animation: famShrink 0.3s cubic-bezier(0.33, 1, 0.68, 1) both; pointer-events: none; }
+@keyframes famGrow { from { transform: translateX(-50%) scale(0.02); } to { transform: translateX(-50%) scale(1); } }
+@keyframes famShrink { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(0.02); } }
+html[data-street-cards] .familiar-dialog,
+#game-root:has(.award-screen.is-visible) .familiar-dialog { visibility: hidden; }
+.familiar-dialog .fam-close { position: absolute; top: 8px; right: 8px; }
+.fam-learned { display: grid; grid-template-columns: 100px minmax(0, 1fr); column-gap: 20px; align-items: start; }
+/* The skill tile sits at about (55, 77)-(178, 200) of its 230 x 310 card layer. */
+.fam-learned-icon, .fam-skill img { object-fit: contain; object-view-box: inset(76px 51px 109px 54px); }
+.fam-learned-icon { width: 100px; height: 100px; }
+.fam-learned-copy { padding-right: 18px; }
+.fam-learned-header { margin: 0; font-size: 13px; font-weight: 700; color: #a9c2c8; }
+.fam-learned-title { margin: 2px 0 4px; font-size: 20px; line-height: 1.2; font-weight: 800; color: #fff; }
+.fam-learned-desc { margin: 0; color: #d4dee0; }
+.fam-learn-next { display: flex; align-items: center; gap: 10px; margin: 12px -20px 10px; font-size: 13px; font-weight: 700; }
+.fam-learn-next::before, .fam-learn-next::after { content: ''; flex: 1; height: 1px; background: #49514f; }
+.fam-learn-next[hidden] { display: none; }
+.fam-skill-list { display: grid; justify-content: center; column-gap: 10px; }
+.fam-skill-list[data-cols="2"] { grid-template-columns: repeat(2, max-content); }
+.fam-skill-list[data-cols="3"] { grid-template-columns: repeat(3, 130px); }
+.fam-skill {
+  display: flex; align-items: center; gap: 5px; padding: 3px 0; border: 0; background: none; cursor: pointer;
+  color: #fff; font: inherit; font-size: 11px; font-weight: 700; text-align: left;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+.fam-skill img { width: 20px; height: 20px; flex: none; }
+.fam-skill:hover, .fam-skill:focus-visible { color: #d79035; outline: none; }
+.fam-tree-link {
+  display: block; margin: 15px auto 0; padding: 0; border: 0; background: none; cursor: pointer;
+  color: #5c96a3; font: inherit; font-size: 12px; text-decoration: underline;
+}
+@media (max-width: 560px) {
+  .familiar-dialog { top: 12px; min-height: 0; padding: 16px; }
+  .fam-learned { grid-template-columns: 64px minmax(0, 1fr); column-gap: 12px; }
+  .fam-learned-icon { width: 64px; height: 64px; }
+  .fam-learned-title { font-size: 17px; }
+  .fam-learn-next { margin-left: -16px; margin-right: -16px; }
+  .fam-skill-list[data-cols="3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* AchievementView.as: pet_rock 68 px drops in beside the badge onto a blurred
+   oval, then says "New Achievement!" in a chat bubble. */
+.award-familiar {
+  position: absolute; z-index: 2; left: calc(50% + 48px + 12px); top: calc(1.4rem + 96px - 68px);
+  width: 68px; height: 68px; pointer-events: none; text-align: left;
+}
+.award-familiar[hidden] { display: none; }
+.award-familiar-rock { position: relative; z-index: 1; will-change: transform; }
+.award-familiar-shadow {
+  position: absolute; left: 17px; bottom: 0; width: 34px; height: 10px; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.8); filter: blur(6px); opacity: 0;
+}
+.award-familiar-bubble {
+  position: absolute; z-index: 2; left: -52px; bottom: calc(100% - 2px); width: max-content; max-width: 220px;
+  margin: 0; padding: 6px 10px; border-radius: 8px; background: #fff; color: #263238;
+  font-size: 12px; line-height: 1.35; text-shadow: none; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  animation: famBubbleIn 0.18s ease-out both;
+}
+.award-familiar-bubble[hidden] { display: none; }
+.award-familiar-bubble::after {
+  content: ''; position: absolute; left: 96px; bottom: -7px;
+  border-style: solid; border-width: 8px 6px 0; border-color: #fff transparent transparent;
+}
+.award-familiar-bubble span { display: block; }
+.award-familiar-bubble span[hidden] { display: none; }
+@keyframes famBubbleIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.award-screen[data-familiar="true"] .award-kicker { visibility: hidden; }
+@media (max-width: 480px) {
+  .award-familiar { left: auto; right: 4px; }
+  .award-familiar-bubble { left: auto; right: 0; }
+  .award-familiar-bubble::after { left: auto; right: 22px; }
 }

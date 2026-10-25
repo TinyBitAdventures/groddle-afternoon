@@ -12,10 +12,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PROMPT_ROLL_OUT_MS, armPromptTimeout, promptTimeoutMs, timeoutChoice } from '../public/js/prompt-timeout.js?v=g200-1';
-import { STREET_CARD_GONE, STREET_CARD_UP, cardHidesKey, cardPausedTimeout, installStreetCardKeyGuard, streetCardUp } from '../public/js/screen-fx.js?v=g200-1';
+import { PROMPT_ROLL_OUT_MS, armPromptTimeout, promptTimeoutMs, timeoutChoice } from '../public/js/prompt-timeout.js?v=g211-1';
+import { STREET_CARD_GONE, STREET_CARD_UP, cardHidesKey, cardPausedTimeout, installStreetCardKeyGuard, streetCardUp } from '../public/js/screen-fx.js?v=g211-1';
 import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-7';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-3';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-4';
 import { HELL_ENTRY_PROMPT_TIMEOUT_MS, HELL_TEXT } from '../public/js/hell.js';
 import { createQuestState } from '../public/js/quests.js';
 
@@ -221,7 +221,8 @@ describe('the game wires them', () => {
   const css = read(join(PUBLIC, 'style.css'));
 
   it('engine.prompt passes timeout, timeoutMs, timeoutValue and onTimeout to the prompt card', () => {
-    assert.match(game, /prompt\(\{ title = '', kicker = '', text = '', timeout = 0, timeoutMs = 0, timeoutValue = null, onTimeout = null \} = \{\}\) \{\s*openScriptedQuestDialogue\(\{[\s\S]{0,200}timeout,\s*timeoutMs,\s*timeoutValue,\s*onTimeout,/);
+    // G213: `choices` sets the buttons (one choice: no Close), between the signature and the call.
+    assert.match(game, /prompt\(\{ title = '', kicker = '', text = '', choices = null, timeout = 0, timeoutMs = 0, timeoutValue = null, onTimeout = null \} = \{\}\) \{[\s\S]{0,500}?openScriptedQuestDialogue\(\{[\s\S]{0,400}timeout,\s*timeoutMs,\s*timeoutValue,\s*onTimeout,/);
     assert.match(game, /renderQuestDialogueBeat\(\);\n  armQuestDialogueTimeout\(\{ timeout, timeoutMs, timeoutValue, onTimeout \}\);/);
     assert.match(game, /hoverEl: document\.querySelector\('#quest-dialogue \.quest-dialogue-card'\)/);
     assert.match(game, /if \(questDialogueState !== mine\) return;\s*closeQuestDialogue\(\{ force: true \}\);/, 'only the prompt that armed it');

@@ -1,6 +1,6 @@
 /** Official Glitch quoin types and their persistent daily economy. */
 
-import { energyMax, moodMax } from './metabolics.js';
+import { energyMax, metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 export const DEFAULT_DAILY_QUOIN_LIMIT = 100;
@@ -124,8 +124,11 @@ export function resetQuoinDay(state, upgrades = []) {
  * (items/quoin.js 162-174 and 184-187 call the same stats_add_xp,
  * metabolics_add_mood / _energy and stats_add_currants).
  */
-export function creditQuoinStat(pc, typeId, rawAmount) {
+export function creditQuoinStat(pc, typeId, rawAmount, { gated = false } = {}) {
   const amount = Math.max(0, Math.round(finite(rawAmount, 0)));
+  // G213: quoin.js 128-131 and 185-186 add through metabolics_add_mood / _energy,
+  // which give nothing while dead or (energy) Super Pooped (js/metabolics.js).
+  if (!gated && (typeId === 'energy' || typeId === 'mood') && amount > 0 && !metabolicGain(typeId).ok) return 0;
   if (typeId === 'xp' || typeId === 'qurazy') {
     pc.imagination = Math.max(0, Math.floor(finite(pc.imagination, 0)));
     pc.xp = Math.max(0, Math.floor(finite(pc.xp, 0)));
@@ -172,8 +175,18 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
   const amount = Math.max(0, Math.round(baseAmount * multiplier));
   let actual = amount;
   let acceleration = null;
+  let blocked = null;
 
-  if (resolvedType === 'xp' || resolvedType === 'qurazy' || resolvedType === 'energy'
+  if ((resolvedType === 'energy' || resolvedType === 'mood') && amount > 0) {
+    // G213: the gain is refused (dead, Super Pooped); the quoin still counts.
+    const gate = metabolicGain(resolvedType);
+    if (!gate.ok) {
+      actual = 0;
+      blocked = gate.msg || 'blocked';
+    } else {
+      actual = creditQuoinStat(pc, resolvedType, amount, { gated: true });
+    }
+  } else if (resolvedType === 'xp' || resolvedType === 'qurazy' || resolvedType === 'energy'
     || resolvedType === 'mood' || resolvedType === 'currants') {
     actual = creditQuoinStat(pc, resolvedType, amount);
   } else if (resolvedType === 'favor') {
@@ -209,6 +222,7 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     baseAmount,
     amount,
     actual,
+    blocked,
     multiplier,
     dailyCount: state.collectedToday,
     dailyLimit: state.dailyLimit,
@@ -216,4 +230,130 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     giantId: resolvedType === 'favor' ? String(opts.giantId || 'all').toLowerCase() : null,
     acceleration: resolvedType === 'time' ? acceleration : null,
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* G216: respawn by quoin class                                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Every class_name in items/quoin.js onPropsChanged (318-662): its type and
+ * respawn_time in seconds. After a grab the quoin goes unspawned and
+ * onRespawn (664) brings it back respawn_time later (305), except in races,
+ * games, cloudhopolis and top_of_tree; a qurazy quoin is deleted instead
+ * (264). The benefit numbers stay the remake's own (QUOIN_TYPES).
+ */
+export const QUOIN_CLASSES = Object.freeze({
+  'fast tiny mood': Object.freeze({ type: 'mood', respawnSec: 4 * 60, line: 325 }),
+  'fast tiny energy': Object.freeze({ type: 'energy', respawnSec: 3 * 60, line: 331 }),
+  'fast tiny xp': Object.freeze({ type: 'xp', respawnSec: 60, line: 337 }),
+  'fast tiny currants': Object.freeze({ type: 'currants', respawnSec: 40, line: 343 }),
+  'fast tiny time': Object.freeze({ type: 'time', respawnSec: 60, line: 349 }),
+  'small random mood': Object.freeze({ type: 'mood', respawnSec: 7 * 60, line: 359 }),
+  'small random energy': Object.freeze({ type: 'energy', respawnSec: 7 * 60, line: 366 }),
+  'small random xp': Object.freeze({ type: 'xp', respawnSec: 5 * 60, line: 373 }),
+  'small random currants': Object.freeze({ type: 'currants', respawnSec: 3 * 60, line: 380 }),
+  'slow medium-large mood': Object.freeze({ type: 'mood', respawnSec: 30 * 60, line: 388 }),
+  'slow medium-large energy': Object.freeze({ type: 'energy', respawnSec: 30 * 60, line: 394 }),
+  'slow medium-large xp': Object.freeze({ type: 'xp', respawnSec: 30 * 60, line: 400 }),
+  'slow medium-large currants': Object.freeze({ type: 'currants', respawnSec: 30 * 60, line: 406 }),
+  'long random large mood': Object.freeze({ type: 'mood', respawnSec: 60 * 60, line: 413 }),
+  'long random large energy': Object.freeze({ type: 'energy', respawnSec: 60 * 60, line: 420 }),
+  'long random large xp': Object.freeze({ type: 'xp', respawnSec: 60 * 60, line: 427 }),
+  'long random large currants': Object.freeze({ type: 'currants', respawnSec: 60 * 60, line: 434 }),
+  'placement tester': Object.freeze({ type: '', respawnSec: 1, line: 442 }),
+  'rainbow run': Object.freeze({ type: 'mood', respawnSec: 15, line: 448 }),
+  'small random favor': Object.freeze({ type: 'favor', respawnSec: 5 * 60, line: 460 }),
+  'slow medium random favor': Object.freeze({ type: 'favor', respawnSec: 20 * 60, line: 469 }),
+  'long large random favor': Object.freeze({ type: 'favor', respawnSec: 60 * 60, line: 477 }),
+  'small time': Object.freeze({ type: 'time', respawnSec: 10 * 60, line: 488 }),
+  'slow medium random time': Object.freeze({ type: 'time', respawnSec: 30 * 60, line: 495 }),
+  'long large random time': Object.freeze({ type: 'time', respawnSec: 60 * 60, line: 503 }),
+  'random baqala mood': Object.freeze({ type: 'mood', respawnSec: 10 * 60, line: 513 }),
+  'random baqala energy': Object.freeze({ type: 'energy', respawnSec: 10 * 60, line: 520 }),
+  'random baqala xp': Object.freeze({ type: 'xp', respawnSec: 10 * 60, line: 527 }),
+  'random baqala currants': Object.freeze({ type: 'currants', respawnSec: 10 * 60, line: 534 }),
+  'random baqala favor': Object.freeze({ type: 'favor', respawnSec: 10 * 60, line: 541 }),
+  'random baqala time': Object.freeze({ type: 'time', respawnSec: 10 * 60, line: 549 }),
+  'quoin hub fast currants': Object.freeze({ type: 'currants', respawnSec: 40, line: 560 }),
+  'quoin hub fast iMG': Object.freeze({ type: 'xp', respawnSec: 60, line: 567 }),
+  'paradise currants': Object.freeze({ type: 'currants', respawnSec: 400000, line: 578 }),
+  'paradise iMG': Object.freeze({ type: 'xp', respawnSec: 400000, line: 584 }),
+  'slow tiny mood': Object.freeze({ type: 'mood', respawnSec: 300, line: 593 }),
+  'slow tiny energy': Object.freeze({ type: 'energy', respawnSec: 300, line: 599 }),
+  'slow tiny xp': Object.freeze({ type: 'xp', respawnSec: 300, line: 605 }),
+  'slow tiny currants': Object.freeze({ type: 'currants', respawnSec: 300, line: 611 }),
+  'slow tiny time': Object.freeze({ type: 'time', respawnSec: 300, line: 617 }),
+  'party mood': Object.freeze({ type: 'mood', respawnSec: 2 * 60, line: 627 }),
+  'party energy': Object.freeze({ type: 'energy', respawnSec: 2 * 60, line: 633 }),
+  'party iMG': Object.freeze({ type: 'xp', respawnSec: 90, line: 639 }),
+  'party currants': Object.freeze({ type: 'currants', respawnSec: 60, line: 645 }),
+});
+
+/**
+ * The classes an ordinary street quoin of each type can be. The placed
+ * quoins' own class_name values are not in the recovered street data, so a
+ * street spot takes one of these by a stable hash: the fast tiny, small,
+ * slow medium, long large and slow tiny tiers (Baqala, quoin hub, party,
+ * Paradise, rainbow run and the placement tester belong to their own places).
+ * Mystery quoins have no class in the source, so they use the iMG tiers.
+ */
+export const STREET_QUOIN_CLASSES = Object.freeze({
+  xp: Object.freeze(['fast tiny xp', 'small random xp', 'slow medium-large xp', 'long random large xp', 'slow tiny xp']),
+  mood: Object.freeze(['fast tiny mood', 'small random mood', 'slow medium-large mood', 'long random large mood', 'slow tiny mood']),
+  energy: Object.freeze(['fast tiny energy', 'small random energy', 'slow medium-large energy', 'long random large energy', 'slow tiny energy']),
+  currants: Object.freeze(['fast tiny currants', 'small random currants', 'slow medium-large currants', 'long random large currants', 'slow tiny currants']),
+  favor: Object.freeze(['small random favor', 'slow medium random favor', 'long large random favor']),
+  time: Object.freeze(['fast tiny time', 'small time', 'slow medium random time', 'long large random time', 'slow tiny time']),
+});
+
+/** The class a street's natural quoin `index` of `typeId` is ('' for qurazy: it never respawns). */
+export function streetQuoinClass(streetTsid, index, typeId) {
+  if (typeId === 'qurazy') return '';
+  const list = STREET_QUOIN_CLASSES[typeId] || STREET_QUOIN_CLASSES.xp;
+  return list[stableHash(`${streetTsid}#${index}`) % list.length];
+}
+
+/** respawn_time of a class in ms; Infinity for none (qurazy, unknown). */
+export function quoinRespawnMs(className) {
+  const row = QUOIN_CLASSES[className];
+  return row ? row.respawnSec * 1000 : Infinity;
+}
+
+/**
+ * Note a grabbed natural quoin's respawn on its street slot
+ * (`{ collectedQuoins, quoinRespawn }`). A quoin with no respawn stays
+ * collected until the game day turns, as before.
+ */
+export function noteQuoinRespawn(street, index, respawnMs, now = Date.now()) {
+  if (!street || !Number.isInteger(index) || index < 0) return null;
+  street.quoinRespawn ||= {};
+  if (!Number.isFinite(respawnMs)) {
+    delete street.quoinRespawn[index];
+    return null;
+  }
+  const at = now + Math.max(0, respawnMs);
+  street.quoinRespawn[index] = at;
+  return at;
+}
+
+/**
+ * onRespawn: the street's natural quoins whose time has come are no longer
+ * collected. Returns the indexes released, smallest first.
+ */
+export function releaseQuoinRespawns(street, now = Date.now()) {
+  const due = [];
+  const map = street?.quoinRespawn;
+  if (!map) return due;
+  for (const [key, at] of Object.entries(map)) {
+    const index = Number(key);
+    if (!Number.isInteger(index) || !(Number(at) <= now)) continue;
+    due.push(index);
+    delete map[key];
+  }
+  if (due.length && Array.isArray(street.collectedQuoins)) {
+    const gone = new Set(due);
+    street.collectedQuoins = street.collectedQuoins.filter((i) => !gone.has(i));
+  }
+  return due.sort((a, b) => a - b);
 }

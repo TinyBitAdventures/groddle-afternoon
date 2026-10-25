@@ -7,6 +7,8 @@
  * DOM-driven (not Pixi) so it covers HUD + canvas inside #game-root.
  */
 
+import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=g211-1';
+
 /**
  * Street-load timings (seconds).
  * Slightly slower than original LoadingLocationView so teleports read as intentional
@@ -527,6 +529,75 @@ async function streetTransition(el, opts) {
 }
 
 /**
+ * G219: the familiar drops in beside a new badge (AchievementView.as 163-185,
+ * 466-480, 541-557): pet_rock idle at 68 px falls from above the screen with
+ * easeOutBounce (1 s, after 1 s) onto a blurred black oval (0.8, blur
+ * 25 / 15 px plus the gap / 10 while it falls), and 0.4 s after it lands it
+ * says "New Achievement!" (plus the status text) in a chat bubble.
+ * Returns a stop function.
+ */
+export function startFamiliarDrop(fam, { status = '', body = '', name = '' } = {}) {
+  if (!fam) return () => {};
+  const rock = fam.querySelector('[data-award-familiar-rock]');
+  const shadow = fam.querySelector('.award-familiar-shadow');
+  const bubble = fam.querySelector('[data-award-familiar-bubble]');
+  mountPetRock(rock, { size: ACHIEVEMENT_ROCK_WH });
+  const text = achievementBubbleText({ status, name });
+  // The remake's card already prints the status prose as its body: say it once.
+  const line = text.line && text.line !== String(body || '').trim() && status ? text.line : '';
+  if (bubble) {
+    bubble.hidden = true;
+    bubble.querySelector('b').textContent = text.head;
+    bubble.querySelector('span').textContent = line;
+    bubble.querySelector('span').hidden = !line;
+  }
+  fam.dataset.phase = 'waiting';
+  rock.style.transform = 'translateY(-200vh)';
+  if (shadow) shadow.style.opacity = '0';
+  const t0 = performance.now();
+  let raf = 0;
+  let from = 0;
+  let bubbleTimer = 0;
+  let stopped = false;
+  const frame = (now) => {
+    if (stopped) return;
+    const t = now - t0 - ACHIEVEMENT_DROP.delayMs;
+    if (t < 0) {
+      raf = requestAnimationFrame(frame);
+      return;
+    }
+    if (!from) {
+      // From above the screen: -(distance to the top) - 2 * the rock's height.
+      const host = fam.closest('.award-screen') || fam.parentElement;
+      const top = host ? fam.getBoundingClientRect().top - host.getBoundingClientRect().top : 200;
+      from = Math.max(200, top + 2 * ACHIEVEMENT_ROCK_WH);
+      fam.dataset.phase = 'falling';
+      if (shadow) shadow.style.opacity = '1';
+    }
+    const p = Math.min(1, t / ACHIEVEMENT_DROP.durationMs);
+    const gap = from * (1 - easeOutBounce(p));
+    rock.style.transform = `translateY(${-gap.toFixed(1)}px)`;
+    if (shadow) shadow.style.filter = `blur(${((25 + gap / 10) / 4).toFixed(1)}px)`;
+    if (p < 1) {
+      raf = requestAnimationFrame(frame);
+      return;
+    }
+    fam.dataset.phase = 'landed';
+    bubbleTimer = setTimeout(() => {
+      if (stopped || !bubble) return;
+      bubble.hidden = false;
+      fam.dataset.phase = 'talking';
+    }, ACHIEVEMENT_DROP.bubbleAfterMs);
+  };
+  raf = requestAnimationFrame(frame);
+  return () => {
+    stopped = true;
+    cancelAnimationFrame(raf);
+    clearTimeout(bubbleTimer);
+  };
+}
+
+/**
  * Full-screen award / quest complete celebration.
  * @param {HTMLElement} el  #award-screen
  * @param {{
@@ -607,6 +678,19 @@ export async function showAwardScreen(el, payload) {
   }
 
   el.dataset.kind = kind;
+  // G219: a badge (an achievement with a class) brings the familiar along.
+  const fam = el.querySelector('[data-award-familiar]');
+  const withFamiliar = Boolean(fam) && kind === 'achievement' && Boolean(payload.classTsid) && !paged;
+  let stopFamiliar = () => {};
+  if (fam) fam.hidden = !withFamiliar;
+  el.dataset.familiar = withFamiliar ? 'true' : 'false';
+  if (withFamiliar) {
+    stopFamiliar = startFamiliarDrop(fam, {
+      status: payload.status || '',
+      body: bodyText,
+      name: awardText(payload.title),
+    });
+  }
   if (paged) {
     el.dataset.paged = 'true';
     el.dataset.pages = String(pages.length);
@@ -700,6 +784,8 @@ export async function showAwardScreen(el, payload) {
   el.removeEventListener('click', swallow);
 
   await crossfadeElement(el, { show: false, durationSec: AWARD_FADE_OUT });
+  stopFamiliar();
+  if (fam) fam.hidden = true;
   if (next) next.hidden = true;
   if (close) close.hidden = true;
   delete el.dataset.paged;

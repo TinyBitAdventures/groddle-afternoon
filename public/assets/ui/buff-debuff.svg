@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <!-- G213: a debuff with no item_class shows a white bang in the client (BuffUI.as setIcon 156-171, buff_bang_white); redrawn in vector. -->
+  <circle cx="20" cy="20" r="18" fill="#b8473c" stroke="#7d2a22" stroke-width="2"/>
+  <rect x="17" y="8" width="6" height="16" rx="3" fill="#fff"/>
+  <circle cx="20" cy="30" r="3.4" fill="#fff"/>
+</svg>

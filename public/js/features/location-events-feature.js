@@ -28,7 +28,9 @@
  * &physicsautoplay=jump launches one jump at the street's jump speed.
  * ?eventdemo=<tsid>&eventautoplay=1 drops the avatar onto the first event
  * box, or fires each named event in turn when the street has none
- * (&eventname=<name> for one). Data: eventStreet, eventCount, eventBoxes,
+ * (&eventname=<name> for one; &eventwait=<ms> before the first, default 300;
+ * &eventautoplay=busy fires while a menu is open too, so a VOG can be seen
+ * waiting for the menu to close, G217). Data: eventStreet, eventCount, eventBoxes,
  * eventFired, eventLast, eventEffects, eventPhysics, eventUnsupported,
  * eventTeleport, eventDemo.
  */
@@ -198,13 +200,14 @@ function applyEffects(engine, effects, now) {
         const next = () => {
           if (fx.next && current && engine.streetTsid === tsid) fire(engine, fx.next, true, clock);
         };
-        engine.offerQuestDialogue({
+        // G213: a VOG has no speaker. locations/inc_events.js events_VOGPlayer 556-600
+        // sends a locking vp_overlay (click_to_advance, one line a click, no close) of
+        // centred nuxp_vog text, so no "Mr. Block" kicker, no Close and no quest sound.
+        engine.scriptedDialogue({
           title: engine.street?.label || '',
+          kicker: null,
           beats: fx.lines.map((text) => ({ text, response: 'OK' })),
-          acceptLabel: 'OK',
-          declineLabel: 'Close',
-          onAccept: next,
-          onDecline: next,
+          onComplete: next,
         });
         break;
       }
@@ -374,7 +377,7 @@ function demoStep(engine, now) {
     return;
   }
   // Event demo.
-  if (engine.param('eventautoplay') !== '1') {
+  if (engine.param('eventautoplay') !== '1' && engine.param('eventautoplay') !== 'busy') {
     engine.setData('eventDemo', 'arrived');
     demo.stage = 'done';
     return;
@@ -399,11 +402,12 @@ function demoStep(engine, now) {
     }
     const arrival = new Set(arrivalEvents(current.events).map((e) => e.name));
     const names = only ? [only] : Object.keys(current.events).filter((n) => !arrival.has(n));
-    demo = { ...demo, stage: 'run', queue: names, at: now + 300 };
+    demo = { ...demo, stage: 'run', queue: names, at: now + Math.max(0, Number(engine.param('eventwait')) || 300) };
     engine.setData('eventDemo', `firing:${names.length}`);
     return;
   }
-  if (engine.busy()) return;
+  // &eventautoplay=busy fires even while a menu is open (G217 QA: the VOG waits for it).
+  if (engine.busy() && engine.param('eventautoplay') !== 'busy') return;
   const name = demo.queue.shift();
   if (!name) {
     engine.setData('eventDemo', 'fired-all');

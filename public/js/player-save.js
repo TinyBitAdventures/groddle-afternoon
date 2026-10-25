@@ -1,6 +1,6 @@
 /** Persistent player systems + per-street world snapshot. */
 import { normalizeShrineState } from './shrines.js?v=shrines-1';
-import { normalizeQuoinState } from './quoins.js?v=g212-1';
+import { normalizeQuoinState } from './quoins.js?v=g216-1';
 import { normalizeToolConditionState } from './tools.js?v=tools-5';
 import { normalizeSkillState } from './skills.js';
 import { normalizeFoodState } from './food.js?v=food-memory-2';
@@ -49,6 +49,19 @@ function cleanIndexArray(value) {
     .map((entry) => Math.floor(finite(entry, -1)))
     .filter((entry) => entry >= 0 && entry <= 999))]
     .sort((a, b) => a - b);
+}
+
+/** G216: natural quoin index -> respawn time (ms), for the indexes still collected. */
+function cleanRespawnMap(value, collected) {
+  const out = {};
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+  const keep = new Set(collected);
+  for (const [rawKey, rawAt] of Object.entries(value)) {
+    const index = Math.floor(finite(rawKey, -1));
+    const at = finite(rawAt, NaN);
+    if (keep.has(index) && Number.isFinite(at) && at > 0) out[index] = Math.round(at);
+  }
+  return out;
 }
 
 function cleanScalarRecord(value, depth = 0) {
@@ -280,12 +293,14 @@ function normalizeStreetSnapshot(seed = {}) {
     classId: cleanKey(row?.classId),
     rock: cleanScalarRecord(row?.rock),
   })).filter((row) => row.classId);
+  const collectedQuoins = cleanIndexArray(seed?.collectedQuoins);
   return {
     gardens,
     trees,
     rocks,
     collectedApples: cleanIndexArray(seed?.collectedApples),
-    collectedQuoins: cleanIndexArray(seed?.collectedQuoins),
+    collectedQuoins,
+    quoinRespawn: cleanRespawnMap(seed?.quoinRespawn, collectedQuoins),
     features: normalizeFeatureSlices(seed?.features),
   };
 }
