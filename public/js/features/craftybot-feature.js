@@ -85,6 +85,7 @@ import {
 } from '../craftybot.js?v=craftybot-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g251-1';
 
 export const CRAFTYBOT_FEATURE_ID = 'craftybot';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -705,7 +706,7 @@ function openBox(engine) {
   if (!view?.box || pendingOpenAt) return;
   const x = view.box.box.x;
   engine.playSound?.('PROTO_PUFF', { volume: 0.7 });
-  puff(engine, x, view.box.box.y - 62);
+  puff(engine, x, displayTopOf(view.box.box));
   view.box.box.visible = false;
   engine.unregister?.(view.box.target);
   pendingOpenAt = performance.now() + CRAFTYBOT.OPEN_DELAY_MS;
@@ -714,31 +715,14 @@ function openBox(engine) {
 
 let pendingOpenX = 0;
 
-function puff(engine, x, y) {
-  const { PIXI } = engine;
-  const g = new PIXI.Graphics();
-  for (let i = 0; i < 9; i += 1) {
-    const a = (i / 9) * Math.PI * 2;
-    g.circle(Math.cos(a) * 34, Math.sin(a) * 22, 18 + (i % 3) * 5).fill({ color: 0xffffff, alpha: 0.85 });
-  }
-  g.circle(0, 0, 34).fill({ color: 0xffffff, alpha: 0.9 });
-  g.x = x;
-  g.y = y;
-  g.zIndex = 70;
-  engine.entityLayer.addChild(g);
-  const start = performance.now();
-  const tick = () => {
-    if (g.destroyed) return;
-    const k = (performance.now() - start) / 2000;
-    if (k >= 1) {
-      g.destroy();
-      return;
-    }
-    g.alpha = 1 - k;
-    g.scale.set(1 + k * 0.8);
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
+/**
+ * items/butler_box.js 114-121 (the Craftybot box opens the same way):
+ * itemstack_overlay proto_puff, delta_y 125 from the box's display top, 2 s:
+ * Tiny Speck's own puff (tools/overlay-art, G251; stop() on its last frame).
+ */
+function puff(engine, x, top) {
+  const at = itemstackOverlayPoint(x, top, { dy: 125 });
+  playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70 });
 }
 
 function finishOpen(engine) {

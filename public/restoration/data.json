@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 459,
+  "commits": 460,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Qurazy quoins follow the original rule: one roll a day on each street's Qurazy marker, always on a first visit, likelier on streets you haven't seen in a while"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "The Scion's quotes keep Tiny Speck's own em-dashes"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Plain words instead of em-dashes in the game's own lines"
    }
   ]
  },
- "tests": 270,
+ "tests": 271,
  "generatedAt": "2026-10-25"
 }

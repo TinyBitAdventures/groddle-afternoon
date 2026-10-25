@@ -49,6 +49,7 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
+import { displayTopOf } from '../overlay-art.js?v=g251-1';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=g259-1';
 import {
@@ -99,7 +100,7 @@ import {
 import { moodMax } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g259-1';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g251-1';
 import { grantMoodXp } from '../mood-xp.js';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
@@ -543,14 +544,17 @@ export function deathRollFor(engine) {
 }
 
 /**
- * The smoke_puff overlay (npc_piggy.js 1964-1971): no OpenGameArt sheet of it
- * exists, so a short grey Pixi puff over the piggy, as long as the overlay
- * (1.5 s). &animaldeathfx=hold keeps it up for headless screenshots.
+ * The smoke_puff overlay (npc_piggy.js 1964-1971), Tiny Speck's own art
+ * (G251), shared with crowding departures (animal-mood-feature.js); `top` is
+ * the piggy's display top. &animaldeathfx=hold keeps it up for headless
+ * screenshots.
  */
-/** The smoke_puff overlay (shared with crowding departures, animal-mood-feature.js). */
-function smokePuff(engine, x, y) {
-  return sharedSmokePuff(engine, x, y, { hold: engine.param('animaldeathfx') === 'hold' });
+function smokePuff(engine, x, top) {
+  return sharedSmokePuff(engine, x, top, { hold: engine.param('animaldeathfx') === 'hold' });
 }
+
+/** A yard row has no sprite: about a piggy's height (npc_piggy sheets) over the ground. */
+const PIGGY_TOP_PX = 75;
 
 /** die() 1036-1041 on this street: 10 Meat at the piggy, a Plop 80 px along. */
 function dropStarvedRemains(engine, x, refY) {
@@ -586,7 +590,7 @@ function starveExtra(engine, entity, { replay = false, row = entity?.row, where 
     extras = extras.filter((e) => e !== entity);
     if (spr) spr._moodHold = true; // stop walking while the puff covers it
   }
-  smokePuff(engine, x, ground - PIGGY_DEATH_PUFF.deltaY * 0.45);
+  smokePuff(engine, x, spr ? displayTopOf(spr) : ground - PIGGY_TOP_PX);
   const gen = generation;
   const tsid = engine.streetTsid;
   const finish = () => {

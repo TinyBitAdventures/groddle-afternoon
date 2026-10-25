@@ -52,7 +52,7 @@ import {
   streetKeyFor,
   triggerSecretSpot,
 } from '../secret-spots.js?v=secrets-1';
-import { verticalTextGradient } from '../text-gradient.js';
+import { playSheetOverlay } from '../overlay-art.js?v=g251-1';
 
 export const SECRET_SPOTS_FEATURE_ID = 'secret-spots';
 const MARKER_Z = 4;
@@ -61,14 +61,13 @@ const BEACON_EVERY_MS = 2600;
 const BEACON_RANGE = 900; // px: past this the shimmer is silent
 const CHECK_MS = 80;
 const LEVEL_CHECK_MS = 3000;
-const RAINBOW_COLORS = [0xdb4327, 0xe8a42d, 0xfef935, 0xbdfa31, 0x77c4fd]; // rainbow_secretspot band fills
 
 let state = createSecretState();
 let markers = []; // { spot, box, root, blobs: [{ main, red, green }], glow, flames, flash, off: 0|startMs }
 let inside = new Set();
 let queue = []; // { at, fn }
 let running = null; // { id, count, giant, msgIndex }
-let rainbow = null; // { root, until, born }
+let rainbow = null; // playSheetOverlay handle
 let blobTex = null;
 let lastCheck = 0;
 let lastLevelCheck = 0;
@@ -275,91 +274,28 @@ function buildMarkers(engine) {
 /* Rainbow (rainbow_secretspot)                                        */
 /* ------------------------------------------------------------------ */
 
-/** A five-point star outline (Pixi 7 core has no drawStar). */
-function starPoints(points, outer, inner) {
-  const out = [];
-  for (let i = 0; i < points * 2; i += 1) {
-    const r = i % 2 ? inner : outer;
-    const a = -Math.PI / 2 + (i * Math.PI) / points;
-    out.push(Math.cos(a) * r, Math.sin(a) * r);
-  }
-  return out;
-}
-
-function buildRainbow(engine) {
-  const { PIXI } = engine;
-  const root = new PIXI.Container();
-  root.zIndex = 60;
-  root.eventMode = 'none';
-  const g = new PIXI.Graphics();
-  RAINBOW_COLORS.forEach((color, i) => {
-    g.arc(0, 0, 92 - i * 8.5, Math.PI * 1.04, Math.PI * 1.96).stroke({ width: 9, color: color, alpha: 0.92 });
-  });
-  root.addChild(g);
-  const word = 'Secret Spot!';
-  const letters = [];
-  const radius = 108;
-  const span = 1.6; // radians across the arc
-  [...word].forEach((ch, i) => {
-    const a = -Math.PI / 2 - span / 2 + (span * i) / (word.length - 1);
-    const t = new PIXI.Text({ text: ch, style: {
-      fontFamily: '"Trebuchet MS", sans-serif',
-      fontSize: 24,
-      fontWeight: '900',
-      fill: verticalTextGradient([0xfefcc8, 0xf1e896]),
-      stroke: { color: 0x6e3f1a, width: 5 },
-      dropShadow: { alpha: 0.8, blur: 0, color: 0x763b1a, distance: 2 },
-    } });
-    t.resolution = 3;
-    t.anchor.set(0.5, 1);
-    t.x = Math.cos(a) * radius;
-    t.y = Math.sin(a) * radius + 18;
-    t.rotation = a + Math.PI / 2;
-    root.addChild(t);
-    letters.push(t);
-  });
-  const stars = [];
-  for (let i = 0; i < 9; i += 1) {
-    const star = new PIXI.Graphics();
-    star.poly(starPoints(5, i % 3 === 0 ? 4 : 6, i % 3 === 0 ? 1.6 : 2.6)).fill(i % 3 === 0 ? 0xffffff : 0xf9eca1).stroke({ width: 1, color: 0xa18831, alpha: i % 3 === 0 ? 0 : 0.9 });
-    const a = Math.PI * (1.08 + (0.84 * i) / 8);
-    star.x = Math.cos(a) * (60 + (i % 2) * 70);
-    star.y = Math.sin(a) * (60 + (i % 2) * 70) - 8;
-    root.addChild(star);
-    stars.push(star);
-  }
-  engine.entityLayer.addChild(root);
-  // QA: &secretrainbowhold=1 keeps it up at full size for headless screenshots.
-  const hold = engine.param('secretrainbowhold') === '1';
-  return { root, stars, letters, born: performance.now() - (hold ? 1000 : 0), until: hold ? Infinity : performance.now() + SECRET_TIMING.rainbow };
-}
-
-function poseRainbow(engine, now) {
-  if (!rainbow) return;
+/**
+ * players/player.js 3014-3029 show_rainbow('rainbow_secretspot'): a
+ * pc_overlay, 400 x 400 standing at the avatar (no keep-in-bounds), 4 s,
+ * Tiny Speck's own art (tools/overlay-art, G251); the SWF stop()s on its last
+ * frame. QA: &secretrainbowhold=1 holds it at 3 s, the words spelled out.
+ */
+function playRainbow(engine) {
   const p = engine.player;
-  if (now >= rainbow.until || !p || rainbow.root.destroyed) {
-    clearRainbow();
-    return;
-  }
-  const age = now - rainbow.born;
-  const left = rainbow.until - now;
-  const pop = Math.min(1, age / 300);
-  const s = 0.35 + 0.65 * (1 - (1 - pop) ** 3);
-  rainbow.root.scale.set(s);
-  rainbow.root.alpha = Math.min(1, left / 500);
-  rainbow.root.x = p.x;
-  // Kept in view like InLocationAnnouncementOverlay (below the street-name pill).
-  rainbow.root.y = Math.max(p.y - 90, (engine.camera?.y || 0) + 60 + 140 * s);
-  rainbow.stars.forEach((st, i) => {
-    st.alpha = 0.5 + 0.5 * Math.sin(age / 140 + i * 1.7);
-    st.rotation = age / 900 + i;
+  const hold = engine.param('secretrainbowhold') === '1';
+  return playSheetOverlay(engine.PIXI, 'rainbow_secretspot', {
+    layer: engine.entityLayer,
+    at: () => ({ x: p.x, y: p.y }),
+    wh: 400,
+    durationMs: SECRET_TIMING.rainbow,
+    loop: false,
+    holdMs: hold ? 3000 : null,
   });
 }
 
 function clearRainbow() {
   if (!rainbow) return;
-  if (rainbow.root.parent) rainbow.root.parent.removeChild(rainbow.root);
-  if (!rainbow.root.destroyed) rainbow.root.destroy({ children: true });
+  rainbow.stop();
   rainbow = null;
 }
 
@@ -479,7 +415,7 @@ function find(engine, marker, now) {
   });
   later(now, SECRET_TIMING.rainbowDelay, () => {
     clearRainbow();
-    rainbow = buildRainbow(engine);
+    rainbow = playRainbow(engine);
     engine.playSound(SECRET_SOUNDS.rainbow, { volume: 0.7 });
   });
   later(now, SECRET_TIMING.announce, () => announce(engine));
@@ -670,7 +606,6 @@ export const secretSpotsFeature = {
       if (!engine.param('secretdemo')) maybeStart(engine);
     }
     for (const m of markers) poseMarker(m, t);
-    poseRainbow(engine, t);
     placeUi();
     checkSpots(engine, t);
     beacon(engine, t);

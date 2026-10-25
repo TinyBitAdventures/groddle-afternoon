@@ -375,7 +375,7 @@ describe('delivery and wiring', () => {
 
   it('registers the feature and ships its art and sounds', () => {
     const index = readFileSync(join(PUBLIC, 'js/features/index.js'), 'utf8');
-    assert.match(index, /craftybot-feature\.js\?v=g249-1'; FEATURES\.push\(craftybotFeature\)/);
+    assert.match(index, /craftybot-feature\.js\?v=g251-1'; FEATURES\.push\(craftybotFeature\)/);
     for (const f of ['idle0', 'walk', 'collapse', 'craftStart', 'craftEnd', 'expand', 'sleepMode', 'peek']) {
       assert.ok(existsSync(join(PUBLIC, `assets/sprites/craftybot/craftybot_${f}.webp`)), f);
     }

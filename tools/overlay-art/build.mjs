@@ -3,18 +3,22 @@
  * Tiny Speck's overlay FLAs (glitch-overlays/*.fla, CC0) to art the game
  * plays. tools/overlay-art/xfl-svg.mjs draws each frame as SVG; then, per
  * overlay, either
- *  - kind "svg": the frames are kept as vector SVG, a JSON array in
- *    <key>.frames.json (the fireworks fill the whole viewport, 1500-2200 px across,
- *    which no bitmap sheet carries at a sane size), each cropped to the
- *    union of what any frame draws; or
+ *  - kind "svg": the frames are kept as vector SVG in <key>.frames.json,
+ *    { defs, frames } with the repeated outlines and ramps shared
+ *    (shareFrames; the fireworks fill the whole viewport, 1500-2200 px
+ *    across, which no bitmap sheet carries at a sane size), each cropped to
+ *    the union of what any frame draws; or
  *  - kind "sheet": Chrome rasterises each frame, identical frames are kept
- *    once and packed in a grid PNG (play_glitch, 110 x 80).
+ *    once and packed in a grid PNG (play_glitch, 110 x 80), or a WebP at
+ *    quality `webp` (the G251 sheets: a quarter to a half of the PNG's bytes).
  *
  * overlays.json: { <key>: { kind, src, fla (sha1), fps, frames, stage: [w, h],
  *   box: [x, y, w, h] (stage px the art covers), file,
  *   sheet only: scale, cell: [w, h], cols, order: [cell per frame] } }
- * The game places the stage the way the client did (ArbitrarySWFView, stage
- * centred on the overlay point at 1:1 when no size is given).
+ * The game places the stage the way the client did (ArbitrarySWFView at 1:1
+ * when no size is given, else fitted to the width x height box): centred on
+ * the point for a window overlay (vp_overlay), standing on it (registration
+ * center_bottom) for pc_, itemstack_ and location_overlay.
  *
  * Usage: node tools/overlay-art/build.mjs [key...]   (all by default)
  *        node tools/overlay-art/build.mjs --check    (overlays.json matches the FLAs)
@@ -47,6 +51,35 @@ export const OVERLAYS = Object.freeze({
   // catalog_buffs.js 2446-2510 sneezing_fit on_tick: pc_overlay
   // overlay_sneezing_powder, 300 x 300 at delta_y -110, 2 s (Señor Funpickle, G209).
   overlay_sneezing_powder: { fla: 'glitch-overlays/overlay_sneezing_powder.fla', kind: 'sheet', scale: 1, step: 1 },
+  // locations/location.js 730-760 spawnQurazy: announce_vp_overlay
+  // o_qurazy_quoin_overlay for 10 s (x 50%, top_y -5%, fade_out_sec 3). Its
+  // one main frame holds clips (the rays turn every 60 frames, the quoin
+  // every 104) that keep playing while it shows, fade out included
+  // (10 s - 0.2 s + 3 s, AbstractAnnouncementOverlay.as 535-540, 694-701), so
+  // `frames` draws those 12.8 s: 384 frames, every other one (15 fps; the
+  // slow turn reads the same, at half the bytes).
+  o_qurazy_quoin_overlay: { fla: 'glitch-overlays/o_qurazy_quoin_overlay.fla', kind: 'svg', step: 2, frames: 384 },
+  // G251: the hand-drawn stand-ins swapped for the real art.
+  // locations/inc_rook.js 697-707, 778-785 doOrbAttack: location_overlay
+  // focusing_orb_laser_beam, 1 s, scaled 1 + min(n/6, 1) over 0.25 s.
+  focusing_orb_laser_beam: { fla: 'glitch-overlays/focusing_orb_laser_beam.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  // items/include/shrines.js 1055-1071 launchAttack: itemstack_overlay
+  // shrine_laser_beam_1/2/3 (2 = 100+ damage, 3 = an emblem), 2 s, delta 5 / 140.
+  shrine_laser_beam_1: { fla: 'glitch-overlays/shrine_laser_beam_1.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  shrine_laser_beam_2: { fla: 'glitch-overlays/shrine_laser_beam_2.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  shrine_laser_beam_3: { fla: 'glitch-overlays/shrine_laser_beam_3.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  // players/player.js 3014-3029 show_rainbow: pc_overlay, 400 x 400, 4 s (the
+  // 330 x 200 stage at 400/330); items/include/rook.js 208-222 the same box over
+  // a fully revived trant or critter. stop() on frame 115 holds the last frame.
+  rainbow_youdidit: { fla: 'glitch-overlays/rainbow_youdidit.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
+  rainbow_fullyrevived: { fla: 'glitch-overlays/rainbow_fullyrevived.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
+  rainbow_secretspot: { fla: 'glitch-overlays/rainbow_secretspot.fla', kind: 'sheet', scale: 1.25, step: 1, webp: 0.85 },
+  // items/npc_piggy.js 1964-1971 (and npc_butterfly.js, npc_chicken.js):
+  // itemstack_overlay smoke_puff, delta_y 95, 1.5 s; 24 fps, stop() on frame 21.
+  smoke_puff: { fla: 'glitch-overlays/smoke_puff.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
+  // items/butler_box.js 114-121 (and item.js 499, location.js 2056 poof_in):
+  // itemstack_overlay proto_puff, delta_y 125, 2 s; stop() on frame 46.
+  proto_puff: { fla: 'glitch-overlays/proto_puff.fla', kind: 'sheet', scale: 1, step: 1, webp: 0.85 },
   play_glitch: {
     fla: 'glitch-overlays/play_glitch.fla',
     kind: 'sheet',
@@ -108,7 +141,7 @@ export function checkOverlays() {
     if (!existsSync(file)) continue;
     if (m.fla !== sha1(file)) bad.push(`${key}: FLA changed`);
     if (m.kind !== cfg.kind) bad.push(`${key}: kind`);
-    if (m.frames !== Math.ceil(frameCount(loadFla(file)) / cfg.step)) bad.push(`${key}: frame count`);
+    if (m.frames !== Math.ceil((cfg.frames || frameCount(loadFla(file))) / cfg.step)) bad.push(`${key}: frame count`);
   }
   return bad;
 }
@@ -159,18 +192,85 @@ window.addFrame = async (src) => {
   frames.push({ c, data, sig });
   return frames.length - 1;
 };
-window.pack = (cols) => {
+window.pack = (cols, type = 'image/png', quality = 0.9) => {
   const w = frames[0].c.width, h = frames[0].c.height;
   const s = document.createElement('canvas');
   s.width = w * Math.min(cols, frames.length); s.height = h * Math.ceil(frames.length / cols);
   const ctx = s.getContext('2d');
   frames.forEach((f, i) => ctx.drawImage(f.c, (i % cols) * w, Math.floor(i / cols) * h));
   frames = [];
-  return s.toDataURL('image/png');
+  return s.toDataURL(type, quality);
 };
 `;
 
 const round2 = (v) => Math.round(v * 100) / 100;
+
+/**
+ * Vector frames with their repeats shared (G251): the fireworks draw the same
+ * few dozen outlines and gradient ramps in every frame, only placed and
+ * tinted differently (fireworks_1: 2,537 paths, 88 distinct outlines; 1,121
+ * gradients, 25 distinct ramps). Each outline goes once into `defs` as
+ * <path id="_pN" fill-rule="evenodd" d=".."/> and the frames <use> it with
+ * their own transform and fill (both inherit into the use); each ramp goes
+ * once as a template (<linearGradient id="_sN"> or radial, with the units,
+ * the 819.2 px Flash square and the stops), and a frame's gradient keeps only
+ * its matrix and takes the rest by href (SVG gradient templates). Gradients
+ * and glow filters that two frames define alike are kept once as well (_gN,
+ * _fN), and a run of uses with one transform becomes a group carrying it.
+ * Gradient translations drop to 1/100 px (shape space); the outlines keep
+ * theirs, as rounding those moved a few spark edges by a pixel in Chrome.
+ * Chrome draws every fireworks frame pixel for pixel as before, at a tenth of
+ * the bytes (7.3 MB to 0.7 MB). js/overlay-art.js assembleFrames() puts
+ * `defs` back into each frame's <defs>. Returns { defs, frames }.
+ */
+export function shareFrames(svgs) {
+  const paths = new Map();
+  const ramps = new Map();
+  const tr = (m) => m.replace(/matrix\(([^)]*)\)/g, (all, nums) => {
+    const n = nums.split(' ');
+    if (n.length !== 6) return all;
+    for (const i of [4, 5]) n[i] = String(round2(Number(n[i])));
+    return `matrix(${n.join(' ')})`;
+  });
+  const frames = svgs.map((svg) => svg
+    .replace(/<path fill-rule="evenodd" transform="([^"]*)" d="([^"]*)"/g, (all, t, d) => {
+      if (!paths.has(d)) paths.set(d, `_p${paths.size}`);
+      return `<use href="#${paths.get(d)}" transform="${t}"`;
+    })
+    .replace(/<(linearGradient|radialGradient) (id="[^"]*") ([^>]*?) ?gradientTransform="([^"]*)">((?:<stop [^>]*\/>)+)<\/\1>/g, (all, tag, id, attrs, gt, stops) => {
+      const key = `${tag} ${attrs}>${stops}`;
+      if (!ramps.has(key)) ramps.set(key, `_s${ramps.size}`);
+      return `<${tag} ${id} gradientTransform="${tr(gt)}" href="#${ramps.get(key)}"/>`;
+    }));
+  // Gradients and filters that two or more frames define alike go to defs once
+  // (_gN, _fN) and the frames point at them.
+  const defEl = /<(linearGradient|radialGradient) id="([^"]+)"([^>]*)\/>|<filter id="([^"]+)"([\s\S]*?<\/filter>)/g;
+  const keyOf = (m) => (m[1] ? `${m[1]}${m[3]}` : `filter${m[5]}`);
+  const seen = new Map();
+  for (const f of frames) for (const k of new Set([...f.matchAll(defEl)].map(keyOf))) seen.set(k, (seen.get(k) || 0) + 1);
+  const shared = new Map();
+  const sharedFrames = frames.map((f) => {
+    const remap = new Map();
+    let out = f.replace(defEl, (...m) => {
+      const k = keyOf(m);
+      if (seen.get(k) < 2) return m[0];
+      if (!shared.has(k)) shared.set(k, `_${m[1] ? 'g' : 'f'}${shared.size}`);
+      remap.set(m[2] || m[4], shared.get(k));
+      return '';
+    });
+    for (const [from, to] of remap) out = out.split(`url(#${from})`).join(`url(#${to})`);
+    // A run of uses with one transform becomes a group carrying it.
+    return out.replace(/(?:<use href="#[^"]+" transform="([^"]+)"[^>]*\/>)(?:<use href="#[^"]+" transform="\1"[^>]*\/>)+/g, (run, t) =>
+      `<g transform="${t}">${run.split(` transform="${t}"`).join('')}</g>`);
+  });
+  const defs = [...paths].map(([d, id]) => `<path id="${id}" fill-rule="evenodd" d="${d}"/>`).join('')
+    + [...ramps].map(([key, id]) => {
+      const tag = key.slice(0, key.indexOf(' '));
+      return `<${key.replace(/^(\w+) /, `$1 id="${id}" `)}</${tag}>`;
+    }).join('')
+    + [...shared].map(([k, id]) => (k.startsWith('filter') ? `<filter id="${id}"${k.slice(6)}` : `<${k.replace(/^(\w+)/, `$1 id="${id}"`)}/>`)).join('');
+  return { defs, frames: sharedFrames };
+}
 
 async function build(keys) {
   mkdirSync(outDir, { recursive: true });
@@ -184,7 +284,7 @@ async function build(keys) {
       const cfg = OVERLAYS[key];
       const file = join(audit, cfg.fla);
       const fla = scrub(loadFla(file), cfg.scrub);
-      const total = frameCount(fla);
+      const total = cfg.frames || frameCount(fla);
       const picks = [];
       for (let n = 0; n < total; n += cfg.step) picks.push(n);
       // Union of the drawn area over every frame, at 1:1 with a margin round the stage.
@@ -203,7 +303,8 @@ async function build(keys) {
       const base = { kind: cfg.kind, src: cfg.fla, fla: sha1(file), fps: fla.doc.frameRate / cfg.step, frames: picks.length, stage: [W, H], box };
       if (cfg.kind === 'svg') {
         const out = `${key}.frames.json`;
-        writeFileSync(join(outDir, out), `[\n${picks.map((n) => JSON.stringify(frameSvg(fla, n, { box }))).join(',\n')}\n]\n`);
+        const { defs, frames } = shareFrames(picks.map((n) => frameSvg(fla, n, { box })));
+        writeFileSync(join(outDir, out), `{"defs":${JSON.stringify(defs)},\n"frames":[\n${frames.map((f) => JSON.stringify(f)).join(',\n')}\n]}\n`);
         manifest[key] = { ...base, file: out };
         console.log(`${key}: ${picks.length} SVG frames, box ${box.join(',')}`);
         continue;
@@ -214,9 +315,10 @@ async function build(keys) {
       const cellW = Math.ceil(box[2] * cfg.scale);
       const cellH = Math.ceil(box[3] * cfg.scale);
       const cols = Math.max(1, Math.min(unique, Math.floor(4096 / cellW)));
-      const dataUrl = await page.evaluate((c) => window.pack(c), cols);
+      const ext = cfg.webp ? 'webp' : 'png';
+      const dataUrl = await page.evaluate(([c, t, q]) => window.pack(c, t, q), [cols, `image/${ext}`, cfg.webp || 1]);
       // @2x: the game's textures.js reads the resolution from the name (logical size = stage px).
-      const out = cfg.scale === 1 ? `${key}.png` : `${key}@${cfg.scale}x.png`;
+      const out = cfg.scale === 1 ? `${key}.${ext}` : `${key}@${cfg.scale}x.${ext}`;
       writeFileSync(join(outDir, out), Buffer.from(dataUrl.split(',')[1], 'base64'));
       manifest[key] = { ...base, file: out, scale: cfg.scale, cell: [cellW, cellH], cols, order };
       console.log(`${key}: ${picks.length} frames (${unique} unique), cell ${cellW}x${cellH}, ${cols} cols, box ${box.join(',')}`);

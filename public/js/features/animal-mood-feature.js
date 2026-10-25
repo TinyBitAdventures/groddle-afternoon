@@ -75,13 +75,14 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g251-1';
 import { isInHell } from '../hell.js';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
 import { animalStatusLabel } from '../animals.js?v=g259-1';
 import { quoteAnimalKinship } from '../animal-kinship.js?v=g259-1';
 import { captureVerbState, isFoodItem, itemLabel } from '../animal-husbandry.js';
-import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=g259-1';
+import { ROOK_SHEETS, rookAttackFeature } from './rook-attack-feature.js?v=g251-1';
 import {
   CHECK_ON_REMOVE,
   CROWD_CLASSES,
@@ -468,37 +469,26 @@ let crowdRolledAt = 0; // the last game-day rollover this feature saw (saved; a 
 let crowdRespawnQa = ''; // &animalcrowdrespawn=1: '' → 'armed' → 'rolled'
 let crowdRespawnAt = 0;
 
-/** A smoke_puff overlay (also the starvation puff, animal-husbandry-feature.js). `hold` keeps it up for screenshots. */
-export function smokePuff(engine, x, y, { hold = false } = {}) {
-  const { PIXI } = engine;
-  if (!PIXI?.Graphics || !engine.entityLayer) return null;
-  const g = new PIXI.Graphics();
-  const blobs = [[0, 0, 30], [-26, 8, 22], [26, 8, 22], [-14, -20, 20], [16, -22, 21], [0, 18, 20], [-34, -6, 15], [34, -8, 15]];
-  for (const [bx, by, r] of blobs) g.circle(bx, by, r).fill({ color: 0xd9d4cb, alpha: 0.9 });
-  for (const [bx, by, r] of blobs.slice(0, 5)) g.circle(bx - r * 0.25, by - r * 0.3, r * 0.55).fill({ color: 0xf4f1ea, alpha: 0.85 });
-  g.x = x;
-  g.y = y;
-  g.zIndex = 70;
-  engine.entityLayer.addChild(g);
-  if (hold) {
-    g.scale.set(1.25);
-    return g;
-  }
-  const start = now();
-  const tick = () => {
-    if (g.destroyed) return;
-    const k = (now() - start) / PIGGY_DEATH_PUFF.durationMs;
-    if (k >= 1) {
-      g.destroy();
-      return;
-    }
-    g.alpha = k < 0.25 ? 1 : 1 - (k - 0.25) / 0.75;
-    g.scale.set(0.5 + k * 0.9);
-    g.y = y - k * 24;
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-  return g;
+/**
+ * The smoke_puff overlay (also the starvation puff, animal-husbandry-feature.js):
+ * items/npc_piggy.js 1964-1971 (npc_butterfly.js 998-1007, npc_chicken.js 958-967
+ * alike) itemstack_overlay, delta_y 95 from the stack's display top, following
+ * it, 1.5 s: Tiny Speck's own puff (tools/overlay-art, G251; 24 fps, stop() on
+ * its last frame). `top` is the stack's display top (displayTopOf). `hold`
+ * keeps the full puff up for screenshots.
+ */
+export function smokePuff(engine, x, top, { hold = false } = {}) {
+  const layer = engine?.entityLayer;
+  if (!engine?.PIXI || !layer) return null;
+  const at = itemstackOverlayPoint(x, top, { dy: PIGGY_DEATH_PUFF.deltaY });
+  return playSheetOverlay(engine.PIXI, PIGGY_DEATH_PUFF.overlay, {
+    layer,
+    at: () => at,
+    durationMs: PIGGY_DEATH_PUFF.durationMs,
+    loop: false,
+    holdMs: hold ? 300 : null,
+    zIndex: 70,
+  });
 }
 
 function crowdActive(engine) {
@@ -664,9 +654,7 @@ function removeGone(engine, target, rec, { cascade = true } = {}) {
 function puffAt(engine, target) {
   const spr = target.sprite;
   if (!spr || spr.destroyed) return;
-  const grounded = (spr.anchor?.y ?? 1) >= 0.9;
-  const y = grounded ? spr.y - PIGGY_DEATH_PUFF.deltaY * 0.45 : spr.y;
-  smokePuff(engine, spr.x, y, { hold: engine.param('animalcrowdfx') === 'hold' });
+  smokePuff(engine, spr.x, displayTopOf(spr), { hold: engine.param('animalcrowdfx') === 'hold' });
 }
 
 /** onSadnessCheck for one animal at this population. Returns the outcome (or null). */

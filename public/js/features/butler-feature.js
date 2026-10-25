@@ -76,6 +76,7 @@ import { NEIGHBOURS, NEIGHBOUR_ITEMS, neighbourById } from '../neighbours.js?v=n
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig, paintPortrait, portraitUrl } from '../butler-rig.js?v=butler-rig-1';
 import { acceptOffer, declineOffer, npcQuestOffers, questStatus } from '../quest-offers.js';
 import { getQuestCatalog } from '../content-catalogs.js';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g251-1';
 import {
   BUTLER,
   BUTLER_BOX,
@@ -734,7 +735,7 @@ function openBox(engine) {
   if (!view?.box || pendingOpenAt) return;
   const x = view.box.sprite.x;
   engine.playSound?.('PROTO_PUFF', { volume: 0.7 });
-  puff(engine, x, engine.groundY - 50);
+  puff(engine, x, displayTopOf(view.box.sprite));
   // unregister removes and destroys the sprite.
   engine.unregister?.(view.box.target);
   view.box = null;
@@ -742,28 +743,14 @@ function openBox(engine) {
   pendingOpenX = x;
 }
 
-function puff(engine, x, y) {
-  const { PIXI } = engine;
-  const g = new PIXI.Graphics();
-  for (let i = 0; i < 9; i += 1) {
-    const a = (i / 9) * Math.PI * 2;
-    g.circle(Math.cos(a) * 30, Math.sin(a) * 20, 16 + (i % 3) * 5).fill({ color: 0xffffff, alpha: 0.85 });
-  }
-  g.circle(0, 0, 30).fill({ color: 0xffffff, alpha: 0.9 });
-  g.x = x;
-  g.y = y;
-  g.zIndex = 70;
-  engine.entityLayer.addChild(g);
-  const start = performance.now();
-  const tick = () => {
-    if (g.destroyed) return;
-    const k = (performance.now() - start) / 2000;
-    if (k >= 1) return g.destroy();
-    g.alpha = 1 - k;
-    g.scale.set(1 + k * 0.8);
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
+/**
+ * items/butler_box.js 114-121 open: itemstack_overlay proto_puff, delta_y 125
+ * from the box's display top, 2 s: Tiny Speck's own puff (tools/overlay-art,
+ * G251; stop() on its last frame).
+ */
+function puff(engine, x, top) {
+  const at = itemstackOverlayPoint(x, top, { dy: 125 });
+  playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70 });
 }
 
 function finishOpen(engine) {

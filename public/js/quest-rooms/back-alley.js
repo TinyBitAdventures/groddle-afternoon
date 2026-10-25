@@ -40,6 +40,7 @@
  */
 
 import { onLoaded, textureFromUrl } from '../textures.js';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g251-1';
 import { BACK_ALLEY_FILES } from './back-alley-art.js';
 
 export const QUEST = 'fuelmaking_refuel_robot';
@@ -487,7 +488,7 @@ async function refuel(ctx) {
   const bot = ctx.data.bot;
   bot.rotation = 0;
   bot.tint = 0xffffff;
-  puff(ctx, bot.x, bot.y - PUFF_DY);
+  puff(ctx, bot);
   ctx.sound('PROTO_PUFF', { volume: 0.5 });
   useSheet(bot, ctx.data.botHappy, 0.4);
   await ctx.wait(900);
@@ -507,16 +508,14 @@ async function refuel(ctx) {
   }
 }
 
-function puff(ctx, x, y) {
-  const { PIXI } = ctx;
-  const g = new PIXI.Graphics();
-  for (const [dx, dy, r] of [[0, 0, 26], [-24, 10, 18], [24, 8, 20], [-10, -18, 16], [14, -16, 15]]) {
-    g.circle(dx, dy, r).fill({ color: 0xe8e6df, alpha: 0.9 });
-  }
-  g.x = x;
-  g.y = y;
-  ctx.add(g, 40);
-  ctx.data.puff = { g, at: Date.now() };
+/**
+ * npc_maintenance_bot.js 445-457 revive(): itemstack_overlay smoke_puff,
+ * delta_y 140 from the bot's display top, no duration (the SWF plays once and
+ * holds its empty last frame): Tiny Speck's own puff (tools/overlay-art, G251).
+ */
+function puff(ctx, bot) {
+  const at = itemstackOverlayPoint(bot.x, displayTopOf(bot), { dy: PUFF_DY });
+  ctx.data.puff = playSheetOverlay(ctx.PIXI, 'smoke_puff', { layer: ctx.engine.entityLayer, at: () => at, durationMs: 1500, loop: false, zIndex: 40 });
 }
 
 /* ------------------------------------------------------------------ */
@@ -625,13 +624,6 @@ export const room = {
     }
     const bot = ctx.data.bot;
     if (bot && !bot.destroyed && !ctx.data.collided && !ctx.data.revived && !busy && inBotBox(bot, p.x, p.y)) botCollide(ctx);
-    const pf = ctx.data.puff;
-    if (pf && !pf.g.destroyed) {
-      const t = (Date.now() - pf.at) / 700;
-      pf.g.scale.set(1 + t * 0.8);
-      pf.g.alpha = Math.max(0, 1 - t);
-      if (t >= 1) pf.g.visible = false;
-    }
     const roll = ctx.data.rollFrom;
     if (roll && bot && !bot.destroyed) {
       const dist = ((Date.now() - roll.at) / 1000) * BOT_SPEED;

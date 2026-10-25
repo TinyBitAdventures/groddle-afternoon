@@ -34,7 +34,7 @@
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { grantMoodXp } from '../mood-xp.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, overlayPlacement } from '../overlay-art.js?v=g209-1';
+import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement } from '../overlay-art.js?v=g251-1';
 import { vpOverlay } from '../quest-rooms/vp-overlay.js?v=ffw-1';
 import {
   GAME_BOX,
@@ -324,7 +324,8 @@ function tickBadge(now, engine) {
     const ms = ((now - (state.playUntil - playMs())) / playMs()) * PLAY.durationMs;
     const frame = overlayFrameAt(playArt, ms, { loop: false });
     badge.texture = playTexture(playArt.order[frame]);
-    const at = overlayPlacement(playArt, p.x, p.y + PLAY_OVERLAY.dy, 1);
+    // A pc_overlay stands on its point (center_bottom, G251): the 110 x 80 stage fitted to 110.
+    const at = standPlacement(playArt, p.x, p.y + PLAY_OVERLAY.dy, 110);
     badge.x = at.left;
     badge.y = at.top;
     badge.width = at.width;

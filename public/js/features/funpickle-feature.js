@@ -41,7 +41,7 @@ import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { landingY, nearestSurfaceY } from '../walk-surface.js';
 import { STREET_INDEX } from '../street-loader.js';
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
-import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, overlayPlacement } from '../overlay-art.js?v=g209-1';
+import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, standPlacement } from '../overlay-art.js?v=g251-1';
 import {
   AWARD_ITEM,
   AWARD_LINE,
@@ -562,10 +562,9 @@ function tickOverlay(engine, t) {
   }
   const frame = overlayFrameAt(sneezeArt, ms, { loop: false });
   overlay.sprite.texture = sneezeTexture(sneezeArt.order[frame]);
-  // The stage fits the 300 x 300 box (ArbitrarySWFView), centred 110 px above your feet.
-  const [sw, sh] = sneezeArt.stage;
-  const scale = Math.min(SNEEZE_OVERLAY.width / sw, SNEEZE_OVERLAY.height / sh);
-  const at = overlayPlacement(sneezeArt, p.x, p.y + SNEEZE_OVERLAY.dy, scale);
+  // The stage fits the 300 x 300 box (ArbitrarySWFView) and stands 110 px above
+  // your feet (a pc_overlay's registration is center_bottom, G251).
+  const at = standPlacement(sneezeArt, p.x, p.y + SNEEZE_OVERLAY.dy, Math.max(SNEEZE_OVERLAY.width, SNEEZE_OVERLAY.height));
   overlay.sprite.x = at.left;
   overlay.sprite.y = at.top;
   overlay.sprite.width = at.width;

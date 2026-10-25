@@ -83,9 +83,9 @@ import {
   strikeDamageFor,
   useBalmPoint,
 } from '../rook-attack.js';
-import { verticalTextGradient } from '../text-gradient.js';
 import { shrinePrimeBonus } from '../imagination-effects.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g251-1';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
@@ -167,8 +167,7 @@ let ui = null; // screen layer
 let fore = null; // { sprite, target, flipAt, speakAt, dir }
 let silhouettes = [];
 let feathers = [];
-let beams = [];
-let rainbows = [];
+let artOverlays = []; // playSheetOverlay handles (G251)
 let overlays = [];
 let shakeUntil = 0;
 let swoop = null;
@@ -833,74 +832,71 @@ function updateFeathers(dtMs) {
   });
 }
 
-/** A vertical light column (focusing_orb_laser_beam / shrine_laser_beam_n). */
-function spawnBeam(engine, from, to, size = 2) {
-  if (!ensureUi(engine)) return;
-  const { PIXI } = engine;
-  const g = new PIXI.Graphics();
-  g._from = from;
-  g._to = to;
-  g._size = size;
-  g._life = 1000;
-  ui.fxLayer.addChild(g);
-  beams.push(g);
+/*
+ * The recovered overlays (G251, tools/overlay-art WebP sheets via
+ * js/overlay-art.js playSheetOverlay), standing on their point the way the
+ * client's in-location overlays did. &rookarthold=<ms> freezes each at that
+ * moment for screenshots.
+ */
+function playArt(engine, key, opts) {
+  const hold = engine.param?.('rookarthold');
+  const h = playSheetOverlay(engine.PIXI, key, {
+    layer: engine.fxLayer || engine.entityLayer,
+    holdMs: hold != null && hold !== '' && Number.isFinite(Number(hold)) ? Number(hold) : null,
+    ...opts,
+  });
+  artOverlays.push(h);
+  h.done.then(() => { artOverlays = artOverlays.filter((x) => x !== h); });
+  engine.setData('rookOverlay', key);
+  return h;
 }
 
-function updateBeams(dtMs) {
-  beams = beams.filter((g) => {
-    if (g.destroyed) return false;
-    g._life -= dtMs;
-    const k = Math.max(0, g._life / 1000);
-    const w = 6 + g._size * 5;
-    const { _from: a, _to: b } = g;
-    g.clear();
-    g.moveTo(a.x, a.y).lineTo(b.x, b.y);
-    g.stroke({ width: w * 2.6, color: 0x7ff0ff, alpha: 0.22 * k }).moveTo(a.x, a.y).lineTo(b.x, b.y);
-    g.stroke({ width: w * 1.4, color: 0xbff8ff, alpha: 0.5 * k }).moveTo(a.x, a.y).lineTo(b.x, b.y);
-    g.stroke({ width: w * 0.55, color: 0xffffff, alpha: 0.95 * k }).circle(b.x, b.y, 20 + (1 - k) * 46);
-    g.stroke({ width: 3, color: 0x9ff6ff, alpha: 0.8 * k });
-    if (g._life <= 0) {
-      g.destroy();
-      return false;
-    }
-    return true;
-  });
+/**
+ * doOrbAttack (locations/inc_rook.js 697-707, 778-785): location_overlay
+ * focusing_orb_laser_beam at the initiator, raised 50 - 100 x scale px
+ * (scale = min(players / 6, 1)), for 1 s, then overlay_scale to 1 + scale
+ * over 0.25 s (easeOutBack).
+ */
+function orbLaser(engine, joiners) {
+  const p = engine.player;
+  if (!p) return;
+  const s = Math.min(Math.max(0, joiners) / 6, 1);
+  const at = { x: p.x, y: p.y - (50 - s * 100) };
+  playArt(engine, 'focusing_orb_laser_beam', { at: () => at, durationMs: 1000, zoomAt: (ms) => 1 + s * easeOutBack(ms / 250) });
 }
 
-/** rainbow_youdidit / rainbow_fullyrevived: six-colour arc with a word over it (world space). */
-function spawnRainbow(engine, x, y, word, scale = 1) {
-  const { PIXI } = engine;
-  const c = new PIXI.Container();
-  const g = new PIXI.Graphics();
-  const colors = [0xe8473f, 0xf39a2b, 0xf6d43b, 0x5cc35c, 0x3f9be0, 0x8a5cd6];
-  colors.forEach((col, i) => {
-    g.arc(0, 0, (84 - i * 8) * scale, Math.PI, 0).stroke({ width: 7 * scale, color: col, alpha: 0.9 });
-  });
-  const label = new PIXI.Text({ text: word, style: textStyle(20 * scale, { fill: verticalTextGradient([0xffe14a, 0xff7a3d], [0, 1]) }) });
-  label.anchor.set(0.5);
-  label.y = -32 * scale;
-  c.addChild(g, label);
-  c.x = x;
-  c.y = y;
-  c._life = 4000;
-  c.alpha = 0;
-  c.eventMode = 'none';
-  engine.fxLayer.addChild(c);
-  rainbows.push(c);
+/**
+ * launchAttack (items/include/shrines.js 1055-1071): itemstack_overlay
+ * shrine_laser_beam_1 (2 for 100+ damage, 3 for an emblem) on the shrine,
+ * delta_x 5, delta_y 140 from its top, for 2 s.
+ */
+function shrineLaser(engine, spr, size) {
+  if (!spr) return;
+  const at = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dx: 5, dy: 140 });
+  playArt(engine, `shrine_laser_beam_${Math.max(1, Math.min(3, size))}`, { at: () => at, durationMs: 2000 });
 }
 
-function updateRainbows(dtMs) {
-  rainbows = rainbows.filter((c) => {
-    if (c.destroyed) return false;
-    c._life -= dtMs;
-    c.alpha = Math.min(1, (4000 - c._life) / 300, c._life / 500);
-    c.y -= dtMs * 0.004;
-    if (c._life <= 0) {
-      c.destroy();
-      return false;
-    }
-    return true;
-  });
+/**
+ * show_rainbow (players/player.js 3014-3029): pc_overlay, 400 x 400 at the
+ * avatar, 4 s, rainbow_youdidit for the Rook's defeat (locations/inc_rook.js
+ * 204). The SWF stop()s on its last frame.
+ */
+function youDidItRainbow(engine) {
+  const p = engine.player;
+  playArt(engine, 'rainbow_youdidit', { at: () => ({ x: p.x, y: p.y }), wh: 400, durationMs: 4000, loop: false });
+}
+
+/**
+ * revive's third dose (items/include/rook.js 208-222): itemstack_overlay
+ * rainbow_fullyrevived, 400 x 400, following the stack, 4 s.
+ */
+function revivedRainbow(engine, spr) {
+  let last = itemstackOverlayPoint(spr.x, displayTopOf(spr));
+  const at = () => {
+    if (spr && !spr.destroyed) last = itemstackOverlayPoint(spr.x, displayTopOf(spr));
+    return last;
+  };
+  playArt(engine, 'rainbow_fullyrevived', { at, wh: 400, durationMs: 4000, loop: false });
 }
 
 // ---------------------------------------------------------------------------
@@ -1040,7 +1036,7 @@ function onDefeat(engine, a) {
   spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y, 22);
   const xp = grant(engine, { xp: defeatXpFor(a) });
   engine.pushActivity({ base: a.damageDealt > 0 ? ROOK_TEXT.defeatHelp(xp) : ROOK_TEXT.defeatWitness(xp), effects: { xp } });
-  spawnRainbow(engine, engine.player.x, engine.player.y - 150, 'YOU DID IT!', 1.15);
+  youDidItRainbow(engine);
   engine.playSound('RAINBOW_YOUDIDIT', { volume: 0.7 });
   if (armored()) engine.achievement('essence_of_rookswort:defeated_rook', 1);
   save.stats.defeats += 1;
@@ -1262,7 +1258,6 @@ function cancelOrb(engine, why = '') {
 function releaseOrb(engine) {
   if (!orb) return;
   const joiners = orb.joiners;
-  const c = orbCenter(engine);
   cancelOrb(engine);
   const a = here(engine);
   if (!a) return;
@@ -1281,8 +1276,7 @@ function releaseOrb(engine) {
     engine.save();
     return;
   }
-  const cam = engine.camera;
-  spawnBeam(engine, { x: c.x - cam.x, y: c.y - cam.y }, rookScreenPos(), 2);
+  orbLaser(engine, joiners);
   spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y);
   setHeadClip('stun', { once: true, lockMs: 1100 });
   if (ui?.badge) {
@@ -1395,8 +1389,7 @@ function strike(engine, target, classTsid, count) {
   primed.damage += r.damage;
   primed.strikeAt = now() + ROOK_SOURCE.strikeCooldownMs / timeScale;
   const spr = target.sprite;
-  const cam = engine.camera;
-  spawnBeam(engine, { x: spr.x - cam.x, y: spr.y - 120 - cam.y }, rookScreenPos(), strikeBeamFor(r.damage, emblem));
+  shrineLaser(engine, spr, strikeBeamFor(r.damage, emblem));
   spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y);
   setHeadClip('stunnedHit', { once: true, lockMs: 1100 });
   const xp = grant(engine, { xp: r.damage });
@@ -1554,7 +1547,7 @@ function revive(engine, target, { balm = false } = {}) {
     const favor = engine.pc.giantFavor;
     if (favor && typeof favor === 'object') for (const g of Object.keys(favor)) favor[g] = (favor[g] || 0) + r.favor;
     removeRookedVisual(engine, key);
-    spawnRainbow(engine, target.sprite.x, target.sprite.y - 120, 'revived', 0.8);
+    revivedRainbow(engine, target.sprite);
     engine.playSound('RAINBOW_FULLYREVIVED', { volume: 0.5 });
     save.stats.fullRevives += 1;
     engine.pushActivity({ base: `You revived a ${label}! +${r.favor} favor with every Giant`, effects: { xp, energy: -energy, mood: -mood } });
@@ -1813,8 +1806,8 @@ export const rookAttackFeature = {
       fore.target = null;
       fore = null;
     }
-    for (const r of rainbows) if (!r.destroyed) r.destroy();
-    rainbows = [];
+    for (const h of artOverlays) h.stop();
+    artOverlays = [];
     overlays = [];
     swoop = null;
     departing = null;
@@ -1867,12 +1860,10 @@ export const rookAttackFeature = {
       updateRook(engine, mine, dtMs);
       updateSilhouettes(dtMs);
       updateFeathers(dtMs);
-      updateBeams(dtMs);
       updateOverlays(engine);
       drawHud(engine, mine);
       if (mine && rookPresent(mine) && mine.phase !== 'dead' && Math.random() < dtMs / 9000) spawnSilhouettes(engine, 1);
     }
-    updateRainbows(dtMs);
     updateOrb(engine, dtMs);
     updatePrimeFx(engine);
     if (t < shakeUntil) {

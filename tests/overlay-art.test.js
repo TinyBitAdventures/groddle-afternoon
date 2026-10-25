@@ -10,13 +10,14 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   OVERLAY_FADE,
+  assembleFrames,
   cellRect,
   overlayAlpha,
   overlayFrameAt,
   overlayLifeMs,
   overlayPlacement,
   sheetCell,
-} from '../public/js/overlay-art.js?v=g209-1';
+} from '../public/js/overlay-art.js?v=g251-1';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
 import { DRINK_TICKS, applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=item-buffs-6';
 import { MOOD_XP_SOURCES } from '../public/js/mood-xp.js';
@@ -63,7 +64,7 @@ describe('the built overlays', () => {
       const m = manifest[key];
       assert.equal(m.kind, 'svg', key);
       assert.equal(m.fps, 30);
-      const frames = JSON.parse(readFileSync(join(pub, 'assets/sprites/overlays', m.file), 'utf8'));
+      const frames = assembleFrames(JSON.parse(readFileSync(join(pub, 'assets/sprites/overlays', m.file), 'utf8')));
       assert.equal(frames.length, m.frames, key);
       assert.ok(frames.every((s) => s.startsWith('<svg xmlns="http://www.w3.org/2000/svg"')), key);
     }

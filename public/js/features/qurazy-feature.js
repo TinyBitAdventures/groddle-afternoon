@@ -26,6 +26,7 @@
 
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
 import { qurazyMarkersFor } from '../qurazy-markers.js?v=g260-1';
+import { OVERLAY_FADE, playVectorOverlay } from '../overlay-art.js?v=g251-1';
 import {
   QURAZY_SPAWN_LINE,
   createQurazyState,
@@ -96,6 +97,39 @@ function placeQurazy(engine, spot) {
   return q;
 }
 
+/**
+ * location.js 746-756: announce_vp_overlay o_qurazy_quoin_overlay, 10 s,
+ * x 50%, top_y -5%, fade_out_sec 3 (scale_to_stage leaves a SWF at 1:1:
+ * InWindowAnnouncementOverlay.as 177), Tiny Speck's own art (tools/overlay-art,
+ * G251) on the 960-wide viewport. The toast stands in if it cannot load.
+ */
+export const QURAZY_OVERLAY = Object.freeze({ key: 'o_qurazy_quoin_overlay', durationMs: 10000, x: 0.5, topY: -0.05, fadeOutMs: 3000 });
+
+function showSpawnOverlay(engine) {
+  const root = typeof document === 'undefined' ? null : document.getElementById('game-root');
+  const c = root?.querySelector('canvas:not(.overlay-art):not(.lonely-fireworks):not(.lonely-portrait)')?.getBoundingClientRect();
+  if (!c?.width) {
+    engine.toast?.(QURAZY_SPAWN_LINE);
+    return;
+  }
+  const r = root.getBoundingClientRect();
+  const rect = { left: c.left - r.left, top: c.top - r.top, width: c.width, height: c.height };
+  engine.setData?.('qurazyOverlay', 'playing');
+  playVectorOverlay(root, QURAZY_OVERLAY.key, {
+    rect,
+    x: QURAZY_OVERLAY.x,
+    topY: QURAZY_OVERLAY.topY,
+    scale: c.width / 960,
+    durationMs: QURAZY_OVERLAY.durationMs,
+    fade: { inMs: OVERLAY_FADE.inMs, outMs: QURAZY_OVERLAY.fadeOutMs },
+    loop: false,
+    className: 'overlay-art qurazy-overlay',
+  }).then((ok) => {
+    engine.setData?.('qurazyOverlay', ok ? 'done' : 'missing');
+    if (!ok) engine.toast?.(QURAZY_SPAWN_LINE);
+  });
+}
+
 function standBeside(engine, mode) {
   const player = engine.player;
   if (!player || !liveQuoin) return;
@@ -153,7 +187,7 @@ export const qurazyFeature = {
         if (spot && placeQurazy(engine, spot)) {
           st.live = { tsid, day: today, x: spot.x, y: spot.y };
           engine.pushActivity?.(QURAZY_SPAWN_LINE);
-          engine.toast?.(QURAZY_SPAWN_LINE);
+          showSpawnOverlay(engine);
         }
       }
     }
