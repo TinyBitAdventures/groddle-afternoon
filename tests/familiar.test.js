@@ -222,7 +222,8 @@ describe('skill learned panel (G218)', () => {
     assert.match(game, /skillLearnedInfo\(classTsid\) \{/);
     assert.match(game, /openSkillTree\(classTsid = ''\) \{/);
     const index = read('js/features/index.js');
-    assert.match(index, /import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g225-1'; FEATURES\.push\(familiarDialogFeature\);\n?$/);
+    // Registered (G185 appends the loneliness feature after it; neither answers the other's first-answer hooks).
+    assert.match(index, /^import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g225-1'; FEATURES\.push\(familiarDialogFeature\);$/m);
   });
 });
 

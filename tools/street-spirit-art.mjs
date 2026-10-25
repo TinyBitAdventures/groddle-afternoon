@@ -11,7 +11,13 @@
  * the feet anchor the same across states (the Uralia spirit's
  * raise/hover/lower clips share one ground). Needs ImageMagick 7.
  *
+ * G185 adds the loneliness strips (STREET_SPIRIT_LONELY_ART): each look's
+ * cry clip on the look's own grid, and the invite's porthole portrait, whose
+ * three states each have their own grid (measured by cell gutters and
+ * checked by eye: loneliness_in 164x165 on the dirt look, the loop 153x153).
+ *
  *   node tools/street-spirit-art.mjs            write the strips
+ *   node tools/street-spirit-art.mjs --lonely   write only the G185 strips
  *   node tools/street-spirit-art.mjs --measure  print each sheet's populated
  *                                               frame count and the union crop
  */
@@ -20,13 +26,23 @@ import { mkdirSync, readdirSync, rmSync, mkdtempSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
-import { STREET_SPIRIT_ART, spiritCell, spiritSheetName } from '../public/js/street-spirits.js';
+import {
+  PORTRAIT_STATES,
+  STREET_SPIRIT_ART,
+  STREET_SPIRIT_LONELY_ART,
+  portraitBox,
+  portraitLook,
+  spiritCell,
+  spiritCryBox,
+  spiritSheetName,
+} from '../public/js/street-spirits.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OGA = join(os.homedir(), 'Documents/glitch-audit/opengameart/extracted_g174/glitch-assets');
 const OUT = join(root, 'public/assets/sprites/street-spirits');
 const COLS = 8;
 const measure = process.argv.includes('--measure');
+const lonelyOnly = process.argv.includes('--lonely');
 const magick = (args) => execFileSync('magick', args, { stdio: ['ignore', 'pipe', 'pipe'] }).toString();
 
 /** The OGA sheet for one look and state: <dir>/<dir>_<look>_x1_<state>_png_<epoch>.png */
@@ -46,10 +62,51 @@ function trimBox(file) {
   return w <= 1 && h <= 1 ? null : { x, y, w, h };
 }
 
+/** Cut `frames` cells (every `step`-th) of a grid sheet to `crop` and write an 8-column WebP strip. */
+function writeStrip(src, cell, crop, frames, step, out, tmpDir) {
+  const cells = mkdtempSync(join(tmpDir, 'cells-'));
+  try {
+    magick([src, '-crop', `${cell.w}x${cell.h}`, '+repage', join(cells, '%04d.png')]);
+    const all = readdirSync(cells).sort().map((f) => join(cells, f));
+    const kept = all.slice(0, frames).filter((_, i) => i % step === 0);
+    const want = Math.ceil(frames / step);
+    if (kept.length !== want) throw new Error(`${src}: ${kept.length} of ${want} frames`);
+    const { x, y, w, h } = crop;
+    const args = [];
+    for (let r = 0; r < Math.ceil(kept.length / COLS); r += 1) {
+      args.push('(', ...kept.slice(r * COLS, r * COLS + COLS).flatMap((f) => ['(', f, '-crop', `${w}x${h}+${x}+${y}`, '+repage', '-background', 'none', '-extent', `${w}x${h}`, ')']), '+append', ')');
+    }
+    magick([...args, '-background', 'none', '-gravity', 'northwest', '-append', '-quality', '88', '-define', 'webp:alpha-quality=100', out]);
+    console.log(`wrote ${out}`);
+  } finally {
+    rmSync(cells, { recursive: true, force: true });
+  }
+}
+
+/** G185: each look's cry strip and the portrait strips (Firebog: size_large only). */
+function writeLonely(tmpDir) {
+  for (const [variant, lonely] of Object.entries(STREET_SPIRIT_LONELY_ART)) {
+    const art = STREET_SPIRIT_ART[variant];
+    const portraits = new Set();
+    for (const look of Object.keys(art.looks)) {
+      const cry = spiritCryBox(variant, look);
+      if (cry) writeStrip(sourceSheet(art, look, lonely.cry.oga), cry.cell, cry.crop, lonely.cry.frames, 1, join(OUT, spiritSheetName(variant, look, 'cry')), tmpDir);
+      portraits.add(portraitLook(variant, look));
+    }
+    for (const look of portraits) {
+      for (const state of PORTRAIT_STATES) {
+        const box = portraitBox(variant, look, state);
+        const p = lonely.portrait[state];
+        writeStrip(sourceSheet(art, look, p.oga), box.cell, box.crop, p.frames, 1, join(OUT, spiritSheetName(variant, look, `lonely_${state}`)), tmpDir);
+      }
+    }
+  }
+}
+
 mkdirSync(OUT, { recursive: true });
 const tmp = mkdtempSync(join(os.tmpdir(), 'street-spirits-'));
 try {
-  for (const [variant, art] of Object.entries(STREET_SPIRIT_ART)) {
+  for (const [variant, art] of lonelyOnly ? [] : Object.entries(STREET_SPIRIT_ART)) {
     const unions = new Map();
     for (const look of Object.keys(art.looks)) {
       const box = spiritCell(variant, look);
@@ -93,6 +150,7 @@ try {
       for (const [key, u] of unions) console.log(`${key} union crop: { x: ${u.x0}, y: ${u.y0}, w: ${u.x1 - u.x0}, h: ${u.y1 - u.y0} }`);
     }
   }
+  if (!measure) writeLonely(tmp);
 } finally {
   rmSync(tmp, { recursive: true, force: true });
 }

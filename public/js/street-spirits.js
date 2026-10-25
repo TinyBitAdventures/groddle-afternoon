@@ -27,8 +27,12 @@
  *   Stories" + "Sonnets of the Street Spirit", Firebog "Street Spirit
  *   Mysteries", Uralia "When Down Was Up"; Ix has none). Lines in
  *   js/dialogue.js.
- * - Loneliness offsets and the cry state differ (not built: the remake has
- *   no loneliness system).
+ * - Loneliness offsets and the cry state differ (G185: built by
+ *   js/spirit-loneliness.js and features/spirit-loneliness-feature.js; the
+ *   cry clip and the invite's porthole portrait are STREET_SPIRIT_LONELY_ART
+ *   below). Firebog's x offset is declared as "loneliness_offset_x"
+ *   (street_spirit_firebog.js 30), a name inc_world_events.js 60 never
+ *   reads, so its invite uses the default corner offset.
  *
  * Placement: the location dump names every spirit only by its objref label
  * "Street Spirit" (885 streets), never its class, so the variant comes from
@@ -75,7 +79,8 @@ export const STREET_SPIRIT_VARIANTS = Object.freeze({
     talk: 'talk',
     dialogueKey: 'street_spirit_firebog',
     conversations: ['street_spirit_mysteries_1', 'street_spirit_mysteries_2'],
-    loneliness: { state: 'idle_cry', size: 325, x: 60, y: 85 },
+    // x is declared as loneliness_offset_x (firebog.js 30): never read (inc_world_events.js 60).
+    loneliness: { state: 'idle_cry', size: 325, x: 60, y: 85, xRead: false },
   }),
   zutto: Object.freeze({
     classTsid: 'street_spirit_zutto',
@@ -200,6 +205,118 @@ export const STREET_SPIRIT_ART = Object.freeze({
 export const SPIRIT_ART_DIR = 'assets/sprites/street-spirits/';
 const STRIP_COLS = 8;
 
+/**
+ * Loneliness art (register G185), from the same CC0 OGA dump
+ * (tools/street-spirit-art.mjs writes these strips too).
+ *
+ * - `cry`: the street clip a lonely spirit plays, the class prop
+ *   loneliness_state (Groddle and Firebog idle_cry, Uralia hoverCry; Ix has
+ *   idleCry but is placed nowhere). Same grid as the look's idle sheet; its
+ *   own crop (the tears fall below the feet), anchored so the look's ground
+ *   line stays put. Loaded only when a spirit is lonely.
+ * - `portrait`: the invite's porthole (inc_world_events.js 45-71:
+ *   loneliness_in, then loneliness at 1 s, loneliness_out at 13 s). Each
+ *   state has its own grid; strips are cut to the porthole and drawn centred.
+ *   Firebog only exported the porthole for size_large (the size_medium
+ *   loneliness clips are its plain body), so every Firebog invite uses it.
+ *   `frames` counts from cell 0 (loneliness_in's first cell is blank).
+ */
+export const STREET_SPIRIT_LONELY_ART = Object.freeze({
+  groddle: {
+    cry: {
+      oga: 'idle_cry',
+      frames: 33,
+      crops: {
+        dirt: { x: 0, y: 29, w: 90, h: 121 },
+        sprout: { x: 0, y: 21, w: 105, h: 173 },
+        flower: { x: 0, y: 19, w: 96, h: 168 },
+        lotus: { x: 0, y: 21, w: 96, h: 162 },
+        leafhat: { x: 0, y: 19, w: 96, h: 158 },
+        feathers: { x: 3, y: 38, w: 118, h: 137 },
+      },
+    },
+    portrait: {
+      in: {
+        oga: 'loneliness_in',
+        frames: 21,
+        cells: { dirt: { w: 164, h: 165 }, sprout: { w: 192, h: 186 }, flower: { w: 164, h: 181 }, lotus: { w: 192, h: 178 }, leafhat: { w: 164, h: 166 }, feathers: { w: 164, h: 165 } },
+        crops: {
+          dirt: { x: 0, y: 1, w: 163, h: 162 },
+          sprout: { x: 28, y: 22, w: 163, h: 162 },
+          flower: { x: 0, y: 17, w: 163, h: 162 },
+          lotus: { x: 28, y: 14, w: 163, h: 162 },
+          leafhat: { x: 0, y: 2, w: 163, h: 162 },
+          feathers: { x: 0, y: 1, w: 163, h: 162 },
+        },
+      },
+      loop: { oga: 'loneliness', frames: 56, cell: { w: 153, h: 153 }, crop: { x: 1, y: 1, w: 151, h: 151 } },
+      out: {
+        oga: 'loneliness_out',
+        frames: 15,
+        cells: { dirt: { w: 164, h: 165 }, sprout: { w: 192, h: 186 }, flower: { w: 164, h: 181 }, lotus: { w: 192, h: 178 }, leafhat: { w: 164, h: 166 }, feathers: { w: 164, h: 165 } },
+        crops: {
+          dirt: { x: 1, y: 1, w: 162, h: 162 },
+          sprout: { x: 29, y: 22, w: 162, h: 162 },
+          flower: { x: 1, y: 17, w: 162, h: 162 },
+          lotus: { x: 29, y: 14, w: 162, h: 162 },
+          leafhat: { x: 1, y: 2, w: 162, h: 162 },
+          feathers: { x: 1, y: 1, w: 162, h: 162 },
+        },
+      },
+    },
+  },
+  firebog: {
+    cry: { oga: 'idle_cry', frames: 24, crops: { medium: { x: 0, y: 0, w: 63, h: 189 }, large: { x: 0, y: 0, w: 107, h: 244 } } },
+    portraitLook: 'large',
+    portrait: {
+      in: { oga: 'loneliness_in', frames: 19, cell: { w: 183, h: 183 }, crop: { x: 1, y: 1, w: 181, h: 181 } },
+      loop: { oga: 'loneliness', frames: 75, cell: { w: 167, h: 168 }, crop: { x: 0, y: 1, w: 166, h: 166 } },
+      out: { oga: 'loneliness_out', frames: 13, cell: { w: 183, h: 183 }, crop: { x: 1, y: 1, w: 181, h: 181 } },
+    },
+  },
+  zutto: {
+    // The full cell, as the other Uralia clips, so raise/hover/cry share one ground.
+    cry: { oga: 'hoverCry', frames: 23, crop: { x: 0, y: 0, w: 151, h: 180 } },
+    portrait: {
+      in: { oga: 'loneliness_in', frames: 21, cell: { w: 144, h: 144 }, crop: { x: 1, y: 1, w: 142, h: 142 } },
+      loop: { oga: 'loneliness', frames: 56, cell: { w: 131, h: 132 }, crop: { x: 1, y: 1, w: 129, h: 129 } },
+      out: { oga: 'loneliness_out', frames: 15, cell: { w: 152, h: 152 }, crop: { x: 9, y: 9, w: 142, h: 142 } },
+    },
+  },
+});
+
+export const PORTRAIT_STATES = Object.freeze(['in', 'loop', 'out']);
+
+/** The cry clip's grid cell, crop and anchor for one look (null: no cry art). */
+export function spiritCryBox(variant, look) {
+  const cry = STREET_SPIRIT_LONELY_ART[variant]?.cry;
+  const base = spiritCell(variant, look);
+  if (!cry || !base || STREET_SPIRIT_ART[variant].looks[look] === undefined) return null;
+  const crop = cry.crops?.[look] || cry.crop;
+  if (!crop) return null;
+  const ground = base.crop.y + base.crop.h;
+  return {
+    cell: base.cell,
+    crop,
+    anchor: { x: (base.cell.w / 2 - crop.x) / crop.w, y: (ground - crop.y) / crop.h },
+  };
+}
+
+/** The look a variant's portrait is cut from (Firebog: always size_large). */
+export function portraitLook(variant, look) {
+  return STREET_SPIRIT_LONELY_ART[variant]?.portraitLook || look;
+}
+
+/** One portrait state's grid cell and crop. */
+export function portraitBox(variant, look, state) {
+  const p = STREET_SPIRIT_LONELY_ART[variant]?.portrait?.[state];
+  const l = portraitLook(variant, look);
+  if (!p || STREET_SPIRIT_ART[variant]?.looks[l] === undefined) return null;
+  const cell = p.cells?.[l] || p.cell;
+  const crop = p.crops?.[l] || p.crop;
+  return cell && crop ? { cell, crop } : null;
+}
+
 /** Grid cell and crop for one look (Firebog sizes each have their own). */
 export function spiritCell(variant, look) {
   const art = STREET_SPIRIT_ART[variant];
@@ -225,6 +342,44 @@ export function spiritSheet(variant, look, state) {
     fps: 30 / (sheet.step || 1),
     once: Boolean(sheet.once),
   };
+}
+
+/** G185: the cry clip's strip (`<variant>_<look>_cry.webp`), with the anchor that keeps the ground line. */
+export function spiritCrySheet(variant, look) {
+  const cry = STREET_SPIRIT_LONELY_ART[variant]?.cry;
+  const box = spiritCryBox(variant, look);
+  if (!cry || !box) return null;
+  return {
+    path: `${SPIRIT_ART_DIR}${spiritSheetName(variant, look, 'cry')}`,
+    fw: box.crop.w,
+    fh: box.crop.h,
+    cols: STRIP_COLS,
+    frames: cry.frames,
+    fps: 30,
+    once: false,
+    anchor: box.anchor,
+  };
+}
+
+/** G185: one portrait state's strip (`<variant>_<look>_lonely_<state>.webp`), drawn centred. */
+export function portraitSheet(variant, look, state) {
+  const p = STREET_SPIRIT_LONELY_ART[variant]?.portrait?.[state];
+  const box = portraitBox(variant, look, state);
+  if (!p || !box) return null;
+  return {
+    path: `${SPIRIT_ART_DIR}${spiritSheetName(variant, portraitLook(variant, look), `lonely_${state}`)}`,
+    fw: box.crop.w,
+    fh: box.crop.h,
+    cols: STRIP_COLS,
+    frames: p.frames,
+    fps: 30,
+    once: state !== 'loop',
+  };
+}
+
+/** The portrait's largest crop: the invite scales it to the class's loneliness_size (ItemIconView fits wh). */
+export function portraitFit(variant, look) {
+  return Math.max(0, ...PORTRAIT_STATES.map((s) => portraitBox(variant, look, s)).filter(Boolean).flatMap((b) => [b.crop.w, b.crop.h]));
 }
 
 /** Every sheet one look needs. */

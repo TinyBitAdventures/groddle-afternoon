@@ -581,7 +581,7 @@
    "group": "economy",
    "name": "Street spirits and vendors",
    "status": "source",
-   "blurb": "The original stores, stock and prices, buying and selling. The scarecrow Gardening Tools Vendor, the Meal Vendor, the Tool Vendor, Uncle Friendly, Helga and the Sno Cone Vending Machine stand on the eleven streets the archive puts them on, each with its own store, and the scarecrow sends you on his Meet the Merchants errands. Sno Cones give iMG, not energy: each colour needs its level, the fourth of the day may freeze your brain, and a dropped cone melts.",
+   "blurb": "The original stores, stock and prices, buying and selling. The scarecrow Gardening Tools Vendor, the Meal Vendor, the Tool Vendor, Uncle Friendly, Helga and the Sno Cone Vending Machine stand on the eleven streets the archive puts them on, each with its own store, and the scarecrow sends you on his Meet the Merchants errands. Sno Cones give iMG, not energy: each colour needs its level, the fourth of the day may freeze your brain, and a dropped cone melts. A Street Spirit you have not visited for a game day may get lonely: it calls you from the corner of the screen in its porthole, asks to be your destination, cries on its street until you walk up to it, and thanks you with 1000 iMG, or throws you a party.",
    "spot": "vendor",
    "evidence": [
     "public/js/vendor.js",
@@ -589,7 +589,9 @@
     "public/js/vendor-npcs.js",
     "public/js/features/vendor-npcs-feature.js",
     "public/js/sno-cones.js",
-    "public/js/features/sno-cones-feature.js"
+    "public/js/features/sno-cones-feature.js",
+    "public/js/spirit-loneliness.js",
+    "public/js/features/spirit-loneliness-feature.js"
    ],
    "shot": null,
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&vendor=toys&practice=1"
@@ -2152,6 +2154,6 @@
    }
   ]
  },
- "tests": 257,
+ "tests": 258,
  "generatedAt": "2026-10-25"
 }

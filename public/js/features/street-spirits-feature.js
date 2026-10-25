@@ -44,6 +44,14 @@
  * &spiritlore=<id,id> (record conversations as told). Canvas:
  * spiritConvoOffered, spiritConvoActive, spiritConvoNext,
  * spiritConvoCompleted, spiritConvoLast.
+ *
+ * Loneliness (G185, features/spirit-loneliness-feature.js): while this
+ * street's spirit is lonely it plays its cry clip (the class prop
+ * loneliness_state: Groddle and Firebog idle_cry as their idle, Uralia
+ * hoverCry in bursts while it hovers) and offers no conversation, as
+ * onPlayerCollision runs lonelinessVisit first (street_spirit.js 541-545).
+ * The loneliness feature answers engine.query('spiritCry') and
+ * engine.query('spiritLonelyHere').
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
@@ -53,6 +61,7 @@ import {
   STREET_SPIRIT_VARIANTS,
   spiritAnchor,
   spiritCell,
+  spiritCrySheet,
   spiritForStreet,
   spiritSheet,
   spiritSheets,
@@ -156,6 +165,8 @@ function tickOffer(engine, now) {
   const t = talkTarget;
   const p = engine.player;
   if (!t || !p || !TALK_ORDER[talkVariant] || active || !t.sprite || t.sprite.destroyed) return;
+  // G185: a lonely spirit's collision is the loneliness visit (street_spirit.js 541-545).
+  if (engine.query?.('spiritLonelyHere', engine)) return;
   const near = Math.abs(p.x - t.sprite.x) <= 90 && Math.abs(p.y - t.sprite.y) <= 120;
   const dev = devRules(engine);
   // Collision fires on the way in; dev QA keeps checking while the player stands there.
@@ -278,10 +289,18 @@ function vendorSpirit(engine) {
   );
 }
 
+/** G185: the cry clip loads only when a spirit is lonely; it keeps the look's ground line. */
+function clipDef(s, clip) {
+  return clip === 'cry' ? spiritCrySheet(s.variant, s.look) : spiritSheet(s.variant, s.look, clip);
+}
+
 function setClip(s, clip) {
-  const def = spiritSheet(s.variant, s.look, clip);
+  const def = clipDef(s, clip);
   const frames = def ? loader.frames(def) : [];
+  if (!frames.length && def && clip === 'cry') loader.load(def);
   if (!frames.length || s.sprite.destroyed) return;
+  const a = def.anchor || spiritAnchor(s.variant, s.look);
+  s.sprite.anchor.set(a.x, a.y);
   s.clip = clip;
   s.done = false;
   s.sprite.textures = frames;
@@ -342,15 +361,30 @@ function tickZutto(engine, now) {
   if (near && !s.near) face(s, engine.player, true);
   s.near = near;
   if (talking) {
-    if (s.clip === 'hover' || (s.clip === 'raise' && s.done)) setClip(s, 'talk');
+    if (s.clip === 'hover' || s.clip === 'cry' || (s.clip === 'raise' && s.done)) setClip(s, 'talk');
     return;
   }
   if (s.clip === 'talk') {
     setClip(s, 'hover');
     return;
   }
+  // G185: zutto.js declareLoneliness 410-418: hoverCry for 5 s, only while it hovers.
+  const cry = lonelyCry(engine);
+  if (near && cry && s.clip === 'hover') {
+    setClip(s, 'cry');
+    return;
+  }
+  if (near && !cry && s.clip === 'cry') {
+    setClip(s, 'hover');
+    return;
+  }
   const next = zuttoNextClip(s.clip, near, s.done);
   if (next !== s.clip) setClip(s, next);
+}
+
+/** G185: whether the loneliness feature wants this street's spirit crying now. */
+function lonelyCry(engine) {
+  return engine.query?.('spiritCry', engine) === true;
 }
 
 function startTalk(engine, now) {
@@ -451,6 +485,11 @@ export const streetSpiritsFeature = {
     else if (spirit.talkUntil && now >= spirit.talkUntil) {
       spirit.talkUntil = 0;
       setClip(spirit, STREET_SPIRIT_VARIANTS[spirit.variant].idle);
+    } else if (!spirit.talkUntil) {
+      // G185: onLonelinessStart makes idle_cry its idle (street_spirit.js 493-498); onLonelinessEnd ends it.
+      const cry = lonelyCry(engine);
+      if (cry && spirit.clip !== 'cry') setClip(spirit, 'cry');
+      else if (!cry && spirit.clip === 'cry') setClip(spirit, STREET_SPIRIT_VARIANTS[spirit.variant].idle);
     }
     publish(engine);
   },
