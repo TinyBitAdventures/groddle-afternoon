@@ -35,11 +35,10 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
 .site-nav-play:hover { filter: brightness(1.08); }
 .site-nav a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
-/* Phones: the mark alone, the two reports and Play. */
+/* Phones: the mark alone, then the links and Play. */
 @media (max-width: 640px) {
   .site-nav .wordmark span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .site-nav-links { gap: 14px; }
-  .site-nav-links .site-nav-dev { display: none; }
 }
 
 /* Narrow phones: tighter, and the links scroll inside the bar rather than widen the page. */
