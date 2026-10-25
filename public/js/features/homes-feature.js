@@ -38,9 +38,15 @@
  *     pick up (decorate) or cultivate / expand / remove (cultivate) loop.
  *     &homefurniture=furniture_rug,furniture_painting puts those in furniture storage
  *     (shared with Tower floors: &homedemo=home&towerdemo=inside, then Decorate).
+ * Wine of the Dead (js/wine-pour.js, items/wine_of_the_dead.js): its pack verb
+ * "pour" works on your home street, on the nearest cultivated item within
+ * 200 px (wears it out 3 s later; a Patch's tree goes with its Patch) or a
+ * proto whose project has started (the project is canceled, the unbuilt
+ * Tower's too). The Cultivate sidebar's Pour button and the proto's verb ask
+ * the same "Please Confirm!". QA: &homedemo=cultivate&wotddemo=3.
  * Canvas data: homeDecorPlaced, homeDecorStorage, homeDecorWall/Walls/Floor/Ceiling, homeStamping,
  * homeDecorSegments, homeMode, homeCultivations, homeYard, homeAutoplay,
- * homeProtos, homeRestore, homeLifespan.
+ * homeProtos, homeRestore, homeLifespan, homePour (confirm|pouring|depleted|canceled:<id>).
  *     &cultwear=N  every cultivation wears out after N uses (x its lifespan multiplier)
  *     &homeautoplay=restore (with homedemo=cultivate): wears the Metal Rock out,
  *       then seeds and runs its Restore project to the restored rock
@@ -115,11 +121,13 @@ import {
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { projectApi } from './street-jobs-feature.js?v=g148-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-2';
-import { towerApi } from './home-tower-feature.js?v=home-tower-3';
+import { towerApi } from './home-tower-feature.js?v=home-tower-4';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-1';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-4';
 import { patchesFeature } from './patches-feature.js?v=patches-6';
+import { plotLabel } from '../patches.js';
+import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import { textureFromUrl } from '../textures.js';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
@@ -305,6 +313,8 @@ let selected = null; // { kind, id }
 let stamping = null; // { kind: 'wall'|'floor'|'ceiling', key } while a swatch is on the cursor
 let stampHover = null; // { kind, segment?, center? } under the cursor
 let scene = null; // live scene context while a home room is shown
+let houseVisits = 0; // butler_hint_counters visited_my_house
+let lastHomeRoom = null; // 'house' | 'tower' | 'street' while at home, null away
 let pointer = { x: 0, y: 0, inside: false };
 let lastNodeCheck = 0;
 let demoDone = false;
@@ -1322,26 +1332,107 @@ function finishRestore(engine, id, jobId) {
 }
 let restoreLast = '';
 
-/** Wine of the Dead on a proto cancels its project; on a live cultivation it wears it out. */
-function pourWine(engine, id) {
-  const item = cult.items.find((row) => row.id === Number(id));
+/**
+ * items/wine_of_the_dead.js getValidTargets: every cultivated item on the home
+ * street, plus the protos whose project has started, but never the finished
+ * Tower. Rows for js/wine-pour.js: { id, kind, name, x, y }.
+ */
+function pourTargets(engine) {
+  const home = engine.homeContext?.() || {};
+  if (!home.inHome || !home.owned || scene?.room !== 'street') return [];
+  const soil = engine.streetSlot?.('patches', HOME_STREET_TSID)?.plots || {};
+  const soilKeys = soilKeyMap(cult.items);
+  const rows = [];
+  for (const item of cult.items) {
+    const def = cultivationDef(item.protoClass);
+    if (!def) continue;
+    const base = { id: item.id, x: cultivationWorldX(item), y: STREET_GROUND_Y };
+    if (def.kind === 'tower') {
+      // proto_furniture_tower_chassis (name_single "Tower") with its job started.
+      if (item.endClass !== TOWER_CHASSIS && towerApi.projectStarted?.()) rows.push({ ...base, kind: 'proto', tower: true, name: 'Tower' });
+      continue;
+    }
+    if (item.depleted) {
+      if (projectApi.inProgress(restoreJobId(item))) rows.push({ ...base, kind: 'proto', name: def.label });
+      continue;
+    }
+    // A Patch's tree, seedling or dead tree keeps its proto_class (patch.js:751, trants.js:774).
+    const plot = def.kind === 'patch' ? soil[soilKeys.get(item.id)?.[0]] : null;
+    const name = plot ? plotLabel(plot) : def.kind === 'garden' ? 'Garden' : def.label;
+    rows.push({ ...base, kind: 'cultivated', name });
+  }
+  return rows;
+}
+
+/** The pour target where the avatar stands (nearest within 200 px), or null. */
+function pourTargetHere(engine) {
+  return nearestPourTarget(pourTargets(engine), engine.player);
+}
+
+/** Pour on one row after the confirm (items/wine_of_the_dead.js modal_callback). */
+function applyPour(engine, row) {
+  const item = cult.items.find((r) => r.id === Number(row?.id));
   if (!item || countItem(engine.inv, WOTD) < 1) return false;
-  if (item.depleted) {
+  if (row.tower) {
+    if (item.endClass === TOWER_CHASSIS || !towerApi.cancelProject?.(engine)) return false;
+    engine.pushActivity(WOTD_TEXT.canceled('Tower'));
+  } else if (item.depleted) {
     const jobId = restoreJobId(item);
     if (!projectApi.inProgress(jobId)) return false;
-    removeItem(engine.inv, WOTD, 1);
     projectApi.cancel(engine, jobId);
-    engine.pushActivity(`You poured Wine of the Dead on a ${cultivationDef(item.protoClass).label} and canceled the project.`);
+    engine.pushActivity(WOTD_TEXT.canceled(cultivationDef(item.protoClass).label));
   } else {
     if (cultivationDef(item.protoClass)?.kind === 'tower') return false;
-    removeItem(engine.inv, WOTD, 1);
-    depleteItem(engine, item.id, { wotd: true });
+    // apiSetTimerX('makeDepleted', 3000, true): it wears out as the pour finishes.
+    const id = item.id;
+    const cycle = item.cycle || 0;
+    pourLast = `pouring:${id}`;
+    engine.setData('homePour', pourLast);
+    setTimeout(() => {
+      const now = cult.items.find((r) => r.id === id);
+      if (!now || now.depleted || (now.cycle || 0) !== cycle) return;
+      depleteItem(engine, id, { wotd: true });
+      pourLast = `depleted:${id}`;
+      engine.setData('homePour', pourLast);
+      engine.refreshHomeScene?.();
+    }, WOTD_DEPLETE_MS);
   }
+  removeItem(engine.inv, WOTD, 1);
   engine.achievement('wotd:poured_on_something', 1);
+  if (row.tower || item.depleted) {
+    pourLast = `canceled:${item.id}`;
+    engine.setData('homePour', pourLast);
+  }
   engine.updateHud();
   engine.save();
   engine.refreshHomeScene?.();
   return true;
+}
+let pourLast = '';
+let wotdDemoDone = false;
+let wotdPlaced = false;
+
+/** verbs.pour handler: "Please Confirm!", then the pour (every pour route asks first). */
+function confirmPour(engine, row) {
+  if (!row) return false;
+  engine.offerQuestDialogue({
+    title: WOTD_TEXT.confirmTitle,
+    kicker: 'Wine of the Dead',
+    beats: [{ text: pourConfirmText(row), response: WOTD_TEXT.yes }],
+    acceptLabel: WOTD_TEXT.yes,
+    declineLabel: WOTD_TEXT.nevermind,
+    onAccept: () => applyPour(engine, row),
+  });
+  pourLast = `confirm:${row.id}`;
+  engine.setData('homePour', pourLast);
+  return true;
+}
+
+/** The sidebar button and the proto verb: pour on that cultivation, wherever you stand. */
+function pourWine(engine, id) {
+  const row = pourTargets(engine).find((r) => r.id === Number(id));
+  if (!row || countItem(engine.inv, WOTD) < 1) return false;
+  return confirmPour(engine, row);
 }
 
 function protoVerbs(item, engine) {
@@ -2357,6 +2448,27 @@ function demoFurniture(engine) {
 
 function demoSetup(engine) {
   demoFurniture(engine);
+  // QA: &wotddemo=N puts N Wine of the Dead in the pack (the pour pack verb) and,
+  // on the home street, stands you 120 px left of the first rock, garden or patch
+  // (else the Tower).
+  const wotd = Math.floor(Number(engine.param('wotddemo')) || 0);
+  if (wotd > 0 && !wotdDemoDone) {
+    wotdDemoDone = true;
+    if (countItem(engine.inv, WOTD) < wotd) engine.inv[WOTD] = wotd;
+    engine.updateHud();
+  }
+  if (wotd > 0 && scene?.room === 'street' && !wotdPlaced) {
+    const item = cult.items.find((row) => !row.depleted && cultivationDef(row.protoClass)?.kind !== 'tower') || towerItem(cult);
+    if (item && engine.player) {
+      wotdPlaced = true;
+      setTimeout(() => {
+        if (!engine.player || scene?.room !== 'street') return;
+        engine.player.x = cultivationWorldX(item) - 120;
+        engine.snapCamera?.();
+        engine.setData('homePourDemo', `${item.id}:${cultivationDef(item.protoClass).label}`);
+      }, 800);
+    }
+  }
   if (demoDone || !scene) return;
   const demo = String(engine.param('homedemo') || '').toLowerCase();
   if (demo !== 'decorate' && demo !== 'cultivate') return;
@@ -2615,10 +2727,32 @@ function towerFloorScene(engine, floor) {
   };
 }
 
+/**
+ * location.js:72-74 onPlayerEnter: butler_hint_counters visited_my_house counts
+ * each time you enter your own house (any way in: the door, /house, from the
+ * Tower). A rebuild of the room you are already in is not a visit.
+ */
+/** QA &housevisits=N (a fresh game runs no restore, so init reads it too). */
+function qaHouseVisits(engine) {
+  const raw = engine?.param?.('housevisits');
+  const n = raw == null || raw === '' ? NaN : Number(raw);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : null;
+}
+
+export function countHouseVisit(engine, roomKey) {
+  const fresh = roomKey !== lastHomeRoom;
+  lastHomeRoom = roomKey;
+  if (!fresh || roomKey !== 'house') return;
+  houseVisits += 1;
+  engine.setData?.('homeHouseVisits', String(houseVisits));
+  engine.save?.();
+}
+
 function homeScene(room, engine) {
   const ctx = engine.homeContext?.() || {};
   const style = ctx.style || 'meadow';
   const floor = room === 'interior' ? towerApi.currentFloor() : null;
+  countHouseVisit(engine, floor != null ? 'tower' : room === 'interior' ? 'house' : 'street');
   if (floor != null) return towerFloorScene(engine, floor);
   decor = houseDecor;
   if (room !== 'interior') towerApi.clearFloor();
@@ -2709,15 +2843,19 @@ export const homesFeature = {
   init(engine) {
     ensureFurnitureItems();
     towerApi.connect(towerBridge);
+    houseVisits = qaHouseVisits(engine) ?? houseVisits;
     publish(engine);
   },
 
   save() {
     // Tower floors share the house's furniture storage; it is saved once, with the house.
-    return { decor: houseDecor, cult, towerDecor: towerDecor.map(({ storage, ...rest }) => rest), streetGround: savedStreetGround };
+    return { decor: houseDecor, cult, towerDecor: towerDecor.map(({ storage, ...rest }) => rest), streetGround: savedStreetGround, houseVisits };
   },
 
-  restore(slice) {
+  restore(slice, engine) {
+    // butler_hint_counters visited_my_house (QA: &housevisits=N).
+    houseVisits = qaHouseVisits(engine) ?? Math.max(0, Math.floor(Number(slice?.houseVisits) || 0));
+    lastHomeRoom = null;
     const ground = Number(slice?.streetGround);
     savedStreetGround = !slice ? STREET_GROUND_Y : Number.isFinite(ground) ? ground : OLD_STREET_GROUND_Y;
     houseDecor = normalizeHomeDecorState(slice?.decor || {});
@@ -2746,6 +2884,7 @@ export const homesFeature = {
   onStreetEnter(street, engine) {
     // Ordinary streets: no home scene, so the mode bar must be gone.
     if (!engine.homeContext?.().inHome) {
+      lastHomeRoom = null;
       mode = null;
       placing = null;
       selected = null;
@@ -2755,6 +2894,12 @@ export const homesFeature = {
 
   /** Pack furniture: place it straight from the pack while inside the house. */
   packVerbs(classTsid, engine) {
+    // items/wine_of_the_dead.js verbs.pour (sort_on 54).
+    if (classTsid === WOTD) {
+      if (countItem(engine.inv, WOTD) < 1) return [];
+      const home = engine.homeContext?.() || {};
+      return [pourButton(pourConditions({ canCultivate: home.inHome && home.owned, target: pourTargetHere(engine) }))];
+    }
     if (!FURNITURE_CATALOG[classTsid]) return [];
     const inside = scene?.room === 'interior' && !scene.construction;
     return [{
@@ -2768,6 +2913,12 @@ export const homesFeature = {
   },
 
   runPackVerb(classTsid, verbId, engine) {
+    if (classTsid === WOTD && verbId === 'pour') {
+      const row = countItem(engine.inv, WOTD) > 0 ? pourTargetHere(engine) : null;
+      if (!row) engine.toast(WOTD_TEXT.nothingHere, 2600);
+      else confirmPour(engine, row);
+      return true;
+    }
     if (verbId !== 'place_furniture' || !FURNITURE_CATALOG[classTsid] || scene?.room !== 'interior' || scene.construction) return false;
     if (mode !== 'decorate') setMode(engine, 'decorate');
     beginPlacing(engine, classTsid, 'pack');
@@ -2809,6 +2960,11 @@ export const homesFeature = {
 
   /** QA / tests. */
   _state() {
-    return { decor, houseDecor, towerDecor, cult, mode, placing, selected, scene };
+    return { decor, houseDecor, towerDecor, cult, mode, placing, selected, scene, houseVisits };
+  },
+
+  /** butler_hints.js:383: how many times you have gone into your house. */
+  houseVisits() {
+    return houseVisits;
   },
 };

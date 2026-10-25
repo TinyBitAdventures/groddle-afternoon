@@ -51,6 +51,10 @@
  *                   hint|tower|gift|visitors|mailbox|
  *                   turn (back to you, then lookAtPlayer: turnBack, turnFront)|
  *                   walk (220 px right on walk4 and back)
+ *   &butlerhint=<id>     the next hint is that one, if its conditions hold
+ *                        (butlerautoplay=hint): house_command needs
+ *                        &housevisits=11, tower_command &towervisits=11
+ *                        (the homes-feature / home-tower-feature counters)
  * Join the Club end to end: ?autostart=1&fresh=1&resetgame=1&questoffer=off&
  *   homedemo=owned&butlerdemo=owned&questdemo=join_club&questautoplay=1&questfx=0,
  *   then Home → Teleport home (canvas clubButler=heard, butlerLast=quest:join_club).
@@ -64,7 +68,8 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon, listPackItemSlots, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { homeStreetLayout, towerItem } from '../home-cultivation.js?v=home-cultivation-1';
-import { homesFeature } from './homes-feature.js?v=homes-7';
+import { homesFeature } from './homes-feature.js?v=homes-8';
+import { towerApi } from './home-tower-feature.js?v=home-tower-4';
 import { levelInfoForXp } from '../progression.js?v=progression-1';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { NEIGHBOURS, NEIGHBOUR_ITEMS, neighbourById } from '../neighbours.js?v=neighbours-1';
@@ -125,7 +130,7 @@ import {
   takeVisitorDelivery,
   teachButler,
   visitorsReport,
-} from '../butler.js?v=butler-4';
+} from '../butler.js?v=butler-5';
 
 export const BUTLER_FEATURE_ID = 'butler';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -827,7 +832,7 @@ function idleAnim(engine) {
   else if (chance > 5) oneOff(engine, chance > 8 ? 'idle3' : 'idle4');
 }
 
-function ownerHintCtx(engine) {
+export function ownerHintCtx(engine) {
   const inv = engine.inv || {};
   const learned = engine.learnedSkills || [];
   const qs = engine.questState || {};
@@ -854,12 +859,17 @@ function ownerHintCtx(engine) {
     hasTower: hasTower(),
     sdbPlaced: placedSdb,
     sdbOwned: storedSdb,
+    // butler_hints.js:382-399: the /house and /tower hints.
+    usedHouseCommand: engine.query?.('usedCommand', 'house') === true,
+    usedTowerCommand: engine.query?.('usedCommand', 'tower') === true,
+    houseVisits: homesFeature.houseVisits?.() || 0,
+    towerVisits: towerApi.visits?.() || 0,
   };
 }
 
 function maybeHint(engine, force = false) {
   if (!hintDue(st, { now: now(), level: level(engine), force })) return false;
-  const hint = pickHint(st, ownerHintCtx(engine), { now: now() });
+  const hint = pickHint(st, ownerHintCtx(engine), { now: now(), only: engine.param?.('butlerhint') || '' });
   if (!hint) return false;
   say(engine, hint.text, 6000, { activity: true });
   engine.save?.();

@@ -110,6 +110,7 @@ import {
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { pieceUrl } from '../home-wallpaper.js?v=home-wallpaper-1';
 import { wantsHiresDecos } from '../deco-hires.js';
+import { WOTD_TEXT } from '../wine-pour.js?v=g165-1';
 
 /** 3x tower pieces where the screen has more than 2.25 backing pixels per world pixel. */
 function hires(engine) {
@@ -509,6 +510,12 @@ async function goToFloor(engine, floor, via = 'elevator') {
   const idx = Math.max(0, Math.min(max - 1, Math.floor(Number(floor) || 0)));
   if (work) stopWork(engine, '');
   closePanel();
+  // location.js:170-174: entering your own Tower (the door or /tower) counts
+  // butler_hint_counters visited_my_tower; the elevator moves inside it.
+  if (tower.floor == null) {
+    tower.visits = (tower.visits || 0) + 1;
+    engine.setData?.('towerVisits', String(tower.visits));
+  }
   tower.floor = idx;
   floorArrival = via;
   engine.save();
@@ -1091,10 +1098,22 @@ function onCultivated(engine, item) {
   return item;
 }
 
+/** QA &towervisits=N (a fresh game runs no restore, so init reads it too). */
+function qaTowerVisits(engine) {
+  const raw = engine?.param?.('towervisits');
+  const n = raw == null || raw === '' ? NaN : Number(raw);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : null;
+}
+
+/** items/include/jobs.js hasInProgressJob: something has gone into the Tower project. */
+function projectStarted() {
+  return !tower.built && projectPercent(TOWER_JOB, tower.project) > 0;
+}
+
 /**
- * proto remove verb: an untouched proto goes after a confirm; a started
- * project needed Wine of the Dead (not obtainable in the remake), so the
- * remake asks twice and keeps nothing. A built Tower stays.
+ * proto remove verb (proto_furniture_tower_chassis.js:49-77): an untouched
+ * proto goes after "Please Confirm!"; a started project first needs Wine of the
+ * Dead poured on it (homes-feature pour, js/wine-pour.js). A built Tower stays.
  */
 function requestRemove(engine, item, doRemove) {
   if (!item) return false;
@@ -1102,13 +1121,14 @@ function requestRemove(engine, item, doRemove) {
     engine.toast('Your Tower is built; it stays.');
     return false;
   }
-  const started = projectPercent(TOWER_JOB, tower.project) > 0;
+  if (projectStarted()) {
+    engine.toast(WOTD_TEXT.pourFirst, 3200);
+    return false;
+  }
   engine.offerQuestDialogue({
     title: 'Please Confirm!',
     kicker: 'Tower',
-    beats: [{ text: started
-      ? 'Are you really sure you want to remove this Tower? The project has started (the original wanted Wine of the Dead poured on it), and everything already added is lost.'
-      : 'Are you really sure you want to remove this Tower?', response: 'Yes' }],
+    beats: [{ text: 'Are you really sure you want to remove this Tower?', response: 'Yes' }],
     acceptLabel: 'Yes',
     declineLabel: 'Nevermind',
     onAccept: () => {
@@ -1118,6 +1138,18 @@ function requestRemove(engine, item, doRemove) {
       publish(engine, true);
     },
   });
+  return true;
+}
+
+/** Wine of the Dead on the Tower proto: proto resetJob, everything put in is lost. */
+function cancelProject(engine) {
+  if (!projectStarted()) return false;
+  if (work) stopWork(engine, '');
+  tower.project = {};
+  if (panelMode === 'project') closePanel();
+  engine.save();
+  refreshProtoArt(engine);
+  publish(engine, true);
   return true;
 }
 
@@ -1151,6 +1183,10 @@ export const towerApi = {
   },
   onCultivated,
   requestRemove,
+  projectStarted,
+  cancelProject: (engine) => cancelProject(engine),
+  /** butler_hints.js:393: how many times you have gone into your Tower. */
+  visits: () => tower.visits || 0,
   expandCosts: () => expandCosts(tower),
   beginExpansion: (engine) => beginExpansion(engine),
   label: () => towerLabel(tower),
@@ -1334,6 +1370,8 @@ export const homeTowerFeature = {
     ensureItem(TOWER_EXPANDER, { label: 'Workbench', desc: 'Where a new Tower floor gets built.', stackMax: 1, donatable: false });
     const kind = String(engine.param('towerdemo') || '');
     if (kind) demo = { kind };
+    const qaVisits = qaTowerVisits(engine);
+    if (qaVisits != null) tower.visits = qaVisits;
     publish(engine, true);
   },
 
@@ -1341,8 +1379,10 @@ export const homeTowerFeature = {
     return tower;
   },
 
-  restore(slice) {
+  restore(slice, engine) {
     tower = normalizeTowerState(slice || {});
+    // butler_hint_counters visited_my_tower, saved with the Tower (QA: &towervisits=N).
+    tower.visits = qaTowerVisits(engine) ?? Math.max(0, Math.floor(Number(slice?.visits) || 0));
   },
 
   onStreetEnter(street, engine) {
@@ -1388,7 +1428,8 @@ export const homeTowerFeature = {
         const started = projectPercent(TOWER_JOB, tower.project) > 0;
         return [
           { id: 'build_tower', label: started ? 'view project' : 'build tower', enabled: true, tooltip: 'Start a project to build a tower here', durationMs: 0 },
-          { id: 'remove', label: 'remove', enabled: true, tooltip: 'Remove from the location', durationMs: 0 },
+          // proto.js remove conditions: a started project needs Wine of the Dead first.
+          { id: 'remove', label: 'remove', enabled: !started, reason: started ? WOTD_TEXT.pourFirst : '', tooltip: 'Remove from the location', durationMs: 0 },
         ];
       }
       case TOWER_CHASSIS:

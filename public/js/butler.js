@@ -941,11 +941,19 @@ export function idleChatter(state, { now = Date.now(), lastCommandAt = 0, level 
  * plain text). Left out: UI and website pointers (Info Mode, zoom keys,
  * hotkeys, calendar, bug icon, Snaps, Global Chat, Facebook, Twitter, Glitch
  * Mash, wardrobe), friends and buddy towers, hub visit counts, the fox
- * preserve route, /house and /tower chat commands, feats and rook alerts.
+ * preserve route, feats and rook alerts.
+ *
+ * The /house and /tower hints (butler_hints.js:382-399) need more than ten
+ * visits to your house or Tower (location.js butler_hint_counters
+ * visited_my_house / visited_my_tower: homes-feature, home-tower-feature) and
+ * that you have never typed the command (main.js:1880, :1891
+ * has_used_house_command / has_used_tower_command: slash-commands-feature).
  */
 export const BUTLER_HINTS = Object.freeze([
   { id: 'salt', when: (c) => c.level <= 7, text: "A little butler's tip for you, madamsir: you can make your own salt the same way you can make many spices: by grinding Allspice with a Spice Mill. Obvious when you know how, no?" },
   { id: 'cheese', when: (c) => c.level <= 7, text: 'As unlikely as it sounds, I heard that you can make your own cheese from butterfly milk. Not sure how one goes about that. Begin by shaking it, I assume?' },
+  { id: 'house_command', when: (c) => !c.usedHouseCommand && (Number(c.houseVisits) || 0) > 10, text: "I note you often merely pass by here before entering your house. If you're in a hurry, do you know you can skip straight to the inside of your house by tapping /house into local chat, wherever you are? Will that be all, madamsir? Very good." },
+  { id: 'tower_command', when: (c) => !c.usedTowerCommand && (Number(c.towerVisits) || 0) > 10, text: "Sirmadam, I've noticed you sometimes pass by here before entering your tower. Did you know you can go straight to the inside of your tower by typing /tower in local chat, wherever you are? Have a nice day, ma'amsir." },
   { id: 'skill_picker', when: (c) => !c.learning && c.skillCount < 50, text: "Far be it from me to to judge, madamsir, but you don't appear to be currently learning anything. Perhaps a visit to the Skill Picker is in order? Wouldn't want to waste that marvellous brain of yours..." },
   { id: 'visiting_stones', when: (c) => c.canOptIn && !c.allowVisits, text: "I hope you don't mind me saying so, sirmadam, but I do love meeting new people. If you find a Visiting Stone and request new visitors, I'd meet Glitches from every corner of Ur: and you'd get more iMG from your Magic Rock! You could also use the Visiting Stone to visit random Glitches' butlers... I mean, their home streets." },
   { id: 'tower_quest_1', group: 'tower_quest', when: (c) => c.level >= 12 && c.towerQuestNone, text: "Gwendolyn's story makes me shed salty eye-fluff every time I hear of it. I'd tell you the story myself, but she tells it far better. Oh, how I wish I could go to Jethimadh Tower to hear it with my own clothy ear-holes..." },
@@ -976,9 +984,17 @@ export function hintDue(state, { now = Date.now(), level = 1, force = false } = 
  * getHint: a random hint not given yet (the tower-quest pair counts as one);
  * when every hint has been given, the list starts over.
  */
-export function pickHint(state, ctx = {}, { now = Date.now(), rand = Math.random } = {}) {
+export function pickHint(state, ctx = {}, { now = Date.now(), rand = Math.random, only = '' } = {}) {
   const given = new Set(state.givenHints);
   const groupGiven = new Set(BUTLER_HINTS.filter((h) => h.group && given.has(h.id)).map((h) => h.group));
+  // `only` (QA &butlerhint=<id>): that hint if its conditions hold, else none.
+  if (only) {
+    const hint = BUTLER_HINTS.find((h) => h.id === only);
+    if (!hint || !hint.when(ctx)) return null;
+    if (!given.has(hint.id)) state.givenHints.push(hint.id);
+    state.lastHintAt = whole(now);
+    return { id: hint.id, text: typeof hint.text === 'function' ? hint.text(ctx) : hint.text };
+  }
   const ok = (h) => h.when(ctx) && !given.has(h.id) && !(h.group && groupGiven.has(h.group));
   let pool = BUTLER_HINTS.filter(ok);
   if (!pool.length) {

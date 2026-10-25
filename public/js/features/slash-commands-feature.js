@@ -24,10 +24,10 @@
  *     (`<command>:<outcome>`), slashLine (the last line shown).
  */
 
-import { BUTLER_STRINGS } from '../butler.js?v=butler-4';
-import { butlerApi } from './butler-feature.js?v=butler-feature-4';
+import { BUTLER_STRINGS } from '../butler.js?v=butler-5';
+import { butlerApi } from './butler-feature.js?v=butler-feature-5';
 import { hellFeature } from './hell-feature.js?v=hell-3';
-import { towerApi } from './home-tower-feature.js?v=home-tower-3';
+import { towerApi } from './home-tower-feature.js?v=home-tower-4';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=g160-1';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';

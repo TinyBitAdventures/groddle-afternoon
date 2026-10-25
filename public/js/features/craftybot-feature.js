@@ -42,7 +42,7 @@ import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=to
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g169-1';
 import { listDroppedStacks } from '../world-items.js?v=catalog-unified-2';
 import { homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-1';
-import { homesFeature } from './homes-feature.js?v=homes-7';
+import { homesFeature } from './homes-feature.js?v=homes-8';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,

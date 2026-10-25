@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-59';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-60';
 import {
   actionDurationFor,
   createTimedAction,
@@ -4681,11 +4681,10 @@ function showMusicblockFx(def) {
 }
 
 // —— Verb menu (HTML) ——
-function openVerbMenu(target) {
-  if (currentAction) return;
-  menuTarget = target;
+/** A target's verb menu (engine.targetVerbs: pack verbs that proxy to a nearby target read it too). */
+function menuVerbsFor(target) {
   // A feature may take over any target's menu (rooked trees/animals, shrines under attack).
-  const verbs = features.query('verbOverride', target, engine) ?? features.verbsFor(target, engine) ?? features.decorateVerbs(target, getVerbsFor(target, {
+  return features.query('verbOverride', target, engine) ?? features.verbsFor(target, engine) ?? features.decorateVerbs(target, getVerbsFor(target, {
     pc,
     inv,
     tools: toolState,
@@ -4694,6 +4693,12 @@ function openVerbMenu(target) {
     imaginationUpgrades: pc.imaginationUpgrades || [],
     streetTsid: currentStreetTsid,
   }), engine);
+}
+
+function openVerbMenu(target) {
+  if (currentAction) return;
+  menuTarget = target;
+  const verbs = menuVerbsFor(target);
   // InteractionMenu.as present(): no choices -> a growl, no menu (the Hall's widget: "I have nothing for you!").
   if (!verbs.length && target.emptyMenuGrowl) {
     menuTarget = null;
@@ -7481,6 +7486,9 @@ const engine = {
   wornArticle: (type) => vectorPartName(type),
   /** The pack's Eat / Drink / Use, as if clicked (QA autoplay). */
   usePackItem: (classTsid) => usePackItem(classTsid),
+  /** A target's verb menu, and starting one of its verbs as a menu click would (features/pack-tree-verbs-feature.js). */
+  targetVerbs: (target) => menuVerbsFor(target),
+  beginVerb: (target, verb) => beginVerbAction(target, verb),
   /** Open the Make panel on a machine in the world: { tool, toolState, onComplete({ recipe, key, made }) } (G169). */
   openMakeStation: (station) => openMakePanel(station),
   /** First non-null answer from any feature's `hook` (feature-host query). */
