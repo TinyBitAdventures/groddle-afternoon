@@ -107,7 +107,7 @@ import { IMAGINATION_UPGRADES } from '../imagination.js';
 import { assignQuest, completeQuest } from '../quests.js';
 import { acceptOffer, enqueueQuestOffer, questAwardPayload, turnInQuest } from '../quest-offers.js';
 import { getQuestCatalog } from '../content-catalogs.js';
-import { locationEventsApi } from './location-events-feature.js?v=location-events-2';
+import { locationEventsApi } from './location-events-feature.js?v=location-events-3';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';

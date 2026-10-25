@@ -16,13 +16,33 @@
  * (QA 23.6 s). The client held quest conversations under the card and showed
  * them once it had gone (QuestsDialog.as onEmergencyTick 338, G192).
  *
- * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=now offers the first
- * pending quest immediately; &questofferautoplay=accept accepts it. Other QA
- * routes (any *demo or *autoplay param) get no offers; ?questoffer=off
- * silences them anywhere. &questofferaward=1 queues an award screen when a
- * check first falls under a loading card (G213: the screen shows as the card
- * goes and the check looks again every second while it is up); canvas
- * questOfferAfterCardMs is the wait from the card going to the offer.
+ * G225: only is_emergency offers pop up on the street (no close, Escape does
+ * nothing, rays behind the rock). Every other offer waits in the quest log,
+ * as in the final client: QuestManager.as 115-143 counts it on the player
+ * info (updateNewQuestCount; ImaginationButton.as 96-135 pops the count and
+ * shows "New Quest Added!" with QUEST_ADDED), and the Quests dialog says "You
+ * have N new quests" with "Show me" / "Show me one" (QuestsDialog.as 241-252),
+ * which opens the oldest one's card inside the dialog (onToastStarted
+ * 222-238). Closing a card without answering leaves the offer waiting
+ * (onConvoClose 209-216); "Not right now" declines it as before. An emergency
+ * left unanswered (closed by force, or saved) shows again on the next check
+ * (onEmergencyTick 335-360).
+ *
+ * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=now runs the first check
+ * at once (on a fresh level 5 save that is send_mail, an emergency, so it
+ * pops); &questofferautoplay=accept accepts it, opening a waiting offer from
+ * the Quests dialog when the offer waits. &questofferpop=1 pops ordinary
+ * offers on the street too (the pre-G225 behaviour, for older QA routes).
+ * &questofferdemo=waiting (&questoffercount=N, default 3) puts N ordinary
+ * offers in the log at once; =show also opens the Quests dialog and presses
+ * "Show me". Other QA routes (any *demo or *autoplay param) get no offers;
+ * ?questoffer=off silences them anywhere (the demo still runs).
+ * &questofferaward=1 queues an award screen when a check first falls under a
+ * loading card (G213: the screen shows as the card goes and the check looks
+ * again every second while it is up); canvas questOfferAfterCardMs is the wait
+ * from the card going to the offer. Canvas: questOffer (the last offer made),
+ * questOffersWaiting (the count), questOfferCard (the open card: id:street|log),
+ * questOfferResult.
  */
 
 import {
@@ -32,11 +52,14 @@ import {
   heldForNpcTurnIn,
   markOffered,
   nextQuestOffer,
+  pendingQuestOffers,
   questAwardPayload,
+  questOfferCard,
   routeQuestEvent,
   syncItemRequirements,
   tickQuestTimers,
   turnInQuest,
+  waitingOffers,
 } from '../quest-offers.js';
 import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-4';
 
@@ -56,6 +79,14 @@ let cardGoneAt = 0;
 let qaAwardQueued = false;
 /** Offers are suppressed on QA routes and with ?questoffer=off. */
 let quiet = false;
+/** The card on screen: { classTsid, inLog } (G225). */
+let openCard = null;
+/** Waiting offers at the last sync (-1 before the first), for the count's pop. */
+let lastWaiting = -1;
+/** &questofferdemo (G225 QA), run once the game has started. */
+let demo = '';
+let ui = null;
+let noticeTimer = 0;
 /** Pack counts at the last sync, for `in_inventory:<item>` gain events. */
 let lastPack = null;
 // Musicblocks and Cubimals already emit in_inventory through their badges.
@@ -104,17 +135,43 @@ function finish(rows, engine) {
 function presentOffer(engine, now = Date.now()) {
   if (offerOpen || engine.busy() || engine.questOffersHeld?.()) return false;
   const qs = engine.questState;
-  const card = nextQuestOffer(qs, engine.pc, questContext(engine, now));
-  if (!card || card.waiting) {
-    if (card?.waiting) nextOfferCheckAt = now + Math.max(1_000, card.waiting);
-    return false;
+  // QuestsDialog.as onEmergencyTick 335-360: an emergency still unanswered shows again.
+  const again = waitingOffers(qs).find((row) => row.emergency);
+  let card = again ? questOfferCard(again.classTsid) : null;
+  if (!card) {
+    card = nextQuestOffer(qs, engine.pc, questContext(engine, now));
+    if (!card || card.waiting) {
+      if (card?.waiting) nextOfferCheckAt = now + Math.max(1_000, card.waiting);
+      return false;
+    }
+    markOffered(qs, card.classTsid, now);
   }
-  markOffered(qs, card.classTsid, now);
-  offerOpen = true;
   engine.setData('questOffer', card.classTsid);
+  if (card.emergency === true || engine.param('questofferpop') === '1') {
+    openOffer(engine, card, { inLog: false });
+    return true;
+  }
+  // G225: an ordinary offer waits in the quest log (QuestManager.as 115-138).
+  engine.save();
+  syncWaiting(engine);
+  if (engine.param('questofferautoplay') === 'accept') setTimeout(() => showWaitingOffer(engine, { openPanel: true }), 400);
+  return true;
+}
+
+/** Show an offer's card: on the street, or inside the Quests dialog (`inLog`). */
+function openOffer(engine, card, { inLog = false } = {}) {
+  const qs = engine.questState;
+  offerOpen = true;
+  openCard = { classTsid: card.classTsid, inLog };
+  engine.setData('questOfferCard', `${card.classTsid}:${inLog ? 'log' : 'street'}`);
   engine.playSound('QUEST_OFFER', { volume: 0.55 });
-  const accept = () => {
+  const settle = () => {
     offerOpen = false;
+    openCard = null;
+    engine.setData('questOfferCard', '');
+  };
+  const accept = () => {
+    settle();
     const result = acceptOffer(qs, card.classTsid, questContext(engine));
     engine.setData('questOfferResult', result.ok ? 'accepted' : result.reason || 'failed');
     if (result.ok) {
@@ -125,13 +182,15 @@ function presentOffer(engine, now = Date.now()) {
       if (result.completable?.length && !card.def.instanceRoom) finish([{ classTsid: card.classTsid, def: card.def }], engine);
     }
     engine.save();
+    syncWaiting(engine);
   };
   const decline = () => {
-    offerOpen = false;
+    settle();
     declineOffer(qs, card.classTsid, Date.now());
     engine.setData('questOfferResult', 'declined');
     engine.pushActivity(`You can accept “${card.def.title}” from your quest log later.`);
     engine.save();
+    syncWaiting(engine);
   };
   engine.offerQuestDialogue({
     title: card.def.title,
@@ -141,11 +200,105 @@ function presentOffer(engine, now = Date.now()) {
     declineLabel: card.declineLabel,
     onAccept: accept,
     onDecline: decline,
-    // G211: is_emergency offers pop with the rays behind the rock (QuestConversationUI.as 147-153).
-    urgent: card.emergency === true,
+    // G211: is_emergency offers pop with the rays behind the rock (QuestConversationUI.as 147-153);
+    // inside the Quests dialog they have none (hide_rays, QuestsDialog.as 349).
+    urgent: card.emergency === true && !inLog,
+    inLog,
   });
+  syncWaiting(engine);
   if (engine.param('questofferautoplay') === 'accept') setTimeout(() => engine.acceptOpenOffer(), 400);
+}
+
+/**
+ * "Show me" (QuestsDialog.as onToastStarted 222-238): the oldest waiting
+ * offer opens inside the Quests dialog. `openPanel` opens the dialog first (QA).
+ */
+export function showWaitingOffer(engine, { openPanel = false } = {}) {
+  if (offerOpen) return false;
+  const row = waitingOffers(engine.questState).find((r) => !r.emergency);
+  const card = row ? questOfferCard(row.classTsid) : null;
+  if (!card) return false;
+  if (openPanel && typeof document !== 'undefined' && document.getElementById('quest-panel')?.hidden) {
+    document.getElementById('quest-btn')?.click();
+  }
+  openOffer(engine, card, { inLog: true });
   return true;
+}
+
+/** QuestsDialog.as updateCountToast 241-252: the toast's words for `n` new quests. */
+export function questCountToast(n) {
+  const count = Math.max(0, Math.floor(Number(n) || 0));
+  return {
+    count,
+    text: count ? `You have ${count} new ${count !== 1 ? 'quests' : 'quest'}` : '',
+    button: count > 1 ? 'Show me one' : 'Show me',
+  };
+}
+
+function buildUi(engine) {
+  if (typeof document === 'undefined') return null;
+  if (ui?.toast?.isConnected) return ui;
+  const btn = document.getElementById('quest-btn');
+  const list = document.getElementById('quest');
+  if (!btn || !list) return null;
+  const count = document.createElement('span');
+  count.className = 'quest-btn-count';
+  count.hidden = true;
+  count.setAttribute('aria-hidden', 'true');
+  const notice = document.createElement('span');
+  notice.className = 'quest-added-notice';
+  notice.textContent = 'New Quest Added!';
+  notice.setAttribute('aria-hidden', 'true');
+  btn.append(count, notice);
+  const toast = document.createElement('div');
+  toast.id = 'quest-offer-toast';
+  toast.className = 'quest-offer-toast';
+  toast.hidden = true;
+  toast.setAttribute('role', 'status');
+  toast.innerHTML = '<span data-quest-toast-text></span><button type="button" data-quest-toast-show></button>';
+  list.parentNode.insertBefore(toast, list);
+  toast.querySelector('[data-quest-toast-show]').addEventListener('click', () => showWaitingOffer(engine));
+  ui = { btn, count, notice, toast, text: toast.querySelector('[data-quest-toast-text]'), show: toast.querySelector('[data-quest-toast-show]') };
+  return ui;
+}
+
+/** Update the count, the toast and canvas data; a rise pops the count with "New Quest Added!". */
+function syncWaiting(engine) {
+  const n = waitingOffers(engine.questState).filter((row) => !row.emergency).length;
+  engine.setData('questOffersWaiting', String(n));
+  const el = buildUi(engine);
+  if (el) {
+    const words = questCountToast(n);
+    el.count.textContent = String(n);
+    el.count.hidden = n <= 0;
+    el.btn.title = n ? `Quests (Q): ${words.text}` : 'Quests (Q)';
+    el.toast.hidden = n <= 0;
+    el.text.innerHTML = n ? `You have <b>${n}</b> new ${n !== 1 ? 'quests' : 'quest'}` : '';
+    el.show.textContent = words.button;
+    // QuestsDialog.as onQuestUpdated 306-307: the button waits while a conversation is open.
+    el.show.disabled = offerOpen;
+    if (lastWaiting >= 0 && n > lastWaiting) {
+      el.count.classList.remove('is-pop');
+      void el.count.offsetWidth;
+      el.count.classList.add('is-pop');
+      el.notice.classList.add('is-shown');
+      clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => el.notice.classList.remove('is-shown'), 3300);
+    }
+  }
+  if (lastWaiting >= 0 && n > lastWaiting) engine.playSound?.('QUEST_ADDED', { volume: 0.6 });
+  lastWaiting = n;
+}
+
+/** &questofferdemo=waiting|show: N ordinary offers straight into the log (G225 QA). */
+function runDemo(engine, mode) {
+  const qs = engine.questState;
+  const want = Math.max(1, Number(engine.param('questoffercount')) || 3);
+  const rows = pendingQuestOffers(qs, engine.pc, questContext(engine)).filter((row) => !row.emergency).slice(0, want);
+  rows.forEach((row, i) => markOffered(qs, row.classTsid, Date.now() - (rows.length - i)));
+  engine.save();
+  syncWaiting(engine);
+  if (mode === 'show') setTimeout(() => showWaitingOffer(engine, { openPanel: true }), 1200);
 }
 
 export const questOffersFeature = {
@@ -162,6 +315,11 @@ export const questOffersFeature = {
     nextOfferCheckAt = Date.now() + (engine.param('questoffer') === 'now' ? 1_500 : 12_000);
     heldByCard = false;
     cardGoneAt = 0;
+    offerOpen = false;
+    openCard = null;
+    lastWaiting = -1;
+    nextSyncAt = 0;
+    demo = String(engine.param('questofferdemo') || '');
   },
 
   onStreetEnter(street, engine) {
@@ -180,14 +338,21 @@ export const questOffersFeature = {
   onTick(dtMs, now, engine) {
     if (!engine.started) return;
     if (offerOpen && !engine.questDialogueOpen()) {
-      // Closed with Escape: treat it as "Not right now".
+      // G225: closed without an answer (the X in the Quests dialog, Escape):
+      // the offer keeps waiting in the log (QuestsDialog.as onConvoClose 209-216).
       offerOpen = false;
-      const pending = Object.keys(ensureQuestOfferState(engine.questState).offered);
-      for (const id of pending) declineOffer(engine.questState, id, now);
-      engine.save();
+      openCard = null;
+      engine.setData('questOfferCard', '');
+      syncWaiting(engine);
+    }
+    if (demo) {
+      const mode = demo;
+      demo = '';
+      setTimeout(() => runDemo(engine, mode), 800);
     }
     if (now >= nextSyncAt) {
       nextSyncAt = now + SYNC_MS;
+      syncWaiting(engine);
       const qs = engine.questState;
       const failed = tickQuestTimers(qs, now);
       for (const id of failed) engine.pushActivity('A timed quest ran out of time. You can restart it from the quest log.');

@@ -134,17 +134,57 @@ export function raysSvg(kind = 'quest', radius = RAY_SETS[kind]?.radius || 80, i
     `<g fill="url(#${id})">${paths}</g></svg>`;
 }
 
+/** LayoutModel.as 37: familiar_dialog_min_w (the CONVERSATION panel's width floor). */
+export const FAMILIAR_DIALOG_MIN_W = 330;
+
 /**
- * Which look the shared quest card takes. `familiar`: the Magic Rock speaks
- * (its quest offers, story offers from the quest log, its other lines):
- * QuestConversationUI. `vog`: a tutorial voice-of-rock overlay
- * (inc_announcements.js bubble_familiar). Anything else keeps the plain card.
+ * Which look the shared quest card takes.
+ * `familiar`: a Magic Rock quest offer (its own offers, story offers from the
+ *   quest log): QuestConversationUI, the rock beside a dark bubble.
+ * `conversation`: any other Magic Rock line (familiar_send_alert, a quest
+ *   room's familiar talk, instances_exit_familiar): the FamiliarDialog
+ *   CONVERSATION panel, ChoicesDialog FAM_CONVERSATION (G225). No rock: the
+ *   2012 familiar talks from a dark panel grown out of the header.
+ * `vog`: a tutorial voice-of-rock overlay (inc_announcements.js bubble_familiar).
+ * Anything else keeps the plain card (prompts_add lines say look: 'plain').
  */
-export function familiarLook({ look = '', kicker = '', mode = '' } = {}) {
-  if (look === 'vog' || look === 'familiar' || look === 'plain') return look;
-  if (mode === 'offer') return 'familiar';
-  if (String(kicker).trim() === 'Magic Rock') return 'familiar';
+export function familiarLook({ look = '', kicker = '', mode = '', offer = false } = {}) {
+  if (['vog', 'familiar', 'plain', 'conversation'].includes(look)) return look;
+  if (mode === 'offer' || offer === true) return 'familiar';
+  if (String(kicker).trim() === 'Magic Rock') return 'conversation';
   return 'plain';
+}
+
+/**
+ * The location viewport inside the game root (TSMainView: loc_vp_w excludes
+ * the right-hand rail, loc_vp_h the pack; the header sits above the root).
+ * `railLeft` is where a visible right rail starts, 0 or less for none.
+ */
+export function locationViewport({ rootW = 0, rootH = 0, packH = 0, railLeft = 0 } = {}) {
+  const w = Math.max(1, Math.round(railLeft > 0 && railLeft < rootW ? railLeft : rootW));
+  const h = Math.max(1, Math.round(rootH - Math.max(0, packH)));
+  return { x: 0, y: 0, w, h };
+}
+
+/**
+ * Measure the location viewport in a modal's own box (the modal lies over the
+ * game root; a .glitch-modal already stops above the pack).
+ */
+export function measureLocationViewport(modal) {
+  const box = modal?.getBoundingClientRect?.();
+  if (typeof document === 'undefined' || !box || !box.width) {
+    return locationViewport({ rootW: modal?.clientWidth || 800, rootH: modal?.clientHeight || 600 });
+  }
+  const pack = document.getElementById('pack-bar');
+  const rail = document.getElementById('play-context');
+  const packRect = pack && pack.offsetParent !== null ? pack.getBoundingClientRect() : null;
+  const railRect = rail && rail.offsetParent !== null ? rail.getBoundingClientRect() : null;
+  return locationViewport({
+    rootW: box.width,
+    rootH: box.height,
+    packH: packRect ? box.bottom - packRect.top : 0,
+    railLeft: railRect ? railRect.left - box.left : 0,
+  });
 }
 
 /** QuestConversationUI.as 86: the header of an offer card. */
@@ -310,28 +350,66 @@ export function ensureFamiliarRock(host, { size = QUEST_ROCK_WH, rays = 'quest',
 }
 
 /**
- * Dress a `.quest-dialogue` modal for a look: sets data-look / data-urgent,
- * builds the rock (and its rays) when the look needs one, and for the voice
- * overlay sizes the art from the viewport (inc_announcements.js 189-218:
- * size 40% of the smaller side, x 50%, y 15%; the bubble at top_y 25%).
+ * Voice-of-rock geometry in a location viewport (inc_announcements.js 189-218:
+ * the art at x 50%, y 15%, sized 40% of the smaller side; the bubble at top_y
+ * 25% under an 18 x 12 px pointer). Coordinates are in the viewport's parent.
  */
-export function applyFamiliarLook(modal, { look = 'plain', urgent = false, width = 0 } = {}) {
+export function vogLayout(vp = { x: 0, y: 0, w: 800, h: 600 }) {
+  const box = 0.4 * Math.min(vp.w, vp.h);
+  const scale = box / VOG_ART_W;
+  const top = Math.round(vp.y + 0.25 * vp.h + 12);
+  return {
+    scale,
+    rockSize: Math.round(PET_ROCK_SHEETS.idle.bbox.h * scale),
+    raysRadius: RAY_SETS.vog.radius * scale,
+    centerX: Math.round(vp.x + vp.w / 2),
+    top,
+    // The rock's centre (15%) relative to the card's top.
+    rockDy: Math.round(vp.y + 0.15 * vp.h) - top,
+    maxW: Math.max(120, Math.round(vp.w - 24)),
+  };
+}
+
+/**
+ * Dress a `.quest-dialogue` modal for a look: sets data-look / data-urgent,
+ * builds the rock (and its rays) when the look needs one, places the voice
+ * overlay and the conversation panel in the location viewport, and grows the
+ * conversation panel out of the header centre when it opens (`grow`).
+ * `at` ({ x, y } in the modal) pins an offer card inside the Quests dialog
+ * (QuestsDialog.as onToastStarted 229-231: x 10, list top + 10), with no rays.
+ */
+export function applyFamiliarLook(modal, { look = 'plain', urgent = false, width = 0, grow = false, at = null } = {}) {
   if (!modal) return;
+  const was = modal.dataset.look;
   modal.dataset.look = look;
-  modal.dataset.urgent = urgent ? 'true' : 'false';
+  modal.dataset.urgent = urgent && !at ? 'true' : 'false';
+  modal.dataset.inLog = at ? 'true' : 'false';
   const card = modal.querySelector('.quest-dialogue-card');
   if (!card) return;
   if (look === 'familiar') {
     ensureFamiliarRock(card, { size: QUEST_ROCK_WH, rays: 'quest' });
+    if (at) {
+      card.style.setProperty('--fam-log-x', `${Math.round(at.x)}px`);
+      card.style.setProperty('--fam-log-y', `${Math.round(at.y)}px`);
+    }
   } else if (look === 'vog') {
-    const w = modal.clientWidth || 800;
-    const h = modal.clientHeight || 600;
-    const box = 0.4 * Math.min(w, h);
-    const scale = box / VOG_ART_W;
-    const rockSize = Math.round(PET_ROCK_SHEETS.idle.bbox.h * scale);
-    ensureFamiliarRock(card, { size: rockSize, rays: 'vog', raysRadius: RAY_SETS.vog.radius * scale });
+    const lay = vogLayout(measureLocationViewport(modal));
+    ensureFamiliarRock(card, { size: lay.rockSize, rays: 'vog', raysRadius: lay.raysRadius });
     card.style.setProperty('--vog-w', `${width || 500}px`);
-    // The card's top sits at 25% + the 12 px pointer; the rock's centre at 15%.
-    card.style.setProperty('--vog-dy', `${-Math.round(0.1 * h + 12)}px`);
+    card.style.setProperty('--vog-x', `${lay.centerX}px`);
+    card.style.setProperty('--vog-top', `${lay.top}px`);
+    card.style.setProperty('--vog-max-w', `${lay.maxW}px`);
+    card.style.setProperty('--vog-dy', `${lay.rockDy}px`);
+  } else if (look === 'conversation') {
+    // FamiliarDialog._place 500-509: centred in the location viewport, header + 30.
+    const vp = measureLocationViewport(modal);
+    card.style.setProperty('--fam-vp-cx', `${Math.round(vp.x + vp.w / 2)}px`);
+    card.style.setProperty('--fam-vp-w', `${vp.w}px`);
+    if (grow || was !== 'conversation') {
+      // FamiliarDialog.start 330-343: scale 0.02 at the header centre, 0.3 s easeInCubic.
+      card.classList.remove('fam-grow');
+      void card.offsetWidth;
+      card.classList.add('fam-grow');
+    }
   }
 }

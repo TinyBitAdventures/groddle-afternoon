@@ -200,15 +200,11 @@ function applyEffects(engine, effects, now) {
         const next = () => {
           if (fx.next && current && engine.streetTsid === tsid) fire(engine, fx.next, true, clock);
         };
-        // G213: a VOG has no speaker. locations/inc_events.js events_VOGPlayer 556-600
-        // sends a locking vp_overlay (click_to_advance, one line a click, no close) of
-        // centred nuxp_vog text, so no "Mr. Block" kicker, no Close and no quest sound.
-        engine.scriptedDialogue({
-          title: engine.street?.label || '',
-          kicker: null,
-          beats: fx.lines.map((text) => ({ text, response: 'OK' })),
-          onComplete: next,
-        });
+        // G213/G228: locations/inc_events.js events_VOGPlayer 556-600 sends a locking
+        // vp_overlay (click_to_advance, one line a click, no close) of centred nuxp_vog
+        // text over a 30% black shade, its next_event as the done_payload. game.js
+        // engine.vog draws that (js/vog-overlay.js), not the quest card.
+        engine.vog?.({ lines: fx.lines, onComplete: next });
         break;
       }
       case 'activity':

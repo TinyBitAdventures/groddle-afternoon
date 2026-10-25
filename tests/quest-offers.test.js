@@ -38,6 +38,8 @@ import {
   nextQuestOffer,
   npcQuestOffers,
   markOffered,
+  questOfferCard,
+  waitingOffers,
   declineOffer,
   acceptOffer,
   listDeclinedOffers,
@@ -217,8 +219,13 @@ describe('familiar delivery, decline and accept', () => {
     assert.equal(first.classTsid, 'buy_bag');
     assert.ok(first.beats.length > 0);
     markOffered(state, first.classTsid, ctx.now);
-    assert.equal(nextQuestOffer(state, pc, ctx), null, 'one offer at a time');
+    // G225: an offer made waits in the log; only the 5-minute spacing holds the next (quests_offer).
+    const held = nextQuestOffer(state, pc, ctx);
+    assert.ok(held.waiting > 0 && held.classTsid !== 'buy_bag', 'the next offer waits out the spacing');
+    assert.deepEqual(waitingOffers(state).map((row) => [row.classTsid, row.emergency]), [['buy_bag', true]]);
+    assert.equal(questOfferCard('buy_bag').title, first.title);
     acceptOffer(state, 'buy_bag', { now: ctx.now });
+    assert.deepEqual(waitingOffers(state), []);
     const waiting = nextQuestOffer(state, pc, { ...ctx, now: ctx.now + 1000 });
     assert.ok(waiting.waiting > 0 && waiting.waiting <= OFFER_INTERVAL_MS);
     const later = nextQuestOffer(state, pc, { ...ctx, now: ctx.now + OFFER_INTERVAL_MS });

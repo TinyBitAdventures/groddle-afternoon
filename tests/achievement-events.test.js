@@ -201,12 +201,13 @@ describe('video badge client integration', () => {
     const html = readFileSync(join(publicRoot, 'play/index.html'), 'utf8');
     assert.match(game, /worldVerbAchievementCounters\(target\.classId, verbId, result\)/);
     assert.match(game, /makingToolAchievementCounter\(record\.recipe\.tool\)/);
-    assert.match(game, /update\.def\.statusText[\s\S]*update\.def\.desc/);
+    // G225: the card prints desc; the rock's bubble says status_text (AchievementView.as 347-349, 552).
+    assert.match(game, /body: update\.def\.desc \|\| update\.def\.description \|\| '',\n\s+status: update\.def\.statusText \|\| update\.def\.status_text \|\| '',/);
     assert.match(game, /rewards\.favor\?\.points/);
     assert.match(game, /achievementdemo/);
     assert.match(game, /achievementUnlocked/);
     assert.match(game, /badge-icons\.json\?v=catalog-art-3/);
-    assert.match(game, /screen-fx\.js\?v=g211-1/);
+    assert.match(game, /screen-fx\.js\?v=g225-1/);
     assert.match(html, /game\.js\?v=official-ecology-1/);
     assert.match(html, /badges=catalog-art-3/);
     assert.match(game, /muted: loadMutedPreference\(\)/);

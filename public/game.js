@@ -4,8 +4,9 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-82';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-83';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
+import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
   actionDurationFor,
   createTimedAction,
@@ -634,10 +635,11 @@ import {
   showAwardScreen,
   afterStreetCard,
   streetCardUp,
+  STREET_CARD_UP,
   cardPausedTimeout,
-} from './js/screen-fx.js?v=g211-1';
-import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g211-1';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g211-1';
+} from './js/screen-fx.js?v=g225-1';
+import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g225-1';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g225-1';
 import {
   planTravel,
   listMapDestinations,
@@ -1914,12 +1916,10 @@ function announceAchievementUpdates(updates = []) {
       kind: 'achievement',
       classTsid: update.classTsid || update.def.classTsid,
       title: update.def.name || update.def.title || 'Badge',
-      body:
-        update.def.statusText ||
-        update.def.status_text ||
-        update.def.desc ||
-        update.def.description ||
-        '',
+      // G225: the card prints desc and the rock's bubble says status_text
+      // (AchievementView.as 347-349, 552; inc_achievements.js 310-311).
+      body: update.def.desc || update.def.description || '',
+      status: update.def.statusText || update.def.status_text || '',
       subtitle: rewardBits.join(' · '),
       iconUrl: badgeIconFor(update.classTsid || update.def.classTsid),
       // inc_achievements.js:428: collection trophies say TROPHY_RECEIVED, every other badge ACHIEVEMENT_UNLOCKED.
@@ -5778,7 +5778,81 @@ function enterChooserUi() {
   return enterChooser;
 }
 
+/**
+ * G228: location-event VOGs (js/vog-overlay.js, inc_events.js events_VOGPlayer
+ * 556-600): centred lines over a 30% shade on the location view, one a click.
+ * Like the scripted dialogs they wait for the Enter chooser and verb menus
+ * (G217) and for the street loading card (G192).
+ */
+let vogOverlay = null;
+
+function vogOverlayUi() {
+  vogOverlay ||= createVogOverlay({
+    document,
+    mount: () => document.getElementById('game-root'),
+    // The location viewport: the canvas above the pack (loc_vp_h = VIEW_H - MIN_PACK_HEIGHT).
+    rect: () => {
+      const root = document.getElementById('game-root');
+      const canvas = app?.canvas;
+      if (!root || !canvas) return null;
+      const r = root.getBoundingClientRect();
+      const c = canvas.getBoundingClientRect();
+      // The pack bar overlays the canvas: the view ends at its top edge when it is shown.
+      const pack = document.getElementById('pack-bar')?.getBoundingClientRect();
+      const bottom = pack && pack.height > 0 && pack.top > c.top && pack.top < c.bottom
+        ? pack.top
+        : c.top + (c.height * LOCATION_VIEW_H) / VIEW_H;
+      return {
+        left: c.left - r.left - root.clientLeft,
+        top: c.top - r.top - root.clientTop,
+        width: c.width,
+        height: bottom - c.top,
+      };
+    },
+    setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
+  });
+  return vogOverlay;
+}
+
+function isVogOpen() {
+  return Boolean(vogOverlay?.isOpen());
+}
+
+function openLocationVog(opts) {
+  if (holdScriptedDialog({ ...opts, vog: true })) return;
+  if (streetCardUp()) {
+    const tsid = currentStreetTsid;
+    afterStreetCard().then(() => { if (currentStreetTsid === tsid) openLocationVog(opts); });
+    return;
+  }
+  vogOverlayUi().show(opts);
+}
+
+/**
+ * G228: a street change ends the Enter chooser (its choices are the old
+ * street's) and the VOG on screen or waiting (TSMainView.as moveMoveStarted
+ * 1589-1635: dialogs close and cancelAllOverlaysWeCan, 1612).
+ */
+function endStreetOverlays(reason = 'street-change') {
+  if (enterChooser?.isOpen()) enterChooser.close(reason);
+  vogOverlay?.cancel();
+  for (let i = heldScriptedDialogs.length - 1; i >= 0; i -= 1) {
+    if (heldScriptedDialogs[i]?.vog) heldScriptedDialogs.splice(i, 1);
+  }
+}
+
+/** G228: a feature that holds Enter (the crab's call-out), else null. */
+function enterHeldBy() {
+  return features.query('holdsEnter', engine) || null;
+}
+
 function tryOpenNearestMenu({ nearestFirst = false } = {}) {
+  // G228: the crab's call-out never took focus (dont_take_focus), so Enter never
+  // answered it; here it does nothing while the call-out is up instead of
+  // opening the chooser over it.
+  const held = enterHeldBy();
+  if (app?.canvas) app.canvas.dataset.enterHeld = held || '';
+  if (held) return;
   // The original interaction cadence often chains verbs (pet → nibble). Large
   // trant hit boxes can overlap small animals, so keep E on the entity just
   // used until the player moves away or deliberately moves the pointer.
@@ -7725,6 +7799,7 @@ const engine = {
         menuTarget ||
         isQuestDialogueOpen() ||
         isScreenFxBlocking() ||
+        isVogOpen() ||
         anyTransientInstance() ||
         engine.inScene() ||
         engine.instanceHold ||
@@ -7738,14 +7813,15 @@ const engine = {
   questDialogueOpen: () => isQuestDialogueOpen(),
   /** True while a feature holds the Magic Rock quiet (rook attack, Naraka, meditation). */
   questOffersHeld: () => features.query('holdQuestOffers', engine) === true,
-  /** A quest offer: the recovered beats, then accept / decline. */
-  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false }) {
+  /** A quest offer: the recovered beats, then accept / decline. `inLog` opens it inside the Quests dialog (G225). */
+  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false, inLog = false }) {
     openScriptedQuestDialogue({
       title,
       kicker,
       // G211: an offer card ("New Quest"); is_emergency offers get the rays.
       offer: true,
       urgent: urgent === true,
+      inLog: inLog === true,
       beats: beats?.length ? beats : [{ text: title, response: acceptLabel || 'OK' }],
       onComplete: (...args) => {
         playSound('QUEST_ADDED', { volume: 0.6 });
@@ -7911,9 +7987,10 @@ const engine = {
     // G213: one button per source choice and nothing else (PromptView.as 286-322): a one-choice
     // prompt (Pooped, Super Pooped) has no Close, and Escape does not answer it. No choices: one OK.
     const list = (Array.isArray(choices) ? choices : []).filter((c) => c && c.label);
+    // G228: no kicker or heading unless passed (PromptView.as 210-237 text only, 462 title).
     openScriptedQuestDialogue({
-      title,
-      kicker,
+      title: title || null,
+      kicker: kicker || null,
       beats: [{ text, response: list[0]?.label || 'OK' }],
       cancelable: list.length > 1,
       primaryLabel: list[0]?.label || '',
@@ -7930,6 +8007,9 @@ const engine = {
   startHogHaulRace: (opts = {}) => startHogHaulRace(opts),
   /** A scripted NPC conversation: beats, onComplete; cancelable adds a second button (primaryLabel / cancelLabel, onCancel). */
   scriptedDialogue: (opts) => openScriptedQuestDialogue(opts),
+  /** G228: a location event's VOG ({ lines, onComplete }): js/vog-overlay.js, not the quest card. */
+  vog: (opts) => openLocationVog(opts),
+  vogOpen: () => isVogOpen(),
   stopFollowing: () => stopCompanionFollowForInstance(),
   transientInstance: () => anyTransientInstance() || engine.inScene() || Boolean(engine.instanceHold),
   homeContext() {
@@ -7964,7 +8044,7 @@ const engine = {
   streetWorld: (tsid) => streetWorldState(tsid),
   /** createItemStack on the current street: a ground stack anyone can pick up. */
   dropWorldStack(classTsid, count, x, y) {
-    const result = dropInventoryStack(droppedItemState, { [classTsid]: count }, currentStreetTsid, classTsid, count, { x, y }, { now: Date.now(), merge: false });
+    const result = dropInventoryStack(droppedItemState, { [classTsid]: count }, droppedStacksTsid(), classTsid, count, { x, y }, { now: Date.now(), merge: false });
     if (result.ok) {
       saveDroppedItems();
       refreshDroppedWorldItems();
@@ -8745,7 +8825,7 @@ function refreshDroppedWorldItems() {
     spr?.destroy?.({ children: true });
   }
   droppedItemSprites = [];
-  const streetStacks = listDroppedStacks(droppedItemState, currentStreetTsid);
+  const streetStacks = listDroppedStacks(droppedItemState, droppedStacksTsid());
   app.canvas.dataset.droppedStacks = String(streetStacks.length);
   app.canvas.dataset.droppedStootDolls = String(
     streetStacks.filter((stack) => stack.classTsid === STOOT_DOLL_ID).length
@@ -8793,7 +8873,7 @@ function dropPackItem(classTsid, requested = 1) {
   const result = dropInventoryStack(
     droppedItemState,
     inv,
-    currentStreetTsid,
+    droppedStacksTsid(),
     classTsid,
     count,
     { x, y },
@@ -8820,7 +8900,7 @@ function pickupDroppedWorldItem(target) {
   const id = target?.state?.id || target?.worldItemId;
   const x = target?.sprite?.x ?? player?.x ?? 0;
   const y = target?.sprite?.y ?? player?.y ?? 0;
-  const result = pickupDroppedStack(droppedItemState, inv, currentStreetTsid, id);
+  const result = pickupDroppedStack(droppedItemState, inv, droppedStacksTsid(), id);
   if (!result.ok) {
     toast('That stack has already been picked up.');
     refreshDroppedWorldItems();
@@ -9313,6 +9393,7 @@ function gameplayInputBlocked() {
     greedyStreetTransitionBusy ||
     rookHitFx ||
     isQuestDialogueOpen() ||
+    isVogOpen() ||
     isRookMuseumExhibitOpen() ||
     menuTarget ||
     currentAction ||
@@ -18409,6 +18490,7 @@ function handleHomeTarget(target, verbId) {
 
 function clearWorldEntities() {
   cancelCurrentAction({ quiet: true });
+  endStreetOverlays();
   clearHoverGlow();
   clearSignpostBoardHover();
   recentInteractionTarget = null;
@@ -19359,7 +19441,11 @@ function renderQuestDialogueBeat() {
     kicker.hidden = questDialogueState.kicker === null;
     kicker.textContent = questDialogueState.kicker || (mode === 'script' ? 'Conversation' : 'New quest');
   }
-  if (title) title.textContent = def?.title || questDialogueState.title || 'Quest';
+  if (title) {
+    // G228: title: null is a prompt with no heading (engine.prompt without a source title).
+    title.hidden = !def && questDialogueState.title === null;
+    title.textContent = def?.title || questDialogueState.title || 'Quest';
+  }
   if (copy) copy.textContent = beat.text;
   if (next) {
     const finalBeat = index >= beats.length - 1;
@@ -19380,20 +19466,37 @@ function renderQuestDialogueBeat() {
         ? questDialogueState.cancelLabel || 'Close'
         : 'Maybe later';
   }
-  // G211: the Magic Rock's lines take QuestConversationUI's look (js/familiar.js).
-  const look = familiarLook({ look: questDialogueState.look, kicker: questDialogueState.kicker, mode });
+  // G211: Magic Rock offers take QuestConversationUI's look; G225: its other
+  // lines the FamiliarDialog CONVERSATION panel (js/familiar.js).
   const offer = mode === 'offer' || questDialogueState.offer === true;
+  const look = familiarLook({ look: questDialogueState.look, kicker: questDialogueState.kicker, mode, offer });
   const urgent = look === 'familiar' && questDialogueState.urgent === true;
+  const inLog = look === 'familiar' && questDialogueState.inLog === true;
   const head = modal.querySelector('#quest-dialogue-head span');
-  if (head) head.textContent = familiarCardHeading({ offer, kicker: questDialogueState.kicker });
+  // ConversationManager.as 155-165: a titled familiar conversation shows the quest book and its title.
+  if (head) head.textContent = look === 'conversation' ? (title && !title.hidden ? title.textContent : '') : familiarCardHeading({ offer, kicker: questDialogueState.kicker });
   const closeX = document.getElementById('quest-dialogue-close');
-  // The card's close X declines like "Not right now"; emergencies have none (QuestConversationUI.as 154-155).
-  if (closeX) closeX.hidden = look !== 'familiar' || !cancel || cancel.hidden || urgent;
+  // The card's close X declines like "Not right now" (in the Quests dialog it only closes the card);
+  // emergencies have none (QuestConversationUI.as 154-155). The conversation panel's X ends a
+  // conversation that can be left (ChoicesDialog.as 327-344).
+  if (closeX) closeX.hidden = !['familiar', 'conversation'].includes(look) || ((!cancel || cancel.hidden) && !inLog) || urgent;
   // Split steps show one button; the decline joins the last one (QuestConversationUI.as 207-252).
   if (cancel && look === 'familiar' && offer && closeX && !closeX.hidden && index < beats.length - 1) cancel.hidden = true;
+  const wasHidden = modal.hidden;
   modal.hidden = false;
-  applyFamiliarLook(modal, { look, urgent });
-  if (app?.canvas) app.canvas.dataset.questCardLook = `${look}${urgent ? ':urgent' : ''}`;
+  applyFamiliarLook(modal, { look, urgent, grow: wasHidden, at: inLog ? questLogCardSpot(modal) : null });
+  if (app?.canvas) app.canvas.dataset.questCardLook = `${look}${urgent ? ':urgent' : ''}${inLog ? ':log' : ''}`;
+}
+
+/** G225: an offer opened from the Quests dialog sits inside it (QuestsDialog.as 229-231: x 10, list top + 10). */
+function questLogCardSpot(modal) {
+  const panel = document.getElementById('quest-panel');
+  const list = document.getElementById('quest');
+  if (!panel || panel.hidden || !list) return null;
+  const base = modal.getBoundingClientRect();
+  const p = panel.getBoundingClientRect();
+  const l = list.getBoundingClientRect();
+  return { x: p.left - base.left + 10, y: l.top - base.top + 10 };
 }
 
 function openQuestDialogue(classTsid) {
@@ -19463,10 +19566,12 @@ function openScriptedQuestDialogue({
   look = '',
   offer = false,
   urgent = false,
+  inLog = false,
 }) {
   // G217: an offer or prompt that arrives over the Enter chooser or a verb menu waits until they close.
   if (holdScriptedDialog(arguments[0])) return;
-  closeQuestPanel();
+  // G225: an offer opened from the Quests dialog shows inside it.
+  if (!inLog) closeQuestPanel();
   closePackPopover();
   cancelQuestDialogueTimeout();
   questDialogueState = {
@@ -19476,6 +19581,7 @@ function openScriptedQuestDialogue({
     look,
     offer,
     urgent,
+    inLog,
     beats: (beats || []).map((beat) =>
       typeof beat === 'string' ? { text: beat, response: 'Continue' } : beat
     ),
@@ -19506,8 +19612,11 @@ function holdScriptedDialog(opts) {
 }
 
 function releaseHeldScriptedDialog() {
-  if (!heldScriptedDialogs.length || menuTarget || enterChooser?.isOpen() || isQuestDialogueOpen()) return;
-  openScriptedQuestDialogue(heldScriptedDialogs.shift());
+  if (!heldScriptedDialogs.length || menuTarget || enterChooser?.isOpen() || isQuestDialogueOpen() || isVogOpen()) return;
+  const next = heldScriptedDialogs.shift();
+  // G228: a held VOG goes back to its own overlay.
+  if (next?.vog) openLocationVog(next);
+  else openScriptedQuestDialogue(next);
   if (app?.canvas) app.canvas.dataset.dialogHeld = String(heldScriptedDialogs.length);
 }
 
@@ -19517,6 +19626,11 @@ function closeQuestDialogue(opts = {}) {
     questDialogueState.cancelable !== true &&
     opts.force !== true
   ) {
+    return false;
+  }
+  // G225: an emergency offer on the street has no close and ignores Escape
+  // (QuestConversationUI.as 154-155, escKeyHandler 410-414); its buttons still answer.
+  if (questDialogueState?.urgent === true && !questDialogueState.inLog && opts.cancel !== true && opts.force !== true) {
     return false;
   }
   const onCancel =
@@ -23525,7 +23639,8 @@ async function main() {
     closeQuestDialogue({ cancel: true })
   );
   document.getElementById('quest-dialogue-close')?.addEventListener('click', () =>
-    closeQuestDialogue({ cancel: true })
+    // G225: in the Quests dialog the X only closes the card; the offer keeps waiting (QuestsDialog.as 209-216).
+    closeQuestDialogue({ cancel: questDialogueState?.inLog !== true, force: questDialogueState?.inLog === true })
   );
   document.getElementById('hog-haul-ready-btn')?.addEventListener('click', beginHogHaulCountdown);
   document.getElementById('hog-haul-leave-btn')?.addEventListener('click', leaveHogHaulRace);
@@ -23547,6 +23662,8 @@ async function main() {
     closePackPopover();
   });
 
+  // G228: a move starts (the loading card goes up): the chooser and VOGs end there, not on arrival.
+  document.documentElement.addEventListener(STREET_CARD_UP, () => endStreetOverlays());
   // AvatarController: any key or click restarts the AFK timer (and returns from AFK).
   window.addEventListener('keydown', noteAvatarInput, { capture: true });
   window.addEventListener('pointerdown', noteAvatarInput, { capture: true });
@@ -24347,7 +24464,8 @@ async function main() {
           const plan = enterPlanForPrompt();
           if (plan.mode === 'chooser') label = enterPromptLabel(plan, label);
         }
-        want = {
+        // G228: no Enter hint while a call-out holds Enter.
+        if (!enterHeldBy()) want = {
           key: 'Enter',
           label,
           x: near.sprite.x,

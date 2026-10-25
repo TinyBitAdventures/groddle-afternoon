@@ -2935,18 +2935,6 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
   box-shadow: 0 22px 70px rgba(0,0,0,0.42), inset 0 0 0 1px #cbb7dc;
   padding: 1.2rem 1.45rem 1.1rem;
 }
-.quest-dialogue-orb {
-  display: grid;
-  place-items: center;
-  width: 54px;
-  height: 54px;
-  margin: -0.15rem auto 0.35rem;
-  color: #fff8c7;
-  font-size: 1.8rem;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 28%, #c7a7e2, #70508d 72%);
-  box-shadow: 0 0 22px rgba(149, 106, 185, 0.55);
-}
 .quest-dialogue-card h2 {
   margin: 0.1rem 0 0.7rem;
   color: #543b69;
@@ -7216,12 +7204,12 @@ header.top-bar + .sub { display: none; }
    padding 15) at top_y 25% with an 18 x 12 px pointer up at it. */
 .quest-dialogue[data-look="vog"] { display: block; padding: 0; }
 .quest-dialogue[data-look="vog"] .quest-dialogue-shade,
-.quest-dialogue[data-look="vog"] .quest-dialogue-orb,
 .quest-dialogue[data-look="vog"] .mr-kicker,
 .quest-dialogue[data-look="vog"] .quest-dialogue-card h2 { display: none; }
 .quest-dialogue[data-look="vog"] .quest-dialogue-card {
-  position: absolute; left: 50%; top: calc(25% + 12px); transform: translateX(-50%);
-  box-sizing: border-box; width: min(calc(var(--vog-w, 500px) + 30px), calc(100% - 24px)); max-height: none; overflow: visible;
+  /* G225: placed in the location viewport (familiar.js vogLayout), not the whole game root. */
+  position: absolute; left: var(--vog-x, 50%); top: var(--vog-top, calc(25% + 12px)); transform: translateX(-50%);
+  box-sizing: border-box; width: min(calc(var(--vog-w, 500px) + 30px), var(--vog-max-w, calc(100% - 24px))); max-height: none; overflow: visible;
   padding: 15px; border: 0; border-radius: 7.5px; background: rgba(0, 0, 0, 0.7); box-shadow: none;
   color: #fff; text-align: center;
 }
@@ -7237,6 +7225,93 @@ header.top-bar + .sub { display: none; }
   min-height: 0; margin: 0; font-size: 17px; line-height: 1.35; font-weight: 600; color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
+
+/* G225: an offer opened from the Quests dialog sits inside it, at x 10 and the
+   list top + 10, with no rays (QuestsDialog.as 229-231, 345-351). */
+.quest-dialogue[data-look="familiar"][data-in-log="true"] { display: block; padding: 0; }
+.quest-dialogue[data-look="familiar"][data-in-log="true"] .quest-dialogue-card {
+  position: absolute; left: var(--fam-log-x, 10px); top: var(--fam-log-y, 80px);
+  max-width: calc(100% - var(--fam-log-x, 10px) - 8px);
+}
+
+/* G225: FamiliarDialog CONVERSATION, the Magic Rock's other lines (ChoicesDialog.as
+   FAM_CONVERSATION 249-344, 614-634, 674-677; FamiliarDialog.as 85-95, 453-475,
+   500-509): no shade and no rock; a 360 px panel in 0x0a181d at 0.9, radius 10,
+   grown out of the header centre, centred in the location viewport 30 px under
+   the header. A titled conversation shows the quest book and its title over a
+   1 px 0x49514f rule (ConversationManager.as 155-165); dark buttons; a close X. */
+.quest-dialogue[data-look="conversation"] { display: block; padding: 0; }
+.quest-dialogue[data-look="conversation"] .quest-dialogue-shade,
+.quest-dialogue[data-look="conversation"] .mr-kicker,
+.quest-dialogue[data-look="conversation"] .quest-dialogue-card h2 { display: none; }
+.quest-dialogue[data-look="conversation"] .quest-dialogue-card {
+  position: absolute; left: var(--fam-vp-cx, 50%); top: 30px; transform: translateX(-50%); transform-origin: 50% -30px;
+  box-sizing: border-box; width: 360px; max-width: calc(var(--fam-vp-w, 100%) - 16px); max-height: calc(100% - 40px); overflow: auto;
+  padding: 0 25px 25px; border: 0; border-radius: 10px; background: rgba(10, 24, 29, 0.9); box-shadow: none;
+  color: #fff; text-align: left; font-size: 13px; line-height: 1.4;
+}
+.quest-dialogue[data-look="conversation"] .quest-dialogue-card.fam-grow { animation: famConvGrow 0.3s cubic-bezier(0.32, 0, 0.67, 0) both; }
+@keyframes famConvGrow { from { transform: translateX(-50%) scale(0.02); } to { transform: translateX(-50%) scale(1); } }
+.quest-dialogue[data-look="conversation"] .fam-head {
+  display: flex; align-items: center; gap: 11px; margin: 0 -25px 21px; padding: 10px 40px 8px 10px;
+  border-bottom: 1px solid #49514f; font-size: 15px; font-weight: 800; line-height: 22px; color: #f3e46a;
+}
+.quest-dialogue[data-look="conversation"] .fam-head img { display: block; width: 32px; height: 22px; }
+.quest-dialogue[data-look="conversation"] .fam-head:has(span:empty) { display: block; height: 0; margin-bottom: 25px; padding: 0; border: 0; }
+.quest-dialogue[data-look="conversation"] .fam-head:has(span:empty) img { display: none; }
+.quest-dialogue[data-look="conversation"] .fam-close:not([hidden]) { display: block; position: absolute; top: 8px; right: 8px; }
+.quest-dialogue[data-look="conversation"] .quest-dialogue-copy { min-height: 0; margin: 0; font-size: 14px; line-height: 1.4; color: #fff; }
+.quest-dialogue[data-look="conversation"] .quest-dialogue-actions,
+.quest-dialogue[data-look="conversation"] [data-qi-choices] {
+  display: flex !important; flex-direction: row !important; flex-wrap: wrap; justify-content: center; gap: 11px; margin-top: 15px;
+}
+.quest-dialogue[data-look="conversation"] .quest-dialogue-actions button,
+.quest-dialogue[data-look="conversation"] [data-qi-choices] button {
+  /* Button TYPE_DARK, SIZE_CONVERSATION */
+  min-width: 0; margin: 0; padding: 5px 14px; font: inherit; font-size: 13px; font-weight: 700; line-height: 1.2;
+  color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.55); cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 4px;
+  background: linear-gradient(#66737a, #3d494f); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.quest-dialogue[data-look="conversation"] .quest-dialogue-actions button:hover,
+.quest-dialogue[data-look="conversation"] .quest-dialogue-actions button:focus-visible,
+.quest-dialogue[data-look="conversation"] [data-qi-choices] button:hover,
+.quest-dialogue[data-look="conversation"] [data-qi-choices] button:focus-visible {
+  background: linear-gradient(#78868d, #4a575d); outline: none; box-shadow: 0 0 0 2px rgba(215, 144, 53, 0.75);
+}
+.quest-dialogue[data-look="conversation"] .quest-dialogue-actions button[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .quest-dialogue[data-look="conversation"] .quest-dialogue-card.fam-grow { animation: none; } }
+
+/* G225: offers that wait in the quest log. The count rides the Quests button
+   (ImaginationButton.as 96-135: 0xb21f00 pill, pops to 1.5, "New Quest Added!"
+   for 3 s with QUEST_ADDED) and the Quests dialog says "You have N new quests"
+   with "Show me" (QuestToast.as, QuestsDialog.as 241-252). */
+#quest-btn { position: relative; }
+.quest-btn-count {
+  position: absolute; top: -7px; right: -7px; box-sizing: border-box; min-width: 17px; height: 17px; padding: 0 4px;
+  border-radius: 9px; background: #b21f00; color: #fff; font-size: 11px; font-weight: 800; line-height: 17px; text-align: center;
+  box-shadow: 0 0 0 1px #fff; pointer-events: none;
+}
+.quest-btn-count[hidden] { display: none; }
+.quest-btn-count.is-pop { animation: questCountPop 1.6s ease-out both; }
+@keyframes questCountPop { 0% { transform: scale(0.01); } 18% { transform: scale(1.5); } 80% { transform: scale(1.5); } 100% { transform: scale(1); } }
+.quest-added-notice {
+  position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); white-space: nowrap;
+  font-size: 12px; font-weight: 800; color: #b21f00; text-shadow: 0 1px 0 #fff; pointer-events: none;
+  clip-path: inset(0 0 0 100%); transition: clip-path 0.5s ease 0.3s;
+}
+.quest-added-notice.is-shown { clip-path: inset(0 0 0 0); }
+.quest-offer-toast {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 0.6rem; padding: 0.45rem 0.6rem 0.45rem 0.75rem;
+  border-radius: 8px; background: #fff3c4; border: 1px solid #e7cf7a; color: #4a3b12; font-size: 0.85rem;
+}
+.quest-offer-toast[hidden] { display: none; }
+.quest-offer-toast b { color: #b21f00; }
+.quest-offer-toast button {
+  flex: none; padding: 0.2rem 0.6rem; border: 1px solid #c9b25d; border-radius: 6px; background: #fffbe8; color: #4a3b12;
+  font: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+}
+.quest-offer-toast button:disabled { opacity: 0.5; cursor: default; }
 
 /* FamiliarDialog SKILL_LEARNED: grows out of the header centre (scale 0.02 to 1,
    0.3 s easeInCubic), centred 30 px under the header, 0x0a181d at 0.9, radius 10. */

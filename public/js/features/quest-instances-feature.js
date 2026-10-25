@@ -63,7 +63,7 @@ import {
 } from '../quest-instance.js?v=qi-1';
 import { FAMILIAR_GATES, QUEST_ROOMS, REMINISCE_ITEMS, ROOM_ITEMS, isBuiltRoom, questGiver, roomModulePath } from '../quest-rooms/catalog.js?v=qi-2';
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
-import { locationEventsApi } from './location-events-feature.js?v=location-events-2';
+import { locationEventsApi } from './location-events-feature.js?v=location-events-3';
 import {
   acceptOffer,
   ensureQuestOfferState,
@@ -74,9 +74,9 @@ import {
 import { parseQuestConversation } from '../quests.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
-import { runStreetTransition } from '../screen-fx.js';
-import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=g211-1';
-import { applyFamiliarLook } from '../familiar.js?v=g211-1';
+import { runStreetTransition } from '../screen-fx.js?v=g225-1';
+import { armPromptTimeout, promptTimeoutMs } from '../prompt-timeout.js?v=g225-1';
+import { applyFamiliarLook, familiarLook } from '../familiar.js?v=g225-1';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import { sourceFromUrl } from '../textures.js';
 
@@ -342,7 +342,8 @@ function buildChrome(engine) {
   const modal = el('div', { id: 'qi-dialogue', class: 'quest-dialogue glitch-modal', hidden: true, role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'qi-dialogue-title' }, `
     <div class="quest-dialogue-shade"></div>
     <div class="quest-dialogue-card">
-      <div class="quest-dialogue-orb" aria-hidden="true">✦</div>
+      <p class="fam-head"><img src="assets/ui/familiar/quests_small.png" alt="" width="32" height="22" /><span data-qi-head></span></p>
+      <button type="button" class="fam-close" data-qi-close aria-label="Close" hidden></button>
       <p class="mr-kicker" data-qi-kicker></p>
       <h2 id="qi-dialogue-title" data-qi-dtitle></h2>
       <p class="quest-dialogue-copy" data-qi-copy></p>
@@ -361,6 +362,8 @@ function buildChrome(engine) {
   };
   dialog = {
     modal,
+    head: modal.querySelector('[data-qi-head]'),
+    close: modal.querySelector('[data-qi-close]'),
     kicker: modal.querySelector('[data-qi-kicker]'),
     title: modal.querySelector('[data-qi-dtitle]'),
     copy: modal.querySelector('[data-qi-copy]'),
@@ -373,6 +376,8 @@ function buildChrome(engine) {
       first?.click();
     }
   });
+  // G225: the familiar conversation panel's X makes no choice (ChoicesDialog.as _escKeyHandler 1472-1500).
+  dialog.close.addEventListener('click', () => dialog.resolve?.(null));
 }
 
 /**
@@ -382,7 +387,9 @@ function buildChrome(engine) {
  * `timeout` (source seconds) closes it on its own and resolves with
  * `timeoutValue` or null (G198, js/prompt-timeout.js).
  */
-function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null, look = 'plain', width = 0 } = {}) {
+function converse(engine, { title = '', kicker = '', text = '', beats = null, choices = null, timeout = 0, timeoutValue = null, look: lookOpt = '', width = 0 } = {}) {
+  // G225: Magic Rock lines take the FamiliarDialog CONVERSATION panel unless the caller names a look.
+  const look = familiarLook({ look: lookOpt, kicker });
   buildChrome(engine);
   const pages = beats || parseQuestConversation(text);
   if (!pages.length) pages.push({ text, response: 'OK' });
@@ -402,6 +409,8 @@ function converse(engine, { title = '', kicker = '', text = '', beats = null, ch
       const page = pages[index];
       dialog.kicker.textContent = kicker;
       dialog.title.textContent = title;
+      dialog.head.textContent = title;
+      dialog.close.hidden = look !== 'conversation';
       dialog.copy.innerHTML = String(page.text || '').replace(/\n/g, '<br>');
       dialog.choices.innerHTML = '';
       const last = index === pages.length - 1;
@@ -418,10 +427,11 @@ function converse(engine, { title = '', kicker = '', text = '', beats = null, ch
         dialog.choices.appendChild(b);
       });
       engine.setData('qiDialog', `${title}:${index + 1}/${pages.length}`);
+      const opening = dialog.modal.hidden;
       dialog.modal.hidden = false;
       // G220: `look: 'vog'` is the source's voice-of-rock overlay (bubble_familiar,
       // inc_announcements.js 375-482): the rock with rays at the top, the bubble under it.
-      applyFamiliarLook(dialog.modal, { look, width });
+      applyFamiliarLook(dialog.modal, { look, width, grow: opening });
       engine.setData('qiDialogLook', look);
       dialog.choices.querySelector('button')?.focus?.();
     };

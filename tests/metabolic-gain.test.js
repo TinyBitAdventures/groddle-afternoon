@@ -11,7 +11,7 @@ import { metabolicGain, setMetabolicGainGate } from '../public/js/metabolics.js'
 import { applyRewards, createQuestState } from '../public/js/quests.js';
 import { collectQuoin, createQuoinState, creditQuoinStat } from '../public/js/quoins.js';
 import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.js';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-4';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-5';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -140,9 +140,9 @@ describe('prompts, VOGs and the buffs tray', () => {
   it('a location VOG has no speaker, no Close and no quest sound', () => {
     const src = read('js/features/location-events-feature.js');
     const vog = src.slice(src.indexOf("case 'vog': {"), src.indexOf("case 'activity':"));
-    assert.match(vog, /engine\.scriptedDialogue\(\{/);
-    assert.match(vog, /kicker: null,/);
-    assert.doesNotMatch(vog, /offerQuestDialogue|declineLabel|cancelable/);
+    // G228: its own overlay (js/vog-overlay.js), not the quest card.
+    assert.match(vog, /engine\.vog\?\.\(\{ lines: fx\.lines, onComplete: next \}\);/);
+    assert.doesNotMatch(vog, /scriptedDialogue|offerQuestDialogue|declineLabel|cancelable/);
     assert.match(game, /kicker\.hidden = questDialogueState\.kicker === null;/);
   });
 

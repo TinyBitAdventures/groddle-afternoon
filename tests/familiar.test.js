@@ -13,10 +13,12 @@ import {
   PET_ROCK_SHEETS,
   QUEST_ROCK_WH,
   RAY_SETS,
+  FAMILIAR_DIALOG_MIN_W,
   achievementBubbleText,
   easeOutBounce,
   familiarCardHeading,
   familiarLook,
+  locationViewport,
   petRockFrameStyle,
   raySpinSeconds,
   rayWedgePaths,
@@ -25,13 +27,15 @@ import {
   skillLearnedActivity,
   skillLearnedModel,
   truncateLabel,
-} from '../public/js/familiar.js?v=g211-1';
+  vogLayout,
+} from '../public/js/familiar.js?v=g225-1';
+import { CARD_ART_LAYERS } from '../public/js/imagination-data.js';
 import {
   _resetFamiliarDialog,
   familiarDialogFeature,
   familiarDialogOpen,
   queueSkillLearned,
-} from '../public/js/features/familiar-dialog-feature.js?v=g218-1';
+} from '../public/js/features/familiar-dialog-feature.js?v=g225-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(root, 'public');
@@ -85,7 +89,10 @@ describe('rays from the source FLAs', () => {
 
 describe('quest card look (G211) and voice of rock (G220)', () => {
   it('gives the Magic Rock its card and leaves other speakers plain', () => {
-    assert.equal(familiarLook({ kicker: 'Magic Rock' }), 'familiar');
+    // G225: its offers take the quest card, its other lines the CONVERSATION panel.
+    assert.equal(familiarLook({ kicker: 'Magic Rock' }), 'conversation');
+    assert.equal(familiarLook({ kicker: 'Magic Rock', offer: true }), 'familiar');
+    assert.equal(familiarLook({ look: 'plain', kicker: 'Magic Rock' }), 'plain');
     assert.equal(familiarLook({ mode: 'offer', kicker: '' }), 'familiar');
     assert.equal(familiarLook({ kicker: 'Mr. Block' }), 'plain');
     assert.equal(familiarLook({ look: 'vog', kicker: 'Magic Rock' }), 'vog');
@@ -111,13 +118,13 @@ describe('quest card look (G211) and voice of rock (G220)', () => {
 
   it('wires urgent offers, the close X and the voice-of-rock lines', () => {
     const game = read('game.js');
-    assert.match(game, /familiarLook\(\{ look: questDialogueState\.look, kicker: questDialogueState\.kicker, mode \}\)/);
+    assert.match(game, /familiarLook\(\{ look: questDialogueState\.look, kicker: questDialogueState\.kicker, mode, offer \}\)/);
     assert.match(game, /getElementById\('quest-dialogue-close'\)\?\.addEventListener\('click'/);
     assert.match(game, /offer: true,\n\s+urgent: urgent === true,/);
     assert.match(read('js/features/quest-offers-feature.js'), /urgent: card\.emergency === true/);
     assert.match(read('js/quest-rooms/top-of-tree.js'), /text: ROCK_LINE, choices: \[\{ label: 'OK', value: 'ok' \}\], look: 'vog', width: 500/);
     assert.match(read('js/features/smuggling-feature.js'), /kicker: 'Magic Rock', beats, look: 'vog', width: 500/);
-    assert.match(read('js/features/quest-instances-feature.js'), /applyFamiliarLook\(dialog\.modal, \{ look, width \}\)/);
+    assert.match(read('js/features/quest-instances-feature.js'), /applyFamiliarLook\(dialog\.modal, \{ look, width, grow: opening \}\)/);
   });
 });
 
@@ -129,6 +136,15 @@ describe('achievement drop (G219)', () => {
     assert.ok(easeOutBounce(0.5) > 0.7 && easeOutBounce(0.5) < 0.8);
     assert.deepEqual(achievementBubbleText({ name: 'Gardener' }), { head: 'New Achievement!', line: 'You got the Gardener badge!' });
     assert.equal(achievementBubbleText({ status: 'Well done.', name: 'X' }).line, 'Well done.');
+  });
+
+  it('prints desc on the card and status_text in the bubble (G225, AchievementView.as 349, 552)', () => {
+    const fx = read('js/screen-fx.js');
+    const drop = fx.slice(fx.indexOf('export function startFamiliarDrop'), fx.indexOf('if (bubble) {', fx.indexOf('export function startFamiliarDrop')));
+    assert.match(drop, /const line = text\.line;/);
+    assert.match(fx, /status: payload\.status \|\| '',/);
+    const game = read('game.js');
+    assert.match(game, /body: update\.def\.desc \|\| update\.def\.description \|\| '',\n\s+status: update\.def\.statusText \|\| update\.def\.status_text \|\| '',/);
   });
 
   it('drops the rock only for badges inside the existing award card', () => {
@@ -206,7 +222,71 @@ describe('skill learned panel (G218)', () => {
     assert.match(game, /skillLearnedInfo\(classTsid\) \{/);
     assert.match(game, /openSkillTree\(classTsid = ''\) \{/);
     const index = read('js/features/index.js');
-    assert.match(index, /import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g218-1'; FEATURES\.push\(familiarDialogFeature\);\n?$/);
+    assert.match(index, /import \{ familiarDialogFeature \} from '\.\/familiar-dialog-feature\.js\?v=g225-1'; FEATURES\.push\(familiarDialogFeature\);\n?$/);
+  });
+});
+
+describe('G225 familiar follow-ups', () => {
+  it('sizes the voice of rock from the location viewport, not the game root', () => {
+    // A 1256 x 706 root with a 106 px pack: the viewport is 1256 x 600.
+    const vp = locationViewport({ rootW: 1256, rootH: 706, packH: 106 });
+    assert.deepEqual(vp, { x: 0, y: 0, w: 1256, h: 600 });
+    assert.equal(locationViewport({ rootW: 1256, rootH: 706, packH: 106, railLeft: 980 }).w, 980, 'a visible rail narrows it');
+    const lay = vogLayout(vp);
+    assert.equal(lay.centerX, 628);
+    assert.equal(lay.top, Math.round(0.25 * 600 + 12), 'bubble at top_y 25% under the 12 px pointer');
+    assert.equal(lay.rockDy, Math.round(0.15 * 600) - lay.top, 'rock centre at y 15%');
+    assert.equal(lay.rockSize, Math.round(PET_ROCK_SHEETS.idle.bbox.h * (0.4 * 600) / 145));
+    const fx = read('js/familiar.js');
+    assert.match(fx, /const lay = vogLayout\(measureLocationViewport\(modal\)\);/);
+    assert.doesNotMatch(fx, /modal\.clientHeight \|\| 600;\n\s+const box/);
+  });
+
+  it('builds the FamiliarDialog CONVERSATION panel and drops the orb everywhere', () => {
+    assert.equal(FAMILIAR_DIALOG_MIN_W, 330);
+    const css = read('style.css');
+    assert.doesNotMatch(css, /quest-dialogue-orb/);
+    assert.match(css, /\.quest-dialogue\[data-look="conversation"\] \.quest-dialogue-card \{[^}]*top: 30px;[^}]*width: 360px;[^}]*rgba\(10, 24, 29, 0\.9\)/);
+    assert.match(css, /\.quest-dialogue\[data-look="conversation"\] \.fam-head \{[^}]*border-bottom: 1px solid #49514f/);
+    assert.match(css, /@keyframes famConvGrow \{ from \{ transform: translateX\(-50%\) scale\(0\.02\); \}/);
+    const qi = read('js/features/quest-instances-feature.js');
+    const ffw = read('js/quest-rooms/firefly-whistle.js');
+    for (const src of [qi, ffw, read('play/index.html')]) assert.doesNotMatch(src, /quest-dialogue-orb/);
+    assert.match(qi, /const look = familiarLook\(\{ look: lookOpt, kicker \}\);/);
+    assert.match(qi, /dialog\.close\.addEventListener\('click', \(\) => dialog\.resolve\?\.\(null\)\);/);
+    // prompts_add lines stay plain prompts; familiar_send_alert lines take the panel.
+    assert.match(read('js/quest-rooms/penalty.js'), /kicker: 'Magic Rock',\n\s+look: 'plain',\n\s+text: EXIT_PROMPT/);
+    assert.match(read('js/quest-rooms/top-of-tree.js'), /look: 'plain', text: nag\.text/);
+    assert.match(read('js/quest-rooms/back-alley.js'), /kicker: 'Magic Rock', text: FUEL_HINT/);
+  });
+
+  it('ships the skill tiles the imagination SWF has for every remake skill family but Master Gardener', () => {
+    for (const fam of ['teleportation', 'eyeballery', 'penmanship', 'woodworking', 'nudgery', 'bureaucraticarts', 'martialimagination']) {
+      const name = `art_skill_${fam}`;
+      assert.ok(CARD_ART_LAYERS.includes(name), name);
+      const svg = readFileSync(join(PUBLIC, `assets/imagination/cards/${name}.svg`), 'utf8');
+      assert.match(svg, /viewBox="0 0 230 310"/);
+      assert.equal(skillArtFor(`${fam}_1`, CARD_ART_LAYERS), `assets/imagination/cards/${name}.svg`);
+    }
+    assert.equal(skillArtFor('mastergardener_1', CARD_ART_LAYERS), 'assets/imagination/cards/art_brain.svg', 'no tile in imagination_cards.swf');
+  });
+
+  it('keys every import of screen-fx.js the same (it holds the street card state)', () => {
+    const keys = new Set();
+    const walk = (dir) => {
+      for (const ent of readdirSync(dir, { withFileTypes: true })) {
+        const p = join(dir, ent.name);
+        if (ent.isDirectory()) {
+          if (ent.name !== 'node_modules' && ent.name !== 'assets') walk(p);
+        } else if (ent.name.endsWith('.js')) {
+          for (const m of readFileSync(p, 'utf8').matchAll(/(?:from |import\()'[./]*(?:public\/)?(?:js\/)?screen-fx\.js(\?v=[^']*)?'/g)) keys.add(m[1] || '');
+        }
+      }
+    };
+    walk(PUBLIC);
+    walk(join(root, 'tests'));
+    assert.equal(keys.size, 1, [...keys].join(' '));
+    assert.ok([...keys][0], 'keyed');
   });
 });
 
@@ -224,6 +304,7 @@ describe('one familiar module', () => {
       }
     };
     walk(PUBLIC);
-    assert.deepEqual([...keys], ['?v=g211-1']);
+    assert.equal(keys.size, 1, `familiar.js under ${[...keys].join(', ')}`);
+    assert.ok([...keys][0].startsWith('?v='), 'familiar.js is imported with a key');
   });
 });

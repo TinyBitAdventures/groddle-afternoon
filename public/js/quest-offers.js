@@ -15,7 +15,9 @@
  *    quest completion code (chains), achievements, and named hooks.
  *  - Only one offer every 5 minutes (last_quest_offer, quests_offer_queue);
  *    is_emergency quests skip the wait. The 'turn_off_quests' buff holds all.
- *  - The Magic Rock familiar delivers offers one at a time.
+ *  - The Magic Rock familiar delivers offers one at a time. Ordinary offers
+ *    wait in the quest log ("You have N new quests"); only is_emergency
+ *    offers pop up on the street (QuestsDialog.as 131-138, 335-360; G225).
  *  - "Not right now" on a familiar offer leaves the quest in the log as
  *    offered-not-accepted. It is never auto-offered again, but can be
  *    accepted from the log at any time. Declining an NPC offer records
@@ -42,7 +44,7 @@
  *   pendingQuestOffers(questState, pc, ctx) / nextQuestOffer(questState, pc, ctx)
  *   npcQuestOffers(questState, npcClass, pc, ctx)
  *   enqueueQuestOffer(questState, id) / markOffered / declineOffer / acceptOffer
- *   listDeclinedOffers(questState)
+ *   listDeclinedOffers(questState) / waitingOffers(questState) / questOfferCard(id)
  *   routeQuestEvent(questState, event, amount, ctx) / syncItemRequirements(questState, inv, ctx)
  *   eventCounters(event) / requirementRoute(req) / isEventEmitted(event) / questRoutingReport(catalog)
  *   questEventsForVerb(classTsid, verbId, achievementEvents)
@@ -470,7 +472,8 @@ function offerCard(row, waitMs = 0) {
  */
 export function nextQuestOffer(questState, pc = null, ctx = {}) {
   const offers = ensureQuestOfferState(questState);
-  if (Object.keys(offers.offered).length) return null; // one at a time
+  // G225: offers already made wait in the quest log (QuestsDialog.as 131-138,
+  // 335-360); like quests_offer, only the 5-minute spacing holds the next one.
   if (asSet(ctx.buffs).has('turn_off_quests')) return null;
   const pending = pendingQuestOffers(questState, pc, ctx);
   if (!pending.length) return null;
@@ -503,6 +506,26 @@ export function npcQuestOffers(questState, npcClass, pc = null, ctx = {}) {
     if (requirementsComplete(questState, def)) completable.push({ classTsid: id, def, turnIn: 'npc' });
   }
   return { offered, completable };
+}
+
+/**
+ * Offers made and not yet accepted or declined, oldest first: the quest log's
+ * "You have N new quests" (QuestManager.getUnacceptedQuests; QuestsDialog.as
+ * updateCountToast 241-252). Emergencies are flagged; they pop on the street.
+ */
+export function waitingOffers(questState) {
+  const offers = ensureQuestOfferState(questState);
+  const catalog = getQuestCatalog();
+  return Object.entries(offers.offered)
+    .filter(([id]) => catalog[id] && !questState.active?.[id])
+    .sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : 1))
+    .map(([id, at]) => ({ classTsid: id, def: catalog[id], offeredAt: at, emergency: !!catalog[id].isEmergency }));
+}
+
+/** The offer card for a quest already offered (opened again from the quest log). */
+export function questOfferCard(classTsid) {
+  const def = getQuestCatalog()[classTsid];
+  return def ? offerCard({ def, trigger: null, emergency: !!def.isEmergency }) : null;
 }
 
 /** Queue a quest for familiar delivery (chain offers use this). */

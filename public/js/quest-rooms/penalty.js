@@ -442,9 +442,11 @@ export const room = {
     // exit_delay 2*60: instances_show_exit_prompt, once.
     if (!ctx.data.promptShown && Date.now() - ctx.data.enteredAt >= EXIT_PROMPT_MS && !ctx.dialogOpen() && !ctx.engine.acting() && !ctx.data.crawling) {
       ctx.data.promptShown = true;
+      // inc_instances.js 322-339: a prompts_add prompt, not a familiar conversation (G225).
       ctx.converse({
         title: 'Penalty Island',
         kicker: 'Magic Rock',
+        look: 'plain',
         text: EXIT_PROMPT,
         choices: [{ label: 'Yes, please', value: 'yes' }, { label: 'No thanks', value: 'no' }],
       }).then((answer) => answer === 'yes' && ctx.leave({ transition: ctx.fx() }));

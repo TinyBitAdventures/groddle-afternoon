@@ -306,7 +306,6 @@ function askCode(ctx) {
   wrap.innerHTML = `
     <div class="quest-dialogue-shade"></div>
     <div class="quest-dialogue-card">
-      <div class="quest-dialogue-orb" aria-hidden="true">✦</div>
       <p class="mr-kicker"></p>
       <h2></h2>
       <form style="display:grid;gap:.6rem;margin-top:.4rem">

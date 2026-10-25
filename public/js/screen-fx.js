@@ -7,7 +7,7 @@
  * DOM-driven (not Pixi) so it covers HUD + canvas inside #game-root.
  */
 
-import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=g211-1';
+import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=g225-1';
 
 /**
  * Street-load timings (seconds).
@@ -543,8 +543,11 @@ export function startFamiliarDrop(fam, { status = '', body = '', name = '' } = {
   const bubble = fam.querySelector('[data-award-familiar-bubble]');
   mountPetRock(rock, { size: ACHIEVEMENT_ROCK_WH });
   const text = achievementBubbleText({ status, name });
-  // The remake's card already prints the status prose as its body: say it once.
-  const line = text.line && text.line !== String(body || '').trim() && status ? text.line : '';
+  // G225: the card prints desc, so the bubble always carries the status line:
+  // status_text, or 'You got the <name> badge!' (AchievementView.as 552;
+  // inc_achievements.js 310-311). `body` is kept for callers; unused.
+  void body;
+  const line = text.line;
   if (bubble) {
     bubble.hidden = true;
     bubble.querySelector('b').textContent = text.head;

@@ -651,6 +651,18 @@ export const crabsFeature = {
     last = 'crab-state-of-mind';
   },
 
+  /**
+   * G228: Enter while the call-out is up. npc_crab.js onPlayerCollision 737
+   * opens it with dont_take_focus, and the client's ChoicesDialog then never
+   * takes the keys (ChoicesDialog.as _actuallyPresent 527-543: mouse only, no
+   * requestFocus), so Enter never answered it. The client let Enter open its
+   * menu beside the crab's bubble; here the chooser would cover the card, so
+   * Enter does nothing until the call-out is answered or gone.
+   */
+  holdsEnter() {
+    return talk ? 'crab' : null;
+  },
+
   verbsFor(target) {
     const crab = crabs.find((c) => c.target === target);
     return crab ? crabVerbs(crab.memory, dayKey()) : [];

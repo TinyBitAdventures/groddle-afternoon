@@ -99,6 +99,12 @@ for (const u of Object.values(upgrades)) {
   }
   if (u.config.suit) wanted.add(`suit_${u.config.suit}_back`);
 }
+// G225: skill tiles no upgrade card names, for the familiar's skill-learned
+// panel (js/familiar.js skillArtFor). Same SWF, same placement. The SWF has
+// no art_skill_mastergardener, so Master Gardener keeps art_brain.
+for (const family of ['bureaucraticarts', 'eyeballery', 'martialimagination', 'nudgery', 'penmanship', 'teleportation', 'woodworking']) {
+  wanted.add(`art_skill_${family}`);
+}
 
 const round = (s) => s.replace(/-?\d+\.\d{3,}/g, (n) => String(Math.round(Number(n) * 100) / 100));
 const layers = {};
