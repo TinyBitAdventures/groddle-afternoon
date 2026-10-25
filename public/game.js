@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-93';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-94';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -3161,11 +3161,14 @@ function updateHud() {
     const winterLabel = winterLocationLabel(currentStreet.tsid);
     const streetLabel = winterLabel?.street ||
       (currentStreet.tsid === AXIS_DENYDE_STREET_ID ? 'Axis Denyde' : currentStreet.label);
+    // G186 (desk HUBLESS): an instance copy has no region (location.js 3311 sends
+    // hub_name '' for instances), so the 21 copies whose files name a hidden hub
+    // show the street alone, as the nameplate on arrival does; no Groddle Forest.
     const hubLabel = winterLabel?.hub ||
       (currentStreet.tsid === AXIS_DENYDE_STREET_ID
         ? 'Pollokoo'
-        : currentStreet.hubName || 'Groddle Forest');
-    streetEl.textContent = `${streetLabel} · ${hubLabel}`;
+        : currentStreet.hubName || '');
+    streetEl.textContent = hubLabel ? `${streetLabel} · ${hubLabel}` : streetLabel;
     streetEl.dataset.tsid = currentStreet.tsid;
   }
   updateDametimeChrome();
@@ -3175,12 +3178,14 @@ function updateHud() {
   if (qBox) {
     qBox.innerHTML = '';
     const log = listQuestLog(questState);
+    // G229: quests put off with "Not right now" wait in the log to be started (quest-offers-feature).
+    const putOff = features.collect('questLogCards', engine);
     const meta = document.getElementById('quest-meta');
     if (meta) {
       const n = Object.keys(getQuestCatalog()).length;
       meta.textContent = `${log.filter((r) => r.status === 'active').length} active · ${questState.completed.length} done · ${n} in catalog`;
     }
-    if (!log.length) {
+    if (!log.length && !putOff.length) {
       const empty = document.createElement('div');
       empty.className = 'q-req';
       empty.textContent = 'No active quests. Catalog loaded from GSJS.';
@@ -3315,6 +3320,8 @@ function updateHud() {
       }
       qBox.appendChild(card);
     }
+    const firstDone = qBox.querySelector('.q-card.done');
+    for (const el of putOff) qBox.insertBefore(el, firstDone);
     appendStoryQuestOffers(qBox);
   }
   renderQuestTracker();
@@ -7843,7 +7850,9 @@ const engine = {
   /** True while a feature holds the Magic Rock quiet (rook attack, Naraka, meditation). */
   questOffersHeld: () => features.query('holdQuestOffers', engine) === true,
   /** A quest offer: the recovered beats, then accept / decline. `inLog` opens it inside the Quests dialog (G225). */
-  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false, inLog = false }) {
+  // G229: declinable false is an offer with only its accept button (quest.js 1119-1124: a quest that
+  // cannot be started later has one choice); the X and Escape still close it where they would.
+  offerQuestDialogue({ title, kicker, beats, acceptLabel, declineLabel, onAccept, onDecline, urgent = false, inLog = false, declinable = true }) {
     openScriptedQuestDialogue({
       title,
       kicker,
@@ -7856,8 +7865,9 @@ const engine = {
         playSound('QUEST_ADDED', { volume: 0.6 });
         return onAccept?.(...args);
       },
-      onCancel: onDecline,
+      onCancel: declinable === false ? null : onDecline,
       cancelable: true,
+      noDecline: declinable === false,
       primaryLabel: acceptLabel || 'OK',
       cancelLabel: declineLabel || 'Not right now',
     });
@@ -19503,7 +19513,7 @@ function renderQuestDialogueBeat() {
     next.dataset.accept = mode === 'offer' && finalBeat ? '1' : '0';
   }
   if (cancel) {
-    cancel.hidden = mode === 'script' && questDialogueState.cancelable !== true;
+    cancel.hidden = (mode === 'script' && questDialogueState.cancelable !== true) || questDialogueState.noDecline === true;
     cancel.textContent =
       mode === 'script'
         ? questDialogueState.cancelLabel || 'Close'
@@ -19610,6 +19620,7 @@ function openScriptedQuestDialogue({
   offer = false,
   urgent = false,
   inLog = false,
+  noDecline = false,
 }) {
   // G217: an offer or prompt that arrives over the Enter chooser or a verb menu waits until they close.
   if (holdScriptedDialog(arguments[0])) return;
@@ -19634,6 +19645,7 @@ function openScriptedQuestDialogue({
     cancelable,
     primaryLabel,
     cancelLabel,
+    noDecline: noDecline === true,
   };
   renderQuestDialogueBeat();
   armQuestDialogueTimeout({ timeout, timeoutMs, timeoutValue, onTimeout });
@@ -23852,7 +23864,7 @@ async function main() {
       if (e.key === 'b' || e.key === 'B') closeAchievePanel();
       if (e.key === 'h' || e.key === 'H') closeFeatPanel();
       if (e.key === 'k' || e.key === 'K') closeSkillsPanel();
-      if (e.key === 'u' || e.key === 'U') closeBuffsPanel();
+      if (e.key === 'y' || e.key === 'Y') closeBuffsPanel();
       if (e.key === 'c' || e.key === 'C') closeMakePanel();
       if (e.key === 'l' || e.key === 'L') closeAvatarPanel();
       return;
@@ -23885,6 +23897,18 @@ async function main() {
       tryOpenNearestMenu({ nearestFirst: e.isTrusted === false });
       return;
     }
+    // G221: the client's Shift keys (TSMainView.as 647-649): Shift+S the skills
+    // (shiftSKeyHandler 893-913), Shift+T the saved teleport points (915-923,
+    // teleportation-feature teleportPointsKey). Neither moves the avatar.
+    if (e.shiftKey && (e.key === 's' || e.key === 'S')) {
+      keys.delete(e.key);
+      if (!e.repeat) openSkillsPanel();
+      return;
+    }
+    if (e.shiftKey && (e.key === 't' || e.key === 'T')) {
+      if (!e.repeat) features.query('teleportPointsKey', engine);
+      return;
+    }
     if (e.key === 'f' || e.key === 'F') eatApple();
     if (e.key === 't' || e.key === 'T') doTeleport();
     if (e.key === 'g' || e.key === 'G') openMap();
@@ -23892,14 +23916,22 @@ async function main() {
     if (e.key === 'b' || e.key === 'B') openAchievePanel();
     if (e.key === 'h' || e.key === 'H') openFeatPanel();
     if (e.key === 'k' || e.key === 'K') openSkillsPanel();
-    if (e.key === 'u' || e.key === 'U') openBuffsPanel();
+    // G221: U is the upgrade cards (imagination-feature); Buffs moved to Y.
+    if (e.key === 'y' || e.key === 'Y') openBuffsPanel();
     // G226: shift+C toggles cultivation mode at home (TSMainView.as shiftCKeyHandler).
     if (e.shiftKey && (e.key === 'c' || e.key === 'C') && features.query('cultivateKey', engine)) return;
     if (e.key === 'c' || e.key === 'C') openMakePanel();
     if (e.key === 'v' || e.key === 'V') openVendor();
     if (e.key === 'l' || e.key === 'L') openAvatarPanel();
   });
-  window.addEventListener('keyup', (e) => keys.delete(e.key));
+  // A letter let go after Shift comes up lower case: drop both (G221, Shift+S held then Shift let go).
+  window.addEventListener('keyup', (e) => {
+    keys.delete(e.key);
+    if (e.key?.length === 1) {
+      keys.delete(e.key.toLowerCase());
+      keys.delete(e.key.toUpperCase());
+    }
+  });
   window.addEventListener('resize', updateLocalChatDockPosition);
 
   document.getElementById('map-btn')?.addEventListener('click', () => {

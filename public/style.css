@@ -7246,7 +7246,8 @@ header.top-bar + .sub { display: none; }
 
 /* G225: an offer opened from the Quests dialog sits inside it, at x 10 and the
    list top + 10, with no rays (QuestsDialog.as 229-231, 345-351). */
-.quest-dialogue[data-look="familiar"][data-in-log="true"] { display: block; padding: 0; }
+/* :not([hidden]) so an answered card goes (the attribute selector outranked .quest-dialogue[hidden]). */
+.quest-dialogue[data-look="familiar"][data-in-log="true"]:not([hidden]) { display: block; padding: 0; }
 .quest-dialogue[data-look="familiar"][data-in-log="true"] .quest-dialogue-card {
   position: absolute; left: var(--fam-log-x, 10px); top: var(--fam-log-y, 80px);
   max-width: calc(100% - var(--fam-log-x, 10px) - 8px);

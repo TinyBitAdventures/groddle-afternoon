@@ -18,10 +18,17 @@
  *  - The Magic Rock familiar delivers offers one at a time. Ordinary offers
  *    wait in the quest log ("You have N new quests"); only is_emergency
  *    offers pop up on the street (QuestsDialog.as 131-138, 335-360; G225).
- *  - "Not right now" on a familiar offer leaves the quest in the log as
- *    offered-not-accepted. It is never auto-offered again, but can be
- *    accepted from the log at any time. Declining an NPC offer records
- *    nothing: the NPC asks again next time you talk (npc_conversation.js).
+ *  - "Not right now" was not a decline (G229): quest.js get_status 1102-1124
+ *    gives a startable quest (one with onStarted) the choices
+ *    accept_and_start ("Ok, I'll do it!") and accept (button_decline, "Not
+ *    right now"); any other quest only accept. Plain accept put the quest in
+ *    the log not started (main.js doQuestConversationChoice 6034-6049,
+ *    quest.js onAccept 60-77), and the log's "Try it" started it
+ *    (QuestElementUI.as setTryButton 224-232, restartQuest). Here a put-off
+ *    quest waits under offers.declined (putOffOffer, listDeclinedOffers) and
+ *    is accepted, which starts it, from the log. It is never auto-offered
+ *    again. Declining an NPC offer records nothing: the NPC asks again next
+ *    time you talk (npc_conversation.js).
  *  - NPC givers (setAvailableQuests) check `prerequisites` (has_skill,
  *    over_level, has_achievement, ...) as well as prereq_quests.
  *  - Accept runs doProvided (items from the familiar), then init_reqs:
@@ -43,7 +50,7 @@
  *   prerequisitesMet(def, questState, pc, ctx) / triggerMet(trigger, def, questState, pc, ctx)
  *   pendingQuestOffers(questState, pc, ctx) / nextQuestOffer(questState, pc, ctx)
  *   npcQuestOffers(questState, npcClass, pc, ctx)
- *   enqueueQuestOffer(questState, id) / markOffered / declineOffer / acceptOffer
+ *   enqueueQuestOffer(questState, id) / markOffered / declineOffer / putOffOffer / acceptOffer
  *   listDeclinedOffers(questState) / waitingOffers(questState) / questOfferCard(id)
  *   routeQuestEvent(questState, event, amount, ctx) / syncItemRequirements(questState, inv, ctx)
  *   eventCounters(event) / requirementRoute(req) / isEventEmitted(event) / questRoutingReport(catalog)
@@ -461,6 +468,8 @@ function offerCard(row, waitMs = 0) {
     beats: parseQuestConversation(def.offer || def.desc),
     acceptLabel: def.acceptLabel || "Ok, I'll do it!",
     declineLabel: def.declineLabel || 'Not right now',
+    // G229: only a startable quest (onStarted, quest.js 1105-1117) has the second button.
+    startable: offerCanWait(def),
     waitMs,
   };
 }
@@ -545,8 +554,10 @@ export function markOffered(questState, classTsid, now = Date.now()) {
 }
 
 /**
- * "Not right now". Familiar offers stay in the log as acceptable and are not
- * offered again; NPC offers are simply dropped so the NPC asks next time.
+ * Set an offer aside. Familiar offers stay in the log to be started and are
+ * not offered again (putOffOffer, G229; saves from before G229 may hold
+ * declined quests that are not startable: the log accepts those); NPC offers
+ * are simply dropped so the NPC asks next time.
  */
 export function declineOffer(questState, classTsid, now = Date.now(), { source = 'familiar' } = {}) {
   const offers = ensureQuestOfferState(questState);
@@ -556,7 +567,28 @@ export function declineOffer(questState, classTsid, now = Date.now(), { source =
   return { ok: true, status: questStatus(questState, classTsid) };
 }
 
-/** Declined familiar offers, for the quest log's "accept" rows. */
+/**
+ * G229: can this offer be put off? quest.js get_status 1094/1105: only a quest
+ * with onStarted (catalog needsStart) offers "Not right now" (value accept).
+ */
+export function offerCanWait(def) {
+  return Boolean(def?.needsStart);
+}
+
+/**
+ * "Not right now" on a startable familiar offer: the quest goes in the log,
+ * not started (main.js 6041: accept without restartQuest). Refused for a
+ * quest that cannot be started later; its card has only the accept button.
+ */
+export function putOffOffer(questState, classTsid, now = Date.now()) {
+  const def = getQuestCatalog()[classTsid];
+  if (!def) return { ok: false, reason: 'unknown' };
+  if (!offerCanWait(def)) return { ok: false, reason: 'not_startable' };
+  if (questState.active?.[classTsid]) return { ok: false, reason: 'already_active' };
+  return declineOffer(questState, classTsid, now);
+}
+
+/** Put-off familiar offers, for the quest log's "Try it" rows (G229). */
 export function listDeclinedOffers(questState) {
   const offers = ensureQuestOfferState(questState);
   const catalog = getQuestCatalog();

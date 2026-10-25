@@ -489,6 +489,15 @@ function onKeyDown(e) {
       e.preventDefault();
       openPanel();
     }
+    // G221: U opens the upgrade cards (TSMainView.as 663, uKeyHandler 996-1010:
+    // ImgMenuView with Cloud.TYPE_UPGRADES). KeyBeacon.as 288-295 sends Shift+U as
+    // SHIFT_PLUS_ U, which nothing hears, and a held key does not fire again.
+    if (!typing && (e.key === 'u' || e.key === 'U') && !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat &&
+        engineRef?.started && !engineRef.busy()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      openPanel({ view: 'hand' });
+    }
     return;
   }
   // The shop is modal: keep keys away from the avatar while it is open.
@@ -622,7 +631,7 @@ function installChrome() {
   if (document.getElementById('img-btn')) return;
   ensurePanel();
   const skills = document.getElementById('skills-btn');
-  const btn = el('button', { id: 'img-btn', type: 'button', class: 'chrome-btn img-chrome-btn', title: 'Imagination upgrades (X)' });
+  const btn = el('button', { id: 'img-btn', type: 'button', class: 'chrome-btn img-chrome-btn', title: 'Imagination upgrades (U or X)' });
   btn.append(el('img', { src: `${UI}imagination_button.png`, alt: '' }), document.createTextNode('Upgrades'));
   btn.addEventListener('click', () => (panel && !panel.hidden ? closePanel() : openPanel()));
   if (skills?.parentElement) skills.parentElement.insertBefore(btn, skills.nextSibling);

@@ -525,6 +525,33 @@ export const teleportationFeature = {
     return card ? [card] : [];
   },
 
+  /**
+   * G221: Shift+T, the saved teleport points. TSMainView.as shiftTKeyHandler
+   * 915-923 opens the map area's Teleport tab; MapChatArea.as 330-347 shows it
+   * when you have Teleportation, or else the teleportation_1 skill info. Here
+   * the points are the Map's Teleportation card, so the Map opens with that
+   * card shown; without the skill the Skills panel opens on Teleportation I.
+   * Canvas data teleportKey: points | skill.
+   */
+  teleportPointsKey(engine) {
+    if (!teleportRank(learned(engine))) {
+      engine.setData('teleportKey', 'skill');
+      engine.openSkillTree?.('teleportation_1');
+      return true;
+    }
+    engine.setData('teleportKey', 'points');
+    Promise.resolve(engine.openMap()).then(() => {
+      if (typeof document === 'undefined') return;
+      const card = document.querySelector('#map-panel [data-teleport-card]');
+      if (!card) return;
+      // G192 folds the Map's extra cards into Shortcuts: open it on this card.
+      const fold = card.closest('details');
+      if (fold && !fold.open) fold.open = true;
+      card.scrollIntoView?.({ block: 'nearest' });
+    });
+    return true;
+  },
+
   packVerbs(classTsid, engine) {
     if (classTsid === SCRIPT_CLASS) {
       const ctx = jumpCtx(engine);

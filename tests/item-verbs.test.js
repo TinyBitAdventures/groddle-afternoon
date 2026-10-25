@@ -22,7 +22,7 @@ import {
   isTrophyClass,
   itemVerbsFeature,
 } from '../public/js/features/item-verbs-feature.js';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=homes-13';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=homes-14';
 import {
   applyAchievementProgress,
   createAchievementState,

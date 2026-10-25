@@ -24,7 +24,7 @@
  * have N new quests" with "Show me" / "Show me one" (QuestsDialog.as 241-252),
  * which opens the oldest one's card inside the dialog (onToastStarted
  * 222-238). Closing a card without answering leaves the offer waiting
- * (onConvoClose 209-216); "Not right now" declines it as before. An emergency
+ * (onConvoClose 209-216). An emergency
  * left unanswered (closed by force, or saved) shows again on the next check
  * (onEmergencyTick 335-360).
  *
@@ -43,16 +43,28 @@
  * from the card going to the offer. Canvas: questOffer (the last offer made),
  * questOffersWaiting (the count), questOfferCard (the open card: id:street|log),
  * questOfferResult.
+ *
+ * G229: "Not right now" is the source's accept without start (quest.js
+ * get_status 1102-1124, main.js doQuestConversationChoice 6034-6049): only a
+ * startable quest (onStarted, catalog needsStart) shows it, and it puts the
+ * quest in the log, not started; the log card's "Try it" (QuestElementUI.as
+ * setTryButton 224-232) accepts it, which starts it. Every other offer has
+ * only its accept button. Put off from the street, the Quests dialog opens on
+ * it (QuestManager.as questConversationCompleteHandler 341-352). QA:
+ * &questofferdemo=putoff[:<quest>] puts a startable offer in the log, put off,
+ * and opens the Quests dialog; =card:<quest> opens any quest's offer card in
+ * the log (one button or two). Canvas questOffersPutOff (the count).
  */
 
 import {
   acceptOffer,
-  declineOffer,
   ensureQuestOfferState,
+  listDeclinedOffers,
   heldForNpcTurnIn,
   markOffered,
   nextQuestOffer,
   pendingQuestOffers,
+  putOffOffer,
   questAwardPayload,
   questOfferCard,
   routeQuestEvent,
@@ -158,6 +170,67 @@ function presentOffer(engine, now = Date.now()) {
   return true;
 }
 
+/** Accept an offer (the card's accept, or a put-off quest's Try it): in the log and started. */
+function acceptCard(engine, classTsid, def) {
+  const result = acceptOffer(engine.questState, classTsid, questContext(engine));
+  engine.setData('questOfferResult', result.ok ? 'accepted' : result.reason || 'failed');
+  if (result.ok) {
+    engine.pushActivity(`New quest: ${def.title}`);
+    engine.refreshPack();
+    // A rebuilt quest room turns its own quest in: a room quest with no
+    // requirements (Le Misérable, Gwendolyn's Task) must not complete on accept.
+    if (result.completable?.length && !def.instanceRoom) finish([{ classTsid, def }], engine);
+    // Accept and start closes the Quests dialog (QuestManager.as 341-344; Try it, questBeginHandler 307-312).
+    if (def.needsStart && typeof document !== 'undefined' && !document.getElementById('quest-panel')?.hidden) {
+      document.getElementById('quest-close')?.click();
+    }
+  }
+  engine.save();
+  syncWaiting(engine);
+  return result;
+}
+
+/**
+ * G229: the quest log's cards for quests put off with "Not right now": the
+ * quest's words and requirements, and "Try it" (QuestElementUI.as 224-232),
+ * which accepts and so starts it. A quest declined by a save from before G229
+ * that has no start (not startable) shows its accept label instead.
+ */
+export function putOffCards(engine) {
+  if (typeof document === 'undefined') return [];
+  const rows = listDeclinedOffers(engine.questState).filter((row) => !engine.questState.active?.[row.classTsid]);
+  return rows.map(({ classTsid, def }) => {
+    const card = document.createElement('div');
+    card.className = 'q-card q-put-off';
+    card.dataset.questPutOff = classTsid;
+    const title = document.createElement('div');
+    title.className = 'q-title';
+    title.textContent = def.title;
+    const state = document.createElement('div');
+    state.className = 'q-req';
+    state.textContent = 'Not started yet.';
+    card.append(title, state);
+    for (const r of def.requirements || []) {
+      const row = document.createElement('div');
+      row.className = 'q-req';
+      row.textContent = `${r.desc}: 0 / ${r.num}`;
+      card.appendChild(row);
+    }
+    const go = document.createElement('button');
+    go.type = 'button';
+    go.className = 'content-action-btn';
+    go.textContent = def.needsStart ? 'Try it' : def.acceptLabel || "Ok, I'll do it!";
+    go.disabled = offerOpen;
+    go.addEventListener('click', () => {
+      if (offerOpen || engine.questDialogueOpen?.()) return;
+      acceptCard(engine, classTsid, def);
+      engine.updateHud?.();
+    });
+    card.appendChild(go);
+    return card;
+  });
+}
+
 /** Show an offer's card: on the street, or inside the Quests dialog (`inLog`). */
 function openOffer(engine, card, { inLog = false } = {}) {
   const qs = engine.questState;
@@ -172,24 +245,22 @@ function openOffer(engine, card, { inLog = false } = {}) {
   };
   const accept = () => {
     settle();
-    const result = acceptOffer(qs, card.classTsid, questContext(engine));
-    engine.setData('questOfferResult', result.ok ? 'accepted' : result.reason || 'failed');
+    acceptCard(engine, card.classTsid, card.def);
+  };
+  // G229: "Not right now" (value accept): in the log, not started.
+  const putOff = () => {
+    settle();
+    const result = putOffOffer(qs, card.classTsid, Date.now());
+    engine.setData('questOfferResult', result.ok ? 'putoff' : result.reason || 'failed');
     if (result.ok) {
-      engine.pushActivity(`New quest: ${card.def.title}`);
-      engine.refreshPack();
-      // A rebuilt quest room turns its own quest in: a room quest with no
-      // requirements (Le Misérable, Gwendolyn's Task) must not complete on accept.
-      if (result.completable?.length && !card.def.instanceRoom) finish([{ classTsid: card.classTsid, def: card.def }], engine);
+      engine.pushActivity(`“${card.def.title}” is in your quest log, not started yet. Choose Try it there when you are ready.`);
+      // QuestManager.as 345-351: just accepting opens the Quests dialog on the quest.
+      if (!inLog && typeof document !== 'undefined' && document.getElementById('quest-panel')?.hidden) {
+        document.getElementById('quest-btn')?.click();
+      }
     }
     engine.save();
-    syncWaiting(engine);
-  };
-  const decline = () => {
-    settle();
-    declineOffer(qs, card.classTsid, Date.now());
-    engine.setData('questOfferResult', 'declined');
-    engine.pushActivity(`You can accept “${card.def.title}” from your quest log later.`);
-    engine.save();
+    engine.updateHud?.();
     syncWaiting(engine);
   };
   engine.offerQuestDialogue({
@@ -198,8 +269,9 @@ function openOffer(engine, card, { inLog = false } = {}) {
     beats: card.beats,
     acceptLabel: card.acceptLabel,
     declineLabel: card.declineLabel,
+    declinable: card.startable === true,
     onAccept: accept,
-    onDecline: decline,
+    onDecline: card.startable === true ? putOff : null,
     // G211: is_emergency offers pop with the rays behind the rock (QuestConversationUI.as 147-153);
     // inside the Quests dialog they have none (hide_rays, QuestsDialog.as 349).
     urgent: card.emergency === true && !inLog,
@@ -266,6 +338,7 @@ function buildUi(engine) {
 function syncWaiting(engine) {
   const n = waitingOffers(engine.questState).filter((row) => !row.emergency).length;
   engine.setData('questOffersWaiting', String(n));
+  engine.setData('questOffersPutOff', String(listDeclinedOffers(engine.questState).length));
   const el = buildUi(engine);
   if (el) {
     const words = questCountToast(n);
@@ -293,6 +366,24 @@ function syncWaiting(engine) {
 /** &questofferdemo=waiting|show: N ordinary offers straight into the log (G225 QA). */
 function runDemo(engine, mode) {
   const qs = engine.questState;
+  const [kind, named] = mode.split(':');
+  if (kind === 'putoff' || kind === 'card') {
+    // G229 QA: putoff[:<quest>] puts a startable offer (the first due, or the one named) in the
+    // log, put off; card:<quest> makes any quest a waiting offer and opens its card in the log.
+    const id = named || pendingQuestOffers(qs, engine.pc, questContext(engine)).find((r) => r.def.needsStart)?.classTsid;
+    if (id && !qs.active?.[id]) {
+      markOffered(qs, id, Date.now());
+      if (kind === 'putoff') putOffOffer(qs, id, Date.now());
+    }
+    engine.save();
+    engine.updateHud?.();
+    syncWaiting(engine);
+    if (kind === 'card') setTimeout(() => showWaitingOffer(engine, { openPanel: true }), 1200);
+    else if (typeof document !== 'undefined' && document.getElementById('quest-panel')?.hidden) {
+      setTimeout(() => document.getElementById('quest-btn')?.click(), 600);
+    }
+    return;
+  }
   const want = Math.max(1, Number(engine.param('questoffercount')) || 3);
   const rows = pendingQuestOffers(qs, engine.pc, questContext(engine)).filter((row) => !row.emergency).slice(0, want);
   rows.forEach((row, i) => markOffered(qs, row.classTsid, Date.now() - (rows.length - i)));
@@ -303,6 +394,11 @@ function runDemo(engine, mode) {
 
 export const questOffersFeature = {
   id: 'quest-offers',
+
+  /** G229: game.js quest log asks for the put-off quests' cards. */
+  questLogCards(engine) {
+    return putOffCards(engine);
+  },
 
   init(engine) {
     ensureQuestOfferState(engine.questState);
