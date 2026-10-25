@@ -448,7 +448,8 @@ const HOLIDAY_TICKS = Object.freeze({
  * a minute; Smashed +3 mood -3 energy a minute; Hungover -2 mood +3 iMG a
  * minute; Garlic Breath +3 mood a minute; Gandlevery +3 energy / 15 s;
  * Gandlevery Charge -10 mood +30 energy / 15 s; A Cold Place -1 energy a
- * second (the buff feature removes it off the three winter streets).
+ * second (the buff feature removes it off the three winter streets); Party
+ * Time! +5 mood / 10 s.
  */
 export const DRINK_TICKS = Object.freeze({
   caffeine_buzz: { mood: 2 },
@@ -464,6 +465,9 @@ export const DRINK_TICKS = Object.freeze({
   gandlevery: { energy: 3 },
   gandlevery_charge: { mood: -10, energy: 30 },
   kukubee_winter_negative: { energy: -1 },
+  // catalog_buffs.js 1564-1580 Party Time!: 60 s, metabolics_add_mood(5) every 10 s
+  // (given by the loneliness party, items/include/loneliness.js 246).
+  party_time: { mood: 5 },
 });
 
 /** catalog_buffs.js on_apply metabolics: Gandlevery -5 mood; Gandlevery Charge -10 mood, +30 energy. */

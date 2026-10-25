@@ -818,9 +818,9 @@
   "register": "G124"
  },
  "buff:party_time": {
-  "status": "lost",
-  "reason": "include/loneliness.js:246: given to the visitors of someone else's home party",
-  "register": "G124"
+  "status": "source",
+  "reason": "include/loneliness.js:246: the loneliness party gives it (js/features/spirit-loneliness-feature.js applyBuff(LONELY_RULES.partyBuff)); its +5 mood every 10 s is buffs.js DRINK_TICKS (catalog_buffs.js 1564-1580)",
+  "register": "G238"
  },
  "buff:play_musicblocks": {
   "status": "lost",

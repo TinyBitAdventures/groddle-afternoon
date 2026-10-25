@@ -47,7 +47,7 @@ import {
   spiritCryBox,
   spiritCrySheet,
 } from '../public/js/street-spirits.js';
-import { spiritLonelinessFeature } from '../public/js/features/spirit-loneliness-feature.js?v=lonely-1';
+import { spiritLonelinessFeature } from '../public/js/features/spirit-loneliness-feature.js?v=lonely-2';
 import { ROUTE_SOURCES } from '../public/js/map-routes.js?v=lonely-1';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=official-ecology-6';
 import { applyStreetIndex } from '../public/js/street-loader.js';
@@ -417,7 +417,7 @@ describe('feature', () => {
 
   it('is registered after the street spirits feature, with its key', () => {
     const idx = read(join(PUBLIC, 'js/features/index.js'));
-    assert.match(idx, /import \{ spiritLonelinessFeature \} from '\.\/spirit-loneliness-feature\.js\?v=lonely-1'; FEATURES\.push\(spiritLonelinessFeature\);/);
+    assert.match(idx, /import \{ spiritLonelinessFeature \} from '\.\/spirit-loneliness-feature\.js\?v=lonely-2'; FEATURES\.push\(spiritLonelinessFeature\);/);
     assert.ok(idx.indexOf('spiritLonelinessFeature') > idx.indexOf('streetSpiritsFeature'));
     const spirits = read(join(PUBLIC, 'js/features/street-spirits-feature.js'));
     assert.match(spirits, /engine\.query\?\.\('spiritLonelyHere', engine\)/);

@@ -29,9 +29,11 @@
  * - Missed (15 minutes for a race, 5 for a party): "Someone else cheered up
  *   the Street Spirit in X. Looks like you missed your chance!"
  *
- * The fireworks overlays (glitch-overlays fireworks_1/2/3.fla) are not
- * rendered yet: a plain burst of dots stands in at the source positions and
- * times (follow-up row). The bubble is drawn from
+ * The fireworks are Tiny Speck's own overlays (glitch-overlays
+ * fireworks_1/2/3.fla, recovered as vector frames by tools/overlay-art,
+ * register G237), drawn through js/overlay-art.js at the source positions
+ * and times; a plain burst of dots stands in only if their art fails to
+ * load. The bubble is drawn from
  * loneliness_quest_bubble_overlay.fla's shape (a 246 x 90 white rounded box,
  * tail at the bottom right, Arial 12 text field 226 x 73, drop shadow).
  *
@@ -54,6 +56,7 @@ import { getStreetEcologyCatalog } from '../street-ecology.js?v=official-ecology
 import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=lonely-1';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { loadVectorFrames, playVectorOverlay } from '../overlay-art.js?v=g237-1';
 import {
   INVITE_ART,
   LONELY_RULES,
@@ -110,6 +113,8 @@ function freshRuntime() {
     convoOpen: false,
     dialogSeen: false,
     party: null, // { finishAt, finishedAt, jabberAt, fireworksAt, done: Set }
+    fireworks: 0,
+    fireworksArt: '',
     last: '',
     xp: 0,
     demoDone: false,
@@ -228,6 +233,7 @@ function publish(engine) {
   engine.setData('lonelyLeft', e && !e.visitedAt ? String(Math.max(0, Math.round((e.endsAt - now) / 1000))) : '');
   engine.setData('lonelyHere', lonelyHere(engine) ? '1' : '');
   engine.setData('lonelyCry', engine.query?.('spiritCry', engine) ? '1' : '');
+  engine.setData('lonelyFireworks', rt.fireworks ? `${rt.fireworks}:${rt.fireworksArt || 'loading'}` : '');
   engine.setData('lonelyPortrait', rt.invite ? portraitStateAt(inviteMs(now)) || 'gone' : '');
   engine.setData('lonelyPrompt', rt.promptOpen ? 'open' : e?.answer || '');
   engine.setData('lonelyLast', rt.last);
@@ -429,6 +435,29 @@ function hideStreetOverlay() {
 }
 
 /** Stand-in for fireworks_1/2/3.fla: a burst of dots at the source position for 2 s. */
+/**
+ * lonelinessEndPartyOverlay's vp_overlay: the fireworks SWF at 1:1 on the
+ * 960-wide viewport (vp.scale), its stage centred on the x/y percentages,
+ * shown for fireworkMs. The dot burst stands in if the art cannot load.
+ */
+function fireworks(at) {
+  const root = rootEl();
+  const vp = viewport();
+  if (!root || !vp) return;
+  ensureCss();
+  rt.fireworks = (rt.fireworks || 0) + 1;
+  playVectorOverlay(root, at.key, { rect: vp, x: at.x, y: at.y, scale: vp.scale, durationMs: LONELY_RULES.fireworkMs, className: 'lonely-fireworks' })
+    .then((ok) => {
+      if (!ok) burst(at);
+      rt.fireworksArt = ok ? 'overlay' : 'dots';
+    });
+}
+
+/** Load the three fireworks before the party ends (the client loaded each SWF on announce). */
+function preloadFireworks() {
+  for (const key of new Set(LONELY_RULES.fireworks.map((fw) => fw.key))) loadVectorFrames(key).catch(() => {});
+}
+
 function burst(at) {
   const root = rootEl();
   const vp = viewport();
@@ -591,6 +620,7 @@ function visit(engine, target, now) {
     rt.last = 'visit:party';
     engine.say?.(target, partyStartLine(name), LONELY_RULES.partyStartBubbleMs);
     rt.party = { finishAt: out.partyAt, finishedAt: 0, jabberAt: 0, done: new Set(), street: streetKey(engine.streetTsid), target };
+    preloadFireworks();
     clearEvent(state);
     engine.save?.();
   }
@@ -623,7 +653,7 @@ function tickParty(engine, now) {
       if (p.done.has(i) || now < p.finishedAt + fw.at) return;
       p.done.add(i);
       if (streetKey(engine.streetTsid) !== p.street) return;
-      burst(fw);
+      fireworks(fw);
       engine.playSound?.(LONELY_RULES.fireworkSound, { volume: 0.6 });
     });
     if (p.jabberAt && now >= p.jabberAt) {

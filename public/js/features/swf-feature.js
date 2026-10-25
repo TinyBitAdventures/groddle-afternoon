@@ -14,9 +14,13 @@
  *   load.
  * - Game (game_box): Play runs 24.5 s and pays 250 iMG with the mood bonus,
  *   then the Game is gone. Drop is blocked while it plays (the
- *   packDropBlockReason query in game.js). Stand-in: play_glitch's overlay
- *   art survives only as glitch-overlays/play_glitch.fla (vector XFL, not
- *   converted), so the Game's own CC0 icon bobs above the avatar instead.
+ *   packDropBlockReason query in game.js). Above the avatar plays
+ *   play_glitch, Tiny Speck's own overlay (glitch-overlays/play_glitch.fla,
+ *   recovered by tools/overlay-art as a 15 fps sheet, register G194; the
+ *   Glitch wordmark left out): a little Glitch client loads, "still
+ *   loading...", "just a little more...", runs for a moment, then "OOPS
+ *   flash crashed". The Game's own icon bobs there only if that sheet
+ *   cannot load.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&swfdemo=wrangle|game|play
  *   wrangle: swf_1 and swf_2 in the pack (&swfautoplay=1 wrangles swf_1).
@@ -29,7 +33,8 @@
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { grantMoodXp } from '../mood-xp.js';
-import { textureFromUrl } from '../textures.js';
+import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, overlayPlacement } from '../overlay-art.js?v=g237-1';
 import { vpOverlay } from '../quest-rooms/vp-overlay.js?v=ffw-1';
 import {
   GAME_BOX,
@@ -58,7 +63,10 @@ let game = null;
 let lockUntil = 0;
 let lastCounts = null;
 let last = '';
-let badge = null; // the Play stand-in sprite
+let badge = null; // the play_glitch overlay sprite (or the icon stand-in)
+let playArt = null; // overlays.json play_glitch, once loaded
+let playArtFailed = false;
+const playFrames = new Map(); // sheet cell -> Texture
 let demoDone = false;
 let fast = false;
 
@@ -257,11 +265,45 @@ function clearBadge() {
   badge = null;
 }
 
+/** game_box.js 137-149: pc_overlay play_glitch, 110 x 110 box, delta_y -140. */
+const PLAY_OVERLAY = Object.freeze({ key: 'play_glitch', dy: -140 });
+
+function playTexture(cellIndex) {
+  let t = playFrames.get(cellIndex);
+  if (!t) {
+    const c = cellRect(playArt, cellIndex);
+    t = frameTexture(sourceFromUrl(`${OVERLAY_BASE}${playArt.file}`), new globalThis.PIXI.Rectangle(c.x, c.y, c.w, c.h));
+    playFrames.set(cellIndex, t);
+  }
+  return t;
+}
+
 function showBadge(engine) {
   clearBadge();
   const { PIXI } = engine;
   const layer = engine.fxLayer || engine.entityLayer;
   if (!PIXI || !layer) return;
+  if (!playArt && !playArtFailed) {
+    loadOverlayManifest()
+      .then((m) => {
+        if (!m?.[PLAY_OVERLAY.key]) throw new Error('no play_glitch');
+        playArt = m[PLAY_OVERLAY.key];
+      })
+      .catch(() => {
+        playArtFailed = true;
+      })
+      .finally(() => {
+        if (playing()) showBadge(engine);
+      });
+  }
+  if (playArt) {
+    badge = new PIXI.Sprite(playTexture(playArt.order[0]));
+    badge.label = 'play_glitch';
+    badge.zIndex = 60;
+    badge.eventMode = 'none';
+    layer.addChild(badge);
+    return;
+  }
   const url = ITEM_CATALOG[GAME_BOX]?.icon || `assets/sprites/icons/${GAME_BOX}.png`;
   badge = new PIXI.Sprite(textureFromUrl(url));
   badge.anchor.set(0.5, 0.5);
@@ -277,6 +319,20 @@ function tickBadge(now, engine) {
   if (!badge || badge.destroyed) return;
   const p = engine.player;
   if (!p) return;
+  if (badge.label === 'play_glitch' && playArt) {
+    // The overlay's own clock: 24.5 s of the 744-frame clip (QA &swffast=1 runs it 10x).
+    const ms = ((now - (state.playUntil - playMs())) / playMs()) * PLAY.durationMs;
+    const frame = overlayFrameAt(playArt, ms, { loop: false });
+    badge.texture = playTexture(playArt.order[frame]);
+    const at = overlayPlacement(playArt, p.x, p.y + PLAY_OVERLAY.dy, 1);
+    badge.x = at.left;
+    badge.y = at.top;
+    badge.width = at.width;
+    badge.height = at.height;
+    badge.alpha = overlayAlpha(ms, PLAY.durationMs);
+    engine.setData?.('swfPlayFrame', String(frame));
+    return;
+  }
   // play_glitch's pc_overlay sat at delta_y -140 above the avatar.
   badge.x = p.x;
   badge.y = p.y - 140 + Math.sin(now / 260) * 4;

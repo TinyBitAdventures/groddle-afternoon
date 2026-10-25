@@ -76,6 +76,9 @@ export const MOOD_XP_SOURCES = Object.freeze({
     game: 'players/inc_games.js 672, 1077, 1373 (Game of Crowns)',
     job: 'quests/job_*.js job_complete, job_complete_performance',
     rook: 'locations/inc_rook.js 198-201, 741-792; items/include/rook.js 185, 198',
+    swf_wrangle: 'items/swf_1.js 68, swf_2.js 68, swf_3.js 49 wrangle (25 per SWF, no_bonus false)',
+    game_play: 'items/game_box.js 185 onFinishPlayGame (250, no_bonus false)',
+    loneliness: 'items/include/loneliness.js 244 (party, 200), 621 (race visit)',
   }),
   flat: Object.freeze({
     quest: 'quests/*.js quest_complete (no_bonus true)',
