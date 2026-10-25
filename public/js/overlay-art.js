@@ -8,6 +8,8 @@
  *   bitmap sheet, and the browser draws them sharp at any scale.
  * - play_glitch (the Game's Play verb, items/game_box.js 137-149) is a
  *   bitmap sheet (play_glitch@2x.png), 15 fps.
+ * - overlay_sneezing_powder (Sneezing Fit's tick, catalog_buffs.js 2446-2510,
+ *   from Señor Funpickle, G209) is a bitmap sheet, 30 fps.
  *
  * Placement follows the client: an overlay with no width or height shows its
  * Flash stage at 1:1, centred on the overlay point (ArbitrarySWFView scale(),
@@ -20,7 +22,7 @@
  */
 
 export const OVERLAY_BASE = 'assets/sprites/overlays/';
-export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g237-1`;
+export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g209-1`;
 /** Announcement.as 149-150. */
 export const OVERLAY_FADE = Object.freeze({ inMs: 200, outMs: 400 });
 

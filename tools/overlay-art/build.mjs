@@ -44,6 +44,9 @@ export const OVERLAYS = Object.freeze({
   fireworks_1: { fla: 'glitch-overlays/fireworks_1.fla', kind: 'svg', step: 1 },
   fireworks_2: { fla: 'glitch-overlays/fireworks_2.fla', kind: 'svg', step: 1 },
   fireworks_3: { fla: 'glitch-overlays/fireworks_3.fla', kind: 'svg', step: 1 },
+  // catalog_buffs.js 2446-2510 sneezing_fit on_tick: pc_overlay
+  // overlay_sneezing_powder, 300 x 300 at delta_y -110, 2 s (Señor Funpickle, G209).
+  overlay_sneezing_powder: { fla: 'glitch-overlays/overlay_sneezing_powder.fla', kind: 'sheet', scale: 1, step: 1 },
   play_glitch: {
     fla: 'glitch-overlays/play_glitch.fla',
     kind: 'sheet',

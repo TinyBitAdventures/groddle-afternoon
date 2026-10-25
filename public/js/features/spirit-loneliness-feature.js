@@ -56,7 +56,7 @@ import { getStreetEcologyCatalog } from '../street-ecology.js?v=official-ecology
 import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=lonely-1';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { loadVectorFrames, playVectorOverlay } from '../overlay-art.js?v=g237-1';
+import { loadVectorFrames, playVectorOverlay } from '../overlay-art.js?v=g209-1';
 import {
   INVITE_ART,
   LONELY_RULES,

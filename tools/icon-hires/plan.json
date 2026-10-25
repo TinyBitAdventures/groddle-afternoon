@@ -1155,6 +1155,12 @@
   "frame": "iconic",
   "seed": true
  },
+ "special_item_that_only_beta_testers_get": {
+  "swf": "~/Documents/glitch-audit/glitch-items/misc/special_item_that_only_beta_testers_get/special_item_that_only_beta_testers_get.swf",
+  "sprite": 4,
+  "frame": "iconic",
+  "oga": "~/Documents/glitch-audit/opengameart/extracted_g209/glitch-assets/special_item_that_only_beta_testers_get/special_item_that_only_beta_testers_get__x1_iconic_png_1354833774.png"
+ },
  "stoot_barfield_pullstring_doll": {
   "swf": "~/Documents/glitch-audit/glitch-items/rare_items/stoot_barfield_pullstring_doll/stoot_barfield_pullstring_doll.swf",
   "oga": "~/Documents/glitch-audit/opengameart/extracted_g174/glitch-assets/stoot_barfield_pullstring_doll/stoot_barfield_pullstring_doll__x1_1_png_1354840058.png"
