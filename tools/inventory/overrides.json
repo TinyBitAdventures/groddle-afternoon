@@ -912,6 +912,11 @@
   "reason": "Glitchmas only: catalog_drop_tables.js glitchmas_cracker drop 46 is a game_box; js/features/seasons-feature.js:944 pullCracker rolls that table with a nearby critter helping",
   "register": "G125"
  },
+ "item:party_pack_taster_winter_wingding": {
+  "status": "source",
+  "reason": "Glitchmas only: catalog_drop_tables.js:1352-1354 glitchmas_cracker row 88 (rolls 87-88 of 0-100) is one Winter Wingding taster; js/drop-tables-data.js carries the row and js/features/seasons-feature.js pullCracker rolls CRACKER.table (seasons.js); party-spaces-feature.js activates it into the glitchmas space for 10 minutes",
+  "register": "G180"
+ },
  "item:rook_hall_focusing_orb": {
   "status": "source",
   "reason": "Museum of the Rook exhibit (instance template LA91BDTNHS82D36): game.js draws it from rook_hall_focusing_orb__x1_1 art in the rebuilt museum (js/rook-museum.js)",
