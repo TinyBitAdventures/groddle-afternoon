@@ -937,10 +937,11 @@
    "group": "late",
    "name": "Hell (Naraka)",
    "status": "source",
-   "blurb": "Croak and work your way out by squishing grapes.",
+   "blurb": "Croak and work your way out by squishing grapes, or step into the Hell Bar behind Panka Surazu, where Hell’s Bartender swaps a Diabolical Drink Ticket for Wine of the Dead.",
    "spot": null,
    "evidence": [
-    "public/js/hell.js"
+    "public/js/hell.js",
+    "public/js/hell-bar.js"
    ],
    "shot": "shots/hell.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&helldemo=croak&practice=1"
@@ -950,12 +951,13 @@
    "group": "late",
    "name": "Musicblocks, Cubimals and the Stoot doll",
    "status": "source",
-   "blurb": "All 27 recovered Musicblock tunes (five series of five, SB-1 and Goodnight Groddle) with their collector trophies, both Cubimal series and the memorial pull-string doll.",
+   "blurb": "All 27 recovered Musicblock tunes (five series of five, SB-1 and Goodnight Groddle) with their collector trophies, both Cubimal series and the memorial pull-string doll. Crabs on eight streets will listen to your Musicblocks, and one that hears its oldest tune is a happy crab.",
    "spot": null,
    "evidence": [
     "public/js/musicblocks.js",
     "public/js/cubimals.js",
-    "public/js/stoot-doll.js"
+    "public/js/stoot-doll.js",
+    "public/js/crabs.js"
    ],
    "shot": "shots/collectibles.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&stootdemo=1&stootquote=38&practice=1"
@@ -1975,9 +1977,29 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 384,
+  "commits": 390,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "The Hell Bar behind Panka Surazu's door, with Hell's Bartender and Wine of the Dead"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Fortune Cookies, Plates of Beans, the Hog Haul Ticket, the Class Axe and the Plexus balls"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Crabs on eight of Ur's streets ask for Musicblocks"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "fix",
+    "text": "Rubeweed gives Luck of the Rube, better drops for five minutes"
+   },
    {
     "date": "2026-10-24",
     "kind": "fix",
@@ -2077,26 +2099,6 @@
     "date": "2026-10-24",
     "kind": "fix",
     "text": "Firebog streets keep up to four Sloths, so Circle Crunch can happen"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "89 more badges can be earned: refining, eating and drinking, smelting, furniture, jumps and more"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "The Ur subway, twelve stations on the Red and Blue Lines"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Vicar's Peak, the Groddle Heights cliff of vined ladders behind Thornfad Layers' locked door"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "The fall from the Fireflex lab opens on \"Back to life, back to the present time\""
    }
   ]
  },
