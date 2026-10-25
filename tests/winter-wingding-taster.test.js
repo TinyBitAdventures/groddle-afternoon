@@ -75,11 +75,8 @@ describe('the taster pack opens a 10-minute Winter Wingding', () => {
     assert.ok(existsSync(join(pub, `assets/sprites/icons/${TASTER}@3x.png`)));
   });
 
-  it('the item inventory counts the cracker as its source (tools/inventory/overrides.json)', () => {
+  it('the item inventory finds the cracker drop on its own, with no override (G183 dropTableReach)', () => {
     const overrides = JSON.parse(readFileSync(join(root, 'tools/inventory/overrides.json'), 'utf8'));
-    const row = overrides[`item:${TASTER}`];
-    assert.equal(row?.status, 'source');
-    assert.match(row.reason, /glitchmas_cracker row 88/);
-    assert.equal(row.register, 'G180');
+    assert.equal(overrides[`item:${TASTER}`], undefined);
   });
 });

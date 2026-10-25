@@ -395,6 +395,55 @@ export function judgeItems({ items, reach, present, codeCtx, gsjsRefs, families 
   return rows;
 }
 
+/**
+ * Items the remake's shared drop tables hand out (G183). A table counts only when a live call rolls
+ * it: drop-tables.js rollDropTable(tableId) (rollCrack's bound rollTable included), or a skill
+ * package rolled through rollPackageDrop / rollDropFor, whose rows and imagination overlays name
+ * drop_class_id tables. Nested `table` entries are walked too (glitchmas_cracker, artifacts).
+ *   emissions  scanEmissions rows tagged 'droptable' (pattern = table id) or 'droppackage'
+ *              (pattern = package id); QA rows are skipped
+ *   tables     drop-tables-data.js DROP_TABLES ({ id: { rows: [[threshold, [entry]]] } })
+ *   packages   skill-packages-data.js SKILL_PACKAGES
+ * Returns [[itemId, why]] in emission order, the first table that reaches an item as its evidence.
+ */
+export function dropTableReach({ emissions = [], tables = {}, packages = {} }) {
+  const out = [];
+  const seen = new Set();
+  const tableIds = Object.keys(tables);
+  const packageIds = Object.keys(packages);
+  const matching = (ids, pattern) => (pattern.length === 1 && typeof pattern[0] === 'string'
+    ? (ids.includes(pattern[0]) ? [pattern[0]] : [])
+    : ids.filter((id) => matchPattern(pattern, id)));
+  const packageTables = (id) => {
+    const pkg = packages[id] || {};
+    const rows = [...Object.values(pkg.skills || {}), ...Object.values(pkg.img_upgrades || {})];
+    return [...new Set(rows.map((r) => r.drop_class_id).filter((t) => t && tables[t]))];
+  };
+  const walk = (id, why, path, depth = 0) => {
+    if (depth > 8 || path.includes(id)) return;
+    for (const [, entries] of tables[id]?.rows || []) {
+      for (const e of entries) {
+        if (e.item && !seen.has(e.item)) {
+          seen.add(e.item);
+          out.push([e.item, `${why}${path.length ? ` via ${[...path.slice(1), id].join(' > ')}` : ''}`]);
+        } else if (e.table) walk(e.table, why, [...path, id], depth + 1);
+      }
+    }
+  };
+  for (const e of emissions) {
+    if (e.qa) continue;
+    const at = `${e.file}:${e.line}`;
+    if (e.tag === 'droptable') {
+      for (const t of matching(tableIds, e.pattern)) walk(t, `drop table ${t} (rolled at ${at})`, []);
+    } else if (e.tag === 'droppackage') {
+      for (const p of matching(packageIds, e.pattern)) {
+        for (const t of packageTables(p)) walk(t, `drop table ${t} (skill package ${p}, rolled at ${at})`, []);
+      }
+    }
+  }
+  return out;
+}
+
 /* ------------------------------------------------------------------ */
 /* Quests, skills, imagination, buffs, jobs, sounds, wardrobe, badge art */
 /* ------------------------------------------------------------------ */

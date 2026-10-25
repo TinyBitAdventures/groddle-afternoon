@@ -44,7 +44,8 @@
  *                partial; else research/streets-hunt/categories.json decides (excluded with the category
  *                as reason; unreleased/other rows are unknown).
  *   item / npc   GSJS items/*.js (npc_* separately): obtainable (tools/job-obtainable.mjs: vendors,
- *                starter kit, harvests, recipe and conversion fixpoint; plus solo quest rewards and
+ *                starter kit, harvests, recipe and conversion fixpoint; plus solo quest rewards, the
+ *                shared drop tables a live rollDropTable / rollPackageDrop call rolls (dropTableReach), and
  *                addItem() / inv[id] += n grants outside QA paths; consuming, counting or naming an
  *                item is not a grant, see itemGrantReach), in the world (street-ecology.json), or placed by
  *                code (a classId/classTsid literal or a spawn/create/place call argument). Unreferenced
@@ -97,6 +98,34 @@ export const REMAKE_EMITTERS = [
   // Quest rooms hand items over through their runtime: ctx.give('juju_trowel', 1).
   { name: 'give', args: [0], member: true, tag: 'item', files: /quest-rooms\// },
 ];
+
+/**
+ * Shared drop-table rolls (G183): drop-tables.js rollDropTable(tableId), artifacts.js rollCrack's
+ * bound rollTable(step.table), and skill-package drops (rollPackageDrop(packageId), drops-feature.js
+ * rollDropFor(engine, packageId)). See dropRollEmissions.
+ */
+export const DROP_EMITTERS = [
+  { name: 'rollDropTable', args: [0], member: false, tag: 'droptable' },
+  { name: 'rollTable', args: [0], member: false, tag: 'droptable', files: /artifacts\.js$/ },
+  { name: 'rollPackageDrop', args: [0], member: false, tag: 'droppackage' },
+  { name: 'rollDropFor', args: [1], member: false, tag: 'droppackage' },
+];
+
+/**
+ * Drop-roll call sites with resolved table / package patterns. A file that declares its own
+ * function of the emitter's name rolls something else (resource-nodes.js and street-jobs.js keep
+ * private rollDropTable helpers over their own tables) or recurses (drop-tables.js nested rows,
+ * walked from the data instead), so its calls are left out; rollDropFor is drops-feature.js's own
+ * wrapper and stays.
+ */
+export function dropRollEmissions(index) {
+  const { emissions } = scanEmissions(index, DROP_EMITTERS);
+  const declares = (rel, name) => {
+    const file = index.files.find((f) => f.rel === rel);
+    return Boolean(file && new RegExp(`function\\s+${name}\\b`).test(file.text));
+  };
+  return emissions.filter((e) => e.callee === 'rollDropFor' || e.callee === 'rollTable' || !declares(e.file, e.callee));
+}
 
 export const GSJS_EMITTERS = [
   { name: 'achievements_increment', args: [0, 1], tag: 'counter' },
@@ -349,6 +378,10 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
     for (const [k, x] of Object.entries(v)) if ((k === 'class_id' || k === 'classTsid') && typeof x === 'string') addReach(x, why); else walkIds(x, why);
   };
   for (const [name, t] of Object.entries(sjEarly.drops || {})) walkIds(t, `street-project drop table ${t.name || name}`);
+  // Shared drop tables the remake rolls (G183): rollDropTable / rollPackageDrop call sites -> drop-tables-data.js.
+  const { DROP_TABLES } = await import(join(pub, 'js/drop-tables-data.js'));
+  const { SKILL_PACKAGES } = await import(join(pub, 'js/skill-packages-data.js'));
+  for (const [id, why] of D.dropTableReach({ emissions: dropRollEmissions(remakeIndex), tables: DROP_TABLES, packages: SKILL_PACKAGES })) addReach(id, why);
   const conversions = await supplyConversions();
   // emblem_base iconize (js/giant-icons.js iconize): eleven Emblems of a Giant become its Icon.
   const { GIANT_ICON_DATA } = await import(join(pub, 'js/giant-icons-data.js'));

@@ -11,9 +11,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { buildIndex, contextLiterals, inventoryWrites, liveFiles, matchPattern, prefixLabels, scanEmissions } from '../tools/inventory/scan.mjs';
-import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills, conditionReach, gsjsItemRefs } from '../tools/inventory/detectors.mjs';
+import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills, conditionReach, dropTableReach, gsjsItemRefs } from '../tools/inventory/detectors.mjs';
 import { readTsidRefs, tsidRefsFromText } from '../tools/inventory/gsjs-data.mjs';
-import { REMAKE_EMITTERS, GSJS_EMITTERS, emissionsByTag, itemGrantReach, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
+import { REMAKE_EMITTERS, GSJS_EMITTERS, dropRollEmissions, emissionsByTag, itemGrantReach, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 
 const SUBWAY_JS = `export const RIDE_COUNTER = 'transit:subways_entered';\nexport const OTHER = 'x';\n`;
@@ -425,6 +425,54 @@ describe('item detector: taking an item is not a way to get it (G176)', () => {
     assert.ok(!reach.has('musicblock_x'), reach.get('musicblock_x'));
     assert.ok(reach.has('homestreet_ticket'), 'a real grant beside a QA help callback');
     assert.ok(!reach.has('drink_ticket'), reach.get('drink_ticket'));
+  });
+});
+
+describe('item detector: drop tables the remake rolls (G183)', () => {
+  const TABLES = {
+    cracker: { rows: [[50, [{ item: 'taster' }]], [100, [{ table: 'pieces' }]]] },
+    pieces: { rows: [[100, [{ item: 'piece_1' }, { currants: 5 }]]] },
+    package_table: { rows: [[100, [{ item: 'musicblock_x' }]]] },
+    card_table: { rows: [[100, [{ item: 'flaming_x' }]]] },
+    never_rolled: { rows: [[100, [{ item: 'orphan' }]]] },
+    qa_only: { rows: [[100, [{ item: 'qa_prize' }]]] },
+    own_helper: { rows: [[100, [{ item: 'wrong_table' }]]] },
+  };
+  const PACKAGES = {
+    peat_harvest: { skills: { no_skill: { rank: 0, drop_class_id: 'package_table' } }, img_upgrades: { card: { rank: '1', drop_class_id: 'card_table' } } },
+    unused_pkg: { skills: { no_skill: { rank: 0, drop_class_id: 'never_rolled' } } },
+  };
+  const reachOf = (files) => {
+    const index = buildIndex(files.map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' });
+    return new Map(dropTableReach({ emissions: dropRollEmissions(index), tables: TABLES, packages: PACKAGES }));
+  };
+  const FILES = [
+    ['js/seasons.js', "export const CRACKER = { table: 'cracker' };\n"],
+    ['js/features/seasons-feature.js', "import { rollDropTable } from '../drop-tables.js';\nimport { CRACKER } from '../seasons.js';\nexport function pull(rng) { return rollDropTable(CRACKER.table, rng); }\nfunction demo(engine) { return rollDropTable(engine.param('dropdemo') || 'qa_only'); }\n"],
+    ['js/features/drops-feature.js', "import { rollPackageDrop } from '../drop-tables.js';\nexport function rollDropFor(engine, packageId) { return rollPackageDrop(packageId, {}); }\nexport function onPeat(engine) { return rollDropFor(engine, 'peat_harvest'); }\n"],
+    ['js/resource-nodes.js', "function rollDropTable(id) { return []; }\nexport function trap() { return rollDropTable('own_helper'); }\n"],
+  ];
+
+  it('counts a table rolled through a constant, nested tables included, with the table as evidence', () => {
+    const reach = reachOf(FILES);
+    assert.match(reach.get('taster'), /^drop table cracker \(rolled at js\/features\/seasons-feature\.js:3\)$/);
+    assert.match(reach.get('piece_1'), /drop table cracker .* via pieces$/);
+  });
+
+  it('follows a skill package to its drop tables, imagination overlays included', () => {
+    const reach = reachOf(FILES);
+    assert.match(reach.get('musicblock_x'), /drop table package_table \(skill package peat_harvest, rolled at js\/features\/drops-feature\.js:3\)/);
+    assert.ok(reach.has('flaming_x'));
+  });
+
+  it('skips QA rolls, tables nothing rolls and a private helper of the same name', () => {
+    const reach = reachOf(FILES);
+    for (const id of ['orphan', 'qa_prize', 'wrong_table']) assert.ok(!reach.has(id), `${id}: ${reach.get(id)}`);
+  });
+
+  it('regression: without the cracker roll, the taster is not reachable', () => {
+    const reach = reachOf(FILES.map(([p, t]) => [p, p.endsWith('seasons-feature.js') ? 'export function pull() { return null; }\n' : t]));
+    assert.ok(!reach.has('taster'));
   });
 });
 
