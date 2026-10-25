@@ -62,17 +62,17 @@ const pick = (list, rng = Math.random) => list[Math.floor(rng() * list.length) %
 // Items
 // ---------------------------------------------------------------------------
 
-/** Pack items this module introduces (labels, costs, stack sizes from each GSJS item file). */
+/** Pack items this module introduces (labels, costs, stack sizes and descriptions from each GSJS item file; G315 restored four shortened descriptions). */
 export const HUSBANDRY_ITEMS = Object.freeze({
-  guano: { label: 'Guano', namePlural: 'Guano', baseCost: 20, stackMax: 40, desc: 'An unobtrusive pellet from the back end of a Batterfly, Guano can be used as a fertilizer.' },
+  guano: { label: 'Guano', namePlural: 'Guano', baseCost: 20, stackMax: 40, desc: 'An unobtrusive pellet from the back end of a Batterfly, Guano can be used as a fertilizer to boost the growth of Crops and Herbs, as an ingredient for Potions, or in the street-building trade.' },
   plop: { label: 'Piggy Plop', namePlural: 'Piggy Plops', baseCost: 0, stackMax: 1, desc: 'Piggy plop is the delicately scented excrescence of a healthy piggy. Round, brown, and mysterious, it may contain presents.', sellable: false, donatable: false },
   caterpillar: { label: 'Caterpillar', namePlural: 'Caterpillars', baseCost: 500, stackMax: 1, desc: 'A proto-Butterfly.' },
   chick: { label: 'Chick', namePlural: 'Chicks', baseCost: 300, stackMax: 1, desc: 'A wide-eyed chick, fresh from the egg. It needs grain in order to reach full chickenhood.' },
   piglet: { label: 'Piglet', namePlural: 'Piglets', baseCost: 400, stackMax: 1, desc: 'One wiggly little piggly. He wants to turn into a big pig. Feed him nourishing plant-y food to help him grow.' },
   hogtied_piggy: { label: 'Hog-tied Piggy', namePlural: 'Hog-tied Piggies', baseCost: 500, stackMax: 1, desc: 'One wiggly wild piggy, bound and gagged. Better pen him up fast. Drop this piggy in your home before he gets away.', sellable: false },
-  magic_pig_stick: { label: 'Pig Stick', namePlural: 'Pig Sticks', baseCost: 400, stackMax: 1, desc: 'Placed in your home or on your land, Piggies within trotting distance feel irresistibly drawn to the Pig Stick and want to stay near it.' },
-  magic_chicken_stick: { label: 'Chicken Stick', namePlural: 'Chicken Sticks', baseCost: 400, stackMax: 1, desc: 'A stick for summoning and containing poultry in a happy feathery cabal, when placed in a house or on your land.' },
-  magic_butterfly_stick: { label: 'Butterfly Stick', namePlural: 'Butterfly Sticks', baseCost: 400, stackMax: 1, desc: 'One stick imbued with purest butterfly attractant. Placed on your land, nearby Butterflies are irresistibly attracted to it.' },
+  magic_pig_stick: { label: 'Pig Stick', namePlural: 'Pig Sticks', baseCost: 400, stackMax: 1, desc: 'The saying "Speak softly and carry a Pig Stick" is wise but misleading, as the Pig Stick is not effective when carried, only once placed somewhere in your home or on your land. There, Piggies within trotting distance will feel irresistibly drawn to the precious Pig Stick, and want to stay near it.' },
+  magic_chicken_stick: { label: 'Chicken Stick', namePlural: 'Chicken Sticks', baseCost: 400, stackMax: 1, desc: 'A stick for summoning and containing poultry in a happy feathery cabal. When placed in a house or on your land, chickens within walking, flapping or climbing range will feel an irresistible physical draw to this chick magnet.' },
+  magic_butterfly_stick: { label: 'Butterfly Stick', namePlural: 'Butterfly Sticks', baseCost: 400, stackMax: 1, desc: 'One stick imbued with purest butterfly attractant. Placed in a house or on your land, any Butterflies close enough that their wings tingle with the frequency of buttervibes the stick resonates at (a very precise range) will be irresistibly attracted to it.' },
   meat_collector: { label: 'Meat Collector', namePlural: 'Meat Collectors', baseCost: 500, stackMax: 1, desc: "A farm-grade meat collector. It works around the clock to collect meat from your piggies when you can't." },
   butterfly_milker: { label: 'Butterfly Milker', namePlural: 'Butterfly Milkers', baseCost: 400, stackMax: 1, desc: 'A mechanized butterfly milker. It will gently milk your butterflies in your absence. Good for busy farmers or those with chapped hands.' },
   piggy_feeder: { label: 'Piggy Feeder', namePlural: 'Piggy Feeders', baseCost: 200, stackMax: 1, desc: 'A piggy feeder is a must-have device for lazy farmers. It will feed your pigs while you are away.' },

@@ -222,7 +222,8 @@ export const room = {
   kicker: 'Unblock your way to the exit',
   icon: 'assets/sprites/icons/play_cube.png',
   theme: 'warm',
-  hubName: 'A puzzle place beyond Ur',
+  // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
+  hubName: 'Puzzles',
   durationMs: 5 * 60 * 1000,
   leaveText: 'Leave before you find the exit? You will have to start over.',
   travelText: 'Find the exit, or use Leave.',

@@ -31,11 +31,11 @@ import { unlearningFeature } from './unlearning-feature.js?v=unlearn-1';
 import { dropsFeature } from './drops-feature.js?v=drops-4';
 import { masterGardenFeature } from './master-garden-feature.js?v=mastergarden-4';
 import { animalHusbandryFeature } from './animal-husbandry-feature.js?v=g311-1';
-import { questInstancesFeature } from './quest-instances-feature.js?v=qi-14';
+import { questInstancesFeature } from './quest-instances-feature.js?v=qi-15';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-7';
 import { seasonsFeature } from './seasons-feature.js?v=play-10';
 import { cameraModeFeature } from './camera-mode-feature.js?v=g231-1';
-import { newxpFeature } from './newxp-feature.js?v=g310-1';
+import { newxpFeature } from './newxp-feature.js?v=g315-1';
 
 export { questFlagsFeature };
 
@@ -73,7 +73,7 @@ export const FEATURES = [
   cameraModeFeature,
   newxpFeature,
 ];
-import { smugglingFeature } from './smuggling-feature.js?v=card-12'; FEATURES.push(smugglingFeature);
+import { smugglingFeature } from './smuggling-feature.js?v=card-13'; FEATURES.push(smugglingFeature);
 import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-14'; FEATURES.push(homeTowerFeature);
 import { secretSpotsFeature } from './secret-spots-feature.js?v=secrets-7'; FEATURES.push(secretSpotsFeature);
 import { musicblocksFeature } from './musicblocks-feature.js?v=musicblocks-1'; FEATURES.push(musicblocksFeature);
@@ -84,7 +84,7 @@ import { treeDeathFeature } from './tree-death-feature.js?v=tree-death-16'; FEAT
 import { enchantedForestFeature } from './enchanted-forest-feature.js?v=g296-1'; FEATURES.push(enchantedForestFeature);
 import { jujuBanditsFeature } from './juju-bandits-feature.js?v=g300-1'; FEATURES.push(jujuBanditsFeature);
 import { craftybotFeature } from './craftybot-feature.js?v=g313-1'; FEATURES.push(craftybotFeature);
-import { moodDecayFeature } from './mood-decay-feature.js?v=g313-1'; FEATURES.push(moodDecayFeature);
+import { moodDecayFeature } from './mood-decay-feature.js?v=g315-1'; FEATURES.push(moodDecayFeature);
 import { animalMoodFeature } from './animal-mood-feature.js?v=g311-1'; FEATURES.push(animalMoodFeature);
 import { butlerFeature } from './butler-feature.js?v=butler-feature-31'; FEATURES.push(butlerFeature);
 import { pouchFeature } from './elemental-pouch-feature.js?v=g300-1'; FEATURES.push(pouchFeature);
@@ -100,11 +100,11 @@ import { powdersFeature } from './powders-feature.js?v=g300-1'; FEATURES.push(po
 import { itemVerbsFeature } from './item-verbs-feature.js?v=g313-1'; FEATURES.push(itemVerbsFeature);
 import { artifactsFeature } from './artifacts-feature.js?v=g300-1'; FEATURES.push(artifactsFeature);
 import { doorDrinkFeature } from './door-drink-feature.js?v=g300-1'; FEATURES.push(doorDrinkFeature);
-import { buffTriggersFeature } from './buff-triggers-feature.js?v=card-18'; FEATURES.push(buffTriggersFeature);
+import { buffTriggersFeature } from './buff-triggers-feature.js?v=card-19'; FEATURES.push(buffTriggersFeature);
 import { snoConesFeature } from './sno-cones-feature.js?v=g300-1'; FEATURES.push(snoConesFeature);
 import { bureaucraticHallsFeature } from './bureaucratic-halls-feature.js?v=play-1'; FEATURES.push(bureaucraticHallsFeature);
-import { potionsFeature } from './potions-feature.js?v=card-23'; FEATURES.push(potionsFeature);
-import { purpleJourneyFeature } from './purple-journey-feature.js?v=g313-1'; FEATURES.push(purpleJourneyFeature);
+import { potionsFeature } from './potions-feature.js?v=card-24'; FEATURES.push(potionsFeature);
+import { purpleJourneyFeature } from './purple-journey-feature.js?v=g315-1'; FEATURES.push(purpleJourneyFeature);
 import { smallItemsFeature } from './small-items-feature.js?v=card-24'; FEATURES.push(smallItemsFeature);
 import { crabsFeature } from './crabs-feature.js?v=g300-1'; FEATURES.push(crabsFeature);
 import { hellBarFeature } from './hell-bar-feature.js?v=g300-1'; FEATURES.push(hellBarFeature);
@@ -124,4 +124,4 @@ import { familiarDialogFeature } from './familiar-dialog-feature.js?v=g225-1'; F
 import { spiritLonelinessFeature } from './spirit-loneliness-feature.js?v=lonely-11'; FEATURES.push(spiritLonelinessFeature);
 import { funpickleFeature } from './funpickle-feature.js?v=desk2-7'; FEATURES.push(funpickleFeature);
 import { qurazyFeature } from './qurazy-feature.js?v=g310-1'; FEATURES.push(qurazyFeature);
-import { energyDecayFeature } from './energy-decay-feature.js?v=g313-1'; FEATURES.push(energyDecayFeature);
+import { energyDecayFeature } from './energy-decay-feature.js?v=g315-1'; FEATURES.push(energyDecayFeature);

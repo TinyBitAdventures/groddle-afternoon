@@ -493,7 +493,8 @@ export const room = {
   kicker: 'Hone your skills as you travel toward the radiant glare above',
   icon: 'assets/sprites/icons/play_cube.png',
   theme: 'lab',
-  hubName: 'A puzzle place beyond Ur',
+  // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
+  hubName: 'Puzzles',
   durationMs: EXIT_DELAY_MS,
   leaveText: 'Leave before you reach the glare? You will have to start over.',
   travelText: 'Find the EXIT, or use Leave.',

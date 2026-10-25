@@ -248,7 +248,8 @@ export const room = {
   kicker: 'Vision test',
   icon: `${ART}frog_icon.png`,
   theme: 'memory',
-  hubName: 'A quiet place beyond Ur',
+  // G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording.
+  hubName: 'Quest',
   durationMs: 5 * 60 * 1000,
   leaveText: 'Leave the Institute? The frog still needs your eyes.',
   travelText: 'You are in the middle of a vision test.',

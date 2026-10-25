@@ -623,7 +623,8 @@ export const room = {
   kicker: 'Drop blocks, climb out',
   icon: 'assets/sprites/icons/play_cube.png',
   theme: 'dark',
-  hubName: 'A puzzle place beyond Ur',
+  // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
+  hubName: 'Puzzles',
   // The 5 * 60 exit delay is a prompt, not a clock (see tick).
   durationMs: 0,
   leaveText: 'Leave before you reach the end? You will have to start over.',

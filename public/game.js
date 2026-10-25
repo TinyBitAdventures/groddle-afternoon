@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-11';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-124';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-125';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -1652,7 +1652,8 @@ ensureItem(SMALL_WORTHLESS_ID, {
 });
 ensureItem(EMOTIONAL_BEAR_ID, {
   label: 'Emotional Bear',
-  desc: "When you can't express how you're feeling, this furry companion will emote on your behalf. Attach Lips for kissing or a Moon for you-know-whatting.",
+  // G315: items/emotional_bear.js 8 (links dropped); was a shortened rewrite.
+  desc: "When you can't express how you're feeling, this furry companion will emote on your behalf. Particularly when equipped with Lips for kissing or a Moon for you-know-whatting…",
   icon: emotionalBearIcon(emotionalBearState),
   baseCost: 300,
   stackMax: 1,
@@ -11432,7 +11433,7 @@ async function startFourLetterQuest(opts = {}) {
     currentStreet = {
       tsid: FOUR_LETTER_ROOM_ID,
       label: "Mr. Block's Playroom",
-      hubName: 'A very small room',
+      hubName: 'Quest', // G315: hub 61, a dev label (inc_data_maps_prod.js 245)
       bounds: { l: 0, r: KIDS_ROOM_W, t: 0, b: 760 },
       platforms: bgLayer.platformsScreen,
       signposts: [],
@@ -11462,7 +11463,7 @@ async function startFourLetterQuest(opts = {}) {
     world.y = -Math.round(camY);
     const nameEl = document.getElementById('street-name');
     if (nameEl) {
-      nameEl.textContent = "Mr. Block's Playroom · A very small room";
+      nameEl.textContent = "Mr. Block's Playroom · Quest";
       nameEl.dataset.tsid = FOUR_LETTER_ROOM_ID;
     }
     savePlayerLocation(fourLetterSourceLocation);
@@ -12068,7 +12069,7 @@ function spawnLegalizeGregariousExterior() {
   legalizeTargets.push(register({
     classId: 'legalize_hall_entrance',
     label: 'Bureaucratic Hall',
-    subtitle: 'Bureau of Administrative Affairs · Ministry of Departments',
+    subtitle: 'Bureau of Administrative Affairs · Ministry of Departments', // Tiny Speck blog 2011-02-27 (research/wayback/raw/blog)
     sprite: hall,
     state: { legalizeState: legalizeRun, routeAction: 'enter_hall' },
   }));
@@ -13113,10 +13114,11 @@ function updateGreedyStreetSpirit() {
 
 function winterLocationLabel(tsid) {
   if (tsid === WINTER_WALK_STREET_ID) {
-    return { street: 'Winter Walk', hub: 'A quiet place beyond Ur' };
+    // G315: both templates sit in hub 61, a dev label (inc_data_maps_prod.js 245, 17934-17938): plain remake wording.
+    return { street: 'Winter Walk', hub: 'Quest' };
   }
   if (tsid === WINTER_HAVEN_STREET_ID) {
-    return { street: 'Winter Haven', hub: 'Beneath Winter Walk' };
+    return { street: 'Winter Haven', hub: 'Quest' };
   }
   return null;
 }
@@ -13671,10 +13673,11 @@ function summersDayIsInstanced() {
 
 function summersDayLocationLabel(tsid = currentStreetTsid) {
   if (tsid === SUMMERS_DAY_MAIN_ID) {
-    return { street: 'A Summer’s Day', hub: 'A shared memory of the Giants' };
+    // G315: both templates sit in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label: plain remake wording.
+    return { street: 'A Summer’s Day', hub: 'Quest' };
   }
   if (tsid === SUMMERS_DAY_BONUS_ID) {
-    return { street: 'Annex of A Summer’s Day', hub: 'A shared memory of the Giants' };
+    return { street: 'Annex of A Summer’s Day', hub: 'Quest' };
   }
   return null;
 }
@@ -14139,7 +14142,7 @@ async function transitionIntoSummersDay(stage, useTransition = true) {
     fromLabel: currentStreet?.label || '',
     fromHub: currentStreet?.hubName || '',
     toLabel: label,
-    toHub: 'A shared memory of the Giants',
+    toHub: 'Quest',
     topColor: 0xf9fdff,
     bottomColor: 0xb8dce8,
     onMid: async () => setup(),
@@ -14777,7 +14780,7 @@ function setupRookWoodsInstance() {
   currentStreet = {
     tsid: ROOK_WOODS_STREET_ID,
     label: "Rooks' Woods",
-    hubName: 'A Humbaba trial',
+    hubName: 'Quest', // G315: hub 61, a dev label (inc_data_maps_prod.js 245)
     hubId: 'rook',
     bounds: { l: 0, r: bgLayer.worldW, t: 0, b: bgLayer.worldH },
     platforms: bgLayer.platformsScreen,
@@ -14805,7 +14808,7 @@ function setupRookWoodsInstance() {
   world.position.set(-Math.round(camTarget), -Math.round(camY));
   const name = document.getElementById('street-name');
   if (name) {
-    name.textContent = "Rooks' Woods · A Humbaba trial";
+    name.textContent = "Rooks' Woods · Quest";
     name.dataset.tsid = ROOK_WOODS_STREET_ID;
   }
   setAmbientForStreet({ hubName: 'Rook Woods' }, { force: true });
@@ -14857,7 +14860,7 @@ async function startRookWoodsQuest(opts = {}) {
         fromLabel: currentStreet?.label || '',
         fromHub: currentStreet?.hubName || '',
         toLabel: "Rooks' Woods",
-        toHub: 'A Humbaba trial',
+        toHub: 'Quest',
         topColor: '#2e332c',
         bottomColor: '#101411',
         onMid: setup,
@@ -16015,7 +16018,7 @@ function setupDeEmbiggenifyInstance() {
     tsid: EESTI_STREET_ID,
     productionTsid: EESTI_PRODUCTION_TSID,
     label: 'Eesti Life Catalogue Page 17',
-    hubName: 'A very big little room',
+    hubName: 'Eesti Life Catalog', // G315: hub 49 (inc_data_maps_prod.js 119)
     hubId: '49',
     bounds: { l: 0, r: bgLayer.worldW, t: 0, b: bgLayer.worldH },
     platforms: bgLayer.platformsScreen,
@@ -16045,7 +16048,7 @@ function setupDeEmbiggenifyInstance() {
   world.y = -Math.round(camY);
   const name = document.getElementById('street-name');
   if (name) {
-    name.textContent = 'Eesti Life Catalogue Page 17 · A very big little room';
+    name.textContent = 'Eesti Life Catalogue Page 17 · Eesti Life Catalog';
     name.dataset.tsid = EESTI_PRODUCTION_TSID;
   }
   if (state.started && audio.ctx) {
@@ -18832,9 +18835,9 @@ async function enterStreet(tsid, opts = {}) {
     data.label = LAST_FEAT_STREET_LABELS[data.tsid];
   }
   if (data.tsid === STOOT_MEMORIAL_STREET_ID) {
-    // The archived private street omits its hub label; the supplied loading
-    // screen preserves the original Alphermia Prime attribution.
-    data.hubName = 'Alphermia Prime';
+    // The archived private street omits its hub label. G315: 'unnnn' is in hub 96
+    // (inc_data_maps_prod.js 16973-16978, 679); the old hub label had no source.
+    data.hubName = 'Jethimadh Tower: Mid';
   }
   features.prepareStreet(data, engine);
   currentStreet = data;
@@ -19062,7 +19065,7 @@ async function enterStreet(tsid, opts = {}) {
   if (nameEl) {
     const winterLabel = winterLocationLabel(data.tsid);
     const stootLabel = data.tsid === STOOT_MEMORIAL_STREET_ID
-      ? { street: 'unnnn', hub: 'Alphermia Prime' }
+      ? { street: 'unnnn', hub: 'Jethimadh Tower: Mid' }
       : null;
     const streetLabel = winterLabel?.street || stootLabel?.street ||
       (data.tsid === AXIS_DENYDE_STREET_ID ? 'Axis Denyde' : data.label);

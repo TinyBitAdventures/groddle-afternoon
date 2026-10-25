@@ -38,8 +38,8 @@ export const INSTANCE_LABEL = 'You Feel Woooooozy...';
 export const LOADING_LABEL = 'Back to life, back to the present time';
 export const ENTRY = ARRIVAL;
 export const PHYSICS = Object.freeze({ vyMax: VY_MAX });
-/** The location bar's hub line in the fall (the quest-room runtime's default). */
-export const FALL_HUB = 'A quiet place beyond Ur';
+/** The location bar's hub line in the fall. G315: template LLI12DVTLA01HT5 sits in hub 45 'Start' (inc_data_maps_prod.js 105), a dev label; plain remake wording. */
+export const FALL_HUB = 'Quest';
 
 /** Source y of the avatar's feet. */
 const srcY = (p) => Math.round(p.y + (FLOOR_Y - FLOOR));

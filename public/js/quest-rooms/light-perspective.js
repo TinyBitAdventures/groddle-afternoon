@@ -553,7 +553,8 @@ export const room = {
   kicker: 'Light up your path to find the way',
   icon: 'assets/sprites/icons/bulb.png',
   theme: 'dark',
-  hubName: 'A puzzle place beyond Ur',
+  // G315: hub 135 'Puzzles' (inc_data_maps_prod.js 1197), the template's hub.
+  hubName: 'Puzzles',
   durationMs: DURATION_MS,
   leaveText: 'Leave before you find the exit? You will have to start over.',
   travelText: 'Find the exit, or use Leave.',

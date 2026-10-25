@@ -522,7 +522,8 @@ export const room = {
   kicker: 'Solve the maze',
   icon: 'assets/sprites/icons/cheese.png',
   theme: 'lab',
-  hubName: 'Somewhere you should not be',
+  // G315: B.T.C Room #3's hub, 'Fireflex 3000 Lab' (inc_data_maps_prod.js 1253, 18097-18099).
+  hubName: 'Fireflex 3000 Lab',
   durationMs: EXIT_MS,
   leaveText: 'Sneak out before you reach the exit? The quest will fail.',
   travelText: 'Reach the exit, or use Leave.',

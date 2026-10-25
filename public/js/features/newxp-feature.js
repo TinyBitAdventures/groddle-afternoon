@@ -247,6 +247,9 @@ const CSS = `
 .nx-instr{position:fixed;z-index:58;transform:translateX(-50%);background:rgba(255,255,255,.92);color:#555;border-radius:999px;padding:6px 16px;
   font:700 14px Nunito,"Trebuchet MS",sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.2);pointer-events:none;white-space:nowrap}
 .nx-instr b{color:#333}
+/* G315: the hand's help text sits where the instruction overlay does; the client filled the viewport behind the hand
+   (glitch-client ImgMenuView.as 323-336, beginFill(0, .7)), so an open card hides the instruction until it closes. */
+body:has(.nx-card:not([hidden])) .nx-instr{visibility:hidden}
 .nx-card{position:fixed;inset:0;z-index:62;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(10,10,20,.72);color:#fff;
   font:700 14px Nunito,"Trebuchet MS",sans-serif;text-align:center}
 .nx-card h2{margin:0;font-size:34px;font-weight:800}
@@ -1049,7 +1052,8 @@ function buildClouds(engine) {
   const world = root.layer(1, 2);
   const beats = L.beats.map((b) => {
     const text = kit.label(PIXI, b.text, b.x, b.y, { size: b.text.length < 12 ? 64 : 34, fill: 0xffffff, wrap: 560, stroke: { color: 0x6fa7c9, width: 2 } });
-    text.alpha = 0;
+    // G315: the words were street art (decos) in the newxp_intro template, so they
+    // stood on the clouds from the start; newxp_intro.js (1-104) has no reveal step.
     world.addChild(text);
     return text;
   });

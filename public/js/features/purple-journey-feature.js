@@ -262,8 +262,8 @@ export function enterVoyage(engine) {
   engine.enterScene({
     tsid: VOYAGE_SCENE,
     label: VOYAGE_LABEL,
-    // Hub 61 is a hidden instance hub; the remake's rooms say where they are the same way.
-    hubName: 'A quiet place beyond Ur',
+    // G315: hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245) is a dev label; plain remake wording.
+    hubName: 'Quest',
     width: VOYAGE_W,
     height: VOYAGE_H,
     background: scene.background,
@@ -579,7 +579,7 @@ export const purpleJourneyFeature = {
 
   /** The scene keeps no ordinary signposts; a reload resumes where you came from (enterScene's returnTo). */
   labelFor(tsid) {
-    return tsid === VOYAGE_SCENE ? { street: VOYAGE_LABEL, hub: 'A quiet place beyond Ur', hubId: 'scene' } : null;
+    return tsid === VOYAGE_SCENE ? { street: VOYAGE_LABEL, hub: 'Quest', hubId: 'scene' } : null;
   },
 
   /** purple_flower.js canMunch while Purpled Out. */

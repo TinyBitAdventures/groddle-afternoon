@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 485,
+  "commits": 486,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Leaving the street ends the Firefly and Game lines, a failed Gwendolyn's Task or Juju quest goes back to its giver, and the Game of Crowns says Stay it for 60 seconds"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "Home questions are plain yes/no prompts, races and games stop new quests from starting, and Go Moloko Loco waits for Animal Kinship IV"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The Spinning Wheel, pecking chickens and the Hatchet no longer blink out once a loop"
    }
   ]
  },

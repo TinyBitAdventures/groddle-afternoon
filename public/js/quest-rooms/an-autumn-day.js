@@ -48,7 +48,8 @@ export const AUTUMN_MS = 5 * 60 * 1000;
 /** source: inc_data_maps_prod.js location names. */
 export const MAIN_LABEL = 'An Autumn Day';
 export const FEELING_LABEL = 'This feeling of …';
-export const HUB_NAME = 'A shared memory of the Giants';
+/** G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording. */
+export const HUB_NAME = 'Quest';
 export const CAPTION = 'Almost forgot this feeling of …';
 export const SOURCE_TSIDS = Object.freeze({
   main: 'LUVCCQSMDIB3HOI',

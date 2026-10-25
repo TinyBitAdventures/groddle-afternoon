@@ -399,7 +399,8 @@ export const room = {
   title: "Mr. Block's Playroom",
   icon: 'assets/sprites/quests/four-letter/quest-icon.png',
   theme: 'warm',
-  hubName: 'A very small room',
+  // G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording.
+  hubName: 'Quest',
   durationMs: 5 * 60_000,
   leaveText: 'Oh, are you not having fun here? Would you prefer to leave?',
 
@@ -415,7 +416,7 @@ export const room = {
     ctx.data.scenePieces = background.pieces;
     return {
       label: "Mr. Block's Playroom",
-      hubName: 'A very small room',
+      hubName: 'Quest',
       width: W,
       height: H,
       background,

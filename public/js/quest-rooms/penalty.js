@@ -289,7 +289,8 @@ export const room = {
   kicker: 'Wrongfully imprisoned',
   icon: `${ART}vendor_icon.png`,
   theme: 'dark',
-  hubName: 'Penalty Island',
+  // G315: hub 73 'Penalty' (inc_data_maps_prod.js 371, street 'The Penalty Box' 18014).
+  hubName: 'Penalty',
   durationMs: 0, // exit_delay: a prompt after two minutes, no clock
   leaveText: 'Leave the cell? The Smuggler stays locked up and you will have to come back.',
   travelText: 'The bars are sturdier than they look. There must be another way out.',

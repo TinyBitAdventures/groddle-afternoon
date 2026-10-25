@@ -255,7 +255,8 @@ export const room = {
   kicker: 'Take a nap',
   icon: 'assets/sprites/quest-rooms/being_watched/cup_of_water.png',
   theme: 'warm',
-  hubName: 'A beige dream',
+  // G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording.
+  hubName: 'Quest',
   durationMs: NAP_MS,
   leaveText: 'Wake up now? You have not ridden it out yet.',
   travelText: 'You are fast asleep.',

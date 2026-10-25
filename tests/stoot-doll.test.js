@@ -109,8 +109,9 @@ test.describe('pull-string interaction', () => {
     assert.match(game, /function handleStootDollTarget\(/);
     assert.match(game, /function pullPackedStootDoll\(/);
     assert.match(game, /data\.tsid === STOOT_MEMORIAL_STREET_ID/);
-    assert.match(game, /data\.hubName = 'Alphermia Prime'/);
-    assert.match(game, /Alphermia Prime/);
+    // G315: hub 96 (inc_data_maps_prod.js 16973-16978); 'Alphermia Prime' had no source.
+    assert.match(game, /data\.hubName = 'Jethimadh Tower: Mid'/);
+    assert.doesNotMatch(game, /Alphermia Prime/);
     assert.match(game, /currentStreetPopulation\.companions !== false/);
     assert.match(game, /stootDollAudio = 'recovered-c2'/);
     assert.match(game, /if \(result\.soundKey\) playSound\(result\.soundKey/);
