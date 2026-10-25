@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Every item in Tiny Speck's Glitch and its status in the Groddle Afternoon remake: 760 of 994 are in." />
+  <title>Item catalog · Groddle Field Notes</title>
+  <link rel="stylesheet" href="../restoration/restoration.css" />
+  <link rel="stylesheet" href="../changelog/changelog.css" />
+  <link rel="stylesheet" href="../site/site-nav.css" />
+  <link rel="stylesheet" href="../items/catalog.css" />
+  <link rel="icon" href="../favicon.svg?v=quoin" type="image/svg+xml" />
+  <link rel="icon" href="../favicon.ico?v=quoin" sizes="32x32" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png?v=quoin" />
+  <script type="module" src="catalog.js"></script>
+</head>
+<body class="notes catalog">
+  <nav class="site-nav" aria-label="Site">
+    <div class="wrap site-nav-row">
+      <a class="wordmark" href="../"><img src="../favicon.svg?v=quoin" alt="" width="28" height="28" /><span>Groddle Afternoon</span></a>
+      <div class="site-nav-links">
+        <a href="../restoration/">Restoration</a>
+        <a href="../compare/">Compare</a>
+        <a href="../items/" aria-current="page">Items</a>
+        <a href="../changelog/">Notes</a>
+        <a class="site-nav-play" href="../play/">Play</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="masthead note-head cat-head">
+    <div class="wrap">
+      <p class="kicker">Groddle Field Notes · Items</p>
+      <h1>Item catalog</h1>
+      <p class="lead">Every item in Tiny Speck’s Glitch, from the game’s own code, and whether you can get it in the remake yet.</p>
+      <p class="cat-score"><strong>760</strong> of 994 items are in the remake. 77 are not in yet, 9 are lost because they needed other players, and 148 were never finished in the original.</p>
+      <p class="cat-note">138 more classes in the item folder are server plumbing (admin tools, tests, quest markers, containers the server made for itself) and are left out.</p>
+    </div>
+  </header>
+
+  <main class="band cat-main">
+    <div class="wrap">
+      <div class="cat-tools">
+        <label class="history-search cat-search" for="q">
+          <span class="visually-hidden">Search items</span>
+          <input id="q" type="search" placeholder="Search, e.g. apple, pick, piggy" autocomplete="off" spellcheck="false" />
+        </label>
+        <div class="cat-selects">
+          <label><span>Category</span>
+            <select id="cat">
+              <option value="">All categories</option>
+              <option value="Musicblocks">Musicblocks (28)</option>
+              <option value="Drinks">Drinks (29)</option>
+              <option value="Food">Food (201)</option>
+              <option value="Tools">Tools (72)</option>
+              <option value="Potions and powders">Potions and powders (17)</option>
+              <option value="Alchemy">Alchemy (26)</option>
+              <option value="Garden">Garden (28)</option>
+              <option value="Animals">Animals (16)</option>
+              <option value="Resources">Resources (69)</option>
+              <option value="Machines">Machines (14)</option>
+              <option value="Artifacts">Artifacts (104)</option>
+              <option value="Trophies">Trophies (38)</option>
+              <option value="Emblems and icons">Emblems and icons (22)</option>
+              <option value="Furniture and home">Furniture and home (72)</option>
+              <option value="Bags">Bags (35)</option>
+              <option value="Toys and games">Toys and games (32)</option>
+              <option value="Cards and tickets">Cards and tickets (18)</option>
+              <option value="Keys">Keys (12)</option>
+              <option value="Holidays">Holidays (11)</option>
+              <option value="Mental items">Mental items (26)</option>
+              <option value="Street objects">Street objects (83)</option>
+              <option value="Other">Other (41)</option>
+            </select>
+          </label>
+          <label><span>Sold by</span>
+            <select id="sold">
+              <option value="">Any vendor</option>
+              <option value="produce">Produce Vendor</option>
+              <option value="hardware">Hardware Vendor</option>
+              <option value="sno_cone">Sno Cone Vendor</option>
+              <option value="gardening">Gardening Goods Vendor</option>
+              <option value="kitchen">Kitchen Tools Vendor</option>
+              <option value="groceries">Groceries Vendor</option>
+              <option value="alchemical">Alchemical Goods Vendor</option>
+              <option value="animal">Animal Goods Vendor</option>
+              <option value="tools">Tool Vendor</option>
+              <option value="gardening_tools">Gardening Tools Vendor</option>
+              <option value="emporium">Uncle Friendly's Emporium</option>
+              <option value="liquor">Helga's Liquor Store</option>
+              <option value="meals">Meal Vendor</option>
+              <option value="mining">Mining Vendor</option>
+              <option value="toys">Toy Vendor</option>
+              <option value="fox_ranger">Fox Ranger</option>
+              <option value="bureaucracy">Bureaucratic Hall clerk</option>
+              <option value="rare_item_vendor">Rare Item Vendor</option>
+              <option value="race_ticket_dispenser">Race Ticket Dispenser</option>
+            </select>
+          </label>
+        </div>
+        <div class="chips" role="group" aria-label="Status">
+          <button type="button" class="chip" data-status="" aria-pressed="true">All <span class="count">994</span></button>
+          <button type="button" class="chip" data-status="source" aria-pressed="false"><span class="dot st-source" aria-hidden="true"></span>In the remake <span class="count">760</span></button>
+          <button type="button" class="chip" data-status="missing" aria-pressed="false"><span class="dot st-missing" aria-hidden="true"></span>Not yet <span class="count">77</span></button>
+          <button type="button" class="chip" data-status="lost" aria-pressed="false"><span class="dot st-lost" aria-hidden="true"></span>Lost <span class="count">9</span></button>
+          <button type="button" class="chip" data-status="unbuilt_original" aria-pressed="false"><span class="dot st-unbuilt_original" aria-hidden="true"></span>Never finished <span class="count">148</span></button>
+        </div>
+        <div class="chips" role="group" aria-label="Can get it now">
+          <span class="cat-chips-label">Get it now:</span>
+          <button type="button" class="chip" data-get="sold" aria-pressed="false">Sold by a vendor <span class="count">162</span></button>
+          <button type="button" class="chip" data-get="made" aria-pressed="false">Made <span class="count">396</span></button>
+          <button type="button" class="chip" data-get="harvest" aria-pressed="false">Harvested <span class="count">76</span></button>
+          <button type="button" class="chip" data-get="other" aria-pressed="false">Found or given <span class="count">249</span></button>
+        </div>
+      </div>
+      <p class="cat-count" id="count" aria-live="polite">994 items</p>
+      <ul class="cat-grid" id="grid"></ul>
+      <p class="cat-empty" id="empty" hidden>No items match. Try fewer filters.</p>
+      <noscript><p class="cat-empty">The catalog list needs JavaScript. Every item also has its own page, starting with <a href="dice_12sided/">12-sided Die</a>; each page links to the next.</p></noscript>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p>Tiny Speck's Glitch art, music and code are CC0. Item names and descriptions are Tiny Speck's, from the game's code. Groddle Afternoon is a fan remake and uses no Glitch logo.</p>
+      <p><a href="../">Home</a> · <a href="../play/">Play Groddle Afternoon</a> · <a href="../restoration/">Restoration report</a> · <a href="../items/">Item catalog</a></p>
+    </div>
+  </footer>
+</body>
+</html>

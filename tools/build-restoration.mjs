@@ -330,5 +330,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const history = historyLog();
     writeFileSync(join(pub, 'restoration', 'history.json'), `${JSON.stringify({ generatedAt: data.generatedAt, ...history })}\n`);
     console.log(`${data.back}/${data.possible} systems back · ${data.quests.playable} playable quests · ${data.rooms.built}/${data.rooms.total} rooms -> ${out}`);
+    // The item catalog reads the same game data and the coverage inventory, so it is rebuilt with the report.
+    execFileSync(process.execPath, [fileURLToPath(new URL('./catalog/build.mjs', import.meta.url))], { stdio: 'inherit' });
   }
 }

@@ -1,0 +1,116 @@
+/* Groddle Field Notes · Item catalog. Builds on ../restoration/restoration.css
+   (tokens, chips, pills, search box) and ../changelog/changelog.css (dark
+   theme, note head, tags, pager). The pages are written by
+   tools/catalog/build.mjs; ./catalog.js draws the grid from ./data.json. */
+
+.catalog { --ph: color-mix(in srgb, var(--border) 55%, transparent); }
+.st-source { --tone: var(--moss); }
+.st-missing { --tone: var(--sun); }
+.st-lost { --tone: var(--plum); }
+.st-unbuilt_original { --tone: var(--stone); }
+.dot.st-source, .dot.st-missing, .dot.st-lost, .dot.st-unbuilt_original { background: var(--tone); }
+
+/* —— The catalog —— */
+.cat-head { padding-bottom: 20px; }
+.cat-score { margin: 0 0 6px; font-size: 18px; max-width: 46em; }
+.cat-score strong { font-family: var(--font-display); font-size: 30px; color: var(--moss); }
+.cat-note { margin: 0; color: var(--muted); font-size: 14px; max-width: 46em; }
+.cat-main { padding-top: 8px; }
+.cat-tools { display: grid; gap: 12px; margin-bottom: 14px; }
+.cat-search { max-width: 520px; }
+.cat-selects { display: flex; flex-wrap: wrap; gap: 10px 16px; }
+.cat-selects label { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--muted); }
+.cat-selects select {
+  font: inherit; font-size: 14px; font-weight: 600; color: var(--fg); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; max-width: 62vw;
+}
+.cat-selects select:focus-visible, .catalog .chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.cat-chips-label { align-self: center; font-size: 14px; font-weight: 700; color: var(--muted); }
+.catalog .chip .dot { width: 9px; height: 9px; }
+.cat-count { margin: 0 0 12px; font-weight: 700; min-height: 1.55em; }
+.cat-empty { color: var(--muted); }
+
+.cat-grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 10px;
+}
+.cat-grid li { content-visibility: auto; contain-intrinsic-size: auto 150px; }
+.cat-grid li[hidden] { display: none; }
+.cat-card {
+  height: 150px; box-sizing: border-box; display: grid; grid-template-rows: 56px 1fr auto; justify-items: center; gap: 4px;
+  padding: 10px 8px 8px; text-align: center; text-decoration: none; color: var(--fg);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.cat-card:hover { border-color: var(--moss); }
+.cat-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.cat-ic { width: 52px; height: 52px; object-fit: contain; align-self: center; }
+.cat-ph { display: block; border: 2px dashed var(--ph); border-radius: 12px; box-sizing: border-box; }
+.cat-ph.cat-ic { width: 44px; height: 44px; }
+.cat-name { font-size: 14px; font-weight: 700; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.cat-st { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: var(--muted); white-space: nowrap; }
+.cat-st::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--tone); }
+@media (max-width: 440px) {
+  .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .cat-card { height: 144px; padding: 8px 4px 6px; grid-template-rows: 50px 1fr auto; }
+  .cat-grid li { contain-intrinsic-size: auto 144px; }
+  .cat-ic { width: 46px; height: 46px; }
+  .cat-name { font-size: 13px; }
+}
+
+/* —— An item —— */
+.cat-item-head { padding-bottom: 24px; }
+.cat-hero { display: flex; align-items: center; gap: 24px; }
+.cat-hero h1 { margin: 0 0 4px; font-size: clamp(34px, 5vw, 60px); overflow-wrap: anywhere; }
+.cat-hero-frame {
+  flex: none; width: 168px; height: 168px; display: grid; place-items: center;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+.cat-hero-icon { max-width: 144px; max-height: 144px; width: auto; height: auto; object-fit: contain; }
+.cat-hero-icon.cat-ph { width: 96px; height: 96px; }
+.cat-plural { margin: 0 0 10px; color: var(--muted); }
+.cat-status { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.cat-register { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.cat-cols { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
+.cat-original { padding-top: 28px; }
+.cat-original h2, .cat-remake h2, .cat-verbs-band h2 { font-size: clamp(26px, 3.4vw, 36px); }
+.cat-desc { font-size: 18px; max-width: 40em; }
+.cat-desc p { margin: 0 0 12px; }
+.cat-list { margin: 0 0 18px; padding-left: 20px; max-width: 46em; display: grid; gap: 6px; }
+.cat-list a, .cat-desc a, .cat-music a { color: var(--moss); font-weight: 700; }
+.cat-extras { color: var(--lead); }
+.cat-with { color: var(--muted); font-size: 0.92em; }
+.cat-source { margin: 14px 0 0; font-size: 13px; color: var(--muted); }
+.cat-muted { color: var(--muted); }
+.cat-facts {
+  margin: 0; padding: 16px 18px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 14px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); font-size: 15px;
+}
+.cat-facts dt { font-weight: 700; color: var(--muted); }
+.cat-facts dd { margin: 0; overflow-wrap: anywhere; }
+.cat-facts .note-tags { gap: 5px; }
+.cat-facts .note-tags li { font-size: 11px; padding: 2px 8px; }
+.cat-remake h3 { font-size: 20px; margin: 18px 0 8px; }
+.cat-status-text { font-size: 18px; margin: 0 0 6px; max-width: 46em; }
+.cat-music { margin: 14px 0 0; }
+.cat-music a::before { content: '♪ '; }
+.cat-verbs { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 8px 18px; }
+.cat-verbs div { padding: 8px 0; border-bottom: 1px solid var(--row-line); }
+.cat-verbs dt { font-weight: 700; }
+.cat-verbs dd { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.cat-verbs dd:empty { display: none; }
+li[id^="recipe-"]:target { background: color-mix(in srgb, var(--accent) 18%, transparent); border-radius: 6px; }
+@media (max-width: 800px) { .cat-cols { grid-template-columns: 1fr; } }
+@media (max-width: 520px) {
+  .cat-hero { gap: 16px; }
+  .cat-hero-frame { width: 104px; height: 104px; }
+  .cat-hero-icon { max-width: 88px; max-height: 88px; }
+  .cat-hero-icon.cat-ph { width: 64px; height: 64px; }
+  .cat-desc { font-size: 17px; }
+}
+@media (max-width: 520px) {
+  .cat-head { padding-top: 36px; }
+  .cat-head .lead { font-size: 17px; margin-bottom: 16px; }
+  .cat-score { font-size: 16px; }
+  .cat-score strong { font-size: 26px; }
+  .cat-note { font-size: 13px; }
+}

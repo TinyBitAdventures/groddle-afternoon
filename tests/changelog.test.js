@@ -199,8 +199,8 @@ describe('notes: the site header', () => {
     ...data.posts.map((p) => ({ file: `changelog/${p.slug}/index.html`, prefix: '../../', current: 'changelog' })),
   ];
 
-  it('is the same on every page, with Notes between Compare and Play', () => {
-    assert.match(home, /Compare<\/a>\n\s*<a href="changelog\/">Notes<\/a>\n\s*<a class="site-nav-play"/);
+  it('is the same on every page, with Items and Notes between Compare and Play', () => {
+    assert.match(home, /Compare<\/a>\n\s*<a href="items\/">Items<\/a>\n\s*<a href="changelog\/">Notes<\/a>\n\s*<a class="site-nav-play"/);
     for (const p of pages) {
       const html = read(p.file);
       assert.match(html, new RegExp(`<link rel="stylesheet" href="${p.prefix}site/site-nav\\.css" />`), p.file);
