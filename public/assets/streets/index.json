@@ -13124,6 +13124,15 @@
       "platforms": 4,
       "decos": 1,
       "reconstructed": true
+    },
+    "GIF16EM56A12FSB": {
+      "label": "Forest Community Machine Room",
+      "file": "assets/streets/GIF16EM56A12FSB.json",
+      "hubId": "56",
+      "hubName": "Groddle Forest",
+      "platforms": 2,
+      "decos": 3,
+      "reconstructed": true
     }
   }
 }

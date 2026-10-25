@@ -31,9 +31,18 @@ function mappedSet(hubId) {
   return mappedSets.get(key);
 }
 
+/**
+ * config_prod.js:1332 machine_rooms, G-prefixed. location.js onPlayerEnter
+ * (:183) counts a public machine room as a hidden location, not
+ * locations_visited, and countsTowardHubAchievement (:2767) leaves it out of
+ * its hub's Completist; hubs_visited still counts it.
+ */
+export const MACHINE_ROOMS = new Set(['GCR101Q98A12EHH', 'GIF16EM56A12FSB', 'GA9MU59GB792T80']);
+export const isMachineRoom = (tsid) => MACHINE_ROOMS.has(String(tsid || '').replace(/^L/, 'G'));
+
 /** True when the hub's own map lists the street (countsTowardHubAchievement). */
 export function countsTowardHub(tsid, hubId) {
-  return Boolean(tsid && hubId != null && mappedSet(hubId).has(tsid));
+  return Boolean(tsid && hubId != null && mappedSet(hubId).has(tsid) && !isMachineRoom(tsid));
 }
 
 /**
@@ -44,7 +53,7 @@ export function countsTowardHub(tsid, hubId) {
  */
 export function availableHubStreets(hubId, indexStreets = {}) {
   const key = String(hubId);
-  return (HUB_MAP_STREETS[key] || []).filter((tsid) => String(indexStreets[tsid]?.hubId ?? '') === key);
+  return (HUB_MAP_STREETS[key] || []).filter((tsid) => String(indexStreets[tsid]?.hubId ?? '') === key && !isMachineRoom(tsid));
 }
 
 /** Total streets the source hub map lists for a hub. */
@@ -63,7 +72,7 @@ export function hubMapStreetCount(hubId) {
  */
 export function streetVisitCounters({ tsid, hubId, visitedInHub = [], indexStreets = {} }) {
   if (!tsid) return [];
-  const out = [{ counter: `locations_visited:${tsid}`, amount: 1 }];
+  const out = [{ counter: `${isMachineRoom(tsid) ? 'hidden_locations_visited' : 'locations_visited'}:${tsid}`, amount: 1 }];
   if (hubId == null || hubId === '') return out;
   const hub = String(hubId);
   out.push({ counter: `hubs_visited:${hub}`, amount: 1 });

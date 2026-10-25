@@ -1187,11 +1187,6 @@
   "reason": "Monster Bash: a placeholder party space in config_prod.js party_spaces.halloween (desc \"Something something halloween\", picture borrowed from Shimla Shack); no geometry, never finished (G141 triage)",
   "register": "G141"
  },
- "location:LIF16EM56A12FSB": {
-  "status": "missing",
-  "reason": "Forest Community Machine Room: geometry lost; the Meadow and Besara machine rooms (imported) share its template (bldg_int_machine.swf, 1400x700), door on Middle Valley Clearing",
-  "register": "G156"
- },
  "location:LA9RLGSQ05F3Q69": {
   "status": "missing",
   "reason": "Snowed In: door on Abbasid River; encyclopedia street page and 2 Snaps, no geometry or code",

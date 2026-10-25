@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-53';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-54';
 import {
   actionDurationFor,
   createTimedAction,

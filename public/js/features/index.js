@@ -108,3 +108,4 @@ import { purpleJourneyFeature } from './purple-journey-feature.js?v=g150-1'; FEA
 import { smallItemsFeature } from './small-items-feature.js?v=g155-1'; FEATURES.push(smallItemsFeature);
 import { crabsFeature } from './crabs-feature.js?v=g154-1'; FEATURES.push(crabsFeature);
 import { hellBarFeature } from './hell-bar-feature.js?v=g140-1'; FEATURES.push(hellBarFeature);
+import { machineRoomsFeature } from './machine-rooms-feature.js?v=g156-1'; FEATURES.push(machineRoomsFeature);
