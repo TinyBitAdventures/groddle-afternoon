@@ -97,16 +97,18 @@ export function qrazyRewardForLevel(level = 1) {
   return QURAZY_REWARDS[index];
 }
 
-/** Stable street plan with a rare Qurazy replacement (roughly one street in 29). */
+/**
+ * Stable street plan of natural quoins. G260: no natural spot is a Qurazy;
+ * the Qurazy is a per-player roll on the street's marker
+ * (js/qurazy.js, features/qurazy-feature.js; location.js 200-265).
+ */
 export function planStreetQuoins(streetTsid, count = 8) {
   const total = clamp(Math.floor(finite(count, 8)), 1, 32);
   const hash = stableHash(streetTsid);
   const offset = hash % STREET_SEQUENCE.length;
-  const plan = Array.from({ length: total }, (_, index) =>
+  return Array.from({ length: total }, (_, index) =>
     STREET_SEQUENCE[(offset + index) % STREET_SEQUENCE.length]
   );
-  if (hash % 29 === 0) plan[plan.length - 1] = 'qurazy';
-  return plan;
 }
 
 export function resetQuoinDay(state, upgrades = []) {

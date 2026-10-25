@@ -2030,9 +2030,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 456,
+  "commits": 459,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Going home shows your own loading card: Entering Your Home Street, House or Tower, with you by the door"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "A timed quest that runs out shows Try again in the quest log, Hell's quest offers have one button, and party spaces stop new quests from starting"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Drinks, item verbs and skill mood bonuses give nothing while dead, and buff badges no longer cover the activity feed"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2137,24 +2152,9 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "Plain words instead of em-dashes in the game's own lines"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Help mine a rock with the Glitches near you, and they help you mine yours"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Change your home street to any of 36 original street styles"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Enter near several things asks which one, in the original order"
    }
   ]
  },
- "tests": 269,
+ "tests": 270,
  "generatedAt": "2026-10-25"
 }

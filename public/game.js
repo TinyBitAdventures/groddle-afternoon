@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-100';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-101';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -423,7 +423,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-10';
+} from './js/player-save.js?v=player-save-11';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -770,7 +770,7 @@ import {
   releaseQuoinRespawns,
   quoinClassType,
   resetStreetQuoinsForNewDay,
-} from './js/quoins.js?v=g227-1';
+} from './js/quoins.js?v=g260-1';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -7750,6 +7750,27 @@ const engine = {
     quoins.splice(index, 1);
     entityLayer?.removeChild(q);
     return true;
+  },
+  /** G260: a quoin off the natural spots (a Qurazy on its marker), grabbed like any other. */
+  spawnQuoin(spot, typeId = 'xp', opts = {}) {
+    if (!entityLayer || !spot) return null;
+    const q = spawnWorldQuoin(spot, typeId, opts);
+    quoins.push(q);
+    return q;
+  },
+  /** G260: visits to a street before this entry counts (the loading card's rule, G89). */
+  streetVisitsBefore(tsid = currentStreetTsid) {
+    const slot = persistentWorldState.streets?.[tsid]?.features?.[STREET_VISITS_SLOT];
+    return Math.max(Number(slot?.visits) || 0, achieveState.groups?.locations_visited?.includes(tsid) ? 1 : 0);
+  },
+  /** G260: every street's last visit ({ tsid: ms }, stats_get_street_history). */
+  streetLastVisits() {
+    const out = {};
+    for (const [tsid, street] of Object.entries(persistentWorldState.streets || {})) {
+      const at = Number(street?.features?.[STREET_VISITS_SLOT]?.lastAt) || 0;
+      if (at) out[tsid] = at;
+    }
+    return out;
   },
   get unlockedAchievements() {
     return achieveState.unlocked || [];

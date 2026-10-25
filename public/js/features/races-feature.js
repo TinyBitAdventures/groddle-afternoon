@@ -90,7 +90,7 @@ import { runStreetTransition } from '../screen-fx.js?v=card-2';
 import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
 import { startCrowns } from './crowns-feature.js?v=g259-1';
 import { textureFromUrl } from '../textures.js';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g227-1';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g260-1';
 import { moodMax } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
 
