@@ -1181,5 +1181,35 @@
   "status": "unbuilt_original",
   "reason": "Hyperspacetime Portal Door: none of the 2,846 archived street files places one and no GSJS code creates one (only catalog.js lists it). The auto match was the party teleporter's 'portal' phase name in party-spaces-feature.js, a different thing (G147)",
   "register": "G147"
+ },
+ "location:LDOG1ST9G1E2EV5": {
+  "status": "unbuilt_original",
+  "reason": "Monster Bash: a placeholder party space in config_prod.js party_spaces.halloween (desc \"Something something halloween\", picture borrowed from Shimla Shack); no geometry, never finished (G141 triage)",
+  "register": "G141"
+ },
+ "location:LIF16EM56A12FSB": {
+  "status": "missing",
+  "reason": "Forest Community Machine Room: geometry lost; the Meadow and Besara machine rooms (imported) share its template (bldg_int_machine.swf, 1400x700), door on Middle Valley Clearing",
+  "register": "G156"
+ },
+ "location:LA9RLGSQ05F3Q69": {
+  "status": "missing",
+  "reason": "Snowed In: door on Abbasid River; encyclopedia street page and 2 Snaps, no geometry or code",
+  "register": "G157"
+ },
+ "location:LA9S2N3F15F3JD3": {
+  "status": "missing",
+  "reason": "Growing Stuff: door on Abbasid Jail; 1 Snap, no geometry or code",
+  "register": "G157"
+ },
+ "location:LCR14T7ECHM18G8": {
+  "status": "missing",
+  "reason": "Martleby Hare: a Seams street (explore_the_seams counts it, 3 of 10 needed); geometry lost; Footlands Heath was cloned from it",
+  "register": "G158"
+ },
+ "location:LA9EKMN138D3QK2": {
+  "status": "missing",
+  "reason": "Ethereal Endeavour: door on Gentle Island's Doonboggle Trail; no geometry, code, Snaps or page",
+  "register": "G159"
  }
 }
