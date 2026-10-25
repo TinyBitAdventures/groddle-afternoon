@@ -396,6 +396,118 @@ export function prefixLabels(pattern, prefix) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Parents and guards                                                   */
+/* ------------------------------------------------------------------ */
+
+const parentMaps = new WeakMap();
+/** node -> parent for every node of an indexed file (built once, on first use). */
+export function parentsOf(file) {
+  if (!parentMaps.has(file)) {
+    const m = new Map();
+    walk(file.ast, (n, parent) => { if (parent) m.set(n, parent); });
+    parentMaps.set(file, m);
+  }
+  return parentMaps.get(file);
+}
+
+const EQ_OPS = new Set(['===', '==']);
+const NE_OPS = new Set(['!==', '!=']);
+
+/** `x.prop === 'lit'` (either side): { name, prop, value, eq } or null. */
+function memberEquality(test) {
+  if (test?.type !== 'BinaryExpression' || !(EQ_OPS.has(test.operator) || NE_OPS.has(test.operator))) return null;
+  const sides = [[test.left, test.right], [test.right, test.left]];
+  for (const [m, lit] of sides) {
+    if (m.type !== 'MemberExpression' || m.computed || m.object.type !== 'Identifier') continue;
+    if (lit.type !== 'Literal' || typeof lit.value !== 'string') continue;
+    return { name: m.object.name, prop: m.property.name, value: lit.value, eq: EQ_OPS.has(test.operator) };
+  }
+  return null;
+}
+
+/**
+ * Guards a test proves when it holds (`truthy`) or fails: [{ name, prop, eq: Set|null, ne: Set|null }].
+ * `a && b` holds -> both; `x.p === 'a' || x.p === 'b'` holds -> x.p in {a, b}; the negation of a
+ * single comparison (or of an `||` of them on one member) is its complement.
+ */
+function guardsFromTest(test, truthy) {
+  if (!test) return [];
+  if (test.type === 'LogicalExpression' && test.operator === '&&') return truthy ? [...guardsFromTest(test.left, true), ...guardsFromTest(test.right, true)] : [];
+  if (test.type === 'LogicalExpression' && test.operator === '||') {
+    if (!truthy) return [...guardsFromTest(test.left, false), ...guardsFromTest(test.right, false)];
+    const l = guardsFromTest(test.left, true);
+    const r = guardsFromTest(test.right, true);
+    if (l.length === 1 && r.length === 1 && l[0].name === r[0].name && l[0].prop === r[0].prop && l[0].eq && r[0].eq) {
+      return [{ name: l[0].name, prop: l[0].prop, eq: new Set([...l[0].eq, ...r[0].eq]), ne: null }];
+    }
+    return [];
+  }
+  if (test.type === 'UnaryExpression' && test.operator === '!') return guardsFromTest(test.argument, !truthy);
+  const m = memberEquality(test);
+  if (!m) return [];
+  const isEq = m.eq === truthy;
+  return [{ name: m.name, prop: m.prop, eq: isEq ? new Set([m.value]) : null, ne: isEq ? null : new Set([m.value]) }];
+}
+
+const guardMemo = new WeakMap();
+/**
+ * Discriminator guards around `node`: the `if`, `?:`, `&&` and `switch` tests that must hold for
+ * it to run, e.g. `if (e.type === 'grant_item') addItem(inv, e.classTsid)` -> e.type in {grant_item}.
+ * The resolver drops effect rows a guard rules out ({ type: 'consume_item', classTsid } there).
+ */
+export function guardsAt(file, node) {
+  let byFile = guardMemo.get(file);
+  if (!byFile) { byFile = new Map(); guardMemo.set(file, byFile); }
+  if (byFile.has(node)) return byFile.get(node);
+  const parents = parentsOf(file);
+  const out = [];
+  let child = node;
+  let p = parents.get(node);
+  while (p) {
+    if ((p.type === 'IfStatement' || p.type === 'ConditionalExpression') && child !== p.test) {
+      out.push(...guardsFromTest(p.test, child === p.consequent));
+    } else if (p.type === 'LogicalExpression' && p.operator === '&&' && child === p.right) {
+      out.push(...guardsFromTest(p.left, true));
+    } else if (p.type === 'SwitchCase' && child !== p.test) {
+      const sw = parents.get(p);
+      const d = sw?.discriminant;
+      if (d?.type === 'MemberExpression' && !d.computed && d.object.type === 'Identifier') {
+        const i = sw.cases.indexOf(p);
+        const labels = new Set();
+        // Fallthrough: empty cases just above share this body.
+        for (let k = i; k >= 0 && (k === i || !sw.cases[k].consequent.length); k -= 1) {
+          const t = sw.cases[k].test;
+          if (!t) { labels.clear(); break; }
+          if (t.type === 'Literal' && typeof t.value === 'string') labels.add(t.value);
+        }
+        if (labels.size) out.push({ name: d.object.name, prop: d.property.name, eq: labels, ne: null });
+        else if (!p.test) {
+          const others = sw.cases.filter((c) => c.test?.type === 'Literal' && typeof c.test.value === 'string').map((c) => c.test.value);
+          if (others.length) out.push({ name: d.object.name, prop: d.property.name, eq: null, ne: new Set(others) });
+        }
+      }
+    }
+    child = p;
+    p = parents.get(p);
+  }
+  byFile.set(node, out);
+  return out;
+}
+
+/** Does an object expression's literal `prop` value break one of the guards on its binding? */
+function ruledOut(objNode, guards) {
+  if (objNode.type !== 'ObjectExpression') return false;
+  for (const g of guards) {
+    const p = objNode.properties.find((x) => x.type === 'Property' && propName(x) === g.prop);
+    if (!p || p.value.type !== 'Literal' || typeof p.value.value !== 'string') continue;
+    const v = p.value.value;
+    if (g.eq && !g.eq.has(v)) return true;
+    if (g.ne && g.ne.has(v)) return true;
+  }
+  return false;
+}
+
+/* ------------------------------------------------------------------ */
 /* Resolver                                                             */
 /* ------------------------------------------------------------------ */
 
@@ -587,6 +699,12 @@ export function createResolver(index, opts = {}) {
     }
   }
 
+  /** An object key as an element: its name, or the expression of a computed key (`{ [CONST]: 1 }`). */
+  function keyValue(o, p, depth) {
+    if (p.computed && p.key.type !== 'Literal') return { file: o.file, node: p.key, env: o.env, depth };
+    return { literal: propName(p) };
+  }
+
   /** Element value nodes of an iterable expression (arrays, Object.keys/values, .map()). */
   function elementsOf(file, node, env, depth, forIn = false) {
     if (!node || depth > MAX_DEPTH) return [];
@@ -599,8 +717,14 @@ export function createResolver(index, opts = {}) {
           if (o.node.type !== 'ObjectExpression') continue;
           for (const p of o.node.properties) {
             if (p.type !== 'Property') continue;
-            if (m === 'keys') out.push({ literal: propName(p) });
+            if (m === 'keys') out.push(keyValue(o, p, depth));
             else if (m === 'values') out.push({ file: o.file, node: p.value, env: o.env, depth });
+            else {
+              // Object.entries: a [key, value] pair per property, for `for (const [cls, n] of Object.entries(give))`
+              // over `{ [PLATE_OF_BEANS]: 1 }` (G176: constant grants through a computed key).
+              const key = p.computed && p.key.type !== 'Literal' ? p.key : { type: 'Literal', value: propName(p), start: p.key.start, end: p.key.end };
+              out.push({ file: o.file, node: { type: 'ArrayExpression', elements: [key, p.value], start: p.start, end: p.end }, env: o.env, depth });
+            }
           }
         }
         return out;
@@ -640,7 +764,7 @@ export function createResolver(index, opts = {}) {
           else out.push({ file: o.file, node: p, env: o.env, depth });
         }
       } else if (o.node.type === 'ObjectExpression' && forIn) {
-        for (const p of o.node.properties) if (p.type === 'Property') out.push({ literal: propName(p) });
+        for (const p of o.node.properties) if (p.type === 'Property') out.push(keyValue(o, p, depth));
       }
     }
     return out;
@@ -785,7 +909,17 @@ export function createResolver(index, opts = {}) {
           const idx = node.property.type === 'Literal' ? node.property.value : null;
           return base.map((p) => (p.length === 1 && typeof p[0] === 'string' && sep != null && idx != null ? [p[0].split(sep)[idx] ?? ''] : p.map((x) => (typeof x === 'string' && sep != null && idx === 0 ? x.split(sep)[0] : x))));
         }
-        const objs = objectsOf(file, node.object, env, depth + 1);
+        let objs = objectsOf(file, node.object, env, depth + 1);
+        // `if (e.type === 'grant_item') addItem(inv, e.classTsid)`: rows the guard rules out
+        // (a `{ type: 'consume_item' }` effect) are not what this read can see (G176).
+        if (objs.length && node.object.type === 'Identifier') {
+          const guards = guardsAt(file, node).filter((g) => g.name === node.object.name);
+          if (guards.length) {
+            const kept = objs.filter((o) => !ruledOut(o.node, guards));
+            if (!kept.length) return [];
+            objs = kept;
+          }
+        }
         const out = [];
         for (const o of objs) {
           if (o.node.type === 'ObjectExpression') {
@@ -895,11 +1029,10 @@ export function scanEmissions(index, emitters, { keyTableKeys, qaRe = /engine\.p
           patterns = concat(concat(patterns, [[em.join ?? ':']]), resolver.strings(file, argNodes[k]));
         }
         patterns = dedupe(patterns);
-        const fnText = fns.length ? file.text.slice(fns[0].start, fns[0].end) : '';
-        const qa = qaRe ? qaRe.test(fnText) : false;
+        const qa = qaAt(file, call.start, qaRe);
         const informative = patterns.some((p) => !isUninformative(p));
         for (const pattern of patterns) {
-          const row = { tag: em.tag, pattern, text: patternString(pattern), file: file.rel, line, callee: name, qa };
+          const row = { tag: em.tag, pattern, text: patternString(pattern), file: file.rel, line, start: call.start, argKey: memberKey(argNodes[0]), callee: name, qa };
           if (!isUninformative(pattern)) { emissions.push(row); continue; }
           // A literal '' (an `x || ''` fallback, an empty `counter:` row) emits nothing.
           if (pattern.every((p) => typeof p === 'string')) continue;
@@ -911,6 +1044,12 @@ export function scanEmissions(index, emitters, { keyTableKeys, qaRe = /engine\.p
     }
   }
   return { emissions, unresolved, passThrough, failures: index.failures };
+}
+
+/** `row.classTsid` -> 'classTsid' (the key a dynamic argument reads), else null. */
+function memberKey(node) {
+  const n = node?.type === 'ChainExpression' ? node.expression : node;
+  return n?.type === 'MemberExpression' && !n.computed ? n.property.name : null;
 }
 
 /** The emitter call forwards parameters of `fn`, and `fn` is an emitter of the same tag taking them at the same positions. */
@@ -1003,9 +1142,251 @@ export function contextLiterals(index) {
 
 /** Whether a node sits in a function that reads URL params: QA and demo seeding, never evidence (as scanEmissions' `qa`). */
 const QA_RE = /engine\.param\(|searchParams|URLSearchParams/;
+/**
+ * Whether `pos` runs in QA or demo seeding: an enclosing function, out to the innermost named one,
+ * whose own code reads URL params. Nested functions that do not hold `pos` are not its own code:
+ * newxp-feature.js runTraining2 hands over the Home Street Ticket for real, and only its
+ * `help: () => engine.param('newxpstyle')` callback is QA (G176).
+ */
+export function qaAt(file, pos, re = QA_RE) {
+  if (!re) return false;
+  for (const fn of file.enclosing(pos)) {
+    let text = file.text.slice(fn.start, fn.end);
+    for (const g of file.fns) {
+      if (g === fn || g.start <= fn.start || g.end > fn.end || (g.start <= pos && g.end >= pos)) continue;
+      text = text.slice(0, g.start - fn.start) + ' '.repeat(g.end - g.start) + text.slice(g.end - fn.start);
+    }
+    re.lastIndex = 0;
+    if (re.test(text)) return true;
+    if ((file.fnNameOf.get(fn) || []).length) break;
+  }
+  return false;
+}
 function inQaFunction(file, node) {
-  const fn = file.enclosing(node.start)[0];
-  return Boolean(fn) && QA_RE.test(file.text.slice(fn.start, fn.end));
+  return qaAt(file, node.start);
+}
+
+/* ------------------------------------------------------------------ */
+/* What a literal does (G176)                                           */
+/* ------------------------------------------------------------------ */
+
+// A place that takes, checks or names an item is not a way to get it (hell-bar-feature.js consumes
+// drink_ticket; the inventory once called it obtainable for that). These name the call shapes and
+// row keys of the remake's pack code: inventory.js addItem/removeItem/countItem and the effect rows.
+export const GRANT_CALL = /^(addItems?|give|giveItems?|grantItems?|addTo|addInv|addToPack|awardItem|createItemFromFamiliar)$/;
+const CONSUME_CALL = /^(removeItems?|removeFrom|consumeItems?|takeItems?|takeFrom|spendItems?|useItem|usePackItem|burnItems?|destroyItem|deleteItem)$/;
+const CHECK_CALL = /^(countItems?|hasItems?|haveItem|countOf|itemCount|count|includes|has|indexOf|lastIndexOf|startsWith|endsWith|test|holding|owns|hasBuff)$/;
+const LABEL_CALL = /(label|icon|sprite|texture|title|name|art|image|sound|ensureItem|itemdef|describe|toast|say|log|setData|registerItemUse)/i;
+const PASS_CALL = /^(freeze|assign|concat|from|of)$/;
+const GRANT_KEY = /^(gives?|giveItems|grants?|rewards?|outputs?|prizes?|drops?|yields?|loot|awards?|becomes|results?|makes|produces|gifts?|spawns?|contents|packs?)$/i;
+const CONSUME_KEY = /^(inputs?|consumes?|costs?|takes?|spend|burns?|ingredients?|fuel|removes?|uses|eats?|pay|price|wants?|accepts?|tradeIn|trade_in)$/i;
+const CHECK_KEY = /^(requires?|required|requirements?|reqs?|needs?|needed|needsItem|tools?|toolClass|toolId|gate|ifHas|holding|when|unless|key|keyClass)$/i;
+const LABEL_KEY = /^(labels?|name|title|icons?|sprite|art|image|img|src|tooltip|text|desc|description|sound|alt|hint|msg|message|note|verb)$/i;
+/** Keys whose value names an item class: a row's id, not one of its other fields (`reason: 'missing'`). */
+const ITEM_KEY = /^(cls|item|items|id|ids|tsid|class|from|to|swap)$|(Id|Ids|Class|Classes|Tsid|Item|Items)$|_(id|class|tsid)$/;
+const COUNTER_KEY = new Set(['event', 'counter', 'counters', 'achievement', 'badge', 'flag']);
+const DISCRIM_KEY = new Set(['type', 'kind', 'op', 'effect', 'action', 'mode']);
+const GRANT_TYPE = /grant|give|add|reward|drop|award|output|yield|loot|prize|gift/i;
+const CONSUME_TYPE = /consume|remove|take|spend|cost|require|need|input|burn|pay/i;
+
+const calleeName = (c) => (c.type === 'Identifier' ? c.name : c.type === 'MemberExpression' && !c.computed ? c.property.name : '');
+
+function callRole(name) {
+  if (GRANT_CALL.test(name)) return 'grant';
+  if (CONSUME_CALL.test(name)) return 'consume';
+  if (CHECK_CALL.test(name)) return 'check';
+  if (LABEL_CALL.test(name)) return 'label';
+  return null;
+}
+
+/**
+ * What the expression `node` is used for where it stands: { role, table, key } with role one of
+ * grant | consume | check | label | counter | data | const | other, `table` the name a data row is
+ * declared under (`const MUSICBLOCK_CATALOG = { ... }`) and `key` the property it is the value of.
+ */
+export function useRole(file, node) {
+  const parents = parentsOf(file);
+  let child = node;
+  let p = parents.get(node);
+  let inData = false;
+  let innermostObj = true;
+  let key = null; // the property the literal is the value of (`chunkId: 'beryl'`)
+  const data = () => (inData ? 'data' : 'other');
+  const R = (role, table = null) => ({ role, table, key });
+  while (p) {
+    if (p.type === 'ConditionalExpression' && child !== p.test) { child = p; p = parents.get(p); continue; }
+    if (p.type === 'LogicalExpression') { child = p; p = parents.get(p); continue; }
+    if (p.type === 'BinaryExpression') return R(EQ_OPS.has(p.operator) || NE_OPS.has(p.operator) ? 'check' : 'other');
+    if (p.type === 'SwitchCase' && child === p.test) return R('check');
+    if (p.type === 'SwitchStatement' && child === p.discriminant) return R('check');
+    if ((p.type === 'IfStatement' || p.type === 'WhileStatement') && child === p.test) return R('check');
+    if (p.type === 'UnaryExpression') return R('check');
+    if (p.type === 'MemberExpression') {
+      if (p.computed && p.property === child) {
+        const a = parents.get(p);
+        if (a?.type === 'AssignmentExpression' && a.left === p) {
+          if (a.operator === '+=') return R('grant');
+          if (a.operator === '-=') return R('consume');
+          if (a.operator === '=' && a.right.type === 'BinaryExpression') return R(a.right.operator === '+' ? 'grant' : a.right.operator === '-' ? 'consume' : 'other');
+          return R('other');
+        }
+        return R('check');
+      }
+      if (p.object === child) {
+        // `['a', 'b'].includes(x)`, `new Set([...]).has(x)`.
+        const call = parents.get(p);
+        if (call?.type === 'CallExpression' && call.callee === p && callRole(p.property?.name || '') === 'check') return R('check');
+        return R(data());
+      }
+      return R('other');
+    }
+    if (p.type === 'CallExpression' || p.type === 'NewExpression') {
+      if (p.callee === child) return R('other');
+      const name = calleeName(p.callee);
+      const r = callRole(name);
+      if (r) return R(r);
+      // Object.freeze({...}), new Set([...]), and row builders inside a table (`a: row('musicblock_x', ...)`).
+      const up = parents.get(p);
+      if (p.type === 'NewExpression' || PASS_CALL.test(name) || up?.type === 'Property' || up?.type === 'ArrayExpression') { inData = true; child = p; p = up; continue; }
+      return R(data());
+    }
+    if (p.type === 'Property') {
+      if (p.key === child && !p.computed) {
+        // A quoted key: a label map ({ 'drink_ticket': 'Drink Ticket' }) names it; a table keyed by id is data.
+        if (p.value.type === 'Literal' && typeof p.value.value === 'string') return R('label');
+        inData = true; child = p; p = parents.get(p); continue;
+      }
+      if (p.key === child) { inData = true; child = p; p = parents.get(p); continue; }
+      const k = p.computed ? '' : propName(p) || '';
+      if (child === node) key = k;
+      if (GRANT_KEY.test(k)) return R('grant');
+      if (CONSUME_KEY.test(k)) return R('consume');
+      if (CHECK_KEY.test(k)) return R('check');
+      if (LABEL_KEY.test(k)) return R('label');
+      // A plain field of a row (`reason: 'missing'`, `state: 'idle'`) is not an item reference.
+      if (child === node && !ITEM_KEY.test(k)) return R('other');
+      inData = true; child = p; p = parents.get(p); continue;
+    }
+    if (p.type === 'ObjectExpression') {
+      const keys = p.properties.filter((x) => x.type === 'Property').map((x) => [propName(x), x]);
+      if (keys.some(([k]) => COUNTER_KEY.has(k))) return R('counter');
+      if (innermostObj) {
+        for (const [k, x] of keys) {
+          if (!DISCRIM_KEY.has(k) || x.value.type !== 'Literal' || typeof x.value.value !== 'string') continue;
+          if (CONSUME_TYPE.test(x.value.value)) return R('consume');
+          if (GRANT_TYPE.test(x.value.value)) return R('grant');
+        }
+      }
+      innermostObj = false;
+      inData = true; child = p; p = parents.get(p); continue;
+    }
+    if (p.type === 'ArrayExpression' || p.type === 'SpreadElement' || p.type === 'TemplateLiteral' || p.type === 'ChainExpression') { inData = true; child = p; p = parents.get(p); continue; }
+    if (p.type === 'VariableDeclarator' && p.init === child) return inData ? R('data', p.id?.type === 'Identifier' ? p.id.name : null) : R('const');
+    if (p.type === 'AssignmentExpression' && p.right === child) return R(data(), p.left.type === 'Identifier' ? p.left.name : null);
+    if (p.type === 'ReturnStatement' || p.type === 'ArrowFunctionExpression' || p.type === 'ExportDefaultDeclaration') return R('data');
+    return R(data());
+  }
+  return R('other');
+}
+
+const ROLE_ORDER = ['grant', 'data', 'consume', 'check', 'label', 'counter', 'other'];
+
+/**
+ * The role of every string literal of a file: Map literal start -> { role, table } (useRole), with
+ * QA seeding (functions that read URL params) as `qa`. A constant (`const TICKET = 'drink_ticket'`)
+ * takes the strongest role among its uses in the file (grant over data over consume ...), so a
+ * constant only ever checked is a check.
+ */
+export function literalRoles(file) {
+  const parents = parentsOf(file);
+  const out = new Map();
+  const uses = new Map(); // name -> [Identifier nodes that read it]
+  const consts = [];
+  walk(file.ast, (n, parent) => {
+    if (n.type !== 'Identifier' || !parent) return;
+    if ((parent.type === 'MemberExpression' && parent.property === n && !parent.computed) || (parent.type === 'Property' && parent.key === n && !parent.computed)
+      || (parent.type === 'VariableDeclarator' && parent.id === n) || /Specifier$/.test(parent.type)) return;
+    if (!uses.has(n.name)) uses.set(n.name, []);
+    uses.get(n.name).push(n);
+  });
+  walk(file.ast, (n) => {
+    if (n.type !== 'Literal' || typeof n.value !== 'string') return;
+    if (inQaFunction(file, n)) { out.set(n.start, { role: 'qa', table: null, key: null }); return; }
+    const r = useRole(file, n);
+    if (r.role === 'const') consts.push(n);
+    out.set(n.start, r);
+  });
+  for (const n of consts) {
+    const decl = parents.get(n);
+    const name = decl?.id?.type === 'Identifier' ? decl.id.name : null;
+    const got = (uses.get(name) || []).filter((u) => !inQaFunction(file, u)).map((u) => useRole(file, u)).map((r) => (r.role === 'const' ? { ...r, role: 'other' } : r));
+    const role = got.length ? ROLE_ORDER.find((r) => got.some((g) => g.role === r)) : 'other';
+    const use = got.find((g) => g.role === role);
+    out.set(n.start, { role, table: use?.table || null, key: use?.key ?? null, via: name });
+  }
+  return out;
+}
+
+/**
+ * Identifier names read in [start, end) of a file, following same-file functions and module tables
+ * they name (`selectCubimal` -> `CUBIMAL_SERIES` -> `cubimal()`), `hops` deep: { names, fns }.
+ */
+export function namesReached(file, start, end, hops = 3) {
+  const names = new Set();
+  const spans = [[start, end]];
+  const seenFns = new Set();
+  const seenTables = new Set();
+  const tables = new Map();
+  for (const d of file.decls) if (!d.owner && d.kind === 'const' && d.node && !isFn(d.node)) tables.set(d.name, d.node);
+  for (let h = 0; h <= hops && spans.length; h += 1) {
+    const next = [];
+    for (const [a, b] of spans.splice(0)) {
+      walk(file.ast, (n) => {
+        if (n.type !== 'Identifier' || n.start < a || n.end > b || names.has(n.name)) return;
+        names.add(n.name);
+        for (const fn of file.fnNames.get(n.name) || []) if (!seenFns.has(fn)) { seenFns.add(fn); next.push([fn.start, fn.end]); }
+        const t = tables.get(n.name);
+        if (t && !seenTables.has(t)) { seenTables.add(t); next.push([t.start, t.end]); }
+      });
+    }
+    spans.push(...next);
+  }
+  return { names, fns: [...seenFns] };
+}
+
+const INV_OBJ = /^(inv|inventory|pack)$/i;
+/**
+ * Pack writes that add: `inv[id] += n`, `inv[id] = (inv[id] || 0) + n`, `inv[id] = Math.max(...)`.
+ * Returns emissions like scanEmissions' (tag 'item', callee 'inv[]'): animal-husbandry.js, rube.js,
+ * home-decor.js and master-garden.js give items this way, not through addItem.
+ */
+export function inventoryWrites(index, { qaRe = QA_RE, emitterFns = new Set(['addItem', 'addItems', 'give']) } = {}) {
+  const resolver = createResolver(index);
+  const emissions = [];
+  const unresolved = [];
+  for (const file of index.files) {
+    walk(file.ast, (n) => {
+      if (n.type !== 'AssignmentExpression' || n.left.type !== 'MemberExpression' || !n.left.computed) return;
+      const o = n.left.object;
+      const objName = o.type === 'Identifier' ? o.name : o.type === 'MemberExpression' && !o.computed ? o.property.name : '';
+      if (!INV_OBJ.test(objName)) return;
+      const r = n.right;
+      const adds = n.operator === '+=' || (n.operator === '=' && ((r.type === 'BinaryExpression' && r.operator === '+')
+        || (r.type === 'CallExpression' && r.callee.type === 'MemberExpression' && r.callee.object.name === 'Math' && r.callee.property.name === 'max')));
+      if (!adds) return;
+      const fn = file.enclosing(n.start)[0];
+      // inventory.js addItem itself: its callers are scanned as emitters (and QA callers flagged there).
+      if (fn && (file.fnNameOf.get(fn) || []).some((x) => emitterFns.has(x))) return;
+      const qa = qaAt(file, n.start, qaRe);
+      const line = n.loc?.start.line || 0;
+      for (const pattern of dedupe(resolver.strings(file, n.left.property))) {
+        const row = { tag: 'item', pattern, text: patternString(pattern), file: file.rel, line, start: n.start, argKey: memberKey(n.left.property), callee: 'inv[]', qa };
+        if (!isUninformative(pattern)) emissions.push(row);
+        else if (!pattern.every((x) => typeof x === 'string')) unresolved.push(row);
+      }
+    });
+  }
+  return { emissions, unresolved };
 }
 
 /** Patterns of every template literal with substitutions in one indexed file (prize tables built from slugs). */
@@ -1014,7 +1395,7 @@ export function templatePatterns(index, file, opts = {}) {
   const out = [];
   walk(file.ast, (n) => {
     if (n.type !== 'TemplateLiteral' || !n.expressions.length || inQaFunction(file, n)) return;
-    for (const p of resolver.strings(file, n)) if (!isUninformative(p)) out.push({ pattern: p, line: n.loc?.start.line || 0 });
+    for (const p of resolver.strings(file, n)) if (!isUninformative(p)) out.push({ pattern: p, line: n.loc?.start.line || 0, start: n.start, node: n });
   });
   return out;
 }

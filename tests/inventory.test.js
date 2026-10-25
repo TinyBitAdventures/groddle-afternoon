@@ -10,10 +10,10 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { buildIndex, contextLiterals, liveFiles, matchPattern, prefixLabels, scanEmissions } from '../tools/inventory/scan.mjs';
+import { buildIndex, contextLiterals, inventoryWrites, liveFiles, matchPattern, prefixLabels, scanEmissions } from '../tools/inventory/scan.mjs';
 import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills, conditionReach, gsjsItemRefs } from '../tools/inventory/detectors.mjs';
 import { readTsidRefs, tsidRefsFromText } from '../tools/inventory/gsjs-data.mjs';
-import { REMAKE_EMITTERS, GSJS_EMITTERS, emissionsByTag, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
+import { REMAKE_EMITTERS, GSJS_EMITTERS, emissionsByTag, itemGrantReach, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
 
 const SUBWAY_JS = `export const RIDE_COUNTER = 'transit:subways_entered';\nexport const OTHER = 'x';\n`;
@@ -322,6 +322,109 @@ describe('item detector: items nobody can get (G125)', () => {
       ['js/other.js', "export function f(ctx) { ctx.give('not_a_grant', 1); }\n"],
     ]);
     assert.deepEqual((by.item || []).map((e) => e.text), ['juju_trowel']);
+  });
+});
+
+describe('item detector: taking an item is not a way to get it (G176)', () => {
+  /** What the remake's pack grants reach, as build.mjs collect() computes it: Map id -> why. */
+  const grantsOf = (files, itemIds) => {
+    const index = buildIndex(files.map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' });
+    const { by, unresolved } = emissionsByTag(index, REMAKE_EMITTERS);
+    const w = inventoryWrites(index);
+    return new Map(itemGrantReach({ index, emissions: [...(by.item || []), ...w.emissions], unresolved: [...unresolved, ...w.unresolved], itemIds: new Set(itemIds) }));
+  };
+
+  it('does not count a consumed item as a grant (hell-bar-feature.js and drink_ticket)', () => {
+    const reach = grantsOf([
+      ['js/hell.js', `export const TICKET_CLASS = 'drink_ticket';
+        export function buyWine(state) {
+          return { ok: true, effects: [{ type: 'consume_item', classTsid: 'drink_ticket', count: 1 }, { type: 'grant_item', classTsid: 'wine_of_the_dead', count: 1 }, { type: 'quest_flag', flag: 'buy_wotd' }] };
+        }`],
+      ['js/features/hell-bar-feature.js', `import { addItem, countItem, removeItem } from '../inventory.js?v=3';
+        import { buyWine, TICKET_CLASS } from '../hell.js?v=2';
+        const TICKET = 'drink_ticket';
+        function applyGrant(engine, result) {
+          for (const e of result.effects) {
+            if (e.type === 'consume_item') removeItem(engine.inv, e.classTsid, e.count);
+            else if (e.type === 'grant_item') addItem(engine.inv, e.classTsid, e.count);
+          }
+        }
+        export function buy(engine) { if (countItem(engine.inv, TICKET) < 1) return; applyGrant(engine, buyWine(engine.hell)); }
+        export function talk(engine) { return countItem(engine.inv, TICKET_CLASS) > 0 ? 'ticket' : 'none'; }`],
+    ], ['drink_ticket', 'wine_of_the_dead']);
+    assert.ok(reach.has('wine_of_the_dead'), [...reach.keys()].join(','));
+    assert.ok(!reach.has('drink_ticket'), reach.get('drink_ticket'));
+  });
+
+  it('does not let a dynamic grant claim the ids its file only removes, counts, compares or labels', () => {
+    const reach = grantsOf([
+      ['js/features/carve-feature.js', `import { addItem, countItem, removeItem, ensureItem } from '../inventory.js';
+        ensureItem('homestreet_ticket', { label: 'Home Street Ticket' });
+        export function carve(engine, out) {
+          if (countItem(engine.inv, 'pumpkin') < 1) return { ok: false, reason: 'missing' };
+          removeItem(engine.inv, 'pumpkin', 1);
+          if (engine.demo === 'ball') engine.toast('ball');
+          for (const [id, qty] of out.outputs) addItem(engine.inv, id, qty);
+          return { ok: true };
+        }`],
+    ], ['pumpkin', 'ball', 'missing', 'homestreet_ticket']);
+    assert.deepEqual([...reach.keys()], []);
+  });
+
+  it('follows a grant through a constant, a computed key and an imported constant', () => {
+    const reach = grantsOf([
+      ['js/small-items.js', `export const PLATE_OF_BEANS = 'plate_of_beans';
+        export function chatCommand(text) { return text === '/beans' ? { command: 'beans', give: { [PLATE_OF_BEANS]: 1 } } : null; }`],
+      ['js/features/small-items-feature.js', `import { addItem } from '../inventory.js';
+        import { chatCommand } from '../small-items.js';
+        export function runChatCommand(engine, text) {
+          const cmd = chatCommand(text);
+          if (!cmd) return null;
+          for (const [cls, n] of Object.entries(cmd.give)) addItem(engine.inv, cls, n);
+          return cmd;
+        }`],
+      ['js/hell-tickets.js', "export const TICKET_CLASS = 'drink_ticket';\n"],
+      ['js/features/hell-tickets-feature.js', "import { addItem } from '../inventory.js';\nimport { TICKET_CLASS } from '../hell-tickets.js';\nfunction grantTicket(engine) { addItem(engine.inv, TICKET_CLASS, 1); }\nexport function onGrave(engine) { grantTicket(engine); }\n"],
+    ], ['plate_of_beans', 'drink_ticket']);
+    assert.match(reach.get('plate_of_beans') || '', /small-items-feature\.js/);
+    assert.match(reach.get('drink_ticket') || '', /hell-tickets-feature\.js/);
+  });
+
+  it('counts a data table the dynamic grant reads, and not one it never touches', () => {
+    const reach = grantsOf([
+      ['js/cubimals.js', `import { addItem, removeItem } from './inventory.js';
+        function cubimal(slug, cutoff) { return Object.freeze({ classTsid: \`npc_cubimal_\${slug}\`, slug, cutoff }); }
+        const SERIES = { 1: [cubimal('piggy', 50), cubimal('fox', 100)] };
+        const PRIZES = Object.freeze([{ classTsid: 'apple', w: 3 }, { classTsid: 'cherry', w: 1 }]);
+        export const QUEST_NPCS = ['npc_piggy', 'magic_rock'];
+        function selectCubimal(roll) { return SERIES[1].find((row) => roll <= row.cutoff); }
+        export function openPackage(inv, roll) { if (!removeItem(inv, 'cubimal_package', 1)) return null; const prize = selectCubimal(roll); addItem(inv, prize.classTsid, 1); return prize; }
+        export function rollPrize(inv, r) { const p = PRIZES.find((x) => x.w > r); addItem(inv, p.classTsid, 1); }`],
+      ['game.js', "import { openPackage, rollPrize } from './js/cubimals.js';\nexport function open(inv) { openPackage(inv, Math.random() * 100); rollPrize(inv, 2); }\n"],
+    ], ['npc_cubimal_piggy', 'npc_cubimal_fox', 'apple', 'cherry', 'npc_piggy', 'magic_rock', 'cubimal_package']);
+    for (const id of ['npc_cubimal_piggy', 'npc_cubimal_fox', 'apple', 'cherry']) assert.ok(reach.has(id), `${id}: ${[...reach.keys()].join(',')}`);
+    for (const id of ['npc_piggy', 'magic_rock', 'cubimal_package']) assert.ok(!reach.has(id), `${id}: ${reach.get(id)}`);
+  });
+
+  it('counts pack writes that add, skips ones that take, QA seeding and functions nothing calls', () => {
+    const reach = grantsOf([
+      ['js/rube.js', `export function trade(inv, give, take) { inv[take] = (Number(inv[take]) || 0) - 1; inv[give] = (Number(inv[give]) || 0) + 1; }
+        export function swap(inv) { trade(inv, 'rube_gift', 'cherry'); }`],
+      ['js/musicblocks.js', `import { addItem } from './inventory.js';
+        const CATALOG = { musicblock_x: { classTsid: 'musicblock_x' } };
+        export function collectMusicblock(inv, classTsid) { if (!CATALOG[classTsid]) return false; addItem(inv, classTsid, 1); return true; }`],
+      ['js/features/tutorial-feature.js', `import { addItem } from '../inventory.js';
+        export async function runTraining(engine, until) {
+          await until(() => true, { help: () => engine.param('style') });
+          addItem(engine.inv, 'homestreet_ticket', 1);
+        }
+        export function seed(engine) { const n = Number(engine.param('tickets')); if (n) addItem(engine.inv, 'drink_ticket', n); }`],
+    ], ['rube_gift', 'cherry', 'musicblock_x', 'homestreet_ticket', 'drink_ticket']);
+    assert.match(reach.get('rube_gift') || '', /inv\[id\] \+= at js\/rube\.js/);
+    assert.ok(!reach.has('cherry'), reach.get('cherry'));
+    assert.ok(!reach.has('musicblock_x'), reach.get('musicblock_x'));
+    assert.ok(reach.has('homestreet_ticket'), 'a real grant beside a QA help callback');
+    assert.ok(!reach.has('drink_ticket'), reach.get('drink_ticket'));
   });
 });
 

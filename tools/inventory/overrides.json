@@ -1246,5 +1246,85 @@
   "status": "excluded",
   "reason": "typo duplicate of million_currant_trophy (2012-08-02), referenced nowhere; the real class is used across catalog_tags.js (G174)",
   "register": "G174"
+ },
+ "item:musicblock_b_brown_01": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_b_brown_03": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_blue_02": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_blue_03": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_blue_04": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_green_01": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_green_02": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_green_03": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_green_04": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_red_01": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_red_03": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_d_red_05": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_x_shiny_01": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_x_shiny_02": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_x_shiny_05": {
+  "status": "source",
+  "reason": "a street drop: planMusicblockDrop picks an unowned block from MUSICBLOCK_STREET_POOL (every series block, musicblocks.js:232) on each new street, spawnMusicblockDrop places it, content.js musicblockPickup collects it (location.js:663 street spawns). The scanner cannot follow the pool constant (G176)",
+  "register": "G176"
+ },
+ "item:musicblock_goodnight_groddle": {
+  "status": "source",
+  "reason": "MUSICBLOCK_ENDGAME_DROP: the remake places it on a street once all 25 series tunes are owned (musicblocks.js:235); in Glitch it was the beta testers' gift (special_item_that_only_beta_testers_get.js:377). The scanner cannot follow the constant (G176)",
+  "register": "G176"
  }
 }

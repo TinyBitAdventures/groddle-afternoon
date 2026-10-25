@@ -45,7 +45,8 @@
  *                as reason; unreleased/other rows are unknown).
  *   item / npc   GSJS items/*.js (npc_* separately): obtainable (tools/job-obtainable.mjs: vendors,
  *                starter kit, harvests, recipe and conversion fixpoint; plus solo quest rewards and
- *                addItem() grants outside QA paths), in the world (street-ecology.json), or placed by
+ *                addItem() / inv[id] += n grants outside QA paths; consuming, counting or naming an
+ *                item is not a grant, see itemGrantReach), in the world (street-ecology.json), or placed by
  *                code (a classId/classTsid literal or a spawn/create/place call argument). Unreferenced
  *                anywhere in GSJS = unbuilt_original. Source verbs are listed in the evidence.
  *   quest        GSJS quests/*.js against quests.json solo flags and soloReason, quest rooms built.
@@ -69,7 +70,7 @@ import { homedir } from 'node:os';
 import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildIndex, contextLiterals, listJsFiles, literalIndex, liveFiles, matchPattern, patternString, scanEmissions, spawnTemplates, templatePatterns } from './scan.mjs';
+import { buildIndex, contextLiterals, inventoryWrites, listJsFiles, literalIndex, literalRoles, liveFiles, namesReached, useRole, matchPattern, patternString, scanEmissions, spawnTemplates, templatePatterns } from './scan.mjs';
 import * as G from './gsjs-data.mjs';
 import * as D from './detectors.mjs';
 
@@ -117,6 +118,89 @@ export function emissionsByTag(index, emitters, opts) {
   const by = {};
   for (const e of emissions) (by[e.tag] ||= []).push(e);
   return { by, unresolved };
+}
+
+/** Literal roles that can stand for a grant in a dynamic addItem's file: a grant row or plain data (a table). */
+export const GRANT_ROLES = new Set(['grant', 'data']);
+
+/**
+ * Item ids the remake's pack grants reach: [[id, why]] in scan order.
+ *   emissions   item emissions (addItem, quest-room give, inv[id] += n) with resolved patterns
+ *   unresolved  emitter calls whose argument could not be bound
+ *   itemIds     every GSJS item id
+ * A literal pattern is a grant (the scanner already drops effect rows a discriminator guard rules
+ * out: `if (e.type === 'grant_item')`). A dynamic grant (addItem(inv, row.classTsid)) counts, weakly,
+ * the item ids its own file holds as data or grant rows: never ones the file only removes, counts,
+ * compares, labels or routes as counters (G176: hell-bar-feature.js's consumed drink_ticket), and
+ * never QA seeding. game.js is too broad for that fallback.
+ */
+export function itemGrantReach({ index, emissions = [], unresolved = [], itemIds }) {
+  const out = [];
+  const seen = new Set();
+  const add = (id, why) => { if (id && !seen.has(id)) { seen.add(id); out.push([id, why]); } };
+  for (const e of emissions) {
+    if (e.qa) continue;
+    if (e.pattern.length === 1 && typeof e.pattern[0] === 'string') add(e.pattern[0], `${e.callee === 'inv[]' ? 'inv[id] +=' : 'addItem'} at ${e.file}:${e.line}`);
+  }
+  const roleCache = new Map();
+  const rolesOf = (file) => { if (!roleCache.has(file)) roleCache.set(file, literalRoles(file)); return roleCache.get(file); };
+  /** A function nothing names anywhere but its own declaration never runs (musicblocks.js collectMusicblock). */
+  const named = (file, fn) => {
+    const names = file.fnNameOf.get(fn) || [];
+    if (!names.length) return true;
+    return names.some((n) => {
+      const re = new RegExp(`\\b${n}\\b`, 'g');
+      return index.files.some((f) => (f.text.match(re) || []).length > (f === file ? 1 : 0));
+    });
+  };
+  /**
+   * Item literals of `file` a dynamic grant at `start` can stand for: grant rows anywhere in the
+   * file, and data rows the grant's own function reads (its body, a table it names, the same-file
+   * functions it calls, two hops deep). A table the grant never touches (quest-offers.js
+   * REMAKE_QUEST_NPCS) is not its prize list. When the argument reads a key (`rock.chunkId`), only
+   * values of that key count (ROCK_CATALOG's rock ids are not chunks).
+   */
+  const grantScope = (file, e) => {
+    const fns = e.start == null ? [] : file.enclosing(e.start);
+    const top = fns.find((f) => (file.fnNameOf.get(f) || []).length) || fns[0] || null;
+    if (top && !named(file, top)) return null;
+    const reach = top ? namesReached(file, top.start, top.end) : null;
+    const inSpan = (pos) => !top || (pos >= top.start && pos <= top.end) || reach.fns.some((f) => pos >= f.start && pos <= f.end);
+    const accepts = (r, pos) => {
+      if (!r || !GRANT_ROLES.has(r.role)) return null;
+      if (e.argKey && r.key !== e.argKey && r.role !== 'grant') return null;
+      if (r.role === 'grant') return 'a grant row';
+      const table = r.table || r.via;
+      if (table && reach?.names.has(table)) return `table ${table}`;
+      return inSpan(pos) ? 'data' : null;
+    };
+    return { accepts, inSpan };
+  };
+  for (const e of [...emissions, ...unresolved.filter((u) => u.tag === 'item')]) {
+    if (e.qa || (e.pattern.length === 1 && typeof e.pattern[0] === 'string') || e.file === 'game.js') continue;
+    const file = index.files.find((f) => f.rel === e.file);
+    const scope = file && grantScope(file, e);
+    if (!scope) continue;
+    const roles = rolesOf(file);
+    const ok = new Map();
+    for (const l of file.literals) {
+      if (l.regex || ok.has(l.value) || !itemIds.has(l.value)) continue;
+      const how = scope.accepts(roles.get(l.start), l.start);
+      if (how) ok.set(l.value, how);
+    }
+    for (const [v, how] of ok) add(v, `addItem (dynamic) at ${e.file}:${e.line}, listed in that file (${how})`);
+    for (const c of e.pattern.filter((x) => typeof x === 'object' && x.cons)) for (const v of c.cons.strings) if (ok.has(v)) add(v, `addItem at ${e.file}:${e.line}`);
+    for (const t of templatePatterns(index, file)) {
+      if (!t.pattern.some((x) => typeof x === 'string' && x.length >= 4)) continue;
+      if (!scope.accepts(useRole(file, t.node), t.start)) continue;
+      for (const id of itemIds) if (matchPattern(t.pattern, id)) add(id, `addItem (dynamic) at ${e.file}:${e.line}, built at ${e.file}:${t.line} ${patternString(t.pattern)}`);
+    }
+    // Template grants such as `npc_cubimal_${slug}`: expand against the GSJS item list.
+    if (e.pattern.some((x) => typeof x === 'string' && x.length >= 6)) {
+      for (const id of itemIds) if (matchPattern(e.pattern.map((x) => (typeof x === 'object' ? { wild: true, cons: null } : x)), id)) add(id, `addItem ${e.text} at ${e.file}:${e.line}`);
+    }
+  }
+  return out;
 }
 
 /**
@@ -243,32 +327,14 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   // Item reach: obtainable + grants + quest rewards, then the conversion fixpoint again.
   const reach = new Map([...ob.items].map((id) => [id, ob.sources[id] || 'obtainable']));
   const addReach = (id, why) => { if (id && !reach.has(id)) reach.set(id, why); };
-  for (const e of remake.by.item || []) {
-    if (e.qa) continue;
-    if (e.pattern.length === 1 && typeof e.pattern[0] === 'string') addReach(e.pattern[0], `addItem at ${e.file}:${e.line}`);
-  }
-  // addItem(inv, row.classTsid): a grant the scan cannot bind. Item ids written literally in that
-  // same file (its prize or reward table) count, weakly. game.js is too broad for this.
   const itemIdSet = new Set(G.listNames(gsjs, 'items'));
-  for (const e of [...(remake.by.item || []), ...remake.unresolved.filter((u) => u.tag === 'item')]) {
-    if (e.qa || (e.pattern.length === 1 && typeof e.pattern[0] === 'string') || e.file === 'game.js') continue;
-    const file = remakeIndex.files.find((f) => f.rel === e.file);
-    for (const l of file?.literals || []) {
-      if (l.regex || !itemIdSet.has(l.value)) continue;
-      addReach(l.value, `addItem (dynamic) at ${e.file}:${e.line}, listed in that file`);
-    }
-    for (const c of e.pattern.filter((x) => typeof x === 'object' && x.cons)) for (const v of c.cons.strings) if (itemIdSet.has(v)) addReach(v, `addItem at ${e.file}:${e.line}`);
-    if (file) {
-      for (const t of templatePatterns(remakeIndex, file)) {
-        if (!t.pattern.some((x) => typeof x === 'string' && x.length >= 4)) continue;
-        for (const id of itemIdSet) if (matchPattern(t.pattern, id)) addReach(id, `addItem (dynamic) at ${e.file}:${e.line}, built at ${e.file}:${t.line} ${patternString(t.pattern)}`);
-      }
-    }
-    // Template grants such as `npc_cubimal_${slug}`: expand against the GSJS item list.
-    if (e.pattern.some((x) => typeof x === 'string' && x.length >= 6)) {
-      for (const id of itemIdSet) if (matchPattern(e.pattern.map((x) => (typeof x === 'object' ? { wild: true, cons: null } : x)), id)) addReach(id, `addItem ${e.text} at ${e.file}:${e.line}`);
-    }
-  }
+  const invWrites = inventoryWrites(remakeIndex);
+  for (const [id, why] of itemGrantReach({
+    index: remakeIndex,
+    emissions: [...(remake.by.item || []), ...invWrites.emissions],
+    unresolved: [...remake.unresolved, ...invWrites.unresolved],
+    itemIds: itemIdSet,
+  })) addReach(id, why);
   for (const q of Object.values(quests)) {
     if (!q.solo) continue;
     for (const r of Object.values(q.rewards?.items || {})) addReach(r.class_tsid || r.class_id, `reward of quest ${q.classTsid}`);
@@ -315,7 +381,9 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   }
 
   // Achievements.
-  const itemOk = (id) => reach.has(id) || present.has(id);
+  // An item a manual judgement calls reachable (a constant or pool grant the scanner cannot follow) counts too.
+  const judgedReachable = new Set(Object.entries(overrides).filter(([k, v]) => k.startsWith('item:') && D.REACHABLE.has(v.status)).map(([k]) => k.slice(5)));
+  const itemOk = (id) => reach.has(id) || present.has(id) || judgedReachable.has(id);
   const remakeDeps = (group, name) => {
     if (['in_inventory', 'making_tool', 'making_known_tool'].includes(group) && !itemOk(name)) return `${group}:${name} counts, but ${name} cannot be obtained`;
     if (group === 'making_known_recipe' && !recipeIds.has(String(name))) return `recipe ${name} is not in recipes.json`;

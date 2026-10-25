@@ -346,6 +346,10 @@ export function judgeItems({ items, reach, present, codeCtx, gsjsRefs, families 
     const verbs = it.verbs.length ? `source verbs: ${it.verbs.join(',')}` : '';
     const add = (status, ...ev) => rows.push(row(kind, it.id, { ...base, status, evidence: [...ev, verbs].filter(Boolean).join(' | ') }));
     if (it.id === 'catalog' || it.id.startsWith('catalog_')) { add('excluded', 'data catalog, not an item'); continue; }
+    // items/item.js is the class every item inherits (no parent_classes list names it) and items/missing.js
+    // the stand-in the server drew for a class whose file was gone ("MISSING ITEM: " + this.missingClass).
+    if (it.id === 'item') { add('excluded', 'base class of every item (items/item.js), not an item'); continue; }
+    if (it.id === 'missing') { add('excluded', 'placeholder for a missing item class (items/missing.js label "MISSING ITEM: "+this.missingClass), never handed out'); continue; }
     if (it.id.startsWith('quest_req_icon_')) { add('excluded', 'quest requirement icon: the class_id of a quests/*.js requirement row, drawn in the quest log, never held'); continue; }
     const tag = it.tags.find((t) => EXCLUDE_TAGS.includes(t));
     if (tag) { add('excluded', `catalog_tags/tags: ${tag}`); continue; }
