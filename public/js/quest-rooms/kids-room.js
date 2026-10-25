@@ -32,6 +32,7 @@
 import { applyRewards } from '../quests.js';
 import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=catalog-unified-6';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
+import { playPoofIn } from '../overlay-art.js?v=g273-1';
 import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js';
 
 const W = KIDS_ROOM_W;
@@ -271,6 +272,9 @@ async function anagramStart(ctx) {
 /* Word Up blocks                                                      */
 /* ------------------------------------------------------------------ */
 
+/** A block's height in the room (the 197 px cell at 0.74). */
+const BLOCK_H = Math.round(197 * 0.74);
+
 function createBlocks(ctx) {
   removeBlocks(ctx);
   const { PIXI } = ctx;
@@ -287,6 +291,11 @@ function createBlocks(ctx) {
     setBlockLetter(ctx, block, letter);
     return block;
   });
+  // callback_createBlocks makes each with createItemStackWithPoof
+  // (letter_block_3.js 75-92, location.js 2054-2070): proto_puff poof_in and PROTO_PUFF (G285).
+  const puffs = ctx.add(new PIXI.Container(), 46);
+  for (const b of ctx.data.blocks) playPoofIn(PIXI, { layer: puffs, x: b.sprite.x, bottom: b.sprite.y, itemH: BLOCK_H });
+  ctx.sound('PROTO_PUFF', { volume: 0.5 });
   ctx.data.spelling = true;
   ctx.data.spellEndsAt = Date.now() + SPELL_MS;
   // instances_schedule_exit_prompt('kids_room', 5*60): the room stays open 5 more minutes.

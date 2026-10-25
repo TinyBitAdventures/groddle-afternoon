@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getVerbsFor, runVerb } from '../public/content.js?v=woodcutting-test-5';
+import { getVerbsFor, runVerb } from '../public/content.js?v=woodcutting-test-6';
 import { createAnimalState, listAnimalFeedOptions } from '../public/js/animals.js?v=g268-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -27,21 +27,26 @@ describe('original-style target-item feed picker', () => {
 
   it('keeps Feed visible but disabled when the pack has no eligible food', () => {
     const piggy = { classId: 'npc_piggy', state: createAnimalState('npc_piggy') };
-    const chicken = { classId: 'npc_chicken', state: createAnimalState('npc_chicken') };
     const pigFeed = getVerbsFor(piggy, { pc: player(), inv: { plank: 3 } }).find((verb) => verb.id === 'feed');
-    const chickenFeed = getVerbsFor(chicken, { pc: player(), inv: { apple: 2 } }).find((verb) => verb.id === 'feed');
     assert.equal(pigFeed.enabled, false);
     assert.match(pigFeed.reason, /don't have anything/i);
-    assert.equal(chickenFeed.enabled, false);
+  });
+
+  it('chickens have no Feed (npc_chicken.js has no feed verb; Austin, desk FEED, G280)', () => {
+    const chicken = { classId: 'npc_chicken', state: createAnimalState('npc_chicken') };
+    const verbs = getVerbsFor(chicken, { pc: player(), inv: { grain: 4, corn: 1 } });
+    assert.equal(verbs.some((verb) => verb.id === 'feed' || verb.id.startsWith('feed:')), false);
+    const inv = { grain: 4, corn: 1 };
+    const result = runVerb(chicken, 'feed:corn', { pc: player(), inv });
+    assert.notEqual(result?.ok, true);
+    assert.deepEqual(inv, { grain: 4, corn: 1 });
   });
 
   it('builds a stable eligible-item model and consumes only the chosen stack', () => {
     const inv = { apple: 2, grain: 4, corn: 1, meat: 9 };
-    assert.deepEqual(
-      listAnimalFeedOptions('npc_chicken', inv).map((food) => food.classTsid),
-      ['grain', 'corn']
-    );
-    const target = { classId: 'npc_chicken', state: createAnimalState('npc_chicken') };
+    const options = listAnimalFeedOptions('npc_piggy', inv).map((food) => food.classTsid);
+    assert.deepEqual(options.slice(0, 3), ['apple', 'grain', 'corn']);
+    const target = { classId: 'npc_piggy', state: createAnimalState('npc_piggy') };
     const result = runVerb(target, 'feed:corn', { pc: player(), inv });
     assert.equal(result.ok, true);
     assert.equal(inv.corn, 0);

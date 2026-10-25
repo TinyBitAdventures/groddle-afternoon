@@ -81,6 +81,7 @@ import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v
 import {
   drawCheckpointFlag,
   drawFinishPosts,
+  WINNER_RAINBOW,
   drawWinnerRainbow,
   raceLoadingColors,
   renderRaceCourse,
@@ -112,6 +113,7 @@ let dispenserTarget = null;
 let hud = null;
 let progressHint = 0;
 let resultApplied = false;
+let resultRevealTimer = null; // G285: the win card waits for the rainbow
 let lastHudAt = 0;
 let startTimer = null;
 let soonTimer = null; // the 5 s "YAY! THE GAME IS STARTING SOON." wait after Click to Start
@@ -966,11 +968,7 @@ function showResult(engine) {
     engine.achievement(counters.won, 1);
     engine.pushActivity(`You won ${race.title}! +${reward.currants} currants · +${reward.xp} iMG.`);
     engine.playSound('YOU_WIN', { volume: 0.7 });
-    const rainbow = drawWinnerRainbow(engine.PIXI);
-    rainbow.x = engine.player.x;
-    rainbow.y = engine.player.y - 30;
-    rainbow.zIndex = 60;
-    engine.entityLayer.addChild(rainbow);
+    followWinnerRainbow(engine, drawWinnerRainbow(engine.PIXI));
   } else if (run.status === 'lost') {
     engine.achievement(counters.lost, 1);
     engine.pushActivity(`${run.rivalName} won ${race.title}.`);
@@ -993,7 +991,20 @@ function showResult(engine) {
       : run.status === 'lost' ? `You were ${Math.round(run.playerProgress * 100)}% of the way there.` : '';
   hud.countdown.hidden = true;
   hud.ready.hidden = true;
-  hud.result.hidden = false;
+  // G285: a pc_overlay plays in the street under the source's vp_overlay text
+  // (inc_race.js 371-384), so nothing hid the rainbow; the remake's result
+  // card covers the street, so on a win it waits until the rainbow is done.
+  clearTimeout(resultRevealTimer);
+  resultRevealTimer = null;
+  if (run.status === 'won') {
+    const mine = run;
+    resultRevealTimer = setTimeout(() => {
+      resultRevealTimer = null;
+      if (run !== mine || !hud) return;
+      hud.result.hidden = false;
+      publish(engine);
+    }, WINNER_RAINBOW.durationMs);
+  } else hud.result.hidden = false;
   engine.player.vx = 0;
   engine.updateHud();
   engine.save();
@@ -1001,11 +1012,33 @@ function showResult(engine) {
   publish(engine);
 }
 
+/**
+ * show_rainbow (players/player.js 3014-3029): a pc_overlay follows the
+ * avatar (placeByPcView on every move), so the rainbow stands on your feet
+ * as you walk (G285). It removes itself when the overlay ends.
+ */
+function followWinnerRainbow(engine, rainbow) {
+  rainbow.zIndex = 60;
+  engine.entityLayer.addChild(rainbow);
+  const step = () => {
+    if (rainbow.destroyed) return;
+    const p = engine.player;
+    if (p) {
+      rainbow.x = p.x;
+      rainbow.y = p.y - 30;
+    }
+    requestAnimationFrame(step);
+  };
+  step();
+}
+
 async function leaveRace(engine) {
   if (!run || raceIsLive(run)) return false;
   const outcome = run.status;
   const back = record.returnTo;
   if (outcome === 'won') engine.questFlag(RACE_FLAGS.leave);
+  clearTimeout(resultRevealTimer);
+  resultRevealTimer = null;
   hud.result.hidden = true;
   hud.bar.hidden = true;
   hud.countdown.hidden = true;
@@ -1056,6 +1089,7 @@ function renderHud(engine, force = false) {
 
 function publish(engine) {
   engine.setData('raceStatus', run ? run.status : 'idle');
+  engine.setData('raceResultCard', hud && !hud.result.hidden ? 'shown' : '');
   engine.setData('raceId', run ? run.raceId : '');
   engine.setData('raceRival', run ? run.rivalName : '');
   engine.setData('raceProgress', run ? (run.playerProgress || 0).toFixed(3) : '0');

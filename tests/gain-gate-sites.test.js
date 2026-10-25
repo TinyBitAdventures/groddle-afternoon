@@ -23,6 +23,7 @@ import { applyTreePoison, performAntidotePour } from '../public/js/tree-poison.j
 import { createPlot, performPlotVerb } from '../public/js/patches.js';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js';
 import { runVerb } from '../public/content.js';
+import { applySetFree } from '../public/js/animal-set-free.js';
 import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
 import { room as topOfTree } from '../public/js/quest-rooms/top-of-tree.js';
 import { room as esquibeth } from '../public/js/quest-rooms/esquibeth.js';
@@ -257,15 +258,13 @@ describe('module gain sites', () => {
     }
   });
 
-  it('feeding a chicken while dead spends the grain for no mood', () => {
+  it('setting a chicken free while dead still costs 5 energy and gives no mood (G284)', () => {
     refuse('mood');
-    const pc = { energy: 50, mood: 20, xp: 0, imagination: 0 };
-    const inv = { grain: 2 };
-    const r = runVerb({ classId: 'npc_chicken', state: {} }, 'feed:grain', { pc, inv });
-    assert.equal(r.ok, true);
-    assert.equal(inv.grain, 1);
-    assert.equal(r.effects.mood, 0);
+    const pc = { energy: 50, mood: 20 };
+    const r = applySetFree('npc_chicken', pc, 0);
+    assert.deepEqual(r.slugs, { mood: 0, energy: 5 });
     assert.equal(pc.mood, 20);
+    assert.equal(pc.energy, 45);
   });
 
   it('the High Jumper boost is refused while Super Pooped (inc_announcements.js 380)', () => {
@@ -307,9 +306,11 @@ describe('feature gain sites ask the shared gate (source text)', () => {
     assert.doesNotMatch(src('js/features/tree-death-feature.js'), /moodGain = engine\.metabolicGate/);
   });
 
-  it('content.js gates the chicken feed and Arborology mood; butter up gates in animal-flattery.js', () => {
+  it('content.js gates the Arborology mood; butter up gates in animal-flattery.js, set free in animal-set-free.js', () => {
     const content = src('content.js');
-    assert.equal((content.match(/metabolicGain\('mood'\)\.ok/g) || []).length, 2);
+    // G280 dropped the remake-only chicken Feed and its mood.
+    assert.equal((content.match(/metabolicGain\('mood'\)\.ok/g) || []).length, 1);
+    assert.match(src('js/animal-set-free.js'), /if \(metabolicGain\('mood'\)\.ok\) pc\.mood = Math\.min\(moodMax\(pc\), moodBefore \+ SET_FREE\.mood\);/);
     // G279: butter up's +10 mood (npc_chicken.js 198); sing to has no mood at all.
     const flattery = src('js/animal-flattery.js');
     assert.equal((flattery.match(/metabolicGain\('mood'\)\.ok/g) || []).length, 1);

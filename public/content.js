@@ -74,6 +74,7 @@ import {
   startIncubation,
 } from './js/animal-husbandry.js';
 import { metabolicGain, moodMax } from './js/metabolics.js';
+import { SET_FREE, setFreeVerbState } from './js/animal-set-free.js';
 import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js';
 import { levelInfoForXp } from './js/progression.js?v=progression-1';
 import { getGameDayKey } from './js/game-day.js?v=dametime-1';
@@ -613,15 +614,7 @@ export function getVerbsFor(target, ctx) {
       enabled: squeeze.ok,
       reason: squeeze.ok ? '' : squeeze.msg,
     });
-    const feedOptions = listAnimalFeedOptions(classId, inv);
-    add('feed', 'feed', {
-      sort: 20,
-      enabled: feedOptions.length > 0,
-      reason: feedOptions.length ? '' : "You don't have anything this Chicken wants to eat.",
-      tooltip: feedOptions.length
-        ? `Choose from ${feedOptions.length} eligible pack item${feedOptions.length === 1 ? '' : 's'}`
-        : 'Feed it grain or corn',
-    });
+    // No Feed: npc_chicken.js has no feed verb (Austin, desk FEED, register G280).
     // G279: npc_chicken.js 163-236 (js/animal-flattery.js): no daily limit.
     const butter = butterUpVerbState(s);
     if (butter) {
@@ -645,6 +638,9 @@ export function getVerbsFor(target, ctx) {
       });
     }
     for (const verb of namingVerbs(classId, s, hk)) add(verb.id, verb.label, verb);
+    // G284: set free in a place you own (npc_chicken.js 359-414); features/animal-husbandry-feature.js runs it.
+    const free = setFreeVerbState(classId, s, hk);
+    if (free) add('set_free', SET_FREE.verb, free);
     add('talk_to', 'talk to', { sort: 90, tooltip: 'I have something to tell you!' });
   }
 
@@ -695,6 +691,9 @@ export function getVerbsFor(target, ctx) {
       });
     }
     for (const verb of namingVerbs(classId, s, husbandryCtx(ctx))) add(verb.id, verb.label, verb);
+    // G284: set free in a place you own (npc_butterfly.js 320-370); features/animal-husbandry-feature.js runs it.
+    const free = setFreeVerbState(classId, s, husbandryCtx(ctx));
+    if (free) add('set_free', SET_FREE.verb, free);
     add('talk_to', 'talk to', { sort: 40, tooltip: 'I have something to tell you!' });
   }
 
@@ -1056,25 +1055,6 @@ export function runVerb(target, verbId, ctx) {
       incubation: started,
       speech: { speaker: target.label || 'Chicken', text: started.bubble, durationMs: 6000 },
     };
-  }
-
-  // --- animal feeding (GSJS target-item verb, flattened into pack-backed choices) ---
-  if (classId === 'npc_chicken' && verbBase === 'feed') {
-    const fed = feedAnimal(classId, s, inv, verbTarget);
-    if (!fed.ok) return { ok: false, msgs: [fed.msg], effects };
-    effects.items[fed.classTsid] = -1;
-    // Remake design (npc_chicken.js has no feed verb); its mood takes the
-    // source's one door, metabolics_add_mood (inc_metabolics.js 79-86).
-    const moodBefore = pc.mood || 0;
-    if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + 2);
-    effects.mood = pc.mood - moodBefore;
-    pc.imagination = (pc.imagination || 0) + 2;
-    pc.xp = (pc.xp || 0) + 2;
-    effects.img = 2;
-    effects.xp = 2;
-    msgs.push(`You fed the ${classId === 'npc_piggy' ? 'Piggy' : 'Chicken'} one ${fed.label}.`);
-    finalizeMsgs(msgs, effects);
-    return { ok: true, msgs, effects, anim: 'feed', animalChanged: true };
   }
 
   const performKinship = (verb) => {

@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-5';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-6';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-109';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-110';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -812,6 +812,7 @@ import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
+import { playPoofIn } from './js/overlay-art.js?v=g273-1';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
 import { hidesChatBubble } from './js/hi-signs.js?v=hi-chat-1';
@@ -8337,9 +8338,9 @@ const engine = {
   stopHit() {
     if (player) player.hitUntil = 0;
   },
-  /** A cream speech bubble that follows a registered target. */
-  say(target, text, durationMs = 4000) {
-    return showSpeechBubble(target, { text, durationMs });
+  /** A cream speech bubble that follows a registered target; `extra.slugs` ({ xp, mood, energy }) adds the stat pills (G284). */
+  say(target, text, durationMs = 4000, extra = null) {
+    return showSpeechBubble(target, { ...(extra || {}), text, durationMs });
   },
   /**
    * G253: close a target's speech bubble (or the bubble say() returned): it
@@ -11202,6 +11203,8 @@ function spawnFourLetterBlocks() {
     spr.y = 620;
     spr.zIndex = 45;
     entityLayer.addChild(spr);
+    // letter_block_2.js 74-98 createItemStackWithPoof: proto_puff poof_in (G285).
+    playPoofIn(PIXI, { layer: entityLayer, x: spr.x, bottom: spr.y, itemH: Math.round(197 * 0.74), zIndex: 46 });
     return register({
       classId: 'letter_block',
       label: `Letter Block ${index + 1}`,
@@ -11362,6 +11365,7 @@ async function startFourLetterQuest(opts = {}) {
     streetWalls = [];
     climb = { active: false, wall: null };
     spawnFourLetterBlocks();
+    playSound('PROTO_PUFF', { volume: 0.5 });
     spawnFourLetterMrBlock();
 
     if (player) {

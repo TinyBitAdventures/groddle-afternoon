@@ -2010,7 +2010,7 @@
   "skipped": 20
  },
  "icons": {
-  "items": 1029,
+  "items": 1030,
   "sharp": 1018
  },
  "imagination": {
@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 469,
+  "commits": 470,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Energy drifts as in Glitch: a small loss every 90 seconds, no walking cost and no standing refill, so Pooped lasts until you eat"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "Speech bubble tails point at their speaker at the screen edge, and the unlearning card looks like the client's"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Lonely Street Spirits call you over, cry on their street, and thank you when you come"
    }
   ]
  },
- "tests": 277,
+ "tests": 278,
  "generatedAt": "2026-10-25"
 }

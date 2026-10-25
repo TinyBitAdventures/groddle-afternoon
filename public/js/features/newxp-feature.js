@@ -111,6 +111,7 @@ import { locationEventsApi } from './location-events-feature.js?v=location-event
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g273-1';
 import { HOME_MACHINE } from '../home-ticket.js?v=g268-1';
 
 export const NEWXP_FEATURE_ID = 'newxp';
@@ -756,6 +757,32 @@ function quoinTexture(PIXI, type = 'xp') {
   return quoinFrames[type] || quoinFrames.xp;
 }
 
+/**
+ * deleteWithPoof (items/item.js 490-508): itemstack_overlay proto_puff at
+ * the stack's display top plus delta_x / delta_y (2 s, its last frame
+ * held), PROTO_PUFF, and the stack is gone (G285).
+ */
+function deleteWithPoof(engine, spr, dx = 0, dy = 0) {
+  if (!spr || spr.destroyed) return null;
+  const at = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dx, dy });
+  engine.playSound('PROTO_PUFF', { volume: 0.5 });
+  return playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70 });
+}
+
+/**
+ * createItemStackWithPoof (locations/location.js 2054-2070) for a quoin:
+ * poof_in with the given overlay (newxp_training1.js 444 passes
+ * smoke_puff_overlay, the same FLA as smoke_puff), PROTO_PUFF, and the quoin
+ * fading in (js/overlay-art.js playPoofIn, poofInAlpha).
+ */
+function poofInQuoin(engine, q, key = 'smoke_puff') {
+  const h = q.spr.height || 0;
+  q.poofAt = Date.now();
+  q.spr.alpha = 0;
+  engine.playSound('PROTO_PUFF', { volume: 0.5 });
+  playPoofIn(engine.PIXI, { layer: engine.entityLayer, x: q.x, bottom: q.y + h / 2, itemH: h, key });
+}
+
 /** An iMG quoin with a location_event_id; `onTake` runs once when touched. */
 function addQuoin(engine, id, x, y, onTake, { type = 'xp', reach = 78, amount = null } = {}) {
   const spr = new engine.PIXI.Sprite(quoinTexture(engine.PIXI, type));
@@ -777,6 +804,7 @@ function stepQuoins(engine) {
   for (const q of run.quoins) {
     if (q.taken || q.spr.destroyed) continue;
     q.spr.y = q.y + Math.sin(t + q.x) * 3;
+    if (q.poofAt) q.spr.alpha = poofInAlpha(Date.now() - q.poofAt);
     if (Math.abs(q.x - p.x) < 34 && q.y > p.y - (q.reach || 78) && q.y < p.y + 12) takeQuoin(engine, q);
   }
 }
@@ -1060,8 +1088,8 @@ async function runTraining1(t) {
   setStep('walk_coin');
   const coinX = Math.min(P().x + 300, L.walkCoin.maxX);
   let got = false;
-  addQuoin(engine, 'img_pickup_walk', coinX, L.walkCoin.y, () => { got = true; });
-  engine.playSound('TELEPORTER_VISIBLE_APPEAR', { volume: 0.4 });
+  // slow_create_coin (newxp_training1.js 439-450): the quoin poofs in on smoke_puff_overlay.
+  poofInQuoin(engine, addQuoin(engine, 'img_pickup_walk', coinX, L.walkCoin.y, () => { got = true; }));
   await until(t, () => got, { help: () => place(coinX, L.floorY) });
   await sleep(t, 600);
   await overlay(t, LINES.img1);
@@ -1124,6 +1152,8 @@ async function runTraining1(t) {
   const hideTree = () => {
     if (treeGone) return;
     treeGone = true;
+    // slothRemove (newxp_training1.js 695-708): deleteWithPoof(-50, 250), the tree right after.
+    if (sloth.alpha > 0 && sloth.visible) deleteWithPoof(engine, sloth, -50, 250);
     sloth.visible = false;
     engine.playSound('SLOTH_ARRIVES', { volume: 0.3 });
     if (run?.views) {
@@ -1186,9 +1216,10 @@ async function runTraining1(t) {
   }
   rooted = true;
   await talk(t, fl, LINES.t1Bye, { buttons: ['Thank you'] });
-  // door_show1-3: the flamingo poofs; walk into the tube.
+  // door_show1-3: the flamingo poofs (door_show2, newxp_training1.js 629-631:
+  // deleteWithPoof(10, 170)); walk into the tube.
   await sleep(t, 1000);
-  engine.playSound('TELEPORTER_VISIBLE_DISAPPEARS', { volume: 0.4 });
+  deleteWithPoof(engine, fl.sprite, 10, 170);
   fl.sprite.visible = false;
   if (fl.target) engine.unregister(fl.target);
   await sleep(t, 1000);

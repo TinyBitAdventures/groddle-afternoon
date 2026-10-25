@@ -57,6 +57,7 @@ import { isPoisoned } from '../tree-poison.js';
 import { furnitureSize } from '../home-decor.js?v=home-decor-4';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
+import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g273-1';
 import {
   ANIMAL_BABIES,
   KEY_NAMES,
@@ -121,7 +122,8 @@ let demoDone = false;
 let autoplayAt = 0;
 let lastRugSync = 0;
 let rugTargets = [];
-let heart = null;
+let heart = null; // playSheetOverlay handle
+let heartRetryAt = 0;
 let adopting = []; // street trees handed to patches, waiting for their plot's first draw
 const views = new Map(); // item id -> sprite
 
@@ -421,8 +423,8 @@ const EFFECTS = {
       const at = list.indexOf(target);
       if (at >= 0) list.splice(at, 1);
     }
-    poof(engine, x, y - 30);
     engine.dropWorldStack?.(baby, 1, x, y - 1);
+    poof(engine, x, y - 1, BABY_STACK_H);
     return { ok: true, tag: `${target.classId}>${baby}` };
   },
 
@@ -439,6 +441,7 @@ const EFFECTS = {
     const out = trantsformOutcome(target.classId, target.state.maturity, { home });
     const x = target.sprite.x;
     const y = target.sprite.y;
+    const treeH = Math.min(260, Math.max(60, Number(target.sprite.height) || 0));
     const oldLabel = GROWN_TREE_LABELS[target.classId] || target.label;
     if (target.grownFromBean) {
       const plots = engine.streetSlot('patches')?.plots || {};
@@ -457,7 +460,7 @@ const EFFECTS = {
       // adoptPlot draws the bare plot first; the new tree takes it over once that is on screen.
       adopting.push({ entity, out, until: now() + 5000 });
     }
-    poof(engine, x, y - 60);
+    poof(engine, x, y, treeH);
     return { ok: true, msg: trantsformMessage(oldLabel, GROWN_TREE_LABELS[out.classId]), tag: `${target.classId}>${out.classId}` };
   },
 };
@@ -495,8 +498,19 @@ function tickAdopting(t) {
   });
 }
 
-function poof(engine, x, y) {
-  engine.floatText?.(x, y, '*poof*', 0xffffff);
+/** A dropped stack's height in the street (the baby lies there as a ground stack). */
+const BABY_STACK_H = 40;
+
+/**
+ * replaceWithPoofIfOnGround (items/item.js 478-488) makes the new stack with
+ * createItemStackWithPoof: Tiny Speck's proto_puff poof_in, centred on it
+ * (locations/location.js 2054-2071, js/overlay-art.js playPoofIn). `bottom`
+ * is the new stack's feet, `itemH` its height.
+ */
+function poof(engine, x, bottom, itemH = 0) {
+  const layer = engine.fxLayer || engine.entityLayer;
+  if (!layer) return null;
+  return playPoofIn(engine.PIXI, { layer, x, bottom, itemH });
 }
 
 /* ------------------------------------------------------------------ */
@@ -688,35 +702,48 @@ function syncTrayIcons(engine) {
   }
 }
 
+/**
+ * Feeling Called Love's indicator (catalog_buffs.js 721
+ * announce_add_indicator('feeling_called_love', 'amorous_philtre_heart');
+ * players/inc_announcements.js 585-642): a pc_overlay of Tiny Speck's
+ * amorous_philtre_heart at 1:1, delta_y -120, duration 0 (until the buff
+ * ends and announce_remove_indicator takes it off). The heart rides higher
+ * on an embiggened avatar.
+ */
+export const LOVE_HEART = Object.freeze({ key: 'amorous_philtre_heart', dy: -120 });
+
+function stopHeart() {
+  heart?.stop?.();
+  heart = null;
+}
+
 function syncHeart(engine) {
   const on = engine.hasBuff(LOVE) && engine.player;
   if (!on) {
-    if (heart && !heart.destroyed) {
-      heart.parent?.removeChild(heart);
-      heart.destroy();
-    }
-    heart = null;
+    if (heart) stopHeart();
     return;
   }
-  const { PIXI } = engine;
-  if (!heart || heart.destroyed) {
-    if (!PIXI?.Graphics) return;
-    // announce_add_indicator('feeling_called_love', 'amorous_philtre_heart'): a heart over the avatar.
-    heart = new PIXI.Graphics()
-      .moveTo(0, 6)
-      .bezierCurveTo(-14, -6, -8, -18, 0, -10)
-      .bezierCurveTo(8, -18, 14, -6, 0, 6)
-      .fill({ color: 0xff5f9e })
-      .stroke({ width: 2, color: 0xffffff, alpha: 0.9 });
-    heart.zIndex = 950;
-    heart.eventMode = 'none';
-    engine.entityLayer.addChild(heart);
-  }
-  const p = engine.player;
-  const beat = 1 + Math.max(0, Math.sin(now() / 160)) * 0.15;
-  heart.x = p.x;
-  heart.y = p.y - 128 * Math.abs(p.baseScale || 1) / Math.abs(baseScale || p.baseScale || 1);
-  heart.scale.set(beat);
+  if (heart || now() < heartRetryAt) return;
+  const layer = engine.fxLayer || engine.entityLayer;
+  if (!layer) return;
+  heart = playSheetOverlay(engine.PIXI, LOVE_HEART.key, {
+    layer,
+    at: () => {
+      const p = engine.player;
+      if (!p) return { x: 0, y: 0 };
+      const k = Math.abs(p.baseScale || 1) / Math.abs(baseScale || p.baseScale || 1);
+      return { x: p.x, y: p.y + LOVE_HEART.dy * k };
+    },
+    durationMs: Infinity,
+    zIndex: 950,
+  });
+  const mine = heart;
+  // Gone without a stop (a street change cleared its layer, or no art): try again shortly.
+  heart.done.then(() => {
+    if (heart !== mine || mine.stopped) return;
+    heart = null;
+    heartRetryAt = now() + 500;
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -803,8 +830,7 @@ export const potionsFeature = {
     adopting = [];
     rugTargets = [];
     syncRugs.key = '';
-    if (heart && !heart.destroyed) heart.destroy();
-    heart = null;
+    stopHeart();
   },
 
   onTick(dtMs, t, engine) {
@@ -936,6 +962,6 @@ export const potionsFeature = {
     syncRugs.key = '';
     views.clear();
     frameCache = new Map();
-    heart = null;
+    stopHeart();
   },
 };

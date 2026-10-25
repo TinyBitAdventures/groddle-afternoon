@@ -171,8 +171,9 @@ describe('mood-XP sources for the SWFs, the Game and the loneliness rewards', ()
 describe('wiring', () => {
   it('the party plays the recovered fireworks and Play shows play_glitch', () => {
     const lonely = readFileSync(join(pub, 'js/features/spirit-loneliness-feature.js'), 'utf8');
-    assert.match(lonely, /playVectorOverlay\(root, at\.key/);
-    assert.match(lonely, /durationMs: LONELY_RULES\.fireworkMs/);
+    // G250 (desk FIREWORKS): 1:1, under the bubbles and prompts (the bottom of the fx layer).
+    assert.match(lonely, /fireworksUnder\(engine, at, vp, LONELY_RULES\.fireworkMs\)/);
+    assert.match(lonely, /layer\.addChildAt\(sprite, 0\)/);
     const swf = readFileSync(join(pub, 'js/features/swf-feature.js'), 'utf8');
     assert.match(swf, /PLAY_OVERLAY = Object\.freeze\(\{ key: 'play_glitch', dy: -140 \}\)/);
     assert.match(swf, /overlayFrameAt\(playArt, ms, \{ loop: false \}\)/);

@@ -56,7 +56,7 @@ import { getStreetEcologyCatalog } from '../street-ecology.js?v=official-ecology
 import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=lonely-1';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { loadVectorFrames, playVectorOverlay } from '../overlay-art.js?v=g273-1';
+import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement } from '../overlay-art.js?v=g273-1';
 import {
   INVITE_ART,
   LONELY_RULES,
@@ -434,23 +434,88 @@ function hideStreetOverlay() {
   }
 }
 
-/** Stand-in for fireworks_1/2/3.fla: a burst of dots at the source position for 2 s. */
 /**
  * lonelinessEndPartyOverlay's vp_overlay: the fireworks SWF at 1:1 on the
- * 960-wide viewport (vp.scale), its stage centred on the x/y percentages,
- * shown for fireworkMs. The dot burst stands in if the art cannot load.
+ * 960-wide viewport, its stage centred on the x/y percentages, shown for
+ * fireworkMs. A burst of dots stands in if the art cannot load.
+ * Austin, 2026-10-25 (desk FIREWORKS, register G250): keep them 1:1 but
+ * under speech bubbles and prompts, so the spirit's lines stay readable. The
+ * client drew a vp_overlay over the whole location; here each frame is
+ * drawn into a canvas texture at the bottom of the world's fx layer (the
+ * bubbles, the verb prompt and floating text all sit above it), kept on the
+ * camera.
  */
-function fireworks(at) {
-  const root = rootEl();
+function fireworks(engine, at) {
   const vp = viewport();
-  if (!root || !vp) return;
+  if (!vp) return;
   ensureCss();
   rt.fireworks = (rt.fireworks || 0) + 1;
-  playVectorOverlay(root, at.key, { rect: vp, x: at.x, y: at.y, scale: vp.scale, durationMs: LONELY_RULES.fireworkMs, className: 'lonely-fireworks' })
-    .then((ok) => {
-      if (!ok) burst(at);
-      rt.fireworksArt = ok ? 'overlay' : 'dots';
-    });
+  fireworksUnder(engine, at, vp, LONELY_RULES.fireworkMs).then((ok) => {
+    if (!ok) burst(at);
+    rt.fireworksArt = ok ? 'under' : 'dots';
+  });
+}
+
+/** One firework under the fx layer (see fireworks). Resolves true once played, false without art. */
+export async function fireworksUnder(engine, at, vp, durationMs) {
+  const PIXI = engine?.PIXI;
+  const layer = engine?.fxLayer;
+  if (!PIXI?.Sprite || !PIXI.Texture?.from || !layer || typeof document === 'undefined') return false;
+  let art;
+  try {
+    art = await loadVectorFrames(at.key);
+  } catch {
+    return false;
+  }
+  if (layer.destroyed) return false;
+  const { meta, imgs } = art;
+  // The viewport in logical px (960 wide), drawn at the screen's resolution.
+  const w = Math.max(1, Math.round(vp.width / vp.scale));
+  const h = Math.max(1, Math.round(vp.height / vp.scale));
+  const res = Math.min(2, Math.max(1, vp.scale * (globalThis.devicePixelRatio || 1)));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(w * res);
+  canvas.height = Math.round(h * res);
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return false;
+  const texture = PIXI.Texture.from(canvas);
+  const sprite = new PIXI.Sprite(texture);
+  sprite.eventMode = 'none';
+  sprite.label = `overlay:${at.key}`;
+  sprite.alpha = 0;
+  sprite.width = w;
+  sprite.height = h;
+  layer.addChildAt(sprite, 0);
+  const place = overlayPlacement(meta, w * at.x, h * at.y, 1);
+  const life = overlayLifeMs(durationMs);
+  const t0 = performance.now();
+  let shown = -1;
+  await new Promise((resolve) => {
+    const step = (t) => {
+      const ms = t - t0;
+      if (ms >= life || sprite.destroyed) {
+        resolve();
+        return;
+      }
+      const cam = engine.camera;
+      sprite.x = cam.x;
+      sprite.y = cam.y;
+      const f = overlayFrameAt(meta, ms);
+      if (f !== shown && imgs[f]?.complete) {
+        shown = f;
+        ctx.setTransform(res, 0, 0, res, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(imgs[f], place.left, place.top, place.width, place.height);
+        texture.source?.update?.();
+      }
+      sprite.alpha = overlayAlpha(ms, durationMs);
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+  if (!sprite.destroyed) sprite.destroy();
+  texture.destroy(true);
+  return true;
 }
 
 /** Load the three fireworks before the party ends (the client loaded each SWF on announce). */
@@ -653,7 +718,7 @@ function tickParty(engine, now) {
       if (p.done.has(i) || now < p.finishedAt + fw.at) return;
       p.done.add(i);
       if (streetKey(engine.streetTsid) !== p.street) return;
-      fireworks(fw);
+      fireworks(engine, fw);
       engine.playSound?.(LONELY_RULES.fireworkSound, { volume: 0.6 });
     });
     if (p.jabberAt && now >= p.jabberAt) {

@@ -35,6 +35,9 @@
  * QA: ?autostart=1&fresh=1&resetgame=1&animaldemo=batterfly|plop|incubate|name|herd
  * (+ &animalautoplay=1, &questoffer=off). The back yard route is
  * ?autostart=1&fresh=1&resetgame=1&homedemo=home&animaldemo=remote&animalautoplay=1.
+ * Set free (G284): &homedemo=home&animaldemo=setfree puts a Chicken and a
+ * Butterfly beside you in the yard; &animalautoplay=1 (or =butterfly) asks
+ * and answers OK.
  * &animalfast=1 shortens incubation to 6 s for headless runs. Starvation:
  * &animaldemo=starve releases a Piggy beside you at hunger 10 whose next tick
  * is 3 s away (yard: &homedemo=home&animaldemo=remote&animalhunger=10 does the
@@ -49,7 +52,8 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
-import { displayTopOf } from '../overlay-art.js?v=g273-1';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g273-1';
+import { SET_FREE, applySetFree, canSetFree, setFreeGoneLine, setFreePrompt } from '../animal-set-free.js';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { createAnimalState, resetAnimalDay, animalStatusLabel, listAnimalFeedOptions } from '../animals.js?v=g268-1';
 import {
@@ -100,7 +104,7 @@ import {
 import { moodMax } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g273-1';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g283-1';
 import { grantMoodXp } from '../mood-xp.js';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
@@ -967,6 +971,83 @@ function releasePiggyHere(engine, { escaped = false } = {}) {
   return true;
 }
 
+// —— Set free (G284) ——————————————————————————————————————————————————————
+
+/**
+ * verbs.set_free's handler (npc_chicken.js 391-414, npc_butterfly.js
+ * 353-370): a modal OK / Cancel prompt; OK runs modal_callback.
+ */
+function askSetFree(engine, target) {
+  const name = target.state?.userName || '';
+  engine.scriptedDialogue({
+    title: null,
+    kicker: null,
+    beats: [{ text: setFreePrompt(target.classId, name), response: SET_FREE.ok }],
+    cancelable: true,
+    primaryLabel: SET_FREE.ok,
+    cancelLabel: SET_FREE.cancel,
+    onComplete: () => setFreeNow(engine, target),
+    onCancel: () => {
+      lastAction = `set_free:cancel:${target.classId}`;
+      publish(engine, true);
+    },
+  });
+  lastAction = `set_free:ask:${target.classId}`;
+  publish(engine, true);
+}
+
+/**
+ * modal_callback 'ok' (npc_chicken.js 948-971, npc_butterfly.js 985-1010):
+ * +20 mood (the metabolic gate) and -5 energy, the set_free_in_pol line with
+ * those slugs, smoke_puff following the animal (delay 2.5 s, delta_y 95 from
+ * its display top, 1.5 s), and at 3 s freeChicken / freeButterfly: the
+ * activity line and apiDelete. The slot row goes at once, so a reload
+ * cannot bring it back.
+ */
+function setFreeNow(engine, target) {
+  const spr = target?.sprite;
+  if (!spr || spr.destroyed || !(engine.interactables || []).includes(target) || target._setFree) return false;
+  target._setFree = true;
+  const cls = target.classId;
+  const name = target.state?.userName || '';
+  const res = applySetFree(cls, engine.pc);
+  engine.updateHud();
+  engine.say(target, res.line, 4000, { slugs: { mood: res.slugs.mood, energy: res.slugs.energy } });
+  let last = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dy: SET_FREE.puff.deltaY });
+  playSheetOverlay(engine.PIXI, SET_FREE.puff.overlay, {
+    layer: engine.entityLayer,
+    at: () => {
+      if (!spr.destroyed) last = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dy: SET_FREE.puff.deltaY });
+      return last;
+    },
+    delayMs: SET_FREE.puff.delayMs,
+    durationMs: SET_FREE.puff.durationMs,
+    loop: false,
+    zIndex: 70,
+  });
+  const entity = extras.find((e) => e.target === target);
+  const finish = entity ? vanishExtra(engine, entity) : null;
+  const gen = generation;
+  later(SET_FREE.freedMs, () => {
+    engine.pushActivity(setFreeGoneLine(cls, name));
+    if (gen !== generation) return;
+    if (finish) finish();
+    else {
+      // Not one of this feature's rows: take it off the street all the same.
+      spr.visible = false;
+      engine.unregister(target);
+    }
+    if (!spr.destroyed) spr.visible = false;
+    animalCrowdChanged(engine, cls, { exclude: target });
+    lastAction = `set_free:gone:${cls}`;
+    publish(engine, true);
+  });
+  lastAction = `set_free:ok:${cls}:mood=${res.slugs.mood}:energy=${res.slugs.energy}`;
+  engine.save();
+  publish(engine, true);
+  return true;
+}
+
 // —— Pack-side babies ————————————————————————————————————————————————————
 
 function babyTarget(engine, babyClass) {
@@ -1103,8 +1184,8 @@ let engine_ref = null;
 function setupDemo(engine) {
   if (demoUsed) return;
   const mode = String(engine.param('animaldemo') || '');
-  if (!['batterfly', 'plop', 'incubate', 'name', 'herd', 'remote', 'sad', 'starve', 'crowd'].includes(mode)) return;
-  if (mode === 'remote' && !isYard(engine)) return; // waits for the home street
+  if (!['batterfly', 'plop', 'incubate', 'name', 'herd', 'remote', 'sad', 'starve', 'crowd', 'setfree'].includes(mode)) return;
+  if ((mode === 'remote' || mode === 'setfree') && !isYard(engine)) return; // waits for the home street
   if (mode === 'crowd' && engine.param('homedemo') && !isYard(engine)) return; // the yard crowd waits for home
   demoUsed = true;
   demoMode = mode;
@@ -1264,6 +1345,23 @@ function setupDemo(engine) {
       // Every animal of the class checks once (the demo skips the one-by-one arrivals).
       animalCrowdChanged(engine, cls);
       publish(engine, true);
+    });
+    return;
+  }
+
+  if (mode === 'setfree') {
+    // G284: a Chicken and a Butterfly of yours beside you in the yard, Herdkeeping known.
+    grant(engine, [HERDKEEPING.skill]);
+    const x = p?.x || 300;
+    const rows = [addExtraAnimal(engine, 'npc_chicken', x + 110), addExtraAnimal(engine, 'npc_butterfly', x + 200)];
+    engine.save();
+    publish(engine, true);
+    if (!auto) return;
+    const row = auto === 'butterfly' ? rows[1] : rows[0];
+    later(1500, () => {
+      const entity = extras.find((e) => e.row === row);
+      if (entity) askSetFree(engine, entity.target);
+      later(1200, () => document.querySelector('#quest-dialogue:not([hidden]) #quest-dialogue-next')?.click());
     });
     return;
   }
@@ -1717,6 +1815,10 @@ export const animalHusbandryFeature = {
     }
     if (verbId === 'capture' && target.classId === 'npc_piggy') {
       capture(engine, target);
+      return true;
+    }
+    if (verbId === 'set_free' && canSetFree(target.classId)) {
+      askSetFree(engine, target);
       return true;
     }
     return null;

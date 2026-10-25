@@ -100,6 +100,18 @@ const ARMOR_CLASS = 'essence_of_rookswort';
 /** music_map ROOK_FLOCK (archive.org 'rook flight'): inc_rook.js:40 loops it for the whole attack. */
 const ROOK_MUSIC = 'assets/audio/sfx/ROOK_FLOCK.mp3';
 const ROOK_HOME = Object.freeze({ x: 580, y: 170, scale: 0.82 });
+/** The HUD badge, docked in the viewport's top right; its feed hangs below, its right edge 10 px in (G283). */
+export const BADGE = Object.freeze({ x: VIEW_W - 70, y: 66, feedX: -90 });
+/**
+ * Camera headroom while a stun orb is up and its beam fires (G283). The orb
+ * stands 312 px above your feet (ORB_ART), and the client's viewport ran up
+ * to 600 px tall (LayoutModel.as max_vp_h) with the avatar 150 px below its
+ * centre (CameraMan.as 121-138), so the orb sat about 140 px down from the
+ * top. The remake's 408 px viewport puts your feet at about 306 px and the
+ * orb above the top edge; the camera looks 90 px higher, which brings the
+ * orb to about 84 px down and keeps your feet 12 px inside the viewport.
+ */
+export const ORB_HEADROOM = Object.freeze({ dy: 90, afterMs: 1500 });
 
 const DIR = 'assets/sprites/rooks/';
 const sheet = (file, fw, fh, cols, frames) => Object.freeze({ path: `${DIR}${file}`, fw, fh, cols, frames });
@@ -162,6 +174,7 @@ let musicFor = '';
 let primed = null; // { target, until, damage, strikeAt }
 let orb = null; // runtime orb
 let offerPanel = null;
+let headroom = null; // { until }: the camera looks up for the orb (G283)
 
 // Pixi parts
 let ui = null; // screen layer
@@ -452,6 +465,14 @@ function ensureUi(engine) {
   sky.alpha = 0;
   sky.eventMode = 'none';
   const rookLayer = new PIXI.Container();
+  // In front of the hovering Rook, in world px (kept on the camera by
+  // syncFront): the orb, its count and motes and the beams. The client flies
+  // its rooks in a middle layer of the street (RookManager.as 1140-1170) and
+  // draws pc_ and location_overlays over the street, so nothing it owns hides
+  // them (G283).
+  const front = new PIXI.Container();
+  front.eventMode = 'passive';
+  front.sortableChildren = true;
   const fxLayer = new PIXI.Container();
   fxLayer.eventMode = 'none';
   const tint = new PIXI.Graphics();
@@ -460,11 +481,26 @@ function ensureUi(engine) {
   textLayer.eventMode = 'none';
   const hud = new PIXI.Container();
   hud.eventMode = 'none';
-  root.addChild(sky, rookLayer, fxLayer, tint, textLayer, hud);
+  root.addChild(sky, rookLayer, front, fxLayer, tint, textLayer, hud);
   stage.addChild(root);
-  ui = { root, sky, rookLayer, fxLayer, tint, textLayer, hud, rook: null, head: null, headClip: '', headLock: 0, badge: null };
+  ui = { root, sky, rookLayer, front, fxLayer, tint, textLayer, hud, rook: null, head: null, headClip: '', headLock: 0, badge: null };
   buildHud(engine);
+  syncFront(engine);
   return ui;
+}
+
+/** Keep the front layer on the world: its children use world px. */
+function syncFront(engine) {
+  const f = ui?.front;
+  if (!f || f.destroyed) return;
+  const cam = engine.camera;
+  f.x = -cam.x;
+  f.y = -cam.y;
+}
+
+/** The layer the Rook fight's own art goes on: in front of the Rook. */
+function frontLayer(engine) {
+  return ensureUi(engine)?.front || engine.fxLayer;
 }
 
 function textStyle(size, extra = {}) {
@@ -484,9 +520,13 @@ function buildHud(engine) {
   const { PIXI } = engine;
   const hud = ui.hud;
   hud.removeChildren();
+  // The client's rook head sits in its header, above the location viewport
+  // (RookIncidentHeaderView.as 640-651: x at the header centre, y 45). The
+  // remake's header is the page's own bar, and the viewport's top centre is
+  // where the stun orb rises (G283), so the badge docks in the top right.
   const badge = new PIXI.Container();
-  badge.x = VIEW_W / 2;
-  badge.y = 94;
+  badge.x = BADGE.x;
+  badge.y = BADGE.y;
   const disc = new PIXI.Graphics();
   const arc = new PIXI.Graphics();
   const stars = new PIXI.Graphics();
@@ -504,11 +544,12 @@ function buildHud(engine) {
   phase.anchor.set(0.5, 1);
   phase.y = -46;
   const stamp = new PIXI.Text({ text: 'STUN!', style: textStyle(24, { fill: 0xffffff, stroke: { color: 0x2a1438, width: 5 } }) });
-  stamp.anchor.set(0.5);
+  stamp.anchor.set(1, 0.5);
+  stamp.x = -52; // left of the docked badge, so it grows inward
   stamp.alpha = 0;
   const armor = new PIXI.Text({ text: '', style: textStyle(11, { fill: 0xbaf7d0, fontWeight: '800' }) });
-  armor.anchor.set(0, 0.5);
-  armor.x = 46;
+  armor.anchor.set(1, 0.5);
+  armor.x = -50;
   armor.y = -20;
   const feedBox = new PIXI.Graphics();
   const feed = new PIXI.Text({ text: '', style: {
@@ -521,6 +562,7 @@ function buildHud(engine) {
     lineHeight: 16,
   } });
   feed.anchor.set(0.5, 0);
+  feed.x = BADGE.feedX;
   feed.y = 70;
   badge.addChild(disc, headMask, arc, stars, head, phase, clock, stamp, armor, feedBox, feed);
   hud.addChild(badge);
@@ -594,8 +636,8 @@ function drawHud(engine, a) {
   b.feedBox.clear();
   if (showFeed) {
     const h = Math.max(22, b.feed.height + 14);
-    b.feedBox.roundRect(-150, 64, 300, h + 2, 8).fill({ color: 0x000000, alpha: 0.1 });
-    b.feedBox.roundRect(-150, 62, 300, h, 8).fill({ color: 0xf2f2f0, alpha: 0.96 });
+    b.feedBox.roundRect(BADGE.feedX - 150, 64, 300, h + 2, 8).fill({ color: 0x000000, alpha: 0.1 });
+    b.feedBox.roundRect(BADGE.feedX - 150, 62, 300, h, 8).fill({ color: 0xf2f2f0, alpha: 0.96 });
   }
 }
 
@@ -842,7 +884,7 @@ function updateFeathers(dtMs) {
 function playArt(engine, key, opts) {
   const hold = engine.param?.('rookarthold');
   const h = playSheetOverlay(engine.PIXI, key, {
-    layer: engine.fxLayer || engine.entityLayer,
+    layer: frontLayer(engine) || engine.entityLayer,
     holdMs: hold != null && hold !== '' && Number.isFinite(Number(hold)) ? Number(hold) : null,
     ...opts,
   });
@@ -1149,7 +1191,8 @@ function startStun(engine, source = 'verb') {
   root.cursor = 'pointer';
   root.hitArea = new PIXI.Circle(0, 0, 40);
   root.on('pointertap', () => releaseOrb(engine));
-  engine.fxLayer.addChild(root);
+  frontLayer(engine).addChild(root);
+  holdHeadroom(engine, Infinity);
   // The orb itself: Tiny Speck's focusing_orb_attack (G272), state by joiners.
   const art = playArt(engine, 'focusing_orb_attack', {
     at: () => ({ x: p.x, y: p.y + ORB_ART.dy }),
@@ -1174,6 +1217,27 @@ function startStun(engine, source = 'verb') {
   return true;
 }
 
+/** Look up ORB_HEADROOM.dy until `until` (ms clock), unless Camera Mode already looks elsewhere. */
+function holdHeadroom(engine, until) {
+  if (typeof engine.setCameraLook !== 'function') return;
+  if (headroom) {
+    headroom.until = until;
+    return;
+  }
+  const look = engine.cameraLook || { x: 0, y: 0 };
+  if (look.x || look.y) return;
+  engine.setCameraLook(0, -ORB_HEADROOM.dy);
+  headroom = { until };
+}
+
+/** Let the camera settle back once the beam is done (or at once on `force`). */
+function releaseHeadroom(engine, force = false) {
+  if (!headroom || (!force && now() < headroom.until)) return;
+  const look = engine.cameraLook;
+  if (look && look.x === 0 && look.y === -ORB_HEADROOM.dy) engine.setCameraLook(0, 0);
+  headroom = null;
+}
+
 function spawnMote(engine, from) {
   const { PIXI } = engine;
   const m = new PIXI.Graphics();
@@ -1184,7 +1248,7 @@ function spawnMote(engine, from) {
   m._from = { ...from };
   m._t = 0;
   m.eventMode = 'none';
-  engine.fxLayer.addChild(m);
+  frontLayer(engine).addChild(m);
   orb.motes.push(m);
 }
 
@@ -1251,6 +1315,7 @@ function cancelOrb(engine, why = '') {
   for (const m of orb.motes) if (!m.destroyed) m.destroy();
   if (!orb.root.destroyed) orb.root.destroy({ children: true });
   orb = null;
+  if (headroom) headroom.until = now();
   if (why) lastAction = `orb_cancel:${why}`;
 }
 
@@ -1258,6 +1323,7 @@ function releaseOrb(engine) {
   if (!orb) return;
   const joiners = orb.joiners;
   cancelOrb(engine);
+  if (headroom) headroom.until = now() + ORB_HEADROOM.afterMs;
   const a = here(engine);
   if (!a) return;
   const r = resolveStun(a, joiners, now(), PLAYER_LABEL);
@@ -1739,6 +1805,7 @@ function publish(engine, force = false) {
   engine.setData('rookRooked', String(rookedKeys.length));
   engine.setData('rookRookedKeys', rookedKeys.slice(0, 16).join(','));
   engine.setData('rookOrb', orb ? `${orb.joiners}/${orb.order.length}:${orbLookFor(orb.joiners).state}` : '');
+  engine.setData('rookHeadroom', headroom ? String(ORB_HEADROOM.dy) : '');
   engine.setData('rookLast', lastAction);
   engine.setData('rookFeed', feedText);
   engine.setData('rookNextAttack', save.nextAttackAt ? String(Math.max(0, Math.round((save.nextAttackAt - t) / 1000))) : '');
@@ -1794,6 +1861,7 @@ export const rookAttackFeature = {
   onStreetClear(engine) {
     generation += 1;
     cancelOrb(engine);
+    releaseHeadroom(engine, true);
     endPrime(engine, false);
     closeOfferPanel();
     for (const row of tracked.values()) if (row.halo && !row.halo.destroyed) row.halo.destroy();
@@ -1864,11 +1932,13 @@ export const rookAttackFeature = {
       if (mine && rookPresent(mine) && mine.phase !== 'dead' && Math.random() < dtMs / 9000) spawnSilhouettes(engine, 1);
     }
     updateOrb(engine, dtMs);
+    releaseHeadroom(engine);
     updatePrimeFx(engine);
     if (t < shakeUntil) {
       const k = (shakeUntil - t) / 1100;
       engine.nudgeCamera?.((Math.random() - 0.5) * 14 * k, (Math.random() - 0.5) * 10 * k);
     }
+    syncFront(engine);
     stepAutoplay(engine);
     publish(engine);
   },
