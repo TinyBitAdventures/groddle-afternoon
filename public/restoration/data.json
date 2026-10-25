@@ -2027,9 +2027,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 433,
+  "commits": 436,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Plain words instead of em-dashes in the game's own lines"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Help mine a rock with the Glitches near you, and they help you mine yours"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Change your home street to any of 36 original street styles"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2134,21 +2149,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "The Irrigator 9000 wears out and pours first, and the Grand Ol' Grinder grinds with its own animation"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Every street sits in its own region: Louise Pasture is Groddle Meadow again"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Each region gets its own Street Spirit"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "Release a Pocket Salmon in Jal and Samudra, three feeds per animal for Heebo, and Fertilidust counts only on living trees"
    }
   ]
  },

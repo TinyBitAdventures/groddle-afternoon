@@ -212,10 +212,9 @@ describe('Le Voyage Violet', () => {
     const flat = (t) => t.replace(/\s+/g, ' ').replace(/[“”"]/g, '"').trim();
     const src = flat(apparition.replace(/\\n/g, ' ').replace(/"\s*\+\s*tab\s*\+\s*"/g, ' ').replace(/"\s*\+\s*"/g, '').replace(/\\"/g, '"').replace(/\\“/g, '“').replace(/\\”/g, '”'));
     for (const q of SCION_QUOTES) {
-      // The two em-dashes in the source are commas here.
-      const want = flat(q.replace('silence, that', 'silence—that').replace('spine,\nwe', 'spine—\nwe'));
+      // Verbatim, the source's two em-dashes included (Tiny Speck's words stay exact).
+      const want = flat(q);
       assert.ok(src.includes(want), want.slice(0, 50));
-      assert.ok(!q.includes('—'));
     }
   });
 

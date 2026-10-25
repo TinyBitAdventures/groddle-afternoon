@@ -195,7 +195,7 @@ export const SCION_QUOTES = Object.freeze([
   'Tes yeux, où rien ne se révèle\nDe doux ni d’amer,\nSont deux bijoux froids où se mêle\nL’or avec le fer.',
   `A lost battalion of platonic conversationalists jumping\n${TAB}down the stoops off fire escapes off windowsills\n${TAB}off Empire State out of the moon.`,
   // The source's dash after "silence" is a comma here (no em-dashes in the game's copy).
-  'Everything is dead, and the dead are everywhere.\nMen are alone, and all around them is silence, that is the earth!',
+  'Everything is dead, and the dead are everywhere.\nMen are alone, and all around them is silence—that is the earth!',
   'For forty years I have been listening to your words there through a crack under the floor. I have invented them myself. After all, there was nothing else I could invent.',
   'Le Prince d’Aquitaine à la tour abolie.\nThese fragments I have shored against my ruins.',
   `I'm with you in Rockland\n${TAB}where fifty more shocks will never return your\n${TAB}soul to its body again from its pilgrimage to a\n${TAB}cross in the void`,
@@ -204,7 +204,7 @@ export const SCION_QUOTES = Object.freeze([
   'Between the desire\nand the spasm\nBetween the potency\nand the existence\nBetween the essence\nand the descent\nFalls the Shadow',
   'This is the record of a box man. I am at this time beginning to write this record in my box. I am in a cardboard box that fits over my head and covers me completely to the hips.',
   '“Do you see the eye?” she asked me.\n“Well?”\n“It’s an egg,” she concluded in all simplicity.',
-  'And the worms, they will climb\nthe crooked ladder of your spine—\nwe’re all mad here.'.replace('—', ','),
+  'And the worms, they will climb\nthe crooked ladder of your spine—\nwe’re all mad here.',
   '“Yes, Lord,” she replied, grabbing a butcher’s knife from the kitchen.',
   '(i do not know what it is about you that closes\nand opens;only something in me understands\nthe voice of your eyes is deeper than all roses)\nnobody,not even the rain,has such small hands',
   'People with pure hearts can go to a whole new world.',

@@ -46,8 +46,9 @@ const SOURCE_VERBATIM = [
   ['js/newxp.js', 'Not so fast — head home first', 'glitch-GameServerJS/locations/newbie_island.js'],
   ['js/newxp.js', 'You little adventurer, you — nicely done.', 'glitch-GameServerJS/locations/home.js'],
   ['js/newxp.js', 'kinds of skills — Teleportation and Mining', 'glitch-GameServerJS/locations/home.js'],
-  // The Scion's quote; purple-journey.js turns the dash into a comma when it speaks (e6775507).
+  // The Scion's quotes, verbatim (purple_apparition.js 89, 111).
   ['js/purple-journey.js', 'the crooked ladder of your spine—', 'glitch-GameServerJS/items/purple_apparition.js'],
+  ['js/purple-journey.js', 'all around them is silence—that is the earth!', 'glitch-GameServerJS/items/purple_apparition.js'],
   ['js/quest-rooms/back-alley.js', 'routine subway maintenance—refilling', 'glitch-GameServerJS/items/npc_maintenance_bot.js'],
   ['js/quest-rooms/kids-room.js', 'six different letters—A, B, E, M, S and T—you', 'glitch-GameServerJS/items/npc_letterblock.js'],
   ['js/rube.js', 'Something smells weird—like', 'glitch-GameServerJS/items/essence_of_rubeweed.js'],

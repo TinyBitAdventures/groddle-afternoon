@@ -58,7 +58,7 @@ import {
   imbibeButton,
   purpleTimeline,
   scionWords,
-} from '../purple-journey.js?v=g150-1';
+} from '../purple-journey.js?v=g150-2';
 import { VOYAGE_FLOOR, VOYAGE_H, VOYAGE_OFFSET, VOYAGE_W, buildVoyageScene } from '../purple-journey-scene.js?v=g150-1';
 import { homesFeature } from './homes-feature.js?v=homes-9';
 
