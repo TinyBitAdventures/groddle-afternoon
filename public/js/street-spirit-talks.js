@@ -31,55 +31,55 @@
  *   conversation of the spirit's class. An offer is kept per class, so any
  *   spirit of that region can tell it.
  *
- * The shrine gates: the remake has none of the shrine conversations, or the
- * chain of about thirty animal, tree, rock and patch conversations before
- * them (chickens_cautionary_tales_1 ... perspectives_of_a_patch_4 ...
- * facts_of_the_giants_1-4), so nothing can complete them yet. UNBUILT_GATES
- * counts them as met; a gate is still honoured when the ledger records it,
- * and `strict` (QA ?spiritgates=strict) turns them back on. The second
- * conversation of each pair is gated for real.
+ * The shrine gates (G189): the shrine conversations and the chain of
+ * animal, tree, rock and patch conversations before them are built
+ * (js/conversations-data.js), so every gate is real. UNBUILT_GATES is
+ * empty; `strict` (QA ?spiritgates=strict) is kept and changes nothing.
+ *
+ * The ledger is the player's one conversation record (js/conversations.js),
+ * shared with every other teller: the offer rules, the chain rule (a
+ * conversation outside a chain waits while one is in progress) and the
+ * completions are the same functions. The spirits' own saved ledger (G185)
+ * is folded into it on load.
  *
  * The world side is features/street-spirits-feature.js.
  */
 
+import {
+  CONVERSATION_RULES,
+  CONVO_BUBBLE_CHOICES,
+  canDoChain,
+  completeConversation,
+  hasCompleted as recordHasCompleted,
+  hasOffered as recordHasOffered,
+  normalizeRecord,
+  offerBubble as recordOfferBubble,
+  offerRules,
+  offeredForClass,
+  recordOffer,
+} from './conversations.js?v=g189-1';
+
+export { CONVO_BUBBLE_CHOICES };
+
 export const SPIRIT_TALKS_SOURCE = 'tinyspeck/glitch-GameServerJS items/street_spirit_{groddle,firebog,zutto}.js, players/inc_conversations.js (CC0)';
 
-const MINUTE = 60 * 1000;
-
-/** inc_conversations.js conversations_offer / conversations_has_offered. */
+/** inc_conversations.js conversations_offer / conversations_has_offered (js/conversations.js). */
 export const TALK_RULES = Object.freeze({
-  offerTimeoutMs: 30 * MINUTE, // 59, 91: offered expiry, and the gap after any offer or completion
-  devTimeoutMs: 10 * 1000, // config.is_dev
-  loginGraceMs: 5 * MINUTE, // 88
-  streetDwellMs: 10 * 1000, // 89
-  bubbleMs: 10000, // conversations_offer_bubble 258
-  shrineQuest: 'donate_to_all_shrines', // 97-100
+  offerTimeoutMs: CONVERSATION_RULES.offerTimeoutMs, // 59, 91: offered expiry, and the gap after any offer or completion
+  devTimeoutMs: CONVERSATION_RULES.devTimeoutMs, // config.is_dev
+  loginGraceMs: CONVERSATION_RULES.loginGraceMs, // 88
+  streetDwellMs: CONVERSATION_RULES.streetDwellMs, // 89
+  bubbleMs: CONVERSATION_RULES.bubbleMs, // conversations_offer_bubble 258
+  shrineQuest: CONVERSATION_RULES.shrineQuest, // 97-100
 });
 
-/** The shrine conversations the spirits' first talks wait on, unbuilt in the remake. */
-export const UNBUILT_GATES = Object.freeze([
-  'facts_of_the_giants_4',
-  'voicemail_of_the_giants_3',
-  'rituals_of_the_giants_3',
-  'from_the_books_of_the_giants_3',
-]);
-
-/** inc_conversations.js 237-251, in order. */
-export const CONVO_BUBBLE_CHOICES = Object.freeze([
-  "Hey {pc_label}, come here, I've got something to tell you!",
-  'Hey! {pc_label}! Come talk to me!',
-  '{pc_label}! Talk to me? I know secrets.',
-  'Say, {pc_label}? You want secrets? Talk to me.',
-  'Psssssst! {pc_label}! Talk to me!',
-  'Hey! {pc_label}! Talk to me! Here! Me! {pc_label}!',
-  'Hey hey hey! Hey! {pc_label}! Hey! Talk to me!',
-  'Oy, {pc_label}! Talk to me! I have secrets.',
-  'Psst, {pc_label}… Pssst, talk to me!… {pc_label}!',
-  '{pc_label}? Want to know what I know? Talk to me!',
-  'I know stuff about stuff, {pc_label}. Curious? Talk to me.',
-  'Hello? {pc_label}? C’mere. Talk to me.',
-  '{pc_label}! Pssssst! Talk to me! {pc_label}!',
-]);
+/**
+ * The shrine conversations the spirits' first talks wait on
+ * (facts_of_the_giants_4, voicemail_of_the_giants_3,
+ * rituals_of_the_giants_3, from_the_books_of_the_giants_3) are built in
+ * G189, so none is met by default any more.
+ */
+export const UNBUILT_GATES = Object.freeze([]);
 
 /** Spirit class per region (the remake's vendor spirits are dressed as these). */
 export const TALK_CLASSES = Object.freeze({
@@ -227,44 +227,22 @@ export const TALK_ORDER = Object.freeze({
 
 const num = (v) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Number(v) : 0);
 
-function cleanMap(raw) {
-  const out = {};
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
-  for (const [cls, ids] of Object.entries(raw)) {
-    if (!ids || typeof ids !== 'object' || Array.isArray(ids)) continue;
-    const row = {};
-    for (const [id, ts] of Object.entries(ids)) if (num(ts)) row[id] = num(ts);
-    if (Object.keys(row).length) out[cls] = row;
-  }
-  return out;
-}
-
-/** The player's conversation ledger, shaped like pc.conversations: { completed, offered: { [class]: { [id]: ms } }, lastOffer }. */
+/** The player's conversation record (js/conversations.js normalizeRecord): { completed, offered, lastOffer, chainsCompleted, chainsInProgress, heard }. */
 export function normalizeTalkState(raw = {}) {
-  const src = raw && typeof raw === 'object' ? raw : {};
-  return { completed: cleanMap(src.completed), offered: cleanMap(src.offered), lastOffer: num(src.lastOffer) };
+  return normalizeRecord(raw);
 }
 
 /** conversations_has_completed(null, id): completed with any class. */
 export function hasCompleted(state, id) {
-  return Object.values(state.completed || {}).some((row) => Boolean(row?.[id]));
+  return recordHasCompleted(state, id);
 }
 
 /** conversations_has_offered(null, id): offered by any class within the timeout. */
 export function hasOffered(state, id, now, timeoutMs = TALK_RULES.offerTimeoutMs) {
-  for (const row of Object.values(state.offered || {})) {
-    if (row?.[id]) return now - row[id] < timeoutMs;
-  }
-  return false;
+  return recordHasOffered(state, id, now, timeoutMs);
 }
 
-function lastCompleted(state) {
-  let high = 0;
-  for (const row of Object.values(state.completed || {})) for (const ts of Object.values(row || {})) high = Math.max(high, ts);
-  return high;
-}
-
-/** A conversation's gate: the ledger, or an unbuilt shrine gate unless strict. */
+/** A conversation's gate: completed in the record (UNBUILT_GATES is empty since G189). */
 export function gateMet(state, gate, { strict = false } = {}) {
   if (!gate) return true;
   if (hasCompleted(state, gate)) return true;
@@ -273,20 +251,16 @@ export function gateMet(state, gate, { strict = false } = {}) {
 
 /**
  * conversations_offer for one id. ctx: { now, dev, strict, sessionStart,
- * streetEnteredAt, shrinesDone }. Returns { ok, reason }.
+ * streetEnteredAt, shrinesDone }. Returns { ok, reason }. The shared rules
+ * first, then conversation_canoffer_<id>: the chain rule (chain null) and
+ * the gate.
  */
 export function canOffer(state, id, ctx = {}) {
   const def = SPIRIT_CONVERSATIONS[id];
   if (!def) return { ok: false, reason: 'unknown' };
-  const now = num(ctx.now) || Date.now();
-  const timeout = ctx.dev ? TALK_RULES.devTimeoutMs : TALK_RULES.offerTimeoutMs;
-  if (hasCompleted(state, id)) return { ok: false, reason: 'completed' };
-  if (hasOffered(state, id, now, timeout)) return { ok: false, reason: 'offered' };
-  if (!ctx.dev && now - num(ctx.sessionStart) < TALK_RULES.loginGraceMs) return { ok: false, reason: 'login' };
-  if (now - num(ctx.streetEnteredAt) < TALK_RULES.streetDwellMs) return { ok: false, reason: 'street' };
-  if (state.lastOffer > now - timeout) return { ok: false, reason: 'cooldown' };
-  if (lastCompleted(state) > now - timeout) return { ok: false, reason: 'cooldown' };
-  if (!ctx.dev && !ctx.shrinesDone) return { ok: false, reason: TALK_RULES.shrineQuest };
+  const rules = offerRules(state, id, ctx);
+  if (!rules.ok) return rules;
+  if (!canDoChain(state, null)) return { ok: false, reason: 'chain' };
   if (!gateMet(state, def.gate, ctx)) return { ok: false, reason: `gate:${def.gate}` };
   return { ok: true, reason: '' };
 }
@@ -302,10 +276,7 @@ export function offerNext(state, variant, ctx = {}) {
   for (const id of TALK_ORDER[variant] || []) {
     const res = canOffer(state, id, ctx);
     if (res.ok) {
-      const now = num(ctx.now) || Date.now();
-      state.offered[cls] ||= {};
-      state.offered[cls][id] = now;
-      state.lastOffer = now;
+      recordOffer(state, cls, id, num(ctx.now) || Date.now());
       return { id, reason: '' };
     }
     if (reason === 'none' && res.reason !== 'completed') reason = res.reason;
@@ -315,20 +286,12 @@ export function offerNext(state, variant, ctx = {}) {
 
 /** conversations_offered_for_class: every id this class has offered (expired offers stay until told). */
 export function offeredFor(state, variant) {
-  const row = state.offered?.[TALK_CLASSES[variant]] || {};
-  return Object.keys(row).filter((id) => SPIRIT_CONVERSATIONS[id]?.variant === variant);
+  return offeredForClass(state, TALK_CLASSES[variant]).filter((id) => SPIRIT_CONVERSATIONS[id]?.variant === variant);
 }
 
 /** conversations_complete: drop the offer everywhere, record the completion under the class. */
 export function completeTalk(state, variant, id, now = Date.now()) {
-  for (const [cls, row] of Object.entries(state.offered)) {
-    delete row[id];
-    if (!Object.keys(row).length) delete state.offered[cls];
-  }
-  const cls = TALK_CLASSES[variant];
-  state.completed[cls] ||= {};
-  state.completed[cls][id] = now;
-  return true;
+  return completeConversation(state, TALK_CLASSES[variant], id, null, now);
 }
 
 /** Scripted-dialogue beats: the spirit's line with its one answer. */
@@ -336,10 +299,7 @@ export function talkBeats(id) {
   return (SPIRIT_CONVERSATIONS[id]?.steps || []).map((s) => ({ text: s.text, response: s.choice }));
 }
 
-/** The call-out bubble (choose_one in the source; `pick` in [0, 1)). The remake has no player names, so {pc_label} reads "friend". */
+/** The call-out bubble (js/conversations.js offerBubble). */
 export function offerBubble(pick = Math.random(), label = 'friend') {
-  const i = Math.min(CONVO_BUBBLE_CHOICES.length - 1, Math.max(0, Math.floor(pick * CONVO_BUBBLE_CHOICES.length)));
-  // A name opening a sentence is capitalized, as the source's player names were.
-  const cap = label.charAt(0).toUpperCase() + label.slice(1);
-  return CONVO_BUBBLE_CHOICES[i].replace(/(^|[.!?…]\s*)\{pc_label\}/g, `$1${cap}`).replace(/\{pc_label\}/g, label);
+  return recordOfferBubble(pick, label);
 }

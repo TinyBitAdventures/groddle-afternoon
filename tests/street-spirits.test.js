@@ -45,6 +45,7 @@ import {
   talkBeats,
 } from '../public/js/street-spirit-talks.js';
 import { runVerb } from '../public/content.js?v=street-spirits-test-1';
+import { CONVERSATIONS } from '../public/js/conversations-data.js?v=g189-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LOCATIONS = join(ROOT, '../streets/mnt/stos/location_data');
@@ -396,15 +397,18 @@ test.describe('conversations against GameServerJS (G185)', () => {
       assert.equal(SPIRIT_CONVERSATIONS[id].gate, gate, id);
       assert.equal(gsjsGate(item(`street_spirit_${SPIRIT_CONVERSATIONS[id].variant}`), id), gate, id);
     }
-    // The four shrine gates are conversations on the npc_shrine_* classes, not books.
+    // The four shrine gates are conversations on the npc_shrine_* classes, not books, built since G189.
     const shrines = readdirSync(join(GSJS, 'items')).filter((f) => f.startsWith('npc_shrine_'));
-    for (const gate of UNBUILT_GATES) {
+    const gates = Object.values(want).filter((g) => !SPIRIT_CONVERSATIONS[g]);
+    assert.equal(gates.length, 4);
+    for (const gate of gates) {
       assert.ok(shrines.some((f) => readFileSync(join(GSJS, 'items', f), 'utf8').includes(`function conversation_run_${gate}(`)), gate);
+      assert.ok(CONVERSATIONS[gate].tellers.every((cls) => cls.startsWith('npc_shrine_')), gate);
     }
-    assert.deepEqual([...UNBUILT_GATES].sort(), Object.values(want).filter((g) => !SPIRIT_CONVERSATIONS[g]).sort());
+    assert.deepEqual([...UNBUILT_GATES], []);
   });
 
-  test('the shrine gates are still unbuilt in the remake (else gate on them for real)', () => {
+  test('no gate is met by default any more (UNBUILT_GATES lists only gates the remake cannot tell)', () => {
     const files = [];
     const walk = (dir) => {
       for (const f of readdirSync(dir, { withFileTypes: true })) {
@@ -451,8 +455,11 @@ test.describe('conversations against GameServerJS (G185)', () => {
     assert.equal(canOffer(state, 'when_down_was_up_1', ctx(t0 + 4 * M)).reason, 'login');
     assert.equal(canOffer(state, 'when_down_was_up_1', ctx(t0 + 6 * M, { streetEnteredAt: t0 + 6 * M - 9000 })).reason, 'street');
     assert.equal(canOffer(state, 'when_down_was_up_1', ctx(t0 + 6 * M, { shrinesDone: false })).reason, 'donate_to_all_shrines');
+    assert.equal(canOffer(state, 'when_down_was_up_1', ctx(t0 + 6 * M)).reason, 'gate:rituals_of_the_giants_3');
     assert.equal(canOffer(state, 'when_down_was_up_1', ctx(t0 + 6 * M, { strict: true })).reason, 'gate:rituals_of_the_giants_3');
     assert.equal(canOffer(state, 'when_down_was_up_2', ctx(t0 + 6 * M)).reason, 'gate:when_down_was_up_1');
+    // Told at a Spriggan shrine well before: the gate holds for real (G189).
+    state.completed.npc_shrine_spriggan = { rituals_of_the_giants_3: t0 - 40 * M };
 
     let now = t0 + 6 * M;
     assert.deepEqual(offerNext(state, 'zutto', ctx(now)), { id: 'when_down_was_up_1', reason: '' });
@@ -468,7 +475,7 @@ test.describe('conversations against GameServerJS (G185)', () => {
     now += 31 * M;
     completeTalk(state, 'zutto', 'when_down_was_up_1', now + 1000);
     assert.equal(hasCompleted(state, 'when_down_was_up_1'), true);
-    assert.deepEqual(state.completed, { street_spirit_zutto: { when_down_was_up_1: now + 1000 } });
+    assert.deepEqual(state.completed, { npc_shrine_spriggan: { rituals_of_the_giants_3: t0 - 40 * M }, street_spirit_zutto: { when_down_was_up_1: now + 1000 } });
     assert.deepEqual(offeredFor(state, 'zutto'), []);
     // 30 minutes after the last completion, the second opens; the first never returns.
     assert.equal(offerNext(state, 'zutto', ctx(now + 20 * M)).reason, 'cooldown');
@@ -480,18 +487,30 @@ test.describe('conversations against GameServerJS (G185)', () => {
   test('dev rules, strict gates and the saved ledger', () => {
     const state = normalizeTalkState();
     const dev = { now: 50_000, dev: true, sessionStart: 49_000, streetEnteredAt: 30_000, shrinesDone: false };
+    assert.equal(offerNext(state, 'groddle', dev).reason, 'gate:facts_of_the_giants_4');
+    assert.equal(gateMet(state, 'facts_of_the_giants_4'), false);
+    assert.equal(gateMet(state, 'facts_of_the_giants_4', { strict: true }), false);
+    state.completed.npc_shrine_zille = { facts_of_the_giants_4: 1 };
+    state.completed.npc_shrine_ti = { voicemail_of_the_giants_3: 1 };
+    assert.equal(gateMet(state, 'facts_of_the_giants_4'), true);
+    assert.equal(gateMet(state, 'facts_of_the_giants_4', { strict: true }), true);
     assert.equal(offerNext(state, 'groddle', dev).id, 'street_spirit_stories_1');
     assert.equal(offerNext(state, 'groddle', { ...dev, now: 55_000 }).reason, 'offered');
     assert.equal(offerNext(state, 'firebog', { ...dev, now: 61_000 }).id, 'street_spirit_mysteries_1');
-    assert.equal(gateMet(state, 'facts_of_the_giants_4'), true);
-    assert.equal(gateMet(state, 'facts_of_the_giants_4', { strict: true }), false);
-    state.completed.npc_shrine_zille = { facts_of_the_giants_4: 1 };
-    assert.equal(gateMet(state, 'facts_of_the_giants_4', { strict: true }), true);
     assert.equal(gateMet(state, 'street_spirit_stories_1'), false);
+    // A conversation chain in progress holds the spirits (chain null), as every conversation outside one.
+    // conversation_canoffer checks the chain before the gate.
+    state.chainsInProgress.facts_of_the_giants = 60_000;
+    assert.equal(canOffer(state, 'when_down_was_up_1', { ...dev, now: 90_000 }).reason, 'chain');
+    state.chainsInProgress = {};
+    assert.equal(canOffer(state, 'when_down_was_up_1', { ...dev, now: 90_000 }).reason, 'gate:rituals_of_the_giants_3');
+    state.completed.npc_shrine_spriggan = { rituals_of_the_giants_3: 1 };
+    assert.equal(canOffer(state, 'when_down_was_up_1', { ...dev, now: 90_000 }).ok, true);
     const round = normalizeTalkState(JSON.parse(JSON.stringify(state)));
     assert.deepEqual(round, state);
-    assert.deepEqual(normalizeTalkState({ completed: { a: { b: 'x', c: 5 } }, offered: [], lastOffer: -1 }), { completed: { a: { c: 5 } }, offered: {}, lastOffer: 0 });
-    assert.deepEqual(normalizeTalkState(null), { completed: {}, offered: {}, lastOffer: 0 });
+    const empty = { chainsCompleted: {}, chainsInProgress: {}, heard: {} };
+    assert.deepEqual(normalizeTalkState({ completed: { a: { b: 'x', c: 5 } }, offered: [], lastOffer: -1 }), { completed: { a: { c: 5 } }, offered: {}, lastOffer: 0, ...empty });
+    assert.deepEqual(normalizeTalkState(null), { completed: {}, offered: {}, lastOffer: 0, ...empty });
   });
 
   test('the feature saves the ledger, offers on approach and runs the talk in the shared dialogue', () => {
@@ -499,7 +518,10 @@ test.describe('conversations against GameServerJS (G185)', () => {
     assert.match(feature, /from '\.\.\/street-spirit-talks\.js\?v=[\w-]+'/);
     assert.match(feature, /engine\.scriptedDialogue\(\{[\s\S]*?beats: talkBeats\(id\),[\s\S]*?cancelable: true,/);
     assert.match(feature, /engine\.say\(t, offerBubble\(\), TALK_RULES\.bubbleMs\);/);
-    assert.match(feature, /save\(\) \{\n    return talks;/);
+    // The ledger is the shared record (js/conversations.js); the old saved slice is handed over on restore.
+    assert.match(feature, /const record = \(\) => conversationRecord\(\);/);
+    assert.match(feature, /save\(\) \{\n    return \{ moved: 'conversations' \};/);
+    assert.match(feature, /if \(slice\?\.moved !== 'conversations'\) adoptLegacyTalks\(slice\);/);
     assert.match(feature, /questStatus\(engine\.questState \|\| \{\}, TALK_RULES\.shrineQuest\) === 'done'/);
   });
 

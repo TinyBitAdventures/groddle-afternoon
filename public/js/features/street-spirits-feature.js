@@ -33,10 +33,14 @@
  * the spirit offers its region's next conversation with a call-out bubble;
  * Talk to then runs it step by step in the shared scripted dialogue, once
  * per player. With nothing offered, Talk to keeps the single lines
- * (content.js). QA: &spiritconvo=dev (the source's dev-server rules: no
- * login wait, no shrine quest, 10 s timeouts), &spiritgates=strict (the
- * unbuilt shrine gates hold), &spiritlore=<id,id> (record conversations as
- * told). Canvas: spiritConvoOffered, spiritConvoActive, spiritConvoNext,
+ * (content.js). Since G189 the ledger is the player's one conversation
+ * record (js/conversations.js, saved by features/conversations-feature.js):
+ * the first talk of each pair waits for real on its shrine conversation,
+ * and the old saved ledger is handed over on load. QA: &spiritconvo=dev or
+ * &convo=dev (the source's dev-server rules: no login wait, no shrine quest,
+ * 10 s timeouts), &spiritgates=strict (kept; every gate is real now),
+ * &spiritlore=<id,id> (record conversations as told). Canvas:
+ * spiritConvoOffered, spiritConvoActive, spiritConvoNext,
  * spiritConvoCompleted, spiritConvoLast.
  */
 
@@ -60,12 +64,13 @@ import {
   canOffer,
   completeTalk,
   hasCompleted,
-  normalizeTalkState,
   offerBubble,
   offerNext,
   offeredFor,
   talkBeats,
-} from '../street-spirit-talks.js?v=g185-1';
+} from '../street-spirit-talks.js?v=g189-1';
+import { CONVERSATIONS } from '../conversations-data.js?v=g189-1';
+import { adoptLegacyTalks, afterRecordRestore, conversationRecord, markHeard } from '../conversations.js?v=g189-1';
 import { questStatus } from '../quest-offers.js';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';
@@ -75,8 +80,8 @@ let loader = null;
 let generation = 0;
 /** { target, variant, look, sprite, clip, done, talkUntil, near } */
 let spirit = null;
-/** The player's conversation ledger (saved). */
-let talks = normalizeTalkState();
+/** The player's conversation record (js/conversations.js; the conversations feature saves it). */
+const record = () => conversationRecord();
 let sessionStart = Date.now();
 /** The street's vendor spirit and its region, known before its art loads. */
 let talkTarget = null;
@@ -95,10 +100,15 @@ function publish(engine) {
   engine.setData('spiritClip', spirit?.clip || '');
 }
 
+/** The source's dev-server rules: ?spiritconvo=dev, or ?convo=dev for every teller. */
+function devRules(engine) {
+  return engine.param('spiritconvo') === 'dev' || engine.param('convo') === 'dev';
+}
+
 function talkCtx(engine, now) {
   return {
     now,
-    dev: engine.param('spiritconvo') === 'dev',
+    dev: devRules(engine),
     strict: engine.param('spiritgates') === 'strict',
     sessionStart,
     streetEnteredAt,
@@ -109,18 +119,18 @@ function talkCtx(engine, now) {
 /** Where the region's conversations stand: the first untold one and why it waits. */
 function nextStatus(engine, now) {
   const order = TALK_ORDER[talkVariant] || [];
-  const id = order.find((c) => !hasCompleted(talks, c));
+  const id = order.find((c) => !hasCompleted(record(), c));
   if (!id) return order.length ? 'all-told' : '';
-  if (offeredFor(talks, talkVariant).includes(id)) return `${id}:offered`;
-  const res = canOffer(talks, id, talkCtx(engine, now));
+  if (offeredFor(record(), talkVariant).includes(id)) return `${id}:offered`;
+  const res = canOffer(record(), id, talkCtx(engine, now));
   return `${id}:${res.ok ? 'ready' : res.reason}`;
 }
 
 function publishTalk(engine, now = Date.now()) {
-  engine.setData('spiritConvoOffered', talkVariant ? offeredFor(talks, talkVariant).join(',') : '');
+  engine.setData('spiritConvoOffered', talkVariant ? offeredFor(record(), talkVariant).join(',') : '');
   engine.setData('spiritConvoActive', active?.id || '');
   engine.setData('spiritConvoNext', talkVariant ? nextStatus(engine, now) : '');
-  engine.setData('spiritConvoCompleted', Object.values(talks.completed).flatMap((row) => Object.keys(row)).join(','));
+  engine.setData('spiritConvoCompleted', Object.values(record().completed).flatMap((row) => Object.keys(row)).join(','));
   engine.setData('spiritConvoLast', lastTalk);
 }
 
@@ -130,14 +140,14 @@ function tickOffer(engine, now) {
   const p = engine.player;
   if (!t || !p || !TALK_ORDER[talkVariant] || active || !t.sprite || t.sprite.destroyed) return;
   const near = Math.abs(p.x - t.sprite.x) <= 90 && Math.abs(p.y - t.sprite.y) <= 120;
-  const dev = engine.param('spiritconvo') === 'dev';
+  const dev = devRules(engine);
   // Collision fires on the way in; dev QA keeps checking while the player stands there.
   const entering = near && (!wasNear || (dev && now >= nextCheckAt));
   wasNear = near;
   if (!entering) return;
   nextCheckAt = now + 1000;
   if (engine.busy?.() || engine.transientInstance?.()) return;
-  const res = offerNext(talks, talkVariant, talkCtx(engine, now));
+  const res = offerNext(record(), talkVariant, talkCtx(engine, now));
   if (!res.id) {
     lastTalk = `held:${res.reason}`;
     return;
@@ -149,12 +159,13 @@ function tickOffer(engine, now) {
 
 /** talk_to: run the first conversation this region's spirits have offered. */
 function startConversation(engine, target, now) {
-  const id = offeredFor(talks, talkVariant)[0];
+  const id = offeredFor(record(), talkVariant)[0];
   if (!id || !engine.scriptedDialogue) return false;
   const def = SPIRIT_CONVERSATIONS[id];
   const variant = talkVariant;
   active = { id, variant, target };
   lastTalk = `talking:${id}`;
+  markHeard(record(), id, now);
   if (spirit?.target === target) spirit.talkUntil = Infinity;
   engine.scriptedDialogue({
     title: def.title,
@@ -163,7 +174,7 @@ function startConversation(engine, target, now) {
     cancelable: true,
     cancelLabel: 'Close',
     onComplete: () => {
-      completeTalk(talks, variant, id, Date.now());
+      completeTalk(record(), variant, id, Date.now());
       lastTalk = `completed:${id}`;
       endConversation(engine);
       engine.pushActivity(`You talked to the Street Spirit: ${def.title}.`);
@@ -182,16 +193,17 @@ function endConversation(engine) {
   publishTalk(engine);
 }
 
-/** QA: &spiritlore=<id,id> records those conversations as told (any gate id, e.g. facts_of_the_giants_4). */
+/** QA: &spiritlore=<id,id> records those conversations as told (any id, e.g. facts_of_the_giants_4, under its first teller). */
 function seedLore(engine) {
   const ids = String(engine.param('spiritlore') || '').split(',').map((s) => s.trim()).filter((s) => /^\w+$/.test(s));
+  const rec = record();
   for (const id of ids) {
-    if (hasCompleted(talks, id)) continue;
+    if (hasCompleted(rec, id)) continue;
     const variant = SPIRIT_CONVERSATIONS[id]?.variant;
     // Old enough that the 30-minute gap after a completion has passed.
     const at = Date.now() - TALK_RULES.offerTimeoutMs - 1000;
-    if (variant) completeTalk(talks, variant, id, at);
-    else (talks.completed.qa_lore ||= {})[id] = at;
+    if (variant) completeTalk(rec, variant, id, at);
+    else (rec.completed[CONVERSATIONS[id]?.tellers[0] || 'qa_lore'] ||= {})[id] = at;
   }
 }
 
@@ -307,6 +319,8 @@ export const streetSpiritsFeature = {
     loader = createSheetLoader(engine.PIXI);
     sessionStart = Date.now();
     seedLore(engine);
+    // The conversations feature restores the record after this one: seed again then.
+    afterRecordRestore(() => seedLore(engine));
     publish(engine);
   },
 
@@ -377,12 +391,14 @@ export const streetSpiritsFeature = {
     return null;
   },
 
+  /** The record is saved by the conversations feature; this marks the old ledger as handed over. */
   save() {
-    return talks;
+    return { moved: 'conversations' };
   },
 
+  /** A save from before G189 holds the ledger here: hand it to the shared record (js/conversations.js). */
   restore(slice, engine) {
-    talks = normalizeTalkState(slice);
+    if (slice?.moved !== 'conversations') adoptLegacyTalks(slice);
     if (engine) seedLore(engine);
   },
 
@@ -391,6 +407,6 @@ export const streetSpiritsFeature = {
     return spirit ? { variant: spirit.variant, look: spirit.look, clip: spirit.clip } : null;
   },
   _talks() {
-    return { talks, active: active?.id || '', variant: talkVariant, last: lastTalk };
+    return { talks: record(), active: active?.id || '', variant: talkVariant, last: lastTalk };
   },
 };

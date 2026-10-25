@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-72';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-73';
 import {
   actionDurationFor,
   createTimedAction,
@@ -19248,6 +19248,8 @@ function isQuestDialogueOpen() {
 function advanceQuestDialogue() {
   if (!questDialogueState) return;
   const { def, beats, mode } = questDialogueState;
+  // A scripted beat may act on its answer (G189: a conversation's reward on that step).
+  beats[questDialogueState.index]?.onAnswer?.();
   if (questDialogueState.index < beats.length - 1) {
     questDialogueState.index += 1;
     renderQuestDialogueBeat();
