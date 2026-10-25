@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-63';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-64';
 import {
   actionDurationFor,
   createTimedAction,
@@ -4428,8 +4428,20 @@ function positionSpeechBubble(bubble) {
   if (underPill) lowestTip = Math.max(lowestTip, cameraY + pill.bottom + 8 + meta.height + 11);
   const highestTip = cameraY + LOCATION_VIEW_H - 18;
   bubble.y = clamp(spr.y - spriteHeight - 12, Math.min(lowestTip, highestTip), highestTip);
+  // Clamped down onto the speaker (a short one near the top of the view): hang
+  // the bubble under its feet, tail up, when that fits (G185).
+  const below = spr.y + 6;
+  const flip = bubble.y > spr.y - spriteHeight && below + 11 + meta.height <= cameraY + LOCATION_VIEW_H - 8;
+  if (flip) bubble.y = below;
+  if (meta.flipped !== flip) {
+    meta.flipped = flip;
+    bubble.pivot.y = flip ? -11 : meta.height + 11;
+    if (meta.tailDown) meta.tailDown.visible = !flip;
+    if (meta.tailUp) meta.tailUp.visible = flip;
+  }
   if (app?.canvas) {
-    app.canvas.dataset.speechTop = String(Math.round(bubble.y - cameraY - meta.height - 11));
+    app.canvas.dataset.speechFlipped = flip ? '1' : '';
+    app.canvas.dataset.speechTop = String(Math.round(flip ? bubble.y + 11 - cameraY : bubble.y - cameraY - meta.height - 11));
     app.canvas.dataset.speechPillBottom = underPill ? String(Math.round(pill.bottom)) : '';
     app.canvas.dataset.speechTarget = `${Math.round(spr.x)},${Math.round(spr.y)}`;
     app.canvas.dataset.speechBubble = `${Math.round(bubble.x)},${Math.round(bubble.y)}`;
@@ -4471,15 +4483,21 @@ function showSpeechBubble(target, speech) {
   bg.roundRect(0, 0, width, height, 12).fill({ color: 0xfffdf5, alpha: 0.97 }).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
   // Tail: fill over the bubble's bottom border so the two read as one shape,
   // then outline only its two slanted sides at the bubble's border weight.
-  bg.poly([width / 2 - 9, height - 2, width / 2, height + 11, width / 2 + 9, height - 2]).fill({ color: 0xfffdf5, alpha: 0.97 });
-  bg.moveTo(width / 2 - 9, height).lineTo(width / 2, height + 11).lineTo(width / 2 + 9, height).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
+  // The up tail is for a bubble hung under its speaker (positionSpeechBubble).
+  const tailDown = new PIXI.Graphics();
+  tailDown.poly([width / 2 - 9, height - 2, width / 2, height + 11, width / 2 + 9, height - 2]).fill({ color: 0xfffdf5, alpha: 0.97 });
+  tailDown.moveTo(width / 2 - 9, height).lineTo(width / 2, height + 11).lineTo(width / 2 + 9, height).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
+  const tailUp = new PIXI.Graphics();
+  tailUp.poly([width / 2 - 9, 2, width / 2, -11, width / 2 + 9, 2]).fill({ color: 0xfffdf5, alpha: 0.97 });
+  tailUp.moveTo(width / 2 - 9, 0).lineTo(width / 2, -11).lineTo(width / 2 + 9, 0).stroke({ width: 2, color: 0x594c40, alpha: 0.34 });
+  tailUp.visible = false;
   speaker.x = 12;
   speaker.y = 10;
   body.x = 12;
   body.y = 10 + speaker.height + 4;
 
   const bubble = new PIXI.Container();
-  bubble.addChild(bg, speaker, body);
+  bubble.addChild(bg, tailDown, tailUp, speaker, body);
   if (slugRow) {
     slugRow.x = 12;
     slugRow.y = body.y + body.height + 6;
@@ -4493,6 +4511,9 @@ function showSpeechBubble(target, speech) {
     target,
     width,
     height,
+    tailDown,
+    tailUp,
+    flipped: false,
     life: 0,
     max: Math.max(210, Number(speech.durationMs || 5000) / (1000 / 60)),
   };

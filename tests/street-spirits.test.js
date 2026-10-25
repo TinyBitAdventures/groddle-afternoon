@@ -26,6 +26,24 @@ import {
   zuttoNextClip,
 } from '../public/js/street-spirits.js';
 import { dialoguePool, nextDialogue } from '../public/js/dialogue.js';
+import {
+  CONVO_BUBBLE_CHOICES,
+  SPIRIT_CONVERSATIONS,
+  TALK_CLASSES,
+  TALK_ORDER,
+  TALK_RULES,
+  UNBUILT_GATES,
+  canOffer,
+  completeTalk,
+  gateMet,
+  hasCompleted,
+  hasOffered,
+  normalizeTalkState,
+  offerBubble,
+  offerNext,
+  offeredFor,
+  talkBeats,
+} from '../public/js/street-spirit-talks.js';
 import { runVerb } from '../public/content.js?v=street-spirits-test-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -287,6 +305,209 @@ test.describe('behaviour helpers', () => {
     assert.match(index, /import \{ streetSpiritsFeature \} from '\.\/street-spirits-feature\.js\?v=[\w-]+'; FEATURES\.push\(streetSpiritsFeature\);/);
     const feature = readFileSync(join(ROOT, 'public/js/features/street-spirits-feature.js'), 'utf8');
     assert.match(feature, /startsWith\('street_spirit_'\) && it\.state\?\.vendorKey/);
-    assert.match(feature, /return null;\n  \},/); // runVerbOverride never handles the verb
+    // runVerbOverride handles Talk to only when a conversation is offered; otherwise content.js speaks.
+    const override = feature.slice(feature.indexOf('  runVerbOverride('), feature.indexOf('  save() {'));
+    assert.match(override, /if \(verbId !== 'talk_to'\) return null;/);
+    assert.match(override, /startConversation\(engine, target, Date\.now\(\)\)\) return true;\n    return null;/);
+  });
+});
+
+/** One conversation_run_<id> body: its title and each step's spirit line and answer, decoded as JS strings. */
+function gsjsConversation(src, id) {
+  const start = src.indexOf(`function conversation_run_${id}(`);
+  const body = src.slice(start, src.indexOf('\n}\n', start));
+  const str = (raw) => JSON.parse(`"${raw}"`);
+  const title = body.match(/var conversation_title = "([^"]+)"/)[1];
+  const choices = [...body.matchAll(/= \{txt: "((?:[^"\\]|\\.)*)", value: '[\w-]+'\};/g)].map((m) => str(m[1]));
+  const lines = [...body.matchAll(/this\.conversation_(?:start|reply)\(pc, (?:msg, )?"((?:[^"\\]|\\.)*)", choices\['(\d)'\], null, null, null, \{title: conversation_title\}\);/g)];
+  const calls = (body.match(/this\.conversation_(?:start|reply)\(/g) || []).length;
+  return { title, choices, lines: lines.map((m) => str(m[1])), steps: lines.map((m) => Number(m[2])), calls, body };
+}
+
+function gsjsGate(src, id) {
+  const start = src.indexOf(`function conversation_canoffer_${id}(`);
+  return src.slice(start, src.indexOf('\n}\n', start)).match(/conversations_has_completed\(null, "(\w+)"\)/)?.[1];
+}
+
+test.describe('conversations against GameServerJS (G185)', () => {
+  const VARIANTS = ['groddle', 'firebog', 'zutto'];
+
+  test('each region tells its own conversations, in its class order; Ix and the legacy class have none', () => {
+    for (const v of VARIANTS) {
+      const src = item(`street_spirit_${v}`);
+      const list = src.slice(src.indexOf('var conversations = ['), src.indexOf('];', src.indexOf('var conversations = [')));
+      assert.deepEqual([...list.matchAll(/"(\w+)"/g)].map((m) => m[1]), [...TALK_ORDER[v]], v);
+      assert.deepEqual([...TALK_ORDER[v]], STREET_SPIRIT_VARIANTS[v].conversations, v);
+      assert.equal(TALK_CLASSES[v], STREET_SPIRIT_VARIANTS[v].classTsid);
+      for (const id of TALK_ORDER[v]) assert.equal(SPIRIT_CONVERSATIONS[id].variant, v, id);
+    }
+    assert.equal(Object.keys(SPIRIT_CONVERSATIONS).length, 8);
+    for (const name of ['street_spirit', 'street_spirit_ix']) assert.doesNotMatch(item(name), /^function conversation_run_/m);
+    assert.equal(TALK_ORDER.ix, undefined);
+  });
+
+  test('every step is verbatim: the spirit line and its one answer, in order', () => {
+    for (const v of VARIANTS) {
+      const src = item(`street_spirit_${v}`);
+      for (const id of TALK_ORDER[v]) {
+        const want = gsjsConversation(src, id);
+        const have = SPIRIT_CONVERSATIONS[id];
+        assert.equal(have.title, want.title, id);
+        assert.equal(want.calls, want.lines.length, `${id}: every call parsed`);
+        assert.deepEqual(want.steps, want.lines.map((_, i) => i), `${id}: one step per choice set`);
+        assert.equal(have.steps.length, want.lines.length, id);
+        assert.deepEqual(have.steps.map((s) => s.text), want.lines, id);
+        assert.deepEqual(have.steps.map((s) => s.choice), want.choices, id);
+        // The last answer completes the conversation.
+        const lastValue = `${id}-${want.lines.length - 1}-2`;
+        assert.match(want.body, new RegExp(`if \\(msg\\.choice == "${lastValue}"\\)\\{\\s*pc\\.conversations_complete\\(this\\.class_tsid, conversation_id, chain\\);`));
+        assert.deepEqual(talkBeats(id), have.steps.map((s) => ({ text: s.text, response: s.choice })));
+        const [from, to] = have.source.match(/(\d+)-(\d+)$/).slice(1).map(Number);
+        const lines = src.split('\n');
+        assert.match(lines[from - 1], new RegExp(`^function conversation_canoffer_${id}\\(`), `${id} source start`);
+        assert.equal(lines[to - 1], '}', `${id} source end`);
+      }
+    }
+  });
+
+  test('no conversation gives a reward, and none needs a chain', () => {
+    for (const v of VARIANTS) {
+      const src = item(`street_spirit_${v}`);
+      for (const id of TALK_ORDER[v]) {
+        const { body } = gsjsConversation(src, id);
+        assert.match(body, /var chain = null;/);
+        assert.doesNotMatch(body, /self_effects\.push|apiGive|stats_add|xp_give|achievements_/, id);
+      }
+    }
+  });
+
+  test('gates: the first of each pair waits on a shrine conversation, the second on the first', () => {
+    const want = {
+      street_spirit_stories_1: 'facts_of_the_giants_4',
+      street_spirit_stories_2: 'street_spirit_stories_1',
+      sonnets_of_the_street_spirit_1: 'from_the_books_of_the_giants_3',
+      sonnets_of_the_street_spirit_2: 'sonnets_of_the_street_spirit_1',
+      street_spirit_mysteries_1: 'voicemail_of_the_giants_3',
+      street_spirit_mysteries_2: 'street_spirit_mysteries_1',
+      when_down_was_up_1: 'rituals_of_the_giants_3',
+      when_down_was_up_2: 'when_down_was_up_1',
+    };
+    for (const [id, gate] of Object.entries(want)) {
+      assert.equal(SPIRIT_CONVERSATIONS[id].gate, gate, id);
+      assert.equal(gsjsGate(item(`street_spirit_${SPIRIT_CONVERSATIONS[id].variant}`), id), gate, id);
+    }
+    // The four shrine gates are conversations on the npc_shrine_* classes, not books.
+    const shrines = readdirSync(join(GSJS, 'items')).filter((f) => f.startsWith('npc_shrine_'));
+    for (const gate of UNBUILT_GATES) {
+      assert.ok(shrines.some((f) => readFileSync(join(GSJS, 'items', f), 'utf8').includes(`function conversation_run_${gate}(`)), gate);
+    }
+    assert.deepEqual([...UNBUILT_GATES].sort(), Object.values(want).filter((g) => !SPIRIT_CONVERSATIONS[g]).sort());
+  });
+
+  test('the shrine gates are still unbuilt in the remake (else gate on them for real)', () => {
+    const files = [];
+    const walk = (dir) => {
+      for (const f of readdirSync(dir, { withFileTypes: true })) {
+        const p = join(dir, f.name);
+        if (f.isDirectory()) walk(p);
+        else if (/\.js$/.test(f.name) && !p.endsWith('street-spirit-talks.js') && !p.endsWith('street-spirits-feature.js')) files.push(p);
+      }
+    };
+    walk(join(ROOT, 'public/js'));
+    files.push(join(ROOT, 'public/game.js'), join(ROOT, 'public/content.js'));
+    for (const gate of UNBUILT_GATES) {
+      const hit = files.find((f) => readFileSync(f, 'utf8').includes(gate));
+      assert.equal(hit, undefined, `${gate} is now tracked in ${hit}: drop it from UNBUILT_GATES`);
+    }
+  });
+
+  test('offer rules and call-outs are the source’s (players/inc_conversations.js)', () => {
+    const inc = readFileSync(join(GSJS, 'players/inc_conversations.js'), 'utf8');
+    const offer = inc.slice(inc.indexOf('function conversations_offer('), inc.indexOf('function conversations_force_offer('));
+    assert.match(inc, /var timeout = config\.is_dev \? 10 : 30\*60;/);
+    assert.equal(TALK_RULES.offerTimeoutMs, 30 * 60 * 1000);
+    assert.equal(TALK_RULES.devTimeoutMs, 10 * 1000);
+    assert.match(offer, /now - this\.date_last_loggedin < \(5\*60\)/);
+    assert.equal(TALK_RULES.loginGraceMs, 5 * 60 * 1000);
+    assert.match(offer, /stats_get_last_street_visit\(this\.location\.tsid\) < 10\)/);
+    assert.equal(TALK_RULES.streetDwellMs, 10 * 1000);
+    assert.match(offer, /getQuestInstance\('donate_to_all_shrines'\)/);
+    assert.equal(TALK_RULES.shrineQuest, 'donate_to_all_shrines');
+    assert.match(inc, /source\.sendBubble\(choice, 10000, this\);/);
+    assert.equal(TALK_RULES.bubbleMs, 10000);
+    const list = inc.slice(inc.indexOf('var convo_bubble_choices = ['), inc.indexOf('];', inc.indexOf('var convo_bubble_choices')));
+    assert.deepEqual([...list.matchAll(/^\t"(.*)",?$/gm)].map((m) => JSON.parse(`"${m[1]}"`)), [...CONVO_BUBBLE_CHOICES]);
+    assert.equal(offerBubble(0), "Hey friend, come here, I've got something to tell you!");
+    assert.equal(offerBubble(0.99), 'Friend! Pssssst! Talk to me! Friend!');
+    assert.equal(offerBubble(8.5 / 13), 'Psst, friend… Pssst, talk to me!… Friend!');
+    for (let i = 0; i < 13; i++) assert.doesNotMatch(offerBubble(i / 13), /\{pc_label\}|—/);
+  });
+
+  test('a player is offered each conversation once, in order, under the source timings', () => {
+    const t0 = 1_000_000_000;
+    const state = normalizeTalkState();
+    const ctx = (now, extra = {}) => ({ now, sessionStart: t0, streetEnteredAt: t0, shrinesDone: true, ...extra });
+    const M = 60 * 1000;
+    assert.equal(canOffer(state, 'when_down_was_up_1', ctx(t0 + 4 * M)).reason, 'login');
+    assert.equal(canOffer(state, 'when_down_was_up_1', ctx(t0 + 6 * M, { streetEnteredAt: t0 + 6 * M - 9000 })).reason, 'street');
+    assert.equal(canOffer(state, 'when_down_was_up_1', ctx(t0 + 6 * M, { shrinesDone: false })).reason, 'donate_to_all_shrines');
+    assert.equal(canOffer(state, 'when_down_was_up_1', ctx(t0 + 6 * M, { strict: true })).reason, 'gate:rituals_of_the_giants_3');
+    assert.equal(canOffer(state, 'when_down_was_up_2', ctx(t0 + 6 * M)).reason, 'gate:when_down_was_up_1');
+
+    let now = t0 + 6 * M;
+    assert.deepEqual(offerNext(state, 'zutto', ctx(now)), { id: 'when_down_was_up_1', reason: '' });
+    assert.deepEqual(offeredFor(state, 'zutto'), ['when_down_was_up_1']);
+    assert.deepEqual(offeredFor(state, 'firebog'), []);
+    assert.equal(hasOffered(state, 'when_down_was_up_1', now + 29 * M), true);
+    // Still offered: nothing new until it expires or is told.
+    assert.equal(offerNext(state, 'zutto', ctx(now + M)).reason, 'offered');
+    // The 30-minute gap after any offer holds every region.
+    assert.equal(offerNext(state, 'firebog', ctx(now + M)).reason, 'cooldown');
+    // An expired, untold offer stays runnable and can be offered again.
+    assert.equal(offerNext(state, 'zutto', ctx(now + 31 * M)).id, 'when_down_was_up_1');
+    now += 31 * M;
+    completeTalk(state, 'zutto', 'when_down_was_up_1', now + 1000);
+    assert.equal(hasCompleted(state, 'when_down_was_up_1'), true);
+    assert.deepEqual(state.completed, { street_spirit_zutto: { when_down_was_up_1: now + 1000 } });
+    assert.deepEqual(offeredFor(state, 'zutto'), []);
+    // 30 minutes after the last completion, the second opens; the first never returns.
+    assert.equal(offerNext(state, 'zutto', ctx(now + 20 * M)).reason, 'cooldown');
+    assert.deepEqual(offerNext(state, 'zutto', ctx(now + 31 * M)), { id: 'when_down_was_up_2', reason: '' });
+    completeTalk(state, 'zutto', 'when_down_was_up_2', now + 32 * M);
+    assert.deepEqual(offerNext(state, 'zutto', ctx(now + 90 * M)), { id: '', reason: 'none' });
+  });
+
+  test('dev rules, strict gates and the saved ledger', () => {
+    const state = normalizeTalkState();
+    const dev = { now: 50_000, dev: true, sessionStart: 49_000, streetEnteredAt: 30_000, shrinesDone: false };
+    assert.equal(offerNext(state, 'groddle', dev).id, 'street_spirit_stories_1');
+    assert.equal(offerNext(state, 'groddle', { ...dev, now: 55_000 }).reason, 'offered');
+    assert.equal(offerNext(state, 'firebog', { ...dev, now: 61_000 }).id, 'street_spirit_mysteries_1');
+    assert.equal(gateMet(state, 'facts_of_the_giants_4'), true);
+    assert.equal(gateMet(state, 'facts_of_the_giants_4', { strict: true }), false);
+    state.completed.npc_shrine_zille = { facts_of_the_giants_4: 1 };
+    assert.equal(gateMet(state, 'facts_of_the_giants_4', { strict: true }), true);
+    assert.equal(gateMet(state, 'street_spirit_stories_1'), false);
+    const round = normalizeTalkState(JSON.parse(JSON.stringify(state)));
+    assert.deepEqual(round, state);
+    assert.deepEqual(normalizeTalkState({ completed: { a: { b: 'x', c: 5 } }, offered: [], lastOffer: -1 }), { completed: { a: { c: 5 } }, offered: {}, lastOffer: 0 });
+    assert.deepEqual(normalizeTalkState(null), { completed: {}, offered: {}, lastOffer: 0 });
+  });
+
+  test('the feature saves the ledger, offers on approach and runs the talk in the shared dialogue', () => {
+    const feature = readFileSync(join(ROOT, 'public/js/features/street-spirits-feature.js'), 'utf8');
+    assert.match(feature, /from '\.\.\/street-spirit-talks\.js\?v=[\w-]+'/);
+    assert.match(feature, /engine\.scriptedDialogue\(\{[\s\S]*?beats: talkBeats\(id\),[\s\S]*?cancelable: true,/);
+    assert.match(feature, /engine\.say\(t, offerBubble\(\), TALK_RULES\.bubbleMs\);/);
+    assert.match(feature, /save\(\) \{\n    return talks;/);
+    assert.match(feature, /questStatus\(engine\.questState \|\| \{\}, TALK_RULES\.shrineQuest\) === 'done'/);
+  });
+
+  test('speech bubbles clamped onto a speaker hang under its feet instead', () => {
+    const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');
+    const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
+    assert.match(fn, /const flip = bubble\.y > spr\.y - spriteHeight && below \+ 11 \+ meta\.height <= cameraY \+ LOCATION_VIEW_H - 8;/);
+    assert.match(fn, /bubble\.pivot\.y = flip \? -11 : meta\.height \+ 11;/);
+    assert.match(game, /bubble\.addChild\(bg, tailDown, tailUp, speaker, body\);/);
   });
 });
