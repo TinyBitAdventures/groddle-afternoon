@@ -531,7 +531,7 @@ import {
   formatActivityHtml,
   buildActivitySegments,
   activitySegmentsToHtml,
-} from './js/verb-rewards.js?v=g148-1';
+} from './js/verb-rewards.js?v=g162-1';
 import {
   loadStreetData,
   STREET_INDEX,

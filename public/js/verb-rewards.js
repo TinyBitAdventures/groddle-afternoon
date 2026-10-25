@@ -202,8 +202,13 @@ export function formatActivityLine(base, effects = {}, labelOf = (id) => id) {
   if (!segs.length) return '';
   const baseSeg = segs.find((s) => s.kind === 'base');
   const rest = segs.filter((s) => s.kind !== 'base').map((s) => s.text);
-  if (!rest.length) return (baseSeg?.text || '') + (baseSeg ? '.' : '');
-  return `${baseSeg?.text || 'You did a thing'}. ${rest.join(', ')}.`;
+  if (!rest.length) return baseSeg ? closeSentence(baseSeg.text) : '';
+  return `${closeSentence(baseSeg?.text || 'You did a thing')} ${rest.join(', ')}.`;
+}
+
+/** A line that already ends a sentence ("plus tomatoes!") keeps its own mark instead of gaining a period. */
+function closeSentence(text) {
+  return /[.!?…]["'”’)]*$/.test(text) ? text : `${text}.`;
 }
 
 /**
@@ -222,15 +227,16 @@ export function activitySegmentsToHtml(segments) {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   let html = base ? `<span class="act-base">${esc(base.text)}</span>` : '';
+  const stop = base && closeSentence(base.text) !== base.text ? '.' : '';
   if (rest.length) {
     const bits = rest.map((s) => {
       const cls =
         s.kind === 'loss' ? 'act-loss' : s.kind === 'gain' ? 'act-gain' : 'act-neutral';
       return `<span class="${cls}">${esc(s.text)}</span>`;
     });
-    html += (html ? '. ' : '') + bits.join(', ') + '.';
+    html += (html ? `${stop} ` : '') + bits.join(', ') + '.';
   } else if (html) {
-    html += '.';
+    html += stop;
   }
   return html;
 }
