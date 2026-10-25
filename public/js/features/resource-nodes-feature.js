@@ -1538,6 +1538,27 @@ export const resourceNodesFeature = {
     return true;
   },
 
+  /**
+   * Multiplayer street objects (features/street-objects-feature.js): this
+   * street's nodes, the QA demo node left out. ready(verbId) is the player's
+   * own side of a verb (tools, skills, energy, daily limits) with the stock
+   * left to the realtime server; refresh() redraws after a state change.
+   */
+  streetResourceNodes(engine) {
+    return entities.filter((entity) => entity !== demoEntity).map((entity) => ({
+      key: entity.key,
+      classTsid: entity.classTsid,
+      node: entity.node,
+      target: entity.target,
+      refresh: () => refreshEntity(engine, entity),
+      ready(verbId) {
+        const def = getResourceNodeDef(entity.classTsid);
+        const full = { ...entity.node, units: def?.stock?.max ?? entity.node.units, depleted: false, petted: false, watered: false };
+        return resourceNodeVerbs(full, engine.inv, engine.pc, verbContext(engine, entity)).find((v) => v.id === verbId)?.enabled === true;
+      },
+    }));
+  },
+
   /** QA / tests. */
   _state() {
     return { jar: { ...jar }, starterKit: kit.starterKit, entities: entities.length };

@@ -293,7 +293,7 @@ describe('game wiring', () => {
     assert.match(src, /spawnMineRocks/);
     assert.match(src, /starterMiningTools/);
     assert.match(src, /STARTER_MINING_SKILLS/);
-    assert.match(src, /from '\.\/js\/mining\.js\?v=g300-1'/);
+    assert.match(src, /from '\.\/js\/mining\.js\?v=g330-1'/);
     const preloadedSheets = {
       mineRockMetal: [137, 100],
       mineRockDullite: [131, 114],

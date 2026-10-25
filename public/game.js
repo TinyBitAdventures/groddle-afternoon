@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-13';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-14';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-133';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-134';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -533,7 +533,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=g300-1';
+} from './js/mining.js?v=g330-1';
 import {
   createActivityLog,
   appendActivity,
@@ -5529,6 +5529,11 @@ function executeVerb(target, verbId) {
   const forcedRoll = baseVerb === 'harvest' && Number.isFinite(harvestRoll)
     ? harvestRoll
     : animalRoll;
+  // Multiplayer street objects (features/street-objects-feature.js): the
+  // realtime server's go-ahead may carry its roll (a tree's tending success,
+  // used as the first random draw) and a rock swing's chunks.
+  const sharedGrant = features.query('sharedVerbGrant', target, verbId, engine);
+  let sharedRoll = Number.isFinite(sharedGrant?.roll) ? clamp(sharedGrant.roll, 0, 0.999999) : null;
   const result = runVerb(target, verbId, {
     pc,
     inv,
@@ -5540,9 +5545,17 @@ function executeVerb(target, verbId) {
     musicblocks: musicblockState,
     shrines: shrineState,
     streetTsid: currentStreetTsid,
-    rng: () => Number.isFinite(forcedRoll)
-      ? clamp(forcedRoll, 0, 0.999999)
-      : buffedRandom(buffState, Math.random, Date.now()),
+    sharedChunks: sharedGrant?.chunks,
+    rng: () => {
+      if (sharedRoll != null) {
+        const roll = sharedRoll;
+        sharedRoll = null;
+        return roll;
+      }
+      return Number.isFinite(forcedRoll)
+        ? clamp(forcedRoll, 0, 0.999999)
+        : buffedRandom(buffState, Math.random, Date.now());
+    },
   });
   if (baseVerb === 'feed' && app?.canvas) {
     app.canvas.dataset.feedPickerResult = result.ok ? 'success' : 'failed';
@@ -7877,6 +7890,11 @@ const engine = {
     quoins.push(q);
     return q;
   },
+  /** Multiplayer: the realtime server says this player got quoin q ({ amount, share: { sound } }); the solo reward path. */
+  grantQuoin(q, shared) {
+    if (!q || !quoins.includes(q)) return false;
+    return grabWorldQuoin(q, { amount: Number(shared?.amount) || 0, share: shared?.share || null });
+  },
   /** G260: visits to a street before this entry counts (the loading card's rule, G89). */
   streetVisitsBefore(tsid = currentStreetTsid) {
     const slot = persistentWorldState.streets?.[tsid]?.features?.[STREET_VISITS_SLOT];
@@ -7947,6 +7965,20 @@ const engine = {
   /** A target's verb menu, and starting one of its verbs as a menu click would (features/pack-tree-verbs-feature.js). */
   targetVerbs: (target) => menuVerbsFor(target),
   beginVerb: (target, verb) => beginVerbAction(target, verb),
+  /**
+   * Multiplayer street objects: run a verb's effect now (the realtime server's
+   * go-ahead for a swing that already played; animated skips the start animation).
+   */
+  executeVerb(target, verbId, { animated = false } = {}) {
+    verbAnimationAlreadyStarted = animated;
+    try {
+      executeVerb(target, verbId);
+    } finally {
+      verbAnimationAlreadyStarted = false;
+    }
+  },
+  /** Redraw a mine rock after its state changed (frame, label, subtitle). */
+  refreshRock: (target) => refreshMineRockVisual(target),
   /** Open the Make panel on a machine in the world: { tool, toolState, onComplete({ recipe, key, made }) } (G169). */
   openMakeStation: (station) => openMakePanel(station),
   /**
@@ -8847,6 +8879,8 @@ function spawnTrees(spots) {
       subtitle: matHint,
       sprite: spr,
       state: targetState,
+      // Multiplayer street objects: tree:<index> (js/street-objects.js).
+      treeIndex: i,
     });
     streetState.trees[i] = { classId, state: targetState };
   });
@@ -9252,6 +9286,8 @@ function spawnQuoins(points = samplePlatformPoints(8)) {
 let nextQuoinRespawnCheck = 0;
 function tickQuoinRespawns(now = Date.now()) {
   if (now < nextQuoinRespawnCheck || !currentStreetTsid || naturalQuoins.tsid !== currentStreetTsid || !entityLayer) return;
+  // Multiplayer: the realtime server brings shared street quoins back (features/shared-quoins-feature.js).
+  if (features.query('quoinsShared', engine)) return;
   nextQuoinRespawnCheck = now + 1000;
   const due = releaseQuoinRespawns(streetWorldState(), now);
   for (const i of due) {
@@ -9261,6 +9297,99 @@ function tickQuoinRespawns(now = Date.now()) {
     quoins.push(q);
     if (app?.canvas) app.canvas.dataset.quoinRespawned = `${i}:${q.typeId}:${q.quoinClass}`;
   }
+}
+
+/**
+ * The player gets world quoin q: the reward, its sound and text, quest
+ * progress. False when the daily limit refuses it (q stays). `shared` is the
+ * realtime server's answer for a multiplayer street quoin ({ amount, share:
+ * { sound } }, features/shared-quoins-feature.js via engine.grantQuoin).
+ */
+function grabWorldQuoin(q, shared = null) {
+  const giantId = giantForStreet(currentStreet).id;
+  const result = collectQuoin(quoinState, q.typeId, pc, {
+    // G227: a street spot gives what its class gives (quoin.js 161-166, 321-650).
+    className: q.quoinClass,
+    // Multiplayer: the amount the realtime server rolled (quoin.js 161-166).
+    ...(shared ? { amount: shared.amount } : {}),
+    giantId,
+    favor: shrineState.favor,
+    favorCap: (id) => emblemCostFor(shrineState, id),
+    accelerateStudy: (seconds) => accelerateActiveStudy(skillState, seconds, Date.now()),
+  });
+  if (!result.ok) {
+    if (!q._limitNoticeAt || Date.now() - q._limitNoticeAt > 5000) {
+      q._limitNoticeAt = Date.now();
+      toast(`Wowza! You've reached today's ${result.dailyLimit}-quoin limit.`);
+    }
+    return false;
+  }
+  // Multiplayer street quoins: the server keeps who took them and brings them back.
+  if (Number.isInteger(q.naturalQuoinIndex) && !shared) {
+    collectNaturalIndex('quoin', q.naturalQuoinIndex);
+    // G216: it comes back after its class's respawn_time (items/quoin.js 305, 320-662).
+    const respawnMs = quoinRespawnMs(q.quoinClass);
+    noteQuoinRespawn(streetWorldState(), q.naturalQuoinIndex, respawnMs, Date.now());
+    app.canvas.dataset.quoinRespawn = `${q.naturalQuoinIndex}:${q.quoinClass || 'none'}:${Number.isFinite(respawnMs) ? respawnMs / 1000 : 'never'}`;
+  }
+  if (Number.isInteger(q.summersDayBonusIndex) && summersDayRun?.stage === 'bonus') {
+    collectSummersDayBonusQuoin(
+      summersDayRun,
+      q.summersDayBonusIndex,
+      Date.now(),
+      summersDayBonusQuoins.length || 8
+    );
+  }
+  if (Number.isInteger(q.summersDayRewardIndex)) {
+    const summerStory = ensureSummersDayStory(questState);
+    summerStory.pendingQurazies = Math.max(0, summerStory.pendingQurazies - 1);
+    if (!summerStory.pendingQurazies) summerStory.qurazyStreetTsid = '';
+  }
+  entityLayer.removeChild(q);
+  const at = quoins.indexOf(q);
+  if (at >= 0) quoins.splice(at, 1);
+  const rewardDef = QUOIN_TYPES[result.resolvedTypeId] || q.def;
+  const copy = quoinResultCopy(result);
+  // QA (G148): base amount > what landed after the mood bonus.
+  app.canvas.dataset.quoinLast = `${result.typeId}:${result.amount}>${result.actual}`;
+  app.canvas.dataset.moodXpMultiplier = String(moodXpMultiplierFor(pc));
+  // G212: Glitches within 300 px get shards; you hear QUOIN_SHARD_<n> (items/quoin.js 169, 266-271).
+  // Multiplayer: the server shared it out (features/shared-quoins-feature.js).
+  const quoinShare = shared ? shared.share : features.query('quoinShards', {
+    grabber: 'player',
+    typeId: result.typeId,
+    baseAmount: result.baseAmount,
+    quoin: { x: q.x, y: q.y },
+    at: { x: player.x, y: player.y },
+  }, engine);
+  playSound(quoinShare?.sound || soundForQuoin(result.typeId), {
+    volume: result.typeId === 'qurazy' ? 0.82 : 0.6,
+    rate: result.typeId === 'qurazy' ? 1.2 : 1,
+    jitter: result.typeId === 'qurazy' ? 0 : 0.03,
+  });
+  toast(result.typeId === 'mystery' ? `Mystery quoin: ${copy}` : copy);
+  const kind = q.typeId === 'xp' ? 'iMG' : q.typeId;
+  pushActivity(`You collected ${/^[aeiou]/i.test(kind) ? 'an' : 'a'} ${kind} quoin. ${copy}.`);
+  if (result.acceleration?.completed?.length) {
+    handleSkillCompletions(result.acceleration.completed);
+  }
+  floatText(q.x, q.y - 20, copy, rewardDef.color);
+  burst(q.x, q.y, rewardDef.color, result.typeId === 'qurazy' ? 28 : 12);
+  applyQuestProgress(questState, 'quoins_collected', 1, pc);
+  if (result.resolvedTypeId === 'favor') {
+    const shrine = interactables.find((target) => target.classId?.startsWith('npc_shrine_'));
+    if (shrine) refreshShrineTarget(shrine);
+  }
+  if (result.hitLimit) {
+    enqueueAward({
+      kind: 'achievement',
+      title: 'Quoin Limit Reached!',
+      body: `You gathered all ${result.dailyLimit} quoins available this game day.`,
+      subtitle: 'Numismatical!',
+    });
+  }
+  updateHud();
+  return true;
 }
 
 function quoinResultCopy(result) {
@@ -10174,84 +10303,9 @@ function physics(dt) {
     for (let i = quoins.length - 1; i >= 0; i--) {
       const q = quoins[i];
       if (Math.hypot(q.x - player.x, q.y - (player.y - 28)) < 44) {
-        const giantId = giantForStreet(currentStreet).id;
-        const result = collectQuoin(quoinState, q.typeId, pc, {
-          // G227: a street spot gives what its class gives (quoin.js 161-166, 321-650).
-          className: q.quoinClass,
-          giantId,
-          favor: shrineState.favor,
-          favorCap: (id) => emblemCostFor(shrineState, id),
-          accelerateStudy: (seconds) => accelerateActiveStudy(skillState, seconds, Date.now()),
-        });
-        if (!result.ok) {
-          if (!q._limitNoticeAt || Date.now() - q._limitNoticeAt > 5000) {
-            q._limitNoticeAt = Date.now();
-            toast(`Wowza! You've reached today's ${result.dailyLimit}-quoin limit.`);
-          }
-          continue;
-        }
-        if (Number.isInteger(q.naturalQuoinIndex)) {
-          collectNaturalIndex('quoin', q.naturalQuoinIndex);
-          // G216: it comes back after its class's respawn_time (items/quoin.js 305, 320-662).
-          const respawnMs = quoinRespawnMs(q.quoinClass);
-          noteQuoinRespawn(streetWorldState(), q.naturalQuoinIndex, respawnMs, Date.now());
-          app.canvas.dataset.quoinRespawn = `${q.naturalQuoinIndex}:${q.quoinClass || 'none'}:${Number.isFinite(respawnMs) ? respawnMs / 1000 : 'never'}`;
-        }
-        if (Number.isInteger(q.summersDayBonusIndex) && summersDayRun?.stage === 'bonus') {
-          collectSummersDayBonusQuoin(
-            summersDayRun,
-            q.summersDayBonusIndex,
-            Date.now(),
-            summersDayBonusQuoins.length || 8
-          );
-        }
-        if (Number.isInteger(q.summersDayRewardIndex)) {
-          const summerStory = ensureSummersDayStory(questState);
-          summerStory.pendingQurazies = Math.max(0, summerStory.pendingQurazies - 1);
-          if (!summerStory.pendingQurazies) summerStory.qurazyStreetTsid = '';
-        }
-        entityLayer.removeChild(q);
-        quoins.splice(i, 1);
-        const rewardDef = QUOIN_TYPES[result.resolvedTypeId] || q.def;
-        const copy = quoinResultCopy(result);
-        // QA (G148): base amount > what landed after the mood bonus.
-        app.canvas.dataset.quoinLast = `${result.typeId}:${result.amount}>${result.actual}`;
-        app.canvas.dataset.moodXpMultiplier = String(moodXpMultiplierFor(pc));
-        // G212: Glitches within 300 px get shards; you hear QUOIN_SHARD_<n> (items/quoin.js 169, 266-271).
-        const quoinShare = features.query('quoinShards', {
-          grabber: 'player',
-          typeId: result.typeId,
-          baseAmount: result.baseAmount,
-          quoin: { x: q.x, y: q.y },
-          at: { x: player.x, y: player.y },
-        }, engine);
-        playSound(quoinShare?.sound || soundForQuoin(result.typeId), {
-          volume: result.typeId === 'qurazy' ? 0.82 : 0.6,
-          rate: result.typeId === 'qurazy' ? 1.2 : 1,
-          jitter: result.typeId === 'qurazy' ? 0 : 0.03,
-        });
-        toast(result.typeId === 'mystery' ? `Mystery quoin: ${copy}` : copy);
-        const kind = q.typeId === 'xp' ? 'iMG' : q.typeId;
-        pushActivity(`You collected ${/^[aeiou]/i.test(kind) ? 'an' : 'a'} ${kind} quoin. ${copy}.`);
-        if (result.acceleration?.completed?.length) {
-          handleSkillCompletions(result.acceleration.completed);
-        }
-        floatText(q.x, q.y - 20, copy, rewardDef.color);
-        burst(q.x, q.y, rewardDef.color, result.typeId === 'qurazy' ? 28 : 12);
-        applyQuestProgress(questState, 'quoins_collected', 1, pc);
-        if (result.resolvedTypeId === 'favor') {
-          const shrine = interactables.find((target) => target.classId?.startsWith('npc_shrine_'));
-          if (shrine) refreshShrineTarget(shrine);
-        }
-        if (result.hitLimit) {
-          enqueueAward({
-            kind: 'achievement',
-            title: 'Quoin Limit Reached!',
-            body: `You gathered all ${result.dailyLimit} quoins available this game day.`,
-            subtitle: 'Numismatical!',
-          });
-        }
-        updateHud();
+        // Multiplayer: a street quoin is the realtime server's to give (features/shared-quoins-feature.js).
+        if (features.query('quoinTouched', q, engine)) continue;
+        grabWorldQuoin(q);
       }
     }
   }
@@ -18958,7 +19012,10 @@ async function enterStreet(tsid, opts = {}) {
     const point = worldToScreen(data, signpost.x, signpost.y);
     return { ...point, key: `signpost:${index}`, clearance: 100 };
   });
-  if (Number.isFinite(opts.spawnX) && Number.isFinite(opts.spawnY)) {
+  // Multiplayer: no per-player reservation, so every player's street (and the
+  // realtime server's layout, tools/build-realtime-objects.mjs) puts each
+  // rock, tree and node in the same place.
+  if (GAME_MODE !== 'multiplayer' && Number.isFinite(opts.spawnX) && Number.isFinite(opts.spawnY)) {
     reserved.push({ x: opts.spawnX, y: opts.spawnY, key: 'saved-arrival', clearance: 210 });
   }
   currentStreetPlacement = planStreetPlacements(
@@ -22651,6 +22708,8 @@ function spawnMineRock(classTsid, x, y, index = 0) {
     subtitle: rockStatusLabel(rock),
     sprite: root,
     state: { rock },
+    // Multiplayer street objects: rock:<index> (js/street-objects.js).
+    rockIndex: index,
   });
   root.mineTarget = target;
   mineRocks.push(target);

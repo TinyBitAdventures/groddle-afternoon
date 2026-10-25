@@ -40,7 +40,7 @@ import {
   tickBuffs,
 } from '../public/js/buffs.js?v=item-buffs-7';
 import { getSkillPackageOverride, skillPackageDetails } from '../public/js/skill-packages.js';
-import { miningProfile } from '../public/js/mining.js?v=g300-1';
+import { miningProfile } from '../public/js/mining.js?v=g330-1';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js?v=g296-1';
 import { makingSkillAdjustments } from '../public/js/making.js?v=g300-1';
 import { sessionPackage } from '../public/js/meditation.js';

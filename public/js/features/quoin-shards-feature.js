@@ -358,8 +358,9 @@ function companionBounds(actor) {
 
 function naturalQuoins(engine) {
   // Only the street's own quoins: quest, Summer's Day and other placed ones stay yours.
+  // Multiplayer street quoins are the server's (shared-quoins-feature): companions leave them be.
   return (engine.quoins || []).filter((q) => q && !q.destroyed && Number.isInteger(q.naturalQuoinIndex)
-    && !Number.isInteger(q.summersDayBonusIndex) && !Number.isInteger(q.summersDayRewardIndex));
+    && !Number.isInteger(q.summersDayBonusIndex) && !Number.isInteger(q.summersDayRewardIndex) && !q.sharedQuoin);
 }
 
 function companionGrab(actor, q, engine) {
@@ -563,5 +564,16 @@ export const quoinShardsFeature = {
   /** engine.query('quoinShards', grab, engine): see the file comment. */
   quoinShards(grab, engine) {
     return shareQuoin(grab, engine);
+  },
+
+  /**
+   * engine.query('quoinShardFx', opts, engine): draw one grab the realtime
+   * server reported (multiplayer, features/shared-quoins-feature.js), opts
+   * as quoinShardFxPlan ({ quoin, grabberIsViewer, viewerId, shards, stat }).
+   */
+  quoinShardFx(opts, engine) {
+    const plan = quoinShardFxPlan(opts);
+    showFx(engine, plan);
+    return plan;
   },
 };

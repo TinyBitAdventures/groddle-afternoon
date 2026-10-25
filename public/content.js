@@ -38,7 +38,7 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=g300-1';
+} from './js/mining.js?v=g330-1';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
@@ -1446,6 +1446,8 @@ export function runVerb(target, verbId, ctx) {
       requireSkill: true,
       now: Date.now(),
       toolState: ctx.tools,
+      // Multiplayer: the realtime server rolled this swing (realtime/objects.go).
+      chunks: ctx.sharedChunks,
     });
     if (!r.ok) return { ok: false, msgs: r.msgs || ['Cannot mine.'], effects };
     if (r.effects) {

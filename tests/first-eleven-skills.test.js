@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import { createSkillState, grantSkillWithPrereqs } from '../public/js/skills.js';
-import { STARTER_MINING_SKILLS } from '../public/js/mining.js?v=g300-1';
+import { STARTER_MINING_SKILLS } from '../public/js/mining.js?v=g330-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const game = readFileSync(join(here, '../public/game.js'), 'utf8');

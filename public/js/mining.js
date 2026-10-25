@@ -295,7 +295,7 @@ export function hasMiningTool(inv, toolId) {
  * @param {ReturnType<typeof createMineRock>} rock
  * @param {import('./inventory.js').Inventory} inv
  * @param {{ energy?: number, mood?: number, imagination?: number, xp?: number }} pc
- * @param {{ learned?: string[], requireSkill?: boolean, rng?: () => number, now?: number }} [opts]
+ * @param {{ learned?: string[], requireSkill?: boolean, rng?: () => number, now?: number, chunks?: number }} [opts]
  */
 export function mineRock(rock, inv, pc, opts = {}) {
   const def = ROCK_CATALOG[rock.classTsid] || Object.values(ROCK_CATALOG).find((r) => r.rockType === rock.rockType);
@@ -347,7 +347,10 @@ export function mineRock(rock, inv, pc, opts = {}) {
   }
 
   const rng = opts.rng || Math.random;
-  let toGet = randInt(def?.minChunks ?? 3, def?.maxChunks ?? 9, rng);
+  // opts.chunks: multiplayer, the realtime server's roll (realtime/objects.go mine).
+  let toGet = Number.isInteger(opts.chunks) && opts.chunks > 0
+    ? opts.chunks
+    : randInt(def?.minChunks ?? 3, def?.maxChunks ?? 9, rng);
   // include/mining.js: Beryl/Dullite/Metal Rock/Sparkly Expert, +round(15%).
   toGet += miningExpertBonus(rock.classTsid || def?.classTsid, upgrades, toGet);
   // include/mining.js gives the whole to_get, even past chunks_remaining.
