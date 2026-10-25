@@ -1978,128 +1978,128 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 384,
+  "commits": 419,
   "since": "2026-10-19",
   "recent": [
    {
-    "date": "2026-10-24",
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Three SWFs make a Game, and you can wrangle or play them"
+   },
+   {
+    "date": "2026-10-25",
     "kind": "fix",
-    "text": "The Musicblocks entry says what Musicblock T-1 turned out to be"
+    "text": "Room 23 sits in Tower Quest, as the map data says"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Room machines work while you wait, then hold your stuff until you collect it"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Quests draw their route on the Map, and a GPS points at the next signpost"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Every making tool works with its own animation in the Make panel"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "The coverage inventory counts artifacts and necklaces assembled from reachable pieces"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Street Spirits tell their stories, step by step"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "The coverage inventory counts items from the drop tables the game rolls"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "The Irrigator 9000 wears out and pours first, and the Grand Ol' Grinder grinds with its own animation"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Every street sits in its own region: Louise Pasture is Groddle Meadow again"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Each region gets its own Street Spirit"
    },
    {
     "date": "2026-10-24",
     "kind": "improve",
-    "text": "The site menu drops Development"
+    "text": "Release a Pocket Salmon in Jal and Samudra, three feeds per animal for Heebo, and Fertilidust counts only on living trees"
    },
    {
     "date": "2026-10-24",
     "kind": "new",
-    "text": "Street music in the Groddle Wiki, every track Tiny Speck published to play"
+    "text": "The Grand Ol' Grinder and High-Class Hoe, made on the Tinkertool"
    },
    {
     "date": "2026-10-24",
     "kind": "new",
-    "text": "The Groddle Wiki, with Musicblocks as its first entry"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "A Musicblocks page with every recovered tune to play"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "The restoration report is a Minn page, edited in Minn Admin"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "Notes are edited as blocks in Minn Admin, not raw HTML"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "groddle.localhost is the Minn site now; the built game sits beside its webroot in game/"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "The Groddle theme on Minn, and the Notes blog moves into Minn as editable posts"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Potions can be quaffed and poured, a Rug can be munched, and Essence of Purple takes you on the Purple Journey"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "Mood shapes iMG again: a glum Glitchen earns less, a cheerful one more"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Groddle on Minn: a Minn-native extension serves the site's folder pages through the route seam"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Bushels of Grain and the Smuggler's extremely rare items, and the inventory knows 213 more items"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Sno cones freeze brains, Fertilidust revives dead trees, and the Andra and Muufo Bureaucratic Halls open"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "49 more buffs work: coffee, cocktails, hooch hangovers, cold winter streets and quest timers"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Petrified rocks crack open, artifacts and necklaces rebuild themselves, and Door Drinks open portals"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "The inventory knows the quest rooms and scenes the remake rebuilt"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Powders work again, and 18 more badges can be earned"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "The scarecrow, Tool Vendor, Meal Vendor, Uncle Friendly, Helga and the Sno Cone machine at their own stalls"
+    "text": "Pack verbs for the Hatchet and Class Axe, Wine of the Dead pours, and the Butler teaches /house and /tower"
    },
    {
     "date": "2026-10-24",
     "kind": "fix",
-    "text": "Firebog streets keep up to four Sloths, so Circle Crunch can happen"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "89 more badges can be earned: refining, eating and drinking, smelting, furniture, jumps and more"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "The Ur subway, twelve stations on the Red and Blue Lines"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Vicar's Peak, the Groddle Heights cliff of vined ladders behind Thornfad Layers' locked door"
+    "text": "The inventory no longer counts taking an item as a way to get it"
    },
    {
     "date": "2026-10-24",
     "kind": "improve",
-    "text": "The fall from the Fireflex lab opens on \"Back to life, back to the present time\""
+    "text": "Pocketing a Salmon, a Cubimal box from the Spinning Wheel and Fertilidust now count toward your Feats"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "A companion mourning your grave brings a Diabolical Drink Ticket and the Beelzebooze chain"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "Icons for 236 more catalog items, from Tiny Speck's own art"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Machines in the three Community Machine Rooms, with the Altar bonus"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Ten of the old Feats as goals of your own, each worth a Small Petrified Rock"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "An item catalog with every Glitch item and whether the remake has it"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Slash commands in Local chat: /who, /home, /house, /tower, /leave, /butler, /makegod, /xyzzy"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "The Forest Community Machine Room behind Middle Valley Clearing's door"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "fix",
+    "text": "Activity lines that end in \"!\" no longer get a stray period"
    }
   ]
  },
