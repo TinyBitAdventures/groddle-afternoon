@@ -346,8 +346,11 @@ export function populationForStreet(tsid, entry, { starter = false } = {}) {
 
 /** Build dense, stable candidates along the lower reachable platform bands. */
 export function buildPlatformCandidates(platforms, { worldW = 2500, seed = '' } = {}) {
+  // An underside or ceiling line (pc_perm 1, street-model.js platformsScreen) is not
+  // ground: a tree placed there floats (the cave roof on Meadow's Edge).
   const clean = (platforms || []).filter((platform) => {
-    return [platform?.x1, platform?.y1, platform?.x2, platform?.y2].every(Number.isFinite);
+    return [platform?.x1, platform?.y1, platform?.x2, platform?.y2].every(Number.isFinite)
+      && platform.pcPerm !== 1 && platform.pc_perm !== 1;
   });
   if (!clean.length) {
     return Array.from({ length: 32 }, (_, index) => ({

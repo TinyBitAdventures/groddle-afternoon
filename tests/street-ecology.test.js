@@ -161,6 +161,36 @@ describe('one-pass platform placement', () => {
     }
   });
 
+  it('never places anything on an underside or ceiling line (pc_perm 1): the Meadow\'s Edge cave roof', () => {
+    const meadow = JSON.parse(readFileSync(join(publicRoot, 'assets/streets/GLID3PL336E1RN1.json'), 'utf8'));
+    const lines = platformsScreen(meadow);
+    const roof = lines.find((line) => line.id === '_pl1288206457409');
+    assert.equal(roof.pcPerm, 1, 'platformsScreen keeps the source permeability');
+    assert.equal(lines.find((line) => line.id === '_pl1282009625346').pcPerm, -1);
+    const candidates = buildPlatformCandidates(lines, { worldW: streetWidth(meadow), seed: meadow.tsid });
+    const ceilingIds = new Set(lines.filter((line) => line.pcPerm === 1).map((line) => line.id));
+    assert.ok(ceilingIds.size >= 3);
+    assert.deepEqual(candidates.filter((point) => ceilingIds.has(point.id.slice(0, point.id.lastIndexOf(':')))), []);
+    // Every street: no candidate sits on a ceiling line.
+    const index = JSON.parse(readFileSync(join(publicRoot, 'assets/streets/index.json'), 'utf8'));
+    const tsids = Object.keys(index.streets || index).filter((k) => /^G[A-Z0-9]{14}$/.test(k));
+    let checked = 0;
+    for (const tsid of tsids) {
+      const file = join(publicRoot, `assets/streets/${tsid}.json`);
+      if (!existsSync(file)) continue;
+      const street = JSON.parse(readFileSync(file, 'utf8'));
+      if (!Array.isArray(street.platforms)) continue;
+      const all = platformsScreen(street);
+      const ceilings = new Set(all.filter((line) => line.pcPerm === 1).map((line) => line.id));
+      if (!ceilings.size) continue;
+      const bad = buildPlatformCandidates(all, { worldW: streetWidth(street), seed: tsid })
+        .filter((point) => ceilings.has(point.id.slice(0, point.id.lastIndexOf(':'))));
+      assert.deepEqual(bad, [], tsid);
+      checked += 1;
+    }
+    assert.ok(checked >= 50, `checked ${checked} streets with ceiling lines`);
+  });
+
   it('is deterministic, fills every requested group, and keeps arrival clear', () => {
     const first = planStreetPlacements(platforms, requests, options);
     const second = planStreetPlacements(platforms, requests, options);

@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 494,
+  "commits": 495,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Parties in multiplayer: invite, accept, party chat and a roster that follows members across streets"
+   },
    {
     "date": "2026-10-25",
     "kind": "improve",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "Sharp making-tool and machine animations, and the Fruit Changing Machine plays all 90 frames"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "The stun orb rises into view, home chickens and butterflies can be set free, and Tiny Speck's own heart, puffs and rainbow replace the last stand-ins"
    }
   ]
  },

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-13';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-131';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-132';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -790,7 +790,7 @@ import {
   populationForStreet,
   planStreetPlacements,
   nearestPlacementGap,
-} from './js/street-ecology.js?v=official-ecology-6';
+} from './js/street-ecology.js?v=official-ecology-7';
 import { createSoundBoard, DEFAULT_SFX_VOLUME, watchButtonClicks, watchPanelSounds } from './js/sound-board.js';
 import {
   actionLoopFor,

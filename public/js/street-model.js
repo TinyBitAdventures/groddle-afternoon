@@ -80,11 +80,14 @@ export function platformsScreen(street) {
   return street.platforms.map((p) => {
     const a = worldToScreen(street, p.x1, p.y1);
     const b = worldToScreen(street, p.x2, p.y2);
+    // The source line's permeability (platform_line pc_perm): 1 is an underside or
+    // ceiling, solid only from below, never ground to stand or place things on.
+    const pcPerm = Number.isFinite(p.pc_perm) ? p.pc_perm : null;
     // ensure left→right for queries
     if (a.x <= b.x) {
-      return { id: p.id, x1: a.x, y1: a.y, x2: b.x, y2: b.y };
+      return { id: p.id, x1: a.x, y1: a.y, x2: b.x, y2: b.y, pcPerm };
     }
-    return { id: p.id, x1: b.x, y1: b.y, x2: a.x, y2: a.y };
+    return { id: p.id, x1: b.x, y1: b.y, x2: a.x, y2: a.y, pcPerm };
   });
 }
 

@@ -97,9 +97,9 @@ import {
   usePotion,
 } from '../potions.js?v=g149-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
-import { patchesFeature } from './patches-feature.js?v=patches-14';
-import { homesFeature } from './homes-feature.js?v=homes-34';
-import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-16';
+import { patchesFeature } from './patches-feature.js?v=patches-15';
+import { homesFeature } from './homes-feature.js?v=homes-35';
+import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-17';
 import { questRoomConverse } from './quest-instances-feature.js?v=qi-15';
 
 export const POTIONS_FEATURE_ID = 'potions';
