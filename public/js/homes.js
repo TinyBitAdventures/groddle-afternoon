@@ -4,15 +4,20 @@
  * Sources:
  * - GameServerJS/players/inc_houses.js
  * - GameServerJS/locations/inc_pols.js
+ * - GameServerJS/items/homestreet_ticket.js
  * - GameServerJS/items/homestreet_ticket_dispenser.js
  *
- * The old real-estate system used a per-location currant cost (1,000 was the
- * server fallback), while the later homestreet ticket selected one of three
- * visual styles. The remake combines those two source-backed flows into one
- * clear deed purchase.
+ * G208: homes follow the 2012 game. houses_go_to_new_house
+ * (players/inc_houses.js 807-914) made the house and home street on demand,
+ * for free: no currants and no Your Papers (those belonged to the older
+ * real-estate sale, pols_buyHouse in locations/inc_pols.js 45-49, not to the
+ * 2012 home streets). New players picked the street's
+ * style with the Magic Rock's free Home Street Ticket
+ * (locations/newxp_training2.js 714-746); js/home-ticket.js is that ticket.
+ * The remake's old 1,000-currant deed is retired; saves that bought one keep
+ * their home (`owned` is read as before).
  */
 
-export const HOME_PURCHASE_COST = 1_000;
 export const HOME_STREET_TSID = 'RH_HOME_EXT';
 export const HOME_INTERIOR_TSID = 'RH_HOME_INT';
 
@@ -81,30 +86,15 @@ export function createHomeState(seed = {}) {
   return normalizeHomeState(seed);
 }
 
-export function quoteHomePurchase(state, player, style = 'meadow') {
+/**
+ * houses_go_to_new_house (players/inc_houses.js 807-914): the home street and
+ * house are imagined, free, in the chosen style. `purchasedAt` keeps its old
+ * save name: it is when the home was made.
+ */
+export function imagineHome(state, style = 'meadow', now = Date.now()) {
   const home = normalizeHomeState(state);
-  if (home.owned) {
-    return { ok: false, reason: 'already_owned', cost: 0, shortfall: 0 };
-  }
-  if (!HOME_STYLES[style]) {
-    return { ok: false, reason: 'unknown_style', cost: HOME_PURCHASE_COST, shortfall: 0 };
-  }
-  const currants = finiteInt(player?.currants);
-  if (currants < HOME_PURCHASE_COST) {
-    return {
-      ok: false,
-      reason: 'no_money',
-      cost: HOME_PURCHASE_COST,
-      shortfall: HOME_PURCHASE_COST - currants,
-    };
-  }
-  return { ok: true, reason: '', cost: HOME_PURCHASE_COST, shortfall: 0 };
-}
-
-export function purchaseHome(state, player, style = 'meadow', now = Date.now()) {
-  const quote = quoteHomePurchase(state, player, style);
-  if (!quote.ok) return quote;
-  player.currants = finiteInt(player.currants) - quote.cost;
+  if (home.owned) return { ok: false, reason: 'already_owned' };
+  if (!HOME_STYLES[style]) return { ok: false, reason: 'unknown_style' };
   Object.assign(state, {
     owned: true,
     style,
@@ -114,13 +104,7 @@ export function purchaseHome(state, player, style = 'meadow', now = Date.now()) 
     room: 'street',
     returnLocation: null,
   });
-  return {
-    ok: true,
-    cost: quote.cost,
-    style,
-    styleLabel: HOME_STYLES[style].label,
-    remainingCurrants: player.currants,
-  };
+  return { ok: true, style, styleLabel: HOME_STYLES[style].label };
 }
 
 export function beginHomeVisit(state, location = {}) {

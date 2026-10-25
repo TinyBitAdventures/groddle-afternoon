@@ -111,6 +111,7 @@ import { locationEventsApi } from './location-events-feature.js?v=location-event
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { HOME_MACHINE } from '../home-ticket.js?v=g208-1';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 const ART = 'assets/sprites/newxp/';
@@ -118,7 +119,7 @@ const CARD_ART = 'assets/imagination/cards/';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
 const DEFAULT_START = 'GLI2V0UN7RD1T2J'; // Hechey Track (index default)
 
-ensureItem('homestreet_ticket', { label: 'Home Street Ticket', desc: 'Good for one home street, in the style of your choosing.', baseCost: 0, sellable: false, donatable: false });
+// homestreet_ticket is registered by js/home-ticket.js (homestreet_ticket.js text, G208).
 ensureItem('greeter_twig', { label: 'Greeter Twig', desc: 'A relic of Gentle Island. Greeters once came when it was waved.', baseCost: 0, sellable: false });
 ensureItem('bag_generic', { label: 'Generic Bag', desc: 'A plain, sturdy bag for carrying more stuff.', baseCost: 900 });
 
@@ -2742,7 +2743,8 @@ export const newxpFeature = {
       case 'newxp_egg_plant': return [{ id: 'harvest', label: 'Harvest', enabled: !run?.data.eggHarvested, reason: 'Nothing left to harvest', durationMs: 2000 }];
       case 'newxp_dustbunny': return [{ id: 'give_egg', label: 'Give Egg', enabled: true, durationMs: 0 }];
       case 'newxp_bag_vendor': return [{ id: 'buy', label: 'Buy', enabled: true, durationMs: 0 }];
-      case 'newxp_machine': return [{ id: 'choose', label: 'Choose this style', enabled: true, durationMs: 0 }];
+      // homestreet_ticket_dispenser.js 43-143: "Pick <Style> Style" and its tooltip.
+      case 'newxp_machine': return [{ id: 'choose', label: HOME_MACHINE.verb(target.nxStyle).name, tooltip: HOME_MACHINE.verb(target.nxStyle).tooltip, enabled: true, durationMs: 0 }];
       case 'newxp_rock':
       case 'newxp_flamingo': return [{ id: 'talk', label: 'Talk to', enabled: true, durationMs: 0 }];
       default: return [];
@@ -2775,7 +2777,7 @@ export const newxpFeature = {
       return true;
     }
     if (target?.classId === 'newxp_machine' && verbId === 'choose') {
-      if (countItem(engine.inv, 'homestreet_ticket') < 1) engine.toast('You need your Home Street Ticket.', 2500);
+      if (countItem(engine.inv, 'homestreet_ticket') < 1) engine.toast(HOME_MACHINE.needTicket, 2500);
       else run.data.style = target.nxStyle;
       return true;
     }

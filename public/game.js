@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-95';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-96';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -423,10 +423,9 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-8';
+} from './js/player-save.js?v=player-save-9';
 import {
   HOME_INTERIOR_TSID,
-  HOME_PURCHASE_COST,
   HOME_STREET_TSID,
   HOME_STYLES,
   beginHomeVisit,
@@ -434,9 +433,9 @@ import {
   endHomeVisit,
   enterHomeInterior,
   leaveHomeInterior,
-  purchaseHome,
-  quoteHomePurchase,
-} from './js/homes.js?v=homes-mail-2';
+  imagineHome,
+} from './js/homes.js?v=homes-mail-3';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g208-1';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -7994,16 +7993,16 @@ const engine = {
     announceAchievementUpdates([{ classTsid, unlocked: true, rewards: unlocked.rewards, def: unlocked.def }]);
     return true;
   },
-  /** Open the shared mail panel from a street mailbox (no deed needed, like npc_mailbox.js). */
+  /** Open the shared mail panel from a street mailbox (no home needed, like npc_mailbox.js). */
   openMailbox: () => openMailboxPanel({ anywhere: true }),
   mailboxOpen: () => isMailboxOpen(),
   mailUnread: () => unreadMailCount(mailboxState, Date.now()),
   /** Whether the player owns a home street (Visiting Stone opt-in, visitor letters). */
   homeOwned: () => homeState.owned === true,
-  /** newxp: the Magic Rock imagines the home street for free (no deed cost). */
+  /** newxp: the Magic Rock imagines the home street for free (inc_houses.js houses_go_to_new_house). */
   grantHome(style = 'meadow') {
     if (homeState.owned) return false;
-    const result = purchaseHome(homeState, { currants: HOME_PURCHASE_COST }, style, Date.now());
+    const result = imagineHome(homeState, style, Date.now());
     if (!result.ok) return false;
     seedMailbox(mailboxState, Date.now());
     updateHomeChrome();
@@ -17820,7 +17819,7 @@ function updateHomeChrome() {
     button.classList.toggle('is-owned', homeState.owned);
     button.title = homeState.owned
       ? `${homeState.inHome ? 'At home' : 'Go home'} · ${unread} unread mail`
-      : `Buy a home · ${HOME_PURCHASE_COST} currants`;
+      : 'Get your home street';
   }
   if (badge) {
     badge.textContent = String(unread);
@@ -17859,55 +17858,9 @@ function renderHomePanel() {
   const title = document.getElementById('home-panel-title');
   if (!body) return;
   if (!homeState.owned) {
-    if (title) title.textContent = 'Choose your home';
-    const selected = body.dataset.style && HOME_STYLES[body.dataset.style]
-      ? body.dataset.style
-      : 'meadow';
-    body.dataset.style = selected;
-    const quote = quoteHomePurchase(homeState, pc, selected);
-    body.innerHTML = `
-      <p class="home-intro">The old real-estate market and the later homestreet ticket have been folded into one tidy deed. Pick a landscape; the deed includes a house, a home street, and Mailbox (1).</p>
-      <div class="home-style-grid">
-        ${Object.values(HOME_STYLES).map((style) => `
-          <button type="button" class="home-style${style.id === selected ? ' is-selected' : ''}" data-home-style="${style.id}" style="--home-accent:${style.accent}">
-            <span class="home-style-visual"></span>
-            <strong>${escapeHtml(style.label)}</strong>
-            <span>${escapeHtml(style.description)}</span>
-          </button>
-        `).join('')}
-      </div>
-      <div class="home-purchase-bar">
-        <div class="home-purchase-copy">
-          <strong>Deed: ◎ ${HOME_PURCHASE_COST.toLocaleString()} currants</strong>
-          <span>${quote.ok ? `You will have ◎ ${(pc.currants - HOME_PURCHASE_COST).toLocaleString()} left.` : `You need ◎ ${quote.shortfall.toLocaleString()} more.`}</span>
-        </div>
-        <button type="button" id="home-purchase-btn" class="btn-glitch-primary" ${quote.ok ? '' : 'disabled'}>Purchase ${escapeHtml(HOME_STYLES[selected].label)} home</button>
-      </div>
-    `;
-    body.querySelectorAll('[data-home-style]').forEach((button) => {
-      button.addEventListener('click', () => {
-        body.dataset.style = button.dataset.homeStyle;
-        renderHomePanel();
-      });
-    });
-    body.querySelector('#home-purchase-btn')?.addEventListener('click', () => {
-      const style = body.dataset.style || 'meadow';
-      const result = purchaseHome(homeState, pc, style, Date.now());
-      if (!result.ok) {
-        toast(result.reason === 'no_money'
-          ? `You need ${result.shortfall} more currants.`
-          : 'That deed cannot be purchased.');
-        return;
-      }
-      seedMailbox(mailboxState, Date.now());
-      pushActivity(`You purchased a ${result.styleLabel} home for ${result.cost} currants.`);
-      toast('The deed is yours. Your mailbox already has something in it!', 3600);
-      playSfx('quest', { volume: 0.48, rate: 1.08 });
-      updateHud();
-      updateHomeChrome();
-      savePlayerState();
-      renderHomePanel();
-    });
+    // G208: no home yet: the panel is the Home Street Selection Machine (js/home-ticket.js).
+    if (title) title.textContent = HOME_MACHINE.label;
+    renderTicketMachine(body, homeTicketHost());
     return;
   }
 
@@ -17949,12 +17902,39 @@ function renderHomePanel() {
   });
 }
 
+/** G208: what the free Home Street Ticket (js/home-ticket.js) needs from the game. */
+function homeTicketHost() {
+  return {
+    inv,
+    home: homeState,
+    gate: () => features.travelGate(HOME_STREET_TSID, engine, { via: 'home' }),
+    dialogue: (opts) => openScriptedQuestDialogue(opts),
+    toast: (msg) => toast(msg),
+    activity: (msg) => pushActivity(msg),
+    changed(made) {
+      if (made) seedMailbox(mailboxState, Date.now());
+      updateHud();
+      updateHomeChrome();
+      savePlayerState();
+    },
+    reopen: () => openHomePanel(),
+    async goHome() {
+      const result = await teleportHome();
+      if (!result?.ok && isHomePanelOpen()) renderHomePanel();
+    },
+  };
+}
+
 function openHomePanel() {
   closeMailboxPanel();
   closeMap();
   closeVendor();
   closeQuestPanel();
   closePackPopover();
+  if (!homeState.owned && offerHomeTicket(homeTicketHost())) {
+    closeHomePanel();
+    return;
+  }
   renderHomePanel();
   const panel = document.getElementById('home-panel');
   if (panel) panel.hidden = false;
@@ -18211,7 +18191,7 @@ function renderMailboxPanel() {
 function openMailboxPanel({ anywhere = false } = {}) {
   if (!homeState.owned && !anywhere) {
     openHomePanel();
-    toast('A mailbox comes with your home deed.');
+    toast('A mailbox comes with your home street.');
     return;
   }
   if (homeState.owned) seedMailbox(mailboxState, Date.now());
@@ -19106,13 +19086,13 @@ function renderHomeMapCallout(panel) {
       : 'Your mailbox is quiet · remembers where to return';
   } else {
     title.textContent = 'A place of your own';
-    detail.textContent = `Home deed · ${HOME_PURCHASE_COST.toLocaleString()} currants`;
+    detail.textContent = 'Free, with a Home Street Ticket from your Magic Rock';
   }
   copy.append(title, detail);
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'content-action-btn';
-  button.textContent = homeState.owned ? 'Teleport home' : 'View homes';
+  button.textContent = homeState.owned ? 'Teleport home' : 'Get your home street';
   button.addEventListener('click', () => {
     closeMap();
     if (homeState.owned) teleportHome();
@@ -22789,9 +22769,9 @@ async function main() {
   }
   const homeDemo = String(bootParams.get('homedemo') || '').toLowerCase();
   if (homeDemo) {
-    pc.currants = Math.max(pc.currants, HOME_PURCHASE_COST + 250);
+    pc.currants = Math.max(pc.currants, 1_250);
     if (['owned', 'mail', 'home', 'interior', 'decorate', 'cultivate'].includes(homeDemo) && !homeState.owned) {
-      purchaseHome(homeState, pc, bootParams.get('homestyle') || 'meadow', Date.now() - 60_000);
+      imagineHome(homeState, bootParams.get('homestyle') || 'meadow', Date.now() - 60_000);
     }
     if (homeState.owned) seedMailbox(mailboxState, Date.now());
   }
@@ -24190,7 +24170,7 @@ async function main() {
       // pointer gesture that summoned it.
       if (best.classId === 'npc_mailbox') {
         // Through the verb path, so street mailboxes (street-furniture) open
-        // without a deed and the home mailbox still opens the home mail.
+        // without a home and the home mailbox still opens the home mail.
         executeVerb(best, 'view_inbox');
         return;
       }

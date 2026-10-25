@@ -4,15 +4,13 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   HOME_INTERIOR_TSID,
-  HOME_PURCHASE_COST,
   HOME_STREET_TSID,
   beginHomeVisit,
   createHomeState,
   endHomeVisit,
   enterHomeInterior,
   leaveHomeInterior,
-  purchaseHome,
-  quoteHomePurchase,
+  imagineHome,
 } from '../public/js/homes.js';
 import {
   MAIL_BASE_COST,
@@ -29,25 +27,24 @@ import {
 } from '../public/js/mailbox.js';
 
 describe('source-backed home ownership', () => {
-  it('quotes the old server fallback of 1,000 currants', () => {
+  it('imagines one of the three homestreet ticket styles once, free (inc_houses.js houses_go_to_new_house)', () => {
     const state = createHomeState();
-    const poor = quoteHomePurchase(state, { currants: 999 }, 'meadow');
-    assert.equal(HOME_PURCHASE_COST, 1000);
-    assert.equal(poor.ok, false);
-    assert.equal(poor.reason, 'no_money');
-    assert.equal(poor.shortfall, 1);
-  });
-
-  it('purchases one of the three homestreet ticket styles once', () => {
-    const state = createHomeState();
-    const player = { currants: 1500 };
-    const result = purchaseHome(state, player, 'firebog', 123);
+    const result = imagineHome(state, 'firebog', 123);
     assert.equal(result.ok, true);
+    assert.equal(result.styleLabel, 'Firebog');
     assert.equal(state.owned, true);
     assert.equal(state.style, 'firebog');
     assert.equal(state.purchasedAt, 123);
-    assert.equal(player.currants, 500);
-    assert.equal(purchaseHome(state, player, 'uralia').reason, 'already_owned');
+    assert.equal(imagineHome(state, 'uralia').reason, 'already_owned');
+    assert.equal(imagineHome(createHomeState(), 'mordor').reason, 'unknown_style');
+  });
+
+  it('keeps a home bought with the retired deed (G208)', () => {
+    const state = createHomeState({ owned: true, style: 'uralia', purchasedAt: 99, visits: 4 });
+    assert.equal(state.owned, true);
+    assert.equal(state.style, 'uralia');
+    assert.equal(state.purchasedAt, 99);
+    assert.equal(state.visits, 4);
   });
 
   it('teleports home, enters the house, and returns to the remembered street', () => {
@@ -130,7 +127,7 @@ describe('mailbox state and GSJS postage', () => {
 });
 
 describe('playable home and mailbox integration', () => {
-  it('ships the home deed, map teleport, physical mailbox, and mail UI', () => {
+  it('ships the home ticket machine, map teleport, physical mailbox, and mail UI', () => {
     const root = join(import.meta.dirname, '..', 'public');
     const game = readFileSync(join(root, 'game.js'), 'utf8');
     const html = readFileSync(join(root, 'play/index.html'), 'utf8');

@@ -35,7 +35,7 @@ import { questInstancesFeature } from './quest-instances-feature.js?v=qi-7';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-2';
 import { seasonsFeature } from './seasons-feature.js?v=play-1';
 import { cameraModeFeature } from './camera-mode-feature.js?v=g231-1';
-import { newxpFeature } from './newxp-feature.js?v=g148-4';
+import { newxpFeature } from './newxp-feature.js?v=g208-1';
 
 export { questFlagsFeature };
 
@@ -84,7 +84,7 @@ import { treeDeathFeature } from './tree-death-feature.js?v=tree-death-4'; FEATU
 import { enchantedForestFeature } from './enchanted-forest-feature.js?v=g5-2'; FEATURES.push(enchantedForestFeature);
 import { jujuBanditsFeature } from './juju-bandits-feature.js?v=g39-3'; FEATURES.push(jujuBanditsFeature);
 import { craftybotFeature } from './craftybot-feature.js?v=g221-1'; FEATURES.push(craftybotFeature);
-import { moodDecayFeature } from './mood-decay-feature.js?v=g221-1'; FEATURES.push(moodDecayFeature);
+import { moodDecayFeature } from './mood-decay-feature.js?v=g208-1'; FEATURES.push(moodDecayFeature);
 import { animalMoodFeature } from './animal-mood-feature.js?v=g148-3'; FEATURES.push(animalMoodFeature);
 import { butlerFeature } from './butler-feature.js?v=butler-feature-11'; FEATURES.push(butlerFeature);
 import { pouchFeature } from './elemental-pouch-feature.js?v=g148-1'; FEATURES.push(pouchFeature);

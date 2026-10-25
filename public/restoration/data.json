@@ -824,10 +824,11 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the street and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of 36 of the original 37 street styles and the back yard as any of 34 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street of its template family), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).",
+   "blurb": "Get your house and home street free, as in 2012: the Magic Rock hands you a Home Street Ticket and the Home Street Selection Machine takes it for a Meadow, Firebog or Uralia street. Paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the street and the private back yard left of the house (walk out through the house’s open end; worn-out rocks, gardens and patches become protos you restore with a project), expand both (the yard from 5 to 20 segments, which with a full-width street earns Landgrabber), restyle the street as any of 36 of the original 37 street styles and the back yard as any of 34 of its 37 (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery, a yard drawn like the street of its template family), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).",
    "spot": "mailbox",
    "evidence": [
     "public/js/homes.js",
+    "public/js/home-ticket.js",
     "public/js/home-decor.js",
     "public/js/home-wallpaper.js",
     "public/js/home-cultivation.js",
@@ -2029,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 453,
+  "commits": 454,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Each quoin gives what its class gives, a new day leaves waiting quoins alone, and buffs, drops and crabs respect Super Pooped"
+   },
    {
     "date": "2026-10-25",
     "kind": "improve",
@@ -2146,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "The skill card warns before you switch away from accelerated learning, and an accelerated study resumes the way the server did"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Icons tell their stories by the same rules, and a talk cut off by a reload picks up where it stopped"
    }
   ]
  },
- "tests": 264,
+ "tests": 265,
  "generatedAt": "2026-10-25"
 }

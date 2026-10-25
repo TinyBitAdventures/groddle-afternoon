@@ -6773,6 +6773,39 @@ header.top-bar + .sub { display: none; }
   font-size: 12px;
 }
 
+/* G208: the Home Street Selection Machine (js/home-ticket.js). */
+.home-ticket {
+  display: grid;
+  grid-template-columns: 50px 1fr 48px;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #eee5cf;
+}
+
+.home-ticket-copy strong,
+.home-ticket-copy span {
+  display: block;
+}
+
+.home-ticket-copy span {
+  margin-top: 3px;
+  color: #756878;
+  font-size: 12px;
+}
+
+.home-ticket-copy .home-ticket-have {
+  color: #51485a;
+  font-weight: 700;
+}
+
+.home-style:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .home-owned-hero {
   display: grid;
   grid-template-columns: 150px 1fr;
@@ -7220,7 +7253,7 @@ header.top-bar + .sub { display: none; }
 /* Voice of rock (inc_announcements.js bubble_familiar; InWindowAnnouncementOverlay.as
    494-515): the rock with rays at x 50% y 15%, a black 0.7 bubble (radius 15,
    padding 15) at top_y 25% with an 18 x 12 px pointer up at it. */
-.quest-dialogue[data-look="vog"] { display: block; padding: 0; }
+.quest-dialogue[data-look="vog"]:not([hidden]) { display: block; padding: 0; }
 .quest-dialogue[data-look="vog"] .quest-dialogue-shade,
 .quest-dialogue[data-look="vog"] .mr-kicker,
 .quest-dialogue[data-look="vog"] .quest-dialogue-card h2 { display: none; }
@@ -7259,7 +7292,8 @@ header.top-bar + .sub { display: none; }
    grown out of the header centre, centred in the location viewport 30 px under
    the header. A titled conversation shows the quest book and its title over a
    1 px 0x49514f rule (ConversationManager.as 155-165); dark buttons; a close X. */
-.quest-dialogue[data-look="conversation"] { display: block; padding: 0; }
+/* :not([hidden]): an answered conversation goes (G208 found the card left on screen). */
+.quest-dialogue[data-look="conversation"]:not([hidden]) { display: block; padding: 0; }
 .quest-dialogue[data-look="conversation"] .quest-dialogue-shade,
 .quest-dialogue[data-look="conversation"] .mr-kicker,
 .quest-dialogue[data-look="conversation"] .quest-dialogue-card h2 { display: none; }
