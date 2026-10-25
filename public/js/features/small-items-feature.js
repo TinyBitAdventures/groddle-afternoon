@@ -11,7 +11,7 @@
  *   before saying a line) gives one; "Overthink" asks, and asks again after
  *   1, 2, 4, 8... seconds with one more "really" each time.
  * - Ball: one on Plexus and one on Nandu Pitha; E -> Hit knocks it 200 px
- *   away from you with a bounce (reconstructed motion, see small-items.js).
+ *   away from you with a bounce (reimagined motion, see small-items.js).
  *   Where it lands is kept in the street slot.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&smallitemdemo=fortune|beans|ball|axe

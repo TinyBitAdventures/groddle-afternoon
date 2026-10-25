@@ -24,7 +24,11 @@
  *   in the archived location XML. "hit" (key h, the default verb) calls the
  *   native apiHitTheBall(200, 10, 0.5), whose server code is lost; the remake
  *   reads it as a 200 px knock away from the hitter, 10 frames of the arc's
- *   rise, and a bounce that keeps 0.5 of its height (reconstructed).
+ *   rise, and a bounce that keeps 0.5 of its height.
+ *   REIMAGINED (decision desk BALL, 2026-10-25): only the three arguments
+ *   survive, not what the engine did with them, so the motion (planBallHit,
+ *   ballHitPose: the arc height, timing and easing) is designed fresh around
+ *   them. The verb, label, tooltip, art and placements are from the source.
  */
 
 export const FORTUNE_COOKIE = 'fortune_cookie';
@@ -59,7 +63,8 @@ export const BEANS_TEXT = Object.freeze({
 });
 
 export const BALL_HIT = Object.freeze({
-  // ball.js verbs.hit: this.apiHitTheBall(200, 10, 0.5).
+  // ball.js verbs.hit: this.apiHitTheBall(200, 10, 0.5). The arguments are
+  // source; the meanings given them below are reimagined (header).
   args: Object.freeze([200, 10, 0.5]),
   distance: 200,
   riseFrames: 10,
@@ -224,7 +229,8 @@ export function chatCommand(text) {
 /**
  * One hit: the ball flies BALL_HIT.distance away from the hitter, clamped to
  * the street, rising for riseFrames frames and then bouncing once at half
- * height (reconstructed from the apiHitTheBall arguments).
+ * height. Reimagined around the apiHitTheBall arguments (header): the 0.3
+ * peak, the 4 x riseFrames length and the easing are the remake's own.
  */
 export function planBallHit(ballX, hitterX, { minX = 0, maxX = Infinity } = {}) {
   const from = Number(ballX) || 0;
