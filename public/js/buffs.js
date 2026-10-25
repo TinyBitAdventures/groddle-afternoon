@@ -44,11 +44,14 @@ export const BUFF_ITEM_CATALOG = Object.freeze({
     effectHint: 'Kicks in after 15 seconds, then grants 1 iMG every 7 seconds',
     delaySeconds: 15,
   },
+  // GSJS items/rubeweed.js names max_luck; the drop checks (drop-tables,
+  // patches, master garden, Rube spawns) read rubeweed, Luck of the Rube in
+  // catalog_buffs.js, so Munch applies that (Austin, 2026-10-25).
   rubeweed: {
-    buffId: 'max_luck',
+    buffId: 'rubeweed',
     verb: 'Munch',
     message: 'Do you feel lucky? Yes, you do!',
-    effectHint: 'Random rolls favor their best outcome until the effect is ended',
+    effectHint: 'Luck of the Rube: better drop chances for 5 minutes',
   },
   silvertongue: {
     buffId: 'silvertongue',

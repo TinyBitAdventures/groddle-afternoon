@@ -141,12 +141,16 @@ describe('official item buff mappings', () => {
     assert.equal(silverPc.rewardMultiplier, 1);
   });
 
-  it('makes Rubeweed Max Luck favor low-roll-is-good checks', () => {
+  it('makes Rubeweed apply Luck of the Rube for five minutes, not Max Luck', () => {
     const state = createBuffState();
     const inv = { rubeweed: 1 };
     const pc = { energy: 50, mood: 50 };
     activateBuffItem(state, inv, pc, 'rubeweed', 0);
-    assert.equal(buffedRandom(state, () => 0.99, 0), 0);
+    assert.ok(hasBuff(state, 'rubeweed', 0));
+    assert.ok(hasBuff(state, 'rubeweed', 299_000));
+    assert.ok(!hasBuff(state, 'rubeweed', 300_000));
+    assert.ok(!hasBuff(state, 'max_luck', 0));
+    assert.equal(buffedRandom(state, () => 0.99, 0), 0.99);
   });
 });
 
