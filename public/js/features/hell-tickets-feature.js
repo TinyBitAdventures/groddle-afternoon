@@ -60,7 +60,7 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../hell-tickets.js';
-import { hellFeature } from './hell-feature.js?v=hell-7';
+import { hellFeature } from './hell-feature.js?v=hell-8';
 import { doorsFeature } from './doors-feature.js?v=doors-2';
 
 export const HELL_TICKETS_FEATURE_ID = 'hell-tickets';
@@ -140,7 +140,7 @@ function grantTicket(engine) {
 function applyRecognition(engine, result) {
   for (const effect of result.effects || []) {
     if (effect.type === 'grant_item' && effect.classTsid === TICKET_CLASS) grantTicket(engine);
-    else if (effect.type === 'prompt') pendingPrompts.push({ title: 'Diabolical Drink Ticket', text: effect.text });
+    else if (effect.type === 'prompt') pendingPrompts.push({ text: effect.text });
     else if (effect.type === 'quest_offer') presentOffer(engine, effect.quest, effect.text);
   }
 }
@@ -337,7 +337,9 @@ export const hellTicketsFeature = {
     if (engine.busy() || offerOpen || now - streetAt < SETTLE_MS) return;
     if (pendingPrompts.length) {
       const next = pendingPrompts.shift();
-      engine.prompt({ kicker: 'Naraka', title: next.title, text: next.text });
+      // G230: text only, as player.js recognizeDeath 1467-1472 and hell_quest.js onAccepted 107-112
+      // send it (prompts_add with txt and choices, no title); no invented "Naraka" kicker.
+      engine.prompt({ text: next.text });
       return;
     }
     const due = graveVisitDue(state.visit, hs, now, { inHell: isInHell(engine.streetTsid, engine.street?.hubId || '') });
@@ -358,7 +360,7 @@ export const hellTicketsFeature = {
     if (ticketDue(qs, state)) {
       state = { ...state, ticketGiven: true };
       grantTicket(engine);
-      pendingPrompts.push({ title: HELL_QUESTS.hell_quest.title, text: hellQuestAcceptedText(false) });
+      pendingPrompts.push({ text: hellQuestAcceptedText(false) });
       // hell_quest.js onAccepted 114-120: buildPath('LA5RPAFK9OE28GN', pc.location.tsid), the route the prompt promises (G177).
       engine.query?.('mapRoute', 'set', { to: HELL_QUESTS.hell_quest.pathTo, source: 'hell_quest', quest: 'hell_quest' }, engine);
       engine.save();

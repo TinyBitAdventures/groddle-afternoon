@@ -27,8 +27,8 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../public/js/hell-tickets.js';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g200-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-7';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g230-1';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-8';
 import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g140-2';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-5';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=flags-1';
@@ -351,6 +351,8 @@ describe('the chain in play (features, fake engine)', () => {
     assert.equal(countOf(engine, 'drink_ticket'), 1);
     hellTicketsFeature.onTick(16, now + 20, engine);
     assert.equal(engine.log.prompts.at(-1).text, 'Lily Linguistic has mourned your passing, you received a drink ticket for Wine of the Dead.');
+    // G230: text only (player.js 1467-1472 sends no title), no "Naraka" kicker.
+    assert.deepEqual(Object.keys(engine.log.prompts.at(-1)), ['text']);
   });
 
   it('declining leaves the quest in the log, and the next croak in Hell One asks again', () => {

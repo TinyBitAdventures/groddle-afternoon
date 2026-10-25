@@ -174,8 +174,10 @@ export function learnButtonText(entry, active) {
  * animateArrows 508-517). Learning is the green bar; accelerated learning is the yellow bar with the gold arrows
  * scrolling across its filled part (a 17x25 arrow every 24 px, one step in
  * 0.4 s, masked to the bar); paused studies (never drawn by the client, which
- * showed only the one in training) keep the green, dimmed; unlearning keeps
- * the remake's red.
+ * showed only the one in training) keep the green, dimmed; unlearning is the
+ * client's teal bar filling from the right (unlearn_pb 0x75c1c2 to
+ * 0x42a5a8, tip 0x4d9899 to 0x4e989a, DIRECTION_RIGHT_TO_LEFT:
+ * ImaginationSkillsUI.as 208-211, 449-450; G230; style.css).
  */
 export function studyBarKind(study) {
   if (!study) return 'learn';

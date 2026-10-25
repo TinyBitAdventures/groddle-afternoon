@@ -148,8 +148,8 @@ describe('prompts, VOGs and the buffs tray', () => {
 
   it('buff-triggers mirrors Pooped and Super Pooped from the hell state, quietly', () => {
     const src = read('js/features/buff-triggers-feature.js');
-    assert.match(src, /import \{ hellFeature \} from '\.\/hell-feature\.js\?v=hell-7';/);
-    assert.match(read('js/features/index.js'), /hell-feature\.js\?v=hell-7/);
+    assert.match(src, /import \{ hellFeature \} from '\.\/hell-feature\.js\?v=hell-8';/);
+    assert.match(read('js/features/index.js'), /hell-feature\.js\?v=hell-8/);
     assert.match(src, /'pooped',\s*'super_pooped',\s*\]\);/);
     assert.match(src, /const QUIET_MIRRORS = new Set\(\['pooped', 'super_pooped'\]\);/);
     assert.match(src, /mirror\(engine, kind, poopedKind === kind \? Number\(hell\.pooped\?\.expiresAt\) \|\| 0 : 0\);/);

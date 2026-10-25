@@ -28,9 +28,9 @@ import {
   routeStep,
   signpostToward,
 } from '../public/js/map-routes.js?v=g198-1';
-import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=g200-1';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g200-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-7';
+import { mapRoutesFeature } from '../public/js/features/map-routes-feature.js?v=g230-1';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g230-1';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-8';
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { applyStreetIndex } from '../public/js/street-loader.js';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
@@ -40,7 +40,7 @@ import { SUBWAY_STREETS } from '../public/js/quest-rooms/back-alley.js';
 import { doorRooms, doorToward, routeGraph } from '../public/js/map-routes.js?v=g198-1';
 import { afterStreetCard, runStreetTransition, streetCardUp } from '../public/js/screen-fx.js?v=g225-1';
 import { EMITTED_EVENTS } from '../public/js/quest-offers.js';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g225-1';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=g230-1';
 import { addItem } from '../public/js/inventory.js?v=catalog-unified-4';
 import { resurrect } from '../public/js/hell.js';
 
@@ -337,7 +337,7 @@ describe('the feature', () => {
 
   it('is registered in features/index.js under its cache key', () => {
     const index = read(join(PUBLIC, 'js/features/index.js'));
-    assert.match(index, /map-routes-feature\.js\?v=g200-1'; FEATURES\.push\(mapRoutesFeature\);$/m);
+    assert.match(index, /map-routes-feature\.js\?v=g230-1'; FEATURES\.push\(mapRoutesFeature\);$/m);
   });
 
   it('Beelzebooze accepted: the ticket, the prompt and the route to Panka Surazu', () => {
@@ -797,7 +797,8 @@ describe('G192 the loading card first', () => {
     assert.equal(engine.log.prompts.length, 0);
     t.mock.timers.tick(1);
     assert.equal(engine.log.prompts.length, 1);
-    assert.deepEqual({ ...engine.log.prompts[0], text: '' }, { kicker: 'Naraka', title: 'You croaked!', text: '', timeoutMs: 10000 });
+    // G230: text only (location.js 321-331 sends no title).
+    assert.deepEqual({ ...engine.log.prompts[0], text: '' }, { text: '', timeoutMs: 10000 });
     assert.match(engine.log.prompts[0].text, /^Uh oh\. You croaked! Bummer!/);
     hellFeature.restore({});
   });
@@ -814,8 +815,8 @@ describe('G192 the loading card first', () => {
     hellFeature.onTick(16, now + 16, engine);
     t.mock.timers.tick(0);
     assert.equal(engine.log.prompts.length, 1);
-    assert.equal(engine.log.prompts[0].title, 'Pooped');
-    assert.equal(engine.log.prompts[0].kicker, 'Energy');
+    assert.equal(engine.log.prompts[0].title, undefined);
+    assert.equal(engine.log.prompts[0].kicker, undefined);
     assert.equal(engine.log.prompts[0].text, 'You are seriously pooped! You need energy to get out of it.');
     hellFeature.restore({});
   });

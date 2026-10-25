@@ -79,6 +79,20 @@ describe('the study bar', () => {
     assert.match(panel, /`skill-study-time\$\{row\.isAccelerated \? ' is-fast' : ''\}`/);
   });
 
+  it('unlearning: the client\'s teal bar, filling from the right (G230)', () => {
+    if (existsSync(imagination)) {
+      const src = readFileSync(join(imagination, 'ImaginationSkillsUI.as'), 'utf8');
+      for (const hex of ['75c1c2', '42a5a8', '4d9899', '4e989a']) assert.match(src, new RegExp(`'imagination_skills_unlearn_pb', '\\w+', 0x${hex}\\)`), hex);
+      assert.match(src, /progress_bar\.direction = ProgressBar\.DIRECTION_RIGHT_TO_LEFT;\s*progress_bar\.setBarColors\(unlearn_pb_top, unlearn_pb_bottom, unlearn_pb_tip_top, unlearn_pb_tip_bottom\);/);
+    }
+    const css = read('style.css');
+    const rule = css.slice(css.indexOf('.skill-study-card.unlearning .skill-study-bar i {'), css.indexOf('.skill-unlearn-btn {'));
+    assert.match(rule, /linear-gradient\(180deg, #75c1c2, #42a5a8\)/);
+    assert.match(rule, /linear-gradient\(180deg, #4d9899, #4e989a\) left \/ 2px 100% no-repeat/);
+    assert.match(rule, /margin-left: auto;/);
+    assert.doesNotMatch(rule, /#c96a5e/);
+  });
+
   it('style.css draws them in those colours, with the arrows scrolling one step every 0.4 s', () => {
     const css = read('style.css');
     const block = css.slice(css.indexOf('/* G222: study bars'), css.indexOf('.skill-study-card .skill-study-time.is-fast'));

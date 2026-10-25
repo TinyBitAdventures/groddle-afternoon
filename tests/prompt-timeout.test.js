@@ -14,7 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PROMPT_ROLL_OUT_MS, armPromptTimeout, promptTimeoutMs, timeoutChoice } from '../public/js/prompt-timeout.js?v=g225-1';
 import { STREET_CARD_GONE, STREET_CARD_UP, cardHidesKey, cardPausedTimeout, installStreetCardKeyGuard, streetCardUp } from '../public/js/screen-fx.js?v=g225-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-7';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-8';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-5';
 import { HELL_ENTRY_PROMPT_TIMEOUT_MS, HELL_TEXT } from '../public/js/hell.js';
 import { createQuestState } from '../public/js/quests.js';
@@ -314,7 +314,8 @@ describe('the hell demos run once (helldemo=croak, helldemo=pooped)', () => {
     hellFeature.onTick(16, Date.now(), engine);
     t.mock.timers.tick(0);
     assert.equal(engine.log.prompts.length, 1);
-    assert.deepEqual(engine.log.prompts[0], { kicker: 'Energy', title: 'Pooped', text: HELL_TEXT.pooped, timeoutMs: 10000 });
+    // G230: text only, no invented kicker or title (catalog_buffs.js 1706-1712, PromptView.as 210-237).
+    assert.deepEqual(engine.log.prompts[0], { text: HELL_TEXT.pooped, timeoutMs: 10000 });
     assert.equal(hellFeature._state().pooped?.kind, 'pooped');
     engine.pc.energy = 5;
     hellFeature.onStreetEnter(engine.street, engine);
@@ -334,7 +335,7 @@ describe('the hell demos run once (helldemo=croak, helldemo=pooped)', () => {
     t.mock.timers.tick(0);
     assert.equal(hellFeature._state().energyConsumedToday, 2000, 'the 1 lost counted (inc_metabolics.js 134)');
     assert.equal(hellFeature._state().pooped?.kind, 'super_pooped');
-    assert.deepEqual(engine.log.prompts, [{ kicker: 'Energy', title: 'Super Pooped', text: HELL_TEXT.superPooped, timeoutMs: 10000 }]);
+    assert.deepEqual(engine.log.prompts, [{ text: HELL_TEXT.superPooped, timeoutMs: 10000 }]);
     assert.equal(hellFeature.metabolicGate('energy', 'gain')?.msg, HELL_TEXT.superPoopedEnergyGain);
     hellFeature.restore({});
   });

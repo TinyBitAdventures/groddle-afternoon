@@ -22,7 +22,6 @@
 
 import {
   GRAPES_REQUIRED,
-  HELL_BUFFS,
   HELL_LOCATION,
   HELL_ONE_GRAPES,
   HELL_SPRITES,
@@ -101,30 +100,12 @@ function publish(engine) {
 }
 
 /**
- * The prompt's heading. The source prompts have no title (pc.prompts_add txt
- * only), so the card names what it is about: Hell One's entry prompt
- * (location.js 315-330, is_grape_squish) or the Pooped buff that sent it
- * (catalog_buffs.js 1689-1713 on_apply). Before G192 every prompt here said
- * "You croaked!", the Pooped one too.
- */
-function promptHeading(effect, buff) {
-  if (effect.isGrapeSquish) return { kicker: 'Naraka', title: HELL_TEXT.croaked };
-  const name = buff && HELL_BUFFS[buff]?.name;
-  if (name) return { kicker: 'Energy', title: name };
-  return { kicker: 'Naraka', title: HELL_TEXT.croaked };
-}
-
-/**
  * Apply a hell.js effects list in order. `prompts: false` skips the prompts,
  * for a caller that shows them once the loading card has gone (G192).
  */
 function applyEffects(effects, engine, { prompts = true } = {}) {
-  let buff = '';
   for (const effect of effects || []) {
     switch (effect.type) {
-      case 'buff':
-        buff = effect.buff || '';
-        break;
       case 'sound':
         engine.playSound(effect.key === 'SQUISH_GRAPES' ? 'SQUISH_GRAPES' : 'CROAK', { volume: 1 });
         break;
@@ -169,13 +150,18 @@ function applyEffects(effects, engine, { prompts = true } = {}) {
         break;
       case 'prompt': {
         if (!prompts) break;
+        // G230: no heading. The source sends text only (location.js 321-331
+        // is_grape_squish; catalog_buffs.js 1706-1712 pooped, 2629-2635
+        // super_pooped: prompts_add with txt and choices, no title) and the
+        // client's PromptView shows the text alone (PromptView.as 210-237; a
+        // title only when one is sent, 462). Before G230 the card carried
+        // invented "Naraka" / "Energy" kickers and a title (G192).
         const delay = Math.max(0, effect.delayMs || 0);
-        const heading = promptHeading(effect, buff);
         // The source prompts' timeout: 10 (location.js 321-325, catalog_buffs.js 1706/2629);
         // timeout_value '' or none, so it just goes (G198, js/prompt-timeout.js).
         const timed = effect.timeoutMs > 0 ? { timeoutMs: effect.timeoutMs } : {};
         promptTimers.push(
-          setTimeout(() => engine.prompt({ ...heading, text: effect.text, ...timed }), delay)
+          setTimeout(() => engine.prompt({ text: effect.text, ...timed }), delay)
         );
         break;
       }

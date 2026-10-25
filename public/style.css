@@ -3424,7 +3424,15 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
 .skill-study-card .skill-study-time { font-size: 0.74rem; color: #4c5b60; }
 .skill-study-card.unlearning { border-color: #c9908a; background: #fff1ef; }
 .skill-study-card.unlearning .skill-study-title span { color: #9a3d33; }
-.skill-study-card.unlearning .skill-study-bar i { background: #c96a5e; }
+.skill-study-card.unlearning .skill-study-bar i {
+  /* G230: the client's unlearning bar (ImaginationSkillsUI.as 208-211, 449-450):
+     teal, filling from the right with its tip on the left (ProgressBar.as 142,
+     DIRECTION_RIGHT_TO_LEFT; perc is the time gone, 407). */
+  margin-left: auto;
+  background:
+    linear-gradient(180deg, #4d9899, #4e989a) left / 2px 100% no-repeat,
+    linear-gradient(180deg, #75c1c2, #42a5a8);
+}
 .skill-unlearn-btn { margin-top: 0.35rem; color: #8a3a31; border-color: #e0b3ad; background: #fff7f5; }
 .skill-unlearn-btn.is-confirm { color: #fff; background: #b8564a; border-color: #9a3d33; }
 .skill-tree-toolbar {
@@ -3644,7 +3652,7 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
 /* G222: study bars in the client's look (js/skills-panel.js studyBar):
    ProgressBar.as 20-33 + drawBar 113-150 (grey frame with a dark top edge, a
    vertical gradient fill and a 2 px tip), ImaginationSkillsUI.as 200-211 (learn
-   and fast colours), buildArrows 241-263 and animateArrows 508-517 (gold 17x25
+   and fast colours; unlearning's teal is with .skill-study-card.unlearning, G230), buildArrows 241-263 and animateArrows 508-517 (gold 17x25
    arrows every 24 px over the filled part, one step every 0.4 s). */
 .quest-log-body .q-bar.skill-study-bar {
   height: 10px;
