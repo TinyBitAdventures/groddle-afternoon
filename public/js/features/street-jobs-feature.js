@@ -55,6 +55,7 @@ import {
   settlePhase,
   chooseOption,
   roadClosure,
+  closedStreets,
   appliedUpgrade,
   upgradeEcologyEntry,
   upgradeFeatures,
@@ -1240,6 +1241,11 @@ export const streetJobsFeature = {
     const head = boardHeadline(engine);
     if (head) openPanel(engine, head.jobId);
     return true;
+  },
+
+  /** Streets whose road is still closed (signposts into them are blocked): map routes go round them (G177). */
+  closedRoads() {
+    return catalog ? closedStreets(state, catalog, opts()) : null;
   },
 
   mapCards(engine) {

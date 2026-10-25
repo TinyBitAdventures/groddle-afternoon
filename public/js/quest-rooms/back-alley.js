@@ -34,8 +34,9 @@
  * station platform (pillars, map stand and train from the Lily Linguistic
  * subway recordings) instead of "This door is not working!". The bot's
  * climb to y -349 has no stairs here, so it rolls the same 300 px/s along
- * the platform and out of sight. No route line: the closest station's street
- * is named in the activity feed and the room objective.
+ * the platform and out of sight. The closest station's street is named in
+ * the activity feed and the room objective, and the Map gets the route to it
+ * (map-routes feature, G177).
  */
 
 import { onLoaded, textureFromUrl } from '../textures.js';
@@ -396,7 +397,10 @@ async function proposition(ctx) {
   ctx.data.talked = true;
   ctx.progress('talk_to_bureaucrat');
   const back = ctx.run?.returnTo?.tsid;
-  const near = SUBWAY_STREETS.find((r) => r.street === back) || nearestStation(ctx.data.returnHub);
+  // npc_bureaucrat.js 768-792: buildPath(dst, prev.tsid), the closest station from the street you came from (G177).
+  const routed = ctx.engine.query?.('mapRoute', 'set', { from: back, to: SUBWAY_STREETS.map((r) => r.street), source: QUEST, quest: QUEST }, ctx.engine);
+  const dest = String(routed?.route?.destination || '');
+  const near = SUBWAY_STREETS.find((r) => r.street === back) || SUBWAY_STREETS.find((r) => dest && r.street.slice(1) === dest.slice(1)) || nearestStation(ctx.data.returnHub);
   ctx.data.nearest = near;
   ctx.activity(`The closest Subway Station: ${near.station}, on ${near.label} (${near.hub}).`);
   ctx.solve();

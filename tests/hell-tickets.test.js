@@ -27,8 +27,8 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../public/js/hell-tickets.js';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g163-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-3';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g177-1';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-4';
 import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g140-2';
 import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-2';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=flags-1';
@@ -257,7 +257,7 @@ describe('the chain in play (features, fake engine)', () => {
     }
   });
 
-  it('mourned in Hell One: hell_hole, the jump, Beelzebooze, the ticket, the wine, the drink, the rewards', () => {
+  it('mourned in Hell One: hell_hole, the jump, Beelzebooze, the ticket, the wine, the drink, the rewards', async () => {
     const engine = fakeEngine({ gravedemo: 'mourn', gravevisitms: 0, gravecompanion: 'Bumbishfish' });
     hellTicketsFeature.init(engine);
     questOffersFeature.init(engine);
@@ -315,6 +315,9 @@ describe('the chain in play (features, fake engine)', () => {
     const currants = engine.pc.currants;
     hellFeature.runPackVerb('wine_of_the_dead', 'drink', engine);
     assert.equal(hellFeature.isDead(), true, 'the living croak');
+    // G177: the drink_wotd event waits for the croak's street entry (its loading card) to finish.
+    assert.ok(!engine.questState.completed.includes('hell_quest'), 'not before Hell One has loaded');
+    await new Promise((resolve) => setTimeout(resolve, 0));
     assert.ok(engine.questState.completed.includes('hell_quest'));
     assert.equal(engine.log.awards.at(-1).title, 'Beelzebooze');
     assert.equal(engine.pc.xp - xp, 250);

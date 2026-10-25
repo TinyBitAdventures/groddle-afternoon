@@ -476,13 +476,17 @@ export const hellFeature = {
     state = result.state;
     clearPromptTimers();
     applyEffects(result.effects, engine);
-    // The quest event behind hell_quest's drink_wotd flag (wine_of_the_dead.js:96 sets it on every drink; G163).
-    engine.achievement('wine_of_the_dead:drink', 1);
     engine.save();
+    // The quest event behind hell_quest's drink_wotd flag (wine_of_the_dead.js:96 sets it on every drink; G163).
+    // Drinking while alive croaks you into Hell One: send it once that loading card has gone,
+    // so Beelzebooze's completion card follows the card instead of covering it (G177).
+    const drank = () => engine.achievement('wine_of_the_dead:drink', 1);
     const to = result.teleport;
     if (to) {
       lastEnergy = null;
-      engine.enter(to.tsid, { spawnX: to.x, spawnY: to.y, bypassFeatureGates: true });
+      Promise.resolve(engine.enter(to.tsid, { spawnX: to.x, spawnY: to.y, bypassFeatureGates: true })).then(drank, drank);
+    } else {
+      drank();
     }
     publish(engine);
     return true;

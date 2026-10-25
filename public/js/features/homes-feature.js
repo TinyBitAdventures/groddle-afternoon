@@ -119,7 +119,7 @@ import {
   towerItem,
 } from '../home-cultivation.js?v=home-cultivation-2';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
-import { projectApi } from './street-jobs-feature.js?v=g148-1';
+import { projectApi } from './street-jobs-feature.js?v=g177-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-2';
 import { towerApi } from './home-tower-feature.js?v=home-tower-4';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-1';

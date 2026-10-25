@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-64';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-65';
 import {
   actionDurationFor,
   createTimedAction,
@@ -7591,6 +7591,10 @@ const engine = {
   /** Street deco sprites by XML deco id (street-render decoViews), for location events. */
   get decoViews() {
     return bgLayer?.decoViews || null;
+  },
+  /** Street signpost views (street-render signViews: signBoards per arm), for the map route glow (G177). */
+  get signViews() {
+    return bgLayer?.signViews || [];
   },
   /** Every registered interactable on the current street (read only). */
   get interactables() {

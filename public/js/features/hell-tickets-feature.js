@@ -31,6 +31,8 @@
  *                                  Panka Surazu's door, buy the wine at the counter,
  *                                  resurrect (QA shortcut for the 11 grapes), drink, done
  *   &hellticketstepms=N            pause on each dialogue before advancing (default 2500)
+ *   &routeautoplay=1               with hellticketautoplay: follow the map route to Panka
+ *                                  Surazu signpost by signpost (map-routes feature, G177)
  * Canvas data: hellTicketVisit, hellTicketVisitAt, hellTicketVisitor, hellTicketBranch,
  * hellTicketOffer, hellTicketStage, hellTicketQuest, hellTicketHole, hellTicketTickets,
  * hellTicketWine, hellTicketVisits.
@@ -58,7 +60,7 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../hell-tickets.js';
-import { hellFeature } from './hell-feature.js?v=hell-3';
+import { hellFeature } from './hell-feature.js?v=hell-4';
 import { doorsFeature } from './doors-feature.js?v=doors-2';
 
 export const HELL_TICKETS_FEATURE_ID = 'hell-tickets';
@@ -260,6 +262,8 @@ function autoplay(engine, now) {
       }
       return;
     }
+    // &routeautoplay=1 walks the Beelzebooze map route signpost by signpost instead (G177).
+    if (engine.param('routeautoplay') === '1') return stage(engine, 'route', now);
     if (auto.stage !== 'travel') {
       stage(engine, 'travel', now);
       engine.enter(PANKA_TSID, { bypassFeatureGates: true });
@@ -355,6 +359,8 @@ export const hellTicketsFeature = {
       state = { ...state, ticketGiven: true };
       grantTicket(engine);
       pendingPrompts.push({ title: HELL_QUESTS.hell_quest.title, text: hellQuestAcceptedText(false) });
+      // hell_quest.js onAccepted 114-120: buildPath('LA5RPAFK9OE28GN', pc.location.tsid), the route the prompt promises (G177).
+      engine.query?.('mapRoute', 'set', { to: HELL_QUESTS.hell_quest.pathTo, source: 'hell_quest', quest: 'hell_quest' }, engine);
       engine.save();
       publish(engine);
       return;

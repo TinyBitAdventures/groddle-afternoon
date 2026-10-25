@@ -5,7 +5,7 @@
  */
 
 import { questFlagsFeature } from './quest-flags-feature.js?v=flags-1';
-import { hellFeature } from './hell-feature.js?v=hell-3';
+import { hellFeature } from './hell-feature.js?v=hell-4';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-5';
 import { questOffersFeature } from './quest-offers-feature.js?v=offers-2';
 import { meditationFeature } from './meditation-feature.js?v=g148-1';
@@ -22,7 +22,7 @@ import { doorsFeature } from './doors-feature.js?v=doors-2';
 import { locationEventsFeature } from './location-events-feature.js?v=location-events-1';
 import { puzzlesFeature } from './puzzles-feature.js?v=puzzles-2';
 import { puzzleScenesFeature } from './puzzle-scenes-feature.js?v=g148-1';
-import { streetJobsFeature } from './street-jobs-feature.js?v=g148-1';
+import { streetJobsFeature } from './street-jobs-feature.js?v=g177-1';
 import { imaginationFeature } from './imagination-feature.js?v=imagination-1';
 import { supplyFeature } from './supply-feature.js?v=supply-4';
 import { giantIconsFeature } from './giant-icons-feature.js?v=g148-1';
@@ -73,7 +73,7 @@ export const FEATURES = [
   cameraModeFeature,
   newxpFeature,
 ];
-import { smugglingFeature } from './smuggling-feature.js?v=g148-1'; FEATURES.push(smugglingFeature);
+import { smugglingFeature } from './smuggling-feature.js?v=g177-1'; FEATURES.push(smugglingFeature);
 import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-4'; FEATURES.push(homeTowerFeature);
 import { secretSpotsFeature } from './secret-spots-feature.js?v=secrets-1'; FEATURES.push(secretSpotsFeature);
 import { musicblocksFeature } from './musicblocks-feature.js?v=musicblocks-1'; FEATURES.push(musicblocksFeature);
@@ -111,6 +111,7 @@ import { hellBarFeature } from './hell-bar-feature.js?v=g140-2'; FEATURES.push(h
 import { machineRoomsFeature } from './machine-rooms-feature.js?v=g169-1'; FEATURES.push(machineRoomsFeature);
 import { soloFeatsFeature } from './solo-feats-feature.js?v=g178-1'; FEATURES.push(soloFeatsFeature);
 import { slashCommandsFeature } from './slash-commands-feature.js?v=g160-1'; FEATURES.push(slashCommandsFeature);
-import { hellTicketsFeature } from './hell-tickets-feature.js?v=g163-1'; FEATURES.push(hellTicketsFeature);
+import { hellTicketsFeature } from './hell-tickets-feature.js?v=g177-1'; FEATURES.push(hellTicketsFeature);
 import { packTreeVerbsFeature } from './pack-tree-verbs-feature.js?v=g165-1'; FEATURES.push(packTreeVerbsFeature);
 import { streetSpiritsFeature } from './street-spirits-feature.js?v=g185-1'; FEATURES.push(streetSpiritsFeature);
+import { mapRoutesFeature } from './map-routes-feature.js?v=g177-1'; FEATURES.push(mapRoutesFeature);

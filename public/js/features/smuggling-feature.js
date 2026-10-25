@@ -27,7 +27,8 @@
  *     beside you), =deim (a run to a far street; a Deimaginator spawns),
  *     =carry (a run to a signpost neighbour). &smugglingautoplay=deliver
  *     plays give -> receive on one street, =caught walks into the
- *     Deimaginator, =drop drops the package, =sts accepts Smuggle the Smuggler.
+ *     Deimaginator, =drop drops the package, =sts accepts Smuggle the Smuggler,
+ *     =route keeps the run and its map route (add &routeautoplay=1 to walk it).
  *     Canvas: smugState, smugRun, smugDest, smugNext, smugGiver, smugReceiver,
  *     smugDeim, smugLast, smugCounts, smugAutoplay.
  */
@@ -40,7 +41,7 @@ import { getQuestCatalog } from '../content-catalogs.js';
 import { STREET_INDEX, resolveIndexTsid } from '../street-loader.js';
 import { worldToScreen } from '../street-model.js';
 import { landingY, walkSurfaceY } from '../walk-surface.js';
-import { hellFeature } from './hell-feature.js?v=hell-3';
+import { hellFeature } from './hell-feature.js?v=hell-4';
 import { questRoomConverse } from './quest-instances-feature.js?v=qi-3';
 import {
   CONTRABAND,
@@ -178,6 +179,10 @@ function route(engine) {
   const from = indexKey(engine.streetTsid);
   const to = indexKey(state.run.destination);
   if (!from || !to) return null;
+  // The Map's route for this run (G177, it goes round closed roads) while you are on it.
+  const shared = engine.query?.('mapRoute', 'get', null, engine);
+  const at = shared?.source === 'smuggling' && shared.path ? shared.path.indexOf(from) : -1;
+  if (at > -1) return shared.path.slice(at);
   return routeTo(graph, from, to);
 }
 
@@ -316,6 +321,8 @@ function failRun(engine, text) {
   if (n > 0) removeItem(engine.inv, CONTRABAND, n);
   if (state.run) state.failed += 1;
   state.run = null;
+  // contraband.js drop 102 / npc_deimaginator.js finishCatch 258: clear_location_path (G177).
+  engine.query?.('mapRoute', 'clear', { source: 'smuggling' }, engine);
   last = text;
   engine.refreshPack?.();
   engine.updateHud?.();
@@ -372,6 +379,8 @@ function completeRun(engine) {
   }
   state.delivered += 1;
   state.run = null;
+  // npc_smuggler.js 525 / 884-885: clear_location_path once the package is handed over (G177).
+  engine.query?.('mapRoute', 'clear', { source: 'smuggling' }, engine);
   engine.playSound?.('COMPLETE_QUEST_REQUIREMENT', { volume: 0.6 });
   engine.pushActivity?.('Quest complete: Warm and Smuggly');
   engine.updateHud?.();
@@ -441,6 +450,8 @@ async function revealDestination(engine, kind) {
   renderHud(engine);
   if (!state.run) return;
   const hub = streetHub(state.run.destination);
+  // inc_announcements.js 449-452: get_path_to_location, then map_open on the destination (G177).
+  engine.query?.('mapRoute', 'set', { to: state.run.destination, source: 'smuggling', quest: SMUGGLING_QUEST }, engine);
   engine.openMap?.(hub.hubId || undefined);
   publish(engine);
 }
@@ -992,6 +1003,11 @@ async function autoplay(engine, demo, mode) {
         engine.setData('smugAutoplay', `sts:${state.lastSts || ''}`);
         return;
       }
+      // =route: keep the run and its map route (walk it with &routeautoplay=1, G177).
+      if (mode === 'route') {
+        engine.setData('smugAutoplay', 'route');
+        return;
+      }
       // Hand it straight to a contact here (QA: the destination is this street).
       if (state.run) state.run.destination = sourceKey(indexKey(engine.streetTsid));
       if (mode === 'drop') {
@@ -1154,6 +1170,8 @@ export const smugglingFeature = {
           engine.pushActivity?.(TEXT.offPath);
           last = TEXT.offPath;
         } else {
+          // contraband.js check_address 68-74: the route again, then the map (G177).
+          engine.query?.('mapRoute', 'set', { to: state.run.destination, source: 'smuggling', quest: SMUGGLING_QUEST }, engine);
           engine.openMap?.(streetHub(state.run.destination).hubId || undefined);
         }
         renderHud(engine);
