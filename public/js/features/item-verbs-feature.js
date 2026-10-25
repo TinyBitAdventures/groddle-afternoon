@@ -31,9 +31,9 @@
  *   itemVerbLast, itemVerbBuzz, itemVerbDash.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-5';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { moodMax } from '../metabolics.js';
-import { listDroppedStacks } from '../world-items.js?v=world-items-2';
+import { listDroppedStacks } from '../world-items.js?v=world-items-3';
 import {
   GARLIC_EAT_COUNTER,
   ITEM_VERBS,
@@ -44,7 +44,7 @@ import {
   itemVerbsFor,
   runItemVerb,
 } from '../item-verbs.js?v=item-verbs-2';
-import { homesFeature } from './homes-feature.js?v=homes-17';
+import { homesFeature } from './homes-feature.js?v=homes-18';
 import { CROWNS_STREET } from '../game-of-crowns.js?v=crowns-1';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { isRaceSceneTsid } from '../races.js?v=races-4';

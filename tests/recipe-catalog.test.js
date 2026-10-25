@@ -29,7 +29,7 @@ import {
   countItem,
   getItemUseInfo,
   useItem,
-} from '../public/js/inventory.js?v=catalog-unified-5';
+} from '../public/js/inventory.js?v=catalog-unified-6';
 import {
   FOOD_VARIETY_UPGRADE,
   createFoodState,

@@ -24,7 +24,7 @@
  */
 import { questStatus } from '../quest-offers.js';
 import { GIANT_SCREEN_FADE_MS, giantLoveResponse } from '../giant-love.js?v=g94-1';
-import { GIANTS, inEmblemHitbox } from '../shrines.js?v=spinning-wheel-test-2';
+import { GIANTS, inEmblemHitbox } from '../shrines.js?v=spinning-wheel-test-3';
 import { vogPages } from '../newxp.js';
 
 export const SHRINE_HINT_FEATURE_ID = 'shrine-hint';

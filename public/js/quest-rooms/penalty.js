@@ -27,7 +27,7 @@
 import { createPlot, performPlotVerb, plotArtPath, plotVerbs, soilResponse } from '../patches.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { onLoaded, textureFromUrl } from '../textures.js';
-import { ensureItem } from '../inventory.js?v=catalog-unified-5';
+import { ensureItem } from '../inventory.js?v=catalog-unified-6';
 
 export const PART_1 = 'smuggle_the_smuggler_part1';
 export const PART_2 = 'smuggle_the_smuggler_part2';

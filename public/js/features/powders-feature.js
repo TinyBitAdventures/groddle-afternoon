@@ -49,10 +49,10 @@
  *   powderCharges, powderNoNo, powderTreesGrown.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-5';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { getGameDayKey } from '../game-day.js';
 import { isPooped } from '../hell.js';
-import { moodMax } from '../metabolics.js';
+import { metabolicGain, moodMax } from '../metabolics.js';
 import {
   POWDERS,
   POWDER_TEXT,
@@ -71,7 +71,7 @@ import {
 } from '../powders.js?v=powders-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-2';
 import { DEAD_TRANT_CLASSES } from '../patches.js';
-import { hellFeature } from './hell-feature.js?v=hell-9';
+import { hellFeature } from './hell-feature.js?v=hell-10';
 import { grantMoodXp } from '../mood-xp.js';
 
 export const POWDERS_FEATURE_ID = 'powders';
@@ -214,7 +214,8 @@ const RUNNERS = {
   sparkle_powder(engine, classTsid) {
     const pc = engine.pc;
     pc.energy = Math.max(0, (Number(pc.energy) || 0) - 20);
-    pc.mood = Math.min(moodMax(pc), (Number(pc.mood) || 0) + 10);
+    // sparkle_powder.js 289: metabolics_add_mood(10), nothing while dead (inc_metabolics.js 79-86).
+    if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), (Number(pc.mood) || 0) + 10);
     say(engine, POWDER_TEXT.sparkle);
     finishUse(engine, classTsid);
     engine.updateHud?.();

@@ -71,7 +71,7 @@
  *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-5';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-6';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
@@ -139,13 +139,13 @@ import {
   towerItem,
 } from '../home-cultivation.js?v=home-cultivation-3';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
-import { projectApi } from './street-jobs-feature.js?v=g259-1';
+import { projectApi } from './street-jobs-feature.js?v=g268-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-2';
-import { towerApi } from './home-tower-feature.js?v=home-tower-9';
+import { towerApi } from './home-tower-feature.js?v=home-tower-10';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-7';
-import { patchesFeature } from './patches-feature.js?v=patches-8';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-8';
+import { patchesFeature } from './patches-feature.js?v=patches-9';
 import { plotLabel } from '../patches.js';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
@@ -182,7 +182,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=g232-1';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g208-1';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g268-1';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
 
 export const HOMES_FEATURE_ID = 'homes';

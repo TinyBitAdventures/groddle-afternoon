@@ -394,15 +394,27 @@ export function useItem(inv, pc, classTsid) {
   // (items/include/drink.js 66, 88; food.js 123), which give nothing while
   // dead or (energy) Super Pooped and say so (inc_metabolics.js 40-53, 79-86).
   // The drink is still drunk; a loss never asks.
-  if (info.effects.energy && (info.effects.energy < 0 || metabolicGain('energy').ok)) {
+  const addEnergy = () => {
+    if (!info.effects.energy || (info.effects.energy > 0 && !metabolicGain('energy').ok)) return;
     const before = pc.energy || 0;
     pc.energy = Math.max(0, Math.min(Math.max(100, Number(pc.energyMax) || 100), before + info.effects.energy));
     if (pc.energy !== before) effects.energy = pc.energy - before;
-  }
-  if (info.effects.mood && (info.effects.mood < 0 || metabolicGain('mood').ok)) {
+  };
+  const addMood = () => {
+    if (!info.effects.mood || (info.effects.mood > 0 && !metabolicGain('mood').ok)) return;
     const before = pc.mood || 0;
     pc.mood = Math.max(0, Math.min(moodMax(pc), before + info.effects.mood));
     if (pc.mood !== before) effects.mood = pc.mood - before;
+  };
+  // G268: drink_drink adds mood first, then energy (drink.js 66, then 88), so
+  // a dead drinker hears the mood line before the energy line; food_eat
+  // (food.js 123) leads with energy.
+  if (info.kind === 'drink') {
+    addMood();
+    addEnergy();
+  } else {
+    addEnergy();
+    addMood();
   }
   if (info.effects.xp > 0) {
     pc.imagination = (pc.imagination || 0) + info.effects.xp;

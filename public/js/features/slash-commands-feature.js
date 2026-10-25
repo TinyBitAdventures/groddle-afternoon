@@ -25,9 +25,9 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=butler-5';
-import { butlerApi } from './butler-feature.js?v=butler-feature-15';
-import { hellFeature } from './hell-feature.js?v=hell-9';
-import { towerApi } from './home-tower-feature.js?v=home-tower-9';
+import { butlerApi } from './butler-feature.js?v=butler-feature-16';
+import { hellFeature } from './hell-feature.js?v=hell-10';
+import { towerApi } from './home-tower-feature.js?v=home-tower-10';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=g249-1';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';

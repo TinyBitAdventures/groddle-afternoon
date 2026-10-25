@@ -41,7 +41,7 @@ import {
   rewardBits,
   stepTriggers,
 } from '../puzzle-triggers.js';
-import { moodMax } from '../metabolics.js';
+import { energyMax, metabolicGain, moodMax } from '../metabolics.js';
 import { isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 
 export const PUZZLES_FEATURE_ID = 'puzzles';
@@ -460,17 +460,23 @@ function stepRun(engine) {
   run.prevY = engine.player?.y ?? null;
 }
 
+/** Pays the reward; returns it with any energy or mood the gate refused set to 0. */
 function payout(engine, r) {
   const pc = engine.pc;
+  // puzzle_level_color_blockage.js 45: metabolics_add_energy, which gives
+  // nothing while dead or Super Pooped and says so (inc_metabolics.js 40-53, 79-86).
+  const energy = r.energy > 0 && metabolicGain('energy').ok ? r.energy : 0;
+  const mood = r.mood > 0 && metabolicGain('mood').ok ? r.mood : 0;
   if (r.xp) {
     pc.xp = (pc.xp || 0) + r.xp;
     pc.imagination = (pc.imagination || 0) + r.xp;
   }
   if (r.currants) pc.currants = (pc.currants || 0) + r.currants;
-  if (r.energy) pc.energy = Math.min(100, (pc.energy || 0) + r.energy);
-  if (r.mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + r.mood);
+  if (energy) pc.energy = Math.min(energyMax(pc), (pc.energy || 0) + energy);
+  if (mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
   const ledger = pc.giantFavor;
   for (const f of r.favor || []) if (ledger) ledger[f.giant] = Math.max(0, Number(ledger[f.giant]) || 0) + f.points;
+  return { ...r, energy, mood };
 }
 
 function complete(engine) {
@@ -483,8 +489,7 @@ function complete(engine) {
   if (!save.best[tsid] || ms < save.best[tsid]) save.best[tsid] = ms;
   const name = run.def.name || engine.street?.label || 'Puzzle street';
   const quoins = `${run.taken.size}/${run.def.quoins.length} quoins`;
-  if (reward) payout(engine, reward);
-  const bits = rewardBits(reward);
+  const bits = rewardBits(reward ? payout(engine, reward) : null);
   engine.setData('puzzleComplete', `${tsid}:${save.completed[tsid]}`);
   engine.setData('puzzleReward', bits.join(' · ') || 'none');
   engine.pushActivity(reward ? `You solved ${name}! ${bits.join(', ')}` : `You solved ${name} again (${quoins}).`);

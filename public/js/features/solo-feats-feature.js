@@ -70,7 +70,7 @@
  *   finished at least once), soloFeatReopens (id:ms until it opens again).
  */
 
-import { addItem } from '../inventory.js?v=catalog-unified-5';
+import { addItem } from '../inventory.js?v=catalog-unified-6';
 import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=dametime-1';
 import {
   COMPLETE_BUTTON,

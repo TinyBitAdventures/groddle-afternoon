@@ -38,10 +38,10 @@ import {
 } from '../public/js/machine-art.js?v=g193-1';
 import { MACHINE_IDS } from '../public/js/machines.js';
 import { MACHINE_EXTRA_WAIT_MS, machineTank, tankFuel } from '../public/js/machine-rooms.js';
-import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g259-1';
+import { craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g268-1';
 import { platformsScreen } from '../public/js/street-model.js';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g259-1';
-import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=g259-1';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g268-1';
+import { machineArtFeature } from '../public/js/features/machine-art-feature.js?v=g268-1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pub = join(spike, 'public');
@@ -254,7 +254,7 @@ describe('G193 machine art: wiring', () => {
     assert.match(game, /showMakeResult\(record\.lowFuel \? \{ \.\.\.result, lowFuel: true \} : result, record\.key\)/);
     assert.match(game, /result\.lowFuel \? `<span class="mr-machine-say" role="status">\$\{LOW_FUEL_LINE\}<\/span>`/);
     assert.match(css, /\.make-progress \.mp-tool-machine,\n\.make-result \.mr-machine \{[\s\S]*?animation: none;[\s\S]*?transform: translateX\(-50%\) scale\(var\(--mp-scale\)\);/);
-    assert.match(read('js/features/index.js'), /import \{ machineArtFeature \} from '\.\/machine-art-feature\.js\?v=g259-1'; FEATURES\.push\(machineArtFeature\);/);
+    assert.match(read('js/features/index.js'), /import \{ machineArtFeature \} from '\.\/machine-art-feature\.js\?v=g268-1'; FEATURES\.push\(machineArtFeature\);/);
   });
 });
 

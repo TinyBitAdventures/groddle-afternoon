@@ -183,7 +183,7 @@ describe('location detector: places rebuilt as scenes', () => {
 
   it('takes builders only from live modules, leaves catalogs and comparisons out, and skips ambiguous config ids', () => {
     const index = buildIndex([
-      ['game.js', "import { ROOK } from './js/rook-woods.js?v=2';\nexport { N } from './js/features/f.js';\nimport('./js/later.js');\nexport const x = ROOK;\n"],
+      ['game.js', "import { ROOK } from './js/rook-woods.js?v=rook-woods-3';\nexport { N } from './js/features/f.js';\nimport('./js/later.js');\nexport const x = ROOK;\n"],
       ['js/rook-woods.js', "export const ROOK = 'LLI1AD8LUCH109E';\nexport const SCENES = { beam: { id: 'beam_me_down' }, skill: { id: 'ezcooking_1' } };\n"],
       ['js/later.js', "export const HELL_BAR = Object.freeze({ sourceTsid: 'LA5FPUNAI7P2NVF', available: false });\nexport function here(t) { return t === 'LCHECK000000001'; }\n"],
       ['js/dead.js', "export const OLD = 'LDEAD0000000001';\n"],
@@ -343,8 +343,8 @@ describe('item detector: taking an item is not a way to get it (G176)', () => {
         export function buyWine(state) {
           return { ok: true, effects: [{ type: 'consume_item', classTsid: 'drink_ticket', count: 1 }, { type: 'grant_item', classTsid: 'wine_of_the_dead', count: 1 }, { type: 'quest_flag', flag: 'buy_wotd' }] };
         }`],
-      ['js/features/hell-bar-feature.js', `import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-5';
-        import { buyWine, TICKET_CLASS } from '../hell.js?v=g259-1';
+      ['js/features/hell-bar-feature.js', `import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
+        import { buyWine, TICKET_CLASS } from '../hell.js?v=g268-1';
         const TICKET = 'drink_ticket';
         function applyGrant(engine, result) {
           for (const e of result.effects) {
@@ -485,7 +485,7 @@ describe('item detector: artifact and necklace assembly (G187)', () => {
     cube: { artifact: 'artifact_cube', pieces: ['cube_piece1', 'cube_piece2'] },
   };
   const NECK = { bead_x: { required: 17, produces: 'necklace_x' }, bead_y: { required: 19, produces: 'necklace_y' } };
-  const GAME = "import { artifactsFeature } from './js/features/artifacts-feature.js?v=g259-1';\n";
+  const GAME = "import { artifactsFeature } from './js/features/artifacts-feature.js?v=g268-1';\n";
   const FEATURE = "import { addItem } from '../inventory.js';\nimport { assemblyFor, consumeForAssembly } from '../artifacts.js';\n"
     + "function assemble(engine, plan) {\n  if (!consumeForAssembly(engine.inv, plan)) return false;\n  addItem(engine.inv, plan.artifact, 1);\n}\nexport const artifactsFeature = { assemble };\n";
   const sitesOf = (files) => assemblySites(buildIndex(files.map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' }));

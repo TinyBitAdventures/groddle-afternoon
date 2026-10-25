@@ -10,7 +10,7 @@
  * Those hidden verbs are listed in KITTY_SOURCE_HIDDEN_VERBS and never shown.
  */
 
-import { moodMax } from './metabolics.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 export const KITTY_ID = 'npc_kitty_chicken';
 export const KITTY_LABEL = 'Heli Kitty';
@@ -167,8 +167,9 @@ export function petKitty(kitty, pc) {
   if (!kitty || kitty.flying) return { ok: false, reason: 'flying', msg: 'This kitty is up in the air.' };
   const energy = Math.min(KITTY_PET.energy, Math.max(0, pc.energy || 0));
   pc.energy = Math.max(0, (pc.energy || 0) - energy);
+  // npc_kitty_chicken.js 247: metabolics_add_mood(10), nothing while dead (inc_metabolics.js 79-86).
   const before = pc.mood || 0;
-  pc.mood = Math.min(moodMax(pc), before + KITTY_PET.mood);
+  if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), before + KITTY_PET.mood);
   const mood = pc.mood - before;
   // npc_kitty_chicken.js 757: stats_add_xp(4) takes the mood bonus.
   const xp = grantMoodXp(pc, KITTY_PET.xp);

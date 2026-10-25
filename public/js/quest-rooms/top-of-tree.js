@@ -21,6 +21,8 @@
  * flared root base, and the place's own name.
  */
 
+import { metabolicGain } from '../metabolics.js';
+
 export const TREE_W = 1400;
 export const TREE_H = 2320;
 export const GROUND = 2160;
@@ -202,7 +204,9 @@ export const room = {
 
   start(ctx) {
     const pc = ctx.engine.pc;
-    pc.energy = Math.min((Number(pc.energyMax) || 100), (Number(pc.energy) || 0) + 50);
+    // inc_announcements.js 380: metabolics_add_energy(50), refused while dead
+    // or Super Pooped (inc_metabolics.js 40-53).
+    if (metabolicGain('energy').ok) pc.energy = Math.min((Number(pc.energyMax) || 100), (Number(pc.energy) || 0) + 50);
     ctx.data.enteredAt = Date.now();
     ctx.data.spinachActivated = false;
     ctx.data.nagged = 0;

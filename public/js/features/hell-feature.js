@@ -60,7 +60,7 @@ import {
   SUPER_POOPED_CONSUMED_MULTIPLIER,
 } from '../hell.js';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
-import { countItem, removeItem } from '../inventory.js?v=catalog-unified-5';
+import { countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 
 const GRAPE_SCALE = 0.8;

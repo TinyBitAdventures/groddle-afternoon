@@ -27,10 +27,10 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../public/js/hell-tickets.js';
-import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g255-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-9';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g259-1';
-import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-9';
+import { hellTicketsFeature } from '../public/js/features/hell-tickets-feature.js?v=g268-1';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-10';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g268-1';
+import { questOffersFeature } from '../public/js/features/quest-offers-feature.js?v=offers-10';
 import { questFlagsFeature } from '../public/js/features/quest-flags-feature.js?v=flags-1';
 import { FEATURES } from '../public/js/features/index.js';
 

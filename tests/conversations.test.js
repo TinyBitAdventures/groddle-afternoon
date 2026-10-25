@@ -395,7 +395,7 @@ test.describe('the Street Spirits’ saved ledger moves onto the record', () => 
     streetSpiritsFeature.restore({ moved: 'conversations' });
     assert.deepEqual(conversationRecord().completed, {});
     // The spirits read the same record the conversations feature saves.
-    const { conversationsFeature } = await import('../public/js/features/conversations-feature.js?v=g259-1');
+    const { conversationsFeature } = await import('../public/js/features/conversations-feature.js?v=g268-1');
     resetConversationRecord();
     conversationsFeature.restore(OLD);
     assert.equal(streetSpiritsFeature._talks().talks, conversationRecord());
@@ -442,7 +442,7 @@ test.describe('the conversations feature in a stub world', () => {
   }
 
   test('a rock walked into offers, gets a Talk to, and tells its conversation step by step', async () => {
-    const { conversationsFeature: f, CONVO_TALK_VERB } = await import('../public/js/features/conversations-feature.js?v=g259-1');
+    const { conversationsFeature: f, CONVO_TALK_VERB } = await import('../public/js/features/conversations-feature.js?v=g268-1');
     resetConversationRecord();
     const w = stubWorld({ classId: 'rock_beryl_1', label: 'Beryl Rock', state: { rock: { chunksRemaining: 10 } }, params: { convo: 'dev' } });
     w.feature = f;
@@ -483,7 +483,7 @@ test.describe('the conversations feature in a stub world', () => {
   });
 
   test('a Fruit Tree’s Surfeit of Cherries 3 hands over 250 Cherries on its third answer; Talk to stays the tree’s own otherwise', async () => {
-    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=g259-1');
+    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=g268-1');
     const rec = resetConversationRecord();
     for (const id of prerequisitesOf('surfeit_of_cherries_3')) completeConversation(rec, CONVERSATIONS[id].tellers[0], id, CONVERSATIONS[id].chain, 1);
     rec.chainsInProgress = { surfeit_of_cherries: 1 };
@@ -648,7 +648,7 @@ test.describe('G202: Icons and resume in the conversations feature', () => {
   const at = (ms) => { clock += ms; return clock; };
 
   test('a placed Icon offers on collision by the shared rules, gets a Talk to, and pays 111 iMG on the last answer', async () => {
-    const { conversationsFeature: f, CONVO_TALK_VERB } = await import('../public/js/features/conversations-feature.js?v=g259-1');
+    const { conversationsFeature: f, CONVO_TALK_VERB } = await import('../public/js/features/conversations-feature.js?v=g268-1');
     resetConversationRecord();
     const w = world({ classId: 'icon_pot', label: 'Icon of Pot', iconId: 'i1', params: { convo: 'dev' } });
     w.feature = f;
@@ -701,7 +701,7 @@ test.describe('G202: Icons and resume in the conversations feature', () => {
   });
 
   test('a conversation cut off by a reload opens again at its line by its teller, without the reward again; out of range it waits', async () => {
-    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=g259-1');
+    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=g268-1');
     const rec = resetConversationRecord();
     for (const id of prerequisitesOf('surfeit_of_cherries_3')) completeConversation(rec, CONVERSATIONS[id].tellers[0], id, CONVERSATIONS[id].chain, 1);
     rec.chainsInProgress = { surfeit_of_cherries: 1 };
@@ -766,7 +766,7 @@ test.describe('G202: Icons and resume in the conversations feature', () => {
   });
 
   test('closing keeps the state; Talk to again starts from the first line', async () => {
-    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=g259-1');
+    const { conversationsFeature: f } = await import('../public/js/features/conversations-feature.js?v=g268-1');
     const rec = resetConversationRecord();
     recordOffer(rec, 'rock_beryl_1', 'common_complaints_of_beryl_1', clock);
     const realNow = Date.now;

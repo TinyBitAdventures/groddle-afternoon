@@ -50,8 +50,8 @@
  *   hiRecordsHeld, hiBest, hiAutoplay.
  */
 
-import { butlerApi } from './butler-feature.js?v=butler-feature-15';
-import { moodMax } from '../metabolics.js';
+import { butlerApi } from './butler-feature.js?v=butler-feature-16';
+import { metabolicGain, moodMax } from '../metabolics.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 import {
   HI,
@@ -139,7 +139,9 @@ function save(engine) {
 function addMood(engine, n) {
   const pc = engine?.pc;
   if (!pc || !(n > 0)) return 0;
-  if (engine.metabolicGate?.('mood', 'gain')?.ok === false) return 0;
+  // inc_emotes.js 218, 319, 337: metabolics_add_mood, not quiet, so the dead
+  // hear "You would have gained some mood, but you're dead!" (inc_metabolics.js 79-86).
+  if (!metabolicGain('mood').ok) return 0;
   const before = Number(pc.mood) || 0;
   pc.mood = Math.min(moodMax(pc), before + n);
   engine.updateHud?.();

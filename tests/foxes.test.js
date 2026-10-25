@@ -31,7 +31,7 @@ import {
   stepFox,
 } from '../public/js/foxes.js';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-5';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-6';
 import { getAchievementCatalog, loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import {
   inReach,

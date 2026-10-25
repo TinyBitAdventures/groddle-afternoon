@@ -100,7 +100,7 @@ import {
   tutorialPhysics,
   vogPages,
 } from '../newxp.js?v=newxp-2';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js';
 import { soundForQuoin } from '../sound-moments.js';
 import { IMAGINATION_UPGRADES } from '../imagination.js';
@@ -111,7 +111,7 @@ import { locationEventsApi } from './location-events-feature.js?v=location-event
 import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { HOME_MACHINE } from '../home-ticket.js?v=g259-1';
+import { HOME_MACHINE } from '../home-ticket.js?v=g268-1';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 const ART = 'assets/sprites/newxp/';

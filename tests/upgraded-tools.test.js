@@ -26,7 +26,7 @@ import {
   recipeToolFor,
   recipeToolInUse,
 } from '../public/js/making.js';
-import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=catalog-unified-5';
+import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=catalog-unified-6';
 import {
   GRINDER_TOOLS,
   HOE_TOOLS,
@@ -36,7 +36,7 @@ import {
   firstWorkingTool,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=tools-5';
+} from '../public/js/tools.js?v=woodcutting-test-2';
 import { crushOre } from '../public/js/mining.js';
 import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js';
 import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js';

@@ -10,8 +10,8 @@
  * Produce counts are the GSJS seed classProps produces_count.
  */
 
-import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-5';
-import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-5';
+import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-6';
+import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-2';
 import { skillPackageDetails } from './skill-packages.js';
 import { gardenGrowModifier } from './imagination-effects.js';
 import { metabolicGain, moodMax } from './metabolics.js';

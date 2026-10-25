@@ -22,7 +22,7 @@ import {
   countItem,
   createInventory,
   listPackToolSlots,
-} from '../public/js/inventory.js?v=catalog-unified-5';
+} from '../public/js/inventory.js?v=catalog-unified-6';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const publicRoot = join(here, '../public');

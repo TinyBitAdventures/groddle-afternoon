@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 462,
+  "commits": 463,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Home questions are plain yes/no prompts, races and games stop new quests from starting, and Go Moloko Loco waits for Animal Kinship IV"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "Skill learn buttons use the original words, and accelerated study gets the yellow bar with arrows"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "The Magic Rock speaks from its own cards, quoins respawn on their class timers, and prompts, Pooped and Enter behave as the client did"
    }
   ]
  },
- "tests": 273,
+ "tests": 274,
  "generatedAt": "2026-10-25"
 }

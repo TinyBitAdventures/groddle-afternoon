@@ -47,11 +47,11 @@
  *   potionRugs, potionFavorGiant.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { getGameDayKey } from '../game-day.js';
-import { moodMax } from '../metabolics.js';
+import { metabolicGain, moodMax } from '../metabolics.js';
 import { quoinDailyLimitFor } from '../quoins.js';
-import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-2';
+import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-3';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js';
 import { isPoisoned } from '../tree-poison.js';
 import { furnitureSize } from '../home-decor.js?v=home-decor-4';
@@ -96,10 +96,10 @@ import {
   usePotion,
 } from '../potions.js?v=g149-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-2';
-import { patchesFeature } from './patches-feature.js?v=patches-8';
-import { homesFeature } from './homes-feature.js?v=homes-17';
-import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-5';
-import { questRoomConverse } from './quest-instances-feature.js?v=qi-9';
+import { patchesFeature } from './patches-feature.js?v=patches-9';
+import { homesFeature } from './homes-feature.js?v=homes-18';
+import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-6';
+import { questRoomConverse } from './quest-instances-feature.js?v=qi-10';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';
@@ -340,8 +340,9 @@ function applyLove(engine) {
   engine.applyBuff(LOVE);
   syncTrayIcons(engine);
   const pc = engine.pc;
+  // catalog_buffs.js 719: on_apply is metabolics_add_mood, nothing while dead (inc_metabolics.js 79-86).
   const before = Number(pc.mood) || 0;
-  pc.mood = Math.min(moodMax(pc), before + loveMood(moodMax(pc)));
+  if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), before + loveMood(moodMax(pc)));
   const gained = Math.round(pc.mood - before);
   if (gained && engine.player) engine.floatText?.(engine.player.x, engine.player.y - 96, `+${gained} mood`, 0xff7eb6);
   engine.refreshPack?.();

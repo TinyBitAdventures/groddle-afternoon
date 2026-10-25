@@ -6,7 +6,7 @@
  */
 
 import { repairGivesMood } from './imagination-effects.js';
-import { moodMax } from './metabolics.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {
@@ -302,7 +302,8 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
   // Tink Happy Thoughts (tinkertool.js:419): each repair tick adds mood equal
   // to that tick's Tinkertool wear, so the whole repair adds the full wear.
   let moodGained = 0;
-  if (repairGivesMood(opts.upgrades || pc?.imaginationUpgrades) && pc) {
+  // metabolics_add_mood: nothing while dead (inc_metabolics.js 79-86).
+  if (repairGivesMood(opts.upgrades || pc?.imaginationUpgrades) && pc && quote.tinkertoolWear > 0 && metabolicGain('mood').ok) {
     const before = Number(pc.mood) || 0;
     pc.mood = Math.min(moodMax(pc), before + quote.tinkertoolWear);
     moodGained = pc.mood - before;

@@ -23,11 +23,11 @@ import {
   ITEM_CATALOG,
   createInventory,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=catalog-unified-5';
+} from '../public/js/inventory.js?v=catalog-unified-6';
 import {
   createShrineState,
   donateToShrine,
-} from '../public/js/shrines.js?v=spinning-wheel-test-2';
+} from '../public/js/shrines.js?v=spinning-wheel-test-3';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

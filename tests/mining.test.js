@@ -31,7 +31,7 @@ import {
   countItem,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=catalog-unified-5';
+} from '../public/js/inventory.js?v=catalog-unified-6';
 import {
   loadRecipeCatalogFromFile,
   listRecipesForTool,
@@ -41,7 +41,7 @@ import {
   TOOL_CATALOG,
 } from '../public/js/making.js';
 import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-5';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=woodcutting-test-2';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPIKE = join(__dirname, '../public');
@@ -293,7 +293,7 @@ describe('game wiring', () => {
     assert.match(src, /spawnMineRocks/);
     assert.match(src, /starterMiningTools/);
     assert.match(src, /STARTER_MINING_SKILLS/);
-    assert.match(src, /from '\.\/js\/mining\.js\?v=g259-1'/);
+    assert.match(src, /from '\.\/js\/mining\.js\?v=g268-1'/);
     const preloadedSheets = {
       mineRockMetal: [137, 100],
       mineRockDullite: [131, 114],

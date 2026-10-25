@@ -21,7 +21,7 @@
  * sceneId, sceneStatus, sceneProgress, sceneQuoins, sceneReward, sceneDemo.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import {
   BEAM_ME_DOWN,
@@ -38,7 +38,7 @@ import {
   normalizeSceneSave,
   sceneTsid,
 } from '../puzzle-scenes.js';
-import { moodMax } from '../metabolics.js';
+import { metabolicGain, moodMax } from '../metabolics.js';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 
@@ -340,7 +340,11 @@ function payout(engine, r) {
     pc.xp = (pc.xp || 0) + r.xp;
     pc.imagination = (pc.imagination || 0) + r.xp;
   }
-  if (r.mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + r.mood);
+  // The scene's mood goes through metabolics_add_mood like every source gain:
+  // nothing while dead (inc_metabolics.js 79-86). Returns the mood that landed.
+  const mood = r.mood > 0 && metabolicGain('mood').ok ? r.mood : 0;
+  if (mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
+  return mood;
 }
 
 function finish(engine) {
@@ -351,9 +355,9 @@ function finish(engine) {
   save.done[id] = (save.done[id] || 0) + 1;
   const bits = [];
   if (first) {
-    payout(engine, scene.reward);
+    const mood = payout(engine, scene.reward);
     if (scene.reward.xp) bits.push(`+${scene.reward.xp} iMG`);
-    if (scene.reward.mood) bits.push(`+${scene.reward.mood} mood`);
+    if (mood) bits.push(`+${mood} mood`);
   }
   active.reward = bits.join(' · ') || 'none';
   active.status = 'complete';

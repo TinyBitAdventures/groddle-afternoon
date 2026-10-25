@@ -18,8 +18,8 @@ import {
   ensureItem,
   itemIcon,
   ITEM_CATALOG,
-} from './inventory.js?v=catalog-unified-5';
-import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-5';
+} from './inventory.js?v=catalog-unified-6';
+import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-2';
 import { skillPackageDetails } from './skill-packages.js';
 import { grantMoodXp } from './mood-xp.js';
 import { GEM_ITEMS, MEGA_ROCK_CHUNKS, megaRockChance, miningExpertBonus, rollGemSmall, smeltingOverrides } from './imagination-effects.js';

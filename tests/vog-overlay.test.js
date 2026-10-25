@@ -215,7 +215,7 @@ describe('Enter during the crab\'s call-out', () => {
   });
 
   it('the crab feature answers holdsEnter from its talk state', async () => {
-    const { crabsFeature } = await import('../public/js/features/crabs-feature.js?v=g259-1');
+    const { crabsFeature } = await import('../public/js/features/crabs-feature.js?v=g268-1');
     assert.equal(crabsFeature.holdsEnter(), null);
   });
 });

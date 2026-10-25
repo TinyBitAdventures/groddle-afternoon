@@ -6,7 +6,7 @@
  * This module keeps that loop deterministic and persistence-friendly without
  * coupling it to Pixi or DOM state.
  */
-import { addItem, removeItem } from './inventory.js?v=catalog-unified-5';
+import { addItem, removeItem } from './inventory.js?v=catalog-unified-6';
 
 export const WORLD_ITEM_STATE_VERSION = 1;
 export const DEFAULT_MERGE_RADIUS = 56;

@@ -28,7 +28,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=g259-1';
+} from './js/garden.js?v=g268-1';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -38,30 +38,30 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=g259-1';
+} from './js/mining.js?v=g268-1';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=g259-1';
+} from './js/animals.js?v=g268-1';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
-} from './js/animal-kinship.js?v=g259-1';
+} from './js/animal-kinship.js?v=g268-1';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=g259-1';
+} from './js/musicblocks.js?v=g268-1';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-2';
 import {
   ensureWoodTreeState,
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=woodcutting-3';
-import { findWorkingRookTool } from './js/rook-woods.js?v=rook-woods-1';
+} from './js/woodcutting.js?v=woodcutting-test-2';
+import { findWorkingRookTool } from './js/rook-woods.js?v=rook-woods-3';
 import {
   HERDKEEPING,
   INCUBATION,
@@ -72,8 +72,8 @@ import {
   queuePlops,
   startIncubation,
 } from './js/animal-husbandry.js';
-import { moodMax } from './js/metabolics.js';
-import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-5';
+import { metabolicGain, moodMax } from './js/metabolics.js';
+import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-6';
 
 /** Naming / capture context for an animal target (the back yard counts as yours). */
 function husbandryCtx(ctx) {
@@ -1044,8 +1044,10 @@ export function runVerb(target, verbId, ctx) {
     const fed = feedAnimal(classId, s, inv, verbTarget);
     if (!fed.ok) return { ok: false, msgs: [fed.msg], effects };
     effects.items[fed.classTsid] = -1;
+    // Remake design (npc_chicken.js has no feed verb); its mood takes the
+    // source's one door, metabolics_add_mood (inc_metabolics.js 79-86).
     const moodBefore = pc.mood || 0;
-    pc.mood = Math.min(moodMax(pc), moodBefore + 2);
+    if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + 2);
     effects.mood = pc.mood - moodBefore;
     pc.imagination = (pc.imagination || 0) + 2;
     pc.xp = (pc.xp || 0) + 2;
@@ -1141,8 +1143,9 @@ export function runVerb(target, verbId, ctx) {
     ensureAnimalState(classId, s);
     if (s.buttered) return { ok: false, msgs: ['This Chicken has received enough compliments today.'], effects };
     s.buttered = true;
+    // npc_chicken.js 198: metabolics_add_mood, nothing while dead (inc_metabolics.js 79-86).
     const moodBefore = pc.mood || 0;
-    pc.mood = Math.min(moodMax(pc), moodBefore + 6);
+    if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + 6);
     effects.mood += pc.mood - moodBefore;
     msgs.push('You tell the chicken it is magnificent. It pretends not to care.');
     finalizeMsgs(msgs, effects);
@@ -1190,8 +1193,11 @@ export function runVerb(target, verbId, ctx) {
   if (classId === 'npc_butterfly' && verbId === 'sing_to') {
     pc.energy = Math.max(0, pc.energy - 1);
     effects.energy -= 1;
-    pc.mood = Math.min(moodMax(pc), pc.mood + 4);
-    effects.mood += 4;
+    // Remake design (npc_butterfly.js 543-682 sing_to gives no mood); the
+    // mood takes metabolics_add_mood's door (inc_metabolics.js 79-86).
+    const moodBefore = pc.mood || 0;
+    if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + 4);
+    effects.mood += pc.mood - moodBefore;
     msgs.push('You sing. The butterfly wafts thoughtfully.');
     return { ok: true, msgs, effects };
   }
@@ -1288,7 +1294,9 @@ export function runVerb(target, verbId, ctx) {
     // Spend energy / gain mood & xp from Arborology package
     pc.energy -= result.energyCost;
     effects.energy -= result.energyCost;
-    if (result.moodBonus) {
+    // inc_skill_packages.js 524: the mood bonus is metabolics_add_mood,
+    // nothing while dead (inc_metabolics.js 79-86).
+    if (result.moodBonus > 0 && metabolicGain('mood').ok) {
       pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + result.moodBonus);
       effects.mood += result.moodBonus;
     }

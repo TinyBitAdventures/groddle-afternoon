@@ -67,6 +67,7 @@
 
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { metabolicGain, moodMax } from '../metabolics.js';
 
 export const ROOM_ID = 'esquibeth';
 export const MAIN = 'last_pilgrimage_of_esquibeth';
@@ -1669,13 +1670,16 @@ export const room = {
       const day = (ts) => Math.floor(ts / (4 * 60 * 60 * 1000));
       const reward = conchPlayReward(mem.conchHeard || 0, now, mem.conchHeard ? day(mem.conchHeard) === day(now) : false);
       mem.conchHeard = now;
-      pc.mood = Math.min(Number(pc.moodMax) || 100, (Number(pc.mood) || 0) + 2);
+      // conch.js 397: metabolics_add_mood(2), nothing while dead (inc_metabolics.js 79-86).
+      const moodBefore = Number(pc.mood) || 0;
+      if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + 2);
+      const moodGained = (Number(pc.mood) || 0) - moodBefore;
       pc.energy = Math.max(0, (Number(pc.energy) || 0) - 2);
       // conch.js 364-382: stats_add_xp(n, false) takes the mood bonus (the
       // blow's Esquibeth reward above is no_bonus, conch.js 507).
       const xp = reward.xp ? grantMoodXp(pc, reward.xp) : 0;
       engine.playCue?.(`${SFX}CONCH.mp3`, { volume: 0.6 });
-      engine.pushActivity(`You played the Conch.${reward.msg ? ` ${reward.msg}` : ''}${xp ? ` +${xp} iMG` : ''} +2 mood`);
+      engine.pushActivity(`You played the Conch.${reward.msg ? ` ${reward.msg}` : ''}${xp ? ` +${xp} iMG` : ''}${moodGained ? ` +${moodGained} mood` : ''}`);
       engine.updateHud();
       wctx.save();
       return true;

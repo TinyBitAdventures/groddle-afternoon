@@ -20,8 +20,9 @@
  * Every verb works on one item or the whole stack, like the source's count.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=catalog-unified-5';
+import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=catalog-unified-6';
 import { skillPackageDetails } from './skill-packages.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 
 /**
  * Plain transforms: { verb, label, out, energy, mood, keep } per input class.
@@ -175,8 +176,10 @@ export function runTransform(classTsid, verb, count, inv, pc, learned = [], rng 
   removeItem(inv, classTsid, n * (t.per || 1));
   pc.energy -= check.energy;
   if (check.mood) pc.mood = (pc.mood || 0) - check.mood;
-  const moodGain = (t.moodGain || 0) * n;
-  if (moodGain) pc.mood = Math.min(Number.isFinite(pc.moodMax) ? pc.moodMax : 100, (pc.mood || 0) + moodGain);
+  // grain_bushel.js 126: metabolics_add_mood(10 * count), nothing while dead
+  // (inc_metabolics.js 79-86); the tank caps it (metabolics.js moodMax).
+  const moodGain = (t.moodGain || 0) * n > 0 && metabolicGain('mood').ok ? (t.moodGain || 0) * n : 0;
+  if (moodGain) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + moodGain);
   addItem(inv, t.out, got);
   if (t.becomes) addItem(inv, t.becomes, n);
   const cost = [`-${check.energy} energy`, ...(check.mood ? [`-${check.mood} mood`] : []), ...(moodGain ? [`+${moodGain} mood`] : [])].join(', ');

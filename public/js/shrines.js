@@ -18,12 +18,12 @@ import {
   ensureItem,
   isToolItem,
   removeItem,
-} from './inventory.js?v=catalog-unified-5';
+} from './inventory.js?v=catalog-unified-6';
 import {
   GAMESHOW_TICKET_ID,
   gameshowTicketChance,
-} from './spinning-wheel.js?v=spinning-wheel-2';
-import { moodMax } from './metabolics.js';
+} from './spinning-wheel.js?v=spinning-wheel-3';
+import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { getSkillCatalog } from './content-catalogs.js';
 import { accelerateActiveStudy, getActiveStudy, maxStudyAcceleration } from './skills.js';
@@ -323,8 +323,10 @@ export function donateToShrine(state, giantId, inv, pc, classTsid, count = 1, op
 
   xp = Math.min(xp, quote.dailyXpRoom);
 
+  // shrines.js 490-492: the mood comes back through metabolics_add_mood,
+  // which gives nothing while dead (inc_metabolics.js 79-86).
   const moodBefore = Number(pc.mood) || 0;
-  pc.mood = Math.min(moodMax(pc), moodBefore + mood);
+  if (mood > 0 && metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + mood);
   const actualMood = pc.mood - moodBefore;
   pc.xp = (Number(pc.xp) || 0) + xp;
   pc.imagination = (Number(pc.imagination) || 0) + xp;

@@ -39,7 +39,7 @@
  * treeGuilt, treeDeaths, treePoisonAutoplay.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-5';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-6';
 import { moodMax } from '../metabolics.js';
 import { plantChoices } from '../patches.js';
 import { textureFromUrl } from '../textures.js';
@@ -69,7 +69,7 @@ import {
   quotePoisonVerb,
   treeDeathOutcome,
 } from '../tree-poison.js';
-import { patchesFeature } from './patches-feature.js?v=patches-8';
+import { patchesFeature } from './patches-feature.js?v=patches-9';
 
 export const TREE_DEATH_FEATURE_ID = 'tree-death';
 const VERB_PREFIX = 'treepoison:';
@@ -353,8 +353,9 @@ function completePour(engine, kind, target) {
   } else {
     const q = quoteAntidoteVerb(target.state, ctx);
     if (!q.enabled) return say(engine, q.reason || POISON_COPY.noAntidoteTarget, false), false;
-    const moodGain = engine.metabolicGate?.('mood', 'gain')?.ok !== false;
-    const res = performAntidotePour(target.state, { ...ctx, moodGain, bottles });
+    // G268: the pour asks the metabolic gate itself, after it lands, and the
+    // gate says "You would have gained some mood, but you're dead!".
+    const res = performAntidotePour(target.state, { ...ctx, bottles });
     if (!res.ok) return say(engine, res.msg, false), false;
     dropOverlay(target);
     if (res.moodGained) engine.floatText?.(engine.player.x + 20, engine.player.y - 90, `+${res.moodGained} mood`, 0xffe066);

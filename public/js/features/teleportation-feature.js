@@ -31,9 +31,9 @@
  * teleportLast, teleportScripts, teleportEnergyCost.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
-import { canUseTool, useToolCondition } from '../tools.js?v=tools-5';
+import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-2';
 import {
   PAPER_CLASS,
   QUILL_CLASS,

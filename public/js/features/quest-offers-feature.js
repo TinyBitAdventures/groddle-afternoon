@@ -94,7 +94,7 @@ import {
   turnInQuest,
   waitingOffers,
 } from '../quest-offers.js';
-import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-5';
+import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-6';
 import { getQuestCatalog } from '../content-catalogs.js';
 
 const OFFER_CHECK_MS = 30_000;

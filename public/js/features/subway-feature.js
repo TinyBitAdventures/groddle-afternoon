@@ -31,8 +31,8 @@
  *   subwayDemo, subwayWindows, subwayLinked.
  */
 
-import { countItem } from '../inventory.js?v=catalog-unified-5';
-import { doorsFeature } from './doors-feature.js?v=doors-3';
+import { countItem } from '../inventory.js?v=catalog-unified-6';
+import { doorsFeature } from './doors-feature.js?v=doors-4';
 import { textureFromUrl } from '../textures.js';
 import {
   CAR_FLOOR,

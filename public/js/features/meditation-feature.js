@@ -29,7 +29,7 @@
  * meditationZen, meditationTotalSeconds, meditationLevitating.
  */
 
-import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-5';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-6';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../game-day.js?v=dametime-1';
 import {
   STATION_COUNTER,
@@ -54,7 +54,7 @@ import {
   startLevitation,
   startMeditation,
 } from '../meditation.js';
-import { energyMax, moodMax } from '../metabolics.js';
+import { energyMax, metabolicGain, moodMax } from '../metabolics.js';
 import { levitationCards } from '../imagination-effects.js';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js';
 import { sourceFromUrl } from '../textures.js';
@@ -377,8 +377,10 @@ function end(engine, reason = 'timer', at = Date.now()) {
     scaleXp: (xp, mood) => moodScaledXp({ ...pc, mood }, xp),
   });
   let { energy, mood } = out;
-  if (energy && engine.metabolicGate('energy', 'gain').ok === false) energy = 0;
-  if (mood && engine.metabolicGate('mood', 'gain').ok === false) mood = 0;
+  // focusing_orb.js 822-823: metabolics_add_energy, then _mood, each saying
+  // why it gave nothing while dead or Super Pooped (inc_metabolics.js 40-53, 79-86).
+  if (energy > 0 && !metabolicGain('energy').ok) energy = 0;
+  if (mood > 0 && !metabolicGain('mood').ok) mood = 0;
   // Energy the gate refused does not count toward the daily top.
   state = { ...out.state, energyToday: Math.max(0, out.state.energyToday - (out.energy - energy)) };
   pc.energy = Math.min(tankOf(engine), (pc.energy || 0) + energy);

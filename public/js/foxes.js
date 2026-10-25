@@ -15,7 +15,7 @@
  * - achievements/*foxbrusher*.js, fleet_foxer.js, fox_tourist.js
  */
 
-import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-5';
+import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-6';
 import { canUseTool, useToolCondition } from './tools.js';
 import { foxBrushingCard, scaledToolWear } from './imagination-effects.js';
 import { grantMoodXp } from './mood-xp.js';

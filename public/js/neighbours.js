@@ -24,6 +24,8 @@
  * neighbours.
  */
 
+import { metabolicGain } from './metabolics.js';
+
 export const NEIGHBOUR_SCENE_PREFIX = 'NB_';
 export const NEIGHBOUR_SCENE = Object.freeze({ width: 2200, height: 700, groundY: 620 });
 /** Letters arrive a little after the chore is done, like the mailbox's companion replies. */
@@ -248,7 +250,9 @@ export function doChore(state, neighbour, pc, ctx = {}) {
   pc.energy = whole(pc.energy) - energy;
   const maxMood = Number.isFinite(pc.maxMood) ? pc.maxMood : 100;
   const before = whole(pc.mood);
-  pc.mood = Math.min(maxMood, before + chore.mood);
+  // The chores are remake design; their mood goes through the same door as
+  // every source gain (metabolics_add_mood, inc_metabolics.js 79-86).
+  if (chore.mood > 0 && metabolicGain('mood').ok) pc.mood = Math.min(maxMood, before + chore.mood);
   pc.xp = whole(pc.xp) + chore.xp;
   if (pc.imagination != null) pc.imagination = whole(pc.imagination) + chore.xp;
   const take = chore.needs ? [{ ...chore.needs }] : [];

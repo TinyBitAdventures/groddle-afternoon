@@ -29,6 +29,8 @@
  * is not wired here (see the header of js/patches.js).
  */
 
+import { metabolicGain } from './metabolics.js';
+
 export const TREE_POISON = 'potion_tree_poison';
 export const TREE_ANTIDOTE = 'potion_tree_poison_antidote';
 /** tool_base required_skill on both potions; trant_base checks it too. */
@@ -332,7 +334,9 @@ export function performPoisonPour(state, ctx = {}) {
 export function performAntidotePour(state, ctx = {}) {
   if (!isPoisoned(state)) return { ok: false, msg: pourMessage(TREE_ANTIDOTE, [POISON_COPY.noAntidoteTarget], true) };
   let moodGained = 0;
-  if (ctx.pc && ctx.moodGain !== false) {
+  // tree_poison_antidote.js 284: metabolics_add_mood(10), which gives nothing
+  // while dead and says so (inc_metabolics.js 79-86).
+  if (ctx.pc && ctx.moodGain !== false && metabolicGain('mood').ok) {
     const cap = Number.isFinite(ctx.maxMood) ? ctx.maxMood : 100;
     const before = Number(ctx.pc.mood) || 0;
     ctx.pc.mood = Math.min(cap, before + ANTIDOTE_MOOD);

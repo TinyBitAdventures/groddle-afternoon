@@ -34,9 +34,9 @@
  *   (rolled with the shared js/drop-tables.js runDropTable).
  */
 
-import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-5';
+import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-6';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
-import { moodMax } from './metabolics.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { musicblockItemMeta } from './musicblocks.js';
 import { isEnchantedForest } from './enchanted-forests.js?v=g5-1';
@@ -787,8 +787,9 @@ export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', no
   if (rng() < HERDKEEPING.chance || sad) {
     inv.hogtied_piggy = (inv.hogtied_piggy || 0) + 1;
     effects.items.hogtied_piggy = 1;
+    // npc_piggy.js 451: metabolics_add_mood(30), nothing while dead (inc_metabolics.js 79-86).
     const before = pc.mood || 0;
-    pc.mood = Math.min(moodMax(pc), before + HERDKEEPING.successMood);
+    if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), before + HERDKEEPING.successMood);
     effects.mood = pc.mood - before;
     if (!ownYard) {
       // npc_piggy.js 460: stats_add_xp(50, false) takes the mood bonus.
