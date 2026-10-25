@@ -22,7 +22,7 @@ import {
   isTrophyClass,
   itemVerbsFeature,
 } from '../public/js/features/item-verbs-feature.js';
-import { homesFeature } from '../public/js/features/homes-feature.js?v=homes-15';
+import { homesFeature } from '../public/js/features/homes-feature.js?v=homes-16';
 import {
   applyAchievementProgress,
   createAchievementState,
@@ -300,6 +300,6 @@ describe('game.js wiring for G134', () => {
     assert.match(registry, /powders-feature\.js\?v=g\d+-\d+'; FEATURES\.push\(powdersFeature\)/);
     assert.match(registry, /item-verbs-feature\.js\?v=g\d+-\d+'; FEATURES\.push\(itemVerbsFeature\)/);
     // Lanes after this one bump the registry further.
-    assert.match(game, /features\/index\.js\?v=registry-(?:4[89]|[5-9]\d)'/);
+    assert.ok(Number(game.match(/features\/index\.js\?v=registry-(\d+)'/)?.[1]) >= 48, 'registry key at 48 or later');
   });
 });

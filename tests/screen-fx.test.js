@@ -18,7 +18,7 @@ import {
   awardRewardTokens,
   runStreetTransition,
   showAwardScreen,
-} from '../public/js/screen-fx.js?v=card-1';
+} from '../public/js/screen-fx.js?v=card-2';
 
 describe('screen-fx timings (LoadingLocationView / BaseScreenView)', () => {
   it('uses deliberate non-skippable fade windows (seconds)', () => {
@@ -164,7 +164,7 @@ describe('badge + loading asset maps (local pack)', () => {
 
 describe('award card text', () => {
   it('drops GSJS item links and tags but keeps the words', async () => {
-    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=card-1');
+    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=card-2');
     assert.equal(
       awardText('Give 6 <a href="event:item|npc_piggy">Piggies</a> the pleasuring of a lifetime. By petting them, of course.'),
       'Give 6 Piggies the pleasuring of a lifetime. By petting them, of course.',
@@ -175,7 +175,7 @@ describe('award card text', () => {
   });
 });
 
-import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=card-1';
+import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=card-2';
 
 describe('loading card status and hub split (LoadingLocationView.as)', () => {
   it('uses the client status labels with the TimerBar percent', () => {
@@ -209,5 +209,105 @@ describe('loading card without a picture', () => {
     const css = readFileSync(join(pub, 'style.css'), 'utf8');
     assert.match(css, /\.st-title \{\n  position: relative;\n  margin-top: -42px;/);
     assert.match(css, /\.st-card\.no-snap \.st-title \{ margin-top: 0; \}/);
+  });
+});
+
+import {
+  POL_LAYOUT,
+  POL_OWNER_SIZE,
+  POL_TYPES,
+  nameApostrophe,
+  polCardLayout,
+  polCardTitle,
+  polFeaturesLine,
+  polGradient,
+  polNeighbours,
+  polVisitLine,
+} from '../public/js/screen-fx.js?v=card-2';
+
+describe('home loading card (G249, LoadingLocationPOLView.as)', () => {
+  it('names the place as setText does (215-235)', () => {
+    assert.deepEqual(POL_TYPES, ['interior', 'exterior', 'tower']);
+    assert.deepEqual(polCardTitle({ type: 'exterior' }), { entering: 'Entering', name: 'Your', street: 'Home Street' });
+    assert.equal(polCardTitle({ type: 'interior' }).street, 'House');
+    assert.equal(polCardTitle({ type: 'tower' }).street, 'Tower');
+    assert.deepEqual(polCardTitle({ type: 'exterior', ownerName: 'Dorrit Applewhistle' }),
+      { entering: 'Entering', name: 'Dorrit Applewhistle’s', street: 'Home Street' });
+    // A custom name takes the name's place; a Tower keeps whose it is in brackets.
+    assert.deepEqual(polCardTitle({ type: 'tower', customName: 'The Spire' }), { entering: 'Entering', name: 'The Spire', street: '(Your Tower)' });
+    assert.equal(polCardTitle({ type: 'tower', ownerName: 'Bob', customName: 'Bobhenge' }).street, '(Bob’s Tower)');
+    assert.equal(polCardTitle({ type: 'street' }), null);
+    // StringUtil.nameApostrophe 586: always ’s, even after an s.
+    assert.equal(nameApostrophe('Jess'), 'Jess’s');
+    assert.equal(nameApostrophe(''), '');
+  });
+
+  it('writes the last-here box as setDetails does (282-310)', () => {
+    assert.equal(polVisitLine({ firstVisit: true }), '<b>First time here!</b>');
+    assert.equal(polVisitLine({ visitCount: 3, lastVisitMins: 90 }), 'Last here <b>1 hour 30 mins ago</b> &#8212; this is your 4th visit');
+    // No time known: "just moments ago".
+    assert.equal(polVisitLine({ visitCount: 1, lastVisitMins: 0 }), 'Last here <b>just moments ago</b> &#8212; this is your 2nd visit');
+    // Two parts under ten days, one past it (max_to_show 2 or 1, "~" when trimmed).
+    assert.equal(polVisitLine({ visitCount: 1, lastVisitMins: 1440 + 61 }), 'Last here <b>~1 day 1 hour ago</b> &#8212; this is your 2nd visit');
+    assert.equal(polVisitLine({ visitCount: 21, lastVisitMins: 1440 * 12 + 300 }), 'Last here <b>~12 days ago</b> &#8212; this is your 22nd visit');
+    assert.equal(polVisitLine({ visitCount: 0, lastVisitMins: 5 }), 'Last here <b>5 mins ago</b>');
+  });
+
+  it('shows only the first feature and up to five neighbour faces outside', () => {
+    assert.equal(polFeaturesLine(['A <b>Magic Rock</b>.', 'Plus <b>2 Piggies</b>']), 'Features: A <b>Magic Rock</b>.');
+    assert.equal(polFeaturesLine([]), '');
+    const six = Array.from({ length: 6 }, (_, i) => ({ name: `N${i}`, faceUrl: `f${i}.png` }));
+    assert.equal(polNeighbours('exterior', six).length, POL_LAYOUT.maxNeighbours);
+    assert.deepEqual(polNeighbours('exterior', [{ name: 'Dorrit' }]), []);
+    assert.deepEqual(polNeighbours('interior', six), []);
+  });
+
+  it('lays the card out with the client offsets (refresh 147-187, setAvatar 337-347)', () => {
+    const house = polCardLayout('interior');
+    assert.equal(house.textX, 290);
+    assert.equal(house.allWidth, 290 + 326);
+    assert.deepEqual(house.owner, { x: -20, y: 15 });
+    assert.equal(house.door.src, 'assets/sprites/loading/enter_home_door.png');
+    assert.equal(house.enterY, 50);
+    assert.equal(house.featuresPad, 20);
+    assert.equal(house.artHeight, 380);
+    const tower = polCardLayout('tower');
+    assert.deepEqual([tower.door.x, tower.door.y], [-105, -10]);
+    assert.equal(tower.door.src, 'assets/sprites/loading/enter_tower_door.png');
+    const street = polCardLayout('exterior');
+    assert.equal(street.textX, 135);
+    assert.equal(street.door, null);
+    assert.deepEqual(street.owner, { x: -40, y: -20 });
+    assert.equal(street.artHeight, -20 + POL_OWNER_SIZE.h);
+    assert.equal(polCardLayout('street'), null);
+    // The 200 px radial fill sits 30 px right of the holder's left edge.
+    assert.equal(polGradient(street), 'radial-gradient(circle 200px at calc(50% - 201px) 50%, #d5ede1 35.3%, #adccbd 100%)');
+  });
+
+  it('ships the two door pictures and reads the card from the game', async () => {
+    const { existsSync, readFileSync } = await import('node:fs');
+    const { join, dirname } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
+    assert.ok(existsSync(join(pub, 'assets/sprites/loading/enter_home_door.png')));
+    assert.ok(existsSync(join(pub, 'assets/sprites/loading/enter_tower_door.png')));
+    const game = readFileSync(join(pub, 'game.js'), 'utf8');
+    assert.match(game, /pol: \{ type: homeState\.room === 'interior' \? 'interior' : 'exterior' \}/);
+    assert.match(game, /pol: \{ type: room === 'interior' \? 'interior' : 'exterior' \}/);
+    assert.match(game, /if \(opts\.pol\) await showLocationTransition\(\{ pol: opts\.pol, load \}\);/);
+    const tower = readFileSync(join(pub, 'js/features/home-tower-feature.js'), 'utf8');
+    assert.match(tower, /pol: \{ type: 'tower', customName: tower\.name \|\| ''/);
+    assert.match(tower, /engine\.enter\(HOME_STREET_TSID, \{ pol: \{ type: 'exterior' \} \}\)/);
+  });
+});
+
+describe('home loading card on a narrow screen', () => {
+  it('scales the holder and the fill to fit with 16 px gutters', async () => {
+    const { polCardScale } = await import('../public/js/screen-fx.js?v=card-2');
+    const house = polCardLayout('interior');
+    assert.equal(polCardScale(house, 1280), 1);
+    assert.equal(polCardScale(house, 390), (390 - 32) / 616);
+    assert.equal(polCardScale(house, 0), 1);
+    assert.equal(polGradient(house, 0.5), 'radial-gradient(circle 100px at calc(50% - 139px) 50%, #d5ede1 35.3%, #adccbd 100%)');
   });
 });

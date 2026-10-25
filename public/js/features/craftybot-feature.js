@@ -47,7 +47,7 @@ import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=to
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g259-1';
 import { listDroppedStacks } from '../world-items.js?v=world-items-2';
 import { homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-3';
-import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=homes-15';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=homes-16';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-99';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-100';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -636,9 +636,10 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   cardPausedTimeout,
-} from './js/screen-fx.js?v=card-1';
+  POL_OWNER_SIZE,
+} from './js/screen-fx.js?v=card-2';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g225-1';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=card-1';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=card-2';
 import {
   planTravel,
   listMapDestinations,
@@ -8334,7 +8335,10 @@ const engine = {
     if (tsid === HOME_STREET_TSID || tsid === HOME_INTERIOR_TSID) {
       homeState.inHome = true;
       homeState.room = tsid === HOME_INTERIOR_TSID ? 'interior' : 'street';
-      await renderHomeScene(homeState.room, { spawnX: opts.spawnX });
+      const load = () => renderHomeScene(homeState.room, { spawnX: opts.spawnX });
+      // G249: a feature's own door into a home place (the Tower's) shows the home card.
+      if (opts.pol) await showLocationTransition({ pol: opts.pol, load });
+      else await load();
       return;
     }
     if (homeIsInstanced()) homeState.inHome = false;
@@ -18424,21 +18428,59 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
   return currentStreet;
 }
 
+/** G249: your avatar standing still for the home card (the client loaded pc.singles_url + '_172.png'). */
+const ownerPortraits = new Map();
+async function ownerPortraitUrl() {
+  if (!avatarCatalog) avatarCatalog = await loadAvatarCatalog().catch(() => null);
+  if (!avatarCatalog) return null;
+  const look = resolveLook(playerAppearance.vector, avatarCatalog);
+  const key = lookKey(look);
+  if (!ownerPortraits.has(key)) {
+    ownerPortraits.set(key, prepareLook(look).then((prep) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = POL_OWNER_SIZE.w * 2;
+      canvas.height = POL_OWNER_SIZE.h * 2;
+      return paintVectorPreview(prep, canvas, 801, { pad: 12, flip: true }).toDataURL('image/png');
+    }).catch(() => null));
+  }
+  return ownerPortraits.get(key);
+}
+
+/**
+ * G249: the home card (LoadingLocationPOLView) for your home street, house or
+ * Tower: its visits (location.js getLoadingInfo 3157-3159 pols_visited, read
+ * before this entry counts), then counted. knownVisits credits saves from
+ * before the history was kept (home visits, house visits).
+ */
+function homeLoadingCard(pol) {
+  if (!pol?.type) return null;
+  const tower = pol.type === 'tower';
+  const slot = engine.streetSlot(tower ? `${STREET_VISITS_SLOT}:tower` : STREET_VISITS_SLOT, pol.type === 'exterior' ? HOME_STREET_TSID : HOME_INTERIOR_TSID);
+  const known = Math.max(0, Number(pol.knownVisits ?? (pol.type === 'exterior' ? homeState.visits - 1 : tower ? 0 : features.query('houseVisits'))) || 0);
+  const visit = streetLoadingVisit(slot, { knownVisits: known });
+  recordStreetEntry(slot, Date.now(), known);
+  return { ...pol, visit, ownerImg: ownerPortraitUrl };
+}
+
 async function showLocationTransition({
   fromLabel = '',
   fromHub = '',
   toLabel = '',
   toHub = '',
+  pol = null,
   load,
 } = {}) {
   const el = document.getElementById('screen-transition');
   if (!el) return load?.();
   let result = null;
+  const card = homeLoadingCard(pol);
   await runStreetTransition(el, {
     fromLabel,
     fromHub,
     toLabel,
     toHub,
+    pol: card,
+    details: card ? () => loadingCardDetails({ targets: interactables, quoinTypes: quoins.map((q) => q.typeId), visit: card.visit }) : undefined,
     onMid: async () => {
       result = await load?.();
     },
@@ -18478,6 +18520,7 @@ async function teleportHome({ room = 'street' } = {}) {
     fromLabel: source.label,
     fromHub: source.hubName,
     toLabel: homeState.room === 'interior' ? 'Your House' : 'Your Home Street',
+    pol: { type: homeState.room === 'interior' ? 'interior' : 'exterior' },
     toHub: `${HOME_STYLES[homeState.style]?.label || 'Meadow'} Home`,
     load: () => renderHomeScene(homeState.room),
   });
@@ -18498,6 +18541,7 @@ async function switchHomeRoom(room) {
     fromHub: 'Home',
     toLabel: result.label,
     toHub: 'Home',
+    pol: { type: room === 'interior' ? 'interior' : 'exterior' },
     load: () => renderHomeScene(room, { arrive: 'door', spawnX: room === 'interior' ? 1030 : 910 }),
   });
   savePlayerState();

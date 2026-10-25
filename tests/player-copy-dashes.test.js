@@ -57,6 +57,8 @@ const SOURCE_VERBATIM = [
   ['js/seasons-data.js', 'not sure what they are — though from the description', 'glitch-GameServerJS/players/player.js'],
   ['js/street-furniture.js', 'Ah — I know just the street to send you to.', 'glitch-GameServerJS/items/visiting_stone.js'],
   ['js/exploration.js', ' &#8212; ', 'glitch-client/com/tinyspeck/engine/view/gameoverlay/LoadingLocationView.as'],
+  // G249: the home card's last-here box (LoadingLocationPOLView.as 299).
+  ['js/screen-fx.js', ' &#8212; ', 'glitch-client/com/tinyspeck/engine/view/gameoverlay/LoadingLocationPOLView.as'],
 ];
 
 const walk = (dir, skip) => readdirSync(dir).flatMap((name) => {

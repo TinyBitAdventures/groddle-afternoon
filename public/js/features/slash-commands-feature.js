@@ -25,10 +25,10 @@
  */
 
 import { BUTLER_STRINGS } from '../butler.js?v=butler-5';
-import { butlerApi } from './butler-feature.js?v=butler-feature-12';
+import { butlerApi } from './butler-feature.js?v=butler-feature-13';
 import { hellFeature } from './hell-feature.js?v=hell-9';
-import { towerApi } from './home-tower-feature.js?v=home-tower-8';
-import { slashPlan, unknownLine } from '../slash-commands.js?v=g160-1';
+import { towerApi } from './home-tower-feature.js?v=home-tower-9';
+import { slashPlan, unknownLine } from '../slash-commands.js?v=g249-1';
 
 export const SLASH_COMMANDS_FEATURE_ID = 'slash-commands';
 

@@ -17,12 +17,12 @@ import {
   slashPlan,
   slashWords,
   unknownLine,
-} from '../public/js/slash-commands.js?v=g160-1';
-import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=g259-1';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=card-5';
-import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-8';
+} from '../public/js/slash-commands.js?v=g249-1';
+import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=g249-1';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=card-6';
+import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-9';
 import { BUTLER_STRINGS } from '../public/js/butler.js?v=butler-5';
-import { butlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-12';
+import { butlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-13';
 import { FEATURES } from '../public/js/features/index.js';
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { countItem } from '../public/js/inventory.js?v=catalog-unified-5';

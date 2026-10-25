@@ -1098,9 +1098,9 @@
   "register": "G125"
  },
  "item:homestreet_ticket_dispenser": {
-  "status": "unbuilt_original",
-  "reason": "homestreet_ticket.js:51 looks for one within 100 px, but nothing in GSJS places it and no archived street holds one; the Home Street Ticket itself works without it in the remake (features/newxp-feature.js)",
-  "register": "G125"
+  "status": "source",
+  "reason": "nothing in GSJS places one and no archived street holds one (homestreet_ticket.js:51 looks within 100 px), but the remake stands it in twice with its verbs and lines (homestreet_ticket_dispenser.js 1, 38, 43-161): the tutorial's three CHOOSE <STYLE> STYLE machines (features/newxp-feature.js newxp_machine) and the Home panel's Home Street Selection Machine, which takes the ticket (js/home-ticket.js renderTicketMachine, useHomeTicket)",
+  "register": "G264"
  },
  "item:clickable_broadcaster": {
   "status": "excluded",

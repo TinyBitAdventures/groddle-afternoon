@@ -26,7 +26,7 @@
 
 export const NEIGHBOUR_SCENE_PREFIX = 'NB_';
 export const NEIGHBOUR_SCENE = Object.freeze({ width: 2200, height: 700, groundY: 620 });
-/** Letters arrive a little after the deed, like the mailbox's companion replies. */
+/** Letters arrive a little after the chore is done, like the mailbox's companion replies. */
 export const LETTER_DELAY_MS = 20_000;
 export const FIRST_VISIT_XP = 15;
 

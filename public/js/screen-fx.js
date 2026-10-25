@@ -8,6 +8,7 @@
  */
 
 import { ACHIEVEMENT_DROP, ACHIEVEMENT_ROCK_WH, achievementBubbleText, easeOutBounce, mountPetRock } from './familiar.js?v=g225-1';
+import { formatLoadingTime, ordinal } from './exploration.js';
 
 /**
  * Street-load timings (seconds).
@@ -316,6 +317,153 @@ export function loadingSplit({ fromHub = '', toHub = '', fromTop, fromBottom, to
   return { split: true, leaving: !same, welcome: Boolean(toHub) };
 }
 
+/* ------------------------------------------------------------------ */
+/* G249: the home loading card (LoadingLocationPOLView)                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * LoadingInfo.as 12-14. location.js getLoadingInfo 3391-3407 sends pol_type
+ * (homes_get_type) and the owner for a home location, and
+ * LoadingLocationView.fadeIn 340-370 then hides the picture, the street name,
+ * the hub and the Home to: list and shows LoadingLocationPOLView instead.
+ */
+export const POL_TYPES = Object.freeze(['interior', 'exterior', 'tower']);
+
+/** LoadingLocationPOLView.as 24-31 and refresh 147-159. */
+export const POL_LAYOUT = Object.freeze({
+  extX: 135,
+  intX: 290,
+  lastHereW: 326,
+  lastHereH: 28,
+  gradRadius: 200,
+  gradColors: Object.freeze(['#d5ede1', '#adccbd']),
+  gradSpread: Object.freeze([90, 255]),
+  /** setNeighbors 384: at most five faces. */
+  maxNeighbours: 5,
+});
+
+/** The pc singles picture the card loads (setAvatar 333, `_172.png`: 172 x 248). */
+export const POL_OWNER_SIZE = Object.freeze({ w: 172, h: 248 });
+
+/**
+ * buildBase 62-68: Tiny Speck's enter_home_door.png / enter_tower_door.png
+ * (glitch-client TSEngineAssets/src/assets/graphics, Assets.as 245-248).
+ */
+const POL_DOORS = Object.freeze({
+  interior: Object.freeze({ src: 'assets/sprites/loading/enter_home_door.png', x: 0, y: 0, w: 294, h: 380 }),
+  tower: Object.freeze({ src: 'assets/sprites/loading/enter_tower_door.png', x: -105, y: -10, w: 409, h: 370 }),
+});
+
+export function isPolType(type) {
+  return POL_TYPES.includes(type);
+}
+
+/** StringUtil.nameApostrophe 581-587: always "’s" ("we don't want to be old times"). */
+export function nameApostrophe(name) {
+  return name ? `${name}’s` : '';
+}
+
+/**
+ * setText 215-235: "Entering", then "Your" (or the owner's name), then House,
+ * Home Street or Tower. A custom name takes the name's place, and a Tower's
+ * last line becomes "(Your Tower)".
+ * @param {{ type: string, ownerName?: string, customName?: string }} pol
+ */
+export function polCardTitle({ type, ownerName = '', customName = '' } = {}) {
+  if (!isPolType(type)) return null;
+  let name = ownerName ? nameApostrophe(ownerName) : 'Your';
+  let street = type === 'interior' ? 'House' : 'Home Street';
+  if (type === 'tower') street = 'Tower';
+  if (customName) {
+    if (type === 'tower') street = `(${name} Tower)`;
+    name = customName;
+  }
+  return { entering: 'Entering', name, street };
+}
+
+/**
+ * setDetails 282-310, the last-here box as the client's HTML. Unlike the
+ * street card it has no Qurazy line, says "just moments ago" without a time,
+ * and trims the time to two parts (one past ten days). The em-dash is Tiny
+ * Speck's own (&#8212;, line 299).
+ * @param {{ firstVisit?: boolean, visitCount?: number, lastVisitMins?: number }} visit
+ */
+export function polVisitLine(visit = {}) {
+  let txt = '';
+  const mins = Number(visit.lastVisitMins) || 0;
+  const count = Number(visit.visitCount) || 0;
+  if (visit.firstVisit) {
+    txt = '<b>First time here!</b>';
+  } else {
+    txt = mins
+      ? `Last here <b>${formatLoadingTime(mins * 60, { maxToShow: mins < 1440 * 10 ? 2 : 1 })} ago</b>`
+      : 'Last here <b>just moments ago</b>';
+    if (count) txt += ' &#8212; ';
+  }
+  // visit_count is 0-based: first visit = 0, 2nd = 1 (lines 304-307).
+  if (count && !visit.firstVisit) txt += `this is your ${ordinal(count + 1)} visit`;
+  return txt;
+}
+
+/** setDetails 313-316: only the first street feature, after "Features: ". */
+export function polFeaturesLine(features = []) {
+  const first = Array.isArray(features) ? features.find((f) => f) : '';
+  return first ? `Features: ${first}` : '';
+}
+
+/**
+ * setNeighbors 383-424: exterior only, the first five neighbours that have a
+ * face; the row shows only when one does.
+ * @param {Array<{ name?: string, faceUrl?: string }>} list
+ */
+export function polNeighbours(type, list = []) {
+  if (type !== 'exterior' || !Array.isArray(list)) return [];
+  return list.slice(0, POL_LAYOUT.maxNeighbours).filter((n) => n?.faceUrl);
+}
+
+/**
+ * Where everything sits (refresh 147-187, setText 202-209, setAvatar 337-347):
+ * the text column at x 290 behind a door (house: x 0, Tower: -105, -10) or at
+ * x 135 on a home street; the owner at -20, 15 by the door or -40, -20 outside.
+ */
+export function polCardLayout(type) {
+  if (!isPolType(type)) return null;
+  const inside = type !== 'exterior';
+  const textX = inside ? POL_LAYOUT.intX : POL_LAYOUT.extX;
+  const owner = inside ? { x: -20, y: 15 } : { x: -40, y: -20 };
+  const door = POL_DOORS[type] || null;
+  return {
+    textX,
+    enterY: inside ? 50 : 0,
+    featuresPad: inside ? 20 : 12,
+    allWidth: textX + POL_LAYOUT.lastHereW,
+    owner,
+    door,
+    artHeight: Math.max(owner.y + POL_OWNER_SIZE.h, door ? door.y + door.h : 0),
+  };
+}
+
+/**
+ * refresh 189-195: the radial fill, a 200 px circle centred 30 px right of
+ * the holder's left edge (the holder is centred), mint inside 90/255 of the
+ * way out, then the darker green. `scale` shrinks it with the holder on a
+ * narrow screen.
+ */
+export function polGradient(layout, scale = 1) {
+  const s = Number(scale) > 0 ? Number(scale) : 1;
+  const half = Math.round(((layout?.allWidth || POL_LAYOUT.extX + POL_LAYOUT.lastHereW) / 2 - 30) * s);
+  const [inner, outer] = POL_LAYOUT.gradColors;
+  const stop = Math.round((POL_LAYOUT.gradSpread[0] / 255) * 1000) / 10;
+  return `radial-gradient(circle ${Math.round(POL_LAYOUT.gradRadius * s)}px at calc(50% - ${half}px) 50%, ${inner} ${stop}%, ${outer} 100%)`;
+}
+
+/** The holder's scale on a screen narrower than the card (16 px gutters); 1 otherwise. */
+export function polCardScale(layout, viewWidth) {
+  const w = Number(viewWidth) || 0;
+  if (!layout || w <= 0) return 1;
+  return Math.min(1, Math.max(0.3, (w - 32) / layout.allWidth));
+}
+
 const CARD_HTML = `
   <div class="st-split" data-st-split hidden></div>
   <div class="st-hubs">
@@ -336,13 +484,146 @@ const CARD_HTML = `
       <div class="st-upgrade" data-st-upgrade hidden></div>
     </div>
   </div>
+  <div class="st-pol" data-st-pol hidden>
+    <div class="st-pol-holder" data-st-pol-holder>
+      <div class="st-pol-art" data-st-pol-art>
+        <img class="st-pol-door" data-st-pol-door alt="" hidden />
+        <img class="st-pol-owner" data-st-pol-owner alt="" hidden />
+      </div>
+      <div class="st-pol-text" data-st-pol-text>
+        <p class="st-pol-entering" data-st-pol-entering>Entering</p>
+        <p class="st-pol-name" data-st-pol-name></p>
+        <p class="st-pol-street" data-st-pol-street></p>
+        <p class="st-pol-last" data-st-pol-last></p>
+        <p class="st-pol-features" data-st-pol-features hidden></p>
+        <div class="st-pol-neighbours" data-st-pol-neighbours hidden><span>Neighbors:</span></div>
+      </div>
+    </div>
+  </div>
   <div class="st-progress" aria-hidden="true"><i data-st-bar></i><span class="st-status" data-st-status></span></div>`;
 
 /** Builds the card once over whatever placeholder markup the page shipped. */
 function ensureLoadingCard(el) {
-  if (el.dataset.stCard === '2' || !el.ownerDocument) return;
+  if (el.dataset.stCard === '3' || !el.ownerDocument) return;
   el.innerHTML = CARD_HTML;
-  el.dataset.stCard = '2';
+  el.dataset.stCard = '3';
+}
+
+/**
+ * G249: show or hide the home card (LoadingLocationView.fadeIn 340-370:
+ * pol_ui.visible = is_house, over the street card and under the bar).
+ * Returns the layout when shown.
+ */
+function showPolCard(el, pol) {
+  const root = el.querySelector('[data-st-pol]');
+  const layout = pol ? polCardLayout(pol.type) : null;
+  const title = pol ? polCardTitle(pol) : null;
+  el.dataset.stPol = layout ? pol.type : '';
+  if (!root) return null;
+  if (!layout || !title) {
+    root.hidden = true;
+    return null;
+  }
+  const q = (sel) => root.querySelector(sel);
+  root.hidden = false;
+  root.style.background = polGradient(layout);
+  const holder = q('[data-st-pol-holder]');
+  if (holder) {
+    holder.style.width = `${layout.allWidth}px`;
+    holder.style.gridTemplateColumns = `${layout.textX}px ${POL_LAYOUT.lastHereW}px`;
+  }
+  const art = q('[data-st-pol-art]');
+  if (art) art.style.minHeight = `${layout.artHeight}px`;
+  const text = q('[data-st-pol-text]');
+  if (text) {
+    text.style.paddingTop = `${layout.enterY}px`;
+    text.style.setProperty('--st-pol-features-pad', `${layout.featuresPad}px`);
+  }
+  const door = q('[data-st-pol-door]');
+  if (door) {
+    door.hidden = !layout.door;
+    if (layout.door) {
+      door.src = layout.door.src;
+      Object.assign(door.style, { left: `${layout.door.x}px`, top: `${layout.door.y}px`, width: `${layout.door.w}px`, height: `${layout.door.h}px` });
+    } else door.removeAttribute('src');
+  }
+  const owner = q('[data-st-pol-owner]');
+  if (owner) {
+    Object.assign(owner.style, { left: `${layout.owner.x}px`, top: `${layout.owner.y}px`, width: `${POL_OWNER_SIZE.w}px`, height: `${POL_OWNER_SIZE.h}px` });
+    owner.hidden = true;
+    owner.removeAttribute('src');
+    // setAvatar / onAvatarLoad 327-367: the picture arrives when it has loaded.
+    const want = (owner.dataset.want = String(Math.random()));
+    Promise.resolve(typeof pol.ownerImg === 'function' ? pol.ownerImg() : pol.ownerImg)
+      .then((url) => {
+        if (!url || owner.dataset.want !== want) return;
+        owner.alt = pol.ownerName || 'You';
+        owner.onload = () => { if (owner.dataset.want === want) owner.hidden = false; };
+        owner.src = url;
+      })
+      .catch(() => {});
+  }
+  const set = (sel, value) => {
+    const node = q(sel);
+    if (node) node.textContent = value;
+  };
+  set('[data-st-pol-entering]', title.entering);
+  set('[data-st-pol-name]', title.name);
+  set('[data-st-pol-street]', title.street);
+  el.dataset.stPolTitle = `${title.entering} / ${title.name} / ${title.street}`;
+  const name = q('[data-st-pol-name]');
+  if (name) name.style.fontSize = '';
+  setPolVisit(el, pol.visit);
+  setPolDetails(el, pol, []);
+  const row = q('[data-st-pol-neighbours]');
+  if (row) {
+    row.querySelectorAll('img').forEach((img) => img.remove());
+    const faces = polNeighbours(pol.type, pol.neighbours);
+    for (const n of faces) {
+      const img = el.ownerDocument.createElement('img');
+      img.className = 'st-pol-face';
+      img.alt = n.name || '';
+      img.src = n.faceUrl;
+      row.append(img);
+    }
+    row.hidden = !faces.length;
+  }
+  return layout;
+}
+
+/**
+ * Needs layout, so after the fade-in starts: refresh 170-175 scales a name
+ * wider than the last-here box down to fit, and a narrow screen scales the
+ * whole holder (and the fill with it).
+ */
+function fitPolCard(el, layout) {
+  const root = el.querySelector('[data-st-pol]:not([hidden])');
+  const view = el.ownerDocument?.defaultView;
+  if (!root || !view) return;
+  const scale = polCardScale(layout, root.clientWidth);
+  root.querySelector('[data-st-pol-holder]')?.style.setProperty('--st-pol-scale', String(scale));
+  root.style.background = polGradient(layout, scale);
+  const name = root.querySelector('[data-st-pol-name]');
+  if (!name) return;
+  const over = name.scrollWidth / POL_LAYOUT.lastHereW;
+  if (over > 1) name.style.fontSize = `${Math.floor(parseFloat(view.getComputedStyle(name).fontSize) / over)}px`;
+}
+
+function setPolVisit(el, visit) {
+  const node = el.querySelector('[data-st-pol-last]');
+  const html = polVisitLine(visit || {});
+  if (node) node.innerHTML = html;
+  el.dataset.stVisit = html.replace(/<[^>]+>/g, '').replace(/&#8212;/g, '—');
+}
+
+function setPolDetails(el, pol, features) {
+  const node = el.querySelector('[data-st-pol-features]');
+  const html = polFeaturesLine(features?.length ? features : pol?.features);
+  if (node) {
+    node.innerHTML = html;
+    node.hidden = !html;
+  }
+  el.dataset.stPolFeatures = html.replace(/<[^>]+>/g, '');
 }
 
 /**
@@ -362,6 +643,10 @@ function ensureLoadingCard(el) {
  *   visitHtml?: string,
  *   details?: () => ({ visitHtml?: string, qurazyHere?: boolean, features?: string[], activeProject?: boolean,
  *     upgradeHtml?: string, upgradeBadge?: boolean }|null|Promise<object|null>),
+ *   pol?: { type: 'interior'|'exterior'|'tower', ownerName?: string, customName?: string,
+ *     visit?: { firstVisit?: boolean, visitCount?: number, lastVisitMins?: number },
+ *     features?: string[], neighbours?: Array<{ name?: string, faceUrl?: string }>,
+ *     ownerImg?: string|null|Promise<string|null>|(() => Promise<string|null>) }|null,
  *   holdMs?: number,
  *   onMid?: () => Promise<void>|void,
  * }} opts
@@ -456,6 +741,8 @@ async function streetTransition(el, opts) {
   }
   if (badge) badge.hidden = true;
   el.dataset.stHomeTo = '';
+  // G249: a home (location.js getLoadingInfo pol_type) gets the owner's card instead.
+  const polLayout = showPolCard(el, opts.pol);
   if (snapWrap && snap) {
     // refresh() always drew the rounded 0x666666 picture box with the street's
     // picture over it, and set "Entering" 42 px above the box's foot. Most
@@ -494,14 +781,19 @@ async function streetTransition(el, opts) {
   el.style.pointerEvents = 'auto';
   el.setAttribute('aria-busy', 'true');
 
-  await crossfadeElement(el, { show: true, durationSec: LOAD_FADE_IN });
+  const fading = crossfadeElement(el, { show: true, durationSec: LOAD_FADE_IN });
+  if (polLayout) fitPolCard(el, polLayout);
+  await fading;
 
   try {
     setStatus(LOAD_STATUS.preparing);
     if (opts.onMid) await opts.onMid();
     // What the street turned out to hold (location.js getLoadingInfo street_details).
     const info = opts.details ? await opts.details() : null;
-    if (info) {
+    if (info && polLayout) {
+      // LoadingLocationPOLView.setDetails: the box keeps its own words; Features: is the first street feature.
+      setPolDetails(el, opts.pol, Array.isArray(info.features) ? info.features : []);
+    } else if (info) {
       if (info.visitHtml != null || info.qurazyHere) setVisit(info.visitHtml ?? opts.visitHtml, Boolean(info.qurazyHere));
       const features = Array.isArray(info.features) ? info.features : [];
       if (home && (features.length || info.activeProject)) {

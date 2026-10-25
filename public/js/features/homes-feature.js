@@ -141,7 +141,7 @@ import {
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { projectApi } from './street-jobs-feature.js?v=g259-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-2';
-import { towerApi } from './home-tower-feature.js?v=home-tower-8';
+import { towerApi } from './home-tower-feature.js?v=home-tower-9';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-6';
@@ -182,6 +182,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=g232-1';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g208-1';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
 
 export const HOMES_FEATURE_ID = 'homes';
@@ -1302,9 +1303,10 @@ function runRockVerb(target, verbId, engine) {
 // ---------------------------------------------------------------------------
 
 /**
- * The house on the lot: the look bought with the deed (js/homes.js
- * HOME_STYLES). A street style change keeps it, as the source keeps the
- * furniture_chassis item through homes_rebuild_exterior.
+ * The house on the lot: the look picked with the Home Street Ticket at the
+ * Selection Machine (js/home-ticket.js, js/homes.js HOME_STYLES). A street
+ * style change keeps it, as the source keeps the furniture_chassis item
+ * through homes_rebuild_exterior.
  */
 const HOUSES = {
   meadow: { path: 'door_asset_house_large_01', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
@@ -4103,6 +4105,11 @@ export const homesFeature = {
 
   /** Pack furniture: place it straight from the pack while inside the house. */
   packVerbs(classTsid, engine) {
+    // G264: homestreet_ticket.js 29-42, the ticket's "use" is always disabled in the pack.
+    if (classTsid === HOME_TICKET_CLASS) {
+      if (countItem(engine.inv, HOME_TICKET_CLASS) < 1) return [];
+      return [{ id: 'use', label: 'Use', enabled: false, reason: HOME_TICKET.useReason }];
+    }
     // items/wine_of_the_dead.js verbs.pour (sort_on 54).
     if (classTsid === WOTD) {
       if (countItem(engine.inv, WOTD) < 1) return [];

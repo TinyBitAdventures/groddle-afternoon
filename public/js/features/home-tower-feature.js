@@ -467,7 +467,8 @@ async function goToFloor(engine, floor, via = 'elevator') {
   closePanel();
   // location.js:170-174: entering your own Tower (the door or /tower) counts
   // butler_hint_counters visited_my_tower; the elevator moves inside it.
-  if (tower.floor == null) {
+  const entering = tower.floor == null;
+  if (entering) {
     tower.visits = (tower.visits || 0) + 1;
     engine.setData?.('towerVisits', String(tower.visits));
   }
@@ -475,7 +476,9 @@ async function goToFloor(engine, floor, via = 'elevator') {
   floorArrival = via;
   engine.save();
   engine.playSound?.('DOOR_OPEN', { volume: 0.4 });
-  await engine.enter(HOME_INTERIOR_TSID, {});
+  // G249: coming in from outside loads the Tower (pol_type tower, a named
+  // Tower's custom_name: location.js 3395-3398) behind the home card.
+  await engine.enter(HOME_INTERIOR_TSID, entering ? { pol: { type: 'tower', customName: tower.name || '', knownVisits: tower.visits - 1 } } : {});
   return true;
 }
 
@@ -487,7 +490,7 @@ async function leaveTower(engine) {
   // FancyDoor: the door (and the spot you step out to) mirrors about the foot with the Tower.
   arrivalX = Number.isFinite(x) ? x + towerFacingX(TOWER_DOOR_DX, tower.facingRight) : null;
   engine.save();
-  await engine.enter(HOME_STREET_TSID, {});
+  await engine.enter(HOME_STREET_TSID, { pol: { type: 'exterior' } });
   return true;
 }
 

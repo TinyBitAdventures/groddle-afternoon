@@ -40,7 +40,7 @@ import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { canUseTool, useToolCondition } from '../tools.js?v=tools-5';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
-import { runStreetTransition } from '../screen-fx.js?v=card-1';
+import { runStreetTransition } from '../screen-fx.js?v=card-2';
 import {
   BOARD_ART,
   BOARD_CAPACITY,
@@ -111,11 +111,11 @@ import {
   postNoteVerb,
   recordVisit,
   visitorLetter,
-} from '../neighbours.js?v=neighbours-1';
-import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-1';
+} from '../neighbours.js?v=neighbours-2';
+import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-2';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from './butler-feature.js?v=butler-feature-12';
+import { butlerApi } from './butler-feature.js?v=butler-feature-13';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';

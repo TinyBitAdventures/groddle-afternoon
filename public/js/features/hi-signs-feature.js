@@ -50,7 +50,7 @@
  *   hiRecordsHeld, hiBest, hiAutoplay.
  */
 
-import { butlerApi } from './butler-feature.js?v=butler-feature-12';
+import { butlerApi } from './butler-feature.js?v=butler-feature-13';
 import { moodMax } from '../metabolics.js';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 import {

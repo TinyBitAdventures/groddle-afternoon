@@ -25,9 +25,11 @@
  * Remake mapping: Home is the Home panel's travel (game.js teleportHome /
  * switchHomeRoom / returnFromHome, exposed as engine.homeTravel); the Tower is
  * features/home-tower-feature.js towerApi; the Butler is
- * features/butler-feature.js butlerApi. The remake's home is a deed you buy,
- * so /home and /house without one open the Home panel (teleportHome's own
- * answer) where the source would have built one.
+ * features/butler-feature.js butlerApi. The source built a home on the spot
+ * (inc_houses.js houses_go_to_new_house 807-914); the remake's home comes from
+ * the free Home Street Ticket (js/home-ticket.js), so /home and /house without
+ * one open the Home panel (teleportHome's own answer), where the Magic Rock
+ * hands over the ticket and the Selection Machine takes it.
  */
 
 /** main.js doChatCommand, inc_houses.js and location.js lines, verbatim. */

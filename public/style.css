@@ -5180,6 +5180,63 @@ header.top-bar + .sub { display: none; }
   font-weight: 700;
   color: #4a4a4a;
 }
+/* G249: the home card (LoadingLocationPOLView) over the street card, under
+   the bar. Sizes and offsets are the client's (screen-fx.js polCardLayout);
+   the radial fill is set inline. The text colours are ours: the client's
+   loading_location_pol_* styles came from a stylesheet that does not survive. */
+.st-pol {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  color: #2f5446;
+  font-family: "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
+}
+.st-pol[hidden] { display: none !important; }
+.st-pol-holder {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  align-items: start;
+  transform: translate(-50%, -50%) scale(var(--st-pol-scale, 1));
+}
+.st-pol-art { position: relative; }
+.st-pol-door,
+.st-pol-owner { position: absolute; display: block; max-width: none; pointer-events: none; }
+.st-pol-door[hidden],
+.st-pol-owner[hidden],
+.st-pol-features[hidden],
+.st-pol-neighbours[hidden] { display: none !important; }
+.st-pol-text p { margin: 0; }
+.st-pol-entering,
+.st-pol-street { font-size: 1.35rem; font-weight: 700; opacity: 0.8; line-height: 1.1; }
+.st-pol-name {
+  margin: -0.1rem 0 -0.05rem 2px !important;
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1.05;
+  color: #23443a;
+  white-space: nowrap;
+}
+.st-pol-street { margin-bottom: 4px !important; }
+.st-pol-last {
+  min-height: 28px;
+  margin-left: 3px !important;
+  padding: 5px 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  background: rgba(118, 158, 143, 0.7);
+  box-shadow: 0 1px 0 #fff, inset 0 3px 3px rgba(0, 0, 0, 0.18);
+  font-size: 0.8rem;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+.st-pol-features { margin-top: var(--st-pol-features-pad, 12px) !important; font-size: 0.85rem; }
+.st-pol-neighbours { display: flex; align-items: center; gap: 11px; margin-top: 10px; opacity: 1; }
+.st-pol-neighbours > span { font-size: 0.85rem; opacity: 0.7; }
+.st-pol-face { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: rgba(255, 255, 255, 0.7); }
 @media (max-width: 640px) {
   .screen-transition-inner.st-card { width: calc(100% - 32px); }
   .st-hubs, .st-progress { left: 16px; right: 16px; }

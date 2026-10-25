@@ -86,7 +86,7 @@ import {
   renderRaceCourse,
 } from '../race-render.js?v=races-5';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
-import { runStreetTransition } from '../screen-fx.js?v=card-1';
+import { runStreetTransition } from '../screen-fx.js?v=card-2';
 import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
 import { startCrowns } from './crowns-feature.js?v=g259-1';
 import { textureFromUrl } from '../textures.js';
