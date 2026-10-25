@@ -119,6 +119,37 @@ export function resetQuoinDay(state, upgrades = []) {
 }
 
 /**
+ * Credit an iMG, mood, energy or currants amount to the player and return
+ * what landed: the shared reward path for a grabbed quoin and a quoin shard
+ * (items/quoin.js 162-174 and 184-187 call the same stats_add_xp,
+ * metabolics_add_mood / _energy and stats_add_currants).
+ */
+export function creditQuoinStat(pc, typeId, rawAmount) {
+  const amount = Math.max(0, Math.round(finite(rawAmount, 0)));
+  if (typeId === 'xp' || typeId === 'qurazy') {
+    pc.imagination = Math.max(0, Math.floor(finite(pc.imagination, 0)));
+    pc.xp = Math.max(0, Math.floor(finite(pc.xp, 0)));
+    // items/quoin.js 164, 184, 209: stats_add_xp(amount[, false]) takes the mood bonus.
+    const actual = grantMoodXp(pc, amount);
+    return actual;
+  }
+  if (typeId === 'energy' || typeId === 'mood') {
+    // metabolics_add_energy / _mood cap at the tank, never lowering a tank above 100.
+    const top = typeId === 'mood' ? moodMax(pc) : energyMax(pc);
+    const before = clamp(finite(pc[typeId], 0), 0, top);
+    pc[typeId] = clamp(before + amount, 0, top);
+    // GSJS stats are whole numbers; ours drift by fractions, so report the
+    // change in the whole numbers the HUD shows.
+    return Math.floor(pc[typeId]) - Math.floor(before);
+  }
+  if (typeId === 'currants') {
+    pc.currants = Math.max(0, Math.floor(finite(pc.currants, 0))) + amount;
+    return amount;
+  }
+  return 0;
+}
+
+/**
  * Apply one quoin. Qurazy quoins bypass the daily limit, matching GSJS.
  * Time quoins accelerate an active skill study through opts.accelerateStudy,
  * matching GameServerJS `skills_start_acceleration`.
@@ -142,21 +173,9 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
   let actual = amount;
   let acceleration = null;
 
-  if (resolvedType === 'xp' || resolvedType === 'qurazy') {
-    pc.imagination = Math.max(0, Math.floor(finite(pc.imagination, 0)));
-    pc.xp = Math.max(0, Math.floor(finite(pc.xp, 0)));
-    // items/quoin.js 184, 209: stats_add_xp(amount, false) takes the mood bonus.
-    actual = grantMoodXp(pc, amount);
-  } else if (resolvedType === 'energy' || resolvedType === 'mood') {
-    // metabolics_add_energy / _mood cap at the tank, never lowering a tank above 100.
-    const top = resolvedType === 'mood' ? moodMax(pc) : energyMax(pc);
-    const before = clamp(finite(pc[resolvedType], 0), 0, top);
-    pc[resolvedType] = clamp(before + amount, 0, top);
-    // GSJS stats are whole numbers; ours drift by fractions, so report the
-    // change in the whole numbers the HUD shows.
-    actual = Math.floor(pc[resolvedType]) - Math.floor(before);
-  } else if (resolvedType === 'currants') {
-    pc.currants = Math.max(0, Math.floor(finite(pc.currants, 0))) + amount;
+  if (resolvedType === 'xp' || resolvedType === 'qurazy' || resolvedType === 'energy'
+    || resolvedType === 'mood' || resolvedType === 'currants') {
+    actual = creditQuoinStat(pc, resolvedType, amount);
   } else if (resolvedType === 'favor') {
     const giantId = String(opts.giantId || 'all').toLowerCase();
     const favor = opts.favor && typeof opts.favor === 'object' ? opts.favor : {};
@@ -186,6 +205,8 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     reason: 'collected',
     typeId: originalType,
     resolvedTypeId: resolvedType,
+    // The benefit before the multiplier: what items/quoin.js 169 hands distributeQuoinShards.
+    baseAmount,
     amount,
     actual,
     multiplier,

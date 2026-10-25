@@ -87,7 +87,7 @@ import { runStreetTransition } from '../screen-fx.js';
 import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
 import { startCrowns } from './crowns-feature.js?v=g148-1';
 import { textureFromUrl } from '../textures.js';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g148-1';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g212-1';
 import { moodMax } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
 
@@ -886,16 +886,27 @@ function quoinTick(engine, now) {
     const result = grabRaceQuoin(run, touched ? 'you' : 'rival', now);
     if (!result.ok) continue;
     const amount = quoinGrabMood(engine.quoinState?.multiplier);
+    // G212: the quoin_grab game runs the same onPlayerCollision, so a grab
+    // within 300 px shards the other racer (items/quoin.js 83-154, 169).
+    const rivalAt = rivalSprite && !rivalSprite.destroyed ? { name: run.rivalName, x: rivalSprite.x, y: rivalSprite.y } : null;
+    const share = engine.query('quoinShards', {
+      grabber: touched ? 'player' : run.rivalName,
+      typeId: 'mood',
+      baseAmount: quoinGrabMood(1),
+      quoin: { x: q.x, y: q.y },
+      at: touched ? { x: player.x, y: player.y } : rivalAt || { x: q.x, y: q.y },
+      others: touched && rivalAt ? [rivalAt] : [],
+    }, engine);
     if (touched) {
       // Game quoins pay their benefit but skip the daily quoin limit.
       const pc = engine.pc;
       pc.mood = Math.max(0, Math.min(moodMax(pc), (pc.mood || 0) + amount));
       engine.floatText(q.x, q.y - 24, `+${amount} mood`, 0xb5e35b);
-      engine.playSound('QUOIN_GOT', { volume: 0.6, jitter: 0.04 });
+      engine.playSound(share?.sound || 'QUOIN_GOT', { volume: 0.6, jitter: 0.04 });
       engine.updateHud();
     } else {
       engine.floatText(q.x, q.y - 24, `+${amount} mood`, 0xd9c8ff);
-      engine.playSound('QUOIN_GOT', { volume: 0.22, jitter: 0.04 });
+      if (!(share?.playerShard?.actual > 0)) engine.playSound('QUOIN_GOT', { volume: 0.22, jitter: 0.04 });
     }
     engine.setData('raceLastGrab', `${result.who}:${q.index}`);
     if (result.winner) {

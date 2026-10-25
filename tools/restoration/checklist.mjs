@@ -152,8 +152,8 @@ export const CHECKLIST = Object.freeze([
 
   // —— Giants & economy ——
   { id: 'quoins', group: 'economy', name: 'Quoins', status: 'source', spot: 'quoin',
-    blurb: 'All eight quoin types, daily limits, multipliers and Qurazy quoins.',
-    evidence: ['public/js/quoins.js'] },
+    blurb: 'All eight quoin types, daily limits, multipliers and Qurazy quoins. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you.',
+    evidence: ['public/js/quoins.js', 'public/js/quoin-shards.js', 'public/js/features/quoin-shards-feature.js'] },
   { id: 'shrines', group: 'economy', name: 'Giants and shrines', status: 'source', spot: 'shrine',
     blurb: 'Donate at the eleven Giants’ shrines for favor; a waiting emblem is handed over as you walk past, and the third shrine you pass says hello. Spend favor, or a spare emblem, to learn the skill you are studying faster.',
     evidence: ['public/js/shrines.js'] },

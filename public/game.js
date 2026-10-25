@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-75';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-76';
 import {
   actionDurationFor,
   createTimedAction,
@@ -421,7 +421,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=g178-1';
+} from './js/player-save.js?v=g212-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_PURCHASE_COST,
@@ -760,7 +760,7 @@ import {
   planStreetQuoins,
   collectQuoin,
   resetQuoinDay,
-} from './js/quoins.js?v=g148-1';
+} from './js/quoins.js?v=g212-1';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -6399,7 +6399,7 @@ function localCompanionsEnabled() {
     try { localStorage.setItem(COMPANIONS_STORAGE_KEY, requested); } catch { /* storage unavailable */ }
     return requested === '1';
   }
-  if (params.has('companiondemo') || params.has('followdemo') || params.has('beardemo')) return true;
+  if (params.has('companiondemo') || params.has('followdemo') || params.has('beardemo') || params.has('quoinshard')) return true;
   try {
     return localStorage.getItem(COMPANIONS_STORAGE_KEY) === '1';
   } catch {
@@ -7495,6 +7495,27 @@ const engine = {
   /** Live quoin economy state (multiplier, daily limit) for imagination upgrades. */
   get quoinState() {
     return quoinState;
+  },
+  /** G212 quoin shards (features/quoin-shards-feature.js): the live street quoins and companions, read only. */
+  get quoins() {
+    return quoins;
+  },
+  get localCompanions() {
+    return localCompanions;
+  },
+  get playerFollowing() {
+    return companionFollowState.active === true;
+  },
+  get playerAfk() {
+    return afkState.afk === true;
+  },
+  /** Another Glitch took this quoin: gone for now, not saved as yours, so it is back next visit. */
+  takeQuoin(q) {
+    const index = quoins.indexOf(q);
+    if (index < 0) return false;
+    quoins.splice(index, 1);
+    entityLayer?.removeChild(q);
+    return true;
   },
   get unlockedAchievements() {
     return achieveState.unlocked || [];
@@ -9656,7 +9677,15 @@ function physics(dt) {
         // QA (G148): base amount > what landed after the mood bonus.
         app.canvas.dataset.quoinLast = `${result.typeId}:${result.amount}>${result.actual}`;
         app.canvas.dataset.moodXpMultiplier = String(moodXpMultiplierFor(pc));
-        playSound(soundForQuoin(result.typeId), {
+        // G212: Glitches within 300 px get shards; you hear QUOIN_SHARD_<n> (items/quoin.js 169, 266-271).
+        const quoinShare = features.query('quoinShards', {
+          grabber: 'player',
+          typeId: result.typeId,
+          baseAmount: result.baseAmount,
+          quoin: { x: q.x, y: q.y },
+          at: { x: player.x, y: player.y },
+        }, engine);
+        playSound(quoinShare?.sound || soundForQuoin(result.typeId), {
           volume: result.typeId === 'qurazy' ? 0.82 : 0.6,
           rate: result.typeId === 'qurazy' ? 1.2 : 1,
           jitter: result.typeId === 'qurazy' ? 0 : 0.03,
