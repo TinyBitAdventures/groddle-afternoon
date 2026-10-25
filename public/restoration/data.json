@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 460,
+  "commits": 461,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Tiny Speck's own lasers, rainbows and puffs replace the hand-drawn ones, the Qurazy banner plays, and the fireworks load a tenth as heavy"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "A back yard behind your house to cultivate, expand and restyle"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The Scion's quotes keep Tiny Speck's own em-dashes"
    }
   ]
  },
- "tests": 271,
+ "tests": 272,
  "generatedAt": "2026-10-25"
 }

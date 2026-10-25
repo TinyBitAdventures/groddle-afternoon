@@ -915,9 +915,11 @@ const SHEETS = {
     url: 'assets/sprites/npc_chicken__x1_walk_png_1354830385.png',
     fw: 148, fh: 110, cols: 6, rows: 4,
   },
+  // Sheets whose last cells are blank play only their real frames (Austin, 2026-10-25: the ticket's
+  // Spinning Wheel blinked out each turn). tests/sheet-blank-cells.test.js checks every sheet here.
   chickenPeck: {
     url: 'assets/sprites/npc_chicken__x1_pecking_once_png_1354830398.png',
-    fw: 148, fh: 110, cols: 6, rows: 6,
+    fw: 148, fh: 110, cols: 6, rows: 6, frameCount: 32,
   },
   butterfly: {
     url: 'assets/sprites/npc_butterfly__x1_fly-side_png_1354829525.png',
@@ -992,7 +994,7 @@ const SHEETS = {
   },
   hatchetTool: {
     url: 'assets/sprites/tools/hatchet-tool.png',
-    fw: 110, fh: 64, cols: 8, rows: 5,
+    fw: 110, fh: 64, cols: 8, rows: 5, frameCount: 38,
   },
   // OGA class_axe__x1_tool_animation (888×325): 38 cells of 111×65.
   classAxeTool: {
@@ -1013,7 +1015,7 @@ const SHEETS = {
   },
   wheelGreenSpin: {
     url: 'assets/sprites/spinning-wheel/green-spin.png',
-    fw: 514, fh: 450, cols: 7, rows: 8, frameCount: 56,
+    fw: 514, fh: 450, cols: 7, rows: 8, frameCount: 53,
   },
   wheelGreenEnd: {
     url: 'assets/sprites/spinning-wheel/green-end.png',
@@ -1021,7 +1023,7 @@ const SHEETS = {
   },
   wheelWhiteSpin: {
     url: 'assets/sprites/spinning-wheel/white-spin.png',
-    fw: 514, fh: 450, cols: 7, rows: 8, frameCount: 56,
+    fw: 514, fh: 450, cols: 7, rows: 8, frameCount: 53,
   },
   wheelWhiteEnd: {
     url: 'assets/sprites/spinning-wheel/white-end.png',
@@ -1029,7 +1031,7 @@ const SHEETS = {
   },
   wheelRedSpin: {
     url: 'assets/sprites/spinning-wheel/red-spin.png',
-    fw: 514, fh: 450, cols: 7, rows: 8, frameCount: 56,
+    fw: 514, fh: 450, cols: 7, rows: 8, frameCount: 53,
   },
   wheelRedEnd: {
     url: 'assets/sprites/spinning-wheel/red-end.png',
