@@ -18,7 +18,7 @@ import {
   ensureItem,
   itemIcon,
   ITEM_CATALOG,
-} from './inventory.js?v=catalog-unified-4';
+} from './inventory.js?v=catalog-unified-5';
 import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-5';
 import { skillPackageDetails } from './skill-packages.js';
 import { grantMoodXp } from './mood-xp.js';

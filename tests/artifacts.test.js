@@ -33,7 +33,7 @@ import {
 import { artifactsFeature, finishCrack } from '../public/js/features/artifacts-feature.js';
 import { FEATURES } from '../public/js/features/index.js';
 import { DROP_ITEMS, DROP_TABLES, rollDropTable } from '../public/js/drop-tables.js';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-4';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-5';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-5';
 import { HIRES_ICONS } from '../public/js/icon-hires.js';
 

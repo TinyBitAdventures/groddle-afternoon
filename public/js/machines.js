@@ -21,7 +21,7 @@
  * (capacity 200, not repairable, refuelled here).
  */
 
-import { addItem, countItem, removeItem } from './inventory.js?v=catalog-unified-4';
+import { addItem, countItem, removeItem } from './inventory.js?v=catalog-unified-5';
 import { ensureToolCondition, getToolCondition } from './tools.js';
 import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js';
 

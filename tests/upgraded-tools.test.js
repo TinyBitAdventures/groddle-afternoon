@@ -26,7 +26,7 @@ import {
   recipeToolFor,
   recipeToolInUse,
 } from '../public/js/making.js';
-import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=catalog-unified-4';
+import { ITEM_CATALOG, countItem, createInventory, isToolItem } from '../public/js/inventory.js?v=catalog-unified-5';
 import {
   GRINDER_TOOLS,
   HOE_TOOLS,

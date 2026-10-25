@@ -34,7 +34,7 @@
  *   (rolled with the shared js/drop-tables.js runDropTable).
  */
 
-import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-4';
+import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-5';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
 import { moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';

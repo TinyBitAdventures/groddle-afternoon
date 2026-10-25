@@ -32,7 +32,7 @@ import {
   getAchievementProgress,
   seedAchievementNearCompletion,
 } from '../public/js/achievements.js?v=badge-events-1';
-import { createShrineState, donateToShrine, quoteShrineDonation } from '../public/js/shrines.js?v=shrine-powders-1';
+import { createShrineState, donateToShrine, quoteShrineDonation } from '../public/js/shrines.js?v=spinning-wheel-test-2';
 import { applyBuff, createBuffState, tickBuffs } from '../public/js/buffs.js?v=item-buffs-6';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 

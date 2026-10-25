@@ -38,7 +38,7 @@
  * hellTicketWine, hellTicketVisits.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { acceptOffer, declineOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { parseQuestConversation } from '../quests.js';
@@ -60,8 +60,8 @@ import {
   recognitionBranch,
   ticketDue,
 } from '../hell-tickets.js';
-import { hellFeature } from './hell-feature.js?v=hell-8';
-import { doorsFeature } from './doors-feature.js?v=doors-2';
+import { hellFeature } from './hell-feature.js?v=hell-9';
+import { doorsFeature } from './doors-feature.js?v=doors-3';
 
 export const HELL_TICKETS_FEATURE_ID = 'hell-tickets';
 

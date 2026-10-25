@@ -71,7 +71,7 @@
  *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-4';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-5';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,
@@ -139,13 +139,13 @@ import {
   towerItem,
 } from '../home-cultivation.js?v=home-cultivation-3';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
-import { projectApi } from './street-jobs-feature.js?v=g221-1';
+import { projectApi } from './street-jobs-feature.js?v=g259-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-2';
-import { towerApi } from './home-tower-feature.js?v=home-tower-7';
+import { towerApi } from './home-tower-feature.js?v=home-tower-8';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-5';
-import { patchesFeature } from './patches-feature.js?v=patches-7';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-6';
+import { patchesFeature } from './patches-feature.js?v=patches-8';
 import { plotLabel } from '../patches.js';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';

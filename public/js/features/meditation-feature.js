@@ -29,7 +29,7 @@
  * meditationZen, meditationTotalSeconds, meditationLevitating.
  */
 
-import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-4';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-5';
 import { GAME_DAY_MS, getGameDayKey, getGameDayStartMs } from '../game-day.js?v=dametime-1';
 import {
   STATION_COUNTER,

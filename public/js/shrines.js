@@ -18,11 +18,11 @@ import {
   ensureItem,
   isToolItem,
   removeItem,
-} from './inventory.js?v=catalog-unified-4';
+} from './inventory.js?v=catalog-unified-5';
 import {
   GAMESHOW_TICKET_ID,
   gameshowTicketChance,
-} from './spinning-wheel.js?v=spinning-wheel-1';
+} from './spinning-wheel.js?v=spinning-wheel-2';
 import { moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { getSkillCatalog } from './content-catalogs.js';

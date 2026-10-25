@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-4';
+import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-5';
 import { createToolConditionState, getToolCondition } from '../public/js/tools.js';
 import {
   MACHINE_ASSEMBLIES,

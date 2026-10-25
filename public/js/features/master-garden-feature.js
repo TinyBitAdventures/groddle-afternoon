@@ -21,7 +21,7 @@
  *     mgPlots, mgAutoplay, mgDrop.
  */
 
-import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=catalog-unified-4';
+import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=catalog-unified-5';
 import { SEED_CATALOG, listPlantableSeeds } from '../garden.js';
 import {
   GARDEN_POTIONS,
@@ -36,7 +36,7 @@ import {
   usePotion,
 } from '../master-garden.js';
 import { rollDropTable } from '../drop-tables.js';
-import { payDrop } from './drops-feature.js?v=drops-1';
+import { payDrop } from './drops-feature.js?v=drops-2';
 import { textureFromUrl } from '../textures.js';
 
 export const MASTER_GARDEN_FEATURE_ID = 'master-garden';

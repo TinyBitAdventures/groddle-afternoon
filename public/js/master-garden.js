@@ -34,7 +34,7 @@
 import { SEED_CATALOG, stageElapsedMs, wetPlot } from './garden.js';
 import { gardenGrowModifier } from './imagination-effects.js';
 import { skillPackageDetails } from './skill-packages.js';
-import { moodMax } from './metabolics.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 export const MASTER_GARDENER = 'mastergardener_1';
@@ -211,7 +211,9 @@ export function potionTendGarden(garden, action, inv, pc, ctx = {}) {
     energy += cost;
     // master_garden.js runs the package once per plot: its mood first, then
     // its xp_bonus, which inc_skill_packages.js 532 scales by the mood so far.
-    const plotMood = Number(details.mood_bonus) || 0;
+    // G259: the package's mood_bonus is metabolics_add_mood (inc_skill_packages.js 524), refused while dead.
+    const rawMood = Number(details.mood_bonus) || 0;
+    const plotMood = rawMood > 0 && !metabolicGain('mood').ok ? 0 : rawMood;
     mood += plotMood;
     pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + plotMood);
     xp += grantMoodXp(pc, Number(details.xp_bonus) || 0);

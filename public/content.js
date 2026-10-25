@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=g183-1';
+} from './js/trant-care.js?v=trant-care-test-2';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -28,7 +28,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=g183-4';
+} from './js/garden.js?v=g259-1';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -38,22 +38,22 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=g179-1';
+} from './js/mining.js?v=g259-1';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,
   listAnimalFeedOptions,
   feedAnimal,
-} from './js/animals.js?v=g148-1';
+} from './js/animals.js?v=g259-1';
 import {
   quoteAnimalKinship,
   performAnimalKinship,
-} from './js/animal-kinship.js?v=g148-1';
+} from './js/animal-kinship.js?v=g259-1';
 import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=g148-1';
+} from './js/musicblocks.js?v=g259-1';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-2';
 import {
   ensureWoodTreeState,
@@ -73,7 +73,7 @@ import {
   startIncubation,
 } from './js/animal-husbandry.js';
 import { moodMax } from './js/metabolics.js';
-import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-4';
+import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-5';
 
 /** Naming / capture context for an animal target (the back yard counts as yours). */
 function husbandryCtx(ctx) {

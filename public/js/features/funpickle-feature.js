@@ -33,7 +33,7 @@
  * funpicklePowers, funpickleAward, funpickleSneezes, funpickleOverlay.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { ITEM_BASE_COSTS } from '../store-catalog.js';
 import { moodMax } from '../metabolics.js';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';

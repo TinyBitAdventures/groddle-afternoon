@@ -37,7 +37,7 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { canUseTool, useToolCondition } from '../tools.js?v=tools-5';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { runStreetTransition } from '../screen-fx.js?v=card-1';
@@ -115,7 +115,7 @@ import {
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-1';
 import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
-import { butlerApi } from './butler-feature.js?v=butler-feature-11';
+import { butlerApi } from './butler-feature.js?v=butler-feature-12';
 
 export const FURNITURE_FEATURE_ID = 'street-furniture';
 const PLAYER_ID = 'player';

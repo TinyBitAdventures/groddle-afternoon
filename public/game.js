@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-2';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-97';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-98';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -402,13 +402,13 @@ import {
   ensureItem,
   addItem,
   removeItem,
-} from './js/inventory.js?v=catalog-unified-4';
+} from './js/inventory.js?v=catalog-unified-5';
 import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=g148-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g148-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=g259-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g259-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -417,13 +417,13 @@ import {
   normalizeStackQuantity,
   dropInventoryStack,
   pickupDroppedStack,
-} from './js/world-items.js?v=catalog-unified-2';
+} from './js/world-items.js?v=world-items-2';
 import {
   createPlayerSave,
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-9';
+} from './js/player-save.js?v=player-save-10';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -435,7 +435,7 @@ import {
   leaveHomeInterior,
   imagineHome,
 } from './js/homes.js?v=homes-mail-3';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g208-1';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g259-1';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -490,7 +490,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=g215-1';
+} from './js/making.js?v=g259-1';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g188-1';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g193-1';
 import {
@@ -517,7 +517,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=g183-2';
+} from './js/garden.js?v=g259-1';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -529,7 +529,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=g179-1';
+} from './js/mining.js?v=g259-1';
 import {
   createActivityLog,
   appendActivity,
@@ -590,7 +590,7 @@ import {
   canEatFood,
   recordFoodEat,
   resetFoodDay,
-} from './js/food.js?v=food-memory-2';
+} from './js/food.js?v=food-memory-3';
 import {
   TRIPLE_JUMP_UPGRADES,
   createJumpState,
@@ -682,7 +682,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=g148-1';
+} from './js/musicblocks.js?v=g259-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -693,12 +693,12 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=g148-1';
+} from './js/vendor.js?v=vendor-profiles-2';
 import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=g148-1';
+} from './js/animals.js?v=g259-1';
 import {
   ensureWoodTreeState,
   pickWoodTool,
@@ -727,7 +727,7 @@ import {
   favorRelationNote,
   emblemRelationNote,
   formatSpeedUpTime,
-} from './js/shrines.js?v=shrine-powders-1';
+} from './js/shrines.js?v=spinning-wheel-test-2';
 import { shrinePowderOptions, shrinePowderAchievementCounters } from './js/powders.js?v=powders-1';
 import {
   GAMESHOW_TICKET_ID,
@@ -738,7 +738,7 @@ import {
   spinMeResponse,
   spinningWheelPhase,
   startSpinningWheel,
-} from './js/spinning-wheel.js?v=catalog-unified-2';
+} from './js/spinning-wheel.js?v=spinning-wheel-2';
 import {
   CUBIMAL_PACKAGE_IDS,
   cubimalCollectionProgress,
@@ -747,7 +747,7 @@ import {
   ensureCubimalItems,
   openCubimalPackage,
   setCubimalFree,
-} from './js/cubimals.js?v=cubimals-2';
+} from './js/cubimals.js?v=cubimals-3';
 import {
   STOOT_DOLL_BUBBLE_MS,
   STOOT_DOLL_ID,

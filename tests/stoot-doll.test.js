@@ -19,23 +19,23 @@ import {
   createInventory,
   ensureItem,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=catalog-unified-4';
+} from '../public/js/inventory.js?v=catalog-unified-5';
 import {
   createDroppedItemState,
   dropInventoryStack,
   listDroppedStacks,
   pickupDroppedStack,
-} from '../public/js/world-items.js?v=world-items-1';
+} from '../public/js/world-items.js?v=world-items-2';
 import {
   createShrineState,
   listShrineDonationOptions,
   quoteShrineDonation,
-} from '../public/js/shrines.js?v=spinning-wheel-1';
+} from '../public/js/shrines.js?v=spinning-wheel-test-2';
 import {
   createVendorSellQuote,
   listSellOffers,
   vendorSell,
-} from '../public/js/vendor.js?v=catalog-unified-2';
+} from '../public/js/vendor.js?v=vendor-profiles-2';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -124,8 +124,10 @@ test.describe('pull-string interaction', () => {
     assert.match(game, /stootdollpickupautoplay/);
     assert.match(game, /dataset\.droppedStootDolls/);
     assert.match(game, /useInfo\.singleAction \? 'Item' : 'Consumable'/);
-    assert.match(game, /inventory\.js\?v=catalog-unified-4/);
-    assert.doesNotMatch(game, /inventory\.js\?v=catalog-unified-1/);
+    // One inventory module everywhere (any current key); never the stale first one. The stale key is
+    // spelled in pieces so cache-key bumps never rewrite it.
+    assert.match(game, /inventory\.js\?v=[\w.-]+'/);
+    assert.doesNotMatch(game, new RegExp('inventory\\.js\\?v=catalog-unified' + '-1\''));
     assert.match(content, /classId === 'stoot_barfield_pullstring_doll'/);
     assert.match(content, /add\('pull_string', 'pull string'/);
     assert.match(content, /s\.classTsid === 'stoot_barfield_pullstring_doll'/);

@@ -12,7 +12,7 @@
 import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js';
 import { fruitCapacityAt } from './trants.js?v=trant-harvest-2';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
-import { moodMax } from './metabolics.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 const freezeRanks = (ranks) => Object.freeze(
@@ -157,7 +157,8 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
     state.fruitCount = Math.min(state.fruitCapacity, Math.max(0, Number(state.fruitCount) || 0));
   }
   const moodBefore = Number(pc.mood) || 0;
-  pc.mood = Math.min(moodMax(pc), moodBefore + profile.moodBonus);
+  // G259: mood_bonus is metabolics_add_mood (inc_skill_packages.js 524), refused while dead.
+  if (!(profile.moodBonus > 0) || metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + profile.moodBonus);
   const mood = pc.mood - moodBefore;
   // inc_skill_packages.js 532: xp_bonus takes the mood bonus (after the mood gain).
   const xp = grantMoodXp(pc, profile.xpBonus);

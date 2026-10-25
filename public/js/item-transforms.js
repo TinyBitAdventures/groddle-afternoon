@@ -20,7 +20,7 @@
  * Every verb works on one item or the whole stack, like the source's count.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=catalog-unified-4';
+import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=catalog-unified-5';
 import { skillPackageDetails } from './skill-packages.js';
 
 /**

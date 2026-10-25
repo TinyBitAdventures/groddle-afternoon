@@ -33,7 +33,7 @@
  * foxRangerTalk.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { getToolCondition } from '../tools.js';
 import { worldToScreen } from '../street-model.js';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';

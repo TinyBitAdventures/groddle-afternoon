@@ -6,7 +6,7 @@
 /** @typedef {Record<string, number>} Inventory */
 
 /** Canonical icon path for a class_tsid (OGA iconic extract). */
-import { moodMax } from './metabolics.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 export function itemIcon(classTsid) {
   if (!classTsid) return 'assets/sprites/icons/apple.png';
   return `assets/sprites/icons/${classTsid}.png`;
@@ -390,12 +390,16 @@ export function useItem(inv, pc, classTsid) {
     return { ok: false, msgs: [`No ${classTsid} in pack.`] };
   }
   const effects = {};
-  if (info.effects.energy) {
+  // G259: drink_drink and food_eat add through metabolics_add_energy / _mood
+  // (items/include/drink.js 66, 88; food.js 123), which give nothing while
+  // dead or (energy) Super Pooped and say so (inc_metabolics.js 40-53, 79-86).
+  // The drink is still drunk; a loss never asks.
+  if (info.effects.energy && (info.effects.energy < 0 || metabolicGain('energy').ok)) {
     const before = pc.energy || 0;
     pc.energy = Math.max(0, Math.min(Math.max(100, Number(pc.energyMax) || 100), before + info.effects.energy));
     if (pc.energy !== before) effects.energy = pc.energy - before;
   }
-  if (info.effects.mood) {
+  if (info.effects.mood && (info.effects.mood < 0 || metabolicGain('mood').ok)) {
     const before = pc.mood || 0;
     pc.mood = Math.max(0, Math.min(moodMax(pc), before + info.effects.mood));
     if (pc.mood !== before) effects.mood = pc.mood - before;

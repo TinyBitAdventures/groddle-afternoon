@@ -29,8 +29,8 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
-import { VENDOR_PROFILES } from '../vendor.js?v=g148-1';
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
+import { VENDOR_PROFILES } from '../vendor.js?v=vendor-profiles-2';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { parseQuestConversation } from '../quests.js';
 import {
   acceptOffer,

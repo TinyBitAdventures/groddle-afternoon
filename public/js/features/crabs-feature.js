@@ -31,7 +31,7 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
-import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=catalog-unified-4';
+import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js';
 import { energyMax, metabolicGain, moodMax } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';

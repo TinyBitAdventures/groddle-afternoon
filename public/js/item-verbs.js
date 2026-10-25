@@ -12,6 +12,7 @@
  */
 
 import { grantMoodXp } from './mood-xp.js';
+import { metabolicGain } from './metabolics.js';
 
 const ENERGY = "You don't have enough energy to do this.";
 const DEPRESSED = 'You are too depressed to do this.';
@@ -131,7 +132,8 @@ export function crunchIce(pc, count = 1, ctx = {}) {
     } else {
       msgs.push(ICE_TEXT.crunched);
       const cap = Math.max(1, Number(ctx.moodMax) || 100);
-      pc.mood = Math.min(cap, (Number(pc.mood) || 0) + 6 * n);
+      // G259: ice.js 87 metabolics_add_mood, refused while dead (inc_metabolics.js 79-86).
+      if (metabolicGain('mood').ok) pc.mood = Math.min(cap, (Number(pc.mood) || 0) + 6 * n);
     }
   }
   pc.energy = Math.max(0, (Number(pc.energy) || 0) - 3 * n);
@@ -149,12 +151,14 @@ export function runItemVerb(def, pc, ctx = {}) {
   const effects = {};
   const energyCap = Math.max(1, Number(ctx.energyMax) || 100);
   const moodCap = Math.max(1, Number(ctx.moodMax) || 100);
-  if (def.energy) {
+  // G259: a rise goes through metabolics_add_energy / _mood (laughing_gas.js 129,
+  // inc_metabolics.js 40-53, 79-86): nothing while dead or (energy) Super Pooped.
+  if (def.energy && (def.energy < 0 || metabolicGain('energy').ok)) {
     const before = Number(pc.energy) || 0;
     pc.energy = Math.max(0, Math.min(energyCap, before + def.energy));
     effects.energy = pc.energy - before;
   }
-  if (def.mood) {
+  if (def.mood && (def.mood < 0 || metabolicGain('mood').ok)) {
     const before = Number(pc.mood) || 0;
     pc.mood = Math.max(0, Math.min(moodCap, before + def.mood));
     effects.mood = pc.mood - before;

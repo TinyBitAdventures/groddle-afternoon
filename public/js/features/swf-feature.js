@@ -31,7 +31,7 @@
  *   swfLocked, swfCounts.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { grantMoodXp } from '../mood-xp.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { OVERLAY_BASE, cellRect, loadOverlayManifest, overlayAlpha, overlayFrameAt, overlayPlacement } from '../overlay-art.js?v=g209-1';

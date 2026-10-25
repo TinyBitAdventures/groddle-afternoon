@@ -10,11 +10,11 @@
  * Produce counts are the GSJS seed classProps produces_count.
  */
 
-import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-4';
+import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-5';
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-5';
 import { skillPackageDetails } from './skill-packages.js';
 import { gardenGrowModifier } from './imagination-effects.js';
-import { moodMax } from './metabolics.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 /** @typedef {'clean'|'seeds'|'shoots'|'crop'|'dirty'} PlotState */
@@ -746,7 +746,8 @@ function rollSucceeds(profile, opts) {
 function applyGardenRewards(pc, profile) {
   const got = { mood: 0, xp: 0 };
   if (profile.legacy) return got;
-  if (profile.mood && pc.mood != null) {
+  // G259: mood_bonus is metabolics_add_mood (inc_skill_packages.js 524), refused while dead.
+  if (profile.mood && pc.mood != null && metabolicGain('mood').ok) {
     const before = pc.mood || 0;
     pc.mood = Math.min(moodMax(pc), before + profile.mood);
     got.mood = Math.max(0, pc.mood - before);
@@ -1254,7 +1255,10 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
   addItem(inv, seed.cropId, n + bonus);
   let got = { mood: 2, xp: 2 };
   if (profile.legacy) {
-    if (pc.mood != null) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + 2);
+    if (pc.mood != null) {
+      if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + 2);
+      else got.mood = 0;
+    }
     got.xp = grantMoodXp(pc, 2);
   } else {
     got = applyGardenRewards(pc, profile);

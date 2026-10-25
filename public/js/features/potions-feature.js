@@ -47,11 +47,11 @@
  *   potionRugs, potionFavorGiant.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { getGameDayKey } from '../game-day.js';
 import { moodMax } from '../metabolics.js';
 import { quoinDailyLimitFor } from '../quoins.js';
-import { emblemCostFor } from '../shrines.js?v=shrine-powders-1';
+import { emblemCostFor } from '../shrines.js?v=spinning-wheel-test-2';
 import { GROWN_TREE_LABELS, trantsformPlotTree } from '../patches.js';
 import { isPoisoned } from '../tree-poison.js';
 import { furnitureSize } from '../home-decor.js?v=home-decor-4';
@@ -95,11 +95,11 @@ import {
   trantsformOutcome,
   usePotion,
 } from '../potions.js?v=g149-1';
-import { itemVerbAchievementCounters } from '../item-verbs.js?v=g137-1';
-import { patchesFeature } from './patches-feature.js?v=patches-7';
-import { homesFeature } from './homes-feature.js?v=homes-14';
-import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-4';
-import { questRoomConverse } from './quest-instances-feature.js?v=qi-7';
+import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-2';
+import { patchesFeature } from './patches-feature.js?v=patches-8';
+import { homesFeature } from './homes-feature.js?v=homes-15';
+import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-5';
+import { questRoomConverse } from './quest-instances-feature.js?v=qi-8';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';

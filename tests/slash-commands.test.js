@@ -18,14 +18,14 @@ import {
   slashWords,
   unknownLine,
 } from '../public/js/slash-commands.js?v=g160-1';
-import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=g221-1';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=card-3';
-import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-7';
+import { slashCommandsFeature, slashContext } from '../public/js/features/slash-commands-feature.js?v=g259-1';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=card-4';
+import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-8';
 import { BUTLER_STRINGS } from '../public/js/butler.js?v=butler-5';
-import { butlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-11';
+import { butlerFeature } from '../public/js/features/butler-feature.js?v=butler-feature-12';
 import { FEATURES } from '../public/js/features/index.js';
 import { createFeatureHost } from '../public/js/feature-host.js';
-import { countItem } from '../public/js/inventory.js?v=catalog-unified-4';
+import { countItem } from '../public/js/inventory.js?v=catalog-unified-5';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');

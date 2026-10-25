@@ -18,7 +18,7 @@ import {
   useToolCondition,
 } from './tools.js?v=tools-5';
 import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js';
-import { moodMax } from './metabolics.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { petPiggy, piggyNibbleRefusal } from './animal-mood.js';
 
@@ -274,7 +274,8 @@ function awardMetabolics(pc, selected, moodBonus = selected.moodBonus) {
   const effects = { energy: 0, mood: 0, xp: 0, items: {} };
   pc.energy = Math.max(0, (Number(pc.energy) || 0) - selected.energyCost);
   effects.energy = -selected.energyCost;
-  if (moodBonus) {
+  // G259: mood_bonus is metabolics_add_mood (inc_skill_packages.js 524), refused while dead.
+  if (moodBonus && (moodBonus < 0 || metabolicGain('mood').ok)) {
     const before = Number(pc.mood) || 0;
     pc.mood = Math.min(moodMax(pc), before + moodBonus);
     effects.mood = pc.mood - before;

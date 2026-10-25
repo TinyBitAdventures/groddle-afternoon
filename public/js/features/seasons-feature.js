@@ -27,19 +27,19 @@
  *     seasonGiftees, seasonFaces, seasonCrackers, seasonEggs, seasonPlaced.
  */
 
-import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-4';
+import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-5';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=dametime-1';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g183-1';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g259-1';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js';
-import { setSeasonalRecipeCheck } from '../making.js?v=g215-1';
+import { setSeasonalRecipeCheck } from '../making.js?v=g259-1';
 import { getToolCondition } from '../tools.js';
 import { landingY, nearestSurfaceY } from '../walk-surface.js';
 import { isBatterflyHabitat } from '../animal-husbandry.js';
 import { emblemCostFor } from '../shrines.js';
 import { rollDropTable } from '../drop-tables.js';
 import { openNoteView, noteViewOpen } from '../note-view.js';
-import { payDrop } from './drops-feature.js?v=drops-1';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-5';
+import { payDrop } from './drops-feature.js?v=drops-2';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-6';
 import { SEASON_DATA } from '../seasons-data.js';
 import {
   CANDY_CLASSES,

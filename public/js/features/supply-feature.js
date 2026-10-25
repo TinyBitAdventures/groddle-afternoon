@@ -28,7 +28,7 @@
  *     data-supply-permits).
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-4';
+import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-5';
 import { getToolCondition } from '../tools.js';
 import {
   MACHINE_ASSEMBLIES,

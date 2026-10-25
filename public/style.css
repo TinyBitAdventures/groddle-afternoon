@@ -3698,17 +3698,32 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
 .skill-study-card .skill-study-time.is-fast { color: #8a6a00; font-weight: 700; }
 .side-panel.buffs-panel { left: auto; right: 10px; top: 44px; }
 
+/*
+ * G256: the buff chips take the activity feed's top-left corner and the feed
+ * steps down below them, so a badge never covers a line. The original kept
+ * buffs in one row beside the player info at the top of the screen
+ * (BuffViewManager.as 32, 118, 149-150: y 20, 5 px apart); the feed is the
+ * remake's own popup column. Strip and feed share each breakpoint's top.
+ */
 .buff-strip {
   position: absolute;
   z-index: 18;
-  top: 54px;
-  left: 12px;
+  top: 48px;
+  left: 10px;
   display: flex;
   align-items: center;
   gap: 5px;
   pointer-events: auto;
 }
 .buff-strip[hidden] { display: none !important; }
+/* One 38 px row of chips (renderBuffStrip shows six at most), then a 6 px gap. */
+.buff-strip:not([hidden]) ~ .activity-feed { margin-top: 44px; }
+@media (max-width: 760px) {
+  .buff-strip { top: 36px; }
+}
+@media (min-width: 1500px) {
+  .buff-strip { top: 58px; left: 14px; }
+}
 .buff-chip {
   min-width: 52px;
   height: 38px;
