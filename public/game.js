@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-13';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-132';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-133';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -561,6 +561,8 @@ import {
   barriersScreen,
   blockBarrierCrossing,
   buriedSignpostUnder,
+  headCeiling,
+  isStandable,
 } from './js/street-model.js';
 import {
   buildStreetView,
@@ -9283,6 +9285,9 @@ function quoinResultCopy(result) {
   return `+${amount}`;
 }
 
+/** The avatar's collision height at scale 1 (street-model.js blockBarrierCrossing bodyH). */
+const AVATAR_BODY_H = 80;
+
 function resolveGround(px, py) {
   if (streetPlatforms?.length) {
     const hit = resolveStreetGround(streetPlatforms, px, py, player?.vy ?? 0, 16);
@@ -9291,6 +9296,7 @@ function resolveGround(px, py) {
     let best = null;
     let bestY = -Infinity;
     for (const p of streetPlatforms) {
+      if (!isStandable(p)) continue; // an underside is never the floor (pc_perm 1)
       const y = (p.y1 + p.y2) / 2;
       const minX = Math.min(p.x1, p.x2) - 8;
       const maxX = Math.max(p.x1, p.x2) + 8;
@@ -9950,11 +9956,23 @@ function physics(dt) {
     player.vy += 0.42 * movementBuff.gravity * dt;
     streetPhysicsFreeFall(movementBuff, dt);
     const prevX = player.x;
+    const prevY = player.y;
     player.x += player.vx * dt;
     player.y += player.vy * dt;
     player.x = clamp(player.x, 24, WORLD_W - 24);
+    // The avatar's collision height (80 px) shrinks with a street's pc_scale.
+    const bodyH = AVATAR_BODY_H * (features.query('avatarBodyScale', engine) ?? 1);
+    // A rising head stops under an underside or ceiling (platform pc_perm 1).
+    // Puzzle streets with reversible gravity run their own (features/puzzles-feature.js).
+    const headY = streetPlatforms?.length && features.query('ownsCeilings', engine) !== true
+      ? headCeiling(streetPlatforms, prevX, prevY, player.x, player.y, bodyH)
+      : null;
+    if (headY != null) {
+      player.y = headY;
+      if (player.vy < 0) player.vy = 0;
+    }
     // Source <walls>: vertical colliders with directional pc_perm.
-    const walledX = blockBarrierCrossing(barriersScreen(currentStreet), prevX, player.x, player.y);
+    const walledX = blockBarrierCrossing(barriersScreen(currentStreet), prevX, player.x, player.y, bodyH);
     if (walledX !== player.x) {
       player.x = walledX;
       player.vx = 0;

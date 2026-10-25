@@ -34,7 +34,8 @@ describe('ladder tops', () => {
       const plats = platformsScreen(street);
       for (const wall of wallsScreen(street).filter((w) => w.source === 'ladder')) {
         // A deck a player could mean: a surface within 48 px of the top that is not the base floor.
-        const deck = plats.map((p) => platformYAt(p, wall.x)).filter((y) => y != null && y - wall.yTop > -46 && y - wall.yTop <= 48 && y < wall.yBot - 8);
+        // An underside (pc_perm 1) is no deck: Purplysa's secret ladder ends under one.
+        const deck = plats.filter((p) => p.pcPerm !== 1).map((p) => platformYAt(p, wall.x)).filter((y) => y != null && y - wall.yTop > -46 && y - wall.yTop <= 48 && y < wall.yBot - 8);
         if (!deck.length) continue;
         withDeck += 1;
         if (ladderTopDeck(plats, wall.x, wall.yTop + 2, wall.yBot) != null) mounted += 1;

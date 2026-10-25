@@ -209,8 +209,8 @@ export function blockBarrierCrossing(barriers, prevX, nextX, feetY, bodyH = 80) 
   let allowed = nextX;
   for (const w of barriers) {
     // Overlap of more than a few pixels: a wall ending at the floor line or
-    // just above the head does not block.
-    if (Math.min(feetY - 4, w.yBot) - Math.max(headY, w.yTop) <= 0) continue;
+    // just above the head (an underside the head is pressed against) does not block.
+    if (Math.min(feetY - 4, w.yBot) - Math.max(headY + 1, w.yTop) <= 0) continue;
     if (nextX > prevX && w.fromLeft && prevX <= w.x && allowed > w.x) allowed = w.x - 1;
     else if (nextX < prevX && w.fromRight && prevX >= w.x && allowed < w.x) allowed = w.x + 1;
   }
@@ -262,12 +262,62 @@ export function groundBeneath(platforms, x, feetY, maxRise = 6) {
   let below = null;
   let lowest = null;
   for (const p of platforms || []) {
+    if (!isStandable(p)) continue;
     const y = platformYAt(p, x, 0);
     if (y == null) continue;
     if (y >= feetY - maxRise && (!below || y < below.y)) below = { y, platform: p };
     if (!lowest || y > lowest.y) lowest = { y, platform: p };
   }
   return below || lowest;
+}
+
+/**
+ * A line the avatar can stand on. The source's platform_pc_perm (PlatformLine.as,
+ * GSJS geo_modify_plat_pc_perms): -1 solid from the top only (a floor you can
+ * jump up through), 1 solid from the bottom only (an underside or ceiling: a
+ * rising head stops under it, a falling avatar drops through it), 0 soft both
+ * ways, null hard both ways. `pcPerm` comes from platformsScreen; lines built
+ * by hand (scene floors) carry no pcPerm and stay standable. pc_perm 0 lines
+ * are taken out of the list by the location events feature, so only 1 is
+ * refused here.
+ */
+export function isStandable(p) {
+  return p?.pcPerm !== 1;
+}
+
+/**
+ * A line that stops a rising head: the source's pc_perm 1. null (hard both
+ * ways in the source) is left out: rebuilt puzzle rooms (Penumbra, Kristel
+ * Kaos) write null for plain floors, and js/features/puzzles-feature.js
+ * already treats null as a ceiling on the puzzle streets that need it.
+ */
+export function isSolidFromBelow(p) {
+  return p?.pcPerm === 1;
+}
+
+/**
+ * The avatar's head moving up from (prevX, prevFeetY - bodyH) to
+ * (x, feetY - bodyH) that crosses a line solid from below stops under it
+ * (AvatarPhysicsHandler: the client tests the head against pc_solid_from_bottom
+ * lines). Returns the clamped feet y (line + bodyH), or null when clear.
+ * Lines whose ends are within `inset` px of x are skipped, so brushing an
+ * underside's end does not catch the avatar beside it.
+ * @param {{ x1:number,y1:number,x2:number,y2:number,pcPerm?:number|null }[]} platforms  screen-space
+ */
+export function headCeiling(platforms, prevX, prevFeetY, x, feetY, bodyH = 80, inset = 2) {
+  if (!(feetY < prevFeetY)) return null;
+  const head = feetY - bodyH;
+  const prevHead = prevFeetY - bodyH;
+  let best = null;
+  for (const p of platforms || []) {
+    if (!isSolidFromBelow(p)) continue;
+    const y = platformYAt(p, x, -inset);
+    if (y == null) continue;
+    const before = platformYAt(p, prevX, 0) ?? y;
+    // Crossed it this frame: the head was at or under the line, now above it.
+    if (prevHead >= before - 1 && head < y && (best == null || y > best)) best = y;
+  }
+  return best == null ? null : best + bodyH;
 }
 
 /** game.js caps a frame's delta at 2.5 frames (slow or throttled frames). */
@@ -292,6 +342,7 @@ export function resolveGround(platforms, feetX, feetY, vy = 0, snap = 12) {
   // Plus a little for the surface's own slope between last frame's x and this one.
   const reach = vy > 0 ? Math.max(snap, vy * FRAME_DT_CAP + 8) : snap;
   for (const p of platforms) {
+    if (!isStandable(p)) continue;
     const y = platformYAt(p, feetX);
     if (y == null) continue;
     // Only consider platforms at or below feet when falling / standing

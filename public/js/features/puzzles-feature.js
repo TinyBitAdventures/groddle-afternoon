@@ -27,7 +27,7 @@
  * puzzleRespawns, puzzleComplete, puzzleReward, puzzleDemo.
  */
 
-import { locationEventsApi } from './location-events-feature.js?v=location-events-3';
+import { locationEventsApi } from './location-events-feature.js?v=location-events-4';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import {
   PUZZLE_DATA_URL,
@@ -728,6 +728,11 @@ export const puzzlesFeature = {
     demoStep(engine, now);
     if (run && !engine.transientInstance()) stepRun(engine);
     publish(engine, now);
+  },
+
+  /** game.js leaves head-against-ceiling to clampCeiling/stepInverted on these streets. */
+  ownsCeilings(engine) {
+    return run?.ceilings && !engine?.transientInstance?.() ? true : null;
   },
 
   physics(engine) {

@@ -118,6 +118,9 @@ function setPlatform(engine, id, pcPerm) {
     return true;
   }
   const back = stash.get(id);
+  // A line switched to 1 (solid from below) or null/-1 changes what it is for the avatar.
+  const live = back || plats.find((p) => p.id === id);
+  if (live && 'pcPerm' in live) live.pcPerm = pcPerm == null ? null : Number(pcPerm);
   if (!back) return plats.some((p) => p.id === id);
   stash.delete(id);
   plats.push(back);
@@ -527,6 +530,11 @@ export const locationEventsFeature = {
     fades = [];
     stash = new Map();
     current = null;
+  },
+
+  /** The avatar's collision height against normal while pc_scale shrinks it (game.js physics). */
+  avatarBodyScale() {
+    return scale.player && scale.applied !== 1 ? scale.applied : null;
   },
 
   physics(engine) {
