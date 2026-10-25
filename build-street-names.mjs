@@ -6,14 +6,25 @@
  *
  * The archived location XML often carries an internal template label
  * ("firebog_05"); production players saw "Pandu Chepa". This patches
- * assets/streets/index.json (label, internalLabel, hubName, store) and each
- * street JSON's label. Safe to re-run.
+ * assets/streets/index.json (label, internalLabel, hubId, hubName, store) and
+ * each street JSON's label, hubId and hubName. Safe to re-run.
+ *
+ * Hubs (G184): each street's own location object names its hub, the
+ * game_object attribute `hubid` on streets/mnt/stos/location_data/L<id>.xml
+ * (Tiny Speck's locations-xml.zip, e.g. LLIFIG7BP8G1MU9.xml line 1, Louise
+ * Pasture hubid="58"), and maps_get_streets() lists the street under that
+ * same hub for every imported street. The importer once took the hub of the
+ * first signpost target instead, which on a border street is the neighbour's
+ * hub (Louise Pasture got Ix). A street listed on the map data takes its own
+ * hub; an instance copy that is not on the map lists keeps what it has, and a
+ * rebuilt room (no L*.xml) keeps the hub its build tool gave it.
  *
  * Run from spike root:
  *   node build-street-names.mjs
+ *   node build-street-names.mjs --check   exit 1 if index.json or a street is stale
  */
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, open } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -21,6 +32,27 @@ import vm from 'node:vm';
 const root = dirname(fileURLToPath(import.meta.url));
 const gsjs = process.env.GSJS_ROOT || '/Users/austin/Documents/glitch-audit/glitch-GameServerJS';
 const indexPath = join(root, 'public/assets/streets/index.json');
+const locationDir =
+  process.env.LOCATION_XML_DIR || join(root, '../streets/mnt/stos/location_data');
+const check = process.argv.includes('--check');
+const stale = [];
+
+/** The hubid attribute on L<key>.xml's game_object (first line), or null. */
+async function ownLocationHub(key, dir = locationDir) {
+  let fh;
+  try {
+    fh = await open(join(dir, `L${key}.xml`), 'r');
+  } catch {
+    return null;
+  }
+  try {
+    const { buffer, bytesRead } = await fh.read(Buffer.alloc(1024), 0, 1024, 0);
+    const head = buffer.subarray(0, bytesRead).toString('utf8');
+    return head.match(/<game_object\b[^>]*\bhubid="(\d+)"/)?.[1] ?? null;
+  } finally {
+    await fh.close();
+  }
+}
 
 /** map_stores names → js/vendor.js profile keys. */
 const STORE_KEYS = {
@@ -62,9 +94,11 @@ for (const hubs of Object.values(maps.streets || {})) {
   }
 }
 
-const index = JSON.parse(await readFile(indexPath, 'utf8'));
+const indexText = await readFile(indexPath, 'utf8');
+const index = JSON.parse(indexText);
 let renamed = 0;
 let stores = 0;
+let rehubbed = 0;
 for (const [tsid, meta] of Object.entries(index.streets || {})) {
   const key = tsid.slice(1);
   const found = names.get(key);
@@ -72,19 +106,42 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
     if (!meta.internalLabel && meta.label !== found.name) meta.internalLabel = meta.label;
     if (meta.label !== found.name) renamed += 1;
     meta.label = found.name;
-    if (!meta.hubId) meta.hubId = found.hubId;
-    const hubName = maps.hubs?.[meta.hubId]?.name;
-    if (hubName && !meta.hubName) meta.hubName = hubName;
+    const own = await ownLocationHub(key);
+    if (own && own !== found.hubId) {
+      throw new Error(`${tsid}: L${key}.xml hubid ${own} but maps_get_streets lists hub ${found.hubId}`);
+    }
+    const hubName = maps.hubs?.[found.hubId]?.name;
+    if (own) {
+      if (meta.hubId !== own) rehubbed += 1;
+      meta.hubId = own;
+      if (hubName) meta.hubName = hubName;
+    } else {
+      if (!meta.hubId) meta.hubId = found.hubId;
+      const name = maps.hubs?.[meta.hubId]?.name;
+      if (name && !meta.hubName) meta.hubName = name;
+    }
     try {
       const streetPath = join(root, 'public', meta.file);
-      const street = JSON.parse(await readFile(streetPath, 'utf8'));
+      const text = await readFile(streetPath, 'utf8');
+      const street = JSON.parse(text);
       if (street.label !== found.name) {
         street.internalLabel ||= street.label;
         street.label = found.name;
-        await writeFile(streetPath, `${JSON.stringify(street)}\n`);
       }
-    } catch {
-      // Street geometry file missing: the index label is still corrected.
+      // A street JSON that carries its own hub (the loader prefers it over the
+      // index row) carries the same one; files without one read the index.
+      if (own && street.hubId != null) {
+        street.hubId = meta.hubId;
+        if (meta.hubName) street.hubName = meta.hubName;
+      }
+      const next = `${JSON.stringify(street)}\n`;
+      if (next !== text) {
+        stale.push(meta.file);
+        if (!check) await writeFile(streetPath, next);
+      }
+    } catch (err) {
+      // Street geometry file missing: the index row is still corrected.
+      if (err?.code !== 'ENOENT') throw err;
     }
   }
   const storeName = extras.stores?.[`L${key}`] || extras.stores?.[`G${key}`];
@@ -97,5 +154,16 @@ for (const [tsid, meta] of Object.entries(index.streets || {})) {
   }
 }
 
-await writeFile(indexPath, `${JSON.stringify(index, null, 2)}\n`);
-console.log(`Public names: ${names.size} in map data, ${renamed} index labels corrected; ${stores} official stores.`);
+const indexNext = `${JSON.stringify(index, null, 2)}\n`;
+if (indexNext !== indexText) {
+  stale.push('assets/streets/index.json');
+  if (!check) await writeFile(indexPath, indexNext);
+}
+console.log(
+  `Public names: ${names.size} in map data, ${renamed} index labels corrected, ${rehubbed} hubs corrected; ${stores} official stores.`
+);
+console.log(`${check ? 'stale' : 'wrote'}: ${stale.length ? `${stale.length} files` : 'nothing'}`);
+if (check && stale.length) {
+  console.log(stale.slice(0, 20).join('\n'));
+  process.exit(1);
+}

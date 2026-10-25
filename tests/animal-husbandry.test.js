@@ -102,7 +102,8 @@ describe('Batterflies and Guano (npc_batterfly.js)', () => {
     const index = JSON.parse(readFileSync(join(publicDir, 'assets/streets/index.json'), 'utf8')).streets;
     const counts = Object.entries(index).map(([tsid, row]) => batterflyCountForStreet({ tsid, ...row }));
     const habitat = counts.filter(Boolean);
-    assert.equal(habitat.length, 51);
+    // 52 since G184 put Oktyabrya in Uralia, its own location hub (was Groddle Forest).
+    assert.equal(habitat.length, 52);
     assert.ok(habitat.every((n) => n === 1 || n === 2));
     assert.deepEqual(batterflyPlacementGroups({ tsid: 'GA9114MS8B32FB2', label: 'Churni Sanctum', hubName: 'Ilmenskie Deeps' })[0].key, 'batterfly');
   });

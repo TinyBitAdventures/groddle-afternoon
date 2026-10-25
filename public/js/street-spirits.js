@@ -107,21 +107,6 @@ export const STREET_SPIRIT_VARIANTS = Object.freeze({
 
 export const SPIRIT_VARIANT_IDS = Object.freeze(Object.keys(STREET_SPIRIT_VARIANTS));
 
-/**
- * Streets whose hub in assets/streets/index.json is not the hub of their
- * late-game location object (L*.xml hubid, which GSJS inc_data_maps_prod.js
- * maps_get_streets agrees with) where that changes the spirit. The remake's
- * index differs on 54 spirit streets; these 6 would get the wrong region.
- */
-export const SPIRIT_STREET_HUBS = Object.freeze({
-  GA5KKVRDKAT2EA2: '121', // Shinso Ello: index Jethimadh (71), maps_get_streets Sura (121)
-  GCR13M5UQEM15TA: '56', // Ferncaster End: index Shimla Mirch (63), Groddle Forest (56)
-  GLIFIG7BP8G1MU9: '58', // Louise Pasture: index Ix (27), Groddle Meadow (58)
-  GTJ12O0H7AO1IBS: '63', // Viscid Pud: index Cauda (120), Shimla Mirch (63)
-  GTJ12SJ2RUV1N6R: '72', // Belan Bends: index Kloro (133), Chakra Phool (72)
-  GUVNIF7Q9KR2382: '120', // Pandhal Pegs: index Shimla Mirch (63), Cauda (120)
-});
-
 /** The regional spirit for a street's hub id. */
 export function spiritVariantForHub(hubId) {
   const hub = String(hubId ?? '');
@@ -277,10 +262,9 @@ export function spiritLookFor(variant, tsid) {
 
 /** Variant and look for a street, or a forced variant (QA). */
 export function spiritForStreet(street = {}, forced = '') {
-  const id = String(street.tsid || '');
-  const g = id.startsWith('L') ? `G${id.slice(1)}` : id;
-  const hub = SPIRIT_STREET_HUBS[g] ?? street.hubId;
-  const variant = STREET_SPIRIT_VARIANTS[forced] ? forced : spiritVariantForHub(hub);
+  // The street's hub is its own location object's (index.json since G184,
+  // build-street-names.mjs), so the hub rule needs no per-street overrides.
+  const variant = STREET_SPIRIT_VARIANTS[forced] ? forced : spiritVariantForHub(street.hubId);
   return { variant, look: spiritLookFor(variant, street.tsid), ...STREET_SPIRIT_VARIANTS[variant] };
 }
 

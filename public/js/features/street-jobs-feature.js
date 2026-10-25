@@ -114,7 +114,7 @@ function load() {
   if (catalog) return Promise.resolve(catalog);
   if (!loading) {
     loading = Promise.all([
-      fetch('assets/content/street-jobs.json?v=jobs-3').then((r) => r.json()),
+      fetch('assets/content/street-jobs.json?v=jobs-4').then((r) => r.json()),
       fetch('assets/streets/index.json').then((r) => r.json()),
     ])
       .then(([cat, idx]) => {

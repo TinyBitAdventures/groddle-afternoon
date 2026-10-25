@@ -185,7 +185,7 @@ export const SUBWAY_LINE = Object.freeze({
       connects_to: "LIF2IUQJQ571TFL",
       surfaceStreetTsid: "GIF2IUQJQ571TFL",
       surfaceLabel: "Eastern Approach",
-      surfaceHubId: "50",
+      surfaceHubId: "51",
       x: 0,
       y: -136,
       map_pos: Object.freeze([118,175]),

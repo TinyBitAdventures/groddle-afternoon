@@ -124,9 +124,13 @@ export function childValue(objNode, id, fallback = null) {
 /**
  * @param {object} gameObject root game_object node
  * @param {Record<string, string>} [hubNames] hubId → name
+ * @param {{ hubId?: string|number|null }} [opts] hubId: the street's own hub,
+ *   the `hubid` attribute on its L*.xml location object (G184). The geometry
+ *   XML carries no hub of its own; without one the hub of the first signpost
+ *   target is a guess, and on a border street that is the neighbour's hub.
  * @returns {StreetData}
  */
-export function convertGameObjectToStreet(gameObject, hubNames = {}) {
+export function convertGameObjectToStreet(gameObject, hubNames = {}, opts = {}) {
   if (!gameObject || gameObject.tag !== 'game_object') {
     throw new Error('expected game_object root');
   }
@@ -275,6 +279,11 @@ export function convertGameObjectToStreet(gameObject, hubNames = {}) {
 
   // Prefer G-prefix tsid from game_object when present
   const outTsid = tsid;
+  const ownHub = opts?.hubId != null && opts.hubId !== '' ? String(opts.hubId) : '';
+  if (ownHub) {
+    hubId = ownHub;
+    hubName = hubNames[ownHub] || '';
+  }
 
   /** @type {StreetData} */
   const street = {
@@ -305,14 +314,14 @@ export function convertGameObjectToStreet(gameObject, hubNames = {}) {
  * @param {string} xmlText
  * @param {Record<string, string>} [hubNames]
  */
-export function convertLocationXml(xmlText, hubNames = {}) {
+export function convertLocationXml(xmlText, hubNames = {}, opts = {}) {
   if (!xmlText || !String(xmlText).includes('game_object')) {
     throw new Error('not a location game_object XML');
   }
   const tree = parseLocationXmlTree(xmlText);
   const gameObject = tree.children.find((c) => c.tag === 'game_object');
   if (!gameObject) throw new Error('game_object not found');
-  return convertGameObjectToStreet(gameObject, hubNames);
+  return convertGameObjectToStreet(gameObject, hubNames, opts);
 }
 
 /**

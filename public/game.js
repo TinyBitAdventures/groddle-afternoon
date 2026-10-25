@@ -18413,6 +18413,8 @@ async function enterStreet(tsid, opts = {}) {
     nameEl.dataset.tsid = data.tsid;
   }
   // Hub-tuned ambient BGM (GSJS ambient_hub_map → ambient_library)
+  // Canvas data-ambient-theme: the street's theme, with or without sound (G184 QA).
+  if (app?.canvas) app.canvas.dataset.ambientTheme = resolveAmbientTheme(data);
   if (state.started && audio.ctx) {
     const prevTheme = ambientThemeId;
     setAmbientForStreet(data);

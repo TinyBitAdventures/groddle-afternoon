@@ -12,7 +12,6 @@ import { fileURLToPath } from 'node:url';
 import {
   FIREBOG_HUBS,
   IX_HUBS,
-  SPIRIT_STREET_HUBS,
   SPIRIT_VARIANT_IDS,
   STREET_SPIRIT_ART,
   STREET_SPIRIT_VARIANTS,
@@ -111,16 +110,14 @@ test.describe('placement against the location XML', () => {
     const byTsid = new Map(streets.map((s) => [s.tsid, s]));
     const placed = Object.entries(ecology.streets).filter(([, row]) => (row.counts?.street_spirit || 0) > 0);
     assert.equal(placed.length, 885);
-    const wrongRegion = [];
     for (const [tsid] of placed) {
       const xml = byTsid.get(tsid);
       assert.ok(xml, `${tsid} has no Street Spirit in the XML`);
-      // The game knows the index hub; the late-game XML hub decides the region.
-      if (spiritVariantForHub(index[tsid].hubId) !== spiritVariantForHub(xml.hub)) wrongRegion.push(tsid);
+      // The index hub is the late-game XML hub (G184), so the region follows;
+      // an instance copy off the map lists (The Greedy Street Spirit) has none.
+      if (index[tsid].hubId !== '') assert.equal(index[tsid].hubId, xml.hub, tsid);
       assert.equal(spiritForStreet({ hubId: index[tsid].hubId, tsid }).variant, spiritVariantForHub(xml.hub), tsid);
     }
-    assert.deepEqual(wrongRegion.sort(), Object.keys(SPIRIT_STREET_HUBS).sort());
-    for (const [tsid, hub] of Object.entries(SPIRIT_STREET_HUBS)) assert.equal(byTsid.get(tsid).hub, hub, tsid);
   });
 
   test('QA streets resolve to their region', () => {

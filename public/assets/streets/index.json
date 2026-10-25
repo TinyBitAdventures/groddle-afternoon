@@ -171,8 +171,8 @@
     "GA513A7M0J521F2": {
       "label": "Loutish Ln A",
       "file": "assets/streets/GA513A7M0J521F2.json",
-      "hubId": "95",
-      "hubName": "Xalanga",
+      "hubId": "91",
+      "hubName": "Zhambu",
       "platforms": 16,
       "decos": 185
     },
@@ -260,8 +260,8 @@
     "GA513PFS0J52F45": {
       "label": "Cornfed Crt D",
       "file": "assets/streets/GA513PFS0J52F45.json",
-      "hubId": "89",
-      "hubName": "Andra",
+      "hubId": "91",
+      "hubName": "Zhambu",
       "platforms": 27,
       "decos": 159
     },
@@ -332,8 +332,8 @@
     "GA51450HIC42Q4I": {
       "label": "Parsin's Trail SW",
       "file": "assets/streets/GA51450HIC42Q4I.json",
-      "hubId": "85",
-      "hubName": "Kajuu",
+      "hubId": "86",
+      "hubName": "Baqala",
       "platforms": 33,
       "decos": 223
     },
@@ -509,8 +509,8 @@
     "GA517JJML262LT0": {
       "label": "Pakodi Prim",
       "file": "assets/streets/GA517JJML262LT0.json",
-      "hubId": "91",
-      "hubName": "Zhambu",
+      "hubId": "89",
+      "hubName": "Andra",
       "platforms": 30,
       "decos": 285,
       "store": "hardware"
@@ -776,8 +776,8 @@
     "GA54EE8QNMR2G7C": {
       "label": "Chueo Vegae",
       "file": "assets/streets/GA54EE8QNMR2G7C.json",
-      "hubId": "120",
-      "hubName": "Cauda",
+      "hubId": "121",
+      "hubName": "Sura",
       "platforms": 34,
       "decos": 530,
       "store": "hardware",
@@ -795,8 +795,8 @@
     "GA54O13ELKR29I9": {
       "label": "Jarjai Binq",
       "file": "assets/streets/GA54O13ELKR29I9.json",
-      "hubId": "123",
-      "hubName": "Fenneq",
+      "hubId": "121",
+      "hubName": "Sura",
       "platforms": 25,
       "decos": 269,
       "store": "toys",
@@ -1083,8 +1083,8 @@
     "GA5D24IIRL13IIC": {
       "label": "Mens Liber",
       "file": "assets/streets/GA5D24IIRL13IIC.json",
-      "hubId": "72",
-      "hubName": "Chakra Phool",
+      "hubId": "128",
+      "hubName": "Balzare",
       "platforms": 192,
       "decos": 538,
       "internalLabel": "climb_08"
@@ -1307,8 +1307,8 @@
     "GA5H2SQS45T2EIU": {
       "label": "Budae Bada",
       "file": "assets/streets/GA5H2SQS45T2EIU.json",
-      "hubId": "120",
-      "hubName": "Cauda",
+      "hubId": "123",
+      "hubName": "Fenneq",
       "platforms": 29,
       "decos": 564,
       "store": "gardening",
@@ -1461,8 +1461,8 @@
     "GA5JI29VIMB2SDT": {
       "label": "Essec Zyte",
       "file": "assets/streets/GA5JI29VIMB2SDT.json",
-      "hubId": "75",
-      "hubName": "Bortola",
+      "hubId": "102",
+      "hubName": "Ormonos",
       "platforms": 74,
       "decos": 293,
       "store": "kitchen",
@@ -1490,8 +1490,8 @@
     "GA5KKVRDKAT2EA2": {
       "label": "Shinso Ello",
       "file": "assets/streets/GA5KKVRDKAT2EA2.json",
-      "hubId": "71",
-      "hubName": "Jethimadh",
+      "hubId": "121",
+      "hubName": "Sura",
       "platforms": 27,
       "decos": 441,
       "store": "gardening",
@@ -2005,8 +2005,8 @@
     "GA91195E8492R4B": {
       "label": "Crillic Crit",
       "file": "assets/streets/GA91195E8492R4B.json",
-      "hubId": "92",
-      "hubName": "Tamila",
+      "hubId": "98",
+      "hubName": "Besara",
       "platforms": 37,
       "decos": 339,
       "store": "gardening",
@@ -2167,8 +2167,8 @@
     "GA92VDUR8D82E3F": {
       "label": "Ginseng Grope",
       "file": "assets/streets/GA92VDUR8D82E3F.json",
-      "hubId": "112",
-      "hubName": "Brillah",
+      "hubId": "97",
+      "hubName": "Muufo",
       "platforms": 52,
       "decos": 203,
       "store": "animal",
@@ -2177,8 +2177,8 @@
     "GA931BPTNLD3E35": {
       "label": "Glutton Greens",
       "file": "assets/streets/GA931BPTNLD3E35.json",
-      "hubId": "121",
-      "hubName": "Sura",
+      "hubId": "142",
+      "hubName": "Moshi Moshi Oshilatis",
       "platforms": 148,
       "decos": 322
     },
@@ -2368,8 +2368,8 @@
     "GA97Q5LV0F92PU6": {
       "label": "Garillis Fill",
       "file": "assets/streets/GA97Q5LV0F92PU6.json",
-      "hubId": "101",
-      "hubName": "Aranna",
+      "hubId": "98",
+      "hubName": "Besara",
       "platforms": 41,
       "decos": 361,
       "store": "gardening",
@@ -2773,8 +2773,8 @@
     "GA9I8CS028A2O5F": {
       "label": "Pilnjan Plink",
       "file": "assets/streets/GA9I8CS028A2O5F.json",
-      "hubId": "72",
-      "hubName": "Chakra Phool",
+      "hubId": "99",
+      "hubName": "Kalavana",
       "platforms": 62,
       "decos": 274,
       "store": "alchemical",
@@ -2912,8 +2912,8 @@
     "GA9KLA8H1D82JM3": {
       "label": "Mimosa Mix",
       "file": "assets/streets/GA9KLA8H1D82JM3.json",
-      "hubId": "92",
-      "hubName": "Tamila",
+      "hubId": "97",
+      "hubName": "Muufo",
       "platforms": 41,
       "decos": 235,
       "store": "hardware",
@@ -2922,8 +2922,8 @@
     "GA9KLB7I1D822OL": {
       "label": "Nira Nooks",
       "file": "assets/streets/GA9KLB7I1D822OL.json",
-      "hubId": "88",
-      "hubName": "Karnata",
+      "hubId": "97",
+      "hubName": "Muufo",
       "platforms": 23,
       "decos": 230,
       "store": "hardware",
@@ -3125,8 +3125,8 @@
     "GA9QTSIOV4F31QH": {
       "label": "Bliss",
       "file": "assets/streets/GA9QTSIOV4F31QH.json",
-      "hubId": "140",
-      "hubName": "Samudra",
+      "hubId": "143",
+      "hubName": "Vortex of Random",
       "platforms": 21,
       "decos": 268
     },
@@ -3231,8 +3231,8 @@
     "GA9S90EJ0G8241N": {
       "label": "Shoga Links",
       "file": "assets/streets/GA9S90EJ0G8241N.json",
-      "hubId": "105",
-      "hubName": "Lida",
+      "hubId": "97",
+      "hubName": "Muufo",
       "platforms": 67,
       "decos": 404,
       "store": "alchemical",
@@ -3355,8 +3355,8 @@
     "GA9U27HN7LD3FVE": {
       "label": "Greyving Grays",
       "file": "assets/streets/GA9U27HN7LD3FVE.json",
-      "hubId": "92",
-      "hubName": "Tamila",
+      "hubId": "142",
+      "hubName": "Moshi Moshi Oshilatis",
       "platforms": 94,
       "decos": 321,
       "internalLabel": "Grey"
@@ -3381,8 +3381,8 @@
     "GA9UIKNQ7LD3SN0": {
       "label": "Yellow Yawning",
       "file": "assets/streets/GA9UIKNQ7LD3SN0.json",
-      "hubId": "95",
-      "hubName": "Xalanga",
+      "hubId": "142",
+      "hubName": "Moshi Moshi Oshilatis",
       "platforms": 72,
       "decos": 192,
       "internalLabel": "Yellow"
@@ -3673,8 +3673,8 @@
     "GCR12SD8J4K1PCV": {
       "label": "Larceny Ladder",
       "file": "assets/streets/GCR12SD8J4K1PCV.json",
-      "hubId": "58",
-      "hubName": "Groddle Meadow",
+      "hubId": "64",
+      "hubName": "Groddle Heights",
       "platforms": 45,
       "decos": 232,
       "store": "alchemical"
@@ -3763,8 +3763,8 @@
     "GCR13M5UQEM15TA": {
       "label": "Ferncaster End",
       "file": "assets/streets/GCR13M5UQEM15TA.json",
-      "hubId": "63",
-      "hubName": "Shimla Mirch",
+      "hubId": "56",
+      "hubName": "Groddle Forest",
       "platforms": 86,
       "decos": 554,
       "store": "hardware"
@@ -3854,8 +3854,8 @@
     "GCR14HPKPBK1U25": {
       "label": "The Landing",
       "file": "assets/streets/GCR14HPKPBK1U25.json",
-      "hubId": "64",
-      "hubName": "Groddle Heights",
+      "hubId": "56",
+      "hubName": "Groddle Forest",
       "platforms": 7,
       "decos": 95,
       "store": "produce"
@@ -3863,8 +3863,8 @@
     "GCR14K7RQBK119B": {
       "label": "Footlands Heath",
       "file": "assets/streets/GCR14K7RQBK119B.json",
-      "hubId": "64",
-      "hubName": "Groddle Heights",
+      "hubId": "58",
+      "hubName": "Groddle Meadow",
       "platforms": 6,
       "decos": 80,
       "store": "alchemical"
@@ -4196,8 +4196,8 @@
     "GCRPA1RV1N12J4H": {
       "label": "Kolan Presence",
       "file": "assets/streets/GCRPA1RV1N12J4H.json",
-      "hubId": "85",
-      "hubName": "Kajuu",
+      "hubId": "76",
+      "hubName": "Alakol",
       "platforms": 102,
       "decos": 568,
       "store": "hardware"
@@ -4371,8 +4371,8 @@
     "GDO5CC4R1FD2SQG": {
       "label": "Limmu Later",
       "file": "assets/streets/GDO5CC4R1FD2SQG.json",
-      "hubId": "110",
-      "hubName": "Massadoe",
+      "hubId": "107",
+      "hubName": "Callopee",
       "platforms": 24,
       "decos": 219,
       "store": "mining"
@@ -4390,8 +4390,8 @@
     "GDO6NJEE1AE3MKL": {
       "label": "Namaste",
       "file": "assets/streets/GDO6NJEE1AE3MKL.json",
-      "hubId": "137",
-      "hubName": "Nottis",
+      "hubId": "66",
+      "hubName": "The Seams",
       "platforms": 74,
       "decos": 198
     },
@@ -4456,8 +4456,8 @@
     "GDOB5HTH1ID2MTL": {
       "label": "Kristel Kaos",
       "file": "assets/streets/GDOB5HTH1ID2MTL.json",
-      "hubId": "106",
-      "hubName": "Pollokoo",
+      "hubId": "66",
+      "hubName": "The Seams",
       "platforms": 155,
       "decos": 152
     },
@@ -4508,8 +4508,8 @@
     "GDOEMNGFQCD2KI2": {
       "label": "Bayadd Yadding",
       "file": "assets/streets/GDOEMNGFQCD2KI2.json",
-      "hubId": "106",
-      "hubName": "Pollokoo",
+      "hubId": "107",
+      "hubName": "Callopee",
       "platforms": 26,
       "decos": 258,
       "store": "groceries"
@@ -4517,8 +4517,8 @@
     "GDOEP1822S03350": {
       "label": "Rhystosto Motto",
       "file": "assets/streets/GDOEP1822S03350.json",
-      "hubId": "128",
-      "hubName": "Balzare",
+      "hubId": "126",
+      "hubName": "Roobrik",
       "platforms": 150,
       "decos": 379,
       "internalLabel": "climb_09"
@@ -4936,8 +4936,8 @@
     "GDOU1UON87E3K2T": {
       "label": "uutiif",
       "file": "assets/streets/GDOU1UON87E3K2T.json",
-      "hubId": "126",
-      "hubName": "Roobrik",
+      "hubId": "66",
+      "hubName": "The Seams",
       "platforms": 120,
       "decos": 252
     },
@@ -5120,8 +5120,8 @@
     "GHF7DU3N0UC3DRA": {
       "label": "Luminous Night",
       "file": "assets/streets/GHF7DU3N0UC3DRA.json",
-      "hubId": "137",
-      "hubName": "Nottis",
+      "hubId": "141",
+      "hubName": "Drifa",
       "platforms": 61,
       "decos": 545,
       "store": "hardware",
@@ -5288,8 +5288,8 @@
     "GHFET4I773D2OUU": {
       "label": "Awasa Wash",
       "file": "assets/streets/GHFET4I773D2OUU.json",
-      "hubId": "92",
-      "hubName": "Tamila",
+      "hubId": "106",
+      "hubName": "Pollokoo",
       "platforms": 25,
       "decos": 135,
       "store": "animal",
@@ -5380,8 +5380,8 @@
     "GHFHR6S923D2RL9": {
       "label": "ZilZiil Zeal",
       "file": "assets/streets/GHFHR6S923D2RL9.json",
-      "hubId": "97",
-      "hubName": "Muufo",
+      "hubId": "106",
+      "hubName": "Pollokoo",
       "platforms": 24,
       "decos": 118,
       "store": "animal",
@@ -5880,8 +5880,8 @@
     "GHV15KA8NE42GSP": {
       "label": "Fesenjan Freeq",
       "file": "assets/streets/GHV15KA8NE42GSP.json",
-      "hubId": "76",
-      "hubName": "Alakol",
+      "hubId": "85",
+      "hubName": "Kajuu",
       "platforms": 50,
       "decos": 388,
       "store": "produce"
@@ -5916,8 +5916,8 @@
     "GHV1BIOIL142P25": {
       "label": "Seva Opens",
       "file": "assets/streets/GHV1BIOIL142P25.json",
-      "hubId": "89",
-      "hubName": "Andra",
+      "hubId": "85",
+      "hubName": "Kajuu",
       "platforms": 57,
       "decos": 446,
       "store": "produce"
@@ -5979,8 +5979,8 @@
     "GHV1H1EHOF32UJM": {
       "label": "Evi Effect",
       "file": "assets/streets/GHV1H1EHOF32UJM.json",
-      "hubId": "92",
-      "hubName": "Tamila",
+      "hubId": "75",
+      "hubName": "Bortola",
       "platforms": 59,
       "decos": 344,
       "store": "kitchen"
@@ -6089,8 +6089,8 @@
     "GHV1U1OJ7DB3RGF": {
       "label": "Frysta Virki",
       "file": "assets/streets/GHV1U1OJ7DB3RGF.json",
-      "hubId": "141",
-      "hubName": "Drifa",
+      "hubId": "137",
+      "hubName": "Nottis",
       "platforms": 85,
       "decos": 471,
       "store": "hardware",
@@ -6180,8 +6180,8 @@
     "GHV2JBHA9152QAS": {
       "label": "Laroo Ledge",
       "file": "assets/streets/GHV2JBHA9152QAS.json",
-      "hubId": "75",
-      "hubName": "Bortola",
+      "hubId": "85",
+      "hubName": "Kajuu",
       "platforms": 107,
       "decos": 603,
       "store": "hardware"
@@ -6513,8 +6513,8 @@
     "GHVDGF0JMQ7299V": {
       "label": "Smy Mod",
       "file": "assets/streets/GHVDGF0JMQ7299V.json",
-      "hubId": "93",
-      "hubName": "Salatu",
+      "hubId": "76",
+      "hubName": "Alakol",
       "platforms": 87,
       "decos": 452,
       "store": "kitchen"
@@ -6532,8 +6532,8 @@
     "GHVDIELDQQ7228K": {
       "label": "Plexus",
       "file": "assets/streets/GHVDIELDQQ7228K.json",
-      "hubId": "89",
-      "hubName": "Andra",
+      "hubId": "66",
+      "hubName": "The Seams",
       "platforms": 124,
       "decos": 182
     },
@@ -6626,8 +6626,8 @@
     "GHVHMCSV0QA2JET": {
       "label": "Mullangi Meda",
       "file": "assets/streets/GHVHMCSV0QA2JET.json",
-      "hubId": "110",
-      "hubName": "Massadoe",
+      "hubId": "101",
+      "hubName": "Aranna",
       "platforms": 105,
       "decos": 719,
       "store": "kitchen"
@@ -6992,8 +6992,8 @@
     "GIF101NCNU112O2": {
       "label": "Oktyabrya",
       "file": "assets/streets/GIF101NCNU112O2.json",
-      "hubId": "56",
-      "hubName": "Groddle Forest",
+      "hubId": "51",
+      "hubName": "Uralia",
       "platforms": 24,
       "decos": 231
     },
@@ -7133,8 +7133,8 @@
     "GIF12VEKFAV1D67": {
       "label": "Sysma Link",
       "file": "assets/streets/GIF12VEKFAV1D67.json",
-      "hubId": "72",
-      "hubName": "Chakra Phool",
+      "hubId": "71",
+      "hubName": "Jethimadh",
       "platforms": 79,
       "decos": 283,
       "store": "alchemical"
@@ -7683,8 +7683,8 @@
     "GIF2IUQJQ571TFL": {
       "label": "Eastern Approach",
       "file": "assets/streets/GIF2IUQJQ571TFL.json",
-      "hubId": "50",
-      "hubName": "Ilmenskie Caverns",
+      "hubId": "51",
+      "hubName": "Uralia",
       "platforms": 37,
       "decos": 283
     },
@@ -7761,8 +7761,8 @@
     "GIF38KRD8S12HAR": {
       "label": "Raudan Sparkle",
       "file": "assets/streets/GIF38KRD8S12HAR.json",
-      "hubId": "102",
-      "hubName": "Ormonos",
+      "hubId": "75",
+      "hubName": "Bortola",
       "platforms": 84,
       "decos": 262,
       "store": "groceries"
@@ -7770,8 +7770,8 @@
     "GIF3I4MK96E26KF": {
       "label": "Pradera Passo",
       "file": "assets/streets/GIF3I4MK96E26KF.json",
-      "hubId": "75",
-      "hubName": "Bortola",
+      "hubId": "105",
+      "hubName": "Lida",
       "platforms": 61,
       "decos": 373,
       "store": "hardware",
@@ -7954,8 +7954,8 @@
     "GIF6APMFJUG2AK5": {
       "label": "Balleet Berm",
       "file": "assets/streets/GIF6APMFJUG2AK5.json",
-      "hubId": "137",
-      "hubName": "Nottis",
+      "hubId": "100",
+      "hubName": "Vantalu",
       "platforms": 49,
       "decos": 906,
       "store": "animal"
@@ -7963,8 +7963,8 @@
     "GIF6BOGS0I43INV": {
       "label": "Tsuga Ramaria",
       "file": "assets/streets/GIF6BOGS0I43INV.json",
-      "hubId": "131",
-      "hubName": "Haoma",
+      "hubId": "133",
+      "hubName": "Kloro",
       "platforms": 164,
       "decos": 705,
       "internalLabel": "kloro_12A"
@@ -8089,8 +8089,8 @@
     "GIF992JCSAH29T1": {
       "label": "Canjeero Crams",
       "file": "assets/streets/GIF992JCSAH29T1.json",
-      "hubId": "90",
-      "hubName": "Choru",
+      "hubId": "100",
+      "hubName": "Vantalu",
       "platforms": 33,
       "decos": 695,
       "store": "animal",
@@ -8117,8 +8117,8 @@
     "GIF9O9SDPJ3318J": {
       "label": "Tremella Frondosa",
       "file": "assets/streets/GIF9O9SDPJ3318J.json",
-      "hubId": "133",
-      "hubName": "Kloro",
+      "hubId": "131",
+      "hubName": "Haoma",
       "platforms": 130,
       "decos": 504,
       "internalLabel": "shroom_zoom_18"
@@ -8381,8 +8381,8 @@
     "GIFEL8CPH08259V": {
       "label": "Vattuu Vains",
       "file": "assets/streets/GIFEL8CPH08259V.json",
-      "hubId": "131",
-      "hubName": "Haoma",
+      "hubId": "93",
+      "hubName": "Salatu",
       "platforms": 77,
       "decos": 442,
       "store": "hardware",
@@ -8707,8 +8707,8 @@
     "GIFF91EEBO723DF": {
       "label": "Deadpan Dike 1",
       "file": "assets/streets/GIFF91EEBO723DF.json",
-      "hubId": "91",
-      "hubName": "Zhambu",
+      "hubId": "95",
+      "hubName": "Xalanga",
       "platforms": 27,
       "decos": 171
     },
@@ -8813,8 +8813,8 @@
     "GIFG7L7VG4I21HR": {
       "label": "Felin Pryde",
       "file": "assets/streets/GIFG7L7VG4I21HR.json",
-      "hubId": "97",
-      "hubName": "Muufo",
+      "hubId": "112",
+      "hubName": "Brillah",
       "platforms": 80,
       "decos": 617,
       "store": "alchemical",
@@ -8905,8 +8905,8 @@
     "GIFHNVD4SG33SKK": {
       "label": "Tre Oofull",
       "file": "assets/streets/GIFHNVD4SG33SKK.json",
-      "hubId": "133",
-      "hubName": "Kloro",
+      "hubId": "131",
+      "hubName": "Haoma",
       "platforms": 178,
       "decos": 668,
       "internalLabel": "shroom_zoom_07"
@@ -9008,8 +9008,8 @@
     "GIFJ48A6O743F2G": {
       "label": "Pourto Ello",
       "file": "assets/streets/GIFJ48A6O743F2G.json",
-      "hubId": "72",
-      "hubName": "Chakra Phool",
+      "hubId": "133",
+      "hubName": "Kloro",
       "platforms": 140,
       "decos": 789,
       "internalLabel": "kloro_01"
@@ -9268,8 +9268,8 @@
     "GIFLRSGG7952SBS": {
       "label": "Redhorn Rd E",
       "file": "assets/streets/GIFLRSGG7952SBS.json",
-      "hubId": "100",
-      "hubName": "Vantalu",
+      "hubId": "90",
+      "hubName": "Choru",
       "platforms": 41,
       "decos": 290
     },
@@ -9599,8 +9599,8 @@
     "GIFNNL3OJG52OKJ": {
       "label": "Chester Way 1A",
       "file": "assets/streets/GIFNNL3OJG52OKJ.json",
-      "hubId": "95",
-      "hubName": "Xalanga",
+      "hubId": "90",
+      "hubName": "Choru",
       "platforms": 48,
       "decos": 309
     },
@@ -9623,8 +9623,8 @@
     "GIFNRF3P0E02J90": {
       "label": "Jonku Impressions",
       "file": "assets/streets/GIFNRF3P0E02J90.json",
-      "hubId": "85",
-      "hubName": "Kajuu",
+      "hubId": "75",
+      "hubName": "Bortola",
       "platforms": 76,
       "decos": 275,
       "store": "groceries"
@@ -9845,8 +9845,8 @@
     "GIFSLDITPAH2CHG": {
       "label": "Jameeda Meds",
       "file": "assets/streets/GIFSLDITPAH2CHG.json",
-      "hubId": "101",
-      "hubName": "Aranna",
+      "hubId": "100",
+      "hubName": "Vantalu",
       "platforms": 158,
       "decos": 637,
       "store": "kitchen",
@@ -10193,8 +10193,8 @@
     "GLI1D5DO1671QPA": {
       "label": "The Other Drop",
       "file": "assets/streets/GLI1D5DO1671QPA.json",
-      "hubId": "51",
-      "hubName": "Uralia",
+      "hubId": "50",
+      "hubName": "Ilmenskie Caverns",
       "platforms": 65,
       "decos": 273,
       "store": "mining"
@@ -10472,8 +10472,8 @@
     "GLID3PL336E1RN1": {
       "label": "Meadow's Edge",
       "file": "assets/streets/GLID3PL336E1RN1.json",
-      "hubId": "56",
-      "hubName": "Groddle Forest",
+      "hubId": "58",
+      "hubName": "Groddle Meadow",
       "platforms": 17,
       "decos": 216,
       "store": "gardening"
@@ -10526,8 +10526,8 @@
     "GLIFIG7BP8G1MU9": {
       "label": "Louise Pasture",
       "file": "assets/streets/GLIFIG7BP8G1MU9.json",
-      "hubId": "27",
-      "hubName": "Ix",
+      "hubId": "58",
+      "hubName": "Groddle Meadow",
       "platforms": 22,
       "decos": 267,
       "store": "animal"
@@ -10544,8 +10544,8 @@
     "GM112V6OCA126K1": {
       "label": "Devi Drape",
       "file": "assets/streets/GM112V6OCA126K1.json",
-      "hubId": "50",
-      "hubName": "Ilmenskie Caverns",
+      "hubId": "78",
+      "hubName": "Ilmenskie Deeps",
       "platforms": 120,
       "decos": 563,
       "store": "mining"
@@ -10571,8 +10571,8 @@
     "GM11E7ODKHO1QJE": {
       "label": "Wintry Place",
       "file": "assets/streets/GM11E7ODKHO1QJE.json",
-      "hubId": "64",
-      "hubName": "Groddle Heights",
+      "hubId": "66",
+      "hubName": "The Seams",
       "platforms": 28,
       "decos": 170
     },
@@ -10639,8 +10639,8 @@
     "GM4115NJ46G8M": {
       "label": "Groddle Ladder",
       "file": "assets/streets/GM4115NJ46G8M.json",
-      "hubId": "56",
-      "hubName": "Groddle Forest",
+      "hubId": "27",
+      "hubName": "Ix",
       "platforms": 38,
       "decos": 98
     },
@@ -10656,8 +10656,8 @@
     "GM413RQ6LRG9N": {
       "label": "West Spice",
       "file": "assets/streets/GM413RQ6LRG9N.json",
-      "hubId": "58",
-      "hubName": "Groddle Meadow",
+      "hubId": "27",
+      "hubName": "Ix",
       "platforms": 19,
       "decos": 136,
       "store": "liquor"
@@ -10930,8 +10930,8 @@
     "GNVEA19502I2S8M": {
       "label": "Rudna Barthii",
       "file": "assets/streets/GNVEA19502I2S8M.json",
-      "hubId": "97",
-      "hubName": "Muufo",
+      "hubId": "88",
+      "hubName": "Karnata",
       "platforms": 81,
       "decos": 429,
       "store": "alchemical"
@@ -11236,8 +11236,8 @@
     "GTJ102GGGJK1VDO": {
       "label": "Harbinger Heath",
       "file": "assets/streets/GTJ102GGGJK1VDO.json",
-      "hubId": "72",
-      "hubName": "Chakra Phool",
+      "hubId": "63",
+      "hubName": "Shimla Mirch",
       "platforms": 54,
       "decos": 257,
       "store": "gardening"
@@ -11325,8 +11325,8 @@
     "GTJ10KOCHTU1N89": {
       "label": "Lemmen Connect",
       "file": "assets/streets/GTJ10KOCHTU1N89.json",
-      "hubId": "63",
-      "hubName": "Shimla Mirch",
+      "hubId": "72",
+      "hubName": "Chakra Phool",
       "platforms": 48,
       "decos": 329,
       "store": "hardware"
@@ -11413,8 +11413,8 @@
     "GTJ12O0H7AO1IBS": {
       "label": "Viscid Pud",
       "file": "assets/streets/GTJ12O0H7AO1IBS.json",
-      "hubId": "120",
-      "hubName": "Cauda",
+      "hubId": "63",
+      "hubName": "Shimla Mirch",
       "platforms": 67,
       "decos": 399,
       "store": "gardening"
@@ -11431,8 +11431,8 @@
     "GTJ12SJ2RUV1N6R": {
       "label": "Belan Bends",
       "file": "assets/streets/GTJ12SJ2RUV1N6R.json",
-      "hubId": "133",
-      "hubName": "Kloro",
+      "hubId": "72",
+      "hubName": "Chakra Phool",
       "platforms": 103,
       "decos": 370,
       "store": "animal"
@@ -11557,16 +11557,16 @@
     "GTJ1KL16N2O13T2": {
       "label": "Palindrone",
       "file": "assets/streets/GTJ1KL16N2O13T2.json",
-      "hubId": "58",
-      "hubName": "Groddle Meadow",
+      "hubId": "66",
+      "hubName": "The Seams",
       "platforms": 32,
       "decos": 180
     },
     "GTJ1KOM8N2O1EFS": {
       "label": "Snool",
       "file": "assets/streets/GTJ1KOM8N2O1EFS.json",
-      "hubId": "58",
-      "hubName": "Groddle Meadow",
+      "hubId": "66",
+      "hubName": "The Seams",
       "platforms": 29,
       "decos": 121
     },
@@ -11801,8 +11801,8 @@
     "GUV2SSTOU8A30RS": {
       "label": "Indri Slope",
       "file": "assets/streets/GUV2SSTOU8A30RS.json",
-      "hubId": "114",
-      "hubName": "Firozi",
+      "hubId": "136",
+      "hubName": "Jal",
       "platforms": 37,
       "decos": 425,
       "internalLabel": "long 09"
@@ -11819,8 +11819,8 @@
     "GUV3BOQ5GKR2V7N": {
       "label": "Anaka Azimuth",
       "file": "assets/streets/GUV3BOQ5GKR2V7N.json",
-      "hubId": "123",
-      "hubName": "Fenneq",
+      "hubId": "120",
+      "hubName": "Cauda",
       "platforms": 34,
       "decos": 466,
       "store": "gardening",
@@ -12178,8 +12178,8 @@
     "GUVG9L7NOLA3CEB": {
       "label": "Adityas Plain",
       "file": "assets/streets/GUVG9L7NOLA3CEB.json",
-      "hubId": "140",
-      "hubName": "Samudra",
+      "hubId": "136",
+      "hubName": "Jal",
       "platforms": 28,
       "decos": 441,
       "internalLabel": "jal 15"
@@ -12441,8 +12441,8 @@
     "GUVNH88P9KR2B8L": {
       "label": "Tachai Tanbur",
       "file": "assets/streets/GUVNH88P9KR2B8L.json",
-      "hubId": "121",
-      "hubName": "Sura",
+      "hubId": "120",
+      "hubName": "Cauda",
       "platforms": 30,
       "decos": 308,
       "store": "hardware",
@@ -12460,8 +12460,8 @@
     "GUVNIF7Q9KR2382": {
       "label": "Pandhal Pegs",
       "file": "assets/streets/GUVNIF7Q9KR2382.json",
-      "hubId": "63",
-      "hubName": "Shimla Mirch",
+      "hubId": "120",
+      "hubName": "Cauda",
       "platforms": 30,
       "decos": 327,
       "store": "toys",
@@ -12577,8 +12577,8 @@
     "GUVQ4HDKLSF274K": {
       "label": "Midtunam Tunam",
       "file": "assets/streets/GUVQ4HDKLSF274K.json",
-      "hubId": "113",
-      "hubName": "Tahli",
+      "hubId": "109",
+      "hubName": "Rasana",
       "platforms": 80,
       "decos": 484,
       "store": "alchemical"
@@ -12757,8 +12757,8 @@
     "GUVUKCOSE793PHI": {
       "label": "Via Firozi",
       "file": "assets/streets/GUVUKCOSE793PHI.json",
-      "hubId": "114",
-      "hubName": "Firozi",
+      "hubId": "76",
+      "hubName": "Alakol",
       "platforms": 85,
       "decos": 445,
       "store": "hardware",

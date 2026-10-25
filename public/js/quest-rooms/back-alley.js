@@ -111,7 +111,7 @@ export const SUBWAY_STREETS = Object.freeze([
   { street: 'GA51CGIGKK62NV8', label: 'Kongu Hop', hubId: '89', hub: 'Andra', station: 'Kongu Hop Subway Station', door: 'door_1313450653802' },
   { street: 'GHVE9CULH652BV2', label: 'Pitika Parse', hubId: '85', hub: 'Kajuu', station: 'Pitika Parse Subway Station', door: 'door_1309226286485' },
   { street: 'GIF10HE4JTU1S7P', label: 'Onto Parada', hubId: '71', hub: 'Jethimadh', station: 'Onto Parada Subway Station', door: 'door_1303607498850' },
-  { street: 'GIF2IUQJQ571TFL', label: 'Eastern Approach', hubId: '50', hub: 'Ilmenskie Caverns', station: 'Eastern Approach Subway Station', door: 'door_1306221529369' },
+  { street: 'GIF2IUQJQ571TFL', label: 'Eastern Approach', hubId: '51', hub: 'Uralia', station: 'Eastern Approach Subway Station', door: 'door_1306221529369' },
   { street: 'GIFI9G70SV72H3C', label: 'Thiruvan Thrive', hubId: '93', hub: 'Salatu', station: 'Thiruvan Thrive Subway Station', door: 'door_1313452707196' },
   { street: 'GLI57DI72HI153U', label: 'Somewhat Sump', hubId: '63', hub: 'Shimla Mirch', station: 'Somewhat Sump Subway Station', door: 'door_1' },
   { street: 'GTJ8GSQV1IV1FBE', label: 'Jutuan Central', hubId: '72', hub: 'Chakra Phool', station: 'Jutuan Central Subway Station', door: 'door_1303608131851' },

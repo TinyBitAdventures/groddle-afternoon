@@ -110,9 +110,13 @@ describe('street visit counters', () => {
   });
 
   it('only streets on their own hub map count toward the hub', () => {
-    const borrowed = HUB_MAP_STREETS['56'].find((t) => index[t] && index[t].hubId !== '56');
-    assert.ok(borrowed, 'hub 56 shows a neighbour hub street');
-    assert.equal(countsTowardHub(borrowed, index[borrowed].hubId), HUB_MAP_STREETS[index[borrowed].hubId]?.includes(borrowed) || false);
+    // Since G184 every imported street on a hub's list is filed under that hub.
+    for (const [hub, list] of Object.entries(HUB_MAP_STREETS)) {
+      for (const t of list) if (index[t]) assert.equal(index[t].hubId, hub, `${t} on hub ${hub}'s list`);
+    }
+    // Louise Pasture (Groddle Meadow) borders Ix; it counts for its own hub only.
+    assert.equal(countsTowardHub('GLIFIG7BP8G1MU9', '58'), true);
+    assert.equal(countsTowardHub('GLIFIG7BP8G1MU9', '27'), false);
   });
 
   it('explorer badges grow with distinct streets', () => {
@@ -140,10 +144,14 @@ describe('street visit counters', () => {
   });
 
   it('groddle forest is not finished one street early', () => {
+    // 43 kept streets of the map's 56; the badge wants 41 (groddle_forest_completist).
     const kept = availableHubStreets('56', index);
+    assert.equal(kept.length, 43);
     const state = createAchievementState();
-    for (const tsid of kept.slice(0, -1)) visit(state, tsid);
+    for (const tsid of kept.slice(0, 40)) visit(state, tsid);
     assert.ok(!state.unlocked.includes('groddle_forest_completist'));
+    visit(state, kept[40]);
+    assert.ok(state.unlocked.includes('groddle_forest_completist'));
   });
 });
 

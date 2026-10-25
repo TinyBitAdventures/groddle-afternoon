@@ -43,7 +43,7 @@
  * one subway template per station), each with its own name sign.
  */
 
-import { SUBWAY_LINE } from './subway-line.js?v=g115-1';
+import { SUBWAY_LINE } from './subway-line.js?v=g184-1';
 import { SUBWAY_ART } from './subway-art.js?v=g115-1';
 
 export { SUBWAY_LINE, SUBWAY_ART };
