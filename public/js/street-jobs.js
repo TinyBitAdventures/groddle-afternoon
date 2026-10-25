@@ -51,6 +51,7 @@
  */
 
 export const SOLO_DIVISOR = 50;
+import { loseEnergy } from './metabolics.js';
 /** items/include/jobs.js startJobWork unit_duration. */
 export const WORK_UNIT_MS = 1500;
 /** locations/inc_jobs.js jobs_get_available: 30 * 60 seconds. */
@@ -368,7 +369,8 @@ export function applyWorkUnit(state, catalog, jobId, rid, ctx = {}, now = Date.n
   const check = workCheck(state, catalog, jobId, rid, { ...ctx, energy: ctx.pc?.energy }, now);
   if (!check.ok) return check;
   const { req, tool } = check;
-  ctx.pc.energy = Math.max(0, (Number(ctx.pc.energy) || 0) - req.energy);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(ctx.pc, req.energy);
   const wear = ctx.useTool ? ctx.useTool(tool, req.wear) : null;
   const row = rowFor(state, jobId);
   row.got[req.id] = req.got + 1;

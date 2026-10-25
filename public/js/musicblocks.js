@@ -8,7 +8,7 @@
 
 import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified-6';
 import { GAME_DAY_MS } from './game-day.js';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { SOUND_ALIASES, SOUND_FILES } from './sound-keys.js';
 
@@ -322,7 +322,8 @@ export function playMusicblock(state, pc, classTsid, now = Date.now()) {
   // musicblock_*.js play: stats_add_xp(xp, false) takes the mood bonus, before
   // the +2 mood and -2 energy.
   if (xp) xp = grantMoodXp(pc, xp);
-  pc.energy = Math.max(0, (pc.energy || 0) - 2);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, 2);
   // musicblock_*.js 370: metabolics_add_mood(2), nothing while dead (inc_metabolics.js 79-86).
   const oldMood = pc.mood || 0;
   if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), oldMood + 2);

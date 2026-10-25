@@ -39,7 +39,7 @@ import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
 import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { musicblockItemMeta } from './musicblocks.js';
-import { isEnchantedForest } from './enchanted-forests.js?v=g5-1';
+import { isEnchantedForest } from './enchanted-forests.js?v=g289-1';
 import { isSymphoniousTsid } from './symphonious-maximus.js?v=g90-1';
 import { isMissingFloorTsid } from './hidden-floors.js?v=g105-1';
 import { stationByTsid } from './subway.js?v=play-1';

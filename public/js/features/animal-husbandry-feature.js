@@ -101,10 +101,10 @@ import {
   stepHogtie,
   stickPlaceState,
 } from '../animal-husbandry.js';
-import { moodMax } from '../metabolics.js';
+import { moodMax, loseEnergy } from '../metabolics.js';
 import { textureFromUrl } from '../textures.js';
 import { PIGGY_DEATH_DROPS, PIGGY_DEATH_PUFF, SAD_BABY, forcedRoll, isSadIn } from '../animal-mood.js';
-import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g283-1';
+import { animalCrowdChanged, animalCrowdSad, animalPlaceIsDepressing, crowdLimit, smokePuff as sharedSmokePuff } from './animal-mood-feature.js?v=g289-1';
 import { grantMoodXp } from '../mood-xp.js';
 
 export const HUSBANDRY_FEATURE_ID = 'animal-husbandry';
@@ -1461,7 +1461,7 @@ function examine(engine, pile) {
 
 function sniff(engine, where) {
   const lost = Math.min(engine.pc.energy || 0, PLOP.sniffEnergy);
-  engine.pc.energy -= lost;
+  loseEnergy(engine.pc, lost); // G289 loss gate (inc_metabolics.js 108-122)
   const xp = gainXp(engine, PLOP.sniffXp);
   engine.pushActivity({ base: PLOP.sniffMsg, effects: { energy: -lost, xp } });
   emit(engine, 'plop:sniff');

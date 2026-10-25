@@ -19,6 +19,7 @@ import { addItem, countItem, ensureItem } from './inventory.js?v=catalog-unified
 import { canUseTool, useToolCondition } from './tools.js';
 import { foxBrushingCard, scaledToolWear } from './imagination-effects.js';
 import { grantMoodXp } from './mood-xp.js';
+import { loseEnergy } from './metabolics.js';
 
 export const FOX_ID = 'npc_fox';
 export const FOX_RANGER_ID = 'npc_fox_ranger';
@@ -494,7 +495,8 @@ export function brushFox(ctx) {
   const wasMoving = FOX_MOVING_STATES.has(fox.state);
   const wearPoints = scaledToolWear(toolState, FOX_BRUSH_ID, pkg.toolWear, wearMultiplier);
   const wear = wearPoints > 0 ? useToolCondition(toolState, FOX_BRUSH_ID, wearPoints) : { wear: 0 };
-  pc.energy = Math.max(0, (pc.energy || 0) - pkg.energyCost);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, pkg.energyCost);
   // inc_skill_packages.js 532 (fox_brushing): xp_bonus takes the mood bonus.
   const xp = grantMoodXp(pc, pkg.xpBonus);
   const [lo, hi] = foxFiberRange(ctx.learned, upgrades);

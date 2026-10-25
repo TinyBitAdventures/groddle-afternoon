@@ -22,7 +22,7 @@
 
 import { addItem, countItem, ensureItem, removeItem } from './inventory.js?v=catalog-unified-6';
 import { skillPackageDetails } from './skill-packages.js';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
 
 /**
  * Plain transforms: { verb, label, out, energy, mood, keep } per input class.
@@ -174,8 +174,9 @@ export function runTransform(classTsid, verb, count, inv, pc, learned = [], rng 
   const t = check.transform;
   const got = n * (t.outQty || 1);
   removeItem(inv, classTsid, n * (t.per || 1));
-  pc.energy -= check.energy;
-  if (check.mood) pc.mood = (pc.mood || 0) - check.mood;
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, check.energy);
+  if (check.mood) loseMood(pc, check.mood);
   // grain_bushel.js 126: metabolics_add_mood(10 * count), nothing while dead
   // (inc_metabolics.js 79-86); the tank caps it (metabolics.js moodMax).
   const moodGain = (t.moodGain || 0) * n > 0 && metabolicGain('mood').ok ? (t.moodGain || 0) * n : 0;
@@ -190,7 +191,7 @@ export function runTransform(classTsid, verb, count, inv, pc, learned = [], rng 
 function shuck(classTsid, n, inv, pc, learned, rng) {
   const herb = HERB_SEEDS[classTsid];
   const d = shuckDetails(learned, pc?.imaginationUpgrades);
-  pc.energy -= d.energy * n;
+  loseEnergy(pc, d.energy * n); // G289 loss gate
   if (rng() >= d.successRate) {
     return { ok: false, reason: 'failed', energy: d.energy * n, msg: `You tried to extract seeds, but you failed! (-${d.energy * n} energy)` };
   }

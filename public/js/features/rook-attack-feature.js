@@ -86,6 +86,7 @@ import {
 } from '../rook-attack.js';
 import { shrinePrimeBonus } from '../imagination-effects.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
 import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g273-1';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
@@ -210,20 +211,24 @@ function armored() {
   return save.armorUntil > now();
 }
 
-function clampStat(v) {
-  return Math.max(0, Math.min(100, Math.round(v)));
-}
 
 /**
  * Pay or charge metabolics and iMG the way other features do (pc mutation + activity).
  * inc_rook.js 198-201, 741-792 and include/rook.js 185, 198 award with
  * stats_add_xp(n) / (n, false), so iMG takes the mood bonus; returns what landed.
+ * G289: charges are metabolics_lose_energy / metabolics_lose_mood
+ * (include/rook.js 19-21, 186-187, 199-200; inc_rook.js 795), refused while
+ * dead; a gain would be metabolics_add_* (refused while dead or, for energy,
+ * Super Pooped). Both stop at the tank, never a flat 100 (inc_metabolics.js
+ * 40-53, 79-86, 108-122, 180-194).
  */
 function grant(engine, { xp = 0, energy = 0, mood = 0 } = {}) {
   const pc = engine.pc;
   const landed = xp ? grantMoodXp(pc, xp) : 0;
-  if (energy) pc.energy = clampStat((pc.energy || 0) + energy);
-  if (mood) pc.mood = clampStat((pc.mood || 0) + mood);
+  if (energy > 0) gainMetabolic(pc, 'energy', Math.round(energy));
+  else if (energy < 0) loseEnergy(pc, Math.round(-energy));
+  if (mood > 0) gainMetabolic(pc, 'mood', Math.round(mood));
+  else if (mood < 0) loseMood(pc, Math.round(-mood));
   engine.updateHud();
   return landed;
 }
@@ -1183,9 +1188,12 @@ function startStun(engine, source = 'verb') {
   const root = new PIXI.Container();
   root.zIndex = 40;
   // orbCountMessage (locations/inc_rook.js 502-520): the joined count as a
-  // second pc_overlay at delta_y -175, right aligned.
+  // second pc_overlay at delta_y -175. With no width the client sizes the
+  // text box to the text and centres it on the avatar, bottom edge at
+  // delta_y (InLocationAnnouncementOverlay.as showText 376-391), so its
+  // align="right" moves nothing (G291).
   const count = new PIXI.Text({ text: '0', style: textStyle(20, { fill: 0xffffff }) });
-  count.anchor.set(1, 1);
+  count.anchor.set(0.5, 1);
   root.addChild(count);
   root.eventMode = 'static';
   root.cursor = 'pointer';
@@ -1301,8 +1309,9 @@ function updateOrb(engine, dtMs) {
   const left = Math.max(0, 1 - (t - orb.startedAt) / (ROOK_SOURCE.orbWindowMs / timeScale));
   orb.root.x = c.x;
   orb.root.y = c.y;
-  orb.count.x = 42;
-  orb.count.y = ORB_ART.countDy + ORB_ART.orbAbove;
+  // inc_rook.js 521-522: the count rises 30 px as joiners reach six.
+  orb.count.x = 0;
+  orb.count.y = ORB_ART.countDy - 30 * Math.min(orb.joiners / 6, 1) + ORB_ART.orbAbove;
   orb.count.text = String(orb.joiners);
   // The window ends at 15 s, or a moment after the last joiner arrives.
   const allIn = orb.joiners >= orb.order.length && !orb.motes.length && t >= orb.nextJoinAt - (ROOK_SOLO.joinIntervalMs / timeScale) * 0.4;

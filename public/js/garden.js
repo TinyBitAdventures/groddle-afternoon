@@ -14,7 +14,7 @@ import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventor
 import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-2';
 import { skillPackageDetails } from './skill-packages.js';
 import { gardenGrowModifier } from './imagination-effects.js';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 /** @typedef {'clean'|'seeds'|'shoots'|'crop'|'dirty'} PlotState */
@@ -1040,7 +1040,8 @@ function spendEnergy(pc, cost) {
   if ((pc.energy || 0) <= cost) {
     return { ok: false, reason: 'energy', msgs: [`Need ${cost} energy (have ${Math.floor(pc.energy || 0)}).`] };
   }
-  pc.energy = Math.max(0, (pc.energy || 0) - cost);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, cost);
   return { ok: true, energy: -cost };
 }
 
@@ -1241,7 +1242,7 @@ export function harvestPlot(garden, key, inv, pc, opts = {}) {
       },
     };
   }
-  pc.energy = Math.max(0, (pc.energy || 0) - cost);
+  loseEnergy(pc, cost); // G289 loss gate
   // Players without Croppery I / Herbalism I receive half (rounded).
   const n = profile.halfHarvest ? Math.round(seed.produces / 2) : seed.produces;
   let bonus = 0;

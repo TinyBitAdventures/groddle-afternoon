@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-6';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-7';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-112';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-113';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -235,7 +235,7 @@ import {
   listEmotionalBearActions,
   performEmotionalBearAction,
   upgradeEmotionalBear,
-} from './js/emotional-bear.js?v=emotional-bear-1';
+} from './js/emotional-bear.js?v=emotional-bear-2';
 import {
   LAST_FEAT_STREET_IDS,
   LAST_FEAT_STREET_LABELS,
@@ -425,7 +425,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-14';
+} from './js/player-save.js?v=player-save-15';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -519,7 +519,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=g268-1';
+} from './js/garden.js?v=g289-1';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -539,7 +539,7 @@ import {
   formatActivityHtml,
   buildActivitySegments,
   activitySegmentsToHtml,
-} from './js/verb-rewards.js?v=g227-1';
+} from './js/verb-rewards.js?v=g289-1';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -685,7 +685,7 @@ import {
   planMusicblockDrop,
   playMusicblock,
   starterMusicblocks,
-} from './js/musicblocks.js?v=g268-1';
+} from './js/musicblocks.js?v=g289-1';
 import {
   VENDOR_PROFILES,
   selectVendorProfile,
@@ -696,7 +696,7 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=vendor-profiles-3';
+} from './js/vendor.js?v=vendor-profiles-4';
 import {
   createAnimalState,
   resetAnimalDay,
@@ -708,7 +708,7 @@ import {
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=woodcutting-test-2';
+} from './js/woodcutting.js?v=woodcutting-test-3';
 import {
   GIANTS,
   createShrineState,
@@ -803,7 +803,7 @@ import {
   soundForQuoin,
   soundForVerb,
 } from './js/sound-moments.js';
-import { moodMax, setMetabolicGainGate } from './js/metabolics.js';
+import { loseMood, moodMax, setMetabolicGainGate, setMetabolicLossGate } from './js/metabolics.js';
 import { installHiresIcons } from './js/icon-hires.js';
 import { installHiresDecos } from './js/deco-hires.js';
 import { loadMutedPreference, saveMutedPreference } from './js/audio-pref.js';
@@ -8428,6 +8428,13 @@ setMetabolicGainGate((stat, { quiet = false } = {}) => {
   if (gate?.ok === false && !quiet && gate.msg) pushActivity(gate.msg);
   return gate;
 });
+// G289: losses too (metabolics_lose_energy 108-122, metabolics_lose_mood 180-194): none while dead
+// or in the first two tutorial scenes; verb costs spend through js/metabolics.js loseEnergy.
+setMetabolicLossGate((stat, { quiet = false } = {}) => {
+  const gate = features.metabolicGate(stat, 'loss', engine);
+  if (gate?.ok === false && !quiet && gate.msg) pushActivity(gate.msg);
+  return gate;
+});
 
 function streetWorldState(tsid = currentStreetTsid) {
   const key = String(tsid || currentStreetTsid);
@@ -14934,7 +14941,7 @@ function beginRookCrusherHit(entry, now) {
   rookLastHitAt = now;
   cancelCurrentAction({ quiet: true });
   const moodLoss = crusherMoodLoss(player.x, rookWoodsState.spawn.x);
-  pc.mood = Math.max(0, (pc.mood || 0) - moodLoss);
+  loseMood(pc, moodLoss); // G289 metabolics_lose_mood (inc_metabolics.js 180-194)
   keys.clear();
   rookHitFx = {
     startedAt: now,

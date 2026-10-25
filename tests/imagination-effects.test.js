@@ -24,10 +24,10 @@ import { createInventory, countItem, ensureItem } from '../public/js/inventory.j
 import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js';
 import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js';
 import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=woodcutting-test-2';
-import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=woodcutting-test-2';
+import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=woodcutting-test-3';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js';
 import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js';
-import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=vendor-profiles-3';
+import { vendorBuy, vendorSell, vendorBuyUnitPrice } from '../public/js/vendor.js?v=vendor-profiles-4';
 import { normalizePlayerSnapshot } from '../public/js/player-save.js';
 import { loadContentCatalogsFromDir, resetContentCatalogs } from '../public/js/content-catalogs.js';
 import { createSkillState, getStudyStatus, pauseSkillStudy, startSkillStudy } from '../public/js/skills.js';

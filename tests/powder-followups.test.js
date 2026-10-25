@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { REVIVED_TRANT, createPlot, reviveDeadTree, tickPlot } from '../public/js/patches.js';
 import { powdersFeature } from '../public/js/features/powders-feature.js';
 import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-verbs-feature.js';
-import { GAME_CHEAT_BLOCKS, gameCheatBlock } from '../public/js/item-verbs.js?v=item-verbs-2';
+import { GAME_CHEAT_BLOCKS, gameCheatBlock } from '../public/js/item-verbs.js?v=item-verbs-3';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=crowns-1';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=hog-haul-2';
 import { raceSceneTsid } from '../public/js/races.js?v=races-4';

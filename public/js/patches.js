@@ -34,11 +34,11 @@
  */
 
 import { createTrantState, fruitCapacityAt, refillFruit, resetTrantDay } from './trants.js?v=trant-harvest-2';
-import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=woodcutting-test-2';
+import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=woodcutting-test-3';
 import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-test-2';
 import { musicblockItemMeta } from './musicblocks.js';
 import { grantMoodXp } from './mood-xp.js';
-import { metabolicGain } from './metabolics.js';
+import { metabolicGain, loseEnergy } from './metabolics.js';
 
 export const PATCH_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 export const SOIL_SPRITE_ROOT = 'assets/sprites/soil';
@@ -915,7 +915,8 @@ function fail(verbId, msg, extra = {}) {
 }
 
 function applyCosts(pc, costs) {
-  if (costs.energy) pc.energy = Math.max(0, (Number(pc.energy) || 0) - costs.energy);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  if (costs.energy) loseEnergy(pc, costs.energy);
   // inc_skill_packages.js 524: the mood bonus goes through metabolics_add_mood,
   // nothing while dead (inc_metabolics.js 79-86); costs.mood is what landed.
   if (costs.mood > 0 && !metabolicGain('mood').ok) costs.mood = 0;

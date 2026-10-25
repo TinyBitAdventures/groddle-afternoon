@@ -80,7 +80,7 @@ import {
 import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-test-2';
 import { getGameDayKey } from './game-day.js?v=dametime-1';
 import { grantMoodXp } from './mood-xp.js';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { metabolicGain, moodMax, loseEnergy, loseMood } from './metabolics.js';
 
 export const RESOURCE_NODES_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 export const RESOURCE_SPRITE_ROOT = 'assets/sprites/resources';
@@ -1288,7 +1288,8 @@ function bumpDaily(node, verbId, dayKey) {
 }
 
 function applyMetabolics(pc, costs) {
-  if (costs.energy) pc.energy = Math.max(0, (pc.energy || 0) - costs.energy);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  if (costs.energy) loseEnergy(pc, costs.energy);
   if (costs.mood > 0) {
     // G278: a package's mood_bonus is metabolics_add_mood
     // (inc_skill_packages.js 524), refused while dead (inc_metabolics.js
@@ -1297,7 +1298,7 @@ function applyMetabolics(pc, costs) {
     if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), before + costs.mood);
     costs.mood = Math.max(0, (Number(pc.mood) || 0) - before);
   } else if (costs.mood) {
-    pc.mood = Math.max(0, (pc.mood || 0) + costs.mood);
+    loseMood(pc, -costs.mood);
   }
   if (costs.xp && costs.xpNoBonus) {
     // firefly_jar.js 383: the full jar's iMG is a cultivation reward, paid
@@ -1695,7 +1696,7 @@ export function releaseSalmon(inv, pc, { hubId = '', salmonCount = 0 } = {}) {
   if (countItem(inv, SALMON_RELEASE.classTsid) < 1) return { ok: false, reason: 'no_salmon', message: '', msgs: [] };
   removeItem(inv, SALMON_RELEASE.classTsid, 1);
   const before = Math.max(0, Number(pc?.energy) || 0);
-  if (pc) pc.energy = Math.max(0, before - SALMON_RELEASE.energy);
+  if (pc) loseEnergy(pc, SALMON_RELEASE.energy); // G289 loss gate
   const energy = before - Math.max(0, Number(pc?.energy) || 0);
   const xp = pc ? grantMoodXp(pc, SALMON_RELEASE.xp) : 0;
   const effects = [];

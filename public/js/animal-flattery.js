@@ -21,7 +21,7 @@
  * (685) live in js/solo-feats.js and the sound (680) in js/sound-moments.js.
  */
 
-import { metabolicGain, moodMax, energyMax } from './metabolics.js';
+import { metabolicGain, moodMax, energyMax, loseEnergy } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 export const BUTTER_UP = Object.freeze({
@@ -99,7 +99,8 @@ export function butterUpChicken(state = {}, pc = {}) {
   const gate = butterUpVerbState(state);
   if (!gate || !gate.enabled) return { ok: false, msg: gate?.reason || '', effects: { energy: 0, mood: 0, xp: 0 } };
   const energyBefore = num(pc.energy);
-  pc.energy = Math.max(0, energyBefore - BUTTER_UP.energyCost);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, BUTTER_UP.energyCost);
   const moodBefore = num(pc.mood);
   // 197: metabolics_add_mood, nothing while dead (inc_metabolics.js 79-86).
   if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + BUTTER_UP.mood);
@@ -188,7 +189,7 @@ export function singToButterfly(state = {}, pc = {}, ctx = {}) {
   if (life > 0) state.timesSungTo = sung + 1;
   const xp = grantMoodXp(pc, reward.xp); // 658 stats_add_xp(xp, false, ...)
   const energyBefore = num(pc.energy);
-  pc.energy = Math.max(0, energyBefore - reward.energyCost); // 666
+  loseEnergy(pc, reward.energyCost); // 666 metabolics_lose_energy (G289)
   // 682 incrementSkillPackageLimit: keyed by game day (current_day_key).
   state.singToUses = singUsesToday(state, dayKey) + 1;
   state.singToDay = dayKey;

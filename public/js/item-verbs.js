@@ -12,7 +12,7 @@
  */
 
 import { grantMoodXp } from './mood-xp.js';
-import { metabolicGain } from './metabolics.js';
+import { metabolicGain, loseEnergy } from './metabolics.js';
 
 const ENERGY = "You don't have enough energy to do this.";
 const DEPRESSED = 'You are too depressed to do this.';
@@ -136,7 +136,8 @@ export function crunchIce(pc, count = 1, ctx = {}) {
       if (metabolicGain('mood').ok) pc.mood = Math.min(cap, (Number(pc.mood) || 0) + 6 * n);
     }
   }
-  pc.energy = Math.max(0, (Number(pc.energy) || 0) - 3 * n);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, 3 * n);
   return { ok: true, consumed: n, msgs, xp, achievementCounters: [...rows, ...itemVerbAchievementCounters('ice', 'crunch', n)] };
 }
 

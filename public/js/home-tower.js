@@ -45,6 +45,7 @@
 
 import { TOWER_ROOM_SPOTS } from './tower-rooms.js?v=tower-rooms-1';
 import { TOWER_PART_CHOICES, TOWER_VARIANT_ART } from './home-tower-art.js?v=tower-art-1';
+import { loseEnergy } from './metabolics.js';
 
 export { TOWER_PART_CHOICES, TOWER_VARIANT_ART };
 
@@ -653,7 +654,8 @@ export function applyWorkUnit(jobId, got, rid, ctx = {}) {
   const check = workCheck(jobId, got, rid, { ...ctx, energy: ctx.pc?.energy });
   if (!check.ok) return check;
   const { req, tool } = check;
-  ctx.pc.energy = Math.max(0, (Number(ctx.pc.energy) || 0) - req.energy);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(ctx.pc, req.energy);
   const wear = ctx.useTool ? ctx.useTool(tool, req.wear) : null;
   got[req.id] = req.got + 1;
   return { ok: true, req, tool, wear, energy: req.energy, left: req.need - req.got - 1, complete: projectComplete(jobId, got) };

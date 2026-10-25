@@ -17,7 +17,7 @@
  *   activity says so.
  */
 
-import { metabolicGain, moodMax } from './metabolics.js';
+import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
 
 export const SET_FREE = Object.freeze({
   verb: 'set free',
@@ -125,7 +125,8 @@ export function applySetFree(classId, pc = {}, roll = Math.random()) {
   const moodBefore = Number(pc.mood) || 0;
   if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + SET_FREE.mood);
   const energyBefore = Number(pc.energy) || 0;
-  pc.energy = Math.max(0, energyBefore - SET_FREE.energy);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, SET_FREE.energy);
   return {
     slugs: { mood: (Number(pc.mood) || 0) - moodBefore, energy: energyBefore - pc.energy },
     line: setFreeResponse(classId, roll),

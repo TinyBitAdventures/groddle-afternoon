@@ -444,7 +444,9 @@ export const hellFeature = {
     }
     if (engine.transientInstance() || !isFinite(engine.pc.energy)) return;
     const energy = engine.pc.energy;
-    if (lastEnergy != null && energy > lastEnergy) {
+    // G289: on the first look after a load (lastEnergy null) too, so a gain that landed before
+    // it (a badge reward at boot) still ends Pooped above 5% (metabolics_add_energy 66-70).
+    if (lastEnergy == null || energy > lastEnergy) {
       const gained = onEnergyGained(state, engine.pc, now);
       state = gained.state;
       // G258: eating over 5% ends Pooped; drop its HUD buff and refresh data-hell-pooped.

@@ -29,7 +29,7 @@ import { worldToScreen } from '../street-model.js';
 import { signArmWidth } from '../street-render.js?v=parallax-7';
 import { getSkillCatalog } from '../content-catalogs.js';
 import { GIANTS } from '../shrines.js?v=spinning-wheel-test-3';
-import { teleportationFeature } from './teleportation-feature.js?v=teleport-6';
+import { teleportationFeature } from './teleportation-feature.js?v=teleport-7';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
@@ -66,8 +66,8 @@ import {
   jobInProgress,
   cancelJob,
   jobDivisor,
-} from '../street-jobs.js?v=jobs-2';
-import { energyMax, moodMax } from '../metabolics.js';
+} from '../street-jobs.js?v=jobs-3';
+import { gainMetabolic } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { textureFromUrl } from '../textures.js';
 
@@ -348,11 +348,6 @@ function clearFlora() {
 /* Rewards                                                              */
 /* ------------------------------------------------------------------ */
 
-/** 0 up to the player's metabolic maximum (the energy tank, also mood's). */
-function clampMetabolic(v, max) {
-  return Math.max(0, Math.min(max, Math.round(v)));
-}
-
 /**
  * quests/job_*.js job_complete and job_complete_performance award with
  * stats_add_xp(n, false), so the iMG takes the mood bonus. Returns the
@@ -363,15 +358,19 @@ function payout(engine, rewards = {}) {
   const pc = engine.pc;
   const landed = xp ? grantMoodXp(pc, xp) : 0;
   if (currants) pc.currants = (pc.currants || 0) + currants;
-  if (mood) pc.mood = clampMetabolic((pc.mood || 0) + mood, moodMax(pc));
-  if (energy) pc.energy = clampMetabolic((pc.energy || 0) + energy, energyMax(pc));
+  // G289: job_complete pays mood and energy through metabolics_add_mood /
+  // metabolics_add_energy, refused while dead (and energy while Super Pooped),
+  // capped at the tank (inc_metabolics.js 40-53, 79-86; quests/job_cw_test.js
+  // 172-173 keeps the returned change as the reward). Report what landed.
+  const moodLanded = mood > 0 ? gainMetabolic(pc, 'mood', mood) : 0;
+  const energyLanded = energy > 0 ? gainMetabolic(pc, 'energy', energy) : 0;
   const ledger = pc.giantFavor;
   for (const f of favor) {
     if (!f?.points || !ledger) continue;
     const giants = f.giant === 'all' ? Object.keys(GIANTS) : [f.giant === 'tii' ? 'ti' : f.giant];
     for (const g of giants) ledger[g] = Math.max(0, Number(ledger[g]) || 0) + f.points;
   }
-  return { ...(rewards || {}), xp: landed };
+  return { ...(rewards || {}), xp: landed, mood: moodLanded, energy: energyLanded };
 }
 
 function rewardBits(r) {

@@ -31,7 +31,7 @@
 
 import { platformsScreen, platformYAt } from '../street-model.js';
 import { frameTexture, textureFromUrl } from '../textures.js';
-import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=woodcutting-test-2';
+import { ensureWoodTreeState, resetWoodTreeDay, woodTreeStatusLabel } from '../woodcutting.js?v=woodcutting-test-3';
 import { noteWoodTreeCare } from '../patches.js';
 import {
   ENCHANTED_FORESTS,
@@ -44,7 +44,7 @@ import {
   normalizeEnchantedTree,
   petEnchantedSeedling,
   seedlingStatusLabel,
-} from '../enchanted-forests.js?v=g5-1';
+} from '../enchanted-forests.js?v=g289-1';
 
 export const ENCHANTED_FEATURE_ID = 'enchanted-forest';
 const SEEDLING_URL = 'assets/sprites/soil/patch-seedling@3x.webp';

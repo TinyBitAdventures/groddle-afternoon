@@ -54,7 +54,7 @@ import {
   startLevitation,
   startMeditation,
 } from '../meditation.js';
-import { energyMax, metabolicGain, moodMax } from '../metabolics.js';
+import { energyMax, metabolicGain, moodMax, loseEnergy } from '../metabolics.js';
 import { levitationCards } from '../imagination-effects.js';
 import { applyPhysicsAdjustments, physicsMultipliers } from '../location-events.js';
 import { sourceFromUrl } from '../textures.js';
@@ -439,7 +439,8 @@ function levitate(engine) {
     return false;
   }
   state = out.state;
-  engine.pc.energy = Math.max(0, engine.pc.energy - out.energyCost);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(engine.pc, out.energyCost);
   engine.pushActivity(out.message);
   engine.toast('Levitating! Tap Space in the air to float higher.', 2400);
   engine.updateHud();

@@ -62,6 +62,7 @@ import {
   teleporterPhase,
 } from '../party-spaces.js';
 import { frameTexture, sourceFromUrl, textureFromUrl } from '../textures.js';
+import { loseEnergy } from '../metabolics.js';
 
 export const PARTY_FEATURE_ID = 'party-spaces';
 const HOLD = 'party';
@@ -413,7 +414,8 @@ function rejoin(engine) {
     note(engine, PARTY_TEXT.noEnergy);
     return false;
   }
-  engine.pc.energy -= cost;
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(engine.pc, cost);
   engine.updateHud();
   openTeleporter(engine);
   engine.save();

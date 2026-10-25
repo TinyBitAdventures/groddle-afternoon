@@ -10,6 +10,8 @@
  * named street companions already present in the Feat replay as local players.
  */
 
+import { loseEnergy } from './metabolics.js';
+
 export const EMOTIONAL_BEAR_ITEM_ID = 'emotional_bear';
 export const EMOTIONAL_BEAR_LIPS_ID = 'lips';
 export const EMOTIONAL_BEAR_MOON_ID = 'moon';
@@ -248,7 +250,8 @@ export function performEmotionalBearAction(
   }
 
   const action = EMOTIONAL_BEAR_ACTIONS[actionId];
-  player.energy = Math.max(0, (Number(player.energy) || 0) - action.energy);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(player, action.energy);
   const selfMoodBefore = clampMood(player.mood);
   player.mood = clampMood(selfMoodBefore + action.selfMood);
   const selfMood = player.mood - selfMoodBefore;

@@ -39,6 +39,7 @@
  */
 
 export const ENCHANTED_SOURCE = 'tinyspeck/glitch-GameServerJS CC0 items/wood_tree_enchanted.js';
+import { loseEnergy } from './metabolics.js';
 export const ENCHANTED_FOREST_SOURCE = 'reconstruction: Enchanted Forest hollows (not in tinyspeck/glitch-locations); a purple-shaded slice of the parent street\'s CC0 location';
 
 /** wood_tree_enchanted.js onLoad and patch_seedling.js timers. */
@@ -255,7 +256,8 @@ export function seedlingRemainingMs(tree, now = Date.now()) {
 export function petEnchantedSeedling(tree, pc = {}, turn = 0) {
   if (tree?.stage !== 'seedling') return { ok: false, reason: 'not_seedling' };
   const energy = ENCHANTED_WOOD_TREE.seedlingPetEnergy;
-  pc.energy = Math.max(0, (Number(pc.energy) || 0) - energy);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, energy);
   tree.seedlingPets = whole(tree.seedlingPets, 0) + 1;
   const lines = SEEDLING_PET_NO_MORE_LINES;
   return {

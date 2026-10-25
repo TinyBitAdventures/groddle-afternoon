@@ -81,7 +81,6 @@ import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v
 import {
   drawCheckpointFlag,
   drawFinishPosts,
-  WINNER_RAINBOW,
   drawWinnerRainbow,
   raceLoadingColors,
   renderRaceCourse,
@@ -113,7 +112,10 @@ let dispenserTarget = null;
 let hud = null;
 let progressHint = 0;
 let resultApplied = false;
-let resultRevealTimer = null; // G285: the win card waits for the rainbow
+let leavePromptTimer = null; // G291: 'Ready to leave?' 1 s after the result (inc_race.js 386)
+let leavePromptOpen = false;
+const LEAVE_PROMPT_TEXT = 'Ready to leave?';
+const LEAVE_PROMPT_DELAY_MS = 1000;
 let lastHudAt = 0;
 let startTimer = null;
 let soonTimer = null; // the 5 s "YAY! THE GAME IS STARTING SOON." wait after Click to Start
@@ -251,7 +253,26 @@ const STYLE = `
 .race-store-card button[data-race-activate] { background: #b8f08a; }
 .race-store-card button:disabled { cursor: default; opacity: .5; }
 .race-store-card .race-store-close { position: absolute; right: 10px; top: 8px; background: transparent; color: #fff; font-size: 1.2rem; }
-.race-result-time { margin: -10px 0 18px; color: #f6e7c4; font-size: .8rem; font-weight: 800; }
+/* G291: the result is a vp_overlay (inc_race.js 371-382: width 500, x 50%, top_y 20%,
+   duration 0, not locking): two nuxp_vog lines over the street, no shade, no card. */
+.race-results-vog { position: absolute; z-index: 86; left: 50%; top: 20%; transform: translateX(-50%);
+  width: min(500px, calc(100% - 32px)); margin: 0; text-align: center; pointer-events: none; }
+.race-results-vog[hidden] { display: none !important; }
+.race-results-vog p { margin: 0; color: #fff; text-shadow: 0 2px 0 #24303a, 0 0 3px #24303a, 0 0 14px rgba(0,0,0,.45); }
+.race-results-vog [data-race-result-title] { font: 900 clamp(1.1rem, 2.6vw + .4rem, 2rem)/1.2 Nunito, 'Trebuchet MS', sans-serif; }
+.race-results-vog [data-race-result-detail] { font: 800 clamp(.8rem, 1.2vw + .4rem, 1.1rem)/1.3 Nunito, 'Trebuchet MS', sans-serif; }
+.race-results-vog [data-race-result-detail]:empty { display: none; }
+/* PromptView.as: a non-modal prompt, 300 px wide, 0x393b32 at 0.9, round 12, 7 px padding,
+   docked 30 px in from the viewport's bottom right (refresh 417-419), above the pack; no shade. */
+.race-prompt { position: absolute; z-index: 87; right: 30px; bottom: calc(var(--pack-live-height, 112px) + 30px); box-sizing: border-box;
+  width: min(300px, calc(100% - 32px)); padding: 7px; border-radius: 6px; background: rgba(57,59,50,.9);
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; color: #fff;
+  font: 700 14px/1.35 Nunito, 'Trebuchet MS', sans-serif; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+.race-prompt[hidden] { display: none !important; }
+.race-prompt p { margin: 0; padding: 0 0 2px 2px; }
+.race-prompt button { flex: none; min-width: 64px; padding: 5px 14px; border: 1px solid rgba(255,255,255,.28); border-radius: 4px;
+  font: 800 13px/1.2 inherit; color: #fff; cursor: pointer; background: linear-gradient(#7aa83f, #4f7d22); }
+@media (max-width: 620px) { .race-prompt { right: 16px; } }
 @media (max-width: 620px) {
   .race-store-card li { grid-template-columns: 32px 1fr; }
   .race-store-card li .race-store-actions { grid-column: 1 / -1; justify-content: flex-end; }
@@ -298,17 +319,12 @@ function buildChrome(engine) {
       <button type="button" class="btn-glitch-primary" data-race-ready-btn>Click to Start</button>
     </div>`);
   const countdown = el('div', { id: 'race-countdown', class: 'hog-haul-countdown', hidden: true, 'aria-live': 'assertive' });
-  const result = el('div', { id: 'race-result', class: 'hog-haul-screen', hidden: true, role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'race-result-title' }, `
-    <div class="hog-haul-screen-shade"></div>
-    <div class="hog-haul-result-card">
-      <div class="hog-haul-result-rays" aria-hidden="true"></div>
-      <img data-race-result-icon alt="" />
-      <p data-race-result-kicker>RACE</p>
-      <h2 id="race-result-title" data-race-result-title>YOU WON!</h2>
-      <p data-race-result-detail></p>
-      <p class="race-result-time" data-race-result-time></p>
-      <button type="button" class="btn-glitch-primary" data-race-leave>Leave the Game</button>
-    </div>`);
+  const result = el('div', { id: 'race-result', class: 'race-results-vog', hidden: true, role: 'status', 'aria-live': 'assertive' }, `
+    <p data-race-result-title>YOU WON!</p>
+    <p data-race-result-detail></p>`);
+  const leavePrompt = el('div', { id: 'race-leave-prompt', class: 'race-prompt', hidden: true, role: 'alertdialog', 'aria-label': LEAVE_PROMPT_TEXT }, `
+    <p>${LEAVE_PROMPT_TEXT}</p>
+    <button type="button" data-race-leave-ok>OK</button>`);
   const banner = el('div', { id: 'race-start-banner', class: 'race-start-banner', hidden: true, 'aria-live': 'assertive' });
   const store = el('div', { id: 'race-store-panel', class: 'hog-haul-screen race-store', hidden: true, role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'race-store-title' }, `
     <div class="hog-haul-screen-shade" data-race-store-close></div>
@@ -318,10 +334,10 @@ function buildChrome(engine) {
         <div><h2 id="race-store-title">Ticket Dispenser</h2><p data-race-store-currants></p></div></header>
       <ul data-race-store-list></ul>
     </div>`);
-  for (const node of [bar, ready, countdown, result, banner, store]) host.appendChild(node);
-  hud = { bar, ready, countdown, result, banner, store };
+  for (const node of [bar, ready, countdown, result, leavePrompt, banner, store]) host.appendChild(node);
+  hud = { bar, ready, countdown, result, leavePrompt, banner, store };
+  leavePrompt.querySelector('[data-race-leave-ok]').addEventListener('click', () => leaveRace(engine));
   ready.querySelector('[data-race-ready-btn]').addEventListener('click', () => readyUp(engine));
-  result.querySelector('[data-race-leave]').addEventListener('click', () => leaveRace(engine));
   bar.querySelector('[data-race-forfeit]').addEventListener('click', () => confirmForfeit(engine));
   store.querySelectorAll('[data-race-store-close]').forEach((node) => node.addEventListener('click', () => closeStore()));
   store.querySelector('[data-race-store-list]').addEventListener('click', (event) => {
@@ -976,35 +992,24 @@ function showResult(engine) {
     engine.pushActivity(`You left ${race.title}.`);
   }
   const copy = raceResultCopy(run, reward);
-  const card = hud.result.querySelector('.hog-haul-result-card');
-  card.classList.toggle('is-loss', run.status !== 'won');
-  hud.result.querySelector('[data-race-result-icon]').src = `${RACE_ICON_DIR}${race.ticket}.png`;
-  hud.result.querySelector('[data-race-result-kicker]').textContent = race.title.toUpperCase();
   hud.result.querySelector('[data-race-result-title]').textContent = copy.title;
   hud.result.querySelector('[data-race-result-detail]').textContent = copy.detail;
+  // The remake's own time line (no source) goes to the activity log, not the overlay.
   const time = raceElapsedMs(run, Date.now());
   const best = record.best[run.raceId];
-  hud.result.querySelector('[data-race-result-time]').textContent = quoins
-    ? `You grabbed ${run.scores.you} of ${run.quoinTotal} quoins · ${run.rivalName} ${run.scores.rival}${run.status === 'won' ? ` · ${formatRaceTime(time)}` : ''}`
+  const timeLine = quoins
+    ? `You grabbed ${run.scores.you} of ${run.quoinTotal} quoins, ${run.rivalName} ${run.scores.rival}${run.status === 'won' ? `, in ${formatRaceTime(time)}` : ''}.`
     : run.status === 'won'
-      ? `Your time ${formatRaceTime(time)}${best ? ` · Best ${formatRaceTime(best)}` : ''}${run.falls ? ` · ${run.falls} fall${run.falls === 1 ? '' : 's'}` : ''}`
+      ? `Your time ${formatRaceTime(time)}${best ? `, best ${formatRaceTime(best)}` : ''}${run.falls ? `, ${run.falls} fall${run.falls === 1 ? '' : 's'}` : ''}.`
       : run.status === 'lost' ? `You were ${Math.round(run.playerProgress * 100)}% of the way there.` : '';
+  if (timeLine) engine.pushActivity(timeLine);
   hud.countdown.hidden = true;
   hud.ready.hidden = true;
-  // G285: a pc_overlay plays in the street under the source's vp_overlay text
-  // (inc_race.js 371-384), so nothing hid the rainbow; the remake's result
-  // card covers the street, so on a win it waits until the rainbow is done.
-  clearTimeout(resultRevealTimer);
-  resultRevealTimer = null;
-  if (run.status === 'won') {
-    const mine = run;
-    resultRevealTimer = setTimeout(() => {
-      resultRevealTimer = null;
-      if (run !== mine || !hud) return;
-      hud.result.hidden = false;
-      publish(engine);
-    }, WINNER_RAINBOW.durationMs);
-  } else hud.result.hidden = false;
+  // G291: inc_race.js 371-386 sends the YOU WON! vp_overlay (top_y 20%, not
+  // locking) at once, next to the rainbow pc_overlay, and sets the
+  // 'Ready to leave?' prompt for 1 s later (the loser's too, 400-418).
+  hud.result.hidden = false;
+  armLeavePrompt(engine, LEAVE_PROMPT_DELAY_MS);
   engine.player.vx = 0;
   engine.updateHud();
   engine.save();
@@ -1032,13 +1037,34 @@ function followWinnerRainbow(engine, rainbow) {
   step();
 }
 
+/**
+ * players/inc_quests.js quests_multiplayer_leave_prompt 1156-1172: 'Ready to
+ * leave?' with one OK and no timeout; OK dismisses race_results and exits the
+ * instance (quests_multiplayer_leave 1174-1183). A non-modal prompt
+ * (PromptView.as) in the bottom right, so the street and the rainbow stay
+ * in view.
+ */
+function armLeavePrompt(engine, delayMs) {
+  clearTimeout(leavePromptTimer);
+  const mine = run;
+  leavePromptTimer = setTimeout(() => {
+    leavePromptTimer = null;
+    if (!hud || !run || run !== mine || raceIsLive(run)) return;
+    leavePromptOpen = true;
+    hud.leavePrompt.hidden = false;
+    publish(engine);
+  }, Math.max(0, delayMs));
+}
+
 async function leaveRace(engine) {
   if (!run || raceIsLive(run)) return false;
   const outcome = run.status;
   const back = record.returnTo;
   if (outcome === 'won') engine.questFlag(RACE_FLAGS.leave);
-  clearTimeout(resultRevealTimer);
-  resultRevealTimer = null;
+  clearTimeout(leavePromptTimer);
+  leavePromptTimer = null;
+  leavePromptOpen = false;
+  hud.leavePrompt.hidden = true;
   hud.result.hidden = true;
   hud.bar.hidden = true;
   hud.countdown.hidden = true;
@@ -1090,6 +1116,7 @@ function renderHud(engine, force = false) {
 function publish(engine) {
   engine.setData('raceStatus', run ? run.status : 'idle');
   engine.setData('raceResultCard', hud && !hud.result.hidden ? 'shown' : '');
+  engine.setData('raceLeavePrompt', leavePromptOpen ? 'open' : leavePromptTimer ? 'armed' : '');
   engine.setData('raceId', run ? run.raceId : '');
   engine.setData('raceRival', run ? run.rivalName : '');
   engine.setData('raceProgress', run ? (run.playerProgress || 0).toFixed(3) : '0');

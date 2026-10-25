@@ -12,7 +12,8 @@
 
 import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-test-2';
 import { woodHarvestOverrides } from './imagination-effects.js';
-import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=g5-1';
+import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=g289-1';
+import { loseEnergy } from './metabolics.js';
 
 export const WOOD_TREE_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 
@@ -165,7 +166,8 @@ export function harvestWoodTree(state, inv = {}, pc = {}, toolState = {}) {
   if (!toolUse.ok) return { ...toolUse, reason: 'broken_hatchet' };
 
   const maturityBefore = s.maturity;
-  pc.energy = Math.max(0, (pc.energy || 0) - quote.energyCost);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, quote.energyCost);
   inv.plank = (inv.plank || 0) + quote.plankYield;
   s.harvestedToday = true;
   s.totalHarvests += 1;

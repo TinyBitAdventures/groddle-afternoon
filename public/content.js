@@ -3,7 +3,7 @@
  * Simplified conditions/handlers for the Groddle spike.
  */
 
-import { getVerbReward, applyVerbReward, formatActivityLine } from './js/verb-rewards.js?v=g227-1';
+import { getVerbReward, applyVerbReward, formatActivityLine } from './js/verb-rewards.js?v=g289-1';
 import { grantMoodXp } from './js/mood-xp.js';
 import {
   TRANT_META,
@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=trant-care-test-2';
+} from './js/trant-care.js?v=trant-care-test-3';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -28,7 +28,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=g268-1';
+} from './js/garden.js?v=g289-1';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -54,14 +54,14 @@ import {
   MUSICBLOCK_CATALOG,
   collectMusicblock,
   isMusicblock,
-} from './js/musicblocks.js?v=g268-1';
+} from './js/musicblocks.js?v=g289-1';
 import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-2';
 import {
   ensureWoodTreeState,
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=woodcutting-test-2';
+} from './js/woodcutting.js?v=woodcutting-test-3';
 import { findWorkingRookTool } from './js/rook-woods.js?v=rook-woods-3';
 import {
   HERDKEEPING,

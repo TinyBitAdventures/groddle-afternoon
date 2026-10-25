@@ -56,6 +56,7 @@ import {
   teleportToPoint,
   useScript,
 } from '../teleportation.js';
+import { loseEnergy } from '../metabolics.js';
 
 export const TELEPORT_FEATURE_ID = 'teleportation';
 const TANK = 100;
@@ -192,7 +193,8 @@ function preflight(engine, target) {
 
 function launch(engine, out, how) {
   state = out.state;
-  if (out.energyCost) engine.pc.energy = Math.max(0, engine.pc.energy - out.energyCost);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  if (out.energyCost) loseEnergy(engine.pc, out.energyCost);
   engine.updateHud();
   engine.closeMap();
   engine.pushActivity(
@@ -252,7 +254,7 @@ function writeScript(engine) {
   if (!out.ok) return engine.toast(out.error || 'You cannot write a script here.'), false;
   removeItem(engine.inv, PAPER_CLASS, out.costs.paper);
   const wear = useToolCondition(engine.toolState, QUILL_CLASS, out.costs.quillWear);
-  engine.pc.energy = Math.max(0, engine.pc.energy - out.costs.energy);
+  loseEnergy(engine.pc, out.costs.energy); // G289 loss gate
   state = out.state;
   addItem(engine.inv, SCRIPT_CLASS, 1);
   for (const event of out.events) engine.achievement(event.counter, event.amount);

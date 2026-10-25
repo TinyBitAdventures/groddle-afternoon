@@ -29,7 +29,7 @@
 
 import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-6';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=dametime-1';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g268-1';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g289-1';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js';
 import { setSeasonalRecipeCheck } from '../making.js?v=g268-1';
 import { getToolCondition } from '../tools.js';

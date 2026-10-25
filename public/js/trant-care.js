@@ -12,7 +12,7 @@
 import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js';
 import { fruitCapacityAt } from './trants.js?v=trant-harvest-2';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { metabolicGain, moodMax, loseEnergy } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 
 const freezeRanks = (ranks) => Object.freeze(
@@ -139,7 +139,8 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
       effects: { energy: 0, mood: (Number(pc.mood) || 0) - moodBefore, xp: 0 },
     };
   }
-  pc.energy = Math.max(0, (Number(pc.energy) || 0) - profile.energyCost);
+  // G289: metabolics_lose_energy, nothing lost while dead (inc_metabolics.js 108-122).
+  loseEnergy(pc, profile.energyCost);
   // Heavy Flow (lightgreenthumb_tool_wear): the Watering Can wears at half rate.
   const upgrades = ctx.upgrades || ctx.imaginationUpgrades || pc?.imaginationUpgrades || [];
   const wear = kind === 'water'
