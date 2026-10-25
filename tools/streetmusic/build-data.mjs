@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Writes public/street-music/data.json for the Street music entry in the
- * Groddle Wiki (/wiki/street-music/, drawn by minn/groddle/src/StreetMusic.php).
+ * Writes public/street-music/data.json for the Street music page
+ * (/street-music/, drawn by minn/groddle/src/StreetMusic.php).
  *
  * The tracks, their titles and their groups are Tiny Speck's own, from its
  * downloads page (assets/content/ambient-music.json "downloads"); where each

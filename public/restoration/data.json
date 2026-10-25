@@ -1977,29 +1977,9 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 390,
+  "commits": 384,
   "since": "2026-10-19",
   "recent": [
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "The Hell Bar behind Panka Surazu's door, with Hell's Bartender and Wine of the Dead"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Fortune Cookies, Plates of Beans, the Hog Haul Ticket, the Class Axe and the Plexus balls"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Crabs on eight of Ur's streets ask for Musicblocks"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "fix",
-    "text": "Rubeweed gives Luck of the Rube, better drops for five minutes"
-   },
    {
     "date": "2026-10-24",
     "kind": "fix",
@@ -2099,9 +2079,29 @@
     "date": "2026-10-24",
     "kind": "fix",
     "text": "Firebog streets keep up to four Sloths, so Circle Crunch can happen"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "89 more badges can be earned: refining, eating and drinking, smelting, furniture, jumps and more"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "The Ur subway, twelve stations on the Red and Blue Lines"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "Vicar's Peak, the Groddle Heights cliff of vined ladders behind Thornfad Layers' locked door"
+   },
+   {
+    "date": "2026-10-24",
+    "kind": "improve",
+    "text": "The fall from the Fireflex lab opens on \"Back to life, back to the present time\""
    }
   ]
  },
- "tests": 218,
+ "tests": 220,
  "generatedAt": "2026-10-24"
 }

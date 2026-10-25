@@ -61,7 +61,6 @@ export const siteNav = (p, current) => `  <nav class="site-nav" aria-label="Site
       <div class="site-nav-links">
         <a href="${p}restoration/">Restoration</a>
         <a href="${p}compare/">Compare</a>
-        <a href="${p}wiki/">Wiki</a>
         <a href="${p}changelog/"${current === 'changelog' ? ' aria-current="page"' : ''}>Notes</a>
         <a class="site-nav-play" href="${p}play/">Play</a>
       </div>

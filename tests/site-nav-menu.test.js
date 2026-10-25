@@ -43,7 +43,6 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     assert.equal(links, [
       '        <a href="/restoration/">Restoration</a>',
       '        <a href="/compare/" aria-current="page">Compare</a>',
-      '        <a href="/wiki/">Wiki</a>',
       '        <a href="/changelog/">Notes</a>',
       '        <a class="site-nav-play" href="/play/">Play</a>',
     ].join('\n'));

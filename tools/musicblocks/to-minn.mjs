@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 /**
- * Creates the Musicblocks entry in the Groddle Wiki (/wiki/musicblocks/, the
- * theme's wiki_entry type, in the Music topic), which is its source from then
- * on: the words are core blocks edited in Minn Admin, and each series is a
- * groddle/musicblocks block drawn from public/musicblocks/data.json
- * (tools/musicblocks/build-data.mjs), so the tunes, descriptions and figures
- * come from the game. The Music topic is made first when it is missing.
+ * Creates the Musicblocks page in Minn (/musicblocks/, template "Full-width
+ * page"), which is its source from then on: the words are core blocks edited
+ * in Minn Admin, and each series is a groddle/musicblocks block drawn from
+ * public/musicblocks/data.json (tools/musicblocks/build-data.mjs), so the
+ * tunes, descriptions and figures come from the game.
  *
  *   MINN_USER=admin MINN_PASS=... node tools/musicblocks/to-minn.mjs [--site=https://groddle.localhost] [--dry] [--force]
  *
- * Creates the entry once. If it is already there it is left alone, since it may
+ * Creates the page once. If it is already there it is left alone, since it may
  * have been edited since; --force overwrites it with the words below.
  */
 import { attrJson, Minn } from '../changelog/to-minn.mjs';
@@ -40,7 +39,7 @@ export function musicblocksContent() {
   };
   return [
     group('header', 'masthead', null, [group('div', 'wrap', null, [
-      p('kicker', '<a href="/wiki/">Groddle Wiki</a> · <a href="/wiki/topic/music/">Music</a>'),
+      p('kicker', 'Groddle Field Notes · Music'),
       h(1, 'Musicblocks'),
       p('lead', 'Musicblocks were Glitch’s pocket music: small collectible blocks, each holding one tune, that you could play for yourself and anyone nearby. Tiny Speck released the recordings with the rest of the game, and every tune that survived is here to hear. Press play on any block.'),
       p('jump', jump),
@@ -63,9 +62,6 @@ export function musicblocksContent() {
   ].join('\n\n');
 }
 
-/** The topic the entry belongs to, made when the wiki has none by that slug yet. */
-export const TOPIC = { name: 'Music', slug: 'music', description: 'The music of Glitch: its tunes, the Musicblocks that held them, and where to hear them again.' };
-
 async function main() {
   const content = musicblocksContent();
   if (args.dry) {
@@ -74,16 +70,14 @@ async function main() {
   }
   const minn = new Minn(SITE);
   await minn.signIn(process.env.MINN_USER || 'admin', process.env.MINN_PASS || '');
-  const topics = await minn.rest('GET', `/wp/v2/wiki-topics?slug=${TOPIC.slug}`);
-  const topic = topics[0] ?? await minn.rest('POST', '/wp/v2/wiki-topics', TOPIC);
-  const found = await minn.rest('GET', '/wp/v2/wiki?slug=musicblocks&status=publish,draft,private,pending&context=edit');
+  const found = await minn.rest('GET', '/wp/v2/pages?slug=musicblocks&status=publish,draft,private,pending&context=edit');
   if (found[0] && !args.force) {
-    console.log(`entry ${found[0].id} is already there; left alone (--force overwrites it)`);
+    console.log(`page ${found[0].id} is already there; left alone (--force overwrites it)`);
     return;
   }
-  const body = { title: 'Musicblocks', slug: 'musicblocks', status: 'publish', 'wiki-topics': [topic.id], excerpt: 'Every recovered Musicblock tune from Tiny Speck’s Glitch, to play, with the series they belong to and what they paid in the game.', content };
-  const saved = found[0] ? await minn.rest('POST', `/wp/v2/wiki/${found[0].id}`, body) : await minn.rest('POST', '/wp/v2/wiki', body);
-  console.log(`${found[0] ? 'overwrote' : 'created'} entry ${saved.id} at ${saved.link}`);
+  const body = { title: 'Musicblocks', slug: 'musicblocks', status: 'publish', template: 'page-wide', excerpt: 'Every recovered Musicblock tune from Tiny Speck’s Glitch, to play, with the series they belong to and what they paid in the game.', content };
+  const saved = found[0] ? await minn.rest('POST', `/wp/v2/pages/${found[0].id}`, body) : await minn.rest('POST', '/wp/v2/pages', body);
+  console.log(`${found[0] ? 'overwrote' : 'created'} page ${saved.id} at ${saved.link}`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) main().catch((e) => { console.error(e.message); process.exit(1); });

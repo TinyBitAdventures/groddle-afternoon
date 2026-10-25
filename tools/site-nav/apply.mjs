@@ -19,7 +19,6 @@ import { join, relative, sep } from 'node:path';
 export const FALLBACK = [
   { label: 'Restoration', href: '/restoration/', className: '' },
   { label: 'Compare', href: '/compare/', className: '' },
-  { label: 'Wiki', href: '/wiki/', className: '' },
   { label: 'Notes', href: '/changelog/', className: '' },
   { label: 'Play', href: '/play/', className: 'site-nav-play' },
 ];
