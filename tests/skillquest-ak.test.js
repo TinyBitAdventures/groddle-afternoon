@@ -32,7 +32,7 @@ import {
 } from '../public/js/skillquest-ak.js';
 import { listAnimalFeedOptions } from '../public/js/animals.js';
 import { populationForStreet } from '../public/js/street-ecology.js';
-import { newxpFeature } from '../public/js/features/newxp-feature.js?v=g300-1';
+import { newxpFeature } from '../public/js/features/newxp-feature.js?v=g303-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -150,7 +150,9 @@ describe('G290 wiring', () => {
   it('the sloth\'s tree hides 0.5 s after its poof (slothRemove -> hideTree)', { skip: !haveGsjs }, () => {
     assert.match(gsjs('locations/newxp_training1.js'), /sloth\.deleteWithPoof\(-50, 250\);\n\tthis\.apiSetTimer\('hideTree', 0\.5\*1000\);/);
     has(newxp, /const SLOTH_TREE_HIDE_MS = 500;/);
-    has(newxp, /deleteWithPoof\(engine, sloth, -50, 250, \{ holdMs \}\);[\s\S]{0,800}setTimeout\(\(\) => \{[\s\S]{0,80}treeHidden = true;[\s\S]*?\}, SLOTH_TREE_HIDE_MS\);/);
+    // G303: -50 is slothPoofBase's delta_x, mirrored to the remake sloth's facing.
+    has(newxp, /export function slothPoofBase\(bounds, facing = 1, dx = -50\)/);
+    has(newxp, /deleteWithPoof\(engine, sloth, base\.dx, 250, \{ holdMs, x: base\.x, top: base\.top \}\);[\s\S]{0,800}setTimeout\(\(\) => \{[\s\S]{0,80}treeHidden = true;[\s\S]*?\}, SLOTH_TREE_HIDE_MS\);/);
   });
 
   it('cultivations poof in where the source does (quest.js 1880, cultivation.js 75)', { skip: !haveGsjs }, () => {

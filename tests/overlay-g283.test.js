@@ -198,7 +198,8 @@ describe('G285: the last overlay stand-ins', () => {
     const f = read('js/features/newxp-feature.js');
     assert.match(f, /poofInQuoin\(engine, addQuoin\(engine, 'img_pickup_walk'/);
     assert.match(f, /deleteWithPoof\(engine, fl\.sprite, 10, 170\);/);
-    assert.match(f, /deleteWithPoof\(engine, sloth, -50, 250, \{ holdMs \}\);/);
+    // G303: delta 250 measured from npc_sloth.swf's drawn rect (slothPoofBase), delta_x mirrored for right-facing art.
+    assert.match(f, /deleteWithPoof\(engine, sloth, base\.dx, 250, \{ holdMs, x: base\.x, top: base\.top \}\);/);
   });
 
   it('the Cactus has a pack icon (cut from its OGA idle frame)', () => {

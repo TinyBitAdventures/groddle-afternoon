@@ -26,7 +26,7 @@
 
 import { GENTLE_ISLAND_TSIDS, isNewxpSceneTsid } from '../newxp.js?v=newxp-2';
 import { qurazyMarkersFor } from '../qurazy-markers.js?v=g260-1';
-import { OVERLAY_FADE, loadOverlayManifest, playVectorOverlay } from '../overlay-art.js?v=g294-1';
+import { OVERLAY_FADE, loadOverlayManifest, overlayPlacement, playVectorOverlay } from '../overlay-art.js?v=g294-1';
 import {
   QURAZY_SPAWN_LINE,
   createQurazyState,
@@ -130,7 +130,82 @@ function pillBottomIn(c) {
   return pill.bottom - c.top;
 }
 
+/**
+ * G297: the banner's drawn box (the art box, as overlayPlacement and
+ * playVectorOverlay place it) in the px of `rect`'s parent (#game-root):
+ * { left, top, right, bottom }.
+ */
+export function qurazyBannerBox(meta, rect, { x = QURAZY_OVERLAY.x, topY = QURAZY_OVERLAY.topY, scale = 1 } = {}) {
+  if (!meta?.stage || !meta?.box || !rect) return null;
+  const at = overlayPlacement(meta, rect.width * x, rect.height * topY + (meta.stage[1] * scale) / 2, scale);
+  const left = rect.left + at.left;
+  const top = rect.top + at.top;
+  return { left, top, right: left + at.width, bottom: top + at.height };
+}
+
+/** True when two { left, top, right, bottom } boxes share any area. */
+export function boxesOverlap(a, b) {
+  return Boolean(a && b) && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+}
+
+/**
+ * G297: at 760 px and below the banner lands on the activity feed's line
+ * that repeats its message. The banner keeps the source's place (top_y -5%,
+ * just under the street-name pill) and the feed fades under it while they
+ * meet, the way it does under a speech bubble with no clear spot (G269,
+ * style.css data-under-speech). Its own attribute, since game.js sets
+ * data-under-speech every frame.
+ */
+export const QURAZY_FEED_ATTR = 'data-under-banner';
+
+function clearFeedFade() {
+  if (typeof document === 'undefined') return;
+  document.getElementById('activity-feed')?.removeAttribute(QURAZY_FEED_ATTR);
+}
+
+function fadeFeedUnderBanner(root, canvas, box) {
+  const feed = document.getElementById('activity-feed');
+  if (!feed || !box) return;
+  const step = () => {
+    if (!canvas.isConnected) {
+      feed.removeAttribute(QURAZY_FEED_ATTR);
+      return;
+    }
+    const r = root.getBoundingClientRect();
+    let over = false;
+    if (Number(canvas.style.opacity || 0) > 0.05) {
+      for (const line of feed.querySelectorAll('.act:not(.is-leaving)')) {
+        const b = line.getBoundingClientRect();
+        if (b.width && b.height && boxesOverlap(box, { left: b.left - r.left, top: b.top - r.top, right: b.right - r.left, bottom: b.bottom - r.top })) {
+          over = true;
+          break;
+        }
+      }
+    }
+    if (feed.hasAttribute(QURAZY_FEED_ATTR) !== over) feed.toggleAttribute(QURAZY_FEED_ATTR, over);
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+/**
+ * G303: AnnouncementController.cancelAllOverlaysWeCan (193-215), run from
+ * LocationView.as 50 as the old street is taken down, removes every
+ * in-window overlay, so the banner never plays over the next street.
+ * Returns how many it stopped.
+ */
+export function stopQurazyBanner(root = typeof document === 'undefined' ? null : document.getElementById('game-root')) {
+  const live = root?.querySelectorAll?.('canvas.qurazy-overlay') || [];
+  for (const c of live) c.remove();
+  clearFeedFade();
+  return live.length;
+}
+
+/** Bumped when a banner starts or is stopped, so a stopped one does not report "done". */
+let bannerRun = 0;
+
 async function showSpawnOverlay(engine) {
+  const run = ++bannerRun;
   const root = typeof document === 'undefined' ? null : document.getElementById('game-root');
   const c = root?.querySelector('canvas:not(.overlay-art):not(.lonely-fireworks):not(.lonely-portrait)')?.getBoundingClientRect();
   if (!c?.width) {
@@ -140,11 +215,23 @@ async function showSpawnOverlay(engine) {
   const r = root.getBoundingClientRect();
   const rect = { left: c.left - r.left, top: c.top - r.top, width: c.width, height: c.height };
   const scale = c.width / 960;
-  // The art box's top (overlays.json); playVectorOverlay reads the same cached manifest.
-  const boxTop = await loadOverlayManifest().then((m) => m?.[QURAZY_OVERLAY.key]?.box?.[1] ?? 0, () => 0);
+  // The art box (overlays.json); playVectorOverlay reads the same cached manifest.
+  const meta = await loadOverlayManifest().then((m) => m?.[QURAZY_OVERLAY.key] || null, () => null);
+  if (run !== bannerRun) return;
+  const boxTop = meta?.box?.[1] ?? 0;
   const topY = qurazyBannerTopY({ height: c.height, scale, boxTop, pillBottom: pillBottomIn(c) });
   engine.setData?.('qurazyOverlay', 'playing');
   engine.setData?.('qurazyOverlayTopY', String(Math.round(topY * 1000) / 1000));
+  const box = qurazyBannerBox(meta, rect, { topY, scale });
+  // playVectorOverlay adds its canvas once the frames load: watch for it (3 s at most).
+  const t0 = Date.now();
+  const watch = () => {
+    if (run !== bannerRun || Date.now() - t0 > 3000) return;
+    const canvas = root.querySelector('canvas.qurazy-overlay');
+    if (canvas) fadeFeedUnderBanner(root, canvas, box);
+    else requestAnimationFrame(watch);
+  };
+  requestAnimationFrame(watch);
   playVectorOverlay(root, QURAZY_OVERLAY.key, {
     rect,
     x: QURAZY_OVERLAY.x,
@@ -155,6 +242,7 @@ async function showSpawnOverlay(engine) {
     loop: false,
     className: 'overlay-art qurazy-overlay',
   }).then((ok) => {
+    if (run !== bannerRun) return;
     engine.setData?.('qurazyOverlay', ok ? 'done' : 'missing');
     if (!ok) engine.toast?.(QURAZY_SPAWN_LINE);
   });
@@ -227,11 +315,14 @@ export const qurazyFeature = {
     publish(engine);
   },
 
-  onStreetClear() {
+  onStreetClear(engine) {
     // onPlayerExit: one you did not grab is gone. The boot's first clear
     // comes before the reconnect check, so it keeps the saved one.
     if (!reconnecting) st.live = null;
     liveQuoin = null;
+    // G303: the banner goes with the street (cancelAllOverlaysWeCan).
+    bannerRun += 1;
+    if (stopQurazyBanner()) engine?.setData?.('qurazyOverlay', 'stopped');
   },
 
   onTick(dtMs, now, engine) {

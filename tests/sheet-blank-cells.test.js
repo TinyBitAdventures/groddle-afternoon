@@ -12,8 +12,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ENDS_EMPTY = new Set(['wheelDisappear']);
 // The Phantom's appear clip (played once) starts from nothing as it fades in.
 const ALLOWED = new Set(['phantomAppear cell 0']);
+// G297: game.js sheets whose frameCount stops before cells that still hold art, on purpose.
+const GAME_TAIL_ALLOWED = [];
 
-test('every game.js sheet plays only cells with art', async () => {
+test('every game.js sheet plays only cells with art, and no count cuts off its art', async () => {
   // G281: read from game.js's syntax tree (tests/sheet-sources.js gameSheetTable), as the module test is.
   const { gameSheetTable } = await import('./sheet-sources.js');
   const table = gameSheetTable();
@@ -23,23 +25,29 @@ test('every game.js sheet plays only cells with art', async () => {
     .map((r) => ({ ...r, path: join(root, 'public', r.path) }));
   assert.ok(rows.length > 40, `found ${rows.length} sheets`);
   // Pillow does the pixel work (python3.11 has it); the test skips if it is missing.
+  // The tail check (as the module test's): cells after the count, to the last full row of the image.
   const py = `import json,sys
 from PIL import Image
-out=[]
+out={'blank':[],'tail':[]}
 for r in json.load(sys.stdin):
-    im=Image.open(r['path']).convert('RGBA')
+    im=Image.open(r['path']).convert('RGBA'); a=im.getchannel('A')
+    box=lambda i:((i%r['cols'])*r['fw'],(i//r['cols'])*r['fh'],(i%r['cols'])*r['fw']+r['fw'],(i//r['cols'])*r['fh']+r['fh'])
+    art=lambda b: b[2]<=im.width and b[3]<=im.height and a.crop(b).getbbox() is not None
     for i in range(r['n']):
-        c,w=i%r['cols'],i//r['cols']; b=(c*r['fw'],w*r['fh'],c*r['fw']+r['fw'],w*r['fh']+r['fh'])
-        if b[2]>im.width or b[3]>im.height or not im.crop(b).getchannel('A').getbbox(): out.append(f"{r['name']} cell {i}")
+        if not art(box(i)): out['blank'].append(f"{r['name']} cell {i}")
+    extra=[i for i in range(r['n'],r['cols']*(im.height//r['fh'])) if art(box(i))]
+    if extra: out['tail'].append(f"{r['name']}: {len(extra)} cell(s) with art after its {r['n']}, first {extra[0]}")
 print(json.dumps(out))`;
-  let blank;
+  let found;
   try {
-    blank = JSON.parse(execFileSync('python3.11', ['-I', '-c', py], { input: JSON.stringify(rows), encoding: 'utf8' }));
+    found = JSON.parse(execFileSync('python3.11', ['-I', '-c', py], { input: JSON.stringify(rows), encoding: 'utf8' }));
   } catch (err) {
     if (/ENOENT|No module named/.test(String(err))) return;
     throw err;
   }
-  assert.deepEqual(blank.filter((b) => !ALLOWED.has(b)), []);
+  assert.deepEqual(found.blank.filter((b) => !ALLOWED.has(b)), []);
+  assert.deepEqual(found.tail.filter((t) => !GAME_TAIL_ALLOWED.some(([re]) => re.test(t))), []);
+  for (const [re, why] of GAME_TAIL_ALLOWED) assert.ok(found.tail.some((t) => re.test(t)), `unused allowance ${re} (${why})`);
 });
 
 // G276: the same check for every sheet the js/ modules slice (tests/sheet-sources.js reads their

@@ -784,15 +784,58 @@ function quoinTexture(PIXI, type = 'xp') {
  * the stack's display top plus delta_x / delta_y (2 s, its last frame
  * held), PROTO_PUFF, and the stack is gone (G285).
  */
-function deleteWithPoof(engine, spr, dx = 0, dy = 0, { holdMs = null } = {}) {
+function deleteWithPoof(engine, spr, dx = 0, dy = 0, { holdMs = null, x = spr?.x, top = null } = {}) {
   if (!spr || spr.destroyed) return null;
-  const at = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dx, dy });
+  const at = itemstackOverlayPoint(x, top ?? displayTopOf(spr), { dx, dy });
   engine.playSound('PROTO_PUFF', { volume: 0.5 });
   return playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70, holdMs });
 }
 
 /** items/item.js 509 deleteWithPoof: apiSetTimer('apiDelete', 200), the stack goes 200 ms after the puff. */
 const POOF_DELETE_MS = 200;
+
+/**
+ * G303: npc_sloth.swf (glitch-items/inhabitants/sloth) against the remake's
+ * sloth.png. The client stands an itemstack_overlay on the stack's x plus
+ * delta_x and its display top plus delta_y (InLocationAnnouncementOverlay.as
+ * 84-101; the top is getYAboveDisplay, the drawn rect's top,
+ * LocationItemstackView.as 633-654), the movie's stage bottom centre on the
+ * stack's x,y (LocationItemstackView.as 853-854). The SWF's stage is
+ * 260 x 240 with sloth_mc at (130, 114); hanging (sloth_mc frames 141-428:
+ * the end of drop, hangIdle, talk) its drawn rect runs from 221 px above the
+ * stack's y (the canopy shape over the branch) to 10 px above it, and the
+ * sloth itself spans 11-117 px to one side of x and 10-134 px up. slothCreate
+ * sets dir 'left' (newxp_training1.js 665-667), so it hangs 11-117 px left of
+ * x, its middle 64 px left. deleteWithPoof(-50, 250) thus stands the puff
+ * (proto_puff, 175 px above its point and 13 below) 39 px under the sloth's
+ * feet and 14 px behind its middle: the puff covers it. The remake's
+ * sloth.png is a tighter cut with no canopy shape, so its display top would
+ * put the puff about 250 px down; these numbers measure from the drawn
+ * sloth instead.
+ */
+export const SLOTH_POOF_ART = Object.freeze({
+  /** The SWF's drawn top above the sloth's feet: 221 - 10. */
+  topAboveFeet: 211,
+  /** The stack's x from the sloth's middle, on its back side. */
+  regFromMiddle: 64,
+});
+
+/**
+ * Where slothRemove's deleteWithPoof(-50, 250) lands for a sloth drawn in
+ * `bounds` ({ left, right, bottom } world px) facing `facing` (1 right, -1
+ * left): { x, top } to hand deleteWithPoof as the stack's x and display top,
+ * with delta_x mirrored to the sloth's facing (the source's dx is for one
+ * facing left). Returns { x, top, dx }.
+ */
+export function slothPoofBase(bounds, facing = 1, dx = -50) {
+  const middle = (bounds.left + bounds.right) / 2;
+  const back = facing >= 0 ? -1 : 1;
+  return {
+    x: middle + back * SLOTH_POOF_ART.regFromMiddle,
+    top: bounds.bottom - SLOTH_POOF_ART.topAboveFeet,
+    dx: facing >= 0 ? -dx : dx,
+  };
+}
 
 /**
  * QA: &newxphold=sloth stops the autoplay at the sloth's poof in training1 and
@@ -1193,8 +1236,18 @@ async function runTraining1(t) {
     // slothRemove (newxp_training1.js 695-708): deleteWithPoof(-50, 250), the tree right after.
     const holdMs = slothHoldMs();
     if (sloth.alpha > 0 && sloth.visible) {
-      deleteWithPoof(engine, sloth, -50, 250, { holdMs });
+      // G303: measured from the drawn sloth (SLOTH_POOF_ART); sloth.png faces right.
+      const lb = sloth.getLocalBounds();
+      const sx = sloth.scale?.x ?? 1;
+      const sy = sloth.scale?.y ?? 1;
+      const base = slothPoofBase({
+        left: sloth.x + Math.min(lb.x * sx, (lb.x + lb.width) * sx),
+        right: sloth.x + Math.max(lb.x * sx, (lb.x + lb.width) * sx),
+        bottom: sloth.y + (lb.y + lb.height) * sy,
+      }, sx >= 0 ? 1 : -1);
+      deleteWithPoof(engine, sloth, base.dx, 250, { holdMs, x: base.x, top: base.top });
       engine.setData('newxpSlothPoof', `${Math.round(sloth.x)},${Math.round(sloth.y)}`);
+      engine.setData('newxpSlothPuff', `${Math.round(base.x + base.dx)},${Math.round(base.top + 250)}`);
       if (holdMs != null) {
         auto = false;
         engine.setData('newxpAutoplay', 'hold:sloth');

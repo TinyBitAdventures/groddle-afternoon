@@ -2030,9 +2030,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 478,
+  "commits": 480,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Buffs, drinks, spices, crabs, powders and other mood and energy losses cost nothing while dead, and a new game's eleven-skills badge comes on its first load"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Prompts dock bottom right in their own stack, and races and the Hog Haul end on Tiny Speck's winner splash"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2142,19 +2152,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Drinks, item verbs and skill mood bonuses give nothing while dead, and buff badges no longer cover the activity feed"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Señor Funpickle, the beta testers' toy, turns up on a rare late-game street with all six powers"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Your home street is free again: the Magic Rock hands you a Home Street Ticket and the Selection Machine takes it"
    }
   ]
  },
- "tests": 286,
+ "tests": 287,
  "generatedAt": "2026-10-25"
 }

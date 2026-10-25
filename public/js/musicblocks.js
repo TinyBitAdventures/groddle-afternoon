@@ -25,6 +25,7 @@ export const MUSICBLOCK_REPLAY_MS = 4 * 60 * 60 * 1000;
  * recovered.
  */
 export const MUSICBLOCK_SERIES = Object.freeze({
+  // glow: the Musicblocks web page's accent per set (tools/musicblocks); the game draws no glow (G286).
   DG: Object.freeze({ id: 'DG', colour: 'green', badge: 'collection_musicblocks_dg', glow: 0x9ee4ac }),
   DR: Object.freeze({ id: 'DR', colour: 'red', badge: 'collection_musicblocks_dr', glow: 0xf5a5b5 }),
   DB: Object.freeze({ id: 'DB', colour: 'blue', badge: 'collection_musicblocks_db', glow: 0x9cc8f5 }),
@@ -43,7 +44,6 @@ function row(classTsid, label, collection, durationMs, baseCost, stackMax, desc)
     audio: SOUND_FILES[soundKey] || SOUND_FILES[SOUND_ALIASES[soundKey]] || null,
     icon: `assets/sprites/icons/${classTsid}.png`,
     collection,
-    glow: collection ? MUSICBLOCK_SERIES[collection].glow : 0xe6d29a,
     baseCost,
     stackMax,
     // musicblock_base play: SB-1's first hearing pays 1000 XP, every other tune 50.

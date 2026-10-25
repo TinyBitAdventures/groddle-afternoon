@@ -35,7 +35,7 @@ import { questInstancesFeature } from './quest-instances-feature.js?v=qi-11';
 import { partySpacesFeature } from './party-spaces-feature.js?v=party-7';
 import { seasonsFeature } from './seasons-feature.js?v=play-9';
 import { cameraModeFeature } from './camera-mode-feature.js?v=g231-1';
-import { newxpFeature } from './newxp-feature.js?v=g300-1';
+import { newxpFeature } from './newxp-feature.js?v=g303-1';
 
 export { questFlagsFeature };
 
@@ -84,7 +84,7 @@ import { treeDeathFeature } from './tree-death-feature.js?v=tree-death-13'; FEAT
 import { enchantedForestFeature } from './enchanted-forest-feature.js?v=g296-1'; FEATURES.push(enchantedForestFeature);
 import { jujuBanditsFeature } from './juju-bandits-feature.js?v=g300-1'; FEATURES.push(jujuBanditsFeature);
 import { craftybotFeature } from './craftybot-feature.js?v=g300-1'; FEATURES.push(craftybotFeature);
-import { moodDecayFeature } from './mood-decay-feature.js?v=g300-1'; FEATURES.push(moodDecayFeature);
+import { moodDecayFeature } from './mood-decay-feature.js?v=g303-1'; FEATURES.push(moodDecayFeature);
 import { animalMoodFeature } from './animal-mood-feature.js?v=g300-1'; FEATURES.push(animalMoodFeature);
 import { butlerFeature } from './butler-feature.js?v=butler-feature-26'; FEATURES.push(butlerFeature);
 import { pouchFeature } from './elemental-pouch-feature.js?v=g300-1'; FEATURES.push(pouchFeature);
@@ -123,5 +123,5 @@ import { helpMineFeature } from './help-mine-feature.js?v=g300-1'; FEATURES.push
 import { familiarDialogFeature } from './familiar-dialog-feature.js?v=g225-1'; FEATURES.push(familiarDialogFeature);
 import { spiritLonelinessFeature } from './spirit-loneliness-feature.js?v=lonely-7'; FEATURES.push(spiritLonelinessFeature);
 import { funpickleFeature } from './funpickle-feature.js?v=desk2-3'; FEATURES.push(funpickleFeature);
-import { qurazyFeature } from './qurazy-feature.js?v=g294-1'; FEATURES.push(qurazyFeature);
-import { energyDecayFeature } from './energy-decay-feature.js?v=g300-1'; FEATURES.push(energyDecayFeature);
+import { qurazyFeature } from './qurazy-feature.js?v=g303-1'; FEATURES.push(qurazyFeature);
+import { energyDecayFeature } from './energy-decay-feature.js?v=g303-1'; FEATURES.push(energyDecayFeature);

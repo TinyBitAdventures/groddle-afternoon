@@ -24,14 +24,18 @@ import {
 } from '../public/js/qurazy.js';
 import { planStreetQuoins } from '../public/js/quoins.js';
 import {
+  QURAZY_FEED_ATTR,
   QURAZY_OVERLAY,
   QURAZY_PILL_GAP,
   QURAZY_PLACEMENT_GROUP,
+  boxesOverlap,
+  qurazyBannerBox,
   qurazyBannerTopY,
   qurazyFeature,
   qurazyFeatureState,
   qurazyStreetEligible,
   resetQurazyFeatureForTests,
+  stopQurazyBanner,
 } from '../public/js/features/qurazy-feature.js';
 import { GENTLE_ISLAND } from '../public/js/newxp.js';
 
@@ -355,5 +359,53 @@ describe('the spawn banner and the street-name pill (G274)', () => {
 
   it('never moves it up: a pill already clear of the banner keeps -5%', () => {
     assert.equal(qurazyBannerTopY({ height: 540, scale: 1, boxTop, pillBottom: -40 }), -0.05);
+  });
+});
+
+describe('the banner on a street change (G303) and over the feed (G297)', () => {
+  const manifest = JSON.parse(readFileSync(join(PUBLIC, 'assets/sprites/overlays/overlays.json'), 'utf8'));
+  const meta = manifest[QURAZY_OVERLAY.key];
+  /** A #game-root stand-in holding `n` banner canvases. */
+  const fakeRoot = (n) => {
+    const kids = Array.from({ length: n }, () => ({ removed: false, remove() { this.removed = true; } }));
+    return { kids, querySelectorAll: (sel) => (sel === 'canvas.qurazy-overlay' ? kids.filter((k) => !k.removed) : []) };
+  };
+
+  it('stops every banner still playing (cancelAllOverlaysWeCan)', () => {
+    const root = fakeRoot(2);
+    assert.equal(stopQurazyBanner(root), 2);
+    assert.ok(root.kids.every((k) => k.removed));
+    assert.equal(stopQurazyBanner(root), 0);
+    assert.equal(stopQurazyBanner(null), 0);
+  });
+
+  it('leaving the street clears it without a banner to stop', () => {
+    const engine = fakeEngine();
+    qurazyFeature.onStreetClear(engine);
+    assert.equal(engine.data.qurazyOverlay, undefined);
+  });
+
+  it('the banner box is the art box where playVectorOverlay draws it', () => {
+    const rect = { left: 10, top: 20, width: 960, height: 540 };
+    const box = qurazyBannerBox(meta, rect, { topY: -0.05, scale: 1 });
+    const [sw, sh] = meta.stage;
+    const [bx, by, bw, bh] = meta.box;
+    assert.equal(box.left, 10 + 480 + bx - sw / 2);
+    assert.equal(box.top, 20 + 540 * -0.05 + by);
+    assert.equal(box.right - box.left, bw);
+    assert.equal(box.bottom - box.top, bh);
+    assert.equal(qurazyBannerBox(null, rect), null);
+  });
+
+  it('at 760 px wide and below the banner meets the feed column', () => {
+    // style.css: the feed at left 10, width min(300px, 72%) at 760 and below, min(320px, 42%) above.
+    const feedAt = (w) => ({ left: 10, right: 10 + Math.min(w <= 760 ? 300 : 320, (w <= 760 ? 0.72 : 0.42) * w), top: 40, bottom: 70 });
+    for (const [w, h, meets] of [[760, 430, true], [700, 400, true], [390, 300, true]]) {
+      const box = qurazyBannerBox(meta, { left: 0, top: 0, width: w, height: h }, { topY: 0.05, scale: w / 960 });
+      assert.equal(boxesOverlap(box, feedAt(w)), meets, `${w} px`);
+    }
+    assert.equal(QURAZY_FEED_ATTR, 'data-under-banner');
+    const css = readFileSync(join(PUBLIC, 'style.css'), 'utf8');
+    assert.match(css, /\.activity-feed\[data-under-banner\] \{ opacity: 0\.18; \}/);
   });
 });
