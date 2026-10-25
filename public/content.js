@@ -48,6 +48,7 @@ import {
 import {
   quoteAnimalKinship,
   performAnimalKinship,
+  highestAnimalKinshipRank,
 } from './js/animal-kinship.js?v=g268-1';
 import {
   MUSICBLOCK_CATALOG,
@@ -73,6 +74,9 @@ import {
   startIncubation,
 } from './js/animal-husbandry.js';
 import { metabolicGain, moodMax } from './js/metabolics.js';
+import { BUTTER_UP, SING_TO, butterUpVerbState, butterUpChicken, singToVerbState, singToButterfly } from './js/animal-flattery.js';
+import { levelInfoForXp } from './js/progression.js?v=progression-1';
+import { getGameDayKey } from './js/game-day.js?v=dametime-1';
 import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-6';
 
 /** Naming / capture context for an animal target (the back yard counts as yours). */
@@ -618,12 +622,17 @@ export function getVerbsFor(target, ctx) {
         ? `Choose from ${feedOptions.length} eligible pack item${feedOptions.length === 1 ? '' : 's'}`
         : 'Feed it grain or corn',
     });
-    add('butter_up', 'butter up', {
-      sort: 60,
-      tooltip: 'Tell this chicken how wonderful it is',
-      enabled: !s.buttered,
-      reason: s.buttered ? 'This Chicken has received enough compliments today.' : '',
-    });
+    // G279: npc_chicken.js 163-236 (js/animal-flattery.js): no daily limit.
+    const butter = butterUpVerbState(s);
+    if (butter) {
+      add('butter_up', BUTTER_UP.label, {
+        sort: 60,
+        // No energy field: the source has no energy check (it may spend you to 0).
+        tooltip: BUTTER_UP.tooltip,
+        enabled: butter.enabled,
+        reason: butter.reason,
+      });
+    }
     const hk = husbandryCtx(ctx);
     const incubate = incubateVerbState(s, hk.learned);
     if (incubate) {
@@ -670,11 +679,21 @@ export function getVerbsFor(target, ctx) {
       enabled: massage.ok,
       reason: massage.ok ? '' : massage.msg,
     });
-    add('sing_to', 'sing to', {
-      sort: 30,
-      energy: 1,
-      tooltip: 'Your song might scare them or charm them',
+    // G279: npc_butterfly.js 543-693 (js/animal-flattery.js): Butterfly Whisperer only.
+    const sing = singToVerbState(s, {
+      achievements: ctx.achievements || [],
+      energy: pc?.energy,
+      dayKey: getGameDayKey(ctx.now ?? Date.now()),
     });
+    if (sing) {
+      add('sing_to', SING_TO.label, {
+        sort: 30,
+        // No energy field: the menu only checks > 2 (576); the handler refuses the rest (637-640).
+        tooltip: SING_TO.tooltip,
+        enabled: sing.enabled,
+        reason: sing.reason,
+      });
+    }
     for (const verb of namingVerbs(classId, s, husbandryCtx(ctx))) add(verb.id, verb.label, verb);
     add('talk_to', 'talk to', { sort: 40, tooltip: 'I have something to tell you!' });
   }
@@ -1141,15 +1160,22 @@ export function runVerb(target, verbId, ctx) {
   }
   if (classId === 'npc_chicken' && verbId === 'butter_up') {
     ensureAnimalState(classId, s);
-    if (s.buttered) return { ok: false, msgs: ['This Chicken has received enough compliments today.'], effects };
-    s.buttered = true;
-    // npc_chicken.js 198: metabolics_add_mood, nothing while dead (inc_metabolics.js 79-86).
-    const moodBefore = pc.mood || 0;
-    if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + 6);
-    effects.mood += pc.mood - moodBefore;
-    msgs.push('You tell the chicken it is magnificent. It pretends not to care.');
+    // G279: npc_chicken.js 197-232 (js/animal-flattery.js); the mood takes the metabolic gate.
+    const butter = butterUpChicken(s, pc);
+    if (!butter.ok) return { ok: false, msgs: [butter.msg], effects };
+    effects.energy += butter.effects.energy;
+    effects.mood += butter.effects.mood;
+    effects.img += butter.effects.xp;
+    effects.xp += butter.effects.xp;
+    effects._activityBase = butter.msg;
     finalizeMsgs(msgs, effects);
-    return { ok: true, msgs, effects, animalChanged: true };
+    return {
+      ok: true,
+      msgs,
+      effects,
+      animalChanged: true,
+      speech: { speaker: target.label || 'Chicken', text: butter.bubble, durationMs: butter.bubbleMs },
+    };
   }
   if (classId === 'npc_chicken' && verbId === 'talk_to') {
     return spokenResult(classId, s, effects, { speaker: 'Chicken' });
@@ -1191,15 +1217,29 @@ export function runVerb(target, verbId, ctx) {
     };
   }
   if (classId === 'npc_butterfly' && verbId === 'sing_to') {
-    pc.energy = Math.max(0, pc.energy - 1);
-    effects.energy -= 1;
-    // Remake design (npc_butterfly.js 543-682 sing_to gives no mood); the
-    // mood takes metabolics_add_mood's door (inc_metabolics.js 79-86).
-    const moodBefore = pc.mood || 0;
-    if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + 4);
-    effects.mood += pc.mood - moodBefore;
-    msgs.push('You sing. The butterfly wafts thoughtfully.');
-    return { ok: true, msgs, effects };
+    // G279: npc_butterfly.js 594-687 (js/animal-flattery.js): iMG worth 5% of
+    // the tank for twice that in energy, no mood, once a game day.
+    const sung = singToButterfly(s, pc, {
+      achievements: ctx.achievements || [],
+      level: levelInfoForXp(pc.xp).level,
+      akRank: highestAnimalKinshipRank(ctx.skills?.learned || ctx.learned || []),
+      dayKey: getGameDayKey(ctx.now ?? Date.now()),
+      rng: ctx.rng || Math.random,
+    });
+    if (!sung.ok) return { ok: false, msgs: [sung.msg], effects };
+    effects.energy += sung.effects.energy;
+    effects.img += sung.effects.xp;
+    effects.xp += sung.effects.xp;
+    effects._activityBase = sung.msg;
+    finalizeMsgs(msgs, effects);
+    return {
+      ok: true,
+      msgs,
+      effects,
+      animalChanged: true,
+      wisdom: sung.wisdom,
+      speech: { speaker: target.label || 'Butterfly', text: sung.bubble, durationMs: sung.bubbleMs },
+    };
   }
   if (classId === 'npc_butterfly' && verbId === 'talk_to') {
     return spokenResult(classId, s, effects, { speaker: 'Butterfly' });

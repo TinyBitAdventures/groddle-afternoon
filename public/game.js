@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-4';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-5';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-105';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
@@ -4799,6 +4799,7 @@ function menuVerbsFor(target) {
     skills: skillState,
     learned: skillState.learned,
     imaginationUpgrades: pc.imaginationUpgrades || [],
+    achievements: achieveState.unlocked || [],
     streetTsid: currentStreetTsid,
   }), engine);
 }
@@ -5487,6 +5488,7 @@ function executeVerb(target, verbId) {
     skills: skillState,
     learned: skillState.learned,
     imaginationUpgrades: pc.imaginationUpgrades || [],
+    achievements: achieveState.unlocked || [],
     musicblocks: musicblockState,
     shrines: shrineState,
     streetTsid: currentStreetTsid,

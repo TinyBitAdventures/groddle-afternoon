@@ -80,6 +80,7 @@ import {
 import { canUseTool, useToolCondition } from './tools.js?v=woodcutting-test-2';
 import { getGameDayKey } from './game-day.js?v=dametime-1';
 import { grantMoodXp } from './mood-xp.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 
 export const RESOURCE_NODES_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
 export const RESOURCE_SPRITE_ROOT = 'assets/sprites/resources';
@@ -1288,7 +1289,16 @@ function bumpDaily(node, verbId, dayKey) {
 
 function applyMetabolics(pc, costs) {
   if (costs.energy) pc.energy = Math.max(0, (pc.energy || 0) - costs.energy);
-  if (costs.mood) pc.mood = (pc.mood || 0) + costs.mood;
+  if (costs.mood > 0) {
+    // G278: a package's mood_bonus is metabolics_add_mood
+    // (inc_skill_packages.js 524), refused while dead (inc_metabolics.js
+    // 79-86) and capped at the tank; costs.mood keeps what landed.
+    const before = Number(pc.mood) || 0;
+    if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), before + costs.mood);
+    costs.mood = Math.max(0, (Number(pc.mood) || 0) - before);
+  } else if (costs.mood) {
+    pc.mood = Math.max(0, (pc.mood || 0) + costs.mood);
+  }
   if (costs.xp && costs.xpNoBonus) {
     // firefly_jar.js 383: the full jar's iMG is a cultivation reward, paid
     // with no_bonus (magic_rock.js 429).

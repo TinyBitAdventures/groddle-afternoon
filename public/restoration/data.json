@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 464,
+  "commits": 465,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "The Magic Rock no longer vanishes as it lands, and five more clips stop blinking or losing their last frame"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "The Magic Rock in your back yard teaches cultivating, expanding and styles, and things keep their place when your yard grows"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Ordinary quest offers wait in the quest log, the Magic Rock's other lines use its panel, and street announcements speak over the street"
    }
   ]
  },
- "tests": 274,
+ "tests": 275,
  "generatedAt": "2026-10-25"
 }

@@ -23,6 +23,7 @@ import { applyTreePoison, performAntidotePour } from '../public/js/tree-poison.j
 import { createPlot, performPlotVerb } from '../public/js/patches.js';
 import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js';
 import { runVerb } from '../public/content.js';
+import { RESOURCE_SKILL_PACKAGES, createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
 import { room as topOfTree } from '../public/js/quest-rooms/top-of-tree.js';
 import { room as esquibeth } from '../public/js/quest-rooms/esquibeth.js';
 
@@ -207,18 +208,53 @@ describe('module gain sites', () => {
     assert.deepEqual(r.effects, { energy: -3, mood: 0, xp: 8 });
   });
 
-  it('buttering up a chicken or singing to a butterfly while dead gives no mood', () => {
+  it('buttering up a chicken while dead gives no mood; singing to a butterfly never gives mood (G279)', () => {
     refuse('energy', 'mood');
     const pc = { energy: 50, mood: 20, xp: 0, imagination: 0 };
     const butter = runVerb({ classId: 'npc_chicken', state: {} }, 'butter_up', { pc, inv: {} });
     assert.equal(butter.ok, true);
     assert.equal(butter.effects.mood, 0);
-    const sing = runVerb({ classId: 'npc_butterfly', state: {} }, 'sing_to', { pc, inv: {} });
+    assert.equal(butter.effects.energy, -4);
+    assert.equal(pc.mood, 20);
+    assert.equal(pc.energy, 46);
+    const sing = runVerb({ classId: 'npc_butterfly', state: {} }, 'sing_to', {
+      pc,
+      inv: {},
+      achievements: ['butterfly_whisperer'],
+      rng: () => 0,
+    });
     assert.equal(sing.ok, true);
     assert.equal(sing.effects.mood, 0);
-    assert.equal(sing.effects.energy, -1);
+    assert.equal(sing.effects.energy, -10);
     assert.equal(pc.mood, 20);
-    assert.equal(pc.energy, 49);
+    assert.equal(pc.energy, 36);
+    assert.deepEqual(asked, ['mood']);
+  });
+
+  it('a skill-package mood_bonus on a resource node takes the gate (G278)', () => {
+    const pkg = RESOURCE_SKILL_PACKAGES.scraping.skills.no_skill;
+    pkg.mood_bonus = 3;
+    try {
+      const harvest = (pc) => harvestResourceNode(createResourceNode('mortar_barnacle', { seed: 'a' }), { scraper: 1 }, pc, {
+        now: Date.UTC(2026, 0, 1),
+        dayKey: 'd1',
+        rng: () => 0,
+        toolState: createToolConditionState(),
+      });
+      refuse('mood');
+      const dead = { energy: 50, mood: 20, xp: 0, imagination: 0 };
+      const r = harvest(dead);
+      assert.equal(r.ok, true, r.message);
+      assert.equal(r.effects.mood, 0);
+      assert.equal(dead.mood, 20);
+      setMetabolicGainGate(null);
+      const live = { energy: 50, mood: 98, xp: 0, imagination: 0 };
+      const ok = harvest(live);
+      assert.equal(ok.effects.mood, 2, 'capped at the tank');
+      assert.equal(live.mood, 100);
+    } finally {
+      delete pkg.mood_bonus;
+    }
   });
 
   it('feeding a chicken while dead spends the grain for no mood', () => {
@@ -271,9 +307,15 @@ describe('feature gain sites ask the shared gate (source text)', () => {
     assert.doesNotMatch(src('js/features/tree-death-feature.js'), /moodGain = engine\.metabolicGate/);
   });
 
-  it('content.js gates the chicken, butterfly and Arborology mood', () => {
+  it('content.js gates the chicken feed and Arborology mood; butter up gates in animal-flattery.js', () => {
     const content = src('content.js');
-    assert.equal((content.match(/metabolicGain\('mood'\)\.ok/g) || []).length, 4);
+    assert.equal((content.match(/metabolicGain\('mood'\)\.ok/g) || []).length, 2);
+    // G279: butter up's +10 mood (npc_chicken.js 198); sing to has no mood at all.
+    const flattery = src('js/animal-flattery.js');
+    assert.equal((flattery.match(/metabolicGain\('mood'\)\.ok/g) || []).length, 1);
+    assert.match(flattery, /if \(metabolicGain\('mood'\)\.ok\) pc\.mood = Math\.min\(moodMax\(pc\), moodBefore \+ BUTTER_UP\.mood\);/);
+    // G278: resource-node packages' mood_bonus.
+    assert.match(src('js/resource-nodes.js'), /if \(metabolicGain\('mood'\)\.ok\) pc\.mood = Math\.min\(moodMax\(pc\), before \+ costs\.mood\);/);
   });
 
   it('the Paradise ticket in game.js already asks before its 1 energy', () => {
