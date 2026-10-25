@@ -22704,17 +22704,8 @@ function spawnMineRock(classTsid, x, y, index = 0) {
   root.rockFrameH = fh;
   root.rockBaseTex = fallbackTexture;
 
-  const tag = new PIXI.Text({ text: def.label, style: {
-    fontFamily: 'Trebuchet MS, sans-serif',
-    fontSize: 11,
-    fill: 0x4a4035,
-    fontWeight: '700',
-  } });
-  tag.anchor.set(0.5, 1);
-  tag.y = -fh * 0.85 - 4;
-  tag.eventMode = 'none';
-  root.addChild(tag);
-  root.rockTag = tag;
+  // No name over the rock: like every other street thing, its name and state show in the
+  // nearby prompt (target.label, target.subtitle), as the original's hover tip did.
 
   entityLayer.addChild(root);
 
@@ -22749,11 +22740,6 @@ function refreshMineRockVisual(target) {
     root.rockSprite.texture = frameTexture(base.source || base, new PIXI.Rectangle(fi * fw, 0, fw, fh));
   }
   root.rockSprite.alpha = rock.depleted ? 0.35 : 1;
-  if (root.rockTag) {
-    root.rockTag.text = rock.depleted
-      ? `${ROCK_CATALOG[rock.classTsid]?.label || 'Rock'} (empty)`
-      : ROCK_CATALOG[rock.classTsid]?.label || 'Rock';
-  }
   target.subtitle = rockStatusLabel(rock);
   target.label = ROCK_CATALOG[rock.classTsid]?.label || target.label;
 }

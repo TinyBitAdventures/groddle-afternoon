@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 500,
+  "commits": 501,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Pack card buttons no longer blink or wash out on hover"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "The Animal Kinship practice street carries only its 3 quoins and Side Table, its hint signs show, and home cultivations fade in under their poof"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Machines, making, mining, repairs, Animal Kinship, piggy capture, chores and the conch cost no energy while dead"
    }
   ]
  },

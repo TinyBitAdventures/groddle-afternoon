@@ -291,6 +291,10 @@ describe('game wiring', () => {
   it('game.js imports mining and spawns rocks', () => {
     const src = readFileSync(join(SPIKE, 'game.js'), 'utf8');
     assert.match(src, /spawnMineRocks/);
+    // A rock carries no name over it (the early demo's tag); its name and state show in the nearby prompt.
+    const spawn = src.slice(src.indexOf('function spawnMineRock('), src.indexOf('function refreshMineRockVisual('));
+    assert.doesNotMatch(spawn, /new PIXI\.Text\(/);
+    assert.doesNotMatch(src, /rockTag/);
     assert.match(src, /starterMiningTools/);
     assert.match(src, /STARTER_MINING_SKILLS/);
     assert.match(src, /from '\.\/js\/mining\.js\?v=g330-1'/);
