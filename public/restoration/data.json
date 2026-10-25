@@ -2030,9 +2030,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 490,
+  "commits": 493,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "In multiplayer, see the other players on your street and chat with them"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "A player who connects from a second window sees the first one close cleanly"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "A realtime server for multiplayer, and the sign-in ticket that opens it"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2137,21 +2152,6 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "Energy drifts as in Glitch: a small loss every 90 seconds, no walking cost and no standing refill, so Pooped lasts until you eat"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Visiting a neighbour shows their home card, Firebog and Uralia homes get the original tutorial streets, and the house sign has Tiny Speck's icons"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Street quoins are mostly small again, as the Purple Emperor placed them, and Señor Funpickle lies on the ground without a drawn glow"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "The stun orb, secret markers, poisoned trees and Giant Love play Tiny Speck's own animations, and race winners get the real rainbow"
    }
   ]
  },

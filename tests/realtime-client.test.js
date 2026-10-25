@@ -30,9 +30,9 @@ import {
   pushSample,
   sampleTrack,
   socketUrl,
-} from '../public/js/realtime-client.js?v=mp3-1';
+} from '../public/js/realtime-client.js?v=mp3-2';
 import { createMinnAccount } from '../public/js/minn-account.js?v=mp2-2';
-import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=mp3-1';
+import { emoteCommand, lookOf, poseOf, realtimeFeature, sharedStreet, statusText } from '../public/js/features/realtime-feature.js?v=mp3-2';
 import { FEATURES } from '../public/js/features/index.js';
 
 const root = join(import.meta.dirname, '..');
@@ -216,6 +216,21 @@ describe('realtime-client: connecting', () => {
     const kinds = ctx.events.map(([k]) => k);
     assert.ok(kinds.includes('joined') && kinds.includes('left') && kinds.includes('moved'));
     assert.equal(ctx.events.filter(([k, d]) => k === 'moved' && d.id === 99).length, 0, 'strangers do not move');
+  });
+
+  it('module kinds: send() carries them, core kinds are refused, and their frames arrive as msg:<kind>', async () => {
+    const ctx = setup();
+    assert.equal(ctx.client.send('quoin', { id: 'q1' }), false, 'nothing is sent before online');
+    const ws = await online(ctx);
+    assert.equal(ctx.client.send('quoin', { id: 'q1', t: 'chat' }), true);
+    assert.deepEqual(ws.sent.at(-1), { id: 'q1', t: 'quoin' }, 'the kind wins over a t in the payload');
+    for (const core of ['auth', 'join', 'move', 'chat', 'emote', 'leave', 'ping']) assert.equal(ctx.client.send(core), false, core);
+    assert.equal(ctx.client.send('Bad-Kind'), false);
+    const heard = [];
+    ctx.client.on('msg:quoin_gone', (m) => heard.push(m.id));
+    ws.receive({ t: 'quoin_gone', id: 'q1' });
+    ws.receive({ t: 'pong' });
+    assert.deepEqual(heard, ['q1']);
   });
 
   it('frames from the old street are dropped until the new street answers', async () => {
@@ -528,7 +543,7 @@ describe('minn-account: realtime tickets', () => {
 describe('realtime feature', () => {
   it('is registered (before the account backup, which stays last), under its own key', () => {
     assert.equal(FEATURES.at(-2), realtimeFeature);
-    assert.match(read('public/js/features/index.js'), /realtime-feature\.js\?v=mp3-1/);
+    assert.match(read('public/js/features/index.js'), /realtime-feature\.js\?v=mp3-2/);
   });
 
   it('does nothing in solo: no socket, no UI, no hook answers', () => {

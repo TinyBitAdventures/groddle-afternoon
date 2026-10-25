@@ -26,7 +26,7 @@
  */
 
 import { createMinnAccount } from '../minn-account.js?v=mp2-2';
-import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=mp3-1';
+import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=mp3-2';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js';
 
 export const REALTIME_FEATURE_ID = 'realtime';
@@ -438,6 +438,17 @@ export const realtimeFeature = {
   /** The name the player's own chat lines show under. */
   playerChatName() {
     return session?.chatName() || null;
+  },
+
+  /**
+   * The realtime client (js/realtime-client.js) for the features built on it
+   * (shared quoins, street objects, parties): engine.query('realtimeClient').
+   * Null in solo and before the session starts. Listen with
+   * client.on('msg:<kind>', fn), send with client.send(kind, payload), and
+   * client.on('roster', fn) for each street joined (and each arrival).
+   */
+  realtimeClient() {
+    return session?.client || null;
   },
 
   /** /who: the other players on this street. */
