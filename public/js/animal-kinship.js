@@ -16,9 +16,9 @@ import {
   canUseTool,
   setToolRemaining,
   useToolCondition,
-} from './tools.js?v=woodcutting-test-2';
+} from './tools.js?v=woodcutting-test-3';
 import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { loseEnergy, metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { petPiggy, piggyNibbleRefusal } from './animal-mood.js';
 
@@ -272,8 +272,9 @@ export function quoteAnimalKinship(state, classId, verbId, ctx = {}) {
 
 function awardMetabolics(pc, selected, moodBonus = selected.moodBonus) {
   const effects = { energy: 0, mood: 0, xp: 0, items: {} };
-  pc.energy = Math.max(0, (Number(pc.energy) || 0) - selected.energyCost);
-  effects.energy = -selected.energyCost;
+  // inc_skill_packages.js 487-488: slugs.energy is what metabolics_lose_energy took (0 while dead).
+  const lost = loseEnergy(pc, selected.energyCost);
+  effects.energy = lost ? -lost : 0;
   // G259: mood_bonus is metabolics_add_mood (inc_skill_packages.js 524), refused while dead.
   if (moodBonus && (moodBonus < 0 || metabolicGain('mood').ok)) {
     const before = Number(pc.mood) || 0;

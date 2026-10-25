@@ -21,6 +21,12 @@ import { HELL_TEXT, metabolicGate, normalizeHellState } from '../public/js/hell.
 import { BUTTER_UP, butterUpChicken } from '../public/js/animal-flattery.js';
 import { SET_FREE, applySetFree } from '../public/js/animal-set-free.js';
 import { applyVerbReward, getVerbReward } from '../public/js/verb-rewards.js';
+import { createInventory, countItem } from '../public/js/inventory.js';
+import { startAssembly, startDisassembly } from '../public/js/machines.js';
+import { createToolConditionState, repairToolCondition, setToolRemaining } from '../public/js/tools.js';
+import { smeltMetalRocks } from '../public/js/mining.js';
+import { craftRecipe } from '../public/js/making.js';
+import { doChore, neighbourById, normalizeNeighbourState } from '../public/js/neighbours.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -151,8 +157,9 @@ describe('verb costs spend through the door', () => {
   });
 
   it('no module left subtracting energy by hand outside the door (ratchet)', () => {
-    const dirs = ['js', 'js/features'];
-    const raw = /\b(?:pc|player|ctx\.pc|engine\.pc)\.energy\s*(?:-=|=\s*Math\.max\(0,[^;\n]*-\s)/;
+    const dirs = ['js', 'js/features', 'js/quest-rooms'];
+    // G296: any `-=` or an assignment with a subtraction in it (the G289 pattern missed `(pc.energy || 0) - x`).
+    const raw = /\b(?:pc|player|ctx\.pc|engine\.pc)\.energy\s*(?:-=|=(?!=)[^;\n]*\s-\s)/;
     const left = [];
     for (const d of dirs) {
       for (const f of readdirSync(join(pub, d))) {
@@ -162,8 +169,9 @@ describe('verb costs spend through the door', () => {
         if (raw.test(read(rel))) left.push(rel);
       }
     }
-    // Owned by other lanes on 2026-10-25 (Make machines, tinkering, Animal Kinship): G289 follow-up.
-    assert.deepEqual(left.sort(), ['js/animal-kinship.js', 'js/machines.js', 'js/making.js', 'js/tools.js']);
+    // G296 routed animal-kinship, machines, making, tools, mining, animal-husbandry, neighbours and
+    // the Esquibeth conch. Left: buffs.js's catalog_buffs ticks (clamped, energy and mood), a follow-up row.
+    assert.deepEqual(left.sort(), ['js/buffs.js']);
   });
 
   it('rook attacks and street jobs pay and charge through the doors', () => {
@@ -179,6 +187,67 @@ describe('verb costs spend through the door', () => {
   it('a gain the hell watcher missed (before its first look after a load) still ends Pooped', () => {
     const hell = read('js/features/hell-feature.js');
     assert.match(hell, /if \(lastEnergy == null \|\| energy > lastEnergy\) \{\s*const gained = onEnergyGained\(state, engine\.pc, now\);/);
+  });
+});
+
+describe('G296: the loss-door leftovers cost nothing while dead', () => {
+  const deadDoor = () => setMetabolicLossGate(gateFor(dead(), 'loss'));
+
+  it('machine assembly and disassembly (machine_stand.js 460, 695)', () => {
+    deadDoor();
+    const inv = createInventory({ machine_stand: 1, woodworker_fuser: 1, woodworker_chassis: 1, blockmaker_engine: 1 });
+    const pc = { energy: 80 };
+    const built = startAssembly(inv, pc, 'woodworker', ['engineering_1']);
+    assert.equal(built.ok, true);
+    assert.equal(pc.energy, 80);
+    assert.equal(built.energy, 0);
+    assert.doesNotMatch(built.msg, /energy/);
+    const inv2 = createInventory({ woodworker: 1 });
+    const apart = startDisassembly(inv2, pc, 'woodworker', ['engineering_1']);
+    assert.equal(apart.ok, true);
+    assert.equal(pc.energy, 80);
+    assert.equal(countItem(inv2, 'woodworker'), 0);
+  });
+
+  it('a Tinkertool repair says what it spent (tinkertool.js 368, 435)', () => {
+    const state = createToolConditionState();
+    setToolRemaining(state, 'hoe', 44);
+    const alive = { energy: 20 };
+    assert.match(repairToolCondition(state, 'hoe', alive, { learned: ['tinkering_1'], hasTinkertool: true }).msg, /You spent 2 energy\./);
+    assert.equal(alive.energy, 18);
+    deadDoor();
+    setToolRemaining(state, 'hoe', 44);
+    const pc = { energy: 20 };
+    const out = repairToolCondition(state, 'hoe', pc, { learned: ['tinkering_1'], hasTinkertool: true });
+    assert.equal(out.ok, true);
+    assert.equal(pc.energy, 20);
+    assert.match(out.msg, /You spent 0 energy\./);
+  });
+
+  it('making, smelting and chores', () => {
+    deadDoor();
+    const pc = { energy: 20, imagination: 0, xp: 0 };
+    const made = craftRecipe(createInventory({ grain: 10, knife_and_board: 1 }), pc, 'flour', { requireSkill: false });
+    assert.equal(made.ok, true);
+    assert.equal(pc.energy, 20);
+    assert.match(made.msgs[0], /−0 energy/);
+    const smelt = smeltMetalRocks(createInventory({ metal_rock: 12, smelter: 1 }), pc, { learned: ['smelting_1'], requireSkill: true });
+    assert.equal(smelt.ok, true);
+    assert.equal(pc.energy, 20);
+    assert.equal(smelt.effects.energy, 0);
+    const chorePc = { energy: 50, mood: 40, xp: 0, imagination: 0 };
+    const chore = doChore(normalizeNeighbourState({}), neighbourById('dorrit'), chorePc, { dayKey: 'd1', now: 1000, energy: 50 });
+    assert.equal(chore.ok, true);
+    assert.equal(chorePc.energy, 50);
+    assert.equal(chore.effects.energy, 0);
+  });
+
+  it('every routed module spends through loseEnergy', () => {
+    for (const rel of ['js/animal-kinship.js', 'js/machines.js', 'js/making.js', 'js/tools.js', 'js/mining.js',
+      'js/animal-husbandry.js', 'js/neighbours.js', 'js/quest-rooms/esquibeth.js']) {
+      assert.match(read(rel), /import \{[^}]*\bloseEnergy\b[^}]*\} from '\.\.?\/metabolics\.js';/, rel);
+    }
+    assert.match(read('js/making.js'), /const energyLost = loseEnergy\(pc, TRANSMOG_FAIL_ENERGY\);\s*const moodLost = pc\.mood != null \? loseMood\(pc, TRANSMOG_FAIL_MOOD\) : 0;/);
   });
 });
 

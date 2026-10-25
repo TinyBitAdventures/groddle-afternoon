@@ -19,9 +19,10 @@ import {
   itemIcon,
   ITEM_CATALOG,
 } from './inventory.js?v=catalog-unified-6';
-import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-2';
+import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
 import { skillPackageDetails } from './skill-packages.js';
 import { grantMoodXp } from './mood-xp.js';
+import { loseEnergy } from './metabolics.js';
 import { GEM_ITEMS, MEGA_ROCK_CHUNKS, megaRockChance, miningExpertBonus, rollGemSmall, smeltingOverrides } from './imagination-effects.js';
 
 /**
@@ -352,7 +353,8 @@ export function mineRock(rock, inv, pc, opts = {}) {
   // include/mining.js gives the whole to_get, even past chunks_remaining.
   const got = toGet;
 
-  pc.energy = (pc.energy || 0) - profile.energy;
+  // inc_skill_packages.js 487: metabolics_lose_energy (nothing while dead).
+  const minedEnergy = loseEnergy(pc, profile.energy);
   // inc_skill_packages.js 532 (mining): xp_bonus takes the mood bonus.
   const minedXp = grantMoodXp(pc, profile.xp);
 
@@ -399,7 +401,7 @@ export function mineRock(rock, inv, pc, opts = {}) {
     reason: 'mined',
     msgs,
     effects: {
-      energy: -profile.energy,
+      energy: minedEnergy ? -minedEnergy : 0,
       xp: minedXp,
       img: minedXp,
       activityLine: msgs[0],
@@ -484,7 +486,8 @@ export function smeltMetalRocks(inv, pc, opts = {}) {
   if (!removeItem(inv, 'metal_rock', chunks)) {
     return { ok: false, reason: 'pack', msgs: ['Not enough metal rock.'] };
   }
-  pc.energy = (pc.energy || 0) - energy;
+  // smelter.js 576: metabolics_lose_energy (nothing while dead).
+  const spent = loseEnergy(pc, energy);
   // smelter.js 577: stats_add_xp(n, false) takes the mood bonus.
   const xp = grantMoodXp(pc, SMELT_COSTS.xpPerIngot * ingots);
   addItem(inv, 'plain_metal', ingots);
@@ -499,7 +502,7 @@ export function smeltMetalRocks(inv, pc, opts = {}) {
     ok: true,
     reason: 'smelted',
     msgs,
-    effects: { energy: -energy, xp, img: xp, activityLine: msgs[0] },
+    effects: { energy: spent ? -spent : 0, xp, img: xp, activityLine: msgs[0] },
     ingots,
     chunks,
     toolUse,
@@ -560,7 +563,8 @@ export function crushOre(inv, pc, oreId, opts = {}) {
   if (!removeItem(inv, oreId, qty)) {
     return { ok: false, reason: 'pack', msgs: ['Not enough ore.'] };
   }
-  pc.energy = (pc.energy || 0) - energy;
+  // ore_grinder.js 592: metabolics_lose_energy (nothing while dead).
+  const spent = loseEnergy(pc, energy);
   // ore_grinder.js 590: stats_add_xp(n, false) takes the mood bonus.
   const xp = grantMoodXp(pc, refining.xp * qty);
 
@@ -579,7 +583,7 @@ export function crushOre(inv, pc, oreId, opts = {}) {
     ok: true,
     reason: 'crushed',
     msgs,
-    effects: { energy: -energy, xp, img: xp, activityLine: msgs[0] },
+    effects: { energy: spent ? -spent : 0, xp, img: xp, activityLine: msgs[0] },
     got,
     toolUse,
     refining,

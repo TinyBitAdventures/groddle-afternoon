@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 
 import { createFeatureHost } from '../public/js/feature-host.js';
 import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-6';
-import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-2';
+import { createToolConditionState } from '../public/js/tools.js?v=woodcutting-test-3';
 import { meditationFeature } from '../public/js/features/meditation-feature.js';
 import { teleportationFeature } from '../public/js/features/teleportation-feature.js';
 

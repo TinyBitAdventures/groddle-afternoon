@@ -29,7 +29,7 @@
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
-import { VENDOR_PROFILES } from '../vendor.js?v=vendor-profiles-4';
+import { VENDOR_PROFILES } from '../vendor.js?v=vendor-profiles-5';
 import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-6';
 import { parseQuestConversation } from '../quests.js';
 import {

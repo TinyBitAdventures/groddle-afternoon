@@ -37,7 +37,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-6';
-import { canUseTool } from '../tools.js?v=woodcutting-test-2';
+import { canUseTool } from '../tools.js?v=woodcutting-test-3';
 import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js';
 import { parseQuestConversation } from '../quests.js';
 import { getQuestCatalog } from '../content-catalogs.js';

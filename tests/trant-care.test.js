@@ -22,8 +22,8 @@ import {
   createToolConditionState,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=woodcutting-test-2';
-import { getVerbsFor, runVerb } from '../public/content.js?v=woodcutting-test-8';
+} from '../public/js/tools.js?v=woodcutting-test-3';
+import { getVerbsFor, runVerb } from '../public/content.js?v=woodcutting-test-9';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(root, 'public');

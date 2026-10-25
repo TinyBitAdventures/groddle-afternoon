@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-8';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-9';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-114';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-115';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -183,7 +183,7 @@ import {
   rookEggStateForProgress,
   rookWoodsObjective,
   rookWoodsRemainingMs,
-} from './js/rook-woods.js?v=rook-woods-3';
+} from './js/rook-woods.js?v=rook-woods-4';
 import {
   ROOK_HALL_QUEST_ID,
   ROOK_HALL_START_QUEST_ID,
@@ -409,8 +409,8 @@ import {
   packPagerState,
   packPageTarget,
 } from './js/pack-pager.js?v=original-pager-1';
-import { listAnimalFeedOptions } from './js/animals.js?v=g290-1';
-import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g290-1';
+import { listAnimalFeedOptions } from './js/animals.js?v=g296-1';
+import { pickerMaxCount, pickerOptionsFor, pickerTakesCount } from './js/animals.js?v=g296-1';
 import {
   createDroppedItemState,
   parseDroppedItemState,
@@ -425,7 +425,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-15';
+} from './js/player-save.js?v=player-save-16';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -463,7 +463,7 @@ import {
   setToolRemaining,
   WATERING_CAN_TOOLS,
   firstWorkingTool,
-} from './js/tools.js?v=woodcutting-test-2';
+} from './js/tools.js?v=woodcutting-test-3';
 import {
   listRecipes,
   listRecipesForTool,
@@ -492,7 +492,7 @@ import {
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
   recipeToolInUse,
-} from './js/making.js?v=g268-1';
+} from './js/making.js?v=g296-1';
 import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g191-1';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g193-1';
 import {
@@ -519,7 +519,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=g289-1';
+} from './js/garden.js?v=g296-1';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -531,7 +531,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=g268-1';
+} from './js/mining.js?v=g296-1';
 import {
   createActivityLog,
   appendActivity,
@@ -696,19 +696,19 @@ import {
   createVendorSellQuote,
   vendorSellUnitPrice,
   vendorBuyUnitPrice,
-} from './js/vendor.js?v=vendor-profiles-4';
+} from './js/vendor.js?v=vendor-profiles-5';
 import {
   createAnimalState,
   resetAnimalDay,
   animalStatusLabel,
-} from './js/animals.js?v=g290-1';
+} from './js/animals.js?v=g296-1';
 import {
   ensureWoodTreeState,
   pickWoodTool,
   resetWoodTreeDay,
   woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=woodcutting-test-3';
+} from './js/woodcutting.js?v=woodcutting-test-4';
 import {
   GIANTS,
   createShrineState,

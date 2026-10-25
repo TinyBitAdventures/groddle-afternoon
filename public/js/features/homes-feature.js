@@ -140,13 +140,13 @@ import {
 } from '../home-cultivation.js?v=home-cultivation-4';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { playPoofIn } from '../overlay-art.js?v=g273-1';
-import { projectApi } from './street-jobs-feature.js?v=g289-1';
+import { projectApi } from './street-jobs-feature.js?v=g296-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
-import { towerApi } from './home-tower-feature.js?v=home-tower-11';
+import { towerApi } from './home-tower-feature.js?v=home-tower-12';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-8';
-import { patchesFeature } from './patches-feature.js?v=patches-12';
+import { patchesFeature } from './patches-feature.js?v=patches-13';
 import { plotLabel } from '../patches.js';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';

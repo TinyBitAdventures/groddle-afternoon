@@ -182,5 +182,5 @@ test('Rooks’ Woods uses a deterministic clean-asset forest with readable depth
   const game = fs.readFileSync(path.join(root, 'public/game.js'), 'utf8');
   assert.match(game, /rookForestArt/);
   assert.match(game, /ROOK_FOREST_DEPTH_LAYERS/);
-  assert.match(game, /rook-woods\.js\?v=rook-woods-3/);
+  assert.match(game, /rook-woods\.js\?v=rook-woods-4/);
 });

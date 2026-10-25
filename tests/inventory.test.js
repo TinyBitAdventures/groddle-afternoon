@@ -183,7 +183,7 @@ describe('location detector: places rebuilt as scenes', () => {
 
   it('takes builders only from live modules, leaves catalogs and comparisons out, and skips ambiguous config ids', () => {
     const index = buildIndex([
-      ['game.js', "import { ROOK } from './js/rook-woods.js?v=rook-woods-3';\nexport { N } from './js/features/f.js';\nimport('./js/later.js');\nexport const x = ROOK;\n"],
+      ['game.js', "import { ROOK } from './js/rook-woods.js?v=rook-woods-4';\nexport { N } from './js/features/f.js';\nimport('./js/later.js');\nexport const x = ROOK;\n"],
       ['js/rook-woods.js', "export const ROOK = 'LLI1AD8LUCH109E';\nexport const SCENES = { beam: { id: 'beam_me_down' }, skill: { id: 'ezcooking_1' } };\n"],
       ['js/later.js', "export const HELL_BAR = Object.freeze({ sourceTsid: 'LA5FPUNAI7P2NVF', available: false });\nexport function here(t) { return t === 'LCHECK000000001'; }\n"],
       ['js/dead.js', "export const OLD = 'LDEAD0000000001';\n"],
@@ -485,7 +485,7 @@ describe('item detector: artifact and necklace assembly (G187)', () => {
     cube: { artifact: 'artifact_cube', pieces: ['cube_piece1', 'cube_piece2'] },
   };
   const NECK = { bead_x: { required: 17, produces: 'necklace_x' }, bead_y: { required: 19, produces: 'necklace_y' } };
-  const GAME = "import { artifactsFeature } from './js/features/artifacts-feature.js?v=g268-1';\n";
+  const GAME = "import { artifactsFeature } from './js/features/artifacts-feature.js?v=g296-1';\n";
   const FEATURE = "import { addItem } from '../inventory.js';\nimport { assemblyFor, consumeForAssembly } from '../artifacts.js';\n"
     + "function assemble(engine, plan) {\n  if (!consumeForAssembly(engine.inv, plan)) return false;\n  addItem(engine.inv, plan.artifact, 1);\n}\nexport const artifactsFeature = { assemble };\n";
   const sitesOf = (files) => assemblySites(buildIndex(files.map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' }));

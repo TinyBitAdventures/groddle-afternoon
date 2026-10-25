@@ -36,7 +36,7 @@ import {
   firstWorkingTool,
   getToolCondition,
   setToolRemaining,
-} from '../public/js/tools.js?v=woodcutting-test-2';
+} from '../public/js/tools.js?v=woodcutting-test-3';
 import { crushOre } from '../public/js/mining.js';
 import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js';
 import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js';

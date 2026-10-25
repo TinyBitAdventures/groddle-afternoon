@@ -6,7 +6,7 @@
  */
 
 import { repairGivesMood } from './imagination-effects.js';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { loseEnergy, metabolicGain, moodMax } from './metabolics.js';
 
 export const TOOL_CONDITION_CATALOG = Object.freeze({
   butterfly_lotion: {
@@ -293,7 +293,8 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
     };
   }
   const target = ensureToolCondition(state, classTsid);
-  pc.energy = Math.max(0, (pc.energy || 0) - quote.energy);
+  // tinkertool.js 435: each tick is metabolics_lose_energy; 368 reports what was used.
+  const energyUsed = loseEnergy(pc, quote.energy);
   target.remaining = quote.condition.capacity;
   target.broken = false;
   target.repairs = (target.repairs || 0) + 1;
@@ -313,7 +314,7 @@ export function repairToolCondition(state, classTsid, pc, opts = {}) {
     quote,
     tinkertoolUse,
     moodGained,
-    msg: `You fixed the ${quote.condition.label} up just perfect. You spent ${quote.energy} energy.`,
+    msg: `You fixed the ${quote.condition.label} up just perfect. You spent ${energyUsed} energy.`,
   };
 }
 

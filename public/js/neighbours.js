@@ -24,7 +24,7 @@
  * neighbours.
  */
 
-import { metabolicGain } from './metabolics.js';
+import { loseEnergy, metabolicGain } from './metabolics.js';
 
 export const NEIGHBOUR_SCENE_PREFIX = 'NB_';
 export const NEIGHBOUR_SCENE = Object.freeze({ width: 2200, height: 700, groundY: 620 });
@@ -246,8 +246,9 @@ export function doChore(state, neighbour, pc, ctx = {}) {
   if (!verb || !verb.enabled) return { ok: false, msg: verb?.reason || 'Nothing to do here.' };
   const chore = CHORES[neighbour.chore];
   state.chores[neighbour.id] = ctx.dayKey;
-  const energy = Math.min(chore.energy || 0, whole(pc.energy));
-  pc.energy = whole(pc.energy) - energy;
+  pc.energy = whole(pc.energy);
+  // Chores are remake design; their cost spends through the loss door like every source verb.
+  const energy = loseEnergy(pc, chore.energy || 0);
   const maxMood = Number.isFinite(pc.maxMood) ? pc.maxMood : 100;
   const before = whole(pc.mood);
   // The chores are remake design; their mood goes through the same door as
@@ -267,7 +268,7 @@ export function doChore(state, neighbour, pc, ctx = {}) {
       deliveryAt: whole(ctx.now) + LETTER_DELAY_MS,
     };
   }
-  return { ok: true, chore, effects: { energy: -energy, mood: pc.mood - before, xp: chore.xp }, take, give, letter };
+  return { ok: true, chore, effects: { energy: energy ? -energy : 0, mood: pc.mood - before, xp: chore.xp }, take, give, letter };
 }
 
 /** Posting a carried note in a neighbour's mailbox: one reply per game day. */

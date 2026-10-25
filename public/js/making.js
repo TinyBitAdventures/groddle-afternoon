@@ -17,7 +17,7 @@ import {
   ensureItem,
   registerItemUse,
 } from './inventory.js?v=catalog-unified-6';
-import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-2';
+import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=woodcutting-test-3';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js';
 import {
   adjustedTaskLimit,
@@ -31,6 +31,7 @@ import {
   wondrousWeave,
 } from './imagination-effects.js';
 import { grantMoodXp } from './mood-xp.js';
+import { loseEnergy, loseMood } from './metabolics.js';
 
 /**
  * @typedef {{
@@ -999,10 +1000,9 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   if (adjust.failChance && unitIndex === 1 && !opts.maxLuck && (opts.rng || Math.random)() < adjust.failChance) {
     const failPoints = recipe.tool && opts.toolState ? wearFor(baseWear * batchWearUnits(recipe, batchQty)) : 0;
     const failWear = failPoints > 0 ? useToolCondition(opts.toolState, wornTool, failPoints) : null;
-    const energyLost = Math.min(TRANSMOG_FAIL_ENERGY, Math.max(0, pc.energy || 0));
-    const moodLost = Math.min(TRANSMOG_FAIL_MOOD, Math.max(0, pc.mood || 0));
-    pc.energy = (pc.energy || 0) - energyLost;
-    if (pc.mood != null) pc.mood = (pc.mood || 0) - moodLost;
+    // inc_making.js 792-794: metabolics_lose_energy(2) / _lose_mood(2), what they took in the line.
+    const energyLost = loseEnergy(pc, TRANSMOG_FAIL_ENERGY);
+    const moodLost = pc.mood != null ? loseMood(pc, TRANSMOG_FAIL_MOOD) : 0;
     return {
       ok: false,
       reason: 'transmog_failed',
@@ -1028,7 +1028,8 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     }
   }
 
-  pc.energy = Math.max(0, (pc.energy || 0) - cost);
+  // inc_making.js 1530: metabolics_lose_energy(energy_cost) (nothing while dead).
+  const energyLost = loseEnergy(pc, cost);
   // inc_making.js 1546: stats_add_xp(actual, false) takes the mood bonus.
   const recipeXp = recipe.xpReward ? grantMoodXp(pc, recipe.xpReward) : 0;
   const rng = opts.rng || Math.random;
@@ -1088,7 +1089,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
     recipe,
     recipeKey,
     msgs: [
-      `You made ${recipe.name} with ${toolLabel} (${outLabels}). −${cost} energy, +${recipeXp} iMG.`,
+      `You made ${recipe.name} with ${toolLabel} (${outLabels}). −${energyLost} energy, +${recipeXp} iMG.`,
       ...(bonusImagination ? [`Bonus imagination! +${bonusImagination} iMG.`] : []),
       ...(unitIndex === 1 && swap ? [batchExtras.lines[0]] : []),
       ...(toolUse?.broke ? [toolUse.msg] : []),

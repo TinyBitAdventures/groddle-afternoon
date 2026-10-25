@@ -36,7 +36,7 @@
 
 import { ITEM_CATALOG, ensureItem, getItemUseInfo } from './inventory.js?v=catalog-unified-6';
 import { DROP_TABLES, applyDropResult, rollDropTable } from './drop-tables.js';
-import { metabolicGain, moodMax } from './metabolics.js';
+import { loseEnergy, metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 import { musicblockItemMeta } from './musicblocks.js';
 import { isEnchantedForest } from './enchanted-forests.js?v=g289-1';
@@ -780,9 +780,9 @@ export function capturePiggy(state, { pc, inv, learned = [], streetTsid = '', no
   if ((inv.pig_bait || 0) < 1) return { ok: false, msg: HERDKEEPING.noBait, effects };
   inv.pig_bait -= 1;
   effects.items.pig_bait = -1;
-  const lost = Math.min(pc.energy || 0, HERDKEEPING.energy);
-  pc.energy = (pc.energy || 0) - lost;
-  effects.energy = -lost;
+  // npc_piggy.js 426: metabolics_lose_energy(20) (nothing while dead).
+  const lost = loseEnergy(pc, HERDKEEPING.energy);
+  effects.energy = lost ? -lost : 0;
   // A sad piggy is happy to be captured (npc_piggy.js 439-444).
   if (rng() < HERDKEEPING.chance || sad) {
     inv.hogtied_piggy = (inv.hogtied_piggy || 0) + 1;

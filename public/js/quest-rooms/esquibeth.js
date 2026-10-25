@@ -67,7 +67,7 @@
 
 import { isLoaded, onLoaded, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { metabolicGain, moodMax } from '../metabolics.js';
+import { loseEnergy, metabolicGain, moodMax } from '../metabolics.js';
 
 export const ROOM_ID = 'esquibeth';
 export const MAIN = 'last_pilgrimage_of_esquibeth';
@@ -1674,7 +1674,7 @@ export const room = {
       const moodBefore = Number(pc.mood) || 0;
       if (metabolicGain('mood').ok) pc.mood = Math.min(moodMax(pc), moodBefore + 2);
       const moodGained = (Number(pc.mood) || 0) - moodBefore;
-      pc.energy = Math.max(0, (Number(pc.energy) || 0) - 2);
+      loseEnergy(pc, 2); // conch.js 406: metabolics_lose_energy(2)
       // conch.js 364-382: stats_add_xp(n, false) takes the mood bonus (the
       // blow's Esquibeth reward above is no_bonus, conch.js 507).
       const xp = reward.xp ? grantMoodXp(pc, reward.xp) : 0;

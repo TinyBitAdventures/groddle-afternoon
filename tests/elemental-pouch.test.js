@@ -31,7 +31,7 @@ import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js';
 import { FEATURES } from '../public/js/features/index.js';
 import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=catalog-unified-6';
 import { STORE_CATALOG } from '../public/js/store-catalog.js';
-import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=vendor-profiles-4';
+import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=vendor-profiles-5';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js';
 import { isOfferedInRemake, remakeStatus } from '../public/js/imagination-remake.js';
 import { SKILL_REMAKE_NOTES } from '../public/js/skill-tree.js';

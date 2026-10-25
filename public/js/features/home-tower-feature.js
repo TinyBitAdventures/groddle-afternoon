@@ -49,7 +49,7 @@
  */
 
 import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-6';
-import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-2';
+import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-3';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';

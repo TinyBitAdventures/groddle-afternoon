@@ -24,6 +24,7 @@
 import { addItem, countItem, removeItem } from './inventory.js?v=catalog-unified-6';
 import { ensureToolCondition, getToolCondition } from './tools.js';
 import { distillingBonus, hasMasterAssembler, hasMasterExploder, machinePartInstallMs } from './imagination-effects.js';
+import { loseEnergy } from './metabolics.js';
 
 export const MACHINE_STAND = 'machine_stand';
 export const MACHINE_ENGINE = 'blockmaker_engine';
@@ -114,13 +115,14 @@ export function startAssembly(inv, pc, machine, learned = [], upgrades = [], now
   if (!check.ok) return check;
   removeItem(inv, MACHINE_STAND, 1);
   for (const part of check.def.parts) removeItem(inv, part, 1);
-  if (check.energy) pc.energy -= check.energy;
+  // machine_stand.js 695: metabolics_lose_energy (nothing while dead).
+  const energy = loseEnergy(pc, check.energy);
   return {
     ok: true,
-    energy: check.energy,
+    energy,
     durationMs: check.durationMs,
-    pending: { kind: 'assemble', machine, energy: check.energy, readyAt: now + check.durationMs },
-    msg: `Installing the ${check.def.label}'s parts…${check.energy ? ` (-${check.energy} energy)` : ''}`,
+    pending: { kind: 'assemble', machine, energy, readyAt: now + check.durationMs },
+    msg: `Installing the ${check.def.label}'s parts…${energy ? ` (-${energy} energy)` : ''}`,
   };
 }
 
@@ -180,13 +182,14 @@ export function startDisassembly(inv, pc, machine, learned = [], upgrades = [], 
   const check = disassemblyCheck(inv, pc, machine, learned, upgrades, opts);
   if (!check.ok) return check;
   removeItem(inv, machine, 1);
-  pc.energy -= check.energy;
+  // machine_stand.js 460: metabolics_lose_energy(15) (nothing while dead).
+  const energy = loseEnergy(pc, check.energy);
   return {
     ok: true,
-    energy: check.energy,
+    energy,
     durationMs: check.durationMs,
-    pending: { kind: 'disassemble', machine, energy: check.energy, full: check.full, readyAt: now + check.durationMs },
-    msg: `Taking the ${check.def.label} apart… (-${check.energy} energy)`,
+    pending: { kind: 'disassemble', machine, energy, full: check.full, readyAt: now + check.durationMs },
+    msg: `Taking the ${check.def.label} apart…${energy ? ` (-${energy} energy)` : ''}`,
   };
 }
 

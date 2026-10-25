@@ -2030,9 +2030,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 473,
+  "commits": 476,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "The Animal Kinship practice animals poof in with their bubbles and poof away after milking, nibbling and the second squeeze"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Energy and mood losses do nothing while dead, rewards respect Super Pooped and the full tank, and a race win shows YOU WON! at once with a Ready to leave? prompt"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Speech bubbles keep clear of the activity feed, the Qurazy banner sits below the street name, and Musicblock drops lose their drawn glow"
+   },
    {
     "date": "2026-10-25",
     "kind": "improve",
@@ -2137,21 +2152,6 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "U opens the upgrade cards, Shift+S skills and Shift+T your teleport points, \"Not right now\" puts a quest in your log to start later, and quest copies show no region"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "The Magic Rock hands over your home street's daily iMG, and old Tower stacks and the Craftybot box sit where you can reach them"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "The loneliness party lights Tiny Speck's own fireworks, Party Time! lifts your mood, and playing the Game shows its little crashing client"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Subway stairs sit flush with the wall, Bureaucratic Hall clerks stop blinking out and move at their real speed, its doors and chairs no longer overlap, and lit pumpkins lose their drawn rings"
    }
   ]
  },

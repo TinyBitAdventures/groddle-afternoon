@@ -23,13 +23,13 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-6';
-import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-2';
+import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-3';
 import { ecologyForStreet } from '../street-ecology.js?v=official-ecology-6';
 import { worldToScreen } from '../street-model.js';
 import { signArmWidth } from '../street-render.js?v=parallax-7';
 import { getSkillCatalog } from '../content-catalogs.js';
 import { GIANTS } from '../shrines.js?v=spinning-wheel-test-3';
-import { teleportationFeature } from './teleportation-feature.js?v=teleport-7';
+import { teleportationFeature } from './teleportation-feature.js?v=teleport-8';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,
