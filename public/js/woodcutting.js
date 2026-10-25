@@ -4,13 +4,34 @@
  * Source: Tiny Speck `items/wood_tree.js`, `items/hatchet.js`, and the
  * `wood_tree_harvest` skill package. The remake keeps the original daily
  * limit, maturity production curve, energy cost, and Hatchet wear.
+ *
+ * The Class Axe (items/class_axe.js, parent class hatchet, 300 points) works
+ * wherever a Hatchet does: wood_tree.js:673 doHarvest takes the first working
+ * stack where `class_tsid == 'hatchet' || class_tsid == 'class_axe'`.
  */
 
-import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
+import { canUseTool, useToolCondition } from './tools.js?v=tools-3';
 import { woodHarvestOverrides } from './imagination-effects.js';
 import { ENCHANTED_WOOD_TREE } from './enchanted-forests.js?v=g5-1';
 
 export const WOOD_TREE_SOURCE = 'tinyspeck/glitch-GameServerJS CC0';
+
+/** wood_tree.js:673 is_hatchet, in the order the remake looks for them. */
+export const WOOD_TOOLS = Object.freeze(['hatchet', 'class_axe']);
+const WOOD_TOOL_LABELS = Object.freeze({ hatchet: 'Hatchet', class_axe: 'Class Axe' });
+
+export function woodToolLabel(tool) {
+  return WOOD_TOOL_LABELS[tool] || 'Hatchet';
+}
+
+/**
+ * The tool a harvest uses: the first working Hatchet or Class Axe, else the
+ * first one owned (so its broken message shows), else null.
+ */
+export function pickWoodTool(inv = {}, toolState = {}, wear = WOOD_TREE_HARVEST.hatchetWear) {
+  const owned = WOOD_TOOLS.filter((id) => (inv?.[id] || 0) >= 1);
+  return owned.find((id) => canUseTool(toolState, id, wear).ok) || owned[0] || null;
+}
 
 export const WOOD_TREE_HARVEST = Object.freeze({
   durationMs: 4000,
@@ -92,18 +113,19 @@ export function quoteWoodTreeHarvest(state, inv = {}, pc = {}, toolState = {}) {
       msg: 'You can only harvest this tree once per game day.',
     };
   }
-  if ((inv?.hatchet || 0) < 1) {
+  // Woodier Harvest (gardening_harvest_wood): 12 energy and 3 Hatchet wear.
+  const woodier = woodHarvestOverrides(pc?.imaginationUpgrades);
+  const hatchetWear = woodier?.toolWear ?? WOOD_TREE_HARVEST.hatchetWear;
+  const woodTool = pickWoodTool(inv, toolState, hatchetWear);
+  if (!woodTool) {
     return {
       ok: false,
       reason: 'hatchet',
       msg: "You can't just pluck planks from a tree. You need a Hatchet.",
     };
   }
-  // Woodier Harvest (gardening_harvest_wood): 12 energy and 3 Hatchet wear.
-  const woodier = woodHarvestOverrides(pc?.imaginationUpgrades);
   const energyCost = woodier?.energyCost ?? WOOD_TREE_HARVEST.energyCost;
-  const hatchetWear = woodier?.toolWear ?? WOOD_TREE_HARVEST.hatchetWear;
-  const tool = canUseTool(toolState, 'hatchet', hatchetWear);
+  const tool = canUseTool(toolState, woodTool, hatchetWear);
   if (!tool.ok) return { ...tool, reason: 'broken_hatchet', msg: tool.msg };
   if ((pc?.energy || 0) <= energyCost) {
     return {
@@ -117,6 +139,8 @@ export function quoteWoodTreeHarvest(state, inv = {}, pc = {}, toolState = {}) {
     durationMs: WOOD_TREE_HARVEST.durationMs,
     energyCost,
     hatchetWear,
+    tool: woodTool,
+    toolLabel: woodToolLabel(woodTool),
     plankYield: plankYieldForMaturity(s.maturity, s),
     maturity: s.maturity,
     condition: tool.condition,
@@ -137,7 +161,7 @@ export function harvestWoodTree(state, inv = {}, pc = {}, toolState = {}) {
   const s = ensureWoodTreeState(state || {});
   const quote = quoteWoodTreeHarvest(s, inv, pc, toolState);
   if (!quote.ok) return quote;
-  const toolUse = useToolCondition(toolState, 'hatchet', quote.hatchetWear);
+  const toolUse = useToolCondition(toolState, quote.tool, quote.hatchetWear);
   if (!toolUse.ok) return { ...toolUse, reason: 'broken_hatchet' };
 
   const maturityBefore = s.maturity;
@@ -162,6 +186,8 @@ export function harvestWoodTree(state, inv = {}, pc = {}, toolState = {}) {
     maturityAfter: s.maturity,
     depleted: s.maturity <= 0,
     energyCost: quote.energyCost,
+    tool: quote.tool,
+    toolLabel: quote.toolLabel,
     toolUse,
     line: harvestLine(maturityBefore, s.totalHarvests - 1),
     source: WOOD_TREE_SOURCE,

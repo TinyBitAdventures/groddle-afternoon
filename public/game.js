@@ -458,7 +458,7 @@ import {
   quoteToolRepair,
   repairToolCondition,
   setToolRemaining,
-} from './js/tools.js?v=tools-2';
+} from './js/tools.js?v=tools-3';
 import {
   listRecipes,
   listRecipesForTool,
@@ -689,9 +689,11 @@ import {
 } from './js/animals.js?v=g148-1';
 import {
   ensureWoodTreeState,
+  pickWoodTool,
   resetWoodTreeDay,
+  woodToolLabel,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=woodcutting-2';
+} from './js/woodcutting.js?v=woodcutting-3';
 import {
   GIANTS,
   createShrineState,
@@ -970,6 +972,11 @@ const SHEETS = {
   hatchetTool: {
     url: 'assets/sprites/tools/hatchet-tool.png',
     fw: 110, fh: 64, cols: 8, rows: 5,
+  },
+  // OGA class_axe__x1_tool_animation (888×325): 38 cells of 111×65.
+  classAxeTool: {
+    url: 'assets/sprites/tools/class-axe-tool.png',
+    fw: 111, fh: 65, cols: 8, rows: 5, frameCount: 38,
   },
   wateringCanTool: {
     url: 'assets/sprites/tools/watering-can-tool.png',
@@ -3000,6 +3007,7 @@ function renderPackRow(box, slots, opts = {}) {
       const brokenToolIcons = {
         tinkertool: 'assets/sprites/icons/tinkertool_broken.png',
         hatchet: 'assets/sprites/icons/hatchet_broken.png',
+        class_axe: 'assets/sprites/icons/class_axe_broken.png',
         watering_can: 'assets/sprites/icons/watering_can_broken.png',
       };
       img.src = toolCondition?.broken && brokenToolIcons[s.classTsid]
@@ -5040,7 +5048,8 @@ function playButterflyCareAnimation(target, verbId, durationMs = 0) {
 }
 
 function playHatchetAnimation(target) {
-  const frames = textures.hatchetTool?.frames || [];
+  const axe = pickWoodTool(inv, toolState) === 'class_axe';
+  const frames = (axe ? textures.classAxeTool?.frames : null) || textures.hatchetTool?.frames || [];
   if (!frames.length || !fxLayer || !player || !target?.sprite) return null;
   clearActionToolFx('replaced');
   const tool = new PIXI.AnimatedSprite(frames);
@@ -5475,10 +5484,12 @@ function executeVerb(target, verbId) {
     }
     if (result.woodTreeChanged) {
       refreshWoodTreeVisual(target);
-      const condition = getToolCondition(toolState, 'hatchet');
+      const woodTool = result.woodHarvest?.tool || 'hatchet';
+      const condition = getToolCondition(toolState, woodTool);
       app.canvas.dataset.woodYield = String(result.woodHarvest?.plankYield || 0);
       app.canvas.dataset.hatchetRemaining = String(condition.remaining);
-      if (condition.broken) toast('Ooops! You done broke your Hatchet. Repair it with the Tinkertool.', 4200);
+      app.canvas.dataset.woodTool = woodTool;
+      if (condition.broken) toast(`Ooops! You done broke your ${woodToolLabel(woodTool)}. Repair it with the Tinkertool.`, 4200);
     }
     if (result.animalChanged && target.state) {
       target.subtitle = animalStatusLabel(target.classId, target.state);
@@ -7644,6 +7655,8 @@ const engine = {
   },
   /** Enter the Museum of the Rook instance (as ?questdemo=rookmuseum does): the Mezzanine Greeterbot (mid-tower-feature). */
   startRookMuseum: (opts = {}) => startRookMuseum(opts),
+  /** Enter The Great Hog Haul (as the quest does); races-feature passes { ticket, rivalLabel } for a Hog Haul Ticket. */
+  startHogHaulRace: (opts = {}) => startHogHaulRace(opts),
   /** A scripted NPC conversation: beats, onComplete; cancelable adds a second button (primaryLabel / cancelLabel, onCancel). */
   scriptedDialogue: (opts) => openScriptedQuestDialogue(opts),
   stopFollowing: () => stopCompanionFollowForInstance(),
@@ -10213,6 +10226,8 @@ async function startHogHaulRace(opts = {}) {
       rivalLabel: opts.rivalLabel || 'Gomez Addams',
       rivalTimesMs: hogHaulRivalTimesFromUrl(),
     });
+    // A Great Hog Haul Ticket (features/races-feature.js) rather than the quest.
+    hogHaulState.ticket = opts.ticket || null;
     hogHaulResultApplied = false;
     hogHaulLastCollisionAt = 0;
     hogHaulAutoNextAt = 0;
@@ -10369,6 +10384,7 @@ function finishHogHaulRace() {
 async function leaveHogHaulRace() {
   if (!hogHaulState || !['won', 'lost'].includes(hogHaulState.status)) return false;
   const outcome = hogHaulState.status;
+  const fromTicket = Boolean(hogHaulState.ticket);
   if (outcome === 'won') {
     const updates = applyQuestProgress(questState, 'race_leave', 1, pc);
     announceQuestCompletions(updates);
@@ -10391,7 +10407,7 @@ async function leaveHogHaulRace() {
     app.canvas.dataset.hogHaulOutcome = outcome;
   }
   if (outcome === 'lost') {
-    toast('The Great Hog Haul is still in your Quest Log. Try again anytime.', 4200);
+    if (!fromTicket) toast('The Great Hog Haul is still in your Quest Log. Try again anytime.', 4200);
   } else {
     toast('Dem Piggies got hogtied up good! Nice work.', 3600);
   }
@@ -23154,6 +23170,11 @@ async function main() {
     if (!state.started) return;
     const input = document.getElementById('local-chat-input');
     const text = input?.value || '';
+    // main.js doChatCommand: a feature may answer a player slash command (e.g. /beans).
+    if (text.trim().startsWith('/') && features.query('chatCommand', text.trim(), engine)) {
+      if (input) input.value = '';
+      return;
+    }
     const result = sayLocalChat(text, 'Ur');
     if (input) input.value = '';
     if (result.ok) finishAssistedFeatChain(result);

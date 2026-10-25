@@ -11,7 +11,7 @@
  */
 
 import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
+import { canUseTool, useToolCondition } from './tools.js?v=tools-3';
 import { skillPackageDetails } from './skill-packages.js';
 import { gardenGrowModifier } from './imagination-effects.js';
 import { moodMax } from './metabolics.js';

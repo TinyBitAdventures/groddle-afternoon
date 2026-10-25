@@ -60,7 +60,7 @@ import {
   quoteWoodTreeHarvest,
   harvestWoodTree,
   woodTreeStatusLabel,
-} from './js/woodcutting.js?v=woodcutting-2';
+} from './js/woodcutting.js?v=woodcutting-3';
 import { findWorkingRookTool } from './js/rook-woods.js?v=rook-woods-1';
 import {
   HERDKEEPING,
@@ -726,7 +726,7 @@ export function getVerbsFor(target, ctx) {
         sort: 30,
         energy: harvest.energyCost || 20,
         tooltip: harvest.ok
-          ? `Extract ${harvest.plankYield} planks with your Hatchet · ${harvest.hatchetWear} condition`
+          ? `Extract ${harvest.plankYield} planks with your ${harvest.toolLabel || 'Hatchet'} · ${harvest.hatchetWear} condition`
           : `${harvestTooltip(classId)} · Hatchet required`,
         enabled: harvest.ok,
         reason: harvest.ok ? '' : harvest.msg,
@@ -1335,7 +1335,7 @@ export function runVerb(target, verbId, ctx) {
     if (!result.ok) return { ok: false, msgs: [result.msg || 'Cannot harvest this Wood Tree.'], effects };
     effects.energy -= result.energyCost;
     effects.items.plank = result.plankYield;
-    effects._activityBase = 'You harvest a Wood Tree with your Hatchet.';
+    effects._activityBase = `You harvest a Wood Tree with your ${result.toolLabel || 'Hatchet'}.`;
     msgs.push(result.line);
     msgs.push(`Harvested ${result.plankYield} planks. ${woodTreeStatusLabel(s)}.`);
     finalizeMsgs(msgs, effects);

@@ -21,7 +21,8 @@
  *                                          (Grab 'Em Good: finish|canopy = below the canopy)
  *   ?autostart=1&racedemo=dispenser        a dispenser beside you, store open
  *     &raceautoplay=buy                    buy + activate a Space Race ticket
- *     &raceticket=<ticket class>           ...or that ticket (e.g. race_ticket_grab_em_good)
+ *     &raceticket=<ticket class>           ...or that ticket (e.g. race_ticket_grab_em_good;
+ *                                          race_ticket_hogtie_piggy opens The Great Hog Haul)
  *   ?autostart=1&racedemo=grab_em_good     Grab 'Em Good; raceassist freezes the rival,
  *                                          racerivalseconds=N times its own tree to N s
  */
@@ -59,6 +60,8 @@ import {
   RACE_STARTING_SOON,
   RACE_STARTING_SOON_MS,
   QUOIN_GRAB_ACHIEVEMENTS,
+  HOG_HAUL_GAME_ID,
+  HOG_HAUL_TICKET,
   grabRaceQuoin,
   quoinGrabMood,
   quoinGrabRemaining,
@@ -70,7 +73,7 @@ import {
   settleRace,
   startDelayMessage,
   tickRace,
-} from '../races.js?v=races-3';
+} from '../races.js?v=races-4';
 import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v=races-5';
 import {
   drawCheckpointFlag,
@@ -119,6 +122,7 @@ let pinX = 0;
 let quoinSprites = [];
 let rivalFrozen = false;
 let autoTimeline = null;
+let hogTicketRuns = 0; // Hog Haul instances opened from a ticket this session (QA data)
 
 /* ------------------------------------------------------------------ */
 /* Items                                                              */
@@ -136,6 +140,16 @@ function ensureRaceItems() {
       namePlural: `${race.ticketLabel}s`,
     });
   }
+  // items/race_ticket_hogtie_piggy.js: base_cost 20, stackmax 5, its own tags.
+  ensureItem(HOG_HAUL_TICKET.classTsid, {
+    label: HOG_HAUL_TICKET.label,
+    desc: HOG_HAUL_TICKET.desc,
+    icon: `${RACE_ICON_DIR}${HOG_HAUL_TICKET.classTsid}.png`,
+    baseCost: 20,
+    stackMax: RACE_TICKET_STACK,
+    tags: ['no_rube', 'games', 'ticket', 'races', 'toys'],
+    namePlural: HOG_HAUL_TICKET.namePlural,
+  });
   ensureItem(CROWNS_TICKET, {
     label: 'Game of Crowns Ticket',
     desc: 'Challenge another player to Game of Crowns.',
@@ -157,23 +171,29 @@ function ensureRaceItems() {
 }
 
 function isRaceTicket(classTsid) {
-  return classTsid === RACE_GENERIC_TICKET || classTsid === CROWNS_TICKET || Boolean(raceForTicket(classTsid));
+  return classTsid === RACE_GENERIC_TICKET || classTsid === CROWNS_TICKET || classTsid === HOG_HAUL_TICKET.classTsid || Boolean(raceForTicket(classTsid));
 }
 
 function ticketRaceId(classTsid) {
   if (classTsid === CROWNS_TICKET) return 'it_game';
+  if (classTsid === HOG_HAUL_TICKET.classTsid) return HOG_HAUL_GAME_ID;
   return classTsid === RACE_GENERIC_TICKET ? null : raceForTicket(classTsid)?.id || null;
 }
 
 function playable(raceId) {
-  return raceId === 'it_game' || RACE_COURSE_IDS.includes(raceId);
+  return raceId === 'it_game' || raceId === HOG_HAUL_GAME_ID || RACE_COURSE_IDS.includes(raceId);
 }
 
+/** quests/hogtie_piggy.js desc (the other races' store lines are their quest descs too). */
+const HOG_HAUL_QUEST_DESC = 'Hogtie three Piggies and put them in the Pig Pen!';
+
 function raceTitle(raceId) {
+  if (raceId === HOG_HAUL_GAME_ID) return HOG_HAUL_TICKET.title;
   return raceId === 'it_game' ? CROWNS_TITLE : RACES[raceId]?.title || '';
 }
 
 function raceDesc(raceId) {
+  if (raceId === HOG_HAUL_GAME_ID) return HOG_HAUL_QUEST_DESC;
   return raceId === 'it_game' ? 'Hold the crown for 60 seconds to win.' : RACES[raceId]?.desc || '';
 }
 
@@ -396,10 +416,15 @@ function activateTicket(classTsid, engine, opts = {}) {
     engine.toast('That race is not in this remake yet.');
     return false;
   }
+  if (raceId === HOG_HAUL_GAME_ID && typeof engine.startHogHaulRace !== 'function') {
+    engine.toast('That race is not in this remake yet.');
+    return false;
+  }
   removeItem(engine.inv, classTsid, 1);
   record.pendingTicket = classTsid;
   engine.updateHud();
   engine.save();
+  if (raceId === HOG_HAUL_GAME_ID) return activateHogHaul(classTsid, engine, opts);
   const crowns = raceId === 'it_game';
   const rival = pickRival(raceId, Date.now() / 1000);
   // inc_games.js pretty_list(opponent_names, ' and ').
@@ -424,8 +449,42 @@ function activateTicket(classTsid, engine, opts = {}) {
   return true;
 }
 
+/**
+ * race_ticket.js activate -> games_invite_create('hogtie_piggy'): the source
+ * five-second start, then the Hog Haul instance (game.js startHogHaulRace,
+ * its own Click to Start card, scores and 100 currants + 50 iMG win). As
+ * with the Game of Crowns, the ticket is spent once the instance opens; a
+ * reload before then gives it back.
+ */
+function activateHogHaul(classTsid, engine, opts = {}) {
+  const rival = pickRival(HOG_HAUL_GAME_ID, Date.now() / 1000);
+  engine.pushActivity(`You activated a ${ITEM_LABEL(classTsid)}. ${rival.name} accepted your challenge!`);
+  buildChrome(engine);
+  if (hud) {
+    hud.banner.textContent = startDelayMessage(HOG_HAUL_TICKET.title, 'you', rival.name);
+    hud.banner.hidden = false;
+  }
+  engine.playSound('GAME_STARTING_SOON', { volume: 0.5 });
+  starting = true;
+  hogTicketRuns += 1;
+  const delay = opts.delayMs ?? RACE_START_DELAY_MS;
+  clearTimeout(startTimer);
+  startTimer = setTimeout(() => {
+    if (hud) hud.banner.hidden = true;
+    record.pendingTicket = null;
+    engine.save();
+    Promise.resolve(engine.startHogHaulRace({ rivalLabel: rival.name, ticket: classTsid })).finally(() => {
+      starting = false;
+      publish(engine);
+    });
+  }, delay);
+  publish(engine);
+  return true;
+}
+
 function ITEM_LABEL(classTsid) {
   if (classTsid === CROWNS_TICKET) return 'Game of Crowns Ticket';
+  if (classTsid === HOG_HAUL_TICKET.classTsid) return HOG_HAUL_TICKET.label;
   return raceForTicket(classTsid)?.ticketLabel || 'Race Ticket';
 }
 
@@ -973,6 +1032,7 @@ function publish(engine) {
   engine.setData('raceWins', String(Object.values(record.wins).reduce((a, b) => a + b, 0)));
   engine.setData('raceTickets', String(RACE_STORE_ITEMS.reduce((n, row) => n + countItem(engine.inv, row.classTsid), 0)));
   engine.setData('raceDispenser', dispenserTarget ? '1' : '0');
+  engine.setData('raceHogTicketRuns', String(hogTicketRuns));
   engine.setData('raceCourseSource', course ? 'reconstructed' : '');
   engine.setData('raceKind', run ? run.kind : '');
   engine.setData('raceQuoinsYou', run?.kind === 'quoins' ? String(run.scores.you) : '');

@@ -1951,11 +1951,11 @@
   "musicTracks": 58
  },
  "recipes": {
-  "imported": 323,
-  "skipped": 23
+  "imported": 324,
+  "skipped": 22
  },
  "icons": {
-  "items": 787,
+  "items": 792,
   "sharp": 781
  },
  "imagination": {
@@ -2100,6 +2100,6 @@
    }
   ]
  },
- "tests": 216,
+ "tests": 217,
  "generatedAt": "2026-10-24"
 }

@@ -19,7 +19,7 @@ import {
   itemIcon,
   ITEM_CATALOG,
 } from './inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
+import { canUseTool, useToolCondition } from './tools.js?v=tools-3';
 import { skillPackageDetails } from './skill-packages.js';
 import { grantMoodXp } from './mood-xp.js';
 import { GEM_ITEMS, MEGA_ROCK_CHUNKS, megaRockChance, miningExpertBonus, rollGemSmall, smeltingOverrides } from './imagination-effects.js';

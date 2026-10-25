@@ -41,7 +41,7 @@ import {
   TOOL_CATALOG,
 } from '../public/js/making.js';
 import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-2';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-3';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPIKE = join(__dirname, '../public');

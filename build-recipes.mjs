@@ -85,6 +85,9 @@ const PLAYABLE_TOOL_OUTPUTS = new Set([
   ...INCLUDED_TOOLS,
   'hoe',
   'hatchet',
+  // Class Axe (recipe 301): hatchet's child class; woodcutting.js and
+  // patches.js take either (wood_tree.js / trant_*_dead.js is_hatchet).
+  'class_axe',
   'watering_can',
   'irrigator_9000',
   'pick',
@@ -107,7 +110,6 @@ const PLAYABLE_TOOL_OUTPUTS = new Set([
 const UNPLAYABLE_TOOL_REASONS = {
   grand_ol_grinder: "Grand Ol' Grinder is an upgraded Grinder; mining.js only recognizes ore_grinder.",
   high_class_hoe: 'High-Class Hoe is an upgraded Hoe; garden.js only recognizes hoe.',
-  class_axe: 'Class Axe is an upgraded Hatchet; woodcutting.js only recognizes hatchet.',
 };
 
 /** Furniture classes with recovered art (build-homes.mjs FURNITURE_CLASSES). */
@@ -276,6 +278,7 @@ const VERB_RECIPES = {
 const EXTRA_TOOL_ITEMS = new Set([
   'hoe',
   'hatchet',
+  'class_axe',
   'watering_can',
   'irrigator_9000',
   'pick',

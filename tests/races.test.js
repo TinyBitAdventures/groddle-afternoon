@@ -43,6 +43,7 @@ import {
   normalizeRaceRecord,
   passRaceCheckpoint,
   pickGenericRace,
+  HOG_HAUL_GAME_ID,
   projectRouteProgress,
   raceCountdownCue,
   raceForTicket,
@@ -100,9 +101,10 @@ describe('race catalog and ticket store', () => {
     assert.ok(existsSync(join(root, 'assets/sprites/races/race_ticket.png')));
   });
 
-  it('rolls the generic ticket onto a race, or Grab \'Em Good on the last value', () => {
-    // race_ticket.js: randInt(0, 8): 0-6 a race, 7 Hog Haul (no ticket route here), 8 quoin_grab.
-    for (let i = 0; i < 8; i += 1) assert.ok(RACE_IDS.includes(pickGenericRace(i / 9 + 0.01)), `roll ${i}`);
+  it('rolls the generic ticket onto a race, The Great Hog Haul, or Grab \'Em Good', () => {
+    // race_ticket.js: randInt(0, 8): 0-6 a race, 7 hogtie_piggy (G155), 8 quoin_grab.
+    for (let i = 0; i < 7; i += 1) assert.ok(RACE_IDS.includes(pickGenericRace(i / 9 + 0.01)), `roll ${i}`);
+    assert.equal(pickGenericRace(7 / 9 + 0.01), HOG_HAUL_GAME_ID);
     assert.equal(pickGenericRace(0), 'amazing_race');
     assert.equal(pickGenericRace(8 / 9 + 0.01), GRAB_EM_GOOD_ID);
     assert.equal(pickGenericRace(0.999), GRAB_EM_GOOD_ID);

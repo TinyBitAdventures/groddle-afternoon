@@ -17,7 +17,7 @@ import {
   ensureItem,
   registerItemUse,
 } from './inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from './tools.js?v=tools-2';
+import { canUseTool, useToolCondition } from './tools.js?v=tools-3';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js';
 import {
   adjustedTaskLimit,

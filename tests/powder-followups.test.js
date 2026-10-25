@@ -16,7 +16,7 @@ import { itemVerbsFeature, inGameLocation } from '../public/js/features/item-ver
 import { GAME_CHEAT_BLOCKS, gameCheatBlock } from '../public/js/item-verbs.js?v=g137-1';
 import { CROWNS_STREET } from '../public/js/game-of-crowns.js?v=crowns-1';
 import { HOG_HAUL_STREET_ID } from '../public/js/hog-haul.js?v=hog-haul-1';
-import { raceSceneTsid } from '../public/js/races.js?v=races-3';
+import { raceSceneTsid } from '../public/js/races.js?v=races-4';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

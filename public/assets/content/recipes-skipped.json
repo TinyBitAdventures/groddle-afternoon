@@ -2,8 +2,8 @@
   "_meta": {
     "generator": "build-recipes.mjs",
     "sourceRecipes": 339,
-    "imported": 316,
-    "skipped": 23,
+    "imported": 317,
+    "skipped": 22,
     "verbRecipes": 7
   },
   "skipped": [
@@ -196,16 +196,6 @@
       ],
       "reason": "learnt 3: hidden/retired in production (main.js skips learnt == 3 when building the client recipe catalog).",
       "source": "catalog_recipes.js recipes[\"287\"]"
-    },
-    {
-      "id": "301",
-      "name": "Class Axe",
-      "tool": "tinkertool",
-      "outputs": [
-        "class_axe"
-      ],
-      "reason": "Class Axe is an upgraded Hatchet; woodcutting.js only recognizes hatchet.",
-      "source": "catalog_recipes.js recipes[\"301\"]"
     },
     {
       "id": "303",

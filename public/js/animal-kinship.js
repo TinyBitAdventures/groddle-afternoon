@@ -16,7 +16,7 @@ import {
   canUseTool,
   setToolRemaining,
   useToolCondition,
-} from './tools.js?v=tools-2';
+} from './tools.js?v=tools-3';
 import { SKILL_PACKAGES, getSkillPackageOverride, skillPackageDetails } from './skill-packages.js';
 import { moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';

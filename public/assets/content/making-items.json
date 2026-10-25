@@ -1236,6 +1236,21 @@
         "source": "items/cinnamon.js base_cost 8 × energy_factor 0.1 (include/food.js food_eat)"
       }
     },
+    "class_axe": {
+      "label": "Class Axe",
+      "namePlural": "Class Axes",
+      "desc": "Vibrating with raw power far beyond the realm of the basic Hatchet, the Class Axe is perfect for wielding by anyone who really loves to whack their wood.",
+      "baseCost": 900,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "premiumtool"
+      ],
+      "isTool": true,
+      "source": "items/class_axe.js",
+      "pointsCapacity": 300,
+      "makingType": ""
+    },
     "cloud_11_smoothie": {
       "label": "Cloud 11 Smoothie",
       "namePlural": "Cloud 11 Smoothies",

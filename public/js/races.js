@@ -187,6 +187,25 @@ export const RACE_IDS = Object.freeze(
     .map((race) => race.id)
 );
 
+/**
+ * The Great Hog Haul Ticket (items/race_ticket_hogtie_piggy.js: game_id
+ * hogtie_piggy, stackmax 5, store 20). Activating it starts the same race the
+ * quest runs (js/hog-haul.js, game.js startHogHaulRace): config_prod.js
+ * shared_instances.hogtie_piggy names it 'The Great Hog Haul'; its production
+ * instance LHVLC8CI3Q62P8T is not archived, so the quest's imported cave
+ * stands in.
+ */
+export const HOG_HAUL_GAME_ID = 'hogtie_piggy';
+export const HOG_HAUL_TICKET = Object.freeze({
+  classTsid: 'race_ticket_hogtie_piggy',
+  label: 'The Great Hog Haul Ticket',
+  namePlural: 'The Great Hog Haul Tickets',
+  desc: 'Challenge another player to The Great Hog Haul.',
+  title: 'The Great Hog Haul',
+  // players/inc_games.js games_hogtie_piggy_splash.
+  splash: 'Be the first to capture 3 Piggies.',
+});
+
 /** Every ticket game the races feature runs (record keys). */
 export const RACE_GAME_IDS = Object.freeze(Object.keys(RACES));
 export const GRAB_EM_GOOD_ID = 'grab_em_good';
@@ -250,13 +269,14 @@ export function isRaceSceneTsid(tsid) {
 
 /**
  * The generic Race Ticket rolls randInt(0, races + 1): one of the seven races,
- * or (the last two values) Hog Haul / Grab 'Em Good. Hog Haul has no ticket
- * route here, so that roll falls back onto a race.
+ * or (the last two values) The Great Hog Haul (game_id hogtie_piggy) / Grab
+ * 'Em Good (race_ticket.js verbs.activate).
  */
 export function pickGenericRace(roll = Math.random()) {
   const n = RACE_IDS.length;
   const choice = Math.max(0, Math.min(n + 1, Math.floor(Number(roll) * (n + 2))));
   if (choice === n + 1) return GRAB_EM_GOOD_ID;
+  if (choice === n) return HOG_HAUL_GAME_ID;
   return RACE_IDS[choice % n];
 }
 

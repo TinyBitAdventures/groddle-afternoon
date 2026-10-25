@@ -38,7 +38,7 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from '../tools.js?v=tools-2';
+import { canUseTool, useToolCondition } from '../tools.js?v=tools-3';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { runStreetTransition } from '../screen-fx.js';
 import {
@@ -253,6 +253,28 @@ function removeCarried(engine, id) {
 
 function noteTitle(note) {
   return noteContent(note).title;
+}
+
+/**
+ * Written notes in the pack, for other features (fortune_cookie.js add_note
+ * takes a note whose `contents` are set and keeps last_editor as the author).
+ */
+export function writtenCarriedNotes(engine) {
+  syncCarried(engine);
+  return carried
+    .map((n) => normalizeNote(n))
+    .filter((n) => n.body)
+    .map((n) => ({ id: n.id, title: noteTitle(n), body: n.body, author: n.lastEditor || PLAYER_ID }));
+}
+
+/** Add one carried note with its text (QA seeding for other features). */
+export function giveCarriedNote(engine, note) {
+  addCarried(engine, note);
+}
+
+/** Remove one carried note (and its pack stack) by id; returns it or null. */
+export function takeCarriedNote(engine, id) {
+  return removeCarried(engine, id);
 }
 
 function bylineFor(note) {

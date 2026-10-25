@@ -9608,6 +9608,40 @@
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"300\"]"
   },
+  "class_axe": {
+    "id": "301",
+    "name": "Class Axe",
+    "tool": "tinkertool",
+    "energyCost": 50,
+    "xpReward": 40,
+    "waitMs": 10000,
+    "inputs": [
+      {
+        "classTsid": "metal_post",
+        "qty": 1
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "class_axe",
+        "qty": 1
+      }
+    ],
+    "skill": "tinkering_5",
+    "skills": [
+      "tinkering_5",
+      "engineering_1"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"301\"]"
+  },
   "splendid_spindle": {
     "id": "302",
     "name": "Splendid Spindle",

@@ -37,7 +37,7 @@
 
 import { addItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { DROP_ITEMS, rollDropTable } from '../drop-tables.js';
-import { canUseTool, useToolCondition, TOOL_CONDITION_CATALOG } from '../tools.js?v=tools-2';
+import { canUseTool, useToolCondition, TOOL_CONDITION_CATALOG } from '../tools.js?v=tools-3';
 import { textureFromUrl } from '../textures.js';
 import {
   ALL_ARTIFACT_CLASSES,

@@ -19,6 +19,7 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   watering_can: { label: 'Watering Can', capacity: 100, baseCost: 75, source: 'watering_can.js' },
   hoe: { label: 'Hoe', capacity: 50, baseCost: 60, source: 'hoe.js' },
   hatchet: { label: 'Hatchet', capacity: 100, baseCost: 100, source: 'hatchet.js' },
+  class_axe: { label: 'Class Axe', capacity: 300, baseCost: 900, source: 'class_axe.js' },
   pick: { label: 'Pick', capacity: 100, baseCost: 500, source: 'pick.js' },
   fancy_pick: { label: 'Fancy Pick', capacity: 200, baseCost: 1000, source: 'fancy_pick.js' },
   smelter: { label: 'Smelter', capacity: 500, baseCost: 700, source: 'smelter.js' },
