@@ -75,6 +75,39 @@ const DIALOGUE_POOLS = Object.freeze({
     "Half the forest once fell cattywampus into itself, and rocks tumbled down and buried it in caves.",
     "Sometimes, I swear I can hear that old forest growing down there.",
   ]),
+  // The Firebog spirit's "Street Spirit Mysteries" (street_spirit_firebog.js
+  // 897-1019: street_spirit_mysteries_1 and _2), its lines in order.
+  street_spirit_firebog: Object.freeze([
+    'Darklee sat yon giants, brooding in their funk. In darkly times, they grizzled at their woe.',
+    'They grumbled! After the furny blast did blasty-raze the wood and leave but twiggybits!',
+    'For surishly maybelike! Twiggybits just! No mores! Well, no more but wetly peat-ash and jellicle-spores.',
+    'Sayso! Firelybogs from forests green did spring and giantly grumbles echoly did ring. For eons long!',
+    'Full rightly wowzers say you, tiny Glitch. This fizzling firebog once all forest was. And giantly sads was deep and thick and flub.',
+    'Flub.',
+    "Yay, listen Glitchy, while history surrounds 'ee.",
+    'Tight-wovened strings that binded giants were till Rookling first did swoop upon the world. It tore with toothied beak and razored claw straight through the imaginings so careful-wrought.',
+    'And in their sleep giant tears rolled down giant chins, to watch their frabjous world be torn in bits. The rook is part of them they cannot kill. The knowledge of it heavy on them sits. And breaks their sleeps.',
+    'Sleeps.',
+  ]),
+  // The Uralia spirit's "When Down Was Up" (street_spirit_zutto.js 947-1104:
+  // when_down_was_up_1 and _2), its lines in order.
+  street_spirit_zutto: Object.freeze([
+    'SPOING!!! Ha?!? What? Say? Hi!',
+    'Woah! Yah! Woaaaaahh! Hee-hee! Spoing!',
+    'Hee! No calm! Too much! Look! Look you talking! You talking! To me!',
+    'Zille frowns on jollity. And fun. And floating. Floating is fun.',
+    'Me? No. This? No no no. This is just a hangover from a time before, when down was up and up was down.',
+    'When time that Cosma forgot and most other giants ignored. Who are they to care if caverns are suddenly the tunnels of the sky?',
+    'So then I hung upside down, now I hang downside up. Whatever. All helps to get the stardusts out of my earryholes.',
+    'Hi hi hi hi! SPOING!!!!',
+    'Shhh, here is a secret. Come closer. Not that close.',
+    'Hee! Oooh! Here! During an age in the middle of the ages that I cannot summon the energy to remember, but it is written down somewhere...',
+    'Some. Somewhere. Theresome. Anyway but. The caverns filled with water.',
+    'No no no no no no no no no no.',
+    'No.',
+    'Other caverns, elsewhere else. And those? Those filled with things of life and sea and sealife things. But I? I kept all dry. And why?',
+    "I don't know. I just liked the rhyme. Why. Dry. Fly. Try. Pie. I. Rye.",
+  ]),
 });
 
 const SPEAKER_LABELS = Object.freeze({
@@ -88,10 +121,15 @@ const SPEAKER_LABELS = Object.freeze({
   trant_gas: 'Gas Plant',
   trant_spice: 'Spice Plant',
   street_spirit: 'Street Spirit',
+  street_spirit_firebog: 'Street Spirit',
+  street_spirit_zutto: 'Street Spirit',
 });
 
 function dialogueKey(classId) {
   const id = String(classId || '');
+  // Store vendors (street_spirit_groceries...) share the Groddle lines; the
+  // regional classes with their own conversations keep them (js/street-spirits.js).
+  if (DIALOGUE_POOLS[id]) return id;
   return id.startsWith('street_spirit_') ? 'street_spirit' : id;
 }
 

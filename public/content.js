@@ -54,7 +54,7 @@ import {
   collectMusicblock,
   isMusicblock,
 } from './js/musicblocks.js?v=g148-1';
-import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-1';
+import { nextDialogue, formatSpokenLine } from './js/dialogue.js?v=dialogue-2';
 import {
   ensureWoodTreeState,
   quoteWoodTreeHarvest,
@@ -1394,7 +1394,8 @@ export function runVerb(target, verbId, ctx) {
     return { ok: true, msgs, effects, openVendor: true };
   }
   if (classId.startsWith('street_spirit_') && verbId === 'talk_to') {
-    return spokenResult(classId, s, effects, {
+    // A regional spirit speaks its own region's lines (features/street-spirits-feature.js sets spiritDialogue).
+    return spokenResult(s.spiritDialogue || classId, s, effects, {
       speaker: s.vendorLabel || 'Street Spirit',
     });
   }

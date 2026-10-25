@@ -113,3 +113,4 @@ import { soloFeatsFeature } from './solo-feats-feature.js?v=g178-1'; FEATURES.pu
 import { slashCommandsFeature } from './slash-commands-feature.js?v=g160-1'; FEATURES.push(slashCommandsFeature);
 import { hellTicketsFeature } from './hell-tickets-feature.js?v=g163-1'; FEATURES.push(hellTicketsFeature);
 import { packTreeVerbsFeature } from './pack-tree-verbs-feature.js?v=g165-1'; FEATURES.push(packTreeVerbsFeature);
+import { streetSpiritsFeature } from './street-spirits-feature.js?v=g181-1'; FEATURES.push(streetSpiritsFeature);
