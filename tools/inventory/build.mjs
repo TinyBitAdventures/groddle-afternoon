@@ -45,7 +45,8 @@
  *                as reason; unreleased/other rows are unknown).
  *   item / npc   GSJS items/*.js (npc_* separately): obtainable (tools/job-obtainable.mjs: vendors,
  *                starter kit, harvests, recipe and conversion fixpoint; plus solo quest rewards, the
- *                shared drop tables a live rollDropTable / rollPackageDrop call rolls (dropTableReach), and
+ *                shared drop tables a live rollDropTable / rollPackageDrop call rolls (dropTableReach),
+ *                artifacts and necklaces assembled from reachable pieces (assemblyConversions), and
  *                addItem() / inv[id] += n grants outside QA paths; consuming, counting or naming an
  *                item is not a grant, see itemGrantReach), in the world (street-ecology.json), or placed by
  *                code (a classId/classTsid literal or a spawn/create/place call argument). Unreferenced
@@ -71,7 +72,7 @@ import { homedir } from 'node:os';
 import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildIndex, contextLiterals, inventoryWrites, listJsFiles, literalIndex, literalRoles, liveFiles, namesReached, useRole, matchPattern, patternString, scanEmissions, spawnTemplates, templatePatterns } from './scan.mjs';
+import { buildIndex, contextLiterals, inventoryWrites, listJsFiles, literalIndex, literalRoles, liveFiles, namesReached, qaAt, useRole, matchPattern, patternString, scanEmissions, spawnTemplates, templatePatterns } from './scan.mjs';
 import * as G from './gsjs-data.mjs';
 import * as D from './detectors.mjs';
 
@@ -125,6 +126,27 @@ export function dropRollEmissions(index) {
     return Boolean(file && new RegExp(`function\\s+${name}\\b`).test(file.text));
   };
   return emissions.filter((e) => e.callee === 'rollDropFor' || e.callee === 'rollTable' || !declares(e.file, e.callee));
+}
+
+/**
+ * Artifact and necklace assembly call sites (G187): a live file (imported from game.js) that imports
+ * js/artifacts.js, calls its consumeForAssembly outside QA seeding and adds the made item to the pack
+ * (features/artifacts-feature.js assemble + tickAssembly addItem). Returns ['rel:line'];
+ * D.assemblyConversions turns them and the ARTIFACT_MAP / ARTIFACT_NECKLACES tables into conversions.
+ */
+export function assemblySites(index, { roots = ['game.js'] } = {}) {
+  const live = liveFiles(index, roots);
+  const sites = [];
+  for (const file of index.files) {
+    if (!live.has(file.rel) || /(^|\/)artifacts\.js$/.test(file.rel)) continue;
+    if (!file.deps.some((d) => /(^|\/)artifacts\.js(\?|$)/.test(d))) continue;
+    const named = (call, name) => call.callee.type === 'Identifier' && call.callee.name === name;
+    if (!file.calls.some((c) => named(c, 'addItem'))) continue;
+    for (const call of file.calls) {
+      if (named(call, 'consumeForAssembly') && !qaAt(file, call.start)) sites.push(`${file.rel}:${call.loc?.start.line || 0}`);
+    }
+  }
+  return sites;
 }
 
 export const GSJS_EMITTERS = [
@@ -386,17 +408,10 @@ export async function collect({ spike = SPIKE, log = () => {} } = {}) {
   // emblem_base iconize (js/giant-icons.js iconize): eleven Emblems of a Giant become its Icon.
   const { GIANT_ICON_DATA } = await import(join(pub, 'js/giant-icons-data.js'));
   for (const g of Object.values(GIANT_ICON_DATA)) conversions.push({ inputs: [g.emblemClass], tool: null, outputs: [g.iconClass], source: 'iconize (js/giant-icons.js)' });
-  const fix = () => {
-    let grew = true;
-    while (grew) {
-      grew = false;
-      for (const c of conversions) {
-        if (c.tool && !reach.has(c.tool)) continue;
-        if (!c.inputs.every((i) => reach.has(i))) continue;
-        for (const o of c.outputs) if (!reach.has(o)) { reach.set(o, c.source); grew = true; }
-      }
-    }
-  };
+  // Artifact and necklace assembly (js/artifacts.js tables, features/artifacts-feature.js): made once every piece is reachable.
+  const { ARTIFACT_MAP, ARTIFACT_NECKLACES } = await import(join(pub, 'js/artifacts.js'));
+  conversions.push(...D.assemblyConversions({ artifacts: ARTIFACT_MAP, necklaces: ARTIFACT_NECKLACES, sites: assemblySites(remakeIndex) }));
+  const fix = () => D.conversionFixpoint(reach, conversions);
   fix();
   const present = new Map();
   for (const sec of ['streets', 'soil', 'wildlife', 'furniture', 'vendors']) {

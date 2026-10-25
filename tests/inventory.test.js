@@ -11,10 +11,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { buildIndex, contextLiterals, inventoryWrites, liveFiles, matchPattern, prefixLabels, scanEmissions } from '../tools/inventory/scan.mjs';
-import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills, conditionReach, dropTableReach, gsjsItemRefs } from '../tools/inventory/detectors.mjs';
+import { judgeAchievements, judgeBuffs, judgeLocations, judgeItems, judgeSkills, conditionReach, dropTableReach, assemblyConversions, conversionFixpoint, gsjsItemRefs } from '../tools/inventory/detectors.mjs';
 import { readTsidRefs, tsidRefsFromText } from '../tools/inventory/gsjs-data.mjs';
-import { REMAKE_EMITTERS, GSJS_EMITTERS, dropRollEmissions, emissionsByTag, itemGrantReach, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
+import { REMAKE_EMITTERS, GSJS_EMITTERS, assemblySites, dropRollEmissions, emissionsByTag, itemGrantReach, locationBuilders, openDb, writeDb, lastDiff, summary, blockerRows } from '../tools/inventory/build.mjs';
 import { CHECKLIST } from '../tools/restoration/checklist.mjs';
+import { ARTIFACT_MAP, ARTIFACT_NECKLACES } from '../public/js/artifacts.js';
+import { DROP_TABLES } from '../public/js/drop-tables-data.js';
+import { SKILL_PACKAGES } from '../public/js/skill-packages-data.js';
 
 const SUBWAY_JS = `export const RIDE_COUNTER = 'transit:subways_entered';\nexport const OTHER = 'x';\n`;
 const FEATURE_JS = `import { RIDE_COUNTER } from '../subway.js?v=2';\nfunction board(engine) { engine.achievement(RIDE_COUNTER, 1); }\n`;
@@ -473,6 +476,76 @@ describe('item detector: drop tables the remake rolls (G183)', () => {
   it('regression: without the cracker roll, the taster is not reachable', () => {
     const reach = reachOf(FILES.map(([p, t]) => [p, p.endsWith('seasons-feature.js') ? 'export function pull() { return null; }\n' : t]));
     assert.ok(!reach.has('taster'));
+  });
+});
+
+describe('item detector: artifact and necklace assembly (G187)', () => {
+  const ART = {
+    nose: { artifact: 'artifact_nose', pieces: ['nose_piece1', 'nose_piece2'] },
+    cube: { artifact: 'artifact_cube', pieces: ['cube_piece1', 'cube_piece2'] },
+  };
+  const NECK = { bead_x: { required: 17, produces: 'necklace_x' }, bead_y: { required: 19, produces: 'necklace_y' } };
+  const GAME = "import { artifactsFeature } from './js/features/artifacts-feature.js?v=1';\n";
+  const FEATURE = "import { addItem } from '../inventory.js';\nimport { assemblyFor, consumeForAssembly } from '../artifacts.js';\n"
+    + "function assemble(engine, plan) {\n  if (!consumeForAssembly(engine.inv, plan)) return false;\n  addItem(engine.inv, plan.artifact, 1);\n}\nexport const artifactsFeature = { assemble };\n";
+  const sitesOf = (files) => assemblySites(buildIndex(files.map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' }));
+  const LIVE = [['game.js', GAME], ['js/features/artifacts-feature.js', FEATURE], ['js/artifacts.js', 'export function consumeForAssembly(inv, plan) { return true; }\n']];
+  const reached = (sites, have) => conversionFixpoint(new Map(have.map((id) => [id, 'drop table'])), assemblyConversions({ artifacts: ART, necklaces: NECK, sites }));
+
+  it('finds the live assembly call site, not the rules module', () => {
+    assert.deepEqual(sitesOf(LIVE), ['js/features/artifacts-feature.js:4']);
+  });
+
+  it('makes an artifact reachable only when every piece is, with the assembly and its pieces as evidence', () => {
+    const reach = reached(sitesOf(LIVE), ['nose_piece1', 'nose_piece2', 'cube_piece1', 'bead_x']);
+    assert.equal(reach.get('artifact_nose'), 'artifact assembly nose from nose_piece1 + nose_piece2 (js/artifacts.js ARTIFACT_MAP, assembled at js/features/artifacts-feature.js:4)');
+    assert.ok(!reach.has('artifact_cube'), 'cube_piece2 is not reachable');
+    assert.match(reach.get('necklace_x'), /^necklace assembly from 17 bead_x \(js\/artifacts\.js ARTIFACT_NECKLACES, assembled at /);
+    assert.ok(!reach.has('necklace_y'));
+  });
+
+  it('regression: a feature that never assembles (or is not loaded, or only in QA) makes nothing', () => {
+    const noCall = LIVE.map(([p, t]) => [p, p.endsWith('artifacts-feature.js') ? "import { assemblyFor } from '../artifacts.js';\nexport const artifactsFeature = {};\n" : t]);
+    const unloaded = LIVE.map(([p, t]) => [p, p === 'game.js' ? 'export {};\n' : t]);
+    const qaOnly = LIVE.map(([p, t]) => [p, p.endsWith('artifacts-feature.js') ? t.replace('if (!consumeForAssembly', "if (engine.param('artdemo') && !consumeForAssembly") : t]);
+    for (const files of [noCall, unloaded, qaOnly]) {
+      const sites = sitesOf(files);
+      assert.deepEqual(sites, []);
+      assert.ok(!reached(sites, ['nose_piece1', 'nose_piece2', 'bead_x']).has('artifact_nose'));
+    }
+  });
+
+  it('follows the real tables in js/artifacts.js: 10 artifacts and 5 necklaces', () => {
+    const rows = assemblyConversions({ artifacts: ARTIFACT_MAP, necklaces: ARTIFACT_NECKLACES, sites: ['x:1'] });
+    assert.equal(rows.length, 15);
+    const spork = rows.find((r) => r.outputs[0] === 'artifact_platinumium_spork');
+    assert.deepEqual(spork.inputs, ['artifact_platinumium_spork_piece1', 'artifact_platinumium_spork_piece2']);
+  });
+});
+
+describe('item detector: the SWFs really drop (G187)', () => {
+  // GSJS catalog_drop_tables.js 335-365: barnacle_scraping rows 92/96/100 nest swfs_1/2/3 (2342-2362), as do
+  // gardening_small/large, jellisac_scooping, light_green_thumb_small/large and tree_watering_small/large.
+  // The scraping package's live imagination card barnacle_scraping_drop_1 drops from barnacle_scraping, and
+  // resource-nodes-feature.js -> drops-feature.js rollResourceNodeDrop rolls it, so swf_1-3 land in the pack.
+  const FILES = [
+    ['js/features/drops-feature.js', "import { rollPackageDrop } from '../drop-tables.js';\nexport function rollDropFor(engine, packageId) { return rollPackageDrop(packageId, {}); }\n"
+      + "export const RESOURCE_NODE_DROP_PACKAGES = Object.freeze({ 'mortar_barnacle:scrape': 'scraping' });\n"
+      + "export function rollResourceNodeDrop(engine, result) {\n  const pkg = RESOURCE_NODE_DROP_PACKAGES[`${result.classTsid}:${result.verbId}`];\n  return pkg ? rollDropFor(engine, pkg) : null;\n}\n"],
+  ];
+  const reachOf = (files) => {
+    const index = buildIndex(files.map(([path, text]) => ({ path: `/fixture/public/${path}`, text })), { root: '/fixture/public' });
+    return new Map(dropTableReach({ emissions: dropRollEmissions(index), tables: DROP_TABLES, packages: SKILL_PACKAGES }));
+  };
+
+  it('reaches swf_1-3 through the scraping package and barnacle_scraping, naming the nested table', () => {
+    const reach = reachOf(FILES);
+    for (const n of [1, 2, 3]) assert.match(reach.get(`swf_${n}`), new RegExp(`^drop table barnacle_scraping \\(skill package scraping, rolled at js/features/drops-feature\\.js:6\\) via swfs_${n}$`));
+  });
+
+  it('nothing rolls swfs_1 by its own id: without a package roll the SWFs are not reached', () => {
+    const reach = reachOf([['js/features/drops-feature.js', "export const RESOURCE_NODE_DROP_PACKAGES = { 'mortar_barnacle:scrape': 'scraping' };\n"]]);
+    for (const n of [1, 2, 3]) assert.ok(!reach.has(`swf_${n}`));
   });
 });
 

@@ -1067,21 +1067,6 @@
   "reason": "admin tool: locations/inc_admin.js:664 lists it among things to clean up; the one placed copy is on 'The forgotten floor' LDOOSA8V29J24I3 (WIP)",
   "register": "G125"
  },
- "item:swf_1": {
-  "status": "unbuilt_original",
-  "reason": "an easter egg nothing hands out: drop tables swfs_1/2/3 (catalog_drop_tables.js 2342-2362) are run by no file in GSJS or eleven-gsjs; holding all three would make a game_box (players/inc_items.js 652-805)",
-  "register": "G125"
- },
- "item:swf_2": {
-  "status": "unbuilt_original",
-  "reason": "an easter egg nothing hands out: drop table swfs_2 (catalog_drop_tables.js 2350) is run by no file; see swf_1",
-  "register": "G125"
- },
- "item:swf_3": {
-  "status": "unbuilt_original",
-  "reason": "an easter egg nothing hands out: drop table swfs_3 (catalog_drop_tables.js 2358) is run by no file; see swf_1",
-  "register": "G125"
- },
  "item:note_pole": {
   "status": "lost",
   "reason": "a public notice pole for the home street (recipe 303, Furnituremaking I + Construction Tool): visitors read and pin notes; build-recipes.mjs skips it (no note-board system)",

@@ -444,6 +444,49 @@ export function dropTableReach({ emissions = [], tables = {}, packages = {} }) {
   return out;
 }
 
+/**
+ * The conversion fixpoint: a conversion whose tool (if any) and every input are reachable makes its
+ * outputs reachable, with the conversion's source as evidence. Mutates `reach` (Map id -> why).
+ */
+export function conversionFixpoint(reach, conversions = []) {
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const c of conversions) {
+      if (c.tool && !reach.has(c.tool)) continue;
+      if (!c.inputs.every((i) => reach.has(i))) continue;
+      for (const o of c.outputs) if (!reach.has(o)) { reach.set(o, c.source); grew = true; }
+    }
+  }
+  return reach;
+}
+
+/**
+ * Artifacts and necklaces the remake assembles from pieces (G187). players/inc_artifacts.js
+ * artifactPieceAdded -> createArtifact (one of each artifact_map piece) / createArtifactNecklace
+ * (artifact_necklaces: N beads); the remake's table is js/artifacts.js ARTIFACT_MAP and
+ * ARTIFACT_NECKLACES, used by a live consumeForAssembly call (features/artifacts-feature.js).
+ * Returns conversion rows for the item fixpoint, so an artifact reads reachable only when every
+ * piece does; none when no live call site assembles.
+ *   artifacts  { type: { artifact, pieces: [classTsid] } }
+ *   necklaces  { beadClass: { required, produces } }
+ *   sites      ['js/features/artifacts-feature.js:182'] (assembly call sites)
+ */
+export function assemblyConversions({ artifacts = {}, necklaces = {}, sites = [] }) {
+  if (!sites.length) return [];
+  const at = `assembled at ${sites.join(', ')}`;
+  const out = [];
+  for (const [type, a] of Object.entries(artifacts)) {
+    if (!a?.artifact || !a.pieces?.length) continue;
+    out.push({ inputs: [...a.pieces], tool: null, outputs: [a.artifact], source: `artifact assembly ${type} from ${a.pieces.join(' + ')} (js/artifacts.js ARTIFACT_MAP, ${at})` });
+  }
+  for (const [bead, n] of Object.entries(necklaces)) {
+    if (!n?.produces) continue;
+    out.push({ inputs: [bead], tool: null, outputs: [n.produces], source: `necklace assembly from ${n.required} ${bead} (js/artifacts.js ARTIFACT_NECKLACES, ${at})` });
+  }
+  return out;
+}
+
 /* ------------------------------------------------------------------ */
 /* Quests, skills, imagination, buffs, jobs, sounds, wardrobe, badge art */
 /* ------------------------------------------------------------------ */
