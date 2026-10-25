@@ -47,7 +47,7 @@ import {
   squishGrape,
   wineDrinkConditions,
 } from '../hell.js';
-import { countItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 
 const GRAPE_SCALE = 0.8;

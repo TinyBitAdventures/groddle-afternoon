@@ -100,7 +100,7 @@ import {
   tutorialPhysics,
   vogPages,
 } from '../newxp.js?v=newxp-2';
-import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js';
 import { soundForQuoin } from '../sound-moments.js';
 import { IMAGINATION_UPGRADES } from '../imagination.js';

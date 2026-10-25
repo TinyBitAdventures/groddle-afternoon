@@ -73,7 +73,7 @@ import {
 } from '../quest-offers.js';
 import { parseQuestConversation } from '../quests.js';
 import { getQuestCatalog } from '../content-catalogs.js';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { runStreetTransition } from '../screen-fx.js';
 import { collectQuoin, QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js';
 import { sourceFromUrl } from '../textures.js';

@@ -2618,6 +2618,17 @@ button.play-context-head:focus-visible {
   transform: scale(1.42);
   animation: fruit-machine-work 1.35s steps(17, end) infinite;
 }
+.make-progress .mp-tool-grand-ol-grinder {
+  display: block;
+  width: 50px;
+  height: 79px;
+  /* grand_ol_grinder.swf tool_animation (OGA grand_ol_grinder__x1_tool_animation,
+     CC0, 850x395 = 17x5 cells of 50x79): the 83 frames repacked into one row,
+     played at the SWF's 30 fps. */
+  background: url('assets/sprites/making/grand_ol_grinder-work.png') 0 0 / 4150px 79px no-repeat;
+  transform: scale(1.18);
+  animation: grand-ol-grinder-work 2.77s steps(83, end) infinite;
+}
 .make-progress .mp-spark {
   position: absolute;
   color: #f3b61f;
@@ -2688,6 +2699,10 @@ button.play-context-head:focus-visible {
 @keyframes make-tool-breathe {
   from { transform: scale(0.97); filter: drop-shadow(0 3px 3px rgba(67,49,24,0.18)); }
   to { transform: scale(1.04); filter: drop-shadow(0 6px 7px rgba(243,182,31,0.35)); }
+}
+@keyframes grand-ol-grinder-work {
+  from { background-position: 0 0; }
+  to { background-position: -4150px 0; }
 }
 @keyframes fruit-machine-work {
   from { background-position: 0 0; }

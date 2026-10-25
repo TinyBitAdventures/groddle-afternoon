@@ -23,7 +23,7 @@ import {
   ITEM_CATALOG,
   createInventory,
   listPackItemSlots,
-} from '../public/js/inventory.js?v=catalog-unified-3';
+} from '../public/js/inventory.js?v=catalog-unified-4';
 import {
   createShrineState,
   donateToShrine,

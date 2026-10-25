@@ -28,7 +28,7 @@ import {
   tickQuestTimers,
   turnInQuest,
 } from '../quest-offers.js';
-import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-4';
 
 const OFFER_CHECK_MS = 30_000;
 const STREET_ENTER_DELAY_MS = 4_000;

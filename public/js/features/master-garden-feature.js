@@ -21,7 +21,7 @@
  *     mgPlots, mgAutoplay, mgDrop.
  */
 
-import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, countItem, ensureItem } from '../inventory.js?v=catalog-unified-4';
 import { SEED_CATALOG, listPlantableSeeds } from '../garden.js';
 import {
   GARDEN_POTIONS,

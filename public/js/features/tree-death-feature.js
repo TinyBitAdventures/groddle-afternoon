@@ -39,7 +39,7 @@
  * treeGuilt, treeDeaths, treePoisonAutoplay.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-4';
 import { moodMax } from '../metabolics.js';
 import { plantChoices } from '../patches.js';
 import { textureFromUrl } from '../textures.js';

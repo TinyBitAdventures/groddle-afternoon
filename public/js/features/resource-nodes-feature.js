@@ -52,7 +52,7 @@
  * last release: released:respawned|new:<key>, or failed:<reason>).
  */
 
-import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=catalog-unified-4';
 import { platformYAt } from '../street-model.js';
 import { hiresSpriteUrl } from '../sprite-hires.js';
 import { rollResourceNodeDrop } from './drops-feature.js?v=drops-1';

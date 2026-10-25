@@ -11,8 +11,8 @@ import {
   listPackItemSlots,
   ITEM_CATALOG,
   ensureItem,
-} from './inventory.js?v=catalog-unified-3';
-import { gardenVendorOffers } from './garden.js?v=g179-5';
+} from './inventory.js?v=catalog-unified-4';
+import { gardenVendorOffers } from './garden.js?v=g183-5';
 import { miningVendorOffers } from './mining.js';
 
 import { STORE_CATALOG, ITEM_BASE_COSTS, NO_VENDOR_ITEMS } from './store-catalog.js?v=stores-2';

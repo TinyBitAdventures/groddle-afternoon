@@ -53,7 +53,7 @@
  *       (=restorehold stops on the proto, =restoreaward on the award)
  */
 
-import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { countItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-4';
 import {
   CULTIVATION_CLASSES,
   FURNITURE_CATALOG,

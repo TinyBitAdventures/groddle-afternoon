@@ -49,7 +49,7 @@
  *   powderCharges, powderNoNo, powderTreesGrown.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { getGameDayKey } from '../game-day.js';
 import { isPooped } from '../hell.js';
 import { moodMax } from '../metabolics.js';

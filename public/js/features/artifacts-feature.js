@@ -35,9 +35,9 @@
  *     artifactPending, artifactOverlay, artifactProgress, artifactAutoplay.
  */
 
-import { addItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, ensureItem, ITEM_CATALOG, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { DROP_ITEMS, rollDropTable } from '../drop-tables.js';
-import { canUseTool, useToolCondition, TOOL_CONDITION_CATALOG } from '../tools.js?v=tools-4';
+import { canUseTool, useToolCondition, TOOL_CONDITION_CATALOG } from '../tools.js?v=tools-5';
 import { textureFromUrl } from '../textures.js';
 import {
   ALL_ARTIFACT_CLASSES,

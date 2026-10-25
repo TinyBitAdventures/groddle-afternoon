@@ -29,7 +29,7 @@ import {
 } from '../public/js/elemental-pouch.js';
 import { pouchFeature } from '../public/js/features/elemental-pouch-feature.js';
 import { FEATURES } from '../public/js/features/index.js';
-import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, countItem, createInventory } from '../public/js/inventory.js?v=catalog-unified-4';
 import { STORE_CATALOG } from '../public/js/store-catalog.js';
 import { VENDOR_PROFILES, vendorBuy } from '../public/js/vendor.js?v=g148-1';
 import { IMAGINATION_UPGRADES } from '../public/js/imagination.js';

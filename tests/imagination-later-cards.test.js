@@ -22,7 +22,7 @@ import {
   rollSlothBonusSnails,
   taskLimitMultiplier,
 } from '../public/js/imagination-effects.js';
-import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-3';
+import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-4';
 import { createToolConditionState, getToolCondition, setToolRemaining } from '../public/js/tools.js';
 import {
   DEFAULT_TASK_LIMIT,

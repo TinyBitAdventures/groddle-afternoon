@@ -46,8 +46,8 @@
  *   towerWork, towerAutoplay, towerSecrets, towerRock, towerVisited, towerTopY (street).
  */
 
-import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from '../tools.js?v=tools-4';
+import { ITEM_CATALOG, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-4';
+import { canUseTool, useToolCondition } from '../tools.js?v=tools-5';
 import { acceptOffer, npcQuestOffers } from '../quest-offers.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';

@@ -61,7 +61,7 @@
  *   soloFeatWired, soloFeatUnwired.
  */
 
-import { addItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem } from '../inventory.js?v=catalog-unified-4';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import {
   COMPLETE_BUTTON,

@@ -53,7 +53,7 @@
  *   cubimalStep, cubimalInPack.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { landingY, walkSurfaceY } from '../walk-surface.js';
 import {

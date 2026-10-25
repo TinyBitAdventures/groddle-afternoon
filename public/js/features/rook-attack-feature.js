@@ -45,7 +45,7 @@
  *   rookNextAttack, rookArmor, rookBalmPoints, rookDemo, rookArt, rookStats.
  */
 
-import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, ensureItem, removeItem, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-4';
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { donationValueFor } from '../shrines.js?v=shrine-walkby-1';

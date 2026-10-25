@@ -31,7 +31,7 @@ import {
   countItem,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=catalog-unified-3';
+} from '../public/js/inventory.js?v=catalog-unified-4';
 import {
   loadRecipeCatalogFromFile,
   listRecipesForTool,
@@ -41,7 +41,7 @@ import {
   TOOL_CATALOG,
 } from '../public/js/making.js';
 import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-4';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-5';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPIKE = join(__dirname, '../public');

@@ -26,7 +26,7 @@
  *     pouchDeltas, pouchName, pouchCards, pouchPickup, pouchAutoplay.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
 import { VENDOR_PROFILES } from '../vendor.js?v=g148-1';

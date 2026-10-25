@@ -20,7 +20,7 @@
  *     rubeLast, rubeAutoplay, rubeChance.
  */
 
-import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-4';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { hellFeature } from './hell-feature.js?v=hell-3';
 import { landingY, walkSurfaceY } from '../walk-surface.js';

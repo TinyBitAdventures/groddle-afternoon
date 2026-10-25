@@ -47,7 +47,7 @@ import {
 } from '../machine-rooms.js';
 import { refuelMachine, MAX_FUEL } from '../machines.js';
 import { DROP_ITEMS, applyDropResult, isEmptyDrop, rollDropTable } from '../drop-tables.js';
-import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-4';
 import { energyMax, moodMax } from '../metabolics.js';
 import { getSkillCatalog } from '../content-catalogs.js';
 import { worldToScreen } from '../street-model.js';

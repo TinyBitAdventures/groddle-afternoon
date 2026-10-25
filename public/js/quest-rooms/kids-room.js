@@ -30,7 +30,7 @@
  */
 
 import { applyRewards } from '../quests.js';
-import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, isToolItem } from '../inventory.js?v=catalog-unified-4';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl } from '../textures.js';
 import { KIDS_ROOM_FLOOR, KIDS_ROOM_H, KIDS_ROOM_W, buildKidsRoomScene } from '../kids-room-scene.js';
 

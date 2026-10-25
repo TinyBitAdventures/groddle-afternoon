@@ -36,7 +36,7 @@
  * hellTicketWine, hellTicketVisits.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { acceptOffer, declineOffer, ensureQuestOfferState, markOffered } from '../quest-offers.js';
 import { getQuestCatalog } from '../content-catalogs.js';
 import { parseQuestConversation } from '../quests.js';

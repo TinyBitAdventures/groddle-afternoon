@@ -16,8 +16,8 @@ import {
   itemIcon,
   ensureItem,
   registerItemUse,
-} from './inventory.js?v=catalog-unified-3';
-import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-4';
+} from './inventory.js?v=catalog-unified-4';
+import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-5';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js';
 import {
   adjustedTaskLimit,

@@ -25,7 +25,7 @@
  *     iconPlaced, iconLast, iconBestowed, iconAutoplay, iconActions.
  */
 
-import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-4';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
 import { emblemCostFor } from '../shrines.js';

@@ -32,7 +32,7 @@
  *   0 outside the Savanna).
  */
 
-import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, removeItem, countItem } from '../inventory.js?v=catalog-unified-4';
 import { acceptOffer, npcQuestOffers, questStatus } from '../quest-offers.js';
 import { groundBeneath, platformYAt, platformsScreen } from '../street-model.js';
 import { sheetFrames } from '../quest-rooms/kit.js?v=qi-1';

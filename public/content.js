@@ -15,7 +15,7 @@ import {
 import {
   quoteTrantCare,
   performTrantCare,
-} from './js/trant-care.js?v=g148-1';
+} from './js/trant-care.js?v=g183-1';
 import {
   listPlantableSeeds,
   waterAllPlots,
@@ -28,7 +28,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=g179-4';
+} from './js/garden.js?v=g183-4';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -73,7 +73,7 @@ import {
   startIncubation,
 } from './js/animal-husbandry.js';
 import { moodMax } from './js/metabolics.js';
-import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG } from './js/inventory.js?v=catalog-unified-4';
 
 /** Naming / capture context for an animal target (the back yard counts as yours). */
 function husbandryCtx(ctx) {
@@ -714,7 +714,7 @@ export function getVerbsFor(target, ctx) {
       sort: 20,
       energy: waterCare.profile?.energyCost || 5,
       tooltip: waterCare.ok
-        ? `Give water · Watering Can · ${waterCare.profile.toolWear} condition`
+        ? `Give water · ${waterCare.toolLabel || 'Watering Can'} · ${waterCare.profile.toolWear} condition`
         : 'Give water · Watering Can required',
       durationMs: waterCare.profile?.durationMs,
       enabled: waterCare.ok,

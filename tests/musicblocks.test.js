@@ -36,7 +36,7 @@ import {
   ITEM_CATALOG,
   countItem,
   createInventory,
-} from '../public/js/inventory.js?v=catalog-unified-3';
+} from '../public/js/inventory.js?v=catalog-unified-4';
 import { getVerbsFor, runVerb } from '../public/content.js';
 
 const here = dirname(fileURLToPath(import.meta.url));

@@ -47,7 +47,7 @@
  *   potionRugs, potionFavorGiant.
  */
 
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { getGameDayKey } from '../game-day.js';
 import { moodMax } from '../metabolics.js';
 import { quoinDailyLimitFor } from '../quoins.js';

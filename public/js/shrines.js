@@ -18,7 +18,7 @@ import {
   ensureItem,
   isToolItem,
   removeItem,
-} from './inventory.js?v=catalog-unified-3';
+} from './inventory.js?v=catalog-unified-4';
 import {
   GAMESHOW_TICKET_ID,
   gameshowTicketChance,

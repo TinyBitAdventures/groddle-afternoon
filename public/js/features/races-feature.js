@@ -82,7 +82,7 @@ import {
   raceLoadingColors,
   renderRaceCourse,
 } from '../race-render.js?v=races-5';
-import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { runStreetTransition } from '../screen-fx.js';
 import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
 import { startCrowns } from './crowns-feature.js?v=g148-1';

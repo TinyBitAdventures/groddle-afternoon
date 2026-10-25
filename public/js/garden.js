@@ -10,8 +10,8 @@
  * Produce counts are the GSJS seed classProps produces_count.
  */
 
-import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-3';
-import { HOE_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-4';
+import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-4';
+import { HOE_TOOLS, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-5';
 import { skillPackageDetails } from './skill-packages.js';
 import { gardenGrowModifier } from './imagination-effects.js';
 import { moodMax } from './metabolics.js';
@@ -822,7 +822,7 @@ export function starterGardenTools() {
 
 /** @param {import('./inventory.js').Inventory} inv */
 export function hasWateringCan(inv) {
-  return countItem(inv, 'watering_can') >= 1 || countItem(inv, 'irrigator_9000') >= 1;
+  return WATERING_CAN_TOOLS.some((id) => countItem(inv, id) >= 1);
 }
 
 /** @param {import('./inventory.js').Inventory} inv */
@@ -1151,14 +1151,10 @@ export function waterPlot(garden, key, pc, opts = {}) {
       speech: gardenTalkback('broken_watering_can', { rng: opts.talkRng, failed: true }),
     };
   }
-  const toolId = opts.inv
-    ? countItem(opts.inv, 'watering_can') >= 1
-      ? 'watering_can'
-      : countItem(opts.inv, 'irrigator_9000') >= 1
-        ? 'irrigator_9000'
-        : null
-    : null;
   const profile = gardenActionProfile(garden.gardenType, 'water', opts.learned, opts.upgrades);
+  // include/garden.js:125-130: a working Irrigator 9000 first, then a Watering Can.
+  const can = opts.inv ? firstWorkingTool(opts.toolState, opts.inv, WATERING_CAN_TOOLS, profile.toolWear) : null;
+  const toolId = can ? can.tool || can.fallback : null;
   if (requireTool && toolId && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, toolId, profile.toolWear);
     if (!toolCheck.ok) {

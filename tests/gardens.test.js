@@ -47,7 +47,7 @@ import {
   listPackItemSlots,
   listPackToolSlots,
   isToolItem,
-} from '../public/js/inventory.js?v=catalog-unified-3';
+} from '../public/js/inventory.js?v=catalog-unified-4';
 import { DEFAULT_VENDOR, vendorBuy } from '../public/js/vendor.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

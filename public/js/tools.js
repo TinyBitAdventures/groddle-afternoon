@@ -17,6 +17,8 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
     source: 'butterfly_lotion.js',
   },
   watering_can: { label: 'Watering Can', capacity: 100, baseCost: 75, source: 'watering_can.js' },
+  // irrigator_9000.js:16,18,25: parent watering_can, points_capacity 500, base_cost 750.
+  irrigator_9000: { label: 'Irrigator 9000', capacity: 500, baseCost: 750, source: 'irrigator_9000.js' },
   hoe: { label: 'Hoe', capacity: 50, baseCost: 60, source: 'hoe.js' },
   // high_class_hoe.js:16,25: parent hoe, points_capacity 250, base_cost 600.
   high_class_hoe: { label: 'High-Class Hoe', capacity: 250, baseCost: 600, source: 'high_class_hoe.js' },
@@ -68,12 +70,15 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
  * working one.
  * - Hoes: include/garden.js:233-238 and patch.js:393-402 take a working
  *   High-Class Hoe first, then a plain Hoe (patch.js:342-347 accepts either).
+ * - Watering cans: include/garden.js:125-130 and include/trants.js:117-121
+ *   water with a working Irrigator 9000 first, then a Watering Can.
  * - Grinders: dullite.js:108,126 and barnacle.js:108,119 crush with either
  *   (findFirst in pack order; the remake tries the plain Grinder first, the
  *   order the source's own conditions name them).
  */
 export const HOE_TOOLS = Object.freeze(['high_class_hoe', 'hoe']);
 export const GRINDER_TOOLS = Object.freeze(['ore_grinder', 'grand_ol_grinder']);
+export const WATERING_CAN_TOOLS = Object.freeze(['irrigator_9000', 'watering_can']);
 
 /**
  * The first owned tool in `candidates` that can take `wear` (any owned one

@@ -58,7 +58,7 @@ import {
   squishGrape,
   wineDrinkConditions,
 } from '../public/js/hell.js';
-import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG } from '../public/js/inventory.js?v=catalog-unified-4';
 import { GAME_DAY_MS, getGameDayStartMs } from '../public/js/game-day.js?v=dametime-1';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 import {

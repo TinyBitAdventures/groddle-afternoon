@@ -2,7 +2,7 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g181-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-63';
 import {
@@ -400,7 +400,7 @@ import {
   ensureItem,
   addItem,
   removeItem,
-} from './js/inventory.js?v=catalog-unified-3';
+} from './js/inventory.js?v=catalog-unified-4';
 import {
   packPagerState,
   packPageTarget,
@@ -458,7 +458,9 @@ import {
   quoteToolRepair,
   repairToolCondition,
   setToolRemaining,
-} from './js/tools.js?v=tools-4';
+  WATERING_CAN_TOOLS,
+  firstWorkingTool,
+} from './js/tools.js?v=tools-5';
 import {
   listRecipes,
   listRecipesForTool,
@@ -486,6 +488,7 @@ import {
   hasTool,
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
+  recipeToolInUse,
 } from './js/making.js?v=g179-1';
 import {
   createGarden,
@@ -511,7 +514,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=g179-2';
+} from './js/garden.js?v=g183-2';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -3011,6 +3014,7 @@ function renderPackRow(box, slots, opts = {}) {
         hatchet: 'assets/sprites/icons/hatchet_broken.png',
         class_axe: 'assets/sprites/icons/class_axe_broken.png',
         watering_can: 'assets/sprites/icons/watering_can_broken.png',
+        irrigator_9000: 'assets/sprites/icons/irrigator_9000_broken.png',
       };
       img.src = toolCondition?.broken && brokenToolIcons[s.classTsid]
         ? brokenToolIcons[s.classTsid]
@@ -5084,8 +5088,20 @@ function playHatchetAnimation(target) {
   return tool;
 }
 
-function playWateringCanAnimation(target, durationMs = 0) {
-  const frames = textures.wateringCanTool?.frames || [];
+// OGA irrigator_9000__x1_tool_animation (950x228, CC0): 30 cells of 95x76, loaded on the first pour.
+const IRRIGATOR_TOOL_SHEET = Object.freeze({ url: 'assets/sprites/making/irrigator_9000-tool.png', fw: 95, fh: 76, cols: 10, rows: 3 });
+let irrigatorToolFrames = null;
+
+async function playWateringCanAnimation(target, durationMs = 0) {
+  // include/garden.js:125-130, include/trants.js:117-121: a working Irrigator 9000 pours first.
+  const can = firstWorkingTool(toolState, inv, WATERING_CAN_TOOLS).tool || 'watering_can';
+  if (can === 'irrigator_9000' && !irrigatorToolFrames) {
+    const tex = await loadTexture(IRRIGATOR_TOOL_SHEET.url).catch(() => null);
+    if (tex) irrigatorToolFrames = sliceSheet(tex.source, IRRIGATOR_TOOL_SHEET, 30);
+    // Another verb may have started while the sheet loaded.
+    if (currentAction && currentAction.target !== target) return null;
+  }
+  const frames = (can === 'irrigator_9000' && irrigatorToolFrames) || textures.wateringCanTool?.frames || [];
   if (!frames.length || !fxLayer || !player || !target?.sprite) return null;
   clearActionToolFx('replaced');
   const tool = new PIXI.AnimatedSprite(frames);
@@ -5102,7 +5118,10 @@ function playWateringCanAnimation(target, durationMs = 0) {
   tool._toolAnimationDataset = 'wateringCanAnimation';
   actionToolFx = tool;
   fxLayer.addChild(tool);
-  if (app?.canvas) app.canvas.dataset.wateringCanAnimation = 'playing';
+  if (app?.canvas) {
+    app.canvas.dataset.wateringCanAnimation = 'playing';
+    app.canvas.dataset.wateringCanAnimationTool = can;
+  }
   tool.onComplete = () => {
     if (actionToolFx === tool) actionToolFx = null;
     if (tool.parent) tool.parent.removeChild(tool);
@@ -5414,11 +5433,13 @@ function executeVerb(target, verbId) {
   }
 
   if (result.trantCareAttempted) {
-    const condition = getToolCondition(toolState, 'watering_can');
+    const wateredWith = result.trantCare?.toolUse?.classTsid || result.trantCare?.toolId || 'watering_can';
+    const condition = getToolCondition(toolState, wateredWith);
     if (app?.canvas) {
       app.canvas.dataset.trantCareResult = result.ok ? 'success' : (result.trantCare?.reason || 'failed');
       app.canvas.dataset.wateringCanRemaining = String(condition.remaining);
       app.canvas.dataset.trantCareClass = target.classId;
+      app.canvas.dataset.trantCareTool = wateredWith;
     }
     if (target.classId === 'wood_tree') {
       refreshWoodTreeVisual(target);
@@ -5426,7 +5447,7 @@ function executeVerb(target, verbId) {
       target.subtitle = trantStatusLabel(target.state, TRANT_META[target.classId]);
     }
     if (result.trantCare?.toolUse?.broke) {
-      toast('Ooops! You done broke your Watering Can. Repair it with the Tinkertool.', 4200);
+      toast(`${result.trantCare.toolUse.msg} Repair it with the Tinkertool.`, 4200);
     }
   }
 
@@ -19899,9 +19920,13 @@ function renderMakeProgressStage(record) {
     </span>`).join('');
   const output = recipe.outputs?.[0];
   const toolIcon = TOOL_CATALOG[recipe.tool]?.icon || itemIconUrl(recipe.tool);
+  // The stand-in doing the work (dullite.js:124-133): a Grand Ol' Grinder swings its own tool_animation.
+  const toolInUse = recipeToolInUse(inv, recipe.tool, record.opts?.toolState || toolState, recipe.toolWear || 1);
   const toolVisual = recipe.tool === 'fruit_changing_machine'
     ? '<span class="mp-tool mp-tool-fruit-machine" data-tool="fruit_changing_machine" role="img" aria-label="Fruit Changing Machine working"></span>'
-    : `<img class="mp-tool" data-tool="${escapeHtml(recipe.tool || '')}" src="${toolIcon}" alt="" />`;
+    : toolInUse === 'grand_ol_grinder'
+      ? '<span class="mp-tool mp-tool-grand-ol-grinder" data-tool="grand_ol_grinder" role="img" aria-label="Grand Ol\' Grinder working"></span>'
+      : `<img class="mp-tool" data-tool="${escapeHtml(recipe.tool || '')}" src="${toolIcon}" alt="" />`;
   prog.hidden = false;
   prog.innerHTML = `
     <p class="mp-label" data-mp-label>${escapeHtml(formatCraftProgress(1, timer.qty, recipe.name))}</p>

@@ -4,11 +4,12 @@
  * Sources:
  * - items/catalog_skill_packages.js: light_green_thumb_pet/water,
  *   wood_tree_pet/water
- * - items/include/trants.js: Watering Can requirement and completion cadence
+ * - items/include/trants.js: Watering Can requirement and completion cadence;
+ *   :117-121 waters with a working Irrigator 9000 first, then a Watering Can
  * - items/wood_tree.js: Wood Tree tending gates
  */
 
-import { canUseTool, useToolCondition } from './tools.js';
+import { TOOL_CONDITION_CATALOG, WATERING_CAN_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js';
 import { fruitCapacityAt } from './trants.js?v=trant-harvest-2';
 import { scaledToolWear, toolWearMultiplier } from './imagination-effects.js';
 import { moodMax } from './metabolics.js';
@@ -73,10 +74,6 @@ export function resolveTrantCarePackage(classId, kind, learned = []) {
   return row ? { ...row, packageId, rankId, kind } : null;
 }
 
-function countInventory(inv, classTsid) {
-  return Math.max(0, Math.floor(Number(inv?.[classTsid]) || 0));
-}
-
 /** Quote all gates without mutating player, tree, inventory, or tool state. */
 export function quoteTrantCare(state, classId, kind, ctx = {}) {
   const profile = resolveTrantCarePackage(classId, kind, ctx.learned || ctx.skills || []);
@@ -84,16 +81,19 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
     return { ok: false, reason: 'invalid', msg: 'That tree cannot be tended this way.', profile };
   }
   const flag = kind === 'water' ? 'watered' : 'petted';
+  let toolId = null;
   if (state[flag]) {
     return { ok: false, reason: 'daily', msg: `This tree was already ${flag} today.`, profile };
   }
   if (kind === 'water') {
-    if (countInventory(ctx.inv, 'watering_can') < 1) {
+    const can = firstWorkingTool(ctx.tools, ctx.inv, WATERING_CAN_TOOLS, profile.toolWear);
+    if (!can.owned) {
       return { ok: false, reason: 'tool_missing', msg: 'You need a working Watering Can.', profile };
     }
-    const tool = canUseTool(ctx.tools, 'watering_can', profile.toolWear);
+    toolId = can.tool || can.fallback;
+    const tool = canUseTool(ctx.tools, toolId, profile.toolWear);
     if (!tool.ok) {
-      return { ok: false, reason: 'tool_broken', msg: 'Sadly, your Watering Can is too worn out.', profile, tool };
+      return { ok: false, reason: 'tool_broken', msg: 'Sadly, your Watering Can is too worn out.', profile, tool, toolId };
     }
   }
   const energy = Math.max(0, Number(ctx.pc?.energy) || 0);
@@ -106,7 +106,7 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
       profile,
     };
   }
-  return { ok: true, profile, flag };
+  return { ok: true, profile, flag, toolId, toolLabel: TOOL_CONDITION_CATALOG[toolId]?.label || null };
 }
 
 /**
@@ -119,7 +119,7 @@ export function quoteTrantCare(state, classId, kind, ctx = {}) {
 export function performTrantCare(state, classId, kind, ctx = {}) {
   const quote = quoteTrantCare(state, classId, kind, ctx);
   if (!quote.ok) return quote;
-  const { profile, flag } = quote;
+  const { profile, flag, toolId } = quote;
   const rng = ctx.rng || Math.random;
   const pc = ctx.pc;
   const success = rng() * 100 < profile.successRate;
@@ -143,10 +143,10 @@ export function performTrantCare(state, classId, kind, ctx = {}) {
   // Heavy Flow (lightgreenthumb_tool_wear): the Watering Can wears at half rate.
   const upgrades = ctx.upgrades || ctx.imaginationUpgrades || pc?.imaginationUpgrades || [];
   const wear = kind === 'water'
-    ? scaledToolWear(ctx.tools, 'watering_can', profile.toolWear, toolWearMultiplier('watering_can', upgrades))
+    ? scaledToolWear(ctx.tools, toolId, profile.toolWear, toolWearMultiplier(toolId, upgrades))
     : 0;
   const toolUse = kind === 'water' && wear > 0
-    ? useToolCondition(ctx.tools, 'watering_can', wear)
+    ? useToolCondition(ctx.tools, toolId, wear)
     : null;
   state[flag] = true;
   if (classId !== 'wood_tree') {

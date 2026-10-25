@@ -22,8 +22,8 @@
  * 'restore', job type 5) and finishes the restore in its `onDone` hook.
  */
 
-import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from '../tools.js?v=tools-4';
+import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-4';
+import { canUseTool, useToolCondition } from '../tools.js?v=tools-5';
 import { ecologyForStreet } from '../street-ecology.js?v=official-ecology-6';
 import { worldToScreen } from '../street-model.js';
 import { signArmWidth } from '../street-render.js?v=parallax-7';

@@ -26,7 +26,7 @@
  * buffTriggerOverrides, buffTriggerMirrors, buffColdTicks.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import {
   BUBBLE_MEDITATION_PACKAGES,
   BUFF_END_MESSAGES,

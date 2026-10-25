@@ -213,8 +213,9 @@ export function isToolItem(classTsid) {
   if (!classTsid) return false;
   const meta = ITEM_CATALOG[classTsid];
   if (meta?.isTool) return true;
-  // Common GSJS tool class_tsids even before ensureMakingItems
-  return /^(knife_and_board|frying_pan|blender|gassifier|bubble_tuner|spice_mill|watering_can|irrigator_9000|hoe|hoe_highclass|hatchet|shovel|pick|trowel|shears)/.test(
+  // Common GSJS tool class_tsids even before ensureMakingItems (whole ids: a
+  // prefix match made Pickles a tool).
+  return /^(knife_and_board|frying_pan|blender|gassifier|bubble_tuner|spice_mill|watering_can|irrigator_9000|hoe|high_class_hoe|hatchet|shovel|pick|trowel|shears)$/.test(
     classTsid
   );
 }

@@ -31,7 +31,7 @@
  *   itemVerbLast, itemVerbBuzz, itemVerbDash.
  */
 
-import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-3';
+import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { moodMax } from '../metabolics.js';
 import { listDroppedStacks } from '../world-items.js?v=catalog-unified-2';
 import {
