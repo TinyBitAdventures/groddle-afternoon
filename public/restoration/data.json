@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 493,
+  "commits": 494,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Room in the realtime server and client for shared systems"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "The stun orb rises into view, home chickens and butterflies can be set free, and Tiny Speck's own heart, puffs and rainbow replace the last stand-ins"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Energy drifts as in Glitch: a small loss every 90 seconds, no walking cost and no standing refill, so Pooped lasts until you eat"
    }
   ]
  },
- "tests": 294,
+ "tests": 295,
  "generatedAt": "2026-10-25"
 }
