@@ -49,8 +49,9 @@ import {
 } from '../public/js/home-styles.js';
 import { WALLPAPER_MAPS, WALLPAPER_PIECES } from '../public/js/home-wallpaper-art.js';
 import { roomPieces } from '../public/js/home-wallpaper.js';
-import { BACK_YARD_GROUND_Y, homesFeature, shiftHusbandryRows, shiftInteriorRows, towerDropTsid } from '../public/js/features/homes-feature.js';
-import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-6';
+import { BACK_YARD_GROUND_Y, clampRowsX, homesFeature, shiftHusbandryRows, shiftInteriorRows, towerDropTsid } from '../public/js/features/homes-feature.js';
+import { getGameDayKey } from '../public/js/game-day.js';
+import { towerApi } from '../public/js/features/home-tower-feature.js?v=home-tower-7';
 import { shiftBotX } from '../public/js/features/craftybot-feature.js';
 import { normalizeDroppedItemState } from '../public/js/world-items.js';
 import { applyAchievementProgress, createAchievementState } from '../public/js/achievements.js';
@@ -387,11 +388,23 @@ describe('G226 follow-ups', () => {
   });
 
   it('offers the yard rock’s verbs only for the rock, and runs only its own', () => {
-    homesFeature.restore({ decor: {}, cult: {}, magicRock: {} });
+    // G232: today's iMG already handed over, so talk to is not offered.
+    homesFeature.restore({ decor: {}, cult: {}, magicRock: {}, rockImgDay: getGameDayKey(Date.now()) });
     const engine = { pc: { level: 3 } };
     const rows = homesFeature.verbsFor({ classId: 'magic_rock', state: { room: 'yard' } }, engine);
     assert.deepEqual(rows.map((r) => r.id), ['howto_changestyle', 'howto_expand', 'howto_cultivate']);
-    assert.equal(homesFeature.runVerb({ classId: 'magic_rock', state: { room: 'yard' } }, 'talk_to', engine), false);
+    assert.equal(homesFeature.runVerb({ classId: 'magic_rock', state: { room: 'yard' } }, 'pickup', engine), false);
+  });
+
+  it('G232: an old Tower stack past the house’s right wall is set down inside it', () => {
+    const rows = [{ x: 1810 }, { x: 1150 }, { x: -20 }, { x: 'n/a' }];
+    assert.equal(clampRowsX(rows, 36, 1688), 2);
+    assert.deepEqual(rows.map((r) => r.x), [1688, 1150, 36, 'n/a']);
+    assert.equal(clampRowsX(rows, 36, 1688), 0, 'once inside, nothing moves');
+    // A pre-G135 save: tower x 1060 + the 750 px yard is past the 1050 px house's inner right (750 + 974).
+    assert.ok(1060 + 750 > 750 + 1050 - 76);
+    const feature = readFileSync(join(pub, 'js/features/homes-feature.js'), 'utf8');
+    assert.match(feature, /syncHouseShift\(engine\);\s*keepStacksInHouse\(engine\);/);
   });
 
   it('draws dropped stacks when a home room is built, and every drop path uses the room’s key', () => {

@@ -141,7 +141,7 @@ import {
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { projectApi } from './street-jobs-feature.js?v=g177-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-2';
-import { towerApi } from './home-tower-feature.js?v=home-tower-6';
+import { towerApi } from './home-tower-feature.js?v=home-tower-7';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-5';
@@ -167,13 +167,21 @@ import {
 } from '../home-styles.js?v=g135-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import {
+  HOUSE_SIGN,
+  IMG_BUBBLE_MS,
   cultivateLandCheck,
   cultivationModeEnded,
+  dailyImgCounters,
+  houseSignCanExpand,
+  imgBubbleText,
+  imgRewardLine,
+  imgRewards,
   normalizeRockFlags,
   readHowto,
   rockVerbs,
   ROCK_VERB_IDS,
-} from '../magic-rock-home.js?v=g226-1';
+} from '../magic-rock-home.js?v=g232-1';
+import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
 
 export const HOMES_FEATURE_ID = 'homes';
@@ -345,6 +353,25 @@ export function shiftInteriorRows(rows, dx) {
   return moved;
 }
 
+/**
+ * G232: rows whose x lies outside [lo, hi] are brought to that edge. Pure;
+ * returns how many moved.
+ */
+export function clampRowsX(rows, lo, hi) {
+  if (!Array.isArray(rows) || !(hi >= lo)) return 0;
+  let moved = 0;
+  for (const row of rows) {
+    const x = Number(row?.x);
+    if (!Number.isFinite(x)) continue;
+    const next = Math.round(Math.max(lo, Math.min(hi, x)));
+    if (next !== x) {
+      row.x = next;
+      moved += 1;
+    }
+  }
+  return moved;
+}
+
 /** G226: the dropped-stack key of Tower floor `floor` (0 is the ground floor). */
 export function towerDropTsid(floor) {
   return `${TOWER_DROP_PREFIX}${Math.max(0, Math.floor(Number(floor) || 0))}`;
@@ -442,6 +469,11 @@ let yardDemoDone = false;
 let rockFlags = {};
 let rockTarget = null;
 let rockDemoDone = false;
+// G232: the game day the rock last handed over its iMG (the daily counter cultivation_img_rewards).
+let rockImgDay = null;
+let rockBubbled = false; // the "I have some iMG for you" bubble, once a visit
+let rockBubble = null; // its handle, faded out when the iMG is handed over
+let rockSubtitleAt = 0;
 // G226: the home street's house x the street's stacks and piles were saved against.
 let savedStreetHouseX = null;
 
@@ -507,6 +539,9 @@ function publish(engine) {
   engine.setData('homeStyleShown', stylePreview || '');
   engine.setData('homeRock', Object.entries(rockFlags).map(([k, v]) => `${k}:${v}`).join(','));
   engine.setData('homeRockX', rockTarget?.sprite && !rockTarget.sprite.destroyed ? Math.round(rockTarget.sprite.x) : '');
+  engine.setData('homeRockImg', rockImgToCollect(engine));
+  engine.setData('homeRockSubtitle', liveRock()?.subtitle || '');
+  engine.setData('homeSign', ui?.sign && !ui.sign.hidden ? '1' : '');
   engine.setData('homeStreetHouseX', savedStreetHouseX ?? '');
 }
 
@@ -795,6 +830,26 @@ function shiftShownRoom(engine, room, dx) {
 }
 
 /**
+ * G232: the house's stacks stay where you can walk. A save from before the
+ * back yard kept the house's stacks and those dropped on Tower floors (G231:
+ * they stay in the house) at house x 0; the yard's width then moved them
+ * all right, and a Tower floor is 128 px wider than the house (1178 / 1050),
+ * so a Tower stack near its right end landed past the house's right wall,
+ * out of reach. Any such stack is set down just inside the wall (or the
+ * yard's left end). STACK_WALL_MARGIN keeps it within the player's reach
+ * of keepInsideWalls' last step.
+ */
+const STACK_WALL_MARGIN = 36;
+function keepStacksInHouse(engine) {
+  const rows = engine.droppedItems?.streets?.[HOME_INTERIOR_TSID];
+  if (!rows?.length) return 0;
+  const hi = houseX0() + interiorWidth(houseDecor) - INTERIOR.endCapW - STACK_WALL_MARGIN;
+  const moved = clampRowsX(rows, STACK_WALL_MARGIN, hi);
+  if (moved) engine.save?.();
+  return moved;
+}
+
+/**
  * Once per change of the house's x on the home street (an expansion to the
  * left): the street's stacks, piles and Craftybot move with it. A save from
  * before G226 starts from the house where it is now.
@@ -900,7 +955,7 @@ function spawnRock(engine, x, groundY, room) {
     classId: 'magic_rock',
     featureId: HOMES_FEATURE_ID,
     label: 'Magic Rock',
-    subtitle: room === 'yard' ? 'Your yard' : towerApi.rockTalk?.(engine)?.subtitle || 'Your home street',
+    subtitle: rockSubtitle(engine, room),
     sprite: box,
     state: { room },
   });
@@ -909,6 +964,60 @@ function spawnRock(engine, x, groundY, room) {
 /** The live rock target of the room being shown (yard or street), or null. */
 function liveRock() {
   return rockTarget?.sprite && !rockTarget.sprite.destroyed ? rockTarget : null;
+}
+
+/** The rock's hover line: on the street the Tower quest's, else where it stands. */
+function rockSubtitle(engine, room) {
+  if (room === 'yard') return 'Your yard';
+  return towerApi.rockTalk?.(engine)?.subtitle || 'Your home street';
+}
+
+/**
+ * G232: the rock's subtitle follows the Tower offer while you stand there
+ * (a level gained on the street unlocks Build a Tower mid-visit); checked
+ * twice a second, not every frame (the offer test walks the quest catalog).
+ */
+function refreshRockSubtitle(engine, now = Date.now()) {
+  const rock = liveRock();
+  if (!rock || now - rockSubtitleAt < 500) return false;
+  rockSubtitleAt = now;
+  const next = rockSubtitle(engine, rockRoom(rock));
+  if (rock.subtitle === next) return false;
+  rock.subtitle = next;
+  return true;
+}
+
+/**
+ * G232: houses_get_img_rewards for this player now (js/magic-rock-home.js
+ * imgRewards: with no visitors, the daily stipend from level 2).
+ */
+function rockImgToCollect(engine, now = Date.now()) {
+  return imgRewards({ level: engine.pc?.level || 1, cashedToday: rockImgDay === getGameDayKey(now) });
+}
+
+/**
+ * onPlayerCollision (magic_rock.js 992-1001): coming up to the rock while it
+ * has iMG for you, it says so (10 s), once a visit.
+ */
+function rockImgBubble(engine) {
+  const rock = liveRock();
+  const p = engine.player;
+  if (rockBubbled || !rock || !p || mode) return;
+  if (Math.abs(p.x - rock.sprite.x) > 90) return;
+  rockBubbled = true;
+  if (!rockImgToCollect(engine)) return;
+  rockBubble = engine.say?.(rock, imgBubbleText(), IMG_BUBBLE_MS) || null;
+}
+
+/**
+ * The rock's conversation takes over from its bubble (the client draws both
+ * on the rock): fade the bubble out (game.js speech bubbles fade over their
+ * last 24 frames; the engine has no call to close one).
+ */
+function fadeRockBubble() {
+  const fx = rockBubble?.destroyed ? null : rockBubble?._speechFx;
+  if (fx && Number.isFinite(fx.life)) fx.max = Math.min(fx.max, fx.life + 24);
+  rockBubble = null;
 }
 
 /**
@@ -929,6 +1038,8 @@ function syncStreetRock(engine) {
     engine.unregister?.(have);
     rockTarget = null;
     publish(engine);
+  } else if (have && refreshRockSubtitle(engine)) {
+    publish(engine);
   }
 }
 
@@ -946,15 +1057,171 @@ function rockRoom(target) {
 }
 
 /**
- * The rock's verb rows (magic_rock.js conditions). On the home street the
- * Tower quest's talk to (sort_on 61) follows the home verbs (53-60).
+ * The rock's verb rows (magic_rock.js conditions). talk to (sort_on 61)
+ * follows the home verbs (53-60): on either rock while there is iMG to hand
+ * over (conditions 380-385, houses_get_img_rewards), and on the home street
+ * while the Tower quest has something to say (G231).
  */
 function magicRockVerbs(target, engine) {
   const room = rockRoom(target);
   const rows = rockVerbs(rockFlags, { level: engine.pc?.level || 1, room });
-  const talk = room === 'street' ? towerApi.rockTalk?.(engine) : null;
+  const talk = (room === 'street' && towerApi.rockTalk?.(engine)) || (rockImgToCollect(engine) > 0 ? { tooltip: 'Talk to the Magic Rock!' } : null);
   if (talk) rows.push({ id: 'talk_to', label: 'talk to', enabled: true, tooltip: talk.tooltip, durationMs: 0 });
   return rows;
+}
+
+/**
+ * G232: talk to's handler (magic_rock.js 387-461). Decorate ends first
+ * (decoration_mode_end, 389). The Tower offer comes first, as the
+ * handler's quest branch does (418-422); then the day's iMG, handed over
+ * once a game day (427-446); then the running Tower quest's line (G231).
+ * With nothing to say the rock sends houses_upgrade_start (448-458): the
+ * client opens HouseSignDialog. In the source that branch never runs for a
+ * player: talk to is only enabled with iMG to hand over (380-385) and the
+ * server checks a verb's conditions again before its handler (main.js
+ * 3067-3079); it is home_sign's talk to (items/home_sign.js 26-53), the
+ * street sign the rock replaced (inc_homes.js 2382-2390). It is kept here as
+ * the source has it; QA opens it with window.groddleHomeRock('house_sign').
+ */
+function talkToRock(target, engine) {
+  if (mode === 'decorate') setMode(engine, null);
+  const room = rockRoom(target);
+  if (room === 'street' && towerApi.rockOffer?.(engine)) {
+    engine.setData?.('homeRockLast', 'talk_tower');
+    return towerApi.talkToRock(engine) || true;
+  }
+  const img = rockImgToCollect(engine);
+  if (img > 0) return handOverImg(engine, img);
+  if (room === 'street' && towerApi.rockTalk?.(engine)) {
+    engine.setData?.('homeRockLast', 'talk_tower');
+    return towerApi.talkToRock(engine) || true;
+  }
+  engine.setData?.('homeRockLast', 'house_sign');
+  return openHouseSign(engine);
+}
+
+/**
+ * magic_rock.js 427-446: stats_add_xp(img, true) (no mood bonus), the
+ * daily_img counters, houses_reset_img_rewards (no more today), and the line.
+ */
+function handOverImg(engine, img) {
+  const pc = engine.pc;
+  if (pc) {
+    pc.imagination = (pc.imagination || 0) + img;
+    pc.xp = (pc.xp || 0) + img;
+  }
+  rockImgDay = getGameDayKey(Date.now());
+  fadeRockBubble();
+  for (const counter of dailyImgCounters(img)) engine.achievement?.(counter, 1);
+  const p = engine.player;
+  if (p) engine.floatText?.(p.x, p.y - 120, `+${img.toLocaleString()} iMG`, 0xf0e6d0);
+  engine.pushActivity?.(`The Magic Rock handed over ${img.toLocaleString()} iMG.`);
+  engine.updateHud?.();
+  engine.save?.();
+  engine.setData?.('homeRockLast', `img:${img}`);
+  rockSays(engine, [{ text: imgRewardLine(img), response: 'OK' }]);
+  publish(engine);
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// G232: HouseSignDialog (houses_upgrade_start)
+// ---------------------------------------------------------------------------
+
+function ensureHouseSignUi(engine) {
+  if (!ensureUi(engine)) return null;
+  if (!ui.sign) {
+    ui.sign = el('section', { class: 'homes-sign', id: 'homes-sign', hidden: true, role: 'dialog', 'aria-label': HOUSE_SIGN.title });
+    ui.sign.addEventListener('keydown', (e) => houseSignKey(engine, e));
+    ui.root.append(ui.sign);
+  }
+  return ui.sign;
+}
+
+function closeHouseSign() {
+  if (ui?.sign) ui.sign.hidden = true;
+}
+
+/** BigDialog: the arrow keys move the focus round the buttons (CLICK_SUCCESS), Enter chooses, Escape closes. */
+function houseSignKey(engine, e) {
+  const list = [...(ui?.sign?.querySelectorAll('.hsd-bt') || [])];
+  if (!list.length) return;
+  const i = list.indexOf(document.activeElement);
+  if (['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'].includes(e.key)) {
+    const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : -1;
+    list[(i + step + list.length) % list.length].focus();
+    engine.playSound?.('CLICK_SUCCESS', { volume: 0.32 });
+  } else if (e.key === 'Escape') {
+    closeHouseSign();
+  } else {
+    // Enter and Space click the focused button themselves; the street's own keys stay out of it.
+    if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+    return;
+  }
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+/** Expansions left here (quoteYardExpansion), for the Expand button. */
+function expandCountHere(engine) {
+  const st = activeCult();
+  const back = isBackYard(st);
+  const quote = back ? quoteYardExpansion(st, engine.pc) : quoteYardExpansion(st, engine.pc, 'left');
+  return houseSignCanExpand({ room: back ? 'yard' : 'street', count: quote.count || 0, countLeft: quote.countLeft || 0, countRight: quote.countRight || 0 });
+}
+
+/**
+ * HouseSignDialog.as: "Your street", 200 px wide, one button a row. Expand
+ * (disabled with its tip when nothing is left to expand) opens the expand
+ * dialog, Change Style the styles dialog, Cultivate Land goes straight into
+ * cultivation (HouseManager.startCultivation, no yard lesson check, as
+ * shift+C); each closes the dialog. A disabled button clicks CLICK_FAILURE.
+ */
+function openHouseSign(engine) {
+  const ctx = engine.homeContext?.() || {};
+  if (!ctx.inHome || !scene || scene.construction) return false;
+  const box = ensureHouseSignUi(engine);
+  if (!box) return true;
+  if (ui.styles) ui.styles.hidden = true;
+  const canExpand = expandCountHere(engine);
+  const act = {
+    expand: () => openExpandDialog(engine),
+    change_style: () => openStyleDialog(engine),
+    cultivate: () => setMode(engine, 'cultivate'),
+  };
+  const buttons = HOUSE_SIGN.buttons.map((row) => {
+    const off = row.id === 'expand' && !canExpand;
+    return el('button', {
+      type: 'button',
+      class: `hsd-bt${off ? ' off' : ''}`,
+      'data-house-sign': row.id,
+      'aria-disabled': off ? 'true' : false,
+      title: off ? HOUSE_SIGN.expandTip : false,
+      text: row.label,
+      onclick: () => {
+        if (off) {
+          engine.playSound?.('CLICK_FAILURE', { volume: 0.4 });
+          return;
+        }
+        engine.playSound?.('CLICK_SUCCESS', { volume: 0.32 });
+        closeHouseSign();
+        act[row.id]();
+        publish(engine);
+      },
+    });
+  });
+  box.replaceChildren(
+    el('header', {}, [
+      el('h3', { text: HOUSE_SIGN.title }),
+      el('button', { type: 'button', class: 'hb-close', 'aria-label': 'Close', text: '×', onclick: () => closeHouseSign() }),
+    ]),
+    el('div', { class: 'hsd-body' }, buttons),
+  );
+  box.hidden = false;
+  // focusDefaultChoice: the first button.
+  buttons[0]?.focus?.();
+  publish(engine);
+  return true;
 }
 
 /** conversation_start: the rock's pages on the familiar card. */
@@ -1004,7 +1271,7 @@ function openExpandDialog(engine) {
 function runRockVerb(target, verbId, engine) {
   const room = rockRoom(target);
   if (!magicRockVerbs(target, engine).some((v) => v.id === verbId)) return true;
-  if (verbId === 'talk_to') return towerApi.talkToRock(engine) || true;
+  if (verbId === 'talk_to') return talkToRock(target, engine);
   if (verbId.startsWith('howto_')) {
     const pages = readHowto(rockFlags, verbId);
     engine.save?.();
@@ -1954,6 +2221,15 @@ const CSS = `
 .homes-styles .hs-band{position:absolute;left:0;right:0}
 .homes-styles .hs-field{position:absolute;left:0;right:0;bottom:0}
 .homes-modes button{white-space:nowrap}
+.homes-sign{position:absolute;left:50%;top:132px;transform:translateX(-50%);z-index:45;width:200px;background:#fffdf7;border-radius:14px;box-shadow:0 12px 32px rgba(40,30,20,.28);border:1px solid rgba(90,70,40,.18);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:#2b2a33;overflow:hidden}
+.homes-sign[hidden]{display:none}
+.homes-sign header{display:flex;align-items:center;gap:8px;padding:11px 12px 9px 20px;background:linear-gradient(180deg,#f7ecd6,#efe1c4);border-bottom:1px solid rgba(90,70,40,.15)}
+.homes-sign header h3{margin:0;font-size:15px;flex:1}
+.homes-sign .hb-close{border:none;background:transparent;font-size:18px;cursor:pointer;color:#6a5a45;line-height:1}
+.homes-sign .hsd-body{display:flex;flex-direction:column;gap:7px;padding:18px 20px 20px}
+.homes-sign .hsd-bt{border:1px solid rgba(90,70,40,.2);background:#fff;border-radius:8px;padding:8px 12px;font:inherit;font-size:13px;font-weight:700;color:#4a3a28;cursor:pointer;text-align:left}
+.homes-sign .hsd-bt:hover,.homes-sign .hsd-bt:focus-visible{border-color:#e0a84a;background:#fff6e2;outline:none}
+.homes-sign .hsd-bt.off{opacity:.45;cursor:not-allowed}
 @media (max-width:640px){.homes-styles{top:auto;bottom:106px;max-height:56%}.homes-styles .hs-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;padding:8px}.homes-styles .hs-prev{height:52px}.homes-styles .hs-sel{padding:7px 10px}}
 `;
 
@@ -3616,6 +3892,7 @@ function homeScene(room, engine) {
     }
     // The back yard left of the house (G135): the room starts at its width.
     syncHouseShift(engine);
+    keepStacksInHouse(engine);
     qaYardStyle(engine);
     qaRockFlags(engine);
     const background = interiorBackground(engine, { yard: true });
@@ -3729,10 +4006,12 @@ export const homesFeature = {
         publish(engine);
         return true;
       };
-      // QA: window.groddleHomeRock() lists the yard rock's verbs; (verbId) runs one.
+      // QA: window.groddleHomeRock() lists the rock's verbs; (verbId) runs one; ('house_sign') opens HouseSignDialog.
       window.groddleHomeRock = (verbId) => {
         if (!rockTarget || rockTarget.sprite?.destroyed) return null;
         if (!verbId) return magicRockVerbs(rockTarget, engine).map((v) => v.id);
+        // G232: houses_upgrade_start, the branch talk to never reaches in play.
+        if (verbId === 'house_sign') return openHouseSign(engine);
         const out = runRockVerb(rockTarget, verbId, engine);
         publish(engine);
         return out;
@@ -3757,6 +4036,8 @@ export const homesFeature = {
       // G226: pc.magic_rock, and the street's house x (left expansions move what stands there).
       magicRock: rockFlags,
       streetHouseX: savedStreetHouseX ?? homeStreetLayout(cult).houseX,
+      // G232: the game day the rock's iMG was handed over (cultivation_img_rewards).
+      rockImgDay,
     };
   },
 
@@ -3778,6 +4059,7 @@ export const homesFeature = {
     savedHouseX = !slice ? null : Number.isFinite(hx) ? hx : 0;
     rockFlags = normalizeRockFlags(slice?.magicRock);
     rockTarget = null;
+    rockImgDay = typeof slice?.rockImgDay === 'string' ? slice.rockImgDay : null;
     // Saves from before G226: nothing to move until the street grows again.
     const sx = Number(slice?.streetHouseX);
     savedStreetHouseX = slice?.streetHouseX != null && Number.isFinite(sx) ? sx : null;
@@ -3796,9 +4078,12 @@ export const homesFeature = {
     destroyGhost();
     scene = null;
     rockTarget = null;
+    rockBubbled = false;
+    rockBubble = null;
     if (ui) {
       ui.bar.hidden = true;
       ui.modes.hidden = true;
+      if (ui.sign) ui.sign.hidden = true;
     }
   },
 
@@ -3851,6 +4136,7 @@ export const homesFeature = {
 
   onTick(dtMs, now, engine) {
     if (!scene) return;
+    rockImgBubble(engine);
     if (scene.room === 'street') {
       syncStreetRock(engine);
       wearFromNodes(engine, now);
@@ -3875,7 +4161,7 @@ export const homesFeature = {
   },
 
   runVerb(target, verbId, engine) {
-    if (target?.classId === 'magic_rock' && (ROCK_VERB_IDS.includes(verbId) || (verbId === 'talk_to' && rockRoom(target) === 'street'))) {
+    if (target?.classId === 'magic_rock' && (ROCK_VERB_IDS.includes(verbId) || verbId === 'talk_to')) {
       return runRockVerb(target, verbId, engine);
     }
     const id = target?.state?.cultivationId;

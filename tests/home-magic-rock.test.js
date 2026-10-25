@@ -22,11 +22,23 @@ import {
   readHowto,
   rockVerbs,
 } from '../public/js/magic-rock-home.js';
+import {
+  CULTIVATION_REWARDS_CAP,
+  HOUSE_SIGN,
+  dailyImgCounters,
+  houseSignCanExpand,
+  imgBubbleText,
+  imgRewardLine,
+  imgRewards,
+  rewardsCap,
+} from '../public/js/magic-rock-home.js?v=g232-1';
+import { getGameDayKey } from '../public/js/game-day.js?v=dametime-1';
 
 const spike = join(import.meta.dirname, '..');
 const GS = join(spike, '../glitch-GameServerJS');
 const ROCK_JS = join(GS, 'items/magic_rock.js');
 const ids = (rows) => rows.map((r) => r.id);
+const today = () => getGameDayKey(Date.now());
 
 describe('Magic Rock home verbs (magic_rock.js)', () => {
   it('a new player sees only the lessons, in sort_on order', () => {
@@ -142,9 +154,9 @@ describe('source wording', { skip: !existsSync(ROCK_JS) }, () => {
  * shiftCKeyHandler 816-828; HouseManager.as startCultivation 102-118).
  */
 describe('the home street rock (G231)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-12');
-  const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=home-tower-6');
-  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=butler-feature-9');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-13');
+  const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=home-tower-7');
+  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=butler-feature-10');
   const { homeEditing } = await import('../public/js/features/camera-mode-feature.js?v=g231-1');
   const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=g148-4');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
@@ -163,7 +175,8 @@ describe('the home street rock (G231)', async () => {
   });
 
   it('the street rock adds the Tower quest’s talk to after its home verbs; the yard rock never does', () => {
-    homesFeature.restore({ decor: {}, cult: {}, magicRock: { cultivate: 'cultivate_complete', changestyle: 'howto_shown', expand: 'howto_shown' } });
+    // G232: today's iMG already handed over, so only the Tower can bring talk to.
+    homesFeature.restore({ decor: {}, cult: {}, magicRock: { cultivate: 'cultivate_complete', changestyle: 'howto_shown', expand: 'howto_shown' }, rockImgDay: today() });
     const engine = { pc: { level: 20 }, questState: towerQuest };
     assert.deepEqual(towerApi.rockTalk(engine), { tooltip: 'Talk to the Magic Rock!', subtitle: 'Build a Tower' });
     assert.deepEqual(ids(homesFeature.verbsFor(street, engine)), ['change_style', 'expand', 'cultivate_land', 'talk_to']);
@@ -173,14 +186,15 @@ describe('the home street rock (G231)', async () => {
     assert.deepEqual(ids(homesFeature.verbsFor(street, quiet)), ['change_style', 'expand', 'cultivate_land']);
   });
 
-  it('talk to on the street rock runs the Tower’s talk; on the yard rock it is not the rock’s verb', () => {
-    homesFeature.restore({ decor: {}, cult: {}, magicRock: {} });
+  it('talk to on the street rock runs the Tower’s talk; on the yard rock it has nothing to say', () => {
+    homesFeature.restore({ decor: {}, cult: {}, magicRock: {}, rockImgDay: today() });
     const said = [];
     const engine = { pc: { level: 20 }, questState: towerQuest, say: (who, text) => said.push(text) };
     assert.equal(homesFeature.runVerb(street, 'talk_to', engine), true);
     assert.equal(said.length, 1);
     assert.match(said[0], /Cultivate a Tower/);
-    assert.equal(homesFeature.runVerb(yard, 'talk_to', engine), false);
+    assert.equal(homesFeature.runVerb(yard, 'talk_to', engine), true, 'the rock’s verb, not offered: nothing happens');
+    assert.equal(said.length, 1);
   });
 
   it('the yard rule can fire on the street rock now (magic_rock.js 350)', () => {
@@ -235,5 +249,116 @@ describe('the home street rock (G231)', async () => {
       const hm = readFileSync(join(spike, '../glitch-client/com/tinyspeck/engine/port/HouseManager.as'), 'utf8');
       assert.match(hm, /private function onCultStart[\s\S]*?\} else \{\s*SoundMaster\.instance\.playSound\('CLICK_FAILURE'\);/);
     }
+  });
+});
+
+/*
+ * G232: talk to hands over the home street's daily iMG (magic_rock.js
+ * 380-446, inc_houses.js 1706-1715, inc_cultivation.js 168-292), else sends
+ * houses_upgrade_start (448-458), the client's HouseSignDialog
+ * (NCMsgHandler.as 3093-3096). Solo: no visitors, so only the stipend.
+ */
+describe('the rock’s daily iMG and the house sign (G232)', async () => {
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-13');
+  const street = { classId: 'magic_rock', state: { room: 'street' } };
+  const yard = { classId: 'magic_rock', state: { room: 'yard' } };
+  const quiet = { active: {}, completed: [], offers: {} };
+  const src = existsSync(ROCK_JS) ? readFileSync(ROCK_JS, 'utf8') : '';
+  const cultSrc = existsSync(join(GS, 'locations/inc_cultivation.js')) ? readFileSync(join(GS, 'locations/inc_cultivation.js'), 'utf8') : '';
+
+  it('keeps cultivation_rewards_cap row for row, and the stipend rule', { skip: !cultSrc }, () => {
+    const table = cultSrc.match(/var cultivation_rewards_cap = \[([\s\S]*?)\];/)[1].match(/\d+/g).map(Number);
+    assert.deepEqual([...CULTIVATION_REWARDS_CAP], table);
+    assert.equal(table.length, 60);
+    assert.match(cultSrc, /if \(pc\.stats_get_level\(\) >= 2\)\{\s*best_amount \+= Math\.round\(cap \* 0\.20\);/);
+    // The owner never adds to their own pool; visitors only (the solo reading).
+    assert.match(cultSrc, /if \(!config\.is_dev && this\.pols_is_owner\(pc\)\) return false;/);
+    assert.match(cultSrc, /if \(pc\.stats_get_daily_counter\('cultivation_img_rewards'\)\) return 0;/);
+  });
+
+  it('solo: nothing at level 1, then 20% of the level’s cap once a game day', () => {
+    assert.equal(imgRewards({ level: 1 }), 0);
+    assert.equal(imgRewards({ level: 2 }), 15);
+    assert.equal(imgRewards({ level: 20 }), 165);
+    assert.equal(imgRewards({ level: 60 }), 915);
+    assert.equal(imgRewards({ level: 75 }), 915, 'past the table: its last row');
+    assert.equal(imgRewards({ level: 20, cashedToday: true }), 0);
+    assert.equal(rewardsCap(1), 50);
+    // With a visitors' pool: the best earlier day, capped; today never counts.
+    assert.equal(imgRewards({ level: 2, pool: { d1: 40, d2: 900, d3: 5000 }, today: 'd3' }), 75 + 15);
+    assert.equal(imgRewards({ level: 1, pool: { d1: 30 }, today: 'd2' }), 30);
+  });
+
+  it('keeps the source’s words and badge thresholds', { skip: !src }, () => {
+    assert.ok(src.includes('My observations today have resulted in <b>"+img_rewards+" iMG</b>. Remember: the more stuff visitors do on your home street, the more you’ll earn.'));
+    assert.equal(imgRewardLine(165), 'My observations today have resulted in 165 iMG. Remember: the more stuff visitors do on your home street, the more you’ll earn.');
+    assert.ok(src.includes('I have some iMG for you. Click on me and I’ll hand it over.'));
+    assert.equal(imgBubbleText(), 'Hey friend, I have some iMG for you. Click on me and I’ll hand it over.');
+    assert.deepEqual(dailyImgCounters(503), []);
+    assert.deepEqual(dailyImgCounters(515), ['daily_img:five_hundred_three']);
+    assert.deepEqual(dailyImgCounters(2504), ['daily_img:five_hundred_three', 'daily_img:one_thousand_nine', 'daily_img:twenty_five_hundred_three']);
+    assert.match(src, /type:'houses_upgrade_start',/);
+  });
+
+  it('talk to shows on either rock while there is iMG, hands it over once, then opens the house sign', () => {
+    homesFeature.restore({ decor: {}, cult: {}, magicRock: { cultivate: 'cultivate_complete', changestyle: 'howto_shown', expand: 'howto_shown' } });
+    const beats = [];
+    const counters = [];
+    const data = {};
+    const pc = { level: 40, imagination: 100, xp: 1000 };
+    const engine = {
+      pc,
+      questState: quiet,
+      scriptedDialogue: (d) => beats.push(d),
+      achievement: (c) => counters.push(c),
+      setData: (k, v) => { data[k] = v; },
+      homeContext: () => ({ inHome: false }),
+    };
+    assert.deepEqual(ids(homesFeature.verbsFor(yard, engine)), ['change_style', 'expand', 'cultivate_land', 'talk_to']);
+    assert.deepEqual(ids(homesFeature.verbsFor(street, engine)), ['change_style', 'expand', 'cultivate_land', 'talk_to']);
+    assert.equal(homesFeature.runVerb(yard, 'talk_to', engine), true);
+    assert.equal(pc.imagination, 100 + 515);
+    assert.equal(pc.xp, 1000 + 515);
+    assert.deepEqual(counters, ['daily_img:five_hundred_three']);
+    assert.equal(beats.length, 1);
+    assert.equal(beats[0].beats[0].text, imgRewardLine(515));
+    assert.equal(data.homeRockLast, 'img:515');
+    assert.equal(homesFeature.save().rockImgDay, today());
+    // Nothing more today: talk to leaves the menu. A click from a stale menu does nothing: the
+    // server checks a verb's conditions again before its handler (main.js 3067-3079).
+    assert.deepEqual(ids(homesFeature.verbsFor(yard, engine)), ['change_style', 'expand', 'cultivate_land']);
+    assert.equal(homesFeature.runVerb(yard, 'talk_to', engine), true, 'not offered: nothing');
+    assert.equal(pc.imagination, 615);
+  });
+
+  it('the Tower offer still comes before the iMG on the street rock', () => {
+    const feature = readFileSync(join(spike, 'public/js/features/homes-feature.js'), 'utf8');
+    const body = feature.slice(feature.indexOf('function talkToRock('), feature.indexOf('function handOverImg('));
+    assert.ok(body.indexOf('towerApi.rockOffer') < body.indexOf('rockImgToCollect'));
+    assert.ok(body.indexOf('rockImgToCollect') < body.indexOf('openHouseSign'));
+    const tower = readFileSync(join(spike, 'public/js/features/home-tower-feature.js'), 'utf8');
+    assert.match(tower, /rockOffer: \(engine\) => rockOffers\(engine\)\.length > 0,/);
+  });
+
+  it('the house sign has the client’s title, buttons and Expand rule', () => {
+    assert.equal(HOUSE_SIGN.title, 'Your street');
+    assert.deepEqual(HOUSE_SIGN.buttons.map((b) => b.label), ['Expand', 'Change Style', 'Cultivate Land']);
+    assert.equal(HOUSE_SIGN.expandTip, 'Your street is already sooo big!');
+    assert.equal(houseSignCanExpand({ room: 'street', countLeft: 0, countRight: 2 }), true);
+    assert.equal(houseSignCanExpand({ room: 'street', countLeft: 0, countRight: 0 }), false);
+    assert.equal(houseSignCanExpand({ room: 'yard', count: 1 }), true);
+    assert.equal(houseSignCanExpand({ room: 'yard', count: 0 }), false);
+    const dlg = join(spike, '../glitch-client/com/tinyspeck/engine/port/HouseSignDialog.as');
+    if (existsSync(dlg)) {
+      const as = readFileSync(dlg, 'utf8');
+      assert.match(as, /_setTitle\('Your street'\);/);
+      assert.match(as, /buildButton\('Expand', onExpandClick\)[\s\S]*buildButton\('Change Style', onChangeStyleClick\)[\s\S]*buildButton\('Cultivate Land', onCutivateClick\)/);
+      assert.ok(as.includes("{txt:'Your street is already sooo big!'"));
+    }
+  });
+
+  it('the street rock’s subtitle follows the Tower offer while you stand there', () => {
+    const feature = readFileSync(join(spike, 'public/js/features/homes-feature.js'), 'utf8');
+    assert.match(feature, /\} else if \(have && refreshRockSubtitle\(engine\)\) \{/);
   });
 });

@@ -3,9 +3,13 @@
  * js/craftybot.js; this file binds them to the home, the pack and the panel.
  *
  * Source map:
- *  - Delivery: locations/location.js onPlayerEnter puts a "Special One-Time
- *    Delivery" (butler_box, state 'craftybot') 124 px left of the Magic Rock
- *    on the owner's home street while they have no Crafty Bot. Read label runs
+ *  - Delivery: locations/location.js onPlayerEnter 128-156 puts a "Special
+ *    One-Time Delivery" (butler_box, state 'craftybot') 124 px left of the
+ *    Magic Rock, on the platform under it, when the owner enters their house
+ *    (`!this.is_public && pc == this.owner`) without a Crafty Bot: the yard
+ *    rock (inc_homes.js homes_demo_backyard 2354, x -29), so the box stands
+ *    in the back yard at x -153 (G232; it used to stand on the home street,
+ *    in front of the house's wall art). Read label runs
  *    butler_box.js read_label_craftybot (five beats); Open puffs the box
  *    (proto_puff) and player.js createCraftybot makes the bot 750 ms later at
  *    the box's x: "All hail the Craftybot."
@@ -23,7 +27,8 @@
  *    crystals, Queue Size and the fuel gauge (Add More walks to a Fuel Cell).
  *
  * QA (with ?autostart=1&fresh=1&resetgame=1&questoffer=off&homedemo=home):
- *   &craftybotdemo=box     the delivery box by the Magic Rock spot
+ *   &craftybotdemo=box     the delivery box by the yard's Magic Rock (with
+ *                          homedemo=interior; &homex=-200 stands beside it)
  *   &craftybotdemo=bot     the bot already out, Cherries and a Fruit Changing
  *                          Machine dropped on the home street
  *   &craftybotdemo=pack    the bot in the pack with Cherries and the machine
@@ -42,7 +47,7 @@ import { canUseTool, getToolCondition, setToolRemaining } from '../tools.js?v=to
 import { MAKING_TOOL_SKILLS, listRecipes, recipeKnown, TOOL_CATALOG } from '../making.js?v=g215-1';
 import { listDroppedStacks } from '../world-items.js?v=catalog-unified-2';
 import { homeStreetLayout } from '../home-cultivation.js?v=home-cultivation-3';
-import { homesFeature } from './homes-feature.js?v=homes-12';
+import { BACK_YARD_GROUND_Y, homesFeature } from './homes-feature.js?v=homes-13';
 import {
   CRAFTYBOT,
   CRAFTYBOT_BOX,
@@ -459,17 +464,43 @@ function currentRoom(engine) {
   return null;
 }
 
-function rockX(engine) {
-  const rock = engine.interactables?.find((t) => t.classId === 'magic_rock' && t.sprite && !t.sprite.destroyed);
-  if (rock) return rock.sprite.x;
-  // G231: the street's Magic Rock stands at houseX + 221 (inc_homes.js 2470,
-  // homes-feature STREET_ROCK); it is away only while the tutorial's rock has the street.
-  const cult = homesFeature._state?.()?.cult;
-  return cult ? homeStreetLayout(cult).houseX + 221 : 600;
+/** The house's left end in interior world x (the back yard is left of it). */
+function houseLeftX() {
+  return homesFeature.roomWorldX?.() || 0;
 }
 
+/**
+ * G232: the yard rock's x in the house (inc_homes.js 2354: -29 from the
+ * house's left end, homes-feature YARD_ROCK).
+ */
+function yardRockX(engine) {
+  const rock = engine.interactables?.find((t) => t.classId === 'magic_rock' && t.state?.room === 'yard' && t.sprite && !t.sprite.destroyed);
+  return rock ? rock.sprite.x : houseLeftX() - 29;
+}
+
+/** location.js 147-148: the box at the rock's x - 124. */
 function boxX(engine) {
-  return Math.round(rockX(engine) + CRAFTYBOT.BOX_OFFSET_X);
+  return Math.round(yardRockX(engine) + CRAFTYBOT.BOX_OFFSET_X);
+}
+
+/**
+ * QA demos that start with the bot already out keep it on the home street,
+ * where the remake used to deliver it: 124 px left of the street rock
+ * (G231, houseX + 221).
+ */
+function streetDemoX() {
+  const cult = homesFeature._state?.()?.cult;
+  return Math.round((cult ? homeStreetLayout(cult).houseX + 221 : 600) + CRAFTYBOT.BOX_OFFSET_X);
+}
+
+/**
+ * G232: the ground under x where the bot stands: in the house, left of its
+ * open end is the back yard, 60 px lower than the floor (homes-feature
+ * BACK_YARD_GROUND_Y); elsewhere the scene's ground.
+ */
+function groundYAt(engine, x, room = currentRoom(engine)) {
+  if (room === 'interior' && x < houseLeftX()) return BACK_YARD_GROUND_Y;
+  return engine.groundY;
 }
 
 function clipFrames(engine, clip) {
@@ -490,7 +521,7 @@ function spawnBox(engine) {
   const spr = new PIXI.Sprite(textureFromUrl(BOX_ART_3X));
   spr.anchor.set(0.5, 0.96);
   spr.x = boxX(engine);
-  spr.y = engine.groundY + 2;
+  spr.y = groundYAt(engine, spr.x, 'interior') + 2;
   spr.zIndex = 27;
   engine.entityLayer.addChild(spr);
   const target = engine.register({
@@ -510,14 +541,13 @@ function spawnBot(engine) {
   spr.anchor.set(ANCHOR.x, ANCHOR.y);
   spr.animationSpeed = FPS / 60;
   spr.x = bot.xNow ?? bot.x;
-  spr.y = engine.groundY + 2;
   spr.zIndex = 29;
   const box = new PIXI.Container();
   box.zIndex = 29;
   box.addChild(spr);
   box.x = spr.x;
   spr.x = 0;
-  box.y = engine.groundY + 2;
+  box.y = groundYAt(engine, box.x) + 2;
   spr.y = 0;
   const tool = new PIXI.Sprite(PIXI.Texture.EMPTY);
   tool.anchor.set(0.5, 1);
@@ -581,6 +611,7 @@ function syncAnim(engine, t) {
     v.anim.onComplete = () => setClip(engine, 'idle0', true);
   }
   v.container.x = Math.round(bot.move ? moveX(bot, t) : bot.x);
+  v.container.y = groundYAt(engine, v.container.x) + 2;
   // The walk art faces left (npc_crafty_bot.js onPathing: "asset is backwards").
   v.anim.scale.x = bot.dir === 'right' ? -1 : 1;
   // While crafting the tool rides above the open cube (make_config special_display).
@@ -650,7 +681,7 @@ function clearView() {
 function spawnView(engine, room) {
   clearView();
   view = { room, box: null, bot: null };
-  if (room === 'street' && !bot.owned && engine.homeContext?.().owned) {
+  if (room === 'interior' && !bot.owned && engine.homeContext?.().owned) {
     view.box = spawnBox(engine);
     if (pendingOpenAt) view.box.box.alpha = 0.5;
   }
@@ -674,7 +705,7 @@ function openBox(engine) {
   if (!view?.box || pendingOpenAt) return;
   const x = view.box.box.x;
   engine.playSound?.('PROTO_PUFF', { volume: 0.7 });
-  puff(engine, x, engine.groundY - 60);
+  puff(engine, x, view.box.box.y - 62);
   view.box.box.visible = false;
   engine.unregister?.(view.box.target);
   pendingOpenAt = performance.now() + CRAFTYBOT.OPEN_DELAY_MS;
@@ -713,12 +744,13 @@ function puff(engine, x, y) {
 function finishOpen(engine) {
   pendingOpenAt = 0;
   const t = now(engine);
-  createBot(bot, pendingOpenX, 'street', t);
+  // player.js createCraftybot: in the box's location, the house.
+  createBot(bot, pendingOpenX, 'interior', t);
   engine.pushActivity(CRAFTYBOT_COPY.created);
   engine.toast?.(CRAFTYBOT_COPY.created, 3000);
   lastMsg = CRAFTYBOT_COPY.created;
   engine.save?.();
-  if (currentRoom(engine) === 'street') {
+  if (currentRoom(engine) === 'interior') {
     view?.box?.box?.destroy?.();
     view.box = null;
     view.bot = spawnBot(engine);
@@ -1555,7 +1587,7 @@ function demoSetup(engine) {
   } else {
     bot = createCraftybotState();
     const t = now(engine);
-    createBot(bot, boxX(engine), kind === 'pack' ? 'pack' : 'street', t);
+    createBot(bot, streetDemoX(), kind === 'pack' ? 'pack' : 'street', t);
     bot.boxRead = true;
     if (kind === 'pack') addItem(inv, BOT, 1);
     else {
@@ -1603,12 +1635,12 @@ function autoplayStep(engine) {
       if (!bot.owned) return later(300);
       // Drop the Cherries and the machine from the pack onto the floor, right of the bot.
       const state = engine.droppedItems;
-      const tsid = HOME_STREET_TSID;
+      const tsid = homeTsid(bot.where);
       state.streets[tsid] ||= [];
       for (const [cls, n, dx] of [['cherry', 9, 260], ['fruit_changing_machine', 1, 420]]) {
         if (countItem(engine.inv, cls) < n) continue;
         removeItem(engine.inv, cls, n);
-        state.streets[tsid].push({ id: `world-item-${state.nextId++}`, streetTsid: tsid, classTsid: cls, count: n, x: bot.x + dx, y: engine.groundY, droppedAt: Date.now() });
+        state.streets[tsid].push({ id: `world-item-${state.nextId++}`, streetTsid: tsid, classTsid: cls, count: n, x: bot.x + dx, y: groundYAt(engine, bot.x + dx), droppedAt: Date.now() });
       }
       engine.droppedItemsChanged?.();
       engine.refreshPack?.();

@@ -24,10 +24,26 @@
  * (TSMainView.as 815-828) send cultivation_start, which the server never
  * checks against these flags (inc_cultivation.js cultivation_start 104-111).
  *
+ * G232: talk to (magic_rock.js 360-461) hands over the home street's daily
+ * iMG (players/inc_houses.js houses_get_img_rewards 1706-1710 ->
+ * locations/inc_cultivation.js cultivation_get_img_rewards 244-278), and
+ * with nothing to hand over sends houses_upgrade_start, which opens the
+ * client's HouseSignDialog (NCMsgHandler.as 3093-3096).
+ *
+ * The solo reading of the iMG: the pool only grows from other players.
+ * cultivation_add_img_rewards (inc_cultivation.js 168-178) refuses the
+ * owner (`!config.is_dev && this.pols_is_owner(pc)`), and every caller
+ * (harvesting, petting, mining, Making on the street, ...) passes the acting
+ * player; home.js home_log_visitor 435-458 (3% of the cap for each new
+ * visitor a game day) only runs for someone who is not the owner (home.js
+ * 93-96). With no visitors the pool stays empty, so what is left is the
+ * stipend the same function adds on top: from level 2, 20% of the level's
+ * cap (cultivation_rewards_cap 180-241), once a game day (the daily counter
+ * cultivation_img_rewards, reset by player.js doNewDay 1052).
+ *
  * Left out: How To: House Keys / house keys (keys are for other players),
  * How To: Customize / customize (the house chassis, street only, credits),
- * talk to (enabled only for newxp or for iMG earned from visitors' actions,
- * houses_get_img_rewards), Whatcha Reading? (is_god only).
+ * Whatcha Reading? (is_god only).
  */
 
 /** checkLevelCapForHowto: pc.stats_get_level() >= 6. */
@@ -142,4 +158,104 @@ export function cultivationModeEnded(flags) {
   const first = flags.cultivate === HOWTO_SHOWN;
   flags.cultivate = CULTIVATE_COMPLETE;
   return first ? ROCK_LINES.goodWork : null;
+}
+
+// ---------------------------------------------------------------------------
+// G232: talk to: the home street's daily iMG
+// ---------------------------------------------------------------------------
+
+/** inc_cultivation.js cultivation_rewards_cap 180-241: the cap for each level (index level - 1). */
+export const CULTIVATION_REWARDS_CAP = Object.freeze([
+  50, 75, 100, 125, 150, 175, 200, 225, 250, 275,
+  325, 375, 425, 475, 525, 585, 645, 705, 765, 825,
+  900, 975, 1050, 1125, 1200, 1275, 1350, 1425, 1500, 1575,
+  1675, 1775, 1875, 1975, 2075, 2175, 2275, 2375, 2475, 2575,
+  2675, 2775, 2875, 2975, 3075, 3175, 3275, 3375, 3475, 3575,
+  3675, 3775, 3875, 3975, 4075, 4175, 4275, 4375, 4475, 4575,
+]);
+
+/** cultivation_get_img_rewards: `if (pc.stats_get_level() >= 2)` adds the stipend. */
+export const STIPEND_LEVEL = 2;
+/** Math.round(cap * 0.20). */
+export const STIPEND_SHARE = 0.2;
+
+/** cultivation_get_rewards_cap 280-282 (levels past the table use its last row). */
+export function rewardsCap(level) {
+  const n = Math.max(1, Math.floor(Number(level) || 1));
+  return CULTIVATION_REWARDS_CAP[Math.min(n, CULTIVATION_REWARDS_CAP.length) - 1];
+}
+
+/**
+ * cultivation_get_img_rewards (inc_cultivation.js 244-278): 0 once cashed in
+ * this game day; else the best earlier day in `pool` ({ dayKey: amount },
+ * today's own day never counts), capped, plus the stipend from level 2.
+ * The remake keeps no pool (see the solo reading above), so callers pass none.
+ */
+export function imgRewards({ level = 1, cashedToday = false, pool = null, today = '' } = {}) {
+  if (cashedToday) return 0;
+  let best = 0;
+  for (const [day, amount] of Object.entries(pool || {})) {
+    if (day === today) continue;
+    const n = Number(amount) || 0;
+    if (n > best) best = n;
+  }
+  const cap = rewardsCap(level);
+  let out = Math.min(best, cap);
+  if (Math.floor(Number(level) || 1) >= STIPEND_LEVEL) out += Math.round(cap * STIPEND_SHARE);
+  return out;
+}
+
+/**
+ * magic_rock.js 431-441: the daily_img counters for a hand-over of `amount`
+ * (Healthy iMG turnover, Raking in the iMG, The Kindness of Strangers).
+ */
+export function dailyImgCounters(amount) {
+  const out = [];
+  if (amount > 503) out.push('daily_img:five_hundred_three');
+  if (amount > 1009) out.push('daily_img:one_thousand_nine');
+  if (amount > 2503) out.push('daily_img:twenty_five_hundred_three');
+  return out;
+}
+
+/**
+ * magic_rock.js 445: the conversation_start line (its "<b>N iMG</b>" in
+ * plain text; the quest card draws no markup).
+ */
+export function imgRewardLine(amount) {
+  return `My observations today have resulted in ${amount} iMG. Remember: the more stuff visitors do on your home street, the more you’ll earn.`;
+}
+
+/**
+ * onPlayerCollision (magic_rock.js 992-1001): the bubble while there is iMG
+ * to hand over, for 10 s. The remake has no player names ("friend", as
+ * quests.js reads {pc_label}).
+ */
+export const IMG_BUBBLE_MS = 10 * 1000;
+export function imgBubbleText(name = 'friend') {
+  return `Hey ${name}, I have some iMG for you. Click on me and I’ll hand it over.`;
+}
+
+/**
+ * HouseSignDialog.as (opened by houses_upgrade_start): the title, the
+ * buttons in their order (buildBase 50-75, showButtons 91-151) and the
+ * Expand tip. Change House (the exterior's chassis changer) and House Keys
+ * (the key ACL, for other players) are not built here; Change Tower is
+ * always hidden in the client (147).
+ */
+export const HOUSE_SIGN = Object.freeze({
+  title: 'Your street',
+  buttons: Object.freeze([
+    Object.freeze({ id: 'expand', label: 'Expand' }),
+    Object.freeze({ id: 'change_style', label: 'Change Style' }),
+    Object.freeze({ id: 'cultivate', label: 'Cultivate Land' }),
+  ]),
+  expandTip: 'Your street is already sooo big!',
+});
+
+/**
+ * showButtons 99-104: on the home street Expand is open while either side
+ * has expansions left, in the yard while the yard has.
+ */
+export function houseSignCanExpand({ room = 'yard', count = 0, countLeft = 0, countRight = 0 } = {}) {
+  return room === 'street' ? Boolean(countLeft || countRight) : Boolean(count);
 }

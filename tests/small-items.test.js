@@ -28,8 +28,8 @@ import {
   planBallHit,
   reconcileFortunes,
 } from '../public/js/small-items.js?v=g155-1';
-import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=card-1';
-import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=furniture-9';
+import { smallItemsFeature } from '../public/js/features/small-items-feature.js?v=card-2';
+import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js?v=furniture-10';
 import { FEATURES } from '../public/js/features/index.js';
 import { countItem } from '../public/js/inventory.js?v=catalog-unified-4';
 import { pickWoodTool, quoteWoodTreeHarvest, harvestWoodTree, woodToolLabel } from '../public/js/woodcutting.js?v=woodcutting-3';

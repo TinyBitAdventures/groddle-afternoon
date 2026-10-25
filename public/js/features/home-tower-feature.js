@@ -1159,6 +1159,8 @@ export const towerApi = {
     return { tooltip: 'Talk to the Magic Rock!', subtitle: questActive(engine) ? 'Build a Tower' : 'Has an idea for you' };
   },
   talkToRock: (engine) => talkToRock(engine),
+  /** G232: Build a Tower is on offer now (homes-feature puts the offer before the rock's iMG). */
+  rockOffer: (engine) => rockOffers(engine).length > 0,
   projectStarted,
   cancelProject: (engine) => cancelProject(engine),
   /** butler_hints.js:393: how many times you have gone into your Tower. */
