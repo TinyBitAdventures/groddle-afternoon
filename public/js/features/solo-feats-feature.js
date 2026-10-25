@@ -34,7 +34,9 @@
  *    clear here.
  *
  * UI: a "Your Feats" list inside the Feat panel (H, or Menu > Feat), under
- * the Last Feat chain.
+ * the Last Feat chain. A finished Feat shows Done and when it opens again:
+ * one game week (8 game days, 32 real hours) after it was finished, for
+ * another Small rock (G171, Austin 2026-10-25; solo-feats.js WEEKLY FEATS).
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&featdemo=<feat id>
  *     sets that Feat one short of its goal (&featprogress=<n> for another
@@ -56,17 +58,25 @@
  *     &animaldemo=batterfly&featfeedautoplay=4&featfeedanimal=batterfly does the
  *     same to the Batterfly.
  *     Release: see resource-nodes-feature (&resrelease=1).
+ *     G171 weekly Feats: &featdemo=<id>&featweekago=1 marks that Feat finished
+ *     one game week (and a minute) ago, so it opens again as the game loads
+ *     (back to 0, with &featprogress=<n> applied after); &featdoneago=<game
+ *     days> marks it finished that long ago and still Done (e.g. 2 shows
+ *     "Opens again in 5 game days"). &featruns=<n> sets how many times it
+ *     was finished before (default 1).
  * Canvas: soloFeats (id:value/goal,...), soloFeatLast, soloFeatRocks,
  *   soloFeatCompleted, soloFeatPending, soloFeatStreak, soloFeatDemo,
- *   soloFeatWired, soloFeatUnwired.
+ *   soloFeatWired, soloFeatUnwired, soloFeatRuns (id:runs for every Feat
+ *   finished at least once), soloFeatReopens (id:ms until it opens again).
  */
 
 import { addItem } from '../inventory.js?v=catalog-unified-4';
-import { getGameDayKey } from '../game-day.js?v=dametime-1';
+import { GAME_DAY_MS, getGameDayKey } from '../game-day.js?v=dametime-1';
 import {
   COMPLETE_BUTTON,
   COMPLETE_TITLE,
   FEAT_BY_ID,
+  GAME_WEEK_MS,
   LOST_COMMIT_TEXT,
   REWARD_ITEM,
   REWARD_LABEL,
@@ -82,12 +92,17 @@ import {
   incrementFeat,
   isFeatComplete,
   normalizeSoloFeatState,
+  reopenDueFeats,
+  reopenText,
+  reopensAt,
   resetPending,
   streakCheck,
   takePending,
-} from '../solo-feats.js?v=g178-1';
+} from '../solo-feats.js?v=g171-1';
 
 const POLL_MS = 500;
+/** How often an open panel redraws its "Opens again in" lines. */
+const COUNTDOWN_MS = 30_000;
 const ROCK_ICON = 'assets/sprites/icons/petrified_rock_small@3x.png';
 /** Archived street TSIDs (assets/streets/index.json): homes, neighbours and instances use other ids. */
 const REAL_STREET = /^G[A-Z0-9]{12,14}$/;
@@ -102,6 +117,7 @@ let demoDone = false;
 let autoplayAt = 0;
 let panelObserver = null;
 let feedAutoplay = null;
+let countdownAt = 0;
 
 function nekkid(engine) {
   return typeof engine.hasBuff === 'function' && engine.hasBuff('nekkid') === true;
@@ -127,6 +143,25 @@ function publish(engine) {
   engine.setData('soloFeatDemo', demo ? demo.featId : 'none');
   engine.setData('soloFeatWired', WIRED_FEATS.length);
   engine.setData('soloFeatUnwired', UNWIRED_FEATS.map((f) => f.id).join(','));
+  const now = Date.now();
+  engine.setData('soloFeatRuns', WIRED_FEATS.filter((f) => state.progress[f.id]?.runs).map((f) => `${f.id}:${state.progress[f.id].runs}`).join(',') || 'none');
+  engine.setData('soloFeatReopens', WIRED_FEATS.filter((f) => reopensAt(state, f.id)).map((f) => `${f.id}:${Math.max(0, reopensAt(state, f.id) - now)}`).join(',') || 'none');
+}
+
+/** G171: open again every finished Feat whose game week is up, and say so. */
+function reopenDue(engine, now = Date.now()) {
+  const ids = reopenDueFeats(state, now);
+  if (!ids.length) return ids;
+  for (const id of ids) {
+    const line = `The Feat "${FEAT_BY_ID[id].title}" is open again, for another ${REWARD_LABEL}.`;
+    engine.pushActivity?.(line);
+    engine.toast?.(line, 4200);
+  }
+  last = `reopened:${ids.join('+')}`;
+  render();
+  engine.save?.();
+  publish(engine);
+  return ids;
 }
 
 // —— Increments ———————————————————————————————————————————————————————————
@@ -148,6 +183,8 @@ function settle(engine, res) {
     engine.playSound?.('PETRIFIED_ROCK', { volume: 0.6 });
     const body = completionText(f.title);
     engine.pushActivity?.(`${body} 1 ${REWARD_LABEL}.`);
+    // G171: it opens again a game week later.
+    engine.pushActivity?.(`"${f.title}" opens again in a game week, for another ${REWARD_LABEL}.`);
     engine.award?.({
       kind: 'feat',
       title: COMPLETE_TITLE,
@@ -167,15 +204,19 @@ function settle(engine, res) {
 }
 
 function increment(engine, featId, amount, opts = {}) {
-  return settle(engine, incrementFeat(state, featId, amount, opts, Date.now()));
+  const now = Date.now();
+  reopenDue(engine, now);
+  return settle(engine, incrementFeat(state, featId, amount, opts, now));
 }
 
 function onFeatEvent(engine, counter, amount, detail) {
+  // Before the caps are read: a reopened Feat frees its own.
+  reopenDue(engine);
   for (const row of featEventIncrements(state, counter, amount, detail)) {
     if (row.mode === 'direct') {
       increment(engine, row.featId, row.amount);
     } else if (row.mode === 'commit') {
-      if (addPending(state, row.amount)) {
+      if (addPending(state, row.amount, Date.now())) {
         last = `pending:+${row.amount}:${state.pending}`;
         render();
         publish(engine);
@@ -193,6 +234,13 @@ function onFeatEvent(engine, counter, amount, detail) {
 
 /** questState.completed and quoinState.qurazyFound only grow; count the growth. */
 function poll(engine) {
+  const t = Date.now();
+  reopenDue(engine, t);
+  if (t >= countdownAt) {
+    countdownAt = t + COUNTDOWN_MS;
+    const panel = typeof document !== 'undefined' ? document.getElementById('feat-panel') : null;
+    if (panel && !panel.hidden) render();
+  }
   const quests = engine.questState?.completed;
   if (Array.isArray(quests)) {
     const n = quests.length;
@@ -232,6 +280,7 @@ const STYLE = `
 .solo-feat.done { background: rgba(214, 236, 196, 0.75); }
 .solo-feat.done i::after { background: #6aa84f; }
 .solo-feat small { grid-column: 1 / -1; font-size: 10.5px; color: #8a5a12; }
+.solo-feat.done small { color: #3f6f2a; }
 `;
 
 function ensurePanel() {
@@ -251,7 +300,7 @@ function ensurePanel() {
   box.id = 'solo-feats';
   box.setAttribute('aria-label', 'Your Feats');
   box.innerHTML = '<div class="solo-feats-head"><h4>Your Feats</h4><small data-solo-feat-rocks></small></div>'
-    + '<p class="solo-feats-copy">The old Feats, as goals of your own. Finish one for a Small Petrified Rock.</p>'
+    + '<p class="solo-feats-copy">The old Feats, as goals of your own. Finish one for a Small Petrified Rock. A finished Feat opens again a game week later.</p>'
     + '<div class="solo-feats-list" data-solo-feat-list></div>';
   card.appendChild(box);
   const panel = document.getElementById('feat-panel');
@@ -273,6 +322,7 @@ function render() {
   const list = box.querySelector('[data-solo-feat-list]');
   if (!list) return;
   list.textContent = '';
+  const now = Date.now();
   for (const row of featRows(state)) {
     const el = document.createElement('div');
     el.className = `solo-feat${row.complete ? ' done' : ''}`;
@@ -289,6 +339,17 @@ function render() {
     if (row.pending && !row.complete) {
       const note = document.createElement('small');
       note.textContent = `${row.pending} waiting: leave the street to count them.`;
+      el.append(note);
+    }
+    if (!row.complete && row.runs && !row.pending) {
+      const note = document.createElement('small');
+      note.textContent = row.runs === 1 ? 'You have finished it once. Finish it again for another rock.' : `You have finished it ${row.runs} times. Finish it again for another rock.`;
+      el.append(note);
+    }
+    if (row.complete && row.reopensAt) {
+      const note = document.createElement('small');
+      note.dataset.featReopens = String(row.reopensAt);
+      note.textContent = reopenText(row.reopensAt, now);
       el.append(note);
     }
     list.appendChild(el);
@@ -335,7 +396,15 @@ function readDemo(engine) {
   const raw = engine.param?.('featprogress');
   const value = raw == null || raw === '' ? f.goal - 1 : Math.max(0, Math.min(f.goal - 1, Math.floor(Number(raw) || 0)));
   const pending = Math.max(0, Math.floor(Number(engine.param?.('featpending')) || 0));
-  return { featId, value, pending, autoplay: engine.param?.('featautoplay') === '1' };
+  // G171: finished some game days ago (featweekago=1 is a week and a minute).
+  let doneAgoMs = null;
+  if (engine.param?.('featweekago') === '1') doneAgoMs = GAME_WEEK_MS + 60_000;
+  else {
+    const days = Number(engine.param?.('featdoneago'));
+    if (engine.param?.('featdoneago') != null && Number.isFinite(days) && days >= 0) doneAgoMs = Math.round(days * GAME_DAY_MS);
+  }
+  const runs = Math.max(1, Math.min(99, Math.floor(Number(engine.param?.('featruns')) || 1)));
+  return { featId, value, pending, doneAgoMs, runs, rawProgress: raw, autoplay: engine.param?.('featautoplay') === '1' };
 }
 
 function applyDemo(engine) {
@@ -346,8 +415,23 @@ function applyDemo(engine) {
   demo = readDemo(engine);
   if (demo) {
     const now = Date.now();
-    state.progress[demo.featId] = { value: demo.value, contributedAt: demo.value ? now : 0, completedAt: 0 };
-    if (demo.featId === 'pet_only') state.pending = demo.pending;
+    const f = FEAT_BY_ID[demo.featId];
+    if (demo.doneAgoMs != null) {
+      const at = now - demo.doneAgoMs;
+      state.progress[demo.featId] = { value: f.goal, contributedAt: at - 60_000, completedAt: at, runs: demo.runs };
+      // A week up: open it again now, then apply &featprogress if given.
+      if (reopenDueFeats(state, now, demo.featId).length) {
+        demo.value = demo.rawProgress == null || demo.rawProgress === '' ? 0 : demo.value;
+        state.progress[demo.featId].value = demo.value;
+        if (demo.featId === 'pet_only') state.pending = demo.pending;
+        engine.pushActivity?.(`The Feat "${f.title}" is open again, for another ${REWARD_LABEL}.`);
+      } else {
+        demo.value = f.goal;
+      }
+    } else {
+      state.progress[demo.featId] = { value: demo.value, contributedAt: demo.value ? now : 0, completedAt: 0, runs: 0 };
+      if (demo.featId === 'pet_only') state.pending = demo.pending;
+    }
     if (demo.autoplay) autoplayAt = now + 1500;
     last = `demo:${demo.featId}:${demo.value}`;
   }
@@ -426,7 +510,7 @@ export const soloFeatsFeature = {
     if (autoplayAt && now >= autoplayAt && demo) {
       autoplayAt = 0;
       if (demo.featId === 'pet_only') {
-        addPending(state, 1);
+        addPending(state, 1, Date.now());
         last = `pending:+1:${state.pending}`;
       } else {
         increment(engine, demo.featId, 1);
@@ -449,6 +533,8 @@ export const soloFeatsFeature = {
     if (!state.openedAt) state.openedAt = Date.now();
     demoDone = false;
     entry = null;
+    // Poll at the next tick: a Feat whose week ran out while away opens then.
+    pollAt = 0;
     render();
   },
 };

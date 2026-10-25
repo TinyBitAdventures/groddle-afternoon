@@ -34,8 +34,16 @@ import {
   streakCheck,
   takePending,
   vogTextFor,
-} from '../public/js/solo-feats.js?v=g178-1';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g178-1';
+  CAP_OWNERS,
+  GAME_WEEK_DAYS,
+  GAME_WEEK_MS,
+  featRows,
+  reopenDueFeats,
+  reopenText,
+  reopensAt,
+} from '../public/js/solo-feats.js?v=g171-1';
+import { DAY_NAMES, GAME_DAY_MS } from '../public/js/game-day.js?v=dametime-1';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g171-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=player-save-7';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
@@ -187,7 +195,8 @@ describe('Personal goal rules', () => {
     assert.ok(third.counters.some((c) => c.counter === 'feats:contributed_to'));
     assert.equal(state.rocks, 1);
     assert.equal(isFeatComplete(state, 'qurazy_quoin_collecting'), true);
-    assert.equal(incrementFeat(state, 'qurazy_quoin_collecting', 1).reason, 'complete');
+    // Done until a game week has passed (G171).
+    assert.equal(incrementFeat(state, 'qurazy_quoin_collecting', 1, {}, 9001).reason, 'complete');
     assert.equal(state.rocks, 1);
   });
 
@@ -526,5 +535,160 @@ describe('G178 Feat follow-ups', () => {
     const at = src.indexOf('  fertilidust(engine, classTsid) {');
     const body = src.slice(at, src.indexOf('\n  fertilidust_lite(', at));
     assert.match(body, /if \(trees\.length\) engine\.achievement\('fertilidust:trees_grown', 1\);/);
+  });
+});
+
+describe('G171: Feats open again each game week', () => {
+  const WEEK = GAME_WEEK_MS;
+  const finish = (state, id, at) => incrementFeat(state, id, FEAT_BY_ID[id].goal, {}, at);
+
+  it('uses the remake calendar week: eight game days of four hours', () => {
+    assert.equal(DAY_NAMES.length, 8);
+    assert.equal(GAME_WEEK_DAYS, 8);
+    assert.equal(GAME_WEEK_MS, 8 * GAME_DAY_MS);
+    assert.equal(GAME_WEEK_MS, 32 * 60 * 60 * 1000);
+  });
+
+  it('shows Done with when it opens again, then reopens at 0 a week after the finish', () => {
+    const state = normalizeSoloFeatState({ openedAt: 1000 });
+    const t0 = 5_000_000;
+    const done = finish(state, 'tottlys_toys', t0);
+    assert.equal(done.completed, true);
+    assert.equal(done.run, 1);
+    assert.equal(done.reopensAt, t0 + WEEK);
+    const row = featRows(state).find((r) => r.id === 'tottlys_toys');
+    assert.equal(row.complete, true);
+    assert.equal(row.reopensAt, t0 + WEEK);
+    assert.equal(reopenText(row.reopensAt, t0), 'Opens again in 8 game days (about 32 hours).');
+    assert.equal(reopenText(row.reopensAt, t0 + 2 * GAME_DAY_MS + 5000), 'Opens again in 6 game days (about 24 hours).');
+    assert.equal(reopenText(row.reopensAt, t0 + WEEK - 30 * 60_000), 'Opens again in about 30 minutes.');
+    assert.equal(incrementFeat(state, 'tottlys_toys', 1, {}, t0 + WEEK - 1).reason, 'complete');
+    assert.deepEqual(reopenDueFeats(state, t0 + WEEK - 1), []);
+    assert.deepEqual(reopenDueFeats(state, t0 + WEEK), ['tottlys_toys']);
+    assert.equal(state.progress.tottlys_toys.value, 0);
+    assert.equal(isFeatComplete(state, 'tottlys_toys'), false);
+    assert.equal(reopensAt(state, 'tottlys_toys'), 0);
+    assert.equal(state.progress.tottlys_toys.runs, 1);
+  });
+
+  it('gives another rock for the next finish, without the first-contribution badges', () => {
+    const state = normalizeSoloFeatState({ openedAt: 1000 });
+    const first = incrementFeat(state, 'qurazy_quoin_collecting', 1, {}, 2000);
+    assert.ok(first.counters.some((c) => c.counter === 'feats:contributed'));
+    assert.ok(first.grants.includes('quick_on_your_feat'));
+    finish(state, 'qurazy_quoin_collecting', 3000);
+    assert.equal(state.rocks, 1);
+    // A week on, the next increment reopens it first. Quick on Your Feat and feats:contributed sit behind the first contribution ever (inc_feats.js:52).
+    const again = incrementFeat(state, 'qurazy_quoin_collecting', 1, {}, 3000 + WEEK);
+    assert.equal(again.reopened, true);
+    assert.equal(again.counted, true);
+    assert.equal(again.value, 1);
+    assert.equal(again.firstContribution, false);
+    assert.equal(again.vogText, '');
+    assert.deepEqual(again.counters, []);
+    assert.deepEqual(again.grants, ['down_to_the_wire']);
+    const second = incrementFeat(state, 'qurazy_quoin_collecting', 2, {}, 4000 + WEEK);
+    assert.equal(second.completed, true);
+    assert.equal(second.run, 2);
+    assert.equal(state.rocks, 2);
+    // feats_gather_rewards counts each run; feats:contributed and the epic counters do not come back.
+    assert.deepEqual(second.counters, [{ counter: 'feats:contributed_to', amount: 1 }]);
+    assert.equal(state.progress.qurazy_quoin_collecting.runs, 2);
+  });
+
+  it('never counts an epic again on a repeat run', () => {
+    const state = normalizeSoloFeatState({ openedAt: 1 });
+    // Every epic keeps an unwired Feat, so epics_completed cannot fire solo; a repeat must not add any epic counter either.
+    for (const epic of [2, 4]) assert.ok(WIRED_FEATS.filter((f) => f.epic_id === epic).length < SOLO_FEATS.filter((f) => f.epic_id === epic).length);
+    const t = 10_000;
+    const a = finish(state, 'hi_signs_1', t);
+    assert.ok(!a.counters.some((c) => c.counter.startsWith('epics_completed')));
+    const b = finish(state, 'hi_signs_1', t + WEEK + 1);
+    assert.equal(b.run, 2);
+    assert.ok(!b.counters.some((c) => c.counter.startsWith('epics_completed') || c.counter.startsWith('epics_contributed')));
+  });
+
+  it('frees the per-animal caps of the reopened Feat only', () => {
+    const state = normalizeSoloFeatState({ openedAt: 1 });
+    state.caps['crab:GX:hug'] = 1;
+    state.caps['kitty:GX:k0'] = 3;
+    state.caps['times_fed_for_feat:GX:npc_piggy:0'] = 3;
+    state.caps['other:thing'] = 1;
+    finish(state, 'tottlys_toys', 100);
+    reopenDueFeats(state, 100 + WEEK);
+    assert.equal(Object.keys(state.caps).length, 4, 'a toy Feat owns no caps');
+    finish(state, 'animal_love', 200);
+    assert.equal(incrementFeat(state, 'animal_love', 1, { cap: { key: 'crab:GX:hug', max: 1 } }, 300).reason, 'complete');
+    reopenDueFeats(state, 200 + WEEK);
+    assert.deepEqual(Object.keys(state.caps), ['other:thing']);
+    assert.equal(incrementFeat(state, 'animal_love', 1, { cap: { key: 'crab:GX:hug', max: 1 } }, 201 + WEEK).counted, true);
+    for (const owner of CAP_OWNERS) assert.ok(owner.feats.every((id) => FEAT_BY_ID[id]?.wired), owner.prefix);
+  });
+
+  it('names every cap prefix the call sites use', () => {
+    const src = (f) => readFileSync(join(ROOT, 'public/js/features', f), 'utf8');
+    assert.match(src('crabs-feature.js'), /key: `crab:/);
+    assert.match(src('heli-kitties-feature.js'), /key: `kitty:/);
+    assert.equal(FEED_CAP.name, 'times_fed_for_feat');
+    const prefixes = CAP_OWNERS.map((o) => o.prefix);
+    for (const p of ['crab:', 'kitty:', 'times_fed_for_feat:']) assert.ok(prefixes.includes(p), p);
+  });
+
+  it('keeps old saves finished, and opens them a week after the stored finish', () => {
+    // A G143 save: value at goal, completedAt set, no runs.
+    const old = normalizeSoloFeatState({ progress: { streaking: { value: 5, contributedAt: 10, completedAt: 1_000_000 } } });
+    assert.equal(isFeatComplete(old, 'streaking'), true);
+    assert.equal(old.progress.streaking.runs, 1);
+    assert.equal(reopensAt(old, 'streaking'), 1_000_000 + WEEK);
+    assert.deepEqual(reopenDueFeats(old, 1_000_000 + WEEK - 1), []);
+    assert.deepEqual(reopenDueFeats(old, 1_000_000 + WEEK), ['streaking']);
+    // No completedAt at all: it reads as finished at time 1, so it is open again at once.
+    const bare = normalizeSoloFeatState({ progress: { streaking: { value: 5 } } });
+    assert.equal(bare.progress.streaking.completedAt, 1);
+    assert.deepEqual(reopenDueFeats(bare, Date.now()), ['streaking']);
+    // A reopened run keeps its finish and run count through a save.
+    const again = normalizeSoloFeatState(JSON.parse(JSON.stringify(old)));
+    assert.deepEqual(again.progress.streaking, { value: 0, contributedAt: 10, completedAt: 1_000_000, runs: 1 });
+  });
+
+  it('opens a stored Feat again in the feature and gives a second rock', () => {
+    const engine = fakeEngine();
+    const at = Date.now() - WEEK - 60_000;
+    soloFeatsFeature.restore({ openedAt: at - 10, rocks: 1, progress: { tottlys_toys: { value: 10, contributedAt: at - 5, completedAt: at } } }, engine);
+    soloFeatsFeature.onTick(16, 1_000_000, engine);
+    assert.match(engine.calls.activity.join('\n'), /The Feat "Tottly's Toys" is open again, for another Small Petrified Rock\./);
+    assert.match(engine.calls.data.soloFeats, /tottlys_toys:0\/10/);
+    assert.equal(soloFeatsFeature.featsIncrement('tottlys_toys', 10, {}, engine), 10);
+    assert.equal(engine.inv.petrified_rock_small, 1);
+    assert.equal(soloFeatsFeature.save().rocks, 2);
+    assert.equal(engine.calls.data.soloFeatRuns.includes('tottlys_toys:2'), true);
+    assert.ok(!engine.calls.grant.includes('quick_on_your_feat'));
+    assert.ok(!engine.calls.achievement.some(([c]) => c === 'feats:contributed'));
+    assert.ok(engine.calls.achievement.some(([c]) => c === 'feats:contributed_to'));
+    assert.match(engine.calls.activity.join('\n'), /opens again in a game week/);
+    const reopen = Number(engine.calls.data.soloFeatReopens.split(':')[1]);
+    assert.ok(reopen > WEEK - 5000 && reopen <= WEEK, String(reopen));
+  });
+
+  it('QA route: featweekago reopens the Feat, featdoneago leaves it Done', () => {
+    const run = (params) => {
+      const engine = fakeEngine({ param: (k) => params[k] ?? null });
+      soloFeatsFeature.restore(undefined, engine);
+      soloFeatsFeature.onStreetEnter({ tsid: 'GLI32G3NUTD100I' }, engine);
+      return engine;
+    };
+    const week = run({ featdemo: 'animal_love', featweekago: '1' });
+    assert.match(week.calls.data.soloFeats, /animal_love:0\/50/);
+    assert.match(week.calls.activity.join('\n'), /is open again/);
+    const nearly = run({ featdemo: 'animal_love', featweekago: '1', featprogress: '49' });
+    assert.match(nearly.calls.data.soloFeats, /animal_love:49\/50/);
+    assert.equal(soloFeatsFeature.featsIncrement('animal_love', 1, {}, nearly), 1);
+    assert.equal(nearly.inv.petrified_rock_small, 1);
+    assert.match(nearly.calls.data.soloFeatRuns, /animal_love:2/);
+    assert.ok(!nearly.calls.grant.includes('quick_on_your_feat'));
+    const done = run({ featdemo: 'animal_love', featdoneago: '2' });
+    assert.match(done.calls.data.soloFeats, /animal_love:50\/50/);
+    const left = Number(done.calls.data.soloFeatReopens.split(':')[1]);
+    assert.ok(Math.abs(left - 6 * GAME_DAY_MS) < 5000, String(left));
   });
 });

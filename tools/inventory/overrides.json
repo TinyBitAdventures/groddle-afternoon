@@ -1143,14 +1143,14 @@
   "register": "G150"
  },
  "achievement:student_of_artifactology": {
-  "status": "missing",
-  "reason": "needs whole artifacts, and solo Feats give at most 10 Small Petrified Rocks a save (G143): about a 1.6% chance of one artifact from all ten (rollCrack). Assembly works (9aae153a); more rocks wait on G171",
+  "status": "source",
+  "reason": "3 artifacts from cracked petrified rocks: solo Feats repeat each game week (Austin 10-25, desk ROCKS), ten Small rocks a week; a 2,000-run simulation through rollCrack and the real drop tables needs ~157 rocks (p10-p90 101-237), about 16 game weeks (~21 real days) of all ten Feats",
   "register": "G171"
  },
  "achievement:qualified_artifactologist": {
   "status": "missing",
-  "reason": "needs whole artifacts, and solo Feats give at most 10 Small Petrified Rocks a save (G143): about a 1.6% chance of one artifact from all ten (rollCrack). Assembly works (9aae153a); more rocks wait on G171",
-  "register": "G171"
+  "reason": "10 artifacts needs ~1,800 Small rocks (p10-p90 1,064-3,160; rollCrack simulation): ~180 game weeks (~8 months) of all ten weekly Feats, so not reachable in practice; a faster solo source would open it (G195)",
+  "register": "G195"
  },
  "item:portal": {
   "status": "unbuilt_original",

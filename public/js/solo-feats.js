@@ -38,8 +38,32 @@
  * (feats_get 15-35, feats_get_current 295-309), years apart. A solo save
  * cannot replay that calendar, so every wired Feat is open at once (what the
  * source's own config.enable_all_the_feats switch did, inc_feats.js:21),
- * shown in game_day order, and each completes once per save.
+ * shown in game_day order.
+ *
+ * WEEKLY FEATS (register G171). Austin 2026-10-25 (decision desk ROCKS): a
+ * finished Feat opens again one game week later, for another Small rock. The
+ * source never re-ran a Feat (each ran once on its game_day), so this is a
+ * solo adaptation. A game week is the remake's own calendar week:
+ * game-day.js DAY_NAMES has eight days (Hairday to Fabday) and GAME_DAY_MS
+ * is four real hours, so GAME_WEEK_MS is 8 x 4 h = 32 real hours, counted
+ * from the moment the Feat was finished (progress.completedAt). On reopening
+ * the run's progress goes back to 0 and the Feat's own per-animal caps are
+ * dropped (the source's *_for_feat maps belonged to one Feat run).
+ *
+ * What a repeat run counts, read from players/inc_feats.js:
+ *  - feats:contributed, epics_contributed:<epic> and quick_on_your_feat sit
+ *    behind feats_has_contributed(feat_id) (52-72), which stays true for good
+ *    once feats.feats[feat_id] is written (feats_gather_rewards 278, checked
+ *    at 286). Keyed by Feat id, so a repeat run of the same Feat never counts
+ *    them again: Feat First, Quick on Your Feat and Five Feat Under ("five
+ *    amazing feats", five different Feats) are not re-earned by repeats.
+ *  - feats:contributed_to is feats_gather_rewards' own counter (281), once per
+ *    rewards handed out, so it counts each completed run. No badge reads it.
+ *  - epics_completed:<epic> counts once, when the epic's last Feat is first
+ *    finished.
  */
+
+import { DAY_NAMES, GAME_DAY_MS } from './game-day.js?v=dametime-1';
 
 export const SOLO_FEATS_ID = 'solo-feats';
 export const REWARD_ITEM = 'petrified_rock_small';
@@ -54,6 +78,22 @@ export const LOST_COMMIT_TEXT = 'Whoops! You lost your contribution to the "… 
 export const QUICK_MS = 30 * 60 * 1000;
 /** location.js:1045: streaking counts at 1,000 px from where you entered. */
 export const STREAK_PX = 1000;
+/** game-day.js: eight days a week (DAY_NAMES), four real hours a day. */
+export const GAME_WEEK_DAYS = DAY_NAMES.length;
+export const GAME_WEEK_MS = GAME_WEEK_DAYS * GAME_DAY_MS;
+
+/**
+ * The per-animal caps each Feat owns (state.caps key prefixes), dropped when
+ * that Feat opens again. Feeds share one cap between Heebo and the commit
+ * pile (FEED_CAP), so either reopening frees them.
+ */
+export const CAP_OWNERS = Object.freeze([
+  Object.freeze({ prefix: 'times_fed_for_feat:', feats: Object.freeze(['animal_love', 'pet_only']) }),
+  // crabs-feature.js crab:<street>:<verb> (npc_crab.js hugged_for_feat and the rest).
+  Object.freeze({ prefix: 'crab:', feats: Object.freeze(['animal_love']) }),
+  // heli-kitties-feature.js kitty:<street>:<kitty> (npc_kitty_chicken.js petted_for_feat).
+  Object.freeze({ prefix: 'kitty:', feats: Object.freeze(['animal_love']) }),
+]);
 
 /** inc_feats.js:189 completion_text. */
 export function completionText(title) {
@@ -389,7 +429,12 @@ export function createSoloFeatState() {
 }
 
 /**
- * progress: featId -> { value, contributedAt, completedAt }.
+ * progress: featId -> { value, contributedAt, completedAt, runs }: value is
+ * this run's count, contributedAt the first contribution ever (the badge
+ * gate), completedAt the last finish (its reopening is a game week later),
+ * runs how many times it has been finished. Saves from before G171 have no
+ * runs: a finished Feat reads as one run, and its reopening comes from its
+ * stored completedAt.
  * pending: pet_only's not-yet-committed pile (feats.to_commit).
  * caps: "<key>" -> times counted (once-per-crab, three-per-kitty limits).
  * streaked: "<day>|<tsid>" keys (location.js 1046-1050 streaking_increments).
@@ -402,9 +447,10 @@ export function normalizeSoloFeatState(seed = {}) {
     if (!row || typeof row !== 'object') continue;
     const value = Math.min(int(row.value), f.goal);
     const contributedAt = int(row.contributedAt);
-    const completedAt = int(row.completedAt);
+    const completedAt = int(row.completedAt) || (value >= f.goal ? 1 : 0);
+    const runs = Math.max(int(row.runs), completedAt ? 1 : 0);
     if (!value && !contributedAt && !completedAt) continue;
-    progress[f.id] = { value, contributedAt, completedAt: value >= f.goal ? completedAt || 1 : 0 };
+    progress[f.id] = { value, contributedAt, completedAt, runs };
   }
   const caps = {};
   for (const [k, v] of Object.entries(seed?.caps || {})) {
@@ -426,7 +472,57 @@ export function normalizeSoloFeatState(seed = {}) {
 }
 
 export function featProgress(state, featId) {
-  return state.progress[featId] || { value: 0, contributedAt: 0, completedAt: 0 };
+  return state.progress[featId] || { value: 0, contributedAt: 0, completedAt: 0, runs: 0 };
+}
+
+/** When a finished Feat opens again (0 while it is open). */
+export function reopensAt(state, featId) {
+  const f = FEAT_BY_ID[featId];
+  const p = featProgress(state, featId);
+  if (!f?.wired || p.value < f.goal) return 0;
+  return (p.completedAt || 1) + GAME_WEEK_MS;
+}
+
+/**
+ * Open again every finished Feat whose game week is up: this run's progress
+ * goes back to 0 and the caps it owns (CAP_OWNERS) are dropped. Returns the
+ * ids reopened. `only` limits it to one Feat.
+ */
+export function reopenDueFeats(state, now = Date.now(), only = null) {
+  const t = int(now);
+  const out = [];
+  for (const f of WIRED_FEATS) {
+    if (only && f.id !== only) continue;
+    const at = reopensAt(state, f.id);
+    if (!at || t < at) continue;
+    state.progress[f.id].value = 0;
+    if (f.commit) state.pending = 0;
+    for (const owner of CAP_OWNERS) {
+      if (!owner.feats.includes(f.id)) continue;
+      for (const key of Object.keys(state.caps)) if (key.startsWith(owner.prefix)) delete state.caps[key];
+    }
+    out.push(f.id);
+  }
+  return out;
+}
+
+/**
+ * The panel line under a Done Feat: "Opens again in 7 game days (about 28
+ * hours)." Game days first (the remake's calendar), then real time.
+ */
+export function reopenText(at, now = Date.now()) {
+  const left = Math.max(0, int(at) - int(now));
+  if (!left) return 'Opens again now.';
+  const minutes = Math.ceil(left / 60_000);
+  const real = minutes < 90 ? `${minutes} minute${minutes === 1 ? '' : 's'}` : `${Math.round(minutes / 60)} hours`;
+  if (left < GAME_DAY_MS) return `Opens again in about ${real}.`;
+  const days = Math.round(left / GAME_DAY_MS);
+  return `Opens again in ${days} game day${days === 1 ? '' : 's'} (about ${real}).`;
+}
+
+/** Ever finished (any run): the epic test and the Done-before line. */
+export function featRuns(state, featId) {
+  return featProgress(state, featId).runs || 0;
 }
 
 export function isFeatComplete(state, featId) {
@@ -459,14 +555,15 @@ export function incrementFeat(state, featId, amount = 1, opts = {}, now = Date.n
   if (!f || !f.wired) return { ...none, reason: 'not_wired' };
   const n = int(amount);
   if (!n) return { ...none, reason: 'no_amount' };
-  if (isFeatComplete(state, featId)) return { ...none, reason: 'complete' };
+  const reopened = reopenDueFeats(state, now, featId).length > 0;
+  if (isFeatComplete(state, featId)) return { ...none, reason: 'complete', reopensAt: reopensAt(state, featId) };
   if (opts?.cap?.key) {
     const key = String(opts.cap.key).slice(0, 120);
     const max = Math.max(1, int(opts.cap.max) || 1);
     if ((state.caps[key] || 0) >= max) return { ...none, reason: 'capped' };
     state.caps[key] = (state.caps[key] || 0) + 1;
   }
-  const row = state.progress[featId] || (state.progress[featId] = { value: 0, contributedAt: 0, completedAt: 0 });
+  const row = state.progress[featId] || (state.progress[featId] = { value: 0, contributedAt: 0, completedAt: 0, runs: 0 });
   const before = row.value;
   row.value = Math.min(f.goal, before + n);
   const counters = [];
@@ -482,15 +579,20 @@ export function incrementFeat(state, featId, amount = 1, opts = {}, now = Date.n
   // inc_feats.js:104-106.
   grants.push('down_to_the_wire');
   const completed = row.value >= f.goal && before < f.goal;
+  let run = 0;
   if (completed) {
+    const firstRun = !row.runs;
     row.completedAt = int(now) || 1;
+    row.runs = (row.runs || 0) + 1;
+    run = row.runs;
     state.rocks += 1;
-    // inc_feats.js:58-69: every Feat of the epic done (the rewarded ones plus this one).
-    if (f.epic_id) {
-      const done = SOLO_FEATS.filter((o) => o.epic_id === f.epic_id && isFeatComplete(state, o.id)).length;
+    // inc_feats.js:58-69: every Feat of the epic done (the rewarded ones plus
+    // this one). Once: only the first finish of the epic's last Feat.
+    if (f.epic_id && firstRun) {
+      const done = SOLO_FEATS.filter((o) => o.epic_id === f.epic_id && featRuns(state, o.id) > 0).length;
       if (done === featsInEpic(f.epic_id)) counters.push({ counter: `epics_completed:${f.epic_id}`, amount: 1 });
     }
-    // inc_feats.js:281 feats_gather_rewards.
+    // inc_feats.js:281 feats_gather_rewards: once per rewards handed out, so every run.
     counters.push({ counter: 'feats:contributed_to', amount: 1 });
   }
   const remaining = f.goal - row.value;
@@ -504,6 +606,9 @@ export function incrementFeat(state, featId, amount = 1, opts = {}, now = Date.n
     // inc_feats.js:74-83: the vog_text only on the first contribution.
     vogText: firstContribution ? vogTextFor(featId, remaining) : '',
     completed,
+    run,
+    reopened,
+    reopensAt: completed ? row.completedAt + GAME_WEEK_MS : 0,
     remaining,
     counters,
     grants,
@@ -511,7 +616,8 @@ export function incrementFeat(state, featId, amount = 1, opts = {}, now = Date.n
 }
 
 /** feats_increment_for_commit: pile up pet_only points on this street. */
-export function addPending(state, amount) {
+export function addPending(state, amount, now = Date.now()) {
+  reopenDueFeats(state, now, 'pet_only');
   if (isFeatComplete(state, 'pet_only')) return 0;
   // Never pile up more than the goal still needs.
   const room = Math.max(0, remainingFor(state, 'pet_only') - state.pending);
@@ -550,11 +656,13 @@ export function streakCheck(state, { tsid, dayKey, entry, exit, nekkid, realStre
   return { ok: true, distance };
 }
 
-/** Panel rows, in game_day order. */
+/** Panel rows, in game_day order (reopensAt: when a finished one opens again). */
 export function featRows(state) {
   return WIRED_FEATS.map((f) => {
     const p = featProgress(state, f.id);
     return {
+      reopensAt: reopensAt(state, f.id),
+      runs: p.runs || 0,
       id: f.id,
       title: f.title,
       what: f.what,
