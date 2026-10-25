@@ -320,27 +320,31 @@ export const QUOIN_CLASSES = Object.freeze({
 });
 
 /**
- * The classes an ordinary street quoin of each type can be. The placed
- * quoins' own class_name values are not in the recovered street data, so a
- * street spot takes one of these by a stable hash: the fast tiny, small,
- * slow medium, long large and slow tiny tiers (Baqala, quoin hub, party,
- * Paradise, rainbow run and the placement tester belong to their own places).
- * Mystery quoins have no class in the source, so they use the iMG tiers.
+ * The classes an ordinary street quoin of each type can be: [small, big].
+ * The placed quoins' own class_name values are not in the recovered street
+ * data. The source's one written placement rule is the Purple Emperor's
+ * (purple_emperor.js 58-75): 95% a small random class, 5% slow medium-large;
+ * Austin chose it for street spots (G257, desk QUOINTIER). Favor and time use
+ * their small and slow medium classes the same way; mystery quoins have no
+ * class in the source, so they use the iMG pair.
  */
 export const STREET_QUOIN_CLASSES = Object.freeze({
-  xp: Object.freeze(['fast tiny xp', 'small random xp', 'slow medium-large xp', 'long random large xp', 'slow tiny xp']),
-  mood: Object.freeze(['fast tiny mood', 'small random mood', 'slow medium-large mood', 'long random large mood', 'slow tiny mood']),
-  energy: Object.freeze(['fast tiny energy', 'small random energy', 'slow medium-large energy', 'long random large energy', 'slow tiny energy']),
-  currants: Object.freeze(['fast tiny currants', 'small random currants', 'slow medium-large currants', 'long random large currants', 'slow tiny currants']),
-  favor: Object.freeze(['small random favor', 'slow medium random favor', 'long large random favor']),
-  time: Object.freeze(['fast tiny time', 'small time', 'slow medium random time', 'long large random time', 'slow tiny time']),
+  xp: Object.freeze(['small random xp', 'slow medium-large xp']),
+  mood: Object.freeze(['small random mood', 'slow medium-large mood']),
+  energy: Object.freeze(['small random energy', 'slow medium-large energy']),
+  currants: Object.freeze(['small random currants', 'slow medium-large currants']),
+  favor: Object.freeze(['small random favor', 'slow medium random favor']),
+  time: Object.freeze(['small time', 'slow medium random time']),
 });
 
-/** The class a street's natural quoin `index` of `typeId` is ('' for qurazy: it never respawns). */
+/** purple_emperor.js 71: is_chance(0.05) picks the big class. */
+export const STREET_BIG_QUOIN_CHANCE = 0.05;
+
+/** The class a street's natural quoin `index` of `typeId` is ('' for qurazy: it never respawns); stable per spot. */
 export function streetQuoinClass(streetTsid, index, typeId) {
   if (typeId === 'qurazy') return '';
-  const list = STREET_QUOIN_CLASSES[typeId] || STREET_QUOIN_CLASSES.xp;
-  return list[stableHash(`${streetTsid}#${index}`) % list.length];
+  const [small, big] = STREET_QUOIN_CLASSES[typeId] || STREET_QUOIN_CLASSES.xp;
+  return (stableHash(`${streetTsid}#${index}`) % 10000) / 10000 < STREET_BIG_QUOIN_CHANCE ? big : small;
 }
 
 /** respawn_time of a class in ms; Infinity for none (qurazy, unknown). */

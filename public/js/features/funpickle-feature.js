@@ -226,14 +226,8 @@ function spawnFind(engine) {
   const p = st.placed;
   if (!p || !engine.PIXI || !engine.entityLayer) return;
   const y = surfaceY(engine, p.x, p.y);
-  // A soft glow, like the Musicblock street drops, so a rare find reads as one.
-  const glow = new engine.PIXI.Graphics();
-  glow.ellipse(0, 0, 54, 22).fill({ color: 0xd8f07a, alpha: 0.22 });
-  glow.x = p.x;
-  glow.y = y - 20;
-  glow.zIndex = 26;
-  glow.eventMode = 'none';
-  engine.entityLayer.addChild(glow);
+  // No drawn glow round it (Austin, desk FUNTUNE): the original never marked items on the ground.
+  const glow = null;
   const sprite = stillSprite(engine, p.x, y);
   const target = engine.register({
     classId: FUNPICKLE,

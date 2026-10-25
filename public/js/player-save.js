@@ -1,6 +1,6 @@
 /** Persistent player systems + per-street world snapshot. */
 import { normalizeShrineState } from './shrines.js?v=spinning-wheel-test-3';
-import { normalizeQuoinState } from './quoins.js?v=g260-1';
+import { normalizeQuoinState } from './quoins.js?v=desk2-1';
 import { normalizeToolConditionState } from './tools.js?v=woodcutting-test-2';
 import { normalizeSkillState } from './skills.js';
 import { normalizeFoodState } from './food.js?v=food-memory-4';

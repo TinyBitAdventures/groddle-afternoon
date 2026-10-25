@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 466,
+  "commits": 467,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "The stun orb, secret markers, poisoned trees and Giant Love play Tiny Speck's own animations, and race winners get the real rainbow"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "Speech bubbles sit where the original put them, and an Icon telling its story skips that walk-in's gift"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "The Magic Rock stands on your home street too, Camera Mode leaves C alone while you cultivate, and Shift+C away from home just clicks"
    }
   ]
  },

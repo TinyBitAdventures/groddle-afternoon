@@ -9,13 +9,14 @@ import { fileURLToPath } from 'node:url';
 import {
   QUOIN_CLASSES,
   QUOIN_TYPES,
+  STREET_BIG_QUOIN_CHANCE,
   STREET_QUOIN_CLASSES,
   noteQuoinRespawn,
   quoinRespawnMs,
   releaseQuoinRespawns,
   streetQuoinClass,
 } from '../public/js/quoins.js';
-import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=player-save-12';
+import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=player-save-13';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -90,12 +91,14 @@ describe('street quoin classes', () => {
     assert.ok(STREET_QUOIN_CLASSES.xp.includes(streetQuoinClass('GLI2V0UN7RD1T2J', 3, 'mystery')), 'mystery uses the iMG tiers');
   });
 
-  it('is stable per street spot and spreads across tiers', () => {
+  it('is stable per street spot; about 5% are the big class (G257, purple_emperor.js 58-75)', () => {
     const a = streetQuoinClass('GLI2V0UN7RD1T2J', 2, 'currants');
     assert.equal(streetQuoinClass('GLI2V0UN7RD1T2J', 2, 'currants'), a);
-    const seen = new Set();
-    for (let i = 0; i < 60; i += 1) seen.add(streetQuoinClass(`street${i}`, i % 8, 'currants'));
-    assert.ok(seen.size >= 4, [...seen].join(', '));
+    let big = 0;
+    const n = 4000;
+    for (let i = 0; i < n; i += 1) if (streetQuoinClass(`street${i}`, i % 8, 'currants') === 'slow medium-large currants') big += 1;
+    assert.ok(big / n > 0.035 && big / n < 0.065, `${big} of ${n}`);
+    assert.equal(STREET_BIG_QUOIN_CHANCE, 0.05);
   });
 
   it('fast tiny currants: back 40 s after the grab, not before', () => {

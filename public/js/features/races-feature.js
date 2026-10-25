@@ -91,7 +91,7 @@ import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { startCrowns } from './crowns-feature.js?v=g268-1';
 import { textureFromUrl } from '../textures.js';
-import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g260-1';
+import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=desk2-1';
 import { moodMax } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
 

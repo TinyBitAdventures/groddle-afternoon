@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-5';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-106';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-107';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -425,7 +425,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-12';
+} from './js/player-save.js?v=player-save-13';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -772,7 +772,7 @@ import {
   releaseQuoinRespawns,
   quoinClassType,
   resetStreetQuoinsForNewDay,
-} from './js/quoins.js?v=g260-1';
+} from './js/quoins.js?v=desk2-1';
 import {
   buildHubMapView,
   mapClickTravel,
