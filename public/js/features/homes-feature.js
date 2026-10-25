@@ -144,7 +144,7 @@ import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tow
 import { towerApi } from './home-tower-feature.js?v=home-tower-9';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-6';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-7';
 import { patchesFeature } from './patches-feature.js?v=patches-8';
 import { plotLabel } from '../patches.js';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
@@ -2120,16 +2120,37 @@ let pourLast = '';
 let wotdDemoDone = false;
 let wotdPlaced = false;
 
+/**
+ * G267: the home's yes / no questions are confirms, not quest offers: two
+ * buttons, no Magic Rock card, no New Quest heading and no quest sound. The
+ * source asks each with two choices: wine_of_the_dead.js 187-199 prompts_add
+ * (ok / cancel), CultManager.as 119-126 warning_cdVO, HouseStylesDialog.as
+ * 113-118 and HouseExpandDialog.as 202-209 cdVO (escape_value false: Escape is
+ * the no). engine.scriptedDialogue draws the plain prompt card (familiar.js
+ * familiarLook), as game.js confirmEmblemSpend does.
+ */
+function confirmDialog(engine, { title, kicker, beats, yes, no, onYes }) {
+  engine.scriptedDialogue({
+    title,
+    kicker,
+    beats,
+    cancelable: true,
+    primaryLabel: yes,
+    cancelLabel: no,
+    onComplete: onYes,
+  });
+}
+
 /** verbs.pour handler: "Please Confirm!", then the pour (every pour route asks first). */
 function confirmPour(engine, row) {
   if (!row) return false;
-  engine.offerQuestDialogue({
+  confirmDialog(engine, {
     title: WOTD_TEXT.confirmTitle,
     kicker: 'Wine of the Dead',
     beats: [{ text: pourConfirmText(row), response: WOTD_TEXT.yes }],
-    acceptLabel: WOTD_TEXT.yes,
-    declineLabel: WOTD_TEXT.nevermind,
-    onAccept: () => applyPour(engine, row),
+    yes: WOTD_TEXT.yes,
+    no: WOTD_TEXT.nevermind,
+    onYes: () => applyPour(engine, row),
   });
   pourLast = `confirm:${row.id}`;
   engine.setData('homePour', pourLast);
@@ -2472,13 +2493,13 @@ function confirmStyle(engine, key) {
   const { cost } = styleChoicesHere(engine);
   const text = styleText();
   const yard = styleRoom() === 'yard';
-  engine.offerQuestDialogue({
+  confirmDialog(engine, {
     title: text.confirmTitle,
     kicker: text.button,
     beats: [{ text: confirmText(cost, styleRoom()), response: text.yes }],
-    acceptLabel: text.yes,
-    declineLabel: text.no,
-    onAccept: () => (yard ? applyYardStyle(engine, key) : applyStreetStyle(engine, key)),
+    yes: text.yes,
+    no: text.no,
+    onYes: () => (yard ? applyYardStyle(engine, key) : applyStreetStyle(engine, key)),
   });
 }
 
@@ -2968,17 +2989,21 @@ function beginMove(engine, id) {
   renderBar(engine);
 }
 
+/** CultManager.as 119-124: the placement warning's confirm. */
+export const CULT_WARNING_TEXT = Object.freeze({ title: 'Are you sure?', yes: 'Yes, Do It!!', no: 'No, Forget It' });
+
 function beginCultivate(engine, protoClass, opts = {}) {
   const def = cultivationDef(protoClass);
   if (def?.warning && !opts.confirmed) {
-    // cultivation_get_available placement_warning before the Tower plans are bought.
-    engine.offerQuestDialogue({
-      title: def.label,
-      kicker: 'Cultivate',
-      beats: [{ text: def.warning, response: 'Yes' }],
-      acceptLabel: 'Yes',
-      declineLabel: 'Nevermind',
-      onAccept: () => beginCultivate(engine, protoClass, { confirmed: true }),
+    // cultivation_get_available placement_warning before the Tower plans are bought, asked with
+    // CultManager.as warning_cdVO 119-126: "Are you sure?", Yes, Do It!! / No, Forget It.
+    confirmDialog(engine, {
+      title: CULT_WARNING_TEXT.title,
+      kicker: def.label,
+      beats: [{ text: def.warning, response: CULT_WARNING_TEXT.yes }],
+      yes: CULT_WARNING_TEXT.yes,
+      no: CULT_WARNING_TEXT.no,
+      onYes: () => beginCultivate(engine, protoClass, { confirmed: true }),
     });
     return;
   }
@@ -3076,16 +3101,16 @@ function confirmUnexpand(engine) {
     engine.toast(quote.msg, 2400);
     return quote;
   }
-  engine.offerQuestDialogue({
+  confirmDialog(engine, {
     title: UNEXPAND_TEXT.title,
     kicker: 'Decorate',
     beats: [
       { text: `${UNEXPAND_TEXT.body} ${UNEXPAND_TEXT.refund} ${refundList(quote.items)}.`, response: 'Un-expand it' },
       { text: UNEXPAND_TEXT.confirm, response: UNEXPAND_TEXT.yes },
     ],
-    acceptLabel: UNEXPAND_TEXT.yes,
-    declineLabel: UNEXPAND_TEXT.no,
-    onAccept: () => unexpandHouse(engine),
+    yes: UNEXPAND_TEXT.yes,
+    no: UNEXPAND_TEXT.no,
+    onYes: () => unexpandHouse(engine),
   });
   return quote;
 }

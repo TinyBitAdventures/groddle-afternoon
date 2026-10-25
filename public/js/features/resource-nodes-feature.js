@@ -83,7 +83,7 @@ import {
   tickResourceNode,
 } from '../resource-nodes.js';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
-import { acceptOffer, declineOffer, npcQuestOffers, questStatus } from '../quest-offers.js';
+import { acceptOffer, markOffered, npcQuestOffers, putOffOffer, questStatus } from '../quest-offers.js';
 import { vpSequence } from '../quest-rooms/vp-overlay.js?v=ffw-1';
 
 export const RESOURCE_FEATURE_ID = 'resource-nodes';
@@ -1087,25 +1087,41 @@ function checkFireflyOffer(engine) {
   vpSequence(engine, FIREFLY_OFFER_LINES).then(() => {
     engine.setData('fireflyOffer', 'offered');
     engine.playSound('QUEST_OFFER', { volume: 0.55 });
+    // G267: firefly_whistle has onStarted (firefly_whistle.js 52), so quest.js get_status
+    // 1105-1117 gives its offer both choices: accept_and_start and "Not right now"
+    // (value accept: in the log, not started, G229). It is_emergency (12): the rays, no X.
+    // Under no_starting_quests the accept is disabled (ConversationManager.as 582-585).
+    const startable = card.startable === true;
+    // quests_offer lists it as offered: pushed off screen unanswered, the familiar shows the
+    // emergency again (QuestsDialog.as onEmergencyTick 335-378; quest-offers-feature presentOffer).
+    markOffered(engine.questState, FIREFLY_WHISTLE_QUEST, Date.now());
     engine.offerQuestDialogue({
       title: card.def.title,
       kicker: 'Magic Rock',
       beats: card.beats,
       acceptLabel: card.acceptLabel,
       declineLabel: card.declineLabel,
+      declinable: startable,
+      urgent: card.emergency === true,
+      acceptBlocked: startable && engine.query?.('noStartingQuests', engine) === true ? 'Starting new quests is not allowed right now!' : '',
       onAccept: () => {
         const result = acceptOffer(engine.questState, FIREFLY_WHISTLE_QUEST, fireflyQuestCtx(engine));
         engine.setData('fireflyOffer', result.ok ? 'accepted' : result.reason || 'failed');
         if (result.ok) engine.pushActivity(`New quest: ${card.def.title}`);
         engine.save();
       },
-      onDecline: () => {
-        // A familiar offer: it waits in the quest log (declineOffer, source 'familiar').
-        declineOffer(engine.questState, FIREFLY_WHISTLE_QUEST, Date.now());
-        engine.setData('fireflyOffer', 'declined');
-        engine.pushActivity(`You can accept “${card.def.title}” from your quest log later.`);
+      onDecline: startable ? () => {
+        // "Not right now": the quest waits in the log with Try it (quest-offers-feature putOffCards).
+        const result = putOffOffer(engine.questState, FIREFLY_WHISTLE_QUEST, Date.now());
+        engine.setData('fireflyOffer', result.ok ? 'putoff' : result.reason || 'failed');
+        if (result.ok) {
+          engine.pushActivity(`“${card.def.title}” is in your quest log, not started yet. Choose Try it there when you are ready.`);
+          // QuestManager.as 345-351: just accepting opens the Quests dialog on the quest.
+          if (typeof document !== 'undefined' && document.getElementById('quest-panel')?.hidden) document.getElementById('quest-btn')?.click();
+        }
         engine.save();
-      },
+        engine.updateHud?.();
+      } : null,
     });
     if (engine.param('fireflyofferautoplay') === 'accept') setTimeout(() => engine.acceptOpenOffer(), 400);
   });

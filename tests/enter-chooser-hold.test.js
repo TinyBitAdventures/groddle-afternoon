@@ -44,7 +44,8 @@ describe('offers wait for the chooser and verb menus', () => {
   it('a scripted dialog opened over either is held and shown once both have closed', () => {
     const open = game.slice(game.indexOf('function openScriptedQuestDialogue({'));
     assert.match(open, /^function openScriptedQuestDialogue\(\{[\s\S]{0,600}?\}\) \{\s*\/\/ G217[^\n]*\n\s*if \(holdScriptedDialog\(arguments\[0\]\)\) return;\s*(?:\/\/ G225[^\n]*\n\s*if \(!inLog\) )?closeQuestPanel\(\);/);
-    assert.match(game, /function holdScriptedDialog\(opts\) \{\s*if \(!opts \|\| !\(menuTarget \|\| enterChooser\?\.isOpen\(\)\)\) return false;/);
+    // G267: also held while an emergency offer is up (a prompt or line, not another offer).
+    assert.match(game, /function holdScriptedDialog\(opts\) \{(?:\s*\/\/[^\n]*)*\s*const underEmergency = !opts\?\.offer && isQuestDialogueOpen\(\) && questDialogueState\?\.urgent === true;\s*if \(!opts \|\| !\(menuTarget \|\| enterChooser\?\.isOpen\(\) \|\| underEmergency\)\) return false;/);
     assert.match(game, /function releaseHeldScriptedDialog\(\) \{\s*if \(!heldScriptedDialogs\.length \|\| menuTarget \|\| enterChooser\?\.isOpen\(\) \|\| isQuestDialogueOpen\(\) \|\| isVogOpen\(\)\) return;/);
     assert.match(game, /features\.tick\(\(1000 \/ 60\) \* dt, Date\.now\(\), engine\);\s*releaseHeldScriptedDialog\(\);/);
   });

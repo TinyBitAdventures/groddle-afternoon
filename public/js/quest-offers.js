@@ -910,6 +910,38 @@ function matchTemplate(template, value) {
 const fill = (template, vars) => String(template).replace(/\{([ab])\}/g, (_, k) => vars[k] ?? `{${k}}`);
 
 /**
+ * G267: does the offer system route this counter itself (a COUNTER_ROUTES row)?
+ * game.js's world-verb counters (quests.js applyQuestProgress) then skip the
+ * quests it handed out, which would otherwise count each pet, milk or watering twice.
+ */
+export function routesCounter(counterOrEvent) {
+  const counter = eventToCounter(counterOrEvent) || counterOrEvent;
+  return COUNTER_ROUTES.some((route) => route.counter === counter);
+}
+
+/**
+ * G267: "Go Moloko Loco, Butterfly Style" (animalkinship_milk_butterflies) was
+ * assigned to every new save at boot, outside the offer system, so it ran with
+ * no timer and no Try it. In the source it is Animal Kinship IV's quest
+ * (inc_data_skills.js 235 quest_id, 3915), offered by the familiar once that
+ * skill is learned (quests.json offerTriggers), and it is startable
+ * (animalkinship_milk_butterflies.js onStarted 69: the go_moloko_loco timer).
+ * A save holding that boot copy (active, not managed, no timer) drops it, so
+ * the familiar offers it properly. Returns true when it dropped one.
+ */
+export const BOOT_STARTER_LEFTOVERS = Object.freeze(['animalkinship_milk_butterflies']);
+export function dropBootStarterQuests(questState) {
+  const offers = ensureQuestOfferState(questState);
+  let dropped = false;
+  for (const id of BOOT_STARTER_LEFTOVERS) {
+    if (!questState.active?.[id] || offers.managed[id] || offers.timers[id]) continue;
+    delete questState.active[id];
+    dropped = true;
+  }
+  return dropped;
+}
+
+/**
  * Counter names an event advances, with route metadata.
  * @returns {{ counter: string, route: object, label: string }[]}
  */

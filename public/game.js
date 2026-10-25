@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-3';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-102';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-103';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -24,6 +24,8 @@ import {
   parseQuestConversation,
   cleanQuestMarkup,
 } from './js/quests.js';
+// G267: the world-verb quest counters skip offer-system quests; old saves drop the boot Moloko quest.
+import { dropBootStarterQuests, routesCounter } from './js/quest-offers.js';
 import {
   PHANTOM_QUEST_ID,
   REMEMBER_QUEST_ID,
@@ -5680,7 +5682,9 @@ function executeVerb(target, verbId) {
       questEvent = 'harvest_trant';
     }
     if (questEvent) {
-      const updates = applyQuestProgress(questState, questEvent, 1, pc);
+      // G267: quests the offer system handed out count routed counters from the badge event
+      // (quest-offers-feature onEvent); counting them here too doubled each pet, milk or watering.
+      const updates = applyQuestProgress(questState, questEvent, 1, pc, { skipManaged: routesCounter(questEvent) });
       for (const u of updates) {
         if (u.completed) {
           floatText(player.x, player.y - 100, `${u.def.title} ✓`, 0xffe066);
@@ -19736,7 +19740,12 @@ function openScriptedQuestDialogue({
 const heldScriptedDialogs = [];
 
 function holdScriptedDialog(opts) {
-  if (!opts || !(menuTarget || enterChooser?.isOpen())) return false;
+  // G267: a prompt or line (not another offer) that pops while an emergency offer is up waits
+  // for it to be answered. The client stacks prompts beside the quest card (PromptView.as
+  // addPrompt 330-354) and shows an emergency whatever prompts are up (QuestsDialog.as
+  // onEmergencyTick 335-340); with one card, the croak prompt used to push Hell's offer off.
+  const underEmergency = !opts?.offer && isQuestDialogueOpen() && questDialogueState?.urgent === true;
+  if (!opts || !(menuTarget || enterChooser?.isOpen() || underEmergency)) return false;
   heldScriptedDialogs.push(opts);
   if (app?.canvas) app.canvas.dataset.dialogHeld = String(heldScriptedDialogs.length);
   return true;
@@ -20561,7 +20570,10 @@ function renderBuffStrip() {
   const button = document.getElementById('buffs-btn');
   if (!strip) return;
   const now = Date.now();
-  const rows = [...listActiveBuffs(buffState, now), ...listPendingBuffs(buffState, now)];
+  // G267: timer buffs (a timed quest's clock, its time left on the chip) lead the strip,
+  // as the client adds them at the front (BuffViewManager.as 57; BuffUI.as 117-121, 294-298).
+  const rows = [...listActiveBuffs(buffState, now), ...listPendingBuffs(buffState, now)]
+    .sort((a, b) => Number(Boolean(b.def?.isTimer)) - Number(Boolean(a.def?.isTimer)));
   strip.innerHTML = '';
   strip.hidden = rows.length === 0;
   if (button) {
@@ -22814,7 +22826,8 @@ async function main() {
   await loadTransitionAssets();
   // Starter quests from mined catalog (ignore prereqs for onboarding)
   assignQuest(questState, 'animalkinship_pet_piggies', { ignorePrereq: true });
-  assignQuest(questState, 'animalkinship_milk_butterflies', { ignorePrereq: true });
+  // G267: Go Moloko Loco, Butterfly Style is Animal Kinship IV's offer, timed and startable
+  // (inc_data_skills.js 235, animalkinship_milk_butterflies.js 69): the familiar offers it.
   // Free starter skill with no skill prereqs if present
   // Starter skills arrive with their whole prerequisite chain (Alchemy II
   // brings Alchemy I, Element Handling, and so on), never as orphans.
@@ -22855,6 +22868,7 @@ async function main() {
     features.restore(savedFeatureSlices, engine);
     restoreAnimalStateCache();
     rehydrateSavedBuffs();
+    dropBootStarterQuests(questState);
     const mainQuests = ['animalkinship_pet_piggies', 'animalkinship_milk_butterflies'];
     state.questDone = mainQuests.every((id) => questState.completed.includes(id));
     handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });

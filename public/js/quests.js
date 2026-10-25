@@ -171,13 +171,18 @@ export function eventToCounter(event) {
  * @param {string} counterOrEvent
  * @param {number} [amount=1]
  * @param {object} [pc]
+ * @param {{ skipManaged?: boolean }} [opts]
  */
-export function applyQuestProgress(state, counterOrEvent, amount = 1, pc = null) {
+export function applyQuestProgress(state, counterOrEvent, amount = 1, pc = null, { skipManaged = false } = {}) {
   const counter = eventToCounter(counterOrEvent) || counterOrEvent;
   const updates = [];
   const cat = getQuestCatalog();
 
   for (const qid of Object.keys(state.active)) {
+    // G267: `skipManaged` leaves out quests the offer system handed out (quest-offers.js
+    // acceptOffer marks them managed): it counts this counter for them through its own
+    // routes, with their timers, distinct labels and familiar turn-in.
+    if (skipManaged && state.offers?.managed?.[qid]) continue;
     const q = state.active[qid];
     const def = cat[qid];
     if (!def) continue;

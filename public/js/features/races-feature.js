@@ -87,7 +87,8 @@ import {
 } from '../race-render.js?v=races-5';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-5';
 import { runStreetTransition } from '../screen-fx.js?v=card-2';
-import { CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
+import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
+import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { startCrowns } from './crowns-feature.js?v=g259-1';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=g260-1';
@@ -1198,6 +1199,21 @@ export const racesFeature = {
   travelGate() {
     if (run || starting) return { ok: false, msg: "You can't leave in the middle of a race!" };
     return null;
+  },
+
+  /**
+   * G267: location.js 2666-2671 sets no_starting_quests (with no_familiar) on
+   * every is_race or is_game location. Races are the multiplayer quest
+   * instances (quest.js 405: The Great Hog Haul, game.js on its street);
+   * games are the shared instances a ticket opens (shared_instance_manager.js
+   * 544: these race courses, Grab 'Em Good, the Hog Haul ticket and the Game
+   * of Crowns arena). There the quest log's Try buttons and an offer's
+   * accept_and_start are disabled (quest-offers-feature startBlockedReason).
+   * null elsewhere, so another feature can answer.
+   */
+  noStartingQuests(engine) {
+    const tsid = engine.streetTsid;
+    return isRaceSceneTsid(tsid) || tsid === HOG_HAUL_STREET_ID || tsid === CROWNS_STREET ? true : null;
   },
 
   physics(engine) {

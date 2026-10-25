@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 461,
+  "commits": 462,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "The Spinning Wheel, pecking chickens and the Hatchet no longer blink out once a loop"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "The Magic Rock speaks from its own cards, quoins respawn on their class timers, and prompts, Pooped and Enter behave as the client did"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "A back yard behind your house to cultivate, expand and restyle"
    }
   ]
  },
- "tests": 272,
+ "tests": 273,
  "generatedAt": "2026-10-25"
 }
