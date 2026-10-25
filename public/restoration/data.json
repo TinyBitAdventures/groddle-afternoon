@@ -820,13 +820,14 @@
    "group": "home",
    "name": "Your house and yard",
    "status": "source",
-   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).",
+   "blurb": "Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), restyle the street as any of 36 of the original 37 street styles (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).",
    "spot": "mailbox",
    "evidence": [
     "public/js/homes.js",
     "public/js/home-decor.js",
     "public/js/home-wallpaper.js",
     "public/js/home-cultivation.js",
+    "public/js/home-styles.js",
     "public/js/hi-signs.js"
    ],
    "shot": "shots/homes.webp",
@@ -2024,9 +2025,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 432,
+  "commits": 433,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Enter near several things asks which one, in the original order"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2141,14 +2147,9 @@
     "date": "2026-10-24",
     "kind": "improve",
     "text": "Release a Pocket Salmon in Jal and Samudra, three feeds per animal for Heebo, and Fertilidust counts only on living trees"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "The Grand Ol' Grinder and High-Class Hoe, made on the Tinkertool"
    }
   ]
  },
- "tests": 244,
+ "tests": 245,
  "generatedAt": "2026-10-25"
 }

@@ -129,6 +129,16 @@ import { patchesFeature } from './patches-feature.js?v=patches-7';
 import { plotLabel } from '../patches.js';
 import { WOTD_DEPLETE_MS, WOTD_TEXT, nearestPourTarget, pourButton, pourConditions, pourConfirmText } from '../wine-pour.js?v=g165-1';
 import { XP_FOR_LEVEL } from '../progression.js?v=progression-1';
+import {
+  STREET_STYLE_BY_KEY,
+  STYLE_TEXT,
+  changeForLabel,
+  confirmText,
+  streetLook,
+  streetStyleFor,
+  styleChoices,
+  switchStreetStyle,
+} from '../home-styles.js?v=g204-1';
 import { textureFromUrl } from '../textures.js';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
 
@@ -320,6 +330,12 @@ let lastNodeCheck = 0;
 let demoDone = false;
 let autoplay = null;
 let ui = null;
+/** The chosen street style (inc_homes.js cfg.style on the exterior); null: the purchase look's. */
+let streetStyle = null;
+let stylePick = null; // the style highlighted in the Change Style dialog
+let stylePreview = null; // a picked style shown on the street before you pay for it
+let styleDemoDone = false;
+let styleDialogDemoDone = false;
 
 function publish(engine) {
   if (!engine) return;
@@ -340,6 +356,9 @@ function publish(engine) {
   engine.setData('homeYard', `${cult.yardLeft},${cult.yardRight}`);
   engine.setData('homeSelected', selected ? `${selected.kind}:${selected.id}` : '');
   engine.setData('homePlacing', placing ? placing.classTsid || placing.protoClass || '' : '');
+  engine.setData('homeStreetStyle', currentStreetStyle(engine));
+  engine.setData('homeStylePick', ui?.styles && !ui.styles.hidden ? stylePick || '' : '');
+  engine.setData('homeStyleShown', stylePreview || '');
 }
 
 // ---------------------------------------------------------------------------
@@ -576,114 +595,20 @@ function spawnInteriorTargets(engine) {
 // ---------------------------------------------------------------------------
 
 /**
- * Street compositions in the source regions' own deco vocabulary
- * (Groddle Meadow, Kalavana for Firebog, Uralia), arranged around the lot.
- * Each layer: parallax factor f (0 = fixed to the sky, 1 = world), and decos
- * repeated every `every` px with deterministic jitter.
+ * The house on the lot: the look bought with the deed (js/homes.js
+ * HOME_STYLES). A street style change keeps it, as the source keeps the
+ * furniture_chassis item through homes_rebuild_exterior.
  */
-const STREET_STYLES = {
-  meadow: {
-    sky: [0xa6effa, 0xeafcfb],
-    field: 0x77ad43,
-    fieldDark: 0x5f9636,
-    soil: 'crosssection_short_3',
-    soilColor: 0x6a4329,
-    house: { path: 'door_asset_house_large_01', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
-    layers: [
-      { f: 0.08, items: [{ s: 'mountain_blue_1', w: 1648, h: 550, scale: 0.42, y: 470, every: 760, jitter: 120 }] },
-      { f: 0.16, items: [{ s: 'pinehills_distant_1', w: 2038, h: 668, scale: 0.34, y: 500, every: 900, jitter: 200 }] },
-      { f: 0.3, items: [{ s: 'pinehills_1', w: 1700, h: 540, scale: 0.36, y: 520, every: 1100, jitter: 260 }] },
-      {
-        f: 0.5,
-        items: [
-          { s: 'transition_hill_1', w: 2146, h: 320, scale: 0.5, y: 548, every: 1000, jitter: 120 },
-          { s: 'tree_coniferous_2', w: 740, h: 1322, scale: 0.2, y: 548, every: 520, jitter: 160, offset: 140 },
-          { s: 'tree_deciduous3', w: 864, h: 1170, scale: 0.21, y: 552, every: 780, jitter: 140, offset: 380 },
-        ],
-      },
-      {
-        f: 0.75,
-        items: [
-          { s: 'evenground_horizon', w: 2432, h: 218, scale: 0.55, y: 590, every: 1300, jitter: 0 },
-          { s: 'bush_3', w: 566, h: 200, scale: 0.42, y: 596, every: 640, jitter: 200, offset: 260 },
-          { s: 'tree_coniferous_1', w: 530, h: 1294, scale: 0.24, y: 594, every: 1150, jitter: 220, offset: 700 },
-        ],
-      },
-    ],
-    near: [
-      { s: 'groddle_grass_2', w: 162, h: 130, scale: 0.55, every: 300, jitter: 120 },
-      { s: 'wildflowers_bunch_2', w: 382, h: 50, scale: 0.6, every: 420, jitter: 160, offset: 120 },
-      { s: 'groddle_grass_1', w: 212, h: 102, scale: 0.5, every: 520, jitter: 160, offset: 60 },
-    ],
-    trim: ['flower_bush_5', 'bush_1', 'groddle_flower_2'],
-  },
-  firebog: {
-    sky: [0xf0d98a, 0x9a5a3a],
-    field: 0x6a4a34,
-    fieldDark: 0x523726,
-    soil: null,
-    soilColor: 0x4c3022,
-    house: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, signX: 0.06 },
-    layers: [
-      { f: 0.1, items: [{ s: 'background_horizon_bottletrees_1', w: 1896, h: 236, scale: 0.7, y: 500, every: 1300, jitter: 0 }] },
-      { f: 0.25, items: [{ s: 'background_brown_bump3', w: 2144, h: 176, scale: 0.6, y: 548, every: 1280, jitter: 0 }] },
-      {
-        f: 0.45,
-        items: [
-          { s: 'treetop_noflowers_2', w: 1694, h: 824, scale: 0.2, y: 420, every: 900, jitter: 180, offset: 200 },
-          { s: 'bottletree_body1', w: 1302, h: 832, scale: 0.16, y: 566, every: 900, jitter: 180, offset: 200 },
-          { s: 'background_bottletree_silhouette', w: 174, h: 234, scale: 0.8, y: 560, every: 430, jitter: 120, offset: 60 },
-        ],
-      },
-      {
-        f: 0.75,
-        items: [
-          { s: 'background_brown_bump1', w: 2988, h: 172, scale: 0.55, y: 600, every: 1600, jitter: 0 },
-          { s: 'mushrooms', w: 136, h: 232, scale: 0.42, y: 600, every: 560, jitter: 200, offset: 300 },
-        ],
-      },
-    ],
-    near: [
-      { s: 'grass_solid', w: 124, h: 106, scale: 0.6, every: 260, jitter: 100 },
-      { s: 'underground_plant_1', w: 78, h: 106, scale: 0.6, every: 380, jitter: 140, offset: 90 },
-      { s: 'ground_spots_dark_1', w: 628, h: 70, scale: 0.5, every: 700, jitter: 200, offset: 30, below: 18 },
-    ],
-    trim: ['mushrooms', 'grass_solid', 'underground_plant_1'],
-  },
-  uralia: {
-    sky: [0x8fd6cf, 0xd8eedd],
-    field: 0x5e8f8a,
-    fieldDark: 0x4b7672,
-    soil: null,
-    soilColor: 0x40525a,
-    house: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
-    layers: [
-      { f: 0.06, items: [{ s: 'zutto_cloud_1', w: 500, h: 136, scale: 0.6, y: 360, every: 700, jitter: 260 }] },
-      { f: 0.14, items: [{ s: 'bck_hill_9', w: 948, h: 612, scale: 0.42, y: 540, every: 620, jitter: 160 }] },
-      {
-        f: 0.32,
-        items: [
-          { s: 'hill_11', w: 992, h: 280, scale: 0.55, y: 560, every: 760, jitter: 140 },
-          { s: 'bck_tree_2', w: 148, h: 190, scale: 0.8, y: 560, every: 330, jitter: 120, offset: 100 },
-        ],
-      },
-      {
-        f: 0.6,
-        items: [
-          { s: 'zutto_hill_1', w: 1380, h: 290, scale: 0.5, y: 594, every: 1100, jitter: 0 },
-          { s: 'tree_11', w: 332, h: 570, scale: 0.42, y: 596, every: 780, jitter: 220, offset: 320 },
-          { s: 'tree_7', w: 256, h: 418, scale: 0.46, y: 596, every: 980, jitter: 200, offset: 700 },
-        ],
-      },
-    ],
-    near: [
-      { s: 'plant_grass_2', w: 50, h: 96, scale: 0.7, every: 220, jitter: 90 },
-      { s: 'purple_mushroom_3', w: 168, h: 140, scale: 0.4, every: 640, jitter: 200, offset: 200 },
-      { s: 'plant_fern_2', w: 72, h: 144, scale: 0.55, every: 420, jitter: 140, offset: 80 },
-    ],
-    trim: ['purple_mushroom_3', 'zutto_plant_2', 'plant_fern_2'],
-  },
+const HOUSES = {
+  meadow: { path: 'door_asset_house_large_01', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
+  firebog: { path: 'door_asset_house_medium_03', w: 764, h: 586, scale: 0.58, doorX: 0.55, signX: 0.06 },
+  uralia: { path: 'door_asset_house_large_05', w: 830, h: 668, scale: 0.48, doorX: 0.52, signX: 0.06 },
 };
+
+/** The street style shown: the one you chose, else the purchase look's (js/home-styles.js). */
+function currentStreetStyle(engine) {
+  return streetStyleFor(streetStyle, engine?.homeContext?.().style || 'meadow');
+}
 
 function hash01(seed) {
   let s = 2166136261;
@@ -691,55 +616,96 @@ function hash01(seed) {
   return (s % 10000) / 10000;
 }
 
+function decoUrl(name) {
+  return name.endsWith('.svg') ? `${DECO}${name}` : `${DECO}${name}.png`;
+}
+
 function decoSprite(PIXI, item, x, y, flip = false) {
-  const spr = new PIXI.Sprite(textureFromUrl(`${DECO}${item.s}.png`));
-  spr.anchor.set(0.5, 1);
+  const spr = new PIXI.Sprite(textureFromUrl(decoUrl(item.s)));
+  spr.anchor.set(0.5, item.hang ? 0 : 1);
   spr.width = item.w * item.scale;
   spr.height = item.h * item.scale;
-  if (flip) spr.scale.x *= -1;
+  if (flip && !item.noFlip) spr.scale.x *= -1;
+  if (item.flipY) spr.scale.y *= -1;
+  if (item.tint != null) spr.tint = item.tint;
+  if (item.alpha != null) spr.alpha = item.alpha;
   spr.x = x;
   spr.y = y;
   return spr;
 }
 
-function gradientTexture(PIXI, top, bottom) {
+/** A repeated item's sprite at position i: one of its alts, by a stable hash. */
+function pickAlt(item, seed) {
+  if (!item.alts) return item;
+  return { ...item, ...item.alts[Math.floor(hash01(seed) * item.alts.length)] };
+}
+
+function gradientTexture(PIXI, ...colors) {
   const canvas = document.createElement('canvas');
   canvas.width = 2;
   canvas.height = 256;
   const ctx = canvas.getContext('2d');
   const grad = ctx.createLinearGradient(0, 0, 0, 256);
-  grad.addColorStop(0, `#${top.toString(16).padStart(6, '0')}`);
-  grad.addColorStop(1, `#${bottom.toString(16).padStart(6, '0')}`);
+  colors.forEach((c, i) => grad.addColorStop(i / Math.max(1, colors.length - 1), `#${c.toString(16).padStart(6, '0')}`));
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 2, 256);
   return PIXI.Texture.from(canvas);
 }
 
-function streetBackground(engine, styleId) {
+function streetBackground(engine, styleKey, houseStyle = 'meadow') {
   const { PIXI } = engine;
-  const style = STREET_STYLES[styleId] || STREET_STYLES.meadow;
+  const style = streetLook(styleKey);
+  const seed = style.seed || styleKey;
   const layout = homeStreetLayout(cult);
   const width = layout.width;
   const root = new PIXI.Container();
   root.sortableChildren = true;
-  const sky = new PIXI.Sprite(gradientTexture(PIXI, style.sky[0], style.sky[1]));
+  const sky = new PIXI.Sprite(gradientTexture(PIXI, ...style.sky));
   sky.zIndex = -100;
   root.addChild(sky);
 
   const parallax = [];
+  const spanFor = (f) => width * f + VIEW_W * (1 - f) + 400;
+  if (style.stars) {
+    // A night sky: fixed dots, as the Toxic Moon and Midnight Glow headers show.
+    const lc = new PIXI.Container();
+    lc.zIndex = -99;
+    const dots = new PIXI.Graphics();
+    const f = 0.02;
+    const span = spanFor(f);
+    const count = Math.round((style.stars.count * span) / 1000);
+    for (let i = 0; i < count; i += 1) {
+      const x = hash01(`${seed}:star:x:${i}`) * span - 200;
+      const y = -120 + hash01(`${seed}:star:y:${i}`) * (style.stars.maxY + 120) + STREET_LIFT;
+      const r = 0.8 + hash01(`${seed}:star:r:${i}`) * 1.6;
+      dots.circle(x, y, r).fill({ color: style.stars.color ?? 0xffffff, alpha: 0.5 + hash01(`${seed}:star:a:${i}`) * 0.5 });
+    }
+    lc.addChild(dots);
+    lc.parallaxF = f;
+    root.addChild(lc);
+    parallax.push(lc);
+  }
   style.layers.forEach((layer, li) => {
     const lc = new PIXI.Container();
     lc.zIndex = -90 + li;
     // A layer spans what the camera can reveal at its parallax rate.
-    const span = width * layer.f + VIEW_W * (1 - layer.f) + 400;
-    for (const item of layer.items) {
+    const span = spanFor(layer.f);
+    if (layer.band) {
+      const band = new PIXI.Graphics();
+      band.rect(-200, layer.band.y + STREET_LIFT, span + 200, layer.band.h).fill({ color: layer.band.color, alpha: layer.band.alpha ?? 1 });
+      lc.addChild(band);
+    }
+    for (const item of layer.items || []) {
       let i = 0;
       for (let x = (item.offset || 0) - 200; x < span; x += item.every) {
-        const jx = item.jitter ? (hash01(`${styleId}:${li}:${item.s}:${i}`) - 0.5) * item.jitter * 2 : 0;
-        lc.addChild(decoSprite(PIXI, item, x + jx, item.y + STREET_LIFT, hash01(`${item.s}:${i}:flip`) > 0.5));
+        const jx = item.jitter ? (hash01(`${seed}:${li}:${item.s}:${i}`) - 0.5) * item.jitter * 2 : 0;
+        const row = pickAlt(item, `${seed}:${li}:${item.s}:${i}:alt`);
+        if (row.tint == null && layer.tint != null) row.tint = layer.tint;
+        lc.addChild(decoSprite(PIXI, row, x + jx, item.y + STREET_LIFT, hash01(`${item.s}:${i}:flip`) > 0.5));
         i += 1;
       }
     }
+    if (layer.alpha != null) lc.alpha = layer.alpha;
     lc.parallaxF = layer.f;
     root.addChild(lc);
     parallax.push(lc);
@@ -764,7 +730,7 @@ function streetBackground(engine, styleId) {
     }
   }
   for (let x = -40; style.soil && x < width + soilW; x += soilW - 2) {
-    const soil = new PIXI.Sprite(textureFromUrl(`${DECO}${style.soil}.png`));
+    const soil = new PIXI.Sprite(textureFromUrl(decoUrl(style.soil)));
     soil.anchor.set(0, 0);
     soil.width = soilW;
     soil.height = 150;
@@ -779,17 +745,19 @@ function streetBackground(engine, styleId) {
   for (const item of style.near) {
     let i = 0;
     for (let x = item.offset || 0; x < width; x += item.every) {
-      const jx = (hash01(`${styleId}:near:${item.s}:${i}`) - 0.5) * item.jitter * 2;
+      const jx = (hash01(`${seed}:near:${item.s}:${i}`) - 0.5) * item.jitter * 2;
       const px = x + jx;
       i += 1;
       if (px > layout.lotLeft + 40 && px < layout.lotRight - 40) continue;
-      near.addChild(decoSprite(PIXI, item, px, STREET_GROUND_Y + 22 + (item.below || 0), hash01(`${item.s}:${i}`) > 0.5));
+      const row = pickAlt(item, `${seed}:near:${item.s}:${i}:alt`);
+      if (row.tint == null && style.nearTint != null) row.tint = style.nearTint;
+      near.addChild(decoSprite(PIXI, row, px, STREET_GROUND_Y + 22 + (item.below || 0), hash01(`${item.s}:${i}`) > 0.5));
     }
   }
   root.addChild(near);
 
   // The house, centred on its lot
-  const h = style.house;
+  const h = HOUSES[houseStyle] || HOUSES.meadow;
   const house = new PIXI.Sprite(textureFromUrl(`${DECO}${h.path}.png`));
   house.anchor.set(0.5, 1);
   house.scale.set(h.scale);
@@ -801,21 +769,9 @@ function streetBackground(engine, styleId) {
   const trim = new PIXI.Container();
   trim.zIndex = -19;
   const left = layout.houseX - (h.w * h.scale) / 2;
-  const trimItems = {
-    flower_bush_5: { w: 260, h: 180, scale: 0.44 },
-    bush_1: { w: 208, h: 166, scale: 0.5 },
-    groddle_flower_2: { w: 120, h: 110, scale: 0.6 },
-    mushrooms: { w: 136, h: 232, scale: 0.38 },
-    grass_solid: { w: 124, h: 106, scale: 0.7 },
-    underground_plant_1: { w: 78, h: 106, scale: 0.7 },
-    purple_mushroom_3: { w: 168, h: 140, scale: 0.5 },
-    zutto_plant_2: { w: 202, h: 186, scale: 0.45 },
-    plant_fern_2: { w: 72, h: 144, scale: 0.6 },
-  };
-  style.trim.forEach((name, i) => {
-    const meta = trimItems[name];
-    if (!meta) return;
-    trim.addChild(decoSprite(PIXI, { s: name, ...meta }, left + h.w * h.scale * (h.signX + 0.05 + i * 0.07), STREET_GROUND_Y + 20, i % 2 === 1));
+  style.trim.forEach((meta, i) => {
+    const row = style.nearTint != null && meta.tint == null ? { ...meta, tint: style.nearTint } : meta;
+    trim.addChild(decoSprite(PIXI, row, left + h.w * h.scale * (h.signX + 0.05 + i * 0.07), STREET_GROUND_Y + 20, i % 2 === 1));
   });
   root.addChild(trim);
 
@@ -830,6 +786,7 @@ function streetBackground(engine, styleId) {
   };
   root.houseDoorX = layout.houseX + (h.doorX - 0.5) * h.w * h.scale;
   root.houseSignX = left + h.w * h.scale * (h.signX + 0.02);
+  root.streetStyle = styleKey;
   return root;
 }
 
@@ -1490,6 +1447,32 @@ const CSS = `
 .homes-modes[hidden]{display:none}
 .homes-modes button{border:none;border-radius:999px;padding:6px 14px;font-weight:700;font-size:12.5px;cursor:pointer;background:rgba(255,253,247,.94);color:#4a3a28;box-shadow:0 3px 10px rgba(40,30,20,.18)}
 .homes-modes button.on{background:#e07a3d;color:#fff}
+.homes-styles{position:absolute;left:50%;top:56px;transform:translateX(-50%);z-index:45;width:min(600px,calc(100% - 20px));max-height:calc(100% - 150px);display:flex;flex-direction:column;background:#fffdf7;border-radius:14px;box-shadow:0 12px 32px rgba(40,30,20,.28);border:1px solid rgba(90,70,40,.18);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:#2b2a33;overflow:hidden}
+.homes-styles[hidden]{display:none}
+.homes-styles header{display:flex;align-items:center;gap:8px;padding:9px 12px 7px;background:linear-gradient(180deg,#f7ecd6,#efe1c4);border-bottom:1px solid rgba(90,70,40,.15)}
+.homes-styles header h3{margin:0;font-size:15px;flex:1}
+.homes-styles header small{color:#7a6a55;font-weight:600;white-space:nowrap}
+.homes-styles .hb-close{border:none;background:transparent;font-size:18px;cursor:pointer;color:#6a5a45;line-height:1}
+.homes-styles .hs-sel{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid rgba(90,70,40,.12)}
+.homes-styles .hs-name strong{display:block;font-size:14px}
+.homes-styles .hs-name small{color:#7a6a55;font-size:11.5px}
+.homes-styles .hs-actions{display:flex;gap:6px}
+.homes-styles .hs-actions button{border:1px solid rgba(90,70,40,.2);background:#fff;border-radius:8px;padding:6px 11px;font-size:12.5px;font-weight:700;color:#4a3a28;cursor:pointer}
+.homes-styles .hs-actions button.primary{background:#4a90c8;border-color:#4a90c8;color:#fff}
+.homes-styles .hs-actions button:disabled{opacity:.45;cursor:not-allowed}
+.homes-styles .hs-note{margin:6px 12px 0;font-size:12px;color:#a0522d}
+.homes-styles .hs-grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:8px;padding:10px 12px 12px}
+.homes-styles .hs-tile{display:flex;flex-direction:column;gap:4px;border:2px solid transparent;background:#f6efe2;border-radius:10px;padding:4px;cursor:pointer;text-align:left;font:inherit;color:#3b3328}
+.homes-styles .hs-tile:hover{border-color:#e0a84a}
+.homes-styles .hs-tile.on{border-color:#d08a2a;background:#fff3d8}
+.homes-styles .hs-tile.current .hs-label::after{content:" (yours)";color:#5a8f4a;font-weight:700}
+.homes-styles .hs-label{font-size:11.5px;font-weight:700;line-height:1.2;padding:0 2px}
+.homes-styles .hs-prev{position:relative;display:block;height:64px;border-radius:7px;overflow:hidden}
+.homes-styles .hs-prev img{position:absolute;transform:translateX(-50%);max-width:none;pointer-events:none}
+.homes-styles .hs-band{position:absolute;left:0;right:0}
+.homes-styles .hs-field{position:absolute;left:0;right:0;bottom:0}
+.homes-modes button{white-space:nowrap}
+@media (max-width:640px){.homes-styles{top:auto;bottom:106px;max-height:56%}.homes-styles .hs-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;padding:8px}.homes-styles .hs-prev{height:52px}.homes-styles .hs-sel{padding:7px 10px}}
 `;
 
 function el(tag, attrs = {}, children = []) {
@@ -1584,6 +1567,197 @@ function stampAt(engine, p) {
   return applySwatch(engine, kind, key, hit.kind === 'wall' && hit.center ? { segment: hit.segment } : {});
 }
 
+// ---------------------------------------------------------------------------
+// Change Style (players/inc_houses.js houses_style_choices / houses_style_set,
+// client HouseStylesDialog.as). Picking a style shows it on the street behind
+// the dialog (the client's lightbox showed the style's main image); Change asks
+// the source's confirm and charges level x 10 iMG (at least 40).
+// ---------------------------------------------------------------------------
+
+/** The style drawn on the street: the one being looked at in the dialog, else yours. */
+function shownStreetStyle(engine) {
+  return stylePreview || currentStreetStyle(engine);
+}
+
+/** QA: &homestreetstyle=<GSJS exterior key> sets the street style once, free. */
+function qaStreetStyle(engine) {
+  if (styleDemoDone) return;
+  const key = String(engine.param?.('homestreetstyle') || '');
+  if (!key) return;
+  styleDemoDone = true;
+  if (STREET_STYLE_BY_KEY[key]?.built) streetStyle = key;
+}
+
+function hexColor(c) {
+  return `#${Number(c).toString(16).padStart(6, '0')}`;
+}
+
+function decoImageUrl(name) {
+  return name.endsWith('.svg') ? `${DECO}${name}` : `${DECO}${name}.webp`;
+}
+
+/** A small picture of a style for its tile: sky, field and a few of its decos. */
+function stylePreviewEl(look) {
+  const box = el('span', { class: 'hs-prev', 'aria-hidden': 'true' });
+  box.style.background = `linear-gradient(${look.sky.map(hexColor).join(',')})`;
+  const H = 64; // tile picture height in CSS px
+  const k = H / 470; // about the street's height above the ground
+  const fieldPct = 18;
+  const layers = look.layers;
+  layers.forEach((layer, li) => {
+    if (layer.band) {
+      box.append(el('span', {
+        class: 'hs-band',
+        style: `bottom:${fieldPct + Math.max(0, (586 - layer.band.y - layer.band.h) * k / H * 100)}%;height:${Math.max(1, layer.band.h * k)}px;background:${hexColor(layer.band.color)};opacity:${layer.band.alpha ?? 1}`,
+      }));
+      return;
+    }
+    const item = (layer.items || []).find((row) => !row.hang && !row.flipY);
+    if (!item) return;
+    const tint = item.tint ?? layer.tint;
+    const lum = tint == null ? 1 : (((tint >> 16) & 255) * 0.3 + ((tint >> 8) & 255) * 0.59 + (tint & 255) * 0.11) / 255;
+    const h = Math.min(H * 1.2, item.h * item.scale * k);
+    const bottom = Math.max(0, (620 - item.y) * k);
+    [0.22, 0.72].forEach((at, n) => {
+      if (layers.length > 3 && li === 0 && n === 1) return;
+      box.append(el('img', {
+        src: decoImageUrl(item.s),
+        alt: '',
+        loading: 'lazy',
+        style: `left:${(at + (li % 2) * 0.08) * 100}%;bottom:${bottom}px;height:${h}px;${n ? 'transform:translateX(-50%) scaleX(-1);' : ''}${lum < 0.98 ? `filter:brightness(${lum.toFixed(2)});` : ''}${item.alpha != null ? `opacity:${item.alpha};` : ''}`,
+      }));
+    });
+  });
+  box.append(el('span', { class: 'hs-field', style: `height:${fieldPct}%;background:${hexColor(look.field)}` }));
+  return box;
+}
+
+function ensureStylesUi(engine) {
+  if (!ensureUi(engine)) return null;
+  if (!ui.styles) {
+    ui.styles = el('section', { class: 'homes-styles', id: 'homes-styles', hidden: true, role: 'dialog', 'aria-label': STYLE_TEXT.title });
+    ui.root.append(ui.styles);
+  }
+  return ui.styles;
+}
+
+function openStyleDialog(engine) {
+  const ctx = engine.homeContext?.() || {};
+  if (!ctx.inHome || scene?.room !== 'street' || scene.construction) {
+    engine.toast(STYLE_TEXT.notAtHome, 2200);
+    return false;
+  }
+  if (mode) setMode(engine, null);
+  stylePick = currentStreetStyle(engine);
+  const box = ensureStylesUi(engine);
+  if (!box) return false;
+  box.hidden = false;
+  renderStyleDialog(engine);
+  publish(engine);
+  return true;
+}
+
+function closeStyleDialog(engine) {
+  if (ui?.styles) ui.styles.hidden = true;
+  stylePick = null;
+  const had = stylePreview;
+  stylePreview = null;
+  if (had && had !== currentStreetStyle(engine)) engine.refreshHomeScene?.();
+  publish(engine);
+}
+
+/** Click a style: it goes up on the street behind the dialog. */
+function pickStyle(engine, key) {
+  if (!STREET_STYLE_BY_KEY[key]?.built) return false;
+  stylePick = key;
+  const show = key === currentStreetStyle(engine) ? null : key;
+  if (show !== stylePreview) {
+    stylePreview = show;
+    engine.refreshHomeScene?.();
+  }
+  renderStyleDialog(engine);
+  publish(engine);
+  return true;
+}
+
+function confirmStyle(engine, key) {
+  const { cost } = styleChoices(currentStreetStyle(engine), engine.pc.level);
+  engine.offerQuestDialogue({
+    title: STYLE_TEXT.confirmTitle,
+    kicker: STYLE_TEXT.button,
+    beats: [{ text: confirmText(cost), response: STYLE_TEXT.yes }],
+    acceptLabel: STYLE_TEXT.yes,
+    declineLabel: STYLE_TEXT.no,
+    onAccept: () => applyStreetStyle(engine, key),
+  });
+}
+
+/** houses_style_set: take the iMG, keep the house, yard, furniture and cultivations, redraw the street. */
+function applyStreetStyle(engine, key) {
+  const ctx = engine.homeContext?.() || {};
+  const state = { streetStyle: currentStreetStyle(engine) };
+  const result = switchStreetStyle(state, engine.pc, key, { atHome: Boolean(ctx.inHome && scene?.room === 'street') });
+  if (!result.ok) {
+    engine.toast(result.msg, 2400);
+    renderStyleDialog(engine);
+    return result;
+  }
+  streetStyle = key;
+  stylePreview = null;
+  if (ui?.styles) ui.styles.hidden = true;
+  stylePick = null;
+  engine.pushActivity(`Your street is now ${result.label}. That took ${result.cost.toLocaleString()} iMG.`);
+  engine.updateHud();
+  engine.save();
+  engine.refreshHomeScene?.();
+  publish(engine);
+  return result;
+}
+
+function renderStyleDialog(engine) {
+  const box = ui?.styles;
+  if (!box || box.hidden) return;
+  const current = currentStreetStyle(engine);
+  const { cost, choices } = styleChoices(current, engine.pc.level);
+  const img = Math.floor(engine.pc.imagination || 0);
+  const pick = choices.find((row) => row.key === stylePick) || choices.find((row) => row.isCurrent);
+  const short = img < cost;
+  const header = el('header', {}, [
+    el('h3', { text: STYLE_TEXT.title }),
+    el('small', { text: `◉ ${img.toLocaleString()} iMG` }),
+    el('button', { class: 'hb-close', type: 'button', 'aria-label': 'Close', text: '×', onclick: () => closeStyleDialog(engine) }),
+  ]);
+  const sel = el('div', { class: 'hs-sel' }, [
+    el('div', { class: 'hs-name' }, [
+      el('strong', { text: pick?.label || '' }),
+      el('small', { text: pick?.isCurrent ? 'Your street now' : 'Shown behind this window' }),
+    ]),
+    el('div', { class: 'hs-actions' }, [
+      el('button', {
+        type: 'button',
+        class: 'primary',
+        id: 'homes-style-change',
+        disabled: !pick || pick.isCurrent || short,
+        title: !pick?.isCurrent && short ? STYLE_TEXT.needImg : '',
+        text: pick?.isCurrent ? STYLE_TEXT.change : changeForLabel(cost),
+        onclick: () => confirmStyle(engine, pick.key),
+      }),
+      el('button', { type: 'button', id: 'homes-style-cancel', text: STYLE_TEXT.cancel, onclick: () => closeStyleDialog(engine) }),
+    ]),
+  ]);
+  const note = !pick?.isCurrent && short ? el('p', { class: 'hs-note', text: STYLE_TEXT.needImg }) : null;
+  const grid = el('div', { class: 'hs-grid' }, choices.map((row) => el('button', {
+    type: 'button',
+    class: `hs-tile${row.key === pick?.key ? ' on' : ''}${row.isCurrent ? ' current' : ''}`,
+    'data-home-style': row.key,
+    title: row.label,
+    onclick: () => pickStyle(engine, row.key),
+  }, [stylePreviewEl(row.look), el('span', { class: 'hs-label', text: row.label })])));
+  const scrollTop = box.querySelector('.hs-grid')?.scrollTop || 0;
+  box.replaceChildren(header, sel, ...(note ? [note] : []), grid);
+  grid.scrollTop = scrollTop;
+}
+
 function renderModes(engine) {
   if (!ensureUi(engine)) return;
   const ctx = engine.homeContext?.() || {};
@@ -1591,9 +1765,13 @@ function renderModes(engine) {
   ui.modes.hidden = !atHome || Boolean(mode) || Boolean(scene.construction);
   if (!atHome || scene.construction) return;
   ui.modes.replaceChildren(
-    scene.room === 'interior'
-      ? el('button', { type: 'button', id: 'homes-decorate-btn', text: 'Decorate', onclick: () => setMode(engine, 'decorate') })
-      : el('button', { type: 'button', id: 'homes-cultivate-btn', text: 'Cultivate', onclick: () => setMode(engine, 'cultivate') })
+    ...(scene.room === 'interior'
+      ? [el('button', { type: 'button', id: 'homes-decorate-btn', text: 'Decorate', onclick: () => setMode(engine, 'decorate') })]
+      : [
+        el('button', { type: 'button', id: 'homes-cultivate-btn', text: 'Cultivate', onclick: () => setMode(engine, 'cultivate') }),
+        // HouseSignDialog.as: the street sign's "Change Style" button.
+        el('button', { type: 'button', id: 'homes-style-btn', text: STYLE_TEXT.button, onclick: () => openStyleDialog(engine) }),
+      ])
   );
 }
 
@@ -2448,6 +2626,11 @@ function demoFurniture(engine) {
 
 function demoSetup(engine) {
   demoFurniture(engine);
+  // QA: &homestyledemo=open opens Change Style on the home street once.
+  if (!styleDialogDemoDone && scene?.room === 'street' && engine.param('homestyledemo') === 'open') {
+    styleDialogDemoDone = true;
+    setTimeout(() => openStyleDialog(engine), 300);
+  }
   // QA: &wotddemo=N puts N Wine of the Dead in the pack (the pour pack verb) and,
   // on the home street, stands you 120 px left of the first rock, garden or patch
   // (else the Tower).
@@ -2791,7 +2974,8 @@ function homeScene(room, engine) {
     };
   }
   liftOldStreetSave(engine);
-  const background = streetBackground(engine, style);
+  qaStreetStyle(engine);
+  const background = streetBackground(engine, shownStreetStyle(engine), style);
   const layout = homeStreetLayout(cult);
   return {
     width: layout.width,
@@ -2829,6 +3013,7 @@ function afterEnter(engine) {
   }
   if (placing) makeGhost(engine);
   renderBar(engine);
+  renderStyleDialog(engine);
   publish(engine);
   demoSetup(engine);
 }
@@ -2844,12 +3029,23 @@ export const homesFeature = {
     ensureFurnitureItems();
     towerApi.connect(towerBridge);
     houseVisits = qaHouseVisits(engine) ?? houseVisits;
+    // QA (home demos only): window.groddleHomeStyle(key) redraws the street in that style, free.
+    if (engine.param?.('homedemo') && typeof window !== 'undefined') {
+      window.groddleHomeStyle = (key) => {
+        if (!STREET_STYLE_BY_KEY[key]?.built) return false;
+        streetStyle = key;
+        stylePreview = null;
+        engine.refreshHomeScene?.();
+        publish(engine);
+        return true;
+      };
+    }
     publish(engine);
   },
 
   save() {
     // Tower floors share the house's furniture storage; it is saved once, with the house.
-    return { decor: houseDecor, cult, towerDecor: towerDecor.map(({ storage, ...rest }) => rest), streetGround: savedStreetGround, houseVisits };
+    return { decor: houseDecor, cult, towerDecor: towerDecor.map(({ storage, ...rest }) => rest), streetGround: savedStreetGround, houseVisits, streetStyle };
   },
 
   restore(slice, engine) {
@@ -2861,6 +3057,7 @@ export const homesFeature = {
     houseDecor = normalizeHomeDecorState(slice?.decor || {});
     decor = houseDecor;
     cult = normalizeCultivationState(slice?.cult || {});
+    streetStyle = STREET_STYLE_BY_KEY[slice?.streetStyle]?.built ? slice.streetStyle : null;
     towerDecor = (Array.isArray(slice?.towerDecor) ? slice.towerDecor : [])
       .slice(0, TOWER_CONFIG.MAX_FLOORS)
       .map((row) => normalizeHomeDecorState({ ...row, wallSegments: TOWER_GEO.wallSegments, layout: 'tower', starterKit: true }));
@@ -2885,6 +3082,9 @@ export const homesFeature = {
     // Ordinary streets: no home scene, so the mode bar must be gone.
     if (!engine.homeContext?.().inHome) {
       lastHomeRoom = null;
+      stylePreview = null;
+      stylePick = null;
+      if (ui?.styles) ui.styles.hidden = true;
       mode = null;
       placing = null;
       selected = null;

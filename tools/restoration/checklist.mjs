@@ -216,8 +216,8 @@ export const CHECKLIST = Object.freeze([
 
   // —— Home & neighbours ——
   { id: 'homes', group: 'home', name: 'Your house and yard', status: 'source', spot: 'mailbox',
-    blurb: 'Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).',
-    evidence: ['public/js/homes.js', 'public/js/home-decor.js', 'public/js/home-wallpaper.js', 'public/js/home-cultivation.js', 'public/js/hi-signs.js'] },
+    blurb: 'Buy a house, paper it wall by wall with Tiny Speck’s own 109 wallpapers, floors and ceilings, decorate rooms, cultivate the yard (worn-out rocks, gardens and patches become protos you restore with a project), restyle the street as any of 36 of the original 37 street styles (Change Style, level x 10 iMG; each rebuilt from Tiny Speck’s own scenery), keep animals. A Butler arrives in a box, stitched part by part from Tiny Speck’s own pieces (choose its head, face, accessory, body, arms and legs), to greet you home, hold what neighbours leave, invite you to join the club and hear about it, and swap daily hi signs with you (press 5; outrun its hi for the evasion badges).',
+    evidence: ['public/js/homes.js', 'public/js/home-decor.js', 'public/js/home-wallpaper.js', 'public/js/home-cultivation.js', 'public/js/home-styles.js', 'public/js/hi-signs.js'] },
   { id: 'mail', group: 'home', name: 'Mail', status: 'source',
     blurb: 'Mailboxes, postage, parcels and replies.',
     evidence: ['public/js/mailbox.js'] },
