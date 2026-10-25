@@ -38,6 +38,7 @@ import {
   noteNarakaVisit,
   onEnergyGained,
   planHellGrapes,
+  recognizeDeath,
   remainingGrapes,
   resolveReloadLocation,
   resurrect,
@@ -58,6 +59,7 @@ let graveSprite = null;
 let lastEnergy = null;
 let promptTimers = [];
 let autoplayAt = 0;
+let holeDropping = false;
 
 function clearPromptTimers() {
   for (const id of promptTimers) clearTimeout(id);
@@ -342,7 +344,11 @@ export const hellFeature = {
     state = visit.state;
     for (const event of visit.events) engine.achievement(event.counter, event.amount);
     const flag = hellHoleFlagForStreet(street.tsid);
-    if (flag) engine.questFlag(flag);
+    if (flag) {
+      engine.questFlag(flag);
+      // The quest event behind hell_hole's jump_hell_hole flag (js/quest-offers.js COUNTER_ROUTES, G163).
+      engine.achievement('hell_hole_jumped', 1);
+    }
     if (narakaStreet(street.tsid)) spawnGrapes(street, engine);
     spawnGrave(street, engine);
     demoSetup(engine);
@@ -352,6 +358,7 @@ export const hellFeature = {
   onStreetClear() {
     grapeTargets = [];
     graveSprite = null;
+    holeDropping = false;
   },
 
   onTick(dtMs, now, engine) {
@@ -364,8 +371,10 @@ export const hellFeature = {
         isInHellOne(engine.streetTsid) &&
         player.x >= hole.x1 &&
         player.x <= hole.x2 &&
-        player.y > HELL_LOCATION.spawns[0].groundY + 260
+        player.y >= hole.rimY - 2 &&
+        !holeDropping
       ) {
+        holeDropping = true;
         engine.enter(hole.destinationTsid, { bypassFeatureGates: true });
       }
       if (engine.param('hellautoplay') === '1' && now - autoplayAt > 450 && grapeTargets.length) {
@@ -467,6 +476,8 @@ export const hellFeature = {
     state = result.state;
     clearPromptTimers();
     applyEffects(result.effects, engine);
+    // The quest event behind hell_quest's drink_wotd flag (wine_of_the_dead.js:96 sets it on every drink; G163).
+    engine.achievement('wine_of_the_dead:drink', 1);
     engine.save();
     const to = result.teleport;
     if (to) {
@@ -475,6 +486,27 @@ export const hellFeature = {
     }
     publish(engine);
     return true;
+  },
+
+  /**
+   * Another Glitch celebrates or mourns your grave (items/graveside_marker.js
+   * 37-137 -> players/player.js recognizeDeath 1430). Commits the hell state and
+   * returns js/hell.js recognizeDeath's result; the caller
+   * (features/hell-tickets-feature.js, G163) applies its offer / ticket effects.
+   */
+  recognizeGrave({ type, recognizer, questState } = {}, engine) {
+    const result = recognizeDeath(state, {
+      type,
+      recognizer,
+      questState,
+      streetTsid: engine.streetTsid,
+      hubId: engine.street?.hubId || '',
+    });
+    if (!result.ok) return result;
+    state = result.state;
+    engine.save();
+    publish(engine);
+    return result;
   },
 
   /** QA / tests. */

@@ -38,8 +38,8 @@ import {
   pickBartenderLine,
   talkStateFor,
 } from '../public/js/hell-bar.js';
-import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g140-1';
-import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-2';
+import { hellBarFeature } from '../public/js/features/hell-bar-feature.js?v=g140-2';
+import { hellFeature } from '../public/js/features/hell-feature.js?v=hell-3';
 import { FEATURES } from '../public/js/features/index.js';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');

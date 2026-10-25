@@ -781,6 +781,7 @@ export const EMITTED_EVENTS = Object.freeze([
   { event: 'cultivate_tower', note: 'features/home-tower-feature.js on cultivating the Tower' },
   { event: 'build_tower', note: 'features/home-tower-feature.js when the Tower project finishes' },
   { event: 'meditation_station_days', note: 'js/meditation-station.js, one per counted game day' },
+  { event: 'hell_hole_jumped', note: 'features/hell-feature.js on arriving in Mahatam Audarika (G163)' },
   // game.js emitGameEvent (2026-10-19)
   { event: '{a}:{b}', note: 'every successful world verb and pack use' },
   { event: 'rocks_depleted:{a}' },

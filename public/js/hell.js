@@ -228,6 +228,12 @@ export const HELL_LOCATION = Object.freeze({
     sourceX2: 1244,
     x1: 1097 - HELL_ONE_BOUNDS.l,
     x2: 1244 - HELL_ONE_BOUNDS.l,
+    /**
+     * The rims' floor height (pl1263887138338 ends at 1097,-191; plat_1319486971932
+     * starts at 1244,-195). game.js resolveGround bridges plain gaps at the lowest
+     * floor, so standing over the gap at rim height is the fall (G163).
+     */
+    rimY: -195 - HELL_ONE_BOUNDS.t,
     sign: Object.freeze({ sprite: 'signpost_hell', sourceX: 1130, sourceY: -214, w: 155, h: 179 }),
     destinationSourceTsid: 'LA5PV4T79OE2AOA',
     destinationTsid: 'GA5PV4T79OE2AOA',

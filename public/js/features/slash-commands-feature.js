@@ -26,7 +26,7 @@
 
 import { BUTLER_STRINGS } from '../butler.js?v=butler-4';
 import { butlerApi } from './butler-feature.js?v=butler-feature-4';
-import { hellFeature } from './hell-feature.js?v=hell-2';
+import { hellFeature } from './hell-feature.js?v=hell-3';
 import { towerApi } from './home-tower-feature.js?v=home-tower-3';
 import { slashPlan, unknownLine } from '../slash-commands.js?v=g160-1';
 

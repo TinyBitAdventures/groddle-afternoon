@@ -224,6 +224,8 @@ function applyGrant(engine, result) {
     say(engine, result.bubble, 5000);
   }
   for (const line of result.activity) engine.pushActivity(line);
+  // The quest event behind hell_quest's buy_wotd flag (js/quest-offers.js COUNTER_ROUTES, G163).
+  if (result.ok) engine.achievement('vendor_bought:wine_of_the_dead', 1);
   engine.refreshPack();
   engine.save();
   engine.setData('hellBarLast', result.ok ? 'bought' : 'refused');
