@@ -19684,6 +19684,14 @@ function closeQuestDialogue(opts = {}) {
   return true;
 }
 
+/** The focused button when it sits in an open dialog, else null (Enter and Space belong to it). */
+function focusedDialogButton() {
+  const button = document.activeElement?.closest?.('button, [role="button"]');
+  if (!button || button.disabled) return null;
+  const dialog = button.closest('dialog, [role="dialog"], [aria-modal="true"], .glitch-modal');
+  return dialog && !dialog.hidden ? button : null;
+}
+
 function isQuestDialogueOpen() {
   const modal = document.getElementById('quest-dialogue');
   return Boolean(modal && !modal.hidden);
@@ -23714,6 +23722,9 @@ async function main() {
       }
       return;
     }
+    // A focused button in an open dialog (the subway's red button refusal and other
+    // feature dialogs) takes Enter and Space itself: never the nearest thing's menu or a jump.
+    if ((e.key === 'Enter' || e.key === ' ') && focusedDialogButton()) return;
     keys.add(e.key);
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
     if (e.key === 'Escape') {
