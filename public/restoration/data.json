@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 488,
+  "commits": 489,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Multiplayer signs in through Minn and saves on the server, and a signed-in solo player can back up and restore their game"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Buttering up a chicken and singing to a butterfly follow the source, and resource-node mood bonuses take the metabolic gate"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The Magic Rock no longer vanishes as it lands, and five more clips stop blinking or losing their last frame"
    }
   ]
  },
