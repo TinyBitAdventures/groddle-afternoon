@@ -16,8 +16,9 @@ import { homedir } from 'node:os';
 
 import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=mp2-2';
 import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=mp2-2';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=mp2-2';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=mp2-3';
 import { FEATURES } from '../public/js/features/index.js';
+import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-1';
 
 const root = join(import.meta.dirname, '..');
@@ -195,6 +196,20 @@ describe('account backup feature', () => {
     const src = read('public/js/features/account-backup-feature.js');
     assert.match(src, /freezeSoloSaves\(\);\n\s*restoreSoloSave\(backup\.data\);/);
     assert.doesNotMatch(src, /createMultiplayerSaveStore|GRODDLE_MP_BOOT|groddle\/v1\/save/);
+  });
+
+  it('a solo game on the Groddle site has a Menu way into multiplayer (the start card only asks on a new game)', () => {
+    const src = read('public/js/features/account-backup-feature.js');
+    assert.match(src, /if \(!session\.minn\) return;[\s\S]*id: 'multiplayer-btn'[\s\S]*location\.href = multiplayerEntryUrl\(document\.baseURI\)/);
+    // /play/ sets <base href="../">: the base URI is the site root.
+    assert.equal(multiplayerEntryUrl('https://groddle.localhost/'), 'https://groddle.localhost/play/online/');
+  });
+
+  it('folder paths without their slash go on to the slashed page (/play/online), query kept', () => {
+    const pages = readFileSync(join(ext, 'src', 'StaticPages.php'), 'utf8');
+    assert.match(pages, /#\[Route\(Method::Get, '\/\{folder:\[a-z0-9\]\[a-z0-9_-\]\*\(\?:\/\[a-z0-9\]\[a-z0-9_-\]\*\)\*\}', policy: new Policy\(Access::Public\)\)\]\n\s*public function bare/);
+    assert.match(pages, /\$this->root->indexFor\(\$folder\) === null\) \{\n\s*throw new RouteMiss\(\);/, 'only built folders redirect');
+    assert.match(pages, /Response::redirect\("\/\{\$folder\}\/\{\$query\}", 301\)/);
   });
 });
 

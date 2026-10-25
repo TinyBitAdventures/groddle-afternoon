@@ -9,6 +9,9 @@
  * save). Restoring over a local game that was saved later than the backup
  * asks first.
  *
+ * The Menu also gets Multiplayer, the way to /play/online/ from a solo game
+ * already under way (the start card only offers the choice on a new game).
+ *
  * Off in multiplayer, in practice copies (?practice=1 swaps the storage),
  * and on a plain static server (no account routes answer).
  * QA: /play/ on groddle.localhost, Menu, Account.
@@ -17,6 +20,7 @@
 import { createMinnAccount } from '../minn-account.js?v=mp2-2';
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=mp2-1';
 import { formatGameDayLabel } from '../game-day.js?v=dametime-3';
+import { multiplayerEntryUrl } from '../game-mode.js?v=mp2-1';
 
 /** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
 export function slotForNewBackup(backups, slots) {
@@ -291,6 +295,10 @@ async function install(engine) {
   if (!session.minn) return;
   const list = document.getElementById('more-list');
   if (!list) return;
+  // The way into multiplayer from a solo game in progress (the start card only asks on a new game).
+  const online = el('button', { id: 'multiplayer-btn', type: 'button', class: 'chrome-btn', title: 'Play with others: sign in and play a separate character, saved on the Groddle site' }, 'Multiplayer');
+  online.addEventListener('click', () => { location.href = multiplayerEntryUrl(document.baseURI); });
+  list.append(online);
   const panel = createPanel(engine, account, session);
   const btn = el('button', { id: 'account-btn', type: 'button', class: 'chrome-btn', title: 'Back up or restore your solo game' }, 'Account');
   btn.addEventListener('click', () => { panel.open(); });
