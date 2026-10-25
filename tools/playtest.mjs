@@ -287,6 +287,17 @@ class Session {
     }
     await this.page.keyboard.press('e');
     await this.wait(500);
+    // G206: several things in reach open the Enter chooser; pick this target's tile.
+    await this.page.evaluate((want) => {
+      const box = document.getElementById('enter-chooser');
+      if (!box || box.hidden) return;
+      const tiles = [...box.querySelectorAll('.feed-picker-choice[data-kind]:not([data-kind="cancel"])')];
+      const tile = tiles.find((b) => want.label && b.textContent.trim() === want.label)
+        || tiles.find((b) => b.dataset.classId === want.classId)
+        || tiles[0];
+      tile?.click();
+    }, { label: (live || target).label || '', classId: (live || target).classId || '' });
+    await this.wait(400);
     const menu = await this.verbs();
     return menu ? { ...menu, target: live || target, viaKey: true } : null;
   }

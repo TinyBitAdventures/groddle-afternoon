@@ -5,6 +5,7 @@
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
 import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-76';
+import { buildEnterChoices, planEnter, createEnterChooser, trimmedIconUrl } from './js/enter-chooser.js?v=g206-1';
 import {
   actionDurationFor,
   createTimedAction,
@@ -5688,7 +5689,72 @@ function executeVerb(target, verbId) {
   checkQuest();
 }
 
-function tryOpenNearestMenu() {
+/** G206 QA: &enterchooser=nearest keeps the old nearest-first Enter (no chooser). */
+const ENTER_CHOOSER_OFF = new URLSearchParams(location.search).get('enterchooser') === 'nearest';
+let enterChooser = null;
+
+/** Everything Enter reaches (LocationInputHandler._beginInteractionAfterEnterKey). */
+function enterChoicesHere() {
+  const near = [];
+  for (const t of interactables) {
+    const d = interactReach(t);
+    if (d < 100) near.push({ target: t, distance: d });
+  }
+  const sign = currentStreet && !climb.active ? signpostNear(currentStreet, player.x, 140) : null;
+  const connects = (sign?.signpost?.connects || []).filter((c) => c && !c.hidden);
+  return buildEnterChoices({
+    near,
+    signpost: connects.length ? { signpost: sign.signpost, distance: sign.distance, labels: connects.map((c) => c.label) } : null,
+  });
+}
+
+/** Chooser tile art: the item's icon, else the thing as drawn (InteractionMenu.buildTargetItemCUIs). */
+function enterChoiceIcon(choice) {
+  const cls = choice.target?.classId === 'dropped_item' ? choice.target.state?.classTsid : choice.classId;
+  if (cls && ITEM_ICONS[cls]) return ITEM_ICONS[cls];
+  const spr = choice.kind === 'signpost'
+    ? (bgLayer?.signViews || []).find((v) => v.signpost === choice.signpost)
+    : choice.target?._gardenRoot || choice.target?.sprite;
+  if (!spr || spr.destroyed || !app?.renderer) return null;
+  // A bare (animated) sprite is drawn from its current frame: extract renders a
+  // leaf with its own street transform, which lands outside the frame.
+  const art = spr.texture && !spr.children?.length ? new PIXI.Sprite(spr.texture) : spr;
+  try {
+    if (art !== spr) art.anchor.copyFrom(spr.anchor);
+    const b = art.getLocalBounds();
+    const max = Math.max(b.width, b.height);
+    if (!(max > 0)) return null;
+    return trimmedIconUrl(app.renderer.extract.canvas({ target: art, resolution: Math.min(2, 100 / max) }));
+  } catch (_) {
+    return null;
+  } finally {
+    if (art !== spr) art.destroy();
+  }
+}
+
+function openEnterChoice(choice) {
+  if (choice.kind === 'signpost') {
+    doTeleport();
+    return;
+  }
+  const t = choice.open || choice.target;
+  if (t?.sprite && !t.sprite.destroyed) openVerbMenu(t);
+}
+
+function enterChooserUi() {
+  enterChooser ||= createEnterChooser({
+    document,
+    mount: document.getElementById('verb-menu')?.parentElement,
+    iconFor: enterChoiceIcon,
+    onChoose: openEnterChoice,
+    playSound: (key) => playSound(key, { volume: 0.45 }),
+    setData: (key, value) => { if (app?.canvas) app.canvas.dataset[key] = value; },
+    yieldKeys: () => isQuestDialogueOpen() || isEmotionalBearPickerOpen() || isFeedPickerOpen(),
+  });
+  return enterChooser;
+}
+
+function tryOpenNearestMenu({ nearestFirst = false } = {}) {
   // The original interaction cadence often chains verbs (pet → nibble). Large
   // trant hit boxes can overlap small animals, so keep E on the entity just
   // used until the player moves away or deliberately moves the pointer.
@@ -5706,6 +5772,20 @@ function tryOpenNearestMenu() {
     const d = interactDistance(hoverTarget, player.x, player.y);
     if (d < 160) {
       openVerbMenu(hoverTarget);
+      return;
+    }
+  }
+  // G206: several things in reach open the chooser in the client's order; a
+  // lone signpost goes where T goes. Scripted (untrusted) presses from in-page
+  // autoplays and &enterchooser=nearest keep nearest-first.
+  if (!nearestFirst && !ENTER_CHOOSER_OFF) {
+    const plan = planEnter(enterChoicesHere());
+    if (plan.mode === 'chooser') {
+      enterChooserUi().open(plan.choices);
+      return;
+    }
+    if (plan.mode === 'single' && plan.choice.kind === 'signpost') {
+      doTeleport();
       return;
     }
   }
@@ -5735,19 +5815,25 @@ function interactDistance(t, px, py) {
   return Math.hypot(dx, dy);
 }
 
+/** Weighted reach used by Enter (nearest pick and the G206 chooser alike). */
+function interactReach(t) {
+  if (!t?.sprite || t.sprite.destroyed) return Infinity;
+  let d = interactDistance(t, player.x, player.y);
+  // Prefer individual garden plots over the bed foot / large entities
+  if (t.classId === 'dropped_item') {
+    if (d > 130) return Infinity;
+    d = d * 0.35 - 48;
+  }
+  if (t.classId === 'garden_plot') d *= 0.55;
+  if (t.classId === 'garden_new') d *= 1.35;
+  return d;
+}
+
 function nearestInteractable(maxD) {
   let best = null;
   let bestD = maxD;
   for (const t of interactables) {
-    if (!t.sprite || t.sprite.destroyed) continue;
-    let d = interactDistance(t, player.x, player.y);
-    // Prefer individual garden plots over the bed foot / large entities
-    if (t.classId === 'dropped_item') {
-      if (d > 130) continue;
-      d = d * 0.35 - 48;
-    }
-    if (t.classId === 'garden_plot') d *= 0.55;
-    if (t.classId === 'garden_new') d *= 1.35;
+    const d = interactReach(t);
     if (d < bestD) {
       bestD = d;
       best = t;
@@ -8831,7 +8917,8 @@ function isScreenFxBlocking() {
     (eb && !eb.hidden) ||
     (qd && !qd.hidden) ||
     (hp && !hp.hidden) ||
-    (mp && !mp.hidden)
+    (mp && !mp.hidden) ||
+    Boolean(enterChooser?.isOpen())
   );
 }
 
@@ -23442,7 +23529,7 @@ async function main() {
     // Enter / Return or E — open verb menu on nearest interactable
     if (e.key === 'Enter' || e.key === 'e' || e.key === 'E') {
       e.preventDefault();
-      tryOpenNearestMenu();
+      tryOpenNearestMenu({ nearestFirst: e.isTrusted === false });
       return;
     }
     if (e.key === 'f' || e.key === 'F') eatApple();

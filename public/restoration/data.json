@@ -2024,9 +2024,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 431,
+  "commits": 432,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Glitches near a quoin you grab get a shard, and their grabs near you share with you"
+   },
    {
     "date": "2026-10-25",
     "kind": "improve",
@@ -2141,14 +2146,9 @@
     "date": "2026-10-24",
     "kind": "new",
     "text": "The Grand Ol' Grinder and High-Class Hoe, made on the Tinkertool"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "Pack verbs for the Hatchet and Class Axe, Wine of the Dead pours, and the Butler teaches /house and /tower"
    }
   ]
  },
- "tests": 243,
+ "tests": 244,
  "generatedAt": "2026-10-25"
 }
