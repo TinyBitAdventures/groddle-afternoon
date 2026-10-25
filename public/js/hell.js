@@ -251,13 +251,17 @@ export const NARAKA_STREETS = Object.freeze([
   { sourceTsid: 'LA5RPAFK9OE28GN', tsid: 'GA5RPAFK9OE28GN', label: 'Panka Surazu', internalLabel: 'FireBrimstoneFernando', grapes: 30 },
 ].map((row) => Object.freeze(row)));
 
-/** Hell Bar instance (hell_quest `hell_bar`); its geometry is not in the public dump. */
+/**
+ * Hell Bar instance (hell_quest `hell_bar`); its geometry is not in the public
+ * dump, so it is rebuilt from reference (js/hell-bar.js, tools/build-hell-bar.mjs,
+ * features/hell-bar-feature.js; G140).
+ */
 export const HELL_BAR = Object.freeze({
   sourceTsid: 'LA5FPUNAI7P2NVF',
   entranceStreetSourceTsid: 'LA5RPAFK9OE28GN',
   entranceStreetTsid: 'GA5RPAFK9OE28GN',
   entranceStreetLabel: 'Panka Surazu',
-  available: false,
+  available: true,
 });
 
 /**
@@ -447,9 +451,15 @@ export function isInHellOne(tsid) {
   return streetKey(tsid) === streetKey(HELL_LOCATION.tsid);
 }
 
-/** location.isInPurgatoryHub(): any hub-40 street. Hell One is hub 40 in the source. */
+/**
+ * location.isInPurgatoryHub(): any hub-40 location. Hell One is hub 40 in the
+ * source, and so is the Hell Bar (inc_data_maps_prod.js hub 40; Panka's door
+ * connect hub_id 40), though it is not one of the seven streets the Naraka
+ * Completist badge counts.
+ */
 export function isInPurgatoryHub(tsid, hubId = '') {
-  return String(hubId) === '40' || NARAKA_KEYS.has(streetKey(tsid));
+  const key = streetKey(tsid);
+  return String(hubId) === '40' || NARAKA_KEYS.has(key) || key === streetKey(HELL_BAR.sourceTsid);
 }
 
 /** location.isInHell(): Hell One or the purgatory hub. */

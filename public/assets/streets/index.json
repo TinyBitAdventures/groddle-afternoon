@@ -13115,6 +13115,15 @@
       "platforms": 6,
       "decos": 2,
       "reconstructed": true
+    },
+    "GA5FPUNAI7P2NVF": {
+      "label": "Hell Bar",
+      "file": "assets/streets/GA5FPUNAI7P2NVF.json",
+      "hubId": "40",
+      "hubName": "Naraka",
+      "platforms": 4,
+      "decos": 1,
+      "reconstructed": true
     }
   }
 }

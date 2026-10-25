@@ -1,0 +1,629 @@
+{
+ "source": "tinyspeck/glitch-locations firebog.swf, groddle1.swf, kukubee.swf (CC0), rendered by tools/deco-pipeline",
+ "settings": {
+  "version": 1,
+  "zoom": 3,
+  "quality": 82,
+  "lossless_over": 4.5,
+  "same_colour": 8.0,
+  "same_alpha": 12.0,
+  "svg_colour": 4.0,
+  "svg_alpha": 5.0,
+  "min_gain": 6.0,
+  "dense": 2.9,
+  "max_3x": 8192,
+  "big_3x": 4096
+ },
+ "tools": {
+  "cwebp": "1.6.0",
+  "ffdec_jar_sha": "090ab695053ad94c"
+ },
+ "pieces": {
+  "counter": {
+   "scale": 0,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    810.8,
+    103.05
+   ],
+   "px": [
+    1800,
+    224
+   ],
+   "file": "counter@2x.webp",
+   "swf": "bundle:groddle1.swf#bureaucratic_hall_counter_1",
+   "swf_sha": "29321345792d17ad",
+   "key": "29321345792d17ad:0:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#0d0000\"], [60, \"#281100\"], [110, \"#382310\"], [160, \"#5a3a14\"], [210, \"#7a4e18\"], [255, \"#8a5a1a\"]]:size=[900, 112]",
+   "ramp": [
+    [
+     0,
+     "#0d0000"
+    ],
+    [
+     60,
+     "#281100"
+    ],
+    [
+     110,
+     "#382310"
+    ],
+    [
+     160,
+     "#5a3a14"
+    ],
+    [
+     210,
+     "#7a4e18"
+    ],
+    [
+     255,
+     "#8a5a1a"
+    ]
+   ],
+   "size": [
+    900,
+    112
+   ],
+   "out_px": [
+    1800,
+    224
+   ],
+   "world": [
+    900,
+    112
+   ],
+   "bytes": 17634,
+   "lossless": false,
+   "err": 1.48,
+   "sha": "cca81f97277894b5"
+  },
+  "hell_bar_bartender_flames_01a": {
+   "scale": 0.95,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    272.35,
+    277.75
+   ],
+   "px": [
+    517,
+    528
+   ],
+   "file": "hell_bar_bartender_flames_01a@2x.webp",
+   "swf": "bundle:kukubee.swf#hell_bar_bartender_flames_01a",
+   "swf_sha": "ebcefd5dd9223c4b",
+   "key": "ebcefd5dd9223c4b:0.95:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    517,
+    528
+   ],
+   "world": [
+    259,
+    264
+   ],
+   "bytes": 60844,
+   "lossless": false,
+   "err": 1.41,
+   "sha": "3e5618f2b8d048bf"
+  },
+  "hell_bar_sign_01a": {
+   "scale": 1.0,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    249.1,
+    185.0
+   ],
+   "px": [
+    498,
+    370
+   ],
+   "file": "hell_bar_sign_01a@2x.webp",
+   "swf": "bundle:kukubee.swf#hell_bar_sign_01a",
+   "swf_sha": "7cb43f96869be6e4",
+   "key": "7cb43f96869be6e4:1.0:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    498,
+    370
+   ],
+   "world": [
+    249,
+    185
+   ],
+   "bytes": 63772,
+   "lossless": false,
+   "err": 4.06,
+   "sha": "86f6f157a73bbc5b"
+  },
+  "shelf_bone": {
+   "scale": 0.12,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    474.95,
+    739.0
+   ],
+   "px": [
+    114,
+    177
+   ],
+   "file": "shelf_bone@2x.webp",
+   "swf": "bundle:kukubee.swf#k02_foreground_bone",
+   "swf_sha": "e3d89d4bddaddfc3",
+   "key": "e3d89d4bddaddfc3:0.12:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#3a2414\"], [120, \"#8a6844\"], [200, \"#c8a070\"], [255, \"#e2c294\"]]",
+   "ramp": [
+    [
+     0,
+     "#3a2414"
+    ],
+    [
+     120,
+     "#8a6844"
+    ],
+    [
+     200,
+     "#c8a070"
+    ],
+    [
+     255,
+     "#e2c294"
+    ]
+   ],
+   "out_px": [
+    114,
+    177
+   ],
+   "world": [
+    57,
+    89
+   ],
+   "bytes": 8348,
+   "lossless": true,
+   "err": 4.99,
+   "sha": "c48519c645fd5a14"
+  },
+  "shelf_long": {
+   "scale": 1.1,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    283.75,
+    52.2
+   ],
+   "px": [
+    624,
+    115
+   ],
+   "file": "shelf_long@2x.webp",
+   "swf": "bundle:kukubee.swf#wardrobia_shelf_long",
+   "swf_sha": "b67e30b1d615a3ec",
+   "key": "b67e30b1d615a3ec:1.1:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#030000\"], [70, \"#24120a\"], [140, \"#53331a\"], [200, \"#785046\"], [255, \"#b07a44\"]]",
+   "ramp": [
+    [
+     0,
+     "#030000"
+    ],
+    [
+     70,
+     "#24120a"
+    ],
+    [
+     140,
+     "#53331a"
+    ],
+    [
+     200,
+     "#785046"
+    ],
+    [
+     255,
+     "#b07a44"
+    ]
+   ],
+   "out_px": [
+    624,
+    115
+   ],
+   "world": [
+    312,
+    58
+   ],
+   "bytes": 5078,
+   "lossless": false,
+   "err": 2.03,
+   "sha": "52f07b0a7f41cc92"
+  },
+  "skull_decal": {
+   "scale": 0.34,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    318.25,
+    197.75
+   ],
+   "px": [
+    216,
+    134
+   ],
+   "file": "skull_decal@2x.webp",
+   "swf": "bundle:kukubee.swf#k01_fossil_01",
+   "swf_sha": "217e6686a0528636",
+   "key": "217e6686a0528636:0.34:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#0d0000\"], [70, \"#2a0400\"], [140, \"#5e1e04\"], [200, \"#873f0f\"], [255, \"#c06a28\"]]",
+   "ramp": [
+    [
+     0,
+     "#0d0000"
+    ],
+    [
+     70,
+     "#2a0400"
+    ],
+    [
+     140,
+     "#5e1e04"
+    ],
+    [
+     200,
+     "#873f0f"
+    ],
+    [
+     255,
+     "#c06a28"
+    ]
+   ],
+   "out_px": [
+    216,
+    134
+   ],
+   "world": [
+    108,
+    67
+   ],
+   "bytes": 6124,
+   "lossless": false,
+   "err": 4.48,
+   "sha": "0ff98a1c3278ba11"
+  },
+  "splash_white": {
+   "scale": 0.22,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    372.0,
+    446.1
+   ],
+   "px": [
+    164,
+    196
+   ],
+   "file": "splash_white@2x.webp",
+   "swf": "bundle:kukubee.swf#k01_splatter_01_white",
+   "swf_sha": "2e2647c64469199e",
+   "key": "2e2647c64469199e:0.22:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    164,
+    196
+   ],
+   "world": [
+    82,
+    98
+   ],
+   "bytes": 5730,
+   "lossless": false,
+   "err": 0.0,
+   "sha": "b49b2a52bca40e78"
+  },
+  "stool": {
+   "scale": 0,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    64.1,
+    42.5
+   ],
+   "px": [
+    192,
+    156
+   ],
+   "file": "stool@2x.webp",
+   "swf": "bundle:firebog.swf#chair",
+   "swf_sha": "aa393aa1c9d7a670",
+   "key": "aa393aa1c9d7a670:0:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#090000\"], [50, \"#1a0100\"], [90, \"#2b0e00\"], [150, \"#4a3100\"], [210, \"#5e3e00\"], [255, \"#6e4c02\"]]:size=[96, 78]",
+   "ramp": [
+    [
+     0,
+     "#090000"
+    ],
+    [
+     50,
+     "#1a0100"
+    ],
+    [
+     90,
+     "#2b0e00"
+    ],
+    [
+     150,
+     "#4a3100"
+    ],
+    [
+     210,
+     "#5e3e00"
+    ],
+    [
+     255,
+     "#6e4c02"
+    ]
+   ],
+   "size": [
+    96,
+    78
+   ],
+   "out_px": [
+    192,
+    156
+   ],
+   "world": [
+    96,
+    78
+   ],
+   "bytes": 5726,
+   "lossless": false,
+   "err": 2.32,
+   "sha": "76cdeb72884ec83e"
+  },
+  "wall_rock_1": {
+   "scale": 1.3,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    173.5,
+    55.4
+   ],
+   "px": [
+    338,
+    108
+   ],
+   "file": "wall_rock_1@1.5x.webp",
+   "swf": "bundle:groddle1.swf#heights_face_rock_1",
+   "swf_sha": "c580748d7ab0afd2",
+   "key": "c580748d7ab0afd2:1.3:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#0b0401\"], [50, \"#1d0a03\"], [100, \"#2e1406\"], [150, \"#40230e\"], [200, \"#56381a\"], [255, \"#6e4e26\"]]",
+   "ramp": [
+    [
+     0,
+     "#0b0401"
+    ],
+    [
+     50,
+     "#1d0a03"
+    ],
+    [
+     100,
+     "#2e1406"
+    ],
+    [
+     150,
+     "#40230e"
+    ],
+    [
+     200,
+     "#56381a"
+    ],
+    [
+     255,
+     "#6e4e26"
+    ]
+   ],
+   "out_px": [
+    338,
+    108
+   ],
+   "world": [
+    225,
+    72
+   ],
+   "bytes": 11100,
+   "lossless": false,
+   "err": 1.8,
+   "sha": "4bdf5d3804df744c"
+  },
+  "wall_rock_2": {
+   "scale": 1.0,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    391.15,
+    111.9
+   ],
+   "px": [
+    587,
+    168
+   ],
+   "file": "wall_rock_2@1.5x.webp",
+   "swf": "bundle:groddle1.swf#heights_face_rock_2",
+   "swf_sha": "b06dcf1fbf2f49b2",
+   "key": "b06dcf1fbf2f49b2:1.0:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#0b0401\"], [50, \"#1d0a03\"], [100, \"#2e1406\"], [150, \"#40230e\"], [200, \"#56381a\"], [255, \"#6e4e26\"]]",
+   "ramp": [
+    [
+     0,
+     "#0b0401"
+    ],
+    [
+     50,
+     "#1d0a03"
+    ],
+    [
+     100,
+     "#2e1406"
+    ],
+    [
+     150,
+     "#40230e"
+    ],
+    [
+     200,
+     "#56381a"
+    ],
+    [
+     255,
+     "#6e4e26"
+    ]
+   ],
+   "out_px": [
+    587,
+    168
+   ],
+   "world": [
+    391,
+    112
+   ],
+   "bytes": 21430,
+   "lossless": false,
+   "err": 1.83,
+   "sha": "71f430f084982157"
+  },
+  "wall_rock_3": {
+   "scale": 1.0,
+   "density": 1.5,
+   "band": 0,
+   "stage": [
+    374.75,
+    139.1
+   ],
+   "px": [
+    562,
+    209
+   ],
+   "file": "wall_rock_3@1.5x.webp",
+   "swf": "bundle:groddle1.swf#heights_face_rock_3",
+   "swf_sha": "713e3d8579a6edbc",
+   "key": "713e3d8579a6edbc:1.0:1.5:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}:ramp=[[0, \"#0b0401\"], [50, \"#1d0a03\"], [100, \"#2e1406\"], [150, \"#40230e\"], [200, \"#56381a\"], [255, \"#6e4e26\"]]",
+   "ramp": [
+    [
+     0,
+     "#0b0401"
+    ],
+    [
+     50,
+     "#1d0a03"
+    ],
+    [
+     100,
+     "#2e1406"
+    ],
+    [
+     150,
+     "#40230e"
+    ],
+    [
+     200,
+     "#56381a"
+    ],
+    [
+     255,
+     "#6e4e26"
+    ]
+   ],
+   "out_px": [
+    562,
+    209
+   ],
+   "world": [
+    375,
+    139
+   ],
+   "bytes": 25716,
+   "lossless": false,
+   "err": 1.72,
+   "sha": "738740017b3fd8c8"
+  },
+  "wine_of_the_dead_01a_k1": {
+   "scale": 1.05,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    20.0,
+    65.0
+   ],
+   "px": [
+    42,
+    136
+   ],
+   "file": "wine_of_the_dead_01a_k1@2x.webp",
+   "swf": "bundle:kukubee.swf#wine_of_the_dead_01a_k1",
+   "swf_sha": "d155a1a68a550ae6",
+   "key": "d155a1a68a550ae6:1.05:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    42,
+    136
+   ],
+   "world": [
+    21,
+    68
+   ],
+   "bytes": 6506,
+   "lossless": true,
+   "err": 5.96,
+   "sha": "e951a49012ec0c89"
+  },
+  "wine_of_the_dead_01b_k1": {
+   "scale": 1.05,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    20.05,
+    64.95
+   ],
+   "px": [
+    42,
+    136
+   ],
+   "file": "wine_of_the_dead_01b_k1@2x.webp",
+   "swf": "bundle:kukubee.swf#wine_of_the_dead_01b_k1",
+   "swf_sha": "7bc2b2fa3f9c5959",
+   "key": "7bc2b2fa3f9c5959:1.05:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    42,
+    136
+   ],
+   "world": [
+    21,
+    68
+   ],
+   "bytes": 6112,
+   "lossless": true,
+   "err": 5.02,
+   "sha": "2a902399b32fae8f"
+  },
+  "wine_of_the_dead_01c_k1": {
+   "scale": 1.05,
+   "density": 2,
+   "band": 0,
+   "stage": [
+    37.5,
+    29.4
+   ],
+   "px": [
+    79,
+    62
+   ],
+   "file": "wine_of_the_dead_01c_k1@2x.webp",
+   "swf": "bundle:kukubee.swf#wine_of_the_dead_01c_k1",
+   "swf_sha": "fa9d86569582b584",
+   "key": "fa9d86569582b584:1.05:2:0:{\"big_3x\": 4096, \"dense\": 2.9, \"lossless_over\": 4.5, \"max_3x\": 8192, \"min_gain\": 6.0, \"quality\": 82, \"same_alpha\": 12.0, \"same_colour\": 8.0, \"svg_alpha\": 5.0, \"svg_colour\": 4.0, \"version\": 1, \"zoom\": 3}",
+   "out_px": [
+    79,
+    62
+   ],
+   "world": [
+    40,
+    31
+   ],
+   "bytes": 4740,
+   "lossless": true,
+   "err": 6.05,
+   "sha": "fb8a5224fac5c743"
+  }
+ }
+}

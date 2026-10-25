@@ -494,6 +494,55 @@ SETS = {
             'cloud_small2': (1, 2, 0),
         },
     },
+    # G140: the Hell Bar (LA5FPUNAI7P2NVF, hell_quest `hell_bar`) is not in the public locations dump, but
+    # Panka Surazu's door into it (GA5RPAFK9OE28GN.xml door_1330398275523) names its location SWFs:
+    # kukubee, groddle1, firebog. kukubee.swf holds the bar's own decos (hell_bar_sign_01a, the
+    # bartender's flames, three wine_of_the_dead bottles, the two shelves); the rest is read off the
+    # Snaps (research/wayback/raw/snaps/hell_quest/) and video shQ_KY3Pwxo (reference only): a wall of
+    # rounded stones (groddle1 heights_face_rock), a long plank counter (groddle1
+    # bureaucratic_hall_counter_1) with a skull-and-bones decal on its front (kukubee k01_fossil_01),
+    # round stools (firebog chair), curled bones at the shelf ends (kukubee k02_foreground_bone) and a
+    # white splash on the dark right wall (kukubee k01_splatter_01_white). Ramps are the colours sampled
+    # off the video (frames t115, t135): the location's dark red-brown light, baked in once. World
+    # scales against the avatar (~115 world px tall; the video shows ~1.35 world px per video px).
+    'hell_bar': {
+        'bundle': 'kukubee.swf',
+        'out': 'assets/sprites/hell/bar',
+        'js': 'js/hell-bar-art.js',
+        'export': 'HELL_BAR_FILES',
+        'pieces': {
+            'hell_bar_sign_01a': (1.0, 2, 0),
+            'hell_bar_bartender_flames_01a': (0.95, 2, 0),
+            'wine_of_the_dead_01a_k1': (1.05, 2, 0),
+            'wine_of_the_dead_01b_k1': (1.05, 2, 0),
+            'wine_of_the_dead_01c_k1': (1.05, 2, 0),
+            'shelf_long': (1.1, 2, 0, 'kukubee.swf', {
+                'deco': 'wardrobia_shelf_long',
+                'ramp': [[0, '#030000'], [70, '#24120a'], [140, '#53331a'], [200, '#785046'], [255, '#b07a44']]}),
+            'shelf_bone': (0.12, 2, 0, 'kukubee.swf', {
+                'deco': 'k02_foreground_bone',
+                'ramp': [[0, '#3a2414'], [120, '#8a6844'], [200, '#c8a070'], [255, '#e2c294']]}),
+            'skull_decal': (0.34, 2, 0, 'kukubee.swf', {
+                'deco': 'k01_fossil_01',
+                'ramp': [[0, '#0d0000'], [70, '#2a0400'], [140, '#5e1e04'], [200, '#873f0f'], [255, '#c06a28']]}),
+            'splash_white': (0.22, 2, 0, 'kukubee.swf', {'deco': 'k01_splatter_01_white'}),
+            'wall_rock_1': (1.3, 1.5, 0, 'groddle1.swf', {
+                'deco': 'heights_face_rock_1',
+                'ramp': [[0, '#0b0401'], [50, '#1d0a03'], [100, '#2e1406'], [150, '#40230e'], [200, '#56381a'], [255, '#6e4e26']]}),
+            'wall_rock_2': (1.0, 1.5, 0, 'groddle1.swf', {
+                'deco': 'heights_face_rock_2',
+                'ramp': [[0, '#0b0401'], [50, '#1d0a03'], [100, '#2e1406'], [150, '#40230e'], [200, '#56381a'], [255, '#6e4e26']]}),
+            'wall_rock_3': (1.0, 1.5, 0, 'groddle1.swf', {
+                'deco': 'heights_face_rock_3',
+                'ramp': [[0, '#0b0401'], [50, '#1d0a03'], [100, '#2e1406'], [150, '#40230e'], [200, '#56381a'], [255, '#6e4e26']]}),
+            'counter': (0, 2, 0, 'groddle1.swf', {
+                'deco': 'bureaucratic_hall_counter_1', 'size': [900, 112],
+                'ramp': [[0, '#0d0000'], [60, '#281100'], [110, '#382310'], [160, '#5a3a14'], [210, '#7a4e18'], [255, '#8a5a1a']]}),
+            'stool': (0, 2, 0, 'firebog.swf', {
+                'deco': 'chair', 'size': [96, 78],
+                'ramp': [[0, '#090000'], [50, '#1a0100'], [90, '#2b0e00'], [150, '#4a3100'], [210, '#5e3e00'], [255, '#6e4c02']]}),
+        },
+    },
 }
 
 

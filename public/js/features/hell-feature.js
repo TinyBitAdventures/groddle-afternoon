@@ -7,7 +7,9 @@
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&helldemo=croak sets energy to zero so
  * the next frame croaks; &helldemo=squish arrives dead with 10 grapes already
- * squished; &hellautoplay=1 squishes the nearest grapes until resurrection.
+ * squished; &hellautoplay=1 squishes the nearest grapes until resurrection;
+ * &helldemo=dead makes you dead where you stand (no teleport), so a Naraka
+ * street's doors and the Hell Bar can be walked as the dead walk them.
  */
 
 import {
@@ -20,6 +22,7 @@ import {
   checkPooped,
   createHellState,
   croak,
+  drinkWineOfTheDead,
   enforceHellOnEnter,
   ensureHellItems,
   graveMarkerPhase,
@@ -41,7 +44,9 @@ import {
   canTeleport,
   shouldCroak,
   squishGrape,
+  wineDrinkConditions,
 } from '../hell.js';
+import { countItem, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { frameTexture, sourceFromUrl } from '../textures.js';
 
 const GRAPE_SCALE = 0.8;
@@ -99,6 +104,14 @@ function applyEffects(effects, engine) {
       case 'quest_flag':
         engine.questFlag(effect.flag);
         break;
+      case 'consume_item':
+        removeItem(engine.inv, effect.classTsid, effect.count || 1);
+        engine.refreshPack();
+        break;
+      case 'remove_buff':
+        // Pooped lives in the hell state (hellPhysics); drop any HUD buff of that name too.
+        if (engine.hasBuff?.(effect.buff)) engine.removeBuff(effect.buff);
+        break;
       case 'remove_grape': {
         const target = grapeTargets.find((t) => t.grapeId === effect.id);
         if (target) {
@@ -134,10 +147,10 @@ function teleportFrom(effects) {
   return (effects || []).find((effect) => effect.type === 'teleport') || null;
 }
 
-function doCroak(engine) {
+function croakContext(engine) {
   const home = engine.homeContext();
   const street = engine.street;
-  const result = croak(state, {
+  return {
     streetTsid: engine.streetTsid,
     x: engine.player.x,
     y: engine.player.y,
@@ -146,7 +159,11 @@ function doCroak(engine) {
     home: home.inHome ? home.room : null,
     giant: street?.officialGiantId || 'generic',
     pc: engine.pc,
-  });
+  };
+}
+
+function doCroak(engine) {
+  const result = croak(state, croakContext(engine));
   if (!result.ok) return false;
   state = result.state;
   clearPromptTimers();
@@ -231,6 +248,11 @@ function demoSetup(engine) {
   const demo = engine.param('helldemo');
   if (demo === 'croak') {
     engine.pc.energy = 0;
+  } else if (demo === 'dead' && !state.isDead) {
+    // QA: dead where you stand (no croak teleport), e.g. on a Naraka street for the Hell Bar door.
+    state = normalizeHellState({ ...state, isDead: true, croakedAt: Date.now(), visitId: state.visitId + 1 });
+    engine.pc.energy = 0;
+    engine.updateHud();
   } else if (demo === 'squish' && !state.isDead) {
     engine.pc.energy = 0;
     if (doCroak(engine)) {
@@ -424,6 +446,34 @@ export const hellFeature = {
     publish(engine);
     if (result.canResurrect) setTimeout(() => doResurrect(engine), 900);
     else engine.save();
+    return true;
+  },
+
+  /** items/wine_of_the_dead.js drink: the dead stop being Pooped; the living croak. */
+  packVerbs(classTsid) {
+    if (classTsid !== 'wine_of_the_dead') return [];
+    const cond = wineDrinkConditions(state, Date.now());
+    return [{ id: 'drink', label: 'Drink', enabled: cond.state === 'enabled', reason: cond.reason, tooltip: cond.tooltip }];
+  },
+
+  runPackVerb(classTsid, verbId, engine) {
+    if (classTsid !== 'wine_of_the_dead' || verbId !== 'drink') return false;
+    if (countItem(engine.inv, 'wine_of_the_dead') < 1) return true;
+    const result = drinkWineOfTheDead(state, { ...croakContext(engine), now: Date.now() });
+    if (!result.ok) {
+      if (result.text) engine.toast(result.text, 2200);
+      return true;
+    }
+    state = result.state;
+    clearPromptTimers();
+    applyEffects(result.effects, engine);
+    engine.save();
+    const to = result.teleport;
+    if (to) {
+      lastEnergy = null;
+      engine.enter(to.tsid, { spawnX: to.x, spawnY: to.y, bypassFeatureGates: true });
+    }
+    publish(engine);
     return true;
   },
 

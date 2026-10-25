@@ -5,7 +5,7 @@
  */
 
 import { questFlagsFeature } from './quest-flags-feature.js?v=flags-1';
-import { hellFeature } from './hell-feature.js?v=hell-1';
+import { hellFeature } from './hell-feature.js?v=hell-2';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-3';
 import { questOffersFeature } from './quest-offers-feature.js?v=offers-2';
 import { meditationFeature } from './meditation-feature.js?v=g148-1';
@@ -105,5 +105,6 @@ import { snoConesFeature } from './sno-cones-feature.js?v=g148-1'; FEATURES.push
 import { bureaucraticHallsFeature } from './bureaucratic-halls-feature.js?v=g139-1'; FEATURES.push(bureaucraticHallsFeature);
 import { potionsFeature } from './potions-feature.js?v=g149-1'; FEATURES.push(potionsFeature);
 import { purpleJourneyFeature } from './purple-journey-feature.js?v=g150-1'; FEATURES.push(purpleJourneyFeature);
-import { crabsFeature } from './crabs-feature.js?v=g154-1'; FEATURES.push(crabsFeature);
 import { smallItemsFeature } from './small-items-feature.js?v=g155-1'; FEATURES.push(smallItemsFeature);
+import { crabsFeature } from './crabs-feature.js?v=g154-1'; FEATURES.push(crabsFeature);
+import { hellBarFeature } from './hell-bar-feature.js?v=g140-1'; FEATURES.push(hellBarFeature);
