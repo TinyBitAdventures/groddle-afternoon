@@ -31,11 +31,13 @@ export function minnUrls(baseUri) {
 const NONCE = /^[0-9a-f]{10}$/;
 
 /**
- * @param {{ baseUri: string, fetch?: typeof fetch }} opts
+ * @param {{ baseUri: string, fetch?: typeof fetch, nonce?: string }} opts
+ *   nonce: a REST nonce already in hand (the multiplayer boot data), so the
+ *   first call needs no admin-ajax round trip.
  */
-export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(globalThis) } = {}) {
+export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.bind(globalThis), nonce: givenNonce = '' } = {}) {
   const urls = minnUrls(baseUri);
-  let nonce = '';
+  let nonce = NONCE.test(String(givenNonce)) ? String(givenNonce) : '';
 
   async function call(path, { method = 'GET', body, keepalive = false } = {}) {
     const headers = {};
@@ -54,6 +56,19 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     let data = null;
     try { data = await res.json(); } catch { /* not JSON: no Minn here */ }
     return { status: res.status, ok: res.ok, data };
+  }
+
+  /** A fresh nonce from admin-ajax (a stale one answers 403 rest_cookie_invalid_nonce). */
+  async function refreshNonce() {
+    try {
+      const res = await fetchFn(urls.nonce, { credentials: 'same-origin', cache: 'no-store' });
+      const text = String(await res.text()).trim();
+      if (res.ok && NONCE.test(text)) {
+        nonce = text;
+        return true;
+      }
+    } catch { /* offline: the caller's answer stands */ }
+    return false;
   }
 
   const failed = (what, r) => Object.assign(new Error(`${what} failed (${r.status}${r.data?.code ? ` ${r.data.code}` : ''})`), { status: r.status, code: r.data?.code || '', data: r.data });
@@ -112,6 +127,28 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     async writeBackup(slot, data, gameDay = '') {
       const r = await call(`backups/${Number(slot)}`, { method: 'PUT', body: { data, gameDay } });
       if (!r.ok) throw failed('Backing up', r);
+      return r.data;
+    },
+
+    /**
+     * A single-use ticket for the realtime server (multiplayer phase 3,
+     * minn/groddle/src/RealtimeTicket.php): { ticket, expiresIn, path }.
+     * Throws with .status: 401 signed out, 503 when the site has no realtime
+     * secret, 0 when the site cannot be reached. A stale nonce is refreshed
+     * once.
+     */
+    async realtimeTicket() {
+      let r;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          r = await call('realtime', { method: 'POST' });
+        } catch {
+          throw Object.assign(new Error('The Groddle site is not answering'), { status: 0, code: 'offline' });
+        }
+        if (r.status === 403 && r.data?.code === 'rest_cookie_invalid_nonce' && attempt === 0 && (await refreshNonce())) continue;
+        break;
+      }
+      if (!r.ok || typeof r.data?.ticket !== 'string') throw failed('Asking for a realtime ticket', r);
       return r.data;
     },
 

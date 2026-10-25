@@ -125,4 +125,5 @@ import { spiritLonelinessFeature } from './spirit-loneliness-feature.js?v=lonely
 import { funpickleFeature } from './funpickle-feature.js?v=desk2-7'; FEATURES.push(funpickleFeature);
 import { qurazyFeature } from './qurazy-feature.js?v=g321-1'; FEATURES.push(qurazyFeature);
 import { energyDecayFeature } from './energy-decay-feature.js?v=g321-1'; FEATURES.push(energyDecayFeature);
-import { accountBackupFeature } from './account-backup-feature.js?v=mp2-1'; FEATURES.push(accountBackupFeature);
+import { realtimeFeature } from './realtime-feature.js?v=mp3-1'; FEATURES.push(realtimeFeature);
+import { accountBackupFeature } from './account-backup-feature.js?v=mp2-2'; FEATURES.push(accountBackupFeature);

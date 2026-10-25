@@ -14,9 +14,9 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=mp2-1';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=mp2-1';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=mp2-1';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=mp2-2';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=mp2-2';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=mp2-2';
 import { FEATURES } from '../public/js/features/index.js';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-1';
 

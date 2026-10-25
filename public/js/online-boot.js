@@ -12,7 +12,7 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccount } from './minn-account.js?v=mp2-1';
+import { createMinnAccount } from './minn-account.js?v=mp2-2';
 
 const PILL_TEXT = {
   saved: 'Saved',

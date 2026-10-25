@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-13';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-128';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-129';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -6956,6 +6956,8 @@ const idleSheetLog = [];
 let avatarCatalog = null;
 /** Baked custom looks: lookKey -> { pack?, promise, bases }. Two at most. */
 const vectorBakes = new Map();
+/** Packs other players' Glitches are drawn with (multiplayer, engine.holdGlitchPacks): never trimmed. */
+let heldGlitchAnims = new Set();
 
 /** Device pixels per art pixel decide the bake: 3x like js/sprite-hires.js, else 1x. */
 function vectorBakeScale() {
@@ -7050,7 +7052,7 @@ function vectorAnimPack(key, app) {
 function trimVectorBakes(keep) {
   for (const [lk, bake] of vectorBakes) {
     if (vectorBakes.size <= 2) break;
-    if (lk === keep || !bake.pack || player?.anims === bake.pack.anims) continue;
+    if (lk === keep || !bake.pack || player?.anims === bake.pack.anims || heldGlitchAnims.has(bake.pack.anims)) continue;
     for (const [k, p] of appearanceTexCache) if (p.anims === bake.pack.anims) appearanceTexCache.delete(k);
     for (const base of bake.bases) base.destroy();
     vectorBakes.delete(lk);
@@ -7798,6 +7800,25 @@ const engine = {
   get groundY() {
     return GROUND_Y;
   },
+  /** The player's look (character builder), for others to draw (multiplayer). */
+  get playerAppearance() {
+    return playerAppearance;
+  },
+  /**
+   * Another player's Glitch from their look ({ vector }): the anim pack the
+   * player's own sprite uses (pack.anims by source animation). A custom
+   * look bakes first: the default look comes back with pending: true until
+   * it is ready, so ask again. Hold the packs in use with holdGlitchPacks.
+   */
+  glitchPack(look) {
+    return getAppearanceTextures(normalizeAppearance({ vector: look?.vector && typeof look.vector === 'object' ? look.vector : {} }));
+  },
+  /** The packs other players are drawn with: their bakes are kept, every other bake may be freed. */
+  holdGlitchPacks(packs) {
+    heldGlitchAnims = new Set((packs || []).map((p) => p?.anims).filter(Boolean));
+  },
+  /** A line in the Local chat dock (it fades like the street's own). */
+  chatLine: (speaker, text) => showLocalChatBubble(String(speaker || ''), String(text || '')),
   get worldW() {
     return WORLD_W;
   },
@@ -8212,7 +8233,7 @@ const engine = {
     return Promise.resolve(false);
   },
   /** /who (location.js get_roster_msg): the player and the Glitches chatting on this street. */
-  whoIsHere: () => [playerSpeechTarget?.label || 'Ur', ...localCompanions.map((actor) => actor.name)],
+  whoIsHere: () => [playerSpeechTarget?.label || 'Ur', ...localCompanions.map((actor) => actor.name), ...(features.query('remotePlayerNames', engine) || [])],
   /** Rebuild the current home room in place (decorate / cultivate changes). */
   async refreshHomeScene(opts = {}) {
     if (!homeIsInstanced()) return false;
@@ -20085,7 +20106,10 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   const text = String(message || '').trim().slice(0, 180);
   if (!text) return { ok: false, reason: 'empty' };
   const result = submitIncantation(featState, text, participant, Date.now());
-  showLocalChatBubble(participant, text, { feat: result.matched || result.broken });
+  // Multiplayer: the player's line also goes to the street, under their own name (realtime-feature).
+  const shown = participant === 'Ur' ? features.query('playerChatName', engine) || participant : participant;
+  if (participant === 'Ur') features.query('localChatSaid', text, engine);
+  showLocalChatBubble(shown, text, { feat: result.matched || result.broken });
   // The Local chat dock keeps the whole chain. In-world, keep only the current
   // speaker readable instead of stacking three large bubbles over the actors.
   if (result.matched) clearSpeechBubbles();
@@ -20093,7 +20117,7 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
     // A plain "hi" says hi (the hi sign) with no bubble (RightSideManager.as 233).
   } else if (participant === 'Ur') {
     showSpeechBubble(playerSpeechTarget, {
-      speaker: participant,
+      speaker: shown,
       text,
       durationMs: result.matched ? 12_000 : 7_200,
     });
@@ -20105,7 +20129,7 @@ function sayLocalChat(message, participant = 'Ur', { quietActivity = false } = {
   if (result.ok || result.broken) {
     handleFeatResult(result, participant);
   } else if (!quietActivity && participant === 'Ur') {
-    pushActivity(`${participant}: ${text}`);
+    pushActivity(`${shown}: ${text}`);
   }
   return result;
 }
