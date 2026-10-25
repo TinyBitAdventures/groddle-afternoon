@@ -457,18 +457,29 @@ async function streetTransition(el, opts) {
   if (badge) badge.hidden = true;
   el.dataset.stHomeTo = '';
   if (snapWrap && snap) {
-    // refresh() always draws the rounded 0x666666 picture box; the image loads over it.
-    snapWrap.hidden = false;
+    // refresh() always drew the rounded 0x666666 picture box with the street's
+    // picture over it, and set "Entering" 42 px above the box's foot. Most
+    // streets have no picture in the remake: an empty box under the overlapping
+    // title read as broken, so without one the box goes and the title stands
+    // on its own (data-st-snap="none").
+    const card = snapWrap.closest('.st-card');
+    const noPicture = () => {
+      snap.removeAttribute('src');
+      snap.hidden = true;
+      snapWrap.hidden = true;
+      card?.classList.add('no-snap');
+      el.dataset.stSnap = 'none';
+    };
     if (opts.loadingImg) {
       snap.alt = opts.toLabel || 'Street preview';
       snap.hidden = false;
-      snap.onerror = () => {
-        snap.hidden = true;
-      };
+      snapWrap.hidden = false;
+      card?.classList.remove('no-snap');
+      el.dataset.stSnap = 'picture';
+      snap.onerror = noPicture;
       snap.src = opts.loadingImg;
     } else {
-      snap.removeAttribute('src');
-      snap.hidden = true;
+      noPicture();
     }
   }
   const setStatus = (text, percent = 0) => {

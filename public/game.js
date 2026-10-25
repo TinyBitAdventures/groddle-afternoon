@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-89';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-90';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -637,9 +637,9 @@ import {
   streetCardUp,
   STREET_CARD_UP,
   cardPausedTimeout,
-} from './js/screen-fx.js?v=g225-1';
+} from './js/screen-fx.js?v=card-1';
 import { applyFamiliarLook, familiarCardHeading, familiarLook, skillLearnedActivity } from './js/familiar.js?v=g225-1';
-import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=g225-1';
+import { armPromptTimeout, promptTimeoutMs } from './js/prompt-timeout.js?v=card-1';
 import {
   planTravel,
   listMapDestinations,

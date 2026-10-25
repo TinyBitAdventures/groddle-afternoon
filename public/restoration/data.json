@@ -2029,9 +2029,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 446,
+  "commits": 447,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Speech bubble tails point at their speaker at the screen edge, and the unlearning card looks like the client's"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2146,11 +2151,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Feats open again a game week after you finish them, for another rock"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "A crab that hears its last tune again sulks but lets you keep the block"
    }
   ]
  },

@@ -5088,6 +5088,8 @@ header.top-bar + .sub { display: none; }
   margin-top: -42px;
   padding: 0 10px;
 }
+/* No picture for this street: the title stands on its own, not over a box's foot. */
+.st-card.no-snap .st-title { margin-top: 0; }
 .st-entering {
   margin: 0;
   font-size: 0.82rem;

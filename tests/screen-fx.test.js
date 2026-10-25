@@ -18,7 +18,7 @@ import {
   awardRewardTokens,
   runStreetTransition,
   showAwardScreen,
-} from '../public/js/screen-fx.js?v=g225-1';
+} from '../public/js/screen-fx.js?v=card-1';
 
 describe('screen-fx timings (LoadingLocationView / BaseScreenView)', () => {
   it('uses deliberate non-skippable fade windows (seconds)', () => {
@@ -164,7 +164,7 @@ describe('badge + loading asset maps (local pack)', () => {
 
 describe('award card text', () => {
   it('drops GSJS item links and tags but keeps the words', async () => {
-    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=g225-1');
+    const { awardText, normalizeAwardPages } = await import('../public/js/screen-fx.js?v=card-1');
     assert.equal(
       awardText('Give 6 <a href="event:item|npc_piggy">Piggies</a> the pleasuring of a lifetime. By petting them, of course.'),
       'Give 6 Piggies the pleasuring of a lifetime. By petting them, of course.',
@@ -175,7 +175,7 @@ describe('award card text', () => {
   });
 });
 
-import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=g225-1';
+import { LOAD_STATUS, loadStatusLabel, loadingSplit, cssColor } from '../public/js/screen-fx.js?v=card-1';
 
 describe('loading card status and hub split (LoadingLocationView.as)', () => {
   it('uses the client status labels with the TimerBar percent', () => {
@@ -193,5 +193,21 @@ describe('loading card status and hub split (LoadingLocationView.as)', () => {
     assert.equal(loadingSplit({ fromHub: 'A', toHub: 'B', fromTop: '#111', toTop: '#111', fromBottom: '#222', toBottom: '#222' }).leaving, false);
     assert.equal(cssColor(0x0a0b0c), '#0a0b0c');
     assert.equal(cssColor('', '#fff'), '#fff');
+  });
+});
+
+describe('loading card without a picture', () => {
+  it('drops the empty picture box and lets the title stand on its own', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join, dirname } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
+    const fx = readFileSync(join(pub, 'js/screen-fx.js'), 'utf8');
+    // With a picture, "Entering" sits 42 px over its foot (LoadingLocationView.as 589); without one, no box.
+    assert.match(fx, /snapWrap\.hidden = true;\n\s+card\?\.classList\.add\('no-snap'\);/);
+    assert.match(fx, /snap\.onerror = noPicture;/);
+    const css = readFileSync(join(pub, 'style.css'), 'utf8');
+    assert.match(css, /\.st-title \{\n  position: relative;\n  margin-top: -42px;/);
+    assert.match(css, /\.st-card\.no-snap \.st-title \{ margin-top: 0; \}/);
   });
 });
