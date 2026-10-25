@@ -17,7 +17,10 @@
  *    (cubimal-race-feature).
  *  - Game events the remake already emits (onEvent, EVENT_RULES): animal
  *    verbs, tree care, harvests, meditation minutes, Emotional Bear actions,
- *    Cubimals set free.
+ *    Cubimals set free; since G173 also Salmon pockets (resource-nodes.js
+ *    npc_salmon:pocket), Fertilidust and the fecundity powders (powders
+ *    feature notifyVerb), and the Spinning Wheel's Cubimal boxes (game.js
+ *    updateSpinningWheel drop_table_spinning_wheel_<item>).
  *  - Counts this feature watches (onTick): completed quests
  *    (questState.completed) and qurazy quoins (quoinState.qurazyFound).
  *  - Streaking (location.js 1041-1055) and "… And Ask Nothing in Return"
@@ -34,6 +37,14 @@
  *     and E > Pet. &featautoplay=1 sends one increment through the
  *     featsIncrement hook 1.5 s in (for screenshots). &featopen=1 opens the
  *     Feat panel. &featreset=1 clears solo Feat progress.
+ *     G173 verbs: &featdemo=animal_love&resdemo=npc_salmon&resautoplay=1
+ *     (pocket a Salmon; 1 in 10 is a boot and does not count);
+ *     &featdemo=streaking&featprogress=0&stootdemo=1&wheelautoplay=1&wheelroll=0.995
+ *     (a Cubimal Series 1 Box, +5; 0.985 gives Series 2);
+ *     &featdemo=pet_only&featprogress=0&powderdemo=1&powderautoplay=fertilidust
+ *     (+3 waiting, on a street with trees; fertilidust_lite gives +1), and
+ *     &featdemo=pet_only&featpending=5&powderdemo=1&powderautoplay=powder_of_mild_fecundity
+ *     (the pile is lost).
  * Canvas: soloFeats (id:value/goal,...), soloFeatLast, soloFeatRocks,
  *   soloFeatCompleted, soloFeatPending, soloFeatStreak, soloFeatDemo,
  *   soloFeatWired, soloFeatUnwired.
@@ -63,7 +74,7 @@ import {
   resetPending,
   streakCheck,
   takePending,
-} from '../solo-feats.js?v=g143-1';
+} from '../solo-feats.js?v=g173-1';
 
 const POLL_MS = 500;
 const ROCK_ICON = 'assets/sprites/icons/petrified_rock_small@3x.png';

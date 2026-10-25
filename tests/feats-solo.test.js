@@ -31,10 +31,11 @@ import {
   streakCheck,
   takePending,
   vogTextFor,
-} from '../public/js/solo-feats.js?v=g143-1';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g143-1';
+} from '../public/js/solo-feats.js?v=g173-1';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g173-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=player-save-7';
+import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
 
 const ROOT = join(import.meta.dirname, '..');
 const GSJS = join(ROOT, '..', 'glitch-GameServerJS');
@@ -311,5 +312,119 @@ describe('Solo Feats feature', () => {
     assert.equal(again.pending, 1);
     assert.equal(featSummary(again), featSummary(normalizeSoloFeatState(slice)));
     assert.equal(normalizeSoloFeatState({ progress: { animal_love: { value: 999 } } }).progress.animal_love.value, 50);
+  });
+});
+
+describe('G173: the missing increments', () => {
+  const by = (counter, amount) => eventIncrements(counter, amount).map((r) => `${r.featId}:${r.mode}:${r.amount}`).sort();
+  const read = (...parts) => readFileSync(join(GSJS, ...parts), 'utf8');
+
+  it('reads the source call sites it wires', { skip: !hasGsjs && 'glitch-GameServerJS not checked out' }, () => {
+    // npc_salmon.js:195-207: the boot fails the verb; only a landed Pocket Salmon counts.
+    assert.match(read('items', 'npc_salmon.js'), /if \(remainder > 0\) \{\s*failed = true;\s*\}\s*else \{\s*pc\.feats_increment\('animal_love', 1\);/);
+    // salmon.js:92 release, +1 (no remake verb yet).
+    assert.match(read('items', 'salmon.js'), /pc\.announce_sound\('SALMON_RELEASE'\); \/\/play sound\s*pc\.feats_increment\('animal_love', 1\);/);
+    // inc_skill_packages.js:53-54: the Spinning Wheel's Cubimal boxes give the Lucky Streak 5.
+    assert.match(read('players', 'inc_skill_packages.js'),
+      /class_id == 'spinning_wheel' && \(it\.class_id == 'cubimal_package' \|\| it\.class_id == 'cubimal_package_2'\)\)\{\s*this\.feats_increment\('streaking', 5\);/);
+    assert.ok(read('players', 'inc_skill_packages.js').includes("this.quests_inc_counter('drop_table_'+class_id+'_'+it.class_id, it.count);"));
+    assert.ok(read('items', 'fertilidust.js').includes('pc.feats_increment_for_commit(3);'));
+    assert.ok(read('items', 'fertilidust_lite.js').includes('pc.feats_increment_for_commit(1);'));
+    assert.ok(read('items', 'powder_of_mild_fecundity.js').includes('pc.feats_reset_commit();'));
+    assert.ok(read('items', 'powder_of_startling_fecundity.js').includes('pc.feats_reset_commit();'));
+  });
+
+  it('finds that a Batterfly only counts its feed: milk, massage and sing to are hidden no-ops', { skip: !hasGsjs && 'glitch-GameServerJS not checked out' }, () => {
+    const src = read('items', 'npc_batterfly.js');
+    for (const verb of ['milk', 'massage', 'sing_to']) {
+      const start = src.indexOf(`verbs.${verb} = { // defined by npc_batterfly`);
+      assert.ok(start > 0, verb);
+      const body = src.slice(start, src.indexOf('\n};', start));
+      // conditions return {state:null}: the verb is not offered; the handler never reaches parent_verb_npc_butterfly_*.
+      assert.match(body, /"conditions"\s*: function\(pc, drop_stack\)\{\s*return \{state:null\};/, verb);
+      assert.doesNotMatch(body, /parent_verb_|feats_increment|runSkillPackage/, verb);
+    }
+    // The feed is the batterfly's own, three per animal per player.
+    assert.match(src, /verbs\.feed = \{ \/\/ defined by npc_batterfly/);
+    assert.match(src, /if \(this\.times_fed_for_feat\[pc\.tsid\] < 3\) \{\s*pc\.feats_increment\('animal_love', 1\);/);
+  });
+
+  it('maps the new events at the source amounts', () => {
+    assert.deepEqual(by('npc_salmon:pocket'), ['animal_love:direct:1']);
+    assert.deepEqual(by('drop_table_spinning_wheel_cubimal_package'), ['streaking:direct:5']);
+    assert.deepEqual(by('drop_table_spinning_wheel_cubimal_package_2'), ['streaking:direct:5']);
+    assert.deepEqual(by('drop_table_spinning_wheel_musicblock_x_shiny_01'), []);
+    assert.deepEqual(by('drop_table_spinning_wheel_currants', 500), []);
+    assert.deepEqual(by('drop_table_sno_cones_sno_cone_blue'), []);
+    assert.deepEqual(by('fertilidust:disperse'), ['pet_only:commit:3']);
+    assert.deepEqual(by('fertilidust_lite:sprinkle'), ['pet_only:commit:1']);
+    assert.deepEqual(by('powder_of_mild_fecundity:disperse'), ['pet_only:reset:0']);
+    assert.deepEqual(by('powder_of_startling_fecundity:disperse'), ['pet_only:reset:0']);
+    // The Batterfly's milk / massage / sing to are not counted (see above).
+    assert.deepEqual(by('npc_batterfly:milk'), []);
+    assert.deepEqual(by('npc_batterfly:massage'), []);
+    assert.deepEqual(by('npc_batterfly:sing_to'), []);
+    assert.deepEqual(by('npc_batterfly:feed'), ['animal_love:direct:1']);
+  });
+
+  it('counts npc_salmon:pocket from a real pocket, never from the boot', () => {
+    const counters = (roll) => harvestResourceNode(createResourceNode('npc_salmon'), {}, { energy: 50 },
+      { now: 1_000, dayKey: 'd1', rng: () => roll }).achievementCounters.map((c) => c.counter);
+    assert.deepEqual(counters(0.5), ['npc_salmon:pocket']);
+    assert.deepEqual(counters(0.05), []);
+  });
+
+  it('emits the Spinning Wheel drop-table counter from game.js', () => {
+    const game = readFileSync(join(ROOT, 'public', 'game.js'), 'utf8');
+    const at = game.indexOf('function updateSpinningWheel()');
+    const body = game.slice(at, game.indexOf('\nfunction ', at + 10));
+    assert.match(body, /emitGameEvent\(`drop_table_\$\{result\.reward\.table \|\| 'spinning_wheel'\}_/);
+  });
+
+  it('finishes the Lucky Streak from one Cubimal box and Heebo from one Salmon', () => {
+    const params = { featdemo: 'streaking', featprogress: '0' };
+    const engine = fakeEngine({ param: (k) => params[k] ?? null });
+    soloFeatsFeature.restore(undefined, engine);
+    soloFeatsFeature.onStreetEnter({ tsid: 'GLI32G3NUTD100I' }, engine);
+    soloFeatsFeature.onEvent('drop_table_spinning_wheel_cubimal_package', 1, engine);
+    assert.equal(soloFeatsFeature.save().progress.streaking.value, 5);
+    assert.equal(engine.inv.petrified_rock_small, 1);
+    assert.match(engine.calls.data.soloFeatLast, /^streaking:\+5:5\/5:complete$/);
+
+    const salmon = fakeEngine({ param: (k) => ({ featdemo: 'animal_love' })[k] ?? null });
+    soloFeatsFeature.restore(undefined, salmon);
+    soloFeatsFeature.onStreetEnter({ tsid: 'GLI32G3NUTD100I' }, salmon);
+    soloFeatsFeature.onEvent('npc_salmon:pocket', 1, salmon);
+    assert.equal(soloFeatsFeature.save().progress.animal_love.value, 50);
+    assert.equal(salmon.inv.petrified_rock_small, 1);
+  });
+
+  it('piles up Fertilidust kindness and loses it to a fecundity powder', () => {
+    const engine = fakeEngine();
+    soloFeatsFeature.restore(undefined, engine);
+    soloFeatsFeature.onEvent('fertilidust:disperse', 1, engine);
+    soloFeatsFeature.onEvent('fertilidust_lite:sprinkle', 1, engine);
+    assert.equal(soloFeatsFeature.save().pending, 4);
+    soloFeatsFeature.onEvent('powder_of_mild_fecundity:disperse', 1, engine);
+    assert.equal(soloFeatsFeature.save().pending, 0);
+    assert.ok(engine.calls.activity.includes(LOST_COMMIT_TEXT));
+  });
+
+  // QA oddity: a fresh game's first quest gave Feat First, Quick on Your Feat
+  // and Down To The Wire at once. inc_feats.js 53-72 + 104-106 do the same for
+  // a first contribution in the Feat's first 30 minutes (here: of the save).
+  it('gives a first quest the three badges the source gives a first contribution', () => {
+    const engine = fakeEngine();
+    soloFeatsFeature.restore(undefined, engine);
+    // onTick polls every 500 ms of its own clock (module state shared with the tests above).
+    soloFeatsFeature.onTick(16, 50_000_000, engine);
+    engine.questState.completed.push('first');
+    soloFeatsFeature.onTick(16, 60_000_000, engine);
+    assert.deepEqual(engine.calls.achievement, [['feats:contributed', 1], ['epics_contributed:2', 1]]);
+    assert.deepEqual(engine.calls.grant, ['quick_on_your_feat', 'down_to_the_wire']);
+    // After the first 30 minutes a first contribution to another Feat gets no Quick on Your Feat.
+    const late = normalizeSoloFeatState({ openedAt: 1_000 });
+    assert.deepEqual(incrementFeat(late, 'hi_signs_1', 1, {}, 1_000 + QUICK_MS + 1).grants, ['down_to_the_wire']);
+    assert.deepEqual(incrementFeat(late, 'tottlys_toys', 1, {}, 1_000 + QUICK_MS).grants, ['quick_on_your_feat', 'down_to_the_wire']);
   });
 });

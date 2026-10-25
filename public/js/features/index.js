@@ -6,7 +6,7 @@
 
 import { questFlagsFeature } from './quest-flags-feature.js?v=flags-1';
 import { hellFeature } from './hell-feature.js?v=hell-3';
-import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-3';
+import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-4';
 import { questOffersFeature } from './quest-offers-feature.js?v=offers-2';
 import { meditationFeature } from './meditation-feature.js?v=g148-1';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-1';
@@ -109,6 +109,6 @@ import { smallItemsFeature } from './small-items-feature.js?v=g155-1'; FEATURES.
 import { crabsFeature } from './crabs-feature.js?v=g154-2'; FEATURES.push(crabsFeature);
 import { hellBarFeature } from './hell-bar-feature.js?v=g140-2'; FEATURES.push(hellBarFeature);
 import { machineRoomsFeature } from './machine-rooms-feature.js?v=g169-1'; FEATURES.push(machineRoomsFeature);
-import { soloFeatsFeature } from './solo-feats-feature.js?v=g143-1'; FEATURES.push(soloFeatsFeature);
+import { soloFeatsFeature } from './solo-feats-feature.js?v=g173-1'; FEATURES.push(soloFeatsFeature);
 import { slashCommandsFeature } from './slash-commands-feature.js?v=g160-1'; FEATURES.push(slashCommandsFeature);
 import { hellTicketsFeature } from './hell-tickets-feature.js?v=g163-1'; FEATURES.push(hellTicketsFeature);

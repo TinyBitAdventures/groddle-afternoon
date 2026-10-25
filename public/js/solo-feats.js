@@ -198,8 +198,8 @@ export const SOLO_FEATS = Object.freeze([
     epic_id: 0,
     goal: 5,
     unit: 'streets',
-    what: 'Go nekkid and cross a street: leave it at least 1,000 pixels from where you came in. One per street per game day.',
-    source: 'locations/location.js 1041-1055 onPlayerExit (nekkid, 1,000 px, once per street per game day)',
+    what: 'Go nekkid and cross a street: leave it at least 1,000 pixels from where you came in. One per street per game day. A Cubimal box from the Spinning Wheel counts 5.',
+    source: 'locations/location.js 1041-1055 onPlayerExit (nekkid, 1,000 px, once per street per game day); players/inc_skill_packages.js:53-54 spinning_wheel cubimal_package +5',
   }),
   feat('tottlys_toys', {
     line: 98,
@@ -222,8 +222,8 @@ export const SOLO_FEATS = Object.freeze([
     epic_id: 0,
     goal: 50,
     unit: 'animal interactions',
-    what: 'Pet, feed, nibble, squeeze, milk, massage, sing to, brush, hug and flatter animals.',
-    source: 'feats_increment("animal_love") in npc_piggy, npc_chicken, npc_butterfly, npc_batterfly, npc_crab, npc_fox, npc_sloth, npc_kitty_chicken, chick, piglet, caterpillar',
+    what: 'Pet, feed, nibble, squeeze, milk, massage, sing to, brush, hug and flatter animals, or pocket a Salmon.',
+    source: 'feats_increment("animal_love") in npc_piggy, npc_chicken, npc_butterfly, npc_batterfly, npc_crab, npc_fox, npc_sloth, npc_kitty_chicken, npc_salmon, chick, piglet, caterpillar',
   }),
   feat('makeup_feat_redux', {
     line: 114,
@@ -272,6 +272,10 @@ export const EVENT_RULES = Object.freeze([
   rule('animal_love', /^animals_grown:(?:chick|piglet|caterpillar)$/, 1, 'chick.js:245, piglet.js:259, caterpillar.js:195 feed that grows it'),
   rule('animal_love', /^fox:fibers_brushed$/, 1, 'npc_fox.js:413 endBrushing'),
   rule('animal_love', /^sloth:snails_received$/, 1, 'npc_sloth.js:303 feed'),
+  // G173. npc_salmon.js:207 pocket, only when the Pocket Salmon lands (not the
+  // 10% boot); resource-nodes.js counts npc_salmon:pocket on that branch.
+  // salmon.js:92 release (the pack item's verb) has no remake verb yet.
+  rule('animal_love', /^npc_salmon:pocket$/, 1, 'npc_salmon.js:207 pocket'),
   // —— "… And Ask Nothing in Return": pending until you leave the street ——
   rule('pet_only', /^trants_petted:/, 1, 'include/trants.js:92 onPettingComplete', 'commit'),
   rule('pet_only', /^trants_watered:/, 1, 'include/trants.js:198 onWateringComplete, paper_tree.js:624 onTendComplete', 'commit'),
@@ -284,11 +288,25 @@ export const EVENT_RULES = Object.freeze([
   rule('pet_only', /^(?:trants_harvested:|completed_harvest:wood_tree$|paper_tree:harvest$)/, 0, 'include/trants.js:435, wood_tree.js:798, paper_tree.js:480 harvests', 'reset'),
   rule('pet_only', /^npc_butterfly:milk$/, 0, 'npc_butterfly.js:1360 onMilkComplete', 'reset'),
   rule('pet_only', /^npc_piggy:nibble$/, 0, 'npc_piggy.js:1668 (commented after the Feat)', 'reset'),
+  // G173. Fertilidust is kindness to trees (fertilidust.js:352 +3 when live
+  // trants are on the street, fertilidust_lite.js:296 +1 on a tree); a
+  // fecundity powder milks every animal at once and drops the pile
+  // (powder_of_mild_fecundity.js:376, powder_of_startling_fecundity.js:379).
+  // The remake's fertilidust:disperse also fires when it only revives dead
+  // trants (powders-feature fertilidust), which the source would not count.
+  rule('pet_only', /^fertilidust:disperse$/, 3, 'fertilidust.js:352 onUse', 'commit'),
+  rule('pet_only', /^fertilidust_lite:sprinkle$/, 1, 'fertilidust_lite.js:296 onUse', 'commit'),
+  rule('pet_only', /^powder_of_(?:mild|startling)_fecundity:disperse$/, 0, 'powder_of_mild_fecundity.js:376, powder_of_startling_fecundity.js:379', 'reset'),
   // —— The Meditation of Groddlocritus: whole minutes ——
   rule('meditation_of_groddlocritus', /^focusing_orb:meditation_time$/, 'event', 'meditation.js focusing_orb:meditation_time (minutes)'),
   // —— Tottly's Toys ——
   rule('tottlys_toys', /^(?:players_hugged|players_high_fived|kissed|players_mooned)$/, 1, 'emotional_bear.js:124/192/299/380 (once per target)'),
   rule('tottlys_toys', /^cubimals_freed:/, 5, 'npc_cubimal_*.js:861 set free'),
+  // —— The Lucky Streak: the Spinning Wheel's Cubimal boxes ——
+  // G173. inc_skill_packages.js:53-54 runDropTable('spinning_wheel') gives +5
+  // for cubimal_package or cubimal_package_2; game.js updateSpinningWheel
+  // emits the drop table's own quest counter (inc_skill_packages.js:41).
+  rule('streaking', /^drop_table_spinning_wheel_cubimal_package(?:_2)?$/, 5, 'inc_skill_packages.js:54 spinning_wheel cubimal_package'),
 ]);
 
 function rule(featId, match, amount, source, mode = 'direct') {

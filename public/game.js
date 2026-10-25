@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-58';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-59';
 import {
   actionDurationFor,
   createTimedAction,
@@ -6092,6 +6092,9 @@ function updateSpinningWheel() {
         durationMs: 5_800,
       });
       pushActivity(`The Spinning Wheel awards ${result.label}. ${result.response}`);
+      // inc_skill_packages.js:41 / :66 runDropTable quest counter drop_table_<table>_<item|currants>
+      // (the Lucky Streak's +5 for a Cubimal box rides on it, :53-54, js/solo-feats.js).
+      emitGameEvent(`drop_table_${result.reward.table || 'spinning_wheel'}_${result.reward.kind === 'currants' ? 'currants' : result.reward.classTsid}`, result.reward.amount);
       toast(`You won ${result.label}!`, 4200);
       floatText(target.sprite.x, target.sprite.y - 170, result.label, 0xffdc5e);
       burst(target.sprite.x, target.sprite.y - 90, 0xffdc5e, result.tier === 4 ? 32 : 18);

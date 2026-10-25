@@ -1511,6 +1511,10 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
       node.respawnAt = now + def.respawnMs;
       msgs.push(plan.boot ? 'Huh, looked like a fish at first.' : 'You pocketed a Salmon.');
       extra.boot = plan.boot;
+      // items/item.js:738 notifyVerb counts npc_salmon:pocket only on success;
+      // the boot sets failed (npc_salmon.js:195-198). Heebo's Happy Accident
+      // rides on it (npc_salmon.js:207, js/solo-feats.js).
+      if (!plan.boot) achievementCounters.push({ counter: 'npc_salmon:pocket', amount: 1 });
       break;
     }
     case 'mortar_barnacle':
