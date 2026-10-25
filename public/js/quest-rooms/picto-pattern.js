@@ -292,7 +292,7 @@ export const room = {
     // The question clouds rest on the felt grass, in front of it.
     const behind = new PIXI.Container();
     world.addChild(behind);
-    // The title plank, tilted, at the start (footage: "Picto Pattern").
+    // The title plank, tilted, at the start: the location name, inc_data_maps_prod.js 18092 (as the footage shows it).
     world.addChild(kit.deco(PIXI, 'firebog_sign_blank_plank', 100, FLOOR - 112, { ay: 0.5, scale: 0.36, rotation: -0.1 }));
     const title = kit.label(PIXI, 'Picto Pattern', 100, FLOOR - 114, { size: 17, fill: 0xffffff, stroke: { color: 0x5a3a1c, width: 4 } });
     title.rotation = -0.1;

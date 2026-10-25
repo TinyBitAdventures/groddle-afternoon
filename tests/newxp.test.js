@@ -114,6 +114,29 @@ describe('newxp source data', () => {
     assert.deepEqual(TRAINING2_DRINKS.map((f) => [f.classTsid, f.count]), [['spicy_grog', 1], ['fruity_juice', 3], ['spicy_grog', 3]]);
   });
 
+  it('G310: overlay and callout words come from CC0 sources, none from the playthrough', () => {
+    const AUDIT = join(GS, '..');
+    // The overlay art each instruction / imagination line is read from.
+    for (const fla of ['move_instructions', 'button_instructions', 'jump_instructions', 'jumpAcross_instructions', 'climb_instructions', 'interact_instructions', 'inventory_instructions_overlay', 'newxp_img1_overlay', 'newxp_img2_overlay', 'newxp_img3_overlay']) {
+      const file = join(AUDIT, 'glitch-overlays', `${fla}.fla`);
+      if (existsSync(join(AUDIT, 'glitch-overlays'))) assert.ok(existsSync(file), fla);
+    }
+    assert.equal(LINES.moveInstructions, 'Use Arrow Keys to move!<br>(or W,A,S,D Keys if you prefer)');
+    assert.equal(LINES.jumpAcrossInstructions, 'Use Space Bar & Arrow Keys to jump across!');
+    assert.match(LINES.img2.body, /a lot more than this\.\)$/);
+    assert.deepEqual(Object.keys(LINES.firstInventory), ['title', 'body', 'button']);
+    const hand = join(AUDIT, 'glitch-client/com/tinyspeck/engine/view/ui/imagination/ImaginationHandUI.as');
+    if (existsSync(hand)) assert.ok(readFileSync(hand, 'utf8').includes(LINES.upgradeHelp), 'upgradeHelp');
+    const disp = join(GS, 'items/homestreet_ticket_dispenser.js');
+    if (existsSync(disp)) {
+      const src = readFileSync(disp, 'utf8');
+      for (const c of training2Layout().machine.choices) assert.match(src, new RegExp(`"name"\\s*:\\s*"${c.label}"`), c.label);
+    }
+    // The transcribed lines are gone.
+    const all = JSON.stringify(LINES);
+    for (const gone of ['ELEVEN GIANTS WHO', 'LET’S GO', 'Hold an Arrow Key', 'Eating food gives you energy', 'The higher your mood', 'Things you pick up']) assert.ok(!all.includes(gone), gone);
+  });
+
   it('quotes the source dialogue', () => {
     if (!existsSync(join(GS, 'locations/newxp_training1.js'))) return;
     const t1 = readFileSync(join(GS, 'locations/newxp_training1.js'), 'utf8');
@@ -142,8 +165,9 @@ describe('newxp layouts', () => {
     const cloud = by(L, 'cloud');
     assert.ok(L.spawn.x > cloud.x1 && L.spawn.x < cloud.x2);
     assert.ok(L.dropX > cloud.x2);
-    assert.equal(L.beats.length, 4);
-    assert.equal(L.beats.at(-1).text, 'LET’S GO!');
+    // G310: the cloud words were lost with the template; two lines of remake copy.
+    assert.equal(L.beats.length, 2);
+    for (const b of L.beats) assert.ok(b.x > cloud.x1 && b.x < cloud.x2, b.text);
   });
 
   it('training1: mushrooms need Walk Speed I; the islands need High Jumper I; the top needs the tree and ladder', () => {

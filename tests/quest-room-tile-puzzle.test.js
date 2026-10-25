@@ -30,11 +30,12 @@ describe('B.T.C Room #3 source facts', () => {
     }
   });
 
-  it('transcribes the speaker in order', () => {
-    assert.equal(mod.INTRO.length, 4);
-    assert.match(mod.INTRO[0].text, /How'd you get in here/);
-    assert.match(mod.INTRO[2].text, /cheese as compensation/);
-    assert.deepEqual(mod.OUTRO.map((b) => b.text.slice(0, 12)), ['Ooohh, about', 'We ran out.', 'You can stil']);
+  it('G310: the voice reads the quest description; nothing is transcribed from the recording', () => {
+    assert.equal(mod.INTRO.map((b) => b.text).join(' '), 'Solve the maze using the ladders and buttons. Piece of Cheesecake! Okay, I lied about the cake …');
+    const quest = gsjs('btc_room_3.js');
+    if (quest) assert.ok(quest.includes(`var desc = "${mod.INTRO.map((b) => b.text).join(' ')}";`));
+    const all = JSON.stringify([mod.INTRO, mod.OUTRO]);
+    for (const gone of ['Gasp!', 'cheese as compensation', 'We ran out', 'not cheese']) assert.ok(!all.includes(gone), gone);
   });
 });
 

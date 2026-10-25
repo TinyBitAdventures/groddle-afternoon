@@ -79,8 +79,10 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
     assert.equal(mod.CONCH.blowXp, 1000);
     assert.equal(mod.CONCH.blowFavor, 150);
     assert.equal(mod.DANCE_MS, Math.round((384 / 30) * 1000));
-    assert.equal(mod.LINES.intro.length, 3);
-    assert.equal(mod.LINES.found(1, 3), 'Found 1 of 3 Notes');
+    // G310: the narration is remake copy; the sound warning is the CC0 overlay's.
+    assert.equal(mod.LINES.intro.length, 2);
+    assert.equal(mod.LINES.found(1, 3), 'Notes: 1 / 3');
+    for (const gone of ['great uncertainty', 'drifting apart', 'Elevenness', 'final hope', 'Found 1 of']) assert.ok(!JSON.stringify(mod.LINES).includes(gone) && !mod.LINES.found(1, 3).includes(gone), gone);
     assert.equal(mod.room.durationMs, 0, 'the 5 * 60 is an exit delay, not a clock');
   });
 

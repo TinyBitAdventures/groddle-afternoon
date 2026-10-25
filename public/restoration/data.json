@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 483,
+  "commits": 484,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Fireworks, the sneeze and the Game's screen end when you leave the street, a failed quest room waits in the quest log, and the Magic Rock's how-tos are VOGs"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Tiny Speck's own lasers, rainbows and puffs replace the hand-drawn ones, the Qurazy banner plays, and the fireworks load a tenth as heavy"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Qurazy quoins follow the original rule: one roll a day on each street's Qurazy marker, always on a first visit, likelier on streets you haven't seen in a while"
    }
   ]
  },

@@ -305,7 +305,7 @@ export function hellBarIndexEntry(street = hellBarStreet()) {
 
 export const BARTENDER_TEXT = Object.freeze({
   label: HELL_BARTENDER.label,
-  /** The Info card under the name (video t45: "Exchange a Diabolical Drink Ticket for Wine of the Dead"). */
+  /** The Info card under the name: the buy verb's tooltip, items/hell_bartender.js 283 (as video t45 shows it). */
   subtitle: 'Exchange a Diabolical Drink Ticket for Wine of the Dead',
   talkTooltip: 'Chat up the Hell Bartender',
   buyTooltip: 'Exchange a Diabolical Drink Ticket for Wine of the Dead',

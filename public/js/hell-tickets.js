@@ -38,7 +38,7 @@
  */
 
 import { HELL_QUESTS, normalizeHellState } from './hell.js';
-import { LOCAL_COMPANION_PROFILES } from './local-companions.js?v=street-players-3';
+import { LOCAL_COMPANION_PROFILES } from './local-companions.js?v=street-players-4';
 
 export const HELL_TICKETS_VERSION = 1;
 

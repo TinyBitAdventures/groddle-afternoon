@@ -19,10 +19,13 @@
  *  - inc_data_imagination.js walk_speed_1/2, jump_1/2 physics rewards.
  *
  * Lost and rebuilt: the geometry of the three newxp instance templates (no
- * G*.xml for them in the archive) and the client overlays' text, which was
- * read from the 10-minute playthrough (K2q5GXruLvE). Gentle Island (hub 129,
- * six streets) and the Animal Kinship / Light Green Thumb practice streets
- * are imported and used as they are.
+ * G*.xml for them in the archive). The client overlays' text is Tiny Speck's
+ * CC0 overlay art (glitch-overlays/*_instructions.fla, newxp_img1/2/3_overlay.fla,
+ * inventory_instructions_overlay.fla) and glitch-client strings and callout
+ * PNGs; where the archive has none (the cloud words, first_eat, first_drink)
+ * the copy is the remake's own (G310, research/coverage/g310-copy-provenance.md).
+ * Gentle Island (hub 129, six streets) and the Animal Kinship / Light Green
+ * Thumb practice streets are imported and used as they are.
  *
  * Gentle Island scripts (newbie_island.js and the six streets' location
  * events): the quoins with a location_event_id (the Qurazy on Surveyor's
@@ -202,19 +205,25 @@ export function reachablePlatforms(platforms, ladders, startId, reach) {
 /* ------------------------------------------------------------------ */
 
 export const LINES = Object.freeze({
-  // newxp_intro: client overlays read from the playthrough.
-  moveInstructions: 'Use Arrow Keys to move (or W,A,S,D Keys if you prefer)',
+  // newxp_intro.js 11-18 move_instructions_overlay: the words on the CC0 overlay
+  // art, glitch-overlays/move_instructions.fla LIBRARY/move-overlay.png (two lines).
+  moveInstructions: 'Use Arrow Keys to move!<br>(or W,A,S,D Keys if you prefer)',
+  // The cloud level's words were street art in the lost newxp_intro template
+  // (no CC0 copy survives): remake copy, G310.
   cloudBeats: [
-    'THE ELEVEN GIANTS WHO THOUGHT AND SANG AND IMAGINED EVERYTHING INTO EXISTENCE …',
-    '… THESE GIANTS ARE SOMETIMES LUCKY ENOUGH TO IMAGINE SOMEONE LIKE YOU.',
-    'YOU HAVE YOUR OWN IMAGINATION, AND YOU CAN HELP GROW AND SHAPE THIS WORLD.',
-    'LET’S GO!',
+    'Welcome to Ur.',
+    'Head right and drop through the clouds.',
   ],
-  // inc_data_overlays.js instruction overlays (text from the playthrough).
+  // inc_data_overlays.js 148-152, 165 instruction overlays: the words on each
+  // CC0 overlay's art (the bitmap its DOMDocument places), glitch-overlays/
+  // button_instructions.fla button-overlay2.png, jump_instructions.fla
+  // jump-overlay.png, jumpAcross_instructions.fla jump-across-overlay.png,
+  // climb_instructions.fla climb-overlay.png, interact_instructions.fla
+  // "interact-overlay.png copy 2".
   buttonInstructions: 'Use Enter to advance through conversations',
-  jumpInstructions: 'Use the Space Bar to jump',
-  jumpAcrossInstructions: 'Hold an Arrow Key and press the Space Bar to jump across',
-  climbInstructions: 'Use Up/Down Keys to climb ladders',
+  jumpInstructions: 'Use the Space Bar to jump!',
+  jumpAcrossInstructions: 'Use Space Bar & Arrow Keys to jump across!',
+  climbInstructions: 'Use Up/Down Keys to climb ladders!',
   interactInstructions: 'Use Enter to interact with glowing objects or players',
   // newxp_training1.js
   t1Talk1: 'Well, well — welcome.<br><br>I’m a “Welcoming Flamingo”.<br>But I am not a patient Flamingo.',
@@ -232,11 +241,14 @@ export const LINES = Object.freeze({
   t1Bye: 'You seem fairly well set up now, {name}. And we must be off to welcome the next new player. Good luck!',
   // items/npc_sloth.js newxp_talk
   sloth: 'You’re doing greeeeeeeeeeeat…<br>Keep going!',
-  // newxp_img1/2/3_overlay (text from the playthrough)
+  // newxp_img1/2/3_overlay: the vector lettering in glitch-overlays/
+  // newxp_img1_overlay.fla, newxp_img2_overlay.fla, newxp_img3_overlay.fla
+  // (DOMDocument, Scene 1 frame 0; img1 also as LIBRARY/Bitmap 1), CC0.
   img1: { title: 'You got some imagination', body: 'You can use imagination to upgrade and customize your character.', button: 'Choose Upgrade' },
-  img2: { title: 'You got more imagination', body: 'At various thresholds, as you earn more, you’ll level up. (But you’ll need a lot more than this!)', button: 'Choose Upgrade' },
+  img2: { title: 'You got more imagination', body: 'At various thresholds, as you earn more, you’ll level up. (But you’ll need a lot more than this.)', button: 'Choose Upgrade' },
   img3: { title: 'Even more imagination', body: 'Nicely done. We’ll sock this one away till later', button: 'Okay' },
-  upgradeHelp: 'Select a card above to learn about the upgrade',
+  // glitch-client ImaginationHandUI.as 95.
+  upgradeHelp: 'Select a card above<br>to learn about the upgrade',
   // newxp_training2.js
   t2Talk1: 'Wow. Okay! Hihi {name}.<br>Let\'s scratch your back, so to speak.',
   t2Talk5: 'And then you scratch mine! HA!<br> Just follow my lead.',
@@ -263,12 +275,20 @@ export const LINES = Object.freeze({
   rockUpHere: '{name}! Up here!',
   rockTicket: '{name}, my new chum.<br>I have a ticket for you.<split butt_txt="Good">You can use it to pick the home street<br>style that fits your vibe the best.<split butt_txt="OK">It\'s pretty easy to change your mind<br>later - just need a little imagination.<split butt_txt="Right">So make your choice and I\'ll meet you<br>at your new place.',
   rockOhRight: 'Oh right, the ticket.',
-  // first_inv / first_eat / first_drink overlays (text from the playthrough)
-  firstInventory: 'Things you pick up will go into your inventory.',
-  firstEat: 'Eating food gives you energy, and energy keeps you alive.',
-  firstDrink: 'Drinks give you mood. The higher your mood, the more imagination you earn.',
-  watchEnergy: 'Watch your energy',
+  // newxp_training2.js 844 first_inv_overlay: its own art was in the lost
+  // template, so Tiny Speck's inventory overlay of the same month stands in
+  // (inc_data_overlays.js 166, glitch-overlays/inventory_instructions_overlay.fla
+  // LIBRARY/inventory-overlay.png, CC0).
+  firstInventory: { title: 'Check out your inventory', body: 'When you pick up or buy items (or when someone gives you an item) they’ll end up in your inventory below the game window.', button: 'Makes Sense!' },
+  // newxp_training2.js 523 / 578 first_eat_overlay / first_drink_overlay: lost
+  // with the template; remake copy (G310).
+  firstEat: 'Food fills your energy bar.',
+  firstDrink: 'Drinks fill your mood bar.',
+  // The words on glitch-client TSEngineAssets/src/assets/graphics/callout_energy.png
+  // and callout_mood.png (Assets.as 79-80, 95-96; PlayerInfoUI.as 489 shows the first).
+  watchEnergy: 'Watch Your Energy',
   keepMood: 'Keep your mood up',
+  // items/homestreet_ticket_dispenser.js 1.
   machine: 'Home Street Selection Machine',
   // items/magic_rock.js (house exterior / home)
   ooof: 'Ooof.',
@@ -553,7 +573,7 @@ export function cloudsLayout() {
     ],
     walls: [],
     barriers: [{ id: 'cloud_back', x: 30, y: CLOUD - 600, h: 600, pc_perm: null }],
-    beats: LINES.cloudBeats.map((text, i) => ({ text, x: 800 + i * 700, y: CLOUD - 190 })),
+    beats: LINES.cloudBeats.map((text, i) => ({ text, x: 800 + i * 1400, y: CLOUD - 190 })),
     // Falling past this line (beyond the cloud edge) lands in training1.
     dropX: 3360,
     dropY: CLOUD + 120,
@@ -658,10 +678,11 @@ export function training2Layout() {
     },
     eggPlant: { x: X(57) + 60, y: 1100 }, // source trant_egg x 57 (+60 onto the rebuilt ledge)
     rock: { x: 3545, y: 1260 },
+    // Panel words: the machine's verb names, items/homestreet_ticket_dispenser.js 112, 78, 44.
     machine: { x: 3820, y: FLOOR, choices: [
-      { style: 'meadow', label: 'CHOOSE MEADOW STYLE', x: 3700 },
-      { style: 'firebog', label: 'CHOOSE FIREBOG STYLE', x: 3840 },
-      { style: 'uralia', label: 'CHOOSE URALIA STYLE', x: 3980 },
+      { style: 'meadow', label: 'Pick Meadow Style', x: 3700 },
+      { style: 'firebog', label: 'Pick Firebog Style', x: 3840 },
+      { style: 'uralia', label: 'Pick Uralia Style', x: 3980 },
     ] },
     boxes: {
       to_food: { x: 1300, y: FLOOR, w: 80, h: 300 },

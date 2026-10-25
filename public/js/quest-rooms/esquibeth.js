@@ -47,7 +47,9 @@
  * Lost: all four location geometries and their location events (the
  * narration, the note pickups, the song check, the exits). Rebuilt from the
  * two recordings (BgRgIaeaj9Q part 1, fvin5awPESI the reminisce):
- *  - Narration and log lines are read off the recordings, in order.
+ *  - The narration's words were location events and no CC0 copy survives, so
+ *    the narration is the remake's own (G310): only the beats (when a line
+ *    shows) follow the recordings. The sound warning is the CC0 overlay's.
  *  - Each grotto hides 3, 4 and then 5 notes ("Found 1 of 3 Notes" ...). With
  *    all found ("You found all the notes. Now, play the song.") Esquibeth's
  *    ghost plays the song at a carved Giant glyph; you play it back on the
@@ -90,7 +92,7 @@ export const STAGE_TSIDS = Object.freeze({
   waterfall_03: 'LIFR7REVQ583H6Q',
   waterfall_04_wider: 'LIFVOTC3H593H7H',
 });
-/** Notes hidden in each location (the recordings' "Found k of N Notes"). */
+/** Notes hidden in each location (counted in the recordings). */
 export const NOTE_COUNTS = Object.freeze({ waterfall_01: 3, waterfall_02: 4, waterfall_03: 5 });
 /** esquibeth_note_1..5 -> its bell (recovered BW_* sounds, by the song match). */
 export const BELLS = Object.freeze({ 1: 'BW_D2', 2: 'BW_E2', 3: 'BW_G2', 4: 'BW_C2', 5: 'BW_A1' });
@@ -127,22 +129,25 @@ export const CONCH = Object.freeze({
 export const REMINISCE_WAIT_HOURS = 4;
 
 export const LINES = Object.freeze({
+  // The words on Tiny Speck's CC0 turn_up_sound overlays (inc_data_overlays.js 186):
+  // glitch-overlays/turn_up_sound_overlay_2.fla and turn_up_sound_overlay.fla, LIBRARY/Symbol 1.xml.
   soundBanner: 'Sound required! Turn up your speakers and in-game volume sliders.',
-  soundLog: 'Sound required. Turn up speakers and game sound.',
+  soundLog: 'This quest requires sound. Please Turn up your speakers and game sound.',
+  // Remake copy (G310): the location events that spoke here are lost.
   intro: [
-    'It was a time of great uncertainty.\nThe Giants, confused and weary,\nwere drifting apart.',
-    'Their shared imagination\n– this very world –\nwas under threat.',
-    'It was then that Esquibeth of Inari embarked\nupon her last pilgrimage …',
+    'A memory of Esquibeth,\none of the Ancient Heroes.',
+    'Find the notes in each grotto\nand learn her song.',
   ],
-  found: (k, n) => `Found ${k} of ${n} Notes`,
-  allFound: 'You found all the notes. Now, play the song.',
+  found: (k, n) => `Notes: ${k} / ${n}`,
+  allFound: 'All the notes are here. Listen, then play them back.',
   after: {
-    waterfall_01: 'Esquibeth’s entry into the mind of\nGrendaline was our final hope …',
-    waterfall_02: 'Her song rang out, and by this song\nGrendaline called to the other Giants …',
+    waterfall_01: 'The rocks give way. On through the caves.',
+    waterfall_02: 'Up towards the falls.',
     waterfall_03: '',
   },
-  hollow: '… and so it was that Esquibeth’s pilgrimage\nbrought Grendaline back to the fold and\npreserved the Elevenness of Everything.',
-  memento: 'Take this artifact as a memento\nso you may better remember the\nLast Pilgrimage of Esquibeth.',
+  hollow: 'Grendaline hears the song.',
+  memento: 'A Conch, to remember the pilgrimage by.',
+  // locations/location.js 461.
   endVog: 'Contemplate well the Last Pilgrimage of Esquibeth. Your knowledge of this hero and her deeds enables you to participate in Feats.',
 });
 

@@ -102,7 +102,7 @@ import {
   training2Layout,
   tutorialPhysics,
   vogPages,
-} from '../newxp.js?v=newxp-2';
+} from '../newxp.js?v=newxp-3';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { QUOIN_SHEET, QUOIN_TYPES, qrazyRewardForLevel } from '../quoins.js';
 import { soundForQuoin } from '../sound-moments.js';
@@ -115,7 +115,7 @@ import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g311-1';
-import { HOME_MACHINE } from '../home-ticket.js?v=g300-1';
+import { HOME_MACHINE } from '../home-ticket.js?v=g310-1';
 import { createAnimalState } from '../animals.js?v=g296-1';
 import {
   AK_ANIMALS,
@@ -142,7 +142,7 @@ const SLOTH_TREE_HIDE_MS = 500;
  * flamingo_*, dustbunny_* and rock_* sheets are byte copies of the OGA dump's extracted_newxp
  * npc_flamingo, npc_newxp_dustbunny and magic_rock_book_orangeBook x1 sheets; sloth.png is frame 1
  * of glitch-items inhabitants/sloth/npc_sloth.swf sprite 123. The levels, not the art, were rebuilt
- * from the playthrough.
+ * from the playthrough (geometry only: every word is from GSJS, the CC0 overlays or the remake, G310).
  */
 const ART = 'assets/sprites/newxp/';
 const CARD_ART = 'assets/imagination/cards/';
@@ -1010,7 +1010,7 @@ function enterNewxpScene(engine, stage, layout, background, label) {
   engine.enterScene({
     tsid: SCENE_TSIDS[stage],
     label,
-    hubName: 'Somewhere else entirely',
+    hubName: 'Tutorial', // remake label (G310: no source names the newxp levels' region)
     width: layout.width,
     height: layout.height,
     background,
@@ -1059,7 +1059,8 @@ function buildClouds(engine) {
   const fill = new PIXI.Graphics();
   fill.rect(-300, L.cloudY + 90, 3640, 600).fill(0xf7fbff);
   world.addChildAt(fill, 0);
-  enterNewxpScene(engine, 'clouds', L, root, 'Somewhere above');
+  // Scene names: the source files' header comments (newxp_intro.js 1, newxp_training1.js 3, newxp_training2.js 3).
+  enterNewxpScene(engine, 'clouds', L, root, 'Cloud Level');
   run.views = { beats, root };
   return L;
 }
@@ -1129,7 +1130,7 @@ function buildTraining1(engine) {
   tube.rect(L.tube.x - 50, L.tube.y - 270, 100, 270).fill({ color: 0xcfe9ff, alpha: 0.28 });
   tube.ellipse(L.tube.x, L.tube.y, 70, 12).fill(0x9aa3ad);
   root.addChild(tube);
-  enterNewxpScene(engine, 'training1', L, root, 'Training: Movement');
+  enterNewxpScene(engine, 'training1', L, root, 'Training Level One');
   run.views = { shrooms, tree, branches, wall };
   return L;
 }
@@ -1394,11 +1395,11 @@ function buildTraining2(engine) {
     p.roundRect(c.x - 58, L.floorY - 190, 116, 150, 10).fill(panelColors[c.style]);
     p.roundRect(c.x - 52, L.floorY - 182, 104, 64, 8).fill({ color: 0x1d2a44, alpha: 0.85 });
     machine.addChild(p);
-    machine.addChild(kit.label(PIXI, c.label.replace('CHOOSE ', 'CHOOSE\n'), c.x, L.floorY - 150, { size: 11, fill: 0xffffff }));
+    machine.addChild(kit.label(PIXI, c.label.replace('Pick ', 'Pick\n'), c.x, L.floorY - 150, { size: 11, fill: 0xffffff }));
   }
   root.addChild(machine);
   machine.addChild(kit.label(PIXI, LINES.machine, 3840, L.floorY - 360, { size: 15, fill: 0xd7dde5 }));
-  enterNewxpScene(engine, 'training2', L, root, 'Training: Stuff');
+  enterNewxpScene(engine, 'training2', L, root, 'Training Level Two');
   run.views = { walls, root };
   run.data.egg = egg;
   return L;
@@ -1456,11 +1457,12 @@ async function runTraining2(t) {
   await until(t, () => firstPick, { help: () => pickUp(engine, run.pickups.find((r) => r.id === 'food_2')) });
   clearInstruction();
   // first_inv_overlay, then the pack appears.
-  await overlay(t, { title: LINES.firstInventory, button: 'OK' });
+  await overlay(t, LINES.firstInventory);
   hud({ meta: true, energy: true, mood: true, pack: false, actions: true });
   // food_wait_eat: the slot callout and the nagging.
   setStep('food_wait_eat');
   run.data.eaten = false;
+  // "Eat This" / "Drink This": glitch-client graphics/callout_eat.png and callout_drink.png; the rest is remake copy.
   instruction(`Eat This: click the ${ITEM_LABEL(firstPick.classTsid)} in your pack, then Eat`);
   let nag = 0;
   let nagAt = Date.now() + 3000;
@@ -1632,7 +1634,7 @@ async function runTraining2(t) {
     const hit = new engine.PIXI.Graphics();
     hit.rect(-58, -190, 116, 190).fill({ color: 0xffffff, alpha: 0.001 });
     spr.addChild(hit);
-    return registerFixture(engine, spr, 'newxp_machine', c.label.replace('CHOOSE ', 'Choose ').replace(' STYLE', ' style'), { nxStyle: c.style });
+    return registerFixture(engine, spr, 'newxp_machine', c.label, { nxStyle: c.style });
   });
   run.data.panels = panels;
   run.data.style = '';

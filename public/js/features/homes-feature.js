@@ -185,7 +185,7 @@ import {
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=g253-1';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
-import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g300-1';
+import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g310-1';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
 
 export const HOMES_FEATURE_ID = 'homes';

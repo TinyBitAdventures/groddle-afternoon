@@ -38,7 +38,7 @@ export const COMPANION_FOLLOW_MAX_DISTANCE = 1000;
 export const COMPANION_FOLLOW_TRAIL_DISTANCE = 74;
 export const STALKER_ACHIEVEMENT_ID = 'stalker_noncreepy_designation';
 
-/** Public street names visible in the supplied "The Last Feat" recording. */
+/** Public street names: inc_data_maps_prod.js 17654, 17663, 17664 (the names "The Last Feat" recording shows). */
 export const LAST_FEAT_STREET_LABELS = Object.freeze({
   GDOFACJ62S03LLK: 'Lunae Hubaye',
   GDO3CO0RUR0307B: 'Flavus Muss',

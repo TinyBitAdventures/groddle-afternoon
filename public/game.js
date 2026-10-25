@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-11';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-122';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-123';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -251,7 +251,7 @@ import {
   recordCompanionFollowStreet,
   startCompanionFollow,
   stopCompanionFollow,
-} from './js/local-companions.js?v=street-players-3';
+} from './js/local-companions.js?v=street-players-4';
 import {
   GREEDY_ACTS,
   GREEDY_FIRST_REWARD,
@@ -439,7 +439,7 @@ import {
   leaveHomeInterior,
   imagineHome,
 } from './js/homes.js?v=homes-mail-4';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g300-1';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g310-1';
 import {
   MAIL_COMPANIONS,
   archiveMail,

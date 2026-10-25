@@ -15,11 +15,11 @@
  * ledges and wall screens, between teal maze shafts drawn in glowing cyan.
  * Each screen shows the glyph of the shaft tile beside it and the red wall
  * button under it (items/wall_button.js: resetting mode, 1000 ms) turns that
- * tile to its next layout. The speaker lines are transcribed from the
- * recording: "Gasp! How'd you get in here?!?" ... "Solve this maze and we'll
- * supply you with cheese as compensation." At the glowing "end" box: "Ooohh,
- * about the cheese." "We ran out." and the floor drops into a lower room
- * of "not cheese" quoins with the EXIT door.
+ * tile to its next layout. The room's location events (a voice over the
+ * speakers at the start and at the glowing "end" box) are lost and no CC0
+ * copy of their words survives, so the voice reads the quest's own
+ * description (btc_room_3.js 2) and the end is remake copy (G310). At the
+ * end box the floor drops into a lower room of quoins with the EXIT door.
  *
  * Reconstruction: six tiles (three columns, two rows), each a pipe piece
  * (elbow, straight or tee) whose open sides are where you can pass. A closed
@@ -63,16 +63,14 @@ export const STEPS = [
   { dx1: 20, dx2: 130, rise: 2 * STEP_RISE },
 ];
 
+// quests/btc_room_3.js 2 desc.
 export const INTRO = [
-  { text: 'Gasp! How\'d you get in here?!?', response: 'Click anywhere…' },
-  { text: 'Hmmm. Well, we could use more testers. …', response: 'Click anywhere…' },
-  { text: 'Solve this maze and we\'ll supply you with cheese as compensation.', response: 'Click anywhere…' },
-  { text: 'Yes, Cheese! Everyone likes the cheese.', response: 'Click anywhere…' },
+  { text: 'Solve the maze using the ladders and buttons.', response: 'Click anywhere…' },
+  { text: 'Piece of Cheesecake! Okay, I lied about the cake …', response: 'Click anywhere…' },
 ];
+// Remake copy (G310).
 export const OUTRO = [
-  { text: 'Ooohh, about the cheese.', response: 'Click anywhere…' },
-  { text: 'We ran out.', response: 'Click anywhere…' },
-  { text: 'You can still have these other "not cheese" things though. They\'re down below.', response: 'Click anywhere…' },
+  { text: 'Maze solved. Drop down for your quoins, then take the EXIT.', response: 'Click anywhere…' },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -287,7 +285,7 @@ export function clampCeiling(player, prevY, list) {
 
 export function mazeQuoins() {
   const out = TILES.map((t) => ({ id: `q_${t.id}`, x: tileRect(t).x1 + 70, y: rowBot(t.r) - 52, type: 'xp' }));
-  // The "not cheese" things down below.
+  // The quoins down below.
   out.push(
     { id: 'nc0', x: END_X1 + 60, y: FLOOR - 52, type: 'currants' },
     { id: 'nc1', x: END_X1 + 160, y: FLOOR - 95 - 52, type: 'xp' },
@@ -654,9 +652,9 @@ export const room = {
     const phase = ctx.data.phase;
     const got = (ctx.data.quoins || []).filter((q) => q.taken).length;
     const text = phase === 'done'
-      ? 'Out the door, cheese or no cheese.'
+      ? 'Out the door.'
       : phase === 'drop' || phase === 'outro'
-        ? 'The "not cheese" things are down below. Then the EXIT.'
+        ? 'The quoins are down below. Then the EXIT.'
         : 'Solve the maze using the ladders and buttons. Reach the "end" box.';
     return { text, stats: [['buttons', ctx.data.presses?.length || 0], ['quoins', `${got}/${(ctx.data.quoins || []).length}`]] };
   },
