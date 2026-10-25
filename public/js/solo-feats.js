@@ -222,8 +222,8 @@ export const SOLO_FEATS = Object.freeze([
     epic_id: 0,
     goal: 50,
     unit: 'animal interactions',
-    what: 'Pet, feed, nibble, squeeze, milk, massage, sing to, brush, hug and flatter animals, or pocket a Salmon.',
-    source: 'feats_increment("animal_love") in npc_piggy, npc_chicken, npc_butterfly, npc_batterfly, npc_crab, npc_fox, npc_sloth, npc_kitty_chicken, npc_salmon, chick, piglet, caterpillar',
+    what: 'Pet, feed, nibble, squeeze, milk, massage, sing to, brush, hug and flatter animals, or pocket and release a Salmon. Each Piggy and Batterfly counts 3 feeds.',
+    source: 'feats_increment("animal_love") in npc_piggy, npc_chicken, npc_butterfly, npc_batterfly, npc_crab, npc_fox, npc_sloth, npc_kitty_chicken, npc_salmon, salmon (release), chick, piglet, caterpillar',
   }),
   feat('makeup_feat_redux', {
     line: 114,
@@ -255,27 +255,40 @@ export function featsInEpic(epicId) {
 }
 
 /**
+ * npc_piggy.js 734-739 and npc_batterfly.js 830-840 keep times_fed_for_feat
+ * per player on each animal: only an animal's first 3 feeds count. The feed
+ * event names the animal (game.js and animal-husbandry-feature pass
+ * { animal: '<street tsid>:<class>:<index>' }); one feed takes one place under
+ * the cap for every Feat rule it feeds (the source's one counter gates both
+ * its animal_love call and the commented-out commit beside it).
+ */
+export const FEED_CAP = Object.freeze({ name: 'times_fed_for_feat', max: 3 });
+
+/**
  * Game events (badge counters and quest events, feature-host onEvent) that
  * are Feat increments. `amount: 'event'` takes the event's own amount.
  * `commit` rows add to pet_only's pending pile, `reset` rows drop it.
+ * `cap` rows count at most cap.max times per animal (the event's detail).
  */
 export const EVENT_RULES = Object.freeze([
   // —— Heebo's Happy Accident ——
   rule('animal_love', /^npc_piggy:pet$/, 1, 'npc_piggy.js:1769 onPetComplete'),
   rule('animal_love', /^npc_piggy:nibble$/, 1, 'npc_piggy.js:887 nibble'),
-  rule('animal_love', /^npc_piggy:feed\b/, 1, 'npc_piggy.js:738 feed (the source caps it at 3 per animal)'),
+  rule('animal_love', /^npc_piggy:feed\b/, 1, 'npc_piggy.js:738 feed (3 per animal, 734-739)', 'direct', FEED_CAP),
   rule('animal_love', /^npc_chicken:squeeze$/, 1, 'npc_chicken.js:1561 onSqueezeComplete'),
   rule('animal_love', /^eggs_incubated:/, 1, 'npc_chicken.js:924 giveIncubatedItem'),
   rule('animal_love', /^npc_butterfly:(?:milk|massage)$/, 1, 'npc_butterfly.js:739 milk, 816 massage'),
   rule('animal_love', /^npc_butterfly:sing_to$/, 3, 'npc_butterfly.js:685 sing_to'),
-  rule('animal_love', /^npc_batterfly:feed$/, 1, 'npc_batterfly.js:839 feed (the source caps it at 3 per animal)'),
+  rule('animal_love', /^npc_batterfly:feed$/, 1, 'npc_batterfly.js:839 feed (3 per animal, 830-840)', 'direct', FEED_CAP),
   rule('animal_love', /^animals_grown:(?:chick|piglet|caterpillar)$/, 1, 'chick.js:245, piglet.js:259, caterpillar.js:195 feed that grows it'),
   rule('animal_love', /^fox:fibers_brushed$/, 1, 'npc_fox.js:413 endBrushing'),
   rule('animal_love', /^sloth:snails_received$/, 1, 'npc_sloth.js:303 feed'),
   // G173. npc_salmon.js:207 pocket, only when the Pocket Salmon lands (not the
   // 10% boot); resource-nodes.js counts npc_salmon:pocket on that branch.
-  // salmon.js:92 release (the pack item's verb) has no remake verb yet.
   rule('animal_love', /^npc_salmon:pocket$/, 1, 'npc_salmon.js:207 pocket'),
+  // G178. salmon.js:92 release, the Pocket Salmon's pack verb
+  // (resource-nodes-feature sends its notifyVerb counter salmon:release).
+  rule('animal_love', /^salmon:release$/, 1, 'salmon.js:92 release'),
   // —— "… And Ask Nothing in Return": pending until you leave the street ——
   rule('pet_only', /^trants_petted:/, 1, 'include/trants.js:92 onPettingComplete', 'commit'),
   rule('pet_only', /^trants_watered:/, 1, 'include/trants.js:198 onWateringComplete, paper_tree.js:624 onTendComplete', 'commit'),
@@ -283,7 +296,7 @@ export const EVENT_RULES = Object.freeze([
   rule('pet_only', /^npc_butterfly:massage$/, 1, 'npc_butterfly.js:1191 onMassageComplete', 'commit'),
   rule('pet_only', /^npc_butterfly:sing_to$/, 3, 'npc_butterfly.js:684 (commented after the Feat)', 'commit'),
   rule('pet_only', /^npc_piggy:pet$/, 1, 'npc_piggy.js:1768 (commented after the Feat)', 'commit'),
-  rule('pet_only', /^npc_piggy:feed\b/, 1, 'npc_piggy.js:737 (commented after the Feat)', 'commit'),
+  rule('pet_only', /^npc_piggy:feed\b/, 1, 'npc_piggy.js:737 (commented after the Feat, inside the 3-feed cap)', 'commit', FEED_CAP),
   rule('pet_only', /^animals_grown:(?:chick|piglet|caterpillar)$/, 1, 'chick.js:244, piglet.js:258, caterpillar.js:194 (commented after the Feat)', 'commit'),
   rule('pet_only', /^(?:trants_harvested:|completed_harvest:wood_tree$|paper_tree:harvest$)/, 0, 'include/trants.js:435, wood_tree.js:798, paper_tree.js:480 harvests', 'reset'),
   rule('pet_only', /^npc_butterfly:milk$/, 0, 'npc_butterfly.js:1360 onMilkComplete', 'reset'),
@@ -292,9 +305,11 @@ export const EVENT_RULES = Object.freeze([
   // trants are on the street, fertilidust_lite.js:296 +1 on a tree); a
   // fecundity powder milks every animal at once and drops the pile
   // (powder_of_mild_fecundity.js:376, powder_of_startling_fecundity.js:379).
-  // The remake's fertilidust:disperse also fires when it only revives dead
-  // trants (powders-feature fertilidust), which the source would not count.
-  rule('pet_only', /^fertilidust:disperse$/, 3, 'fertilidust.js:352 onUse', 'commit'),
+  // G178: the +3 sits inside fertilidust.js:344 `if (trants)`, so dust that
+  // only revives dead trants gives nothing. powders-feature sends
+  // fertilidust:trees_grown only when living trees took it; the verb's own
+  // fertilidust:disperse fires either way and is not a Feat event.
+  rule('pet_only', /^fertilidust:trees_grown$/, 3, 'fertilidust.js:352 onUse (living trees only)', 'commit'),
   rule('pet_only', /^fertilidust_lite:sprinkle$/, 1, 'fertilidust_lite.js:296 onUse', 'commit'),
   rule('pet_only', /^powder_of_(?:mild|startling)_fecundity:disperse$/, 0, 'powder_of_mild_fecundity.js:376, powder_of_startling_fecundity.js:379', 'reset'),
   // —— The Meditation of Groddlocritus: whole minutes ——
@@ -309,12 +324,25 @@ export const EVENT_RULES = Object.freeze([
   rule('streaking', /^drop_table_spinning_wheel_cubimal_package(?:_2)?$/, 5, 'inc_skill_packages.js:54 spinning_wheel cubimal_package'),
 ]);
 
-function rule(featId, match, amount, source, mode = 'direct') {
-  return Object.freeze({ featId, match, amount, source, mode });
+function rule(featId, match, amount, source, mode = 'direct', cap = null) {
+  return Object.freeze({ featId, match, amount, source, mode, ...(cap ? { cap } : {}) });
 }
 
-/** The increments one game event makes: [{ featId, amount, mode }]. */
-export function eventIncrements(counter, amount = 1) {
+/**
+ * The caps key for one animal: `<cap name>:<animal>`. An event with no animal
+ * named shares one key per class, so it can never count more than an animal.
+ */
+export function capKeyFor(cap, counter, detail) {
+  const animal = String(detail?.animal || '').trim().slice(0, 96);
+  const cls = String(counter || '').split(':')[0];
+  return `${cap.name}:${animal || `${cls}:unnamed`}`;
+}
+
+/**
+ * The increments one game event makes: [{ featId, amount, mode, cap? }].
+ * cap rows carry { key, max } (capKeyFor with the event's detail).
+ */
+export function eventIncrements(counter, amount = 1, detail = null) {
   const key = String(counter || '');
   if (!key) return [];
   const out = [];
@@ -322,9 +350,31 @@ export function eventIncrements(counter, amount = 1) {
     if (!r.match.test(key)) continue;
     const n = r.amount === 'event' ? Math.max(0, Math.floor(Number(amount) || 0)) : r.amount;
     if (r.mode !== 'reset' && n <= 0) continue;
-    out.push({ featId: r.featId, amount: n, mode: r.mode });
+    const row = { featId: r.featId, amount: n, mode: r.mode };
+    if (r.cap) row.cap = { key: capKeyFor(r.cap, key, detail), max: r.cap.max };
+    out.push(row);
   }
   return out;
+}
+
+/**
+ * eventIncrements for this save: a capped event takes one place under each
+ * cap key it names (npc_piggy.js:739 times_fed_for_feat[pc.tsid]++), and an
+ * animal already at its cap drops every row under that key. Mutates
+ * state.caps. Rows come back without `cap`.
+ */
+export function featEventIncrements(state, counter, amount = 1, detail = null) {
+  const rows = eventIncrements(counter, amount, detail);
+  const open = new Map();
+  for (const row of rows) {
+    if (!row.cap || open.has(row.cap.key)) continue;
+    const used = state.caps[row.cap.key] || 0;
+    open.set(row.cap.key, used < row.cap.max);
+    if (used < row.cap.max) state.caps[row.cap.key] = used + 1;
+  }
+  return rows
+    .filter((row) => !row.cap || open.get(row.cap.key))
+    .map(({ featId, amount: n, mode }) => ({ featId, amount: n, mode }));
 }
 
 // —— State ——————————————————————————————————————————————————————————————

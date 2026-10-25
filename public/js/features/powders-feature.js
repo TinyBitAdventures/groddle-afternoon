@@ -28,12 +28,20 @@
  * Charges: a jar has 5 (No-No Powder is used up by each sniff); the open
  * jar's charges are saved per class, and the jar goes at zero.
  *
+ * Feats (solo Feats, js/solo-feats.js): Fertilidust that reaches living
+ * trees gives "... And Ask Nothing in Return" +3 waiting (fertilidust.js:352
+ * pc.feats_increment_for_commit(3), inside `if (trants)`), so the runner
+ * sends fertilidust:trees_grown only then; reviving dead trants alone sends
+ * just the verb's own fertilidust:disperse, which the Feat does not count.
+ * Fertilidust Lite gives +1 (fertilidust_lite.js:296) and a Fecundity powder
+ * loses the pile (feats_reset_commit). The source switched these off after
+ * the Feat ran (inc_feats.js:321 returns on its first line); solo Feats turn
+ * them back on.
+ *
  * Not built: the sneezing and sparkle effects on other players (Sneeze-O-Rama
- * needs 5 of them, Sparkle Buddy 7: lost). Nothing to build for the rest:
- * include/trants.js:1244 onFertilidust calls this.reduceRookedness(60) on a
- * rooked trant, but no GSJS file defines reduceRookedness, and
- * players/inc_feats.js:321 feats_increment_for_commit returns on its first
- * line, so the Feat points were switched off.
+ * needs 5 of them, Sparkle Buddy 7: lost). Nothing to build for
+ * include/trants.js:1244 onFertilidust: it calls this.reduceRookedness(60) on
+ * a rooked trant, but no GSJS file defines reduceRookedness.
  *
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&powderdemo=1 packs one of
  *   every powder (a Fecundity cooldown is cleared); &powderautoplay=<class>
@@ -247,6 +255,8 @@ const RUNNERS = {
     if (trees.length) later(3000, () => fertilize(engine, trees));
     if (out.sound) later(2000, () => engine.playSound?.(out.sound, { volume: 0.6 }));
     for (const row of out.achievementCounters) engine.achievement(row.counter, row.amount);
+    // fertilidust.js:352: the Feat counts only when living trees took the dust.
+    if (trees.length) engine.achievement('fertilidust:trees_grown', 1);
     finishUse(engine, classTsid);
     return `trees:${trees.length}${dead ? `:revived:${dead}` : ''}`;
   },

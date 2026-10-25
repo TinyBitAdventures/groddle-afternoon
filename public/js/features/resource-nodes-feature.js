@@ -34,9 +34,25 @@
  * needs); &resautoplay=1 performs its main verb once. Canvas data attributes:
  * resourceNodeCount, resourceNodeClasses, resourceLastHarvest, fireflyJar,
  * resourceDemo.
+ *
+ * Pocket Salmon: Release (G178, items/salmon.js 30-100; rules in
+ * js/resource-nodes.js SALMON_RELEASE). A pack button on the Pocket Salmon,
+ * shown only in Jal (hub 136) and Samudra (hub 140) while the street has
+ * fewer than 71 Salmon swimming. It costs 4 energy, gives 5 iMG (mood bonus),
+ * plays SALMON_RELEASE and counts salmon:release (Heebo's Happy Accident +1).
+ * The Salmon goes back in the water where you stand: the nearest pocketed
+ * Salmon still waiting on its 10 s respawn swims again at once, beside you
+ * for this visit, so the street keeps its count; with none waiting, a new
+ * one joins for this visit (salmon.js:71 createItemStack at pc.x, pc.y).
+ * QA: &resrelease=1 (with or without &resdemo=npc_salmon&resautoplay=1)
+ * packs one Pocket Salmon if you have none and releases it 3 s after the
+ * street's nodes spawn; &resrelease=hold only packs it, for the popover.
+ * Use a Jal or Samudra street, e.g. &streetdemo=GUVCLS8RV5D3VGT (Kaiki, hub
+ * 140). Canvas: salmonRelease (state from the last pack popover, or the
+ * last release: released:respawned|new:<key>, or failed:<reason>).
  */
 
-import { ITEM_CATALOG, addItem } from '../inventory.js?v=catalog-unified-3';
+import { ITEM_CATALOG, addItem, countItem } from '../inventory.js?v=catalog-unified-3';
 import { platformYAt } from '../street-model.js';
 import { hiresSpriteUrl } from '../sprite-hires.js';
 import { rollResourceNodeDrop } from './drops-feature.js?v=drops-1';
@@ -45,6 +61,7 @@ import {
   DUST_TRAP_DROP_ITEM_DEFS,
   RESOURCE_ITEM_DEFS,
   RESOURCE_NODE_CATALOG,
+  SALMON_RELEASE,
   createFireflyJarState,
   createResourceNode,
   ensureResourceItems,
@@ -53,11 +70,16 @@ import {
   harvestResourceNode,
   normalizeFireflyJarState,
   normalizeResourceNode,
+  pickReleasedSalmon,
+  releaseSalmon,
+  respawnReleasedSalmon,
   resourceNodeFrame,
   resourceNodeStatusLabel,
   resourceNodeVerbs,
+  salmonReleaseConditions,
   sheetFrameRect,
   starterResourceTools,
+  swimmingSalmonCount,
   tickResourceNode,
 } from '../resource-nodes.js';
 import { frameTexture as sheetFrameTexture, loadTexture, textureFromUrl } from '../textures.js';
@@ -455,6 +477,9 @@ let demoUsed = false;
 let demoEntity = null;
 let autoplayTimer = null;
 let jarFx = null;
+let releaseState = '';
+let releaseCount = 0;
+let releaseTimer = null;
 
 /** path -> { base, bounds } once loaded; promises while loading. */
 const sheets = new Map();
@@ -598,6 +623,7 @@ function publish(engine) {
     'resourceDemo',
     demoEntity ? `${demoEntity.classTsid}:${demoEntity.node.units}:${resourceNodeStatusLabel(demoEntity.node)}` : ''
   );
+  engine.setData('salmonRelease', releaseState);
 }
 
 // ---------------------------------------------------------------------------
@@ -1176,6 +1202,79 @@ function performVerb(engine, entity, verbId) {
 }
 
 // ---------------------------------------------------------------------------
+// Pocket Salmon: Release (G178)
+// ---------------------------------------------------------------------------
+
+function releaseGate(engine) {
+  return salmonReleaseConditions({ hubId: engine.street?.hubId, salmonCount: swimmingSalmonCount(entities) });
+}
+
+/** salmon.js:71 createItemStack('npc_salmon', 1, pc.x, pc.y): back in the water where you stand. */
+function salmonBackInWater(engine) {
+  const p = engine.player || { x: 0, y: 0 };
+  const y = surfaceNear(engine.platforms, p.x, p.y);
+  const back = pickReleasedSalmon(entities, p.x);
+  if (back) {
+    respawnReleasedSalmon(back.node);
+    // Moved for this visit only: the plan seats it again on the next entry.
+    back.x = p.x;
+    back.y = y;
+    if (engine.entityLayer) refreshEntity(engine, back);
+    return `respawned:${back.key}`;
+  }
+  releaseCount += 1;
+  const key = `release:${releaseCount}`;
+  const entity = {
+    key,
+    classTsid: 'npc_salmon',
+    x: p.x,
+    y,
+    node: createResourceNode('npc_salmon', { seed: `${engine.streetTsid}:${key}`, now: Date.now() }),
+    target: null,
+    view: null,
+  };
+  entities.push(entity);
+  // Drawn when there is a world to draw in (not in the Node tests).
+  if (engine.entityLayer) refreshEntity(engine, entity);
+  return `new:${key}`;
+}
+
+/** The Pocket Salmon's Release (pack button, QA, tests). */
+export function runSalmonRelease(engine) {
+  const result = releaseSalmon(engine.inv, engine.pc, { hubId: engine.street?.hubId, salmonCount: swimmingSalmonCount(entities) });
+  if (!result.ok) {
+    releaseState = `failed:${result.reason}`;
+    publish(engine);
+    return result;
+  }
+  const where = salmonBackInWater(engine);
+  for (const line of result.msgs) engine.pushActivity?.(line);
+  const p = engine.player;
+  if (p && result.costs.xp) engine.floatText?.(p.x, p.y - 90, `+${result.costs.xp} iMG`, 0xd7b8ff);
+  engine.playSound?.(result.sound, { volume: 0.6, jitter: 0.05 });
+  // item.js:738 notifyVerb salmon:release; solo Feats count it (salmon.js:92).
+  for (const counter of result.achievementCounters) engine.achievement?.(counter.counter, counter.amount);
+  releaseState = `released:${where}`;
+  engine.updateHud?.();
+  engine.refreshPack?.();
+  engine.save?.();
+  publish(engine);
+  return { ...result, where };
+}
+
+function scheduleRelease(engine) {
+  const mode = engine.param('resrelease');
+  if (mode !== '1' && mode !== 'hold') return;
+  if (countItem(engine.inv, SALMON_RELEASE.classTsid) < 1) {
+    addItem(engine.inv, SALMON_RELEASE.classTsid, 1);
+    engine.refreshPack();
+  }
+  if (mode !== '1') return;
+  clearTimeout(releaseTimer);
+  releaseTimer = setTimeout(() => runSalmonRelease(engine), 3000);
+}
+
+// ---------------------------------------------------------------------------
 // Street lifecycle
 // ---------------------------------------------------------------------------
 
@@ -1245,6 +1344,7 @@ async function spawnStreet(engine, items, myGeneration) {
   }
   publish(engine);
   scheduleAutoplay(engine);
+  scheduleRelease(engine);
 }
 
 function triggerTrap(engine, entity) {
@@ -1349,6 +1449,8 @@ export const resourceNodesFeature = {
   onStreetClear() {
     generation += 1;
     clearTimeout(autoplayTimer);
+    clearTimeout(releaseTimer);
+    releaseState = '';
     clearEffects();
     entities = [];
     underSloth = null;
@@ -1399,6 +1501,22 @@ export const resourceNodesFeature = {
     const entity = entities.find((row) => row.target === target);
     if (!entity) return true;
     performVerb(engine, entity, rulesVerbId(verbId));
+    return true;
+  },
+
+  /** salmon.js 30-100: Release on the Pocket Salmon, hidden outside Jal and Samudra. */
+  packVerbs(classTsid, engine) {
+    if (classTsid !== SALMON_RELEASE.classTsid || countItem(engine.inv, classTsid) < 1) return [];
+    const gate = releaseGate(engine);
+    releaseState = gate.state === 'enabled' ? 'enabled' : `hidden:${gate.reason}`;
+    engine.setData?.('salmonRelease', releaseState);
+    if (gate.state !== 'enabled') return [];
+    return [{ id: SALMON_RELEASE.verb, label: SALMON_RELEASE.label, tooltip: SALMON_RELEASE.tooltip, enabled: true }];
+  },
+
+  runPackVerb(classTsid, verbId, engine) {
+    if (classTsid !== SALMON_RELEASE.classTsid || verbId !== SALMON_RELEASE.verb) return false;
+    runSalmonRelease(engine);
     return true;
   },
 

@@ -6,8 +6,10 @@ import { chromium } from 'playwright';
 const [query = '', out = 'shot.png', waitArg = '6000', actionsArg = '[]'] = process.argv.slice(2);
 const base = String(process.env.BASE || 'https://groddle.localhost/').replace(/\/?$/, '/');
 const url = `${base}${query.startsWith('/') ? query.slice(1) : query.startsWith('?') || /^[\w/-]+\.html/.test(query) ? query : `?${query}`}`;
+// No user gesture in a headless run: let audio start anyway, so routes that
+// run after the game starts (sounds, music cues awaited on play) do not stall.
 const browser = await chromium.launch({
-  args: ['--ignore-certificate-errors', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+  args: ['--ignore-certificate-errors', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'],
 });
 const page = await browser.newPage({ viewport: { width: 1280, height: 860 }, ignoreHTTPSErrors: true });
 const logs = [];

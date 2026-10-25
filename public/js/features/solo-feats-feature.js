@@ -20,7 +20,13 @@
  *    Cubimals set free; since G173 also Salmon pockets (resource-nodes.js
  *    npc_salmon:pocket), Fertilidust and the fecundity powders (powders
  *    feature notifyVerb), and the Spinning Wheel's Cubimal boxes (game.js
- *    updateSpinningWheel drop_table_spinning_wheel_<item>).
+ *    updateSpinningWheel drop_table_spinning_wheel_<item>); since G178 the
+ *    Pocket Salmon's Release (resource-nodes-feature salmon:release) and
+ *    Fertilidust only when living trees take it (fertilidust:trees_grown).
+ *  - Piggy and Batterfly feeds count 3 per animal (npc_piggy.js 734-739,
+ *    npc_batterfly.js 830-840): the feed event's detail names the animal
+ *    (game.js world verbs, animal-husbandry-feature), and solo-feats.js
+ *    featEventIncrements keeps the count in state.caps.
  *  - Counts this feature watches (onTick): completed quests
  *    (questState.completed) and qurazy quoins (quoinState.qurazyFound).
  *  - Streaking (location.js 1041-1055) and "… And Ask Nothing in Return"
@@ -45,6 +51,11 @@
  *     (+3 waiting, on a street with trees; fertilidust_lite gives +1), and
  *     &featdemo=pet_only&featpending=5&powderdemo=1&powderautoplay=powder_of_mild_fecundity
  *     (the pile is lost).
+ *     G178: &featdemo=animal_love&featprogress=0&animaldemo=piggy&animalreset=1&featfeedautoplay=4
+ *     feeds the nearest Piggy a Cherry 4 times, 2.5 s apart (only 3 count);
+ *     &animaldemo=batterfly&featfeedautoplay=4&featfeedanimal=batterfly does the
+ *     same to the Batterfly.
+ *     Release: see resource-nodes-feature (&resrelease=1).
  * Canvas: soloFeats (id:value/goal,...), soloFeatLast, soloFeatRocks,
  *   soloFeatCompleted, soloFeatPending, soloFeatStreak, soloFeatDemo,
  *   soloFeatWired, soloFeatUnwired.
@@ -65,7 +76,7 @@ import {
   addPending,
   completionText,
   createSoloFeatState,
-  eventIncrements,
+  featEventIncrements,
   featRows,
   featSummary,
   incrementFeat,
@@ -74,7 +85,7 @@ import {
   resetPending,
   streakCheck,
   takePending,
-} from '../solo-feats.js?v=g173-1';
+} from '../solo-feats.js?v=g178-1';
 
 const POLL_MS = 500;
 const ROCK_ICON = 'assets/sprites/icons/petrified_rock_small@3x.png';
@@ -90,6 +101,7 @@ let demo = null;
 let demoDone = false;
 let autoplayAt = 0;
 let panelObserver = null;
+let feedAutoplay = null;
 
 function nekkid(engine) {
   return typeof engine.hasBuff === 'function' && engine.hasBuff('nekkid') === true;
@@ -158,8 +170,8 @@ function increment(engine, featId, amount, opts = {}) {
   return settle(engine, incrementFeat(state, featId, amount, opts, Date.now()));
 }
 
-function onFeatEvent(engine, counter, amount) {
-  for (const row of eventIncrements(counter, amount)) {
+function onFeatEvent(engine, counter, amount, detail) {
+  for (const row of featEventIncrements(state, counter, amount, detail)) {
     if (row.mode === 'direct') {
       increment(engine, row.featId, row.amount);
     } else if (row.mode === 'commit') {
@@ -285,6 +297,37 @@ function render() {
 
 // —— QA ——————————————————————————————————————————————————————————————————
 
+const FEED_CLASSES = /^npc_(?:piggy|batterfly)$/;
+
+/** The Piggy or Batterfly nearest the avatar (&featfeedanimal=piggy|batterfly picks one kind). */
+function nearestFeedable(engine) {
+  const p = engine.player;
+  if (!p) return null;
+  const only = String(engine.param?.('featfeedanimal') || '');
+  let best = null;
+  for (const t of engine.interactables || []) {
+    if (!FEED_CLASSES.test(String(t?.classId)) || !t.sprite || t.sprite.destroyed) continue;
+    if (only && t.classId !== `npc_${only}`) continue;
+    const d = Math.abs((Number(t.sprite.x) || 0) - p.x);
+    if (!best || d < best.d) best = { t, d };
+  }
+  return best?.t || null;
+}
+
+/** &featfeedautoplay=<n>: one Cherry at a time through the animal's own feed verb (engine.beginVerb). */
+function runFeedAutoplay(engine, now) {
+  if (!feedAutoplay || now < feedAutoplay.at) return;
+  const target = nearestFeedable(engine);
+  feedAutoplay.at = now + 2500;
+  if (!target || engine.busy?.()) return;
+  addItem(engine.inv, 'cherry', 1);
+  const id = target.classId === 'npc_batterfly' ? 'feed:cherry:1' : 'feed:cherry';
+  engine.beginVerb?.(target, { id, label: 'feed Cherry', ...(target.featureId ? { durationMs: 0 } : {}) });
+  feedAutoplay.left -= 1;
+  engine.setData?.('soloFeatFeeds', `${target.classId}:${feedAutoplay.left}`);
+  if (feedAutoplay.left <= 0) feedAutoplay = null;
+}
+
 function readDemo(engine) {
   const featId = String(engine.param?.('featdemo') || '').trim();
   const f = FEAT_BY_ID[featId];
@@ -308,6 +351,8 @@ function applyDemo(engine) {
     if (demo.autoplay) autoplayAt = now + 1500;
     last = `demo:${demo.featId}:${demo.value}`;
   }
+  const feeds = Math.min(10, Math.floor(Number(engine.param?.('featfeedautoplay')) || 0));
+  if (feeds > 0) feedAutoplay = { left: feeds, at: Date.now() + 2500 };
   if (engine.param?.('featopen') === '1' && typeof document !== 'undefined') {
     setTimeout(() => {
       const panel = document.getElementById('feat-panel');
@@ -338,8 +383,9 @@ export const soloFeatsFeature = {
     return increment(engine, featId, amount, opts || {});
   },
 
-  onEvent(counter, amount, engine) {
-    onFeatEvent(engine, counter, amount);
+  /** detail (feature-host event): { animal } on Piggy and Batterfly feeds. */
+  onEvent(counter, amount, engine, detail) {
+    onFeatEvent(engine, counter, amount, detail);
   },
 
   onStreetEnter(street, engine) {
@@ -387,6 +433,7 @@ export const soloFeatsFeature = {
       }
       publish(engine);
     }
+    runFeedAutoplay(engine, now);
     if (now < pollAt) return;
     pollAt = now + POLL_MS;
     poll(engine);

@@ -42,6 +42,9 @@
  *   createFireflyJarState(seed?), normalizeFireflyJarState(seed?)
  *   fireflyJarSheet(flies, state)
  *   ensureResourceItems(), starterResourceTools(), resourceVendorOffers()
+ *   SALMON_RELEASE, salmonReleaseConditions({ hubId, salmonCount }),
+ *   releaseSalmon(inv, pc, { hubId, salmonCount }), pickReleasedSalmon(rows, x),
+ *   respawnReleasedSalmon(node), swimmingSalmonCount(rows)   (salmon.js release)
  *
  * ctx for verbs/harvest:
  *   { verbId?, skills?|learned?, upgrades?, achievements?, toolState?, rng?,
@@ -1623,6 +1626,112 @@ export function harvestResourceNode(node, inv, pc, ctx = {}) {
     node,
     ...extra,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Pocket Salmon: Release (register G178)
+// ---------------------------------------------------------------------------
+
+/**
+ * items/salmon.js 30-100 verbs.release, the Pocket Salmon's pack verb
+ * ("Release the Salmon!", sort_on 50, is_single, in_pack only).
+ *
+ * conditions (43-61): only in hub 136 (Jal) or 140 (Samudra), and only while
+ * the location holds fewer than 71 npc_salmon; otherwise state null, so the
+ * button is hidden, never greyed out.
+ *
+ * handler (62-99): createItemStack('npc_salmon', 1, pc.x, pc.y) puts a live
+ * Salmon back in the water where you stand (71), metabolics_add_energy(-4)
+ * (73, no energy gate; the effect shows what was actually lost),
+ * stats_add_xp(5, false) (82, the mood bonus applies), SALMON_RELEASE (91),
+ * feats_increment('animal_love', 1) (92), then the Pocket Salmon is deleted
+ * (97). The message is item.js buildVerbMessage(1, 'release', 'released'):
+ * "You released a Pocket Salmon. " plus the effects ("-4 Energy +5 iMG",
+ * item.js transformEffects / formatEffectsList). notifyVerb counts
+ * salmon:release (item.js:738), which solo Feats read as Heebo's Happy
+ * Accident +1.
+ */
+export const SALMON_RELEASE = Object.freeze({
+  classTsid: 'salmon',
+  verb: 'release',
+  label: 'Release',
+  tooltip: 'Release the Salmon!',
+  hubs: Object.freeze(['136', '140']),
+  maxSalmon: 71,
+  energy: 4,
+  xp: 5,
+  sound: 'SALMON_RELEASE',
+  counter: 'salmon:release',
+  source: 'items/salmon.js 30-100 verbs.release',
+});
+
+/** salmon.js 43-61: { state: 'enabled' } or { state: null, reason } (hidden). */
+export function salmonReleaseConditions({ hubId = '', salmonCount = 0 } = {}) {
+  if (!SALMON_RELEASE.hubs.includes(String(hubId ?? ''))) return { state: null, reason: 'hub' };
+  if (whole(salmonCount) >= SALMON_RELEASE.maxSalmon) return { state: null, reason: 'crowded' };
+  return { state: 'enabled' };
+}
+
+/**
+ * Run the release on the pack and the player. Checks first, then mutates
+ * inv (one Pocket Salmon) and pc (energy, iMG with the mood bonus).
+ * Returns { ok, reason?, message, msgs, costs: { energy, xp }, sound,
+ * achievementCounters }. Where the Salmon swims back in is the caller's
+ * (pickReleasedSalmon, respawnReleasedSalmon).
+ */
+export function releaseSalmon(inv, pc, { hubId = '', salmonCount = 0 } = {}) {
+  const gate = salmonReleaseConditions({ hubId, salmonCount });
+  if (gate.state !== 'enabled') return { ok: false, reason: gate.reason, message: '', msgs: [] };
+  if (countItem(inv, SALMON_RELEASE.classTsid) < 1) return { ok: false, reason: 'no_salmon', message: '', msgs: [] };
+  removeItem(inv, SALMON_RELEASE.classTsid, 1);
+  const before = Math.max(0, Number(pc?.energy) || 0);
+  if (pc) pc.energy = Math.max(0, before - SALMON_RELEASE.energy);
+  const energy = before - Math.max(0, Number(pc?.energy) || 0);
+  const xp = pc ? grantMoodXp(pc, SALMON_RELEASE.xp) : 0;
+  const effects = [];
+  if (energy) effects.push(`-${energy} Energy`);
+  if (xp) effects.push(`+${xp} iMG`);
+  const def = RESOURCE_ITEM_DEFS.salmon;
+  const message = `You released a ${def?.label || 'Pocket Salmon'}. ${effects.join(' ')}`.trim();
+  return {
+    ok: true,
+    message,
+    msgs: [message],
+    costs: { energy, xp },
+    sound: SALMON_RELEASE.sound,
+    achievementCounters: [{ counter: SALMON_RELEASE.counter, amount: 1 }],
+  };
+}
+
+/**
+ * The street Salmon that comes back: the pocketed one (waiting on its
+ * respawn) nearest x, so the street keeps its count, or null when every
+ * Salmon is already swimming (the caller adds one). Rows are
+ * { classTsid, x, node }.
+ */
+export function pickReleasedSalmon(rows, x = 0) {
+  let best = null;
+  for (const row of Array.isArray(rows) ? rows : []) {
+    if (row?.classTsid !== 'npc_salmon' || !row.node?.depleted) continue;
+    const d = Math.abs((Number(row.x) || 0) - (Number(x) || 0));
+    if (!best || d < best.d) best = { row, d };
+  }
+  return best?.row || null;
+}
+
+/** A pocketed Salmon node swims again now (instead of after its 10 s respawn). */
+export function respawnReleasedSalmon(node) {
+  if (node?.classTsid !== 'npc_salmon') return false;
+  const def = getResourceNodeDef('npc_salmon');
+  node.units = def.stock.max;
+  node.depleted = false;
+  node.respawnAt = 0;
+  return true;
+}
+
+/** Live Salmon on the street (salmon.js:44 find_items('npc_salmon')). */
+export function swimmingSalmonCount(rows) {
+  return (Array.isArray(rows) ? rows : []).filter((row) => row?.classTsid === 'npc_salmon' && !row.node?.depleted).length;
 }
 
 // ---------------------------------------------------------------------------

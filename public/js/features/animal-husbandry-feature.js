@@ -210,8 +210,8 @@ function gainXp(engine, n) {
   return grantMoodXp(engine.pc, n);
 }
 
-function emit(engine, counter, amount = 1) {
-  engine.achievement(counter, amount);
+function emit(engine, counter, amount = 1, detail = undefined) {
+  engine.achievement(counter, amount, detail);
 }
 
 // —— Sprites ————————————————————————————————————————————————————————————
@@ -459,6 +459,8 @@ function buildExtraAnimal(engine, row) {
     airborne: row.classId === 'npc_butterfly',
     state: row.state,
     husbandryAnimal: row.id,
+    // game.js sends it with the feed event: solo Feats count 3 feeds per animal (npc_piggy.js 734-739).
+    animalKey: `${engine.streetTsid || ''}:husbandry:${row.id}`,
   });
   const entity = { row, sprite: spr, target, vx: (row.id.length % 2 ? 1 : -1) * 0.45, baseX: row.x, phase: row.id.length };
   // G63: a piggy you own can starve; the animal-mood feature calls this when its tick says die.
@@ -1652,7 +1654,8 @@ export const animalHusbandryFeature = {
       engine.pushActivity(res.msg);
       if (res.guano) dropGuano(engine, entity.sprite.x, res.guano);
       emit(engine, 'animals_fed:npc_batterfly');
-      emit(engine, 'npc_batterfly:feed');
+      // npc_batterfly.js 830-840 times_fed_for_feat: the solo Feat counts 3 feeds per Batterfly.
+      emit(engine, 'npc_batterfly:feed', 1, { animal: `${engine.streetTsid || ''}:${entity.key}` });
       engine.playSound('FEED_PIGGY', { volume: 0.5 });
       lastAction = `batterfly:fed:${arg}:${countText || 1}:guano=${res.guano}`;
       engine.updateHud();

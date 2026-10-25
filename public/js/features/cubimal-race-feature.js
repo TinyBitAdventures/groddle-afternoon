@@ -26,9 +26,11 @@
  * Dropping and picking up a figure are the pack's own Drop and the dropped
  * stack's pick up (js/world-items.js), saved per street.
  *
- * Not here: battles (G40, another player's cubimal), the tottlys_toys feat
- * points (feats are not in the remake), and sloth taunts (no source: npc_sloth
- * has no race hook).
+ * Tottly's Toys (solo Feats, G143): a race of 5 planks or more gives +2
+ * (raceEnd, npc_cubimal_*.js:942). Not here: battles (G40, another player's
+ * cubimal), with the Tottly's Toys points a battle win gives
+ * (npc_cubimal_*.js makeWinner 650, 661), and sloth taunts (no source:
+ * npc_sloth has no race hook).
  *
  * Art: the client's CC0 race recordings, assets/sprites/cubimals/*_race.webp
  * (tools/cubimal-race-art.mjs), 60 frames at 30 fps, frame 0 for the wound-down

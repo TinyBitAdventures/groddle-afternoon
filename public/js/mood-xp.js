@@ -69,6 +69,7 @@ export const MOOD_XP_SOURCES = Object.freeze({
     shrine_emblem: 'items/include/shrines.js 111',
     giant_icon: 'items/include/icon.js 230, 455; icon_*.js',
     fertilidust: 'items/fertilidust.js 371',
+    salmon_release: 'items/salmon.js 82 release (Pocket Salmon)',
     craftybot: 'items/npc_crafty_bot.js 1132 (disperse)',
     smuggler: 'items/npc_smuggler.js 515',
     race: 'locations/inc_race.js 368, 400',

@@ -3,8 +3,8 @@
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
-import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-61';
+import { createFeatureHost } from './js/feature-host.js?v=features-3';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-62';
 import {
   actionDurationFor,
   createTimedAction,
@@ -421,7 +421,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=g148-1';
+} from './js/player-save.js?v=g178-1';
 import {
   HOME_INTERIOR_TSID,
   HOME_PURCHASE_COST,
@@ -5583,7 +5583,9 @@ function executeVerb(target, verbId) {
     // Every world verb is also a `<class>:<verb>` quest event, unless a badge
     // counter of the same name already carried it.
     const verbEvent = `${target.classId}:${verbId}`;
-    if (!achievementEvents.some((event) => event.counter === verbEvent)) emitGameEvent(verbEvent);
+    // The animal's identity rides along (npc_piggy.js:734 times_fed_for_feat, solo Feats).
+    const verbDetail = target.animalKey ? { animal: target.animalKey } : undefined;
+    if (!achievementEvents.some((event) => event.counter === verbEvent)) emitGameEvent(verbEvent, 1, verbDetail);
     if (ROCK_CATALOG[target.classId] && verbId === 'mine' && target.state?.rock?.depleted) {
       emitGameEvent(`rocks_depleted:${target.classId}`);
     }
@@ -7307,9 +7309,9 @@ function register(target) {
  * Badge progress plus the feature event stream: every counter the game emits
  * also reaches features (quest offers advance from these).
  */
-function applyAchievementProgress(state, counter, amount = 1, pcRef = pc) {
+function applyAchievementProgress(state, counter, amount = 1, pcRef = pc, detail = undefined) {
   const updates = applyAchievementProgressRaw(state, counter, amount, pcRef);
-  features.event(counter, amount, engine);
+  features.event(counter, amount, engine, detail);
   playGameEventSound(counter);
   return updates;
 }
@@ -7348,8 +7350,8 @@ function backfillStreetVisits() {
 }
 
 /** Quest-only game events (no badge counter of their own). */
-function emitGameEvent(counter, amount = 1) {
-  features.event(counter, amount, engine);
+function emitGameEvent(counter, amount = 1, detail = undefined) {
+  features.event(counter, amount, engine, detail);
   playGameEventSound(counter);
 }
 
@@ -7614,8 +7616,9 @@ const engine = {
   param(name) {
     return new URLSearchParams(location.search).get(name);
   },
-  achievement(counter, amount = 1) {
-    announceAchievementUpdates(applyAchievementProgress(achieveState, counter, amount, pc));
+  /** detail reaches features' onEvent (solo Feats: { animal } on feeds). */
+  achievement(counter, amount = 1, detail = undefined) {
+    announceAchievementUpdates(applyAchievementProgress(achieveState, counter, amount, pc, detail));
   },
   /** achievements_set(group, label, 0): the counter starts over; set to n = reset, then achievement(counter, n). */
   resetAchievementCounter: (counter) => resetAchievementCounter(achieveState, counter),
@@ -8029,6 +8032,7 @@ function spawnPiggies(xs) {
       subtitle: animalStatusLabel('npc_piggy', animalState),
       sprite: spr,
       state: animalState,
+      animalKey: `${currentStreetTsid}:npc_piggy:${i}`,
     });
   });
   return list;

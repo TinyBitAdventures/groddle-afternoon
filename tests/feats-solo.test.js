@@ -22,7 +22,10 @@ import {
   addPending,
   completionText,
   createSoloFeatState,
+  FEED_CAP,
+  capKeyFor,
   eventIncrements,
+  featEventIncrements,
   featSummary,
   incrementFeat,
   isFeatComplete,
@@ -31,8 +34,8 @@ import {
   streakCheck,
   takePending,
   vogTextFor,
-} from '../public/js/solo-feats.js?v=g173-1';
-import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g173-1';
+} from '../public/js/solo-feats.js?v=g178-1';
+import { soloFeatsFeature } from '../public/js/features/solo-feats-feature.js?v=g178-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { createPlayerSave, parsePlayerSave, serializePlayerSave } from '../public/js/player-save.js?v=player-save-7';
 import { createResourceNode, harvestResourceNode } from '../public/js/resource-nodes.js';
@@ -322,7 +325,7 @@ describe('G173: the missing increments', () => {
   it('reads the source call sites it wires', { skip: !hasGsjs && 'glitch-GameServerJS not checked out' }, () => {
     // npc_salmon.js:195-207: the boot fails the verb; only a landed Pocket Salmon counts.
     assert.match(read('items', 'npc_salmon.js'), /if \(remainder > 0\) \{\s*failed = true;\s*\}\s*else \{\s*pc\.feats_increment\('animal_love', 1\);/);
-    // salmon.js:92 release, +1 (no remake verb yet).
+    // salmon.js:92 release, +1 (resource-nodes SALMON_RELEASE, G178).
     assert.match(read('items', 'salmon.js'), /pc\.announce_sound\('SALMON_RELEASE'\); \/\/play sound\s*pc\.feats_increment\('animal_love', 1\);/);
     // inc_skill_packages.js:53-54: the Spinning Wheel's Cubimal boxes give the Lucky Streak 5.
     assert.match(read('players', 'inc_skill_packages.js'),
@@ -356,7 +359,9 @@ describe('G173: the missing increments', () => {
     assert.deepEqual(by('drop_table_spinning_wheel_musicblock_x_shiny_01'), []);
     assert.deepEqual(by('drop_table_spinning_wheel_currants', 500), []);
     assert.deepEqual(by('drop_table_sno_cones_sno_cone_blue'), []);
-    assert.deepEqual(by('fertilidust:disperse'), ['pet_only:commit:3']);
+    // G178: the verb's own counter is not a Feat event; trees_grown is (living trees only).
+    assert.deepEqual(by('fertilidust:disperse'), []);
+    assert.deepEqual(by('fertilidust:trees_grown'), ['pet_only:commit:3']);
     assert.deepEqual(by('fertilidust_lite:sprinkle'), ['pet_only:commit:1']);
     assert.deepEqual(by('powder_of_mild_fecundity:disperse'), ['pet_only:reset:0']);
     assert.deepEqual(by('powder_of_startling_fecundity:disperse'), ['pet_only:reset:0']);
@@ -402,7 +407,7 @@ describe('G173: the missing increments', () => {
   it('piles up Fertilidust kindness and loses it to a fecundity powder', () => {
     const engine = fakeEngine();
     soloFeatsFeature.restore(undefined, engine);
-    soloFeatsFeature.onEvent('fertilidust:disperse', 1, engine);
+    soloFeatsFeature.onEvent('fertilidust:trees_grown', 1, engine);
     soloFeatsFeature.onEvent('fertilidust_lite:sprinkle', 1, engine);
     assert.equal(soloFeatsFeature.save().pending, 4);
     soloFeatsFeature.onEvent('powder_of_mild_fecundity:disperse', 1, engine);
@@ -426,5 +431,100 @@ describe('G173: the missing increments', () => {
     const late = normalizeSoloFeatState({ openedAt: 1_000 });
     assert.deepEqual(incrementFeat(late, 'hi_signs_1', 1, {}, 1_000 + QUICK_MS + 1).grants, ['down_to_the_wire']);
     assert.deepEqual(incrementFeat(late, 'tottlys_toys', 1, {}, 1_000 + QUICK_MS).grants, ['quick_on_your_feat', 'down_to_the_wire']);
+  });
+});
+
+// G178: the Pocket Salmon's Release, three feeds per animal, Fertilidust on dead trees.
+describe('G178 Feat follow-ups', () => {
+  const GSJS = join(ROOT, '..', 'glitch-GameServerJS');
+  const hasGsjs = existsSync(join(GSJS, 'items', 'npc_piggy.js'));
+  const read = (...parts) => readFileSync(join(GSJS, ...parts), 'utf8');
+  const by = (counter, amount) => eventIncrements(counter, amount).map((r) => `${r.featId}:${r.mode}:${r.amount}`).sort();
+  const piggy = (i) => ({ animal: `GLI32G3NUTD100I:npc_piggy:${i}` });
+
+  it('reads the 3-feed caps and the live-tree Fertilidust rule from the source', { skip: !hasGsjs && 'glitch-GameServerJS not checked out' }, () => {
+    // npc_piggy.js 734-739: the cap gates the animal_love call and the commented commit together.
+    assert.match(read('items', 'npc_piggy.js'),
+      /if \(this\.times_fed_for_feat\[pc\.tsid\] < 3\)\{\s*\/\/ pc\.feats_increment_for_commit\(1\);\s*pc\.feats_increment\('animal_love', 1\);\s*this\.times_fed_for_feat\[pc\.tsid\]\+\+;/);
+    // npc_batterfly.js 830-840: the first feed sets 0, later ones add 1; 0, 1, 2 count.
+    assert.match(read('items', 'npc_batterfly.js'),
+      /if \(!this\.times_fed_for_feat\[pc\.tsid\]\) \{\s*this\.times_fed_for_feat\[pc\.tsid\] = 0;\s*\}\s*else \{\s*this\.times_fed_for_feat\[pc\.tsid\]\+\+;\s*\}\s*if \(this\.times_fed_for_feat\[pc\.tsid\] < 3\) \{/);
+    assert.equal(FEED_CAP.max, 3);
+    // fertilidust.js 344-352: the +3 sits inside `if (trants)`; reviving dead trants alone skips it.
+    const dust = read('items', 'fertilidust.js');
+    const live = dust.slice(dust.indexOf('\tif (trants){'), dust.indexOf('\telse if (!dead_trants){'));
+    assert.ok(live.includes('pc.feats_increment_for_commit(3);'));
+    assert.equal(dust.split('feats_increment_for_commit').length - 1, 1);
+  });
+
+  it('counts the Release toward Heebo at +1', () => {
+    assert.deepEqual(by('salmon:release'), ['animal_love:direct:1']);
+    assert.deepEqual(by('salmon:eat'), []);
+  });
+
+  it('caps feeds at 3 per animal, for Heebo and the commit pile together', () => {
+    const state = normalizeSoloFeatState({});
+    const rows = (counter, detail) => featEventIncrements(state, counter, 1, detail).map((r) => `${r.featId}:${r.mode}:${r.amount}`).sort();
+    for (let i = 0; i < 3; i += 1) assert.deepEqual(rows('npc_piggy:feed:cherry', piggy(0)), ['animal_love:direct:1', 'pet_only:commit:1']);
+    assert.deepEqual(rows('npc_piggy:feed:cherry:2', piggy(0)), []);
+    // Another Piggy has its own three.
+    assert.deepEqual(rows('npc_piggy:feed:apple', piggy(1)), ['animal_love:direct:1', 'pet_only:commit:1']);
+    // Petting is not capped.
+    assert.deepEqual(rows('npc_piggy:pet', piggy(0)), ['animal_love:direct:1', 'pet_only:commit:1']);
+    assert.equal(state.caps[capKeyFor(FEED_CAP, 'npc_piggy:feed', piggy(0))], 3);
+    // Batterflies: three each, keyed by street and slot.
+    const bat = { animal: 'GLI32G3NUTD100I:batterfly:0' };
+    for (let i = 0; i < 3; i += 1) assert.deepEqual(rows('npc_batterfly:feed', bat), ['animal_love:direct:1']);
+    assert.deepEqual(rows('npc_batterfly:feed', bat), []);
+    // A feed with no animal named shares one cap per class: never more than one animal's worth.
+    const unnamed = normalizeSoloFeatState({});
+    const counted = Array.from({ length: 5 }, () => featEventIncrements(unnamed, 'npc_piggy:feed:cherry').length).filter(Boolean).length;
+    assert.equal(counted, 3);
+  });
+
+  it('keeps the caps through a save', () => {
+    const state = normalizeSoloFeatState({});
+    for (let i = 0; i < 3; i += 1) featEventIncrements(state, 'npc_batterfly:feed', 1, { animal: 'T:batterfly:0' });
+    const back = normalizeSoloFeatState(JSON.parse(JSON.stringify(state)));
+    assert.deepEqual(featEventIncrements(back, 'npc_batterfly:feed', 1, { animal: 'T:batterfly:0' }), []);
+  });
+
+  it('counts a fourth feed of the same Piggy for nothing in the feature', () => {
+    const engine = fakeEngine({ param: (k) => ({ featdemo: 'animal_love', featprogress: '0', featreset: '1' })[k] ?? null });
+    soloFeatsFeature.restore(undefined, engine);
+    soloFeatsFeature.onStreetEnter({ tsid: 'GLI32G3NUTD100I' }, engine);
+    for (let i = 0; i < 4; i += 1) soloFeatsFeature.onEvent('npc_piggy:feed:cherry', 1, engine, piggy(2));
+    assert.equal(soloFeatsFeature.save().progress.animal_love.value, 3);
+    assert.equal(soloFeatsFeature.save().pending, 3);
+    soloFeatsFeature.onEvent('npc_piggy:feed:cherry', 1, engine, piggy(3));
+    assert.equal(soloFeatsFeature.save().progress.animal_love.value, 4);
+  });
+
+  it('passes the animal from the verb sites into the event', () => {
+    const game = readFileSync(join(ROOT, 'public', 'game.js'), 'utf8');
+    assert.match(game, /animalKey: `\$\{currentStreetTsid\}:npc_piggy:\$\{i\}`/);
+    assert.match(game, /const verbDetail = target\.animalKey \? \{ animal: target\.animalKey \} : undefined;/);
+    assert.match(game, /emitGameEvent\(verbEvent, 1, verbDetail\)/);
+    assert.match(game, /function emitGameEvent\(counter, amount = 1, detail = undefined\) \{\s*features\.event\(counter, amount, engine, detail\);/);
+    assert.match(game, /achievement\(counter, amount = 1, detail = undefined\) \{\s*announceAchievementUpdates\(applyAchievementProgress\(achieveState, counter, amount, pc, detail\)\);/);
+    const host = readFileSync(join(ROOT, 'public', 'js', 'feature-host.js'), 'utf8');
+    assert.match(host, /event\(counter, amount, engine, detail\) \{\s*each\('onEvent', counter, amount, engine, detail\);/);
+    const husbandry = readFileSync(join(ROOT, 'public', 'js', 'features', 'animal-husbandry-feature.js'), 'utf8');
+    assert.match(husbandry, /emit\(engine, 'npc_batterfly:feed', 1, \{ animal: `\$\{engine\.streetTsid \|\| ''\}:\$\{entity\.key\}` \}\)/);
+  });
+
+  it('hands the detail to every onEvent through the feature host', async () => {
+    const { createFeatureHost } = await import('../public/js/feature-host.js');
+    const seen = [];
+    const host = createFeatureHost([{ id: 't', onEvent: (...args) => seen.push(args) }]);
+    host.event('npc_batterfly:feed', 1, 'E', { animal: 'x' });
+    assert.deepEqual(seen, [['npc_batterfly:feed', 1, 'E', { animal: 'x' }]]);
+  });
+
+  it('sends fertilidust:trees_grown only when living trees took the dust', () => {
+    const src = readFileSync(join(ROOT, 'public', 'js', 'features', 'powders-feature.js'), 'utf8');
+    const at = src.indexOf('  fertilidust(engine, classTsid) {');
+    const body = src.slice(at, src.indexOf('\n  fertilidust_lite(', at));
+    assert.match(body, /if \(trees\.length\) engine\.achievement\('fertilidust:trees_grown', 1\);/);
   });
 });

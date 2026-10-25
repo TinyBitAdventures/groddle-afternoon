@@ -10,7 +10,7 @@ import { normalizeFeatSnapshot } from './feats.js?v=incantations-2';
 import { normalizeEmotionalBearState } from './emotional-bear.js?v=emotional-bear-1';
 import { normalizeHomeState } from './homes.js?v=homes-mail-1';
 import { normalizeMailboxState } from './mailbox.js?v=homes-mail-1';
-import { normalizeFeatureSlices } from './feature-host.js?v=features-2';
+import { normalizeFeatureSlices } from './feature-host.js?v=features-3';
 import { normalizeQuestOfferState } from './quest-offers.js';
 
 export const PLAYER_SAVE_VERSION = 7;
