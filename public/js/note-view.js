@@ -17,6 +17,8 @@ const CSS = `
 .note-view h2 { margin: 0.15rem 0 0.5rem; font-size: 1.2rem; color: #3d3423; overflow-wrap: anywhere; }
 .note-view .note-body { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.98rem; line-height: 1.5; color: #3b3326; min-height: 3.2rem; background-image: repeating-linear-gradient(transparent, transparent 1.45rem, #efe6c9 1.45rem, #efe6c9 1.5rem); padding-bottom: 0.3rem; }
 .note-view .note-byline { margin-top: 0.55rem; font-size: 0.78rem; color: #8a7b58; font-style: italic; }
+.note-view .note-marker { display: inline-block; margin: 0.25rem 0 0.1rem; padding: 0.12rem 0.5rem; border: 1px dashed #b89b52; border-radius: 999px; background: #fff3c9; color: #6f5a22; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.02em; }
+.note-view .board-pin .note-marker { margin: 0; align-self: flex-start; font-size: 0.62rem; padding: 0.05rem 0.4rem; }
 .note-view .note-reason { margin-top: 0.4rem; font-size: 0.78rem; color: #a0503a; }
 .note-view .note-actions { display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap; margin-top: 0.8rem; }
 .note-view .note-actions button { font: inherit; font-size: 0.85rem; border: 1px solid #d8cba3; border-radius: 8px; padding: 0.38rem 0.85rem; background: #fff; color: #3d3423; cursor: pointer; }
@@ -123,6 +125,8 @@ export function openNoteView(opts = {}) {
     card.innerHTML = '';
     card.appendChild(el('div', { className: 'note-kicker' }, opts.kicker || 'Note'));
     if (!editing) {
+      // Remake text (street-furniture.js isRemakeNote): said so on the note itself (G175).
+      if (opts.marker) card.appendChild(el('div', { className: 'note-marker', 'data-remake': '1' }, opts.marker));
       card.appendChild(el('h2', {}, opts.title || 'A note!'));
       card.appendChild(el('div', { className: 'note-body' }, opts.body || ''));
       if (opts.byline) card.appendChild(el('div', { className: 'note-byline' }, opts.byline));
@@ -174,7 +178,7 @@ export function openNoteView(opts = {}) {
 
 /**
  * The notice board: pinned notes with Read / Take, plus Add a note.
- * opts: { title, count, capacity, pins: [{ id, title, preview }], addLabel,
+ * opts: { title, count, capacity, pins: [{ id, title, preview, marker? }], addLabel,
  *         addEnabled, addReason, onRead(id), onTake(id), onAdd(), onClose }
  */
 export function openBoardView(opts = {}) {
@@ -201,6 +205,7 @@ export function openBoardView(opts = {}) {
     const grid = el('div', { className: 'board-grid' });
     for (const pin of pins) {
       const box = el('div', { className: 'board-pin' });
+      if (pin.marker) box.appendChild(el('span', { className: 'note-marker', 'data-remake': '1' }, pin.marker));
       box.appendChild(el('strong', {}, pin.title));
       box.appendChild(el('p', {}, pin.preview));
       const actions = el('div', { className: 'note-actions' });

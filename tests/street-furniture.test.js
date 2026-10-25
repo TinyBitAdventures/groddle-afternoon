@@ -47,6 +47,7 @@ import {
   takePinnedNote,
   writePaperNote,
 } from '../public/js/street-furniture.js';
+import { REMAKE_NOTE_BYLINE, REMAKE_NOTE_MARKER, isRemakeNote, normalizeNote as normalizeNoteRow } from '../public/js/street-furniture.js';
 import { streetFurnitureFeature } from '../public/js/features/street-furniture-feature.js';
 import { FEATURES } from '../public/js/features/index.js';
 import { createFeatureHost } from '../public/js/feature-host.js';
@@ -304,5 +305,42 @@ describe('feature wiring', () => {
     assert.deepEqual(streetFurnitureFeature.reloadLocation({ tsid: 'NB_dorrit' }), { tsid: 'GLI2V0UN7RD1T2J', x: 10, y: 20 });
     assert.equal(streetFurnitureFeature.reloadLocation({ tsid: 'GLI2V0UN7RD1T2J' }), null);
     streetFurnitureFeature.restore(undefined);
+  });
+});
+
+
+describe('remake text is labelled as such (G175)', () => {
+  const PEN_EDIT = { learned: ['penmanship_1'], quillWorking: true, playerId: 'player', nowS: 1000 };
+
+  it('every authored note and pin carries the remake flag, and its seeds keep it', () => {
+    for (const row of [...Object.values(STREET_NOTES).flat(), ...Object.values(BOARD_PINS).flat()]) assert.equal(row.remake, true, row.title);
+    for (const tsid of ['GCR101Q98A12EHH', 'GA9MU59GB792T80']) {
+      const pins = boardPinSeeds(tsid);
+      assert.ok(pins.length > 0, tsid);
+      for (const pin of pins) {
+        assert.equal(pin.remakeText, true);
+        assert.equal(isRemakeNote(pin), true);
+      }
+    }
+    const [meadowNote] = streetNoteSeeds('GCR101Q98A12EHH', 1);
+    assert.equal(isRemakeNote(meadowNote), true);
+    assert.equal(isRemakeNote(streetNoteSeeds('GDOU1UON87E3K2T', 59)[58]), false, 'a blank note is nobody\'s text');
+  });
+
+  it('an older save without the flag is still matched by its text; a player\'s words are not', () => {
+    const old = normalizeNoteRow({ id: 'b0', initialTitle: BOARD_PINS.GCR101Q98A12EHH[0].title, initialText: BOARD_PINS.GCR101Q98A12EHH[0].text });
+    assert.equal(old.remakeText, undefined);
+    assert.equal(isRemakeNote(old), true);
+    const out = editNote(boardPinSeeds('GCR101Q98A12EHH')[0], { title: 'Mine', body: 'My own words' }, PEN_EDIT);
+    assert.equal(out.ok, true);
+    assert.equal(isRemakeNote(out.note), false);
+    assert.equal(isRemakeNote(normalizeNoteRow({ id: 'x', initialTitle: 'Someone', initialText: 'Not ours' })), false);
+  });
+
+  it('the marker and byline are plain words', () => {
+    for (const text of [REMAKE_NOTE_MARKER, REMAKE_NOTE_BYLINE]) {
+      assert.ok(text.length > 0 && !text.includes('—'));
+    }
+    assert.match(REMAKE_NOTE_MARKER, /remake/i);
   });
 });

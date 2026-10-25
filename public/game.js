@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-65';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-66';
 import {
   actionDurationFor,
   createTimedAction,
@@ -7536,6 +7536,34 @@ const engine = {
   beginVerb: (target, verb) => beginVerbAction(target, verb),
   /** Open the Make panel on a machine in the world: { tool, toolState, onComplete({ recipe, key, made }) } (G169). */
   openMakeStation: (station) => openMakePanel(station),
+  /**
+   * Finish a room machine's job (G175): craft its units on the machine's own
+   * `hold` inventory (ingredients in, outputs out) with that machine's tank,
+   * counting each unit as the Make panel does. Returns { made, xp, msgs }.
+   */
+  makeStationJob({ key, qty = 1, hold, tool, toolState }) {
+    const recipe = RECIPE_CATALOG[key];
+    const out = { made: 0, xp: 0, msgs: [] };
+    if (!recipe || !hold) return out;
+    const opts = { ...craftOpts(), toolState, stationTool: tool };
+    delete opts.station;
+    const record = { key, recipe, qty, made: 0, opts };
+    for (let i = 0; i < qty; i++) {
+      const stringBefore = hold.string || 0;
+      const result = craftRecipe(hold, pc, key, { ...opts, unitIndex: i + 1, batchQty: qty });
+      if (!result.ok) {
+        out.msgs.push(...(result.msgs || []));
+        break;
+      }
+      if (result.toolUse?.broke) out.msgs.push(result.toolUse.msg);
+      record.made += 1;
+      out.xp += (result.xp || 0) + (result.bonusImagination || 0);
+      noteMadeUnit(record, hold, stringBefore);
+    }
+    out.made = record.made;
+    updateHud();
+    return out;
+  },
   /** First non-null answer from any feature's `hook` (feature-host query). */
   query: (hook, ...args) => features.query(hook, ...args),
   award: (payload) => enqueueAward(payload),
@@ -20083,45 +20111,50 @@ function updateMakeCraft(deltaMs) {
       playSfx('alert', { volume: 0.35, rate: 0.72 });
     }
     record.made += 1;
-    emitGameEvent(`making_recipe:${record.key}`);
-    for (const output of record.recipe.outputs || []) {
-      emitGameEvent(`making_tool_output:${record.recipe.tool}:${output.classTsid}`, output.qty || 1);
-    }
-    const achievementCounter = makingToolAchievementCounter(record.recipe.tool);
-    const achievementUpdates = achievementCounter
-      ? applyAchievementProgress(achieveState, achievementCounter, 1, pc)
-      : [];
-    // inc_making also counts making_known_tool / making_known_recipe; the
-    // first gates the level-two cooking skills (Able Chopper and friends).
-    achievementUpdates.push(
-      ...applyAchievementProgress(achieveState, `making_known_tool:${record.recipe.tool}`, 1, pc),
-      ...(record.recipe.id ? applyAchievementProgress(achieveState, `making_known_recipe:${record.recipe.id}`, 1, pc) : []),
-    );
-    // inc_making.js:881: cooking tools count each output under making_food
-    // (Chowhound, Culinarian Supreme: distinct foods made).
-    // construction_tool.js:314: every furniture piece made (Domestic Completist).
-    if (record.recipe.tool === 'construction_tool') {
-      for (const output of record.recipe.outputs || []) {
-        achievementUpdates.push(...applyAchievementProgress(achieveState, `furniture_made:${output.classTsid}`, output.qty || 1, pc));
-      }
-    }
-    if (MAKING_TOOL_SKILLS[record.recipe.tool]?.makingType === 'cooking') {
-      for (const output of record.recipe.outputs || []) {
-        achievementUpdates.push(...applyAchievementProgress(achieveState, `making_food:${output.classTsid}`, 1, pc));
-      }
-    }
-    // Refined elements, ingots, crystals, furniture (js/achievements.js).
-    const spin = { unitIndex: record.made, batchQty: record.qty, string: (inv.string || 0) > stringBefore };
-    for (const row of makingOutputAchievementCounters(record.recipe.tool, record.recipe.outputs, spin)) {
-      achievementUpdates.push(...applyAchievementProgress(achieveState, row.counter, row.amount, pc));
-    }
-    announceAchievementUpdates(achievementUpdates);
-    if (achievementCounter) app.canvas.dataset.achievementCounter = achievementCounter;
+    noteMadeUnit(record, inv, stringBefore);
     updateHud();
     playSound('CRAFT_TICK', { volume: 0.35, jitter: 0.08 });
   }
   updateMakeProgressUi(record);
   if (record.timer.status === 'complete') finishMakeCraft(record);
+}
+
+/** One made unit's game events and badge counters (the panel's session and room machines, G175). */
+function noteMadeUnit(record, madeInv, stringBefore) {
+  emitGameEvent(`making_recipe:${record.key}`);
+  for (const output of record.recipe.outputs || []) {
+    emitGameEvent(`making_tool_output:${record.recipe.tool}:${output.classTsid}`, output.qty || 1);
+  }
+  const achievementCounter = makingToolAchievementCounter(record.recipe.tool);
+  const achievementUpdates = achievementCounter
+    ? applyAchievementProgress(achieveState, achievementCounter, 1, pc)
+    : [];
+  // inc_making also counts making_known_tool / making_known_recipe; the
+  // first gates the level-two cooking skills (Able Chopper and friends).
+  achievementUpdates.push(
+    ...applyAchievementProgress(achieveState, `making_known_tool:${record.recipe.tool}`, 1, pc),
+    ...(record.recipe.id ? applyAchievementProgress(achieveState, `making_known_recipe:${record.recipe.id}`, 1, pc) : []),
+  );
+  // inc_making.js:881: cooking tools count each output under making_food
+  // (Chowhound, Culinarian Supreme: distinct foods made).
+  // construction_tool.js:314: every furniture piece made (Domestic Completist).
+  if (record.recipe.tool === 'construction_tool') {
+    for (const output of record.recipe.outputs || []) {
+      achievementUpdates.push(...applyAchievementProgress(achieveState, `furniture_made:${output.classTsid}`, output.qty || 1, pc));
+    }
+  }
+  if (MAKING_TOOL_SKILLS[record.recipe.tool]?.makingType === 'cooking') {
+    for (const output of record.recipe.outputs || []) {
+      achievementUpdates.push(...applyAchievementProgress(achieveState, `making_food:${output.classTsid}`, 1, pc));
+    }
+  }
+  // Refined elements, ingots, crystals, furniture (js/achievements.js).
+  const spin = { unitIndex: record.made, batchQty: record.qty, string: (madeInv.string || 0) > stringBefore };
+  for (const row of makingOutputAchievementCounters(record.recipe.tool, record.recipe.outputs, spin)) {
+    achievementUpdates.push(...applyAchievementProgress(achieveState, row.counter, row.amount, pc));
+  }
+  announceAchievementUpdates(achievementUpdates);
+  if (achievementCounter) app.canvas.dataset.achievementCounter = achievementCounter;
 }
 
 /** Start a cancellable per-unit session without mutating inventory up front. */
@@ -20147,6 +20180,13 @@ function runMakeCraft(key, qty) {
   if (!check.ok) {
     toast(check.reason === 'ingredients' ? 'You need more ingredients.' : check.msg || 'Cannot make that right now.');
     renderMakePanel();
+    return;
+  }
+  // A room machine takes the ingredients now and runs on its own; the panel
+  // closes (inc_making.js:306-308, rsp.no_modal :504) and you collect later (G175).
+  if (typeof makeStation?.startJob === 'function') {
+    const waitMultiplier = makingSkillAdjustments(recipe, opts.learned, opts.upgrades).waitMultiplier || 1;
+    if (makeStation.startJob({ key, recipe, qty: n, waitMultiplier }) !== false) closeMakePanel();
     return;
   }
 

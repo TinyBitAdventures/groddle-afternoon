@@ -184,9 +184,114 @@ export function machineTank(seed, classTsid) {
 export const tankFuel = (tank, classTsid) => Math.max(0, Number(tank?.condition?.[classTsid]?.remaining) || 0);
 
 /**
- * The verbs a room machine offers: use and refuel (machine_base verbs.use
- * :633-668, verbs.refuel :442-558). No pick up and no disassemble.
- * ctx: { learned, fuelCells, skillName(id) }
+ * Wait, collect and lock (G175). A machine job is not made in your hands:
+ * - making_make_known (players/inc_making.js:306-308) takes the ingredients
+ *   up front for a machine, the job runs count * wait_ms + 2200 ms (:187,
+ *   :230-231, "Extra time for the animations"), and the window does not stay
+ *   open (rsp.no_modal, :504).
+ * - finishMakingKnown (:716-946) runs the recipe when the time is up, wherever
+ *   you are: the tank pays its fuel then (:760-777, item.use), and the outputs
+ *   go into the machine (setContents, fuelmaker.js:1533-1544; inc_making.js:827-833) with READY and
+ *   a callPlayer bubble; the activity line adds "Make sure to pick up your
+ *   stuff soon, or it might disappear!" away from your own house (:915-918).
+ * - While it runs, canUse (fuelmaker.js:1011-1021) is false: use says "The
+ *   machine is still running. N remaining." to the one who started it and
+ *   "Someone else is using this. N remaining." to everybody else
+ *   (verbs.use :633-668). With your output waiting, use is hidden and the
+ *   default verb is collect (:560-630), which hands it over with COLLECT.
+ * - expireOldContents (:1146-1158): output left more than
+ *   days_to_store_contents (6) game days in a machine that is not in your own
+ *   house is gone. game_days_since_ts rounds (common.js:189-200; 14,400 real
+ *   seconds to a game day).
+ */
+export const MACHINE_EXTRA_WAIT_MS = 2200;
+export const GAME_DAY_MS = 14400 * 1000;
+export const DAYS_TO_STORE_CONTENTS = 6;
+/** The one player in a solo game; a job carries who started it, as last_user does. */
+export const SOLO_USER = 'you';
+
+/** computeEnergyAndTimeCost for a machine (inc_making.js:187, :230-231). */
+export function machineJobMs(waitMs, qty = 1, waitMultiplier = 1) {
+  const n = Math.max(1, Math.floor(Number(qty) || 1));
+  const each = Math.max(0, Number(waitMs) || 0) * (Number(waitMultiplier) || 1);
+  return Math.round(n * each) + MACHINE_EXTRA_WAIT_MS;
+}
+
+/** machineTimeRemaining (inc_making.js:1873-1890): whole seconds left, rounded. */
+export const jobSecondsLeft = (job, now = Date.now()) => Math.max(0, Math.round(((Number(job?.readyAt) || 0) - now) / 1000));
+
+export const jobRunning = (job, now = Date.now()) => Boolean(job) && now < (Number(job.readyAt) || 0);
+
+/** common.js:204-240 secondsToString (minutes and seconds, no hours). */
+export function secondsToString(secs) {
+  const s = Math.max(0, Math.floor(Number(secs) || 0));
+  if (s >= 60) {
+    const mins = Math.floor(s / 60);
+    const rest = s - mins * 60;
+    const minWord = mins === 1 ? 'minute' : 'minutes';
+    const secWord = rest === 1 ? 'second' : 'seconds';
+    return rest ? `${mins} ${minWord} and ${rest} ${secWord}` : `${mins} ${minWord}`;
+  }
+  return `${s} ${s === 1 ? 'second' : 'seconds'}`;
+}
+
+/** game_days_since_ts (common.js:189-200) > days_to_store_contents. */
+export function contentsExpired(at, now = Date.now()) {
+  const diff = now - (Number(at) || 0);
+  if (diff < 0) return false;
+  return Math.round(diff / GAME_DAY_MS) > DAYS_TO_STORE_CONTENTS;
+}
+
+/** machine_base collect get_tooltip (fuelmaker.js:570-576). */
+export const COLLECT_TOOLTIPS = Object.freeze({
+  fuelmaker: 'Collect your fuel cell',
+  blockmaker: 'Collect your block',
+  metalmaker: 'Collect your metal',
+  woodworker: 'Collect your wood',
+});
+
+/** machine_base callPlayer (fuelmaker.js:1006-1009) and onPlayerCollision (:1413-1419), said on finishing and when you come near. */
+export const CALL_PLAYER_LINES = Object.freeze(['I made things for you!', 'Hey, come get your stuff!', 'Come take this stuff off my gears.']);
+
+/** onPlayerCollision's hitbox (apiSetHitBox(200, 100), fuelmaker.js:1423). */
+export const MACHINE_HITBOX = Object.freeze({ w: 200, h: 100 });
+
+/** finishMakingKnown's activity line for a machine (inc_making.js:893-918; machine recipes cost no energy). */
+export function machineMadeLine(recipeName, count, xp) {
+  const xpBit = xp > 0 ? ` +${Math.round(xp)} iMG` : '';
+  return `You made ${recipeName} (x${count})${xpBit}. Make sure to pick up your stuff soon, or it might disappear!`;
+}
+
+/** buildVerbMessage(count, 'collect from', 'collected from') with the machine's article (item.js:26-75). */
+export const collectLine = (classTsid) => `You collected from a ${MACHINE_LABELS[classTsid] || classTsid}.`;
+
+/**
+ * Metal Music (metalmaker.js:46-101): Turn Music Off / On, only with the
+ * Making Metal card (metalmaking_music); music_on is the machine's own and
+ * on by default. The verbs carry no isInCraftingAltar check, so a room's
+ * Metal Machine has them too.
+ */
+export function metalMusicVerbs(classTsid, { upgrade = false, musicOn = true } = {}) {
+  if (classTsid !== 'metalmaker' || !upgrade) return [];
+  return musicOn
+    ? [{ id: 'music_off', label: 'Turn Music Off', sort: 50, tooltip: 'Stop playing Metal Music while the machine is working', enabled: true, reason: '', durationMs: 0 }]
+    : [{ id: 'music_on', label: 'Turn Music On', sort: 51, tooltip: 'Play Metal Music while the machine is working', enabled: true, reason: '', durationMs: 0 }];
+}
+
+/** isPlayingMusic (metalmaker.js:787-800) / onPlayerEnter (:1527-1556), onMakingStart (:958-975): the sound a running machine loops. */
+export function runningSoundKey(classTsid, { upgrade = false, musicOn = true } = {}) {
+  return classTsid === 'metalmaker' && upgrade && musicOn ? 'METALMAKER' : 'ACTIVE';
+}
+
+/** Has stuff waiting: getContentsForPlayer (fuelmaker.js:1160-1172). */
+export const hasContents = (contents) => Boolean(contents) && Object.values(contents.items || {}).some((n) => n > 0);
+
+/**
+ * The verbs a room machine offers: use, collect and refuel (machine_base
+ * verbs.use, collect, refuel: fuelmaker.js:633, :560, :442), plus Metal Music on
+ * a Metal Machine. No pick up and no disassemble.
+ * ctx: { learned, fuelCells, skillName(id), job, contents, now, user,
+ *        musicUpgrade, musicOn }
  */
 export function roomMachineVerbs(classTsid, tank, ctx = {}) {
   const label = MACHINE_LABELS[classTsid] || classTsid;
@@ -194,12 +299,40 @@ export function roomMachineVerbs(classTsid, tank, ctx = {}) {
   const skill = MACHINE_SKILLS[classTsid];
   const learned = Array.isArray(ctx.learned) ? ctx.learned : [];
   const skillName = typeof ctx.skillName === 'function' ? ctx.skillName(skill) : skill;
-  // making_check_allowed (inc_making.js:80-108).
-  const useReason = skill && !learned.includes(skill)
-    ? `You need to know ${skillName} to use this.`
-    : fuel <= 0
-      ? `This ${label} does not have enough fuel remaining.`
-      : '';
+  const now = Number.isFinite(ctx.now) ? ctx.now : Date.now();
+  const me = ctx.user || SOLO_USER;
+  const job = ctx.job || null;
+  const running = jobRunning(job, now);
+  const left = running ? secondsToString(jobSecondsLeft(job, now)) : '';
+  const lockReason = running
+    ? (job.user || SOLO_USER) === me
+      ? `The machine is still running. ${left} remaining.`
+      : `Someone else is using this. ${left} remaining.`
+    : '';
+  const waiting = hasContents(ctx.contents);
+  const verbs = [];
+  if (waiting) {
+    // collect conditions: enabled unless the machine is running for somebody else.
+    const otherRun = running && (job.user || SOLO_USER) !== me;
+    verbs.push({
+      id: 'collect',
+      label: 'Collect',
+      sort: 58,
+      tooltip: COLLECT_TOOLTIPS[classTsid] || 'Collect a finished block',
+      enabled: !otherRun,
+      reason: otherRun ? `Someone else is using this. ${left} remaining.` : '',
+      primary: !otherRun,
+      durationMs: 0,
+    });
+  } else {
+    // making_check_allowed (inc_making.js:80-108).
+    const useReason = lockReason || (skill && !learned.includes(skill)
+      ? `You need to know ${skillName} to use this.`
+      : fuel <= 0
+        ? `This ${label} does not have enough fuel remaining.`
+        : '');
+    verbs.push({ id: 'use', label: 'Use', sort: 56, tooltip: `Get Excited and Make Things. Fuel: ${fuel}/${MAX_FUEL}`, enabled: !useReason, reason: useReason, durationMs: 0 });
+  }
   const cells = Math.max(0, Math.floor(Number(ctx.fuelCells) || 0));
   const refuelReason = fuel > MAX_FUEL - FUEL_PER_CELL
     ? `There is not enough space for a fuel cell. Current level: ${fuel}/${MAX_FUEL}`
@@ -207,12 +340,23 @@ export function roomMachineVerbs(classTsid, tank, ctx = {}) {
       ? "You don't have any fuel cells."
       : '';
   const fit = Math.min(cells, Math.floor((MAX_FUEL - fuel) / FUEL_PER_CELL));
-  const verbs = [
-    { id: 'use', label: 'Use', sort: 56, tooltip: `Get Excited and Make Things. Fuel: ${fuel}/${MAX_FUEL}`, enabled: !useReason, reason: useReason, durationMs: 0 },
-    { id: 'refuel', label: 'Refuel', sort: 54, tooltip: `Add more fuel. Current level: ${fuel}/${MAX_FUEL}`, enabled: !refuelReason, reason: refuelReason, durationMs: 0 },
-  ];
+  verbs.push({ id: 'refuel', label: 'Refuel', sort: 54, tooltip: `Add more fuel. Current level: ${fuel}/${MAX_FUEL}`, enabled: !refuelReason, reason: refuelReason, durationMs: 0 });
   if (!refuelReason && fit > 1) {
     verbs.push({ id: 'refuel_all', label: `Refuel with ${fit} cells`, sort: 55, tooltip: `Fill the tank. Current level: ${fuel}/${MAX_FUEL}`, enabled: true, reason: '', durationMs: 0 });
   }
+  verbs.push(...metalMusicVerbs(classTsid, { upgrade: ctx.musicUpgrade, musicOn: ctx.musicOn !== false }));
   return verbs;
+}
+
+/**
+ * What a started job holds: count * each input, taken from the pack now
+ * (inc_making.js:306-308). Returns null when the pack is short.
+ */
+export function takeJobIngredients(inv, recipe, qty, { count, remove }) {
+  const n = Math.max(1, Math.floor(Number(qty) || 1));
+  const need = {};
+  for (const inp of recipe?.inputs || []) need[inp.classTsid] = (need[inp.classTsid] || 0) + inp.qty * n;
+  for (const [id, q] of Object.entries(need)) if (count(inv, id) < q) return null;
+  for (const [id, q] of Object.entries(need)) remove(inv, id, q);
+  return need;
 }

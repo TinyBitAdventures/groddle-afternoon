@@ -83,13 +83,16 @@ import {
   openMailboxView,
   paperWriteVerb,
   pinNote,
+  REMAKE_NOTE_BYLINE,
+  REMAKE_NOTE_MARKER,
+  isRemakeNote,
   reconcileCarried,
   stoneVerbs,
   stoneVog,
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=furniture-g169';
+} from '../street-furniture.js?v=furniture-g175';
 import {
   CHORES,
   NEIGHBOURS,
@@ -110,7 +113,7 @@ import {
   visitorLetter,
 } from '../neighbours.js?v=neighbours-1';
 import { buildNeighbourBackground, neighbourLoadingColors, neighbourPlatforms } from './neighbour-scene.js?v=neighbours-1';
-import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=furniture-1';
+import { closeNoteView, noteViewOpen, openBoardView, openNotePicker, openNoteView } from '../note-view.js?v=note-g175';
 import { textureFromUrl } from '../textures.js';
 import { butlerApi } from './butler-feature.js?v=butler-feature-5';
 
@@ -284,6 +287,8 @@ function bylineFor(note) {
     const when = n.lastEdited ? new Date(n.lastEdited * 1000).toLocaleDateString() : '';
     return `Written by you${when ? ` · ${when}` : ''}`;
   }
+  // STREET_NOTES / BOARD_PINS are remake text, said so plainly (G175).
+  if (isRemakeNote(note)) return REMAKE_NOTE_BYLINE;
   return n.initialText || n.initialTitle ? 'Left by a Glitch who passed this way' : '';
 }
 
@@ -295,6 +300,7 @@ function showNote(engine, note, { kicker = 'Note', startEdit = false, save = nul
     kicker,
     title: view.title,
     body: view.body,
+    marker: isRemakeNote(note) ? REMAKE_NOTE_MARKER : '',
     byline: bylineFor(note),
     reason: startEdit || !save ? '' : view.disabledReason,
     editable,
@@ -577,7 +583,7 @@ function openBoard(engine, entity) {
     title: 'Notice Board',
     count: pins.length,
     capacity: BOARD_CAPACITY,
-    pins: pins.map((p) => ({ id: p.id, title: noteTitle(p), preview: noteContent(p).body.slice(0, 200) })),
+    pins: pins.map((p) => ({ id: p.id, title: noteTitle(p), preview: noteContent(p).body.slice(0, 200), marker: isRemakeNote(p) ? REMAKE_NOTE_MARKER : '' })),
     addEnabled: add.enabled,
     addReason: add.reason,
     onRead: (id) => {

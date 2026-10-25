@@ -2,7 +2,8 @@
  * Machines in the three Community Machine Rooms (register row G169):
  * js/machine-rooms.js, features/machine-rooms-feature.js, the Make panel's
  * station option (making.js canCraft stationTool) and the street furniture
- * furnitureRow hook that hangs each room's Notice Board.
+ * furnitureRow hook that hangs each room's Notice Board; and G175: the wait,
+ * collect and lock of a machine job, Metal Music on a room Metal Machine.
  */
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,6 +13,20 @@ import { fileURLToPath } from 'node:url';
 import {
   ALTAR_BONUS_TABLES,
   ALTAR_PREFACE,
+  CALL_PLAYER_LINES,
+  COLLECT_TOOLTIPS,
+  DAYS_TO_STORE_CONTENTS,
+  GAME_DAY_MS,
+  MACHINE_EXTRA_WAIT_MS,
+  collectLine,
+  contentsExpired,
+  jobSecondsLeft,
+  machineJobMs,
+  machineMadeLine,
+  metalMusicVerbs,
+  runningSoundKey,
+  secondsToString,
+  takeJobIngredients,
   MACHINE_ROOM_BOARD,
   MACHINE_ROOM_LAYOUTS,
   MACHINE_ROOM_TSIDS,
@@ -28,13 +43,14 @@ import {
 import { FOREST_MACHINE_ROOM_HELD, FOREST_MACHINE_ROOM_TSID } from '../public/js/forest-machine-room.js';
 import { FRESH_FUEL, MAX_FUEL, refuelMachine } from '../public/js/machines.js';
 import { DROP_TABLES, applyDropResult, rollDropTable } from '../public/js/drop-tables.js';
+import { countItem, removeItem } from '../public/js/inventory.js?v=catalog-unified-4';
 import { canUseTool } from '../public/js/tools.js?v=tools-5';
-import { MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g179-1';
-import { fixedFurniturePoints, furniturePlacementGroups } from '../public/js/street-furniture.js?v=furniture-g169';
+import { MACHINE_EXTRA_WAIT_MS as MAKING_EXTRA_WAIT_MS, MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g179-1';
+import { fixedFurniturePoints, furniturePlacementGroups } from '../public/js/street-furniture.js?v=furniture-g175';
 import { worldToScreen } from '../public/js/street-model.js';
 import { nearestSurfaceY } from '../public/js/walk-surface.js';
 import { platformsScreen } from '../public/js/street-model.js';
-import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g169-1';
+import { machineRoomsFeature } from '../public/js/features/machine-rooms-feature.js?v=g175-1';
 
 const spike = join(dirname(fileURLToPath(import.meta.url)), '..');
 const gsjs = join(spike, '../glitch-GameServerJS');
@@ -235,6 +251,117 @@ describe('the furnitureRow hook: a Notice Board on every room\'s wall', () => {
   });
 });
 
+describe('wait, collect and lock: the source rules (G175)', () => {
+  before(async () => {
+    await loadRecipeCatalogFromFile(join(spike, 'public/assets/content/recipes.json'));
+    ensureMakingItems();
+  });
+
+  it('a job runs count * wait_ms + 2200 ms (computeEnergyAndTimeCost)', () => {
+    const making = src('players/inc_making.js');
+    assert.match(making, /var wait_time = count \* intval\(recipe\.wait_ms\);/);
+    assert.match(making, /wait_time \+= 2200; \/\/ Extra time for the animations/);
+    assert.equal(MACHINE_EXTRA_WAIT_MS, 2200);
+    assert.equal(MAKING_EXTRA_WAIT_MS, MACHINE_EXTRA_WAIT_MS);
+    assert.equal(machineJobMs(RECIPE_CATALOG.fuel_cell.waitMs, 3), 3 * 20000 + 2200);
+    assert.equal(machineJobMs(RECIPE_CATALOG.board.waitMs, 1), 2500 + 2200);
+    assert.equal(machineJobMs(10000, 2, 0.5), 10000 + 2200);
+  });
+
+  it('secondsToString and machineTimeRemaining match common.js and inc_making.js', () => {
+    assert.match(src('common.js'), /return \(""\+wholeMins\+" "\+minWord\+" and "\+wholeSeconds\+" "\+secWord\);/);
+    assert.equal(secondsToString(1), '1 second');
+    assert.equal(secondsToString(42), '42 seconds');
+    assert.equal(secondsToString(60), '1 minute');
+    assert.equal(secondsToString(61), '1 minute and 1 second');
+    assert.equal(secondsToString(185), '3 minutes and 5 seconds');
+    assert.equal(jobSecondsLeft({ readyAt: 10_600 }, 0), 11, 'Math.round, as machineTimeRemaining');
+    assert.equal(jobSecondsLeft({ readyAt: 0 }, 5000), 0);
+  });
+
+  it('output waits 6 game days at most (expireOldContents, game_days_since_ts rounds)', () => {
+    assert.match(src('items/fuelmaker.js'), /"days_to_store_contents"\s*:\s*"6"/);
+    assert.match(src('common.js'), /there are 14400 real seconds in a game day/);
+    assert.equal(DAYS_TO_STORE_CONTENTS, 6);
+    assert.equal(GAME_DAY_MS, 14_400_000);
+    assert.equal(contentsExpired(0, 6.49 * GAME_DAY_MS), false);
+    assert.equal(contentsExpired(0, 6.5 * GAME_DAY_MS), true);
+    assert.equal(contentsExpired(1000, 0), false, 'a time in the future is 0 days');
+  });
+
+  it('use is locked while the job runs: your own run, and somebody else\'s', () => {
+    const fm = src('items/fuelmaker.js');
+    const job = { readyAt: 62_000, user: 'you' };
+    const ctx = { learned: ['fuelmaking_1'], fuelCells: 0, job, now: 0 };
+    const mine = roomMachineVerbs('fuelmaker', machineTank(null, 'fuelmaker'), ctx);
+    assert.deepEqual(mine.map((v) => v.id), ['use', 'refuel']);
+    assert.equal(mine[0].enabled, false);
+    assert.equal(mine[0].reason, 'The machine is still running. 1 minute and 2 seconds remaining.');
+    assert.ok(fm.includes('"The machine is still running. "+time_left+" remaining."'));
+    const theirs = roomMachineVerbs('fuelmaker', machineTank(null, 'fuelmaker'), { ...ctx, job: { ...job, user: 'someone' } });
+    assert.equal(theirs[0].reason, 'Someone else is using this. 1 minute and 2 seconds remaining.');
+    assert.ok(fm.includes('"Someone else is using this. "+time_left+" remaining."'));
+    const done = roomMachineVerbs('fuelmaker', machineTank(null, 'fuelmaker'), { ...ctx, now: 62_000 });
+    assert.equal(done[0].enabled, true, 'free again once the time is up');
+  });
+
+  it('with your output waiting, use is hidden and Collect is the default verb', () => {
+    const fm = src('items/fuelmaker.js');
+    const verbs = roomMachineVerbs('blockmaker', machineTank(null, 'blockmaker'), { learned: ['blockmaking_1'], contents: { items: { grade_aa_earth_block: 2 } }, now: 0 });
+    assert.deepEqual(verbs.map((v) => v.id), ['collect', 'refuel']);
+    assert.equal(verbs[0].enabled, true);
+    assert.equal(verbs[0].primary, true);
+    assert.equal(verbs[0].tooltip, 'Collect your block');
+    for (const [cls, tip] of Object.entries(COLLECT_TOOLTIPS)) assert.ok(fm.includes(`if (this.class_tsid == '${cls}') return "${tip}";`), cls);
+    for (const line of CALL_PLAYER_LINES) assert.ok(fm.includes(`"${line}"`), line);
+    const empty = roomMachineVerbs('blockmaker', machineTank(null, 'blockmaker'), { learned: ['blockmaking_1'], contents: { items: { grade_aa_earth_block: 0 } } });
+    assert.equal(empty[0].id, 'use');
+  });
+
+  it('the finish and collect lines are the source\'s', () => {
+    const making = src('players/inc_making.js');
+    assert.ok(making.includes('msg += " Make sure to pick up your stuff soon, or it might disappear!"'));
+    assert.equal(machineMadeLine('Fuel Cell', 2, 20), 'You made Fuel Cell (x2) +20 iMG. Make sure to pick up your stuff soon, or it might disappear!');
+    assert.ok(src('items/fuelmaker.js').includes("this.buildVerbMessage(msg.count, 'collect from', 'collected from'"));
+    assert.equal(collectLine('metalmaker'), 'You collected from a Metal Machine.');
+  });
+
+  it('a job takes count * each input from the pack up front, or nothing', () => {
+    const inv = { tin: 3, plain_metal: 2 };
+    const held = takeJobIngredients(inv, RECIPE_CATALOG.metal_rod, 2, { count: countItem, remove: removeItem });
+    assert.deepEqual(held, { tin: 2, plain_metal: 2 });
+    assert.deepEqual(inv, { tin: 1, plain_metal: 0 });
+    assert.equal(takeJobIngredients(inv, RECIPE_CATALOG.metal_rod, 1, { count: countItem, remove: removeItem }), null);
+    assert.deepEqual(inv, { tin: 1, plain_metal: 0 }, 'a short pack keeps everything');
+  });
+});
+
+describe('Metal Music on a room Metal Machine (G175)', () => {
+  it('the music verbs carry no machine-room check, so the room machine offers them', () => {
+    const mm = src('items/metalmaker.js');
+    const off = mm.slice(mm.indexOf('verbs.turn_off_music'), mm.indexOf('verbs.turn_on_music'));
+    const on = mm.slice(mm.indexOf('verbs.turn_on_music'), mm.indexOf('verbs.', mm.indexOf('verbs.turn_on_music') + 10));
+    for (const v of [off, on]) {
+      assert.ok(!v.includes('isInCraftingAltar'), 'no machine room check');
+      assert.ok(v.includes("imagination_has_upgrade('metalmaking_music')"));
+    }
+    assert.ok(off.includes('"Stop playing Metal Music while the machine is working"'));
+    assert.ok(on.includes('"Play Metal Music while the machine is working"'));
+  });
+
+  it('Turn Music Off / On with the Making Metal card, on by default, only on the Metal Machine', () => {
+    assert.deepEqual(metalMusicVerbs('metalmaker', { upgrade: false }), []);
+    assert.deepEqual(metalMusicVerbs('fuelmaker', { upgrade: true }), []);
+    assert.deepEqual(metalMusicVerbs('metalmaker', { upgrade: true }).map((v) => v.label), ['Turn Music Off']);
+    assert.deepEqual(metalMusicVerbs('metalmaker', { upgrade: true, musicOn: false }).map((v) => v.label), ['Turn Music On']);
+    const verbs = roomMachineVerbs('metalmaker', machineTank(null, 'metalmaker'), { learned: ['metalwork_1'], musicUpgrade: true });
+    assert.deepEqual(verbs.map((v) => v.id), ['use', 'refuel', 'music_off']);
+    assert.equal(runningSoundKey('metalmaker', { upgrade: true, musicOn: true }), 'METALMAKER');
+    assert.equal(runningSoundKey('metalmaker', { upgrade: true, musicOn: false }), 'ACTIVE');
+    assert.equal(runningSoundKey('woodworker', { upgrade: true }), 'ACTIVE');
+  });
+});
+
 describe('the feature in a room', () => {
   class Obj {
     constructor() {
@@ -243,13 +370,28 @@ describe('the feature in a room', () => {
     }
     addChild(c) { this.children.push(c); return c; }
   }
-  const PIXI = { Sprite: Obj, Container: Obj, ImageSource: class { on() {} emit() {} }, Texture: class { constructor(o) { Object.assign(this, o); } } };
+  class Gfx extends Obj {
+    clear() { this.ops = []; return this; }
+    roundRect(...a) { (this.ops ||= []).push(['rect', ...a]); return this; }
+    circle(...a) { (this.ops ||= []).push(['circle', ...a]); return this; }
+    fill() { return this; }
+    stroke() { return this; }
+  }
+  const PIXI = { Sprite: Obj, Container: Obj, Graphics: Gfx, ImageSource: class { on() {} emit() {} }, Texture: class { constructor(o) { Object.assign(this, o); } } };
+  let clock = 1_000_000;
+  const realNow = Date.now;
 
-  function roomEngine(tsid, extra = {}) {
+  before(async () => {
+    await loadRecipeCatalogFromFile(join(spike, 'public/assets/content/recipes.json'));
+    ensureMakingItems();
+  });
+
+  function roomEngine(tsid, extra = {}, shared = {}) {
     const room = street(tsid);
-    const slots = {};
+    const slots = shared.slots || {};
     const data = {};
-    const log = [];
+    const log = shared.log || [];
+    const sounds = shared.sounds || [];
     const engine = {
       PIXI,
       street: room,
@@ -257,72 +399,196 @@ describe('the feature in a room', () => {
       entityLayer: new Obj(),
       platforms: platformsScreen(room),
       player: { x: 600, y: 570 },
-      pc: { energy: 100, mood: 50, xp: 0, level: 5, energyMax: 100 },
-      inv: {},
-      learnedSkills: ['fuelmaking_1', 'blockmaking_1'],
+      pc: shared.pc || { energy: 100, mood: 50, xp: 0, imagination: 0, level: 5, energyMax: 100, imaginationUpgrades: [] },
+      inv: shared.inv || {},
+      learnedSkills: ['fuelmaking_1', 'blockmaking_1', 'woodworking_1', 'metalwork_1'],
       streetSlot: (id, t) => ((slots[`${id}:${t}`] ||= {})),
-      register: (t) => t,
+      register: (t) => ((shared.registered ||= []).push(t), t),
       setData: (k, v) => { data[k] = v; },
       param: () => null,
       pushActivity: (line) => log.push(line),
       toast() {},
+      say: (target, line) => log.push(`say ${target.classId}: ${line}`),
       floatText() {},
       updateHud() {},
+      refreshPack() {},
       save() {},
+      playSound: (key) => sounds.push(key),
+      playSoundLoop: (key) => { sounds.push(`loop ${key}`); return { stop: () => sounds.push(`stop ${key}`) }; },
       achievement: (c, n) => log.push(`counter ${c} ${n}`),
       openMakeStation: (station) => { engine.station = station; },
+      // game.js makeStationJob: craftRecipe on the machine's hold, with its tank.
+      makeStationJob: ({ key, qty, hold, tool, toolState }) => {
+        const out = { made: 0, xp: 0, msgs: [] };
+        const opts = { learned: engine.learnedSkills, requireSkill: true, requireTool: true, toolState, stationTool: tool };
+        for (let i = 0; i < qty; i++) {
+          const r = craftRecipe(hold, engine.pc, key, { ...opts, unitIndex: i + 1, batchQty: qty });
+          if (!r.ok) { out.msgs.push(...r.msgs); break; }
+          out.made += 1;
+          out.xp += r.xp;
+        }
+        return out;
+      },
       data,
       log,
       slots,
+      sounds,
       ...extra,
     };
     return engine;
   }
 
-  it('spawns every machine, uses one through the Make panel and pays the bonus once per job', () => {
+  const tick = (engine, ms) => {
+    clock += ms;
+    machineRoomsFeature.onTick(300, clock, engine);
+  };
+
+  it('spawns every machine; a job takes the ingredients, runs while you are away, and waits to be collected', () => {
     const prev = globalThis.PIXI;
     globalThis.PIXI = PIXI;
+    Date.now = () => clock;
     try {
-      const engine = roomEngine('GCR101Q98A12EHH', { param: (n) => (n === 'machineroomroll' ? '0' : null) });
+      machineRoomsFeature._reset();
+      const shared = { inv: { jellisac_clump: 24, peat: 16, white_gas: 4 } };
+      const engine = roomEngine('GCR101Q98A12EHH', { param: (n) => (n === 'machineroomroll' ? '0' : null) }, shared);
       machineRoomsFeature.onStreetClear(engine);
       machineRoomsFeature.onStreetEnter(engine.street, engine);
       assert.equal(engine.data.machineRoom, 'GCR101Q98A12EHH');
       assert.equal(engine.data.machineRoomMachines, '5');
-      const state = machineRoomsFeature._state();
-      assert.deepEqual(state.machines.map((m) => m.classTsid), ['blockmaker', 'blockmaker', 'fuelmaker', 'woodworker', 'metalmaker']);
-      assert.equal(engine.entityLayer.children.length, 5);
-      const registered = [];
-      const engine2 = roomEngine('GCR101Q98A12EHH', { register: (t) => (registered.push(t), t), param: (n) => (n === 'machineroomroll' ? '0' : null) });
-      machineRoomsFeature.onStreetClear(engine2);
-      machineRoomsFeature.onStreetEnter(engine2.street, engine2);
-      const fm = registered.find((t) => t.classId === 'fuelmaker');
-      assert.ok(fm);
-      assert.deepEqual(machineRoomsFeature.verbsFor(fm, engine2).map((v) => v.id), ['use', 'refuel']);
-      assert.equal(machineRoomsFeature.runVerb(fm, 'use', engine2), true);
-      assert.equal(engine2.station.tool, 'fuelmaker');
-      assert.equal(tankFuel(engine2.station.toolState, 'fuelmaker'), FRESH_FUEL);
-      engine2.station.onComplete({ recipe: { id: '192' }, made: 3 });
-      assert.deepEqual(engine2.log, ['Altar bonus! You used a Machine in a Machine Room: You got 7 mood!']);
-      assert.equal(engine2.pc.mood, 57);
-      assert.equal(engine2.data.machineRoomBonus, '1');
-      // A Woodworker job finishes with no bonus (recipe 192 only, woodworker.js:862).
-      const ww = registered.find((t) => t.classId === 'woodworker');
-      machineRoomsFeature.runVerb(ww, 'use', engine2);
-      engine2.station.onComplete({ recipe: { id: '253' }, made: 1 });
-      assert.equal(engine2.log.length, 1);
-      // Refuel: the Bowser counter as well as refueled.
-      engine2.inv.fuel_cell = 1;
-      machineRoomsFeature.runVerb(fm, 'refuel', engine2);
-      assert.ok(engine2.log.includes('counter machines:refueled_for_others 1'));
-      const slot = engine2.slots['machine-rooms:GCR101Q98A12EHH'];
-      assert.equal(tankFuel(slot.tanks.IDOOVGC4SRJ2PBN, 'fuelmaker'), FRESH_FUEL + 50, 'the tank is saved in the street slot');
-      machineRoomsFeature.onStreetClear(engine2);
-      const outside = roomEngine('GCR10K3BPJK1U6F');
+      assert.deepEqual(machineRoomsFeature._state().machines.map((m) => m.classTsid), ['blockmaker', 'blockmaker', 'fuelmaker', 'woodworker', 'metalmaker']);
+      const fm = shared.registered.find((t) => t.classId === 'fuelmaker');
+      assert.deepEqual(machineRoomsFeature.verbsFor(fm, engine).map((v) => v.id), ['use', 'refuel']);
+      assert.equal(machineRoomsFeature.runVerb(fm, 'use', engine), true);
+      assert.equal(engine.station.tool, 'fuelmaker');
+      assert.equal(typeof engine.station.startJob, 'function', 'the panel starts a job instead of making in your hands');
+      assert.equal(engine.station.startJob({ key: 'fuel_cell', recipe: RECIPE_CATALOG.fuel_cell, qty: 2, waitMultiplier: 1 }), true);
+      assert.deepEqual(shared.inv, { jellisac_clump: 0, peat: 0, white_gas: 0 }, 'ingredients go in up front');
+      const job = machineRoomsFeature._state().jobs.IDOOVGC4SRJ2PBN;
+      assert.equal(job.readyAt - job.startedAt, 2 * 20000 + 2200);
+      assert.deepEqual(engine.sounds, ['loop ACTIVE'], 'the machine hums while you are in the room');
+      const busy = machineRoomsFeature.verbsFor(fm, engine);
+      assert.equal(busy[0].enabled, false);
+      assert.equal(busy[0].reason, 'The machine is still running. 42 seconds remaining.');
+      assert.equal(engine.station.startJob({ key: 'fuel_cell', recipe: RECIPE_CATALOG.fuel_cell, qty: 1 }), false, 'one job at a time');
+      tick(engine, 10_000);
+      assert.match(machineRoomsFeature._state().machines[2].subtitle, /^Working · 32 seconds left$/);
+      // Leave; the job finishes while you are elsewhere (finishMakingKnown is on the player's timer).
+      machineRoomsFeature.onStreetClear(engine);
+      assert.ok(engine.sounds.includes('stop ACTIVE'));
+      const outside = roomEngine('GCR10K3BPJK1U6F', { param: (n) => (n === 'machineroomroll' ? '0' : null) }, { ...shared, slots: engine.slots, log: engine.log, sounds: engine.sounds });
       machineRoomsFeature.onStreetEnter(outside.street, outside);
-      assert.equal(outside.data.machineRoom, '');
-      assert.equal(outside.data.machineRoomMachines, '0');
+      tick(outside, 33_000);
+      assert.equal(machineRoomsFeature._state().jobs.IDOOVGC4SRJ2PBN, undefined);
+      assert.deepEqual(machineRoomsFeature._state().contents.IDOOVGC4SRJ2PBN.items, { fuel_cell: 2 }, 'the output waits in the machine');
+      assert.equal(shared.inv.fuel_cell || 0, 0, 'not in the pack yet');
+      // xpReward 10 each, through grantMoodXp (mood 50 trims it).
+      assert.ok(outside.log.some((l) => /^You made Fuel Cell \(x2\) \+\d+ iMG\. Make sure to pick up your stuff soon, or it might disappear!$/.test(l)), outside.log.join(' / '));
+      assert.ok(outside.log.includes('Altar bonus! You used a Machine in a Machine Room: You got 7 mood!'), 'one bonus roll per finished job');
+      assert.equal(machineRoomsFeature._state().bonusPaid, 1);
+      assert.ok(outside.sounds.includes('READY'));
+      const slot = engine.slots['machine-rooms:GCR101Q98A12EHH'];
+      assert.equal(tankFuel(slot.tanks.IDOOVGC4SRJ2PBN, 'fuelmaker'), FRESH_FUEL - 2 * Number(RECIPE_CATALOG.fuel_cell.toolWear), 'the room tank paid the fuel at the finish');
+      machineRoomsFeature.onStreetClear(outside);
+      // Come back: Collect is the default, Use is gone, and it calls you when you come near.
+      shared.registered = [];
+      const back = roomEngine('GCR101Q98A12EHH', {}, { ...shared, slots: engine.slots });
+      back.player.x = -9999;
+      machineRoomsFeature.onStreetEnter(back.street, back);
+      const fm2 = shared.registered.find((t) => t.classId === 'fuelmaker');
+      assert.deepEqual(machineRoomsFeature.verbsFor(fm2, back).map((v) => v.id), ['collect', 'refuel']);
+      assert.equal(back.data.machineRoomWaiting, 'IDOOVGC4SRJ2PBN');
+      back.player.x = fm2.sprite.x + 60;
+      back.player.y = fm2.sprite.y;
+      tick(back, 300);
+      assert.ok(back.log.some((l) => /^say fuelmaker: /.test(l) && CALL_PLAYER_LINES.includes(l.slice('say fuelmaker: '.length))));
+      machineRoomsFeature.runVerb(fm2, 'collect', back);
+      assert.equal(shared.inv.fuel_cell, 2);
+      assert.ok(back.log.includes('You collected from a Fuelmaker.'));
+      assert.ok(back.sounds.includes('COLLECT'));
+      assert.deepEqual(machineRoomsFeature.verbsFor(fm2, back).map((v) => v.id), ['use', 'refuel', 'refuel_all']);
+      // A Woodworker job finishes with no bonus (recipe 192 only, woodworker.js:862).
+      shared.inv.plank = 4;
+      const ww = shared.registered.find((t) => t.classId === 'woodworker');
+      machineRoomsFeature.runVerb(ww, 'use', back);
+      back.station.startJob({ key: 'board', recipe: RECIPE_CATALOG.board, qty: 1 });
+      tick(back, 5_000);
+      assert.deepEqual(machineRoomsFeature._state().contents.IA5RL1JTRQS2J4J.items, { board: 1 });
+      assert.equal(machineRoomsFeature._state().bonusPaid, 1);
+      // Refuel: the Bowser counter as well as refueled.
+      machineRoomsFeature.runVerb(fm2, 'refuel', back);
+      assert.ok(back.log.includes('counter machines:refueled_for_others 1'));
+      machineRoomsFeature.onStreetClear(back);
+      const out2 = roomEngine('GCR10K3BPJK1U6F');
+      machineRoomsFeature.onStreetEnter(out2.street, out2);
+      assert.equal(out2.data.machineRoom, '');
+      assert.equal(out2.data.machineRoomMachines, '0');
     } finally {
       globalThis.PIXI = prev;
+      Date.now = realNow;
+    }
+  });
+
+  it('a job and its output survive a reload; output left 6.5 game days is gone', () => {
+    const prev = globalThis.PIXI;
+    globalThis.PIXI = PIXI;
+    Date.now = () => clock;
+    try {
+      machineRoomsFeature._reset();
+      const shared = { inv: { tin: 1, plain_metal: 1 } };
+      const engine = roomEngine('GA9MU59GB792T80', {}, shared);
+      machineRoomsFeature.onStreetEnter(engine.street, engine);
+      const mm = shared.registered.find((t) => t.classId === 'metalmaker');
+      machineRoomsFeature.runVerb(mm, 'use', engine);
+      engine.station.startJob({ key: 'metal_rod', recipe: RECIPE_CATALOG.metal_rod, qty: 1 });
+      const saved = JSON.parse(JSON.stringify(machineRoomsFeature.save()));
+      machineRoomsFeature.onStreetClear(engine);
+      machineRoomsFeature._reset();
+      machineRoomsFeature.restore(saved);
+      assert.equal(machineRoomsFeature._state().jobs.IHV10AAIAHV2S0H.key, 'metal_rod');
+      tick(engine, 12_200);
+      assert.deepEqual(machineRoomsFeature._state().contents.IHV10AAIAHV2S0H.items, { metal_rod: 1 });
+      machineRoomsFeature.restore(JSON.parse(JSON.stringify(machineRoomsFeature.save())));
+      clock += 6.5 * GAME_DAY_MS;
+      const back = roomEngine('GA9MU59GB792T80', {}, { ...shared, slots: engine.slots });
+      machineRoomsFeature.onStreetEnter(back.street, back);
+      assert.equal(machineRoomsFeature._state().contents.IHV10AAIAHV2S0H, undefined, 'expireOldContents on entering');
+      machineRoomsFeature.restore({ jobs: { X: { room: 'GCR10K3BPJK1U6F', key: 'board', readyAt: 1 } }, contents: { Y: { room: 'nowhere', items: {} } } });
+      assert.deepEqual(machineRoomsFeature._state().jobs, {}, 'rows for rooms that are not machine rooms are dropped');
+      machineRoomsFeature.onStreetClear(back);
+    } finally {
+      globalThis.PIXI = prev;
+      Date.now = realNow;
+    }
+  });
+
+  it('a room Metal Machine plays Metal Music with the Making Metal card, and keeps its own setting', () => {
+    const prev = globalThis.PIXI;
+    globalThis.PIXI = PIXI;
+    Date.now = () => clock;
+    try {
+      machineRoomsFeature._reset();
+      const shared = { inv: { tin: 1, plain_metal: 1 }, pc: { energy: 100, mood: 50, xp: 0, imagination: 0, level: 5, energyMax: 100, imaginationUpgrades: ['metalmaking_music'] } };
+      const engine = roomEngine('GA9MU59GB792T80', {}, shared);
+      machineRoomsFeature.onStreetEnter(engine.street, engine);
+      const mm = shared.registered.find((t) => t.classId === 'metalmaker');
+      assert.deepEqual(machineRoomsFeature.verbsFor(mm, engine).map((v) => v.id), ['use', 'refuel', 'music_off']);
+      const fm = shared.registered.find((t) => t.classId === 'fuelmaker');
+      assert.ok(!machineRoomsFeature.verbsFor(fm, engine).some((v) => /music/.test(v.id)));
+      machineRoomsFeature.runVerb(mm, 'use', engine);
+      engine.station.startJob({ key: 'metal_rod', recipe: RECIPE_CATALOG.metal_rod, qty: 1 });
+      assert.deepEqual(engine.sounds, ['loop METALMAKER']);
+      machineRoomsFeature.runVerb(mm, 'music_off', engine);
+      assert.deepEqual(engine.sounds, ['loop METALMAKER', 'stop METALMAKER', 'loop ACTIVE'], 'announce_sound_stop(METALMAKER); the hum goes on');
+      assert.deepEqual(machineRoomsFeature.verbsFor(mm, engine).map((v) => v.id), ['use', 'refuel', 'music_on']);
+      assert.deepEqual(machineRoomsFeature.save().musicOff, { IHV10AAIAHV2S0H: true });
+      machineRoomsFeature.runVerb(mm, 'music_on', engine);
+      assert.equal(engine.sounds.at(-1), 'loop METALMAKER');
+      tick(engine, 12_200);
+      assert.ok(engine.sounds.includes('stop METALMAKER'), 'the music stops when the job is done');
+      machineRoomsFeature.onStreetClear(engine);
+    } finally {
+      globalThis.PIXI = prev;
+      Date.now = realNow;
     }
   });
 });

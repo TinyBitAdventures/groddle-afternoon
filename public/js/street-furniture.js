@@ -24,7 +24,14 @@
  * Archived populations (build-street-ecology.mjs `furniture`): 265 Mailboxes,
  * 199 Visiting Stones, 135 Notes and 7 Notice Boards across the location XML.
  * The per-instance note texts are not in the public dump, so the notes and
- * pinned notices below are authored for the remake (see STREET_NOTES).
+ * pinned notices below are authored for the remake (see STREET_NOTES). Each
+ * carries `remake: true`, and a note seeded from one keeps `remakeText`, so
+ * the note view can say so (G175). Tiny Speck's own word on the boards is
+ * that players wrote them: "Notice Boards (first debuted inside Machine
+ * Rooms ...) which allow players to post notes for others to read ... Jokes,
+ * propaganda and instructions abound" (glitch blog 2011-06-01, research/
+ * wayback/raw/blog/2011-06-01-life-in-beta-new-features-so-far.txt:78); no
+ * capture of a note's text survives.
  */
 
 export const MAILBOX_CLASS = 'npc_mailbox';
@@ -258,6 +265,7 @@ export function normalizeNote(seed = {}) {
     initialText: cleanText(seed.initialText, NOTE_LIMITS.body),
     title: cleanText(seed.title, NOTE_LIMITS.title),
     body: cleanText(seed.body, NOTE_LIMITS.body),
+    ...(seed.remakeText ? { remakeText: true } : {}),
     lastEditor: seed.lastEditor ? String(seed.lastEditor) : null,
     lastEdited: whole(seed.lastEdited, Number.MAX_SAFE_INTEGER),
     history: history.map((h) => ({
@@ -459,7 +467,8 @@ export function insideStoneHitbox(stone, player) {
 // Authored note texts (the dump has no per-instance initial_text)
 // ---------------------------------------------------------------------------
 
-const note = (title, text) => Object.freeze({ title, text });
+/** Remake text, not from Tiny Speck (flagged so views can mark it). */
+const note = (title, text) => Object.freeze({ title, text, remake: true });
 
 /**
  * Placed notes per street, in placement order. Counts match the archived
@@ -563,7 +572,7 @@ export function streetNoteSeeds(tsid, count) {
   const out = [];
   for (let i = 0; i < whole(count); i += 1) {
     const row = authored[i];
-    out.push(normalizeNote({ id: `s${i}`, initialTitle: row?.title || '', initialText: row?.text || '' }));
+    out.push(normalizeNote({ id: `s${i}`, initialTitle: row?.title || '', initialText: row?.text || '', remakeText: Boolean(row?.remake) }));
   }
   return out;
 }
@@ -571,6 +580,23 @@ export function streetNoteSeeds(tsid, count) {
 /** Initial pins for a board (instance texts are authored, see BOARD_PINS). */
 export function boardPinSeeds(tsid) {
   return (BOARD_PINS[String(tsid)] || []).map((row, i) =>
-    normalizeNote({ id: `b${i}`, initialTitle: row.title, initialText: row.text })
+    normalizeNote({ id: `b${i}`, initialTitle: row.title, initialText: row.text, remakeText: Boolean(row.remake) })
   );
 }
+
+const REMAKE_TEXTS = new Set([...Object.values(STREET_NOTES), ...Object.values(BOARD_PINS)].flat().map((row) => row.text));
+
+/**
+ * True while a note still shows text written for the remake: seeded from
+ * STREET_NOTES / BOARD_PINS (or an older save holding one of their texts)
+ * and not yet written over by a player.
+ */
+export function isRemakeNote(note) {
+  const n = normalizeNote(note);
+  if (!n.initialText && !n.initialTitle) return false;
+  return Boolean(note?.remakeText) || REMAKE_TEXTS.has(n.initialText);
+}
+
+/** The marker the note view shows on remake text. */
+export const REMAKE_NOTE_MARKER = 'Written for this remake';
+export const REMAKE_NOTE_BYLINE = 'Not from the original game: its note texts were not saved.';
