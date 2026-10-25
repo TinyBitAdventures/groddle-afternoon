@@ -17,6 +17,7 @@ import {
   STREET_SPIRIT_VARIANTS,
   URALIA_HUBS,
   spiritAnchor,
+  spiritCell,
   spiritForStreet,
   spiritLookFor,
   spiritSheet,
@@ -45,7 +46,7 @@ import {
   talkBeats,
 } from '../public/js/street-spirit-talks.js';
 import { runVerb } from '../public/content.js?v=street-spirits-test-1';
-import { CONVERSATIONS } from '../public/js/conversations-data.js?v=g189-1';
+import { CONVERSATIONS } from '../public/js/conversations-data.js?v=g202-1';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LOCATIONS = join(ROOT, '../streets/mnt/stos/location_data');
@@ -516,7 +517,13 @@ test.describe('conversations against GameServerJS (G185)', () => {
   test('the feature saves the ledger, offers on approach and runs the talk in the shared dialogue', () => {
     const feature = readFileSync(join(ROOT, 'public/js/features/street-spirits-feature.js'), 'utf8');
     assert.match(feature, /from '\.\.\/street-spirit-talks\.js\?v=[\w-]+'/);
-    assert.match(feature, /engine\.scriptedDialogue\(\{[\s\S]*?beats: talkBeats\(id\),[\s\S]*?cancelable: true,/);
+    // The spirit's lines from its saved line on (G202 resume), each answer saving the line reached.
+    assert.match(feature, /const all = talkBeats\(id\);[\s\S]*?const beats = all\.slice\(start\)[\s\S]*?engine\.scriptedDialogue\(\{[\s\S]*?beats,[\s\S]*?cancelable: true,/);
+    assert.match(feature, /saveState\(engine, variant, id, target, i \+ 1\);/);
+    assert.match(feature, /completeTalk\(record\(\), variant, id, Date\.now\(\)\);\n      clearCurrentState\(record\(\)\);/);
+    // conversations_login: once per load, the street's spirit in the source's 300 x 150 range.
+    assert.match(feature, /function resumeTick\(engine, now\) \{[\s\S]*?resumeTarget\(record\(\), \{ street: engine\.streetTsid, player: engine\.player,[\s\S]*?startConversation\(engine, t, now, \{ id: st\.id, step: st\.step \}\);/);
+    assert.match(feature, /shrinesDoneAt: questDoneAt\(engine\.questState \|\| \{\}, TALK_RULES\.shrineQuest\)/);
     assert.match(feature, /engine\.say\(t, offerBubble\(\), TALK_RULES\.bubbleMs\);/);
     // The ledger is the shared record (js/conversations.js); the old saved slice is handed over on restore.
     assert.match(feature, /const record = \(\) => conversationRecord\(\);/);
@@ -531,5 +538,14 @@ test.describe('conversations against GameServerJS (G185)', () => {
     assert.match(fn, /const flip = bubble\.y > spr\.y - spriteHeight && below \+ 11 \+ meta\.height <= cameraY \+ LOCATION_VIEW_H - 8;/);
     assert.match(fn, /bubble\.pivot\.y = flip \? -11 : meta\.height \+ 11;/);
     assert.match(game, /bubble\.addChild\(bg, tailDown, tailUp, speaker, body\);/);
+  });
+
+  test('a dressed spirit\'s bubble sits over its art, the 244 px Firebog too, not the 170 px cap (G202)', () => {
+    const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');
+    const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
+    assert.match(fn, /const artHeight = Number\(meta\.target\.artHeight\);\n  const spriteHeight = artHeight > 0 \? artHeight : clamp\(Math\.abs\(spr\.height \|\| 60\), 36, 170\);/);
+    const feature = readFileSync(join(ROOT, 'public/js/features/street-spirits-feature.js'), 'utf8');
+    assert.match(feature, /const h = box\.crop\.h;[\s\S]*?target\.artHeight = h - 2;/);
+    assert.equal(spiritCell('firebog', 'large').crop.h, 244);
   });
 });

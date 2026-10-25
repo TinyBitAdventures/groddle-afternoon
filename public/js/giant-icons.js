@@ -23,7 +23,13 @@
  *                          favor cap; "A tithe is due." once a minute when
  *                          the icon is out of actions
  *   items/icon_*.js        20 actions, Voices/Rituals/Books/Facts of the
- *                          Giants conversations (level 10, 111 iMG)
+ *                          Giants conversations (level 10, 111 iMG): since
+ *                          G202 these run on the player's one conversation
+ *                          record with the source's offer rules
+ *                          (js/conversations.js, conversations-data.js,
+ *                          features/conversations-feature.js), as
+ *                          include/icon.js onPlayerCollision 565-575 runs
+ *                          them through pc.conversations_offer
  *   quests/create_giant_icon.js, achievements/giant_lover.js
  *
  * ruminate/revere/reflect only work in the pack or a POL (container.is_bag ||
@@ -109,7 +115,6 @@ export function createIconState(seed = {}) {
     titheAskAt: { ...(s.titheAskAt || {}) },
     iconized: Array.isArray(s.iconized) ? s.iconized.filter((g) => GIANT_ICON_DATA[g]) : [],
     created: whole(s.created),
-    talked: Array.isArray(s.talked) ? s.talked.map(String) : [],
     bestowed: whole(s.bestowed),
     nextId: Math.max(1, whole(s.nextId) || 1),
   };
@@ -467,27 +472,13 @@ export function bestowMessage(giant, type, actual) {
 
 /* ------------------------------------------------------------ talk to */
 
-/** The conversation a placed Icon offers now (canoffer: level 10, then the next in its chain). */
-export function iconConversation(state, giant, level) {
-  const def = GIANT_ICON_DATA[giant];
-  if (!def) return null;
-  for (const c of def.conversations) {
-    if (state.talked.includes(c.id)) continue;
-    if (c.level && level < c.level) continue;
-    if (c.after && !state.talked.includes(c.after)) continue;
-    return c;
-  }
-  return null;
-}
-
-export function completeConversation(state, id) {
-  if (state.talked.includes(id)) return { ok: false, xp: 0 };
-  state.talked.push(id);
-  for (const def of Object.values(GIANT_ICON_DATA)) {
-    const c = def.conversations.find((row) => row.id === id);
-    if (c) return { ok: true, xp: c.xp };
-  }
-  return { ok: true, xp: 0 };
+/**
+ * A save from before G202 kept the Icon conversations told in `talked`;
+ * the feature hands them to the shared record once. The ids it knows.
+ */
+export function legacyIconTalks(slice) {
+  const known = new Set(Object.values(GIANT_ICON_DATA).flatMap((d) => d.conversations.map((c) => c.id)));
+  return (Array.isArray(slice?.talked) ? slice.talked : []).map(String).filter((id) => known.has(id));
 }
 
 export const GIANT_ICON_IDS = Object.freeze(GIANT_IDS);

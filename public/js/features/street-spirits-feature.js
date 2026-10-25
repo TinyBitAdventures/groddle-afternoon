@@ -36,7 +36,9 @@
  * (content.js). Since G189 the ledger is the player's one conversation
  * record (js/conversations.js, saved by features/conversations-feature.js):
  * the first talk of each pair waits for real on its shrine conversation,
- * and the old saved ledger is handed over on load. QA: &spiritconvo=dev or
+ * and the old saved ledger is handed over on load. A talk cut off by a
+ * reload opens again at its line when the player is still by the spirit
+ * (conversations_login, inc_conversations.js 192-220; G202). QA: &spiritconvo=dev or
  * &convo=dev (the source's dev-server rules: no login wait, no shrine quest,
  * 10 s timeouts), &spiritgates=strict (kept; every gate is real now),
  * &spiritlore=<id,id> (record conversations as told). Canvas:
@@ -68,10 +70,20 @@ import {
   offerNext,
   offeredFor,
   talkBeats,
-} from '../street-spirit-talks.js?v=g189-1';
-import { CONVERSATIONS } from '../conversations-data.js?v=g189-1';
-import { adoptLegacyTalks, afterRecordRestore, conversationRecord, markHeard } from '../conversations.js?v=g189-1';
+} from '../street-spirit-talks.js?v=g202-1';
+import { CONVERSATIONS } from '../conversations-data.js?v=g202-1';
+import {
+  adoptLegacyTalks,
+  afterRecordRestore,
+  clearCurrentState,
+  conversationRecord,
+  currentState,
+  markHeard,
+  resumeTarget,
+  setCurrentState,
+} from '../conversations.js?v=g202-1';
 import { questStatus } from '../quest-offers.js';
+import { questDoneAt } from '../quests.js';
 
 export const STREET_SPIRITS_FEATURE_ID = 'street-spirits';
 const TALK_MS = 5000; // the remake's talk bubble; the source talks until the conversation ends
@@ -93,6 +105,9 @@ let nextCheckAt = 0;
 let active = null;
 let lastTalk = '';
 let publishAt = 0;
+/** conversations_login: one try per load, for 15 s after the first street. */
+let resume = { pending: true, until: 0 };
+const RESUME_WINDOW_MS = 15000;
 
 function publish(engine) {
   engine.setData('spiritVariant', spirit?.variant || '');
@@ -113,6 +128,7 @@ function talkCtx(engine, now) {
     sessionStart,
     streetEnteredAt,
     shrinesDone: questStatus(engine.questState || {}, TALK_RULES.shrineQuest) === 'done',
+    shrinesDoneAt: questDoneAt(engine.questState || {}, TALK_RULES.shrineQuest), // inc_conversations.js 99
   };
 }
 
@@ -157,24 +173,44 @@ function tickOffer(engine, now) {
   engine.save();
 }
 
-/** talk_to: run the first conversation this region's spirits have offered. */
-function startConversation(engine, target, now) {
-  const id = offeredFor(record(), talkVariant)[0];
-  if (!id || !engine.scriptedDialogue) return false;
+/** conversations_set_current_state: the spirit and the line the player is on. */
+function saveState(engine, variant, id, target, step) {
+  setCurrentState(record(), { cls: TALK_CLASSES[variant], id, step, street: engine.streetTsid || '', x: target.sprite?.x || 0, y: target.sprite?.y || 0 });
+}
+
+/** talk_to: run the first conversation this region's spirits have offered, or (resume) the saved one from its line. */
+function startConversation(engine, target, now, from = null) {
+  const id = from ? from.id : offeredFor(record(), talkVariant)[0];
+  if (!id || !engine.scriptedDialogue || !SPIRIT_CONVERSATIONS[id]) return false;
   const def = SPIRIT_CONVERSATIONS[id];
   const variant = talkVariant;
   active = { id, variant, target };
   lastTalk = `talking:${id}`;
+  // Only a state saved before this load resumes.
+  resume.pending = false;
   markHeard(record(), id, now);
   if (spirit?.target === target) spirit.talkUntil = Infinity;
+  const all = talkBeats(id);
+  const start = from ? Math.min(Math.max(0, from.step), all.length - 1) : 0;
+  saveState(engine, variant, id, target, start);
+  engine.save();
+  const beats = all.slice(start).map((beat, k) => {
+    const i = start + k;
+    if (i === all.length - 1) return beat;
+    return { ...beat, onAnswer: () => {
+      saveState(engine, variant, id, target, i + 1);
+      engine.save();
+    } };
+  });
   engine.scriptedDialogue({
     title: def.title,
     kicker: target.state?.vendorLabel || 'Street Spirit',
-    beats: talkBeats(id),
+    beats,
     cancelable: true,
     cancelLabel: 'Close',
     onComplete: () => {
       completeTalk(record(), variant, id, Date.now());
+      clearCurrentState(record());
       lastTalk = `completed:${id}`;
       endConversation(engine);
       engine.pushActivity(`You talked to the Street Spirit: ${def.title}.`);
@@ -183,6 +219,34 @@ function startConversation(engine, target, now) {
   });
   publishTalk(engine, now);
   return true;
+}
+
+/**
+ * conversations_login 192-220, once per load: a spirit talk cut off by a
+ * reload opens again at its line when this street's spirit is in range
+ * (300 x 150 px). Other tellers' states are the conversations feature's.
+ */
+function resumeTick(engine, now) {
+  if (!resume.pending || active || !engine.player || !streetEnteredAt) return;
+  const st = currentState(record());
+  if (!st || !Object.values(TALK_CLASSES).includes(st.cls)) {
+    resume.pending = false;
+    return;
+  }
+  if (!resume.until) resume.until = now + RESUME_WINDOW_MS;
+  if (now > resume.until) {
+    resume.pending = false;
+    lastTalk = `kept:${st.id}:${st.step}`;
+    return;
+  }
+  const t = talkTarget;
+  if (!t?.sprite || t.sprite.destroyed || TALK_CLASSES[talkVariant] !== st.cls || SPIRIT_CONVERSATIONS[st.id]?.variant !== talkVariant) return;
+  if (engine.busy?.() || engine.transientInstance?.() || engine.questDialogueOpen?.()) return;
+  if (!resumeTarget(record(), { street: engine.streetTsid, player: engine.player, targets: [{ cls: st.cls, x: t.sprite.x, y: t.sprite.y }] })) return;
+  resume.pending = false;
+  lastTalk = `resumed:${st.id}:${st.step}`;
+  if (spirit && spirit.target === t) startTalk(engine, now);
+  startConversation(engine, t, now, { id: st.id, step: st.step });
 }
 
 /** The dialogue closed (told or not): stop the talk clip. An untold conversation stays offered. */
@@ -245,6 +309,10 @@ function dress(engine, target, variant, look) {
   if (crest) crest.position.set(cx - 35, cy + 84);
   if (badge) badge.position.set(cx, cy);
   if (label) label.y = -h - 8;
+  // Speech bubbles sit over the art (game.js positionSpeechBubble), not the
+  // container's bounds with the name label, nor the 170 px cap for unknown
+  // sprites: the large Firebog spirit is 244 px tall. The art stands 2 px low.
+  target.artHeight = h - 2;
   const def = STREET_SPIRIT_VARIANTS[variant];
   target.state.spiritVariant = variant;
   target.state.spiritClass = def.classTsid;
@@ -318,6 +386,7 @@ export const streetSpiritsFeature = {
   init(engine) {
     loader = createSheetLoader(engine.PIXI);
     sessionStart = Date.now();
+    resume = { pending: true, until: 0 };
     seedLore(engine);
     // The conversations feature restores the record after this one: seed again then.
     afterRecordRestore(() => seedLore(engine));
@@ -366,6 +435,7 @@ export const streetSpiritsFeature = {
   onTick(dtMs, now, engine) {
     const wall = Date.now();
     if (active && !engine.questDialogueOpen?.()) endConversation(engine);
+    resumeTick(engine, wall);
     tickOffer(engine, wall);
     if (talkTarget && wall >= publishAt) {
       publishAt = wall + 500;

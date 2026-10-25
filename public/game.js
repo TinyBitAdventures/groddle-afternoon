@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g183-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-74';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-75';
 import {
   actionDurationFor,
   createTimedAction,
@@ -4431,7 +4431,11 @@ function positionSpeechBubble(bubble) {
   if (!meta || !spr || spr.destroyed) return false;
   const cameraX = Number.isFinite(camTarget) ? camTarget : 0;
   const cameraY = Number.isFinite(camY) ? camY : 0;
-  const spriteHeight = clamp(Math.abs(spr.height || 60), 36, 170);
+  // The speaker's art height when it knows it (a dressed Street Spirit: its
+  // sheet's crop, up to the 244 px Firebog, G202); otherwise the whole
+  // sprite's bounds, capped, since frames carry padding and name labels.
+  const artHeight = Number(meta.target.artHeight);
+  const spriteHeight = artHeight > 0 ? artHeight : clamp(Math.abs(spr.height || 60), 36, 170);
   bubble.x = clampWorldOverlayX(spr.x, meta.width, 12);
   // The tail tip sits at bubble.y; the bubble's top is height + 11 above it.
   let lowestTip = cameraY + meta.height + 24;

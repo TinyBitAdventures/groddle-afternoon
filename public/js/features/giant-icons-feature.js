@@ -9,8 +9,11 @@
  *  - Placed on a street, an Icon checks once a minute per Giant as you walk
  *    past and, 5% of the time, bestows Giant Love (mood, energy, iMG or
  *    favor) with the ICON_GIANT_LOVE sound and a heart burst; out of actions
- *    it asks for a tithe. Talk to it from level 10 for its recorded
- *    "Voices of the Giants" message (111 iMG). Pick it back up any time.
+ *    it asks for a tithe. From level 10 it calls out and offers its
+ *    recorded "Voices of the Giants" message (111 iMG) by the source's
+ *    conversation rules; Talk to then tells it (G202: the shared record,
+ *    js/conversations.js, and features/conversations-feature.js, which owns
+ *    the verb). Pick it back up any time.
  *  - The first Icon completes "Loyalty's Rich Reward" (icons_created, offered
  *    by the Magic Rock once a Giant has given you four emblems); Icons of
  *    all eleven Giants grant Giant Lover.
@@ -19,8 +22,11 @@
  *     Emblems of Alph, an Icon of Mab down to 3 actions, level 20 and 2,000
  *     currants. &iconautoplay=1 iconizes, caresses/considers/contemplates,
  *     ruminates/reveres/reflects, tithes the Mab icon, places the Alph icon,
- *     walks into it with the source testing flag (always bestows), talks to
- *     it and picks it up. &icontesting=1 alone keeps placed icons in testing
+ *     walks into it with the source testing flag (always bestows), waits for
+ *     its conversation offer, talks to it, answers every line and picks it
+ *     up (add &convo=dev for the source's dev-server offer rules, otherwise
+ *     the offer waits 5 minutes after load and on donate_to_all_shrines).
+ *     &icontesting=1 alone keeps placed icons in testing
  *     mode; &iconlover=1 adds 11 emblems of every Giant. Canvas: iconPack,
  *     iconPlaced, iconLast, iconBestowed, iconAutoplay, iconActions.
  */
@@ -42,13 +48,12 @@ import {
   adoreIcon,
   bestowCheck,
   bestowMessage,
-  completeConversation,
   createIconState,
   emblemVerbCheck,
   giantForEmblem,
   giantForIcon,
-  iconConversation,
   iconize,
+  legacyIconTalks,
   pickUpIcon,
   placeIcon,
   rollIconDay,
@@ -61,6 +66,7 @@ import {
 import { textureFromUrl } from '../textures.js';
 import { verticalTextGradient } from '../text-gradient.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=g202-1';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
 const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.png`;
@@ -75,6 +81,7 @@ let demoDone = false;
 let autoplayAt = 0;
 let autoplayStep = 0;
 let autoplayLog = [];
+let autoplayTalkUntil = 0;
 
 const dayKey = () => getGameDayKey(Date.now());
 const owned = (engine) => engine.pc?.imaginationUpgrades || [];
@@ -369,6 +376,7 @@ const AUTOPLAY = [
   ['walk'],
   ['wait'],
   ['talk'],
+  ['answer'],
   ['pick'],
 ];
 
@@ -402,13 +410,28 @@ function autoplay(engine, now) {
   } else if (step[0] === 'wait') {
     autoplayAt = now + 2500;
   } else if (step[0] === 'talk') {
+    // The conversations feature offers on collision (its rules) and owns Talk to.
     const v = views[views.length - 1];
-    if (v) {
-      giantIconsFeature.runVerb(v.target, 'talk_to', engine);
-      setTimeout(() => engine.acceptOpenOffer?.(), 600);
+    const verb = v && (engine.targetVerbs?.(v.target) || []).find((r) => r.id === 'convo_talk');
+    if (v && !verb && !autoplayTalkUntil) autoplayTalkUntil = now + 30_000;
+    if (v && !verb && now < autoplayTalkUntil) {
+      autoplayStep -= 1;
+      autoplayAt = now + 500;
+      return publish(engine);
     }
-    autoplayLog.push('talk');
-    autoplayAt = now + 2200;
+    if (verb) engine.beginVerb?.(v.target, verb);
+    autoplayLog.push(verb ? 'talk' : 'talk:none');
+    autoplayAt = now + 800;
+  } else if (step[0] === 'answer') {
+    if (engine.questDialogueOpen?.()) {
+      if (typeof document !== 'undefined') document.getElementById('quest-dialogue-next')?.click();
+      autoplayStep -= 1;
+      autoplayAt = now + 500;
+      return publish(engine);
+    }
+    const v = views[views.length - 1];
+    const id = GIANT_ICON_DATA[v?.row.giant]?.conversations[0]?.id;
+    autoplayLog.push(`told:${id && hasCompleted(conversationRecord(), id) ? id : 'none'}`);
   } else if (step[0] === 'pick') {
     const v = views[views.length - 1];
     if (v && engine.param('iconautoplay') !== 'hold') giantIconsFeature.runVerb(v.target, 'pickup', engine);
@@ -506,9 +529,8 @@ export const giantIconsFeature = {
     const ctx = ctxFor(engine);
     const tithe = titheCheck(state, { placedId: v.row.id }, { ...ctx, currants: engine.pc.currants });
     const cost = titheCost(ctx.level, ctx.upgrades);
-    const convo = iconConversation(state, v.row.giant, ctx.level);
+    // Talk to (verbs.talk_to, icon_alph.js 269-308) is added by the conversations feature while one is offered.
     const rows = [];
-    if (convo) rows.push({ id: 'talk_to', label: 'Talk to', enabled: true, tooltip: 'I have something to tell you!', durationMs: 0 });
     rows.push({ id: 'tithe', label: `Tithe ${cost}c`, enabled: tithe.ok, reason: tithe.msg || '', tooltip: `Insert ${cost} currants to support the Icon`, durationMs: 0 });
     rows.push({ id: 'pickup', label: 'Pick up', enabled: true, tooltip: 'Put it in your pack', durationMs: 0 });
     return rows;
@@ -529,36 +551,23 @@ export const giantIconsFeature = {
       target.subtitle = v.row.actions > 0 ? `${v.row.actions} actions before a tithe` : 'A tithe is due';
       return true;
     }
-    if (verbId === 'talk_to') {
-      const convo = iconConversation(state, v.row.giant, level(engine));
-      if (!convo) return true;
-      engine.offerQuestDialogue?.({
-        title: convo.title,
-        kicker: GIANT_ICON_DATA[v.row.giant].label,
-        beats: convo.beats,
-        acceptLabel: convo.beats[convo.beats.length - 1].response,
-        declineLabel: 'Later',
-        onAccept: () => {
-          const done = completeConversation(state, convo.id);
-          if (done.ok && done.xp) {
-            const actual = grant(engine, 'xp', done.xp);
-            say(engine, `You talked to an ${GIANT_ICON_DATA[v.row.giant].label}`, true, { xp: actual });
-          }
-          engine.setData?.('iconTalked', state.talked.join(','));
-          engine.save?.();
-        },
-      });
-      return true;
-    }
     return false;
   },
 
+  /** version 2: the conversations told live in the shared record (G202), not here. */
   save() {
-    return { version: 1, ...state };
+    return { version: 2, ...state };
   },
 
+  /**
+   * A version 1 save's `talked` list is handed to the shared record once
+   * (in either restore order, js/conversations.js adoptLegacyTalks), told
+   * long enough ago that no offer waits on it.
+   */
   restore(slice) {
     state = createIconState(slice || {});
+    const told = legacyIconTalks(slice);
+    if (told.length) adoptLegacyTalks(toldRecord(told, Date.now() - CONVERSATION_RULES.offerTimeoutMs - 60_000));
   },
 
   /** QA / tests. */
@@ -574,5 +583,6 @@ export const giantIconsFeature = {
     autoplayAt = 0;
     autoplayStep = 0;
     autoplayLog = [];
+    autoplayTalkUntil = 0;
   },
 };

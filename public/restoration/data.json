@@ -394,6 +394,22 @@
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&crabdemo=1&crabblocks=3&practice=1"
   },
   {
+   "id": "conversations",
+   "group": "creatures",
+   "name": "Animals, trees and shrines tell their stories",
+   "status": "source",
+   "blurb": "Walk up to a chicken, piggy, butterfly, tree, rock, peat bog, barnacle, patch, shrine or Icon and it may call you over with something to tell. All 92 of their conversations come word for word from the source, offered by its rules: one every half hour, every 15 seconds while you are in the middle of a chain, and none until you have given to every shrine. Forty-three of them lead up to the shrines, whose stories wake the Street Spirits’ own. A talk cut off by a reload picks up where it stopped.",
+   "spot": null,
+   "evidence": [
+    "public/js/conversations.js",
+    "public/js/conversations-data.js",
+    "public/js/features/conversations-feature.js",
+    "tools/build-conversations.mjs"
+   ],
+   "shot": null,
+   "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&convodemo=brief_thoughts_of_the_fruit_tree_1&practice=1"
+  },
+  {
    "id": "ecology",
    "group": "creatures",
    "name": "Who lives where",
@@ -1033,15 +1049,15 @@
   }
  ],
  "tally": {
-  "source": 43,
+  "source": 44,
   "rebuilt": 10,
   "solo": 9,
   "lost": 3,
   "reimagined": 1,
   "progress": 1
  },
- "back": 63,
- "possible": 64,
+ "back": 64,
+ "possible": 65,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2006,9 +2022,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 428,
+  "commits": 429,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "The Magic Rock speaks as the loading card goes, Super Pooped can happen, hidden prompts take no keys, and the door glow is route yellow in Naraka"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2123,11 +2144,6 @@
     "date": "2026-10-24",
     "kind": "improve",
     "text": "Pocketing a Salmon, a Cubimal box from the Spinning Wheel and Fertilidust now count toward your Feats"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "new",
-    "text": "A companion mourning your grave brings a Diabolical Drink Ticket and the Beelzebooze chain"
    }
   ]
  },

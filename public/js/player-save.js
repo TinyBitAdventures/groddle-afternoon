@@ -127,11 +127,19 @@ export function normalizeQuestSnapshot(seed = {}) {
   if (seed?.story?.greedyStreetSpirit) {
     story.greedyStreetSpirit = cleanScalarRecord(seed.story.greedyStreetSpirit);
   }
+  // When each quest was finished (G202: the shrine quest's minute before conversations).
+  const doneAt = {};
+  for (const [rawId, at] of Object.entries(seed?.doneAt || {})) {
+    const classTsid = cleanKey(rawId);
+    const ms = Math.floor(finite(at, 0));
+    if (classTsid && ms > 0) doneAt[classTsid] = ms;
+  }
   return {
     active,
     completed: cleanStringArray(seed?.completed),
     story,
     offers: normalizeQuestOfferState(seed?.offers),
+    ...(Object.keys(doneAt).length ? { doneAt } : {}),
   };
 }
 

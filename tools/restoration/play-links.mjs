@@ -48,6 +48,8 @@ export const PLAY_ROUTES = Object.freeze({
   crabs: `${BASE}&crabdemo=1&crabblocks=3`,
   // A Ball beside you to hit (the real ones are on Plexus and Nandu Pitha).
   'small-items': `${BASE}&smallitemdemo=ball`,
+  // Beside a Fruit Tree with its first story offered (convodemo meets its level and shrine terms, dev offer rules).
+  conversations: `${BASE}&convodemo=brief_thoughts_of_the_fruit_tree_1`,
 });
 
 /** Nothing to open: lost systems, and the quest-rooms row (the rooms section links each room). */

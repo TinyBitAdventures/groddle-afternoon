@@ -196,11 +196,21 @@ export function applyQuestProgress(state, counterOrEvent, amount = 1, pc = null)
 }
 
 /**
+ * When a quest was last finished (ms), 0 when unknown: a save from before
+ * finish times were kept, or never finished.
+ */
+export function questDoneAt(state, classTsid) {
+  const at = Number(state?.doneAt?.[classTsid]);
+  return Number.isFinite(at) && at > 0 ? at : 0;
+}
+
+/**
  * @param {ReturnType<typeof createQuestState>} state
  * @param {string} classTsid
  * @param {object} [pc]
+ * @param {number} [now] the finish time recorded in state.doneAt
  */
-export function completeQuest(state, classTsid, pc = null) {
+export function completeQuest(state, classTsid, pc = null, now = Date.now()) {
   const def = getQuestCatalog()[classTsid];
   if (!def) throw new Error(`Unknown quest: ${classTsid}`);
   if (!state.active[classTsid]) {
@@ -208,6 +218,8 @@ export function completeQuest(state, classTsid, pc = null) {
   }
   delete state.active[classTsid];
   if (!state.completed.includes(classTsid)) state.completed.push(classTsid);
+  // The quest's ts_done (inc_quests.js completeQuest 373): conversations wait a minute after donate_to_all_shrines (G202).
+  (state.doneAt ||= {})[classTsid] = now;
 
   const rewards = { ...(def.rewards || {}) };
   // Fit for a King I-V: +2% to +10% on top of any reward buff (inc_quests.js:844).

@@ -1,8 +1,8 @@
 /**
  * Conversations (register G189): the player's one conversation record and
  * the source's offer, chain and completion rules, shared by every teller:
- * animals, trees, rocks, peat bogs, barnacles, patches, shrines
- * (js/conversations-data.js) and the Street Spirits
+ * animals, trees, rocks, peat bogs, barnacles, patches, shrines, the Icons
+ * (js/conversations-data.js; the Icons since G202) and the Street Spirits
  * (js/street-spirit-talks.js). The world side is
  * features/conversations-feature.js.
  *
@@ -19,7 +19,8 @@
  *   not on dev), within 10 s of arriving on the street (89), within the
  *   timeout of the last offer or the last completion (91-95: 30 minutes, 15
  *   s while a chain is in progress; 10 s and 5 s on dev), before
- *   donate_to_all_shrines is done (97-100, not on dev), or when the
+ *   donate_to_all_shrines is done and for 60 s after it was (97-100, its
+ *   ts_done; not on dev), or when the
  *   conversation's own conversation_canoffer_<id> says no (102-105). It then
  *   records the offer under the teller's class and the time (107-110).
  * - conversations_complete 120-144: drops the offer from every class, records
@@ -35,18 +36,29 @@
  *   while any chain is in progress; a chain's conversation waits while a
  *   different chain is.
  * - convo_bubble_choices 237-260: the call-out, 10 s.
- *
- * Not carried over: conversations_set_current_state / conversations_login
- * (178-220) resume a conversation cut off by a logout; here closing the
- * dialogue keeps it offered, so Talk to starts it again. The source also
- * waits 60 s after donate_to_all_shrines finishes (99); the remake's quest
- * record keeps no finish time, so that minute is not held.
+ * - conversations_set_current_state 178-182: every step of a
+ *   conversation_run_ saves { itemstack_tsid, conversation_name, choice }
+ *   (choice: the answer just given, none on the first line);
+ *   conversations_clear_current_state 184-190 drops it when the conversation
+ *   completes. Closing the dialogue does not clear it.
+ * - conversations_login 192-220 (player.js onLoggedin 173): with a state
+ *   saved, the teller must still exist (197-201), be on the player's street
+ *   within 300 px across and 150 px up or down (204-207) and still have the
+ *   conversation (210-214); it then runs the conversation again at that
+ *   choice with replay set (the step after the last answer, without that
+ *   answer's reward again) and clears the state (217-219). A teller missing
+ *   or out of range keeps the state for the next login.
+ *   The remake's tellers have no saved tsid, so the state keeps the class,
+ *   the street and where the teller stood; `step` is the index of the line to
+ *   show again (the answers given). Animals and trees are placed afresh each
+ *   load, so the range is also met by the player standing where the
+ *   conversation was. See currentState / resumeTarget.
  *
  * `heard` is the remake's own: when the player first opened each
  * conversation (the source keeps only the one in progress).
  */
 
-import { CONVERSATIONS, TELLERS } from './conversations-data.js?v=g189-1';
+import { CONVERSATIONS, TELLERS } from './conversations-data.js?v=g202-1';
 
 export const CONVERSATION_RULES_SOURCE = 'tinyspeck/glitch-GameServerJS players/inc_conversations.js (CC0)';
 
@@ -62,6 +74,9 @@ export const CONVERSATION_RULES = Object.freeze({
   streetDwellMs: 10 * 1000, // 89
   bubbleMs: 10000, // 258
   shrineQuest: 'donate_to_all_shrines', // 97-100
+  shrineWaitMs: 60 * 1000, // 99: time() - ts_done < 60
+  resumeRangeX: 300, // conversations_login 204
+  resumeRangeY: 150, // 204
 });
 
 /** inc_conversations.js 237-251, in order. */
@@ -109,10 +124,28 @@ function cleanByClass(raw) {
   return out;
 }
 
+/** conversations.state, the remake's way: { cls, id, step, street, x, y }, or null. */
+function cleanState(raw) {
+  if (!isMap(raw)) return null;
+  const cls = String(raw.cls || '');
+  const id = String(raw.id || '');
+  if (!/^\w+$/.test(cls) || !/^\w+$/.test(id)) return null;
+  const finite = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
+  return {
+    cls,
+    id,
+    step: Math.max(0, Math.floor(finite(raw.step))),
+    street: String(raw.street || ''),
+    x: finite(raw.x),
+    y: finite(raw.y),
+    ...(raw.ref ? { ref: String(raw.ref) } : {}),
+  };
+}
+
 /** The record, shaped like pc.conversations (plus `heard`). */
 export function normalizeRecord(raw = {}) {
   const src = isMap(raw) ? raw : {};
-  return {
+  const out = {
     completed: cleanByClass(src.completed),
     offered: cleanByClass(src.offered),
     lastOffer: num(src.lastOffer),
@@ -120,6 +153,9 @@ export function normalizeRecord(raw = {}) {
     chainsInProgress: cleanFlat(src.chainsInProgress),
     heard: cleanFlat(src.heard),
   };
+  const state = cleanState(src.state);
+  if (state) out.state = state;
+  return out;
 }
 
 /** conversations_has_completed(class_id, id). */
@@ -156,7 +192,8 @@ export function canDoChain(record, chain) {
 /**
  * The checks every offer makes (conversations_offer 83-100) before the
  * conversation's own gate. ctx: { now, dev, sessionStart, streetEnteredAt,
- * shrinesDone, rooked, poisoned }. Returns { ok, reason }.
+ * shrinesDone, shrinesDoneAt (when donate_to_all_shrines was finished, the
+ * quest's ts_done; 0 when unknown), rooked, poisoned }. Returns { ok, reason }.
  */
 export function offerRules(record, id, ctx = {}) {
   const now = num(ctx.now) || Date.now();
@@ -173,6 +210,8 @@ export function offerRules(record, id, ctx = {}) {
   if (record.lastOffer > now - gap) return { ok: false, reason: 'cooldown' };
   if (lastCompleted(record) > now - gap) return { ok: false, reason: 'cooldown' };
   if (!dev && !ctx.shrinesDone) return { ok: false, reason: CONVERSATION_RULES.shrineQuest };
+  // 99: and not within a minute of finishing it.
+  if (!dev && now - num(ctx.shrinesDoneAt) < CONVERSATION_RULES.shrineWaitMs) return { ok: false, reason: `${CONVERSATION_RULES.shrineQuest}:wait` };
   return { ok: true, reason: '' };
 }
 
@@ -192,6 +231,8 @@ export function completeConversation(record, cls, id, chain = null, now = Date.n
   }
   record.completed[cls] ||= {};
   record.completed[cls][id] = now;
+  // conversation_run_ calls conversations_clear_current_state right after.
+  if (record.state?.id === id) delete record.state;
   if (chain) {
     if (chain.level === chain.max) {
       record.chainsCompleted[chain.id] = now;
@@ -202,6 +243,61 @@ export function completeConversation(record, cls, id, chain = null, now = Date.n
     }
   }
   return true;
+}
+
+/**
+ * conversations_set_current_state: the conversation the player is in and
+ * the line it is on (`step`: answers given so far), with the teller's class,
+ * street and position (the remake's stand-in for its itemstack tsid; `ref`
+ * names a teller that has an id, a placed Icon).
+ */
+export function setCurrentState(record, { cls, id, step = 0, street = '', x = 0, y = 0, ref = '' } = {}) {
+  const state = cleanState({ cls, id, step, street, x, y, ref });
+  if (state) record.state = state;
+  else delete record.state;
+  return record.state || null;
+}
+
+/** conversations_clear_current_state. */
+export function clearCurrentState(record) {
+  delete record.state;
+}
+
+/** The saved conversation state, or null. */
+export function currentState(record) {
+  return record.state || null;
+}
+
+/**
+ * conversations_login 197-214: of `targets` ({ cls, x, y, ref? }), the
+ * teller to resume with, or null (keep the state). The saved class on the
+ * saved street (a saved `ref`, a placed Icon's id, must match), within 300 x
+ * 150 px of the player; of several, the one nearest where the teller stood.
+ * The remake's animals and trees are placed afresh on every load (only
+ * authored ones keep their spot), so when none of the class is in range but
+ * the player still stands within range of where the teller stood, the one
+ * nearest that spot stands in for it.
+ */
+export function resumeTarget(record, { street, player, targets = [] } = {}) {
+  const st = record.state;
+  if (!st || !player || st.street !== String(street || '')) return null;
+  const inRange = (x, y) => Math.abs(x - player.x) <= CONVERSATION_RULES.resumeRangeX && Math.abs(y - player.y) <= CONVERSATION_RULES.resumeRangeY;
+  const mine = targets.filter((t) => t && t.cls === st.cls && (!st.ref || t.ref === st.ref));
+  const nearest = (list) => {
+    let best = null;
+    let bestD = Infinity;
+    for (const t of list) {
+      const d = Math.abs(t.x - st.x) + Math.abs(t.y - st.y);
+      if (d < bestD) {
+        best = t;
+        bestD = d;
+      }
+    }
+    return best;
+  };
+  const near = mine.filter((t) => inRange(t.x, t.y));
+  if (near.length) return nearest(near);
+  return inRange(st.x, st.y) ? nearest(mine) : null;
 }
 
 /** The remake's `heard`: the first time the player opened a conversation. */
@@ -311,8 +407,9 @@ export function conversationRecord() {
 
 /**
  * Fold an older record (the Street Spirits' saved ledger, register G185,
- * shaped { completed, offered, lastOffer }) into `into`: completions and the
- * last offer keep the later time, and an offer already told is not revived.
+ * shaped { completed, offered, lastOffer }, or the Icons' told list) into
+ * `into`: completions and the last offer keep the later time, and an offer
+ * already told is not revived.
  */
 export function mergeRecords(into, older) {
   const src = normalizeRecord(older);
@@ -336,6 +433,24 @@ export function mergeRecords(into, older) {
 
 const hasData = (r) => Object.keys(r.completed).length > 0 || Object.keys(r.offered).length > 0 || r.lastOffer > 0;
 
+/**
+ * A record of conversations told before the shared record held them (the
+ * Icons' `talked` list, G148): each completed under its first teller class
+ * at `at`, which callers set before any offer timeout so nothing waits on it.
+ */
+export function toldRecord(ids, at, defs = CONVERSATIONS) {
+  const out = normalizeRecord();
+  const when = num(at) || 1;
+  for (const raw of Array.isArray(ids) ? ids : []) {
+    const id = String(raw || '');
+    const cls = defs[id]?.tellers?.[0];
+    if (!cls) continue;
+    out.completed[cls] ||= {};
+    out.completed[cls][id] = when;
+  }
+  return out;
+}
+
 /** restore(): the saved record, with any older ledger handed over this load. */
 export function restoreConversationRecord(slice) {
   record = normalizeRecord(slice);
@@ -346,15 +461,18 @@ export function restoreConversationRecord(slice) {
 }
 
 /**
- * The Street Spirits' restore hands over its old ledger (saves made before
- * G189). It is folded into the record now and again if the record is
- * restored after it, so feature order does not matter.
+ * A feature's restore hands over its old ledger (the Street Spirits' from
+ * before G189, the Icons' from before G202). It is folded into the record
+ * now and again if the record is restored after it, so feature order does
+ * not matter; several old ledgers in one load all count.
  */
 export function adoptLegacyTalks(slice) {
   const old = normalizeRecord(slice);
-  legacy = hasData(old) ? old : null;
-  if (legacy) mergeRecords(record, legacy);
-  return Boolean(legacy);
+  if (!hasData(old)) return false;
+  delete old.state;
+  legacy = legacy ? mergeRecords(legacy, old) : old;
+  mergeRecords(record, old);
+  return true;
 }
 
 /** Tests: start a clean record. */

@@ -5,7 +5,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -15,10 +15,9 @@ import {
   bestowChance,
   bestowCheck,
   bestowMessage,
-  completeConversation,
   createIconState,
-  iconConversation,
   iconize,
+  legacyIconTalks,
   pickUpIcon,
   placeIcon,
   rewardRange,
@@ -29,6 +28,9 @@ import {
   useEmblem,
 } from '../public/js/giant-icons.js';
 import { remakeStatus } from '../public/js/imagination-remake.js';
+// The key every importer uses (giant-icons-feature.js too): one module, one record.
+import { CONVERSATION_RULES, conversationRecord, hasCompleted, resetConversationRecord, restoreConversationRecord } from '../public/js/conversations.js?v=g202-1';
+import { CONVERSATIONS, TELLERS } from '../public/js/conversations-data.js?v=g202-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const seq = (...vals) => {
@@ -193,15 +195,61 @@ describe('placed icons', () => {
   });
 });
 
-describe('icon conversations', () => {
-  it('level 10, then the chain, 111 iMG once', () => {
-    const state = createIconState();
-    assert.equal(iconConversation(state, 'humbaba', 9), null);
-    const first = iconConversation(state, 'humbaba', 10);
-    assert.equal(first.id, 'icon_humbaba_1');
-    assert.equal(completeConversation(state, first.id).xp, 111);
-    assert.equal(iconConversation(state, 'humbaba', 10).id, 'icon_humbaba_2');
-    assert.equal(completeConversation(state, first.id).ok, false);
+describe('icon conversations (G202: the shared record)', () => {
+  it('all 13 are told by their Icon class through the shared data: level 10, then the chain, 111 iMG', () => {
+    const ids = Object.values(GIANT_ICON_DATA).flatMap((d) => d.conversations.map((c) => c.id));
+    assert.equal(ids.length, 13);
+    for (const def of Object.values(GIANT_ICON_DATA)) {
+      assert.deepEqual([...TELLERS[def.iconClass].list], def.conversations.map((c) => c.id), def.iconClass);
+      assert.equal(TELLERS[def.iconClass].talk, 'class');
+      for (const c of def.conversations) {
+        const d = CONVERSATIONS[c.id];
+        assert.deepEqual([...d.tellers], [def.iconClass]);
+        assert.equal(d.chain, null);
+        assert.equal(d.gate.level, c.level);
+        assert.deepEqual([...d.gate.after], c.after ? [c.after] : []);
+        assert.deepEqual(d.steps.map((s) => ({ text: s.text, response: s.choice })), c.beats, c.id);
+        assert.deepEqual(d.steps.map((s) => s.reward?.xp || 0), d.steps.map((_, i) => (i === d.steps.length - 1 ? c.xp : 0)), c.id);
+      }
+    }
+    assert.deepEqual([...CONVERSATIONS.icon_humbaba_2.gate.after], ['icon_humbaba_1']);
+  });
+
+  it('the state keeps no talked list; an old one is read for the hand-over, known ids only', () => {
+    assert.equal('talked' in createIconState({ talked: ['icon_alph_1'] }), false);
+    assert.deepEqual(legacyIconTalks({ talked: ['icon_alph_1', 'nope', 'icon_zille_2'] }), ['icon_alph_1', 'icon_zille_2']);
+    assert.deepEqual(legacyIconTalks({}), []);
+  });
+
+  it('a version 1 save hands its talked list to the record once, in either restore order', async () => {
+    const { giantIconsFeature } = await import('../public/js/features/giant-icons-feature.js');
+    const old = { version: 1, talked: ['icon_humbaba_1', 'icon_alph_1'] };
+    const saved = { completed: { npc_chicken: { chickens_cautionary_tales_1: 700 } } };
+    const t0 = Date.now();
+    // Icons first, then the record (the feature order in features/index.js).
+    resetConversationRecord();
+    giantIconsFeature.restore(old);
+    restoreConversationRecord(saved);
+    const a = JSON.parse(JSON.stringify(conversationRecord()));
+    // The record first.
+    resetConversationRecord();
+    restoreConversationRecord(saved);
+    giantIconsFeature.restore(old);
+    const b = JSON.parse(JSON.stringify(conversationRecord()));
+    assert.deepEqual(Object.keys(a.completed).sort(), ['icon_alph', 'icon_humbaba', 'npc_chicken']);
+    assert.deepEqual(Object.keys(a.completed).sort(), Object.keys(b.completed).sort());
+    assert.equal(hasCompleted(a, 'icon_humbaba_1', 'icon_humbaba'), true);
+    assert.equal(hasCompleted(b, 'icon_alph_1', 'icon_alph'), true);
+    // Told before any offer timeout, so nothing waits on the hand-over.
+    assert.ok(a.completed.icon_alph.icon_alph_1 <= t0 - CONVERSATION_RULES.offerTimeoutMs);
+    // The new save has no list, so a reload does not hand it over again.
+    const next = giantIconsFeature.save();
+    assert.equal(next.version, 2);
+    assert.equal('talked' in next, false);
+    resetConversationRecord();
+    giantIconsFeature.restore(next);
+    restoreConversationRecord(saved);
+    assert.deepEqual(Object.keys(conversationRecord().completed), ['npc_chicken']);
   });
 });
 
@@ -243,5 +291,17 @@ describe('giant icons feature', () => {
     giantIconsFeature.runPackVerb('icon_alph', 'revere', engine);
     assert.ok(engine.pc.energy > 10);
     assert.equal(giantIconsFeature._state().pack.alph[0], 19);
+  });
+
+  it('a placed Icon\'s own menu has no Talk to: the conversations feature adds it while one is offered', () => {
+    // Placing needs Pixi textures, so this reads the feature source (browser QA covers the live menu).
+    const src = readFileSync(join(root, 'js/features/giant-icons-feature.js'), 'utf8');
+    const verbsFor = src.slice(src.indexOf('  verbsFor(target, engine) {'), src.indexOf('  runVerb(target, verbId, engine) {'));
+    const runVerb = src.slice(src.indexOf('  runVerb(target, verbId, engine) {'), src.indexOf('  save() {'));
+    assert.ok(verbsFor.length > 100 && runVerb.length > 100);
+    assert.doesNotMatch(verbsFor, /'talk_to'/);
+    assert.doesNotMatch(runVerb, /'talk_to'|offerQuestDialogue/);
+    // The shared record under the one key every importer uses.
+    assert.match(src, /from '\.\.\/conversations\.js\?v=[\w-]+';/);
   });
 });
