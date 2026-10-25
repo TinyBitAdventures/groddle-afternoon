@@ -1975,9 +1975,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 380,
+  "commits": 381,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-24",
+    "kind": "new",
+    "text": "The Groddle Wiki, with Musicblocks as its first entry"
+   },
    {
     "date": "2026-10-24",
     "kind": "new",
@@ -2092,11 +2097,6 @@
     "date": "2026-10-24",
     "kind": "improve",
     "text": "Room 4's drinks stand on its felt shelves and Room 16's way out is a sharp bottletree mouth"
-   },
-   {
-    "date": "2026-10-24",
-    "kind": "improve",
-    "text": "Star Sprint's trap planet is Tiny Speck's own sliced planet from its Snap"
    }
   ]
  },

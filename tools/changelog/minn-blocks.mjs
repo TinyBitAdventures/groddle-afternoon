@@ -81,6 +81,7 @@ export function blockTypes(icons) {
     sign: leaf('sign', 'Sign arm', 'One arm of a signpost.', { side: { type: 'string', enum: ['left', 'right'], default: 'left' }, text: text('Somewhere') }, 'signpost'),
     ...restorationTypes(leaf),
     ...musicblockTypes(leaf),
+    'street-music': { ...leaf('street-music', 'Street music', 'One group of Tiny Speck\'s published tracks, each to play, with where the remake plays it.', { group: { type: 'string', enum: ['theme', 'sketch', 'activity', 'ringtone'], default: 'theme' } }), category: 'widgets', keywords: ['music', 'wiki'] },
     'wiki-topics': { ...leaf('wiki-topics', 'Wiki topics', 'The wiki\'s topics as links, each with how many entries it holds; the one being read is marked.', { allLabel: text('All') }), category: 'widgets', keywords: ['wiki', 'topics'] },
   };
 }

@@ -346,5 +346,34 @@
     "Ormonos": "andra_kajuu",
     "Ix": "ix",
     "Rook": "rook"
-  }
+  },
+  "downloadsSource": "Tiny Speck's Glitch downloads page (glitchthegame.com/downloads, Wayback 2013-12-14): its music sections and track titles, in the page's order; theme = Theme Tracks, sketch = Theme Sketches, activity = Activity Music, ringtone = The Rube Song from Ringtones. Music Blocks are on the Musicblocks wiki entry.",
+  "downloads": [
+    {"section": "theme", "title": "Winter Holiday", "file": "winter_holiday_1344997255.mp3"},
+    {"section": "theme", "title": "Eesti Life Catalogue", "file": "eesti_life_catalogue_1344997859.mp3"},
+    {"section": "theme", "title": "Enchanted Woods", "file": "enchanted_woods_1344997332.mp3"},
+    {"section": "theme", "title": "Rook's Woods", "file": "rooks_woods_1344997275.mp3"},
+    {"section": "theme", "title": "Winterland", "file": "winterland_1344997854.mp3"},
+    {"section": "theme", "title": "Moon Music", "file": "moon_music_1344997839.mp3"},
+    {"section": "theme", "title": "Original Groddle Forest Theme", "file": "Groddle-Forest-Theme_1291876879.mp3"},
+    {"section": "theme", "title": "Groddle Theme (Dreamland Mix)", "file": "Groddle-Theme-Dreamland-Mix_1291876965.mp3"},
+    {"section": "theme", "title": "Groddle Theme (Snappy Mix)", "file": "Groddle-Theme-Snappy-Mix_1291876544.mp3"},
+    {"section": "theme", "title": "Spooky Groddle", "file": "Spooky_Groddle_1291879214.mp3"},
+    {"section": "theme", "title": "Dirge of the Damned", "file": "Dirge-of-the-Damned_1291886020.mp3"},
+    {"section": "theme", "title": "Ilmenskie Caverns Work Song", "file": "Ilmenskie-Caverns-Work-Song_1291877437.mp3"},
+    {"section": "theme", "title": "Ix Tubamaphone", "file": "Tubamaphone_1292397289.mp3"},
+    {"section": "sketch", "title": "Marching Band", "file": "marching_band_1344997302.mp3"},
+    {"section": "sketch", "title": "Elevator Music", "file": "elevator_music_1344997334.mp3"},
+    {"section": "sketch", "title": "Subway Music", "file": "subway_music_1344997270.mp3"},
+    {"section": "sketch", "title": "Waiting Muzak", "file": "waiting_muzak_1344997267.mp3"},
+    {"section": "activity", "title": "Meditation", "file": "Meditation_1291879502.mp3"},
+    {"section": "activity", "title": "Meditation – Variation 1", "file": "meditation1_1344997850.mp3"},
+    {"section": "activity", "title": "Meditation – Variation 2", "file": "meditation2_1344997844.mp3"},
+    {"section": "activity", "title": "Meditation – Variation 3", "file": "meditation3_1344997842.mp3"},
+    {"section": "activity", "title": "Meditation – Variation 4", "file": "meditation4_1344997846.mp3"},
+    {"section": "activity", "title": "Metalmaker", "file": "metalmaker_1344997841.mp3"},
+    {"section": "activity", "title": "Spinning Wheel", "file": "Spinning-Wheel_1292034939.mp3"},
+    {"section": "activity", "title": "Rainbow Run", "file": "Rainbow-Run_1291879159.mp3"},
+    {"section": "ringtone", "title": "The Rube Song", "file": "The_Rube_Song_1290596637.mp3"}
+  ]
 }

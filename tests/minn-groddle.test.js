@@ -63,18 +63,20 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     }
   });
 
-  it('registers one block per block.json, each drawn by Blocks.php, Restoration.php, Musicblocks.php or Wiki.php, with the icons the cards name', () => {
+  it('registers one block per block.json, each drawn by Blocks.php, Restoration.php, Musicblocks.php, StreetMusic.php or Wiki.php, with the icons the cards name', () => {
     const declared = JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8')).blocks;
     const dirs = readdirSync(join(ext, 'blocks'));
     const blocks = readFileSync(join(ext, 'src/Blocks.php'), 'utf8');
     const restoration = readFileSync(join(ext, 'src/Restoration.php'), 'utf8');
     const musicblocks = readFileSync(join(ext, 'src/Musicblocks.php'), 'utf8');
     const wiki = readFileSync(join(ext, 'src/Wiki.php'), 'utf8');
+    const streetMusic = readFileSync(join(ext, 'src/StreetMusic.php'), 'utf8');
     assert.deepEqual(dirs.map((d) => `groddle/${d}`).sort(), [...declared].sort());
     for (const d of dirs) {
       const type = JSON.parse(readFileSync(join(ext, 'blocks', d, 'block.json'), 'utf8'));
       assert.equal(type.name, `groddle/${d}`);
       if (d.startsWith('restoration-')) assert.match(restoration, new RegExp(`\\$section\\('${d.slice('restoration-'.length)}'`), d);
+      else if (d === 'street-music') assert.match(streetMusic, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
       else if (d.startsWith('wiki-')) assert.match(wiki, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
       else if (d.startsWith('musicblocks')) assert.match(musicblocks, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
       else assert.match(blocks, new RegExp(`\\$minn->block\\('blocks/${d}'`), d);
@@ -127,6 +129,24 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     // The player script finds the markup the drawer prints.
     const drawn = readFileSync(join(ext, 'src/Musicblocks.php'), 'utf8');
     for (const cls of ['mb-set', 'mb-card', 'mb-face', 'mb-name']) assert.match(drawn, new RegExp(`class="${cls}`), cls);
+  });
+
+  it('makes the Street music entry from Tiny Speck\'s downloads catalogue: every published track, one block per group (tools/streetmusic)', async () => {
+    execFileSync('node', [join(root, 'tools/streetmusic/build-data.mjs'), '--check'], { stdio: 'ignore' });
+    const music = JSON.parse(readFileSync(join(root, 'public/assets/content/ambient-music.json'), 'utf8'));
+    const data = JSON.parse(readFileSync(join(root, 'public/street-music/data.json'), 'utf8'));
+    const { PLACES, GROUPS } = await import('../tools/streetmusic/build-data.mjs');
+    assert.deepEqual(Object.keys(music.themes).filter((id) => !(id in PLACES)), [], 'every music theme names its place');
+    assert.equal(data.counts.tracks, music.downloads.length);
+    for (const t of data.groups.flatMap((g) => g.tracks)) assert.ok(readFileSync(join(root, 'public', t.audio)).length > 0, t.title);
+    const { streetMusicContent, BANDS } = await import('../tools/streetmusic/to-minn.mjs');
+    const content = streetMusicContent();
+    assert.doesNotMatch(content, /wp:html/);
+    assert.deepEqual(BANDS.map(([, set]) => set), GROUPS.map((g) => g.id));
+    for (const [, set] of BANDS) assert.equal(content.split(`<!-- wp:groddle/street-music {"group":"${set}"} /-->`).length - 1, 1, set);
+    const bands = [...content.matchAll(/<section class="wp-block-group band[^"]*" id="([a-z]+)">/g)].map((m) => m[1]);
+    for (const [, id] of content.matchAll(/<a href="#([a-z]+)">/g)) assert.ok(bands.includes(id), id);
+    assert.doesNotMatch(content, /\u2014/, 'no em dashes');
   });
 
   it('draws what restoration.js fills: every container id the script looks for', () => {
