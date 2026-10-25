@@ -67,7 +67,7 @@ import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
 import { MEDITATION_MUSIC, ORB_TOOL_SHEET } from '../meditation.js';
 import { gainMetabolic, loseMood } from '../metabolics.js';
 import { frameTexture, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g294-1';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g304-1';
 import { GWENDOLYN_INNER_FILES } from './gwendolyn-inner-art.js';
 
 export const ROOM_ID = 'gwendolyn';
@@ -1562,14 +1562,14 @@ export const room = {
     // instances_show_exit_prompt every 2 minutes (not in the chamber).
     if (d.stuckAt && now >= d.stuckAt && free(ctx) && !d.offering && !d.scriptRunning) {
       d.stuckAt = 0;
-      ctx.converse({
-        title: INSTANCES[stage]?.label || "Gwendolyn's Task",
-        kicker: 'Are you stuck?',
+      // G304: a prompts_add with icon_buttons (inc_instances.js 322-344): the prompt stack.
+      ctx.prompt({
         text: STUCK_TEXT,
+        iconButtons: true,
         choices: [{ label: 'Yes, please', value: 'yes' }, { label: 'No thanks', value: 'no' }],
       }).then((choice) => {
         if (choice === 'yes') ctx.leave();
-        else resetStuck(ctx); // instances_exit_via_prompt 'no': ask again in 2 * 60
+        else if (choice === 'no') resetStuck(ctx); // instances_exit_via_prompt 'no': ask again in 2 * 60
       });
     }
   },

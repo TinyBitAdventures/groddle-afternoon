@@ -1387,10 +1387,11 @@ function maybePromptStuck(ctx, now) {
   if (ctx.data.phase !== 'play' || ctx.data.prompting || now < ctx.data.promptAt) return;
   if (ctx.dialogOpen?.() || ctx.cardOpen?.()) return;
   ctx.data.prompting = true;
-  ctx.converse({
-    title: ctx.data.geo.title,
-    kicker: 'Are you stuck?',
+  // G304: instances_show_exit_prompt (inc_instances.js 322-344) is a prompts_add with
+  // icon_buttons and no timeout: the bottom-right prompt stack, not the card.
+  ctx.prompt({
     text: STUCK_TEXT,
+    iconButtons: true,
     choices: [
       { label: 'Yes, please', value: 'yes' },
       { label: 'No thanks', value: 'no' },

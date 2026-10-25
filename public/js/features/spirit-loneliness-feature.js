@@ -12,7 +12,9 @@
  * - 15 s later: "A Street Spirit in X needs your help. Would you like to set
  *   that as your destination?" Yes sets the route through the map routes
  *   feature (engine.query('mapRoute', 'set', { to, source: 'loneliness' }),
- *   prompts_loneliness_callback 133-142).
+ *   prompts_loneliness_callback 133-142). G304: it is a prompts_add
+ *   (showLonelinessPrompt 118-131: Yes / No, no timeout, not modal), so it
+ *   joins the bottom-right prompt stack (engine.prompt), not the centre card.
  * - On its street it cries (street-spirits-feature plays the cry clip through
  *   engine.query('spiritCry')); a race shows "There is a lonely street spirit
  *   here. Hurry! Hurry!", a party "End the loneliness with a party! 0/1
@@ -56,7 +58,7 @@ import { getStreetEcologyCatalog } from '../street-ecology.js?v=official-ecology
 import { graphKey, routeGraph, tsidAliases } from '../map-routes.js?v=lonely-1';
 import { STREET_SPIRIT_VARIANTS, portraitFit, portraitSheet, spiritForStreet } from '../street-spirits.js';
 import { grantMoodXp } from '../mood-xp.js';
-import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement } from '../overlay-art.js?v=g294-1';
+import { loadVectorFrames, overlayAlpha, overlayFrameAt, overlayLifeMs, overlayPlacement } from '../overlay-art.js?v=g304-1';
 import {
   INVITE_ART,
   LONELY_RULES,
@@ -110,6 +112,7 @@ function freshRuntime() {
     zuttoCryUntil: 0,
     invite: null, // { startAt, variant, look, sheets: { in, loop, out }, imgs: {}, text }
     promptOpen: false,
+    promptUid: '', // G304: the invite's uid in the prompt stack
     convoOpen: false,
     dialogSeen: false,
     party: null, // { finishAt, finishedAt, jabberAt, fireworksAt, done: Set }
@@ -607,21 +610,25 @@ function showPrompt(engine) {
   rt.promptOpen = true;
   rt.last = 'prompt';
   engine.save?.();
-  engine.scriptedDialogue({
-    title: null,
-    kicker: null,
-    beats: [{ text: promptText(e.label), response: LONELY_TEXT.promptYes }],
-    cancelable: true,
-    primaryLabel: LONELY_TEXT.promptYes,
-    cancelLabel: LONELY_TEXT.promptNo,
-    onComplete: () => answerPrompt(engine, 'yes'),
-    onCancel: () => answerPrompt(engine, 'no'),
-  });
+  // inc_world_events.js showLonelinessPrompt 118-131: prompts_add, choices yes / no.
+  rt.promptUid = engine.prompt?.({
+    text: promptText(e.label),
+    choices: [{ value: 'yes', label: LONELY_TEXT.promptYes }, { value: 'no', label: LONELY_TEXT.promptNo }],
+    onChoice: (value) => answerPrompt(engine, value === 'yes' ? 'yes' : 'no'),
+  }) || '';
+}
+
+/** The invite prompt went from the stack without an answer (prompts_remove, a cleared stack): count it as No. */
+function promptGone(engine) {
+  if (!rt.promptOpen || !rt.promptUid || typeof engine.prompts !== 'function') return false;
+  const { shown = [], queued = [] } = engine.prompts() || {};
+  return ![...shown, ...queued].some((p) => p.uid === rt.promptUid);
 }
 
 function answerPrompt(engine, answer) {
   if (!rt.promptOpen) return;
   rt.promptOpen = false;
+  rt.promptUid = '';
   const e = state.event;
   if (!e) return;
   e.answer = answer;
@@ -638,7 +645,9 @@ function answerPrompt(engine, answer) {
 
 function missed(engine) {
   const e = state.event;
-  if (rt.promptOpen) return; // the prompt answers first
+  // G304: the invite is a stacked prompt now, so the missed prompt stacks over it
+  // (cancelLoneliness 73-84 adds its own and leaves the invite); an answer to the
+  // old invite then finds no event and does nothing.
   if (streetKey(engine.streetTsid) === e.tsid) hideStreetOverlay();
   closeInvite();
   engine.prompt?.({ text: missedText(e.label), choices: [{ label: 'OK', value: 'ok' }] });
@@ -808,7 +817,8 @@ function autoplay(engine, now) {
     if (!rt.autoAt) rt.autoAt = now + 1500;
     if (now >= rt.autoAt) {
       rt.autoAt = 0;
-      next?.click();
+      // The stacked prompt's first choice (Yes).
+      document.querySelector(`[data-prompt-uid="${rt.promptUid}"] [data-prompt-choice="0"]`)?.click();
     }
     return;
   }
@@ -889,15 +899,16 @@ export const spiritLonelinessFeature = {
     if (!engine.started) return;
     const now = Date.now();
     demo(engine, now);
-    // A prompt or talk closed some other way (Escape, a forced close) counts as No / unanswered.
+    // A talk closed some other way (Escape, a forced close) counts as unanswered.
     // (A dialog held behind a menu, G217, has not been seen yet.)
     const open = Boolean(engine.questDialogueOpen?.());
-    if (open && (rt.promptOpen || rt.convoOpen)) rt.dialogSeen = true;
+    if (open && rt.convoOpen) rt.dialogSeen = true;
     if (!open && rt.dialogSeen) {
       rt.dialogSeen = false;
-      if (rt.promptOpen) answerPrompt(engine, 'no');
       rt.convoOpen = false;
     }
+    // The invite taken from the stack unanswered counts as No.
+    if (promptGone(engine)) answerPrompt(engine, 'no');
     if (rt.invite) drawInvite(now);
     if (rt.pendingOverlay && !engine.streetCardUp?.()) {
       if (lonelyHere(engine)) showStreetOverlay(rt.pendingOverlay.lines, rt.pendingOverlay.width);

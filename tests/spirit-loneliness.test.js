@@ -47,7 +47,7 @@ import {
   spiritCryBox,
   spiritCrySheet,
 } from '../public/js/street-spirits.js';
-import { spiritLonelinessFeature } from '../public/js/features/spirit-loneliness-feature.js?v=lonely-7';
+import { spiritLonelinessFeature } from '../public/js/features/spirit-loneliness-feature.js?v=lonely-8';
 import { ROUTE_SOURCES } from '../public/js/map-routes.js?v=lonely-1';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js?v=official-ecology-6';
 import { applyStreetIndex } from '../public/js/street-loader.js';
@@ -360,6 +360,7 @@ describe('feature', () => {
     const calls = { dialogs: [], prompts: [], activity: [], routes: [], said: [], buffs: [], sounds: [] };
     const spirit = { classId: 'street_spirit_groddle', state: { vendorKey: 'groceries', vendorLabel: 'Street Spirit' }, sprite: { x: 1000, y: 500, destroyed: false } };
     let dialogOpen = false;
+    let stack = [];
     const engine = {
       started: true,
       streetTsid: tsid,
@@ -384,7 +385,10 @@ describe('feature', () => {
       say: (t, text) => calls.said.push(text),
       applyBuff: (b) => calls.buffs.push(b),
       playSound: (k) => calls.sounds.push(k),
-      prompt: (o) => calls.prompts.push(o),
+      // G304: engine.prompt is the bottom-right stack; it returns the prompt's uid.
+      prompt(o) { const uid = `p${calls.prompts.length + 1}`; calls.prompts.push({ ...o, uid }); stack.push(uid); return uid; },
+      prompts: () => ({ shown: stack.map((uid) => ({ uid })), queued: [] }),
+      removePrompt(uid) { stack = stack.filter((u) => u !== uid); },
       scriptedDialogue(o) { dialogOpen = true; calls.dialogs.push(o); },
       closeDialog() { dialogOpen = false; },
       query(hook, ...args) {
@@ -396,6 +400,13 @@ describe('feature', () => {
       },
     };
     return engine;
+  }
+
+  /** Answer the last stacked prompt with this value (the stack drops it, then onChoice). */
+  function choose(engine, value) {
+    const p = engine.calls.prompts.at(-1);
+    engine.removePrompt(p.uid);
+    p.onChoice?.(value);
   }
 
   /** Answer the open dialog with its first (or cancel) button. */
@@ -417,7 +428,7 @@ describe('feature', () => {
 
   it('is registered after the street spirits feature, with its key', () => {
     const idx = read(join(PUBLIC, 'js/features/index.js'));
-    assert.match(idx, /import \{ spiritLonelinessFeature \} from '\.\/spirit-loneliness-feature\.js\?v=lonely-7'; FEATURES\.push\(spiritLonelinessFeature\);/);
+    assert.match(idx, /import \{ spiritLonelinessFeature \} from '\.\/spirit-loneliness-feature\.js\?v=lonely-8'; FEATURES\.push\(spiritLonelinessFeature\);/);
     assert.ok(idx.indexOf('spiritLonelinessFeature') > idx.indexOf('streetSpiritsFeature'));
     const spirits = read(join(PUBLIC, 'js/features/street-spirits-feature.js'));
     assert.match(spirits, /engine\.query\?\.\('spiritLonelyHere', engine\)/);
@@ -432,13 +443,19 @@ describe('feature', () => {
     assert.equal(engine.data.lonelyPhase, 'invite');
     mock.timers.tick(14_999);
     spiritLonelinessFeature.onTick(16, 0, engine);
-    assert.equal(engine.calls.dialogs.length, 0);
+    assert.equal(engine.calls.prompts.length, 0);
     mock.timers.tick(1);
     spiritLonelinessFeature.onTick(16, 0, engine);
-    const d = engine.calls.dialogs[0];
-    assert.equal(d.beats[0].text, 'A Street Spirit in Lonely Lane needs your help. Would you like to set that as your destination?');
-    assert.deepEqual([d.primaryLabel, d.cancelLabel, d.title, d.kicker], ['Yes', 'No', null, null]);
-    answer(engine);
+    // G304: showLonelinessPrompt is a prompts_add: the stack, not the card.
+    assert.equal(engine.calls.dialogs.length, 0);
+    const d = engine.calls.prompts[0];
+    assert.equal(d.text, 'A Street Spirit in Lonely Lane needs your help. Would you like to set that as your destination?');
+    assert.deepEqual(d.choices, [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }]);
+    assert.equal(d.modal, undefined);
+    mock.timers.tick(300); // publish runs every 250 ms
+    spiritLonelinessFeature.onTick(16, 0, engine);
+    assert.equal(engine.data.lonelyPrompt, 'open', 'still open while it sits in the stack');
+    choose(engine, 'yes');
     assert.deepEqual(engine.calls.routes[0], ['set', { to: 'GLONE', source: 'loneliness' }, engine]);
     assert.equal(spiritLonelinessFeature._state().event.answer, 'yes');
   });
@@ -454,7 +471,7 @@ describe('feature', () => {
     mock.timers.tick(20_000);
     // The prompt still comes (you can arrive before answering); say No.
     spiritLonelinessFeature.onTick(16, 0, engine);
-    answer(engine, true);
+    choose(engine, 'no');
     engine.player.x = engine.spirit.sprite.x + 60;
     spiritLonelinessFeature.onTick(16, 0, engine);
     const talk = engine.calls.dialogs.at(-1);
@@ -496,11 +513,40 @@ describe('feature', () => {
     spiritLonelinessFeature._begin(engine, 'GLONE', { type: 'A', now: Date.now() });
     mock.timers.tick(15_000);
     spiritLonelinessFeature.onTick(16, 0, engine);
-    answer(engine, true);
+    choose(engine, 'no');
     mock.timers.tick(LONELY_RULES.raceMs);
     spiritLonelinessFeature.onTick(16, 0, engine);
-    assert.equal(engine.calls.prompts[0].text, 'Someone else cheered up the Street Spirit in Lonely Lane. Looks like you missed your chance!');
+    assert.equal(engine.calls.prompts[1].text, 'Someone else cheered up the Street Spirit in Lonely Lane. Looks like you missed your chance!');
     assert.equal(spiritLonelinessFeature._state().missed, 1);
+  });
+
+  it('G304: an unanswered invite stays in the stack, the missed prompt stacks over it, and one taken away counts as No', () => {
+    const engine = fakeEngine();
+    spiritLonelinessFeature.onStreetEnter({}, engine);
+    spiritLonelinessFeature._begin(engine, 'GLONE', { type: 'A', now: Date.now() });
+    mock.timers.tick(15_000);
+    spiritLonelinessFeature.onTick(16, 0, engine);
+    assert.equal(engine.prompts().shown.length, 1);
+    mock.timers.tick(LONELY_RULES.raceMs);
+    spiritLonelinessFeature.onTick(16, 0, engine);
+    assert.equal(engine.prompts().shown.length, 2, 'cancelLoneliness adds its prompt and leaves the invite');
+    assert.match(engine.calls.prompts[1].text, /^Someone else cheered up/);
+    // Yes on the stale invite finds no event: no route.
+    const invite = engine.calls.prompts[0];
+    engine.removePrompt(invite.uid);
+    invite.onChoice('yes');
+    assert.equal(engine.calls.routes.length, 0);
+
+    spiritLonelinessFeature._reset();
+    spiritLonelinessFeature._setGraph(GRAPH);
+    const e2 = fakeEngine();
+    spiritLonelinessFeature.onStreetEnter({}, e2);
+    spiritLonelinessFeature._begin(e2, 'GLONE', { type: 'A', now: Date.now() });
+    mock.timers.tick(15_000);
+    spiritLonelinessFeature.onTick(16, 0, e2);
+    e2.removePrompt(e2.calls.prompts[0].uid);
+    spiritLonelinessFeature.onTick(16, 0, e2);
+    assert.equal(spiritLonelinessFeature._state().event.answer, 'no');
   });
 
   it('the solo picker: a met spirit left alone a game day, 3 streets away, after 15 minutes of play', () => {

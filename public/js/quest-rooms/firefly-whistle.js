@@ -457,10 +457,11 @@ function maybePromptStuck(ctx, now) {
   if (d.prompting || d.exiting || now < d.promptAt) return;
   if (ctx.dialogOpen?.() || ctx.cardOpen?.() || d.codeBox) return;
   d.prompting = true;
-  ctx.converse({
-    title: 'Firefly Whistle',
-    kicker: 'Are you stuck?',
+  // G304: instances_show_exit_prompt (inc_instances.js 322-344) is a prompts_add with
+  // icon_buttons and no timeout: the bottom-right prompt stack, not the card.
+  ctx.prompt({
     text: STUCK_TEXT,
+    iconButtons: true,
     choices: [
       { label: 'Yes, please', value: 'yes' },
       { label: 'No thanks', value: 'no' },

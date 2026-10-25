@@ -67,7 +67,7 @@ import {
   useEmblem,
 } from '../giant-icons.js';
 import { textureFromUrl } from '../textures.js';
-import { playSheetOverlay } from '../overlay-art.js?v=g294-1';
+import { playSheetOverlay } from '../overlay-art.js?v=g304-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=g202-1';
 import { TELLERS } from '../conversations-data.js?v=g202-1';

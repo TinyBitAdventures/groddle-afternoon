@@ -139,8 +139,8 @@ import {
   towerItem,
 } from '../home-cultivation.js?v=home-cultivation-4';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
-import { playPoofIn } from '../overlay-art.js?v=g294-1';
-import { fadeInNewNear } from '../poof-fade.js?v=g294-1';
+import { playPoofIn } from '../overlay-art.js?v=g304-1';
+import { fadeInNewNear } from '../poof-fade.js?v=g304-1';
 import { projectApi } from './street-jobs-feature.js?v=g300-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
 import { towerApi } from './home-tower-feature.js?v=home-tower-14';

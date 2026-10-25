@@ -57,7 +57,7 @@ import { isPoisoned } from '../tree-poison.js';
 import { furnitureSize } from '../home-decor.js?v=home-decor-4';
 import { textureFromUrl, sourceFromUrl, frameTexture } from '../textures.js';
 import { POTION_ART } from '../potion-art.js?v=g149-1';
-import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g294-1';
+import { playPoofIn, playSheetOverlay } from '../overlay-art.js?v=g304-1';
 import {
   ANIMAL_BABIES,
   KEY_NAMES,
@@ -98,9 +98,9 @@ import {
 } from '../potions.js?v=g149-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-4';
 import { patchesFeature } from './patches-feature.js?v=patches-14';
-import { homesFeature } from './homes-feature.js?v=homes-27';
-import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-13';
-import { questRoomConverse } from './quest-instances-feature.js?v=qi-11';
+import { homesFeature } from './homes-feature.js?v=homes-28';
+import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-14';
+import { questRoomConverse } from './quest-instances-feature.js?v=qi-12';
 
 export const POTIONS_FEATURE_ID = 'potions';
 const LOVE = 'feeling_called_love';

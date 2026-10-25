@@ -44,7 +44,7 @@ import { ITEM_CATALOG, ensureItem } from '../inventory.js?v=catalog-unified-7';
 import { moodMax } from '../metabolics.js';
 import { plantChoices } from '../patches.js';
 import { textureFromUrl } from '../textures.js';
-import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g294-1';
+import { displayTopOf, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g304-1';
 import {
   GUILT_BUFF,
   POISON_COPY,

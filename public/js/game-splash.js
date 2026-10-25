@@ -24,14 +24,36 @@
  *     first does_close button's payload, else CLICK_FAILURE.
  *   - BaseSplashScreenView hide: fades out over 0.3 s.
  * The art is Tiny Speck's own FLA (glitch-overlays/race_winner.fla,
- * thegreathoghaul_winner.fla), drawn by tools/overlay-art/build.mjs into
- * sheets with the two labels as states. Not recovered: client.css's
- * game_splash_race (background colour and alpha, the name's font, so the
- * splash has no shade and the name uses the game's outlined label look) and
- * the level_up_rays clip (CSS rays stand in).
+ * thegreathoghaul_winner.fla, game_of_crowns_winner.fla), drawn by
+ * tools/overlay-art/build.mjs into sheets with the two labels as states.
+ * G304:
+ * - Game of Crowns ends here too (games_end_it_game 613-730: tsid it_game,
+ *   game_of_crowns_winner, text_delta_y 25, Play Again and Leave the Game).
+ * - The rays are the client's own (GameSplashScreenView.as 37, 91 new
+ *   Rays('combinedSlow'); Rays.as: TSEngineAssets/level_up_rays.fla, scene
+ *   combinedSlow, scale 1.5), two fans drawn by tools/overlay-art (kind
+ *   "spin") turning at their tweens' rates; placeGraphic 340-342 centres
+ *   them on the graphic (rays.x = width/2 - 413, the 1.5x stage's middle).
+ * - The name's place is the client's (splashTextY): the graphic sits in
+ *   ArbitrarySWFView's square of the larger stage side, bottom aligned
+ *   (scale 312-340), and onSWFComplete 316-324 lifts it by the clip's y, so
+ *   the middle of the holder is stage y h - max(w, h) / 2; text_delta_y adds
+ *   to that. The Game of Crowns recording (PUUVxH_h_cQ, 4:06, reference
+ *   only) puts the name 5 px from that, in the crown above its plate; on
+ *   race_winner it lands in the orb, not on the plate.
+ * - Every splash button is type 'minor' (inc_games.js 1352-1356 and the
+ *   rest), the light button the recording shows.
+ * Not recovered: client.css's game_splash_<tsid> styles (searched: no
+ * client stylesheet in glitch-client, Wayback's c1.glitch.bz/css index has
+ * only the website's), so the name keeps the outlined label look; the
+ * recording shows no shade behind the splash (the street stays full
+ * strength), which is what the remake draws.
  */
 
-import { OVERLAY_BASE, loadOverlayManifest, sheetCell, stateFrameAt } from './overlay-art.js?v=g294-1';
+import { OVERLAY_BASE, loadOverlayManifest, sheetCell, stateFrameAt } from './overlay-art.js?v=g304-1';
+
+/** GameSplashScreenView.as 37 RAYS_SCENE, drawn as overlays.json level_up_rays. */
+export const SPLASH_RAYS_KEY = 'level_up_rays';
 
 export const SPLASH_FADE_IN_MS = 400; // BaseSplashScreenView animate
 export const SPLASH_FADE_OUT_MS = 300; // BaseSplashScreenView hide
@@ -40,10 +62,12 @@ export const SPLASH_RAYS_FADE_MS = 500;
 export const SPLASH_BUTTON_GAP = 20; // buttons.delta_y
 
 /** games_end_race 1336-1360 and games_end_hogtie_piggy 2104-2127. */
-export const RACE_SPLASH = Object.freeze({ key: 'race_winner', textDeltaY: 55, leaveLabel: 'Leave the Game', buttonW: 150, nameY: 103 });
+export const RACE_SPLASH = Object.freeze({ key: 'race_winner', textDeltaY: 55, leaveLabel: 'Leave the Game', buttonW: 150 });
 export const HOG_HAUL_SPLASH = Object.freeze({ key: 'thegreathoghaul_winner', textDeltaY: -10, leaveLabel: 'Leave the Game', buttonW: 0 });
 /** games_end_quoin_grab 1543-1586 (Grab 'Em Good, the remake's quoin races). */
 export const QUOIN_GRAB_SPLASH = Object.freeze({ key: 'grabemgood_winner', textDeltaY: 0, leaveLabel: 'Leave the Game', buttonW: 0 });
+/** G304: games_end_it_game 633-660, 692-694: both buttons w 150; Play Again first. */
+export const CROWNS_SPLASH = Object.freeze({ key: 'game_of_crowns_winner', textDeltaY: 25, againLabel: 'Play Again', leaveLabel: 'Leave the Game', buttonW: 150 });
 
 /** The frame label a player sees: you_winner (with rays) or other_winner (with the winner's name). */
 export function splashFor(won, winnerName = '') {
@@ -53,15 +77,51 @@ export function splashFor(won, winnerName = '') {
 }
 
 /**
- * Where the graphic's text centres, in the art box's px (show 122-123: the
- * graphic's middle plus text_delta_y). `nameY` overrides it: on race_winner
- * as the FLA draws it, the middle plus 55 lands on the "IS THE WINNER"
- * plate, so the remake puts the name in the empty orb above it (RACE_SPLASH).
+ * Where the graphic's text centres, in the art box's px (show 122-123:
+ * the holder's y plus half its height plus text_delta_y). The holder is
+ * ArbitrarySWFView's square of the larger stage side with the stage at its
+ * bottom (scale 312-340: mc.y = wh - h), lifted by mc.y (onSWFComplete
+ * 316-324), so its middle is stage y h - wh / 2. Without a stage (old
+ * manifests) the box's middle. `nameY` (box px) overrides it.
  */
 export function splashTextY(meta, textDeltaY = 0, nameY = null) {
   if (Number.isFinite(nameY)) return nameY;
-  const [, , , bh] = meta.box;
-  return bh / 2 + (Number(textDeltaY) || 0);
+  const [, by, , bh] = meta.box;
+  const delta = Number(textDeltaY) || 0;
+  if (!Array.isArray(meta.stage)) return bh / 2 + delta;
+  // contentLoaderInfo.width / height are whole pixels.
+  const [sw, sh] = meta.stage.map((v) => Math.round(Number(v) || 0));
+  return sh - Math.max(sw, sh) / 2 + delta - by;
+}
+
+/** The graphic's middle across, in box px: the stage's (show 120, draw 286). */
+export function splashTextX(meta) {
+  const [bx, , bw] = meta.box;
+  return Array.isArray(meta.stage) ? Number(meta.stage[0]) / 2 - bx : bw / 2;
+}
+
+/**
+ * The rays (Rays.as, placeGraphic 340-342): the fans' square (box px of the
+ * graphic: its centre on the graphic's stage middle; its side the drawn
+ * square at Rays' 1.5) and each fan's turn in seconds per full circle.
+ */
+export function splashRays(graphicMeta, raysMeta) {
+  if (!graphicMeta || !raysMeta?.layers?.length) return null;
+  const [gx, gy] = graphicMeta.box;
+  const [sw, sh] = Array.isArray(graphicMeta.stage) ? graphicMeta.stage : [graphicMeta.box[2], graphicMeta.box[3]];
+  const side = raysMeta.box[2] * (Number(raysMeta.scale) || 1);
+  const fps = Number(raysMeta.fps) || 30;
+  return {
+    cx: sw / 2 - gx,
+    cy: sh / 2 - gy,
+    side,
+    layers: raysMeta.layers.map((l) => ({
+      file: l.file,
+      // degPerFrame at the clip's fps; 0 holds still.
+      turnSec: l.degPerFrame ? Math.round((360 / (Math.abs(l.degPerFrame) * fps)) * 100) / 100 : 0,
+      reverse: l.degPerFrame < 0,
+    })),
+  };
 }
 
 /** onDoneClick 362-391: the first does_close button, or null (then CLICK_FAILURE). */
@@ -78,18 +138,27 @@ html[data-street-cards] .game-splash { visibility: hidden; }
 .game-splash-block { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; }
 .game-splash-graphic { position: relative; }
 .game-splash-art { position: relative; background-repeat: no-repeat; }
-.game-splash-rays { position: absolute; left: 50%; top: 50%; width: 200%; aspect-ratio: 826 / 586; transform: translate(-50%, -50%);
-  border-radius: 50%; opacity: 0; transition: opacity ${SPLASH_RAYS_FADE_MS}ms linear ${SPLASH_RAYS_DELAY_MS}ms;
+.game-splash-rays { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none;
+  opacity: 0; transition: opacity ${SPLASH_RAYS_FADE_MS}ms linear ${SPLASH_RAYS_DELAY_MS}ms; }
+.game-splash-rays img { position: absolute; inset: 0; width: 100%; height: 100%; animation: gameSplashTurn linear infinite; }
+.game-splash-rays.is-standin { width: 200%; aspect-ratio: 826 / 586; border-radius: 50%;
   background: repeating-conic-gradient(rgba(255, 255, 255, .22) 0deg 10deg, transparent 10deg 20deg);
-  -webkit-mask-image: radial-gradient(closest-side, #000 35%, transparent 100%); mask-image: radial-gradient(closest-side, #000 35%, transparent 100%);
-  animation: awardSpin 40s linear infinite; }
+  -webkit-mask-image: radial-gradient(closest-side, #000 35%, transparent 100%); mask-image: radial-gradient(closest-side, #000 35%, transparent 100%); }
+@keyframes gameSplashTurn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .game-splash-rays img { animation: none; } }
 .game-splash.is-in .game-splash-rays.is-on { opacity: 1; }
-.game-splash-name { position: absolute; left: 0; right: 0; margin: 0; transform: translateY(-50%); text-align: center; white-space: nowrap;
+.game-splash-name { position: absolute; left: 50%; margin: 0; transform: translate(-50%, -50%); text-align: center; white-space: nowrap;
   color: #fff; font: 900 var(--splash-name-size, 26px)/1 Nunito, 'Trebuchet MS', sans-serif; letter-spacing: .02em;
   text-shadow: 0 0 2px #3b2a20, 0 0 3px #3b2a20, 0 2px 0 #3b2a20, 0 3px 6px rgba(0,0,0,.35); }
 .game-splash-name:empty { display: none; }
 .game-splash-buttons { display: flex; gap: 10px; margin-top: ${SPLASH_BUTTON_GAP}px; pointer-events: auto; }
 .game-splash-buttons button { min-width: 0; }
+/* Button type 'minor' (client.css .button_minor_*, not recovered): light, as recorded. */
+.game-splash-buttons .game-splash-minor { min-height: 28px; padding: 4px 14px; border: 1px solid #c9c4b8; border-radius: 6px; cursor: pointer;
+  color: #4d4a40; background: linear-gradient(#ffffff, #e9e6df); font: 700 13px/1.2 Nunito, 'Trebuchet MS', sans-serif;
+  box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.game-splash-buttons .game-splash-minor:hover { background: linear-gradient(#ffffff, #f3f1ec); }
+.game-splash-buttons .game-splash-minor:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 `;
 
 /**
@@ -176,8 +245,11 @@ export function createGameSplash(opts = {}) {
     hide();
     const mine = ++token;
     let meta = null;
+    let raysMeta = null;
     try {
-      meta = (await manifest())?.[key] || null;
+      const all = await manifest();
+      meta = all?.[key] || null;
+      raysMeta = all?.[SPLASH_RAYS_KEY] || null;
     } catch {
       meta = null;
     }
@@ -198,6 +270,28 @@ export function createGameSplash(opts = {}) {
     const raysEl = doc.createElement('div');
     raysEl.className = `game-splash-rays${rays ? ' is-on' : ''}`;
     raysEl.hidden = !rays;
+    const raysPlan = rays ? splashRays(meta, raysMeta) : null;
+    if (raysPlan) {
+      Object.assign(raysEl.style, {
+        left: `${raysPlan.cx * scale}px`,
+        top: `${raysPlan.cy * scale}px`,
+        width: `${raysPlan.side * scale}px`,
+        height: `${raysPlan.side * scale}px`,
+      });
+      for (const layer of raysPlan.layers) {
+        const img = doc.createElement('img');
+        img.src = `${OVERLAY_BASE}${layer.file}`;
+        img.alt = '';
+        img.decoding = 'async';
+        img.style.animationDuration = layer.turnSec ? `${layer.turnSec}s` : '0s';
+        if (layer.reverse) img.style.animationDirection = 'reverse';
+        raysEl.appendChild(img);
+      }
+      setData('gameSplashRays', raysPlan.layers.map((l) => l.turnSec).join(','));
+    } else if (rays) {
+      raysEl.className += ' is-standin'; // the art failed: the CSS stand-in
+      setData('gameSplashRays', 'standin');
+    } else setData('gameSplashRays', '');
     const art = doc.createElement('div');
     art.className = 'game-splash-art';
     const name = doc.createElement('p');
@@ -215,6 +309,7 @@ export function createGameSplash(opts = {}) {
         backgroundSize: `${meta.cols * cellW * scale}px ${rows * cellH * scale}px`,
       });
       name.style.top = `${splashTextY(meta, textDeltaY, nameY) * scale}px`;
+      name.style.left = `${splashTextX(meta) * scale}px`;
       name.style.setProperty('--splash-name-size', `${Math.round(26 * scale)}px`);
     } else {
       // No art (the manifest failed): the label's words, so the result still reads.
@@ -228,7 +323,8 @@ export function createGameSplash(opts = {}) {
     for (const b of buttons) {
       const bt = doc.createElement('button');
       bt.type = 'button';
-      bt.className = 'btn-glitch-primary';
+      // inc_games.js: every splash button is size 'default', type 'minor'.
+      bt.className = b.type === 'primary' ? 'btn-glitch-primary' : 'game-splash-minor';
       bt.textContent = b.label;
       if (b.w) bt.style.width = `${b.w}px`;
       bt.addEventListener('click', () => press(b));

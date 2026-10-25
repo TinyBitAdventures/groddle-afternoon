@@ -275,8 +275,9 @@ export const room = {
     const nag = NAG[ctx.data.nagged];
     if (nag && since >= nag.atMs && !ctx.data.spinachActivated && !ctx.dialogOpen() && !ctx.hasProgress('top_of_tree')) {
       ctx.data.nagged += 1;
-      // inc_announcements.js 363-375 activate_spinach_prompt: a prompts_add prompt (G225: plain card).
-      ctx.converse({ title: 'The High Jumper', kicker: 'Magic Rock', look: 'plain', text: nag.text, choices: [{ label: 'Ok', value: 'ok' }] });
+      // inc_announcements.js 363-375 activate_spinach_prompt: a prompts_add prompt, timeout 10,
+      // timeout_value '' (G304: the bottom-right prompt stack, not a card).
+      ctx.prompt({ text: nag.text, choices: [{ label: 'Ok', value: '' }], timeout: 10, timeoutValue: '' });
     } else if (nag && ctx.data.spinachActivated) {
       ctx.data.nagged = NAG.length;
     }
@@ -288,8 +289,9 @@ export const room = {
       ctx.sound('ACHIEVEMENT_UNLOCKED', { volume: 0.5 });
       ctx.turnIn().then(() => {
         ctx.data.jumpOff = true;
-        // locations/location.js 366-374: prompts_add_delayed timeout 10, timeout_value '' (G198).
-        return ctx.converse({ title: 'The High Jumper', kicker: 'Magic Rock', look: 'plain', text: JUMP_OFF_LINE, choices: [{ label: 'Ok', value: 'ok' }], timeout: 10 });
+        // locations/location.js 366-374: prompts_add_delayed timeout 10, timeout_value '' (G198;
+        // G304: the prompt stack).
+        return ctx.prompt({ text: JUMP_OFF_LINE, choices: [{ label: 'Ok', value: '' }], timeout: 10, timeoutValue: '' });
       });
     }
     // Jumping off the tree (landing on the ground once you have topped it) goes back.

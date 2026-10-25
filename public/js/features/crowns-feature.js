@@ -17,6 +17,7 @@
  *     &raceassist=1                          rivals stand still
  *     &raceautoplay=1                        you start with the crown and walk into play
  *     &crownstart=<seconds>                  pre-fill your crown clock
+ *     &crownrival=<seconds>                  pre-fill the first rival's clock; it starts as It (G304 loss splash)
  */
 
 import { crowdScaleX } from '../avatar-anims.js';
@@ -53,6 +54,7 @@ import { wallsScreen } from '../street-model.js';
 import { addItem } from '../inventory.js?v=catalog-unified-7';
 import { textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { CROWNS_SPLASH, splashFor } from '../game-splash.js?v=g304-1';
 
 const ICON = 'assets/sprites/races/';
 const CROWN_DIR = 'assets/sprites/races/crowns/';
@@ -118,7 +120,6 @@ const STYLE = `
 .crowns-clock img { width: 34px; height: auto; }
 .crowns-rules { margin: 0 auto 16px; padding: 0; list-style: none; text-align: left; display: inline-block; font-weight: 700; font-size: .9rem; }
 .crowns-rules li::before { content: '• '; color: #f2d36c; }
-.crowns-result-actions { display: flex; gap: 10px; justify-content: center; }
 `;
 
 function buildChrome(engine) {
@@ -143,24 +144,10 @@ function buildChrome(engine) {
       <button type="button" class="btn-glitch-primary" data-crowns-ready>Click to Start</button>
     </div>`);
   const countdown = el('div', { id: 'crowns-countdown', class: 'hog-haul-countdown', hidden: true });
-  const result = el('div', { id: 'crowns-result', class: 'hog-haul-screen', hidden: true, role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'crowns-result-title' }, `
-    <div class="hog-haul-screen-shade"></div>
-    <div class="hog-haul-result-card">
-      <div class="hog-haul-result-rays" aria-hidden="true"></div>
-      <img src="${CROWN_DIR}game_crown_unlocked.png" alt="" />
-      <p>GAME OF CROWNS</p>
-      <h2 id="crowns-result-title" data-crowns-result-title></h2>
-      <p data-crowns-result-detail></p>
-      <div class="crowns-result-actions">
-        <button type="button" class="btn-glitch-primary" data-crowns-again>Play Again</button>
-        <button type="button" class="btn-glitch-primary" data-crowns-leave>Leave the Game</button>
-      </div>
-    </div>`);
-  for (const node of [bar, ready, countdown, result]) host.appendChild(node);
-  hud = { bar, ready, countdown, result };
+  // G304: the end is the game splash (engine.gameSplash), not a card of its own.
+  for (const node of [bar, ready, countdown]) host.appendChild(node);
+  hud = { bar, ready, countdown };
   ready.querySelector('[data-crowns-ready]').addEventListener('click', () => readyUp(engine));
-  result.querySelector('[data-crowns-leave]').addEventListener('click', () => leave(engine));
-  result.querySelector('[data-crowns-again]').addEventListener('click', () => playAgain(engine));
 }
 
 /* ------------------------------------------------------------------ */
@@ -193,10 +180,13 @@ function setupArena(street, engine) {
   const players = [{ id: 'you', name: 'You' }, ...rivals().map((r) => ({ id: r.name, name: r.name }))];
   const crownStart = Number(params.get('crownstart'));
   if (crownStart > 0) players[0].crownMs = crownStart * 1000;
+  // QA (G304): &crownrival=<seconds> pre-fills the first rival's clock and starts it as It (the loss splash).
+  const rivalStart = Number(params.get('crownrival'));
+  if (rivalStart > 0 && players[1]) players[1].crownMs = rivalStart * 1000;
   game = createCrownsGame({
     now: Date.now(),
     players,
-    itId: params.get('raceautoplay') === '1' ? 'you' : undefined,
+    itId: params.get('raceautoplay') === '1' ? 'you' : rivalStart > 0 && players[1] ? players[1].id : undefined,
   });
   placeCrownLocks(game, LOCK_POINTS);
   resultApplied = false;
@@ -246,7 +236,7 @@ function setupArena(street, engine) {
   player.y = START_POINTS[0].y;
   hud.ready.hidden = false;
   hud.bar.hidden = false;
-  hud.result.hidden = true;
+  engine.hideGameSplash?.();
   renderHud(engine, true);
   publish(engine);
   if (params.get('racedemo') === CROWNS_ID && params.get('racestage') !== 'ready') setTimeout(() => readyUp(engine), 600);
@@ -497,15 +487,25 @@ function finish(engine) {
     record.losses += 1;
     engine.achievement('it_game:lost', 1);
     engine.pushActivity(`${res.winnerName} won the Game of Crowns.`);
+    engine.playSound('YOU_LOSE', { volume: 0.7 }); // inc_games.js 695
   }
   if (res.secondsWithCrown > 0) engine.achievement('it_game:seconds_with_crown', res.secondsWithCrown);
-  const card = hud.result.querySelector('.hog-haul-result-card');
-  card.classList.toggle('is-loss', !res.won);
-  hud.result.querySelector('[data-crowns-result-title]').textContent = res.won ? 'YOU WON!' : `${res.winnerName} IS THE WINNER!`;
-  hud.result.querySelector('[data-crowns-result-detail]').textContent = res.won
-    ? `(You got ${res.reward.currants} currants and ${xp} xp.)`
-    : `You held the crown for ${res.secondsWithCrown} seconds.`;
-  hud.result.hidden = false;
+  // The remake's own crown-time line (no source) goes to the activity log, not the splash.
+  if (!res.won) engine.pushActivity(`You held the crown for ${res.secondsWithCrown} seconds.`);
+  // G304: games_end_it_game 633-700: a game_splash_screen, tsid it_game,
+  // game_of_crowns_winner at you_winner with rays, or other_winner with the
+  // winner's name (text_delta_y 25), then Play Again and Leave the Game (w 150,
+  // does_close, games_leave_instance_overlay 'again' / 'leave'). The prize
+  // (200 iMG and 50 currants) is drawn in the art.
+  engine.gameSplash?.({
+    key: CROWNS_SPLASH.key,
+    ...splashFor(res.won, res.winnerName),
+    textDeltaY: CROWNS_SPLASH.textDeltaY,
+    buttons: [
+      { label: CROWNS_SPLASH.againLabel, w: CROWNS_SPLASH.buttonW, value: 'again', onClick: () => playAgain(engine) },
+      { label: CROWNS_SPLASH.leaveLabel, w: CROWNS_SPLASH.buttonW, value: 'leave', onClick: () => leave(engine) },
+    ],
+  });
   hud.countdown.hidden = true;
   if (crownSprite) crownSprite.visible = false;
   engine.updateHud();
@@ -515,7 +515,7 @@ function finish(engine) {
 
 async function leave(engine) {
   const back = record.returnTo;
-  hud.result.hidden = true;
+  engine.hideGameSplash?.();
   hud.bar.hidden = true;
   game = null;
   pending = null;
@@ -527,7 +527,7 @@ async function leave(engine) {
 }
 
 function playAgain(engine) {
-  hud.result.hidden = true;
+  engine.hideGameSplash?.();
   game = null;
   pending = { at: Date.now() };
   engine.enter(CROWNS_STREET, { spawnX: START_POINTS[0].x, spawnY: START_POINTS[0].y, bypassFeatureGates: true, useTransition: false });

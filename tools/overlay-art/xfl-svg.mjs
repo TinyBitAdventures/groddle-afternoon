@@ -536,7 +536,12 @@ export function parseScript(src) {
   return acts;
 }
 
-export function loadFla(file) {
+/**
+ * Read an FLA. `scene` picks one of the document's scenes (a DOMTimeline
+ * under <timelines> by name, G304: level_up_rays.fla keeps six, and the
+ * client's Rays.as plays 'combinedSlow'); the first one by default.
+ */
+export function loadFla(file, { scene = null } = {}) {
   const zip = readZip(file);
   const docNode = parseXml(zip.read('DOMDocument.xml').toString('utf8'));
   const symbols = new Map();
@@ -546,7 +551,10 @@ export function loadFla(file) {
     const sym = parseXml(buf.toString('utf8'));
     symbols.set(sym.attrs.name, readTimeline(at(sym, 'timeline', 'DOMTimeline')));
   }
-  const main = readTimeline(at(docNode, 'timelines', 'DOMTimeline'));
+  const scenes = kids(kid(docNode, 'timelines'), 'DOMTimeline');
+  const mainNode = scene == null ? scenes[0] : scenes.find((t) => t.attrs.name === scene);
+  if (!mainNode) throw new Error(`${file}: no scene ${scene}`);
+  const main = readTimeline(mainNode);
   const a = docNode.attrs;
   // Bitmaps, decoded when first drawn.
   // (rook_flock's one bitmap is a photo traced from in a guide layer: guide

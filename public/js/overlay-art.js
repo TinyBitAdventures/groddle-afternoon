@@ -40,12 +40,44 @@
 import { frameTexture, sourceFromUrl } from './textures.js';
 
 export const OVERLAY_BASE = 'assets/sprites/overlays/';
-export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g299-1`;
+export const OVERLAY_MANIFEST_URL = `${OVERLAY_BASE}overlays.json?v=g304-1`;
 /** Announcement.as 149-150. */
 export const OVERLAY_FADE = Object.freeze({ inMs: 200, outMs: 400 });
 
 let manifestPromise = null;
 const framePromises = new Map();
+
+/*
+ * G309: a move takes every overlay down. TSMainView.moveMoveStarted (1611-1612) and
+ * LocationView.dispose (50) call AnnouncementController.cancelAllOverlaysWeCan (193-215), which
+ * removes every in-window overlay (vp_overlay, window_overlay) and every in-location one
+ * (location_, itemstack_, pc_overlay), even one already fading out; no annc flag exempts one
+ * (Announcement.as has none). What it leaves are not overlays: the quoin fly-up and lightning
+ * (getQuoinAnimation, getLightningBolt) and the vp_canvas, which the loading screen hides. Indicators
+ * (announce_add_indicator) come back because GSJS sends them again on arrival
+ * (players/inc_announcements.js 666-683), not because they survive.
+ *
+ * Every player below registers here while it runs; game.js calls cancelAllOverlays() where a
+ * street change starts (endStreetOverlays). A cancelled sheet overlay's handle gets
+ * `cancelled: true` (its `stopped` stays the caller's own stop()) and `done` resolves false; a
+ * cancelled vector overlay resolves null.
+ */
+const liveOverlays = new Set();
+let overlayEpoch = 0;
+
+/** Cancel every overlay playing or still loading; returns how many were live. */
+export function cancelAllOverlays() {
+  overlayEpoch += 1;
+  const live = [...liveOverlays];
+  liveOverlays.clear();
+  for (const h of live) h.cancel();
+  return live.length;
+}
+
+/** How many overlays are playing (QA and tests). */
+export function liveOverlayCount() {
+  return liveOverlays.size;
+}
 
 /** overlays.json, once. */
 export function loadOverlayManifest() {

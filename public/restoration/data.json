@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 480,
+  "commits": 481,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "The sloth's puff covers the sloth, the Qurazy banner stops when you leave the street, and the feed fades under it on narrow screens"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "A timed quest that runs out shows Try again in the quest log, Hell's quest offers have one button, and party spaces stop new quests from starting"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Drinks, item verbs and skill mood bonuses give nothing while dead, and buff badges no longer cover the activity feed"
    }
   ]
  },

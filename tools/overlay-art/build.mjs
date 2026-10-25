@@ -30,7 +30,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { frameCount, frameSvg, loadFla, stateFrames } from './xfl-svg.mjs';
+import { frameCount, frameSvg, loadFla, rotationDelta, stateFrames } from './xfl-svg.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const spike = join(here, '../..');
@@ -136,6 +136,17 @@ export const OVERLAYS = Object.freeze({
   // games_end_quoin_grab 1529-1600: Grab 'Em Good's own (text_delta_y 0).
   grabemgood_winner: { fla: 'glitch-overlays/grabemgood_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
   thegreathoghaul_winner: { fla: 'glitch-overlays/thegreathoghaul_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
+  // G304: games_end_it_game 613-730 (Game of Crowns): the same splash, text_delta_y 25,
+  // with Play Again and Leave the Game. (crown_game_winner_you / _someone_else are
+  // Math Mayhem's vp_overlays, games_end_math_mayhem 1050-1115, not this game's.)
+  game_of_crowns_winner: { fla: 'glitch-overlays/game_of_crowns_winner.fla', kind: 'sheet', scale: 1.5, step: 1, webp: 0.85, states: { symbol: 'holder', labels: ['other_winner', 'you_winner'] } },
+  // G304: the splash's rays (GameSplashScreenView.as 37, 91: new Rays('combinedSlow');
+  // Rays.as: the client's own TSEngineAssets/level_up_rays.fla, scene combinedSlow, at
+  // SCALE_DEFAULT 1.5). The scene's one frame holds the clip raysCombinedSlow: two
+  // static ray fans (raysThinSlowAnim, raysThickSlowAnim, white radial ramps) each
+  // turned by a linear motion tween over 178 frames, looping. Kind "spin": each fan is
+  // drawn once as SVG and the game turns it at the tween's rate (no frame sheet).
+  level_up_rays: { fla: 'glitch-client/TSEngineAssets/level_up_rays.fla', kind: 'spin', scene: 'combinedSlow', clip: 'raysCombinedSlow', scale: 1.5 },
   play_glitch: {
     fla: 'glitch-overlays/play_glitch.fla',
     kind: 'sheet',
@@ -198,6 +209,7 @@ const sha1 = (file) => createHash('sha1').update(readFileSync(file)).digest('hex
  * with its { from, frames, loop } (G273).
  */
 export function framePlan(cfg, fla) {
+  if (cfg.kind === 'spin') return { picks: [{ n: 0, start: null }], states: null, frames: fla.symbols.get(cfg.clip)?.frameCount || 1 };
   if (!cfg.states) {
     const total = cfg.frames || frameCount(fla);
     const picks = [];
@@ -226,7 +238,9 @@ export function checkOverlays() {
     if (!existsSync(file)) continue;
     if (m.fla !== sha1(file)) bad.push(`${key}: FLA changed`);
     if (m.kind !== cfg.kind) bad.push(`${key}: kind`);
-    if (m.frames !== framePlan(cfg, scrub(loadFla(file), cfg.scrub)).picks.length) bad.push(`${key}: frame count`);
+    const plan = framePlan(cfg, scrub(loadFla(file, { scene: cfg.scene }), cfg.scrub));
+    if (m.frames !== (plan.frames ?? plan.picks.length)) bad.push(`${key}: frame count`);
+    for (const layer of m.layers || []) if (!existsSync(join(outDir, layer.file))) bad.push(`${key}: no ${layer.file}`);
     if (Boolean(m.states) !== Boolean(cfg.states)) bad.push(`${key}: states`);
     if (cfg.webp && !m.file.endsWith('.webp')) bad.push(`${key}: not WebP`);
   }
@@ -359,6 +373,65 @@ export function shareFrames(svgs) {
   return { defs, frames: sharedFrames };
 }
 
+/**
+ * G304, kind "spin": a clip whose layers are each one static graphic turned
+ * by a linear motion tween (level_up_rays' raysCombinedSlow). Each layer is
+ * drawn once at its first keyframe as an SVG square of side 2R round the
+ * clip's registration point (R: the furthest the layer draws from it, so any
+ * turn stays inside), and `degPerFrame` is the tween's turn (first keyframe
+ * to last, the short way unless the frame says otherwise) over its frames.
+ * Manifest: { kind, src, fla, fps, frames (the clip's loop), stage, box (the
+ * square in stage px), scale (the client's), file (the first layer),
+ * layers: [{ name, file, degPerFrame }] }.
+ */
+async function buildSpin(page, key, cfg, file, fla) {
+  const clip = fla.symbols.get(cfg.clip);
+  if (!clip) throw new Error(`${key}: no clip ${cfg.clip}`);
+  const inst = fla.main.layers.flatMap((L) => L.frames.flatMap((f) => f.els)).find((e) => e.k === 'inst' && e.lib === cfg.clip);
+  const [cx, cy] = [inst.m[4], inst.m[5]];
+  const pad = 600;
+  const W = fla.doc.width;
+  const H = fla.doc.height;
+  const wide = [-pad, -pad, W + pad * 2, H + pad * 2];
+  // One square for every layer: R, the furthest any layer draws from the point.
+  const solos = [];
+  let R = 0;
+  for (const layer of clip.layers) {
+    const keep = layer.name;
+    const solo = scrub(loadFla(file, { scene: cfg.scene }), clip.layers.filter((L) => L.name !== keep).map((L) => ({ symbol: cfg.clip, layer: L.name })));
+    const b = await page.evaluate((src) => window.bbox(src), frameSvg(solo, 0, { box: wide }));
+    if (!b) throw new Error(`${key}: ${keep} draws nothing`);
+    R = Math.max(R, Math.ceil(Math.max(cx - (b[0] - pad), b[2] - pad - cx, cy - (b[1] - pad), b[3] - pad - cy)) + 1);
+    solos.push({ layer, solo });
+  }
+  const box = [cx - R, cy - R, 2 * R, 2 * R];
+  const layers = [];
+  for (const { layer, solo } of solos) {
+    const keys = layer.frames.filter((f) => f.els.length);
+    const first = keys[0];
+    const last = keys[keys.length - 1];
+    const angle = (m) => Math.atan2(m[1], m[0]);
+    const turn = last === first ? 0 : rotationDelta(angle(first.els[0].m), angle(last.els[0].m), first.rotate, first.turns);
+    const frames = last.index - first.index || 1;
+    const out = `${key}.${layer.name}.svg`;
+    writeFileSync(join(outDir, out), `${frameSvg(solo, 0, { box })}\n`);
+    layers.push({ name: layer.name, file: out, degPerFrame: Math.round((turn * 180 / Math.PI / frames) * 1e5) / 1e5 });
+    console.log(`${key}: ${layer.name} R ${R}, ${(turn * 180 / Math.PI).toFixed(2)} deg over ${frames} frames`);
+  }
+  return {
+    kind: 'spin',
+    src: cfg.fla,
+    fla: sha1(file),
+    fps: fla.doc.frameRate,
+    frames: clip.frameCount,
+    stage: [W, H],
+    box,
+    scale: cfg.scale,
+    file: layers[0].file,
+    layers,
+  };
+}
+
 async function build(keys) {
   mkdirSync(outDir, { recursive: true });
   const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
@@ -370,7 +443,11 @@ async function build(keys) {
     for (const key of keys) {
       const cfg = OVERLAYS[key];
       const file = join(audit, cfg.fla);
-      const fla = scrub(loadFla(file), cfg.scrub);
+      const fla = scrub(loadFla(file, { scene: cfg.scene }), cfg.scrub);
+      if (cfg.kind === 'spin') {
+        manifest[key] = await buildSpin(page, key, cfg, file, fla);
+        continue;
+      }
       const plan = framePlan(cfg, fla);
       const picks = plan.picks;
       // Union of the drawn area over every frame, at 1:1 with a margin round the stage.

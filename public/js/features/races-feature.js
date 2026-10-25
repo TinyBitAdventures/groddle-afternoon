@@ -58,7 +58,6 @@ import {
   raceElapsedMs,
   raceForTicket,
   raceIsLive,
-  raceResultCopy,
   RACE_SPLASH_TEXT,
   RACE_STARTING_SOON,
   RACE_STARTING_SOON_MS,
@@ -84,16 +83,16 @@ import {
   drawWinnerRainbow,
   raceLoadingColors,
   renderRaceCourse,
-} from '../race-render.js?v=races-7';
+} from '../race-render.js?v=races-8';
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
 import { runStreetTransition } from '../screen-fx.js?v=card-2';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-1';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
-import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g294-1';
-import { startCrowns } from './crowns-feature.js?v=g300-1';
+import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g304-1';
+import { startCrowns } from './crowns-feature.js?v=g304-1';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=desk2-1';
-import { moodMax } from '../metabolics.js';
+import { gainMetabolic } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
@@ -910,9 +909,10 @@ function quoinTick(engine, now) {
       others: touched && rivalAt ? [rivalAt] : [],
     }, engine);
     if (touched) {
-      // Game quoins pay their benefit but skip the daily quoin limit.
-      const pc = engine.pc;
-      pc.mood = Math.max(0, Math.min(moodMax(pc), (pc.mood || 0) + amount));
+      // Game quoins pay their benefit but skip the daily quoin limit. G304: through the
+      // gain gate (items/quoin.js 185 metabolics_add_mood: nothing lands while dead);
+      // the quoin still shows its own amount (quoin.js 204 only swaps in xp's actual).
+      gainMetabolic(engine.pc, 'mood', amount);
       engine.floatText(q.x, q.y - 24, `+${amount} mood`, 0xb5e35b);
       engine.playSound(share?.sound || 'QUOIN_GOT', { volume: 0.6, jitter: 0.04 });
       engine.updateHud();

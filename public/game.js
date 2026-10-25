@@ -4,11 +4,11 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-11';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-119';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-120';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
-import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g294-1';
+import { HOG_HAUL_SPLASH, createGameSplash, splashFor } from './js/game-splash.js?v=g304-1';
 import {
   actionDurationFor,
   createTimedAction,
@@ -814,7 +814,7 @@ import { installHiresFirstDraw, installHiresSprites } from './js/sprite-hires.js
 import { wholeStatAmounts, wholeEffects } from './js/stat-text.js';
 import { createPromptSettler, promptId } from './js/prompt-settle.js';
 import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl, whenLoaded } from './js/textures.js';
-import { playPoofIn } from './js/overlay-art.js?v=g294-1';
+import { playPoofIn } from './js/overlay-art.js?v=g304-1';
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
 import { hidesChatBubble } from './js/hi-signs.js?v=hi-chat-1';

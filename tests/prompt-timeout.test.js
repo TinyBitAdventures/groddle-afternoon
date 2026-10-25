@@ -240,7 +240,7 @@ describe('the game wires them', () => {
     assert.match(read(join(PUBLIC, 'js/features/teleportation-feature.js')), /title: out\.script\.title, text: out\.message, timeout: 15 \}/);
     // items/npc_bureaucrat.js showEndPrompt 909-917 (G294: the stack, no heading).
     assert.match(game, /engine\.prompt\(\{\s*text: 'Thank you for your business\. To conduct another transaction, you must exit and re-enter the Hall\.',\s*choices: \[\{ label: 'OK', value: 'ok' \}\],\s*timeout: 10,\s*\}\);/);
-    assert.match(read(join(PUBLIC, 'js/quest-rooms/top-of-tree.js')), /text: JUMP_OFF_LINE, choices: \[\{ label: 'Ok', value: 'ok' \}\], timeout: 10 \}/);
+    assert.match(read(join(PUBLIC, 'js/quest-rooms/top-of-tree.js')), /ctx\.prompt\(\{ text: JUMP_OFF_LINE, choices: \[\{ label: 'Ok', value: '' \}\], timeout: 10, timeoutValue: '' \}\)/);
     assert.match(read(join(PUBLIC, 'js/features/quest-instances-feature.js')), /const ms = promptTimeoutMs\(\{ timeout \}\);/);
     // The subway's stop prompt already ran its own (inc_transit.js 378-382, timeout_value 'timeout').
     assert.match(read(join(PUBLIC, 'js/features/subway-feature.js')), /timeoutMs: ride\.timing\.prompt,/);

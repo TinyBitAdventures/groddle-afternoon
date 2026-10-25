@@ -255,9 +255,9 @@ describe('G225 familiar follow-ups', () => {
     for (const src of [qi, ffw, read('play/index.html')]) assert.doesNotMatch(src, /quest-dialogue-orb/);
     assert.match(qi, /const look = familiarLook\(\{ look: lookOpt, kicker \}\);/);
     assert.match(qi, /dialog\.close\.addEventListener\('click', \(\) => dialog\.resolve\?\.\(null\)\);/);
-    // prompts_add lines stay plain prompts; familiar_send_alert lines take the panel.
-    assert.match(read('js/quest-rooms/penalty.js'), /kicker: 'Magic Rock',\n\s+look: 'plain',\n\s+text: EXIT_PROMPT/);
-    assert.match(read('js/quest-rooms/top-of-tree.js'), /look: 'plain', text: nag\.text/);
+    // prompts_add lines go to the prompt stack (G304, ctx.prompt); familiar_send_alert lines take the panel.
+    assert.match(read('js/quest-rooms/penalty.js'), /ctx\.prompt\(\{\n\s+text: EXIT_PROMPT,\n\s+iconButtons: true,/);
+    assert.match(read('js/quest-rooms/top-of-tree.js'), /ctx\.prompt\(\{ text: nag\.text, choices: \[\{ label: 'Ok', value: '' \}\], timeout: 10, timeoutValue: '' \}\)/);
     assert.match(read('js/quest-rooms/back-alley.js'), /kicker: 'Magic Rock', text: FUEL_HINT/);
   });
 

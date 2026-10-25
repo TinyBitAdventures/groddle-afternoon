@@ -524,6 +524,7 @@ function makeContext(engine) {
     data: {},
     targets: [],
     sprites: [],
+    prompts: [],
     param: (name) => engine.param(name),
     fx: () => engine.param('questfx') !== '0',
     now: () => Date.now(),
@@ -556,6 +557,24 @@ function makeContext(engine) {
     leave: (opts) => leaveInstance(engine, opts),
     gotoStage: (stage, opts) => gotoStage(engine, stage, opts),
     converse: (opts) => converse(engine, opts),
+    /**
+     * G304: a source prompts_add (not modal) on the bottom-right prompt stack
+     * (engine.prompt), e.g. instances_show_exit_prompt's "Are you stuck?".
+     * Resolves with the choice's value, or null when it goes unanswered
+     * (removed, or the room is torn down: instances_cancel_exit_prompt).
+     */
+    prompt(opts = {}) {
+      return new Promise((resolve) => {
+        let uid = '';
+        const done = (value) => {
+          c.prompts = c.prompts.filter((p) => p.uid !== uid);
+          resolve(value);
+        };
+        uid = engine.prompt?.({ ...opts, onChoice: (value) => done(value ?? null) }) || '';
+        if (!uid) resolve(null);
+        else c.prompts.push({ uid, cancel: () => { engine.removePrompt?.(uid); done(null); } });
+      });
+    },
     advanceDialog,
     dialogOpen,
     /** Add a display object to the world entity layer (removed on clear). */
@@ -691,6 +710,9 @@ function clearContextEntities(engine) {
   }
   ctx.targets = [];
   ctx.sprites = [];
+  // G304: prompts the room left in the stack go with it (instances_cancel_exit_prompt).
+  for (const p of [...(ctx.prompts || [])]) p.cancel();
+  ctx.prompts = [];
 }
 
 function restorePlayerScale(engine) {

@@ -83,6 +83,7 @@ let arrow = null;
 let enteredAt = 0;
 let lastCheck = 0;
 let exitAt = 0;
+let exitUid = ''; // G304: the "Are you stuck?" prompt in the stack
 let last = '';
 let teleporting = false;
 
@@ -98,7 +99,14 @@ function setData(engine) {
   if (greeter) engine.setData('room23GreeterAt', `${Math.round(greeter.x)},${Math.round(greeter.y)}`);
 }
 
+/** instances_cancel_exit_prompt (inc_instances.js 359-370): prompts_remove the stuck prompt. */
+function cancelExitPrompt(engine) {
+  if (exitUid) engine?.removePrompt?.(exitUid);
+  exitUid = '';
+}
+
 function clear(engine) {
+  if (engine) cancelExitPrompt(engine);
   if (engine) {
     if (greeter?.target) engine.unregister(greeter.target);
     if (gwen?.target) engine.unregister(gwen.target);
@@ -416,6 +424,8 @@ export function offerTask(engine) {
       if (res.ok) {
         save.repeatPaid = false;
         exitAt = 0;
+        // tower_quest.js onAccepted 38-39: instances_cancel_exit_prompt('tower_quest').
+        cancelExitPrompt(engine);
         engine.pushActivity(`New quest: ${card.def.title}`);
         engine.updateHud?.();
         engine.save();
@@ -447,17 +457,26 @@ const near = (engine, x, y) => {
   return Math.abs(p.x - s.x) <= HIT_HALF && Math.abs(p.y - s.y) <= HIT_HALF;
 };
 
+/**
+ * G304: instances_show_exit_prompt (inc_instances.js 322-344) is a prompts_add
+ * (icon_buttons, no timeout, not modal): it joins the bottom-right prompt
+ * stack with a check and an X, and the room goes on under it.
+ */
 function exitPrompt(engine) {
   exitAt = 0;
   last = 'exit_prompt';
-  engine.scriptedDialogue?.({
-    title: TITLE,
-    kicker: 'Are you stuck?',
-    beats: [{ text: EXIT_PROMPT.text, response: EXIT_PROMPT.yes }],
-    cancelable: true,
-    primaryLabel: EXIT_PROMPT.yes,
-    cancelLabel: EXIT_PROMPT.no,
-    onComplete: async () => {
+  cancelExitPrompt(engine);
+  exitUid = engine.prompt?.({
+    text: EXIT_PROMPT.text,
+    iconButtons: true,
+    choices: [{ value: 'yes', label: EXIT_PROMPT.yes }, { value: 'no', label: EXIT_PROMPT.no }],
+    onChoice: async (value) => {
+      exitUid = '';
+      if (value !== 'yes') {
+        // instances_exit_via_prompt 'no': ask again in 2 * 60.
+        exitAt = Date.now() + EXIT_PROMPT_MS;
+        return;
+      }
       // instances_exit_via_prompt 'yes': back where you came in (Corridor Five, at Room 23's door).
       teleporting = true;
       last = 'exit';
@@ -468,11 +487,7 @@ function exitPrompt(engine) {
         teleporting = false;
       }
     },
-    onCancel: () => {
-      // 'no': ask again in 2 * 60.
-      exitAt = Date.now() + EXIT_PROMPT_MS;
-    },
-  });
+  }) || '';
 }
 
 function check(engine, now) {
