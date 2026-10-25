@@ -105,3 +105,4 @@ import { snoConesFeature } from './sno-cones-feature.js?v=g148-1'; FEATURES.push
 import { bureaucraticHallsFeature } from './bureaucratic-halls-feature.js?v=g139-1'; FEATURES.push(bureaucraticHallsFeature);
 import { potionsFeature } from './potions-feature.js?v=g149-1'; FEATURES.push(potionsFeature);
 import { purpleJourneyFeature } from './purple-journey-feature.js?v=g150-1'; FEATURES.push(purpleJourneyFeature);
+import { crabsFeature } from './crabs-feature.js?v=g154-1'; FEATURES.push(crabsFeature);
