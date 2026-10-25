@@ -38,7 +38,7 @@ import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { nearestSurfaceY } from '../walk-surface.js';
 import { loadWildlifeCatalog, wildlifeCatalog } from '../wildlife.js';
 import { ITEM_CATALOG, addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from '../tools.js?v=tools-3';
+import { canUseTool, useToolCondition } from '../tools.js?v=tools-4';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
 import { runStreetTransition } from '../screen-fx.js';
 import {

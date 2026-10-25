@@ -380,7 +380,7 @@ describe('craftybot feature: the ingredient source and the job menu', async () =
   const { craftybotFeature } = await import('../public/js/features/craftybot-feature.js');
   const { homesFeature } = await import('../public/js/features/homes-feature.js?v=homes-8');
   const cbMod = await import('../public/js/craftybot.js?v=craftybot-1');
-  const making = await import('../public/js/making.js?v=g169-1');
+  const making = await import('../public/js/making.js?v=g179-1');
 
   function fakeEngine(extra = {}) {
     return {

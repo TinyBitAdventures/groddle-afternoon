@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-60';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-61';
 import {
   actionDurationFor,
   createTimedAction,
@@ -458,7 +458,7 @@ import {
   quoteToolRepair,
   repairToolCondition,
   setToolRemaining,
-} from './js/tools.js?v=tools-3';
+} from './js/tools.js?v=tools-4';
 import {
   listRecipes,
   listRecipesForTool,
@@ -486,7 +486,7 @@ import {
   hasTool,
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
-} from './js/making.js?v=g169-1';
+} from './js/making.js?v=g179-1';
 import {
   createGarden,
   tickGarden,
@@ -511,7 +511,7 @@ import {
   cropIcon,
   hasWateringCan,
   hasHoe,
-} from './js/garden.js?v=g148-2';
+} from './js/garden.js?v=g179-2';
 import {
   ROCK_CATALOG,
   createMineRock,
@@ -523,7 +523,7 @@ import {
   starterMiningTools,
   STARTER_MINING_SKILLS,
   findWorkingPick,
-} from './js/mining.js?v=g148-1';
+} from './js/mining.js?v=g179-1';
 import {
   createActivityLog,
   appendActivity,

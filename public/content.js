@@ -28,7 +28,7 @@ import {
   hasWateringCan,
   hasHoe,
   plotStatusLabel,
-} from './js/garden.js?v=g148-4';
+} from './js/garden.js?v=g179-4';
 import {
   ROCK_CATALOG,
   MINING_COSTS,
@@ -38,7 +38,7 @@ import {
   findWorkingPick,
   rockStatusLabel,
   ensureMiningItems,
-} from './js/mining.js?v=g148-1';
+} from './js/mining.js?v=g179-1';
 import {
   ANIMAL_CLASS_IDS,
   ensureAnimalState,

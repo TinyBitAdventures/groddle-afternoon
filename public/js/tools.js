@@ -18,12 +18,16 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   },
   watering_can: { label: 'Watering Can', capacity: 100, baseCost: 75, source: 'watering_can.js' },
   hoe: { label: 'Hoe', capacity: 50, baseCost: 60, source: 'hoe.js' },
+  // high_class_hoe.js:16,25: parent hoe, points_capacity 250, base_cost 600.
+  high_class_hoe: { label: 'High-Class Hoe', capacity: 250, baseCost: 600, source: 'high_class_hoe.js' },
   hatchet: { label: 'Hatchet', capacity: 100, baseCost: 100, source: 'hatchet.js' },
   class_axe: { label: 'Class Axe', capacity: 300, baseCost: 900, source: 'class_axe.js' },
   pick: { label: 'Pick', capacity: 100, baseCost: 500, source: 'pick.js' },
   fancy_pick: { label: 'Fancy Pick', capacity: 200, baseCost: 1000, source: 'fancy_pick.js' },
   smelter: { label: 'Smelter', capacity: 500, baseCost: 700, source: 'smelter.js' },
   ore_grinder: { label: 'Grinder', capacity: 100, baseCost: 200, source: 'ore_grinder.js' },
+  // grand_ol_grinder.js:16,25: parent ore_grinder, points_capacity 500, base_cost 2000.
+  grand_ol_grinder: { label: "Grand Ol' Grinder", capacity: 500, baseCost: 2000, source: 'grand_ol_grinder.js' },
   alchemical_tongs: { label: 'Alchemical Tongs', capacity: 100, baseCost: 600, source: 'alchemical_tongs.js' },
   knife_and_board: { label: 'Knife & Board', capacity: 100, baseCost: 75, source: 'knife_and_board.js' },
   frying_pan: { label: 'Frying Pan', capacity: 100, baseCost: 125, source: 'frying_pan.js' },
@@ -58,6 +62,35 @@ export const TOOL_CONDITION_CATALOG = Object.freeze({
   fuelmaker: { label: 'Fuelmaker', capacity: 200, baseCost: 0, repairable: false, fuel: true, source: 'fuelmaker.js machine_base max_fuel' },
   blockmaker: { label: 'Blockmaker', capacity: 200, baseCost: 0, repairable: false, fuel: true, source: 'blockmaker.js machine_base max_fuel' },
 });
+
+/**
+ * Tools that stand in for one another, in the order the source looks for a
+ * working one.
+ * - Hoes: include/garden.js:233-238 and patch.js:393-402 take a working
+ *   High-Class Hoe first, then a plain Hoe (patch.js:342-347 accepts either).
+ * - Grinders: dullite.js:108,126 and barnacle.js:108,119 crush with either
+ *   (findFirst in pack order; the remake tries the plain Grinder first, the
+ *   order the source's own conditions name them).
+ */
+export const HOE_TOOLS = Object.freeze(['high_class_hoe', 'hoe']);
+export const GRINDER_TOOLS = Object.freeze(['ore_grinder', 'grand_ol_grinder']);
+
+/**
+ * The first owned tool in `candidates` that can take `wear` (any owned one
+ * when no condition state is given). `owned` says whether the pack holds any
+ * of them, so callers can tell "no hoe" from "a broken hoe".
+ * @param {object|null} state  tool condition state (createToolConditionState)
+ * @param {Record<string, number>} inv
+ * @param {readonly string[]} candidates
+ * @param {number} [wear]
+ */
+export function firstWorkingTool(state, inv, candidates, wear = 1) {
+  const owned = candidates.filter((id) => (Number(inv?.[id]) || 0) > 0);
+  for (const id of owned) {
+    if (!state || canUseTool(state, id, wear).ok) return { tool: id, owned: true, fallback: owned[0] };
+  }
+  return { tool: null, owned: owned.length > 0, fallback: owned[0] || null };
+}
 
 /** Rank data from catalog_skill_packages.js `tinkering`. */
 export const TINKERING_RANKS = Object.freeze({

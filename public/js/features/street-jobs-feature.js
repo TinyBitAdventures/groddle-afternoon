@@ -23,7 +23,7 @@
  */
 
 import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon } from '../inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from '../tools.js?v=tools-3';
+import { canUseTool, useToolCondition } from '../tools.js?v=tools-4';
 import { ecologyForStreet } from '../street-ecology.js?v=official-ecology-6';
 import { worldToScreen } from '../street-model.js';
 import { signArmWidth } from '../street-render.js?v=parallax-7';
@@ -114,7 +114,7 @@ function load() {
   if (catalog) return Promise.resolve(catalog);
   if (!loading) {
     loading = Promise.all([
-      fetch('assets/content/street-jobs.json?v=jobs-2').then((r) => r.json()),
+      fetch('assets/content/street-jobs.json?v=jobs-3').then((r) => r.json()),
       fetch('assets/streets/index.json').then((r) => r.json()),
     ])
       .then(([cat, idx]) => {

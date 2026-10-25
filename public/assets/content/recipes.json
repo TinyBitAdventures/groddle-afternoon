@@ -7131,6 +7131,78 @@
     "learnt": 1,
     "source": "catalog_recipes.js recipes[\"218\"]"
   },
+  "grand_ol_grinder": {
+    "id": "219",
+    "name": "Grand Ol' Grinder",
+    "tool": "tinkertool",
+    "energyCost": 75,
+    "xpReward": 60,
+    "waitMs": 20000,
+    "inputs": [
+      {
+        "classTsid": "molybdenum",
+        "qty": 11
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 17
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "grand_ol_grinder",
+        "qty": 1
+      }
+    ],
+    "skill": "refining_2",
+    "skills": [
+      "refining_2",
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"219\"]"
+  },
+  "high_class_hoe": {
+    "id": "220",
+    "name": "High-Class Hoe",
+    "tool": "tinkertool",
+    "energyCost": 40,
+    "xpReward": 40,
+    "waitMs": 20000,
+    "inputs": [
+      {
+        "classTsid": "plank",
+        "qty": 2
+      },
+      {
+        "classTsid": "plain_metal",
+        "qty": 5
+      },
+      {
+        "classTsid": "molybdenum",
+        "qty": 3
+      }
+    ],
+    "outputs": [
+      {
+        "classTsid": "high_class_hoe",
+        "qty": 1
+      }
+    ],
+    "skill": "soil_appreciation_5",
+    "skills": [
+      "soil_appreciation_5",
+      "tinkering_5"
+    ],
+    "achievements": [],
+    "toolWear": 1,
+    "taskLimit": 1,
+    "learnt": 1,
+    "source": "catalog_recipes.js recipes[\"220\"]"
+  },
   "irrigator_9000": {
     "id": "221",
     "name": "Irrigator 9000",

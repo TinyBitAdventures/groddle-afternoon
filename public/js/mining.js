@@ -19,7 +19,7 @@ import {
   itemIcon,
   ITEM_CATALOG,
 } from './inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from './tools.js?v=tools-3';
+import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-4';
 import { skillPackageDetails } from './skill-packages.js';
 import { grantMoodXp } from './mood-xp.js';
 import { GEM_ITEMS, MEGA_ROCK_CHUNKS, megaRockChance, miningExpertBonus, rollGemSmall, smeltingOverrides } from './imagination-effects.js';
@@ -523,7 +523,8 @@ export function crushOre(inv, pc, oreId, opts = {}) {
   if (countItem(inv, oreId) < qty) {
     return { ok: false, reason: 'empty', msgs: [`You need ${qty} ${oreId}.`] };
   }
-  if (opts.requireTool !== false && !hasMiningTool(inv, REFINE_COSTS.tool)) {
+  // dullite.js:108: a working Grinder or Grand Ol' Grinder.
+  if (opts.requireTool !== false && !GRINDER_TOOLS.some((id) => hasMiningTool(inv, id))) {
     return { ok: false, reason: 'no_grinder', msgs: ['You need a Grinder to crush ore.'] };
   }
   if (opts.requireSkill !== false) {
@@ -539,8 +540,11 @@ export function crushOre(inv, pc, oreId, opts = {}) {
   // ore_grinder.js getToolWearMultiplier: round(count / 3), and
   // runSkillPackage treats a 0 multiplier as 1.
   const toolWear = refining.toolWear * (Math.round(qty / 3) || 1);
+  // dullite.js:124-133 is_working_grinder: the first grinder with the points left.
+  const pick = firstWorkingTool(opts.toolState, inv, GRINDER_TOOLS, toolWear);
+  const grinder = pick.tool || pick.fallback || REFINE_COSTS.tool;
   if (opts.requireTool !== false && opts.toolState) {
-    const toolCheck = canUseTool(opts.toolState, REFINE_COSTS.tool, toolWear);
+    const toolCheck = canUseTool(opts.toolState, grinder, toolWear);
     if (!toolCheck.ok) {
       return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck };
     }
@@ -567,7 +571,7 @@ export function crushOre(inv, pc, oreId, opts = {}) {
     got.push({ classTsid: y.classTsid, qty: n });
   }
   const toolUse = opts.requireTool !== false && opts.toolState
-    ? useToolCondition(opts.toolState, REFINE_COSTS.tool, toolWear)
+    ? useToolCondition(opts.toolState, grinder, toolWear)
     : null;
   const parts = got.map((g) => `${g.qty} ${g.classTsid.replace(/_/g, ' ')}`).join(', ');
   const msgs = [`You crush ${qty} ${oreId} into ${parts}.`, ...(toolUse?.broke ? [toolUse.msg] : [])];

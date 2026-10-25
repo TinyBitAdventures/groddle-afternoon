@@ -17,7 +17,7 @@ import {
   ensureItem,
   registerItemUse,
 } from './inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from './tools.js?v=tools-3';
+import { GRINDER_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-4';
 import { getSkillPackageOverride, highestSkillLevel, skillPackageDetails } from './skill-packages.js';
 import {
   adjustedTaskLimit,
@@ -117,6 +117,15 @@ export const TOOL_CATALOG = {
     label: 'Grinder',
     desc: 'Crush dullite, beryl, sparkly into elements.',
     icon: itemIcon('ore_grinder'),
+    isTool: true,
+  },
+  // grand_ol_grinder.js:18 parent ore_grinder: the same Crush, 500 points
+  // instead of 100. Its recipes are the Grinder's (TOOL_STAND_INS).
+  grand_ol_grinder: {
+    classTsid: 'grand_ol_grinder',
+    label: "Grand Ol' Grinder",
+    desc: 'Crush dullite, beryl, sparkly into elements. Lasts five times as long as a Grinder.',
+    icon: itemIcon('grand_ol_grinder'),
     isTool: true,
   },
   alchemical_tongs: {
@@ -577,9 +586,9 @@ export async function loadRecipeCatalog(fetchImpl = globalThis.fetch) {
   }
   try {
     const [res, itemsRes] = await Promise.all([
-      fetchImpl('assets/content/recipes.json?v=fruit-machine-2&catalog=recipes-full-1'),
+      fetchImpl('assets/content/recipes.json?v=fruit-machine-2&catalog=recipes-full-2'),
       Promise.resolve()
-        .then(() => fetchImpl('assets/content/making-items.json?v=recipes-full-2'))
+        .then(() => fetchImpl('assets/content/making-items.json?v=recipes-full-3'))
         .catch(() => null),
     ]);
     if (itemsRes?.ok) {
@@ -753,7 +762,8 @@ export function listRecipes() {
  * @param {string} toolId
  */
 export function listRecipesForTool(toolId) {
-  return listRecipes().filter((r) => r.tool === toolId);
+  const recipeTool = recipeToolFor(toolId);
+  return listRecipes().filter((r) => r.tool === recipeTool);
 }
 
 /**
@@ -762,7 +772,42 @@ export function listRecipesForTool(toolId) {
  */
 export function hasTool(inv, toolId) {
   if (!toolId) return true;
-  return countItem(inv, toolId) >= 1;
+  return toolOptions(toolId).some((id) => countItem(inv, id) >= 1);
+}
+
+/**
+ * Tools that make a recipe tool's recipes. Crush recipes name ore_grinder;
+ * dullite.js:108,126 and barnacle.js:108,119 crush with a Grinder or a
+ * Grand Ol' Grinder (craftytasking.js:737 'ore_grinder|grand_ol_grinder').
+ */
+export const TOOL_STAND_INS = Object.freeze({
+  ore_grinder: GRINDER_TOOLS,
+});
+
+/** The recipe tool whose recipes a stand-in makes (grand_ol_grinder -> ore_grinder). */
+export function recipeToolFor(toolId) {
+  for (const [recipeTool, ids] of Object.entries(TOOL_STAND_INS)) {
+    if (ids.includes(toolId)) return recipeTool;
+  }
+  return toolId;
+}
+
+function toolOptions(toolId) {
+  return TOOL_STAND_INS[toolId] || [toolId];
+}
+
+/**
+ * The tool class a recipe actually wears: the first owned stand-in that can
+ * take `wear`, else the first owned one (so the broken-tool message names it).
+ * @param {import('./inventory.js').Inventory} inv
+ * @param {string} toolId  recipe.tool
+ * @param {object|null} [toolState]
+ * @param {number} [wear]
+ */
+export function recipeToolInUse(inv, toolId, toolState = null, wear = 1) {
+  if (!toolId || !TOOL_STAND_INS[toolId]) return toolId;
+  const pick = firstWorkingTool(toolState, inv, TOOL_STAND_INS[toolId], wear);
+  return pick.tool || pick.fallback || toolId;
 }
 
 /**
@@ -799,13 +844,15 @@ export function canCraft(inv, recipe, opts = {}) {
     return { ok: false, reason: 'tool', tool: recipe.tool, need: label };
   }
   if (requireTool && recipe.tool && opts.toolState) {
-    const condition = canUseTool(opts.toolState, recipe.tool, opts.toolWear || recipe.toolWear || 1);
+    const wear = opts.toolWear || recipe.toolWear || 1;
+    const toolId = atStation ? recipe.tool : recipeToolInUse(inv, recipe.tool, opts.toolState, wear);
+    const condition = canUseTool(opts.toolState, toolId, wear);
     if (!condition.ok) {
       return {
         ok: false,
         reason: 'broken_tool',
-        tool: recipe.tool,
-        need: TOOL_CATALOG[recipe.tool]?.label || recipe.tool,
+        tool: toolId,
+        need: TOOL_CATALOG[toolId]?.label || toolId,
         msg: condition.msg,
       };
     }
@@ -927,7 +974,11 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   const adjust = makingSkillAdjustments(recipe, opts.learned, upgrades);
   const cost = adjust.energyCost;
   // getHitPointModifier: the *_tool_wear cards halve that cooking tool's wear.
-  const wearFor = (wear) => scaledToolWear(opts.toolState, recipe.tool, wear, toolWearMultiplier(recipe.tool, upgrades));
+  // The Grand Ol' Grinder makes the Grinder's recipes and takes their wear.
+  const wornTool = opts.stationTool === recipe.tool
+    ? recipe.tool
+    : recipeToolInUse(inv, recipe.tool, opts.toolState, opts.toolWear || adjust.toolWear || recipe.toolWear || 1);
+  const wearFor = (wear) => scaledToolWear(opts.toolState, wornTool, wear, toolWearMultiplier(wornTool, upgrades));
   // inc_making.js refuses when energy_cost >= energy.
   if ((pc.energy || 0) <= cost) {
     return {
@@ -947,7 +998,7 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
   // a flat 2 energy and 2 mood (finishMakingKnown).
   if (adjust.failChance && unitIndex === 1 && !opts.maxLuck && (opts.rng || Math.random)() < adjust.failChance) {
     const failPoints = recipe.tool && opts.toolState ? wearFor(baseWear * batchWearUnits(recipe, batchQty)) : 0;
-    const failWear = failPoints > 0 ? useToolCondition(opts.toolState, recipe.tool, failPoints) : null;
+    const failWear = failPoints > 0 ? useToolCondition(opts.toolState, wornTool, failPoints) : null;
     const energyLost = Math.min(TRANSMOG_FAIL_ENERGY, Math.max(0, pc.energy || 0));
     const moodLost = Math.min(TRANSMOG_FAIL_MOOD, Math.max(0, pc.mood || 0));
     pc.energy = (pc.energy || 0) - energyLost;
@@ -1025,9 +1076,9 @@ export function craftRecipe(inv, pc, recipeKey, opts = {}) {
 
   const unitWear = batchWearUnits(recipe, unitIndex) - batchWearUnits(recipe, unitIndex - 1);
   const wearPoints = recipe.tool && opts.toolState && unitWear > 0 ? wearFor(baseWear * unitWear) : 0;
-  const toolUse = wearPoints > 0 ? useToolCondition(opts.toolState, recipe.tool, wearPoints) : null;
+  const toolUse = wearPoints > 0 ? useToolCondition(opts.toolState, wornTool, wearPoints) : null;
 
-  const toolLabel = TOOL_CATALOG[recipe.tool]?.label || recipe.tool || 'hands';
+  const toolLabel = TOOL_CATALOG[wornTool]?.label || wornTool || 'hands';
   const outLabels = (recipe.outputs || [])
     .map((o) => `${o.qty}× ${ITEM_CATALOG[o.classTsid]?.label || o.classTsid}`)
     .join(', ');

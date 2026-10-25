@@ -26,7 +26,7 @@ import {
 import { packTreeVerbsFeature, runPackTreeVerb } from '../public/js/features/pack-tree-verbs-feature.js?v=g165-1';
 import { getVerbsFor } from '../public/content.js?v=g148-1';
 import { plotVerbs } from '../public/js/patches.js';
-import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=tools-3';
+import { createToolConditionState, setToolRemaining } from '../public/js/tools.js?v=tools-4';
 import { FEATURES } from '../public/js/features/index.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

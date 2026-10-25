@@ -33,7 +33,7 @@
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
 import { getGameDayKey } from '../game-day.js?v=dametime-1';
-import { canUseTool, useToolCondition } from '../tools.js?v=tools-3';
+import { canUseTool, useToolCondition } from '../tools.js?v=tools-4';
 import {
   PAPER_CLASS,
   QUILL_CLASS,

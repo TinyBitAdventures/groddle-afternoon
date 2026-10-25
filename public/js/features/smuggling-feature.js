@@ -33,7 +33,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-3';
-import { canUseTool } from '../tools.js?v=tools-3';
+import { canUseTool } from '../tools.js?v=tools-4';
 import { acceptOffer, ensureQuestOfferState, turnInQuest } from '../quest-offers.js';
 import { parseQuestConversation } from '../quests.js';
 import { getQuestCatalog } from '../content-catalogs.js';

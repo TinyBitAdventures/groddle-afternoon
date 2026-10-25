@@ -46,7 +46,7 @@ import {
   MACHINE_EXTRA_WAIT_MS,
 } from '../public/js/making.js';
 import { createInventory, countItem } from '../public/js/inventory.js?v=catalog-unified-3';
-import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-3';
+import { createToolConditionState, getToolCondition } from '../public/js/tools.js?v=tools-4';
 
 const root = join(import.meta.dirname, '..', 'public');
 

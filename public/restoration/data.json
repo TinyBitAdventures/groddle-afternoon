@@ -1954,8 +1954,8 @@
   "musicTracks": 58
  },
  "recipes": {
-  "imported": 324,
-  "skipped": 22
+  "imported": 326,
+  "skipped": 20
  },
  "icons": {
   "items": 1028,
@@ -2103,6 +2103,6 @@
    }
   ]
  },
- "tests": 230,
+ "tests": 231,
  "generatedAt": "2026-10-24"
 }

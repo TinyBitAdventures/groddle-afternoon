@@ -23,7 +23,7 @@ import { applyRewards } from '../public/js/quests.js';
 import { createInventory, countItem, ensureItem } from '../public/js/inventory.js?v=catalog-unified-3';
 import { createMineRock, miningProfile, mineRock, smeltMetalRocks } from '../public/js/mining.js';
 import { craftRecipe, makingSkillAdjustments } from '../public/js/making.js';
-import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=tools-3';
+import { createToolConditionState, getToolCondition, repairToolCondition, setToolRemaining } from '../public/js/tools.js?v=tools-4';
 import { quoteWoodTreeHarvest } from '../public/js/woodcutting.js?v=woodcutting-1';
 import { resolveAnimalKinshipPackage } from '../public/js/animal-kinship.js';
 import { createGarden, getPlot, plantPlot, plotKey } from '../public/js/garden.js';

@@ -28,8 +28,8 @@ import {
 import { FOREST_MACHINE_ROOM_HELD, FOREST_MACHINE_ROOM_TSID } from '../public/js/forest-machine-room.js';
 import { FRESH_FUEL, MAX_FUEL, refuelMachine } from '../public/js/machines.js';
 import { DROP_TABLES, applyDropResult, rollDropTable } from '../public/js/drop-tables.js';
-import { canUseTool } from '../public/js/tools.js?v=tools-3';
-import { MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g169-1';
+import { canUseTool } from '../public/js/tools.js?v=tools-4';
+import { MAKING_TOOL_SKILLS, RECIPE_CATALOG, canCraft, craftRecipe, ensureMakingItems, loadRecipeCatalogFromFile } from '../public/js/making.js?v=g179-1';
 import { fixedFurniturePoints, furniturePlacementGroups } from '../public/js/street-furniture.js?v=furniture-g169';
 import { worldToScreen } from '../public/js/street-model.js';
 import { nearestSurfaceY } from '../public/js/walk-surface.js';

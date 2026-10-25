@@ -2935,6 +2935,21 @@
         "source": "items/grain.js base_cost 1 × energy_factor 1 (include/food.js food_eat)"
       }
     },
+    "grand_ol_grinder": {
+      "label": "Grand Ol' Grinder",
+      "namePlural": "Grand Ol' Grinders",
+      "desc": "More hefty than any grinder you may have met before, a meatier mortar and more powerful pestle means a lot more grind for your currant. Which is good, as it also costs a bunch more currants.",
+      "baseCost": 2000,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "premiumtool"
+      ],
+      "isTool": true,
+      "source": "items/grand_ol_grinder.js",
+      "pointsCapacity": 500,
+      "makingType": ""
+    },
     "greasy_frybread": {
       "label": "Greasy Frybread",
       "namePlural": "Greasy Frybreads",
@@ -3220,6 +3235,21 @@
         "energy": 576,
         "source": "items/heston_mash.js base_cost 576 × energy_factor 1 (include/food.js food_eat)"
       }
+    },
+    "high_class_hoe": {
+      "label": "High-Class Hoe",
+      "namePlural": "High-Class Hoes",
+      "desc": "More refined than your average hoe, the High-Class Hoe is a hoe you'll be proud to be seen with. Extra investment brings a five-times longer lifespan: With this glamorous new companion you'll be hoeing the whole night through.",
+      "baseCost": 600,
+      "stackMax": 1,
+      "tags": [
+        "tool",
+        "premiumtool"
+      ],
+      "isTool": true,
+      "source": "items/high_class_hoe.js",
+      "pointsCapacity": 250,
+      "makingType": ""
     },
     "hoe": {
       "label": "Hoe",

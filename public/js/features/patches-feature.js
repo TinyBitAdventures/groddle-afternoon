@@ -17,7 +17,8 @@
  *
  * Art: recovered CC0 OGA patch/patch_dark clean, dirty, dug and seedling
  * states, the six dead trant rasters, and the Hoe (10x3, 86x58) and Shovel
- * (14x4, 65x82, 53 frames) tool animation sheets under assets/sprites/soil/.
+ * (14x4, 65x82, 53 frames) tool animation sheets under assets/sprites/soil/, and
+ * the High-Class Hoe's own (10x3, 89x55) when that is the hoe the tend uses.
  *
  * QA: ?autostart=1&fresh=1&patchdemo=1 puts a weedy Patch beside the player
  * with a Hoe, Shovel, Watering Can and Seasoned Beans in the pack.
@@ -56,12 +57,14 @@ import {
   plotStatusLabel,
   plotVerbs,
   resetPlotDay,
+  resolveTendPackage,
   resetPlotDayIfStale,
   soilSpawnClasses,
   soilSpritePaths,
   tickPlot,
 } from '../patches.js';
 import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from '../textures.js';
+import { HOE_TOOLS, firstWorkingTool } from '../tools.js?v=tools-4';
 
 export const PATCHES_FEATURE_ID = 'patches';
 export const SOIL_GROUP_PREFIX = 'soil:';
@@ -77,6 +80,8 @@ const WOOD_SHEET = Object.freeze({
 });
 const TOOL_SHEETS = Object.freeze({
   hoe: Object.freeze({ url: 'assets/sprites/soil/hoe-tool.png', fw: 86, fh: 58, cols: 10, count: 30 }),
+  // high_class_hoe.swf tool_animation (OGA high_class_hoe__x1_tool_animation, CC0): 890x165, 10x3.
+  high_class_hoe: Object.freeze({ url: 'assets/sprites/soil/high-class-hoe-tool.png', fw: 89, fh: 55, cols: 10, count: 30 }),
   shovel: Object.freeze({ url: 'assets/sprites/soil/shovel-tool.png', fw: 65, fh: 82, cols: 14, count: 53 }),
   hatchet: Object.freeze({ url: 'assets/sprites/tools/hatchet-tool.png', fw: 110, fh: 64, cols: 8, count: 40 }),
 });
@@ -482,9 +487,19 @@ function stopToolFx() {
   toolFx = null;
 }
 
+/** The sheet for the tool the verb will use: patch.js:398-402 tends with a High-Class Hoe first. */
+function toolSheetKey(engine, verb) {
+  const key = VERB_TOOL[verb];
+  if (key !== 'hoe') return key;
+  const pkg = resolveTendPackage(engine.learnedSkills || [], engine.pc?.imaginationUpgrades || []);
+  const { tool } = firstWorkingTool(engine.toolState, engine.inv, HOE_TOOLS, pkg.tool_wear * pkg.wearMultiplier);
+  return tool === 'high_class_hoe' ? 'high_class_hoe' : 'hoe';
+}
+
 /** The source tool_animation sheet beside the avatar while a timed verb runs. */
 async function startToolFx(engine, entity, verb) {
-  const sheet = TOOL_SHEETS[VERB_TOOL[verb]];
+  const sheetKey = toolSheetKey(engine, verb);
+  const sheet = TOOL_SHEETS[sheetKey];
   if (!sheet) return;
   stopToolFx();
   const { PIXI } = engine;
@@ -504,7 +519,7 @@ async function startToolFx(engine, entity, verb) {
   engine.fxLayer.addChild(tool);
   tool.play();
   toolFx = { sprite: tool, entity, startedAt: Date.now() };
-  engine.setData('patchToolAnimation', `${VERB_TOOL[verb]}:playing`);
+  engine.setData('patchToolAnimation', `${sheetKey}:playing`);
 }
 
 // ---------------------------------------------------------------------------

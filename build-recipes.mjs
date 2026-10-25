@@ -94,6 +94,11 @@ const PLAYABLE_TOOL_OUTPUTS = new Set([
   'fancy_pick',
   'smelter',
   'ore_grinder',
+  // Upgraded tools (recipes 219, 220): grand_ol_grinder.js and
+  // high_class_hoe.js are children of ore_grinder and hoe; tools.js
+  // GRINDER_TOOLS / HOE_TOOLS let them do the parent's work.
+  'grand_ol_grinder',
+  'high_class_hoe',
   // Scraping/digging tools: tools.js tracks their condition for the
   // resource-nodes lane (barnacles, peat/dirt piles).
   'scraper',
@@ -107,10 +112,8 @@ const PLAYABLE_TOOL_OUTPUTS = new Set([
   'piggy_feeder',
 ]);
 
-const UNPLAYABLE_TOOL_REASONS = {
-  grand_ol_grinder: "Grand Ol' Grinder is an upgraded Grinder; mining.js only recognizes ore_grinder.",
-  high_class_hoe: 'High-Class Hoe is an upgraded Hoe; garden.js only recognizes hoe.',
-};
+/** Tinkertool outputs with no loop yet, by class (none since recipes 219/220 arrived). */
+const UNPLAYABLE_TOOL_REASONS = {};
 
 /** Furniture classes with recovered art (build-homes.mjs FURNITURE_CLASSES). */
 const PLACEABLE_FURNITURE = new Set(
@@ -285,6 +288,8 @@ const EXTRA_TOOL_ITEMS = new Set([
   'fancy_pick',
   'smelter',
   'ore_grinder',
+  'grand_ol_grinder',
+  'high_class_hoe',
   'scraper',
   'super_scraper',
   'shovel',

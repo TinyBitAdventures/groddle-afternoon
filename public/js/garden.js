@@ -11,7 +11,7 @@
  */
 
 import { addItem, removeItem, countItem, ensureItem, itemIcon } from './inventory.js?v=catalog-unified-3';
-import { canUseTool, useToolCondition } from './tools.js?v=tools-3';
+import { HOE_TOOLS, canUseTool, firstWorkingTool, useToolCondition } from './tools.js?v=tools-4';
 import { skillPackageDetails } from './skill-packages.js';
 import { gardenGrowModifier } from './imagination-effects.js';
 import { moodMax } from './metabolics.js';
@@ -827,7 +827,7 @@ export function hasWateringCan(inv) {
 
 /** @param {import('./inventory.js').Inventory} inv */
 export function hasHoe(inv) {
-  return countItem(inv, 'hoe') >= 1 || countItem(inv, 'hoe_highclass') >= 1;
+  return HOE_TOOLS.some((id) => countItem(inv, id) >= 1);
 }
 
 /**
@@ -1162,7 +1162,7 @@ export function waterPlot(garden, key, pc, opts = {}) {
   if (requireTool && toolId && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, toolId, profile.toolWear);
     if (!toolCheck.ok) {
-      const speech = gardenTalkback(toolId === 'hoe' || toolId === 'hoe_highclass' ? 'broken_hoe' : 'broken_watering_can', { rng: opts.talkRng, failed: true });
+      const speech = gardenTalkback(HOE_TOOLS.includes(toolId) ? 'broken_hoe' : 'broken_watering_can', { rng: opts.talkRng, failed: true });
       return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck, speech };
     }
   }
@@ -1314,18 +1314,14 @@ export function clearPlot(garden, key, pc, opts = {}) {
       speech: gardenTalkback('broken_hoe', { rng: opts.talkRng, failed: true }),
     };
   }
-  const toolId = opts.inv
-    ? countItem(opts.inv, 'hoe') >= 1
-      ? 'hoe'
-      : countItem(opts.inv, 'hoe_highclass') >= 1
-        ? 'hoe_highclass'
-        : null
-    : null;
   const profile = gardenActionProfile(garden.gardenType, 'clear', opts.learned, opts.upgrades);
+  // include/garden.js:233-238: a working High-Class Hoe first, then a Hoe.
+  const hoe = opts.inv ? firstWorkingTool(opts.toolState, opts.inv, HOE_TOOLS, profile.toolWear) : null;
+  const toolId = hoe ? hoe.tool || hoe.fallback : null;
   if (requireTool && toolId && opts.toolState) {
     const toolCheck = canUseTool(opts.toolState, toolId, profile.toolWear);
     if (!toolCheck.ok) {
-      const speech = gardenTalkback(toolId === 'hoe' || toolId === 'hoe_highclass' ? 'broken_hoe' : 'broken_watering_can', { rng: opts.talkRng, failed: true });
+      const speech = gardenTalkback(HOE_TOOLS.includes(toolId) ? 'broken_hoe' : 'broken_watering_can', { rng: opts.talkRng, failed: true });
       return { ok: false, reason: 'broken_tool', msgs: [toolCheck.msg], toolCheck, speech };
     }
   }

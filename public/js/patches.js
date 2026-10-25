@@ -35,7 +35,7 @@
 
 import { createTrantState, fruitCapacityAt, refillFruit, resetTrantDay } from './trants.js?v=trant-harvest-2';
 import { ensureWoodTreeState, resetWoodTreeDay } from './woodcutting.js?v=woodcutting-3';
-import { canUseTool, useToolCondition } from './tools.js?v=tools-3';
+import { canUseTool, useToolCondition } from './tools.js?v=tools-4';
 import { musicblockItemMeta } from './musicblocks.js';
 import { grantMoodXp } from './mood-xp.js';
 

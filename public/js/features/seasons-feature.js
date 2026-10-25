@@ -29,9 +29,9 @@
 
 import { addItem, countItem, ensureItem, removeItem, registerItemUse, ITEM_CATALOG } from '../inventory.js?v=catalog-unified-3';
 import { dametimeParts, getGameDayKey } from '../game-day.js?v=dametime-1';
-import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g148-1';
+import { setSeasonalSeedCheck as setGardenSeasonGate } from '../garden.js?v=g179-1';
 import { setSeasonalSeedCheck as setMasterGardenSeasonGate } from '../garden.js';
-import { setSeasonalRecipeCheck } from '../making.js?v=g169-1';
+import { setSeasonalRecipeCheck } from '../making.js?v=g179-1';
 import { getToolCondition } from '../tools.js';
 import { landingY, nearestSurfaceY } from '../walk-surface.js';
 import { isBatterflyHabitat } from '../animal-husbandry.js';
