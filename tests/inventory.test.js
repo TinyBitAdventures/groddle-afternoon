@@ -20,7 +20,7 @@ import { DROP_TABLES } from '../public/js/drop-tables-data.js';
 import { SKILL_PACKAGES } from '../public/js/skill-packages-data.js';
 
 const SUBWAY_JS = `export const RIDE_COUNTER = 'transit:subways_entered';\nexport const OTHER = 'x';\n`;
-const FEATURE_JS = `import { RIDE_COUNTER } from '../subway.js?v=2';\nfunction board(engine) { engine.achievement(RIDE_COUNTER, 1); }\n`;
+const FEATURE_JS = `import { RIDE_COUNTER } from '../subway.js?v=play-1';\nfunction board(engine) { engine.achievement(RIDE_COUNTER, 1); }\n`;
 const FEATURE_NO_COUNTER_JS = `function board(engine) { engine.setData('subwayRide', 1); }\n`;
 
 const SUBWAYFARER = { id: 'subwayfarer', name: 'Subwayfarer', desc: 'Rode the subway rails 23 times', category: 'exploring', isSecret: false, conditions: [{ type: 'counter', group: 'transit', name: 'subways_entered', num: 23 }] };

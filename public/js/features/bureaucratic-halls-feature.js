@@ -99,8 +99,9 @@ function spawnHall(engine, kit) {
   });
   const counter = kit.sprite(COUNTER_ART);
   counter.anchor.set(0.5, 1);
-  counter.position.set(830, ROOM.ground);
-  counter.width = 1020;
+  // x 620-1480 as in game.js spawnLegalizeHall: clear of the doors and the waiting-area chairs.
+  counter.position.set(1050, ROOM.ground);
+  counter.width = 860;
   counter.height = 132;
   counter.zIndex = 44;
   counter.eventMode = 'none';

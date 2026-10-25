@@ -2029,9 +2029,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 447,
+  "commits": 449,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Enter presses a dialog's focused OK instead of reopening the menu behind it"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Loading cards for streets with no picture show the street name plainly, not across an empty box"
+   },
    {
     "date": "2026-10-25",
     "kind": "improve",
@@ -2141,19 +2151,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Prompts time out as the source did, and you can pick rooms behind doors on the Map"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The loading card shows before croak, Pooped and award cards, and routes go through doors"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Feats open again a game week after you finish them, for another rock"
    }
   ]
  },
- "tests": 259,
+ "tests": 260,
  "generatedAt": "2026-10-25"
 }

@@ -431,18 +431,6 @@ function groundAt(engine, x, refY) {
     ?? engine.groundY;
 }
 
-function makeGlow(engine, x, y, color = 0xffb347, radius = 46) {
-  const g = new engine.PIXI.Graphics();
-  for (let i = 5; i >= 1; i -= 1) {
-    g.circle(0, 0, (radius * i) / 5).fill({ color: color, alpha: 0.05 + (5 - i) * 0.012 });
-  }
-  g.x = x;
-  g.y = y;
-  g.blendMode = 'add';
-  g.zIndex = 4;
-  engine.entityLayer.addChild(g);
-  return g;
-}
 
 function lanternCount(engine) {
   const w = engine.worldW || 2000;
@@ -464,7 +452,8 @@ function spawnLantern(engine, pt, index) {
   spr._worldHitW = 70;
   spr._worldHitH = 70;
   engine.entityLayer.addChild(spr);
-  const glow = makeGlow(engine, spr.x, y - 22);
+  // No ring round the lantern: Tiny Speck's lit pumpkin art (pumpkin_lit_N.fla) glows only inside its face.
+  const glow = null;
   const target = engine.register({
     classId: litClass(face),
     featureId: SEASONS_FEATURE_ID,
@@ -598,7 +587,7 @@ function spawnPlaced(engine, row) {
     spr.gotoAndStop(0);
   }
   engine.entityLayer.addChild(spr);
-  const glow = lit ? makeGlow(engine, spr.x, y - 22) : null;
+  const glow = null; // lit or not: the art's own lit face is the glow (pumpkin_lit_N.fla)
   const target = engine.register({
     classId: row.cls,
     featureId: SEASONS_FEATURE_ID,

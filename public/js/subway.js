@@ -325,7 +325,9 @@ export const canDisembark = (ride) => !!ride && ride.phase === 'stopped';
  */
 export const STATION_FLOOR = -136;
 export const STATION_BOUNDS = Object.freeze({ l: -960, r: 850, t: -640, b: -50 });
-export const STATION_X = Object.freeze({ stairs: -860, crack: -690, sign: -500, column: -330, map: -150, arrive: 0, crack2: 130, train: 210, post: 420, gate: 560 });
+// The stairs' flat back stands flush with the station's left end (l -960 + 132 / 2), as in the footage;
+// 34 px further in, their cut-off side showed (Austin, 2026-10-25).
+export const STATION_X = Object.freeze({ stairs: -894, crack: -690, sign: -500, column: -330, map: -150, arrive: 0, crack2: 130, train: 210, post: 420, gate: 560 });
 
 const art = (piece, x, y, z, extra = {}) => {
   const [, w, h] = SUBWAY_ART[piece] || [null, 0, 0];

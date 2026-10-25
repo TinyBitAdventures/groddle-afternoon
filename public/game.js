@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-90';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-91';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -926,37 +926,38 @@ const SHEETS = {
     url: 'assets/sprites/npc_butterfly__x1_rest-angle1_png_1354829530.png',
     fw: 70, fh: 65, cols: 6, rows: 1,
   },
+  // The sheets end in empty cells (idle 57 of 60, talk 26 of 27): played, the clerks vanished each loop.
   bureaucrat0Idle: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_idle1_png_1354832995.png',
-    fw: 97, fh: 89, cols: 10, rows: 6,
+    fw: 97, fh: 89, cols: 10, rows: 6, frameCount: 57,
   },
   bureaucrat0Talk: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_01_glasses_none_hair_01_legs_01_necklace_none_tie_01_torso_01_x1_talk_png_1354832993.png',
-    fw: 97, fh: 89, cols: 9, rows: 3,
+    fw: 97, fh: 89, cols: 9, rows: 3, frameCount: 26,
   },
   bureaucrat1Idle: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_idle1_png_1354833004.png',
-    fw: 97, fh: 91, cols: 10, rows: 6,
+    fw: 97, fh: 91, cols: 10, rows: 6, frameCount: 57,
   },
   bureaucrat1Talk: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_02_glasses_none_hair_02_legs_02_necklace_none_tie_02_torso_02_x1_talk_png_1354833002.png',
-    fw: 97, fh: 91, cols: 9, rows: 3,
+    fw: 97, fh: 91, cols: 9, rows: 3, frameCount: 26,
   },
   bureaucrat2Idle: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_idle1_png_1354833012.png',
-    fw: 97, fh: 96, cols: 10, rows: 6,
+    fw: 97, fh: 96, cols: 10, rows: 6, frameCount: 57,
   },
   bureaucrat2Talk: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_03_glasses_none_hair_04_legs_03_necklace_01_tie_none_torso_03_x1_talk_png_1354833010.png',
-    fw: 97, fh: 96, cols: 9, rows: 3,
+    fw: 97, fh: 96, cols: 9, rows: 3, frameCount: 26,
   },
   bureaucrat3Idle: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_idle1_png_1354833021.png',
-    fw: 97, fh: 101, cols: 10, rows: 6,
+    fw: 97, fh: 101, cols: 10, rows: 6, frameCount: 57,
   },
   bureaucrat3Talk: {
     url: 'assets/sprites/quests/legalize/npc_bureaucrat_arms_04_glasses_none_hair_05_legs_04_necklace_02_tie_none_torso_04_x1_talk_png_1354833019.png',
-    fw: 97, fh: 101, cols: 9, rows: 3,
+    fw: 97, fh: 101, cols: 9, rows: 3, frameCount: 26,
   },
   quoin: {
     url: QUOIN_SHEET.url,
@@ -11660,7 +11661,8 @@ function drawBureaucraticHall() {
     room.lineTo(x + 60, 760);
   }
   room.stroke({ width: 2, color: 0xb9b3a1, alpha: 0.5 });
-  for (const x of [90, 180, 270, 360]) {
+  // Chairs and plaque start right of the hall's glass doors (bureaucratic-halls-feature EXIT_X 70, about 190 px wide).
+  for (const x of [250, 340, 430, 520]) {
     room.roundRect(x, 526, 58, 15, 6);
     room.roundRect(x + 5, 541, 48, 36, 5);
     room.rect(x + 11, 575, 6, 45);
@@ -11677,9 +11679,9 @@ function drawBureaucraticHall() {
     align: 'center',
   } });
   waiting.anchor.set(0.5);
-  waiting.position.set(255, 460);
+  waiting.position.set(415, 460);
   const plaque = new PIXI.Graphics();
-  plaque.roundRect(195, 420, 120, 76, 5).fill(0x4a4b46);
+  plaque.roundRect(355, 420, 120, 76, 5).fill(0x4a4b46);
   layer.addChild(plaque, waiting);
 
   const tv = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_tv_1.png'));
@@ -11753,7 +11755,8 @@ function makeLegalizeBureaucrat(index, x, y, scale = 0.86) {
   spr.anchor.set(0.5, 1);
   spr.position.set(x, y);
   spr.scale.set(scale);
-  spr.animationSpeed = 0.18;
+  // The sheets are the SWF's 30 fps frames (sprite-sheets.js pixiSpeed); slower, the idle's blink came every 8 s.
+  spr.animationSpeed = 0.5;
   spr.loop = true;
   spr.autoUpdate = true;
   spr.play();
@@ -11765,7 +11768,7 @@ function setLegalizeBureaucratAnimation(target, mode = 'idle', durationMs = 0) {
   const spr = target?.sprite;
   if (!(spr instanceof PIXI.AnimatedSprite)) return;
   spr.textures = mode === 'talk' ? spr.texturesTalk : spr.texturesIdle;
-  spr.animationSpeed = mode === 'talk' ? 0.24 : 0.12;
+  spr.animationSpeed = 0.5;
   spr.gotoAndPlay(0);
   spr._legalizeAnimation = mode;
   spr._legalizeAnimationUntil = durationMs ? Date.now() + durationMs : 0;
@@ -11939,8 +11942,9 @@ function spawnLegalizeHall() {
   });
   const counter = new PIXI.Sprite(textureFromUrl('assets/decos/groddle/bureaucratic_hall_counter_1.png'));
   counter.anchor.set(0.5, 1);
-  counter.position.set(830, GROUND_Y);
-  counter.width = 1020;
+  // x 620-1480: behind the four clerks, clear of the waiting-area chairs (x 250-578).
+  counter.position.set(1050, GROUND_Y);
+  counter.width = 860;
   counter.height = 132;
   counter.zIndex = 44;
   counter.eventMode = 'none';
