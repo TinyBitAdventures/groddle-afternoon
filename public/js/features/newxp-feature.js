@@ -112,7 +112,7 @@ import * as kit from '../quest-rooms/kit.js?v=qi-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g273-1';
-import { HOME_MACHINE } from '../home-ticket.js?v=g268-1';
+import { HOME_MACHINE } from '../home-ticket.js?v=g288-1';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 const ART = 'assets/sprites/newxp/';

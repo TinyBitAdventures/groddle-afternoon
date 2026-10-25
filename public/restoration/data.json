@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 471,
+  "commits": 472,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "Sharp making-tool and machine animations, and the Fruit Changing Machine plays all 90 frames"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Enter presses a dialog's focused OK instead of reopening the menu behind it"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Loading cards for streets with no picture show the street name plainly, not across an empty box"
    }
   ]
  },

@@ -21,23 +21,22 @@
 export const HOME_STREET_TSID = 'RH_HOME_EXT';
 export const HOME_INTERIOR_TSID = 'RH_HOME_INT';
 
+// The three home styles; no blurbs (Austin, desk STYLECOPY): the Selection Machine had none
+// (homestreet_ticket_dispenser.js description is empty), only "Pick <Style> Style".
 export const HOME_STYLES = Object.freeze({
   meadow: Object.freeze({
     id: 'meadow',
     label: 'Meadow',
-    description: 'Soft Groddle grass, open sky, and a very optimistic fence.',
     accent: '#74b957',
   }),
   firebog: Object.freeze({
     id: 'firebog',
     label: 'Firebog',
-    description: 'Warm peat, luminous spores, and pleasantly unreasonable roots.',
     accent: '#d06d55',
   }),
   uralia: Object.freeze({
     id: 'uralia',
     label: 'Uralia',
-    description: 'Dusky stone, purple scrub, and a mysterious amount of moss.',
     accent: '#8667b5',
   }),
 });

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-6';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-110';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-111';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -425,7 +425,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=player-save-13';
+} from './js/player-save.js?v=player-save-14';
 import {
   HOME_INTERIOR_TSID,
   HOME_STREET_TSID,
@@ -436,8 +436,8 @@ import {
   enterHomeInterior,
   leaveHomeInterior,
   imagineHome,
-} from './js/homes.js?v=homes-mail-3';
-import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g268-1';
+} from './js/homes.js?v=homes-mail-4';
+import { HOME_MACHINE, offerHomeTicket, renderTicketMachine } from './js/home-ticket.js?v=g288-1';
 import {
   MAIL_COMPANIONS,
   archiveMail,
@@ -17934,7 +17934,7 @@ function renderHomePanel() {
       <div class="home-owned-mark" aria-hidden="true">⌂</div>
       <div>
         <h3>Your ${escapeHtml(style.label)} home</h3>
-        <p>${escapeHtml(style.description)} ${escapeHtml(locationCopy)}</p>
+        <p>${escapeHtml(locationCopy)}</p>
       </div>
     </div>
     <div class="home-owned-actions">
