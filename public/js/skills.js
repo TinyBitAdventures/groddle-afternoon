@@ -7,6 +7,16 @@
  * - paused progress and active completion timestamps persist across sessions
  * - time quoins, shrine favor and emblems accelerate the active study, up to
  *   half its remaining time
+ * - G205, when acceleration is lost or kept (inc_skills.js 732-1067):
+ *   the speed-up itself is spent at once (the end moves earlier), so pausing,
+ *   switching or unlearning keeps every second of it in the paused points.
+ *   A pause also keeps the row's is_accelerated flag (776-778, 614-617 never
+ *   clear it), and resuming a flagged row marks it accelerated to its end
+ *   (824-830), which leaves no room for more speed-ups until it finishes. A
+ *   fresh start is never accelerated (832-835). The one skills_stop_acceleration
+ *   timer is not cancelled by a switch (only 1007, 1958), so it still fires at
+ *   the old acceleration end and clears the flag of whatever is studying then
+ *   (1003-1023); `accelerationStopAt` keeps that pending timer.
  */
 
 import { getSkillCatalog } from './content-catalogs.js';
@@ -33,6 +43,29 @@ function cleanLearned(value) {
 function cleanTimeFactor(value) {
   const n = finite(value, 1);
   return n > 0 && n < 1000 ? n : 1;
+}
+
+/**
+ * The pending skills_stop_acceleration timer (inc_skills.js 983, 1056): when
+ * it is due, it clears the flag of the study that is active at that moment.
+ * Every change below fires it first, so the active row now is the one that
+ * was active when it came due.
+ */
+function fireAccelerationStop(state, now) {
+  const stopAt = finite(state?.accelerationStopAt, 0);
+  if (!stopAt || stopAt > now) return;
+  for (const row of Object.values(state.queue || {})) {
+    if (row && !row.isPaused) row.acceleratedUntil = Math.min(finite(row.acceleratedUntil, 0), stopAt);
+  }
+  state.accelerationStopAt = 0;
+}
+
+/** The active row's acceleration end with a due stop timer applied (read only). */
+function effectiveAcceleratedUntil(state, row, now) {
+  if (!row || row.isPaused) return 0;
+  const until = Math.max(0, finite(row.acceleratedUntil, 0));
+  const stopAt = finite(state?.accelerationStopAt, 0);
+  return stopAt && stopAt <= now ? Math.min(until, stopAt) : until;
 }
 
 function resolveTimeFactor(ctx, def) {
@@ -75,10 +108,13 @@ export function normalizeSkillState(seed = {}) {
       pausedAt: isPaused ? Math.max(0, Math.floor(finite(rawRow.pausedAt, 0))) : 0,
       isPaused,
       acceleratedUntil: isPaused ? 0 : Math.max(0, Math.floor(finite(rawRow.acceleratedUntil, 0))),
+      // GSJS keeps is_accelerated on a paused queue row (see the header).
+      pausedAccelerated: isPaused && rawRow.pausedAccelerated === true,
       timeFactor,
     };
   }
-  return { learned, queue };
+  const accelerationStopAt = Math.max(0, Math.floor(finite(seed?.accelerationStopAt, 0)));
+  return { learned, queue, accelerationStopAt };
 }
 
 export function createSkillState(seed = {}) {
@@ -150,13 +186,15 @@ export function getStudyStatus(state, classTsid, now = Date.now()) {
   const remainingSeconds = row.isPaused
     ? Math.max(1, Math.ceil((row.pointsRemaining / SKILL_POINTS_PER_SECOND) * factor))
     : Math.max(0, Math.ceil((row.endsAt - now) / 1000));
+  const acceleratedUntil = effectiveAcceleratedUntil(state, row, now);
   return {
     ...row,
+    acceleratedUntil,
     totalSeconds,
     remainingSeconds,
     elapsedSeconds: Math.max(0, totalSeconds - remainingSeconds),
     progress: Math.max(0, Math.min(1, (totalSeconds - remainingSeconds) / totalSeconds)),
-    isAccelerated: !row.isPaused && row.acceleratedUntil > now,
+    isAccelerated: !row.isPaused && acceleratedUntil > now,
   };
 }
 
@@ -171,12 +209,19 @@ export function getActiveStudy(state, now = Date.now()) {
   return listStudyQueue(state, now).find((row) => !row.isPaused) || null;
 }
 
+/**
+ * Pause one study (skills_train 774-778, skills_unlearn 611-617): its points
+ * keep the time left, speed-ups included, and the row keeps is_accelerated.
+ */
 export function pauseSkillStudy(state, classTsid, now = Date.now()) {
   const row = state.queue?.[classTsid];
   if (!row) return { ok: false, reason: 'not_queued' };
   if (row.isPaused) return { ok: false, reason: 'already_paused' };
   const remainingSeconds = Math.max(0, (row.endsAt - now) / 1000);
   if (remainingSeconds <= 0) return tickSkillStudy(state, now);
+  fireAccelerationStop(state, now);
+  // skills_get_queue 1360-1364 has already cleared a lapsed flag by now.
+  const wasAccelerated = finite(row.acceleratedUntil, 0) > now;
   row.pointsRemaining = Math.max(
     1,
     Math.ceil((remainingSeconds * SKILL_POINTS_PER_SECOND) / cleanTimeFactor(row.timeFactor))
@@ -186,12 +231,20 @@ export function pauseSkillStudy(state, classTsid, now = Date.now()) {
   row.pausedAt = now;
   row.isPaused = true;
   row.acceleratedUntil = 0;
-  return { ok: true, reason: 'paused', classTsid, remainingSeconds: row.pointsRemaining / SKILL_POINTS_PER_SECOND };
+  row.pausedAccelerated = wasAccelerated;
+  return {
+    ok: true,
+    reason: 'paused',
+    classTsid,
+    wasAccelerated,
+    remainingSeconds: row.pointsRemaining / SKILL_POINTS_PER_SECOND,
+  };
 }
 
 /** Start a new study or resume paused progress; active study is paused first. */
 export function startSkillStudy(state, classTsid, ctx = {}, now = Date.now()) {
   const due = tickSkillStudy(state, now);
+  fireAccelerationStop(state, now);
   const check = canLearnSkill(state, classTsid, ctx);
   if (!check.ok) return { ...check, completed: due.completed };
   const pausedIds = [];
@@ -206,21 +259,27 @@ export function startSkillStudy(state, classTsid, ctx = {}, now = Date.now()) {
   const pointsRemaining = existing?.pointsRemaining || totalPoints;
   const timeFactor = resolveTimeFactor(ctx, check.def);
   const durationSeconds = Math.max(1, Math.round((pointsRemaining / SKILL_POINTS_PER_SECOND) * timeFactor));
+  const endsAt = now + durationSeconds * 1000;
+  // skills_train 824-830: a resumed row that was accelerated when paused is
+  // accelerated to its end; a new start (832-835) is not accelerated.
+  const keepsAcceleration = Boolean(existing?.isPaused && existing.pausedAccelerated);
   state.queue[classTsid] = {
     classTsid,
     totalPoints: existing?.totalPoints || totalPoints,
     pointsRemaining,
     startedAt: existing?.startedAt || now,
-    endsAt: now + durationSeconds * 1000,
+    endsAt,
     resumedAt: now,
     pausedAt: 0,
     isPaused: false,
-    acceleratedUntil: existing?.acceleratedUntil > now ? existing.acceleratedUntil : 0,
+    acceleratedUntil: keepsAcceleration ? endsAt : 0,
+    pausedAccelerated: false,
     timeFactor,
   };
   return {
     ok: true,
     reason: existing ? 'resumed' : 'started',
+    accelerated: keepsAcceleration,
     def: check.def,
     durationSeconds,
     timeFactor,
@@ -265,6 +324,7 @@ export function learnSkill(state, classTsid, _pc = null, ctx = {}) {
 
 /** Complete any due active study. Absolute timestamps make offline study work. */
 export function tickSkillStudy(state, now = Date.now()) {
+  fireAccelerationStop(state, now);
   const completed = [];
   for (const [classTsid, row] of Object.entries(state.queue || {})) {
     if (row.isPaused || row.endsAt > now) continue;
@@ -308,10 +368,16 @@ export function accelerateActiveStudy(state, seconds, now = Date.now(), opts = {
     ? Math.max(0, Math.floor(active.remainingSeconds))
     : maxStudyAcceleration(state, now);
   const applied = Math.min(requested, maximum);
-  if (!applied) return { ok: false, reason: 'max_acceleration', requested, maximum, classTsid: active.classTsid };
   const row = state.queue[active.classTsid];
+  if (!applied) {
+    // quoin.js 202 calls skills_start_acceleration even at the maximum; its
+    // zero reschedule (1052-1056) re-arms the stop timer at the row's end.
+    if (active.isAccelerated) state.accelerationStopAt = row.acceleratedUntil;
+    return { ok: false, reason: 'max_acceleration', requested, maximum, classTsid: active.classTsid };
+  }
   row.endsAt = Math.max(now + 100, row.endsAt - applied * 1000);
   row.acceleratedUntil = Math.max(row.acceleratedUntil || 0, now) + applied * 1000;
+  state.accelerationStopAt = row.acceleratedUntil;
   const tick = tickSkillStudy(state, now);
   return {
     ok: true,

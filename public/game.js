@@ -19749,7 +19749,7 @@ function renderSkillsPanel() {
 }
 
 /** Start, resume, or pause one study from the Skills panel. */
-function runSkillStudyAction(classTsid, action) {
+function runSkillStudyAction(classTsid, action, confirmed = false) {
   const def = getSkillCatalog()[classTsid];
   const name = skillTitle(def) || classTsid;
   // skills_train refuses while a skill is being unlearned.
@@ -19759,23 +19759,67 @@ function runSkillStudyAction(classTsid, action) {
     renderSkillsPanel();
     return;
   }
+  // G205: ImaginationSkillDetailsUI.as onLearnClick 300-320 asks before an
+  // accelerated study is paused by a switch; the remake's Pause asks too.
+  const active = confirmed ? null : getActiveStudy(skillState, Date.now());
+  const pausesActive = action === 'pause' ? active?.classTsid === classTsid : active && active.classTsid !== classTsid;
+  if (active?.isAccelerated && pausesActive) {
+    confirmAcceleratedStudyPause(classTsid, action, active);
+    return;
+  }
   const result = action === 'pause'
     ? pauseSkillStudy(skillState, classTsid, Date.now())
     : startSkillStudy(skillState, classTsid, skillStudyContext(), Date.now());
   if (result.completed?.length) handleSkillCompletions(result.completed);
+  // skills_train 791: the switched-away study is announced first.
+  for (const id of result.pausedIds || []) {
+    pushActivity(`You paused learning ${skillTitle(getSkillCatalog()[id]) || id}.`);
+  }
   if (result.ok && action === 'start' && result.reason === 'started') {
     playSound('BEGIN_LEARNING_SKILL', { volume: 0.6 });
     toast(`Started studying ${name} · ${formatStudyTime(result.durationSeconds)}`);
-    pushActivity(`You started learning ${name}. It will continue while you explore — and while you are away.`);
+    // inc_skills.js 857 and the 914 learning note.
+    pushActivity(`You started learning ${name}. Skill learning will continue while you do other things. It even goes on when you're not playing the game.`);
   } else if (result.ok) {
     const verb = action === 'pause' ? 'Paused' : 'Resumed';
     toast(`${verb} ${name}.`);
-    pushActivity(`${verb} learning ${name}.`);
+    // inc_skills.js 791 and 849.
+    pushActivity(`You ${verb.toLowerCase()} learning ${name}.`);
   } else {
     toast(`Cannot study ${name} yet.`);
   }
   updateHud();
   renderSkillsPanel();
+}
+
+/**
+ * ImaginationSkillDetailsUI.as 306-319: the ConfirmationDialog before an
+ * accelerated study is paused. The Pause button's "Yup, pause it" is remake
+ * copy (the original had no pause button, only a switch).
+ */
+function confirmAcceleratedStudyPause(classTsid, action, active) {
+  const activeName = skillTitle(getSkillCatalog()[active.classTsid]) || active.classTsid;
+  const primary = action === 'pause' ? 'Yup, pause it' : 'Yup, start learning!';
+  app.canvas.dataset.skillSpeedConfirm = action;
+  openScriptedQuestDialogue({
+    title: 'Stop your accelerated learning?',
+    kicker: 'Skills',
+    cancelable: true,
+    primaryLabel: primary,
+    cancelLabel: 'No, nevermind',
+    beats: [{
+      text: `Are you sure you want to pause learning ${activeName}? You will lose your accelerated learning speed if you do.`,
+      response: primary,
+    }],
+    onComplete: () => {
+      app.canvas.dataset.skillSpeedConfirm = 'yes';
+      runSkillStudyAction(classTsid, action, true);
+    },
+    onCancel: () => {
+      app.canvas.dataset.skillSpeedConfirm = 'no';
+      renderSkillsPanel();
+    },
+  });
 }
 
 /** emblem_base spend: trade one pack emblem for its skill-unlock badge. */

@@ -3609,6 +3609,18 @@ html[data-street-cards] .activity-feed { visibility: hidden; }
 }
 .skill-link:hover { color: #2c5a1c; }
 .skill-meta { color: #8a8379; font-size: 0.7rem; margin-bottom: 0.15rem; }
+/* G205: the switch note above Start/Resume (ImaginationSkillDetailsUI.as 222-232). */
+.skill-switch-note {
+  margin-top: 0.4rem;
+  border-left: 3px solid #d6b986;
+  background: #fff8e9;
+  border-radius: 0 6px 6px 0;
+  padding: 0.3rem 0.45rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #6d5226;
+}
+.skill-switch-note.is-accelerated { border-left-color: #c96a5e; background: #fff1ef; color: #8a3a31; font-weight: 700; }
 .skill-action { width: 100%; margin-top: 0.4rem; padding: 0.38rem 0.55rem; }
 .skill-action.btn-glitch-primary { color: #fff; }
 .skill-emblem-btn { border-color: #b79ad6; background: #f1e9fb; color: #5a3d7a; }

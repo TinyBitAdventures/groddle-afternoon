@@ -126,6 +126,35 @@ function rankPips(family, state) {
   return pips;
 }
 
+/**
+ * ImaginationSkillDetailsUI.as setLearnButton 222-232: while another skill is
+ * studying, starting or resuming this one pauses it, and an accelerated study
+ * warns that the speed goes with it. The original showed this as the learn
+ * button's tooltip; here it sits above the button and is its title too.
+ */
+export function switchStudyNote(entry, active) {
+  if (!active || active.classTsid === entry.classTsid) return null;
+  if (entry.status !== 'available' && entry.status !== 'paused') return null;
+  if (active.isAccelerated) {
+    return {
+      kind: 'accelerated',
+      lines: ["You're learning at an accelerated rate.", 'Switching to start this skill will lose that speed!'],
+    };
+  }
+  const name = skillTitle(getSkillCatalog()[active.classTsid]) || active.classTsid;
+  return { kind: 'paused', lines: [`Your progress on ${name} will be paused`] };
+}
+
+function switchNoteNode(note) {
+  const node = el('div', `skill-switch-note is-${note.kind}`);
+  node.dataset.switchNote = note.kind;
+  note.lines.forEach((line, index) => {
+    if (index) node.appendChild(document.createElement('br'));
+    node.appendChild(document.createTextNode(line));
+  });
+  return node;
+}
+
 function actionButton(entry, ctx, actions) {
   const btn = el('button', 'content-action-btn skill-action');
   btn.type = 'button';
@@ -247,7 +276,7 @@ function rowHint(entry) {
   return null;
 }
 
-function skillRow(entry, ctx, actions, rerender) {
+function skillRow(entry, ctx, actions, rerender, active = null) {
   const open = ui.expanded.has(entry.classTsid);
   const row = el('div', `skill-row is-${entry.status}${open ? ' is-open' : ''}`);
   row.dataset.skill = entry.classTsid;
@@ -324,6 +353,12 @@ function skillRow(entry, ctx, actions, rerender) {
   if (giants.length) meta.push(giants.join(', '));
   body.appendChild(el('div', 'skill-meta', meta.join(' · ')));
   const btn = actionButton(entry, ctx, actions);
+  const note = btn && !btn.disabled ? switchStudyNote(entry, active) : null;
+  if (note) {
+    body.appendChild(switchNoteNode(note));
+    btn.title = note.lines.join('\n');
+    btn.dataset.switchNote = note.kind;
+  }
   if (btn) body.appendChild(btn);
   const unlearn = unlearnButton(entry, ctx, actions, rerender);
   if (unlearn) body.appendChild(unlearn);
@@ -429,7 +464,9 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
     }
     study.appendChild(card);
   }
-  for (const row of listStudyQueue(state, now)) {
+  const queueRows = listStudyQueue(state, now);
+  const active = queueRows.find((row) => !row.isPaused) || null;
+  for (const row of queueRows) {
     const def = getSkillCatalog()[row.classTsid];
     if (!def) continue;
     const card = el('div', `skill-study-card ${row.isPaused ? 'paused' : 'studying'}`);
@@ -447,8 +484,8 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
       const giants = studyGiantsLine(def, ctx);
       if (giants) {
         const line = el('div', 'skill-study-time skill-study-giants', giants);
-        // items/include/shrines.js giant_tips[3]
-        line.title = 'Spending favor with any Giant speeds up skill learning — but spending favor with the Primary Giant of a given skill will speed it up the most.';
+        // items/include/shrines.js giant_tips[3] (its dash made a comma, house style)
+        line.title = 'Spending favor with any Giant speeds up skill learning, but spending favor with the Primary Giant of a given skill will speed it up the most.';
         card.appendChild(line);
       }
     }
@@ -477,7 +514,7 @@ export function renderSkillTreePanel({ box, meta, state, ctx, actions, now = Dat
         head.appendChild(rankPips(family, state));
         fam.appendChild(head);
       }
-      for (const entry of family.entries) fam.appendChild(skillRow(entry, ctx, actions, rerender));
+      for (const entry of family.entries) fam.appendChild(skillRow(entry, ctx, actions, rerender, active));
       section.appendChild(fam);
     }
     list.appendChild(section);
