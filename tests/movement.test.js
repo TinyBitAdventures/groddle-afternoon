@@ -260,7 +260,8 @@ test.describe('smooth directional camera and client wiring', () => {
     assert.match(game, /cameraTargetForPlayer\(player\.x, player\.vx/);
     assert.match(game, /dataset\.cameraRightInset/);
     assert.match(game, /clampWorldOverlayX\(prompt\.x, prompt\.width/);
-    assert.match(game, /clampWorldOverlayX\(spr\.x, meta\.width/);
+    // G214: the class offset_x moves the bubble (js/speech-placement.js).
+    assert.match(game, /clampWorldOverlayX\(spr\.x \+ offset\.x, meta\.width/);
     assert.match(game, /dataset\.actionSafeRight/);
     assert.match(game, /dataset\.promptWidth/);
     assert.match(game, /dataset\.speechWidth/);

@@ -535,7 +535,9 @@ test.describe('conversations against GameServerJS (G185)', () => {
   test('speech bubbles clamped onto a speaker hang under its feet instead', () => {
     const game = readFileSync(join(ROOT, 'public/game.js'), 'utf8');
     const fn = game.slice(game.indexOf('function positionSpeechBubble'), game.indexOf('function showSpeechBubble'));
-    assert.match(fn, /const flip = bubble\.y > spr\.y - spriteHeight && below \+ 11 \+ meta\.height <= cameraY \+ LOCATION_VIEW_H - 8;/);
+    // G214: the client's push over the speaker first (js/speech-placement.js placeSpeechTip, tests/speech-placement.test.js).
+    assert.match(fn, /belowFits: below \+ 11 \+ meta\.height <= cameraY \+ LOCATION_VIEW_H - 8,/);
+    assert.match(fn, /const flip = place\.flip;\n  bubble\.y = place\.tip;/);
     assert.match(fn, /bubble\.pivot\.y = flip \? -11 : meta\.height \+ 11;/);
     assert.match(game, /bubble\.addChild\(bg, tailDown, tailUp, speaker, body\);/);
   });

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-85';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-86';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -811,6 +811,7 @@ import { forgetTexture, frameTexture, isLoaded, onFailed, onLoaded, textureFromU
 import * as textureUrls from './js/textures.js';
 import { installPixiFixes } from './js/pixi-fixes.js';
 import { hidesChatBubble } from './js/hi-signs.js?v=hi-chat-1';
+import { giveArtHeight, placeSpeechTip, speechOffsetFor } from './js/speech-placement.js?v=g214-1';
 
 /** @type {object|null} assets/maps/index.json */
 let mapIndexCache = null;
@@ -4446,11 +4447,14 @@ function positionSpeechBubble(bubble) {
   const cameraX = Number.isFinite(camTarget) ? camTarget : 0;
   const cameraY = Number.isFinite(camY) ? camY : 0;
   // The speaker's art height when it knows it (a dressed Street Spirit: its
-  // sheet's crop, up to the 244 px Firebog, G202); otherwise the whole
-  // sprite's bounds, capped, since frames carry padding and name labels.
+  // sheet's crop, up to the 244 px Firebog, G202; animals, trees and Icons:
+  // the opaque top of their frames, G214); otherwise the whole sprite's
+  // bounds, capped, since frames carry padding and name labels.
   const artHeight = Number(meta.target.artHeight);
   const spriteHeight = artHeight > 0 ? artHeight : clamp(Math.abs(spr.height || 60), 36, 170);
-  bubble.x = clampWorldOverlayX(spr.x, meta.width, 12);
+  // The class's conversation_offset_x/y (G214, js/speech-placement.js): street spirits point 60 px into their art.
+  const offset = speechOffsetFor(meta.target);
+  bubble.x = clampWorldOverlayX(spr.x + offset.x, meta.width, 12);
   // The tail tip sits at bubble.y; the bubble's top is height + 11 above it.
   let lowestTip = cameraY + meta.height + 24;
   const pill = nameplateViewBox();
@@ -4458,12 +4462,20 @@ function positionSpeechBubble(bubble) {
   const underPill = Boolean(pill && left < pill.right + 8 && left + meta.width > pill.left - 8);
   if (underPill) lowestTip = Math.max(lowestTip, cameraY + pill.bottom + 8 + meta.height + 11);
   const highestTip = cameraY + LOCATION_VIEW_H - 18;
-  bubble.y = clamp(spr.y - spriteHeight - 12, Math.min(lowestTip, highestTip), highestTip);
-  // Clamped down onto the speaker (a short one near the top of the view): hang
-  // the bubble under its feet, tail up, when that fits (G185).
+  // Pushed down over the speaker as the client did (at most 120 px), else hung
+  // under the feet of a short one near the top of the view, tail up (G185).
   const below = spr.y + 6;
-  const flip = bubble.y > spr.y - spriteHeight && below + 11 + meta.height <= cameraY + LOCATION_VIEW_H - 8;
-  if (flip) bubble.y = below;
+  const place = placeSpeechTip({
+    want: spr.y - spriteHeight - 12 + offset.y,
+    minTip: lowestTip,
+    maxTip: highestTip,
+    artTop: spr.y - spriteHeight,
+    feet: spr.y,
+    below,
+    belowFits: below + 11 + meta.height <= cameraY + LOCATION_VIEW_H - 8,
+  });
+  const flip = place.flip;
+  bubble.y = place.tip;
   if (meta.flipped !== flip) {
     meta.flipped = flip;
     bubble.pivot.y = flip ? -11 : meta.height + 11;
@@ -4478,6 +4490,8 @@ function positionSpeechBubble(bubble) {
     app.canvas.dataset.speechBubble = `${Math.round(bubble.x)},${Math.round(bubble.y)}`;
     app.canvas.dataset.speechScreen = `${Math.round(bubble.x - cameraX)},${Math.round(bubble.y - cameraY)}`;
     app.canvas.dataset.speechSafeRight = horizontalLocationViewWidth().toFixed(2);
+    app.canvas.dataset.speechArt = `${Math.round(spriteHeight)}${artHeight > 0 ? '' : ':bounds'}`;
+    app.canvas.dataset.speechOffset = `${offset.x},${offset.y}`;
     app.canvas.dataset.speechWidth = Number(meta.width).toFixed(2);
   }
   return true;
@@ -7543,6 +7557,8 @@ function applyPlayerFacing() {
 }
 
 function register(target) {
+  // G214: animals, trees and Icons measure their art for speech bubbles.
+  giveArtHeight(target);
   interactables.push(target);
   wireInteractableSprite(target);
   return target;

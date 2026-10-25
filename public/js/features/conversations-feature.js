@@ -15,7 +15,9 @@
  *   include/mining.js isUseable 135-137), patch.js 654-662, npc_shrine_base
  *   (npc_shrine_alph.js 563-592), npc_chicken.js 1299-1325 (nothing while
  *   incubating), npc_piggy.js 1059-1079 via npc_animal 2595-2602, and the
- *   Icons' icon_base (items/include/icon.js 565-575). The source's hit boxes
+ *   Icons' icon_base (items/include/icon.js 565-575: the Icon's feature calls
+ *   tellerCollision, and an offer skips that collision's bestowment, G214).
+ *   The source's hit boxes
  *   are 400 x 400 (apiSetHitBox(400, 400) on all of them but the chicken,
  *   which sets none, the remake gives it a small one, and the Icons, 300 x
  *   250: icon_alph.js onCreate 315).
@@ -217,31 +219,41 @@ function publish(engine) {
   engine.setData('convoResume', resume.status);
 }
 
+/** A placed Icon: its own feature runs its collision (tellerCollision), offer first. */
+function isIcon(target) {
+  return String(target?.classId || '').startsWith('icon_');
+}
+
+/** One teller's onPlayerCollision offer; true when it offered and called out. */
+function collide(engine, target, now, busy) {
+  const cls = tellerClass(target);
+  if (!cls) return false;
+  const inside = inBox(engine.player, target);
+  const was = near.get(target) || false;
+  near.set(target, inside);
+  // Collision fires on the way in; dev QA keeps checking while the player stands there.
+  const entering = inside && (!was || (devRules(engine) && now >= (target._convoNextCheck || 0)));
+  if (!entering || busy) return false;
+  target._convoNextCheck = now + 1000;
+  if (tellerHolds(target) || rockSpent(target)) return false;
+  const res = offerFor(record(), cls, ctxFor(engine, now, target));
+  if (!res.id) {
+    lastHeld = `${cls}:${res.reason}`;
+    return false;
+  }
+  lastConvo = `offered:${cls}:${res.id}`;
+  engine.say(target, offerBubble(), CONVERSATION_RULES.bubbleMs);
+  engine.save();
+  return true;
+}
+
 /** onPlayerCollision for every teller on the street: the first one walked into this scan offers. */
 function scanOffers(engine, now) {
-  const p = engine.player;
-  if (!p || active) return;
+  if (!engine.player || active) return;
   const busy = engine.busy?.() || engine.transientInstance?.();
   for (const target of engine.interactables || []) {
-    const cls = tellerClass(target);
-    if (!cls) continue;
-    const inside = inBox(p, target);
-    const was = near.get(target) || false;
-    near.set(target, inside);
-    // Collision fires on the way in; dev QA keeps checking while the player stands there.
-    const entering = inside && (!was || (devRules(engine) && now >= (target._convoNextCheck || 0)));
-    if (!entering || busy) continue;
-    target._convoNextCheck = now + 1000;
-    if (tellerHolds(target) || rockSpent(target)) continue;
-    const res = offerFor(record(), cls, ctxFor(engine, now, target));
-    if (!res.id) {
-      lastHeld = `${cls}:${res.reason}`;
-      continue;
-    }
-    lastConvo = `offered:${cls}:${res.id}`;
-    engine.say(target, offerBubble(), CONVERSATION_RULES.bubbleMs);
-    engine.save();
-    return;
+    if (isIcon(target)) continue;
+    if (collide(engine, target, now, busy)) return;
   }
 }
 
@@ -519,6 +531,17 @@ export const conversationsFeature = {
     if (base.some((v) => v.id === 'talk_to' && v.label === 'talk to')) return null;
     const verb = { id: CONVO_TALK_VERB, label: 'talk to', sort: 45, tooltip: TALK_TOOLTIP, enabled: true, reason: '', energy: 0, durationMs: 0 };
     return [...base, verb].sort((a, b) => (a.sort ?? 50) - (b.sort ?? 50));
+  },
+
+  /**
+   * A placed Icon's onPlayerCollision (items/include/icon.js 565-575) runs
+   * through its feature every tick: the conversation offer comes first, and
+   * true (it offered) means no bestowment on that collision. null otherwise.
+   */
+  tellerCollision(target, engine) {
+    if (!isIcon(target) || !engine?.player || active) return null;
+    const busy = engine.busy?.() || engine.transientInstance?.();
+    return collide(engine, target, Date.now(), busy) ? true : null;
   },
 
   /** Talk to with a conversation offered runs it (true); otherwise the target's own Talk to (null). */

@@ -47,6 +47,7 @@
  */
 
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
+import { STREET_SPIRIT_SPEECH_OFFSET } from '../speech-placement.js?v=g214-1';
 import {
   STREET_SPIRIT_ART,
   STREET_SPIRIT_VARIANTS,
@@ -313,6 +314,10 @@ function dress(engine, target, variant, look) {
   // container's bounds with the name label, nor the 170 px cap for unknown
   // sprites: the large Firebog spirit is 244 px tall. The art stands 2 px low.
   target.artHeight = h - 2;
+  // Every Street Spirit's conversation_offset_x/y, 0 and 60 (street_spirit*.js
+  // classProps 26-27): its bubbles point 60 px down into its art, which keeps
+  // the Firebog's in view beside the player (G214, js/speech-placement.js).
+  target.speechOffset = STREET_SPIRIT_SPEECH_OFFSET;
   const def = STREET_SPIRIT_VARIANTS[variant];
   target.state.spiritVariant = variant;
   target.state.spiritClass = def.classTsid;

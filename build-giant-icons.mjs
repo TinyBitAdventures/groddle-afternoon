@@ -2,11 +2,13 @@
  * Build the Giant Icon catalog from Tiny Speck's GameServerJS (CC0).
  *
  * Reads:
- *   items/icon_<giant>.js     label, description, actions_capacity, and the
- *                             "Voices/Rituals/Books/Facts of the Giants"
- *                             talk_to conversations (linear chains, one
- *                             button per beat, 111 iMG on the last button)
+ *   items/icon_<giant>.js     label, description, actions_capacity
  *   items/emblem_<giant>.js   emblem label (iconize/caress/consider/contemplate)
+ *
+ * The Icons' conversations ("Voices/Rituals/Books/Facts of the Giants") are
+ * not here: since G202 they come from tools/build-conversations.mjs into
+ * public/js/conversations-data.js with every other teller's (G214 dropped the
+ * copy; tests/giant-icons.test.js parses the GSJS files to check that data).
  *
  * Writes:
  *   public/js/giant-icons-data.js   frozen ES module
@@ -34,25 +36,6 @@ const strVar = (src, name) => {
   return m ? unq(m[1]) : '';
 };
 
-function conversations(src, iconClass) {
-  const list = (src.match(/var conversations = \[([\s\S]*?)\];/) || [])[1] || '';
-  const ids = [...list.matchAll(/"([a-z0-9_]+)"/g)].map((m) => m[1]);
-  return ids.map((id) => {
-    const canOffer = src.match(new RegExp(`function conversation_canoffer_${id}\\(pc\\)\\{[\\s\\S]*?\\n\\}`))?.[0] || '';
-    const run = src.match(new RegExp(`function conversation_run_${id}\\(pc, msg, replay\\)\\{[\\s\\S]*?\\n\\}\\n`))?.[0] || '';
-    const level = Number(canOffer.match(/pc\.stats\.level >= (\d+)/)?.[1] || 0);
-    const after = canOffer.match(/conversations_has_completed\(null, "([a-z0-9_]+)"\)/)?.[1] || null;
-    const title = unq(run.match(/var conversation_title = "((?:[^"\\]|\\.)*)";/)?.[1] || '');
-    const beats = [];
-    // Each block: choices['N']['<id>-N-2'] = {txt: "...", ...}; then the text.
-    const blockRe = /choices\['(\d+)'\]\['[^']+'\] = \{txt: "((?:[^"\\]|\\.)*)"[\s\S]*?this\.conversation_(?:start|reply)\(pc, (?:msg, )?"((?:[^"\\]|\\.)*)"/g;
-    for (const m of run.matchAll(blockRe)) beats.push({ text: unq(m[3]), response: unq(m[2]) });
-    const xp = Number(run.match(/stats_add_xp\((\d+) \* msg\.count/)?.[1] || 0);
-    if (!beats.length) throw new Error(`${iconClass}: no beats in ${id}`);
-    return { id, title, level, after, beats, xp };
-  });
-}
-
 const icons = {};
 for (const giant of GIANTS) {
   const iconClass = `icon_${iconSuffix(giant)}`;
@@ -69,7 +52,6 @@ for (const giant of GIANTS) {
     emblemLabel: strVar(emblemSrc, 'label'),
     emblemPlural: strVar(emblemSrc, 'name_plural'),
     capacity,
-    conversations: conversations(src, iconClass),
   };
 }
 
@@ -80,4 +62,4 @@ const header = `/**
 
 `;
 writeFileSync(OUT, `${header}export const GIANT_ICON_DATA = Object.freeze(${JSON.stringify(icons, null, 2)});\n`);
-console.log(`wrote ${OUT}: ${Object.keys(icons).length} icons, ${Object.values(icons).reduce((n, i) => n + i.conversations.length, 0)} conversations`);
+console.log(`wrote ${OUT}: ${Object.keys(icons).length} icons`);

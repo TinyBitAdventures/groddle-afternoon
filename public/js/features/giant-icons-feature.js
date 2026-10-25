@@ -11,7 +11,8 @@
  *    favor) with the ICON_GIANT_LOVE sound and a heart burst; out of actions
  *    it asks for a tithe. From level 10 it calls out and offers its
  *    recorded "Voices of the Giants" message (111 iMG) by the source's
- *    conversation rules; Talk to then tells it (G202: the shared record,
+ *    conversation rules, and a walk-in that brings an offer bestows nothing
+ *    (include/icon.js 565-575, G214); Talk to then tells it (G202: the shared record,
  *    js/conversations.js, and features/conversations-feature.js, which owns
  *    the verb). Pick it back up any time.
  *  - The first Icon completes "Loyalty's Rich Reward" (icons_created, offered
@@ -23,12 +24,14 @@
  *     currants. &iconautoplay=1 iconizes, caresses/considers/contemplates,
  *     ruminates/reveres/reflects, tithes the Mab icon, places the Alph icon,
  *     walks into it with the source testing flag (always bestows), waits for
- *     its conversation offer, talks to it, answers every line and picks it
- *     up (add &convo=dev for the source's dev-server offer rules, otherwise
+ *     its conversation offer (that collision bestows nothing, G214), talks
+ *     to it, answers every line, walks out and back in for a bestowment and
+ *     picks it up (add &convo=dev for the source's dev-server offer rules, otherwise
  *     the offer waits 5 minutes after load and on donate_to_all_shrines).
  *     &icontesting=1 alone keeps placed icons in testing
  *     mode; &iconlover=1 adds 11 emblems of every Giant. Canvas: iconPack,
- *     iconPlaced, iconLast, iconBestowed, iconAutoplay, iconActions.
+ *     iconPlaced, iconLast, iconBestowed, iconAutoplay, iconActions,
+ *     iconOfferCollisions (walk-ins that offered instead of bestowing).
  */
 
 import { addItem, countItem, ensureItem } from '../inventory.js?v=catalog-unified-4';
@@ -67,6 +70,7 @@ import { textureFromUrl } from '../textures.js';
 import { verticalTextGradient } from '../text-gradient.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { CONVERSATION_RULES, adoptLegacyTalks, conversationRecord, hasCompleted, toldRecord } from '../conversations.js?v=g202-1';
+import { TELLERS } from '../conversations-data.js?v=g202-1';
 
 export const ICONS_FEATURE_ID = 'giant-icons';
 const WORLD_ART = (iconClass) => `assets/sprites/giant-icons/${iconClass}.png`;
@@ -82,6 +86,8 @@ let autoplayAt = 0;
 let autoplayStep = 0;
 let autoplayLog = [];
 let autoplayTalkUntil = 0;
+/** Collisions that made a conversation offer instead of a bestowment (QA: iconOfferCollisions). */
+let offerCollisions = 0;
 
 const dayKey = () => getGameDayKey(Date.now());
 const owned = (engine) => engine.pc?.imaginationUpgrades || [];
@@ -377,6 +383,10 @@ const AUTOPLAY = [
   ['wait'],
   ['talk'],
   ['answer'],
+  // G214: the walk-in that brought the offer bestowed nothing; walk out and in again for one.
+  ['away'],
+  ['walk'],
+  ['wait'],
   ['pick'],
 ];
 
@@ -407,6 +417,10 @@ function autoplay(engine, now) {
       engine.player.x = v.sprite.x - 20;
     }
     autoplayLog.push('walk');
+  } else if (step[0] === 'away') {
+    const v = views[views.length - 1];
+    if (v) engine.player.x = v.sprite.x + 600;
+    autoplayLog.push('away');
   } else if (step[0] === 'wait') {
     autoplayAt = now + 2500;
   } else if (step[0] === 'talk') {
@@ -430,7 +444,7 @@ function autoplay(engine, now) {
       return publish(engine);
     }
     const v = views[views.length - 1];
-    const id = GIANT_ICON_DATA[v?.row.giant]?.conversations[0]?.id;
+    const id = TELLERS[GIANT_ICON_DATA[v?.row.giant]?.iconClass]?.list[0];
     autoplayLog.push(`told:${id && hasCompleted(conversationRecord(), id) ? id : 'none'}`);
   } else if (step[0] === 'pick') {
     const v = views[views.length - 1];
@@ -487,8 +501,20 @@ export const giantIconsFeature = {
     for (const v of views) {
       v.t += dtMs / 1000;
       v.sprite.y = v.baseY - 3 - Math.sin(v.t * 1.6) * 3;
-      if (!p || engine.busy?.()) continue;
-      if (Math.abs(p.x - v.sprite.x) <= COLLIDE_W && Math.abs((p.y || 0) - v.baseY) <= COLLIDE_H) bestowFor(engine, v, now);
+      if (!p) continue;
+      // include/icon.js onPlayerCollision 565-575: a conversation offer comes
+      // first and returns, so that collision bestows nothing (G214). The
+      // conversations feature keeps its own hit box and enter edge.
+      if (engine.query?.('tellerCollision', v.target, engine) === true) {
+        v.offered = true;
+        offerCollisions += 1;
+        engine.setData?.('iconOfferCollisions', String(offerCollisions));
+      }
+      const inside = Math.abs(p.x - v.sprite.x) <= COLLIDE_W && Math.abs((p.y || 0) - v.baseY) <= COLLIDE_H;
+      // Leaving ends the collision; the next walk-in may bestow again.
+      if (!inside) v.offered = false;
+      if (!inside || v.offered || engine.busy?.()) continue;
+      bestowFor(engine, v, now);
     }
     for (const f of fx) {
       f.age += dtMs;
@@ -584,5 +610,6 @@ export const giantIconsFeature = {
     autoplayStep = 0;
     autoplayLog = [];
     autoplayTalkUntil = 0;
+    offerCollisions = 0;
   },
 };

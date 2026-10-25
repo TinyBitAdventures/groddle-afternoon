@@ -33,6 +33,32 @@ import { CONVERSATION_RULES, conversationRecord, hasCompleted, resetConversation
 import { CONVERSATIONS, TELLERS } from '../public/js/conversations-data.js?v=g202-1';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
+const GSJS = join(root, '..', '..', 'glitch-GameServerJS');
+
+/**
+ * An Icon's conversations parsed from items/icon_<giant>.js (the parser
+ * build-giant-icons.mjs had until G214): the canoffer level and earlier
+ * conversation, each block's line and button, and stats_add_xp on the last.
+ */
+function iconConversationsFromGsjs(iconClass) {
+  const unq = (t) => t.replace(/\\\//g, '/').replace(/\\"/g, '"').replace(/\\'/g, "'").replace(/\\n/g, '\n');
+  const src = readFileSync(join(GSJS, 'items', `${iconClass}.js`), 'utf8');
+  const list = (src.match(/var conversations = \[([\s\S]*?)\];/) || [])[1] || '';
+  return [...list.matchAll(/"([a-z0-9_]+)"/g)].map(([, id]) => {
+    const canOffer = src.match(new RegExp(`function conversation_canoffer_${id}\\(pc\\)\\{[\\s\\S]*?\\n\\}`))?.[0] || '';
+    const run = src.match(new RegExp(`function conversation_run_${id}\\(pc, msg, replay\\)\\{[\\s\\S]*?\\n\\}\\n`))?.[0] || '';
+    const beats = [];
+    const blockRe = /choices\['(\d+)'\]\['[^']+'\] = \{txt: "((?:[^"\\]|\\.)*)"[\s\S]*?this\.conversation_(?:start|reply)\(pc, (?:msg, )?"((?:[^"\\]|\\.)*)"/g;
+    for (const m of run.matchAll(blockRe)) beats.push({ text: unq(m[3]), response: unq(m[2]) });
+    return {
+      id,
+      level: Number(canOffer.match(/pc\.stats\.level >= (\d+)/)?.[1] || 0),
+      after: canOffer.match(/conversations_has_completed\(null, "([a-z0-9_]+)"\)/)?.[1] || null,
+      beats,
+      xp: Number(run.match(/stats_add_xp\((\d+) \* msg\.count/)?.[1] || 0),
+    };
+  });
+}
 const seq = (...vals) => {
   let i = 0;
   return () => vals[Math.min(i++, vals.length - 1)];
@@ -48,13 +74,21 @@ describe('giant icon catalog', () => {
       assert.match(def.desc, /Icon of/);
       assert.ok(existsSync(join(root, 'assets/sprites/icons', `${def.iconClass}.png`)), def.iconClass);
       assert.ok(existsSync(join(root, 'assets/sprites/giant-icons', `${def.iconClass}.png`)), def.iconClass);
-      assert.ok(def.conversations.length >= 1);
-      assert.equal(def.conversations[0].level, 10);
-      assert.equal(def.conversations[0].xp, 111);
+      // G214: the conversations live only in conversations-data.js.
+      assert.equal('conversations' in def, false, def.iconClass);
+      const first = CONVERSATIONS[TELLERS[def.iconClass].list[0]];
+      assert.equal(first.gate.level, 10);
+      assert.equal(first.steps.at(-1).reward.xp, 111);
     }
-    assert.equal(GIANT_ICON_DATA.alph.conversations[0].beats[0].text, '*Click* ... Welcome to the Icon of Alph. Please enter your request after the tone.');
-    assert.equal(GIANT_ICON_DATA.alph.conversations[0].beats[0].response, 'What?');
-    assert.equal(GIANT_ICON_DATA.zille.conversations[1].after, 'icon_zille_1');
+    assert.equal(CONVERSATIONS.icon_alph_1.steps[0].text, '*Click* ... Welcome to the Icon of Alph. Please enter your request after the tone.');
+    assert.equal(CONVERSATIONS.icon_alph_1.steps[0].choice, 'What?');
+    assert.deepEqual([...CONVERSATIONS.icon_zille_2.gate.after], ['icon_zille_1']);
+  });
+
+  it('build-giant-icons.mjs no longer writes the conversation text', () => {
+    const build = readFileSync(join(root, '..', 'build-giant-icons.mjs'), 'utf8');
+    assert.doesNotMatch(build, /conversation_run_|beats|conversations:/);
+    assert.doesNotMatch(readFileSync(join(root, 'js/giant-icons-data.js'), 'utf8'), /"conversations"|Please enter your request/);
   });
 });
 
@@ -196,13 +230,17 @@ describe('placed icons', () => {
 });
 
 describe('icon conversations (G202: the shared record)', () => {
-  it('all 13 are told by their Icon class through the shared data: level 10, then the chain, 111 iMG', () => {
-    const ids = Object.values(GIANT_ICON_DATA).flatMap((d) => d.conversations.map((c) => c.id));
+  it('all 13 are told by their Icon class through the shared data: level 10, then the chain, 111 iMG', { skip: !existsSync(GSJS) && 'no GSJS checkout' }, () => {
+    // G214: read straight from GameServerJS (the parser build-giant-icons.mjs
+    // used before the copy was dropped), so the one copy is checked against source.
+    const fromSource = Object.values(GIANT_ICON_DATA).map((def) => ({ def, list: iconConversationsFromGsjs(def.iconClass) }));
+    const ids = fromSource.flatMap(({ list }) => list.map((c) => c.id));
     assert.equal(ids.length, 13);
-    for (const def of Object.values(GIANT_ICON_DATA)) {
-      assert.deepEqual([...TELLERS[def.iconClass].list], def.conversations.map((c) => c.id), def.iconClass);
+    for (const { def, list } of fromSource) {
+      assert.deepEqual([...TELLERS[def.iconClass].list], list.map((c) => c.id), def.iconClass);
       assert.equal(TELLERS[def.iconClass].talk, 'class');
-      for (const c of def.conversations) {
+      for (const c of list) {
+        assert.ok(c.beats.length > 0 && c.xp === 111, c.id);
         const d = CONVERSATIONS[c.id];
         assert.deepEqual([...d.tellers], [def.iconClass]);
         assert.equal(d.chain, null);

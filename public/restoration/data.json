@@ -2027,9 +2027,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 442,
+  "commits": 443,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "The Magic Rock stands on your home street too, Camera Mode leaves C alone while you cultivate, and Shift+C away from home just clicks"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2144,14 +2149,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Room 23 sits in Tower Quest, as the map data says"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Room machines work while you wait, then hold your stuff until you collect it"
    }
   ]
  },
- "tests": 256,
+ "tests": 257,
  "generatedAt": "2026-10-25"
 }

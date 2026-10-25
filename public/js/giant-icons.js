@@ -29,7 +29,8 @@
  *                          (js/conversations.js, conversations-data.js,
  *                          features/conversations-feature.js), as
  *                          include/icon.js onPlayerCollision 565-575 runs
- *                          them through pc.conversations_offer
+ *                          them through pc.conversations_offer; their text
+ *                          is only in conversations-data.js (G214)
  *   quests/create_giant_icon.js, achievements/giant_lover.js
  *
  * ruminate/revere/reflect only work in the pack or a POL (container.is_bag ||
@@ -39,6 +40,8 @@
  */
 
 import { GIANT_ICON_DATA } from './giant-icons-data.js';
+// The Icon conversations' one copy, with every other teller's (G214); the key every importer uses.
+import { TELLERS } from './conversations-data.js?v=g202-1';
 
 export { GIANT_ICON_DATA };
 
@@ -477,7 +480,7 @@ export function bestowMessage(giant, type, actual) {
  * the feature hands them to the shared record once. The ids it knows.
  */
 export function legacyIconTalks(slice) {
-  const known = new Set(Object.values(GIANT_ICON_DATA).flatMap((d) => d.conversations.map((c) => c.id)));
+  const known = new Set(Object.values(GIANT_ICON_DATA).flatMap((d) => TELLERS[d.iconClass]?.list || []));
   return (Array.isArray(slice?.talked) ? slice.talked : []).map(String).filter((id) => known.has(id));
 }
 

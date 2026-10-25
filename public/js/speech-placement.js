@@ -1,0 +1,181 @@
+/**
+ * Where a world speech bubble goes over its speaker (register G214).
+ *
+ * The client (glitch-client, reference only):
+ * - LisChatBubbleManager.as bubble 100-130: an itemstack's bubble points at
+ *   LocationItemstackView.getYAboveDisplay() (633-655: the top of the view's
+ *   drawn bounds, getRect, so the art and not its padded frame) moved by the
+ *   message's offset_x / offset_y (130), and a negative offset_x reverses the
+ *   pointer (129).
+ * - GameServerJS item.js sendBubble 562-584 (CC0) sends those offsets from the
+ *   class's conversation_offset_x / conversation_offset_y; conversations use
+ *   the same props (include/npc_conversation.js 87-90, 168-171). Every Street
+ *   Spirit has 0 / 60 (street_spirit*.js classProps 26-27): its bubble points
+ *   60 px down into its art, so the 244 px Firebog spirit keeps its bubble in
+ *   the 408 px view without a camera move or a bubble beside it.
+ * - ChatBubble.as keepInBounds 98-117: a bubble above the top of the view is
+ *   pushed down over its speaker, for itemstack bubbles "within reason"
+ *   (LisChatBubbleManager.as 124: keep_in_viewport_within_reason) at most
+ *   120 px (114).
+ *
+ * The remake keeps its own rule beyond that (G185): when even the client's
+ * push would leave the bubble pointing past the middle of the speaker, it
+ * hangs under the speaker's feet, tail up, when that fits.
+ */
+
+/** ChatBubble.as keepInBounds 114: y -= Math.max(-120, rect.y). */
+export const SPEECH_PUSH_LIMIT = 120;
+
+/** An alpha at or under this counts as empty when measuring art. */
+export const OPAQUE_ALPHA = 16;
+
+/**
+ * GameServerJS conversation_offset_x / conversation_offset_y (classProps,
+ * items/<class>.js lines 22-27) for the classes the remake lets speak; every
+ * other class is 0 / 0. Street spirits get theirs from the spirits feature
+ * (the vendor target's class is its store), see STREET_SPIRIT_SPEECH_OFFSET.
+ */
+export const SPEECH_OFFSETS = Object.freeze({
+  npc_piggy: Object.freeze({ x: 0, y: -22 }), // npc_piggy.js 24-25
+  mortar_barnacle: Object.freeze({ x: -10, y: -20 }), // mortar_barnacle.js 22-23
+  patch: Object.freeze({ x: 0, y: -35 }), // patch.js 22-23
+  patch_dark: Object.freeze({ x: 0, y: -35 }), // patch_dark.js 22-23
+  patch_seedling: Object.freeze({ x: 0, y: -35 }), // patch_seedling.js 22-23
+  peat_1: Object.freeze({ x: -8, y: 0 }), // peat_1.js 22-23
+  peat_2: Object.freeze({ x: -8, y: 0 }), // peat_2.js 22-23
+  peat_3: Object.freeze({ x: -8, y: 0 }), // peat_3.js 22-23
+  rock_beryl_1: Object.freeze({ x: -16, y: 0 }), // rock_beryl_1.js 24-25
+  rock_beryl_2: Object.freeze({ x: -16, y: 0 }),
+  rock_beryl_3: Object.freeze({ x: -16, y: 0 }),
+  rock_dullite_1: Object.freeze({ x: -10, y: 0 }), // rock_dullite_1.js 24-25
+  rock_dullite_2: Object.freeze({ x: -10, y: 0 }),
+  rock_dullite_3: Object.freeze({ x: -10, y: 0 }),
+  rock_sparkly_1: Object.freeze({ x: -6, y: 0 }), // rock_sparkly_1.js 24-25
+  rock_sparkly_2: Object.freeze({ x: -6, y: 0 }),
+  rock_sparkly_3: Object.freeze({ x: -6, y: 0 }),
+  hell_bartender: Object.freeze({ x: 0, y: 20 }), // hell_bartender.js 24-25
+  phantom_glitch: Object.freeze({ x: 0, y: 60 }), // phantom_glitch.js 24-25
+  ice_knob: Object.freeze({ x: 0, y: -40 }), // ice_knob.js 22
+});
+
+/** street_spirit.js / _groddle / _firebog / _zutto / _ix classProps 26-27. */
+export const STREET_SPIRIT_SPEECH_OFFSET = Object.freeze({ x: 0, y: 60 });
+
+const NONE = Object.freeze({ x: 0, y: 0 });
+
+/** The speaker's offset: its own (set by a feature) or its class's. */
+export function speechOffsetFor(target) {
+  const own = target?.speechOffset;
+  if (own && (Number.isFinite(own.x) || Number.isFinite(own.y))) return { x: Number(own.x) || 0, y: Number(own.y) || 0 };
+  return SPEECH_OFFSETS[String(target?.classId || '')] || NONE;
+}
+
+/**
+ * The tail tip's y for a bubble (view or world units, y down).
+ *  want    the tip over the speaker's art, offsets applied
+ *  minTip  the highest tip that keeps the bubble's top in view
+ *  maxTip  the lowest tip still in view
+ *  artTop  the top of the speaker's art; feet its feet
+ *  below   the tip when hung under the feet; belowFits whether that fits
+ * Returns { tip, flip }.
+ */
+export function placeSpeechTip({ want, minTip, maxTip, artTop, feet, below, belowFits }) {
+  const top = Math.min(minTip, maxTip);
+  if (want >= top) return { tip: Math.min(want, maxTip), flip: false };
+  // Pushed down over the speaker, as far as the client would and while the
+  // tail still points at the upper half of the art.
+  const middle = Number.isFinite(artTop) && Number.isFinite(feet) ? (artTop + feet) / 2 : Infinity;
+  if (top - want <= SPEECH_PUSH_LIMIT && top <= middle) return { tip: top, flip: false };
+  if (belowFits) return { tip: below, flip: true };
+  return { tip: top, flip: false };
+}
+
+/** The first row (0 = top) of a w x h alpha array with any pixel over OPAQUE_ALPHA, or -1. */
+export function firstOpaqueRow(alpha, w, h, stride = 1) {
+  for (let y = 0; y < h; y += 1) {
+    const row = y * w * stride;
+    for (let x = 0; x < w; x += 1) {
+      if (alpha[row + x * stride] > OPAQUE_ALPHA) return y;
+    }
+  }
+  return -1;
+}
+
+const tops = new WeakMap();
+let scratch = null;
+
+/**
+ * The first opaque row of a Pixi texture's frame, read once from its image
+ * (null while it has not loaded, or outside a browser). `read` replaces the
+ * canvas read in tests: (texture) => { alpha, w, h, stride } | null.
+ */
+export function opaqueTopOf(texture, read = readFrameAlpha) {
+  if (!texture) return null;
+  if (tops.has(texture)) return tops.get(texture);
+  const px = read(texture);
+  if (!px) return null;
+  const row = firstOpaqueRow(px.alpha, px.w, px.h, px.stride || 1);
+  const top = row < 0 ? px.h : row;
+  tops.set(texture, top);
+  return top;
+}
+
+function readFrameAlpha(texture) {
+  const res = texture?.source?.resource;
+  const f = texture?.frame;
+  if (!res || !f || !(f.width > 0) || !(f.height > 0) || typeof document === 'undefined') return null;
+  if (res.complete === false || !(res.width > 0)) return null;
+  try {
+    scratch ||= document.createElement('canvas');
+    const w = Math.ceil(f.width);
+    const h = Math.ceil(f.height);
+    if (scratch.width < w) scratch.width = w;
+    if (scratch.height < h) scratch.height = h;
+    const ctx = scratch.getContext('2d', { willReadFrequently: true });
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(res, f.x, f.y, f.width, f.height, 0, 0, w, h);
+    const data = ctx.getImageData(0, 0, w, h).data;
+    return { alpha: data.subarray(3), w, h, stride: 4 };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * How far a sprite's art reaches above its anchor point, in world px: the
+ * opaque top of its frame (the tallest frame of an animated clip), scaled.
+ * 0 when not known yet.
+ */
+export function artHeightOf(sprite, read = readFrameAlpha) {
+  if (!sprite || sprite.destroyed) return 0;
+  const list = Array.isArray(sprite.textures) && sprite.textures.length ? sprite.textures : [sprite.texture];
+  const ay = Number(sprite.anchor?.y) || 0;
+  let best = 0;
+  for (const tex of list) {
+    const top = opaqueTopOf(tex, read);
+    if (top == null) return 0;
+    const h = Number(tex.orig?.height ?? tex.frame?.height) || 0;
+    const trimY = Number(tex.trim?.y) || 0;
+    best = Math.max(best, ay * h - (top + trimY));
+  }
+  return Math.max(0, best * Math.abs(Number(sprite.scale?.y) || 1));
+}
+
+/** Animals, trees and Icons measure their art (G214); Street Spirits use their sheet's crop. */
+export const ART_HEIGHT_CLASS = /^(npc_(piggy|chicken|butterfly|batterfly)|trant_\w+|wood_tree|icon_\w+)$/;
+
+/**
+ * Give a target an artHeight read from its sprite each time it is asked
+ * (cached per texture), unless something already set one.
+ */
+export function giveArtHeight(target, read = readFrameAlpha) {
+  if (!target || !ART_HEIGHT_CLASS.test(String(target.classId || '')) || 'artHeight' in target) return target;
+  Object.defineProperty(target, 'artHeight', {
+    configurable: true,
+    enumerable: false,
+    get: () => artHeightOf(target.sprite, read),
+    // A feature that knows better can still set one.
+    set: (value) => Object.defineProperty(target, 'artHeight', { value, writable: true, configurable: true, enumerable: true }),
+  });
+  return target;
+}
