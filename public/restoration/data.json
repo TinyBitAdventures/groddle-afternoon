@@ -539,7 +539,7 @@
    "group": "economy",
    "name": "Quoins",
    "status": "source",
-   "blurb": "All eight quoin types, daily limits, multipliers and Qurazy quoins. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you.",
+   "blurb": "All eight quoin types, daily limits, multipliers and Qurazy quoins. Each street quoin spot is given one of the original quoin classes, which sets what it gives (a tiny 1, a small 2 to 6, a steady 25, a long-wait 2 to 100) and how long it takes to come back. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you.",
    "spot": "quoin",
    "evidence": [
     "public/js/quoins.js",
@@ -2029,9 +2029,29 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 449,
+  "commits": 453,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "improve",
+    "text": "U opens the upgrade cards, Shift+S skills and Shift+T your teleport points, \"Not right now\" puts a quest in your log to start later, and quest copies show no region"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "The Magic Rock hands over your home street's daily iMG, and old Tower stacks and the Craftybot box sit where you can reach them"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "The loneliness party lights Tiny Speck's own fireworks, Party Time! lifts your mood, and playing the Game shows its little crashing client"
+   },
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Subway stairs sit flush with the wall, Bureaucratic Hall clerks stop blinking out and move at their real speed, its doors and chairs no longer overlap, and lit pumpkins lose their drawn rings"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2131,29 +2151,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Icons tell their stories by the same rules, and a talk cut off by a reload picks up where it stopped"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The Magic Rock speaks as the loading card goes, Super Pooped can happen, hidden prompts take no keys, and the door glow is route yellow in Naraka"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Chickens, piggies, trees, rocks, patches and shrines tell their stories, and the spirits' first talks wait on the shrines for real"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Machines show their own art as they load, work, wait and hand over"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Prompts time out as the source did, and you can pick rooms behind doors on the Map"
    }
   ]
  },
- "tests": 263,
+ "tests": 264,
  "generatedAt": "2026-10-25"
 }

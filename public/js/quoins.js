@@ -32,6 +32,9 @@ export const QURAZY_REWARDS = Object.freeze([
   815, 835, 855, 875, 895, 915,
 ]);
 
+/** config_base.js 165-177: the Giants a favor quoin for 'all' credits. */
+export const FAVOR_GIANT_IDS = Object.freeze(['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille']);
+
 const STREET_SEQUENCE = Object.freeze(['xp', 'energy', 'mood', 'currants', 'mystery', 'favor', 'xp', 'time']);
 
 function finite(value, fallback = 0) {
@@ -156,6 +159,10 @@ export function creditQuoinStat(pc, typeId, rawAmount, { gated = false } = {}) {
  * Apply one quoin. Qurazy quoins bypass the daily limit, matching GSJS.
  * Time quoins accelerate an active skill study through opts.accelerateStudy,
  * matching GameServerJS `skills_start_acceleration`.
+ * G227: `opts.className` (a QUOIN_CLASSES name of this type) sets the
+ * benefit, rolled per grab with `opts.rng`, and a class's own Giant; an
+ * explicit `opts.amount` still wins, and with neither the type's baseAmount
+ * applies. The multiplier scales whichever it is (quoin.js 171-174).
  */
 export function collectQuoin(state, typeId, pc, opts = {}) {
   const normalized = normalizeQuoinState(state);
@@ -169,9 +176,13 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
   const resolvedType = originalType;
   const def = QUOIN_TYPES[resolvedType];
   const multiplier = originalType === 'qurazy' ? 1 : state.multiplier;
+  const classAmount = originalType === 'qurazy' ? null : quoinClassAmount(opts.className, originalType, opts.rng);
   const baseAmount = originalType === 'qurazy'
     ? qrazyRewardForLevel(pc?.level)
-    : Math.max(0, Math.floor(finite(opts.amount, def.baseAmount)));
+    : Math.max(0, Math.floor(finite(opts.amount, classAmount ?? def.baseAmount)));
+  const giantId = resolvedType === 'favor'
+    ? String((classAmount !== null && quoinClassGiant(opts.className)) || opts.giantId || 'all').toLowerCase()
+    : null;
   const amount = Math.max(0, Math.round(baseAmount * multiplier));
   let actual = amount;
   let acceleration = null;
@@ -190,13 +201,22 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     || resolvedType === 'mood' || resolvedType === 'currants') {
     actual = creditQuoinStat(pc, resolvedType, amount);
   } else if (resolvedType === 'favor') {
-    const giantId = String(opts.giantId || 'all').toLowerCase();
     const favor = opts.favor && typeof opts.favor === 'object' ? opts.favor : {};
     // stats_add_favor_points caps each Giant at its emblem target (stats_get_max_favor).
-    const cap = typeof opts.favorCap === 'function' ? Number(opts.favorCap(giantId)) : Infinity;
-    const before = Math.max(0, Math.floor(finite(favor[giantId], 0)));
-    favor[giantId] = Math.min(Number.isFinite(cap) ? Math.max(before, cap) : Infinity, before + amount);
-    actual = favor[giantId] - before;
+    const add = (id) => {
+      const cap = typeof opts.favorCap === 'function' ? Number(opts.favorCap(id)) : Infinity;
+      const before = Math.max(0, Math.floor(finite(favor[id], 0)));
+      favor[id] = Math.min(Number.isFinite(cap) ? Math.max(before, cap) : Infinity, before + amount);
+      return favor[id] - before;
+    };
+    if (giantId === 'all') {
+      // inc_stats.js 956-961: 'all' adds to every Giant and returns the value
+      // asked for, so the line reads "+N favor with all giants!" (quoin.js 191-192).
+      for (const id of FAVOR_GIANT_IDS) add(id);
+      actual = amount;
+    } else {
+      actual = add(giantId);
+    }
   } else if (resolvedType === 'time') {
     acceleration = typeof opts.accelerateStudy === 'function'
       ? opts.accelerateStudy(amount)
@@ -227,7 +247,8 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
     dailyCount: state.collectedToday,
     dailyLimit: state.dailyLimit,
     hitLimit: originalType !== 'qurazy' && state.collectedToday >= state.dailyLimit,
-    giantId: resolvedType === 'favor' ? String(opts.giantId || 'all').toLowerCase() : null,
+    giantId,
+    quoinClass: classAmount !== null ? opts.className : null,
     acceleration: resolvedType === 'time' ? acceleration : null,
   };
 }
@@ -241,53 +262,59 @@ export function collectQuoin(state, typeId, pc, opts = {}) {
  * respawn_time in seconds. After a grab the quoin goes unspawned and
  * onRespawn (664) brings it back respawn_time later (305), except in races,
  * games, cloudhopolis and top_of_tree; a qurazy quoin is deleted instead
- * (264). The benefit numbers stay the remake's own (QUOIN_TYPES).
+ * (264).
+ *
+ * G227: the class also sets what the quoin gives (Austin, desk QUOINCLASS):
+ * a fixed `benefit`, or `floor`..`ceil` when is_random, rolled on every grab
+ * with randInt (common.js 691, inclusive; quoin.js 161-166), and `giant`
+ * where the class names one ('all': every Giant, inc_stats.js 956-961).
+ * QUOIN_TYPES.baseAmount stays for quoins with no class (quests, rooms).
  */
 export const QUOIN_CLASSES = Object.freeze({
-  'fast tiny mood': Object.freeze({ type: 'mood', respawnSec: 4 * 60, line: 325 }),
-  'fast tiny energy': Object.freeze({ type: 'energy', respawnSec: 3 * 60, line: 331 }),
-  'fast tiny xp': Object.freeze({ type: 'xp', respawnSec: 60, line: 337 }),
-  'fast tiny currants': Object.freeze({ type: 'currants', respawnSec: 40, line: 343 }),
-  'fast tiny time': Object.freeze({ type: 'time', respawnSec: 60, line: 349 }),
-  'small random mood': Object.freeze({ type: 'mood', respawnSec: 7 * 60, line: 359 }),
-  'small random energy': Object.freeze({ type: 'energy', respawnSec: 7 * 60, line: 366 }),
-  'small random xp': Object.freeze({ type: 'xp', respawnSec: 5 * 60, line: 373 }),
-  'small random currants': Object.freeze({ type: 'currants', respawnSec: 3 * 60, line: 380 }),
-  'slow medium-large mood': Object.freeze({ type: 'mood', respawnSec: 30 * 60, line: 388 }),
-  'slow medium-large energy': Object.freeze({ type: 'energy', respawnSec: 30 * 60, line: 394 }),
-  'slow medium-large xp': Object.freeze({ type: 'xp', respawnSec: 30 * 60, line: 400 }),
-  'slow medium-large currants': Object.freeze({ type: 'currants', respawnSec: 30 * 60, line: 406 }),
-  'long random large mood': Object.freeze({ type: 'mood', respawnSec: 60 * 60, line: 413 }),
-  'long random large energy': Object.freeze({ type: 'energy', respawnSec: 60 * 60, line: 420 }),
-  'long random large xp': Object.freeze({ type: 'xp', respawnSec: 60 * 60, line: 427 }),
-  'long random large currants': Object.freeze({ type: 'currants', respawnSec: 60 * 60, line: 434 }),
-  'placement tester': Object.freeze({ type: '', respawnSec: 1, line: 442 }),
-  'rainbow run': Object.freeze({ type: 'mood', respawnSec: 15, line: 448 }),
-  'small random favor': Object.freeze({ type: 'favor', respawnSec: 5 * 60, line: 460 }),
-  'slow medium random favor': Object.freeze({ type: 'favor', respawnSec: 20 * 60, line: 469 }),
-  'long large random favor': Object.freeze({ type: 'favor', respawnSec: 60 * 60, line: 477 }),
-  'small time': Object.freeze({ type: 'time', respawnSec: 10 * 60, line: 488 }),
-  'slow medium random time': Object.freeze({ type: 'time', respawnSec: 30 * 60, line: 495 }),
-  'long large random time': Object.freeze({ type: 'time', respawnSec: 60 * 60, line: 503 }),
-  'random baqala mood': Object.freeze({ type: 'mood', respawnSec: 10 * 60, line: 513 }),
-  'random baqala energy': Object.freeze({ type: 'energy', respawnSec: 10 * 60, line: 520 }),
-  'random baqala xp': Object.freeze({ type: 'xp', respawnSec: 10 * 60, line: 527 }),
-  'random baqala currants': Object.freeze({ type: 'currants', respawnSec: 10 * 60, line: 534 }),
-  'random baqala favor': Object.freeze({ type: 'favor', respawnSec: 10 * 60, line: 541 }),
-  'random baqala time': Object.freeze({ type: 'time', respawnSec: 10 * 60, line: 549 }),
-  'quoin hub fast currants': Object.freeze({ type: 'currants', respawnSec: 40, line: 560 }),
-  'quoin hub fast iMG': Object.freeze({ type: 'xp', respawnSec: 60, line: 567 }),
-  'paradise currants': Object.freeze({ type: 'currants', respawnSec: 400000, line: 578 }),
-  'paradise iMG': Object.freeze({ type: 'xp', respawnSec: 400000, line: 584 }),
-  'slow tiny mood': Object.freeze({ type: 'mood', respawnSec: 300, line: 593 }),
-  'slow tiny energy': Object.freeze({ type: 'energy', respawnSec: 300, line: 599 }),
-  'slow tiny xp': Object.freeze({ type: 'xp', respawnSec: 300, line: 605 }),
-  'slow tiny currants': Object.freeze({ type: 'currants', respawnSec: 300, line: 611 }),
-  'slow tiny time': Object.freeze({ type: 'time', respawnSec: 300, line: 617 }),
-  'party mood': Object.freeze({ type: 'mood', respawnSec: 2 * 60, line: 627 }),
-  'party energy': Object.freeze({ type: 'energy', respawnSec: 2 * 60, line: 633 }),
-  'party iMG': Object.freeze({ type: 'xp', respawnSec: 90, line: 639 }),
-  'party currants': Object.freeze({ type: 'currants', respawnSec: 60, line: 645 }),
+  'fast tiny mood': Object.freeze({ type: 'mood', respawnSec: 4 * 60, benefit: 1, line: 325 }),
+  'fast tiny energy': Object.freeze({ type: 'energy', respawnSec: 3 * 60, benefit: 1, line: 331 }),
+  'fast tiny xp': Object.freeze({ type: 'xp', respawnSec: 60, benefit: 1, line: 337 }),
+  'fast tiny currants': Object.freeze({ type: 'currants', respawnSec: 40, benefit: 1, line: 343 }),
+  'fast tiny time': Object.freeze({ type: 'time', respawnSec: 60, benefit: 1, line: 349 }),
+  'small random mood': Object.freeze({ type: 'mood', respawnSec: 7 * 60, floor: 2, ceil: 6, line: 359 }),
+  'small random energy': Object.freeze({ type: 'energy', respawnSec: 7 * 60, floor: 2, ceil: 6, line: 366 }),
+  'small random xp': Object.freeze({ type: 'xp', respawnSec: 5 * 60, floor: 2, ceil: 6, line: 373 }),
+  'small random currants': Object.freeze({ type: 'currants', respawnSec: 3 * 60, floor: 2, ceil: 6, line: 380 }),
+  'slow medium-large mood': Object.freeze({ type: 'mood', respawnSec: 30 * 60, benefit: 25, line: 388 }),
+  'slow medium-large energy': Object.freeze({ type: 'energy', respawnSec: 30 * 60, benefit: 25, line: 394 }),
+  'slow medium-large xp': Object.freeze({ type: 'xp', respawnSec: 30 * 60, benefit: 25, line: 400 }),
+  'slow medium-large currants': Object.freeze({ type: 'currants', respawnSec: 30 * 60, benefit: 25, line: 406 }),
+  'long random large mood': Object.freeze({ type: 'mood', respawnSec: 60 * 60, floor: 2, ceil: 100, line: 413 }),
+  'long random large energy': Object.freeze({ type: 'energy', respawnSec: 60 * 60, floor: 2, ceil: 100, line: 420 }),
+  'long random large xp': Object.freeze({ type: 'xp', respawnSec: 60 * 60, floor: 2, ceil: 100, line: 427 }),
+  'long random large currants': Object.freeze({ type: 'currants', respawnSec: 60 * 60, floor: 2, ceil: 100, line: 434 }),
+  'placement tester': Object.freeze({ type: '', respawnSec: 1, benefit: 0, line: 442 }),
+  'rainbow run': Object.freeze({ type: 'mood', respawnSec: 15, benefit: 1, line: 448 }),
+  'small random favor': Object.freeze({ type: 'favor', respawnSec: 5 * 60, floor: 1, ceil: 3, giant: 'all', line: 460 }),
+  'slow medium random favor': Object.freeze({ type: 'favor', respawnSec: 20 * 60, floor: 2, ceil: 9, line: 469 }),
+  'long large random favor': Object.freeze({ type: 'favor', respawnSec: 60 * 60, benefit: 10, line: 477 }),
+  'small time': Object.freeze({ type: 'time', respawnSec: 10 * 60, benefit: 5, line: 488 }),
+  'slow medium random time': Object.freeze({ type: 'time', respawnSec: 30 * 60, floor: 5, ceil: 25, line: 495 }),
+  'long large random time': Object.freeze({ type: 'time', respawnSec: 60 * 60, benefit: 30, line: 503 }),
+  'random baqala mood': Object.freeze({ type: 'mood', respawnSec: 10 * 60, floor: 6, ceil: 17, line: 513 }),
+  'random baqala energy': Object.freeze({ type: 'energy', respawnSec: 10 * 60, floor: 6, ceil: 17, line: 520 }),
+  'random baqala xp': Object.freeze({ type: 'xp', respawnSec: 10 * 60, floor: 6, ceil: 17, line: 527 }),
+  'random baqala currants': Object.freeze({ type: 'currants', respawnSec: 10 * 60, floor: 6, ceil: 17, line: 534 }),
+  'random baqala favor': Object.freeze({ type: 'favor', respawnSec: 10 * 60, floor: 1, ceil: 4, giant: 'all', line: 541 }),
+  'random baqala time': Object.freeze({ type: 'time', respawnSec: 10 * 60, floor: 6, ceil: 17, line: 549 }),
+  'quoin hub fast currants': Object.freeze({ type: 'currants', respawnSec: 40, floor: 1, ceil: 3, line: 560 }),
+  'quoin hub fast iMG': Object.freeze({ type: 'xp', respawnSec: 60, floor: 1, ceil: 3, line: 567 }),
+  'paradise currants': Object.freeze({ type: 'currants', respawnSec: 400000, benefit: 1, line: 578 }),
+  'paradise iMG': Object.freeze({ type: 'xp', respawnSec: 400000, benefit: 1, line: 584 }),
+  'slow tiny mood': Object.freeze({ type: 'mood', respawnSec: 300, benefit: 1, line: 593 }),
+  'slow tiny energy': Object.freeze({ type: 'energy', respawnSec: 300, benefit: 1, line: 599 }),
+  'slow tiny xp': Object.freeze({ type: 'xp', respawnSec: 300, benefit: 1, line: 605 }),
+  'slow tiny currants': Object.freeze({ type: 'currants', respawnSec: 300, benefit: 1, line: 611 }),
+  'slow tiny time': Object.freeze({ type: 'time', respawnSec: 300, benefit: 1, line: 617 }),
+  'party mood': Object.freeze({ type: 'mood', respawnSec: 2 * 60, benefit: 1, line: 627 }),
+  'party energy': Object.freeze({ type: 'energy', respawnSec: 2 * 60, benefit: 1, line: 633 }),
+  'party iMG': Object.freeze({ type: 'xp', respawnSec: 90, benefit: 1, line: 639 }),
+  'party currants': Object.freeze({ type: 'currants', respawnSec: 60, benefit: 1, line: 645 }),
 });
 
 /**
@@ -318,6 +345,50 @@ export function streetQuoinClass(streetTsid, index, typeId) {
 export function quoinRespawnMs(className) {
   const row = QUOIN_CLASSES[className];
   return row ? row.respawnSec * 1000 : Infinity;
+}
+
+/** The source's randInt(lo, hi) (common.js 691-694): lo to hi, both included. */
+function randInt(lo, hi, rng = Math.random) {
+  const r = clamp(finite(rng(), 0), 0, 0.999999999);
+  return lo + Math.floor(r * (1 + hi - lo));
+}
+
+/**
+ * G227: what one grab of a `className` quoin gives before the multiplier
+ * (items/quoin.js 161-166): its benefit, or randInt(benefit_floor,
+ * benefit_ceil) when the class is random. null for an unknown class or one
+ * of another type (mystery and qurazy quoins keep their own rules).
+ */
+export function quoinClassAmount(className, typeId, rng = Math.random) {
+  const row = className ? QUOIN_CLASSES[className] : null;
+  if (!row || (row.type && row.type !== typeId)) return null;
+  if (Number.isFinite(row.benefit)) return row.benefit;
+  return randInt(row.floor, row.ceil, typeof rng === 'function' ? rng : Math.random);
+}
+
+/** The Giant a favor class names, if any ('all' for small random and Baqala favor; quoin.js 466, 547). */
+export function quoinClassGiant(className) {
+  return (className && QUOIN_CLASSES[className]?.giant) || null;
+}
+
+/** The type a class sets (quoin.js 321-650), '' for none or unknown. */
+export function quoinClassType(className) {
+  return (className && QUOIN_CLASSES[className]?.type) || '';
+}
+
+/**
+ * G227: the source has no game-day reset for street quoins (a grabbed one
+ * comes back only on its onRespawn timer, quoin.js 305, 664). A new day
+ * leaves spots still waiting on a timer collected and frees the rest (a
+ * Qurazy spot, or a grab saved before G216 with no timer).
+ */
+export function resetStreetQuoinsForNewDay(street) {
+  if (!street) return 0;
+  const before = Array.isArray(street.collectedQuoins) ? street.collectedQuoins : [];
+  const timers = street.quoinRespawn && typeof street.quoinRespawn === 'object' ? street.quoinRespawn : {};
+  street.collectedQuoins = before.filter((i) => Number.isFinite(Number(timers[i])));
+  street.quoinRespawn = Object.fromEntries(street.collectedQuoins.map((i) => [i, Number(timers[i])]));
+  return before.length - street.collectedQuoins.length;
 }
 
 /**

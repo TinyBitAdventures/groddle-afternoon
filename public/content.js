@@ -3,7 +3,7 @@
  * Simplified conditions/handlers for the Groddle spike.
  */
 
-import { getVerbReward, applyVerbReward, formatActivityLine } from './js/verb-rewards.js?v=g162-1';
+import { getVerbReward, applyVerbReward, formatActivityLine } from './js/verb-rewards.js?v=g227-1';
 import { grantMoodXp } from './js/mood-xp.js';
 import {
   TRANT_META,

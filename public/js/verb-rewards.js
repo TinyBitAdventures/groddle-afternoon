@@ -16,7 +16,7 @@
  * Default rewards when skill rank ≈ Animal Kinship 1 / base gardening.
  * Source: items/catalog_skill_packages.js (energy_cost, mood_bonus, xp_bonus).
  */
-import { moodMax } from './metabolics.js';
+import { metabolicGain, moodMax } from './metabolics.js';
 import { grantMoodXp } from './mood-xp.js';
 export const VERB_REWARDS = {
   'npc_piggy:pet': {
@@ -122,7 +122,9 @@ export function applyVerbReward(pc, reward) {
     return { energy: 0, mood: 0, xp: 0, ok: false };
   }
   pc.energy = Math.max(0, (pc.energy || 0) - cost);
-  const mood = reward.moodGain || 0;
+  // G227: inc_skill_packages.js 524 adds mood_bonus through metabolics_add_mood,
+  // which gives nothing while dead (inc_metabolics.js 79-86; js/metabolics.js).
+  const mood = reward.moodGain && metabolicGain('mood').ok ? reward.moodGain : 0;
   const xp = reward.xpGain || 0;
   if (mood) pc.mood = Math.min(moodMax(pc), (pc.mood || 0) + mood);
   // inc_skill_packages.js 532: the package's xp_bonus takes the mood bonus.

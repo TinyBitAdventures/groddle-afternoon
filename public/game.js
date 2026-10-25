@@ -2,9 +2,9 @@
  * Groddle Afternoon — original street geometry + layered decos
  * PixiJS 8 · locations-xml streets · CoU PNG decos · quests/items
  */
-import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g215-1';
+import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-2';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-94';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-95';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import {
@@ -379,7 +379,7 @@ import {
   formatBuffRemaining,
   consumeRewardBuff,
   studyBuffBlockReason,
-} from './js/buffs.js?v=item-buffs-5';
+} from './js/buffs.js?v=item-buffs-6';
 import { grantMoodXp, moodXpMultiplierFor, setMoodXpEnv } from './js/mood-xp.js';
 import {
   loadContentCatalogs,
@@ -423,7 +423,7 @@ import {
   parsePlayerSave,
   serializePlayerSave,
   restorePlayerSave,
-} from './js/player-save.js?v=g216-1';
+} from './js/player-save.js?v=player-save-8';
 import {
   HOME_INTERIOR_TSID,
   HOME_PURCHASE_COST,
@@ -538,7 +538,7 @@ import {
   formatActivityHtml,
   buildActivitySegments,
   activitySegmentsToHtml,
-} from './js/verb-rewards.js?v=g162-1';
+} from './js/verb-rewards.js?v=g227-1';
 import {
   loadStreetData,
   STREET_INDEX,
@@ -768,7 +768,9 @@ import {
   quoinRespawnMs,
   noteQuoinRespawn,
   releaseQuoinRespawns,
-} from './js/quoins.js?v=g216-1';
+  quoinClassType,
+  resetStreetQuoinsForNewDay,
+} from './js/quoins.js?v=g227-1';
 import {
   buildHubMapView,
   mapClickTravel,
@@ -8721,10 +8723,10 @@ function resetAllAnimalsForNewDay() {
 function resetStreetCollectiblesForNewDay() {
   let n = 0;
   for (const street of Object.values(persistentWorldState.streets || {})) {
-    n += (street.collectedApples?.length || 0) + (street.collectedQuoins?.length || 0);
+    n += street.collectedApples?.length || 0;
     street.collectedApples = [];
-    street.collectedQuoins = [];
-    street.quoinRespawn = {};
+    // G227: quoins have no day reset in the source; timed spots wait for onRespawn.
+    n += resetStreetQuoinsForNewDay(street);
   }
   return n;
 }
@@ -9018,6 +9020,9 @@ function naturalQuoinPlan(count) {
   const params = new URLSearchParams(location.search);
   const demoType = params.get('quoindemo');
   if (demoType !== null) plan[0] = QUOIN_TYPES[demoType] ? demoType : 'currants';
+  // G227: a forced class sets spot 0's type too (quoin.js 321-650).
+  const forcedType = quoinClassType(params.get('quoinclass'));
+  if (forcedType && QUOIN_TYPES[forcedType]) plan[0] = forcedType;
   return plan;
 }
 
@@ -9078,6 +9083,8 @@ function quoinResultCopy(result) {
   if (result.resolvedTypeId === 'currants') return `+${amount} currants`;
   if (result.resolvedTypeId === 'favor') {
     const giant = GIANTS[result.giantId];
+    // quoin.js 191-192: "+N favor with all giants!" for a class that names them all.
+    if (result.giantId === 'all') return `+${amount} favor with all giants`;
     return `+${amount} favor${giant ? ` with ${giant.name}` : ''}`;
   }
   if (result.resolvedTypeId === 'time') {
@@ -9978,6 +9985,8 @@ function physics(dt) {
       if (Math.hypot(q.x - player.x, q.y - (player.y - 28)) < 44) {
         const giantId = giantForStreet(currentStreet).id;
         const result = collectQuoin(quoinState, q.typeId, pc, {
+          // G227: a street spot gives what its class gives (quoin.js 161-166, 321-650).
+          className: q.quoinClass,
           giantId,
           favor: shrineState.favor,
           favorCap: (id) => emblemCostFor(shrineState, id),

@@ -15,7 +15,7 @@ import {
   releaseQuoinRespawns,
   streetQuoinClass,
 } from '../public/js/quoins.js';
-import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=player-save-7';
+import { normalizeWorldSnapshot } from '../public/js/player-save.js?v=player-save-8';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -131,7 +131,8 @@ describe('street quoin classes', () => {
     assert.match(game, /const respawnMs = quoinRespawnMs\(q\.quoinClass\);\s*noteQuoinRespawn\(streetWorldState\(\), q\.naturalQuoinIndex, respawnMs, Date\.now\(\)\);/);
     assert.match(game, /releaseQuoinRespawns\(world, Date\.now\(\)\);\s*const collected = new Set\(world\.collectedQuoins\);/);
     assert.match(game, /\/\/ quoin auto collect\s*tickQuoinRespawns\(\);/);
-    assert.match(game, /street\.collectedQuoins = \[\];\s*street\.quoinRespawn = \{\};/);
+    // G227: the day turn keeps timed spots (resetStreetQuoinsForNewDay, tests/quoin-class-benefit.test.js).
+    assert.match(game, /n \+= resetStreetQuoinsForNewDay\(street\);/);
   });
 });
 

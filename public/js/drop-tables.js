@@ -17,6 +17,7 @@
 import { DROP_ITEMS, DROP_TABLES } from './drop-tables-data.js';
 import { skillPackageDetails } from './skill-packages.js';
 import { grantMoodXp } from './mood-xp.js';
+import { metabolicGain } from './metabolics.js';
 
 export { DROP_ITEMS, DROP_TABLES };
 
@@ -135,17 +136,20 @@ export function applyDropResult(result, target = {}) {
     landed.favor += total;
     lines.push(`You got ${f.points} favor with ${f.giant === 'all' ? 'all the Giants' : capitalize(f.giant)}!`);
   }
+  // G227: runDropTable adds through metabolics_add_mood / _energy
+  // (inc_skill_packages.js 85, 96), refused while dead or (energy) Super Pooped,
+  // and still says "You got 0 energy!" (inc_metabolics.js 40-53, 79-86).
   if (result.mood && pc) {
     const cap = target.moodCap ?? 100;
     const before = Number(pc.mood) || 0;
-    pc.mood = Math.min(cap, before + result.mood);
+    if (metabolicGain('mood').ok) pc.mood = Math.min(cap, before + result.mood);
     landed.mood = Math.round(pc.mood - before);
     lines.push(`You got ${landed.mood} mood!`);
   }
   if (result.energy && pc) {
     const cap = target.energyCap ?? 100;
     const before = Number(pc.energy) || 0;
-    pc.energy = Math.min(cap, before + result.energy);
+    if (metabolicGain('energy').ok) pc.energy = Math.min(cap, before + result.energy);
     landed.energy = Math.round(pc.energy - before);
     lines.push(`You got ${landed.energy} energy!`);
   }

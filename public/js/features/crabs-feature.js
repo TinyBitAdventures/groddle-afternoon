@@ -33,7 +33,7 @@
 import { createSheetLoader, pixiSpeed } from '../sprite-sheets.js';
 import { addItem, countItem, ensureItem, registerItemUse, removeItem } from '../inventory.js?v=catalog-unified-4';
 import { MUSICBLOCK_CATALOG, ensureMusicblockItems } from '../musicblocks.js';
-import { energyMax, moodMax } from '../metabolics.js';
+import { energyMax, metabolicGain, moodMax } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { getGameDayKey } from '../game-day.js';
 import { cleanQuestMarkup } from '../quests.js';
@@ -393,12 +393,14 @@ function onSettle(engine, row) {
     effects.items[MUSICBLOCK_CATALOG[settled.destroyBlock]?.label || settled.destroyBlock] = -1;
   }
   const r = settled.rewards;
-  if (r.mood) {
+  // G227: rewards go through metabolics_add_mood / _energy, refused while dead
+  // or (energy) Super Pooped (inc_metabolics.js 40-53, 79-86; js/metabolics.js).
+  if (r.mood > 0 && metabolicGain('mood').ok) {
     const before = pc.mood || 0;
     pc.mood = Math.min(moodMax(pc), before + r.mood);
     effects.mood = (effects.mood || 0) + (pc.mood - before);
   }
-  if (r.energy) {
+  if (r.energy > 0 && metabolicGain('energy').ok) {
     const before = pc.energy || 0;
     pc.energy = Math.min(energyMax(pc), before + r.energy);
     effects.energy = pc.energy - before;
@@ -437,12 +439,13 @@ function runCrabVerb(engine, crab, verb) {
   if (!result) return;
   const pc = engine.pc;
   const effects = { items: {} };
-  if (result.mood) {
+  // G227: a rise asks the metabolic gate (dead, Super Pooped); a loss never does.
+  if (result.mood && (result.mood < 0 || metabolicGain('mood').ok)) {
     const before = pc.mood || 0;
     pc.mood = Math.max(0, Math.min(moodMax(pc), before + result.mood));
     if (pc.mood !== before) effects.mood = pc.mood - before;
   }
-  if (result.energy) {
+  if (result.energy && (result.energy < 0 || metabolicGain('energy').ok)) {
     const before = pc.energy || 0;
     pc.energy = Math.max(0, Math.min(energyMax(pc), before + result.energy));
     if (pc.energy !== before) effects.energy = pc.energy - before;

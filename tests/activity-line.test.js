@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { activitySegmentsToHtml, buildActivitySegments, formatActivityLine } from '../public/js/verb-rewards.js?v=g162-1';
+import { activitySegmentsToHtml, buildActivitySegments, formatActivityLine } from '../public/js/verb-rewards.js?v=g227-1';
 
 describe('activity lines end one sentence once (G162)', () => {
   it('adds a period only where the line has no mark of its own', () => {

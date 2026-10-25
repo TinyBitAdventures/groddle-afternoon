@@ -27,12 +27,14 @@
  *     &quoinshardautoplay=1). &quoinshard=them sends Amp to the quoin while you
  *     stand 120 px away; &quoinshard=natural sets the three round a quoin and
  *     leaves it to their own interest roll. &quoinmult=3 scales your shard. quoinshard turns the
- *     companions on for that load (game.js localCompanionsEnabled).
+ *     companions on for that load (game.js localCompanionsEnabled). A shard is a share of
+ *     the quoin's class benefit (G227: spot 0's class is a stable hash; force one with
+ *     &quoinclass=slow medium-large xp for a steady 25, or fast tiny xp for 1).
  * Canvas: data-quoin-shard-last, -crowd, -sound, -you, -fx, -demo,
  *     data-companion-quoins; data-last-sound for the sound check.
  */
 
-import { QUOIN_TYPES, creditQuoinStat } from '../quoins.js?v=g216-1';
+import { QUOIN_TYPES, creditQuoinStat, quoinClassAmount } from '../quoins.js?v=g227-1';
 import {
   COMPANION_QUOIN_RULES,
   QUOIN_SHARD_FX,
@@ -373,7 +375,8 @@ function companionGrab(actor, q, engine) {
   shareQuoin({
     grabber: actor.name,
     typeId: q.typeId,
-    baseAmount: QUOIN_TYPES[q.typeId]?.baseAmount,
+    // G227: the spot's class sets the amount it shards (quoin.js 161-169).
+    baseAmount: quoinClassAmount(q.quoinClass, q.typeId) ?? QUOIN_TYPES[q.typeId]?.baseAmount,
     quoin: { x: q.x, y: q.y },
     at: { x: actor.sprite.x, y: actor.sprite.y },
   }, engine);
