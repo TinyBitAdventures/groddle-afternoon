@@ -2593,41 +2593,21 @@ button.play-context-head:focus-visible {
   filter: drop-shadow(0 5px 4px rgba(67, 49, 24, 0.22));
   animation: make-tool-work 0.62s ease-in-out infinite alternate;
 }
-.make-progress .mp-tool[data-tool="blender"],
-.make-progress .mp-tool[data-tool="spice_mill"],
-.make-progress .mp-tool[data-tool="ore_grinder"] {
-  animation-name: make-tool-whirr;
-  animation-duration: 0.2s;
-}
-.make-progress .mp-tool[data-tool="frying_pan"] {
-  animation-name: make-tool-toss;
-  animation-duration: 0.78s;
-}
-.make-progress .mp-tool[data-tool="gassifier"],
-.make-progress .mp-tool[data-tool="smelter"] {
-  animation-name: make-tool-breathe;
-  animation-duration: 0.7s;
-}
-.make-progress .mp-tool-fruit-machine {
+.make-progress .mp-tool-sheet {
+  /* G188: a making tool's own tool_animation (glitch-client MakingToolAnimator.as), one row of
+     frames from js/make-tool-sheets.js (built by tools/build-make-tool-sheets.py). The span is one
+     1x cell, scaled to fit the tool box; game.js sets the sheet, frame size, row width, frame
+     count, loop length (frames at 30 fps) and scale as custom properties. */
   display: block;
-  width: 44px;
-  height: 66px;
-  /* 17 working frames rendered at 3x from glitch-items fruit_changing_machine.swf
-     (scene tool_animation, FFDec -zoom 3), drawn at 1x size for sharpness. */
-  background: url('assets/sprites/making/fruit_changing_machine-work@3x.webp') 0 0 / 748px 66px no-repeat;
-  transform: scale(1.42);
-  animation: fruit-machine-work 1.35s steps(17, end) infinite;
-}
-.make-progress .mp-tool-grand-ol-grinder {
-  display: block;
-  width: 50px;
-  height: 79px;
-  /* grand_ol_grinder.swf tool_animation (OGA grand_ol_grinder__x1_tool_animation,
-     CC0, 850x395 = 17x5 cells of 50x79): the 83 frames repacked into one row,
-     played at the SWF's 30 fps. */
-  background: url('assets/sprites/making/grand_ol_grinder-work.png') 0 0 / 4150px 79px no-repeat;
-  transform: scale(1.18);
-  animation: grand-ol-grinder-work 2.77s steps(83, end) infinite;
+  width: var(--mp-fw);
+  height: var(--mp-fh);
+  object-fit: none;
+  background-position: 0 0;
+  background-size: var(--mp-row) var(--mp-fh);
+  background-repeat: no-repeat;
+  transform: scale(var(--mp-scale));
+  transform-origin: 50% 50%;
+  animation: make-tool-sheet var(--mp-dur) steps(var(--mp-steps), end) infinite;
 }
 .make-progress .mp-spark {
   position: absolute;
@@ -2688,25 +2668,9 @@ button.play-context-head:focus-visible {
   from { transform: rotate(-7deg) translateY(3px); }
   to { transform: rotate(8deg) translateY(-3px); }
 }
-@keyframes make-tool-whirr {
-  from { transform: translateX(-2px) rotate(-1deg); }
-  to { transform: translateX(2px) rotate(1deg); }
-}
-@keyframes make-tool-toss {
-  0%, 100% { transform: rotate(-7deg) translateY(4px); }
-  50% { transform: rotate(7deg) translateY(-7px); }
-}
-@keyframes make-tool-breathe {
-  from { transform: scale(0.97); filter: drop-shadow(0 3px 3px rgba(67,49,24,0.18)); }
-  to { transform: scale(1.04); filter: drop-shadow(0 6px 7px rgba(243,182,31,0.35)); }
-}
-@keyframes grand-ol-grinder-work {
+@keyframes make-tool-sheet {
   from { background-position: 0 0; }
-  to { background-position: -4150px 0; }
-}
-@keyframes fruit-machine-work {
-  from { background-position: 0 0; }
-  to { background-position: -748px 0; }
+  to { background-position: calc(-1 * var(--mp-row)) 0; }
 }
 @keyframes make-spark {
   from { opacity: 0.25; transform: scale(0.65) rotate(0); }

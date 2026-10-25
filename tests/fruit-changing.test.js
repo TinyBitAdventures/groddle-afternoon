@@ -141,10 +141,12 @@ describe('Fruit Changing interface wiring', () => {
     assert.match(game, /Convert fruit/);
     assert.match(game, /Transmogrify/);
     assert.match(game, /11 fruits|recipes\.length.*fruits/s);
-    assert.match(game, /mp-tool-fruit-machine/);
-    assert.match(css, /fruit_changing_machine-work@3x\.webp/);
-    assert.match(css, /@keyframes fruit-machine-work/);
-    assert.match(css, /background-position: -748px 0/);
+    // G188: played through the Make panel's one tool-sheet path (js/make-tool-sheets.js).
+    const sheets = readFileSync(join(publicRoot, 'js/make-tool-sheets.js'), 'utf8');
+    assert.match(game, /makeToolSheetVisual\(recipe\.tool\)/);
+    assert.match(sheets, /fruit_changing_machine: Object\.freeze\(\{ url: 'assets\/sprites\/making\/fruit_changing_machine-work@3x\.webp', fw: 44, fh: 66, frames: 17, durationMs: 1350, scale: 1\.42, density: 3 \}\)/);
+    assert.match(css, /\.mp-tool-sheet \{[\s\S]*?steps\(var\(--mp-steps\), end\)/);
+    assert.match(css, /@keyframes make-tool-sheet/);
     const making = readFileSync(join(publicRoot, 'js/making.js'), 'utf8');
     assert.match(making, /recipes\.json\?v=fruit-machine-2/);
     assert.match(html, /game\.js\?v=(?:official-ecology-1|trant-harvest-[12]|badge-events-1|butterfly-care-1|feed-picker-1|animal-kinship-[12]|trant-care-[1-3]|woodcutting-[1-4]|dialogue-[1-3]|movement-1|food-memory-1|dametime-1|fruit-machine-2|vendor-profiles-1|world-items-[12]|world-persistence-1|shrines-[1-4]|quoins-[12]|item-buffs-[12]|tool-condition-1)/);

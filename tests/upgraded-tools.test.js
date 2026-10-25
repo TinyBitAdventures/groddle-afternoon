@@ -341,12 +341,13 @@ describe('G183: isToolItem and the Grand Ol\' Grinder animation', () => {
   it('the Make panel swings the Grand Ol\' Grinder sheet when it does the crushing', () => {
     const game = readFileSync(join(pub, 'game.js'), 'utf8');
     assert.match(game, /const toolInUse = recipeToolInUse\(inv, recipe\.tool,/);
-    assert.match(game, /toolInUse === 'grand_ol_grinder'[\s\S]{0,80}mp-tool-grand-ol-grinder/);
-    const css = readFileSync(join(pub, 'style.css'), 'utf8');
-    assert.match(css, /\.mp-tool-grand-ol-grinder \{[\s\S]*?grand_ol_grinder-work\.png'\) 0 0 \/ 4150px 79px[\s\S]*?steps\(83, end\)/);
+    // G188: the stand-in's sheet first, then the recipe tool's (js/make-tool-sheets.js).
+    assert.match(game, /makeToolSheetVisual\(toolInUse\) \|\| makeToolSheetVisual\(recipe\.tool\)/);
     // grand_ol_grinder__x1_tool_animation (850x395, 17x5 cells of 50x79, 83 frames) in one row.
-    const png = readFileSync(join(pub, 'assets/sprites/making/grand_ol_grinder-work.png'));
-    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [83 * 50, 79]);
+    const webp = readFileSync(join(pub, 'assets/sprites/making/grand_ol_grinder-work.webp'));
+    assert.equal(webp.toString('ascii', 12, 16), 'VP8L');
+    const bits = webp.readUInt32LE(21);
+    assert.deepEqual([(bits & 0x3fff) + 1, ((bits >> 14) & 0x3fff) + 1], [83 * 50, 79]);
   });
 
   it('recipeToolInUse names the Grand Ol\' Grinder only when it is the grinder at work', () => {

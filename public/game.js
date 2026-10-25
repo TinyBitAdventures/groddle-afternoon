@@ -490,6 +490,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
 } from './js/making.js?v=g179-1';
+import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g188-1';
 import {
   createGarden,
   tickGarden,
@@ -19929,6 +19930,28 @@ function setMakeCraftingUi(isCrafting) {
   document.querySelector('#make-panel .make-card')?.classList.toggle('is-crafting', isCrafting);
 }
 
+/**
+ * The tool's own tool_animation while its recipe runs (glitch-client MakingToolAnimator.as:16,92),
+ * looped (SSCollection.as:123) from the one-row sheets in js/make-tool-sheets.js (G188).
+ * Null for a tool without a sheet, which keeps its icon.
+ */
+function makeToolSheetVisual(toolId) {
+  const sheet = toolId && MAKE_TOOL_SHEETS[toolId];
+  if (!sheet) return null;
+  const label = TOOL_CATALOG[toolId]?.label || toolId;
+  const durationMs = sheet.durationMs || Math.round((sheet.frames / sheet.fps) * 1000);
+  const style = [
+    `--mp-fw:${sheet.fw}px`,
+    `--mp-fh:${sheet.fh}px`,
+    `--mp-row:${sheet.frames * sheet.fw}px`,
+    `--mp-steps:${sheet.frames}`,
+    `--mp-dur:${durationMs}ms`,
+    `--mp-scale:${sheet.scale}`,
+    `background-image:url('${sheet.url}')`,
+  ].join(';');
+  return `<span class="mp-tool mp-tool-sheet" data-tool="${escapeHtml(toolId)}" data-frames="${sheet.frames}" role="img" aria-label="${escapeHtml(label)} working" style="${style}"></span>`;
+}
+
 /** Draw the source-inspired ingredients → working tool → output stage once. */
 function renderMakeProgressStage(record) {
   const { recipe, timer } = record;
@@ -19943,11 +19966,8 @@ function renderMakeProgressStage(record) {
   const toolIcon = TOOL_CATALOG[recipe.tool]?.icon || itemIconUrl(recipe.tool);
   // The stand-in doing the work (dullite.js:124-133): a Grand Ol' Grinder swings its own tool_animation.
   const toolInUse = recipeToolInUse(inv, recipe.tool, record.opts?.toolState || toolState, recipe.toolWear || 1);
-  const toolVisual = recipe.tool === 'fruit_changing_machine'
-    ? '<span class="mp-tool mp-tool-fruit-machine" data-tool="fruit_changing_machine" role="img" aria-label="Fruit Changing Machine working"></span>'
-    : toolInUse === 'grand_ol_grinder'
-      ? '<span class="mp-tool mp-tool-grand-ol-grinder" data-tool="grand_ol_grinder" role="img" aria-label="Grand Ol\' Grinder working"></span>'
-      : `<img class="mp-tool" data-tool="${escapeHtml(recipe.tool || '')}" src="${toolIcon}" alt="" />`;
+  const toolVisual = makeToolSheetVisual(toolInUse) || makeToolSheetVisual(recipe.tool)
+    || `<img class="mp-tool" data-tool="${escapeHtml(recipe.tool || '')}" src="${toolIcon}" alt="" />`;
   prog.hidden = false;
   prog.innerHTML = `
     <p class="mp-label" data-mp-label>${escapeHtml(formatCraftProgress(1, timer.qty, recipe.name))}</p>

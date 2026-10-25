@@ -205,7 +205,8 @@ describe('GSJS recipe catalog import', () => {
       assert.equal(ITEM_CATALOG[id].icon, `assets/sprites/icons/${id}.png`);
     }
     for (const id of ['saucepan', 'mike_tyson_grill', 'cocktail_shaker', 'awesome_pot', 'cauldron']) {
-      assert.ok(existsSync(join(publicRoot, 'assets/sprites/making', `${id}-tool.png`)), `${id} sheet`);
+      // G188: the OGA tool_animation grids ship repacked into one row (tools/build-make-tool-sheets.py).
+      assert.ok(existsSync(join(publicRoot, 'assets/sprites/making', `${id}-work.webp`)), `${id} sheet`);
     }
   });
 });
