@@ -38,12 +38,15 @@
  * "Skip to Ur"; existing saves and autostart routes are never redirected.
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&newxp=1 (or
  * =training1|training2|house|skill|island) forces it; &newxpautoplay=1 runs
- * it end to end (&newxphold=<stage> stops on reaching that stage,
+ * it end to end (&newxphold=<stage> stops on reaching that stage, =sloth at
+ * the sloth's poof with the puff frozen at &newxpholdms=<ms>,
  * &newxpskill=animalkinship_1|ezcooking_1|light_green_thumb_1,
  * &newxpstyle=meadow|firebog|uralia). Canvas data: newxpStatus, newxpStage,
  * newxpStep, newxpUpgrades, newxpIsland, newxpAutoplay, newxpLast, newxpFlags,
- * newxpCard (island:<hand>), newxpIslandCard, newxpStreetEvent, newxpGarden.
- * The island autoplay also tours the gully and Doonboggle (&newxpisland=quick
+ * newxpCard (island:<hand>), newxpIslandCard, newxpStreetEvent, newxpGarden,
+ * newxpSlothPoof, and on the practice street newxpAk (its trail), newxpAkTable
+ * and newxpSigns (each shown hint sign: id tail @ x,y a alpha). The island
+ * autoplay also tours the gully and Doonboggle (&newxpisland=quick
  * skips them); &newxpcard=<id> picks that card from an island hand.
  */
 
@@ -119,14 +122,17 @@ import {
   AK_BUBBLE,
   AK_EVENT_BOXES,
   AK_POOF_OUT,
+  AK_QUOINS,
+  AK_SIDE_TABLE,
   AK_SIGNS,
   AK_WALL_OFF_MS,
   SKILLQUEST_AK_SOURCE,
   SKILLQUEST_AK_TSID,
   akAnimalForEvent,
+  akSideTablePlacement,
   akVerbReaction,
   createAkState,
-} from '../skillquest-ak.js?v=g290-1';
+} from '../skillquest-ak.js?v=g298-1';
 
 export const NEWXP_FEATURE_ID = 'newxp';
 /** newxp_training1.js 705-706 slothRemove: deleteWithPoof, then hideTree 0.5 s later. */
@@ -778,11 +784,26 @@ function quoinTexture(PIXI, type = 'xp') {
  * the stack's display top plus delta_x / delta_y (2 s, its last frame
  * held), PROTO_PUFF, and the stack is gone (G285).
  */
-function deleteWithPoof(engine, spr, dx = 0, dy = 0) {
+function deleteWithPoof(engine, spr, dx = 0, dy = 0, { holdMs = null } = {}) {
   if (!spr || spr.destroyed) return null;
   const at = itemstackOverlayPoint(spr.x, displayTopOf(spr), { dx, dy });
   engine.playSound('PROTO_PUFF', { volume: 0.5 });
-  return playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70 });
+  return playSheetOverlay(engine.PIXI, 'proto_puff', { layer: engine.entityLayer, at: () => at, durationMs: 2000, loop: false, zIndex: 70, holdMs });
+}
+
+/** items/item.js 509 deleteWithPoof: apiSetTimer('apiDelete', 200), the stack goes 200 ms after the puff. */
+const POOF_DELETE_MS = 200;
+
+/**
+ * QA: &newxphold=sloth stops the autoplay at the sloth's poof in training1 and
+ * freezes the puff &newxpholdms=<ms> into its 2 s run (default 400) for a
+ * screenshot (G298; canvas newxpAutoplay hold:sloth, newxpSlothPoof x,y).
+ */
+function slothHoldMs() {
+  if (holdAt !== 'sloth') return null;
+  const raw = engineRef?.param('newxpholdms');
+  const ms = raw == null || raw === '' ? NaN : Number(raw);
+  return Number.isFinite(ms) && ms >= 0 ? ms : 400;
 }
 
 /**
@@ -1170,8 +1191,19 @@ async function runTraining1(t) {
     if (treeGone) return;
     treeGone = true;
     // slothRemove (newxp_training1.js 695-708): deleteWithPoof(-50, 250), the tree right after.
-    if (sloth.alpha > 0 && sloth.visible) deleteWithPoof(engine, sloth, -50, 250);
-    sloth.visible = false;
+    const holdMs = slothHoldMs();
+    if (sloth.alpha > 0 && sloth.visible) {
+      deleteWithPoof(engine, sloth, -50, 250, { holdMs });
+      engine.setData('newxpSlothPoof', `${Math.round(sloth.x)},${Math.round(sloth.y)}`);
+      if (holdMs != null) {
+        auto = false;
+        engine.setData('newxpAutoplay', 'hold:sloth');
+      }
+    }
+    // The sloth stays until apiDelete, 200 ms after the puff (kept under a held puff before that).
+    setTimeout(() => {
+      if (t === token && (holdMs == null || holdMs >= POOF_DELETE_MS)) sloth.visible = false;
+    }, POOF_DELETE_MS);
     engine.playSound('SLOTH_ARRIVES', { volume: 0.3 });
     // apiSetTimer('hideTree', 0.5*1000): treehide and plat1 half a second after the poof (G290).
     setTimeout(() => {
@@ -1209,6 +1241,8 @@ async function runTraining1(t) {
   }, {
     help: async () => {
       place(2300, 1350);
+      // &newxphold=sloth: stand in the peek box and let the sloth show, talk and poof (slothHoldMs).
+      if (slothHoldMs() != null) return;
       slothShownAt = Date.now() - 8000;
       hideTree();
       await new Promise((r) => setTimeout(r, SLOTH_TREE_HIDE_MS + 150));
@@ -1693,6 +1727,7 @@ async function runSkill(t) {
     : { id: 'watering_can', classTsid: 'watering_can', x: 650, y: 900, off: 'wateringcan_off' };
   const groundAt = (x, y) => groundBelow(engine, x, y);
   addPickup(engine, tool.id, tool.classTsid, 1, tool.x, groundAt(tool.x, tool.y), () => fireSafe(tool.off));
+  if (ak) akSideTable(engine);
   // flamingo_talk1: the flamingo pops in to say hello.
   const fl = makeNpc(engine, 'flamingo', 370, groundAt(370, 880), { register: true });
   run.npcs.push(fl);
@@ -1716,6 +1751,26 @@ async function runSkill(t) {
 /* ------------------------------------------------------------------ */
 /* skillquest_ak: the practice animals (js/skillquest-ak.js, G290)      */
 /* ------------------------------------------------------------------ */
+
+/** The Side Table the lotion stands on (js/skillquest-ak.js AK_SIDE_TABLE, G298): scenery, as a stack with no verbs. */
+function akSideTable(engine) {
+  const bounds = engine.street?.bounds;
+  const plat = AK_SIDE_TABLE.platform;
+  const top = sourceToStreet(bounds, (plat.x1 + plat.x2) / 2, plat.y);
+  const floor = groundBelow(engine, top.x, top.y + 25);
+  const at = akSideTablePlacement(floor + (bounds?.t ?? 0));
+  const spr = new engine.PIXI.Sprite(textureFromUrl(AK_SIDE_TABLE.art));
+  spr.anchor.set(0.5, 1);
+  spr.x = top.x;
+  spr.y = floor + 2;
+  spr.width = at.width;
+  spr.height = at.height;
+  spr.zIndex = 26;
+  spr.eventMode = 'none';
+  engine.entityLayer.addChild(spr);
+  run.fixtures.push(spr);
+  engine.setData('newxpAkTable', `${Math.round(spr.x)},${Math.round(floor)},${at.width}x${at.height}`);
+}
 
 /** QA trail on the canvas (data-newxp-ak): what the practice street did, in order. */
 function akLog(engine, what) {
@@ -2499,7 +2554,15 @@ function syncSigns(engine) {
       row.label.y = at.y;
     }
   }
+  // QA (data-newxp-signs): each shown sign's deco id tail and label centre in world px.
+  const shown = (run?.data?.signs || []).filter((row) => row.label.visible && !row.label.destroyed)
+    .map((row) => `${row.id.slice(-4)}@${Math.round(row.label.x)},${Math.round(row.label.y)}a${row.label.alpha.toFixed(2)}`).join(' ');
+  if (shown !== lastSignsData) {
+    lastSignsData = shown;
+    engine.setData('newxpSigns', shown);
+  }
 }
+let lastSignsData = null;
 
 function fireStreetEvent(engine, name) {
   const ok = locationEventsApi.fire(engine, name);
@@ -2922,8 +2985,12 @@ export const newxpFeature = {
   ecologyOverride(street) {
     // skillquest_ak.js reset() removes every npc_chicken, npc_piggy and npc_butterfly; the
     // event boxes poof one of each in (akSpawn, G290), so the street itself has none.
+    // LHFRK14DDU53RQQ.xml items (273-290) are the whole street: ten event boxes, 3 Coins
+    // (items/quoin.js), a Side Table (akSideTable) and a hidden teleporter (the EXIT, our
+    // finish box). As an exact row (street-ecology.js `interior`, like tower-rooms-feature)
+    // it gets those 3 quoins and no apples, Musicblocks or seasonal decor (G298).
     if (street?.tsid === SKILLQUEST_AK_TSID) {
-      return { label: 'A L\'il Animal Kinship', sourceTsid: SKILLQUEST_AK_SOURCE, counts: {} };
+      return { label: 'A L\'il Animal Kinship', sourceTsid: SKILLQUEST_AK_SOURCE, counts: {}, interior: true, quoins: AK_QUOINS };
     }
     return null;
   },
@@ -2957,6 +3024,8 @@ export const newxpFeature = {
     }
     stepNpcs(dtMs);
     akStep(dtMs);
+    // The practice street's hint signs follow their decos' fades and parallax every frame (G298).
+    if (run?.data?.ak) syncSigns(engine);
     stepQuoins(engine);
     // Three jumps (countJumps): a take-off from the ground.
     const p = P();

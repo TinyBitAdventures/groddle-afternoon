@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 476,
+  "commits": 477,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "fix",
+    "text": "Machines, making, mining, repairs, Animal Kinship, piggy capture, chores and the conch cost no energy while dead"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "improve",
     "text": "Each quoin gives what its class gives, a new day leaves waiting quoins alone, and buffs, drops and crabs respect Super Pooped"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "U opens the upgrade cards, Shift+S skills and Shift+T your teleport points, \"Not right now\" puts a quest in your log to start later, and quest copies show no region"
    }
   ]
  },
- "tests": 281,
+ "tests": 282,
  "generatedAt": "2026-10-25"
 }

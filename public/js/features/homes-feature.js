@@ -140,6 +140,7 @@ import {
 } from '../home-cultivation.js?v=home-cultivation-4';
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { playPoofIn } from '../overlay-art.js?v=g273-1';
+import { fadeInNewNear } from '../poof-fade.js?v=g298-1';
 import { projectApi } from './street-jobs-feature.js?v=g296-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
 import { towerApi } from './home-tower-feature.js?v=home-tower-12';
@@ -1734,7 +1735,7 @@ function queueCultivationPoof(item, st, { proto = false } = {}) {
   pendingPoofs.push({ id: item.id, st, itemH, at: Date.now() });
 }
 
-function playPendingPoofs(engine, st) {
+function playPendingPoofs(engine, st, before = null) {
   const now = Date.now();
   for (let i = pendingPoofs.length - 1; i >= 0; i -= 1) {
     const row = pendingPoofs[i];
@@ -1745,6 +1746,9 @@ function playPendingPoofs(engine, st) {
     if (!item) continue;
     engine.playSound?.('PROTO_PUFF', { volume: 0.5 });
     playPoofIn(engine.PIXI, { layer: engine.entityLayer, x: cultivationWorldX(item, st), bottom: yardGroundY(st) + 6, itemH: row.itemH });
+    // poofItIn's fade (LocationItemstackView.as 739, 768): whatever the redraw drew for this item (G298).
+    const faded = before ? fadeInNewNear(engine.entityLayer, before, { x: cultivationWorldX(item, st), halfW: footprint(item.protoClass) }) : [];
+    if (engine.setData) engine.setData('homePoofFade', String(faded.length));
   }
   if (engine.setData) engine.setData('homePoof', String(now));
 }
@@ -1766,6 +1770,8 @@ function spawnCultivations(engine, st = activeCult()) {
   const tsid = yardTsid(st);
   const groundY = yardGroundY(st);
   const world = engine.streetWorld ? engine.streetWorld(tsid) : null;
+  // A queued poof fades in what this redraw adds for its item (playPendingPoofs, G298).
+  const poofBefore = pendingPoofs.length ? new Set(engine.entityLayer?.children || []) : null;
   // Rocks: the yard's own rock slots, in cultivation order.
   const rocks = rockItems(st.items);
   rocks.forEach((item, index) => {
@@ -1827,7 +1833,7 @@ function spawnCultivations(engine, st = activeCult()) {
   }
   // Worn-out cultivations: their protos and Restore projects.
   spawnProtos(engine, st);
-  if (pendingPoofs.length) playPendingPoofs(engine, st);
+  if (pendingPoofs.length) playPendingPoofs(engine, st, poofBefore);
   if (mode === 'cultivate') drawCultivationMarkers(engine);
   // The back yard has no Tower (cultivation_get_available: street only).
   if (isBackYard(st)) return;

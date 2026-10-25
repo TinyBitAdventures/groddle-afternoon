@@ -70,6 +70,43 @@ export const AK_SIGNS = Object.freeze({
   groddle_sign_blank_1342132710696: Object.freeze({ text: 'EXIT', face: true, plaque: true }),
 });
 
+/**
+ * LHFRK14DDU53RQQ.xml items (273-290) list the street's whole population:
+ * ten Collision-triggered Event Boxes (AK_EVENT_BOXES), 3 Coins (items/quoin.js
+ * label "Coin"), a Side Table, a Collision-triggered Teleporter (hidden; the
+ * EXIT, the newxp finish box) and the Chicken reset() removes. The stacks
+ * themselves were never archived, so the Coins take the street planner's
+ * spots like any quoin (G298).
+ */
+export const AK_QUOINS = 3;
+
+/**
+ * The Side Table (items/furniture_sidetable.js). Its stack is lost, but the
+ * lotion stands on an item-only platform (plat_1342128759603, x 1804-1845 at
+ * y -187, pc_perm 0) laid with the sign and light shaft over it
+ * (1342128759601-609): the table under the lotion, its top on that platform.
+ * Drawn from the side table's art (surface 50 of 54 px, homes-catalog.js)
+ * scaled to that top.
+ */
+export const AK_SIDE_TABLE = Object.freeze({
+  classTsid: 'furniture_sidetable',
+  label: 'Side Table',
+  art: 'assets/sprites/icons/furniture_sidetable@3x.png',
+  artW: 62,
+  artH: 54,
+  surface: 50,
+  platform: Object.freeze({ id: 'plat_1342128759603', x1: 1804, x2: 1845, y: -187 }),
+});
+
+/** Where the Side Table stands (source px): centred under its platform, feet on `floorY`, top on the platform. */
+export function akSideTablePlacement(floorY) {
+  const t = AK_SIDE_TABLE;
+  const x = (t.platform.x1 + t.platform.x2) / 2;
+  const rise = Math.max(1, Number(floorY) - t.platform.y);
+  const scale = rise / t.surface;
+  return { x, bottom: Number(floorY), width: Math.round(t.artW * scale), height: Math.round(t.artH * scale), scale };
+}
+
 /** The animal a location event spawns (chicken -> npc_chicken), or null. */
 export function akAnimalForEvent(event) {
   for (const [classId, row] of Object.entries(AK_ANIMALS)) if (row.event === event) return classId;

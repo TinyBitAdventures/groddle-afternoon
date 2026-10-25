@@ -98,7 +98,7 @@ import {
 } from '../potions.js?v=g149-1';
 import { itemVerbAchievementCounters } from '../item-verbs.js?v=item-verbs-3';
 import { patchesFeature } from './patches-feature.js?v=patches-13';
-import { homesFeature } from './homes-feature.js?v=homes-24';
+import { homesFeature } from './homes-feature.js?v=homes-25';
 import { streetTreeIndex } from './tree-death-feature.js?v=tree-death-11';
 import { questRoomConverse } from './quest-instances-feature.js?v=qi-10';
 

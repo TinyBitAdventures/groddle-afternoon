@@ -4,6 +4,9 @@
  * second squeeze, the nibble and the milk, with the sign events; cultivations
  * poof in at home (quest.js 1880, include/cultivation.js 75); no chicken feed
  * entry; the sloth's tree goes 0.5 s after its poof.
+ * G298: the street carries only its item list (3 quoins, the Side Table under
+ * the lotion), its hint signs follow their decos every frame, home poofs fade
+ * the new item in (tests/poof-fade.test.js), &newxphold=sloth.
  * Run: node --test tests/skillquest-ak.test.js
  */
 import { describe, it } from 'node:test';
@@ -16,15 +19,20 @@ import {
   AK_BUBBLE,
   AK_EVENT_BOXES,
   AK_POOF_OUT,
+  AK_QUOINS,
+  AK_SIDE_TABLE,
   AK_SIGNS,
   AK_SQUEEZES,
   AK_WALL_OFF_MS,
   SKILLQUEST_AK_TSID,
   akAnimalForEvent,
+  akSideTablePlacement,
   akVerbReaction,
   createAkState,
 } from '../public/js/skillquest-ak.js';
 import { listAnimalFeedOptions } from '../public/js/animals.js';
+import { populationForStreet } from '../public/js/street-ecology.js';
+import { newxpFeature } from '../public/js/features/newxp-feature.js?v=g298-1';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pub = join(here, '../public');
@@ -132,7 +140,7 @@ describe('G290 wiring', () => {
   const homes = read('js/features/homes-feature.js');
 
   it('the practice street has no fauna of its own; the run spawns, bubbles and poofs them', () => {
-    has(newxp, /SKILLQUEST_AK_TSID\) \{\n\s+return \{ label: 'A L\\'il Animal Kinship', sourceTsid: SKILLQUEST_AK_SOURCE, counts: \{\} \}/);
+    has(newxp, /SKILLQUEST_AK_TSID\) \{\n\s+return \{ label: 'A L\\'il Animal Kinship', sourceTsid: SKILLQUEST_AK_SOURCE, counts: \{\}, interior: true, quoins: AK_QUOINS \}/);
     has(newxp, /function akSpawn\([\s\S]*?playPoofIn\(PIXI[\s\S]*?engine\.say\(target, def\.bubble, AK_BUBBLE\.durationMs\)/);
     has(newxp, /function akPoofOut\([\s\S]*?deleteWithPoof\(engine, row\.sprite, AK_POOF_OUT\.dx, AK_POOF_OUT\.dy\)/);
     has(newxp, /akVerb\(engine, cls, verb\)/);
@@ -142,7 +150,7 @@ describe('G290 wiring', () => {
   it('the sloth\'s tree hides 0.5 s after its poof (slothRemove -> hideTree)', { skip: !haveGsjs }, () => {
     assert.match(gsjs('locations/newxp_training1.js'), /sloth\.deleteWithPoof\(-50, 250\);\n\tthis\.apiSetTimer\('hideTree', 0\.5\*1000\);/);
     has(newxp, /const SLOTH_TREE_HIDE_MS = 500;/);
-    has(newxp, /deleteWithPoof\(engine, sloth, -50, 250\);[\s\S]{0,200}setTimeout\(\(\) => \{[\s\S]{0,80}treeHidden = true;[\s\S]*?\}, SLOTH_TREE_HIDE_MS\);/);
+    has(newxp, /deleteWithPoof\(engine, sloth, -50, 250, \{ holdMs \}\);[\s\S]{0,800}setTimeout\(\(\) => \{[\s\S]{0,80}treeHidden = true;[\s\S]*?\}, SLOTH_TREE_HIDE_MS\);/);
   });
 
   it('cultivations poof in where the source does (quest.js 1880, cultivation.js 75)', { skip: !haveGsjs }, () => {
@@ -151,11 +159,67 @@ describe('G290 wiring', () => {
     has(homes, /import \{ playPoofIn \} from '\.\.\/overlay-art\.js/);
     has(homes, /function finishRestore\([\s\S]*?queueCultivationPoof\(result\.item, st\);/);
     has(homes, /function depleteItem\([\s\S]*?queueCultivationPoof\(.*\{ proto: true \}\);/);
-    has(homes, /spawnProtos\(engine, st\);\n\s+if \(pendingPoofs\.length\) playPendingPoofs\(engine, st\);/);
+    has(homes, /spawnProtos\(engine, st\);\n\s+if \(pendingPoofs\.length\) playPendingPoofs\(engine, st, poofBefore\);/);
   });
 
   it('chickens have no feed entry (npc_chicken.js has no feed verb)', () => {
     assert.deepEqual(listAnimalFeedOptions('npc_chicken', { grain: 4, corn: 2 }), []);
     assert.ok(!/npc_chicken: Object\.freeze\(\{\n\s+grain:/.test(read('js/animals.js')));
+  });
+});
+
+describe('G298: only what the source lists', () => {
+  const has = (text, re) => assert.ok(re.test(text), String(re));
+  const newxp = read('js/features/newxp-feature.js');
+
+  it('LHFRK14DDU53RQQ.xml items: 3 Coins (quoins), one Side Table, one teleporter', { skip: !haveLoc || !haveGsjs }, () => {
+    const items = loc('LHFRK14DDU53RQQ').match(/<objrefs id="items">([\s\S]*?)<\/objrefs>/)[1];
+    const count = (label) => (items.match(new RegExp(`label="${label}"`, 'g')) || []).length;
+    assert.equal(count('Coin'), AK_QUOINS);
+    assert.equal(count('Side Table'), 1);
+    assert.equal(count('Collision-triggered Teleporter'), 1);
+    assert.match(gsjs('items/quoin.js'), /^var label = "Coin";/m);
+    assert.match(gsjs('items/furniture_sidetable.js'), /^var label = "Side Table";/m);
+    assert.match(gsjs('items/teleporter.js'), /^var is_hidden = true;/m);
+  });
+
+  it('the practice street is an exact row: 3 quoins, no apples, Musicblocks, fauna or seasonal decor', () => {
+    const row = newxpFeature.ecologyOverride({ tsid: SKILLQUEST_AK_TSID });
+    assert.equal(row.interior, true);
+    const pop = populationForStreet(SKILLQUEST_AK_TSID, row);
+    assert.equal(pop.quoins, 3);
+    assert.equal(pop.apples, 0);
+    assert.equal(pop.musicblocks, 0);
+    assert.equal(pop.piggies + pop.chickens + pop.butterflies, 0);
+    assert.equal(pop.treeClasses.length + pop.rockClasses.length + pop.gardens, 0);
+    assert.ok(!pop.vendor && !pop.shrine);
+    // seasons-feature: interiors get no lanterns, ghost, eggs or canes; qurazy has no marker here.
+    has(read('js/features/seasons-feature.js'), /population\?\.interior \|\| population\?\.sourceEmpty\) return \[\];/);
+    assert.equal(newxpFeature.ecologyOverride({ tsid: 'LA9112O7OS71O33' }), null);
+  });
+
+  it('the Side Table stands under the lotion\'s item-only platform', { skip: !haveGsjs }, () => {
+    const plat = street.platforms.find((p) => p.id === AK_SIDE_TABLE.platform.id);
+    assert.ok(plat);
+    assert.deepEqual([plat.x1, plat.x2, plat.y1, plat.y2, plat.pc_perm], [AK_SIDE_TABLE.platform.x1, AK_SIDE_TABLE.platform.x2, AK_SIDE_TABLE.platform.y, AK_SIDE_TABLE.platform.y, 0]);
+    // reset() creates the lotion at its location target, just over that platform.
+    assert.match(gsjs('locations/skillquest_ak.js'), /'butterfly_lotion': \{x:1823, y:-190\}/);
+    assert.ok(1823 >= plat.x1 && 1823 <= plat.x2);
+    const at = akSideTablePlacement(-102);
+    assert.equal(at.x, 1824.5);
+    assert.equal(at.bottom, -102);
+    // The art's surface lands on the platform.
+    assert.ok(Math.abs(at.bottom - at.height * (AK_SIDE_TABLE.surface / AK_SIDE_TABLE.artH) - AK_SIDE_TABLE.platform.y) <= 1);
+    assert.ok(Math.abs(at.width / at.height - AK_SIDE_TABLE.artW / AK_SIDE_TABLE.artH) < 0.02);
+    assert.ok(existsSync(join(pub, AK_SIDE_TABLE.art)));
+  });
+
+  it('the hint signs follow their decos every frame, the table is drawn, and the sloth hold parses', { skip: !haveGsjs }, () => {
+    has(newxp, /akStep\(dtMs\);\n[^\n]*\n\s+if \(run\?\.data\?\.ak\) syncSigns\(engine\);/);
+    has(newxp, /if \(ak\) akSideTable\(engine\);/);
+    has(newxp, /function slothHoldMs\(\) \{\n\s+if \(holdAt !== 'sloth'\) return null;\n\s+const raw = engineRef\?\.param\('newxpholdms'\);\n\s+const ms = raw == null \|\| raw === '' \? NaN : Number\(raw\);/);
+    // item.js deleteWithPoof: apiDelete 200 ms after the puff; the sloth stays that long.
+    assert.match(gsjs('items/item.js'), /container\.announce_sound_to_all\('PROTO_PUFF'\);\n\t\}\n\n\tthis\.apiSetTimer\('apiDelete', 200\);/);
+    has(newxp, /const POOF_DELETE_MS = 200;/);
   });
 });

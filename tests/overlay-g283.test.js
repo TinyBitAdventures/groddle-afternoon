@@ -198,7 +198,7 @@ describe('G285: the last overlay stand-ins', () => {
     const f = read('js/features/newxp-feature.js');
     assert.match(f, /poofInQuoin\(engine, addQuoin\(engine, 'img_pickup_walk'/);
     assert.match(f, /deleteWithPoof\(engine, fl\.sprite, 10, 170\);/);
-    assert.match(f, /deleteWithPoof\(engine, sloth, -50, 250\);/);
+    assert.match(f, /deleteWithPoof\(engine, sloth, -50, 250, \{ holdMs \}\);/);
   });
 
   it('the Cactus has a pack icon (cut from its OGA idle frame)', () => {
