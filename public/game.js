@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-54';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-55';
 import {
   actionDurationFor,
   createTimedAction,
@@ -7671,6 +7671,18 @@ const engine = {
       unread: unreadMailCount(mailboxState, Date.now()),
     };
   },
+  /**
+   * Slash commands (features/slash-commands-feature.js, main.js doChatCommand /home, /house, /leave):
+   * the Home panel's own travel. 'teleport' | 'teleport-inside' | 'inside' | 'outside' | 'return'.
+   */
+  homeTravel(action) {
+    if (action === 'teleport' || action === 'teleport-inside') return teleportHome({ room: action === 'teleport-inside' ? 'interior' : 'street' });
+    if (action === 'inside' || action === 'outside') return switchHomeRoom(action === 'inside' ? 'interior' : 'street');
+    if (action === 'return') return returnFromHome();
+    return Promise.resolve(false);
+  },
+  /** /who (location.js get_roster_msg): the player and the Glitches chatting on this street. */
+  whoIsHere: () => [playerSpeechTarget?.label || 'Ur', ...localCompanions.map((actor) => actor.name)],
   /** Rebuild the current home room in place (decorate / cultivate changes). */
   async refreshHomeScene(opts = {}) {
     if (!homeIsInstanced()) return false;
@@ -17913,7 +17925,7 @@ async function showLocationTransition({
   return result;
 }
 
-async function teleportHome() {
+async function teleportHome({ room = 'street' } = {}) {
   if (!homeState.owned) {
     openHomePanel();
     return { ok: false, reason: 'not_owned' };
@@ -17936,15 +17948,17 @@ async function teleportHome() {
   };
   const result = beginHomeVisit(homeState, source);
   if (!result.ok) return result;
+  // /house (inc_houses.js houses_go_to_new_house go_inside) lands straight inside the house.
+  if (room === 'interior') homeState.room = 'interior';
   closeHomePanel();
   closeMap();
   closeVerbMenu();
   await showLocationTransition({
     fromLabel: source.label,
     fromHub: source.hubName,
-    toLabel: 'Your Home Street',
+    toLabel: homeState.room === 'interior' ? 'Your House' : 'Your Home Street',
     toHub: `${HOME_STYLES[homeState.style]?.label || 'Meadow'} Home`,
-    load: () => renderHomeScene('street'),
+    load: () => renderHomeScene(homeState.room),
   });
   pushActivity(`Teleported home from ${source.label}.`);
   toast('Welcome home. Your mailbox is waiting.', 3000);
@@ -23170,8 +23184,9 @@ async function main() {
     if (!state.started) return;
     const input = document.getElementById('local-chat-input');
     const text = input?.value || '';
-    // main.js doChatCommand: a feature may answer a player slash command (e.g. /beans).
-    if (text.trim().startsWith('/') && features.query('chatCommand', text.trim(), engine)) {
+    // main.js doChatCommand: a feature may answer a player slash command (e.g. /beans);
+    // a line no feature knows gets the source's "Unknown command" (slash-commands-feature).
+    if (text.trim().startsWith('/') && (features.query('chatCommand', text.trim(), engine) || features.query('unknownChatCommand', text.trim(), engine))) {
       if (input) input.value = '';
       return;
     }

@@ -74,7 +74,7 @@ export const FEATURES = [
   newxpFeature,
 ];
 import { smugglingFeature } from './smuggling-feature.js?v=g148-1'; FEATURES.push(smugglingFeature);
-import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-2'; FEATURES.push(homeTowerFeature);
+import { homeTowerFeature } from './home-tower-feature.js?v=home-tower-3'; FEATURES.push(homeTowerFeature);
 import { secretSpotsFeature } from './secret-spots-feature.js?v=secrets-1'; FEATURES.push(secretSpotsFeature);
 import { musicblocksFeature } from './musicblocks-feature.js?v=musicblocks-1'; FEATURES.push(musicblocksFeature);
 import { shrineHintFeature } from './shrine-hint-feature.js?v=shrine-hint-2'; FEATURES.push(shrineHintFeature);
@@ -109,3 +109,4 @@ import { smallItemsFeature } from './small-items-feature.js?v=g155-1'; FEATURES.
 import { crabsFeature } from './crabs-feature.js?v=g154-1'; FEATURES.push(crabsFeature);
 import { hellBarFeature } from './hell-bar-feature.js?v=g140-1'; FEATURES.push(hellBarFeature);
 import { machineRoomsFeature } from './machine-rooms-feature.js?v=g156-1'; FEATURES.push(machineRoomsFeature);
+import { slashCommandsFeature } from './slash-commands-feature.js?v=g160-1'; FEATURES.push(slashCommandsFeature);

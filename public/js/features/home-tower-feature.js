@@ -1131,7 +1131,8 @@ export const towerApi = {
   floorTitle,
   spawnStreet,
   spawnFloor,
-  goToFloor: (engine, floor) => goToFloor(engine, floor),
+  /** `via` 'door' lands at the teleport point (tower_get_teleport_point), as /tower does; default the elevator. */
+  goToFloor: (engine, floor, via) => goToFloor(engine, floor, via),
   leaveTower: (engine) => leaveTower(engine),
   /** homes-feature: a street scene resets the floor pointer. */
   clearFloor() {
