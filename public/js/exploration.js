@@ -12,8 +12,8 @@
  * - `streets_visited_in_hub_<hub>:<tsid>` on every counting visit (Haraiva's
  *   Completist is a group_count over it).
  *
- * Remake rule: the public archive lost a few streets of most hubs (1 to 3 of
- * Groddle Forest's 41, all but 2 of Uralia's 4), so no Completist badge could
+ * Remake rule: the public archive lost some streets of most hubs (Groddle
+ * Forest keeps 43 of the 56 its map lists), so no Completist badge could
  * ever finish. When every street the archive kept for a hub has been visited,
  * the hub counter is topped up to the hub map's full street count.
  */

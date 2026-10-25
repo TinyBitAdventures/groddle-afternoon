@@ -62,8 +62,14 @@ export const ROOM_23_SOURCE_TSID = 'LCR8MORFJI12IR4';
 export const CORRIDOR_FIVE_TSID = 'GTJ10M515812V0C';
 /** Corridor Five's archived locked door into Room 23 (key 5). */
 export const ROOM_23_DOOR = Object.freeze({ id: 'door_1304678396366', x: 132, y: -549, key: 5, arrive: Object.freeze({ x: -1919, y: -135 }) });
-/** Hub 79 (inc_data_maps_prod.js) has no name; the chip names the tower its door is in. */
-export const ROOM_23_HUB = Object.freeze({ hubId: '79', hubName: 'Jethimadh Tower' });
+/**
+ * Hub 79: Corridor Five's door connects to hub_id 79 (GTJ10M515812V0C.xml
+ * door_1304678396366), and inc_data_maps_prod.js maps_get_hubs() names hub 79
+ * "Tower Quest" (maps_get_streets lists Room 23 under it). Room 23 is the
+ * location itself, not an instance, so location.js 2253 / 3311 sent that
+ * hub_name to the client ("in Tower Quest" on the loading screen).
+ */
+export const ROOM_23_HUB = Object.freeze({ hubId: '79', hubName: 'Tower Quest' });
 export const ROOM_23_SOURCE = 'reconstruction: Room 23 (LCR8MORFJI12IR4, not in tinyspeck/glitch-locations); door, arrival and NPC rules from the archive and GSJS, layout from two player Snaps; art from firebog.swf (CC0)';
 export const ROOM_23_ART_ROOT = 'assets/sprites/quest-rooms/gwendolyn/room_23/';
 
