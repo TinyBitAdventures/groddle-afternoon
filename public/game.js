@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=g148-1';
 import { createFeatureHost } from './js/feature-host.js?v=features-2';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-56';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-57';
 import {
   actionDurationFor,
   createTimedAction,
@@ -486,7 +486,7 @@ import {
   hasTool,
   MAKING_TOOL_SKILLS,
   recipeTaskLimit,
-} from './js/making.js?v=g148-1';
+} from './js/making.js?v=g169-1';
 import {
   createGarden,
   tickGarden,
@@ -1423,6 +1423,8 @@ let vendorReceiptTimer = 0;
 /** @type {string} make panel tool filter (`all` or tool class_tsid) */
 let makeToolFilter = 'all';
 let makeSearchQuery = '';
+/** A machine standing in the world the Make panel runs on instead of the pack (machine rooms, G169): { tool, toolState, onComplete } */
+let makeStation = null;
 /** @type {string|null} recipe key for make detail */
 let makeSelected = null;
 const ACHIEVEMENT_PAGE_SIZE = 40;
@@ -7476,6 +7478,10 @@ const engine = {
   wornArticle: (type) => vectorPartName(type),
   /** The pack's Eat / Drink / Use, as if clicked (QA autoplay). */
   usePackItem: (classTsid) => usePackItem(classTsid),
+  /** Open the Make panel on a machine in the world: { tool, toolState, onComplete({ recipe, key, made }) } (G169). */
+  openMakeStation: (station) => openMakePanel(station),
+  /** First non-null answer from any feature's `hook` (feature-host query). */
+  query: (hook, ...args) => features.query(hook, ...args),
   award: (payload) => enqueueAward(payload),
   /** pc.feats_increment (players/inc_feats.js:37): a solo Feat contribution, counted by features/solo-feats-feature.js (G143). */
   featsIncrement: (featId, amount = 1, opts = {}) => features.query('featsIncrement', featId, amount, opts, engine) || 0,
@@ -19828,7 +19834,8 @@ function craftOpts() {
     completedQuests: questState.completed || [],
     requireSkill: true,
     requireTool: true,
-    toolState,
+    toolState: makeStation?.toolState || toolState,
+    ...(makeStation ? { stationTool: makeStation.tool, station: makeStation } : {}),
     upgrades: pc.imaginationUpgrades || [],
   };
 }
@@ -19942,6 +19949,7 @@ function finishMakeCraft(record, { close = false, cancelled = false, quiet = fal
       updateHud();
       pushActivity(result.activityLine);
       if (!quiet) toast(result.activityLine);
+      record.opts?.station?.onComplete?.({ recipe: record.recipe, key: record.key, made: record.made });
       playSound('CRAFT_DONE', { volume: 0.6 });
       if (player) floatText(player.x, player.y - 80, record.recipe.name, 0xffe066);
       if (!close) showMakeResult(result, record.key);
@@ -20182,12 +20190,13 @@ function renderMakePanel() {
     // Owned tools first: the original opened recipes from a tool in the pack,
     // so the 28-tool catalog leads with what the player can actually use.
     const makingTools = listMakingTools();
-    const ownedTools = makingTools.filter((t) => hasTool(inv, t.classTsid));
-    const otherTools = makingTools.filter((t) => !hasTool(inv, t.classTsid));
+    const usable = (id) => makeStation?.tool === id || hasTool(inv, id);
+    const ownedTools = makingTools.filter((t) => usable(t.classTsid));
+    const otherTools = makingTools.filter((t) => !usable(t.classTsid));
     for (const t of [...ownedTools, ...otherTools]) {
       const btn = document.createElement('button');
       btn.type = 'button';
-      const owned = hasTool(inv, t.classTsid);
+      const owned = usable(t.classTsid);
       btn.className = 'make-tool-chip'
         + (makeToolFilter === t.classTsid && !makeSearchQuery.trim() ? ' active' : '')
         + (owned ? '' : ' unowned');
@@ -20359,7 +20368,12 @@ function renderMakePanel() {
   }
 }
 
-function openMakePanel() {
+function openMakePanel(station = null) {
+  makeStation = typeof station?.tool === 'string' ? station : null;
+  if (makeStation) {
+    makeToolFilter = makeStation.tool;
+    makeSearchQuery = '';
+  }
   closeFeatPanel();
   if (isShrineOpen()) closeShrinePanel();
   closePackPopover();
@@ -20381,6 +20395,7 @@ function openMakePanel() {
 
 function closeMakePanel() {
   cancelMakeCraft({ close: true, quiet: true });
+  makeStation = null;
   clearMakeFeedback();
   setMakeCraftingUi(false);
   const panel = document.getElementById('make-panel');

@@ -33,6 +33,8 @@
  *                                         //    extra buttons on that item's pack popover
  *   runPackVerb(classTsid, verbId, engine)// -> true when handled
  *   mapCards(engine)                      // -> [HTMLElement] cards shown above the Map canvas
+ *   furnitureRow(street, base, engine)    // -> street furniture row (base = the archived row or null),
+ *                                         //    row.at[classTsid] = fixed screen points (engine.query)
  *   save()                                // -> JSON-safe slice
  *   restore(slice, engine)                // slice may be undefined on a fresh game
  * }

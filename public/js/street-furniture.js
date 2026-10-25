@@ -166,11 +166,24 @@ export function furnitureFor(catalog, tsid) {
   return null;
 }
 
+/**
+ * Fixed screen points a row pins one class to (row.at[classTsid]), or null to
+ * use the planner. Rebuilt and special rooms supply rows through the feature
+ * hook furnitureRow(street, base, engine) (the machine rooms hang their Notice
+ * Board on the wall, G169).
+ */
+export function fixedFurniturePoints(row, classTsid) {
+  const pts = row?.at?.[classTsid];
+  if (!Array.isArray(pts)) return null;
+  return pts.filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y)).slice(0, whole(row[classTsid]));
+}
+
 /** Planner groups for one street row (notes beyond the planner cap pile up nearby). */
 export function furniturePlacementGroups(row) {
   if (!row) return [];
   const out = [];
   for (const [classTsid, group] of Object.entries(FURNITURE_GROUPS)) {
+    if (fixedFurniturePoints(row, classTsid)) continue;
     const count = Math.min(PLANNER_GROUP_MAX, whole(row[classTsid]));
     if (count > 0) out.push({ key: group.key, count, clearance: group.clearance });
   }

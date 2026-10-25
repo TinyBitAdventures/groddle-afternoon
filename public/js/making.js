@@ -791,7 +791,10 @@ export function canCraft(inv, recipe, opts = {}) {
   }
 
   const requireTool = opts.requireTool !== false;
-  if (requireTool && recipe.tool && !hasTool(inv, recipe.tool)) {
+  // A machine standing in the world (machine rooms, G169) is the tool: the
+  // pack need not hold one, and opts.toolState is that machine's own tank.
+  const atStation = Boolean(opts.stationTool) && recipe.tool === opts.stationTool;
+  if (requireTool && recipe.tool && !atStation && !hasTool(inv, recipe.tool)) {
     const label = TOOL_CATALOG[recipe.tool]?.label || recipe.tool;
     return { ok: false, reason: 'tool', tool: recipe.tool, need: label };
   }

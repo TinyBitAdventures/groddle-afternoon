@@ -68,6 +68,7 @@ import {
   closeMailboxView,
   createMailboxView,
   editNote,
+  fixedFurniturePoints,
   furniturePlacementGroups,
   furnitureFor,
   insideStoneHitbox,
@@ -88,7 +89,7 @@ import {
   streetNoteSeeds,
   takePinnedNote,
   writePaperNote,
-} from '../street-furniture.js?v=furniture-1';
+} from '../street-furniture.js?v=furniture-g169';
 import {
   CHORES,
   NEIGHBOURS,
@@ -1099,17 +1100,27 @@ function demoPoint(engine, dx) {
   return { x, y };
 }
 
+/**
+ * The street's furniture row: the archived catalog row, unless a feature's
+ * furnitureRow(street, base, engine) hook answers (rebuilt rooms without
+ * location XML, fixed wall spots; see fixedFurniturePoints).
+ */
+function rowFor(engine, catalog, street) {
+  const base = furnitureFor(catalog, street?.tsid);
+  return (street && engine?.query?.('furnitureRow', street, base, engine)) || base;
+}
+
 function spawnStreet(engine, row) {
   currentRow = row;
   const groups = FURNITURE_GROUPS;
-  const at = (key) => engine.placement(key) || [];
-  (at(groups.npc_mailbox.key)).forEach((p) => buildMailbox(engine, p.x, p.y));
-  (at(groups.visiting_stone.key)).forEach((p, i) => buildStone(engine, p.x, p.y, i));
-  (at(groups.bag_notice_board.key)).forEach((p, i) => buildBoard(engine, p.x, p.y, i));
+  const at = (classTsid) => fixedFurniturePoints(row, classTsid) || engine.placement(groups[classTsid].key) || [];
+  (at('npc_mailbox')).forEach((p) => buildMailbox(engine, p.x, p.y));
+  (at('visiting_stone')).forEach((p, i) => buildStone(engine, p.x, p.y, i));
+  (at('bag_notice_board')).forEach((p, i) => buildBoard(engine, p.x, p.y, i));
   const noteCount = Number(row?.note) || 0;
   if (noteCount) {
     const rows = streetNotes(engine, noteCount);
-    notePositions(at(groups.note.key), noteCount).forEach((p, i) => {
+    notePositions(at('note'), noteCount).forEach((p, i) => {
       if (rows[i] && !rows[i].taken) buildNote(engine, p.x, p.y, i, rows[i]);
     });
   }
@@ -1259,10 +1270,10 @@ export const streetFurnitureFeature = {
     publish(engine, true);
   },
 
-  placementGroups(population, street) {
+  placementGroups(population, street, engine) {
     const catalog = wildlifeCatalog();
     if (!catalog || !street?.tsid) return [];
-    return furniturePlacementGroups(furnitureFor(catalog, street.tsid));
+    return furniturePlacementGroups(rowFor(engine, catalog, street));
   },
 
   onStreetEnter(street, engine) {
@@ -1271,7 +1282,7 @@ export const streetFurnitureFeature = {
     if (!isNeighbourSceneTsid(engine.streetTsid) && nb.returnTo) nb.returnTo = null;
     Promise.all([loadWildlifeCatalog(), loader.loadAll(Object.values(MAILBOX_SHEETS))]).then(([catalog]) => {
       if (mine !== generation) return;
-      spawnStreet(engine, furnitureFor(catalog, engine.streetTsid));
+      spawnStreet(engine, rowFor(engine, catalog, engine.street || street));
       setupDemos(engine);
       deliverVisitor(engine);
       publish(engine, true);

@@ -742,11 +742,6 @@
   "reason": "sparkle_powder.js:310-341: counts only when 7 or more other players on the street are sprinkled",
   "register": "G134"
  },
- "achievement:bowser": {
-  "status": "lost",
-  "reason": "woodworker.js:548-550 (metalmaker.js:608-610, fuelmaker.js, blockmaker.js): refuel a machine away from your own home, i.e. on another player's",
-  "register": "G134"
- },
  "achievement:fox_flurrier": {
   "status": "lost",
   "reason": "inc_npcs.js:130-154 spawn_fox: a fourth fox spawns only with 9+ active players on the preserve (max_foxes = players / 3)",

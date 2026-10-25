@@ -29,9 +29,10 @@
  * LIF16EM56A12FSB_main_1337622698.jpg, reference only) puts the sign where
  * Meadow's is (centre ~348 of 720 px, x -24; Besara's would sit at ~301 px).
  *
- * What the room held is not built here (see FOREST_MACHINE_ROOM_HELD): the
- * remake places no machines in any machine room yet, and its Notice Boards come
- * from the ecology catalog, which only archived rooms have.
+ * What the room held (FOREST_MACHINE_ROOM_HELD) is placed by
+ * js/machine-rooms.js and features/machine-rooms-feature.js (G169), with the
+ * other two rooms' machines; the Notice Board comes through that feature's
+ * furnitureRow hook, since the ecology catalog only has archived rooms.
  *
  * tools/build-forest-machine-room.mjs writes the street JSON, its index row and
  * the Clearing door's target; features/machine-rooms-feature.js keeps the room
@@ -56,8 +57,7 @@ export const FOREST_MACHINE_ROOM_SOURCE =
   'reconstruction: Forest Community Machine Room (LIF16EM56A12FSB, not in tinyspeck/glitch-locations); geometry copied from the Meadow Community Machine Room (GCR101Q98A12EHH, tinyspeck/glitch-locations locations-xml.zip, CC0), the template every community machine room shares';
 
 /**
- * What the room held, for the follow-up that places machine-room machines
- * (none of the three rooms has them in the remake). Read off the 2012-05-21
+ * What the room held (placed by js/machine-rooms.js, G169). Read off the 2012-05-21
  * street render (reference only): a Fuelmaker on the first floor cross, the
  * Blockmaker on the third, a Fuelmaker by the way out, and a Notice Board with
  * one note pinned on the right wall. The archived rooms, for comparison
@@ -134,7 +134,7 @@ export function forestMachineRoomStreet(template, { clearingArrive = null, clear
       arrival: 'Middle Valley Clearing (GLI23FELDHD1O3C.xml) door_1304704230037 connect 522,-150 (hub 56, swf bldg_int_machine 1322700879), as Meadow (587,-144) and Besara (525,-145) land in front of their way out.',
       geometry: 'Copied from the Meadow Community Machine Room: the same bldg_int_machine.swf room as Besara; the 2012-05-21 street render shows the sign at Meadow\'s place, not Besara\'s.',
       wayOut: 'The template\'s door on the right wall, back to Middle Valley Clearing in front of its door (the Clearing\'s geometry sources list LIF16EM56A12FSB).',
-      notBuilt: 'Machines and the Notice Board (FOREST_MACHINE_ROOM_HELD): the remake places no machine-room machines yet. Music: the room\'s music_file is lost (Meadow\'s is empty); it plays Groddle Forest\'s.',
+      notBuilt: 'Machines and the Notice Board (FOREST_MACHINE_ROOM_HELD) are placed at run time by js/machine-rooms.js (G169), not in this JSON. Music: the room\'s music_file is lost (Meadow\'s is empty); it plays Groddle Forest\'s.',
     },
   };
 }
