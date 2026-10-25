@@ -24,11 +24,11 @@ import {
   smeltItDealtItFreeSmelts,
 } from '../public/js/buff-triggers.js?v=g124-1';
 import { MIRRORED_BUFFS, buffTriggersFeature } from '../public/js/features/buff-triggers-feature.js';
-import { meditationFeature } from '../public/js/features/meditation-feature.js?v=g319-1';
-import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=teleport-10';
+import { meditationFeature } from '../public/js/features/meditation-feature.js?v=g321-1';
+import { teleportationFeature } from '../public/js/features/teleportation-feature.js?v=teleport-11';
 import { rookAttackFeature } from '../public/js/features/rook-attack-feature.js?v=g311-1';
-import { rubeFeature } from '../public/js/features/rube-feature.js?v=rube-10';
-import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=card-14';
+import { rubeFeature } from '../public/js/features/rube-feature.js?v=rube-11';
+import { smugglingFeature } from '../public/js/features/smuggling-feature.js?v=card-15';
 import { normalizeHusbandryPack } from '../public/js/animal-husbandry.js';
 import {
   activateBuffItem,
@@ -507,7 +507,7 @@ describe('wiring', () => {
     for (const m of src.matchAll(/from '\.\/([a-z-]+-feature\.js\?v=[^']+)'/g)) {
       assert.ok(index.includes(`'./${m[1]}'`), m[1]);
     }
-    assert.match(index, /buff-triggers-feature\.js\?v=card-20'; FEATURES\.push\(buffTriggersFeature\)/);
+    assert.match(index, /buff-triggers-feature\.js\?v=card-21'; FEATURES\.push\(buffTriggersFeature\)/);
   });
 
   it('game.js applies Stuffed at the daily limit and announces each making batch', () => {

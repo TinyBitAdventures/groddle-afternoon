@@ -29,7 +29,7 @@ import { worldToScreen } from '../street-model.js';
 import { signArmWidth } from '../street-render.js?v=parallax-7';
 import { getSkillCatalog } from '../content-catalogs.js';
 import { GIANTS } from '../shrines.js?v=spinning-wheel-test-4';
-import { teleportationFeature } from './teleportation-feature.js?v=teleport-10';
+import { teleportationFeature } from './teleportation-feature.js?v=teleport-11';
 import {
   SOLO_DIVISOR,
   WORK_UNIT_MS,

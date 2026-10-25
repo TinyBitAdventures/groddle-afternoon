@@ -27,7 +27,7 @@
  */
 
 import { addItem, countItem, ensureItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-import { getGameDayKey } from '../game-day.js?v=dametime-2';
+import { getGameDayKey } from '../game-day.js?v=dametime-3';
 import { acceptOffer, ensureQuestOfferState } from '../quest-offers.js';
 import { VENDOR_PROFILES } from '../vendor.js?v=vendor-profiles-6';
 import {

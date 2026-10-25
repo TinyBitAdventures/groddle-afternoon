@@ -43,8 +43,8 @@
  * player did; letters that come by post stay in the mailbox.
  */
 
-import { getGameDayKey } from './game-day.js?v=dametime-2';
-import { normalizeButlerHi } from './hi-signs.js?v=hi-signs-2';
+import { getGameDayKey } from './game-day.js?v=dametime-3';
+import { normalizeButlerHi } from './hi-signs.js?v=hi-signs-3';
 
 /** classProps and onCreate numbers. */
 export const BUTLER = Object.freeze({

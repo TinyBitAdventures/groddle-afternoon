@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 487,
+  "commits": 488,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "Choose Solo or Multiplayer on a new game, with one save interface behind every save"
+   },
    {
     "date": "2026-10-25",
     "kind": "fix",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "The Magic Rock no longer vanishes as it lands, and five more clips stop blinking or losing their last frame"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Shrines, pets, musicblocks, potions, powders, puzzles and the Conch give no mood while dead, and drinks give mood before energy"
    }
   ]
  },
- "tests": 291,
+ "tests": 293,
  "generatedAt": "2026-10-25"
 }

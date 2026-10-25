@@ -141,7 +141,7 @@ import {
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { playPoofIn } from '../overlay-art.js?v=g311-1';
 import { fadeInNewNear } from '../poof-fade.js?v=g311-1';
-import { projectApi } from './street-jobs-feature.js?v=g319-1';
+import { projectApi } from './street-jobs-feature.js?v=g321-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
 import { towerApi } from './home-tower-feature.js?v=home-tower-14';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
@@ -184,7 +184,7 @@ import {
   rockVerbs,
   ROCK_VERB_IDS,
 } from '../magic-rock-home.js?v=g253-1';
-import { getGameDayKey } from '../game-day.js?v=dametime-2';
+import { getGameDayKey } from '../game-day.js?v=dametime-3';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g310-1';
 import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
 

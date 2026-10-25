@@ -1,13 +1,15 @@
 /**
  * Multiplayer phase 1: the mode flag (js/game-mode.js), the start card's
  * Solo / Multiplayer choice (newxp-feature.js showStartCard) and the
- * /play/online/ entry page that strips demo and QA params in multiplayer.
+ * /play/online/ entry page that strips demo and QA params in multiplayer
+ * (phase 2: generated from play/index.html with a sign-in gate over the shell).
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import vm from 'node:vm';
+import { execFileSync } from 'node:child_process';
 
 import {
   GAME_MODE,
@@ -21,7 +23,7 @@ import {
   multiplayerEntryUrl,
   offersModeChoice,
   resolveGameMode,
-} from '../public/js/game-mode.js?v=mp1-1';
+} from '../public/js/game-mode.js?v=mp2-1';
 
 const pub = join(import.meta.dirname, '..', 'public');
 const read = (rel) => readFileSync(join(pub, rel), 'utf8');
@@ -50,13 +52,14 @@ describe('mode flag', () => {
 
   it('is engine.mode and the canvas data-mode in game.js', () => {
     const game = read('game.js');
-    assert.match(game, /import \{ GAME_MODE \} from '\.\/js\/game-mode\.js\?v=mp1-1';/);
+    assert.match(game, /import \{ GAME_MODE \} from '\.\/js\/game-mode\.js\?v=mp2-1';/);
     assert.match(game, /const engine = \{\n\s*PIXI,\n(?:\s*\/\*\*[^\n]*\*\/\n)?\s*mode: GAME_MODE,/);
     assert.match(game, /app\.canvas\.dataset\.mode = GAME_MODE;/);
   });
 
   it('picks the save store', () => {
-    assert.match(read('js/save-store.js'), /export const saveStore = createSaveStore\(GAME_MODE\);/);
+    // Multiplayer gets the Minn store; solo the browser store (frozen by a backup restore).
+    assert.match(read('js/save-store.js'), /export const saveStore = GAME_MODE === MULTIPLAYER\n\s*\? createSaveStore\(GAME_MODE\)\n\s*: \(\(\) => \{\n\s*const browser = createBrowserSaveStore\(\);/);
   });
 });
 
@@ -98,12 +101,13 @@ describe('start card: Solo or Multiplayer', () => {
 
   it('uses plain copy with no em-dashes', () => {
     assert.doesNotMatch(MODE_CHOICE_HTML, /—/);
-    assert.doesNotMatch(read('play/online/index.html'), /—/);
+    // Player-facing words only: comments copied from play/index.html are not shown.
+    assert.doesNotMatch(read('play/online/index.html').replace(/<!--[\s\S]*?-->/g, ''), /—/);
   });
 
   it('newxp shows it before the tutorial choice, only for brand-new saves', () => {
     const f = read('js/features/newxp-feature.js');
-    assert.match(f, /import \{ mountModeChoice, multiplayerEntryUrl, offersModeChoice \} from '\.\.\/game-mode\.js\?v=mp1-1';/);
+    assert.match(f, /import \{ mountModeChoice, multiplayerEntryUrl, offersModeChoice \} from '\.\.\/game-mode\.js\?v=mp2-1';/);
     // Existing saves (hadSave) and autostart/newxp routes never get a card, as before.
     assert.match(f, /if \(!engine\.started && !hadSave && !engine\.param\('autostart'\) && !engine\.param\('newxp'\)\) showStartCard\(engine\);/);
     const card = f.slice(f.indexOf('function showStartCard'), f.indexOf('/* Feature  '));
@@ -174,10 +178,17 @@ describe('/play/online/ entry page', () => {
     assert.match(html, /<base href="\.\.\/\.\.\/" \/>/);
   });
 
-  it('phase 1: a closed card that links back to solo play, no game boot', () => {
-    assert.doesNotMatch(markup, /game\.js|pixi-8|type="module"/);
-    assert.match(html, /<h2>Multiplayer is not open yet<\/h2>/);
-    assert.match(html, /need an account/);
-    assert.match(html, /<a class="online-play" href="play\/">Play solo<\/a>/);
+  it('phase 2: a sign-in gate over the game shell; game.js loads only through online-boot', () => {
+    assert.match(html, /<body class="is-booting online-gated">\n\s*<!--[^\n]*-->\n\s*<main id="online-gate" class="online-gate" data-online="checking">/);
+    assert.match(html, /body\.online-gated #wrap \{ display: none; \}/);
+    assert.doesNotMatch(markup, /<script type="module" src="game\.js/, 'no direct game.js module');
+    const boot = html.match(/<script type="module" id="online-boot" src="(js\/online-boot\.js\?v=[^"]+)" data-game="(game\.js\?[^"]+)"><\/script>/);
+    assert.ok(boot, 'online-boot names game.js');
+    assert.equal(boot[2], read('play/index.html').match(/<script type="module" src="(game\.js\?[^"]+)"><\/script>/)[1], 'the same game.js the solo page loads');
+    assert.match(markup, /<a href="play\/">Play solo<\/a>/, 'noscript still links back to solo');
+  });
+
+  it('is generated from play/index.html and is current', () => {
+    execFileSync('node', [join(import.meta.dirname, '..', 'tools/play-online/build.mjs'), '--check'], { stdio: 'pipe' });
   });
 });

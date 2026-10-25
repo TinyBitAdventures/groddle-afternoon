@@ -344,7 +344,7 @@ describe('item detector: taking an item is not a way to get it (G176)', () => {
           return { ok: true, effects: [{ type: 'consume_item', classTsid: 'drink_ticket', count: 1 }, { type: 'grant_item', classTsid: 'wine_of_the_dead', count: 1 }, { type: 'quest_flag', flag: 'buy_wotd' }] };
         }`],
       ['js/features/hell-bar-feature.js', `import { addItem, countItem, removeItem } from '../inventory.js?v=catalog-unified-7';
-        import { buyWine, TICKET_CLASS } from '../hell.js?v=g319-1';
+        import { buyWine, TICKET_CLASS } from '../hell.js?v=g321-1';
         const TICKET = 'drink_ticket';
         function applyGrant(engine, result) {
           for (const e of result.effects) {

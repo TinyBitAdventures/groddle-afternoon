@@ -24,7 +24,7 @@ import {
   createAchievementState,
   seedAchievementNearCompletion,
 } from '../public/js/achievements.js?v=badge-events-1';
-import { getGameDayKey } from '../public/js/game-day.js?v=dametime-2';
+import { getGameDayKey } from '../public/js/game-day.js?v=dametime-3';
 import { loadContentCatalogsFromDir } from '../public/js/content-catalogs.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

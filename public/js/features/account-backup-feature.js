@@ -1,0 +1,307 @@
+/**
+ * Solo backups on the player's account (multiplayer phase 2, Austin's plan of
+ * 2026-10-25): when the solo game runs on the Groddle site (Minn), the Menu
+ * gets an Account item. Signed in, it backs this browser's solo game up to
+ * one of a few slots on the account and restores one into the browser, so a
+ * solo game can move to another browser or survive a cleared one. A backup
+ * stays a solo game: it is only ever restored here, never played online
+ * (minn/groddle/src/SoloBackups.php keeps them apart from the multiplayer
+ * save). Restoring over a local game that was saved later than the backup
+ * asks first.
+ *
+ * Off in multiplayer, in practice copies (?practice=1 swaps the storage),
+ * and on a plain static server (no account routes answer).
+ * QA: /play/ on groddle.localhost, Menu, Account.
+ */
+
+import { createMinnAccount } from '../minn-account.js?v=mp2-1';
+import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=mp2-1';
+import { formatGameDayLabel } from '../game-day.js?v=dametime-3';
+
+/** Which slot a new backup goes to: the first empty one, else the oldest (which then needs a yes). */
+export function slotForNewBackup(backups, slots) {
+  const used = new Map((backups || []).map((b) => [b.slot, b]));
+  for (let slot = 1; slot <= slots; slot++) if (!used.has(slot)) return { slot, replaces: null };
+  const oldest = [...used.values()].sort((a, b) => String(a.madeAt).localeCompare(String(b.madeAt)) || a.slot - b.slot)[0];
+  return { slot: oldest.slot, replaces: oldest };
+}
+
+/**
+ * Whether restoring would replace a local game saved after the backup.
+ * @returns {{ ask: boolean, localAt: number, backupAt: number }}
+ */
+export function restoreNeedsAsking(localEntries, backupEntries) {
+  const localAt = savedAtOf(localEntries);
+  const backupAt = savedAtOf(backupEntries);
+  return { ask: localAt > 0 && localAt > backupAt, localAt, backupAt };
+}
+
+/** A size for people: 12 KB, 1.4 MB. */
+export function sizeLabel(bytes) {
+  const n = Number(bytes) || 0;
+  if (n < 1024 * 1024) return `${Math.max(1, Math.round(n / 1024))} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function when(ms) {
+  if (!ms) return 'unknown time';
+  try {
+    return new Date(ms).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'medium' });
+  } catch {
+    return new Date(ms).toISOString();
+  }
+}
+
+const STYLE = `
+.account-shade { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 1rem; background: rgba(20, 34, 16, 0.45); }
+.account-shade[hidden] { display: none; }
+.account-panel { width: min(30rem, 100%); max-height: calc(100vh - 2rem); overflow: auto; border-radius: 14px; padding: 1rem 1.1rem 1.1rem;
+  background: #fbf8ef; color: #2b2a22; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); font: 14px/1.45 system-ui, sans-serif; }
+.account-panel h2 { margin: 0 0 0.4rem; font-size: 1.15rem; }
+.account-panel p { margin: 0.35rem 0; }
+.account-panel .account-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0 0.25rem; }
+.account-panel button, .account-panel a.account-link { font: inherit; font-weight: 700; border: 0; border-radius: 9px; padding: 0.5rem 0.85rem; cursor: pointer;
+  text-decoration: none; color: #fff; background: linear-gradient(180deg, #f09a55, #e07a35); box-shadow: 0 2px 0 #b85a24; }
+.account-panel button.alt, .account-panel a.account-link.alt { color: #2e5a20; background: #eef6e4; box-shadow: inset 0 0 0 2px #b9d8a0; }
+.account-panel button:disabled { opacity: 0.55; cursor: default; }
+.account-panel .account-slots { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.45rem; }
+.account-panel .account-slots li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; padding: 0.5rem 0.6rem; border-radius: 9px; background: #f0ead8; }
+.account-panel .account-slots .slot-what { flex: 1 1 14rem; }
+.account-panel .account-slots .slot-what small { display: block; opacity: 0.75; }
+.account-panel .account-slots button { padding: 0.35rem 0.65rem; }
+.account-panel .account-note { min-height: 1.4em; margin-top: 0.6rem; font-weight: 600; color: #4c6b2e; }
+.account-panel .account-note[data-tone="bad"] { color: #a33b22; }
+.account-panel .account-close { float: right; padding: 0.2rem 0.55rem; color: #2b2a22; background: transparent; box-shadow: none; font-size: 1.2rem; line-height: 1; }
+`;
+
+function el(tag, attrs = {}, text = '') {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v === true) node.setAttribute(k, '');
+    else if (v !== false && v != null) node.setAttribute(k, v);
+  }
+  if (text) node.textContent = text;
+  return node;
+}
+
+function createPanel(engine, account, session) {
+  const style = el('style', { id: 'account-backup-css' });
+  style.textContent = STYLE;
+  document.head.append(style);
+  const shade = el('div', { id: 'account-shade', class: 'account-shade', hidden: true });
+  const panel = el('div', { id: 'account-panel', class: 'account-panel', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'account-title' });
+  shade.append(panel);
+  document.body.append(shade);
+  let busy = false;
+  let list = null;
+  const back = location.href;
+
+  const close = () => {
+    shade.hidden = true;
+    engine.setData?.('accountPanel', 'closed');
+  };
+  shade.addEventListener('pointerdown', (e) => { if (e.target === shade) close(); });
+  // Keys pressed in the panel stay in it: the game's movement keys must not fire under it.
+  shade.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Escape') close();
+  });
+
+  const note = el('p', { class: 'account-note', role: 'status', 'aria-live': 'polite' });
+  const say = (text, tone = 'good') => {
+    note.textContent = text;
+    note.dataset.tone = tone;
+  };
+
+  function frame(title) {
+    panel.replaceChildren();
+    const x = el('button', { type: 'button', class: 'account-close', 'aria-label': 'Close' }, '×');
+    x.addEventListener('click', close);
+    panel.append(x, el('h2', { id: 'account-title' }, title));
+  }
+
+  function signedOut() {
+    frame('Back up your solo game');
+    panel.append(
+      el('p', {}, 'Log in to keep copies of this browser\'s solo game on your Groddle account, then carry on in another browser.'),
+    );
+    const actions = el('div', { class: 'account-actions' });
+    actions.append(
+      el('a', { class: 'account-link', href: account.urls.login(back), 'data-account-login': '' }, 'Log in'),
+      el('a', { class: 'account-link alt', href: account.urls.register(back) }, 'Create an account'),
+    );
+    panel.append(actions);
+  }
+
+  function localEntries() {
+    try { return soloSaveSnapshot(createBrowserSaveStore()).entries; } catch { return null; }
+  }
+
+  async function backUp() {
+    if (busy) return;
+    const target = slotForNewBackup(list?.backups, list?.slots || 3);
+    if (target.replaces && !(await ask(`All ${list.slots} slots are full. Replace the oldest backup (slot ${target.slot}, ${when(Date.parse(target.replaces.madeAt))})?`, 'Replace it'))) return;
+    await backUpTo(target.slot);
+  }
+
+  async function backUpTo(slot) {
+    busy = true;
+    say('Backing up…');
+    try {
+      try { engine.save?.(); } catch { /* the store says what it can */ }
+      const data = soloSaveSnapshot(createBrowserSaveStore());
+      const day = formatGameDayLabel(savedAtOf(data.entries) || Date.now());
+      await account.writeBackup(slot, data, day);
+      busy = false;
+      await render();
+      say(`Backed up to slot ${slot}.`);
+      engine.setData?.('accountBackup', `slot-${slot}`);
+    } catch (err) {
+      busy = false;
+      say(err?.code === 'groddle_save_too_large' ? 'This game is too big to back up.' : `The backup did not save: ${err?.message || err}`, 'bad');
+    }
+  }
+
+  async function restore(slot) {
+    if (busy) return;
+    busy = true;
+    say('Fetching the backup…');
+    let backup;
+    try {
+      backup = await account.readBackup(slot);
+    } catch (err) {
+      busy = false;
+      say(`The backup did not load: ${err?.message || err}`, 'bad');
+      return;
+    }
+    busy = false;
+    say('');
+    const local = localEntries();
+    const { ask: newer, localAt, backupAt } = restoreNeedsAsking(local, backup.data?.entries);
+    if (newer && !(await ask(`The game in this browser was saved ${when(localAt)}. This backup holds the game as it was ${when(backupAt)}. Restoring replaces the newer game here. Restore anyway?`, 'Restore anyway'))) {
+      say('Nothing changed.');
+      return;
+    }
+    try {
+      freezeSoloSaves();
+      restoreSoloSave(backup.data);
+    } catch (err) {
+      say(`That backup cannot be restored: ${err?.message || err}`, 'bad');
+      return;
+    }
+    say('Restored. Starting the game again…');
+    engine.setData?.('accountRestore', `slot-${slot}`);
+    setTimeout(() => location.reload(), 250);
+  }
+
+  async function remove(slot) {
+    if (busy || !(await ask(`Delete the backup in slot ${slot}?`, 'Delete'))) return;
+    try {
+      await account.deleteBackup(slot);
+      await render();
+      say(`Slot ${slot} is empty now.`);
+    } catch (err) {
+      say(`The backup was not deleted: ${err?.message || err}`, 'bad');
+    }
+  }
+
+  /** An in-panel yes or no (no browser dialog, which would stop the game loop). */
+  function ask(question, yes) {
+    return new Promise((resolve) => {
+      const box = el('div', { class: 'account-ask', role: 'alertdialog' });
+      box.append(el('p', {}, question));
+      const actions = el('div', { class: 'account-actions' });
+      const ok = el('button', { type: 'button', 'data-account-yes': '' }, yes);
+      const no = el('button', { type: 'button', class: 'alt', 'data-account-no': '' }, 'Cancel');
+      actions.append(ok, no);
+      box.append(actions);
+      const done = (answer) => {
+        box.remove();
+        resolve(answer);
+      };
+      ok.addEventListener('click', () => done(true));
+      no.addEventListener('click', () => done(false));
+      note.before(box);
+      ok.focus();
+    });
+  }
+
+  async function render() {
+    frame('Your account');
+    panel.append(el('p', {}, `Signed in as ${session.player?.name || 'you'}. Backups keep copies of this browser's solo game on your account. They stay solo games and never go online.`));
+    try {
+      list = await account.listBackups();
+    } catch (err) {
+      panel.append(note);
+      say(`Your backups did not load: ${err?.message || err}`, 'bad');
+      return;
+    }
+    const local = localEntries();
+    const actions = el('div', { class: 'account-actions' });
+    const backBtn = el('button', { type: 'button', 'data-account-backup': '', disabled: !local }, 'Back up to my account');
+    backBtn.addEventListener('click', backUp);
+    const newest = [...list.backups].sort((a, b) => String(b.madeAt).localeCompare(String(a.madeAt)))[0];
+    const restoreBtn = el('button', { type: 'button', class: 'alt', 'data-account-restore': '', disabled: !newest }, 'Restore from my account');
+    restoreBtn.addEventListener('click', () => newest && restore(newest.slot));
+    actions.append(backBtn, restoreBtn);
+    panel.append(actions);
+    if (!local) panel.append(el('p', {}, 'There is no solo game in this browser yet, so there is nothing to back up.'));
+    const slots = el('ul', { class: 'account-slots' });
+    const bySlot = new Map(list.backups.map((b) => [b.slot, b]));
+    for (let slot = 1; slot <= list.slots; slot++) {
+      const b = bySlot.get(slot);
+      const row = el('li', { 'data-slot': String(slot), 'data-filled': b ? 'true' : 'false' });
+      const what = el('span', { class: 'slot-what' });
+      what.append(document.createTextNode(b ? `Slot ${slot}: ${b.gameDay || 'a solo game'}` : `Slot ${slot}: empty`));
+      if (b) what.append(el('small', {}, `Backed up ${when(Date.parse(b.madeAt))} · ${sizeLabel(b.size)}`));
+      row.append(what);
+      const here = el('button', { type: 'button', class: 'alt', 'data-account-backup-slot': String(slot), disabled: !local }, 'Back up here');
+      here.addEventListener('click', async () => {
+        if (b && !(await ask(`Replace the backup in slot ${slot}?`, 'Replace it'))) return;
+        backUpTo(slot);
+      });
+      row.append(here);
+      if (b) {
+        const r = el('button', { type: 'button', 'data-account-restore-slot': String(slot) }, 'Restore');
+        r.addEventListener('click', () => restore(slot));
+        const d = el('button', { type: 'button', class: 'alt', 'data-account-delete-slot': String(slot) }, 'Delete');
+        d.addEventListener('click', () => remove(slot));
+        row.append(r, d);
+      }
+      slots.append(row);
+    }
+    panel.append(slots, note);
+  }
+
+  return {
+    async open() {
+      shade.hidden = false;
+      engine.setData?.('accountPanel', 'open');
+      if (session.signedIn) await render();
+      else signedOut();
+      panel.querySelector('button, a')?.focus();
+    },
+  };
+}
+
+async function install(engine) {
+  const account = createMinnAccount({ baseUri: document.baseURI });
+  const session = await account.session();
+  engine.setData?.('accountSession', session.minn ? (session.signedIn ? 'signed-in' : 'signed-out') : 'none');
+  if (!session.minn) return;
+  const list = document.getElementById('more-list');
+  if (!list) return;
+  const panel = createPanel(engine, account, session);
+  const btn = el('button', { id: 'account-btn', type: 'button', class: 'chrome-btn', title: 'Back up or restore your solo game' }, 'Account');
+  btn.addEventListener('click', () => { panel.open(); });
+  list.append(btn);
+}
+
+export const accountBackupFeature = {
+  id: 'account-backup',
+
+  init(engine) {
+    if (engine.mode !== 'solo' || typeof document === 'undefined' || globalThis.groddlePractice === true) return;
+    install(engine).catch((err) => console.warn('[account-backup]', err));
+  },
+};
