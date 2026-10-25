@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js';
 import {
   RECIPE_CATALOG,
   TOOL_CATALOG,
@@ -82,14 +83,16 @@ describe('official Fruit Changing Machine catalog', () => {
       const icon = join(publicRoot, `assets/sprites/icons/${id}.png`);
       assert.ok(existsSync(icon), `missing ${id} iconic art`);
     }
-    // 17 working frames rendered at 3x from the vector SWF: 17 x 132 by 198 (44 x 66 at 1x).
-    const animation = join(publicRoot, 'assets/sprites/making/fruit_changing_machine-work@3x.webp');
-    const webp = readFileSync(animation);
+    // G191: all 90 tool_animation frames (fruit_changing_machine.swf root frames 3-92) rendered at 3x
+    // from the vector SWF, 44 x 66 cells at 1x, in a grid of full rows (js/make-tool-sheets.js).
+    const s = MAKE_TOOL_SHEETS.fruit_changing_machine;
+    assert.deepEqual([s.fw, s.fh, s.frames, s.fps, s.density], [44, 66, 90, 30, 3]);
+    const webp = readFileSync(join(publicRoot, s.url));
     assert.equal(webp.toString('ascii', 0, 4), 'RIFF');
     assert.equal(webp.toString('ascii', 12, 16), 'VP8L');
     const bits = webp.readUInt32LE(21);
-    assert.equal((bits & 0x3fff) + 1, 17 * 132);
-    assert.equal(((bits >> 14) & 0x3fff) + 1, 198);
+    assert.equal((bits & 0x3fff) + 1, s.cols * 132);
+    assert.equal(((bits >> 14) & 0x3fff) + 1, (90 / s.cols) * 198);
   });
 });
 
@@ -144,8 +147,8 @@ describe('Fruit Changing interface wiring', () => {
     // G188: played through the Make panel's one tool-sheet path (js/make-tool-sheets.js).
     const sheets = readFileSync(join(publicRoot, 'js/make-tool-sheets.js'), 'utf8');
     assert.match(game, /makeToolSheetVisual\(recipe\.tool\)/);
-    assert.match(sheets, /fruit_changing_machine: Object\.freeze\(\{ url: 'assets\/sprites\/making\/fruit_changing_machine-work@3x\.webp', fw: 44, fh: 66, frames: 17, durationMs: 1350, scale: 1\.42, density: 3 \}\)/);
-    assert.match(css, /\.mp-tool-sheet \{[\s\S]*?steps\(var\(--mp-steps\), end\)/);
+    assert.match(sheets, /fruit_changing_machine: Object\.freeze\(\{ url: 'assets\/sprites\/making\/fruit_changing_machine-work@3x\.webp', fw: 44, fh: 66, cols: \d+, frames: 90, fps: 30, scale: 1\.41, density: 3 \}\)/);
+    assert.match(css, /\.mp-tool-sheet \{[\s\S]*?steps\(var\(--mp-cols\), end\)/);
     assert.match(css, /@keyframes make-tool-sheet/);
     const making = readFileSync(join(publicRoot, 'js/making.js'), 'utf8');
     assert.match(making, /recipes\.json\?v=fruit-machine-2/);

@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 470,
+  "commits": 471,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-25",
+    "kind": "new",
+    "text": "The stun orb rises into view, home chickens and butterflies can be set free, and Tiny Speck's own heart, puffs and rainbow replace the last stand-ins"
+   },
    {
     "date": "2026-10-25",
     "kind": "improve",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Loading cards for streets with no picture show the street name plainly, not across an empty box"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Speech bubble tails point at their speaker at the screen edge, and the unlearning card looks like the client's"
    }
   ]
  },

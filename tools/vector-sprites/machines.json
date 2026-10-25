@@ -1,0 +1,20 @@
+{
+ "about": "Machine state sheets (register rows G193, G201; js/machine-art-sheets.js, tools/build-machine-art.py): each machine SWF's inner animatee clip (glitch-items tools/<machine>/<machine>.swf; the DefineSprite whose FrameLabels hold active and ready, as tools/build-machine-art.py animatee_labels reads them), every packed cell paired with its animatee frame through frameList in sheet order (assembled, loadOpen, loadOpenHold, loadClose, active, ready, collectOpen, collectOpenHold, collectClose). The 3x parts sit next to the 1x sheets and swap in when a room machine is first drawn (machine-rooms-feature.js loads through js/sprite-sheets.js). The Make panel keeps the 1x sheet: it draws a machine at 0.43 to 0.64. Run: node tools/vector-sprites/build.mjs --manifest tools/vector-sprites/machines.json",
+ "firstDraw": true,
+ "webp": true,
+ "budget": {"maxSide": 8192, "maxMB": 64},
+ "jobs": [
+  {"name": "machine-blockmaker", "swf": "tools/blockmaker/blockmaker.swf", "sprite": 69, "sheets": [
+   {"path": "assets/sprites/machines/blockmaker-states.webp", "fw": 143, "fh": 183, "cols": 14, "frames": 106, "frameList": [2, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199], "mirror": false}
+  ]},
+  {"name": "machine-fuelmaker", "swf": "tools/fuelmaker/fuelmaker.swf", "sprite": 57, "sheets": [
+   {"path": "assets/sprites/machines/fuelmaker-states.webp", "fw": 121, "fh": 146, "cols": 16, "frames": 103, "frameList": [2, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245], "mirror": false}
+  ]},
+  {"name": "machine-metalmaker", "swf": "tools/metalmaker/metalmaker.swf", "sprite": 108, "sheets": [
+   {"path": "assets/sprites/machines/metalmaker-states.webp", "fw": 129, "fh": 216, "cols": 15, "frames": 110, "frameList": [2, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252], "mirror": false}
+  ]},
+  {"name": "machine-woodworker", "swf": "tools/woodworker/woodworker.swf", "sprite": 45, "sheets": [
+   {"path": "assets/sprites/machines/woodworker-states.webp", "fw": 133, "fh": 146, "cols": 15, "frames": 95, "frameList": [2, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237], "mirror": false}
+  ]}
+ ]
+}

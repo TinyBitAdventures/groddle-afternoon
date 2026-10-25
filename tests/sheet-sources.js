@@ -202,9 +202,9 @@ export async function collectSheets() {
     }
   }
 
-  // Make panel tool loops: one row, frame k at x = k * fw (tools/build-make-tool-sheets.py).
+  // Make panel tool loops: a grid of full rows, `cols` per row (tools/build-make-tool-sheets.py, G188/G191).
   const { MAKE_TOOL_SHEETS } = await imp('js/make-tool-sheets.js');
-  for (const [k, s] of Object.entries(MAKE_TOOL_SHEETS)) rows.push(row(`make tool ${k}`, s.url, { fw: s.fw, fh: s.fh, cols: s.frames, n: s.frames, density: s.density || 1 }));
+  for (const [k, s] of Object.entries(MAKE_TOOL_SHEETS)) rows.push(row(`make tool ${k}`, s.url, { fw: s.fw, fh: s.fh, cols: s.cols, n: s.frames, density: s.density || 1 }));
 
   // Machines: each state's run inside the packed sheet (the whole sheet is already a plain def).
   const { MACHINE_ART_SHEETS } = await imp('js/machine-art-sheets.js');

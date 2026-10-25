@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js';
 import {
   RECIPE_CATALOG,
   TOOL_CATALOG,
@@ -205,8 +206,8 @@ describe('GSJS recipe catalog import', () => {
       assert.equal(ITEM_CATALOG[id].icon, `assets/sprites/icons/${id}.png`);
     }
     for (const id of ['saucepan', 'mike_tyson_grill', 'cocktail_shaker', 'awesome_pot', 'cauldron']) {
-      // G188: the OGA tool_animation grids ship repacked into one row (tools/build-make-tool-sheets.py).
-      assert.ok(existsSync(join(publicRoot, 'assets/sprites/making', `${id}-work.webp`)), `${id} sheet`);
+      // G188/G191: each tool's tool_animation sheet (tools/build-make-tool-sheets.py, js/make-tool-sheets.js).
+      assert.ok(MAKE_TOOL_SHEETS[id] && existsSync(join(publicRoot, MAKE_TOOL_SHEETS[id].url)), `${id} sheet`);
     }
   });
 });

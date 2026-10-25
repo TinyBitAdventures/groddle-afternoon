@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.11
-"""Make panel tool animations (register row G188): every making tool's own `tool_animation`, in one row.
+"""Make panel tool animations (register rows G188, G191): every making tool's own `tool_animation`, sharp.
 
 The Glitch client plays a tool's `tool_animation` scene while a recipe is being made
 (glitch-client com/tinyspeck/engine/view/ui/making/MakingToolAnimator.as:16 TOOL_FRAME, :92 ItemIconView),
@@ -13,28 +13,41 @@ class, frames in a grid read left to right. The frame count of each grid is the 
 which is also how each sheet is checked to be that tool's art: the GSJS item file names the same SWF
 (`asset_swf_v`, cited per row below). The cells past the last frame must be empty.
 
-Each grid is repacked into one row (frame k at x = k * fw), the way the Grand Ol' Grinder was in 9d736239,
-so CSS can play it with one `steps(frames)` animation. Writes public/assets/sprites/making/<tool>-work.webp
-(lossless; fully transparent pixels are cleared to 0,0,0,0, about 40% smaller than PNG)
-and public/js/make-tool-sheets.js (tool -> sheet, frame size, frame count, fps, display scale).
+Sharp sheets (G191, the b81d991f method): `--render` exports every frame of the SWF's tool_animation
+scene with FFDec at zoom 3 (Java 21, root timeline, a copy of the SWF with a stage three times the size so
+art outside the authored stage is kept: tools/icon-hires/swfinfo.py rewrite), then lets
+tools/vector-sprites/build.mjs (--dry) find the one placement that makes each render's 3:1 box downscale
+match the OGA cell and score every frame. Tools that pass are written at a density of 3 texels per CSS
+pixel when the panel draws them above 1x (scale > 1, so 3.2 device pixels per art pixel at DPR 2) and 2
+otherwise (a 3x render shrunk with Lanczos), as `<tool>-work@<d>x.webp`, in a grid whose columns divide
+the frame count (every row full, so style.css plays it with one steps() per axis) and whose sides stay
+under WebP's 16383 px. The placements and scores are kept in tools/make-tool-hires.json, so the table
+and --check need neither FFDec nor the renders. A tool that fails keeps its 1x row
+(`<tool>-work.webp`, frame k at x = k * fw, repacked from the OGA grid as in 9d736239).
 
-The Fruit Changing Machine keeps its sharper 3x render from b81d991f (17 of the 90 frames, FFDec from the
-SWF, not built here); it is in the table so it plays through the same path, with its timing kept.
+Writes public/assets/sprites/making/<tool>-work[@<d>x].webp (lossless; fully transparent pixels are
+cleared to 0,0,0,0) and public/js/make-tool-sheets.js (tool -> sheet, frame size, columns, frame count,
+fps, display scale, density).
 
-Usage (python3.11 has Pillow):
-  python3.11 -I tools/build-make-tool-sheets.py            build the sheets and the table
+Usage (python3.11 has Pillow and numpy):
+  python3.11 -I tools/build-make-tool-sheets.py --render   render, place, write the sharp sheets and the table
+  python3.11 -I tools/build-make-tool-sheets.py            rewrite the 1x rows and the table from the plan
   python3.11 -I tools/build-make-tool-sheets.py --check    exit 1 if a sheet or the table is stale
---check always checks the table and each sheet's size; it also rebuilds each sheet in memory and compares
-pixels when the OGA dump is present (GLITCH_AUDIT, default ~/Documents/glitch-audit), and the frame
-counts against the SWFs when glitch-items is. The SWFs are data: their tags are read, nothing runs them.
+--render needs glitch-items, Java 21 + FFDec and node (work files in research/make-tool-hires).
+--check always checks the table and each sheet's size; with the OGA dump present (GLITCH_AUDIT, default
+~/Documents/glitch-audit) it compares each 1x row's pixels with a fresh repack and scores each sharp
+sheet's box downscale against the OGA cells (the build.mjs score: mean 0.88, every frame 0.8), and with
+glitch-items it checks the frame counts against the SWFs. The SWFs are data: their tags are read and
+FFDec renders them; nothing runs their scripts.
 """
-import argparse, glob, json, os, struct, sys, zlib
+import argparse, glob, json, os, struct, subprocess, sys, zlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPIKE = os.path.dirname(HERE)
 PUBLIC = os.path.join(SPIKE, 'public')
 OUT = os.path.join(PUBLIC, 'assets', 'sprites', 'making')
 OUT_JS = os.path.join(PUBLIC, 'js', 'make-tool-sheets.js')
+HIRES_JSON = os.path.join(HERE, 'make-tool-hires.json')
 
 
 def audit_dir():
@@ -63,6 +76,7 @@ PLAN = {
     'construction_tool': ('extracted_homes/glitch-assets/construction_tool/construction_tool__x1_tool_animation_png_1354833722.png', 16, 61, 59, 79, 'tools/tool_base/construction_tool/construction_tool.swf', 'items/construction_tool.js:718'),
     'crystallizer': ('extracted_recipes/glitch-assets/crystallizer/crystallizer__x1_tool_animation_png_1354833105.png', 8, 122, 175, 98, 'tools/tool_base/crystallizer/crystallizer.swf', 'items/crystallizer.js:759'),
     'egg_seasoner': ('extracted_recipes/glitch-assets/egg_seasoner/egg_seasoner__x1_tool_animation_png_1354830313.png', 30, 23, 52, 90, 'tools/tool_base/egg_seasoner/egg_seasoner.swf', 'items/egg_seasoner.js:641'),
+    'fruit_changing_machine': ('extracted_g188/glitch-assets/fruit_changing_machine/fruit_changing_machine__x1_tool_animation_png_1354830329.png', 18, 44, 66, 90, 'tools/tool_base/fruit_changing_machine/fruit_changing_machine.swf', 'items/fruit_changing_machine.js:654'),
     'frying_pan': ('extracted_recipes/glitch-assets/frying_pan/frying_pan__x1_tool_animation_png_1354830080.png', 6, 160, 96, 90, 'tools/tool_base/frying_pan/frying_pan.swf', 'items/frying_pan.js:662'),
     'gassifier': ('extracted_recipes/glitch-assets/gassifier/gassifier__x1_tool_animation_png_1354830621.png', 23, 43, 40, 90, 'tools/tool_base/gassifier/gassifier.swf', 'items/gassifier.js:654'),
     'grand_ol_grinder': ('extracted_g174/glitch-assets/grand_ol_grinder/grand_ol_grinder__x1_tool_animation_png_1354836354.png', 17, 50, 79, 83, 'tools/ore_grinder/grand_ol_grinder/grand_ol_grinder.swf', 'items/grand_ol_grinder.js:996'),
@@ -80,14 +94,35 @@ PLAN = {
     'tinkertool': ('extracted_g188/glitch-assets/tinkertool/tinkertool__x1_tool_animation_png_1354832368.png', 13, 51, 46, 26, 'tools/tool_base/tinkertool/tinkertool.swf', 'items/tinkertool.js:849'),
 }
 
-# Not built here: b81d991f's 3x render (17 frames of 44 x 66 at 1x, 1.35 s, scale 1.42; see the docstring).
-FRUIT_MACHINE = {'url': 'assets/sprites/making/fruit_changing_machine-work@3x.webp', 'fw': 44, 'fh': 66, 'frames': 17,
-                 'durationMs': 1350, 'scale': 1.42, 'density': 3,
-                 'source': 'glitch-items fruit_changing_machine.swf tool_animation, frames 1-17 at 3x (b81d991f)'}
+MAX_SIDE = 16383  # WebP's largest side
+SHEET_MIN, FRAME_MIN = 0.88, 0.8  # tools/vector-sprites/build.mjs SHEET_MIN, FRAME_MIN
 
 
-def out_name(tool):
-    return f'{tool}-work.webp'
+def out_name(tool, density=1):
+    return f'{tool}-work.webp' if density == 1 else f'{tool}-work@{density}x.webp'
+
+
+def density_for(scale):
+    """3 texels per CSS pixel when the panel draws the art above 1x, else 2 (DPR 2 needs 2 x scale)."""
+    return 3 if scale > 1 else 2
+
+
+def grid_cols(frames, fw, fh, density):
+    """Columns for a full-row grid (cols divides frames) within MAX_SIDE, squarest first; None if none fits."""
+    best = None
+    for c in range(1, frames + 1):
+        if frames % c:
+            continue
+        W, H = c * fw * density, frames // c * fh * density
+        if W > MAX_SIDE or H > MAX_SIDE:
+            continue
+        if best is None or max(W, H) < best[0]:
+            best = (max(W, H), c)
+    return best and best[1]
+
+
+def load_hires():
+    return json.load(open(HIRES_JSON)) if os.path.exists(HIRES_JSON) else {}
 
 
 def scale_for(fw, fh):
@@ -170,33 +205,38 @@ def clear_transparent(img):
 
 def table():
     rows = {}
+    hires = load_hires()
     for tool, (src, cols, fw, fh, frames, swf, gsjs) in sorted(PLAN.items()):
-        rows[tool] = {'url': f'assets/sprites/making/{out_name(tool)}', 'fw': fw, 'fh': fh, 'frames': frames,
-                      'fps': FPS, 'scale': scale_for(fw, fh),
-                      'source': f'OGA {os.path.basename(src)} ({cols} cols); glitch-items {os.path.basename(swf)} tool_animation; GSJS {gsjs}'}
-    rows['fruit_changing_machine'] = dict(FRUIT_MACHINE)
+        scale = scale_for(fw, fh)
+        source = f'OGA {os.path.basename(src)} ({cols} cols); glitch-items {os.path.basename(swf)} tool_animation; GSJS {gsjs}'
+        h = hires.get(tool)
+        if h:
+            a, b = h['swfFrames']
+            rows[tool] = {'url': f'assets/sprites/making/{out_name(tool, h["density"])}', 'fw': fw, 'fh': fh,
+                          'cols': h['cols'], 'frames': frames, 'fps': FPS, 'scale': scale, 'density': h['density'],
+                          'source': f'{source}; SWF frames {a}-{b} at {h["density"]}x (score {h["score"]})'}
+        else:
+            rows[tool] = {'url': f'assets/sprites/making/{out_name(tool)}', 'fw': fw, 'fh': fh, 'cols': frames,
+                          'frames': frames, 'fps': FPS, 'scale': scale, 'source': source}
     return dict(sorted(rows.items()))
 
 
 def write_js(rows):
     lines = [
-        '// Generated by tools/build-make-tool-sheets.py (register row G188). Do not edit by hand:',
-        '// change the plan there and rerun it (python3.11 -I tools/build-make-tool-sheets.py).',
+        '// Generated by tools/build-make-tool-sheets.py (register rows G188, G191). Do not edit by hand:',
+        '// change the plan there and rerun it (python3.11 -I tools/build-make-tool-sheets.py [--render]).',
         '//',
-        "// Each making tool's own tool_animation for the Make panel, repacked into one row: frame k sits at",
-        '// x = k * fw. The client loops it (glitch-client SSCollection.as:123) at 30 fps (TSEngineConstants.as:6).',
-        '// scale fits the 1x cell in the panel\'s tool box; density is texels per CSS pixel (1 unless noted).',
+        "// Each making tool's own tool_animation for the Make panel, in a grid of full rows: frame k sits at",
+        '// column k % cols, row floor(k / cols), cells fw x fh in CSS pixels. The client loops it',
+        '// (glitch-client SSCollection.as:123) at 30 fps (TSEngineConstants.as:6). scale fits the cell in the',
+        "// panel's tool box; density is texels per CSS pixel (1 unless noted: the sharp FFDec renders, G191).",
         '',
         'export const MAKE_TOOL_SHEETS = Object.freeze({',
     ]
     for tool, r in rows.items():
         lines.append(f"  // {r['source']}")
-        fields = [f"url: '{r['url']}'", f"fw: {r['fw']}", f"fh: {r['fh']}", f"frames: {r['frames']}"]
-        if 'fps' in r:
-            fields.append(f"fps: {r['fps']}")
-        if 'durationMs' in r:
-            fields.append(f"durationMs: {r['durationMs']}")
-        fields.append(f"scale: {r['scale']}")
+        fields = [f"url: '{r['url']}'", f"fw: {r['fw']}", f"fh: {r['fh']}", f"cols: {r['cols']}",
+                  f"frames: {r['frames']}", f"fps: {r['fps']}", f"scale: {r['scale']}"]
         if r.get('density', 1) != 1:
             fields.append(f"density: {r['density']}")
         lines.append(f'  {tool}: Object.freeze({{ {", ".join(fields)} }}),')
@@ -204,20 +244,145 @@ def write_js(rows):
     return '\n'.join(lines)
 
 
-def cmd_build():
-    if not AUDIT:
-        raise SystemExit('the OGA dump is missing (set GLITCH_AUDIT)')
-    from PIL import Image  # noqa: F401
+def stale_files(keep):
+    """Make-tool sheets in OUT that the table no longer names (old 1x rows, old densities)."""
+    tools = set(PLAN)
+    out = []
+    for f in sorted(os.listdir(OUT)):
+        stem = f.split('-work', 1)[0]
+        if stem in tools and '-work' in f and f not in keep:
+            out.append(f)
+    return out
+
+
+def write_table_and_rows():
+    """The 1x rows of tools without a sharp sheet, the table, and stale files removed."""
+    rows = table()
     total = 0
-    for tool in sorted(PLAN):
+    for tool, r in rows.items():
+        if r.get('density', 1) != 1:
+            total += os.path.getsize(os.path.join(PUBLIC, r['url']))
+            continue
         img = repack(tool)
         path = os.path.join(OUT, out_name(tool))
         img.save(path, 'WEBP', lossless=True, quality=100, method=6)
         total += os.path.getsize(path)
-        print(f'{tool:20} {img.size[0]}x{img.size[1]}  {os.path.getsize(path):>7} bytes')
+        print(f'{tool:22} 1x row {img.size[0]}x{img.size[1]}  {os.path.getsize(path):>7} bytes')
+    keep = {os.path.basename(r['url']) for r in rows.values()}
+    for f in stale_files(keep):
+        os.remove(os.path.join(OUT, f))
+        print('removed', f)
     with open(OUT_JS, 'w') as f:
-        f.write(write_js(table()))
+        f.write(write_js(rows))
     print('total bytes', total)
+
+
+def cmd_build():
+    if not AUDIT:
+        raise SystemExit('the OGA dump is missing (set GLITCH_AUDIT)')
+    write_table_and_rows()
+
+
+# ---- sharp renders (G191) -----------------------------------------------------------------------------
+
+def cmd_render(work, only):
+    """FFDec zoom-3 renders of each tool_animation scene, placed by tools/vector-sprites/build.mjs --dry."""
+    if not AUDIT:
+        raise SystemExit('the OGA dump is missing (set GLITCH_AUDIT)')
+    from PIL import Image
+    sys.path.insert(0, os.path.join(HERE, 'icon-hires'))
+    import swfinfo  # noqa: E402
+    items = os.path.join(AUDIT, 'glitch-items')
+    for d in ('ref', 'swf'):
+        os.makedirs(os.path.join(work, d), exist_ok=True)
+    tools = [t for t in sorted(PLAN) if not only or t in only]
+    jobs, starts = [], {}
+    for tool in tools:
+        src, cols, fw, fh, frames, swf, _ = PLAN[tool]
+        info = swfinfo.read(os.path.join(items, swf))
+        start = info['scenes']['tool_animation']  # 1-based root frame (DefineSceneAndFrameLabelData)
+        starts[tool] = start
+        ref = os.path.join(work, 'ref', f'{tool}.png')
+        repack(tool).save(ref)
+        padded = os.path.join(work, 'swf', f'{tool}.swf')
+        swfinfo.rewrite(os.path.join(items, swf), padded, pad=1.0)
+        jobs.append({'name': f'make-{tool}', 'swf': padded, 'sprite': 0, 'sheets': [{
+            'path': os.path.relpath(ref, PUBLIC), 'fw': fw, 'fh': fh, 'cols': frames, 'frames': frames,
+            'swfStart': start, 'swfCount': frames, 'mirror': False, 'shift': 0}]})
+    manifest = os.path.join(work, 'make-tools.json')
+    json.dump({'about': 'Generated by tools/build-make-tool-sheets.py --render (G191).', 'jobs': jobs}, open(manifest, 'w'), indent=1)
+    subprocess.run(['node', os.path.join(HERE, 'vector-sprites', 'build.mjs'), '--manifest', manifest, '--work', work, '--dry'], check=True)
+    results = json.load(open(os.path.join(work, 'dry-results.json')))
+    hires = load_hires()
+    for tool in tools:
+        src, cols, fw, fh, frames, swf, _ = PLAN[tool]
+        r = results.get(os.path.relpath(os.path.join(work, 'ref', f'{tool}.png'), PUBLIC), {})
+        if r.get('status') != 'dry':
+            print(f'{tool}: kept at 1x ({r.get("reason", "not built")})')
+            hires.pop(tool, None)
+            continue
+        density = density_for(scale_for(fw, fh))
+        gc = grid_cols(frames, fw, fh, density)
+        if not gc:
+            print(f'{tool}: no full-row grid fits {MAX_SIDE} px at {density}x; kept at 1x')
+            hires.pop(tool, None)
+            continue
+        dx, dy = r['offset3x']
+        a, b = r['swfFrames']
+        frame_dir = os.path.join(work, f'{tool}_0', 'root')
+        sheet = Image.new('RGBA', (gc * fw * density, frames // gc * fh * density), (0, 0, 0, 0))
+        for k in range(frames):
+            img = Image.open(os.path.join(frame_dir, f'{a + k}.png')).convert('RGBA')
+            cell = Image.new('RGBA', (fw * 3, fh * 3), (0, 0, 0, 0))
+            cell.paste(img, (dx, dy))  # render pixel (X, Y) at cell 3x pixel (X + dx, Y + dy), clipped
+            if density != 3:
+                cell = cell.convert('RGBa').resize((fw * density, fh * density), Image.LANCZOS).convert('RGBA')
+            sheet.paste(cell, ((k % gc) * fw * density, (k // gc) * fh * density))
+        path = os.path.join(OUT, out_name(tool, density))
+        clear_transparent(sheet).save(path, 'WEBP', lossless=True, quality=100, method=6)
+        mean, low = hires_score(tool, path, density, gc)
+        hires[tool] = {'density': density, 'cols': gc, 'swfFrames': [a, b], 'offset3x': [dx, dy],
+                       'score': round(mean, 4), 'minFrame': round(low, 4), 'placementScore': r['score']}
+        print(f'{tool:22} {density}x {sheet.size[0]}x{sheet.size[1]} ({gc} cols) score {mean:.3f} min {low:.3f}  {os.path.getsize(path):>8} bytes')
+    with open(HIRES_JSON, 'w') as f:
+        rows = [f'  {json.dumps(t)}: {json.dumps(h, separators=(", ", ": "))}' for t, h in sorted(hires.items())]
+        f.write('{\n' + ',\n'.join(rows) + '\n}\n')
+    write_table_and_rows()
+
+
+def _premul(a):
+    """float32 premultiplied RGBA (0..255) from a uint8 RGBA array."""
+    a = a.astype('float32')
+    a[..., :3] *= a[..., 3:4] / 255
+    return a
+
+
+def frame_score(o, d):
+    """tools/vector-sprites/build.mjs compare + scoreOf for two aligned premultiplied cells."""
+    import numpy as np
+    both = (o[..., 3] > 0) | (d[..., 3] > 0)
+    m = np.maximum(o[..., 3], d[..., 3])[both].sum()
+    if m == 0:
+        return 1.0
+    ea = np.abs(o[..., 3] - d[..., 3])[both].sum()
+    ec = np.abs(o[..., :3] - d[..., :3])[both].sum()
+    return float(1 - (ea / m + ec / (3 * m)) / 2)
+
+
+def hires_score(tool, path, density, gc):
+    """(mean, min) frame score of a sharp sheet's box downscale against the OGA cells."""
+    import numpy as np
+    from PIL import Image
+    _src, _cols, fw, fh, frames, *_ = PLAN[tool]
+    ref = np.asarray(repack(tool))
+    hi = np.asarray(Image.open(path).convert('RGBA'))
+    scores = []
+    for k in range(frames):
+        x, y = (k % gc) * fw * density, (k // gc) * fh * density
+        cell = _premul(hi[y:y + fh * density, x:x + fw * density])
+        down = cell.reshape(fh, density, fw, density, 4).mean(axis=(1, 3))
+        scores.append(frame_score(_premul(ref[:, k * fw:(k + 1) * fw]), down))
+    return sum(scores) / len(scores), min(scores)
 
 
 def webp_size(path):
@@ -244,23 +409,32 @@ def cmd_check():
         from PIL import Image, ImageChops
     for tool in sorted(PLAN):
         src, cols, fw, fh, frames, swf, _ = PLAN[tool]
-        path = os.path.join(OUT, out_name(tool))
+        r = rows[tool]
+        d, gc = r.get('density', 1), r['cols']
+        name = os.path.basename(r['url'])
+        path = os.path.join(PUBLIC, r['url'])
         if not os.path.exists(path):
-            print(f'{tool}: {out_name(tool)} missing'); bad += 1; continue
-        if webp_size(path) != (frames * fw, fh):
-            print(f'{tool}: {out_name(tool)} is {webp_size(path)}, want {(frames * fw, fh)}'); bad += 1; continue
+            print(f'{tool}: {name} missing'); bad += 1; continue
+        want = (gc * fw * d, frames // gc * fh * d)
+        if frames % gc or webp_size(path) != want:
+            print(f'{tool}: {name} is {webp_size(path)}, want {want} ({gc} cols)'); bad += 1; continue
         if items and os.path.exists(os.path.join(items, swf)):
             got = swf_scenes(os.path.join(items, swf)).get('tool_animation')
             if got != frames:
                 print(f'{tool}: {swf} tool_animation has {got} frames, plan says {frames}'); bad += 1
-        if pixels:
-            want = repack(tool)
+        if not pixels:
+            continue
+        if d == 1:
             have = clear_transparent(Image.open(path).convert('RGBA'))
-            if ImageChops.difference(want, have).getbbox():
-                print(f'{tool}: {out_name(tool)} differs from a fresh repack'); bad += 1
-    fcm = os.path.join(PUBLIC, FRUIT_MACHINE['url'])
-    if not os.path.exists(fcm):
-        print('fruit_changing_machine: 3x sheet missing'); bad += 1
+            if ImageChops.difference(repack(tool), have).getbbox():
+                print(f'{tool}: {name} differs from a fresh repack'); bad += 1
+        else:
+            mean, low = hires_score(tool, path, d, gc)
+            if mean < SHEET_MIN or low < FRAME_MIN:
+                print(f'{tool}: {name} scores {mean:.3f} (min frame {low:.3f}) against the OGA cells'); bad += 1
+    keep = {os.path.basename(r['url']) for r in rows.values()}
+    for f in stale_files(keep):
+        print(f'{f} is not in the table'); bad += 1
     print(('ok' if not bad else f'{bad} problems') + ('' if pixels else ' (OGA dump missing: pixels not compared)'))
     return 1 if bad else 0
 
@@ -268,9 +442,15 @@ def cmd_check():
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--check', action='store_true')
+    ap.add_argument('--render', action='store_true', help='FFDec renders + placement, then build')
+    ap.add_argument('--work', default=os.path.join(AUDIT or SPIKE, 'research', 'make-tool-hires'))
+    ap.add_argument('tools', nargs='*', help='--render only these tools')
     args = ap.parse_args()
     if args.check:
         sys.exit(cmd_check())
+    if args.render:
+        cmd_render(args.work, set(args.tools))
+        return
     cmd_build()
 
 

@@ -493,7 +493,7 @@ import {
   recipeTaskLimit,
   recipeToolInUse,
 } from './js/making.js?v=g268-1';
-import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g188-1';
+import { MAKE_TOOL_SHEETS } from './js/make-tool-sheets.js?v=g191-1';
 import { LOW_FUEL_LINE, craftSessionElapsedMs, isLowFuel, isMachineArt, machineArtHtml, packMakeState, playMachineHandOver, setMachineArtFrame } from './js/machine-art.js?v=g193-1';
 import {
   createGarden,
@@ -20715,20 +20715,23 @@ function setMakeCraftingUi(isCrafting) {
 
 /**
  * The tool's own tool_animation while its recipe runs (glitch-client MakingToolAnimator.as:16,92),
- * looped (SSCollection.as:123) from the one-row sheets in js/make-tool-sheets.js (G188).
+ * looped (SSCollection.as:123) from the sheets in js/make-tool-sheets.js (G188; sharp renders G191).
+ * A sheet is a grid of full rows, so style.css steps x along a row and y down the rows.
  * Null for a tool without a sheet, which keeps its icon.
  */
 function makeToolSheetVisual(toolId) {
   const sheet = toolId && MAKE_TOOL_SHEETS[toolId];
   if (!sheet) return null;
   const label = TOOL_CATALOG[toolId]?.label || toolId;
-  const durationMs = sheet.durationMs || Math.round((sheet.frames / sheet.fps) * 1000);
+  const rows = sheet.frames / sheet.cols;
   const style = [
     `--mp-fw:${sheet.fw}px`,
     `--mp-fh:${sheet.fh}px`,
-    `--mp-row:${sheet.frames * sheet.fw}px`,
-    `--mp-steps:${sheet.frames}`,
-    `--mp-dur:${durationMs}ms`,
+    `--mp-sheet-w:${sheet.cols * sheet.fw}px`,
+    `--mp-sheet-h:${rows * sheet.fh}px`,
+    `--mp-cols:${sheet.cols}`,
+    `--mp-rows:${rows}`,
+    `--mp-row-dur:${((sheet.cols / sheet.fps) * 1000).toFixed(3)}ms`,
     `--mp-scale:${sheet.scale}`,
     `background-image:url('${sheet.url}')`,
   ].join(';');

@@ -185,7 +185,7 @@ describe('tool save and client wiring', () => {
     for (const rel of [
       'assets/sprites/icons/tinkertool.png',
       'assets/sprites/icons/tinkertool_broken.png',
-      'assets/sprites/tools/tinkertool-repair.png',
+      'assets/sprites/making/tinkertool-work@3x.webp',
     ]) {
       assert.equal(fs.existsSync(path.join(publicDir, rel)), true, rel);
     }
@@ -195,7 +195,8 @@ describe('tool save and client wiring', () => {
     assert.match(game, /beginToolRepair/);
     assert.match(game, /toolremaining/);
     assert.match(game, /pack-slot-wear/);
-    assert.match(css, /tinkertool-repair\.png/);
+    // G191: the repair card plays the Make panel's Tinkertool sheet (tests/make-tool-animations.test.js).
+    assert.match(css, /\.tool-repair-sprite \{[\s\S]*?tinkertool-work@3x\.webp/);
     assert.match(html, /game\.js\?v=official-ecology-1/);
   });
 });

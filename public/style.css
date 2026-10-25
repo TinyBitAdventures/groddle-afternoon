@@ -2009,11 +2009,21 @@ button.play-context-head:focus-visible {
   pointer-events: none;
 }
 .tool-repair-sprite {
+  /* G191: the Tinkertool's own tool_animation, the Make panel's sharp sheet (js/make-tool-sheets.js
+     tinkertool: 26 frames of 51 x 46, 2 columns by 13 rows at 3x), played as .mp-tool-sheet plays it,
+     30 fps, 2 frames a row (tinkertool.js:473 sends state tool_animation while it repairs). */
+  --mp-sheet-w: 102px;
+  --mp-sheet-h: 598px;
+  --mp-cols: 2;
+  --mp-rows: 13;
+  --mp-row-dur: 66.667ms;
   grid-row: 1 / span 2;
   width: 51px;
   height: 46px;
-  background: url('assets/sprites/tools/tinkertool-repair.png') 0 0 / 663px 92px no-repeat;
-  animation: tinkertool-cycle 1.15s steps(13) infinite;
+  background: url('assets/sprites/making/tinkertool-work@3x.webp') 0 0 / var(--mp-sheet-w) var(--mp-sheet-h) no-repeat;
+  animation:
+    make-tool-sheet-x var(--mp-row-dur) steps(var(--mp-cols), end) infinite,
+    make-tool-sheet-y calc(var(--mp-row-dur) * var(--mp-rows)) steps(var(--mp-rows), end) infinite;
 }
 .tool-repair-copy {
   align-self: end;
@@ -2033,12 +2043,6 @@ button.play-context-head:focus-visible {
   border-radius: inherit;
   background: linear-gradient(90deg, #d58f38, #76af55);
   animation: tool-repair-progress var(--tool-repair-ms) linear forwards;
-}
-@keyframes tinkertool-cycle {
-  0% { background-position: 0 0; }
-  49.9% { background-position: -663px 0; }
-  50% { background-position: 0 -46px; }
-  100% { background-position: -663px -46px; }
 }
 @keyframes tool-repair-progress {
   from { width: 0; }
@@ -2600,20 +2604,29 @@ button.play-context-head:focus-visible {
   animation: make-tool-work 0.62s ease-in-out infinite alternate;
 }
 .make-progress .mp-tool-sheet {
-  /* G188: a making tool's own tool_animation (glitch-client MakingToolAnimator.as), one row of
-     frames from js/make-tool-sheets.js (built by tools/build-make-tool-sheets.py). The span is one
-     1x cell, scaled to fit the tool box; game.js sets the sheet, frame size, row width, frame
-     count, loop length (frames at 30 fps) and scale as custom properties. */
+  /* G188, G191: a making tool's own tool_animation (glitch-client MakingToolAnimator.as), from
+     js/make-tool-sheets.js (built by tools/build-make-tool-sheets.py). The span is one cell in CSS
+     pixels, scaled to fit the tool box; the sheet is a grid of full rows (sharp FFDec renders at 2x or
+     3x, drawn at 1x size), so x steps along a row while y steps down the rows once per row. game.js
+     sets the sheet, cell, grid, row time (cols at 30 fps) and scale as custom properties. */
   display: block;
   width: var(--mp-fw);
   height: var(--mp-fh);
   object-fit: none;
   background-position: 0 0;
-  background-size: var(--mp-row) var(--mp-fh);
+  background-size: var(--mp-sheet-w) var(--mp-sheet-h);
   background-repeat: no-repeat;
-  transform: scale(var(--mp-scale));
+  /* Centred on the box even when the 1x cell is bigger than it (the Frying Pan's 160 x 96, the
+     Crystallizer's 122 x 175): a grid item that overflows is start-aligned by Chrome, which pushed
+     those six tools off to one side. ItemIconView.as:328-336 centres the art's bounds in the box. */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(var(--mp-scale));
   transform-origin: 50% 50%;
-  animation: make-tool-sheet var(--mp-dur) steps(var(--mp-steps), end) infinite;
+  animation:
+    make-tool-sheet-x var(--mp-row-dur) steps(var(--mp-cols), end) infinite,
+    make-tool-sheet-y calc(var(--mp-row-dur) * var(--mp-rows)) steps(var(--mp-rows), end) infinite;
 }
 .make-progress .mp-tool-machine,
 .make-result .mr-machine {
@@ -2718,9 +2731,13 @@ button.play-context-head:focus-visible {
   from { transform: rotate(-7deg) translateY(3px); }
   to { transform: rotate(8deg) translateY(-3px); }
 }
-@keyframes make-tool-sheet {
-  from { background-position: 0 0; }
-  to { background-position: calc(-1 * var(--mp-row)) 0; }
+@keyframes make-tool-sheet-x {
+  from { background-position-x: 0; }
+  to { background-position-x: calc(-1 * var(--mp-sheet-w)); }
+}
+@keyframes make-tool-sheet-y {
+  from { background-position-y: 0; }
+  to { background-position-y: calc(-1 * var(--mp-sheet-h)); }
 }
 @keyframes make-spark {
   from { opacity: 0.25; transform: scale(0.65) rotate(0); }

@@ -38,6 +38,7 @@ import {
   setToolRemaining,
 } from '../public/js/tools.js?v=woodcutting-test-2';
 import { crushOre } from '../public/js/mining.js';
+import { MAKE_TOOL_SHEETS } from '../public/js/make-tool-sheets.js';
 import { clearPlot, createGarden, getPlot, hasHoe, hasWateringCan, plantPlot, waterPlot } from '../public/js/garden.js';
 import { performTrantCare, quoteTrantCare } from '../public/js/trant-care.js';
 import { createTrantState, setTrantTables } from '../public/js/trants.js?v=trant-harvest-2';
@@ -343,11 +344,14 @@ describe('G183: isToolItem and the Grand Ol\' Grinder animation', () => {
     assert.match(game, /const toolInUse = recipeToolInUse\(inv, recipe\.tool,/);
     // G188: the stand-in's sheet first, then the recipe tool's (js/make-tool-sheets.js).
     assert.match(game, /makeToolSheetVisual\(toolInUse\) \|\| makeToolSheetVisual\(recipe\.tool\)/);
-    // grand_ol_grinder__x1_tool_animation (850x395, 17x5 cells of 50x79, 83 frames) in one row.
-    const webp = readFileSync(join(pub, 'assets/sprites/making/grand_ol_grinder-work.webp'));
+    // grand_ol_grinder__x1_tool_animation (850x395, 17x5 cells of 50x79, 83 frames): G191 renders it
+    // sharp from grand_ol_grinder.swf, 83 frames in one row (83 is prime) at the table's density.
+    const s = MAKE_TOOL_SHEETS.grand_ol_grinder;
+    assert.deepEqual([s.fw, s.fh, s.frames, s.cols], [50, 79, 83, 83]);
+    const webp = readFileSync(join(pub, s.url));
     assert.equal(webp.toString('ascii', 12, 16), 'VP8L');
     const bits = webp.readUInt32LE(21);
-    assert.deepEqual([(bits & 0x3fff) + 1, ((bits >> 14) & 0x3fff) + 1], [83 * 50, 79]);
+    assert.deepEqual([(bits & 0x3fff) + 1, ((bits >> 14) & 0x3fff) + 1], [83 * 50 * (s.density || 1), 79 * (s.density || 1)]);
   });
 
   it('recipeToolInUse names the Grand Ol\' Grinder only when it is the grinder at work', () => {
