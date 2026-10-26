@@ -2041,9 +2041,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 521,
+  "commits": 523,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, change your email and password from Menu > Account"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2158,11 +2163,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Trees and other street things are never placed on a cave ceiling or a ledge's underside"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Parties in multiplayer: invite, accept, party chat and a roster that follows members across streets"
    }
   ]
  },
