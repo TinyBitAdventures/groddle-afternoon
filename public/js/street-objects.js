@@ -225,6 +225,27 @@ export function freshenTree(state, classId, index) {
   return state;
 }
 
+/**
+ * A Wood Tree as the server has it (groddle-afternoon-server objects.go chopWood):
+ * the shared maturity and harvest_count. harvestedToday stays the player's own
+ * (the source's per-player intervals[today]).
+ */
+export function applyWoodState(state, s) {
+  if (!state || !s) return state;
+  const whole = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.floor(Number(v) || 0)));
+  state.maturity = whole(s.maturity, 0, 6);
+  state.harvestCount = whole(s.count, 0, 1);
+  return state;
+}
+
+/** A Wood Tree nobody has touched on the server: maturity 6 (js/woodcutting.js ensureWoodTreeState). */
+export function freshenWood(state) {
+  if (!state) return state;
+  state.maturity = 6;
+  state.harvestCount = 0;
+  return state;
+}
+
 export function applyTreeState(state, s) {
   if (!state || !s) return state;
   const whole = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.floor(Number(v) || 0)));
@@ -307,6 +328,9 @@ export function reconcile(obj, copy, now = Date.now()) {
   } else if (obj.kind === 'tree') {
     if (s) applyTreeState(obj.state, s);
     else freshenTree(obj.state, obj.classId, obj.index);
+  } else if (obj.kind === 'wood') {
+    if (s) applyWoodState(obj.state, s);
+    else freshenWood(obj.state);
   } else return false;
   return true;
 }

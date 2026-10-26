@@ -128,6 +128,6 @@ import { energyDecayFeature } from './energy-decay-feature.js?v=g339-1'; FEATURE
 import { partyFeature } from './party-feature.js?v=mp4-1'; FEATURES.push(partyFeature);
 import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=mp4-1'; FEATURES.push(sharedQuoinsFeature);
 import { tradeFeature } from './trade-feature.js?v=g334-1'; FEATURES.push(tradeFeature);
-import { streetObjectsFeature } from './street-objects-feature.js?v=g334-2'; FEATURES.push(streetObjectsFeature);
+import { streetObjectsFeature } from './street-objects-feature.js?v=g334-3'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=mp3-5'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=mp-login-3'; FEATURES.push(accountBackupFeature);

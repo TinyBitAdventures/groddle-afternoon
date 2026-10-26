@@ -20,11 +20,13 @@ import {
   applyNodeState,
   applyRockState,
   applyTreeState,
+  applyWoodState,
   createStreetCopy,
   freshTreePlan,
   freshenNode,
   freshenRock,
   freshenTree,
+  freshenWood,
   idKind,
   nodePerks,
   reconcile,
@@ -36,8 +38,8 @@ import {
   takeObjs,
   treeReady,
   treeSkill,
-} from '../public/js/street-objects.js?v=mp4-1';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g334-2';
+} from '../public/js/street-objects.js?v=g334-1';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g334-3';
 import { FEATURES } from '../public/js/features/index.js';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=g330-1';
 import { createResourceNode } from '../public/js/resource-nodes.js';
@@ -248,7 +250,7 @@ describe('street objects: the feature', () => {
   it('is registered just before the realtime feature', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'));
-    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g334-2/);
+    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g334-3/);
   });
 
   it('asks for the street on joining, and waits for it', () => {
@@ -379,3 +381,34 @@ describe('street objects: the server\'s layout', () => {
     }
   });
 });
+
+describe('street objects: Wood Trees', () => {
+  it('take the shared maturity and harvest count, and keep the player\'s own daily limit', () => {
+    const state = { maturity: 6, harvestCount: 0, harvestedToday: true, totalHarvests: 3 };
+    applyWoodState(state, { id: 'tree:7', maturity: 4, count: 1 });
+    assert.deepEqual(state, { maturity: 4, harvestCount: 1, harvestedToday: true, totalHarvests: 3 });
+    applyWoodState(state, { id: 'tree:7', maturity: 99, count: -3 });
+    assert.equal(state.maturity, 6);
+    assert.equal(state.harvestCount, 0);
+    freshenWood(state);
+    assert.equal(state.maturity, 6);
+    assert.equal(state.harvestedToday, true, 'fresh on the server is not a new day for you');
+  });
+
+  it('reconcile treats wood as its own kind', () => {
+    const copy = createStreetCopy();
+    takeObjs(copy, { street: 'GA1', snap: true, objs: [{ id: 'tree:7', maturity: 2, count: 0 }] });
+    const obj = { id: 'tree:7', kind: 'wood', state: { maturity: 6, harvestCount: 1 } };
+    assert.equal(reconcile(obj, copy), true);
+    assert.deepEqual(obj.state, { maturity: 2, harvestCount: 0 });
+  });
+
+  it('the server data carries the Wood Trees the game lays out', { skip: skipWithoutServer }, () => {
+    const data = JSON.parse(readFileSync(serverPath('data', 'objects.json'), 'utf8'));
+    const woods = Object.values(data.streets).flatMap((s) => (s.trees || []).filter((r) => r[1] === 'wood_tree'));
+    assert.ok(woods.length > 100, `${woods.length} wood trees`);
+    assert.ok(woods.every((r) => r[4] === 6 && r[5] === 0), 'fresh at maturity 6');
+    assert.match(read('public/js/features/street-objects-feature.js'), /t\.classId === 'wood_tree' && !t\.grownFromBean/);
+  });
+});
+

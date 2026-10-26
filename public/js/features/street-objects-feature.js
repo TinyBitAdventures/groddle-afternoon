@@ -40,6 +40,7 @@ import {
   applyNodeState,
   applyRockState,
   applyTreeState,
+  applyWoodState,
   createStreetCopy,
   nodeId,
   nodePerks,
@@ -54,9 +55,10 @@ import {
   treeId,
   treeReady,
   treeSkill,
-} from '../street-objects.js?v=mp4-1';
+} from '../street-objects.js?v=g334-1';
 import { ROCK_CATALOG } from '../mining.js?v=g330-1';
 import { TRANT_META, trantStatusLabel } from '../trants.js?v=trant-harvest-2';
+import { quoteWoodTreeHarvest } from '../woodcutting.js?v=woodcutting-test-4';
 
 export const STREET_OBJECTS_FEATURE_ID = 'street-objects';
 const RECONCILE_MS = 250;
@@ -140,6 +142,8 @@ function localObjects(engine) {
       out.push({ id: rockId(t.rockIndex), kind: 'rock', target: t, classId: t.classId, rock: t.state.rock });
     } else if (Number.isInteger(t.treeIndex) && TRANT_META[t.classId] && t.state) {
       out.push({ id: treeId(t.treeIndex), kind: 'tree', target: t, classId: t.classId, state: t.state, index: t.treeIndex });
+    } else if (Number.isInteger(t.treeIndex) && t.classId === 'wood_tree' && !t.grownFromBean && t.state) {
+      out.push({ id: treeId(t.treeIndex), kind: 'wood', target: t, classId: t.classId, state: t.state, index: t.treeIndex });
     }
   }
   for (const n of engine.query?.('streetResourceNodes', engine) || []) {
@@ -162,6 +166,8 @@ function redraw(engine, obj, before = null) {
     }
   } else if (obj.kind === 'tree') {
     if (obj.target) obj.target.subtitle = trantStatusLabel(obj.state, TRANT_META[obj.classId]);
+  } else if (obj.kind === 'wood') {
+    if (obj.target) engine.refreshTreeVisual?.(obj.target);
   } else obj.refresh?.();
 }
 
@@ -194,6 +200,7 @@ function reconcileAll(engine, force = false) {
 function viewOf(obj) {
   if (obj.kind === 'rock') return `${obj.id}=${obj.rock.chunksRemaining}${obj.rock.mega ? 'm' : ''}`;
   if (obj.kind === 'node') return `${obj.id}=${obj.node.units}${obj.node.petted ? 'p' : ''}${obj.node.watered ? 'w' : ''}`;
+  if (obj.kind === 'wood') return `${obj.id}=m${obj.state.maturity}c${obj.state.harvestCount || 0}`;
   return `${obj.id}=${obj.state.fruitCount}${obj.state.petted ? 'p' : ''}${obj.state.watered ? 'w' : ''}`;
 }
 
@@ -218,6 +225,13 @@ function sharedVerbOn(engine, target, verbId) {
       skill: treeSkill(verbId, learned),
     };
   }
+  if (Number.isInteger(target.treeIndex) && target.classId === 'wood_tree' && !target.grownFromBean && target.state) {
+    if (verbId !== 'harvest') return null;
+    return {
+      id: treeId(target.treeIndex),
+      ready: () => quoteWoodTreeHarvest(target.state, engine.inv, engine.pc, engine.toolState).ok,
+    };
+  }
   if (target.resourceKey) {
     const n = (engine.query?.('streetResourceNodes', engine) || []).find((row) => row.target === target);
     if (!n || !sharedNodeVerb(n.classTsid, verbId)) return null;
@@ -230,6 +244,7 @@ function applyKnown(obj, s) {
   const now = Date.now();
   if (obj.kind === 'rock') applyRockState(obj.rock, s, now);
   else if (obj.kind === 'node') applyNodeState(obj.node, s, now);
+  else if (obj.kind === 'wood') applyWoodState(obj.state, s);
   else applyTreeState(obj.state, s);
 }
 

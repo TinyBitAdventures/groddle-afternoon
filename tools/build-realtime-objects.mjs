@@ -96,7 +96,8 @@ function groundY(platforms) {
 /**
  * One street's shared objects, in the client's own ids:
  *   rocks [i, class, x, y]                 game.js spawnMineRocks / spawnMineRock (index i in rockClasses)
- *   trees [i, class, x, y, maturity, health] game.js spawnTrees (living trants only; wood trees stay local)
+ *   trees [i, class, x, y, maturity, health] game.js spawnTrees (the trants, and the Wood Tree at
+ *                                          maturity 6, health 0: ensureWoodTreeState's fresh tree)
  *   nodes [key, class, x, y]               resource-nodes-feature resourceSpawnPlan (`<class>:<n>`)
  */
 export function streetObjectLayout(data, { starter = false, ecology = ecologyForStreet(data.tsid) } = {}) {
@@ -125,6 +126,10 @@ export function streetObjectLayout(data, { starter = false, ecology = ecologyFor
   const trees = [];
   placement('trees').forEach((p, i) => {
     const classTsid = population.treeClasses[i];
+    if (classTsid === 'wood_tree') {
+      trees.push([i, classTsid, r1(p.x), r1((p.y ?? ground) + 2), 6, 0]);
+      return;
+    }
     if (!TRANT_META[classTsid]) return;
     const fresh = freshTreePlan(i);
     trees.push([i, classTsid, r1(p.x), r1((p.y ?? ground) + 2), fresh.maturity, fresh.health]);
