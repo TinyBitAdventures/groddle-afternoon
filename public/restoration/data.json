@@ -384,7 +384,7 @@
    "group": "creatures",
    "name": "Crabs",
    "status": "solo",
-   "blurb": "Crabs on eight streets will listen to your Musicblocks, and one that hears its oldest tune is a happy crab. Flatter one and hug it for Crabato Juice. Play a crab the tune it just heard and it still shouts and sulks, but you keep the block: the original destroyed it, which only made sense with other players in between.",
+   "blurb": "Crabs on eight streets will listen to your Musicblocks, and one that hears its oldest tune is a happy crab. Flatter one and hug it for Crabato Juice. Play a crab the tune it just heard and it still shouts and sulks, but solo you keep the block: the original destroyed it, which only made sense with other players in between. In multiplayer the crab keeps it, as in the original.",
    "spot": null,
    "evidence": [
     "public/js/crabs.js",
@@ -2041,7 +2041,7 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 523,
+  "commits": 524,
   "since": "2026-10-19",
   "recent": [
    {

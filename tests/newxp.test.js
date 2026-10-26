@@ -275,6 +275,12 @@ describe('newxp save', () => {
     const src = readFileSync(join(ROOT, 'js/features/index.js'), 'utf8');
     assert.match(src, /newxpFeature/);
   });
+
+  it('offers no skip in multiplayer, at the start or on the pill (Austin 2026-10-26)', () => {
+    const src = readFileSync(join(ROOT, 'js/features/newxp-feature.js'), 'utf8');
+    assert.match(src, /if \(skip\) skip\.hidden = engineRef\?\.mode === 'multiplayer';/);
+    assert.match(src, /\[data-nx-skip\]'\)\.addEventListener\('click', \(\) => \{\n    if \(engineRef\?\.mode === 'multiplayer'\) return;/);
+  });
 });
 
 describe('newxp island order (newbie_island.js, home.js, magic_rock.js)', () => {

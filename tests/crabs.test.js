@@ -34,6 +34,7 @@ import {
   crabRoamTarget,
   crabSettle,
   SOLO_KEEP_REPEATED_BLOCK,
+  keepsRepeatedBlock,
   crabVerb,
   crabVerbMessage,
   crabVerbs,
@@ -178,6 +179,14 @@ describe('blockPlayCallback', () => {
     const repeat = crabHearBlock(seeded(2), BLOCKS[1], 9_999_999);
     assert.deepEqual(crabSettle(repeat, { keepRepeatedBlock: false }), { rewards: {}, moodLoss: 0, destroyBlock: BLOCKS[1], removeCrabphones: 1 });
     assert.equal(crabSettle(repeat, { crabStateOfMind: true, keepRepeatedBlock: false }).moodLoss, 20);
+  });
+
+  it('multiplayer takes the repeated block, solo keeps it (Austin 2026-10-26, G196)', () => {
+    assert.equal(keepsRepeatedBlock('multiplayer'), false);
+    assert.equal(keepsRepeatedBlock('solo'), true);
+    assert.equal(keepsRepeatedBlock(undefined), true);
+    const src = readFileSync(join(PUBLIC, 'js/features/crabs-feature.js'), 'utf8');
+    assert.match(src, /keepRepeatedBlock: keepsRepeatedBlock\(engine\.mode\)/);
   });
 
   it('doubles every liked reward in a Crab State of Mind', () => {

@@ -61,6 +61,7 @@ import {
   crabVerbMessage,
   crabVerbs,
   crabWalkSpeed,
+  keepsRepeatedBlock,
   crabWantsMusic,
   ignoreToday,
   inCrabHitBox,
@@ -377,7 +378,8 @@ function onListen(engine, row) {
 function onSettle(engine, row) {
   const pc = engine.pc;
   const inv = engine.inv;
-  const settled = crabSettle(row.heard, { crabStateOfMind: engine.hasBuff(CRAB_STATE_OF_MIND) });
+  // Multiplayer keeps the source rule: a repeated tune costs the block (Austin 2026-10-26, G196).
+  const settled = crabSettle(row.heard, { crabStateOfMind: engine.hasBuff(CRAB_STATE_OF_MIND), keepRepeatedBlock: keepsRepeatedBlock(engine.mode) });
   const effects = { items: {} };
   if (countItem(inv, CRABPHONES) > 0) {
     removeItem(inv, CRABPHONES, 1);

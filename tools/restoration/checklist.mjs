@@ -116,7 +116,7 @@ export const CHECKLIST = Object.freeze([
     blurb: 'Fox brushing in the preserves and the kitties overhead.',
     evidence: ['public/js/foxes.js'] },
   { id: 'crabs', group: 'creatures', name: 'Crabs', status: 'solo',
-    blurb: 'Crabs on eight streets will listen to your Musicblocks, and one that hears its oldest tune is a happy crab. Flatter one and hug it for Crabato Juice. Play a crab the tune it just heard and it still shouts and sulks, but you keep the block: the original destroyed it, which only made sense with other players in between.',
+    blurb: 'Crabs on eight streets will listen to your Musicblocks, and one that hears its oldest tune is a happy crab. Flatter one and hug it for Crabato Juice. Play a crab the tune it just heard and it still shouts and sulks, but solo you keep the block: the original destroyed it, which only made sense with other players in between. In multiplayer the crab keeps it, as in the original.',
     evidence: ['public/js/crabs.js', 'public/js/features/crabs-feature.js'] },
   { id: 'conversations', group: 'creatures', name: 'Animals, trees and shrines tell their stories', status: 'source',
     blurb: 'Walk up to a chicken, piggy, butterfly, tree, rock, peat bog, barnacle, patch, shrine or Icon and it may call you over with something to tell. All 92 of their conversations come word for word from the source, offered by its rules: one every half hour, every 15 seconds while you are in the middle of a chain, and none until you have given to every shrine. Forty-three of them lead up to the shrines, whose stories wake the Street Spirits’ own. A talk cut off by a reload picks up where it stopped.',

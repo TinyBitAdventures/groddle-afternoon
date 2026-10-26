@@ -321,6 +321,7 @@ function ensureUi() {
   };
   for (const node of [ui.bubble, ui.say, ui.vog, ui.instr, ui.card, ui.pill, ui.fade]) host.appendChild(node);
   ui.pill.querySelector('[data-nx-skip]').addEventListener('click', () => {
+    if (engineRef?.mode === 'multiplayer') return;
     if (typeof confirm === 'function' && !auto && !confirm('Skip the rest of the tutorial and head into Ur?')) return;
     skipTutorial(engineRef);
   });
@@ -669,6 +670,9 @@ function hud(parts = {}) {
 function showPill(on) {
   ensureUi();
   ui.pill.hidden = !on;
+  // Multiplayer: no way out of the tutorial (players/player.js onCreate 1238-1239; Austin 2026-10-26).
+  const skip = ui.pill.querySelector('[data-nx-skip]');
+  if (skip) skip.hidden = engineRef?.mode === 'multiplayer';
   const label = ui.pill.querySelector('[data-nx-label]');
   if (label) label.textContent = `Tutorial · ${({ clouds: 'Welcome', training1: 'Training', training2: 'Training', house: 'Home Street', skill: 'Practice', island: 'Gentle Island' })[save.stage] || ''}`;
 }

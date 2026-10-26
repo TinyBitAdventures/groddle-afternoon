@@ -301,9 +301,15 @@ export function crabHearBlock(memory, blockClass, now) {
  * Decision: refuse, but keep the block. Same line, same dislike reaction, no
  * reward, and in a Crab State of Mind the disliked tune still costs 20 mood
  * (526-528); only the items_destroy is skipped. Austin: "Should revisit once
- * multiplayer becomes real." Set this to false to restore the source.
+ * multiplayer becomes real." Solo only: multiplayer, where other players can
+ * trade a lost block back, uses the source (Austin 2026-10-26, G196).
  */
 export const SOLO_KEEP_REPEATED_BLOCK = true;
+
+/** Whether a repeated tune leaves the block: solo by the flag above, multiplayer never (npc_crab.js:530). */
+export function keepsRepeatedBlock(mode) {
+  return mode === 'multiplayer' ? false : SOLO_KEEP_REPEATED_BLOCK;
+}
 
 /**
  * blockPlayCallback: the CrabPod Headphones go back; a disliked tune costs, in
