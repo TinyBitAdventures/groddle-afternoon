@@ -778,8 +778,8 @@ function lookAtTower(engine) {
   if ((now.x || now.y) && !(towerLook && now.x === towerLook.x && now.y === towerLook.y)) return;
   const b = towerBounds(composeTower(tower.style, extraFloors(tower), tower.config, tower.facingRight));
   const mid = box.y + (b.t + b.b) / 2;
-  // cameraTargetY puts the target 75% down the 408 px view: centre `mid` instead.
-  const dy = Math.round(mid - p.y + 408 * 0.25);
+  // cameraTargetY puts the target 75% down the location view: centre `mid` instead.
+  const dy = Math.round(mid - p.y + (engine.camera?.h || 408) * 0.25);
   const dx = Math.round(box.x - p.x - CONFIG_UI_W / 2);
   towerLook = { x: dx, y: dy, engine };
   engine.setCameraLook(dx, dy);

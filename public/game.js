@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-14';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-139';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-140';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -614,8 +614,9 @@ import {
   yCamOffsetAnchor,
   cameraBottomSlack,
   cameraWorldHeightForGround,
-} from './js/movement.js?v=movement-5';
+} from './js/movement.js?v=movement-6';
 import { renderResolution, RESOLUTION_STEP } from './js/render-density.js';
+import { DEFAULT_VP_H, MAX_VP_H, locationViewHeightFor, sceneViewCap } from './js/location-view.js?v=viewheight-1';
 import {
   levelInfoForXp,
   reconcilePlayerProgression,
@@ -875,12 +876,17 @@ function playerHubId() {
 }
 
 const VIEW_W = 960;
-const VIEW_H = 540;
 // Tiny Speck's TSMainView subtracts MIN_PACK_HEIGHT (132px) before setting
 // loc_vp_h. Our pack overlays the Pixi canvas, so camera framing must use the
 // same shorter location viewport or low platforms disappear behind the pack.
 const PACK_VIEW_RESERVE = 132;
-const LOCATION_VIEW_H = VIEW_H - PACK_VIEW_RESERVE;
+// VIEWHEIGHT = grow: the location view follows the window from 400 to 600 px
+// (LayoutModel.as 10, 13; TSMainView.as 1229-1257), set by
+// syncLocationViewHeight; the canvas is the view plus the pack allowance.
+let LOCATION_VIEW_H = DEFAULT_VP_H;
+let VIEW_H = LOCATION_VIEW_H + PACK_VIEW_RESERVE;
+/** The fixed canvas height authored scenes (home, fallback street) were drawn for. */
+const AUTHORED_VIEW_H = 540;
 let WORLD_W = 2400;
 let GROUND_Y = 420;
 const SCALE = 1.35;
@@ -1241,6 +1247,52 @@ function syncRenderResolution() {
   app.canvas.dataset.renderResolution = String(next);
 }
 
+/** The scene whose height last held the location view (syncLocationViewHeight). */
+let viewSceneLayer = null;
+
+/**
+ * VIEWHEIGHT = grow (js/location-view.js): the room the window leaves under
+ * the top bar, in view pixels, less the pack allowance, 400 to 600 px.
+ * `?viewh=<px>` pins the window's share for QA and the restoration shots.
+ */
+function measureLocationViewHeight() {
+  const root = document.getElementById('game-root');
+  if (!root) return DEFAULT_VP_H;
+  const host = app?.canvas?.isConnected ? app.canvas : root;
+  const rect = host.getBoundingClientRect();
+  const wrap = root.parentElement ? getComputedStyle(root.parentElement) : null;
+  const below = (parseFloat(wrap?.paddingBottom) || 0) + (parseFloat(getComputedStyle(root).borderBottomWidth) || 0);
+  return locationViewHeightFor({
+    availableHeight: window.innerHeight - (rect.top + window.scrollY) - below,
+    displayWidth: rect.width || root.clientWidth,
+    viewWidth: VIEW_W,
+    packReserve: PACK_VIEW_RESERVE,
+    sceneHeight: sceneViewCap(bgLayer),
+    forced: new URLSearchParams(location.search).get('viewh'),
+  });
+}
+
+/** Resize the canvas to the window's location view, live; true when it changed. */
+function syncLocationViewHeight() {
+  viewSceneLayer = bgLayer;
+  const next = measureLocationViewHeight();
+  if (next === LOCATION_VIEW_H) return false;
+  const grew = next - LOCATION_VIEW_H;
+  LOCATION_VIEW_H = next;
+  VIEW_H = next + PACK_VIEW_RESERVE;
+  if (app?.renderer) {
+    app.renderer.resize(VIEW_W, VIEW_H, app.renderer.resolution);
+    app.canvas.dataset.locationViewportHeight = String(LOCATION_VIEW_H);
+  }
+  // CameraMan scales y_cam_offset with loc_vp_h: the avatar keeps its share of the view.
+  if (world && Number.isFinite(camY)) {
+    const anchor = streetCameraAnchor();
+    camY = clamp(camY - grew * anchor, 0, Math.max(0, activeCameraWorldHeight(anchor) - LOCATION_VIEW_H));
+    world.y = -Math.round(camY * 2) / 2;
+  }
+  return true;
+}
+
 /**
  * Translate the HTML quest/activity rail into Pixi view coordinates. The
  * original client reserved this width when calculating its location viewport;
@@ -1288,7 +1340,7 @@ function deepestWalkableGroundY() {
 /** The street's own y_cam_offset (G*.xml physics; default 150) as a viewport anchor. */
 function streetCameraAnchor() {
   const offset = Number(currentStreet?.physics?.setting?.y_cam_offset);
-  return yCamOffsetAnchor(Number.isFinite(offset) ? offset : 150);
+  return yCamOffsetAnchor(Number.isFinite(offset) ? offset : 150, LOCATION_VIEW_H);
 }
 
 function activeCameraWorldHeight(anchorRatio = 0.75) {
@@ -9022,11 +9074,10 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
   spr.baseScale = 1.65;
   spr.scale.set(spr.baseScale);
   spr.x = clamp(point.x + (exactPlacement ? 0 : 92), 44, Math.max(44, WORLD_W - 44));
-  // Hover above crowded street furniture so the collectible reads as its own target.
-  spr.baseY = point.y - 120;
-  spr.y = spr.baseY;
-  spr.bob = 0;
-  spr.zIndex = 27;
+  // Desk DROPHOVER (G297): it sits on the ground like every other dropped
+  // item (no hover, bob or pulse), drawn in front of street furniture as they are.
+  spr.y = point.y;
+  spr.zIndex = 43;
   // G286: no drawn glow behind it. musicblock_*.js and musicblock_base set no
   // glow or highlight state, and the client only glows an itemstack under the
   // pointer or a drag (LocationItemstackView.as 408-424, AbstractItemstackView.as 457-486),
@@ -9037,7 +9088,6 @@ function spawnMusicblockDrop(point, exactPlacement = false) {
     label: def.label,
     subtitle: `Playable collectible · recovered tunes ${collection.owned}/${collection.total}`,
     sprite: spr,
-    airborne: true,
     state: { streetTsid: currentStreetTsid },
   });
   return [spr];
@@ -10207,13 +10257,6 @@ function physics(dt) {
     a.bob = (a.bob || 0) + 0.05 * dt;
     if (!a._baseY) a._baseY = a.y;
     a.y = a._baseY + Math.sin(a.bob) * 3;
-  }
-
-  for (const block of worldMusicblocks) {
-    block.bob = (block.bob || 0) + 0.045 * dt;
-    block.y = block.baseY + Math.sin(block.bob) * 5;
-    const pulse = 1 + Math.sin(block.bob * 1.4) * 0.055;
-    block.scale.set(block.baseScale * pulse);
   }
 
   for (const stack of droppedItemSprites) {
@@ -13313,7 +13356,7 @@ function spawnWinterSnow() {
   snow.eventMode = 'none';
 
   const veil = new PIXI.Graphics();
-  veil.rect(0, 0, VIEW_W, VIEW_H).fill({ color: winterWalkState?.stage === 'haven' ? 0x18345f : 0xc9efff, alpha: 0.055 });
+  veil.rect(0, 0, VIEW_W, MAX_VP_H + PACK_VIEW_RESERVE).fill({ color: winterWalkState?.stage === 'haven' ? 0x18345f : 0xc9efff, alpha: 0.055 });
   veil._winterVeil = true;
   snow.addChild(veil);
 
@@ -18495,7 +18538,7 @@ function drawHomeBackground(styleId, room) {
   }[style.id];
   const container = new PIXI.Container();
   container.worldH = cameraWorldHeightForGround(
-    VIEW_H,
+    AUTHORED_VIEW_H,
     620,
     LOCATION_VIEW_H
   );
@@ -18645,7 +18688,7 @@ async function renderHomeScene(room = homeState.room || 'street', opts = {}) {
     label: room === 'interior' ? 'Your House' : 'Your Home Street',
     hubId: 'home',
     hubName: 'Home',
-    bounds: { l: 0, r: WORLD_W, t: 0, b: VIEW_H },
+    bounds: { l: 0, r: WORLD_W, t: 0, b: AUTHORED_VIEW_H },
     platforms: streetPlatforms,
     signposts: [],
   };
@@ -22944,8 +22987,10 @@ function rendererPreference() {
 async function main() {
   const root = document.getElementById('game-root');
   syncCameraSafeArea();
+  syncLocationViewHeight();
   window.addEventListener('resize', () => {
     syncCameraSafeArea();
+    syncLocationViewHeight();
     syncRenderResolution();
     refreshPackPagers();
     if (player && Number.isFinite(WORLD_W)) {
@@ -22989,7 +23034,7 @@ async function main() {
   root.insertBefore(app.canvas, document.getElementById('overlay'));
   syncRenderResolution();
   // Panels and the HUD can resize the canvas without a window resize.
-  if (typeof ResizeObserver === 'function') new ResizeObserver(() => syncRenderResolution()).observe(app.canvas);
+  if (typeof ResizeObserver === 'function') new ResizeObserver(() => { syncLocationViewHeight(); syncRenderResolution(); }).observe(app.canvas);
 
   await loadSheets();
   // The vector avatar's catalog (looks, colourways); the default look's sheets are already loaded.
@@ -23104,14 +23149,17 @@ async function main() {
     state.questDone = mainQuests.every((id) => questState.completed.includes(id));
     handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });
     backfillStreetVisits();
-  } else if (bootParams.has('resetgame')) {
-    // G301 QA: a reset game already knows 11+ starter skills; mark the badge quietly
-    // (as skillknown does) so no route opens on its card.
+  } else if (bootParams.has('resetgame') || !NEW_PLAYER) {
+    // Desk BADGE11 (Austin 2026-10-26, G306): a new solo game's demo kit already knows
+    // 11+ starter skills, so first_eleven_skills is in the collection from the start,
+    // quietly: no award card and none of its +250 iMG / +500 currants. A resetgame QA
+    // boot does the same (G301), as skillknown does.
     if (skillState.learned.length >= 11 && !achieveState.unlocked.includes('first_eleven_skills')) achieveState.unlocked.push('first_eleven_skills');
   } else {
-    // G301: main.js 1011-1014 runs pc.onLoggedin() on every login_end, a new player's
-    // first included, so its eleven-skills check (player.js 217) runs on a fresh boot
-    // too: the starter skills above earn the badge now, not on the second load.
+    // A new multiplayer player (js/new-player.js) has no starter skills and earns it the
+    // normal way, card and rewards, at its eleventh (inc_skills.js 1513). G301: main.js
+    // 1011-1014 runs pc.onLoggedin() on every login_end, the first included, so the
+    // eleven-skills check (player.js 217) runs on this first boot too.
     handleSkillCompletions([]);
   }
   const homeDemo = String(bootParams.get('homedemo') || '').toLowerCase();
@@ -24802,6 +24850,8 @@ async function main() {
     updateSpinningWheel();
     features.tick((1000 / 60) * dt, Date.now(), engine);
     releaseHeldScriptedDialog();
+    // A new street or room may hold the view to its own height (TSMainView smallest layer).
+    if (bgLayer !== viewSceneLayer) syncLocationViewHeight();
     bgLayer?.updateParallax?.(-world.x, -world.y, VIEW_W, LOCATION_VIEW_H, VIEW_H);
     bgLayer?.cullDecos?.(-world.x, -world.y, VIEW_W, VIEW_H);
 

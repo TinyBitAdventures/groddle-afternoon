@@ -341,7 +341,8 @@ describe('every NPC Glitch path uses the vector rig', () => {
     const party = read('js/features/party-spaces-feature.js');
     assert.match(races, /engine\.npcGlitch\?\.\(run\.rivalName/);
     assert.match(races, /rivalSprite\.npc\.setMode\(/);
-    assert.match(races, /rivalSprite\?\.npc\?\.emote\(/);
+    // Desk RAINBOW (G305): no end-of-race emotes on ticket races (tests/desk-decisions.test.js).
+    assert.doesNotMatch(races, /rivalSprite\?\.npc\?\.emote\(/);
     assert.match(crowns, /engine\.npcGlitch\?\.\(r\.name\)/);
     assert.match(crowns, /a\.sprite\.npc\.setMode\(/);
     assert.match(party, /engine\.npcGlitch\?\.\(guest\.name, \{ salt: index/);

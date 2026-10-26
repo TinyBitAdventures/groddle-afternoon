@@ -123,14 +123,16 @@ describe('An Autumn Day (an_autumn_day): source', () => {
     for (const d of ['heights_tree_bare_1', 'heights_tree_bare_3', 'tree_bare_tall_1', 'background_ghost_transparent']) {
       assert.ok(existsSync(pub(`assets/decos/groddle/${d}.webp`)), d);
     }
-    assert.equal(CAPTION, 'Almost forgot this feeling of …');
+    // Desk FOOTWORDS (G314): GSJS's own words (inc_data_maps_prod.js 17952-17954), not the footage's.
+    assert.equal(CAPTION, 'This feeling of …');
+    assert.equal(CAPTION, FEELING_LABEL);
   });
 });
 
 describe('An Autumn Day: the drifting words', () => {
-  it('drifts the eight words of the footage', () => {
+  it('drifts the words of the sentence and its three endings', () => {
     const words = mainWords();
-    assert.equal(words.length, 8);
+    assert.equal(words.length, 6);
     assert.deepEqual(new Set(words.map((w) => w.text)), new Set([...SENTENCE, ...ENDINGS]));
   });
 
@@ -157,17 +159,19 @@ describe('An Autumn Day: the drifting words', () => {
 });
 
 describe('An Autumn Day: the sentence', () => {
-  it('starts scrambled as filmed and cycles each slot', () => {
-    assert.deepEqual([...SCRAMBLE], ['forgot', 'Almost', 'this', 'forgot', 'of', 'comfort.']);
+  it('starts scrambled and cycles each slot', () => {
+    assert.deepEqual([...SENTENCE], ['This', 'feeling', 'of']);
+    assert.deepEqual([...SCRAMBLE], ['feeling', 'of', 'This', 'comfort.']);
+    assert.equal(sentenceSlots().length, SCRAMBLE.length);
     assert.equal(sentenceReady(SCRAMBLE), false);
-    assert.equal(cycleWord(0, 'Almost'), 'forgot');
-    assert.equal(cycleWord(0, 'of'), 'Almost');
-    assert.equal(cycleWord(5, 'wonder.'), 'stillness.');
-    assert.equal(cycleWord(5, 'comfort.'), 'wonder.');
-    assert.ok(slotCorrect(5, 'stillness.'));
-    assert.ok(!slotCorrect(3, 'forgot'));
-    assert.equal(touchesToSolve(SCRAMBLE, 'wonder.'), 8);
-    assert.equal(touchesToSolve(SCRAMBLE, 'comfort.'), 7);
+    assert.equal(cycleWord(0, 'This'), 'feeling');
+    assert.equal(cycleWord(0, 'of'), 'This');
+    assert.equal(cycleWord(3, 'wonder.'), 'stillness.');
+    assert.equal(cycleWord(3, 'comfort.'), 'wonder.');
+    assert.ok(slotCorrect(3, 'stillness.'));
+    assert.ok(!slotCorrect(1, 'of'));
+    assert.equal(touchesToSolve(SCRAMBLE, 'wonder.'), 7);
+    assert.equal(touchesToSolve(SCRAMBLE, 'comfort.'), 6);
   });
 
   it('leads to the room its last word names', () => {
@@ -176,7 +180,9 @@ describe('An Autumn Day: the sentence', () => {
       assert.ok(sentenceReady(words));
       assert.equal(feelingFor(words), end.replace('.', ''));
     }
-    assert.equal(feelingCaption('wonder'), 'Almost forgot this feeling of wonder.');
+    assert.equal(feelingCaption('wonder'), 'This feeling of wonder.');
+    // A six-word row from an old save is not a sentence.
+    assert.equal(sentenceReady(['Almost', 'forgot', 'this', 'feeling', 'of', 'wonder.']), false);
     assert.equal(feelingFor(['x']), null);
   });
 

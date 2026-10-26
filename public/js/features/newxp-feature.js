@@ -385,7 +385,7 @@ function positionBubbles() {
   ui.fade.style.width = `${r.width}px`;
   ui.fade.style.height = `${r.height}px`;
   ui.instr.style.left = `${r.left + r.width / 2}px`;
-  ui.instr.style.top = `${r.top + Math.min(r.height - 60, 408 * (r.width / 960) - 44)}px`;
+  ui.instr.style.top = `${r.top + Math.min(r.height - 60, (engineRef?.camera?.h || 408) * (r.width / 960) - 44)}px`;
   ui.pill.style.left = `${r.left + 10}px`;
   ui.pill.style.top = `${r.top + 10}px`;
 }

@@ -106,7 +106,8 @@ export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
 const VIEW_H = 408;
 // The whole canvas: the pack allowance below the location viewport shows street too.
-const SCREEN_H = 540;
+// The view grows with the window up to 600 px (js/location-view.js), so cover 600 + 132.
+const SCREEN_H = 732;
 const PLAYER_LABEL = 'Ur';
 const ORB_CLASS = 'focusing_orb';
 const BALM_CLASS = 'potion_rook_balm';
@@ -116,16 +117,6 @@ const ROOK_MUSIC = 'assets/audio/sfx/ROOK_FLOCK.mp3';
 const ROOK_HOME = Object.freeze({ x: 580, y: 170, scale: 0.82 });
 /** The HUD badge, docked in the viewport's top right; its feed hangs below, its right edge 10 px in (G283). */
 export const BADGE = Object.freeze({ x: VIEW_W - 70, y: 66, feedX: -90 });
-/**
- * Camera headroom while a stun orb is up and its beam fires (G283). The orb
- * stands 312 px above your feet (ORB_ART), and the client's viewport ran up
- * to 600 px tall (LayoutModel.as max_vp_h) with the avatar 150 px below its
- * centre (CameraMan.as 121-138), so the orb sat about 140 px down from the
- * top. The remake's 408 px viewport puts your feet at about 306 px and the
- * orb above the top edge; the camera looks 90 px higher, which brings the
- * orb to about 84 px down and keeps your feet 12 px inside the viewport.
- */
-export const ORB_HEADROOM = Object.freeze({ dy: 90, afterMs: 1500 });
 
 const DIR = 'assets/sprites/rooks/';
 const sheet = (file, fw, fh, cols, frames) => Object.freeze({ path: `${DIR}${file}`, fw, fh, cols, frames });
@@ -188,7 +179,6 @@ let musicFor = '';
 let primed = null; // { target, until, damage, strikeAt }
 let orb = null; // runtime orb
 let offerPanel = null;
-let headroom = null; // { until }: the camera looks up for the orb (G283)
 /** Multiplayer only (see the Multiplayer section): the server's attack for this street, or null in solo. */
 let mp = null;
 
@@ -1206,20 +1196,14 @@ function startStun(engine, source = 'verb') {
   );
   const root = new PIXI.Container();
   root.zIndex = 40;
-  // orbCountMessage (locations/inc_rook.js 502-520): the joined count as a
-  // second pc_overlay at delta_y -175. With no width the client sizes the
-  // text box to the text and centres it on the avatar, bottom edge at
-  // delta_y (InLocationAnnouncementOverlay.as showText 376-391), so its
-  // align="right" moves nothing (G291).
-  const count = new PIXI.Text({ text: '0', style: textStyle(20, { fill: 0xffffff }) });
-  count.anchor.set(0.5, 1);
+  // The joined count, drawn on the orb itself (ORB_ART, desk ORBERA).
+  const count = orbCountText(PIXI);
   root.addChild(count);
   root.eventMode = 'static';
   root.cursor = 'pointer';
   root.hitArea = new PIXI.Circle(0, 0, 40);
   root.on('pointertap', () => releaseOrb(engine));
   frontLayer(engine).addChild(root);
-  holdHeadroom(engine, Infinity);
   // The orb itself: Tiny Speck's focusing_orb_attack (G272), state by joiners.
   const art = playArt(engine, 'focusing_orb_attack', {
     at: () => ({ x: p.x, y: p.y + ORB_ART.dy }),
@@ -1244,27 +1228,6 @@ function startStun(engine, source = 'verb') {
   return true;
 }
 
-/** Look up ORB_HEADROOM.dy until `until` (ms clock), unless Camera Mode already looks elsewhere. */
-function holdHeadroom(engine, until) {
-  if (typeof engine.setCameraLook !== 'function') return;
-  if (headroom) {
-    headroom.until = until;
-    return;
-  }
-  const look = engine.cameraLook || { x: 0, y: 0 };
-  if (look.x || look.y) return;
-  engine.setCameraLook(0, -ORB_HEADROOM.dy);
-  headroom = { until };
-}
-
-/** Let the camera settle back once the beam is done (or at once on `force`). */
-function releaseHeadroom(engine, force = false) {
-  if (!headroom || (!force && now() < headroom.until)) return;
-  const look = engine.cameraLook;
-  if (look && look.x === 0 && look.y === -ORB_HEADROOM.dy) engine.setCameraLook(0, 0);
-  headroom = null;
-}
-
 function spawnMote(engine, from) {
   const { PIXI } = engine;
   const m = new PIXI.Graphics();
@@ -1280,13 +1243,31 @@ function spawnMote(engine, from) {
 }
 
 /**
- * orbAttackAnnc (locations/inc_rook.js 455-500): pc_overlay
- * focusing_orb_attack, delta_y -163, no width (the 295.7 x 294.75 stage at
- * 1:1), state orb1 (nobody joined), orb2 (1-2), orb3 (3-5), orb4 (6-9),
- * orbBreak (10+). The orb clip sits at (148.25, 145.4) on that stage, so it
- * shows about 312 px above your feet; orbCountMessage's count is at -175.
+ * The stun orb over the player who started it (desk ORBERA, Austin
+ * 2026-10-26, register G293): just above the name labels, with the joined
+ * count drawn on the orb, as the later client's "New Style Rook Attack"
+ * shows (GlitchAddict video qpHjKlUAEgE 2:52-3:16; reference only, nothing
+ * from it ships). The art is Tiny Speck's focusing_orb_attack, state orb1
+ * (nobody joined), orb2 (1-2), orb3 (3-5), orb4 (6-9), orbBreak (10+); its
+ * 295.7 x 294.75 stage shows at 1:1 standing on its point (center_bottom),
+ * with the orb clip at (148.25, 145.4), 149.35 px above the stage's bottom.
+ * GSJS's orbAttackAnnc (locations/inc_rook.js 455-500) sends it at delta_y
+ * -163, about 312 px above your feet, with orbCountMessage's count at -175
+ * (502-522), the earlier placement the video's client no longer used, and
+ * one that needed the camera to look up in the remake's shorter view.
+ * Name plates end 150 px above the feet (realtime-feature PLATE_Y), about
+ * 170 px with the plate; the ball is about 22 px in radius, so its centre
+ * stands 200 px up, its bottom just clear of the plate.
  */
-const ORB_ART = Object.freeze({ dy: -163, orbAbove: 163 + (294.75 - 145.4), countDy: -175 });
+const ORB_STAGE = Object.freeze({ h: 294.75, orbY: 145.4 });
+export const ORB_ART = Object.freeze({ orbAbove: 200, dy: -(200 - (ORB_STAGE.h - ORB_STAGE.orbY)) });
+
+/** The joined count, centred on the orb (root sits at the orb's centre). */
+function orbCountText(PIXI) {
+  const count = new PIXI.Text({ text: '0', style: textStyle(22, { fill: 0xffffff, stroke: { color: 0x2a2140, width: 4, join: 'round' } }) });
+  count.anchor.set(0.5, 0.5);
+  return count;
+}
 
 function orbCenter(engine) {
   const p = engine.player;
@@ -1328,9 +1309,6 @@ function updateOrb(engine, dtMs) {
   const left = Math.max(0, 1 - (t - orb.startedAt) / (ROOK_SOURCE.orbWindowMs / timeScale));
   orb.root.x = c.x;
   orb.root.y = c.y;
-  // inc_rook.js 521-522: the count rises 30 px as joiners reach six.
-  orb.count.x = 0;
-  orb.count.y = ORB_ART.countDy - 30 * Math.min(orb.joiners / 6, 1) + ORB_ART.orbAbove;
   orb.count.text = String(orb.joiners);
   // The window ends at 15 s, or a moment after the last joiner arrives.
   const allIn = orb.joiners >= orb.order.length && !orb.motes.length && t >= orb.nextJoinAt - (ROOK_SOLO.joinIntervalMs / timeScale) * 0.4;
@@ -1343,7 +1321,6 @@ function cancelOrb(engine, why = '') {
   for (const m of orb.motes) if (!m.destroyed) m.destroy();
   if (!orb.root.destroyed) orb.root.destroy({ children: true });
   orb = null;
-  if (headroom) headroom.until = now();
   if (why) lastAction = `orb_cancel:${why}`;
 }
 
@@ -1351,7 +1328,6 @@ function releaseOrb(engine) {
   if (!orb) return;
   const joiners = orb.joiners;
   cancelOrb(engine);
-  if (headroom) headroom.until = now() + ORB_HEADROOM.afterMs;
   const a = here(engine);
   if (!a) return;
   const r = resolveStun(a, joiners, now(), PLAYER_LABEL);
@@ -2130,8 +2106,9 @@ function mpOrbPackVerbs(engine) {
 
 /**
  * Every open orb over its initiator (focusing_orb_attack, orb1-4 by joiners,
- * inc_rook.js newOrbMessage 454-500), with the joined count above it; another
- * player's orb is clickable to focus on it.
+ * inc_rook.js newOrbMessage 454-500), placed as in solo (ORB_ART, desk
+ * ORBERA) with the joined count on it; another player's orb is clickable to
+ * focus on it.
  */
 function mpDrawOrbs(engine) {
   const a = here(engine);
@@ -2139,25 +2116,22 @@ function mpDrawOrbs(engine) {
   const me = mpMyId();
   const live = new Set(orbs.map((o) => o.by));
   for (const by of [...mp.arts.keys()]) if (!live.has(by)) mpDropArt(by);
-  let mineUp = false;
   const t = now();
   for (const o of orbs) {
     const pos = mpPosOf(engine, o.by);
     if (!pos) continue;
-    if (o.by === me) mineUp = true;
     let art = mp.arts.get(o.by);
     if (!art) {
       const { PIXI } = engine;
       const root = new PIXI.Container();
       root.zIndex = 40;
-      const count = new PIXI.Text({ text: '0', style: textStyle(20, { fill: 0xffffff }) });
-      count.anchor.set(0.5, 1);
+      const count = orbCountText(PIXI);
       root.addChild(count);
       if (o.by !== me) {
         root.eventMode = 'static';
         root.cursor = 'pointer';
-        // The orb and the count under it.
-        root.hitArea = new PIXI.Rectangle(-70, -80, 140, 240);
+        // The orb, with its count on it.
+        root.hitArea = new PIXI.Circle(0, 0, 40);
         root.on('pointertap', () => mpJoinOrb(engine, o.by));
       } else root.eventMode = 'none';
       frontLayer(engine).addChild(root);
@@ -2176,12 +2150,8 @@ function mpDrawOrbs(engine) {
     art.fx?.setState?.(orbLookFor(o.joiners.length).state);
     art.root.x = pos.x;
     art.root.y = pos.y - ORB_ART.orbAbove;
-    art.count.y = ORB_ART.countDy - 30 * Math.min(o.joiners.length / 6, 1) + ORB_ART.orbAbove;
     art.count.text = String(o.joiners.length);
   }
-  // Any open orb: the camera looks up so it shows (the original's taller viewport did, G283).
-  if (mineUp || mp.arts.size) holdHeadroom(engine, Infinity);
-  else if (headroom && headroom.until === Infinity) headroom.until = now() + ORB_HEADROOM.afterMs;
 }
 
 function mpDropArt(by) {
@@ -2392,7 +2362,6 @@ function publish(engine, force = false) {
   engine.setData('rookRooked', String(rookedKeys.length));
   engine.setData('rookRookedKeys', rookedKeys.slice(0, 16).join(','));
   engine.setData('rookOrb', orb ? `${orb.joiners}/${orb.order.length}:${orbLookFor(orb.joiners).state}` : '');
-  engine.setData('rookHeadroom', headroom ? String(ORB_HEADROOM.dy) : '');
   engine.setData('rookLast', lastAction);
   engine.setData('rookFeed', feedText);
   engine.setData('rookNextAttack', save.nextAttackAt ? String(Math.max(0, Math.round((save.nextAttackAt - t) / 1000))) : '');
@@ -2470,7 +2439,6 @@ export const rookAttackFeature = {
     generation += 1;
     cancelOrb(engine);
     if (mp) mpLeaveStreet(engine);
-    releaseHeadroom(engine, true);
     endPrime(engine, false);
     closeOfferPanel();
     for (const row of tracked.values()) if (row.halo && !row.halo.destroyed) row.halo.destroy();
@@ -2547,7 +2515,6 @@ export const rookAttackFeature = {
     }
     updateOrb(engine, dtMs);
     if (mp) mpDrawOrbs(engine);
-    releaseHeadroom(engine);
     updatePrimeFx(engine);
     if (t < shakeUntil) {
       const k = (shakeUntil - t) / 1100;

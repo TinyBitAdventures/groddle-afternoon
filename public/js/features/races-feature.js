@@ -80,7 +80,6 @@ import { platformUnder, raceCourse, RACE_COURSE_IDS } from '../race-courses.js?v
 import {
   drawCheckpointFlag,
   drawFinishPosts,
-  drawWinnerRainbow,
   raceLoadingColors,
   renderRaceCourse,
 } from '../race-render.js?v=races-10';
@@ -1021,12 +1020,10 @@ function showResult(engine) {
   const reward = { ...settled.reward, xp: settled.reward.xp ? grantMoodXp(pc, settled.reward.xp) : 0 };
   if (reward.currants) pc.currants = (pc.currants || 0) + reward.currants;
   const race = RACES[run.raceId];
-  // inc_race.js: the winner plays happy and the loser angry, 2 s on.
-  if (run.status === 'won' || run.status === 'lost') {
-    engine.playEmotion?.(run.status === 'won' ? 'happy' : 'angry', 2000);
-    // The rival too: angry when you won, happy when it did.
-    rivalSprite?.npc?.emote(run.status === 'won' ? 'angry' : 'happy');
-  }
+  // Desk RAINBOW (Austin 2026-10-26, G305): no winner rainbow and no happy or
+  // angry emotes. Those are the quest races' race_finish (locations/inc_race.js
+  // 384-385, 416); these ticket races end through inc_games.js games_end_race
+  // (1330-1390), which has neither: the splash below is the whole ending.
   const quoins = run.kind === 'quoins';
   const counters = quoins ? QUOIN_GRAB_ACHIEVEMENTS : RACE_ACHIEVEMENTS;
   if (run.status === 'won') {
@@ -1034,7 +1031,6 @@ function showResult(engine) {
     engine.achievement(counters.won, 1);
     engine.pushActivity(`You won ${race.title}! +${reward.currants} currants · +${reward.xp} iMG.`);
     engine.playSound('YOU_WIN', { volume: 0.7 });
-    followWinnerRainbow(engine, drawWinnerRainbow(engine.PIXI));
   } else if (run.status === 'lost') {
     engine.achievement(counters.lost, 1);
     engine.pushActivity(`${run.rivalName} won ${race.title}.`);
@@ -1077,26 +1073,6 @@ function showResult(engine) {
   engine.save();
   renderHud(engine, true);
   publish(engine);
-}
-
-/**
- * show_rainbow (players/player.js 3014-3029): a pc_overlay follows the
- * avatar (placeByPcView on every move), so the rainbow stands on your feet
- * as you walk (G285). It removes itself when the overlay ends.
- */
-function followWinnerRainbow(engine, rainbow) {
-  rainbow.zIndex = 60;
-  engine.entityLayer.addChild(rainbow);
-  const step = () => {
-    if (rainbow.destroyed) return;
-    const p = engine.player;
-    if (p) {
-      rainbow.x = p.x;
-      rainbow.y = p.y - 30;
-    }
-    requestAnimationFrame(step);
-  };
-  step();
 }
 
 async function leaveRace(engine) {

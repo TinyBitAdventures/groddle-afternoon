@@ -50,7 +50,9 @@ for (const key of keys) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   try {
-    await page.goto(`${BASE}${spec.route}`, { waitUntil: 'load', timeout: 120000 });
+    // viewh=408 keeps the street view the shots were framed for (the view now grows with the window).
+    const route = `${spec.route}${spec.route.includes('?') ? '&' : '?'}viewh=408`;
+    await page.goto(`${BASE}${route}`, { waitUntil: 'load', timeout: 120000 });
     await page.addStyleTag({ content: hd ? HIDE_HD : HIDE });
     await page.waitForTimeout(spec.wait || 9000);
     for (const step of spec.steps || []) {
@@ -62,8 +64,9 @@ for (const key of keys) {
     const box = await page.evaluate((frame) => {
       const host = frame === 'panel' ? document.getElementById('game-root') : document.querySelector('canvas');
       const r = host.getBoundingClientRect();
-      // The street view is the canvas above the 132 px pack allowance (408 of 540).
-      const h = frame === 'panel' ? r.height : r.height * (408 / 540);
+      // The street view is the canvas above the 132 px pack allowance (408 of 540 at viewh=408).
+      const view = Number(document.querySelector('canvas')?.dataset.locationViewportHeight) || 408;
+      const h = frame === 'panel' ? r.height : r.height * (view / (view + 132));
       return { x: Math.round(r.left), y: Math.round(r.top), width: Math.round(r.width), height: Math.round(h) };
     }, spec.frame || 'world');
     const png = join(tmpdir(), `resto-${process.pid}-${key.replace(/[^a-z0-9]/gi, '_')}.png`);

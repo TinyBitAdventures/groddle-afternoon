@@ -232,7 +232,8 @@ describe('wiring: the stand-ins are gone', () => {
     const f = read('js/features/rook-attack-feature.js');
     assert.match(f, /playArt\(engine, 'focusing_orb_attack'/);
     assert.match(f, /orb\.art\?\.setState\?\.\(orbLookFor\(orb\.joiners\)\.state\)/);
-    assert.match(f, /dy: -163/);
+    // Desk ORBERA (G293): placed by ORB_ART, just above the name labels (tests/desk-decisions.test.js).
+    assert.match(f, /at: \(\) => \(\{ x: p\.x, y: p\.y \+ ORB_ART\.dy \}\)/);
     assert.ok(!f.includes('orb.glow'));
   });
 

@@ -248,12 +248,15 @@ export function cameraTargetX(
 /**
  * Where the avatar sits in the location viewport for a street's y_cam_offset
  * (CameraMan: pc.y - y_cam_offset, scaled from max_vp_h 600). The default 150
- * gives 0.75; streets set their own in their G*.xml physics. The remake's
- * 408 px viewport is shorter than the client's, so the negative offsets
- * (-96, -179) stop at 0.4, which keeps the whole avatar under the top chrome.
+ * gives 0.75; streets set their own in their G*.xml physics. The share holds
+ * at every view height (the offset scales with loc_vp_h), but the negative
+ * offsets (-96, -179) would put the feet too near the top chrome in a short
+ * view, so the feet stay at least 0.4 of a 408 px view (163 px) down: 0.4 at
+ * 408, 0.27 at 600 (js/location-view.js grows the view with the window).
  */
-export function yCamOffsetAnchor(yCamOffset = 150) {
-  return clamp(0.5 + finite(yCamOffset, 150) / 600, 0.4, 0.95);
+export function yCamOffsetAnchor(yCamOffset = 150, viewHeight = 408) {
+  const view = Math.max(1, finite(viewHeight, 408));
+  return clamp(0.5 + finite(yCamOffset, 150) / 600, Math.min(0.4, (0.4 * 408) / view), 0.95);
 }
 
 /**

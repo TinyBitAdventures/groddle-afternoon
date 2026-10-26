@@ -143,7 +143,7 @@ import { playPoofIn } from '../overlay-art.js?v=g311-1';
 import { fadeInNewNear } from '../poof-fade.js?v=g311-1';
 import { projectApi } from './street-jobs-feature.js?v=g327-1';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
-import { towerApi } from './home-tower-feature.js?v=home-tower-14';
+import { towerApi } from './home-tower-feature.js?v=home-tower-15';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
 import { wantsHiresDecos } from '../deco-hires.js';
 import { resourceNodesFeature } from './resource-nodes-feature.js?v=resource-nodes-12';
@@ -186,7 +186,7 @@ import {
 } from '../magic-rock-home.js?v=g253-1';
 import { getGameDayKey } from '../game-day.js?v=dametime-3';
 import { HOME_TICKET, HOME_TICKET_CLASS } from '../home-ticket.js?v=g310-1';
-import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-5';
+import { MIN_GROUND_CLEARANCE, yCamOffsetAnchor } from '../movement.js?v=movement-6';
 
 export const HOMES_FEATURE_ID = 'homes';
 const HOME_STREET_TSID = 'RH_HOME_EXT';
@@ -3470,7 +3470,8 @@ let lastLookTag = '';
  * the view top. Both negative (up) or 0.
  */
 export function interiorLook({ playerY = INTERIOR.floorY, anchor = 0.75, view = LOOK_VIEW_H, clearance = MIN_GROUND_CLEARANCE, ceilingTop = INTERIOR.ceilingTop, margin = CEILING_MARGIN } = {}) {
-  const walk = Math.min(0, Math.round(view * anchor - (view - clearance)));
+  // ceil: a whole-pixel look never takes the feet under the clearance (any view height).
+  const walk = Math.min(0, Math.ceil(view * anchor - (view - clearance)));
   const ceiling = Math.min(walk, Math.round(ceilingTop - margin - playerY + view * anchor));
   return { walk, ceiling };
 }

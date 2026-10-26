@@ -177,24 +177,27 @@ describe('a home street tall enough for a nine-floor Tower', () => {
 describe('interior camera (walk and Decorate)', () => {
   const VIEW = 408;
   // Home interiors and Tower floors: 620 px ground, 660 px camera world (cameraWorldHeight)
-  const frame = (look, anchor) => {
-    const camY = cameraTargetY(INTERIOR.floorY + look, 660, VIEW, anchor);
-    return { clearance: VIEW - (INTERIOR.floorY - camY), camY };
+  const frame = (look, anchor, view = VIEW) => {
+    const camY = cameraTargetY(INTERIOR.floorY + look, 660, view, anchor);
+    return { clearance: view - (INTERIOR.floorY - camY), camY };
   };
-  for (const [room, offset] of [['house', 150], ['Tower floor', 220]]) {
-    it(`keeps the ${room}'s feet 40 px over the pack while walking and on entering Decorate`, () => {
-      // y_cam_offset 150 (default) / 220 (tower.js 487) as CameraMan anchors: 0.75 / 0.867
-      const anchor = yCamOffsetAnchor(offset);
-      const look = interiorLook({ anchor });
-      const walk = frame(look.walk, anchor);
-      assert.ok(walk.clearance >= MIN_GROUND_CLEARANCE, `${room} walk clearance ${walk.clearance}`);
-      assert.ok(walk.clearance < MIN_GROUND_CLEARANCE + 1, 'and looks up as far as that allows');
-      assert.ok(walk.camY <= INTERIOR.wallTop, 'the whole wall shows');
-      // the ceiling look (a ceiling piece in hand; the avatar is hidden, HandOfDecorator.start hidePCs)
-      const ceil = frame(look.ceiling, anchor);
-      assert.ok(ceil.camY <= INTERIOR.ceilingTop, `${room}: ceiling band top ${INTERIOR.ceilingTop} in view from ${ceil.camY}`);
-      assert.ok(ceil.camY + VIEW >= INTERIOR.floorY - 40, 'and the wall down to just over the floor');
-    });
+  // The location view grows with the window from 408 to 600 px (js/location-view.js).
+  for (const view of [408, 500, 600]) {
+    for (const [room, offset] of [['house', 150], ['Tower floor', 220]]) {
+      it(`keeps the ${room}'s feet 40 px over the pack while walking and on entering Decorate (${view} px view)`, () => {
+        // y_cam_offset 150 (default) / 220 (tower.js 487) as CameraMan anchors: 0.75 / 0.867
+        const anchor = yCamOffsetAnchor(offset, view);
+        const look = interiorLook({ anchor, view });
+        const walk = frame(look.walk, anchor, view);
+        assert.ok(walk.clearance >= MIN_GROUND_CLEARANCE, `${room} walk clearance ${walk.clearance}`);
+        assert.ok(walk.clearance < MIN_GROUND_CLEARANCE + 1, 'and looks up as far as that allows');
+        assert.ok(walk.camY <= INTERIOR.wallTop, 'the whole wall shows');
+        // the ceiling look (a ceiling piece in hand; the avatar is hidden, HandOfDecorator.start hidePCs)
+        const ceil = frame(look.ceiling, anchor, view);
+        assert.ok(ceil.camY <= INTERIOR.ceilingTop, `${room}: ceiling band top ${INTERIOR.ceilingTop} in view from ${ceil.camY}`);
+        assert.ok(ceil.camY + view >= INTERIOR.floorY - 40, 'and the wall down to just over the floor');
+      });
+    }
   }
   it('was the fixed looks: -105 px in Decorate put feet behind the pack (-3 house, -51 Tower)', () => {
     assert.equal(Math.round(frame(-105, 0.75).clearance), -3);

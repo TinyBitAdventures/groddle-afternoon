@@ -27,6 +27,7 @@ import {
   cameraWorldHeightForGround,
 } from '../public/js/movement.js';
 import { streetHeight, platformsScreen } from '../public/js/street-model.js';
+import { MIN_VP_H, MAX_VP_H, VIEW_FLOOR_H, locationViewHeightFor } from '../public/js/location-view.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -154,6 +155,11 @@ test.describe('smooth directional camera and client wiring', () => {
     assert.equal(yCamOffsetAnchor(114), 0.69);
     assert.equal(yCamOffsetAnchor(54), 0.59);
     assert.equal(yCamOffsetAnchor(-179), 0.4);
+    // The share holds at every view height; the negative-offset floor keeps the feet 163 px down.
+    assert.equal(yCamOffsetAnchor(150, 600), 0.75);
+    assert.ok(Math.abs(yCamOffsetAnchor(-96, 600) - 0.34) < 1e-9);
+    assert.equal(yCamOffsetAnchor(-179, 600), (0.4 * 408) / 600);
+    assert.equal(yCamOffsetAnchor(-179, 400), 0.4);
     assert.equal(cameraTargetX(20, -4.4, 3_000, 1_000), 0);
     assert.equal(cameraTargetX(2_980, 4.4, 3_000, 1_000), 2_000);
   });
@@ -169,77 +175,90 @@ test.describe('smooth directional camera and client wiring', () => {
     assert.ok(2_980 - target < 1_000 - inset);
   });
 
-  test('frames low platforms against the pack-safe location viewport', () => {
-    const locationViewHeight = 540 - 132;
-    assert.equal(locationViewHeight, 408);
-    assert.equal(cameraTargetY(20, 1_000, locationViewHeight), 0);
-    assert.equal(cameraBottomSlack(locationViewHeight), 40);
+  test('frames low platforms against the pack-safe location viewport at every view height', () => {
+    for (const locationViewHeight of [MIN_VP_H, 408, 500, MAX_VP_H]) {
+      assert.equal(cameraTargetY(20, 1_000, locationViewHeight), 0);
+      assert.equal(cameraBottomSlack(locationViewHeight), 40);
 
-    const lowestPlatformY = 1_034;
-    const cameraWorldHeight = cameraWorldHeightForGround(
-      1_000,
-      lowestPlatformY,
-      locationViewHeight
-    );
-    const cameraY = cameraTargetY(
-      lowestPlatformY,
-      cameraWorldHeight,
-      locationViewHeight
-    );
-    const playerScreenY = lowestPlatformY - cameraY;
-    // Bounded like CameraMan: the feet drop towards the pack, never closer than 40.
-    assert.equal(playerScreenY, 368);
-    assert.equal(locationViewHeight - playerScreenY, 40);
-    assert.ok(playerScreenY < locationViewHeight, 'feet stay above the pack');
-  });
-
-  test('repairs authored worlds whose declared height ends above their ground', () => {
-    const locationViewHeight = 408;
-    const homeGroundY = 620;
-    const cameraWorldHeight = cameraWorldHeightForGround(
-      540,
-      homeGroundY,
-      locationViewHeight
-    );
-    assert.equal(cameraWorldHeight, 660);
-    const cameraY = cameraTargetY(homeGroundY, cameraWorldHeight, locationViewHeight);
-    assert.equal(cameraY, 252);
-    assert.equal(locationViewHeight - (homeGroundY - cameraY), 40);
-  });
-
-  test('keeps the lowest platform above the pack in every imported street', () => {
-    const locationViewHeight = 540 - 132;
-    const streetsDir = path.join(root, 'public/assets/streets');
-    const streetFiles = fs.readdirSync(streetsDir)
-      .filter((file) => file.endsWith('.json') && file !== 'index.json');
-    let checked = 0;
-
-    for (const file of streetFiles) {
-      const street = JSON.parse(fs.readFileSync(path.join(streetsDir, file), 'utf8'));
-      if (!street?.bounds || !Array.isArray(street.platforms) || !street.platforms.length) continue;
-      const platforms = platformsScreen(street);
-      const lowestPlatformY = Math.max(
-        ...platforms.flatMap((platform) => [platform.y1, platform.y2])
-      );
-      const cameraWorldHeight = Math.ceil(cameraWorldHeightForGround(
-        streetHeight(street),
+      // Dust Path 1E (GA55S7P5RJ42VTG): ground at 1,034 under a 1,000 px street.
+      const lowestPlatformY = 1_034;
+      const cameraWorldHeight = cameraWorldHeightForGround(
+        1_000,
         lowestPlatformY,
         locationViewHeight
-      ));
-      const playerScreenY = lowestPlatformY - cameraTargetY(
+      );
+      const cameraY = cameraTargetY(
         lowestPlatformY,
         cameraWorldHeight,
         locationViewHeight
       );
-
-      assert.ok(
-        playerScreenY < locationViewHeight,
-        `${street.tsid || file} leaves the avatar behind the pack`
-      );
-      checked += 1;
+      const playerScreenY = lowestPlatformY - cameraY;
+      // Bounded like CameraMan: the feet drop towards the pack, never closer than 40.
+      assert.equal(playerScreenY, locationViewHeight - 40);
+      assert.equal(locationViewHeight - playerScreenY, 40);
+      assert.ok(playerScreenY < locationViewHeight, 'feet stay above the pack');
     }
+  });
 
-    assert.ok(checked > 1_400, `expected the full street catalog, checked ${checked}`);
+  test('frames the avatar 0.75 down the view at every height, like CameraMan', () => {
+    // CameraMan.as 285 (pc.y - y_cam_offset) with the getter's 138 scale (offset * loc_vp_h / 600).
+    for (const view of [MIN_VP_H, 408, 512, MAX_VP_H]) {
+      const offset = 150 * (view / 600);
+      const centre = 5_000 - offset;
+      const cameraY = cameraTargetY(5_000, 10_000, view, yCamOffsetAnchor(150, view));
+      assert.equal(cameraY, centre - view / 2);
+      assert.equal(5_000 - cameraY, view * 0.75);
+    }
+  });
+
+  test('repairs authored worlds whose declared height ends above their ground', () => {
+    const homeGroundY = 620;
+    for (const [locationViewHeight, cameraY] of [[MIN_VP_H, 260], [408, 252], [MAX_VP_H, 60]]) {
+      const cameraWorldHeight = cameraWorldHeightForGround(
+        540,
+        homeGroundY,
+        locationViewHeight
+      );
+      assert.equal(cameraWorldHeight, 660);
+      assert.equal(cameraTargetY(homeGroundY, cameraWorldHeight, locationViewHeight), cameraY);
+      assert.equal(locationViewHeight - (homeGroundY - cameraY), 40);
+    }
+  });
+
+  test('keeps the lowest platform above the pack in every imported street at 408 and 600', () => {
+    const streetsDir = path.join(root, 'public/assets/streets');
+    const streetFiles = fs.readdirSync(streetsDir)
+      .filter((file) => file.endsWith('.json') && file !== 'index.json');
+    let checked = 0;
+    for (const windowView of [VIEW_FLOOR_H, MAX_VP_H]) {
+      for (const file of streetFiles) {
+        const street = JSON.parse(fs.readFileSync(path.join(streetsDir, file), 'utf8'));
+        if (!street?.bounds || !Array.isArray(street.platforms) || !street.platforms.length) continue;
+        // TSMainView: a street shorter than the window's view holds it (never under 408).
+        const locationViewHeight = locationViewHeightFor({ forced: windowView, sceneHeight: streetHeight(street) });
+        const platforms = platformsScreen(street);
+        const lowestPlatformY = Math.max(
+          ...platforms.flatMap((platform) => [platform.y1, platform.y2])
+        );
+        const cameraWorldHeight = Math.ceil(cameraWorldHeightForGround(
+          streetHeight(street),
+          lowestPlatformY,
+          locationViewHeight
+        ));
+        const playerScreenY = lowestPlatformY - cameraTargetY(
+          lowestPlatformY,
+          cameraWorldHeight,
+          locationViewHeight
+        );
+
+        assert.ok(
+          playerScreenY < locationViewHeight,
+          `${street.tsid || file} leaves the avatar behind the pack`
+        );
+        checked += 1;
+      }
+    }
+    assert.ok(checked > 2_800, `expected the full street catalog twice, checked ${checked}`);
   });
 
   test('keeps camera damping equivalent across split frames', () => {
@@ -267,7 +286,10 @@ test.describe('smooth directional camera and client wiring', () => {
     assert.match(game, /dataset\.speechWidth/);
     assert.match(game, /dataset\.actionWidth/);
     assert.match(game, /const PACK_VIEW_RESERVE = 132/);
-    assert.match(game, /const LOCATION_VIEW_H = VIEW_H - PACK_VIEW_RESERVE/);
+    assert.match(game, /let VIEW_H = LOCATION_VIEW_H \+ PACK_VIEW_RESERVE/);
+    assert.match(game, /VIEW_H = next \+ PACK_VIEW_RESERVE/);
+    assert.match(game, /app\.renderer\.resize\(VIEW_W, VIEW_H, app\.renderer\.resolution\)/);
+    assert.match(game, /window\.addEventListener\('resize', \(\) => \{\n    syncCameraSafeArea\(\);\n    syncLocationViewHeight\(\);/);
     assert.match(game, /cameraBottomPadding: cameraBottomSlack\(LOCATION_VIEW_H\)/);
     assert.match(game, /cameraTargetY\(player\.y, streetH, LOCATION_VIEW_H\)/);
     assert.match(game, /cameraWorldHeightForGround/);

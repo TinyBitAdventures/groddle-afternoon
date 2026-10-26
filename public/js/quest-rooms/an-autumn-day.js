@@ -16,13 +16,16 @@
  * part 1 and after its own last finish or fail).
  *
  * The four location files (geometry, the word props, their scripts) are
- * lost. Reconstructed from GlitchAddict footage (OuO_TtcfAyI, 2 min): a
- * silhouetted autumn wood at sunset, the caption "Almost forgot this feeling
- * of …", a black bird that flies ahead, words drifting in the air that the
- * player climbs (forgot; Almost, wonder., feeling; stillness., comfort.,
- * this, of), then a scrambled sentence whose words change as the player jumps
- * into them. With "Almost forgot this feeling of" in place the bird lands in a
- * warm glow; touching it opens the room named by the last word. The Wonder
+ * lost. Reconstructed from GlitchAddict footage (OuO_TtcfAyI, 2 min,
+ * reference only): a silhouetted autumn wood at sunset, a caption, a black
+ * bird that flies ahead, words drifting in the air that the player climbs,
+ * then a scrambled sentence whose words change as the player jumps into them;
+ * with the sentence in place the bird lands in a warm glow, and touching it
+ * opens the room named by the last word. Desk FOOTWORDS (Austin 2026-10-26,
+ * G314): the footage's six-word caption does not ship; the caption, the
+ * drifting words and the sentence are GSJS's own "This feeling of …" (the
+ * three rooms' name, inc_data_maps_prod.js 17952-17954), so the climb and the
+ * scramble are the remake's (This; wonder., feeling; stillness., comfort., of). The Wonder
  * room (the one recorded) has a bench, falling leaves and a hovering red
  * bird that leaves a Qurazy Quoin behind (+1098 iMG on camera: level 60's
  * 915 x 1.2), and a small "exit" at its left edge. Stillness and Comfort are
@@ -50,7 +53,8 @@ export const MAIN_LABEL = 'An Autumn Day';
 export const FEELING_LABEL = 'This feeling of …';
 /** G315: template in hub 61 'Simple Level Quests' (inc_data_maps_prod.js 245), a dev label; plain remake wording. */
 export const HUB_NAME = 'Quest';
-export const CAPTION = 'Almost forgot this feeling of …';
+/** Desk FOOTWORDS (G314): GSJS's words, inc_data_maps_prod.js 17952 "This feeling of …". */
+export const CAPTION = 'This feeling of …';
 export const SOURCE_TSIDS = Object.freeze({
   main: 'LUVCCQSMDIB3HOI',
   stillness: 'LUVCL0STDIB37HE',
@@ -59,11 +63,11 @@ export const SOURCE_TSIDS = Object.freeze({
 });
 export const FEELINGS = Object.freeze(['stillness', 'comfort', 'wonder']);
 
-/** The sentence: five fixed words, then one of three endings. */
-export const SENTENCE = Object.freeze(['Almost', 'forgot', 'this', 'feeling', 'of']);
+/** The sentence: three fixed words, then one of three endings. */
+export const SENTENCE = Object.freeze(['This', 'feeling', 'of']);
 export const ENDINGS = Object.freeze(['stillness.', 'comfort.', 'wonder.']);
-/** Footage: the row first read "forgot Almost this forgot of comfort." */
-export const SCRAMBLE = Object.freeze(['forgot', 'Almost', 'this', 'forgot', 'of', 'comfort.']);
+/** The row starts scrambled (a remake choice): two jumps per fixed word, one more for wonder. */
+export const SCRAMBLE = Object.freeze(['feeling', 'of', 'This', 'comfort.']);
 /** Seconds in a feeling room before its Qurazy Quoin shows (footage: ~18 s, camera mode included). */
 export const LINGER_MS = 12_000;
 
@@ -87,20 +91,18 @@ export function wordWidth(text) {
 
 /**
  * Drifting words in climbing order: `y` is the walking line on the word.
- * forgot lifts the player onto a fallen trunk; two staircases cross two rock
+ * This lifts the player onto a fallen trunk; two staircases cross two rock
  * walls too tall to jump.
  */
 export function mainWords() {
   const F = MAIN.FLOOR;
   return [
-    { id: 'forgot', text: 'forgot', x: 925, y: F - 78, stair: 0 },
-    { id: 'almost', text: 'Almost', x: 1500, y: F - 92, stair: 1 },
-    { id: 'wonder', text: 'wonder.', x: 1590, y: F - 182, stair: 1 },
-    { id: 'feeling', text: 'feeling', x: 1688, y: F - 270, stair: 1 },
+    { id: 'this', text: 'This', x: 925, y: F - 78, stair: 0 },
+    { id: 'wonder', text: 'wonder.', x: 1580, y: F - 92, stair: 1 },
+    { id: 'feeling', text: 'feeling', x: 1688, y: F - 182, stair: 1 },
     { id: 'stillness', text: 'stillness.', x: 2420, y: F - 92, stair: 2 },
     { id: 'comfort', text: 'comfort.', x: 2532, y: F - 182, stair: 2 },
-    { id: 'this', text: 'this', x: 2612, y: F - 272, stair: 2 },
-    { id: 'of', text: 'of', x: 2656, y: F - 362, stair: 2 },
+    { id: 'of', text: 'of', x: 2656, y: F - 272, stair: 2 },
   ].map((w) => ({ ...w, w: wordWidth(w.text) }));
 }
 
@@ -111,8 +113,8 @@ export function mainProps() {
     bench: { x: 330, y: F - 34, w: 120 },
     trunk: { x1: 985, x2: 1170, top: F - 128 },
     walls: [
-      { id: 'aad_wall_a', x1: 1760, x2: 1905, top: F - 332 },
-      { id: 'aad_wall_b', x1: 2780, x2: 2925, top: F - 440 },
+      { id: 'aad_wall_a', x1: 1760, x2: 1905, top: F - 260 },
+      { id: 'aad_wall_b', x1: 2780, x2: 2925, top: F - 350 },
     ],
     stones: [
       { x1: 1330, x2: 1400, top: F - 58 },
@@ -151,10 +153,11 @@ export function mainBarriers() {
   ];
 }
 
-/** The sentence row: six slots the player jumps into (head height, not standing height). */
+/** The sentence row: one slot per word, the player jumps into them (head height, not standing height). */
+export const SLOT_COUNT = SENTENCE.length + 1;
 export function sentenceSlots() {
   const F = MAIN.FLOOR;
-  return [0, 1, 2, 3, 4, 5].map((i) => ({ i, x: 3300 + i * 138, y: F - 140, w: 120, h: 34 }));
+  return Array.from({ length: SLOT_COUNT }, (_, i) => ({ i, x: 3300 + i * 150, y: F - 140, w: 132, h: 34 }));
 }
 
 /** Where the bird waits in the clearing, and where it lands once the sentence is right. */
@@ -189,7 +192,7 @@ export function feelingPlatforms(kit, feeling) {
 /* Sentence rules                                                       */
 /* ------------------------------------------------------------------ */
 
-/** The word after `word` in its slot's cycle (five sentence words, or the three endings). */
+/** The word after `word` in its slot's cycle (the three sentence words, or the three endings). */
 export function cycleWord(slot, word) {
   const list = slot >= SENTENCE.length ? ENDINGS : SENTENCE;
   const at = list.indexOf(word);
@@ -200,20 +203,20 @@ export function slotCorrect(slot, word) {
   return slot >= SENTENCE.length ? ENDINGS.includes(word) : SENTENCE[slot] === word;
 }
 
-/** "Almost forgot this feeling of" in place (any ending will do). */
+/** "This feeling of" in place (any ending will do). */
 export function sentenceReady(words) {
-  return Array.isArray(words) && words.length === 6 && words.every((w, i) => slotCorrect(i, w));
+  return Array.isArray(words) && words.length === SLOT_COUNT && words.every((w, i) => slotCorrect(i, w));
 }
 
 /** The room the sentence leads to ('wonder' for "wonder."). */
 export function feelingFor(words) {
-  const end = Array.isArray(words) ? String(words[5] || '') : '';
+  const end = Array.isArray(words) ? String(words[SENTENCE.length] || '') : '';
   const id = end.replace(/\.$/, '');
   return FEELINGS.includes(id) ? id : null;
 }
 
 export function feelingCaption(feeling) {
-  return FEELINGS.includes(feeling) ? `Almost forgot this feeling of ${feeling}.` : CAPTION;
+  return FEELINGS.includes(feeling) ? `This feeling of ${feeling}.` : CAPTION;
 }
 
 /** Fewest jumps to fix a sentence for a chosen ending (QA and tests). */
@@ -792,11 +795,11 @@ function styleSlots(ctx) {
 /** Jumping into a slot changes its word (also QA). */
 export function touchSlot(ctx, i) {
   const d = ctx.data;
-  if (!d.sentenceShown || d.choosing || i < 0 || i > 5) return false;
+  if (!d.sentenceShown || d.choosing || i < 0 || i >= SLOT_COUNT) return false;
   const before = sentenceReady(d.sentence);
   setSlotWord(ctx, i, cycleWord(i, d.sentence[i]));
   d.touches = (d.touches || 0) + 1;
-  ctx.sound(i === 5 ? 'LITTLE_STAR_9' : `LITTLE_STAR_${3 + i}`, { volume: 0.32 });
+  ctx.sound(i === SENTENCE.length ? 'LITTLE_STAR_9' : `LITTLE_STAR_${3 + i}`, { volume: 0.32 });
   const ready = sentenceReady(d.sentence);
   if (ready && !before) {
     ctx.flag('sentence');
@@ -995,7 +998,8 @@ export const room = {
 
   build(ctx, stage) {
     ctx.data.remembered ||= {};
-    ctx.data.sentence ||= [...SCRAMBLE];
+    // A row saved before desk FOOTWORDS had six words: start it again.
+    if (!Array.isArray(ctx.data.sentence) || ctx.data.sentence.length !== SLOT_COUNT) ctx.data.sentence = [...SCRAMBLE];
     if (FEELINGS.includes(stage)) {
       const scene = drawFeelingRoom(ctx, stage);
       ctx.data.scene = scene;
@@ -1140,8 +1144,8 @@ export const room = {
     if (mode === 'words') return 'words';
     ctx.place(CLEARING.x1 + 120, MAIN.FLOOR);
     if (!(await settle(() => ctx.data.sentenceShown, 3000))) return 'no-sentence';
-    for (let i = 0; i < 6; i++) {
-      const want = i === 5 ? `${feeling}.` : SENTENCE[i];
+    for (let i = 0; i < SLOT_COUNT; i++) {
+      const want = i === SENTENCE.length ? `${feeling}.` : SENTENCE[i];
       for (let k = 0; k < 6 && ctx.data.sentence[i] !== want; k++) {
         touchSlot(ctx, i);
         await ctx.wait(120);

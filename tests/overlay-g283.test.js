@@ -41,30 +41,24 @@ const manifest = JSON.parse(read('assets/sprites/overlays/overlays.json'));
 afterEach(() => setMetabolicGainGate(null));
 
 describe('G283: the stun orb and the beam in view', () => {
-  it('the camera looks 90 px up while the orb is up, so the orb (312 px over your feet) sits in the 408 px viewport', async () => {
-    const { ORB_HEADROOM, BADGE } = await import('../public/js/features/rook-attack-feature.js');
+  // Desk ORBERA (G293): the orb moved down to just above the name labels, so
+  // the camera no longer looks up for it (tests/desk-decisions.test.js).
+  it('the orb (200 px over your feet) sits in the 408 px viewport without the camera looking up', async () => {
+    const { ORB_ART, BADGE } = await import('../public/js/features/rook-attack-feature.js');
     const viewH = 408;
     const feet = viewH * (0.5 + 150 / 600); // movement.js yCamOffsetAnchor(150)
-    const orbAbove = 163 + (294.75 - 145.4);
-    assert.ok(feet - orbAbove < 0, 'without headroom the orb is above the top edge');
-    const orbY = feet + ORB_HEADROOM.dy - orbAbove;
-    assert.ok(orbY > 60 && orbY < 120, `orb at ${orbY}`);
-    assert.ok(feet + ORB_HEADROOM.dy <= viewH - 10, 'your feet stay inside the viewport');
+    const orbY = feet - ORB_ART.orbAbove;
+    assert.ok(orbY > 60 && orbY < 160, `orb at ${orbY}`);
     // The badge leaves the top centre (where the orb rises) for the top right.
     assert.ok(BADGE.x > 960 - 100 && BADGE.y < 100);
     assert.ok(BADGE.x + BADGE.feedX + 150 <= 960, 'the feed box stays on screen');
   });
 
-  it('the orb, its count, motes and the beams draw in front of the Rook; the headroom is let go after the beam', () => {
+  it('the orb, its count, motes and the beams draw in front of the Rook; the camera stays put', () => {
     const f = read('js/features/rook-attack-feature.js');
     assert.match(f, /root\.addChild\(sky, rookLayer, front, fxLayer, tint, textLayer, hud\)/);
     assert.match(f, /layer: frontLayer\(engine\) \|\| engine\.entityLayer/);
-    assert.match(f, /frontLayer\(engine\)\.addChild\(root\);\n\s*holdHeadroom\(engine, Infinity\);/);
-    assert.match(f, /if \(headroom\) headroom\.until = now\(\) \+ ORB_HEADROOM\.afterMs;/);
-    assert.match(f, /releaseHeadroom\(engine, true\)/);
-    // Camera Mode's own look is never overwritten or reset.
-    assert.match(f, /if \(look\.x \|\| look\.y\) return;/);
-    assert.match(f, /look\.x === 0 && look\.y === -ORB_HEADROOM\.dy/);
+    assert.doesNotMatch(f, /headroom|setCameraLook/i);
   });
 
   it('the source: no keep-in-bounds for the orb or the beam; the client puts the rook head in its header', { skip: !haveGsjs }, () => {
@@ -174,9 +168,9 @@ describe('G285: the last overlay stand-ins', () => {
     assert.doesNotMatch(f, /bezierCurveTo/);
   });
 
-  it('the race rainbow follows you; G299: the end splash shows at once (tests/game-splash.test.js)', () => {
+  it('ticket races show no rainbow (desk RAINBOW, tests/desk-decisions.test.js); G299: the end splash shows at once (tests/game-splash.test.js)', () => {
     const f = read('js/features/races-feature.js');
-    assert.match(f, /followWinnerRainbow\(engine, drawWinnerRainbow\(engine\.PIXI\)\);/);
+    assert.doesNotMatch(f, /drawWinnerRainbow|followWinnerRainbow/);
     assert.doesNotMatch(f, /resultRevealTimer|armLeavePrompt/);
     assert.match(f, /splashShown = true;\s*engine\.gameSplash\?\.\(\{/);
   });

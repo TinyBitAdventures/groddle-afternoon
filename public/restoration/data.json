@@ -2030,9 +2030,24 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 503,
+  "commits": 506,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, trade items and currants with another player"
+   },
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, race Grab 'Em Good and the finish-line races against real players"
+   },
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, a Rook attack is one fight for everyone on the street"
+   },
    {
     "date": "2026-10-25",
     "kind": "new",
@@ -2137,24 +2152,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Every overlay ends when you leave the street, as in the original, and the tutorial's art is traced to Tiny Speck's own files"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Game of Crowns ends on Tiny Speck's winner splash with its rays, and the loneliness invite and stuck prompts join the prompt stack"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The sloth's puff covers the sloth, the Qurazy banner stops when you leave the street, and the feed fades under it on narrow screens"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Buffs, drinks, spices, crabs, powders and other mood and energy losses cost nothing while dead, and a new game's eleven-skills badge comes on its first load"
    }
   ]
  },
- "tests": 302,
+ "tests": 304,
  "generatedAt": "2026-10-26"
 }

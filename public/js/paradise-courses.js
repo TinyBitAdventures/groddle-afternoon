@@ -269,7 +269,11 @@ const PLUNGE_PLATFORMS = freezeList([
 ]);
 /** The "Back to Top" door (left on the landing): stand at it to go back up to the start cloud. */
 export const SKY_PLUNGE_BACK_TO_TOP = Object.freeze({ x: 225, y: SKY_PLUNGE_LANDING_Y, reach: 36, label: 'Back to Top' });
-/** Text on the landing, transcribed from the Snap (positions read off it). */
+/**
+ * Text on the landing, transcribed from the Snap (positions read off it):
+ * glitchthegame.com snap PHF6RRQFSTC2DA8 (Festeus, 2012-10-01). Desk
+ * FOOTWORDS (Austin 2026-10-26, G314): the three-word "Back to Top" sign stays.
+ */
 export const SKY_PLUNGE_LANDING_SIGNS = Object.freeze([
   Object.freeze({ id: 'lettering', text: 'AHHHHH YEAHHHH!!!!!', x: 640, y: SKY_PLUNGE_LANDING_Y - 340, size: 62 }),
   Object.freeze({ id: 'back-to-top', text: 'Back to Top', x: 205, y: SKY_PLUNGE_LANDING_Y - 240, size: 40 }),

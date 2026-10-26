@@ -339,10 +339,12 @@ describe('G296: the loss-door leftovers cost nothing while dead', () => {
 });
 
 describe('G291: the orb count', () => {
-  it('is centred on the avatar and rises 30 px as joiners reach six (inc_rook.js 521-522)', () => {
+  // Desk ORBERA (G293) replaced inc_rook.js 521-522's count above the orb with the count on it.
+  it('is drawn on the orb, centred on it, in solo and multiplayer', () => {
     const rook = read('js/features/rook-attack-feature.js');
-    assert.match(rook, /count\.anchor\.set\(0\.5, 1\);/);
-    assert.match(rook, /orb\.count\.x = 0;\s*orb\.count\.y = ORB_ART\.countDy - 30 \* Math\.min\(orb\.joiners \/ 6, 1\) \+ ORB_ART\.orbAbove;/);
+    assert.match(rook, /count\.anchor\.set\(0\.5, 0\.5\);/);
+    assert.equal((rook.match(/const count = orbCountText\(PIXI\);/g) || []).length, 2);
+    assert.doesNotMatch(rook, /count\.y =/);
   });
 });
 
