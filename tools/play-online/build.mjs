@@ -23,7 +23,7 @@ const SOURCE = join(root, 'public/play/index.html');
 const TARGET = join(root, 'public/play/online/index.html');
 
 /** The cache key of js/online-boot.js (bump it when that file or js/minn-account.js changes). */
-export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=g338-1';
+export const ONLINE_BOOT_SRC = 'js/online-boot.js?v=play-1';
 
 const MODE_ENTRY = `  <!--
     Multiplayer entry (js/game-mode.js). This must stay the FIRST script on the page, ahead of
@@ -69,6 +69,11 @@ const ONLINE_STYLE = `  <style>
       font-weight: 700; color: #2e5a20; background: #eef6e4; box-shadow: inset 0 0 0 2px #b9d8a0;
     }
     .online-gate .online-home { display: block; margin-top: 0.6rem; text-align: center; color: #2e5a20; font-weight: 700; }
+    .online-gate button.online-home { width: 100%; padding: 0; border: 0; background: none; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+    /* Play solo under the sign-in (Austin 2026-10-26: Play shows the sign-in or a button to play solo). */
+    .online-gate .online-solo { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid rgba(46, 90, 32, 0.2); }
+    .online-gate .online-solo h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+    .online-gate .online-solo p { margin: 0; }
     /* The multiplayer save state (js/save-store.js groddle:save-state). */
     .save-pill {
       position: fixed; left: 10px; bottom: 10px; z-index: 60; display: flex; gap: 0.45rem; align-items: center;

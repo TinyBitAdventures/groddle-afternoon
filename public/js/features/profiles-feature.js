@@ -37,7 +37,7 @@ import { lookKey, resolveLook } from '../avatar-looks.js';
 import {
   AVATAR_FRAME, AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_MAX_BYTES, HOME_SETTLE_MS, HOME_WIDTHS, PICTURE_RESOLUTION, PROFILE_COPY,
   aboutCounter, avatarKeyOf, base64Bytes, homeKeyOf, pngBase64, shouldUpload, stillTransform,
-} from '../profiles.js?v=g338-1';
+} from '../profiles.js?v=play-1';
 
 export const PROFILES_FEATURE_ID = 'profiles';
 

@@ -131,7 +131,7 @@ export function base64Bytes(b64) {
 /** Copy shown in Menu > Account, Your profile. */
 export const PROFILE_COPY = Object.freeze({
   heading: 'Your profile',
-  intro: 'Everyone can see your profile on the Groddle site: your Glitch, your home street, your badges and what you write here.',
+  intro: 'From level 5, everyone can see your profile on the Groddle site: your Glitch, your home street, your badges and what you write here. Until then it is yours alone.',
   label: 'About you',
   placeholder: 'A few words for other players.',
   save: 'Save',

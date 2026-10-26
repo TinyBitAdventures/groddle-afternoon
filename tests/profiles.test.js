@@ -17,7 +17,7 @@ import { homedir } from 'node:os';
 import {
   AVATAR_STILL, AVATAR_TILE, FAILURE_BACKOFF_MS, HOME_MAX_BYTES, HOME_REFRESH_MS, PROFILE_ABOUT_MAX, PROFILE_COPY, RETRY_MS,
   aboutCounter, aboutLength, avatarKeyOf, base64Bytes, cleanAbout, homeKeyOf, pngBase64, profileSlug, shortHash, shouldUpload, stillTransform,
-} from '../public/js/profiles.js?v=g338-1';
+} from '../public/js/profiles.js?v=play-1';
 import { createMinnAccount } from '../public/js/minn-account.js?v=g338-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
@@ -132,7 +132,7 @@ describe('the profiles feature', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.ok(ids.includes('profiles'));
     assert.ok(ids.indexOf('profiles') < ids.indexOf('account-backup'));
-    assert.match(read('public/js/features/index.js'), /profiles-feature\.js\?v=g338-1/);
+    assert.match(read('public/js/features/index.js'), /profiles-feature\.js\?v=play-1/);
   });
 
   it('does nothing in solo: no state, no account section, no upload', () => {
@@ -256,3 +256,16 @@ describe('the site side (groddle-afternoon-site)', { skip: skipWithoutSite }, ()
     assert.equal(out['image url'], '/players/57/tile.png?v=1793037600');
   });
 });
+
+describe('only characters from level 5 are public (Austin 2026-10-26)', () => {
+  it('the grid lists level 5 and up; a lower page and its pictures are the owner\'s alone', { skip: skipWithoutSite }, () => {
+    const prof = readFileSync(join(SITE_DIR, 'src/Profiles.php'), 'utf8');
+    const pages = readFileSync(join(SITE_DIR, 'src/PlayerPages.php'), 'utf8');
+    assert.match(prof, /public const LISTED_LEVEL = 5;/);
+    assert.match(pages, /AND " \. Profiles::levelSql\('s'\) \. ' >= ' \. Profiles::LISTED_LEVEL;/);
+    assert.match(pages, /if \(\$facts\['level'\] < Profiles::LISTED_LEVEL && !\$own\) \{\n\s+throw new RouteMiss\(\);/);
+    assert.match(pages, /if \(!\$listed && \$this->minn->reader->userId !== \(int\) \$id\) \{\n\s+throw new RouteMiss\(\);/);
+    assert.match(pages, /!\$listed \? 'private, no-store'/);
+  });
+});
+

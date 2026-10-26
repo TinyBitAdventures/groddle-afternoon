@@ -38,8 +38,8 @@
  * "Skip to Ur"; existing saves and autostart routes are never redirected.
  * Multiplayer: a new character (js/new-player.js) has only "Start", which
  * starts the tutorial, as every new player in the original did.
- * On a plain /play/ (no query) the card first asks Solo or Multiplayer
- * (js/game-mode.js): Solo leads to that choice, Multiplayer to /play/online/.
+ * Solo or multiplayer is picked before the game, on the Play page
+ * (/play/online/, js/online-boot.js): /play/ is the solo game.
  * QA: ?autostart=1&fresh=1&resetgame=1&questoffer=off&newxp=1 (or
  * =training1|training2|house|skill|island) forces it; &newxpautoplay=1 runs
  * it end to end (&newxphold=<stage> stops on reaching that stage, =sloth at
@@ -121,7 +121,6 @@ import { grantMoodXp } from '../mood-xp.js';
 import { displayTopOf, itemstackOverlayPoint, playPoofIn, playSheetOverlay, poofInAlpha } from '../overlay-art.js?v=g311-1';
 import { HOME_MACHINE } from '../home-ticket.js?v=g310-1';
 import { createAnimalState } from '../animals.js?v=g296-1';
-import { mountModeChoice, multiplayerEntryUrl, offersModeChoice } from '../game-mode.js?v=mp2-1';
 import {
   AK_ANIMALS,
   AK_BUBBLE,
@@ -3003,26 +3002,9 @@ function showStartCard(engine) {
     });
     engine.setData('newxpStartCard', 'shown');
   };
-  // Multiplayer phase 1 (js/game-mode.js): a plain /play/ asks Solo or Multiplayer first;
-  // any query route (autostart, fresh, resetgame, QA params) goes straight to the tutorial choice, solo.
-  if (!offersModeChoice({ mode: engine.mode, search: location.search })) {
-    tutorialChoice();
-    return;
-  }
-  const customize = document.getElementById('start-customize-btn');
-  if (customize) customize.hidden = true;
-  mountModeChoice(box, {
-    onSolo: () => {
-      engine.setData('startMode', 'solo');
-      if (customize) customize.hidden = false;
-      tutorialChoice();
-    },
-    onMultiplayer: () => {
-      engine.setData('startMode', 'multiplayer');
-      location.assign(multiplayerEntryUrl(document.baseURI));
-    },
-  });
-  engine.setData('newxpStartCard', 'mode');
+  // Solo or multiplayer is chosen before the game, on the Play page (/play/online/: sign in, or
+  // Play solo; Austin 2026-10-26), so a new solo game goes straight to the tutorial choice.
+  tutorialChoice();
 }
 
 /* ------------------------------------------------------------------ */

@@ -14,14 +14,11 @@ import { execFileSync } from 'node:child_process';
 import {
   GAME_MODE,
   GAME_MODES,
-  MODE_CHOICE_HTML,
   MULTIPLAYER,
   MULTIPLAYER_ENTRY_PATH,
   SOLO,
   isSolo,
-  mountModeChoice,
   multiplayerEntryUrl,
-  offersModeChoice,
   resolveGameMode,
 } from '../public/js/game-mode.js?v=mp2-1';
 
@@ -63,58 +60,37 @@ describe('mode flag', () => {
   });
 });
 
-describe('start card: Solo or Multiplayer', () => {
-  it('asks only on a plain solo /play/', () => {
-    assert.equal(offersModeChoice({ mode: SOLO, search: '' }), true);
-    assert.equal(offersModeChoice({ mode: SOLO, search: '?' }), true);
-    assert.equal(offersModeChoice({ mode: MULTIPLAYER, search: '' }), false);
-    for (const q of ['?autostart=1', '?fresh=1', '?resetgame=1', '?practice=1', '?questdemo=phantom', '?sound=1', '?newxp=1', '?companions=0', '?x']) {
-      assert.equal(offersModeChoice({ mode: SOLO, search: q }), false, q);
-    }
+describe('the Play page chooses: sign in, or Play solo (Austin 2026-10-26)', () => {
+  it('a new solo game goes straight to the tutorial choice; /play/ asks nothing more', () => {
+    const f = read('js/features/newxp-feature.js');
+    assert.doesNotMatch(f, /mountModeChoice|offersModeChoice|game-mode\.js/);
+    // Existing saves (hadSave) and autostart/newxp routes never get a card, as before.
+    assert.match(f, /if \(!engine\.started && !hadSave && !engine\.param\('autostart'\) && !engine\.param\('newxp'\)\) showStartCard\(engine\);/);
+    const card = f.slice(f.indexOf('function showStartCard'), f.indexOf('/* Feature  '));
+    assert.match(card, /\n  tutorialChoice\(\);\n\}/);
+    assert.match(card, /Start with the tutorial<\/button>[\s\S]*Skip to Ur<\/button>/);
   });
 
-  it('Solo continues to the tutorial choice and Multiplayer leaves for /play/online/', () => {
-    const buttons = {};
-    const box = {
-      innerHTML: '',
-      dataset: {},
-      querySelector(sel) {
-        const attr = sel.slice(1, -1);
-        assert.ok(this.innerHTML.includes(attr), `${sel} is in the card`);
-        buttons[attr] ||= { handlers: [], addEventListener(type, fn) { assert.equal(type, 'click'); this.handlers.push(fn); }, click() { this.handlers.forEach((fn) => fn()); } };
-        return buttons[attr];
-      },
-    };
-    const calls = [];
-    mountModeChoice(box, { onSolo: () => calls.push('solo'), onMultiplayer: () => calls.push('multiplayer') });
-    assert.equal(box.dataset.step, 'mode');
-    assert.match(box.innerHTML, />Solo<\/button>/);
-    assert.match(box.innerHTML, />Multiplayer<\/button>/);
-    buttons['data-mode-solo'].click();
-    buttons['data-mode-multiplayer'].click();
-    assert.deepEqual(calls, ['solo', 'multiplayer']);
+  it('the Menu still links a solo game to the Play page', () => {
     assert.equal(MULTIPLAYER_ENTRY_PATH, 'play/online/');
     // play/index.html has <base href="../">, so document.baseURI is the site root.
     assert.equal(multiplayerEntryUrl('https://groddle.localhost/'), 'https://groddle.localhost/play/online/');
     assert.equal(multiplayerEntryUrl('http://127.0.0.1:8790/sub/'), 'http://127.0.0.1:8790/sub/play/online/');
   });
 
-  it('uses plain copy with no em-dashes', () => {
-    assert.doesNotMatch(MODE_CHOICE_HTML, /—/);
-    // Player-facing words only: comments copied from play/index.html are not shown.
-    assert.doesNotMatch(read('play/online/index.html').replace(/<!--[\s\S]*?-->/g, ''), /—/);
+  it('the sign-in offers Play solo; a signed-in player picks Play as <name> or Play solo, once a tab', () => {
+    const boot = read('js/online-boot.js');
+    assert.match(boot, /title: 'Or play solo',\n\s+body: 'Your own scrap of Ur, saved in this browser\. No account needed\.',\n\s+button: 'Play solo',/);
+    assert.match(boot, /if \(state === 'signed-out'\) \{\n\s+const solo = el\('section', \{ class: 'online-solo'/);
+    assert.match(boot, /if \(!continuedHere\(\)\) \{\n\s+showGate\(gate, 'choose'/);
+    assert.match(boot, /name \? `Play as \$\{name\}` : 'Play'/);
+    assert.match(boot, /const onSignedIn = \(\) => \{ markContinued\(\); boot\(\); \};/);
   });
 
-  it('newxp shows it before the tutorial choice, only for brand-new saves', () => {
-    const f = read('js/features/newxp-feature.js');
-    assert.match(f, /import \{ mountModeChoice, multiplayerEntryUrl, offersModeChoice \} from '\.\.\/game-mode\.js\?v=mp2-1';/);
-    // Existing saves (hadSave) and autostart/newxp routes never get a card, as before.
-    assert.match(f, /if \(!engine\.started && !hadSave && !engine\.param\('autostart'\) && !engine\.param\('newxp'\)\) showStartCard\(engine\);/);
-    const card = f.slice(f.indexOf('function showStartCard'), f.indexOf('/* Feature  '));
-    assert.match(card, /if \(!offersModeChoice\(\{ mode: engine\.mode, search: location\.search \}\)\) \{\n\s*tutorialChoice\(\);\n\s*return;\n\s*\}/);
-    assert.match(card, /onSolo: \(\) => \{[\s\S]*?tutorialChoice\(\);/);
-    assert.match(card, /onMultiplayer: \(\) => \{[\s\S]*?location\.assign\(multiplayerEntryUrl\(document\.baseURI\)\);/);
-    assert.match(card, /Start with the tutorial<\/button>[\s\S]*Skip to Ur<\/button>/);
+  it('uses plain copy with no em-dashes', () => {
+    // Player-facing words only: comments copied from play/index.html are not shown.
+    assert.doesNotMatch(read('play/online/index.html').replace(/<!--[\s\S]*?-->/g, ''), /—/);
+    assert.doesNotMatch(read('js/online-boot.js').replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, ''), /—/);
   });
 });
 

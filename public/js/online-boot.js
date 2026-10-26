@@ -1,5 +1,9 @@
 /**
- * /play/online/ (multiplayer phase 2): sign the player in, load the whole
+ * /play/online/ (multiplayer phase 2), where the site's Play links lead
+ * (Austin 2026-10-26: Play shows the sign-in or a button to play solo). A
+ * signed-out player signs in, makes a character or picks Play solo; a
+ * signed-in one picks Play as <name> or Play solo, once a tab (a reload goes
+ * straight back in). Then: sign the player in, load the whole
  * multiplayer save from Minn into window.GRODDLE_MP_BOOT, and only then load
  * game.js, whose save store (js/save-store.js) serves the game from that copy
  * and writes it back. A signed-out player signs in or makes a new character
@@ -26,12 +30,43 @@ const PILL_TEXT = {
   error: 'Not saved',
 };
 
+/** The solo choice under the sign-in (plain remake copy, no em-dashes). */
+export const SOLO_COPY = {
+  title: 'Or play solo',
+  body: 'Your own scrap of Ur, saved in this browser. No account needed.',
+  button: 'Play solo',
+};
+
+/** Set when the player picks Play as <name> in this tab, so a reload goes straight in. */
+const CONTINUE_KEY = 'groddle-online-continue';
+
+function continuedHere() {
+  try {
+    return sessionStorage.getItem(CONTINUE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markContinued(on = true) {
+  try {
+    if (on) sessionStorage.setItem(CONTINUE_KEY, '1');
+    else sessionStorage.removeItem(CONTINUE_KEY);
+  } catch {
+    // Private windows: the card shows again on a reload, nothing worse.
+  }
+}
+
 /** The gate's words for each state (plain remake copy, no em-dashes). */
 export const GATE_COPY = {
   checking: { title: 'Finding your account', body: ['Checking whether you are signed in…'] },
   'signed-out': {
-    title: 'Play with others',
-    body: ['Multiplayer keeps your character on the Groddle site, so it is the same on every device. Your solo game stays in this browser and needs no account.'],
+    title: 'Play Groddle Afternoon',
+    body: ['Sign in, or make a character, to share Ur with other players. Your character lives on the Groddle site, the same on every device.'],
+  },
+  choose: {
+    title: 'Welcome back',
+    body: ['Carry on with other players, or play your solo game.'],
   },
   'no-server': {
     title: 'Multiplayer needs the Groddle site',
@@ -77,14 +112,32 @@ function el(tag, attrs = {}, text = '') {
   return node;
 }
 
-function showGate(gate, state, { account, onSignedIn }) {
+function showGate(gate, state, { account, onSignedIn, onSignedOut = onSignedIn, session = null, onPlay = null }) {
   const copy = GATE_COPY[state] || GATE_COPY.checking;
   gate.dataset.online = state;
   const card = gate.querySelector('.card');
   const keep = card.querySelector('img');
   card.replaceChildren(...(keep ? [keep] : []));
-  card.append(el('h2', {}, copy.title));
+  const name = session?.player?.name || '';
+  card.append(el('h2', {}, state === 'choose' && name ? `${copy.title}, ${name}` : copy.title));
   for (const line of copy.body) card.append(el('p', {}, line));
+  if (state === 'choose') {
+    const play = el('button', { type: 'button', class: 'online-play', 'data-online-continue': '' }, name ? `Play as ${name}` : 'Play');
+    play.addEventListener('click', () => onPlay?.());
+    card.append(play, el('a', { class: 'online-alt', href: 'play/', 'data-online-solo': '' }, SOLO_COPY.button));
+    const out = el('button', { type: 'button', class: 'online-home online-signout', 'data-online-signout': '' }, name ? `Not ${name}? Sign out` : 'Sign out');
+    out.addEventListener('click', async () => {
+      out.disabled = true;
+      markContinued(false);
+      try {
+        await account.signOut();
+      } finally {
+        onSignedOut();
+      }
+    });
+    card.append(out);
+    return;
+  }
   if (state === 'signed-out') {
     const host = el('div', { class: 'online-account' });
     card.append(host);
@@ -96,10 +149,14 @@ function showGate(gate, state, { account, onSignedIn }) {
     retry.addEventListener('click', () => location.reload());
     card.append(retry);
   }
-  if (state !== 'checking') {
-    card.append(el('a', { class: state === 'signed-out' ? 'online-home' : 'online-play', href: 'play/' }, 'Play solo'));
-    card.append(el('a', { class: 'online-home', href: './' }, 'Back to Groddle Afternoon'));
+  if (state === 'signed-out') {
+    const solo = el('section', { class: 'online-solo', 'aria-labelledby': 'online-solo-title' });
+    solo.append(el('h3', { id: 'online-solo-title' }, SOLO_COPY.title), el('p', {}, SOLO_COPY.body), el('a', { class: 'online-alt', href: 'play/', 'data-online-solo': '' }, SOLO_COPY.button));
+    card.append(solo);
+  } else if (state !== 'checking') {
+    card.append(el('a', { class: 'online-play', href: 'play/', 'data-online-solo': '' }, SOLO_COPY.button));
   }
+  if (state !== 'checking') card.append(el('a', { class: 'online-home', href: './' }, 'Back to Groddle Afternoon'));
 }
 
 function mountSavePill(player) {
@@ -121,8 +178,9 @@ async function boot() {
   const gate = document.getElementById('online-gate');
   const script = document.getElementById('online-boot');
   const account = createMinnAccount({ baseUri: document.baseURI });
-  // Signed in from the gate's forms: the same steps again, now with a session.
-  const onSignedIn = () => { boot(); };
+  // Signed in from the gate's forms: the same steps again, now with a session, straight into the game.
+  const onSignedIn = () => { markContinued(); boot(); };
+  const onSignedOut = () => { boot(); };
   showGate(gate, 'checking', { account, onSignedIn });
   const session = await account.session();
   const state = gateFor(session);
@@ -130,6 +188,16 @@ async function boot() {
     showGate(gate, state, { account, onSignedIn });
     return;
   }
+  // Signed in already: Play as <name> or Play solo, once a tab.
+  if (!continuedHere()) {
+    showGate(gate, 'choose', { account, onSignedIn, onSignedOut, session, onPlay: () => { markContinued(); enter(gate, script, account, session, onSignedIn); } });
+    return;
+  }
+  await enter(gate, script, account, session, onSignedIn);
+}
+
+/** Loads the signed-in player's save, then the game. */
+async function enter(gate, script, account, session, onSignedIn) {
   let save;
   try {
     save = await account.multiplayerSave();
