@@ -161,6 +161,11 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return r.ok ? { ok: true } : refusal(r);
     },
 
+    /** A new password from a reset link (its key and login), then signed straight in. Same answers as signUp. */
+    async confirmPasswordReset({ login, key, password }) {
+      return signedIn(await post('password-reset/confirm', { login, key, password }));
+    },
+
     /** The multiplayer save: { version, updatedAt, data } (data null before the first write). */
     async multiplayerSave() {
       const r = await call('save');

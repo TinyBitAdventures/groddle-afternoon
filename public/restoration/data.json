@@ -2040,9 +2040,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 512,
+  "commits": 513,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "Make a multiplayer character and sign in right in the game, with an email and a password"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2157,11 +2162,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Choose Solo or Multiplayer on a new game, with one save interface behind every save"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The cloud level's words show, the upgrade hand hides the Enter tip, and quest rooms name their real hubs"
    }
   ]
  },

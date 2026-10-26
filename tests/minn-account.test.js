@@ -15,9 +15,10 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=mp-login-1';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=mp-login-1';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=mp-login-1';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=mp-login-2';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=mp-login-4';
+import { FORM_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=mp-login-3';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=mp-login-3';
 import { FEATURES } from '../public/js/features/index.js';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-1';
@@ -125,6 +126,30 @@ describe('minn-account', () => {
     assert.deepEqual(await account.signOut(), { ok: true });
     assert.equal(account.nonce, '', 'signed out, no nonce is sent again');
     assert.equal(calls.filter((c) => /\/(players|session|password-reset)$/.test(c.url)).every((c) => !('username' in (c.body || {}))), true, 'no username is ever sent');
+  });
+
+  it('a reset link opens the gate on a new password: the key and login come from the fragment, then it signs in', async () => {
+    assert.deepEqual(resetLinkFrom('#reset=AbC123xyz&login=player-0123abcdef'), { key: 'AbC123xyz', login: 'player-0123abcdef' });
+    for (const bad of ['', '#new', '#reset=', '#reset=a b&login=x', '#reset=abc', '#reset=abc&login=x&more=1']) assert.equal(resetLinkFrom(bad), null, bad);
+    const calls = [];
+    const fetch = async (url, init = {}) => {
+      calls.push({ url, body: init.body ? JSON.parse(init.body) : undefined });
+      if (url.endsWith(NONCE_PATH)) return { status: 200, ok: true, headers: { get: () => null }, text: async () => 'abcdef0123' };
+      return { status: 200, ok: true, headers: { get: () => null }, json: async () => ({ signedIn: true, player: { id: 4, name: 'Rae' } }) };
+    };
+    const account = createMinnAccount({ baseUri: BASE, fetch });
+    const r = await account.confirmPasswordReset({ login: 'player-0123abcdef', key: 'AbC123xyz', password: 'zz-new-pass-1' });
+    assert.deepEqual(r, { ok: true, player: { id: 4, name: 'Rae' } });
+    assert.ok(calls[0].url.endsWith('groddle/v1/password-reset/confirm'));
+    assert.deepEqual(calls[0].body, { login: 'player-0123abcdef', key: 'AbC123xyz', password: 'zz-new-pass-1' });
+    assert.equal(account.nonce, 'abcdef0123');
+  });
+
+  it('the form copy is plain, with no em-dashes, and never says username', () => {
+    const words = JSON.stringify(FORM_COPY);
+    assert.doesNotMatch(words, /\u2014/);
+    assert.doesNotMatch(words, /user ?name/i);
+    assert.doesNotMatch(read('public/js/account-forms.js'), /name: 'username'|name: 'log'|user_login/);
   });
 
   it('a nonce from a session that ended is refused even on the open routes: asked again with none', async () => {
@@ -291,6 +316,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
       'Get /groddle/v1/me Public',
       'Get /groddle/v1/save SignedIn',
       'Post /groddle/v1/password-reset Public',
+      'Post /groddle/v1/password-reset/confirm Public',
       'Post /groddle/v1/players Public',
       'Post /groddle/v1/realtime SignedIn',
       'Post /groddle/v1/session Public',
@@ -331,7 +357,9 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
     assert.match(acct, /public const ROLE = 'subscriber';/, 'players never edit, so they never get the Minn bar');
     assert.match(acct, /LOWER\(display_name\) = LOWER\(\?\)/, 'no two players share a name');
     assert.match(acct, /->signIn\(\$answer, \$email, \$password\)/, 'sign-in is by email');
-    assert.doesNotMatch(acct, /\$body\['(?:login|username)'\]/, 'no route reads a username');
+    assert.ok(acct.includes("'/play/online/'") && acct.includes("$page . '#reset=' . rawurlencode($key) . '&login=' . rawurlencode($login)"), 'a reset link opens the game, the key in the fragment');
+    assert.doesNotMatch(acct, /\$body\['username'\]/, 'no route reads a username');
+    assert.equal(acct.match(/\$body\['login'\]/g)?.length, 1, 'only the reset confirm reads a login: the one the mailed link carried');
     assert.match(src('Player.php'), /'name' => \$user->displayName !== '' \? \$user->displayName : \$user->login/);
   });
 
@@ -342,6 +370,21 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
   });
 
   const engine = process.env.MINN_ENGINE_DIR || join(homedir(), 'Cove/Sites/minn-engine.localhost/public/minn');
+  it('the reset email: HTML in the site\'s look, from Groddle Afternoon, the character named and escaped, the username only inside the link', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
+    const mail = JSON.parse(execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/player-mail.php'), engine, ext], { encoding: 'utf8' }));
+    assert.equal(mail.subject, 'Reset your Groddle Afternoon password');
+    assert.deepEqual(mail.headers, ['Content-Type: text/html; charset=UTF-8', 'From: Groddle Afternoon <noreply@groddle.example>']);
+    assert.equal(mail.named[1], 'From: Groddle Afternoon <hello@groddle.example>', 'groddle_mail_from names the address');
+    assert.equal(mail.bad[1], 'From: Groddle Afternoon <noreply@groddle.example>', 'an option that is not an address falls back');
+    assert.match(mail.html, /Hi <strong>Zz &lt;b&gt;Bold&lt;\/b&gt; &amp; Co<\/strong>,/, 'the character name is escaped');
+    assert.match(mail.html, /href="https:\/\/groddle\.example\/play\/online\/#reset=AbC123&amp;login=player-0123abcdef"/);
+    assert.match(mail.html, /src="https:\/\/groddle\.example\/apple-touch-icon\.png"/, 'the quoin from the site, absolute');
+    assert.match(mail.html, /background:#dcefc9/, 'the site\'s moss background');
+    assert.match(mail.html, /background:#e58b3f/, 'the orange Play button');
+    const outsideLink = mail.html.replaceAll(/#reset=[^"<]+/g, '');
+    assert.doesNotMatch(outsideLink, /player-[0-9a-f]{10}|username/i, 'no username anywhere but the link');
+    assert.doesNotMatch(mail.html, /\u2014/, 'no em-dashes');
+  });
   it('SaveShape checks the shape and the size, nothing more (php, when the engine is here)', { skip: !existsSync(join(engine, 'src/Minn/Autoloader.php')) && 'Minn Engine not found (set MINN_ENGINE_DIR)' }, () => {
     const out = execFileSync('php', [join(root, 'tests/fixtures/minn-accounts/save-shape.php'), engine, ext], { encoding: 'utf8' });
     const rows = JSON.parse(out);

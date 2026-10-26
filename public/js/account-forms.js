@@ -11,9 +11,13 @@
  * name other players see. The account's username is made up by the site and
  * never shown. A hidden "website" field catches form-filling scripts.
  *
- * mountAccountForms(host, { account, start, onSignedIn }) replaces host's
- * children; onSignedIn({ player, how: 'signin' | 'signup' }) runs once the
- * session and its nonce are in place.
+ * A password reset mails a link back to /play/online/#reset=<key>&login=<login>;
+ * resetLinkFrom(hash) reads it and the gate opens on Choose a new password,
+ * which saves it and signs the player in.
+ *
+ * mountAccountForms(host, { account, start, reset, onSignedIn }) replaces
+ * host's children; onSignedIn({ player, how: 'signin' | 'signup' | 'reset' })
+ * runs once the session and its nonce are in place.
  */
 
 /** The form copy (plain remake copy, no em-dashes). */
@@ -35,12 +39,31 @@ export const FORM_COPY = Object.freeze({
     sent: 'If that email has a character, a reset link is on its way. Check your inbox.',
     back: 'Back to sign in',
   },
+  reset: {
+    title: 'Choose a new password',
+    body: 'Then you\'re signed straight in.',
+    submit: 'Save and sign in',
+    busy: 'Saving…',
+    again: 'Ask for a new link',
+  },
 });
+
+/** The reset link's key and login from a location hash (#reset=<key>&login=<login>), or null. */
+export function resetLinkFrom(hash) {
+  const m = /^#reset=([A-Za-z0-9]+)&login=([^&]+)$/.exec(String(hash || ''));
+  if (!m) return null;
+  try {
+    return { key: m[1], login: decodeURIComponent(m[2]) };
+  } catch {
+    return null;
+  }
+}
 
 const STYLE_ID = 'account-forms-css';
 const STYLE = `
 .acct-forms { text-align: left; }
 .acct-tabs { display: flex; gap: 0.3rem; margin: 0.4rem 0 0.8rem; padding: 0.25rem; border-radius: 12px; background: #e9f1dd; }
+.acct-tabs[hidden] { display: none; }
 .acct-tabs button { flex: 1; border: 0; border-radius: 9px; padding: 0.5rem 0.6rem; font: inherit; font-weight: 700; cursor: pointer;
   color: #2e5a20; background: transparent; box-shadow: none; }
 .acct-tabs button[aria-selected="true"] { color: #24401b; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18); }
@@ -99,10 +122,10 @@ function field(id, label, attrs, help = '') {
 /**
  * Draws the forms into host.
  * @param {HTMLElement} host
- * @param {{ account: object, start?: 'signin' | 'signup', onSignedIn?: (r: { player: object, how: string }) => void }} opts
+ * @param {{ account: object, start?: 'signin' | 'signup', reset?: { key: string, login: string } | null, onSignedIn?: (r: { player: object, how: string }) => void }} opts
  *   account: createMinnAccount() from js/minn-account.js
  */
-export function mountAccountForms(host, { account, start = 'signin', onSignedIn = () => {} } = {}) {
+export function mountAccountForms(host, { account, start = 'signin', reset = null, onSignedIn = () => {} } = {}) {
   if (!document.getElementById(STYLE_ID)) {
     const style = el('style', { id: STYLE_ID });
     style.textContent = STYLE;
@@ -147,6 +170,13 @@ export function mountAccountForms(host, { account, start = 'signin', onSignedIn 
   const backLink = el('button', { type: 'button', class: 'acct-link', 'data-account-back': '' }, FORM_COPY.forgot.back);
   forgot.append(el('strong', {}, FORM_COPY.forgot.title), el('p', { class: 'acct-message' }, FORM_COPY.forgot.body), fgEmail.wrap, fgSubmit, backLink);
 
+  // Choose a new password (from a reset link)
+  const renew = el('form', { class: 'acct-form', id: `acct-reset-${n}`, 'data-form': 'reset', novalidate: true, hidden: true });
+  const rsPass = field(`acct-rs-pass-${n}`, 'New password', { name: 'password', type: 'password', autocomplete: 'new-password', minlength: '8', required: true }, FORM_COPY.signup.passwordHelp);
+  const rsSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'reset' }, FORM_COPY.reset.submit);
+  const againLink = el('button', { type: 'button', class: 'acct-link', 'data-account-again': '' }, FORM_COPY.reset.again);
+  renew.append(el('strong', {}, FORM_COPY.reset.title), el('p', { class: 'acct-message' }, FORM_COPY.reset.body), rsPass.wrap, rsSubmit, againLink);
+
   const panels = { signin, signup };
   const tabButtons = {};
   for (const key of ['signin', 'signup']) {
@@ -172,7 +202,7 @@ export function mountAccountForms(host, { account, start = 'signin', onSignedIn 
 
   function show(which, { focus = false } = {}) {
     say('');
-    tabs.hidden = which === 'forgot';
+    tabs.hidden = which === 'forgot' || which === 'reset';
     for (const [key, b] of Object.entries(tabButtons)) {
       b.setAttribute('aria-selected', String(key === which));
       b.tabIndex = key === which ? 0 : -1;
@@ -180,8 +210,9 @@ export function mountAccountForms(host, { account, start = 'signin', onSignedIn 
     signin.hidden = which !== 'signin';
     signup.hidden = which !== 'signup';
     forgot.hidden = which !== 'forgot';
+    renew.hidden = which !== 'reset';
     root.dataset.showing = which;
-    if (focus) ({ signin: siEmail, signup: suEmail, forgot: fgEmail })[which].input.focus();
+    if (focus) ({ signin: siEmail, signup: suEmail, forgot: fgEmail, reset: rsPass })[which].input.focus();
   }
 
   /** The site's refusals on their fields; the first bad field takes the focus. */
@@ -262,14 +293,27 @@ export function mountAccountForms(host, { account, start = 'signin', onSignedIn 
     });
   });
 
+  renew.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submit(renew, rsSubmit, FORM_COPY.reset.busy, async () => {
+      const password = rsPass.input.value;
+      if (password.length < 8) return showRefusal({ fields: { password: 'Passwords need at least 8 characters.' } }, { password: rsPass });
+      const r = await account.confirmPasswordReset({ ...reset, password });
+      if (!r.ok) return showRefusal(r, { password: rsPass });
+      root.dataset.signedIn = 'true';
+      onSignedIn({ player: r.player, how: 'reset' });
+    });
+  });
+  againLink.addEventListener('click', () => show('forgot', { focus: true }));
+
   forgotLink.addEventListener('click', () => {
     fgEmail.input.value = siEmail.input.value;
     show('forgot', { focus: true });
   });
   backLink.addEventListener('click', () => show('signin', { focus: true }));
 
-  root.append(tabs, message, signin, signup, forgot);
+  root.append(tabs, message, signin, signup, forgot, renew);
   host.replaceChildren(root);
-  show(start === 'signup' ? 'signup' : 'signin');
+  show(reset ? 'reset' : start === 'signup' ? 'signup' : 'signin');
   return { root, show };
 }

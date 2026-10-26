@@ -13,8 +13,8 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccount } from './minn-account.js?v=mp-login-1';
-import { mountAccountForms } from './account-forms.js?v=mp-login-1';
+import { createMinnAccount } from './minn-account.js?v=mp-login-2';
+import { mountAccountForms, resetLinkFrom } from './account-forms.js?v=mp-login-3';
 
 const PILL_TEXT = {
   saved: 'Saved',
@@ -88,8 +88,8 @@ function showGate(gate, state, { account, onSignedIn }) {
   if (state === 'signed-out') {
     const host = el('div', { class: 'online-account' });
     card.append(host);
-    // A link from the site can open the gate on New player: /play/online/#new
-    mountAccountForms(host, { account, start: location.hash === '#new' ? 'signup' : 'signin', onSignedIn });
+    // A link from the site can open the gate on New player (/play/online/#new); a reset email opens it on a new password.
+    mountAccountForms(host, { account, start: location.hash === '#new' ? 'signup' : 'signin', reset: resetLinkFrom(location.hash), onSignedIn });
   }
   if (state === 'offline' || state === 'load-failed') {
     const retry = el('button', { type: 'button', class: 'online-play', 'data-online-retry': '' }, 'Try again');
@@ -143,11 +143,18 @@ async function boot() {
   gate.dataset.online = 'ready';
   document.body.classList.remove('online-gated');
   mountSavePill(session.player);
-  if (location.hash === '#new') history.replaceState(history.state, '', location.pathname);
+  // The reset key is spent once signed in: it leaves the address bar too.
+  if (location.hash === '#new' || location.hash.startsWith('#reset=')) history.replaceState(history.state, '', location.pathname);
   const game = document.createElement('script');
   game.type = 'module';
   game.src = script.dataset.game;
   document.body.append(game);
 }
 
-if (typeof document !== 'undefined' && document.getElementById('online-boot')) boot();
+if (typeof document !== 'undefined' && document.getElementById('online-boot')) {
+  boot();
+  // A reset link opened in a tab already on the gate changes only the hash: show its form.
+  window.addEventListener('hashchange', () => {
+    if (document.getElementById('online-gate')?.dataset.online === 'signed-out' && resetLinkFrom(location.hash)) boot();
+  });
+}

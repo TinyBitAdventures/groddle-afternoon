@@ -129,5 +129,5 @@ import { partyFeature } from './party-feature.js?v=mp4-1'; FEATURES.push(partyFe
 import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=mp4-1'; FEATURES.push(sharedQuoinsFeature);
 import { tradeFeature } from './trade-feature.js?v=mp4-1'; FEATURES.push(tradeFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=mp4-1'; FEATURES.push(streetObjectsFeature);
-import { realtimeFeature } from './realtime-feature.js?v=mp3-4'; FEATURES.push(realtimeFeature);
-import { accountBackupFeature } from './account-backup-feature.js?v=mp-login-1'; FEATURES.push(accountBackupFeature);
+import { realtimeFeature } from './realtime-feature.js?v=mp3-5'; FEATURES.push(realtimeFeature);
+import { accountBackupFeature } from './account-backup-feature.js?v=mp-login-3'; FEATURES.push(accountBackupFeature);
