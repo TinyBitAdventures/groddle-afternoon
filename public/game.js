@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-14';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-146';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-147';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -5455,6 +5455,8 @@ function beginVerbAction(target, verb) {
 
 function cancelCurrentAction(opts = {}) {
   if (!currentAction || currentAction.status !== 'running') return false;
+  // Help mine in multiplayer: a cancelled swing leaves the rock's crew (features/help-mine-feature.js).
+  features.query('verbCancelled', currentAction.target, currentAction.verbId, engine);
   stopTrantHarvestAnimation(currentAction.target, 'cancelled');
   if (currentAction.target === rookEggTarget) resetRookEggSmashVisual();
   currentAction = cancelTimedAction(currentAction);

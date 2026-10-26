@@ -323,3 +323,76 @@ describe('features/help-mine-feature.js', () => {
     assert.match(game, /features\.query\('rockMined', target, result, engine\);\s*refreshMineRockVisual\(target\);/);
   });
 });
+
+describe('features/help-mine-feature.js in multiplayer (the realtime server keeps the crew)', () => {
+  async function stageShared({ miners = [], help = null } = {}) {
+    const mod = await import(`../public/js/features/help-mine-feature.js?v=test-${Math.random()}`);
+    const feature = mod.helpMineFeature;
+    const rock = createMineRock('rock_metal_1');
+    const rockTarget = { classId: 'rock_metal_1', rockIndex: 1, state: { rock }, sprite: { x: 600, y: 600, destroyed: false } };
+    const sent = [];
+    const log = [];
+    const events = [];
+    const data = {};
+    const crew = { miners };
+    const engine = {
+      mode: 'multiplayer',
+      started: true,
+      player: { x: 560, y: 600 },
+      pc: { energy: 100 },
+      inv: { pick: 1 },
+      learnedSkills: ['mining_1'],
+      interactables: [rockTarget],
+      localCompanions: [],
+      questState: createQuestState(),
+      currentAction: null,
+      acting: () => false,
+      busy: () => false,
+      param: () => null,
+      setData: (k, v) => { data[k] = String(v); },
+      pushActivity: (line) => log.push(line),
+      floatText() {},
+      refreshPack() {},
+      achievement: (counter, n) => events.push([counter, n]),
+      query(name, ...args) {
+        if (name === 'realtimeClient') return { me: { id: 7 } };
+        if (name === 'sharedMiners') return crew.miners;
+        if (name === 'sharedMineSwing') { sent.push(args[1]); return true; }
+        if (name === 'sharedVerbGrant') return { chunks: 5, help };
+        return undefined;
+      },
+    };
+    feature.onStreetEnter({}, engine);
+    return { feature, engine, rock, rockTarget, sent, log, events, data, crew };
+  }
+
+  it('labels the verb help mine only while someone else swings', async () => {
+    const s = await stageShared({ miners: [7] });
+    assert.equal(s.feature.decorateVerbs(s.rockTarget, [{ id: 'mine', label: 'mine' }], s.engine), null, 'only you: plain mine');
+    s.crew.miners = [3, 7];
+    assert.deepEqual(s.feature.decorateVerbs(s.rockTarget, [{ id: 'mine', label: 'mine' }], s.engine), [{ id: 'mine', label: 'help mine' }]);
+  });
+
+  it('tells the server a swing starts and is cancelled, and never cancels a swing that landed', async () => {
+    const s = await stageShared({ miners: [] });
+    s.feature.verbStarted(s.rockTarget, { id: 'mine' }, s.engine);
+    s.feature.onTick(16, Date.now(), s.engine); // no running action: solo would read this as a cancel
+    s.feature.verbCancelled(s.rockTarget, 'mine', s.engine);
+    assert.deepEqual(s.sent, ['start', 'stop']);
+    s.feature.verbStarted(s.rockTarget, { id: 'mine' }, s.engine);
+    s.feature.rockMined(s.rockTarget, { ok: true, rock: s.rock }, s.engine);
+    s.feature.verbCancelled(s.rockTarget, 'mine', s.engine);
+    assert.deepEqual(s.sent, ['start', 'stop', 'start'], 'a landed swing is over: nothing to cancel');
+  });
+
+  it('adds the server\'s help bonus in the source words, and a helper counts for I Me Mine', async () => {
+    const s = await stageShared({ miners: [3], help: { bonus: 3, by: ['Ada', 'Bo'] } });
+    const before = s.engine.inv[s.rock.chunkId] || 0;
+    s.feature.verbStarted(s.rockTarget, { id: 'mine' }, s.engine);
+    s.feature.rockMined(s.rockTarget, { ok: true, rock: s.rock }, s.engine);
+    assert.equal((s.engine.inv[s.rock.chunkId] || 0) - before, 3);
+    assert.match(s.log.at(-1), /^You got 3 additional .+ with the help you received from Ada, and Bo\.$/, 'getHelpString 25-50: ", and " before the last name');
+    assert.deepEqual(s.events, [['help_mine', 1]], 'you helped Ada: I Me Mine counts it');
+    assert.equal(s.data.helpMineLast, 'bonus:3:Ada,Bo');
+  });
+});

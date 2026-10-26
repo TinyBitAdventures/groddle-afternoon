@@ -14,6 +14,14 @@
  *     help bonus) but always leave COMPANION_MINE_RULES.leaveChunks, and a
  *     companion called away (a Feat, the bear, a quoin) stops at once.
  *
+ * In multiplayer the crew is real players and the realtime server keeps it
+ * (groddle-afternoon-server objects.go, through street-objects-feature's
+ * sharedMineSwing / sharedMiners / sharedVerbGrant): your swing at a shared
+ * rock tells the server it starts (or is cancelled, game.js verbCancelled);
+ * "help mine" shows while someone else swings; your landed swing's answer
+ * carries the bonus from everyone who helped, and the line names them.
+ * Companions stay solo stand-ins.
+ *
  * Companions are opt-in (?companions=1, game.js localCompanionsEnabled).
  * Hooks from game.js: engine.query('verbStarted', target, verb, engine) as a
  * timed verb begins, engine.query('rockMined', target, result, engine) after
@@ -324,6 +332,46 @@ function lookForRocks(now, engine) {
   }
 }
 
+/** Multiplayer with the realtime server: the crew is the server's, made of real players. */
+function sharedCrew(engine, target) {
+  if (engine.mode !== 'multiplayer' || !engine.query?.('realtimeClient')) return null;
+  const miners = engine.query('sharedMiners', target);
+  if (!Array.isArray(miners)) return null;
+  const me = Number(engine.query('realtimeClient')?.me?.id) || 0;
+  return { miners, others: miners.filter((id) => id !== me) };
+}
+
+/** Your swing at a shared rock begins: the server adds you to its crew. */
+function sharedStarts(target, crew, engine) {
+  playerAt = { target, helping: crew.others.length > 0, shared: true };
+  engine.query('sharedMineSwing', target, 'start');
+  engine.setData('helpMineCrew', `shared:${crew.miners.length + 1}`);
+}
+
+/** Your shared swing lands: the bonus is the server's (mining.js 327-383), from everyone who helped. */
+function sharedMined(target, result, engine) {
+  const rock = result?.rock || target.state.rock;
+  const help = engine.query('sharedVerbGrant', target, 'mine')?.help;
+  const bonus = Math.max(0, Math.floor(Number(help?.bonus) || 0));
+  if (bonus > 0) {
+    addItem(engine.inv, rock.chunkId, bonus);
+    const names = Array.isArray(help.by) ? help.by.map(String) : [];
+    engine.pushActivity(helpBonusMessage(rock.rockType, bonus, names));
+    engine.floatText?.(target.sprite.x, target.sprite.y - 120, `+${bonus}`, 0xfff4d6);
+    engine.setData('helpMineLast', `bonus:${bonus}:${names.join(',')}`);
+    engine.refreshPack?.();
+  }
+  const helping = playerAt?.target === target && playerAt.helping;
+  playerAt = null;
+  if (helping) {
+    helps += 1;
+    engine.setData('helpMineHelps', String(helps));
+    if (bonus <= 0) engine.setData('helpMineLast', 'helped');
+    engine.achievement(HELP_MINE_COUNTER, 1);
+    publishQuest(engine);
+  }
+}
+
 /** Your swing begins: are you helping, and does anyone join you? */
 function playerStarts(target, engine, now = Date.now()) {
   const crew = crewOf(target);
@@ -396,7 +444,8 @@ function playerMined(target, result, engine) {
 
 /** mining.js miningSanityCheck: you are off the rock once your swing is no longer running. */
 function sanity(engine) {
-  if (!playerAt) return;
+  // A shared swing ends by landing (sharedMined) or by verbCancelled; the server keeps the crew.
+  if (!playerAt || playerAt.shared) return;
   const action = engine.currentAction;
   if (action && action.target === playerAt.target && String(action.verbId).split(':')[0] === 'mine') return;
   const crew = crews.get(playerAt.target);
@@ -529,6 +578,12 @@ export const helpMineFeature = {
   /** mining.js getVerbLabel: "help mine" while a companion works the rock. */
   decorateVerbs(target, verbs, engine) {
     if (!isRock(target)) return null;
+    const shared = sharedCrew(engine, target);
+    if (shared) {
+      if (!shared.others.length) return null;
+      engine.setData('helpMineLabel', 'help mine');
+      return verbs.map((v) => (v.id === 'mine' ? { ...v, label: 'help mine' } : v));
+    }
     const crew = crews.get(target);
     if (!crew || mineVerbLabel(crew, PLAYER_MINER) !== 'Help mine') return null;
     engine.setData('helpMineLabel', 'help mine');
@@ -536,12 +591,25 @@ export const helpMineFeature = {
   },
 
   verbStarted(target, verb, engine) {
-    if (isRock(target) && verb?.id === 'mine') playerStarts(target, engine);
+    if (!isRock(target) || verb?.id !== 'mine') return undefined;
+    const shared = sharedCrew(engine, target);
+    if (shared) sharedStarts(target, shared, engine);
+    else playerStarts(target, engine);
+    return undefined;
+  },
+
+  verbCancelled(target, verbId, engine) {
+    if (playerAt?.shared && playerAt.target === target && String(verbId).split(':')[0] === 'mine') {
+      engine.query('sharedMineSwing', target, 'stop');
+      playerAt = null;
+    }
     return undefined;
   },
 
   rockMined(target, result, engine) {
-    if (isRock(target)) playerMined(target, result, engine);
+    if (!isRock(target)) return undefined;
+    if (playerAt?.shared && playerAt.target === target) sharedMined(target, result, engine);
+    else playerMined(target, result, engine);
     return undefined;
   },
 };

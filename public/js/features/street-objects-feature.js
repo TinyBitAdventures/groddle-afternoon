@@ -23,6 +23,10 @@
  * waits ("The street is still connecting."); with no realtime on the site,
  * or this window replaced by another, the local rules apply.
  *
+ * - Help mine: help-mine-feature tells the server when a mining swing starts
+ *   or is cancelled (sharedMineSwing), reads who is swinging (sharedMiners)
+ *   and the help bonus with the swing's grant (sharedVerbGrant().help).
+ *
  * QA: canvas data streetObjects (street:snap|none|waiting), streetObjectsLast
  * (id:verb:ok|code), streetObjectsShared (shared objects on this street),
  * streetObjectsView (each as this client has it: rock:1=43, tree:0=98pw).
@@ -251,7 +255,7 @@ function answered(engine, msg, ok) {
   if (!obj) return;
   // The local rules run on the state the server decided from, with its rolls.
   if (msg.before) applyKnown(obj, msg.before);
-  grant = { target: p.target, verbId: p.verbId, roll: Number(msg.roll), chunks: Number.isInteger(msg.chunks) ? msg.chunks : undefined };
+  grant = { target: p.target, verbId: p.verbId, roll: Number(msg.roll), chunks: Number.isInteger(msg.chunks) ? msg.chunks : undefined, help: msg.help && typeof msg.help === 'object' ? msg.help : null };
   try {
     engine.executeVerb?.(p.target, p.verbId, { animated: true });
   } finally {
@@ -345,7 +349,20 @@ export const streetObjectsFeature = {
   /** game.js runVerb: the server's rolls for the verb it just allowed. */
   sharedVerbGrant(target, verbId) {
     if (!grant || grant.target !== target || grant.verbId !== verbId) return null;
-    return { roll: Number.isFinite(grant.roll) ? grant.roll : undefined, chunks: grant.chunks };
+    return { roll: Number.isFinite(grant.roll) ? grant.roll : undefined, chunks: grant.chunks, help: grant.help };
+  },
+
+  /** Help mine (features/help-mine-feature.js): who the server says is swinging at a shared rock, or null. */
+  sharedMiners(target) {
+    if (!client || !copy.snap || !Number.isInteger(target?.rockIndex)) return null;
+    const s = stateFor(copy, rockId(target.rockIndex));
+    return Array.isArray(s?.miners) ? s.miners.map(Number) : [];
+  },
+
+  /** Help mine: tell the server a swing at a shared rock starts or stops (objects.go obj_mine). */
+  sharedMineSwing(target, what) {
+    if (!client || !Number.isInteger(target?.rockIndex) || (what !== 'start' && what !== 'stop')) return false;
+    return client.send('obj_mine', { id: rockId(target.rockIndex), do: what }) !== false;
   },
 
   /** QA / tests. */

@@ -37,7 +37,7 @@ import {
   treeReady,
   treeSkill,
 } from '../public/js/street-objects.js?v=mp4-1';
-import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=mp4-1';
+import { streetObjectsFeature } from '../public/js/features/street-objects-feature.js?v=g334-2';
 import { FEATURES } from '../public/js/features/index.js';
 import { createMineRock, mineRock } from '../public/js/mining.js?v=g330-1';
 import { createResourceNode } from '../public/js/resource-nodes.js';
@@ -248,7 +248,7 @@ describe('street objects: the feature', () => {
   it('is registered just before the realtime feature', () => {
     const ids = FEATURES.map((f) => f.id);
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'));
-    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=mp4-1/);
+    assert.match(read('public/js/features/index.js'), /street-objects-feature\.js\?v=g334-2/);
   });
 
   it('asks for the street on joining, and waits for it', () => {
@@ -275,7 +275,7 @@ describe('street objects: the feature', () => {
     assert.deepEqual(r.engine.toasts, [COPY.busy], 'one request per object at a time');
     r.client.emit('msg:obj_ok', { t: 'obj_ok', req: 1, id: 'rock:1', verb: 'mine', before: { id: 'rock:1', chunks: 12, mega: false, in: 0 }, obj: { id: 'rock:1', chunks: 5, mega: false, in: 0 }, chunks: 7 });
     const exec = r.calls.find((c) => c[0] === 'execute');
-    assert.deepEqual(exec, ['execute', 'mine', true, { roll: undefined, chunks: 7 }]);
+    assert.deepEqual(exec, ['execute', 'mine', true, { roll: undefined, chunks: 7, help: null }]);
     assert.equal(r.rock.chunksRemaining, 5);
     assert.equal(r.engine.inv.dullite, 7, 'the reward the server rolled');
     assert.equal(streetObjectsFeature.sharedVerbGrant(r.rockT, 'mine'), null, 'the grant is spent');
@@ -303,7 +303,7 @@ describe('street objects: the feature', () => {
     assert.deepEqual(r.sent.at(-1), { t: 'obj_act', req: 1, id: 'tree:0', verb: 'pet', skill: 'no_skill' });
     const before = { id: 'tree:0', fruit: 50, cap: 98, health: 7, maturity: 10, petted: false, watered: false };
     r.client.emit('msg:obj_ok', { t: 'obj_ok', req: 1, id: 'tree:0', verb: 'pet', before, obj: { ...before, petted: true }, roll: 0.25, success: true });
-    assert.deepEqual(r.calls.find((c) => c[0] === 'execute')[3], { roll: 0.25, chunks: undefined });
+    assert.deepEqual(r.calls.find((c) => c[0] === 'execute')[3], { roll: 0.25, chunks: undefined, help: null });
     assert.equal(r.tree.petted, true);
     r.client.emit('msg:objs', { t: 'objs', street: 'GSTREET', objs: [{ ...before, fruit: 20, petted: true, watered: true, health: 8 }] });
     streetObjectsFeature.onTick(16, 0, r.engine);
