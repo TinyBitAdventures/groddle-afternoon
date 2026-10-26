@@ -2041,9 +2041,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 527,
+  "commits": 528,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "improve",
+    "text": "First Eleven Skills comes at the eleventh skill you learn, in solo too"
+   },
    {
     "date": "2026-10-26",
     "kind": "fix",
@@ -2158,11 +2163,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "A Multiplayer item in the Menu, and folder links work without their slash"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "In multiplayer, quoins, rocks, resource nodes and trees are shared by everyone on the street"
    }
   ]
  },
