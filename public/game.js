@@ -7872,6 +7872,19 @@ function anyTransientInstance() {
 }
 
 /** The engine API features use instead of reaching into game.js state. */
+
+/**
+ * An open panel on screen. A panel counts only when it is drawn: the Account
+ * panel lives inside a hidden shade without a hidden attribute of its own, and
+ * counting it made the game busy for good on the Groddle site (G338 lane).
+ */
+function panelOnScreen() {
+  if (typeof document === 'undefined') return false;
+  const sel = '.glitch-modal:not([hidden]), [id$="-panel"]:not([hidden])';
+  const found = document.querySelectorAll ? [...document.querySelectorAll(sel)] : [document.querySelector(sel)].filter(Boolean);
+  return found.some((n) => typeof n.getClientRects !== 'function' || n.getClientRects().length > 0);
+}
+
 const engine = {
   PIXI,
   /** 'solo' | 'multiplayer' (js/game-mode.js); solo everywhere until multiplayer opens. */
@@ -8109,7 +8122,7 @@ const engine = {
         engine.instanceHold ||
         (!ignoreHome && homeIsInstanced()) ||
         // Any open panel (Feat, quests, make, vendor, map, mailbox, ...).
-        document.querySelector('.glitch-modal:not([hidden]), [id$="-panel"]:not([hidden])')
+        panelOnScreen()
     );
   },
   /** A verb in progress or the verb menu open (both interrupt meditation). */
