@@ -105,6 +105,26 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
 
   const failed = (what, r) => Object.assign(new Error(`${what} failed (${r.status}${r.data?.code ? ` ${r.data.code}` : ''})`), { status: r.status, code: r.data?.code || '', data: r.data });
 
+  /** A signed-in call that refreshes a stale nonce once (as realtimeTicket does) and throws on a refusal. */
+  async function buddyCall(what, path, init = {}) {
+    let r;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        r = await call(path, init);
+      } catch {
+        throw Object.assign(new Error('The Groddle site is not answering'), { status: 0, code: 'offline', message: 'The Groddle site is not answering. Try again in a moment.' });
+      }
+      if (r.status === 403 && r.data?.code === 'rest_cookie_invalid_nonce' && attempt === 0 && (await refreshNonce())) continue;
+      break;
+    }
+    if (!r.ok) {
+      const err = failed(what, r);
+      if (typeof r.data?.message === 'string') err.message = r.data.message;
+      throw err;
+    }
+    return r.data;
+  }
+
   return {
     urls,
     get nonce() { return nonce; },
@@ -214,6 +234,34 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       }
       if (!r.ok || typeof r.data?.ticket !== 'string') throw failed('Asking for a realtime ticket', r);
       return r.data;
+    },
+
+    /**
+     * Buddies (register G325, groddle-afternoon-site/src/Buddies.php): each
+     * call answers the whole list, { limit, group, buddies, reverse,
+     * ignoring, watch: { token, expiresIn } }, the token being what the
+     * realtime server watches (buddies_watch). addBuddy also answers told,
+     * the proof for buddy_tell. A refusal throws with .status, .code and the
+     * site's .message.
+     */
+    async buddies() {
+      return buddyCall('Loading buddies', 'buddies');
+    },
+
+    async addBuddy(id) {
+      return buddyCall('Adding a buddy', 'buddies', { method: 'POST', body: { id: Number(id) } });
+    },
+
+    async removeBuddy(id) {
+      return buddyCall('Removing a buddy', `buddies/${Number(id)}`, { method: 'DELETE' });
+    },
+
+    async ignorePlayer(id) {
+      return buddyCall('Blocking', 'buddies/ignores', { method: 'POST', body: { id: Number(id) } });
+    },
+
+    async unignorePlayer(id) {
+      return buddyCall('Un-blocking', `buddies/ignores/${Number(id)}`, { method: 'DELETE' });
     },
 
     async deleteBackup(slot) {

@@ -25,7 +25,7 @@
  * realtimeStreet, realtimeLastSaid; window.groddleRealtime in multiplayer.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=mp-login-2';
+import { createMinnAccount } from '../minn-account.js?v=g325-1';
 import { EMOTES, createRealtimeClient, createTrack, pushSample, sampleTrack } from '../realtime-client.js?v=mp3-2';
 import { ANIM_FPS, EMOTION_MS, animForState, crowdScaleX } from '../avatar-anims.js';
 
@@ -339,6 +339,8 @@ function createSession(engine) {
     if (r) pushSample(r.track, { x: p.x, y: p.y, dir: p.dir, anim: p.anim }, performance.now());
   });
   client.on('said', ({ id, name, text, mine }) => {
+    // A blocked player's words never reach you (buddies-feature: the source's buddy_ignore).
+    if (!mine && engine.query?.('realtimeHidden', id)) return;
     addLog({ name, text });
     engine.setData?.('realtimeLastSaid', `${name}:${text}`);
     if (mine) return;
@@ -347,6 +349,7 @@ function createSession(engine) {
     engine.chatLine?.(name, text);
   });
   client.on('emoted', ({ id, e }) => {
+    if (engine.query?.('realtimeHidden', id)) return;
     const r = remotes.get(id);
     if (!r) return;
     r.emote = e;

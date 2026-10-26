@@ -15,10 +15,10 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=mp-login-2';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=mp-login-4';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=g325-1';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=g325-1';
 import { FORM_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=mp-login-3';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=mp-login-3';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g325-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-1';
@@ -289,8 +289,8 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
   const manifest = HAS_SITE ? JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8')) : {};
   const src = (f) => readFileSync(join(ext, 'src', f), 'utf8');
 
-  it('declares its two tables under its own names, with the keys the routes rely on', () => {
-    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_mp_saves', 'groddle_players', 'groddle_solo_backups']);
+  it('declares its tables under its own names, with the keys the routes rely on', () => {
+    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_buddies', 'groddle_ignores', 'groddle_mp_saves', 'groddle_players', 'groddle_solo_backups']);
     assert.ok(manifest.tables.groddle_players.includes('UNIQUE KEY name_key (name_key)'), 'no two characters share a name, whatever its letter case');
     assert.ok(manifest.tables.groddle_mp_saves.includes('PRIMARY KEY  (user_id)'), 'one multiplayer save per user');
     assert.ok(manifest.tables.groddle_solo_backups.includes('PRIMARY KEY  (user_id,slot)'), 'one backup per slot');
@@ -303,19 +303,24 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
     assert.deepEqual(entries, [...SAVE_ENTRY_NAMES]);
   });
 
-  it('registers groddle/v1 REST routes: me open to anyone, every save, backup and realtime route signed-in', () => {
-    assert.match(src('Extension.php'), /\$minn->rest\(new Player\(\$minn\), new PlayerAccount\(\$minn\), new MultiplayerSave\(\$minn\), new SoloBackups\(\$minn\), new RealtimeTicket\(\$minn\)\);/);
+  it('registers groddle/v1 REST routes: me open to anyone, every save, backup, realtime and buddy route signed-in', () => {
+    assert.match(src('Extension.php'), /\$minn->rest\(new Player\(\$minn\), new PlayerAccount\(\$minn\), new MultiplayerSave\(\$minn\), new SoloBackups\(\$minn\), new RealtimeTicket\(\$minn\), new Buddies\(\$minn\)\);/);
     const routes = [];
-    for (const f of ['Player.php', 'PlayerAccount.php', 'MultiplayerSave.php', 'SoloBackups.php', 'RealtimeTicket.php']) {
+    for (const f of ['Player.php', 'PlayerAccount.php', 'MultiplayerSave.php', 'SoloBackups.php', 'RealtimeTicket.php', 'Buddies.php']) {
       for (const m of src(f).matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]/g)) routes.push(`${m[1]} ${m[2]} ${m[3]}`);
     }
     assert.deepEqual(routes.sort(), [
       'Delete /groddle/v1/backups/{slot:\\d+} SignedIn',
+      'Delete /groddle/v1/buddies/ignores/{id:\\d+} SignedIn',
+      'Delete /groddle/v1/buddies/{id:\\d+} SignedIn',
       'Delete /groddle/v1/session Public',
       'Get /groddle/v1/backups SignedIn',
       'Get /groddle/v1/backups/{slot:\\d+} SignedIn',
+      'Get /groddle/v1/buddies SignedIn',
       'Get /groddle/v1/me Public',
       'Get /groddle/v1/save SignedIn',
+      'Post /groddle/v1/buddies SignedIn',
+      'Post /groddle/v1/buddies/ignores SignedIn',
       'Post /groddle/v1/password-reset Public',
       'Post /groddle/v1/password-reset/confirm Public',
       'Post /groddle/v1/players Public',

@@ -232,8 +232,8 @@ export const CHECKLIST = Object.freeze([
     blurb: 'A crafting robot delivered in a box by your Magic Rock: queue jobs and it fetches the ingredients and tools, crafts every step, burns fuel and crystals, and hands you the results.',
     evidence: ['public/js/craftybot.js', 'public/js/features/craftybot-feature.js', 'public/assets/content/craftybot-specs.json'] },
   { id: 'chat', group: 'home', name: 'Other players and chat', status: 'progress',
-    blurb: 'Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, and form a party with its own chat. Global chat, groups and buddy lists are not here yet.',
-    evidence: ['public/js/realtime-client.js', 'public/js/features/realtime-feature.js', 'public/js/features/party-feature.js', 'public/js/account-forms.js'] },
+    blurb: 'Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global chat and groups are not here yet.',
+    evidence: ['public/js/realtime-client.js', 'public/js/features/realtime-feature.js', 'public/js/features/party-feature.js', 'public/js/account-forms.js', 'public/js/features/buddies-feature.js'] },
 
   // —— Late game ——
   { id: 'rooks', group: 'late', name: 'Rook attacks', status: 'solo',
