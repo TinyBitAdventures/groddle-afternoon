@@ -127,6 +127,7 @@ import { qurazyFeature } from './qurazy-feature.js?v=g321-1'; FEATURES.push(qura
 import { energyDecayFeature } from './energy-decay-feature.js?v=g334-1'; FEATURES.push(energyDecayFeature);
 import { partyFeature } from './party-feature.js?v=mp4-1'; FEATURES.push(partyFeature);
 import { sharedQuoinsFeature } from './shared-quoins-feature.js?v=mp4-1'; FEATURES.push(sharedQuoinsFeature);
+import { tradeFeature } from './trade-feature.js?v=mp4-1'; FEATURES.push(tradeFeature);
 import { streetObjectsFeature } from './street-objects-feature.js?v=mp4-1'; FEATURES.push(streetObjectsFeature);
 import { realtimeFeature } from './realtime-feature.js?v=mp3-3'; FEATURES.push(realtimeFeature);
 import { accountBackupFeature } from './account-backup-feature.js?v=mp2-3'; FEATURES.push(accountBackupFeature);
