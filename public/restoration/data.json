@@ -902,13 +902,14 @@
    "group": "home",
    "name": "Other players and chat",
    "status": "progress",
-   "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, and form a party with its own chat. Global chat, groups and buddy lists are not here yet.",
+   "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, form a party with its own chat, keep buddies (who is online and where) and block players. Global chat and groups are not here yet.",
    "spot": null,
    "evidence": [
     "public/js/realtime-client.js",
     "public/js/features/realtime-feature.js",
     "public/js/features/party-feature.js",
-    "public/js/account-forms.js"
+    "public/js/account-forms.js",
+    "public/js/features/buddies-feature.js"
    ],
    "shot": null,
    "play": null
@@ -2040,9 +2041,34 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 515,
+  "commits": 521,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, add players as buddies, see who is online and where, and block players"
+   },
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, Wood Trees are shared: harvests by anyone wear one down"
+   },
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, help another player mine and both get more chunks"
+   },
+   {
+    "date": "2026-10-26",
+    "kind": "fix",
+    "text": "The trade window stays above the Qurazy banner"
+   },
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "In multiplayer, a tree the Rook rooks loses its fruit for everyone until it is revived"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2137,34 +2163,9 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Parties in multiplayer: invite, accept, party chat and a roster that follows members across streets"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "improve",
-    "text": "Room in the realtime server and client for shared systems"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "In multiplayer, see the other players on your street and chat with them"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "A realtime server for multiplayer, and the sign-in ticket that opens it"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The Giant Icons load the same day clock as the rest of the game"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Multiplayer signs in through Minn and saves on the server, and a signed-in solo player can back up and restore their game"
    }
   ]
  },
- "tests": 305,
+ "tests": 306,
  "generatedAt": "2026-10-26"
 }
