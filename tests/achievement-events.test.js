@@ -388,7 +388,7 @@ describe('G117 badges GSJS grants outright', () => {
 
   it('game.js grants First Eleven Skills, Down to the Wire and wires every new counter', () => {
     const game = readFileSync(join(publicRoot, 'game.js'), 'utf8');
-    assert.match(game, /skillState\.learned\.length >= 11\) engine\.grantAchievement\('first_eleven_skills'\)/);
+    assert.match(game, /skillsLearnedCount\(\) >= 11\) engine\.grantAchievement\('first_eleven_skills'\)/);
     assert.match(game, /result\.participant === 'Ur'\) engine\.grantAchievement\('down_to_the_wire'\)/);
     assert.match(game, /purchaseAchievementUpdates\(achieveState, r\.cost, pc\)/);
     assert.match(game, /makingOutputAchievementCounters\(record\.recipe\.tool, record\.recipe\.outputs, spin\)/);

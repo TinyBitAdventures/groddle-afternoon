@@ -1428,6 +1428,15 @@ let achieveState = createAchievementState();
 let featState = createFeatState();
 /** @type {ReturnType<typeof createSkillState>} */
 let skillState = createSkillState();
+/**
+ * The demo kit's starter skills (solo only; a new multiplayer player has none).
+ * First Eleven Skills counts the skills learned beyond them (Austin 2026-10-26, G306).
+ */
+let starterSkills = new Set();
+/** Skills the player learned: everything known except the demo kit's starters. */
+function skillsLearnedCount() {
+  return skillState.learned.filter((id) => !starterSkills.has(id)).length;
+}
 /** @type {ReturnType<typeof createBuffState>} */
 let buffState = createBuffState();
 // G148: stats_add_xp's mood bonus reads the live buffs and skips the dead
@@ -20733,7 +20742,8 @@ function handleSkillCompletions(completed, { offline = false } = {}) {
     pushActivity(skillLearnedActivity(skillTitle(row.def) || name, row.def?.learned || '', { offline }));
   }
   // inc_skills.js:1513 (on learning) and player.js:217 (on login): eleven skills known.
-  if (skillState.learned.length >= 11) engine.grantAchievement('first_eleven_skills');
+  // Solo counts only the ones learned beyond the demo kit (G306); saves that hold it keep it.
+  if (skillsLearnedCount() >= 11) engine.grantAchievement('first_eleven_skills');
 }
 
 function updateSkillChrome(now = Date.now()) {
@@ -23150,6 +23160,7 @@ async function main() {
     for (const sk of STARTER_MINING_SKILLS) {
       grantSkillWithPrereqs(skillState, sk);
     }
+    starterSkills = new Set(skillState.learned);
   }
 
   // Full locations-xml street catalog (index.json), then last saved street (or default)
@@ -23184,11 +23195,10 @@ async function main() {
     handleSkillCompletions(tickSkillStudy(skillState, Date.now()).completed, { offline: true });
     backfillStreetVisits();
   } else if (bootParams.has('resetgame') || !NEW_PLAYER) {
-    // Desk BADGE11 (Austin 2026-10-26, G306): a new solo game's demo kit already knows
-    // 11+ starter skills, so first_eleven_skills is in the collection from the start,
-    // quietly: no award card and none of its +250 iMG / +500 currants. A resetgame QA
-    // boot does the same (G301), as skillknown does.
-    if (skillState.learned.length >= 11 && !achieveState.unlocked.includes('first_eleven_skills')) achieveState.unlocked.push('first_eleven_skills');
+    // G306 (Austin 2026-10-26): a new solo game's demo kit already knows 11+ starter
+    // skills, which don't count: the badge, its card and its +250 iMG / +500 currants
+    // come at the eleventh skill the player learns (skillsLearnedCount). A resetgame QA
+    // boot is the same; skillknown QA still marks it.
   } else {
     // A new multiplayer player (js/new-player.js) has no starter skills and earns it the
     // normal way, card and rewards, at its eleventh (inc_skills.js 1513). G301: main.js

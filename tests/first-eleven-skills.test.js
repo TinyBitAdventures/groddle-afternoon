@@ -1,9 +1,8 @@
 // G301: the eleven-skills badge's login check runs on a fresh game's first
 // boot too (the source's onLoggedin runs on every login_end, the first
-// included). Desk BADGE11 (G306): a new solo game starts with 11+ starter
-// skills, so its first boot marks the badge quietly (no card, no rewards), as
-// a resetgame QA boot does; a new multiplayer player has no starter skills and
-// earns it with its card at the eleventh.
+// included). G306 (Austin 2026-10-26): a new solo game starts with 11+ starter
+// skills, which don't count; solo and multiplayer both earn the badge, its card
+// and rewards at the eleventh skill the player learns.
 import { before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -57,15 +56,16 @@ describe('the remake', () => {
   it("a new multiplayer player's fresh boot runs the same check a save does", () => {
     assert.match(game, /handleSkillCompletions\(tickSkillStudy\(skillState, Date\.now\(\)\)\.completed, \{ offline: true \}\);\s*backfillStreetVisits\(\);\s*\} else if \(bootParams\.has\('resetgame'\) \|\| !NEW_PLAYER\) \{/);
     assert.match(game, /\} else \{\s*(?:\/\/[^\n]*\n\s*)+handleSkillCompletions\(\[\]\);\s*\}/);
-    assert.match(game, /if \(skillState\.learned\.length >= 11\) engine\.grantAchievement\('first_eleven_skills'\);/);
+    assert.match(game, /if \(skillsLearnedCount\(\) >= 11\) engine\.grantAchievement\('first_eleven_skills'\);/);
   });
 
-  it('a new solo game and a resetgame QA boot mark it quietly, as skillknown does', () => {
+  it('the demo kit\'s starter skills never count: a new solo game holds no badge until the eleventh learned skill', () => {
+    assert.match(game, /function skillsLearnedCount\(\) \{\n\s+return skillState\.learned\.filter\(\(id\) => !starterSkills\.has\(id\)\)\.length;/);
+    assert.match(game, /grantSkillWithPrereqs\(skillState, sk\);\n\s+\}\n\s+starterSkills = new Set\(skillState\.learned\);/);
     const at = game.indexOf("} else if (bootParams.has('resetgame') || !NEW_PLAYER) {");
     assert.ok(at > 0);
     const body = game.slice(at, game.indexOf('} else {', at));
-    assert.match(body, /if \(skillState\.learned\.length >= 11 && !achieveState\.unlocked\.includes\('first_eleven_skills'\)\) achieveState\.unlocked\.push\('first_eleven_skills'\);/);
-    assert.doesNotMatch(body, /grantAchievement|handleSkillCompletions/);
+    assert.doesNotMatch(body, /first_eleven_skills'\)|grantAchievement|handleSkillCompletions/);
     assert.match(game, /if \(knownTarget >= 11 && !achieveState\.unlocked\.includes\('first_eleven_skills'\)\) \{\s*achieveState\.unlocked\.push\('first_eleven_skills'\);/);
   });
 });

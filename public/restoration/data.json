@@ -2041,9 +2041,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 525,
+  "commits": 527,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "fix",
+    "text": "On the Groddle site the game no longer thinks a panel is always open"
+   },
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "Multiplayer characters show their avatar and home on their public profile"
+   },
    {
     "date": "2026-10-26",
     "kind": "improve",
@@ -2153,16 +2163,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "In multiplayer, quoins, rocks, resource nodes and trees are shared by everyone on the street"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "The avatar can no longer get stuck under a floating block or stand on a ledge's underside"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "A donation message no longer covers the shrine panel when you open it again"
    }
   ]
  },

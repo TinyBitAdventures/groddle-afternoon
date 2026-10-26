@@ -4,8 +4,9 @@
  *   joined count on it, solo and multiplayer; the camera no longer looks up.
  * - DROPHOVER (G297): a street Musicblock sits on the ground, still.
  * - RAINBOW (G305): ticket races end on the winner splash only.
- * - BADGE11 (G306): a new solo game has first_eleven_skills quietly; a new
- *   multiplayer player earns it at the eleventh skill.
+ * - BADGE11 (G306): asked again 2026-10-26, Austin: solo counts only the skills
+ *   learned beyond the demo kit, so every game earns first_eleven_skills, card
+ *   and rewards, at the eleventh skill the player learns.
  * - FOOTWORDS (G314): "Back to Top" stays with its Snap id; An Autumn Day says
  *   GSJS's own "This feeling of …".
  * Run: node --test tests/desk-decisions.test.js
@@ -86,20 +87,19 @@ describe('RAINBOW: ticket races end on the splash', () => {
 });
 
 describe('BADGE11: the eleven-skills badge', () => {
-  it('a new solo game has it quietly; a new multiplayer player earns it with its card', () => {
+  it('the demo kit never counts; every game earns it with its card at the eleventh learned skill', () => {
     const at = game.indexOf("} else if (bootParams.has('resetgame') || !NEW_PLAYER) {");
     assert.ok(at > 0);
     const end = game.indexOf('} else {', at);
-    const quiet = game.slice(at, end);
-    assert.match(quiet, /achieveState\.unlocked\.push\('first_eleven_skills'\)/);
-    assert.doesNotMatch(quiet, /grantAchievement|handleSkillCompletions/);
+    const fresh = game.slice(at, end);
+    assert.doesNotMatch(fresh, /first_eleven_skills'\)|grantAchievement|handleSkillCompletions/);
     const loud = game.slice(end, game.indexOf('\n  }\n', end));
     assert.match(loud, /handleSkillCompletions\(\[\]\);/);
     // Starter skills are the solo demo kit's; the new multiplayer player has none.
     const kit = game.indexOf('if (!NEW_PLAYER) {', game.indexOf('await loadTransitionAssets();'));
     assert.ok(kit > 0 && game.indexOf("grantSkillWithPrereqs(skillState, 'animalkinship_1');", kit) > kit);
     // Learning the eleventh still awards it (inc_skills.js 1513).
-    assert.match(fnBody(game, 'handleSkillCompletions'), /if \(skillState\.learned\.length >= 11\) engine\.grantAchievement\('first_eleven_skills'\);/);
+    assert.match(fnBody(game, 'handleSkillCompletions'), /if \(skillsLearnedCount\(\) >= 11\) engine\.grantAchievement\('first_eleven_skills'\);/);
   });
 });
 
