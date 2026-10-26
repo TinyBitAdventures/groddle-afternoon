@@ -1996,14 +1996,14 @@
   "hubs": 60
  },
  "sounds": {
-  "keys": 638,
-  "deadKeys": 3,
-  "withFile": 284,
-  "playable": 367,
+  "keys": 637,
+  "deadKeys": 4,
+  "withFile": 249,
+  "playable": 332,
   "recoveredWayback": 38,
-  "archiveorgSfx": 216,
+  "archiveorgSfx": 205,
   "ambientTracks": 34,
-  "musicTracks": 58
+  "musicTracks": 59
  },
  "recipes": {
   "imported": 326,
@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 507,
+  "commits": 509,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "fix",
+    "text": "The multiplayer page loads the current game, and build scripts find the source data beside the repo"
+   },
    {
     "date": "2026-10-26",
     "kind": "improve",
@@ -2147,14 +2152,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Tutorial and quest-room copy comes from Tiny Speck's own files, not footage"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Fireworks, the sneeze and the Game's screen end when you leave the street, a failed quest room waits in the quest log, and the Magic Rock's how-tos are VOGs"
    }
   ]
  },
- "tests": 304,
+ "tests": 305,
  "generatedAt": "2026-10-26"
 }

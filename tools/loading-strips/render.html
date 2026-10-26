@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!-- Served from the spike root by tools/loading-strips/build.mjs; game modules and assets resolve under public/. -->
+<base href="/public/" />
+<title>Loading strips</title>
+<script src="vendor/pixi/pixi-8.22.0.min.js"></script>
+</head>
+<body style="margin:0;background:#222">
+<script type="module">
+import { installPixiFixes } from './js/pixi-fixes.js';
+import * as textureUrls from './js/textures.js';
+import { installHiresDecos } from './js/deco-hires.js';
+import { buildStreetView, loadDecoManifest } from './js/street-render.js';
+import { streetWidth, streetHeight } from './js/street-model.js';
+
+const PIXI = globalThis.PIXI;
+const OUT_W = 840;
+const OUT_H = 160;
+/** Drawn at this multiple of the strip, then box-filtered down (no mipmaps in Pixi). */
+const OVER = 4;
+
+PIXI.Filter.defaultOptions.resolution = 'inherit';
+installPixiFixes(PIXI);
+// 2x deco WebPs (resolution 1 here, so never the 3x files).
+installHiresDecos(textureUrls, { renderer: () => null });
+const app = new PIXI.Application();
+await app.init({ width: OUT_W * OVER, height: OUT_H * OVER, background: 0x8ec8e8, antialias: true, resolution: 1, preference: 'webgl', preserveDrawingBuffer: true });
+await loadDecoManifest();
+
+function sprites(node, out = []) {
+  if (node instanceof PIXI.Sprite) out.push(node);
+  for (const c of node.children || []) sprites(c, out);
+  return out;
+}
+
+async function settle(root, ms = 30000) {
+  const until = Date.now() + ms;
+  for (;;) {
+    const pending = sprites(root).filter((s) => !s.destroyed && !textureUrls.isLoaded(s.texture) && !textureUrls.isFailed(s.texture));
+    if (!pending.length || Date.now() > until) return pending.length;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+}
+
+/**
+ * The whole street at strip scale: the middleground at its world size, each
+ * parallax layer scaled (uniformly) to the street's width and stood on the
+ * street's bottom, the sky gradient behind; the strip is the bottom band.
+ */
+window.renderStrip = async (file) => {
+  const street = await (await fetch(file)).json();
+  const view = buildStreetView(street, PIXI, { renderer: app.renderer });
+  const W = streetWidth(street);
+  const H = streetHeight(street);
+  for (const lc of view.parallaxLayers) {
+    const { w, h } = lc.parallaxLayer;
+    const k = W / w;
+    lc.scale.set(k);
+    lc.x = 0;
+    lc.y = H - h * k;
+  }
+  const sky = view.children.find((c) => c.zIndex === -1100);
+  if (sky) { sky.x = 0; sky.y = 0; sky.width = W; sky.height = H; }
+  const left = await settle(view);
+  // Blurred and recoloured layers bake once their textures arrive.
+  await new Promise((r) => setTimeout(r, 400));
+  const s = (OUT_W * OVER) / W;
+  view.scale.set(s);
+  view.x = 0;
+  view.y = OUT_H * OVER - H * s;
+  app.stage.addChild(view);
+  app.render();
+  const big = app.canvas;
+  // Halve with smoothing until the strip size (a cheap box filter).
+  let src = big;
+  let w = big.width;
+  let h = big.height;
+  while (w > OUT_W) {
+    w = Math.max(OUT_W, Math.round(w / 2));
+    h = Math.max(OUT_H, Math.round(h / 2));
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const g = c.getContext('2d');
+    g.imageSmoothingEnabled = true;
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(src, 0, 0, w, h);
+    src = c;
+  }
+  const url = src.toDataURL('image/jpeg', 0.86);
+  const drawn = view.decoDrawn;
+  app.stage.removeChild(view);
+  view.destroy({ children: true });
+  return { url, W, H, missing: left, drawn };
+};
+window.stripReady = true;
+</script>
+</body>
+</html>

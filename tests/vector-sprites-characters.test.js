@@ -60,7 +60,8 @@ const manifest = JSON.parse(readFileSync(join(root, 'tools/vector-sprites/charac
 const SHARP = [
   'bureaucrat-0', 'bureaucrat-1', 'bureaucrat-2', 'bureaucrat-3', 'letter-blocks', 'mr-block',
   'dustbunny', 'ilmenskie-jones', 'forehorseman', 'rook-head', 'rooked-piggy', 'rooked-chicken',
-  'sad-kitty', 'rooked-butterfly', 'gwendolyn', 'cactus', 'crab', 'myopic-frog', 'maintenance-bot',
+  // rooked-butterfly left (G316): its only SWF is a Wayback copy in no CC0 release, so it stays 1x.
+  'sad-kitty', 'gwendolyn', 'cactus', 'crab', 'myopic-frog', 'maintenance-bot',
   'fox-ranger', 'fox-bait', 'juju-red', 'juju-green', 'juju-yellow',
   ...['red', 'green', 'yellow'].flatMap((v) => ['blue', 'black', 'red'].map((b) => `juju-bandit-${v}-${b}`)),
   ...['alph', 'cosma', 'friendly', 'grendaline', 'humbaba', 'lem', 'mab', 'pot', 'spriggan', 'ti', 'zille'].map((g) => `shrine-${g}`),

@@ -81,11 +81,13 @@ describe('sound-key catalog', () => {
   test('keys whose every call is commented out are dead in the final client, not missing', () => {
     const dead = Object.entries(catalog.keys).filter(([, r]) => r.dead).map(([k]) => k).sort();
     // trumpet: TSFrontController.as 2784/2792 (the shutdown plays GOODNIGHT_GRODDLE);
-    // TALK_FROG "Removed per Danny" (npc_yoga_frog.js 221); CRAFTYBOT_IDLE_1 (npc_crafty_bot.js 3024).
-    assert.deepEqual(dead, ['CRAFTYBOT_IDLE_1', 'TALK_FROG', 'trumpet']);
+    // TALK_FROG "Removed per Danny" (npc_yoga_frog.js 221); CRAFTYBOT_IDLE_1 (npc_crafty_bot.js 3024);
+    // MAKING_WAITING_COOKING (inc_making.js tryToMake), live only while it shipped an
+    // unlicensed archive.org take (G317).
+    assert.deepEqual(dead, ['CRAFTYBOT_IDLE_1', 'MAKING_WAITING_COOKING', 'TALK_FROG', 'trumpet']);
     assert.deepEqual(catalog.keys.trumpet.commentedOut.map((s) => s.match(/:(\d+) /)[1]), ['2784', '2792']);
-    assert.equal(SOUND_KEY_COUNTS.dead, 3);
-    assert.equal(SOUND_KEY_COUNTS.live, SOUND_KEY_COUNTS.keys - 3);
+    assert.equal(SOUND_KEY_COUNTS.dead, 4);
+    assert.equal(SOUND_KEY_COUNTS.live, SOUND_KEY_COUNTS.keys - 4);
     for (const key of dead) {
       assert.equal(catalog.keys[key].file, undefined, key);
       assert.equal(catalog.keys[key].alias, undefined, key);
@@ -98,6 +100,21 @@ describe('sound-key catalog', () => {
 
   test('every recovered file exists, is MPEG audio, and keeps its CDN url', () => {
     assert.equal(SOUND_KEY_COUNTS.recoveredWayback, 38);
+    // G317: only the 10 c2 files whose recording is in a CC0 file ship; the rest keep
+    // their url, no file, and nothing of theirs is left in the sfx folder.
+    const shipped = Object.entries(catalog.keys).filter(([, r]) => r.origin === 'wayback-c2').map(([k]) => k).sort();
+    assert.deepEqual(shipped, ['CONCH', 'FIREFLY_WHISTLE_2', 'FIREFLY_WHISTLE_3', 'HERE_YOU_GO_LIGHTER', 'MOONWALK',
+      'PETRIFIED_ROCK', 'ROCKS_DISAPPEAR', 'WATERFALL_SUCCESS', 'WATERFALL_SYMBOL_GLOW', 'WATER_SPLASH']);
+    assert.equal(SOUND_KEY_COUNTS.waybackShipped, 10);
+    for (const [key, row] of Object.entries(catalog.keys)) {
+      if (!row.notCc0) continue;
+      assert.match(row.url, /^http:\/\/c2\.glitch\.bz\/sounds\//, key);
+      if (row.origin !== 'archiveorg-sfx' && row.origin !== 'archiveorg-derived') assert.equal(row.file, undefined, key);
+      if (!row.file) assert.ok(!fs.existsSync(path.join(pub, 'assets/audio/sfx', `${key}.mp3`)), key);
+    }
+    // Nothing from the archive.org item with no licence field ships.
+    assert.ok(!Object.values(catalog.keys).some((r) => r.archiveItem === 'glitch-mmo-tiny-speck-unused-sfx'));
+    assert.ok(!fs.existsSync(path.join(pub, 'assets/audio/imagination_upgrade.mp3')));
     for (const [key, file] of Object.entries(SOUND_FILES)) {
       const abs = path.join(pub, file);
       assert.ok(fs.existsSync(abs), `${key} → ${file}`);
@@ -108,6 +125,9 @@ describe('sound-key catalog', () => {
         assert.equal(path.basename(file), `${key}.mp3`);
         if (catalog.keys[key].origin === 'archiveorg-sfx') {
           assert.match(catalog.keys[key].source, /^https:\/\/archive\.org\/download\/[a-z0-9-]+\/.+\.mp3$/);
+        } else if (catalog.keys[key].origin === 'archiveorg-derived') {
+          assert.match(catalog.keys[key].source, /^https:\/\/archive\.org\/download\/[a-z0-9-]+\/.+\.mp3$/);
+          assert.match(catalog.keys[key].derivedFrom, /\(CC0\)/);
         } else if (catalog.keys[key].origin === 'overlay-fla') {
           assert.match(catalog.keys[key].overlaySource, /^glitch-overlays\/[\w]+\.fla LIBRARY\/\d+-[\w.]+\.mp3$/);
         } else {
@@ -137,7 +157,8 @@ describe('sound-key catalog', () => {
     // card deals, remake moments ...).
     assert.ok(synthesized >= 100 && synthesized <= 200, `${synthesized} synthesized`);
     const real = Object.keys(catalog.keys).filter((k) => resolveSound(k).file).length;
-    assert.ok(real >= 350, `only ${real} keys play a real file`);
+    // 350+ until G317 took out the c2 and unlicensed takes with no CC0 copy (about 30 keys).
+    assert.ok(real >= 325, `only ${real} keys play a real file`);
   });
 });
 
@@ -300,18 +321,25 @@ describe('sound board', () => {
 
   test('loads a recovered file once and plays it from the cache', async () => {
     const h = host();
-    await h.board.preload(['HARVEST', 'HARVEST', 'pickup']);
-    assert.deepEqual(h.fetched.sort(), ['assets/audio/discover_new_item.mp3', 'assets/audio/sfx/HARVEST.mp3']);
-    const handle = h.board.play('HARVEST');
+    await h.board.preload(['PETRIFIED_ROCK', 'PETRIFIED_ROCK', 'pickup']);
+    assert.deepEqual(h.fetched.sort(), ['assets/audio/discover_new_item.mp3', 'assets/audio/sfx/PETRIFIED_ROCK.mp3']);
+    const handle = h.board.play('PETRIFIED_ROCK');
     assert.equal(handle.kind, 'file');
     assert.equal(h.board.stats.cached, 2);
   });
 
-  test('a cold voice line plays once its file arrives', async () => {
+  test('a cold music cue plays once its file arrives', async () => {
     const h = host();
-    const handle = h.board.play('STEWARTDOLL10');
+    const handle = h.board.play('ROOK_ATTACK');
     assert.equal(handle.kind, 'loading');
     await new Promise((r) => setTimeout(r, 5));
     assert.equal(h.board.stats.file, 1);
+  });
+
+  test('a voice line with no CC0 file plays nothing (G317)', () => {
+    const h = host();
+    assert.ok(!resolveSound('STEWARTDOLL10').file);
+    assert.equal(h.board.play('STEWARTDOLL10'), null);
+    assert.equal(h.fetched.length, 0);
   });
 });

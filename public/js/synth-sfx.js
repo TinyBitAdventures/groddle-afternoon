@@ -714,6 +714,10 @@ const KEY_RECIPES = {
   AWESOME_POT: 'bubble',
   CAULDRON: 'bubble',
   MAKING_WAITING_COOKING: 'bubble',
+  // G317: these lost their files (no CC0 copy); stand-ins by moment.
+  IMAGINATION_PURCHASE: 'sparkle',
+  BUTLER_DOLL_FALL: 'drop',
+  BUTLER_DOLL_IDLE_2: 'squishSoft',
   BEAKER: 'brew',
   TEST_TUBE: 'brew',
   TINCTURING_KIT: 'brew',

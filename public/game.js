@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-14';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-140';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-141';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -572,7 +572,7 @@ import {
   loadSignpostTextures,
   setSignpostHover,
   signpostBoardAt,
-} from './js/street-render.js?v=parallax-7';
+} from './js/street-render.js?v=parallax-8';
 import {
   GAME_DAY_MS,
   shouldFireNewDay,
@@ -987,7 +987,8 @@ const SHEETS = {
     cols: QUOIN_SHEET.columns,
     rows: QUOIN_SHEET.rows,
   },
-  treeFruit: { url: 'assets/sprites/tree_fruit_single.png', whole: true },
+  // A CC0 trant_fruit cell (OGA sheet, maturity 7); the old tree_fruit_single.png had no traced source (G316).
+  treeFruit: { url: 'assets/sprites/trants/frames/trant_fruit_m7.png', whole: true },
   treeWood: { url: 'assets/sprites/tree_wood_single.png', whole: true },
   treeWoodGrowth: {
     url: 'assets/sprites/wood_tree_maturity_6_variant_2_x6_1_png_1354833445.png',
@@ -3850,7 +3851,7 @@ async function loadAudio() {
 /** Small recovered files worth warming at boot (the rest load on first use). */
 const PRELOAD_SOUND_KEYS = [
   'QUEST_COMPLETE', 'LEVEL_UP', 'TRIPLE_JUMP', 'DISCOVER_USEFUL_NEW_ITEM', 'QUORAZY_QUOIN',
-  'QUEST_ADDED', 'CLIENT_LOADED', 'STREET_LOADED', 'HARVEST', 'PETRIFIED_ROCK', 'PIGGY_PLOP',
+  'QUEST_ADDED', 'CLIENT_LOADED', 'STREET_LOADED', 'PETRIFIED_ROCK', 'PIGGY_PLOP',
   'HERE_YOU_GO_LIGHTER', 'NEWDAY', 'WATER_SPLASH',
   // Small archive.org takes heard every minute (all under 60 KB).
   'ITEM_PICKUP', 'ITEM_DROP', 'QUOIN_GOT', 'CLICK_SUCCESS', 'CLICK_FAILURE', 'PET_PIGGY', 'PICK', 'HATCHET',
@@ -6432,7 +6433,8 @@ function spawnStootMemorial() {
   if (app?.canvas) {
     app.canvas.dataset.stootMemorial = 'clean-cc0';
     app.canvas.dataset.stootDollActive = '1';
-    app.canvas.dataset.stootDollAudio = 'recovered-c2';
+    // The c2 voice lines are in no CC0 release (G317): the doll is silent.
+    app.canvas.dataset.stootDollAudio = 'none';
   }
   return memorial;
 }
@@ -6467,9 +6469,10 @@ function handleStootDollTarget(target, verbId, { context = 'world', animate = tr
     app.canvas.dataset.stootDollQuote = result.quote;
     app.canvas.dataset.stootDollSoundKey = result.soundKey || '';
   }
-  // Clean production voice files (c2.glitch.bz Stewart_Doll_1-14) were
-  // recovered from the Wayback CDX index; quotes 0-28 never had audio.
-  // Never substitute compressed video audio for the missing lines.
+  // The production voice files (c2.glitch.bz Stewart_Doll_1-14, Wayback) are
+  // in no CC0 release (G317), so the 14 voiced keys play nothing (voice keys
+  // never get a synth stand-in) and the quote shows on its own; quotes 0-28
+  // never had audio. Never substitute compressed video audio for the lines.
   if (result.soundKey) playSound(result.soundKey, { volume: 0.85 });
 }
 

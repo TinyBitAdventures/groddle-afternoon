@@ -619,8 +619,10 @@ export const EXTRA_PARADISE_COURSES = Object.freeze({
     // The special message for every quoin (remake copy after Radial Heights'
     // source sign "Good work, you've got all the stars!", GHFQOLEIHN63P27).
     completion: "Good work, you've got every quoin! The way home is open!",
-    // The every-quoin music: the Rainbow Run A Cappella intro, over the
-    // course's own CLOUD_DROP_2 loop (assets/content/ambient-music.json).
+    // The source keys: the Rainbow Run A Cappella intro over the course's
+    // CLOUD_DROP_2 loop. Those c2 cuts are in no CC0 release (G317): the key
+    // plays Tiny Speck's CC0 Rainbow Run theme (assets/content/ambient-music.json)
+    // and the intro borrows the CC0 choir sting (build-sound-keys.mjs ALIASES).
     musicFile: 'CLOUD_DROP_2',
     completionSound: 'CLOUD_DROP_2_INTRO',
     controls: 'Arrows steer · hold Spacebar to float · Down dives',

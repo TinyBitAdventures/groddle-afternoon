@@ -87,7 +87,7 @@ function objectSprite(ctx, cls) {
     crab.scale.set(0.55);
     return crab;
   }
-  if (cls === 'trant_fruit') return kit.deco(PIXI, 'tree_fruit_single', x, y + 4, { dir: 'assets/sprites/', scale: 0.85 });
+  if (cls === 'trant_fruit') return kit.deco(PIXI, 'trant_fruit_m7', x, y + 4, { dir: 'assets/sprites/trants/frames/', scale: 0.85 });
   if (cls === 'rock_sparkly_1') {
     const base = sourceFromUrl('assets/sprites/mining/rock_sparkly.png');
     const tex = frameTexture(base, new PIXI.Rectangle(0, 0, 131, 127));

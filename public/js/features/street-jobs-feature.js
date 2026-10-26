@@ -26,7 +26,7 @@ import { ITEM_CATALOG, addItem, countItem, ensureItem, itemIcon } from '../inven
 import { canUseTool, useToolCondition } from '../tools.js?v=woodcutting-test-3';
 import { ecologyForStreet } from '../street-ecology.js?v=official-ecology-7';
 import { worldToScreen } from '../street-model.js';
-import { signArmWidth } from '../street-render.js?v=parallax-7';
+import { signArmWidth } from '../street-render.js?v=parallax-8';
 import { getSkillCatalog } from '../content-catalogs.js';
 import { GIANTS } from '../shrines.js?v=spinning-wheel-test-4';
 import { teleportationFeature } from './teleportation-feature.js?v=teleport-11';

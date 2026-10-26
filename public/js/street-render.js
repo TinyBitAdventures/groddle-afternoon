@@ -15,6 +15,13 @@ import { frameTexture, isLoaded, onFailed, onLoaded, textureFromUrl } from './te
 import { decoUrl } from './deco-hires.js';
 
 const DECO_BASE = 'assets/decos/groddle/';
+/**
+ * Street names for a deco whose art ships under its SWF's own name. The old
+ * grass_texture3 and house_back_medium_05 PNGs (Children of Ur exports, no SWF
+ * by those names) are pixel for pixel grass_texture_3 and house_back_medium05,
+ * whose CC0 glitch-locations SWFs the deco pipeline renders (G317).
+ */
+export const DECO_TWINS = Object.freeze({ grass_texture3: 'grass_texture_3', house_back_medium_05: 'house_back_medium05' });
 const PLACEHOLDER = 0x5a7a4a;
 /** Original engine art from TSEngineAssets (SignpostView.as). */
 const SIGNPOST = {
@@ -926,7 +933,8 @@ export function buildStreetView(street, PIXI, opts = {}) {
       const pos = parallax || /^T_/.test(String(layer.id || ''))
         ? { x: deco.x, y: deco.y }
         : worldToScreen(street, deco.x, deco.y);
-      if (!available.has(deco.sprite)) {
+      const sprite = available.has(deco.sprite) ? deco.sprite : DECO_TWINS[deco.sprite] || deco.sprite;
+      if (!available.has(sprite)) {
         missingSprites.add(deco.sprite);
         // skip tiny missing decorations to reduce noise; keep platform-like names as placeholders
         if (/platform|dirt|mound|crosssection|patch|trunk|ladder/i.test(deco.sprite)) {
@@ -934,7 +942,7 @@ export function buildStreetView(street, PIXI, opts = {}) {
         }
         continue;
       }
-      const url = `${decoBase}${deco.sprite}.png`;
+      const url = `${decoBase}${sprite}.png`;
       const farUrl = far ? decoUrl(url) : null;
       const tex = farUrl ? textureFromUrl(farUrl, { raw: true }) : textureFromUrl(url);
       const spr = new PIXI.Sprite(tex);

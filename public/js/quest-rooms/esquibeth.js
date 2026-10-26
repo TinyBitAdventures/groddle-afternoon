@@ -43,6 +43,10 @@
  *    0.88-0.95). music_map WATERFALL_MELODY (Bells_Waterfall_1.3, 2012-08-29)
  *    is an earlier take of the same seven notes (E G D E C A D); it never
  *    stands out in either recording, so the room does not play it.
+ *    The c2 bell files and AMBIENT_WATERFALL(_LEVEL3) are in no CC0 release
+ *    (G317): the bells are cut from Tiny Speck's CC0 ringtone "Esquebeth
+ *    Puzzle" (tools/sound/build-esquibeth-bells.mjs) and the rooms have no
+ *    music bed (ROOM_MUSIC).
  *
  * Lost: all four location geometries and their location events (the
  * narration, the note pickups, the song check, the exits). Rebuilt from the
@@ -94,7 +98,7 @@ export const STAGE_TSIDS = Object.freeze({
 });
 /** Notes hidden in each location (counted in the recordings). */
 export const NOTE_COUNTS = Object.freeze({ waterfall_01: 3, waterfall_02: 4, waterfall_03: 5 });
-/** esquibeth_note_1..5 -> its bell (recovered BW_* sounds, by the song match). */
+/** esquibeth_note_1..5 -> its bell (BW_* keys, by the song match; CC0-derived files, G317). */
 export const BELLS = Object.freeze({ 1: 'BW_D2', 2: 'BW_E2', 3: 'BW_G2', 4: 'BW_C2', 5: 'BW_A1' });
 /** The song, phrase by phrase (A = E G D, B = E C, C = A D), as note numbers. */
 export const PHRASES = Object.freeze({ A: [2, 3, 1], B: [2, 4], C: [5, 1] });
@@ -1330,14 +1334,24 @@ export const CONCH_ITEM = Object.freeze({
 /* Music and keys                                                       */
 /* ------------------------------------------------------------------ */
 
-function startMusic(ctx, file) {
+/**
+ * The rooms' music bed by source key. The source played AMBIENT_WATERFALL (and
+ * _LEVEL3 on the climb and in the hollow), but those are c2 CDN files in no CC0
+ * release (G317): no key has a file, so the grottos have no music bed. The
+ * bells, the ghost's takes and the Conch still play.
+ */
+export const ROOM_MUSIC = Object.freeze({ AMBIENT_WATERFALL: null, AMBIENT_WATERFALL_LEVEL3: null });
+
+function startMusic(ctx, key) {
   stopMusic(ctx);
+  const file = ROOM_MUSIC[key];
+  if (!file) return;
   const d = ctx.data;
-  d.musicFile = file;
+  d.musicFile = key;
   d.musicAt = Date.now();
-  const p = ctx.engine.playCue?.(`${SFX}${file}.mp3`, { volume: 0.45 });
+  const p = ctx.engine.playCue?.(file, { volume: 0.45 });
   if (p?.then) p.then((stop) => {
-    if (d.musicFile === file) d.stopMusic = stop;
+    if (d.musicFile === key) d.stopMusic = stop;
     else stop?.();
   });
 }

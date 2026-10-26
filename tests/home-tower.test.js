@@ -310,9 +310,11 @@ describe('exterior art', () => {
       assert.equal(two.some((op) => op.part === 'deco_side'), false, 'deco_side needs an extra floor');
       assert.ok(towerBounds(nine).h > towerBounds(two).h + 400, id);
     }
-    for (const f of ['proto_1.webp', 'proto_2.webp', 'proto_3.webp', 'elevator.png', 'tower_expander.png']) {
+    for (const f of ['proto_1.webp', 'proto_2.webp', 'proto_3.webp', 'tower_expander.png']) {
       assert.ok(existsSync(join(root, TOWER_ART_DIR, f)), f);
     }
+    // G316: elevator.png had no traced source and nothing drew it.
+    assert.ok(!existsSync(join(root, TOWER_ART_DIR, 'elevator.png')));
   });
 
   it('ships every choice the client offered, one WebP per drawn article', () => {

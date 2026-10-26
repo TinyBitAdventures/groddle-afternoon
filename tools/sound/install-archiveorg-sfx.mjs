@@ -16,7 +16,11 @@
  *
  * Writes tools/sound/archiveorg-install-log.json (source md5, sizes, loudness, gain).
  *
- *   node tools/sound/install-archiveorg-sfx.mjs [--dry-run]
+ *   node tools/sound/install-archiveorg-sfx.mjs [--dry-run] [--only KEY,KEY]
+ *
+ * --only installs just those keys and keeps the other log rows (re-encoding the
+ * whole set changes bytes nobody asked to change). Log rows for keys no longer in
+ * the map are dropped either way.
  */
 
 import { createHash } from 'node:crypto';
@@ -32,6 +36,9 @@ const MAP = JSON.parse(readFileSync(join(here, 'archiveorg-sfx-map.json'), 'utf8
 const OUT_DIR = join(root, 'public/assets/audio/sfx');
 const LOG = join(here, 'archiveorg-install-log.json');
 const DRY = process.argv.includes('--dry-run');
+const onlyAt = process.argv.indexOf('--only');
+const ONLY = onlyAt > 0 ? new Set(String(process.argv[onlyAt + 1] || '').split(',').filter(Boolean)) : null;
+if (ONLY) for (const key of ONLY) if (!MAP.files.some((f) => f.key === key)) throw new Error(`--only ${key}: not in the map`);
 
 const LOUD_MIN = -30;
 const LOUD_MAX = -10;
@@ -68,10 +75,19 @@ function gainFor({ loudness, peak }) {
 }
 
 const items = MAP.items;
+const previous = ONLY && existsSync(LOG) ? JSON.parse(readFileSync(LOG, 'utf8')).files || {} : {};
 const log = {};
 let bytesIn = 0;
 let bytesOut = 0;
 for (const entry of MAP.files) {
+  if (ONLY && !ONLY.has(entry.key)) {
+    if (previous[entry.key]) {
+      log[entry.key] = previous[entry.key];
+      bytesIn += previous[entry.key].bytesIn || 0;
+      bytesOut += previous[entry.key].bytesOut || 0;
+    }
+    continue;
+  }
   const item = items[entry.item];
   const src = join(RESEARCH, item.id, entry.file);
   if (!existsSync(src)) throw new Error(`missing source ${src}`);

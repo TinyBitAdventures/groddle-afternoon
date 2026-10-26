@@ -86,13 +86,15 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
     assert.equal(mod.room.durationMs, 0, 'the 5 * 60 is an exit delay, not a clock');
   });
 
-  it('builds the song from the three recorded phrases', () => {
+  it('builds the song from the three recorded phrases', async () => {
+    const { SOUND_FILES } = await import('../public/js/sound-keys.js');
+    const catalog = JSON.parse(readFileSync(join(root, 'public/assets/content/sound-keys.json'), 'utf8')).keys;
     assert.deepEqual(mod.NOTE_COUNTS, { waterfall_01: 3, waterfall_02: 4, waterfall_03: 5 });
     assert.deepEqual(mod.SONGS.waterfall_01, [2, 3, 1]);
     assert.deepEqual(mod.SONGS.waterfall_02, [2, 3, 1, 2, 4]);
     assert.deepEqual(mod.SONGS.waterfall_03, [2, 3, 1, 2, 4, 5, 1]);
     assert.equal(mod.SONG_BEATS_MS.length, mod.SONGS.waterfall_03.length);
-    // E G D | E C | A D on the five recovered bells.
+    // E G D | E C | A D on the five bells.
     assert.deepEqual(mod.SONGS.waterfall_03.map((n) => mod.BELLS[n]), ['BW_E2', 'BW_G2', 'BW_D2', 'BW_E2', 'BW_C2', 'BW_A1', 'BW_D2']);
     for (const stage of ['waterfall_01', 'waterfall_02', 'waterfall_03']) {
       // Every note of a song is one you can find in that location.
@@ -101,7 +103,16 @@ describe('The Last Pilgrimage of Esquibeth (esquibeth)', () => {
       for (const n of mod.SONGS[stage]) assert.ok(found.has(n), `${stage} note ${n}`);
       assert.equal(Object.keys(mod.socketOffsets(found.size)).length, found.size);
     }
-    for (const key of Object.values(mod.BELLS)) assert.ok(existsSync(join(root, 'public/assets/audio/sfx', `${key}.mp3`)), key);
+    // G317: the bells are cut from the CC0 ringtone (tools/sound/build-esquibeth-bells.mjs);
+    // the c2 copies are gone, and the rooms have no music bed.
+    for (const key of Object.values(mod.BELLS)) {
+      assert.equal(SOUND_FILES[key], `assets/audio/sfx/bells/${key}.mp3`);
+      assert.ok(existsSync(join(root, 'public', SOUND_FILES[key])), key);
+      assert.ok(!existsSync(join(root, 'public/assets/audio/sfx', `${key}.mp3`)), key);
+      assert.equal(catalog[key].origin, 'archiveorg-derived');
+    }
+    assert.deepEqual(Object.values(mod.ROOM_MUSIC), [null, null]);
+    for (const key of Object.keys(mod.ROOM_MUSIC)) assert.ok(!existsSync(join(root, 'public/assets/audio/sfx', `${key}.mp3`)), key);
   });
 
   it('checks the song note by note and starts over on a wrong note', () => {
