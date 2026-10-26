@@ -2030,9 +2030,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 506,
+  "commits": 507,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "improve",
+    "text": "Six desk decisions: a taller street view on big screens, the Rook orb above the labels, grounded Musicblocks, plainer race endings, a quiet eleven-skills badge, GSJS wording for An Autumn Day"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Fireworks, the sneeze and the Game's screen end when you leave the street, a failed quest room waits in the quest log, and the Magic Rock's how-tos are VOGs"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Every overlay ends when you leave the street, as in the original, and the tutorial's art is traced to Tiny Speck's own files"
    }
   ]
  },

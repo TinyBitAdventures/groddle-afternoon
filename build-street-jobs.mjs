@@ -36,9 +36,9 @@ import { obtainableItems } from './tools/job-obtainable.mjs';
 import { loadRetiredItems, retireRequirement } from './tools/retired-items.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const gsjs = process.env.GRODDLE_GSJS || '/Users/austin/Documents/glitch-audit/glitch-GameServerJS';
+const gsjs = process.env.GRODDLE_GSJS || decodeURIComponent(new URL('../glitch-GameServerJS', import.meta.url).pathname);
 const locationRoot =
-  process.env.GRODDLE_LOCATION_XML || '/Users/austin/Documents/glitch-audit/streets/mnt/stos/location_data';
+  process.env.GRODDLE_LOCATION_XML || decodeURIComponent(new URL('../streets/mnt/stos/location_data', import.meta.url).pathname);
 const outputPath = join(root, 'public/assets/content/street-jobs.json');
 const index = JSON.parse(await readFile(join(root, 'public/assets/streets/index.json'), 'utf8'));
 

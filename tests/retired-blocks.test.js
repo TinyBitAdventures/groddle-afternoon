@@ -20,7 +20,7 @@ import { loadRetiredItems, retireRequirement } from '../tools/retired-items.mjs'
 import { obtainableItems } from '../tools/job-obtainable.mjs';
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
-const GSJS = process.env.GRODDLE_GSJS || '/Users/austin/Documents/glitch-audit/glitch-GameServerJS';
+const GSJS = process.env.GRODDLE_GSJS || decodeURIComponent(new URL('../../glitch-GameServerJS', import.meta.url).pathname);
 const catalog = JSON.parse(readFileSync(join(SPIKE, 'assets/content/street-jobs.json'), 'utf8'));
 const RETIRED = ['brick', 'grade_a_earth_block', 'grade_aaa_earth_block'];
 

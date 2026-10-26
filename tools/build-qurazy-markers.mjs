@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const locationRoot =
   process.env.GRODDLE_LOCATION_XML ||
-  '/Users/austin/Documents/glitch-audit/streets/mnt/stos/location_data';
+  decodeURIComponent(new URL('../../streets/mnt/stos/location_data', import.meta.url).pathname);
 const outputPath = join(root, 'public/js/qurazy-markers.js');
 
 const files = (await readdir(locationRoot)).filter((f) => /^L[A-Z0-9]+\.xml$/.test(f)).sort();

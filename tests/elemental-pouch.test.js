@@ -40,7 +40,7 @@ import { createQuestState } from '../public/js/quests.js';
 import { acceptOffer, pendingQuestOffers, syncItemRequirements, turnInQuest } from '../public/js/quest-offers.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const GSJS = '/Users/austin/Documents/glitch-audit/glitch-GameServerJS';
+const GSJS = decodeURIComponent(new URL('../../glitch-GameServerJS', import.meta.url).pathname);
 const DAY = '2026-10-23';
 const CARD1 = ['element_handling_bonus_1'];
 const BOTH = ['element_handling_bonus_1', 'element_handling_bonus_2'];

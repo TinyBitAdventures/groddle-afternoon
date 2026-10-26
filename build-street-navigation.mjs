@@ -33,7 +33,7 @@ const root = dirname(fileURLToPath(import.meta.url));
 const streetsDir = join(root, 'public/assets/streets');
 const xmlRoot =
   process.env.GRODDLE_LOCATION_XML ||
-  '/Users/austin/Documents/glitch-audit/streets/mnt/stos/location_data';
+  decodeURIComponent(new URL('../streets/mnt/stos/location_data', import.meta.url).pathname);
 
 async function readable(path) {
   try {

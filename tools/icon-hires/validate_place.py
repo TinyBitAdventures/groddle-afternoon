@@ -1,6 +1,6 @@
 import json, os, re, subprocess, sys
 T = sys.argv[1]
-ICONS = '/Users/austin/Documents/glitch-audit/spike/public/assets/sprites/icons'
+ICONS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'public', 'assets', 'sprites', 'icons')
 m = json.load(open(f'{T}/map.json'))
 def box(path):
     out = subprocess.run(['magick', path, '-format', '%@ %w %h', 'info:'], capture_output=True, text=True).stdout.strip()

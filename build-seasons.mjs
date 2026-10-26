@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const gsjs = process.env.GSJS_ROOT || '/Users/austin/Documents/glitch-audit/glitch-GameServerJS';
+const gsjs = process.env.GSJS_ROOT || decodeURIComponent(new URL('../glitch-GameServerJS', import.meta.url).pathname);
 const outPath = join(root, 'public/js/seasons-data.js');
 
 const src = (rel) => readFile(join(gsjs, rel), 'utf8');

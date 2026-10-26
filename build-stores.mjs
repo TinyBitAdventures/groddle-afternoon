@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const gsjs = process.env.GSJS_ROOT || '/Users/austin/Documents/glitch-audit/glitch-GameServerJS';
+const gsjs = process.env.GSJS_ROOT || decodeURIComponent(new URL('../glitch-GameServerJS', import.meta.url).pathname);
 const outPath = join(root, 'public/js/store-catalog.js');
 
 /** Street-spirit store ids kept, with the remake's world badge and colour. */

@@ -18,7 +18,7 @@ const streetIndexPath = join(root, 'public/assets/streets/index.json');
 const outputPath = join(root, 'public/assets/content/street-ecology.json');
 const locationRoot =
   process.env.GRODDLE_LOCATION_XML ||
-  '/Users/austin/Documents/glitch-audit/streets/mnt/stos/location_data';
+  decodeURIComponent(new URL('../streets/mnt/stos/location_data', import.meta.url).pathname);
 const gsjsRoot = process.env.GRODDLE_GSJS || join(root, '..', 'glitch-GameServerJS');
 
 /**

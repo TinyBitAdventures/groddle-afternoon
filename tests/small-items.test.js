@@ -41,7 +41,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
 const gsjs = join(root, '..', 'glitch-GameServerJS');
 const src = (rel) => readFileSync(join(gsjs, rel), 'utf8');
-const LOCATION_XML = '/Users/austin/Documents/glitch-audit/streets/mnt/stos/location_data';
+const LOCATION_XML = decodeURIComponent(new URL('../../streets/mnt/stos/location_data', import.meta.url).pathname);
 
 function fakeEngine(over = {}) {
   const data = {};

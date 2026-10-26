@@ -1,6 +1,6 @@
 import json, os, re, subprocess, sys
 T = sys.argv[1]
-ICONS = '/Users/austin/Documents/glitch-audit/spike/public/assets/sprites/icons'
+ICONS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'public', 'assets', 'sprites', 'icons')
 m = json.load(open(f'{T}/map.json'))
 import glob as _g
 renders = {os.path.basename(os.path.dirname(f))[:-4]: f for f in _g.glob(f'{T}/' + (sys.argv[2] if len(sys.argv) > 2 else 'out') + '/*/*.png')}

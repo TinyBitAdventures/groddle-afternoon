@@ -46,7 +46,7 @@ const streetsDir = join(root, 'public/assets/streets');
 const audioDir = join(root, 'public/assets/audio');
 const xmlRoot =
   process.env.GRODDLE_LOCATION_XML ||
-  '/Users/austin/Documents/glitch-audit/streets/mnt/stos/location_data';
+  decodeURIComponent(new URL('../streets/mnt/stos/location_data', import.meta.url).pathname);
 
 async function readable(path) {
   try {

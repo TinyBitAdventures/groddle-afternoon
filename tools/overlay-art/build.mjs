@@ -248,8 +248,8 @@ export function checkOverlays() {
 }
 
 async function launch() {
-  const core = '/Users/austin/Cove/Sites/minnadmin.localhost/public/wp-content/plugins/minn-admin/tests/node_modules/playwright-core/index.mjs';
-  const { chromium } = await import(existsSync(core) ? core : 'playwright');
+  // PLAYWRIGHT_CORE may name another playwright-core build; the repo's own playwright otherwise.
+  const { chromium } = await import(process.env.PLAYWRIGHT_CORE || 'playwright');
   const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
   return chromium.launch({ executablePath: existsSync(chrome) ? chrome : undefined, args: ['--force-color-profile=srgb', '--disable-features=MacAppCodeSignClone'] });
 }
