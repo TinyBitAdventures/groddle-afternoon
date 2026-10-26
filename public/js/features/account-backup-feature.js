@@ -16,7 +16,8 @@
  * already under way (the start card only offers the choice on a new game).
  *
  * In multiplayer the Menu gets Account (change the sign-in email or the
- * password, each with the current password) and Sign out: the save is
+ * password, each with the current password; Your profile, from
+ * profiles-feature) and Sign out: the save is
  * written first, then the session ends and the page goes back to the gate.
  *
  * Off in practice copies (?practice=1 swaps the storage) and on a plain
@@ -24,7 +25,7 @@
  * QA: /play/ on groddle.localhost, Menu, Account; /play/online/, Menu, Sign out.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=g337-1';
+import { createMinnAccount } from '../minn-account.js?v=g338-1';
 import { mountAccountForms, mountAccountSettings } from '../account-forms.js?v=g337-1';
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=mp2-1';
 import { formatGameDayLabel } from '../game-day.js?v=dametime-3';
@@ -382,6 +383,10 @@ function createMultiplayerPanel(engine, account) {
       const host = el('div', { class: 'account-forms' });
       panel.append(host);
       mountAccountSettings(host, { account, email: session.account?.email || '', onChanged: ({ what }) => engine.setData?.('accountChanged', what) });
+      // Your profile (features/profiles-feature.js, G338): the description and a link to the public page.
+      const profile = el('div', { class: 'account-profile-host' });
+      panel.append(profile);
+      if (!engine.query?.('accountProfile', profile, engine)) profile.remove();
       const actions = el('div', { class: 'account-actions' });
       const out = el('button', { type: 'button', class: 'alt', 'data-account-signout': '' }, 'Sign out');
       out.addEventListener('click', () => signOutMultiplayer(engine, account, out));

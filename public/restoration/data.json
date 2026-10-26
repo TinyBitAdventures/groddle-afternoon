@@ -2041,9 +2041,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 524,
+  "commits": 525,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "improve",
+    "text": "In multiplayer the tutorial has no skip, and a crab keeps a repeated Musicblock"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2158,14 +2163,9 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "A donation message no longer covers the shrine panel when you open it again"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Trees and other street things are never placed on a cave ceiling or a ledge's underside"
    }
   ]
  },
- "tests": 306,
+ "tests": 307,
  "generatedAt": "2026-10-26"
 }

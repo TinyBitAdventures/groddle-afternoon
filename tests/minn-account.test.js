@@ -15,10 +15,10 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=g337-1';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=g337-1';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=g338-1';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=g338-1';
 import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=g337-1';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g337-1';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g338-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-1';
@@ -310,7 +310,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
   const src = (f) => readFileSync(join(ext, 'src', f), 'utf8');
 
   it('declares its tables under its own names, with the keys the routes rely on', () => {
-    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_buddies', 'groddle_ignores', 'groddle_mp_saves', 'groddle_players', 'groddle_solo_backups']);
+    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_buddies', 'groddle_ignores', 'groddle_mp_saves', 'groddle_players', 'groddle_profiles', 'groddle_solo_backups']);
     assert.ok(manifest.tables.groddle_players.includes('UNIQUE KEY name_key (name_key)'), 'no two characters share a name, whatever its letter case');
     assert.ok(manifest.tables.groddle_mp_saves.includes('PRIMARY KEY  (user_id)'), 'one multiplayer save per user');
     assert.ok(manifest.tables.groddle_solo_backups.includes('PRIMARY KEY  (user_id,slot)'), 'one backup per slot');
@@ -324,7 +324,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
   });
 
   it('registers groddle/v1 REST routes: me open to anyone, every save, backup, realtime and buddy route signed-in', () => {
-    assert.match(src('Extension.php'), /\$minn->rest\(new Player\(\$minn\), new PlayerAccount\(\$minn\), new MultiplayerSave\(\$minn\), new SoloBackups\(\$minn\), new RealtimeTicket\(\$minn\), new Buddies\(\$minn\)\);/);
+    assert.match(src('Extension.php'), /\$minn->rest\(new Player\(\$minn\), new PlayerAccount\(\$minn\), new MultiplayerSave\(\$minn\), new SoloBackups\(\$minn\), new RealtimeTicket\(\$minn\), new Buddies\(\$minn\)(?:, new \w+\(\$minn\))*\);/);
     const routes = [];
     for (const f of ['Player.php', 'PlayerAccount.php', 'MultiplayerSave.php', 'SoloBackups.php', 'RealtimeTicket.php', 'Buddies.php']) {
       for (const m of src(f).matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]/g)) routes.push(`${m[1]} ${m[2]} ${m[3]}`);
@@ -381,7 +381,7 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
 
   it('players sign up by email and a character name: the username underneath is made up, the role is always subscriber', () => {
     const acct = src('PlayerAccount.php');
-    assert.match(acct, /->register\('player-' \. bin2hex\(random_bytes\(5\)\), \$email, \$password, \$name, self::ROLE\)/);
+    assert.match(acct, /->registerQuietly\('player-' \. bin2hex\(random_bytes\(5\)\), \$email, \$password, \$name, self::ROLE\)/);
     assert.match(acct, /public const ROLE = 'subscriber';/, 'players never edit, so they never get the Minn bar');
     assert.match(acct, /\(new Characters\(\$this->minn->db\)\)->taken\(\$name\)/, 'no two players share a name');
     assert.match(src('Characters.php'), /WHERE name_key = \?/);

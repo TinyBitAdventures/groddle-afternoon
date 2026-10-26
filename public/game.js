@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-14';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-151';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-152';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -8180,6 +8180,22 @@ const engine = {
   /** The Pixi stage, for screen-space layers above the world. */
   get stage() {
     return app?.stage || null;
+  },
+  /**
+   * The view as the player sees it (the stage inside the location's view),
+   * drawn to a new canvas: the home picture on a multiplayer profile
+   * (features/profiles-feature.js, G338). Null before the renderer starts.
+   */
+  snapshotView({ resolution = 1 } = {}) {
+    if (!app?.renderer || !app.stage) return null;
+    // The "Enter: choose" prompt is a hint to the player, not part of the street.
+    const hint = prompt?.visible;
+    if (prompt) prompt.visible = false;
+    try {
+      return app.renderer.extract.canvas({ target: app.stage, frame: new PIXI.Rectangle(0, 0, VIEW_W, LOCATION_VIEW_H), resolution });
+    } finally {
+      if (prompt) prompt.visible = hint;
+    }
   },
   /**
    * Hold the camera centred `dx`/`dy` world pixels away from the avatar

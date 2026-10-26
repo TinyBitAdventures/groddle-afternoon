@@ -279,6 +279,29 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       return buddyCall('Un-blocking', `buddies/ignores/${Number(id)}`, { method: 'DELETE' });
     },
 
+    /**
+     * The player's profile (register G338, groddle-afternoon-site/src/Profiles.php):
+     * { id, name, url, about, aboutMax, avatar: { key, at, url } | null,
+     * home: { key, at, url } | null }. Each write answers the same. Pictures
+     * are base64 PNGs (the site checks and re-encodes them). A refusal
+     * throws with .status, .code and the site's .message.
+     */
+    async profile() {
+      return buddyCall('Loading your profile', 'profile');
+    },
+
+    async saveAbout(about) {
+      return buddyCall('Saving your profile', 'profile', { method: 'PUT', body: { about: String(about ?? '') } });
+    },
+
+    async uploadAvatar({ key, avatar, tile }) {
+      return buddyCall('Saving your avatar picture', 'profile/avatar', { method: 'PUT', body: { key, avatar, tile } });
+    },
+
+    async uploadHome({ key, home }) {
+      return buddyCall('Saving your home picture', 'profile/home', { method: 'PUT', body: { key, home } });
+    },
+
     async deleteBackup(slot) {
       const r = await call(`backups/${Number(slot)}`, { method: 'DELETE' });
       if (!r.ok) throw failed('Deleting the backup', r);
