@@ -84,7 +84,7 @@ describe('groddle/v1 on the live site', { skip: !LIVE && 'set GRODDLE_LIVE=1 to 
   });
   after(() => {
     for (const p of [a, b].filter(Boolean)) {
-      wp('db', 'query', `DELETE FROM wp_groddle_mp_saves WHERE user_id = ${p.id}; DELETE FROM wp_groddle_solo_backups WHERE user_id = ${p.id}`);
+      wp('db', 'query', `DELETE FROM wp_groddle_mp_saves WHERE user_id = ${p.id}; DELETE FROM wp_groddle_solo_backups WHERE user_id = ${p.id}; DELETE FROM wp_groddle_players WHERE user_id = ${p.id}`);
       wp('user', 'delete', String(p.id), '--yes');
     }
     rmSync(dir, { recursive: true, force: true });

@@ -290,7 +290,8 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
   const src = (f) => readFileSync(join(ext, 'src', f), 'utf8');
 
   it('declares its two tables under its own names, with the keys the routes rely on', () => {
-    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_mp_saves', 'groddle_solo_backups']);
+    assert.deepEqual(Object.keys(manifest.tables).sort(), ['groddle_mp_saves', 'groddle_players', 'groddle_solo_backups']);
+    assert.ok(manifest.tables.groddle_players.includes('UNIQUE KEY name_key (name_key)'), 'no two characters share a name, whatever its letter case');
     assert.ok(manifest.tables.groddle_mp_saves.includes('PRIMARY KEY  (user_id)'), 'one multiplayer save per user');
     assert.ok(manifest.tables.groddle_solo_backups.includes('PRIMARY KEY  (user_id,slot)'), 'one backup per slot');
     for (const col of ['user_id', 'data', 'version', 'updated_at']) assert.ok(manifest.tables.groddle_mp_saves.some((l) => l.startsWith(`${col} `)), col);
@@ -355,16 +356,20 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
     const acct = src('PlayerAccount.php');
     assert.match(acct, /->register\('player-' \. bin2hex\(random_bytes\(5\)\), \$email, \$password, \$name, self::ROLE\)/);
     assert.match(acct, /public const ROLE = 'subscriber';/, 'players never edit, so they never get the Minn bar');
-    assert.match(acct, /LOWER\(display_name\) = LOWER\(\?\)/, 'no two players share a name');
+    assert.match(acct, /\(new Characters\(\$this->minn->db\)\)->taken\(\$name\)/, 'no two players share a name');
+    assert.match(src('Characters.php'), /WHERE name_key = \?/);
+    assert.match(src('Characters.php'), /LOWER\(display_name\) = \?/, 'nor a name an existing account shows');
     assert.match(acct, /->signIn\(\$answer, \$email, \$password\)/, 'sign-in is by email');
     assert.ok(acct.includes("'/play/online/'") && acct.includes("$page . '#reset=' . rawurlencode($key) . '&login=' . rawurlencode($login)"), 'a reset link opens the game, the key in the fragment');
     assert.doesNotMatch(acct, /\$body\['username'\]/, 'no route reads a username');
     assert.equal(acct.match(/\$body\['login'\]/g)?.length, 1, 'only the reset confirm reads a login: the one the mailed link carried');
-    assert.match(src('Player.php'), /'name' => \$user->displayName !== '' \? \$user->displayName : \$user->login/);
+    assert.match(src('Player.php'), /'name' => \$characters->nameOf\(\$user\)/, 'the game shows the character name, not a display name a profile can change');
+    assert.match(src('RealtimeTicket.php'), /'name' => \(new Characters\(\$this->minn->db\)\)->nameOf\(\$user\)/, 'other players see it too');
+    assert.match(acct, /\(new Characters\(\$this->minn->db\)\)->claim\(\$made->id, \$name\)/);
   });
 
   it('runs no WordPress function (the engine\'s classes only)', () => {
-    for (const f of ['Player.php', 'PlayerAccount.php', 'MultiplayerSave.php', 'SoloBackups.php', 'SaveShape.php']) {
+    for (const f of ['Player.php', 'PlayerAccount.php', 'PlayerMail.php', 'Characters.php', 'MultiplayerSave.php', 'SoloBackups.php', 'SaveShape.php']) {
       assert.doesNotMatch(src(f), /\b(?:get_option|wp_[a-z_]+|current_user_can|get_current_user_id|esc_[a-z]+|\$wpdb)\s*\(/, f);
     }
   });
