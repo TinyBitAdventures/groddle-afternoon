@@ -54,7 +54,9 @@
     "og-vid-look": { "title": "Video: \"Learn how to change your look!\" Odd Giants #2 (yorkcommatyler)", "url": "https://www.youtube.com/watch?v=XdXqAiPk3nY", "checked": "2026-10-22" },
     "wikipedia": { "title": "Wikipedia: Glitch (video game)", "url": "https://en.wikipedia.org/wiki/Glitch_(video_game)", "checked": "2026-10-22" },
     "ts-gsjs": { "title": "tinyspeck/glitch-GameServerJS README (CC0 1.0, logo and trademark excluded)", "url": "https://github.com/tinyspeck/glitch-GameServerJS", "checked": "2026-10-22" },
-    "ga-restoration": { "title": "Groddle Field Notes: restoration report (built from this repository)", "url": "../restoration/", "checked": "2026-10-23" }
+    "ga-restoration": { "title": "Groddle Field Notes: restoration report (built from this repository)", "url": "../restoration/", "checked": "2026-10-26" },
+    "ga-github": { "title": "Groddle Afternoon on GitHub: the game, the realtime server and the site", "url": "https://github.com/TinyBitAdventures/groddle-afternoon", "checked": "2026-10-26" },
+    "ga-site": { "title": "Groddle Afternoon", "url": "https://groddleafternoon.com", "checked": "2026-10-26" }
   },
   "projects": [
     {
@@ -117,16 +119,16 @@
       "years": "2026",
       "approach": "Fresh take",
       "ours": true,
-      "badge": { "label": "In development · not yet public", "tone": "sun" },
-      "summary": "This project. A single-player web game that rebuilds Glitch rule by rule from Tiny Speck's released code and art, and fills the gaps from players' Snaps and recordings.",
+      "badge": { "label": "In development · open source", "tone": "sun" },
+      "summary": "This project. A web game that rebuilds Glitch rule by rule from Tiny Speck's released code and art, played solo in your browser or multiplayer with other players, and fills the gaps from players' Snaps and recordings.",
       "link": { "label": "Restoration report", "url": "../restoration/" },
       "facts": [
         { "label": "Client", "text": "PixiJS 8 in the browser, with sharp 3x art on high-resolution screens. No Flash, nothing to install.", "sources": ["ga-restoration"] },
-        { "label": "Server and rules", "text": "No server: the original server code (GSJS) is mined as the design reference and its rules are rewritten in modern JavaScript. Saves stay on your device.", "sources": ["ga-restoration"] },
+        { "label": "Server and rules", "text": "The original server code (GSJS) is mined as the design reference and its rules are rewritten in modern JavaScript. Solo needs no server and saves in your browser. Multiplayer adds accounts and server saves on the site, and a small Go server that decides what players share: quoins, rocks, races, Rook fights and trades.", "sources": ["ga-restoration", "ga-github"] },
         { "label": "Platform", "text": "Web browser.", "sources": ["ga-restoration"] },
-        { "label": "Licence and code", "text": "Uses Tiny Speck's CC0 art and code plus recovered audio; no Glitch logo or trademark. Repository is local only for now.", "sources": ["ts-gsjs", "ga-restoration"] },
-        { "label": "Status", "text": "In development; not yet public.", "sources": ["ga-restoration"] },
-        { "label": "How to play", "text": "Not yet public.", "sources": ["ga-restoration"] },
+        { "label": "Licence and code", "text": "MIT code on GitHub in three repositories: the game, the realtime server and the site. Uses only Tiny Speck's CC0 art, sound and code, plus art and sound made fresh where nothing survives; no Glitch logo or trademark.", "sources": ["ts-gsjs", "ga-github"] },
+        { "label": "Status", "text": "In development; playable in the browser, solo or multiplayer.", "sources": ["ga-restoration"] },
+        { "label": "How to play", "text": "Open groddleafternoon.com in a desktop browser. Solo needs no account; multiplayer needs a free one.", "sources": ["ga-site"] },
         { "label": "Team", "text": "A one-person project.", "sources": ["ga-restoration"] }
       ]
     }

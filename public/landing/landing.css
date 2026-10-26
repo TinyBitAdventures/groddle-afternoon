@@ -151,7 +151,8 @@ a.dev-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .solo-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: center; }
 .solo-note .section-lead { margin-bottom: 0; max-width: 44em; }
 .solo-note h2 { margin-bottom: 10px; }
-@media (max-width: 760px) { .solo-grid { grid-template-columns: 1fr; gap: 20px; } .solo-note .btn { justify-self: start; } }
+.solo-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+@media (max-width: 760px) { .solo-grid { grid-template-columns: 1fr; gap: 20px; } .solo-actions { justify-self: start; } }
 
 .landing .foot a { color: var(--fg); }
 

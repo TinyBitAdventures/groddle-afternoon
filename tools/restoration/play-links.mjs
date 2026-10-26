@@ -8,7 +8,8 @@
  * player route: it drops what only a camera needs (autoplay, preview and hold
  * freezes, skipped intro effects, fixed camera looks, mid-quest stages).
  * PLAY_ROUTES covers systems with no screenshot; NO_PLAY lists ones with
- * nothing to open (lost systems need other players).
+ * nothing to open here: lost systems, and the multiplayer-only ones (chat,
+ * trading), which open from /play/online/ and never from a practice link.
  */
 import { SHOTS } from './shots.mjs';
 
@@ -52,7 +53,7 @@ export const PLAY_ROUTES = Object.freeze({
   conversations: `${BASE}&convodemo=brief_thoughts_of_the_fruit_tree_1`,
 });
 
-/** Nothing to open: lost systems, and the quest-rooms row (the rooms section links each room). */
+/** Nothing to open: lost and multiplayer-only systems, and the quest-rooms row (the rooms section links each room). */
 export const NO_PLAY = new Set(['auctions', 'chat', 'snaps', 'quest-rooms']);
 
 /** A capture route with the camera-only parameters removed. */

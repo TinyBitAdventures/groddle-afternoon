@@ -184,7 +184,7 @@ const STATUS = Object.fromEntries(STATUSES.map((s) => [s.key, s]));
 const STATUS_TEXT = {
   source: 'This item is in the remake.',
   missing: 'Not in the remake yet. Tiny Speck’s game had it, and it is on the list to bring back.',
-  lost: 'Lost. It needed other players (or Tiny Speck’s own servers) to work, so a one-player remake can’t bring it back as it was.',
+  lost: 'Lost for now. It needed other players or Tiny Speck’s own servers in a way neither solo play nor multiplayer brings back yet.',
   unbuilt_original: 'Never finished in the original. Tiny Speck’s code defines it, but the game never handed it out, so there is nothing to restore.',
 };
 
@@ -585,7 +585,7 @@ function indexPage(data) {
       <p class="kicker">Groddle Field Notes · Items</p>
       <h1>Item catalog</h1>
       <p class="lead">Every item in Tiny Speck’s Glitch, from the game’s own code, and whether you can get it in the remake yet.</p>
-      <p class="cat-score"><strong>${fmt(s.source)}</strong> of ${fmt(c.listed)} items are in the remake. ${fmt(s.missing)} are not in yet, ${fmt(s.lost)} are lost because they needed other players, and ${fmt(s.unbuilt_original)} were never finished in the original.</p>
+      <p class="cat-score"><strong>${fmt(s.source)}</strong> of ${fmt(c.listed)} items are in the remake. ${fmt(s.missing)} are not in yet, ${fmt(s.lost)} are lost for now because they needed other players or Tiny Speck’s own servers, and ${fmt(s.unbuilt_original)} were never finished in the original.</p>
       <p class="cat-note">${fmt(c.excluded)} more classes in the item folder are server plumbing (admin tools, tests, quest markers, containers the server made for itself) and are left out.</p>
     </div>
   </header>

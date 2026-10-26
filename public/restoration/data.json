@@ -47,7 +47,7 @@
    "short": "Lost",
    "tone": "dusk",
    "mark": "×",
-   "desc": "It needed other people, or nothing about it survives."
+   "desc": "Nothing about it survives, or Tiny Speck retired it before Glitch closed."
   }
  },
  "groups": [
@@ -539,7 +539,7 @@
    "group": "economy",
    "name": "Quoins",
    "status": "source",
-   "blurb": "All eight quoin types, daily limits, multipliers and Qurazy quoins. Each street quoin spot is given one of the original quoin classes, which sets what it gives (a tiny 1, a small 2 to 6, a steady 25, a long-wait 2 to 100) and how long it takes to come back. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you.",
+   "blurb": "All eight quoin types, daily limits, multipliers and Qurazy quoins. Each street quoin spot is given one of the original quoin classes, which sets what it gives (a tiny 1, a small 2 to 6, a steady 25, a long-wait 2 to 100) and how long it takes to come back. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you. In multiplayer a street’s quoins are shared: the first to touch one gets it.",
    "spot": "quoin",
    "evidence": [
     "public/js/quoins.js",
@@ -643,10 +643,13 @@
    "id": "auctions",
    "group": "economy",
    "name": "Auctions and trading",
-   "status": "lost",
-   "blurb": "The player auction house and trading needed other players.",
+   "status": "progress",
+   "blurb": "In multiplayer, trade items and currants face to face with another player on your street: the server holds both offers until you both accept. The auction house is not here yet.",
    "spot": null,
-   "evidence": [],
+   "evidence": [
+    "public/js/trade.js",
+    "public/js/features/trade-feature.js"
+   ],
    "shot": null,
    "play": null
   },
@@ -729,11 +732,12 @@
    "group": "quests",
    "name": "Races and Game of Crowns",
    "status": "solo",
-   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules.",
+   "blurb": "Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules. In multiplayer, Grab ’Em Good and the seven finish-line races are against the real players on your street.",
    "spot": null,
    "evidence": [
     "public/js/races.js",
-    "public/js/game-of-crowns.js"
+    "public/js/game-of-crowns.js",
+    "public/js/races-mp.js"
    ],
    "shot": "shots/races.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&racedemo=space_race&practice=1"
@@ -896,11 +900,15 @@
   {
    "id": "chat",
    "group": "home",
-   "name": "Chat, groups and friends",
-   "status": "lost",
-   "blurb": "Global chat, groups and buddy lists were about other people.",
+   "name": "Other players and chat",
+   "status": "progress",
+   "blurb": "Sign in to play multiplayer and you share the street with other players: see them walk and emote, chat on the street, and form a party with its own chat. Global chat, groups and buddy lists are not here yet.",
    "spot": null,
-   "evidence": [],
+   "evidence": [
+    "public/js/realtime-client.js",
+    "public/js/features/realtime-feature.js",
+    "public/js/features/party-feature.js"
+   ],
    "shot": null,
    "play": null
   },
@@ -909,10 +917,11 @@
    "group": "late",
    "name": "Rook attacks",
    "status": "solo",
-   "blurb": "The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival.",
+   "blurb": "The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival. In multiplayer, everyone on the street fights the same Rook together.",
    "spot": null,
    "evidence": [
-    "public/js/rook-attack.js"
+    "public/js/rook-attack.js",
+    "public/js/rook-mp.js"
    ],
    "shot": "shots/rooks.webp",
    "play": "../play/?autostart=1&fresh=1&resetgame=1&questoffer=off&timedemo=day&rookdemo=attack&practice=1"
@@ -1060,12 +1069,12 @@
   "source": 44,
   "rebuilt": 10,
   "solo": 9,
-  "lost": 3,
+  "progress": 3,
   "reimagined": 1,
-  "progress": 1
+  "lost": 1
  },
  "back": 64,
- "possible": 65,
+ "possible": 67,
  "quests": {
   "total": 445,
   "story": 245,
@@ -2030,7 +2039,7 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 508,
+  "commits": 510,
   "since": "2026-10-19",
   "recent": [
    {

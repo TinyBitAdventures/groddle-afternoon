@@ -15,9 +15,10 @@
  *   rebuilt     Rebuilt: the original level or art was never archived, so it is reconstructed from footage
  *   reimagined  Reimagined: nothing survives, so it is designed fresh in the original's spirit
  *   solo        Adapted for solo play: a multiplayer system reworked so one player can enjoy it
+ *               (the blurb says what multiplayer shares, where it does)
  *   progress    In progress
  *   missing     Not yet
- *   lost        Can't come back: needs other players, or nothing about it survives
+ *   lost        Can't come back: nothing about it survives, or it was retired
  *
  * spot: where the item sits in the page's street diorama (optional).
  * shot: a screenshot under spike/shots/ to illustrate it (optional).
@@ -37,7 +38,7 @@ export const STATUS = Object.freeze({
   missing: { label: 'Not yet', short: 'Not yet', tone: 'stone', mark: '',
     desc: 'Recoverable, but not started.' },
   lost: { label: "Can't come back", short: 'Lost', tone: 'dusk', mark: '×',
-    desc: 'It needed other people, or nothing about it survives.' },
+    desc: 'Nothing about it survives, or Tiny Speck retired it before Glitch closed.' },
 });
 
 export const GROUPS = Object.freeze([
@@ -152,7 +153,7 @@ export const CHECKLIST = Object.freeze([
 
   // —— Giants & economy ——
   { id: 'quoins', group: 'economy', name: 'Quoins', status: 'source', spot: 'quoin',
-    blurb: 'All eight quoin types, daily limits, multipliers and Qurazy quoins. Each street quoin spot is given one of the original quoin classes, which sets what it gives (a tiny 1, a small 2 to 6, a steady 25, a long-wait 2 to 100) and how long it takes to come back. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you.',
+    blurb: 'All eight quoin types, daily limits, multipliers and Qurazy quoins. Each street quoin spot is given one of the original quoin classes, which sets what it gives (a tiny 1, a small 2 to 6, a steady 25, a long-wait 2 to 100) and how long it takes to come back. Grab an iMG, mood, energy or currants quoin near other Glitches and they get a shard, and their grabs near you share with you. In multiplayer a street’s quoins are shared: the first to touch one gets it.',
     evidence: ['public/js/quoins.js', 'public/js/quoin-shards.js', 'public/js/features/quoin-shards-feature.js'] },
   { id: 'shrines', group: 'economy', name: 'Giants and shrines', status: 'source', spot: 'shrine',
     blurb: 'Donate at the eleven Giants’ shrines for favor; a waiting emblem is handed over as you walk past, and the third shrine you pass says hello. Spend favor, or a spare emblem, to learn the skill you are studying faster.',
@@ -172,9 +173,9 @@ export const CHECKLIST = Object.freeze([
   { id: 'badges', group: 'economy', name: 'Badges', status: 'source',
     blurb: 'The full badge catalog with official art and the original counters.',
     evidence: ['public/js/achievements.js', 'public/js/exploration.js'] },
-  { id: 'auctions', group: 'economy', name: 'Auctions and trading', status: 'lost',
-    blurb: 'The player auction house and trading needed other players.',
-    evidence: [] },
+  { id: 'auctions', group: 'economy', name: 'Auctions and trading', status: 'progress',
+    blurb: 'In multiplayer, trade items and currants face to face with another player on your street: the server holds both offers until you both accept. The auction house is not here yet.',
+    evidence: ['public/js/trade.js', 'public/js/features/trade-feature.js'] },
 
   // —— Quests & adventures ——
   { id: 'quests', group: 'quests', name: 'Story and skill quests', status: 'source', spot: 'rock-magic',
@@ -193,8 +194,8 @@ export const CHECKLIST = Object.freeze([
     blurb: 'Thirteen private courses: Cloud Rings, Radial Heights, Starlit Night, Slip ’N Slide, Aerial Boost, Mountain Scaling, Abysmal Thrill, Arbor Hollow, Bippity Bop, Cloud Flight, Updraft, Sky Plunge and Drafty Uplift. Tiny Speck built Updraft and Drafty Uplift, but they may never have reached players: only eleven Paradise courses are known to have gone live.',
     evidence: ['public/js/paradise-flight.js', 'public/js/paradise-courses.js', 'public/js/paradise-course-runtime.js'] },
   { id: 'races', group: 'quests', name: 'Races and Game of Crowns', status: 'solo',
-    blurb: 'Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules.',
-    evidence: ['public/js/races.js', 'public/js/game-of-crowns.js'] },
+    blurb: 'Seven race courses rebuilt from footage, raced against recovered rival Glitches under the final ticket-race rules. In multiplayer, Grab ’Em Good and the seven finish-line races are against the real players on your street.',
+    evidence: ['public/js/races.js', 'public/js/game-of-crowns.js', 'public/js/races-mp.js'] },
   { id: 'hog-haul', group: 'quests', name: 'The Great Hog Haul', status: 'solo',
     blurb: 'The piggy-wrangling race, on its real cave street, against a rival.',
     evidence: ['public/js/hog-haul.js'] },
@@ -230,14 +231,14 @@ export const CHECKLIST = Object.freeze([
   { id: 'craftybot', group: 'home', name: 'Craftybot', status: 'source',
     blurb: 'A crafting robot delivered in a box by your Magic Rock: queue jobs and it fetches the ingredients and tools, crafts every step, burns fuel and crystals, and hands you the results.',
     evidence: ['public/js/craftybot.js', 'public/js/features/craftybot-feature.js', 'public/assets/content/craftybot-specs.json'] },
-  { id: 'chat', group: 'home', name: 'Chat, groups and friends', status: 'lost',
-    blurb: 'Global chat, groups and buddy lists were about other people.',
-    evidence: [] },
+  { id: 'chat', group: 'home', name: 'Other players and chat', status: 'progress',
+    blurb: 'Sign in to play multiplayer and you share the street with other players: see them walk and emote, chat on the street, and form a party with its own chat. Global chat, groups and buddy lists are not here yet.',
+    evidence: ['public/js/realtime-client.js', 'public/js/features/realtime-feature.js', 'public/js/features/party-feature.js'] },
 
   // —— Late game ——
   { id: 'rooks', group: 'late', name: 'Rook attacks', status: 'solo',
-    blurb: 'The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival.',
-    evidence: ['public/js/rook-attack.js'] },
+    blurb: 'The herald, the attack, stuns with the Focusing Orb, primed shrines and the revival. In multiplayer, everyone on the street fights the same Rook together.',
+    evidence: ['public/js/rook-attack.js', 'public/js/rook-mp.js'] },
   { id: 'skills', group: 'late', name: 'Skills', status: 'source',
     blurb: 'All 105 skills to learn, with the real effects where their systems exist.',
     evidence: ['public/js/skill-tree.js', 'public/js/skills.js'] },

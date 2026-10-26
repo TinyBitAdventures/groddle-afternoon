@@ -34,7 +34,7 @@ export function restorationContent() {
     group('header', 'masthead', null, [group('div', 'wrap', null, [
       p('kicker', 'Groddle Field Notes · Restoration report'),
       h(1, 'How much of Glitch is back?'),
-      p('lead', 'Glitch closed in December 2012. Tiny Speck released its art, music and server code into the public domain, and almost everything else was lost: the maps of private quest rooms, most of the sound library, the multiplayer world itself. Groddle Afternoon is a fresh web build that puts the pieces back together, rule by rule from the original code, and room by room from players’ recordings where nothing else survives.'),
+      p('lead', 'Glitch closed in December 2012. Tiny Speck released its art, music and server code into the public domain, and almost everything else was lost: the maps of private quest rooms, most of the sound library, the multiplayer world itself. Groddle Afternoon is a fresh web build that puts the pieces back together, rule by rule from the original code, room by room from players’ recordings where nothing else survives, and with a new multiplayer server so players can share Ur again.'),
       data('score'),
       p('jump', jump),
     ])]),
@@ -72,7 +72,7 @@ export function restorationContent() {
         group('div', '', null, [
           h(3, 'Gone for good'),
           data('lost'),
-          p('note', 'Things that only made sense with other players are adapted for one where it works (races against rival Glitches, Feats with companions, street projects with a hired hand) and left out where it doesn’t.'),
+          p('note', 'Solo play adapts what needed other players where it works (races against rival Glitches, Feats with companions, street projects with a hired hand). Multiplayer brings back the shared street: chat, parties, races, trading and Rook fights. What neither can bring back is listed here.'),
         ]),
         group('div', '', null, [h(3, 'How to read the tags'), data('legend')]),
       ]),

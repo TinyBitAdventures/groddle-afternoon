@@ -103,7 +103,8 @@ describe('our column', () => {
     copy.items.find((it) => it.id === 'mining').status = 'solo';
     assert.equal(oursCell(row, copy).status, 'partial');
     const players = data.rows.find((r) => r.id === 'players');
-    assert.equal(oursCell(players, restoration).status, 'no', 'chat is single-player by design');
+    // Multiplayer has street chat and parties; global chat, groups and friends are not back yet.
+    assert.equal(oursCell(players, restoration).status, 'partial', 'other players and chat are partly back, in multiplayer');
   });
 
   it('headline numbers come from data.json', () => {

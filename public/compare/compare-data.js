@@ -42,7 +42,7 @@ export function oursCell(row, restoration) {
 export function oursNumbers(restoration) {
   const r = restoration;
   return [
-    { id: 'systems', num: r.back, of: r.possible, label: 'systems playable again', note: `${r.tally?.lost || 0} more can't come back without other players` },
+    { id: 'systems', num: r.back, of: r.possible, label: 'systems playable again', note: `${r.tally?.lost || 0} more can't come back: retired, or nothing survives` },
     { id: 'quests', num: r.quests.playable, of: r.quests.story, label: 'story and skill quests playable' },
     { id: 'streets', num: r.streets.imported, of: null, label: 'original streets', note: `across ${r.streets.hubs} regions` },
     { id: 'rooms', num: r.rooms.built, of: r.rooms.total, label: 'private quest rooms rebuilt' },
