@@ -561,6 +561,7 @@ const shell = ({ p, title, description, body, script }) => `<!doctype html>
   <link rel="stylesheet" href="${p}restoration/restoration.css" />
   <link rel="stylesheet" href="${p}changelog/changelog.css" />
   <link rel="stylesheet" href="${p}site/site-nav.css" />
+  <script src="${p}site/theme.js"></script>
   <link rel="stylesheet" href="${p}items/catalog.css" />
   <link rel="icon" href="${p}favicon.svg?v=quoin" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=quoin" sizes="32x32" />

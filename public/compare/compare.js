@@ -25,28 +25,6 @@ const longDate = (iso) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB
 const isExternal = (url) => /^https?:/.test(url);
 const linkAttrs = (url) => (isExternal(url) ? { href: url, target: '_blank', rel: 'noopener noreferrer' } : { href: url });
 
-/* —— Theme ———————————————————————————— */
-function setupTheme() {
-  const root = document.documentElement;
-  const button = $('#theme-toggle');
-  const order = ['auto', 'light', 'dark'];
-  const labels = { auto: 'Theme: auto', light: 'Theme: light', dark: 'Theme: dark' };
-  let mode = 'auto';
-  try { mode = localStorage.getItem('groddle-compare-theme') || 'auto'; } catch { /* storage blocked */ }
-  const apply = () => {
-    if (mode === 'auto') root.removeAttribute('data-theme');
-    else root.setAttribute('data-theme', mode);
-    $('.theme-toggle-text', button).textContent = labels[mode];
-    button.setAttribute('aria-label', `${labels[mode]}. Switch colour theme`);
-  };
-  button.addEventListener('click', () => {
-    mode = order[(order.indexOf(mode) + 1) % order.length];
-    try { localStorage.setItem('groddle-compare-theme', mode); } catch { /* storage blocked */ }
-    apply();
-  });
-  apply();
-}
-
 /* —— Sources (numbered once, in first-use order) ———————————————— */
 function makeSourceIndex(data) {
   const order = [];
@@ -263,7 +241,6 @@ async function load(url) {
   }
 }
 
-setupTheme();
 const [data, restoration] = await Promise.all([load('compare.json'), load('../restoration/data.json')]);
 if (data) {
   $('#checked-date').textContent = longDate(data.checked);

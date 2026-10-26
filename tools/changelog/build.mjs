@@ -65,6 +65,7 @@ export const siteNav = (p, current) => `  <nav class="site-nav" aria-label="Site
         <a href="${p}changelog/"${current === 'changelog' ? ' aria-current="page"' : ''}>Notes</a>
         <a class="site-nav-play" href="${p}play/">Play</a>
       </div>
+      <button class="site-nav-theme" type="button" aria-label="Colour theme"></button>
     </div>
   </nav>`;
 
@@ -78,6 +79,7 @@ ${noindex ? '  <meta name="robots" content="noindex" />\n' : ''}  <title>${esc(t
   <link rel="stylesheet" href="${p}restoration/restoration.css" />
   <link rel="stylesheet" href="${p}changelog/changelog.css" />
   <link rel="stylesheet" href="${p}site/site-nav.css" />
+  <script src="${p}site/theme.js"></script>
   <link rel="icon" href="${p}favicon.svg?v=quoin" type="image/svg+xml" />
   <link rel="icon" href="${p}favicon.ico?v=quoin" sizes="32x32" />
   <link rel="apple-touch-icon" href="${p}apple-touch-icon.png?v=quoin" />

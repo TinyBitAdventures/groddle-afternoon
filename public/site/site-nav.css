@@ -20,7 +20,7 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   color: var(--fg); text-decoration: none; white-space: nowrap;
   font-family: var(--font-display); font-weight: 600; font-size: 20px; letter-spacing: -0.01em;
 }
-.site-nav-links { display: flex; align-items: center; gap: 18px; }
+.site-nav-links { display: flex; align-items: center; gap: 18px; margin-left: auto; }
 .site-nav-links a:not(.site-nav-play) {
   color: var(--muted); text-decoration: none; font-weight: 700; font-size: 15px;
   padding: 4px 0; border-bottom: 2px solid transparent;
@@ -33,7 +33,56 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   transition: filter .15s ease;
 }
 .site-nav-play:hover { filter: brightness(1.08); }
-.site-nav a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+.site-nav a:focus-visible, .site-nav-theme:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+/* The colour theme button (site/theme.js shows it once it has set data-theme-mode on <html>).
+   Its icon is the choice: a sun, a moon, or a half-lit circle for System. */
+.site-nav-theme { display: none; }
+:root[data-theme-mode] .site-nav-theme {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 36px; height: 36px; padding: 0; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: transparent; color: var(--muted);
+  transition: color .15s ease, border-color .15s ease;
+  -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+}
+:root[data-theme-mode] .site-nav-theme:focus-visible { border-radius: 999px; }
+.site-nav-theme:hover, .site-nav-theme[aria-expanded="true"] { color: var(--fg); border-color: var(--muted); }
+.site-nav-theme::before {
+  content: ''; width: 18px; height: 18px; background: currentColor;
+  -webkit-mask: var(--theme-icon) center / contain no-repeat; mask: var(--theme-icon) center / contain no-repeat;
+}
+:root[data-theme-mode="light"] .site-nav-theme {
+  --theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4.5'/%3E%3Cpath d='M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8'/%3E%3C/svg%3E");
+}
+:root[data-theme-mode="dark"] .site-nav-theme {
+  --theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z'/%3E%3C/svg%3E");
+}
+:root[data-theme-mode="system"] .site-nav-theme {
+  --theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2v16a8 8 0 0 1 0-16z'/%3E%3C/svg%3E");
+}
+
+/* Its right-click menu: Light, Dark, System (built by site/theme.js, fixed under the button). */
+.site-nav-theme-menu {
+  position: fixed; z-index: 60; min-width: 148px; padding: 6px;
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--surface); color: var(--fg);
+  border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.45);
+}
+.site-nav-theme-menu[hidden] { display: none; }
+.site-nav-theme-menu:focus { outline: none; }
+.site-nav-theme-menu button {
+  position: relative; display: block; width: 100%; text-align: left; cursor: pointer;
+  padding: 8px 12px 8px 32px; border: 0; border-radius: 8px; background: none; color: inherit;
+  font-family: var(--font-body); font-size: 15px; font-weight: 700;
+}
+.site-nav-theme-menu button:hover, .site-nav-theme-menu button:focus-visible {
+  background: color-mix(in srgb, var(--accent) 18%, transparent); outline: none;
+}
+.site-nav-theme-menu button[aria-checked="true"]::before {
+  content: ''; position: absolute; left: 12px; top: 50%; width: 8px; height: 8px; margin-top: -4px;
+  border-radius: 50%; background: var(--accent);
+}
 
 /* Phones: the mark alone, then the links and Play. */
 @media (max-width: 640px) {
@@ -41,20 +90,38 @@ html { scroll-padding-top: calc(var(--site-nav-h) + 12px); }
   .site-nav-links { gap: 14px; }
 }
 
-/* Narrow phones: tighter, and the links scroll inside the bar rather than widen the page. */
+/* Narrow phones: tighter, and the links scroll inside the bar rather than widen the page.
+   The theme button stays outside the scroll, so the sizes step down to keep Play in view beside it. */
 @media (max-width: 440px) {
-  .site-nav-row { gap: 10px; }
-  .site-nav-links { gap: 11px; min-width: 0; overflow-x: auto; scrollbar-width: none; padding: 6px 4px; margin: -6px -4px; }
+  .site-nav-row { gap: 8px; }
+  .site-nav-links { gap: 10px; min-width: 0; overflow-x: auto; scrollbar-width: none; padding: 6px 4px; margin: -6px -4px; }
   .site-nav-links::-webkit-scrollbar { display: none; }
-  .site-nav-links a:not(.site-nav-play) { font-size: 14px; white-space: nowrap; }
-  .site-nav-play { padding: 0 12px; font-size: 14px; flex-shrink: 0; }
+  .site-nav-links a:not(.site-nav-play) { font-size: 13.5px; white-space: nowrap; }
+  .site-nav-play { padding: 0 11px; font-size: 13.5px; flex-shrink: 0; }
+  :root[data-theme-mode] .site-nav-theme { width: 30px; height: 30px; }
+  .site-nav-theme::before { width: 16px; height: 16px; }
 }
-
-/* The narrowest phones (320 px): smaller still, so Play stays in view. */
-@media (max-width: 350px) {
+@media (max-width: 390px) {
   .site-nav-links { gap: 8px; }
   .site-nav-links a:not(.site-nav-play) { font-size: 13px; }
-  .site-nav-play { padding: 0 10px; font-size: 13px; }
+  .site-nav-play { padding: 0 10px; font-size: 13px; min-height: 32px; }
+  :root[data-theme-mode] .site-nav-theme { width: 28px; height: 28px; }
+}
+/* Small phones (360 px): smaller still, so Play stays in view. */
+@media (max-width: 370px) {
+  .site-nav-row { gap: 6px; }
+  .site-nav-links { gap: 6px; }
+  .site-nav-links a:not(.site-nav-play) { font-size: 12px; }
+  .site-nav-play { padding: 0 8px; font-size: 12px; }
+}
+/* The narrowest phones (320 px). */
+@media (max-width: 340px) {
+  .site-nav-row { gap: 4px; }
+  .site-nav-links { gap: 5px; }
+  .site-nav-links a:not(.site-nav-play) { font-size: 11.5px; }
+  .site-nav-play { padding: 0 7px; font-size: 11.5px; }
+  :root[data-theme-mode] .site-nav-theme { width: 26px; height: 26px; }
+  .site-nav-theme::before { width: 14px; height: 14px; }
 }
 
-@media (prefers-reduced-motion: reduce) { .site-nav-play { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .site-nav-play, .site-nav-theme { transition: none; } }

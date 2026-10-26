@@ -81,13 +81,6 @@ body.compare { background-color: var(--bg); overflow-x: hidden; }
 .checked { color: var(--muted); font-size: 0.86em; }
 
 /* —— Masthead extras —— */
-.masthead-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.theme-toggle {
-  display: inline-flex; align-items: center; gap: 8px; flex: none;
-  border: 1px solid var(--border); background: var(--chip-bg); border-radius: 999px;
-  padding: 5px 12px; font-size: 13px; font-weight: 700; cursor: pointer; color: var(--fg);
-}
-.theme-toggle-dot { width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(90deg, #fbfaf2 50%, #202a21 50%); border: 1px solid var(--border); }
 .checked-line { margin: -12px 0 18px; color: var(--muted); font-size: 15px; }
 .cc0-strip { display: flex; align-items: flex-end; gap: 18px; height: 70px; margin: 0 0 4px; }
 .cc0-strip .sheet-quoin { transform: scale(0.8); transform-origin: 50% 100%; }
