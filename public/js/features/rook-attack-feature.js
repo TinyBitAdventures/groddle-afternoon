@@ -88,6 +88,19 @@ import { shrinePrimeBonus } from '../imagination-effects.js';
 import { grantMoodXp } from '../mood-xp.js';
 import { gainMetabolic, loseEnergy, loseMood } from '../metabolics.js';
 import { displayTopOf, easeOutBack, itemstackOverlayPoint, playSheetOverlay } from '../overlay-art.js?v=g311-1';
+import {
+  MP_ROOK,
+  MP_ROOK_TEXT,
+  attackFromServer,
+  offerAllowed,
+  orbOf,
+  primeBonusLevel,
+  rookedFromServer,
+  shareLine,
+  shareOf,
+  strikeDamage as mpStrikeDamage,
+  syncKeys,
+} from '../rook-mp.js?v=mp4-1';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
@@ -176,6 +189,8 @@ let primed = null; // { target, until, damage, strikeAt }
 let orb = null; // runtime orb
 let offerPanel = null;
 let headroom = null; // { until }: the camera looks up for the orb (G283)
+/** Multiplayer only (see the Multiplayer section): the server's attack for this street, or null in solo. */
+let mp = null;
 
 // Pixi parts
 let ui = null; // screen layer
@@ -191,6 +206,7 @@ let departing = null;
 const now = () => Date.now();
 
 function slot(engine, tsid) {
+  if (mp) return mp.slot;
   const raw = engine.streetSlot(ROOK_FEATURE_ID, tsid);
   const clean = normalizeRookedSlot(raw);
   raw.rooked = clean.rooked;
@@ -199,6 +215,7 @@ function slot(engine, tsid) {
 }
 
 function active() {
+  if (mp) return mp.attack;
   return save.active && !save.active.cleared ? save.active : null;
 }
 
@@ -905,8 +922,8 @@ function playArt(engine, key, opts) {
  * (scale = min(players / 6, 1)), for 1 s, then overlay_scale to 1 + scale
  * over 0.25 s (easeOutBack).
  */
-function orbLaser(engine, joiners) {
-  const p = engine.player;
+function orbLaser(engine, joiners, from = engine.player) {
+  const p = from;
   if (!p) return;
   const s = Math.min(Math.max(0, joiners) / 6, 1);
   const at = { x: p.x, y: p.y - (50 - s * 100) };
@@ -1157,6 +1174,7 @@ function handleRemoteEvents(engine, a, events) {
 // ---------------------------------------------------------------------------
 
 function stunGate(engine) {
+  if (mp) return mpStunGate(engine);
   const a = here(engine);
   if (!a || !rookPresent(a)) return { ok: false, reason: ROOK_TEXT.stunWait };
   if (!canStun(a)) return { ok: false, reason: ROOK_TEXT.stunWait };
@@ -1168,6 +1186,7 @@ function stunGate(engine) {
 }
 
 function startStun(engine, source = 'verb') {
+  if (mp) return mpStartStun(engine, source);
   const gate = stunGate(engine);
   if (!gate.ok) {
     if (source !== 'auto') engine.toast(gate.reason, 2200);
@@ -1380,6 +1399,7 @@ function releaseOrb(engine) {
 // ---------------------------------------------------------------------------
 
 function prime(engine, target) {
+  if (mp) return mpPrime(engine, target);
   const a = here(engine);
   if (!canStrike(a)) {
     engine.toast(ROOK_TEXT.primeNotStunned, 2400);
@@ -1410,6 +1430,7 @@ function endPrime(engine, announce = true) {
 }
 
 function strikeGate(engine, target) {
+  if (mp) return mpStrikeGate(engine, target);
   const a = here(engine);
   if (!a || !rookPresent(a)) return { ok: false, reason: '' };
   if (!canStrike(a)) return { ok: false, reason: ROOK_TEXT.donateBlocked };
@@ -1424,6 +1445,7 @@ function primeBonusFor(engine) {
 }
 
 function offerOptions(engine, giantId) {
+  if (mp) return mpOfferOptions(engine, giantId);
   const inv = engine.inv;
   const out = [];
   for (const [classTsid, n] of Object.entries(inv)) {
@@ -1447,6 +1469,7 @@ function offerOptions(engine, giantId) {
 }
 
 function strike(engine, target, classTsid, count) {
+  if (mp) return mpStrike(engine, target, classTsid, count);
   const gate = strikeGate(engine, target);
   if (!gate.ok) {
     engine.toast(gate.reason || ROOK_TEXT.strikeNeedsPrime, 2000);
@@ -1549,7 +1572,7 @@ function openOfferPanel(engine, target) {
 
 function updatePrimeFx(engine) {
   if (!primed) return;
-  if (now() >= primed.until) {
+  if (now() >= primed.until && !primed.mp) {
     endPrime(engine, true);
     return;
   }
@@ -1594,6 +1617,7 @@ function nearestRooked(engine, range = ROOK_SOURCE.balmRange) {
 }
 
 function revive(engine, target, { balm = false } = {}) {
+  if (mp) return mpRevive(engine, target, { balm });
   const key = keyOf.get(target);
   const s = slot(engine);
   if (!key || !s.rooked[key]) return false;
@@ -1639,7 +1663,7 @@ function rookedVerbs(engine, target) {
   const s = slot(engine);
   const row = s.rooked[key];
   const label = rookLabel(target);
-  const energy = soloCost(ROOK_SOURCE.reviveEnergy);
+  const energy = costOf(ROOK_SOURCE.reviveEnergy);
   const verbs = [];
   if (balmCount(engine) > 0 || save.balmPoints > 0) {
     verbs.push({
@@ -1652,11 +1676,13 @@ function rookedVerbs(engine, target) {
     });
   }
   const enough = (engine.pc.energy || 0) > energy;
+  // Multiplayer: one dose per player (items/include/rook.js startRevive 112).
+  const dosed = Boolean(mp && row?.by?.includes(mp.client.me?.id));
   verbs.push({
     id: 'rook_revive',
     label: `Revive (${(row?.doses || 0) + 1}/${ROOK_SOURCE.reviveHealers})`,
-    enabled: enough,
-    reason: enough ? '' : "You don't have enough energy to do that!",
+    enabled: enough && !dosed,
+    reason: dosed ? 'You have already helped revive this one.' : enough ? '' : "You don't have enough energy to do that!",
     tooltip: ROOK_TEXT.reviveTooltip.replace('$itemclass', label.toLowerCase()).replace('$energy_cost', String(energy)),
     durationMs: ROOK_SOURCE.reviveMs,
     energy,
@@ -1666,15 +1692,16 @@ function rookedVerbs(engine, target) {
 
 function shrineVerbs(engine, target, a) {
   const stunned = canStrike(a);
-  const cost = soloCost(ROOK_SOURCE.primeEnergy, { armor: armored() });
-  const isPrimed = primed?.target === target;
+  const cost = costOf(ROOK_SOURCE.primeEnergy, { armor: armored() });
+  const isPrimed = mp ? Boolean(a?.primed) : primed?.target === target;
+  const pietyless = Boolean(mp) && !engine.learnedSkills?.includes(MP_ROOK.primeSkill);
   const gate = strikeGate(engine, target);
   return [
     {
       id: 'rook_prime',
       label: isPrimed ? 'Primed!' : 'Prime',
-      enabled: stunned && !isPrimed && (engine.pc.energy || 0) > cost,
-      reason: isPrimed ? 'This shrine is already primed.' : stunned ? '' : ROOK_TEXT.primeNotStunned,
+      enabled: stunned && !isPrimed && !pietyless && (engine.pc.energy || 0) > cost,
+      reason: pietyless ? MP_ROOK_TEXT.needsPiety : isPrimed ? 'This shrine is already primed.' : stunned ? '' : ROOK_TEXT.primeNotStunned,
       tooltip: ROOK_TEXT.primeTooltip.replace('$energy_cost', String(cost)),
       energy: cost,
       durationMs: 0,
@@ -1691,6 +1718,557 @@ function shrineVerbs(engine, target, a) {
 }
 
 // ---------------------------------------------------------------------------
+// Multiplayer (phase 4): one shared attack per street, owned by the realtime
+// server (realtime/rook.go; the pure half is js/rook-mp.js). Everyone on the
+// street sees the same herald, Rook, health, stun, orbs, primed shrine and
+// wing beats; each player's own share arrives as rook_you and lands on their
+// own save here. Solo never reaches this section (mp stays null).
+// ---------------------------------------------------------------------------
+
+/** A metabolic cost: the solo 100-energy-tank scale in solo, the source value in multiplayer. */
+function costOf(sourceValue, opts = {}) {
+  if (!mp) return soloCost(sourceValue, opts);
+  let value = sourceValue;
+  if (opts.armor) value = opts.armorRule === 'none' ? 0 : value / 2;
+  return Math.max(0, Math.round(value));
+}
+
+/** realtime-feature sharedStreet: the street others share, or '' in a private place. */
+function mpSharedStreet(engine) {
+  if (!engine?.player || !engine.streetTsid) return '';
+  if (engine.transientInstance?.()) return '';
+  if (engine.homeContext?.().inHome) return '';
+  return String(engine.streetTsid);
+}
+
+function mpBind(engine) {
+  if (mp) return mp;
+  const client = engine.query?.('realtimeClient');
+  if (!client) return null;
+  mp = { client, street: '', synced: '', snapped: '', syncAt: 0, attack: null, slot: { rooked: {}, pendingBeats: 0 }, arts: new Map(), lastYou: '' };
+  // An MP save never runs a local attack (older saves may hold one from before the server owned them).
+  save.active = null;
+  client.on('msg:rook', (msg) => mpOnRook(engineRef || engine, msg));
+  client.on('msg:rook_you', (msg) => mpOnYou(engineRef || engine, msg));
+  client.on('msg:rook_no', (msg) => {
+    if (msg?.message) (engineRef || engine).toast?.(String(msg.message), 2400);
+    lastAction = `refused:${msg?.what || ''}:${msg?.code || ''}`;
+  });
+  client.on('state', ({ state }) => {
+    if (state === 'online') return;
+    mp.synced = '';
+    mp.snapped = '';
+  });
+  client.on('roster', ({ street }) => {
+    if (street !== mp.synced) mp.synced = '';
+  });
+  return mp;
+}
+
+function mpMyId() {
+  return mp?.client?.me?.id ?? null;
+}
+
+/** Where a player stands: you, or another Glitch the realtime client knows. */
+function mpPosOf(engine, id) {
+  if (id != null && id === mpMyId()) return engine.player ? { x: engine.player.x, y: engine.player.y } : null;
+  const p = mp?.client?.players?.find((x) => x.id === id);
+  return p ? { x: Number(p.x) || 0, y: Number(p.y) || 0 } : null;
+}
+
+function mpLeaveStreet(engine) {
+  for (const by of [...mp.arts.keys()]) mpDropArt(by);
+  if (mp.attack) stopMusic();
+  mp.attack = null;
+  mp.slot.rooked = {};
+  mp.street = '';
+  mp.synced = '';
+  mp.snapped = '';
+  primed = null;
+}
+
+function mpTick(engine, t) {
+  if (save.active) save.active = null;
+  if (!mpBind(engine)) return;
+  const street = mpSharedStreet(engine);
+  if (street !== mp.street) {
+    mpLeaveStreet(engine);
+    mp.street = street;
+    mp.syncAt = t + 1500; // the street's critters and trees are scanned (and keyed) by then
+  }
+  if (!street) return;
+  // Ask once the server has us on this street and our rookable keys are known.
+  if (!mp.synced && mp.client.state === 'online' && mp.client.street === street && t >= mp.syncAt) {
+    if (mp.client.send('rook_sync', { keys: syncKeys(rookableTargets(engine)) })) mp.synced = street;
+  }
+  mpSyncPrimed(engine);
+}
+
+/** The primed shrine for everyone (shrines.js primeStart: anyone may then donate). */
+function mpSyncPrimed(engine) {
+  const p = mp.attack?.primed;
+  const shrine = shrineTarget(engine);
+  if (!p || !shrine) {
+    if (primed?.mp) {
+      if (primed.ring && !primed.ring.destroyed) primed.ring.destroy();
+      primed = null;
+      closeOfferPanel();
+    }
+    return;
+  }
+  if (!primed?.mp || primed.target !== shrine) primed = { mp: true, target: shrine, until: p.until, damage: 0, strikeAt: 0, ring: primed?.ring };
+  primed.until = p.until;
+  primed.by = p.by;
+}
+
+function mpOnRook(engine, msg) {
+  if (!mp || !msg || msg.street !== engine.streetTsid || msg.street !== mp.street) return;
+  const t = now();
+  const before = mp.attack;
+  mp.attack = attackFromServer(msg.attack, msg.street, t);
+  mp.slot.rooked = rookedFromServer(msg.rooked);
+  const a = mp.attack;
+  if (msg.snap) {
+    mp.snapped = msg.street;
+    // onPlayerEnterRooked (inc_rook.js 628-655): the ROOK ATTACK! overlay and the music for an arrival.
+    if (a && rookPresent(a) && a.phase !== 'dead' && a.phase !== 'departed') {
+      ensureUi(engine);
+      showOverlay(engine, ROOK_TEXT.attack);
+      startMusic(engine);
+    } else if (a?.phase === 'herald') ensureUi(engine);
+  }
+  const ev = msg.ev && typeof msg.ev === 'object' ? msg.ev : null;
+  if (ev) mpEvent(engine, a, ev);
+  if (!a && before) {
+    stopMusic();
+    for (const by of [...mp.arts.keys()]) mpDropArt(by);
+  }
+  mpSyncPrimed(engine);
+  syncRookedVisuals(engine, rookableTargets(engine));
+  publish(engine, true);
+}
+
+function mpEvent(engine, a, ev) {
+  const me = mpMyId();
+  const mine = ev.by != null && ev.by === me;
+  switch (ev.type) {
+    case 'herald_warning':
+    case 'angry2':
+    case 'angry3':
+      ensureUi(engine);
+      handleEvents(engine, a, [{ type: ev.type, n: Number(ev.n) || 1, at: now() }]);
+      break;
+    case 'attack_start':
+      ensureUi(engine);
+      save.stats.attacks += 1;
+      handleEvents(engine, a, [{ type: 'attack_start', at: now() }]);
+      break;
+    case 'wing_beat':
+      mpWingBeatFx(engine, a, Array.isArray(ev.hit) ? ev.hit.map(String) : []);
+      break;
+    case 'depart':
+      onDepart(engine);
+      break;
+    case 'stun_recovery':
+      setFeed('The Rook shakes off the stun. Stun it again!');
+      lastAction = 'stun_recovery';
+      break;
+    case 'clear':
+      stopMusic();
+      lastAction = ev.defeated ? 'clear:defeated' : 'clear';
+      break;
+    case 'crowd':
+      setFeed(MP_ROOK_TEXT.stronger);
+      lastAction = `crowd:${ev.crowd}`;
+      break;
+    case 'orb_start':
+      engine.playSound('FOCUSING_ORB', { volume: mine ? 0.5 : 0.35 });
+      if (!mine) setFeed(MP_ROOK_TEXT.joinHint(ev.name || 'Someone'), 8000);
+      lastAction = `orb_start:${ev.by}`;
+      break;
+    case 'orb_join':
+      lastAction = `orb_join:${ev.by}:${ev.count}`;
+      break;
+    case 'orb_cancel':
+      lastAction = `orb_cancel:${ev.by}`;
+      break;
+    case 'stun':
+      mpStunFx(engine, a, ev);
+      break;
+    case 'stun_failed':
+      if (ev.text) setFeed(String(ev.text));
+      if (ev.first) showOverlay(engine, ROOK_TEXT.firstStun);
+      lastAction = 'stun_failed';
+      break;
+    case 'primed':
+      setFeed(mine ? MP_ROOK_TEXT.primedYou : MP_ROOK_TEXT.primedBy(ev.name || 'Someone'));
+      engine.playSound('DONATE_TO_SHRINE', { volume: 0.5 });
+      lastAction = mine ? 'primed' : `primed_by:${ev.by}`;
+      break;
+    case 'prime_end':
+      lastAction = 'prime_end';
+      break;
+    case 'strike':
+      mpStrikeFx(engine, ev);
+      break;
+    case 'defeated':
+      mpDefeatFx(engine);
+      break;
+    case 'revive':
+      mpReviveFx(engine, ev);
+      break;
+    default:
+      break;
+  }
+}
+
+/** rookWingBeat (inc_rook.js 248-278): the swoop for everyone and the things the server rooked. */
+function mpWingBeatFx(engine, a, hit) {
+  swoop = { at: now(), ms: 1700 };
+  shakeUntil = now() + 1100;
+  spawnFeathers(engine, VIEW_W / 2, 210, 14);
+  const entries = rookableTargets(engine);
+  const hits = new Set(hit);
+  // items/include/trants.js onRooked: fruit gone, health -2, on this player's copy of the tree.
+  for (const e of entries) if (hits.has(e.key) && TRANT_META[e.classId] && e.target.state) rookTrantState(e.target.state);
+  syncRookedVisuals(engine, entries);
+  const cam = engine.camera;
+  const first = entries.find((e) => hits.has(e.key) && e.x > cam.x + 40 && e.x < cam.x + cam.w * 0.75);
+  if (first) {
+    const line = rookResponse(first.classId, 'rooked');
+    if (line) engine.say(first.target, line, 3500);
+  }
+  engine.pushActivity(`The Rook attacks! ${hit.length} ${hit.length === 1 ? 'thing was' : 'things were'} rooked.`);
+  setFeed(`The Rook swooped! ${hit.length} rooked. ${a?.phase === 'departed' ? '' : 'Stun it before it strikes again.'}`);
+  engine.playSound('ROOK_CAW', { volume: 0.5, rate: 0.8, allowMultiple: true });
+  lastAction = `wing_beat:${hit.length}`;
+}
+
+function mpStunFx(engine, a, ev) {
+  const at = mpPosOf(engine, ev.by) || engine.player;
+  const damage = Number(ev.damage) || 0;
+  orbLaser(engine, Number(ev.joiners) || 0, at);
+  spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y);
+  setHeadClip('stun', { once: true, lockMs: 1100 });
+  if (ui?.badge) {
+    ui.badge.stamp.text = `STUN! ${damage}`;
+    ui.badge.stampUntil = now() + 1400;
+  }
+  if (at) engine.floatText(at.x, at.y - 190, `STUN ${damage}`, 0xfff27a);
+  if (ev.text) setFeed(String(ev.text));
+  if (ev.first) showOverlay(engine, ROOK_TEXT.firstStun);
+  if (ev.stunned) {
+    // doStunned 415 and rook_attack.js stunned_text.
+    showOverlay(engine, ROOK_TEXT.stunned);
+    setFeed(ROOK_TEXT.stunnedNote, 9000);
+    engine.playSound('MEDITATION_SUCCESS', { volume: 0.5 });
+  }
+  engine.playSound('EFFECT_MILD', { volume: 0.5 });
+  lastAction = `stun:${damage}:${a?.stun ?? ''}`;
+}
+
+function mpStrikeFx(engine, ev) {
+  const spr = shrineTarget(engine)?.sprite;
+  const damage = Number(ev.damage) || 0;
+  if (spr && !spr.destroyed) {
+    shrineLaser(engine, spr, Number(ev.beam) || 1);
+    engine.floatText(spr.x, spr.y - 170, `-${damage}`, 0xff5a6e);
+  }
+  spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y);
+  setHeadClip('stunnedHit', { once: true, lockMs: 1100 });
+  if (ev.text) setFeed(String(ev.text));
+  lastAction = `strike:${damage}:${ev.health}`;
+}
+
+/** rookStateChange('dead') (inc_rook.js 187-206) as everyone sees it; the iMG comes as rook_you. */
+function mpDefeatFx(engine) {
+  showOverlay(engine, { ...ROOK_TEXT.defeated, color: ROOK_COLORS.teal, holdS: 4.5 });
+  setHeadClip('killShot', { once: true, lockMs: 1300 });
+  const r = ui?.rook;
+  if (r && !r.destroyed) departing = { at: now(), ms: 2600, x: r.x, y: r.y, scale: r.scale.x };
+  spawnFeathers(engine, rookScreenPos().x, rookScreenPos().y, 22);
+  youDidItRainbow(engine);
+  engine.playSound('RAINBOW_YOUDIDIT', { volume: 0.7 });
+  for (const by of [...mp.arts.keys()]) mpDropArt(by);
+  lastAction = 'defeated';
+}
+
+function mpReviveFx(engine, ev) {
+  const entry = rookableTargets(engine).find((e) => e.key === ev.key);
+  const doses = Number(ev.doses) || 0;
+  lastAction = ev.done ? `revived:${ev.key}` : `revive_dose:${ev.key}:${doses}`;
+  if (!entry) return;
+  const pool = ev.done ? 'revived_3rd_time' : doses === 1 ? 'revived_1st_time' : 'revived_2nd_time';
+  const line = rookResponse(entry.classId, pool, Math.random, ev.name || PLAYER_LABEL);
+  if (line) engine.say(entry.target, line, 4000);
+  if (ev.done) {
+    removeRookedVisual(engine, ev.key);
+    if (entry.target.sprite && !entry.target.sprite.destroyed) revivedRainbow(engine, entry.target.sprite);
+    engine.playSound('RAINBOW_FULLYREVIVED', { volume: 0.5 });
+  }
+}
+
+/** This player's own share of the fight (rook.go rook_you), applied to their own save. */
+function mpOnYou(engine, msg) {
+  if (!mp || !msg) return;
+  const share = shareOf(msg, { armor: armored() });
+  const why = share.why;
+  if (why === 'strike') {
+    // The offering leaves the pack only once the shrine took it.
+    const item = String(msg.item || '');
+    const n = Math.min(Math.max(1, Number(msg.count) || 1), countItem(engine.inv, item));
+    if (n > 0) removeItem(engine.inv, item, n);
+    engine.refreshPack();
+    save.stats.strikes += 1;
+  }
+  if (why === 'revive' && msg.balm) {
+    const use = useBalmPoint(save, balmCount(engine));
+    if (use.ok && use.consumeItem) removeItem(engine.inv, BALM_CLASS, 1);
+    save.stats.balms += 1;
+    engine.achievement(`potions_used:${BALM_CLASS}`, 1);
+    engine.refreshPack();
+  }
+  const xp = grant(engine, { xp: share.xp, energy: share.energy, mood: share.mood });
+  if (share.favor) {
+    const favor = engine.pc.giantFavor;
+    if (favor && typeof favor === 'object') for (const g of Object.keys(favor)) favor[g] = (favor[g] || 0) + share.favor;
+  }
+  const effects = { xp, energy: share.energy, mood: share.mood };
+  let line = shareLine(msg, { xp, energy: share.energy, mood: share.mood });
+  if (why === 'revive') {
+    const label = ITEM_CATALOG[msg.class]?.label || String(msg.class || 'critter').replace(/^npc_|^trant_/, '').replace(/_/g, ' ');
+    save.stats.revives += 1;
+    if (msg.done) save.stats.fullRevives += 1;
+    line = msg.done
+      ? `You revived a ${label}! +${share.favor} favor with every Giant`
+      : `You helped revive a ${label} (${msg.doses}/${ROOK_SOURCE.reviveHealers})`;
+  }
+  if (why === 'stun_lead') save.stats.stuns += 1;
+  if (why === 'defeat_help' || why === 'defeat_witness') {
+    save.stats.defeats += 1;
+    // inc_rook.js 193-195: Rook Ranger with Rook Armor on.
+    if (armored()) engine.achievement('essence_of_rookswort:defeated_rook', 1);
+  }
+  if (why === 'wing_beat' && engine.player) {
+    engine.floatText(engine.player.x, engine.player.y - 130, `-${-share.energy} energy${share.mood ? ` ${share.mood} mood` : ''}`, 0xff8a8a);
+  }
+  if (line) engine.pushActivity({ base: line, effects });
+  mp.lastYou = `${why}:${xp}`;
+  engine.save();
+  publish(engine, true);
+}
+
+// —— Actions ——
+
+function mpStunGate(engine) {
+  const a = here(engine);
+  if (!a || !rookPresent(a) || !canStun(a)) return { ok: false, reason: ROOK_TEXT.stunWait };
+  if (!engine.learnedSkills?.includes(MP_ROOK.stunSkill)) return { ok: false, reason: MP_ROOK_TEXT.needsMartial };
+  if (orbOf(a, mpMyId())) return { ok: false, reason: 'You are already focused on an orb.' };
+  if (countItem(engine.inv, ORB_CLASS) <= 0) return { ok: false, reason: 'You need a Focusing Orb to stun the Rook.' };
+  const cost = costOf(ROOK_SOURCE.stunEnergy, { armor: armored() });
+  if ((engine.pc.energy || 0) < cost) return { ok: false, reason: ROOK_TEXT.stunTired };
+  return { ok: true, cost };
+}
+
+function mpStartStun(engine, source = 'verb') {
+  // A click on the Rook while someone else's orb is open joins it.
+  const a = here(engine);
+  const me = mpMyId();
+  if (source === 'click' && a && !orbOf(a, me)) {
+    const open = a.orbs.find((o) => o.by !== me);
+    if (open && !engine.learnedSkills?.includes(MP_ROOK.stunSkill)) return mpJoinOrb(engine, open.by);
+  }
+  const gate = mpStunGate(engine);
+  if (!gate.ok) {
+    if (source !== 'auto') engine.toast(gate.reason, 2200);
+    return false;
+  }
+  return Boolean(mp.client.send('rook_orb'));
+}
+
+function mpJoinOrb(engine, by) {
+  const a = here(engine);
+  const o = a?.orbs.find((x) => x.by === by);
+  if (!o) {
+    engine.toast('That orb has already been released.', 2000);
+    return false;
+  }
+  if (orbOf(a, mpMyId())) {
+    engine.toast('You are already focused on an orb.', 2000);
+    return false;
+  }
+  // focusing_orb.js onOverlayClicked 1714-1717.
+  if ((engine.pc.energy || 0) <= MP_ROOK.joinEnergy) {
+    engine.toast(MP_ROOK_TEXT.joinTired, 2200);
+    return false;
+  }
+  return Boolean(mp.client.send('rook_orb_join', { by }));
+}
+
+function mpOrbPackVerbs(engine) {
+  const a = here(engine);
+  if (!a || !rookPresent(a)) return [];
+  const me = mpMyId();
+  const mine = orbOf(a, me);
+  if (mine) return [{ id: 'rook_focusing', label: `Focusing (${mine.joiners.length})`, enabled: false, reason: 'The orb fires on its own when its 15 seconds are up.', tooltip: '', primary: true }];
+  const gate = mpStunGate(engine);
+  const verbs = [{
+    id: 'rook_stun',
+    label: 'Stun attack',
+    enabled: gate.ok,
+    reason: gate.ok ? '' : gate.reason,
+    tooltip: ROOK_TEXT.stunTooltip.replace('$energy_cost', String(costOf(ROOK_SOURCE.stunEnergy, { armor: armored() }))),
+    primary: true,
+  }];
+  for (const o of a.orbs) {
+    if (o.by === me) continue;
+    verbs.push({ id: `rook_join:${o.by}`, label: `Focus on ${o.name || 'their'}'s orb`, enabled: (engine.pc.energy || 0) > MP_ROOK.joinEnergy, reason: MP_ROOK_TEXT.joinTired, tooltip: MP_ROOK_TEXT.orbClick });
+  }
+  return verbs;
+}
+
+/**
+ * Every open orb over its initiator (focusing_orb_attack, orb1-4 by joiners,
+ * inc_rook.js newOrbMessage 454-500), with the joined count above it; another
+ * player's orb is clickable to focus on it.
+ */
+function mpDrawOrbs(engine) {
+  const a = here(engine);
+  const orbs = a?.orbs || [];
+  const me = mpMyId();
+  const live = new Set(orbs.map((o) => o.by));
+  for (const by of [...mp.arts.keys()]) if (!live.has(by)) mpDropArt(by);
+  let mineUp = false;
+  const t = now();
+  for (const o of orbs) {
+    const pos = mpPosOf(engine, o.by);
+    if (!pos) continue;
+    if (o.by === me) mineUp = true;
+    let art = mp.arts.get(o.by);
+    if (!art) {
+      const { PIXI } = engine;
+      const root = new PIXI.Container();
+      root.zIndex = 40;
+      const count = new PIXI.Text({ text: '0', style: textStyle(20, { fill: 0xffffff }) });
+      count.anchor.set(0.5, 1);
+      root.addChild(count);
+      if (o.by !== me) {
+        root.eventMode = 'static';
+        root.cursor = 'pointer';
+        // The orb and the count under it.
+        root.hitArea = new PIXI.Rectangle(-70, -80, 140, 240);
+        root.on('pointertap', () => mpJoinOrb(engine, o.by));
+      } else root.eventMode = 'none';
+      frontLayer(engine).addChild(root);
+      const fx = playArt(engine, 'focusing_orb_attack', {
+        at: () => {
+          const p = mpPosOf(engine, o.by) || pos;
+          return { x: p.x, y: p.y + ORB_ART.dy };
+        },
+        durationMs: Math.max(1000, o.fireAt - t) + 1500,
+        state: orbLookFor(o.joiners.length).state,
+        zIndex: 39,
+      });
+      art = { root, count, fx };
+      mp.arts.set(o.by, art);
+    }
+    art.fx?.setState?.(orbLookFor(o.joiners.length).state);
+    art.root.x = pos.x;
+    art.root.y = pos.y - ORB_ART.orbAbove;
+    art.count.y = ORB_ART.countDy - 30 * Math.min(o.joiners.length / 6, 1) + ORB_ART.orbAbove;
+    art.count.text = String(o.joiners.length);
+  }
+  // Any open orb: the camera looks up so it shows (the original's taller viewport did, G283).
+  if (mineUp || mp.arts.size) holdHeadroom(engine, Infinity);
+  else if (headroom && headroom.until === Infinity) headroom.until = now() + ORB_HEADROOM.afterMs;
+}
+
+function mpDropArt(by) {
+  const art = mp?.arts.get(by);
+  if (!art) return;
+  mp.arts.delete(by);
+  art.fx?.stop?.();
+  if (!art.root.destroyed) art.root.destroy({ children: true });
+}
+
+function mpPrime(engine, target) {
+  const a = here(engine);
+  if (!canStrike(a)) {
+    engine.toast(ROOK_TEXT.primeNotStunned, 2400);
+    return false;
+  }
+  if (!engine.learnedSkills?.includes(MP_ROOK.primeSkill)) {
+    engine.toast(MP_ROOK_TEXT.needsPiety, 2400);
+    return false;
+  }
+  const cost = costOf(ROOK_SOURCE.primeEnergy, { armor: armored() });
+  if ((engine.pc.energy || 0) <= cost) {
+    engine.toast("You don't have enough energy to do that!", 2200);
+    return false;
+  }
+  return Boolean(mp.client.send('rook_prime', { bonus: primeBonusLevel(primeBonusFor(engine)) }));
+}
+
+function mpStrikeGate(engine, target) {
+  const a = here(engine);
+  if (!a || !rookPresent(a)) return { ok: false, reason: '' };
+  if (!canStrike(a)) return { ok: false, reason: ROOK_TEXT.donateBlocked };
+  if (!a.primed) return { ok: false, reason: ROOK_TEXT.strikeNeedsPrime };
+  if (now() < (mp.strikeAt || 0)) return { ok: false, reason: 'The shrine is still recharging.' };
+  return { ok: true };
+}
+
+/** The shrine's offering grid in multiplayer: what the server takes, at its own damage (no solo crowd). */
+function mpOfferOptions(engine, giantId) {
+  const out = [];
+  // The primer's Shrine On card is the server's to add (rook.go strikeDamage), so the grid shows the base damage.
+  const bonus = 0;
+  for (const [classTsid, n] of Object.entries(engine.inv)) {
+    if (!(n > 0)) continue;
+    // An emblem carries no catalog row until one is claimed at a shrine this session (shrines.js claimEmblem).
+    const own = classTsid === `emblem_${giantId}`;
+    const meta = ITEM_CATALOG[classTsid] || (own ? { label: `Emblem of ${giantId.charAt(0).toUpperCase()}${giantId.slice(1)}`, tags: ['emblem'] } : null);
+    if (!offerAllowed(classTsid, meta, giantId)) continue;
+    const emblem = classTsid === `emblem_${giantId}`;
+    const base = donationValueFor(classTsid);
+    const one = mpStrikeDamage({ baseCost: base, count: 1, emblem, primeBonus: bonus });
+    const all = mpStrikeDamage({ baseCost: base, count: Math.min(n, 999), emblem, primeBonus: bonus });
+    if (all <= 0) continue;
+    out.push({ classTsid, label: meta.label || classTsid, icon: meta.icon, count: Math.min(n, 999), emblem, one, all });
+  }
+  return out.sort((x, y) => y.all - x.all).slice(0, 24);
+}
+
+function mpStrike(engine, target, classTsid, count) {
+  const gate = mpStrikeGate(engine, target);
+  if (!gate.ok) {
+    engine.toast(gate.reason || ROOK_TEXT.strikeNeedsPrime, 2000);
+    return false;
+  }
+  const n = Math.max(1, Math.min(count, countItem(engine.inv, classTsid), 999));
+  if (countItem(engine.inv, classTsid) <= 0) return false;
+  // shrineAttack 967: the donate overlay comes back after 3 s.
+  mp.strikeAt = now() + ROOK_SOURCE.strikeCooldownMs;
+  return Boolean(mp.client.send('rook_strike', { item: classTsid, count: n }));
+}
+
+function mpRevive(engine, target, { balm = false } = {}) {
+  const key = keyOf.get(target);
+  const row = key ? mp.slot.rooked[key] : null;
+  if (!row) return false;
+  if (balm && save.balmPoints <= 0 && balmCount(engine) <= 0) {
+    engine.toast(ROOK_TEXT.balmNothing, 2000);
+    return false;
+  }
+  if (!balm && row.by?.includes(mpMyId())) {
+    engine.toast('You have already helped revive this one.', 2000);
+    return false;
+  }
+  return Boolean(mp.client.send('rook_revive', { key, balm }));
+}
+
+// ---------------------------------------------------------------------------
 // QA routes
 // ---------------------------------------------------------------------------
 
@@ -1703,7 +2281,7 @@ function seedDemoKit(engine) {
 }
 
 function setupDemo(engine) {
-  if (demoDone) return;
+  if (demoDone || engine.mode === 'multiplayer') return;
   const mode = String(engine.param('rookdemo') || '');
   if (!mode) return;
   demoDone = true;
@@ -1823,6 +2401,27 @@ function publish(engine, force = false) {
   engine.setData('rookDemo', demoMode);
   engine.setData('rookArt', `rook=${ui?.rook && !ui.rook.destroyed ? 'glitch-overlays-rook_fly_forward' : 'none'},head=${ui?.headClip || ''},halo=${tracked.size}`);
   engine.setData('rookStats', Object.entries(save.stats).map(([k, v]) => `${k}=${v}`).join(','));
+  if (mp) {
+    engine.setData('rookMp', mp.synced ? `synced:${mp.synced}${mp.snapped === mp.synced ? '' : ':waiting'}` : 'waiting');
+    engine.setData('rookCrowd', a ? String(a.crowd || '') : '');
+    engine.setData('rookOrbs', (a?.orbs || []).map((o) => `${o.by}:${o.joiners.length}`).join(','));
+    engine.setData('rookPrimed', a?.primed ? String(a.primed.by) : '');
+    engine.setData('rookYou', mp.lastYou);
+    // Live-check aids: where to click on the canvas (stage px) for the shrine, each orb and the nearest rooked thing.
+    const at = (o, dy = 0) => {
+      try {
+        const g = o?.getGlobalPosition?.();
+        return g ? `${Math.round(g.x)},${Math.round(g.y + dy)}` : '';
+      } catch {
+        return '';
+      }
+    };
+    engine.setData('rookShrineAt', at(shrineTarget(engine)?.sprite, -60));
+    engine.setData('rookOrbsAt', [...mp.arts].map(([by, art]) => `${by}@${at(art.root)}`).join(' '));
+    const near = nearestRooked(engine, 4000);
+    engine.setData('rookRookedAt', near ? `${near.key}@${at(near.row.target.sprite, -20)}` : '');
+    engine.setData('rookRookedSpots', [...tracked].slice(0, 16).map(([key, row]) => `${key}@${at(row.target.sprite, -20)}`).join(' '));
+  }
 }
 
 /** Other lanes' QA routes (any *demo / *autoplay param) never get a surprise Rook. */
@@ -1870,6 +2469,7 @@ export const rookAttackFeature = {
   onStreetClear(engine) {
     generation += 1;
     cancelOrb(engine);
+    if (mp) mpLeaveStreet(engine);
     releaseHeadroom(engine, true);
     endPrime(engine, false);
     closeOfferPanel();
@@ -1898,17 +2498,22 @@ export const rookAttackFeature = {
 
   onTick(dtMs, t, engine) {
     if (!engine.started || !engine.player) return;
-    // Schedule (about hourly) on rookable streets only.
-    if (!save.nextAttackAt) scheduleNextAttack(save, t);
-    if (!active() && t >= save.nextAttackAt && !demoMode && !qaRoute(engine)) {
-      const rookable = streetIsRookable({ hasShrine: hasShrine(engine), instance: engine.transientInstance(), home: engine.homeContext().inHome });
-      if (rookable && !engine.busy() && t - enteredAt > 8000) beginAttack(engine);
-    }
-    const a = active();
-    if (a) {
-      const events = stepRookAttack(a, t);
-      if (a.tsid === engine.streetTsid) handleEvents(engine, a, events);
-      else handleRemoteEvents(engine, a, events);
+    if (engine.mode === 'multiplayer') {
+      // The realtime server owns every attack (realtime/rook.go): no local schedule or timers.
+      mpTick(engine, t);
+    } else {
+      // Schedule (about hourly) on rookable streets only.
+      if (!save.nextAttackAt) scheduleNextAttack(save, t);
+      if (!active() && t >= save.nextAttackAt && !demoMode && !qaRoute(engine)) {
+        const rookable = streetIsRookable({ hasShrine: hasShrine(engine), instance: engine.transientInstance(), home: engine.homeContext().inHome });
+        if (rookable && !engine.busy() && t - enteredAt > 8000) beginAttack(engine);
+      }
+      const a = active();
+      if (a) {
+        const events = stepRookAttack(a, t);
+        if (a.tsid === engine.streetTsid) handleEvents(engine, a, events);
+        else handleRemoteEvents(engine, a, events);
+      }
     }
     const mine = here(engine);
     // Scan the street for rookable targets and keep their visuals in step.
@@ -1941,6 +2546,7 @@ export const rookAttackFeature = {
       if (mine && rookPresent(mine) && mine.phase !== 'dead' && Math.random() < dtMs / 9000) spawnSilhouettes(engine, 1);
     }
     updateOrb(engine, dtMs);
+    if (mp) mpDrawOrbs(engine);
     releaseHeadroom(engine);
     updatePrimeFx(engine);
     if (t < shakeUntil) {
@@ -1997,6 +2603,7 @@ export const rookAttackFeature = {
   packVerbs(classTsid, engine) {
     const a = here(engine);
     if (classTsid === ORB_CLASS) {
+      if (mp) return mpOrbPackVerbs(engine);
       if (orb) return [{ id: 'rook_unleash', label: `Unleash (${orb.joiners})`, enabled: true, tooltip: 'Release the gathered imagination at the Rook', primary: true }];
       if (!a || !rookPresent(a)) return [];
       const gate = stunGate(engine);
@@ -2005,7 +2612,7 @@ export const rookAttackFeature = {
         label: 'Stun attack',
         enabled: gate.ok,
         reason: gate.ok ? '' : gate.reason,
-        tooltip: ROOK_TEXT.stunTooltip.replace('$energy_cost', String(soloCost(ROOK_SOURCE.stunEnergy, { armor: armored() }))),
+        tooltip: ROOK_TEXT.stunTooltip.replace('$energy_cost', String(costOf(ROOK_SOURCE.stunEnergy, { armor: armored() }))),
         primary: true,
       }];
     }
@@ -2035,6 +2642,10 @@ export const rookAttackFeature = {
 
   runPackVerb(classTsid, verbId, engine) {
     if (verbId === 'rook_stun') return startStun(engine) || true;
+    if (String(verbId).startsWith('rook_join:')) {
+      mpJoinOrb(engine, Number(String(verbId).slice('rook_join:'.length)));
+      return true;
+    }
     if (verbId === 'rook_unleash') {
       releaseOrb(engine);
       return true;
