@@ -72,6 +72,9 @@ export function poseOf(player) {
 /** The street others can share with you now, or '' in a private place. */
 export function sharedStreet(engine) {
   if (!engine?.player || !engine.streetTsid) return '';
+  // A private scene some players share (a multiplayer race: races-feature realtimeStreet, RACE_<match>).
+  const own = engine.query?.('realtimeStreet', engine);
+  if (own) return String(own);
   if (engine.transientInstance?.()) return '';
   if (engine.homeContext?.().inHome) return '';
   return String(engine.streetTsid);

@@ -94,6 +94,18 @@ import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=desk2-1';
 import { gainMetabolic } from '../metabolics.js';
 import { grantMoodXp } from '../mood-xp.js';
+import { quoinShardGrabberSound, quoinShardSoundKey } from '../quoin-shards.js?v=g216-1';
+import {
+  MP_RACE_COURSES,
+  MP_RACE_TEXT,
+  endOutcome,
+  mayClaim,
+  normalizeMatch,
+  normalizeScores,
+  othersLabel,
+  shardAmount,
+  splitScores,
+} from '../races-mp.js?v=mp4-1';
 
 const RACE_ICON_DIR = 'assets/sprites/races/';
 const RIVAL_SCALE = 1.35 * 0.4;
@@ -132,6 +144,21 @@ let rivalCloseDir = 1;
 const RIVAL_CLOSE_DX = 90;
 let autoTimeline = null;
 let hogTicketRuns = 0; // Hog Haul instances opened from a ticket this session (QA data)
+
+// Multiplayer (js/races-mp.js, realtime/races.go): real players race each
+// other instead of the stand-in. Everything below is unused in solo.
+/** The match this player is in: normalizeMatch(race_match) + { myId, rows, remaining, ready, acked }. */
+let mp = null;
+let mpClient = null;
+/** Challenger id -> prompt uid of the challenges heard on this street. */
+const mpInvites = new Map();
+let mpWaitUid = null; // "Waiting for other players..."
+let mpMustWaitUid = null; // "You must wait for more players before this game can begin."
+let mpChallenging = false; // race_challenge sent, no answer yet
+let mpAccepting = false; // race_accept sent, no answer yet
+let mpReadyAt = 0;
+let mpFinishAt = 0;
+let mpLast = '';
 
 /* ------------------------------------------------------------------ */
 /* Items                                                              */
@@ -307,7 +334,8 @@ function buildChrome(engine) {
     </div>`);
   for (const node of [bar, ready, countdown, banner, store]) host.appendChild(node);
   hud = { bar, ready, countdown, banner, store };
-  ready.querySelector('[data-race-ready-btn]').addEventListener('click', () => readyUp(engine));
+  // The ready card doubles as a called-off multiplayer game's end card (data-mode="leave").
+  ready.querySelector('[data-race-ready-btn]').addEventListener('click', () => (ready.dataset.mode === 'leave' ? leaveRace(engine) : readyUp(engine)));
   bar.querySelector('[data-race-forfeit]').addEventListener('click', () => confirmForfeit(engine));
   store.querySelectorAll('[data-race-store-close]').forEach((node) => node.addEventListener('click', () => closeStore()));
   store.querySelector('[data-race-store-list]').addEventListener('click', (event) => {
@@ -416,6 +444,7 @@ function activateTicket(classTsid, engine, opts = {}) {
     engine.toast('That race is not in this remake yet.');
     return false;
   }
+  if (isMp(engine) && MP_RACE_COURSES.includes(raceId)) return mpChallenge(classTsid, raceId, engine);
   removeItem(engine.inv, classTsid, 1);
   record.pendingTicket = classTsid;
   engine.updateHud();
@@ -501,11 +530,12 @@ async function startRace(raceId, engine, opts = {}) {
     };
   }
   course = nextCourse;
-  const params = new URLSearchParams(location.search);
+  // Multiplayer: the race QA params stay solo's (a real opponent, no stand-in).
+  const params = opts.mp ? new URLSearchParams() : new URLSearchParams(location.search);
   const rivalSeconds = Number(params.get('racerivalseconds'));
   rivalOpts = { pace: course.rivalPace, gravity: course.gravity };
   rivalTimeline = routeTimeline(rivalRoute(), rivalOpts);
-  routeLens = routeLengths(course.route);
+  routeLens = routeLengths(myRoute());
   // Grab 'Em Good times the rival on its own tree (it then works down yours).
   const ownRival = course.kind === 'quoins' ? rivalRoute().slice(0, course.route.length) : rivalRoute();
   const natural = routeDurationMs(ownRival, rivalOpts);
@@ -513,12 +543,15 @@ async function startRace(raceId, engine, opts = {}) {
   soonTimer = null;
   run = createRaceRun(raceId, {
     now: Date.now(),
-    rival: opts.rival,
-    rivalDurationMs: params.get('raceassist') === '1'
-      ? 3_600_000
-      : Number.isFinite(rivalSeconds) && rivalSeconds > 0 ? rivalSeconds * 1000 : natural,
+    rival: opts.mp ? { name: othersLabel(opts.mp.players, mp?.myId) || 'Your rival', tint: 0xc9a6ff } : opts.rival,
+    // Multiplayer: nobody wins on the clock; the server's race_end decides.
+    rivalDurationMs: opts.mp
+      ? 86_400_000
+      : params.get('raceassist') === '1'
+        ? 3_600_000
+        : Number.isFinite(rivalSeconds) && rivalSeconds > 0 ? rivalSeconds * 1000 : natural,
     ticket: opts.ticket || null,
-    quoinTotal: course.quoins?.length || 0,
+    quoinTotal: opts.mp ? opts.mp.total : course.quoins?.length || 0,
   });
   if (rivalSeconds > 0) rivalOpts = { ...rivalOpts, pace: course.rivalPace * (natural / (rivalSeconds * 1000)) };
   rivalTimeline = routeTimeline(rivalRoute(), rivalOpts);
@@ -540,7 +573,7 @@ async function startRace(raceId, engine, opts = {}) {
     background,
     platforms: course.platforms,
     walls: course.walls,
-    spawn: course.spawn.player,
+    spawn: mySpawn(),
     returnTo: record.returnTo,
   };
   const setup = () => {
@@ -585,7 +618,9 @@ function spawnQuoins(engine) {
   const frames = engine.textures?.quoin?.frames || [];
   const start = QUOIN_TYPES.mood.row * QUOIN_SHEET.columns;
   const mood = frames.slice(start, start + QUOIN_SHEET.columns);
-  quoinSprites = course.quoins.map((q, index) => {
+  // Multiplayer: where the server has them (realtime/data/races.json, the same course).
+  const spots = mp ? mp.quoins.map((p, index) => ({ ...(course.quoins[index] || {}), x: p.x, y: p.y })) : course.quoins;
+  quoinSprites = spots.map((q, index) => {
     let sprite;
     if (mood.length) {
       sprite = new PIXI.AnimatedSprite(mood);
@@ -632,7 +667,8 @@ function spawnRaceEntities(engine) {
   }
   if (course.kind === 'quoins') spawnQuoins(engine);
   // The rival is a vector Glitch with its name's look (engine.npcGlitch).
-  const npc = engine.npcGlitch?.(run.rivalName || run.raceId) || null;
+  // Multiplayer has none: the other racers are real Glitches (realtime-feature).
+  const npc = mp ? null : engine.npcGlitch?.(run.rivalName || run.raceId) || null;
   if (npc) {
     rivalSprite = npc.sprite;
     rivalSprite.npc = npc;
@@ -656,8 +692,8 @@ function spawnRaceEntities(engine) {
     engine.entityLayer.addChild(rivalLabel);
   }
   placeRival(course.spawn.rival.x, course.spawn.rival.y, 'idle', 1);
-  pinX = course.spawn.player.x;
-  const preview = new URLSearchParams(location.search).get('racepreview');
+  pinX = mySpawn().x;
+  const preview = mp ? null : new URLSearchParams(location.search).get('racepreview');
   if (preview && engine.player) {
     // Grab 'Em Good has no posts: "finish" / "canopy" starts on the bough under the canopy.
     const top = course.kind === 'quoins' ? course.route[course.route.length - 3] : null;
@@ -679,6 +715,27 @@ function spawnRaceEntities(engine) {
 /** Twin-path climbs give the rival its own mirrored route. */
 function rivalRoute() {
   return course?.rivalRoute || course?.route || [];
+}
+
+/**
+ * Multiplayer: slot 0 starts where solo's player does, slot 1 where solo's
+ * stand-in does (realtime/data/races.json spawns), and on a twin-path climb
+ * slot 1 climbs the mirrored side.
+ */
+function mySpawn() {
+  if (mp?.spawn) return { x: mp.spawn.x, y: mp.spawn.y };
+  return mp && mp.slot % 2 === 1 ? course.spawn.rival : course.spawn.player;
+}
+
+function myRoute() {
+  return mp && mp.slot % 2 === 1 && course?.rivalRoute && course.kind !== 'quoins' ? course.rivalRoute : course?.route || [];
+}
+
+/** The checkpoints on my side (a twin-path climb mirrors them for slot 1). */
+function myCheckpoint(index) {
+  const cp = course.checkpoints[index];
+  if (!cp || !(mp && mp.slot % 2 === 1 && course.rivalRoute)) return cp || null;
+  return { ...cp, x: course.width - cp.x };
 }
 
 function placeRival(x, y, mode, facing) {
@@ -710,12 +767,15 @@ function showReady(engine) {
   hud.ready.querySelector('[data-race-ready-kicker]').textContent = race.title;
   // games_quoin_grab_splash has its own line; the races share games_race_splash.
   hud.ready.querySelector('[data-race-ready-desc]').textContent = race.splash || RACE_SPLASH_TEXT;
+  hud.ready.querySelector('[data-race-ready-btn]').textContent = 'Click to Start';
+  delete hud.ready.dataset.mode;
   hud.ready.hidden = false;
   hud.bar.hidden = false;
   renderHud(engine, true);
 }
 
 function readyUp(engine) {
+  if (mp) return mpReadyUp(engine);
   if (!run || run.status !== 'staging' || soonTimer) return;
   // shared_instance_manager.js: once everyone has clicked, 5 s of "YAY! THE
   // GAME IS STARTING SOON." (GAME_STARTING_SOON), then the 4 s countdown.
@@ -743,16 +803,21 @@ function readyUp(engine) {
 function confirmForfeit(engine) {
   if (!run || !raceIsLive(run)) return;
   // eslint-disable-next-line no-alert
-  const sure = engine.param('raceautoplay') ? true : window.confirm(`Leave ${RACES[run.raceId].title}? ${run.rivalName} will win.`);
+  const title = RACES[run.raceId].title;
+  const sure = mp
+    ? window.confirm(MP_RACE_TEXT.confirmLeave(title))
+    : engine.param('raceautoplay') ? true : window.confirm(`Leave ${title}? ${run.rivalName} will win.`);
   if (!sure) return;
+  // global_game.js playerLeft 814-815: leaving calls the game off for everyone.
+  if (mp) mpClient?.send('race_leave', { match: mp.match });
   forfeitRace(run, Date.now());
   showResult(engine);
 }
 
 function respawn(engine, why) {
   const player = engine.player;
-  const cp = course.checkpoints[run.checkpoint] || null;
-  const to = cp || course.spawn.player;
+  const cp = myCheckpoint(run.checkpoint);
+  const to = cp || mySpawn();
   noteRaceFall(run);
   player.x = to.x;
   player.y = to.y;
@@ -809,11 +874,14 @@ function raceTick(engine, now) {
     return;
   }
 
-  const pose = routePoseAt(rivalRoute(), now - run.startAt, rivalOpts, rivalTimeline);
-  placeRival(pose.x, pose.y, pose.mode, pose.facing);
-  run.rivalProgress = pose.progress;
+  if (mp) mpRivalProgress();
+  else {
+    const pose = routePoseAt(rivalRoute(), now - run.startAt, rivalOpts, rivalTimeline);
+    placeRival(pose.x, pose.y, pose.mode, pose.facing);
+    run.rivalProgress = pose.progress;
+  }
 
-  if (engine.param('raceautoplay') === '1') {
+  if (!mp && engine.param('raceautoplay') === '1') {
     const auto = routePoseAt(course.route, (now - autoplayStartAt) * 1.0, { pace: 1.25, gravity: course.gravity });
     player.x = auto.x;
     player.y = auto.y;
@@ -822,13 +890,14 @@ function raceTick(engine, now) {
     player.onGround = auto.mode !== 'jump';
   }
 
-  const proj = projectRouteProgress(course.route, player.x, player.y, progressHint, routeLens);
+  const proj = projectRouteProgress(myRoute(), player.x, player.y, progressHint, routeLens);
   if (proj.distance < 160) {
     progressHint = proj.segment;
     run.playerProgress = Math.max(0, Math.min(0.999, proj.progress));
   }
 
-  course.checkpoints.forEach((cp, index) => {
+  course.checkpoints.forEach((_, index) => {
+    const cp = myCheckpoint(index);
     if (Math.abs(player.x - cp.x) < 64 && Math.abs(player.y - cp.y) < 90 && passRaceCheckpoint(run, index)) {
       checkpointSprites[index]?.setPassed?.(true);
       engine.floatText(cp.x, cp.y - 100, 'Checkpoint!', 0xb8f08a);
@@ -846,7 +915,13 @@ function raceTick(engine, now) {
 
   const f = course.finish;
   if (f && Math.abs(player.x - f.x) < 52 && player.y <= f.y + 8 && player.y >= f.y - 150) {
-    if (finishRace(run, now)) showResult(engine);
+    // Multiplayer: the server names the first across (race_set_winner); ask once a second.
+    if (mp) {
+      if (now - mpFinishAt >= 1000) {
+        mpFinishAt = now;
+        mpClient?.send('race_finish', { match: mp.match });
+      }
+    } else if (finishRace(run, now)) showResult(engine);
   }
 }
 
@@ -856,6 +931,10 @@ function raceTick(engine, now) {
  * onPlayerCollision). Each grab may settle the game (grabRaceQuoin).
  */
 function quoinTick(engine, now) {
+  if (mp) {
+    mpQuoinTick(engine, now);
+    return;
+  }
   const elapsed = now - run.startAt;
   const player = engine.player;
   if (rivalClose && player) {
@@ -959,6 +1038,8 @@ function showResult(engine) {
   } else if (run.status === 'lost') {
     engine.achievement(counters.lost, 1);
     engine.pushActivity(`${run.rivalName} won ${race.title}.`);
+  } else if (mp?.calledOff != null) {
+    engine.pushActivity(MP_RACE_TEXT.calledOff(mp.calledOff));
   } else {
     engine.pushActivity(`You left ${race.title}.`);
   }
@@ -988,6 +1069,8 @@ function showResult(engine) {
       nameY: splash.nameY,
       buttons: [{ label: splash.leaveLabel, w: splash.buttonW, value: 'leave', onClick: () => leaveRace(engine) }],
     });
+  } else if (mp?.calledOff != null) {
+    showCalledOff(engine);
   } else setTimeout(() => leaveRace(engine), 0);
   engine.player.vx = 0;
   engine.updateHud();
@@ -1025,6 +1108,14 @@ async function leaveRace(engine) {
   splashShown = false;
   hud.bar.hidden = true;
   hud.countdown.hidden = true;
+  hud.ready.hidden = true;
+  delete hud.ready.dataset.mode;
+  if (mp) {
+    // Out of the instance (games_leave_instance_overlay 'leave'); the street override ends with it.
+    mpClient?.send('race_leave', { match: mp.match });
+    mpClearPrompts(engine);
+    mp = null;
+  }
   run = null;
   course = null;
   record.returnTo = null;
@@ -1035,6 +1126,427 @@ async function leaveRace(engine) {
   engine.setData('raceOutcome', outcome);
   publish(engine);
   return true;
+}
+
+/* ------------------------------------------------------------------ */
+/* Multiplayer: real players (js/races-mp.js, realtime/races.go)       */
+/* ------------------------------------------------------------------ */
+
+function isMp(engine) {
+  return engine?.mode === 'multiplayer' && Boolean(engine.query?.('realtimeClient'));
+}
+
+function mpMyId() {
+  return mpClient?.me?.id ?? null;
+}
+
+function mpNote(engine, what) {
+  mpLast = what;
+  engine.setData?.('raceMpLast', what);
+}
+
+function mpClearPrompts(engine) {
+  for (const uid of [mpWaitUid, mpMustWaitUid]) if (uid) engine.removePrompt?.(uid);
+  mpWaitUid = null;
+  mpMustWaitUid = null;
+}
+
+/** The ticket back after a challenge that never became a game (inc_games.js 2448-2450). */
+function mpRefund(engine) {
+  if (!record.pendingTicket) return;
+  addItem(engine.inv, record.pendingTicket, 1);
+  record.pendingTicket = null;
+  engine.updateHud();
+  engine.save();
+}
+
+/** race_ticket.js activate in multiplayer: challenge the street (inc_games.js games_invite_create). */
+function mpChallenge(classTsid, raceId, engine) {
+  const c = mpClient || engine.query('realtimeClient');
+  if (!c || c.state !== 'online' || !c.street) {
+    engine.toast('You are offline, so nobody can hear your challenge.', 2600);
+    return false;
+  }
+  // race_ticket.js:121: the verb is disabled with nobody else here.
+  if (!c.players.length) {
+    engine.toast('You need at least one other player here.', 2600);
+    return false;
+  }
+  removeItem(engine.inv, classTsid, 1);
+  record.pendingTicket = classTsid;
+  engine.updateHud();
+  engine.save();
+  engine.pushActivity(`You activated a ${ITEM_LABEL(classTsid)}.`);
+  mpChallenging = true;
+  starting = true;
+  if (!c.send('race_challenge', { course: raceId })) {
+    mpChallenging = false;
+    starting = false;
+    mpRefund(engine);
+    return false;
+  }
+  mpNote(engine, `challenge:${raceId}`);
+  publish(engine);
+  return true;
+}
+
+function mpAttach(engine) {
+  if (mpClient) return mpClient;
+  const c = engine.query?.('realtimeClient');
+  if (!c) return null;
+  mpClient = c;
+  c.on('msg:race_challenged', (msg) => {
+    const from = Number(msg.from?.id) || 0;
+    if (!from || from === mpMyId()) return;
+    if (mpInvites.has(from)) engine.removePrompt?.(mpInvites.get(from));
+    // inc_games.js 2392 broadcastActionRequest('game_accept', …): accept from the prompt.
+    const uid = engine.prompt?.({
+      text: String(msg.text || ''),
+      choices: [{ label: MP_RACE_TEXT.accept, value: 'accept' }, { label: MP_RACE_TEXT.decline, value: 'no' }],
+      timeout: Math.max(1, Math.min(60, Number(msg.timeout) || 60)),
+      iconButtons: true,
+      onChoice: (v) => {
+        mpInvites.delete(from);
+        if (v !== 'accept') return;
+        if (run || starting) {
+          engine.toast('You are already racing!', 2400);
+          return;
+        }
+        mpAccepting = true;
+        starting = true;
+        if (!c.send('race_accept', { from })) {
+          mpAccepting = false;
+          starting = false;
+        }
+        publish(engine);
+      },
+      onTimeout: () => mpInvites.delete(from),
+    });
+    mpInvites.set(from, uid || '');
+    mpNote(engine, `challenged:${from}`);
+  });
+  c.on('msg:race_unchallenged', (msg) => {
+    const from = Number(msg.from) || 0;
+    const uid = mpInvites.get(from);
+    if (uid) engine.removePrompt?.(uid);
+    mpInvites.delete(from);
+    if (msg.text) engine.pushActivity(String(msg.text));
+  });
+  c.on('msg:race_waiting', (msg) => {
+    mpChallenging = false;
+    mpAccepting = false;
+    starting = true;
+    if (mpWaitUid) engine.removePrompt?.(mpWaitUid);
+    // inc_games.js 2396-2405: "Waiting for other players..." with OK, for 60 s.
+    mpWaitUid = engine.prompt?.({
+      text: String(msg.text || 'Waiting for other players...'),
+      choices: [{ label: MP_RACE_TEXT.ok, value: 'ok' }],
+      timeout: Math.max(1, Math.min(60, Number(msg.timeout) || 60)),
+      onChoice: () => { mpWaitUid = null; },
+      onTimeout: () => { mpWaitUid = null; },
+    }) || null;
+    mpNote(engine, 'waiting');
+    publish(engine);
+  });
+  c.on('msg:race_failed', (msg) => {
+    mpChallenging = false;
+    mpAccepting = false;
+    if (!run) starting = false;
+    mpClearPrompts(engine);
+    if (msg.refund === true) {
+      mpRefund(engine);
+      engine.prompt?.({ text: String(msg.text || ''), choices: [{ label: MP_RACE_TEXT.dagnabit, value: 'ok' }], timeout: 10 });
+    } else if (msg.text) engine.pushActivity(String(msg.text));
+    mpNote(engine, `failed:${msg.refund === true ? 'refund' : 'no'}`);
+    publish(engine);
+  });
+  c.on('msg:race_refused', (msg) => {
+    const text = String(msg.text || '');
+    if (mpChallenging) {
+      mpChallenging = false;
+      starting = false;
+      mpRefund(engine);
+      engine.toast(text, 3000);
+    } else if (mpAccepting) {
+      mpAccepting = false;
+      starting = false;
+      // inc_games.js 2466-2470: the late accepter's prompt.
+      if (msg.why === 'full') engine.prompt?.({ text, choices: [{ label: MP_RACE_TEXT.dagnabit, value: 'ok' }], timeout: 10 });
+      else engine.toast(text, 3000);
+    } else if (text) engine.toast(text, 2600);
+    mpNote(engine, `refused:${msg.why || ''}`);
+    publish(engine);
+  });
+  c.on('msg:race_starting', (msg) => {
+    mpChallenging = false;
+    mpAccepting = false;
+    starting = true;
+    mpClearPrompts(engine);
+    for (const uid of mpInvites.values()) if (uid) engine.removePrompt?.(uid);
+    mpInvites.clear();
+    buildChrome(engine);
+    closeStore();
+    hud.banner.textContent = String(msg.text || '');
+    hud.banner.hidden = false;
+    engine.pushActivity(String(msg.text || ''));
+    engine.playSound('GAME_STARTING_SOON', { volume: 0.5 });
+    mpNote(engine, 'starting');
+    publish(engine);
+  });
+  c.on('msg:race_match', (msg) => {
+    const info = normalizeMatch(msg);
+    if (!info || run) {
+      if (msg?.match) c.send('race_leave', { match: String(msg.match) });
+      if (!run) starting = false;
+      return;
+    }
+    const myId = mpMyId();
+    mp = { ...info, myId, rows: info.players.map((p) => ({ id: p.id, name: p.name, score: 0 })), remaining: info.total, ready: false, acked: false, calledOff: null };
+    if (hud) hud.banner.hidden = true;
+    // The ticket is spent once the instance opens (as the Hog Haul and the crowns tickets).
+    record.pendingTicket = null;
+    mpNote(engine, `match:${info.match}`);
+    Promise.resolve(startRace(info.course, engine, { mp: info })).finally(() => {
+      starting = false;
+      publish(engine);
+    });
+  });
+  c.on('msg:race_ready_state', (msg) => {
+    if (!mp || msg.match !== mp.match) return;
+    if ((msg.ready || []).map(Number).includes(mp.myId)) mp.acked = true;
+    if (msg.text) engine.pushActivity(String(msg.text));
+    mpNote(engine, `ready:${(msg.ready || []).length}`);
+  });
+  c.on('msg:race_soon', (msg) => {
+    if (!mp || msg.match !== mp.match || !run || run.status !== 'staging') return;
+    mp.acked = true;
+    mp.soon = true;
+    if (mpMustWaitUid) engine.removePrompt?.(mpMustWaitUid);
+    mpMustWaitUid = null;
+    hud.ready.hidden = true;
+    hud.countdown.hidden = false;
+    hud.countdown.classList.remove('is-go');
+    hud.countdown.classList.add('race-soon');
+    hud.countdown.textContent = String(msg.text || RACE_STARTING_SOON);
+    engine.playSound('GAME_STARTING_SOON', { volume: 0.5 });
+    engine.setData('raceStarting', 'soon');
+    mpNote(engine, 'soon');
+    publish(engine);
+  });
+  c.on('msg:race_countdown', (msg) => {
+    if (!mp || msg.match !== mp.match || !run) return;
+    if (beginRaceCountdown(run, Date.now())) run.startAt = Date.now() + Math.max(0, Number(msg.in) || 0);
+    hud.countdown.classList.remove('race-soon');
+    hud.countdown.textContent = 'READY?';
+    engine.playSound('COUNT_DOWN', { volume: 0.55 });
+    engine.setData('raceStarting', 'countdown');
+    mpNote(engine, 'countdown');
+    publish(engine);
+  });
+  c.on('msg:race_go', (msg) => {
+    if (!mp || msg.match !== mp.match || !run) return;
+    if (run.status === 'countdown') run.startAt = Math.min(run.startAt, Date.now());
+    mpNote(engine, 'go');
+  });
+  c.on('msg:race_grabbed', (msg) => mpGrabbed(engine, msg));
+  c.on('msg:race_grab_refused', (msg) => {
+    if (!mp || msg.match !== mp.match) return;
+    const q = quoinSprites[Number(msg.i)];
+    if (q?.live) {
+      if (msg.why === 'gone') takeQuoin(q);
+      else if (q.sprite) q.sprite.alpha = 1;
+    }
+    mpNote(engine, `refused:${msg.i}:${msg.why}`);
+  });
+  c.on('msg:race_end', (msg) => mpEnd(engine, msg));
+  c.on('msg:race_removed', (msg) => {
+    if (!mp || msg.match !== mp.match) return;
+    engine.pushActivity(String(msg.text || ''));
+    engine.toast(String(msg.text || ''), 3600);
+    mp.calledOff = null;
+    if (run && raceIsLive(run)) {
+      forfeitRace(run, Date.now());
+      showResult(engine);
+    }
+  });
+  return c;
+}
+
+/** Click to Start: tell the server, then wait for everyone (dismissOverlaysAndStart 231-342). */
+function mpReadyUp(engine) {
+  if (!run || run.status !== 'staging' || mp.ready) return;
+  mp.ready = true;
+  mpReadyAt = Date.now();
+  hud.ready.hidden = true;
+  mpClient?.send('race_ready', { match: mp.match });
+  hud.countdown.hidden = false;
+  hud.countdown.classList.remove('is-go');
+  hud.countdown.classList.add('race-soon');
+  hud.countdown.textContent = MP_RACE_TEXT.mustWait;
+  // The prompt (with Leave) only once it is clear others are still to click:
+  // the last to click goes straight to "starting soon" (dismissOverlaysAndStart 259-296).
+  const thisRun = run;
+  setTimeout(() => {
+    if (mpMustWaitUid || run !== thisRun || run.status !== 'staging' || !mp || mp.soon) return;
+    mpMustWaitUid = engine.prompt?.({
+      text: MP_RACE_TEXT.mustWait,
+      choices: [{ label: MP_RACE_TEXT.leave, value: 'leave' }],
+      onChoice: (v) => {
+        mpMustWaitUid = null;
+        if (v === 'leave' && run && raceIsLive(run)) {
+          mpClient?.send('race_leave', { match: mp?.match });
+          forfeitRace(run, Date.now());
+          showResult(engine);
+        }
+      },
+    }) || null;
+  }, 700);
+  engine.setData('raceStarting', 'waiting');
+  mpNote(engine, 'clicked');
+  publish(engine);
+}
+
+/** A finish-line race: the leading other racer's progress from where the server says they are. */
+function mpRivalProgress() {
+  let best = 0;
+  for (const p of mpClient?.players || []) {
+    const slot = mp.players.find((q) => q.id === p.id)?.slot;
+    if (slot == null) continue;
+    const route = slot % 2 === 1 && course.rivalRoute ? course.rivalRoute : course.route;
+    // projectRouteProgress searches round a hint, so each racer keeps theirs.
+    mp.hints ||= new Map();
+    const proj = projectRouteProgress(route, p.x, p.y, mp.hints.get(p.id) || 0, null);
+    if (proj.distance < 200) {
+      mp.hints.set(p.id, proj.segment);
+      best = Math.max(best, Math.min(0.999, proj.progress));
+    }
+  }
+  run.rivalProgress = Math.max(run.rivalProgress || 0, best);
+}
+
+/** Grab 'Em Good with real players: a touch asks the server (first touch wins, quoin.js 157). */
+function mpQuoinTick(engine, now) {
+  const player = engine.player;
+  const bob = Math.sin(now / 320);
+  for (const q of quoinSprites) {
+    if (!q.live) continue;
+    if (q.sprite) q.sprite.y = q.y + bob * 3;
+    const touched = player && Math.abs(player.x - q.x) <= 40 && q.y >= player.y - 118 && q.y <= player.y + 18;
+    if (!touched || !mayClaim(q, now)) continue;
+    q.claimAt = now;
+    if (q.sprite) q.sprite.alpha = 0.45;
+    mpClient?.send('race_grab', { match: mp.match, i: q.index });
+  }
+}
+
+function mpGrabbed(engine, msg) {
+  if (!mp || msg.match !== mp.match || !run) return;
+  const myId = mp.myId;
+  const rows = normalizeScores(msg.scores);
+  if (rows.length) mp.rows = rows;
+  mp.remaining = Math.max(0, Math.floor(Number(msg.remaining) || 0));
+  const split = splitScores(mp.rows, myId);
+  run.scores.you = split.you;
+  run.scores.rival = split.rival;
+  run.playerProgress = run.quoinTotal ? split.you / run.quoinTotal : 0;
+  run.rivalProgress = run.quoinTotal ? split.rival / run.quoinTotal : 0;
+  const i = Number(msg.i);
+  const q = quoinSprites[i];
+  const x = Number(msg.x) || q?.x || 0;
+  const y = Number(msg.y) || q?.y || 0;
+  if (q?.live) takeQuoin(q);
+  const mult = engine.quoinState?.multiplier;
+  const shards = (Array.isArray(msg.shards) ? msg.shards : []).filter((s) => Number.isFinite(Number(s?.id)));
+  if (Number(msg.id) === myId) {
+    // Game quoins pay their benefit times the multiplier and skip the daily limit (quoin.js 159-185).
+    const amount = quoinGrabMood(mult);
+    gainMetabolic(engine.pc, 'mood', amount);
+    engine.floatText(x, y - 24, `+${amount} mood`, 0xb5e35b);
+    engine.playSound(quoinShardGrabberSound(shards.length) || 'QUOIN_GOT', { volume: 0.6, jitter: 0.04 });
+    if (shards.length) {
+      engine.query?.('quoinShardFx', {
+        quoin: { x, y },
+        grabberIsViewer: true,
+        viewerId: myId,
+        shards: shards.map((s) => ({ id: Number(s.id), x: Number(s.x) || 0, y: Number(s.y) || 0, delta: 0, stat: 'mood' })),
+        stat: 'mood',
+      }, engine);
+    }
+    engine.updateHud();
+  } else {
+    engine.floatText(x, y - 24, `+${quoinGrabMood(1)} mood`, 0xd9c8ff);
+    const amount = shardAmount(msg, myId, mult);
+    let actual = 0;
+    if (amount > 0) {
+      // quoin.js 121-133: the shard lands on this racer's own mood.
+      actual = gainMetabolic(engine.pc, 'mood', amount);
+      if (actual > 0) {
+        engine.playSound(quoinShardSoundKey(msg.crowd), { volume: 0.6, jitter: 0.03 });
+        engine.pushActivity(`You got a quoin shard from ${String(msg.name || 'someone')}: +${actual} mood.`);
+        engine.updateHud();
+      }
+      engine.setData('quoinShardYou', `mood:${amount}>${actual}`);
+    } else engine.playSound('QUOIN_GOT', { volume: 0.22, jitter: 0.04 });
+    if (shards.some((s) => Number(s.id) === myId)) {
+      engine.query?.('quoinShardFx', {
+        quoin: { x, y },
+        grabberIsViewer: false,
+        viewerId: myId,
+        shards: shards.map((s) => ({ id: Number(s.id), x: Number(s.x) || 0, y: Number(s.y) || 0, delta: Number(s.id) === myId ? actual : 0, stat: 'mood' })),
+        stat: 'mood',
+      }, engine);
+    }
+  }
+  engine.setData('raceLastGrab', `${Number(msg.id) === myId ? 'you' : 'rival'}:${i}`);
+  mpNote(engine, `grabbed:${i}:${msg.id}`);
+  renderHud(engine, true);
+  publish(engine);
+}
+
+/** race_end: the winner from the server (global_game.js), or called off when someone left. */
+function mpEnd(engine, msg) {
+  if (!mp || msg.match !== mp.match) return;
+  const rows = normalizeScores(msg.scores);
+  if (rows.length) {
+    mp.rows = rows;
+    const split = splitScores(rows, mp.myId);
+    if (run) {
+      run.scores.you = split.you;
+      run.scores.rival = split.rival;
+    }
+  }
+  if (Number.isFinite(Number(msg.remaining))) mp.remaining = Number(msg.remaining);
+  if (mpMustWaitUid) engine.removePrompt?.(mpMustWaitUid);
+  mpMustWaitUid = null;
+  mpNote(engine, `end:${msg.why || ''}`);
+  if (!run || !raceIsLive(run)) return;
+  const { outcome, winnerName, leftName } = endOutcome(msg, mp.myId);
+  const now = Date.now();
+  if (outcome === 'won') {
+    run.status = 'won';
+    run.playerProgress = run.kind === 'quoins' ? run.playerProgress : 1;
+  } else if (outcome === 'lost') {
+    run.status = 'lost';
+    run.rivalName = winnerName || run.rivalName;
+    if (run.kind !== 'quoins') run.rivalProgress = 1;
+  } else {
+    run.status = 'forfeit';
+    mp.calledOff = leftName;
+  }
+  if (!run.startAt) run.startAt = now;
+  run.finishedAt = now;
+  showResult(engine);
+}
+
+/** A game called off (inc_games.js games_end_quoin_grab 1587-1610: the logo and Leave the Game, no reward). */
+function showCalledOff(engine) {
+  const race = RACES[run.raceId];
+  hud.ready.querySelector('[data-race-ready-icon]').src = `${RACE_ICON_DIR}${race.ticket}.png`;
+  hud.ready.querySelector('[data-race-ready-kicker]').textContent = race.title;
+  hud.ready.querySelector('[data-race-ready-desc]').textContent = MP_RACE_TEXT.calledOff(mp?.calledOff || '');
+  hud.ready.querySelector('[data-race-ready-btn]').textContent = MP_RACE_TEXT.leaveGame;
+  hud.ready.dataset.mode = 'leave';
+  hud.ready.hidden = false;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1054,7 +1566,7 @@ function renderHud(engine, force = false) {
   hud.bar.querySelector('[data-race-rival]').textContent = run.rivalName;
   hud.bar.querySelector('[data-race-rival-pct]').textContent = quoins ? String(run.scores.rival) : `${them}%`;
   hud.bar.querySelector('[data-race-remaining-wrap]').hidden = !quoins;
-  hud.bar.querySelector('[data-race-remaining]').textContent = String(quoinGrabRemaining(run));
+  hud.bar.querySelector('[data-race-remaining]').textContent = String(mp && quoins ? mp.remaining : quoinGrabRemaining(run));
   hud.bar.querySelector('.race-track').hidden = quoins;
   hud.bar.querySelector('[data-race-you]').style.left = `${you}%`;
   hud.bar.querySelector('[data-race-them]').style.left = `${them}%`;
@@ -1088,7 +1600,12 @@ function publish(engine) {
   engine.setData('raceKind', run ? run.kind : '');
   engine.setData('raceQuoinsYou', run?.kind === 'quoins' ? String(run.scores.you) : '');
   engine.setData('raceQuoinsRival', run?.kind === 'quoins' ? String(run.scores.rival) : '');
-  engine.setData('raceQuoinsRemaining', run?.kind === 'quoins' ? String(quoinGrabRemaining(run)) : '');
+  engine.setData('raceQuoinsRemaining', run?.kind === 'quoins' ? String(mp ? mp.remaining : quoinGrabRemaining(run)) : '');
+  engine.setData('raceMp', mp ? `${mp.match}:${mp.slot}` : '');
+  engine.setData('raceMpStreet', mp ? mp.street : '');
+  engine.setData('raceMpPlayers', mp ? mp.players.map((p) => p.name).join(',') : '');
+  engine.setData('raceMpScores', mp ? mp.rows.map((r) => `${r.name}:${r.score}`).join(',') : '');
+  engine.setData('raceMpLast', mpLast);
   engine.setData('raceQuoinsTotal', run?.kind === 'quoins' ? String(run.quoinTotal) : '');
   if (run && ['won', 'lost', 'forfeit'].includes(run.status)) engine.setData('raceOutcome', run.status);
 }
@@ -1122,6 +1639,11 @@ function wantsDemoDispenser(engine) {
 
 function handleDemo(engine) {
   if (demoHandled || !engine.started) return;
+  // Demo and QA routes are solo's (Austin's multiplayer plan).
+  if (engine.mode === 'multiplayer') {
+    demoHandled = true;
+    return;
+  }
   const demo = engine.param('racedemo');
   if (!demo) {
     demoHandled = true;
@@ -1186,6 +1708,7 @@ export const racesFeature = {
 
   onStreetEnter(street, engine) {
     buildChrome(engine);
+    if (engine.mode === 'multiplayer') mpAttach(engine);
     if (!run) {
       if (record.pendingTicket) {
         addItem(engine.inv, record.pendingTicket, 1);
@@ -1243,6 +1766,12 @@ export const racesFeature = {
 
   onTick(dtMs, now, engine) {
     if (!demoHandled && engine.started) handleDemo(engine);
+    if (engine.mode === 'multiplayer' && !mpClient) mpAttach(engine);
+    // Click to Start counts once the racer stands in the instance: ask again until it does.
+    if (mp?.ready && !mp.acked && mpClient?.street === mp.street && now - mpReadyAt >= 1500) {
+      mpReadyAt = now;
+      mpClient.send('race_ready', { match: mp.match });
+    }
     if (!run || !course) return;
     if (!engine.inScene()) return;
     raceTick(engine, now);
@@ -1264,7 +1793,9 @@ export const racesFeature = {
   packVerbs(classTsid, engine) {
     if (!isRaceTicket(classTsid)) return [];
     const raceId = ticketRaceId(classTsid);
-    const block = activationBlock(engine);
+    // race_ticket.js:121, multiplayer: disabled with nobody else on the street.
+    const alone = isMp(engine) && (!raceId || MP_RACE_COURSES.includes(raceId)) && !(engine.query('realtimeClient')?.players.length > 0);
+    const block = activationBlock(engine) || (alone ? 'You need at least one other player here.' : '');
     const name = raceId ? raceTitle(raceId) : 'a random race';
     return [{
       id: 'activate',
@@ -1282,8 +1813,22 @@ export const racesFeature = {
     return true;
   },
 
+  /**
+   * realtime-feature sharedStreet: in a multiplayer race the scene is shared
+   * with the other racers on the match's own hub street (RACE_<match>).
+   */
+  realtimeStreet(engine) {
+    return mp && run && engine.inScene?.() ? mp.street : null;
+  },
+
+  /** A racer's place in a party roster (party-feature streetLabel): the race, not RACE_<match>. */
+  labelFor(tsid) {
+    if (!/^RACE_[0-9A-F]{16}$/.test(String(tsid || ''))) return null;
+    return { street: mp?.street === tsid ? RACES[mp.course]?.title || 'A race' : 'A race', hub: 'Race', hubId: 'scene' };
+  },
+
   /** QA / tests. */
   _state() {
-    return { run, record, course: course?.id || null };
+    return { run, record, course: course?.id || null, mp };
   },
 };
