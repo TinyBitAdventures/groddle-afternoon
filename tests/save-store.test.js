@@ -61,8 +61,8 @@ afterEach(() => {
 });
 
 describe('save-store keys', () => {
-  it('keeps every key the game wrote before the save interface (HEAD 2cfd764f)', () => {
-    // game.js 6701, 9337-9341; game-day.js 28-29; character-builder.js 41 at 2cfd764f.
+  it('keeps every key the game wrote before the save interface (HEAD 600db87d)', () => {
+    // game.js 6701, 9337-9341; game-day.js 28-29; character-builder.js 41 at 600db87d.
     assert.deepEqual({ ...SAVE_KEYS }, {
       playerState: 'groddle_player_state_v1',
       location: 'groddle_player_location',

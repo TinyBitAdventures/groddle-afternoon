@@ -146,7 +146,7 @@ const DOWNLOADS = {
   PIGGY_PLOP: { file: 'assets/audio/piggy_plop.mp3', name: 'piggy_plop.mp3', fit: 'Piggy Plop' },
   SPINNING_WHEEL: { file: 'assets/audio/ambient/Spinning-Wheel_1292034939.mp3', name: 'Spinning-Wheel_1292034939.mp3', fit: 'Spinning Wheel' },
   METALMAKER: { file: 'assets/audio/ambient/metalmaker_1344997841.mp3', name: 'metalmaker_1344997841.mp3', fit: 'metalmaker (music_map METALMAKER)' },
-  // NEWDAY's old stand-in, new_day_fanfare.mp3, was the client's licensed trumpet.mp3 and is gone (2244251f);
+  // NEWDAY's old stand-in, new_day_fanfare.mp3, was the client's licensed trumpet.mp3 and is gone (64216a47);
   // NEWDAY plays Tiny Speck's own "new day" recording from archive.org.
 };
 

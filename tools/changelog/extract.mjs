@@ -27,7 +27,7 @@ const repo = join(here, '..', '..');
 export const POSTS_FILE = join(here, 'posts.json');
 
 /** The last commit whose public/changelog.html is the full build archive. */
-export const ARCHIVE_COMMIT = '51140eed';
+export const ARCHIVE_COMMIT = '5be3846d';
 export const ARCHIVE_PATH = 'public/changelog.html';
 
 export const archiveHtml = (commit = ARCHIVE_COMMIT) =>

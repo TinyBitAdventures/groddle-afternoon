@@ -2030,9 +2030,19 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 509,
+  "commits": 508,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "improve",
+    "text": "The realtime server and the Minn site move to their own repos, and the game gets a readme and MIT licence"
+   },
+   {
+    "date": "2026-10-26",
+    "kind": "fix",
+    "text": "Only CC0 or our own art and sound ship: every file from Glitch's CDN or downloads page is traced, replaced or dropped"
+   },
    {
     "date": "2026-10-26",
     "kind": "fix",
@@ -2115,11 +2125,6 @@
    },
    {
     "date": "2026-10-25",
-    "kind": "fix",
-    "text": "A player who connects from a second window sees the first one close cleanly"
-   },
-   {
-    "date": "2026-10-25",
     "kind": "new",
     "text": "A realtime server for multiplayer, and the sign-in ticket that opens it"
    },
@@ -2147,11 +2152,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "Leaving the street ends the Firefly and Game lines, a failed Gwendolyn's Task or Juju quest goes back to its giver, and the Game of Crowns says Stay it for 60 seconds"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Tutorial and quest-room copy comes from Tiny Speck's own files, not footage"
    }
   ]
  },

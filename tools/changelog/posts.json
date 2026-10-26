@@ -2,7 +2,7 @@
   "about": "Groddle Afternoon build notes. One object per post, newest first. Text fields are HTML fragments. Posts with \"archived\" were lifted word for word from the old build archive by tools/changelog/extract.mjs; \"draft\": true builds the page but leaves it out of the list. Rebuild the pages with: node tools/changelog/build.mjs",
   "archive": {
     "source": {
-      "commit": "51140eed",
+      "commit": "5be3846d",
       "path": "public/changelog.html"
     },
     "title": "Groddle Field Notes · Build archive",

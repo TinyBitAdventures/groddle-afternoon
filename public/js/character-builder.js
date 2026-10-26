@@ -76,7 +76,7 @@ const DEFAULT_COLOURS = Object.freeze({
 /**
  * The retired bitmap presets, as saved (style + colours), and the vector look
  * each moves to: the untouched defaults to the vector default, the five
- * colour themes to their vector rebuilds (10c415cb), the purple Alt body to
+ * colour themes to their vector rebuilds (f281be8a), the purple Alt body to
  * Midnight. Any other retired look keeps its colours as tints.
  */
 const LEGACY_LOOKS = [

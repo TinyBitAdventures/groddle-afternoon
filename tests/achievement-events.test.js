@@ -215,7 +215,7 @@ describe('video badge client integration', () => {
 });
 
 /**
- * G116-G119 (inventory 6c8179a3): counters the remake never incremented and
+ * G116-G119 (inventory 84129480): counters the remake never incremented and
  * badges GSJS grants outright. Each case runs the remake's action, checks the
  * counter moved, then that the badge unlocks exactly at its threshold.
  */

@@ -13,7 +13,7 @@ class, frames in a grid read left to right. The frame count of each grid is the 
 which is also how each sheet is checked to be that tool's art: the GSJS item file names the same SWF
 (`asset_swf_v`, cited per row below). The cells past the last frame must be empty.
 
-Sharp sheets (G191, the b81d991f method): `--render` exports every frame of the SWF's tool_animation
+Sharp sheets (G191, the 9a80dcf5 method): `--render` exports every frame of the SWF's tool_animation
 scene with FFDec at zoom 3 (Java 21, root timeline, a copy of the SWF with a stage three times the size so
 art outside the authored stage is kept: tools/icon-hires/swfinfo.py rewrite), then lets
 tools/vector-sprites/build.mjs (--dry) find the one placement that makes each render's 3:1 box downscale
@@ -23,7 +23,7 @@ otherwise (a 3x render shrunk with Lanczos), as `<tool>-work@<d>x.webp`, in a gr
 the frame count (every row full, so style.css plays it with one steps() per axis) and whose sides stay
 under WebP's 16383 px. The placements and scores are kept in tools/make-tool-hires.json, so the table
 and --check need neither FFDec nor the renders. A tool that fails keeps its 1x row
-(`<tool>-work.webp`, frame k at x = k * fw, repacked from the OGA grid as in 9d736239).
+(`<tool>-work.webp`, frame k at x = k * fw, repacked from the OGA grid as in 8bfcf43e).
 
 Writes public/assets/sprites/making/<tool>-work[@<d>x].webp (lossless; fully transparent pixels are
 cleared to 0,0,0,0) and public/js/make-tool-sheets.js (tool -> sheet, frame size, columns, frame count,
@@ -60,7 +60,7 @@ def audit_dir():
 AUDIT = audit_dir()
 FPS = 30  # TSEngineConstants.as:6
 # The Make panel's tool box (style.css .mp-tool-wrap, 112 x 104): fit each cell in about 110 x 93,
-# never upscaling the 1x art past 1.6. The Grand Ol' Grinder's 50 x 79 comes out at 1.18, as in 9d736239.
+# never upscaling the 1x art past 1.6. The Grand Ol' Grinder's 50 x 79 comes out at 1.18, as in 8bfcf43e.
 BOX_W, BOX_H, MAX_SCALE = 110, 93, 1.6
 
 # tool: (OGA sheet under opengameart/, grid columns, cell w, cell h, frames, glitch-items SWF, GSJS asset_swf_v)

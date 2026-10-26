@@ -40,7 +40,7 @@ const FEED_CATALOG = Object.freeze({
     bun: { label: 'Bun', nutrition: 4 },
     sammich: { label: 'Sammich', nutrition: 6 },
   }),
-  // npc_chicken.js has no feed verb (G280, a6abadef dropped it): no chicken entry (G290).
+  // npc_chicken.js has no feed verb (G280, 3c6c2f47 dropped it): no chicken entry (G290).
   npc_butterfly: Object.freeze({}),
 });
 

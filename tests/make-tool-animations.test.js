@@ -112,7 +112,7 @@ describe('G188 Make panel tool animations', () => {
       assert.ok(s.scale > 0 && s.scale <= 1.6, `${id} scale ${s.scale}`);
       assert.ok(s.fw * s.scale <= 112 && s.fh * s.scale <= 104, `${id}: ${s.fw}x${s.fh} at ${s.scale}`);
     }
-    // The Grand Ol' Grinder keeps 9d736239's cell and fit (83 frames of 50 x 79 at 1.18), now at 3x in one
+    // The Grand Ol' Grinder keeps 8bfcf43e's cell and fit (83 frames of 50 x 79 at 1.18), now at 3x in one
     // row (83 is prime).
     assert.deepEqual({ ...MAKE_TOOL_SHEETS.grand_ol_grinder }, {
       url: 'assets/sprites/making/grand_ol_grinder-work@3x.webp', fw: 50, fh: 79, cols: 83, frames: 83, fps: 30, scale: 1.18, density: 3,
