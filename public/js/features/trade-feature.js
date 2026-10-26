@@ -69,7 +69,8 @@ let saved = normalizeSlice(null);
 let multiplayer = false;
 
 const STYLE = `
-.trade-win { position: fixed; z-index: 60; left: 50%; top: 9vh; transform: translateX(-50%); width: min(660px, calc(100vw - 32px)); max-height: 84vh; overflow-y: auto;
+/* Above overlay art (z 70, e.g. the Qurazy banner): a window in use is never covered by an effect. */
+.trade-win { position: fixed; z-index: 75; left: 50%; top: 9vh; transform: translateX(-50%); width: min(660px, calc(100vw - 32px)); max-height: 84vh; overflow-y: auto;
   border-radius: 12px; background: #fffdf6; color: #302b34; box-shadow: 0 10px 30px rgba(28, 25, 31, 0.35), 0 0 0 1px rgba(116, 80, 142, 0.18); font: 13px/1.4 system-ui, sans-serif; pointer-events: auto; }
 .trade-win[hidden] { display: none; }
 .trade-head { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.8rem 0.9rem 0.4rem; }
