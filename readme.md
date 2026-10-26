@@ -69,10 +69,13 @@ read the original sources from checkouts beside this repo:
     git clone https://github.com/tinyspeck/glitch-client
     git clone https://github.com/tinyspeck/glitch-items
     git clone https://github.com/tinyspeck/glitch-overlays
+    git clone https://github.com/tinyspeck/glitch-locations
+    unzip -q glitch-locations/locations-xml.zip -d streets
 
 The multiplayer tests read the server and site repos from `../groddle-afternoon-server` and
 `../groddle-afternoon-site` (or `GRODDLE_SERVER_DIR` and `GRODDLE_SITE_DIR`), and skip with a
-clone hint when they are missing.
+clone hint when they are missing. A few tests check the item catalog against a research
+inventory kept outside the repo, and skip without it.
 
 `tools/shot.mjs` takes a screenshot of any route and `tools/playtest.mjs` plays the game like a
 person would (both use Playwright with your installed Chrome).

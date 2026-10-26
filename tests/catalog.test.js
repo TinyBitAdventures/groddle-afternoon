@@ -8,7 +8,7 @@ import { describe, it } from 'node:test';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { GSJS, readInventory } from '../tools/catalog/build.mjs';
+import { GSJS, INVENTORY_DB, readInventory } from '../tools/catalog/build.mjs';
 import { siteNav } from '../tools/changelog/build.mjs';
 import { servedByMinn } from './minn-served.js';
 
@@ -16,7 +16,9 @@ const spike = join(import.meta.dirname, '..');
 const pub = join(spike, 'public');
 const items = join(pub, 'items');
 const data = JSON.parse(readFileSync(join(items, 'data.json'), 'utf8'));
-const inventory = readInventory();
+// The coverage inventory is a research file beside the repo (research/coverage/inventory.sqlite), not in it.
+const skipWithoutInventory = existsSync(INVENTORY_DB) ? false : `needs the coverage inventory at ${INVENTORY_DB}`;
+const inventory = skipWithoutInventory ? new Map() : readInventory();
 const gsjsIds = readdirSync(join(GSJS, 'items')).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3));
 const listed = gsjsIds.filter((id) => inventory.has(id) && inventory.get(id).status !== 'excluded');
 const excluded = gsjsIds.filter((id) => inventory.get(id)?.status === 'excluded');
@@ -27,7 +29,7 @@ const musicCards = new Set(JSON.parse(readFileSync(join(pub, 'musicblocks', 'dat
 const minnServed = (ref) => servedByMinn(ref) || /(^|\/)musicblocks\/$/.test(ref.replace(/#.*$/, ''));
 
 describe('item catalog', () => {
-  it('has a page for every GSJS item the inventory does not exclude, and none for excluded ones', () => {
+  it('has a page for every GSJS item the inventory does not exclude, and none for excluded ones', { skip: skipWithoutInventory }, () => {
     assert.ok(listed.length > 900, `only ${listed.length} items listed`);
     assert.deepEqual(data.items.map((i) => i.id).sort(), [...listed].sort());
     for (const id of listed) assert.ok(existsSync(join(items, id, 'index.html')), id);
@@ -38,7 +40,7 @@ describe('item catalog', () => {
     assert.ok(!data.items.some((i) => /^npc_/.test(i.id) && !inventory.has(i.id)));
   });
 
-  it('shows the inventory status of each item, on the list and on its page', () => {
+  it('shows the inventory status of each item, on the list and on its page', { skip: skipWithoutInventory }, () => {
     const labels = Object.fromEntries(data.statuses.map((s) => [s.key, s.label]));
     for (const item of data.items) {
       const inv = inventory.get(item.id);
@@ -122,7 +124,7 @@ describe('item catalog', () => {
     assert.ok(!index.html.includes('—'), 'em-dash on the catalog page');
   });
 
-  it('is current (node tools/catalog/build.mjs --check)', () => {
+  it('is current (node tools/catalog/build.mjs --check)', { skip: skipWithoutInventory }, () => {
     const run = spawnSync(process.execPath, [join(spike, 'tools/catalog/build.mjs'), '--check'], { encoding: 'utf8' });
     assert.equal(run.status, 0, run.stderr || run.stdout);
   });

@@ -27,9 +27,9 @@ const ROOT = join(__dirname, '..');
 const STREETS = join(ROOT, 'public/assets/streets');
 const XML_SAMPLE = join(
   ROOT,
-  '../streets/xml/GLI2V0UN7RD1T2J.xml'
+  '../streets/mnt/stos/location_data/GLI2V0UN7RD1T2J.xml'
 );
-const XML_JUNC = join(ROOT, '../streets/xml/GLI3272LOTD1B1F.xml');
+const XML_JUNC = join(ROOT, '../streets/mnt/stos/location_data/GLI3272LOTD1B1F.xml');
 const XML_FULL = join(
   ROOT,
   '../streets/mnt/stos/location_data'
