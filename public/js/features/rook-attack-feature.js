@@ -100,7 +100,8 @@ import {
   shareOf,
   strikeDamage as mpStrikeDamage,
   syncKeys,
-} from '../rook-mp.js?v=mp4-1';
+  syncObjs,
+} from '../rook-mp.js?v=g334-1';
 
 export const ROOK_FEATURE_ID = 'rook-attack';
 const VIEW_W = 960;
@@ -1775,7 +1776,8 @@ function mpTick(engine, t) {
   if (!street) return;
   // Ask once the server has us on this street and our rookable keys are known.
   if (!mp.synced && mp.client.state === 'online' && mp.client.street === street && t >= mp.syncAt) {
-    if (mp.client.send('rook_sync', { keys: syncKeys(rookableTargets(engine)) })) mp.synced = street;
+    const entries = rookableTargets(engine);
+    if (mp.client.send('rook_sync', { keys: syncKeys(entries), objs: syncObjs(entries) })) mp.synced = street;
   }
   mpSyncPrimed(engine);
 }

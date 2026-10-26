@@ -17,6 +17,7 @@ import {
   shareOf,
   strikeDamage,
   syncKeys,
+  syncObjs,
 } from '../public/js/rook-mp.js';
 import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js';
 import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
@@ -138,6 +139,28 @@ describe('rook-mp: offerings', () => {
   });
 });
 
+describe('rook-mp: shared trees', () => {
+  it('pairs each tree key with its shared object, only for keys the sync sends', () => {
+    const entries = [
+      { key: 'trant_bean:0', target: { treeIndex: 2 } },
+      { key: 'npc_piggy:0', target: {} },
+      { key: 'trant_fruit:1', target: { treeIndex: 0 } },
+      { key: 'not_a_thing:0', target: { treeIndex: 5 } },
+      { key: 'trant_egg:0', target: { treeIndex: -1 } },
+    ];
+    assert.deepEqual(syncObjs(entries), { 'trant_bean:0': 'tree:2', 'trant_fruit:1': 'tree:0' });
+    assert.deepEqual(syncObjs([]), {});
+  });
+
+  it('rook_sync carries the pairs, and the server takes them', { skip: skipWithoutServer }, () => {
+    assert.match(read('public/js/features/rook-attack-feature.js'), /client\.send\('rook_sync', \{ keys: syncKeys\(entries\), objs: syncObjs\(entries\) \}\)/);
+    const go = fs.readFileSync(serverPath('rook.go'), 'utf8');
+    assert.match(go, /Objs map\[string\]string `json:"objs"`/);
+    assert.match(go, /ProvidedLocked\("objects\.rookTree"\)/);
+    assert.match(fs.readFileSync(serverPath('objects.go'), 'utf8'), /r\.Provide\("objects\.rookTree", o\.rookTree\)/);
+  });
+});
+
 describe('rook-mp: wiring', () => {
   const feature = read('public/js/features/rook-attack-feature.js');
   // The server is rook.go in groddle-afternoon-server (tools/repos.mjs); its checks skip without it.
@@ -145,7 +168,8 @@ describe('rook-mp: wiring', () => {
 
   it('every importer of rook-mp.js uses one key', () => {
     const keys = [...feature.matchAll(/rook-mp\.js\?v=([\w-]+)/g)].map((m) => m[1]);
-    assert.deepEqual([...new Set(keys)], ['mp4-1']);
+    assert.equal(new Set(keys).size, 1);
+    assert.match(keys[0], /^(?:mp4|g\d+)-\d+$/);
   });
 
   it('solo never binds the realtime client or skips its own schedule', () => {

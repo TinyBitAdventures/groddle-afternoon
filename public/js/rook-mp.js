@@ -51,6 +51,22 @@ const num = (v, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d);
 const PHASES = new Set(['herald', 'build_up', 'angry', 'stunned', 'dead', 'departed']);
 
 /** The rookable keys this client has on the street, as the server takes them (at most 64). */
+/**
+ * The shared tree behind each tree key (js/street-objects.js treeId), for
+ * rook_sync's objs: the server strips a rooked tree's fruit and health for
+ * everyone and holds its harvest until it is revived (groddle-afternoon-server
+ * rook.go, objects.go rookTree).
+ */
+export function syncObjs(entries) {
+  const out = {};
+  const keys = new Set(syncKeys(entries));
+  for (const e of entries || []) {
+    const index = e?.target?.treeIndex;
+    if (keys.has(e.key) && Number.isInteger(index) && index >= 0) out[e.key] = `tree:${index}`;
+  }
+  return out;
+}
+
 export function syncKeys(entries) {
   const out = [];
   for (const e of entries || []) {
