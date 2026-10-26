@@ -2,9 +2,10 @@
  * /play/online/ (multiplayer phase 2): sign the player in, load the whole
  * multiplayer save from Minn into window.GRODDLE_MP_BOOT, and only then load
  * game.js, whose save store (js/save-store.js) serves the game from that copy
- * and writes it back. A signed-out player is offered Log in or Create an
- * account, each coming back here; a page with no Groddle site behind it (a
- * static server) says multiplayer needs one. The save state shows in a pill.
+ * and writes it back. A signed-out player signs in or makes a new character
+ * right here, by email (js/account-forms.js), and the game starts without
+ * leaving the page; a page with no Groddle site behind it (a static server)
+ * says multiplayer needs one. The save state shows in a pill.
  *
  * Load order matters: this module must not import js/save-store.js (the store
  * reads GRODDLE_MP_BOOT once, when it first loads), so game.js is added as a
@@ -12,7 +13,8 @@
  * play/index.html by tools/play-online/build.mjs.
  */
 
-import { createMinnAccount } from './minn-account.js?v=mp2-2';
+import { createMinnAccount } from './minn-account.js?v=mp-login-1';
+import { mountAccountForms } from './account-forms.js?v=mp-login-1';
 
 const PILL_TEXT = {
   saved: 'Saved',
@@ -20,7 +22,7 @@ const PILL_TEXT = {
   saving: 'Saving…',
   offline: 'Offline, retrying',
   conflict: 'Saved somewhere else. Reload',
-  'signed-out': 'Signed out. Log in again',
+  'signed-out': 'Signed out. Sign in again',
   error: 'Not saved',
 };
 
@@ -28,12 +30,8 @@ const PILL_TEXT = {
 export const GATE_COPY = {
   checking: { title: 'Finding your account', body: ['Checking whether you are signed in…'] },
   'signed-out': {
-    title: 'Sign in to play with others',
-    body: ['Multiplayer keeps your character on the Groddle site, so it is the same on every device.', 'Your solo game is still right here. It saves in this browser and needs no account.'],
-  },
-  registered: {
-    title: 'Check your email',
-    body: ['We sent you a link to set your password. Set it, then log in here to start your multiplayer character.'],
+    title: 'Play with others',
+    body: ['Multiplayer keeps your character on the Groddle site, so it is the same on every device. Your solo game stays in this browser and needs no account.'],
   },
   'no-server': {
     title: 'Multiplayer needs the Groddle site',
@@ -50,10 +48,10 @@ export const GATE_COPY = {
 };
 
 /** Which gate a session answer leads to; 'ready' boots the game. */
-export function gateFor(session, { registered = false } = {}) {
+export function gateFor(session) {
   if (session?.offline) return 'offline';
   if (!session?.minn) return 'no-server';
-  if (!session.signedIn) return registered ? 'registered' : 'signed-out';
+  if (!session.signedIn) return 'signed-out';
   return 'ready';
 }
 
@@ -79,7 +77,7 @@ function el(tag, attrs = {}, text = '') {
   return node;
 }
 
-function showGate(gate, state, { urls, back }) {
+function showGate(gate, state, { account, onSignedIn }) {
   const copy = GATE_COPY[state] || GATE_COPY.checking;
   gate.dataset.online = state;
   const card = gate.querySelector('.card');
@@ -87,9 +85,11 @@ function showGate(gate, state, { urls, back }) {
   card.replaceChildren(...(keep ? [keep] : []));
   card.append(el('h2', {}, copy.title));
   for (const line of copy.body) card.append(el('p', {}, line));
-  if (state === 'signed-out' || state === 'registered') {
-    card.append(el('a', { class: 'online-play', href: urls.login(back), 'data-online-login': '' }, 'Log in'));
-    if (state === 'signed-out') card.append(el('a', { class: 'online-alt', href: urls.register(back), 'data-online-register': '' }, 'Create an account'));
+  if (state === 'signed-out') {
+    const host = el('div', { class: 'online-account' });
+    card.append(host);
+    // A link from the site can open the gate on New player: /play/online/#new
+    mountAccountForms(host, { account, start: location.hash === '#new' ? 'signup' : 'signin', onSignedIn });
   }
   if (state === 'offline' || state === 'load-failed') {
     const retry = el('button', { type: 'button', class: 'online-play', 'data-online-retry': '' }, 'Try again');
@@ -97,12 +97,12 @@ function showGate(gate, state, { urls, back }) {
     card.append(retry);
   }
   if (state !== 'checking') {
-    card.append(el('a', { class: state === 'signed-out' || state === 'registered' ? 'online-home' : 'online-play', href: 'play/' }, 'Play solo'));
+    card.append(el('a', { class: state === 'signed-out' ? 'online-home' : 'online-play', href: 'play/' }, 'Play solo'));
     card.append(el('a', { class: 'online-home', href: './' }, 'Back to Groddle Afternoon'));
   }
 }
 
-function mountSavePill(player, urls, back) {
+function mountSavePill(player) {
   const pill = el('div', { id: 'save-pill', class: 'save-pill', role: 'status', 'aria-live': 'polite', 'data-state': 'saved' });
   pill.append(el('span', { class: 'save-pill-who' }, player?.name ? `Playing as ${player.name}` : 'Multiplayer'), el('span', { class: 'save-pill-state' }, PILL_TEXT.saved));
   document.body.append(pill);
@@ -110,7 +110,8 @@ function mountSavePill(player, urls, back) {
     const s = e.detail?.state || 'saved';
     pill.dataset.state = s;
     // A conflict or an ended session needs the player: the words become the way out.
-    const href = s === 'conflict' ? location.pathname : s === 'signed-out' ? urls.login(back) : '';
+    // Reloading /play/online/ shows the gate's sign-in when the session is gone.
+    const href = s === 'conflict' || s === 'signed-out' ? location.pathname : '';
     const text = PILL_TEXT[s] || s;
     pill.lastChild.replaceWith(href ? el('a', { class: 'save-pill-state', href }, text) : el('span', { class: 'save-pill-state' }, text));
   });
@@ -120,13 +121,13 @@ async function boot() {
   const gate = document.getElementById('online-gate');
   const script = document.getElementById('online-boot');
   const account = createMinnAccount({ baseUri: document.baseURI });
-  const back = new URL(location.pathname, location.origin).href;
-  const registered = /[?&]action=register\b/.test(document.referrer || '');
-  showGate(gate, 'checking', { urls: account.urls, back });
+  // Signed in from the gate's forms: the same steps again, now with a session.
+  const onSignedIn = () => { boot(); };
+  showGate(gate, 'checking', { account, onSignedIn });
   const session = await account.session();
-  const state = gateFor(session, { registered });
+  const state = gateFor(session);
   if (state !== 'ready') {
-    showGate(gate, state, { urls: account.urls, back });
+    showGate(gate, state, { account, onSignedIn });
     return;
   }
   let save;
@@ -135,13 +136,14 @@ async function boot() {
     window.GRODDLE_MP_BOOT = bootDataFrom({ account, session, save });
   } catch (err) {
     console.warn('[online] save did not load', err);
-    showGate(gate, err?.status === 401 ? 'signed-out' : 'load-failed', { urls: account.urls, back });
+    showGate(gate, err?.status === 401 ? 'signed-out' : 'load-failed', { account, onSignedIn });
     return;
   }
   gate.hidden = true;
   gate.dataset.online = 'ready';
   document.body.classList.remove('online-gated');
-  mountSavePill(session.player, account.urls, back);
+  mountSavePill(session.player);
+  if (location.hash === '#new') history.replaceState(history.state, '', location.pathname);
   const game = document.createElement('script');
   game.type = 'module';
   game.src = script.dataset.game;

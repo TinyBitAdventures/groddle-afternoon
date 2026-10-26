@@ -15,9 +15,9 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=mp2-2';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=mp2-2';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=mp2-3';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=mp-login-1';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=mp-login-1';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=mp-login-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-1';
@@ -55,8 +55,8 @@ describe('minn-account', () => {
     const urls = minnUrls(BASE);
     assert.equal(urls.nonce, `${BASE}${NONCE_PATH}`);
     assert.equal(urls.api, `${BASE}wp-json/groddle/v1/`);
-    assert.equal(urls.login(`${BASE}play/online/`), `${BASE}wp-login.php?redirect_to=https%3A%2F%2Fgroddle.localhost%2Fplay%2Fonline%2F`);
-    assert.equal(urls.register(`${BASE}play/`), `${BASE}wp-login.php?action=register&redirect_to=https%3A%2F%2Fgroddle.localhost%2Fplay%2F`);
+    assert.equal(urls.online, `${BASE}play/online/`);
+    assert.equal(urls.login, undefined, 'no link to the site\'s sign-in page: the game has its own forms');
     assert.equal(minnUrls('http://127.0.0.1:8790/sub/').api, 'http://127.0.0.1:8790/sub/wp-json/groddle/v1/');
   });
 
@@ -98,6 +98,50 @@ describe('minn-account', () => {
     assert.equal(f.calls[2].headers['X-WP-Nonce'], '0123abcdef');
   });
 
+  it('signs up and in by email: the new session\'s nonce is fetched before the answer comes back', async () => {
+    let nonceCalls = 0;
+    const calls = [];
+    const fetch = async (url, init = {}) => {
+      calls.push({ url, ...init, body: init.body ? JSON.parse(init.body) : undefined });
+      const json = (status, body) => ({ status, ok: status < 300, headers: { get: () => null }, json: async () => body, text: async () => JSON.stringify(body) });
+      if (url.endsWith(NONCE_PATH)) return { status: 200, ok: true, headers: { get: () => null }, text: async () => (++nonceCalls ? 'abcdef0123' : '0') };
+      if (url.endsWith('groddle/v1/players')) return json(201, { signedIn: true, player: { id: 9, name: 'Tess Tester' } });
+      if (url.endsWith('groddle/v1/session') && init.method === 'POST') return json(400, { code: 'incorrect_credentials', message: 'That email and password don\'t match.', fields: {} });
+      if (url.endsWith('groddle/v1/session') && init.method === 'DELETE') return json(200, { signedIn: false });
+      if (url.endsWith('groddle/v1/password-reset')) return json(200, { sent: true });
+      return json(404, {});
+    };
+    const account = createMinnAccount({ baseUri: BASE, fetch });
+    const made = await account.signUp({ email: 'tess@example.com', password: 'zz-pass-1234', name: 'Tess Tester' });
+    assert.deepEqual(made, { ok: true, player: { id: 9, name: 'Tess Tester' } });
+    assert.deepEqual(calls[0].body, { email: 'tess@example.com', password: 'zz-pass-1234', name: 'Tess Tester', website: '' });
+    assert.ok(calls[1].url.endsWith(NONCE_PATH), 'the new session\'s nonce comes next');
+    assert.equal(account.nonce, 'abcdef0123');
+    const refused = await account.signIn({ email: 'tess@example.com', password: 'nope' });
+    assert.equal(refused.ok, false);
+    assert.equal(refused.code, 'incorrect_credentials');
+    assert.equal(calls.at(-1).headers['X-WP-Nonce'], 'abcdef0123');
+    assert.deepEqual(await account.requestPasswordReset('tess@example.com'), { ok: true });
+    assert.deepEqual(await account.signOut(), { ok: true });
+    assert.equal(account.nonce, '', 'signed out, no nonce is sent again');
+    assert.equal(calls.filter((c) => /\/(players|session|password-reset)$/.test(c.url)).every((c) => !('username' in (c.body || {}))), true, 'no username is ever sent');
+  });
+
+  it('a nonce from a session that ended is refused even on the open routes: asked again with none', async () => {
+    const seen = [];
+    const fetch = async (url, init = {}) => {
+      seen.push(init.headers?.['X-WP-Nonce'] ?? null);
+      const json = (status, body) => ({ status, ok: status < 300, headers: { get: () => null }, json: async () => body, text: async () => (typeof body === 'string' ? body : JSON.stringify(body)) });
+      if (url.endsWith(NONCE_PATH)) return json(400, '0');
+      if (init.headers?.['X-WP-Nonce']) return json(403, { code: 'rest_cookie_invalid_nonce' });
+      return json(200, { signedIn: true, player: { id: 2, name: 'Bo' } });
+    };
+    const account = createMinnAccount({ baseUri: BASE, fetch, nonce: '0123456789' });
+    const r = await account.signIn({ email: 'bo@example.com', password: 'zz-pass-1234' });
+    assert.equal(r.ok, true);
+    assert.deepEqual(seen.slice(0, 3), ['0123456789', null, null]);
+  });
+
   it('backup calls: list, read, write (PUT with the save and the game day), delete; errors carry the code', async () => {
     const f = routedFetch({
       'backups': { status: 200, body: { slots: 3, maxBytes: 1, backups: [] } },
@@ -122,7 +166,6 @@ describe('online-boot', () => {
     assert.equal(gateFor({ minn: false, offline: true }), 'offline');
     assert.equal(gateFor({ minn: false }), 'no-server');
     assert.equal(gateFor({ minn: true, signedIn: false }), 'signed-out');
-    assert.equal(gateFor({ minn: true, signedIn: false }, { registered: true }), 'registered');
     assert.equal(gateFor({ minn: true, signedIn: true }), 'ready');
   });
 
@@ -168,7 +211,9 @@ describe('account backup feature', () => {
     accountBackupFeature.init({ mode: 'multiplayer', setData() { asked = true; } });
     assert.equal(asked, false);
     const src = read('public/js/features/account-backup-feature.js');
-    assert.match(src, /if \(engine\.mode !== 'solo' \|\| typeof document === 'undefined' \|\| globalThis\.groddlePractice === true\) return;/);
+    assert.match(src, /if \(typeof document === 'undefined' \|\| globalThis\.groddlePractice === true\) return;/);
+    assert.match(src, /if \(engine\.mode === 'multiplayer'\) \{\n\s*installSignOut\(engine\);\n\s*return;/, 'multiplayer gets only Sign out');
+    assert.match(src, /if \(engine\.mode !== 'solo'\) return;/);
     delete globalThis.document;
   });
 
@@ -233,18 +278,22 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
   });
 
   it('registers groddle/v1 REST routes: me open to anyone, every save, backup and realtime route signed-in', () => {
-    assert.match(src('Extension.php'), /\$minn->rest\(new Player\(\$minn\), new MultiplayerSave\(\$minn\), new SoloBackups\(\$minn\), new RealtimeTicket\(\$minn\)\);/);
+    assert.match(src('Extension.php'), /\$minn->rest\(new Player\(\$minn\), new PlayerAccount\(\$minn\), new MultiplayerSave\(\$minn\), new SoloBackups\(\$minn\), new RealtimeTicket\(\$minn\)\);/);
     const routes = [];
-    for (const f of ['Player.php', 'MultiplayerSave.php', 'SoloBackups.php', 'RealtimeTicket.php']) {
+    for (const f of ['Player.php', 'PlayerAccount.php', 'MultiplayerSave.php', 'SoloBackups.php', 'RealtimeTicket.php']) {
       for (const m of src(f).matchAll(/#\[Route\(Method::(\w+), '([^']+)', policy: new Policy\(Access::(\w+)\)\)\]/g)) routes.push(`${m[1]} ${m[2]} ${m[3]}`);
     }
     assert.deepEqual(routes.sort(), [
       'Delete /groddle/v1/backups/{slot:\\d+} SignedIn',
+      'Delete /groddle/v1/session Public',
       'Get /groddle/v1/backups SignedIn',
       'Get /groddle/v1/backups/{slot:\\d+} SignedIn',
       'Get /groddle/v1/me Public',
       'Get /groddle/v1/save SignedIn',
+      'Post /groddle/v1/password-reset Public',
+      'Post /groddle/v1/players Public',
       'Post /groddle/v1/realtime SignedIn',
+      'Post /groddle/v1/session Public',
       'Put /groddle/v1/backups/{slot:\\d+} SignedIn',
       'Put /groddle/v1/save SignedIn',
     ]);
@@ -276,8 +325,18 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
     assert.doesNotMatch(src('MultiplayerSave.php'), /groddle_solo_backups|SoloBackups::TABLE/);
   });
 
+  it('players sign up by email and a character name: the username underneath is made up, the role is always subscriber', () => {
+    const acct = src('PlayerAccount.php');
+    assert.match(acct, /->register\('player-' \. bin2hex\(random_bytes\(5\)\), \$email, \$password, \$name, self::ROLE\)/);
+    assert.match(acct, /public const ROLE = 'subscriber';/, 'players never edit, so they never get the Minn bar');
+    assert.match(acct, /LOWER\(display_name\) = LOWER\(\?\)/, 'no two players share a name');
+    assert.match(acct, /->signIn\(\$answer, \$email, \$password\)/, 'sign-in is by email');
+    assert.doesNotMatch(acct, /\$body\['(?:login|username)'\]/, 'no route reads a username');
+    assert.match(src('Player.php'), /'name' => \$user->displayName !== '' \? \$user->displayName : \$user->login/);
+  });
+
   it('runs no WordPress function (the engine\'s classes only)', () => {
-    for (const f of ['Player.php', 'MultiplayerSave.php', 'SoloBackups.php', 'SaveShape.php']) {
+    for (const f of ['Player.php', 'PlayerAccount.php', 'MultiplayerSave.php', 'SoloBackups.php', 'SaveShape.php']) {
       assert.doesNotMatch(src(f), /\b(?:get_option|wp_[a-z_]+|current_user_can|get_current_user_id|esc_[a-z]+|\$wpdb)\s*\(/, f);
     }
   });

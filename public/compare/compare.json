@@ -128,7 +128,7 @@
         { "label": "Platform", "text": "Web browser.", "sources": ["ga-restoration"] },
         { "label": "Licence and code", "text": "MIT code on GitHub in three repositories: the game, the realtime server and the site. Uses only Tiny Speck's CC0 art, sound and code, plus art and sound made fresh where nothing survives; no Glitch logo or trademark.", "sources": ["ts-gsjs", "ga-github"] },
         { "label": "Status", "text": "In development; playable in the browser, solo or multiplayer.", "sources": ["ga-restoration"] },
-        { "label": "How to play", "text": "Open groddleafternoon.com in a desktop browser. Solo needs no account; multiplayer needs a free one.", "sources": ["ga-site"] },
+        { "label": "How to play", "text": "Open groddleafternoon.com in a desktop browser. Solo needs no account; multiplayer needs a free one, made in the game with an email and a password.", "sources": ["ga-site"] },
         { "label": "Team", "text": "A one-person project.", "sources": ["ga-restoration"] }
       ]
     }

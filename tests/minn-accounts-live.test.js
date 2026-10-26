@@ -46,19 +46,24 @@ function call(jar, method, path, { nonce, body, form } = {}) {
   return { status, json, text, headers };
 }
 
+/** A throwaway player made the way the game makes one: email, password and a character name (groddle/v1/players). */
 function player(name) {
   const jar = join(dir, `${name}.jar`);
   const pass = `zz-${name}-${process.pid}-pass`;
-  const login = `zz-${name}-${process.pid}`;
-  const id = Number(wp('user', 'create', login, `${login}@example.com`, '--role=subscriber', `--user_pass=${pass}`, '--porcelain'));
+  const email = `zz-${name}-${process.pid}@example.com`;
+  const shown = `Zz ${name} ${process.pid % 100000}`;
   writeFileSync(jar, '');
+  const made = call(jar, 'POST', '/wp-json/groddle/v1/players', { body: { email, password: pass, name: shown } });
+  assert.equal(made.status, 201, `${email} signs up: ${made.text}`);
   return {
-    id,
-    login,
+    id: made.json.player.id,
+    email,
+    pass,
+    shown,
     jar,
     signIn() {
-      const r = call(jar, 'POST', '/wp-login.php', { form: `log=${encodeURIComponent(login)}&pwd=${encodeURIComponent(pass)}&rememberme=forever&testcookie=1` });
-      assert.equal(r.status, 302, `${login} signs in`);
+      const r = call(jar, 'POST', '/wp-json/groddle/v1/session', { body: { email, password: pass, remember: true } });
+      assert.equal(r.status, 200, `${email} signs in`);
       this.nonce = call(jar, 'GET', '/wp-admin/admin-ajax.php?action=rest-nonce').text.trim();
       assert.match(this.nonce, /^[0-9a-f]{10}$/);
     },
@@ -83,6 +88,27 @@ describe('groddle/v1 on the live site', { skip: !LIVE && 'set GRODDLE_LIVE=1 to 
       wp('user', 'delete', String(p.id), '--yes');
     }
     rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('the game\'s own sign-up made subscribers named by their character, with a username nobody sees', () => {
+    for (const p of [a, b]) {
+      const [login, shown, roles] = ['user_login', 'display_name', 'roles'].map((f) => wp('user', 'get', String(p.id), `--field=${f}`));
+      assert.match(login, /^player-[0-9a-f]{10}$/);
+      assert.equal(shown, p.shown);
+      assert.equal(roles, 'subscriber');
+    }
+    const again = call(join(dir, 'anon.jar'), 'POST', '/wp-json/groddle/v1/players', { body: { email: `zz-other-${process.pid}@example.com`, password: 'zz-pass-1234', name: a.shown.toUpperCase() } });
+    assert.equal(again.status, 400);
+    assert.ok(again.json.fields.name, 'a name another player has is refused, whatever its letter case');
+    const twice = call(join(dir, 'anon.jar'), 'POST', '/wp-json/groddle/v1/players', { body: { email: a.email, password: 'zz-pass-1234', name: `Zz Fresh ${process.pid % 1000}` } });
+    assert.equal(twice.json.code, 'email_exists');
+    const wrong = call(join(dir, 'anon.jar'), 'POST', '/wp-json/groddle/v1/session', { body: { email: a.email, password: 'not-the-password' } });
+    assert.equal(wrong.status, 400);
+    assert.equal(wrong.json.code, 'incorrect_credentials');
+    wp('db', 'query', "DELETE FROM wp_options WHERE option_name LIKE 'minn_login_throttle_%'");
+    const page = call(a.jar, 'GET', '/changelog/');
+    assert.equal(page.status, 200);
+    assert.doesNotMatch(page.text, /minn-front-bar/, 'a signed-in player sees no Minn bar');
   });
 
   it('signed out: me says so, and every save route is a 401', () => {
@@ -175,7 +201,7 @@ describe('groddle/v1 on the live site', { skip: !LIVE && 'set GRODDLE_LIVE=1 to 
     assert.match(sig, /^[\w-]{43}$/, 'an HMAC-SHA256, base64url');
     const claims = JSON.parse(Buffer.from(body, 'base64url').toString());
     assert.equal(claims.sub, a.id);
-    assert.equal(claims.name, a.login);
+    assert.equal(claims.name, a.shown, 'other players see the character name');
     assert.equal(claims.exp - claims.iat, 60);
     assert.match(claims.jti, /^[0-9a-f]{16}$/);
 

@@ -902,12 +902,13 @@
    "group": "home",
    "name": "Other players and chat",
    "status": "progress",
-   "blurb": "Sign in to play multiplayer and you share the street with other players: see them walk and emote, chat on the street, and form a party with its own chat. Global chat, groups and buddy lists are not here yet.",
+   "blurb": "Make a character with an email and a password, right in the game, and in multiplayer you share the street with other players: see them walk and emote, chat on the street, and form a party with its own chat. Global chat, groups and buddy lists are not here yet.",
    "spot": null,
    "evidence": [
     "public/js/realtime-client.js",
     "public/js/features/realtime-feature.js",
-    "public/js/features/party-feature.js"
+    "public/js/features/party-feature.js",
+    "public/js/account-forms.js"
    ],
    "shot": null,
    "play": null
@@ -2039,9 +2040,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 510,
+  "commits": 512,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "A light, dark or system theme switch in the site header, on every page"
+   },
    {
     "date": "2026-10-26",
     "kind": "improve",
@@ -2156,11 +2162,6 @@
     "date": "2026-10-25",
     "kind": "fix",
     "text": "The cloud level's words show, the upgrade hand hides the Enter tip, and quest rooms name their real hubs"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "fix",
-    "text": "Leaving the street ends the Firefly and Game lines, a failed Gwendolyn's Task or Juju quest goes back to its giver, and the Game of Crowns says Stay it for 60 seconds"
    }
   ]
  },

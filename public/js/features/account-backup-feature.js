@@ -9,16 +9,23 @@
  * save). Restoring over a local game that was saved later than the backup
  * asks first.
  *
+ * Signed out, the panel holds the game's own sign-in forms (js/account-forms.js:
+ * email and password, or a new player), and signed in it has Sign out.
+ *
  * The Menu also gets Multiplayer, the way to /play/online/ from a solo game
  * already under way (the start card only offers the choice on a new game).
  *
- * Off in multiplayer, in practice copies (?practice=1 swaps the storage),
- * and on a plain static server (no account routes answer).
- * QA: /play/ on groddle.localhost, Menu, Account.
+ * In multiplayer the Menu gets Sign out instead: the save is written first,
+ * then the session ends and the page goes back to the gate.
+ *
+ * Off in practice copies (?practice=1 swaps the storage) and on a plain
+ * static server (no account routes answer).
+ * QA: /play/ on groddle.localhost, Menu, Account; /play/online/, Menu, Sign out.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=mp2-2';
-import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=mp2-1';
+import { createMinnAccount } from '../minn-account.js?v=mp-login-1';
+import { mountAccountForms } from '../account-forms.js?v=mp-login-1';
+import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=mp2-1';
 import { formatGameDayLabel } from '../game-day.js?v=dametime-3';
 import { multiplayerEntryUrl } from '../game-mode.js?v=mp2-1';
 
@@ -88,7 +95,8 @@ function el(tag, attrs = {}, text = '') {
   return node;
 }
 
-function createPanel(engine, account, session) {
+function createPanel(engine, account, signedInSession) {
+  let session = signedInSession;
   const style = el('style', { id: 'account-backup-css' });
   style.textContent = STYLE;
   document.head.append(style);
@@ -98,7 +106,6 @@ function createPanel(engine, account, session) {
   document.body.append(shade);
   let busy = false;
   let list = null;
-  const back = location.href;
 
   const close = () => {
     shade.hidden = true;
@@ -127,14 +134,30 @@ function createPanel(engine, account, session) {
   function signedOut() {
     frame('Back up your solo game');
     panel.append(
-      el('p', {}, 'Log in to keep copies of this browser\'s solo game on your Groddle account, then carry on in another browser.'),
+      el('p', {}, 'Sign in to keep copies of this browser\'s solo game on your Groddle account, then carry on in another browser.'),
     );
-    const actions = el('div', { class: 'account-actions' });
-    actions.append(
-      el('a', { class: 'account-link', href: account.urls.login(back), 'data-account-login': '' }, 'Log in'),
-      el('a', { class: 'account-link alt', href: account.urls.register(back) }, 'Create an account'),
-    );
-    panel.append(actions);
+    const host = el('div', { class: 'account-forms' });
+    panel.append(host);
+    mountAccountForms(host, {
+      account,
+      onSignedIn: async ({ player }) => {
+        session = { ...session, signedIn: true, player };
+        engine.setData?.('accountSession', 'signed-in');
+        await render();
+        say(`Signed in as ${player?.name || 'you'}.`);
+        panel.querySelector('button')?.focus();
+      },
+    });
+  }
+
+  async function signOut() {
+    if (busy) return;
+    busy = true;
+    await account.signOut();
+    busy = false;
+    session = { ...session, signedIn: false, player: null };
+    engine.setData?.('accountSession', 'signed-out');
+    signedOut();
   }
 
   function localEntries() {
@@ -241,13 +264,15 @@ function createPanel(engine, account, session) {
       return;
     }
     const local = localEntries();
+    const out = el('button', { type: 'button', class: 'alt', 'data-account-signout': '' }, 'Sign out');
+    out.addEventListener('click', signOut);
     const actions = el('div', { class: 'account-actions' });
     const backBtn = el('button', { type: 'button', 'data-account-backup': '', disabled: !local }, 'Back up to my account');
     backBtn.addEventListener('click', backUp);
     const newest = [...list.backups].sort((a, b) => String(b.madeAt).localeCompare(String(a.madeAt)))[0];
     const restoreBtn = el('button', { type: 'button', class: 'alt', 'data-account-restore': '', disabled: !newest }, 'Restore from my account');
     restoreBtn.addEventListener('click', () => newest && restore(newest.slot));
-    actions.append(backBtn, restoreBtn);
+    actions.append(backBtn, restoreBtn, out);
     panel.append(actions);
     if (!local) panel.append(el('p', {}, 'There is no solo game in this browser yet, so there is nothing to back up.'));
     const slots = el('ul', { class: 'account-slots' });
@@ -305,11 +330,35 @@ async function install(engine) {
   list.append(btn);
 }
 
+/** Multiplayer's Menu: Sign out, once the save is written. */
+function installSignOut(engine) {
+  const list = document.getElementById('more-list');
+  if (!list) return;
+  const account = createMinnAccount({ baseUri: document.baseURI });
+  const btn = el('button', { id: 'signout-btn', type: 'button', class: 'chrome-btn', title: 'Save, sign out and go back to the sign-in' }, 'Sign out');
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = 'Signing out…';
+    try { engine.save?.(); } catch { /* the store writes what it has */ }
+    // Twice: a write already in flight resolves the first, the newest change goes in the second.
+    try { await saveStore.flush?.(); await saveStore.flush?.(); } catch { /* signed out regardless */ }
+    await account.signOut();
+    engine.setData?.('accountSession', 'signed-out');
+    location.href = account.urls.online;
+  });
+  list.append(btn);
+}
+
 export const accountBackupFeature = {
   id: 'account-backup',
 
   init(engine) {
-    if (engine.mode !== 'solo' || typeof document === 'undefined' || globalThis.groddlePractice === true) return;
+    if (typeof document === 'undefined' || globalThis.groddlePractice === true) return;
+    if (engine.mode === 'multiplayer') {
+      installSignOut(engine);
+      return;
+    }
+    if (engine.mode !== 'solo') return;
     install(engine).catch((err) => console.warn('[account-backup]', err));
   },
 };

@@ -1,8 +1,8 @@
 /**
- * The player's account on the Groddle site (Minn, groddle-afternoon-site): who is
- * signed in, the multiplayer save, and the solo backups, over the
- * groddle/v1 REST routes (groddle-afternoon-site/src/Player.php, MultiplayerSave.php,
- * SoloBackups.php).
+ * The player's account on the Groddle site (Minn, groddle-afternoon-site): signing
+ * up, in and out by email, who is signed in, the multiplayer save, and the
+ * solo backups, over the groddle/v1 REST routes (groddle-afternoon-site/src/
+ * PlayerAccount.php, Player.php, MultiplayerSave.php, SoloBackups.php).
  *
  * Minn speaks WordPress's sign-in contract: the sign-in cookie counts on a
  * REST call only with its wp_rest nonce, which a signed-in page asks for at
@@ -21,10 +21,8 @@ export function minnUrls(baseUri) {
   return {
     nonce: at('wp-admin/admin-ajax.php?action=rest-nonce'),
     api: at('wp-json/groddle/v1/'),
-    /** Sign in, then come back to `back` (an absolute URL on this site). */
-    login: (back) => at(`wp-login.php?redirect_to=${encodeURIComponent(back)}`),
-    /** Make an account; the page comes back to `back` after the form. */
-    register: (back) => at(`wp-login.php?action=register&redirect_to=${encodeURIComponent(back)}`),
+    /** The multiplayer entry, where a signed-out player signs in (its gate holds the forms). */
+    online: at('play/online/'),
   };
 }
 
@@ -71,6 +69,40 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
     return false;
   }
 
+  /**
+   * A call to a route anyone may use (sign-up, sign-in): a nonce that went
+   * stale with a session that ended is refused even here, so the call is
+   * made again with a fresh one, or none.
+   */
+  async function post(path, body, method = 'POST') {
+    let r;
+    try {
+      r = await call(path, { method, body });
+      if (r.status === 403 && r.data?.code === 'rest_cookie_invalid_nonce') {
+        if (!(await refreshNonce())) nonce = '';
+        r = await call(path, { method, body });
+      }
+    } catch {
+      return { status: 0, ok: false, data: { code: 'offline', message: 'The Groddle site is not answering. Try again in a moment.' } };
+    }
+    return r;
+  }
+
+  const refusal = (r) => ({
+    ok: false,
+    code: r.data?.code || `http_${r.status}`,
+    message: r.data?.message || 'That didn\'t work. Try again in a moment.',
+    fields: r.data?.fields && typeof r.data.fields === 'object' ? r.data.fields : {},
+  });
+
+  /** A sign-up or sign-in answer; the new session's nonce is fetched before anything else is asked. */
+  async function signedIn(r) {
+    if (!r.ok || r.data?.signedIn !== true) return refusal(r);
+    nonce = '';
+    await refreshNonce();
+    return { ok: true, player: r.data.player };
+  }
+
   const failed = (what, r) => Object.assign(new Error(`${what} failed (${r.status}${r.data?.code ? ` ${r.data.code}` : ''})`), { status: r.status, code: r.data?.code || '', data: r.data });
 
   return {
@@ -100,6 +132,33 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       }
       if (!me.ok || typeof me.data?.signedIn !== 'boolean') return { minn: false, signedIn: false, player: null };
       return { minn: true, signedIn: me.data.signedIn, player: me.data.player || null, backups: me.data.backups || null };
+    },
+
+    /**
+     * A new player (email, password, the character's name): signed straight
+     * in. { ok: true, player } or { ok: false, code, message, fields } with
+     * the refusals keyed by form field (email, password, name).
+     */
+    async signUp({ email, password, name, website = '' }) {
+      return signedIn(await post('players', { email, password, name, website }));
+    },
+
+    /** Signs in by email; remember keeps the session for two weeks. Same answers as signUp. */
+    async signIn({ email, password, remember = false }) {
+      return signedIn(await post('session', { email, password, remember }));
+    },
+
+    /** Signs out (ends the session on the site). */
+    async signOut() {
+      const r = await post('session', undefined, 'DELETE');
+      nonce = '';
+      return { ok: r.ok };
+    },
+
+    /** Mails a password reset link. { ok, message }: the same answer whether or not the address has an account. */
+    async requestPasswordReset(email) {
+      const r = await post('password-reset', { email });
+      return r.ok ? { ok: true } : refusal(r);
     },
 
     /** The multiplayer save: { version, updatedAt, data } (data null before the first write). */

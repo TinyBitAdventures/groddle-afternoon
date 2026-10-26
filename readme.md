@@ -10,7 +10,7 @@ game rules come from the server code they published. Everything else (the engine
 layouts were never archived, the missing art) is new work.
 
 - **Solo**: your own character, saved in your browser. No account needed.
-- **Multiplayer**: sign in, and your character is saved on the server. Other players share the
+- **Multiplayer**: make a character with an email and a password, right in the game, and it is saved on the server. Other players share the
   street with you: chat, parties, shared quoins and rocks, races, trading, and Rook attacks fought
   together.
 
