@@ -2040,9 +2040,14 @@
   "offeringStreets": 593
  },
  "git": {
-  "commits": 513,
+  "commits": 515,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-26",
+    "kind": "new",
+    "text": "Reset a forgotten multiplayer password without leaving the game"
+   },
    {
     "date": "2026-10-26",
     "kind": "new",
@@ -2157,11 +2162,6 @@
     "date": "2026-10-25",
     "kind": "new",
     "text": "Multiplayer signs in through Minn and saves on the server, and a signed-in solo player can back up and restore their game"
-   },
-   {
-    "date": "2026-10-25",
-    "kind": "new",
-    "text": "Choose Solo or Multiplayer on a new game, with one save interface behind every save"
    }
   ]
  },
