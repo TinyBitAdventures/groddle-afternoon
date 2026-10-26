@@ -1,7 +1,7 @@
 /**
- * The player's account on the Groddle site (Minn, minn/groddle): who is
+ * The player's account on the Groddle site (Minn, groddle-afternoon-site): who is
  * signed in, the multiplayer save, and the solo backups, over the
- * groddle/v1 REST routes (minn/groddle/src/Player.php, MultiplayerSave.php,
+ * groddle/v1 REST routes (groddle-afternoon-site/src/Player.php, MultiplayerSave.php,
  * SoloBackups.php).
  *
  * Minn speaks WordPress's sign-in contract: the sign-in cookie counts on a
@@ -132,7 +132,7 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
 
     /**
      * A single-use ticket for the realtime server (multiplayer phase 3,
-     * minn/groddle/src/RealtimeTicket.php): { ticket, expiresIn, path }.
+     * groddle-afternoon-site/src/RealtimeTicket.php): { ticket, expiresIn, path }.
      * Throws with .status: 401 signed out, 503 when the site has no realtime
      * secret, 0 when the site cannot be reached. A stale nonce is refreshed
      * once.

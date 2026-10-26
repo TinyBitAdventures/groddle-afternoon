@@ -2,13 +2,14 @@
  * Multiplayer trading (phase 4), the game side: js/trade.js (offers, the
  * hold, the done, the window's lines) and js/features/trade-feature.js (off
  * in solo, wired before realtime, the escrow flow against a fake client).
- * The server's rules are realtime/trade_test.go; the table is
+ * The server's rules are trade_test.go in groddle-afternoon-server (the
+ * checks that read it skip without it, tools/repos.mjs); the table is
  * tools/build-realtime-trade.mjs.
  */
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import {
@@ -30,15 +31,22 @@ import {
 } from '../public/js/trade.js?v=mp4-1';
 import { tradeFeature } from '../public/js/features/trade-feature.js?v=mp4-1';
 import { FEATURES } from '../public/js/features/index.js';
+import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
+import { GSJS } from '../tools/build-realtime-trade.mjs';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
+const readServer = (rel) => readFileSync(serverPath(rel), 'utf8');
+const skipWithoutGsjs = !existsSync(join(GSJS, 'items')) && `needs tinyspeck/glitch-GameServerJS at ${GSJS}`;
 const table = JSON.parse(read('public/assets/content/trade-items.json'));
 
 describe('trade table (tools/build-realtime-trade.mjs)', () => {
-  it('is current, and the server and the client read the same file', () => {
+  it('is current (node tools/build-realtime-trade.mjs, from GSJS)', { skip: skipWithoutServer || skipWithoutGsjs }, () => {
     execFileSync(process.execPath, ['tools/build-realtime-trade.mjs', '--check'], { cwd: root });
-    assert.equal(read('realtime/data/trade.json'), read('public/assets/content/trade-items.json'));
+  });
+
+  it('the server and the client read the same file', { skip: skipWithoutServer }, () => {
+    assert.equal(readServer('data/trade.json'), read('public/assets/content/trade-items.json'));
   });
 
   it('keeps the source rules', () => {
@@ -138,7 +146,10 @@ describe('trade rules (js/trade.js)', () => {
       const s = typeof v === 'function' ? v('Bo') : v;
       assert.doesNotMatch(s, /—/);
     }
-    const go = read('realtime/trade.go');
+  });
+
+  it('says the refusals the way the server does', { skip: skipWithoutServer }, () => {
+    const go = readServer('trade.go');
     for (const s of [TRADE_TEXT.unsettled, TRADE_TEXT.busySelf, TRADE_TEXT.cantTrade, TRADE_TEXT.soulbound]) assert.ok(go.includes(JSON.stringify(s)), s);
   });
 });
@@ -365,8 +376,8 @@ describe('trade feature wiring', () => {
     assert.ok(ids.indexOf('trade') >= 0 && ids.indexOf('trade') < ids.indexOf('realtime'));
   });
 
-  it('speaks only kinds realtime/trade.go handles, and hears what it sends', () => {
-    const go = read('realtime/trade.go');
+  it('speaks only kinds the server\'s trade.go handles, and hears what it sends', { skip: skipWithoutServer }, () => {
+    const go = readServer('trade.go');
     const header = go.slice(0, go.indexOf('import ('));
     const feature = read('public/js/features/trade-feature.js');
     const sent = [...feature.matchAll(/client\.send\('([a-z_]+)'/g)].map((m) => m[1]);

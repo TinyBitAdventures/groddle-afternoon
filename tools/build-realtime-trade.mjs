@@ -1,6 +1,6 @@
 /**
  * Multiplayer phase 4, trading: which items two players may trade and how
- * many fit in one trade slot, for the realtime server (realtime/trade.go,
+ * many fit in one trade slot, for the realtime server (the realtime server's trade.go,
  * go:embed) and the trade window (js/features/trade-feature.js), both from
  * the same file so they never disagree.
  *
@@ -22,20 +22,21 @@
  *  - The remake's pack has no bags with contents, so the non-empty bag rule
  *    (inc_trading.js:465-471) never applies.
  *
- * Run from spike root:
- *   node tools/build-realtime-trade.mjs           writes realtime/data/trade.json and public/assets/content/trade-items.json
+ * Run from the game repo root:
+ *   node tools/build-realtime-trade.mjs           writes the server repo's data/trade.json and public/assets/content/trade-items.json
  *   node tools/build-realtime-trade.mjs --check   exits 1 when either file is stale
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { requireServer, serverPath } from './repos.mjs';
 
 import { readItemTags, readItems } from './inventory/gsjs-data.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const GSJS = join(root, '..', 'glitch-GameServerJS');
-export const OUT_SERVER = join(root, 'realtime/data/trade.json');
+export const OUT_SERVER = serverPath('data', 'trade.json');
 export const OUT_CLIENT = join(root, 'public/assets/content/trade-items.json');
 
 /** MakingSlot.as:25 MAX_COUNT: no slot holds more, whatever the stackmax. */
@@ -88,6 +89,7 @@ export function tradeJson(gsjs = GSJS) {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  requireServer();
   const text = tradeJson();
   if (process.argv.includes('--check')) {
     let stale = false;

@@ -19,6 +19,7 @@ import {
   syncKeys,
 } from '../public/js/rook-mp.js';
 import { rookClockS, canStrike, canStun, rookPresent } from '../public/js/rook-attack.js';
+import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
@@ -139,7 +140,8 @@ describe('rook-mp: offerings', () => {
 
 describe('rook-mp: wiring', () => {
   const feature = read('public/js/features/rook-attack-feature.js');
-  const go = read('realtime/rook.go');
+  // The server is rook.go in groddle-afternoon-server (tools/repos.mjs); its checks skip without it.
+  const go = HAS_SERVER ? fs.readFileSync(serverPath('rook.go'), 'utf8') : '';
 
   it('every importer of rook-mp.js uses one key', () => {
     const keys = [...feature.matchAll(/rook-mp\.js\?v=([\w-]+)/g)].map((m) => m[1]);
@@ -154,7 +156,7 @@ describe('rook-mp: wiring', () => {
     assert.equal([...feature.matchAll(/mpTick\(/g)].length, 2);
   });
 
-  it('sends only the kinds the server handles, and handles what it sends', () => {
+  it('sends only the kinds the server handles, and handles what it sends', { skip: skipWithoutServer }, () => {
     const sent = new Set([...feature.matchAll(/client\.send\('(rook_[a-z_]+)'/g)].map((m) => m[1]));
     for (const kind of sent) assert.match(go, new RegExp(`r\\.Handle\\("${kind}"`), kind);
     for (const kind of ['rook', 'rook_you', 'rook_no']) assert.match(feature, new RegExp(`'msg:${kind}'`), kind);
@@ -163,8 +165,8 @@ describe('rook-mp: wiring', () => {
     }
   });
 
-  it('the server data is generated, and names its street and offer rows', () => {
-    const data = JSON.parse(read('realtime/data/rook.json'));
+  it('the server data is generated, and names its street and offer rows', { skip: skipWithoutServer }, () => {
+    const data = JSON.parse(fs.readFileSync(serverPath('data/rook.json'), 'utf8'));
     assert.match(data.about, /build-realtime-rook\.mjs/);
     assert.ok(Object.keys(data.streets).length > 100);
     assert.equal(data.streets.GLI2V0UN7RD1T2J.length, 4);

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Writes public/musicblocks/data.json for the Musicblocks page (/musicblocks/,
- * drawn by minn/groddle/src/Musicblocks.php).
+ * drawn by groddle-afternoon-site/src/Musicblocks.php).
  *
  * Everything comes from the game: the blocks, their series, descriptions and
  * recordings from js/musicblocks.js (Tiny Speck's item files and CC0 tunes),

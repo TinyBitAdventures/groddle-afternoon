@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 /**
- * The Groddle theme's blocks (minn/groddle/blocks/<name>/block.json) and the
- * card icons they draw (minn/groddle/marks/<name>.svg). The note blocks are
+ * The Groddle theme's blocks (blocks/<name>/block.json in the site repo,
+ * groddle-afternoon-site, found by tools/repos.mjs) and the card icons they
+ * draw (its marks/<name>.svg). The note blocks are
  * written from tools/changelog/posts.json: each card's icon is named after the
  * first card that used it, and the feature block's icon attribute lists every
  * name. The restoration blocks are the restoration report's data sections,
- * drawn from public/restoration/data.json (minn/groddle/src/Restoration.php).
+ * drawn from public/restoration/data.json (the site's src/Restoration.php).
  *
  *   node tools/changelog/minn-blocks.mjs [--check]
  *
  * --check exits 1 when a file on disk differs from what would be written.
  */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname, join, relative } from 'node:path';
 import { loadPosts } from './build.mjs';
 import { plain } from './html.mjs';
 import { MUSICBLOCK_SERIES } from '../../public/js/musicblocks.js';
+import { SITE_DIR, requireSite } from '../repos.mjs';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
-const THEME = join(ROOT, 'minn/groddle');
+const THEME = SITE_DIR;
 const CHECK = process.argv.includes('--check');
 
 const slug = (s) => plain(s).toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'mark';
@@ -87,7 +87,7 @@ export function blockTypes(icons) {
 
 /**
  * The Musicblocks page's data blocks, drawn from public/musicblocks/data.json
- * (tools/musicblocks/build-data.mjs, minn/groddle/src/Musicblocks.php): one
+ * (tools/musicblocks/build-data.mjs, the site's src/Musicblocks.php): one
  * series (or the rare blocks) per block, and what a play pays.
  */
 function musicblockTypes(leaf) {
@@ -121,6 +121,7 @@ function restorationTypes(leaf) {
 }
 
 function main() {
+  requireSite();
   const marks = markNames();
   const icons = [...marks.values()];
   const files = new Map();
@@ -131,7 +132,7 @@ function main() {
     const now = existsSync(file) ? readFileSync(file, 'utf8') : null;
     if (now === body) continue;
     stale++;
-    if (CHECK) { console.log(`stale ${file.slice(ROOT.length + 1)}`); continue; }
+    if (CHECK) { console.log(`stale ${relative(THEME, file)}`); continue; }
     mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, body);
   }

@@ -3,7 +3,7 @@
  * which tools/build-restoration.mjs computes from the repo and
  * tools/restoration/checklist.mjs.
  *
- * On the Minn site the page is made of blocks (minn/groddle/src/Restoration.php)
+ * On the Minn site the page is made of blocks (groddle-afternoon-site/src/Restoration.php)
  * that draw these containers, some already filled: each part replaces what is
  * there, and a part whose block is not on the page is skipped.
  */

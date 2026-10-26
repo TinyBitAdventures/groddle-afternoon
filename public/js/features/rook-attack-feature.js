@@ -1695,7 +1695,7 @@ function shrineVerbs(engine, target, a) {
 
 // ---------------------------------------------------------------------------
 // Multiplayer (phase 4): one shared attack per street, owned by the realtime
-// server (realtime/rook.go; the pure half is js/rook-mp.js). Everyone on the
+// server (groddle-afternoon-server/rook.go; the pure half is js/rook-mp.js). Everyone on the
 // street sees the same herald, Rook, health, stun, orbs, primed shrine and
 // wing beats; each player's own share arrives as rook_you and lands on their
 // own save here. Solo never reaches this section (mp stays null).
@@ -2467,7 +2467,7 @@ export const rookAttackFeature = {
   onTick(dtMs, t, engine) {
     if (!engine.started || !engine.player) return;
     if (engine.mode === 'multiplayer') {
-      // The realtime server owns every attack (realtime/rook.go): no local schedule or timers.
+      // The realtime server owns every attack (groddle-afternoon-server/rook.go): no local schedule or timers.
       mpTick(engine, t);
     } else {
       // Schedule (about hourly) on rookable streets only.

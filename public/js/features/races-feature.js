@@ -144,7 +144,7 @@ const RIVAL_CLOSE_DX = 90;
 let autoTimeline = null;
 let hogTicketRuns = 0; // Hog Haul instances opened from a ticket this session (QA data)
 
-// Multiplayer (js/races-mp.js, realtime/races.go): real players race each
+// Multiplayer (js/races-mp.js, groddle-afternoon-server/races.go): real players race each
 // other instead of the stand-in. Everything below is unused in solo.
 /** The match this player is in: normalizeMatch(race_match) + { myId, rows, remaining, ready, acked }. */
 let mp = null;
@@ -617,7 +617,7 @@ function spawnQuoins(engine) {
   const frames = engine.textures?.quoin?.frames || [];
   const start = QUOIN_TYPES.mood.row * QUOIN_SHEET.columns;
   const mood = frames.slice(start, start + QUOIN_SHEET.columns);
-  // Multiplayer: where the server has them (realtime/data/races.json, the same course).
+  // Multiplayer: where the server has them (groddle-afternoon-server/data/races.json, the same course).
   const spots = mp ? mp.quoins.map((p, index) => ({ ...(course.quoins[index] || {}), x: p.x, y: p.y })) : course.quoins;
   quoinSprites = spots.map((q, index) => {
     let sprite;
@@ -718,7 +718,7 @@ function rivalRoute() {
 
 /**
  * Multiplayer: slot 0 starts where solo's player does, slot 1 where solo's
- * stand-in does (realtime/data/races.json spawns), and on a twin-path climb
+ * stand-in does (groddle-afternoon-server/data/races.json spawns), and on a twin-path climb
  * slot 1 climbs the mirrored side.
  */
 function mySpawn() {
@@ -1105,7 +1105,7 @@ async function leaveRace(engine) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Multiplayer: real players (js/races-mp.js, realtime/races.go)       */
+/* Multiplayer: real players (js/races-mp.js, groddle-afternoon-server/races.go)       */
 /* ------------------------------------------------------------------ */
 
 function isMp(engine) {

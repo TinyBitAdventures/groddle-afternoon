@@ -1,9 +1,10 @@
 <?php
 /**
- * Runs minn/groddle/src/SaveShape.php against the engine's classes and
- * prints one outcome per case as JSON (tests/minn-account.test.js).
+ * Runs the site repo's src/SaveShape.php (groddle-afternoon-site) against
+ * the engine's classes and prints one outcome per case as JSON
+ * (tests/minn-account.test.js).
  *
- *   php tests/fixtures/minn-accounts/save-shape.php <engine public/minn> <minn/groddle>
+ *   php tests/fixtures/minn-accounts/save-shape.php <engine public/minn> <groddle-afternoon-site>
  */
 
 declare(strict_types=1);

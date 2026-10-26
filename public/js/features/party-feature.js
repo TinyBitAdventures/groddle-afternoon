@@ -1,7 +1,7 @@
 /**
  * Parties in multiplayer (phase 4): invite other players to a party, talk on
  * its own channel, and see where each member is. The server is
- * realtime/party.go (its header lists the messages and the source rules);
+ * groddle-afternoon-server/party.go (its header lists the messages and the source rules);
  * the pure rules and copy are js/party.js.
  *
  * Multiplayer only (engine.mode and engine.query('realtimeClient')). In solo

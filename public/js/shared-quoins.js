@@ -6,7 +6,7 @@
  * a street's quoins are the same for everyone on it: the first Glitch to
  * touch one gets it, it vanishes for everyone and comes back after its
  * class's respawn_time, and Glitches near the grab get a shard
- * (distributeQuoinShards 83-154). The realtime server (realtime/quoins.go)
+ * (distributeQuoinShards 83-154). The realtime server (groddle-afternoon-server/quoins.go)
  * decides all of that; this side asks (quoin_claim), waits for the answer
  * and keeps a book of what the server said:
  *

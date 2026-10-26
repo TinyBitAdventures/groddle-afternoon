@@ -6,7 +6,7 @@
  * that draws other players and the chat (js/features/realtime-feature.js)
  * is the only user, and only in multiplayer.
  *
- * The protocol is the header comment of realtime/hub.go: a ticket from Minn
+ * The protocol is the header comment of groddle-afternoon-server/hub.go: a ticket from Minn
  * (groddle/v1/realtime, single use) is the first frame, then join / move /
  * chat / emote / leave / ping. Close codes: 4001 this character connected
  * somewhere else (never reconnect), 4003 bad or used ticket (fetch a new one
@@ -347,7 +347,7 @@ export function createRealtimeClient({
         emit('error', { code: String(msg.code || ''), message: String(msg.message || '') });
         return;
       default:
-        // pong, and the kinds the server's modules send (realtime/modules.go):
+        // pong, and the kinds the server's modules send (groddle-afternoon-server/modules.go):
         // a feature listens with on('msg:<kind>', fn).
         if (typeof msg.t === 'string' && msg.t && msg.t !== 'pong') emit(`msg:${msg.t}`, msg);
     }
@@ -484,7 +484,7 @@ export function createRealtimeClient({
 
     /** Say a line to the street; false when it could not go (offline, no street, empty). */
     /**
-     * Sends one message of a kind a server module handles (realtime/modules.go),
+     * Sends one message of a kind a server module handles (groddle-afternoon-server/modules.go),
      * e.g. send('quoin', { id }). Core kinds go through their own methods.
      * False when not online.
      */

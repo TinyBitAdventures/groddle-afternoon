@@ -1,6 +1,6 @@
 /**
  * Shared street objects in multiplayer (phase 4): the rules the client needs
- * to talk to realtime/objects.go about rocks, resource nodes and trees.
+ * to talk to groddle-afternoon-server/objects.go about rocks, resource nodes and trees.
  * Pure: no DOM, no Pixi, no engine (tests/street-objects.test.js).
  *
  * The server owns what is contested between players: how many chunks a rock
@@ -15,7 +15,7 @@
  * resourceSpawnPlan key). tools/build-realtime-objects.mjs lays every street
  * out the same way for the server.
  *
- * Wire (realtime/objects.go header):
+ * Wire (groddle-afternoon-server/objects.go header):
  *   send  obj_act { req, id, verb, perks?, skill? }
  *   recv  obj_ok  { req, id, verb, before, obj, chunks?, roll? }
  *         obj_no  { req, id, verb, code, message, obj? }

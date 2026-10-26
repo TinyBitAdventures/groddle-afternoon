@@ -7,8 +7,10 @@
  *
  * GRODDLE_URL and GRODDLE_ROOT (the Minn webroot, for WP-CLI) default to the
  * local Cove site. Requests go through curl, which keeps the sign-in cookies.
- * The realtime test also opens /ws (Cove's route to realtime/, the Go server:
- * realtime/run.sh) and skips that part when nothing answers there.
+ * The realtime test also opens /ws (Cove's route to the Go server,
+ * groddle-afternoon-server's run.sh) and skips that part when nothing answers
+ * there. It drives the site over HTTP only, so it needs neither sibling
+ * checkout.
  */
 import assert from 'node:assert/strict';
 import { describe, it, before, after } from 'node:test';

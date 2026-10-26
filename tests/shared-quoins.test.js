@@ -2,8 +2,9 @@
  * Multiplayer phase 4, shared street quoins: the book (js/shared-quoins.js),
  * the feature (js/features/shared-quoins-feature.js) against a fake engine
  * and realtime client, the generator of the server's quoin data
- * (tools/build-realtime-quoins.mjs, realtime/data/quoins.json) and the
- * server's source constants (realtime/quoins.go). The source rules are
+ * (tools/build-realtime-quoins.mjs, data/quoins.json in the server repo) and
+ * the server's source constants (quoins.go in groddle-afternoon-server; those
+ * checks skip without it, tools/repos.mjs). The source rules are
  * GameServerJS items/quoin.js onPlayerCollision (156-310) and
  * distributeQuoinShards (83-154).
  */
@@ -34,6 +35,7 @@ import {
 import { placementRequests, streetQuoinLayout, classTable } from '../tools/build-realtime-quoins.mjs';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js';
 import { QUOIN_CLASSES } from '../public/js/quoins.js';
+import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -301,7 +303,7 @@ describe('the feature', () => {
 
 describe('the server data', () => {
   const index = JSON.parse(read('public/assets/streets/index.json'));
-  const shipped = JSON.parse(read('realtime/data/quoins.json'));
+  const shipped = HAS_SERVER ? JSON.parse(readFileSync(serverPath('data/quoins.json'), 'utf8')) : null;
   setStreetEcologyCatalog(JSON.parse(read('public/assets/content/street-ecology.json')));
 
   it('lays out quoins with game.js enterStreet planner groups, in its order', () => {
@@ -315,7 +317,7 @@ describe('the server data', () => {
     assert.match(game, /q\.baseY = opts\.useExactY \? spot\.y : spot\.y - 58 - \(phaseIndex % 3\) \* 34;/);
   });
 
-  it('ships the current layout for Hechey Track and every class the spots use', async () => {
+  it('ships the current layout for Hechey Track and every class the spots use', { skip: skipWithoutServer }, async () => {
     const { loadStreetDataFromFs, applyStreetIndex } = await import('../public/js/street-loader.js');
     applyStreetIndex(index);
     for (const tsid of ['GLI2V0UN7RD1T2J', 'GLI3272LOTD1B1F']) {
@@ -334,8 +336,8 @@ describe('the server data', () => {
 });
 
 describe('the server and the wiring', () => {
-  const go = read('realtime/quoins.go');
-  it('uses the source shard rule the solo shards use', () => {
+  const go = HAS_SERVER ? readFileSync(serverPath('quoins.go'), 'utf8') : '';
+  it('uses the source shard rule the solo shards use', { skip: skipWithoutServer }, () => {
     const num = (name) => Number(new RegExp(`${name}\\s*=\\s*([0-9.]+)`).exec(go)?.[1]);
     assert.equal(num('shardRadius'), QUOIN_SHARD_RADIUS);
     assert.equal(num('shardNear'), QUOIN_SHARD_NEAR);

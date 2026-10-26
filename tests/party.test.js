@@ -2,8 +2,10 @@
  * Multiplayer parties (phase 4), the game side: js/party.js (roster, where
  * members are, the Partiers line, chat commands, the Invite to Party verb)
  * and js/features/party-feature.js (off in solo, wired before realtime, the
- * kinds it speaks are the ones realtime/party.go handles). The server's
- * rules are realtime/party_test.go.
+ * kinds it speaks are the ones the realtime server's party.go handles). The
+ * server's rules are party_test.go in groddle-afternoon-server; the checks
+ * that read the server skip when that repo is not beside this one
+ * (tools/repos.mjs).
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -23,9 +25,11 @@ import {
 } from '../public/js/party.js?v=mp4-1';
 import { partyFeature } from '../public/js/features/party-feature.js?v=mp4-1';
 import { FEATURES } from '../public/js/features/index.js';
+import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
+const readServer = (rel) => readFileSync(serverPath(rel), 'utf8');
 
 const roster = {
   leader: 1,
@@ -40,7 +44,10 @@ describe('party rules (js/party.js)', () => {
   it('keeps the source numbers', () => {
     assert.equal(PARTY_MAX_SIZE, 71); // config_prod.js:40
     assert.equal(PARTY_PROMPT_SECONDS, 89); // inc_party.js:131
-    const go = read('realtime/party.go');
+  });
+
+  it('keeps the same numbers as the server', { skip: skipWithoutServer }, () => {
+    const go = readServer('party.go');
     assert.match(go, /partyMaxSize\s+= 71/);
     assert.match(go, /partyInviteTimeout = 90 \* time.Second/);
     assert.match(go, /partyPromptSeconds = 89/);
@@ -132,8 +139,8 @@ describe('party feature (js/features/party-feature.js)', () => {
     assert.ok(ids.indexOf('party') < ids.indexOf('realtime'));
   });
 
-  it('speaks only kinds realtime/party.go handles, and hears what it sends', () => {
-    const go = read('realtime/party.go');
+  it('speaks only kinds the server\'s party.go handles, and hears what it sends', { skip: skipWithoutServer }, () => {
+    const go = readServer('party.go');
     const header = go.slice(0, go.indexOf('import ('));
     const feature = read('public/js/features/party-feature.js');
     const sent = [...feature.matchAll(/client\.send\('([a-z_]+)'/g)].map((m) => m[1]);

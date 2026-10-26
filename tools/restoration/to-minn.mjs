@@ -4,9 +4,9 @@
  * the /restoration/ page becomes a Minn page (template "Full-width page") made
  * of blocks, so its words are edited in Minn Admin. Headings, intros and notes
  * are core blocks; each data section is one of the theme's restoration blocks
- * (minn/groddle/src/Restoration.php), drawn from data.json, so the figures
+ * (groddle-afternoon-site/src/Restoration.php), drawn from data.json, so the figures
  * still come from build-restoration.mjs. A published page at a folder's path
- * wins over the built index.html (minn/groddle/src/StaticPages.php).
+ * wins over the built index.html (groddle-afternoon-site/src/StaticPages.php).
  *
  *   MINN_USER=admin MINN_PASS=... node tools/restoration/to-minn.mjs [--site=https://groddle.localhost] [--dry] [--force]
  *

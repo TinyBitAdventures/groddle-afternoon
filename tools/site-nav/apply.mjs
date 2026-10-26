@@ -2,7 +2,7 @@
 /**
  * Writes the site's Navigation menu into the built pages. The header menu is
  * a wp_navigation post on the Minn site, edited in Minn Admin under Design,
- * Navigation; the Groddle theme draws it on Minn's pages (minn/groddle/src/
+ * Navigation; the Groddle theme draws it on Minn's pages (groddle-afternoon-site/src/
  * SiteNav.php), and this puts the same links in every built page that carries
  * the header (<div class="site-nav-links">), with the section being read
  * marked, so one edit changes every page. sync-to-cove.sh runs it on the

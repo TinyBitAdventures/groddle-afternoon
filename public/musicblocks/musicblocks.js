@@ -1,5 +1,5 @@
 /**
- * The Musicblocks page's players (minn/groddle/src/Musicblocks.php draws the
+ * The Musicblocks page's players (groddle-afternoon-site/src/Musicblocks.php draws the
  * cards, each with a plain <audio> player that works without this script).
  * Here each card gets a play button, a progress bar and the tune's time, and
  * one tune plays at a time, as in the game: starting a block fades the one

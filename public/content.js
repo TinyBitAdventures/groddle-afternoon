@@ -1446,7 +1446,7 @@ export function runVerb(target, verbId, ctx) {
       requireSkill: true,
       now: Date.now(),
       toolState: ctx.tools,
-      // Multiplayer: the realtime server rolled this swing (realtime/objects.go).
+      // Multiplayer: the realtime server rolled this swing (groddle-afternoon-server/objects.go).
       chunks: ctx.sharedChunks,
     });
     if (!r.ok) return { ok: false, msgs: r.msgs || ['Cannot mine.'], effects };

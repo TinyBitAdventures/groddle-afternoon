@@ -5,7 +5,8 @@
  * go-ahead with the server's rolls, refusals, remote changes, solo untouched),
  * the mining.js chunks override, and tools/build-realtime-objects.mjs (the
  * layout the server checks matches game.js and the committed data file).
- * The server side is realtime/objects_test.go.
+ * The server side is objects_test.go in groddle-afternoon-server; the data
+ * file check skips when that repo is not beside this one (tools/repos.mjs).
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -44,6 +45,7 @@ import { createTrantState, fruitCapacityAt, setTrantTables } from '../public/js/
 import { placementRequests, ruleTables, streetObjectLayout } from '../tools/build-realtime-objects.mjs';
 import { STREET_INDEX, applyStreetIndex, loadStreetDataFromFs } from '../public/js/street-loader.js';
 import { setStreetEcologyCatalog } from '../public/js/street-ecology.js';
+import { serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -361,8 +363,8 @@ describe('street objects: the server\'s layout', () => {
     assert.ok(features.indexOf('resource-nodes') < 5);
   });
 
-  it('matches the data file the server embeds', async () => {
-    const data = JSON.parse(read('realtime/data/objects.json'));
+  it('matches the data file the server embeds', { skip: skipWithoutServer }, async () => {
+    const data = JSON.parse(readFileSync(serverPath('data/objects.json'), 'utf8'));
     assert.deepEqual(data.rules, JSON.parse(JSON.stringify(ruleTables(trantTables))), 'rules are stale: node tools/build-realtime-objects.mjs');
     const index = JSON.parse(read('public/assets/streets/index.json'));
     applyStreetIndex(index);

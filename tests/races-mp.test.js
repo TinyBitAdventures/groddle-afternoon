@@ -1,8 +1,9 @@
 /**
  * Multiplayer phase 4, races between real players: the pure client side
  * (js/races-mp.js), the generator of the server's course data
- * (tools/build-realtime-races.mjs, realtime/data/races.json), the server's
- * source constants and copy (realtime/races.go), the realtime street a race
+ * (tools/build-realtime-races.mjs, data/races.json in the server repo), the
+ * server's source constants and copy (races.go in groddle-afternoon-server;
+ * those checks skip without it, tools/repos.mjs), the realtime street a race
  * scene shares (realtime-feature sharedStreet + races-feature
  * realtimeStreet), and that solo races never touch any of it.
  */
@@ -28,6 +29,7 @@ import { raceData } from '../tools/build-realtime-races.mjs';
 import { RACE_COURSE_IDS, raceCourse } from '../public/js/race-courses.js';
 import { quoinGrabWinner } from '../public/js/races.js';
 import { sharedStreet } from '../public/js/features/realtime-feature.js?v=mp3-3';
+import { HAS_SERVER, serverPath, skipWithoutServer } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
@@ -108,7 +110,7 @@ describe('races-mp: what the server sends', () => {
 });
 
 describe('the server\'s course data', () => {
-  it('is current (node tools/build-realtime-races.mjs)', () => {
+  it('is current (node tools/build-realtime-races.mjs)', { skip: skipWithoutServer }, () => {
     const out = execFileSync(process.execPath, [join(root, 'tools/build-realtime-races.mjs'), '--check'], { encoding: 'utf8' });
     assert.match(out, /is current \(8 courses\)/);
   });
@@ -130,8 +132,8 @@ describe('the server\'s course data', () => {
   });
 });
 
-describe('the server (realtime/races.go)', () => {
-  const go = read('realtime/races.go');
+describe('the server (races.go)', { skip: skipWithoutServer }, () => {
+  const go = HAS_SERVER ? readFileSync(serverPath('races.go'), 'utf8') : '';
 
   it('keeps the source numbers', () => {
     assert.match(go, /raceInviteTimeout = 60 \* time\.Second/);

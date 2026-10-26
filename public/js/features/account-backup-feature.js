@@ -5,7 +5,7 @@
  * one of a few slots on the account and restores one into the browser, so a
  * solo game can move to another browser or survive a cleared one. A backup
  * stays a solo game: it is only ever restored here, never played online
- * (minn/groddle/src/SoloBackups.php keeps them apart from the multiplayer
+ * (groddle-afternoon-site/src/SoloBackups.php keeps them apart from the multiplayer
  * save). Restoring over a local game that was saved later than the backup
  * asks first.
  *

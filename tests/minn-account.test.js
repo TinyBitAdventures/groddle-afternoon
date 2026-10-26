@@ -2,8 +2,9 @@
  * Multiplayer phase 2, the account side: js/minn-account.js (who is signed
  * in, the REST nonce, the groddle/v1 calls), js/online-boot.js (the sign-in
  * gate and the boot data the multiplayer store reads), the solo backup
- * feature's rules, and the Groddle extension's routes and tables
- * (minn/groddle). The PHP save shape is run through php when the engine is
+ * feature's rules, and the Groddle extension's routes and tables (the site
+ * repo, groddle-afternoon-site, found by tools/repos.mjs; those checks skip
+ * without it). The PHP save shape is run through php when the engine is
  * on this machine. tests/minn-accounts-live.test.js drives the real routes
  * on groddle.localhost (opt-in).
  */
@@ -20,9 +21,10 @@ import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature }
 import { FEATURES } from '../public/js/features/index.js';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-1';
+import { HAS_SITE, SITE_DIR, serverPath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
-const ext = join(root, 'minn/groddle');
+const ext = SITE_DIR;
 const read = (rel) => readFileSync(join(root, rel), 'utf8');
 
 /** A fetch answering by URL: routes maps a URL suffix to { status, body, nonce } or 'network'. */
@@ -205,7 +207,7 @@ describe('account backup feature', () => {
     assert.equal(multiplayerEntryUrl('https://groddle.localhost/'), 'https://groddle.localhost/play/online/');
   });
 
-  it('folder paths without their slash go on to the slashed page (/play/online), query kept', () => {
+  it('folder paths without their slash go on to the slashed page (/play/online), query kept', { skip: skipWithoutSite }, () => {
     const pages = readFileSync(join(ext, 'src', 'StaticPages.php'), 'utf8');
     assert.match(pages, /#\[Route\(Method::Get, '\/\{folder:\[a-z0-9\]\[a-z0-9_-\]\*\(\?:\/\[a-z0-9\]\[a-z0-9_-\]\*\)\*\}', policy: new Policy\(Access::Public\)\)\]\n\s*public function bare/);
     assert.match(pages, /\$this->root->indexFor\(\$folder\) === null\) \{\n\s*throw new RouteMiss\(\);/, 'only built folders redirect');
@@ -213,8 +215,8 @@ describe('account backup feature', () => {
   });
 });
 
-describe('Groddle extension: accounts (minn/groddle)', () => {
-  const manifest = JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8'));
+describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWithoutSite }, () => {
+  const manifest = HAS_SITE ? JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8')) : {};
   const src = (f) => readFileSync(join(ext, 'src', f), 'utf8');
 
   it('declares its two tables under its own names, with the keys the routes rely on', () => {
@@ -248,14 +250,14 @@ describe('Groddle extension: accounts (minn/groddle)', () => {
     ]);
   });
 
-  it('signs realtime tickets the way realtime/ticket.go checks them, for a minute, with the secret outside the webroot', () => {
+  it('signs realtime tickets the way the server\'s ticket.go checks them, for a minute, with the secret outside the webroot', { skip: skipWithoutServer }, () => {
     const ticket = src('RealtimeTicket.php');
     assert.match(ticket, /public const TTL = 60;/);
     assert.match(ticket, /hash_hmac\('sha256', \$body, \$secret, true\)/);
     assert.match(ticket, /strtr\(base64_encode\(\$bytes\), '\+\/', '-_'\), '='/, 'base64url without padding');
     assert.match(ticket, /'jti' => bin2hex\(random_bytes\(8\)\)/, 'a ticket works once');
     assert.match(ticket, /dirname\(rtrim\(ABSPATH, '\/'\)\) \. '\/realtime\.secret'/, 'beside the webroot, never in it');
-    const go = readFileSync(join(ext, '..', '..', 'realtime', 'ticket.go'), 'utf8');
+    const go = readFileSync(serverPath('ticket.go'), 'utf8');
     for (const field of ['sub', 'name', 'iat', 'exp', 'jti']) assert.match(go, new RegExp(`json:"${field}"`), field);
     assert.match(go, /hmac\.New\(sha256\.New, t\.secret\)/);
     assert.match(go, /base64\.RawURLEncoding/);

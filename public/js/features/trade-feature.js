@@ -1,7 +1,7 @@
 /**
  * Trading in multiplayer (phase 4): two players on one street trade items
  * and currants in the original's trade window. The server is
- * realtime/trade.go (its header lists the messages, the source rules and
+ * groddle-afternoon-server/trade.go (its header lists the messages, the source rules and
  * the escrow guarantees); the pure rules and copy are js/trade.js.
  *
  * Multiplayer only (engine.mode and engine.query('realtimeClient')). In solo

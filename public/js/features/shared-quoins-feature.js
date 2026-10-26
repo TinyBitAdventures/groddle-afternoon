@@ -4,7 +4,7 @@
  * (GameServerJS items/quoin.js onPlayerCollision 156-310): the first Glitch
  * to touch one gets it, it vanishes for everyone and respawns after its
  * class's respawn_time, and Glitches within 300 px get a shard
- * (distributeQuoinShards 83-154). The realtime server (realtime/quoins.go)
+ * (distributeQuoinShards 83-154). The realtime server (groddle-afternoon-server/quoins.go)
  * owns all of that; the book is js/shared-quoins.js.
  *
  * Multiplayer only (engine.mode and the realtime client). In solo this

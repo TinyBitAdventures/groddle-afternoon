@@ -1,7 +1,7 @@
 /**
  * Trading in multiplayer (phase 4): the rules and words of the trade window,
  * pure (no DOM, no engine), for js/features/trade-feature.js. The server is
- * realtime/trade.go; its header lists the messages and the source rules
+ * groddle-afternoon-server/trade.go; its header lists the messages and the source rules
  * (glitch-GameServerJS players/inc_trading.js, glitch-client TradeDialog.as
  * and TradeManager.as).
  *

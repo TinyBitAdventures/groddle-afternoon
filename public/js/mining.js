@@ -347,7 +347,7 @@ export function mineRock(rock, inv, pc, opts = {}) {
   }
 
   const rng = opts.rng || Math.random;
-  // opts.chunks: multiplayer, the realtime server's roll (realtime/objects.go mine).
+  // opts.chunks: multiplayer, the realtime server's roll (groddle-afternoon-server/objects.go mine).
   let toGet = Number.isInteger(opts.chunks) && opts.chunks > 0
     ? opts.chunks
     : randInt(def?.minChunks ?? 3, def?.maxChunks ?? 9, rng);

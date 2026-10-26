@@ -4,7 +4,7 @@
  * Piles, Peat Bogs, Paper Trees) and the living trees are the same for
  * everyone on a street, as in the original: what one player mines, digs or
  * harvests is gone for the others until it comes back. Rules in
- * js/street-objects.js; the server is realtime/objects.go.
+ * js/street-objects.js; the server is groddle-afternoon-server/objects.go.
  *
  * - A shared verb asks the server first (runVerbOverride, after the swing has
  *   played) and applies its effect only on the go-ahead: the local rules run

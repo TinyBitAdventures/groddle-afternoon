@@ -50,7 +50,7 @@ export const SAVE_ENTRY_NAMES = Object.freeze(Object.keys(SAVE_KEYS));
 
 export const MULTIPLAYER_SAVE_UNAVAILABLE = 'Multiplayer saves are not available yet';
 
-/** The kind and format a save carries on the server (minn/groddle/src/SaveShape.php). */
+/** The kind and format a save carries on the server (groddle-afternoon-site/src/SaveShape.php). */
 export const MULTIPLAYER_SAVE_KIND = 'groddle-multiplayer';
 export const SOLO_SAVE_KIND = 'groddle-solo';
 export const SAVE_FORMAT = 1;

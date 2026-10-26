@@ -1,7 +1,7 @@
 /**
  * Group Rook attacks in multiplayer (phase 4): the pure half of the client.
  * No DOM, no Pixi. js/features/rook-attack-feature.js uses it only in
- * multiplayer, where the realtime server (realtime/rook.go, protocol in its
+ * multiplayer, where the realtime server (groddle-afternoon-server/rook.go, protocol in its
  * header) owns each street's attack: phase, health, stun, orbs, the primed
  * shrine, wing beats and the rooked things left behind. This module turns the
  * server's messages into the attack and rooked rows the feature's existing
@@ -22,7 +22,7 @@
 
 import { ROOK_SOURCE, ROOK_TEXT, isRookableClass, strikeDamageFor } from './rook-attack.js';
 
-/** The server's limits (realtime/rook.go). */
+/** The server's limits (groddle-afternoon-server/rook.go). */
 export const MP_ROOK = Object.freeze({
   maxSyncKeys: 64,
   joinEnergy: 25,

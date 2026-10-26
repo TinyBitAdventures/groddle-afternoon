@@ -1,6 +1,6 @@
 /**
  * Races between real players (multiplayer phase 4): the pure side of the
- * client. The server is realtime/races.go (its header lists the messages and
+ * client. The server is groddle-afternoon-server/races.go (its header lists the messages and
  * the GameServerJS rules: race_ticket.js, players/inc_games.js,
  * groups/shared_instance_manager.js, groups/global_game.js); the world side
  * is features/races-feature.js, which keeps solo races exactly as they were.
@@ -9,7 +9,7 @@
  * server sends and works out what this player sees and gets.
  */
 
-/** The courses a ticket can race real players on (the server's realtime/data/races.json). */
+/** The courses a ticket can race real players on (groddle-afternoon-server/data/races.json). */
 export const MP_RACE_COURSES = Object.freeze([
   'amazing_race', 'canyon_run', 'crystal_climb', 'grab_em_good', 'lava_leap', 'space_race', 'star_sprint', 'time_warp',
 ]);

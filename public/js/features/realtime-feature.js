@@ -3,7 +3,7 @@
  * 2026-10-25): their Glitches walk, jump and climb where they really are,
  * with name plates; Local chat reaches them (bubbles over the speaker, the
  * dock's lines, a short chat log) and emotes play on their Glitch. The
- * connection is js/realtime-client.js; the server is realtime/ (Go), opened
+ * connection is js/realtime-client.js; the server is groddle-afternoon-server (Go), opened
  * with a ticket from Minn (groddle/v1/realtime).
  *
  * Multiplayer only (engine.mode). In solo this feature does nothing at all:

@@ -4,19 +4,22 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SITE_DIR, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const ext = join(root, 'minn/groddle');
+// The theme + extension is its own repo, groddle-afternoon-site (tools/repos.mjs);
+// the checks that read it skip when it is not beside this one.
+const ext = SITE_DIR;
 
-describe('Groddle on Minn (minn/groddle, a block theme that is also an extension)', () => {
-  it('has a manifest whose autoload and class match its source', () => {
+describe('Groddle on Minn (groddle-afternoon-site, a block theme that is also an extension)', () => {
+  it('has a manifest whose autoload and class match its source', { skip: skipWithoutSite }, () => {
     const manifest = JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8'));
     assert.equal(manifest.extension, 'Groddle\\Minn\\Extension');
     assert.deepEqual(manifest.autoload, { 'Groddle\\Minn\\': 'src/' });
     assert.match(readFileSync(join(ext, 'src/Extension.php'), 'utf8'), /final class Extension implements MinnExtension/);
   });
 
-  it('answers folder pages through the route seam and never climbs out of its root', () => {
+  it('answers folder pages through the route seam and never climbs out of its root', { skip: skipWithoutSite }, () => {
     const pages = readFileSync(join(ext, 'src/StaticPages.php'), 'utf8');
     assert.match(pages, /\$minn->routes|#\[Route\(Method::Get, '\/'/);
     assert.match(pages, /\{folder:\[a-z0-9\]\[a-z0-9_-\]\*\(\?:\/\[a-z0-9\]\[a-z0-9_-\]\*\)\*\}/);
@@ -26,7 +29,7 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     assert.match(pages, /\$folder === 'changelog' \|\| str_starts_with\(\$folder, 'changelog\/'\)/);
   });
 
-  it('is a block theme: header, templates for notes and pages, the theme it says it is', () => {
+  it('is a block theme: header, templates for notes and pages, the theme it says it is', { skip: skipWithoutSite }, () => {
     assert.match(readFileSync(join(ext, 'style.css'), 'utf8'), /Theme Name: Groddle Afternoon/);
     const theme = JSON.parse(readFileSync(join(ext, 'theme.json'), 'utf8'));
     assert.equal(theme.version, 3);
@@ -50,7 +53,7 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     assert.equal((content.match(/<!-- wp:/g) || []).length - selfClosing, (content.match(/<!-- \/wp:/g) || []).length, 'every block closes');
   });
 
-  it('writes every note without an HTML block: the structured parts are the theme\'s blocks', async () => {
+  it('writes every note without an HTML block: the structured parts are the theme\'s blocks', { skip: skipWithoutSite }, async () => {
     const { noteContent } = await import('../tools/changelog/to-minn.mjs');
     const { loadPosts } = await import('../tools/changelog/build.mjs');
     const declared = JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8')).blocks;
@@ -63,7 +66,7 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     }
   });
 
-  it('registers one block per block.json, each drawn by a class in src/ (the report sections by Restoration.php), with the icons the cards name', () => {
+  it('registers one block per block.json, each drawn by a class in src/ (the report sections by Restoration.php), with the icons the cards name', { skip: skipWithoutSite }, () => {
     const declared = JSON.parse(readFileSync(join(ext, 'minn.json'), 'utf8')).blocks;
     const dirs = readdirSync(join(ext, 'blocks'));
     const restoration = readFileSync(join(ext, 'src/Restoration.php'), 'utf8');
@@ -82,7 +85,7 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     execFileSync('node', [join(root, 'tools/changelog/minn-blocks.mjs'), '--check'], { stdio: 'ignore' });
   });
 
-  it('makes the restoration report a page of blocks: core blocks for the words, one data block per section (tools/restoration/to-minn.mjs)', async () => {
+  it('makes the restoration report a page of blocks: core blocks for the words, one data block per section (tools/restoration/to-minn.mjs)', { skip: skipWithoutSite }, async () => {
     const { restorationContent } = await import('../tools/restoration/to-minn.mjs');
     const content = restorationContent();
     assert.doesNotMatch(content, /wp:html/);
@@ -120,7 +123,9 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     const bands = [...content.matchAll(/<section class="wp-block-group band[^"]*" id="([a-z]+)">/g)].map((m) => m[1]);
     for (const [, id] of content.matchAll(/<a href="#([a-z]+)">/g)) assert.ok(bands.includes(id), id);
     assert.doesNotMatch(content, /\u2014/, 'no em dashes');
-    // The player script finds the markup the drawer prints.
+  });
+
+  it('draws the markup the Musicblocks player script finds (Musicblocks.php)', { skip: skipWithoutSite }, () => {
     const drawn = readFileSync(join(ext, 'src/Musicblocks.php'), 'utf8');
     for (const cls of ['mb-set', 'mb-card', 'mb-face', 'mb-name']) assert.match(drawn, new RegExp(`class="${cls}`), cls);
   });
@@ -143,7 +148,7 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     assert.doesNotMatch(content, /\u2014/, 'no em dashes');
   });
 
-  it('draws what restoration.js fills: every container id the script looks for', () => {
+  it('draws what restoration.js fills: every container id the script looks for', { skip: skipWithoutSite }, () => {
     const script = readFileSync(join(root, 'public/restoration/restoration.js'), 'utf8');
     const drawn = readFileSync(join(ext, 'src/Restoration.php'), 'utf8');
     const ids = new Set([...script.matchAll(/\$\('#([a-z-]+)'/g)].map((m) => m[1]));
@@ -151,7 +156,7 @@ describe('Groddle on Minn (minn/groddle, a block theme that is also an extension
     for (const id of ids) assert.match(drawn, new RegExp(`id="${id}"`), id);
   });
 
-  it('is plain PHP the engine can load', (t) => {
+  it('is plain PHP the engine can load', { skip: skipWithoutSite }, (t) => {
     let php = true;
     try { execFileSync('php', ['-v'], { stdio: 'ignore' }); } catch { php = false; }
     if (!php) return t.skip('no php on PATH');

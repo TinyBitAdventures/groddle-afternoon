@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { FALLBACK, applyToHtml, currentIndex, parseMenu, renderLinks } from '../tools/site-nav/apply.mjs';
+import { sitePath, skipWithoutSite } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
 const MENU = `<!-- wp:navigation-link {"label":"Restoration","url":"/restoration/","kind":"custom","isTopLevelLink":true} /-->
@@ -52,10 +53,13 @@ describe('the header menu in the built pages (tools/site-nav/apply.mjs)', () => 
     assert.equal(applyToHtml('<p>no header</p>', '/x/', FALLBACK), '<p>no header</p>');
   });
 
-  it('falls back to the links the built pages and the theme ship with', () => {
-    const php = readFileSync(join(root, 'minn/groddle/src/SiteNav.php'), 'utf8');
+  it('falls back to the links the theme ships with (the site repo\'s src/SiteNav.php)', { skip: skipWithoutSite }, () => {
+    const php = readFileSync(sitePath('src/SiteNav.php'), 'utf8');
     const rows = [...php.matchAll(/\['([^']+)', '([^']+)', '([^']*)'\]/g)].map(([, label, href, className]) => ({ label, href, className }));
     assert.deepEqual(rows, FALLBACK);
+  });
+
+  it('falls back to the links the built pages ship with', () => {
     const built = readFileSync(join(root, 'public/index.html'), 'utf8').match(/<div class="site-nav-links">([\s\S]*?)<\/div>/)[1];
     const shipped = [...built.matchAll(/<a(?: class="([^"]+)")? href="([^"]+)">([^<]+)<\/a>/g)].map(([, className = '', href, label]) => ({ label, href: '/' + href, className }));
     assert.deepEqual(shipped, FALLBACK);

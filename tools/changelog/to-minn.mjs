@@ -3,7 +3,7 @@
  * Moves the Notes blog into Minn, which is its source from then on: each note in
  * tools/changelog/posts.json becomes a post on the Minn site (groddle.localhost), written
  * through Minn's own REST API, so it can be edited in Minn Admin. The Groddle theme
- * draws it (minn/groddle/templates/single.html, home.html).
+ * draws it (groddle-afternoon-site/templates/single.html, home.html).
  *
  *   MINN_USER=admin MINN_PASS=... node tools/changelog/to-minn.mjs [--site=https://groddle.localhost] [--dry]
  *
@@ -15,7 +15,7 @@
  * Mapping: title (plain), slug, date, draft -> status; summary -> excerpt;
  * label -> category, tags -> tags; subtitle/lead/stat -> a note-intro group;
  * image -> an image block; stat, cards, milestones, ledgers, quests and signs ->
- * the theme's note blocks (minn/groddle/blocks, words in attributes, so Minn
+ * the theme's note blocks (groddle-afternoon-site/blocks, words in attributes, so Minn
  * Admin edits them with a form); sub-intros, checklists and tables -> core
  * blocks; sections -> section groups. The blocks draw the markup build.mjs
  * drew, so the site's stylesheets style them as before.

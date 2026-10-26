@@ -1,7 +1,7 @@
 /**
  * Parties in multiplayer (phase 4): the rules the party feature
  * (js/features/party-feature.js) draws from, kept pure (no DOM, no Pixi) so
- * tests drive them directly. The server is realtime/party.go, whose header
+ * tests drive them directly. The server is groddle-afternoon-server/party.go, whose header
  * lists the messages; the original is GameServerJS groups/party.js and
  * players/inc_party.js, and the client's party chat (glitch-client
  * RightSideManager.as, InteractionMenuController.as).
@@ -28,7 +28,7 @@ export const PARTY_TEXT = Object.freeze({
   notInParty: "You're not in a party!", // inc_party.js:360
 });
 
-/** A member as the server sends it (realtime/party.go roster). */
+/** A member as the server sends it (groddle-afternoon-server/party.go roster). */
 function normMember(m) {
   return {
     id: Number(m?.id) || 0,

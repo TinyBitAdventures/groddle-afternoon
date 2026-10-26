@@ -6,3 +6,4 @@ test-results/
 character-probe/
 _ref-frames/
 /shot.png
+__pycache__/

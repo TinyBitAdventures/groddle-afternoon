@@ -3,8 +3,9 @@
  * auth, reconnects, roster, move throttling, chat, emotes, motion
  * smoothing), minn-account.js realtimeTicket(), and the rules of
  * js/features/realtime-feature.js (off in solo, status copy, emote commands,
- * private places). The protocol is realtime/hub.go's header comment; the
- * real server is driven by tests/minn-accounts-live.test.js (opt-in).
+ * private places). The protocol is hub.go's header comment in
+ * groddle-afternoon-server; the real server is driven by
+ * tests/minn-accounts-live.test.js (opt-in).
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
