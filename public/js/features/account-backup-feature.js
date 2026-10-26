@@ -15,16 +15,17 @@
  * The Menu also gets Multiplayer, the way to /play/online/ from a solo game
  * already under way (the start card only offers the choice on a new game).
  *
- * In multiplayer the Menu gets Sign out instead: the save is written first,
- * then the session ends and the page goes back to the gate.
+ * In multiplayer the Menu gets Account (change the sign-in email or the
+ * password, each with the current password) and Sign out: the save is
+ * written first, then the session ends and the page goes back to the gate.
  *
  * Off in practice copies (?practice=1 swaps the storage) and on a plain
  * static server (no account routes answer).
  * QA: /play/ on groddle.localhost, Menu, Account; /play/online/, Menu, Sign out.
  */
 
-import { createMinnAccount } from '../minn-account.js?v=g325-1';
-import { mountAccountForms } from '../account-forms.js?v=mp-login-3';
+import { createMinnAccount } from '../minn-account.js?v=g337-1';
+import { mountAccountForms, mountAccountSettings } from '../account-forms.js?v=g337-1';
 import { createBrowserSaveStore, freezeSoloSaves, restoreSoloSave, saveStore, savedAtOf, soloSaveSnapshot } from '../save-store.js?v=mp2-1';
 import { formatGameDayLabel } from '../game-day.js?v=dametime-3';
 import { multiplayerEntryUrl } from '../game-mode.js?v=mp2-1';
@@ -330,23 +331,78 @@ async function install(engine) {
   list.append(btn);
 }
 
-/** Multiplayer's Menu: Sign out, once the save is written. */
+/** Signs a multiplayer player out once the save is written, back to the gate. */
+async function signOutMultiplayer(engine, account, button) {
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Signing out…';
+  }
+  try { engine.save?.(); } catch { /* the store writes what it has */ }
+  // Twice: a write already in flight resolves the first, the newest change goes in the second.
+  try { await saveStore.flush?.(); await saveStore.flush?.(); } catch { /* signed out regardless */ }
+  await account.signOut();
+  engine.setData?.('accountSession', 'signed-out');
+  location.href = account.urls.online;
+}
+
+/** Multiplayer's Account panel: who you play as, your email and password, Sign out. */
+function createMultiplayerPanel(engine, account) {
+  if (!document.getElementById('account-backup-css')) {
+    const style = el('style', { id: 'account-backup-css' });
+    style.textContent = STYLE;
+    document.head.append(style);
+  }
+  const shade = el('div', { id: 'account-shade', class: 'account-shade', hidden: true });
+  const panel = el('div', { id: 'account-panel', class: 'account-panel', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'account-title' });
+  shade.append(panel);
+  document.body.append(shade);
+  const close = () => {
+    shade.hidden = true;
+    engine.setData?.('accountPanel', 'closed');
+  };
+  shade.addEventListener('pointerdown', (e) => { if (e.target === shade) close(); });
+  shade.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Escape') close();
+  });
+  return {
+    async open() {
+      shade.hidden = false;
+      engine.setData?.('accountPanel', 'open');
+      panel.replaceChildren();
+      const x = el('button', { type: 'button', class: 'account-close', 'aria-label': 'Close' }, '×');
+      x.addEventListener('click', close);
+      panel.append(x, el('h2', { id: 'account-title' }, 'Your account'));
+      const session = await account.session();
+      if (!session.signedIn) {
+        location.href = account.urls.online;
+        return;
+      }
+      panel.append(el('p', {}, `Playing as ${session.player?.name || 'you'}. Your character saves on the Groddle site.`));
+      const host = el('div', { class: 'account-forms' });
+      panel.append(host);
+      mountAccountSettings(host, { account, email: session.account?.email || '', onChanged: ({ what }) => engine.setData?.('accountChanged', what) });
+      const actions = el('div', { class: 'account-actions' });
+      const out = el('button', { type: 'button', class: 'alt', 'data-account-signout': '' }, 'Sign out');
+      out.addEventListener('click', () => signOutMultiplayer(engine, account, out));
+      actions.append(out);
+      panel.append(actions);
+      panel.querySelector('input')?.focus();
+    },
+  };
+}
+
+/** Multiplayer's Menu: Account (email, password) and Sign out, once the save is written. */
 function installSignOut(engine) {
   const list = document.getElementById('more-list');
   if (!list) return;
   const account = createMinnAccount({ baseUri: document.baseURI });
+  const panel = createMultiplayerPanel(engine, account);
+  const acct = el('button', { id: 'account-btn', type: 'button', class: 'chrome-btn', title: 'Your email and password' }, 'Account');
+  acct.addEventListener('click', () => { panel.open(); });
   const btn = el('button', { id: 'signout-btn', type: 'button', class: 'chrome-btn', title: 'Save, sign out and go back to the sign-in' }, 'Sign out');
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
-    btn.textContent = 'Signing out…';
-    try { engine.save?.(); } catch { /* the store writes what it has */ }
-    // Twice: a write already in flight resolves the first, the newest change goes in the second.
-    try { await saveStore.flush?.(); await saveStore.flush?.(); } catch { /* signed out regardless */ }
-    await account.signOut();
-    engine.setData?.('accountSession', 'signed-out');
-    location.href = account.urls.online;
-  });
-  list.append(btn);
+  btn.addEventListener('click', () => signOutMultiplayer(engine, account, btn));
+  list.append(acct, btn);
 }
 
 export const accountBackupFeature = {

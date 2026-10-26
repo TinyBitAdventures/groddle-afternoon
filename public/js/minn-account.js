@@ -151,7 +151,7 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
         return { minn: false, offline: true, signedIn: false, player: null };
       }
       if (!me.ok || typeof me.data?.signedIn !== 'boolean') return { minn: false, signedIn: false, player: null };
-      return { minn: true, signedIn: me.data.signedIn, player: me.data.player || null, backups: me.data.backups || null };
+      return { minn: true, signedIn: me.data.signedIn, player: me.data.player || null, backups: me.data.backups || null, account: me.data.account || null };
     },
 
     /**
@@ -173,6 +173,21 @@ export function createMinnAccount({ baseUri, fetch: fetchFn = globalThis.fetch?.
       const r = await post('session', undefined, 'DELETE');
       nonce = '';
       return { ok: r.ok };
+    },
+
+    /**
+     * A new password for the signed-in player, the current one first. The
+     * site signs this browser in again (other devices are signed out), so a
+     * fresh nonce follows. Same answers as signIn.
+     */
+    async changePassword({ current, password }) {
+      return signedIn(await post('account/password', { current, password }, 'PUT'));
+    },
+
+    /** A new sign-in email, the current password first: { ok, email } or a refusal. */
+    async changeEmail({ current, email }) {
+      const r = await post('account/email', { current, email }, 'PUT');
+      return r.ok ? { ok: true, email: String(r.data?.email || email) } : refusal(r);
     },
 
     /** Mails a password reset link. { ok, message }: the same answer whether or not the address has an account. */

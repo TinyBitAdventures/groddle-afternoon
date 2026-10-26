@@ -88,6 +88,7 @@ const STYLE = `
 .acct-message { margin: 0; font-weight: 600; color: #4c6b2e; }
 .acct-message:empty { display: none; }
 .acct-message[data-tone="bad"] { color: #a33b22; }
+.acct-forms[data-account-settings] .acct-form + .acct-form { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e3e8d6; }
 `;
 
 function el(tag, attrs = {}, text = '') {
@@ -316,4 +317,107 @@ export function mountAccountForms(host, { account, start = 'signin', reset = nul
   host.replaceChildren(root);
   show(reset ? 'reset' : start === 'signup' ? 'signup' : 'signin');
   return { root, show };
+}
+
+/** The settings copy (plain remake copy, no em-dashes). */
+export const SETTINGS_COPY = Object.freeze({
+  email: { title: 'Email', help: 'You sign in with it, and password resets go to it.', submit: 'Change email', busy: 'Changing…', done: 'Your email changed. The old address was told.' },
+  password: { title: 'Password', submit: 'Change password', busy: 'Changing…', done: 'Your password changed. Other devices were signed out.' },
+});
+
+/**
+ * The signed-in player's settings (the multiplayer Account panel): a new
+ * email or a new password, each confirmed with the current password.
+ * onChanged({ what, email }) after a change.
+ */
+export function mountAccountSettings(host, { account, email = '', onChanged = () => {} } = {}) {
+  if (!document.getElementById(STYLE_ID)) {
+    const style = el('style', { id: STYLE_ID });
+    style.textContent = STYLE;
+    document.head.append(style);
+  }
+  const n = ++formCount;
+  const root = el('div', { class: 'acct-forms', 'data-account-settings': '' });
+  const message = el('p', { class: 'acct-message', role: 'status', 'aria-live': 'polite' });
+  const say = (text, tone = 'good') => {
+    message.textContent = text;
+    message.dataset.tone = tone;
+  };
+  let shownEmail = email;
+
+  const mailForm = el('form', { class: 'acct-form', 'data-form': 'email', novalidate: true });
+  const mailNow = el('p', { class: 'acct-message', 'data-account-email': '' }, shownEmail ? `Now: ${shownEmail}` : '');
+  const mailNew = field(`acct-ch-email-${n}`, 'New email', { name: 'email', type: 'email', autocomplete: 'email', inputmode: 'email', autocapitalize: 'none', spellcheck: 'false', required: true }, SETTINGS_COPY.email.help);
+  const mailCurrent = field(`acct-ch-email-current-${n}`, 'Current password', { name: 'current', type: 'password', autocomplete: 'current-password', required: true });
+  const mailSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'email' }, SETTINGS_COPY.email.submit);
+  mailForm.append(el('strong', {}, SETTINGS_COPY.email.title), mailNow, mailNew.wrap, mailCurrent.wrap, mailSubmit);
+
+  const passForm = el('form', { class: 'acct-form', 'data-form': 'password', novalidate: true });
+  const passCurrent = field(`acct-ch-pass-current-${n}`, 'Current password', { name: 'current', type: 'password', autocomplete: 'current-password', required: true });
+  const passNew = field(`acct-ch-pass-new-${n}`, 'New password', { name: 'password', type: 'password', autocomplete: 'new-password', minlength: '8', required: true }, FORM_COPY.signup.passwordHelp);
+  const passSubmit = el('button', { type: 'submit', class: 'acct-submit', 'data-account-submit': 'password' }, SETTINGS_COPY.password.submit);
+  passForm.append(el('strong', {}, SETTINGS_COPY.password.title), passCurrent.wrap, passNew.wrap, passSubmit);
+
+  const clear = (form) => {
+    for (const input of form.querySelectorAll('input')) input.removeAttribute('aria-invalid');
+    for (const error of form.querySelectorAll('.acct-error')) error.textContent = '';
+  };
+  const show = (r, fields) => {
+    let first = null;
+    for (const [name, text] of Object.entries(r.fields || {})) {
+      const f = fields[name];
+      if (!f) continue;
+      f.input.setAttribute('aria-invalid', 'true');
+      f.error.textContent = text;
+      first ??= f.input;
+    }
+    if (!first) say(r.message, 'bad');
+    first?.focus();
+  };
+  const busy = async (button, text, work) => {
+    if (button.disabled) return;
+    const label = button.textContent;
+    button.disabled = true;
+    button.textContent = text;
+    try { await work(); } finally { button.disabled = false; button.textContent = label; }
+  };
+
+  mailForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    clear(mailForm);
+    say('');
+    busy(mailSubmit, SETTINGS_COPY.email.busy, async () => {
+      const fields = { email: mailNew, current: mailCurrent };
+      const value = mailNew.input.value.trim();
+      if (!value.includes('@')) return show({ fields: { email: 'Enter the new email.' } }, fields);
+      if (!mailCurrent.input.value) return show({ fields: { current: 'Enter your current password.' } }, fields);
+      const r = await account.changeEmail({ current: mailCurrent.input.value, email: value });
+      if (!r.ok) return show(r, fields);
+      shownEmail = r.email;
+      mailNow.textContent = `Now: ${shownEmail}`;
+      mailForm.reset();
+      say(SETTINGS_COPY.email.done);
+      onChanged({ what: 'email', email: shownEmail });
+    });
+  });
+
+  passForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    clear(passForm);
+    say('');
+    busy(passSubmit, SETTINGS_COPY.password.busy, async () => {
+      const fields = { current: passCurrent, password: passNew };
+      if (!passCurrent.input.value) return show({ fields: { current: 'Enter your current password.' } }, fields);
+      if (passNew.input.value.length < 8) return show({ fields: { password: 'Passwords need at least 8 characters.' } }, fields);
+      const r = await account.changePassword({ current: passCurrent.input.value, password: passNew.input.value });
+      if (!r.ok) return show(r, fields);
+      passForm.reset();
+      say(SETTINGS_COPY.password.done);
+      onChanged({ what: 'password' });
+    });
+  });
+
+  root.append(message, mailForm, passForm);
+  host.replaceChildren(root);
+  return { root };
 }

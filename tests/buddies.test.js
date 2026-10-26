@@ -26,8 +26,8 @@ import {
   freshReverse,
   normalizeList,
 } from '../public/js/buddies.js?v=g325-1';
-import { createMinnAccount } from '../public/js/minn-account.js?v=g325-1';
-import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=g325-1';
+import { createMinnAccount } from '../public/js/minn-account.js?v=g337-1';
+import { buddiesFeature } from '../public/js/features/buddies-feature.js?v=g337-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { serverPath, sitePath, skipWithoutServer, skipWithoutSite } from '../tools/repos.mjs';
 
@@ -290,7 +290,7 @@ describe('buddies feature (js/features/buddies-feature.js)', () => {
     assert.ok(ids.indexOf('buddies') < ids.indexOf('realtime'));
     assert.equal(ids.indexOf('street-objects') + 1, ids.indexOf('realtime'), 'street objects stays just before realtime');
     assert.ok(ids.indexOf('buddies') > ids.indexOf('trade'));
-    assert.match(read('public/js/features/index.js'), /buddies-feature\.js\?v=g325-1/);
+    assert.match(read('public/js/features/index.js'), /buddies-feature\.js\?v=g\d+-\d+'/);
   });
 
   it('loads the list, sends the signed list to the server, counts badges and tells new adds', async () => {

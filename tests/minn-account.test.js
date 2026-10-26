@@ -15,10 +15,10 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=g325-1';
-import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=g325-1';
-import { FORM_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=mp-login-3';
-import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g325-1';
+import { createMinnAccount, minnUrls } from '../public/js/minn-account.js?v=g337-1';
+import { GATE_COPY, bootDataFrom, gateFor } from '../public/js/online-boot.js?v=g337-1';
+import { FORM_COPY, SETTINGS_COPY, resetLinkFrom } from '../public/js/account-forms.js?v=g337-1';
+import { restoreNeedsAsking, sizeLabel, slotForNewBackup, accountBackupFeature } from '../public/js/features/account-backup-feature.js?v=g337-1';
 import { FEATURES } from '../public/js/features/index.js';
 import { multiplayerEntryUrl } from '../public/js/game-mode.js?v=mp2-1';
 import { SAVE_ENTRY_NAMES, createMultiplayerSaveStore } from '../public/js/save-store.js?v=mp2-1';
@@ -78,7 +78,7 @@ describe('minn-account', () => {
     const f = routedFetch({ [NONCE_PATH]: { status: 400, body: '0' }, 'groddle/v1/me': { status: 200, body: { signedIn: false, player: null } } });
     const account = createMinnAccount({ baseUri: BASE, fetch: f.fn });
     const session = await account.session();
-    assert.deepEqual(session, { minn: true, signedIn: false, player: null, backups: null });
+    assert.deepEqual(session, { minn: true, signedIn: false, player: null, backups: null, account: null });
     assert.equal(f.calls[1].headers['X-WP-Nonce'], undefined);
     assert.equal(f.calls[1].credentials, 'same-origin');
   });
@@ -146,10 +146,30 @@ describe('minn-account', () => {
   });
 
   it('the form copy is plain, with no em-dashes, and never says username', () => {
-    const words = JSON.stringify(FORM_COPY);
+    const words = JSON.stringify([FORM_COPY, SETTINGS_COPY]);
     assert.doesNotMatch(words, /\u2014/);
     assert.doesNotMatch(words, /user ?name/i);
     assert.doesNotMatch(read('public/js/account-forms.js'), /name: 'username'|name: 'log'|user_login/);
+  });
+
+  it('changes the password (signed in again, a fresh nonce) and the email, each with the current password', async () => {
+    const calls = [];
+    const fetch = async (url, init = {}) => {
+      calls.push({ url, method: init.method, body: init.body ? JSON.parse(init.body) : undefined });
+      const json = (status, body) => ({ status, ok: status < 300, headers: { get: () => null }, json: async () => body, text: async () => JSON.stringify(body) });
+      if (url.endsWith(NONCE_PATH)) return { status: 200, ok: true, headers: { get: () => null }, text: async () => 'fedcba9876' };
+      if (url.endsWith('account/password')) return init.body.includes('wrong') ? json(400, { code: 'incorrect_password', message: "That isn't your current password.", fields: { current: "That isn't your current password." } }) : json(200, { signedIn: true, player: { id: 4, name: 'Rae' } });
+      if (url.endsWith('account/email')) return json(200, { email: 'rae@example.com' });
+      return json(404, {});
+    };
+    const account = createMinnAccount({ baseUri: BASE, fetch, nonce: '0123456789' });
+    const bad = await account.changePassword({ current: 'wrong', password: 'zz-new-pass-1' });
+    assert.deepEqual([bad.ok, bad.code, bad.fields.current], [false, 'incorrect_password', "That isn't your current password."]);
+    const ok = await account.changePassword({ current: 'zz-old-pass-1', password: 'zz-new-pass-1' });
+    assert.equal(ok.ok, true);
+    assert.equal(account.nonce, 'fedcba9876', 'the new session\'s nonce');
+    assert.equal(calls.find((c) => c.url.endsWith('account/password')).method, 'PUT');
+    assert.deepEqual(await account.changeEmail({ current: 'zz-new-pass-1', email: 'rae@example.com' }), { ok: true, email: 'rae@example.com' });
   });
 
   it('a nonce from a session that ended is refused even on the open routes: asked again with none', async () => {
@@ -326,6 +346,8 @@ describe('Groddle extension: accounts (groddle-afternoon-site)', { skip: skipWit
       'Post /groddle/v1/players Public',
       'Post /groddle/v1/realtime SignedIn',
       'Post /groddle/v1/session Public',
+      'Put /groddle/v1/account/email SignedIn',
+      'Put /groddle/v1/account/password SignedIn',
       'Put /groddle/v1/backups/{slot:\\d+} SignedIn',
       'Put /groddle/v1/save SignedIn',
     ]);
