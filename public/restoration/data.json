@@ -2644,9 +2644,24 @@
   ]
  },
  "git": {
-  "commits": 621,
+  "commits": 625,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "fix",
+    "text": "Restoration rows keep Play inside the card when a name carries the In multiplayer chip"
+   },
+   {
+    "date": "2026-10-27",
+    "kind": "improve",
+    "text": "The Code page's contributing links are repo badges"
+   },
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "Swoonerflies on three streets, and Wine of the Dead walks you over and pours"
+   },
    {
     "date": "2026-10-27",
     "kind": "improve",
@@ -2751,21 +2766,6 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "A Code page that measures the three repos from git, and a CONTRIBUTING.md"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Snaps between players, and the Camera takes you to them"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "new",
-    "text": "Shared fox preserves, Fox Flurrier and trade requests in multiplayer"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "improve",
-    "text": "Speech bubbles keep off players' heads, fit their line and name only players"
    }
   ]
  },

@@ -192,7 +192,7 @@ import {
   yardLook,
   yardStyleChoices,
   yardStyleFor,
-} from '../home-styles.js?v=g253-1';
+} from '../home-styles.js?v=g373-1';
 import { frameTexture, isLoaded, onLoaded, sourceFromUrl, textureFromUrl } from '../textures.js';
 import { ROCK_CATALOG } from '../mining.js?v=g330-1';
 import {

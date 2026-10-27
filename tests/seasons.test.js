@@ -9,7 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { HIRES_SPRITES } from '../public/js/sprite-hires.js';
-import { HIRES_ICONS } from '../public/js/icon-hires.js';
+import { HIRES_ICONS } from '../public/js/icon-hires.js?v=g373-1';
 import {
   CANDY_DAILY_MAX,
   CARVED_CLASSES,

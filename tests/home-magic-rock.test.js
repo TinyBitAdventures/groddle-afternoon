@@ -156,9 +156,9 @@ describe('source wording', { skip: !existsSync(ROCK_JS) }, () => {
  * shiftCKeyHandler 816-828; HouseManager.as startCultivation 102-118).
  */
 describe('the home street rock (G231)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=g369-1');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=g373-1');
   const { towerApi } = await import('../public/js/features/home-tower-feature.js?v=g366-1');
-  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=g369-1');
+  const { shiftButlerRuntime } = await import('../public/js/features/butler-feature.js?v=g373-1');
   const { homeEditing } = await import('../public/js/features/camera-mode-feature.js?v=g359-1');
   const { newxpFeature, __newxpTest } = await import('../public/js/features/newxp-feature.js?v=g366-1');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
@@ -285,7 +285,7 @@ describe('the home street rock (G231)', async () => {
  * (NCMsgHandler.as 3093-3096). Solo: no visitors, so only the stipend.
  */
 describe('the rock’s daily iMG and the house sign (G232)', async () => {
-  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=g369-1');
+  const { homesFeature } = await import('../public/js/features/homes-feature.js?v=g373-1');
   const street = { classId: 'magic_rock', state: { room: 'street' } };
   const yard = { classId: 'magic_rock', state: { room: 'yard' } };
   const quiet = { active: {}, completed: [], offers: {} };
@@ -418,5 +418,52 @@ describe('the rock’s daily iMG and the house sign (G232)', async () => {
   it('the street rock’s subtitle follows the Tower offer while you stand there', () => {
     const feature = readFileSync(join(spike, 'public/js/features/homes-feature.js'), 'utf8');
     assert.match(feature, /\} else if \(have && refreshRockSubtitle\(engine\)\) \{/);
+  });
+});
+
+/*
+ * G223: the rock's change_style (items/magic_rock.js 272-294) and its How To
+ * (131-157). The verb sends houses_change_style_start (291); the client opens
+ * HouseStylesDialog (NCMsgHandler.as do_HOUSES_CHANGE_STYLE_START 3116-3121),
+ * the dialog the house sign's Change Style button opens (HouseSignDialog.as
+ * onChangeStyleClick 260-269), titled for the street or the yard
+ * (HouseStylesDialog.as 146-148).
+ */
+const CLIENT = join(spike, '../glitch-client/com/tinyspeck/engine');
+describe('G223: change style opens the style chooser', { skip: !existsSync(ROCK_JS) || !existsSync(CLIENT) }, () => {
+  const src = existsSync(ROCK_JS) ? readFileSync(ROCK_JS, 'utf8') : '';
+  const block = (id) => src.slice(src.indexOf(`verbs.${id} = {`), src.indexOf('\n};', src.indexOf(`verbs.${id} = {`)));
+
+  it('the How To sets changestyle to howto_shown; the verb shows only once it is set, on either rock', () => {
+    assert.match(block('howto_changestyle'), /pc\.magic_rock\['changestyle'\] = 'howto_shown';/);
+    const verb = block('change_style');
+    assert.match(verb, /if \(pc\.magic_rock && pc\.magic_rock\['changestyle'\]\) return \{state:'enabled'\};\s*return \{state: null\};/);
+    assert.match(verb, /pc\.apiSendMsg\(\{type: 'houses_change_style_start'\}\);/);
+    // Unlike customize (street only), change_style never asks homes_get_type().
+    assert.match(block('customize'), /homes_get_type\(\) != 'exterior'/);
+    assert.ok(!verb.includes('homes_get_type'));
+    // The level cap sets the flag too (checkLevelCapForHowto 520-532).
+    assert.match(src, /function checkLevelCapForHowto\(pc\)\{[\s\S]*?pc\.magic_rock\['changestyle'\] \t= 'howto_shown';/);
+    assert.equal(src.match(/"c"\t: "change_style"/)?.[0], '"c"\t: "change_style"', 'keys_in_location');
+    assert.deepEqual(ids(rockVerbs({}, { level: 3 })).slice(0, 1), ['howto_changestyle']);
+    const flags = {};
+    readHowto(flags, 'howto_changestyle');
+    assert.equal(flags.changestyle, HOWTO_SHOWN);
+    for (const room of ['street', 'yard']) assert.ok(ids(rockVerbs({ ...flags }, { level: 3, room })).includes('change_style'), room);
+  });
+
+  it('the client opens HouseStylesDialog, the house sign’s dialog, for the street or the yard', () => {
+    const nc = readFileSync(join(CLIENT, 'control/engine/NCMsgHandler.as'), 'utf8');
+    assert.match(nc, /private function do_HOUSES_CHANGE_STYLE_START\(im:NetIncomingMessageVO\):void \{\s*\/\/change the style\s*if\(!HouseStylesDialog\.instance\.parent\)\{\s*HouseStylesDialog\.instance\.start\(\);/);
+    const sign = readFileSync(join(CLIENT, 'port/HouseSignDialog.as'), 'utf8');
+    assert.match(sign, /private function onChangeStyleClick\(event:TSEvent\):void \{[\s\S]*?HouseStylesDialog\.instance\.start\(\);/);
+    const dlg = readFileSync(join(CLIENT, 'port/HouseStylesDialog.as'), 'utf8');
+    assert.match(dlg, /_setTitle\('Change your '\+\(is_external_street \? 'street' : 'yard'\)\+' style'\);/);
+    // The remake: the rock's verb and the sign's button open the same dialog,
+    // which restyles the yard inside the house and the street outside.
+    const feature = readFileSync(join(spike, 'public/js/features/homes-feature.js'), 'utf8');
+    assert.match(feature, /if \(verbId === 'change_style'\) return openStyleDialog\(engine\) \|\| true;/);
+    assert.match(feature, /change_style: \(\) => openStyleDialog\(engine\),/);
+    assert.match(feature, /function styleRoom\(\) \{\s*return inHouse\(\) \? 'yard' : 'street';/);
   });
 });

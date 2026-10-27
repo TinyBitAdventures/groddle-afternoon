@@ -39,12 +39,13 @@ const HEADERS = [
 ];
 
 /**
- * Trim plants kept at the sizes the first three looks used (homes-feature.js trimItems).
- * Two of those were drawn at hand-typed sizes, not their art's; kept so those looks do not move.
+ * Trim plants at the scales the first three looks used (homes-feature.js trimItems). Every
+ * trim plant is drawn at its art's own size (pngSize). G223: flower_bush_5 (502x214) and
+ * groddle_flower_2 (78x206, a tall flower) were drawn at hand-typed 260x180 and 120x110, which
+ * squashed them; their scales keep the heights they stood at (180 x 0.44, 110 x 0.6).
  */
-const TRIM_SIZE = { flower_bush_5: { w: 260, h: 180 }, groddle_flower_2: { w: 120, h: 110 } };
 const TRIM_SCALE = {
-  flower_bush_5: 0.44, bush_1: 0.5, groddle_flower_2: 0.6, mushrooms: 0.38, grass_solid: 0.7,
+  flower_bush_5: 0.37, bush_1: 0.5, groddle_flower_2: 0.32, mushrooms: 0.38, grass_solid: 0.7,
   underground_plant_1: 0.7, purple_mushroom_3: 0.5, zutto_plant_2: 0.45, plant_fern_2: 0.6,
 };
 
@@ -100,7 +101,7 @@ function resolveLook(look) {
     near: look.near.map(resolveItem),
     trim: look.trim.map((name) => {
       const sprite = resolveSprite(name);
-      return { ...sprite, ...TRIM_SIZE[name], scale: TRIM_SCALE[name] ?? Math.round(Math.min(0.8, 90 / sprite.h) * 100) / 100 };
+      return { ...sprite, scale: TRIM_SCALE[name] ?? Math.round(Math.min(0.8, 90 / sprite.h) * 100) / 100 };
     }),
   };
 }
