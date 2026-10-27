@@ -958,7 +958,7 @@
    "name": "Neighbours",
    "status": "reimagined",
    "blurb": "Visiting Stones lead to six authored neighbours, standing in for other players’ homes.",
-   "multiplayer": "Visit other players’ homes as they keep them, knock to be let in, give friends house keys, leave a package or a message with their Butler, and water and tend their gardens with their key.",
+   "multiplayer": "Visit other players’ homes as they keep them, knock to be let in, give friends house keys, leave a package or a message with their Butler, and water and tend their gardens with their key. Put up to five friends’ homes on your home street’s signpost, post a note on a Note Pole for visitors to read, sell furniture to visitors (the price waits in a Pile of Currants), and restore a friend’s worn-out cultivations together.",
    "spot": null,
    "evidence": [
     "public/js/neighbours.js"
@@ -2590,9 +2590,14 @@
   ]
  },
  "git": {
-  "commits": 593,
+  "commits": 594,
   "since": "2026-10-19",
   "recent": [
+   {
+    "date": "2026-10-27",
+    "kind": "new",
+    "text": "A Code page that measures the three repos from git, and a CONTRIBUTING.md"
+   },
    {
     "date": "2026-10-27",
     "kind": "new",
@@ -2707,14 +2712,9 @@
     "date": "2026-10-27",
     "kind": "new",
     "text": "In multiplayer, poison and lose a street tree together, share the street's Piggies, and dig a Dirt Pile together"
-   },
-   {
-    "date": "2026-10-27",
-    "kind": "fix",
-    "text": "In multiplayer a Game of Crowns Ticket spent on a challenge in flight stays spent through a street change"
    }
   ]
  },
- "tests": 353,
+ "tests": 354,
  "generatedAt": "2026-10-27"
 }

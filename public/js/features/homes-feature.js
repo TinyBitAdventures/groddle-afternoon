@@ -152,7 +152,7 @@ import {
 import { PROTO_DEPLETED_ART } from '../home-proto-art.js';
 import { playPoofIn } from '../overlay-art.js?v=g311-1';
 import { fadeInNewNear } from '../poof-fade.js?v=g311-1';
-import { projectApi } from './street-jobs-feature.js?v=blur-8';
+import { projectApi } from './street-jobs-feature.js?v=blur-9';
 import { TOWER_CHASSIS, TOWER_CONFIG, TOWER_GEO, TOWER_PROTO } from '../home-tower.js?v=home-tower-3';
 import { towerApi } from './home-tower-feature.js?v=home-tower-15';
 import { pieceUrl, roomPieces, surfaceAt, swatchPiece, wallTargetAt } from '../home-wallpaper.js?v=home-wallpaper-2';
@@ -2056,6 +2056,9 @@ function registerRestore(engine, item, st = cult) {
   const job = restoreJob(item);
   if (!job) return false;
   const back = isBackYard(st);
+  // HOMES3 (multiplayer): the realtime server's id makes the project one everyone at your home shares.
+  const wire = engine.query?.('homeRestoreWire', item, back ? 'back' : 'street', engine);
+  if (typeof wire === 'string' && wire) job.wire = wire;
   return projectApi.register(jobId, job, {
     kicker: back ? 'Your yard' : 'Your home street',
     place: back ? 'in your yard' : 'on your home street',
@@ -3189,7 +3192,10 @@ function runFurnitureAction(engine, action, arg) {
     const door = placedItem(decor, id)?.classTsid === DOOR_CLASS
       ? doorLiftCheck(floors, houseFloorHere() ?? -1, id, { inProgress: doorJobStarted() })
       : null;
-    result = door && !door.ok ? { ok: false, reason: 'door', msg: door.msg } : pickUpFurniture(decor, id);
+    // HOMES3 (multiplayer): a piece for sale stays put (furniture_bed.js:70 "You have to stop selling it first.").
+    const sale = houseFloorHere() === 0 ? engine.query?.('furnitureSaleLock', decor, id, engine) : null;
+    result = door && !door.ok ? { ok: false, reason: 'door', msg: door.msg }
+      : typeof sale === 'string' && sale ? { ok: false, reason: 'sale', msg: sale } : pickUpFurniture(decor, id);
     if (result.ok && door?.role === 'pending') {
       // A Door picked up before its project started takes the project with it.
       const jobId = doorJobId(floors);
@@ -4160,10 +4166,13 @@ export function visitorHomeScene(engine, view = {}, room = 'street') {
           layer.sortableChildren = true;
           layer.zIndex = FURNITURE_Z;
           layer.x = x0;
+          // HOMES3: each piece's box, so a sale can take it away (home-street-mp-feature).
+          const pieces = [];
           furniture.forEach((item, i) => {
             const box = furnitureView(PIXI, item);
             box.zIndex = i;
             layer.addChild(box);
+            pieces.push({ item, box });
           });
           eng.entityLayer.addChild(layer);
           const spec = background.room?.door || { piece: 'door_asset_entry_basic', x: interiorDoorX(), y: GROUND_Y + 18, w: 75, h: 236 };
@@ -4176,7 +4185,7 @@ export function visitorHomeScene(engine, view = {}, room = 'street') {
           door.zIndex = 8;
           eng.entityLayer.addChild(door);
           const gardens = drawVisitorYard(eng, yard, BACK_YARD_GROUND_Y, homeStreetLayout(yard).houseX);
-          return { door, gardens };
+          return { door, gardens, pieces, roomX: x0 };
         },
       };
     });

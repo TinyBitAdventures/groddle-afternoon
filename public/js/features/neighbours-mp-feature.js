@@ -79,8 +79,8 @@ import { cultivationDef, homeStreetLayout } from '../home-cultivation.js?v=home-
 import { tickGarden } from '../garden.js?v=g300-1';
 import { BUTLER_RIG_SCALE, ButlerPainter, butlerRigNow, loadButlerRig } from '../butler-rig.js?v=butler-rig-1';
 import { normalizeButlerParts } from '../butler.js?v=butler-9';
-import { butlerApi } from './butler-feature.js?v=butler-feature-50';
-import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=homes-50';
+import { butlerApi } from './butler-feature.js?v=butler-feature-51';
+import { homesFeature, visitorHomeScene, visitorHomeState } from './homes-feature.js?v=homes-51';
 import {
   BUTLER_MESSAGE_MAX,
   KEY_VERB,
@@ -320,6 +320,8 @@ function createSession(engine, client) {
       vb = null;
       const spots = built.populate(engine);
       registerTargets(room, spots);
+      // HOMES3 (features/home-street-mp-feature.js): the signpost, Note Poles, furniture for sale and restorations here.
+      engine.query?.('homeStreetVisit', { owner: visit.owner, name: visit.name, room, key: visit.key, view: visit.view, built, spots }, engine);
       if (room === 'street') {
         spawnVisitorButler(built.groundY);
         // location.js:160-168: another player's home street (not their house), one label per street.

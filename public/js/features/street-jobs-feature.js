@@ -109,7 +109,7 @@ import {
   rowFromServer,
   sharedSlice,
   topLine,
-} from '../street-jobs-mp.js?v=g346-2';
+} from '../street-jobs-mp.js?v=g360-1';
 import { grantMoodXp } from '../mood-xp.js';
 import { createMinnAccount } from '../minn-account.js?v=nbhome-10';
 import { normalizeGroups } from '../groups.js?v=g326-1';
@@ -153,6 +153,17 @@ let mpMigrated = false;
 const mpChoice = {};
 /** Is this project the server's (multiplayer, a street's build or upgrade)? */
 const shared = (jobId) => mpMode && Boolean(catalog) && isSharedJob(catalog, jobId);
+/**
+ * HOMES3: a home restoration's id on the realtime server (projectApi.register
+ * job.wire, projects.go kind "restore") and the id it has here: the owner's
+ * homes-feature keeps its own (home-proto-…), a visitor registers the wire id.
+ */
+const wireIds = new Map();
+const localIds = new Map();
+const wireOf = (jobId) => wireIds.get(jobId) || jobId;
+/** HOMES3: restorations that finished here (their unregister must not give the server's job up). */
+const finishedHere = new Set();
+const localOf = (id) => localIds.get(String(id || '')) || String(id || '');
 
 /* ------------------------------------------------------------------ */
 /* Loading                                                              */
@@ -615,9 +626,11 @@ function finishHall(engine, jobId, job, contributions, note) {
  */
 function finishRestore(engine, jobId, job, def, out) {
   const hooks = external.get(jobId);
+  finishedHere.add(jobId);
   const where = hooks?.place || 'on your home street';
   const name = phaseTitle(job, job.phases[0], def);
-  const text = `The ${name} restoration project ${where} has completed.${out.rewards.xp ? ` Since you contributed, you got ${out.rewards.xp.toLocaleString()} imagination.` : ''}`;
+  const xp = Number(out?.rewards?.xp) || 0;
+  const text = `The ${name} restoration project ${where} has completed.${xp ? ` Since you contributed, you got ${xp.toLocaleString()} imagination.` : ''}`;
   engine.pushActivity(text);
   let after = '';
   try {
@@ -1260,13 +1273,23 @@ function createMp(engine, client) {
   });
   client.on('msg:project_street', (msg) => {
     clock(msg);
-    for (const [jobId, row] of Object.entries(msg.jobs || {})) if (isSharedJob(catalog, jobId)) state.jobs[jobId] = rowFromServer(row, offset);
+    for (const [wire, row] of Object.entries(msg.jobs || {})) {
+      const jobId = localOf(wire);
+      if (isSharedJob(catalog, jobId)) state.jobs[jobId] = rowFromServer(row, offset);
+    }
     refresh();
   });
   client.on('msg:project_state', (msg) => {
     clock(msg);
-    const jobId = String(msg.job || '');
+    const jobId = localOf(msg.job);
     if (!isSharedJob(catalog, jobId)) return;
+    // HOMES3: a home restoration its owner gave up (home_projects.go homeDrop): everything put in is lost.
+    if (msg.gone === true) {
+      delete state.jobs[jobId];
+      if (work?.jobId === jobId) stopWork(engine, '');
+      refresh();
+      return;
+    }
     state.jobs[jobId] = rowFromServer(msg.row, offset);
     if (work?.mp && work.jobId === jobId && !work.awaiting) {
       const req = phaseRequirements(state, catalog, jobId).find((r) => r.id === work.rid);
@@ -1296,14 +1319,14 @@ function createMp(engine, client) {
   async function applyGiven(msg) {
     const id = String(msg.id || '');
     if (!id) return;
-    if (s.giving?.job === msg.job) s.giving = null;
+    if (s.giving?.job === localOf(msg.job)) s.giving = null;
     if (s.applying.has(id)) return;
     if (mpLists.applied.includes(id)) {
       if (await persist(engine)) client.send('project_ack', { id });
       return;
     }
     s.applying.add(id);
-    const jobId = String(msg.job || '');
+    const jobId = localOf(msg.job);
     const items = Object.entries(msg.items && typeof msg.items === 'object' ? msg.items : {});
     for (const [c, n] of items) {
       const k = Math.min(countItem(engine.inv, c), n0(n));
@@ -1341,7 +1364,7 @@ function createMp(engine, client) {
       return;
     }
     s.applying.add(id);
-    const jobId = String(msg.job || '');
+    const jobId = localOf(msg.job);
     const job = jobDef(catalog, jobId);
     const index = n0(msg.phase);
     const pc = job ? phaseClass(catalog, jobId, index) : null;
@@ -1359,6 +1382,8 @@ function createMp(engine, client) {
         index,
         phase: pc.phase,
         def: pc.def,
+        // HOMES3: a shared restoration's award names the iMG it paid (finishRestore).
+        rewards: paid,
         participation: n0(msg.participation),
         finalPhase: msg.final === true,
         phaseCount: job.phases.length,
@@ -1432,7 +1457,7 @@ function mpGive(engine, jobId, what) {
   const have = money ? n0(engine.pc.currants) : countItem(engine.inv, what.classId);
   const n = Math.min(n0(money ? what.currants : what.n), have, req.need - req.got - n0(state.jobs[jobId]?.held?.[req.id]));
   if (n <= 0) return engine.toast(money ? 'You do not have any currants to give.' : `You have no ${String(what.classId).replace(/_/g, ' ')} to give.`), false;
-  const payload = { job: jobId, req: req.id, option: mpChoice[jobId] || '' };
+  const payload = { job: wireOf(jobId), req: req.id, option: mpChoice[jobId] || '' };
   if (money) payload.currants = n;
   else payload.n = n;
   if (!s.client.send('project_give', payload)) return engine.toast(MP_TEXT.offline), false;
@@ -1471,7 +1496,7 @@ function mpTickWork(engine, now) {
     stopWork(engine, check.msg);
     return;
   }
-  if (!mp.client.send('project_work', { job: work.jobId, req: work.rid, option: mpChoice[work.jobId] || '' })) {
+  if (!mp.client.send('project_work', { job: wireOf(work.jobId), req: work.rid, option: mpChoice[work.jobId] || '' })) {
     stopWork(engine, MP_TEXT.offlineWork);
     return;
   }
@@ -1480,7 +1505,7 @@ function mpTickWork(engine, now) {
 }
 
 function mpWorked(engine, msg) {
-  if (!work?.mp || msg.job !== work.jobId || msg.req !== work.rid) return;
+  if (!work?.mp || localOf(msg.job) !== work.jobId || msg.req !== work.rid) return;
   work.awaiting = 0;
   const req = work.req;
   // items/include/jobs.js acceptJobWork: the unit's energy and tool wear (G289 loseEnergy).
@@ -1888,17 +1913,45 @@ export const projectApi = {
     if (!job?.phases?.every((p) => catalog.classes?.[p.classTsid])) return false;
     catalog.jobs[jobId] = { street: '', label: job.label || job.title, hub: '', connecting: [], ...job };
     external.set(jobId, hooks);
+    if (typeof job.wire === 'string' && job.wire) {
+      wireIds.set(jobId, job.wire);
+      localIds.set(job.wire, jobId);
+    }
     return true;
   },
   /** Forget a project (its saved row too when `dropRow`). */
   unregister(jobId, { dropRow = false } = {}) {
+    // HOMES3: the owner giving up a shared restoration before it finished (a proto removed) tells the server.
+    if (dropRow && shared(jobId) && !state.jobs[jobId]?.doneAt && !finishedHere.has(jobId)) mp?.client.send('project_home_drop', { job: wireOf(jobId) });
+    finishedHere.delete(jobId);
     if (catalog?.jobs?.[jobId] && external.has(jobId)) delete catalog.jobs[jobId];
+    localIds.delete(wireIds.get(jobId));
+    wireIds.delete(jobId);
     if (work?.jobId === jobId && engineRef) stopWork(engineRef, '');
     external.delete(jobId);
     if (dropRow) delete state.jobs[jobId];
     if (panelJobId === jobId && panel) panel.hidden = true;
   },
   registered: (jobId) => external.has(jobId),
+  /** HOMES3: the local id of a restoration the realtime server names (home_restored), or null. */
+  localFor: (wire) => (localIds.has(String(wire || '')) ? localIds.get(String(wire)) : external.has(String(wire || '')) ? String(wire) : null),
+  /**
+   * HOMES3: the realtime server says a shared restoration finished
+   * (home_restored): the owner's hook puts the item back, once. True when a
+   * registered project took it.
+   */
+  restored(engine, wire) {
+    const jobId = this.localFor(wire);
+    const hooks = jobId ? external.get(jobId) : null;
+    if (!hooks?.onDone) return false;
+    finishedHere.add(jobId);
+    try {
+      hooks.onDone(engine, { jobId, out: null, job: catalog?.jobs?.[jobId] || null });
+    } catch (err) {
+      console.warn('restored onDone', err);
+    }
+    return true;
+  },
   status: (jobId) => (catalog && catalog.jobs[jobId] ? jobStatus(state, catalog, jobId, Date.now(), opts()) : null),
   inProgress: (jobId) => jobInProgress(state, jobId),
   percent(jobId) {
@@ -1916,6 +1969,8 @@ export const projectApi = {
   /** Wine of the Dead: cancel the project (everything put in is lost). */
   cancel(engine, jobId) {
     if (work?.jobId === jobId) stopWork(engine, '');
+    // HOMES3: Wine of the Dead on a shared restoration: the server forgets what was put in.
+    if (shared(jobId)) mp?.client.send('project_home_drop', { job: wireOf(jobId) });
     const ok = cancelJob(state, jobId);
     if (ok && panelJobId === jobId) renderPanel(engine);
     return ok;

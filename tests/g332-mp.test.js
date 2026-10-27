@@ -29,7 +29,7 @@ import {
   unwrapPack,
   wrapBox,
 } from '../public/js/gifts.js?v=g332-1';
-import { giftsFeature } from '../public/js/features/gifts-feature.js?v=g359-1';
+import { giftsFeature } from '../public/js/features/gifts-feature.js?v=g360-1';
 import { HAS_SERVER, HAS_SITE, SITE_DIR, serverPath, sitePath } from '../tools/repos.mjs';
 
 const root = join(import.meta.dirname, '..');
@@ -238,7 +238,8 @@ describe('the site settles a give in the ledger and applies it on load', { skip:
     assert.match(ext, /new LedgerGift\(\$minn\)/);
     const manifest = JSON.parse(readFileSync(sitePath('minn.json'), 'utf8'));
     assert.ok(manifest.tables.groddle_gifts.some((c) => c.startsWith('PRIMARY KEY')));
-    assert.match(readFileSync(sitePath('src/Ledger.php'), 'utf8'), /LedgerGift::isGift\(\$p\['trade'\]\) \? LedgerGift::catchUp/);
+    // HOMES3 made the catch-up a match (furniture sales have their own): a give still goes through LedgerGift's.
+    assert.match(readFileSync(sitePath('src/Ledger.php'), 'utf8'), /LedgerGift::isGift\(\$p\['trade'\]\) (\?|=>) LedgerGift::catchUp/);
   });
 });
 

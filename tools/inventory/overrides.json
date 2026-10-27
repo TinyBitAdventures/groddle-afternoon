@@ -713,7 +713,9 @@
  "achievement:philanthropic_member_of_the_social_construct": {
   "status": "lost",
   "reason": "inc_jobs.js:459-463: pay over half of a project on another player's home street or yard",
-  "register": "G117"
+  "register": "G117 G328",
+  "mp": "server 7db54b1, site 7884001",
+  "mpReason": "a worn-out cultivation's restoration is shared by everyone at its home (projects.go kind restore, home_projects.go, made from the site's HomeStreet.php token); the server marks a non-owner's share over half as philanthropic (inc_jobs.js:459-463) and home-street-mp-feature.js grants it"
  },
  "item:quoin": {
   "status": "source",
@@ -838,7 +840,9 @@
  "achievement:good_neighbour": {
   "status": "lost",
   "reason": "home.js:35-37 and 250-252: five other players' homes as neighbours on your home street's signpost",
-  "register": "G134"
+  "register": "G134 G328",
+  "mp": "server 7db54b1, site 7884001",
+  "mpReason": "Edit your signpost on your home street puts buddies' homes on its five arms (site HomeSignpost.php checks buddy, home, tutorial: home.js addNeighbor 222-256); the fifth sets signpost:num_neighbors 5 (home-street-mp-feature.js)"
  },
  "location:LTJ102ANR9O1LQL": {
   "status": "excluded",
@@ -1074,7 +1078,9 @@
  "item:pile_of_currants": {
   "status": "lost",
   "reason": "furniture_base sellItem (e.g. furniture_bed.js:609) drops the pile at your house when another player buys furniture you put up for sale",
-  "register": "G125"
+  "register": "G125 G332",
+  "mp": "server 7db54b1, site 7884001",
+  "mpReason": "a visitor buys furniture the owner put up for sale (homes_street.go furn_buy, site LedgerFurniture.php at the site's price, through the ledger); the currants wait in a pile where the piece stood, for the owner, and collect pays them out (pile_of_currants.js)"
  },
  "item:gameserver": {
   "status": "excluded",
@@ -1159,8 +1165,10 @@
  },
  "item:note_pole": {
   "status": "lost",
-  "reason": "a public notice pole for the home street (recipe 303, Furnituremaking I + Construction Tool): visitors read and pin notes; build-recipes.mjs skips it (no note-board system)",
-  "register": "G125"
+  "reason": "a notice pole for your home street or house (recipe 303, Furnituremaking I + Construction Tool): the owner posts a note, visitors read it; build-recipes.mjs skips it in solo",
+  "register": "G125 G332",
+  "mp": "server 7db54b1, site 7884001",
+  "mpReason": "multiplayer only: recipe 303 joins the Construction Tool, the pole is placed at home, the owner posts a note, customizes and picks it up, visitors read it with one click (note_pole.js; site HomeStreet.php sends visitors the poles; CC0 parts from note_pole.swf)"
  },
  "item:furniture_snap_frame": {
   "status": "unbuilt_original",

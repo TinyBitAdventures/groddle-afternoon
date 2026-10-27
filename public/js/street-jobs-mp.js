@@ -32,8 +32,10 @@ const clean = (value) => String(value || '').replace(/[^a-zA-Z0-9_-]/g, '').slic
 
 /** Is this one of the projects the server shares (a street's build or upgrade, a group hall)? Homes' restorations stay per player. */
 export function isSharedJob(catalog, jobId) {
-  const kind = catalog?.jobs?.[jobId]?.kind;
-  return kind === 'street' || kind === 'upgrade' || kind === 'hall';
+  const job = catalog?.jobs?.[jobId];
+  const kind = job?.kind;
+  // HOMES3: a home restoration is shared once it has the realtime server's id (projects.go kind "restore").
+  return kind === 'street' || kind === 'upgrade' || kind === 'hall' || (kind === 'restore' && typeof job.wire === 'string' && job.wire !== '');
 }
 
 /*
