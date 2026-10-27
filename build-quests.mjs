@@ -255,6 +255,15 @@ const EXCLUDE = {
   gardening_plant_5_seed_types: 'broken_in_source',
   // gates that cannot be met
   pied_pepper: 'unreachable_in_source', zero_mood: 'unreachable_in_source', you_croaked: 'unreachable_in_source',
+  // Manor Mystery was never finished (lane juju): nothing calls quests_offer('manor_mystery') or names it
+  // in setAvailableQuests, and the Manor's events only set pc.mmquest_flag1/2 (LA9H1V6OGRU2FSB.xml
+  // check_req, set_flag); nothing archived sets mmquest_flag3, so the Basement's `complete` event
+  // (LA9EBPF8M2031HB.xml) never runs, and even then it sets the plain property pc.quest_manor_mystery_done
+  // rather than quests_set_flag (inc_quests.js:149), the only way the r468 flag requirement fills
+  // (quest.js set_flag 615-627). The end NPC, npc_juju_black, has no talk_to (debug and give_cubimal only),
+  // and no archived street holds one. Its upper floors (LDOBRJIEU2V2Q2G, LDOBRKREU2V2F9B, LHF9DOUO7K03OUA)
+  // were never archived. The inferred Hauki Seeks offer below stays for a phase 2 build.
+  manor_mystery: 'unreachable_in_source',
   // needs real other players (no local-companion stand-in exists)
   kindly_randomness: 'needs_other_players', grub_giver: 'needs_other_players', neighbor_gifts: 'needs_other_players',
   // help_mine (I Me Mine) left this list with G207: the local companions work rocks you can help

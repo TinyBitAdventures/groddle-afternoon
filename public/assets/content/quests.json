@@ -28994,7 +28994,8 @@
     "why": "\"the Manor on Hauki Seeks\""
    }
   ],
-  "solo": true
+  "solo": false,
+  "soloReason": "unreachable_in_source"
  },
  "master_milker": {
   "classTsid": "master_milker",

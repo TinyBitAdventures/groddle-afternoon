@@ -116,9 +116,12 @@ describe('classifyQuests', () => {
     // soilappreciation_1: its newxp practice street is lost; tend + dig anywhere, as its text says.
     // help_mine: the local companions work rocks you can help (G207, features/help-mine-feature.js).
     const featureQuests = ['smuggling_basic', 'build_a_tower', 'meditativearts_meditation_station', 'soilappreciation_1', 'help_mine'].length;
-    assert.equal(c.solo.length, 129 + built + featureQuests);
+    // Judged out after the 129 were counted: Manor Mystery, never offered and never finishable in the
+    // source (lane juju; build-quests.mjs EXCLUDE, tests/juju-judged.test.js).
+    const judgedOut = ['manor_mystery'].length;
+    assert.equal(c.solo.length, 129 + built + featureQuests - judgedOut);
     assert.equal(c.custom.length, 22); // + 5 Gentle Island tutorial quests (newxp-feature.js)
-    assert.equal(c.excluded.length, 294 - built - featureQuests);
+    assert.equal(c.excluded.length, 294 - built - featureQuests + judgedOut);
     assert.equal(c.byReason.job.length, 200);
     assert.equal(c.byReason.multiplayer.length, 11);
     // Gwendolyn's Task and Smuggle the Smuggler were feature_unbuilt, not among the 32.
@@ -133,7 +136,7 @@ describe('classifyQuests', () => {
     assert.ok(c.byReason.needs_other_players.includes('kindly_randomness'));
     assert.ok(c.byReason.removed_feature.includes('say_cheese'));
     assert.ok(c.custom.some((row) => row.classTsid === 'phantom_glitch'));
-    assert.equal(questOfferIndex().length, 129 + built + featureQuests);
+    assert.equal(questOfferIndex().length, 129 + built + featureQuests - judgedOut);
   });
 
   it('marks NPC-only quests whose giver the remake lacks as unreachable', () => {

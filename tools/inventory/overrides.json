@@ -1661,5 +1661,35 @@
   "status": "unbuilt_original",
   "reason": "development only: its course is in config_dev.js:168-176 (a street only in inc_data_maps_dev.js), not config_prod.js:823; no race ticket (items/race_ticket_*.js), not in clean_race_quests (players/inc_quests.js:1394); placeholder offer text",
   "register": "G329"
+ },
+ "quest:manor_mystery": {
+  "status": "unbuilt_original",
+  "reason": "never offered and never finishable in the source: nothing calls quests_offer('manor_mystery') or lists it in setAvailableQuests; the Manor's events only set pc.mmquest_flag1/2 (LA9H1V6OGRU2FSB.xml check_req, set_flag), nothing archived sets mmquest_flag3 for the Basement's complete event (LA9EBPF8M2031HB.xml), which sets the plain property pc.quest_manor_mystery_done instead of quests_set_flag (inc_quests.js:149, quest.js:615-627), and its end NPC npc_juju_black has no turn-in verb and no placement. The upper floors it hints at (Hauki Seeks Manor, floors 1-3) were never archived. build-quests.mjs EXCLUDE (unreachable_in_source)",
+  "register": "G121"
+ },
+ "npc:npc_juju_black": {
+  "status": "unbuilt_original",
+  "reason": "only quests/manor_mystery.js:20 names it (end_npcs), and the original never offered or finished that quest (quest:manor_mystery); nothing in GSJS creates it, no archived street holds one, and it has no talk_to to turn in at (debug and give_cubimal only, npc_juju_black.js:51-181). The Juju Boss's gang is red, green and yellow (npc_juju_boss.js:187-201). Its collision buffs are judged under buff:bad_mood and buff:real_bummer",
+  "register": "G121"
+ },
+ "npc:npc_bundle_of_joy": {
+  "status": "excluded",
+  "reason": "made only by the Dusty Stick's unleash (dusty_stick.js:274-311: createItemStackWithPoof at the player once the stick holds all 20 points, one point back every 12 minutes), and the stick is a staff gift for the Great Item Loss of early 2012 that nothing in GSJS grants (item:dusty_stick, G125). A Bundle lives 20 s (npc_bundle_of_joy.js onCreate, onExcited, onDie: four owner bubbles, then 'Oh no! My existen ...' and a poof into Fiber), so the ones in the Giant Living Room (LA9S04AB15F3H53) and Cebarkul (LIF12PMQ5121D68) dumps were just let loose by players, not placements",
+  "register": "G121"
+ },
+ "buff:bad_mood": {
+  "status": "excluded",
+  "reason": "applied only by a juju_base NPC bumping you, a coin flip with Real Bummer, never while either is on or while the juju spawns, shrinks or hides (npc_juju_black.js:219-235; the same block in npc_juju_red.js, npc_juju_green.js, npc_juju_yellow.js:232-239 and npc_juju_boss.js:383-390). The Juju Boss and his gang are retired (nothing creates the Boss) and the Black Juju is unbuilt_original (only Manor Mystery's end NPC). Bad Mood: 60 s, mood held at 60 or less (catalog_buffs.js:106, inc_metabolics.js:317-321). The Juju Bandits (npc_juju_bandit) never applied it",
+  "register": "G124"
+ },
+ "buff:real_bummer": {
+  "status": "excluded",
+  "reason": "applied only by a juju_base NPC bumping you, a coin flip with Bad Mood, never while either is on or while the juju spawns, shrinks or hides (npc_juju_black.js:219-235; the same block in npc_juju_red.js, npc_juju_green.js, npc_juju_yellow.js:232-239 and npc_juju_boss.js:383-390). The Juju Boss and his gang are retired (nothing creates the Boss) and the Black Juju is unbuilt_original (only Manor Mystery's end NPC). Real Bummer: 180 s, mood held at 30 or less (catalog_buffs.js:2057, inc_metabolics.js:317-321). The Juju Bandits (npc_juju_bandit) never applied it",
+  "register": "G124"
+ },
+ "item:note_manor_mystery": {
+  "status": "unbuilt_original",
+  "reason": "Strange Note: only Manor Mystery hands it out (quests/manor_mystery.js:53-55 doProvided), and the original never offered that quest (quest:manor_mystery); no archived street holds one",
+  "register": "G125"
  }
 }
