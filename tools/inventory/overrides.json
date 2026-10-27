@@ -1416,6 +1416,16 @@
   "mpReason": "radiance.go radiates to every player in range from the rank the site signs (Radiance.php); meditation-feature pays and applies each pulse",
   "register": "G330"
  },
+ "skill:martial_imagination_1": {
+  "mp": "game 221c66ab, server aa257cb",
+  "mpReason": "a Rook attack is one fight for everyone on the street, and only a player who learned Martial Imagination can start the Focusing Orb stun (rook-attack-feature.js MP_ROOK.stunSkill; the source's rook_attack stun rule)",
+  "register": "G334"
+ },
+ "skill:piety_1": {
+  "mp": "game 221c66ab, server aa257cb",
+  "mpReason": "in the street's shared Rook fight only a player who learned Piety can prime a shrine against the Rook (rook-attack-feature.js MP_ROOK.primeSkill)",
+  "register": "G334"
+ },
  "imagination:snapshotting": {
   "mp": "game ac959ce6, site ff4cd91",
   "mpReason": "the card lets Enter in Camera Mode take a Snap, kept on the site (Snaps.php) where other players' Cameras find it (player.js 2148-2173)",
