@@ -124,11 +124,11 @@ export const ROOM_NOTES = Object.freeze({
     footage: [{ id: 'BgRgIaeaj9Q', label: 'The Last Pilgrimage of Esquibeth' }, { id: 'fvin5awPESI', label: 'The Last Pilgrimage of Esquibeth (SnygystFS)' }],
   },
   being_watched: {
-    tagline: 'A beige dream and something behind the veil.',
-    about: 'Being Watched began with a stale cup of water and a nap, and a dream where eyes follow you everywhere.',
-    play: 'Hop across pillow clouds past blinking wall eyes, peek behind the veil, and find out who has been watching.',
+    tagline: 'A dark room, a TV on the ceiling, and something behind the veil.',
+    about: 'Being Watched began with a stale cup of water and a nap, and a dream in the dark where the screens follow you.',
+    play: 'Walk under the ceiling TVs as they turn to keep you in view, hop onto the dais, peek behind the veil, and find out who has been watching.',
     source: 'The five-minute nap, the Peek Behind the Veil and Ride It Out flags, and the rewards.',
-    rebuilt: "No footage or layout survives, so the dream is reimagined; the Bureaucrat's three lines behind the veil are new writing.",
+    rebuilt: "The room is laid out from a player's Snap: all black, a TV hung from the ceiling at the upper right, the sleeper alone in a dim pool of light. The TV is Tiny Speck's own Bureaucratic Hall set; the veil and the Bureaucrat's three lines behind it are new writing.",
     footage: [],
   },
   back_alley: {

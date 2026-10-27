@@ -13169,6 +13169,24 @@
       "platforms": 2,
       "decos": 141,
       "reconstructed": true
+    },
+    "GIFH2AKJ5I735SV": {
+      "label": "Winter Walk",
+      "file": "assets/streets/GIFH2AKJ5I735SV.json",
+      "hubId": "61",
+      "hubName": "Simple Level Quests",
+      "platforms": 21,
+      "decos": 169,
+      "reconstructed": true
+    },
+    "GIFNNTRK1073PQ6": {
+      "label": "Winter Haven",
+      "file": "assets/streets/GIFNNTRK1073PQ6.json",
+      "hubId": "61",
+      "hubName": "Simple Level Quests",
+      "platforms": 24,
+      "decos": 208,
+      "reconstructed": true
     }
   }
 }

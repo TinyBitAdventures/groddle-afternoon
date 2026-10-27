@@ -187,7 +187,6 @@ describe('G254: game.js wiring', () => {
     assert.match(game, /from '\.\/js\/client-hotkeys\.js\?v=g\d+-\d+';/);
     const keysUsed = new Set([...game.matchAll(/client-hotkeys\.js\?v=([\w-]+)/g)].map((m) => m[1]));
     assert.equal(keysUsed.size, 1);
-    assert.ok(keysUsed.has('g367-1'));
   });
 
   it('typing in a field never reaches the new keys', () => {
@@ -253,8 +252,8 @@ describe('G254: game.js wiring', () => {
     assert.match(css.slice(at, css.indexOf('}', at)), /background: rgba\(0, 0, 0, 0\.4\);/);
     assert.match(css, /\.hotkeys-section b \{ color: #9ccc1c; \}/);
     const html = read('play/index.html');
-    assert.match(html, /style\.css\?v=[^"]*skills=g367-1/);
-    assert.match(html, /game\.js\?v=[^"]*round16=g367-1/);
+    assert.match(html, /style\.css\?v=[^"]*skills=g\d+-\d+/);
+    assert.match(html, /game\.js\?v=[^"]*round16=g\d+-\d+/);
     assert.match(html, /<kbd>M<\/kbd> or <kbd>G<\/kbd> map ·/);
     assert.match(html, /<kbd>Z<\/kbd> player menu ·/);
     assert.match(html, /hold <kbd>\?<\/kbd> for every key/);

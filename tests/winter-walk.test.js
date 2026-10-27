@@ -29,8 +29,9 @@ test('Winter Walk uses the source timer, quest id, and first-run ice reward', ()
   assert.equal(WINTER_WALK_QUEST_ID, 'winter_walk');
   assert.equal(WINTER_WALK_DURATION_MS, 300000);
   assert.equal(WINTER_WALK_ICE_REWARD, 23);
-  assert.equal(WINTER_WALK_STREET_ID, 'GHF8LE0Q0UC3QEF');
-  assert.equal(WINTER_HAVEN_STREET_ID, 'GHFA15VS0UC3ITS');
+  // The quest's own templates (winter_walk.js:24-33), rebuilt from players' pictures (js/winter-walk-streets.js).
+  assert.equal(WINTER_WALK_STREET_ID, 'GIFH2AKJ5I735SV');
+  assert.equal(WINTER_HAVEN_STREET_ID, 'GIFNNTRK1073PQ6');
 });
 
 test('motes are stage-bound, unique, and reproduce visible iMG moments', () => {

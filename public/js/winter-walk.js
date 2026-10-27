@@ -1,7 +1,12 @@
 export const WINTER_WALK_QUEST_ID = 'winter_walk';
 export const WINTER_WALK_REPEAT_QUEST_ID = 'winter_walk_part2';
-export const WINTER_WALK_STREET_ID = 'GHF8LE0Q0UC3QEF';
-export const WINTER_HAVEN_STREET_ID = 'GHFA15VS0UC3ITS';
+/**
+ * The two instance streets (winter_walk.js:24-33 LIFH2AKJ5I735SV and
+ * LIFNNTRK1073PQ6), rebuilt from players' pictures in js/winter-walk-streets.js
+ * (they stood in on Drifa's Bright Day and Dark Cavern before).
+ */
+export const WINTER_WALK_STREET_ID = 'GIFH2AKJ5I735SV';
+export const WINTER_HAVEN_STREET_ID = 'GIFNNTRK1073PQ6';
 export const WINTER_WALK_DURATION_MS = 5 * 60 * 1000;
 export const WINTER_WALK_ICE_REWARD = 23;
 

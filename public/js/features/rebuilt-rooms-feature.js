@@ -17,6 +17,7 @@
  */
 
 import { isRebuiltRoomTsid, rebuiltRoomEcology } from '../rebuilt-rooms.js?v=g365-1';
+import { winterStreetEcology } from '../winter-walk-streets.js?v=rooms4-1';
 
 export const REBUILT_ROOMS_FEATURE_ID = 'rebuilt-rooms';
 
@@ -26,7 +27,8 @@ export const rebuiltRoomsFeature = {
   id: REBUILT_ROOMS_FEATURE_ID,
 
   ecologyOverride(street) {
-    return rebuiltRoomEcology(street?.tsid);
+    // Winter Walk and Winter Haven (js/winter-walk-streets.js) are empty too: the route clears them.
+    return rebuiltRoomEcology(street?.tsid) || winterStreetEcology(street?.tsid);
   },
 
   onStreetEnter(street, engine) {

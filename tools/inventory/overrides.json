@@ -1284,6 +1284,31 @@
   "reason": "Ethereal Endeavour: rebuilt from a picture (G159). No geometry or code survives (inc_data_maps_prod.js:17711 only); Cleops' Old Ethereal Endeavour snap (Flickr 8406081612, reference only) matches the newxp brain art, so the room is the brain end of And so it begins... (GA614AEMKBD2UCC, newxp.swf, CC0) mirrored, membrane and EXIT at the left (public/js/rebuilt-rooms.js). In through Doonboggle Trail's door_1343415170600 (Door Key 1, connect -264,-159), out through the oval",
   "register": "G159"
  },
+ "location:LIFH2AKJ5I735SV": {
+  "status": "reimagined",
+  "reason": "Winter Walk: rebuilt from pictures (G352). No geometry survives (winter_walk.js:28, inc_data_maps_prod.js:17936 only); Cleops' 2013-01-26 snaps (Flickr 8417912672, 8417912992), URvonb's snap 111722-054d9a5777 (Flickr 8264519059) and reelasitgets' (Flickr 8273330942), reference only, give the snowy wood: the Juju camp's teepee and campfire at the left end where onStarted drops you (-2875,-81), bare dead trees, snowy scrub and firs, a basalt overhang and snow pillars at the right, built from CC0 Alakol, Heights and Juju camp decos (public/js/winter-walk-streets.js, tools/build-rebuilt-rooms.mjs); the timed route (js/winter-walk.js) runs on it",
+  "register": "G352"
+ },
+ "location:LIFNNTRK1073PQ6": {
+  "status": "reimagined",
+  "reason": "Winter Haven: rebuilt from pictures (G352). No geometry survives (winter_walk.js:32, inc_data_maps_prod.js:17934 only); Cleops' 2013-01-26 snaps (Flickr 8416817115, 8416817377, 8416817629, 8417913246), reference only, give the basalt wall with icicles, the plank boardwalk on trestles over snowy rubble, snow pillars on dark drums (short, tall, short; then rising tops), the fire out of a drum cluster and the ladder up to the EXIT, built from CC0 Alakol and wood decos (public/js/winter-walk-streets.js); the route's EXIT ladder stands on the top landing",
+  "register": "G352"
+ },
+ "location:LIFNBTGUQJ739MC": {
+  "status": "reimagined",
+  "reason": "Winter Walk (winter_walk_part2's copy, winter_walk_part2.js:25): the hourly repeat runs on the rebuilt Winter Walk (GIFH2AKJ5I735SV, public/js/winter-walk-streets.js), laid out from players' pictures (G352), with the source's rewardless repeat rules (js/winter-walk.js)",
+  "register": "G352"
+ },
+ "location:LIFNEN3QHC73UO9": {
+  "status": "reimagined",
+  "reason": "Winter Haven (winter_walk_part2's copy, winter_walk_part2.js:29): the hourly repeat runs on the rebuilt Winter Haven (GIFNNTRK1073PQ6, public/js/winter-walk-streets.js), laid out from players' pictures (G352)",
+  "register": "G352"
+ },
+ "location:LIFHAO6QB4A34MO": {
+  "status": "reimagined",
+  "reason": "Being Watched: the quest room (js/quest-rooms/being-watched.js) is laid out from a picture (G352). No geometry survives (stale_but_necessary.js prod_tsid only); Arthur DentUre's 2012-12-13 snap (Flickr 8270858639, reference only) shows an all-black room with a ceiling TV glowing at the upper right and the sleeper alone in a dim pool of light: the CC0 Bureaucratic Hall TV (bureaucratic_hall_tv_1), sets that turn to face you, a light that follows you; the veil and the booth's lines stay new writing",
+  "register": "G352"
+ },
  "buff:max_luck": {
   "status": "excluded",
   "reason": "Only rubeweed and the /max_luck admin command applied it (main.js:2686); since G151 rubeweed applies Luck of the Rube, so max_luck is a dev command here",

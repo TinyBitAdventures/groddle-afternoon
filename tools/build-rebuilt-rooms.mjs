@@ -5,6 +5,8 @@
  * point the doors that lead in at them: Abbasid River's door_1353965313720,
  * Abbasid Jail's door_1353965060768, Doonboggle Trail's locked
  * door_1343415170600 (Door Key 1) and Rookthills Lay's locked door_1 (Door Key 2).
+ * Also Winter Walk and Winter Haven (public/js/winter-walk-streets.js), the
+ * two streets the timed Winter Walk route runs on (no doors lead in).
  * Each door's own connect x/y is kept and snapped to the rebuilt floor. Safe to
  * re-run; run it again after a street re-import or a build-street-navigation.mjs
  * pass.
@@ -46,6 +48,14 @@ import {
   snowedInIndexEntry,
   snowedInStreet,
 } from '../public/js/rebuilt-rooms.js';
+import {
+  WINTER_HAVEN_TSID,
+  WINTER_WALK_TSID,
+  winterHavenIndexEntry,
+  winterHavenStreet,
+  winterWalkIndexEntry,
+  winterWalkStreet,
+} from '../public/js/winter-walk-streets.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const streetsDir = join(root, 'public/assets/streets');
@@ -144,6 +154,16 @@ function indexRow(tsid, row) {
   put(`${GROWING_STUFF_TSID}.json`, `${JSON.stringify(room)}\n`);
   put(`${ABBASID_JAIL_TSID}.json`, `${JSON.stringify(jail)}\n`);
   indexRow(GROWING_STUFF_TSID, growingStuffIndexEntry(room));
+}
+
+// Winter Walk and Winter Haven: the quest's two instance streets, entered only by the route (js/winter-walk.js).
+{
+  const walk = winterWalkStreet();
+  put(`${WINTER_WALK_TSID}.json`, `${JSON.stringify(walk)}\n`);
+  indexRow(WINTER_WALK_TSID, winterWalkIndexEntry(walk));
+  const haven = winterHavenStreet();
+  put(`${WINTER_HAVEN_TSID}.json`, `${JSON.stringify(haven)}\n`);
+  indexRow(WINTER_HAVEN_TSID, winterHavenIndexEntry(haven));
 }
 
 if (indexChanged) put('index.json', `${JSON.stringify(index, null, 2)}\n`);

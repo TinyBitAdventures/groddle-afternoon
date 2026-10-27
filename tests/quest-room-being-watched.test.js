@@ -1,7 +1,8 @@
 /**
  * Being Watched (public/js/quest-rooms/being-watched.js): source constants
- * from quests/stale_but_necessary.js, the reconstructed dream's reach, and the
- * veil flow on a stub room context.
+ * from quests/stale_but_necessary.js, the dark room after Arthur DentUre's
+ * snap (Flickr 8270858639, reference only), its reach, and the veil flow on a
+ * stub room context.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,20 +16,22 @@ import { JUMP_RISE, JUMP_GAP } from '../public/js/quest-rooms/puzzle-kit.js';
 import {
   DAIS,
   DRINK_TEXT,
-  EYES,
   FLAGS,
   FLOOR,
+  MONITORS,
   NAP_MS,
-  PILLOWS,
   QUEST,
   SPAWN,
+  TV,
   VEIL_TALK,
   VEIL_X,
   W,
+  WATCH_RANGE,
   canPeek,
+  facing,
   napPlatforms,
-  pupilOffset,
   room,
+  watching,
 } from '../public/js/quest-rooms/being-watched.js';
 import { QUEST_ROOMS } from '../public/js/quest-rooms/catalog.js';
 
@@ -59,7 +62,7 @@ describe('Being Watched (stale_but_necessary) source', () => {
 
   it('ships its icon and the recovered art it draws', () => {
     assert.ok(existsSync(join(root, 'public', room.icon)), room.icon);
-    for (const deco of ['cloud_fluffy_1', 'cloud_fluffy_2', 'block_cloud01', 'bureaucratic_hall_tv_1']) {
+    for (const deco of ['bureaucratic_hall_tv_1', 'light_spot', 'groddle_light_pool']) {
       assert.ok(existsSync(join(root, 'public/assets/decos/groddle', `${deco}.webp`)), deco);
     }
     const art = readFileSync(join(root, 'public/js/quest-rooms/being-watched.js'), 'utf8');
@@ -69,20 +72,54 @@ describe('Being Watched (stale_but_necessary) source', () => {
   });
 });
 
-describe('Being Watched dream geometry', () => {
+describe('Being Watched, dark as the snap shows it', () => {
+  const src = readFileSync(join(root, 'public/js/quest-rooms/being-watched.js'), 'utf8');
+
+  it('hangs the Bureaucratic Hall TV from the ceiling, as in the snap, at its own proportions', () => {
+    assert.equal(TV.sprite, 'bureaucratic_hall_tv_1');
+    const manifest = JSON.parse(readFileSync(join(root, 'public/assets/decos/manifest.json'), 'utf8'));
+    assert.ok(manifest.includes(TV.sprite));
+    assert.ok(MONITORS.length >= 3);
+    for (const m of MONITORS) {
+      assert.ok(m.x > SPAWN.x && m.x < DAIS.x1, `set at ${m.x} hangs over the walk`);
+      // The snap: the set's foot well above the avatar's head, the whole set in the top of the view.
+      assert.ok(FLOOR - m.y >= 150 && FLOOR - m.y <= 240, `set foot ${FLOOR - m.y} above the floor`);
+    }
+    // The first set hangs ahead of where you wake, clear of the room card (upper right in the snap).
+    assert.ok(MONITORS[0].x - SPAWN.x > 600 && MONITORS[0].x - SPAWN.x < 800);
+  });
+
+  it('is black with no beige dream: no clouds, no wall eyes, the avatar keeps its colours', () => {
+    assert.match(src, /'#020203'/);
+    assert.doesNotMatch(src, /cloud_fluffy|block_cloud01|desaturate|setPlain|0xead6a8/);
+  });
+
+  it('each set turns to face you and counts as watching only then', () => {
+    const m = MONITORS[1];
+    assert.equal(facing(m, m.x - 200), 1);
+    assert.equal(facing(m, m.x + 200), -1);
+    assert.equal(facing(m, m.x + 4, -1), -1, 'no flapping right under the set');
+    assert.equal(watching(m, m.x - 200), true);
+    assert.equal(watching(m, m.x + 200), true);
+    assert.equal(watching(m, m.x + 200, 1), false, 'facing away');
+    assert.equal(watching(m, m.x - WATCH_RANGE - 50), false, 'too far');
+  });
+});
+
+describe('Being Watched geometry', () => {
   const plats = napPlatforms(kit);
   const floor = plats.find((p) => p.id === 'bw_floor');
 
-  it('lets an ordinary jump reach every ledge and the dais', () => {
+  it('is the floor and the dais, one ordinary jump up', () => {
     assert.equal(floor.x1, 0);
     assert.equal(floor.x2, W);
+    assert.deepEqual(plats.map((p) => p.id), ['bw_floor', 'bw_dais']);
     for (const p of plats.filter((q) => q !== floor)) {
       const below = plats.filter((q) => q !== p && q.y1 > p.y1 && q.x2 >= p.x1 - JUMP_GAP && q.x1 <= p.x2 + JUMP_GAP);
       const rise = Math.min(...below.map((q) => q.y1 - p.y1));
       assert.ok(rise <= JUMP_RISE, `${p.id} rises ${rise}`);
     }
     assert.ok(FLOOR - DAIS.y <= JUMP_RISE);
-    assert.ok(DAIS.x1 > PILLOWS.at(-1).x2, 'the dais is past the last pillow');
   });
 
   it('keeps the veil and spawn where the player can see them', () => {
@@ -98,14 +135,6 @@ describe('Being Watched dream geometry', () => {
     assert.equal(canPeek(VEIL_X - 400, DAIS.y), false);
   });
 
-  it('keeps pupils inside their eyes', () => {
-    for (const e of EYES) {
-      for (const [x, y] of [[0, FLOOR], [W, FLOOR], [e.x, e.y + 400], [e.x + 1, e.y - 900]]) {
-        const o = pupilOffset(e, x, y);
-        assert.ok(Math.hypot(o.x, o.y) <= e.r * 0.45 + 1e-9);
-      }
-    }
-  });
 });
 
 describe('Being Watched veil', () => {

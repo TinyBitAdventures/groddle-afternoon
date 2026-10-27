@@ -75,7 +75,7 @@ export const OWNED_STREETS = Object.freeze({
   GHFQOLEIHN63P27: 'paradise', GHFCVOD2GN631RJ: 'paradise', GHFCS002GN63BRB: 'paradise',
   GNVV9IM8PL4301V: 'summers-day',
   GNVD57N9ERF3TNH: 'greedy-street-spirit',
-  GHF8LE0Q0UC3QEF: 'winter-walk', GHFA15VS0UC3ITS: 'winter-walk',
+  GIFH2AKJ5I735SV: 'winter-walk', GIFNNTRK1073PQ6: 'winter-walk',
 });
 
 export function streetOwner(tsid) {
