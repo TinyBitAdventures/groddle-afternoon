@@ -286,10 +286,19 @@ function refreshSeason(engine, force = false) {
   for (const id of next.ids) {
     if (!was.includes(id) && engine.started) say(engine, `${SEASONS[id].label} has come to Ur!`);
   }
-  if (was.includes('zilloween') && !next.ids.includes('zilloween')) rotPumpkins(engine);
-  state.lastActive = [...next.ids];
+  // ?season= and ?seasondate= preview a season for this load only: they never rot a
+  // save's carved pumpkins or change which season it last saw (G342).
+  if (!isPreview(engine, next)) {
+    if (was.includes('zilloween') && !next.ids.includes('zilloween')) rotPumpkins(engine);
+    state.lastActive = [...next.ids];
+  }
   renderChip(engine);
   return true;
+}
+
+/** A season shown by a QA param rather than the calendar (js/seasons.js activeSeasons via). */
+function isPreview(engine, next) {
+  return next.via === 'override' || parseSeasonDate(engine?.param?.('seasondate')) != null;
 }
 
 function rotPumpkins(engine) {

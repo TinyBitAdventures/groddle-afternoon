@@ -336,3 +336,22 @@ describe('supply paths', () => {
     assert.ok(carve.outputs.includes('pepitas'));
   });
 });
+
+describe('a ?season= preview leaves the save alone (G342)', () => {
+  it('a carved pumpkin survives previewing another season, and the save still remembers Zilloween', async () => {
+    const { seasonsFeature } = await import('../public/js/features/seasons-feature.js');
+    const { createInventory, addItem, countItem } = await import('../public/js/inventory.js?v=catalog-unified-7');
+    const inv = createInventory();
+    addItem(inv, 'pumpkin_carved_1', 2);
+    let saved = 0;
+    const params = { season: 'glitchmas' };
+    const engine = { inv, started: true, param: (k) => params[k] ?? null, save() { saved++; } };
+    seasonsFeature._reset();
+    seasonsFeature.restore({ lastActive: ['zilloween'] }, engine);
+    seasonsFeature.init(engine); // refreshSeason(engine, true)
+    assert.equal(countItem(inv, 'pumpkin_carved_1'), 2, 'the pumpkins are still carved');
+    assert.deepEqual(seasonsFeature._state().state.lastActive, ['zilloween']);
+    assert.equal(saved, 0, 'nothing was saved by the preview');
+  });
+});
+
