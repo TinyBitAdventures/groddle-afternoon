@@ -102,7 +102,7 @@ export const CHECKLIST = Object.freeze([
   // —— Creatures & trees ——
   { id: 'piggies', group: 'creatures', name: 'Piggies', status: 'source', spot: 'piggy',
     blurb: 'Pet, nibble for meat, feed, name, capture and incubate, with the exact Animal Kinship tables; piggies keep a mood and hunger, sulk in gloomy places and wander over to eat dropped food.',
-    multiplayer: 'A street Piggy is everyone’s: its mood, hunger and daily clock, and who petted, nibbled or fed it, are kept by the server, and a hungry one eats a tree’s fruit in front of everyone.',
+    multiplayer: 'A street Piggy is everyone’s: its mood, hunger and daily clock, and who petted, nibbled or fed it, are kept by the server, and a hungry one eats a tree’s fruit in front of everyone; a server restart keeps them.',
     evidence: ['public/js/animal-kinship.js', 'public/js/animal-husbandry.js'] },
   { id: 'chickens', group: 'creatures', name: 'Chickens', status: 'source', spot: 'chicken',
     blurb: 'Squeeze for grain, incubate eggs, raise chicks.',
@@ -112,7 +112,7 @@ export const CHECKLIST = Object.freeze([
     evidence: ['public/js/animal-kinship.js', 'public/js/tools.js'] },
   { id: 'trants', group: 'creatures', name: 'Trants and Wood Trees', status: 'source', spot: 'tree',
     blurb: 'Six living trees to pet, water and harvest (with super harvests), Wood Trees for planks, and Tree Poison: a poisoned tree dies into a dead tree you clear and replant.',
-    multiplayer: 'Trees are shared by everyone on the street: a harvest by anyone wears a Wood Tree down, and a tree the Rook rooks loses its fruit for everyone until it is revived. Tree Poison, its antidote and a tree’s death are everyone’s too: a poisoned tree dies for the whole street, and its Planks fall for the one who poured it.',
+    multiplayer: 'Trees are shared by everyone on the street: a harvest by anyone wears a Wood Tree down, and a tree the Rook rooks loses its fruit for everyone until it is revived. Tree Poison, its antidote and a tree’s death are everyone’s too: a poisoned tree dies for the whole street, and its Planks fall for the one who poured it. A tree’s poison, its death and the Rook’s damage survive a server restart.',
     evidence: ['public/js/trants.js', 'public/js/trant-care.js', 'public/js/woodcutting.js', 'public/js/tree-poison.js'] },
   { id: 'batterflies', group: 'creatures', name: 'Batterflies and guano', status: 'source',
     blurb: 'Cave Batterflies that turn food into guano, and the bar that boosts them.',
