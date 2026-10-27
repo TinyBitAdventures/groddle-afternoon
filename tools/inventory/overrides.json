@@ -1405,6 +1405,11 @@
   "mpReason": "radiance.go radiates to every player in range from the rank the site signs (Radiance.php); meditation-feature pays and applies each pulse",
   "register": "G330"
  },
+ "imagination:snapshotting": {
+  "mp": "game ac959ce6, site ff4cd91",
+  "mpReason": "the card lets Enter in Camera Mode take a Snap, kept on the site (Snaps.php) where other players' Cameras find it (player.js 2148-2173)",
+  "register": "G332"
+ },
  "imagination:transcendental_radius_1": {
   "mp": "game b66b2948, server 0c75b7e, site d352b8b",
   "mpReason": "radiance.go widens the range by 1.5 from the cards the site signs",
