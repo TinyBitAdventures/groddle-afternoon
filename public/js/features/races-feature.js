@@ -88,7 +88,7 @@ import { runStreetTransition } from '../screen-fx.js?v=card-2';
 import { CROWNS_STREET, CROWNS_TICKET, CROWNS_TITLE } from '../game-of-crowns.js?v=crowns-2';
 import { HOG_HAUL_STREET_ID } from '../hog-haul.js?v=hog-haul-2';
 import { QUOIN_GRAB_SPLASH, RACE_SPLASH, splashFor } from '../game-splash.js?v=g311-1';
-import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g334-5';
+import { crownsMpChallenge, startCrowns } from './crowns-feature.js?v=g334-6';
 import { startHogHaulMp } from './hog-haul-mp-feature.js?v=g334-hog-1';
 import { textureFromUrl } from '../textures.js';
 import { QUOIN_SHEET, QUOIN_TYPES } from '../quoins.js?v=desk2-1';
@@ -160,6 +160,8 @@ let mpReadyAt = 0;
 let mpFinishAt = 0;
 let mpLast = '';
 let mpAsked = false; // race_pending sent, no race_ticket yet
+/** race_ticket.js:119, the ticket's words for a dead player. */
+const MP_TOO_DEAD = 'You are too dead to be racing around.';
 
 /* ------------------------------------------------------------------ */
 /* Items                                                              */
@@ -1293,6 +1295,21 @@ function mpAttach(engine) {
     publish(engine);
   });
   c.on('msg:race_match', (msg) => {
+    if (!run && engine.query?.('isDead', engine) === true) {
+      // G334: croaked while the start ran. The dead do not race (race_ticket.js:119; location.js
+      // onPlayerEnter 85-89 sends them back to Hell, instance.js 343-363 takes them out of the game):
+      // leave the match at once. The server normally leaves a player in Naraka out (races.go start).
+      if (msg?.match) c.send('race_leave', { match: String(msg.match) });
+      if (hud) hud.banner.hidden = true;
+      record.pendingTicket = null;
+      starting = false;
+      engine.toast(MP_TOO_DEAD, 3600);
+      engine.pushActivity(MP_TOO_DEAD);
+      engine.save();
+      mpNote(engine, 'dead');
+      publish(engine);
+      return;
+    }
     if (msg?.course === HOG_HAUL_GAME_ID && !run) {
       // The Great Hog Haul runs on its own street (hog-haul-mp-feature); the ticket is spent once it opens.
       if (hud) hud.banner.hidden = true;

@@ -26,8 +26,9 @@
  *   challenge) fails it; race_end with you the winner sets
  *   multiplayer_quest_win, anyone else winning fails it; arriving on a
  *   street that is no race afterwards sets race_leave, which completes it.
- *   These flags are routed to the race quest alone (the solo Great Hog Haul,
- *   hogtie_piggy, has the same two flags).
+ *   These flags are routed to the race quest alone (several quests share the
+ *   two flags). A Great Hog Haul Ticket's challenge logs hogtie_piggy the same
+ *   way (G334 lane RACES3: its race_end is the server's hoghaul.go win).
  *
  * QA: canvas data questsMpFacts (facts kept), questsMpRace (course:state of
  * the race quest in hand), questsMpLast (the last thing counted);
@@ -51,7 +52,7 @@ import {
   isRaceStreet,
   normalizeQuestsMpSlice,
   tradeHoochCount,
-} from '../quests-mp.js?v=g329-4';
+} from '../quests-mp.js?v=g329-5';
 
 export const QUESTS_MP_FEATURE_ID = 'quests-mp';
 const FACT_CHECK_MS = 1_000;

@@ -4,7 +4,7 @@
  */
 import { getVerbsFor, runVerb, ITEM_ICONS, ITEM_LABELS } from './content.js?v=woodcutting-test-15';
 import { createFeatureHost } from './js/feature-host.js?v=features-3';
-import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-174';
+import { FEATURES, questFlagsFeature } from './js/features/index.js?v=registry-175';
 import { buildEnterChoices, planEnter, createEnterChooser, enterPromptLabel, trimmedIconUrl } from './js/enter-chooser.js?v=g217-1';
 import { createVogOverlay } from './js/vog-overlay.js?v=g228-1';
 import { createPromptStack } from './js/prompt-stack.js?v=g294-1';
@@ -3336,7 +3336,8 @@ function updateHud() {
               .join(' · ')}`;
         card.appendChild(hint);
       }
-      if (p.active && p.def.classTsid === HOG_HAUL_QUEST_ID && !hogHaulIsInstanced()) {
+      // G334: in multiplayer the Hog Haul is raced between players by ticket (races.go), never against the bot.
+      if (isSolo() && p.active && p.def.classTsid === HOG_HAUL_QUEST_ID && !hogHaulIsInstanced()) {
         const raceButton = document.createElement('button');
         raceButton.type = 'button';
         raceButton.className = 'content-action-btn';
@@ -19799,7 +19800,8 @@ function canOfferStoryQuest(classTsid) {
       !deEmbiggenifyIsInstanced()
     );
   }
-  if (classTsid === HOG_HAUL_QUEST_ID) return !hogHaulIsInstanced();
+  // G334: multiplayer logs the Hog Haul by its ticket's challenge (js/quests-mp.js), not the bot race.
+  if (classTsid === HOG_HAUL_QUEST_ID) return isSolo() && !hogHaulIsInstanced();
   if (classTsid === ROOK_QUEST_ID) {
     return !questState.completed.includes(ROOK_QUEST_ID) && !rookWoodsIsInstanced();
   }

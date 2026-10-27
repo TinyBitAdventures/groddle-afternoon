@@ -92,12 +92,30 @@
  * 533-538), which completes a won race's quest. Only the challenger holds
  * the quest (inc_race.js quest_owner), as in the source.
  *
+ * The Great Hog Haul (hogtie_piggy, G334 lane RACES3) is logged the same way:
+ * quests/hogtie_piggy.js is a quest race too (is_multiplayer, familiar_turnin,
+ * repeatable, no rewards; r273 multiplayer_quest_win, r274 race_leave), the
+ * Hog Haul is one of the source's race quests (inc_quests.js
+ * clean_race_quests 1394), and a Great Hog Haul Ticket's challenge
+ * (race_ticket_hogtie_piggy.js, races.go course hogtie_piggy) now logs it for
+ * the challenger. The haul's win is the server's (hoghaul.go race_end); the
+ * counters the source keeps for it are hogtie_piggy:won and :lost
+ * (inc_games.js games_end_hogtie_piggy 2136, 2149), counted by
+ * hog-haul-mp-feature from that race_end. No badge or trophy reads them
+ * (achievements/inc_data_counters.js has no hogtie_piggy group), and the quest
+ * pays nothing, so data/economy.json has no row for it. Solo's own Hog Haul
+ * (the bot race the quest log offers) stays solo.
+ *
  * Left out (MULTIPLAYER_QUESTS_LEFT_OUT says what each would need).
  */
 
-/** The quest races' courses (js/races-mp.js MP_RACE_COURSES): each course id is its quest's class. */
+/**
+ * The quest races' courses (js/races-mp.js MP_RACE_COURSES, and the Hog Haul's,
+ * js/hog-haul-mp.js HOG_MP_COURSE): each course id is its quest's class.
+ */
 export const MP_RACE_QUESTS = Object.freeze([
   'amazing_race', 'canyon_run', 'crystal_climb', 'grab_em_good', 'lava_leap', 'space_race', 'star_sprint', 'time_warp',
+  'hogtie_piggy',
 ]);
 
 /** The source's counter and flag names these quests use. */

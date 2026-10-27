@@ -613,6 +613,15 @@ function publish(engine) {
  * and 50 currants (the currants already in the site's ledger, applied once
  * through ledgerReceipt), it_game:won / lost / seconds_with_crown. Solo never
  * reaches any of this (mp is only set from a crown_match).
+ *
+ * G334 (lane RACES3): a reload is a logout (instance.js player_logout 380-394:
+ * playerLeft and games_auto_leave): the page comes back where the challenge
+ * was made and is out of the game, which goes on for the rest (global_game.js
+ * playerLeft 803-813). A page holding a spent ticket it never saw become a
+ * game asks the server (crown_pending -> crown_ticket, as races-feature's
+ * race_pending): a street change never refunds in multiplayer. The dead do not
+ * play (race_ticket_it_game.js:119; location.js onPlayerEnter 85-89 sends them
+ * back to Hell): a crown_match that reaches a dead player is left at once.
  */
 let mp = null; // { match, street, slot, spawn, players, playLine, locks, winMs, myId, status, round, state, ready, acked, readyAt, below, result }
 let mpClient = null;
@@ -622,7 +631,13 @@ let mpMustWaitUid = null;
 let mpChallenging = false;
 let mpAccepting = false;
 let mpStarting = false;
+let mpAsked = false; // crown_pending sent, no crown_ticket yet
 let mpLast = '';
+/** race_ticket_it_game.js:119, the ticket's words for a dead player. */
+const MP_TOO_DEAD = 'You are too dead to be racing around.';
+const MP_LEFT = 'You left the Game of Crowns.';
+let mpLeftNote = false; // this page reloaded out of an arena (reloadLocation)
+let mpLeftTold = false; // the player has been told they left this game
 let mpAppliedIds = []; // crown_reward ids this save applied (kept in the slice)
 const mpCounted = new Set(); // match:round counters applied this session
 const mpApplying = new Set();
@@ -636,6 +651,23 @@ function isMp(engine) {
 function mpNote(engine, what) {
   mpLast = what;
   engine.setData?.('crownsMpLast', what);
+}
+
+function mpDead(engine) {
+  return engine?.query?.('isDead', engine) === true;
+}
+
+/**
+ * G349 for crowns: a spent ticket this page holds for a challenge it never
+ * saw end (a reload, a dropped socket, a croak or teleport while it waited).
+ * The server says what became of it (crown_ticket, or crown_failed for a
+ * challenge still open); entering a street never refunds in multiplayer.
+ */
+function mpAskPending(engine) {
+  const c = mpClient;
+  if (!c || c.state !== 'online' || mpAsked || !record.pendingTicket || mpBusy()) return;
+  mpAsked = c.send('crown_pending', {}) !== false;
+  mpNote(engine, 'pending');
 }
 
 function mpBusy() {
@@ -791,7 +823,20 @@ function mpAttach(engine) {
     publish(engine);
   });
   c.on('msg:crown_match', (msg) => {
+    if (mpDead(engine) && !mp && !game && !pending) {
+      // Croaked while the start ran: back to Hell, out of the game (the ticket was spent on it).
+      if (msg?.match) c.send('crown_leave', { match: String(msg.match) });
+      mpStarting = false;
+      record.pendingTicket = null;
+      engine.toast(MP_TOO_DEAD, 3600);
+      engine.pushActivity(MP_TOO_DEAD);
+      engine.save();
+      mpNote(engine, 'dead');
+      publish(engine);
+      return;
+    }
     const info = normalizeCrownsMatch(msg);
+    mpLeftTold = false;
     if (!info || mp || game || pending) {
       if (msg?.match) c.send('crown_leave', { match: String(msg.match) });
       mpStarting = false;
@@ -912,6 +957,10 @@ function mpAttach(engine) {
   c.on('msg:crown_left', (msg) => {
     // Leaving a running game: the crown time you had goes on your badges (playerLeft -> games_is_not_it).
     const key = `${msg.match}:${msg.round}`;
+    // Out of the arena with the game still on (a reload, another street): it goes on without you
+    // (global_game.js playerLeft 803-813).
+    if (!mp && !mpLeftTold && !mpCounted.has(key)) engine.pushActivity(MP_LEFT);
+    mpLeftTold = true;
     const seconds = Math.max(0, Math.floor(Number(msg.seconds) || 0));
     if (!mpCounted.has(key)) {
       mpCounted.add(key);
@@ -926,6 +975,33 @@ function mpAttach(engine) {
     leave(engine);
   });
   c.on('msg:crown_reward', (msg) => mpApplyReward(engine, msg));
+  // G349 for crowns: what became of a spent ticket's challenge, when this page asks (mpAskPending).
+  c.on('msg:crown_ticket', (msg) => {
+    mpAsked = false;
+    if (!record.pendingTicket || mp) return;
+    if (msg.refund === true) {
+      mpRefund(engine);
+      engine.toast(String(msg.text || 'Your game never started, so your ticket was returned.'), 3600);
+    } else {
+      record.pendingTicket = null;
+      engine.save();
+    }
+    mpNote(engine, `ticket:${msg.refund === true ? 'refund' : 'spent'}`);
+    publish(engine);
+  });
+  // Every (re)connect: the server called off any open challenge this page had (crowns.go onDisconnect).
+  c.on('hello', () => {
+    mpAsked = false;
+    if (!mp && (mpChallenging || mpAccepting || mpStarting)) {
+      // A filled challenge waits for its start, which counts whoever is online then.
+      mpChallenging = false;
+      mpAccepting = false;
+      mpStarting = false;
+      mpClearPrompts(engine);
+    }
+    mpAskPending(engine);
+  });
+  if (c.state === 'online') mpAskPending(engine);
   return c;
 }
 
@@ -1249,8 +1325,10 @@ export const crownsFeature = {
     };
   },
 
-  reloadLocation(saved) {
+  reloadLocation(saved, engine) {
     if (saved?.tsid === CROWNS_STREET) {
+      // G334: in multiplayer a reload out of the arena is a logout: out of the game (told on arrival).
+      if ((engine || engineRef)?.mode === 'multiplayer') mpLeftNote = true;
       const back = record.returnTo;
       return back ? { tsid: back.tsid, x: back.x, y: back.y } : { tsid: 'GLI2V0UN7RD1T2J', x: 600, y: 700 };
     }
@@ -1290,12 +1368,17 @@ export const crownsFeature = {
     }
     // Anywhere else, a multiplayer game is over for this player.
     if (mp && street.tsid !== CROWNS_STREET) mpDrop(engine);
+    if (mpLeftNote && street.tsid !== CROWNS_STREET) {
+      mpLeftNote = false;
+      mpLeftTold = true;
+      engine.pushActivity(MP_LEFT);
+    }
     if (street.tsid !== CROWNS_STREET) {
-      // In multiplayer a ticket spent on a challenge still in flight comes back only
-      // when the server says it failed (crown_failed; inc_games.js 2448-2450): a croak
-      // to Hell One during the start is a street change, not a failed challenge (G349).
-      const inFlight = isMp(engine) && (mpChallenging || mpAccepting || mpStarting);
-      if (record.pendingTicket && !inFlight) {
+      // In multiplayer a spent ticket comes back only when the server says the challenge
+      // failed (crown_failed / crown_ticket; inc_games.js 2448-2450): a croak to Hell One
+      // during the start or a reload is a street change, not a failed challenge (G349).
+      if (engine.mode === 'multiplayer') mpAskPending(engine);
+      else if (record.pendingTicket) {
         addItem(engine.inv, record.pendingTicket, 1);
         record.pendingTicket = null;
         engine.toast('Your game never started, so your ticket was returned.', 3600);
